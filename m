@@ -1,164 +1,177 @@
-Return-Path: <netdev+bounces-210044-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210045-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8AA1B11EFB
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 14:46:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D7EFB11F03
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 14:48:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 91A5A188934B
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 12:46:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D8F1189080D
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 12:48:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 355772D027F;
-	Fri, 25 Jul 2025 12:46:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A0092628C;
+	Fri, 25 Jul 2025 12:47:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f78.google.com (mail-io1-f78.google.com [209.85.166.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 867EC2E36E3
-	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 12:46:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B818134BD
+	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 12:47:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753447593; cv=none; b=h1pKkefKl/FGbjKAFoJSrf8BN/dQaFVMZeTFVIx+t/x0HP80PTS6yhFLXvLPjdKu7qPwO4HJ1Qg+UL68zdtPY3lBgOXZPLsuISfAYbgy5P0ohyL+1cEyv6gGcwWEj8TC1M6RyArVMb62NDzAMu6rl/oBYPgQdGn0WkGO3g4NjZw=
+	t=1753447676; cv=none; b=hlcAC3jfHfMf3pxgXvQxZLlopMnUQcdL5tETf7alXOVnRipfSzH6zyrDLntW4FNI0Ix6h0E1RxqyCsQby2UNYEtvIO6IdFOB4WU+msGSLV6PH6fz8HGqyL0P4E5LI38LBWkbxzzrrSyKLiKDHLRAQ/ZQdVJ799ew3p1R5YzwXrM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753447593; c=relaxed/simple;
-	bh=qm7IYgwWsCevniBDmNoxwlw3iwTZXJXBKMafkaJPtwA=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Sbh27yrYP0RCdMl15YkWe9QBoPHlXvIBETSLsvoEd1IXpSat2f6OkALG7gc+humeOrkrHWgMu0hzNcDaKZroeWkTYY4aFjqd5dCGphKfKqwr51IvZK2acR3wmryIpojCULHhvwWCjA0kXPJLot3YArHH6HRuIBSYpHHlPQ+oF8A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f78.google.com with SMTP id ca18e2360f4ac-87c29bef96cso372915939f.0
-        for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 05:46:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753447591; x=1754052391;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=RcOwnNkGMbRm/SAGPNDv3FvzOSvBQBAw0vpb+6DYIB4=;
-        b=skCOq/iAR0O5dYIH9h0iHBIbIWSGt1ZNtrujizC+zuKE2DxqjdQbvsMehIdXnrxqvT
-         9jFLMdjV2CHod7gviDrVF6BBqXRZXZRb6l++Fp3BXbMh2nAU1ZkGi7kM2LjNORfzVjoB
-         Ke4e2g885HUQqrUH+kLwpiw3FkgJCgH0dY31u5np2BsnCGsDs8LiiTZDu/hWNymMvf5x
-         Hcsxko5+fcvbwzCXIL1Z8dXQrP8h7C4AgcLTq0BckDVa8foOZBdqVk6OtZORaHdOASkq
-         HDjbLd0C5nIqC/kA/2TSaEYTEx6Kvj/yRH+kevWKZ2IuJYZU5aF63hNfNxq4eUuU5yb1
-         De2g==
-X-Forwarded-Encrypted: i=1; AJvYcCXLMFgMiTOAryNl+Rpjg1vRsRf3vcQGFCNIyz93A6DGuwEFWSzEY3TtalqyUxH9QkxzNj6b0cY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzt/VChswRuzyyh9Rba1RvjQ6hBEQSn33bIg4rFhJ6XUZxo11z9
-	xMtdhCUPmuwQrDwTBhOUTkunXDeLU9+Uii43j8KjV+f96cGrR8Z3OaRdrCGoHo+OKd80aWYyYwH
-	+JddMCXf61FlncEpC3YSXMQECovWtlcxK3HSP3x7eOsBF1L+qjh7Gb1yMENU=
-X-Google-Smtp-Source: AGHT+IGhLJ7WPISWlkBBKk0VG56ANSua07lRzc2p1rbmGsljUveQsfjYLhKQDFiB+gfn/k2x9EC/enz4YR91PiOq4KT2/m3G+lxl
+	s=arc-20240116; t=1753447676; c=relaxed/simple;
+	bh=HZtWIFNtCJpMK2qxCgsJ8HLcBMXFIsU6z61saV4vKcA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MkhSFhygF5zMag7gJHn+Z1yTr3vSHiCW17IDaPiqhREWAT3gIa5ort3sDVmmUqJn3xX6nQTo8bbyLI5NmP+8bGCEDFxWaQASXrxvWaxpTk3bSvsQndRI0a1An2/dw/dboIeamSjsp7mm5J2/wI9EVPUPcsBroEGws/1r+fynqEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1ufHpz-0000aE-CF; Fri, 25 Jul 2025 14:47:47 +0200
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1ufHpy-00ADrz-2y;
+	Fri, 25 Jul 2025 14:47:46 +0200
+Received: from pengutronix.de (p5b1645f7.dip0.t-ipconnect.de [91.22.69.247])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 97D7044960A;
+	Fri, 25 Jul 2025 12:47:46 +0000 (UTC)
+Date: Fri, 25 Jul 2025 14:47:46 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Jimmy Assarsson <extja@kvaser.com>
+Cc: linux-can@vger.kernel.org, Jimmy Assarsson <jimmyassarsson@gmail.com>, 
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
+Subject: Re: [PATCH v4 07/10] can: kvaser_pciefd: Add devlink support
+Message-ID: <20250725-ingenious-labradoodle-of-action-d4dfb7-mkl@pengutronix.de>
+References: <20250725123230.8-1-extja@kvaser.com>
+ <20250725123230.8-8-extja@kvaser.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:158b:b0:3df:3110:cc01 with SMTP id
- e9e14a558f8ab-3e3c531f7aemr25617085ab.19.1753447590693; Fri, 25 Jul 2025
- 05:46:30 -0700 (PDT)
-Date: Fri, 25 Jul 2025 05:46:30 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68837ca6.a00a0220.2f88df.0053.GAE@google.com>
-Subject: [syzbot] [netfilter?] WARNING in nft_socket_init (2)
-From: syzbot <syzbot+a225fea35d7baf8dbdc3@syzkaller.appspotmail.com>
-To: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com, 
-	horms@kernel.org, kadlec@netfilter.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	netfilter-devel@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    94619ea2d933 Merge tag 'ipsec-next-2025-07-23' of git://gi..
-git tree:       net-next
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=14bf10a2580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=ceda48240b85ec34
-dashboard link: https://syzkaller.appspot.com/bug?extid=a225fea35d7baf8dbdc3
-compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12bf10a2580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13d27fd4580000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/afd64d9816ee/disk-94619ea2.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/e1755ce1f83b/vmlinux-94619ea2.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/2061dff2fbf4/bzImage-94619ea2.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+a225fea35d7baf8dbdc3@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 5853 at net/netfilter/nft_socket.c:220 nft_socket_init+0x2f4/0x3d0 net/netfilter/nft_socket.c:220
-Modules linked in:
-CPU: 0 UID: 0 PID: 5853 Comm: syz-executor145 Not tainted 6.16.0-rc6-syzkaller-01673-g94619ea2d933 #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
-RIP: 0010:nft_socket_init+0x2f4/0x3d0 net/netfilter/nft_socket.c:220
-Code: 84 c0 0f 85 da 00 00 00 41 88 2c 24 bd 08 00 00 00 e9 ad fe ff ff 89 f3 e8 29 86 07 f8 89 d8 e9 57 ff ff ff e8 1d 86 07 f8 90 <0f> 0b 90 e9 44 ff ff ff 89 e9 80 e1 07 38 c1 0f 8c 87 fd ff ff 48
-RSP: 0018:ffffc9000401f178 EFLAGS: 00010293
-RAX: ffffffff89b8a433 RBX: ffff888077f68020 RCX: ffff888030a8da00
-RDX: 0000000000000000 RSI: 0000000000000100 RDI: 00000000000000ff
-RBP: 00000000000000ff R08: 0000000000000000 R09: ffffffff89b8b21c
-R10: dffffc0000000000 R11: ffffed10299a8e5b R12: 0000000000000100
-R13: ffff8880352ec898 R14: dffffc0000000000 R15: 1ffff1100efed004
-FS:  000055555942b380(0000) GS:ffff888125c15000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000200000000000 CR3: 0000000034702000 CR4: 00000000003526f0
-Call Trace:
- <TASK>
- nf_tables_newexpr net/netfilter/nf_tables_api.c:3496 [inline]
- nf_tables_newrule+0x178f/0x2890 net/netfilter/nf_tables_api.c:4327
- nfnetlink_rcv_batch net/netfilter/nfnetlink.c:524 [inline]
- nfnetlink_rcv_skb_batch net/netfilter/nfnetlink.c:647 [inline]
- nfnetlink_rcv+0x112f/0x2520 net/netfilter/nfnetlink.c:665
- netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
- netlink_unicast+0x82c/0x9e0 net/netlink/af_netlink.c:1346
- netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1896
- sock_sendmsg_nosec net/socket.c:714 [inline]
- __sock_sendmsg+0x219/0x270 net/socket.c:729
- ____sys_sendmsg+0x505/0x830 net/socket.c:2614
- ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2668
- __sys_sendmsg net/socket.c:2700 [inline]
- __do_sys_sendmsg net/socket.c:2705 [inline]
- __se_sys_sendmsg net/socket.c:2703 [inline]
- __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2703
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7efdcf55c0e9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 61 18 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fff48ea8a28 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007efdcf55c0e9
-RDX: 0000000000000000 RSI: 0000200000000000 RDI: 0000000000000003
-RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007efdcf5a5036
-R13: 00007fff48ea8a60 R14: 00007fff48ea8aa0 R15: 0000000000000000
- </TASK>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="3mf2wj25wf4cp2ss"
+Content-Disposition: inline
+In-Reply-To: <20250725123230.8-8-extja@kvaser.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+--3mf2wj25wf4cp2ss
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v4 07/10] can: kvaser_pciefd: Add devlink support
+MIME-Version: 1.0
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+On 25.07.2025 14:32:27, Jimmy Assarsson wrote:
+> --- a/drivers/net/can/kvaser_pciefd/kvaser_pciefd_core.c
+> +++ b/drivers/net/can/kvaser_pciefd/kvaser_pciefd_core.c
+> @@ -1751,14 +1751,16 @@ static int kvaser_pciefd_probe(struct pci_dev *pd=
+ev,
+>  			       const struct pci_device_id *id)
+>  {
+>  	int ret;
+> +	struct devlink *devlink;
+>  	struct device *dev =3D &pdev->dev;
+>  	struct kvaser_pciefd *pcie;
+>  	const struct kvaser_pciefd_irq_mask *irq_mask;
+> =20
+> -	pcie =3D devm_kzalloc(dev, sizeof(*pcie), GFP_KERNEL);
+> -	if (!pcie)
+> +	devlink =3D devlink_alloc(&kvaser_pciefd_devlink_ops, sizeof(*pcie), de=
+v);
+> +	if (!devlink)
+>  		return -ENOMEM;
+> =20
+> +	pcie =3D devlink_priv(devlink);
+>  	pci_set_drvdata(pdev, pcie);
+>  	pcie->pci =3D pdev;
+>  	pcie->driver_data =3D (const struct kvaser_pciefd_driver_data *)id->dri=
+ver_data;
+> @@ -1766,7 +1768,7 @@ static int kvaser_pciefd_probe(struct pci_dev *pdev,
+> =20
+>  	ret =3D pci_enable_device(pdev);
+>  	if (ret)
+> -		return ret;
+> +		goto err_free_devlink;
+> =20
+>  	ret =3D pci_request_regions(pdev, KVASER_PCIEFD_DRV_NAME);
+>  	if (ret)
+> @@ -1830,6 +1832,8 @@ static int kvaser_pciefd_probe(struct pci_dev *pdev,
+>  	if (ret)
+>  		goto err_free_irq;
+> =20
+> +	devlink_register(devlink);
+> +
+>  	return 0;
+> =20
+>  err_free_irq:
+> @@ -1853,6 +1857,9 @@ static int kvaser_pciefd_probe(struct pci_dev *pdev,
+>  err_disable_pci:
+>  	pci_disable_device(pdev);
+> =20
+> +err_free_devlink:
+> +	devlink_free(devlink);
+> +
+>  	return ret;
+>  }
+> =20
+> @@ -1876,6 +1883,8 @@ static void kvaser_pciefd_remove(struct pci_dev *pd=
+ev)
+>  	for (i =3D 0; i < pcie->nr_channels; ++i)
+>  		free_candev(pcie->can[i]->can.dev);
+> =20
+> +	devlink_unregister(priv_to_devlink(pcie));
+> +	devlink_free(priv_to_devlink(pcie));
+>  	pci_iounmap(pdev, pcie->reg_base);
+                          ^^^^
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+This smells like a use after free. Please call the cleanup function in
+reverse order of allocation functions, i.e. move devlink_free() to the
+end of this function.
 
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+>  	pci_release_regions(pdev);
+>  	pci_disable_device(pdev);
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+regards,
+Marc
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
 
-If you want to undo deduplication, reply with:
-#syz undup
+--3mf2wj25wf4cp2ss
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmiDfO8ACgkQDHRl3/mQ
+kZyY2Qf/d8YL1m9zzf0GR8VhMlgXqQMqKI6bgEetN/STYpbPYISZikAXLKH3PMhl
++KPg4RXEm83uDB0jMEm9EW+wmKp523GQAI+nbFKxuNeRCX/XkopzSMr89DqltU0o
+vH1wV5ARkJW1DtiB4sAJdUWpPk2ry44gecZmujxs2fRM8yhU1HivumKUDauaMpu5
+jiQhjvjWet4hcKagRVHU4yt58PPXSc/gbkVKjEzFxHReVEO831SDPBvsUMVaOHMQ
+rSj7uv5Z6ZwAGDHhMAEWr5TtdGQLv/6+5ZFIZzd7ZqoCOk3MjLdvwUcbvgAnhZUa
+dv3ihtEUDQbMCqIKpnnrigGWuCx/iw==
+=veG8
+-----END PGP SIGNATURE-----
+
+--3mf2wj25wf4cp2ss--
 
