@@ -1,93 +1,100 @@
-Return-Path: <netdev+bounces-210202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210203-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9AC6B125ED
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 22:59:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0435B125F2
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 23:04:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C2F7AE2C9B
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 20:58:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C246188ABC1
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 21:04:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73D6025C827;
-	Fri, 25 Jul 2025 20:58:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B9A21F5847;
+	Fri, 25 Jul 2025 21:04:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LrR2gbKK"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="UJCLSweH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4739525C813;
-	Fri, 25 Jul 2025 20:58:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A392A19F420;
+	Fri, 25 Jul 2025 21:04:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753477139; cv=none; b=KaeVWaJiItxiJVDbXkkG0EkAxCUU/w9uxcJHH05L75xO+xw0tjKrxIPLmXowWbHxvMfx1ITQhgSCpSTRYhSIovQ0cNC4cULoI8MEOcPAWcCf2rHgcI0f6Kfw+qVb7xxyhykL9NsRK6CokhId0PblZfxTZxgNzjH1qRThNIRmxgE=
+	t=1753477453; cv=none; b=ETMNuVkbip7hspLKBR6NV8AEARH/FLzrHFirFR2bQT2Z4yuqZAfo5EW9VMCnu39QH0rAS3eAZP7p3N3ezD0fSSHwKc9RShEbf2I50P7t216BR3MZypYbyZux4iWGeE0oeDaSpko8YgPwQcdq4ihLpt3IUzpVJ3UJcR1SagXYIo4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753477139; c=relaxed/simple;
-	bh=AhjYxuVt/FQKPxpoTiF56nGspyPkpGQIFbH1Rp3/uds=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uDiR9qhZ+exs8rcHElvMAjdOD6SSnDTHomQACaLRmtm3TF5JBxhtCnIuXW15gjsti2LNJZYGry8J01caTUX3gBbK7UpewolHQFyP5XEnseJkTxdLq8jYNrMRECZxcbptnjnA1fz/HaavOgviAtfobpOtM2018+3FmqT9e0zsWOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LrR2gbKK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7999BC4CEE7;
-	Fri, 25 Jul 2025 20:58:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753477137;
-	bh=AhjYxuVt/FQKPxpoTiF56nGspyPkpGQIFbH1Rp3/uds=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LrR2gbKKDvlUFa8CAiDZyO3jjKemISIYTlOx63YCPqsQ+j5d7FQDYJOzGB+tLpBMA
-	 u11QsV6cy1O0aXW0df03Jn0rztZGxYvYX2AIACGhCoV+3Tkb752aeIDy8rHR6um6Xj
-	 jJmRTuYjIxvIp65VU/MI2jnjoy2BhanNtOw+Qf4lmBnkBC88AhjTY9TtKkQEvV16hz
-	 zuy6p5QbkacqTbynb7nRT6KkiPOC+79Mln0KFDXIU74KXeZVXsoNxQzgma3WqB/AUo
-	 wEpgMQzNIXGiUCSYU9A+GR6A/BpIbuRksiNgzmJrEHH7mmyJTabziBt6IjLcNkbxAb
-	 ppOueImV5RUHw==
-Date: Fri, 25 Jul 2025 13:58:56 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
- <shuah@kernel.org>, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
- kernel-team@meta.com
-Subject: Re: [PATCH net-next] selftests: net: Skip test if IPv6 is not
- configured
-Message-ID: <20250725135856.6854f2a5@kernel.org>
-In-Reply-To: <6883ed7aed06f_3f184b294c5@willemb.c.googlers.com.notmuch>
-References: <20250723-netcons_test_ipv6-v1-1-41c9092f93f9@debian.org>
-	<20250724182427.5ece92e8@kernel.org>
-	<eutsqoc6f7xcaez2ttuce4uqtfvs3hyit6dradikvfcgxdev75@3senqada4nzn>
-	<6883ed7aed06f_3f184b294c5@willemb.c.googlers.com.notmuch>
+	s=arc-20240116; t=1753477453; c=relaxed/simple;
+	bh=ae71SSY4k8u7fVSaq1e7V57M9dJggxOfsvFSJNAagDg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=k4daJocpdN7V6Y7t/ZkAA6gPLYub40AlpBqIxBGLrUPfex85SuBmHx+/mtuJ+OCrD6J8Xa2CLNgkiu9PibPwA3JLhhD9ICoDzmv3fDlxy/tGdxmVq7nsbxxDE5A7ojhwLJf7zSILGGAXuuGfYBcrl7C52SSdYq+q+eti5rodhf4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=UJCLSweH; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=+bXE8AhHOGf+7yevTX3HLs/Rx4czmj8r+67n/jWJR3k=; b=UJCLSweHd2bF9hdZ3DkkV+4A9e
+	IoTWfF6WTz/n/vO8mmTSQz683r2RhFD61j6yfbaQTV3t9CswgXrMOfrf+6kYpNqbWBGYXz/G1QGMW
+	m23LT2/KUFSkFx3Y81ana2i5uNBrrtW4p+7qj1nWVLJDgGXXJL/bUXIRlWnOzV28lsHsoMRzaktQM
+	pLB3utNL4Tt7iqJn/l5LPX3wN2PFdAzT+Y/MPCYyCsf6aPTXxbdlvn1di4okUd6tgZL6A9BVMv+k3
+	6G59dGwmVq5HrmWqmqUmphNQnw2OTnYNFtjjrfCQErHy3aO3qv4MM/YrLvVyPXGqqEMrQzd+FArt2
+	+Y93C9hA==;
+Received: from [50.53.25.54] (helo=[192.168.254.17])
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1ufPaL-0000000AhWd-1LW0;
+	Fri, 25 Jul 2025 21:04:09 +0000
+Message-ID: <679b2dc9-337f-4b48-8830-add309e2d3e5@infradead.org>
+Date: Fri, 25 Jul 2025 14:04:08 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: linux-next: Tree for Jul 25 (drivers/net/dsa/b53/b53_common.c)
+To: Stephen Rothwell <sfr@canb.auug.org.au>,
+ Linux Next Mailing List <linux-next@vger.kernel.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Florian Fainelli <florian.fainelli@broadcom.com>, netdev@vger.kernel.org
+References: <20250725124835.53f998d0@canb.auug.org.au>
+Content-Language: en-US
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20250725124835.53f998d0@canb.auug.org.au>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri, 25 Jul 2025 16:47:54 -0400 Willem de Bruijn wrote:
-> Less opinionated: the tests implicitly depends on the config files
-> in the test directory. Do we have to start making the robust against
-> situations where CONFIGs in that file are missing?
 
-I was considering adding something like this to the test guidance.
 
-  ### Ensure necessary kernel config knobs are set
+On 7/24/25 7:48 PM, Stephen Rothwell wrote:
+> Hi all,
+> 
+> Changes since 20250724:
+> 
 
-  Each test directory has a `config` file listing which kernel
-  configuration options the tests depend on. This file must be kept
-  up to date, our CIs build minimal kernels for each test group. 
+on ARCH=um SUBARCH=x86_64, when
+# CONFIG_GPIOLIB is not set
 
-  Adding checks inside the tests to validate that the necessary kernel
-  configs are enabled is discouraged. The test author may include such
-  checks, but standalone patches to make tests compatible e.g. with 
-  distro kernel configs are unlikely to be accepted.
+../drivers/net/dsa/b53/b53_common.c: In function ‘b53_switch_reset_gpio’:
+../drivers/net/dsa/b53/b53_common.c:952:9: error: implicit declaration of function ‘gpio_set_value’; did you mean ‘pte_set_val’? [-Wimplicit-function-declaration]
+  952 |         gpio_set_value(gpio, 0);
+      |         ^~~~~~~~~~~~~~
+      |         pte_set_val
+../drivers/net/dsa/b53/b53_common.c: In function ‘b53_switch_init’:
+../drivers/net/dsa/b53/b53_common.c:3012:23: error: implicit declaration of function ‘devm_gpio_request_one’ [-Wimplicit-function-declaration]
+ 3012 |                 ret = devm_gpio_request_one(dev->dev, dev->reset_gpio,
+      |                       ^~~~~~~~~~~~~~~~~~~~~
+../drivers/net/dsa/b53/b53_common.c:3013:45: error: ‘GPIOF_OUT_INIT_HIGH’ undeclared (first use in this function)
+ 3013 |                                             GPIOF_OUT_INIT_HIGH, "robo_reset");
+      |                                             ^~~~~~~~~~~~~~~~~~~
+../drivers/net/dsa/b53/b53_common.c:3013:45: note: each undeclared identifier is reported only once for each function it appears in
 
-WDYT?
 
-Primarily trying to minimize the number of patches and adjustments 
-we'd see, as the matrix of systems and kernel configs can easily get
-out of hand..
+Probably just needs "depends on GPIOLIB" or "select GPIOLIB"...
+
+-- 
+~Randy
+
 
