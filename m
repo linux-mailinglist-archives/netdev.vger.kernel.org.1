@@ -1,138 +1,204 @@
-Return-Path: <netdev+bounces-210204-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210206-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DB7EB1260D
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 23:11:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD29AB12611
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 23:12:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4349E188C6A4
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 21:12:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E730E5A0D62
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 21:12:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30BA425D21A;
-	Fri, 25 Jul 2025 21:11:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CA3625D53B;
+	Fri, 25 Jul 2025 21:12:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H5JPWyFB"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="VBuEiJTW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A08B4DDA9;
-	Fri, 25 Jul 2025 21:11:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E06CDDA9;
+	Fri, 25 Jul 2025 21:12:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753477912; cv=none; b=tWqxgWPcf5/VyCDdRPi81Lr4iAXPVtpRnlnbhWAowdrPTtP5GKDhv1L8vMtjJUvLV8tX8rkWmgijctAXB2V5FINHXXkOXtwznwgsUCNfkQUzgqyVg5nYpK/fZ7d84PvXJwxXpgroFPwJSoYt823xFzWE6RWsFb79EL+gH92zlGs=
+	t=1753477977; cv=none; b=Ii80LoOzX6ewnNjlIuHqUR+xnU1x3a16AETbaziLldspvdtP82ZvObj8OWG0o9MyswIVdbULGIEhYjDJAH96dqT1baxFkZmpxFLZV5kq5zsNTOjmi/Kmm+DTYmTKXj2duL94QnbH1Qm2utFpLewTTEwUbzGA77YNl9msVygt3yw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753477912; c=relaxed/simple;
-	bh=iPntpkN5s9nm/kwmyNW7/VQUJGr7X2cHZpVGCRpZHvM=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=hSoWrwS+bUxJGw+GvhJ/XKJ4uOCUnvF12XYpeasFz1ZPXxuEJpPJoD2tbqoBDHrmiW1pQ1roKh9JQLfbG1tYjSPlr+pOU2usJvVMFQlUs57q0BQDzrz420VE3L0AypqupIjnamIUJmMEWmZ4wK05yrw54lgqM/F6oB4Je16WC9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H5JPWyFB; arc=none smtp.client-ip=209.85.128.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-7115e32802bso21071737b3.1;
-        Fri, 25 Jul 2025 14:11:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753477909; x=1754082709; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BdqOqIb0Bsc0iPEAfHlc33CmH07FCmyzWixSo0X/0wI=;
-        b=H5JPWyFBLmjoA8efxvAA27LtfvPcrmyV3UQcAkVgGtn4Og8hvlHZKbVpNeJCYGIPfk
-         tSZHaddUCZb/Lvab0GCK0/T4LI5yesgVkkLfWTYckCHBAhaMR2KvzB4iU340wuFWTUIF
-         3K+Aqt4uPNRZqE4WLd/IOhwdfsjVQJFnv/9hOaWgHbJGnGiBpWS2SuJWYyAt0n+KONlO
-         7kl3ms1yhuJbgiOkhb52c3Ob4Gogp0N+Cvz62FnYYZE7ZhAoCQvl8Ulq7xBUZ8QhMFAk
-         l2uTZtD23fypT4hQJgJoSE7uj1OInvwpAA0sGHkuGgLYW/EwDJtqaO8aQ0mVRdMybC1E
-         UmnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753477909; x=1754082709;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=BdqOqIb0Bsc0iPEAfHlc33CmH07FCmyzWixSo0X/0wI=;
-        b=j33hdGSdnQfzOMBArjkdejlpq4Kmr7CbZsHbbzx61q6JoTLJKqwYtl80QB/Uzae0RI
-         8Q4ZBUi4x8CatF/hZlZZTbawmtgmcSCCWVXFUTiUpQZyG3i2JaqZB6Tsf4fK/EBxRPiE
-         TWrqTVNq8rFEPEBN5Mf3eIK/ATM9yyHKaz/tpfILREK503vMwrqhUPJPE0U/Z2KmVGIz
-         vgwi/PVWAhVjtXHbm4zFnh7Zrcvd0Sxrrk0w2FKEVNLRpN3oXScSBD6UFNr3+xK5bv/9
-         /ntbkumHjKifcL72O0lOAvBARsnR4m6YPGbCWg9L9Epp2B6VPsT9r3wGr402f0snKM1C
-         jziw==
-X-Forwarded-Encrypted: i=1; AJvYcCUY5a96L7v7CyVwf4bdrCwQCCA5wJRXd5auMKXh5mT+C6ikCZAvJQVLiZqto7eb8bsMK/VO2SJRN9NHOoMlfwin@vger.kernel.org, AJvYcCVyPrYbnDxpX1rhrxrmKjhYuQJOZM76qXH1ov19RMTRvKf25arREGmZmner2LU3HKP6Pgjortub3eCLzwA=@vger.kernel.org, AJvYcCW+8Hut7UUDCKBuMnsr2Obqs0YtEERrfHUY3M+5QF/SnTHUH/F3n/RYqu9MnQfekAktBsQ6hwK+@vger.kernel.org
-X-Gm-Message-State: AOJu0YzV0HEJjXqcJzB3zySas5mVlVYO+EcHg8sku6TAZqrd7Qr/aT/f
-	CgfLX4WXcPAyVVyES6w28GFLogueLD7psmmH4IQQxJJPw4SWZsC1McFV
-X-Gm-Gg: ASbGncug2I96hFq0Sdi87rOR3n3EVDklxvmay9PsWVoSAJn9IJUxcIq/d8BnoYaP1gT
-	2VSMJkR9C+qASTFV69WzPLn6zZvpcX7w2G3H+rq385bNXl2DCi6F/M828+Dw7WefDghp8WkT6O3
-	zGGk2NfWu3dzRnyoqwL4o8+IsQByUmyAq8YHiVTNKT42XDC+qTYgHIARW+KNUC724X6vxfKhrCe
-	YLJsI02Gm3VebipFVcEDr/9OOy6X7vQCNSfdWDMaGS8kL8gnL5VDHOLBOmIS81Ocvo2YgtPg7sE
-	2LxxQF/MpdtsoiWN/zkr8OQ8CdaWnLFBwMyQTPPD7etJbXHreNLIgQ5wpnY8ctv39wERRxYTVdu
-	j6s8KwHcLAsERovZlCGEaml9wCH52jFqgDNQqMHq0hmvLIfa73lDhIrvB1dOfOxN7oymD/w==
-X-Google-Smtp-Source: AGHT+IHFX0QKQh1xLtmHqt4hOrEJp6y1p7TYcXr28uaLfMhJPkaiR9STb8aOvzmtBOjaVFmJZ8G3Ig==
-X-Received: by 2002:a05:690c:fc1:b0:709:1b68:9f5c with SMTP id 00721157ae682-719e32c0f97mr48634007b3.16.1753477909554;
-        Fri, 25 Jul 2025 14:11:49 -0700 (PDT)
-Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
-        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-719f23b39fdsm1543597b3.60.2025.07.25.14.11.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Jul 2025 14:11:48 -0700 (PDT)
-Date: Fri, 25 Jul 2025 17:11:48 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Breno Leitao <leitao@debian.org>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Shuah Khan <shuah@kernel.org>, 
- netdev@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- kernel-team@meta.com
-Message-ID: <6883f3146d073_d14929462@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250725135856.6854f2a5@kernel.org>
-References: <20250723-netcons_test_ipv6-v1-1-41c9092f93f9@debian.org>
- <20250724182427.5ece92e8@kernel.org>
- <eutsqoc6f7xcaez2ttuce4uqtfvs3hyit6dradikvfcgxdev75@3senqada4nzn>
- <6883ed7aed06f_3f184b294c5@willemb.c.googlers.com.notmuch>
- <20250725135856.6854f2a5@kernel.org>
-Subject: Re: [PATCH net-next] selftests: net: Skip test if IPv6 is not
- configured
+	s=arc-20240116; t=1753477977; c=relaxed/simple;
+	bh=vbL+HbP+4YaLPyRV7WLoA2cPjJ+7WNluyxp4IXrjLDg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QMz7qaMvjy+9cws3SYEtNd3cZKOo04EeJSHCpMs26QrOkooWnOv9Wk7wtH2ayQ8g7bQLIgoWTkfhEjnsBTuatKDerfQ6GOFdN+kTrra0lYrhfbOzMbVHx4QHZ9fQhz2eUO40dUp3krsRyfcsRYynPsllDgflEGbLo7bGM5gr3YI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=VBuEiJTW; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=t6PQlTi/al6jK8DK8azc4vIg+nja1nQodGRzg5cDH9o=; b=VBuEiJTW5vNg9VdoaB9vhHN9+n
+	p6C9Jhsg/pKWx1szw/63FWfgMvGxsT/yPfUHDDYoy9WUJZcBVKlBNi+vdUdt6zPLx198tyLUwk4MO
+	GUA4xumlYkdwUi20xlKHTqowCMYI96sxjVqUHKHwKaqnY6FDaSSYlzWONbTisMkOUqlimS8yC3WVA
+	XU+oQxt/Iy435GvXcPDSszDGJO+EQFShDiDdYf7B/YD0mErBBjdLX5MiR8OzI8tpjvU3doKxHSUtM
+	HlE6Hj3I1uzcXyVbzFyea3KDRlLvYJFAQaF18UpVj7awCCh/SnLl9pJJcMBQZSBhtn5iqfFCuwPUq
+	vA2hrnSA==;
+Received: from [50.53.25.54] (helo=[192.168.254.17])
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1ufPio-0000000AiB7-2WsO;
+	Fri, 25 Jul 2025 21:12:54 +0000
+Message-ID: <1c4a5faf-7c1f-4d84-9a9f-ec88b3e6c860@infradead.org>
+Date: Fri, 25 Jul 2025 14:12:53 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: linux-next: Tree for Jul 25 (nfc/nfrmrvl/ and nfc/s3fwrn5/)
+To: Stephen Rothwell <sfr@canb.auug.org.au>,
+ Linux Next Mailing List <linux-next@vger.kernel.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Krzysztof Kozlowski <krzk@kernel.org>, netdev@vger.kernel.org
+References: <20250725124835.53f998d0@canb.auug.org.au>
+Content-Language: en-US
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20250725124835.53f998d0@canb.auug.org.au>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Jakub Kicinski wrote:
-> On Fri, 25 Jul 2025 16:47:54 -0400 Willem de Bruijn wrote:
-> > Less opinionated: the tests implicitly depends on the config files
-> > in the test directory. Do we have to start making the robust against
-> > situations where CONFIGs in that file are missing?
-> 
-> I was considering adding something like this to the test guidance.
-> 
->   ### Ensure necessary kernel config knobs are set
-> 
->   Each test directory has a `config` file listing which kernel
->   configuration options the tests depend on. This file must be kept
->   up to date, our CIs build minimal kernels for each test group. 
-> 
->   Adding checks inside the tests to validate that the necessary kernel
->   configs are enabled is discouraged. The test author may include such
->   checks, but standalone patches to make tests compatible e.g. with 
->   distro kernel configs are unlikely to be accepted.
-> 
-> WDYT?
-> 
-> Primarily trying to minimize the number of patches and adjustments 
-> we'd see, as the matrix of systems and kernel configs can easily get
-> out of hand..
 
-This is great!
 
-It's not really feasible to maintain tests with arbitrary missing
-dependencies.
+On 7/24/25 7:48 PM, Stephen Rothwell wrote:
+> Hi all,
+> 
+> Changes since 20250724:
+> 
+
+on ARCH=um SUBARCH=x86_64, when
+# CONFIG_GPIOLIB is not set
+
+../drivers/nfc/nfcmrvl/main.c: In function ‘nfcmrvl_nci_register_dev’:
+../drivers/nfc/nfcmrvl/main.c:115:13: error: implicit declaration of function ‘gpio_is_valid’; did you mean ‘uuid_is_valid’? [-Wimplicit-function-declaration]
+  115 |         if (gpio_is_valid(priv->config.reset_n_io)) {
+      |             ^~~~~~~~~~~~~
+      |             uuid_is_valid
+../drivers/nfc/nfcmrvl/main.c:116:22: error: implicit declaration of function ‘gpio_request_one’ [-Wimplicit-function-declaration]
+  116 |                 rc = gpio_request_one(priv->config.reset_n_io,
+      |                      ^~~~~~~~~~~~~~~~
+../drivers/nfc/nfcmrvl/main.c:117:39: error: ‘GPIOF_OUT_INIT_LOW’ undeclared (first use in this function)
+  117 |                                       GPIOF_OUT_INIT_LOW,
+      |                                       ^~~~~~~~~~~~~~~~~~
+../drivers/nfc/nfcmrvl/main.c:117:39: note: each undeclared identifier is reported only once for each function it appears in
+../drivers/nfc/nfcmrvl/main.c:176:17: error: implicit declaration of function ‘gpio_free’; did you mean ‘kfifo_free’? [-Wimplicit-function-declaration]
+  176 |                 gpio_free(priv->config.reset_n_io);
+      |                 ^~~~~~~~~
+      |                 kfifo_free
+../drivers/nfc/nfcmrvl/main.c: In function ‘nfcmrvl_chip_reset’:
+../drivers/nfc/nfcmrvl/main.c:238:17: error: implicit declaration of function ‘gpio_set_value’; did you mean ‘pte_set_val’? [-Wimplicit-function-declaration]
+  238 |                 gpio_set_value(priv->config.reset_n_io, 0);
+      |                 ^~~~~~~~~~~~~~
+      |                 pte_set_val
+../drivers/nfc/s3fwrn5/phy_common.c: In function ‘s3fwrn5_phy_set_wake’:
+../drivers/nfc/s3fwrn5/phy_common.c:22:9: error: implicit declaration of function ‘gpio_set_value’; did you mean ‘pte_set_val’? [-Wimplicit-function-declaration]
+   22 |         gpio_set_value(phy->gpio_fw_wake, wake);
+      |         ^~~~~~~~~~~~~~
+      |         pte_set_val
+../drivers/nfc/s3fwrn5/i2c.c: In function ‘s3fwrn5_i2c_parse_dt’:
+../drivers/nfc/s3fwrn5/i2c.c:158:14: error: implicit declaration of function ‘gpio_is_valid’; did you mean ‘uuid_is_valid’? [-Wimplicit-function-declaration]
+  158 |         if (!gpio_is_valid(phy->common.gpio_en)) {
+      |              ^~~~~~~~~~~~~
+      |              uuid_is_valid
+../drivers/nfc/s3fwrn5/i2c.c: In function ‘s3fwrn5_i2c_probe’:
+../drivers/nfc/s3fwrn5/i2c.c:200:15: error: implicit declaration of function ‘devm_gpio_request_one’ [-Wimplicit-function-declaration]
+  200 |         ret = devm_gpio_request_one(&phy->i2c_dev->dev, phy->common.gpio_en,
+      |               ^~~~~~~~~~~~~~~~~~~~~
+../drivers/nfc/s3fwrn5/i2c.c:201:37: error: ‘GPIOF_OUT_INIT_HIGH’ undeclared (first use in this function)
+  201 |                                     GPIOF_OUT_INIT_HIGH, "s3fwrn5_en");
+      |                                     ^~~~~~~~~~~~~~~~~~~
+../drivers/nfc/s3fwrn5/i2c.c:201:37: note: each undeclared identifier is reported only once for each function it appears in
+../drivers/nfc/s3fwrn5/i2c.c:207:37: error: ‘GPIOF_OUT_INIT_LOW’ undeclared (first use in this function)
+  207 |                                     GPIOF_OUT_INIT_LOW, "s3fwrn5_fw_wake");
+      |                                     ^~~~~~~~~~~~~~~~~~
+../drivers/nfc/s3fwrn5/uart.c: In function ‘s3fwrn82_uart_parse_dt’:
+../drivers/nfc/s3fwrn5/uart.c:100:14: error: implicit declaration of function ‘gpio_is_valid’; did you mean ‘uuid_is_valid’? [-Wimplicit-function-declaration]
+  100 |         if (!gpio_is_valid(phy->common.gpio_en))
+      |              ^~~~~~~~~~~~~
+      |              uuid_is_valid
+../drivers/nfc/s3fwrn5/uart.c: In function ‘s3fwrn82_uart_probe’:
+../drivers/nfc/s3fwrn5/uart.c:147:15: error: implicit declaration of function ‘devm_gpio_request_one’ [-Wimplicit-function-declaration]
+  147 |         ret = devm_gpio_request_one(&phy->ser_dev->dev, phy->common.gpio_en,
+      |               ^~~~~~~~~~~~~~~~~~~~~
+../drivers/nfc/s3fwrn5/uart.c:148:37: error: ‘GPIOF_OUT_INIT_HIGH’ undeclared (first use in this function)
+  148 |                                     GPIOF_OUT_INIT_HIGH, "s3fwrn82_en");
+      |                                     ^~~~~~~~~~~~~~~~~~~
+../drivers/nfc/s3fwrn5/uart.c:148:37: note: each undeclared identifier is reported only once for each function it appears in
+../drivers/nfc/s3fwrn5/uart.c:154:37: error: ‘GPIOF_OUT_INIT_LOW’ undeclared (first use in this function)
+  154 |                                     GPIOF_OUT_INIT_LOW, "s3fwrn82_fw_wake");
+      |    
+
+
+Possibly this:
+---
+ drivers/nfc/nfcmrvl/Kconfig |    3 +++
+ drivers/nfc/s3fwrn5/Kconfig |    3 +++
+ 2 files changed, 6 insertions(+)
+
+--- linux-next-20250725.orig/drivers/nfc/nfcmrvl/Kconfig
++++ linux-next-20250725/drivers/nfc/nfcmrvl/Kconfig
+@@ -1,6 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ config NFC_MRVL
+ 	tristate
++	depends on GPIOLIB
+ 	help
+ 	  The core driver to support Marvell NFC devices.
+ 
+@@ -10,6 +11,7 @@ config NFC_MRVL
+ config NFC_MRVL_USB
+ 	tristate "Marvell NFC-over-USB driver"
+ 	depends on NFC_NCI && USB
++	depends on GPIOLIB
+ 	select NFC_MRVL
+ 	help
+ 	  Marvell NFC-over-USB driver.
+@@ -23,6 +25,7 @@ config NFC_MRVL_USB
+ config NFC_MRVL_UART
+ 	tristate "Marvell NFC-over-UART driver"
+ 	depends on NFC_NCI && NFC_NCI_UART
++	depends on GPIOLIB
+ 	select NFC_MRVL
+ 	help
+ 	  Marvell NFC-over-UART driver.
+--- linux-next-20250725.orig/drivers/nfc/s3fwrn5/Kconfig
++++ linux-next-20250725/drivers/nfc/s3fwrn5/Kconfig
+@@ -1,6 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ config NFC_S3FWRN5
+ 	tristate
++	depends on GPIOLIB
+ 	select CRYPTO
+ 	select CRYPTO_HASH
+ 	help
+@@ -11,6 +12,7 @@ config NFC_S3FWRN5
+ config NFC_S3FWRN5_I2C
+ 	tristate "Samsung S3FWRN5 I2C support"
+ 	depends on NFC_NCI && I2C
++	depends on GPIOLIB
+ 	select NFC_S3FWRN5
+ 	default n
+ 	help
+@@ -24,6 +26,7 @@ config NFC_S3FWRN5_I2C
+ config NFC_S3FWRN82_UART
+         tristate "Samsung S3FWRN82 UART support"
+         depends on NFC_NCI && SERIAL_DEV_BUS
++	depends on GPIOLIB
+         select NFC_S3FWRN5
+         help
+           This module adds support for a UART interface to the S3FWRN82 chip.
+
+
+
+-- 
+~Randy
+
 
