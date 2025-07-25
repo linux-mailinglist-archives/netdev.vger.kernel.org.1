@@ -1,114 +1,116 @@
-Return-Path: <netdev+bounces-210150-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210151-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5931BB122EA
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 19:21:10 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CBCAB122F6
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 19:25:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 65D177BFC1E
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 17:19:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BCFD37B9BE7
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 17:24:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 232092EF66B;
-	Fri, 25 Jul 2025 17:21:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 912C02EF9C7;
+	Fri, 25 Jul 2025 17:25:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="d9EkWudX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hL8JmND7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B504F2749C0
-	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 17:21:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D19D92EF9B7;
+	Fri, 25 Jul 2025 17:25:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753464062; cv=none; b=Gi1RTCKUGyB2UudKujmccfwBM219+Gnwmtkfiaipck3+/rtL4R/xRkMUoXSTcqIlL2/6+SO4HyZz3efDXsGbIoYJ8Fq9sPYUgG5GnnW+koZCq1ygZymVtAEwfXIOOa2r+31PuDD1bMN/fYrY0k+zJ2+IOPEeuEiUdBAWtfNBFMs=
+	t=1753464332; cv=none; b=fi06p3w3BxYANwi0aXQAKFftOsTNV0wuIbm9NAc9lpFwAENNSiBZpNPGRBt9NO8wATaxBZpxfgR/IqTW4IFuDvm2gV0H3mRRWxXBhLNO5kHcEp9GvreoS2W7VsPIN1IiRMCpD8TUUhwOwFuFwJYx54hlS+mVjJoPQoroR5Ypx1Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753464062; c=relaxed/simple;
-	bh=ztW5g9Io+DwYXSX5Bjb/sZm/RkMW/CjJ9zOMGyQfjIw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oTEKl3L5+XOjo8mYOtheHjKhKhMLH1p3DWcn8TGftDK3UGuvATv3zDgjUkr35Wua9hWduS9i4zrbRGAh4YVErA+Sgr2TJtHM/lxY70NNhz/DVZjmwCwTHmqpEqmxAz+OAUTAgMvW2oeKpQgAu20r/j1JVmQCpCUHotm98AzuicE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=d9EkWudX; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-23dd9ae5aacso7325ad.1
-        for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 10:21:00 -0700 (PDT)
+	s=arc-20240116; t=1753464332; c=relaxed/simple;
+	bh=zeX7Qkf3lRGP3FATstdWyXsUlgX+8eb1xUhTXKuUuII=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bDkpi5k4C3ubf+ZxvZ6HCrlCluRjC2JLisSVj4oLIhRkMTwwrqrgK/qqHUZD15Gji4fvXOGwnrTvHWLIGR2WNAaH44kP5qce5Kn99XNCAY4z2kJvIUzTywu3j8Oum5FlCucJ6MfqD3z9SumTZRJU5yBjmINIE44YfAyPmlOOCiQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hL8JmND7; arc=none smtp.client-ip=209.85.210.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-7600271f3e9so2189910b3a.0;
+        Fri, 25 Jul 2025 10:25:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753464060; x=1754068860; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ztW5g9Io+DwYXSX5Bjb/sZm/RkMW/CjJ9zOMGyQfjIw=;
-        b=d9EkWudX7JQDV9rHyMYMOYx2hVLOx78xGL/5Lmvt8vg98SD38FMzmIl3LAZZLNZ3++
-         7Sac6CNYM8Y9t5IxCz6zh9IaXs5ft7iujKXiJ1Pgdpa3dF5nGTaWUCO6jXB+c1YhchfN
-         2nID9+OIx55YNDCxTvL/FZdFVxQFVlySRpXJ65KrYxV9AIFnAwDuX54a93mfbJ4EyXCk
-         KUTG8Ud2UG+t8Yuczh7O5an/aU8zYMuXbWDLP/ORQFhVrnddmsKDJ6QTHSLYQPswJZm+
-         c4teoeF4BVSWqDHeUs5fvh6x62pVquRiUX7HB4OVB3EcJ1mKN2ifV0Qso7zqsJD75s1u
-         6Dng==
+        d=gmail.com; s=20230601; t=1753464330; x=1754069130; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=HmLGxEBkN0ZO8rcOT7khGeSzzvTddU8IGWpJopNzb6Q=;
+        b=hL8JmND7dSt6iGG7pW4lPrynq5mvu45bTQ99Oa7Kr4RS62mNjty5yJJbsO9hYuCFAW
+         Iu+baiMwjPwgWOR6zZLissvpthwogfYcjhdKe1A663+fUkjQDNDncKPoSyzy20IUae7f
+         gzrT+A4P+JySxuwKP+fTQd64WWPGlgCZ6PDi52Zy3g/m9znHSaky9/54xxR31BYnJWjG
+         vFLxKS75ohDzwjxBNXXb44+6EvmGf/CBtMjtQdeRTZUFYSQC9iMDPX2Qdy0/czwkUTb3
+         bUACpDqrJ1KY7d5e9202NJqEi7l5L4cUPukz/FFxqdy1WCeCuvwM3Go56Dkyts4eQHvJ
+         HJYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753464060; x=1754068860;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ztW5g9Io+DwYXSX5Bjb/sZm/RkMW/CjJ9zOMGyQfjIw=;
-        b=SB6OUpLg8GKyhykkAufWR2HUI5RYeFxO50Y8M7oPOooKv2bXM/sMrU+I3oJLKXbrOZ
-         dxQdOrVMu0fhcJ7+/pYCBlsll3Jxb7MrFZX1EPSFlXqVS8Z+0hnwi0NWzu067heUG+hk
-         uJnxftDfHpk1F/4TrTEdRbNBRkSZY+1pcP/i8vJeYt9/YxTwcJ3DJapf09fkt0fHgwMK
-         FxVTpfSkgs+U1V8OmeEiXuh6gRoiLW83co92+Fhj0zmBuyhdlgrpqh73A5lCls1SKgTH
-         g5lhJfkE0oj5Oq15J87WDpXUujWkQrVjLK7a/033ng8//buSqvHdSaTFNqvah+yIk8Pu
-         6ZBg==
-X-Forwarded-Encrypted: i=1; AJvYcCW3Iuszcpiq0vsIPgf/haWaIPow70CPGWacLmIsJ14r7g1uO1XBHgjhukO9W8qbNg38z6Mn/NA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy1O3JsAOES4zmzDdgriQKpkILZds0RXqsw0gynElLbmn5phCWZ
-	0FGy9sKaurz8WMhTwHBDhmR2vJRwa/Y3jUvVzAkfxx517kMpd7jJkI25H1kbOiXaWco4pBTvL7+
-	rmbXkLdcneSmyq15kCOOUzS5mZZw/WwTJ0TBIH7UI
-X-Gm-Gg: ASbGnctwcj8icYHyaKVf1MlH7SjGb3ZO8i7gx6zDxIJtvhjqxCfZsIaEFcPFi2pRuI/
-	VA2gYIOlrc+d6/phJaTEzamHBtuVZuOWqoeiFxhY+vY860tSYI3mIMg5Q6J7N/+ZueaGwpMd2Le
-	PQV54uJlfFJ8MZALZ3f+knbISCvm0dapOmsmhojwDbhnrxIlrTaWNkWkJVbBIKRwoMKSGHaq1U6
-	JgH
-X-Google-Smtp-Source: AGHT+IG3La2ZTD3NRSPrjHKZQ5evO30wkrLX+Kpt+QdhR94hbkea+gCEFQx5xnAWugOKKY5PaeRMhwgBkwadUW1udNg=
-X-Received: by 2002:a17:903:2bcb:b0:234:8eeb:d81a with SMTP id
- d9443c01a7336-23fadb18ed0mr3827435ad.16.1753464059728; Fri, 25 Jul 2025
- 10:20:59 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1753464330; x=1754069130;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HmLGxEBkN0ZO8rcOT7khGeSzzvTddU8IGWpJopNzb6Q=;
+        b=wpOd1eInCuRXIrf8HCzzI4BmYIqD/XAf5q/WpYeT5WwA3mNfLerfS/4BTku2viBOAQ
+         lugJi4KJV1Kll7YcTuwzWHGdSXAzZGWPMQgetPTzWB6fqanbHjgn4RzNbhH9fsq6gV+Y
+         hqxnePG1XFi+IT5XboNeKX18NZD3EpxUNufR8UU0gs+YYhYB5bDnIrysP/ERYyfi1OIi
+         4T7oBO0Gt4lFGkJammwGdvnJ8sL2nA7azsfDD2MfFhOBR2Xeo/Im+Wy+L5YWR5G/tgrz
+         jVYqkLafgN4EJLXSAw+liFNo7WSCla2Qk0WHdVHsFeWAm8vS9AzPBZjB1pXo8ZMCz99o
+         z01A==
+X-Forwarded-Encrypted: i=1; AJvYcCWghhTl6Y3Dp748X9y9jmBW9FwEYBcqegsVpXmI2q9mLIfkR2U1O9xSo+fCWR2JWf6X5NdtksMa@vger.kernel.org, AJvYcCXrQZQ5/LyAegQPL+bxhWsfh8JFG3ruznGLYIt856jWo2wOCfP5IigDwKygd9i/wpzZSSq5GlUFzXlV7UM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx95khkX5Ap/1Xv65OzukKbx2uPs2RHqoO6/1FAHNTf4xVtCkPt
+	gnNPG+qvHqxY0CG0tl7G3r2OT7kSDRcGy0PcVpnkhzqI5wk5w8AgVCp2
+X-Gm-Gg: ASbGncsgga1XFU1so91/7y5Fl3Vy/10NP95r2H0BoeqYv9g4EurIinoo+WnJ8Luet45
+	rgQqNRdZTNd7R9uynYY0ACvzgYFtkvcJr2sZPrMlPbx1zgNxSnSJIDJ7wKk4LwOa3Go+xS7RexW
+	GQI0o71ZQiZruGffaQXMbbft3qP4kaeOzHehvt63gcQQ3/9N/ku9gfIJfwnU0e8CTGG4/7Ck8by
+	8TlbZ7/LG1RO8BeU5sRnJ7B++nvr6TkRZOiLbmkinsbgy6vJT4+nyYE6ncVGYSRshGTocizC6qd
+	5nCFdQ1QD/v6DoWJY06Qz0X6qBeSgiPlfSGgthllMO9NZEfmPkkkQQ41g+Ery8tSIB6Mr6yEZvr
+	NP8ReODqengbNQYEPi6kP15+e9A==
+X-Google-Smtp-Source: AGHT+IHP5BRo2iYchjZy+FD/VO9iN0pttkceTIhJ2GYzWjjFESGj/MLZr3TNVOZCWUogIUzxnzQ3Lg==
+X-Received: by 2002:a05:6a20:7d8b:b0:238:351a:f960 with SMTP id adf61e73a8af0-23d6e3b90d0mr4745798637.23.1753464329961;
+        Fri, 25 Jul 2025 10:25:29 -0700 (PDT)
+Received: from localhost ([129.210.115.104])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-76408c02627sm187680b3a.44.2025.07.25.10.25.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Jul 2025 10:25:29 -0700 (PDT)
+Date: Fri, 25 Jul 2025 10:25:28 -0700
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: fan.yu9@zte.com.cn
+Cc: dumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, davem@davemloft.net, jiri@resnulli.us,
+	jhs@mojatatu.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, xu.xin16@zte.com.cn,
+	yang.yang29@zte.com.cn, tu.qiang35@zte.com.cn,
+	jiang.kun2@zte.com.cn, wang.yaxin@zte.com.cn, qiu.yutan@zte.com.cn,
+	he.peilin@zte.com.cn
+Subject: Re: [PATCH net-next] net/sched: Add precise drop reason for
+ pfifo_fast queue overflows
+Message-ID: <aIO+CKQ/kvpX5lMo@pop-os.localdomain>
+References: <20250724212837119BP9HOs0ibXDRWgsXMMir7@zte.com.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250724223225.1481960-6-samitolvanen@google.com>
- <c7241cc9-2b20-4f32-8ae2-93f40d12fc85@linux.dev> <CABCJKud8u_AF6=gWvvYqMeP71kWG3k88jjozEBmXpW9r4YxGKQ@mail.gmail.com>
- <f82341df-bf2a-4913-a58c-e0acdfb245d2@linux.dev>
-In-Reply-To: <f82341df-bf2a-4913-a58c-e0acdfb245d2@linux.dev>
-From: Sami Tolvanen <samitolvanen@google.com>
-Date: Fri, 25 Jul 2025 10:20:21 -0700
-X-Gm-Features: Ac12FXwiLGc5GdsZn_qOja2m3m-3Suv_aTBv8aMYUOQDME3DEqdrTQ3FkvdZlpw
-Message-ID: <CABCJKueq=a6Y_2YmSDOa-VTCW9jwYPiXq94125EAMoZ5Y6-ypA@mail.gmail.com>
-Subject: Re: [PATCH bpf-next 0/4] Use correct destructor kfunc types
-To: Yonghong Song <yonghong.song@linux.dev>
-Cc: bpf@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250724212837119BP9HOs0ibXDRWgsXMMir7@zte.com.cn>
 
-On Fri, Jul 25, 2025 at 9:54=E2=80=AFAM Yonghong Song <yonghong.song@linux.=
-dev> wrote:
->
-> I just tried arm64 with your patch set. CFI crash still happened:
->
-> CFI failure at tcp_ack+0xe74/0x13cc (target: bpf__tcp_congestion_ops_in_a=
-ck_event+0x0/0x78; expected type: 0x64424
-> 87a)
+On Thu, Jul 24, 2025 at 09:28:37PM +0800, fan.yu9@zte.com.cn wrote:
+> From: Fan Yu <fan.yu9@zte.com.cn>
+> 
+> Currently, packets dropped by pfifo_fast due to queue overflow are
+> marked with a generic SKB_DROP_REASON_QDISC_DROP in __dev_xmit_skb().
+> 
+> This patch adds explicit drop reason SKB_DROP_REASON_QDISC_OVERLIMIT
+> for queue-full cases, providing better distinction from other qdisc drops.
+> 
+> Signed-off-by: Fan Yu <fan.yu9@zte.com.cn>
 
-This one should fixed by the other series I posted earlier:
+Reviewed-by: Cong Wang <xiyou.wangcong@gmail.com>
 
-https://lore.kernel.org/bpf/20250722205357.3347626-5-samitolvanen@google.co=
-m/
+BTW, it seems net-next is closed, you may need to resend it after it is
+re-open.
 
-Sami
+Thanks.
 
