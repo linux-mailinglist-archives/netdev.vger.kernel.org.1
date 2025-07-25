@@ -1,60 +1,57 @@
-Return-Path: <netdev+bounces-210207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210208-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A677B12627
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 23:39:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEFA4B1262B
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 23:42:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B9982189F1F7
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 21:39:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7108C583225
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 21:42:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 736AA24E01F;
-	Fri, 25 Jul 2025 21:39:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB35424E01F;
+	Fri, 25 Jul 2025 21:42:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DufsnYNS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qDh04UAA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A7CA242910;
-	Fri, 25 Jul 2025 21:39:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C87820487E;
+	Fri, 25 Jul 2025 21:42:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753479556; cv=none; b=lGp3154xjUWDDBxE/JcS7RLtqGJY8/KVvdu4YKOmpIiezqTg8GUjAQ7YPdemFNtyJsrjwI3m3HWXhEywdtddHb9I7lzLwPEqjM+DMNSac/ajEg/NE62pI4v489N8KYx0tsYcgXphmmgEyv8T8uWHAOi+tGj9Hk4UCwkPPOWwYHw=
+	t=1753479739; cv=none; b=q07wq5Al+j/JPFRNW1bqwOU0i7rIPmXvIhBbrHF91xbBrjyoLtlpEBbkL9Ng1NJTla3gs0h0RJd6kCrjevDNmzJ3KZ5JJbZfmSJ9+FnTwBcUfCJ6Kzj38zEcr7M5qnPQO8PcG2WYPXtO/JH6vyjmNz0ERsQYjVLB6UXKTslE1PQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753479556; c=relaxed/simple;
-	bh=s855RP0ntxcRIelDWLEqT1FhFHtsOA0rt3kzJy72HbQ=;
+	s=arc-20240116; t=1753479739; c=relaxed/simple;
+	bh=WinxX6AYbHEm/FkEU/zisNIu3Co8WMWQ1pz0YSaP9OA=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VLlhz0UbJVaEzv76gLlqbXuIxyPNDPVvYUER/5N2SCZl1V8SUQa6cKu+lKKWvxygD2XhnMnegXuojAQacd2EoEts+zmU+nsiDRIy9p7Z46IZ00jXE/f0sXxp8xUSmkNdVtd7Xyrk3SF8qqCKdaGh+gI7OngpRpO4YH/N+xvc6vE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DufsnYNS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DB5AC4CEEF;
-	Fri, 25 Jul 2025 21:39:15 +0000 (UTC)
+	 MIME-Version:Content-Type; b=q3XaRWQQVz6B2dLfIcxssAtovO5RHWJwaP6hWa9l1FK+GoKl7z7NvWbq4CVL8j8nMXFToMnaXBmuFIxl1sOfAR1lYOoVLUoNQHbT6m/Y0Td7p8LTGWCU7rcSKy1RB3PD4uYZT3JrPIgBreoobBWyXQopGTrZgzeBs5atDfmfbqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qDh04UAA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8A8DC4CEE7;
+	Fri, 25 Jul 2025 21:42:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753479555;
-	bh=s855RP0ntxcRIelDWLEqT1FhFHtsOA0rt3kzJy72HbQ=;
+	s=k20201202; t=1753479739;
+	bh=WinxX6AYbHEm/FkEU/zisNIu3Co8WMWQ1pz0YSaP9OA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=DufsnYNS2gzeiVrOivkaBRbIEV9itq//bQgJzZcMZ52lT6e8rhgOY8WKoulIXB4i1
-	 tSMY89RVvj2xkEr+yEACk1pwPjvQYYJ5KWb2WPpngGqCd0MpTJBalwt47vrNpRuddz
-	 WDXRqR2KYYZaEJHdy9sagWebAcVdl03yGy9eiel5wdG2C8vILk8qeW2i4vHZm2qpDK
-	 K7AQJ4/X0xT20mbom+NU9at/mhwJnkodiQxjBGzuklYD3bb7X4ML4ljxzxA6bf98xC
-	 oxpCKnM9wNr5G28loQfT3HOipeBieo2SRY8z7iTuehtL+t+QZ0fKf1kcKhg3H6LIM/
-	 7BbFeTRnQKvcA==
-Date: Fri, 25 Jul 2025 14:39:14 -0700
+	b=qDh04UAAl7Nw6S1W9yKm0UpWMvAjMiMCH/wEu6grNQ24heA8bBKOUb5vM3q3VkBHg
+	 E6qqRE5LsweDMV3MYFNUauNrQLDYeFecetNDlqh1y9pTGWFaalTBCCN6b/t0Jr5ibP
+	 rEY96S0VBu0cnYGxWtydXxkE7e/4h+6itUbYDf64YC2axSMbzOHHc0NV0AanraPDXO
+	 xK0+IYanHoS2xmo/J1ZosoRi6L1cUw/xhes5mQ8y/fUGLoWgWmqXWUdUjDqCiuwjX4
+	 ssk9NxCkEwtVEluFwZZr9CX16zpD2OB8JbXUdVnzQHScm1c43beg2CRzbng73mYZ2w
+	 ROU5uC01NJpYQ==
+Date: Fri, 25 Jul 2025 14:42:17 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Hariprasad Kelam <hkelam@marvell.com>
-Cc: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Sunil Goutham
- <sgoutham@marvell.com>, Geetha sowjanya <gakula@marvell.com>, "Subbaraya
- Sundeep" <sbhatta@marvell.com>, Bharat Bhushan <bbhushan2@marvell.com>,
- "Andrew Lunn" <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Tomasz Duszynski <tduszynski@marvell.com>, Simon
- Horman <horms@kernel.org>
-Subject: Re: [net PatchV4] Octeontx2-vf: Fix max packet length errors
-Message-ID: <20250725143914.696316b8@kernel.org>
-In-Reply-To: <20250724070623.2354509-1-hkelam@marvell.com>
-References: <20250724070623.2354509-1-hkelam@marvell.com>
+To: Oscar Maes <oscmaes92@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
+ edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
+ stable@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: ipv4: allow directed broadcast routes to
+ use dst hint
+Message-ID: <20250725144217.2617f6bc@kernel.org>
+In-Reply-To: <20250724124942.6895-1-oscmaes92@gmail.com>
+References: <20250724124942.6895-1-oscmaes92@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,19 +61,38 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 24 Jul 2025 12:36:22 +0530 Hariprasad Kelam wrote:
-> @@ -2165,6 +2166,8 @@ static netdev_tx_t otx2_xmit(struct sk_buff *skb, struct net_device *netdev)
->  	/* Check for minimum and maximum packet length */
->  	if (skb->len <= ETH_HLEN ||
->  	    (!skb_shinfo(skb)->gso_size && skb->len > pf->tx_max_pktlen)) {
-> +		dev_stats = &pf->hw.dev_stats;
-> +		dev_stats->tx_discards++;
->  		dev_kfree_skb(skb);
->  		return NETDEV_TX_OK;
->  	}
+On Thu, 24 Jul 2025 14:49:42 +0200 Oscar Maes wrote:
+> Currently, ip_extract_route_hint uses RTN_BROADCAST to decide
+> whether to use the route dst hint mechanism.
+> 
+> This check is too strict, as it prevents directed broadcast
+> routes from using the hint, resulting in poor performance
+> during bursts of directed broadcast traffic.
+> 
+> Fix this in ip_extract_route_hint and modify ip_route_use_hint
+> to preserve the intended behaviour.
 
-This is a multi-queue device and the counter is per device.
-The counter should really be an atomic_long_t, to avoid races.
+We are wrapping up our 6.17 material, I think this will need
+to wait for 6.18. In the meantime, would it make sense to add
+a selftest? Sounds like a relatively rare use case, easy to
+regress.
+
+> diff --git a/net/ipv4/ip_input.c b/net/ipv4/ip_input.c
+> index fc323994b..1581b98bc 100644
+> --- a/net/ipv4/ip_input.c
+> +++ b/net/ipv4/ip_input.c
+> @@ -589,8 +589,10 @@ static void ip_sublist_rcv_finish(struct list_head *head)
+>  static struct sk_buff *ip_extract_route_hint(const struct net *net,
+>  					     struct sk_buff *skb, int rt_type)
+>  {
+> -	if (fib4_has_custom_rules(net) || rt_type == RTN_BROADCAST ||
+> -	    IPCB(skb)->flags & IPSKB_MULTIPATH)
+> +	const struct iphdr *iph = ip_hdr(skb);
+> +
+> +	if (fib4_has_custom_rules(net) || ipv4_is_lbcast(iph->daddr) ||
+> +	    (iph->daddr == 0 && iph->saddr == 0) || IPCB(skb)->flags & IPSKB_MULTIPATH)
+
+nit: we still prefer to wrap lines at 80 chars in networking
 -- 
 pw-bot: cr
 
