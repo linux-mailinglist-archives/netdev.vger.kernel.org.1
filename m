@@ -1,89 +1,106 @@
-Return-Path: <netdev+bounces-210194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E02EAB12514
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 22:05:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 008EBB125BB
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 22:42:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 345FC1CE3DB5
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 20:05:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3854017AE84
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 20:42:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B282253925;
-	Fri, 25 Jul 2025 20:04:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FA3425A352;
+	Fri, 25 Jul 2025 20:42:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tc23Ptee"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YmazIgE/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCDB72528E1;
-	Fri, 25 Jul 2025 20:04:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC7B34501A;
+	Fri, 25 Jul 2025 20:42:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753473888; cv=none; b=PZGOT5v5t8rPKTmxU3p8LWFmXETlrRAmyDDNOxj2gx5GHDQjkRF1abXhzTMTEjHGKi7TGABxUtY2CU7Lq2Q0mucIIumYetYaNE8VR98bi9/gP5gUYCPvxaikap45qejKa8BbvAev4DsmsMGdZ+fX4fAb9yhiilbP1ZQRN5tWaNs=
+	t=1753476146; cv=none; b=YekJ+uH6pSSFK12gJTaZCQqvhwMM7NMzRiCSGVDq0bSyVtWN6FrwwPzkdx4XXFH7+Hm3frurkOTbtXyrX31ZP+FhyG23KTVQyoZBrgFetiBYB8GGG1VzLcufk6oppDRlH8EgCwiuuvEdm2Fyp7hQfC0Xn4Awngfhtl7e3Jun9UY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753473888; c=relaxed/simple;
-	bh=XXKRhRbkPdtCnHz5AqzwvY5fPC+7Cnxs+88nTiPHBpE=;
+	s=arc-20240116; t=1753476146; c=relaxed/simple;
+	bh=fZBV4lqYU38UGMYRXZ6zg+bQ+0ziMRfZaHfcZtGIR5Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uqRK3cK/VNHAvDRcjHk08QvQE8SWFNMpyHGRcJ1ogNzAAsy+OlqOO49OayMlj6NY6f9K3jc6fw6TWK8IEMFUGG7fPhy1lj6X16Xse2dW57vO+HyiNxLKoa0uOuQfPb7m3KwK0YQpdeW8IsZWd54btP6Z8QEL4SSbNIx7kMwRuhM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tc23Ptee; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D533C4CEE7;
-	Fri, 25 Jul 2025 20:04:46 +0000 (UTC)
+	 MIME-Version:Content-Type; b=QvRG+gI87iBCQsjuo+NZS+f+TDjxdkGUmbt7kSbM2FBrt1VIZl5HNZW6Lt6uj22Q6b7yh9iwgSG63xp3+YhnPrf3KAMqIExsnEwuC6VkSDC8ElyzNaZpyRkcxcfhthXmLKn9Gk6wuVxJT199FYmWa/Ue/PGzb207odU247ebaQA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YmazIgE/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0872FC4CEE7;
+	Fri, 25 Jul 2025 20:42:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753473887;
-	bh=XXKRhRbkPdtCnHz5AqzwvY5fPC+7Cnxs+88nTiPHBpE=;
+	s=k20201202; t=1753476145;
+	bh=fZBV4lqYU38UGMYRXZ6zg+bQ+0ziMRfZaHfcZtGIR5Y=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Tc23PteexjiHb5GWF3qs9ivHEy+H5q1OPzvdp+dh44jd8vBm5+0bhm0wPPLVviUXE
-	 h0YSPNOB3hyIqIx/PCzzoOv/mR81NhtPsZLpMBvgtvplYOR6JxNRmua2hgOMzNWGIW
-	 HJq5u0pfTtT/aEUinWJeIBcsw3S1rRKrb8sarmtlkB51WR2vJa4YvJmE9JYC/2fld2
-	 +esltBUXb6HBDed/ccndqjCLbsZmRc8tuAC6Mo7tlwtl3UdGQYyAQBXvcJLBrpf2ZD
-	 GH2ibsBbo78pPXzBPImolt7SgxMAUO8LoRnHNrnnVkGvf2ZMP7hpk50IBI7iE5H+WW
-	 tmW2/vlOh+DXA==
-Date: Fri, 25 Jul 2025 13:04:45 -0700
+	b=YmazIgE/oKWPCKoPTxj8Wt6E/SU3L/MsT36MEbgXjBG9pKgeAi94ulH0+jvPxDCg+
+	 Cs35kvvPfqFeJhoZmv+aEQe2EYG5w4XNvIeUlBx9IvSWk8GYn0mwuetS131ge2ZJJx
+	 amhRR34vrk6SIyyNCKpJZlvl7yfM3I99LkpC1M5q1tcN6PAgXZ5Qpp/gFtHYkLSTxG
+	 nNuBMWz0k3BItJi9wbWT3v+oAWsKLH+6kAcQAUlQrHTTuNIuULWpRoZJ5Ju1u3QCwX
+	 ozLS+MDsGG2CsNK7ALsUGNuthDRAj7BW0P/GxwV9ZVsKhM1+bW1NV5uFAOWAmSJ7/P
+	 qpA+OVeFsfvfQ==
+Date: Fri, 25 Jul 2025 13:42:24 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Russell King
- <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org, Christophe
- Leroy <christophe.leroy@csgroup.eu>, Herve Codina
- <herve.codina@bootlin.com>, Florian Fainelli <f.fainelli@gmail.com>, Heiner
- Kallweit <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
- =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Marek
- =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Oleksij Rempel
- <o.rempel@pengutronix.de>, =?UTF-8?B?Tmljb2zDsg==?= Veronese
- <nicveronese@gmail.com>, Simon Horman <horms@kernel.org>,
- mwojtas@chromium.org, Antoine Tenart <atenart@kernel.org>,
- devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>, Romain
- Gantois <romain.gantois@bootlin.com>, Daniel Golle <daniel@makrotopia.org>,
- Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-Subject: Re: [PATCH net-next v10 00/15] net: phy: Introduce PHY ports
- representation
-Message-ID: <20250725130445.32e0307f@kernel.org>
-In-Reply-To: <20250722121623.609732-1-maxime.chevallier@bootlin.com>
-References: <20250722121623.609732-1-maxime.chevallier@bootlin.com>
+To: Breno Leitao <leitao@debian.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel-team@meta.com
+Subject: Re: [PATCH net-next v3 3/5] netconsole: add support for strings
+ with new line in netpoll_parse_ip_addr
+Message-ID: <20250725134224.0a2da8e7@kernel.org>
+In-Reply-To: <20250723-netconsole_ref-v3-3-8be9b24e4a99@debian.org>
+References: <20250723-netconsole_ref-v3-0-8be9b24e4a99@debian.org>
+	<20250723-netconsole_ref-v3-3-8be9b24e4a99@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, 22 Jul 2025 14:16:05 +0200 Maxime Chevallier wrote:
-> Here's V10 of the phy_port series. This version doesn't contain any
-> significant change, it fixes the conflict on the qualcom PHY driver, as
-> well as aggregates the reviews from Rob, K=C3=B6ry and Christophe (thanks
-> again).
+On Wed, 23 Jul 2025 10:20:31 -0700 Breno Leitao wrote:
+>  	const char *end;
+> +	int len;
+>  
+> -	if (!strchr(str, ':') &&
+> -	    in4_pton(str, -1, (void *)addr, -1, &end) > 0) {
+> -		if (!*end)
+> -			return 0;
+> -	}
+> -	if (in6_pton(str, -1, addr->in6.s6_addr, -1, &end) > 0) {
+> -#if IS_ENABLED(CONFIG_IPV6)
+> -		if (!*end)
+> -			return 1;
+> -#else
+> +	len = strlen(str);
+> +	if (!len)
+>  		return -1;
+> -#endif
+> -	}
+> +
+> +	if (str[len - 1] == '\n')
+> +		len -= 1;
+> +
+> +	if (in4_pton(str, len, (void *)addr, -1, &end) > 0)
+> +		return 0;
+> +	if (IS_ENABLED(CONFIG_IPV6) &&
+> +	    in6_pton(str, len, addr->in6.s6_addr, -1, &end) > 0)
+> +		return 1;
+>  	return -1;
 
-Looks like we gathered no reviews from PHY maintainers here.
-We'll need to Defer this series to 6.18. Perhaps we should
-have pinged PHY maintainers a bit more for their input, sorry :(
---=20
-pw-bot: cr
+Looks like we're removing the validation for reaching the end of 
+the buffer? This should at least be explained in the commit message.
+AFAICT for IPv4 for example 1.2.3.4:xyz would have been rejected,
+now it's accepted. Personally I find the
+
+	if (*end && *end != '\n')
+
+removed by subsequent patch cleaner than modifying the input string.
+
+I'll apply the first patch of the series..
 
