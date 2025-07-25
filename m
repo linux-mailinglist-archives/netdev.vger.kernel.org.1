@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-210237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210238-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5B02B1275D
-	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 01:26:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFA76B12761
+	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 01:26:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC2B91CE0A17
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 23:26:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC47E5A2FF2
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 23:26:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 598FD261574;
-	Fri, 25 Jul 2025 23:25:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B633262FDC;
+	Fri, 25 Jul 2025 23:25:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vCT6Nob5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DcZmAadH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A8E12609D4;
-	Fri, 25 Jul 2025 23:25:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F39CD262FD3;
+	Fri, 25 Jul 2025 23:25:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753485950; cv=none; b=mZyktXEo4Zj6V8qoN/xaRi5tTROLWa4uHCDnkdjoyJiyTsnTnn3aVQtAJXqqYDT29CIG7YHqUEb6UAnhgULk23eDExTJpTQ1pnHojKgJStqiDeiC+ChjNXdRBGTnqiskX6Z0tLMhDRovS2GtVo0hu8ktLrTes5GO2QZ/bx9QvRw=
+	t=1753485952; cv=none; b=a28fQ3rzo/XJTWMARvLWXR9grjKKbJWKNQ5VRsyXp2U+xc82oHN+2njTbnXOG/gAba/TLSXJTa0npXFGyIcmMbSV8hSrqnKNF0e2ZRT6dCP0dy9ZSF1MT8mvbbnyZfL1WZFT16KNMsxqvJITTwfzmdqnIj1gQLJ6rIUsLHl8uKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753485950; c=relaxed/simple;
-	bh=k+gS4GQuoGUziec6fqwcYVbZRGH00+uvJgsa8lL3+8w=;
+	s=arc-20240116; t=1753485952; c=relaxed/simple;
+	bh=l51al/QFedVHOTi6PJmLhdwhub8Z0TdeLred9hEemnc=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=MXMqqiAW3Lr8V2fbvHEvjdUcjEHYxRf9jPrRcDhSrvQAdchLwEp9hlagM+03MvSZu2bvikg0Zn86Q9mdJN5P6csT94J/KzHOIirTwNKVsHMWgs7uIO/raibgIFSzdTCHm0BXQW+0uUImqLD8GivGZB84FQ5J0v5zbeDISOD1V+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vCT6Nob5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 025E6C4CEE7;
-	Fri, 25 Jul 2025 23:25:50 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=ivC0tyyXWqxAwcUcXvk2aKemSeYrURZahezSriF11cJI39gYAZEsqzUEyAmyCRHpiPusOhgzUu/7mLCACkcjcJBsYYFpmbXOHSUzcCO3HGhCtDtu81B0FrjuCfV3Trag6dBOuEgJGwWsBHKgxg+Tbri6r5icsQ4cit13qApiZvE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DcZmAadH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76F12C4CEF5;
+	Fri, 25 Jul 2025 23:25:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753485950;
-	bh=k+gS4GQuoGUziec6fqwcYVbZRGH00+uvJgsa8lL3+8w=;
+	s=k20201202; t=1753485951;
+	bh=l51al/QFedVHOTi6PJmLhdwhub8Z0TdeLred9hEemnc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=vCT6Nob53ktddXRTiLA22iurf8QTUFtVDRLwYuc6tyc4ZtFba8TWPyirgGONVqnEn
-	 qWJs3HcdFvOyjhO2y5ekUJEwu6HZlHQQuJteftEtJ+XLMUjEhc1rfJERKUN8FLq3Lj
-	 Qq18dCgTiE56LRrsa8OgZi3oHsggkp/cnyl8DXKmc9zHr13JqY5QQyL0Te3vDOZGfn
-	 3I8DA1ebMR8M/dQZ3eC+j7iWq7o8NvRjA+U8C9uFOGW1TJZJlm4aftY1NEOuQGnQkG
-	 6lQBcLmz5hr1Lt8HNHOl1/tgJa5ddBRhFhOgkptX909zq/16Vn4H71Fol+pvAOchvB
-	 Q6oWs7LNvJw1A==
+	b=DcZmAadHRzsjZV9pZGPGuq7C0piaPvnN/7m4/Edeb8HushFebzIMANBZVQKJyq3wP
+	 sUWzKY1jhIZ+5G66HMZZ329Tx0omlOxgZo8/XoiFiXakJbzukxRTl6UIA2wpnDT9KM
+	 EGbKXcf4fdbpF5RvAeciLDSZe/SYDtU/Bt7IsBdrb1M+wgtKHbdh/JcMz5+rGJ7Xtk
+	 6Qqqh4TnJTlv2yGWYbI7GN6OD0VKesA1/QerYemCjm+kEiR5PSo2lZMeIMXwxQBa87
+	 xPbgSIF68DTMLSJ67a4JWiuywPTbBe2tvMxbSXRKmT8KK8TVJ51McNOQL9oQjGj0MI
+	 MDG1eHBor1xSQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD3F383BF4E;
-	Fri, 25 Jul 2025 23:26:08 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33CE0383BF4E;
+	Fri, 25 Jul 2025 23:26:10 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,57 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/3] net: Add sockaddr_inet unified address
- structure
+Subject: Re: [PATCH net-next V2 0/2] net/mlx5e: misc changes 2025-07-22
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175348596749.3366157.11889906791238903563.git-patchwork-notify@kernel.org>
-Date: Fri, 25 Jul 2025 23:26:07 +0000
-References: <20250722171528.work.209-kees@kernel.org>
-In-Reply-To: <20250722171528.work.209-kees@kernel.org>
-To: Kees Cook <kees@kernel.org>
-Cc: marcelo.leitner@gmail.com, kuba@kernel.org, Jason@zx2c4.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, lucien.xin@gmail.com, horms@kernel.org,
- linux-kernel@vger.kernel.org, wireguard@lists.zx2c4.com,
- netdev@vger.kernel.org, linux-sctp@vger.kernel.org,
- linux-hardening@vger.kernel.org
+ <175348596874.3366157.1851512921541763037.git-patchwork-notify@kernel.org>
+Date: Fri, 25 Jul 2025 23:26:08 +0000
+References: <1753194228-333722-1-git-send-email-tariqt@nvidia.com>
+In-Reply-To: <1753194228-333722-1-git-send-email-tariqt@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, saeed@kernel.org, gal@nvidia.com,
+ leon@kernel.org, saeedm@nvidia.com, mbloch@nvidia.com,
+ netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 22 Jul 2025 10:18:30 -0700 you wrote:
-> Hi!
+On Tue, 22 Jul 2025 17:23:46 +0300 you wrote:
+> Hi,
 > 
-> Repeating patch 1, as it has the rationale:
+> This series contains misc enhancements to the mlx5e driver.
+> This is V2. Previous one was deferred, find it here:
+> https://lore.kernel.org/all/1752771792-265762-1-git-send-email-tariqt@nvidia.com/
 > 
->     There are cases in networking (e.g. wireguard, sctp) where a union is
->     used to provide coverage for either IPv4 or IPv6 network addresses,
->     and they include an embedded "struct sockaddr" as well (for "sa_family"
->     and raw "sa_data" access). The current struct sockaddr contains a
->     flexible array, which means these unions should not be further embedded
->     in other structs because they do not technically have a fixed size (and
->     are generating warnings for the coming -Wflexible-array-not-at-end flag
->     addition). But the future changes to make struct sockaddr a fixed size
->     (i.e. with a 14 byte sa_data member) make the "sa_data" uses with an IPv6
->     address a potential place for the compiler to get upset about object size
->     mismatches. Therefore, we need a sockaddr that cleanly provides both an
->     sa_family member and an appropriately fixed-sized sa_data member that does
->     not bloat member usage via the potential alternative of sockaddr_storage
->     to cover both IPv4 and IPv6, to avoid unseemly churn in the affected code
->     bases.
+> Regards,
+> Tariq
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,1/3] ipv6: Add sockaddr_inet unified address structure
-    https://git.kernel.org/netdev/net-next/c/463deed51796
-  - [net-next,2/3] wireguard: peer: Replace sockaddr with sockaddr_inet
-    https://git.kernel.org/netdev/net-next/c/9203e0a82c0b
-  - [net-next,3/3] sctp: Replace sockaddr with sockaddr_inet in sctp_addr union
-    https://git.kernel.org/netdev/net-next/c/511d10b4c2f9
+  - [net-next,V2,1/2] net/mlx5e: Support routed networks during IPsec MACs initialization
+    https://git.kernel.org/netdev/net-next/c/71670f766b8f
+  - [net-next,V2,2/2] net/mlx5e: Expose TIS via devlink tx reporter diagnose
+    https://git.kernel.org/netdev/net-next/c/5474ca211819
 
 You are awesome, thank you!
 -- 
