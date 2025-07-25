@@ -1,135 +1,182 @@
-Return-Path: <netdev+bounces-210051-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210052-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3196BB11F63
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 15:34:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 11F1FB11F8E
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 15:50:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E97044E5823
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 13:33:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD7FCAC572B
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 13:50:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EA2419D89B;
-	Fri, 25 Jul 2025 13:34:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8AC617CA1B;
+	Fri, 25 Jul 2025 13:50:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LCWzyzLY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R0jEMv/9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88D749475;
-	Fri, 25 Jul 2025 13:34:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14F0D145355;
+	Fri, 25 Jul 2025 13:50:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753450454; cv=none; b=dC3KyKUAUvS9ZtImudZOX/aaexlIgTO6yEe+ndrCS/kp2fAgYAaQ2tJpkfezSBfNwERcGG/DpX4+gboXyi8RnE8+DqZW/dTTVn0f6QoPv068yAW+4mYc8+5lh+PZ3Eccn065xLfx0GD75UKmjM7RM0up9iNAOF4tOfKon/hHOZE=
+	t=1753451446; cv=none; b=nv6cCTClj6aMJfJhJctnviX0QDR4s7YjhGPPRuxEVlyzfr8b6ykeEey2HnYBBqiNTEJpJ4SyHRZm6MTDYjpb8au1XNnUPfDLaVxPrOSUJdFV4pQdRyRyWjkv5E30cP4gKAvlFC0awdAtQRV/7Esi6sS2gVLhNroJPq3vurACnJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753450454; c=relaxed/simple;
-	bh=npbPwPwPnAlRn5kq54i/SmQHlTeHdREVdeflDeKYFu4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rqh+q0pgmrlCfkZ8w0J+Ja9OA4lHauZD9C/1CBlaXY0LqoS6zC/CHd2+IyybK3dCy0pnU0BL2Sxb1m6twDZyExj1vqyn0Owp6EqOrrTTc8OCvslIkUaFQp7Hl/aP0JOCuihTu5yKBmuDoykDq1DVZLuTqQLUMbOsCVUInGWISsY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LCWzyzLY; arc=none smtp.client-ip=209.85.128.50
+	s=arc-20240116; t=1753451446; c=relaxed/simple;
+	bh=FAPCZ6K0FBV4BSkEjyD8Ux6aerP1JkaHRXR23d1LZ4I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TvUo+3ta4DKV3BFQaplt4SR7RhuG+kFyXzdazJXm6EEp2eF3AeB+xYzR/5OzsbKr11XQX2KULLbpSWYQnrWJiW1b1uq8EBXw42lexa+PfU/g+OoVhQ+WJOv+HoEDWTAwA23pvdD2dGs01aiHT0la9AwVWp7xHxDjM2HFWxQeX74=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R0jEMv/9; arc=none smtp.client-ip=209.85.167.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-45617a1bcdcso1231585e9.1;
-        Fri, 25 Jul 2025 06:34:12 -0700 (PDT)
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-55a4e55d3a9so2393769e87.1;
+        Fri, 25 Jul 2025 06:50:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753450451; x=1754055251; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=L4fkWohIN9Tymim1ViegWsddn2WdurixVR25PkINhrM=;
-        b=LCWzyzLYYz77m/5KDatuye0+Bd2dVH/aE8sfgkKW/4msMGFVZL4YPvcpoftUmgsS7q
-         xUA0GxJFUn6r0rC97PyVdIyUr4SZVvgfFKxJSMFG5SKxwpHuLRk/34BNqxip5CkfFa17
-         2312HAD48CT3n5uhj2v0aA8LPXkqnvpDQL9ZcKkLywMr5N11W94glJD3lpk/fKL5gAzf
-         +dh0nB39y9AilAF5rCF/336jaHZgGu/o/b0KuNmvd4+Xc6KxPYYYaNTHx+FP2NJLmEU2
-         CDCzY54TO8ucji71OeUO1BC/EP/9r20sQchDJoZRF2qILQvsPNm2gSviHoGezTwwlIHD
-         YEtw==
+        d=gmail.com; s=20230601; t=1753451443; x=1754056243; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=H8AZ8dw4wlMt8tvkWDmYjh+r6b67fQnAZ8m3R9J0K5M=;
+        b=R0jEMv/9MCLJ7NsFEoJ25QwJHg2BB5Z5a7Ami2QbU2ydRKfc+LWQVOP0Zdh2LqWoEG
+         05qnoFQQxc3cLTlEP0vHylbKn5onD4qmEnvkJYEnu7Npra56AnznrXrSriQ03TXqTFty
+         zMnWga06gaIf7Cu/l5ATzg2BdPuZ8QPLa+f3u8u1eZ91Afo5/bM7k3QJIMmsU6cb3F0y
+         Shpht1fLfvivabXWP2F4Wtyd3YL9gIWbmaxNXPFcrIijVU1w5bEX4VFKdcvRAZOaLfHZ
+         RmzsDKR2r9eNmpQeJO3fIsAS5EwKv61cvcaqVc0a9KGF7mJ7hc19ndFjYPe8MHH/hvSv
+         +kPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753450451; x=1754055251;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=L4fkWohIN9Tymim1ViegWsddn2WdurixVR25PkINhrM=;
-        b=wiE2Yjy/Ev8RavLyhkptp+zkzrDeL+uagLviqreMvDfFufW64UpRAUipRAkDeslWyC
-         Qfs5VbaQmHZR+epT7F0wDo2bgHUtblzvkEvYT9eJijwfrsSJ8M2T5TWTO8zS8ULq1An6
-         7xstSecCwzDmuEkV4kutK/lfD+5sTs4ouhZXv/21QqNXE7bNnPEMGU5sQbqeS7vdWGIs
-         X0VtgXh8gD2a1lbPN2znn3/F+8W3x5dRIqRV6iB/cFfCzt3hKLbOeBet3GrEpqyWwRpe
-         kKXnAoSsiK537VdQFyuTrUCeWepz+16WR74CXdveVTGD7hZONq6aBCrB2ZUAMI9rLjEk
-         uRTQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUWavzYtK1xc4za+fEn+O3ox77jTBqqRpD0sna7PE5r2vAWsvU2r2vgF+rgsvK/QRMdJ/TVA+PjHuMrfak=@vger.kernel.org, AJvYcCVb6Nu1Cxf+synBczKldLMtZ0tcF7Lb4Ko9TbDps5MIJco5NhQ4m0DJeMr0bPGyd35aIEhVHkU2@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy9troMaihTxRl0g/CN8TA3qaJSEznbnXk19yJIAm/TajREcSeI
-	QDn6MwLPGzVTPiiuhR6nGYQc3lnHmmNsk5FsMohmb5t8dm35zUGX3DaA
-X-Gm-Gg: ASbGncuhaYMnzdy7K7T1CoFZhDCsbOIXkaa9iMLgNigtNZVLzsmHYvjbpSo36FWSDbQ
-	Gu0brng6kQxJDenDRa/ylw/rc/TIKYT57x5hqlZGoS1LYVbTIpfftM91nZc4LVj9AZjtm9lAYu3
-	KUJwa3U4hM2s8nOwJXsNlTpHzugTLGPrUm1JJbJKFWo1AO/cI7/DWDVG5lO0+XQX7VdO9TiCxbB
-	sggMCeiv7R+tcFx7nBAgKclR9vPTyNd1wt97/zKoHa+gxAG0jAgSi67dHxqEIOSW46ZN9Y1oR2F
-	YgQ37b/FV91DGLa2zvSg289L9j3A35ZdzUuX+4oJNOHMGNVSZoAca9Zofcx5Szh6zEtDEWOlVzU
-	bl2/9HXxnfflzxWiZQ0EhHMH/XdJHrM0C15fkWGYLWSjnkQ==
-X-Google-Smtp-Source: AGHT+IGr/2sDO56DQrdwx9I1xVo2cv39WgMClyR+5CETmj47IFNUseUrArHv2aYOr68iQ28812AK6A==
-X-Received: by 2002:a05:600c:5253:b0:456:1823:f10 with SMTP id 5b1f17b1804b1-45876676a3dmr7502385e9.8.1753450450476;
-        Fri, 25 Jul 2025 06:34:10 -0700 (PDT)
-Received: from thomas-precision3591.. ([2a0d:e487:311f:7f4c:22d8:dfe:2923:8b81])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-4587054f22esm56287005e9.9.2025.07.25.06.34.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Jul 2025 06:34:10 -0700 (PDT)
-From: Thomas Fourier <fourier.thomas@gmail.com>
-To: 
-Cc: Thomas Fourier <fourier.thomas@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
-	Moritz Fischer <mdf@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net] net: ethernet: nixge: Add missing check after DMA map
-Date: Fri, 25 Jul 2025 15:33:04 +0200
-Message-ID: <20250725133311.143814-2-fourier.thomas@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20230601; t=1753451443; x=1754056243;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=H8AZ8dw4wlMt8tvkWDmYjh+r6b67fQnAZ8m3R9J0K5M=;
+        b=tD8D2CDcIjGFIiowzS31d8Q+SMLdHq7BuXxQ5akKnF6mRHcNCV1VFZfJOjZXjQLoI7
+         kqC5n4wCOBQZylOsNZ0Ie0bus95WvSNo3wKfQNrTNzCqGMOoO6E+GAZrLA/CbNQhCdI/
+         xzEQNhgspXIkioEXI6wyW9B3yX351PmeFax91mhGQTvfJmSqWQMZ89jdO8mng4mPeIPJ
+         5AJo5LLP1JMeU/gP9zb6EoasyLUlsBjy/cewy5nXr7CBK8DC0eybpqTHJl2CpRjbDehw
+         6FFRKkPrbmNMaC2Lrn1G7VoWbI7VuHh8NmB89QXs7mmmTcVx8yrw6ziHHYk5/CgxOQVK
+         WEgQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXtq1ycZDIEi+dZ754eI6e1tSBpBNpEQhGIBjMsc+IoMDsNRN8wyl9r+aZJSWk1kG6FG1N1/o0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxP6z7ooujvBlCx1SoxC8Pb6O/pMjJ0ZIT9lHiRV8XEFK/pZZkL
+	sndVa0Yn6XNkAvsUnd7mvGtI6JhLVdxgHOqtm5b/eJ+0yR0Oprf8J2pQ
+X-Gm-Gg: ASbGnct9f+ztmYMIPz5Ngqh9xrcflmz0ZznLVGINLX/+gvGuTmaRcojT6DqTyiwToTC
+	ZU/zvK/32THW5kH+wspmqHVpt/cGj44YXvdASm3q4oIqrQR2E5TldJlrGeYWe0/N79NpRosXaCW
+	cBoBYyt6c0Dz7JOcw30VreSKRYOYRMRfh4JNH2KatmAVfcHDGcbFVcxJp4vliHmM1dOJKZLsE4b
+	9qm6H9SWW4ddo8m3TvTkQCHEC4XhuKK4m7ju7slOpJJSeDHFhkxV4SfadO7R9m0yqTjXEOQObbu
+	oJlmbnnGs5ncoeLxHrNDlQPnkQdQyx2SKSINTP5s2UEr2veDIerH1B5ThCskp23VONUvoqmEv+p
+	7hhdQqMI9Ji2Yusn+vkbFt7KIBTLJFPgcLSPK//mYfOUhM0MVG+pWcOmNN+bTvhPxEouTh7Wxbq
+	5h
+X-Google-Smtp-Source: AGHT+IEpeOEfwHq491tawCARQrnliwqCVR0pf+lT8L5QZRcVzG0fLoe6k9h43TGvdHOLnJos7LNYbA==
+X-Received: by 2002:a05:6512:e89:b0:553:2c01:ff44 with SMTP id 2adb3069b0e04-55b5f3d2fb4mr447430e87.2.1753451442676;
+        Fri, 25 Jul 2025 06:50:42 -0700 (PDT)
+Received: from [192.168.66.199] (h-98-128-173-232.A785.priv.bahnhof.se. [98.128.173.232])
+        by smtp.googlemail.com with ESMTPSA id 2adb3069b0e04-55b53b376c4sm952489e87.77.2025.07.25.06.50.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 25 Jul 2025 06:50:42 -0700 (PDT)
+Message-ID: <6cbe9e11-a9b7-48f2-8b13-068fb9eec290@gmail.com>
+Date: Fri, 25 Jul 2025 15:50:41 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 07/10] can: kvaser_pciefd: Add devlink support
+To: Marc Kleine-Budde <mkl@pengutronix.de>, Jimmy Assarsson <extja@kvaser.com>
+Cc: linux-can@vger.kernel.org, Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+ Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
+References: <20250725123230.8-1-extja@kvaser.com>
+ <20250725123230.8-8-extja@kvaser.com>
+ <20250725-ingenious-labradoodle-of-action-d4dfb7-mkl@pengutronix.de>
+Content-Language: en-US
+From: Jimmy Assarsson <jimmyassarsson@gmail.com>
+In-Reply-To: <20250725-ingenious-labradoodle-of-action-d4dfb7-mkl@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The DMA map functions can fail and should be tested for errors.
+On 7/25/25 2:47 PM, Marc Kleine-Budde wrote:
+> On 25.07.2025 14:32:27, Jimmy Assarsson wrote:
+>> --- a/drivers/net/can/kvaser_pciefd/kvaser_pciefd_core.c
+>> +++ b/drivers/net/can/kvaser_pciefd/kvaser_pciefd_core.c
+>> @@ -1751,14 +1751,16 @@ static int kvaser_pciefd_probe(struct pci_dev *pdev,
+>>   			       const struct pci_device_id *id)
+>>   {
+>>   	int ret;
+>> +	struct devlink *devlink;
+>>   	struct device *dev = &pdev->dev;
+>>   	struct kvaser_pciefd *pcie;
+>>   	const struct kvaser_pciefd_irq_mask *irq_mask;
+>>   
+>> -	pcie = devm_kzalloc(dev, sizeof(*pcie), GFP_KERNEL);
+>> -	if (!pcie)
+>> +	devlink = devlink_alloc(&kvaser_pciefd_devlink_ops, sizeof(*pcie), dev);
+>> +	if (!devlink)
+>>   		return -ENOMEM;
+>>   
+>> +	pcie = devlink_priv(devlink);
+>>   	pci_set_drvdata(pdev, pcie);
+>>   	pcie->pci = pdev;
+>>   	pcie->driver_data = (const struct kvaser_pciefd_driver_data *)id->driver_data;
+>> @@ -1766,7 +1768,7 @@ static int kvaser_pciefd_probe(struct pci_dev *pdev,
+>>   
+>>   	ret = pci_enable_device(pdev);
+>>   	if (ret)
+>> -		return ret;
+>> +		goto err_free_devlink;
+>>   
+>>   	ret = pci_request_regions(pdev, KVASER_PCIEFD_DRV_NAME);
+>>   	if (ret)
+>> @@ -1830,6 +1832,8 @@ static int kvaser_pciefd_probe(struct pci_dev *pdev,
+>>   	if (ret)
+>>   		goto err_free_irq;
+>>   
+>> +	devlink_register(devlink);
+>> +
+>>   	return 0;
+>>   
+>>   err_free_irq:
+>> @@ -1853,6 +1857,9 @@ static int kvaser_pciefd_probe(struct pci_dev *pdev,
+>>   err_disable_pci:
+>>   	pci_disable_device(pdev);
+>>   
+>> +err_free_devlink:
+>> +	devlink_free(devlink);
+>> +
+>>   	return ret;
+>>   }
+>>   
+>> @@ -1876,6 +1883,8 @@ static void kvaser_pciefd_remove(struct pci_dev *pdev)
+>>   	for (i = 0; i < pcie->nr_channels; ++i)
+>>   		free_candev(pcie->can[i]->can.dev);
+>>   
+>> +	devlink_unregister(priv_to_devlink(pcie));
+>> +	devlink_free(priv_to_devlink(pcie));
+>>   	pci_iounmap(pdev, pcie->reg_base);
+>                            ^^^^
+> 
+> This smells like a use after free. Please call the cleanup function in
+> reverse order of allocation functions, i.e. move devlink_free() to the
+> end of this function.
+> 
+>>   	pci_release_regions(pdev);
+>>   	pci_disable_device(pdev);
+> 
+> regards,
+> Marc
 
-Fixes: 492caffa8a1a ("net: ethernet: nixge: Add support for National Instruments XGE netdev")
-Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
----
- drivers/net/ethernet/ni/nixge.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/ni/nixge.c b/drivers/net/ethernet/ni/nixge.c
-index 230d5ff99dd7..027e53023007 100644
---- a/drivers/net/ethernet/ni/nixge.c
-+++ b/drivers/net/ethernet/ni/nixge.c
-@@ -334,6 +334,10 @@ static int nixge_hw_dma_bd_init(struct net_device *ndev)
- 		phys = dma_map_single(ndev->dev.parent, skb->data,
- 				      NIXGE_MAX_JUMBO_FRAME_SIZE,
- 				      DMA_FROM_DEVICE);
-+		if (dma_mapping_error(ndev->dev.parent, phys)) {
-+			dev_kfree_skb_any(skb);
-+			goto out;
-+		}
- 
- 		nixge_hw_dma_bd_set_phys(&priv->rx_bd_v[i], phys);
- 
-@@ -645,8 +649,8 @@ static int nixge_recv(struct net_device *ndev, int budget)
- 					  NIXGE_MAX_JUMBO_FRAME_SIZE,
- 					  DMA_FROM_DEVICE);
- 		if (dma_mapping_error(ndev->dev.parent, cur_phys)) {
--			/* FIXME: bail out and clean up */
--			netdev_err(ndev, "Failed to map ...\n");
-+			dev_kfree_skb_any(new_skb);
-+			return packets;
- 		}
- 		nixge_hw_dma_bd_set_phys(cur_p, cur_phys);
- 		cur_p->cntrl = NIXGE_MAX_JUMBO_FRAME_SIZE;
--- 
-2.43.0
+I agree. Thanks for finding this!
+I've tested moving devlink_free() to the end of the function, without any
+issues.
 
+If you don't find any other problems, do you mind making this change before sending
+the PR? Otherwise I need to wait for the netdev 24h grace period, as Paolo
+pointed out [1], before sending v5.
+
+[1] https://lore.kernel.org/linux-can/20250725-furry-precise-jerboa-d9e29d-mkl@pengutronix.de/T/#m174402d37840f225b2799fbc53d7658ccc27be72
+
+Best regards,
+jimmy
 
