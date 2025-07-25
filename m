@@ -1,53 +1,50 @@
-Return-Path: <netdev+bounces-209935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209938-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46800B115A7
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 03:16:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F6F1B115EB
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 03:40:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06B723A40E5
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 01:16:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 500AF545F9B
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 01:40:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 059C817CA1B;
-	Fri, 25 Jul 2025 01:16:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCE98194124;
+	Fri, 25 Jul 2025 01:40:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u9V27TIW"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92D3BB676;
-	Fri, 25 Jul 2025 01:16:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A294B10FD;
+	Fri, 25 Jul 2025 01:40:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753406204; cv=none; b=i/72iDmL8sFoRDAXE3MbcDNEfWAKeg75a4RdxfblXDUEc5JDauinYpNtweL5/e+54ZvpLiJe4RotK/8F+F/vIldPdQR9Hk/uFzcX8c5d9indcE0qjlIHegm6+tAOx/ZZjK8PKzuH1TASPgvFeL87iN5vgGHfF0vmcjof/7eU22s=
+	t=1753407612; cv=none; b=Bp6htYQVVq1/4PZxHBziwli6otPlbb0N5H1ewWNFj6HVTJzNZjGvWSBHQGQN/D40SnraPRG4jE6JMNfRI6Kr2ugh9h3JnLpLvV/F9Gop0jYXE1jG2LufT+YILbqORnvocamtXs/rikfNMrbFlFxuXB6u7v9g7OpchDToj/+NNpQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753406204; c=relaxed/simple;
-	bh=tgJjmb3D/EBX50l0+VI6F0vwMmlQ/g6/llxOIyaa9H0=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=KDeHYOdBuN9+If5oNBvemd588NYuj4JsVLgqLgNILjM2Hosna9GNDEzWfipRNYGgLMkGDUWY+aierh7zPx83mlEvGMgjtrmJUyZn94aa0Dd5D7I6fwo1C6FceTMFMsPVVaUMC7zsWqYwDJsA63Xt3FplxhXRHr3LeFF+DZOzBok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.112])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4bp8zN2fTmz2RVxc;
-	Fri, 25 Jul 2025 09:14:24 +0800 (CST)
-Received: from dggpemf500016.china.huawei.com (unknown [7.185.36.197])
-	by mail.maildlp.com (Postfix) with ESMTPS id CDF271400D4;
-	Fri, 25 Jul 2025 09:16:39 +0800 (CST)
-Received: from huawei.com (10.175.124.27) by dggpemf500016.china.huawei.com
- (7.185.36.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Fri, 25 Jul
- 2025 09:16:38 +0800
-From: Wang Liang <wangliang74@huawei.com>
-To: <sgarzare@redhat.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>
-CC: <yuehaibing@huawei.com>, <zhangchangzhong@huawei.com>,
-	<wangliang74@huawei.com>, <virtualization@lists.linux.dev>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH net-next] vsock: remove unnecessary null check in vsock_getname()
-Date: Fri, 25 Jul 2025 09:38:08 +0800
-Message-ID: <20250725013808.337924-1-wangliang74@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1753407612; c=relaxed/simple;
+	bh=f5HZZIcJyY3r2sAv5U8oKwJfCVI8PDB6W3bJrZlCNI0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=jB4nbkVEcFzWpjTEXQVEqhDIsz1dvNDPnXA+tXjdjpJxu7JaD1Y4uh2KXHPbBuc2guRM/zP15ivfXsvek7DpJMsqRGwDRJGe+gEBXGxR1a8ETy+liFsuO4z8ip1atZuyQ8ulv+/7fZ2njaP+kOShnzXSfhRLZofu+JEUDgyaJVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u9V27TIW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42F0AC4CEED;
+	Fri, 25 Jul 2025 01:40:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753407612;
+	bh=f5HZZIcJyY3r2sAv5U8oKwJfCVI8PDB6W3bJrZlCNI0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=u9V27TIW1Z9wi96FWGQ7U51ijYLS/zke5R3tDo14yf/thcGJxhyRq2H/YOvU2G0um
+	 bcM7ELIQInNBXjOIQNAI5fUylQXE9knn3Kls6QHvk085zF6UykuGJo0LMKkQjM3l5M
+	 Z16ZqVKbLVn1JktoRynrhnp7d6OqlolOZaEshwf+dkF1HT3Yu+uHEGWKVAC967+wFG
+	 CPyFuiibzK6i9MxZFg4bybMCzXt38P16Ts2+Nsfktndm9YfEmBNkn6wxAGZ2D9ddXX
+	 86pXM8oFx0lW4qa8O696iMOKKwAKJ4QZMWh6NplfRlCKTE4FV8eOfEuFMCtE8bdGmi
+	 I+XiXw7ZFFEVQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B8F383BF4E;
+	Fri, 25 Jul 2025 01:40:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,34 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
- dggpemf500016.china.huawei.com (7.185.36.197)
+Subject: Re: [GIT PULL] bluetooth-next 2025-07-23
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175340763001.2600170.388804154259482388.git-patchwork-notify@kernel.org>
+Date: Fri, 25 Jul 2025 01:40:30 +0000
+References: <20250723190233.166823-1-luiz.dentz@gmail.com>
+In-Reply-To: <20250723190233.166823-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org
 
-The local variable 'vm_addr' is always not NULL, no need to check it.
+Hello:
 
-Signed-off-by: Wang Liang <wangliang74@huawei.com>
----
- net/vmw_vsock/af_vsock.c | 5 -----
- 1 file changed, 5 deletions(-)
+This pull request was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-index 1053662725f8..fae512594849 100644
---- a/net/vmw_vsock/af_vsock.c
-+++ b/net/vmw_vsock/af_vsock.c
-@@ -1028,11 +1028,6 @@ static int vsock_getname(struct socket *sock,
- 		vm_addr = &vsk->local_addr;
- 	}
- 
--	if (!vm_addr) {
--		err = -EINVAL;
--		goto out;
--	}
--
- 	/* sys_getsockname() and sys_getpeername() pass us a
- 	 * MAX_SOCK_ADDR-sized buffer and don't set addr_len.  Unfortunately
- 	 * that macro is defined in socket.c instead of .h, so we hardcode its
+On Wed, 23 Jul 2025 15:02:32 -0400 you wrote:
+> The following changes since commit 56613001dfc9b2e35e2d6ba857cbc2eb0bac4272:
+> 
+>   Merge branch 'mlx5-next' of git://git.kernel.org/pub/scm/linux/kernel/git/mellanox/linux (2025-07-22 18:37:23 -0700)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2025-07-23
+> 
+> [...]
+
+Here is the summary with links:
+  - [GIT,PULL] bluetooth-next 2025-07-23
+    https://git.kernel.org/netdev/net-next/c/d2002ccb47dd
+
+You are awesome, thank you!
 -- 
-2.34.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
