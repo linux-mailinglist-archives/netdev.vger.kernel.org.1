@@ -1,159 +1,97 @@
-Return-Path: <netdev+bounces-210216-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210218-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15636B126B9
-	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 00:16:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00B3FB126BF
+	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 00:17:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 37DD71886DB7
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 22:16:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 37F95168A16
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 22:17:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA221230BEE;
-	Fri, 25 Jul 2025 22:16:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1EA0230BEE;
+	Fri, 25 Jul 2025 22:17:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YZKOhAYk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="acSP1X6h"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C19A19D06B;
-	Fri, 25 Jul 2025 22:16:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EE3919D06B;
+	Fri, 25 Jul 2025 22:17:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753481781; cv=none; b=domqD+Eas15LRNsDdpKUeTSkl8F0nYR3RaQRcpgus2+nIXgOUfFvQGlwY/oEAaqSNwXKSaJuxB9Dfh9sPWzEjNslxOokS/Jh4BkkdJey9U+myTZc9kP6Ze0kbp0szT3fTtn3EV7QffBcgIEwDl5HHJeTs/x+wL6+R9IdIIoyGp4=
+	t=1753481826; cv=none; b=qH9amePsQ1z+xf105JvEfCfmkhNTku47o6WVb4s5PUWwp2k2CmZed/3JNsXCTt0qaYqdMuGEPjQ+sW7aVaz2odEe6SDEYueh+3Z0Kmhp3ZW72aQp4rJjvDku9aYZ72Ort9xHW0UFRBp3bPgSiuBdK9iWqU2ee5fT/K5C5vSZnVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753481781; c=relaxed/simple;
-	bh=zcCljp+/O3021EXF1kCLQYobxVhkF/h2q9zxHMYLlrk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LV+IVS9t8mA5SBcAwIoxJHCraoFE93DIMcnbxRq3oroX+a4DhiNK23OlSrADLe6oJE2qwBgJMYuaPSv/MZz3Uh77Fyjab3HKz7O4ihXnMOiDnJAHCxAARXHnoWInMLSNat+7GOEjiVOb3EMqCvmXRYwq2GRw+hRsW9IFlNNpHNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YZKOhAYk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C206C4CEEF;
-	Fri, 25 Jul 2025 22:16:19 +0000 (UTC)
+	s=arc-20240116; t=1753481826; c=relaxed/simple;
+	bh=DBCb4FWtpyFIFm67hpEsdJ6fXyQXhExhN7ermn3t7D0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=MgeH9Bnf8PLJrVDld3AS9zFHYYUS7yh/qvoyo1kKGf5+S4AOslFI5x4AuK7DEm34m5nR0ApJsjKPn1QfZqGwQly7gspeVkisk0e8dxgCk7jxL/rw22YSgltJc1wqa8rUlgk8O0h42AveUpLfvh8gWj3KneZDBSxzV1IhtMGsEds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=acSP1X6h; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39985C4CEE7;
+	Fri, 25 Jul 2025 22:17:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753481780;
-	bh=zcCljp+/O3021EXF1kCLQYobxVhkF/h2q9zxHMYLlrk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=YZKOhAYkjdfG8UL5HyJCFIY5sTjEDtSgODpdhnxJHWSijrZUGlWcW8bnm9QR/3Bo8
-	 MOu7XWmbuz2fW/3mr6s58b1HlBXH/j3Dr5hwwJe7jRQAKLeIpVdfloTiX1kPjPj6LX
-	 RXfHwUTSK6J1UNfxEMAd7zMN50FiHYgDcMkEZmHuCQbFPIvUcS+hmvAxhDVis2PI6F
-	 IMFQ4cGUHzYx3+9Zwm2s7jH6YxyUqcaj+M9S7iriu1EofrRPo3E4488GIgFXE8D07a
-	 WuoDsvFFqj3rxBASIDmQ3E79npvARYh4fHJ9XG+9hMQzqx2MIGGsHOXsBeIZ88Qw00
-	 meD+hksXofvbw==
-Date: Fri, 25 Jul 2025 15:16:18 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
- <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>, Sascha Hauer
- <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>,
- Fabio Estevam <festevam@gmail.com>, Richard Cochran
- <richardcochran@gmail.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org, Stefan Wahren
- <wahrenst@gmx.net>, Simon Horman <horms@kernel.org>
-Subject: Re: [net-next v16 06/12] net: mtip: Add net_device_ops functions to
- the L2 switch driver
-Message-ID: <20250725151618.0bc84bdb@kernel.org>
-In-Reply-To: <20250724223318.3068984-7-lukma@denx.de>
-References: <20250724223318.3068984-1-lukma@denx.de>
-	<20250724223318.3068984-7-lukma@denx.de>
+	s=k20201202; t=1753481826;
+	bh=DBCb4FWtpyFIFm67hpEsdJ6fXyQXhExhN7ermn3t7D0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=acSP1X6h+7EnIL9YFvNNuCfxp2b6l++aBIIOXCev0c7qSBM5+gV9kWO0ixLlChp5k
+	 g/McvzbNPVQwYFCoEL0FVNsV0T1wZFhUCNZq+rWyOBA54J2oXIdmwFyusilKpUhuwn
+	 o44PJsRNEaBQh+g41RCfc20GwB37lAzFFThXPOFSIlmnh6ktaAQSoVaifFFa9zMyf4
+	 UNg2FejKyXeiEoXpBEt6O8n5ytLcEvVDpNk8so36Y/GvRVBJ6kVI3eNP6Mww5f/xEI
+	 J69efI/wFEX7oMZie/jZJ1traJC4MhDDdJs+NlB94EwP2qLaU0gjkgmOfNuNfpRtgn
+	 ddVJiSoK4Z+vw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAFAD383BF5B;
+	Fri, 25 Jul 2025 22:17:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net: phy: micrel: fix KSZ8081/KSZ8091 cable test
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175348184349.3265195.8359629740044567911.git-patchwork-notify@kernel.org>
+Date: Fri, 25 Jul 2025 22:17:23 +0000
+References: <20250723222250.13960-1-fl@n621.de>
+In-Reply-To: <20250723222250.13960-1-fl@n621.de>
+To: Florian Larysch <fl@n621.de>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ Divya.Koppera@microchip.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
 
-On Fri, 25 Jul 2025 00:33:12 +0200 Lukasz Majewski wrote:
-> +static void swap_buffer(void *bufaddr, int len)
-> +{
-> +	int i;
-> +	unsigned int *buf = bufaddr;
-> +
+Hello:
 
-nit: reverse xmas tree
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-> +	if (status & BD_ENET_TX_READY) {
-> +		/* All transmit buffers are full. Bail out.
-> +		 * This should not happen, since dev->tbusy should be set.
-> +		 */
-> +		netif_stop_queue(dev);
-> +		dev_err_ratelimited(&fep->pdev->dev, "%s: tx queue full!.\n",
-> +				    dev->name);
-> +		spin_unlock(&fep->hw_lock);
+On Thu, 24 Jul 2025 00:20:42 +0200 you wrote:
+> Commit 21b688dabecb ("net: phy: micrel: Cable Diag feature for lan8814
+> phy") introduced cable_test support for the LAN8814 that reuses parts of
+> the KSZ886x logic and introduced the cable_diag_reg and pair_mask
+> parameters to account for differences between those chips.
+> 
+> However, it did not update the ksz8081_type struct, so those members are
+> now 0, causing no pairs to be tested in ksz886x_cable_test_get_status
+> and ksz886x_cable_test_wait_for_completion to poll the wrong register
+> for the affected PHYs (Basic Control/Reset, which is 0 in normal
+> operation) and exit immediately.
+> 
+> [...]
 
-As we discussed on previous revision you have many to one mapping
-of netdevs to queues. I think the warning should only be printed
-if the drivers is in "single netdev" mode. Otherwise it _will_
-trigger.
+Here is the summary with links:
+  - [net] net: phy: micrel: fix KSZ8081/KSZ8091 cable test
+    https://git.kernel.org/netdev/net/c/49db61c27c4b
 
-BTW you should put the print after the unlock, console writes are slow.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-> +static void mtip_timeout(struct net_device *dev, unsigned int txqueue)
-> +{
-> +	struct mtip_ndev_priv *priv = netdev_priv(dev);
-> +	struct switch_enet_private *fep = priv->fep;
-> +	struct cbd_t *bdp;
-> +	int i;
-> +
-> +	dev->stats.tx_errors++;
-> +
-> +	if (IS_ENABLED(CONFIG_SWITCH_DEBUG)) {
 
-why are you hiding the debug info under a CONFIG_ ? 
-(which BTW appears not to be defined at all)
-Seems useful to know the state of the HW when the queue hung.
-You can use a DO_ONCE() if you want to avoid spamming logs
-
-> +	/* Set buffer length and buffer pointer */
-> +	bufaddr = skb->data;
-
-You should call skb_cow_data() if you want to write to the skb data.
-
-> +static void mtip_timeout(struct net_device *dev, unsigned int txqueue)
-> +{
-> +	struct mtip_ndev_priv *priv = netdev_priv(dev);
-> +	struct switch_enet_private *fep = priv->fep;
-> +	struct cbd_t *bdp;
-> +	int i;
-> +
-> +	dev->stats.tx_errors++;
-
-timeouts are already counted by the stack, I think the statistic
-is exposed per-queue in sysfs
-
-> +		spin_lock_bh(&fep->hw_lock);
-> +		dev_info(&dev->dev, "%s: transmit timed out.\n", dev->name);
-> +		dev_info(&dev->dev,
-> +			 "Ring data: cur_tx %lx%s, dirty_tx %lx cur_rx: %lx\n",
-> +			 (unsigned long)fep->cur_tx,
-> +			 fep->tx_full ? " (full)" : "",
-> +			 (unsigned long)fep->dirty_tx,
-> +			 (unsigned long)fep->cur_rx);
-> +
-> +		bdp = fep->tx_bd_base;
-> +		dev_info(&dev->dev, " tx: %u buffers\n", TX_RING_SIZE);
-> +		for (i = 0; i < TX_RING_SIZE; i++) {
-> +			dev_info(&dev->dev, "  %08lx: %04x %04x %08x\n",
-> +				 (kernel_ulong_t)bdp, bdp->cbd_sc,
-> +				 bdp->cbd_datlen, (int)bdp->cbd_bufaddr);
-> +			bdp++;
-> +		}
-> +
-> +		bdp = fep->rx_bd_base;
-> +		dev_info(&dev->dev, " rx: %lu buffers\n",
-> +			 (unsigned long)RX_RING_SIZE);
-> +		for (i = 0 ; i < RX_RING_SIZE; i++) {
-> +			dev_info(&dev->dev, "  %08lx: %04x %04x %08x\n",
-> +				 (kernel_ulong_t)bdp,
-> +				 bdp->cbd_sc, bdp->cbd_datlen,
-> +				 (int)bdp->cbd_bufaddr);
-> +			bdp++;
-> +		}
-> +		spin_unlock_bh(&fep->hw_lock);
 
