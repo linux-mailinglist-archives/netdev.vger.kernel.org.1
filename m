@@ -1,275 +1,125 @@
-Return-Path: <netdev+bounces-210190-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210191-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 667B1B12471
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 20:57:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60686B12476
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 20:58:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EA0501CE44FF
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 18:57:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4328AC6B97
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 18:57:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BBDB25C81C;
-	Fri, 25 Jul 2025 18:55:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF398253F2C;
+	Fri, 25 Jul 2025 18:56:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iXYnFyH8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CyATfJSx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 789EC253925;
-	Fri, 25 Jul 2025 18:55:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D0F925394C
+	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 18:56:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753469755; cv=none; b=huwoESkf8LrHGdSPxJBRZFWThL/+F+zTRq+EmvI/CqpSA3NlP5akb22etATPCD7C6hLg7Mc2BEs1o8fHgi9Twsz7rzLKYk10HVomg95P1lvlyowlaZfhM/698mGgoiRpVQ3gNYFWINTTjOOpRxYlsMw08mf/b8X7Sji2bZhLYGA=
+	t=1753469781; cv=none; b=jCd650ozGC2TkNPNbY+U8kn9KBRRHwDsC11gw/R6uFFgHXLVTtoTbZ27znN705ubmWEEQO1BtL6dmEG2vxEPgboPIwDueuB6nDEBNGWXzZSX1TxDYJegUG9opqJwjrdGRAi0hfxyTXotDE9VbW9gjiZL/oroHfBRwiUwuoXy0j0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753469755; c=relaxed/simple;
-	bh=4xXFPYbVAQVFYaiedRqz4YnnUv/G+c2nHre6wAx2+cA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=rKVZQlznqT0iWdNuGVfPXe0ZPQpD0PB2S8tgYWhJKEL41t7iDK788OChUMzoG2cLETmuA3eYfAphZ0FVeaUh87X0H095AnzRWQavTzqtgb5J3ANMqfPxDzGWJSCoUn4vnaR3mNOmm/CsxYMp3613chUOu+AXxqkCLs0Qd+pHAYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iXYnFyH8; arc=none smtp.client-ip=209.85.221.46
+	s=arc-20240116; t=1753469781; c=relaxed/simple;
+	bh=w72PiuRLD/VW7rLyweIirifLc6g/pDjq7GkYSncvxHU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I8DJjzFEpOHBbs9F52GRFDNa1iIihQVxiXWxbDv8/ARPzGEtZCziod6uQsc10yYC+gj6u5DX7n7YdQLGjcd4/wyhafnWBgU+77GlZV9wuL/Wmj6h8855TU9rq4EYjS5TBzbEDbneY0p7wkPScuEaUU1am6mwU8qEkPMQG1YkdxM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CyATfJSx; arc=none smtp.client-ip=209.85.214.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3b77377858bso1603876f8f.3;
-        Fri, 25 Jul 2025 11:55:52 -0700 (PDT)
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2363616a1a6so20657425ad.3
+        for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 11:56:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753469751; x=1754074551; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=l+P1pO0VcptRLVWqzHA93r4jnwUEPVrrjiHiUMAaRCc=;
-        b=iXYnFyH8XnkOP+iwBa/itUiDVEX15HerRWnhlG7wJhpuHQgj5EvX58OJjoYOlXZZvG
-         3JJOd5ljMPgXmyaOWRB/0uu0DYt3KE54B0p0Xyv23ageh1KGCEIF1QZaFGW7TyBrwnx1
-         uAYY1hVkDrycVjI7a792JzYubPi9W/HCX2J9u3O0vFlnn9tFkXx03Fv+9HwR9Bj9nHWI
-         2cu1VfgOp6qR7dabihtDKyriXp1EKr1nfGJN/b+Eto1X8PVcE2B4eduQcdAT32ekgvA+
-         k/olR32AVg8vfuvKkLZ5tOkC1xwk9uMmzoLqltn7WeiYjngnQq1oxdcqigjckkgSFR85
-         7WIA==
+        d=gmail.com; s=20230601; t=1753469777; x=1754074577; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=yCFjTSAyR05tZxAt1zg3lCnQ5nBd70ZmiaJSsK2JjLw=;
+        b=CyATfJSxbOHOxcDOUT5SAORzD1GlgR2IvOD77BCZaoFB2F1PMjsVaSHlsS1v5Zc0i4
+         s5egtzAeWuEE4cMmxdqYLcPDlr68ogRjMnLDiYpWhy7bLI41rHHvOdCLzNZ/cNlzNQDn
+         bKsaPpsg8Pj4qS3hHHEPe9XDAHJStrz2OtWll8B1u958eGC8YP0Uc1WvbfS3suGUBIHk
+         fO6gKYYeantJc+iV1G7y2FeDZIsOXljijJpjnyyjlWB+TzcKgDEcIDebe5znv9qyGHvL
+         LpizQFomFBAE4D2fXMY8nAnaB4a0BN06KfJXABIRvGG61ZE/Z6WYNBBzZ72Lzn24KyyQ
+         zBDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753469751; x=1754074551;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=l+P1pO0VcptRLVWqzHA93r4jnwUEPVrrjiHiUMAaRCc=;
-        b=uVjdnkFzYYF88QVVsLvtCWQm15s3qB5kjmWYgs2XhgOGDdANAgKCxseiFMVnX8Nzal
-         4Ig7QB0At//7edrdv8FfmYjORntTFEC6Y9j1g6zcgsdReIoTugku0D9UzJfQbFduUx2Z
-         K5GXSVZhna8sFstX0rf8d+ZqI/JOVF6tYjcR45HaJfRN55UEEfrMhPMKMeFexZSRt8hr
-         +FhW8RTbjBKMkAamKYRxhpBSlwDtE6U9vc7/h6XL1ONWDDBoQFEb77mKUX10tt0pfpRh
-         ckXBTq1p5NLjyDyUIxsSXRhP/nXIRRO1k39m8vAMVBnbyPseb0qOkAw7X6mptKATrvLj
-         C9DQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU/JaLnYbm3cfCxUAPdhvGSIJvhFGV2Eg31SVuuu5c8FbGtYj2AzAZPZrq1r9TN7ce/kqnIfWFW@vger.kernel.org, AJvYcCUMuOky3y8zbyPt1G4KfIM01rCASWtQYJ6XNbHV3m4DzjuoY+CrQpcf1hrX2j7roS2zUCDp6pL3IRpwwEkVazYK@vger.kernel.org, AJvYcCVcmB9IrgmWrolTI9ydWgINUMgRYgebhKsZQQ71R19NKUnv8D1Sk8lap7pzOfwrN0lax3s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwqNWJNxQmcma3Xao1T/vb+IsezDDmRv5MVS0xTvQNShiYdHQkS
-	F/VGaBssIhWDHAupHPHv7IvLWX7D9/XevqTA1Mb/wkddNZY7/FaTDaGH
-X-Gm-Gg: ASbGnctUBkRvQj9ZHbsn6gWRfNIYQweMMh80UCTam9AgSqdgAsEabmb837JiF+x4Mro
-	xokC+CItG8rTuNPsj+i9q3hxQfAB6MBGTqYacXmNkVG2LLOx6sa1NWqyOiDD8JVUJ5zc/JZkYvk
-	5DJaeKx/noyogcf3oNd+bhrNJLyZ1sw9hGDEdwthuCEhPXxSGSJbTkxVr2cgPO4zXmk1FLDlkvZ
-	wDKrVE5idMysCBJyHkYGJJ34sw/oCTBM2klui7JjVgXvpcwV7o/VsrARdkaciVa+vrqR/CMQlT9
-	N0yOwlLpmXWvl8F9gPLIAFTyfVyuCo94k6gPq7eHR79pd3BWh3kti5srrh3KiNNXH1OPSDXL4Rd
-	DBsZFOkQwZ6qnfwH8YEPtze9RPXFXW1t6TA7UfYkSNF0e5el7
-X-Google-Smtp-Source: AGHT+IH+qzbRUHgyZsobUO5oGyd5H2byoQchDyRA1NkLzNzhINe34lRZ+Qtx9ADULkVGsA8uBqTczA==
-X-Received: by 2002:a5d:5f48:0:b0:3b5:f177:30a7 with SMTP id ffacd0b85a97d-3b7767339e3mr2526546f8f.16.1753469750690;
-        Fri, 25 Jul 2025 11:55:50 -0700 (PDT)
-Received: from mtardy-friendly-lvh-runner.c.cilium-dev.internal ([2600:1900:4010:1a8::])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3b778eb276esm607743f8f.6.2025.07.25.11.55.50
+        d=1e100.net; s=20230601; t=1753469777; x=1754074577;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yCFjTSAyR05tZxAt1zg3lCnQ5nBd70ZmiaJSsK2JjLw=;
+        b=vOCJ2eAaKJo5P1M9dGSoKpVocEpqOevKHk9wFCY5uoNsbn82z3+AHPw/Fo+I3/QFHF
+         yt03m740W4LNhTFEXnECxhAAVtC9i4b675nHjIGMQojx+d7EkknOxgKqaBxyfhkfCSvZ
+         siurhp/NR5O8IA25RgL0CiK9ARo0ViJoyt5c6g/G0eDC4jsAoTvZf0Lo66VulXLAbK2k
+         01hVnHpqy6aEn0gsnDn3ertIv++TjXcQoGSBZm0h5fkOz43vf0Fr9s1Dpnazk0CFlUmO
+         jUg5XMAyortfEet5+Z0u3e/Xo4u0kVggywrZnb0LmV/SbDlBz4yockb5KhLP22F/G3qu
+         nVZw==
+X-Gm-Message-State: AOJu0YwTU4BQFWQbHZMywPXhszf6ZBOzDkWmk9syKXRdCWGyWZDR33nq
+	9tl9zFWdS3yS+7tWu4Msol6S7bztXklb98c//61UlEMCrPfq7J/8kCmp
+X-Gm-Gg: ASbGncuhNfU8GefiEjnhIB1DYPhriz26+RrSnvCOY1PRJ4D05GorCH3kuCMv4wKQZpv
+	IHRTEiIh/Csa8R58zGzxH+vG7G9v/JicPGn2Xetj1J0mSfd69S2u2I9u+Mcksx5yAwo//0U3ItB
+	IIjAO1FLujr6fgqBR2zVTfL8c6VNw0gdYA1efBrPPHcF0NvYxgL6XMGufJLsSRHT5bSikryb71V
+	2yrbr6Jwt8XmgtC6fFbS9SugqzQ5XyTHm3MoyyWFwBo9bDbcx+69SNi6aU9Lg7scUxOWP9puy9v
+	Y6NiB72zLfFHbwdvmaHF8P8ysExzmMcma23GPfn+N1fomsZhfRNlko9hUh6z6qLtHndO1W2wDPf
+	xg3MuktRWtFDierItwBnpZV82iw==
+X-Google-Smtp-Source: AGHT+IEUOsBOgtF7NrzpyDhQ3+jBYN3NWOXkOOyDrjaFjFfio5NOFHJV2F3FLFXOg8tPRLAoD6j17g==
+X-Received: by 2002:a17:903:19e4:b0:23e:3164:2bf3 with SMTP id d9443c01a7336-23fb3126028mr47568705ad.28.1753469777504;
+        Fri, 25 Jul 2025 11:56:17 -0700 (PDT)
+Received: from localhost ([129.210.115.104])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31e83507c40sm242454a91.21.2025.07.25.11.56.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Jul 2025 11:55:50 -0700 (PDT)
-From: Mahe Tardy <mahe.tardy@gmail.com>
-To: alexei.starovoitov@gmail.com
-Cc: andrii@kernel.org,
-	ast@kernel.org,
-	bpf@vger.kernel.org,
-	daniel@iogearbox.net,
-	john.fastabend@gmail.com,
-	mahe.tardy@gmail.com,
-	martin.lau@linux.dev,
-	fw@strlen.de,
-	netfilter-devel@vger.kernel.org,
-	pablo@netfilter.org,
-	netdev@vger.kernel.org,
-	coreteam@netfilter.org
-Subject: [PATCH bpf-next v2 4/4] selftests/bpf: add icmp_send_unreach kfunc tests
-Date: Fri, 25 Jul 2025 18:53:42 +0000
-Message-Id: <20250725185342.262067-5-mahe.tardy@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250725185342.262067-1-mahe.tardy@gmail.com>
-References: <CAADnVQKq_-=N7eJoup6AqFngoocT+D02NF0md_3mi2Vcrw09nQ@mail.gmail.com>
- <20250725185342.262067-1-mahe.tardy@gmail.com>
+        Fri, 25 Jul 2025 11:56:15 -0700 (PDT)
+Date: Fri, 25 Jul 2025 11:56:15 -0700
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: William Liu <will@willsroot.io>
+Cc: netdev@vger.kernel.org, jhs@mojatatu.com, pabeni@redhat.com,
+	kuba@kernel.org, jiri@resnulli.us, davem@davemloft.net,
+	edumazet@google.com, horms@kernel.org, savy@syst3mfailure.io
+Subject: Re: [PATCH net v2 1/2] net/sched: Fix backlog accounting in
+ qdisc_dequeue_internal
+Message-ID: <aIPTTxhfC519+cdr@pop-os.localdomain>
+References: <20250724165507.20789-1-will@willsroot.io>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250724165507.20789-1-will@willsroot.io>
 
-This test opens a server and client, attach a cgroup_skb program on
-egress and calls the icmp_send_unreach function from the client egress
-so that an ICMP unreach control message is sent back to the client.
-It then fetches the message from the error queue to confirm the correct
-ICMP unreach code has been sent.
+On Thu, Jul 24, 2025 at 04:55:27PM +0000, William Liu wrote:
+> diff --git a/net/sched/sch_fq_codel.c b/net/sched/sch_fq_codel.c
+> index 2a0f3a513bfa..f9e6d76a1712 100644
+> --- a/net/sched/sch_fq_codel.c
+> +++ b/net/sched/sch_fq_codel.c
+> @@ -286,6 +286,10 @@ static struct sk_buff *fq_codel_dequeue(struct Qdisc *sch)
+>  	struct fq_codel_flow *flow;
+>  	struct list_head *head;
+>  
+> +	/* reset these here, as change needs them for proper accounting*/
+> +	q->cstats.drop_count = 0;
+> +	q->cstats.drop_len = 0;
+> +
+>  begin:
+>  	head = &q->new_flows;
+>  	if (list_empty(head)) {
+> @@ -319,8 +323,6 @@ static struct sk_buff *fq_codel_dequeue(struct Qdisc *sch)
+>  	if (q->cstats.drop_count) {
+>  		qdisc_tree_reduce_backlog(sch, q->cstats.drop_count,
+>  					  q->cstats.drop_len);
+> -		q->cstats.drop_count = 0;
+> -		q->cstats.drop_len = 0;
 
-Note that the BPF program returns SK_PASS to let the connection being
-established to finish the test cases quicker. Otherwise, you have to
-wait for the TCP three-way handshake to timeout in the kernel and
-retrieve the errno translated from the unreach code set by the ICMP
-control message.
 
-Signed-off-by: Mahe Tardy <mahe.tardy@gmail.com>
----
- .../bpf/prog_tests/icmp_send_unreach_kfunc.c  | 99 +++++++++++++++++++
- .../selftests/bpf/progs/icmp_send_unreach.c   | 36 +++++++
- 2 files changed, 135 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/icmp_send_unreach_kfunc.c
- create mode 100644 tools/testing/selftests/bpf/progs/icmp_send_unreach.c
+Is this change really necessary? This could impact more than just the "shrinking
+to the limit" code path. We need to minimize the the impact of the patch since it
+is targeting -net and -stable.
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/icmp_send_unreach_kfunc.c b/tools/testing/selftests/bpf/prog_tests/icmp_send_unreach_kfunc.c
-new file mode 100644
-index 000000000000..414c1ed8ced3
---- /dev/null
-+++ b/tools/testing/selftests/bpf/prog_tests/icmp_send_unreach_kfunc.c
-@@ -0,0 +1,99 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include <test_progs.h>
-+#include <network_helpers.h>
-+#include <linux/errqueue.h>
-+#include "icmp_send_unreach.skel.h"
-+
-+#define TIMEOUT_MS 1000
-+#define SRV_PORT 54321
-+
-+#define ICMP_DEST_UNREACH 3
-+
-+#define ICMP_FRAG_NEEDED 4
-+#define NR_ICMP_UNREACH 15
-+
-+static void read_icmp_errqueue(int sockfd, int expected_code)
-+{
-+	ssize_t n;
-+	struct sock_extended_err *sock_err;
-+	struct cmsghdr *cm;
-+	char ctrl_buf[512];
-+	struct msghdr msg = {
-+		.msg_control = ctrl_buf,
-+		.msg_controllen = sizeof(ctrl_buf),
-+	};
-+
-+	n = recvmsg(sockfd, &msg, MSG_ERRQUEUE);
-+	if (!ASSERT_GE(n, 0, "recvmsg_errqueue"))
-+		return;
-+
-+	for (cm = CMSG_FIRSTHDR(&msg); cm; cm = CMSG_NXTHDR(&msg, cm)) {
-+		if (!ASSERT_EQ(cm->cmsg_level, IPPROTO_IP, "cmsg_type") ||
-+		    !ASSERT_EQ(cm->cmsg_type, IP_RECVERR, "cmsg_level"))
-+			continue;
-+
-+		sock_err = (struct sock_extended_err *)CMSG_DATA(cm);
-+
-+		if (!ASSERT_EQ(sock_err->ee_origin, SO_EE_ORIGIN_ICMP,
-+			       "sock_err_origin_icmp"))
-+			return;
-+		if (!ASSERT_EQ(sock_err->ee_type, ICMP_DEST_UNREACH,
-+			       "sock_err_type_dest_unreach"))
-+			return;
-+		ASSERT_EQ(sock_err->ee_code, expected_code, "sock_err_code");
-+	}
-+}
-+
-+void test_icmp_send_unreach_kfunc(void)
-+{
-+	struct icmp_send_unreach *skel;
-+	int cgroup_fd = -1, client_fd = 1, srv_fd = -1;
-+	int *code;
-+
-+	skel = icmp_send_unreach__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "skel_open"))
-+		goto cleanup;
-+
-+	cgroup_fd = test__join_cgroup("/icmp_send_unreach_cgroup");
-+	if (!ASSERT_GE(cgroup_fd, 0, "join_cgroup"))
-+		goto cleanup;
-+
-+	skel->links.egress =
-+		bpf_program__attach_cgroup(skel->progs.egress, cgroup_fd);
-+	if (!ASSERT_OK_PTR(skel->links.egress, "prog_attach_cgroup"))
-+		goto cleanup;
-+
-+	code = &skel->bss->unreach_code;
-+
-+	for (*code = 0; *code <= NR_ICMP_UNREACH; (*code)++) {
-+		// The TCP stack reacts differently when asking for
-+		// fragmentation, let's ignore it for now
-+		if (*code == ICMP_FRAG_NEEDED)
-+			continue;
-+
-+		skel->bss->kfunc_ret = -1;
-+
-+		srv_fd = start_server(AF_INET, SOCK_STREAM, "127.0.0.1",
-+				      SRV_PORT, TIMEOUT_MS);
-+		if (!ASSERT_GE(srv_fd, 0, "start_server"))
-+			goto for_cleanup;
-+
-+		client_fd = socket(AF_INET, SOCK_STREAM, 0);
-+		ASSERT_GE(client_fd, 0, "client_socket");
-+
-+		client_fd = connect_to_fd(srv_fd, 0);
-+		if (!ASSERT_GE(client_fd, 0, "client_connect"))
-+			goto for_cleanup;
-+
-+		read_icmp_errqueue(client_fd, *code);
-+
-+		ASSERT_EQ(skel->bss->kfunc_ret, SK_DROP, "kfunc_ret");
-+for_cleanup:
-+		close(client_fd);
-+		close(srv_fd);
-+	}
-+
-+cleanup:
-+	icmp_send_unreach__destroy(skel);
-+	close(cgroup_fd);
-+}
-diff --git a/tools/testing/selftests/bpf/progs/icmp_send_unreach.c b/tools/testing/selftests/bpf/progs/icmp_send_unreach.c
-new file mode 100644
-index 000000000000..15783e5d1d65
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/icmp_send_unreach.c
-@@ -0,0 +1,36 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include "vmlinux.h"
-+#include <bpf/bpf_helpers.h>
-+#include <bpf/bpf_endian.h>
-+
-+char LICENSE[] SEC("license") = "Dual BSD/GPL";
-+
-+int unreach_code = 0;
-+int kfunc_ret = 0;
-+
-+#define SERVER_PORT 54321
-+#define SERVER_IP 0x7F000001
-+
-+SEC("cgroup_skb/egress")
-+int egress(struct __sk_buff *skb)
-+{
-+	void *data = (void *)(long)skb->data;
-+	void *data_end = (void *)(long)skb->data_end;
-+	struct iphdr *iph;
-+	struct tcphdr *tcph;
-+
-+	iph = data;
-+	if ((void *)(iph + 1) > data_end || iph->version != 4 ||
-+	    iph->protocol != IPPROTO_TCP || iph->daddr != bpf_htonl(SERVER_IP))
-+		return SK_PASS;
-+
-+	tcph = (void *)iph + iph->ihl * 4;
-+	if ((void *)(tcph + 1) > data_end ||
-+	    tcph->dest != bpf_htons(SERVER_PORT))
-+		return SK_PASS;
-+
-+	kfunc_ret = bpf_icmp_send_unreach(skb, unreach_code);
-+
-+	/* returns SK_PASS to execute the test case quicker */
-+	return SK_PASS;
-+}
---
-2.34.1
+The rest looks good to me.
 
+Thanks for your patch!
 
