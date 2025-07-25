@@ -1,143 +1,164 @@
-Return-Path: <netdev+bounces-210047-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210044-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37FCCB11F0B
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 14:55:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8AA1B11EFB
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 14:46:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 015EAAE10F3
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 12:55:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 91A5A188934B
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 12:46:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B449E2ECD2E;
-	Fri, 25 Jul 2025 12:55:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IfciSWEb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 355772D027F;
+	Fri, 25 Jul 2025 12:46:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+Received: from mail-io1-f78.google.com (mail-io1-f78.google.com [209.85.166.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 417B02D8784;
-	Fri, 25 Jul 2025 12:55:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 867EC2E36E3
+	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 12:46:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753448146; cv=none; b=klsAmmhIvPqPAJtzuD2TsvgFpaXarsFQJ6qgiM/CPGNOVRu2E3jikhULx7g02HzI4VcgeNwXe+c3vLr8FmvPawyAtgWoO2NiXWOW4S2FEtQefaG947Y76Aln1gKq9ebQtX9bHc5g0jtTIfmNmX2Z96U0NcHzt0FAurxkFBStkRs=
+	t=1753447593; cv=none; b=h1pKkefKl/FGbjKAFoJSrf8BN/dQaFVMZeTFVIx+t/x0HP80PTS6yhFLXvLPjdKu7qPwO4HJ1Qg+UL68zdtPY3lBgOXZPLsuISfAYbgy5P0ohyL+1cEyv6gGcwWEj8TC1M6RyArVMb62NDzAMu6rl/oBYPgQdGn0WkGO3g4NjZw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753448146; c=relaxed/simple;
-	bh=+96td86pl6RYvdjPgEXEaY4yH4Llt3TUn3hBrBZc3sA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jWzxfcmFh0n87UElgWu6n9oHP+ho0wuWmjqmS5JFwk0fkBv5Lkh9a7r7Wh74DRDguhhc0OYGHmRXj3uwVA23nwhIB+VFilfS2Zf4IKxtAHZa5aKBhg1OZI9XU/cjp9/n3B0Vi4N7DtksZwB9ccDxRijrbahvWN3iBOgKmekTAN4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IfciSWEb; arc=none smtp.client-ip=209.85.216.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-31e7e3dc5d2so219767a91.1;
-        Fri, 25 Jul 2025 05:55:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753448144; x=1754052944; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qGEpXVAlxD3K+ugg3yuPPR4elZ+lMYltBWlc9KeJ+S0=;
-        b=IfciSWEbzFc9tbXLQI9i5nAA5ALGIIv0NzFeuneN1p0h2ysyF0FQF5U3MoZYkeu9Yj
-         EiLnds/iCjv3Va6NXCzqVB3J1PsvKBNdg1PaG9jZjTwyJBKAnFEtwpl27tdYsashv6HY
-         wdarg8QNOScFyIBp+Xu10qX8glep0OvM6EqcgUS5Go2ATLL+3lZ14vjCyNM09lzQLmAD
-         N9XSfiYNwoufvdaQpyUg3V9bljnbTm8gGTEYtEbGgVe4XT2zLqb/+2Urnt7BTi0sjfBR
-         3XeE2ORTHXta/Sd3umWk3X6yLEJAbxmy0Kg34wI0Eyg5N4RU38I70exZSCA88hB0ur03
-         ciJQ==
+	s=arc-20240116; t=1753447593; c=relaxed/simple;
+	bh=qm7IYgwWsCevniBDmNoxwlw3iwTZXJXBKMafkaJPtwA=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Sbh27yrYP0RCdMl15YkWe9QBoPHlXvIBETSLsvoEd1IXpSat2f6OkALG7gc+humeOrkrHWgMu0hzNcDaKZroeWkTYY4aFjqd5dCGphKfKqwr51IvZK2acR3wmryIpojCULHhvwWCjA0kXPJLot3YArHH6HRuIBSYpHHlPQ+oF8A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f78.google.com with SMTP id ca18e2360f4ac-87c29bef96cso372915939f.0
+        for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 05:46:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753448144; x=1754052944;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qGEpXVAlxD3K+ugg3yuPPR4elZ+lMYltBWlc9KeJ+S0=;
-        b=XSBO2Y1uE6HXYbm4OSGL5WZr31+TElSRQAI8CTyjj96YbJx8isTyXf2ar8g9ggWGUR
-         ZnrUgZWfZKYfSaaA2dYWB3hgwVWUD0pCFcR3qjJUMbYpiQk/anFTqFvNz37amR8sFaWD
-         TEd5rrdrftwnPIdBIy46lRWMt0QFutY4LixNn6pY8+8cYrEx+FNGI9gCgyX2C55VGjwA
-         yhMMoSUi3k5VI+dtEB+ZsrXx3s6dOBXAsozoX0Rk2b4eU6xAfIWVKV7bclSIPLdISP0H
-         hnWP/FxFehzYd8e405zziVEuD+xb6FNjDzKkeuV+rleEUuIp3/dGoZH4bnm4v0O1V+Nl
-         m7kQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVQXQGEkM97W7TqatlfMPfqG3QT6xoEzmzpgBH/XdLkmojbVxT3X1D2LdFAMM3UHsIxzf3CuY4TyiE=@vger.kernel.org, AJvYcCVpNYPTNXBeTw7T173MhUKseqLKhX0tERP6xfEIzbCAPYBDFqi+ovkx6f8WfMtODvzUweGLQDDzulWKwlf2@vger.kernel.org, AJvYcCW82nyw5qnCO9UZXvxOTUJzDBO6O9UFkOZrr5ljNTG2USfb11OepIZKaUwZ+F6ZjroKTMjIiC2Lh5SyhYPoIRI9@vger.kernel.org
-X-Gm-Message-State: AOJu0YyIhuCDXXMzJDKMDJP+0YPQphXxNy7TaoAqyPtV+n1KiL2nzV1J
-	sgwkYAw/uSLvridxSuL8A4WQRzvBMdtOtfmyvPpAOPUy/fIFmoG4bYz/
-X-Gm-Gg: ASbGncuLcahbDDZ1TzRKOjYixirTwBgNOb9WIeJBJLiYI4CXCvc0aTDR17BMgKxKH89
-	FhW43uaSMbSxPBT6zRU050nyZ3/9JoqXqmF88RH/Az9og16bl+QUu+fklXVy4d9pvirrg56GEVk
-	W4Ve7fF0slmvdtuHmKZXUBlrmP6tu22BRzYYE70N4IQR7znSUe0NNjDlktSTimTWpTyJ1ML8OjB
-	srTLUIyV3aZdI6twk1ysDen12zJWJk/0R4vKVJd3J4hPiXidXtCxmSUjFBKBXIDokEQjDWae7ej
-	/Xgs7G4kKA4ZbdlA1kz7MYj+qqU8g7fLxzE/BKI0jG9XXzYestl9S0p+enj66BPgbb05plJYOn5
-	MNH/NAzuu37Wa8FzsjcfeauFzch8=
-X-Google-Smtp-Source: AGHT+IERyHyW3IcBP+fSmwCMOKFhQWtZFxxc56mB48/vivDFg9NwEVPKFDWWB5I+SUZCA98cM3tnPg==
-X-Received: by 2002:a17:90b:1b45:b0:311:f30b:c18 with SMTP id 98e67ed59e1d1-31e7785ee72mr2444832a91.4.1753448144231;
-        Fri, 25 Jul 2025 05:55:44 -0700 (PDT)
-Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31e662f6ebdsm3461314a91.37.2025.07.25.05.55.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Jul 2025 05:55:43 -0700 (PDT)
-Date: Fri, 25 Jul 2025 12:46:00 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Nikolay Aleksandrov <razor@blackwall.org>
-Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>, Petr Machata <petrm@nvidia.com>,
-	Amit Cohen <amcohen@nvidia.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Alessandro Zanni <alessandro.zanni87@gmail.com>,
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 1/2] bonding: send LACPDUs periodically in passive
- mode after receiving partner's LACPDU
-Message-ID: <aIN8Rpc8YELX2QD6@fedora>
-References: <20250725062848.18889-1-liuhangbin@gmail.com>
- <20250725062848.18889-2-liuhangbin@gmail.com>
- <367f9bbb-537b-4828-b8c8-cfc9d8ca8c2c@blackwall.org>
+        d=1e100.net; s=20230601; t=1753447591; x=1754052391;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=RcOwnNkGMbRm/SAGPNDv3FvzOSvBQBAw0vpb+6DYIB4=;
+        b=skCOq/iAR0O5dYIH9h0iHBIbIWSGt1ZNtrujizC+zuKE2DxqjdQbvsMehIdXnrxqvT
+         9jFLMdjV2CHod7gviDrVF6BBqXRZXZRb6l++Fp3BXbMh2nAU1ZkGi7kM2LjNORfzVjoB
+         Ke4e2g885HUQqrUH+kLwpiw3FkgJCgH0dY31u5np2BsnCGsDs8LiiTZDu/hWNymMvf5x
+         Hcsxko5+fcvbwzCXIL1Z8dXQrP8h7C4AgcLTq0BckDVa8foOZBdqVk6OtZORaHdOASkq
+         HDjbLd0C5nIqC/kA/2TSaEYTEx6Kvj/yRH+kevWKZ2IuJYZU5aF63hNfNxq4eUuU5yb1
+         De2g==
+X-Forwarded-Encrypted: i=1; AJvYcCXLMFgMiTOAryNl+Rpjg1vRsRf3vcQGFCNIyz93A6DGuwEFWSzEY3TtalqyUxH9QkxzNj6b0cY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzt/VChswRuzyyh9Rba1RvjQ6hBEQSn33bIg4rFhJ6XUZxo11z9
+	xMtdhCUPmuwQrDwTBhOUTkunXDeLU9+Uii43j8KjV+f96cGrR8Z3OaRdrCGoHo+OKd80aWYyYwH
+	+JddMCXf61FlncEpC3YSXMQECovWtlcxK3HSP3x7eOsBF1L+qjh7Gb1yMENU=
+X-Google-Smtp-Source: AGHT+IGhLJ7WPISWlkBBKk0VG56ANSua07lRzc2p1rbmGsljUveQsfjYLhKQDFiB+gfn/k2x9EC/enz4YR91PiOq4KT2/m3G+lxl
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <367f9bbb-537b-4828-b8c8-cfc9d8ca8c2c@blackwall.org>
+X-Received: by 2002:a05:6e02:158b:b0:3df:3110:cc01 with SMTP id
+ e9e14a558f8ab-3e3c531f7aemr25617085ab.19.1753447590693; Fri, 25 Jul 2025
+ 05:46:30 -0700 (PDT)
+Date: Fri, 25 Jul 2025 05:46:30 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68837ca6.a00a0220.2f88df.0053.GAE@google.com>
+Subject: [syzbot] [netfilter?] WARNING in nft_socket_init (2)
+From: syzbot <syzbot+a225fea35d7baf8dbdc3@syzkaller.appspotmail.com>
+To: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com, 
+	horms@kernel.org, kadlec@netfilter.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Jul 25, 2025 at 11:49:00AM +0300, Nikolay Aleksandrov wrote:
-> On 7/25/25 09:28, Hangbin Liu wrote:
-> > When `lacp_active` is set to `off`, the bond operates in passive mode, meaning
-> > it only "speaks when spoken to." However, the current kernel implementation
-> > only sends an LACPDU in response when the partner's state changes.
-> > 
-> > As a result, once LACP negotiation succeeds, the actor stops sending LACPDUs
-> > until the partner times out and sends an "expired" LACPDU. This causes
-> > continuous LACP state flapping.
-> > 
-> > According to IEEE 802.1AX-2014, 6.4.13 Periodic Transmission machine. The
-> > values of Partner_Oper_Port_State.LACP_Activity and
-> > Actor_Oper_Port_State.LACP_Activity determine whether periodic transmissions
-> > take place. If either or both parameters are set to Active LACP, then periodic
-> > transmissions occur; if both are set to Passive LACP, then periodic
-> > transmissions do not occur.
-> > 
-> > To comply with this, we remove the `!bond->params.lacp_active` check in
-> > `ad_periodic_machine()`. Instead, we initialize the actor's port's
-> > `LACP_STATE_LACP_ACTIVITY` state based on `lacp_active` setting.
-> > 
-> > Additionally, we avoid setting the partner's state to
-> > `LACP_STATE_LACP_ACTIVITY` in the EXPIRED state, since we should not assume
-> > the partner is active by default.
-> > 
-> > This ensures that in passive mode, the bond starts sending periodic LACPDUs
-> > after receiving one from the partner, and avoids flapping due to inactivity.
-> > 
-> > Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> 
-> Shouldn't the fixes tag be lacp_active commit id?
-> E.g. 3a755cd8b7c6 ("bonding: add new option lacp_active")
+Hello,
 
-Totally forgot that I added this option -_-!!
+syzbot found the following issue on:
 
-Thanks
-Hangbin
+HEAD commit:    94619ea2d933 Merge tag 'ipsec-next-2025-07-23' of git://gi..
+git tree:       net-next
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=14bf10a2580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=ceda48240b85ec34
+dashboard link: https://syzkaller.appspot.com/bug?extid=a225fea35d7baf8dbdc3
+compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12bf10a2580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13d27fd4580000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/afd64d9816ee/disk-94619ea2.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/e1755ce1f83b/vmlinux-94619ea2.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/2061dff2fbf4/bzImage-94619ea2.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+a225fea35d7baf8dbdc3@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 5853 at net/netfilter/nft_socket.c:220 nft_socket_init+0x2f4/0x3d0 net/netfilter/nft_socket.c:220
+Modules linked in:
+CPU: 0 UID: 0 PID: 5853 Comm: syz-executor145 Not tainted 6.16.0-rc6-syzkaller-01673-g94619ea2d933 #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
+RIP: 0010:nft_socket_init+0x2f4/0x3d0 net/netfilter/nft_socket.c:220
+Code: 84 c0 0f 85 da 00 00 00 41 88 2c 24 bd 08 00 00 00 e9 ad fe ff ff 89 f3 e8 29 86 07 f8 89 d8 e9 57 ff ff ff e8 1d 86 07 f8 90 <0f> 0b 90 e9 44 ff ff ff 89 e9 80 e1 07 38 c1 0f 8c 87 fd ff ff 48
+RSP: 0018:ffffc9000401f178 EFLAGS: 00010293
+RAX: ffffffff89b8a433 RBX: ffff888077f68020 RCX: ffff888030a8da00
+RDX: 0000000000000000 RSI: 0000000000000100 RDI: 00000000000000ff
+RBP: 00000000000000ff R08: 0000000000000000 R09: ffffffff89b8b21c
+R10: dffffc0000000000 R11: ffffed10299a8e5b R12: 0000000000000100
+R13: ffff8880352ec898 R14: dffffc0000000000 R15: 1ffff1100efed004
+FS:  000055555942b380(0000) GS:ffff888125c15000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000200000000000 CR3: 0000000034702000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ nf_tables_newexpr net/netfilter/nf_tables_api.c:3496 [inline]
+ nf_tables_newrule+0x178f/0x2890 net/netfilter/nf_tables_api.c:4327
+ nfnetlink_rcv_batch net/netfilter/nfnetlink.c:524 [inline]
+ nfnetlink_rcv_skb_batch net/netfilter/nfnetlink.c:647 [inline]
+ nfnetlink_rcv+0x112f/0x2520 net/netfilter/nfnetlink.c:665
+ netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
+ netlink_unicast+0x82c/0x9e0 net/netlink/af_netlink.c:1346
+ netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1896
+ sock_sendmsg_nosec net/socket.c:714 [inline]
+ __sock_sendmsg+0x219/0x270 net/socket.c:729
+ ____sys_sendmsg+0x505/0x830 net/socket.c:2614
+ ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2668
+ __sys_sendmsg net/socket.c:2700 [inline]
+ __do_sys_sendmsg net/socket.c:2705 [inline]
+ __se_sys_sendmsg net/socket.c:2703 [inline]
+ __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2703
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7efdcf55c0e9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 61 18 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fff48ea8a28 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007efdcf55c0e9
+RDX: 0000000000000000 RSI: 0000200000000000 RDI: 0000000000000003
+RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007efdcf5a5036
+R13: 00007fff48ea8a60 R14: 00007fff48ea8aa0 R15: 0000000000000000
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
