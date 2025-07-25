@@ -1,132 +1,113 @@
-Return-Path: <netdev+bounces-210040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210038-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B192B11EDD
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 14:41:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3C8EB11ED3
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 14:39:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6AF727BCF4E
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 12:39:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 371195A44BF
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 12:39:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC8122ECD00;
-	Fri, 25 Jul 2025 12:40:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QdDbm3CW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06ED62EBB92;
+	Fri, 25 Jul 2025 12:39:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E0842EBB92
-	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 12:40:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5377C2EBBB8
+	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 12:39:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753447202; cv=none; b=bbkMamCw5tENgdCPP8o1ePzE+VdEuXhdvp/PLIIoTseosOQ9KqbdaU3hFLrNvrPGU+hdVqCxtvgJNY2NmZLWY5oRJrWeoqzJY8berVpnpui5oIz7+i3K7Uf3JdToiTm8GsV5Y7GhjVwHu21aOxXzCRRcwIYf2x6fMrfYFHUlyAM=
+	t=1753447173; cv=none; b=ocoRd1/Ck/TVRJbWYeTUtLaJE/6+FP0tcSsJGJYMr9nw2DWM9i2/mmX6PLPFZ16Zf+9xJd80P8MkZ3sijK3Q/npVvDWId4fe2u+kEpuKFogDHH6SgUKO9JGctfd553d6A1+YRl+zaNvrQrW7/75JTS79u1br4n+bBz11T3tCTHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753447202; c=relaxed/simple;
-	bh=i/KYaBfaLvEZNkxu3mUqox5mOLv9vYdSv7n5YIOWW18=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tB8coOeUu8LjrbFXdQI7TCiqT70AA0psAtCAuBcV9b6Hh+mAc7z6F8084E9WMlvSrQew9LXtaCW6J8zz5Ghe7US7cMN1Jb/2813Tcfb13BxS3LTyIBHhfPOGJ/LQmvSeKA7yfjG0IE3SHYQU7FBnJ07bCK7gko8RlHAzW6lndIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QdDbm3CW; arc=none smtp.client-ip=91.218.175.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <8d987133-0e22-4aa8-bf2e-57ef105c8db8@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1753447188;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UyXNdV5tH0+VzIEOaMeJdhwhayXenr6RyT1W6ZYXDcU=;
-	b=QdDbm3CWvaF+MYJyZTJq6QOwJhfeSn9b0mfI5aUftha4Niq0kYMXjeQBbfmhGdUpfFKst+
-	VjA/+yb5Rl29xy8Y6psafvceG2efKY51w7qTocs3km7qeXdHOx9JGdMaNLeFwqHoR4Ahie
-	+KZ2i3tzAQTbsqafhMXpUITrgAQlLHo=
-Date: Fri, 25 Jul 2025 20:38:54 +0800
+	s=arc-20240116; t=1753447173; c=relaxed/simple;
+	bh=j+a4W2shNO3E2WvLnM7Gg4ZUOiPasmfuQFrkEvfwDws=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=LrRf/js1vtqTl1iuSeUcNc7K9uhi3Lu9plUxOG5IP5O0aSbjKC0wlUR6JJFffs63rNgCKgRqii2Ja5mjPC7hQg+cAheDVDEUvyOWmkX7bidYbe9io3/mwzZVCa7LYNQfTENuDtDXUX+W2RfzDNQsvJtCnYyEY2+ndyOUQCrhUI8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-87c43c2af72so235721339f.0
+        for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 05:39:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753447171; x=1754051971;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=DsRRqNHku6ZeTrZx42NT9gZz/zhlyjxw4E67HoXW6+Q=;
+        b=IXHPh3dOqW++aTF0p9Ef/yP1DiZTATcZyw1VrWPYzq63On/cBooQH24Ub31DEec2sq
+         h9etZSJeDOAO1KVPCpIxR2LDI0zfph9N8KvaOjM/9qnnojVHHuJeDBMaAuIPSJp3YOXf
+         gXyIeqa2K6qbN3YyP/0ILY6h/7iSmYV6FTHOXOMI/Iw5uMQXQpN5ULS6sE5lIciihTF+
+         EOXZoBM07xyDOr9X6CD/GWYRF7HNIRVlxAQc/tUFSUxhd7b/ORCehoHR53JlRCziu2FN
+         /jV8f7PmtPtVh6zvmTn2GmYJskJVd9lr5W/SrKaj8I9ZmQk+2g/7FFMYNGA53GT222Z8
+         iiIA==
+X-Forwarded-Encrypted: i=1; AJvYcCVgk0YfpipdG9edfu8w0wBKJ08IvqHBJjmbFL/V5x080U8IjlY6Ettekrx1rO2DKihAhvgQC9c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxM/5OX2d3InB6pSErL2ape9dGNkudZklUitp6MS5/ugqnxMzJU
+	RPyThB80pNe7Fw2UEeCud/sQ5E3WQrgDUg6ybj/agolQJ3AJeH6cDs31GJZbaWFtHwPYdAKeu2O
+	uvYw6qINUqOBtsF0Vf7V906jef9gAbz4O7sKfd1Bod8ZqAc4rs+uTBIRIcdQ=
+X-Google-Smtp-Source: AGHT+IH0F8Z8GN8WXxDT8Boy8j2mXmuu58wAX84J/uXKvxSVcDkuLOBTc4CxdIJ60uw1BF3KmlAN3kg/hAkEeiOghmrHB83fYO1a
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] sfc: handle NULL returned by xdp_convert_buff_to_frame()
-Content-Language: en-US
-To: Edward Cree <ecree@amd.com>, Paolo Abeni <pabeni@redhat.com>,
- Chenyuan Yang <chenyuan0y@gmail.com>, ecree.xilinx@gmail.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
- john.fastabend@gmail.com, sdf@fomichev.me, lorenzo@kernel.org
-Cc: netdev@vger.kernel.org, linux-net-drivers@amd.com, bpf@vger.kernel.org,
- zzjas98@gmail.com
-References: <20250723003203.1238480-1-chenyuan0y@gmail.com>
- <045d1ff5-bb20-481d-a067-0a42345ab83d@redhat.com>
- <de14f60e-b1f0-432c-80b4-a2f0453e0fe2@amd.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kunwu Chan <kunwu.chan@linux.dev>
-In-Reply-To: <de14f60e-b1f0-432c-80b4-a2f0453e0fe2@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-Received: by 2002:a05:6602:6016:b0:876:c5ff:24d4 with SMTP id
+ ca18e2360f4ac-8800f114ff2mr296894639f.4.1753447171528; Fri, 25 Jul 2025
+ 05:39:31 -0700 (PDT)
+Date: Fri, 25 Jul 2025 05:39:31 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68837b03.a00a0220.2f88df.0051.GAE@google.com>
+Subject: [syzbot] Monthly wireless report (Jul 2025)
+From: syzbot <syzbot+list7eb4325eb2535c41d4b1@syzkaller.appspotmail.com>
+To: linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 2025/7/25 18:11, Edward Cree wrote:
-> On 7/24/25 10:57, Paolo Abeni wrote:
->> On 7/23/25 2:32 AM, Chenyuan Yang wrote:
->>> The xdp_convert_buff_to_frame() function can return NULL when there is
->>> insufficient headroom in the buffer to store the xdp_frame structure
->>> or when the driver didn't reserve enough tailroom for skb_shared_info.
->> AFAIC the sfc driver reserves both enough headroom and tailroom, but
->> this is after ebpf run, which in turn could consume enough headroom to
->> cause a failure, so I think this makes sense.
-> Your reasoning seems plausible to me.
-> However, I think the error path ought to more closely follow the existing
->   error cases in logging a ratelimited message and calling the tracepoint.
-> I think the cleanest way to do this would be:
-> 	if (unlikely(!xdpf))
-> 		err = -ENOBUFS;
-> 	else
-> 		err = efx_xdp_tx_buffers(efx, 1, &xdpf, true);
->   so that it can make use of the existing failure path.
-> Adding the check to efx_xdp_tx_buffers() is also an option.
->
-> -ed
->
-Hi Chenyuan,
+Hello wireless maintainers/developers,
 
-THX for addressing this edge case. I concur with Edward's suggestion to 
-integrate this with the existing error handling flow. This will ensure:
-Consistent observability (ratelimited logs + tracepoints)
-Centralized resource cleanup
-Clear error type differentiation via -ENOBUFS
+This is a 31-day syzbot report for the wireless subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/wireless
 
-Proposed refinement:
+During the period, 4 new issues were detected and 2 were fixed.
+In total, 49 issues are still open and 165 have already been fixed.
 
-diff
-  case XDP_TX:
-      /* Buffer ownership passes to tx on success. */
-      xdpf = xdp_convert_buff_to_frame(&xdp);
-+    if (unlikely(!xdpf)) {
-+        err = -ENOBUFS;
-+    } else {
-+        err = efx_siena_xdp_tx_buffers(efx, 1, &xdpf, true);
-+    }
+Some of the still happening issues:
 
--    err = efx_siena_xdp_tx_buffers(efx, 1, &xdpf, true);
-      if (unlikely(err != 1)) {
-          efx_siena_free_rx_buffers(rx_queue, rx_buf, 1);
-          if (net_ratelimit())
-              netif_err(efx, rx_err, efx->net_dev,
--                  "XDP TX failed (%d)\n", err);
-+                  "XDP TX failed (%d)%s\n", err,
-+                  err == -ENOBUFS ? " [frame conversion]" : "");
-          channel->n_rx_xdp_bad_drops++;
--        trace_xdp_exception(efx->net_dev, xdp_prog, xdp_act);
-+        if (err != -ENOBUFS)
-+            trace_xdp_exception(efx->net_dev, xdp_prog, xdp_act);
-      } else {
-          channel->n_rx_xdp_tx++;
-      }
-      break;
+Ref  Crashes Repro Title
+<1>  12509   Yes   WARNING in rate_control_rate_init (3)
+                   https://syzkaller.appspot.com/bug?extid=9bdc0c5998ab45b05030
+<2>  9621    Yes   WARNING in __rate_control_send_low (3)
+                   https://syzkaller.appspot.com/bug?extid=34463a129786910405dd
+<3>  6819    Yes   WARNING in __cfg80211_ibss_joined (2)
+                   https://syzkaller.appspot.com/bug?extid=7f064ba1704c2466e36d
+<4>  1216    Yes   WARNING in ieee80211_start_next_roc
+                   https://syzkaller.appspot.com/bug?extid=c3a167b5615df4ccd7fb
+<5>  764     Yes   INFO: task hung in reg_process_self_managed_hints
+                   https://syzkaller.appspot.com/bug?extid=1f16507d9ec05f64210a
+<6>  623     Yes   INFO: task hung in reg_check_chans_work (7)
+                   https://syzkaller.appspot.com/bug?extid=a2de4763f84f61499210
+<7>  577     Yes   INFO: task hung in crda_timeout_work (8)
+                   https://syzkaller.appspot.com/bug?extid=d41f74db64598e0b5016
+<8>  492     Yes   INFO: rcu detected stall in ieee80211_handle_queued_frames
+                   https://syzkaller.appspot.com/bug?extid=1c991592da3ef18957c0
+<9>  438     No    WARNING in ieee80211_request_ibss_scan
+                   https://syzkaller.appspot.com/bug?extid=1634c5399e29d8b66789
+<10> 208     Yes   INFO: task hung in ath9k_hif_usb_firmware_cb (3)
+                   https://syzkaller.appspot.com/bug?extid=e9b1ff41aa6a7ebf9640
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
--- Thanks, TAO. --- “Life finds a way.”
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
 
