@@ -1,215 +1,210 @@
-Return-Path: <netdev+bounces-210008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210009-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF401B11E64
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 14:21:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B2A3B11E69
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 14:23:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 14661585FBD
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 12:21:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 360121703AC
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 12:23:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F32EB247280;
-	Fri, 25 Jul 2025 12:21:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BED2E243364;
+	Fri, 25 Jul 2025 12:23:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BK88I0VG"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UJXfQzNT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 550272D3A64;
-	Fri, 25 Jul 2025 12:21:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4CB823F405
+	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 12:23:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753446101; cv=none; b=SzXhFykFQ70fRGlTjWC3qH28xMQecfNIXzxeZHbd3nDBgD4eCHEcvFP9wZqPeHHiSenBPCLUMOldmAf7yveyt5Rxmtam4oo/375uwwJe0umO3JG2ufxEdph8dBMnd8iKbe6kyDmJHZw5YV+xTlQdUSpLqqLuhaYxk231eW1WgiM=
+	t=1753446214; cv=none; b=DrcTsXGVZqmEWf0IxlGzMo7oZdoTP0UHJTuFW4TGqus4VDroUv0q4s0O5Xpnl2zfRAQAVFqclXfXqV0Y0u7TbRkNq8yP/w0SlnyyKezJTyhDwoUy27Eqhc1S7nBBQ0UpXaOxA8wohi4+6+nuetUlaqnE3p+F8I5NDgM5UXe2tQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753446101; c=relaxed/simple;
-	bh=xACj9feXS1RmWrfFyYHVI74fN/xzs9DHaqDK5WLfzRs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fKi6kMqwWQB4+/Nbe/XyQ58W1MIpZTFkmBrJvlHGfNqZgXGZgpUlrVKK+v6LMonXqNYT7D11CFiEBxIHDEolxcK0ySccBy5H9sUzljr5HEV5ZxeU1HzCjNMRdCk9MxEQ3gtejDgP6cLyEYZfW0gxFEJKbB4TbZqPDRPh0ybuxsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BK88I0VG; arc=none smtp.client-ip=209.85.166.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-3da73df6c4eso15557465ab.0;
-        Fri, 25 Jul 2025 05:21:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753446099; x=1754050899; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=W13LH+UK8D4i4jKHiisS0BChwj6oA7twJsq3FXAduDw=;
-        b=BK88I0VGIhBWl0N9wS6AFdDibihGiCzgegLSx/PjtxNjUkyYNZFW5aJx1+YpvF9W18
-         P4F5dPSFp5R4A5TCneU1lEcufYtrn5tf8h3ss+WIwEnOk0OV7QgEsGL1DnnqLt70lQQu
-         9MbNeMmaizcnmvpmXx3elvXuUpTkuPUs84QSk1hBYirTZwOR3ZnH3sVsYtYDsuBRLSCC
-         BwuKSCF4d/Yec7BU6BsnDMoa8bOl+kl1YtphY9GBo6rK5FTtc1cqOxUy+6NhCuGN6GBh
-         ym0bGqQYByMMtPZ6gAuGdfDeKAarI7RvMDyJ6kpjevDp8lMYBa9dSmKRee28yYw0t3Gb
-         pE0Q==
+	s=arc-20240116; t=1753446214; c=relaxed/simple;
+	bh=jvCtt4R18tjLNbRTUQm9+GSfCS59sAgzXb9yEqGGJkQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rqU+tS5f+fi/YtYeS7TdMciY2qagelmirtH28zQ0LCmZaCG+2mZTW72wqkX5CuuG/1Ntzy3dWNQgUBvcYaDK9DZt9/edRK6+FN5ho9tgu3W61pLcAVHt0VRvscfYMC+Jx5dUg3fZAMtgVO/FA39J1ZNSkQ7pHGBC7PQJwc5Rbfs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UJXfQzNT; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1753446211;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oE2sFN7go6Vy2a4QIRBJZ6B2jfXbEMiT0hznx8PJc5s=;
+	b=UJXfQzNTuKYj2tj3HpjghltNdOHMFVJkxWhqlT5CeXSzj7IJpVD5PifyLgti5UEEE8v21x
+	jWUViNLJSN3/pbSi/nBKU7S29cABv4KPPS5VB+pYBrFE1V6PHBMt+L0Na0919EF/RYeAg7
+	Q5qZpraeNV0OxWGedITuD0oiB/bjh5g=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-615-FJMS1PELMSalp7eK1NZzLQ-1; Fri, 25 Jul 2025 08:23:30 -0400
+X-MC-Unique: FJMS1PELMSalp7eK1NZzLQ-1
+X-Mimecast-MFC-AGG-ID: FJMS1PELMSalp7eK1NZzLQ_1753446209
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-45639e6a320so11613465e9.3
+        for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 05:23:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753446099; x=1754050899;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=W13LH+UK8D4i4jKHiisS0BChwj6oA7twJsq3FXAduDw=;
-        b=b1q0N2Gk4q/9N5McRhcTwe2EGrG/IjQKAwpEQgKDBaVqYmDQVb7KkWG55seiCh+N2/
-         iWbs/2+LsuVev5MXj4XmMWpZp/z47bmePjzp9BDNfhg7xLjubRm21JKxUP7G8sUI7J1D
-         YP9BukmY66JQ8ydIM59JVC6N6BMma6R+1wFAwJRzFPF/jXDYz1I18UWWmE37gCbPmxmg
-         JV6NVS/0N4FznyhLvG6wZfTvBj3kKqrS6ihyZtozT4FVw0G2SwAYDieQGq3GrGjUYjLD
-         DphBtpI8fY+h+F+3YLzkYhadvrYVvD0BlgMIAfX9SQ+49895DeZdfvG3ak/eg+VvlMA9
-         9rnw==
-X-Forwarded-Encrypted: i=1; AJvYcCWwhLP+LEd5lNi2yAnLZOXsOjagmUe9FPUDRGO64nXQRo6gwTWB/BDX7MOcw02uFXgoZpQ=@vger.kernel.org, AJvYcCXjC5plcOw24+cmTRKcXQCG377B9fe+zrYSYe2Ba8kHp6q3emxUj3qs+lyQq9UojlRRtLqMhL1g@vger.kernel.org
-X-Gm-Message-State: AOJu0YwwOiauGlI13xs1RpEPn61Z01lOzZXwSge3ZV4ontUjYLyIOKRn
-	mrVdp2mNwBnGjMb+vNyDi74Zcf7xgiv1WZBBeaLWsSMU21Hg3Fe5P69uU5XTxQFDR4VQ8HNDFK9
-	5cx4UlvGSxAat8RyR1kA65gcpbMMzhqc=
-X-Gm-Gg: ASbGncucwvRieriUadXdvHdix1WL7IJJpix/hPc9mgxsNfClGJMWIkCJ0dh5u2o0pfE
-	ydpcxOWawB/A98Uyf3Vw2G3A5wrKUbUu/VceN4Ol7uTQdfamodXS2Rx6tEO7GPMnwCCF6NAj4AV
-	E1ULkTA0tFE5iVLhuS440VeC7F5Moei7So4r2oWwMNFeDEK0V4eI1KvQN0jBUdw63iovu6LyKWx
-	uOYDg==
-X-Google-Smtp-Source: AGHT+IEPIShuk+mVCS1GaQLe/6O7xiKmk84XLA/bOK+4kE+w2xf49d8oU58Vp8hWb5S0e5KbfWFQJv2soLssESkheIQ=
-X-Received: by 2002:a05:6e02:3f03:b0:3e2:dc2e:85d8 with SMTP id
- e9e14a558f8ab-3e3c5377a21mr22661995ab.19.1753446099355; Fri, 25 Jul 2025
- 05:21:39 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1753446209; x=1754051009;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=oE2sFN7go6Vy2a4QIRBJZ6B2jfXbEMiT0hznx8PJc5s=;
+        b=gxeHMvlanV9dlOG8CzCbP9j29uVhaXGQXC4rW4X/P7/wX3C/nklro1WT/gfb+xaH7a
+         if0Zb2zpYZFKuAFD2YSA/GBNP3auJ1pzStKwtu4NOTOreJx31GZZAmWaayWKU3+1QN5+
+         5mA4XnNfLT4jcxdGC7oF8XOft4M5x5wUMktVW7D92BJ2oy8YsIDYJbt12PZZ89OB0hab
+         OMbmOa3SHcxFfBNq8nwGVMunBrfANG/YIJZrW59/UXU+iUQpv/I4Kfcc7bYSBNbzW8MG
+         tY+a1KqM1KrdrasNBLzxyDOD1zMw3k3VXvq/++06lPQWixw+6zV5Z8qJ/oqvB0uWB14u
+         s9RA==
+X-Gm-Message-State: AOJu0Ywr65BrmHsyAu2hiSEJW8zOv62BcAis9Aif1CnxatUbSPcfmwFL
+	D4kl/yOhRasplFJwUzSG4sinwFPnITgRu8FQ4a9G0DvjRN1162b/ggzcdBkwg6EKYjWBNGmj/oq
+	su/HHFbN5KXRx4H5uvYgJkYoBGzfSJzAup+56iiSj14TQqEsOrABtd9WZNA==
+X-Gm-Gg: ASbGnculCkxrldjBuVhzdmi1aFiuGPT3LhnhlZlKEAmAqB2DmYYXnMH2nbNsM9jEBro
+	0pduxZ10KXXIam/4Ouns2FeQPcY/qIYuSaLGRlp9FHcYU8cMLCz3lYqvC3KxbdWXhFMPEKcMhSO
+	XW+g8PNFCEFT3ZqM8Vr1b8Bx/fyYoal4TaOG0lIWNgQf9px/3ZWplogL7UnClBpIgQfzVfOdJM2
+	H1AUzythdWz5dueOn2XhajEaDf9RJ9boyZGAvAof6ScJSPBNnjSo37RDy7Rfgm4BVFgNWombdEh
+	TXZEePKxORmbkzzhSIDpkYiryF29o9tMbwDKA3FyxixAmDvlT8abdDj/YJcpGjvdXWkjCd6Nujk
+	Js+3qcU5Rx2Y=
+X-Received: by 2002:a05:600c:3b19:b0:442:dc6f:2f11 with SMTP id 5b1f17b1804b1-4587654e312mr16354015e9.25.1753446209078;
+        Fri, 25 Jul 2025 05:23:29 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF8ENmNYoPN7Z3gkcm2yH8f9BkTobgJbMkC4b4AYupd8QzMA28FL8N2WqdWjd0IoiEJg7qakg==
+X-Received: by 2002:a05:600c:3b19:b0:442:dc6f:2f11 with SMTP id 5b1f17b1804b1-4587654e312mr16353635e9.25.1753446208543;
+        Fri, 25 Jul 2025 05:23:28 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-458705bcbe8sm55213915e9.17.2025.07.25.05.23.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 25 Jul 2025 05:23:27 -0700 (PDT)
+Message-ID: <837ee1c6-a7c8-490b-84ae-6c24fdd48e4e@redhat.com>
+Date: Fri, 25 Jul 2025 14:23:26 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250720091123.474-1-kerneljasonxing@gmail.com>
- <20250720091123.474-4-kerneljasonxing@gmail.com> <aINSDD1BezlEn_gM@soc-5CG4396X81.clients.intel.com>
-In-Reply-To: <aINSDD1BezlEn_gM@soc-5CG4396X81.clients.intel.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Fri, 25 Jul 2025 20:21:03 +0800
-X-Gm-Features: Ac12FXwsLiHwfDK_OwTHMCzcEIzX9OGtl7zZ6hoqgP_leACZAesBwzcjUmkIDzo
-Message-ID: <CAL+tcoAUW_J62aw3aGBru+0GmaTjoom1qu8Y=aiSc9EGU09Nww@mail.gmail.com>
-Subject: Re: [PATCH net-next 3/5] ixgbe: xsk: use ixgbe_desc_unused as the
- budget in ixgbe_xmit_zc
-To: Larysa Zaremba <larysa.zaremba@intel.com>
-Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, bjorn@kernel.org, 
-	magnus.karlsson@intel.com, maciej.fijalkowski@intel.com, 
-	jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org, 
-	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com, 
-	bpf@vger.kernel.org, intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] netpoll: prevent hanging NAPI when netcons gets
+ enabled
+To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
+Cc: netdev@vger.kernel.org, edumazet@google.com, andrew+netdev@lunn.ch,
+ horms@kernel.org, Jason Wang <jasowang@redhat.com>,
+ Zigit Zo <zuozhijie@bytedance.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, leitao@debian.org, sdf@fomichev.me
+References: <20250725024454.690517-1-kuba@kernel.org>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250725024454.690517-1-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jul 25, 2025 at 5:45=E2=80=AFPM Larysa Zaremba <larysa.zaremba@inte=
-l.com> wrote:
->
-> On Sun, Jul 20, 2025 at 05:11:21PM +0800, Jason Xing wrote:
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > - Adjust ixgbe_desc_unused as the budget value.
-> > - Avoid checking desc_unused over and over again in the loop.
-> >
-> > The patch makes ixgbe follow i40e driver that was done in commit
-> > 1fd972ebe523 ("i40e: move check of full Tx ring to outside of send loop=
-").
-> > [ Note that the above i40e patch has problem when ixgbe_desc_unused(tx_=
-ring)
-> > returns zero. The zero value as the budget value means we don't have an=
-y
-> > possible descs to be sent, so it should return true instead to tell the
-> > napi poll not to launch another poll to handle tx packets.
->
-> I do not think such reasoning is correct. If you look at the current matu=
-re
-> implementation in i40e and ice, it always returns (nb_pkts < budget), so =
-when
-> the budget is `0`, the napi will always be rescheduled. Zero unused descr=
-iptors
+On 7/25/25 4:44 AM, Jakub Kicinski wrote:
+> Paolo spotted hangs in NIPA running driver tests against virtio.
+> The tests hang in virtnet_close() -> virtnet_napi_tx_disable().
+> 
+> The problem is only reproducible if running multiple of our tests
+> in sequence (I used TEST_PROGS="xdp.py ping.py netcons_basic.sh \
+> netpoll_basic.py stats.py"). Initial suspicion was that this is
+> a simple case of double-disable of NAPI, but instrumenting the
+> code reveals:
+> 
+>  Deadlocked on NAPI ffff888007cd82c0 (virtnet_poll_tx):
+>    state: 0x37, disabled: false, owner: 0, listed: false, weight: 64
+> 
+> The NAPI was not in fact disabled, owner is 0 (rather than -1),
+> so the NAPI "thinks" it's scheduled for CPU 0 but it's not listed
+> (!list_empty(&n->poll_list)). It seems odd that normal NAPI
+> processing would wedge itself like this.
+> 
+> My suspicion is that netpoll gets enabled while NAPI is polling,
+> and also grab the NAPI instance. This confuses napi_complete_done():
+> 
+>   [netpoll]                                   [normal NAPI]
+>                                         napi_poll()
+>                                           have = netpoll_poll_lock()
+>                                             rcu_access_pointer(dev->npinfo)
+>                                               return NULL # no netpoll
+>                                           __napi_poll()
+> 					    ->poll(->weight)
+>   poll_napi()
+>     cmpxchg(->poll_owner, -1, cpu)
+>       poll_one_napi()
+>         set_bit(NAPI_STATE_NPSVC, ->state)
+>                                               napi_complete_done()
+>                                                 if (NAPIF_STATE_NPSVC)
+>                                                   return false
+>                                            # exit without clearing SCHED
+> 
+> This seems very unlikely, but perhaps virtio has some interactions
+> with the hypervisor in the NAPI -> poll that makes the race window
+> large?
+> 
+> Best I could to to prove the theory was to add and trigger this
+> warning in napi_poll (just before netpoll_poll_unlock()):
+> 
+>       WARN_ONCE(!have && rcu_access_pointer(n->dev->npinfo) &&
+>                 napi_is_scheduled(n) && list_empty(&n->poll_list),
+>                 "NAPI race with netpoll %px", n);
+> 
+> If this warning hits the next virtio_close() will hang.
+> 
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Reported-by: Paolo Abeni <pabeni@redhat.com>
+> Link: https://lore.kernel.org/c5a93ed1-9abe-4880-a3bb-8d1678018b1d@redhat.com
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Sorry, I'm afraid I don't think so. In ice_xmit_zc(), if the budget is
-zero, it will return true because of the following codes:
-nb_pkts =3D xsk_tx_peek_release_desc_batch(xsk_pool, budget);
-if (!nb_pkts)
-        return true;
+It's not clear to me if you have been able to validate the patch into
+NIPA already?
 
-Supposing there is no single desc in the tx ring, the budget will
-always be zero even when the napi poll is triggered.
 
-Thanks,
-Jason
+> ---
+> Looks like this is not a new bug, rather Breno's tests now put
+> enough pressure on netpoll + virtio to trigger it.
+> 
+> CC: Jason Wang <jasowang@redhat.com>
+> CC: Zigit Zo <zuozhijie@bytedance.com>
+> CC: "Michael S. Tsirkin" <mst@redhat.com>
+> CC: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> CC: Eugenio Pérez <eperezma@redhat.com>
+> 
+> CC: leitao@debian.org
+> CC: sdf@fomichev.me
+> ---
+>  drivers/net/netconsole.c | 25 ++++++++++++++++++++-----
+>  1 file changed, 20 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
+> index e3722de08ea9..9bc748ff5752 100644
+> --- a/drivers/net/netconsole.c
+> +++ b/drivers/net/netconsole.c
+> @@ -256,6 +256,24 @@ static struct netconsole_target *alloc_and_init(void)
+>  	return nt;
+>  }
+>  
+> +static int netconsole_setup_and_enable(struct netconsole_target *nt)
+> +{
+> +	int ret;
+> +
+> +	ret = netpoll_setup(&nt->np);
+> +	if (ret)
+> +		return ret;
+> +
+> +	/* Make sure all NAPI polls which started before dev->npinfo
+> +	 * was visible have exited before we start calling NAPI poll.
+> +	 * NAPI skips locking if dev->npinfo is NULL.
+> +	 */
+> +	synchronize_rcu();
 
-> means that the entire ring is held by HW, so it makes sense to retry to
-> reclaim some resources ASAP. Also, zero unused normal descriptors does no=
-t mean
-> there is no UMEM descriptors to process.
->
-> Please, remove the following lines and the patch should be fine:
->
-> +     if (!budget)
-> +             return true;
->
-> > Even though
-> > that patch behaves correctly by returning true in this case, it happens
-> > because of the unexpected underflow of the budget. Taking the current
-> > version of i40e_xmit_zc() as an example, it returns true as expected. ]
-> > Hence, this patch adds a standalone if statement of zero budget in fron=
-t
-> > of ixgbe_xmit_zc() as explained before.
-> >
-> > Use ixgbe_desc_unused to replace the original fixed budget with the num=
-ber
-> > of available slots in the Tx ring. It can gain some performance.
-> >
-> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > ---
-> >  drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c | 13 +++++--------
-> >  1 file changed, 5 insertions(+), 8 deletions(-)
-> >
-> > diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c b/drivers/net=
-/ethernet/intel/ixgbe/ixgbe_xsk.c
-> > index a463c5ac9c7c..f3d3f5c1cdc7 100644
-> > --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
-> > +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
-> > @@ -393,17 +393,14 @@ static bool ixgbe_xmit_zc(struct ixgbe_ring *xdp_=
-ring, unsigned int budget)
-> >       struct xsk_buff_pool *pool =3D xdp_ring->xsk_pool;
-> >       union ixgbe_adv_tx_desc *tx_desc =3D NULL;
-> >       struct ixgbe_tx_buffer *tx_bi;
-> > -     bool work_done =3D true;
-> >       struct xdp_desc desc;
-> >       dma_addr_t dma;
-> >       u32 cmd_type;
-> >
-> > -     while (likely(budget)) {
-> > -             if (unlikely(!ixgbe_desc_unused(xdp_ring))) {
-> > -                     work_done =3D false;
-> > -                     break;
-> > -             }
-> > +     if (!budget)
-> > +             return true;
-> >
-> > +     while (likely(budget)) {
-> >               if (!netif_carrier_ok(xdp_ring->netdev))
-> >                       break;
-> >
-> > @@ -442,7 +439,7 @@ static bool ixgbe_xmit_zc(struct ixgbe_ring *xdp_ri=
-ng, unsigned int budget)
-> >               xsk_tx_release(pool);
-> >       }
-> >
-> > -     return !!budget && work_done;
-> > +     return !!budget;
-> >  }
-> >
-> >  static void ixgbe_clean_xdp_tx_buffer(struct ixgbe_ring *tx_ring,
-> > @@ -505,7 +502,7 @@ bool ixgbe_clean_xdp_tx_irq(struct ixgbe_q_vector *=
-q_vector,
-> >       if (xsk_uses_need_wakeup(pool))
-> >               xsk_set_tx_need_wakeup(pool);
-> >
-> > -     return ixgbe_xmit_zc(tx_ring, q_vector->tx.work_limit);
-> > +     return ixgbe_xmit_zc(tx_ring, ixgbe_desc_unused(tx_ring));
-> >  }
-> >
-> >  int ixgbe_xsk_wakeup(struct net_device *dev, u32 qid, u32 flags)
-> > --
-> > 2.41.3
-> >
-> >
+I'm wondering if it would make any sense to move the above in
+netpoll_setup(), make the exposed symbol safe.
+
+In any case, AFAICS this at very least addresses a real race.
+
+Acked-by: Paolo Abeni <pabeni@redhat.com>
+
 
