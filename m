@@ -1,120 +1,143 @@
-Return-Path: <netdev+bounces-210043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210047-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CABDB11EEF
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 14:45:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37FCCB11F0B
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 14:55:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6DEF91888914
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 12:45:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 015EAAE10F3
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 12:55:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A28152ECD06;
-	Fri, 25 Jul 2025 12:45:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B449E2ECD2E;
+	Fri, 25 Jul 2025 12:55:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ou6TODdl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IfciSWEb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D598B2ECD0C;
-	Fri, 25 Jul 2025 12:45:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 417B02D8784;
+	Fri, 25 Jul 2025 12:55:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753447505; cv=none; b=kg5blvmyMlkZxS4P98ZMnNkEsFi2Zqkpjph297qFQeG3evfW1g9/hwo0WV2gmhY/NF7ayF9g31Uf6/9EW0EPmhbJle6aE+ZWYUbpthtMT2puGAt1pt+tQ2SKIKzmYBrEVGZ6P4dd385yBCT3wbNv3HAMIrNb1wYCCiQxG+b7CeQ=
+	t=1753448146; cv=none; b=klsAmmhIvPqPAJtzuD2TsvgFpaXarsFQJ6qgiM/CPGNOVRu2E3jikhULx7g02HzI4VcgeNwXe+c3vLr8FmvPawyAtgWoO2NiXWOW4S2FEtQefaG947Y76Aln1gKq9ebQtX9bHc5g0jtTIfmNmX2Z96U0NcHzt0FAurxkFBStkRs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753447505; c=relaxed/simple;
-	bh=Ivx+3DpkDEVIWgDPE886sL3hmaIO7VVHI5szFYAJzWg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eeKK49heqvVkTc8GM+ZT6/s8f4Q0kBml5LxF32okC8VnG1oc6or/wWUDHcyYPUxFKqkf0EqoTxBW7jjsKnTxeZrlt0YmWIOP87dtXguy7LrXpMG0MgFlomQW1XWvjftComCp+Szvf5yHe7OhqSPM9j5wJJWgXzGEfGl3vY5sik4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ou6TODdl; arc=none smtp.client-ip=209.85.167.47
+	s=arc-20240116; t=1753448146; c=relaxed/simple;
+	bh=+96td86pl6RYvdjPgEXEaY4yH4Llt3TUn3hBrBZc3sA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jWzxfcmFh0n87UElgWu6n9oHP+ho0wuWmjqmS5JFwk0fkBv5Lkh9a7r7Wh74DRDguhhc0OYGHmRXj3uwVA23nwhIB+VFilfS2Zf4IKxtAHZa5aKBhg1OZI9XU/cjp9/n3B0Vi4N7DtksZwB9ccDxRijrbahvWN3iBOgKmekTAN4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IfciSWEb; arc=none smtp.client-ip=209.85.216.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-558f7472d64so2974968e87.0;
-        Fri, 25 Jul 2025 05:45:03 -0700 (PDT)
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-31e7e3dc5d2so219767a91.1;
+        Fri, 25 Jul 2025 05:55:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753447502; x=1754052302; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=R6TxXc2OJoQQEZeRy0qh5s7Sa5mHuBfc4zIBb0BU55c=;
-        b=Ou6TODdlhtIoYBuWZlheh+UgbR2Hh3ReyAvIPhtdCCPJukFwgvnvB6kZ1JnSJ9PgSp
-         LgVxokRbCrDVYhC9290jPEIc9rk1GbRIGWhbcXzlPbHOSnLXAgdPE/mmwQ1LQuj0xm//
-         4jByisrIf48LrRwme2+6XMWeLirCsqF1h4Mbx5x4WGUkwMp0++7Ty8GXSvosixvRhyQG
-         f5gaTnqy9neKtI6nY5O+QdbpOX9pBxrImoJz/fL6OwXB21ckqclGXTIIB8EY/EttdO8d
-         8adwFn5KSxj/1mUbJNu9ef9PjK3vUUILpXGsdhIplmbOgSvTJfq81JPxkPs453+Rv/7P
-         Dkwg==
+        d=gmail.com; s=20230601; t=1753448144; x=1754052944; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=qGEpXVAlxD3K+ugg3yuPPR4elZ+lMYltBWlc9KeJ+S0=;
+        b=IfciSWEbzFc9tbXLQI9i5nAA5ALGIIv0NzFeuneN1p0h2ysyF0FQF5U3MoZYkeu9Yj
+         EiLnds/iCjv3Va6NXCzqVB3J1PsvKBNdg1PaG9jZjTwyJBKAnFEtwpl27tdYsashv6HY
+         wdarg8QNOScFyIBp+Xu10qX8glep0OvM6EqcgUS5Go2ATLL+3lZ14vjCyNM09lzQLmAD
+         N9XSfiYNwoufvdaQpyUg3V9bljnbTm8gGTEYtEbGgVe4XT2zLqb/+2Urnt7BTi0sjfBR
+         3XeE2ORTHXta/Sd3umWk3X6yLEJAbxmy0Kg34wI0Eyg5N4RU38I70exZSCA88hB0ur03
+         ciJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753447502; x=1754052302;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=R6TxXc2OJoQQEZeRy0qh5s7Sa5mHuBfc4zIBb0BU55c=;
-        b=Sq6gSZvN1eMbdBc6evX0j1123hX+gkopG+FsIDLkGeenA9s0TlcWpW3641o+RbX/7j
-         BqJb0gWCfYlJSPEHXDpiAtfh0k2c/w5PDKoXP5+RcOZHadTfoCnvhX2uX+NYVVLPWU5g
-         4K5zywGqX+dQTMhJ2c0LD1qY7vwotormpJCXiRbG5cKafJASl4J4iu5kYD924QD67uwU
-         2pcfDgMclxqJhifii7veqe88Obmf5Qy65Oet1DW+W0aTk0kcmvNJyYzrsTTfPVWuAJmK
-         IAZIVeKIxYmaMHhBm51BfEQGb6ieixE6z4jS3dRxVVeW8e2lPeiMOi15fA/SGnZHGc43
-         pBvw==
-X-Forwarded-Encrypted: i=1; AJvYcCUNUTQ/v0ucwEbksjoRszKxvz4nK4T80+HjttpAfigFVqCUtIBI6es9O7UoISCbPE5U8Z4waCuqTus=@vger.kernel.org, AJvYcCXMUdT4gWb9N5Ho+v/KZuov5KIHBuqUlLeQK2tVuLWiW4gSV4UJtB8tA7LqENtjWICEmGSfY+MQ@vger.kernel.org
-X-Gm-Message-State: AOJu0YyxBENAh7WKOdiO4dr6KdM4SPjSKH3SL7lEAWphGWV/TTkyL103
-	OUz3CclkPeApi3mO0HmlHkKNicAVzkhUofKW01s+1qznPNRNb2hd309fdktrEQ==
-X-Gm-Gg: ASbGncuz9eYPA5pQ+XyENkea+/tZkMRiPCCHwZETMDhbpLth4qchB1Z4T/j79c4HVze
-	H7CngM2ukRtouXEDj/s0pGfXYIpf0Fz2qc9HOPW5+BlESpd1/7GakSk7gL5AONq1F0VWmn5KrTr
-	k8y91fugHSNiJX17RWTCQi/tLIvwws1cssRLsbOTXHy0w/FrqCAFn7/1OWB6eKbCF7FV7cKpQt0
-	mJhK67vRwBlfAt43RUd6x79ABvmVqz9gfXOjCpkarRLQQG5jo+tl/zeAez4oQsXA+USGIVVzau7
-	1IrW98uyR6TiQKumxu8j0vNJ6VzwseVLueHwoZwjyuF/dW60iSIfYV/pMHz+V2m+dR7elMPX2Nd
-	q3kbpa7TUfdr7F6wNywdlftzkAvjtNhoFCbB8MU8bTbxIbn0tsS4F9IWp8Y9ZZ4vgOA+SjT8Th6
-	iOtSU5pe9LI1g=
-X-Google-Smtp-Source: AGHT+IEybm6khkrXEWXr/3/TGkrlr2zgjTyZeiBtLvPmwfN38fI6k5rWT1d0IbR+P/SqIgokzw5w5w==
-X-Received: by 2002:a05:6512:1396:b0:55a:32ef:6bc2 with SMTP id 2adb3069b0e04-55b5e53d80emr624196e87.25.1753447501725;
-        Fri, 25 Jul 2025 05:45:01 -0700 (PDT)
-Received: from [192.168.66.199] (h-98-128-173-232.A785.priv.bahnhof.se. [98.128.173.232])
-        by smtp.googlemail.com with ESMTPSA id 2adb3069b0e04-55b53b2288csm921792e87.23.2025.07.25.05.45.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 25 Jul 2025 05:45:01 -0700 (PDT)
-Message-ID: <94e5ddd2-3566-496d-a4c9-40f72e649811@gmail.com>
-Date: Fri, 25 Jul 2025 14:45:00 +0200
+        d=1e100.net; s=20230601; t=1753448144; x=1754052944;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qGEpXVAlxD3K+ugg3yuPPR4elZ+lMYltBWlc9KeJ+S0=;
+        b=XSBO2Y1uE6HXYbm4OSGL5WZr31+TElSRQAI8CTyjj96YbJx8isTyXf2ar8g9ggWGUR
+         ZnrUgZWfZKYfSaaA2dYWB3hgwVWUD0pCFcR3qjJUMbYpiQk/anFTqFvNz37amR8sFaWD
+         TEd5rrdrftwnPIdBIy46lRWMt0QFutY4LixNn6pY8+8cYrEx+FNGI9gCgyX2C55VGjwA
+         yhMMoSUi3k5VI+dtEB+ZsrXx3s6dOBXAsozoX0Rk2b4eU6xAfIWVKV7bclSIPLdISP0H
+         hnWP/FxFehzYd8e405zziVEuD+xb6FNjDzKkeuV+rleEUuIp3/dGoZH4bnm4v0O1V+Nl
+         m7kQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVQXQGEkM97W7TqatlfMPfqG3QT6xoEzmzpgBH/XdLkmojbVxT3X1D2LdFAMM3UHsIxzf3CuY4TyiE=@vger.kernel.org, AJvYcCVpNYPTNXBeTw7T173MhUKseqLKhX0tERP6xfEIzbCAPYBDFqi+ovkx6f8WfMtODvzUweGLQDDzulWKwlf2@vger.kernel.org, AJvYcCW82nyw5qnCO9UZXvxOTUJzDBO6O9UFkOZrr5ljNTG2USfb11OepIZKaUwZ+F6ZjroKTMjIiC2Lh5SyhYPoIRI9@vger.kernel.org
+X-Gm-Message-State: AOJu0YyIhuCDXXMzJDKMDJP+0YPQphXxNy7TaoAqyPtV+n1KiL2nzV1J
+	sgwkYAw/uSLvridxSuL8A4WQRzvBMdtOtfmyvPpAOPUy/fIFmoG4bYz/
+X-Gm-Gg: ASbGncuLcahbDDZ1TzRKOjYixirTwBgNOb9WIeJBJLiYI4CXCvc0aTDR17BMgKxKH89
+	FhW43uaSMbSxPBT6zRU050nyZ3/9JoqXqmF88RH/Az9og16bl+QUu+fklXVy4d9pvirrg56GEVk
+	W4Ve7fF0slmvdtuHmKZXUBlrmP6tu22BRzYYE70N4IQR7znSUe0NNjDlktSTimTWpTyJ1ML8OjB
+	srTLUIyV3aZdI6twk1ysDen12zJWJk/0R4vKVJd3J4hPiXidXtCxmSUjFBKBXIDokEQjDWae7ej
+	/Xgs7G4kKA4ZbdlA1kz7MYj+qqU8g7fLxzE/BKI0jG9XXzYestl9S0p+enj66BPgbb05plJYOn5
+	MNH/NAzuu37Wa8FzsjcfeauFzch8=
+X-Google-Smtp-Source: AGHT+IERyHyW3IcBP+fSmwCMOKFhQWtZFxxc56mB48/vivDFg9NwEVPKFDWWB5I+SUZCA98cM3tnPg==
+X-Received: by 2002:a17:90b:1b45:b0:311:f30b:c18 with SMTP id 98e67ed59e1d1-31e7785ee72mr2444832a91.4.1753448144231;
+        Fri, 25 Jul 2025 05:55:44 -0700 (PDT)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31e662f6ebdsm3461314a91.37.2025.07.25.05.55.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Jul 2025 05:55:43 -0700 (PDT)
+Date: Fri, 25 Jul 2025 12:46:00 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Nikolay Aleksandrov <razor@blackwall.org>
+Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>, Petr Machata <petrm@nvidia.com>,
+	Amit Cohen <amcohen@nvidia.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Alessandro Zanni <alessandro.zanni87@gmail.com>,
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net 1/2] bonding: send LACPDUs periodically in passive
+ mode after receiving partner's LACPDU
+Message-ID: <aIN8Rpc8YELX2QD6@fedora>
+References: <20250725062848.18889-1-liuhangbin@gmail.com>
+ <20250725062848.18889-2-liuhangbin@gmail.com>
+ <367f9bbb-537b-4828-b8c8-cfc9d8ca8c2c@blackwall.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 00/11] can: kvaser_usb: Simplify identification of
- physical CAN interfaces
-To: Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
- Jimmy Assarsson <extja@kvaser.com>, linux-can@vger.kernel.org
-Cc: Marc Kleine-Budde <mkl@pengutronix.de>, netdev@vger.kernel.org
-References: <20250724092505.8-1-extja@kvaser.com>
- <aa90e02d-25d5-4f76-bd91-26795825c8a6@wanadoo.fr>
-Content-Language: en-US
-From: Jimmy Assarsson <jimmyassarsson@gmail.com>
-In-Reply-To: <aa90e02d-25d5-4f76-bd91-26795825c8a6@wanadoo.fr>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <367f9bbb-537b-4828-b8c8-cfc9d8ca8c2c@blackwall.org>
 
-On 7/25/25 5:29 AM, Vincent Mailhol wrote:
-> On 24/07/2025 at 18:24, Jimmy Assarsson wrote:
->> This patch series simplifies the process of identifying which network
->> interface (can0..canX) corresponds to which physical CAN channel on
->> Kvaser USB based CAN interfaces.
+On Fri, Jul 25, 2025 at 11:49:00AM +0300, Nikolay Aleksandrov wrote:
+> On 7/25/25 09:28, Hangbin Liu wrote:
+> > When `lacp_active` is set to `off`, the bond operates in passive mode, meaning
+> > it only "speaks when spoken to." However, the current kernel implementation
+> > only sends an LACPDU in response when the partner's state changes.
+> > 
+> > As a result, once LACP negotiation succeeds, the actor stops sending LACPDUs
+> > until the partner times out and sends an "expired" LACPDU. This causes
+> > continuous LACP state flapping.
+> > 
+> > According to IEEE 802.1AX-2014, 6.4.13 Periodic Transmission machine. The
+> > values of Partner_Oper_Port_State.LACP_Activity and
+> > Actor_Oper_Port_State.LACP_Activity determine whether periodic transmissions
+> > take place. If either or both parameters are set to Active LACP, then periodic
+> > transmissions occur; if both are set to Passive LACP, then periodic
+> > transmissions do not occur.
+> > 
+> > To comply with this, we remove the `!bond->params.lacp_active` check in
+> > `ad_periodic_machine()`. Instead, we initialize the actor's port's
+> > `LACP_STATE_LACP_ACTIVITY` state based on `lacp_active` setting.
+> > 
+> > Additionally, we avoid setting the partner's state to
+> > `LACP_STATE_LACP_ACTIVITY` in the EXPIRED state, since we should not assume
+> > the partner is active by default.
+> > 
+> > This ensures that in passive mode, the bond starts sending periodic LACPDUs
+> > after receiving one from the partner, and avoids flapping due to inactivity.
+> > 
+> > Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
 > 
-> 
-> Same as for the kvaser_pciefd, there is a tiny transient issue on a missing
-> header include. The rest is OK, so, for the full series:
-> 
-> Reviewed-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-> 
-> 
-> Yours sincerely,
-> Vincent Mailhol
+> Shouldn't the fixes tag be lacp_active commit id?
+> E.g. 3a755cd8b7c6 ("bonding: add new option lacp_active")
 
-Think all issues should be resolved.
-Thanks for reviewing!
+Totally forgot that I added this option -_-!!
 
-Best regards,
-jimmy
+Thanks
+Hangbin
 
