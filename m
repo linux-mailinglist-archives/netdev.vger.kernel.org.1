@@ -1,81 +1,88 @@
-Return-Path: <netdev+bounces-209937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209935-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A215B115D5
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 03:24:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46800B115A7
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 03:16:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F8071CC6DB4
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 01:24:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06B723A40E5
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 01:16:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C200F1DE2D8;
-	Fri, 25 Jul 2025 01:24:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ij5daOub"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 059C817CA1B;
+	Fri, 25 Jul 2025 01:16:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 966C443ABC;
-	Fri, 25 Jul 2025 01:24:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92D3BB676;
+	Fri, 25 Jul 2025 01:16:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753406669; cv=none; b=idX0+hwR+691JPOe+JBrwIeIQjjEO9lYetNQQoYK0F1lhmby4D7CHyMVuR7UaC9Mn9lSLgrjqlMTR1TRS2koIEuBsw70Jc/RLFUXlNj7HjREnRSTokFlRg1PgSkPBPWI3k29jAGSdQ2UQJS8MIzXJY7oCSuBWAzcUZwGHLL3Qpk=
+	t=1753406204; cv=none; b=i/72iDmL8sFoRDAXE3MbcDNEfWAKeg75a4RdxfblXDUEc5JDauinYpNtweL5/e+54ZvpLiJe4RotK/8F+F/vIldPdQR9Hk/uFzcX8c5d9indcE0qjlIHegm6+tAOx/ZZjK8PKzuH1TASPgvFeL87iN5vgGHfF0vmcjof/7eU22s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753406669; c=relaxed/simple;
-	bh=T8LNO5AvnTSpaz3oGEJtdNfb4yIxbJpcEuBH2EQ7wjg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Qd9mfBBL00eAgQv+ct+727cqvRXbBgNY8J4CbHG3K8JGYHtE+yCcv4QvJZWnrJd7rYDR/sAXGqAvhApRLDaSnogaY7w90d1cDLNl9mgaPpcFXNsCDRaykYogaA3rSuxs9BLsqXCQPC3YP0GHZbK1fwosCHYciPJLxqhz6EuuOdc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ij5daOub; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA3CBC4CEED;
-	Fri, 25 Jul 2025 01:24:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753406669;
-	bh=T8LNO5AvnTSpaz3oGEJtdNfb4yIxbJpcEuBH2EQ7wjg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ij5daOubh+CB/TjrNPq/7PRGY4Nl8LWtEbyQ3Z1yzNT2AtCSdsEt3MzVPDGPCXt9J
-	 OdU0rJygETVxmtyHGLzsJzDsDesUsJT9Kc0fB72JCwmw0W6iqDb6xL+kf2Z2KxmX1P
-	 IFti47mr/7w37CXb241VnmyM0d3ngSSyNbKzr2/hLgDXxaDFesa0SopeDvteCWjIfE
-	 fuIth4ECFuCUcmL7Hzz4ncCt9xxzEA10EUC59mR+y4VCwaBIeCEQFTKLfVbOn0xcwW
-	 O3SoQy1CTrF8KFIuEhUvPpidqA6Oxf/hjH8v9uHN02/bQzYpP/2WwoKHMW8or+ttaP
-	 oH53OsVUL9xVA==
-Date: Thu, 24 Jul 2025 18:24:27 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
- kernel-team@meta.com
-Subject: Re: [PATCH net-next] selftests: net: Skip test if IPv6 is not
- configured
-Message-ID: <20250724182427.5ece92e8@kernel.org>
-In-Reply-To: <20250723-netcons_test_ipv6-v1-1-41c9092f93f9@debian.org>
-References: <20250723-netcons_test_ipv6-v1-1-41c9092f93f9@debian.org>
+	s=arc-20240116; t=1753406204; c=relaxed/simple;
+	bh=tgJjmb3D/EBX50l0+VI6F0vwMmlQ/g6/llxOIyaa9H0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=KDeHYOdBuN9+If5oNBvemd588NYuj4JsVLgqLgNILjM2Hosna9GNDEzWfipRNYGgLMkGDUWY+aierh7zPx83mlEvGMgjtrmJUyZn94aa0Dd5D7I6fwo1C6FceTMFMsPVVaUMC7zsWqYwDJsA63Xt3FplxhXRHr3LeFF+DZOzBok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.112])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4bp8zN2fTmz2RVxc;
+	Fri, 25 Jul 2025 09:14:24 +0800 (CST)
+Received: from dggpemf500016.china.huawei.com (unknown [7.185.36.197])
+	by mail.maildlp.com (Postfix) with ESMTPS id CDF271400D4;
+	Fri, 25 Jul 2025 09:16:39 +0800 (CST)
+Received: from huawei.com (10.175.124.27) by dggpemf500016.china.huawei.com
+ (7.185.36.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Fri, 25 Jul
+ 2025 09:16:38 +0800
+From: Wang Liang <wangliang74@huawei.com>
+To: <sgarzare@redhat.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>
+CC: <yuehaibing@huawei.com>, <zhangchangzhong@huawei.com>,
+	<wangliang74@huawei.com>, <virtualization@lists.linux.dev>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH net-next] vsock: remove unnecessary null check in vsock_getname()
+Date: Fri, 25 Jul 2025 09:38:08 +0800
+Message-ID: <20250725013808.337924-1-wangliang74@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ dggpemf500016.china.huawei.com (7.185.36.197)
 
-On Wed, 23 Jul 2025 10:35:06 -0700 Breno Leitao wrote:
-> Extend the `check_for_dependencies()` function in `lib_netcons.sh` to check
-> whether IPv6 is enabled by verifying the existence of
-> `/proc/net/if_inet6`. Having IPv6 is a now a dependency of netconsole
-> tests. If the file does not exist, the script will skip the test with an
-> appropriate message suggesting to verify if `CONFIG_IPV6` is enabled.
-> 
-> This prevents the test to misbehave if IPv6 is not configured.
+The local variable 'vm_addr' is always not NULL, no need to check it.
 
-IDK. I think this is related to some of the recent patches?
-The context would be helpful in the commit message.
-Otherwise, as networking people, I think we are obligated 
-to respond with hostility to "IPv6 may not be enabled"..
+Signed-off-by: Wang Liang <wangliang74@huawei.com>
+---
+ net/vmw_vsock/af_vsock.c | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+index 1053662725f8..fae512594849 100644
+--- a/net/vmw_vsock/af_vsock.c
++++ b/net/vmw_vsock/af_vsock.c
+@@ -1028,11 +1028,6 @@ static int vsock_getname(struct socket *sock,
+ 		vm_addr = &vsk->local_addr;
+ 	}
+ 
+-	if (!vm_addr) {
+-		err = -EINVAL;
+-		goto out;
+-	}
+-
+ 	/* sys_getsockname() and sys_getpeername() pass us a
+ 	 * MAX_SOCK_ADDR-sized buffer and don't set addr_len.  Unfortunately
+ 	 * that macro is defined in socket.c instead of .h, so we hardcode its
 -- 
-pw-bot: cr
+2.34.1
+
 
