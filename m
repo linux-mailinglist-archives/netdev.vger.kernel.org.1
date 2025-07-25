@@ -1,84 +1,100 @@
-Return-Path: <netdev+bounces-209958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209959-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90FD1B11824
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 07:56:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFC32B11884
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 08:29:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68D883BFAE2
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 05:56:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B68C584605
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 06:29:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6909626C3A4;
-	Fri, 25 Jul 2025 05:56:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4E28288539;
+	Fri, 25 Jul 2025 06:29:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="QMzrh37c";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="JkWZZxG2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DRMgsNut"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62C3D26561D;
-	Fri, 25 Jul 2025 05:56:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EB552882D8;
+	Fri, 25 Jul 2025 06:29:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753422990; cv=none; b=q4Theu2bYmCMamLjMyWjk0b6DvKPQYRk9FnlVQdf50nL0V8BCdaIVhuIkKihyWDzFSSSbNPa7nOmK+YPBSkoojnE7TpFmb+/r/RV9hHT4IuuQuPSUM3SraQ5HGHtJNsWRef34HorHcP3qKP3bJwAwkofV35rafOnG5PNGdC4Hzs=
+	t=1753424942; cv=none; b=F6vtPg8bCsFUgfS6YxqfcnIlusqDp9H0XUem0u8tdoFd/uz8gB/F3Jzi4FMqtWV8phnLDs6hmZuDloKeBRHGSqvooP75SRrhZR3DiSF2hzYEjy5g1mK0oGDEL/hQ9wI8M2j60JgEhSEa0iAEDVGQpozyuUqT7g64clhdjUc12cc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753422990; c=relaxed/simple;
-	bh=aftgpZUtG78IvXtSG5GdtBg/76t2L9VYjMcPIBMDlfA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tLz4AonIc4aPwNLbBsIK+tH4X3M6x59iYRbpshVTGrZvWrvOEDr/RxonZsBsI9wD9bM/eL7ZLLu2rsZ2gBOxyhjFbkbGVnXckfycEi+pC1M6OnJm1Qo1+/NiTV1frteecFNkJvLuVpCoHES1qJgkwCvrvQiBVxlLf7u61Bfp1ks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=QMzrh37c; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=JkWZZxG2 reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
+	s=arc-20240116; t=1753424942; c=relaxed/simple;
+	bh=hWoJ1Cb3MWAVkZyfdvMARj2P4IFP6UvTJ/qsKN+HRr4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KFP+FqADAvhRi35+FwUSsVoCdGOEy407dHgXk21Kzji7RpmIWXIt2pswHM80vH+thRkq36JqKTcvpNLBmIlUdMg6Y7+nNXD4dDXDHPRHHAhBJzCkptQ/B8UmrAEFCzqDAhCo/wRjef/dDt4BG2d3LxyNtHzWY+La5HmRFlGYuI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DRMgsNut; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-7600271f3e9so1580214b3a.0;
+        Thu, 24 Jul 2025 23:29:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
-  t=1753422986; x=1784958986;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=HCqBVfkbtfgHbH3XYzoIfUBaFkPKTk3hdAJqmbyqywg=;
-  b=QMzrh37c9c1e22isRWicLJl3wSW6Gl9RDkr/vlIpbZVTsQMXy6KbHVsk
-   5SAuG2FjAqm+bE7redByYExeRbgNEZZHPMHpE1DbLFVaRVdCwUHiPGhV1
-   /AP420SmVdFSwmQ+wJxztiFE/rTeq5HXeAKnbqCBtIYZADPA1j1R3lCgG
-   IyHbtUc2AoCsHeQwXzFr46JO324AL5JqT2WuLOCbgLCX6wgBYdrHgzQOl
-   +rbDjbTBcajyPBnV879egGYwRGZFkkaXObaX5kdlrVESxk3LGFylhHsVH
-   EfQdU0khVP2kZlvr9N0VJgJhQphEEurz96tokqWszdkhccQTvU6Q9PJqC
-   w==;
-X-CSE-ConnectionGUID: jnU3cw0zRGWbn06g3PNZBA==
-X-CSE-MsgGUID: vvzNxAPwRVOdoe2VCmYCIA==
-X-IronPort-AV: E=Sophos;i="6.16,338,1744063200"; 
-   d="scan'208";a="45412543"
-Received: from vmailcow01.tq-net.de ([10.150.86.48])
-  by mx1.tq-group.com with ESMTP; 25 Jul 2025 07:56:23 +0200
-X-CheckPoint: {68831C87-42-FE216C80-D1ADDD01}
-X-MAIL-CPID: 57E789A37BD89319EDBA5199F119E77E_4
-X-Control-Analysis: str=0001.0A00210C.68831C43.0079,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 20454173583;
-	Fri, 25 Jul 2025 07:56:16 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
-	s=dkim; t=1753422979;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=HCqBVfkbtfgHbH3XYzoIfUBaFkPKTk3hdAJqmbyqywg=;
-	b=JkWZZxG2NGbxawmu9Xk6SPqimAGhZmBEqumzWjgD9WY7F/6jexV97ES8yWud1xEhLmXzzW
-	ZoXu9sAHYGW3A+PIcjBSRulpV47Juy0PrRZRzJ5pMFNuxLznhgZNiZdfW9wazZ3FT/1CEs
-	jKrkg3zwo/kbVDzkM+kgJAdXZfg9+Jq7kDfcVz6UPsWarKqg+bX4N1IvhT0um2sA95ix5l
-	mZAu7rsFRn4LBZ+OFsoOYDZ2HSsbzSRAv7STuu75P5Hcfor3k9bb8jMavGkUQ4GiTm2/ua
-	+G84ZlrD3+fl5tJkYS/Njj8I1s31c7sqGhZ1C75nPpancWSt1x7Dd2kJskwXZA==
-From: Alexander Stein <alexander.stein@ew.tq-group.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
+        d=gmail.com; s=20230601; t=1753424940; x=1754029740; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=lL6i8tXeG4f0zJistqsLTcdxD22zTgA0nGo4IZjHcp8=;
+        b=DRMgsNutvrzfb/vFmI4vIL6n9RdhCXPgusScbCFtw1u50Of2GqBw9h7kp/R7RFz68q
+         /cIfYJkDQTDWVlGUXswKY/d6nJPF8fknu6D3NCXUXvdvn8HIxQWLMDRbMHz6tG4Z37hU
+         NBfF65FgI5SDGSUirsZxlVsUQqObFj7F+XObS5230Cm9lxIo1qBMRD0BSNtZh7VZJBcV
+         QfUTxdzPCra4AlBzJEqJN/YdKjVcRqjC0wPo2m0pzu4Sh2GXMPGZpVnEWSo1L8xzNRUh
+         m9F3NAb6H7E3/cN8YZTJHdfItBg0lSz5AtY28AUN7+M8Tqxq/RYSHKXqrQog18Ojv3nB
+         18Gw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753424940; x=1754029740;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lL6i8tXeG4f0zJistqsLTcdxD22zTgA0nGo4IZjHcp8=;
+        b=ecvgzfBAk48PDdN6/SfMXkiTQP6mCw+xpNZQ8h3iwzHt3gURjhfjZ+NXyoX3eZxqfy
+         apLPYxvqYUFSgjf1mDNZX/vApY3keMDLiRFnLDnM88BQ4sPEJUMTG6A41RAnWLpfEuSC
+         qzPxbXsYfkt8MOGqo8rshwYIFonIcf6JArTNvkty8mguE777gG5nnEL26WM+mMGbF4r2
+         AW4ACtZJvlGmdglrNW4xM9rQwCby+2z1RvQ9q47zy1n1/K//ilfnYSQZFBTqXAYfrpbt
+         uu3xsF5+k6T9biq8AaB048EJuCgkCRXO4uoT40dTCVNS1IxAVkgbJJ2wvmP7fav6UIdF
+         uZFg==
+X-Forwarded-Encrypted: i=1; AJvYcCUg+3zl5H6uf6KLtXvN1tG+QRoI8MP8o5ZNqy84FrwkuMsTPw+rzU7ia0NKSDyiIr163IbR4NKmiks=@vger.kernel.org, AJvYcCUhPJIZU8B2l3uDdwMO2bl/T5AYVz2ydZmzzi8XrBc7tzCWRFyHajbb721BW9uG0m1kfHD32WqRHekoo3H5zCbD@vger.kernel.org, AJvYcCXJPZ+CWtpQx21a8VA5BSPln9f+625W1Gl4QUl3Xmj+Hk6TVmMZ7q0KPW+QfKidvaG73yUWmhY+gZfz1GBJ@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKHuHL0vVi0HBQNMg5RNwn+JcNYz4XPXdhtWj0pvHCMCSK0m03
+	RE4UPGEvr60TUIMTSi3egy6BsVrwApHa6PY++WGKXIUmPJLBjqidJUpuuHxBHCLY
+X-Gm-Gg: ASbGnctsdvk7xAezN8ZFKLOYTpqXSJ7Q2fgtqzcjyQe6wf/JKHTUD93rV9cmTSSL9OY
+	j/3PjoPG/Yze6fDSJv5whHc/RjOgL/Jv0wkcbsEFfE3R90ToNjgus2IeDEkS8wyRSjWsCPfReQo
+	rx+qR8NO/kgqpqfUeRZuAFwYmm/FZTTsb9WPfeYq2oZmUtuvf4QmYqbOPK/SR8x9m+zbAOjOr3Q
+	Qtuy0m/I6PLD+cnS0gf5NJETyfZOqukcyxMO72A8igiYE5H75OgGAXi8iwK/KARxKnQtgnCxLBc
+	dDjfi2B7weC0tq7xHmBAzEu/fMqEbYB5TUk/lFg/iLgMQqaeBHNpnbqobDQQ9B2UJ4zAUp9ftRK
+	Wm1RGxLN0YY+XcWwmaj++8Dtzp7Um7odGQ8SkeqbwDjpTnms=
+X-Google-Smtp-Source: AGHT+IGAUkLGUU7XldjYa1tyK2d1FaF5Xk+jL1aOmKHA9A01tdLyzhwAEeM/IgmulMPfqKq8fqeO9g==
+X-Received: by 2002:a05:6a20:158f:b0:23d:3504:38ea with SMTP id adf61e73a8af0-23d5b5ba3bdmr8476567637.8.1753424940012;
+        Thu, 24 Jul 2025 23:29:00 -0700 (PDT)
+Received: from localhost.localdomain ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b3f6c09b532sm2667917a12.25.2025.07.24.23.28.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Jul 2025 23:28:59 -0700 (PDT)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Jay Vosburgh <jv@jvosburgh.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Alexander Stein <alexander.stein@ew.tq-group.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/1] net: fsl_pq_mdio: use dev_err_probe
-Date: Fri, 25 Jul 2025 07:56:13 +0200
-Message-ID: <20250725055615.259945-1-alexander.stein@ew.tq-group.com>
-X-Mailer: git-send-email 2.43.0
+	Paolo Abeni <pabeni@redhat.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Simon Horman <horms@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Petr Machata <petrm@nvidia.com>,
+	Amit Cohen <amcohen@nvidia.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Alessandro Zanni <alessandro.zanni87@gmail.com>,
+	linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: [PATCH net 0/2] bonding: fix negotiation flapping in 802.3ad passive mode
+Date: Fri, 25 Jul 2025 06:28:46 +0000
+Message-ID: <20250725062848.18889-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,33 +102,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
 
-Silence deferred probes using dev_err_probe(). This can happen when
-the ethernet PHY uses an IRQ line attached to a i2c GPIO expander. If the
-i2c bus is not yet ready, a probe deferral can occur.
+This patch fixes unstable LACP negotiation when bonding is configured in
+passive mode (`lacp_active=off`).
 
-Signed-off-by: Alexander Stein <alexander.stein@ew.tq-group.com>
----
- drivers/net/ethernet/freescale/fsl_pq_mdio.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Previously, the actor would stop sending LACPDUs after initial negotiation
+succeeded, leading to the partner timing out and restarting the negotiation
+cycle. This resulted in continuous LACP state flapping.
 
-diff --git a/drivers/net/ethernet/freescale/fsl_pq_mdio.c b/drivers/net/ethernet/freescale/fsl_pq_mdio.c
-index 56d2f79fb7e32..577f9b1780ad6 100644
---- a/drivers/net/ethernet/freescale/fsl_pq_mdio.c
-+++ b/drivers/net/ethernet/freescale/fsl_pq_mdio.c
-@@ -491,8 +491,8 @@ static int fsl_pq_mdio_probe(struct platform_device *pdev)
- 
- 	err = of_mdiobus_register(new_bus, np);
- 	if (err) {
--		dev_err(&pdev->dev, "cannot register %s as MDIO bus\n",
--			new_bus->name);
-+		dev_err_probe(&pdev->dev, err, "cannot register %s as MDIO bus\n",
-+			      new_bus->name);
- 		goto error;
- 	}
- 
+The fix ensures the passive actor starts sending periodic LACPDUs after
+receiving the first LACPDU from the partner, in accordance with IEEE
+802.1AX-2020 section 6.4.1.
+
+Out of topic:
+Although this patch addresses a functional bug and could be considered for
+`net`, I'm slightly concerned about potential regressions, as it changes
+the current bonding LACP protocol behavior.
+
+It might be safer to merge this through `net-next` first to allow broader
+testing. Thoughts?
+
+Hangbin Liu (2):
+  bonding: send LACPDUs periodically in passive mode after receiving
+    partner's LACPDU
+  selftests: bonding: add test for passive LACP mode
+
+ drivers/net/bonding/bond_3ad.c                | 72 ++++++++++----
+ drivers/net/bonding/bond_options.c            |  1 +
+ include/net/bond_3ad.h                        |  1 +
+ .../selftests/drivers/net/bonding/Makefile    |  3 +-
+ .../drivers/net/bonding/bond_passive_lacp.sh  | 93 +++++++++++++++++++
+ 5 files changed, 151 insertions(+), 19 deletions(-)
+ create mode 100755 tools/testing/selftests/drivers/net/bonding/bond_passive_lacp.sh
+
 -- 
-2.43.0
+2.46.0
 
 
