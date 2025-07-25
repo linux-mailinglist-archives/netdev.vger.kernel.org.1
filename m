@@ -1,113 +1,134 @@
-Return-Path: <netdev+bounces-210038-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210039-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3C8EB11ED3
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 14:39:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EBDDB11ED9
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 14:40:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 371195A44BF
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 12:39:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D71F55A48DD
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 12:40:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06ED62EBB92;
-	Fri, 25 Jul 2025 12:39:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD18D2EBDD1;
+	Fri, 25 Jul 2025 12:39:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H5+c4i90"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5377C2EBBB8
-	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 12:39:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24F892EBB80;
+	Fri, 25 Jul 2025 12:39:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753447173; cv=none; b=ocoRd1/Ck/TVRJbWYeTUtLaJE/6+FP0tcSsJGJYMr9nw2DWM9i2/mmX6PLPFZ16Zf+9xJd80P8MkZ3sijK3Q/npVvDWId4fe2u+kEpuKFogDHH6SgUKO9JGctfd553d6A1+YRl+zaNvrQrW7/75JTS79u1br4n+bBz11T3tCTHU=
+	t=1753447183; cv=none; b=di2YbGxGeh3CbCS38grhTN4thdTC2VuKU8wOWrPx6U2hr64a8e8bsK9Ae/PBcI9UXVAI9wiHC3LODx+JCEj46OnXNmkI45Jo6TfPyOP29k9d1SYRnU2RlBRxlRJaRYut6ngCxoj9id3a6RExhy/7qdAk15utU1cAcsKImGntpN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753447173; c=relaxed/simple;
-	bh=j+a4W2shNO3E2WvLnM7Gg4ZUOiPasmfuQFrkEvfwDws=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=LrRf/js1vtqTl1iuSeUcNc7K9uhi3Lu9plUxOG5IP5O0aSbjKC0wlUR6JJFffs63rNgCKgRqii2Ja5mjPC7hQg+cAheDVDEUvyOWmkX7bidYbe9io3/mwzZVCa7LYNQfTENuDtDXUX+W2RfzDNQsvJtCnYyEY2+ndyOUQCrhUI8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-87c43c2af72so235721339f.0
-        for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 05:39:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753447171; x=1754051971;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+	s=arc-20240116; t=1753447183; c=relaxed/simple;
+	bh=PU8jxNdlyHOWPaTq8T0o4bVvfRiJB5fDz6xUvMrVv6A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MHCumxcWyqjdX7jjOn9hzuUk76VVlRib5bF1WPcx19q9ampbWxqiIJ51UUX5p1cg0PfOUbBMdT/S0yh3OcRxePVuJuNG10VCgFkpwbWTFEm2vi4nLnwVQCa/z+KRA+U3BQ26WuYU84v1YHkR4gfvrQrZsl1NS4uQ4RyVvnk8gAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H5+c4i90; arc=none smtp.client-ip=209.85.208.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-32b2f5d91c8so18142591fa.0;
+        Fri, 25 Jul 2025 05:39:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753447180; x=1754051980; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=DsRRqNHku6ZeTrZx42NT9gZz/zhlyjxw4E67HoXW6+Q=;
-        b=IXHPh3dOqW++aTF0p9Ef/yP1DiZTATcZyw1VrWPYzq63On/cBooQH24Ub31DEec2sq
-         h9etZSJeDOAO1KVPCpIxR2LDI0zfph9N8KvaOjM/9qnnojVHHuJeDBMaAuIPSJp3YOXf
-         gXyIeqa2K6qbN3YyP/0ILY6h/7iSmYV6FTHOXOMI/Iw5uMQXQpN5ULS6sE5lIciihTF+
-         EOXZoBM07xyDOr9X6CD/GWYRF7HNIRVlxAQc/tUFSUxhd7b/ORCehoHR53JlRCziu2FN
-         /jV8f7PmtPtVh6zvmTn2GmYJskJVd9lr5W/SrKaj8I9ZmQk+2g/7FFMYNGA53GT222Z8
-         iiIA==
-X-Forwarded-Encrypted: i=1; AJvYcCVgk0YfpipdG9edfu8w0wBKJ08IvqHBJjmbFL/V5x080U8IjlY6Ettekrx1rO2DKihAhvgQC9c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxM/5OX2d3InB6pSErL2ape9dGNkudZklUitp6MS5/ugqnxMzJU
-	RPyThB80pNe7Fw2UEeCud/sQ5E3WQrgDUg6ybj/agolQJ3AJeH6cDs31GJZbaWFtHwPYdAKeu2O
-	uvYw6qINUqOBtsF0Vf7V906jef9gAbz4O7sKfd1Bod8ZqAc4rs+uTBIRIcdQ=
-X-Google-Smtp-Source: AGHT+IH0F8Z8GN8WXxDT8Boy8j2mXmuu58wAX84J/uXKvxSVcDkuLOBTc4CxdIJ60uw1BF3KmlAN3kg/hAkEeiOghmrHB83fYO1a
+        bh=JN2ivuhljKzLFWe0MvjwcxrDNR4GqFN61OIq2ilMzLw=;
+        b=H5+c4i90uaeAtYl43/C+57k5a+J9r1FmezinhVkU4+a6R0BOUqdJExWx9P8ENzIlUV
+         TBvHQ5CFlMFz+fr4pf63hweSrNEDWOCDs+92TKRZjm2Sd3a9sCyYgAbm6YXZKKENTsTz
+         vqrcPSPoA5Ymd1o9a3ygz98TGNB6Phy2qn9h/icS7bPiBL84LWUddpy1NazitgOAOQBK
+         +IqoHz53AQL9T53NEvjSYBFgCDTePPE+tAHhsam5W2ToeMKO8MUOHZ98BlZPQFyrm+no
+         Gn1m90e550liZuQy3z0U+xTTl8ORQm9fiZz3iJZd7LLc+mPSSWzXcMZriS73XLiWwjIe
+         Gb4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753447180; x=1754051980;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JN2ivuhljKzLFWe0MvjwcxrDNR4GqFN61OIq2ilMzLw=;
+        b=HULdrB3URuoq7nNDJAg9VFubbXzyQfEJDD+CY9SXU+GpdOpHc13E95dS65cTQedT5Z
+         E39X7wKbexpo28GbWNtI6ec4OVU3rKSa9JFuO87/bKQteKrGdjtBYsWRZVRYWWBqO3HU
+         WFI0QS1jk6h9YQGsKvNO/LGH4yIgBx8/ZubJ7Qr2u7QF2Ta2dy8LewIb0jCvU8kl72fv
+         7YjZFzRIR7NQlH3EerCY0TE0ZyJSy0TnWZhfhds31QjSl+x3QbBlGB8iY4VNGeySzGXf
+         L/Sau1/LJ+7160c+ybBif/8BoSGLyVtj3oUnOQjRo5GUoKOl4gD7E0qhGHsaYPdEQn2C
+         zmQw==
+X-Forwarded-Encrypted: i=1; AJvYcCWkwBJjI8SZ4ZidITChhRStbxvv7C0GJ0cmY3x+GtzjjbbJGuA+TPFxmP767Yq6arjLiMSyhLc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6Da68mI1JG/dkx7NpUGctGzEAMMq8AStm5FN/1nzwGsjaeO/C
+	nhxdXmYhfIJJvuX3QGACOs6iAa4VoRXQbnvMPE1YlKhC0MdtSMRumtKE
+X-Gm-Gg: ASbGnct3upPGOLOOACyz7Dv5eDy6HWyUglGodWDpdYqzOfPwOxm9mUGKzAwNQPIvaKv
+	xNQ9TPOzgX/yopqH2Zy2OJrVJE9MzvWVCOo6IrF6hqRTgxt2rGdJ3q8GFCR1su8Tqe6/c25iriN
+	lRpi7waN5/M8cqJd/leE6XESmXLe3A5ZoZ/fLnrRibgf0hxxT+rNyMgVYiq1tmvnQWiM5X2y9Ri
+	D81t2yuV5M65ktTIvFXX7PtHfcVzTZlP485/7C5Gr/aD2luQPsK5VsN/fxXlvLRRkL8OYbTbocn
+	3jD7SlsrcqTYE12LWEcWGlgyjlfWCmQT7LSiLXUI8MagoZwuaN0qkT0VBnTmZkSkOeaRynjVCLt
+	piZ7ExBJLuEfjfJjHdsC3+CWK6XMXD4BbnXNIkBTF40xc8C0OXNiZPUeHzio61mP546ImA1BaTq
+	Ab
+X-Google-Smtp-Source: AGHT+IGPcH999lkOf64IeBZvVPYzxnMdGrpLSM6aThjm2ALpphK9DknXowr8Y55TygUqOJd76KhN+g==
+X-Received: by 2002:a05:651c:889:b0:32a:7d61:ded0 with SMTP id 38308e7fff4ca-331ee7c5762mr5925501fa.19.1753447179864;
+        Fri, 25 Jul 2025 05:39:39 -0700 (PDT)
+Received: from [192.168.66.199] (h-98-128-173-232.A785.priv.bahnhof.se. [98.128.173.232])
+        by smtp.googlemail.com with ESMTPSA id 38308e7fff4ca-331e0912287sm7151741fa.77.2025.07.25.05.39.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 25 Jul 2025 05:39:39 -0700 (PDT)
+Message-ID: <96b9da59-bf24-460a-bccf-5761b8c2e87a@gmail.com>
+Date: Fri, 25 Jul 2025 14:39:38 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:6016:b0:876:c5ff:24d4 with SMTP id
- ca18e2360f4ac-8800f114ff2mr296894639f.4.1753447171528; Fri, 25 Jul 2025
- 05:39:31 -0700 (PDT)
-Date: Fri, 25 Jul 2025 05:39:31 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68837b03.a00a0220.2f88df.0051.GAE@google.com>
-Subject: [syzbot] Monthly wireless report (Jul 2025)
-From: syzbot <syzbot+list7eb4325eb2535c41d4b1@syzkaller.appspotmail.com>
-To: linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 08/10] can: kvaser_pciefd: Expose device firmware
+ version via devlink info_get()
+To: Simon Horman <horms@kernel.org>, Jimmy Assarsson <extja@kvaser.com>
+Cc: linux-can@vger.kernel.org, Marc Kleine-Budde <mkl@pengutronix.de>,
+ Vincent Mailhol <mailhol.vincent@wanadoo.fr>, netdev@vger.kernel.org
+References: <20250724073021.8-1-extja@kvaser.com>
+ <20250724073021.8-9-extja@kvaser.com>
+ <20250724135224.GA1266901@horms.kernel.org>
+Content-Language: en-US
+From: Jimmy Assarsson <jimmyassarsson@gmail.com>
+In-Reply-To: <20250724135224.GA1266901@horms.kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello wireless maintainers/developers,
+On 7/24/25 3:52 PM, Simon Horman wrote:
+> On Thu, Jul 24, 2025 at 09:30:19AM +0200, Jimmy Assarsson wrote:
+> 
+> ...
+> 
+>> diff --git a/drivers/net/can/kvaser_pciefd/kvaser_pciefd_devlink.c b/drivers/net/can/kvaser_pciefd/kvaser_pciefd_devlink.c
+>> index 8145d25943de..4e4550115368 100644
+>> --- a/drivers/net/can/kvaser_pciefd/kvaser_pciefd_devlink.c
+>> +++ b/drivers/net/can/kvaser_pciefd/kvaser_pciefd_devlink.c
+>> @@ -4,7 +4,33 @@
+>>    * Copyright (C) 2025 KVASER AB, Sweden. All rights reserved.
+>>    */
+>>   
+>> +#include "kvaser_pciefd.h"
+>> +
+>>   #include <net/devlink.h>
+> 
+> Hi Jimmy,
+> 
+> Please consider squashing the two-line change above into
+> the previous patch in this series to avoid the following
+> transient Sparse warning.
+> 
+>    .../kvaser_pciefd_devlink.c:9:26: warning: symbol 'kvaser_pciefd_devlink_ops' was not declared. Should it be static?
+> 
+> Thanks!
 
-This is a 31-day syzbot report for the wireless subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/wireless
+Hi Simon!
 
-During the period, 4 new issues were detected and 2 were fixed.
-In total, 49 issues are still open and 165 have already been fixed.
+Sure, I'll fix it in v4.
+Thanks for reviewing!
 
-Some of the still happening issues:
-
-Ref  Crashes Repro Title
-<1>  12509   Yes   WARNING in rate_control_rate_init (3)
-                   https://syzkaller.appspot.com/bug?extid=9bdc0c5998ab45b05030
-<2>  9621    Yes   WARNING in __rate_control_send_low (3)
-                   https://syzkaller.appspot.com/bug?extid=34463a129786910405dd
-<3>  6819    Yes   WARNING in __cfg80211_ibss_joined (2)
-                   https://syzkaller.appspot.com/bug?extid=7f064ba1704c2466e36d
-<4>  1216    Yes   WARNING in ieee80211_start_next_roc
-                   https://syzkaller.appspot.com/bug?extid=c3a167b5615df4ccd7fb
-<5>  764     Yes   INFO: task hung in reg_process_self_managed_hints
-                   https://syzkaller.appspot.com/bug?extid=1f16507d9ec05f64210a
-<6>  623     Yes   INFO: task hung in reg_check_chans_work (7)
-                   https://syzkaller.appspot.com/bug?extid=a2de4763f84f61499210
-<7>  577     Yes   INFO: task hung in crda_timeout_work (8)
-                   https://syzkaller.appspot.com/bug?extid=d41f74db64598e0b5016
-<8>  492     Yes   INFO: rcu detected stall in ieee80211_handle_queued_frames
-                   https://syzkaller.appspot.com/bug?extid=1c991592da3ef18957c0
-<9>  438     No    WARNING in ieee80211_request_ibss_scan
-                   https://syzkaller.appspot.com/bug?extid=1634c5399e29d8b66789
-<10> 208     Yes   INFO: task hung in ath9k_hif_usb_firmware_cb (3)
-                   https://syzkaller.appspot.com/bug?extid=e9b1ff41aa6a7ebf9640
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
+Best regards,
+jimmy
 
