@@ -1,132 +1,122 @@
-Return-Path: <netdev+bounces-209989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209990-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA752B11B28
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 11:51:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74D73B11B4A
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 11:55:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 872D23A676F
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 09:51:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4686E3AD3AA
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 09:55:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA6B22D3734;
-	Fri, 25 Jul 2025 09:51:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DECD28934A;
+	Fri, 25 Jul 2025 09:55:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hF3xZeA3"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="RW9yXgut";
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="JnidZ9xa"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFF9D2D1920;
-	Fri, 25 Jul 2025 09:51:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 345B52D3734;
+	Fri, 25 Jul 2025 09:55:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753437106; cv=none; b=ETmIRQyWA/8etJL3d3f0zeq2N07/oNFpfl/wF4UL0EBNcQx/FDCHiqaKKmFoiAmhZEtf5cIaxmZHovgtYq/yF5vJ94COy8PU+1xRvF2fvgobpfkbakLftd8ga8yUwxrxa9IHH9sCBQvr+LXuaoNgAITtIjxIA84e6pEWDA85cXE=
+	t=1753437351; cv=none; b=rPl9G8niT/+A1jHaYX4tcjgZiLgXiR0sG7vNqaR+sUw6KxZC9t0KRex/6tUHBp8lfPiC6ZgMyi3GVG14Igvv9M34XupSlPbP4RQVzze53i7WLMuOAG3aE+RdE2pFOc07hb9oLGVnjW8Eb5Whhvi+XAKeuktRTHPWtNQUGGPJo2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753437106; c=relaxed/simple;
-	bh=CslKMzEgNIx06AGoQ7+B9pcd0N2hOUm31pNgdyNe0xQ=;
+	s=arc-20240116; t=1753437351; c=relaxed/simple;
+	bh=obxzbRARWp61SAgr4OuGSyuQbiBqYc6yJPDRw1+VWFM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SMBBfcUJDl/TwLn5RuQcDep1QZkN7J8rxSJA0UH8yR8si4mD0f0Im1C/96S27+IZuJXtl/gfHtHazkJl6N8lTmTio6GyVIHjqeMSyEYxm88g4lGsBGC3VdlMZ5MByaoMGwWcqBkBJJ60no5vYBDbSMkSTixdnKqNX8KCvR/EmeA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hF3xZeA3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94577C4CEE7;
-	Fri, 25 Jul 2025 09:51:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753437106;
-	bh=CslKMzEgNIx06AGoQ7+B9pcd0N2hOUm31pNgdyNe0xQ=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=asX8DGEkU6R6qrIaeC/pwnMWCDGcmXmRNsDog1l7WTX/ZZ+vko1mdH54QcVG1s+ryURDZTWH5U1i2zRDDSLZ8AIRn5nMpIkyMY/6qV3dP/70Rptg+q1ZZImXxRaDKzXvd5YUjh7mAVUuj9NZEw02JUhZ9K99KoLO0HP6ZlsNK/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=RW9yXgut; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=JnidZ9xa; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: by mail.netfilter.org (Postfix, from userid 109)
+	id 1C41460272; Fri, 25 Jul 2025 11:55:41 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1753437341;
+	bh=UynE9Asxg2hIcZ+zLWqbX0Hja+9AhIsgeadpl92uNQ0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hF3xZeA3oED1lWe1F0MTD4LkfodA1ZbLBbrtSCZ7ofmL9oFhNjwArAmHpXkizj3Jw
-	 zm5Ld8Cm52fbNhRnCOtjQZ9DV4eQ0rVshGpxJRgogB4iJpk6xJVno9z2WBGov4ZZXz
-	 bhGUD7BKYw7Ba+atf5GSeZ4BdrSnIjM+JTgGzXe+qoz/L8EQixJZbemqmt2MrnWbSp
-	 fzDacgCX3ppehjEoDQiNO/TzOnUrcjwtVTo9ioRlvOS8r0X6SjaNIf/2WUUTsSOXXc
-	 IeozNVGS7LOxpkdLxUt0Wjv99cH0nmde8wgYj+cmbjXYeYvrpNJsAMY1MWGgl2sqMO
-	 HfnQsXQYPpfKQ==
-Date: Fri, 25 Jul 2025 10:51:40 +0100
-From: Simon Horman <horms@kernel.org>
-To: Yibo Dong <dong100@mucse.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net,
-	gur.stavi@huawei.com, maddy@linux.ibm.com, mpe@ellerman.id.au,
-	danishanwar@ti.com, lee@trager.us, gongfan1@huawei.com,
-	lorenzo@kernel.org, geert+renesas@glider.be,
-	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
-	alexanderduyck@fb.com, richardcochran@gmail.com,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 01/15] net: rnpgbe: Add build support for rnpgbe
-Message-ID: <20250725095140.GC1367887@horms.kernel.org>
-References: <20250721113238.18615-1-dong100@mucse.com>
- <20250721113238.18615-2-dong100@mucse.com>
- <20250722112909.GF2459@horms.kernel.org>
- <0E9C9DD4FB65EC52+20250723030111.GA169181@nic-Precision-5820-Tower>
- <20250723200934.GO1036606@horms.kernel.org>
- <173AE84ACE4EE2AE+20250724061047.GA153004@nic-Precision-5820-Tower>
+	b=RW9yXgutzmmpvsQ2npdmWr33e7Oi5h/NwPgf782L6PTblPuuaRoL86pNIuL4gF5o5
+	 Yxay7k+3cbFOVvcC8gsG84GpEl3/ItwVPZXEETdSQIPjUI+vhcg54XsIXs+wWGFWoZ
+	 lh3muGxpndKamr9+StUXd9She/o3bp2gKPjXmiQDEr3h2TnuzEtwQBEHrk5n1myy7y
+	 s2HZk1+j4f1xJloeE6YaHd4YEY5n+EHdd37LqR9cPNQqsrbHj2Ou/P4MTDtmAPIInF
+	 MUixzLD/U3KtPHR8yxrSKpgvcd81gBD5FW2uRt2oy2RmgjCvXp3u5p5040v0ZluBg0
+	 4Izs8QqWkIbHg==
+X-Spam-Level: 
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with ESMTPSA id C028660251;
+	Fri, 25 Jul 2025 11:55:37 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1753437338;
+	bh=UynE9Asxg2hIcZ+zLWqbX0Hja+9AhIsgeadpl92uNQ0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JnidZ9xaZ29WUBKCefYXULw6SHvmz/xszjzq11DjCpkyzU5WXlQasxad7LSe96eKR
+	 jiECGQUVZDIVJEPUm30qQAf3+73yH8xDdXzl/m3IH0M4bdyyBlZDe+z8vnD3B3XZeJ
+	 E9kKlUF70d0RPiJBUylFFoL+KO3ZKnsJE1NjS9ycxwjPEwtqdgcp95ZLmZV7ZCByJg
+	 iYR+t2vLkSfhiBfMZZODOdm10ykakiKwyZ/lJzqjyPIH9Fj04hbtMLv67OqtykDOPH
+	 9RfwCJ7C0lpItbkkDrH43CsEw5190KXIeRA3bGBPhFgwq/2aqyLVvZLSibSfOI+Hl+
+	 ajAHw+hvAxvWw==
+Date: Fri, 25 Jul 2025 11:55:34 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Florian Westphal <fw@strlen.de>
+Cc: lvxiafei <xiafei_xupt@163.com>, coreteam@netfilter.org,
+	davem@davemloft.net, edumazet@google.com, horms@kernel.org,
+	kadlec@netfilter.org, kuba@kernel.org, linux-kernel@vger.kernel.org,
+	lvxiafei@sensetime.com, netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org, pabeni@redhat.com
+Subject: Re: [PATCH V2] netfilter: nf_conntrack: table full detailed log
+Message-ID: <aINUlqscselprHTd@calendula>
+References: <20250508081313.57914-1-xiafei_xupt@163.com>
+ <20250522091954.47067-1-xiafei_xupt@163.com>
+ <aIA0kYa1oi6YPQX8@calendula>
+ <aIJQqacIH7jAzoEa@strlen.de>
+ <aILC8COcZTQsj6sG@calendula>
+ <aILH9Z_C3V7BH6of@strlen.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <173AE84ACE4EE2AE+20250724061047.GA153004@nic-Precision-5820-Tower>
+In-Reply-To: <aILH9Z_C3V7BH6of@strlen.de>
 
-On Thu, Jul 24, 2025 at 02:10:47PM +0800, Yibo Dong wrote:
-> On Wed, Jul 23, 2025 at 09:09:34PM +0100, Simon Horman wrote:
-> > On Wed, Jul 23, 2025 at 11:01:11AM +0800, Yibo Dong wrote:
-> > > On Tue, Jul 22, 2025 at 12:29:09PM +0100, Simon Horman wrote:
-> > > > On Mon, Jul 21, 2025 at 07:32:24PM +0800, Dong Yibo wrote:
-> > 
-> > ...
-> > 
-> > > But I can't get this warning follow steps in my local:
-> > > ---
-> > > - make x86_64_defconfig
-> > > - make menuconfig  (select my driver rnpgbe to *)
-> > > - make W=1 -j 20
-> > > ---
-> > > if I compile it with 'make W=1 C=1 -j 20', some errors like this:
-> > > ---
-> > > ./include/linux/skbuff.h:978:1: error: directive in macro's argument list
-> > > ./include/linux/skbuff.h:981:1: error: directive in macro's argument list
-> > > ........
-> > > Segmentation fault
-> > > ---
-> > > I also tried to use nipa/tests/patch/build_allmodconfig_warn
-> > > /build_allmodconfig.sh (not run the bot, just copy this sh to source
-> > > code). It seems the same with 'make W=1 C=1 -j 20'.
-> > > Is there something wrong for me? I want to get the warnings locally,
-> > > then I can check it before sending patches. Any suggestions to me, please?
-> > > Thanks for your feedback.
-> > 
-> > I would expect what you are trying to work.
+On Fri, Jul 25, 2025 at 01:55:33AM +0200, Florian Westphal wrote:
+> Pablo Neira Ayuso <pablo@netfilter.org> wrote:
+> > I was thinking, does the packet logging exposes already the
+> > net->ns.inum? IIUC the goal is to find what netns is dropping what
+> > packet and the reason for the packet drop, not only in this case but
+> > in every case, to ease finding the needle in the stack. If so, then it
+> > probably makes sense to consolidate this around nf_log()
+> > infrastructure.
 > 
-> I want to reproduce the warning locally, like this: 
-> 'warning: symbol 'rnpgbe_driver_name' was not declared. Should it be static'
-> Then, I can check codes before sending patches.
-
-Yes, I think that is a very good plan.
-
-> > And I certainly would not expect a segmentation fault.
-> > 
-> > I suspect that the version of Sparse you have is causing this problem
-> > (although it is just a wild guess). I would suggest installing
-> > from git. http://git.kernel.org/pub/scm/devel/sparse/sparse.git
-> > 
-> > The current HEAD is commit 0196afe16a50 ("Merge branch 'riscv'").
-> > I have exercised it quite a lot.
-> > 
+> No, it doesn't.  It also depends on the backend:
+> for syslog, nothing will be logged unless nf_log_all_netns sysctl is
+> enabled.
 > 
-> nice, after installation, it works. I reproduced the warning, thanks.
-
-Excellent.
-
+> For nflog, it is logged, to the relevant namespaces ulogd, or not in
+> case that netns doesn't have ulogd running.
 > 
-> > For reference, I also use:
-> > GCC 15.1.0 from here: https://mirrors.edge.kernel.org/pub/tools/crosstool/
-> > Clang 20.1.8 from here: https://mirrors.edge.kernel.org/pub/tools/llvm/
-> > (Because they are the latest non -rc compilers available there)
-> > 
-> > 
+> For syslog one could extend nf_log_dump_packet_common() but I'm not sure
+> how forgiving existing log parsers are when this gets additional
+> field.
 > 
+> Also, would (in case we use this for the "table full" condition), should
+> this log unconditionally or does it need a new sysctl?
+> 
+> Does it need auto-ratelimit (probably yes, its called during packet
+> flood so we dont want to flood syslog/ulog)?
+
+Yes, such extension would need to answer these questions.
+
+> > Anyway, maybe I'm overdoing, I'll be fine with this approach if you
+> > consider it good enough to improve the situation.
+> 
+> I think its better than current state of affairs since it at least
+> allows to figure out which netns is experiencing this.
+
+Thanks for explaining, let's take this patch as is then.
 
