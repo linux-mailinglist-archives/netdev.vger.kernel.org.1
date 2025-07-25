@@ -1,153 +1,139 @@
-Return-Path: <netdev+bounces-210097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210080-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50D20B121A7
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 18:16:10 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46A3AB12171
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 18:06:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33FBEAC78C9
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 16:14:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 995CC7AEC2A
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 16:04:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 430142F0037;
-	Fri, 25 Jul 2025 16:13:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBF3F2EF287;
+	Fri, 25 Jul 2025 16:05:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MVHx51AG"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15FB72F0043
-	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 16:13:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2560E2EAD06
+	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 16:05:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753460025; cv=none; b=poEfQi7GkGkOd7xzl20Drr+0ABQ1+Dsb3aED9QPHFac1xMuSdUlZi3dwDGsHxy3nEQpFxEgTyUUdNGjpAmALD6cDtpVt9aV78abpRr4Su0ENY+RXlGrc+BgjKngv+f/Xim5jsmvylSTqSvmHZ5jPuzFQ5aPfYcNLvY06sCHF0og=
+	t=1753459553; cv=none; b=nkbI8rj6176u0upBCL+AeKD+1Hzvb8nC4GB88d9r0KC08YK6vNde2HZegI5jTcCyQw3D9a3WGPOJpHyZIjjkPs9y8Ov4M1hEajPQdZO3DIsQTTw/En5d9WrodgX1i5FUcrraYRrUnuFz1RNbaIIWyiBk8DM3f/ZSHgvpbhwO+EA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753460025; c=relaxed/simple;
-	bh=2hOSGqnufASPWZYnpMrQxxuXxR/+aQBVqmhGkacV1v8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MAH2Cnr088i2pSKUwMckLU/4lj5E3KFo8JXerrjx3wp/FJ4z0HRDyk9/krJroatOPFbG3lbpXyihHQ5NWr+mQiOCV29cuDxNH/MVWKrqGjUSncLfObVpY2Gh8+pEA35cEyn2mxpGoR9DjTdg1po68E/QNR0Gen5tZ8Blz8PEXPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1ufL3E-0006kM-V9
-	for netdev@vger.kernel.org; Fri, 25 Jul 2025 18:13:40 +0200
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1ufL3A-00AFcg-34
-	for netdev@vger.kernel.org;
-	Fri, 25 Jul 2025 18:13:36 +0200
-Received: from dspam.blackshift.org (localhost [127.0.0.1])
-	by bjornoya.blackshift.org (Postfix) with SMTP id 614F94498E6
-	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 16:13:35 +0000 (UTC)
-Received: from hardanger.blackshift.org (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by bjornoya.blackshift.org (Postfix) with ESMTPS id 216CA449832;
-	Fri, 25 Jul 2025 16:13:31 +0000 (UTC)
-Received: from blackshift.org (localhost [::1])
-	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 8100638b;
-	Fri, 25 Jul 2025 16:13:30 +0000 (UTC)
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	linux-can@vger.kernel.org,
-	kernel@pengutronix.de,
-	Jimmy Assarsson <extja@kvaser.com>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	Marc Kleine-Budde <mkl@pengutronix.de>
-Subject: [PATCH net-next 20/27] can: kvaser_usb: Add intermediate variables
-Date: Fri, 25 Jul 2025 18:05:30 +0200
-Message-ID: <20250725161327.4165174-21-mkl@pengutronix.de>
-X-Mailer: git-send-email 2.47.2
-In-Reply-To: <20250725161327.4165174-1-mkl@pengutronix.de>
-References: <20250725161327.4165174-1-mkl@pengutronix.de>
+	s=arc-20240116; t=1753459553; c=relaxed/simple;
+	bh=YgPAnx9vFCwOx9iFj2kTW3xM7JALaN+r1UZ4mK4q20g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dXQ0W83gXbesOECOtm6Ms/8aZFJuUNvNjrz2sqHcPb2kttmE09/iqKZTgEEXZGlMiKUNSHNDu1OYmmhU641bpFshlJ9ueQwHT8XYfXMStBNTGIbi3QJnIzEicp1ror68MvIWlg6pgH0y4VQNn5AzSmg4j7uKQ5xI+3bP1A5ITJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=MVHx51AG; arc=none smtp.client-ip=91.218.175.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <c7241cc9-2b20-4f32-8ae2-93f40d12fc85@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1753459538;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3g87AqOwyJOiheBSqVuAlI8MtvTXH78Z8e5bHHseWHY=;
+	b=MVHx51AGl+3SbE3RFIiWpv1PxlGsaOafEwYgmp3ig5tdja/tjCdzHveO9mLfKnEH7O/yUy
+	mFgJ1jvmGvH0iQRAKqGYOK/16t3rYgdgVXYqDGF3jo2+UIViufvlLh6mfD0Gk2eEQPF2rJ
+	4RG5WA/L41c8YRSuxajkw/Ui4DEbCQQ=
+Date: Fri, 25 Jul 2025 09:05:31 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Subject: Re: [PATCH bpf-next 0/4] Use correct destructor kfunc types
+Content-Language: en-GB
+To: Sami Tolvanen <samitolvanen@google.com>, bpf@vger.kernel.org
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
+ <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
+ KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+ Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+ Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
+ Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250724223225.1481960-6-samitolvanen@google.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yonghong Song <yonghong.song@linux.dev>
+In-Reply-To: <20250724223225.1481960-6-samitolvanen@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-From: Jimmy Assarsson <extja@kvaser.com>
 
-Add intermediate variables, for readability and to simplify future patches.
 
-Reviewed-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Signed-off-by: Jimmy Assarsson <extja@kvaser.com>
-Link: https://patch.msgid.link/20250725123452.41-5-extja@kvaser.com
-Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
----
- .../net/can/usb/kvaser_usb/kvaser_usb_core.c  | 20 ++++++++++++-------
- 1 file changed, 13 insertions(+), 7 deletions(-)
+On 7/24/25 3:32 PM, Sami Tolvanen wrote:
+> Hi folks,
+>
+> While running BPF self-tests with CONFIG_CFI_CLANG (Clang Control
+> Flow Integrity) enabled, I ran into a couple of CFI failures
+> in bpf_obj_free_fields() caused by type mismatches between
+> the btf_dtor_kfunc_t function pointer type and the registered
+> destructor functions.
+>
+> It looks like we can't change the argument type for these
+> functions to match btf_dtor_kfunc_t because the verifier doesn't
+> like void pointer arguments for functions used in BPF programs,
+> so this series fixes the issue by adding stubs with correct types
+> to use as destructors for each instance of this I found in the
+> kernel tree.
+>
+> The last patch changes btf_check_dtor_kfuncs() to enforce the
+> function type when CFI is enabled, so we don't end up registering
+> destructors that panic the kernel. Perhaps this is something we
+> could enforce even without CONFIG_CFI_CLANG?
 
-diff --git a/drivers/net/can/usb/kvaser_usb/kvaser_usb_core.c b/drivers/net/can/usb/kvaser_usb/kvaser_usb_core.c
-index 7be8604bf760..46e6cda0bf8d 100644
---- a/drivers/net/can/usb/kvaser_usb/kvaser_usb_core.c
-+++ b/drivers/net/can/usb/kvaser_usb/kvaser_usb_core.c
-@@ -364,10 +364,13 @@ static void kvaser_usb_read_bulk_callback(struct urb *urb)
- 	err = usb_submit_urb(urb, GFP_ATOMIC);
- 	if (err == -ENODEV) {
- 		for (i = 0; i < dev->nchannels; i++) {
--			if (!dev->nets[i])
-+			struct kvaser_usb_net_priv *priv;
-+
-+			priv = dev->nets[i];
-+			if (!priv)
- 				continue;
- 
--			netif_device_detach(dev->nets[i]->netdev);
-+			netif_device_detach(priv->netdev);
- 		}
- 	} else if (err) {
- 		dev_err(&dev->intf->dev,
-@@ -795,24 +798,27 @@ static void kvaser_usb_remove_interfaces(struct kvaser_usb *dev)
- {
- 	const struct kvaser_usb_dev_ops *ops = dev->driver_info->ops;
- 	int i;
-+	struct kvaser_usb_net_priv *priv;
- 
- 	for (i = 0; i < dev->nchannels; i++) {
--		if (!dev->nets[i])
-+		priv = dev->nets[i];
-+		if (!priv)
- 			continue;
- 
--		unregister_candev(dev->nets[i]->netdev);
-+		unregister_candev(priv->netdev);
- 	}
- 
- 	kvaser_usb_unlink_all_urbs(dev);
- 
- 	for (i = 0; i < dev->nchannels; i++) {
--		if (!dev->nets[i])
-+		priv = dev->nets[i];
-+		if (!priv)
- 			continue;
- 
- 		if (ops->dev_remove_channel)
--			ops->dev_remove_channel(dev->nets[i]);
-+			ops->dev_remove_channel(priv);
- 
--		free_candev(dev->nets[i]->netdev);
-+		free_candev(priv->netdev);
- 	}
- }
- 
--- 
-2.47.2
+I tried your patch set on top of latest bpf-next. The problem
+still exists with the following error:
 
+[   71.976265] CFI failure at bpf_obj_free_fields+0x298/0x620 (target: __bpf_crypto_ctx_release+0x0/0x10; expected type: 0xc1113566)
+[   71.980134] Oops: invalid opcode: 0000 [#1] SMP KASAN NOPTI
+...
+
+
+The following is the CFI related config items:
+
+$ grep CFI .config
+CONFIG_CFI_AUTO_DEFAULT=y
+CONFIG_FUNCTION_PADDING_CFI=11
+CONFIG_ARCH_SUPPORTS_CFI_CLANG=y
+CONFIG_ARCH_USES_CFI_TRAPS=y
+CONFIG_CFI_CLANG=y
+# CONFIG_CFI_ICALL_NORMALIZE_INTEGERS is not set
+CONFIG_HAVE_CFI_ICALL_NORMALIZE_INTEGERS_CLANG=y
+CONFIG_HAVE_CFI_ICALL_NORMALIZE_INTEGERS_RUSTC=y
+# CONFIG_CFI_PERMISSIVE is not set
+
+Did I miss anything?
+
+>
+> Sami
+>
+> ---
+>
+> Sami Tolvanen (4):
+>    bpf: crypto: Use the correct destructor kfunc type
+>    bpf: net_sched: Use the correct destructor kfunc type
+>    selftests/bpf: Use the correct destructor kfunc type
+>    bpf, btf: Enforce destructor kfunc type with CFI
+>
+>   kernel/bpf/btf.c                                     | 7 +++++++
+>   kernel/bpf/crypto.c                                  | 7 ++++++-
+>   net/sched/bpf_qdisc.c                                | 7 ++++++-
+>   tools/testing/selftests/bpf/test_kmods/bpf_testmod.c | 7 ++++++-
+>   4 files changed, 25 insertions(+), 3 deletions(-)
+>
+>
+> base-commit: 95993dc3039e29dabb9a50d074145d4cb757b08b
 
 
