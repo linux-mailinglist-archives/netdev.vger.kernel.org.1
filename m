@@ -1,137 +1,241 @@
-Return-Path: <netdev+bounces-210159-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210160-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF5D4B12330
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 19:47:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 908D7B12332
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 19:48:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 683EA4E50F7
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 17:47:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 23F17AE13AC
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 17:47:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4D872F002C;
-	Fri, 25 Jul 2025 17:47:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40CF12EFD98;
+	Fri, 25 Jul 2025 17:47:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JeNDJcrP"
+	dkim=pass (1024-bit key) header.d=openai.com header.i=@openai.com header.b="YJDE//0i"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C0E72EFDB9;
-	Fri, 25 Jul 2025 17:47:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7866424291C
+	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 17:47:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753465650; cv=none; b=izbtvK6ik+jlhXlUIZ7YhqMd4whOfNOXyslj58neqoNld/65M1TG3eAwVh9O+4cIPy5ZgpJrfvXIktil7mZg3i4JHB/gowX1MYdw3faQxL/DTURNkIDbfhpsyrMgl6RBRjtmHXCDCJ97DJbv0PZPXRDQHB0Tlb5V885JS0pI7xo=
+	t=1753465670; cv=none; b=RADSQ3fOihj39IOI5M5HrB7tDL5AOZt4lrKpPor35jHlBDMrt+jCMuWeoR1jiBo6CqovjCMzDIpZoUw+CMRQvM2tOPg9Ak8mSyqJBvJt9l/uUcSbo1GgEt7zx91lIwULsoOIJhfJKBsE974p+uB36WzBzQKB+RSymUb4QkhN+DE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753465650; c=relaxed/simple;
-	bh=uK+Zu0KO0atqx4ZnWxOihGDGVV7isMfzF77SakOG4+w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KBZa6Pv4KjrVks+PMq1a6h57m+oc8TuNdnY9e2eNUkDtJx5Lp0EwXN+Pj7bSqJ5GtRO/JvtcFdC6F/9i1UMLgErbx6oyTwSwVPQ0HgutckCwi4cEUFGESYdwg5SO41bysPtspM932hrFPtiKQqU4aPJTCk1QrmU/bNRnIq+ZXNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JeNDJcrP; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-234bfe37cccso21153205ad.0;
-        Fri, 25 Jul 2025 10:47:28 -0700 (PDT)
+	s=arc-20240116; t=1753465670; c=relaxed/simple;
+	bh=9eDIK3jVCFBYpk17cfWHRUnPmLO8AyLiFNJ2QzMQUxM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=N38zTqSQd69jxuQT9qXabfPrrpD8DrtUgceiEz7KVX6/hwJCea0+joD1dSbkBAbPVIjGF79i9u+iZGcvq5z5BE5mGZGda0Hkpcd6rNvNj1uDLE6a5OfpGPn7KucCRvV1F1IO/L3F3Hxj47Pj5HAzldZSWEKByShh6SWLIKnwzGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=openai.com; spf=pass smtp.mailfrom=openai.com; dkim=pass (1024-bit key) header.d=openai.com header.i=@openai.com header.b=YJDE//0i; arc=none smtp.client-ip=209.85.208.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=openai.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openai.com
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-32cd0dfbdb8so23205721fa.0
+        for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 10:47:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753465648; x=1754070448; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=QjbxMN7ETyQPsztoZorLELWE0JXnFSJjRTr+H/q5haI=;
-        b=JeNDJcrPxd0ttateDMQilDRyJ2TLTipPmnhLhL4qLaeSLynGGHAo3eHFsAWgIQKs+2
-         HYqu27HI+NhfB5XrVynHyJcnCAncQG5iP8X9q82V08drwkavNrsrw04TbNC/l7ZerIYN
-         mO2ge87MWdFBzCpW6rbcfXyoOq90rkwGAq9FAr8mpi6DmMPQLNeCtKc/qt4ckl/f7nON
-         8sxbqiMLlar1KklDkH+t+KvNP/Wbd65C384rQIlQHoNz0YqqGSMtXzKeeH3WquQCH5me
-         YUrrzZOMPy51aRAiP93PFUQLaK29xy+HhzDERj9hBaxfW3cvus9WrGcr/AY/XvSs6by+
-         xTHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753465648; x=1754070448;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=openai.com; s=google; t=1753465667; x=1754070467; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QjbxMN7ETyQPsztoZorLELWE0JXnFSJjRTr+H/q5haI=;
-        b=PwC9VLoSfWL+8FoqmBYxPR73e95a3sZpJbgp6rn6Qp1WD8ilZrt0LwYO34yvCevAqz
-         WXbSTr9RjlHbWjgVNCfXOij/f9LL8narC0cDNrPJSK8Q7eIZFeIoRAslh9XhnhWQd5pU
-         vjIc3gTPr4CUKtCTCSXW7PQDx1J3jP9fk6JL/qZt67nTOQABDC1PBiCRbaScD3NL++ge
-         UJkxDhGhfOFaKF1VZdzf0t21Bq1C5ZUxC+P2qqPzpTi8OaTU1Hq4S+Lp75c1ofsjBEs1
-         4yYE5unnwbk34aMVXntlPK6ko3QB0FTZ2o3/5lJBpW+Op1sDTQMmu1+Y7fmDUhy9xQg/
-         Xi9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVEUq8FVuF33eBPY6emw6J7zVseyaEBGDOofLu7non7YrmsvUPFMWvZJI/rujtCDwte1zWrmpym@vger.kernel.org, AJvYcCXzgkZunE0oMe6X5NHaUyEIjdTk1LJsYZllepWwRAmyi0TGjlZwBJ4mvJepj2wxjJghKuv0Ye+Ps1xc+ZI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz7jv9oYMtlD0k4WGK9yBGvpWtxit9jXR0zsNYxoa8avN9eO6c8
-	V8OsP3UruYweNGkMGnd+kLZ5F8Xa42vxJGFoSNciM92JpTmvTOOf2tsv
-X-Gm-Gg: ASbGncsi37EBP6u2C4z/9geqRwN9JhmpoAViVyE77cH6YedbXY01TmepeC+mBSag6no
-	C3GTYbgxbKG96wvfQbap3Dn77ZQguOdSGolPIsojzcVK99Ornmscg7X/cQCgL8uI8TF+yH3cb4+
-	O3wr2gx2mxPWpAmZp3K0WneJPb117BxobOVWNmnjWfY5aG1m/QvtErHtHWLpWHM88aE9+q17Sgo
-	u+KGGhU7i6M52CM8cNVhjy2ya+nMJvD2MQvehOhcObnRjKXW8snwC3PMphm1QoN+Vl8l0X4GXr1
-	yhCFdffYiQ7gaOumeAsZphz6+8RY6hzKdbq7Y+HlWQSSsmn7jq3OgGSSVGMkGhEG0dtRIMDs5aR
-	U2Kh9rN5vYEfOVKrvsz6ylE5HbQ==
-X-Google-Smtp-Source: AGHT+IE9MofzC7clK4UzDItX3Pfjz8HqZyGO9RqSZ00cu4R7rGR7UhjqTFipsz0w9DeGBPmkgngZeg==
-X-Received: by 2002:a17:902:d487:b0:235:f3df:bc26 with SMTP id d9443c01a7336-23fb2fe067cmr47444175ad.3.1753465648272;
-        Fri, 25 Jul 2025 10:47:28 -0700 (PDT)
-Received: from localhost ([129.210.115.104])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23fbe53b52bsm1809945ad.170.2025.07.25.10.47.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Jul 2025 10:47:27 -0700 (PDT)
-Date: Fri, 25 Jul 2025 10:47:26 -0700
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: Suchit K <suchitkarunakaran@gmail.com>
-Cc: Eric Dumazet <edumazet@google.com>, davem@davemloft.net,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	jhs@mojatatu.com, jiri@resnulli.us, sdf@fomichev.me,
-	kuniyu@google.com, aleksander.lobakin@intel.com,
-	netdev@vger.kernel.org, skhan@linuxfoundation.org,
-	linux-kernel-mentees@lists.linux.dev, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: Revert tx queue length on partial failure in
- dev_qdisc_change_tx_queue_len()
-Message-ID: <aIPDLjCUHCf+iI1O@pop-os.localdomain>
-References: <20250722071508.12497-1-suchitkarunakaran@gmail.com>
- <CANn89iJgG3yRQv+a04wzUtgqorSOM3DOFvGV2mgFV8QTVFjYxg@mail.gmail.com>
- <CAO9wTFiGCrAOkZSPr1N6W_8yacyUUcZanvXdQ-FQaphpnWe5DA@mail.gmail.com>
+        bh=o8igKGnqKWRhclIAZjFMGAieuZQEAwLSx36AxSWzK5I=;
+        b=YJDE//0iVUgoS9TC2yJy8ctxmWeggEC6MjZAuYdbt5MGGHI9lY82BZJsyFFIUNrgd4
+         W/0t46NDB6QrsW1jJDyujPZsEbf8ut7ttP+jWtA72jLWtmCpxk+XVIEscm+ANYPrSvHq
+         UII23stwe2Mbg11ylsKH2ByNYWJUn6KfVLuKU=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753465667; x=1754070467;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=o8igKGnqKWRhclIAZjFMGAieuZQEAwLSx36AxSWzK5I=;
+        b=N5UY47iZmpLL659RM9BZXeTcvXm4nv1HsU8o679tnpcUJgllnNxoASiNPjdalgg4Dw
+         9vq64mOvEvdcS5WDZSnSWpvqVwiqEpZMCm+I0wvzPb7K0MiTghWrQkkz7ujTF8eObpM3
+         s5jhDSseBuHRrgUy3MyfztF66aZbzm4WXF3P6fZChv3SG3quWAFWKHyujX3Gt11t1W6A
+         wRD1hnZ33Cl397zYJs7SCFYyLyEKcXH0KWfmHLfAh7PuicKghJMFnQnO5lrkBXuiS0ca
+         N8BYZTIbYqE1l+NPny5YBjE2MgDn9OypF9rz8L7diTT1QeAli3A8pf40xaEEF5cFADWo
+         Op4A==
+X-Forwarded-Encrypted: i=1; AJvYcCWjBFq40JFEvAXoFXWjgEUzZzLKB4AOwb7B+O67dh68JWsCx53MaiSIdtQICjHTRPAsG1hHAzQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxsofB0BhPXTATzP9xOxqfiCIUza/E1rXRzoMVqy8ipZwtxUvUj
+	sR+VPlq2spJ5Fjxs5mSrIDDCNpbcFwYCI8U1YkBTf6HuBBR+CeoVoiMNMHVzqVx6nmcBclMP9tn
+	zQVjMvDYwNmwAolm8D1uNvtHRLfMxUYZ9YU2h/69kLg==
+X-Gm-Gg: ASbGncuxFCNGtOM8/UFJoRifd847IYPCalqdClzJtdCQ167bpFlAgeXQ10kRIiRO/RH
+	MkvqPCgCOXAsuGx9YE6h8Rm67guob21XsU9YHwD2ItdS6RjLaZ1HXRo+fi3bpXWz8ICmlXir4zd
+	QOZNHcx6J5lIJftymkfS4W9p6NZnDUwJeX1I5Nhp7VbL1QRBEvBPmDOH8CQ2mg1WQmuP/jlfhS5
+	5GkDw==
+X-Google-Smtp-Source: AGHT+IFkfnmzNmODcw4O7GHq9qDajGK55gSY11imeb8rrw6tCnKTZQzJU4QShIdnMeRS5NUn9qCF5ViF1iJkhuno3kI=
+X-Received: by 2002:a05:6512:3da3:b0:553:a60d:6898 with SMTP id
+ 2adb3069b0e04-55b5f4aab78mr769594e87.45.1753465666466; Fri, 25 Jul 2025
+ 10:47:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAO9wTFiGCrAOkZSPr1N6W_8yacyUUcZanvXdQ-FQaphpnWe5DA@mail.gmail.com>
+References: <20250724-nexthop_dump-v1-1-6b43fffd5bac@openai.com> <aIOPQH-S5LAPCb1u@shredder>
+In-Reply-To: <aIOPQH-S5LAPCb1u@shredder>
+From: Christoph Paasch <cpaasch@openai.com>
+Date: Fri, 25 Jul 2025 10:47:35 -0700
+X-Gm-Features: Ac12FXzjzTO4-C8ogjX_JnB8KHGgWNT6UwjDM8_9OPCEHmsQhP-m538QaT5BTBo
+Message-ID: <CADg4-L8qauZSuC4=a-Ut4CSmUeyZNT4sprmSxbwWkQ9q-TrRqA@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: Make nexthop-dumps scale linearly with the
+ number of nexthops
+To: Ido Schimmel <idosch@idosch.org>
+Cc: David Ahern <dsahern@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Suchit,
-
-On Wed, Jul 23, 2025 at 11:47:09PM +0530, Suchit K wrote:
+On Fri, Jul 25, 2025 at 7:05=E2=80=AFAM Ido Schimmel <idosch@idosch.org> wr=
+ote:
+>
+> On Thu, Jul 24, 2025 at 05:10:36PM -0700, Christoph Paasch via B4 Relay w=
+rote:
+> > From: Christoph Paasch <cpaasch@openai.com>
 > >
-> > WRITE_ONCE() is missing.
+> > When we have a (very) large number of nexthops, they do not fit within =
+a
+> > single message. rtm_dump_walk_nexthops() thus will be called repeatedly
+> > and ctx->idx is used to avoid dumping the same nexthops again.
 > >
-> > > +               while (i >= 0) {
-> > > +                       qdisc_change_tx_queue_len(dev, &dev->_tx[i]);
+> > The approach in which we avoid dumpint the same nexthops is by basicall=
+y
+>
+> s/dumpint/dumping/
+>
+> > walking the entire nexthop rb-tree from the left-most node until we fin=
+d
+> > a node whose id is >=3D s_idx. That does not scale well.
 > >
-> > What happens if one of these calls fails ?
+> > Instead of this non-efficient  approach, rather go directly through the
+>                                ^ double space
+> s/non-efficient/inefficient/ ?
+>
+> > tree to the nexthop that should be dumped (the one whose nh_id >=3D
+> > s_idx). This allows us to find the relevant node in O(log(n)).
 > >
-> > I think a fix will be more complicated...
-> 
-> Hi Eric,
-> Given that pfifo_fast_change_tx_queue_len is currently the only
-> implementation of change_tx_queue_len, would it be reasonable to
-> handle partial failures solely within pfifo_fast_change_tx_queue_len
-> (which in turn leads to skb_array_resize_multiple_bh)? In other words,
-> is it sufficient to modify only the underlying low level
-> implementation of pfifo_fast_change_tx_queue_len for partial failures,
-> given that it's the sole implementation of change_tx_queue_len?
+> > We have quite a nice improvement with this:
+> >
+> > Before:
+> > =3D=3D=3D=3D=3D=3D=3D
+> >
+> > --> ~1M nexthops:
+> > $ time ~/libnl/src/nl-nh-list | wc -l
+> > 1050624
+> >
+> > real  0m21.080s
+> > user  0m0.666s
+> > sys   0m20.384s
+> >
+> > --> ~2M nexthops:
+> > $ time ~/libnl/src/nl-nh-list | wc -l
+> > 2101248
+> >
+> > real  1m51.649s
+> > user  0m1.540s
+> > sys   1m49.908s
+> >
+> > After:
+> > =3D=3D=3D=3D=3D=3D
+> >
+> > --> ~1M nexthops:
+> > $ time ~/libnl/src/nl-nh-list | wc -l
+> > 1050624
+> >
+> > real  0m1.157s
+> > user  0m0.926s
+> > sys   0m0.259s
+> >
+> > --> ~2M nexthops:
+> > $ time ~/libnl/src/nl-nh-list | wc -l
+> > 2101248
+> >
+> > real  0m2.763s
+> > user  0m2.042s
+> > sys   0m0.776s
+>
+> I was able to reproduce these results.
+>
+> >
+> > Signed-off-by: Christoph Paasch <cpaasch@openai.com>
+> > ---
+> >  net/ipv4/nexthop.c | 34 +++++++++++++++++++++++++++++++++-
+> >  1 file changed, 33 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/net/ipv4/nexthop.c b/net/ipv4/nexthop.c
+> > index 29118c43ebf5f1e91292fe227d4afde313e564bb..226447b1c17d22eab9121be=
+d88c0c2b9148884ac 100644
+> > --- a/net/ipv4/nexthop.c
+> > +++ b/net/ipv4/nexthop.c
+> > @@ -3511,7 +3511,39 @@ static int rtm_dump_walk_nexthops(struct sk_buff=
+ *skb,
+> >       int err;
+> >
+> >       s_idx =3D ctx->idx;
+> > -     for (node =3D rb_first(root); node; node =3D rb_next(node)) {
+> > +
+> > +     /*
+> > +      * If this is not the first invocation, ctx->idx will contain the=
+ id of
+> > +      * the last nexthop we processed.  Instead of starting from the v=
+ery first
+> > +      * element of the red/black tree again and linearly skipping the
+> > +      * (potentially large) set of nodes with an id smaller than s_idx=
+, walk the
+> > +      * tree and find the left-most node whose id is >=3D s_idx.  This=
+ provides an
+> > +      * efficient O(log n) starting point for the dump continuation.
+> > +      */
+>
+> Please try to keep lines at 80 characters.
+>
+> > +     if (s_idx !=3D 0) {
+> > +             struct rb_node *tmp =3D root->rb_node;
+> > +
+> > +             node =3D NULL;
+> > +             while (tmp) {
+> > +                     struct nexthop *nh;
+> > +
+> > +                     nh =3D rb_entry(tmp, struct nexthop, rb_node);
+> > +                     if (nh->id < s_idx) {
+> > +                             tmp =3D tmp->rb_right;
+> > +                     } else {
+> > +                             /* Track current candidate and keep looki=
+ng on
+> > +                              * the left side to find the left-most
+> > +                              * (smallest id) that is still >=3D s_idx=
+.
+> > +                              */
+>
+> I'm aware that netdev now accepts both comment styles, but it's a bit
+> weird to mix both in the same commit and at the same function.
+>
+> > +                             node =3D tmp;
+> > +                             tmp =3D tmp->rb_left;
+> > +                     }
+> > +             }
+> > +     } else {
+> > +             node =3D rb_first(root);
+> > +     }
+> > +
+> > +     for (; node; node =3D rb_next(node)) {
+> >               struct nexthop *nh;
+> >
+> >               nh =3D rb_entry(node, struct nexthop, rb_node);
+>
+> The code below is:
+>
+> if (nh->id < s_idx)
+>         continue;
+>
+> Can't it be removed given the above code means we start at a nexthop
+> whose identifier is at least s_idx ?
 
-Thanks for your patch.
+Yes, we can drop this check.
 
-As you noticed it is tricky to handle the failure elegantly here, which
-was also the reason why I didn't do it. Did you observe any real issue?
+Thanks for all your feedback. Will resubmit when net-next reopens.
 
-To answer your question above: I am not sure if we can do it in pfifo
-fast implementation since struct netdev_queue is not explicitly exposed to
-the lower Qdisc.
 
-On the other hand, although dev_qdisc_change_tx_queue_len() is generic,
-it is only called for this very specific code path, so changing it won't
-impact other code paths, IMHO.
-
-Regards,
-Cong Wang
+Christoph
 
