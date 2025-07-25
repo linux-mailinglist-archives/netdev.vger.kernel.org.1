@@ -1,203 +1,96 @@
-Return-Path: <netdev+bounces-209946-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209947-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16C5FB116A2
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 04:45:04 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82369B116D6
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 05:05:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3ECB65A53F3
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 02:45:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1D9657AFC5A
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 03:04:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C129423185F;
-	Fri, 25 Jul 2025 02:44:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60BFB192D8A;
+	Fri, 25 Jul 2025 03:05:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S+tew8Fw"
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="JKzb/IKu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from out.smtpout.orange.fr (out-69.smtpout.orange.fr [193.252.22.69])
+	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D2A554F81
-	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 02:44:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64175EEAB;
+	Fri, 25 Jul 2025 03:05:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.252.22.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753411499; cv=none; b=eRKX8s+TzZOf10brm+Zit0vJ8uWC2J7YDQIefFa7XZJso073dgI3Xqcx5uZIn2F6kBrTUuozyAN6lOrdHtODGJVvGG87iHKCC8k2Hg+agkjVxxNyMgRvKjPGGqlHEWxW/ddyxcTTxE3gjmfAVIKyWAdWtZ7dA009sAi7sPWB6Sg=
+	t=1753412723; cv=none; b=qcLXU5GYNOxsdmkSX+IZsmDteTooBU7arKn34j4BkFe3im+GjESm+paDMKuyvENNoZqbat5KoXbu7VyTeb2TBuIiXBEzsTJb+MHFeX3fLypbWSYDEYakpm56flkrWNN3fhqxPEjNsk/dZJkvBJQs1yeRLwI8Y2jOugxB4boBPSg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753411499; c=relaxed/simple;
-	bh=Bg92VHyOE6MEMFoWQRKE/2425Pc1ZojxSdZQl1Gp27w=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=d3bx3Pu6c1D+9pyvPuJVUVHnP7xDaMnzmXe99TAk+Sf/M1eAXDHqO8pc1cSVbBNb53GfdGHfl20wP5TXhG/tDpV8EC2URdAPEdnPGCeGd4hYWPFj8t5CBVU1+Ai4b0awTP2FtpGFWHLE6SfMx/j6zegue0BUZkzkn1GFMUchr+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S+tew8Fw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DD52C4CEEF;
-	Fri, 25 Jul 2025 02:44:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753411499;
-	bh=Bg92VHyOE6MEMFoWQRKE/2425Pc1ZojxSdZQl1Gp27w=;
-	h=From:To:Cc:Subject:Date:From;
-	b=S+tew8FwGKaY3GI5IwbL0I0vGWkNJqlszllM2CGtOigp2hFpGVy3B+eFjmL0ZiMYQ
-	 tQFV8Vg+2XJRCIuop4bOUYzbZgnG8XQuQxIaSmRD/lMROIAsSTEcwDIxGXEh2hBd1y
-	 MI1/NO8lRS/BcO7/D9s2oL4JuAFKeeLk80ZrsuGtg+WGqkDMnW79RZaWYnS9j53q5l
-	 TxjdW04ViM4QW+pGBpOTZMBY2Yb+dlvhce1klTQNbh3CP+hj+xmUZuVjZA/2DvyS2v
-	 +kUkYzIgAkF32XSIqfk4nIwEl/V6tLjhOIVVK2X+dxca2Mr+ABvseH1qEOi/wOOzOW
-	 ruVr/Gl6cEnkA==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jason Wang <jasowang@redhat.com>,
-	Zigit Zo <zuozhijie@bytedance.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	leitao@debian.org,
-	sdf@fomichev.me
-Subject: [PATCH net] netpoll: prevent hanging NAPI when netcons gets enabled
-Date: Thu, 24 Jul 2025 19:44:54 -0700
-Message-ID: <20250725024454.690517-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1753412723; c=relaxed/simple;
+	bh=nake4eQNjJwbaaX/FCpGobO+XyGtoFE1MRvsFkkNgaU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bNk9tud3QNJuw4AKkTODeV1/QUPtX15J+p8aSkX0zDDnazPELFen/FhqbD6eIqdA7+qZC2nG8SkC2fRekrxWGAhtrQdZRR/5CjIXq1x+VyF+uYbz4RIJV0hwOuF9uJiwrlXV76KhC1GR2vxdZbuAfhXtFRzNmfncnONYqgQnbLc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=JKzb/IKu; arc=none smtp.client-ip=193.252.22.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from [172.16.82.72] ([124.33.176.97])
+	by smtp.orange.fr with ESMTPA
+	id f8k8ufyqycdoQf8k9uLQiW; Fri, 25 Jul 2025 05:05:11 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1753412711;
+	bh=nake4eQNjJwbaaX/FCpGobO+XyGtoFE1MRvsFkkNgaU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From;
+	b=JKzb/IKuq3jQ5+/RZIMTSI6031eRkpkPmg7KjQcr4ESd6CYQQXClRqxfiY0DkyOVV
+	 4ySgvtAKfx+oCm0y+6BgZr2/AicrF7t44z2sSR3b+zez93QcDTMvo4/XnU8r/dxUIW
+	 B3PUy6/ZWFUfTGRBCIvwsTJQzo3GKrf6PuvLXa6oPZWhsp9ymOWKQXxa9JtOJejzJA
+	 OaIGZ5zD22vbRGFBsDKujRAKgBRGJ8rIWXFchYWNcdNG8pmU/U9++jd2Ss8plN8isH
+	 CXrJMenY2KSg1jrQNyMXZpOYrNsoLi7yHx9d6WFGCaL921rfMDJQd2Kr/bTD7OHDtd
+	 ALZtp3ugVU+HQ==
+X-ME-Helo: [172.16.82.72]
+X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
+X-ME-Date: Fri, 25 Jul 2025 05:05:11 +0200
+X-ME-IP: 124.33.176.97
+Message-ID: <5041358c-7146-409c-9e94-0ab1c996be16@wanadoo.fr>
+Date: Fri, 25 Jul 2025 12:05:07 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 00/10] can: kvaser_pciefd: Simplify identification of
+ physical CAN interfaces
+To: Jimmy Assarsson <extja@kvaser.com>, linux-can@vger.kernel.org
+Cc: Jimmy Assarsson <jimmyassarsson@gmail.com>,
+ Marc Kleine-Budde <mkl@pengutronix.de>, netdev@vger.kernel.org
+References: <20250724073021.8-1-extja@kvaser.com>
+Content-Language: en-US
+From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Autocrypt: addr=mailhol.vincent@wanadoo.fr; keydata=
+ xjMEZluomRYJKwYBBAHaRw8BAQdAf+/PnQvy9LCWNSJLbhc+AOUsR2cNVonvxhDk/KcW7FvN
+ LFZpbmNlbnQgTWFpbGhvbCA8bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI+wrIEExYKAFoC
+ GwMFCQp/CJcFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AWIQTtj3AFdOZ/IOV06OKrX+uI
+ bbuZwgUCZx41XhgYaGtwczovL2tleXMub3BlbnBncC5vcmcACgkQq1/riG27mcIYiwEAkgKK
+ BJ+ANKwhTAAvL1XeApQ+2NNNEwFWzipVAGvTRigA+wUeyB3UQwZrwb7jsQuBXxhk3lL45HF5
+ 8+y4bQCUCqYGzjgEZx4y8xIKKwYBBAGXVQEFAQEHQJrbYZzu0JG5w8gxE6EtQe6LmxKMqP6E
+ yR33sA+BR9pLAwEIB8J+BBgWCgAmFiEE7Y9wBXTmfyDldOjiq1/riG27mcIFAmceMvMCGwwF
+ CQPCZwAACgkQq1/riG27mcJU7QEA+LmpFhfQ1aij/L8VzsZwr/S44HCzcz5+jkxnVVQ5LZ4B
+ ANOCpYEY+CYrld5XZvM8h2EntNnzxHHuhjfDOQ3MAkEK
+In-Reply-To: <20250724073021.8-1-extja@kvaser.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-Paolo spotted hangs in NIPA running driver tests against virtio.
-The tests hang in virtnet_close() -> virtnet_napi_tx_disable().
+On 24/07/2025 at 16:30, Jimmy Assarsson wrote:
+> This patch series simplifies the process of identifying which network
+> interface (can0..canX) corresponds to which physical CAN channel on
+> Kvaser PCIe based CAN interfaces.
 
-The problem is only reproducible if running multiple of our tests
-in sequence (I used TEST_PROGS="xdp.py ping.py netcons_basic.sh \
-netpoll_basic.py stats.py"). Initial suspicion was that this is
-a simple case of double-disable of NAPI, but instrumenting the
-code reveals:
+Make sure to address Simon's comment. Aside from that, all my concerns where
+addressed, so, for the full series:
 
- Deadlocked on NAPI ffff888007cd82c0 (virtnet_poll_tx):
-   state: 0x37, disabled: false, owner: 0, listed: false, weight: 64
+Reviewed-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
 
-The NAPI was not in fact disabled, owner is 0 (rather than -1),
-so the NAPI "thinks" it's scheduled for CPU 0 but it's not listed
-(!list_empty(&n->poll_list)). It seems odd that normal NAPI
-processing would wedge itself like this.
 
-My suspicion is that netpoll gets enabled while NAPI is polling,
-and also grab the NAPI instance. This confuses napi_complete_done():
-
-  [netpoll]                                   [normal NAPI]
-                                        napi_poll()
-                                          have = netpoll_poll_lock()
-                                            rcu_access_pointer(dev->npinfo)
-                                              return NULL # no netpoll
-                                          __napi_poll()
-					    ->poll(->weight)
-  poll_napi()
-    cmpxchg(->poll_owner, -1, cpu)
-      poll_one_napi()
-        set_bit(NAPI_STATE_NPSVC, ->state)
-                                              napi_complete_done()
-                                                if (NAPIF_STATE_NPSVC)
-                                                  return false
-                                           # exit without clearing SCHED
-
-This seems very unlikely, but perhaps virtio has some interactions
-with the hypervisor in the NAPI -> poll that makes the race window
-large?
-
-Best I could to to prove the theory was to add and trigger this
-warning in napi_poll (just before netpoll_poll_unlock()):
-
-      WARN_ONCE(!have && rcu_access_pointer(n->dev->npinfo) &&
-                napi_is_scheduled(n) && list_empty(&n->poll_list),
-                "NAPI race with netpoll %px", n);
-
-If this warning hits the next virtio_close() will hang.
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Reported-by: Paolo Abeni <pabeni@redhat.com>
-Link: https://lore.kernel.org/c5a93ed1-9abe-4880-a3bb-8d1678018b1d@redhat.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-Looks like this is not a new bug, rather Breno's tests now put
-enough pressure on netpoll + virtio to trigger it.
-
-CC: Jason Wang <jasowang@redhat.com>
-CC: Zigit Zo <zuozhijie@bytedance.com>
-CC: "Michael S. Tsirkin" <mst@redhat.com>
-CC: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-CC: Eugenio Pérez <eperezma@redhat.com>
-
-CC: leitao@debian.org
-CC: sdf@fomichev.me
----
- drivers/net/netconsole.c | 25 ++++++++++++++++++++-----
- 1 file changed, 20 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-index e3722de08ea9..9bc748ff5752 100644
---- a/drivers/net/netconsole.c
-+++ b/drivers/net/netconsole.c
-@@ -256,6 +256,24 @@ static struct netconsole_target *alloc_and_init(void)
- 	return nt;
- }
- 
-+static int netconsole_setup_and_enable(struct netconsole_target *nt)
-+{
-+	int ret;
-+
-+	ret = netpoll_setup(&nt->np);
-+	if (ret)
-+		return ret;
-+
-+	/* Make sure all NAPI polls which started before dev->npinfo
-+	 * was visible have exited before we start calling NAPI poll.
-+	 * NAPI skips locking if dev->npinfo is NULL.
-+	 */
-+	synchronize_rcu();
-+	nt->enabled = true;
-+
-+	return 0;
-+}
-+
- /* Clean up every target in the cleanup_list and move the clean targets back to
-  * the main target_list.
-  */
-@@ -574,11 +592,10 @@ static ssize_t enabled_store(struct config_item *item,
- 		 */
- 		netconsole_print_banner(&nt->np);
- 
--		ret = netpoll_setup(&nt->np);
-+		ret = netconsole_setup_and_enable(nt);
- 		if (ret)
- 			goto out_unlock;
- 
--		nt->enabled = true;
- 		pr_info("network logging started\n");
- 	} else {	/* false */
- 		/* We need to disable the netconsole before cleaning it up
-@@ -1889,7 +1906,7 @@ static struct netconsole_target *alloc_param_target(char *target_config,
- 	if (err)
- 		goto fail;
- 
--	err = netpoll_setup(&nt->np);
-+	err = netconsole_setup_and_enable(nt);
- 	if (err) {
- 		pr_err("Not enabling netconsole for %s%d. Netpoll setup failed\n",
- 		       NETCONSOLE_PARAM_TARGET_PREFIX, cmdline_count);
-@@ -1898,8 +1915,6 @@ static struct netconsole_target *alloc_param_target(char *target_config,
- 			 * otherwise, keep the target in the list, but disabled.
- 			 */
- 			goto fail;
--	} else {
--		nt->enabled = true;
- 	}
- 	populate_configfs_item(nt, cmdline_count);
- 
--- 
-2.50.1
+Yours sincerely,
+Vincent Mailhol
 
 
