@@ -1,244 +1,128 @@
-Return-Path: <netdev+bounces-210148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210149-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46045B122D9
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 19:16:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 395B0B122E1
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 19:19:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F18A58129D
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 17:16:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A8E8188D6C1
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 17:19:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D1642EF2B6;
-	Fri, 25 Jul 2025 17:15:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8D602EF2B6;
+	Fri, 25 Jul 2025 17:19:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PeGpAd+S"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kyag1WVd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A054C2882DC
-	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 17:15:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753463755; cv=fail; b=JGIRK4XT6aaPxq5A9mdjVrT2ZCJy+D+2I+it2y2enJ1PRvAzq7xC0hmCz+MLUtwGhx8cvuwfDVKj+jLIdXmS0QWHnUAOUtNnMKNAeTK6SrQagAWUnOkZ7OLqyHu/fX0kMYEoyJA5mwgZUSvjh9H7YAnc+HbyTj3sGYbA/A80e6A=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753463755; c=relaxed/simple;
-	bh=HFaekTkgirlCkTusChL1R2GM7ZLti/JQXHR6JX20RJM=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=nq0OMf1YvVTMA2W93xEhG5r6crpwUFUzzd1jTXH2HmTy3ZqOD6xJJKxCjarPAj3luVXNypW8SK0vlL/ijl0r4O4nqg5zp3IEa3HTZZLPXteE06gseSst90wqPtDKC4e/uXpu7V1yKDnE+W+3eLeCpyLQnnLkeLARAFRYzVrxIM8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PeGpAd+S; arc=fail smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1753463754; x=1784999754;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=HFaekTkgirlCkTusChL1R2GM7ZLti/JQXHR6JX20RJM=;
-  b=PeGpAd+S9I89MaC291xucIIgEbPjQQqmTeTwK/vwiXdVFHzJhzPq4WlU
-   ezQUl6m6ftPfJr4GHpTSSCjFtt9UBEoc5F+4dIzufHYjhjOllZK1ouuLe
-   kkcAbS68o4HYUBSfQkraAE3z4PeIyidQmdGfng1sPyv7OeWi8KycLDUDU
-   vd10aJoFRLEdQxGCtqQKKCcK71hLd2y29EFglHUXMEFNjk9yOzS3TIi/b
-   HOmRU8DP1mBiSXB+GNVhkviwxWSw4vqUObm69Eyya5RuHN3Tl6M/Y/ej3
-   kBFkVmTLiBdtYeKA6gSmqos8Jt4E0VsawszAzxXsWs7QqGr0KO5/LWgMu
-   Q==;
-X-CSE-ConnectionGUID: mqxQBaKNQvmwt/5mJCrMeQ==
-X-CSE-MsgGUID: puuB/udRRrOhf6045QVZ1w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11503"; a="67241178"
-X-IronPort-AV: E=Sophos;i="6.16,339,1744095600"; 
-   d="scan'208";a="67241178"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jul 2025 10:15:54 -0700
-X-CSE-ConnectionGUID: uDCTAD58SV+XOq4redibfQ==
-X-CSE-MsgGUID: sNxZJwKbQNSvuzVn7t+9Vw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,339,1744095600"; 
-   d="scan'208";a="165543748"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by orviesa004.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jul 2025 10:15:53 -0700
-Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26; Fri, 25 Jul 2025 10:15:53 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26 via Frontend Transport; Fri, 25 Jul 2025 10:15:52 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (40.107.243.78)
- by edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26; Fri, 25 Jul 2025 10:15:51 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Y8Rdtuoaugu8p9QCrO7xyFg/WfgMUtiAhNr5lNy/VUfQkR/wh09Fmh9Bu2oPnC9185hN09U3wgPJ2YrOjOJ2Kk2mChGprdFVSpc6mqVdv1uaO2dSeetsS7TV6cpnvWVQ71GuyH7xEVYqRcdUwm/ebnvcsafE56lj7Pb9z/NWGazrod4crJSXT5cffHzuMlFJ0C4ejb186QDZJxxkfYHfmtSQuTik9ExDKS6kt5jpekEz++MLlMbMrZNfVY6o4a/ggaZqkjnI1s/5+JRN1eZPZyKmSZG4PrN8xl4KjMp/+tQLKGmi/ADAOKcJyrJRwYhiOa/pB24Pm7J8scH5WcLcHQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=aSSiaXtHPMF0zmBjgHz3NBtt/Z28M+VnfCD0/Yii1Xo=;
- b=dCxrhHxw6DQFB3W22zagl1MSGnh717EK1THoqQAkniNPSvnLFD8B91YtHcxiZgsQft5FMx7h0zUSecLmaMzvXcerQ9bRuDkZXrJOQc38Cmck2gRoJdDmxDYAttc4EWgcm/1MYjGnMy0128gbrOZ/dhDpZGvMGJzQTzaDuu6hFg82JjSCVKjbW/kWFi/Xi5vjgx4zN6U8zBOtgFbCA9MgCvGq2gWUyDd2tY74jQnFTRraAeouvb9SBJx2Wd3y6BnGa3YNpjhC7Gd/UhGXd78vvhRYi2D/C9RcLJHRllWUlDYoaaWZt2dN1XE3EU1e3/T3zfRyJxW005Gqa4VzrX6qKQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DM4PR11MB6502.namprd11.prod.outlook.com (2603:10b6:8:89::7) by
- CO1PR11MB5058.namprd11.prod.outlook.com (2603:10b6:303:99::17) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8964.24; Fri, 25 Jul 2025 17:15:48 +0000
-Received: from DM4PR11MB6502.namprd11.prod.outlook.com
- ([fe80::21e4:2d98:c498:2d7a]) by DM4PR11MB6502.namprd11.prod.outlook.com
- ([fe80::21e4:2d98:c498:2d7a%6]) with mapi id 15.20.8964.021; Fri, 25 Jul 2025
- 17:15:48 +0000
-From: "Hay, Joshua A" <joshua.a.hay@intel.com>
-To: Simon Horman <horms@kernel.org>
-CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Luigi Rizzo
-	<lrizzo@google.com>, Brian Vazquez <brianvv@google.com>, "Chittim, Madhu"
-	<madhu.chittim@intel.com>, "Loktionov, Aleksandr"
-	<aleksandr.loktionov@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH net v2 4/6] idpf: replace flow
- scheduling buffer ring with buffer pool
-Thread-Topic: [Intel-wired-lan] [PATCH net v2 4/6] idpf: replace flow
- scheduling buffer ring with buffer pool
-Thread-Index: AQHb93jvoNgWAxlFjUS4Sc8NhCHzorRBCVGAgAIVgCA=
-Date: Fri, 25 Jul 2025 17:15:24 +0000
-Deferred-Delivery: Fri, 25 Jul 2025 17:15:00 +0000
-Message-ID: <DM4PR11MB65026412ED88DA7433B2EE16D459A@DM4PR11MB6502.namprd11.prod.outlook.com>
-References: <20250718002150.2724409-1-joshua.a.hay@intel.com>
- <20250718002150.2724409-5-joshua.a.hay@intel.com>
- <20250724092001.GI1150792@horms.kernel.org>
-In-Reply-To: <20250724092001.GI1150792@horms.kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM4PR11MB6502:EE_|CO1PR11MB5058:EE_
-x-ms-office365-filtering-correlation-id: b4158f65-6fa2-43c3-7e95-08ddcb9ee5f6
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?+QHhT/wEI/vXqb5SAmos8u+eTH/n1s5wEXrWu49aQFBhDI8XqAa+EsgTuuz2?=
- =?us-ascii?Q?c84RF9JKJCOi+d3VHwKcgv+APZy3W2gZJEr7G0dJ6Xmf4i5itfISUToJiEUE?=
- =?us-ascii?Q?Pwj/2EDdmMCgmuoE50ElcJ0fnuz0CjKdhrBp7+1CK4X9J/GQFN9W8qcOpEMV?=
- =?us-ascii?Q?aG/d2xCIkP4zYN7CeBXqQ0Yf9ZNXKA4XZIOD08/UhD/xzxsE8JFXNfrUJsS3?=
- =?us-ascii?Q?AbVIKjp4P35i9Zf4s4fHko9ZN6pe6P0iK1os/Gfl6IsuN8xgm2CtSG4jQthP?=
- =?us-ascii?Q?AqyLoye1FJ4yku1/t9AUHG3IPaCXBFEbVpxkC+73rZpOMC+ncCNRdi1qO+22?=
- =?us-ascii?Q?R4RNB2YLuYCpGGCdFHLkMON2RZdTlChGSeV2YPNicRW3mrZReaRr/XBiZ3AC?=
- =?us-ascii?Q?Nx2DPnMdAbKp1XD7qkeY+Rg2nJbyo4015qJenK7j//uKZ9E+ohFk+AcSbg9M?=
- =?us-ascii?Q?EvOdrKOHIFo4qTk3Va47EIR3Iw2ehMLXgnd0uKXQD1qXQyYyLcY/xmcYqQHq?=
- =?us-ascii?Q?XiW6evBrK7OmSh3xKr7yeCkQlfgAFDfxzPBLuDxjAQUA2ET0kMyOEjoK0dAx?=
- =?us-ascii?Q?Xd6HIphWD/1rEwT2wvKQ/Df6Ov54yE5JJ3eEzolYG8h3i74yfnERsEJlhyX9?=
- =?us-ascii?Q?zkjUlP5lgUQJjRNMabsCkBVdQFGKZUYODMxv4NjrY4wk3U7XMjQFiwwHbInl?=
- =?us-ascii?Q?2duAnEjI6Wnh6t27AoqJ0eINPCOjdCWGfJ6siBwXAUAN96g9iYSiYygQHvBo?=
- =?us-ascii?Q?uniQM7KPtIzlwM5qRwtCYH8tp2XMlmldfa4lAoaQ64EXzIizwhinM7YcZ2yO?=
- =?us-ascii?Q?mYZC0OhT7AesU6SCIdDDaOMJEMZEAvMbng8cWitXFowPbsw/P/YP2OZ0j0Ja?=
- =?us-ascii?Q?H4eAxyUgqQQYPXfuR3VqCEQ8AO0UbDhpBrHdaARH+7tVPP1doZRYiGFLvG8a?=
- =?us-ascii?Q?i6q9YAdooIrlG/0TdLJwq36wBrtuRY+RoSaAPET37oy5hYNIoG+S/cbvpQ+I?=
- =?us-ascii?Q?OFsrf/SFeo6LskFv6UaITVROvtub5M+0nYV548/sx7OBJfmgZZryRXt3Re61?=
- =?us-ascii?Q?PXaD61oRG03Ma//UVH1GIBcqDMOK6jZ3xZQL727iGDRFjBPr+5O5VdoxEjyG?=
- =?us-ascii?Q?Qgv9p4zcuzIIp3oV2TL1J50UcluvZtj6nWHiJ1xicDs33P/Nl/rsTFJdxQhN?=
- =?us-ascii?Q?jBscL0+9wUmy2RjImMHOJyFuZFLpiFQb9tEe4WvwBprFtxjx/TSs2XTiN6Bx?=
- =?us-ascii?Q?fcLkzZRq6OkNC6IP4sHv4/5YYQpuAX/Hv+XW8/JjCGx76W9mfwXmbTvYpmMv?=
- =?us-ascii?Q?FwAQNWQYF7PHxOufo13Vx9eOtyftJCbv1MaLXPXSVgajWjTqoFl74bnEVNkz?=
- =?us-ascii?Q?q+OCzZe+Y9DdWD7s0gQ6rtJCS6H2cf5fx9g589d/QDc4vrtab1AA6xf9zq34?=
- =?us-ascii?Q?YChZVJoccGS9LjYtc4YLFBwexixCZpv3fB22Q720YutW6UPkf3t2tw=3D=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6502.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?2zCUwj6W3FFbaeVpGLppLGeIRJKDSE2Ckd2pEyXVmtpFM1IcBHe6C+RjPjTK?=
- =?us-ascii?Q?XsjoE0iZIog7dn4qZb15R1qwceJOoR89JAY4Um5FN9GcUu2d79GGbaFItaRb?=
- =?us-ascii?Q?HtTbIyFr6Xegy173p1Fd6Zk69zQDGLzN+iPSU27cFFPT0+AuUgzUhLIglskY?=
- =?us-ascii?Q?BOFDLUwvUbXi6mSuLx1TRImskokCZzpzuychxrToKhlxJCMC5cYLeBpObXvm?=
- =?us-ascii?Q?ZX6IVC11KGgckZEPth3noUgx3LRc+D2WlpmOpX3y/145sAtLooVszcJzw7QM?=
- =?us-ascii?Q?c6MB68Esl1D7WoMZKvtnFnFgSFtyTfhs3lrtOaV9rdACE0kZONOIGyiNY2g8?=
- =?us-ascii?Q?uGIK4fTwsD6747TuKQaNS5y+E+iVuFkPTbKJO/K+Uh5O+P6goDZAP8BNNHJS?=
- =?us-ascii?Q?EBNt+snGDNdQVWijQL8w90wItSI5055mvzFPf3rDQlw40IvsNz0zLDFyMd0r?=
- =?us-ascii?Q?icKsYqtPuuTXIS/PSDgs4P3+zTGtRXgGI5h+iq/qfq4umREdAHsRNX7tkEKz?=
- =?us-ascii?Q?98fSBEoIq2MLvEFeWUCjoqitqNy6Vnw9YB0EkhgBLOyBDk8Guq1pwdcNI9H6?=
- =?us-ascii?Q?EHHQDPYl6YeAG9NX+MTlBfkiSR0XuaQT2F7EwYO91r33SVeS6ld5Zb3mvlvm?=
- =?us-ascii?Q?ERehAD0EpWmF2R5g7qd0NezdGVG5ILHF87RxnZQK0BdRIYPZ2bQMMFcduqCL?=
- =?us-ascii?Q?+SStuNokGRwLXkk6VFnnkPxh/1SP7j2lSYuuBWlVqhRdxkHRCVoUW119PZYd?=
- =?us-ascii?Q?hMmU9QwxJJGCxV1Y89g7cg/lKDsS53VLPVovKQsN9fhJab8POcx6vgaULqRG?=
- =?us-ascii?Q?MpHvIrSh4CLyyp1PkKAEj854B3IiAUzwRO8Odv2VqnJXDRUhRLCIYrDKsUYV?=
- =?us-ascii?Q?lA9rHonHjzcpO4+RWYmKmvIv30kkPPWi1p0HO7rSn+uMTj55cyvG+lvgPbXL?=
- =?us-ascii?Q?PLhA/rZOJO+HQczHN94nJoRj38okKDk+wq3ILhRTpDMi/7Jfv1atxYdyaqdH?=
- =?us-ascii?Q?qEvigXSSSt9V6XWnUJCg/z7JwPD5XHwhpcRey6UkyHhoq5B+3kygnDwPfTy1?=
- =?us-ascii?Q?zNVFmtIqWf5QzqBZ7UIm4WEj3SDvidBVNxSHVJYoFmXovE6ZAtD8TojYTkoT?=
- =?us-ascii?Q?6GHaOlEaIn2YMZxV/+TdO7JU+mAeBTmNLoCZvZRvfwGlgIEOJQrKRKMJEuCs?=
- =?us-ascii?Q?eyPuhpz5FSRMoiS8/n+8M+aU3r2K1Y8CnoLgvz1eSbDSMVmEJAKMVtaL7/QX?=
- =?us-ascii?Q?u6FepnGG15ZxpypDXQJsFwIje2o9i4mdaCWtX1AvHcPZYlzgC9g1vmmWsZ0F?=
- =?us-ascii?Q?qp0Zc4XM+aC7mMIrLLsvyaSTiVL/mXDtqPFbyOhOjR/BK9SbMkVAz2X+cUVR?=
- =?us-ascii?Q?HPDBlothO8zDsDdfC47YyeZGQp221vOZbqLwu86SqQXH23A0lO4noWJkwh4r?=
- =?us-ascii?Q?XYL3DU6zQnooAwsN8fG6x3xVvyeqrUCi9LF/vOIV/xPLw2cslkuC3cbaFNBV?=
- =?us-ascii?Q?eA05rGlgQxvDLkAHGZc/4RYjyDUdxQzrtz80sCiueX6mJt+Y08xNlfrBZUuK?=
- =?us-ascii?Q?ClZ+BXUU2yvYdH7HDeVCHd34+bRii8xwzUuN10eN?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3A071F461D
+	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 17:19:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753463949; cv=none; b=SEWq6r3unAumTVkJJyTlXBYkZ0rf8JpnPFw+Z2n7CyLcArBRkOje2nyztoyMiYnm1C3vWDACowPFRvzaxwsTtW9QYMsfeBBEHzpAMAEXtyL5TC/9GdO986A/aWTxTErYONhDTocJrp0ORn1t5/n+6rVu6DkGgPQhTQ7JrB7d1XM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753463949; c=relaxed/simple;
+	bh=Iry0RrzUK7STj5zlGmX1/iYQfryskFbG2JBARt0IGEQ=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=mjksBi3VTFJmitZDhfPQueg75kFBrcROO3OSZWRGv/6CeruM6KQLhZEyzVbgKMZPxm1uVaIYVWQFUebfXeo8oi2VVZrAPZQ4fOsrvMmh+QOj6VhSUnGX+PoihyrFia6TAi2JDqutv/TL6n8NDn6tgXkX8lRvutdjFHrXjQ9QyJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Kyag1WVd; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1753463947;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mhNXg4Znv9oLyolvuPc9tKeQwr0BaKn0+lOoZWLaNX8=;
+	b=Kyag1WVd+0vMhq3FURU6eUKd/wFi5/ERY9FS58Hs0QfcjqWyJcviFM2igHnV7rRIjfJBEE
+	P9s/gc9mQEM5Bjb13jrJ7tIM21Kw/6XRCDAbgvibhHFq0C1FEZCsyjsZN0e+0MPyAYwu/a
+	NHAOQoZpAlp28FLceoIjqBgUFUT6kew=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-683-KHltYVInMjyuO3TSx3lsMw-1; Fri,
+ 25 Jul 2025 13:19:02 -0400
+X-MC-Unique: KHltYVInMjyuO3TSx3lsMw-1
+X-Mimecast-MFC-AGG-ID: KHltYVInMjyuO3TSx3lsMw_1753463941
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8749518001C6;
+	Fri, 25 Jul 2025 17:19:00 +0000 (UTC)
+Received: from [10.45.224.176] (unknown [10.45.224.176])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D76C9195608D;
+	Fri, 25 Jul 2025 17:18:56 +0000 (UTC)
+Message-ID: <ea9f9931-95d9-4f7d-abba-eb7fae408977@redhat.com>
+Date: Fri, 25 Jul 2025 19:18:55 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6502.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b4158f65-6fa2-43c3-7e95-08ddcb9ee5f6
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Jul 2025 17:15:47.9432
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: XXhQzy6s3ZHsM/KWQMSyyoPaqZfpjRGm31weiBs/ch202CLg7uFOOfMh6JFWCj1Mjr2uqT7n8ziYNyFekY/Xiw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB5058
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 0/5] dpll: zl3073x: Add support for devlink flash
+From: Ivan Vecera <ivecera@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>,
+ Prathosh Satish <Prathosh.Satish@microchip.com>, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Michal Schmidt <mschmidt@redhat.com>,
+ Petr Oros <poros@redhat.com>
+References: <20250725154136.1008132-1-ivecera@redhat.com>
+Content-Language: en-US
+In-Reply-To: <20250725154136.1008132-1-ivecera@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-> > @@ -1959,10 +1966,29 @@ static bool idpf_tx_clean_buf_ring(struct
-> idpf_tx_queue *txq, u16 compl_tag,
-> >  	};
-> >  	u16 ntc, orig_idx =3D idx;
-> >
-> > +	tx_buf =3D &txq->tx_buf[buf_id];
-> > +	if (tx_buf->type =3D=3D LIBETH_SQE_SKB) {
-> > +		if (skb_shinfo(tx_buf->skb)->tx_flags & SKBTX_IN_PROGRESS)
-> > +			idpf_tx_read_tstamp(txq, tx_buf->skb);
-> > +
-> > +		libeth_tx_complete(tx_buf, &cp);
-> > +		idpf_post_buf_refill(txq->refillq, buf_id);
-> > +	}
-> > +
-> > +	while (idpf_tx_buf_next(tx_buf) !=3D IDPF_TXBUF_NULL) {
-> > +		u16 buf_id =3D idpf_tx_buf_next(tx_buf);
-> > +
-> > +		tx_buf =3D &txq->tx_buf[buf_id];
-> > +		libeth_tx_complete(tx_buf, &cp);
-> > +		idpf_post_buf_refill(txq->refillq, buf_id);
-> > +	}
-> > +
-> > +	return true;
->=20
-> This is not a full review.
-> And I guess this is an artifact of the development of this patch-set.
+On 25. 07. 25 5:41 odp., Ivan Vecera wrote:
+> Add functionality for accessing device hardware registers, loading
+> firmware bundles, and accessing the device's internal flash memory,
+> and use it to implement the devlink flash functionality.
+> 
+> Patch breakdown:
+> Patch1: helpers to access hardware registers
+> Patch2: low level functions to access flash memory
+> Patch3: support to load firmware bundles
+> Patch4: refactoring device initialization and helper functions
+>          for stopping and resuming device normal operation
+> Patch5: devlink .flash_update callback implementation
+> 
+> Ivan Vecera (5):
+>    dpll: zl3073x: Add functions to access hardware registers
+>    dpll: zl3073x: Add low-level flash functions
+>    dpll: zl3073x: Add firmware loading functionality
+>    dpll: zl3073x: Refactor DPLL initialization
+>    dpll: zl3073x: Implement devlink flash callback
+> 
+>   Documentation/networking/devlink/zl3073x.rst |  14 +
+>   drivers/dpll/zl3073x/Makefile                |   2 +-
+>   drivers/dpll/zl3073x/core.c                  | 362 +++++++---
+>   drivers/dpll/zl3073x/core.h                  |  32 +
+>   drivers/dpll/zl3073x/devlink.c               |  92 ++-
+>   drivers/dpll/zl3073x/devlink.h               |   3 +
+>   drivers/dpll/zl3073x/flash.c                 | 674 +++++++++++++++++++
+>   drivers/dpll/zl3073x/flash.h                 |  29 +
+>   drivers/dpll/zl3073x/fw.c                    | 495 ++++++++++++++
+>   drivers/dpll/zl3073x/fw.h                    |  52 ++
+>   drivers/dpll/zl3073x/regs.h                  |  51 ++
+>   11 files changed, 1715 insertions(+), 91 deletions(-)
+>   create mode 100644 drivers/dpll/zl3073x/flash.c
+>   create mode 100644 drivers/dpll/zl3073x/flash.h
+>   create mode 100644 drivers/dpll/zl3073x/fw.c
+>   create mode 100644 drivers/dpll/zl3073x/fw.h
 
-Correct, it's removed in the final patch of the series, but I can remove it=
- in this patch instead. Will send a v3 shortly.
+Self nacked, need to fix warnings found by clang (not identified by
+gcc).
 
-Thanks!
-Josh=20
+Ivan
 
-> But the code in this function below this line appears to be unreachable.
->=20
-> Flagged by Smatch.
->=20
-> > +
-> >  	tx_buf =3D &txq->tx_buf[idx];
-> >
-> >  	if (unlikely(tx_buf->type <=3D LIBETH_SQE_CTX ||
-> > -		     idpf_tx_buf_compl_tag(tx_buf) !=3D compl_tag))
-> > +		     idpf_tx_buf_compl_tag(tx_buf) !=3D buf_id))
-> >  		return false;
-> >
-> >  	if (tx_buf->type =3D=3D LIBETH_SQE_SKB) {
->=20
-> ...
 
