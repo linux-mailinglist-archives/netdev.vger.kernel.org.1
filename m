@@ -1,155 +1,125 @@
-Return-Path: <netdev+bounces-210101-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210081-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CFBCB121AD
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 18:16:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 952C8B1217A
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 18:12:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A8B825407C9
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 16:15:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A9B441CC0EE0
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 16:12:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 604802F0C5E;
-	Fri, 25 Jul 2025 16:13:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E245A2EE606;
+	Fri, 25 Jul 2025 16:12:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="mmGwHMU5"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB58A2F005C
-	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 16:13:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50A792BB17
+	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 16:12:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753460026; cv=none; b=RMRCxlm4QXADZU9MIJCvVfLL+JuGIpyLw4vIw/d7Cn31ofCfYoQeLReeD5HCkgB2MFJ5C6W5UUTqGpXZlefbxmFPCAXSPpI26mFI+LeK1AfNXpzUErBEohhnrxPJs4HgGuKx0/T31vYdDUe5jPfGBOV+0PPitfbUFiX9YqPGeaQ=
+	t=1753459941; cv=none; b=ZehsP0Kf11t8L4wX8DjG0R7OMf/FjxTdYlV0CvA3jm36Z3B3IY5twguaH03RFwxP6T614vqntqc5MHPP0geRNaIQe5V5osdtn4Pn1JXD79A25etrfTRReY2N6MTEPYDVDSm2v1cgsGRVBw6wfTWE8jHCVYvIMVzz14aDlTOLWQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753460026; c=relaxed/simple;
-	bh=9KnqqFaFwDyZCZMWE+vUJz9uknZmucVEElwrEblaJ7k=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tIRr2elfF1YqmPIrQJnxyhTVfvfSOO9zIzlahzDdDPCCo2FYNyMWma47jYCHdydB2EfrXk/z9HwD5vSeX6oLSiAGgifXrEzDE8FhJJ27Ottcr8mnAhQdUxf93VUpTzePYSvrF52SOYLc2/hErGzbu1XsVwv8FjueeC/mdr3fM7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1ufL3F-0006ll-D6
-	for netdev@vger.kernel.org; Fri, 25 Jul 2025 18:13:41 +0200
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1ufL3B-00AFeq-2g
-	for netdev@vger.kernel.org;
-	Fri, 25 Jul 2025 18:13:37 +0200
-Received: from dspam.blackshift.org (localhost [127.0.0.1])
-	by bjornoya.blackshift.org (Postfix) with SMTP id 80E0F449910
-	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 16:13:37 +0000 (UTC)
-Received: from hardanger.blackshift.org (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by bjornoya.blackshift.org (Postfix) with ESMTPS id 0BCFE449851;
-	Fri, 25 Jul 2025 16:13:32 +0000 (UTC)
-Received: from blackshift.org (localhost [::1])
-	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 5ee017b6;
-	Fri, 25 Jul 2025 16:13:30 +0000 (UTC)
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	linux-can@vger.kernel.org,
-	kernel@pengutronix.de,
-	Jimmy Assarsson <extja@kvaser.com>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	Marc Kleine-Budde <mkl@pengutronix.de>
-Subject: [PATCH net-next 27/27] Documentation: devlink: add devlink documentation for the kvaser_usb driver
-Date: Fri, 25 Jul 2025 18:05:37 +0200
-Message-ID: <20250725161327.4165174-28-mkl@pengutronix.de>
-X-Mailer: git-send-email 2.47.2
-In-Reply-To: <20250725161327.4165174-1-mkl@pengutronix.de>
-References: <20250725161327.4165174-1-mkl@pengutronix.de>
+	s=arc-20240116; t=1753459941; c=relaxed/simple;
+	bh=9RXaPBzusmc4gEGjKmhFAjScsE/bdLvBPIpYISHdso8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ODWwAkcucMhQ+THCU+oHKhBmJZywXqZFo4y2X0pck2K3DiEHnSDlRs5mKPw34rotxf5SSgrvvzntYWI8heKgtghY5rbohfqgFD7Deh7wmdOlrjwq9vS11fue0asrzuCGwGCsMH1VvUQpo59XhDUdZaL/xdIFE9sDivsnhibUYls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=mmGwHMU5; arc=none smtp.client-ip=171.64.64.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
+	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
+	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
+	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=N/UH60VefhwxeSvSADQXBksC/DoLzJcerAXQ2HN65UE=; t=1753459940; x=1754323940; 
+	b=mmGwHMU5dCVdcDh8MceazdEI5rxEHpJ05I7zOsZRjSE7ptFyODKp9wzLIUGUu+xI/bltO6aUPfU
+	HhWK91JNeEcSh1/x0Wuy/aq1rm46l8LHSKYQXW1DFR9+Otg/Oen+y9kS9aL+BGIy9yHfi1NqJNc1n
+	Hb/NuJgLcV7bwWAagrUombLEKeVd8CLnVcTd30xkfvzZm5IPkrrmL2Q5G7sS9eJI9enSt7jWoT944
+	xIdXkSOwIGQbK1/iMXNoAmCcbbX8Kc1jedVNOBVcWSv8PRfbQ5Maw+Ufa0akfK+j4csYB1pxEI2kY
+	gTvGZqoEJHjI+Y58dcymBcdq32RZFiwsOrrA==;
+Received: from mail-oi1-f181.google.com ([209.85.167.181]:59397)
+	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.94.2)
+	(envelope-from <ouster@cs.stanford.edu>)
+	id 1ufL1v-0004U2-1q
+	for netdev@vger.kernel.org; Fri, 25 Jul 2025 09:12:19 -0700
+Received: by mail-oi1-f181.google.com with SMTP id 5614622812f47-41b357ba04fso1190822b6e.2
+        for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 09:12:19 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCU8hBRNA7fvHul0jwP8gvfdqjvgyDz4LmsfuR32z9EcvPTZXhdz3ytjDjPrYEJmw6fo1m+3yRY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzsyzqxtU5JvmeI//gGnMnbyK9gWqxsyI84i0WOdu5AJZQPTUZx
+	4hMXxp8TL+VIYO7xV5dJe5PBh4NIoZ+BjPcuQUwbzw+w8Ium4y4s1ute4fOcni4O6/sWi6Zqry3
+	u19me8agmHN+xNgq7QC6+kNIDkk4LzLM=
+X-Google-Smtp-Source: AGHT+IEk179aXI8m1oiZ1IDVWKK9FV196RLu72Vd6W77tsZkN0AxRDGBICODPViz2u3CkSFxH1sVgqbsxCKQN/DdZaw=
+X-Received: by 2002:a05:6808:1409:b0:401:e721:8b48 with SMTP id
+ 5614622812f47-42bb7eb8adamr1322760b6e.8.1753459938390; Fri, 25 Jul 2025
+ 09:12:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+References: <20250724184050.3130-15-ouster@cs.stanford.edu> <20250724194001.1623075-1-kuniyu@google.com>
+In-Reply-To: <20250724194001.1623075-1-kuniyu@google.com>
+From: John Ousterhout <ouster@cs.stanford.edu>
+Date: Fri, 25 Jul 2025 09:11:42 -0700
+X-Gmail-Original-Message-ID: <CAGXJAmysy06MEwRfdoYHiUO_CDi74TfU81kcmU77HZVy=Gdi+Q@mail.gmail.com>
+X-Gm-Features: Ac12FXwSeRpf8KaQYgY5WcRvYGpGH5zKM8RJAo3Nps1h665C1f-FVgtx7JAkQlo
+Message-ID: <CAGXJAmysy06MEwRfdoYHiUO_CDi74TfU81kcmU77HZVy=Gdi+Q@mail.gmail.com>
+Subject: Re: [PATCH net-next v12 14/15] net: homa: create homa_plumbing.c
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: edumazet@google.com, horms@kernel.org, kuba@kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Score: -1.0
+X-Scan-Signature: dcedbbeaec314583a5a6d4e37e27e533
 
-From: Jimmy Assarsson <extja@kvaser.com>
+On Thu, Jul 24, 2025 at 12:40=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.c=
+om> wrote:
+>
+> From: John Ousterhout <ouster@cs.stanford.edu>
+> Date: Thu, 24 Jul 2025 11:40:47 -0700
+> > diff --git a/net/homa/homa_plumbing.c b/net/homa/homa_plumbing.c
+> > new file mode 100644
+> > index 000000000000..694eb18cde00
+> > --- /dev/null
+> > +++ b/net/homa/homa_plumbing.c
+> > @@ -0,0 +1,1115 @@
+> > +// SPDX-License-Identifier: BSD-2-Clause
+>
+> IANAL, but I think this file is also licensed under GPL-2.0 from
+> the doc below (and as you state by MODULE_LICENSE()), so you
+> may want to follow other similar files throughout this series.
+>
+>   $ grep -rnI SPDX net | grep GPL | grep BSD
+>
+>
+> Documentation/process/license-rules.rst
+> ---8<---
+> The license described in the COPYING file applies to the kernel source
+> as a whole, though individual source files can have a different license
+> which is required to be compatible with the GPL-2.0::
+>
+>     GPL-1.0+  :  GNU General Public License v1.0 or later
+>     GPL-2.0+  :  GNU General Public License v2.0 or later
+>     LGPL-2.0  :  GNU Library General Public License v2 only
+>     LGPL-2.0+ :  GNU Library General Public License v2 or later
+>     LGPL-2.1  :  GNU Lesser General Public License v2.1 only
+>     LGPL-2.1+ :  GNU Lesser General Public License v2.1 or later
+>
+> Aside from that, individual files can be provided under a dual license,
+> e.g. one of the compatible GPL variants and alternatively under a
+> permissive license like BSD, MIT etc
 
-List the version information reported by the kvaser_usb driver
-through devlink.
+Thanks for pointing this out; I will switch the SPDX notices to dual-licens=
+e.
 
-Suggested-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Reviewed-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Signed-off-by: Jimmy Assarsson <extja@kvaser.com>
-Link: https://patch.msgid.link/20250725123452.41-12-extja@kvaser.com
-Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
----
- Documentation/networking/devlink/index.rst    |  1 +
- .../networking/devlink/kvaser_usb.rst         | 33 +++++++++++++++++++
- 2 files changed, 34 insertions(+)
- create mode 100644 Documentation/networking/devlink/kvaser_usb.rst
-
-diff --git a/Documentation/networking/devlink/index.rst b/Documentation/networking/devlink/index.rst
-index 053fbafeb491..270a65a01411 100644
---- a/Documentation/networking/devlink/index.rst
-+++ b/Documentation/networking/devlink/index.rst
-@@ -86,6 +86,7 @@ parameters, info versions, and other features it supports.
-    ice
-    ixgbe
-    kvaser_pciefd
-+   kvaser_usb
-    mlx4
-    mlx5
-    mlxsw
-diff --git a/Documentation/networking/devlink/kvaser_usb.rst b/Documentation/networking/devlink/kvaser_usb.rst
-new file mode 100644
-index 000000000000..403db3766cb4
---- /dev/null
-+++ b/Documentation/networking/devlink/kvaser_usb.rst
-@@ -0,0 +1,33 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+==========================
-+kvaser_usb devlink support
-+==========================
-+
-+This document describes the devlink features implemented by the
-+``kvaser_usb`` device driver.
-+
-+Info versions
-+=============
-+
-+The ``kvaser_usb`` driver reports the following versions
-+
-+.. list-table:: devlink info versions implemented
-+   :widths: 5 5 90
-+
-+   * - Name
-+     - Type
-+     - Description
-+   * - ``fw``
-+     - running
-+     - Version of the firmware running on the device. Also available
-+       through ``ethtool -i`` as ``firmware-version``.
-+   * - ``board.rev``
-+     - fixed
-+     - The device hardware revision.
-+   * - ``board.id``
-+     - fixed
-+     - The device EAN (product number).
-+   * - ``serial_number``
-+     - fixed
-+     - The device serial number.
--- 
-2.47.2
-
-
+-John-
 
