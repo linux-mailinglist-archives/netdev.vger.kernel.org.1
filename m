@@ -1,77 +1,68 @@
-Return-Path: <netdev+bounces-210079-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210087-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25E5BB1216B
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 18:00:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38956B12185
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 18:14:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5DE3B56747E
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 16:00:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 761A83B4E47
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 16:13:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DC881B423C;
-	Fri, 25 Jul 2025 16:00:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 330762EF664;
+	Fri, 25 Jul 2025 16:13:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 658E43BBF2;
-	Fri, 25 Jul 2025 16:00:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ED4D1F91C7
+	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 16:13:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753459247; cv=none; b=RCojA2wZ6w75PAWpzfpvnEspj9ZCyQxPYuEBumo4BXb6xx5pVGya4wqEIxTZVD/KVC8R+dR81gg8H90e2y0iUecwZZZLDih8Cmp3G0NCvE2hIeImwNckhl8fx1lgljagquOxF9U5SWcnJpPfX41LdIhGRcI3MnQai3SfZWPsZ1U=
+	t=1753460016; cv=none; b=Bq1Qp4y7MBspIKzBEp0/n0+LzOUsns2Mi1+8rt97ZdKaQcqaRCwBi0z/ywp8VOxlsYGjydFP8cytkuN1QJcPsg5N/NqHXkJxKF4kXqGTpR/T7pEHMn4gwHCHBW7CR3u93ldI4t6EC0eAz6mvJeloItci7zqS1+4X1uDBjaCHyr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753459247; c=relaxed/simple;
-	bh=prWjr9K00ZJsUjWTg+rkTJ++BeLBUFWBiznOta/T9qk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WJVYc7+JiFReP65BvpE3YeWoPWFb6tpvnvYNvbuNhaCXe4E9r9fEo26bfBQy5wNbS1sJZv8HFZ13F2MZJ7Lc3S3bKaO2rqoMfxmKoCgkcoQrtPBWDvw8RO6/ddpB9UITsMhqPa72uNf+1vfELjr6mOlnOvrfjzyQ6MMlq9xsNxU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-23c703c471dso35004935ad.0;
-        Fri, 25 Jul 2025 09:00:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753459244; x=1754064044;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=lXTvfXdoxQ19/qhuhRtwnHTLCuTQzyU8uZOOVdFHHus=;
-        b=aNOgpBLTS8ZJkdn5DMBucM4kihihM/EbqyP+LNd8nNtQeW0bJbH1Pw8sl9tVfMdErm
-         YF480t0HY+1tQjHyfL5JJi+wyVz8d2l49yV8wPen4UmQGb/P+3o+BplGDezqT9BPxJYX
-         5+WmQab2/9aGD0LStDu1HaW2+KYKJTtM65OHFRKR2+p/jzzjFsRaoEW+jgqz6KlRP347
-         bUgwk6uiEOMr6yHbBK0cgnVNFuiUET/qwN1Ph1bg4nSWyROCMuxvXewo/esKw3YiW7wM
-         G1UX0oQuXR5EX9XUf+C7wgjYxjrBsl8gqz1Lf4O0mr2xEr8LjzwzQ1FgDvV6e7IufsZt
-         vWPg==
-X-Forwarded-Encrypted: i=1; AJvYcCU2PFtfnEZnRmwznK71tZ4Tnsm2pO7pkYoypb7Vq9q5au2HtFiFeSPNwbJPknH4liL8UoH41uPReZmuoh8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YycqeW9/fb6W4B3h6ItHn1ZMzR86/2EwO0/k6aYyzo1jifOArmX
-	yTrIJSlmcN4wHCl+kQyDDBM2NfzeLK5TZxcIbU8+qfBbljo1yCtcbSfHSP6H
-X-Gm-Gg: ASbGncvBqZLmI67iTZ0lOsWgRxuqJIdZfLVhcyoYSS9AJX1JdQXsoiBKskI9kvVhMAM
-	p/LRrGVR/QTVrHe0LpXCeUZtL5Pmtl7mZGP/UTm96Pp4p+4UGcXX16W4l1AQjJnmcV38HoW/Bbe
-	7uIZsFJ//HSxFN9afgmBjqyBG8ia6YQ53cOn+vYJdIYUHm3sXim2IzBV8yk6LR/qFg8mdVquR7U
-	mvOHRgxnDLrxVc9P3rYxfGQ2mVi33rkjmiTBdMMf0d4HSACDU+0s4INj7c+uOkksSs367c321Zs
-	H516Qb1DieASBziUhCIPWgHFkyIFeTDHGFbYtMIyRHhDH5/BzE02TFyp18m8O8S5H1TE3zvxt/F
-	//djP0ypoM8VV+q+fxCWJ5/Snbe4Dq/jzy4/BSKJguMo1vk69d03gevXqdpk=
-X-Google-Smtp-Source: AGHT+IGOc/H3S/zpYhauczdcRY51PHmmK5Azhoc2BTLiyaUiDWayJtq7f2oFqLVsO2eBcCEHnURX0Q==
-X-Received: by 2002:a17:902:ef51:b0:231:c89f:4e94 with SMTP id d9443c01a7336-23fa5dac07dmr104253075ad.21.1753459244097;
-        Fri, 25 Jul 2025 09:00:44 -0700 (PDT)
-Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-23fbe512eadsm417215ad.129.2025.07.25.09.00.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Jul 2025 09:00:43 -0700 (PDT)
-From: Stanislav Fomichev <sdf@fomichev.me>
+	s=arc-20240116; t=1753460016; c=relaxed/simple;
+	bh=j82L5eJM8xAEdPCDnX3eC/lwWwMZcc06Zi4yUAoh3ZY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=m1RK4UiVEuCqt1P0RwPqT668nWuEXC+dMM4EPFvpCaopiFnmZ82ly4Zi+JwqqesY4X2kkyw3Vq005BxPb9Upts23njaaZzgCG6A7OfwWRUgHjt55ZpNlvdZhJfZkCcBI4zX/hdPvyWQXad6m5A29Bs2FePAd2UP6S1xcWeA2J9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1ufL35-0006U8-GI
+	for netdev@vger.kernel.org; Fri, 25 Jul 2025 18:13:31 +0200
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1ufL35-00AFUW-0l
+	for netdev@vger.kernel.org;
+	Fri, 25 Jul 2025 18:13:31 +0200
+Received: from dspam.blackshift.org (localhost [127.0.0.1])
+	by bjornoya.blackshift.org (Postfix) with SMTP id DFB4844982A
+	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 16:13:30 +0000 (UTC)
+Received: from hardanger.blackshift.org (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by bjornoya.blackshift.org (Postfix) with ESMTPS id B4DFC449805;
+	Fri, 25 Jul 2025 16:13:29 +0000 (UTC)
+Received: from blackshift.org (localhost [::1])
+	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id db26adcb;
+	Fri, 25 Jul 2025 16:13:28 +0000 (UTC)
+From: Marc Kleine-Budde <mkl@pengutronix.de>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
-	edumazet@google.com,
 	kuba@kernel.org,
-	pabeni@redhat.com,
-	dsahern@kernel.org,
-	andrew+netdev@lunn.ch,
-	linux-kernel@vger.kernel.org,
-	Ido Schimmel <idosch@nvidia.com>
-Subject: [PATCH net v3] vrf: Drop existing dst reference in vrf_ip6_input_dst
-Date: Fri, 25 Jul 2025 09:00:43 -0700
-Message-ID: <20250725160043.350725-1-sdf@fomichev.me>
-X-Mailer: git-send-email 2.50.1
+	linux-can@vger.kernel.org,
+	kernel@pengutronix.de
+Subject: [PATCH net-next 0/27] pull-request: can-next 2025-07-25
+Date: Fri, 25 Jul 2025 18:05:10 +0200
+Message-ID: <20250725161327.4165174-1-mkl@pengutronix.de>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,61 +70,122 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Commit ff3fbcdd4724 ("selftests: tc: Add generic erspan_opts matching support
-for tc-flower") started triggering the following kmemleak warning:
+Hello netdev-team,
 
-unreferenced object 0xffff888015fb0e00 (size 512):
-  comm "softirq", pid 0, jiffies 4294679065
-  hex dump (first 32 bytes):
-    00 00 00 00 00 00 00 00 40 d2 85 9e ff ff ff ff  ........@.......
-    41 69 59 9d ff ff ff ff 00 00 00 00 00 00 00 00  AiY.............
-  backtrace (crc 30b71e8b):
-    __kmalloc_noprof+0x359/0x460
-    metadata_dst_alloc+0x28/0x490
-    erspan_rcv+0x4f1/0x1160 [ip_gre]
-    gre_rcv+0x217/0x240 [ip_gre]
-    gre_rcv+0x1b8/0x400 [gre]
-    ip_protocol_deliver_rcu+0x31d/0x3a0
-    ip_local_deliver_finish+0x37d/0x620
-    ip_local_deliver+0x174/0x460
-    ip_rcv+0x52b/0x6b0
-    __netif_receive_skb_one_core+0x149/0x1a0
-    process_backlog+0x3c8/0x1390
-    __napi_poll.constprop.0+0xa1/0x390
-    net_rx_action+0x59b/0xe00
-    handle_softirqs+0x22b/0x630
-    do_softirq+0xb1/0xf0
-    __local_bh_enable_ip+0x115/0x150
+this is a pull request of 27 patches for net-next/main.
 
-vrf_ip6_input_dst unconditionally sets skb dst entry, add a call to
-skb_dst_drop to drop any existing entry.
+The first patch is by Khaled Elnaggar and converts the janz-ican3
+driver's fwinfo_show() to sysfs_emit().
 
-Cc: David Ahern <dsahern@kernel.org>
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
-Fixes: 9ff74384600a ("net: vrf: Handle ipv6 multicast and link-local addresses")
-Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
---
-v3: fix commit id
-v2: repost without the skb_dst_check
+Vincent Mailhol contributes 3 patches that first fix a warning in the
+ti_hecc driver and then add missing COMPILE_TEST more compile
+coverage to the ti_hecc and tscan1 driver.
+
+Randy Dunlap's patch let's the tscan1 driver depend on PC104.
+
+A patch by Luis Felipe Hernandez fixes a kernel-doc error in the
+ctucanfd driver.
+
+Jimmy Assarsson contributes 10 patches for the kvaser_pciefd and 11
+for the kvaser_usb driver. Both series simplify the identification of
+physical the CAN interfaces and add devlink support to get information
+about the running firmware.
+
+regards,
+Marc
+
 ---
- drivers/net/vrf.c | 2 ++
- 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/net/vrf.c b/drivers/net/vrf.c
-index 9a4beea6ee0c..3ccd649913b5 100644
---- a/drivers/net/vrf.c
-+++ b/drivers/net/vrf.c
-@@ -1302,6 +1302,8 @@ static void vrf_ip6_input_dst(struct sk_buff *skb, struct net_device *vrf_dev,
- 	struct net *net = dev_net(vrf_dev);
- 	struct rt6_info *rt6;
- 
-+	skb_dst_drop(skb);
-+
- 	rt6 = vrf_ip6_route_lookup(net, vrf_dev, &fl6, ifindex, skb,
- 				   RT6_LOOKUP_F_HAS_SADDR | RT6_LOOKUP_F_IFACE);
- 	if (unlikely(!rt6))
--- 
-2.50.1
+The following changes since commit 06baf9bfa6ca8db7d5f32e12e27d1dc1b7cb3a8a:
+
+  Merge branch 'tcp-receiver-changes' (2025-07-14 18:41:43 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can-next.git tags/linux-can-next-for-6.17-20250725
+
+for you to fetch changes up to ecd82dfb4ccdfab7ecafcdb02b3b388dbaff4396:
+
+  Merge patch series "can: kvaser_usb: Simplify identification of physical CAN interfaces" (2025-07-25 18:01:25 +0200)
+
+----------------------------------------------------------------
+linux-can-next-for-6.17-20250725
+
+----------------------------------------------------------------
+Jimmy Assarsson (21):
+      can: kvaser_pciefd: Add support to control CAN LEDs on device
+      can: kvaser_pciefd: Add support for ethtool set_phys_id()
+      can: kvaser_pciefd: Add intermediate variable for device struct in probe()
+      can: kvaser_pciefd: Store the different firmware version components in a struct
+      can: kvaser_pciefd: Store device channel index
+      can: kvaser_pciefd: Split driver into C-file and header-file.
+      can: kvaser_pciefd: Add devlink support
+      can: kvaser_pciefd: Expose device firmware version via devlink info_get()
+      can: kvaser_pciefd: Add devlink port support
+      Documentation: devlink: add devlink documentation for the kvaser_pciefd driver
+      can: kvaser_usb: Add support to control CAN LEDs on device
+      can: kvaser_usb: Add support for ethtool set_phys_id()
+      can: kvaser_usb: Assign netdev.dev_port based on device channel index
+      can: kvaser_usb: Add intermediate variables
+      can: kvaser_usb: Move comment regarding max_tx_urbs
+      can: kvaser_usb: Store the different firmware version components in a struct
+      can: kvaser_usb: Store additional device information
+      can: kvaser_usb: Add devlink support
+      can: kvaser_usb: Expose device information via devlink info_get()
+      can: kvaser_usb: Add devlink port support
+      Documentation: devlink: add devlink documentation for the kvaser_usb driver
+
+Khaled Elnaggar (1):
+      can: janz-ican3: use sysfs_emit() in fwinfo_show()
+
+Luis Felipe Hernandez (1):
+      docs: Fix kernel-doc error in CAN driver
+
+Marc Kleine-Budde (3):
+      Merge patch series "can: Kconfig: add missing COMPILE_TEST"
+      Merge patch series "can: kvaser_pciefd: Simplify identification of physical CAN interfaces"
+      Merge patch series "can: kvaser_usb: Simplify identification of physical CAN interfaces"
+
+Randy Dunlap (1):
+      can: tscan1: CAN_TSCAN1 can depend on PC104
+
+Vincent Mailhol (3):
+      can: ti_hecc: fix -Woverflow compiler warning
+      can: ti_hecc: Kconfig: add COMPILE_TEST
+      can: tscan1: Kconfig: add COMPILE_TEST
+
+ Documentation/networking/devlink/index.rst         |   2 +
+ Documentation/networking/devlink/kvaser_pciefd.rst |  24 ++++
+ Documentation/networking/devlink/kvaser_usb.rst    |  33 +++++
+ drivers/net/can/Kconfig                            |   3 +-
+ drivers/net/can/Makefile                           |   2 +-
+ drivers/net/can/ctucanfd/ctucanfd_base.c           |  11 +-
+ drivers/net/can/janz-ican3.c                       |   2 +-
+ drivers/net/can/kvaser_pciefd/Makefile             |   3 +
+ drivers/net/can/kvaser_pciefd/kvaser_pciefd.h      |  96 ++++++++++++++
+ .../kvaser_pciefd_core.c}                          | 144 ++++++++++-----------
+ .../net/can/kvaser_pciefd/kvaser_pciefd_devlink.c  |  60 +++++++++
+ drivers/net/can/sja1000/Kconfig                    |   2 +-
+ drivers/net/can/ti_hecc.c                          |   2 +-
+ drivers/net/can/usb/Kconfig                        |   1 +
+ drivers/net/can/usb/kvaser_usb/Makefile            |   2 +-
+ drivers/net/can/usb/kvaser_usb/kvaser_usb.h        |  33 ++++-
+ drivers/net/can/usb/kvaser_usb/kvaser_usb_core.c   | 139 ++++++++++++++------
+ .../net/can/usb/kvaser_usb/kvaser_usb_devlink.c    |  87 +++++++++++++
+ drivers/net/can/usb/kvaser_usb/kvaser_usb_hydra.c  |  65 +++++++++-
+ drivers/net/can/usb/kvaser_usb/kvaser_usb_leaf.c   |  75 ++++++++++-
+ 20 files changed, 655 insertions(+), 131 deletions(-)
+ create mode 100644 Documentation/networking/devlink/kvaser_pciefd.rst
+ create mode 100644 Documentation/networking/devlink/kvaser_usb.rst
+ create mode 100644 drivers/net/can/kvaser_pciefd/Makefile
+ create mode 100644 drivers/net/can/kvaser_pciefd/kvaser_pciefd.h
+ rename drivers/net/can/{kvaser_pciefd.c => kvaser_pciefd/kvaser_pciefd_core.c} (96%)
+ create mode 100644 drivers/net/can/kvaser_pciefd/kvaser_pciefd_devlink.c
+ create mode 100644 drivers/net/can/usb/kvaser_usb/kvaser_usb_devlink.c
 
 
