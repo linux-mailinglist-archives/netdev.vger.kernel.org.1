@@ -1,119 +1,86 @@
-Return-Path: <netdev+bounces-210192-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210193-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04197B124B2
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 21:21:55 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 413C9B1250F
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 22:04:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B07A43A9AE0
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 19:21:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 59D7B7A7BCE
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 20:03:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57F8C2517A5;
-	Fri, 25 Jul 2025 19:21:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A017D2528E1;
+	Fri, 25 Jul 2025 20:04:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b="xwrVJ/ak"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q6q+i5BC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-0301.mail-europe.com (mail-0301.mail-europe.com [188.165.51.139])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C22BA205E2F
-	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 19:21:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.165.51.139
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B7C324DCEA;
+	Fri, 25 Jul 2025 20:04:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753471312; cv=none; b=Nq40/Und0NqY4uvLTRnPxlkqWdI4XhMJdHXI+9TT2swMx6srg2AFMyT48+clBvDNd+xDzor8fmkjvNeQzybH59S6GxchHqgR4djmFN3dYLmDHKvv9CXbIZpVGgtvhRur2zN1lDMEyB6hULRk7KYVjp9EaO/uL7QIf8l4WxPX3Yk=
+	t=1753473873; cv=none; b=SYD3bv4aIl4LWHD0KUMo6MKmggABCgVfaAUjkWXjfvCitOL0O8Gpb7BE8wBEa/PB9vzthKoRADtVzLp5RQ+7bsW8kWOTcWvgSqSCvo4qNxemmZU4dxSLBIFYsxF2Dlpjh8DdRZPDsbHew6hCKWdpfE9/S2z1sVc5CjubiDWPSis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753471312; c=relaxed/simple;
-	bh=z6PcWEJcpz+Y9HsDjmffpjbj649cVvM+W7dR2X9ghBM=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QtFL0hD6yqbjXdyWVXzQJTRqrG0UmTKutFOsI/uqF12aHH9UUvjIfJzSwhWKtra2LMYPlXmObDdz2cU4PW8lsZVkEqkOytJpg1ZAMhYpuPjUyYrIh5GpfvCKfAjr4y98tCVEDot74tYl0i+2ky4qG5XmatDLZLj0XfqJiHNkJEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io; spf=pass smtp.mailfrom=willsroot.io; dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b=xwrVJ/ak; arc=none smtp.client-ip=188.165.51.139
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=willsroot.io
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=willsroot.io;
-	s=protonmail2; t=1753471291; x=1753730491;
-	bh=z6PcWEJcpz+Y9HsDjmffpjbj649cVvM+W7dR2X9ghBM=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=xwrVJ/akmgVhfwjUH1TJzL/z8W3cHDf/kz8IbAE3t3iFa7Fw6vV5R6Ci9GXWzs8Qr
-	 UICJmdsF2MXKXMVM4MjJZVfPCZ0a60H2pQoMfqOmGQoitvR8V16t5iRfvRNRxv6aCB
-	 Dqr6Hs4SshNIgzUrupPMzHfn4GjK+ymjkIn+E2c27P7kxueXMHfbUkI1CDGAg2IumC
-	 o7+3l+629uQT1A8teNNP5W4ZJ8sCsieP3omy+Dn9SlDBgbivEOokCthloIdqHWcBYz
-	 O8wfHxPUg/z22Pg59jCYd9A1i4UZ2s2sDku7TdgVxqPDqnrLMBhMWN02teZqaDaDbS
-	 bvQZn9GVTGh1Q==
-Date: Fri, 25 Jul 2025 19:21:25 +0000
-To: Cong Wang <xiyou.wangcong@gmail.com>
-From: William Liu <will@willsroot.io>
-Cc: netdev@vger.kernel.org, jhs@mojatatu.com, pabeni@redhat.com, kuba@kernel.org, jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, horms@kernel.org, savy@syst3mfailure.io
-Subject: Re: [PATCH net v2 1/2] net/sched: Fix backlog accounting in qdisc_dequeue_internal
-Message-ID: <hx253TcI4I55RNMXolN6TJgZIJDge0mfDHoTzM4x69-mZwEL-AGh3pXbhRcWhbKaCitqPL8ljB74UTpyxyduNSpBjPR0wSFBAdRNvv7Tgoc=@willsroot.io>
-In-Reply-To: <aIPTTxhfC519+cdr@pop-os.localdomain>
-References: <20250724165507.20789-1-will@willsroot.io> <aIPTTxhfC519+cdr@pop-os.localdomain>
-Feedback-ID: 42723359:user:proton
-X-Pm-Message-ID: e331be3e89d203215569377454ba4ac485f97123
+	s=arc-20240116; t=1753473873; c=relaxed/simple;
+	bh=j2xP2YzjEhO/30DThbGEpUholDVj1payjvPb0Iem0lw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=THM8mAhDgVpKyy2OVS8aztkDs/NmJY+W2XIOPn5zrRzk1ZnoDDYX7gKNIbt3PXRaSJdrvZ68/mLAlZYsoJjxi1c221JqCw32kTJlA3pHpqpmIPX7XWA/S/mOAVqhhtyfi8DlCmHzYw1Qt0aCvrgW3dtrLYyja/f7/ffhoHFvRGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q6q+i5BC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE636C4CEE7;
+	Fri, 25 Jul 2025 20:04:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753473872;
+	bh=j2xP2YzjEhO/30DThbGEpUholDVj1payjvPb0Iem0lw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Q6q+i5BCLBcSN/DYiQwjJAei6Lyf2boWZMGLisUGWhnTSvhjllyce7I9bQP1hszi5
+	 1X7bklybM3GzS9ckn8txmcbWhAlejexAonWa4/7EgzxQn6dTAYmhNXwgS7umhARiWS
+	 pFlj48Du8XGZ1dVczH7C877p+MLFOPjgfaACzIDFELxaXf/+ZFhWjQpw4N9Iz2UR09
+	 5o1082nlM58UCjjElqObxvGtLQ4Wmz/O5BpA+etRU4QQZ/TTtKLH+uxyxuXMEOOTzr
+	 lGRoV9oncbE22SjmSwwDl5iH/Z2iazqq6aOhhx2cUk0xCZ8JdpXu95RDNsh6YlKpm2
+	 lkpKe2UV76yEQ==
+Date: Fri, 25 Jul 2025 15:04:31 -0500
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: Kyle Hendry <kylehendrydev@gmail.com>
+Cc: jonas.gorski@gmail.com, netdev@vger.kernel.org,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	linux-kernel@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, noltari@gmail.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	Russell King <linux@armlinux.org.uk>, devicetree@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Conor Dooley <conor+dt@kernel.org>
+Subject: Re: [PATCH net-next v2 2/7] dt-bindings: net: dsa: b53: Document
+ brcm,gpio-ctrl property
+Message-ID: <175347387153.1759527.1350037540423103055.robh@kernel.org>
+References: <20250724035300.20497-1-kylehendrydev@gmail.com>
+ <20250724035300.20497-3-kylehendrydev@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250724035300.20497-3-kylehendrydev@gmail.com>
 
-On Friday, July 25th, 2025 at 6:56 PM, Cong Wang <xiyou.wangcong@gmail.com>=
- wrote:
 
->=20
->=20
-> On Thu, Jul 24, 2025 at 04:55:27PM +0000, William Liu wrote:
->=20
-> > diff --git a/net/sched/sch_fq_codel.c b/net/sched/sch_fq_codel.c
-> > index 2a0f3a513bfa..f9e6d76a1712 100644
-> > --- a/net/sched/sch_fq_codel.c
-> > +++ b/net/sched/sch_fq_codel.c
-> > @@ -286,6 +286,10 @@ static struct sk_buff *fq_codel_dequeue(struct Qdi=
-sc *sch)
-> > struct fq_codel_flow *flow;
-> > struct list_head *head;
-> >=20
-> > + /* reset these here, as change needs them for proper accounting*/
-> > + q->cstats.drop_count =3D 0;
-> > + q->cstats.drop_len =3D 0;
-> > +
-> > begin:
-> > head =3D &q->new_flows;
-> > if (list_empty(head)) {
-> > @@ -319,8 +323,6 @@ static struct sk_buff *fq_codel_dequeue(struct Qdis=
-c *sch)
-> > if (q->cstats.drop_count) {
-> > qdisc_tree_reduce_backlog(sch, q->cstats.drop_count,
-> > q->cstats.drop_len);
-> > - q->cstats.drop_count =3D 0;
-> > - q->cstats.drop_len =3D 0;
->=20
->=20
->=20
-> Is this change really necessary? This could impact more than just the "sh=
-rinking
-> to the limit" code path. We need to minimize the the impact of the patch =
-since it
-> is targeting -net and -stable.
->=20
-> The rest looks good to me.
->=20
-> Thanks for your patch!
+On Wed, 23 Jul 2025 20:52:41 -0700, Kyle Hendry wrote:
+> Add description for bcm63xx gpio-ctrl phandle which allows
+> access to registers that control phy functionality.
+> 
+> Signed-off-by: Kyle Hendry <kylehendrydev@gmail.com>
+> ---
+>  Documentation/devicetree/bindings/net/dsa/brcm,b53.yaml | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
 
-I think so, else qdisc_tree_reduce_backlog after the code path for shrinkin=
-g to the limit would have incorrect arguments if the drop path ever happens=
- inside fq_codel_dequeue, which qdisc_dequeue_internal uses on an empty gso=
-_skb.
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
 
-The alternative is to add additional book-keeping fields in the struct for =
-this one case, but I don't see cstats.drop_len or cstats.drop_count used el=
-sewhere.
-
-Best,
-Will
 
