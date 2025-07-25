@@ -1,130 +1,200 @@
-Return-Path: <netdev+bounces-210077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210078-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9C12B1214A
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 17:49:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3847B12158
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 17:54:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4430F7A453C
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 15:48:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B9651CC695E
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 15:55:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63E0F2EE604;
-	Fri, 25 Jul 2025 15:49:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F6F42EE97B;
+	Fri, 25 Jul 2025 15:54:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="p3bhAtN9";
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="d8ZFYSFq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uBaWn3/Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0EEF2BB17;
-	Fri, 25 Jul 2025 15:49:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D01EBAD2C;
+	Fri, 25 Jul 2025 15:54:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753458568; cv=none; b=c3+BS2ETnDf5fJjFQ7bzvxnz0ksqIBIACaCyXJsA+Y12SaO3zHoXtMM0Gwlt4KvjUzhEO1xCREVltveqP8WsetAmcUOgsGxeoE0vzj3Th0tw8D17DAvC75Hd7lRduD0N3YaJMgaMTvz63H8Qnac+eYZdK57le7opKs4/C6rEaRQ=
+	t=1753458886; cv=none; b=bdHep8na5sfKG2bXsfvl5nliDVlQoMr151WF4J6YadczPqK4Ur4RmuLnDb2+1DfphnjHJciC9T+Zq1j/mU1NkhAQdyYutvmDqWq0mjXRXtJ9YiaR42Er/ATZR5nEuhacTdoi8ksvBxe8aXYLAiP5YKeNDGQcArJt9yT5XYNwpp4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753458568; c=relaxed/simple;
-	bh=WIbcDd2hBVWPw5liwDAnKhJorrg6SMWEsW4UWntHIjc=;
+	s=arc-20240116; t=1753458886; c=relaxed/simple;
+	bh=xG/OsJ4RBMjiH7Ek0IeepUFOX5x1inIciVmtdhWccpI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EtH4aP11mKJeUDL5T1fOWzwLWt45dwYfehvvOBNyg9sCZiCvyWJhSfLnMj5PfY4FLWwOia9jckGUyZuzw6FqZ9JONVK5yzIKGGxnN79GQLusbI2YNl8rn8q1sXD4T1KVxk1pPn5UFcVkWSlX647q3ZNinjP1sKdWi/oogQFCoqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=p3bhAtN9; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=d8ZFYSFq; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: by mail.netfilter.org (Postfix, from userid 109)
-	id B4E0A60264; Fri, 25 Jul 2025 17:49:23 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1753458563;
-	bh=hkOlR1Au5kRDU/srz9QZOpj+qDOVeKRe1xam/M4NP7Y=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=BFnGd5eNj3rYWcAjJRREogN9JjjgZc7QMKZUqM98FR4ccZTIJ/Bv+A8TfwUppMDIzjxPgK1Fxww+/4eOdS74wEkhp8/zIOsbqRybX3MuWETeag6IvrqNakgKD7AiYAaovKAbR1sIBKodfYfSqcXDiFZ/WPf53BXFdTvUw4kBZfI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uBaWn3/Q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0F67C4CEEB;
+	Fri, 25 Jul 2025 15:54:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753458886;
+	bh=xG/OsJ4RBMjiH7Ek0IeepUFOX5x1inIciVmtdhWccpI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=p3bhAtN9DUX5KKUkRWHkWtPSC27WfJVZ/Oeb1lpTK0mo/qRxU1fBv04Ekd2znf0Ds
-	 b+5QOfJl1Z72CL8j8ZgFtZNcdCD7WbMu5OnlgPeTKSB5uUW3T/5WVbK/O+5GyU/Bg8
-	 LOwRBHGIiV9yMkXB+g9/FUm++xBcCnMyceSsYlxE41MZhRxXM//FVOTmQO5URrfCtF
-	 wetz7PLj8nCPZLuSWzSRTmAy2UlUepmIdl1jJ0ZYiUiFApzunfRb8ZTGnriIbjG8hc
-	 yOwito7Tw/xVJAdKDRKveovUjuoCMKXOcrb0ugRYpvLRYwCaxmaTYhlnK9Nd06roSd
-	 HtUYZ44R+hwuQ==
-X-Spam-Level: 
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with ESMTPSA id C8936600B5;
-	Fri, 25 Jul 2025 17:49:20 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1753458561;
-	bh=hkOlR1Au5kRDU/srz9QZOpj+qDOVeKRe1xam/M4NP7Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=d8ZFYSFq7eEgDxamrmyFRPNOZP4BsSxxqck3uaceJW1oA9Apk9Du1uTCjyAL80fNc
-	 jizgkT2UzqkZlz00wcl76MyHbPXPQQN4wfCCx5JeZAI0rq1o2GTIt4EgRr8Sy9idMS
-	 fm/lerRSgVFNy8A0jZwcpgAJOjmmhnoD+PVZyTADfgn8lxAk3GnkeFYKCmilPZjDwp
-	 rqPcNky5PXOkwLa3VPt9FU4POIqBXX0UXlr2cvOp6ZGB88XUHRAGBTxEUBrJqjMv15
-	 2umcShPHdzpqBCJvG7swfUSBPj/jkJR6EK8+xNdTqcGcpMdbws0aOWi5c2RjX6ttsJ
-	 cIrwzuy8uNdeQ==
-Date: Fri, 25 Jul 2025 17:49:17 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: syzbot <syzbot+a225fea35d7baf8dbdc3@syzkaller.appspotmail.com>
-Cc: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com,
-	horms@kernel.org, kadlec@netfilter.org, kuba@kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	netfilter-devel@vger.kernel.org, pabeni@redhat.com,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [netfilter?] WARNING in nft_socket_init (2)
-Message-ID: <aIOnfc06qpphQqZs@calendula>
-References: <68837ca6.a00a0220.2f88df.0053.GAE@google.com>
+	b=uBaWn3/Q51Wwky6sepxHfcP+qTHXyvswkD8viZdlu3x9xc8bywF1CfxoOxSRV6qEE
+	 YjXpGOJXm2SVFwtl8YsoHc3nx1xJUJwE2J34Conodh7TE1Tnm2lFZUwaXn3xxAR4pk
+	 tkdIE39he7V3H2rqUPH+QVD5FI9DHI/D2WU2dIhsfvlHfevegQjDPcZvhD+xjEcw6u
+	 GbUgL5yNruK5/YD3GIr8V8HeGIaypxFfXpmlPxG6xmwI9WzHbPHeCFliDKLrN3nT/1
+	 BAWcQ94lGL16YzqpfHBpMXBrWobaGyAZ6vhVS9gddpDMYEIhzbPjO7RF/ohL8SmIKM
+	 vQuomxcJbmVRg==
+Date: Fri, 25 Jul 2025 16:54:40 +0100
+From: Simon Horman <horms@kernel.org>
+To: Lukasz Majewski <lukma@denx.de>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	Stefan Wahren <wahrenst@gmx.net>
+Subject: Re: [net-next v16 06/12] net: mtip: Add net_device_ops functions to
+ the L2 switch driver
+Message-ID: <20250725155440.GF1367887@horms.kernel.org>
+References: <20250724223318.3068984-1-lukma@denx.de>
+ <20250724223318.3068984-7-lukma@denx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="kX7Dfd+oWmQp+3k+"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <68837ca6.a00a0220.2f88df.0053.GAE@google.com>
+In-Reply-To: <20250724223318.3068984-7-lukma@denx.de>
 
-
---kX7Dfd+oWmQp+3k+
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-
-On Fri, Jul 25, 2025 at 05:46:30AM -0700, syzbot wrote:
-> Hello,
+On Fri, Jul 25, 2025 at 12:33:12AM +0200, Lukasz Majewski wrote:
+> This patch provides callbacks for struct net_device_ops for MTIP
+> L2 switch.
 > 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    94619ea2d933 Merge tag 'ipsec-next-2025-07-23' of git://gi..
-> git tree:       net-next
-> console+strace: https://syzkaller.appspot.com/x/log.txt?x=14bf10a2580000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=ceda48240b85ec34
-> dashboard link: https://syzkaller.appspot.com/bug?extid=a225fea35d7baf8dbdc3
-> compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12bf10a2580000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13d27fd4580000
-> 
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/afd64d9816ee/disk-94619ea2.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/e1755ce1f83b/vmlinux-94619ea2.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/2061dff2fbf4/bzImage-94619ea2.xz
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+a225fea35d7baf8dbdc3@syzkaller.appspotmail.com
+> Signed-off-by: Lukasz Majewski <lukma@denx.de>
 
-Attached patch should fix this.
+...
 
---kX7Dfd+oWmQp+3k+
-Content-Type: text/x-diff; charset=utf-8
-Content-Disposition: attachment; filename="fix.patch"
+> +static netdev_tx_t mtip_start_xmit_port(struct sk_buff *skb,
+> +					struct net_device *dev, int port)
+> +{
+> +	struct mtip_ndev_priv *priv = netdev_priv(dev);
+> +	struct switch_enet_private *fep = priv->fep;
+> +	unsigned short status;
+> +	struct cbd_t *bdp;
+> +	void *bufaddr;
+> +
+> +	spin_lock_bh(&fep->hw_lock);
+> +
+> +	if (!fep->link[0] && !fep->link[1]) {
+> +		/* Link is down or autonegotiation is in progress. */
+> +		netif_stop_queue(dev);
+> +		spin_unlock_bh(&fep->hw_lock);
+> +		return NETDEV_TX_BUSY;
+> +	}
+> +
+> +	/* Fill in a Tx ring entry */
+> +	bdp = fep->cur_tx;
+> +	status = bdp->cbd_sc;
+> +
+> +	if (status & BD_ENET_TX_READY) {
+> +		/* All transmit buffers are full. Bail out.
+> +		 * This should not happen, since dev->tbusy should be set.
+> +		 */
+> +		netif_stop_queue(dev);
+> +		dev_err_ratelimited(&fep->pdev->dev, "%s: tx queue full!.\n",
+> +				    dev->name);
+> +		spin_unlock(&fep->hw_lock);
 
-diff --git a/net/netfilter/nft_socket.c b/net/netfilter/nft_socket.c
-index 35d0409b0095..36affbb697c2 100644
---- a/net/netfilter/nft_socket.c
-+++ b/net/netfilter/nft_socket.c
-@@ -217,7 +217,7 @@ static int nft_socket_init(const struct nft_ctx *ctx,
- 
- 		level += err;
- 		/* Implies a giant cgroup tree */
--		if (WARN_ON_ONCE(level > 255))
-+		if (level > 255)
- 			return -EOPNOTSUPP;
- 
- 		priv->level = level;
+Sorry be the one to point out this needle in a haystack,
+but this should be spin_unlock_bh()
 
---kX7Dfd+oWmQp+3k+--
+Flagged by Smatch.
+
+> +		return NETDEV_TX_BUSY;
+> +	}
+> +
+> +	/* Clear all of the status flags */
+> +	status &= ~BD_ENET_TX_STATS;
+> +
+> +	/* Set buffer length and buffer pointer */
+> +	bufaddr = skb->data;
+> +	bdp->cbd_datlen = skb->len;
+> +
+> +	/* On some FEC implementations data must be aligned on
+> +	 * 4-byte boundaries. Use bounce buffers to copy data
+> +	 * and get it aligned.spin
+> +	 */
+> +	if ((unsigned long)bufaddr & MTIP_ALIGNMENT) {
+> +		unsigned int index;
+> +
+> +		index = bdp - fep->tx_bd_base;
+> +		memcpy(fep->tx_bounce[index], skb->data, skb->len);
+> +		bufaddr = fep->tx_bounce[index];
+> +	}
+> +
+> +	if (fep->quirks & FEC_QUIRK_SWAP_FRAME)
+> +		swap_buffer(bufaddr, skb->len);
+> +
+> +	/* Push the data cache so the CPM does not get stale memory
+> +	 * data.
+> +	 */
+> +	bdp->cbd_bufaddr = dma_map_single(&fep->pdev->dev, bufaddr,
+> +					  MTIP_SWITCH_TX_FRSIZE,
+> +					  DMA_TO_DEVICE);
+> +	if (unlikely(dma_mapping_error(&fep->pdev->dev, bdp->cbd_bufaddr))) {
+> +		dev_err(&fep->pdev->dev,
+> +			"Failed to map descriptor tx buffer\n");
+> +		dev->stats.tx_dropped++;
+> +		dev_kfree_skb_any(skb);
+> +		goto err;
+> +	}
+> +
+> +	/* Save skb pointer. */
+> +	fep->tx_skbuff[fep->skb_cur] = skb;
+> +	fep->skb_cur = (fep->skb_cur + 1) & TX_RING_MOD_MASK;
+> +
+> +	/* Send it on its way.  Tell FEC it's ready, interrupt when done,
+> +	 * it's the last BD of the frame, and to put the CRC on the end.
+> +	 */
+> +
+> +	status |= (BD_ENET_TX_READY | BD_ENET_TX_INTR | BD_ENET_TX_LAST |
+> +		   BD_ENET_TX_TC);
+> +
+> +	/* Synchronize all descriptor writes */
+> +	wmb();
+> +	bdp->cbd_sc = status;
+> +
+> +	skb_tx_timestamp(skb);
+> +
+> +	/* Trigger transmission start */
+> +	writel(MCF_ESW_TDAR_X_DES_ACTIVE, fep->hwp + ESW_TDAR);
+> +
+> +	dev->stats.tx_bytes += skb->len;
+> +	/* If this was the last BD in the ring,
+> +	 * start at the beginning again.
+> +	 */
+> +	if (status & BD_ENET_TX_WRAP)
+> +		bdp = fep->tx_bd_base;
+> +	else
+> +		bdp++;
+> +
+> +	if (bdp == fep->dirty_tx) {
+> +		fep->tx_full = 1;
+> +		netif_stop_queue(dev);
+> +	}
+> +
+> +	fep->cur_tx = bdp;
+> + err:
+> +	spin_unlock_bh(&fep->hw_lock);
+> +
+> +	return NETDEV_TX_OK;
+> +}
+
+...
 
