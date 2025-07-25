@@ -1,175 +1,509 @@
-Return-Path: <netdev+bounces-210173-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210181-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A02D5B123C2
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 20:28:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F6D0B1242A
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 20:39:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 628533B95CB
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 18:28:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C10D21898C5E
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 18:39:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 292642472B5;
-	Fri, 25 Jul 2025 18:28:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D91C1DF247;
+	Fri, 25 Jul 2025 18:38:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zcn4GCaG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f77.google.com (mail-io1-f77.google.com [209.85.166.77])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57E7124728F
-	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 18:28:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.77
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6666A2417DE
+	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 18:38:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753468117; cv=none; b=PmMPad7SJMq+nq4Rxs+LhC9OUnY2x5mLQyVrgqbNnl/ADOYV+s2MnjFZqvnG87WmnUKtSQg8Ig1gtgyPZ7R/mdwPNSs9lV3avJnFyvPYNgMkPR/lf8PGUv5LJ2aHxj9KEdi0oHV94vNxvR70Jh64it5lWXgL09c+Me6PwXqJwjo=
+	t=1753468725; cv=none; b=EYRLrZHYbVeu2ZG+vLFsnzF3SHqlqqxpoEl67LKm6oZkOkBosL3lC5d1fAHT59LxYYWpryLVT7G0kcn3S/6gc5T2RMYm6GHLBaD9TL6+kNid0OcdgdiYjWTogwEuwQaM/+hLJz8ZDBLFIreHchu86cte2uRZdYh24typTbGzGcc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753468117; c=relaxed/simple;
-	bh=ouzsgk+19QmaRO9pKjJbgZ+UqbuwEfzKidBzOU/dHWo=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=rrPEnK9tTVbPp3tJNyMCMqQG4cHEVF5Nd0DM1e0fRDZMMmLcLqJclHrcrzM1BY/62sAi+6J6M3sRMvpXz3PhNQvr2PUvr/WLTLUKNKNp2wyjWHyL0yZiIEW3caHhyW9uVmn67AjcI3ATn202B6L5NUPOeX0O+5Ks4Z5iLkJaEWc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f77.google.com with SMTP id ca18e2360f4ac-86d1218df67so263892939f.1
-        for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 11:28:35 -0700 (PDT)
+	s=arc-20240116; t=1753468725; c=relaxed/simple;
+	bh=ZeGfMMRhTnAG2ctNVuCX1noxNGJYbnkcz1g3/yd2XdU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=eiQTaYXGnnPBvY5CXnG26YHcwEBhhLaKYVuJwaVUX2QtnjQP+kzpYTrRGuk09U+Gfnry+K3iWnL1Hr57GYWj+de4fX3oyAXxgm3sjBeKZU/TTo3K9IVIa5AJfSRV8l9ygmjaGgTLEl1hwwucPQgQWgMwhW2ytLANItLZLy//CFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--cmllamas.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zcn4GCaG; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--cmllamas.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-23fba8fd56bso2665075ad.2
+        for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 11:38:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1753468723; x=1754073523; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=hERtp2g6Pc7QoTZ98mMyXxU41JG0va0Re9zNA1XThII=;
+        b=zcn4GCaGT2kLhYWeca0zbOccYioV/CxH+cfRs9RPQPvp9jdoNxSQqPsPXp7fFuVunr
+         xfuunE32gq3tTVkc4KhiX2gGoxH6AEAqif0M6yHs4kfdA3SdgZglAxMv0d9gqQKJl0Al
+         pcTKLD0yHHULukaDJpUGII52RFHuE6yQ+cAztXficfHemKlvUoH9Dp9/ny7nXM29Yq27
+         QWBNqJ4+oM1ersI4wf7k0bfbWyaRwHTcfgvO18icxIXYvJXK0r1Orb6oaRAAgHS6De5n
+         zYquv4oQfMfFDvZyhKwvApOKjkKgA/rP0l1tNQsW+iLprzNV39ONK9lJjBJWCvVzyHSg
+         4o5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753468114; x=1754072914;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pipXtIEWEhRvtnHJ7xlpV/XMoRV9BNZ+hdAoR8pES7Y=;
-        b=aLfanIhRs7BDmkMP6K11cbj4e8O9gNs+8SQ+i/BBch1T5qBgBIdrDhxJ0RG9Yb5MsM
-         MwL8i2ZDAbTxIhCUu9qNDMm4t8C7LG0Pir6xcRe1CRBun9qPuzX+RfIwpb4bGbGkSrI2
-         aX1c5AGKZxZfnVhrpMmk4fQj8NJzsWaRXCxTnX6RS90DwTxUSHC5r1BFiFqCepRZY4s7
-         SMiN4yN4C9p630Smt5/yG2xos6hORwOKnuo9joUAH0JJQrdOciMrRN517upfZr9/QFPW
-         P3BtKlFek8f08BqipyWSdJQqaEQii3Yv46BOgwCNepWyE8JtvWCii+qsU2O0rw39YU2S
-         Mn/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUG9vl/DouBRRUcP9z7/jYnaVtCrIG+pycfn0rQQLdkK4BHqB1/2rUKvb4fiTnhgRu9GMWj9Gc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy/UjSwRqApepzo3AI1BF09UE/c261uyPTt2EJ+bOpQEf0bc0Ep
-	TbVbnrKkNLtdKkk9I6eUdlpFA/OoeRPCf73sYYNc22Df0DZvyC1RZCHMwniOlV5CEtW4OYFlmpy
-	jy5aAAWsL6KLqMakMeKcCzJqXglctOdqog5j9kaHRTCIUHM8kQAbc6dIUxZc=
-X-Google-Smtp-Source: AGHT+IH0x+8018duqbyYiMeiRij8Fur/WaLqmHTXNy2m65q2EWKw8XSHg002KZNgmzWMNe02inHWp8hIfNTBxg3rmRMJeyJQfyKK
+        d=1e100.net; s=20230601; t=1753468723; x=1754073523;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hERtp2g6Pc7QoTZ98mMyXxU41JG0va0Re9zNA1XThII=;
+        b=wgkDeCzYlo3ZzkAj0Qes4Lqd4Zss9Op1xP5x79SttnZ8mVNqVr+kIK/aJH24oK9SeX
+         N+TUF528v6OAeyrV/BwmmCqJWbj+quOfJL8U2ls/4qNCqTeD0h34oa/F8+YUOhn9ugn+
+         JWNmU3ytSOBtyFH1JGYZ+Zsf5GmDjESmNZcyjAspFQRqIAQhT22lSUJSbrO3boQJ9lT7
+         ZM0E9meGG6xoCRQ2wMwfUzHFTfSpWS111aB0f/z/QJAmHMUQHr6ovNPa033nc27BpGAo
+         QL3tjjw2XXFonK1BvDXULLw+hPBJm5ZRrSw+i+GWNESn870NkY8QQyGreJM7sKaq6Igh
+         TIZg==
+X-Forwarded-Encrypted: i=1; AJvYcCVI8vXsvMAbwEPtcaiafjPM8AFD46N9AalTItNZHFNVqzKQHuM5I/vV85FK0y4QyVZp+B+hDNQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyBQCvZSR+/fcfegIz/6rPSq873TqDwRPbpeLdwnP/pGpCPbC0i
+	bk8JYP2CC5FRgtWgoy7jCeFS8WaGOPw5jDyiWEAJ8vQ1OPTSOBjxPDLpN3LOrGjZKLjVqj7amYg
+	VIsAK3QkhwnH71w==
+X-Google-Smtp-Source: AGHT+IElnQ3ltmUEMUOrnqr+/5aFfilQzhfxMYT2GQzuCKhfrb3hO0WPIinsgr69dSU9OKlubrsJp7mniL69pw==
+X-Received: from plht16.prod.google.com ([2002:a17:903:2f10:b0:23e:3914:f342])
+ (user=cmllamas job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:903:490b:b0:234:d7c5:a0f6 with SMTP id d9443c01a7336-23fb30aaf67mr34769985ad.31.1753468722686;
+ Fri, 25 Jul 2025 11:38:42 -0700 (PDT)
+Date: Fri, 25 Jul 2025 18:37:46 +0000
+In-Reply-To: <20250725183811.409580-1-cmllamas@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6602:1494:b0:87c:538b:2a3c with SMTP id
- ca18e2360f4ac-880229b13d5mr427236839f.14.1753468114452; Fri, 25 Jul 2025
- 11:28:34 -0700 (PDT)
-Date: Fri, 25 Jul 2025 11:28:34 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6883ccd2.a00a0220.2f88df.0056.GAE@google.com>
-Subject: [syzbot] [wireless?] WARNING in ieee80211_ocb_rx_no_sta
-From: syzbot <syzbot+a06b95a67a174af018cf@syzkaller.appspotmail.com>
-To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
+Mime-Version: 1.0
+References: <20250725183811.409580-1-cmllamas@google.com>
+X-Mailer: git-send-email 2.50.1.470.g6ba607880d-goog
+Message-ID: <20250725183811.409580-4-cmllamas@google.com>
+Subject: [PATCH v19 3/5] binder: introduce transaction reports via netlink
+From: Carlos Llamas <cmllamas@google.com>
+To: Alice Ryhl <aliceryhl@google.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	"=?UTF-8?q?Arve=20Hj=C3=B8nnev=C3=A5g?=" <arve@android.com>, Todd Kjos <tkjos@android.com>, Martijn Coenen <maco@android.com>, 
+	Joel Fernandes <joelagnelf@nvidia.com>, Christian Brauner <brauner@kernel.org>, 
+	Carlos Llamas <cmllamas@google.com>, Suren Baghdasaryan <surenb@google.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Donald Hunter <donald.hunter@gmail.com>, Li Li <dualli@google.com>
+Cc: Tiffany Yang <ynaffit@google.com>, John Stultz <jstultz@google.com>, 
+	Shai Barack <shayba@google.com>, "=?UTF-8?q?Thi=C3=A9baud=20Weksteen?=" <tweek@google.com>, kernel-team@android.com, 
+	linux-kernel@vger.kernel.org, 
+	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 
-Hello,
+From: Li Li <dualli@google.com>
 
-syzbot found the following issue on:
+Introduce a generic netlink multicast event to report binder transaction
+failures to userspace. This allows subscribers to monitor these events
+and take appropriate actions, such as stopping a misbehaving application
+that is spamming a service with huge amount of transactions.
 
-HEAD commit:    89be9a83ccf1 Linux 6.16-rc7
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=17798fd4580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=9f175a9275d2cdd7
-dashboard link: https://syzkaller.appspot.com/bug?extid=a06b95a67a174af018cf
-compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+The multicast event contains full details of the failed transactions,
+including the sender/target PIDs, payload size and specific error code.
+This interface is defined using a YAML spec, from which the UAPI and
+kernel headers and source are auto-generated.
 
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/34b3f6e5e365/disk-89be9a83.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/55356b071589/vmlinux-89be9a83.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/5daf2522b291/bzImage-89be9a83.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+a06b95a67a174af018cf@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 9078 at net/mac80211/ocb.c:63 ieee80211_ocb_rx_no_sta+0x583/0x710 net/mac80211/ocb.c:63
-Modules linked in:
-CPU: 0 UID: 0 PID: 9078 Comm: syz.1.959 Not tainted 6.16.0-rc7-syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
-RIP: 0010:ieee80211_ocb_rx_no_sta+0x583/0x710 net/mac80211/ocb.c:63
-Code: 48 c7 c2 80 c5 08 8d be 65 03 00 00 48 c7 c7 a0 c4 08 8d c6 05 4b b5 78 05 01 e8 c8 63 7f f6 e9 0b fc ff ff e8 ce 12 a3 f6 90 <0f> 0b 90 e8 25 ac 6d 00 31 ff 89 c3 89 c6 e8 fa 0d a3 f6 85 db 75
-RSP: 0018:ffffc90000007a08 EFLAGS: 00010283
-RAX: 000000000000022a RBX: ffff888056a7cd80 RCX: ffffc90002181000
-RDX: 0000000000040000 RSI: ffffffff8b18d5a2 RDI: 0000000000000005
-RBP: ffff888025e9e40a R08: 0000000000000005 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000001 R12: ffff888030e40e40
-R13: 0000000000000001 R14: 0000000000000000 R15: ffff888033a44500
-FS:  00007f8e60a7d6c0(0000) GS:ffff888124720000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000110c3a8d5a CR3: 00000000343fa000 CR4: 00000000003526f0
-Call Trace:
- <IRQ>
- ieee80211_accept_frame net/mac80211/rx.c:4445 [inline]
- ieee80211_prepare_and_rx_handle+0x55a1/0x77a0 net/mac80211/rx.c:4999
- ieee80211_rx_for_interface+0x10a/0x1f0 net/mac80211/rx.c:5129
- __ieee80211_rx_handle_packet net/mac80211/rx.c:5285 [inline]
- ieee80211_rx_list+0x10d7/0x2980 net/mac80211/rx.c:5420
- ieee80211_rx_napi+0xdc/0x410 net/mac80211/rx.c:5443
- ieee80211_rx include/net/mac80211.h:5185 [inline]
- ieee80211_handle_queued_frames+0xd5/0x130 net/mac80211/main.c:441
- tasklet_action_common+0x281/0x400 kernel/softirq.c:829
- handle_softirqs+0x219/0x8e0 kernel/softirq.c:579
- do_softirq kernel/softirq.c:480 [inline]
- do_softirq+0xb2/0xf0 kernel/softirq.c:467
- </IRQ>
- <TASK>
- __local_bh_enable_ip+0x100/0x120 kernel/softirq.c:407
- ieee80211_tx_skb_tid+0x176/0x4f0 net/mac80211/tx.c:6131
- ieee80211_mgmt_tx+0x14d2/0x2310 net/mac80211/offchannel.c:1023
- rdev_mgmt_tx net/wireless/rdev-ops.h:762 [inline]
- cfg80211_mlme_mgmt_tx+0x7d5/0x1660 net/wireless/mlme.c:938
- nl80211_tx_mgmt+0x9f9/0xd60 net/wireless/nl80211.c:12921
- genl_family_rcv_msg_doit+0x206/0x2f0 net/netlink/genetlink.c:1115
- genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
- genl_rcv_msg+0x55c/0x800 net/netlink/genetlink.c:1210
- netlink_rcv_skb+0x155/0x420 net/netlink/af_netlink.c:2552
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
- netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
- netlink_unicast+0x58d/0x850 net/netlink/af_netlink.c:1346
- netlink_sendmsg+0x8d1/0xdd0 net/netlink/af_netlink.c:1896
- sock_sendmsg_nosec net/socket.c:712 [inline]
- __sock_sendmsg net/socket.c:727 [inline]
- ____sys_sendmsg+0xa95/0xc70 net/socket.c:2566
- ___sys_sendmsg+0x134/0x1d0 net/socket.c:2620
- __sys_sendmsg+0x16d/0x220 net/socket.c:2652
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xcd/0x4c0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f8e5fb8e9a9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f8e60a7d038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007f8e5fdb5fa0 RCX: 00007f8e5fb8e9a9
-RDX: 0000000000000000 RSI: 0000200000000080 RDI: 0000000000000003
-RBP: 00007f8e5fc10d69 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007f8e5fdb5fa0 R15: 00007ffd54948378
- </TASK>
-
-
+Signed-off-by: Li Li <dualli@google.com>
+Signed-off-by: Carlos Llamas <cmllamas@google.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ Documentation/netlink/specs/binder.yaml     | 96 +++++++++++++++++++++
+ MAINTAINERS                                 |  1 +
+ drivers/android/Kconfig                     |  1 +
+ drivers/android/Makefile                    |  2 +-
+ drivers/android/binder.c                    | 85 +++++++++++++++++-
+ drivers/android/binder_netlink.c            | 32 +++++++
+ drivers/android/binder_netlink.h            | 21 +++++
+ include/uapi/linux/android/binder_netlink.h | 37 ++++++++
+ 8 files changed, 270 insertions(+), 5 deletions(-)
+ create mode 100644 Documentation/netlink/specs/binder.yaml
+ create mode 100644 drivers/android/binder_netlink.c
+ create mode 100644 drivers/android/binder_netlink.h
+ create mode 100644 include/uapi/linux/android/binder_netlink.h
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/Documentation/netlink/specs/binder.yaml b/Documentation/netlink/specs/binder.yaml
+new file mode 100644
+index 000000000000..a2e54aa42448
+--- /dev/null
++++ b/Documentation/netlink/specs/binder.yaml
+@@ -0,0 +1,96 @@
++# SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
++#
++# Copyright 2025 Google LLC
++#
++---
++name: binder
++protocol: genetlink
++uapi-header: linux/android/binder_netlink.h
++doc: Binder interface over generic netlink
++
++attribute-sets:
++  -
++    name: report
++    doc: |
++      Attributes included within a transaction failure report. The elements
++      correspond directly with the specific transaction that failed, along
++      with the error returned to the sender e.g. BR_DEAD_REPLY.
++
++    attributes:
++      -
++        name: error
++        type: u32
++        doc: The enum binder_driver_return_protocol returned to the sender.
++      -
++        name: context
++        type: string
++        doc: The binder context where the transaction occurred.
++      -
++        name: from_pid
++        type: u32
++        doc: The PID of the sender process.
++      -
++        name: from_tid
++        type: u32
++        doc: The TID of the sender thread.
++      -
++        name: to_pid
++        type: u32
++        doc: |
++          The PID of the recipient process. This attribute may not be present
++          if the target could not be determined.
++      -
++        name: to_tid
++        type: u32
++        doc: |
++          The TID of the recipient thread. This attribute may not be present
++          if the target could not be determined.
++      -
++        name: is_reply
++        type: flag
++        doc: When present, indicates the failed transaction is a reply.
++      -
++        name: flags
++        type: u32
++        doc: The bitmask of enum transaction_flags from the transaction.
++      -
++        name: code
++        type: u32
++        doc: The application-defined code from the transaction.
++      -
++        name: data_size
++        type: u32
++        doc: The transaction payload size in bytes.
++
++operations:
++  list:
++    -
++      name: report
++      doc: |
++        A multicast event sent to userspace subscribers to notify them about
++        binder transaction failures. The generated report provides the full
++        details of the specific transaction that failed. The intention is for
++        programs to monitor these events and react to the failures as needed.
++
++      attribute-set: report
++      mcgrp: report
++      event:
++        attributes:
++          - error
++          - context
++          - from_pid
++          - from_tid
++          - to_pid
++          - to_tid
++          - is_reply
++          - flags
++          - code
++          - data_size
++
++kernel-family:
++  headers: ["binder_internal.h"]
++
++mcast-groups:
++  list:
++    -
++      name: report
+diff --git a/MAINTAINERS b/MAINTAINERS
+index f8c8f682edf6..df8f6b31f2f8 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1769,6 +1769,7 @@ M:	Suren Baghdasaryan <surenb@google.com>
+ L:	linux-kernel@vger.kernel.org
+ S:	Supported
+ T:	git git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/staging.git
++F:	Documentation/netlink/specs/binder.yaml
+ F:	drivers/android/
+ 
+ ANDROID GOLDFISH PIC DRIVER
+diff --git a/drivers/android/Kconfig b/drivers/android/Kconfig
+index 5b3b8041f827..75af3cf472c8 100644
+--- a/drivers/android/Kconfig
++++ b/drivers/android/Kconfig
+@@ -4,6 +4,7 @@ menu "Android"
+ config ANDROID_BINDER_IPC
+ 	bool "Android Binder IPC Driver"
+ 	depends on MMU
++	depends on NET
+ 	default n
+ 	help
+ 	  Binder is used in Android for both communication between processes,
+diff --git a/drivers/android/Makefile b/drivers/android/Makefile
+index c5d47be0276c..f422f91e026b 100644
+--- a/drivers/android/Makefile
++++ b/drivers/android/Makefile
+@@ -2,5 +2,5 @@
+ ccflags-y += -I$(src)			# needed for trace events
+ 
+ obj-$(CONFIG_ANDROID_BINDERFS)		+= binderfs.o
+-obj-$(CONFIG_ANDROID_BINDER_IPC)	+= binder.o binder_alloc.o
++obj-$(CONFIG_ANDROID_BINDER_IPC)	+= binder.o binder_alloc.o binder_netlink.o
+ obj-$(CONFIG_ANDROID_BINDER_ALLOC_KUNIT_TEST)	+= tests/
+diff --git a/drivers/android/binder.c b/drivers/android/binder.c
+index 95aa1fae53e2..0d37eca514f9 100644
+--- a/drivers/android/binder.c
++++ b/drivers/android/binder.c
+@@ -74,6 +74,7 @@
+ 
+ #include <linux/cacheflush.h>
+ 
++#include "binder_netlink.h"
+ #include "binder_internal.h"
+ #include "binder_trace.h"
+ 
+@@ -2993,6 +2994,67 @@ static void binder_set_txn_from_error(struct binder_transaction *t, int id,
+ 	binder_thread_dec_tmpref(from);
+ }
+ 
++/**
++ * binder_netlink_report() - report a transaction failure via netlink
++ * @proc:	the binder proc sending the transaction
++ * @t:		the binder transaction that failed
++ * @data_size:	the user provided data size for the transaction
++ * @error:	enum binder_driver_return_protocol returned to sender
++ */
++static void binder_netlink_report(struct binder_proc *proc,
++				  struct binder_transaction *t,
++				  u32 data_size,
++				  u32 error)
++{
++	const char *context = proc->context->name;
++	struct sk_buff *skb;
++	void *hdr;
++
++	if (!genl_has_listeners(&binder_nl_family, &init_net,
++				BINDER_NLGRP_REPORT))
++		return;
++
++	skb = genlmsg_new(GENLMSG_DEFAULT_SIZE, GFP_KERNEL);
++	if (!skb)
++		return;
++
++	hdr = genlmsg_put(skb, 0, 0, &binder_nl_family, 0, BINDER_CMD_REPORT);
++	if (!hdr)
++		goto free_skb;
++
++	if (nla_put_u32(skb, BINDER_A_REPORT_ERROR, error) ||
++	    nla_put_string(skb, BINDER_A_REPORT_CONTEXT, context) ||
++	    nla_put_u32(skb, BINDER_A_REPORT_FROM_PID, t->from_pid) ||
++	    nla_put_u32(skb, BINDER_A_REPORT_FROM_TID, t->from_tid))
++		goto cancel_skb;
++
++	if (t->to_proc &&
++	    nla_put_u32(skb, BINDER_A_REPORT_TO_PID, t->to_proc->pid))
++		goto cancel_skb;
++
++	if (t->to_thread &&
++	    nla_put_u32(skb, BINDER_A_REPORT_TO_TID, t->to_thread->pid))
++		goto cancel_skb;
++
++	if (t->is_reply && nla_put_flag(skb, BINDER_A_REPORT_IS_REPLY))
++		goto cancel_skb;
++
++	if (nla_put_u32(skb, BINDER_A_REPORT_FLAGS, t->flags) ||
++	    nla_put_u32(skb, BINDER_A_REPORT_CODE, t->code) ||
++	    nla_put_u32(skb, BINDER_A_REPORT_DATA_SIZE, data_size))
++		goto cancel_skb;
++
++	genlmsg_end(skb, hdr);
++	genlmsg_multicast(&binder_nl_family, skb, 0, BINDER_NLGRP_REPORT,
++			  GFP_KERNEL);
++	return;
++
++cancel_skb:
++	genlmsg_cancel(skb, hdr);
++free_skb:
++	nlmsg_free(skb);
++}
++
+ static void binder_transaction(struct binder_proc *proc,
+ 			       struct binder_thread *thread,
+ 			       struct binder_transaction_data *tr, int reply,
+@@ -3679,10 +3741,13 @@ static void binder_transaction(struct binder_proc *proc,
+ 		return_error_line = __LINE__;
+ 		goto err_copy_data_failed;
+ 	}
+-	if (t->buffer->oneway_spam_suspect)
++	if (t->buffer->oneway_spam_suspect) {
+ 		tcomplete->type = BINDER_WORK_TRANSACTION_ONEWAY_SPAM_SUSPECT;
+-	else
++		binder_netlink_report(proc, t, tr->data_size,
++				      BR_ONEWAY_SPAM_SUSPECT);
++	} else {
+ 		tcomplete->type = BINDER_WORK_TRANSACTION_COMPLETE;
++	}
+ 
+ 	if (reply) {
+ 		binder_enqueue_thread_work(thread, tcomplete);
+@@ -3730,8 +3795,11 @@ static void binder_transaction(struct binder_proc *proc,
+ 		 * process and is put in a pending queue, waiting for the target
+ 		 * process to be unfrozen.
+ 		 */
+-		if (return_error == BR_TRANSACTION_PENDING_FROZEN)
++		if (return_error == BR_TRANSACTION_PENDING_FROZEN) {
+ 			tcomplete->type = BINDER_WORK_TRANSACTION_PENDING;
++			binder_netlink_report(proc, t, tr->data_size,
++					      return_error);
++		}
+ 		binder_enqueue_thread_work(thread, tcomplete);
+ 		if (return_error &&
+ 		    return_error != BR_TRANSACTION_PENDING_FROZEN)
+@@ -3789,6 +3857,8 @@ static void binder_transaction(struct binder_proc *proc,
+ 		binder_dec_node(target_node, 1, 0);
+ 		binder_dec_node_tmpref(target_node);
+ 	}
++
++	binder_netlink_report(proc, t, tr->data_size, return_error);
+ 	kfree(t);
+ 	binder_stats_deleted(BINDER_STAT_TRANSACTION);
+ err_alloc_t_failed:
+@@ -7067,12 +7137,19 @@ static int __init binder_init(void)
+ 		}
+ 	}
+ 
+-	ret = init_binderfs();
++	ret = genl_register_family(&binder_nl_family);
+ 	if (ret)
+ 		goto err_init_binder_device_failed;
+ 
++	ret = init_binderfs();
++	if (ret)
++		goto err_init_binderfs_failed;
++
+ 	return ret;
+ 
++err_init_binderfs_failed:
++	genl_unregister_family(&binder_nl_family);
++
+ err_init_binder_device_failed:
+ 	hlist_for_each_entry_safe(device, tmp, &binder_devices, hlist) {
+ 		misc_deregister(&device->miscdev);
+diff --git a/drivers/android/binder_netlink.c b/drivers/android/binder_netlink.c
+new file mode 100644
+index 000000000000..f62fbca3143c
+--- /dev/null
++++ b/drivers/android/binder_netlink.c
+@@ -0,0 +1,32 @@
++// SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
++/* Do not edit directly, auto-generated from: */
++/*	Documentation/netlink/specs/binder.yaml */
++/* YNL-GEN kernel source */
++
++#include <net/netlink.h>
++#include <net/genetlink.h>
++
++#include "binder_netlink.h"
++
++#include <uapi/linux/android/binder_netlink.h>
++#include <binder_internal.h>
++
++/* Ops table for binder */
++static const struct genl_split_ops binder_nl_ops[] = {
++};
++
++static const struct genl_multicast_group binder_nl_mcgrps[] = {
++	[BINDER_NLGRP_REPORT] = { "report", },
++};
++
++struct genl_family binder_nl_family __ro_after_init = {
++	.name		= BINDER_FAMILY_NAME,
++	.version	= BINDER_FAMILY_VERSION,
++	.netnsok	= true,
++	.parallel_ops	= true,
++	.module		= THIS_MODULE,
++	.split_ops	= binder_nl_ops,
++	.n_split_ops	= ARRAY_SIZE(binder_nl_ops),
++	.mcgrps		= binder_nl_mcgrps,
++	.n_mcgrps	= ARRAY_SIZE(binder_nl_mcgrps),
++};
+diff --git a/drivers/android/binder_netlink.h b/drivers/android/binder_netlink.h
+new file mode 100644
+index 000000000000..f78b8ec54c53
+--- /dev/null
++++ b/drivers/android/binder_netlink.h
+@@ -0,0 +1,21 @@
++/* SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause) */
++/* Do not edit directly, auto-generated from: */
++/*	Documentation/netlink/specs/binder.yaml */
++/* YNL-GEN kernel header */
++
++#ifndef _LINUX_BINDER_GEN_H
++#define _LINUX_BINDER_GEN_H
++
++#include <net/netlink.h>
++#include <net/genetlink.h>
++
++#include <uapi/linux/android/binder_netlink.h>
++#include <binder_internal.h>
++
++enum {
++	BINDER_NLGRP_REPORT,
++};
++
++extern struct genl_family binder_nl_family;
++
++#endif /* _LINUX_BINDER_GEN_H */
+diff --git a/include/uapi/linux/android/binder_netlink.h b/include/uapi/linux/android/binder_netlink.h
+new file mode 100644
+index 000000000000..b218f96d6668
+--- /dev/null
++++ b/include/uapi/linux/android/binder_netlink.h
+@@ -0,0 +1,37 @@
++/* SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause) */
++/* Do not edit directly, auto-generated from: */
++/*	Documentation/netlink/specs/binder.yaml */
++/* YNL-GEN uapi header */
++
++#ifndef _UAPI_LINUX_ANDROID_BINDER_NETLINK_H
++#define _UAPI_LINUX_ANDROID_BINDER_NETLINK_H
++
++#define BINDER_FAMILY_NAME	"binder"
++#define BINDER_FAMILY_VERSION	1
++
++enum {
++	BINDER_A_REPORT_ERROR = 1,
++	BINDER_A_REPORT_CONTEXT,
++	BINDER_A_REPORT_FROM_PID,
++	BINDER_A_REPORT_FROM_TID,
++	BINDER_A_REPORT_TO_PID,
++	BINDER_A_REPORT_TO_TID,
++	BINDER_A_REPORT_IS_REPLY,
++	BINDER_A_REPORT_FLAGS,
++	BINDER_A_REPORT_CODE,
++	BINDER_A_REPORT_DATA_SIZE,
++
++	__BINDER_A_REPORT_MAX,
++	BINDER_A_REPORT_MAX = (__BINDER_A_REPORT_MAX - 1)
++};
++
++enum {
++	BINDER_CMD_REPORT = 1,
++
++	__BINDER_CMD_MAX,
++	BINDER_CMD_MAX = (__BINDER_CMD_MAX - 1)
++};
++
++#define BINDER_MCGRP_REPORT	"report"
++
++#endif /* _UAPI_LINUX_ANDROID_BINDER_NETLINK_H */
+-- 
+2.50.1.470.g6ba607880d-goog
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
