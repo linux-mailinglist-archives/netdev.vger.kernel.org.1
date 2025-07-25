@@ -1,86 +1,110 @@
-Return-Path: <netdev+bounces-210234-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210235-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78D44B12756
-	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 01:25:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB53EB1275A
+	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 01:25:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1CB70189E7F1
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 23:25:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF35917F82B
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 23:25:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24C44258CD4;
-	Fri, 25 Jul 2025 23:25:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8ADB25B1EA;
+	Fri, 25 Jul 2025 23:25:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BhH2V1yH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PBQ+IuA8"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDECC1D9A5D;
-	Fri, 25 Jul 2025 23:25:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A42D825A334
+	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 23:25:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753485919; cv=none; b=UvHjlqg6z6bINMmi97ctJlzqhFtEpvMgeDYEToB9KVZwOVGcxtR1EeygSdd6y0ZpyhSU++2/s7NIXqSDYMZG8xQJ/HbrSTOWNyEjmJagWLuAfaQFe0W8NL1XbEYH8phT0oVwguT0FlmHCpl+VnNQVaeK3J42VXm7GzEliwoCgAo=
+	t=1753485947; cv=none; b=oMZA/GK33jzEoe+ggQYxFMVNhjJ39sH+Q6JDXD7zZ62HZRUt5FpyZ71qQwnuFEjY0T3+GA2S8dOYtaKLWkk5gwyV8cdhbZb7YLiJxjvGAQs6vFrDnx2vJh7Zia18tieqSOERDVaWfokNxl+sTj62XDvyvixd+NrriAkAWM6NxcE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753485919; c=relaxed/simple;
-	bh=30Lu0lu5cTdskwZvddFTxEhvmB6dDSde5G6CiimxE18=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gHoCMEILvqmc4WsYz8e2ILSErtUByCtosP8m3XirrCtHPlO2WQ9kKwIsaUcCWF9X1i4WHylnLmFcpsaqBBF8fIyT4yLD42b+qXoNFlTG/JXdjcwhuD59Bp1U1BYtm0MlDumq8OHW5vWjQpge43KrCBlq/g3IrotIJLgrPJnnVKI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BhH2V1yH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7A37C4CEE7;
-	Fri, 25 Jul 2025 23:25:18 +0000 (UTC)
+	s=arc-20240116; t=1753485947; c=relaxed/simple;
+	bh=BjmTHZb1Gc5BFF4YF7ds2rgMppgL8kivlXIJ+AncmhM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Cdv/lhlbRnOvenWNIVteMbqWDc0PElLvbmpZja0yLIL9UDvddRgcuEbnT06SVgYahcqY7oi2LLNPsbbnS2VuDs5SOkCMh/DXR9GFSTp/s95t3zf1UAG+9LFQWwpcBXe0YdYrypOryhPOkQgprFT0SNLD+gQAnWSKrW667JZhEJI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PBQ+IuA8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42385C4CEE7;
+	Fri, 25 Jul 2025 23:25:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753485918;
-	bh=30Lu0lu5cTdskwZvddFTxEhvmB6dDSde5G6CiimxE18=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BhH2V1yHUI/4eJQ6O6SG1WTvCOkt3dRljpQMyc6AJJvfc9Ge6R4yFP34FihWPc4AU
-	 sCHjWECuBb9JWB5DHvvXko61NyKC4mpUdZUBDorYydB9bN4zn+wWJXl9dRjjTi5oNm
-	 69IZ10ziTsotIvFjLvZ5zVRy0Aw8VaWi36Zm01diusnQXnPMP/Er4YWcGxQ/lIZD03
-	 JQewW2m6ut/0cqUi+V2EZFgFNUuRVVyZlHJl/PRCu3xi28NZFElIJzIx9EKtLDIFJ7
-	 E4curYdmx/NhdLREspoJMKHpBsLMP0OxYHetdO3gTNCl53Mvd6oA2GnJE7/UAegz/B
-	 yCq9g/Ji9+iCQ==
-Date: Fri, 25 Jul 2025 18:25:17 -0500
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Matthew Gerlach <matthew.gerlach@altera.com>
-Cc: alexandre.torgue@foss.st.com, maxime.chevallier@bootlin.com,
-	davem@davemloft.net, conor+dt@kernel.org, mcoquelin.stm32@gmail.com,
-	richardcochran@gmail.com, edumazet@google.com, pabeni@redhat.com,
-	linux-kernel@vger.kernel.org, dinguyen@kernel.org,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	krzk+dt@kernel.org, andrew+netdev@lunn.ch, kuba@kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH v2 1/4] dt-bindings: net: altr,socfpga-stmmac: Add
- compatible string for Agilex5
-Message-ID: <175348591737.2024488.4815901624908424031.robh@kernel.org>
-References: <20250724154052.205706-1-matthew.gerlach@altera.com>
- <20250724154052.205706-2-matthew.gerlach@altera.com>
+	s=k20201202; t=1753485947;
+	bh=BjmTHZb1Gc5BFF4YF7ds2rgMppgL8kivlXIJ+AncmhM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=PBQ+IuA8j6DLvXLK6B/cPbl122bvNmjVx8H5loEDZpIa1y75451mY2o27RZTaVDw5
+	 5WxYnZaK05UTlZDQJR90OUNLpM2xlJTNS2fs+6faR53Vp1OiYIcTpTuHURavVCuqPh
+	 F+j/hT9he8ODGlx5ov+lzxdzRrL9oqEdgLXjhMiFtgZc0vHBhDCgWzZUWVxVGPfP/w
+	 f2FmX+RZUKiF10cyp8vj52qH46h0Hea9Q0uj2cZadT7tyXlx9LD5EeRkkan01zN4Lh
+	 kiWRdORowdf1y299DZNlkde4joYezuZ9WImLlAJaYtLJ5qfo7G5VFjgzbb105qVKDs
+	 HOZfivX1Mg0Ow==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF3E383BF4E;
+	Fri, 25 Jul 2025 23:26:05 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250724154052.205706-2-matthew.gerlach@altera.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 0/8][pull request] libie: commonize adminq
+ structure
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175348596475.3366157.4569740937025846002.git-patchwork-notify@kernel.org>
+Date: Fri, 25 Jul 2025 23:26:04 +0000
+References: <20250724182826.3758850-1-anthony.l.nguyen@intel.com>
+In-Reply-To: <20250724182826.3758850-1-anthony.l.nguyen@intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
+ michal.swiatkowski@linux.intel.com, aleksander.lobakin@intel.com,
+ przemyslaw.kitszel@intel.com, piotr.kwapulinski@intel.com,
+ aleksandr.loktionov@intel.com, jedrzej.jagielski@intel.com,
+ larysa.zaremba@intel.com
 
+Hello:
 
-On Thu, 24 Jul 2025 08:40:48 -0700, Matthew Gerlach wrote:
-> Add compatible string for the Altera Agilex5 variant of the Synopsys DWC
-> XGMAC IP version 2.10.
+This series was applied to netdev/net-next.git (main)
+by Tony Nguyen <anthony.l.nguyen@intel.com>:
+
+On Thu, 24 Jul 2025 11:28:16 -0700 you wrote:
+> Michal Swiatkowski says:
 > 
-> Signed-off-by: Matthew Gerlach <matthew.gerlach@altera.com>
-> ---
-> v2:
->  - Remove generic compatible string for Agilex5.
-> ---
->  .../devicetree/bindings/net/altr,socfpga-stmmac.yaml      | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
+> It is a prework to allow reusing some specific Intel code (eq. fwlog).
 > 
+> Move common *_aq_desc structure to libie header and changing
+> it in ice, ixgbe, i40e and iavf.
+> 
+> [...]
 
-Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+Here is the summary with links:
+  - [net-next,1/8] ice, libie: move generic adminq descriptors to lib
+    https://git.kernel.org/netdev/net-next/c/fdb7f139864a
+  - [net-next,2/8] ixgbe: use libie adminq descriptors
+    https://git.kernel.org/netdev/net-next/c/5b36bef44443
+  - [net-next,3/8] i40e: use libie adminq descriptors
+    https://git.kernel.org/netdev/net-next/c/b46012a20006
+  - [net-next,4/8] iavf: use libie adminq descriptors
+    https://git.kernel.org/netdev/net-next/c/0eb61b356922
+  - [net-next,5/8] libie: add adminq helper for converting err to str
+    https://git.kernel.org/netdev/net-next/c/5feaa7a07b85
+  - [net-next,6/8] ice: use libie_aq_str
+    https://git.kernel.org/netdev/net-next/c/e99c1618f9df
+  - [net-next,7/8] iavf: use libie_aq_str
+    https://git.kernel.org/netdev/net-next/c/43a113063234
+  - [net-next,8/8] i40e: use libie_aq_str
+    https://git.kernel.org/netdev/net-next/c/026cea3c61c2
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
