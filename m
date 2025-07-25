@@ -1,107 +1,100 @@
-Return-Path: <netdev+bounces-209939-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209940-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C5CCB1160D
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 03:49:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FE14B1161F
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 03:59:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B059A169EBF
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 01:49:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 945E4581B02
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 01:59:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CFCB1519BC;
-	Fri, 25 Jul 2025 01:49:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E83B21E0DE2;
+	Fri, 25 Jul 2025 01:59:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ljK7JmZQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SLsHdueA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D26582E36F0;
-	Fri, 25 Jul 2025 01:49:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCDA110E4;
+	Fri, 25 Jul 2025 01:59:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753408144; cv=none; b=CElM15XSPSf1pLcIrDQX2ZTwAN6rLexT9SO2ZtUukCtbuKhNiY/FFn/4UfeCq8hR8lEZGgfzPPjDYCTCvDKgvI8D/AL9A0F9Z2PW3vzJMHrpVR3gS+4sQ7UWHsm0dHrJkLO7wvlZqQnFg3cV5K3J5WoPjmdFZ+DkhiNSZuyzEFU=
+	t=1753408793; cv=none; b=pCESA/Y3HReheL9r8Fj9YsiguljbVORsFKI5ztUaGJNBdmg40Lc7p5u7bRDmfwJJeMXC2KbssAnoBhDnk4jzMxmBzv7uEaAYJ7HSxGqfoIrG7NJedeAXuGem3DYzEsTThAE9UVa8psN+60JY+vFIXhLfZJU2fngRmWN2iCUACSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753408144; c=relaxed/simple;
-	bh=B9lc7fM1jtUNpSTwiyxqs6LzGFpaNCIpPSEYy36++8Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=i7j6nONN7tVhXmmnjCYvkFBMAUOalyLmqrtKkKJuBROIJKXkBPuRNfE+eY7q40mg9y+WvG1XNrq7AV+HPPoK209rORY4BqfCRC2pKD+BBz9hlO8ASWbipoz0EoxlbhG7VDoL78GzQjFTjjBhlWylWCHj4bTq8ChSQRRC/768eaY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ljK7JmZQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 282F6C4CEF8;
-	Fri, 25 Jul 2025 01:49:03 +0000 (UTC)
+	s=arc-20240116; t=1753408793; c=relaxed/simple;
+	bh=i/EY8HwF3v5WgegoMJ1dk4JMAPDlIwwNTv3uTZqgjLo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=NdXCQ+SD/pfPqpWVu7Dm21ckI9s9uihuvMO8uSPugK31HyQAdJLjIcbBv4085YRD+oBLEq3XBkrkCFaxzKDzZ0kFmUjhpqtrQapJmcwobFLbGDEU7lYyrvVrVHw7W79MPLLv7him3g90H6M2jqLunFJH1cAFndVEhLEXAyjneDo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SLsHdueA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41507C4CEED;
+	Fri, 25 Jul 2025 01:59:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753408144;
-	bh=B9lc7fM1jtUNpSTwiyxqs6LzGFpaNCIpPSEYy36++8Q=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ljK7JmZQNB6d1Y/lUQP5CBvKozqg+TyROpDUceazY6iMAN8OuIt6uHoqKKI1QqhQQ
-	 VPS7JDHxK37SG0cOun0Bluuge524GKVNPuV9c1x0SNM9Fm24CkO/aPLHI1Isvl3Nx5
-	 Ly3pcKP4ToDd4xBEgAzi9qRYb9uXHGDDKAETosrcvBsC4u6MUdKm8dg0eosxnVcGdF
-	 2Djc58PEZKUsOWJqougd3xp2AGJqp160jdWiimNOc/Ni0ejvzqzzvzi8nFN0MVc2L1
-	 Ifq1//hazBkRKLIzPfjZWkVa1KwrehqzM/6l1q7j/HQeF+//VaRosSmsswp8lAl275
-	 756B6ApoYH2Dg==
-Date: Thu, 24 Jul 2025 18:49:02 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: Shakeel Butt <shakeel.butt@linux.dev>, Eric Dumazet
- <edumazet@google.com>, Michal =?UTF-8?B?S291dG7DvQ==?= <mkoutny@suse.com>,
- Tejun Heo <tj@kernel.org>, "David S. Miller" <davem@davemloft.net>, Neal
- Cardwell <ncardwell@google.com>, Paolo Abeni <pabeni@redhat.com>, Willem de
- Bruijn <willemb@google.com>, Matthieu Baerts <matttbe@kernel.org>, Mat
- Martineau <martineau@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
- Michal Hocko <mhocko@kernel.org>, Roman Gushchin
- <roman.gushchin@linux.dev>, Andrew Morton <akpm@linux-foundation.org>,
- Simon Horman <horms@kernel.org>, Geliang Tang <geliang@kernel.org>, Muchun
- Song <muchun.song@linux.dev>, Kuniyuki Iwashima <kuni1840@gmail.com>,
- netdev@vger.kernel.org, mptcp@lists.linux.dev, cgroups@vger.kernel.org,
- linux-mm@kvack.org
-Subject: Re: [PATCH v1 net-next 13/13] net-memcg: Allow decoupling memcg
- from global protocol memory accounting.
-Message-ID: <20250724184902.139eff3c@kernel.org>
-In-Reply-To: <CAAVpQUDMj_1p6sVeo=bZ_u34HSX7V3WM6hYG3wHyyCACKrTKmQ@mail.gmail.com>
-References: <z7kkbenhkndwyghwenwk6c4egq3ky4zl36qh3gfiflfynzzojv@qpcazlpe3l7b>
-	<CANn89iLg-VVWqbWvLg__Zz=HqHpQzk++61dbOyuazSah7kWcDg@mail.gmail.com>
-	<jc6z5d7d26zunaf6b4qtwegdoljz665jjcigb4glkb6hdy6ap2@2gn6s52s6vfw>
-	<CAAVpQUAJCLaOr7DnOH9op8ySFN_9Ky__easoV-6E=scpRaUiJQ@mail.gmail.com>
-	<p4fcser5zrjm4ut6lw4ejdr7gn2gejrlhy2u2btmhajiiheoax@ptacajypnvlw>
-	<CAAVpQUAk4F__D7xdWpt0SEE4WEM_-6V1P7DUw9TGaV=pxZ+tgw@mail.gmail.com>
-	<xjtbk6g2a3x26sqqrdxbm2vxgxmm3nfaryxlxwipwohsscg7qg@64ueif57zont>
-	<CAAVpQUAL09OGKZmf3HkjqqkknaytQ59EXozAVqJuwOZZucLR0Q@mail.gmail.com>
-	<jmbszz4m7xkw7fzolpusjesbreaczmr4i64kynbs3zcoehrkpj@lwso5soc4dh3>
-	<CAAVpQUCv+CpKkX9Ryxa5ATG3CC0TGGE4EFeGt4Xnu+0kV7TMZg@mail.gmail.com>
-	<e6qunyonbd4yxgf3g7gyc4435ueez6ledshde6lfdq7j5nslsh@xl7mcmaczfmk>
-	<CAAVpQUDMj_1p6sVeo=bZ_u34HSX7V3WM6hYG3wHyyCACKrTKmQ@mail.gmail.com>
+	s=k20201202; t=1753408793;
+	bh=i/EY8HwF3v5WgegoMJ1dk4JMAPDlIwwNTv3uTZqgjLo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=SLsHdueA2VzBvO1sGJSxkBmeijGni5hsX+XxN7Hx/DghXRScJalbel3UAPsbsGPur
+	 h5p5Nr7sQbdG59ABx81PVwzbCwDZ0qzXAaJRQFJ6WA7jrKtQVrKYnTzgbpE7z78yRc
+	 WY27Dd5jh9SkX1Dvb/8VcNkOnI9H5RzKrJ0SJKR9W0eJ80aBeGF7p8pnNAlksKYCdk
+	 45lYEeTsZdAzZTun1OsYzJbOaBXG2DjqERRHQ21Nq2ylnf14MGF+8v8pvauGLZ3UAd
+	 pPqYfGhN38qsV8p1gIkLdfAq1TFAjideFKJEdTNAJAiXBmRJAYI9qe/Yx8fAgce0Qi
+	 ywlotSEFNzAbQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33A84383BF4E;
+	Fri, 25 Jul 2025 02:00:12 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/3] selftests: drv-net: tso: fix issues with tso
+ selftest
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175340881100.2604761.14479845091806537313.git-patchwork-notify@kernel.org>
+Date: Fri, 25 Jul 2025 02:00:11 +0000
+References: <20250723184740.4075410-1-daniel.zahka@gmail.com>
+In-Reply-To: <20250723184740.4075410-1-daniel.zahka@gmail.com>
+To: Daniel Zahka <daniel.zahka@gmail.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, shuah@kernel.org, willemb@google.com,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
 
-On Wed, 23 Jul 2025 11:06:14 -0700 Kuniyuki Iwashima wrote:
-> > 3. Will there ever be a reasonable use-case where there is non-isolated
-> >    sub-tree under an isolated ancestor?  
-> 
-> I think no, but again, we need to think about the scenario above,
-> otherwise, your ideal semantics is just broken.
-> 
-> Also, "no reasonable scenario" does not always mean "we must
-> prevent the scenario".
-> 
-> If there's nothing harmful, we can just let it be, especially if such
-> restriction gives nothing andrather hurts performance with no
-> good reason.
+Hello:
 
-Stating the obvious perhaps but it's probably too late in the release
-cycle to get enough agreement here to merge the series. So I'll mark
-it as Deferred.
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-While I'm typing, TBH I'm not sure I'm following the arguments about
-making the property hierarchical. Since the memory limit gets inherited
-I don't understand why the property of being isolated would not.
-Either I don't understand the memcg enough, or I don't understand your
-intended semantics. Anyway..
+On Wed, 23 Jul 2025 11:47:35 -0700 you wrote:
+> There are a couple issues with the tso selftest.
+> 
+>  - Features required for test cases are detected by searching the set
+>    of active features at test start, so if a feature is supported by
+>    hw, but disabled, the test will report that the feature under test
+>    is not available and fail.
+>  - The vxlan test cases do not use the correct ip link flags based on
+>    the gso feature under test
+>  - The non-tunneled tso6 test case is showing up with the wrong name.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,1/3] selftests: drv-net: tso: enable test cases based on hw_features
+    https://git.kernel.org/netdev/net/c/266b835e5e84
+  - [net,2/3] selftests: drv-net: tso: fix vxlan tunnel flags to get correct gso_type
+    https://git.kernel.org/netdev/net/c/2cfbcc5d8af9
+  - [net,3/3] selftests: drv-net: tso: fix non-tunneled tso6 test case name
+    https://git.kernel.org/netdev/net/c/b25b44cd178c
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
