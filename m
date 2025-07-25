@@ -1,325 +1,324 @@
-Return-Path: <netdev+bounces-209976-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-209978-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1262EB11A4D
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 10:56:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BFA1B11A61
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 10:59:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A273A3BE8B1
-	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 08:55:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5E9FAC4354
+	for <lists+netdev@lfdr.de>; Fri, 25 Jul 2025 08:59:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9B26244675;
-	Fri, 25 Jul 2025 08:56:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19C5625392B;
+	Fri, 25 Jul 2025 08:59:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="TZiyWJ17"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="1RH+L5ix"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2082.outbound.protection.outlook.com [40.107.220.82])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAE562046A9
-	for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 08:55:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753433760; cv=none; b=WO4cswWCFtVWV2ZzIFVsuoxZ2BT2RyYop3pdDavFFQtGRzsl4r18vZSCtD9swE+VdEtqzekDCiaW3MqIUVb6591VHlUZO74wJh20fG5djxJJJLrRZIazNkJ+OAJAWYT1WwanZCGpry0wHU7HcOjYJTbrlSzsjSVYRe9qRdG1gyU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753433760; c=relaxed/simple;
-	bh=JuuHd3/JWJkWh66N+Da1iNzdDmWdmTZCjsHYbDE9L68=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZiSRfiBggOhmjYn+JWPy8eYCmrab56xwFlgnqNoasAneEcIzpR8RksamfEh+zbkNoQzaHZW+2riWRe+iz3zq+BaEsQ8lDlUVTZqKoRrA/Z2vOcmlChJVhDeiIE/zkeLkOkz6tr3i4UUFKTI9U80Bqavi4C5GQyjq4vPZ+RCD6Fs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=TZiyWJ17; arc=none smtp.client-ip=209.85.218.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-ae360b6249fso315990666b.1
-        for <netdev@vger.kernel.org>; Fri, 25 Jul 2025 01:55:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1753433757; x=1754038557; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6LeP8D1ee7qumndKzatfF7n5JacNT1J8VdXDhVO9bUU=;
-        b=TZiyWJ17XFqxg00XS6PN1aalVO00Fgdh5v11SNZvC56YP7pinWhR0w4Uz+9WbmmHoL
-         vbBtWsQpak2+JkgdfpwpnTT6NICsUWNY9nD1LmgbU//B96OZbvYvsL4pbt8Q1cfFdgBJ
-         PUpBGZ+rvLjUZxAiEAJeAjNzHPTt20MUamPesDjSax7bYI+TlN74d9hmOFosuGnixuEF
-         81dKX5uHO633S0VLG6pFHvAyFs2e0DB5Ajc+1AgSqk5fHZxk8sqGAlqKYDgCnEmi1LUt
-         xBN/SPbf8RX0v1LBqjF0gIZnkZiho/8xaiZd8hUSi60QRSqA6OkacUuvXauywfPLlZ2t
-         Pv4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753433757; x=1754038557;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6LeP8D1ee7qumndKzatfF7n5JacNT1J8VdXDhVO9bUU=;
-        b=KiFh/O52jGNcmoeLlFEJWkVR4IG012eGquOm5EqU1aDYOawpFBYReksw//c46PhSLy
-         /rTWmYzfzY0+LsAj3oNoRzNiAQPEszeX24ddY2CiH/hTI9gfucOptFu2V0QTYl2+92AP
-         6DpNjf+7pkbQM49C0xucZyStj17F2/j0o2h+6BrBlrXAewKTyFk0KNmHb6PkNQNJ/o8Z
-         ddfxye2LtQ8fI8d4hbNxfTLe4YyCthmThrXbAxce/idKDyeguE/TFXX3vAdZ70emPHCC
-         WhDtLBVV9NMSH1HMac8rSWPScJKFZxEkIyq6xnu9Y5ek945XmgJqi/8Z0DgXcNHGUpjz
-         spaA==
-X-Forwarded-Encrypted: i=1; AJvYcCWOvP1HtXsflI2NloMSlqDNehr1NjAjw3nvvrRqfhRGddjDQvz8rfTU3SpcYyxmgFLvuIZOwB8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxLci6eTJ9E80O0wokYx4vBmtIXwOa+j+0T+G3Em2uV2HRh0u0/
-	fixNprkKCG72DMNi3HOj8bdcW0AWmnkvkd5MfBcnqHxT7Jkqy2fGvmiZyCiJ8Hk1n8A=
-X-Gm-Gg: ASbGncufazQu+qTc2wkpvnOCwFw5dbVmGJS8hdTuWsRwpFpev2ChmqQ4DRJbRnLPPSe
-	f1wwPaHhjleKbOMEJLJjlX/SoWZEYQC2I88Bj5HXyT/cnzMoV2gp9HhfhQbmOtOY8k8pkqQE3CA
-	yV/DPKeioB0M+bfWCgKZnEpYxr1ZxcJNFMuwXCFCFqT7raN4I98k+FEXBtlKkS8Cu2P5bJEkMRv
-	aZJ7mFyBdACBPFnFPHi7o72xVb4g8QJRDHzG4IIPCwDYcVoJGnpmCOel67iURtGJYiy2Wk3rs18
-	Gwoyr1CZEWzwECOKlmbwxQmZz2Sa73hEwYUqPM0+vI4cenPk9AN4Sq+N9SuDrm5i0irm923Oo1m
-	UxEkWZEZXLm9TePNJJkX3fQUcZOp3PuceF9V6fBujmIIc6097wCCXyq9ZUvOeO5rK
-X-Google-Smtp-Source: AGHT+IESbgTMAbbOOQ4dkuWrJjDXut0veR7I0Y4h2kmNN5sqbg78IY81j+SvSd3mO/Y8gY1M5e4CZw==
-X-Received: by 2002:a17:906:794b:b0:ae6:c555:8dcf with SMTP id a640c23a62f3a-af61cf980afmr167109166b.26.1753433756789;
-        Fri, 25 Jul 2025 01:55:56 -0700 (PDT)
-Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-af47c496250sm240609066b.13.2025.07.25.01.55.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 25 Jul 2025 01:55:56 -0700 (PDT)
-Message-ID: <a1f88a9d-14b8-4547-a6c1-b880633775a5@blackwall.org>
-Date: Fri, 25 Jul 2025 11:55:54 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2468C2459F8;
+	Fri, 25 Jul 2025 08:59:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.82
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753433968; cv=fail; b=JrwuWZi/q/9Rlj65t09EblQz+FY6d6FcaIQ73wM4B5aOlyZScBZ8dF6QHvfJqiGzP3g8mSeARqatTVZq80xB2CstTJdn9DPWJ/SM0Wfri5xlABEaydZwZ0J+18zpf4ZJDQHt/kvO02DuBSTsPm5U9T+eRt8YrRvZJtN5Nh4Re7k=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753433968; c=relaxed/simple;
+	bh=q3AxWBRtNBCkwLdIBNoboCQdUcNxZXkaZ6mf54AVbHU=;
+	h=Message-ID:Date:Subject:To:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=CBTi8jA7DkgYBmTubgAj1TBbgqYrTouU5JHOedVk3KhsZip2/Bcbx+n05TzcAgl+5J6+JGl2WQflWQZ5hsx1KIABzVkMxg5uy1KRxeV+Bb8I4HPY2xKQFts7xXVtFZCVzcvBDWd8BC9OkJg6zarBziAwcawlGLCorK1vWHRc2JQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=1RH+L5ix; arc=fail smtp.client-ip=40.107.220.82
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=wZvG460eyY38rbaKPU62LKJOH5dg1+k0SIp40FzFtp9osQ5E5mQiMbTErcvsWiMTKSWhvaENhATt4aL8O9hkLQdN+V+6h4PBkEqp1M8eeAcGDPOKaQ8+2rSaBVt2UTwT7v9MWF48JNArk2LPMslFQsroPKxDaf5u8SOzIOPMhWssCJiLExyb0vtL/GRv/ENbhbXHtngg7Pkh07WrnwZESb2RRxIcWUGxLkkhKWpPCD0wltRsw9mU4Abx0ry2WxgXNaWjPA+NVuw6iX+/ti3YgxqN/PbKemzoqe6yOI1qYz+VWNhfkxAsNECOHc6jFne0Y0+qoKJphu9Hfh2MP8puLQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=JfkUjYv8j8VYkoIoYgSo1GVeSTims3mm/tlBtKnhmBQ=;
+ b=PDOxIJ2LGD5xQeHnNFtHinajXv7jG6izcXC+Wq6vyXFEgvdsOquJwu5NEuKbBnDfKxrKFphHJSdJLGQRNnHDhBm7VGKkESsqW8pIPqrGEYuNIveKZNtArdlQmWoKGlhObwT5++HCtc3Ysql/H3hUrkMjLxA04eEw9mN/gRPkgLifWTf4iK8pGjZMGRssG7iH0yMZn3ru/aPoydZA4XQlD0ZikIabgztTI+p49j/qIvVn5ScLwzj2VJrr8lkY6hYf7OxumkHzV3DIufxkQteXe8Z/vLqwai2URFUptw3L+O/b2BBjbuiuxMw/QZ3NDb1mCOOb0QGAeguRdNE4cp+REQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=JfkUjYv8j8VYkoIoYgSo1GVeSTims3mm/tlBtKnhmBQ=;
+ b=1RH+L5ixsQxMz2CzUzyZa2i/4ou53D2LM7RoIu6upHHGreO9/uQ5yf+y6Fzq7aNxf6GY2CaAM06tvZtKifmqzVBjdTaL3NA6ID88ZITliiMnBCtQvfmwargfP4R3lZkhCQgUSnatNNREQS5lJIMXnScagFSs7csi13DDO7NtUK0=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from CH3PR12MB7523.namprd12.prod.outlook.com (2603:10b6:610:148::13)
+ by PH7PR12MB9176.namprd12.prod.outlook.com (2603:10b6:510:2e9::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8964.21; Fri, 25 Jul
+ 2025 08:59:23 +0000
+Received: from CH3PR12MB7523.namprd12.prod.outlook.com
+ ([fe80::f722:9f71:3c1a:f216]) by CH3PR12MB7523.namprd12.prod.outlook.com
+ ([fe80::f722:9f71:3c1a:f216%6]) with mapi id 15.20.8964.019; Fri, 25 Jul 2025
+ 08:59:23 +0000
+Message-ID: <06e29d07-e492-4093-88d5-af91c9060a99@amd.com>
+Date: Fri, 25 Jul 2025 14:29:16 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RESEND PATCH net-next] amd-xgbe: Configure and retrieve
+ 'tx-usecs' for Tx coalescing
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Shyam-sundar.S-k@amd.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250719072608.4048494-1-Vishal.Badole@amd.com>
+ <509add4e-5dff-4f30-b96b-488919fedb77@linux.dev>
+ <e2ee64c4-4923-4691-bcfd-df9222f2c30b@amd.com>
+ <f5e40d58-c956-4ade-9de8-f88c834772f1@linux.dev>
+Content-Language: en-US
+From: "Badole, Vishal" <vishal.badole@amd.com>
+In-Reply-To: <f5e40d58-c956-4ade-9de8-f88c834772f1@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: MA0PR01CA0111.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:a01:11d::17) To CH3PR12MB7523.namprd12.prod.outlook.com
+ (2603:10b6:610:148::13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/3] bonding: add support for per-port LACP actor
- priority
-To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
-Cc: Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, Petr Machata <petrm@nvidia.com>,
- Amit Cohen <amcohen@nvidia.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
- Alessandro Zanni <alessandro.zanni87@gmail.com>, linux-doc@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250724081632.12921-1-liuhangbin@gmail.com>
- <20250724081632.12921-2-liuhangbin@gmail.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20250724081632.12921-2-liuhangbin@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB7523:EE_|PH7PR12MB9176:EE_
+X-MS-Office365-Filtering-Correlation-Id: 26e28a1c-de08-4010-8693-08ddcb598cae
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?WnA0QXhFMkxERVpaNzNxSUlITjc0NkdLYWFleUlEOEd1SW1RY04vRVZOYXda?=
+ =?utf-8?B?OXFnek5NQkErVExGaU1nSnhlRk9FN3FUVHgzNEtNQlJzTTBHd3IveVBNTXBM?=
+ =?utf-8?B?ckNYSFAvWHNuY2RwZ3dJTDJ4Q3hueGwvM3RwNXE0UDFPdlZqQkovckZZUkkx?=
+ =?utf-8?B?V2hXMmtpOEVvbjdUeE5hY1EvNW9QdGlyU0pEUC81YjA2VXJxakl3b1cxNGxY?=
+ =?utf-8?B?clIzOG8zalNCYWwrQjJuVGhKaUFxTkF0aDEwYVl5WlNNM3ZDWk8yWTAralBM?=
+ =?utf-8?B?a1p0bHk3dnZEZEVWTXNvMkVXMHJkRXMwNk9HdHNyMFJ3NVV6OFk1Nm1PMC9n?=
+ =?utf-8?B?UWw0RVVWR0thb3lPN3VmRERpeDFscXRJV2k3U3h3bHppZkpHZ1gvdlpwZ3F0?=
+ =?utf-8?B?L1VCeSsrOFNycGZLNkxEWmNLQlVycFg2cUZualVBcWdodXVLKzc3YTNRZzFF?=
+ =?utf-8?B?M1hoQmR0ckU2S2tvNC9GKyt3ZmRBdXlxVWlJWENERW80UDdxZ3paS0NoUmVk?=
+ =?utf-8?B?VHVTSUVYUCtKU2g3VjA3Sms1Umdhek5laXRYVWRNekFacE9IN25xYnNWQVN5?=
+ =?utf-8?B?VElxNkZqcURWbUhPY2RDRHVEL3RNLzZmeGc1enZSOXdzd3lWYUYyRjEwc2FY?=
+ =?utf-8?B?M3NKMlNjZjhnM0VTVmRjaGJxR2trYWR1a1d2TS8zUGNjZVV4MXpMM0NwVHl1?=
+ =?utf-8?B?VDVMUmtuakFwZEVrZGxPWXdJbTlrNDJIUnRMQitxVTA3MEVrK05YcDZKcFcv?=
+ =?utf-8?B?UGxLZmJHY2tIR09uVjJvMUtCcUJsNkxvMVk2ZnR1SEx1VkRHVmtWUUR3OW4r?=
+ =?utf-8?B?SDJqRUtSNnBkSjhHcm5GSXhWSmNZelJpd1ZzUFNkN1FnV0UzVVBZSjlLSTZ0?=
+ =?utf-8?B?dDFycTB2RmpGNysvek1iUkMvVzRJN2xCOUdhS201MGFYUWdLbmVQK24zeThB?=
+ =?utf-8?B?NDZhQVNOT0FiRnBkNHByYyt6Z1NpeGozVVRhYkF1L3pEaHdDcE1ocVNCblc5?=
+ =?utf-8?B?VmJOZVVMT3JVdUNTRGpMTHhnUG1jMFBWcElvL2Z6NVlXSHNuTGJ3OEc1WVBU?=
+ =?utf-8?B?WHJBcUhld3ZoVVRPZVdBdXgwR0owNHNEd041ZU1sc1BoVDlsd2l1S1VKQlpp?=
+ =?utf-8?B?aTV3bW5lWVNmVlgxRFgwUUdZUlovV05Kbkd1M0Q4NHpOdmg4SngvSEFHZlVW?=
+ =?utf-8?B?ZktnSzlZZXlSQmdTWFRCVFdEV0R4MTVZc3ppSG81bzNJS3phZXg2cGlTWk1o?=
+ =?utf-8?B?R25wY0hXTUJ1Z1piRkd6dUR6TTllMEI5RmpUQW9lOVlVUVlkY2ZhUzVldE5J?=
+ =?utf-8?B?LzlVTlh1bW1qdzZmTk9QTnpyTXByeWxOWjl2YXZBUkhNeGQzVjgzS1RGVG1D?=
+ =?utf-8?B?R3JjVFJCQjFuOXN4NUkvcWJDb2hsbmpOOFBFZFRJWmlOUFc2UTViRW12RDdC?=
+ =?utf-8?B?YVR4c2VlODJGRXpzbDQ3NE1jemptbGZmWlF5VlVYWXp4Rm1MMzhiN2lXdEYv?=
+ =?utf-8?B?aWFqaXk5aXNFOERLa0RhSHNDemZXeTFqZkVJS1IyYlFYaWZnR3FJSERWSXB1?=
+ =?utf-8?B?SDdaVzJzOTl0aEtUYzA5eTRZRGZ6dWFiV2JWUDk4VFA2dGdZNHNmUnkxeUpI?=
+ =?utf-8?B?Mk5jcVJRVTBGUlZvTUdFSU9EeVAzeVozZHhyODNUUGwrSTJHK01yKzJ1S2JX?=
+ =?utf-8?B?Tk01dlpQMlF1RTEyblUzbnRvVW9XaWVjaUJmVHVSSVZXZlBaQUdVZVduN0dj?=
+ =?utf-8?B?N1hhUCt0bFFXL0xubk1ZSTZvbngzZE9Hc2I4U25QQWNYcWx6U0FXeE8vb1h6?=
+ =?utf-8?B?NWQ4UjFDYURLb0Q3V1lqOFJyQmZGYXdLanRLMHhCWDZDRFZVZVA0ZFhvK01F?=
+ =?utf-8?B?NzdLd2hncEpDaFhaWlM2N0szM2p0Vm51MkNTOE5acXVkd0d5NVViVXcvaFU2?=
+ =?utf-8?Q?5NqvZ1TdVKw=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7523.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?dHB5VmMyZlE1SzB5bTRNMmhvK0lNVXBYd3ZFam5tYUxCL2ZqVU40Zml4RUJt?=
+ =?utf-8?B?aU1hYzBwZCtTSUxFd3ZkTDFUajQ1ZU92dkNPRkdHdTFVTWZrajhnYjJJd2xF?=
+ =?utf-8?B?R2hpZXZwZWFjbHJDRHZCYVE2U2hjNUdNZGM5VFFTNG12dWloMmFSUWJ0TWw5?=
+ =?utf-8?B?Q0liQUovWldJb24wV1g4clpFTFU4UTdwaStrdnF0MEw5cjd4UWtSOGM1eGYy?=
+ =?utf-8?B?NHg5NVZkK0VnclRGWnc1NEpKUWFZL2VxZkd5V2NubW9RVFdnU1pGNllDL0Y1?=
+ =?utf-8?B?ck5KcFJlM1RzcUZpNkpjOGJjelhEd2Qxbm1IbXFDQURJdEtGb3dzK0F5K2l5?=
+ =?utf-8?B?T0dOeVhmeUVJU2EvRC9xN3JvbkR1L2lpaTVNSHpWRVZIRHN6NEF6R0w2Zmlq?=
+ =?utf-8?B?dUJHS3NrUlNsMlV2UHltQnp6dFROK0p0bWlhQmNiUHV2dFNId1NQWWNZaFZZ?=
+ =?utf-8?B?SHYwOGxzTjQ5cDgyU3k2Q3NTMXZVT0UvY3NxQWNwSXBpekdRd0xjV0U5Nlhi?=
+ =?utf-8?B?Mm5vQTVNOUJsQ3VMWUlGS3FtUVMzNm5UdG1IeXA3ZnBqV1FYdzhpVndiYTJF?=
+ =?utf-8?B?K2ovUUNVTTloUG8vZFlyQWF0NmhrekJMUVJJT0tBL21TV2JtcUgwR1JBR0VD?=
+ =?utf-8?B?S2JMaWF6VC9FM1YzMnhEeVErVGZLMTFqUFRsb2tadmg5OTJtTngvaW5KaDdQ?=
+ =?utf-8?B?RHdHSHU0d254emhuTHJSUm5UQjM1azVYU1lsbjVFamYzbUI3b3ZvYVlwT010?=
+ =?utf-8?B?TEF6Qm9DVWZMbXVmUEE4UWRnU2dpVzE0dUVMaUVaVlZYemF4N3d4U1JqMGxZ?=
+ =?utf-8?B?dmsxM0daQ3VidEFpWUFidk9lY2NJU0dkb1J6cTdobkRLMy9HMnhuUDVDQ0U5?=
+ =?utf-8?B?UVFmaGZMOEVrbnVEUWZpdzVBMDl1OXVPUGpORjFHcFZGVGJ6U1ZRWUdvVlpN?=
+ =?utf-8?B?K00zUFN0Ni9GRlNjcEt4dC8xb0xKa1B5eDI3aDNkZysvYnNVSDJOZUgvRlpm?=
+ =?utf-8?B?c3JIcXJyK3hOV2VBY1V4d1k1c2p3bkVLSm9RUFNYdTl3cGVIR1A3R04wZEMr?=
+ =?utf-8?B?dE9uR0tiNXd0UzJsRVVWYlJtak81c0ZhUEVwWXBzK1pzWTFVbmRFa3pzazZr?=
+ =?utf-8?B?UXEweE9HajZBQWh0ek5uQmswVEV5dHpYR1NrZHdIVk91WWU1V1R1WTZZcXJJ?=
+ =?utf-8?B?R1N4TkQ2cGlSREloQ3Vka0sxVi8rZG4xd1NVRnYrNDF3QWRYQmx3anQ4RUFx?=
+ =?utf-8?B?RElUT3l5TVJKN1QyQ2pRL1NlSW1BaHEyTG40MklZL3IycHR6ejRuLzhncEg2?=
+ =?utf-8?B?dDZMWWhNRHpBeEFXYWJxNmM5TnBpcFViYVp0dnZjZHZoTGh5bnpyWnA2WXdM?=
+ =?utf-8?B?RVNubDVqOWRhY3VpLzNKaGZnVzZBN0ZqU2Z0aGlBcWtZOGpjN3ZUMlV2SWVU?=
+ =?utf-8?B?eWoxT3FrdUJ4ZmE1TEZhR00welEzZ2NBK0VPL2hVZWFUYzZYS3ZhTlE1dUVa?=
+ =?utf-8?B?NjJ4clZNNlo3eko0aVBHSHhDU1pwVG9wdnZ5N01yL3k2dFBJQW9XbzVUOXc5?=
+ =?utf-8?B?cXNGNzRJRUdCNmljb2ZUbnZlVDhJKzd1aE92aDVlK0ovUGYzNjBpYXMxWnhJ?=
+ =?utf-8?B?VnpxUWhsVDlITko5MnVQT0hkcDl1R0FqZGdUSHZHcGl1LzNxRDB2V3hHNDln?=
+ =?utf-8?B?NHIyeSt2QitKdG9EWmFHemVUelNNVExaV1JWaDhWOTQvdGIyS3Z0WFYyMG85?=
+ =?utf-8?B?UlE0RVpMeXhVSTdGdU9rb09saFhVM2J4U09oZ1R0WFJubExDR1VlWkdiZWEy?=
+ =?utf-8?B?R0ZsblA3bnQyeXRCZ1RPNXQrODM0TGprcTBnQUFzSXU1S0UzNFNJK0dKMjJB?=
+ =?utf-8?B?N0NQZDBQdVdveERGRDJxektLQkh2QUcyYVRTSVNkc2lvTFBlOCtlcVlJZ05t?=
+ =?utf-8?B?Y2krcXI3Y3lHK1dRVWRxMGRlMFNuckhsTXh3aHQwR3pWRytDMXE0aTNOYmRW?=
+ =?utf-8?B?KzhVeUoyMlpVcUErdjQ0dWhGL0taQ2M3aC9CSzFpc3JjdTJDSkg4WlpNNnlO?=
+ =?utf-8?B?RmxicFI5TlVwSzlOTGcyT1A0UmZNVGRteFhWeU5MUkZONEd3NThtVW9OcUJx?=
+ =?utf-8?Q?lVwKC20mvEa67LslKMIIXwVLp?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 26e28a1c-de08-4010-8693-08ddcb598cae
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7523.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jul 2025 08:59:23.3277
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Q2la2sERZLmk7JLYNSXu9ZmF3R0kr4Zfk9Bs3aU1c88Gf/PERfxCdYXrvUz28FznOWvd6ZOxMlCkEP83Dx33Gw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB9176
 
-On 7/24/25 11:16, Hangbin Liu wrote:
-> Introduce a new option ad_actor_port_prio, allowing users to set the actor
-> port priority on a per-port basis in LACPDU.
+
+
+On 7/21/2025 3:05 AM, Vadim Fedorenko wrote:
+> On 20.07.2025 19:28, Badole, Vishal wrote:
+>>
+>>
+>> On 7/19/2025 8:46 PM, Vadim Fedorenko wrote:
+>>> On 19.07.2025 08:26, Vishal Badole wrote:
+>>>> Ethtool has advanced with additional configurable options, but the
+>>>> current driver does not support tx-usecs configuration.
+>>>>
+>>>> Add support to configure and retrieve 'tx-usecs' using ethtool, which
+>>>> specifies the wait time before servicing an interrupt for Tx 
+>>>> coalescing.
+>>>>
+>>>> Signed-off-by: Vishal Badole <Vishal.Badole@amd.com>
+>>>> Acked-by: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
+>>>> ---
+>>>>   drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c | 19 +++++++++++++++++--
+>>>>   drivers/net/ethernet/amd/xgbe/xgbe.h         |  1 +
+>>>>   2 files changed, 18 insertions(+), 2 deletions(-)
+>>>>
+>>>> diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c b/drivers/ 
+>>>> net/ ethernet/amd/xgbe/xgbe-ethtool.c
+>>>> index 12395428ffe1..362f8623433a 100644
+>>>> --- a/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c
+>>>> +++ b/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c
+>>>> @@ -450,6 +450,7 @@ static int xgbe_get_coalesce(struct net_device 
+>>>> *netdev,
+>>>>       ec->rx_coalesce_usecs = pdata->rx_usecs;
+>>>>       ec->rx_max_coalesced_frames = pdata->rx_frames;
+>>>> +    ec->tx_coalesce_usecs = pdata->tx_usecs;
+>>>>       ec->tx_max_coalesced_frames = pdata->tx_frames;
+>>>>       return 0;
+>>>> @@ -463,7 +464,7 @@ static int xgbe_set_coalesce(struct net_device 
+>>>> *netdev,
+>>>>       struct xgbe_prv_data *pdata = netdev_priv(netdev);
+>>>>       struct xgbe_hw_if *hw_if = &pdata->hw_if;
+>>>>       unsigned int rx_frames, rx_riwt, rx_usecs;
+>>>> -    unsigned int tx_frames;
+>>>> +    unsigned int tx_frames, tx_usecs;
+>>>>       rx_riwt = hw_if->usec_to_riwt(pdata, ec->rx_coalesce_usecs);
+>>>>       rx_usecs = ec->rx_coalesce_usecs;
+>>>> @@ -485,9 +486,22 @@ static int xgbe_set_coalesce(struct net_device 
+>>>> *netdev,
+>>>>           return -EINVAL;
+>>>>       }
+>>>> +    tx_usecs = ec->tx_coalesce_usecs;
+>>>>       tx_frames = ec->tx_max_coalesced_frames;
+>>>> +    /* Check if both tx_usecs and tx_frames are set to 0 
+>>>> simultaneously */
+>>>> +    if (!tx_usecs && !tx_frames) {
+>>>> +        netdev_err(netdev,
+>>>> +               "tx_usecs and tx_frames must not be 0 together\n");
+>>>> +        return -EINVAL;
+>>>> +    }
+>>>> +
+>>>>       /* Check the bounds of values for Tx */
+>>>> +    if (tx_usecs > XGMAC_MAX_COAL_TX_TICK) {
+>>>> +        netdev_err(netdev, "tx-usecs is limited to %d usec\n",
+>>>> +               XGMAC_MAX_COAL_TX_TICK);
+>>>> +        return -EINVAL;
+>>>> +    }
+>>>>       if (tx_frames > pdata->tx_desc_count) {
+>>>>           netdev_err(netdev, "tx-frames is limited to %d frames\n",
+>>>>                  pdata->tx_desc_count);
+>>>> @@ -499,6 +513,7 @@ static int xgbe_set_coalesce(struct net_device 
+>>>> *netdev,
+>>>>       pdata->rx_frames = rx_frames;
+>>>>       hw_if->config_rx_coalesce(pdata);
+>>>> +    pdata->tx_usecs = tx_usecs;
+>>>>       pdata->tx_frames = tx_frames;
+>>>>       hw_if->config_tx_coalesce(pdata);
+>>>>
+>>>
+>>> I'm not quite sure, but it looks like it never works. 
+>>> config_tx_coalesce()
+>>> callback equals to xgbe_config_tx_coalesce() which is implemented as:
+>>>
+>>> static int xgbe_config_tx_coalesce(struct xgbe_prv_data *pdata)
+>>> {
+>>>          return 0;
+>>> }
+>>>
+>>> How is it expected to change anything from HW side?
+>>>
+>>
+>> The code analysis reveals that pdata, a pointer to xgbe_prv_data, is 
+>> obtained via netdev_priv(netdev). The tx_usecs member of the 
+>> xgbe_prv_data structure is then updated with the user-specified value 
+>> through this pdata pointer. This updated tx_usecs value propagates 
+>> throughout the codebase wherever TX coalescing functionality is 
+>> referenced.
+>>
+>> We have validated this behavior through log analysis and transmission 
+>> timestamps, confirming the parameter updates are taking effect.
+>>
+>> Since this is a legacy driver implementation where 
+>> xgbe_config_tx_coalesce() currently lacks actual hardware 
+>> configuration logic for TX coalescing parameters, we plan to modernize 
+>> the xgbe driver and eliminate redundant code segments in future releases.
 > 
-> This priority can be used in future enhancements to influence aggregator
-> selection via ad_select policy.
+> Effectively, when the user asks for the coalescing configuration, the 
+> driver reports values which are not really HW-configured values. At the 
+> same time
+> driver reports correct configuration even though the configuration is not
+> actually supported by the driver and it doesn't configure HW. This 
+> sounds odd.
 > 
-> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
-> ---
->  Documentation/networking/bonding.rst |  9 +++++++
->  drivers/net/bonding/bond_3ad.c       |  2 ++
->  drivers/net/bonding/bond_netlink.c   | 16 +++++++++++++
->  drivers/net/bonding/bond_options.c   | 35 ++++++++++++++++++++++++++++
->  include/net/bond_3ad.h               |  1 +
->  include/net/bond_options.h           |  1 +
->  include/uapi/linux/if_link.h         |  1 +
->  7 files changed, 65 insertions(+)
+> Why didn't you start with the actual implementation instead of doing this
+> useless copying of values?
 > 
-> diff --git a/Documentation/networking/bonding.rst b/Documentation/networking/bonding.rst
-> index a4c1291d2561..5e105e7ac8e6 100644
-> --- a/Documentation/networking/bonding.rst
-> +++ b/Documentation/networking/bonding.rst
-> @@ -193,6 +193,15 @@ ad_actor_sys_prio
->  	This parameter has effect only in 802.3ad mode and is available through
->  	SysFs interface.
->  
-> +ad_actor_port_prio
-> +
-> +	In an AD system, this specifies the port priority. The allowed range
-> +	is 1 - 65535. If the value is not specified, it takes 255 as the
-
-
-Leaving this as a note: it is set to 255 because actor_port_priorty is initialized to 255
-                        and port_priority is initialized to actor_port_priority at slave
-                        bind time.
-
-> +	default value.
-> +
-> +	This parameter has effect only in 802.3ad mode and is available through
-> +	netlink interface.
-> +
->  ad_actor_system
->  
->  	In an AD system, this specifies the mac-address for the actor in
-> diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3ad.c
-> index c6807e473ab7..4a1b2f01fe37 100644
-> --- a/drivers/net/bonding/bond_3ad.c
-> +++ b/drivers/net/bonding/bond_3ad.c
-> @@ -436,6 +436,7 @@ static void __ad_actor_update_port(struct port *port)
->  
->  	port->actor_system = BOND_AD_INFO(bond).system.sys_mac_addr;
->  	port->actor_system_priority = BOND_AD_INFO(bond).system.sys_priority;
-> +	port->actor_port_priority = SLAVE_AD_INFO(port->slave)->port_priority;
->  }
->  
->  /* Conversions */
-> @@ -2197,6 +2198,7 @@ void bond_3ad_bind_slave(struct slave *slave)
->  		port->actor_admin_port_key = bond->params.ad_user_port_key << 6;
->  		ad_update_actor_keys(port, false);
->  		/* actor system is the bond's system */
-> +		SLAVE_AD_INFO(slave)->port_priority = port->actor_port_priority;
->  		__ad_actor_update_port(port);
->  		/* tx timer(to verify that no more than MAX_TX_IN_SECOND
->  		 * lacpdu's are sent in one second)
-> diff --git a/drivers/net/bonding/bond_netlink.c b/drivers/net/bonding/bond_netlink.c
-> index ac5e402c34bc..ad91b93cbdac 100644
-> --- a/drivers/net/bonding/bond_netlink.c
-> +++ b/drivers/net/bonding/bond_netlink.c
-> @@ -28,6 +28,7 @@ static size_t bond_get_slave_size(const struct net_device *bond_dev,
->  		nla_total_size(sizeof(u8)) +	/* IFLA_BOND_SLAVE_AD_ACTOR_OPER_PORT_STATE */
->  		nla_total_size(sizeof(u16)) +	/* IFLA_BOND_SLAVE_AD_PARTNER_OPER_PORT_STATE */
->  		nla_total_size(sizeof(s32)) +	/* IFLA_BOND_SLAVE_PRIO */
-> +		nla_total_size(sizeof(u16)) +	/* IFLA_BOND_SLAVE_AD_ACTOR_PORT_PRIO */
->  		0;
->  }
->  
-> @@ -77,6 +78,10 @@ static int bond_fill_slave_info(struct sk_buff *skb,
->  					ad_port->partner_oper.port_state))
->  				goto nla_put_failure;
->  		}
-> +
-> +		if (nla_put_u16(skb, IFLA_BOND_SLAVE_AD_ACTOR_PORT_PRIO,
-> +				SLAVE_AD_INFO(slave)->port_priority))
-> +			goto nla_put_failure;
->  	}
->  
->  	return 0;
-> @@ -129,6 +134,7 @@ static const struct nla_policy bond_policy[IFLA_BOND_MAX + 1] = {
->  static const struct nla_policy bond_slave_policy[IFLA_BOND_SLAVE_MAX + 1] = {
->  	[IFLA_BOND_SLAVE_QUEUE_ID]	= { .type = NLA_U16 },
->  	[IFLA_BOND_SLAVE_PRIO]		= { .type = NLA_S32 },
-> +	[IFLA_BOND_SLAVE_AD_ACTOR_PORT_PRIO]	= { .type = NLA_U16 },
->  };
->  
->  static int bond_validate(struct nlattr *tb[], struct nlattr *data[],
-> @@ -179,6 +185,16 @@ static int bond_slave_changelink(struct net_device *bond_dev,
->  			return err;
->  	}
->  
-> +	if (data[IFLA_BOND_SLAVE_AD_ACTOR_PORT_PRIO]) {
-> +		u16 ad_prio = nla_get_u16(data[IFLA_BOND_SLAVE_AD_ACTOR_PORT_PRIO]);
-> +
-> +		bond_opt_slave_initval(&newval, &slave_dev, ad_prio);
-> +		err = __bond_opt_set(bond, BOND_OPT_AD_ACTOR_PORT_PRIO, &newval,
-> +				     data[IFLA_BOND_SLAVE_AD_ACTOR_PORT_PRIO], extack);
-> +		if (err)
-> +			return err;
-> +	}
-> +
->  	return 0;
->  }
->  
-> diff --git a/drivers/net/bonding/bond_options.c b/drivers/net/bonding/bond_options.c
-> index 91893c29b899..2b8606b4e4f5 100644
-> --- a/drivers/net/bonding/bond_options.c
-> +++ b/drivers/net/bonding/bond_options.c
-> @@ -79,6 +79,8 @@ static int bond_option_tlb_dynamic_lb_set(struct bonding *bond,
->  				  const struct bond_opt_value *newval);
->  static int bond_option_ad_actor_sys_prio_set(struct bonding *bond,
->  					     const struct bond_opt_value *newval);
-> +static int bond_option_ad_actor_port_prio_set(struct bonding *bond,
-> +					      const struct bond_opt_value *newval);
->  static int bond_option_ad_actor_system_set(struct bonding *bond,
->  					   const struct bond_opt_value *newval);
->  static int bond_option_ad_user_port_key_set(struct bonding *bond,
-> @@ -221,6 +223,12 @@ static const struct bond_opt_value bond_ad_actor_sys_prio_tbl[] = {
->  	{ NULL,      -1,    0},
->  };
->  
-> +static const struct bond_opt_value bond_ad_actor_port_prio_tbl[] = {
-> +	{ "minval",  1,     BOND_VALFLAG_MIN},
-> +	{ "maxval",  65535, BOND_VALFLAG_MAX},
-
-
-You can add one more value: { "default", 255, BOND_VALFLAG_DEFAULT }
-
-
-> +	{ NULL,      -1,    0},
-> +};
-> +
->  static const struct bond_opt_value bond_ad_user_port_key_tbl[] = {
->  	{ "minval",  0,     BOND_VALFLAG_MIN | BOND_VALFLAG_DEFAULT},
->  	{ "maxval",  1023,  BOND_VALFLAG_MAX},
-> @@ -476,6 +484,13 @@ static const struct bond_option bond_opts[BOND_OPT_LAST] = {
->  		.values = bond_ad_actor_sys_prio_tbl,
->  		.set = bond_option_ad_actor_sys_prio_set,
->  	},
-> +	[BOND_OPT_AD_ACTOR_PORT_PRIO] = {
-> +		.id = BOND_OPT_AD_ACTOR_PORT_PRIO,
-> +		.name = "ad_actor_port_prio",
-> +		.unsuppmodes = BOND_MODE_ALL_EX(BIT(BOND_MODE_8023AD)),
-> +		.values = bond_ad_actor_port_prio_tbl,
-> +		.set = bond_option_ad_actor_port_prio_set,
-> +	},
->  	[BOND_OPT_AD_ACTOR_SYSTEM] = {
->  		.id = BOND_OPT_AD_ACTOR_SYSTEM,
->  		.name = "ad_actor_system",
-> @@ -1793,6 +1808,26 @@ static int bond_option_ad_actor_sys_prio_set(struct bonding *bond,
->  	return 0;
->  }
->  
-> +static int bond_option_ad_actor_port_prio_set(struct bonding *bond,
-> +					      const struct bond_opt_value *newval)
-> +{
-> +	struct slave *slave;
-> +
-> +	slave = bond_slave_get_rtnl(newval->slave_dev);
-> +	if (!slave) {
-> +		netdev_dbg(bond->dev, "%s called on NULL slave\n", __func__);
-> +		return -ENODEV;
-> +	}
-> +
-> +	netdev_dbg(newval->slave_dev, "Setting ad_actor_port_prio to %llu\n",
-> +		   newval->value);
-> +
-> +	SLAVE_AD_INFO(slave)->port_priority = newval->value;
-> +	bond_3ad_update_ad_actor_settings(bond);
-> +
-> +	return 0;
-> +}
-> +
->  static int bond_option_ad_actor_system_set(struct bonding *bond,
->  					   const struct bond_opt_value *newval)
->  {
-> diff --git a/include/net/bond_3ad.h b/include/net/bond_3ad.h
-> index 2053cd8e788a..bf551ca70359 100644
-> --- a/include/net/bond_3ad.h
-> +++ b/include/net/bond_3ad.h
-> @@ -274,6 +274,7 @@ struct ad_slave_info {
->  	struct port port;		/* 802.3ad port structure */
->  	struct bond_3ad_stats stats;
->  	u16 id;
-> +	u16 port_priority;
->  };
->  
->  static inline const char *bond_3ad_churn_desc(churn_state_t state)
-> diff --git a/include/net/bond_options.h b/include/net/bond_options.h
-> index 18687ccf0638..4aee1935e0e7 100644
-> --- a/include/net/bond_options.h
-> +++ b/include/net/bond_options.h
-> @@ -77,6 +77,7 @@ enum {
->  	BOND_OPT_NS_TARGETS,
->  	BOND_OPT_PRIO,
->  	BOND_OPT_COUPLED_CONTROL,
-> +	BOND_OPT_AD_ACTOR_PORT_PRIO,
->  	BOND_OPT_LAST
->  };
->  
-> diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
-> index 3ad2d5d98034..79bcbbc264a7 100644
-> --- a/include/uapi/linux/if_link.h
-> +++ b/include/uapi/linux/if_link.h
-> @@ -1562,6 +1562,7 @@ enum {
->  	IFLA_BOND_SLAVE_AD_ACTOR_OPER_PORT_STATE,
->  	IFLA_BOND_SLAVE_AD_PARTNER_OPER_PORT_STATE,
->  	IFLA_BOND_SLAVE_PRIO,
-> +	IFLA_BOND_SLAVE_AD_ACTOR_PORT_PRIO,
->  	__IFLA_BOND_SLAVE_MAX,
->  };
->  
+> 
+Since the XGMAC controller does not provide hardware-level register 
+support for tx_usecs-based TX interrupt coalescing, the driver employs 
+an advanced timer-driven software implementation to achieve interrupt 
+batching and improve performance. The tx_usecs parameter is accessible 
+through the pdata structure pointer, allowing dynamic updates that 
+automatically influence the TX coalescing timer mechanism across the 
+driver implementation.
+>>
+>>>> @@ -830,7 +845,7 @@ static int xgbe_set_channels(struct net_device 
+>>>> *netdev,
+>>>>   }
+>>>>   static const struct ethtool_ops xgbe_ethtool_ops = {
+>>>> -    .supported_coalesce_params = ETHTOOL_COALESCE_RX_USECS |
+>>>> +    .supported_coalesce_params = ETHTOOL_COALESCE_USECS |
+>>>>                        ETHTOOL_COALESCE_MAX_FRAMES,
+>>>>       .get_drvinfo = xgbe_get_drvinfo,
+>>>>       .get_msglevel = xgbe_get_msglevel,
+>>>> diff --git a/drivers/net/ethernet/amd/xgbe/xgbe.h b/drivers/net/ 
+>>>> ethernet/ amd/xgbe/xgbe.h
+>>>> index 42fa4f84ff01..e330ae9ea685 100755
+>>>> --- a/drivers/net/ethernet/amd/xgbe/xgbe.h
+>>>> +++ b/drivers/net/ethernet/amd/xgbe/xgbe.h
+>>>> @@ -272,6 +272,7 @@
+>>>>   /* Default coalescing parameters */
+>>>>   #define XGMAC_INIT_DMA_TX_USECS        1000
+>>>>   #define XGMAC_INIT_DMA_TX_FRAMES    25
+>>>> +#define XGMAC_MAX_COAL_TX_TICK        100000
+>>>>   #define XGMAC_MAX_DMA_RIWT        0xff
+>>>>   #define XGMAC_INIT_DMA_RX_USECS        30
+>>>
+>>
+> 
 
 
