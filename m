@@ -1,145 +1,132 @@
-Return-Path: <netdev+bounces-210295-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210296-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84D6EB12B1B
-	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 17:33:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE2F4B12B46
+	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 17:53:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9FDB21C24E65
-	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 15:33:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB2C854147A
+	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 15:53:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99BB01D5CFE;
-	Sat, 26 Jul 2025 15:32:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33B37276023;
+	Sat, 26 Jul 2025 15:53:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="1f4IvM9z"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RHCDniFl"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8419191499;
-	Sat, 26 Jul 2025 15:32:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 071A11DD889;
+	Sat, 26 Jul 2025 15:53:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753543976; cv=none; b=cyIFonCm5UbuLLKnL55x1Mgb7fw3pqHZGwni6XVdtJwMXL05mIP5KdYLNhZ+Q70ikRrT7oGIH2MV4QYGFv78N3tM8EV3KQOiSl1EDj8AMyc3po2Y9uUZ9rVCQPi9D6ZI1o54VJQtuL85jVFfJaoQar9HEMJ2bEFQfi+An89BkbQ=
+	t=1753545233; cv=none; b=ODaYvTlh7i7KyfG+9iDjhoZLO76jFePRDBJqwc6Uqdd9OwHbosIT1GHnjqpQbtbnMPXwlDT8UNxXzP3XwXEf+rGs4K7b47QlPOuycKF6RLy3eRxnIBR2DN5cyOBWVypzI+Nt+RFo2nh0Ugtu4+Yxcm8vX7Lmahu/u7B3kuERg2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753543976; c=relaxed/simple;
-	bh=F4pSiM8sif6t2g8qvFAAosnygaFmnkUokHCeD5NcvxY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Hjvb1ZiewQkjlE8CMFE+xJUk9Ocq+sf3DpovPalplpMvE57BzKcj1AbczZiVBbdvVUB3ikp4Yqmtkkw6noZBg5wDXIal5Q8XsK6fOhocm8NeE7Yg+rXvOg3lkE6tMRc76AUTDBU614g2IpemFv7BWshP+DXwXv2jCccQEZpSRd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=1f4IvM9z; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=aLkEy3g4vj/r0mSrOYBmhqyQ0HVZqYbFyEiyTsWXF0M=; b=1f
-	4IvM9z2FrMXVnZn3sV3uVmmt0iV6nrn3fGF6l7Getl1E3rz9C9qFvRjqDdyqIduqk4k5szDySeKUy
-	ovM3WWz4lImsJEuAhT/wRwdnI1p4rYmQIiE5IPfaueYpRK+CwpZbv/Qd8zUc5r+JPrDiztKX+uEVy
-	/MUHCq911FfAfCQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1ufgt9-002wyp-9z; Sat, 26 Jul 2025 17:32:43 +0200
-Date: Sat, 26 Jul 2025 17:32:43 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "claudiu beznea (tuxon)" <claudiu.beznea@tuxon.dev>
-Cc: Vineeth Karumanchi <vineeth.karumanchi@amd.com>,
-	nicolas.ferre@microchip.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, git@amd.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 3/6] net: macb: Add IEEE 802.1Qbv TAPRIO REPLACE
- command offload support
-Message-ID: <aaf014b1-d0c0-491e-99fb-9d1eb5abafb3@lunn.ch>
-References: <20250722154111.1871292-1-vineeth.karumanchi@amd.com>
- <20250722154111.1871292-4-vineeth.karumanchi@amd.com>
- <64481774-9791-4453-ab81-e4f0c444a2a6@tuxon.dev>
+	s=arc-20240116; t=1753545233; c=relaxed/simple;
+	bh=UBc+BZmaMOHH7cTVN1EGrbdqthdjOH/VQjkGtqKtNCU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OYudaygoCMGnHzRGu6tE/zS73G5mirWV2SNEDaZECKCsBBjUjRgntC5Zh06uM1mJwFDfNbtyUIOEk5z0GBmthLrzUsnECUfRESEiHEmY8QAycX4t9CmIu64mH2T/pOCEUL5Adt2cGeh5v/16Y8pA3ZVkmjNCjMgLjxcgGyDtK1w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RHCDniFl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BF07C4CEED;
+	Sat, 26 Jul 2025 15:53:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753545232;
+	bh=UBc+BZmaMOHH7cTVN1EGrbdqthdjOH/VQjkGtqKtNCU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=RHCDniFlzoCJRm+a1vKsqj47hOGKq3YK74Q3k8ldgmPDRyWCgD8P8HOVznuIxBHV3
+	 cs/YD1iJH0dH/M4MCU2Bi9gvF4WhH9T1947vBLmBV84pYig64y1t0AJl1KIYsEFF9N
+	 zpQZjZHzlwkDE8QZ2j7WeCgTIVvEQCCn79UEMsGTHBUvHFzl972vqvQr+i5PYVV98k
+	 MePVquesowwpVZ8foPMoidCT4Ts/BZDmoqDCbh3Fw5ajzcBwyFY5iUdpPO3LAULjuQ
+	 xFPYpONa+g76mKlag+kxxVQyX2Lve74DQMhNZpYvH0ipgAkeQvK03+nIrqqh+nAeP+
+	 AlOp404kPPtEw==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	eddyz87@gmail.com,
+	song@kernel.org,
+	yonghong.song@linux.dev,
+	john.fastabend@gmail.com,
+	kpsingh@kernel.org,
+	sdf@fomichev.me,
+	haoluo@google.com,
+	jolsa@kernel.org,
+	mykolal@fb.com,
+	shuah@kernel.org,
+	pablo@netfilter.org,
+	bigeasy@linutronix.de,
+	fw@strlen.de,
+	bpf@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net-next] selftests: bpf: fix legacy netfilter options
+Date: Sat, 26 Jul 2025 08:53:49 -0700
+Message-ID: <20250726155349.1161845-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <64481774-9791-4453-ab81-e4f0c444a2a6@tuxon.dev>
 
-> > +	enst_queue = kcalloc(conf->num_entries, sizeof(*enst_queue), GFP_KERNEL);
-> 
-> To simplify the error path you can use something like:
-> 
->         struct queue_enst_configs *enst_queue __free(kfree) = kcalloc(...);
-> 
-> and drop the "goto cleanup" below.
+Recent commit to add NETFILTER_XTABLES_LEGACY missed setting
+a couple of configs to y. They are still enabled but as modules
+which appears to have upset BPF CI, e.g.:
 
-https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+   test_bpf_nf_ct:FAIL:iptables-legacy -t raw -A PREROUTING -j CONNMARK --set-mark 42/0 unexpected error: 768 (errno 0)
 
-1.6.5. Using device-managed and cleanup.h constructs
+Fixes: 3c3ab65f00eb ("selftests: net: Enable legacy netfilter legacy options.")
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+Targeting net-next 'cause that's where the bad commit is.
 
-Netdev remains skeptical about promises of all “auto-cleanup” APIs,
-including even devm_ helpers, historically. They are not the preferred
-style of implementation, merely an acceptable one.
+CC: ast@kernel.org
+CC: daniel@iogearbox.net
+CC: andrii@kernel.org
+CC: martin.lau@linux.dev
+CC: eddyz87@gmail.com
+CC: song@kernel.org
+CC: yonghong.song@linux.dev
+CC: john.fastabend@gmail.com
+CC: kpsingh@kernel.org
+CC: sdf@fomichev.me
+CC: haoluo@google.com
+CC: jolsa@kernel.org
+CC: mykolal@fb.com
+CC: shuah@kernel.org
+CC: pablo@netfilter.org
+CC: bigeasy@linutronix.de
+CC: fw@strlen.de
+CC: bpf@vger.kernel.org
+CC: linux-kselftest@vger.kernel.org
+---
+ tools/testing/selftests/bpf/config | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Use of guard() is discouraged within any function longer than 20
-lines, scoped_guard() is considered more readable. Using normal
-lock/unlock is still (weakly) preferred.
+diff --git a/tools/testing/selftests/bpf/config b/tools/testing/selftests/bpf/config
+index 521836776733..e8c6c77b96cb 100644
+--- a/tools/testing/selftests/bpf/config
++++ b/tools/testing/selftests/bpf/config
+@@ -97,6 +97,8 @@ CONFIG_NF_TABLES_NETDEV=y
+ CONFIG_NF_TABLES_IPV4=y
+ CONFIG_NF_TABLES_IPV6=y
+ CONFIG_NETFILTER_INGRESS=y
++CONFIG_IP_NF_IPTABLES_LEGACY=y
++CONFIG_IP6_NF_IPTABLES_LEGACY=y
+ CONFIG_NETFILTER_XTABLES_LEGACY=y
+ CONFIG_NF_FLOW_TABLE=y
+ CONFIG_NF_FLOW_TABLE_INET=y
+-- 
+2.50.1
 
-Low level cleanup constructs (such as __free()) can be used when
-building APIs and helpers, especially scoped iterators. However,
-direct use of __free() within networking core and drivers is
-discouraged. Similar guidance applies to declaring variables
-mid-function.
-
-> 
-> You can use guard(spinlock_irqsave)(&bp->lock) or
-> scoped_guard(spinlock_irqsave, &bp->lock)
-
-scoped_guard() if anything.
-
-> 
-> > +
-> > +	/* Disable ENST queues if running before configuring */
-> > +	if (gem_readl(bp, ENST_CONTROL))
-> 
-> Is this read necessary?
-> 
-> > +		gem_writel(bp, ENST_CONTROL,
-> > +			   GENMASK(bp->num_queues - 1, 0) << GEM_ENST_DISABLE_QUEUE_OFFSET);
-> 
-> This could be replaced by GEM_BF(GENMASK(...), ENST_DISABLE_QUEUE) if you
-> define GEM_ENST_DISABLE_QUEUE_SIZE along with GEM_ENST_DISABLE_QUEUE_OFFSET.
-> 
-> > +
-> > +	for (i = 0; i < conf->num_entries; i++) {
-> > +		queue = &bp->queues[enst_queue[i].queue_id];
-> > +		/* Configure queue timing registers */
-> > +		queue_writel(queue, ENST_START_TIME, enst_queue[i].start_time_mask);
-> > +		queue_writel(queue, ENST_ON_TIME, enst_queue[i].on_time_bytes);
-> > +		queue_writel(queue, ENST_OFF_TIME, enst_queue[i].off_time_bytes);
-> > +	}
-> > +
-> > +	/* Enable ENST for all configured queues in one write */
-> > +	gem_writel(bp, ENST_CONTROL, configured_queues);
-> 
-> Can this function be executed while other queues are configured? If so,
-> would the configured_queues contains it (as well as conf)?
-> 
-> > +	spin_unlock_irqrestore(&bp->lock, flags);
-> > +
-> > +	netdev_info(ndev, "TAPRIO configuration completed successfully: %lu entries, %d queues configured\n",
-> > +		    conf->num_entries, hweight32(configured_queues));
-
-guard() would put that netdev_info() print inside the guard. Do you
-really want to be doing a print, inside a spinlock, with interrupts
-potentially disabled? This is one of the reasons i don't like this
-magical guard() construct, it is easy to forget how the magic works
-and end up with sub optimal code. A scoped_guard() would avoid this
-issue. You have to think about where you want to lock released in
-order to place the } .
-
-	Andrew
 
