@@ -1,133 +1,124 @@
-Return-Path: <netdev+bounces-210303-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210304-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B286B12BAA
-	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 19:44:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D002B12BCC
+	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 20:05:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A58927A3344
-	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 17:43:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C63A9189EDC8
+	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 18:05:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33AE7244690;
-	Sat, 26 Jul 2025 17:44:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 112DC288C85;
+	Sat, 26 Jul 2025 18:04:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BmzmFcwM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Mk60yALw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09ED018A6CF;
-	Sat, 26 Jul 2025 17:44:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4F7D1DE2D8;
+	Sat, 26 Jul 2025 18:04:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753551874; cv=none; b=WKym7qrfahQ/oxmHxvodsmKMiIEG/lpeiAlwKooxcnMEP0ipMoROkskftkEYOmrI/qHwWhPU6g2bcuugZrCUzfTdDQC07ZHOKB9WScxqQvPe1KYnJogqBhcOAXTbnBBpSKuIiEpULte7i+VA+O0pa8GCmO9J7LbHYJtzW0/j1uw=
+	t=1753553097; cv=none; b=J6+y9NP5wymz3Zbgpb+UtVA82W09ByvwaUJnVCKHdfud2cg+zuTXrvrXfRujvEv15m7FYbQM/+HCoukmReUZKmS5jceO4qA5VD1vb+eC5BANRNTJDO7jNV3AoMuE48zPb3S7p8pJIUOYl4qbQw++PyMCwcHDwz1RlmDdm3n6+bo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753551874; c=relaxed/simple;
-	bh=/wk7CuIpOgogH/fiD0D2D+slPWNVuGX0Qcm0+ATe7fo=;
+	s=arc-20240116; t=1753553097; c=relaxed/simple;
+	bh=dA3RQXEC+Ya4PmUpYs4RFw4idADWpDG4vWeL2fSZ6M4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a0TBwEyZ2/Bbb3hVc3OYKXndLoIpkxglYmefm0Mcx+V+VSiYcufs4oufazCj+m35DpRxeamBU+zPM/miupSNQ0OLE+FHeSOSXb/+tewaYTwyJ21fDqsd9QETJOqpZcRLoOOEHBY7EcQexKx6e2TiQ9cxrFWdFfCPLd5VXvM90cs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BmzmFcwM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EAEF0C4CEED;
-	Sat, 26 Jul 2025 17:44:30 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=WBKkF79+irqk9ufR7oerDhbbqJSux8US7y9p9aTdFHiEV63gbw7KTVCW14yA1oWVifzf3I31B4RJeZCosi3hVaMGET9DVQLRj3GTlcQwy0ohupWi6zKtQyF9OOCpA33zdFB1raU9f59Ulq4fjKLE6aK4Se7VkCbRvoCYO5vINws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Mk60yALw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92186C4CEED;
+	Sat, 26 Jul 2025 18:04:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753551873;
-	bh=/wk7CuIpOgogH/fiD0D2D+slPWNVuGX0Qcm0+ATe7fo=;
+	s=k20201202; t=1753553096;
+	bh=dA3RQXEC+Ya4PmUpYs4RFw4idADWpDG4vWeL2fSZ6M4=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BmzmFcwMsSpyiTFfO6ORcBoBuAEzRbuHtHeaXGJke2meZWmdeiuqONhAi9xUlYBK8
-	 t66bS3j1iZ9Q1swxNpQWvSJAiKxgr0VblqYIuC3oUWPePL09iU+ucbIkXBa3vKgDhT
-	 eaiqKji4Itf9MF0XErOKEuQeAAsWYZz+UAAAUroWUEzGYy6rAGk4D0jp2e/+XPL2+x
-	 Sqz2JlzyggiOLWS9zRxT/jXowpx/46qha3WtDyfNjCbptqvYZkDGwPVt9fmN1kxqyw
-	 qV6d/3sruI+rbwDn87+dGPd8MFgq+eShAud2FbYeUqtxg3CR9EioBVDAUayf6ur6sU
-	 9zDhmAReTSyIA==
-Date: Sat, 26 Jul 2025 18:44:28 +0100
+	b=Mk60yALwghPokJKFHR7S9PFM88kTEYZYtfojXaZI+uiimFAPD9KIEv+wteV4f6jMs
+	 yd/HoAXf4N318Zl0XUPbbgv+DC5DmO+5aMbqR3rOykGrbHcx6W7Wv0hj3+KUVPaaHW
+	 VIcSuKVEuy3n7mDDX6SzQZM46jrOBu+JWpBlHPSRrPx3ksFMg5NnrtHCjLbLDEF27P
+	 pzbHJL5eWw952Uhpz3awLM5TmaJvuaanqxZ6wR89SG5si+cVb6cx61/k2znh4io9qP
+	 kzilZTDlNe2yAYnESP2zFJS4wi91yhuKrESL+HZYgt3Wucq8GxTs/hkpghqAADxiYs
+	 nRLgxFtzaraAA==
+Date: Sat, 26 Jul 2025 19:04:51 +0100
 From: Simon Horman <horms@kernel.org>
-To: Hariprasad Kelam <hkelam@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Sunil Goutham <sgoutham@marvell.com>,
-	Linu Cherian <lcherian@marvell.com>,
-	Geetha sowjanya <gakula@marvell.com>,
-	Jerin Jacob <jerinj@marvell.com>,
-	Subbaraya Sundeep <sbhatta@marvell.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Ratheesh Kannoth <rkannoth@marvell.com>
-Subject: Re: [net] Octeontx2-af: Skip overlap check for SPI field
-Message-ID: <20250726174428.GL1367887@horms.kernel.org>
-References: <20250725064802.2440356-1-hkelam@marvell.com>
+To: Rob Clark <rob.clark@oss.qualcomm.com>
+Cc: Krzysztof Kozlowski <krzk@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+	Wasim Nazir <wasim.nazir@oss.qualcomm.com>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	kernel@oss.qualcomm.com
+Subject: Re: [PATCH 1/7] arm64: dts: qcom: Rename sa8775p SoC to "lemans"
+Message-ID: <20250726180451.GM1367887@horms.kernel.org>
+References: <20250722144926.995064-1-wasim.nazir@oss.qualcomm.com>
+ <20250722144926.995064-2-wasim.nazir@oss.qualcomm.com>
+ <20250723-swinging-chirpy-hornet-eed2f2@kuoka>
+ <159eb27b-fca8-4f7e-b604-ba19d6f9ada7@oss.qualcomm.com>
+ <e718d0d8-87e7-435f-9174-7b376bf6fa2f@kernel.org>
+ <CACSVV00jef8so-jqjCaqJehj-XN2OZ562_R+Dod64+C4-dmDhQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250725064802.2440356-1-hkelam@marvell.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACSVV00jef8so-jqjCaqJehj-XN2OZ562_R+Dod64+C4-dmDhQ@mail.gmail.com>
 
-On Fri, Jul 25, 2025 at 12:18:02PM +0530, Hariprasad Kelam wrote:
-> Octeontx2/CN10K silicon supports generating a 256-bit key per packet.
-> The specific fields to be extracted from a packet for key generation
-> are configurable via a Key Extraction (MKEX) Profile.
+On Thu, Jul 24, 2025 at 08:59:38AM -0700, Rob Clark wrote:
+> On Thu, Jul 24, 2025 at 5:52 AM Krzysztof Kozlowski <krzk@kernel.org> wrote:
+> >
+> > On 24/07/2025 14:47, Konrad Dybcio wrote:
+> > > On 7/23/25 10:29 AM, 'Krzysztof Kozlowski' via kernel wrote:
+> > >> On Tue, Jul 22, 2025 at 08:19:20PM +0530, Wasim Nazir wrote:
+> > >>> SA8775P, QCS9100 and QCS9075 are all variants of the same die,
+> > >>> collectively referred to as lemans. Most notably, the last of them
+> > >>> has the SAIL (Safety Island) fused off, but remains identical
+> > >>> otherwise.
+> > >>>
+> > >>> In an effort to streamline the codebase, rename the SoC DTSI, moving
+> > >>> away from less meaningful numerical model identifiers.
+> > >>>
+> > >>> Signed-off-by: Wasim Nazir <wasim.nazir@oss.qualcomm.com>
+> > >>> ---
+> > >>>  arch/arm64/boot/dts/qcom/{sa8775p.dtsi => lemans.dtsi} | 0
+> > >>>  arch/arm64/boot/dts/qcom/sa8775p-ride.dtsi             | 2 +-
+> > >>
+> > >> No, stop with this rename.
+> > >>
+> > >> There is no policy of renaming existing files.
+> > >
+> > > There's no policy against renaming existing files either.
+> >
+> > There is, because you break all the users. All the distros, bootloaders
+> > using this DTS, people's scripts.
 > 
-> The AF driver scans the configured extraction profile to ensure that
-> fields from upper layers do not overwrite fields from lower layers in
-> the key.
+> I think that is a valid argument against renaming the toplevel .dts
+> (and therefore .dtb), but renaming .dtsi should be a harmless internal
+> detail to the kernel.  And less confusing, IMHO, than
+> qsc9100-myboard.dts #including sa8775p.dtsi.
 > 
-> Example Packet Field Layout:
-> LA: DMAC + SMAC
-> LB: VLAN
-> LC: IPv4/IPv6
-> LD: TCP/UDP
-> 
-> Valid MKEX Profile Configuration:
-> 
-> LA   -> DMAC   -> key_offset[0-5]
-> LC   -> SIP    -> key_offset[20-23]
-> LD   -> SPORT  -> key_offset[30-31]
-> 
-> Invalid MKEX profile configuration:
-> 
-> LA   -> DMAC   -> key_offset[0-5]
-> LC   -> SIP    -> key_offset[20-23]
-> LD   -> SPORT  -> key_offset[2-3]  // Overlaps with DMAC field
-> 
-> In another scenario, if the MKEX profile is configured to extract
-> the SPI field from both AH and ESP headers at the same key offset,
-> the driver rejecting this configuration. In a regular traffic,
-> ipsec packet will be having either AF(LD) or ESP (LE). This patch
+> So wouldn't the sensible way forward be to rename .dtsi but not .dts?
 
-Should "AF" be "AH ?
+FWIIW, and with the dual caveats that: I do not have the full context of
+this series; and SoCs are not somewhere where I am active these days:
 
-> relaxes the check for the same.
-> 
-> Fixes: 12aa0a3b93f3 ("octeontx2-af: Harden rule validation.")
-> Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
-> ---
->  drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
-> index 1b765045aa63..d8d491a01e5b 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
-> @@ -607,7 +607,7 @@ static void npc_set_features(struct rvu *rvu, int blkaddr, u8 intf)
->  			*features &= ~BIT_ULL(NPC_OUTER_VID);
->  
->  	/* Set SPI flag only if AH/ESP and IPSEC_SPI are in the key */
-> -	if (npc_check_field(rvu, blkaddr, NPC_IPSEC_SPI, intf) &&
-> +	if (npc_is_field_present(rvu, NPC_IPSEC_SPI, intf) &&
+I am also under the impression that, in general, renames to
+match product or other organisational changes are a non-starter.
 
-As this checks now differs in form from that of other's in this function,
-perhaps expanding the comment above is warranted.
+But reading over this patchset, I also felt that renaming the .dsti files
+would improve things. And seems to have little scope to break things for
+users.
 
->  	    (*features & (BIT_ULL(NPC_IPPROTO_ESP) | BIT_ULL(NPC_IPPROTO_AH))))
->  		*features |= BIT_ULL(NPC_IPSEC_SPI);
->  
-> -- 
-> 2.34.1
-> 
+</2c>
 
