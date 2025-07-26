@@ -1,87 +1,145 @@
-Return-Path: <netdev+bounces-210294-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210295-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9B65B12B17
-	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 17:14:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 84D6EB12B1B
+	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 17:33:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA8E21C21330
-	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 15:14:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9FDB21C24E65
+	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 15:33:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6112424728C;
-	Sat, 26 Jul 2025 15:14:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99BB01D5CFE;
+	Sat, 26 Jul 2025 15:32:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="jobxrcTD"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="1f4IvM9z"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ECD91172A;
-	Sat, 26 Jul 2025 15:14:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8419191499;
+	Sat, 26 Jul 2025 15:32:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753542869; cv=none; b=UycLx2F0wEYtH7L11i7ePM7/4FZFZrTycIExF9Qd2+Fem21AYaFg/SM2F08fRAXdpg/uhxnN3X9amxM6W+8A8zpC2ryAJ5ap5guiZe/I33ITlfriyqLf2qhJ6VdBjIlvLtBsGeDVl4yPIJxs9L0DeumtaFZoljXAW0BLFDDIjys=
+	t=1753543976; cv=none; b=cyIFonCm5UbuLLKnL55x1Mgb7fw3pqHZGwni6XVdtJwMXL05mIP5KdYLNhZ+Q70ikRrT7oGIH2MV4QYGFv78N3tM8EV3KQOiSl1EDj8AMyc3po2Y9uUZ9rVCQPi9D6ZI1o54VJQtuL85jVFfJaoQar9HEMJ2bEFQfi+An89BkbQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753542869; c=relaxed/simple;
-	bh=7KnVq0bpX4BK5qfmfAMjT2aCIkDDD4mrF0Ibni/E7Oo=;
+	s=arc-20240116; t=1753543976; c=relaxed/simple;
+	bh=F4pSiM8sif6t2g8qvFAAosnygaFmnkUokHCeD5NcvxY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t9APrncLFg6GL8h8+9NXL7y0+XsMW9vWnsHhiqiOc1pf+nOFFqQCDvZT+UUoY/LE2rrRLeLulIiScI8j9qLhZOUqOHQUpOldkdmMVkUtp/qQ81/qyGSRwaKGhrdg1weVkKQfY54xnsIYZ3BDueXFqUA86C0oatnCisl3HX/kXgY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=jobxrcTD; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=Hjvb1ZiewQkjlE8CMFE+xJUk9Ocq+sf3DpovPalplpMvE57BzKcj1AbczZiVBbdvVUB3ikp4Yqmtkkw6noZBg5wDXIal5Q8XsK6fOhocm8NeE7Yg+rXvOg3lkE6tMRc76AUTDBU614g2IpemFv7BWshP+DXwXv2jCccQEZpSRd8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=1f4IvM9z; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=w8iwmIA2XesTNWiyP/rI4G6f6kJKZhgchzLduz9POwc=; b=jobxrcTDtg1zw81Vr6earsEGTk
-	NZ6uyHDKtntzhmO/SVlnESqxWc5z0QWm4sOZWzNbZRPM9VPQ7LM5xEPTrOBWMZNcbb35pcR7hazUL
-	qjzBSre6ZCnVbWPEDAY2lF93WxFgnVmSMSRIUJEDBVc8j5sxgDopgwsmB/3wjb8bsgPE=;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=aLkEy3g4vj/r0mSrOYBmhqyQ0HVZqYbFyEiyTsWXF0M=; b=1f
+	4IvM9z2FrMXVnZn3sV3uVmmt0iV6nrn3fGF6l7Getl1E3rz9C9qFvRjqDdyqIduqk4k5szDySeKUy
+	ovM3WWz4lImsJEuAhT/wRwdnI1p4rYmQIiE5IPfaueYpRK+CwpZbv/Qd8zUc5r+JPrDiztKX+uEVy
+	/MUHCq911FfAfCQ=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1ufgbM-002wwk-JM; Sat, 26 Jul 2025 17:14:20 +0200
-Date: Sat, 26 Jul 2025 17:14:20 +0200
+	id 1ufgt9-002wyp-9z; Sat, 26 Jul 2025 17:32:43 +0200
+Date: Sat, 26 Jul 2025 17:32:43 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: chalianis1@gmail.com
-Cc: hkallweit1@gmail.com, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, linux@armlinux.org.uk, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH net] phy: dp83869: fix interrupts issue when using with
- an optical fiber sfp. to correctly clear the interrupts both status
- registers must be read.
-Message-ID: <33f056e7-6bf4-47be-aa8b-95640bf2151c@lunn.ch>
-References: <20250726001034.28885-1-chalianis1@gmail.com>
+To: "claudiu beznea (tuxon)" <claudiu.beznea@tuxon.dev>
+Cc: Vineeth Karumanchi <vineeth.karumanchi@amd.com>,
+	nicolas.ferre@microchip.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, git@amd.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 3/6] net: macb: Add IEEE 802.1Qbv TAPRIO REPLACE
+ command offload support
+Message-ID: <aaf014b1-d0c0-491e-99fb-9d1eb5abafb3@lunn.ch>
+References: <20250722154111.1871292-1-vineeth.karumanchi@amd.com>
+ <20250722154111.1871292-4-vineeth.karumanchi@amd.com>
+ <64481774-9791-4453-ab81-e4f0c444a2a6@tuxon.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250726001034.28885-1-chalianis1@gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <64481774-9791-4453-ab81-e4f0c444a2a6@tuxon.dev>
 
-On Fri, Jul 25, 2025 at 08:10:34PM -0400, chalianis1@gmail.com wrote:
-> From: Anis Chali <chalianis1@gmail.com>
+> > +	enst_queue = kcalloc(conf->num_entries, sizeof(*enst_queue), GFP_KERNEL);
 > 
-> from datasheet of dp83869hm
-> 7.3.6 Interrupt
-> The DP83869HM can be configured to generate an interrupt when changes of internal status occur. The interrupt
-> allows a MAC to act upon the status in the PHY without polling the PHY registers. The interrupt source can be
-> selected through the interrupt registers, MICR (12h) and FIBER_INT_EN (C18h). The interrupt status can be
-> read from ISR (13h) and FIBER_INT_STTS (C19h) registers.
+> To simplify the error path you can use something like:
+> 
+>         struct queue_enst_configs *enst_queue __free(kfree) = kcalloc(...);
+> 
+> and drop the "goto cleanup" below.
 
-Reading this description, it sounds like the fibre interrupt it not
-cascaded into the micr? There are two completely different sets of
-registers.
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
 
-So i seems like you should be reading this register in
-dp83869_handle_interrupt() same as the MICR.
+1.6.5. Using device-managed and cleanup.h constructs
 
-    Andrew
+Netdev remains skeptical about promises of all “auto-cleanup” APIs,
+including even devm_ helpers, historically. They are not the preferred
+style of implementation, merely an acceptable one.
 
----
-pw-bot: cr
+Use of guard() is discouraged within any function longer than 20
+lines, scoped_guard() is considered more readable. Using normal
+lock/unlock is still (weakly) preferred.
+
+Low level cleanup constructs (such as __free()) can be used when
+building APIs and helpers, especially scoped iterators. However,
+direct use of __free() within networking core and drivers is
+discouraged. Similar guidance applies to declaring variables
+mid-function.
+
+> 
+> You can use guard(spinlock_irqsave)(&bp->lock) or
+> scoped_guard(spinlock_irqsave, &bp->lock)
+
+scoped_guard() if anything.
+
+> 
+> > +
+> > +	/* Disable ENST queues if running before configuring */
+> > +	if (gem_readl(bp, ENST_CONTROL))
+> 
+> Is this read necessary?
+> 
+> > +		gem_writel(bp, ENST_CONTROL,
+> > +			   GENMASK(bp->num_queues - 1, 0) << GEM_ENST_DISABLE_QUEUE_OFFSET);
+> 
+> This could be replaced by GEM_BF(GENMASK(...), ENST_DISABLE_QUEUE) if you
+> define GEM_ENST_DISABLE_QUEUE_SIZE along with GEM_ENST_DISABLE_QUEUE_OFFSET.
+> 
+> > +
+> > +	for (i = 0; i < conf->num_entries; i++) {
+> > +		queue = &bp->queues[enst_queue[i].queue_id];
+> > +		/* Configure queue timing registers */
+> > +		queue_writel(queue, ENST_START_TIME, enst_queue[i].start_time_mask);
+> > +		queue_writel(queue, ENST_ON_TIME, enst_queue[i].on_time_bytes);
+> > +		queue_writel(queue, ENST_OFF_TIME, enst_queue[i].off_time_bytes);
+> > +	}
+> > +
+> > +	/* Enable ENST for all configured queues in one write */
+> > +	gem_writel(bp, ENST_CONTROL, configured_queues);
+> 
+> Can this function be executed while other queues are configured? If so,
+> would the configured_queues contains it (as well as conf)?
+> 
+> > +	spin_unlock_irqrestore(&bp->lock, flags);
+> > +
+> > +	netdev_info(ndev, "TAPRIO configuration completed successfully: %lu entries, %d queues configured\n",
+> > +		    conf->num_entries, hweight32(configured_queues));
+
+guard() would put that netdev_info() print inside the guard. Do you
+really want to be doing a print, inside a spinlock, with interrupts
+potentially disabled? This is one of the reasons i don't like this
+magical guard() construct, it is easy to forget how the magic works
+and end up with sub optimal code. A scoped_guard() would avoid this
+issue. You have to think about where you want to lock released in
+order to place the } .
+
+	Andrew
 
