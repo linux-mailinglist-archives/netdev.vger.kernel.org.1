@@ -1,295 +1,209 @@
-Return-Path: <netdev+bounces-210276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210277-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73F89B12915
-	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 07:53:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18521B12925
+	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 08:22:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21D7A4E874C
-	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 05:53:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 371695670DC
+	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 06:22:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 890C51FBC8C;
-	Sat, 26 Jul 2025 05:53:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fdIf8veI"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C63F220110B;
+	Sat, 26 Jul 2025 06:22:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A97B92A1AA;
-	Sat, 26 Jul 2025 05:53:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 180A328682
+	for <netdev@vger.kernel.org>; Sat, 26 Jul 2025 06:22:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753509230; cv=none; b=HSCnv0pisXgwQKUxoH7dUY3seYhmvB5DrDH+Qrr8copoP1ld6AjdpT7B04Cjh2/Ev2dIgAoubalsuDBeN3t7LfXBWPLaf9yI/4YbSoDOpZB2gHaecfzySA/VXFFezDafzTa/ZHq7gjol8nL5g8zRi1Q4tWIt5hdALlZVg0MKs9A=
+	t=1753510926; cv=none; b=T9SCL8vOCQQysfGAUNraGZFN1p/idTCPjxj5jhx6/K8Oe68AlCDNCn53kL7Pj39lQj2xFIxTgCMuymL1ljrEoS0fE+sJvChrccXAuiIZfRuC2Xm7I9IkqdbfhmJyfjW+9ChYyMR/3g5OB1XZAa+O8Mn8Yy9wK+17Amk1TnK0xmc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753509230; c=relaxed/simple;
-	bh=qjAtuM6bjE5YOicSXvKnHeXz95Ueb3CFX9BTvqHz/ec=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hDaCAldpJLJmc6nBiLF0dM/gTF2CPLLPACHkC0vmtrt/2YmBjfbWuB6nyKFmhgfkQ9cBEAf2xmnZst1MTie8TQxBSbHai8aeVT2OUUIc2FeFjpczJMY0gFHSLKdgYZKjxSzhTK6b/mrt6i1Pa8OrtEUHJLA76EgW0P1L254VEVE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fdIf8veI; arc=none smtp.client-ip=209.85.128.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-7183fd8c4c7so30037857b3.3;
-        Fri, 25 Jul 2025 22:53:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753509227; x=1754114027; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fWn+ulxpcv7HdNLVJ+yLthV3Vv9Iaz7WMBgkwYUe3vQ=;
-        b=fdIf8veIBifnc1fNbXFYmsB0WHMGyApvRQd6YZV+A7cQPISmKY4w+gZhBeCW3tJHz3
-         tm3dpb63YglWtF3Qm+ZlzHN7E3OcsIZnwmNhJyRFyGuhvCJVgPPP3dWXnG6GlAw2cuuY
-         7xZ/tdN49sCJ2i1j9Kr4zruaS2U1VAywtIFB2YOJX0QT28t37TPbhHioN4uhcQwW0XYP
-         cdBmRkg95ouqiRS+IVtoTfej2LHKCy+sBUEyabneH/8BCGZUC8n0GIvYxft3TFcZeaZM
-         oqUAGOgquf0Ii7WHkvsfkSgiB/+3DMci5Nw1bF53OfLQDgyzd29SdapSXw+5eLhCD7x6
-         j9TA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753509227; x=1754114027;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fWn+ulxpcv7HdNLVJ+yLthV3Vv9Iaz7WMBgkwYUe3vQ=;
-        b=BvaF4WJWngGkIVA35dvKN3FjmzdS2jXPl0oHnP4/1KwCNaIU+6r9aDkWPVzGwo/gxK
-         TtQrXnggA4RwRvfeBN+W4hb3YKzEnBvXYbupKu6bf6KixMrAa4R6WWXN8Q9pWRTjLxox
-         ZsWJb53QHtQ0QlQD+EfVQGMANYs1cFUUCYfwd3HUT/jJW6jA987qV54DGMOI8f6EQcq6
-         HF1Rn/NrVXD8goNnxYjr9B3kYpAUkTY7UYHvyZakm7yRLRcTxNApOaHX6C75VoeluPwY
-         1DVsHZbn4Qp8qi9kssYvlHitJn37SV9+zQgzSKbgGCiqLZQwZDaQowBUzXmaNQ9cnP01
-         aW6w==
-X-Forwarded-Encrypted: i=1; AJvYcCV0pW6f3O3M6C5Jg8WXMaN6g5YhcOzrVRMMKCmzWdPAUM2aGcVKHvII8lIoDKg6vCnHetK7wB9L@vger.kernel.org, AJvYcCVD9a6Ea2Du/2FmE7UKl/u8HRfR3phFQVXh0GsuyMUbByPyVX1NHn7xYC77hnBVh1EZO7jG@vger.kernel.org, AJvYcCWqSjn+iJP+LQNHKoiNJO4QlXqQ6C6kYSPncgHT6XZu+bTNVlSVUWgIVe8wYhkGBjDlyv0=@vger.kernel.org, AJvYcCWvixmdIhq57KzekA3F3xBegqpZq5HuyQ42dXiZhlljCMbTv9Uwvhi9zo1r4fP0mPzVZF/L/KnSPDaIGtg9@vger.kernel.org, AJvYcCXDsTyQc3a/8bIi1F2zSQbG5GaxU0tcKYvY1uS4asK/xV0ZPjt6UKzBl4J6djJH7BU7eF9GLHO2V8KU1NCB@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyf8kmhuUGZYR7NNO5ygqcYKbw/oOC7F5v6uK199B/N9WYJUg+N
-	wpjspcXUPCubOg2946YUaaUhmKw4dFMV5o+2x4mtVtTT2oOYbEzMwQ7aDTEHllTzEwT/GY0ohml
-	sjaAlZgH/K876d+NBskoaLOlAnNJZhVA=
-X-Gm-Gg: ASbGncvtuOr56OEsB8RbL0p3rNAOfFdcyMAoCmIszuqVbeObXv9kOcRORsRiSnae6vz
-	0H4RjuG79dqmhA8yptGW/9Ey+Uds/4mPVBLegu6zicv96pcz9oMarFGG5dtk0jgIEMGKkzw0JKB
-	d/NRebPah/BF2X7ZEYK1war0gv90jdAo02Nz9aKJhGYQRE/ZuHxtd4GF5rFaiDkwlaRQ2ECdxtI
-	NAKdeGcEiN1cQDL+Q==
-X-Google-Smtp-Source: AGHT+IE0Lg8OC1qQflbm42pTUDEXQn5wEtvjZAGDRpEYT9WPYGJBWJxfXrPWc1WTljH0ya6XcqQMq2gpMQ7Ymg2lRdk=
-X-Received: by 2002:a05:690c:e0a:b0:6ef:6d61:c254 with SMTP id
- 00721157ae682-719e348e675mr51700067b3.38.1753509227288; Fri, 25 Jul 2025
- 22:53:47 -0700 (PDT)
+	s=arc-20240116; t=1753510926; c=relaxed/simple;
+	bh=N4bjEMZEHQLw2NSc13zRiraVV7AOOO5DLl86UoFcTUk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QN5C4syQTXrY5We50Y6IRre+wp7cAduv4oce289ueMb3dV5sSqXn4C5WnS2WKqM9Yp0yCWc3oqgSJpb3ifaxNbPvo7Qcwfn8i0Gg2hhm1bwBBnm6XUpeSYlD8DoSpTleIGFZP7iglqr0wm475qwyCYfI+l6x+D+UuMkwnzvTOL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1ufYI2-0001Cj-Mx; Sat, 26 Jul 2025 08:21:50 +0200
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1ufYI0-00ALQh-1p;
+	Sat, 26 Jul 2025 08:21:48 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1ufYI0-007BER-1P;
+	Sat, 26 Jul 2025 08:21:48 +0200
+Date: Sat, 26 Jul 2025 08:21:48 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Horatiu Vultur <horatiu.vultur@microchip.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, andrew@lunn.ch,
+	hkallweit1@gmail.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, richardcochran@gmail.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 3/4] net: phy: micrel: Replace hardcoded
+ pages with defines
+Message-ID: <aIRz_EvHUWSNAUVH@pengutronix.de>
+References: <20250724200826.2662658-1-horatiu.vultur@microchip.com>
+ <20250724200826.2662658-4-horatiu.vultur@microchip.com>
+ <aIKbaS8ASndR7Xe_@shell.armlinux.org.uk>
+ <20250725064839.psuzyuxfmyvudfka@DEN-DL-M31836.microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240710212555.1617795-1-amery.hung@bytedance.com> <dsamf7k2byoflztkwya3smj7jyczyq7aludvd36lufdrboxdqk@u73iwrcyb5am>
-In-Reply-To: <dsamf7k2byoflztkwya3smj7jyczyq7aludvd36lufdrboxdqk@u73iwrcyb5am>
-From: Amery Hung <ameryhung@gmail.com>
-Date: Fri, 25 Jul 2025 22:53:35 -0700
-X-Gm-Features: Ac12FXyMvpkfh1BVRP1lxRseahm_ttdL_F4ac_DTON4U9vvl5wd6WOkrVb-fPTk
-Message-ID: <CAMB2axNKxW4gnd6qiSNYdm2zPxJkbbLgZz9P-Kh7SS0Sb1Yw=Q@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next v6 00/14] virtio/vsock: support datagrams
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: stefanha@redhat.com, mst@redhat.com, jasowang@redhat.com, 
-	xuanzhuo@linux.alibaba.com, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, kys@microsoft.com, haiyangz@microsoft.com, 
-	wei.liu@kernel.org, decui@microsoft.com, bryantan@vmware.com, 
-	vdasa@vmware.com, pv-drivers@vmware.com, dan.carpenter@linaro.org, 
-	simon.horman@corigine.com, oxffffaa@gmail.com, kvm@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org, 
-	bpf@vger.kernel.org, bobby.eshleman@bytedance.com, jiang.wang@bytedance.com, 
-	amery.hung@bytedance.com, xiyou.wangcong@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250725064839.psuzyuxfmyvudfka@DEN-DL-M31836.microchip.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Tue, Jul 22, 2025 at 7:35=E2=80=AFAM Stefano Garzarella <sgarzare@redhat=
-.com> wrote:
->
-> Hi Amery,
->
-> On Wed, Jul 10, 2024 at 09:25:41PM +0000, Amery Hung wrote:
-> >Hey all!
-> >
-> >This series introduces support for datagrams to virtio/vsock.
->
-> any update on v7 of this series?
->
+On Fri, Jul 25, 2025 at 08:48:39AM +0200, Horatiu Vultur wrote:
+> The 07/24/2025 21:45, Russell King (Oracle) wrote:
+> > 
+> > On Thu, Jul 24, 2025 at 10:08:25PM +0200, Horatiu Vultur wrote:
+> > > diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
+> > > index b04c471c11a4a..d20f028106b7d 100644
+> > > --- a/drivers/net/phy/micrel.c
+> > > +++ b/drivers/net/phy/micrel.c
+> > > @@ -2788,6 +2788,13 @@ static int ksz886x_cable_test_get_status(struct phy_device *phydev,
+> > >       return ret;
+> e >  }
+> > >
+> > > +#define LAN_EXT_PAGE_0                                       0
+> > > +#define LAN_EXT_PAGE_1                                       1
+> > > +#define LAN_EXT_PAGE_2                                       2
+> > > +#define LAN_EXT_PAGE_4                                       4
+> > > +#define LAN_EXT_PAGE_5                                       5
+> > > +#define LAN_EXT_PAGE_31                                      31
+> 
+> Hi Russell,
+> 
+> > 
+> > I don't see the point of this change. This is almost as bad as:
+> > 
+> > #define ZERO 0
+> > #define ONE 1
+> > #define TWO 2
+> > #define THREE 3
+> > ...
+> > #define ONE_HUNDRED_AND_FIFTY_FIVE 155
+> > etc
+> > 
+> > It doesn't give us any new information, and just adds extra clutter,
+> > making the code less readable.
+> > 
+> > The point of using register definitions is to describe the purpose
+> > of the number, giving the number a meaning, not to just hide the
+> > number because we don't want to see such things in C code.
+> > 
+> > I'm sorry if you were asked to do this in v1, but I think if you
+> > were asked to do it, it would've been assuming that the definitions
+> > could be more meaningful.
+> 
+> You are right, I have been ask to change this in version 1:
+> https://lkml.org/lkml/2025/7/23/672
+> 
+> I have mentioned it that the extended pages don't have any meaningfull
+> names also in the register description document. But Oleksij says he
+> will be fine with xxxx_EXT_PAGE_0, so maybe I have missunderstood Oleksij
 
-Hi Stefano,
+Hi,
 
-Sorry that I don't have personal time to work on v7. Since I don't
-think people involved in this set are still working on it, I am
-posting my v7 WIP here to see if anyone is interested in finishing it.
-Would greatly appreciate any help.
+I requested these defines because it's much easier to search for a specific
+define than for a raw number - especially when debugging or comparing with
+datasheets. Even if the names are generic, it helps track down usage when
+documentation becomes available or evolves.
 
-Link: https://github.com/ameryhung/linux/tree/vsock-dgram-v7
+To improve the situation, I reviewed the LAN8814 documentation and observed how
+the existing driver and patches (for LAN8842) use these extended pages.
+Based on that, I suggest following names:
 
-Here are the things that I haven't address in the WIP:
+Documented Extended Pages:
 
-01/14
-- Arseniy suggested doing skb_put(dg->payload_size) and memcpy(dg->payload_=
-size)
+These are described in the LAN8814 documentation:
 
-07/14
-- Remove the double transport lookup in the send path by passing
-transport to dgram_enqueue
-- Address Arseniy's comment about updating vsock_virtio_transport_common.h
+/**
+ * LAN8814_PAGE_COMMON_REGS - Selects Extended Page 4.
+ *
+ * This page contains device-common registers that affect the entire chip.
+ * It includes controls for chip-level resets, strap status, GPIO,
+ * QSGMII, the shared 1588 PTP block, and the PVT monitor.
+ */
+#define LAN8814_PAGE_COMMON_REGS 4
 
-14/14
-- Split test/vsock into smaller patches
+/**
+ * LAN8814_PAGE_PORT_REGS - Selects Extended Page 5.
+ *
+ * This page contains port-specific registers that must be accessed
+ * on a per-port basis. It includes controls for port LEDs, QSGMII PCS,
+ * rate adaptation FIFOs, and the per-port 1588 TSU block.
+ */
+#define LAN8814_PAGE_PORT_REGS 5
 
-Finally the spec change discussion also needs to happen.
+Undocumented Pages (based on driver and patch analysis):
 
+These pages are not officially documented, but their use is visible in the
+driver and LAN8842 patch:
 
+/**
+ * LAN8814_PAGE_AFE_PMA - Selects Extended Page 1.
+ *
+ * This page appears to control the Analog Front-End (AFE) and Physical
+ * Medium Attachment (PMA) layers. It is used to access registers like
+ * LAN8814_PD_CONTROLS and LAN8814_LINK_QUALITY.
+ */
+#define LAN8814_PAGE_AFE_PMA 1
 
-> Thanks,
-> Stefano
->
-> >
-> >It is a spin-off (and smaller version) of this series from the summer:
-> >  https://lore.kernel.org/all/cover.1660362668.git.bobby.eshleman@byteda=
-nce.com/
-> >
-> >Please note that this is an RFC and should not be merged until
-> >associated changes are made to the virtio specification, which will
-> >follow after discussion from this series.
-> >
-> >Another aside, the v4 of the series has only been mildly tested with a
-> >run of tools/testing/vsock/vsock_test. Some code likely needs cleaning
-> >up, but I'm hoping to get some of the design choices agreed upon before
-> >spending too much time making it pretty.
-> >
-> >This series first supports datagrams in a basic form for virtio, and
-> >then optimizes the sendpath for all datagram transports.
-> >
-> >The result is a very fast datagram communication protocol that
-> >outperforms even UDP on multi-queue virtio-net w/ vhost on a variety
-> >of multi-threaded workload samples.
-> >
-> >For those that are curious, some summary data comparing UDP and VSOCK
-> >DGRAM (N=3D5):
-> >
-> >       vCPUS: 16
-> >       virtio-net queues: 16
-> >       payload size: 4KB
-> >       Setup: bare metal + vm (non-nested)
-> >
-> >       UDP: 287.59 MB/s
-> >       VSOCK DGRAM: 509.2 MB/s
-> >
-> >Some notes about the implementation...
-> >
-> >This datagram implementation forces datagrams to self-throttle according
-> >to the threshold set by sk_sndbuf. It behaves similar to the credits
-> >used by streams in its effect on throughput and memory consumption, but
-> >it is not influenced by the receiving socket as credits are.
-> >
-> >The device drops packets silently.
-> >
-> >As discussed previously, this series introduces datagrams and defers
-> >fairness to future work. See discussion in v2 for more context around
-> >datagrams, fairness, and this implementation.
-> >
-> >Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
-> >Signed-off-by: Amery Hung <amery.hung@bytedance.com>
-> >---
-> >Changes in v6:
-> >- allow empty transport in datagram vsock
-> >- add empty transport checks in various paths
-> >- transport layer now saves source cid and port to control buffer of skb
-> >  to remove the dependency of transport in recvmsg()
-> >- fix virtio dgram_enqueue() by looking up the transport to be used when
-> >  using sendto(2)
-> >- fix skb memory leaks in two places
-> >- add dgram auto-bind test
-> >- Link to v5: https://lore.kernel.org/r/20230413-b4-vsock-dgram-v5-0-581=
-bd37fdb26@bytedance.com
-> >
-> >Changes in v5:
-> >- teach vhost to drop dgram when a datagram exceeds the receive buffer
-> >  - now uses MSG_ERRQUEUE and depends on Arseniy's zerocopy patch:
-> >       "vsock: read from socket's error queue"
-> >- replace multiple ->dgram_* callbacks with single ->dgram_addr_init()
-> >  callback
-> >- refactor virtio dgram skb allocator to reduce conflicts w/ zerocopy se=
-ries
-> >- add _fallback/_FALLBACK suffix to dgram transport variables/macros
-> >- add WARN_ONCE() for table_size / VSOCK_HASH issue
-> >- add static to vsock_find_bound_socket_common
-> >- dedupe code in vsock_dgram_sendmsg() using module_got var
-> >- drop concurrent sendmsg() for dgram and defer to future series
-> >- Add more tests
-> >  - test EHOSTUNREACH in errqueue
-> >  - test stream + dgram address collision
-> >- improve clarity of dgram msg bounds test code
-> >- Link to v4: https://lore.kernel.org/r/20230413-b4-vsock-dgram-v4-0-0ce=
-bbb2ae899@bytedance.com
-> >
-> >Changes in v4:
-> >- style changes
-> >  - vsock: use sk_vsock(vsk) in vsock_dgram_recvmsg instead of
-> >    &sk->vsk
-> >  - vsock: fix xmas tree declaration
-> >  - vsock: fix spacing issues
-> >  - virtio/vsock: virtio_transport_recv_dgram returns void because err
-> >    unused
-> >- sparse analysis warnings/errors
-> >  - virtio/vsock: fix unitialized skerr on destroy
-> >  - virtio/vsock: fix uninitialized err var on goto out
-> >  - vsock: fix declarations that need static
-> >  - vsock: fix __rcu annotation order
-> >- bugs
-> >  - vsock: fix null ptr in remote_info code
-> >  - vsock/dgram: make transport_dgram a fallback instead of first
-> >    priority
-> >  - vsock: remove redundant rcu read lock acquire in getname()
-> >- tests
-> >  - add more tests (message bounds and more)
-> >  - add vsock_dgram_bind() helper
-> >  - add vsock_dgram_connect() helper
-> >
-> >Changes in v3:
-> >- Support multi-transport dgram, changing logic in connect/bind
-> >  to support VMCI case
-> >- Support per-pkt transport lookup for sendto() case
-> >- Fix dgram_allow() implementation
-> >- Fix dgram feature bit number (now it is 3)
-> >- Fix binding so dgram and connectible (cid,port) spaces are
-> >  non-overlapping
-> >- RCU protect transport ptr so connect() calls never leave
-> >  a lockless read of the transport and remote_addr are always
-> >  in sync
-> >- Link to v2: https://lore.kernel.org/r/20230413-b4-vsock-dgram-v2-0-079=
-cc7cee62e@bytedance.com
-> >
-> >
-> >Bobby Eshleman (14):
-> >  af_vsock: generalize vsock_dgram_recvmsg() to all transports
-> >  af_vsock: refactor transport lookup code
-> >  af_vsock: support multi-transport datagrams
-> >  af_vsock: generalize bind table functions
-> >  af_vsock: use a separate dgram bind table
-> >  virtio/vsock: add VIRTIO_VSOCK_TYPE_DGRAM
-> >  virtio/vsock: add common datagram send path
-> >  af_vsock: add vsock_find_bound_dgram_socket()
-> >  virtio/vsock: add common datagram recv path
-> >  virtio/vsock: add VIRTIO_VSOCK_F_DGRAM feature bit
-> >  vhost/vsock: implement datagram support
-> >  vsock/loopback: implement datagram support
-> >  virtio/vsock: implement datagram support
-> >  test/vsock: add vsock dgram tests
-> >
-> > drivers/vhost/vsock.c                   |   62 +-
-> > include/linux/virtio_vsock.h            |    9 +-
-> > include/net/af_vsock.h                  |   24 +-
-> > include/uapi/linux/virtio_vsock.h       |    2 +
-> > net/vmw_vsock/af_vsock.c                |  343 ++++++--
-> > net/vmw_vsock/hyperv_transport.c        |   13 -
-> > net/vmw_vsock/virtio_transport.c        |   24 +-
-> > net/vmw_vsock/virtio_transport_common.c |  188 ++++-
-> > net/vmw_vsock/vmci_transport.c          |   61 +-
-> > net/vmw_vsock/vsock_loopback.c          |    9 +-
-> > tools/testing/vsock/util.c              |  177 +++-
-> > tools/testing/vsock/util.h              |   10 +
-> > tools/testing/vsock/vsock_test.c        | 1032 ++++++++++++++++++++---
-> > 13 files changed, 1638 insertions(+), 316 deletions(-)
-> >
-> >--
-> >2.20.1
-> >
->
+/**
+ * LAN8814_PAGE_PCS_DIGITAL - Selects Extended Page 2.
+ *
+ * This page seems dedicated to the Physical Coding Sublayer (PCS) and other
+ * digital logic. It is used for MDI-X alignment (LAN8814_ALIGN_SWAP) and EEE
+ * state (LAN8814_EEE_STATE) in the LAN8814, and is repurposed for statistics
+ * and self-test counters in the LAN8842.
+ */
+#define LAN8814_PAGE_PCS_DIGITAL 2
+
+/**
+ * LAN8814_PAGE_SYSTEM_CTRL - Selects Extended Page 31.
+ *
+ * This page appears to hold fundamental system or global controls. In the
+ * driver, it is used by the related LAN8804 to access the
+ * LAN8814_CLOCK_MANAGEMENT register.
+ */
+#define LAN8814_PAGE_SYSTEM_CTRL 31
+
+While these names are not official, they still give useful hints and make the
+code more readable. I doubt the LAN8842 has an identical layout, but it looks
+similar enough to reuse these patterns for now.
+
+Are there any plans to make the LAN8842 register documentation public? That
+would help clarify this further and improve upstream support.
+
+Best regards,
+Oleksij
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
