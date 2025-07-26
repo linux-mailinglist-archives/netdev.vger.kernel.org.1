@@ -1,166 +1,233 @@
-Return-Path: <netdev+bounces-210278-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210279-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90FC2B1295E
-	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 09:04:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7103B12A1D
+	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 12:37:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF72B544C73
-	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 07:04:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B6C6E561CF6
+	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 10:37:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E8341E9B0D;
-	Sat, 26 Jul 2025 07:04:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8819923F429;
+	Sat, 26 Jul 2025 10:37:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HWc/vGPA"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="feMXlgtm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B55E946C
-	for <netdev@vger.kernel.org>; Sat, 26 Jul 2025 07:04:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC13823BF91;
+	Sat, 26 Jul 2025 10:37:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753513445; cv=none; b=MwzNCVTUXSJrBcOKFBPihKI9i4TMWoiG+lIeH37EbPpdG+pk+sYFZ7CukwosYkkcxgRdIs8RKnyfN2+n8ZxGThZ5UtPUIu71x0T44m8pidWfIg5anfpxtZz6ce6mLnyU1wCiT+3qznAe9ZQKlRlWKaJpy0DyAHOIWd7FsxhaLPs=
+	t=1753526252; cv=none; b=XOJAFJz6QmUErH2SrqCex+FaFV2aa6L1zD9dzq3JAi4ctw85AD1xMQTLlPozMsseiLpvSWjFkzETq9ZpHTFCJVhpZ1tWuh5UC0YFZDpRublUJHDp+DsA129dqF40MgcrQfJoku5ohV3TNicM/pf+BuQL7mDGttKxTX8Ofa9hSR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753513445; c=relaxed/simple;
-	bh=BL+EfgNMkPUAntwcnK1Ia/wwE95aC360ctPnoRK8qG8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=C+NFKKVCQgb1L6kwKxMBStY8Yox4RWSVF+Po+v/U2RnzWLcJxuiUTuCLCAGyUQyWowmuTNJR++r6WkLaO1D/PFWLRv3HR89TUYLsfBgJm7jaMs47obqc5FUP6K3cotAZ8rujfZTaXMNHZOvKdod6yBoe3kjzzjF/SAYOVCkjUgQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HWc/vGPA; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-236470b2dceso24717815ad.0
-        for <netdev@vger.kernel.org>; Sat, 26 Jul 2025 00:04:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753513443; x=1754118243; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Pzxyt4n75ioi07l8a7XMpiZyFP3lgEvZPPzPSNVfOHs=;
-        b=HWc/vGPAYQP9/XzNdmlQ7hvCk6m/lTMy5TFqq7DBs3eZrTV0PwFdl7H+Kr49VoQ7ha
-         CY+tLovzuG2V3gw2Bgd0qd2dgkj6FSZdJoTX54RzMWAzcMEURaZPI4ft1EOdFvXwcX6i
-         P/ZIYi5JRQr5UpCGYjvVExuuZ1JcxqWYuEtchoXQMKYRWvqDCDRLNH0/BVkCtL5A9r24
-         vXNeWqnbDw60pmOYevnXKfDJLZCDi+ARRls5/pTLFpBz6ma+eM73MIlH9L/b/Rqq+/du
-         jtXWu6zS/4H0ZKDIhTQoLNw1a8xXTVTWWVQPb55ug9uwYt9hPPFROMvkcWELEhlhLbuq
-         UrpQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753513443; x=1754118243;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Pzxyt4n75ioi07l8a7XMpiZyFP3lgEvZPPzPSNVfOHs=;
-        b=kQvBtuYLWneNiCJHZWY841wuqJ7wDQ4snOjP1m5SLln8qXyQ8YYcV0tp2TrEs9lX2u
-         Z7MWkp6Ls5V2GazPV8Ze2Szv6IWJZiwSsp6PKlv/nk3C+zbxGnqHnnsJSyWTcHsJdyNA
-         LYrwNDaqLVHssrGzstYaTNGV3kTjVwoMrNPuv0tXX0DL6bYa+BtMncvTYGlFGlYXm2Km
-         kNMS7BehDzadui+9cSF7OMJeHUL+BeHKKnl3avTDwpzpyYG+uuzas047p3kZB/d+buBd
-         sS+7TJwBRuSWipne78UpysvftFOCDjvPCarqhlffPd6q5y05QjulkWxpeNq+OLgUEJkL
-         ZYRw==
-X-Forwarded-Encrypted: i=1; AJvYcCVezgN/YjMmzN1NiqKXS/r1VJG1f+0FLDLIh4aMROQQ42I5/uuAsilZUwG+FXhc6bNBu1ak8Yw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwmOLqSouu1MMPg4dTXb1zvzxdBg+qhs7jvw0a92XRtwg2irtDs
-	o8j2b9hVmUjWmcV6UYSHTXDktjKBJYIBL+TOC/lHQn+WTyE/cvs/i0Gi
-X-Gm-Gg: ASbGncu43xMN7VDq6aFSc5JG71yjDANroaDKxZuQ9zNkeaRyKJv2aMOIqiROnlRak32
-	GEWbdfUKNOkztBEKjq9Mmt3Y7/Ahl4tL2KTnGNp0uEuEW6Ymd8v65XsFCLkw8XhktOvdJftEOuJ
-	v4YyBwSo26+0flejapV8SuTDv2UdiEzvO+l6Eb/l9T+29VQ9+px2wfjNbKutjIq3BBAuZZO1pFF
-	E9nOxPWpWMJpdiB3JbMlgrAvXD/8ZVoll3PSb/jCHQUpQ36+33DDbEVBGxNuM+dritLWc8ZNz8d
-	zQ91Nms0YNXH0PEUO2nQhXDUhGAz+PHzr7n6sDSIFg6VSBJJMwnRv9587z6NCWLE7eBYWogmKeA
-	aHRp0DuALhdKLoBV1Mk6htjxDWC+a09UA4mbQlgRQPaN2mZsB8K54s1qBdsg=
-X-Google-Smtp-Source: AGHT+IEJHo4UWqF7gjVF86zH2isjnCfKqpnMnFffjQOMthHWa3P0OJj56JLYUczRy0a9KAK7aDGL4Q==
-X-Received: by 2002:a17:903:3c6e:b0:235:779:edf0 with SMTP id d9443c01a7336-23fb31c303fmr71032055ad.50.1753513442738;
-        Sat, 26 Jul 2025 00:04:02 -0700 (PDT)
-Received: from KERNELXING-MC1.tencent.com ([111.201.28.60])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23fbe51408esm11216075ad.139.2025.07.26.00.03.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 26 Jul 2025 00:04:02 -0700 (PDT)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	larysa.zaremba@intel.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	bjorn@kernel.org,
-	maciej.fijalkowski@intel.com
-Cc: intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH v2 iwl-net] ixgbe: xsk: resolve the negative overflow of budget in ixgbe_xmit_zc
-Date: Sat, 26 Jul 2025 15:03:56 +0800
-Message-Id: <20250726070356.58183-1-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
+	s=arc-20240116; t=1753526252; c=relaxed/simple;
+	bh=8vHHoYjenljuKgZ9Ep34XRZPCFDanp20WFBiPhZRta0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QafuwSArjsR8XZwfm8ZTC6y2f0juZnoEAT2B0QEccyqIHZdlw5uKq8dkRzQVJfN93cAbwkjjCcilJt+F7TRMMiIEaMdwY8w01e5FENaT3EXdB8IzJ59MCiM/6jhmUzWz+pdMjQnvpJBpzx91HjHa+1lI+/gQjWeTE27RQ4EaMBA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=feMXlgtm; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1753526251; x=1785062251;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=8vHHoYjenljuKgZ9Ep34XRZPCFDanp20WFBiPhZRta0=;
+  b=feMXlgtmu6rVaT2PFo0k3Tf6mIRGczGuJqY5SA2TTZao5T8pFV6zugLo
+   MBNVWfrOx3iHI2sx6E47FWhZ71jw6jigtq3OpVEqI2CizZQjICx/OrkSw
+   9YRr6tFc0CO9Zs9poInZr30BAWGR04fclJvMASGj709sURgdk9c65iv/m
+   FyAodd+dQ9tHODrLootvqYc+ijWIiFohirAmv55NGSf9tJ88HNG2y41jV
+   qEcESHGyGWUUJDkCZwzcXd55/gHZvjwcm6Ep/iAPwmZZzTNrRt6HH1dA8
+   M2KkxaCZK9bE7InOofU6kRS5zmsd4iC581ym285Fui5YeO3uRGcIIjbdo
+   g==;
+X-CSE-ConnectionGUID: VO5ow9ZVRNeFDxTjV3LnUw==
+X-CSE-MsgGUID: K2jbAs4iQ8epmCESPP7Mog==
+X-IronPort-AV: E=McAfee;i="6800,10657,11503"; a="55704395"
+X-IronPort-AV: E=Sophos;i="6.16,339,1744095600"; 
+   d="scan'208";a="55704395"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jul 2025 03:37:31 -0700
+X-CSE-ConnectionGUID: NeZvv0EXRCGV8sFgGsxMDg==
+X-CSE-MsgGUID: h1CAuaWRTG2GdosNyvmAPw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,339,1744095600"; 
+   d="scan'208";a="161413942"
+Received: from lkp-server01.sh.intel.com (HELO 9ee84586c615) ([10.239.97.150])
+  by fmviesa006.fm.intel.com with ESMTP; 26 Jul 2025 03:37:27 -0700
+Received: from kbuild by 9ee84586c615 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1ufcHM-000Lsp-2o;
+	Sat, 26 Jul 2025 10:37:24 +0000
+Date: Sat, 26 Jul 2025 18:36:56 +0800
+From: kernel test robot <lkp@intel.com>
+To: Ivan Vecera <ivecera@redhat.com>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, Jiri Pirko <jiri@resnulli.us>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Prathosh Satish <Prathosh.Satish@microchip.com>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Michal Schmidt <mschmidt@redhat.com>, Petr Oros <poros@redhat.com>
+Subject: Re: [PATCH net-next 2/5] dpll: zl3073x: Add low-level flash functions
+Message-ID: <202507261837.ofrYjyeT-lkp@intel.com>
+References: <20250725154136.1008132-3-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250725154136.1008132-3-ivecera@redhat.com>
 
-From: Jason Xing <kernelxing@tencent.com>
+Hi Ivan,
 
-Resolve the budget negative overflow which leads to returning true in
-ixgbe_xmit_zc even when the budget of descs are thoroughly consumed.
+kernel test robot noticed the following build warnings:
 
-Before this patch, when the budget is decreased to zero and finishes
-sending the last allowed desc in ixgbe_xmit_zc, it will always turn back
-and enter into the while() statement to see if it should keep processing
-packets, but in the meantime it unexpectedly decreases the value again to
-'unsigned int (0--)', namely, UINT_MAX. Finally, the ixgbe_xmit_zc returns
-true, showing 'we complete cleaning the budget'. That also means
-'clean_complete = true' in ixgbe_poll.
+[auto build test WARNING on net-next/main]
 
-The true theory behind this is if that budget number of descs are consumed,
-it implies that we might have more descs to be done. So we should return
-false in ixgbe_xmit_zc to tell napi poll to find another chance to start
-polling to handle the rest of descs. On the contrary, returning true here
-means job done and we know we finish all the possible descs this time and
-we don't intend to start a new napi poll.
+url:    https://github.com/intel-lab-lkp/linux/commits/Ivan-Vecera/dpll-zl3073x-Add-functions-to-access-hardware-registers/20250725-234600
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20250725154136.1008132-3-ivecera%40redhat.com
+patch subject: [PATCH net-next 2/5] dpll: zl3073x: Add low-level flash functions
+config: x86_64-buildonly-randconfig-003-20250726 (https://download.01.org/0day-ci/archive/20250726/202507261837.ofrYjyeT-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250726/202507261837.ofrYjyeT-lkp@intel.com/reproduce)
 
-It is apparently against our expectations. Please also see how
-ixgbe_clean_tx_irq() handles the problem: it uses do..while() statement
-to make sure the budget can be decreased to zero at most and the negative
-overflow never happens.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202507261837.ofrYjyeT-lkp@intel.com/
 
-The patch adds 'likely' because we rarely would not hit the loop codition
-since the standard budget is 256.
+All warnings (new ones prefixed by >>):
 
-Fixes: 8221c5eba8c1 ("ixgbe: add AF_XDP zero-copy Tx support")
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
-Reviewed-by: Larysa Zaremba <larysa.zaremba@intel.com>
----
-Link: https://lore.kernel.org/all/20250720091123.474-3-kerneljasonxing@gmail.com/
-1. use 'negative overflow' instead of 'underflow' (Willem)
-2. add reviewed-by tag (Larysa)
-3. target iwl-net branch (Larysa)
-4. add the reason why the patch adds likely() (Larysa)
----
- drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+   drivers/dpll/zl3073x/flash.c: In function 'zl3073x_flash_sectors':
+>> drivers/dpll/zl3073x/flash.c:294:70: warning: '%zu' directive output may be truncated writing between 1 and 15 bytes into a region of size 11 [-Wformat-truncation=]
+     294 |                         snprintf(comp_str, sizeof(comp_str), "%s-part%zu",
+         |                                                                      ^~~
+   drivers/dpll/zl3073x/flash.c:294:62: note: directive argument in the range [1, 281474976710656]
+     294 |                         snprintf(comp_str, sizeof(comp_str), "%s-part%zu",
+         |                                                              ^~~~~~~~~~~~
+   drivers/dpll/zl3073x/flash.c:294:25: note: 'snprintf' output 7 or more bytes (assuming 21) into a destination of size 16
+     294 |                         snprintf(comp_str, sizeof(comp_str), "%s-part%zu",
+         |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     295 |                                  component, (ptr - data) / max_block_size + 1);
+         |                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
-index ac58964b2f08..7b941505a9d0 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
-@@ -398,7 +398,7 @@ static bool ixgbe_xmit_zc(struct ixgbe_ring *xdp_ring, unsigned int budget)
- 	dma_addr_t dma;
- 	u32 cmd_type;
- 
--	while (budget-- > 0) {
-+	while (likely(budget)) {
- 		if (unlikely(!ixgbe_desc_unused(xdp_ring))) {
- 			work_done = false;
- 			break;
-@@ -433,6 +433,8 @@ static bool ixgbe_xmit_zc(struct ixgbe_ring *xdp_ring, unsigned int budget)
- 		xdp_ring->next_to_use++;
- 		if (xdp_ring->next_to_use == xdp_ring->count)
- 			xdp_ring->next_to_use = 0;
-+
-+		budget--;
- 	}
- 
- 	if (tx_desc) {
+
+vim +294 drivers/dpll/zl3073x/flash.c
+
+   245	
+   246	/**
+   247	 * zl3073x_flash_sectors - Flash sectors
+   248	 * @zldev: zl3073x device structure
+   249	 * @component: component name
+   250	 * @page: destination flash page
+   251	 * @addr: device memory address to load data
+   252	 * @data: pointer to data to be flashed
+   253	 * @size: size of data
+   254	 * @extack: netlink extack pointer to report errors
+   255	 *
+   256	 * The function flashes given @data with size of @size to the internal flash
+   257	 * memory block starting from page @page. The function uses sector flash
+   258	 * method and has to take into account the flash sector size reported by
+   259	 * flashing utility. Input data are spliced into blocks according this
+   260	 * sector size and each block is flashed separately.
+   261	 *
+   262	 * Return: 0 on success, <0 on error
+   263	 */
+   264	int zl3073x_flash_sectors(struct zl3073x_dev *zldev, const char *component,
+   265				  u32 page, u32 addr, const void *data, size_t size,
+   266				  struct netlink_ext_ack *extack)
+   267	{
+   268	#define ZL_FLASH_MAX_BLOCK_SIZE	0x0001E000
+   269	#define ZL_FLASH_PAGE_SIZE	256
+   270		size_t max_block_size, block_size, sector_size;
+   271		const void *ptr, *end;
+   272		int rc;
+   273	
+   274		/* Get flash sector size */
+   275		rc = zl3073x_flash_get_sector_size(zldev, &sector_size);
+   276		if (rc) {
+   277			ZL_FLASH_ERR_MSG(zldev, extack,
+   278					 "Failed to get flash sector size");
+   279			return rc;
+   280		}
+   281	
+   282		/* Determine max block size depending on sector size */
+   283		max_block_size = ALIGN_DOWN(ZL_FLASH_MAX_BLOCK_SIZE, sector_size);
+   284	
+   285		for (ptr = data, end = data + size; ptr < end; ptr += block_size) {
+   286			char comp_str[16];
+   287	
+   288			block_size = min_t(size_t, max_block_size, end - ptr);
+   289	
+   290			/* Add suffix '-partN' if the requested component size is
+   291			 * greater than max_block_size.
+   292			 */
+   293			if (max_block_size < size)
+ > 294				snprintf(comp_str, sizeof(comp_str), "%s-part%zu",
+   295					 component, (ptr - data) / max_block_size + 1);
+   296			else
+   297				strscpy(comp_str, component);
+   298	
+   299			/* Download block to device memory */
+   300			rc = zl3073x_flash_download(zldev, comp_str, addr, ptr,
+   301						    block_size, extack);
+   302			if (rc)
+   303				goto finish;
+   304	
+   305			/* Set address to flash from */
+   306			rc = zl3073x_write_u32(zldev, ZL_REG_IMAGE_START_ADDR, addr);
+   307			if (rc)
+   308				goto finish;
+   309	
+   310			/* Set size of block to flash */
+   311			rc = zl3073x_write_u32(zldev, ZL_REG_IMAGE_SIZE, block_size);
+   312			if (rc)
+   313				goto finish;
+   314	
+   315			/* Set destination page to flash */
+   316			rc = zl3073x_write_u32(zldev, ZL_REG_FLASH_INDEX_WRITE, page);
+   317			if (rc)
+   318				goto finish;
+   319	
+   320			/* Set filling pattern */
+   321			rc = zl3073x_write_u32(zldev, ZL_REG_FILL_PATTERN, U32_MAX);
+   322			if (rc)
+   323				goto finish;
+   324	
+   325			zl3073x_devlink_flash_notify(zldev, "Flashing image", comp_str,
+   326						     0, 0);
+   327	
+   328			dev_dbg(zldev->dev, "Flashing %zu bytes to page %u\n",
+   329				block_size, page);
+   330	
+   331			/* Execute sectors flash operation */
+   332			rc = zl3073x_flash_cmd_wait(zldev, ZL_WRITE_FLASH_OP_SECTORS,
+   333						    extack);
+   334			if (rc)
+   335				goto finish;
+   336	
+   337			/* Move to next page */
+   338			page += block_size / ZL_FLASH_PAGE_SIZE;
+   339		}
+   340	
+   341	finish:
+   342		zl3073x_devlink_flash_notify(zldev,
+   343					     rc ?  "Flashing failed" : "Flashing done",
+   344					     component, 0, 0);
+   345	
+   346		return rc;
+   347	}
+   348	
+
 -- 
-2.41.3
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
