@@ -1,80 +1,59 @@
-Return-Path: <netdev+bounces-210280-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210281-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8753B12A27
-	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 12:58:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B3E3B12A30
+	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 13:00:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 689AEAA3162
-	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 10:58:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8740EAA33BB
+	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 10:59:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BC0E24167B;
-	Sat, 26 Jul 2025 10:58:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DE1B2441A6;
+	Sat, 26 Jul 2025 10:59:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ai9n+pjj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i6DKezq2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B81B233727;
-	Sat, 26 Jul 2025 10:58:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2985243378;
+	Sat, 26 Jul 2025 10:59:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753527515; cv=none; b=utfJq0Kwjygylv0GNM0WWZzCeCAWfe2TzMcwoJygN/LRcvCeMPIpKFmsAyFIL4TMBf4T5wauamqwkOk0Rih6VYBzSZpwX+KI2FnsZ4I66JQQ4Ent+OoWSPmUHVwoLbhJ05OR4FeHlEkA44aYlmeINPuhqHrc0pj+1flexyjtL1Q=
+	t=1753527597; cv=none; b=qfBSdUhQPb5ok0k53tf4Bx1y6GtLIfTQfAIlmzNPa7sFe6BqUhmSdSUYotNUwSNVWSoPe4NoPpCZzhqu22/n9fJGzGLy1XKOa6MCgKE9J4gf5KRTm2CzzbQcXBWZN5XGdUWxb34l6+ozScq9zws8IHtGtZ8oglkoXWER14DFjZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753527515; c=relaxed/simple;
-	bh=mQnanwLnUU1C5o0pp34uix8UsV6dHEuqF0sPsUHmxQk=;
+	s=arc-20240116; t=1753527597; c=relaxed/simple;
+	bh=aahVRAZ7YarZYp+zx9UXAEqg4elOZxAbYpT4hg7EVDU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=goL6JpufR37Dfc7hOZwTg1efb4qHpeF4PDSQcmhWohFvQbaBMdxcMeq1aZxfSMqXaaYlhB0HpO5o2AqgRcdNl4A2ShkftQxkdxo2jMd3gD6R+w25W7RN2rtad/lka792HmIoLGC/Q99TWF9OihYCtuuHjoTN4YOBizPEy+llTZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ai9n+pjj; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1753527513; x=1785063513;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=mQnanwLnUU1C5o0pp34uix8UsV6dHEuqF0sPsUHmxQk=;
-  b=ai9n+pjj6TwKZOeYpSLWCTRwYRn+r+it9JU5Q+igKxtCXKhFnC0S/N1w
-   wyU8M28Gi7Xc8yXEiJzwwHoDt3R9xH6wUGP8hdmVvX/PZPEaod6IYYLvZ
-   GQQf/uoSxc+qXmq7WB7vo8MqZOS6FDCOvzYX+s88U65ZGofrX3sfFppOg
-   n3z6T/Co/zhv2l/AxWMK1/TuSxXLIjzDpBzcVFcWvbA5cLNVs4rkFiglQ
-   xWyuy/FIl5qbxJyJJ7i6hGmHpKxV9AMYFcIS1KRP4N9S4Hf7h848vtqdG
-   3yQlGG7BCyyTLbnzoe4VVnmEyh6irj+sloW6hfAvRwLa8CQ/UggiHHCHC
-   A==;
-X-CSE-ConnectionGUID: nDtuilW7Q4+PuDzQr5hDEg==
-X-CSE-MsgGUID: CmBseQmES5uxQkI6o8s4eg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11503"; a="73430354"
-X-IronPort-AV: E=Sophos;i="6.16,339,1744095600"; 
-   d="scan'208";a="73430354"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jul 2025 03:58:32 -0700
-X-CSE-ConnectionGUID: RvfV8D4aSly1vDzwLyaJWA==
-X-CSE-MsgGUID: iP1N6lDETkS8ifYjEEkhOA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,339,1744095600"; 
-   d="scan'208";a="192440431"
-Received: from lkp-server01.sh.intel.com (HELO 9ee84586c615) ([10.239.97.150])
-  by fmviesa001.fm.intel.com with ESMTP; 26 Jul 2025 03:58:29 -0700
-Received: from kbuild by 9ee84586c615 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1ufcbi-000Lu5-2i;
-	Sat, 26 Jul 2025 10:58:26 +0000
-Date: Sat, 26 Jul 2025 18:57:33 +0800
-From: kernel test robot <lkp@intel.com>
-To: Ivan Vecera <ivecera@redhat.com>, netdev@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Jiri Pirko <jiri@resnulli.us>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Prathosh Satish <Prathosh.Satish@microchip.com>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Michal Schmidt <mschmidt@redhat.com>, Petr Oros <poros@redhat.com>
-Subject: Re: [PATCH net-next 4/5] dpll: zl3073x: Refactor DPLL initialization
-Message-ID: <202507261812.7458edBX-lkp@intel.com>
-References: <20250725154136.1008132-5-ivecera@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=b+Xk7/tMNG8QjQstTP+A4f3dWIBzz3z88Sv0hvyjVqWYEHTzMEaHU/6D16a/Si0vUwmeuEFOqJLXdSZXodahEik8iwLi3KCfuoPB2gv28iLuZAGpShEMBen8IDEz4lDg8mDtqqTTDG2V/ArzWh3xlSzZs2Um4WLcabNKcsdGkbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i6DKezq2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93B4BC4CEED;
+	Sat, 26 Jul 2025 10:59:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753527596;
+	bh=aahVRAZ7YarZYp+zx9UXAEqg4elOZxAbYpT4hg7EVDU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=i6DKezq2/e+XlkoT2ywvE6ywBUdRS6+vyX/HWPxWy/MdYcvpseQuaivgi1OvGt6Jr
+	 6EBhT7gA1dc5zxGqE0pU+PKHfBvPaHRqRZeBfp6CdXEoX1MNVTLMVKZgJzxr9wBaMF
+	 /+acEn6HiHf4arPSAlQ2OeaSR8c8OXZ+Gr53q857424alouZQR1oqzGXikOLJwWnvh
+	 wKZfVABhBv98666IFhqjqbf3wK538VvgUoxcqpevt2+uZapMgvt5jHAZTrWj3r4gW/
+	 Uen9jrH452IhCHdW/YSDaP98Z6oowj5kg1Gewj3pPw7GoKRrywOrifH3dJZxIY9qLQ
+	 5g4Nu7Zm2XE8w==
+Date: Sat, 26 Jul 2025 11:59:51 +0100
+From: Simon Horman <horms@kernel.org>
+To: Yi Chen <yiche@redhat.com>
+Cc: netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	pablo@netfilter.org, kadlec@netfilter.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	shuah@kernel.org, coreteam@netfilter.org, fw@strlen.de,
+	Hangbin Liu <haliu@redhat.com>
+Subject: Re: [PATCH net v2] selftests: netfilter: ipvs.sh: Explicity disable
+ rp_filter on interface tunl0
+Message-ID: <20250726105951.GJ1367887@horms.kernel.org>
+References: <20250724080653.20723-1-yiche@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,84 +62,95 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250725154136.1008132-5-ivecera@redhat.com>
+In-Reply-To: <20250724080653.20723-1-yiche@redhat.com>
 
-Hi Ivan,
++ Hangbin
 
-kernel test robot noticed the following build warnings:
+On Thu, Jul 24, 2025 at 04:06:53PM +0800, Yi Chen wrote:
+> Although setup_ns() set net.ipv4.conf.default.rp_filter=0,
+> loading certain module such as ipip will automatically create a tunl0 interface
+> in all netns including new created ones. In the script, this is before than
+> default.rp_filter=0 applied, as a result tunl0.rp_filter remains set to 1
+> which causes the test report FAIL when ipip module is preloaded.
+> 
+> Before fix:
+> Testing DR mode...
+> Testing NAT mode...
+> Testing Tunnel mode...
+> ipvs.sh: FAIL
+> 
+> After fix:
+> Testing DR mode...
+> Testing NAT mode...
+> Testing Tunnel mode...
+> ipvs.sh: PASS
+> 
+> Fixes: 7c8b89ec506e ("selftests: netfilter: remove rp_filter configuration")
+> 
+> v2: Fixed the format of Fixes tag.
+> Signed-off-by: Yi Chen <yiche@redhat.com>
+> ---
+>  tools/testing/selftests/net/netfilter/ipvs.sh | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
-[auto build test WARNING on net-next/main]
+For future reference, there should be no blank line between
+the Fixes and other tags. And, version information should go
+below the scissors ('---').
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Ivan-Vecera/dpll-zl3073x-Add-functions-to-access-hardware-registers/20250725-234600
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250725154136.1008132-5-ivecera%40redhat.com
-patch subject: [PATCH net-next 4/5] dpll: zl3073x: Refactor DPLL initialization
-config: i386-randconfig-001-20250726 (https://download.01.org/0day-ci/archive/20250726/202507261812.7458edBX-lkp@intel.com/config)
-compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250726/202507261812.7458edBX-lkp@intel.com/reproduce)
+Something like this:
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202507261812.7458edBX-lkp@intel.com/
+Fixes: ...
+Signed-off-by: ...
+--- 
+ diffstat goes here
 
-All warnings (new ones prefixed by >>):
+v2: Fixed the format of Fixes tag.
 
->> drivers/dpll/zl3073x/core.c:994:3: warning: variable 'mask' is uninitialized when used here [-Wuninitialized]
-     994 |                 mask |= BIT(zldpll->id);
-         |                 ^~~~
-   drivers/dpll/zl3073x/core.c:972:25: note: initialize the variable 'mask' to silence this warning
-     972 |         u8 dpll_meas_ctrl, mask;
-         |                                ^
-         |                                 = '\0'
-   1 warning generated.
+And it is ok to have multiple scissors ('---'), sometimes tooling does that.
+The main point is that what is above the first scissors will, generally,
+show up in Git history, while what is below won't. While everything ends
+up in mailing list archives and so on.
 
+Also, if you do end up posting a v3 for some reason.
+Please consider correcting the spelling of Explicitly in the subject.
+This is flagged by checkpatch.pl --codespell
 
-vim +/mask +994 drivers/dpll/zl3073x/core.c
+And, please generate the CC list for patches using
+get_maintainer.pl this.patch. Which will include people
+involved in the commit cited in the Fixes tag.
+I've CCed Hangbin, to follow that pattern.
 
-   958	
-   959	/**
-   960	 * zl3073x_dev_phase_meas_setup - setup phase offset measurement
-   961	 * @zldev: pointer to zl3073x_dev structure
-   962	 *
-   963	 * Enable phase offset measurement block, set measurement averaging factor
-   964	 * and enable DPLL-to-its-ref phase measurement for all DPLLs.
-   965	 *
-   966	 * Returns: 0 on success, <0 on error
-   967	 */
-   968	static int
-   969	zl3073x_dev_phase_meas_setup(struct zl3073x_dev *zldev)
-   970	{
-   971		struct zl3073x_dpll *zldpll;
-   972		u8 dpll_meas_ctrl, mask;
-   973		int rc;
-   974	
-   975		/* Read DPLL phase measurement control register */
-   976		rc = zl3073x_read_u8(zldev, ZL_REG_DPLL_MEAS_CTRL, &dpll_meas_ctrl);
-   977		if (rc)
-   978			return rc;
-   979	
-   980		/* Setup phase measurement averaging factor */
-   981		dpll_meas_ctrl &= ~ZL_DPLL_MEAS_CTRL_AVG_FACTOR;
-   982		dpll_meas_ctrl |= FIELD_PREP(ZL_DPLL_MEAS_CTRL_AVG_FACTOR, 3);
-   983	
-   984		/* Enable DPLL measurement block */
-   985		dpll_meas_ctrl |= ZL_DPLL_MEAS_CTRL_EN;
-   986	
-   987		/* Update phase measurement control register */
-   988		rc = zl3073x_write_u8(zldev, ZL_REG_DPLL_MEAS_CTRL, dpll_meas_ctrl);
-   989		if (rc)
-   990			return rc;
-   991	
-   992		/* Enable DPLL-to-connected-ref measurement for each channel */
-   993		list_for_each_entry(zldpll, &zldev->dplls, list)
- > 994			mask |= BIT(zldpll->id);
-   995	
-   996		return zl3073x_write_u8(zldev, ZL_REG_DPLL_PHASE_ERR_READ_MASK, mask);
-   997	}
-   998	
+The above notwithstanding, this looks good to me.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Reviewed-by: Simon Horman <horms@kernel.org>
+
+> 
+> diff --git a/tools/testing/selftests/net/netfilter/ipvs.sh b/tools/testing/selftests/net/netfilter/ipvs.sh
+> index 6af2ea3ad6b8..9c9d5b38ab71 100755
+> --- a/tools/testing/selftests/net/netfilter/ipvs.sh
+> +++ b/tools/testing/selftests/net/netfilter/ipvs.sh
+> @@ -151,7 +151,7 @@ test_nat() {
+>  test_tun() {
+>  	ip netns exec "${ns0}" ip route add "${vip_v4}" via "${gip_v4}" dev br0
+>  
+> -	ip netns exec "${ns1}" modprobe -q ipip
+> +	modprobe -q ipip
+>  	ip netns exec "${ns1}" ip link set tunl0 up
+>  	ip netns exec "${ns1}" sysctl -qw net.ipv4.ip_forward=0
+>  	ip netns exec "${ns1}" sysctl -qw net.ipv4.conf.all.send_redirects=0
+> @@ -160,10 +160,10 @@ test_tun() {
+>  	ip netns exec "${ns1}" ipvsadm -a -i -t "${vip_v4}:${port}" -r ${rip_v4}:${port}
+>  	ip netns exec "${ns1}" ip addr add ${vip_v4}/32 dev lo:1
+>  
+> -	ip netns exec "${ns2}" modprobe -q ipip
+>  	ip netns exec "${ns2}" ip link set tunl0 up
+>  	ip netns exec "${ns2}" sysctl -qw net.ipv4.conf.all.arp_ignore=1
+>  	ip netns exec "${ns2}" sysctl -qw net.ipv4.conf.all.arp_announce=2
+> +	ip netns exec "${ns2}" sysctl -qw net.ipv4.conf.tunl0.rp_filter=0
+>  	ip netns exec "${ns2}" ip addr add "${vip_v4}/32" dev lo:1
+>  
+>  	test_service
+> -- 
+> 2.50.1
+> 
 
