@@ -1,168 +1,122 @@
-Return-Path: <netdev+bounces-210323-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210324-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E4FFB12C1E
-	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 21:57:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B22AB12C24
+	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 22:05:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9AF9F189F1F1
-	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 19:57:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B783017E39D
+	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 20:05:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1F4F20CCCA;
-	Sat, 26 Jul 2025 19:57:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40020217F2E;
+	Sat, 26 Jul 2025 20:05:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RTbjJ3Dg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O4d92slr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f47.google.com (mail-ua1-f47.google.com [209.85.222.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EA721401B;
-	Sat, 26 Jul 2025 19:57:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F34078F4C;
+	Sat, 26 Jul 2025 20:05:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753559822; cv=none; b=LPBlknboFCUlgbPcAS0RMVBtQd7pLRsk9xozqE4SSKu7ZSfnkaXzAFoeIpgI3X6wdI9myr6/lfE+GCmf5ywf+Zr1uaLfzVTAglX1OmSJEy9u/Gu9d9ThZpgm25k2Jzsz+4V5Wcs/eVPpmynsNwZqkpWIeiB0wY5z7RSwE9NW1Qg=
+	t=1753560343; cv=none; b=Q0qNXphBefBeon+jWzvWr7Kva2G7zBSL34TyLu39nR/VnPprnWRD17n+0luAPGWwwPAV59ocPEI/blQLLyaNWrTv0iedDsr4u2GIPfJN01mjrWXfFbTmavnzEb8TjPE7wg5eB1LcFHM/8rltBXGt4dAPNufAEmsRXlza4fwa5Io=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753559822; c=relaxed/simple;
-	bh=ZZJS8vmyBJ54WEVUEJMgCAOohs70QF5H7BRFzIbEGP8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pMig3kiEJKHEIMO17XSOUWl4PhHt4dQk+g8KN2EoKMN5zOesuq5OGOGfdj9dKAAYpz3RjQf322e3z2BNCDKpzXMu5L0kOQoED6UOhbIiC3Y/+MZWLZHGw3whk/hC/An7cX0LwI4DBD9z0+MmP++qm3/prW+eCXHJIVXJjSML9Ls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RTbjJ3Dg; arc=none smtp.client-ip=209.85.222.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f47.google.com with SMTP id a1e0cc1a2514c-884f22d91f9so41886241.1;
-        Sat, 26 Jul 2025 12:57:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753559820; x=1754164620; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bjzLMbzT1iVYkNvHW3G4OLXlODM2cB+ZOhaGwXMVBN4=;
-        b=RTbjJ3DgTBqabNaJiaycGvxMKeJg6yOJbPnAflUhUDm7fpQdJDW/3dBqoPesksNHxR
-         LqwDK8Ag9aSW4QyPH8LlaoHP71qxfv8KNcxE8MwRMLsMVPEhfR1jAFEW4s6YN2cLQuEu
-         oMw+M+zJ40Y16HTWSL+e1/TlSqTcWj9OW3onKAalA2iVbYT22fxlcw0dwa7EJjb9FZwo
-         35vK6UtYMwp4a67J6Tg8/lL6NWr+Q3pHdCfxGLCuDo2ifL8g+Aywb8EQ/XMPJNWEUUYD
-         +y/ql0YIO6WP78fwHD3/xoqRIu8okuEQFJS0qROTY902cdXZfl4J6FVU5DZ62BWdutDx
-         ADIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753559820; x=1754164620;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bjzLMbzT1iVYkNvHW3G4OLXlODM2cB+ZOhaGwXMVBN4=;
-        b=uDZ6hY4esFU7QrWWGC7u+73Einvy1qdJ2jW7OEkoingNyBOxPyaAh6hUJaTBjnVore
-         BI8mjfGEm95suTlez7Bsf30WMSZ0Yilrird98a9I/UJ2Ft/LUDsYLvRdN1tcAForBVy4
-         iPn44gnQPulYfxQL3odMUdw1Tz0Pwg5FFD3WzFVoaKnAr189B+1xudbOOwbN3l2fUjGR
-         BW65owXXLwvicFwYxSK5Ld6yHBId078vuLSfwAAUvNkXRJgn53fWkgCrogVVyY5lCdr1
-         JO/LVV11jMre+pTnhs2Cd2s89xCfN0Gia4OfE3OuxmFglrkjppKG51sDU+FHXhs8DjJx
-         QRvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW1EaXpt8ZsfQ7bkFBV5gvNypyUb0wLhi6nN3cdZUg8BR8LMLtloHN0Lsu8/HdXzzr4WQ4u3OP0@vger.kernel.org, AJvYcCWeKNrkTZ43kbESNdjMZIACus3QhbzsxSZx5YjzVQ66CfHQXymoOrD3dtFDxLhp+K0Y+Lw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxTYcSROffcqeCGA0iHTrhbxMeBozOt59EYDaO6LyQsLe/HMcxz
-	5FGSt5Vac7FPA9V7em5nvGv/ed++cecFvCH+gsA39Z+4gfhOlB+NcKcnYpmi3lN0gUsOrtUZL9n
-	Os9VCW4xezAJEc/G+UWvIDjfC4a0wqw==
-X-Gm-Gg: ASbGncs1m1kY2//fHTLOkO02ZZE0mbeQAUnRvp08KH/sW/UuzxVNCspzNqcta4SIFi2
-	DvGYrJt78BKN3iQt4ZxFrPWwQpA0/uqwsQqcdta4khtemQGcg4eBdEZryqIXS5W+WijUdLL9nP6
-	saPlXrLZsQePfZiEBq+DnyHfFbAi/FlWQ25s0oazSwBJ4+Lf6q9SAOuL4iieHyZMkdQdTywK5tf
-	PgZJo1wIatQuqNcR/FIZmp+DJEg6ylDo0wz2B8=
-X-Google-Smtp-Source: AGHT+IEGoIe0zXdy01wXvFWgnYCfeCXxZhSWf9e9c06WXVTpVKkcc+4LK3K0swXZerq8I4zvSkJqmOByl30bpONImXI=
-X-Received: by 2002:a05:6102:3589:b0:4f1:7ed8:9e0a with SMTP id
- ada2fe7eead31-4fa3f8a46cbmr897542137.0.1753559819808; Sat, 26 Jul 2025
- 12:56:59 -0700 (PDT)
+	s=arc-20240116; t=1753560343; c=relaxed/simple;
+	bh=5rCJ2wQNBQmDKsYmk2VF9549ZJsYeQhJZowIoMiUGPI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WSdcNYkXXBZ/LbreXLubzOwrYOgZBViWD+bFpNw9fUvd3zbHzpgpVKKC7R/jhSGGoIOueNrJM7MSbuLkxq7MDHuLqltbJhWWwe8wKOOxuD3NvuQ6GMUxjrVNnt4NaK1yH3rfsgmbqD57Tv1RrKgxM5qe8l1tM820jSUK0FXT324=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O4d92slr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81539C4CEED;
+	Sat, 26 Jul 2025 20:05:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753560342;
+	bh=5rCJ2wQNBQmDKsYmk2VF9549ZJsYeQhJZowIoMiUGPI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=O4d92slr7VEOjfxp308bMJogMXp6wYLJtt3CpUpgtmbtKLpu2zNMm5alMoEDp8wx5
+	 MD6ys53CC7iVInMnL/3LBg9CVmZ61BF7pNRAGN6iCiSfHhZ9loPdDQfWNrsvz+/vhg
+	 MIIFRdGXnNBOBwxCz9QWOM3xjHQCoaUsJXan1jBH/dbaz2oWwOLFNNnMuMFOUoszlT
+	 JB823UOYpLNs8QqA6pVUNg03k/yiNlDqrJlTZ77ceaN8rEJaUz6b0MAvINyx+5CMxF
+	 0+GFKChiF3/oacs/VeccqdCnUPzUJGLJjjko+NaKcfgrKCWqvR11L9KIY0924vSAq7
+	 uptMiVqWT/+ww==
+Date: Sat, 26 Jul 2025 21:05:38 +0100
+From: Simon Horman <horms@kernel.org>
+To: chalianis1@gmail.com
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, linux@armlinux.org.uk,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH net] phy: dp83869: fix interrupts issue when using with
+ an optical fiber sfp. to correctly clear the interrupts both status
+ registers must be read.
+Message-ID: <20250726200538.GO1367887@horms.kernel.org>
+References: <20250726001034.28885-1-chalianis1@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250723003203.1238480-1-chenyuan0y@gmail.com>
- <045d1ff5-bb20-481d-a067-0a42345ab83d@redhat.com> <de14f60e-b1f0-432c-80b4-a2f0453e0fe2@amd.com>
- <8d987133-0e22-4aa8-bf2e-57ef105c8db8@linux.dev>
-In-Reply-To: <8d987133-0e22-4aa8-bf2e-57ef105c8db8@linux.dev>
-From: Chenyuan Yang <chenyuan0y@gmail.com>
-Date: Sat, 26 Jul 2025 12:56:48 -0700
-X-Gm-Features: Ac12FXzDvgLq0UlhRr_NSb5IuTbpazmORXx3QtkaaYw6NWkZT7fSnZHSSIS1E1Y
-Message-ID: <CALGdzuquTFAgnKyPKBs2v4YwaPafzkVyt7qpXG3H0TKYj0-zPw@mail.gmail.com>
-Subject: Re: [PATCH] sfc: handle NULL returned by xdp_convert_buff_to_frame()
-To: Kunwu Chan <kunwu.chan@linux.dev>
-Cc: Edward Cree <ecree@amd.com>, Paolo Abeni <pabeni@redhat.com>, ecree.xilinx@gmail.com, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
-	john.fastabend@gmail.com, sdf@fomichev.me, lorenzo@kernel.org, 
-	netdev@vger.kernel.org, linux-net-drivers@amd.com, bpf@vger.kernel.org, 
-	zzjas98@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250726001034.28885-1-chalianis1@gmail.com>
 
-Thanks so much for your suggestion! I just submitted the v2 based on
-your comments for this issue :)
+On Fri, Jul 25, 2025 at 08:10:34PM -0400, chalianis1@gmail.com wrote:
+> From: Anis Chali <chalianis1@gmail.com>
+> 
+> from datasheet of dp83869hm
+> 7.3.6 Interrupt
+> The DP83869HM can be configured to generate an interrupt when changes of internal status occur. The interrupt
+> allows a MAC to act upon the status in the PHY without polling the PHY registers. The interrupt source can be
+> selected through the interrupt registers, MICR (12h) and FIBER_INT_EN (C18h). The interrupt status can be
+> read from ISR (13h) and FIBER_INT_STTS (C19h) registers. Some interrupts are enabled by default and can
+> be disabled through register access. Both the interrupt status registers must be read in order to clear pending
+> interrupts. Until the pending interrupts are cleared, new interrupts may not be routed to the interrupt pin.
+> 
+> Fixes: 01db923e8377 ("net: phy: dp83869: Add TI dp83869 phy")
+> 
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Anis Chali <chalianis1@gmail.com>
+> ---
+>  drivers/net/phy/dp83869.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/drivers/net/phy/dp83869.c b/drivers/net/phy/dp83869.c
+> index a62cd838a9ea..1e8c20f387b8 100644
+> --- a/drivers/net/phy/dp83869.c
+> +++ b/drivers/net/phy/dp83869.c
+> @@ -41,6 +41,7 @@
+>  #define DP83869_IO_MUX_CFG	0x0170
+>  #define DP83869_OP_MODE		0x01df
+>  #define DP83869_FX_CTRL		0x0c00
+> +#define DP83869_FX_INT_STS		0x0c19
+>  
+>  #define DP83869_SW_RESET	BIT(15)
+>  #define DP83869_SW_RESTART	BIT(14)
+> @@ -195,6 +196,12 @@ static int dp83869_ack_interrupt(struct phy_device *phydev)
+>  	if (err < 0)
+>  		return err;
+>  
+> +	if (linkmode_test_bit(ETHTOOL_LINK_MODE_FIBRE_BIT, phydev->supported)) {
+> +		err = phy_read_mmd(phydev, DP83869_DEVADDR, DP83869_FX_INT_STS);
+> +		if (err < 0)
+> +			return err;		
 
-On Fri, Jul 25, 2025 at 5:39=E2=80=AFAM Kunwu Chan <kunwu.chan@linux.dev> w=
-rote:
->
-> On 2025/7/25 18:11, Edward Cree wrote:
-> > On 7/24/25 10:57, Paolo Abeni wrote:
-> >> On 7/23/25 2:32 AM, Chenyuan Yang wrote:
-> >>> The xdp_convert_buff_to_frame() function can return NULL when there i=
-s
-> >>> insufficient headroom in the buffer to store the xdp_frame structure
-> >>> or when the driver didn't reserve enough tailroom for skb_shared_info=
-.
-> >> AFAIC the sfc driver reserves both enough headroom and tailroom, but
-> >> this is after ebpf run, which in turn could consume enough headroom to
-> >> cause a failure, so I think this makes sense.
-> > Your reasoning seems plausible to me.
-> > However, I think the error path ought to more closely follow the existi=
-ng
-> >   error cases in logging a ratelimited message and calling the tracepoi=
-nt.
-> > I think the cleanest way to do this would be:
-> >       if (unlikely(!xdpf))
-> >               err =3D -ENOBUFS;
-> >       else
-> >               err =3D efx_xdp_tx_buffers(efx, 1, &xdpf, true);
-> >   so that it can make use of the existing failure path.
-> > Adding the check to efx_xdp_tx_buffers() is also an option.
-> >
-> > -ed
-> >
-> Hi Chenyuan,
->
-> THX for addressing this edge case. I concur with Edward's suggestion to
-> integrate this with the existing error handling flow. This will ensure:
-> Consistent observability (ratelimited logs + tracepoints)
-> Centralized resource cleanup
-> Clear error type differentiation via -ENOBUFS
->
-> Proposed refinement:
->
-> diff
->   case XDP_TX:
->       /* Buffer ownership passes to tx on success. */
->       xdpf =3D xdp_convert_buff_to_frame(&xdp);
-> +    if (unlikely(!xdpf)) {
-> +        err =3D -ENOBUFS;
-> +    } else {
-> +        err =3D efx_siena_xdp_tx_buffers(efx, 1, &xdpf, true);
-> +    }
->
-> -    err =3D efx_siena_xdp_tx_buffers(efx, 1, &xdpf, true);
->       if (unlikely(err !=3D 1)) {
->           efx_siena_free_rx_buffers(rx_queue, rx_buf, 1);
->           if (net_ratelimit())
->               netif_err(efx, rx_err, efx->net_dev,
-> -                  "XDP TX failed (%d)\n", err);
-> +                  "XDP TX failed (%d)%s\n", err,
-> +                  err =3D=3D -ENOBUFS ? " [frame conversion]" : "");
->           channel->n_rx_xdp_bad_drops++;
-> -        trace_xdp_exception(efx->net_dev, xdp_prog, xdp_act);
-> +        if (err !=3D -ENOBUFS)
-> +            trace_xdp_exception(efx->net_dev, xdp_prog, xdp_act);
->       } else {
->           channel->n_rx_xdp_tx++;
->       }
->       break;
->
->
-> -- Thanks, TAO. --- =E2=80=9CLife finds a way.=E2=80=9D
+Hi Anis,
+
+Its invisible, of course, but the line above has trailing whitespace.
+
+Flagged by checkpatch.
+
+> +	}
+> +
+>  	return 0;
+>  }
+>  
+> -- 
+> 2.49.0
+> 
+> 
 
