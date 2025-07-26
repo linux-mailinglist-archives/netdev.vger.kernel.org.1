@@ -1,124 +1,103 @@
-Return-Path: <netdev+bounces-210304-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210305-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D002B12BCC
-	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 20:05:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 446CEB12BD6
+	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 20:29:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C63A9189EDC8
-	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 18:05:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 57010176E6B
+	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 18:29:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 112DC288C85;
-	Sat, 26 Jul 2025 18:04:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7945F28643F;
+	Sat, 26 Jul 2025 18:29:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Mk60yALw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tYiVri0Q"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4F7D1DE2D8;
-	Sat, 26 Jul 2025 18:04:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5176C1FC3;
+	Sat, 26 Jul 2025 18:29:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753553097; cv=none; b=J6+y9NP5wymz3Zbgpb+UtVA82W09ByvwaUJnVCKHdfud2cg+zuTXrvrXfRujvEv15m7FYbQM/+HCoukmReUZKmS5jceO4qA5VD1vb+eC5BANRNTJDO7jNV3AoMuE48zPb3S7p8pJIUOYl4qbQw++PyMCwcHDwz1RlmDdm3n6+bo=
+	t=1753554594; cv=none; b=DdxsBc+u6MUHQI6AN8f8NidOA4a9sQ15/8V4A1zK39W7q34nqV5tEoTumkSMpFKdFFYdnUYPq5yyzKIkE6HeMAyeJNSgDiO2WPwS6z9omL9ZhFIN0J+nxPojZHX1CvNQ642cn6Ar26p8fK8GkDbFTCoLkl8OJwnDqDZnNFlq9T4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753553097; c=relaxed/simple;
-	bh=dA3RQXEC+Ya4PmUpYs4RFw4idADWpDG4vWeL2fSZ6M4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WBKkF79+irqk9ufR7oerDhbbqJSux8US7y9p9aTdFHiEV63gbw7KTVCW14yA1oWVifzf3I31B4RJeZCosi3hVaMGET9DVQLRj3GTlcQwy0ohupWi6zKtQyF9OOCpA33zdFB1raU9f59Ulq4fjKLE6aK4Se7VkCbRvoCYO5vINws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Mk60yALw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92186C4CEED;
-	Sat, 26 Jul 2025 18:04:53 +0000 (UTC)
+	s=arc-20240116; t=1753554594; c=relaxed/simple;
+	bh=mxo9qya/kzvBI7JkhII6DI4w28F8yzccAxoPm1FQ4Mc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=jAje75u/yKjngODBqscnIxshhuXK8Sl5BOePg58iN6RLNL8CHhD5TfJKc5xkQS6V1xyuDxe1BCMsuEwpspapHBXUK3/Wk/AD609OC4w2m/PO0YovXubIuclKPgDtGBIGWwv+3vXjp7+vDPHJbfKy80rhRIyb0GnDHTvjkoY4m78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tYiVri0Q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3188C4CEF1;
+	Sat, 26 Jul 2025 18:29:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753553096;
-	bh=dA3RQXEC+Ya4PmUpYs4RFw4idADWpDG4vWeL2fSZ6M4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Mk60yALwghPokJKFHR7S9PFM88kTEYZYtfojXaZI+uiimFAPD9KIEv+wteV4f6jMs
-	 yd/HoAXf4N318Zl0XUPbbgv+DC5DmO+5aMbqR3rOykGrbHcx6W7Wv0hj3+KUVPaaHW
-	 VIcSuKVEuy3n7mDDX6SzQZM46jrOBu+JWpBlHPSRrPx3ksFMg5NnrtHCjLbLDEF27P
-	 pzbHJL5eWw952Uhpz3awLM5TmaJvuaanqxZ6wR89SG5si+cVb6cx61/k2znh4io9qP
-	 kzilZTDlNe2yAYnESP2zFJS4wi91yhuKrESL+HZYgt3Wucq8GxTs/hkpghqAADxiYs
-	 nRLgxFtzaraAA==
-Date: Sat, 26 Jul 2025 19:04:51 +0100
-From: Simon Horman <horms@kernel.org>
-To: Rob Clark <rob.clark@oss.qualcomm.com>
-Cc: Krzysztof Kozlowski <krzk@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-	Wasim Nazir <wasim.nazir@oss.qualcomm.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	kernel@oss.qualcomm.com
-Subject: Re: [PATCH 1/7] arm64: dts: qcom: Rename sa8775p SoC to "lemans"
-Message-ID: <20250726180451.GM1367887@horms.kernel.org>
-References: <20250722144926.995064-1-wasim.nazir@oss.qualcomm.com>
- <20250722144926.995064-2-wasim.nazir@oss.qualcomm.com>
- <20250723-swinging-chirpy-hornet-eed2f2@kuoka>
- <159eb27b-fca8-4f7e-b604-ba19d6f9ada7@oss.qualcomm.com>
- <e718d0d8-87e7-435f-9174-7b376bf6fa2f@kernel.org>
- <CACSVV00jef8so-jqjCaqJehj-XN2OZ562_R+Dod64+C4-dmDhQ@mail.gmail.com>
+	s=k20201202; t=1753554593;
+	bh=mxo9qya/kzvBI7JkhII6DI4w28F8yzccAxoPm1FQ4Mc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=tYiVri0QD33QM0ljryw3G6aNP5+B/csvJqrOIvwmx3AGsJOo0dNaKCdXW+m5ViZWb
+	 d+8uVdUCbGDy6ghfyIxWQFonT0WxCz4jiwY060cGdSgUsPJGJu3gNZOYFAT8RwpOS9
+	 hch5tpQjrTyOp+XvpgKOSsI7YIThcvX+LoYdE2Z+tYZMhAO5/ufBUzpDkNKIUSP4XU
+	 +HWtSCSpf6lBjv8lJFVZMhen5K/qrqRsnPa28RxqESE55KXpCENEMhgmjmmafx9cyW
+	 UpSa8+g9qabVPejG3TF62QGmLEo+cYPCgutZmJe5dtiJJk9FelzYMCzjGZFhcFTVck
+	 qbhbn3aEppxUw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D39383BF4E;
+	Sat, 26 Jul 2025 18:30:12 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACSVV00jef8so-jqjCaqJehj-XN2OZ562_R+Dod64+C4-dmDhQ@mail.gmail.com>
+Subject: Re: [PATCH net v3 0/2] xsk: fix negative overflow issues in zerocopy
+ xmit
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175355461105.3662765.16598122698049376540.git-patchwork-notify@kernel.org>
+Date: Sat, 26 Jul 2025 18:30:11 +0000
+References: <20250723142327.85187-1-kerneljasonxing@gmail.com>
+In-Reply-To: <20250723142327.85187-1-kerneljasonxing@gmail.com>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, bjorn@kernel.org,
+ magnus.karlsson@intel.com, maciej.fijalkowski@intel.com,
+ jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org,
+ daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
+ mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+ linux-stm32@st-md-mailman.stormreply.com, bpf@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ kernelxing@tencent.com
 
-On Thu, Jul 24, 2025 at 08:59:38AM -0700, Rob Clark wrote:
-> On Thu, Jul 24, 2025 at 5:52 AM Krzysztof Kozlowski <krzk@kernel.org> wrote:
-> >
-> > On 24/07/2025 14:47, Konrad Dybcio wrote:
-> > > On 7/23/25 10:29 AM, 'Krzysztof Kozlowski' via kernel wrote:
-> > >> On Tue, Jul 22, 2025 at 08:19:20PM +0530, Wasim Nazir wrote:
-> > >>> SA8775P, QCS9100 and QCS9075 are all variants of the same die,
-> > >>> collectively referred to as lemans. Most notably, the last of them
-> > >>> has the SAIL (Safety Island) fused off, but remains identical
-> > >>> otherwise.
-> > >>>
-> > >>> In an effort to streamline the codebase, rename the SoC DTSI, moving
-> > >>> away from less meaningful numerical model identifiers.
-> > >>>
-> > >>> Signed-off-by: Wasim Nazir <wasim.nazir@oss.qualcomm.com>
-> > >>> ---
-> > >>>  arch/arm64/boot/dts/qcom/{sa8775p.dtsi => lemans.dtsi} | 0
-> > >>>  arch/arm64/boot/dts/qcom/sa8775p-ride.dtsi             | 2 +-
-> > >>
-> > >> No, stop with this rename.
-> > >>
-> > >> There is no policy of renaming existing files.
-> > >
-> > > There's no policy against renaming existing files either.
-> >
-> > There is, because you break all the users. All the distros, bootloaders
-> > using this DTS, people's scripts.
+Hello:
+
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 23 Jul 2025 22:23:25 +0800 you wrote:
+> From: Jason Xing <kernelxing@tencent.com>
 > 
-> I think that is a valid argument against renaming the toplevel .dts
-> (and therefore .dtb), but renaming .dtsi should be a harmless internal
-> detail to the kernel.  And less confusing, IMHO, than
-> qsc9100-myboard.dts #including sa8775p.dtsi.
+> Fix two negative overflow issues around {stmmac_xdp|igb}_xmit_zc().
 > 
-> So wouldn't the sensible way forward be to rename .dtsi but not .dts?
+> Jason Xing (2):
+>   stmmac: xsk: fix negative overflow of budget in zerocopy mode
+>   igb: xsk: solve negative overflow of nb_pkts in zerocopy mode
+> 
+> [...]
 
-FWIIW, and with the dual caveats that: I do not have the full context of
-this series; and SoCs are not somewhere where I am active these days:
+Here is the summary with links:
+  - [net,v3,1/2] stmmac: xsk: fix negative overflow of budget in zerocopy mode
+    https://git.kernel.org/netdev/net/c/2764ab51d5f0
+  - [net,v3,2/2] igb: xsk: solve negative overflow of nb_pkts in zerocopy mode
+    https://git.kernel.org/netdev/net/c/3b7c13dfdcc2
 
-I am also under the impression that, in general, renames to
-match product or other organisational changes are a non-starter.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-But reading over this patchset, I also felt that renaming the .dsti files
-would improve things. And seems to have little scope to break things for
-users.
 
-</2c>
 
