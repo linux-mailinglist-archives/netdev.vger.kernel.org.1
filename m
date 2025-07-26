@@ -1,93 +1,97 @@
-Return-Path: <netdev+bounces-210318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210320-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFD33B12C01
-	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 21:10:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 90F1AB12C16
+	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 21:48:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C29C4E506B
-	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 19:09:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A7773BDDE7
+	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 19:47:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8B57289E39;
-	Sat, 26 Jul 2025 19:09:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1971E186294;
+	Sat, 26 Jul 2025 19:48:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QggkLvJD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fx1SkluW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A140F289E2C;
-	Sat, 26 Jul 2025 19:09:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4662FBF0;
+	Sat, 26 Jul 2025 19:48:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753556998; cv=none; b=ntBtm2HB8CMB1baljO9prypLVVtld4Xf5KOcQOXYFiCMZWkACazZb0/IsmA1r3uA60Iw+EwTiVmsdJdpv8VYXU3YHf05ep2YfPajhZ7ORCpgx02YqpYUFRhfonut2TDd95faxvLU22puO5aAmVsZPQMSeL3vL/IQc+2/5t266Uc=
+	t=1753559298; cv=none; b=Zl/ZNwa47hT/mtjkixgxa9NyL3Z3gedoynCjPFtJ3MrP2QVXgvtanOWa4Pabc1DwKxHFJKc36MuXgYab0Xo7DuVDVFuhCz6wTVBjNRqIqTOrnbH9iLZazy+RSSwTPsyL2q2MyO+ues+4CVza4uVyL31+ql0Fba9fpPjXbhZSixM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753556998; c=relaxed/simple;
-	bh=Z0esAkJVznS9mu9HvUJRGlrFEH4aPDr4qzvHcwf65CA=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=XFUMst2mQKLMNm0wvmkq1Y6NVfhVUl3y5c/hQzBWuo23KEDVrmNBYQ16HutgF9LSOFYVD7g1NsNrA0Ga1fZ79ChFfwfHcz8x3hOUrrxB7Q2XLSxtKI02egbPZYf9TeGcLw98dn8mSv3tJNWzVpGohisgAFUxpCeP85FfTiFOG14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QggkLvJD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3AD34C4CEED;
-	Sat, 26 Jul 2025 19:09:58 +0000 (UTC)
+	s=arc-20240116; t=1753559298; c=relaxed/simple;
+	bh=Eu7mCczLCzH4Q++ee3PkwjTBB0+cpzTWGw87b1bP/2Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RlIyAsLsmCVUDCFs5s7i7b5b1KnqRg42qZaQpdwUZKdl7vM670YB7iKxEBjnogpmmxcYp0eJ8JCz8UVg1oEv6vOfmV4rzuBlzD8gALYzBxxubI1YEoKXZuEwW8rTeLudZ09Mcb3W4gUCb694IycKyukCBXg87WNWz4VxyfqIqZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fx1SkluW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2644EC4CEED;
+	Sat, 26 Jul 2025 19:48:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753556998;
-	bh=Z0esAkJVznS9mu9HvUJRGlrFEH4aPDr4qzvHcwf65CA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=QggkLvJDWoy60Kj7Gs5yIbjZ3agSdXk2QFMP/FWRqOnpDG8Pfv8GB/jpzUlp6yPgM
-	 auVRyEjKqmc3LtTYoDg/nVA8HOjt4XJbtQ9Df+eVqbJ5rH/ayeQAZtTFxWmnA2xLUu
-	 jFDUZOwSlWu0GV/InEqrcj6xbOOrAx2T7R4iSHhfOEzq7+OcTzmKRkjBljdk3R0eAm
-	 iYxXEAiLMh2TrKdS1QCItY37inahP7KzS02lkNaPdr2g6M6GOTY3+UD6BGMfYBBXz+
-	 zZNTdIgUXJLG0RNdPCmcdrIJYMnzf0cTJ1t9q7BHg4WKmU4lXcrZzNj1ANMbB5hXnv
-	 bc2NvZq1QTshQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE79383BF4E;
-	Sat, 26 Jul 2025 19:10:16 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1753559297;
+	bh=Eu7mCczLCzH4Q++ee3PkwjTBB0+cpzTWGw87b1bP/2Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=fx1SkluWSqFlrJ6xNeC4nmRiNW2A5DeYy4E0nBF0AuaQeKL0eLY9cF3ZNCvQu49a5
+	 VQ7Vk9a4CL7NmSflTqBo+07ufSkJlyjEIzmoYwzACM/+YAstceA842zro+d74tHhGl
+	 wRRWxlrtdHX8QxM6JFt0rJmQTKeFmFid7eHRgqbVxfSjOpJjVzY+iW0tr4DDkZdYki
+	 j9Ou4a5FvgZDoL/3z8qr0koiPRf2SEP/4MFcdKNeuMcY/wo0WhldwokQmboO+4O4j8
+	 1gpfBm4+dFaHxOMYSeg7FEZ0kDjSLdJqO8D9WqlY3imCxHzVEadAUfwM1M/zsMy/sv
+	 yJY0yEqHIKL2A==
+Date: Sat, 26 Jul 2025 20:48:13 +0100
+From: Simon Horman <horms@kernel.org>
+To: Jimmy Assarsson <jimmyassarsson@gmail.com>
+Cc: Jimmy Assarsson <extja@kvaser.com>, linux-can@vger.kernel.org,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v2 01/11] can: kvaser_usb: Add support to control CAN
+ LEDs on device
+Message-ID: <20250726194813.GN1367887@horms.kernel.org>
+References: <20250724092505.8-1-extja@kvaser.com>
+ <20250724092505.8-2-extja@kvaser.com>
+ <20250724182611.GC1266901@horms.kernel.org>
+ <a07d995f-0fdf-4773-8cc4-4db6f72ce398@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] dpll: zl3073x: Fix build failure
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175355701525.3670812.15763912931192252437.git-patchwork-notify@kernel.org>
-Date: Sat, 26 Jul 2025 19:10:15 +0000
-References: <20250726184145.25769-1-ivecera@redhat.com>
-In-Reply-To: <20250726184145.25769-1-ivecera@redhat.com>
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: kuba@kernel.org, Prathosh.Satish@microchip.com, jiri@resnulli.us,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a07d995f-0fdf-4773-8cc4-4db6f72ce398@gmail.com>
 
-Hello:
+On Fri, Jul 25, 2025 at 02:44:52PM +0200, Jimmy Assarsson wrote:
+> On 7/24/25 8:26 PM, Simon Horman wrote:
+> > On Thu, Jul 24, 2025 at 11:24:55AM +0200, Jimmy Assarsson wrote:
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+...
 
-On Sat, 26 Jul 2025 20:41:45 +0200 you wrote:
-> If CONFIG_ZL3073X is enabled but both CONFIG_ZL3073X_I2C and
-> CONFIG_ZL3073X_SPI are disabled, the compilation may fail because
-> CONFIG_REGMAP is not enabled.
+> > GCC seems to know that:
+> > * cmd was allocated sizeof(*cmd) = 32 bytes
+> > * struct kvaser_cmd_ext is larger than this (96 bytes)
+> > 
+> > And it thinks that cmd->header.cmd_no might be CMD_EXTENDED.
+> > This is not true, becuae .cmd_no is set to CMD_LED_ACTION_REQ
+> > earlier in kvaser_usb_hydra_set_led. But still, GCC produces
+> > a big fat warning.
+> > 
+> > On the one hand we might say this is a shortcoming in GCC,
+> > a position I agree with. But on the other hand, we might follow
+> > the pattern used elsewhere in this file for similar functions,
+> > which seems to make GCC happy, I guess, and it is strictly a guess,
+> > because less context is needed for it to analyse things correctly.
 > 
-> Fix the issue by selecting CONFIG_REGMAP when CONFIG_ZL3073X is enabled.
+> Thanks for finding this!
 > 
-> Fixes: 2df8e64e01c10 ("dpll: Add basic Microchip ZL3073x support")
-> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+> Marc Kleine-Budde actually sorted this out for other commands some years ago [1],
+> but I had completely forgotten.
 > 
-> [...]
+> [1] https://lore.kernel.org/all/20221219110104.1073881-1-mkl@pengutronix.de
 
-Here is the summary with links:
-  - [net-next] dpll: zl3073x: Fix build failure
-    https://git.kernel.org/netdev/net-next/c/fa582ca7e187
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Nice, thanks for digging that up.
 
