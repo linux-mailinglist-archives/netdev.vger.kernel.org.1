@@ -1,60 +1,78 @@
-Return-Path: <netdev+bounces-210320-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210321-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90F1AB12C16
-	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 21:48:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E4CBB12C19
+	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 21:49:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A7773BDDE7
-	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 19:47:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3BED4189E75B
+	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 19:49:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1971E186294;
-	Sat, 26 Jul 2025 19:48:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B321C1EDA0E;
+	Sat, 26 Jul 2025 19:49:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fx1SkluW"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="anaOAwDt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4662FBF0;
-	Sat, 26 Jul 2025 19:48:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA3C31401B;
+	Sat, 26 Jul 2025 19:49:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753559298; cv=none; b=Zl/ZNwa47hT/mtjkixgxa9NyL3Z3gedoynCjPFtJ3MrP2QVXgvtanOWa4Pabc1DwKxHFJKc36MuXgYab0Xo7DuVDVFuhCz6wTVBjNRqIqTOrnbH9iLZazy+RSSwTPsyL2q2MyO+ues+4CVza4uVyL31+ql0Fba9fpPjXbhZSixM=
+	t=1753559367; cv=none; b=jVikJWe7eSzEaK51Rh+JUItc+XODMKJHXdFJpKbzU8syxxIRnX5gFuhr/XHpZnYY418lusQdUrplSJ9vQ2OPdylghf7o2CzB+KGzR/6GFMJgCkSx5H0yMs5BEaEbqSgibrfSthWqKut/QSrO5ZG5Ky6tlPJ1X6ZKFlNkTdzHcAA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753559298; c=relaxed/simple;
-	bh=Eu7mCczLCzH4Q++ee3PkwjTBB0+cpzTWGw87b1bP/2Q=;
+	s=arc-20240116; t=1753559367; c=relaxed/simple;
+	bh=jBF0oqWUqYKS8OhtkRMLwtvyBIhQM+gKrwZVKEhqJHo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RlIyAsLsmCVUDCFs5s7i7b5b1KnqRg42qZaQpdwUZKdl7vM670YB7iKxEBjnogpmmxcYp0eJ8JCz8UVg1oEv6vOfmV4rzuBlzD8gALYzBxxubI1YEoKXZuEwW8rTeLudZ09Mcb3W4gUCb694IycKyukCBXg87WNWz4VxyfqIqZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fx1SkluW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2644EC4CEED;
-	Sat, 26 Jul 2025 19:48:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753559297;
-	bh=Eu7mCczLCzH4Q++ee3PkwjTBB0+cpzTWGw87b1bP/2Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fx1SkluWSqFlrJ6xNeC4nmRiNW2A5DeYy4E0nBF0AuaQeKL0eLY9cF3ZNCvQu49a5
-	 VQ7Vk9a4CL7NmSflTqBo+07ufSkJlyjEIzmoYwzACM/+YAstceA842zro+d74tHhGl
-	 wRRWxlrtdHX8QxM6JFt0rJmQTKeFmFid7eHRgqbVxfSjOpJjVzY+iW0tr4DDkZdYki
-	 j9Ou4a5FvgZDoL/3z8qr0koiPRf2SEP/4MFcdKNeuMcY/wo0WhldwokQmboO+4O4j8
-	 1gpfBm4+dFaHxOMYSeg7FEZ0kDjSLdJqO8D9WqlY3imCxHzVEadAUfwM1M/zsMy/sv
-	 yJY0yEqHIKL2A==
-Date: Sat, 26 Jul 2025 20:48:13 +0100
-From: Simon Horman <horms@kernel.org>
-To: Jimmy Assarsson <jimmyassarsson@gmail.com>
-Cc: Jimmy Assarsson <extja@kvaser.com>, linux-can@vger.kernel.org,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v2 01/11] can: kvaser_usb: Add support to control CAN
- LEDs on device
-Message-ID: <20250726194813.GN1367887@horms.kernel.org>
-References: <20250724092505.8-1-extja@kvaser.com>
- <20250724092505.8-2-extja@kvaser.com>
- <20250724182611.GC1266901@horms.kernel.org>
- <a07d995f-0fdf-4773-8cc4-4db6f72ce398@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=jIVAzCpMbWftwMyMfJeJdouofnmDhVATQc5c+nCXH0H8TnHmcFW/9OZHq/aZ0vXnfmUrrNRX1Vp3dmdxHWQleJs03Ho40Q5vdGPcTD1BhewkJEKkYCngtumTVf2Hya2PTiI2k+1ZLk/PBO4vv0RuyNry6xrzeLYdtNIFMuwdz4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=anaOAwDt; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Aw/7c/a8OLgnYaUzTv8cMEI87YfbQ4Gsk3r35pIOJiM=; b=anaOAwDt1I8LYFAqXfsid+9XKN
+	Mj/q33Ncdq3RzPp6/vCLe2Sfkq8FB34u1PU/gKhrJySj7Gs/jEcsHafcFPUc2oikf4AWQjXRSFFbc
+	KepNVxDcikkuwBx5S47LHPcaBW35fqjZUKytZblg1Tj5pOTsxtuVW1FMuiFC816c+kAU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1ufktH-002xhZ-RG; Sat, 26 Jul 2025 21:49:07 +0200
+Date: Sat, 26 Jul 2025 21:49:07 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	thomas.petazzoni@bootlin.com, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
+	Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
+	Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
+	Conor Dooley <conor+dt@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+Subject: Re: [PATCH net-next v10 01/15] dt-bindings: net: Introduce the
+ ethernet-connector description
+Message-ID: <8d0029bc-74b7-44bc-ae0b-606d5fd2d7c3@lunn.ch>
+References: <20250722121623.609732-1-maxime.chevallier@bootlin.com>
+ <20250722121623.609732-2-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,35 +81,21 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <a07d995f-0fdf-4773-8cc4-4db6f72ce398@gmail.com>
+In-Reply-To: <20250722121623.609732-2-maxime.chevallier@bootlin.com>
 
-On Fri, Jul 25, 2025 at 02:44:52PM +0200, Jimmy Assarsson wrote:
-> On 7/24/25 8:26 PM, Simon Horman wrote:
-> > On Thu, Jul 24, 2025 at 11:24:55AM +0200, Jimmy Assarsson wrote:
+>  - The number of lanes, which is a quite generic property that allows
+>    differentating between multiple similar technologies such as BaseT1
+>    and "regular" BaseT (which usually means BaseT4).
 
-...
+> +            mdi {
+> +                connector-0 {
+> +                    lanes = <2>;
+> +                    media = "BaseT";
 
-> > GCC seems to know that:
-> > * cmd was allocated sizeof(*cmd) = 32 bytes
-> > * struct kvaser_cmd_ext is larger than this (96 bytes)
-> > 
-> > And it thinks that cmd->header.cmd_no might be CMD_EXTENDED.
-> > This is not true, becuae .cmd_no is set to CMD_LED_ACTION_REQ
-> > earlier in kvaser_usb_hydra_set_led. But still, GCC produces
-> > a big fat warning.
-> > 
-> > On the one hand we might say this is a shortcoming in GCC,
-> > a position I agree with. But on the other hand, we might follow
-> > the pattern used elsewhere in this file for similar functions,
-> > which seems to make GCC happy, I guess, and it is strictly a guess,
-> > because less context is needed for it to analyse things correctly.
-> 
-> Thanks for finding this!
-> 
-> Marc Kleine-Budde actually sorted this out for other commands some years ago [1],
-> but I had completely forgotten.
-> 
-> [1] https://lore.kernel.org/all/20221219110104.1073881-1-mkl@pengutronix.de
+This is correct when the port is Fast Ethernet. However, as you point
+out, now a days, the more normal case is 1G, with 4 lanes for BaseT.
+To avoid developers just copy/pasting without engaging brain, maybe
+add a comment about it being a Fast Ethernet port?
 
-Nice, thanks for digging that up.
+	Andrew
 
