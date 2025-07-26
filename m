@@ -1,50 +1,69 @@
-Return-Path: <netdev+bounces-210314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FB37B12BEA
-	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 20:41:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 368F6B12BED
+	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 20:42:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80CAF17A8F3
-	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 18:41:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 588C7189F354
+	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 18:42:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4983828B3ED;
-	Sat, 26 Jul 2025 18:40:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E378420125F;
+	Sat, 26 Jul 2025 18:41:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J3e0DEyI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZVTcbokK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2053528AB10;
-	Sat, 26 Jul 2025 18:40:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECE241F4CBE
+	for <netdev@vger.kernel.org>; Sat, 26 Jul 2025 18:41:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753555214; cv=none; b=pcm3yGFIJGX5o+hnNQK0TG7deJT72dPC6dm8Y5xIyoDfIzoy59L1zM0zhGR0UMxf7UeBm70AP5VgzBp555tE2RLJApB0gZP9gsxHBXIh3pJuh0GxFZKKAtPZHOtYYpdK9rhJyU+xi1Qy17GrQdB+esuxRIHc1e1CjQvrzLHXcsE=
+	t=1753555317; cv=none; b=uk2kNVrpOu98hvy0fMziO65CoaqJg+GDLxoM5Ps/YUzGue2PHkLPNVpgO82pRzXDxFfI/HwUDpCWKobbDu+ENd48qZnOn42fymLj6HLkBA/nUFaA1ZxxxlJIQr7jESVpcREERlzpHoYaXn9kCdS+oq2/KCPRPfZQlfDHa4g6BTY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753555214; c=relaxed/simple;
-	bh=PTwOYw/TnQVS+TDJZ29TMUnrkDrgTTGYnJZvwHIiays=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ResyekjIlTxhWrf4D7zv7FWnpMjGHHJeLBPNgzgwDzIFu/I4M8lsfa9usO9Qw/JEaVAwwbSS7URFyt7wwxpCcbs2WSYf5fILc15GizorHzlTtpmLkJFPbZu4/cjUgapD2t0su2g2wpQyY7Qc+ZJkFSQ4Jk/Nex0QA/bhWvIPSdc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J3e0DEyI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00018C4CEED;
-	Sat, 26 Jul 2025 18:40:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753555214;
-	bh=PTwOYw/TnQVS+TDJZ29TMUnrkDrgTTGYnJZvwHIiays=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=J3e0DEyIGGi4yKuOtkLuJYvyUh3DTEwSyKO9o16PSDnM+GkbRKnZIx8gQxfR9i+l7
-	 VwUNQYXwquxj6PyVHpk6LOcsU0tpsiDp5JCX4WwVR1zBcFRBsH5/1M1IEAWHpaCb5g
-	 NICMWcAYQnRASNPC+x2Prb+eyQbqBZPivkIAtL1q4ZIPMYXhSUTsIpcy51a1ciWfFD
-	 M/0S0GXX/trS9j2nXucWbLGjJjd5eWQErW5CmLroj7vHm7y6tHbZ9GjnuEY+N/s2a4
-	 N7+ifdH+lXIcIQ9UaSMmz10Cy2bd63I6Xve9pjNyn2hYsCrfzHOavXruFhivf6LzNh
-	 8a8QQiYE9I+Ow==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70CEB383BF4E;
-	Sat, 26 Jul 2025 18:40:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1753555317; c=relaxed/simple;
+	bh=X5SNU6mZpfGJ0uSyCXcVbhVyIzG+8ZB193dZJ72Pxno=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=urlzxeRhgjMTSkc2r/Uv9LkgmbU0wRZGpXOh9CXLQIbEqPDX87JUWTK9jdAD0cyiHLWgKkQV/auRZ/PMEAND9afCwWuWHde/XCAGqqXDhNbBEgefPEC7OahZYXOn8J/XNclKLEmtLp6EDRRQrhp0xPm6VPwpSFt74pCD+NOXoHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZVTcbokK; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1753555313;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=AOhWlntOPTxRL5Vgqd2NjgBziUWiXpKafE0U7ewS1Kc=;
+	b=ZVTcbokKlYAoI8nd26peNLqMuMy7N7jU+ILFDac0ijEsGPQ+vC6KEIA/Qrygcnq15vnd2M
+	r0c6QIKiZqpuXqw8asF9UR6pl5X0VuAYmzyUEuKJ2DHH2nFBn+n9Ud6/2iL3iX3SgAYyql
+	bOVlQ8WS86dwIs+RpTeu3ul7NG3ifyM=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-507-OelhwYqoP6KmGmRg8Wqdnw-1; Sat,
+ 26 Jul 2025 14:41:50 -0400
+X-MC-Unique: OelhwYqoP6KmGmRg8Wqdnw-1
+X-Mimecast-MFC-AGG-ID: OelhwYqoP6KmGmRg8Wqdnw_1753555309
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F2E971956089;
+	Sat, 26 Jul 2025 18:41:48 +0000 (UTC)
+Received: from p16v.luc.cera.cz (unknown [10.44.32.22])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E798F1800242;
+	Sat, 26 Jul 2025 18:41:46 +0000 (UTC)
+From: Ivan Vecera <ivecera@redhat.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Prathosh Satish <Prathosh.Satish@microchip.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	netdev@vger.kernel.org (open list:MICROCHIP ZL3073X DRIVER),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net-next] dpll: zl3073x: Fix build failure
+Date: Sat, 26 Jul 2025 20:41:45 +0200
+Message-ID: <20250726184145.25769-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,50 +71,33 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] selftests: rtnetlink.sh: remove esp4_offload after
- test
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175355523100.3664802.5808444086302389218.git-patchwork-notify@kernel.org>
-Date: Sat, 26 Jul 2025 18:40:31 +0000
-References: 
- <6d3a1d777c4de4eb0ca94ced9e77be8d48c5b12f.1753415428.git.xmu@redhat.com>
-In-Reply-To: 
- <6d3a1d777c4de4eb0ca94ced9e77be8d48c5b12f.1753415428.git.xmu@redhat.com>
-To: Xiumei Mu <xmu@redhat.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, shuah@kernel.org, horms@kernel.org,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org, lxin@redhat.com, sd@queasysnail.net,
- sln@onemain.com, liuhangbin@gmail.com
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-Hello:
+If CONFIG_ZL3073X is enabled but both CONFIG_ZL3073X_I2C and
+CONFIG_ZL3073X_SPI are disabled, the compilation may fail because
+CONFIG_REGMAP is not enabled.
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Fix the issue by selecting CONFIG_REGMAP when CONFIG_ZL3073X is enabled.
 
-On Fri, 25 Jul 2025 11:50:28 +0800 you wrote:
-> The esp4_offload module, loaded during IPsec offload tests, should
-> be reset to its default settings after testing.
-> Otherwise, leaving it enabled could unintentionally affect subsequence
-> test cases by keeping offload active.
-> 
-> Without this fix:
-> $ lsmod | grep offload; ./rtnetlink.sh -t kci_test_ipsec_offload ; lsmod | grep offload;
-> PASS: ipsec_offload
-> esp4_offload           12288  0
-> esp4                   32768  1 esp4_offload
-> 
-> [...]
+Fixes: 2df8e64e01c10 ("dpll: Add basic Microchip ZL3073x support")
+Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+---
+ drivers/dpll/zl3073x/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
-Here is the summary with links:
-  - [net,v2] selftests: rtnetlink.sh: remove esp4_offload after test
-    https://git.kernel.org/netdev/net-next/c/5b32321fdaf3
-
-You are awesome, thank you!
+diff --git a/drivers/dpll/zl3073x/Kconfig b/drivers/dpll/zl3073x/Kconfig
+index 41fa6a8f96ab9..7db262ab84582 100644
+--- a/drivers/dpll/zl3073x/Kconfig
++++ b/drivers/dpll/zl3073x/Kconfig
+@@ -5,6 +5,7 @@ config ZL3073X
+ 	depends on NET
+ 	select DPLL
+ 	select NET_DEVLINK
++	select REGMAP
+ 	help
+ 	  This driver supports Microchip Azurite family DPLL/PTP/SyncE
+ 	  devices that support up to 5 independent DPLL channels,
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.49.1
 
 
