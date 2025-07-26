@@ -1,122 +1,149 @@
-Return-Path: <netdev+bounces-210324-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210325-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B22AB12C24
-	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 22:05:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B72ABB12C29
+	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 22:13:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B783017E39D
-	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 20:05:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EC5E57AFE68
+	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 20:12:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40020217F2E;
-	Sat, 26 Jul 2025 20:05:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AB04231842;
+	Sat, 26 Jul 2025 20:13:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O4d92slr"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="WAUpxAve"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx.denx.de (mx.denx.de [89.58.32.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F34078F4C;
-	Sat, 26 Jul 2025 20:05:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7935A21885D;
+	Sat, 26 Jul 2025 20:13:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753560343; cv=none; b=Q0qNXphBefBeon+jWzvWr7Kva2G7zBSL34TyLu39nR/VnPprnWRD17n+0luAPGWwwPAV59ocPEI/blQLLyaNWrTv0iedDsr4u2GIPfJN01mjrWXfFbTmavnzEb8TjPE7wg5eB1LcFHM/8rltBXGt4dAPNufAEmsRXlza4fwa5Io=
+	t=1753560816; cv=none; b=IcWW1zTKkAV3AwHMp+Wvm5PudlwksBXTGwISJirqsSIYXBAVEoeUjmIq7BLr4NXLYbrezd3Xn5faTGU8vSXPlJ0Y/eqq1TSzzHkjZmPhruGfEsEaR/tn4+ZYiCpUukHwmYWvhaFbjgD959G/j5vI47D8Wj42JTktWqiXEov3uik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753560343; c=relaxed/simple;
-	bh=5rCJ2wQNBQmDKsYmk2VF9549ZJsYeQhJZowIoMiUGPI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WSdcNYkXXBZ/LbreXLubzOwrYOgZBViWD+bFpNw9fUvd3zbHzpgpVKKC7R/jhSGGoIOueNrJM7MSbuLkxq7MDHuLqltbJhWWwe8wKOOxuD3NvuQ6GMUxjrVNnt4NaK1yH3rfsgmbqD57Tv1RrKgxM5qe8l1tM820jSUK0FXT324=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O4d92slr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81539C4CEED;
-	Sat, 26 Jul 2025 20:05:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753560342;
-	bh=5rCJ2wQNBQmDKsYmk2VF9549ZJsYeQhJZowIoMiUGPI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=O4d92slr7VEOjfxp308bMJogMXp6wYLJtt3CpUpgtmbtKLpu2zNMm5alMoEDp8wx5
-	 MD6ys53CC7iVInMnL/3LBg9CVmZ61BF7pNRAGN6iCiSfHhZ9loPdDQfWNrsvz+/vhg
-	 MIIFRdGXnNBOBwxCz9QWOM3xjHQCoaUsJXan1jBH/dbaz2oWwOLFNNnMuMFOUoszlT
-	 JB823UOYpLNs8QqA6pVUNg03k/yiNlDqrJlTZ77ceaN8rEJaUz6b0MAvINyx+5CMxF
-	 0+GFKChiF3/oacs/VeccqdCnUPzUJGLJjjko+NaKcfgrKCWqvR11L9KIY0924vSAq7
-	 uptMiVqWT/+ww==
-Date: Sat, 26 Jul 2025 21:05:38 +0100
-From: Simon Horman <horms@kernel.org>
-To: chalianis1@gmail.com
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, linux@armlinux.org.uk,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH net] phy: dp83869: fix interrupts issue when using with
- an optical fiber sfp. to correctly clear the interrupts both status
- registers must be read.
-Message-ID: <20250726200538.GO1367887@horms.kernel.org>
-References: <20250726001034.28885-1-chalianis1@gmail.com>
+	s=arc-20240116; t=1753560816; c=relaxed/simple;
+	bh=eXFBzQMIOgJACkkiirYjWqbaUNq5h419yPTnWlIryIY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=igi+sNNi+mIV1Hcb81BAMCmn63dLvm4g3CuCb+4G3Q7LRfRzvxGGDn1u/PsHzioaZl5JBMmwVrXQQVQiAN3l6aZs5hlVQEmCn3ZnZW0Vzd4fV2lpuLRxEL0AlK7NhdJ73bt1w1EKECzG6nzrljYXvWjYq7pobyy215MBzucVyX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=WAUpxAve; arc=none smtp.client-ip=89.58.32.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id CEA6010391E80;
+	Sat, 26 Jul 2025 22:13:25 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
+	t=1753560811; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 in-reply-to:references; bh=TWGAw9HUc5B0uTkDq7v2wXCo5i2oNA3eTY8zlOASEHM=;
+	b=WAUpxAveeRNrvct46TWQ/f5v6/UOhl/3j5bocPV7TalPE7I2Nf7mF1teQT53k6EZ3haj/H
+	4Ic4Kv6vhrx3W9oeFSHeDXnuVeaoHVg9bSGO4H63FvtRNM8N33xCIVchxBDi2n4BJvIr7X
+	HL+fE0L2uKoRhLm7NmLugowT8OM2yfwgLybhfhGxjrr+sIOMg9H7jZOFw9h+vb2JRAQzML
+	5GyaJdICf/g1xecNRK3jgIQ++DuL6KOl6uxa+xU/5gGEpdSuq3Ga78Aeqf3XZ6UnzUS3Sf
+	U24HFTBtB2dO54LfmaZDKbQmJNseF43LNIzJDdt7I1sGA6vwzkxQWIQKsRbInQ==
+Date: Sat, 26 Jul 2025 22:13:23 +0200
+From: Lukasz Majewski <lukma@denx.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>, Sascha Hauer
+ <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Fabio Estevam <festevam@gmail.com>, Richard Cochran
+ <richardcochran@gmail.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org, Stefan Wahren
+ <wahrenst@gmx.net>, Simon Horman <horms@kernel.org>, Andrew Lunn
+ <andrew@lunn.ch>
+Subject: Re: [net-next v16 04/12] net: mtip: The L2 switch driver for imx287
+Message-ID: <20250726221323.0754f3cd@wsk>
+In-Reply-To: <20250725151829.40bd5f4e@kernel.org>
+References: <20250724223318.3068984-1-lukma@denx.de>
+	<20250724223318.3068984-5-lukma@denx.de>
+	<20250725151829.40bd5f4e@kernel.org>
+Organization: denx.de
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250726001034.28885-1-chalianis1@gmail.com>
+Content-Type: multipart/signed; boundary="Sig_/QBKx1stqUcQHszVRzo3MNYj";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Fri, Jul 25, 2025 at 08:10:34PM -0400, chalianis1@gmail.com wrote:
-> From: Anis Chali <chalianis1@gmail.com>
-> 
-> from datasheet of dp83869hm
-> 7.3.6 Interrupt
-> The DP83869HM can be configured to generate an interrupt when changes of internal status occur. The interrupt
-> allows a MAC to act upon the status in the PHY without polling the PHY registers. The interrupt source can be
-> selected through the interrupt registers, MICR (12h) and FIBER_INT_EN (C18h). The interrupt status can be
-> read from ISR (13h) and FIBER_INT_STTS (C19h) registers. Some interrupts are enabled by default and can
-> be disabled through register access. Both the interrupt status registers must be read in order to clear pending
-> interrupts. Until the pending interrupts are cleared, new interrupts may not be routed to the interrupt pin.
-> 
-> Fixes: 01db923e8377 ("net: phy: dp83869: Add TI dp83869 phy")
-> 
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Anis Chali <chalianis1@gmail.com>
-> ---
->  drivers/net/phy/dp83869.c | 7 +++++++
->  1 file changed, 7 insertions(+)
-> 
-> diff --git a/drivers/net/phy/dp83869.c b/drivers/net/phy/dp83869.c
-> index a62cd838a9ea..1e8c20f387b8 100644
-> --- a/drivers/net/phy/dp83869.c
-> +++ b/drivers/net/phy/dp83869.c
-> @@ -41,6 +41,7 @@
->  #define DP83869_IO_MUX_CFG	0x0170
->  #define DP83869_OP_MODE		0x01df
->  #define DP83869_FX_CTRL		0x0c00
-> +#define DP83869_FX_INT_STS		0x0c19
->  
->  #define DP83869_SW_RESET	BIT(15)
->  #define DP83869_SW_RESTART	BIT(14)
-> @@ -195,6 +196,12 @@ static int dp83869_ack_interrupt(struct phy_device *phydev)
->  	if (err < 0)
->  		return err;
->  
-> +	if (linkmode_test_bit(ETHTOOL_LINK_MODE_FIBRE_BIT, phydev->supported)) {
-> +		err = phy_read_mmd(phydev, DP83869_DEVADDR, DP83869_FX_INT_STS);
-> +		if (err < 0)
-> +			return err;		
+--Sig_/QBKx1stqUcQHszVRzo3MNYj
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Hi Anis,
+Hi Jakub,
 
-Its invisible, of course, but the line above has trailing whitespace.
+> On Fri, 25 Jul 2025 00:33:10 +0200 Lukasz Majewski wrote:
+> > +	for (i =3D 0; i < SWITCH_EPORT_NUMBER; i++) {
+> > +		fep->ndev[i] =3D alloc_netdev(sizeof(struct
+> > mtip_ndev_priv),
+> > +					    fep->ndev_name[i],
+> > NET_NAME_USER,
+> > +					    ether_setup);
+> > +		if (!fep->ndev[i]) {
+> > +			ret =3D -ENOMEM;
+> > +			break;
+> > +		}
+> > +
+> > +		fep->ndev[i]->ethtool_ops =3D &mtip_ethtool_ops;
+> > +		fep->ndev[i]->netdev_ops =3D &mtip_netdev_ops;
+> > +		SET_NETDEV_DEV(fep->ndev[i], &pdev->dev);
+> > +
+> > +		priv =3D netdev_priv(fep->ndev[i]);
+> > +		priv->dev =3D fep->ndev[i];
+> > +		priv->fep =3D fep;
+> > +		priv->portnum =3D i + 1;
+> > +		fep->ndev[i]->irq =3D fep->irq;
+> > +
+> > +		mtip_setup_mac(fep->ndev[i]);
+> > +
+> > +		ret =3D register_netdev(fep->ndev[i]);
+> > +		if (ret) {
+> > +			dev_err(&fep->ndev[i]->dev,
+> > +				"%s: ndev %s register err: %d\n",
+> > __func__,
+> > +				fep->ndev[i]->name, ret);
+> > +			break;
+> > +		} =20
+>=20
+> Error handling in case of register_netdev() still buggy, AFAICT.
 
-Flagged by checkpatch.
+I've added the code to set fep->ndev[i] =3D NULL to mtip_ndev_cleanup().
+IMHO this is the correct place to add it.
 
-> +	}
-> +
->  	return 0;
->  }
->  
-> -- 
-> 2.49.0
-> 
-> 
+
+Best regards,
+
+Lukasz Majewski
+
+--
+
+DENX Software Engineering GmbH, Managing Director: Johanna Denk,
+Tabea Lutz HRB 165235 Munich, Office: Kirchenstr.5, D-82194
+Groebenzell, Germany
+Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+
+--Sig_/QBKx1stqUcQHszVRzo3MNYj
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmiFNuMACgkQAR8vZIA0
+zr1nZAgAuEPG2jcxe5x4z5+TI7n7rwPtz3Cgbueuh1wjlJ58IWVvM/Q6XbLQ0Av9
+1Fgmn5jR6AY8Zhh/9/rW6jb12GTvFA/fmOgqykhvRFhUbaMfWw6mZqROiGBQZ6lX
+Esg9sYHVGwMr3W2efNc3FCw4jfHJMtW7D6wPCFkCXjnppo6lD88tstj4saczatDO
+asEz2RqDh8HQFbi542j/iUcCNYVm2K7WNRq0RhZf43a789W4I3ARMDFrxwioK5uJ
+8a/Cu/P5ITnAnAIgjgdXBouLIMeSf9iAQy/W9Xu6bGJSk6Ng4i8u9C+TTwUlzJdw
+VPWafe7Gb1LENnDxHz07QYeWtVB9AQ==
+=27wW
+-----END PGP SIGNATURE-----
+
+--Sig_/QBKx1stqUcQHszVRzo3MNYj--
 
