@@ -1,144 +1,127 @@
-Return-Path: <netdev+bounces-210252-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210253-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36F51B127D6
-	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 02:10:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDF5DB127D9
+	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 02:11:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5DADE582CD8
-	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 00:10:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D7FFDAA80DF
+	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 00:10:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24C8180B;
-	Sat, 26 Jul 2025 00:10:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20663645;
+	Sat, 26 Jul 2025 00:10:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bqzFMXsM"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ed/bf9cn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C1B4645;
-	Sat, 26 Jul 2025 00:10:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8B8527455
+	for <netdev@vger.kernel.org>; Sat, 26 Jul 2025 00:10:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753488641; cv=none; b=TPsZCMWs+MYgzuOmjEd3s4zlBAmXICgeUwLfCb3477W9kRn/Oq3c8PjvP5YWYKII0xBUDiHktSJ8QLlYVryqeQxiQLI21bprCFEAcw+0fKa4ENJ5wvaplUszQDkvi1y+9VTmA6wQcLOX8LyM88ICYq3Xgq/fEz0c3f94O35wIeY=
+	t=1753488650; cv=none; b=Pk94JLnXd86qTqIxnonXtkwTiQfFKx4C7G/d+OhtHBu4XlAWeGW0bDWAaIc0R5/vUPwjpRozTJ3he1gJKVg5ei55CA2BpJR3VlZbNlD27Mxz2P809hVft9Ww7rCy91qaSTIJEvfcc4ms1j3DiJxO8iXJaC6Cna0QA76pwayAlC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753488641; c=relaxed/simple;
-	bh=3U3VZpRXZx7iWvBkpY1+V+8G7vmDxvuZyt8BZC0PPlA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rVaDvwarnOZQC1PMD2EyiCeE7KpQypR/j5W8JXvL9ZYwJ0GodT2pwFYwQfJA90SM9viGqWlaqc0v5avWauWf6hfZ0YGBYMP5iId1CNhFblA3Doii9nQsy9mYoVWkCI2XrWerxr0XSavggP8vMtQ+nmQfYoktU6vJCHK4ef91HR0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bqzFMXsM; arc=none smtp.client-ip=209.85.222.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-7e2c920058fso373384785a.0;
-        Fri, 25 Jul 2025 17:10:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753488638; x=1754093438; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=a1FQPmb/qHDmwSuNXKex0cpD7XQ5W81hisvxDnetPzE=;
-        b=bqzFMXsM7wfr3zq3Rc52ek+gYGsfR1RoSz6RKDCswY5lNpuiZw0QaTL2ydODUQiIWH
-         HnEcLozNdEaywVv7LCFfHlXaqUsR2i2q0Xl5r5GaJ/UkGTanGL/YqNuw/lW7bHTHserj
-         aHm6vhyrEtAUOlT1n+fkLERJKSS0b5o2Xh5dK+7vpYCT62tHLAlgppCKl1F/W+HTLieu
-         B37X887oyoOIVPSrljkzeDPlfb6CvleHQIP6t2tXhotSj39orkA6YWrtqgzP52qoQwQM
-         5pWm2fO65uIcd6ITnAHCIStkwQgz8iNOxUeZxW+qt5Rz6ICW3Zlfd3BZX46OYbp3wncM
-         GRDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753488638; x=1754093438;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=a1FQPmb/qHDmwSuNXKex0cpD7XQ5W81hisvxDnetPzE=;
-        b=ZkTL0Cf/jDdDtFgs3lLL10T3aj7tujxf2AZCvch7gaZZ3KH9Jb8cFIEOMxL9aquE/R
-         ZDjIASLYWxR3JxPebheVDe6gG3HAhM1uH1iS0aMkoJfqV1TIuaxkQF9TepF1VtFMGuFK
-         3sS1cdOzaZ9HmJ0vCHiiG8Va4V9B7fz+YWfq/B6wLbEMLMsh9u09nwjOb3QO6lIKDtY/
-         pQdy+yAxRpJACRkzcL294kpQVDV3KmHOKuJ+ekkK0dEX5v4t9Q73wkmOQ4+kh2uDBECw
-         q+f9Smg8/93BIC464utrDGhs2+AtA/DuHBbrUJli4/OkHNpoyULuJobl2myt4XY8SXC7
-         N2Zw==
-X-Forwarded-Encrypted: i=1; AJvYcCVke5A5+EA93NdK9epCmQfzim7FYaWaDKylGg8W56ujehWwNTSzOmompAvjc8NVQ4eN00SXqK9s@vger.kernel.org, AJvYcCX/g7TSkfoxwrd9yQq/mbe3s50Tbj1Z/m3g4VHOl+0ZNUuZRiqhHMjPdTO77yNXBVJPfgtc5Vm0ByIY85s=@vger.kernel.org, AJvYcCXrJaCMCMVWsFgHieghrVhPUazMkN9Vjff0Ji/27aCv2rUCz5BsFLMFkHQrExcPwEQuf8qDSHDy@vger.kernel.org
-X-Gm-Message-State: AOJu0YyJk72C1ETy/xCmMA+jmwG6h5T3M6/1xoqIFWTVJ/BUgv1GNMVi
-	lrKt4FgEU89fmw+B/V1pkgbhiioRAcbt+IbGHFdy/6m5CgB0wmyh0KSk
-X-Gm-Gg: ASbGncsco1oXrsbL4mi14/GLZZBb5Gy/m/22n0EbovtGP5imf07gLCoZmY8qcka9yBB
-	poD7vRufX4ZJvJg3WkZ1slPeuMvFTUw5IoyZkRG6+RC8hDF7r1OS9wKEXYKmsPY9d39paFxCrZg
-	RcNWc+B9NVWkorNreSNPlETzxFeT7WwJtZu991E4XgWGDG059OJZ7L8JFf62vxL4xZTVIGcajx6
-	k9xTFnMMoPiD2LttFXFgLYApRsqpHI/icOXdcbMgJUSEwfkWqo8e0CUthevUXm16UfM76vsy/Cz
-	vJmQeXyimNzlmmh3kySfiYNbd6bKCHzqHP7QMAU6SpHCZJAWU5++xROmSCra7o5/ISbVO/7uRQ3
-	oozM2ES7MbTaSCH3JfCsDIc3e6zqRy2wFa/AwEh86
-X-Google-Smtp-Source: AGHT+IFRfQ6n2S41EljA095+vRKxlLJIX5UD66O2bo6l3je5rKzjGm3XUho0sda/uehRTG4bGqSj9w==
-X-Received: by 2002:a05:620a:1a06:b0:7e3:35aa:7707 with SMTP id af79cd13be357-7e63bad15b1mr496472785a.25.1753488638257;
-        Fri, 25 Jul 2025 17:10:38 -0700 (PDT)
-Received: from Latitude-7490.ht.home ([2607:fa49:8c41:2600:afb4:9d47:7cc2:f4e8])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7e64327ab69sm51992685a.1.2025.07.25.17.10.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Jul 2025 17:10:37 -0700 (PDT)
-From: chalianis1@gmail.com
-To: andrew@lunn.ch
-Cc: hkallweit1@gmail.com,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux@armlinux.org.uk,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	Anis Chali <chalianis1@gmail.com>
-Subject: [PATCH net] phy: dp83869: fix interrupts issue when using with an optical fiber sfp. to correctly clear the interrupts both status registers must be read.
-Date: Fri, 25 Jul 2025 20:10:34 -0400
-Message-Id: <20250726001034.28885-1-chalianis1@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1753488650; c=relaxed/simple;
+	bh=je2cwoQlMLGlO7bmZ1skLQ8C7AdRJcUF+AQbwENZPhM=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=sat19yEq+xZ6H21a0aPJWmZ65aZb8tQOiNPn1wPlbhn+NircxH29UftNP4aXo7lg7klgu7ZM6C8FKakQN2My5DHAxUatnCpfk4+j/w0vDAQ4nV7h+uTvMA2dwL3zJYtoT0LLs9IIo1G4TA8joj1IcLJJVuN2Q/gDizfbH4VQlKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ed/bf9cn; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1753488648; x=1785024648;
+  h=from:to:cc:subject:in-reply-to:references:date:
+   message-id:mime-version;
+  bh=je2cwoQlMLGlO7bmZ1skLQ8C7AdRJcUF+AQbwENZPhM=;
+  b=ed/bf9cnnIuq/Ud0fD/i3NLapu0jTcFzk7C10x3EQTjbOqQ8PpcO4YKi
+   65zUJf+DDWZW8QG5MvXC8+SCgW8HHI0mmlRwq7YVUC86y4ag+QG0L94uM
+   2f89JvmcHcUxtcy1HgRamt1zompqa6O5sUIkXIL17u6BVDIORYY6CGnAb
+   2KvLzCCSf+VKVaGs8EP3ZkyHiP0HbUVwYgoVMCMa8AQDrWdFrWWY536fX
+   f8rJpbAnBCZzeSgkjTefKsFlzHp9Ir8gl8SDYcJawWmFXXtM7ChKppOTG
+   5vjfWhUKauYTF9Yyr9v9APNOaBEFdzuAklWpmcCTq9SY9HlFFmYojNuPz
+   w==;
+X-CSE-ConnectionGUID: BSCwG++hSY24qLZtWdeUoQ==
+X-CSE-MsgGUID: //hB3DdMTO2Y4AGxj7YWww==
+X-IronPort-AV: E=McAfee;i="6800,10657,11503"; a="78379733"
+X-IronPort-AV: E=Sophos;i="6.16,339,1744095600"; 
+   d="scan'208";a="78379733"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jul 2025 17:10:46 -0700
+X-CSE-ConnectionGUID: vk8gS7AtTBG9ankqwXvl+A==
+X-CSE-MsgGUID: 8gb+AOiiR42m54rZggY8Nw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,339,1744095600"; 
+   d="scan'208";a="161561934"
+Received: from ssimmeri-mobl2.amr.corp.intel.com (HELO vcostago-mobl3) ([10.124.220.84])
+  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jul 2025 17:10:45 -0700
+From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+To: Simon Horman <horms@kernel.org>
+Cc: Cong Wang <xiyou.wangcong@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko
+ <jiri@resnulli.us>, Maher Azzouzi <maherazz04@gmail.com>, Paolo Abeni
+ <pabeni@redhat.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ netdev@vger.kernel.org, Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH net-next] net/sched: taprio: align entry index attr
+ validation with mqprio
+In-Reply-To: <20250725-taprio-idx-parse-v1-1-b582fffcde37@kernel.org>
+References: <20250725-taprio-idx-parse-v1-1-b582fffcde37@kernel.org>
+Date: Fri, 25 Jul 2025 17:10:44 -0700
+Message-ID: <87y0sbdd6j.fsf@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-From: Anis Chali <chalianis1@gmail.com>
+Simon Horman <horms@kernel.org> writes:
 
-from datasheet of dp83869hm
-7.3.6 Interrupt
-The DP83869HM can be configured to generate an interrupt when changes of internal status occur. The interrupt
-allows a MAC to act upon the status in the PHY without polling the PHY registers. The interrupt source can be
-selected through the interrupt registers, MICR (12h) and FIBER_INT_EN (C18h). The interrupt status can be
-read from ISR (13h) and FIBER_INT_STTS (C19h) registers. Some interrupts are enabled by default and can
-be disabled through register access. Both the interrupt status registers must be read in order to clear pending
-interrupts. Until the pending interrupts are cleared, new interrupts may not be routed to the interrupt pin.
+> Both taprio and mqprio have code to validate respective entry index
+> attributes. The validation is indented to ensure that the attribute is
+> present, and that it's value is in range, and that each value is only
+> used once.
+>
+> The purpose of this patch is to align the implementation of taprio with
+> that of mqprio as there seems to be no good reason for them to differ.
+> For one thing, this way, bugs will be present in both or neither.
+>
+> As a follow-up some consideration could be given to a common function
+> used by both sch.
+>
+> No functional change intended.
+>
+> Except of tdc run: the results of the taprio tests
+>
+>   # ok 81 ba39 - Add taprio Qdisc to multi-queue device (8 queues)
+>   # ok 82 9462 - Add taprio Qdisc with multiple sched-entry
+>   # ok 83 8d92 - Add taprio Qdisc with txtime-delay
+>   # ok 84 d092 - Delete taprio Qdisc with valid handle
+>   # ok 85 8471 - Show taprio class
+>   # ok 86 0a85 - Add taprio Qdisc to single-queue device
+>   # ok 87 6f62 - Add taprio Qdisc with too short interval
+>   # ok 88 831f - Add taprio Qdisc with too short cycle-time
+>   # ok 89 3e1e - Add taprio Qdisc with an invalid cycle-time
+>   # ok 90 39b4 - Reject grafting taprio as child qdisc of software taprio
+>   # ok 91 e8a1 - Reject grafting taprio as child qdisc of offloaded taprio
+>   # ok 92 a7bf - Graft cbs as child of software taprio
+>   # ok 93 6a83 - Graft cbs as child of offloaded taprio
+>
+> Cc: Vladimir Oltean <vladimir.oltean@nxp.com>
+> Cc: Maher Azzouzi <maherazz04@gmail.com>
+> Link: https://lore.kernel.org/netdev/20250723125521.GA2459@horms.kernel.org/
+> Signed-off-by: Simon Horman <horms@kernel.org>
+> ---
 
-Fixes: 01db923e8377 ("net: phy: dp83869: Add TI dp83869 phy")
+Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
 
-Cc: stable@vger.kernel.org
-Signed-off-by: Anis Chali <chalianis1@gmail.com>
----
- drivers/net/phy/dp83869.c | 7 +++++++
- 1 file changed, 7 insertions(+)
 
-diff --git a/drivers/net/phy/dp83869.c b/drivers/net/phy/dp83869.c
-index a62cd838a9ea..1e8c20f387b8 100644
---- a/drivers/net/phy/dp83869.c
-+++ b/drivers/net/phy/dp83869.c
-@@ -41,6 +41,7 @@
- #define DP83869_IO_MUX_CFG	0x0170
- #define DP83869_OP_MODE		0x01df
- #define DP83869_FX_CTRL		0x0c00
-+#define DP83869_FX_INT_STS		0x0c19
- 
- #define DP83869_SW_RESET	BIT(15)
- #define DP83869_SW_RESTART	BIT(14)
-@@ -195,6 +196,12 @@ static int dp83869_ack_interrupt(struct phy_device *phydev)
- 	if (err < 0)
- 		return err;
- 
-+	if (linkmode_test_bit(ETHTOOL_LINK_MODE_FIBRE_BIT, phydev->supported)) {
-+		err = phy_read_mmd(phydev, DP83869_DEVADDR, DP83869_FX_INT_STS);
-+		if (err < 0)
-+			return err;		
-+	}
-+
- 	return 0;
- }
- 
+Cheers,
 -- 
-2.49.0
-
+Vinicius
 
