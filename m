@@ -1,78 +1,62 @@
-Return-Path: <netdev+bounces-210327-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210328-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BFD4B12C30
-	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 22:33:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 367FFB12C33
+	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 22:34:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7866517EE8A
-	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 20:33:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D214017EA5A
+	for <lists+netdev@lfdr.de>; Sat, 26 Jul 2025 20:34:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1667217659;
-	Sat, 26 Jul 2025 20:33:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1DE8217F36;
+	Sat, 26 Jul 2025 20:33:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="pu4x+6J/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tjzuBg2E"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 043B81E5701;
-	Sat, 26 Jul 2025 20:33:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B31247DA9C;
+	Sat, 26 Jul 2025 20:33:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753562027; cv=none; b=VD+llhrT2s0CurIED5hZxaMevmxWuPWg4bYQ83tFV+/KuOyuDY0lJRhgl7QOoY62x5wlPhAX2k4WtY2f//gwT/pCo4sCQsNqU7ktId4w8vL5qxI4JlK5swoU4uTkJipOLdpEPPwt7HysAV68jwd5i5VtqYw9FaEy1TJS55YxcE8=
+	t=1753562036; cv=none; b=r86GEHA7b3XYkNR85JavVb9dc/eaVi9H5+jDCSVH19ZkDsN9M0xgXZQTHz+FeUf7Dv3xrsuZtKh1VvZdwYmBDnpSOAjko1h6/sxuFQt8j2c5Prj/zbASu68pV5O1q2zd+pVD+ZEix9mj2+mEFzJLyQs32EsQcNGBv4GiS9WU9r8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753562027; c=relaxed/simple;
-	bh=CyaUenj1VJ7ZLB6mG0BcK/h7HN/jaBFXdvQHXyW+BIs=;
+	s=arc-20240116; t=1753562036; c=relaxed/simple;
+	bh=x6bDSChl3CH9hrcSrTX/awDg0AMaJqU9jJXWKacrETo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WwKkbb4c1fxEFS4NtdND4xW0yEc4ToU/1uZfkpWhej0xsJhWDcEsyB610WdRA8VmgK9IgOUyQUc7hFuiVydRPdVFm2V47dCL76peC6x1w4Sel/bLqiZ4Y4Mg0F2lUZiB2ifkmp9lTkR1oEV4eqAPHphKtP/cSaeXpQYWHAHTMx0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=pu4x+6J/; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=0IOvRCaeU2dh9qCzyT4cj/QLVuaRH9ZU7loSGJGjyNw=; b=pu4x+6J/Q5hOdj+NEyYZ5raFsg
-	jCIDvwFHmz7KQWUH0oDDhyTBYatlBOtOYZEIICDmPmyfLGPWOi23j9PNcrO0x+ET3Trsq6/ccMv+0
-	lUy1BNGTKxDQjJNF4gOowmSwFFityHocQVR/NFCsUcp8+AI36Cp1m5hYwpussAVO797Q=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uflaH-002xqk-Ma; Sat, 26 Jul 2025 22:33:33 +0200
-Date: Sat, 26 Jul 2025 22:33:33 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	thomas.petazzoni@bootlin.com, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
-	Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
-	Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-Subject: Re: [PATCH net-next v10 04/15] net: phy: Introduce PHY ports
- representation
-Message-ID: <a915e167-1490-4a20-98a8-35b4e5c6c23c@lunn.ch>
-References: <20250722121623.609732-1-maxime.chevallier@bootlin.com>
- <20250722121623.609732-5-maxime.chevallier@bootlin.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=BHQM8rzRTKvIpgvbjYCyLaG1l9N+NLyOuUxHH47eyUc+Pf00sEX9rKXGvAjLWQsxAmTEYW3AG7WMHy/1SYLrFiAU5Z4rMzI/ZL+iwsoD/yve6VgdcGEBuZNNhi2X+Y0/Tgc3iON7YBSTEpQf+qgoVE7jin7BU6ZybsetgjJXClY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tjzuBg2E; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCA57C4CEED;
+	Sat, 26 Jul 2025 20:33:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753562036;
+	bh=x6bDSChl3CH9hrcSrTX/awDg0AMaJqU9jJXWKacrETo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=tjzuBg2ExuJ8y8G0XxFBW9EpA34a7+hWV6Zs6qZSd0nWrDZvCITodzmB14jF9WZuz
+	 4zusLA06zbFGIAFi5xbTlosTRYoYb1/gbaoDAYaC1gnyUDbHL+vPrJaAS95pWe3VAL
+	 UAv57NP1o3DKPmkVNe0Bw71JqWXu33aQTuBpncb1Me1hAnz3uyiemoVn6ClTt+j09g
+	 IV6Micr5rai8b1IPnVR78pbxlnYPLs30vdObVdcjo9zrrZFcoiuSp5/jOLpF7nb04j
+	 vpdyqTSUNG8YBIWaDpIa9Ng8fDMcaw8FppsjzmI8jxRX+7UwCJbsPVDIXCFrmzyc4D
+	 b+2SYEl/4/M1A==
+Date: Sat, 26 Jul 2025 21:33:51 +0100
+From: Simon Horman <horms@kernel.org>
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: netdev@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Prathosh Satish <Prathosh.Satish@microchip.com>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Michal Schmidt <mschmidt@redhat.com>, Petr Oros <poros@redhat.com>
+Subject: Re: [PATCH net-next 3/5] dpll: zl3073x: Add firmware loading
+ functionality
+Message-ID: <20250726203351.GP1367887@horms.kernel.org>
+References: <20250725154136.1008132-1-ivecera@redhat.com>
+ <20250725154136.1008132-4-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,57 +65,63 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250722121623.609732-5-maxime.chevallier@bootlin.com>
+In-Reply-To: <20250725154136.1008132-4-ivecera@redhat.com>
 
-> +
-> +/**
-> + * phy_caps_medium_get_supported() - Returns linkmodes supported on a given medium
-> + * @supported: After this call, contains all possible linkmodes on a given medium,
-> + *	       and with the given number of lanes.
+On Fri, Jul 25, 2025 at 05:41:34PM +0200, Ivan Vecera wrote:
+> Add functionality for loading firmware files provided by the vendor
+> to be flashed into the device's internal flash memory. The firmware
+> consists of several components, such as the firmware executable itself,
+> chip-specific customizations, and configuration files.
+> 
+> The firmware file contains at least a flash utility, which is executed
+> on the device side, and one or more flashable components. Each component
+> has its own specific properties, such as the address where it should be
+> loaded during flashing, one or more destination flash pages, and
+> the flashing method that should be used.
+> 
+> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 
-Maybe nit picking, but maybe append:
+Hi Ivan,
 
-, or less.
+Some minor feedback from my side.
 
-> +		/* For most cases, min_lanes == lanes, except for 10/100BaseT that work
-> +		 * on 2 lanes but are compatible with 4 lanes mediums
-> +		 */
-> +		if (link_mode_params[i].mediums & BIT(medium) &&
-> +		    link_mode_params[i].lanes >= lanes &&
-> +		    link_mode_params[i].min_lanes <= lanes) {
+...
 
-We should only care about min_lanes here. I don't think the
-link_mode_params[i].lanes >= lanes is needed.
+> diff --git a/drivers/dpll/zl3073x/fw.c b/drivers/dpll/zl3073x/fw.c
 
-Maybe you can add a BUILD_BUG_ON() into the macro to ensure
-min_lanes <= lanes?
+...
 
-> +struct phy_port *phy_of_parse_port(struct device_node *dn)
+> +/* Santity check */
+
+Sanity
+
+> +static_assert(ARRAY_SIZE(component_info) == ZL_FW_NUM_COMPONENTS);
+
+...
+
+> +int zl3073x_fw_flash(struct zl3073x_dev *zldev, struct zl3073x_fw *zlfw,
+> +		     struct netlink_ext_ack *extack)
 > +{
-> +	struct fwnode_handle *fwnode = of_fwnode_handle(dn);
-> +	enum ethtool_link_medium medium;
-> +	struct phy_port *port;
-> +	const char *med_str;
-> +	u32 lanes, mediums = 0;
-> +	int ret;
+> +	int i, rc;
 > +
-> +	ret = fwnode_property_read_u32(fwnode, "lanes", &lanes);
-> +	if (ret)
-> +		lanes = 0;
+> +	for (i = 0; i < ZL_FW_NUM_COMPONENTS; i++) {
+> +		if (!zlfw->component[i])
+> +			continue; /* Component is not present */
+> +
+> +		rc = zl3073x_fw_component_flash(zldev, zlfw->component[i],
+> +						extack);
+> +		if (rc)
+> +			break;
+> +	}
 
-The DT binding says that both properties are required. So i think this
-should be:
+Perhaps it cannot happen in practice.
+But Smatch warns that rc may be used uninitialised below.
+And that does seem theoretically possible if all
+iterations of the loop above hit the "continue" path.
 
-		return ret;
+> +
+> +	return rc;
+> +}
 
-> + * phy_port_get_type() - get the PORT_* attribut for that port.
-
-attribut_e_
-
-> +	 * If the port isn't initialized, the port->mediums and port->lanes
-> +	 * fields must be set, possibly according to stapping information.
-
-st_r_apping
-
-	Andrew
+...
 
