@@ -1,142 +1,162 @@
-Return-Path: <netdev+bounces-210352-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210353-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00B9FB12EB7
-	for <lists+netdev@lfdr.de>; Sun, 27 Jul 2025 10:37:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24090B12EBB
+	for <lists+netdev@lfdr.de>; Sun, 27 Jul 2025 10:42:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 36B411736E6
-	for <lists+netdev@lfdr.de>; Sun, 27 Jul 2025 08:37:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3FE491899805
+	for <lists+netdev@lfdr.de>; Sun, 27 Jul 2025 08:42:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA4DE1E8326;
-	Sun, 27 Jul 2025 08:37:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A8021F03C7;
+	Sun, 27 Jul 2025 08:42:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DkGPnJij"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 315BB1DFE26
-	for <netdev@vger.kernel.org>; Sun, 27 Jul 2025 08:37:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5B4C645;
+	Sun, 27 Jul 2025 08:42:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753605441; cv=none; b=H6G3bHUt64VXvdHbzSpm7E8vKEG/pVTo7sQg8ssycfkGX40mH12Y/bX+V+qlwXK62xU3v5pEODQXgeBCcJXIyYuUUzykXzhd8uyW9YbZr4ZdqrEfqsXs/hHz+1GbNgPvkR57jF/j0pn9pkbOX2AmPZMz7wWqaqol8gnxKXH7nBg=
+	t=1753605749; cv=none; b=WCHUlkJSoJoJOeyvy8fwYqZSjvN4HsCOFWAF0HQ2vV9pqmCgNfk0oWrpPFWKJrynsWyb8zjcRSV/Cepme4aOrWZQN1SzA5gXi5n48nnEqY2RTzL9yzJ2sBYW/+c0RxSL7fpdj2Sxybzu9rSp1mv3/V4reB1RG1oSj0vSwuAR+es=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753605441; c=relaxed/simple;
-	bh=O6Msoqha+znSu7TVUCpgsxtShrRxu9yAZdxMN9lfCNI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MJdRIzS2fbKyggsNoYFR505yc8Rn29i4BX52kCtbcIrYjyEJSGiToh4avni4vrgVtWAjlJSYDjWduhPK23Md7hRDdL6jUmO+ZNsmB+CR18u3j9htdWsVpETrEpze+KweKpY5QYQLA9lnk5bOIGWDa0k/QxdJBpQtrUm1Ka6WLKc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.2.202] (p5b13a0f7.dip0.t-ipconnect.de [91.19.160.247])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id CECEC61E64849;
-	Sun, 27 Jul 2025 10:36:26 +0200 (CEST)
-Message-ID: <a8eba276-afbf-456c-943d-36144877cfc0@molgen.mpg.de>
-Date: Sun, 27 Jul 2025 10:36:25 +0200
+	s=arc-20240116; t=1753605749; c=relaxed/simple;
+	bh=1FBsq3RJo4viUjTTcy8YHS5y2gw/+JTmgv3W+/1sNcc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=H3cI0TZTF8HZYAKqyuT5JaQu1SPBAmtRu2tI0bF/xgAuxfDOaZL9kpecfY3orFWUaTyuiEzVnEAoZBKjsb+9JrDN5qMkMEVx3g7q1kLeIzaEI/n7IquTEmC4Bs0W2iSg83yXis+n6W/nsC3mgW5sAUPibUFgUCX/soYYuIAQjfU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DkGPnJij; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8BB3C4CEEB;
+	Sun, 27 Jul 2025 08:42:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753605749;
+	bh=1FBsq3RJo4viUjTTcy8YHS5y2gw/+JTmgv3W+/1sNcc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DkGPnJijKVgVkPNWynxQoXYQPWllTcSUGGm1qWoE2LkOL7WW0DJemmcv9Sj6aSeQl
+	 2ytVgW4bGL8CsGWfW+FIx/I8QYszufxSMK8hh0Ah0BnOMX+sHtXUwXDxRHTen1yKgk
+	 Py/RDpfVRcdEaWqIq4GLu2tahKmAaJ8FwgqL2ewnWQp2gdFG+HzdcUZ+XAedM0xRYG
+	 mXiiB0FSelfP5TrkzMo0oHwChQ/NCqmBmmq3Oqx94WNz042sqzXVttjVubxMfEq2/n
+	 3hgDKXKo1WrAMyBMu5RDFezLkTt1rf6WPI8Qhm1J2sDUnUHZRW2DIkEW9eLEmiemqT
+	 PDPtR5mqBBWZA==
+Date: Sun, 27 Jul 2025 10:42:25 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
+	Felix Fietkau <nbd@nbd.name>, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next v5 3/7] net: airoha: npu: Add
+ wlan_{send,get}_msg NPU callbacks
+Message-ID: <aIXmcUCQe7-gm9--@lore-desk>
+References: <20250723-airoha-en7581-wlan-offlaod-v5-0-da92e0f8c497@kernel.org>
+ <20250723-airoha-en7581-wlan-offlaod-v5-3-da92e0f8c497@kernel.org>
+ <ff106cec-7e63-4475-a0e6-452bfcb823b3@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH v2 iwl-net] ixgbe: xsk: resolve the
- negative overflow of budget in ixgbe_xmit_zc
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
- larysa.zaremba@intel.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, bjorn@kernel.org,
- maciej.fijalkowski@intel.com, intel-wired-lan@lists.osuosl.org,
- netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-References: <20250726070356.58183-1-kerneljasonxing@gmail.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20250726070356.58183-1-kerneljasonxing@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-
-Dear Jason,
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="KcwatzaRMwMSfQy/"
+Content-Disposition: inline
+In-Reply-To: <ff106cec-7e63-4475-a0e6-452bfcb823b3@linux.dev>
 
 
-Thank you for the improved version.
+--KcwatzaRMwMSfQy/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Am 26.07.25 um 09:03 schrieb Jason Xing:
-> From: Jason Xing <kernelxing@tencent.com>
-> 
-> Resolve the budget negative overflow which leads to returning true in
-> ixgbe_xmit_zc even when the budget of descs are thoroughly consumed.
-> 
-> Before this patch, when the budget is decreased to zero and finishes
-> sending the last allowed desc in ixgbe_xmit_zc, it will always turn back
-> and enter into the while() statement to see if it should keep processing
-> packets, but in the meantime it unexpectedly decreases the value again to
-> 'unsigned int (0--)', namely, UINT_MAX. Finally, the ixgbe_xmit_zc returns
-> true, showing 'we complete cleaning the budget'. That also means
-> 'clean_complete = true' in ixgbe_poll.
-> 
-> The true theory behind this is if that budget number of descs are consumed,
-> it implies that we might have more descs to be done. So we should return
-> false in ixgbe_xmit_zc to tell napi poll to find another chance to start
-> polling to handle the rest of descs. On the contrary, returning true here
-> means job done and we know we finish all the possible descs this time and
-> we don't intend to start a new napi poll.
-> 
-> It is apparently against our expectations. Please also see how
-> ixgbe_clean_tx_irq() handles the problem: it uses do..while() statement
-> to make sure the budget can be decreased to zero at most and the negative
-> overflow never happens.
-> 
-> The patch adds 'likely' because we rarely would not hit the loop codition
-> since the standard budget is 256.
-> 
-> Fixes: 8221c5eba8c1 ("ixgbe: add AF_XDP zero-copy Tx support")
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> Reviewed-by: Larysa Zaremba <larysa.zaremba@intel.com>
-> ---
-> Link: https://lore.kernel.org/all/20250720091123.474-3-kerneljasonxing@gmail.com/
-> 1. use 'negative overflow' instead of 'underflow' (Willem)
-> 2. add reviewed-by tag (Larysa)
-> 3. target iwl-net branch (Larysa)
-> 4. add the reason why the patch adds likely() (Larysa)
-> ---
->   drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
-> index ac58964b2f08..7b941505a9d0 100644
-> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
-> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
-> @@ -398,7 +398,7 @@ static bool ixgbe_xmit_zc(struct ixgbe_ring *xdp_ring, unsigned int budget)
->   	dma_addr_t dma;
->   	u32 cmd_type;
->   
-> -	while (budget-- > 0) {
-> +	while (likely(budget)) {
->   		if (unlikely(!ixgbe_desc_unused(xdp_ring))) {
->   			work_done = false;
->   			break;
-> @@ -433,6 +433,8 @@ static bool ixgbe_xmit_zc(struct ixgbe_ring *xdp_ring, unsigned int budget)
->   		xdp_ring->next_to_use++;
->   		if (xdp_ring->next_to_use == xdp_ring->count)
->   			xdp_ring->next_to_use = 0;
-> +
-> +		budget--;
->   	}
->   
->   	if (tx_desc) {
+> On 23/07/2025 18:19, Lorenzo Bianconi wrote:
+> > Introduce wlan_send_msg() and wlan_get_msg() NPU wlan callbacks used
+> > by the wlan driver (MT76) to initialize NPU module registers in order to
+> > offload wireless-wired traffic.
+> > This is a preliminary patch to enable wlan flowtable offload for EN7581
+> > SoC with MT76 driver.
+> >=20
+> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> > ---
+> >   drivers/net/ethernet/airoha/airoha_npu.c | 58 +++++++++++++++++++++++=
++++++++++
+> >   drivers/net/ethernet/airoha/airoha_npu.h | 21 ++++++++++++
+> >   2 files changed, 79 insertions(+)
+> >=20
+>=20
+> [...]
+>=20
+> > @@ -131,6 +147,12 @@ struct wlan_mbox_data {
+> >   	u32 func_id;
+> >   	union {
+> >   		u32 data;
+> > +		struct {
+> > +			u32 dir;
+> > +			u32 in_counter_addr;
+> > +			u32 out_status_addr;
+> > +			u32 out_counter_addr;
+> > +		} txrx_addr;
+> >   		u8 stats[WLAN_MAX_STATS_SIZE];
+> >   	};
+> >   };
+> > @@ -424,6 +446,30 @@ static int airoha_npu_wlan_msg_send(struct airoha_=
+npu *npu, int ifindex,
+> >   	return err;
+> >   }
+> > +static int airoha_npu_wlan_msg_get(struct airoha_npu *npu, int ifindex,
+> > +				   enum airoha_npu_wlan_get_cmd func_id,
+> > +				   u32 *data, gfp_t gfp)
+> > +{
+> > +	struct wlan_mbox_data *wlan_data;
+> > +	int err;
+> > +
+> > +	wlan_data =3D kzalloc(sizeof(*wlan_data), gfp);
+> > +	if (!wlan_data)
+> > +		return -ENOMEM;
+> > +
+> > +	wlan_data->ifindex =3D ifindex;
+> > +	wlan_data->func_type =3D NPU_OP_GET;
+> > +	wlan_data->func_id =3D func_id;
+> > +
+> > +	err =3D airoha_npu_send_msg(npu, NPU_FUNC_WIFI, wlan_data,
+> > +				  sizeof(*wlan_data));
+> > +	if (!err)
+> > +		*data =3D wlan_data->data;
+> > +	kfree(wlan_data);
+> > +
+> > +	return err;
+> > +}
+>=20
+> Am I reading it correct, that on message_get you allocate 4408 + 8 byte,
+> setting it 0, then reallocate the same size in airoha_npu_send_msg() and
+> copy the data, and then free both buffers, and this is all done just to
+> get u32 value back?
 
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+ack, right. This is was the original approach in the vendor sdk.
+I will fix in v6.
 
-Is this just the smallest fix, and the rewrite to the more idiomatic for 
-loop going to be done in a follow-up?
+Regards,
+Lorenzo
 
 
-Kind regards,
+--KcwatzaRMwMSfQy/
+Content-Type: application/pgp-signature; name=signature.asc
 
-Paul
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaIXmcQAKCRA6cBh0uS2t
+rFrAAP4yzHsHYDp6pps4peenrqug/hiwFirsQerZGdFYZscxxgD/ZPuKL0EPUbb9
+du8EkSKxgOkHAkO0SUXlzjl0Dc4R+Q8=
+=TBNx
+-----END PGP SIGNATURE-----
+
+--KcwatzaRMwMSfQy/--
 
