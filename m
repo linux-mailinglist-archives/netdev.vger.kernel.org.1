@@ -1,139 +1,142 @@
-Return-Path: <netdev+bounces-210351-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210352-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83DFEB12E3F
-	for <lists+netdev@lfdr.de>; Sun, 27 Jul 2025 10:07:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00B9FB12EB7
+	for <lists+netdev@lfdr.de>; Sun, 27 Jul 2025 10:37:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F16F3B2612
-	for <lists+netdev@lfdr.de>; Sun, 27 Jul 2025 08:06:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 36B411736E6
+	for <lists+netdev@lfdr.de>; Sun, 27 Jul 2025 08:37:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF65E1DED64;
-	Sun, 27 Jul 2025 08:07:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cazQ9aYB"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA4DE1E8326;
+	Sun, 27 Jul 2025 08:37:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 940353770B;
-	Sun, 27 Jul 2025 08:07:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 315BB1DFE26
+	for <netdev@vger.kernel.org>; Sun, 27 Jul 2025 08:37:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753603632; cv=none; b=PR+/thrRNeoOlIq+a2GrkakHlQMFTpM1bKHn39pJ5Eze8JUl4yjJm3bEcHpGW5yKos1aysuJ0LT0TeURJP7UEB5RNN+WHEPidKpra2fo2WrUFesj4CYrO9U2rEHvH5VIPRD3anHXcA3mG3hehRPeOnE6xgvAFjly3eiotRjCbgA=
+	t=1753605441; cv=none; b=H6G3bHUt64VXvdHbzSpm7E8vKEG/pVTo7sQg8ssycfkGX40mH12Y/bX+V+qlwXK62xU3v5pEODQXgeBCcJXIyYuUUzykXzhd8uyW9YbZr4ZdqrEfqsXs/hHz+1GbNgPvkR57jF/j0pn9pkbOX2AmPZMz7wWqaqol8gnxKXH7nBg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753603632; c=relaxed/simple;
-	bh=k35kSl4I6kHT6MK6xsLw0rGkngwOopaIhsVLUVNQIlk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BShX79QgISBG5lwJakrk43PVUMW2C2LeKCHl5YpO3EZCGJO/ElyZhDD+8SWQy0YwIhaVijO3lUMCAjg9RreuY8YfDDTFk7sfRzTqYPZFDq1bqShgG81zHzP1/H5K+ghDv5eGunx/H7VTV8cMplk+dAJZJlgK+8YCJTh/L5pLnHk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cazQ9aYB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCFBCC4CEEB;
-	Sun, 27 Jul 2025 08:07:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753603630;
-	bh=k35kSl4I6kHT6MK6xsLw0rGkngwOopaIhsVLUVNQIlk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cazQ9aYB4l8Cp8q+C9MRw5od/73YWSTWxPajqtUjUwGckAN6vlGKFM3GflZMo+ufo
-	 sCnw1+VPoy2ibkmy3qEjZeIZef7CD69POJg14bTgxeQY31Yf4ZQTWCbraJ6b9O8toh
-	 xsatNXka7b2V61FNM9FNLUgKmG8HJygFDFeCncLXLUL6uRcEaVX3I1/DW6lsSQVN0w
-	 eDZqk5zMI2eQehUeF23TCzMnZ/4pky8fD3tBnh/DZQnx8V5UyC6Cuu1VAgEZ/f64SC
-	 KUlucbbhx3RLpQg7c5eOTLedi8gacTmHrGcFDrZWVsip2e9VSZDP1NmRim68E8eUGt
-	 BaUJWDj2sWSOw==
-Date: Sun, 27 Jul 2025 11:07:05 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Sean Anderson <sean.anderson@linux.dev>,
-	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, Dave Ertman <david.m.ertman@intel.com>,
-	Saravana Kannan <saravanak@google.com>,
-	linux-kernel@vger.kernel.org, Michal Simek <michal.simek@amd.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Ira Weiny <ira.weiny@intel.com>
-Subject: Re: [PATCH net v2 1/4] auxiliary: Support hexadecimal ids
-Message-ID: <20250727080705.GY402218@unreal>
-References: <5d8205e1-b384-446b-822a-b5737ea7bd6c@linux.dev>
- <2025071736-viscous-entertain-ff6c@gregkh>
- <03e04d98-e5eb-41c0-8407-23cccd578dbe@linux.dev>
- <2025071726-ramp-friend-a3e5@gregkh>
- <5ee4bac4-957b-481a-8608-15886da458c2@linux.dev>
- <20250720081705.GE402218@unreal>
- <e4b5e4fa-45c4-4b67-b8f1-7d9ff9f8654f@linux.dev>
- <20250723081356.GM402218@unreal>
- <991cbb9a-a1b5-4ab8-9deb-9ecea203ce0f@linux.dev>
- <2025072543-senate-hush-573d@gregkh>
+	s=arc-20240116; t=1753605441; c=relaxed/simple;
+	bh=O6Msoqha+znSu7TVUCpgsxtShrRxu9yAZdxMN9lfCNI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MJdRIzS2fbKyggsNoYFR505yc8Rn29i4BX52kCtbcIrYjyEJSGiToh4avni4vrgVtWAjlJSYDjWduhPK23Md7hRDdL6jUmO+ZNsmB+CR18u3j9htdWsVpETrEpze+KweKpY5QYQLA9lnk5bOIGWDa0k/QxdJBpQtrUm1Ka6WLKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.2.202] (p5b13a0f7.dip0.t-ipconnect.de [91.19.160.247])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id CECEC61E64849;
+	Sun, 27 Jul 2025 10:36:26 +0200 (CEST)
+Message-ID: <a8eba276-afbf-456c-943d-36144877cfc0@molgen.mpg.de>
+Date: Sun, 27 Jul 2025 10:36:25 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2025072543-senate-hush-573d@gregkh>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH v2 iwl-net] ixgbe: xsk: resolve the
+ negative overflow of budget in ixgbe_xmit_zc
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+ larysa.zaremba@intel.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, bjorn@kernel.org,
+ maciej.fijalkowski@intel.com, intel-wired-lan@lists.osuosl.org,
+ netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+References: <20250726070356.58183-1-kerneljasonxing@gmail.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20250726070356.58183-1-kerneljasonxing@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jul 25, 2025 at 07:02:24AM +0200, Greg Kroah-Hartman wrote:
-> On Thu, Jul 24, 2025 at 09:55:59AM -0400, Sean Anderson wrote:
-> > On 7/23/25 04:13, Leon Romanovsky wrote:
-> > > On Mon, Jul 21, 2025 at 10:29:32AM -0400, Sean Anderson wrote:
-> > >> On 7/20/25 04:17, Leon Romanovsky wrote:
-> > >> > On Thu, Jul 17, 2025 at 01:12:08PM -0400, Sean Anderson wrote:
-> > >> >> On 7/17/25 12:33, Greg Kroah-Hartman wrote:
-> > >> > 
-> > >> > <...>
-> > >> > 
-> > >> >> Anyway, if you really think ids should be random or whatever, why not
-> > >> >> just ida_alloc one in axiliary_device_init and ignore whatever's
-> > >> >> provided? I'd say around half the auxiliary drivers just use 0 (or some
-> > >> >> other constant), which is just as deterministic as using the device
-> > >> >> address.
-> > >> > 
-> > >> > I would say that auxiliary bus is not right fit for such devices. This
-> > >> > bus was introduced for more complex devices, like the one who has their
-> > >> > own ida_alloc logic.
-> > >> 
-> > >> I'd say that around 2/3 of the auxiliary drivers that have non-constant
-> > >> ids use ida_alloc solely for the auxiliary bus and for no other purpose.
-> > >> I don't think that's the kind of complexity you're referring to.
-> > >> 
-> > >> >> Another third use ida_alloc (or xa_alloc) so all that could be
-> > >> >> removed.
-> > >> > 
-> > >> > These ID numbers need to be per-device.
-> > >> 
-> > >> Why? They are arbitrary with no semantic meaning, right?
-> > > 
-> > > Yes, officially there is no meaning, and this is how we would like to
-> > > keep it.
-> > > 
-> > > Right now, they are very correlated with with their respective PCI function number.
-> > > Is it important? No, however it doesn't mean that we should proactively harm user
-> > > experience just because we can do it.
-> > > 
-> > > [leonro@c ~]$ l /sys/bus/auxiliary/devices/
-> > > ,,,
-> > > rwxrwxrwx 1 root root 0 Jul 21 15:25 mlx5_core.rdma.0 -> ../../../devices/pci0000:00/0000:00:02.7/0000:0
-> > > 8:00.0/mlx5_core.rdma.0
-> > > lrwxrwxrwx 1 root root 0 Jul 21 15:25 mlx5_core.rdma.1 -> ../../../devices/pci0000:00/0000:00:02.7/0000:0
-> > > 8:00.1/mlx5_core.rdma
-> > 
-> > Well, I would certainly like to have semantic meaning for ids. But apparently
-> > that is only allowed if you can sneak it past the review process.
+Dear Jason,
+
+
+Thank you for the improved version.
+
+Am 26.07.25 um 09:03 schrieb Jason Xing:
+> From: Jason Xing <kernelxing@tencent.com>
 > 
-> Do I need to dust off my "make all ids random" patch again and actually
-> merge it just to prevent this from happening?
-
-After weekend thoughts on it. IDs need to be removed from the driver
-access. Let's make them global at least.
-
-Thanks
-
+> Resolve the budget negative overflow which leads to returning true in
+> ixgbe_xmit_zc even when the budget of descs are thoroughly consumed.
 > 
-> greg k-h
+> Before this patch, when the budget is decreased to zero and finishes
+> sending the last allowed desc in ixgbe_xmit_zc, it will always turn back
+> and enter into the while() statement to see if it should keep processing
+> packets, but in the meantime it unexpectedly decreases the value again to
+> 'unsigned int (0--)', namely, UINT_MAX. Finally, the ixgbe_xmit_zc returns
+> true, showing 'we complete cleaning the budget'. That also means
+> 'clean_complete = true' in ixgbe_poll.
 > 
+> The true theory behind this is if that budget number of descs are consumed,
+> it implies that we might have more descs to be done. So we should return
+> false in ixgbe_xmit_zc to tell napi poll to find another chance to start
+> polling to handle the rest of descs. On the contrary, returning true here
+> means job done and we know we finish all the possible descs this time and
+> we don't intend to start a new napi poll.
+> 
+> It is apparently against our expectations. Please also see how
+> ixgbe_clean_tx_irq() handles the problem: it uses do..while() statement
+> to make sure the budget can be decreased to zero at most and the negative
+> overflow never happens.
+> 
+> The patch adds 'likely' because we rarely would not hit the loop codition
+> since the standard budget is 256.
+> 
+> Fixes: 8221c5eba8c1 ("ixgbe: add AF_XDP zero-copy Tx support")
+> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> Reviewed-by: Larysa Zaremba <larysa.zaremba@intel.com>
+> ---
+> Link: https://lore.kernel.org/all/20250720091123.474-3-kerneljasonxing@gmail.com/
+> 1. use 'negative overflow' instead of 'underflow' (Willem)
+> 2. add reviewed-by tag (Larysa)
+> 3. target iwl-net branch (Larysa)
+> 4. add the reason why the patch adds likely() (Larysa)
+> ---
+>   drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c | 4 +++-
+>   1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
+> index ac58964b2f08..7b941505a9d0 100644
+> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
+> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
+> @@ -398,7 +398,7 @@ static bool ixgbe_xmit_zc(struct ixgbe_ring *xdp_ring, unsigned int budget)
+>   	dma_addr_t dma;
+>   	u32 cmd_type;
+>   
+> -	while (budget-- > 0) {
+> +	while (likely(budget)) {
+>   		if (unlikely(!ixgbe_desc_unused(xdp_ring))) {
+>   			work_done = false;
+>   			break;
+> @@ -433,6 +433,8 @@ static bool ixgbe_xmit_zc(struct ixgbe_ring *xdp_ring, unsigned int budget)
+>   		xdp_ring->next_to_use++;
+>   		if (xdp_ring->next_to_use == xdp_ring->count)
+>   			xdp_ring->next_to_use = 0;
+> +
+> +		budget--;
+>   	}
+>   
+>   	if (tx_desc) {
+
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+
+Is this just the smallest fix, and the rewrite to the more idiomatic for 
+loop going to be done in a follow-up?
+
+
+Kind regards,
+
+Paul
 
