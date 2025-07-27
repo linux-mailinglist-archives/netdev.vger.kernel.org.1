@@ -1,168 +1,190 @@
-Return-Path: <netdev+bounces-210402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210401-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BEABB131A7
-	for <lists+netdev@lfdr.de>; Sun, 27 Jul 2025 22:02:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1FA0B13196
+	for <lists+netdev@lfdr.de>; Sun, 27 Jul 2025 21:58:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A2DE91661A7
-	for <lists+netdev@lfdr.de>; Sun, 27 Jul 2025 20:02:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E967E175C5E
+	for <lists+netdev@lfdr.de>; Sun, 27 Jul 2025 19:58:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E47C1DFD9A;
-	Sun, 27 Jul 2025 20:02:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30454226861;
+	Sun, 27 Jul 2025 19:58:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=posteo.net header.i=@posteo.net header.b="OwdhLGdY"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="xg02+3AN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.65])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72E70126BF1
-	for <netdev@vger.kernel.org>; Sun, 27 Jul 2025 20:02:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.67.36.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3CDD21B9FE;
+	Sun, 27 Jul 2025 19:57:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753646574; cv=none; b=eo5lwB9+GUK8ujphY5xuj0ft8urbpPSpWc6Xl4KqztTrQiRLU5CMpySqj93AcBGFRm/kokB0ZJkuJWrLzy1j9XteTq8LSb8Azdc/klpaopT96Q/4wYTXnfUtRqjt0oEHadYmiZW+JxFiVqAqUnDL5aT5+EmTY8IJKonnO+cqXBI=
+	t=1753646281; cv=none; b=iFmnQRhidZbFxEQbppFr0mzoVm4Dm+wZYxXRbqdGpz3BMHjfkc+ru+RAj+vinIdb6rQKQ8kLEtb2DRPE23qN4Vsz+1UZV43AbNC8TqQL0N7wxzx9Tq3hUGdEG4NRvfwbETCjT7dZmqvK79W9w413VDYOB+dtkWuDZrWQmm0qXGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753646574; c=relaxed/simple;
-	bh=InICUzB5IYuMy5dVYKkleg4CpHJ+Ue6GlSrlIPevuUQ=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=aV5142dBvL1ADnRepZKo7BaJo8/zPe7AvsKvBAdzoZ3axyChaI3kPcXTYDLMydgc8opZh9O6nnyhNHm3bY9pgKSCZeBmpe1z4eC/OXcKOa6rwQy45YVFI6rz9LodmbGjzMMaKGCNPmSIiqKd43OYeWLfit+7i1pIYWK2XyKqPSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net; spf=pass smtp.mailfrom=posteo.net; dkim=pass (3072-bit key) header.d=posteo.net header.i=@posteo.net header.b=OwdhLGdY; arc=none smtp.client-ip=185.67.36.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=posteo.net
-Received: from submission (posteo.de [185.67.36.169]) 
-	by mout01.posteo.de (Postfix) with ESMTPS id CB0D4240027
-	for <netdev@vger.kernel.org>; Sun, 27 Jul 2025 21:53:40 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=posteo.net;
-	s=1984.ea087b; t=1753646020;
-	bh=EBkCPCwivLcm++pduicUmpOXoIvgyMyHaCdpOJVGgW4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type:
-	 From;
-	b=OwdhLGdYSXYqeWTygaN4dQpS3sFM9tsRsa1FOPSGrtDUI3mFX/53bpcE+ROc8x1/0
-	 69FuQnACu4jrUYk6cNAoX/4eXDssC/Z8AAF5W0PxwrpO8xO1zH40ypkdoznFQvDlRP
-	 vC+UHKBzXLwJGlsBkbDDLqVY7uZ6ktpp5zRCGKZ5Bgd0QWD+MN+NEK7tp2YcYFt/Fe
-	 zjjDMpjNCUE7WcR3Ax6QgQo/P8VubEmga8Mw4Hln9OtppIFaP0UblHOFhwNY3eYU1A
-	 slG8FOjO8THcQT8EXhpitN8pHRYvQY8L54g+cdRHxKR6BkFeVHhrxYb8GdpPDaa7Cx
-	 fEBIWv3JzY/1YSwT2vv2zInOnZkeJzKvS99wuNW2RgBCnqmy0AE6SGT2mGgk/m9hPC
-	 W3DtEMMxB/eyK7aaYdHtJm+V/gC3Vqs/paCrT4tR1XkXWxEzMdUiYxuvqOaQ4/vVfu
-	 oJe+1gNO0Pg1tiaxclzKbcwYuQPHD4qPjscMai07c23i+PQpZHA
-Received: from customer (localhost [127.0.0.1])
-	by submission (posteo.de) with ESMTPSA id 4bqsjs644wz9rxN;
-	Sun, 27 Jul 2025 21:53:37 +0200 (CEST)
-From: Charalampos Mitrodimas <charmitro@posteo.net>
-To: syzbot <syzbot+01b0667934cdceb4451c@syzkaller.appspotmail.com>
-Cc: davem@davemloft.net,  dsahern@kernel.org,  edumazet@google.com,
-  herbert@gondor.apana.org.au,  horms@kernel.org,  kuba@kernel.org,
-  linux-kernel@vger.kernel.org,  netdev@vger.kernel.org,
-  pabeni@redhat.com,  steffen.klassert@secunet.com,
-  syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [net?] WARNING in ah6_output
-In-Reply-To: <683265d3.a70a0220.253bc2.0079.GAE@google.com>
-References: <683265d3.a70a0220.253bc2.0079.GAE@google.com>
-Date: Sun, 27 Jul 2025 19:53:40 +0000
-Message-ID: <878qk9csvy.fsf@posteo.net>
+	s=arc-20240116; t=1753646281; c=relaxed/simple;
+	bh=bTV1Ce2wHOqMu2kVymsIX8SlLEnb1OxCNKqezUt3EWU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jT1ZoY8XBH++TpwZDXfumhvHq/L9FTNhQWYE8joFy3venrWvV5qJz7jNeJsEMDvCL5IH7HT9I0sQ9/yAvwy1eWP4kLX7hFD7cAoRMYayJFGHWJP2kmSbGd4tevqytQzrvmNO66alvehfuIuX1jft58qoAYZZV2vh6tTOW57gY7E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=xg02+3AN; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=8hEsloU/e5SnX4wmvFRSNKqlkwL0lNp6OodxTTFUtc0=; b=xg02+3ANIpeQD3xeG/u8lRQDRe
+	yuSKoIF78ltBcE7+xWkS+XUGpjsCBTSqeQa78LWnwjZuwk52634YJEra0hQAR/sotpxZtyczV8Krp
+	pN08ZsKToAcuyA3R+6qutEz/freUUTJEH53k8Qljib7q+oV+z+21zeya99W4XQU64mewL+z2QuZQ2
+	4HoMxaKXa0u5qXZQYmfHcgLzfJ2oJYfz4g5PhkWT6QeEGpCvhuw/INYmdhfSUcx/HZtjKUiVlpkjs
+	jdgFhGJQYUD2Xqx+yOIb/H9vC4CvnICBwCoxBPeDmsD7YT9xtvcnrgwkgWoTb5mYvJUvFnRbN21o6
+	P40lfMMQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:34694)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1ug7Uy-0007gA-2a;
+	Sun, 27 Jul 2025 20:57:33 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1ug7Us-00042L-1o;
+	Sun, 27 Jul 2025 20:57:26 +0100
+Date: Sun, 27 Jul 2025 20:57:26 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jonas Karlman <jonas@kwiboo.se>
+Cc: Linus Walleij <linus.walleij@linaro.org>,
+	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiko Stuebner <heiko@sntech.de>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Yao Zi <ziyao@disroot.org>, Chukun Pan <amadeus@jmu.edu.cn>,
+	netdev@vger.kernel.org, linux-rockchip@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org
+Subject: Re: [PATCH 3/3] arm64: dts: rockchip: Add RTL8367RB-VB switch to
+ Radxa E24C
+Message-ID: <aIaEpkZtPt6wqaiL@shell.armlinux.org.uk>
+References: <20250727180305.381483-1-jonas@kwiboo.se>
+ <20250727180305.381483-4-jonas@kwiboo.se>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250727180305.381483-4-jonas@kwiboo.se>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-syzbot <syzbot+01b0667934cdceb4451c@syzkaller.appspotmail.com> writes:
-
-> Hello,
->
-> syzbot found the following issue on:
->
-> HEAD commit:    9e89db3d847f Merge tag 'linux-can-fixes-for-6.15-20250520'..
-> git tree:       net
-> console output: https://syzkaller.appspot.com/x/log.txt?x=1476d1f4580000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=c3f0e807ec5d1268
-> dashboard link: https://syzkaller.appspot.com/bug?extid=01b0667934cdceb4451c
-> compiler:       Debian clang version 20.1.2 (++20250402124445+58df0ef89dd6-1~exp1~20250402004600.97), Debian LLD 20.1.2
->
-> Unfortunately, I don't have any reproducer for this issue yet.
->
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/8b09322b598e/disk-9e89db3d.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/23ed08e707b5/vmlinux-9e89db3d.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/be78b62450e7/bzImage-9e89db3d.xz
->
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+01b0667934cdceb4451c@syzkaller.appspotmail.com
->
-> ------------[ cut here ]------------
-> memcpy: detected field-spanning write (size 40) of single field "&top_iph->saddr" at net/ipv6/ah6.c:439 (size 16)
-> WARNING: CPU: 0 PID: 8838 at net/ipv6/ah6.c:439 ah6_output+0xe7e/0x14e0 net/ipv6/ah6.c:439
-> Modules linked in:
-> CPU: 0 UID: 0 PID: 8838 Comm: syz.1.814 Not tainted 6.15.0-rc6-syzkaller-00173-g9e89db3d847f #0 PREEMPT(full) 
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
-> RIP: 0010:ah6_output+0xe7e/0x14e0 net/ipv6/ah6.c:439
-> Code: ff e8 36 80 9f f7 c6 05 bb 97 48 05 01 90 b9 10 00 00 00 48 c7 c7 a0 56 7e 8c 4c 89 fe 48 c7 c2 00 59 7e 8c e8 a3 dc 63 f7 90 <0f> 0b 90 90 e9 b5 fe ff ff e8 74 e4 35 01 48 8b 4c 24 10 80 e1 07
-> RSP: 0018:ffffc900049f70e0 EFLAGS: 00010246
-> RAX: 3fffcb5d3bcc7c00 RBX: 0000000000000028 RCX: 0000000000080000
-> RDX: ffffc9000ece1000 RSI: 00000000000052e8 RDI: 00000000000052e9
-> RBP: ffffc900049f7250 R08: 0000000000000003 R09: 0000000000000004
-> R10: dffffc0000000000 R11: fffffbfff1bba944 R12: dffffc0000000000
-> R13: 1ffff9200093ee38 R14: ffff8881452e8800 R15: 0000000000000028
-> FS:  00007fc3a1d2c6c0(0000) GS:ffff8881260c7000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000555569628808 CR3: 000000005cf4e000 CR4: 00000000003526f0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
->  <TASK>
->  xfrm_output_one net/xfrm/xfrm_output.c:555 [inline]
->  xfrm_output_resume+0x2c55/0x6170 net/xfrm/xfrm_output.c:590
->  __xfrm6_output+0x2eb/0x1070 net/ipv6/xfrm6_output.c:103
->  NF_HOOK_COND include/linux/netfilter.h:303 [inline]
->  xfrm6_output+0x1c6/0x4f0 net/ipv6/xfrm6_output.c:108
->  ip6_send_skb+0x1d5/0x390 net/ipv6/ip6_output.c:1981
->  l2tp_ip6_sendmsg+0x1378/0x1870 net/l2tp/l2tp_ip6.c:661
->  sock_sendmsg_nosec net/socket.c:712 [inline]
->  __sock_sendmsg+0x19c/0x270 net/socket.c:727
->  ____sys_sendmsg+0x505/0x830 net/socket.c:2566
->  ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2620
->  __sys_sendmsg net/socket.c:2652 [inline]
->  __do_sys_sendmsg net/socket.c:2657 [inline]
->  __se_sys_sendmsg net/socket.c:2655 [inline]
->  __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2655
->  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
->  do_syscall_64+0xf6/0x210 arch/x86/entry/syscall_64.c:94
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> RIP: 0033:0x7fc3a0f8e969
-> Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-> RSP: 002b:00007fc3a1d2c038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-> RAX: ffffffffffffffda RBX: 00007fc3a11b6080 RCX: 00007fc3a0f8e969
-> RDX: 0000000000000800 RSI: 0000200000000540 RDI: 0000000000000004
-> RBP: 00007fc3a1010ab1 R08: 0000000000000000 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-> R13: 0000000000000000 R14: 00007fc3a11b6080 R15: 00007ffc18a80a58
->  </TASK>
->
->
+On Sun, Jul 27, 2025 at 06:03:00PM +0000, Jonas Karlman wrote:
+> The Radxa E24C has a Realtek RTL8367RB-VB switch with four usable ports
+> and is connected using a fixed-link to GMAC1 on the RK3528 SoC.
+> 
+> Add an ethernet-switch node to describe the RTL8367RB-VB switch.
+> 
+> Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
 > ---
-> This report is generated by a bot. It may contain errors.
-> See https://goo.gl/tpsmEJ for more information about syzbot.
-> syzbot engineers can be reached at syzkaller@googlegroups.com.
->
-> syzbot will keep track of this issue. See:
-> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
->
-> If the report is already addressed, let syzbot know by replying with:
-> #syz fix: exact-commit-title
->
-> If you want to overwrite report's subsystems, reply with:
-> #syz set subsystems: new-subsystem
-> (See the list of subsystem names on the web dashboard)
->
-> If the report is a duplicate of another one, reply with:
-> #syz dup: exact-subject-of-another-report
->
-> If you want to undo deduplication, reply with:
-> #syz undup
+> Initial testing with iperf3 showed ~930-940 Mbits/sec in one direction
+> and only around ~1-2 Mbits/sec in the other direction.
+> 
+> The RK3528 hardware design guide recommends that timing between TXCLK
+> and data is controlled by MAC, and timing between RXCLK and data is
+> controlled by PHY.
 
-#syz test: https://github.com/charmitro/linux.git d4017cef5514575221234e65a2ff9b0713718274
+Assuming RK3528 is the MAC side, then that makes sense - it's basically
+suggesting that the _producer_ of the signals should appropriately skew
+them.
+
+> Any mix of MAC (rx/tx delay) and switch (rx/tx internal delay) did not
+> seem to resolve this speed issue, however dropping snps,tso seems to fix
+> that issue.
+> 
+> Unsure what is best here, should MAC or switch add the delays? Here I
+> just followed DT from vendor downstream tree and added rx/tx internal
+> delay to switch.
+
+Okay. Heres'a an in-depth explanation, because I think many people need
+this for MAC-to-MAC RGMII links. A MAC to PHY link:
+
+	MAC1 ------- PHY1
+
+The PHY mode in the MAC1 description controls the application of delays
+at PHY1. This is relatively well undersood. Now, for a MAC to MAC link:
+
+	MAC1 ------- MAC2 in a PHY
+
+Let's say MAC2 is part of a PHY. Okay, so this is quite simple because
+it's a PHY on the other end, and thus the situation above applies.
+
+In both these cases, the MAC driver will pass the PHY interface to
+phylib, which will in turn pass it to the PHY driver, which is expected
+to configure the PHY appropriately.
+
+There is a side-case, where a MAC driver is allowed to configure the
+delays at its end _provided_ it then passes PHY_INTERFACE_MODE_RGMII
+to phylib (telling the PHY not to add its own delays.)
+
+Now let's look at something that isn't a PHY:
+
+	MAC1 ------- MAC2 in a switch
+
+In this case, MAC2 isn't in a PHY or part of a PHY that is driven by
+phylib, so we don't have a way in the kernel of passing the PHY mode
+from MAC1 to MAC2 in order for MAC2 to configure itself. It's tempting
+to say that which RGMII mode is used doesn't matter, but consider the
+side-case above - if we're talking about a MAC driver that interprets
+the PHY mode and adds its own delays, then it *does* very much matter.
+
+It also matters for MAC2. This could be a switch port that can be used
+as a CPU facing port, or a switch port that is used as a PHY. In the
+latter case, it becomes exactly as the first two cases above.
+
+Let's take a theoretical case of two ethernet MACs on the same system
+connected with a RGMII link:
+
+	MAC1 ------- MAC2
+
+They both use the same driver. What RGMII interface mode should be used
+for each? Would it be correct to state "rgmii-id" for both MACs?
+Or "rgmii" for one and "rgmii-id" for the other.
+
+You may notice I'm not providing a solution - this is a thought
+experiment, to provoke some thought into the proper use of the phy-mode
+property at each end of a MAC to MAC link, and hopefully gain some
+realisation that (probably) using "rgmii-id" for both MACs probably
+isn't correct given the model that phy-mode _generally_ states how the
+opposite end of the RGMII link to the MAC should be configured.
+
+However, currently it doesn't matter as long as we don't end up with
+two MACs that are back to back and the MAC drivers decide to insert
+the RGMII delay (the side-case I mention above.)
+
+Personally, I don't like that we have this side-case as a possibility
+because it causes problems (if you go through the thought experiment
+above, you'll trip over the problem if you consider the combinations
+of MAC1 and MAC2 that do/do not use the side-case!)
+
+So, I would expect a MAC to MAC link to have "rgmii" at one end, and
+"rgmii-id" at the other end, rather than both having the same RGMII
+mode.
+
+> Vendor downstream DT also adds 'pause' to the fixed-link nodes, and this
+> may be something that should be added here. However, during testing flow
+> control always ended up being disabled so I skipped 'pause' here.
+
+Does it get disabled at the switch, or the stmmac end?
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
