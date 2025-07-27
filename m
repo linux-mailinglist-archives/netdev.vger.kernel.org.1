@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-210393-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210394-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19CE6B1310F
-	for <lists+netdev@lfdr.de>; Sun, 27 Jul 2025 20:03:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57A28B13111
+	for <lists+netdev@lfdr.de>; Sun, 27 Jul 2025 20:04:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0706B7A0253
-	for <lists+netdev@lfdr.de>; Sun, 27 Jul 2025 18:02:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25E2C16F3BE
+	for <lists+netdev@lfdr.de>; Sun, 27 Jul 2025 18:04:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EEF022616C;
-	Sun, 27 Jul 2025 18:03:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40C2B1865FA;
+	Sun, 27 Jul 2025 18:03:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kwiboo.se header.i=@kwiboo.se header.b="uk/wlKm7"
+	dkim=pass (2048-bit key) header.d=kwiboo.se header.i=@kwiboo.se header.b="HgXkUUb4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.forwardemail.net (smtp.forwardemail.net [149.28.215.223])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF498224AF0
-	for <netdev@vger.kernel.org>; Sun, 27 Jul 2025 18:03:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92E39610D
+	for <netdev@vger.kernel.org>; Sun, 27 Jul 2025 18:03:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=149.28.215.223
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753639410; cv=none; b=RGwi+SUt259Nuug58G3ITQaeI4h51+ZYB0z14rD2lMR+I59C6qwkGlQ1R0cYeZRGy/w/zZKnZ0LxGyC8zuF4wboRC0EXZefIZDmCeb6SUtihi+Su0ION/yUnNdggbgMutKS89exZwTz2jDJGeW/mLIEYlVhrW820kE2w5XS195Q=
+	t=1753639417; cv=none; b=BZ9HgCDvczu2LUVvlijUeWJgRt6LzqMMAw2LpFfFAiXkiedSJyj1WIWOYJerc8q2wJmVVlrjNegkZ6MB1DLWwdZyQ6znKtk2o8n4HnUy7T3A0YE4xg92DDEtH6UKR3GH1DXwGxnsApwOKaDInotqeRdvYpofWeXYsKFgIYm7kzw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753639410; c=relaxed/simple;
-	bh=38m2SPryUnJAv/Hzt+CHmkXIGXr7hdL8wmqIXo2Ec7U=;
+	s=arc-20240116; t=1753639417; c=relaxed/simple;
+	bh=WIxZnDfBjy3+MWbIUs96xiEYfrzW7OIdSfiwwszp1mM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Mh7xP5k20gZkwrZ2nurtR2iUKz3CSGU5B1eKtGIVY2r5eBv8Bol63m04J43xJKSd2g3XzZznlUTKBK4j3Liu1GQGqAgphAj7g2eAWalTFJTvfTzSKcZAnmVgPUjcUmtGhyMOTAmD0dkXqf4Prg/0A1WpRbZNmGhNjx7rrm5UXsw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kwiboo.se; spf=pass smtp.mailfrom=fe-bounces.kwiboo.se; dkim=pass (2048-bit key) header.d=kwiboo.se header.i=@kwiboo.se header.b=uk/wlKm7; arc=none smtp.client-ip=149.28.215.223
+	 MIME-Version; b=NORpYhmSVQiUh10F17mQ3w0xpPy6CCHxhAXLf9HMM5h49RGUY56BRSjQFVHOqKsOAzqTB3qsV9FSxfjmU0rscdf0dxVMrsjSptkPHrkmW+WW7dNo0nVCuGJenmkJ6fqLvJk1JHQZ6zFITJ56OhgHTGpc4iNMXW0Hx9saS/N6qUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kwiboo.se; spf=pass smtp.mailfrom=fe-bounces.kwiboo.se; dkim=pass (2048-bit key) header.d=kwiboo.se header.i=@kwiboo.se header.b=HgXkUUb4; arc=none smtp.client-ip=149.28.215.223
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kwiboo.se
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fe-bounces.kwiboo.se
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kwiboo.se;
  h=Content-Transfer-Encoding: MIME-Version: References: In-Reply-To:
  Message-ID: Date: Subject: Cc: To: From; q=dns/txt; s=fe-e1b5cab7be;
- t=1753639408; bh=YWL3aOX28KQzuVWsTQMiXAVfLLtLJhYtG+UmgpEGycA=;
- b=uk/wlKm7RpLjrRSXSgjCdMwV66XlSZn1OBQ67zaKg1wuxd+mBAR+QK+Jee2nkOjs6O3PVxJVV
- 2Ud2bszE1rKb2ssGKB/FSxTlEs98TaJXRubCsome6SQJCnDrPJ2IkpBYKuXWGKeMn2pwLX2ijo4
- yehkIo06l+bQ3lVMHJ70pUvwq3/esfNNUXe708vV6SyaGw05fH4P81TPJTIrbPNNfHaK6X2mZRl
- RGPvcumSF7fRQSH6HOI7kPbfDeomjOQWNkJhRMWSbp6/Nq22liawml9M18p91+ePTz1SeeJY3Os
- 1yoMyJ1QDj0Bq+Dl+Toe8iVWWzS5oYbmzCV7qzF9qGrg==
-X-Forward-Email-ID: 688669e9c509b9ee169cf326
+ t=1753639414; bh=EeTBhSz8vgF+IOB9tNLiutH2dTp1nA31ocl9xEGhTRc=;
+ b=HgXkUUb4+0a+LWZa9Flb7opsQbnNHvA3LrY0DAOMIQgE/VbrOwip0azPItGlJvZcpUUdikF0M
+ gpPanPlf4G3snXvVVu5O/tS+Sp1Mqkt9C6dBtRyWpSW55RU9aBqwYiLxh0Or+XCA8PG4WnxQsLi
+ CTCmc3Bc9llTO61M/z2BiPdk1scxXPKvvhW3Figj0CKUVdypLhZwgCZW+3ZeQmsj4LqtdiLpcwt
+ bf9TaA4K4Qs8dJHWrWHCGAgYYmJ4F5nTmy3vbfVX3mWZTZCnhfd2Uf5nU23D2LtiVCi0/jE1d0g
+ P+8dH/2sktrHKri/aBtY1JXOy2Eok9hpAV2UnFw4835A==
+X-Forward-Email-ID: 688669eec509b9ee169cf33b
 X-Forward-Email-Sender: rfc822; jonas@kwiboo.se, smtp.forwardemail.net,
  149.28.215.223
 X-Forward-Email-Version: 1.1.7
@@ -53,21 +53,25 @@ To: Linus Walleij <linus.walleij@linaro.org>,
 	=?UTF-8?q?Alvin=20=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
 	Andrew Lunn <andrew@lunn.ch>,
 	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiko Stuebner <heiko@sntech.de>
+Cc: "David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Yao Zi <ziyao@disroot.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Yao Zi <ziyao@disroot.org>,
 	Chukun Pan <amadeus@jmu.edu.cn>,
-	Heiko Stuebner <heiko@sntech.de>,
 	netdev@vger.kernel.org,
 	linux-rockchip@lists.infradead.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
-	Jonas Karlman <jonas@kwiboo.se>
-Subject: [PATCH net-next 2/3] net: dsa: realtek: Add support for use of an optional mdio node
-Date: Sun, 27 Jul 2025 18:02:59 +0000
-Message-ID: <20250727180305.381483-3-jonas@kwiboo.se>
+	Jonas Karlman <jonas@kwiboo.se>,
+	devicetree@vger.kernel.org
+Subject: [PATCH 3/3] arm64: dts: rockchip: Add RTL8367RB-VB switch to Radxa E24C
+Date: Sun, 27 Jul 2025 18:03:00 +0000
+Message-ID: <20250727180305.381483-4-jonas@kwiboo.se>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20250727180305.381483-1-jonas@kwiboo.se>
 References: <20250727180305.381483-1-jonas@kwiboo.se>
@@ -79,91 +83,110 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The dt-bindings schema for Realtek switches for unmanaged switches
-contains a restriction on use of a mdio child OF node for MDIO-connected
-switches, i.e.:
+The Radxa E24C has a Realtek RTL8367RB-VB switch with four usable ports
+and is connected using a fixed-link to GMAC1 on the RK3528 SoC.
 
-  if:
-    required:
-      - reg
-  then:
-    not:
-      required:
-        - mdio
-    properties:
-      mdio: false
-
-However, the driver currently requires the existence of a mdio child OF
-node to successfully probe and properly function.
-
-Relax the requirement of a mdio child OF node and assign the dsa_switch
-user_mii_bus to allow a MDIO-connected switch to probe and function
-when a mdio child OF node is missing.
+Add an ethernet-switch node to describe the RTL8367RB-VB switch.
 
 Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
 ---
- drivers/net/dsa/realtek/rtl83xx.c | 26 ++++++++++++++++++++++----
- 1 file changed, 22 insertions(+), 4 deletions(-)
+Initial testing with iperf3 showed ~930-940 Mbits/sec in one direction
+and only around ~1-2 Mbits/sec in the other direction.
 
-diff --git a/drivers/net/dsa/realtek/rtl83xx.c b/drivers/net/dsa/realtek/rtl83xx.c
-index 9a05616acea8..47a09b27c4fa 100644
---- a/drivers/net/dsa/realtek/rtl83xx.c
-+++ b/drivers/net/dsa/realtek/rtl83xx.c
-@@ -1,5 +1,6 @@
- // SPDX-License-Identifier: GPL-2.0+
+The RK3528 hardware design guide recommends that timing between TXCLK
+and data is controlled by MAC, and timing between RXCLK and data is
+controlled by PHY.
+
+Any mix of MAC (rx/tx delay) and switch (rx/tx internal delay) did not
+seem to resolve this speed issue, however dropping snps,tso seems to fix
+that issue.
+
+Unsure what is best here, should MAC or switch add the delays? Here I
+just followed DT from vendor downstream tree and added rx/tx internal
+delay to switch.
+
+Vendor downstream DT also adds 'pause' to the fixed-link nodes, and this
+may be something that should be added here. However, during testing flow
+control always ended up being disabled so I skipped 'pause' here.
+
+Schematics: https://dl.radxa.com/e/e24c/docs/radxa_e24c_v1200_schematic.pdf
+---
+ .../boot/dts/rockchip/rk3528-radxa-e24c.dts   | 55 +++++++++++++++++++
+ 1 file changed, 55 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/rockchip/rk3528-radxa-e24c.dts b/arch/arm64/boot/dts/rockchip/rk3528-radxa-e24c.dts
+index 225f2b0c5339..26754ff7f4ef 100644
+--- a/arch/arm64/boot/dts/rockchip/rk3528-radxa-e24c.dts
++++ b/arch/arm64/boot/dts/rockchip/rk3528-radxa-e24c.dts
+@@ -196,6 +196,7 @@ &cpu3 {
+ };
  
-+#include <linux/irqdomain.h>
- #include <linux/module.h>
- #include <linux/regmap.h>
- #include <linux/of_mdio.h>
-@@ -64,7 +65,7 @@ static int rtl83xx_user_mdio_write(struct mii_bus *bus, int addr, int regnum,
-  * @ds: DSA switch associated with this user_mii_bus
-  *
-  * Registers the MDIO bus for built-in Ethernet PHYs, and associates it with
-- * the mandatory 'mdio' child OF node of the switch.
-+ * the optional 'mdio' child OF node of the switch.
-  *
-  * Context: Can sleep.
-  * Return: 0 on success, negative value for failure.
-@@ -75,11 +76,14 @@ int rtl83xx_setup_user_mdio(struct dsa_switch *ds)
- 	struct device_node *mdio_np;
- 	struct mii_bus *bus;
- 	int ret = 0;
-+	int irq;
-+	int i;
- 
- 	mdio_np = of_get_child_by_name(priv->dev->of_node, "mdio");
--	if (!mdio_np) {
--		dev_err(priv->dev, "no MDIO bus node\n");
--		return -ENODEV;
-+	if (mdio_np && !of_device_is_available(mdio_np)) {
-+		dev_err(priv->dev, "no available MDIO bus node\n");
-+		ret = -ENODEV;
-+		goto err_put_node;
- 	}
- 
- 	bus = devm_mdiobus_alloc(priv->dev);
-@@ -95,6 +99,20 @@ int rtl83xx_setup_user_mdio(struct dsa_switch *ds)
- 	snprintf(bus->id, MII_BUS_ID_SIZE, "%s:user_mii", dev_name(priv->dev));
- 	bus->parent = priv->dev;
- 
-+	if (!mdio_np) {
-+		ds->user_mii_bus = bus;
-+		bus->phy_mask = ~ds->phys_mii_mask;
+ &gmac1 {
++	/delete-property/ snps,tso;
+ 	clock_in_out = "output";
+ 	phy-mode = "rgmii-id";
+ 	phy-supply = <&avdd_rtl8367rb>;
+@@ -368,6 +369,60 @@ &mdio1 {
+ 	reset-delay-us = <25000>;
+ 	reset-gpios = <&gpio4 RK_PC2 GPIO_ACTIVE_LOW>;
+ 	reset-post-delay-us = <100000>;
 +
-+		if (priv->irqdomain) {
-+			for (i = 0; i < priv->num_ports; i++) {
-+				irq = irq_find_mapping(priv->irqdomain, i);
-+				if (irq < 0)
-+					continue;
-+				bus->irq[i] = irq;
-+			}
-+		}
-+	}
++	ethernet-switch@1d {
++		compatible = "realtek,rtl8365mb";
++		reg = <0x1d>;
++		pinctrl-names = "default";
++		pinctrl-0 = <&rtl8367rb_eint>;
 +
- 	ret = devm_of_mdiobus_register(priv->dev, bus, mdio_np);
- 	if (ret) {
- 		dev_err(priv->dev, "unable to register MDIO bus %s\n",
++		ethernet-ports {
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			ethernet-port@0 {
++				reg = <0>;
++				label = "wan";
++			};
++
++			ethernet-port@1 {
++				reg = <1>;
++				label = "lan1";
++			};
++
++			ethernet-port@2 {
++				reg = <2>;
++				label = "lan2";
++			};
++
++			ethernet-port@3 {
++				reg = <3>;
++				label = "lan3";
++			};
++
++			ethernet-port@6 {
++				reg = <6>;
++				ethernet = <&gmac1>;
++				label = "cpu";
++				phy-mode = "rgmii-id";
++				rx-internal-delay-ps = <2000>;
++				tx-internal-delay-ps = <2000>;
++
++				fixed-link {
++					speed = <1000>;
++					full-duplex;
++				};
++			};
++		};
++
++		interrupt-controller {
++			interrupt-parent = <&gpio1>;
++			interrupts = <RK_PC2 IRQ_TYPE_LEVEL_LOW>;
++			interrupt-controller;
++			#address-cells = <0>;
++			#interrupt-cells = <1>;
++		};
++	};
+ };
+ 
+ &pinctrl {
 -- 
 2.50.1
 
