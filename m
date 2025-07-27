@@ -1,265 +1,185 @@
-Return-Path: <netdev+bounces-210389-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210390-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69420B130E0
-	for <lists+netdev@lfdr.de>; Sun, 27 Jul 2025 19:16:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9EFEB130F2
+	for <lists+netdev@lfdr.de>; Sun, 27 Jul 2025 19:34:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6422B1897C84
-	for <lists+netdev@lfdr.de>; Sun, 27 Jul 2025 17:16:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 544093A4887
+	for <lists+netdev@lfdr.de>; Sun, 27 Jul 2025 17:33:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1765A21C16D;
-	Sun, 27 Jul 2025 17:16:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 221ED21A426;
+	Sun, 27 Jul 2025 17:34:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C4fz2h+C"
+	dkim=pass (1024-bit key) header.d=ionic.de header.i=@ionic.de header.b="qlMwJQHP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f173.google.com (mail-yb1-f173.google.com [209.85.219.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.ionic.de (ionic.de [145.239.234.145])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D7BE81724;
-	Sun, 27 Jul 2025 17:16:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28EB4610D;
+	Sun, 27 Jul 2025 17:34:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=145.239.234.145
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753636563; cv=none; b=phrG/EuqAIBL3a8kkEhcNkAkpvVgnYSg5zOoqsPvdPedJcDITZBxnlHBicjTZW0aH0cVfJgT7rJv+kxtybUH300hkz2UI+apcgLmYBkpflvwxVYFDZKCtScP5OCKEQQ2IBKT72e7h/F3dTbjb1xk9JKjsj32wqQxcmk48WBMovo=
+	t=1753637645; cv=none; b=ev+IF2PNYSEwNzJ6Zhq4PXuCA6qGvO32XOLqUG9eyYLyQ8evHBOhpkMxrch8O3nOKB5xWrGwFDyy3WflEDQoe4J2q8B3/e2xE8aTGjBX5BnNs2hvdVrsgulWhtu1oFNpeHeZ5J9wHqtxmK6ksB0lv2GKMMSAUzS91TW88zls+JU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753636563; c=relaxed/simple;
-	bh=5zwEztKCBSp4Obb3w98NdqATS2CMdS17Bv4hfZpxqlM=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=phrXvI1UkX2pvaXcw5efEL36I1NbTxF0DeGsLLTHcrht9DnbuQVGpU53sWpXiPBlscLcdA/+CjYRsgH+CLoWiCKz6smUxo6nD74bLSyYZ1DjnE9KMhMhiPqdGLjRKfM1ZGn/gV2S/yZ/e4H0biTitzrA1caluwGB0ycYt+95G7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C4fz2h+C; arc=none smtp.client-ip=209.85.219.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f173.google.com with SMTP id 3f1490d57ef6-e8e0aa2e3f9so523812276.1;
-        Sun, 27 Jul 2025 10:16:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753636560; x=1754241360; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kGOUWrUt6/KLdfWNCgo1PdzYDTwfxMfj9+QwMlA2V4s=;
-        b=C4fz2h+C5cJivA3s2ZoL1xKQ40nQw1YPvz2CIDaP+Z8Hr6yrkY0bmfwToeFkHugeC1
-         j4dmluAlzQxxVDMXSx3Z9kiyZobOSz4FG9emgsWSCTTh1XLahlbsv/9zXIKOsalkmFlo
-         morCvFeqGDirt8N8uBLd9xZ6gBXT+e+l5EPYTUdVkvLluHOdRRI4Id+Q33SewZVSeM7p
-         NzDd2j67vFP6uD76RZHNbm43MvwdP1YeENk11DI4bFoYNIClHo88hF4AcbOKJ4Xa26p1
-         46W50GM2G/oB5XOprrPgNnb9xn6aMLdwxQFL1FOjkD+tqFJdscRMbXXqBuGTcNtA5ao/
-         S7iw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753636560; x=1754241360;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=kGOUWrUt6/KLdfWNCgo1PdzYDTwfxMfj9+QwMlA2V4s=;
-        b=ex5fA/TqNn+GXhL3nQ/I5pfKq+57w0sBzQQWhOLK/0kRrOHMP38bj9mr97S7rQGmZX
-         Uu7P1zBnKnFKI12HC7z9EidwoyztP/Pw5IY4m4fM6psyR3tsvA+U0jGGye5wuEUxuDf3
-         18tmSw+lrZowfgpxvtieWNfMb4BmR8Tg/3is+w58nBMCXvwD2ZtHrS+6j4gtrU70e/zP
-         p8qPjma9A9xH2ZeDhPypmiZbiM/uT296+ecTv9vKk+0hCKd6cdpRstCipvfVQJvUvuu6
-         lSLfTRlCOwFUt5b6oSqj55Zio5Z+0HefVUevlvliEM+3mAhVsx6j8T0votObrzx4KG+q
-         JZHQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUn+J3ZToNAzEBNpU6/trl0YYz8MWNFZ8JKMN587abBaZIT833C3UXs27ZKoKyAhiCUMoBAN1adTuLjBKE=@vger.kernel.org, AJvYcCV/CbDAHouAYKtSYgtH4zN2my4nvhT8VbOybbRfy6um990qmRVLFZwwN6gcIRMcV9AKSyOy+6Nd@vger.kernel.org
-X-Gm-Message-State: AOJu0YzL3lB3AcfK8HjqEn9RL5dC9suKzgSaqJgkZkDNCXWlhYHFZfUV
-	cE84EdDjE4CTq+TRmbYaGIDxhwsXP88So1rnqgWGPeV+hvicBklgX9nhUre8KA==
-X-Gm-Gg: ASbGnctCJFVpyfYRtzM2WEr7dhqC/wTNuNPv9412mQUl5R18AlIoI0/5VOGa3rRNSjm
-	2gZS/2Fkzq6XdSzAQVALOnvYLmDRPnR88pRFvzMYBdXBQoB3ADKp8Yb5m3Oc+m0Xoqf8nnaKYcb
-	872pE3VpbbAUgz4OHSoBs7l42r2p6WrkaFSgvzxVBd/aRlneU6g2kuybiM5FzVhwykHLdexsBSF
-	e9H69l+ErwoW8wtGubyRLBY/R5dj/7tlZ6o65QLjtRqG/RPxog2htR4RV6NCwDTmLD9HCdAX5t6
-	4nyt1+t6mUWAr1mZN1ctcNkGkSgYcb5F55ARV9gcd0S0uUtprp/fV7Sd6be2oQrsV1cfPnh1RCD
-	U3IBD3dTJ3tlXC3YUbaOcvjQUlbsp2TSX+9pH8gH31HoWP7706bCtUxsakyMsW4kovKaQtLdhb2
-	jjfsn6
-X-Google-Smtp-Source: AGHT+IGRgpb969BkgC8x+v/hneqLAXkS6hiR4nYVLPk3riGZTJwJFQzLzbOyOO7L6LzJGp8caBw9fQ==
-X-Received: by 2002:a05:6902:f84:b0:e8d:ed8a:af5e with SMTP id 3f1490d57ef6-e8df10d2b6fmr10951855276.10.1753636560041;
-        Sun, 27 Jul 2025 10:16:00 -0700 (PDT)
-Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
-        by smtp.gmail.com with UTF8SMTPSA id 3f1490d57ef6-e8dff798feesm1136342276.4.2025.07.27.10.15.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 27 Jul 2025 10:15:59 -0700 (PDT)
-Date: Sun, 27 Jul 2025 13:15:58 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Wang Liang <wangliang74@huawei.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- mst@redhat.com, 
- jasowang@redhat.com, 
- xuanzhuo@linux.alibaba.com, 
- eperezma@redhat.com, 
- pabeni@redhat.com, 
- davem@davemloft.net, 
- willemb@google.com, 
- atenart@kernel.org
-Cc: yuehaibing@huawei.com, 
- zhangchangzhong@huawei.com, 
- netdev@vger.kernel.org, 
- virtualization@lists.linux.dev, 
- linux-kernel@vger.kernel.org, 
- steffen.klassert@secunet.com, 
- tobias@strongswan.org
-Message-ID: <68865ecee5cc4_b1f6a29442@willemb.c.googlers.com.notmuch>
-In-Reply-To: <68865594e28d8_9f93f29443@willemb.c.googlers.com.notmuch>
-References: <20250724083005.3918375-1-wangliang74@huawei.com>
- <688235273230f_39271d29430@willemb.c.googlers.com.notmuch>
- <bef878c0-4d7f-4e9a-a05d-30f6fde31e3c@huawei.com>
- <68865594e28d8_9f93f29443@willemb.c.googlers.com.notmuch>
-Subject: Re: [PATCH net] net: check the minimum value of gso size in
- virtio_net_hdr_to_skb()
+	s=arc-20240116; t=1753637645; c=relaxed/simple;
+	bh=xuNLFOQWKxB9sop7LNDg3r7Q0QFBQfgq5ZLLennKUBU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=P7fL5ZVDgBNcDDJQkH3ghrbrSpExfAmMCZjlIoKtuWSxvmxLerV82kCB4NUA3kRchS88nayJUD6GNJq+1LnkIlNRTR7s27CrRFRn0hDq1LrrfPMyPQnAGy48FCb3r8Udg8grImn1g97uA0cSQyQg0mjz4MaW03lsf8OZjDFyM3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ionic.de; spf=pass smtp.mailfrom=ionic.de; dkim=pass (1024-bit key) header.d=ionic.de header.i=@ionic.de header.b=qlMwJQHP; arc=none smtp.client-ip=145.239.234.145
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ionic.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionic.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ionic.de; s=default;
+	t=1753637640; bh=xuNLFOQWKxB9sop7LNDg3r7Q0QFBQfgq5ZLLennKUBU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=qlMwJQHP65fJMG0cufCveK+7XMo0okvhjLYVvAHYxLSEOKf0OqTDajmjVKD3ax/wM
+	 XAYQYqYaT19Wu72bWCsPtNXIFqJhQTBTy6MhnGd2X49yDK//k2iAAuCtrQZx7KI4Nr
+	 6zUWdrfPMDM6TZvNWERqlWQg5jGnvKS+cy9HUwV8=
+Received: from [172.24.215.49] (unknown [185.102.219.57])
+	by mail.ionic.de (Postfix) with ESMTPSA id 1D4CC1480AF7;
+	Sun, 27 Jul 2025 19:34:00 +0200 (CEST)
+Message-ID: <19b393bf-6ba3-406b-8b5b-48a60e5aa855@ionic.de>
+Date: Sun, 27 Jul 2025 19:33:58 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 04/11] net: qrtr: support identical node ids
+To: Simon Horman <horms@kernel.org>
+Cc: linux-arm-msm@vger.kernel.org, Manivannan Sadhasivam <mani@kernel.org>,
+ Denis Kenzior <denkenz@gmail.com>, Eric Dumazet <edumazet@google.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Willem de Bruijn <willemb@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ Dan Carpenter <dan.carpenter@linaro.org>
+References: <cover.1753312999.git.ionic@ionic.de>
+ <8fc53fad3065a9860e3f44cf8853494dd6eb6b47.1753312999.git.ionic@ionic.de>
+ <20250724130836.GL1150792@horms.kernel.org>
+ <a42d70aa-76b8-4034-9695-2e639e6471a2@ionic.de>
+ <20250727144014.GX1367887@horms.kernel.org>
+Content-Language: en-US
+From: Mihai Moldovan <ionic@ionic.de>
+Autocrypt: addr=ionic@ionic.de; keydata=
+ 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
+ S0VlnF9z
+In-Reply-To: <20250727144014.GX1367887@horms.kernel.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------MN1VB316uqi3ZXTLfwfRi9ro"
 
-Willem de Bruijn wrote:
-> Wang Liang wrote:
-> > =
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------MN1VB316uqi3ZXTLfwfRi9ro
+Content-Type: multipart/mixed; boundary="------------h0nmMiWzcsjrt1x9mKWbiDK4";
+ protected-headers="v1"
+From: Mihai Moldovan <ionic@ionic.de>
+To: Simon Horman <horms@kernel.org>
+Cc: linux-arm-msm@vger.kernel.org, Manivannan Sadhasivam <mani@kernel.org>,
+ Denis Kenzior <denkenz@gmail.com>, Eric Dumazet <edumazet@google.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Willem de Bruijn <willemb@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ Dan Carpenter <dan.carpenter@linaro.org>
+Message-ID: <19b393bf-6ba3-406b-8b5b-48a60e5aa855@ionic.de>
+Subject: Re: [PATCH v3 04/11] net: qrtr: support identical node ids
+References: <cover.1753312999.git.ionic@ionic.de>
+ <8fc53fad3065a9860e3f44cf8853494dd6eb6b47.1753312999.git.ionic@ionic.de>
+ <20250724130836.GL1150792@horms.kernel.org>
+ <a42d70aa-76b8-4034-9695-2e639e6471a2@ionic.de>
+ <20250727144014.GX1367887@horms.kernel.org>
+In-Reply-To: <20250727144014.GX1367887@horms.kernel.org>
 
-> > =E5=9C=A8 2025/7/24 21:29, Willem de Bruijn =E5=86=99=E9=81=93:
-> > > Wang Liang wrote:
-> > >> When sending a packet with virtio_net_hdr to tun device, if the gs=
-o_type
-> > >> in virtio_net_hdr is SKB_GSO_UDP and the gso_size is less than udp=
-hdr
-> > >> size, below crash may happen.
-> > >>
-> > > gso_size is the size of the segment payload, excluding the transpor=
-t
-> > > header.
-> > >
-> > > This is probably not the right approach.
-> > >
-> > > Not sure how a GSO skb can be built that is shorter than even the
-> > > transport header. Maybe an skb_dump of the GSO skb can be elucidati=
-ng.
-> > >>   			return -EINVAL;
-> > >>   =
+--------------h0nmMiWzcsjrt1x9mKWbiDK4
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-> > >>   		/* Too small packets are not really GSO ones. */
-> > >> -- =
+KiBPbiA3LzI3LzI1IDE2OjQwLCBTaW1vbiBIb3JtYW4gd3JvdGU6DQo+IEkgdHJpZWQgYWdh
+aW4gd2l0aCB0aGUgbGF0ZXN0IGhlYWQsDQo+IGNvbW1pdCAyZmIyYjkwOTNjNWQgKCJzbGVl
+cF9pbmZvOiBUaGUgc3luY2hyb25pemVfc3JjdSgpIHNsZWVwcyIpLg0KPiBBbmQgaW4gdGhh
+dCBjYXNlIEkgbm8gbG9uZ2VyIHNlZSB0aGUgMXN0IHdhcm5pbmcsIGFib3V0IGxvY2tpbmcu
+DQo+IEkgdGhpbmsgdGhpcyBpcyB3aGF0IHlvdSBzYXcgdG9vLg0KDQpFeGFjdGx5ISBUb2dl
+dGhlciB3aXRoIGltcG9zc2libGUgY29uZGl0aW9uIHdhcm5pbmdzLCBidXQgdGhvc2UgYXJl
+IGFjdHVhbGx5IA0KZmluZS9pbnRlbmRlZC4NCg0KPiBUaGlzIHNlZW1zIHRvIGEgcmVncmVz
+c2lvbiBpbiBTbWF0Y2ggd3J0IHRoaXMgcGFydGljdWxhciBjYXNlIGZvciB0aGlzDQo+IGNv
+ZGUuIEkgYmlzZWN0ZWQgU21hdGNoIGFuZCBpdCBsb29rcyBsaWtlIGl0IHdhcyBpbnRyb2R1
+Y2VkIGluIGNvbW1pdA0KPiBkMDM2N2NkOGE5OTMgKCJyYW5nZXM6IHVzZSBhYnNvbHV0ZSBp
+bnN0ZWFkIGltcGxpZWQgZm9yIHBvc3NpYmx5X3RydWUvZmFsc2UiKQ0KT2gsIHRoYW5rIHlv
+dSB2ZXJ5IG11Y2guIEkgc3VzcGVjdGVkIHRoYXQgSSdtIGp1c3QgbWlzc2luZyBhIHNwZWNp
+YWwgc2NyaXB0IG9yIA0Kb3B0aW9uIG9yIGV2ZW4gYWRkaXRpb24gdG8gU21hc2ggKGdpdmVu
+IHRoYXQgRGFuIHNlZW1zIHRvIGhhdmUgcmV2YW1wZWQgaXRzIA0KbG9ja2luZyBjaGVjayBj
+b2RlIGluIDIwMjApLCBlc3BlY2lhbGx5IHNpbmNlIGl0IHNlZW1zIHRvIGJlIHNvIHdpZGVs
+eSB1c2VkIGluIA0Ka2VybmVsIGRldmVsb3BtZW50LCBidXQgbm90IGEgYnVnIGluIHRoZSBz
+b2Z0d2FyZSBpdHNlbGYuDQoNCg0KDQpNaWhhaQ0K
 
-> > >> 2.34.1
-> > >>
-> > =
+--------------h0nmMiWzcsjrt1x9mKWbiDK4--
 
-> > Thanks for your review!
-> =
+--------------MN1VB316uqi3ZXTLfwfRi9ro
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
-> Thanks for the dump and repro.
-> =
+-----BEGIN PGP SIGNATURE-----
 
-> I can indeed reproduce, only with the UDP_ENCAP_ESPINUDP setsockopt.
-> =
+wsF5BAABCAAjFiEEbhHQj3UzgcdE8cg8H9Yu2W4lOocFAmiGYwcFAwAAAAAACgkQH9Yu2W4lOofA
+xxAA0q/PFb1UUD6aj2S4/mQfcCGxu+bwvG/NwsAZL70XC0JBF4OjIAdmLQytzRJLBv5Rm34T3eB4
+9Uo4DEs31izz+jMpmqYKwPJy20it8+JAkjqJDTIt2FINNZG2p9rKkcMTgndKT6O5HhATFjFmtnou
+OK59kBDCWPT+6fBB4v5SyHu17U8H5+sSWa8IzKX0rm8ts4RUGLpVBA530Ag6t0fLr+LS2dhudxRq
+cTFjXKZM6+VqOgn2CF4JXrUM9gDLSRrYxKymln90nRLdIxx6a5xU/yqDXooaaq7RJzgRKXokXFto
+aLSDkSQv+sLHQNQzt/RbgWTo76kDAv7g96PqrXI6yamgGNi0gljx3k+YKniBwOD7MZZa8JU6Hatc
+045eFgoUKCHVrdHqw2ISSGwfLCJQwxPRfCDbDY0myr5TdGWcHTnwjQdfJJmKX2thRnn2cby5PJ9F
+WM3Fz8VtyasYTy3o9+r3LfCTYaAF0REUK/3M7XVbSbhpY9kR36ov1YLffwiMy3zRlY/7EjPWce2m
+oQq2TdbP3sTpJC6yW38nGsONCWjTlU3an/gr36Uw38IRqp8JpG/BPMdm6l3jTmo/C1ZXxFgs9l6H
+Ik8wBzYuPD83QiPJiWjTFvHmMPGPVjU8+KMhvlkiaaNiz5bj0gvh9A8T/oTG5K1XxWeD6JiY8hoq
+pIA=
+=dwe+
+-----END PGP SIGNATURE-----
 
-> > Here is the skb_dump result:
-> > =
-
-> >  =C2=A0=C2=A0=C2=A0 skb len=3D4 headroom=3D98 headlen=3D4 tailroom=3D=
-282
-> >  =C2=A0=C2=A0=C2=A0 mac=3D(64,14) mac_len=3D14 net=3D(78,20) trans=3D=
-98
-> >  =C2=A0=C2=A0=C2=A0 shinfo(txflags=3D0 nr_frags=3D0 gso(size=3D0 type=
-=3D0 segs=3D0))
-> >  =C2=A0=C2=A0=C2=A0 csum(0x8c start=3D140 offset=3D0 ip_summed=3D1 co=
-mplete_sw=3D0 valid=3D1 level=3D0)
-> =
-
-> So this is as expected not the original GSO skb, but a segment,
-> after udp_rcv_segment from udp_queue_rcv_skb.
-> =
-
-> It is a packet with skb->data pointing to the transport header, and
-> only 4B length. So this is an illegal UDP packet with length shorter
-> than sizeof(struct udphdr).
-> =
-
-> The packet does not enter xfrm4_gro_udp_encap_rcv, so we can exclude
-> that.
-> =
-
-> It does enter __xfrm4_udp_encap_rcv, which will return 1 because the
-> pskb_may_pull will fail. There is a negative integer overflow just
-> before that:
-> =
-
->         len =3D skb->len - sizeof(struct udphdr);
->         if (!pskb_may_pull(skb, sizeof(struct udphdr) + min(len, 8)))
->                 return 1;
-> =
-
-> This is true for all the segments btw, not just the last one. On
-> return of 1 here, the packet does not enter encap_rcv but gets
-> passed to the socket as a normal UDP packet:
-> =
-
-> 	/* If it's a keepalive packet, then just eat it.
-> 	 * If it's an encapsulated packet, then pass it to the
-> 	 * IPsec xfrm input.
-> 	 * Returns 0 if skb passed to xfrm or was dropped.
-> 	 * Returns >0 if skb should be passed to UDP.
-> 	 * Returns <0 if skb should be resubmitted (-ret is protocol)
-> 	 */
-> 	int xfrm4_udp_encap_rcv(struct sock *sk, struct sk_buff *skb)
-> =
-
-> But so the real bug, an skb with 4B in the UDP layer happens before
-> that.
-> =
-
-> An skb_dump in udp_queue_rcv_skb of the GSO skb shows
-> =
-
-> [  174.151409] skb len=3D190 headroom=3D64 headlen=3D190 tailroom=3D66
-> [  174.151409] mac=3D(64,14) mac_len=3D14 net=3D(78,20) trans=3D98
-> [  174.151409] shinfo(txflags=3D0 nr_frags=3D0 gso(size=3D4 type=3D6553=
-8 segs=3D0))
-> [  174.151409] csum(0x8c start=3D140 offset=3D0 ip_summed=3D3 complete_=
-sw=3D0 valid=3D1 level=3D0)
-> [  174.151409] hash(0x0 sw=3D0 l4=3D0) proto=3D0x0800 pkttype=3D2 iif=3D=
-8
-> [  174.151409] priority=3D0x0 mark=3D0x0 alloc_cpu=3D1 vlan_all=3D0x0
-> [  174.151409] encapsulation=3D0 inner(proto=3D0x0000, mac=3D0, net=3D0=
-, trans=3D0)
-> [  174.152101] dev name=3Dtun0 feat=3D0x00002000000048c1
-> =
-
-> And of segs[0] after segmentation
-> =
-
-> [  103.081442] skb len=3D38 headroom=3D64 headlen=3D38 tailroom=3D218
-> [  103.081442] mac=3D(64,14) mac_len=3D14 net=3D(78,20) trans=3D98
-> [  103.081442] shinfo(txflags=3D0 nr_frags=3D0 gso(size=3D0 type=3D0 se=
-gs=3D0))
-> [  103.081442] csum(0x8c start=3D140 offset=3D0 ip_summed=3D1 complete_=
-sw=3D0 valid=3D1 level=3D0)
-> [  103.081442] hash(0x0 sw=3D0 l4=3D0) proto=3D0x0800 pkttype=3D2 iif=3D=
-8
-> [  103.081442] priority=3D0x0 mark=3D0x0 alloc_cpu=3D0 vlan_all=3D0x0
-> [  103.081442] encapsulation=3D0 inner(proto=3D0x0000, mac=3D0, net=3D0=
-, trans=3D0)
-> =
-
-> So here translen is already 38 - (98-64) =3D=3D 38 - 34 =3D=3D 4.
-> =
-
-> So the bug happens in segmentation.
-> =
-
-> [ongoing ..]
-
-Oh of course, this is udp fragmentation offload (UFO):
-VIRTIO_NET_HDR_GSO_UDP.
-
-So only the first packet has an UDP header, and that explains why the
-other packets are only 4B.
-
-They are not UDP packets, but they have already entered the UDP stack
-due to this being GSO applied in udp_queue_rcv_skb.
-
-That was never intended to be used for UFO. Only for GRO, which does
-not build such packets.
-
-Maybe we should just drop UFO (SKB_GSO_UDP) packets in this code path?
-
+--------------MN1VB316uqi3ZXTLfwfRi9ro--
 
