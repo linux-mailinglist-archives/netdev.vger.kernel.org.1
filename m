@@ -1,165 +1,414 @@
-Return-Path: <netdev+bounces-210413-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210414-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B93EBB1327E
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 01:40:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87A3EB1328B
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 01:56:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CCE88188D6CA
-	for <lists+netdev@lfdr.de>; Sun, 27 Jul 2025 23:40:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE087174CF3
+	for <lists+netdev@lfdr.de>; Sun, 27 Jul 2025 23:56:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E65CE25228D;
-	Sun, 27 Jul 2025 23:40:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAA7123C512;
+	Sun, 27 Jul 2025 23:56:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mv4VjWjW"
+	dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b="ppWrvQGI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-10627.protonmail.ch (mail-10627.protonmail.ch [79.135.106.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62F6624C676;
-	Sun, 27 Jul 2025 23:40:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0404B1F0E26
+	for <netdev@vger.kernel.org>; Sun, 27 Jul 2025 23:56:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.27
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753659606; cv=none; b=sYVvrNZ8B7t4eiZdWSiAxeCNmpKek2nHlVBrqcXAzfB5bq3+LJs09YVhKaKXQXqFXkmJpp8XdISz8Zo21Z4sJmKVuIm7+i9dAzkIFYIZsyRfxghWRtaoPuXBzftXlmA+WYKtKmFo9U6zyjbN0R0wYk6m0wnhklJDQT829wNtb+U=
+	t=1753660609; cv=none; b=e7Cfj7hUX80m4cZD1fpMP02xPeu+yL1C81wbjOQ6ERzrEhqRQ99GwjeOpXj9//rfoNvLbWGK4QhAswY/jKAZ3raWkpbOoe/ywPWuuZeE66XHD4xL2Sebftcb7L80TEejPu2qK3hjS6fXnd0JSJOMPt/OssVHf+PI/ZLtC0ABnX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753659606; c=relaxed/simple;
-	bh=FFK/jbQGkSv5TR6tFiR2HkysiaKYhTzpPkOJ/+kVgY8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QvlCrC97hBeCAMe40uPbq7Fxa10eRkaXOqPpq/v03n2PCHZ0YZBqJFMLxVRbULsMHhZ7FR8urZSJQSCARpX6qeswriQWASQhIvFZiuAoVY2QfjyD5ToItlAZDho/7enYwIrmfKQBGgdvIkp05Bqoz/XXPMNJBn1tI9TiOhj8z2I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mv4VjWjW; arc=none smtp.client-ip=209.85.166.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-3df2d8cb8d2so17816925ab.2;
-        Sun, 27 Jul 2025 16:40:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753659604; x=1754264404; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=x2wL2azdKJgx7J4uTcrG5JE0GxUXAaFoKaRVUubWqLI=;
-        b=Mv4VjWjWa1knLO+LUKacRQ/j8ixWlhpBSIFB4tmfIOPIH0NBESE7GFvheGXZ4K0EOF
-         Oyl6g/J6SCK00x825sdr8ajizngdCf7wmwefznW1hDKrwHyv/CASikQzzYeQtJqC0J6e
-         PIn7+bsOEayTRg4poA/RBVdW4DxfQduEnqCGNNyPbTR1KWKvfSMonpXDDYPkfkX4mdTZ
-         sGACDc+jWTbfSlMIucRKmplWiRfe7zbVSZD4WAifGIFXa8JACNI/73uoaOdyKZJjGVIj
-         C8mxumfytl3GDvwXbpyYHSabqQWxL1ZfdsZqKVgfXtmOAZ7ffnDTwV1f6jdAthbYcs0Y
-         07YQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753659604; x=1754264404;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=x2wL2azdKJgx7J4uTcrG5JE0GxUXAaFoKaRVUubWqLI=;
-        b=UUdm6MBpDo7l9435bXHjlw3MY0TYvxu7pbFIDBdIiAZyUVjbbcMvMwPcdoBpczSXu8
-         C8CdwJhsljtJaSS5hvcTG9itZdiLYqO/fvJvCejBd5sXAE3QLjXaa6DCge5nX7rEjPMs
-         XXZ5S9b7eTg2MtUemvHi5d8C2B0eb9i/XNdLLMhm4PJ9uhI+p0iAt9C/bjpo/ePTO9yz
-         1nYg0Q2DjSFD2ndnFWzQ0BhQQZugbM59DsYJuFAk6un9YkMQW6jbDLAS5J+l9wcodEiN
-         k5yOq+jYQ+NOPzBa0QfMXUpM9/Ejni6f42j1uD+r1cXHP4U43Mzn14fZYeqXXD1pOkVB
-         yoHg==
-X-Forwarded-Encrypted: i=1; AJvYcCUv3SZt+ggwEy/rioY6+oImj/uNIiw01+xhub+QWHrbO/6B8Ps9PMMl2K7WKT1LOcmzLr6qtdyO1NP0DDc=@vger.kernel.org, AJvYcCW6LDSWRZjduvhCgOH0MWrr5Rl5ALu1LoDPuM9m744Ck4rfS6Sbqif+sCt6igFqMY3hz7lJV6Le@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx0iBCUwJhwdO3NwHnnO0bE6JjT+eTdiGI+AJkZeNv29+degpwg
-	y79fW4z8XKq/rr/nZgBBcUxC0ZE1TMlMGe30A5TusCfLgWwiHvD59fx6IoOCpN6dqLVUpDlpbds
-	YlglUP/BQSXBbJbSv3B65Fp1Zk1CtUkY=
-X-Gm-Gg: ASbGnctWAJq3H3bznqhbwoWqxCWWRcdf01i4SLrfvP3ymPzmb3MoEmd/x9Iai/mQgNh
-	AFsULMrpxZLtcGkF81s2No6cnRvm+PdPOjBaC5C0DXojw7ma6NnN/fGbVqHpmy7zsO+v9tjkNIn
-	PEwz3OtKj2t+RHloGXDZvWWGNIEmv50j6d4AreU4Vsfoxmp2DyEO8B+7mYdn9ElL0uel1zRXzs2
-	T9pbQ==
-X-Google-Smtp-Source: AGHT+IF7Xj6nsks4HnGhw27xzEh01/M1K44tjCYV+y50D/BUE0SM9aNWe58FfFmYjYEEFrBXMylZRF3qn3YD25d83IY=
-X-Received: by 2002:a05:6e02:1985:b0:3df:3ad6:bfb2 with SMTP id
- e9e14a558f8ab-3e3c5312379mr109009725ab.17.1753659604342; Sun, 27 Jul 2025
- 16:40:04 -0700 (PDT)
+	s=arc-20240116; t=1753660609; c=relaxed/simple;
+	bh=+m7UH6pWZigDq7cVjpK5D7RI099enb9KVrUyCMpbTR4=;
+	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=rdEFLk/wy5EfN0jGpBScJtbym27WKbffi9xEPDeYIAD1Q2/geXXkRA7hK6+OeovhlMakBrGodmLXSY/99I7CeLdR6lpTypWyDaci0kvdXaZDrhxJ/YqyqnOYBBSqViXxE4jIe4+VO2N93HzYUKufUARRm43LCEhhoZssaLfjEvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io; spf=pass smtp.mailfrom=willsroot.io; dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b=ppWrvQGI; arc=none smtp.client-ip=79.135.106.27
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=willsroot.io
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=willsroot.io;
+	s=protonmail2; t=1753660597; x=1753919797;
+	bh=3c0yuvOHlGv/Vmeom/5IVzYs6YVT6VThawwKTJ1T4Vg=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=ppWrvQGIZmH7bzlFpqeEaCeTPY+gqkiEH0aHct6gJeSS8hPhXYoXP82PR/WTOTxgB
+	 dgFXIIkeFL8onyxuS8rKbLSXzfNx7ru+3Hr5Oip5HBkZiKFgIqCKox7hKPc3nxeDg5
+	 //AmDUxQSO3fmp40rvaevyScBjZuhk/2wCIyFNgK545Y3NvVX1dSvGwR0ezc3R39vW
+	 4OV1c3djDYG0S1PM/uwwBCxr5hmBUQg9mKA+qXF8aTAGPcipbbqimR/LP1hF6WKhPg
+	 CmqHoSAt6bnVbDk8RIwYeSs+dd3CKYGkkcThJefTzPRPhAeCjijws265mj4eZGCDEC
+	 AQ6Ceh7oe30+g==
+Date: Sun, 27 Jul 2025 23:56:32 +0000
+To: netdev@vger.kernel.org
+From: William Liu <will@willsroot.io>
+Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, pabeni@redhat.com, kuba@kernel.org, jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, horms@kernel.org, savy@syst3mfailure.io, victor@mojatatu.com, William Liu <will@willsroot.io>
+Subject: [PATCH net v4 1/2] net/sched: Fix backlog accounting in qdisc_dequeue_internal
+Message-ID: <20250727235602.216450-1-will@willsroot.io>
+Feedback-ID: 42723359:user:proton
+X-Pm-Message-ID: 3fa5e3166213a0e2e421c3134904a2e719307833
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250727231750.25626-1-27392025k@gmail.com>
-In-Reply-To: <20250727231750.25626-1-27392025k@gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Mon, 28 Jul 2025 07:39:28 +0800
-X-Gm-Features: Ac12FXzXU_X9JyFA45_CqQyF2HhLrDI_w0N7UlEXxRyoRC_OzuXbMWZpFTZgCNc
-Message-ID: <CAL+tcoD=KJdEPvWWg6BjYkD=q-5mUEARThGmdbnF=TbYTTM7wQ@mail.gmail.com>
-Subject: Re: [PATCH] net: atlantic: fix overwritten return value in Aquantia driver
-To: Tian <27392025k@gmail.com>
-Cc: irusskikh@marvell.com, netdev@vger.kernel.org, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-Hi Tian,
+This issue applies for the following qdiscs: hhf, fq, fq_codel, and
+fq_pie, and occurs in their change handlers when adjusting to the new
+limit. The problems are the following in the values passed to the
+subsequent qdisc_tree_reduce_backlog call given a tbf parent:
 
-On Mon, Jul 28, 2025 at 7:18=E2=80=AFAM Tian <27392025k@gmail.com> wrote:
->
-> From: tian <27392025k@gmail.com>
->
-> In hw_atl_utils.c and hw_atl_utils_fw2x.c, a return value is set and then
-> immediately overwritten by another call, which causes the original result
-> to be lost. This may hide errors that should be returned to the caller.
->
-> This patch fixes the logic to preserve the intended return values.
->
-> Signed-off-by: tian <27392025k@gmail.com>
+1. When the tbf parent runs out of tokens, skbs of these qdiscs will
+   be placed in gso_skb. Their peek handlers are qdisc_peek_dequeued,
+   which accounts for both qlen and backlog. However, in the case of
+   qdisc_dequeue_internal, ONLY qlen is accounted for when pulling
+   from gso_skb. This means that these qdiscs are missing a
+   qdisc_qstats_backlog_dec when dropping packets to satisfy the
+   new limit in their change handlers.
 
-A few suggestions as to the format and should be revised in the next revisi=
-on:
-1. add your full name (given name, surname) on the above signed-off-by line
-2. update the title like [patch net] to show which branch you're
-targeting. Next version should be [patch net v2]
-3. add Fixes: tag so that reviewers can easily know what problem you're sol=
-ving.
+   One can observe this issue with the following (with tc patched to
+   support a limit of 0):
 
-As to the patch itself, could you show us more about the potential
-race details? Like how it can be triggered, how 'err' value has
-adverse effect, what the call traces could be?
+   export TARGET=3Dfq
+   tc qdisc del dev lo root
+   tc qdisc add dev lo root handle 1: tbf rate 8bit burst 100b latency 1ms
+   tc qdisc replace dev lo handle 3: parent 1:1 $TARGET limit 1000
+   echo ''; echo 'add child'; tc -s -d qdisc show dev lo
+   ping -I lo -f -c2 -s32 -W0.001 127.0.0.1 2>&1 >/dev/null
+   echo ''; echo 'after ping'; tc -s -d qdisc show dev lo
+   tc qdisc change dev lo handle 3: parent 1:1 $TARGET limit 0
+   echo ''; echo 'after limit drop'; tc -s -d qdisc show dev lo
+   tc qdisc replace dev lo handle 2: parent 1:1 sfq
+   echo ''; echo 'post graft'; tc -s -d qdisc show dev lo
 
-Thanks,
-Jason
+   The second to last show command shows 0 packets but a positive
+   number (74) of backlog bytes. The problem becomes clearer in the
+   last show command, where qdisc_purge_queue triggers
+   qdisc_tree_reduce_backlog with the positive backlog and causes an
+   underflow in the tbf parent's backlog (4096 Mb instead of 0).
 
-> ---
->  drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_utils.c  | 2 +-
->  .../net/ethernet/aquantia/atlantic/hw_atl/hw_atl_utils_fw2x.c | 4 ++--
->  2 files changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_utils.c=
- b/drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_utils.c
-> index 7e88d7234b14..372f30e296ec 100644
-> --- a/drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_utils.c
-> +++ b/drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_utils.c
-> @@ -492,7 +492,7 @@ static int hw_atl_utils_init_ucp(struct aq_hw_s *self=
-,
->                                         self, self->mbox_addr,
->                                         self->mbox_addr !=3D 0U,
->                                         1000U, 10000U);
-> -       err =3D readx_poll_timeout_atomic(aq_fw1x_rpc_get, self,
-> +       err |=3D readx_poll_timeout_atomic(aq_fw1x_rpc_get, self,
->                                         self->rpc_addr,
->                                         self->rpc_addr !=3D 0U,
->                                         1000U, 100000U);
-> diff --git a/drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_utils_f=
-w2x.c b/drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_utils_fw2x.c
-> index 4d4cfbc91e19..45b7720fd49e 100644
-> --- a/drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_utils_fw2x.c
-> +++ b/drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_utils_fw2x.c
-> @@ -102,12 +102,12 @@ static int aq_fw2x_init(struct aq_hw_s *self)
->                                         self->mbox_addr !=3D 0U,
->                                         1000U, 10000U);
->
-> -       err =3D readx_poll_timeout_atomic(aq_fw2x_rpc_get,
-> +       err |=3D readx_poll_timeout_atomic(aq_fw2x_rpc_get,
->                                         self, self->rpc_addr,
->                                         self->rpc_addr !=3D 0U,
->                                         1000U, 100000U);
->
-> -       err =3D aq_fw2x_settings_get(self, &self->settings_addr);
-> +       err |=3D aq_fw2x_settings_get(self, &self->settings_addr);
->
->         return err;
->  }
-> --
-> 2.39.5 (Apple Git-154)
->
->
+2. fq_codel_change is also wrong in the non gso_skb case. It tracks
+   the amount to drop after the limit adjustment loop through
+   cstats.drop_count and cstats.drop_len, but these are also updated
+   in fq_codel_dequeue, and reset everytime if non-zero in that
+   function after a call to qdisc_tree_reduce_backlog.
+   If the drop path ever occurs in fq_codel_dequeue and
+   qdisc_dequeue_internal takes the non gso_skb path, then we would
+   reduce the backlog by an extra packet.
+
+To fix these issues, the codepath for all clients of
+qdisc_dequeue_internal has been simplified: codel, pie, hhf, fq,
+fq_pie, and fq_codel. qdisc_dequeue_internal handles the backlog
+adjustments for all cases that do not directly use the dequeue
+handler.
+
+Special care is taken for fq_codel_dequeue to account for the
+qdisc_tree_reduce_backlog call in its dequeue handler. The
+cstats reset is moved from the end to the beginning of
+fq_codel_dequeue, so the change handler can use cstats for
+proper backlog reduction accounting purposes. The drop_len and
+drop_count fields are not used elsewhere so this reordering in
+fq_codel_dequeue is ok.
+
+Fixes: 2d3cbfd6d54a ("net_sched: Flush gso_skb list too during ->change()")
+Fixes: 4b549a2ef4be ("fq_codel: Fair Queue Codel AQM")
+Fixes: 10239edf86f1 ("net-qdisc-hhf: Heavy-Hitter Filter (HHF) qdisc")
+Signed-off-by: William Liu <will@willsroot.io>
+Reviewed-by: Savino Dicanosa <savy@syst3mfailure.io>
+---
+v1 -> v2:
+  - Fix commit formatting
+  - There was a suggestion to split the patch apart into one for each
+    qdisc - however, individual qdisc behavior will be further broken
+    by this split due to the reliance on qdisc_dequeue_internal
+---
+ include/net/sch_generic.h |  9 +++++++--
+ net/sched/sch_codel.c     | 10 +++++-----
+ net/sched/sch_fq.c        | 14 +++++++-------
+ net/sched/sch_fq_codel.c  | 22 +++++++++++++++-------
+ net/sched/sch_fq_pie.c    | 10 +++++-----
+ net/sched/sch_hhf.c       |  6 +++---
+ net/sched/sch_pie.c       | 10 +++++-----
+ 7 files changed, 47 insertions(+), 34 deletions(-)
+
+diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
+index 638948be4c50..a24094a638dc 100644
+--- a/include/net/sch_generic.h
++++ b/include/net/sch_generic.h
+@@ -1038,10 +1038,15 @@ static inline struct sk_buff *qdisc_dequeue_interna=
+l(struct Qdisc *sch, bool dir
+ =09skb =3D __skb_dequeue(&sch->gso_skb);
+ =09if (skb) {
+ =09=09sch->q.qlen--;
++=09=09qdisc_qstats_backlog_dec(sch, skb);
++=09=09return skb;
++=09}
++=09if (direct) {
++=09=09skb =3D __qdisc_dequeue_head(&sch->q);
++=09=09if (skb)
++=09=09=09qdisc_qstats_backlog_dec(sch, skb);
+ =09=09return skb;
+ =09}
+-=09if (direct)
+-=09=09return __qdisc_dequeue_head(&sch->q);
+ =09else
+ =09=09return sch->dequeue(sch);
+ }
+diff --git a/net/sched/sch_codel.c b/net/sched/sch_codel.c
+index c93761040c6e..8dc467f665bb 100644
+--- a/net/sched/sch_codel.c
++++ b/net/sched/sch_codel.c
+@@ -103,7 +103,7 @@ static int codel_change(struct Qdisc *sch, struct nlatt=
+r *opt,
+ {
+ =09struct codel_sched_data *q =3D qdisc_priv(sch);
+ =09struct nlattr *tb[TCA_CODEL_MAX + 1];
+-=09unsigned int qlen, dropped =3D 0;
++=09unsigned int prev_qlen, prev_backlog;
+ =09int err;
+=20
+ =09err =3D nla_parse_nested_deprecated(tb, TCA_CODEL_MAX, opt,
+@@ -142,15 +142,15 @@ static int codel_change(struct Qdisc *sch, struct nla=
+ttr *opt,
+ =09=09WRITE_ONCE(q->params.ecn,
+ =09=09=09   !!nla_get_u32(tb[TCA_CODEL_ECN]));
+=20
+-=09qlen =3D sch->q.qlen;
++=09prev_qlen =3D sch->q.qlen;
++=09prev_backlog =3D sch->qstats.backlog;
+ =09while (sch->q.qlen > sch->limit) {
+ =09=09struct sk_buff *skb =3D qdisc_dequeue_internal(sch, true);
+=20
+-=09=09dropped +=3D qdisc_pkt_len(skb);
+-=09=09qdisc_qstats_backlog_dec(sch, skb);
+ =09=09rtnl_qdisc_drop(skb, sch);
+ =09}
+-=09qdisc_tree_reduce_backlog(sch, qlen - sch->q.qlen, dropped);
++=09qdisc_tree_reduce_backlog(sch, prev_qlen - sch->q.qlen,
++=09=09=09=09  prev_backlog - sch->qstats.backlog);
+=20
+ =09sch_tree_unlock(sch);
+ =09return 0;
+diff --git a/net/sched/sch_fq.c b/net/sched/sch_fq.c
+index 902ff5470607..986e71e3362c 100644
+--- a/net/sched/sch_fq.c
++++ b/net/sched/sch_fq.c
+@@ -1014,10 +1014,10 @@ static int fq_change(struct Qdisc *sch, struct nlat=
+tr *opt,
+ =09=09     struct netlink_ext_ack *extack)
+ {
+ =09struct fq_sched_data *q =3D qdisc_priv(sch);
++=09unsigned int prev_qlen, prev_backlog;
+ =09struct nlattr *tb[TCA_FQ_MAX + 1];
+-=09int err, drop_count =3D 0;
+-=09unsigned drop_len =3D 0;
+ =09u32 fq_log;
++=09int err;
+=20
+ =09err =3D nla_parse_nested_deprecated(tb, TCA_FQ_MAX, opt, fq_policy,
+ =09=09=09=09=09  NULL);
+@@ -1135,16 +1135,16 @@ static int fq_change(struct Qdisc *sch, struct nlat=
+tr *opt,
+ =09=09err =3D fq_resize(sch, fq_log);
+ =09=09sch_tree_lock(sch);
+ =09}
++
++=09prev_qlen =3D sch->q.qlen;
++=09prev_backlog =3D sch->qstats.backlog;
+ =09while (sch->q.qlen > sch->limit) {
+ =09=09struct sk_buff *skb =3D qdisc_dequeue_internal(sch, false);
+=20
+-=09=09if (!skb)
+-=09=09=09break;
+-=09=09drop_len +=3D qdisc_pkt_len(skb);
+ =09=09rtnl_kfree_skbs(skb, skb);
+-=09=09drop_count++;
+ =09}
+-=09qdisc_tree_reduce_backlog(sch, drop_count, drop_len);
++=09qdisc_tree_reduce_backlog(sch, prev_qlen - sch->q.qlen,
++=09=09=09=09  prev_backlog - sch->qstats.backlog);
+=20
+ =09sch_tree_unlock(sch);
+ =09return err;
+diff --git a/net/sched/sch_fq_codel.c b/net/sched/sch_fq_codel.c
+index 2a0f3a513bfa..f9e6d76a1712 100644
+--- a/net/sched/sch_fq_codel.c
++++ b/net/sched/sch_fq_codel.c
+@@ -286,6 +286,10 @@ static struct sk_buff *fq_codel_dequeue(struct Qdisc *=
+sch)
+ =09struct fq_codel_flow *flow;
+ =09struct list_head *head;
+=20
++=09/* reset these here, as change needs them for proper accounting*/
++=09q->cstats.drop_count =3D 0;
++=09q->cstats.drop_len =3D 0;
++
+ begin:
+ =09head =3D &q->new_flows;
+ =09if (list_empty(head)) {
+@@ -319,8 +323,6 @@ static struct sk_buff *fq_codel_dequeue(struct Qdisc *s=
+ch)
+ =09if (q->cstats.drop_count) {
+ =09=09qdisc_tree_reduce_backlog(sch, q->cstats.drop_count,
+ =09=09=09=09=09  q->cstats.drop_len);
+-=09=09q->cstats.drop_count =3D 0;
+-=09=09q->cstats.drop_len =3D 0;
+ =09}
+ =09return skb;
+ }
+@@ -366,8 +368,10 @@ static const struct nla_policy fq_codel_policy[TCA_FQ_=
+CODEL_MAX + 1] =3D {
+ static int fq_codel_change(struct Qdisc *sch, struct nlattr *opt,
+ =09=09=09   struct netlink_ext_ack *extack)
+ {
++=09unsigned int dropped_qlen =3D 0, dropped_backlog =3D 0;
+ =09struct fq_codel_sched_data *q =3D qdisc_priv(sch);
+ =09struct nlattr *tb[TCA_FQ_CODEL_MAX + 1];
++=09unsigned int prev_qlen, prev_backlog;
+ =09u32 quantum =3D 0;
+ =09int err;
+=20
+@@ -439,17 +443,21 @@ static int fq_codel_change(struct Qdisc *sch, struct =
+nlattr *opt,
+ =09=09WRITE_ONCE(q->memory_limit,
+ =09=09=09   min(1U << 31, nla_get_u32(tb[TCA_FQ_CODEL_MEMORY_LIMIT])));
+=20
++=09prev_qlen =3D sch->q.qlen;
++=09prev_backlog =3D sch->qstats.backlog;
+ =09while (sch->q.qlen > sch->limit ||
+ =09       q->memory_usage > q->memory_limit) {
+ =09=09struct sk_buff *skb =3D qdisc_dequeue_internal(sch, false);
+=20
+-=09=09q->cstats.drop_len +=3D qdisc_pkt_len(skb);
++=09=09if (q->cstats.drop_count) {
++=09=09=09dropped_qlen +=3D q->cstats.drop_count;
++=09=09=09dropped_backlog +=3D q->cstats.drop_len;
++=09=09}
++
+ =09=09rtnl_kfree_skbs(skb, skb);
+-=09=09q->cstats.drop_count++;
+ =09}
+-=09qdisc_tree_reduce_backlog(sch, q->cstats.drop_count, q->cstats.drop_len=
+);
+-=09q->cstats.drop_count =3D 0;
+-=09q->cstats.drop_len =3D 0;
++=09qdisc_tree_reduce_backlog(sch, prev_qlen - dropped_qlen - sch->q.qlen,
++=09=09=09=09  prev_backlog - dropped_backlog - sch->qstats.backlog);
+=20
+ =09sch_tree_unlock(sch);
+ =09return 0;
+diff --git a/net/sched/sch_fq_pie.c b/net/sched/sch_fq_pie.c
+index b0e34daf1f75..8f49e9ff4f4c 100644
+--- a/net/sched/sch_fq_pie.c
++++ b/net/sched/sch_fq_pie.c
+@@ -289,8 +289,7 @@ static int fq_pie_change(struct Qdisc *sch, struct nlat=
+tr *opt,
+ {
+ =09struct fq_pie_sched_data *q =3D qdisc_priv(sch);
+ =09struct nlattr *tb[TCA_FQ_PIE_MAX + 1];
+-=09unsigned int len_dropped =3D 0;
+-=09unsigned int num_dropped =3D 0;
++=09unsigned int prev_qlen, prev_backlog;
+ =09int err;
+=20
+ =09err =3D nla_parse_nested(tb, TCA_FQ_PIE_MAX, opt, fq_pie_policy, extack=
+);
+@@ -365,14 +364,15 @@ static int fq_pie_change(struct Qdisc *sch, struct nl=
+attr *opt,
+ =09=09=09   nla_get_u32(tb[TCA_FQ_PIE_DQ_RATE_ESTIMATOR]));
+=20
+ =09/* Drop excess packets if new limit is lower */
++=09prev_qlen =3D sch->q.qlen;
++=09prev_backlog =3D sch->qstats.backlog;
+ =09while (sch->q.qlen > sch->limit) {
+ =09=09struct sk_buff *skb =3D qdisc_dequeue_internal(sch, false);
+=20
+-=09=09len_dropped +=3D qdisc_pkt_len(skb);
+-=09=09num_dropped +=3D 1;
+ =09=09rtnl_kfree_skbs(skb, skb);
+ =09}
+-=09qdisc_tree_reduce_backlog(sch, num_dropped, len_dropped);
++=09qdisc_tree_reduce_backlog(sch, prev_qlen - sch->q.qlen,
++=09=09=09=09  prev_backlog - sch->qstats.backlog);
+=20
+ =09sch_tree_unlock(sch);
+ =09return 0;
+diff --git a/net/sched/sch_hhf.c b/net/sched/sch_hhf.c
+index 5aa434b46707..011d1330aea5 100644
+--- a/net/sched/sch_hhf.c
++++ b/net/sched/sch_hhf.c
+@@ -509,8 +509,8 @@ static int hhf_change(struct Qdisc *sch, struct nlattr =
+*opt,
+ =09=09      struct netlink_ext_ack *extack)
+ {
+ =09struct hhf_sched_data *q =3D qdisc_priv(sch);
++=09unsigned int prev_qlen, prev_backlog;
+ =09struct nlattr *tb[TCA_HHF_MAX + 1];
+-=09unsigned int qlen, prev_backlog;
+ =09int err;
+ =09u64 non_hh_quantum;
+ =09u32 new_quantum =3D q->quantum;
+@@ -561,14 +561,14 @@ static int hhf_change(struct Qdisc *sch, struct nlatt=
+r *opt,
+ =09=09=09   usecs_to_jiffies(us));
+ =09}
+=20
+-=09qlen =3D sch->q.qlen;
++=09prev_qlen =3D sch->q.qlen;
+ =09prev_backlog =3D sch->qstats.backlog;
+ =09while (sch->q.qlen > sch->limit) {
+ =09=09struct sk_buff *skb =3D qdisc_dequeue_internal(sch, false);
+=20
+ =09=09rtnl_kfree_skbs(skb, skb);
+ =09}
+-=09qdisc_tree_reduce_backlog(sch, qlen - sch->q.qlen,
++=09qdisc_tree_reduce_backlog(sch, prev_qlen - sch->q.qlen,
+ =09=09=09=09  prev_backlog - sch->qstats.backlog);
+=20
+ =09sch_tree_unlock(sch);
+diff --git a/net/sched/sch_pie.c b/net/sched/sch_pie.c
+index ad46ee3ed5a9..af2646545a8a 100644
+--- a/net/sched/sch_pie.c
++++ b/net/sched/sch_pie.c
+@@ -142,8 +142,8 @@ static int pie_change(struct Qdisc *sch, struct nlattr =
+*opt,
+ =09=09      struct netlink_ext_ack *extack)
+ {
+ =09struct pie_sched_data *q =3D qdisc_priv(sch);
++=09unsigned int prev_qlen, prev_backlog;
+ =09struct nlattr *tb[TCA_PIE_MAX + 1];
+-=09unsigned int qlen, dropped =3D 0;
+ =09int err;
+=20
+ =09err =3D nla_parse_nested_deprecated(tb, TCA_PIE_MAX, opt, pie_policy,
+@@ -193,15 +193,15 @@ static int pie_change(struct Qdisc *sch, struct nlatt=
+r *opt,
+ =09=09=09   nla_get_u32(tb[TCA_PIE_DQ_RATE_ESTIMATOR]));
+=20
+ =09/* Drop excess packets if new limit is lower */
+-=09qlen =3D sch->q.qlen;
++=09prev_qlen =3D sch->q.qlen;
++=09prev_backlog =3D sch->qstats.backlog;
+ =09while (sch->q.qlen > sch->limit) {
+ =09=09struct sk_buff *skb =3D qdisc_dequeue_internal(sch, true);
+=20
+-=09=09dropped +=3D qdisc_pkt_len(skb);
+-=09=09qdisc_qstats_backlog_dec(sch, skb);
+ =09=09rtnl_qdisc_drop(skb, sch);
+ =09}
+-=09qdisc_tree_reduce_backlog(sch, qlen - sch->q.qlen, dropped);
++=09qdisc_tree_reduce_backlog(sch, prev_qlen - sch->q.qlen,
++=09=09=09=09  prev_backlog - sch->qstats.backlog);
+=20
+ =09sch_tree_unlock(sch);
+ =09return 0;
+--=20
+2.43.0
+
+
 
