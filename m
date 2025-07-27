@@ -1,94 +1,111 @@
-Return-Path: <netdev+bounces-210408-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210409-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54BD8B13209
-	for <lists+netdev@lfdr.de>; Sun, 27 Jul 2025 23:52:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A328AB13230
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 00:10:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C67B43A3DA7
-	for <lists+netdev@lfdr.de>; Sun, 27 Jul 2025 21:52:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D6ACB1892E71
+	for <lists+netdev@lfdr.de>; Sun, 27 Jul 2025 22:10:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 091E924676A;
-	Sun, 27 Jul 2025 21:52:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1B682417F0;
+	Sun, 27 Jul 2025 22:10:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=posteo.net header.i=@posteo.net header.b="jKOTtYK5"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="a3JWWBbg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.65])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8084A1DE4FB
-	for <netdev@vger.kernel.org>; Sun, 27 Jul 2025 21:52:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.67.36.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13C6AA93D;
+	Sun, 27 Jul 2025 22:10:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753653164; cv=none; b=k8aaSVrTZrYKbXIgXl1ctR1jpE0vbDRUPvEl4EkcjWuBv3taCaCA8Ay7VwZHtcOl3ovmYzm/W00gnlrLy5qi4WAYnw4W3IkRbqpg2cO+P4Bo/8aatpcIs0cALv3rIOM58v3XXwA/xHquotdnD7m+OZ69x7wJ2nuq1gdxUK8MZXo=
+	t=1753654214; cv=none; b=YbqajX0d5imikimqzTV3S20ndoiV1FjeGNsVx+cEmJqQ8y+cMTNPCEnJNXvHHdL2f8kVoCApcbwqxLUw9SPhFXdMsIE5IUN9A17RYq5a4fVz4s8kFq26ywWZ28rpVb7WYpr9jY2tReMSe8lsAHmhDFVQui4nfATMPRWcY+mgc+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753653164; c=relaxed/simple;
-	bh=BsFLu2PrnOgLDND8gTwXNZQyY3PMgtgnKbUSKqjTb4Q=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=AdSlT3XmAtjo94GTNPT6iWczhKXjVZAFl5MoPMrQ6lPVecaEoQw0XwY6g0DZ6tOOJbF7oIGMShVQRScmHb5gbe4QpJTdvBYzfyUjTRRMXpnGYbCHEEDmYY1UwJMBu3QjrumXj8kJhnUV/CnX3Y9OZsASVPDak210kYgIX3eMt3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net; spf=pass smtp.mailfrom=posteo.net; dkim=pass (3072-bit key) header.d=posteo.net header.i=@posteo.net header.b=jKOTtYK5; arc=none smtp.client-ip=185.67.36.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=posteo.net
-Received: from submission (posteo.de [185.67.36.169]) 
-	by mout01.posteo.de (Postfix) with ESMTPS id EE7BC240027
-	for <netdev@vger.kernel.org>; Sun, 27 Jul 2025 23:52:41 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=posteo.net;
-	s=1984.ea087b; t=1753653161;
-	bh=SOEe8sOFwoxGjcZfi3tvT/0iwJ9By2qEoi/cCaaRnw8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type:
-	 From;
-	b=jKOTtYK5scgzdWWs0FHxeGxx21P6miN5d+n5UBZxU2KytOo+dP099g0hh4cWUVA13
-	 uTG/S+AhZ+aGaqrdwHnRFtv1fasIPTxWU9o1aNnm0p85qAgwahpJGArikyaLUwB7D6
-	 QxG/J5YwnZrCzEvh9TntGPGzDoYgh4b6/t2NRMKA8pGN/zot+J7A8iXpJG2qv94yrL
-	 dDUlDmDj5BQTHwwpGzvYxoZOksqQFvXo1wWP6OrhmACVWHS3QbjxkznurVCcMIOaLX
-	 GSzdpqv9pQyDgGnR29QfH8b0W98bn8MObyyQ9a1kTrgK8gdKn3YRjyVtkEigLJFTLf
-	 cmjtP+sKbZRHcul3QoGLAcBKn1Xx8Jk7RMNolsG7icu9VUBfyLPCAKm/C2q3roXUNu
-	 xnzBO1J7H020SoZzPCMLG/yOIAIMzD5eTEv4VHzsYRKUzVUhxqDww/lkw3nVzJORfJ
-	 fhkyyAFpLrUklfw4Pi0YEg+NHSbXFgsZof2T7wFuZKS6rMMMu4b
-Received: from customer (localhost [127.0.0.1])
-	by submission (posteo.de) with ESMTPSA id 4bqwMC2flRz9rxf;
-	Sun, 27 Jul 2025 23:52:39 +0200 (CEST)
-From: Charalampos Mitrodimas <charmitro@posteo.net>
-To: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,  "David S. Miller"
- <davem@davemloft.net>,  David Ahern <dsahern@kernel.org>,  Eric Dumazet
- <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni
- <pabeni@redhat.com>,  Simon Horman <horms@kernel.org>,
-  netdev@vger.kernel.org,  linux-kernel@vger.kernel.org,
-  syzbot+01b0667934cdceb4451c@syzkaller.appspotmail.com
-Subject: Re: [PATCH net] net: ipv6: fix buffer overflow in AH output
-In-Reply-To: <20250727-ah6-buffer-overflow-v1-1-1f3e11fa98db@posteo.net>
-References: <20250727-ah6-buffer-overflow-v1-1-1f3e11fa98db@posteo.net>
-Date: Sun, 27 Jul 2025 21:52:41 +0000
-Message-ID: <8734ahcndl.fsf@posteo.net>
+	s=arc-20240116; t=1753654214; c=relaxed/simple;
+	bh=3kyG1IazvV/8Ec/Gj7W75f8I8wq+hLT89q5Ubaeyhp0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Nww00t7Uid2IZRAiTlxcVHZg+7Rbfy3sd3yk7vloTYWbjqQHBwt0GnAdLVsQ+TcrJ9/Ynf++AjkoLAo5clLrdfK1fobolMolP/3YRFgb/FN2r24AyQjqA6vDTWXHU4c1Vh6Ul2yARK9QA5hsXamSPAyaKBPWsWsjZsGnh3IQ7xQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=a3JWWBbg; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=t/jnNvXwMwP/wlxBr4uBLC+uY9MAFOThnol22yK/3c8=; b=a3JWWBbg9YFowWswUBsk6pUvX3
+	Rh4dPuNeU9H5G40l+UPMxX00OBxVa3l9v4CiBzUGLb93SYCbfPUecKsarml8MMQT9W7QZxzC+KgCv
+	Ab9aWaBJCc8YLWUEXDhdfAIQuMwCNpV+U7Q/RvZ+q52cuWMKzmOFh9HsSZAG1JAUGlwk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1ug9Yw-0031rJ-Aq; Mon, 28 Jul 2025 00:09:46 +0200
+Date: Mon, 28 Jul 2025 00:09:46 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jonas Karlman <jonas@kwiboo.se>
+Cc: Linus Walleij <linus.walleij@linaro.org>,
+	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Yao Zi <ziyao@disroot.org>, Chukun Pan <amadeus@jmu.edu.cn>,
+	Heiko Stuebner <heiko@sntech.de>, netdev@vger.kernel.org,
+	linux-rockchip@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 2/3] net: dsa: realtek: Add support for use of
+ an optional mdio node
+Message-ID: <9702f3da-f755-4392-bf2b-28814ee0a8c7@lunn.ch>
+References: <20250727180305.381483-1-jonas@kwiboo.se>
+ <20250727180305.381483-3-jonas@kwiboo.se>
+ <2504b605-24e7-4573-bec0-78f55688a482@lunn.ch>
+ <badef015-22ff-4232-a4d0-80d2034113ca@kwiboo.se>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <badef015-22ff-4232-a4d0-80d2034113ca@kwiboo.se>
 
-Charalampos Mitrodimas <charmitro@posteo.net> writes:
+> Something like above does not seem to work, I get following:
+> 
+>   mdio_bus stmmac-0: MDIO device at address 0 is missing.
+>   mdio_bus stmmac-0: MDIO device at address 1 is missing.
+>   mdio_bus stmmac-0: MDIO device at address 2 is missing.
+>   mdio_bus stmmac-0: MDIO device at address 3 is missing.
 
-> Fix a buffer overflow where extension headers are incorrectly copied
-> to the IPv6 address fields, resulting in a field-spanning write of up
-> to 40 bytes into a 16-byte field (IPv6 address).
->
->   memcpy: detected field-spanning write (size 40) of single field "&top_iph->saddr" at net/ipv6/ah6.c:439 (size 16)
->   WARNING: CPU: 0 PID: 8838 at net/ipv6/ah6.c:439 ah6_output+0xe7e/0x14e0 net/ipv6/ah6.c:439
->
-> The issue occurs in ah6_output() and ah6_output_done() where the code
-> attempts to save/restore extension headers by copying them to/from the
-> IPv6 source/destination address fields based on the CONFIG_IPV6_MIP6
-> setting.
->
-> Reported-by: syzbot+01b0667934cdceb4451c@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=b4169a1cfb945d2ed0ec
+O.K, So i was wrong.
 
-Oops, wrong syzbot dashboard link. v2 is sent.
+> And without an explicit 'mdio' child node the driver currently fails to
+> load and the switch is never registered:
+> 
+>   rtl8365mb-mdio stmmac-0:1d: found an RTL8367RB-VB switch
+>   rtl8365mb-mdio stmmac-0:1d: no MDIO bus node
+>   rtl8365mb-mdio stmmac-0:1d: could not set up MDIO bus
+>   rtl8365mb-mdio stmmac-0:1d: error -ENODEV: unable to register switch
 
-C. Mitrodimas
+So, not having an MDIO node was a long time ago seen as a short cut
+for when there was a clear 1:1 mapping between port number and PHY bus
+address. It still works, but it is somewhat deprecated. It also seems
+like it is become more normal to need additional properties, like what
+interrupt the PHY is using, the LEDs it has, etc.
+
+> 
+> With a 'mdio' child node 'make CHECK_DTBS=y' report something like:
+> 
+>   rockchip/rk3528-radxa-e24c.dtb: ethernet-switch@1d (realtek,rtl8365mb): mdio: False schema does not allow { [snip] }
+>         from schema $id: http://devicetree.org/schemas/net/dsa/realtek.yaml#
+> 
+> So something should probably be changed, the driver, dt-bindings or
+> possible both.
+
+I think you should allow an MDIO node in DT. This is the only DSA
+driver that i know of which does not allow it.
+
+	Andrew
 
