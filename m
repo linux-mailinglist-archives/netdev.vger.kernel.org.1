@@ -1,162 +1,134 @@
-Return-Path: <netdev+bounces-210353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210354-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24090B12EBB
-	for <lists+netdev@lfdr.de>; Sun, 27 Jul 2025 10:42:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C90BB12EC0
+	for <lists+netdev@lfdr.de>; Sun, 27 Jul 2025 10:57:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3FE491899805
-	for <lists+netdev@lfdr.de>; Sun, 27 Jul 2025 08:42:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72AEC3B3DDC
+	for <lists+netdev@lfdr.de>; Sun, 27 Jul 2025 08:56:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A8021F03C7;
-	Sun, 27 Jul 2025 08:42:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 069001E2823;
+	Sun, 27 Jul 2025 08:57:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DkGPnJij"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="rm0eDErI"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5B4C645;
-	Sun, 27 Jul 2025 08:42:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCB3A190676;
+	Sun, 27 Jul 2025 08:57:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753605749; cv=none; b=WCHUlkJSoJoJOeyvy8fwYqZSjvN4HsCOFWAF0HQ2vV9pqmCgNfk0oWrpPFWKJrynsWyb8zjcRSV/Cepme4aOrWZQN1SzA5gXi5n48nnEqY2RTzL9yzJ2sBYW/+c0RxSL7fpdj2Sxybzu9rSp1mv3/V4reB1RG1oSj0vSwuAR+es=
+	t=1753606632; cv=none; b=MbRNK3NeHVCU3/UmSyM5UMDuUFaW7hSyPtawxp3bzBWO+nnw5PQS1DmBP/O3M6wU+3vEERDTiyq6v9BqzRyBdNABpsJDkPVZikK2bfh4K2Ldp3w/bKutFiYSgTROOLye/SlofbEa5Z+osv45MNhw4sF0b6i4hSw94fxiLh/a22E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753605749; c=relaxed/simple;
-	bh=1FBsq3RJo4viUjTTcy8YHS5y2gw/+JTmgv3W+/1sNcc=;
+	s=arc-20240116; t=1753606632; c=relaxed/simple;
+	bh=a4FwOdv2RcrEcz4bH44MhknPhjU1EIT8dbqsYLeIkNk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H3cI0TZTF8HZYAKqyuT5JaQu1SPBAmtRu2tI0bF/xgAuxfDOaZL9kpecfY3orFWUaTyuiEzVnEAoZBKjsb+9JrDN5qMkMEVx3g7q1kLeIzaEI/n7IquTEmC4Bs0W2iSg83yXis+n6W/nsC3mgW5sAUPibUFgUCX/soYYuIAQjfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DkGPnJij; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8BB3C4CEEB;
-	Sun, 27 Jul 2025 08:42:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753605749;
-	bh=1FBsq3RJo4viUjTTcy8YHS5y2gw/+JTmgv3W+/1sNcc=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=V0Nij3kS22EH8PSJJTEuyW34e999ulY39VyX48C/GF5VTTIzKdU4/ELJ6mmLeETV7uu0GkyCLqV7u+L2Ti/YUEW3EyFsBdcMUZLTMO7dNm30xrrFDaB6VEGjG1aBUfndunNhl51FNCNLwzoCtz2MMGNoOgpJ1En1hx2Q2qGO8t0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=rm0eDErI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D20FC4CEEB;
+	Sun, 27 Jul 2025 08:57:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1753606632;
+	bh=a4FwOdv2RcrEcz4bH44MhknPhjU1EIT8dbqsYLeIkNk=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DkGPnJijKVgVkPNWynxQoXYQPWllTcSUGGm1qWoE2LkOL7WW0DJemmcv9Sj6aSeQl
-	 2ytVgW4bGL8CsGWfW+FIx/I8QYszufxSMK8hh0Ah0BnOMX+sHtXUwXDxRHTen1yKgk
-	 Py/RDpfVRcdEaWqIq4GLu2tahKmAaJ8FwgqL2ewnWQp2gdFG+HzdcUZ+XAedM0xRYG
-	 mXiiB0FSelfP5TrkzMo0oHwChQ/NCqmBmmq3Oqx94WNz042sqzXVttjVubxMfEq2/n
-	 3hgDKXKo1WrAMyBMu5RDFezLkTt1rf6WPI8Qhm1J2sDUnUHZRW2DIkEW9eLEmiemqT
-	 PDPtR5mqBBWZA==
-Date: Sun, 27 Jul 2025 10:42:25 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
+	b=rm0eDErI49pWQSAo1miOA8ZTT0xrXss2ye7yhbph/BYkZWXXKlY1SAyDci9FLRImC
+	 kRlaogBQ88Ji0LFUVfiYFnJoJF0as8RbT0AG/vvT++X48xrvJKz4BIsssu5DSLyPwX
+	 XHf0YPZ4TKIH1CMSvQr/+HaoHufL5RBilzUfODow=
+Date: Sun, 27 Jul 2025 10:57:09 +0200
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Sean Anderson <sean.anderson@linux.dev>,
+	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
-	Felix Fietkau <nbd@nbd.name>, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next v5 3/7] net: airoha: npu: Add
- wlan_{send,get}_msg NPU callbacks
-Message-ID: <aIXmcUCQe7-gm9--@lore-desk>
-References: <20250723-airoha-en7581-wlan-offlaod-v5-0-da92e0f8c497@kernel.org>
- <20250723-airoha-en7581-wlan-offlaod-v5-3-da92e0f8c497@kernel.org>
- <ff106cec-7e63-4475-a0e6-452bfcb823b3@linux.dev>
+	netdev@vger.kernel.org, Dave Ertman <david.m.ertman@intel.com>,
+	Saravana Kannan <saravanak@google.com>,
+	linux-kernel@vger.kernel.org, Michal Simek <michal.simek@amd.com>,
+	linux-arm-kernel@lists.infradead.org,
+	Ira Weiny <ira.weiny@intel.com>
+Subject: Re: [PATCH net v2 1/4] auxiliary: Support hexadecimal ids
+Message-ID: <2025072751-living-sheath-e601@gregkh>
+References: <2025071736-viscous-entertain-ff6c@gregkh>
+ <03e04d98-e5eb-41c0-8407-23cccd578dbe@linux.dev>
+ <2025071726-ramp-friend-a3e5@gregkh>
+ <5ee4bac4-957b-481a-8608-15886da458c2@linux.dev>
+ <20250720081705.GE402218@unreal>
+ <e4b5e4fa-45c4-4b67-b8f1-7d9ff9f8654f@linux.dev>
+ <20250723081356.GM402218@unreal>
+ <991cbb9a-a1b5-4ab8-9deb-9ecea203ce0f@linux.dev>
+ <2025072543-senate-hush-573d@gregkh>
+ <20250727080705.GY402218@unreal>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="KcwatzaRMwMSfQy/"
-Content-Disposition: inline
-In-Reply-To: <ff106cec-7e63-4475-a0e6-452bfcb823b3@linux.dev>
-
-
---KcwatzaRMwMSfQy/
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20250727080705.GY402218@unreal>
 
-> On 23/07/2025 18:19, Lorenzo Bianconi wrote:
-> > Introduce wlan_send_msg() and wlan_get_msg() NPU wlan callbacks used
-> > by the wlan driver (MT76) to initialize NPU module registers in order to
-> > offload wireless-wired traffic.
-> > This is a preliminary patch to enable wlan flowtable offload for EN7581
-> > SoC with MT76 driver.
-> >=20
-> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> > ---
-> >   drivers/net/ethernet/airoha/airoha_npu.c | 58 +++++++++++++++++++++++=
-+++++++++
-> >   drivers/net/ethernet/airoha/airoha_npu.h | 21 ++++++++++++
-> >   2 files changed, 79 insertions(+)
-> >=20
->=20
-> [...]
->=20
-> > @@ -131,6 +147,12 @@ struct wlan_mbox_data {
-> >   	u32 func_id;
-> >   	union {
-> >   		u32 data;
-> > +		struct {
-> > +			u32 dir;
-> > +			u32 in_counter_addr;
-> > +			u32 out_status_addr;
-> > +			u32 out_counter_addr;
-> > +		} txrx_addr;
-> >   		u8 stats[WLAN_MAX_STATS_SIZE];
-> >   	};
-> >   };
-> > @@ -424,6 +446,30 @@ static int airoha_npu_wlan_msg_send(struct airoha_=
-npu *npu, int ifindex,
-> >   	return err;
-> >   }
-> > +static int airoha_npu_wlan_msg_get(struct airoha_npu *npu, int ifindex,
-> > +				   enum airoha_npu_wlan_get_cmd func_id,
-> > +				   u32 *data, gfp_t gfp)
-> > +{
-> > +	struct wlan_mbox_data *wlan_data;
-> > +	int err;
-> > +
-> > +	wlan_data =3D kzalloc(sizeof(*wlan_data), gfp);
-> > +	if (!wlan_data)
-> > +		return -ENOMEM;
-> > +
-> > +	wlan_data->ifindex =3D ifindex;
-> > +	wlan_data->func_type =3D NPU_OP_GET;
-> > +	wlan_data->func_id =3D func_id;
-> > +
-> > +	err =3D airoha_npu_send_msg(npu, NPU_FUNC_WIFI, wlan_data,
-> > +				  sizeof(*wlan_data));
-> > +	if (!err)
-> > +		*data =3D wlan_data->data;
-> > +	kfree(wlan_data);
-> > +
-> > +	return err;
-> > +}
->=20
-> Am I reading it correct, that on message_get you allocate 4408 + 8 byte,
-> setting it 0, then reallocate the same size in airoha_npu_send_msg() and
-> copy the data, and then free both buffers, and this is all done just to
-> get u32 value back?
+On Sun, Jul 27, 2025 at 11:07:05AM +0300, Leon Romanovsky wrote:
+> On Fri, Jul 25, 2025 at 07:02:24AM +0200, Greg Kroah-Hartman wrote:
+> > On Thu, Jul 24, 2025 at 09:55:59AM -0400, Sean Anderson wrote:
+> > > On 7/23/25 04:13, Leon Romanovsky wrote:
+> > > > On Mon, Jul 21, 2025 at 10:29:32AM -0400, Sean Anderson wrote:
+> > > >> On 7/20/25 04:17, Leon Romanovsky wrote:
+> > > >> > On Thu, Jul 17, 2025 at 01:12:08PM -0400, Sean Anderson wrote:
+> > > >> >> On 7/17/25 12:33, Greg Kroah-Hartman wrote:
+> > > >> > 
+> > > >> > <...>
+> > > >> > 
+> > > >> >> Anyway, if you really think ids should be random or whatever, why not
+> > > >> >> just ida_alloc one in axiliary_device_init and ignore whatever's
+> > > >> >> provided? I'd say around half the auxiliary drivers just use 0 (or some
+> > > >> >> other constant), which is just as deterministic as using the device
+> > > >> >> address.
+> > > >> > 
+> > > >> > I would say that auxiliary bus is not right fit for such devices. This
+> > > >> > bus was introduced for more complex devices, like the one who has their
+> > > >> > own ida_alloc logic.
+> > > >> 
+> > > >> I'd say that around 2/3 of the auxiliary drivers that have non-constant
+> > > >> ids use ida_alloc solely for the auxiliary bus and for no other purpose.
+> > > >> I don't think that's the kind of complexity you're referring to.
+> > > >> 
+> > > >> >> Another third use ida_alloc (or xa_alloc) so all that could be
+> > > >> >> removed.
+> > > >> > 
+> > > >> > These ID numbers need to be per-device.
+> > > >> 
+> > > >> Why? They are arbitrary with no semantic meaning, right?
+> > > > 
+> > > > Yes, officially there is no meaning, and this is how we would like to
+> > > > keep it.
+> > > > 
+> > > > Right now, they are very correlated with with their respective PCI function number.
+> > > > Is it important? No, however it doesn't mean that we should proactively harm user
+> > > > experience just because we can do it.
+> > > > 
+> > > > [leonro@c ~]$ l /sys/bus/auxiliary/devices/
+> > > > ,,,
+> > > > rwxrwxrwx 1 root root 0 Jul 21 15:25 mlx5_core.rdma.0 -> ../../../devices/pci0000:00/0000:00:02.7/0000:0
+> > > > 8:00.0/mlx5_core.rdma.0
+> > > > lrwxrwxrwx 1 root root 0 Jul 21 15:25 mlx5_core.rdma.1 -> ../../../devices/pci0000:00/0000:00:02.7/0000:0
+> > > > 8:00.1/mlx5_core.rdma
+> > > 
+> > > Well, I would certainly like to have semantic meaning for ids. But apparently
+> > > that is only allowed if you can sneak it past the review process.
+> > 
+> > Do I need to dust off my "make all ids random" patch again and actually
+> > merge it just to prevent this from happening?
+> 
+> After weekend thoughts on it. IDs need to be removed from the driver
+> access. Let's make them global at least.
 
-ack, right. This is was the original approach in the vendor sdk.
-I will fix in v6.
-
-Regards,
-Lorenzo
-
-
---KcwatzaRMwMSfQy/
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaIXmcQAKCRA6cBh0uS2t
-rFrAAP4yzHsHYDp6pps4peenrqug/hiwFirsQerZGdFYZscxxgD/ZPuKL0EPUbb9
-du8EkSKxgOkHAkO0SUXlzjl0Dc4R+Q8=
-=TBNx
------END PGP SIGNATURE-----
-
---KcwatzaRMwMSfQy/--
+Great, no objection from me, want to send a patch we can queue up for
+6.18-rc1?
 
