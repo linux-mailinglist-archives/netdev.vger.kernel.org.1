@@ -1,54 +1,58 @@
-Return-Path: <netdev+bounces-210414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210415-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87A3EB1328B
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 01:56:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A0DDAB1328C
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 01:57:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE087174CF3
-	for <lists+netdev@lfdr.de>; Sun, 27 Jul 2025 23:56:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CAE0E174DA9
+	for <lists+netdev@lfdr.de>; Sun, 27 Jul 2025 23:57:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAA7123C512;
-	Sun, 27 Jul 2025 23:56:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AFFE25228D;
+	Sun, 27 Jul 2025 23:57:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b="ppWrvQGI"
+	dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b="CGQt7ErB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-10627.protonmail.ch (mail-10627.protonmail.ch [79.135.106.27])
+Received: from mail-4317.protonmail.ch (mail-4317.protonmail.ch [185.70.43.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0404B1F0E26
-	for <netdev@vger.kernel.org>; Sun, 27 Jul 2025 23:56:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.27
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABF5D24C676
+	for <netdev@vger.kernel.org>; Sun, 27 Jul 2025 23:57:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753660609; cv=none; b=e7Cfj7hUX80m4cZD1fpMP02xPeu+yL1C81wbjOQ6ERzrEhqRQ99GwjeOpXj9//rfoNvLbWGK4QhAswY/jKAZ3raWkpbOoe/ywPWuuZeE66XHD4xL2Sebftcb7L80TEejPu2qK3hjS6fXnd0JSJOMPt/OssVHf+PI/ZLtC0ABnX4=
+	t=1753660647; cv=none; b=jpuXE1acglYqwR1p1WXTCOfNvntAFRXlRdvkp80Xu5BFMtife1YwwkS99DsZBy25SFQ/3ROYNBrat2U0BQSlyEgvbNTAMXDpIIF45bU13azjYA/raeTO3SXG1hshUca+n3w4hyIctmfjjC2Yv0UcAHhXab/yIbqeG+uwl0w7osY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753660609; c=relaxed/simple;
-	bh=+m7UH6pWZigDq7cVjpK5D7RI099enb9KVrUyCMpbTR4=;
-	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=rdEFLk/wy5EfN0jGpBScJtbym27WKbffi9xEPDeYIAD1Q2/geXXkRA7hK6+OeovhlMakBrGodmLXSY/99I7CeLdR6lpTypWyDaci0kvdXaZDrhxJ/YqyqnOYBBSqViXxE4jIe4+VO2N93HzYUKufUARRm43LCEhhoZssaLfjEvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io; spf=pass smtp.mailfrom=willsroot.io; dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b=ppWrvQGI; arc=none smtp.client-ip=79.135.106.27
+	s=arc-20240116; t=1753660647; c=relaxed/simple;
+	bh=/5UgpumCN8IrYGClXUK3J48/YZx8XyXQbhDAJfzaqtg=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Ijj0GiFn5Qdu0q/1OffJ3C5Wx+YnUU3V6DKe43qe4vSaGfTJ4bM5YbFzGAGYOwX8wHy5e0qCyNa19xn3xhssiNwHrm0HMiGxXse+rsR1v5cbypABvZ9wya+4aMG7NvPqSgvkp2ZxEC5G4ylEqA9nsMphTyGJaSjv+eutuD2+wbQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io; spf=pass smtp.mailfrom=willsroot.io; dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b=CGQt7ErB; arc=none smtp.client-ip=185.70.43.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=willsroot.io
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=willsroot.io;
-	s=protonmail2; t=1753660597; x=1753919797;
-	bh=3c0yuvOHlGv/Vmeom/5IVzYs6YVT6VThawwKTJ1T4Vg=;
-	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=ppWrvQGIZmH7bzlFpqeEaCeTPY+gqkiEH0aHct6gJeSS8hPhXYoXP82PR/WTOTxgB
-	 dgFXIIkeFL8onyxuS8rKbLSXzfNx7ru+3Hr5Oip5HBkZiKFgIqCKox7hKPc3nxeDg5
-	 //AmDUxQSO3fmp40rvaevyScBjZuhk/2wCIyFNgK545Y3NvVX1dSvGwR0ezc3R39vW
-	 4OV1c3djDYG0S1PM/uwwBCxr5hmBUQg9mKA+qXF8aTAGPcipbbqimR/LP1hF6WKhPg
-	 CmqHoSAt6bnVbDk8RIwYeSs+dd3CKYGkkcThJefTzPRPhAeCjijws265mj4eZGCDEC
-	 AQ6Ceh7oe30+g==
-Date: Sun, 27 Jul 2025 23:56:32 +0000
+	s=protonmail2; t=1753660637; x=1753919837;
+	bh=o2XIJBuRkM7KtY0xtOtzZbweDQrM9GacTwEP1PuO8cY=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=CGQt7ErBOFif5du2KYsLAkSgEs3vPbP8vM2CXv4sOMd4MdAlmHw5Jts2+YK9sTvgc
+	 6PgRco/sWtLKChDtBf09Rz/9a/WSgp3n5wWTKaO657Xufei3VcEvya3jbbtys91Ufu
+	 755kmwimDaEOnz+MT1iPZLdc75apNq7n7JFpgKbaRJJM6tAdJ9JxwL3nmyH3DMvNGq
+	 Kd+P/1OYLgszz8y/FHR/UDlqjcx7hXOdsPr5qh52aVGBUPkuZqo7R1njajcEjOa8Rg
+	 CBaLWtUeGkFYxwCLaqGwcomGQYpw2jXzrlmbSTagRXH7r+Yin/D92kVFLlG3SOnupG
+	 /Tx4DNnkdV8Kg==
+Date: Sun, 27 Jul 2025 23:57:10 +0000
 To: netdev@vger.kernel.org
 From: William Liu <will@willsroot.io>
 Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, pabeni@redhat.com, kuba@kernel.org, jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, horms@kernel.org, savy@syst3mfailure.io, victor@mojatatu.com, William Liu <will@willsroot.io>
-Subject: [PATCH net v4 1/2] net/sched: Fix backlog accounting in qdisc_dequeue_internal
-Message-ID: <20250727235602.216450-1-will@willsroot.io>
+Subject: [PATCH net v4 2/2] selftests/tc-testing: Check backlog stats in gso_skb case
+Message-ID: <20250727235642.216527-1-will@willsroot.io>
+In-Reply-To: <20250727235602.216450-1-will@willsroot.io>
+References: <20250727235602.216450-1-will@willsroot.io>
 Feedback-ID: 42723359:user:proton
-X-Pm-Message-ID: 3fa5e3166213a0e2e421c3134904a2e719307833
+X-Pm-Message-ID: 948cce2fcfca3fae34819719cd936bf4a33bfb69
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,355 +62,255 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-This issue applies for the following qdiscs: hhf, fq, fq_codel, and
-fq_pie, and occurs in their change handlers when adjusting to the new
-limit. The problems are the following in the values passed to the
-subsequent qdisc_tree_reduce_backlog call given a tbf parent:
+Add tests to ensure proper backlog accounting in hhf, codel, pie, fq,
+fq_pie, and fq_codel qdiscs. We check for the bug pattern originally
+found in fq, fq_pie, and fq_codel, which was an underflow in the tbf
+parent backlog stats upon child qdisc removal.
 
-1. When the tbf parent runs out of tokens, skbs of these qdiscs will
-   be placed in gso_skb. Their peek handlers are qdisc_peek_dequeued,
-   which accounts for both qlen and backlog. However, in the case of
-   qdisc_dequeue_internal, ONLY qlen is accounted for when pulling
-   from gso_skb. This means that these qdiscs are missing a
-   qdisc_qstats_backlog_dec when dropping packets to satisfy the
-   new limit in their change handlers.
-
-   One can observe this issue with the following (with tc patched to
-   support a limit of 0):
-
-   export TARGET=3Dfq
-   tc qdisc del dev lo root
-   tc qdisc add dev lo root handle 1: tbf rate 8bit burst 100b latency 1ms
-   tc qdisc replace dev lo handle 3: parent 1:1 $TARGET limit 1000
-   echo ''; echo 'add child'; tc -s -d qdisc show dev lo
-   ping -I lo -f -c2 -s32 -W0.001 127.0.0.1 2>&1 >/dev/null
-   echo ''; echo 'after ping'; tc -s -d qdisc show dev lo
-   tc qdisc change dev lo handle 3: parent 1:1 $TARGET limit 0
-   echo ''; echo 'after limit drop'; tc -s -d qdisc show dev lo
-   tc qdisc replace dev lo handle 2: parent 1:1 sfq
-   echo ''; echo 'post graft'; tc -s -d qdisc show dev lo
-
-   The second to last show command shows 0 packets but a positive
-   number (74) of backlog bytes. The problem becomes clearer in the
-   last show command, where qdisc_purge_queue triggers
-   qdisc_tree_reduce_backlog with the positive backlog and causes an
-   underflow in the tbf parent's backlog (4096 Mb instead of 0).
-
-2. fq_codel_change is also wrong in the non gso_skb case. It tracks
-   the amount to drop after the limit adjustment loop through
-   cstats.drop_count and cstats.drop_len, but these are also updated
-   in fq_codel_dequeue, and reset everytime if non-zero in that
-   function after a call to qdisc_tree_reduce_backlog.
-   If the drop path ever occurs in fq_codel_dequeue and
-   qdisc_dequeue_internal takes the non gso_skb path, then we would
-   reduce the backlog by an extra packet.
-
-To fix these issues, the codepath for all clients of
-qdisc_dequeue_internal has been simplified: codel, pie, hhf, fq,
-fq_pie, and fq_codel. qdisc_dequeue_internal handles the backlog
-adjustments for all cases that do not directly use the dequeue
-handler.
-
-Special care is taken for fq_codel_dequeue to account for the
-qdisc_tree_reduce_backlog call in its dequeue handler. The
-cstats reset is moved from the end to the beginning of
-fq_codel_dequeue, so the change handler can use cstats for
-proper backlog reduction accounting purposes. The drop_len and
-drop_count fields are not used elsewhere so this reordering in
-fq_codel_dequeue is ok.
-
-Fixes: 2d3cbfd6d54a ("net_sched: Flush gso_skb list too during ->change()")
-Fixes: 4b549a2ef4be ("fq_codel: Fair Queue Codel AQM")
-Fixes: 10239edf86f1 ("net-qdisc-hhf: Heavy-Hitter Filter (HHF) qdisc")
 Signed-off-by: William Liu <will@willsroot.io>
 Reviewed-by: Savino Dicanosa <savy@syst3mfailure.io>
 ---
-v1 -> v2:
-  - Fix commit formatting
-  - There was a suggestion to split the patch apart into one for each
-    qdisc - however, individual qdisc behavior will be further broken
-    by this split due to the reliance on qdisc_dequeue_internal
+v3 -> v4:
+  - Unify tests to check against underflow in tbf stats on purge
+v2 -> v3:
+  - Simplify ping command in test cases
+  - Remove scapyPlugin dependency
 ---
- include/net/sch_generic.h |  9 +++++++--
- net/sched/sch_codel.c     | 10 +++++-----
- net/sched/sch_fq.c        | 14 +++++++-------
- net/sched/sch_fq_codel.c  | 22 +++++++++++++++-------
- net/sched/sch_fq_pie.c    | 10 +++++-----
- net/sched/sch_hhf.c       |  6 +++---
- net/sched/sch_pie.c       | 10 +++++-----
- 7 files changed, 47 insertions(+), 34 deletions(-)
+ .../tc-testing/tc-tests/infra/qdiscs.json     | 198 ++++++++++++++++++
+ 1 file changed, 198 insertions(+)
 
-diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
-index 638948be4c50..a24094a638dc 100644
---- a/include/net/sch_generic.h
-+++ b/include/net/sch_generic.h
-@@ -1038,10 +1038,15 @@ static inline struct sk_buff *qdisc_dequeue_interna=
-l(struct Qdisc *sch, bool dir
- =09skb =3D __skb_dequeue(&sch->gso_skb);
- =09if (skb) {
- =09=09sch->q.qlen--;
-+=09=09qdisc_qstats_backlog_dec(sch, skb);
-+=09=09return skb;
-+=09}
-+=09if (direct) {
-+=09=09skb =3D __qdisc_dequeue_head(&sch->q);
-+=09=09if (skb)
-+=09=09=09qdisc_qstats_backlog_dec(sch, skb);
- =09=09return skb;
- =09}
--=09if (direct)
--=09=09return __qdisc_dequeue_head(&sch->q);
- =09else
- =09=09return sch->dequeue(sch);
- }
-diff --git a/net/sched/sch_codel.c b/net/sched/sch_codel.c
-index c93761040c6e..8dc467f665bb 100644
---- a/net/sched/sch_codel.c
-+++ b/net/sched/sch_codel.c
-@@ -103,7 +103,7 @@ static int codel_change(struct Qdisc *sch, struct nlatt=
-r *opt,
- {
- =09struct codel_sched_data *q =3D qdisc_priv(sch);
- =09struct nlattr *tb[TCA_CODEL_MAX + 1];
--=09unsigned int qlen, dropped =3D 0;
-+=09unsigned int prev_qlen, prev_backlog;
- =09int err;
-=20
- =09err =3D nla_parse_nested_deprecated(tb, TCA_CODEL_MAX, opt,
-@@ -142,15 +142,15 @@ static int codel_change(struct Qdisc *sch, struct nla=
-ttr *opt,
- =09=09WRITE_ONCE(q->params.ecn,
- =09=09=09   !!nla_get_u32(tb[TCA_CODEL_ECN]));
-=20
--=09qlen =3D sch->q.qlen;
-+=09prev_qlen =3D sch->q.qlen;
-+=09prev_backlog =3D sch->qstats.backlog;
- =09while (sch->q.qlen > sch->limit) {
- =09=09struct sk_buff *skb =3D qdisc_dequeue_internal(sch, true);
-=20
--=09=09dropped +=3D qdisc_pkt_len(skb);
--=09=09qdisc_qstats_backlog_dec(sch, skb);
- =09=09rtnl_qdisc_drop(skb, sch);
- =09}
--=09qdisc_tree_reduce_backlog(sch, qlen - sch->q.qlen, dropped);
-+=09qdisc_tree_reduce_backlog(sch, prev_qlen - sch->q.qlen,
-+=09=09=09=09  prev_backlog - sch->qstats.backlog);
-=20
- =09sch_tree_unlock(sch);
- =09return 0;
-diff --git a/net/sched/sch_fq.c b/net/sched/sch_fq.c
-index 902ff5470607..986e71e3362c 100644
---- a/net/sched/sch_fq.c
-+++ b/net/sched/sch_fq.c
-@@ -1014,10 +1014,10 @@ static int fq_change(struct Qdisc *sch, struct nlat=
-tr *opt,
- =09=09     struct netlink_ext_ack *extack)
- {
- =09struct fq_sched_data *q =3D qdisc_priv(sch);
-+=09unsigned int prev_qlen, prev_backlog;
- =09struct nlattr *tb[TCA_FQ_MAX + 1];
--=09int err, drop_count =3D 0;
--=09unsigned drop_len =3D 0;
- =09u32 fq_log;
-+=09int err;
-=20
- =09err =3D nla_parse_nested_deprecated(tb, TCA_FQ_MAX, opt, fq_policy,
- =09=09=09=09=09  NULL);
-@@ -1135,16 +1135,16 @@ static int fq_change(struct Qdisc *sch, struct nlat=
-tr *opt,
- =09=09err =3D fq_resize(sch, fq_log);
- =09=09sch_tree_lock(sch);
- =09}
-+
-+=09prev_qlen =3D sch->q.qlen;
-+=09prev_backlog =3D sch->qstats.backlog;
- =09while (sch->q.qlen > sch->limit) {
- =09=09struct sk_buff *skb =3D qdisc_dequeue_internal(sch, false);
-=20
--=09=09if (!skb)
--=09=09=09break;
--=09=09drop_len +=3D qdisc_pkt_len(skb);
- =09=09rtnl_kfree_skbs(skb, skb);
--=09=09drop_count++;
- =09}
--=09qdisc_tree_reduce_backlog(sch, drop_count, drop_len);
-+=09qdisc_tree_reduce_backlog(sch, prev_qlen - sch->q.qlen,
-+=09=09=09=09  prev_backlog - sch->qstats.backlog);
-=20
- =09sch_tree_unlock(sch);
- =09return err;
-diff --git a/net/sched/sch_fq_codel.c b/net/sched/sch_fq_codel.c
-index 2a0f3a513bfa..f9e6d76a1712 100644
---- a/net/sched/sch_fq_codel.c
-+++ b/net/sched/sch_fq_codel.c
-@@ -286,6 +286,10 @@ static struct sk_buff *fq_codel_dequeue(struct Qdisc *=
-sch)
- =09struct fq_codel_flow *flow;
- =09struct list_head *head;
-=20
-+=09/* reset these here, as change needs them for proper accounting*/
-+=09q->cstats.drop_count =3D 0;
-+=09q->cstats.drop_len =3D 0;
-+
- begin:
- =09head =3D &q->new_flows;
- =09if (list_empty(head)) {
-@@ -319,8 +323,6 @@ static struct sk_buff *fq_codel_dequeue(struct Qdisc *s=
-ch)
- =09if (q->cstats.drop_count) {
- =09=09qdisc_tree_reduce_backlog(sch, q->cstats.drop_count,
- =09=09=09=09=09  q->cstats.drop_len);
--=09=09q->cstats.drop_count =3D 0;
--=09=09q->cstats.drop_len =3D 0;
- =09}
- =09return skb;
- }
-@@ -366,8 +368,10 @@ static const struct nla_policy fq_codel_policy[TCA_FQ_=
-CODEL_MAX + 1] =3D {
- static int fq_codel_change(struct Qdisc *sch, struct nlattr *opt,
- =09=09=09   struct netlink_ext_ack *extack)
- {
-+=09unsigned int dropped_qlen =3D 0, dropped_backlog =3D 0;
- =09struct fq_codel_sched_data *q =3D qdisc_priv(sch);
- =09struct nlattr *tb[TCA_FQ_CODEL_MAX + 1];
-+=09unsigned int prev_qlen, prev_backlog;
- =09u32 quantum =3D 0;
- =09int err;
-=20
-@@ -439,17 +443,21 @@ static int fq_codel_change(struct Qdisc *sch, struct =
-nlattr *opt,
- =09=09WRITE_ONCE(q->memory_limit,
- =09=09=09   min(1U << 31, nla_get_u32(tb[TCA_FQ_CODEL_MEMORY_LIMIT])));
-=20
-+=09prev_qlen =3D sch->q.qlen;
-+=09prev_backlog =3D sch->qstats.backlog;
- =09while (sch->q.qlen > sch->limit ||
- =09       q->memory_usage > q->memory_limit) {
- =09=09struct sk_buff *skb =3D qdisc_dequeue_internal(sch, false);
-=20
--=09=09q->cstats.drop_len +=3D qdisc_pkt_len(skb);
-+=09=09if (q->cstats.drop_count) {
-+=09=09=09dropped_qlen +=3D q->cstats.drop_count;
-+=09=09=09dropped_backlog +=3D q->cstats.drop_len;
-+=09=09}
-+
- =09=09rtnl_kfree_skbs(skb, skb);
--=09=09q->cstats.drop_count++;
- =09}
--=09qdisc_tree_reduce_backlog(sch, q->cstats.drop_count, q->cstats.drop_len=
-);
--=09q->cstats.drop_count =3D 0;
--=09q->cstats.drop_len =3D 0;
-+=09qdisc_tree_reduce_backlog(sch, prev_qlen - dropped_qlen - sch->q.qlen,
-+=09=09=09=09  prev_backlog - dropped_backlog - sch->qstats.backlog);
-=20
- =09sch_tree_unlock(sch);
- =09return 0;
-diff --git a/net/sched/sch_fq_pie.c b/net/sched/sch_fq_pie.c
-index b0e34daf1f75..8f49e9ff4f4c 100644
---- a/net/sched/sch_fq_pie.c
-+++ b/net/sched/sch_fq_pie.c
-@@ -289,8 +289,7 @@ static int fq_pie_change(struct Qdisc *sch, struct nlat=
-tr *opt,
- {
- =09struct fq_pie_sched_data *q =3D qdisc_priv(sch);
- =09struct nlattr *tb[TCA_FQ_PIE_MAX + 1];
--=09unsigned int len_dropped =3D 0;
--=09unsigned int num_dropped =3D 0;
-+=09unsigned int prev_qlen, prev_backlog;
- =09int err;
-=20
- =09err =3D nla_parse_nested(tb, TCA_FQ_PIE_MAX, opt, fq_pie_policy, extack=
-);
-@@ -365,14 +364,15 @@ static int fq_pie_change(struct Qdisc *sch, struct nl=
-attr *opt,
- =09=09=09   nla_get_u32(tb[TCA_FQ_PIE_DQ_RATE_ESTIMATOR]));
-=20
- =09/* Drop excess packets if new limit is lower */
-+=09prev_qlen =3D sch->q.qlen;
-+=09prev_backlog =3D sch->qstats.backlog;
- =09while (sch->q.qlen > sch->limit) {
- =09=09struct sk_buff *skb =3D qdisc_dequeue_internal(sch, false);
-=20
--=09=09len_dropped +=3D qdisc_pkt_len(skb);
--=09=09num_dropped +=3D 1;
- =09=09rtnl_kfree_skbs(skb, skb);
- =09}
--=09qdisc_tree_reduce_backlog(sch, num_dropped, len_dropped);
-+=09qdisc_tree_reduce_backlog(sch, prev_qlen - sch->q.qlen,
-+=09=09=09=09  prev_backlog - sch->qstats.backlog);
-=20
- =09sch_tree_unlock(sch);
- =09return 0;
-diff --git a/net/sched/sch_hhf.c b/net/sched/sch_hhf.c
-index 5aa434b46707..011d1330aea5 100644
---- a/net/sched/sch_hhf.c
-+++ b/net/sched/sch_hhf.c
-@@ -509,8 +509,8 @@ static int hhf_change(struct Qdisc *sch, struct nlattr =
-*opt,
- =09=09      struct netlink_ext_ack *extack)
- {
- =09struct hhf_sched_data *q =3D qdisc_priv(sch);
-+=09unsigned int prev_qlen, prev_backlog;
- =09struct nlattr *tb[TCA_HHF_MAX + 1];
--=09unsigned int qlen, prev_backlog;
- =09int err;
- =09u64 non_hh_quantum;
- =09u32 new_quantum =3D q->quantum;
-@@ -561,14 +561,14 @@ static int hhf_change(struct Qdisc *sch, struct nlatt=
-r *opt,
- =09=09=09   usecs_to_jiffies(us));
- =09}
-=20
--=09qlen =3D sch->q.qlen;
-+=09prev_qlen =3D sch->q.qlen;
- =09prev_backlog =3D sch->qstats.backlog;
- =09while (sch->q.qlen > sch->limit) {
- =09=09struct sk_buff *skb =3D qdisc_dequeue_internal(sch, false);
-=20
- =09=09rtnl_kfree_skbs(skb, skb);
- =09}
--=09qdisc_tree_reduce_backlog(sch, qlen - sch->q.qlen,
-+=09qdisc_tree_reduce_backlog(sch, prev_qlen - sch->q.qlen,
- =09=09=09=09  prev_backlog - sch->qstats.backlog);
-=20
- =09sch_tree_unlock(sch);
-diff --git a/net/sched/sch_pie.c b/net/sched/sch_pie.c
-index ad46ee3ed5a9..af2646545a8a 100644
---- a/net/sched/sch_pie.c
-+++ b/net/sched/sch_pie.c
-@@ -142,8 +142,8 @@ static int pie_change(struct Qdisc *sch, struct nlattr =
-*opt,
- =09=09      struct netlink_ext_ack *extack)
- {
- =09struct pie_sched_data *q =3D qdisc_priv(sch);
-+=09unsigned int prev_qlen, prev_backlog;
- =09struct nlattr *tb[TCA_PIE_MAX + 1];
--=09unsigned int qlen, dropped =3D 0;
- =09int err;
-=20
- =09err =3D nla_parse_nested_deprecated(tb, TCA_PIE_MAX, opt, pie_policy,
-@@ -193,15 +193,15 @@ static int pie_change(struct Qdisc *sch, struct nlatt=
-r *opt,
- =09=09=09   nla_get_u32(tb[TCA_PIE_DQ_RATE_ESTIMATOR]));
-=20
- =09/* Drop excess packets if new limit is lower */
--=09qlen =3D sch->q.qlen;
-+=09prev_qlen =3D sch->q.qlen;
-+=09prev_backlog =3D sch->qstats.backlog;
- =09while (sch->q.qlen > sch->limit) {
- =09=09struct sk_buff *skb =3D qdisc_dequeue_internal(sch, true);
-=20
--=09=09dropped +=3D qdisc_pkt_len(skb);
--=09=09qdisc_qstats_backlog_dec(sch, skb);
- =09=09rtnl_qdisc_drop(skb, sch);
- =09}
--=09qdisc_tree_reduce_backlog(sch, qlen - sch->q.qlen, dropped);
-+=09qdisc_tree_reduce_backlog(sch, prev_qlen - sch->q.qlen,
-+=09=09=09=09  prev_backlog - sch->qstats.backlog);
-=20
- =09sch_tree_unlock(sch);
- =09return 0;
+diff --git a/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json =
+b/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json
+index c6db7fa94f55..14c6224866e8 100644
+--- a/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json
++++ b/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json
+@@ -185,6 +185,204 @@
+             "$IP addr del 10.10.10.10/24 dev $DUMMY || true"
+         ]
+     },
++    {
++        "id": "34c0",
++        "name": "Test TBF with HHF Backlog Accounting in gso_skb case agai=
+nst underflow",
++        "category": [
++            "qdisc",
++            "tbf",
++            "hhf"
++        ],
++        "plugins": {
++            "requires": [
++                "nsPlugin"
++            ]
++        },
++        "setup": [
++            "$IP link set dev $DUMMY up || true",
++            "$IP addr add 10.10.11.10/24 dev $DUMMY || true",
++            "$TC qdisc add dev $DUMMY root handle 1: tbf rate 8bit burst 1=
+00b latency 100ms",
++            "$TC qdisc replace dev $DUMMY handle 2: parent 1:1 hhf limit 1=
+000",
++            [
++                "ping -I $DUMMY -c2 10.10.11.11",
++                1
++            ],
++            "$TC qdisc change dev $DUMMY handle 2: parent 1:1 hhf limit 1"
++        ],
++        "cmdUnderTest": "$TC qdisc del dev $DUMMY handle 2: parent 1:1",
++        "expExitCode": "0",
++        "verifyCmd": "$TC -s qdisc show dev $DUMMY",
++        "matchPattern": "backlog 0b 0p",
++        "matchCount": "1",
++        "teardown": [
++            "$TC qdisc del dev $DUMMY handle 1: root"
++        ]
++    },
++    {
++        "id": "fd68",
++        "name": "Test TBF with CODEL Backlog Accounting in gso_skb case ag=
+ainst underflow",
++        "category": [
++            "qdisc",
++            "tbf",
++            "codel"
++        ],
++        "plugins": {
++            "requires": [
++                "nsPlugin"
++            ]
++        },
++        "setup": [
++            "$IP link set dev $DUMMY up || true",
++            "$IP addr add 10.10.11.10/24 dev $DUMMY || true",
++            "$TC qdisc add dev $DUMMY root handle 1: tbf rate 8bit burst 1=
+00b latency 100ms",
++            "$TC qdisc replace dev $DUMMY handle 2: parent 1:1 codel limit=
+ 1000",
++            [
++                "ping -I $DUMMY -c2 10.10.11.11",
++                1
++            ],
++            "$TC qdisc change dev $DUMMY handle 2: parent 1:1 codel limit =
+1"
++        ],
++        "cmdUnderTest": "$TC qdisc del dev $DUMMY handle 2: parent 1:1",
++        "expExitCode": "0",
++        "verifyCmd": "$TC -s qdisc show dev $DUMMY",
++        "matchPattern": "backlog 0b 0p",
++        "matchCount": "1",
++        "teardown": [
++            "$TC qdisc del dev $DUMMY handle 1: root"
++        ]
++    },
++    {
++        "id": "514e",
++        "name": "Test TBF with PIE Backlog Accounting in gso_skb case agai=
+nst underflow",
++        "category": [
++            "qdisc",
++            "tbf",
++            "pie"
++        ],
++        "plugins": {
++            "requires": [
++                "nsPlugin"
++            ]
++        },
++        "setup": [
++            "$IP link set dev $DUMMY up || true",
++            "$IP addr add 10.10.11.10/24 dev $DUMMY || true",
++            "$TC qdisc add dev $DUMMY root handle 1: tbf rate 8bit burst 1=
+00b latency 100ms",
++            "$TC qdisc replace dev $DUMMY handle 2: parent 1:1 pie limit 1=
+000",
++            [
++                "ping -I $DUMMY -c2 10.10.11.11",
++                1
++            ],
++            "$TC qdisc change dev $DUMMY handle 2: parent 1:1 pie limit 1"
++        ],
++        "cmdUnderTest": "$TC qdisc del dev $DUMMY handle 2: parent 1:1",
++        "expExitCode": "0",
++        "verifyCmd": "$TC -s qdisc show dev $DUMMY",
++        "matchPattern": "backlog 0b 0p",
++        "matchCount": "1",
++        "teardown": [
++            "$TC qdisc del dev $DUMMY handle 1: root"
++        ]
++    },
++    {
++        "id": "6c97",
++        "name": "Test TBF with FQ Backlog Accounting in gso_skb case again=
+st underflow",
++        "category": [
++            "qdisc",
++            "tbf",
++            "fq"
++        ],
++        "plugins": {
++            "requires": [
++                "nsPlugin"
++            ]
++        },
++        "setup": [
++            "$IP link set dev $DUMMY up || true",
++            "$IP addr add 10.10.11.10/24 dev $DUMMY || true",
++            "$TC qdisc add dev $DUMMY root handle 1: tbf rate 8bit burst 1=
+00b latency 100ms",
++            "$TC qdisc replace dev $DUMMY handle 2: parent 1:1 fq limit 10=
+00",
++            [
++                "ping -I $DUMMY -c2 10.10.11.11",
++                1
++            ],
++            "$TC qdisc change dev $DUMMY handle 2: parent 1:1 fq limit 1"
++        ],
++        "cmdUnderTest": "$TC qdisc del dev $DUMMY handle 2: parent 1:1",
++        "expExitCode": "0",
++        "verifyCmd": "$TC -s qdisc show dev $DUMMY",
++        "matchPattern": "backlog 0b 0p",
++        "matchCount": "1",
++        "teardown": [
++            "$TC qdisc del dev $DUMMY handle 1: root"
++        ]
++    },
++    {
++        "id": "5d0b",
++        "name": "Test TBF with FQ_CODEL Backlog Accounting in gso_skb case=
+ against underflow",
++        "category": [
++            "qdisc",
++            "tbf",
++            "fq_codel"
++        ],
++        "plugins": {
++            "requires": [
++                "nsPlugin"
++            ]
++        },
++        "setup": [
++            "$IP link set dev $DUMMY up || true",
++            "$IP addr add 10.10.11.10/24 dev $DUMMY || true",
++            "$TC qdisc add dev $DUMMY root handle 1: tbf rate 8bit burst 1=
+00b latency 100ms",
++            "$TC qdisc replace dev $DUMMY handle 2: parent 1:1 fq_codel li=
+mit 1000",
++            [
++                "ping -I $DUMMY -c2 10.10.11.11",
++                1
++            ],
++            "$TC qdisc change dev $DUMMY handle 2: parent 1:1 fq_codel lim=
+it 1"
++        ],
++        "cmdUnderTest": "$TC qdisc del dev $DUMMY handle 2: parent 1:1",
++        "expExitCode": "0",
++        "verifyCmd": "$TC -s qdisc show dev $DUMMY",
++        "matchPattern": "backlog 0b 0p",
++        "matchCount": "1",
++        "teardown": [
++            "$TC qdisc del dev $DUMMY handle 1: root"
++        ]
++    },
++    {
++        "id": "21c3",
++        "name": "Test TBF with FQ_PIE Backlog Accounting in gso_skb case a=
+gainst underflow",
++        "category": [
++            "qdisc",
++            "tbf",
++            "fq_pie"
++        ],
++        "plugins": {
++            "requires": [
++                "nsPlugin"
++            ]
++        },
++        "setup": [
++            "$IP link set dev $DUMMY up || true",
++            "$IP addr add 10.10.11.10/24 dev $DUMMY || true",
++            "$TC qdisc add dev $DUMMY root handle 1: tbf rate 8bit burst 1=
+00b latency 100ms",
++            "$TC qdisc replace dev $DUMMY handle 2: parent 1:1 fq_pie limi=
+t 1000",
++            [
++                "ping -I $DUMMY -c2 10.10.11.11",
++                1
++            ],
++            "$TC qdisc change dev $DUMMY handle 2: parent 1:1 fq_pie limit=
+ 1"
++        ],
++        "cmdUnderTest": "$TC qdisc del dev $DUMMY handle 2: parent 1:1",
++        "expExitCode": "0",
++        "verifyCmd": "$TC -s qdisc show dev $DUMMY",
++        "matchPattern": "backlog 0b 0p",
++        "matchCount": "1",
++        "teardown": [
++            "$TC qdisc del dev $DUMMY handle 1: root"
++        ]
++    },
+     {
+         "id": "a4bb",
+         "name": "Test FQ_CODEL with HTB parent - force packet drop with em=
+pty queue",
 --=20
 2.43.0
 
