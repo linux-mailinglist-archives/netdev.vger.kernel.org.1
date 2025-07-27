@@ -1,166 +1,199 @@
-Return-Path: <netdev+bounces-210406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210407-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36500B13206
-	for <lists+netdev@lfdr.de>; Sun, 27 Jul 2025 23:51:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3387B13207
+	for <lists+netdev@lfdr.de>; Sun, 27 Jul 2025 23:52:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52AE03A4C53
-	for <lists+netdev@lfdr.de>; Sun, 27 Jul 2025 21:51:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED633173471
+	for <lists+netdev@lfdr.de>; Sun, 27 Jul 2025 21:52:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8501124679F;
-	Sun, 27 Jul 2025 21:51:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CCE62397BF;
+	Sun, 27 Jul 2025 21:52:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=posteo.net header.i=@posteo.net header.b="gL1iJhyE"
+	dkim=pass (2048-bit key) header.d=kwiboo.se header.i=@kwiboo.se header.b="bLkNCHs2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.forwardemail.net (smtp.forwardemail.net [149.28.215.223])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3362A217F34
-	for <netdev@vger.kernel.org>; Sun, 27 Jul 2025 21:51:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.67.36.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D76B58635D
+	for <netdev@vger.kernel.org>; Sun, 27 Jul 2025 21:52:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=149.28.215.223
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753653105; cv=none; b=K8TYbLHjbhxz9L87ExhLzVs/me0AGBrdh3JleIy+7pcLZLXkSADeW8VoC5R8N9fjpXhdrVcHlWMCyf/YfPW5XFnXYoZHX2yG1l2JBHm38iyniMuFNgyeyzQjKmKCEi3o8EHg0F9L3TU0OfGFLSSAf1PCBnHUdrxAR9WPA4EwDsg=
+	t=1753653150; cv=none; b=pzxrwRFaU6QnXjmb29Wy39jeLCbAs19o7UHfnGfrc4Her3NuO7FMpztJYS7Hq5ugsqeH6r7QtoLw9T7T0BZaO4CRtYyzn8lDknoFC80cXYvulkX+AaSn7hns1gITJdf/rUCKgrqFL3taTLSjTaDu26yRebFRrJDO5PxI07ffMAo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753653105; c=relaxed/simple;
-	bh=Z+7M3dHUUYqhuhN82CQks401UX1vkdxI7Mq7JQeJuHo=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=gT08dI/qzPwTOHoqmNi2c3v4w0EhYzFba6a5c/miPWg64KMsNZRLvo1HTe4GE/cLwzrm6wNKs2jBtnIfBPvMkhGj21z6NBJnx25fAP/PeZ56xnuVQCbYrnIuZuJ6zcBYuYkzGIVZqEOnMNRB0EjQqdRJ4ZyIr6nrPchLvUM4sWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net; spf=pass smtp.mailfrom=posteo.net; dkim=pass (3072-bit key) header.d=posteo.net header.i=@posteo.net header.b=gL1iJhyE; arc=none smtp.client-ip=185.67.36.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=posteo.net
-Received: from submission (posteo.de [185.67.36.169]) 
-	by mout01.posteo.de (Postfix) with ESMTPS id 8A6FB240027
-	for <netdev@vger.kernel.org>; Sun, 27 Jul 2025 23:51:41 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=posteo.net;
-	s=1984.ea087b; t=1753653101;
-	bh=l4D4Bh+YmUuggbXuJRHB8wMKe3auffo6UFPEjkwE9v8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding:Message-Id:To:Cc:From;
-	b=gL1iJhyEz3BCszUs9rEfcOGLo96LOmnXWMbFEJTJgr4X4nbFQ7FGSz9QxBBXRoUa+
-	 7LZGYtp6YfE/gNkPQs0EFg7vzQi1VZ5ngidJY5JMGLRfVBl6AnguUQZSA7euuDW4Pv
-	 QPbk4bH7OunkUxs6Ld7XYZ4ZJ7lTifsUqdto3mxPgmvyswS51yrCMTxYnC+DibwTtH
-	 MYT8CAatI5uWXX5D+hErp6cQs2n++/eddSV37AOoE/zT+ALkF79e/BkRpnIhii5qct
-	 zELdPMI177rJJoysPgl9D8zUiNv5i2Jo8ZLAh1+xLszettsRfbPe5AH4mqmhP++mT3
-	 sMLpZO7b+M6MKs4Ox/GSi0yFLGHYK21cf7wyoXJm9ZEo+MgGzeb+P5AxQiSDTgHZoF
-	 M4yIjTsuL/3RoaJhSn0SWP9lbbaZjuvw1uFLrbBeq+MAZxSG8aXkCTCeJUM9glHPqJ
-	 Hz1iJrvPS6FPjcqi/G1qBiyXNipsMW178Sh1vv4arWUOTOJI9zN
-Received: from customer (localhost [127.0.0.1])
-	by submission (posteo.de) with ESMTPSA id 4bqwL42mnnz6v10;
-	Sun, 27 Jul 2025 23:51:40 +0200 (CEST)
-From: Charalampos Mitrodimas <charmitro@posteo.net>
-Date: Sun, 27 Jul 2025 21:51:40 +0000
-Subject: [PATCH net v2] net: ipv6: fix buffer overflow in AH output
+	s=arc-20240116; t=1753653150; c=relaxed/simple;
+	bh=N0APxAeG9t37xZ9G+TVThe0V8aH45UEZqv6kQFu+QrI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aeUkyTR7PupS/TEteO4XDl4MwiDm1khJxbismQeKWSYUuxOvRvFRaFD4J40h3oR+TRGgOZu5M5JSv0Xypf1Awwtk1XIe457hOlq35dytQ+u1ahcGBRpBJrEFDMff5wHPf/Nmfvu7MeESLouQZcvoD0RFo4CGqzjYGilqJBNAq7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kwiboo.se; spf=pass smtp.mailfrom=fe-bounces.kwiboo.se; dkim=pass (2048-bit key) header.d=kwiboo.se header.i=@kwiboo.se header.b=bLkNCHs2; arc=none smtp.client-ip=149.28.215.223
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kwiboo.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fe-bounces.kwiboo.se
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kwiboo.se;
+ h=Content-Transfer-Encoding: Content-Type: In-Reply-To: From: References:
+ Cc: To: Subject: MIME-Version: Date: Message-ID; q=dns/txt;
+ s=fe-e1b5cab7be; t=1753653146;
+ bh=gG+K+EvdGySBaqP3c+lFA0pUt8fKLg2/x4AVyg5jhrc=;
+ b=bLkNCHs26Crr11KwXC2k9BQBj4u2cFKhnRwUF99mbTPqYiyRDZTO7IgBvdNGApPUYEbgRjLpv
+ GredDDt3N1RbOrwZB0WUzW6CgwYAQfm7Lbbk0FUh9sJutWGTw/eAYjLLlTJnbUPJOLs85qUnjLH
+ p6onbca3vfjtnnuA2cELmb+jt7U8dbjZ2WOqTwqcaDeeudBtSIrHQ5rEQBwf4N2doqZFYgJ38cs
+ rvJsRWIjP4cyylthMr5B7fNFeqmeua7U7nOqJSJIUNclbRqvkI3AkRbGloE9NyjE4Kpsai1IgAL
+ M6DfRrMBnpL2mVzA2q8U3U1txBbIq1tIJubIiOS3dN8g==
+X-Forward-Email-ID: 68869f8dc509b9ee169d35e6
+X-Forward-Email-Sender: rfc822; jonas@kwiboo.se, smtp.forwardemail.net,
+ 149.28.215.223
+X-Forward-Email-Version: 1.1.7
+X-Forward-Email-Website: https://forwardemail.net
+X-Complaints-To: abuse@forwardemail.net
+X-Report-Abuse: abuse@forwardemail.net
+X-Report-Abuse-To: abuse@forwardemail.net
+Message-ID: <badef015-22ff-4232-a4d0-80d2034113ca@kwiboo.se>
+Date: Sun, 27 Jul 2025 23:52:07 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/3] net: dsa: realtek: Add support for use of an
+ optional mdio node
+To: Andrew Lunn <andrew@lunn.ch>, Linus Walleij <linus.walleij@linaro.org>
+Cc: =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+ Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Yao Zi <ziyao@disroot.org>, Chukun Pan <amadeus@jmu.edu.cn>,
+ Heiko Stuebner <heiko@sntech.de>, netdev@vger.kernel.org,
+ linux-rockchip@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org
+References: <20250727180305.381483-1-jonas@kwiboo.se>
+ <20250727180305.381483-3-jonas@kwiboo.se>
+ <2504b605-24e7-4573-bec0-78f55688a482@lunn.ch>
+Content-Language: en-US
+From: Jonas Karlman <jonas@kwiboo.se>
+In-Reply-To: <2504b605-24e7-4573-bec0-78f55688a482@lunn.ch>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250727-ah6-buffer-overflow-v2-1-c7b5f0984565@posteo.net>
-X-B4-Tracking: v=1; b=H4sIAFyfhmgC/32NQQ7CIBBFr9LM2jGFptK68h6mC7AzQmJKA4iah
- ruLPYD5q/eT//4GkYKjCOdmg0DZReeXCvLQwM3q5U7o5sogW9m3SirU9oTmyUwBfabAD/9CZjX
- 2ZlDdOMxQl2sgdu/dep0qWxeTD5/9JItf+9+XBdZwR0Kwrk5zWX1M5I8LJZhKKV/3reRgtwAAA
- A==
-X-Change-ID: 20250727-ah6-buffer-overflow-ff795b87398d
-To: Steffen Klassert <steffen.klassert@secunet.com>, 
- Herbert Xu <herbert@gondor.apana.org.au>, 
- "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- syzbot+01b0667934cdceb4451c@syzkaller.appspotmail.com, 
- Charalampos Mitrodimas <charmitro@posteo.net>
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1753653100; l=2871;
- i=charmitro@posteo.net; s=20250727; h=from:subject:message-id;
- bh=Z+7M3dHUUYqhuhN82CQks401UX1vkdxI7Mq7JQeJuHo=;
- b=Rp1FTXTDgVtjNTXyak24zpZA1Sn+gI8Zs1/rfUXYxPw4vCJsV5EH2mlWu8GLcCYt2RtmX90ha
- J7iHX7c6mPoCnG7Z1LrBcusYz8kDh49gZzgn4PxDgpH4LA83SAYzI/t
-X-Developer-Key: i=charmitro@posteo.net; a=ed25519;
- pk=/tpM70o3uGkbo2oePEdVimUYLyVTgpnPq4nwoG0pFsM=
 
-Fix a buffer overflow where extension headers are incorrectly copied
-to the IPv6 address fields, resulting in a field-spanning write of up
-to 40 bytes into a 16-byte field (IPv6 address).
+Hi Andrew,
 
-  memcpy: detected field-spanning write (size 40) of single field "&top_iph->saddr" at net/ipv6/ah6.c:439 (size 16)
-  WARNING: CPU: 0 PID: 8838 at net/ipv6/ah6.c:439 ah6_output+0xe7e/0x14e0 net/ipv6/ah6.c:439
+On 7/27/2025 9:09 PM, Andrew Lunn wrote:
+> On Sun, Jul 27, 2025 at 06:02:59PM +0000, Jonas Karlman wrote:
+>> The dt-bindings schema for Realtek switches for unmanaged switches
+>> contains a restriction on use of a mdio child OF node for MDIO-connected
+>> switches, i.e.:
+>>
+>>   if:
+>>     required:
+>>       - reg
+>>   then:
+>>     not:
+>>       required:
+>>         - mdio
+>>     properties:
+>>       mdio: false
+>>
+>> However, the driver currently requires the existence of a mdio child OF
+>> node to successfully probe and properly function.
+>>
+>> Relax the requirement of a mdio child OF node and assign the dsa_switch
+>> user_mii_bus to allow a MDIO-connected switch to probe and function
+>> when a mdio child OF node is missing.
+>  
+> I could be getting this wrong.... Maybe Linus knows more.
+> 
+> It could be the switch does not have its own separate MDIO bus just
+> for its internal PHYs. They just appear on the parent mdio bus. So
+> you represent this with:
+> 
+> &mdio0 {
+> 	reset-delay-us = <25000>;
+> 	reset-gpios = <&gpio4 RK_PC2 GPIO_ACTIVE_LOW>;
+> 	reset-post-delay-us = <100000>;
+> 
+> 	phy0: ethernet-phy@0 {
+> 		reg = <0>;
+> 	};
+> 
+> 	phy1: ethernet-phy@1 {
+> 		reg = <0>;
+> 	};
+> 
+> 
+>         ethernet-switch@1d {
+>                compatible = "realtek,rtl8365mb";
+>                reg = <0x1d>;
+>                pinctrl-names = "default";
+>                pinctrl-0 = <&rtl8367rb_eint>;
+> 
+>                ethernet-ports {
+>                        #address-cells = <1>;
+>                        #size-cells = <0>;
+> 
+>                        ethernet-port@0 {
+>                                reg = <0>;
+>                                label = "wan";
+> 			       phy-handle = <phy0>;
+>                        };
+> 
+>                        ethernet-port@1 {
+>                                reg = <1>;
+>                                label = "lan1";
+> 			       phy-handle = <phy1>;
+>                        };
+> 
+> If this is correct, you should not need any driver or DT binding
+> changes.
 
-The issue occurs in ah6_output() and ah6_output_done() where the code
-attempts to save/restore extension headers by copying them to/from the
-IPv6 source/destination address fields based on the CONFIG_IPV6_MIP6
-setting.
+Something like above does not seem to work, I get following:
 
-Reported-by: syzbot+01b0667934cdceb4451c@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=01b0667934cdceb4451c
-Signed-off-by: Charalampos Mitrodimas <charmitro@posteo.net>
----
-Changes in v2:
-- Link correct syzbot dashboard link in patch tags
-- Link to v1: https://lore.kernel.org/r/20250727-ah6-buffer-overflow-v1-1-1f3e11fa98db@posteo.net
----
- net/ipv6/ah6.c | 24 +++++-------------------
- 1 file changed, 5 insertions(+), 19 deletions(-)
+  mdio_bus stmmac-0: MDIO device at address 0 is missing.
+  mdio_bus stmmac-0: MDIO device at address 1 is missing.
+  mdio_bus stmmac-0: MDIO device at address 2 is missing.
+  mdio_bus stmmac-0: MDIO device at address 3 is missing.
 
-diff --git a/net/ipv6/ah6.c b/net/ipv6/ah6.c
-index eb474f0987ae016b9d800e9f83d70d73171b21d2..0fa3ed3c64c4ed1a1907d73fb3477e11ef0bd5b8 100644
---- a/net/ipv6/ah6.c
-+++ b/net/ipv6/ah6.c
-@@ -301,13 +301,8 @@ static void ah6_output_done(void *data, int err)
- 	memcpy(ah->auth_data, icv, ahp->icv_trunc_len);
- 	memcpy(top_iph, iph_base, IPV6HDR_BASELEN);
- 
--	if (extlen) {
--#if IS_ENABLED(CONFIG_IPV6_MIP6)
--		memcpy(&top_iph->saddr, iph_ext, extlen);
--#else
--		memcpy(&top_iph->daddr, iph_ext, extlen);
--#endif
--	}
-+	if (extlen)
-+		memcpy((u8 *)(top_iph + 1), iph_ext, extlen);
- 
- 	kfree(AH_SKB_CB(skb)->tmp);
- 	xfrm_output_resume(skb->sk, skb, err);
-@@ -379,11 +374,7 @@ static int ah6_output(struct xfrm_state *x, struct sk_buff *skb)
- 	memcpy(iph_base, top_iph, IPV6HDR_BASELEN);
- 
- 	if (extlen) {
--#if IS_ENABLED(CONFIG_IPV6_MIP6)
--		memcpy(iph_ext, &top_iph->saddr, extlen);
--#else
--		memcpy(iph_ext, &top_iph->daddr, extlen);
--#endif
-+		memcpy(iph_ext, (u8 *)(top_iph + 1), extlen);
- 		err = ipv6_clear_mutable_options(top_iph,
- 						 extlen - sizeof(*iph_ext) +
- 						 sizeof(*top_iph),
-@@ -434,13 +425,8 @@ static int ah6_output(struct xfrm_state *x, struct sk_buff *skb)
- 	memcpy(ah->auth_data, icv, ahp->icv_trunc_len);
- 	memcpy(top_iph, iph_base, IPV6HDR_BASELEN);
- 
--	if (extlen) {
--#if IS_ENABLED(CONFIG_IPV6_MIP6)
--		memcpy(&top_iph->saddr, iph_ext, extlen);
--#else
--		memcpy(&top_iph->daddr, iph_ext, extlen);
--#endif
--	}
-+	if (extlen)
-+		memcpy((u8 *)(top_iph + 1), iph_ext, extlen);
- 
- out_free:
- 	kfree(iph_base);
+  rtl8365mb-mdio stmmac-0:1d: found an RTL8367RB-VB switch
+  rtl8365mb-mdio stmmac-0:1d: configuring for fixed/rgmii link mode
+  rtl8365mb-mdio stmmac-0:1d wan (uninitialized): failed to connect to PHY: -ENODEV
+  rtl8365mb-mdio stmmac-0:1d: Link is Up - 1Gbps/Full - flow control off
+  rtl8365mb-mdio stmmac-0:1d wan (uninitialized): error -19 setting up PHY for tree 0, switch 0, port 0
+  rtl8365mb-mdio stmmac-0:1d lan1 (uninitialized): failed to connect to PHY: -ENODEV
+  rtl8365mb-mdio stmmac-0:1d lan1 (uninitialized): error -19 setting up PHY for tree 0, switch 0, port 1
+  rtl8365mb-mdio stmmac-0:1d lan2 (uninitialized): failed to connect to PHY: -ENODEV
+  rtl8365mb-mdio stmmac-0:1d lan2 (uninitialized): error -19 setting up PHY for tree 0, switch 0, port 2
+  rtl8365mb-mdio stmmac-0:1d lan3 (uninitialized): failed to connect to PHY: -ENODEV
+  rtl8365mb-mdio stmmac-0:1d lan3 (uninitialized): error -19 setting up PHY for tree 0, switch 0, port 3
 
----
-base-commit: b711733e89a3f84c8e1e56e2328f9a0fa5facc7c
-change-id: 20250727-ah6-buffer-overflow-ff795b87398d
+And without an explicit 'mdio' child node the driver currently fails to
+load and the switch is never registered:
 
-Best regards,
--- 
-Charalampos Mitrodimas <charmitro@posteo.net>
+  rtl8365mb-mdio stmmac-0:1d: found an RTL8367RB-VB switch
+  rtl8365mb-mdio stmmac-0:1d: no MDIO bus node
+  rtl8365mb-mdio stmmac-0:1d: could not set up MDIO bus
+  rtl8365mb-mdio stmmac-0:1d: error -ENODEV: unable to register switch
+
+With a 'mdio' child node 'make CHECK_DTBS=y' report something like:
+
+  rockchip/rk3528-radxa-e24c.dtb: ethernet-switch@1d (realtek,rtl8365mb): mdio: False schema does not allow { [snip] }
+        from schema $id: http://devicetree.org/schemas/net/dsa/realtek.yaml#
+
+So something should probably be changed, the driver, dt-bindings or
+possible both.
+
+With this patch the last example in net/dsa/realtek.yaml can be made to
+work. The example the ethernet-switch node in next patch is based on,
+and something that closely matches how mediatek,mt7530 is described.
+
+Please let me know if you want me to drop this and instead try to update
+the dt-bindings and use a more verbose ethernet-switch node.
+
+Regards,
+Jonas
+
+> 
+> 	Andrew
 
 
