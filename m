@@ -1,144 +1,254 @@
-Return-Path: <netdev+bounces-210371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210372-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C24EB12F58
-	for <lists+netdev@lfdr.de>; Sun, 27 Jul 2025 13:39:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 693ABB12F93
+	for <lists+netdev@lfdr.de>; Sun, 27 Jul 2025 14:50:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA276188634A
-	for <lists+netdev@lfdr.de>; Sun, 27 Jul 2025 11:39:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C5121897665
+	for <lists+netdev@lfdr.de>; Sun, 27 Jul 2025 12:50:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7EF01FF5E3;
-	Sun, 27 Jul 2025 11:39:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57CB5212B2F;
+	Sun, 27 Jul 2025 12:50:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KtQzsQCY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z36psbGi"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 876D52B9BA;
-	Sun, 27 Jul 2025 11:39:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E51172614;
+	Sun, 27 Jul 2025 12:50:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753616348; cv=none; b=CFPMSISbrs1hUSzQMryDXNq1UuO9kisOK9oh1dAKlf/KxoWOL/I8tdv9i3M531YfPCYGlNdcznj990GWxWXN8sf5FptGXCcD9ZpIdGLBT/hKdAYEXfiNCLYDWmRzzumHRk66o8FG3gqGKKX/Y9nq3fT6IbaAX9AELPyePufU31Y=
+	t=1753620634; cv=none; b=pK62osqLGO7L3siJJrb02fKEZMP0HCO21932JmqcBt+a2bFa9YzqsESuYwLKR5SV3Plu8/zH7kU9ivS2b/Qj0kKH5XoZVF5Bhmm74GOQfQMCPhe+c9yS4Njbx2BuZugSfaGsDpuwebzBvMsKTEigl8kyRXms8CCZRyiqgvV2Ry4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753616348; c=relaxed/simple;
-	bh=dCQ/5ACZXuFvlMS3yxQyTas5SeryViH4PPdHqfvtjHw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gnUN1RtShTT+8b3AokLsgoBdYM/FLkJjMWppEN6/yiaPfyf+rLrD35M4kGajfLTwOXzKpsGI7fRrqaVGEZPkac4M7mxND6z1AB9mhccn0z9XXMmXtzlVf5pGCpM10L/Hlv/54t0DCaZIMoz8MUUHziRhecN+NJ0xd7wdu5Qf1hw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KtQzsQCY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70085C4CEEB;
-	Sun, 27 Jul 2025 11:39:07 +0000 (UTC)
+	s=arc-20240116; t=1753620634; c=relaxed/simple;
+	bh=NkzP953h92j5VLRMbfFcMgeXvX2jiMh/xm282QHj3xY=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Af5hunQE2TLaOcsWqGto8PfW7LOcOc33MZoevJWDsi0MFdbOgF1QHKRh8R7agArACvWbOe4+MmcuZDeH+oDf8YTGspcbQkF89jNEDubJpio/5OssX28yvOZm3N+PIqG2dbnzvIr4LNauD+vGCZ/jxRGiC+YpOAwFWVvJgbBqB14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z36psbGi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DB82C4CEEB;
+	Sun, 27 Jul 2025 12:50:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753616348;
-	bh=dCQ/5ACZXuFvlMS3yxQyTas5SeryViH4PPdHqfvtjHw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=KtQzsQCYYWW9nVqtBWrQZmQ8Uqd4RYBRQxDHRsuFD9brGCKYT/sVOgFe2LF3n3zB2
-	 Jn8C9LCp7oAeyck6W2HGzrjPsHmLlAwrOQx1aHwWItIJ5g7M3YPSzIjOP2nL5cldzt
-	 jePuMPrIqXb/nB3wpvCokAyoNxAaWzo7q2v+XLof7KEZMmecSvckApUgaACsIn+JyX
-	 uNPAR08kmEe2zPnBTnn/LqEHwCmwubT+9hc6rDfZ/EgsPa0SInWiX8VLomd2Y8jO19
-	 HVcA5xZYVaZRxEMYB6eCKuQF7WhV7FZ0w+F+8Qanbuls94Rq3T0CqxIQfly1UgUmR7
-	 Hm0oaltBPfrAA==
-Date: Sun, 27 Jul 2025 14:39:03 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Sean Anderson <sean.anderson@linux.dev>
-Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, Dave Ertman <david.m.ertman@intel.com>,
-	Saravana Kannan <saravanak@google.com>,
-	linux-kernel@vger.kernel.org, Michal Simek <michal.simek@amd.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Ira Weiny <ira.weiny@intel.com>
-Subject: Re: [PATCH net v2 1/4] auxiliary: Support hexadecimal ids
-Message-ID: <20250727113903.GA402218@unreal>
-References: <03e04d98-e5eb-41c0-8407-23cccd578dbe@linux.dev>
- <2025071726-ramp-friend-a3e5@gregkh>
- <5ee4bac4-957b-481a-8608-15886da458c2@linux.dev>
- <20250720081705.GE402218@unreal>
- <e4b5e4fa-45c4-4b67-b8f1-7d9ff9f8654f@linux.dev>
- <20250723081356.GM402218@unreal>
- <991cbb9a-a1b5-4ab8-9deb-9ecea203ce0f@linux.dev>
- <2025072543-senate-hush-573d@gregkh>
- <20250727080705.GY402218@unreal>
- <2025072751-living-sheath-e601@gregkh>
+	s=k20201202; t=1753620633;
+	bh=NkzP953h92j5VLRMbfFcMgeXvX2jiMh/xm282QHj3xY=;
+	h=From:Date:Subject:To:Cc:From;
+	b=Z36psbGimnIXH9mOsmcqzli2WxhFgt2Q7dWTIkpgrD9Eb3mOw2M8ADs0uMQE4F4zL
+	 duFGFmyIx9mYaWZSrCG24i+dCVs+VZyMd38y7KvxqxucKFXCJM5TFm+Ts9H0ZJR9DW
+	 81leCq1dRahiyOt0gmPbZT5HRudH1WHjM+cJItlNG+MclyNwvGmh4erHysiRdBq1fT
+	 xqIftsATlPy0rRB89rDZJNf9r8BJ2S6HAb3HVoDOZz3wCaHNq4cOkzIAoc1Fg1H2MA
+	 AQPI2uodIPM62UmeQEACwXtrIXAk3bj4vDTeeLi2dHA5+CxepoY6smBJ9L2M+NtSwz
+	 sASwr6CyF2JeA==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Date: Sun, 27 Jul 2025 14:50:03 +0200
+Subject: [PATCH net-next] net: mediatek: wed: Introduce MT7992 WED support
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2025072751-living-sheath-e601@gregkh>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250727-mt7992-wed-support-v1-1-aad7da4dc877@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAHoghmgC/x3MTQqAIBBA4avErBtQyayuEi0kx5pFJdofRHdPW
+ n6L9x5IFJkSdMUDkU5OvK0ZsixgnO06EbLLBiWUFkY2uOymbRVe5DAdIWxxx0rXVgunpW8k5DB
+ E8nz/03543w/Elvk+ZAAAAA==
+X-Change-ID: 20250718-mt7992-wed-support-456a50d51f81
+To: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Matthias Brugger <matthias.bgg@gmail.com>, 
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+ Ryder Lee <ryder.lee@mediatek.com>, Shayne Chen <shayne.chen@mediatek.com>
+Cc: netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, linux-wireless@vger.kernel.org, 
+ Rex Lu <rex.lu@mediatek.com>, Lorenzo Bianconi <lorenzo@kernel.org>
+X-Mailer: b4 0.14.2
 
-On Sun, Jul 27, 2025 at 10:57:09AM +0200, Greg Kroah-Hartman wrote:
-> On Sun, Jul 27, 2025 at 11:07:05AM +0300, Leon Romanovsky wrote:
-> > On Fri, Jul 25, 2025 at 07:02:24AM +0200, Greg Kroah-Hartman wrote:
-> > > On Thu, Jul 24, 2025 at 09:55:59AM -0400, Sean Anderson wrote:
-> > > > On 7/23/25 04:13, Leon Romanovsky wrote:
-> > > > > On Mon, Jul 21, 2025 at 10:29:32AM -0400, Sean Anderson wrote:
-> > > > >> On 7/20/25 04:17, Leon Romanovsky wrote:
-> > > > >> > On Thu, Jul 17, 2025 at 01:12:08PM -0400, Sean Anderson wrote:
-> > > > >> >> On 7/17/25 12:33, Greg Kroah-Hartman wrote:
-> > > > >> > 
-> > > > >> > <...>
-> > > > >> > 
-> > > > >> >> Anyway, if you really think ids should be random or whatever, why not
-> > > > >> >> just ida_alloc one in axiliary_device_init and ignore whatever's
-> > > > >> >> provided? I'd say around half the auxiliary drivers just use 0 (or some
-> > > > >> >> other constant), which is just as deterministic as using the device
-> > > > >> >> address.
-> > > > >> > 
-> > > > >> > I would say that auxiliary bus is not right fit for such devices. This
-> > > > >> > bus was introduced for more complex devices, like the one who has their
-> > > > >> > own ida_alloc logic.
-> > > > >> 
-> > > > >> I'd say that around 2/3 of the auxiliary drivers that have non-constant
-> > > > >> ids use ida_alloc solely for the auxiliary bus and for no other purpose.
-> > > > >> I don't think that's the kind of complexity you're referring to.
-> > > > >> 
-> > > > >> >> Another third use ida_alloc (or xa_alloc) so all that could be
-> > > > >> >> removed.
-> > > > >> > 
-> > > > >> > These ID numbers need to be per-device.
-> > > > >> 
-> > > > >> Why? They are arbitrary with no semantic meaning, right?
-> > > > > 
-> > > > > Yes, officially there is no meaning, and this is how we would like to
-> > > > > keep it.
-> > > > > 
-> > > > > Right now, they are very correlated with with their respective PCI function number.
-> > > > > Is it important? No, however it doesn't mean that we should proactively harm user
-> > > > > experience just because we can do it.
-> > > > > 
-> > > > > [leonro@c ~]$ l /sys/bus/auxiliary/devices/
-> > > > > ,,,
-> > > > > rwxrwxrwx 1 root root 0 Jul 21 15:25 mlx5_core.rdma.0 -> ../../../devices/pci0000:00/0000:00:02.7/0000:0
-> > > > > 8:00.0/mlx5_core.rdma.0
-> > > > > lrwxrwxrwx 1 root root 0 Jul 21 15:25 mlx5_core.rdma.1 -> ../../../devices/pci0000:00/0000:00:02.7/0000:0
-> > > > > 8:00.1/mlx5_core.rdma
-> > > > 
-> > > > Well, I would certainly like to have semantic meaning for ids. But apparently
-> > > > that is only allowed if you can sneak it past the review process.
-> > > 
-> > > Do I need to dust off my "make all ids random" patch again and actually
-> > > merge it just to prevent this from happening?
-> > 
-> > After weekend thoughts on it. IDs need to be removed from the driver
-> > access. Let's make them global at least.
-> 
-> Great, no objection from me, want to send a patch we can queue up for
-> 6.18-rc1?
+Introduce the second WDMA RX ring in WED driver since Meditake MT7992
+WiFi chipset support two separated WDMA rings. This is a preliminary
+patch to properly support WED for MT7992 in MT76 driver.
 
-Sean proposed the initial idea to move IDs to aux core. Let's wait for him
-to see if he wants to do such patch. If not, I'll send.
+Co-developed-by: Rex Lu <rex.lu@mediatek.com>
+Signed-off-by: Rex Lu <rex.lu@mediatek.com>
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+---
+ drivers/net/ethernet/mediatek/mtk_wed.c          | 33 +++++++++++++++++++-----
+ drivers/net/ethernet/mediatek/mtk_wed.h          |  2 +-
+ drivers/net/wireless/mediatek/mt76/mt7915/mmio.c |  6 ++---
+ drivers/net/wireless/mediatek/mt76/mt7996/mmio.c | 12 ++++-----
+ include/linux/soc/mediatek/mtk_wed.h             |  2 +-
+ 5 files changed, 38 insertions(+), 17 deletions(-)
 
-Thanks
+diff --git a/drivers/net/ethernet/mediatek/mtk_wed.c b/drivers/net/ethernet/mediatek/mtk_wed.c
+index 73c26fcfd85e7be3040abea8e80ff4bee881016c..44a7b4b9d5a4e7cb2c6173ff97024ef74c241058 100644
+--- a/drivers/net/ethernet/mediatek/mtk_wed.c
++++ b/drivers/net/ethernet/mediatek/mtk_wed.c
+@@ -59,7 +59,9 @@ struct mtk_wed_flow_block_priv {
+ static const struct mtk_wed_soc_data mt7622_data = {
+ 	.regmap = {
+ 		.tx_bm_tkid		= 0x088,
+-		.wpdma_rx_ring0		= 0x770,
++		.wpdma_rx_ring = {
++			0x770,
++		},
+ 		.reset_idx_tx_mask	= GENMASK(3, 0),
+ 		.reset_idx_rx_mask	= GENMASK(17, 16),
+ 	},
+@@ -70,7 +72,9 @@ static const struct mtk_wed_soc_data mt7622_data = {
+ static const struct mtk_wed_soc_data mt7986_data = {
+ 	.regmap = {
+ 		.tx_bm_tkid		= 0x0c8,
+-		.wpdma_rx_ring0		= 0x770,
++		.wpdma_rx_ring = {
++			0x770,
++		},
+ 		.reset_idx_tx_mask	= GENMASK(1, 0),
+ 		.reset_idx_rx_mask	= GENMASK(7, 6),
+ 	},
+@@ -81,7 +85,10 @@ static const struct mtk_wed_soc_data mt7986_data = {
+ static const struct mtk_wed_soc_data mt7988_data = {
+ 	.regmap = {
+ 		.tx_bm_tkid		= 0x0c8,
+-		.wpdma_rx_ring0		= 0x7d0,
++		.wpdma_rx_ring = {
++			0x7d0,
++			0x7d8,
++		},
+ 		.reset_idx_tx_mask	= GENMASK(1, 0),
+ 		.reset_idx_rx_mask	= GENMASK(7, 6),
+ 	},
+@@ -621,8 +628,8 @@ mtk_wed_amsdu_init(struct mtk_wed_device *dev)
+ 		return ret;
+ 	}
+ 
+-	/* eagle E1 PCIE1 tx ring 22 flow control issue */
+-	if (dev->wlan.id == 0x7991)
++	/* Kite and Eagle E1 PCIE1 tx ring 22 flow control issue */
++	if (dev->wlan.id == 0x7991 || dev->wlan.id == 0x7992)
+ 		wed_clr(dev, MTK_WED_AMSDU_FIFO, MTK_WED_AMSDU_IS_PRIOR0_RING);
+ 
+ 	wed_set(dev, MTK_WED_CTRL, MTK_WED_CTRL_TX_AMSDU_EN);
+@@ -1239,7 +1246,11 @@ mtk_wed_set_wpdma(struct mtk_wed_device *dev)
+ 		return;
+ 
+ 	wed_w32(dev, MTK_WED_WPDMA_RX_GLO_CFG, dev->wlan.wpdma_rx_glo);
+-	wed_w32(dev, dev->hw->soc->regmap.wpdma_rx_ring0, dev->wlan.wpdma_rx);
++	wed_w32(dev, dev->hw->soc->regmap.wpdma_rx_ring[0],
++		dev->wlan.wpdma_rx[0]);
++	if (mtk_wed_is_v3(dev->hw))
++		wed_w32(dev, dev->hw->soc->regmap.wpdma_rx_ring[1],
++			dev->wlan.wpdma_rx[1]);
+ 
+ 	if (!dev->wlan.hw_rro)
+ 		return;
+@@ -2323,6 +2334,16 @@ mtk_wed_start(struct mtk_wed_device *dev, u32 irq_mask)
+ 		if (!dev->rx_wdma[i].desc)
+ 			mtk_wed_wdma_rx_ring_setup(dev, i, 16, false);
+ 
++	if (dev->wlan.hw_rro) {
++		for (i = 0; i < MTK_WED_RX_PAGE_QUEUES; i++) {
++			u32 addr = MTK_WED_RRO_MSDU_PG_CTRL0(i) +
++				   MTK_WED_RING_OFS_COUNT;
++
++			if (!wed_r32(dev, addr))
++				wed_w32(dev, addr, 1);
++		}
++	}
++
+ 	mtk_wed_hw_init(dev);
+ 	mtk_wed_configure_irq(dev, irq_mask);
+ 
+diff --git a/drivers/net/ethernet/mediatek/mtk_wed.h b/drivers/net/ethernet/mediatek/mtk_wed.h
+index c1f0479d7a7182919e77c40efc30ade37abfad58..b49aee9a8b65156310e4f66a17921e5320b3077c 100644
+--- a/drivers/net/ethernet/mediatek/mtk_wed.h
++++ b/drivers/net/ethernet/mediatek/mtk_wed.h
+@@ -17,7 +17,7 @@ struct mtk_wed_wo;
+ struct mtk_wed_soc_data {
+ 	struct {
+ 		u32 tx_bm_tkid;
+-		u32 wpdma_rx_ring0;
++		u32 wpdma_rx_ring[MTK_WED_RX_QUEUES];
+ 		u32 reset_idx_tx_mask;
+ 		u32 reset_idx_rx_mask;
+ 	} regmap;
+diff --git a/drivers/net/wireless/mediatek/mt76/mt7915/mmio.c b/drivers/net/wireless/mediatek/mt76/mt7915/mmio.c
+index 4a82f8e4c118061fc76459dc0e38f7ee27e25a3a..36488aa6cc20117de4f5b76b80beca149015e055 100644
+--- a/drivers/net/wireless/mediatek/mt76/mt7915/mmio.c
++++ b/drivers/net/wireless/mediatek/mt76/mt7915/mmio.c
+@@ -664,8 +664,8 @@ int mt7915_mmio_wed_init(struct mt7915_dev *dev, void *pdev_ptr,
+ 					 MT_RXQ_WED_RING_BASE;
+ 		wed->wlan.wpdma_rx_glo = pci_resource_start(pci_dev, 0) +
+ 					 MT_WPDMA_GLO_CFG;
+-		wed->wlan.wpdma_rx = pci_resource_start(pci_dev, 0) +
+-				     MT_RXQ_WED_DATA_RING_BASE;
++		wed->wlan.wpdma_rx[0] = pci_resource_start(pci_dev, 0) +
++					MT_RXQ_WED_DATA_RING_BASE;
+ 	} else {
+ 		struct platform_device *plat_dev = pdev_ptr;
+ 		struct resource *res;
+@@ -687,7 +687,7 @@ int mt7915_mmio_wed_init(struct mt7915_dev *dev, void *pdev_ptr,
+ 		wed->wlan.wpdma_tx = res->start + MT_TXQ_WED_RING_BASE;
+ 		wed->wlan.wpdma_txfree = res->start + MT_RXQ_WED_RING_BASE;
+ 		wed->wlan.wpdma_rx_glo = res->start + MT_WPDMA_GLO_CFG;
+-		wed->wlan.wpdma_rx = res->start + MT_RXQ_WED_DATA_RING_BASE;
++		wed->wlan.wpdma_rx[0] = res->start + MT_RXQ_WED_DATA_RING_BASE;
+ 	}
+ 	wed->wlan.nbuf = MT7915_HW_TOKEN_SIZE;
+ 	wed->wlan.tx_tbit[0] = is_mt7915(&dev->mt76) ? 4 : 30;
+diff --git a/drivers/net/wireless/mediatek/mt76/mt7996/mmio.c b/drivers/net/wireless/mediatek/mt76/mt7996/mmio.c
+index 30b40f4a91be81d429d11f15036167396756d2dc..fb2428a9b877899a0a6fb879aba84e1f6e7840f2 100644
+--- a/drivers/net/wireless/mediatek/mt76/mt7996/mmio.c
++++ b/drivers/net/wireless/mediatek/mt76/mt7996/mmio.c
+@@ -503,9 +503,9 @@ int mt7996_mmio_wed_init(struct mt7996_dev *dev, void *pdev_ptr,
+ 		}
+ 
+ 		wed->wlan.wpdma_rx_glo = wed->wlan.phy_base + hif1_ofs + MT_WFDMA0_GLO_CFG;
+-		wed->wlan.wpdma_rx = wed->wlan.phy_base + hif1_ofs +
+-				     MT_RXQ_RING_BASE(MT7996_RXQ_BAND0) +
+-				     MT7996_RXQ_BAND0 * MT_RING_SIZE;
++		wed->wlan.wpdma_rx[0] = wed->wlan.phy_base + hif1_ofs +
++					MT_RXQ_RING_BASE(MT7996_RXQ_BAND0) +
++					MT7996_RXQ_BAND0 * MT_RING_SIZE;
+ 
+ 		wed->wlan.id = MT7996_DEVICE_ID_2;
+ 		wed->wlan.tx_tbit[0] = ffs(MT_INT_TX_DONE_BAND2) - 1;
+@@ -518,9 +518,9 @@ int mt7996_mmio_wed_init(struct mt7996_dev *dev, void *pdev_ptr,
+ 
+ 		wed->wlan.wpdma_rx_glo = wed->wlan.phy_base + MT_WFDMA0_GLO_CFG;
+ 
+-		wed->wlan.wpdma_rx = wed->wlan.phy_base +
+-				     MT_RXQ_RING_BASE(MT7996_RXQ_BAND0) +
+-				     MT7996_RXQ_BAND0 * MT_RING_SIZE;
++		wed->wlan.wpdma_rx[0] = wed->wlan.phy_base +
++					MT_RXQ_RING_BASE(MT7996_RXQ_BAND0) +
++					MT7996_RXQ_BAND0 * MT_RING_SIZE;
+ 
+ 		wed->wlan.wpdma_rx_rro[0] = wed->wlan.phy_base +
+ 					    MT_RXQ_RING_BASE(MT7996_RXQ_RRO_BAND0) +
+diff --git a/include/linux/soc/mediatek/mtk_wed.h b/include/linux/soc/mediatek/mtk_wed.h
+index d8949a4ed0dc9d41b3364e85a21e15d258519c45..c4ff6bab176db1f51cd94ac4198df0caeb557df2 100644
+--- a/include/linux/soc/mediatek/mtk_wed.h
++++ b/include/linux/soc/mediatek/mtk_wed.h
+@@ -147,7 +147,7 @@ struct mtk_wed_device {
+ 		u32 wpdma_tx;
+ 		u32 wpdma_txfree;
+ 		u32 wpdma_rx_glo;
+-		u32 wpdma_rx;
++		u32 wpdma_rx[MTK_WED_RX_QUEUES];
+ 		u32 wpdma_rx_rro[MTK_WED_RX_QUEUES];
+ 		u32 wpdma_rx_pg;
+ 
+
+---
+base-commit: fa582ca7e187a15e772e6a72fe035f649b387a60
+change-id: 20250718-mt7992-wed-support-456a50d51f81
+
+Best regards,
+-- 
+Lorenzo Bianconi <lorenzo@kernel.org>
 
 
