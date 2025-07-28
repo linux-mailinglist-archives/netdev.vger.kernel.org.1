@@ -1,99 +1,155 @@
-Return-Path: <netdev+bounces-210474-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210475-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8554B1393D
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 12:51:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E55B1B13943
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 12:53:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EFCFF1786B9
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 10:51:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 29A40178990
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 10:53:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 268C1248F67;
-	Mon, 28 Jul 2025 10:51:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B14124A06D;
+	Mon, 28 Jul 2025 10:53:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nNraNSpY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J8jZ0Hv2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEB4A246BA5;
-	Mon, 28 Jul 2025 10:51:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24421248F7F;
+	Mon, 28 Jul 2025 10:53:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753699908; cv=none; b=QU2zNSO1LZQSqv1uohgabpMMLbUUFTYszaekSY/MeYq0NoLOXePxy1Rviu7ORgR8ARFPH+I/8kcRxiNsfTnKOrUppMyjyoJ5v/ZLLSwQJIgGdaRLr+6ZefvLfxZkOdx5YJDj9oauGz6G5Grqt4eQvWfnb1Ri0IqKZwNQTNnCagE=
+	t=1753699985; cv=none; b=C9Qredrd3U40BJVTfSMapz5Ki7gRgxRPmZeIAW1IFOW+m1UTaRJ0fETOPi/TsXi4a2vjWE7niaqr1G61oPf9dChaR/Ck4c40EuauJ+RHCbbCGiHcKrgNxPx18dymFM6kAvdK2rk0nK0Q9/Nw9s2L80w2s+fGQtpDTLWfi7mqLgM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753699908; c=relaxed/simple;
-	bh=zqnx9HuowZ+lHyObY59ewf0mnjXI/dNEhmmcovb74DI=;
+	s=arc-20240116; t=1753699985; c=relaxed/simple;
+	bh=YzxlFFzWPN1YfBjAA8t6TNM4BqaZ5QzVVLh16SHHCw4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BV86KOcdvnBUczIeU3UZMF9qF7zQJUaPhgmwh04paiC4yjp/p9TUUtDVCvdVKEkHrdM4ulqAAMeAUCrXphCuIde9NadulOmqJymeb8C0gb2sCyOudOorBtpLqYdRa6saRfiL82m90lQ/3omy472/IX+bZktChmMKmrLwab00LwY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nNraNSpY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF5F7C4CEE7;
-	Mon, 28 Jul 2025 10:51:44 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=estW61RUIS108imqUI4aSaKW62cO9KZBAezw8BdObsf9w3GDxirjO/wkTwpAFpaecbTmig8sx8n9SHYXCd9BdJF0m1grvWOF3byMl5MlbENNp6XW9JUTWG0U2uchvRIl9LP74eO4RqFWkxbKeZIhk7KCi5pbdd8eshA/Sfx7vjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J8jZ0Hv2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C3EDC4CEE7;
+	Mon, 28 Jul 2025 10:53:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753699907;
-	bh=zqnx9HuowZ+lHyObY59ewf0mnjXI/dNEhmmcovb74DI=;
+	s=k20201202; t=1753699984;
+	bh=YzxlFFzWPN1YfBjAA8t6TNM4BqaZ5QzVVLh16SHHCw4=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nNraNSpYEiG8XjSnMc8aUz9uHrdzsWQAEbAWu1xhb7mnCgD+rdHM7S6M1PMnAhRvF
-	 pJEss3vzIcDjh1X4nphyBLQLOw/9e+ktT05YSxfB26BnAE742YD00VBHFpFNFm/sKX
-	 99Q5mjHSh9FD+9i2hc2lsBzcLmNEKMHnWoe6VnuMGAPkMBqFKUBYxnYtrNWMe4QW5U
-	 25DKhcSS6ZUd7QQu/fI2UqfJZHzVIfkqj9n2lhZ7MzmnEy9ObZmO8nr6ueKpuJxwtV
-	 e7/1DyBChj7oPDlahFGsSnDKF4H5dQl5yfUUQGuH+LkW53wr6/HuQX5yr/OkCK0y1D
-	 sbU67Op6o9JvQ==
-Date: Mon, 28 Jul 2025 11:51:42 +0100
-From: Simon Horman <horms@kernel.org>
-To: Mihai Moldovan <ionic@ionic.de>
-Cc: linux-arm-msm@vger.kernel.org, Manivannan Sadhasivam <mani@kernel.org>,
-	Denis Kenzior <denkenz@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Willem de Bruijn <willemb@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, Dan Carpenter <dan.carpenter@linaro.org>
-Subject: Re: [PATCH v3 04/11] net: qrtr: support identical node ids
-Message-ID: <20250728105142.GZ1367887@horms.kernel.org>
-References: <cover.1753312999.git.ionic@ionic.de>
- <8fc53fad3065a9860e3f44cf8853494dd6eb6b47.1753312999.git.ionic@ionic.de>
- <20250724130836.GL1150792@horms.kernel.org>
- <a42d70aa-76b8-4034-9695-2e639e6471a2@ionic.de>
- <20250727144014.GX1367887@horms.kernel.org>
- <19b393bf-6ba3-406b-8b5b-48a60e5aa855@ionic.de>
+	b=J8jZ0Hv29q7w3cy//eaHdJ7LcWmSQy8i4vYeHxiCy6d3G3kp3Pau9kT3HI7AIWWys
+	 eytN7VEXLw2xnXJSD8//wGe0ev78JDuhEcCY2cplTjidmQFec+62gkzk+5g0OCXo42
+	 qpPjzgDcvWX9PQ5Z6r0wKult5vZMbzlH3BnVKz5XxJA/++oonQ+tWzKWYbgFBldHa/
+	 Q39EmV+Tqh1LYP0lgSF/9l8DAYAZAU5Qc4ALioaVFN6XMZgGRYWknJbq2AClymm+7h
+	 5FQOru7c9+OphqVyrK8w2AMzRikvFkTR8YUyOvwrtnGyneS2iJmY0qNZoTDjEq+3GP
+	 uwFLuBKkQHjZQ==
+Date: Mon, 28 Jul 2025 12:53:01 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>,
+	Stanislav Fomichev <stfomichev@gmail.com>, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <borkmann@iogearbox.net>,
+	Eric Dumazet <eric.dumazet@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, sdf@fomichev.me,
+	kernel-team@cloudflare.com, arthur@arthurfabre.com,
+	jakub@cloudflare.com, Jesse Brandeburg <jbrandeburg@cloudflare.com>
+Subject: Re: [PATCH bpf-next V2 0/7] xdp: Allow BPF to set RX hints for
+ XDP_REDIRECTed packets
+Message-ID: <aIdWjTCM1nOjiWfC@lore-desk>
+References: <b1873a92-747d-4f32-91f8-126779947e42@kernel.org>
+ <aGvcb53APFXR8eJb@mini-arch>
+ <aG427EcHHn9yxaDv@lore-desk>
+ <aHE2F1FJlYc37eIz@mini-arch>
+ <aHeKYZY7l2i1xwel@lore-desk>
+ <20250716142015.0b309c71@kernel.org>
+ <fbb026f9-54cf-49ba-b0dc-0df0f54c6961@kernel.org>
+ <20250717182534.4f305f8a@kernel.org>
+ <ebc18aba-d832-4eb6-b626-4ca3a2f27fe2@kernel.org>
+ <20250721181344.24d47fa3@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="FO0y4WtgO5PCdobH"
+Content-Disposition: inline
+In-Reply-To: <20250721181344.24d47fa3@kernel.org>
+
+
+--FO0y4WtgO5PCdobH
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <19b393bf-6ba3-406b-8b5b-48a60e5aa855@ionic.de>
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, Jul 27, 2025 at 07:33:58PM +0200, Mihai Moldovan wrote:
-> * On 7/27/25 16:40, Simon Horman wrote:
-> > I tried again with the latest head,
-> > commit 2fb2b9093c5d ("sleep_info: The synchronize_srcu() sleeps").
-> > And in that case I no longer see the 1st warning, about locking.
-> > I think this is what you saw too.
-> 
-> Exactly! Together with impossible condition warnings, but those are actually
-> fine/intended.
+> On Fri, 18 Jul 2025 12:56:46 +0200 Jesper Dangaard Brouer wrote:
+> > >> Thanks for the feedback. I can see why you'd be concerned about addi=
+ng
+> > >> another adhoc scheme or making xdp_frame grow into a "para-skb".
+> > >>
+> > >> However, I'd like to frame this as part of a long-term plan we've be=
+en
+> > >> calling the "mini-SKB" concept. This isn't a new idea, but a
+> > >> continuation of architectural discussions from as far back as [2016]=
+=2E =20
+> > >=20
+> > > My understanding is that while this was floated as a plan by some,
+> > > nobody came up with a clean way of implementing it. =20
+> >=20
+> > I can see why you might think that, but from my perspective, the
+> > xdp_frame *is* the implementation of the mini-SKB concept. We've been
+> > building it incrementally for years. It started as the most minimal
+> > structure possible and has gradually gained more context (e.g. dev_rx,
+> > mem_info/rxq_info, flags, and also uses skb_shared_info with same layout
+> > as SKB).
+>=20
+> My understanding was that just adding all the fields to xdp_frame was
+> considered too wasteful. Otherwise we would have done something along
+> those lines ~10 years ago :S
 
-Yeah, I saw them too.
-I agree they are not correctness issues.
+Hi Jakub,
 
-> 
-> > This seems to a regression in Smatch wrt this particular case for this
-> > code. I bisected Smatch and it looks like it was introduced in commit
-> > d0367cd8a993 ("ranges: use absolute instead implied for possibly_true/false")
-> Oh, thank you very much. I suspected that I'm just missing a special script
-> or option or even addition to Smash (given that Dan seems to have revamped
-> its locking check code in 2020), especially since it seems to be so widely
-> used in kernel development, but not a bug in the software itself.
+sorry for the late reply.
+I am completely fine to redesign the solution to overcome the problem but I
+guess this feature will allow us to improve XDP performance in a common/real
+use-case. Let's consider we want to redirect a packet into a veth and then =
+into
+a container. Preserving the hw metadata performing XDP_REDIRECT will allow =
+us
+to avoid recalculating the checksum creating the skb. This will result in a
+very nice performance improvement.
+So I guess we should really come up with some idea to add this missing feat=
+ure.
 
-Likewise, thanks for pointing out this problem.
+Regards,
+Lorenzo
 
+>=20
+> > This patch is simply the next logical step in that existing evolution:
+> > adding hardware metadata to make it more capable, starting with enabling
+> > XDP_REDIRECT offloads. The xdp_frame is our mini-SKB, and this patchset
+> > continues its evolution.
+>=20
+> I thought one of the goals for mini-skb was to move the skb allocation
+> out of the drivers. The patches as posted seem to make it the
+> responsibility of the XDP program to save the metadata. If you're
+> planning to make drivers populate this metadata by default - why add
+> the helpers.
+>=20
+> Again, I just don't understand how these logically fit into place
+> vis-a-vis the existing metadata "get" callbacks.
 
+--FO0y4WtgO5PCdobH
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaIdWjQAKCRA6cBh0uS2t
+rI6CAP4g67FRjB85fO3H1vEP36zjvQfC+Edmr1E5mCbKq+CWvAD+PSVrVL1WZ7i8
+sm+VfKIzYnP4zmg3VK2Ths+LoOTZdwU=
+=CXBx
+-----END PGP SIGNATURE-----
+
+--FO0y4WtgO5PCdobH--
 
