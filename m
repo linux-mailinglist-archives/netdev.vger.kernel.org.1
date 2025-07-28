@@ -1,90 +1,106 @@
-Return-Path: <netdev+bounces-210556-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210559-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13400B13E60
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 17:31:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9842FB13EE9
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 17:41:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 93B73166A40
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 15:29:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 143B17AE3DE
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 15:38:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED479274659;
-	Mon, 28 Jul 2025 15:28:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DB14270EA8;
+	Mon, 28 Jul 2025 15:38:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EmflJWGr"
+	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="tQZYj3yJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9D42273D7C;
-	Mon, 28 Jul 2025 15:28:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4691C18A6AB;
+	Mon, 28 Jul 2025 15:38:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753716533; cv=none; b=s6y8nXN8S1jUIm1UE1RkMQ8FHMvvEyqRLymjGnZcPgu/t0WIQ6AQ9GfzZLAzO4s064aWjdq/q64PxRI6wbWrCfU/9dRdSmf6iv66pd6aaOHTQf82iKcWLc2DE97IoPcFD2MxLkPErYpMys58+saN/JWWeWivCp5pNEYPiVg4pxA=
+	t=1753717116; cv=none; b=pm0BtK6u9mC6D0eF8ox1S+ozmx+XmAtbp3CEiilgSJ2wLaTItS+QFrUqc4+eWTRD/RL/93UyTSHDU5mhgcYIEE5wrveq6wf4D2VGBZckzkKOqaDIswPnwXwCr7kwJvwq174xbPdGpqbqaal8XLseuxGlhXRc8xJnwJhHCpLUYVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753716533; c=relaxed/simple;
-	bh=lPiDGpZFpdH6itgC3rcfg1u0DDgdbAG7h3QwQTSxGz4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Y78vVwH74hXP0LhFlbu9mt2UjsqfwUJt00t2QWO0bcEE4LG8nAxTZJZQo0PhhCAKuLS7Bh8Pr/IgJaPbhVsjixWmhUxSP3jSTZyk9eXxOSN9zJ49psHW5+T6Lam/lyMdiwBvCMvUxsyEPowt7tD0FcAC+ViKf384wIj7BU7a1hQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EmflJWGr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C01CEC4CEE7;
-	Mon, 28 Jul 2025 15:28:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753716533;
-	bh=lPiDGpZFpdH6itgC3rcfg1u0DDgdbAG7h3QwQTSxGz4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=EmflJWGrgqbhGLWqVxqvw4Yq4qHbm+pgRuCev4GyeV1j2aAeS3HB94b6/1EGL4mIf
-	 idZBrQtkA2SmHyKpO0xqzOndDVDewjc6byd+VyxNgF8b0+Etz0Ee62AnwveT+RgrQV
-	 ywyTuzLoupa5h7V+5rvRd36XDA4YItPeALYBxlQF+x1P1T4weIm84/HMtU9kEpx8TX
-	 WbD3UBTPLEYcf+lwWG0ro2jXtozr+K4eVCOZLDRmDf2KCbjj9iDGQveL2z95d/Ag1N
-	 nJWkzVdosnzwEA839eeqx2paRzs8SuGcb5KJcpE/8jC7RNoXHegSUncLdUyHxQIyv6
-	 SGrC0eVSBOI+w==
-Date: Mon, 28 Jul 2025 08:28:52 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
- <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Simon Horman
- <horms@kernel.org>, Felix Fietkau <nbd@nbd.name>,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- netdev@vger.kernel.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next v6 0/7] net: airoha: Introduce NPU callbacks
- for wlan offloading
-Message-ID: <20250728082852.158f6829@kernel.org>
-In-Reply-To: <20250727-airoha-en7581-wlan-offlaod-v6-0-6afad96ac176@kernel.org>
-References: <20250727-airoha-en7581-wlan-offlaod-v6-0-6afad96ac176@kernel.org>
+	s=arc-20240116; t=1753717116; c=relaxed/simple;
+	bh=hIf20LhUK1tUQLzGj8ydW/4r2tbZmoAN+UJUY1w+mX0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=sJ+3/CNGMW+2wvWWuhX2B0PI31R/IyXSeFPC9j1oarIsiaPml9XKrsCsLMH9Nrb7BWhxqaJwoAY0nQLct+l81H7aqMPGrT/eNOowiR23RsWPHZITpuQ+XADXqW2DKmzwr6glpajzdWFCYlKPpc3CpzxVyl+gv3EtcnPdWb7m6yA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=tQZYj3yJ; arc=none smtp.client-ip=193.68.50.107
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
+Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
+	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id 3A60EA036C;
+	Mon, 28 Jul 2025 17:30:51 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:from:from:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=mail; bh=abci0am6LSqs1O5WrmEN62h6sTg5U/wf/gniUsN48as=; b=
+	tQZYj3yJYmJJpzFbkfaY5r3+049jvj3BoWvr/7cdYPPEF0KefVodqmQoiSSy4UtL
+	/SFb8XviXiVgVgDUFsb/XB0IAP8hF7G5rdkYnwXqYsKUOTbgpMSZ7Jrk2UyJe3nT
+	LD0NChh+2jFvjjj2bMgJStyiipVKuSGX+pU5DREJB+eo2b+VUXY4WRbmEMndmvPg
+	NwMPkGHSseolAMglCsOES4210i6Uk4Z9j5t5kW3wLJSo4j26lgdOQRlrDvFrVchx
+	1r+w/tKgQeEpCvHYGVOmvkls2p7quNqW0ap8HJtbd+lzjdsNSIRxbnTEaic6jWRR
+	5i6bj48cE4xHOjYeg8qEfqP3rzsKgsBsNZ4iAAr3sniZ8L/jTmgdR+UsgZSk58Wv
+	A6v4FNbaGM1MmlEMRonUewylkGx5kgkbENUQeyUy1v8FqGU6nzijC6LyNM/6gjcm
+	9Zr9wAwOvhpcwGKdWgtu9lOeOdLTOG2NdlqSvc9b3jHwCFTmTsyWMZ8aD6Jgl0IX
+	R5olLS++l9k5ulAo6dqrdNhWbSZvTg46fotTSOVb0TDVBLSrFzgH5RmzAwaWPpMs
+	061q3EH6KPS6g4aLdP3YMJftlm4xRQ55dMk8z48DYkL3ROcbOvc7llVZEfTDswAS
+	rbhh13HSm3bJRGmW9fFLXnmfN3Cftm9Se2LihZwV7Gc=
+From: =?UTF-8?q?Bence=20Cs=C3=B3k=C3=A1s?= <csokas.bence@prolan.hu>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: Buday Csaba <buday.csaba@prolan.hu>, =?UTF-8?q?Cs=C3=B3k=C3=A1s=20Bence?=
+	<csokas.bence@prolan.hu>, Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit
+	<hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net resubmit] net: phy: smsc: add proper reset flags for LAN8710A
+Date: Mon, 28 Jul 2025 17:29:16 +0200
+Message-ID: <20250728152916.46249-2-csokas.bence@prolan.hu>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ESET-AS: R=OK;S=0;OP=CALC;TIME=1753716650;VERSION=7994;MC=255693352;ID=388555;TRN=0;CRV=0;IPC=;SP=0;SIPS=0;PI=3;F=0
+X-ESET-Antispam: OK
+X-EsetResult: clean, is OK
+X-EsetId: 37303A2998FD515E677063
 
-On Sun, 27 Jul 2025 16:40:45 +0200 Lorenzo Bianconi wrote:
-> Similar to wired traffic, EN7581 SoC allows to offload traffic to/from
-> the MT76 wireless NIC configuring the NPU module via the Netfilter
-> flowtable. This series introduces the necessary NPU callback used by
-> the MT7996 driver in order to enable the offloading.
-> MT76 support has been posted as RFC in [0] in order to show how the
-> APIs are consumed.
+From: Buday Csaba <buday.csaba@prolan.hu>
 
-## Form letter - net-next-closed
+According to the LAN8710A datasheet (Rev. B, section 3.8.5.1), a hardware
+reset is required after power-on, and the reference clock (REF_CLK) must be
+established before asserting reset.
 
-We have already submitted our pull request with net-next material for v6.17,
-and therefore net-next is closed for new drivers, features, code refactoring
-and optimizations. We are currently accepting bug fixes only.
+Signed-off-by: Buday Csaba <buday.csaba@prolan.hu>
+Cc: Csókás Bence <csokas.bence@prolan.hu>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+---
+ drivers/net/phy/smsc.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Please repost when net-next reopens after Aug 11th.
+diff --git a/drivers/net/phy/smsc.c b/drivers/net/phy/smsc.c
+index b6489da5cfcd..48487149c225 100644
+--- a/drivers/net/phy/smsc.c
++++ b/drivers/net/phy/smsc.c
+@@ -785,6 +785,7 @@ static struct phy_driver smsc_phy_driver[] = {
+ 
+ 	/* PHY_BASIC_FEATURES */
+ 
++	.flags		= PHY_RST_AFTER_CLK_EN,
+ 	.probe		= smsc_phy_probe,
+ 
+ 	/* basic functions */
 
-RFC patches sent for review only are obviously welcome at any time.
-
-See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
+base-commit: fa582ca7e187a15e772e6a72fe035f649b387a60
 -- 
-pw-bot: defer
-pv-bot: closed
+2.43.0
+
+
 
