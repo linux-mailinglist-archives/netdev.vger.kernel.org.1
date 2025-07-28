@@ -1,156 +1,108 @@
-Return-Path: <netdev+bounces-210503-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210504-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19555B13A25
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 13:58:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AED9B13A2B
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 14:02:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E0A6A1896EC3
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 11:58:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ADB417A27C7
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 12:00:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88087262FD3;
-	Mon, 28 Jul 2025 11:58:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58375248F72;
+	Mon, 28 Jul 2025 12:02:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UiGFFLRX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P0FfGMeB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63B8C262FCC
-	for <netdev@vger.kernel.org>; Mon, 28 Jul 2025 11:58:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 303881B412A;
+	Mon, 28 Jul 2025 12:02:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753703908; cv=none; b=OdYoQjE7oLd/b9tcAKKfmHhUoAgYEl50wrB1MxUKprrFX7PxZtO/ROfRE/RagnPx9zsODrUftm53LNyjdHIM3nPd+xSyvhWCFyBbjetQCubhPvSfQuo5TpsVBD98vQX4ow5Td+EukqAF0k5tg+SGuYNkTtR9kZ8U6+gArGOFZbc=
+	t=1753704121; cv=none; b=R1CoGSJnb8z8ekBF05LT8AY3j+I+NtsEoy5lLWIJSoP5PVN56L5gz3KNzSNNAXQ0OdHSuL9Jffxzjslc+WkDqvgADueCxoAUo4uwXX4Mb/4Tq0+fJVKyv789c249UUKCKhjdVJNDfnyZsPmnVXWtf+OZEUTX7Lp3G/nIyf8aK2E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753703908; c=relaxed/simple;
-	bh=i7aKOq5KQVfB2/q14tophkJxPE1KTHjxLov6PFKAuzw=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=HLG0TsWGkHbaCZnOnqjknj70GgqedDW9dftsb0X5bmRaj3yLSZGbrn1VIYuLWDippUXReE1kk+ewV+YdWdC4RSGpLdm0cMVqz3iqUJ/Yek6e8YONqVa51R5UtyMDBqWp3ZUhI05xeypc//u8FDAV1KrDJLOx2a0hYZi7GNAp1uk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UiGFFLRX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D697C4CEF8;
-	Mon, 28 Jul 2025 11:58:27 +0000 (UTC)
+	s=arc-20240116; t=1753704121; c=relaxed/simple;
+	bh=K5omD7RGOhPEzhUznjylosuNOQe0HHUSXY8RpKWqF50=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bKIiBO+YrVup8VBFV3e8msE0foD8A/M4w7acU5sFUxxsU/SKtItgVGZFG758Uhi5CYxg3GB8K5Bu47b4jkbK9DZXofggt2B9FXr91bBAHtIzA2TzOqUYLvKgW6hsFsgyhC5nM0Re/6rwGu0E5FZMyU00l1grExqid8eN63j0ZbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P0FfGMeB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8ECEEC4CEE7;
+	Mon, 28 Jul 2025 12:01:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753703908;
-	bh=i7aKOq5KQVfB2/q14tophkJxPE1KTHjxLov6PFKAuzw=;
-	h=From:Date:Subject:To:Cc:From;
-	b=UiGFFLRXph6DIdO80VKAEFr2r6lwmFgP4INSrr85ATz85g79zqF06Rx5g03sDaGVU
-	 L0Sqmb0Na8c0PN/ylDtMv7CEuixYli5AI70nU37zR0mneU4ZoxIvL/KbSddUBvKAo+
-	 nECOR9/VZf1Wr77gN7+KYaQxpcHA3vfqVh9MnO6XAMxBnKcb3cLgG9pjtQv3WiWimA
-	 NS+vhowSnmqMzmFYkMG4l7ZOcyNthPkXqLJgxaF9ZV7m2b07DezwEJKj52Mdj8BwJR
-	 x5jxgsme08NjPMBzs5cuV/muESj8VaPzUoWHnXKtF8hb/LLwJvFN966vXYXNC2U+O9
-	 FG2ierM9a/5AQ==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Mon, 28 Jul 2025 13:58:08 +0200
-Subject: [PATCH net] net: airoha: Fix PPE table access in
- airoha_ppe_debugfs_foe_show()
+	s=k20201202; t=1753704120;
+	bh=K5omD7RGOhPEzhUznjylosuNOQe0HHUSXY8RpKWqF50=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=P0FfGMeBfQ8OuR+dpvluBCpDrMR7vx/DMnvUHvt/xTFjV+XySV0Wsh/9p8NLIxWWI
+	 tadEH4ydZThUEzmdsHYJ+LklZoIZ1rIfHeM4IV0pSO9r1uWSww3GBzOspXli441h9x
+	 kwf690hHHXz5zbzQZHhQZE0wtonNOVNdXkG7bHeb+0r+NsyeNVgpVJzjUuepDU8pnS
+	 Fx3t/xZ3ZdRcbFe19OycsU9xhjsoKCVViyejTNk07+3iTlVsGXTIKKHkI2wed9CnbB
+	 R6m/g3NCdPAKsT5Kr1xkIMutiA7mwlS+vKdy+VxvYKB3GBckZx7O/7zfFrc1xkdElQ
+	 VAl85G6bYUcNQ==
+Date: Mon, 28 Jul 2025 13:01:55 +0100
+From: Simon Horman <horms@kernel.org>
+To: fan.yu9@zte.com.cn
+Cc: xiyou.wangcong@gmail.com, dumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, davem@davemloft.net, jiri@resnulli.us,
+	jhs@mojatatu.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, xu.xin16@zte.com.cn,
+	yang.yang29@zte.com.cn, tu.qiang35@zte.com.cn,
+	jiang.kun2@zte.com.cn, wang.yaxin@zte.com.cn, qiu.yutan@zte.com.cn,
+	he.peilin@zte.com.cn
+Subject: Re: [PATCH net-next] net/sched: Add precise drop reason for
+ pfifo_fast queue overflows
+Message-ID: <20250728120155.GB1367887@horms.kernel.org>
+References: <aIO+CKQ/kvpX5lMo@pop-os.localdomain>
+ <202507281711372379BW_PL4oZvcBoW5Xti7yO@zte.com.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250728-airoha_ppe_foe_get_entry_locked-v1-1-8630ec73f3d1@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAM9lh2gC/x3NQQqDMBBG4avIrA2kwaL1KkWGqL86VJIwkdIi3
- r2hy2/z3kkZKsjUVycp3pIlhoJbXdG0+bDCyFxMzrq7bV1nvGjcPKcEXiJ4xcEIh355j9MLs2k
- tGowj8OgaKpWkWOTzPzyH6/oBWBGJdXEAAAA=
-X-Change-ID: 20250728-airoha_ppe_foe_get_entry_locked-70e4ebbee984
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-X-Mailer: b4 0.14.2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <202507281711372379BW_PL4oZvcBoW5Xti7yO@zte.com.cn>
 
-In order to avoid any possible race we need to hold the ppe_lock
-spinlock accessing the hw PPE table. airoha_ppe_foe_get_entry routine is
-always executed holding ppe_lock except in airoha_ppe_debugfs_foe_show
-routine. Fix the problem introducing airoha_ppe_foe_get_entry_locked
-routine.
+On Mon, Jul 28, 2025 at 05:11:37PM +0800, fan.yu9@zte.com.cn wrote:
+> > BTW, it seems net-next is closed, you may need to resend it after it is> re-open.>> Thanks.
+> 
+> Hi Cong,  
+> Thank you for your review and the feedback!
+> Could you kindly share how to track the status of the net-next merge window?
+> Should I monitor the linux-netdev mailing list for announcements, or is there a specific schedule I can follow? 
 
-Fixes: 3fe15c640f380 ("net: airoha: Introduce PPE debugfs support")
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
- drivers/net/ethernet/airoha/airoha_eth.h         |  4 ++--
- drivers/net/ethernet/airoha/airoha_ppe.c         | 18 ++++++++++++++++--
- drivers/net/ethernet/airoha/airoha_ppe_debugfs.c |  2 +-
- 3 files changed, 19 insertions(+), 5 deletions(-)
+Hi,
 
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ethernet/airoha/airoha_eth.h
-index a970b789cf232c316e5ea27b0146493bf91c3767..cf33d731ad0db43bca8463fde76673b39a4f6796 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.h
-+++ b/drivers/net/ethernet/airoha/airoha_eth.h
-@@ -615,8 +615,8 @@ int airoha_ppe_setup_tc_block_cb(struct net_device *dev, void *type_data);
- int airoha_ppe_init(struct airoha_eth *eth);
- void airoha_ppe_deinit(struct airoha_eth *eth);
- void airoha_ppe_init_upd_mem(struct airoha_gdm_port *port);
--struct airoha_foe_entry *airoha_ppe_foe_get_entry(struct airoha_ppe *ppe,
--						  u32 hash);
-+struct airoha_foe_entry *
-+airoha_ppe_foe_get_entry_locked(struct airoha_ppe *ppe, u32 hash);
- void airoha_ppe_foe_entry_get_stats(struct airoha_ppe *ppe, u32 hash,
- 				    struct airoha_foe_stats64 *stats);
- 
-diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/ethernet/airoha/airoha_ppe.c
-index 0e217acfc5ef748453b020e5713ace1910abc4a8..4dbf2bf187d02e3e8b9d2b966036c3aa58c867b1 100644
---- a/drivers/net/ethernet/airoha/airoha_ppe.c
-+++ b/drivers/net/ethernet/airoha/airoha_ppe.c
-@@ -498,9 +498,11 @@ static void airoha_ppe_foe_flow_stats_update(struct airoha_ppe *ppe,
- 		FIELD_PREP(AIROHA_FOE_IB2_NBQ, nbq);
- }
- 
--struct airoha_foe_entry *airoha_ppe_foe_get_entry(struct airoha_ppe *ppe,
--						  u32 hash)
-+static struct airoha_foe_entry *
-+airoha_ppe_foe_get_entry(struct airoha_ppe *ppe, u32 hash)
- {
-+	lockdep_assert_held(&ppe_lock);
-+
- 	if (hash < PPE_SRAM_NUM_ENTRIES) {
- 		u32 *hwe = ppe->foe + hash * sizeof(struct airoha_foe_entry);
- 		struct airoha_eth *eth = ppe->eth;
-@@ -527,6 +529,18 @@ struct airoha_foe_entry *airoha_ppe_foe_get_entry(struct airoha_ppe *ppe,
- 	return ppe->foe + hash * sizeof(struct airoha_foe_entry);
- }
- 
-+struct airoha_foe_entry *
-+airoha_ppe_foe_get_entry_locked(struct airoha_ppe *ppe, u32 hash)
-+{
-+	struct airoha_foe_entry *hwe;
-+
-+	spin_lock_bh(&ppe_lock);
-+	hwe = airoha_ppe_foe_get_entry(ppe, hash);
-+	spin_unlock_bh(&ppe_lock);
-+
-+	return hwe;
-+}
-+
- static bool airoha_ppe_foe_compare_entry(struct airoha_flow_table_entry *e,
- 					 struct airoha_foe_entry *hwe)
- {
-diff --git a/drivers/net/ethernet/airoha/airoha_ppe_debugfs.c b/drivers/net/ethernet/airoha/airoha_ppe_debugfs.c
-index 05a756233f6a44fa51d1c57dd39d89c8ea488054..992bf2e9598414ee3f1f126be3f451e486b26640 100644
---- a/drivers/net/ethernet/airoha/airoha_ppe_debugfs.c
-+++ b/drivers/net/ethernet/airoha/airoha_ppe_debugfs.c
-@@ -67,7 +67,7 @@ static int airoha_ppe_debugfs_foe_show(struct seq_file *m, void *private,
- 		u32 type, state, ib2, data;
- 		bool ipv6 = false;
- 
--		hwe = airoha_ppe_foe_get_entry(ppe, i);
-+		hwe = airoha_ppe_foe_get_entry_locked(ppe, i);
- 		if (!hwe)
- 			continue;
- 
+The merge-window opens when a new version of the Kernel is released, in
+this case v6.16 was released yesterday. It remains open until the
+subsequent rc1 release is made, in this case that will be v6.17-rc1. That
+is typically two weeks after the merge-window opens.
 
----
-base-commit: afd8c2c9e2e29c6c7705635bea2960593976dacc
-change-id: 20250728-airoha_ppe_foe_get_entry_locked-70e4ebbee984
+You can observe the current Kernel release in a variety of ways,
+including visiting https://www.kernel.org/
 
-Best regards,
--- 
-Lorenzo Bianconi <lorenzo@kernel.org>
+The timing of the merge window can be predicted with some accuracy by
+following kernel rc releases: it usually occurs 1 week after an rc7
+release. (If not, an rc8 release occurs, and the merge window will likely
+open a week after that; and so on.)
 
+
+net-next closes around the time that the merge-window opens.
+But there is some variance in exactly when this occurs, due
+to the schedules of the maintainers.
+
+net-next re-opens around the time that the merge-window closes.
+But again there is some variance.
+
+The opening and closing of net-next is announced, with [ANN] in
+the subject on the netdev mailing list.
+
+https://lore.kernel.org/netdev/?q=ANN
+
+
+There is some more information on this topic here:
+https://docs.kernel.org/process/maintainer-netdev.html#development-cycle
 
