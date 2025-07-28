@@ -1,143 +1,422 @@
-Return-Path: <netdev+bounces-210552-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210553-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B31D0B13E2D
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 17:25:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46BD8B13E34
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 17:26:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB48017C73D
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 15:25:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A66817FAE2
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 15:26:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B87BA26D4E2;
-	Mon, 28 Jul 2025 15:25:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62452272803;
+	Mon, 28 Jul 2025 15:25:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kwiboo.se header.i=@kwiboo.se header.b="gG/ARB0x"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RmEZXQN6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.forwardemail.net (smtp.forwardemail.net [121.127.44.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 927B91A254E
-	for <netdev@vger.kernel.org>; Mon, 28 Jul 2025 15:25:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=121.127.44.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31FB41E2823;
+	Mon, 28 Jul 2025 15:25:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753716315; cv=none; b=kWuX8WC4vw/Ys7cX7+4G2URKdR/M9sSMyOfzUzp8VT8qhQtVB6a/qC5qYF9pIREnNGDqgcRfAyMQOHfTCiPH/m8BFJAfPxTyi+8CrG2S3xRhBLl0dxKXhL+7MbYA7KCNhnx76atoEn92E9nbOLO3qVbYhXl8UMQ2EN17oPhLRAU=
+	t=1753716332; cv=none; b=bJqSVJv7xGYPNIQy/jYbRbl7Gcgqi0LVsDZNHYPV3PeloY7HzBSFvcIE3Xeeu6GlleLcE17YT8TmoSFB7xP4TfoclF2FU1AIKPHeCJ31I7nzCtS5pgv1tA2ay41uACkgSbwQK+9i/MG2y0gU9RR+++iIJc+DknpLxf1Xfak35Kk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753716315; c=relaxed/simple;
-	bh=IgZBumURBZn3Sf1eLjQJxnY/VLdgD3j/8do2ZrMZKMI=;
+	s=arc-20240116; t=1753716332; c=relaxed/simple;
+	bh=HdclEY6D/ELo3mqAWfqroObatxW0H5QIu+N0Gk80oWg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fi68QixP1tNk2aESVub+FskrvSmdtbBk7FzsEWeaABz4i/HIoyMyLg06KVtt8ZFqyfzTalNbqFTUPB6fPcwYDEAzMDj3oehZ894xFP9BcA6qBicPDTibyBRU+kVPK9bWisvOFySAat0BKMmz4j88k5WXx00cWnxObyeYdc6HicY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kwiboo.se; spf=pass smtp.mailfrom=fe-bounces.kwiboo.se; dkim=pass (2048-bit key) header.d=kwiboo.se header.i=@kwiboo.se header.b=gG/ARB0x; arc=none smtp.client-ip=121.127.44.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kwiboo.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fe-bounces.kwiboo.se
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kwiboo.se;
- h=Content-Transfer-Encoding: Content-Type: In-Reply-To: From: References:
- Cc: To: Subject: MIME-Version: Date: Message-ID; q=dns/txt;
- s=fe-e1b5cab7be; t=1753716307;
- bh=jd6WXK9KVAKuAai0Rlvgq64nX1IBqeA40jOYWtgY/NM=;
- b=gG/ARB0x+z6XS7e2a7d3nIYdBXrKDbnV65rc45L1Hrj/i1Ry/qqWiKLHCd8HT2kd7CLRuzRQ4
- VYLpk08BRR4izQc3UPdo5n2+Dscto6dUi1+tGf1QUycppys+fbn+WdUzr2qW/8cnHy/1Ykp5AHf
- fCBxFugQpZ+VD1viQ2DwUoI5mLh7bYVCNBcJyC5fl8uAwJAHRUU5fJMus+mCDrQ9Ad95W0frWRq
- 2YXDhAfRsyUTJVzGp3g9+GSdn3ORH/IJ5VS/uCeD7JuzXwff2gcgKk8JgonBOIskisz3QpGMQsF
- z/2jwQbBPZBU+Ml/4ti/210w9UdntkV5BX05TwfdCt2A==
-X-Forward-Email-ID: 68879630351ec66b15a1c462
-X-Forward-Email-Sender: rfc822; jonas@kwiboo.se, smtp.forwardemail.net,
- 121.127.44.73
-X-Forward-Email-Version: 1.1.8
-X-Forward-Email-Website: https://forwardemail.net
-X-Complaints-To: abuse@forwardemail.net
-X-Report-Abuse: abuse@forwardemail.net
-X-Report-Abuse-To: abuse@forwardemail.net
-Message-ID: <1c639c62-cc07-4b3d-a18b-77f93668b88f@kwiboo.se>
-Date: Mon, 28 Jul 2025 17:24:27 +0200
+	 In-Reply-To:Content-Type; b=P08qLCBnVZiKPPOwG5+QAVzEM5wyhCG1eD6zYrLslpC20qwzDD5ZlYy56UejDOsG5jH66vx16OEGbczw7C6jaAS9Aaxsi9kQ09OKYadtBhJBuAXokfx/Nhp49xVOHHF9D+3xNKFtgAERIKQoQvz1MdSB3uCzSmTOY2hHhQECOmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RmEZXQN6; arc=none smtp.client-ip=91.218.175.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <8e6cd484-43f6-410e-a580-3671642a7e65@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1753716317;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=43bTjxENVZrLQD/4l+zrHdTaGZI/A43tISDWdUvDAjQ=;
+	b=RmEZXQN6NJEfqrllCKvpHFDLS2DrYpaJ6mTz+Qf+UYgvnnG98dbfSiY4Ptyyz/huhjX6f8
+	cuK1lKqp/yZ7UCu/xrf6bcklUNcaZmX9rZ7LyBX8kD7DRGasXVgwZy6Oa2n4Qfle0tMd4+
+	uh9rVTt03EOZjwQrquNhlxhQMyj8kQs=
+Date: Mon, 28 Jul 2025 23:25:08 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/3] net: dsa: realtek: Add support for use of an
- optional mdio node
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Linus Walleij <linus.walleij@linaro.org>,
- =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Yao Zi <ziyao@disroot.org>, Chukun Pan <amadeus@jmu.edu.cn>,
- Heiko Stuebner <heiko@sntech.de>, netdev@vger.kernel.org,
- linux-rockchip@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org
-References: <20250727180305.381483-1-jonas@kwiboo.se>
- <20250727180305.381483-3-jonas@kwiboo.se>
- <2504b605-24e7-4573-bec0-78f55688a482@lunn.ch>
- <badef015-22ff-4232-a4d0-80d2034113ca@kwiboo.se>
- <9702f3da-f755-4392-bf2b-28814ee0a8c7@lunn.ch>
-Content-Language: en-US
-From: Jonas Karlman <jonas@kwiboo.se>
-In-Reply-To: <9702f3da-f755-4392-bf2b-28814ee0a8c7@lunn.ch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH bpf-next v4 1/3] bpftool: Add bpf_token show
+To: qmo@kernel.org, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+ martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
+ sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
+ kuba@kernel.org, hawk@kernel.org
+Cc: linux-kernel@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org
+References: <20250723144442.1427943-1-chen.dylane@linux.dev>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Tao Chen <chen.dylane@linux.dev>
+In-Reply-To: <20250723144442.1427943-1-chen.dylane@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Hi Andrew,
+在 2025/7/23 22:44, Tao Chen 写道:
 
-On 7/28/2025 12:09 AM, Andrew Lunn wrote:
->> Something like above does not seem to work, I get following:
->>
->>   mdio_bus stmmac-0: MDIO device at address 0 is missing.
->>   mdio_bus stmmac-0: MDIO device at address 1 is missing.
->>   mdio_bus stmmac-0: MDIO device at address 2 is missing.
->>   mdio_bus stmmac-0: MDIO device at address 3 is missing.
+Ping...
+
+Hi,
+
+Quentin has reviewed this patchset, could someone review this again, thanks.
+
+> Add `bpftool token show` command to get token info
+> from bpffs in /proc/mounts.
 > 
-> O.K, So i was wrong.
+> Example plain output for `token show`:
+> token_info  /sys/fs/bpf/token
+> 	allowed_cmds:
+> 	  map_create          prog_load
+> 	allowed_maps:
+> 	allowed_progs:
+> 	  kprobe
+> 	allowed_attachs:
+> 	  xdp
+> token_info  /sys/fs/bpf/token2
+> 	allowed_cmds:
+> 	  map_create          prog_load
+> 	allowed_maps:
+> 	allowed_progs:
+> 	  kprobe
+> 	allowed_attachs:
+> 	  xdp
 > 
->> And without an explicit 'mdio' child node the driver currently fails to
->> load and the switch is never registered:
->>
->>   rtl8365mb-mdio stmmac-0:1d: found an RTL8367RB-VB switch
->>   rtl8365mb-mdio stmmac-0:1d: no MDIO bus node
->>   rtl8365mb-mdio stmmac-0:1d: could not set up MDIO bus
->>   rtl8365mb-mdio stmmac-0:1d: error -ENODEV: unable to register switch
+> Example json output for `token show`:
+> [{
+> 	"token_info": "/sys/fs/bpf/token",
+> 	"allowed_cmds": ["map_create", "prog_load"],
+> 	"allowed_maps": [],
+> 	"allowed_progs": ["kprobe"],
+> 	"allowed_attachs": ["xdp"]
+> }, {
+> 	"token_info": "/sys/fs/bpf/token2",
+> 	"allowed_cmds": ["map_create", "prog_load"],
+> 	"allowed_maps": [],
+> 	"allowed_progs": ["kprobe"],
+> 	"allowed_attachs": ["xdp"]
+> }]
 > 
-> So, not having an MDIO node was a long time ago seen as a short cut
-> for when there was a clear 1:1 mapping between port number and PHY bus
-> address. It still works, but it is somewhat deprecated. It also seems
-> like it is become more normal to need additional properties, like what
-> interrupt the PHY is using, the LEDs it has, etc.
-
-Sure, no problem to change to a more verbose DT even when there is a
-clear 1:1 mapping between port, phy and interrupt here.
-
-When it comes to having the switch being described as an interrupt
-controller in the DT is also very wrong, the switch only consume a
-single HW interrupt. The fact that the driver creates virtual irq for
-each port is purely a software construct and is not something that
-should be reflected in the DT.
-
-Possible something for a future series to clean up.
-
+> Reviewed-by: Quentin Monnet <qmo@kernel.org>
+> Signed-off-by: Tao Chen <chen.dylane@linux.dev>
+> ---
+>   tools/bpf/bpftool/main.c  |   3 +-
+>   tools/bpf/bpftool/main.h  |   1 +
+>   tools/bpf/bpftool/token.c | 225 ++++++++++++++++++++++++++++++++++++++
+>   3 files changed, 228 insertions(+), 1 deletion(-)
+>   create mode 100644 tools/bpf/bpftool/token.c
 > 
->>
->> With a 'mdio' child node 'make CHECK_DTBS=y' report something like:
->>
->>   rockchip/rk3528-radxa-e24c.dtb: ethernet-switch@1d (realtek,rtl8365mb): mdio: False schema does not allow { [snip] }
->>         from schema $id: http://devicetree.org/schemas/net/dsa/realtek.yaml#
->>
->> So something should probably be changed, the driver, dt-bindings or
->> possible both.
+> Change list:
+>   v3 -> v4:
+>    - patch1
+>     - fix CHECK coding style with 'checkpatch.pl --strict'
+>     - repalce [tab] with space when show help information
+>    - patchset reviewed-by Quentin
+>   v3: https://lore.kernel.org/bpf/20250723033107.1411154-1-chen.dylane@linux.dev
 > 
-> I think you should allow an MDIO node in DT. This is the only DSA
-> driver that i know of which does not allow it.
-
-Sure, I will drop this driver change and instead update the dt-binding
-to allow use of a mdio node when the reg prop is defined.
-
-Regards,
-Jonas
-
+>   v2 -> v3:
+>    Quentin suggested:
+>    - patch1
+>     - remove print when token not found.
+>    - patch2
+>     - refactor description message.
+>    - patch3
+>     - update commit message.
+>   v2: https://lore.kernel.org/bpf/20250722115815.1390761-1-chen.dylane@linux.dev
+>       https://lore.kernel.org/bpf/20250722120912.1391604-2-chen.dylane@linux.dev
+>    
+>   v1 -> v2:
+>    Quentin suggested:
+>    - patch1
+>     - remove zclose macro.
+>     - rename __json_array_str to split_json_array_str
+>     - print empty array when value is null for json format.
+>     - show all tokens info and format plain output for readable.
+>     - add info when token not found.
+>     - add copyright in token.c
+>    - patch2
+>     - update 'eBPF progs' to 'eBPF tokens'.
+>     - update description.
+>    - patch3
+>     - add bash-completion.
+>   v1: https://lore.kernel.org/bpf/20250720173310.1334483-1-chen.dylane@linux.dev
 > 
-> 	Andrew
-
+> diff --git a/tools/bpf/bpftool/main.c b/tools/bpf/bpftool/main.c
+> index 2b7f2bd3a7d..0f1183b2ed0 100644
+> --- a/tools/bpf/bpftool/main.c
+> +++ b/tools/bpf/bpftool/main.c
+> @@ -61,7 +61,7 @@ static int do_help(int argc, char **argv)
+>   		"       %s batch file FILE\n"
+>   		"       %s version\n"
+>   		"\n"
+> -		"       OBJECT := { prog | map | link | cgroup | perf | net | feature | btf | gen | struct_ops | iter }\n"
+> +		"       OBJECT := { prog | map | link | cgroup | perf | net | feature | btf | gen | struct_ops | iter | token }\n"
+>   		"       " HELP_SPEC_OPTIONS " |\n"
+>   		"                    {-V|--version} }\n"
+>   		"",
+> @@ -87,6 +87,7 @@ static const struct cmd commands[] = {
+>   	{ "gen",	do_gen },
+>   	{ "struct_ops",	do_struct_ops },
+>   	{ "iter",	do_iter },
+> +	{ "token",	do_token },
+>   	{ "version",	do_version },
+>   	{ 0 }
+>   };
+> diff --git a/tools/bpf/bpftool/main.h b/tools/bpf/bpftool/main.h
+> index 6db704fda5c..a2bb0714b3d 100644
+> --- a/tools/bpf/bpftool/main.h
+> +++ b/tools/bpf/bpftool/main.h
+> @@ -166,6 +166,7 @@ int do_tracelog(int argc, char **arg) __weak;
+>   int do_feature(int argc, char **argv) __weak;
+>   int do_struct_ops(int argc, char **argv) __weak;
+>   int do_iter(int argc, char **argv) __weak;
+> +int do_token(int argc, char **argv) __weak;
+>   
+>   int parse_u32_arg(int *argc, char ***argv, __u32 *val, const char *what);
+>   int prog_parse_fd(int *argc, char ***argv);
+> diff --git a/tools/bpf/bpftool/token.c b/tools/bpf/bpftool/token.c
+> new file mode 100644
+> index 00000000000..6312e662a12
+> --- /dev/null
+> +++ b/tools/bpf/bpftool/token.c
+> @@ -0,0 +1,225 @@
+> +// SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +/* Copyright (C) 2025 Didi Technology Co., Tao Chen */
+> +
+> +#ifndef _GNU_SOURCE
+> +#define _GNU_SOURCE
+> +#endif
+> +#include <errno.h>
+> +#include <fcntl.h>
+> +#include <stdbool.h>
+> +#include <stdio.h>
+> +#include <stdlib.h>
+> +#include <string.h>
+> +#include <unistd.h>
+> +#include <mntent.h>
+> +#include <sys/types.h>
+> +#include <sys/stat.h>
+> +
+> +#include "json_writer.h"
+> +#include "main.h"
+> +
+> +#define MOUNTS_FILE "/proc/mounts"
+> +
+> +static bool has_delegate_options(const char *mnt_ops)
+> +{
+> +	return strstr(mnt_ops, "delegate_cmds") ||
+> +	       strstr(mnt_ops, "delegate_maps") ||
+> +	       strstr(mnt_ops, "delegate_progs") ||
+> +	       strstr(mnt_ops, "delegate_attachs");
+> +}
+> +
+> +static char *get_delegate_value(const char *opts, const char *key)
+> +{
+> +	char *token, *rest, *ret = NULL;
+> +	char *opts_copy = strdup(opts);
+> +
+> +	if (!opts_copy)
+> +		return NULL;
+> +
+> +	for (token = strtok_r(opts_copy, ",", &rest); token;
+> +			token = strtok_r(NULL, ",", &rest)) {
+> +		if (strncmp(token, key, strlen(key)) == 0 &&
+> +		    token[strlen(key)] == '=') {
+> +			ret = token + strlen(key) + 1;
+> +			break;
+> +		}
+> +	}
+> +	free(opts_copy);
+> +
+> +	return ret;
+> +}
+> +
+> +static void print_items_per_line(const char *input, int items_per_line)
+> +{
+> +	char *str, *rest, *strs;
+> +	int cnt = 0;
+> +
+> +	if (!input)
+> +		return;
+> +
+> +	strs = strdup(input);
+> +	if (!strs)
+> +		return;
+> +
+> +	for (str = strtok_r(strs, ":", &rest); str;
+> +			str = strtok_r(NULL, ":", &rest)) {
+> +		if (cnt % items_per_line == 0)
+> +			printf("\n\t  ");
+> +
+> +		printf("%-20s", str);
+> +		cnt++;
+> +	}
+> +
+> +	free(strs);
+> +}
+> +
+> +#define ITEMS_PER_LINE 4
+> +static void show_token_info_plain(struct mntent *mntent)
+> +{
+> +	char *value;
+> +
+> +	printf("token_info  %s", mntent->mnt_dir);
+> +
+> +	printf("\n\tallowed_cmds:");
+> +	value = get_delegate_value(mntent->mnt_opts, "delegate_cmds");
+> +	print_items_per_line(value, ITEMS_PER_LINE);
+> +
+> +	printf("\n\tallowed_maps:");
+> +	value = get_delegate_value(mntent->mnt_opts, "delegate_maps");
+> +	print_items_per_line(value, ITEMS_PER_LINE);
+> +
+> +	printf("\n\tallowed_progs:");
+> +	value = get_delegate_value(mntent->mnt_opts, "delegate_progs");
+> +	print_items_per_line(value, ITEMS_PER_LINE);
+> +
+> +	printf("\n\tallowed_attachs:");
+> +	value = get_delegate_value(mntent->mnt_opts, "delegate_attachs");
+> +	print_items_per_line(value, ITEMS_PER_LINE);
+> +	printf("\n");
+> +}
+> +
+> +static void split_json_array_str(const char *input)
+> +{
+> +	char *str, *rest, *strs;
+> +
+> +	if (!input) {
+> +		jsonw_start_array(json_wtr);
+> +		jsonw_end_array(json_wtr);
+> +		return;
+> +	}
+> +
+> +	strs = strdup(input);
+> +	if (!strs)
+> +		return;
+> +
+> +	jsonw_start_array(json_wtr);
+> +	for (str = strtok_r(strs, ":", &rest); str;
+> +			str = strtok_r(NULL, ":", &rest)) {
+> +		jsonw_string(json_wtr, str);
+> +	}
+> +	jsonw_end_array(json_wtr);
+> +
+> +	free(strs);
+> +}
+> +
+> +static void show_token_info_json(struct mntent *mntent)
+> +{
+> +	char *value;
+> +
+> +	jsonw_start_object(json_wtr);
+> +
+> +	jsonw_string_field(json_wtr, "token_info", mntent->mnt_dir);
+> +
+> +	jsonw_name(json_wtr, "allowed_cmds");
+> +	value = get_delegate_value(mntent->mnt_opts, "delegate_cmds");
+> +	split_json_array_str(value);
+> +
+> +	jsonw_name(json_wtr, "allowed_maps");
+> +	value = get_delegate_value(mntent->mnt_opts, "delegate_maps");
+> +	split_json_array_str(value);
+> +
+> +	jsonw_name(json_wtr, "allowed_progs");
+> +	value = get_delegate_value(mntent->mnt_opts, "delegate_progs");
+> +	split_json_array_str(value);
+> +
+> +	jsonw_name(json_wtr, "allowed_attachs");
+> +	value = get_delegate_value(mntent->mnt_opts, "delegate_attachs");
+> +	split_json_array_str(value);
+> +
+> +	jsonw_end_object(json_wtr);
+> +}
+> +
+> +static int __show_token_info(struct mntent *mntent)
+> +{
+> +	if (json_output)
+> +		show_token_info_json(mntent);
+> +	else
+> +		show_token_info_plain(mntent);
+> +
+> +	return 0;
+> +}
+> +
+> +static int show_token_info(void)
+> +{
+> +	FILE *fp;
+> +	struct mntent *ent;
+> +
+> +	fp = setmntent(MOUNTS_FILE, "r");
+> +	if (!fp) {
+> +		p_err("Failed to open: %s", MOUNTS_FILE);
+> +		return -1;
+> +	}
+> +
+> +	if (json_output)
+> +		jsonw_start_array(json_wtr);
+> +
+> +	while ((ent = getmntent(fp)) != NULL) {
+> +		if (strncmp(ent->mnt_type, "bpf", 3) == 0) {
+> +			if (has_delegate_options(ent->mnt_opts))
+> +				__show_token_info(ent);
+> +		}
+> +	}
+> +
+> +	if (json_output)
+> +		jsonw_end_array(json_wtr);
+> +
+> +	endmntent(fp);
+> +
+> +	return 0;
+> +}
+> +
+> +static int do_show(int argc, char **argv)
+> +{
+> +	if (argc)
+> +		return BAD_ARG();
+> +
+> +	return show_token_info();
+> +}
+> +
+> +static int do_help(int argc, char **argv)
+> +{
+> +	if (json_output) {
+> +		jsonw_null(json_wtr);
+> +		return 0;
+> +	}
+> +
+> +	fprintf(stderr,
+> +		"Usage: %1$s %2$s { show | list }\n"
+> +		"       %1$s %2$s help\n"
+> +		"\n"
+> +		"",
+> +		bin_name, argv[-2]);
+> +	return 0;
+> +}
+> +
+> +static const struct cmd cmds[] = {
+> +	{ "show",	do_show },
+> +	{ "list",	do_show },
+> +	{ "help",	do_help },
+> +	{ 0 }
+> +};
+> +
+> +int do_token(int argc, char **argv)
+> +{
+> +	return cmd_select(cmds, argc, argv, do_help);
+> +}
+-- 
+Best Regards
+Tao Chen
 
