@@ -1,422 +1,91 @@
-Return-Path: <netdev+bounces-210553-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210554-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46BD8B13E34
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 17:26:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6ED27B13E56
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 17:30:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A66817FAE2
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 15:26:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F3ECC17D806
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 15:29:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62452272803;
-	Mon, 28 Jul 2025 15:25:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B762D271479;
+	Mon, 28 Jul 2025 15:28:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RmEZXQN6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T3ITj4GQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31FB41E2823;
-	Mon, 28 Jul 2025 15:25:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E1F626D4E2;
+	Mon, 28 Jul 2025 15:28:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753716332; cv=none; b=bJqSVJv7xGYPNIQy/jYbRbl7Gcgqi0LVsDZNHYPV3PeloY7HzBSFvcIE3Xeeu6GlleLcE17YT8TmoSFB7xP4TfoclF2FU1AIKPHeCJ31I7nzCtS5pgv1tA2ay41uACkgSbwQK+9i/MG2y0gU9RR+++iIJc+DknpLxf1Xfak35Kk=
+	t=1753716521; cv=none; b=M2ryJFH4sijcebEQSi/Ws0XJ0vS8bdPRu2kTHcoSdVgxcUViJ0m0FqD+7Ose7zLxs5wZFeZ+F40V13qYgflNqFO0IdxwpXUwWI+yqp+ekM/k3zzp5iap2IhtwQkmVHctQgYEHEWArFcmMu8cHZjVDMeto+iU7cyPqhFSJomv5BE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753716332; c=relaxed/simple;
-	bh=HdclEY6D/ELo3mqAWfqroObatxW0H5QIu+N0Gk80oWg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=P08qLCBnVZiKPPOwG5+QAVzEM5wyhCG1eD6zYrLslpC20qwzDD5ZlYy56UejDOsG5jH66vx16OEGbczw7C6jaAS9Aaxsi9kQ09OKYadtBhJBuAXokfx/Nhp49xVOHHF9D+3xNKFtgAERIKQoQvz1MdSB3uCzSmTOY2hHhQECOmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RmEZXQN6; arc=none smtp.client-ip=91.218.175.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <8e6cd484-43f6-410e-a580-3671642a7e65@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1753716317;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=43bTjxENVZrLQD/4l+zrHdTaGZI/A43tISDWdUvDAjQ=;
-	b=RmEZXQN6NJEfqrllCKvpHFDLS2DrYpaJ6mTz+Qf+UYgvnnG98dbfSiY4Ptyyz/huhjX6f8
-	cuK1lKqp/yZ7UCu/xrf6bcklUNcaZmX9rZ7LyBX8kD7DRGasXVgwZy6Oa2n4Qfle0tMd4+
-	uh9rVTt03EOZjwQrquNhlxhQMyj8kQs=
-Date: Mon, 28 Jul 2025 23:25:08 +0800
+	s=arc-20240116; t=1753716521; c=relaxed/simple;
+	bh=nCCab6w8oj750hCuDA8aX5D8FTeBEr0NdwDFh06N7Cs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=AfG/vyfrHIAMuNxjkB76konGK68WQee7p9mCVW7Am59ftdW634ahbPWKvzKF08AkNVe8/NrtJfe561tX/6E20GK7wyZDeLUENGlFmFaZXuvagWLRX+Ds0tuyyXo9LIuh9rhhMtXaE/Q2EW4L17tvloSDs+OnRXGcMcfzObraUHw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T3ITj4GQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 477F7C4CEE7;
+	Mon, 28 Jul 2025 15:28:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753716521;
+	bh=nCCab6w8oj750hCuDA8aX5D8FTeBEr0NdwDFh06N7Cs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=T3ITj4GQGjkd+wYCvSJ0HMtHWPi1m06RcLiuvbw7nXi/pQuAhQ28BT3Ec7gjoKnp8
+	 dGJMxBtb4udF9q5Rb+uIGQ1bcb/GW1qh6BjRAk28QxnT7F/eelweZuaNfvQ1JI4ugu
+	 pGzGcdtLTJXW9h2qBWBx4QcTRqg/sQvQ536eGS7J4RA8Ox4fqQADMloDk5UEBhraC3
+	 xfBUAqVi4MiJzdLP0v/8/YVyv0p3BC6llc6VXGfHkkUI+x3JA3Y+oinG65E+dcPizm
+	 GiPKAtAMlHmhIPXu0kWnkwko59pkw/Hwzb0nivYlhSNAG99BJ5p6sS/OnsB9Rkh/qv
+	 o3yXNtCG9VQOA==
+Date: Mon, 28 Jul 2025 08:28:39 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Lukasz Majewski <lukma@denx.de>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>, Sascha Hauer
+ <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Fabio Estevam <festevam@gmail.com>, Richard Cochran
+ <richardcochran@gmail.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org, Stefan Wahren
+ <wahrenst@gmx.net>, Simon Horman <horms@kernel.org>, Lukasz Majewski
+ <lukasz.majewski@mailbox.org>
+Subject: Re: [net-next v17 00/12] net: mtip: Add support for MTIP imx287 L2
+ switch driver
+Message-ID: <20250728082839.2ed8a067@kernel.org>
+In-Reply-To: <20250727100128.1411514-1-lukma@denx.de>
+References: <20250727100128.1411514-1-lukma@denx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v4 1/3] bpftool: Add bpf_token show
-To: qmo@kernel.org, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
- martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
- yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
- sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
- kuba@kernel.org, hawk@kernel.org
-Cc: linux-kernel@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org
-References: <20250723144442.1427943-1-chen.dylane@linux.dev>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Tao Chen <chen.dylane@linux.dev>
-In-Reply-To: <20250723144442.1427943-1-chen.dylane@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-在 2025/7/23 22:44, Tao Chen 写道:
+On Sun, 27 Jul 2025 12:01:16 +0200 Lukasz Majewski wrote:
+> This patch series adds support for More Than IP's L2 switch driver embedded
+> in some NXP's SoCs. This one has been tested on imx287, but is also available
+> in the vf610.
 
-Ping...
+## Form letter - net-next-closed
 
-Hi,
+We have already submitted our pull request with net-next material for v6.17,
+and therefore net-next is closed for new drivers, features, code refactoring
+and optimizations. We are currently accepting bug fixes only.
 
-Quentin has reviewed this patchset, could someone review this again, thanks.
+Please repost when net-next reopens after Aug 11th.
 
-> Add `bpftool token show` command to get token info
-> from bpffs in /proc/mounts.
-> 
-> Example plain output for `token show`:
-> token_info  /sys/fs/bpf/token
-> 	allowed_cmds:
-> 	  map_create          prog_load
-> 	allowed_maps:
-> 	allowed_progs:
-> 	  kprobe
-> 	allowed_attachs:
-> 	  xdp
-> token_info  /sys/fs/bpf/token2
-> 	allowed_cmds:
-> 	  map_create          prog_load
-> 	allowed_maps:
-> 	allowed_progs:
-> 	  kprobe
-> 	allowed_attachs:
-> 	  xdp
-> 
-> Example json output for `token show`:
-> [{
-> 	"token_info": "/sys/fs/bpf/token",
-> 	"allowed_cmds": ["map_create", "prog_load"],
-> 	"allowed_maps": [],
-> 	"allowed_progs": ["kprobe"],
-> 	"allowed_attachs": ["xdp"]
-> }, {
-> 	"token_info": "/sys/fs/bpf/token2",
-> 	"allowed_cmds": ["map_create", "prog_load"],
-> 	"allowed_maps": [],
-> 	"allowed_progs": ["kprobe"],
-> 	"allowed_attachs": ["xdp"]
-> }]
-> 
-> Reviewed-by: Quentin Monnet <qmo@kernel.org>
-> Signed-off-by: Tao Chen <chen.dylane@linux.dev>
-> ---
->   tools/bpf/bpftool/main.c  |   3 +-
->   tools/bpf/bpftool/main.h  |   1 +
->   tools/bpf/bpftool/token.c | 225 ++++++++++++++++++++++++++++++++++++++
->   3 files changed, 228 insertions(+), 1 deletion(-)
->   create mode 100644 tools/bpf/bpftool/token.c
-> 
-> Change list:
->   v3 -> v4:
->    - patch1
->     - fix CHECK coding style with 'checkpatch.pl --strict'
->     - repalce [tab] with space when show help information
->    - patchset reviewed-by Quentin
->   v3: https://lore.kernel.org/bpf/20250723033107.1411154-1-chen.dylane@linux.dev
-> 
->   v2 -> v3:
->    Quentin suggested:
->    - patch1
->     - remove print when token not found.
->    - patch2
->     - refactor description message.
->    - patch3
->     - update commit message.
->   v2: https://lore.kernel.org/bpf/20250722115815.1390761-1-chen.dylane@linux.dev
->       https://lore.kernel.org/bpf/20250722120912.1391604-2-chen.dylane@linux.dev
->    
->   v1 -> v2:
->    Quentin suggested:
->    - patch1
->     - remove zclose macro.
->     - rename __json_array_str to split_json_array_str
->     - print empty array when value is null for json format.
->     - show all tokens info and format plain output for readable.
->     - add info when token not found.
->     - add copyright in token.c
->    - patch2
->     - update 'eBPF progs' to 'eBPF tokens'.
->     - update description.
->    - patch3
->     - add bash-completion.
->   v1: https://lore.kernel.org/bpf/20250720173310.1334483-1-chen.dylane@linux.dev
-> 
-> diff --git a/tools/bpf/bpftool/main.c b/tools/bpf/bpftool/main.c
-> index 2b7f2bd3a7d..0f1183b2ed0 100644
-> --- a/tools/bpf/bpftool/main.c
-> +++ b/tools/bpf/bpftool/main.c
-> @@ -61,7 +61,7 @@ static int do_help(int argc, char **argv)
->   		"       %s batch file FILE\n"
->   		"       %s version\n"
->   		"\n"
-> -		"       OBJECT := { prog | map | link | cgroup | perf | net | feature | btf | gen | struct_ops | iter }\n"
-> +		"       OBJECT := { prog | map | link | cgroup | perf | net | feature | btf | gen | struct_ops | iter | token }\n"
->   		"       " HELP_SPEC_OPTIONS " |\n"
->   		"                    {-V|--version} }\n"
->   		"",
-> @@ -87,6 +87,7 @@ static const struct cmd commands[] = {
->   	{ "gen",	do_gen },
->   	{ "struct_ops",	do_struct_ops },
->   	{ "iter",	do_iter },
-> +	{ "token",	do_token },
->   	{ "version",	do_version },
->   	{ 0 }
->   };
-> diff --git a/tools/bpf/bpftool/main.h b/tools/bpf/bpftool/main.h
-> index 6db704fda5c..a2bb0714b3d 100644
-> --- a/tools/bpf/bpftool/main.h
-> +++ b/tools/bpf/bpftool/main.h
-> @@ -166,6 +166,7 @@ int do_tracelog(int argc, char **arg) __weak;
->   int do_feature(int argc, char **argv) __weak;
->   int do_struct_ops(int argc, char **argv) __weak;
->   int do_iter(int argc, char **argv) __weak;
-> +int do_token(int argc, char **argv) __weak;
->   
->   int parse_u32_arg(int *argc, char ***argv, __u32 *val, const char *what);
->   int prog_parse_fd(int *argc, char ***argv);
-> diff --git a/tools/bpf/bpftool/token.c b/tools/bpf/bpftool/token.c
-> new file mode 100644
-> index 00000000000..6312e662a12
-> --- /dev/null
-> +++ b/tools/bpf/bpftool/token.c
-> @@ -0,0 +1,225 @@
-> +// SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +/* Copyright (C) 2025 Didi Technology Co., Tao Chen */
-> +
-> +#ifndef _GNU_SOURCE
-> +#define _GNU_SOURCE
-> +#endif
-> +#include <errno.h>
-> +#include <fcntl.h>
-> +#include <stdbool.h>
-> +#include <stdio.h>
-> +#include <stdlib.h>
-> +#include <string.h>
-> +#include <unistd.h>
-> +#include <mntent.h>
-> +#include <sys/types.h>
-> +#include <sys/stat.h>
-> +
-> +#include "json_writer.h"
-> +#include "main.h"
-> +
-> +#define MOUNTS_FILE "/proc/mounts"
-> +
-> +static bool has_delegate_options(const char *mnt_ops)
-> +{
-> +	return strstr(mnt_ops, "delegate_cmds") ||
-> +	       strstr(mnt_ops, "delegate_maps") ||
-> +	       strstr(mnt_ops, "delegate_progs") ||
-> +	       strstr(mnt_ops, "delegate_attachs");
-> +}
-> +
-> +static char *get_delegate_value(const char *opts, const char *key)
-> +{
-> +	char *token, *rest, *ret = NULL;
-> +	char *opts_copy = strdup(opts);
-> +
-> +	if (!opts_copy)
-> +		return NULL;
-> +
-> +	for (token = strtok_r(opts_copy, ",", &rest); token;
-> +			token = strtok_r(NULL, ",", &rest)) {
-> +		if (strncmp(token, key, strlen(key)) == 0 &&
-> +		    token[strlen(key)] == '=') {
-> +			ret = token + strlen(key) + 1;
-> +			break;
-> +		}
-> +	}
-> +	free(opts_copy);
-> +
-> +	return ret;
-> +}
-> +
-> +static void print_items_per_line(const char *input, int items_per_line)
-> +{
-> +	char *str, *rest, *strs;
-> +	int cnt = 0;
-> +
-> +	if (!input)
-> +		return;
-> +
-> +	strs = strdup(input);
-> +	if (!strs)
-> +		return;
-> +
-> +	for (str = strtok_r(strs, ":", &rest); str;
-> +			str = strtok_r(NULL, ":", &rest)) {
-> +		if (cnt % items_per_line == 0)
-> +			printf("\n\t  ");
-> +
-> +		printf("%-20s", str);
-> +		cnt++;
-> +	}
-> +
-> +	free(strs);
-> +}
-> +
-> +#define ITEMS_PER_LINE 4
-> +static void show_token_info_plain(struct mntent *mntent)
-> +{
-> +	char *value;
-> +
-> +	printf("token_info  %s", mntent->mnt_dir);
-> +
-> +	printf("\n\tallowed_cmds:");
-> +	value = get_delegate_value(mntent->mnt_opts, "delegate_cmds");
-> +	print_items_per_line(value, ITEMS_PER_LINE);
-> +
-> +	printf("\n\tallowed_maps:");
-> +	value = get_delegate_value(mntent->mnt_opts, "delegate_maps");
-> +	print_items_per_line(value, ITEMS_PER_LINE);
-> +
-> +	printf("\n\tallowed_progs:");
-> +	value = get_delegate_value(mntent->mnt_opts, "delegate_progs");
-> +	print_items_per_line(value, ITEMS_PER_LINE);
-> +
-> +	printf("\n\tallowed_attachs:");
-> +	value = get_delegate_value(mntent->mnt_opts, "delegate_attachs");
-> +	print_items_per_line(value, ITEMS_PER_LINE);
-> +	printf("\n");
-> +}
-> +
-> +static void split_json_array_str(const char *input)
-> +{
-> +	char *str, *rest, *strs;
-> +
-> +	if (!input) {
-> +		jsonw_start_array(json_wtr);
-> +		jsonw_end_array(json_wtr);
-> +		return;
-> +	}
-> +
-> +	strs = strdup(input);
-> +	if (!strs)
-> +		return;
-> +
-> +	jsonw_start_array(json_wtr);
-> +	for (str = strtok_r(strs, ":", &rest); str;
-> +			str = strtok_r(NULL, ":", &rest)) {
-> +		jsonw_string(json_wtr, str);
-> +	}
-> +	jsonw_end_array(json_wtr);
-> +
-> +	free(strs);
-> +}
-> +
-> +static void show_token_info_json(struct mntent *mntent)
-> +{
-> +	char *value;
-> +
-> +	jsonw_start_object(json_wtr);
-> +
-> +	jsonw_string_field(json_wtr, "token_info", mntent->mnt_dir);
-> +
-> +	jsonw_name(json_wtr, "allowed_cmds");
-> +	value = get_delegate_value(mntent->mnt_opts, "delegate_cmds");
-> +	split_json_array_str(value);
-> +
-> +	jsonw_name(json_wtr, "allowed_maps");
-> +	value = get_delegate_value(mntent->mnt_opts, "delegate_maps");
-> +	split_json_array_str(value);
-> +
-> +	jsonw_name(json_wtr, "allowed_progs");
-> +	value = get_delegate_value(mntent->mnt_opts, "delegate_progs");
-> +	split_json_array_str(value);
-> +
-> +	jsonw_name(json_wtr, "allowed_attachs");
-> +	value = get_delegate_value(mntent->mnt_opts, "delegate_attachs");
-> +	split_json_array_str(value);
-> +
-> +	jsonw_end_object(json_wtr);
-> +}
-> +
-> +static int __show_token_info(struct mntent *mntent)
-> +{
-> +	if (json_output)
-> +		show_token_info_json(mntent);
-> +	else
-> +		show_token_info_plain(mntent);
-> +
-> +	return 0;
-> +}
-> +
-> +static int show_token_info(void)
-> +{
-> +	FILE *fp;
-> +	struct mntent *ent;
-> +
-> +	fp = setmntent(MOUNTS_FILE, "r");
-> +	if (!fp) {
-> +		p_err("Failed to open: %s", MOUNTS_FILE);
-> +		return -1;
-> +	}
-> +
-> +	if (json_output)
-> +		jsonw_start_array(json_wtr);
-> +
-> +	while ((ent = getmntent(fp)) != NULL) {
-> +		if (strncmp(ent->mnt_type, "bpf", 3) == 0) {
-> +			if (has_delegate_options(ent->mnt_opts))
-> +				__show_token_info(ent);
-> +		}
-> +	}
-> +
-> +	if (json_output)
-> +		jsonw_end_array(json_wtr);
-> +
-> +	endmntent(fp);
-> +
-> +	return 0;
-> +}
-> +
-> +static int do_show(int argc, char **argv)
-> +{
-> +	if (argc)
-> +		return BAD_ARG();
-> +
-> +	return show_token_info();
-> +}
-> +
-> +static int do_help(int argc, char **argv)
-> +{
-> +	if (json_output) {
-> +		jsonw_null(json_wtr);
-> +		return 0;
-> +	}
-> +
-> +	fprintf(stderr,
-> +		"Usage: %1$s %2$s { show | list }\n"
-> +		"       %1$s %2$s help\n"
-> +		"\n"
-> +		"",
-> +		bin_name, argv[-2]);
-> +	return 0;
-> +}
-> +
-> +static const struct cmd cmds[] = {
-> +	{ "show",	do_show },
-> +	{ "list",	do_show },
-> +	{ "help",	do_help },
-> +	{ 0 }
-> +};
-> +
-> +int do_token(int argc, char **argv)
-> +{
-> +	return cmd_select(cmds, argc, argv, do_help);
-> +}
+RFC patches sent for review only are obviously welcome at any time.
+
+See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
 -- 
-Best Regards
-Tao Chen
+pw-bot: defer
+pv-bot: closed
 
