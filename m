@@ -1,1084 +1,784 @@
-Return-Path: <netdev+bounces-210531-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210532-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E7B5B13D37
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 16:33:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92728B13D40
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 16:35:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5EA7D3B2707
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 14:32:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B40B3A31BF
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 14:34:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAAF21DDC37;
-	Mon, 28 Jul 2025 14:33:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FADA1E0DD9;
+	Mon, 28 Jul 2025 14:35:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="IfASHIb6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fYBSi+d0"
 X-Original-To: netdev@vger.kernel.org
-Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11011041.outbound.protection.outlook.com [52.101.65.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 397E61C862D;
-	Mon, 28 Jul 2025 14:33:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.41
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753713195; cv=fail; b=GzIjvSp97E9V7HTRP100fYiikr30TXsSpLAcPXnxxnQZcesPLER9+IKcfmfUiNpUepT1ZU6CgornCZzatQajuoBhvqHZ1DjYY4grI2cnEDir6nsf+K9mfVzHWlIxiTSYafiO3NsLiq8TT1HhZ2mph4E0XD5UEtC4bXOPb+n6yU0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753713195; c=relaxed/simple;
-	bh=puUdQLnr79ocha9nzskXHJtBNdk4oFN3mAUTvcATAxY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=cni//pe/gGuO3nZVbuEwrQzbbAJnbXzHZIwZ+agq3UwLm1skfQiUOYsE8SNpYrVZdzqfgreVyICBkwJStQ8fZQfvM4o6w8z/GLP5ff9WUd8SvGgROs+7JyRbNW95ugkdwPZnWxNhBKCVwpj2EIzm60d1CWJ/qseg+SiIWU5Am6A=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=IfASHIb6; arc=fail smtp.client-ip=52.101.65.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=U2FoATQbMIZd8VahR4rdZ5Pe6WuOI3W4r4/vouFsTnX1bWw8Uh8YK1+NQX5c6B+msu1ps/w7+BFlH2uZxeb0aKVok/5wYOv48aNEPdSzpnjtuSTncbdexMpEoFAicnfOCStbBPD97vrSaVCFXDl9d+dNrEkF2yq/aY2GhHCOYdyC/c0EfYyFlY8JDOlz7IL2XqoF1DX857Hyg7lQZIfG/UtzEQiv64OlZUSURBBICTUdK4K+xy+84gO0Q/Ei74bxJZpN7n2fc2H4AYdkNvAl5HSuSq5KhaDGJT2CRcc0lNKs0iYP7xC5RwTM1qRPzyDR2iI5bGNcQNk1HTmrtc/KtA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=30FdpL5NttkaUg+r6huItnZ5V2Fuxkty1qcz4dz5pI4=;
- b=r66t+2pC9dABrW01hbkE0Gg3OI7084z7YS9UCkSqqpmE8/a9spqscXjOrE/U9T6TSVctCCDMKQBETt5R39fiwOdYe9thqAgsoofD2PjKhkt9ukdPizeDgSBTk0u2yJPw+H+uau1dXI4h/WZVnRoxG/gagxWZMP4QsafUp6MI+fyfswAR6nP4sDhuHwIcDHx6ZtrUqlJIODeNSjL0uAJGxaQcaoSxvqmgWHZ92vGUN0XTuA7wC25qUGlQGOB9CtulyzH+zXt07nCdzd1t2BKY+f4V2GfQUKO+lBy+1pmJ/egHK6d8cMvWPyCttDEqhpveeCS6TIhIS2Bxw83ndIjfRg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=30FdpL5NttkaUg+r6huItnZ5V2Fuxkty1qcz4dz5pI4=;
- b=IfASHIb6gFNGZMfh17k83424TXfV4sYaILYMpA7kv9yOaBshCkLa+CtWOHNqf4QZrkEfCXMiOqnglGQBIbDyVOKwSd7nCRBNZ/jCXYOOzOAQ4LRpekZkwI2QbprnP2hdeOfPqVEdEsX/MH61MjqPPkpI6wIi5pyF68v8EY7MaPkairWye8R10HU9bfhw10tHqDSJiBAVLhE9bYPk+e3NFxZ5j6uBi2Kn3wH07YfOPDXIg8S0uDrExrNXidE/uAHm8pTBnJ+2HcD7Rng4WJrk7+AFXqWwq7v5Z2VB4Lj+AIqxvIFGyvQ+rzN+TyWon7Ax0YtEBH5jwMXezgSgrv0vMw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from PAXPR04MB9642.eurprd04.prod.outlook.com (2603:10a6:102:240::14)
- by PAXPR04MB8592.eurprd04.prod.outlook.com (2603:10a6:102:21b::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8964.26; Mon, 28 Jul
- 2025 14:33:08 +0000
-Received: from PAXPR04MB9642.eurprd04.prod.outlook.com
- ([fe80::9126:a61e:341d:4b06]) by PAXPR04MB9642.eurprd04.prod.outlook.com
- ([fe80::9126:a61e:341d:4b06%5]) with mapi id 15.20.8964.025; Mon, 28 Jul 2025
- 14:33:08 +0000
-Date: Mon, 28 Jul 2025 10:32:55 -0400
-From: Frank Li <Frank.li@nxp.com>
-To: Joy Zou <joy.zou@nxp.com>
-Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
-	shawnguo@kernel.org, s.hauer@pengutronix.de, kernel@pengutronix.de,
-	festevam@gmail.com, peng.fan@nxp.com, richardcochran@gmail.com,
-	catalin.marinas@arm.com, will@kernel.org, ulf.hansson@linaro.org,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com, frieder.schrempf@kontron.de,
-	primoz.fiser@norik.com, othacehe@gnu.org,
-	Markus.Niebel@ew.tq-group.com, alexander.stein@ew.tq-group.com,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux@ew.tq-group.com, netdev@vger.kernel.org,
-	linux-pm@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com
-Subject: Re: [PATCH v7 05/11] arm64: dts: imx91: add i.MX91 dtsi support
-Message-ID: <aIeKF357ucMeTnQQ@lizhi-Precision-Tower-5810>
-References: <20250728071438.2332382-1-joy.zou@nxp.com>
- <20250728071438.2332382-6-joy.zou@nxp.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250728071438.2332382-6-joy.zou@nxp.com>
-X-ClientProxiedBy: SJ0PR03CA0212.namprd03.prod.outlook.com
- (2603:10b6:a03:39f::7) To PAXPR04MB9642.eurprd04.prod.outlook.com
- (2603:10a6:102:240::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC9773C1F;
+	Mon, 28 Jul 2025 14:35:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753713307; cv=none; b=Zmvev2yeaFggq81WzSeDPmd3py17EZdWTTmxAAK0PL6vfS+hpV915BAf+xNYs52cE7IGt8OHA2/iVtsTTe6sp0XOmLbZIUPwge5mizRJdYJQyi9kgg6JeECXo2KEfhDisU3bJ4aqxWXrSm4OKYUwTser/hs3Tz/FBpUrWv6AAbw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753713307; c=relaxed/simple;
+	bh=JHq3vIkCgHeDKcQiWCYRVWazR4Ah0+AKyi5gR4tgoxg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Y9pJuFCVPyTGui/+qqnRQa/45yPCQKlrQlowVHTJ4XpOsfxm2vGKVLfL73NqUz056dGAJyJ/w/X+dZ4DzgzKTL4bqidlhGi+LvLn3gW6JkDbxai777s/rN6AUEZeVytecbqQoYBy5NiwWxiFDIzyW7J5xCRsA1a4AWvJ6AUvuz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fYBSi+d0; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-3b7825e2775so2245046f8f.2;
+        Mon, 28 Jul 2025 07:35:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753713303; x=1754318103; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zgXOpBnkQ4iZJmI/4i1Fp2jD7StRjynuT5yJOTumF9w=;
+        b=fYBSi+d0g7Ko0xYmQ2s0Oz9RbOob7r6FV6tCr6UoqSHypmUe8pjVpHD1pcMc7dEW3H
+         0yEJWyi/a6anRa8b9jQ5tuNvnKB4XCqf5JfWMUwptyeGKhyPbKgA1dD6gsVmLCUJNoB7
+         uL4Rc8W0lYodHLwx4rKqNUGf7Qumx3s4RSMhpPPzpd8llpdTO+XbgOZfduR9PBjTMEqs
+         xROKyDR+qqqK0AqRA43RCa708RGEFO4RvhtROEOqLeABRM/eD5xAGXAMUSWJeBtcEalc
+         uN6NkXFWMi0LtO2ajpQeDFCbvD25U7XXcc4FlXdLErVJo0wfgOA9iPrBSyWxL2KIqlBn
+         znog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753713303; x=1754318103;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zgXOpBnkQ4iZJmI/4i1Fp2jD7StRjynuT5yJOTumF9w=;
+        b=TF1Fxi3u/cwbOgQnSBq8GTgBHi7dlllcxxLWc5lBmca07CSqs2JCeezB6LsvjC7JFt
+         ZKJdK51ipuGVOk7Dx04c+t8QtjmELt8u3v2R7dRDIxpznUCJDv1uwujqRLZsa6vPB2cU
+         gQyVIZQcZSo2fR8+oe+A2fBnAVMGbO/QAjMUbASs4fglIaQcShDeIB5d7RLn0rI0EYw/
+         XrmvGvUghdKWKK2IAI0EfnfP6mDVc4vKudXSgQsgh9FeU9x2TyaETegN4td+D+Q5obxY
+         gNFRCiQMEzmXc+plV6Egha397KbrkVP8AXp0VONex17PsGwhOL006QA6bpE5CCQmajfR
+         N0Ig==
+X-Forwarded-Encrypted: i=1; AJvYcCUe/jY6tiGW6IZXS+xN2/08yLvQopywhXLP28IdFKbv1SKU/HAhVX4rQNBXxtNu3mfrnuPQ2yDXseL+/faQ@vger.kernel.org, AJvYcCVgtnI3bohd4Uzs0dQurUDf0ZddEo10k7Fqi6ywiLVl/zMIvexhBgXGYGNXYy3DdOZ/zTL6F8yE@vger.kernel.org, AJvYcCW7a4IJZp36ft7AU1JXbaMRHqo5vn//c5R+tvrnG2fKZVO/aC3cIO0yfMlMhRI+FHtYJPY=@vger.kernel.org, AJvYcCWcv5IGa5NhgPqURPAs1QuKSOfx7Ey8LMGqr4SJYL58hJV5QvXGjaP5FkXWhjt0aw6BK+TQxS6X8GNhw8VhwWew@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy+OsrOwz8Oipx5N2+tT/7qpO75WlXqP0g/TNB970MyoNKyocWh
+	b7loekOjClXviUvWXqcDQPmlkDhS3OYXgdiFKWeXZO8OgalZmmTII2u5YYpFuNJXa9cnRZXwq+u
+	+UE6QKUBR3jJkoyTxNupsmEcnGAaSUpg=
+X-Gm-Gg: ASbGnct6WXBmgybKeWm0ubkfsTTpgf5EIm9qpcGvqJCa9WjHXlYnUd+TPh7gKs5+SnH
+	wAmNH+K7HEhNTkn6xybN2FnBMVgyWxLZGPAzmtq6mtWqTahdC2z3hz0q2rgIdHRMkW1L336v5ay
+	VB1ikqhVJN8LY2B3YExyXVccEj0AIFHfh147viTrpckUr5v4ShaJfie84dOxaUUfz8Ox5RmQthw
+	Yan967d/mC2CVB95GZbKpKXEokJS2yanduNPQ==
+X-Google-Smtp-Source: AGHT+IF49YPEE95fSBYP0WhhepSBJkmb39d2hVNN2UJOSESuqjKR5hZoxO3TBuVC60wm1yJhnj4EPS2bae/j2j+7Op4=
+X-Received: by 2002:a05:6000:2505:b0:3b7:888d:8d9a with SMTP id
+ ffacd0b85a97d-3b7888d90d8mr2544585f8f.29.1753713302783; Mon, 28 Jul 2025
+ 07:35:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PAXPR04MB9642:EE_|PAXPR04MB8592:EE_
-X-MS-Office365-Filtering-Correlation-Id: 35b3ad12-78d8-4245-1856-08ddcde3abb8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|19092799006|366016|7416014|376014|52116014|1800799024|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?OsZ7Bdq+oOL0OeXTEVAzgLl+lifm7I9gT02M4aqaDRxwCWCt2kzkKXGSM065?=
- =?us-ascii?Q?fEjxdYU45dNm/bVboEVxF69vTNDA6EFoJJlkm8aq+H6kLTMXwq/YT3W6ryp/?=
- =?us-ascii?Q?PpajtAHKJ/iepHIvLDEp/ErLyjnsZ6vBSJfRPiEYfPCzwB9M3NLpkCRLfDOA?=
- =?us-ascii?Q?nyMsj4gcly+fiPfqk77J0M374KYyOd7G483yowRssxG6uPLFbC/aMxf8GAMC?=
- =?us-ascii?Q?wFtSuq3+/9OOtLn/Qq/Iz9YwW7rjFlE9wcSBLomJzwAEaKF0XRlLt+kc+V4y?=
- =?us-ascii?Q?rqMZ/loo0Yd7dFzRHdT5uhw68W9PcSTHw8dsT+3kDwpQKoHl8V4P3EIhl8GH?=
- =?us-ascii?Q?bQrxjtieVDV+oT3FwoDaLhJSJPv4tWHZ1m5PCsZHq75MxyODmyCLyfbqDmfo?=
- =?us-ascii?Q?irF3sfF6sT0lkS6RQDbXz6Yu3gD1HqxnYzkjBtxFJblsaNLeJKGN+7Mgyje/?=
- =?us-ascii?Q?nEUW7Q7M32SJgQzPwW0azoHYD9YIPUORMQMJ+kbYIChdADKvAH0VZURPeydc?=
- =?us-ascii?Q?r+YVUkefR9/VVvVGqdI/LiXqnji7aT+9LcntfvuaPGuaRL4KCI5LpRINrbSM?=
- =?us-ascii?Q?WYpJDj/5REtPnwaIhtm+xvxKfnQIFu7lXua2LP0CZfMjqPt2X2slUSjCRwPv?=
- =?us-ascii?Q?YA5BMrV3zEXHUqGg9pRx1v24hDxU5ocavskq5XdlAny8XiYqsx54ZMkH8Kf3?=
- =?us-ascii?Q?hyll3CStruZunNGb7BOkuKqsIuFrEOLZSo+qIXsa4hZZjcbmy2YiitgrIwO5?=
- =?us-ascii?Q?RJBJ/Ws1WQWyU7DJXPvySrVVwYao5kBIJJ57Hr8O4mwtAFKKjJmvBHcJdGhK?=
- =?us-ascii?Q?0ot+POEd/BHkLHQ0qeeRFdlhLUw+fej9ypsEw7Wt+neJC8A4CX7ng3Cfjg24?=
- =?us-ascii?Q?tX6q3qHWm4eA8mRO6RSvPGryYQ5JCfYMmC7GNFPR9zqFHTzpT7EULw/wXJ/f?=
- =?us-ascii?Q?2gt3qH3+NY3nMFlhcwsz+K3LmECOtsPcXCtv/xn+WjCOEdY53PGPCFbevwDz?=
- =?us-ascii?Q?5BsqGaI+ZIg+71opyYu84v8626kWmxRPUqFSPokrncs0YyArMbWUaCVJUcMX?=
- =?us-ascii?Q?uRyDyYC+bLEz71qNIWuDS0EPiKazVbl0jtgynRHe+is8ji8klroA/C2dnCqH?=
- =?us-ascii?Q?KjEWwQnptyZ/1RWufIXDcnVK8J7a6gkx47WljX/kUAnAaOqApZ8lD3yMFAgo?=
- =?us-ascii?Q?1/6RK+OvmlVv0wJVXxL/o97KQi3wASviIqewhAFWHeEit0/BZZmBAxn9PUfL?=
- =?us-ascii?Q?Wa0MGKiZw3iABAiyivt7aMZGAYOpQVUuEHQkI+76esl6Go2qfAVhqOc2wTW1?=
- =?us-ascii?Q?Zi9mNfuRdofFAUMWWVSa9pk1ScWhsbX6kQk4Ltb2pevflUHiP1FNBG9zTV0K?=
- =?us-ascii?Q?0JC27eQtJv2um5uqcJj07tdHW40IhfDGKMysEFKOk6Hcu7+cuvghht7pgwUZ?=
- =?us-ascii?Q?fGziihXsMET+yjNIoOvg2JKCR2J90CtG67xWfJ/D5y5fAFVp/Jz9OKV/EyA3?=
- =?us-ascii?Q?0ZQNdqqN72g4mZA=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9642.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(366016)(7416014)(376014)(52116014)(1800799024)(38350700014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?NU5WxYWTjjYpljwP88mYiK0y8xZXr/mjSEIvbZ5OzRuCLUZnWgWFoxZnlzSa?=
- =?us-ascii?Q?bXKapR67xBONkgIgufyoQH0m8QMgvxUkAlHRKcOgTH8R4kHlnO5RLMEk7QlA?=
- =?us-ascii?Q?aHJSG5pzeGQQ26W/OW/tdCJ4Tz4uDdijUIfcA4dzlEhagEexeBLyO2bD+Gm9?=
- =?us-ascii?Q?fouA87CUZAY+2o4nwtDSm978Z3iTEE+fINgkUeFGf7ejLV7o6xz0Cz5g9Zxi?=
- =?us-ascii?Q?H7KnDrWTccqkBR5A5q61z+w9DKwWo1jg78P0uscqUtpsEG3J66f+nIeoKfVX?=
- =?us-ascii?Q?D75K0spORuFmPIWF0VsuT6TdccCWUdxqMYa9PRpKU1zloWXO0MlKa8oz1Nf/?=
- =?us-ascii?Q?MOa19WcyO63T4EPW4Ib5pfEBVSaZh2iZrrpQXZdfYCB0lLnlb16iveUNbnWW?=
- =?us-ascii?Q?4TftBsMWD3lPQr1BNwTKuPorT0oyWQV0eW+F8hsFD7HdgH44FZdbiBTO2s5N?=
- =?us-ascii?Q?mqOwDXhT2sgWhCkVf1/BGqR55FKLCQsvpUUHg1Vk0hl8cFTQ0DNjLTPjHq+l?=
- =?us-ascii?Q?D32Cs3wsDlDb6HBocSF3rQn60GoUkzcUoL04HrR4fJcNWdQU1mIxXCI+grX8?=
- =?us-ascii?Q?Wo5GgG4ynitNMbm52ejWKwoyYzlljd7Pig/SIhBTE+vhEU4CenQQAvw9rH/+?=
- =?us-ascii?Q?2423Zm/zaZ1tOxT+rg8GR6MVn4mDLfgC7+ObxW4iKALcx2so3Boe/rULZhSH?=
- =?us-ascii?Q?D0hIHMQO0f410viarWJmhHp61FYsQefHz2O4NcQ30GMNQTYkdCh/5dB7SSQ6?=
- =?us-ascii?Q?Gn2zw0Mx13M7m0ONrMY+hwoHLc676k2KjSD1ayJD/ftU/2fqyMPiQIbnV1zs?=
- =?us-ascii?Q?DIH4J61UOELUNPZbJsrOZM/JfMHnDQoMzr8a7yuBo2fMiN8s5+tha3GblSQv?=
- =?us-ascii?Q?iluDKhfQy5VJwh6eskL+ss7jCRHiDhsFzIEzgX7vH5F5n3p54DMbL+6EShWQ?=
- =?us-ascii?Q?bQnB1v0/ODaF91nLWGYyvZXDdFsMWEGptqJYHiWpcnDL1MvPqxgfXXwLCrF6?=
- =?us-ascii?Q?MOEITJHnjFCPY+wIYhObG85ldMNcmDqG2hx5vBZc9pasuJNtfUYpNG8peJB0?=
- =?us-ascii?Q?5Esmy6a4+66wQKuK/5plH6/G22eZV/jhi1D59PJwkecIAEEaJJdSAalYLX0A?=
- =?us-ascii?Q?jorSffHDbE8GlxQIaeXv3JhC4es+EBsrDAbekYPF12zlCioTbXZbFdpn2gCx?=
- =?us-ascii?Q?qj+I8lZQb0aDyehp1IVg5ULdRK4SPQPQM3Oqg4ee9dLu/MhBo88SqPd/DoPj?=
- =?us-ascii?Q?pBWMMPRWxGJC3K0Z9jmHxrufxBwK15Kk/Xh+xKSgd1xg7AjZWP0Y6DwRLkX6?=
- =?us-ascii?Q?RiB6FVEPhLX1lE2go5AApD8Wc2hi5IXi6h3NGeesW1sf/yzMEZYHepJP5YrR?=
- =?us-ascii?Q?wvNJcgd3+KYNC/clBNaBvf1vkLaftxFNT4uvItA7edsDYlyzpX8WqypriwTL?=
- =?us-ascii?Q?Xlb2GT3shqlL3D+vsShcioInSwQ0E/Y/V5KSH0C5dH7ea+Mt07PeeRppk6xL?=
- =?us-ascii?Q?JLzkITSnDR088KMcoJpK/taXHnv8pRvj4iGp4SLn5dPlzivuTydyuAQtGZ/O?=
- =?us-ascii?Q?kF0JJnzqNSHYBmwTiTo=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 35b3ad12-78d8-4245-1856-08ddcde3abb8
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB9642.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jul 2025 14:33:08.4142
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: WhOrR4pHUGBOT74Icir1o/di4V5llUzitChwct52dGO5tdI2/ATmvjGf5c6hD9IJ5KlZUubIeN0kV3L/BmkZdA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB8592
+References: <20250722150152.1158205-1-matt@readmodwrite.com>
+In-Reply-To: <20250722150152.1158205-1-matt@readmodwrite.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Mon, 28 Jul 2025 08:34:51 -0600
+X-Gm-Features: Ac12FXwiGwnI_7rXroKnYooKuzupIS79D_vRKcUrWjVYmMw-EVie1gpHZqxUgGI
+Message-ID: <CAADnVQ+rLJwKVbhd6LyGxDQwGUfg9EANcA5wOpA3C3pjaLdRQw@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v3] selftests/bpf: Add LPM trie microbenchmarks
+To: Matt Fleming <matt@readmodwrite.com>
+Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+	kernel-team <kernel-team@cloudflare.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	bpf <bpf@vger.kernel.org>, Martin KaFai Lau <martin.lau@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, Network Development <netdev@vger.kernel.org>, 
+	Matt Fleming <mfleming@cloudflare.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 28, 2025 at 03:14:32PM +0800, Joy Zou wrote:
-> The i.MX 91 family features an Arm Cortex-A55 running at up to
-> 1.4GHz, support for modern LPDDR4 memory to enable platform
-> longevity, along with a rich set of peripherals targeting
-> medical, industrial and consumer IoT market segments.
-
-Nit: wrap at 75 chars if need next version.
-
+On Tue, Jul 22, 2025 at 9:02=E2=80=AFAM Matt Fleming <matt@readmodwrite.com=
+> wrote:
 >
-> The mainly difference between i.MX91 and i.MX93 is as follows:
-> - i.MX91 removed some clocks and modified the names of some clocks.
-> - i.MX91 only has one A core.
-> - i.MX91 has different pinmux.
+> From: Matt Fleming <mfleming@cloudflare.com>
 >
-> Signed-off-by: Joy Zou <joy.zou@nxp.com>
+> Add benchmarks for the standard set of operations: lookup, update,
+> delete. Also, include a benchmark for trie_free() which is known to have
+> terrible performance for maps with many entries.
+>
+> Benchmarks operate on tries without gaps in the key range, i.e. each
+> test begins with a trie with valid keys in the range [0, nr_entries).
+> This is intended to cause maximum branching when traversing the trie.
 
-Reviewed-by: Frank Li <Frank.Li@nxp.com>
+Please make a full description of what the test does,
+since it's not trivial to decipher from the code.
+If I'm reading it correctly, first, the user space
+makes the LPM completely full and then lookup/update
+use random key-s within range.
 
+But delete looks different. It seems the kernel delete
+operation can interleave with user space refilling the LPM,
+so ...
+
+>   lookup: throughput    7.423 =C2=B1 0.023 M ops/s (  7.423M ops/prod), l=
+atency  134.710 ns/op
+>   update: throughput    2.643 =C2=B1 0.015 M ops/s (  2.643M ops/prod), l=
+atency  378.310 ns/op
+>   delete: throughput    0.712 =C2=B1 0.008 M ops/s (  0.712M ops/prod), l=
+atency 1405.152 ns/op
+
+this comparison doesn't look like apples to apples,
+since delete will include user space refill time.
+
+>     free: throughput    0.574 =C2=B1 0.003 K ops/s (  0.574K ops/prod), l=
+atency    1.743 ms/op
+
+Does this measure the free-ing of full LPM ?
+
+Please explain the benchmark logic in words.
+Both in the commit log and the comments.
+
+> Tested-by: Jesper Dangaard Brouer <hawk@kernel.org>
+> Reviewed-by: Jesper Dangaard Brouer <hawk@kernel.org>
+> Signed-off-by: Matt Fleming <mfleming@cloudflare.com>
 > ---
-> Changes for v7:
-> 1. remove temperature sensor description from commit message.
 >
-> Changes for v6:
-> 1. remove tmu node due to dtb-check warning.
+> Changes in v3:
 >
-> Changes for v5:
-> 1. modify the imx91.dtsi to use imx91_93_common.dtsi.
+>  - Replace BPF_CORE_READ() with BPF_CORE_READ_STR_INTO() to avoid
+>    gcc-bpf CI build failure
 >
-> Changes for v4:
-> 1. modify the references in imx91.dtsi.
-> 2. modify the code alignment.
+> Changes in v2:
 >
-> Changes for v2:
-> 1. change ddr node pmu compatible.
-> 2. remove mu1 and mu2.
-> 3. change iomux node compatible and enable 91 pinctr.
-> 4. refine commit message.
-> 5. change hex to lowercase in pinfunc.h.
-> 6. ordering nodes with the dt-format tool
-> ---
->  arch/arm64/boot/dts/freescale/imx91-pinfunc.h | 770 ++++++++++++++++++
->  arch/arm64/boot/dts/freescale/imx91.dtsi      |  71 ++
->  .../boot/dts/freescale/imx91_93_common.dtsi   |   2 +-
->  3 files changed, 842 insertions(+), 1 deletion(-)
->  create mode 100644 arch/arm64/boot/dts/freescale/imx91-pinfunc.h
->  create mode 100644 arch/arm64/boot/dts/freescale/imx91.dtsi
+>  - Add Jesper's Tested-by and Revewied-by tags
+>  - Remove use of atomic_*() in favour of __sync_add_and_fetch()
+>  - Use a file-local 'deleted_entries' in the DELETE op benchmark and add
+>    a comment explaining why non-atomic accesses are safe.
+>  - Bump 'hits' with the number of bpf_loop() loops actually executed
 >
-> diff --git a/arch/arm64/boot/dts/freescale/imx91-pinfunc.h b/arch/arm64/boot/dts/freescale/imx91-pinfunc.h
+>  tools/testing/selftests/bpf/Makefile          |   2 +
+>  tools/testing/selftests/bpf/bench.c           |  10 +
+>  tools/testing/selftests/bpf/bench.h           |   1 +
+>  .../selftests/bpf/benchs/bench_lpm_trie_map.c | 337 ++++++++++++++++++
+>  .../selftests/bpf/progs/lpm_trie_bench.c      | 171 +++++++++
+>  .../selftests/bpf/progs/lpm_trie_map.c        |  19 +
+>  6 files changed, 540 insertions(+)
+>  create mode 100644 tools/testing/selftests/bpf/benchs/bench_lpm_trie_map=
+.c
+>  create mode 100644 tools/testing/selftests/bpf/progs/lpm_trie_bench.c
+>  create mode 100644 tools/testing/selftests/bpf/progs/lpm_trie_map.c
+>
+> diff --git a/tools/testing/selftests/bpf/Makefile b/tools/testing/selftes=
+ts/bpf/Makefile
+> index 910d8d6402ef..10a5f1d0fa41 100644
+> --- a/tools/testing/selftests/bpf/Makefile
+> +++ b/tools/testing/selftests/bpf/Makefile
+> @@ -815,6 +815,7 @@ $(OUTPUT)/bench_bpf_hashmap_lookup.o: $(OUTPUT)/bpf_h=
+ashmap_lookup.skel.h
+>  $(OUTPUT)/bench_htab_mem.o: $(OUTPUT)/htab_mem_bench.skel.h
+>  $(OUTPUT)/bench_bpf_crypto.o: $(OUTPUT)/crypto_bench.skel.h
+>  $(OUTPUT)/bench_sockmap.o: $(OUTPUT)/bench_sockmap_prog.skel.h
+> +$(OUTPUT)/bench_lpm_trie_map.o: $(OUTPUT)/lpm_trie_bench.skel.h $(OUTPUT=
+)/lpm_trie_map.skel.h
+>  $(OUTPUT)/bench.o: bench.h testing_helpers.h $(BPFOBJ)
+>  $(OUTPUT)/bench: LDLIBS +=3D -lm
+>  $(OUTPUT)/bench: $(OUTPUT)/bench.o \
+> @@ -836,6 +837,7 @@ $(OUTPUT)/bench: $(OUTPUT)/bench.o \
+>                  $(OUTPUT)/bench_htab_mem.o \
+>                  $(OUTPUT)/bench_bpf_crypto.o \
+>                  $(OUTPUT)/bench_sockmap.o \
+> +                $(OUTPUT)/bench_lpm_trie_map.o \
+>                  #
+>         $(call msg,BINARY,,$@)
+>         $(Q)$(CC) $(CFLAGS) $(LDFLAGS) $(filter %.a %.o,$^) $(LDLIBS) -o =
+$@
+> diff --git a/tools/testing/selftests/bpf/bench.c b/tools/testing/selftest=
+s/bpf/bench.c
+> index ddd73d06a1eb..fd15f60fd5a8 100644
+> --- a/tools/testing/selftests/bpf/bench.c
+> +++ b/tools/testing/selftests/bpf/bench.c
+> @@ -284,6 +284,7 @@ extern struct argp bench_htab_mem_argp;
+>  extern struct argp bench_trigger_batch_argp;
+>  extern struct argp bench_crypto_argp;
+>  extern struct argp bench_sockmap_argp;
+> +extern struct argp bench_lpm_trie_map_argp;
+>
+>  static const struct argp_child bench_parsers[] =3D {
+>         { &bench_ringbufs_argp, 0, "Ring buffers benchmark", 0 },
+> @@ -299,6 +300,7 @@ static const struct argp_child bench_parsers[] =3D {
+>         { &bench_trigger_batch_argp, 0, "BPF triggering benchmark", 0 },
+>         { &bench_crypto_argp, 0, "bpf crypto benchmark", 0 },
+>         { &bench_sockmap_argp, 0, "bpf sockmap benchmark", 0 },
+> +       { &bench_lpm_trie_map_argp, 0, "LPM trie map benchmark", 0 },
+>         {},
+>  };
+>
+> @@ -558,6 +560,10 @@ extern const struct bench bench_htab_mem;
+>  extern const struct bench bench_crypto_encrypt;
+>  extern const struct bench bench_crypto_decrypt;
+>  extern const struct bench bench_sockmap;
+> +extern const struct bench bench_lpm_trie_lookup;
+> +extern const struct bench bench_lpm_trie_update;
+> +extern const struct bench bench_lpm_trie_delete;
+> +extern const struct bench bench_lpm_trie_free;
+>
+>  static const struct bench *benchs[] =3D {
+>         &bench_count_global,
+> @@ -625,6 +631,10 @@ static const struct bench *benchs[] =3D {
+>         &bench_crypto_encrypt,
+>         &bench_crypto_decrypt,
+>         &bench_sockmap,
+> +       &bench_lpm_trie_lookup,
+> +       &bench_lpm_trie_update,
+> +       &bench_lpm_trie_delete,
+> +       &bench_lpm_trie_free,
+>  };
+>
+>  static void find_benchmark(void)
+> diff --git a/tools/testing/selftests/bpf/bench.h b/tools/testing/selftest=
+s/bpf/bench.h
+> index 005c401b3e22..bea323820ffb 100644
+> --- a/tools/testing/selftests/bpf/bench.h
+> +++ b/tools/testing/selftests/bpf/bench.h
+> @@ -46,6 +46,7 @@ struct bench_res {
+>         unsigned long gp_ns;
+>         unsigned long gp_ct;
+>         unsigned int stime;
+> +       unsigned long duration_ns;
+>  };
+>
+>  struct bench {
+> diff --git a/tools/testing/selftests/bpf/benchs/bench_lpm_trie_map.c b/to=
+ols/testing/selftests/bpf/benchs/bench_lpm_trie_map.c
 > new file mode 100644
-> index 000000000000..3e19945f5ce3
+> index 000000000000..435b5c7ceee9
 > --- /dev/null
-> +++ b/arch/arm64/boot/dts/freescale/imx91-pinfunc.h
-> @@ -0,0 +1,770 @@
-> +/* SPDX-License-Identifier: (GPL-2.0+ OR MIT) */
-> +/*
-> + * Copyright 2025 NXP
-> + */
-> +
-> +#ifndef __DTS_IMX91_PINFUNC_H
-> +#define __DTS_IMX91_PINFUNC_H
+> +++ b/tools/testing/selftests/bpf/benchs/bench_lpm_trie_map.c
+> @@ -0,0 +1,337 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/* Copyright (c) 2025 Cloudflare */
 > +
 > +/*
-> + * The pin function ID is a tuple of
-> + * <mux_reg conf_reg input_reg mux_mode input_val>
+> + * All of these benchmarks operate on tries with keys in the range
+> + * [0, args.nr_entries), i.e. there are no gaps or partially filled
+> + * branches of the trie for any key < args.nr_entries.
+> + *
+> + * This gives an idea of worst-case behaviour.
 > + */
-> +#define MX91_PAD_DAP_TDI__JTAG_MUX_TDI                                           0x0000 0x01b0 0x03d8 0x00 0x00
-> +#define MX91_PAD_DAP_TDI__MQS2_LEFT                                              0x0000 0x01b0 0x0000 0x01 0x00
-> +#define MX91_PAD_DAP_TDI__CAN2_TX                                                0x0000 0x01b0 0x0000 0x03 0x00
-> +#define MX91_PAD_DAP_TDI__FLEXIO2_FLEXIO30                                       0x0000 0x01b0 0x0000 0x04 0x00
-> +#define MX91_PAD_DAP_TDI__GPIO3_IO28                                             0x0000 0x01b0 0x0000 0x05 0x00
-> +#define MX91_PAD_DAP_TDI__LPUART5_RX                                             0x0000 0x01b0 0x0488 0x06 0x00
-> +
-> +#define MX91_PAD_DAP_TMS_SWDIO__JTAG_MUX_TMS                                     0x0004 0x01b4 0x03dc 0x00 0x00
-> +#define MX91_PAD_DAP_TMS_SWDIO__FLEXIO2_FLEXIO31                                 0x0004 0x01b4 0x0000 0x04 0x00
-> +#define MX91_PAD_DAP_TMS_SWDIO__GPIO3_IO29                                       0x0004 0x01b4 0x0000 0x05 0x00
-> +#define MX91_PAD_DAP_TMS_SWDIO__LPUART5_RTS_B                                    0x0004 0x01b4 0x0000 0x06 0x00
-> +
-> +#define MX91_PAD_DAP_TCLK_SWCLK__JTAG_MUX_TCK                                    0x0008 0x01b8 0x03d4 0x00 0x00
-> +#define MX91_PAD_DAP_TCLK_SWCLK__FLEXIO1_FLEXIO30                                0x0008 0x01b8 0x0000 0x04 0x00
-> +#define MX91_PAD_DAP_TCLK_SWCLK__GPIO3_IO30                                      0x0008 0x01b8 0x0000 0x05 0x00
-> +#define MX91_PAD_DAP_TCLK_SWCLK__LPUART5_CTS_B                                   0x0008 0x01b8 0x0484 0x06 0x00
-> +
-> +#define MX91_PAD_DAP_TDO_TRACESWO__JTAG_MUX_TDO                                  0x000c 0x01bc 0x0000 0x00 0x00
-> +#define MX91_PAD_DAP_TDO_TRACESWO__MQS2_RIGHT                                    0x000c 0x01bc 0x0000 0x01 0x00
-> +#define MX91_PAD_DAP_TDO_TRACESWO__CAN2_RX                                       0x000c 0x01bc 0x0364 0x03 0x00
-> +#define MX91_PAD_DAP_TDO_TRACESWO__FLEXIO1_FLEXIO31                              0x000c 0x01bc 0x0000 0x04 0x00
-> +#define MX91_PAD_DAP_TDO_TRACESWO__GPIO3_IO31                                    0x000c 0x01bc 0x0000 0x05 0x00
-> +#define MX91_PAD_DAP_TDO_TRACESWO__LPUART5_TX                                    0x000c 0x01bc 0x048c 0x06 0x00
-> +
-> +#define MX91_PAD_GPIO_IO00__GPIO2_IO0                                            0x0010 0x01c0 0x0000 0x00 0x00
-> +#define MX91_PAD_GPIO_IO00__LPI2C3_SDA                                           0x0010 0x01c0 0x03f4 0x01 0x00
-> +#define MX91_PAD_GPIO_IO00__MEDIAMIX_CAM_CLK                                     0x0010 0x01c0 0x04bc 0x02 0x00
-> +#define MX91_PAD_GPIO_IO00__MEDIAMIX_DISP_CLK                                    0x0010 0x01c0 0x0000 0x03 0x00
-> +#define MX91_PAD_GPIO_IO00__LPSPI6_PCS0                                          0x0010 0x01c0 0x0000 0x04 0x00
-> +#define MX91_PAD_GPIO_IO00__LPUART5_TX                                           0x0010 0x01c0 0x048c 0x05 0x01
-> +#define MX91_PAD_GPIO_IO00__LPI2C5_SDA                                           0x0010 0x01c0 0x0404 0x06 0x00
-> +#define MX91_PAD_GPIO_IO00__FLEXIO1_FLEXIO0                                      0x0010 0x01c0 0x036c 0x07 0x00
-> +
-> +#define MX91_PAD_GPIO_IO01__GPIO2_IO1                                            0x0014 0x01c4 0x0000 0x00 0x00
-> +#define MX91_PAD_GPIO_IO01__LPI2C3_SCL                                           0x0014 0x01c4 0x03f0 0x01 0x00
-> +#define MX91_PAD_GPIO_IO01__MEDIAMIX_CAM_DATA0                                   0x0014 0x01c4 0x0490 0x02 0x00
-> +#define MX91_PAD_GPIO_IO01__MEDIAMIX_DISP_DE                                     0x0014 0x01c4 0x0000 0x03 0x00
-> +#define MX91_PAD_GPIO_IO01__LPSPI6_SIN                                           0x0014 0x01c4 0x0000 0x04 0x00
-> +#define MX91_PAD_GPIO_IO01__LPUART5_RX                                           0x0014 0x01c4 0x0488 0x05 0x01
-> +#define MX91_PAD_GPIO_IO01__LPI2C5_SCL                                           0x0014 0x01c4 0x0400 0x06 0x00
-> +#define MX91_PAD_GPIO_IO01__FLEXIO1_FLEXIO1                                      0x0014 0x01c4 0x0370 0x07 0x00
-> +
-> +#define MX91_PAD_GPIO_IO02__GPIO2_IO2                                            0x0018 0x01c8 0x0000 0x00 0x00
-> +#define MX91_PAD_GPIO_IO02__LPI2C4_SDA                                           0x0018 0x01c8 0x03fc 0x01 0x00
-> +#define MX91_PAD_GPIO_IO02__MEDIAMIX_CAM_VSYNC                                   0x0018 0x01c8 0x04c0 0x02 0x00
-> +#define MX91_PAD_GPIO_IO02__MEDIAMIX_DISP_VSYNC                                  0x0018 0x01c8 0x0000 0x03 0x00
-> +#define MX91_PAD_GPIO_IO02__LPSPI6_SOUT                                          0x0018 0x01c8 0x0000 0x04 0x00
-> +#define MX91_PAD_GPIO_IO02__LPUART5_CTS_B                                        0x0018 0x01c8 0x0484 0x05 0x01
-> +#define MX91_PAD_GPIO_IO02__LPI2C6_SDA                                           0x0018 0x01c8 0x040c 0x06 0x00
-> +#define MX91_PAD_GPIO_IO02__FLEXIO1_FLEXIO2                                      0x0018 0x01c8 0x0374 0x07 0x00
-> +
-> +#define MX91_PAD_GPIO_IO03__GPIO2_IO3                                            0x001c 0x01cc 0x0000 0x00 0x00
-> +#define MX91_PAD_GPIO_IO03__LPI2C4_SCL                                           0x001c 0x01cc 0x03f8 0x01 0x00
-> +#define MX91_PAD_GPIO_IO03__MEDIAMIX_CAM_HSYNC                                   0x001c 0x01cc 0x04b8 0x02 0x00
-> +#define MX91_PAD_GPIO_IO03__MEDIAMIX_DISP_HSYNC                                  0x001c 0x01cc 0x0000 0x03 0x00
-> +#define MX91_PAD_GPIO_IO03__LPSPI6_SCK                                           0x001c 0x01cc 0x0000 0x04 0x00
-> +#define MX91_PAD_GPIO_IO03__LPUART5_RTS_B                                        0x001c 0x01cc 0x0000 0x05 0x00
-> +#define MX91_PAD_GPIO_IO03__LPI2C6_SCL                                           0x001c 0x01cc 0x0408 0x06 0x00
-> +#define MX91_PAD_GPIO_IO03__FLEXIO1_FLEXIO3                                      0x001c 0x01cc 0x0378 0x07 0x00
-> +
-> +#define MX91_PAD_GPIO_IO04__GPIO2_IO4                                            0x0020 0x01d0 0x0000 0x00 0x00
-> +#define MX91_PAD_GPIO_IO04__TPM3_CH0                                             0x0020 0x01d0 0x0000 0x01 0x00
-> +#define MX91_PAD_GPIO_IO04__PDM_CLK                                              0x0020 0x01d0 0x0000 0x02 0x00
-> +#define MX91_PAD_GPIO_IO04__MEDIAMIX_DISP_DATA0                                  0x0020 0x01d0 0x0000 0x03 0x00
-> +#define MX91_PAD_GPIO_IO04__LPSPI7_PCS0                                          0x0020 0x01d0 0x0000 0x04 0x00
-> +#define MX91_PAD_GPIO_IO04__LPUART6_TX                                           0x0020 0x01d0 0x0000 0x05 0x00
-> +#define MX91_PAD_GPIO_IO04__LPI2C6_SDA                                           0x0020 0x01d0 0x040c 0x06 0x01
-> +#define MX91_PAD_GPIO_IO04__FLEXIO1_FLEXIO4                                      0x0020 0x01d0 0x037c 0x07 0x00
-> +
-> +#define MX91_PAD_GPIO_IO05__GPIO2_IO5                                            0x0024 0x01d4 0x0000 0x00 0x00
-> +#define MX91_PAD_GPIO_IO05__TPM4_CH0                                             0x0024 0x01d4 0x0000 0x01 0x00
-> +#define MX91_PAD_GPIO_IO05__PDM_BIT_STREAM0                                      0x0024 0x01d4 0x04c4 0x02 0x00
-> +#define MX91_PAD_GPIO_IO05__MEDIAMIX_DISP_DATA1                                  0x0024 0x01d4 0x0000 0x03 0x00
-> +#define MX91_PAD_GPIO_IO05__LPSPI7_SIN                                           0x0024 0x01d4 0x0000 0x04 0x00
-> +#define MX91_PAD_GPIO_IO05__LPUART6_RX                                           0x0024 0x01d4 0x0000 0x05 0x00
-> +#define MX91_PAD_GPIO_IO05__LPI2C6_SCL                                           0x0024 0x01d4 0x0408 0x06 0x01
-> +#define MX91_PAD_GPIO_IO05__FLEXIO1_FLEXIO5                                      0x0024 0x01d4 0x0380 0x07 0x00
-> +
-> +#define MX91_PAD_GPIO_IO06__GPIO2_IO6                                            0x0028 0x01d8 0x0000 0x00 0x00
-> +#define MX91_PAD_GPIO_IO06__TPM5_CH0                                             0x0028 0x01d8 0x0000 0x01 0x00
-> +#define MX91_PAD_GPIO_IO06__PDM_BIT_STREAM1                                      0x0028 0x01d8 0x04c8 0x02 0x00
-> +#define MX91_PAD_GPIO_IO06__MEDIAMIX_DISP_DATA2                                  0x0028 0x01d8 0x0000 0x03 0x00
-> +#define MX91_PAD_GPIO_IO06__LPSPI7_SOUT                                          0x0028 0x01d8 0x0000 0x04 0x00
-> +#define MX91_PAD_GPIO_IO06__LPUART6_CTS_B                                        0x0028 0x01d8 0x0000 0x05 0x00
-> +#define MX91_PAD_GPIO_IO06__LPI2C7_SDA                                           0x0028 0x01d8 0x0414 0x06 0x00
-> +#define MX91_PAD_GPIO_IO06__FLEXIO1_FLEXIO6                                      0x0028 0x01d8 0x0384 0x07 0x00
-> +
-> +#define MX91_PAD_GPIO_IO07__GPIO2_IO7                                            0x002c 0x01dc 0x0000 0x00 0x00
-> +#define MX91_PAD_GPIO_IO07__LPSPI3_PCS1                                          0x002c 0x01dc 0x0000 0x01 0x00
-> +#define MX91_PAD_GPIO_IO07__MEDIAMIX_CAM_DATA1                                   0x002c 0x01dc 0x0494 0x02 0x00
-> +#define MX91_PAD_GPIO_IO07__MEDIAMIX_DISP_DATA3                                  0x002c 0x01dc 0x0000 0x03 0x00
-> +#define MX91_PAD_GPIO_IO07__LPSPI7_SCK                                           0x002c 0x01dc 0x0000 0x04 0x00
-> +#define MX91_PAD_GPIO_IO07__LPUART6_RTS_B                                        0x002c 0x01dc 0x0000 0x05 0x00
-> +#define MX91_PAD_GPIO_IO07__LPI2C7_SCL                                           0x002c 0x01dc 0x0410 0x06 0x00
-> +#define MX91_PAD_GPIO_IO07__FLEXIO1_FLEXIO7                                      0x002c 0x01dc 0x0388 0x07 0x00
-> +
-> +#define MX91_PAD_GPIO_IO08__GPIO2_IO8                                            0x0030 0x01e0 0x0000 0x00 0x00
-> +#define MX91_PAD_GPIO_IO08__LPSPI3_PCS0                                          0x0030 0x01e0 0x0000 0x01 0x00
-> +#define MX91_PAD_GPIO_IO08__MEDIAMIX_CAM_DATA2                                   0x0030 0x01e0 0x0498 0x02 0x00
-> +#define MX91_PAD_GPIO_IO08__MEDIAMIX_DISP_DATA4                                  0x0030 0x01e0 0x0000 0x03 0x00
-> +#define MX91_PAD_GPIO_IO08__TPM6_CH0                                             0x0030 0x01e0 0x0000 0x04 0x00
-> +#define MX91_PAD_GPIO_IO08__LPUART7_TX                                           0x0030 0x01e0 0x0000 0x05 0x00
-> +#define MX91_PAD_GPIO_IO08__LPI2C7_SDA                                           0x0030 0x01e0 0x0414 0x06 0x01
-> +#define MX91_PAD_GPIO_IO08__FLEXIO1_FLEXIO8                                      0x0030 0x01e0 0x038c 0x07 0x00
-> +
-> +#define MX91_PAD_GPIO_IO09__GPIO2_IO9                                            0x0034 0x01e4 0x0000 0x00 0x00
-> +#define MX91_PAD_GPIO_IO09__LPSPI3_SIN                                           0x0034 0x01e4 0x0000 0x01 0x00
-> +#define MX91_PAD_GPIO_IO09__MEDIAMIX_CAM_DATA3                                   0x0034 0x01e4 0x049c 0x02 0x00
-> +#define MX91_PAD_GPIO_IO09__MEDIAMIX_DISP_DATA5                                  0x0034 0x01e4 0x0000 0x03 0x00
-> +#define MX91_PAD_GPIO_IO09__TPM3_EXTCLK                                          0x0034 0x01e4 0x0000 0x04 0x00
-> +#define MX91_PAD_GPIO_IO09__LPUART7_RX                                           0x0034 0x01e4 0x0000 0x05 0x00
-> +#define MX91_PAD_GPIO_IO09__LPI2C7_SCL                                           0x0034 0x01e4 0x0410 0x06 0x01
-> +#define MX91_PAD_GPIO_IO09__FLEXIO1_FLEXIO9                                      0x0034 0x01e4 0x0390 0x07 0x00
-> +
-> +#define MX91_PAD_GPIO_IO10__GPIO2_IO10                                           0x0038 0x01e8 0x0000 0x00 0x00
-> +#define MX91_PAD_GPIO_IO10__LPSPI3_SOUT                                          0x0038 0x01e8 0x0000 0x01 0x00
-> +#define MX91_PAD_GPIO_IO10__MEDIAMIX_CAM_DATA4                                   0x0038 0x01e8 0x04a0 0x02 0x00
-> +#define MX91_PAD_GPIO_IO10__MEDIAMIX_DISP_DATA6                                  0x0038 0x01e8 0x0000 0x03 0x00
-> +#define MX91_PAD_GPIO_IO10__TPM4_EXTCLK                                          0x0038 0x01e8 0x0000 0x04 0x00
-> +#define MX91_PAD_GPIO_IO10__LPUART7_CTS_B                                        0x0038 0x01e8 0x0000 0x05 0x00
-> +#define MX91_PAD_GPIO_IO10__LPI2C8_SDA                                           0x0038 0x01e8 0x041c 0x06 0x00
-> +#define MX91_PAD_GPIO_IO10__FLEXIO1_FLEXIO10                                     0x0038 0x01e8 0x0394 0x07 0x00
-> +
-> +#define MX91_PAD_GPIO_IO11__GPIO2_IO11                                           0x003c 0x01ec 0x0000 0x00 0x00
-> +#define MX91_PAD_GPIO_IO11__LPSPI3_SCK                                           0x003c 0x01ec 0x0000 0x01 0x00
-> +#define MX91_PAD_GPIO_IO11__MEDIAMIX_CAM_DATA5                                   0x003c 0x01ec 0x04a4 0x02 0x00
-> +#define MX91_PAD_GPIO_IO11__MEDIAMIX_DISP_DATA7                                  0x003c 0x01ec 0x0000 0x03 0x00
-> +#define MX91_PAD_GPIO_IO11__TPM5_EXTCLK                                          0x003c 0x01ec 0x0000 0x04 0x00
-> +#define MX91_PAD_GPIO_IO11__LPUART7_RTS_B                                        0x003c 0x01ec 0x0000 0x05 0x00
-> +#define MX91_PAD_GPIO_IO11__LPI2C8_SCL                                           0x003c 0x01ec 0x0418 0x06 0x00
-> +#define MX91_PAD_GPIO_IO11__FLEXIO1_FLEXIO11                                     0x003c 0x01ec 0x0398 0x07 0x00
-> +
-> +#define MX91_PAD_GPIO_IO12__GPIO2_IO12                                           0x0040 0x01f0 0x0000 0x00 0x00
-> +#define MX91_PAD_GPIO_IO12__TPM3_CH2                                             0x0040 0x01f0 0x0000 0x01 0x00
-> +#define MX91_PAD_GPIO_IO12__PDM_BIT_STREAM2                                      0x0040 0x01f0 0x04cc 0x02 0x00
-> +#define MX91_PAD_GPIO_IO12__MEDIAMIX_DISP_DATA8                                  0x0040 0x01f0 0x0000 0x03 0x00
-> +#define MX91_PAD_GPIO_IO12__LPSPI8_PCS0                                          0x0040 0x01f0 0x0000 0x04 0x00
-> +#define MX91_PAD_GPIO_IO12__LPUART8_TX                                           0x0040 0x01f0 0x0000 0x05 0x00
-> +#define MX91_PAD_GPIO_IO12__LPI2C8_SDA                                           0x0040 0x01f0 0x041c 0x06 0x01
-> +#define MX91_PAD_GPIO_IO12__SAI3_RX_SYNC                                         0x0040 0x01f0 0x04dc 0x07 0x00
-> +
-> +#define MX91_PAD_GPIO_IO13__GPIO2_IO13                                           0x0044 0x01f4 0x0000 0x00 0x00
-> +#define MX91_PAD_GPIO_IO13__TPM4_CH2                                             0x0044 0x01f4 0x0000 0x01 0x00
-> +#define MX91_PAD_GPIO_IO13__PDM_BIT_STREAM3                                      0x0044 0x01f4 0x04d0 0x02 0x00
-> +#define MX91_PAD_GPIO_IO13__MEDIAMIX_DISP_DATA9                                  0x0044 0x01f4 0x0000 0x03 0x00
-> +#define MX91_PAD_GPIO_IO13__LPSPI8_SIN                                           0x0044 0x01f4 0x0000 0x04 0x00
-> +#define MX91_PAD_GPIO_IO13__LPUART8_RX                                           0x0044 0x01f4 0x0000 0x05 0x00
-> +#define MX91_PAD_GPIO_IO13__LPI2C8_SCL                                           0x0044 0x01f4 0x0418 0x06 0x01
-> +#define MX91_PAD_GPIO_IO13__FLEXIO1_FLEXIO13                                     0x0044 0x01f4 0x039c 0x07 0x00
-> +
-> +#define MX91_PAD_GPIO_IO14__GPIO2_IO14                                           0x0048 0x01f8 0x0000 0x00 0x00
-> +#define MX91_PAD_GPIO_IO14__LPUART3_TX                                           0x0048 0x01f8 0x0474 0x01 0x00
-> +#define MX91_PAD_GPIO_IO14__MEDIAMIX_CAM_DATA6                                   0x0048 0x01f8 0x04a8 0x02 0x00
-> +#define MX91_PAD_GPIO_IO14__MEDIAMIX_DISP_DATA10                                 0x0048 0x01f8 0x0000 0x03 0x00
-> +#define MX91_PAD_GPIO_IO14__LPSPI8_SOUT                                          0x0048 0x01f8 0x0000 0x04 0x00
-> +#define MX91_PAD_GPIO_IO14__LPUART8_CTS_B                                        0x0048 0x01f8 0x0000 0x05 0x00
-> +#define MX91_PAD_GPIO_IO14__LPUART4_TX                                           0x0048 0x01f8 0x0480 0x06 0x00
-> +#define MX91_PAD_GPIO_IO14__FLEXIO1_FLEXIO14                                     0x0048 0x01f8 0x03a0 0x07 0x00
-> +
-> +#define MX91_PAD_GPIO_IO15__GPIO2_IO15                                           0x004c 0x01fc 0x0000 0x00 0x00
-> +#define MX91_PAD_GPIO_IO15__LPUART3_RX                                           0x004c 0x01fc 0x0470 0x01 0x00
-> +#define MX91_PAD_GPIO_IO15__MEDIAMIX_CAM_DATA7                                   0x004c 0x01fc 0x04ac 0x02 0x00
-> +#define MX91_PAD_GPIO_IO15__MEDIAMIX_DISP_DATA11                                 0x004c 0x01fc 0x0000 0x03 0x00
-> +#define MX91_PAD_GPIO_IO15__LPSPI8_SCK                                           0x004c 0x01fc 0x0000 0x04 0x00
-> +#define MX91_PAD_GPIO_IO15__LPUART8_RTS_B                                        0x004c 0x01fc 0x0000 0x05 0x00
-> +#define MX91_PAD_GPIO_IO15__LPUART4_RX                                           0x004c 0x01fc 0x047c 0x06 0x00
-> +#define MX91_PAD_GPIO_IO15__FLEXIO1_FLEXIO15                                     0x004c 0x01fc 0x03a4 0x07 0x00
-> +
-> +#define MX91_PAD_GPIO_IO16__GPIO2_IO16                                           0x0050 0x0200 0x0000 0x00 0x00
-> +#define MX91_PAD_GPIO_IO16__SAI3_TX_BCLK                                         0x0050 0x0200 0x0000 0x01 0x00
-> +#define MX91_PAD_GPIO_IO16__PDM_BIT_STREAM2                                      0x0050 0x0200 0x04cc 0x02 0x01
-> +#define MX91_PAD_GPIO_IO16__MEDIAMIX_DISP_DATA12                                 0x0050 0x0200 0x0000 0x03 0x00
-> +#define MX91_PAD_GPIO_IO16__LPUART3_CTS_B                                        0x0050 0x0200 0x046c 0x04 0x00
-> +#define MX91_PAD_GPIO_IO16__LPSPI4_PCS2                                          0x0050 0x0200 0x0000 0x05 0x00
-> +#define MX91_PAD_GPIO_IO16__LPUART4_CTS_B                                        0x0050 0x0200 0x0478 0x06 0x00
-> +#define MX91_PAD_GPIO_IO16__FLEXIO1_FLEXIO16                                     0x0050 0x0200 0x03a8 0x07 0x00
-> +
-> +#define MX91_PAD_GPIO_IO17__GPIO2_IO17                                           0x0054 0x0204 0x0000 0x00 0x00
-> +#define MX91_PAD_GPIO_IO17__SAI3_MCLK                                            0x0054 0x0204 0x0000 0x01 0x00
-> +#define MX91_PAD_GPIO_IO17__MEDIAMIX_CAM_DATA8                                   0x0054 0x0204 0x04b0 0x02 0x00
-> +#define MX91_PAD_GPIO_IO17__MEDIAMIX_DISP_DATA13                                 0x0054 0x0204 0x0000 0x03 0x00
-> +#define MX91_PAD_GPIO_IO17__LPUART3_RTS_B                                        0x0054 0x0204 0x0000 0x04 0x00
-> +#define MX91_PAD_GPIO_IO17__LPSPI4_PCS1                                          0x0054 0x0204 0x0000 0x05 0x00
-> +#define MX91_PAD_GPIO_IO17__LPUART4_RTS_B                                        0x0054 0x0204 0x0000 0x06 0x00
-> +#define MX91_PAD_GPIO_IO17__FLEXIO1_FLEXIO17                                     0x0054 0x0204 0x03ac 0x07 0x00
-> +
-> +#define MX91_PAD_GPIO_IO18__GPIO2_IO18                                           0x0058 0x0208 0x0000 0x00 0x00
-> +#define MX91_PAD_GPIO_IO18__SAI3_RX_BCLK                                         0x0058 0x0208 0x04d8 0x01 0x00
-> +#define MX91_PAD_GPIO_IO18__MEDIAMIX_CAM_DATA9                                   0x0058 0x0208 0x04b4 0x02 0x00
-> +#define MX91_PAD_GPIO_IO18__MEDIAMIX_DISP_DATA14                                 0x0058 0x0208 0x0000 0x03 0x00
-> +#define MX91_PAD_GPIO_IO18__LPSPI5_PCS0                                          0x0058 0x0208 0x0000 0x04 0x00
-> +#define MX91_PAD_GPIO_IO18__LPSPI4_PCS0                                          0x0058 0x0208 0x0000 0x05 0x00
-> +#define MX91_PAD_GPIO_IO18__TPM5_CH2                                             0x0058 0x0208 0x0000 0x06 0x00
-> +#define MX91_PAD_GPIO_IO18__FLEXIO1_FLEXIO18                                     0x0058 0x0208 0x03b0 0x07 0x00
-> +
-> +#define MX91_PAD_GPIO_IO19__GPIO2_IO19                                           0x005c 0x020c 0x0000 0x00 0x00
-> +#define MX91_PAD_GPIO_IO19__SAI3_RX_SYNC                                         0x005c 0x020c 0x04dc 0x01 0x01
-> +#define MX91_PAD_GPIO_IO19__PDM_BIT_STREAM3                                      0x005c 0x020c 0x04d0 0x02 0x01
-> +#define MX91_PAD_GPIO_IO19__MEDIAMIX_DISP_DATA15                                 0x005c 0x020c 0x0000 0x03 0x00
-> +#define MX91_PAD_GPIO_IO19__LPSPI5_SIN                                           0x005c 0x020c 0x0000 0x04 0x00
-> +#define MX91_PAD_GPIO_IO19__LPSPI4_SIN                                           0x005c 0x020c 0x0000 0x05 0x00
-> +#define MX91_PAD_GPIO_IO19__TPM6_CH2                                             0x005c 0x020c 0x0000 0x06 0x00
-> +#define MX91_PAD_GPIO_IO19__SAI3_TX_DATA0                                        0x005c 0x020c 0x0000 0x07 0x00
-> +
-> +#define MX91_PAD_GPIO_IO20__GPIO2_IO20                                           0x0060 0x0210 0x0000 0x00 0x00
-> +#define MX91_PAD_GPIO_IO20__SAI3_RX_DATA0                                        0x0060 0x0210 0x0000 0x01 0x00
-> +#define MX91_PAD_GPIO_IO20__PDM_BIT_STREAM0                                      0x0060 0x0210 0x04c4 0x02 0x01
-> +#define MX91_PAD_GPIO_IO20__MEDIAMIX_DISP_DATA16                                 0x0060 0x0210 0x0000 0x03 0x00
-> +#define MX91_PAD_GPIO_IO20__LPSPI5_SOUT                                          0x0060 0x0210 0x0000 0x04 0x00
-> +#define MX91_PAD_GPIO_IO20__LPSPI4_SOUT                                          0x0060 0x0210 0x0000 0x05 0x00
-> +#define MX91_PAD_GPIO_IO20__TPM3_CH1                                             0x0060 0x0210 0x0000 0x06 0x00
-> +#define MX91_PAD_GPIO_IO20__FLEXIO1_FLEXIO20                                     0x0060 0x0210 0x03b4 0x07 0x00
-> +
-> +#define MX91_PAD_GPIO_IO21__GPIO2_IO21                                           0x0064 0x0214 0x0000 0x00 0x00
-> +#define MX91_PAD_GPIO_IO21__SAI3_TX_DATA0                                        0x0064 0x0214 0x0000 0x01 0x00
-> +#define MX91_PAD_GPIO_IO21__PDM_CLK                                              0x0064 0x0214 0x0000 0x02 0x00
-> +#define MX91_PAD_GPIO_IO21__MEDIAMIX_DISP_DATA17                                 0x0064 0x0214 0x0000 0x03 0x00
-> +#define MX91_PAD_GPIO_IO21__LPSPI5_SCK                                           0x0064 0x0214 0x0000 0x04 0x00
-> +#define MX91_PAD_GPIO_IO21__LPSPI4_SCK                                           0x0064 0x0214 0x0000 0x05 0x00
-> +#define MX91_PAD_GPIO_IO21__TPM4_CH1                                             0x0064 0x0214 0x0000 0x06 0x00
-> +#define MX91_PAD_GPIO_IO21__SAI3_RX_BCLK                                         0x0064 0x0214 0x04d8 0x07 0x01
-> +
-> +#define MX91_PAD_GPIO_IO22__GPIO2_IO22                                           0x0068 0x0218 0x0000 0x00 0x00
-> +#define MX91_PAD_GPIO_IO22__USDHC3_CLK                                           0x0068 0x0218 0x04e8 0x01 0x00
-> +#define MX91_PAD_GPIO_IO22__SPDIF_IN                                             0x0068 0x0218 0x04e4 0x02 0x00
-> +#define MX91_PAD_GPIO_IO22__MEDIAMIX_DISP_DATA18                                 0x0068 0x0218 0x0000 0x03 0x00
-> +#define MX91_PAD_GPIO_IO22__TPM5_CH1                                             0x0068 0x0218 0x0000 0x04 0x00
-> +#define MX91_PAD_GPIO_IO22__TPM6_EXTCLK                                          0x0068 0x0218 0x0000 0x05 0x00
-> +#define MX91_PAD_GPIO_IO22__LPI2C5_SDA                                           0x0068 0x0218 0x0404 0x06 0x01
-> +#define MX91_PAD_GPIO_IO22__FLEXIO1_FLEXIO22                                     0x0068 0x0218 0x03b8 0x07 0x00
-> +
-> +#define MX91_PAD_GPIO_IO23__GPIO2_IO23                                           0x006c 0x021c 0x0000 0x00 0x00
-> +#define MX91_PAD_GPIO_IO23__USDHC3_CMD                                           0x006c 0x021c 0x04ec 0x01 0x00
-> +#define MX91_PAD_GPIO_IO23__SPDIF_OUT                                            0x006c 0x021c 0x0000 0x02 0x00
-> +#define MX91_PAD_GPIO_IO23__MEDIAMIX_DISP_DATA19                                 0x006c 0x021c 0x0000 0x03 0x00
-> +#define MX91_PAD_GPIO_IO23__TPM6_CH1                                             0x006c 0x021c 0x0000 0x04 0x00
-> +#define MX91_PAD_GPIO_IO23__LPI2C5_SCL                                           0x006c 0x021c 0x0400 0x06 0x01
-> +#define MX91_PAD_GPIO_IO23__FLEXIO1_FLEXIO23                                     0x006c 0x021c 0x03bc 0x07 0x00
-> +
-> +#define MX91_PAD_GPIO_IO24__GPIO2_IO24                                           0x0070 0x0220 0x0000 0x00 0x00
-> +#define MX91_PAD_GPIO_IO24__USDHC3_DATA0                                         0x0070 0x0220 0x04f0 0x01 0x00
-> +#define MX91_PAD_GPIO_IO24__MEDIAMIX_DISP_DATA20                                 0x0070 0x0220 0x0000 0x03 0x00
-> +#define MX91_PAD_GPIO_IO24__TPM3_CH3                                             0x0070 0x0220 0x0000 0x04 0x00
-> +#define MX91_PAD_GPIO_IO24__JTAG_MUX_TDO                                         0x0070 0x0220 0x0000 0x05 0x00
-> +#define MX91_PAD_GPIO_IO24__LPSPI6_PCS1                                          0x0070 0x0220 0x0000 0x06 0x00
-> +#define MX91_PAD_GPIO_IO24__FLEXIO1_FLEXIO24                                     0x0070 0x0220 0x03c0 0x07 0x00
-> +
-> +#define MX91_PAD_GPIO_IO25__GPIO2_IO25                                           0x0074 0x0224 0x0000 0x00 0x00
-> +#define MX91_PAD_GPIO_IO25__USDHC3_DATA1                                         0x0074 0x0224 0x04f4 0x01 0x00
-> +#define MX91_PAD_GPIO_IO25__CAN2_TX                                              0x0074 0x0224 0x0000 0x02 0x00
-> +#define MX91_PAD_GPIO_IO25__MEDIAMIX_DISP_DATA21                                 0x0074 0x0224 0x0000 0x03 0x00
-> +#define MX91_PAD_GPIO_IO25__TPM4_CH3                                             0x0074 0x0224 0x0000 0x04 0x00
-> +#define MX91_PAD_GPIO_IO25__JTAG_MUX_TCK                                         0x0074 0x0224 0x03d4 0x05 0x01
-> +#define MX91_PAD_GPIO_IO25__LPSPI7_PCS1                                          0x0074 0x0224 0x0000 0x06 0x00
-> +#define MX91_PAD_GPIO_IO25__FLEXIO1_FLEXIO25                                     0x0074 0x0224 0x03c4 0x07 0x00
-> +
-> +#define MX91_PAD_GPIO_IO26__GPIO2_IO26                                           0x0078 0x0228 0x0000 0x00 0x00
-> +#define MX91_PAD_GPIO_IO26__USDHC3_DATA2                                         0x0078 0x0228 0x04f8 0x01 0x00
-> +#define MX91_PAD_GPIO_IO26__PDM_BIT_STREAM1                                      0x0078 0x0228 0x04c8 0x02 0x01
-> +#define MX91_PAD_GPIO_IO26__MEDIAMIX_DISP_DATA22                                 0x0078 0x0228 0x0000 0x03 0x00
-> +#define MX91_PAD_GPIO_IO26__TPM5_CH3                                             0x0078 0x0228 0x0000 0x04 0x00
-> +#define MX91_PAD_GPIO_IO26__JTAG_MUX_TDI                                         0x0078 0x0228 0x03d8 0x05 0x01
-> +#define MX91_PAD_GPIO_IO26__LPSPI8_PCS1                                          0x0078 0x0228 0x0000 0x06 0x00
-> +#define MX91_PAD_GPIO_IO26__SAI3_TX_SYNC                                         0x0078 0x0228 0x04e0 0x07 0x00
-> +
-> +#define MX91_PAD_GPIO_IO27__GPIO2_IO27                                           0x007c 0x022c 0x0000 0x00 0x00
-> +#define MX91_PAD_GPIO_IO27__USDHC3_DATA3                                         0x007c 0x022c 0x04fc 0x01 0x00
-> +#define MX91_PAD_GPIO_IO27__CAN2_RX                                              0x007c 0x022c 0x0364 0x02 0x01
-> +#define MX91_PAD_GPIO_IO27__MEDIAMIX_DISP_DATA23                                 0x007c 0x022c 0x0000 0x03 0x00
-> +#define MX91_PAD_GPIO_IO27__TPM6_CH3                                             0x007c 0x022c 0x0000 0x04 0x00
-> +#define MX91_PAD_GPIO_IO27__JTAG_MUX_TMS                                         0x007c 0x022c 0x03dc 0x05 0x01
-> +#define MX91_PAD_GPIO_IO27__LPSPI5_PCS1                                          0x007c 0x022c 0x0000 0x06 0x00
-> +#define MX91_PAD_GPIO_IO27__FLEXIO1_FLEXIO27                                     0x007c 0x022c 0x03c8 0x07 0x00
-> +
-> +#define MX91_PAD_GPIO_IO28__GPIO2_IO28                                           0x0080 0x0230 0x0000 0x00 0x00
-> +#define MX91_PAD_GPIO_IO28__LPI2C3_SDA                                           0x0080 0x0230 0x03f4 0x01 0x01
-> +#define MX91_PAD_GPIO_IO28__CAN1_TX                                              0x0080 0x0230 0x0000 0x02 0x00
-> +#define MX91_PAD_GPIO_IO28__FLEXIO1_FLEXIO28                                     0x0080 0x0230 0x0000 0x07 0x00
-> +
-> +#define MX91_PAD_GPIO_IO29__GPIO2_IO29                                           0x0084 0x0234 0x0000 0x00 0x00
-> +#define MX91_PAD_GPIO_IO29__LPI2C3_SCL                                           0x0084 0x0234 0x03f0 0x01 0x01
-> +#define MX91_PAD_GPIO_IO29__CAN1_RX                                              0x0084 0x0234 0x0360 0x02 0x00
-> +#define MX91_PAD_GPIO_IO29__FLEXIO1_FLEXIO29                                     0x0084 0x0234 0x0000 0x07 0x00
-> +
-> +#define MX91_PAD_CCM_CLKO1__CCMSRCGPCMIX_CLKO1                                   0x0088 0x0238 0x0000 0x00 0x00
-> +#define MX91_PAD_CCM_CLKO1__FLEXIO1_FLEXIO26                                     0x0088 0x0238 0x0000 0x04 0x00
-> +#define MX91_PAD_CCM_CLKO1__GPIO3_IO26                                           0x0088 0x0238 0x0000 0x05 0x00
-> +
-> +#define MX91_PAD_CCM_CLKO2__GPIO3_IO27                                           0x008c 0x023c 0x0000 0x05 0x00
-> +#define MX91_PAD_CCM_CLKO2__CCMSRCGPCMIX_CLKO2                                   0x008c 0x023c 0x0000 0x00 0x00
-> +#define MX91_PAD_CCM_CLKO2__FLEXIO1_FLEXIO27                                     0x008c 0x023c 0x03c8 0x04 0x01
-> +
-> +#define MX91_PAD_CCM_CLKO3__CCMSRCGPCMIX_CLKO3                                   0x0090 0x0240 0x0000 0x00 0x00
-> +#define MX91_PAD_CCM_CLKO3__FLEXIO2_FLEXIO28                                     0x0090 0x0240 0x0000 0x04 0x00
-> +#define MX91_PAD_CCM_CLKO3__GPIO4_IO28                                           0x0090 0x0240 0x0000 0x05 0x00
-> +
-> +#define MX91_PAD_CCM_CLKO4__CCMSRCGPCMIX_CLKO4                                   0x0094 0x0244 0x0000 0x00 0x00
-> +#define MX91_PAD_CCM_CLKO4__FLEXIO2_FLEXIO29                                     0x0094 0x0244 0x0000 0x04 0x00
-> +#define MX91_PAD_CCM_CLKO4__GPIO4_IO29                                           0x0094 0x0244 0x0000 0x05 0x00
-> +
-> +#define MX91_PAD_ENET1_MDC__ENET1_MDC                                            0x0098 0x0248 0x0000 0x00 0x00
-> +#define MX91_PAD_ENET1_MDC__LPUART3_DCB_B                                        0x0098 0x0248 0x0000 0x01 0x00
-> +#define MX91_PAD_ENET1_MDC__I3C2_SCL                                             0x0098 0x0248 0x03cc 0x02 0x00
-> +#define MX91_PAD_ENET1_MDC__HSIOMIX_OTG_ID1                                      0x0098 0x0248 0x0000 0x03 0x00
-> +#define MX91_PAD_ENET1_MDC__FLEXIO2_FLEXIO0                                      0x0098 0x0248 0x0000 0x04 0x00
-> +#define MX91_PAD_ENET1_MDC__GPIO4_IO0                                            0x0098 0x0248 0x0000 0x05 0x00
-> +#define MX91_PAD_ENET1_MDC__LPI2C1_SCL                                           0x0098 0x0248 0x03e0 0x06 0x00
-> +
-> +#define MX91_PAD_ENET1_MDIO__ENET_QOS_MDIO                                       0x009c 0x024c 0x0000 0x00 0x00
-> +#define MX91_PAD_ENET1_MDIO__LPUART3_RIN_B                                       0x009c 0x024c 0x0000 0x01 0x00
-> +#define MX91_PAD_ENET1_MDIO__I3C2_SDA                                            0x009c 0x024c 0x03d0 0x02 0x00
-> +#define MX91_PAD_ENET1_MDIO__HSIOMIX_OTG_PWR1                                    0x009c 0x024c 0x0000 0x03 0x00
-> +#define MX91_PAD_ENET1_MDIO__FLEXIO2_FLEXIO1                                     0x009c 0x024c 0x0000 0x04 0x00
-> +#define MX91_PAD_ENET1_MDIO__GPIO4_IO1                                           0x009c 0x024c 0x0000 0x05 0x00
-> +#define MX91_PAD_ENET1_MDIO__LPI2C1_SDA                                          0x009c 0x024c 0x03e4 0x06 0x00
-> +
-> +#define MX91_PAD_ENET1_TD3__ENET_QOS_RGMII_TD3                                   0x00a0 0x0250 0x0000 0x00 0x00
-> +#define MX91_PAD_ENET1_TD3__CAN2_TX                                              0x00a0 0x0250 0x0000 0x02 0x00
-> +#define MX91_PAD_ENET1_TD3__HSIOMIX_OTG_ID2                                      0x00a0 0x0250 0x0000 0x03 0x00
-> +#define MX91_PAD_ENET1_TD3__FLEXIO2_FLEXIO2                                      0x00a0 0x0250 0x0000 0x04 0x00
-> +#define MX91_PAD_ENET1_TD3__GPIO4_IO2                                            0x00a0 0x0250 0x0000 0x05 0x00
-> +#define MX91_PAD_ENET1_TD3__LPI2C2_SCL                                           0x00a0 0x0250 0x03e8 0x06 0x00
-> +
-> +#define MX91_PAD_ENET1_TD2__ENET_QOS_RGMII_TD2                                   0x00a4 0x0254 0x0000 0x00 0x00
-> +#define MX91_PAD_ENET1_TD2__ENET_QOS_CLOCK_GENERATE_CLK                          0x00a4 0x0254 0x0000 0x01 0x00
-> +#define MX91_PAD_ENET1_TD2__CAN2_RX                                              0x00a4 0x0254 0x0364 0x02 0x02
-> +#define MX91_PAD_ENET1_TD2__HSIOMIX_OTG_OC2                                      0x00a4 0x0254 0x0000 0x03 0x00
-> +#define MX91_PAD_ENET1_TD2__FLEXIO2_FLEXIO3                                      0x00a4 0x0254 0x0000 0x04 0x00
-> +#define MX91_PAD_ENET1_TD2__GPIO4_IO3                                            0x00a4 0x0254 0x0000 0x05 0x00
-> +#define MX91_PAD_ENET1_TD2__LPI2C2_SDA                                           0x00a4 0x0254 0x03ec 0x06 0x00
-> +
-> +#define MX91_PAD_ENET1_TD1__ENET1_RGMII_TD1                                      0x00a8 0x0258 0x0000 0x00 0x00
-> +#define MX91_PAD_ENET1_TD1__LPUART3_RTS_B                                        0x00a8 0x0258 0x0000 0x01 0x00
-> +#define MX91_PAD_ENET1_TD1__I3C2_PUR                                             0x00a8 0x0258 0x0000 0x02 0x00
-> +#define MX91_PAD_ENET1_TD1__HSIOMIX_OTG_OC1                                      0x00a8 0x0258 0x0000 0x03 0x00
-> +#define MX91_PAD_ENET1_TD1__FLEXIO2_FLEXIO4                                      0x00a8 0x0258 0x0000 0x04 0x00
-> +#define MX91_PAD_ENET1_TD1__GPIO4_IO4                                            0x00a8 0x0258 0x0000 0x05 0x00
-> +#define MX91_PAD_ENET1_TD1__I3C2_PUR_B                                           0x00a8 0x0258 0x0000 0x06 0x00
-> +
-> +#define MX91_PAD_ENET1_TD0__ENET_QOS_RGMII_TD0                                   0x00ac 0x025c 0x0000 0x00 0x00
-> +#define MX91_PAD_ENET1_TD0__LPUART3_TX                                           0x00ac 0x025c 0x0474 0x01 0x01
-> +#define MX91_PAD_ENET1_TD0__FLEXIO2_FLEXIO5                                      0x00ac 0x025c 0x0000 0x04 0x00
-> +#define MX91_PAD_ENET1_TD0__GPIO4_IO5                                            0x00ac 0x025c 0x0000 0x05 0x00
-> +
-> +#define MX91_PAD_ENET1_TX_CTL__ENET_QOS_RGMII_TX_CTL                             0x00b0 0x0260 0x0000 0x00 0x00
-> +#define MX91_PAD_ENET1_TX_CTL__LPUART3_DTR_B                                     0x00b0 0x0260 0x0000 0x01 0x00
-> +#define MX91_PAD_ENET1_TX_CTL__FLEXIO2_FLEXIO6                                   0x00b0 0x0260 0x0000 0x04 0x00
-> +#define MX91_PAD_ENET1_TX_CTL__GPIO4_IO6                                         0x00b0 0x0260 0x0000 0x05 0x00
-> +#define MX91_PAD_ENET1_TX_CTL__LPSPI2_SCK                                        0x00b0 0x0260 0x043c 0x02 0x00
-> +
-> +#define MX91_PAD_ENET1_TXC__CCM_ENET_QOS_CLOCK_GENERATE_TX_CLK                   0x00b4 0x0264 0x0000 0x00 0x00
-> +#define MX91_PAD_ENET1_TXC__ENET_QOS_TX_ER                                       0x00b4 0x0264 0x0000 0x01 0x00
-> +#define MX91_PAD_ENET1_TXC__FLEXIO2_FLEXIO7                                      0x00b4 0x0264 0x0000 0x04 0x00
-> +#define MX91_PAD_ENET1_TXC__GPIO4_IO7                                            0x00b4 0x0264 0x0000 0x05 0x00
-> +#define MX91_PAD_ENET1_TXC__LPSPI2_SIN                                           0x00b4 0x0264 0x0440 0x02 0x00
-> +
-> +#define MX91_PAD_ENET1_RX_CTL__ENET_QOS_RGMII_RX_CTL                             0x00b8 0x0268 0x0000 0x00 0x00
-> +#define MX91_PAD_ENET1_RX_CTL__LPUART3_DSR_B                                     0x00b8 0x0268 0x0000 0x01 0x00
-> +#define MX91_PAD_ENET1_RX_CTL__HSIOMIX_OTG_PWR2                                  0x00b8 0x0268 0x0000 0x03 0x00
-> +#define MX91_PAD_ENET1_RX_CTL__FLEXIO2_FLEXIO8                                   0x00b8 0x0268 0x0000 0x04 0x00
-> +#define MX91_PAD_ENET1_RX_CTL__GPIO4_IO8                                         0x00b8 0x0268 0x0000 0x05 0x00
-> +#define MX91_PAD_ENET1_RX_CTL__LPSPI2_PCS0                                       0x00b8 0x0268 0x0434 0x02 0x00
-> +
-> +#define MX91_PAD_ENET1_RXC__ENET_QOS_RGMII_RXC                                   0x00bc 0x026c 0x0000 0x00 0x00
-> +#define MX91_PAD_ENET1_RXC__ENET_QOS_RX_ER                                       0x00bc 0x026c 0x0000 0x01 0x00
-> +#define MX91_PAD_ENET1_RXC__FLEXIO2_FLEXIO9                                      0x00bc 0x026c 0x0000 0x04 0x00
-> +#define MX91_PAD_ENET1_RXC__GPIO4_IO9                                            0x00bc 0x026c 0x0000 0x05 0x00
-> +#define MX91_PAD_ENET1_RXC__LPSPI2_SOUT                                          0x00bc 0x026c 0x0444 0x02 0x00
-> +
-> +#define MX91_PAD_ENET1_RD0__ENET_QOS_RGMII_RD0                                   0x00c0 0x0270 0x0000 0x00 0x00
-> +#define MX91_PAD_ENET1_RD0__LPUART3_RX                                           0x00c0 0x0270 0x0470 0x01 0x01
-> +#define MX91_PAD_ENET1_RD0__FLEXIO2_FLEXIO10                                     0x00c0 0x0270 0x0000 0x04 0x00
-> +#define MX91_PAD_ENET1_RD0__GPIO4_IO10                                           0x00c0 0x0270 0x0000 0x05 0x00
-> +
-> +#define MX91_PAD_ENET1_RD1__ENET_QOS_RGMII_RD1                                   0x00c4 0x0274 0x0000 0x00 0x00
-> +#define MX91_PAD_ENET1_RD1__LPUART3_CTS_B                                        0x00c4 0x0274 0x046c 0x01 0x01
-> +#define MX91_PAD_ENET1_RD1__LPTMR2_ALT1                                          0x00c4 0x0274 0x0448 0x03 0x00
-> +#define MX91_PAD_ENET1_RD1__FLEXIO2_FLEXIO11                                     0x00c4 0x0274 0x0000 0x04 0x00
-> +#define MX91_PAD_ENET1_RD1__GPIO4_IO11                                           0x00c4 0x0274 0x0000 0x05 0x00
-> +
-> +#define MX91_PAD_ENET1_RD2__ENET_QOS_RGMII_RD2                                   0x00c8 0x0278 0x0000 0x00 0x00
-> +#define MX91_PAD_ENET1_RD2__LPTMR2_ALT2                                          0x00c8 0x0278 0x044c 0x03 0x00
-> +#define MX91_PAD_ENET1_RD2__FLEXIO2_FLEXIO12                                     0x00c8 0x0278 0x0000 0x04 0x00
-> +#define MX91_PAD_ENET1_RD2__GPIO4_IO12                                           0x00c8 0x0278 0x0000 0x05 0x00
-> +
-> +#define MX91_PAD_ENET1_RD3__ENET_QOS_RGMII_RD3                                   0x00cc 0x027c 0x0000 0x00 0x00
-> +#define MX91_PAD_ENET1_RD3__FLEXSPI1_TESTER_TRIGGER                              0x00cc 0x027c 0x0000 0x02 0x00
-> +#define MX91_PAD_ENET1_RD3__LPTMR2_ALT3                                          0x00cc 0x027c 0x0450 0x03 0x00
-> +#define MX91_PAD_ENET1_RD3__FLEXIO2_FLEXIO13                                     0x00cc 0x027c 0x0000 0x04 0x00
-> +#define MX91_PAD_ENET1_RD3__GPIO4_IO13                                           0x00cc 0x027c 0x0000 0x05 0x00
-> +
-> +#define MX91_PAD_ENET2_MDC__ENET2_MDC                                            0x00d0 0x0280 0x0000 0x00 0x00
-> +#define MX91_PAD_ENET2_MDC__LPUART4_DCB_B                                        0x00d0 0x0280 0x0000 0x01 0x00
-> +#define MX91_PAD_ENET2_MDC__SAI2_RX_SYNC                                         0x00d0 0x0280 0x0000 0x02 0x00
-> +#define MX91_PAD_ENET2_MDC__FLEXIO2_FLEXIO14                                     0x00d0 0x0280 0x0000 0x04 0x00
-> +#define MX91_PAD_ENET2_MDC__GPIO4_IO14                                           0x00d0 0x0280 0x0000 0x05 0x00
-> +#define MX91_PAD_ENET2_MDC__MEDIAMIX_CAM_CLK                                     0x00d0 0x0280 0x04bc 0x06 0x01
-> +
-> +#define MX91_PAD_ENET2_MDIO__ENET2_MDIO                                          0x00d4 0x0284 0x0000 0x00 0x00
-> +#define MX91_PAD_ENET2_MDIO__LPUART4_RIN_B                                       0x00d4 0x0284 0x0000 0x01 0x00
-> +#define MX91_PAD_ENET2_MDIO__SAI2_RX_BCLK                                        0x00d4 0x0284 0x0000 0x02 0x00
-> +#define MX91_PAD_ENET2_MDIO__FLEXIO2_FLEXIO15                                    0x00d4 0x0284 0x0000 0x04 0x00
-> +#define MX91_PAD_ENET2_MDIO__GPIO4_IO15                                          0x00d4 0x0284 0x0000 0x05 0x00
-> +#define MX91_PAD_ENET2_MDIO__MEDIAMIX_CAM_DATA0                                  0x00d4 0x0284 0x0490 0x06 0x01
-> +
-> +#define MX91_PAD_ENET2_TD3__SAI2_RX_DATA0                                        0x00d8 0x0288 0x0000 0x02 0x00
-> +#define MX91_PAD_ENET2_TD3__FLEXIO2_FLEXIO16                                     0x00d8 0x0288 0x0000 0x04 0x00
-> +#define MX91_PAD_ENET2_TD3__GPIO4_IO16                                           0x00d8 0x0288 0x0000 0x05 0x00
-> +#define MX91_PAD_ENET2_TD3__MEDIAMIX_CAM_VSYNC                                   0x00d8 0x0288 0x04c0 0x06 0x01
-> +#define MX91_PAD_ENET2_TD3__ENET2_RGMII_TD3                                      0x00d8 0x0288 0x0000 0x00 0x00
-> +
-> +#define MX91_PAD_ENET2_TD2__ENET2_RGMII_TD2                                      0x00dc 0x028c 0x0000 0x00 0x00
-> +#define MX91_PAD_ENET2_TD2__ENET2_TX_CLK2                                        0x00dc 0x028c 0x0000 0x01 0x00
-> +#define MX91_PAD_ENET2_TD2__FLEXIO2_FLEXIO17                                     0x00dc 0x028c 0x0000 0x04 0x00
-> +#define MX91_PAD_ENET2_TD2__GPIO4_IO17                                           0x00dc 0x028c 0x0000 0x05 0x00
-> +#define MX91_PAD_ENET2_TD2__MEDIAMIX_CAM_HSYNC                                   0x00dc 0x028c 0x04b8 0x06 0x01
-> +
-> +#define MX91_PAD_ENET2_TD1__ENET2_RGMII_TD1                                      0x00e0 0x0290 0x0000 0x00 0x00
-> +#define MX91_PAD_ENET2_TD1__LPUART4_RTS_B                                        0x00e0 0x0290 0x0000 0x01 0x00
-> +#define MX91_PAD_ENET2_TD1__FLEXIO2_FLEXIO18                                     0x00e0 0x0290 0x0000 0x04 0x00
-> +#define MX91_PAD_ENET2_TD1__GPIO4_IO18                                           0x00e0 0x0290 0x0000 0x05 0x00
-> +#define MX91_PAD_ENET2_TD1__MEDIAMIX_CAM_DATA1                                   0x00e0 0x0290 0x0494 0x06 0x01
-> +
-> +#define MX91_PAD_ENET2_TD0__ENET2_RGMII_TD0                                      0x00e4 0x0294 0x0000 0x00 0x00
-> +#define MX91_PAD_ENET2_TD0__LPUART4_TX                                           0x00e4 0x0294 0x0480 0x01 0x01
-> +#define MX91_PAD_ENET2_TD0__FLEXIO2_FLEXIO19                                     0x00e4 0x0294 0x0000 0x04 0x00
-> +#define MX91_PAD_ENET2_TD0__GPIO4_IO19                                           0x00e4 0x0294 0x0000 0x05 0x00
-> +#define MX91_PAD_ENET2_TD0__MEDIAMIX_CAM_DATA2                                   0x00e4 0x0294 0x0498 0x06 0x01
-> +
-> +#define MX91_PAD_ENET2_TX_CTL__ENET2_RGMII_TX_CTL                                0x00e8 0x0298 0x0000 0x00 0x00
-> +#define MX91_PAD_ENET2_TX_CTL__LPUART4_DTR_B                                     0x00e8 0x0298 0x0000 0x01 0x00
-> +#define MX91_PAD_ENET2_TX_CTL__SAI2_TX_SYNC                                      0x00e8 0x0298 0x0000 0x02 0x00
-> +#define MX91_PAD_ENET2_TX_CTL__FLEXIO2_FLEXIO20                                  0x00e8 0x0298 0x0000 0x04 0x00
-> +#define MX91_PAD_ENET2_TX_CTL__GPIO4_IO20                                        0x00e8 0x0298 0x0000 0x05 0x00
-> +#define MX91_PAD_ENET2_TX_CTL__MEDIAMIX_CAM_DATA3                                0x00e8 0x0298 0x049c 0x06 0x01
-> +
-> +#define MX91_PAD_ENET2_TXC__ENET2_RGMII_TXC                                      0x00ec 0x029c 0x0000 0x00 0x00
-> +#define MX91_PAD_ENET2_TXC__ENET2_TX_ER                                          0x00ec 0x029c 0x0000 0x01 0x00
-> +#define MX91_PAD_ENET2_TXC__SAI2_TX_BCLK                                         0x00ec 0x029c 0x0000 0x02 0x00
-> +#define MX91_PAD_ENET2_TXC__FLEXIO2_FLEXIO21                                     0x00ec 0x029c 0x0000 0x04 0x00
-> +#define MX91_PAD_ENET2_TXC__GPIO4_IO21                                           0x00ec 0x029c 0x0000 0x05 0x00
-> +#define MX91_PAD_ENET2_TXC__MEDIAMIX_CAM_DATA4                                   0x00ec 0x029c 0x04a0 0x06 0x01
-> +
-> +#define MX91_PAD_ENET2_RX_CTL__ENET2_RGMII_RX_CTL                                0x00f0 0x02a0 0x0000 0x00 0x00
-> +#define MX91_PAD_ENET2_RX_CTL__LPUART4_DSR_B                                     0x00f0 0x02a0 0x0000 0x01 0x00
-> +#define MX91_PAD_ENET2_RX_CTL__SAI2_TX_DATA0                                     0x00f0 0x02a0 0x0000 0x02 0x00
-> +#define MX91_PAD_ENET2_RX_CTL__FLEXIO2_FLEXIO22                                  0x00f0 0x02a0 0x0000 0x04 0x00
-> +#define MX91_PAD_ENET2_RX_CTL__GPIO4_IO22                                        0x00f0 0x02a0 0x0000 0x05 0x00
-> +#define MX91_PAD_ENET2_RX_CTL__MEDIAMIX_CAM_DATA5                                0x00f0 0x02a0 0x04a4 0x06 0x01
-> +
-> +#define MX91_PAD_ENET2_RXC__ENET2_RGMII_RXC                                      0x00f4 0x02a4 0x0000 0x00 0x00
-> +#define MX91_PAD_ENET2_RXC__ENET2_RX_ER                                          0x00f4 0x02a4 0x0000 0x01 0x00
-> +#define MX91_PAD_ENET2_RXC__FLEXIO2_FLEXIO23                                     0x00f4 0x02a4 0x0000 0x04 0x00
-> +#define MX91_PAD_ENET2_RXC__GPIO4_IO23                                           0x00f4 0x02a4 0x0000 0x05 0x00
-> +#define MX91_PAD_ENET2_RXC__MEDIAMIX_CAM_DATA6                                   0x00f4 0x02a4 0x04a8 0x06 0x01
-> +
-> +#define MX91_PAD_ENET2_RD0__ENET2_RGMII_RD0                                      0x00f8 0x02a8 0x0000 0x00 0x00
-> +#define MX91_PAD_ENET2_RD0__LPUART4_RX                                           0x00f8 0x02a8 0x047c 0x01 0x01
-> +#define MX91_PAD_ENET2_RD0__FLEXIO2_FLEXIO24                                     0x00f8 0x02a8 0x0000 0x04 0x00
-> +#define MX91_PAD_ENET2_RD0__GPIO4_IO24                                           0x00f8 0x02a8 0x0000 0x05 0x00
-> +#define MX91_PAD_ENET2_RD0__MEDIAMIX_CAM_DATA7                                   0x00f8 0x02a8 0x04ac 0x06 0x01
-> +
-> +#define MX91_PAD_ENET2_RD1__ENET2_RGMII_RD1                                      0x00fc 0x02ac 0x0000 0x00 0x00
-> +#define MX91_PAD_ENET2_RD1__SPDIF_IN                                             0x00fc 0x02ac 0x04e4 0x01 0x01
-> +#define MX91_PAD_ENET2_RD1__FLEXIO2_FLEXIO25                                     0x00fc 0x02ac 0x0000 0x04 0x00
-> +#define MX91_PAD_ENET2_RD1__GPIO4_IO25                                           0x00fc 0x02ac 0x0000 0x05 0x00
-> +#define MX91_PAD_ENET2_RD1__MEDIAMIX_CAM_DATA8                                   0x00fc 0x02ac 0x04b0 0x06 0x01
-> +
-> +#define MX91_PAD_ENET2_RD2__ENET2_RGMII_RD2                                      0x0100 0x02b0 0x0000 0x00 0x00
-> +#define MX91_PAD_ENET2_RD2__LPUART4_CTS_B                                        0x0100 0x02b0 0x0478 0x01 0x01
-> +#define MX91_PAD_ENET2_RD2__SAI2_MCLK                                            0x0100 0x02b0 0x0000 0x02 0x00
-> +#define MX91_PAD_ENET2_RD2__MQS2_RIGHT                                           0x0100 0x02b0 0x0000 0x03 0x00
-> +#define MX91_PAD_ENET2_RD2__FLEXIO2_FLEXIO26                                     0x0100 0x02b0 0x0000 0x04 0x00
-> +#define MX91_PAD_ENET2_RD2__GPIO4_IO26                                           0x0100 0x02b0 0x0000 0x05 0x00
-> +#define MX91_PAD_ENET2_RD2__MEDIAMIX_CAM_DATA9                                   0x0100 0x02b0 0x04b4 0x06 0x01
-> +
-> +#define MX91_PAD_ENET2_RD3__ENET2_RGMII_RD3                                      0x0104 0x02b4 0x0000 0x00 0x00
-> +#define MX91_PAD_ENET2_RD3__SPDIF_OUT                                            0x0104 0x02b4 0x0000 0x01 0x00
-> +#define MX91_PAD_ENET2_RD3__SPDIF_IN                                             0x0104 0x02b4 0x04e4 0x02 0x02
-> +#define MX91_PAD_ENET2_RD3__MQS2_LEFT                                            0x0104 0x02b4 0x0000 0x03 0x00
-> +#define MX91_PAD_ENET2_RD3__FLEXIO2_FLEXIO27                                     0x0104 0x02b4 0x0000 0x04 0x00
-> +#define MX91_PAD_ENET2_RD3__GPIO4_IO27                                           0x0104 0x02b4 0x0000 0x05 0x00
-> +
-> +#define MX91_PAD_SD1_CLK__FLEXIO1_FLEXIO8                                        0x0108 0x02b8 0x038c 0x04 0x01
-> +#define MX91_PAD_SD1_CLK__GPIO3_IO8                                              0x0108 0x02b8 0x0000 0x05 0x00
-> +#define MX91_PAD_SD1_CLK__USDHC1_CLK                                             0x0108 0x02b8 0x0000 0x00 0x00
-> +#define MX91_PAD_SD1_CLK__LPSPI2_SCK                                             0x0108 0x02b8 0x043c 0x03 0x01
-> +
-> +#define MX91_PAD_SD1_CMD__USDHC1_CMD                                             0x010c 0x02bc 0x0000 0x00 0x00
-> +#define MX91_PAD_SD1_CMD__FLEXIO1_FLEXIO9                                        0x010c 0x02bc 0x0390 0x04 0x01
-> +#define MX91_PAD_SD1_CMD__GPIO3_IO9                                              0x010c 0x02bc 0x0000 0x05 0x00
-> +#define MX91_PAD_SD1_CMD__LPSPI2_SIN                                             0x010c 0x02bc 0x0440 0x03 0x01
-> +
-> +#define MX91_PAD_SD1_DATA0__USDHC1_DATA0                                         0x0110 0x02c0 0x0000 0x00 0x00
-> +#define MX91_PAD_SD1_DATA0__FLEXIO1_FLEXIO10                                     0x0110 0x02c0 0x0394 0x04 0x01
-> +#define MX91_PAD_SD1_DATA0__GPIO3_IO10                                           0x0110 0x02c0 0x0000 0x05 0x00
-> +#define MX91_PAD_SD1_DATA0__LPSPI2_PCS0                                          0x0110 0x02c0 0x0434 0x03 0x01
-> +
-> +#define MX91_PAD_SD1_DATA1__USDHC1_DATA1                                         0x0114 0x02c4 0x0000 0x00 0x00
-> +#define MX91_PAD_SD1_DATA1__FLEXIO1_FLEXIO11                                     0x0114 0x02c4 0x0398 0x04 0x01
-> +#define MX91_PAD_SD1_DATA1__GPIO3_IO11                                           0x0114 0x02c4 0x0000 0x05 0x00
-> +#define MX91_PAD_SD1_DATA1__CCMSRCGPCMIX_INT_BOOT                                0x0114 0x02c4 0x0000 0x06 0x00
-> +#define MX91_PAD_SD1_DATA1__LPSPI2_SOUT                                          0x0114 0x02c4 0x0444 0x03 0x01
-> +
-> +#define MX91_PAD_SD1_DATA2__USDHC1_DATA2                                         0x0118 0x02c8 0x0000 0x00 0x00
-> +#define MX91_PAD_SD1_DATA2__FLEXIO1_FLEXIO12                                     0x0118 0x02c8 0x0000 0x04 0x00
-> +#define MX91_PAD_SD1_DATA2__GPIO3_IO12                                           0x0118 0x02c8 0x0000 0x05 0x00
-> +#define MX91_PAD_SD1_DATA2__CCMSRCGPCMIX_PMIC_READY                              0x0118 0x02c8 0x0000 0x06 0x00
-> +#define MX91_PAD_SD1_DATA2__LPSPI2_PCS1                                          0x0118 0x02c8 0x0438 0x03 0x00
-> +
-> +#define MX91_PAD_SD1_DATA3__USDHC1_DATA3                                         0x011c 0x02cc 0x0000 0x00 0x00
-> +#define MX91_PAD_SD1_DATA3__FLEXSPI1_A_SS1_B                                     0x011c 0x02cc 0x0000 0x01 0x00
-> +#define MX91_PAD_SD1_DATA3__FLEXIO1_FLEXIO13                                     0x011c 0x02cc 0x039c 0x04 0x01
-> +#define MX91_PAD_SD1_DATA3__GPIO3_IO13                                           0x011c 0x02cc 0x0000 0x05 0x00
-> +#define MX91_PAD_SD1_DATA3__LPSPI1_PCS1                                          0x011c 0x02cc 0x0424 0x03 0x00
-> +
-> +#define MX91_PAD_SD1_DATA4__USDHC1_DATA4                                         0x0120 0x02d0 0x0000 0x00 0x00
-> +#define MX91_PAD_SD1_DATA4__FLEXSPI1_A_DATA4                                     0x0120 0x02d0 0x0000 0x01 0x00
-> +#define MX91_PAD_SD1_DATA4__FLEXIO1_FLEXIO14                                     0x0120 0x02d0 0x03a0 0x04 0x01
-> +#define MX91_PAD_SD1_DATA4__GPIO3_IO14                                           0x0120 0x02d0 0x0000 0x05 0x00
-> +#define MX91_PAD_SD1_DATA4__LPSPI1_PCS0                                          0x0120 0x02d0 0x0420 0x03 0x00
-> +
-> +#define MX91_PAD_SD1_DATA5__USDHC1_DATA5                                         0x0124 0x02d4 0x0000 0x00 0x00
-> +#define MX91_PAD_SD1_DATA5__FLEXSPI1_A_DATA5                                     0x0124 0x02d4 0x0000 0x01 0x00
-> +#define MX91_PAD_SD1_DATA5__USDHC1_RESET_B                                       0x0124 0x02d4 0x0000 0x02 0x00
-> +#define MX91_PAD_SD1_DATA5__FLEXIO1_FLEXIO15                                     0x0124 0x02d4 0x03a4 0x04 0x01
-> +#define MX91_PAD_SD1_DATA5__GPIO3_IO15                                           0x0124 0x02d4 0x0000 0x05 0x00
-> +#define MX91_PAD_SD1_DATA5__LPSPI1_SIN                                           0x0124 0x02d4 0x042c 0x03 0x00
-> +
-> +#define MX91_PAD_SD1_DATA6__USDHC1_DATA6                                         0x0128 0x02d8 0x0000 0x00 0x00
-> +#define MX91_PAD_SD1_DATA6__FLEXSPI1_A_DATA6                                     0x0128 0x02d8 0x0000 0x01 0x00
-> +#define MX91_PAD_SD1_DATA6__USDHC1_CD_B                                          0x0128 0x02d8 0x0000 0x02 0x00
-> +#define MX91_PAD_SD1_DATA6__FLEXIO1_FLEXIO16                                     0x0128 0x02d8 0x03a8 0x04 0x01
-> +#define MX91_PAD_SD1_DATA6__GPIO3_IO16                                           0x0128 0x02d8 0x0000 0x05 0x00
-> +#define MX91_PAD_SD1_DATA6__LPSPI1_SCK                                           0x0128 0x02d8 0x0428 0x03 0x00
-> +
-> +#define MX91_PAD_SD1_DATA7__USDHC1_DATA7                                         0x012c 0x02dc 0x0000 0x00 0x00
-> +#define MX91_PAD_SD1_DATA7__FLEXSPI1_A_DATA7                                     0x012c 0x02dc 0x0000 0x01 0x00
-> +#define MX91_PAD_SD1_DATA7__USDHC1_WP                                            0x012c 0x02dc 0x0000 0x02 0x00
-> +#define MX91_PAD_SD1_DATA7__FLEXIO1_FLEXIO17                                     0x012c 0x02dc 0x03ac 0x04 0x01
-> +#define MX91_PAD_SD1_DATA7__GPIO3_IO17                                           0x012c 0x02dc 0x0000 0x05 0x00
-> +#define MX91_PAD_SD1_DATA7__LPSPI1_SOUT                                          0x012c 0x02dc 0x0430 0x03 0x00
-> +
-> +#define MX91_PAD_SD1_STROBE__USDHC1_STROBE                                       0x0130 0x02e0 0x0000 0x00 0x00
-> +#define MX91_PAD_SD1_STROBE__FLEXSPI1_A_DQS                                      0x0130 0x02e0 0x0000 0x01 0x00
-> +#define MX91_PAD_SD1_STROBE__FLEXIO1_FLEXIO18                                    0x0130 0x02e0 0x03b0 0x04 0x01
-> +#define MX91_PAD_SD1_STROBE__GPIO3_IO18                                          0x0130 0x02e0 0x0000 0x05 0x00
-> +
-> +#define MX91_PAD_SD2_VSELECT__USDHC2_VSELECT                                     0x0134 0x02e4 0x0000 0x00 0x00
-> +#define MX91_PAD_SD2_VSELECT__USDHC2_WP                                          0x0134 0x02e4 0x0000 0x01 0x00
-> +#define MX91_PAD_SD2_VSELECT__LPTMR2_ALT3                                        0x0134 0x02e4 0x0450 0x02 0x01
-> +#define MX91_PAD_SD2_VSELECT__FLEXIO1_FLEXIO19                                   0x0134 0x02e4 0x0000 0x04 0x00
-> +#define MX91_PAD_SD2_VSELECT__GPIO3_IO19                                         0x0134 0x02e4 0x0000 0x05 0x00
-> +#define MX91_PAD_SD2_VSELECT__CCMSRCGPCMIX_EXT_CLK1                              0x0134 0x02e4 0x0368 0x06 0x00
-> +
-> +#define MX91_PAD_SD3_CLK__USDHC3_CLK                                             0x0138 0x02e8 0x04e8 0x00 0x01
-> +#define MX91_PAD_SD3_CLK__FLEXSPI1_A_SCLK                                        0x0138 0x02e8 0x0000 0x01 0x00
-> +#define MX91_PAD_SD3_CLK__LPUART1_CTS_B                                          0x0138 0x02e8 0x0454 0x02 0x00
-> +#define MX91_PAD_SD3_CLK__FLEXIO1_FLEXIO20                                       0x0138 0x02e8 0x03b4 0x04 0x01
-> +#define MX91_PAD_SD3_CLK__GPIO3_IO20                                             0x0138 0x02e8 0x0000 0x05 0x00
-> +
-> +#define MX91_PAD_SD3_CMD__USDHC3_CMD                                             0x013c 0x02ec 0x04ec 0x00 0x01
-> +#define MX91_PAD_SD3_CMD__FLEXSPI1_A_SS0_B                                       0x013c 0x02ec 0x0000 0x01 0x00
-> +#define MX91_PAD_SD3_CMD__LPUART1_RTS_B                                          0x013c 0x02ec 0x0000 0x02 0x00
-> +#define MX91_PAD_SD3_CMD__FLEXIO1_FLEXIO21                                       0x013c 0x02ec 0x0000 0x04 0x00
-> +#define MX91_PAD_SD3_CMD__GPIO3_IO21                                             0x013c 0x02ec 0x0000 0x05 0x00
-> +
-> +#define MX91_PAD_SD3_DATA0__USDHC3_DATA0                                         0x0140 0x02f0 0x04f0 0x00 0x01
-> +#define MX91_PAD_SD3_DATA0__FLEXSPI1_A_DATA0                                     0x0140 0x02f0 0x0000 0x01 0x00
-> +#define MX91_PAD_SD3_DATA0__LPUART2_CTS_B                                        0x0140 0x02f0 0x0460 0x02 0x00
-> +#define MX91_PAD_SD3_DATA0__FLEXIO1_FLEXIO22                                     0x0140 0x02f0 0x03b8 0x04 0x01
-> +#define MX91_PAD_SD3_DATA0__GPIO3_IO22                                           0x0140 0x02f0 0x0000 0x05 0x00
-> +
-> +#define MX91_PAD_SD3_DATA1__USDHC3_DATA1                                         0x0144 0x02f4 0x04f4 0x00 0x01
-> +#define MX91_PAD_SD3_DATA1__FLEXSPI1_A_DATA1                                     0x0144 0x02f4 0x0000 0x01 0x00
-> +#define MX91_PAD_SD3_DATA1__LPUART2_RTS_B                                        0x0144 0x02f4 0x0000 0x02 0x00
-> +#define MX91_PAD_SD3_DATA1__FLEXIO1_FLEXIO23                                     0x0144 0x02f4 0x03bc 0x04 0x01
-> +#define MX91_PAD_SD3_DATA1__GPIO3_IO23                                           0x0144 0x02f4 0x0000 0x05 0x00
-> +
-> +#define MX91_PAD_SD3_DATA2__USDHC3_DATA2                                         0x0148 0x02f8 0x04f8 0x00 0x01
-> +#define MX91_PAD_SD3_DATA2__LPI2C4_SDA                                           0x0148 0x02f8 0x03fc 0x02 0x01
-> +#define MX91_PAD_SD3_DATA2__FLEXSPI1_A_DATA2                                     0x0148 0x02f8 0x0000 0x01 0x00
-> +#define MX91_PAD_SD3_DATA2__FLEXIO1_FLEXIO24                                     0x0148 0x02f8 0x03c0 0x04 0x01
-> +#define MX91_PAD_SD3_DATA2__GPIO3_IO24                                           0x0148 0x02f8 0x0000 0x05 0x00
-> +
-> +#define MX91_PAD_SD3_DATA3__USDHC3_DATA3                                         0x014c 0x02fc 0x04fc 0x00 0x01
-> +#define MX91_PAD_SD3_DATA3__FLEXSPI1_A_DATA3                                     0x014c 0x02fc 0x0000 0x01 0x00
-> +#define MX91_PAD_SD3_DATA3__LPI2C4_SCL                                           0x014c 0x02fc 0x03f8 0x02 0x01
-> +#define MX91_PAD_SD3_DATA3__FLEXIO1_FLEXIO25                                     0x014c 0x02fc 0x03c4 0x04 0x01
-> +#define MX91_PAD_SD3_DATA3__GPIO3_IO25                                           0x014c 0x02fc 0x0000 0x05 0x00
-> +
-> +#define MX91_PAD_SD2_CD_B__USDHC2_CD_B                                           0x0150 0x0300 0x0000 0x00 0x00
-> +#define MX91_PAD_SD2_CD_B__ENET_QOS_1588_EVENT0_IN                               0x0150 0x0300 0x0000 0x01 0x00
-> +#define MX91_PAD_SD2_CD_B__I3C2_SCL                                              0x0150 0x0300 0x03cc 0x02 0x01
-> +#define MX91_PAD_SD2_CD_B__FLEXIO1_FLEXIO0                                       0x0150 0x0300 0x036c 0x04 0x01
-> +#define MX91_PAD_SD2_CD_B__GPIO3_IO0                                             0x0150 0x0300 0x0000 0x05 0x00
-> +#define MX91_PAD_SD2_CD_B__LPI2C1_SCL                                            0x0150 0x0300 0x03e0 0x03 0x01
-> +
-> +#define MX91_PAD_SD2_CLK__USDHC2_CLK                                             0x0154 0x0304 0x0000 0x00 0x00
-> +#define MX91_PAD_SD2_CLK__ENET_QOS_1588_EVENT0_OUT                               0x0154 0x0304 0x0000 0x01 0x00
-> +#define MX91_PAD_SD2_CLK__I2C1_SDA                                               0x0154 0x0304 0x0000 0x03 0x00
-> +#define MX91_PAD_SD2_CLK__I3C2_SDA                                               0x0154 0x0304 0x03d0 0x02 0x01
-> +#define MX91_PAD_SD2_CLK__FLEXIO1_FLEXIO1                                        0x0154 0x0304 0x0370 0x04 0x01
-> +#define MX91_PAD_SD2_CLK__GPIO3_IO1                                              0x0154 0x0304 0x0000 0x05 0x00
-> +#define MX91_PAD_SD2_CLK__CCMSRCGPCMIX_OBSERVE0                                  0x0154 0x0304 0x0000 0x06 0x00
-> +#define MX91_PAD_SD2_CLK__LPI2C1_SDA                                             0x0154 0x0304 0x03e4 0x03 0x01
-> +
-> +#define MX91_PAD_SD2_CMD__USDHC2_CMD                                             0x0158 0x0308 0x0000 0x00 0x00
-> +#define MX91_PAD_SD2_CMD__ENET2_1588_EVENT0_IN                                   0x0158 0x0308 0x0000 0x01 0x00
-> +#define MX91_PAD_SD2_CMD__I3C2_PUR                                               0x0158 0x0308 0x0000 0x02 0x00
-> +#define MX91_PAD_SD2_CMD__I3C2_PUR_B                                             0x0158 0x0308 0x0000 0x03 0x00
-> +#define MX91_PAD_SD2_CMD__FLEXIO1_FLEXIO2                                        0x0158 0x0308 0x0374 0x04 0x01
-> +#define MX91_PAD_SD2_CMD__GPIO3_IO2                                              0x0158 0x0308 0x0000 0x05 0x00
-> +#define MX91_PAD_SD2_CMD__CCMSRCGPCMIX_OBSERVE1                                  0x0158 0x0308 0x0000 0x06 0x00
-> +
-> +#define MX91_PAD_SD2_DATA0__USDHC2_DATA0                                         0x015c 0x030c 0x0000 0x00 0x00
-> +#define MX91_PAD_SD2_DATA0__ENET2_1588_EVENT0_OUT                                0x015c 0x030c 0x0000 0x01 0x00
-> +#define MX91_PAD_SD2_DATA0__CAN2_TX                                              0x015c 0x030c 0x0000 0x02 0x00
-> +#define MX91_PAD_SD2_DATA0__FLEXIO1_FLEXIO3                                      0x015c 0x030c 0x0378 0x04 0x01
-> +#define MX91_PAD_SD2_DATA0__GPIO3_IO3                                            0x015c 0x030c 0x0000 0x05 0x00
-> +#define MX91_PAD_SD2_DATA0__LPUART1_TX                                           0x015c 0x030c 0x045c 0x03 0x00
-> +#define MX91_PAD_SD2_DATA0__CCMSRCGPCMIX_OBSERVE2                                0x015c 0x030c 0x0000 0x06 0x00
-> +
-> +#define MX91_PAD_SD2_DATA1__USDHC2_DATA1                                         0x0160 0x0310 0x0000 0x00 0x00
-> +#define MX91_PAD_SD2_DATA1__ENET2_1588_EVENT1_IN                                 0x0160 0x0310 0x0000 0x01 0x00
-> +#define MX91_PAD_SD2_DATA1__CAN2_RX                                              0x0160 0x0310 0x0364 0x02 0x03
-> +#define MX91_PAD_SD2_DATA1__FLEXIO1_FLEXIO4                                      0x0160 0x0310 0x037c 0x04 0x01
-> +#define MX91_PAD_SD2_DATA1__GPIO3_IO4                                            0x0160 0x0310 0x0000 0x05 0x00
-> +#define MX91_PAD_SD2_DATA1__LPUART1_RX                                           0x0160 0x0310 0x0458 0x03 0x00
-> +#define MX91_PAD_SD2_DATA1__CCMSRCGPCMIX_WAIT                                    0x0160 0x0310 0x0000 0x06 0x00
-> +
-> +#define MX91_PAD_SD2_DATA2__USDHC2_DATA2                                         0x0164 0x0314 0x0000 0x00 0x00
-> +#define MX91_PAD_SD2_DATA2__ENET2_1588_EVENT1_OUT                                0x0164 0x0314 0x0000 0x01 0x00
-> +#define MX91_PAD_SD2_DATA2__MQS2_RIGHT                                           0x0164 0x0314 0x0000 0x02 0x00
-> +#define MX91_PAD_SD2_DATA2__FLEXIO1_FLEXIO5                                      0x0164 0x0314 0x0380 0x04 0x01
-> +#define MX91_PAD_SD2_DATA2__GPIO3_IO5                                            0x0164 0x0314 0x0000 0x05 0x00
-> +#define MX91_PAD_SD2_DATA2__LPUART2_TX                                           0x0164 0x0314 0x0468 0x03 0x00
-> +#define MX91_PAD_SD2_DATA2__CCMSRCGPCMIX_STOP                                    0x0164 0x0314 0x0000 0x06 0x00
-> +
-> +#define MX91_PAD_SD2_DATA3__USDHC2_DATA3                                         0x0168 0x0318 0x0000 0x00 0x00
-> +#define MX91_PAD_SD2_DATA3__LPTMR2_ALT1                                          0x0168 0x0318 0x0448 0x01 0x01
-> +#define MX91_PAD_SD2_DATA3__MQS2_LEFT                                            0x0168 0x0318 0x0000 0x02 0x00
-> +#define MX91_PAD_SD2_DATA3__FLEXIO1_FLEXIO6                                      0x0168 0x0318 0x0384 0x04 0x01
-> +#define MX91_PAD_SD2_DATA3__GPIO3_IO6                                            0x0168 0x0318 0x0000 0x05 0x00
-> +#define MX91_PAD_SD2_DATA3__LPUART2_RX                                           0x0168 0x0318 0x0464 0x03 0x00
-> +#define MX91_PAD_SD2_DATA3__CCMSRCGPCMIX_EARLY_RESET                             0x0168 0x0318 0x0000 0x06 0x00
-> +
-> +#define MX91_PAD_SD2_RESET_B__USDHC2_RESET_B                                     0x016c 0x031c 0x0000 0x00 0x00
-> +#define MX91_PAD_SD2_RESET_B__LPTMR2_ALT2                                        0x016c 0x031c 0x044c 0x01 0x01
-> +#define MX91_PAD_SD2_RESET_B__FLEXIO1_FLEXIO7                                    0x016c 0x031c 0x0388 0x04 0x01
-> +#define MX91_PAD_SD2_RESET_B__GPIO3_IO7                                          0x016c 0x031c 0x0000 0x05 0x00
-> +#define MX91_PAD_SD2_RESET_B__CCMSRCGPCMIX_SYSTEM_RESET                          0x016c 0x031c 0x0000 0x06 0x00
-> +
-> +#define MX91_PAD_I2C1_SCL__LPI2C1_SCL                                            0x0170 0x0320 0x03e0 0x00 0x02
-> +#define MX91_PAD_I2C1_SCL__I3C1_SCL                                              0x0170 0x0320 0x0000 0x01 0x00
-> +#define MX91_PAD_I2C1_SCL__LPUART1_DCB_B                                         0x0170 0x0320 0x0000 0x02 0x00
-> +#define MX91_PAD_I2C1_SCL__TPM2_CH0                                              0x0170 0x0320 0x0000 0x03 0x00
-> +#define MX91_PAD_I2C1_SCL__GPIO1_IO0                                             0x0170 0x0320 0x0000 0x05 0x00
-> +
-> +#define MX91_PAD_I2C1_SDA__LPI2C1_SDA                                            0x0174 0x0324 0x03e4 0x00 0x02
-> +#define MX91_PAD_I2C1_SDA__I3C1_SDA                                              0x0174 0x0324 0x0000 0x01 0x00
-> +#define MX91_PAD_I2C1_SDA__LPUART1_RIN_B                                         0x0174 0x0324 0x0000 0x02 0x00
-> +#define MX91_PAD_I2C1_SDA__TPM2_CH1                                              0x0174 0x0324 0x0000 0x03 0x00
-> +#define MX91_PAD_I2C1_SDA__GPIO1_IO1                                             0x0174 0x0324 0x0000 0x05 0x00
-> +
-> +#define MX91_PAD_I2C2_SCL__LPI2C2_SCL                                            0x0178 0x0328 0x03e8 0x00 0x01
-> +#define MX91_PAD_I2C2_SCL__I3C1_PUR                                              0x0178 0x0328 0x0000 0x01 0x00
-> +#define MX91_PAD_I2C2_SCL__LPUART2_DCB_B                                         0x0178 0x0328 0x0000 0x02 0x00
-> +#define MX91_PAD_I2C2_SCL__TPM2_CH2                                              0x0178 0x0328 0x0000 0x03 0x00
-> +#define MX91_PAD_I2C2_SCL__SAI1_RX_SYNC                                          0x0178 0x0328 0x0000 0x04 0x00
-> +#define MX91_PAD_I2C2_SCL__GPIO1_IO2                                             0x0178 0x0328 0x0000 0x05 0x00
-> +#define MX91_PAD_I2C2_SCL__I3C1_PUR_B                                            0x0178 0x0328 0x0000 0x06 0x00
-> +
-> +#define MX91_PAD_I2C2_SDA__LPI2C2_SDA                                            0x017c 0x032c 0x03ec 0x00 0x01
-> +#define MX91_PAD_I2C2_SDA__LPUART2_RIN_B                                         0x017c 0x032c 0x0000 0x02 0x00
-> +#define MX91_PAD_I2C2_SDA__TPM2_CH3                                              0x017c 0x032c 0x0000 0x03 0x00
-> +#define MX91_PAD_I2C2_SDA__SAI1_RX_BCLK                                          0x017c 0x032c 0x0000 0x04 0x00
-> +#define MX91_PAD_I2C2_SDA__GPIO1_IO3                                             0x017c 0x032c 0x0000 0x05 0x00
-> +
-> +#define MX91_PAD_UART1_RXD__LPUART1_RX                                           0x0180 0x0330 0x0458 0x00 0x01
-> +#define MX91_PAD_UART1_RXD__ELE_UART_RX                                          0x0180 0x0330 0x0000 0x01 0x00
-> +#define MX91_PAD_UART1_RXD__LPSPI2_SIN                                           0x0180 0x0330 0x0440 0x02 0x02
-> +#define MX91_PAD_UART1_RXD__TPM1_CH0                                             0x0180 0x0330 0x0000 0x03 0x00
-> +#define MX91_PAD_UART1_RXD__GPIO1_IO4                                            0x0180 0x0330 0x0000 0x05 0x00
-> +
-> +#define MX91_PAD_UART1_TXD__LPUART1_TX                                           0x0184 0x0334 0x045c 0x00 0x01
-> +#define MX91_PAD_UART1_TXD__ELE_UART_TX                                          0x0184 0x0334 0x0000 0x01 0x00
-> +#define MX91_PAD_UART1_TXD__LPSPI2_PCS0                                          0x0184 0x0334 0x0434 0x02 0x02
-> +#define MX91_PAD_UART1_TXD__TPM1_CH1                                             0x0184 0x0334 0x0000 0x03 0x00
-> +#define MX91_PAD_UART1_TXD__GPIO1_IO5                                            0x0184 0x0334 0x0000 0x05 0x00
-> +
-> +#define MX91_PAD_UART2_RXD__LPUART2_RX                                           0x0188 0x0338 0x0464 0x00 0x01
-> +#define MX91_PAD_UART2_RXD__LPUART1_CTS_B                                        0x0188 0x0338 0x0454 0x01 0x01
-> +#define MX91_PAD_UART2_RXD__LPSPI2_SOUT                                          0x0188 0x0338 0x0444 0x02 0x02
-> +#define MX91_PAD_UART2_RXD__TPM1_CH2                                             0x0188 0x0338 0x0000 0x03 0x00
-> +#define MX91_PAD_UART2_RXD__SAI1_MCLK                                            0x0188 0x0338 0x04d4 0x04 0x00
-> +#define MX91_PAD_UART2_RXD__GPIO1_IO6                                            0x0188 0x0338 0x0000 0x05 0x00
-> +
-> +#define MX91_PAD_UART2_TXD__LPUART2_TX                                           0x018c 0x033c 0x0468 0x00 0x01
-> +#define MX91_PAD_UART2_TXD__LPUART1_RTS_B                                        0x018c 0x033c 0x0000 0x01 0x00
-> +#define MX91_PAD_UART2_TXD__LPSPI2_SCK                                           0x018c 0x033c 0x043c 0x02 0x02
-> +#define MX91_PAD_UART2_TXD__TPM1_CH3                                             0x018c 0x033c 0x0000 0x03 0x00
-> +#define MX91_PAD_UART2_TXD__GPIO1_IO7                                            0x018c 0x033c 0x0000 0x05 0x00
-> +#define MX91_PAD_UART2_TXD__SAI3_TX_SYNC                                         0x018c 0x033c 0x04e0 0x07 0x02
-> +
-> +#define MX91_PAD_PDM_CLK__PDM_CLK                                                0x0190 0x0340 0x0000 0x00 0x00
-> +#define MX91_PAD_PDM_CLK__MQS1_LEFT                                              0x0190 0x0340 0x0000 0x01 0x00
-> +#define MX91_PAD_PDM_CLK__LPTMR1_ALT1                                            0x0190 0x0340 0x0000 0x04 0x00
-> +#define MX91_PAD_PDM_CLK__GPIO1_IO8                                              0x0190 0x0340 0x0000 0x05 0x00
-> +#define MX91_PAD_PDM_CLK__CAN1_TX                                                0x0190 0x0340 0x0000 0x06 0x00
-> +
-> +#define MX91_PAD_PDM_BIT_STREAM0__PDM_BIT_STREAM0                                0x0194 0x0344 0x04c4 0x00 0x02
-> +#define MX91_PAD_PDM_BIT_STREAM0__MQS1_RIGHT                                     0x0194 0x0344 0x0000 0x01 0x00
-> +#define MX91_PAD_PDM_BIT_STREAM0__LPSPI1_PCS1                                    0x0194 0x0344 0x0424 0x02 0x01
-> +#define MX91_PAD_PDM_BIT_STREAM0__TPM1_EXTCLK                                    0x0194 0x0344 0x0000 0x03 0x00
-> +#define MX91_PAD_PDM_BIT_STREAM0__LPTMR1_ALT2                                    0x0194 0x0344 0x0000 0x04 0x00
-> +#define MX91_PAD_PDM_BIT_STREAM0__GPIO1_IO9                                      0x0194 0x0344 0x0000 0x05 0x00
-> +#define MX91_PAD_PDM_BIT_STREAM0__CAN1_RX                                        0x0194 0x0344 0x0360 0x06 0x01
-> +
-> +#define MX91_PAD_PDM_BIT_STREAM1__PDM_BIT_STREAM1                                0x0198 0x0348 0x04c8 0x00 0x02
-> +#define MX91_PAD_PDM_BIT_STREAM1__LPSPI2_PCS1                                    0x0198 0x0348 0x0438 0x02 0x01
-> +#define MX91_PAD_PDM_BIT_STREAM1__TPM2_EXTCLK                                    0x0198 0x0348 0x0000 0x03 0x00
-> +#define MX91_PAD_PDM_BIT_STREAM1__LPTMR1_ALT3                                    0x0198 0x0348 0x0000 0x04 0x00
-> +#define MX91_PAD_PDM_BIT_STREAM1__GPIO1_IO10                                     0x0198 0x0348 0x0000 0x05 0x00
-> +#define MX91_PAD_PDM_BIT_STREAM1__CCMSRCGPCMIX_EXT_CLK1                          0x0198 0x0348 0x0368 0x06 0x01
-> +
-> +#define MX91_PAD_SAI1_TXFS__SAI1_TX_SYNC                                         0x019c 0x034c 0x0000 0x00 0x00
-> +#define MX91_PAD_SAI1_TXFS__SAI1_TX_DATA1                                        0x019c 0x034c 0x0000 0x01 0x00
-> +#define MX91_PAD_SAI1_TXFS__LPSPI1_PCS0                                          0x019c 0x034c 0x0420 0x02 0x01
-> +#define MX91_PAD_SAI1_TXFS__LPUART2_DTR_B                                        0x019c 0x034c 0x0000 0x03 0x00
-> +#define MX91_PAD_SAI1_TXFS__MQS1_LEFT                                            0x019c 0x034c 0x0000 0x04 0x00
-> +#define MX91_PAD_SAI1_TXFS__GPIO1_IO11                                           0x019c 0x034c 0x0000 0x05 0x00
-> +
-> +#define MX91_PAD_SAI1_TXC__SAI1_TX_BCLK                                          0x01a0 0x0350 0x0000 0x00 0x00
-> +#define MX91_PAD_SAI1_TXC__LPUART2_CTS_B                                         0x01a0 0x0350 0x0460 0x01 0x01
-> +#define MX91_PAD_SAI1_TXC__LPSPI1_SIN                                            0x01a0 0x0350 0x042c 0x02 0x01
-> +#define MX91_PAD_SAI1_TXC__LPUART1_DSR_B                                         0x01a0 0x0350 0x0000 0x03 0x00
-> +#define MX91_PAD_SAI1_TXC__CAN1_RX                                               0x01a0 0x0350 0x0360 0x04 0x02
-> +#define MX91_PAD_SAI1_TXC__GPIO1_IO12                                            0x01a0 0x0350 0x0000 0x05 0x00
-> +
-> +#define MX91_PAD_SAI1_TXD0__SAI1_TX_DATA0                                        0x01a4 0x0354 0x0000 0x00 0x00
-> +#define MX91_PAD_SAI1_TXD0__LPUART2_RTS_B                                        0x01a4 0x0354 0x0000 0x01 0x00
-> +#define MX91_PAD_SAI1_TXD0__LPSPI1_SCK                                           0x01a4 0x0354 0x0428 0x02 0x01
-> +#define MX91_PAD_SAI1_TXD0__LPUART1_DTR_B                                        0x01a4 0x0354 0x0000 0x03 0x00
-> +#define MX91_PAD_SAI1_TXD0__CAN1_TX                                              0x01a4 0x0354 0x0000 0x04 0x00
-> +#define MX91_PAD_SAI1_TXD0__GPIO1_IO13                                           0x01a4 0x0354 0x0000 0x05 0x00
-> +#define MX91_PAD_SAI1_TXD0__SAI1_MCLK                                            0x01a4 0x0354 0x04d4 0x06 0x01
-> +
-> +#define MX91_PAD_SAI1_RXD0__SAI1_RX_DATA0                                        0x01a8 0x0358 0x0000 0x00 0x00
-> +#define MX91_PAD_SAI1_RXD0__SAI1_MCLK                                            0x01a8 0x0358 0x04d4 0x01 0x02
-> +#define MX91_PAD_SAI1_RXD0__LPSPI1_SOUT                                          0x01a8 0x0358 0x0430 0x02 0x01
-> +#define MX91_PAD_SAI1_RXD0__LPUART2_DSR_B                                        0x01a8 0x0358 0x0000 0x03 0x00
-> +#define MX91_PAD_SAI1_RXD0__MQS1_RIGHT                                           0x01a8 0x0358 0x0000 0x04 0x00
-> +#define MX91_PAD_SAI1_RXD0__GPIO1_IO14                                           0x01a8 0x0358 0x0000 0x05 0x00
-> +
-> +#define MX91_PAD_WDOG_ANY__WDOG1_WDOG_ANY                                        0x01ac 0x035c 0x0000 0x00 0x00
-> +#define MX91_PAD_WDOG_ANY__GPIO1_IO15                                            0x01ac 0x035c 0x0000 0x05 0x00
-> +#endif /* __DTS_IMX91_PINFUNC_H */
-> diff --git a/arch/arm64/boot/dts/freescale/imx91.dtsi b/arch/arm64/boot/dts/freescale/imx91.dtsi
+> +
+> +#include <argp.h>
+> +#include <linux/time64.h>
+> +#include <linux/if_ether.h>
+> +#include "lpm_trie_bench.skel.h"
+> +#include "lpm_trie_map.skel.h"
+> +#include "bench.h"
+> +#include "testing_helpers.h"
+> +
+> +static struct ctx {
+> +       struct lpm_trie_bench *bench;
+> +} ctx;
+> +
+> +static struct {
+> +       __u32 nr_entries;
+> +       __u32 prefixlen;
+> +} args =3D {
+> +       .nr_entries =3D 10000,
+> +       .prefixlen =3D 32,
+> +};
+> +
+> +enum {
+> +       ARG_NR_ENTRIES =3D 9000,
+> +       ARG_PREFIX_LEN,
+> +};
+> +
+> +static const struct argp_option opts[] =3D {
+> +       { "nr_entries", ARG_NR_ENTRIES, "NR_ENTRIES", 0,
+> +         "Number of unique entries in the LPM trie" },
+> +       { "prefix_len", ARG_PREFIX_LEN, "PREFIX_LEN", 0,
+> +         "Number of prefix bits to use in the LPM trie" },
+> +       {},
+> +};
+> +
+> +static error_t lpm_parse_arg(int key, char *arg, struct argp_state *stat=
+e)
+> +{
+> +       long ret;
+> +
+> +       switch (key) {
+> +       case ARG_NR_ENTRIES:
+> +               ret =3D strtol(arg, NULL, 10);
+> +               if (ret < 1 || ret > UINT_MAX) {
+> +                       fprintf(stderr, "Invalid nr_entries count.");
+> +                       argp_usage(state);
+> +               }
+> +               args.nr_entries =3D ret;
+> +               break;
+> +       case ARG_PREFIX_LEN:
+> +               ret =3D strtol(arg, NULL, 10);
+> +               if (ret < 1 || ret > UINT_MAX) {
+> +                       fprintf(stderr, "Invalid prefix_len value.");
+> +                       argp_usage(state);
+> +               }
+> +               args.prefixlen =3D ret;
+> +               break;
+> +       default:
+> +               return ARGP_ERR_UNKNOWN;
+> +       }
+> +       return 0;
+> +}
+> +
+> +const struct argp bench_lpm_trie_map_argp =3D {
+> +       .options =3D opts,
+> +       .parser =3D lpm_parse_arg,
+> +};
+> +
+> +static void __lpm_validate(void)
+
+why double underscore ?
+Just lpm_validate() ?
+
+> +{
+> +       if (env.consumer_cnt !=3D 0) {
+> +               fprintf(stderr, "benchmark doesn't support consumer!\n");
+> +               exit(1);
+> +       }
+> +
+> +       if ((1UL << args.prefixlen) < args.nr_entries) {
+> +               fprintf(stderr, "prefix_len value too small for nr_entrie=
+s!\n");
+> +               exit(1);
+> +       };
+> +}
+> +
+> +enum { OP_LOOKUP =3D 1, OP_UPDATE, OP_DELETE, OP_FREE };
+> +
+> +static void lpm_delete_validate(void)
+> +{
+> +       __lpm_validate();
+> +
+> +       if (env.producer_cnt !=3D 1) {
+> +               fprintf(stderr,
+> +                       "lpm-trie-delete requires a single producer!\n");
+> +               exit(1);
+> +       }
+> +}
+> +
+> +static void lpm_free_validate(void)
+> +{
+> +       __lpm_validate();
+> +
+> +       if (env.producer_cnt !=3D 1) {
+> +               fprintf(stderr, "lpm-trie-free requires a single producer=
+!\n");
+> +               exit(1);
+> +       }
+> +}
+> +
+> +static void fill_map(int map_fd)
+> +{
+> +       int i, err;
+> +
+> +       for (i =3D 0; i < args.nr_entries; i++) {
+> +               struct trie_key {
+> +                       __u32 prefixlen;
+> +                       __u32 data;
+> +               } key =3D { args.prefixlen, i };
+> +               __u32 val =3D 1;
+> +
+> +               err =3D bpf_map_update_elem(map_fd, &key, &val, BPF_NOEXI=
+ST);
+> +               if (err) {
+> +                       fprintf(stderr, "failed to add key %d to map: %d\=
+n",
+> +                               key.data, -err);
+> +                       exit(1);
+> +               }
+> +       }
+> +}
+> +
+> +static void __lpm_setup(void)
+> +{
+> +       ctx.bench =3D lpm_trie_bench__open_and_load();
+> +       if (!ctx.bench) {
+> +               fprintf(stderr, "failed to open skeleton\n");
+> +               exit(1);
+> +       }
+> +
+> +       ctx.bench->bss->nr_entries =3D args.nr_entries;
+> +       ctx.bench->bss->prefixlen =3D args.prefixlen;
+> +
+> +       if (lpm_trie_bench__attach(ctx.bench)) {
+> +               fprintf(stderr, "failed to attach skeleton\n");
+> +               exit(1);
+> +       }
+> +}
+> +
+> +static void lpm_setup(void)
+> +{
+> +       int fd;
+> +
+> +       __lpm_setup();
+> +
+> +       fd =3D bpf_map__fd(ctx.bench->maps.trie_map);
+> +       fill_map(fd);
+> +}
+
+lpm_setup() vs __lpm_setup() are too cryptic.
+The name of the function should explain at a high level
+what it does.
+
+> +
+> +static void lpm_lookup_setup(void)
+> +{
+> +       lpm_setup();
+> +
+> +       ctx.bench->bss->op =3D OP_LOOKUP;
+> +}
+> +
+> +static void lpm_update_setup(void)
+> +{
+> +       lpm_setup();
+> +
+> +       ctx.bench->bss->op =3D OP_UPDATE;
+> +}
+> +
+> +static void lpm_delete_setup(void)
+> +{
+> +       lpm_setup();
+> +
+> +       ctx.bench->bss->op =3D OP_DELETE;
+> +}
+> +
+> +static void lpm_free_setup(void)
+> +{
+> +       __lpm_setup();
+
+... then the reader won't need to scratch the head
+why this one is __ and other don't.
+
+> +       ctx.bench->bss->op =3D OP_FREE;
+> +}
+> +
+> +static void lpm_measure(struct bench_res *res)
+> +{
+> +       res->hits =3D atomic_swap(&ctx.bench->bss->hits, 0);
+> +       res->duration_ns =3D atomic_swap(&ctx.bench->bss->duration_ns, 0)=
+;
+> +}
+> +
+> +/* For LOOKUP, UPDATE, and DELETE */
+> +static void *lpm_producer(void *unused __always_unused)
+> +{
+> +       int err;
+> +       char in[ETH_HLEN]; /* unused */
+> +
+> +       LIBBPF_OPTS(bpf_test_run_opts, opts, .data_in =3D in,
+> +                   .data_size_in =3D sizeof(in), .repeat =3D 1, );
+> +
+> +       while (true) {
+> +               int fd =3D bpf_program__fd(ctx.bench->progs.run_bench);
+> +               err =3D bpf_prog_test_run_opts(fd, &opts);
+> +               if (err) {
+> +                       fprintf(stderr, "failed to run BPF prog: %d\n", e=
+rr);
+> +                       exit(1);
+> +               }
+> +
+> +               if (opts.retval < 0) {
+> +                       fprintf(stderr, "BPF prog returned error: %d\n",
+> +                               opts.retval);
+> +                       exit(1);
+> +               }
+> +
+> +               if (ctx.bench->bss->op =3D=3D OP_DELETE && opts.retval =
+=3D=3D 1) {
+> +                       /* trie_map needs to be refilled */
+> +                       fill_map(bpf_map__fd(ctx.bench->maps.trie_map));
+> +               }
+> +       }
+> +
+> +       return NULL;
+> +}
+> +
+> +static void *lpm_free_producer(void *unused __always_unused)
+> +{
+> +       while (true) {
+> +               struct lpm_trie_map *skel;
+> +
+> +               skel =3D lpm_trie_map__open_and_load();
+> +               if (!skel) {
+> +                       fprintf(stderr, "failed to open skeleton\n");
+> +                       exit(1);
+> +               }
+> +
+> +               fill_map(bpf_map__fd(skel->maps.trie_free_map));
+> +               lpm_trie_map__destroy(skel);
+> +       }
+> +
+> +       return NULL;
+> +}
+> +
+> +static void free_ops_report_progress(int iter, struct bench_res *res,
+> +                                    long delta_ns)
+> +{
+> +       double hits_per_sec, hits_per_prod;
+> +       double rate_divisor =3D 1000.0;
+> +       char rate =3D 'K';
+> +
+> +       hits_per_sec =3D res->hits / (res->duration_ns / (double)NSEC_PER=
+_SEC) /
+> +                      rate_divisor;
+> +       hits_per_prod =3D hits_per_sec / env.producer_cnt;
+> +
+> +       printf("Iter %3d (%7.3lfus): ", iter,
+> +              (delta_ns - NSEC_PER_SEC) / 1000.0);
+> +       printf("hits %8.3lf%c/s (%7.3lf%c/prod)\n", hits_per_sec, rate,
+> +              hits_per_prod, rate);
+> +}
+> +
+> +static void free_ops_report_final(struct bench_res res[], int res_cnt)
+> +{
+> +       double hits_mean =3D 0.0, hits_stddev =3D 0.0;
+> +       double lat_divisor =3D 1000000.0;
+> +       double rate_divisor =3D 1000.0;
+> +       const char *unit =3D "ms";
+> +       double latency =3D 0.0;
+> +       char rate =3D 'K';
+> +       int i;
+> +
+> +       for (i =3D 0; i < res_cnt; i++) {
+> +               double val =3D res[i].hits / rate_divisor /
+> +                            (res[i].duration_ns / (double)NSEC_PER_SEC);
+> +               hits_mean +=3D val / (0.0 + res_cnt);
+> +               latency +=3D res[i].duration_ns / res[i].hits / (0.0 + re=
+s_cnt);
+> +       }
+> +
+> +       if (res_cnt > 1) {
+> +               for (i =3D 0; i < res_cnt; i++) {
+> +                       double val =3D
+> +                               res[i].hits / rate_divisor /
+> +                               (res[i].duration_ns / (double)NSEC_PER_SE=
+C);
+> +                       hits_stddev +=3D (hits_mean - val) * (hits_mean -=
+ val) /
+> +                                      (res_cnt - 1.0);
+> +               }
+> +
+> +               hits_stddev =3D sqrt(hits_stddev);
+> +       }
+> +       printf("Summary: throughput %8.3lf \u00B1 %5.3lf %c ops/s (%7.3lf=
+%c ops/prod), ",
+> +              hits_mean, hits_stddev, rate, hits_mean / env.producer_cnt=
+,
+> +              rate);
+> +       printf("latency %8.3lf %s/op\n",
+> +              latency / lat_divisor / env.producer_cnt, unit);
+> +}
+> +
+> +const struct bench bench_lpm_trie_lookup =3D {
+> +       .name =3D "lpm-trie-lookup",
+> +       .argp =3D &bench_lpm_trie_map_argp,
+> +       .validate =3D __lpm_validate,
+> +       .setup =3D lpm_lookup_setup,
+> +       .producer_thread =3D lpm_producer,
+> +       .measure =3D lpm_measure,
+> +       .report_progress =3D ops_report_progress,
+> +       .report_final =3D ops_report_final,
+> +};
+> +
+> +const struct bench bench_lpm_trie_update =3D {
+> +       .name =3D "lpm-trie-update",
+> +       .argp =3D &bench_lpm_trie_map_argp,
+> +       .validate =3D __lpm_validate,
+> +       .setup =3D lpm_update_setup,
+> +       .producer_thread =3D lpm_producer,
+> +       .measure =3D lpm_measure,
+> +       .report_progress =3D ops_report_progress,
+> +       .report_final =3D ops_report_final,
+> +};
+> +
+> +const struct bench bench_lpm_trie_delete =3D {
+> +       .name =3D "lpm-trie-delete",
+> +       .argp =3D &bench_lpm_trie_map_argp,
+> +       .validate =3D lpm_delete_validate,
+> +       .setup =3D lpm_delete_setup,
+> +       .producer_thread =3D lpm_producer,
+> +       .measure =3D lpm_measure,
+> +       .report_progress =3D ops_report_progress,
+> +       .report_final =3D ops_report_final,
+> +};
+> +
+> +const struct bench bench_lpm_trie_free =3D {
+> +       .name =3D "lpm-trie-free",
+> +       .argp =3D &bench_lpm_trie_map_argp,
+> +       .validate =3D lpm_free_validate,
+> +       .setup =3D lpm_free_setup,
+> +       .producer_thread =3D lpm_free_producer,
+> +       .measure =3D lpm_measure,
+> +       .report_progress =3D free_ops_report_progress,
+> +       .report_final =3D free_ops_report_final,
+> +};
+> diff --git a/tools/testing/selftests/bpf/progs/lpm_trie_bench.c b/tools/t=
+esting/selftests/bpf/progs/lpm_trie_bench.c
 > new file mode 100644
-> index 000000000000..4d8300b2a7bc
+> index 000000000000..522e1cbef490
 > --- /dev/null
-> +++ b/arch/arm64/boot/dts/freescale/imx91.dtsi
-> @@ -0,0 +1,71 @@
-> +// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
-> +/*
-> + * Copyright 2025 NXP
-> + */
+> +++ b/tools/testing/selftests/bpf/progs/lpm_trie_bench.c
+> @@ -0,0 +1,171 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/* Copyright (c) 2025 Cloudflare */
 > +
-> +#include "imx91-pinfunc.h"
-> +#include "imx91_93_common.dtsi"
+> +#include <vmlinux.h>
+> +#include <bpf/bpf_tracing.h>
+> +#include <bpf/bpf_helpers.h>
+> +#include <bpf/bpf_core_read.h>
+> +#include "bpf_misc.h"
 > +
-> +&clk {
-> +	compatible = "fsl,imx91-ccm";
+> +#define BPF_OBJ_NAME_LEN 16U
+> +#define MAX_ENTRIES 100000000
+> +#define NR_LOOPS 10000
+> +
+> +struct trie_key {
+> +       __u32 prefixlen;
+> +       __u32 data;
 > +};
 > +
-> +&ddr_pmu {
-> +	compatible = "fsl,imx91-ddr-pmu", "fsl,imx93-ddr-pmu";
-> +};
+> +char _license[] SEC("license") =3D "GPL";
 > +
-> +&eqos {
-> +	clocks = <&clk IMX91_CLK_ENET1_QOS_TSN_GATE>,
-> +		 <&clk IMX91_CLK_ENET1_QOS_TSN_GATE>,
-> +		 <&clk IMX91_CLK_ENET_TIMER>,
-> +		 <&clk IMX91_CLK_ENET1_QOS_TSN>,
-> +		 <&clk IMX91_CLK_ENET1_QOS_TSN_GATE>;
-> +	assigned-clocks = <&clk IMX91_CLK_ENET_TIMER>,
-> +			  <&clk IMX91_CLK_ENET1_QOS_TSN>;
-> +	assigned-clock-parents = <&clk IMX93_CLK_SYS_PLL_PFD1_DIV2>,
-> +				 <&clk IMX93_CLK_SYS_PLL_PFD0_DIV2>;
-> +	assigned-clock-rates = <100000000>, <250000000>;
-> +};
+> +struct {
+> +       __uint(type, BPF_MAP_TYPE_HASH);
+> +       __uint(max_entries, 512);
+> +       __type(key, struct bpf_map *);
+> +       __type(value, __u64);
+> +} latency_free_start SEC(".maps");
 > +
-> +&fec {
-> +	clocks = <&clk IMX91_CLK_ENET2_REGULAR_GATE>,
-> +		 <&clk IMX91_CLK_ENET2_REGULAR_GATE>,
-> +		 <&clk IMX91_CLK_ENET_TIMER>,
-> +		 <&clk IMX91_CLK_ENET2_REGULAR>,
-> +		 <&clk IMX93_CLK_DUMMY>;
-> +	assigned-clocks = <&clk IMX91_CLK_ENET_TIMER>,
-> +			  <&clk IMX91_CLK_ENET2_REGULAR>;
-> +	assigned-clock-parents = <&clk IMX93_CLK_SYS_PLL_PFD1_DIV2>,
-> +				 <&clk IMX93_CLK_SYS_PLL_PFD0_DIV2>;
-> +	assigned-clock-rates = <100000000>, <250000000>;
-> +};
+> +/* Filled by userspace. See fill_map() in bench_lpm_trie_map.c */
+> +struct {
+> +       __uint(type, BPF_MAP_TYPE_LPM_TRIE);
+> +       __type(key, struct trie_key);
+> +       __type(value, __u32);
+> +       __uint(map_flags, BPF_F_NO_PREALLOC);
+> +       __uint(max_entries, MAX_ENTRIES);
+> +} trie_map SEC(".maps");
 > +
-> +&i3c1 {
-> +	clocks = <&clk IMX93_CLK_BUS_AON>,
-> +		 <&clk IMX93_CLK_I3C1_GATE>,
-> +		 <&clk IMX93_CLK_DUMMY>;
-> +};
+> +long hits;
+> +long duration_ns;
 > +
-> +&i3c2 {
-> +	clocks = <&clk IMX93_CLK_BUS_WAKEUP>,
-> +		 <&clk IMX93_CLK_I3C2_GATE>,
-> +		 <&clk IMX93_CLK_DUMMY>;
-> +};
+> +/* Configured from userspace */
+> +__u32 nr_entries;
+> +__u32 prefixlen;
+> +__u8 op;
 > +
-> +&iomuxc {
-> +	compatible = "fsl,imx91-iomuxc";
-> +};
+> +SEC("fentry/bpf_map_free_deferred")
+> +int BPF_PROG(trie_free_entry, struct work_struct *work)
+> +{
+> +       struct bpf_map *map =3D container_of(work, struct bpf_map, work);
+> +       char name[BPF_OBJ_NAME_LEN];
+> +       u32 map_type;
+> +       __u64 val;
 > +
-> +&media_blk_ctrl {
-> +	compatible = "fsl,imx91-media-blk-ctrl", "syscon";
-> +	clocks = <&clk IMX93_CLK_MEDIA_APB>,
-> +		 <&clk IMX93_CLK_MEDIA_AXI>,
-> +		 <&clk IMX93_CLK_NIC_MEDIA_GATE>,
-> +		 <&clk IMX93_CLK_MEDIA_DISP_PIX>,
-> +		 <&clk IMX93_CLK_CAM_PIX>,
-> +		 <&clk IMX93_CLK_LCDIF_GATE>,
-> +		 <&clk IMX93_CLK_ISI_GATE>,
-> +		 <&clk IMX93_CLK_MIPI_CSI_GATE>;
-> +	clock-names = "apb", "axi", "nic", "disp", "cam",
-> +		      "lcdif", "isi", "csi";
-> +};
-> diff --git a/arch/arm64/boot/dts/freescale/imx91_93_common.dtsi b/arch/arm64/boot/dts/freescale/imx91_93_common.dtsi
-> index 8f3c8c15642a..7c8c68151b14 100644
-> --- a/arch/arm64/boot/dts/freescale/imx91_93_common.dtsi
-> +++ b/arch/arm64/boot/dts/freescale/imx91_93_common.dtsi
-> @@ -1172,7 +1172,7 @@ memory-controller@4e300000 {
->  			little-endian;
->  		};
->
-> -		ddr-pmu@4e300dc0 {
-> +		ddr_pmu: ddr-pmu@4e300dc0 {
->  			compatible = "fsl,imx93-ddr-pmu";
->  			reg = <0x4e300dc0 0x200>;
->  			interrupts = <GIC_SPI 90 IRQ_TYPE_LEVEL_HIGH>;
-> --
-> 2.37.1
->
+> +       map_type =3D BPF_CORE_READ(map, map_type);
+> +       if (map_type !=3D BPF_MAP_TYPE_LPM_TRIE)
+> +               return 0;
+> +
+> +       /*
+> +        * Ideally we'd have access to the map ID but that's already
+> +        * freed before we enter trie_free().
+> +        */
+> +       BPF_CORE_READ_STR_INTO(&name, map, name);
+> +       if (bpf_strncmp(name, BPF_OBJ_NAME_LEN, "trie_free_map"))
+> +               return 0;
+> +
+> +       val =3D bpf_ktime_get_ns();
+> +       bpf_map_update_elem(&latency_free_start, &map, &val, BPF_ANY);
+
+Looks like there is only one lpm map.
+What's the point of that extra map ?
+Just have a global var for start time ?
+
+> +       return 0;
+> +}
+> +
+> +SEC("fexit/bpf_map_free_deferred")
+> +int BPF_PROG(trie_free_exit, struct work_struct *work)
+> +{
+> +       struct bpf_map *map =3D container_of(work, struct bpf_map, work);
+> +       __u64 *val;
+> +
+> +       val =3D bpf_map_lookup_elem(&latency_free_start, &map);
+> +       if (val) {
+> +               __sync_add_and_fetch(&duration_ns, bpf_ktime_get_ns() - *=
+val);
+> +               __sync_add_and_fetch(&hits, 1);
+> +               bpf_map_delete_elem(&latency_free_start, &map);
+> +       }
+> +
+> +       return 0;
+> +}
+> +
+> +static void gen_random_key(struct trie_key *key)
+> +{
+> +       key->prefixlen =3D prefixlen;
+> +       key->data =3D bpf_get_prandom_u32() % nr_entries;
+
+bpf_get_prandom_u32() is not free
+and modulo operation isn't free either.
+The benchmark includes their time.
+It's ok to have it, but add a mode where the bench
+tests linear lookup/update too with simple key.data++
+
+> +}
+> +
+> +static int lookup(__u32 index, __u32 *unused)
+> +{
+> +       struct trie_key key;
+> +
+> +       gen_random_key(&key);
+> +       bpf_map_lookup_elem(&trie_map, &key);
+> +       return 0;
+> +}
+> +
+> +static int update(__u32 index, __u32 *unused)
+> +{
+> +       struct trie_key key;
+> +       u32 val =3D bpf_get_prandom_u32();
+> +
+> +       gen_random_key(&key);
+> +       bpf_map_update_elem(&trie_map, &key, &val, BPF_EXIST);
+
+Since the map suppose to full before we start all keys
+should be there, right?
+Let's add a sanity check that update() succeeds.
+
+> +       return 0;
+> +}
+> +
+> +static __u32 deleted_entries;
+> +
+> +static int delete (__u32 index, bool *need_refill)
+> +{
+> +       struct trie_key key =3D {
+> +               .data =3D deleted_entries,
+> +               .prefixlen =3D prefixlen,
+> +       };
+> +
+> +       bpf_map_delete_elem(&trie_map, &key);
+> +
+> +       /* Do we need to refill the map? */
+> +       if (++deleted_entries =3D=3D nr_entries) {
+> +               /*
+> +                * Atomicity isn't required because DELETE only supports
+> +                * one producer running concurrently. What we need is a
+> +                * way to track how many entries have been deleted from
+> +                * the trie between consecutive invocations of the BPF
+> +                * prog because a single bpf_loop() call might not
+> +                * delete all entries, e.g. when NR_LOOPS < nr_entries.
+> +                */
+> +               deleted_entries =3D 0;
+> +               *need_refill =3D true;
+> +               return 1;
+
+This early break is another reason that makes
+'delete' op different from 'lookup/update'.
+Pls make all 3 consistent, so they can be compared to each other.
+
+--
+pw-bot: cr
 
