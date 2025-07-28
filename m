@@ -1,80 +1,75 @@
-Return-Path: <netdev+bounces-210664-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210665-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56AF8B143A3
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 22:56:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBA2AB143CE
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 23:25:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 732DF18C2638
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 20:56:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 971E27AB874
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 21:23:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FCDB22F74D;
-	Mon, 28 Jul 2025 20:56:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22F7C266F15;
+	Mon, 28 Jul 2025 21:25:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dK4IYFWf"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="AiJGs3Fv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88C1D22F774;
-	Mon, 28 Jul 2025 20:56:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 786F521C18D;
+	Mon, 28 Jul 2025 21:25:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753736192; cv=none; b=mxPKSz4iZpfdFbq8vYrJZiL2/+2dYbFHoTKwvRo1z/WziGrfCFfKBeciAyK2E2cdY1gwAuzHdXmHGSYHBuSUUHUXSihH4izA+jvzlTKu0/hDdta/qz/bKy+dQyKqxT5Zhoq/26Ll/ICeJIl/5jUxzbxr1WrZy4ZcQRQD90pSFlE=
+	t=1753737915; cv=none; b=ZBPw0Pkovl7BSfY/P4zsRyHfCiIKov6HyXwCEjwfg2b6t0+UbtK6k/gRcm2JRiEKfoY/SKAggOjygwc3kH5qL8a8+S5WJCcTJniGpGNjV1uwsi9ypUe+AMuiIscl+2GkzmpBVRDaAgYcBmt7Om0lkpAhxriIl2SRj0dAH35PNMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753736192; c=relaxed/simple;
-	bh=mrhL5z+dRL/7LvIUNMoZmvlwGP2IeJz0gt4A9ZDu5u8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GT6WkYxVIiGv2tTrg/bx++YrtdATWa69N6qfW6mJihzZahgYdH7zqep19SBfRruU6Zd/bJGBJR0K26DsWf1G/MDijAkyR/jbqKM9tLM5udNH337xb5cCkIggp8Lutn1LFfAUUvcU0DVycnyE0YuDukHUP3X/1zDDwZxZn/Kdyns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dK4IYFWf; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-615398dc162so2628999a12.3;
-        Mon, 28 Jul 2025 13:56:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753736189; x=1754340989; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=axn7/c9oWY5F4rHdVczmAizhZThb4BFLNBto3xGrMc8=;
-        b=dK4IYFWfOmulevZz6KULg7pyQ0BHQWg5N7TvK0Bpn/yuClovVrZBPXEMYyvAG6ISGv
-         xdYCXGc4u2f1qb5Z6v6ozZAHRp4s8P2b9bZ+AT9qgzmeqKwlMaz4HcbNmPsJwHrMnK6i
-         qhqmetmS1NeMC95OkdbTCy1Ba4f4cEsApaXLP5TM959WEtgCELcmtp6J7wOBNaEtmwzm
-         aRgERFRiJK4YPXlmjA/EygK1YtM2dK/VR8EbO0AJrK709uc8kXW5rpr4SEAVnnQdZ+8b
-         4tM6W2zgarphnMWFQVOuKQ+A9I3lcYW65PuT0y9GgW6w6zhfiH8hdhei2m/k+VWl8sVP
-         kpnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753736189; x=1754340989;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=axn7/c9oWY5F4rHdVczmAizhZThb4BFLNBto3xGrMc8=;
-        b=fMKbtE2P8OS1I01/RkUP22CxJA2GvvS3DCp/Sei27sBdeKg2zvVb+4EIfJLGdlf7WT
-         D3AhstxW7GWl48qWf9EEklbBwUs72MvK2Mql/Jv13MQOHBslowzBgiMz4L1Mb6a+uPP/
-         9TzE5qyxYSaD4Rvy2wU0IByJITlRuFrYuyC2sPkt6QWUSoznaUZ966vOAnwD7/NjWRel
-         49M+ft2GyG+9Yjs6WBimKCI2A64XWhdQNaY6O2xxPTDKg+EXjskVBC+A4a1HSnKq6Inv
-         CRSZMkY8ITYXtE34Tve0uLlb1RGUNze7rbh+MzlEf2OM9pnAoM/zThH3LPHg5Ug23uXF
-         OZDA==
-X-Forwarded-Encrypted: i=1; AJvYcCVNNMnwMzJ7IQS81RG2UZvBHbb9l/OPJ9GdrDlj5inzvO/N8oK1+OPxv6SnSVOV+/Fzgz+UUHU3@vger.kernel.org, AJvYcCVb/qYIkN1NahG+rGIauJEjFpFizj7OyxYmblEgjwMvVpfeuARVC6lhi2nyx6R3reG4Nw8qy48/Lg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwHUjrBri2orKB1o+SPahyiLFhO7rzrdiBQZ22Oh3SghIAZYcRx
-	jIIY7PUe19vAQNiTWUXDpbtPRxb2QpBVA2rDi1gLqnWw3V6irPPrt/oJ
-X-Gm-Gg: ASbGnctvl1OJBg8OmRRq8hXzu/k/dDq9JVcTZyhJoss40eJXBjaXDuHmcI3QpFLwYXP
-	GoX4cmtLR1lM65bruN1QGjOD/RwZ2QKmJH5Za7jiTEqe0gKZvnSBi5KWIp2YfxvDyuIwNqXK5Kd
-	pZbt22L8P5Q90pXw8Rz/chXzWvvdsTaJm1I24E6oZ3mDHnIoBCkjXyeXBAYPjBjnfblMvoD2+rU
-	83XmITnNn0PuOXyu/37KuvhxEvkdgWXlNSTGYWgAs9ZRZK1s1WtzqjiBFn+vtSsRiVN/4xXb5Y4
-	zqsiJy3J3zfXkvpuIAASVtm71BWGHoGlRNK/54tA/63U7WMPEgazhs+HxZTvRAycgqKiqP/WNI+
-	7rFImP7rlKEyITZLuunNYDWk2aeaJXSk=
-X-Google-Smtp-Source: AGHT+IF+KtZY7J9joZ+spRy/zMGlBvv4wyq7UggxbrnVCWhIj6oMdZpb9o8KiF3qvzAPavzu5ghYHw==
-X-Received: by 2002:a17:907:60cd:b0:af2:4257:fa1e with SMTP id a640c23a62f3a-af617d00e58mr1582521666b.25.1753736188447;
-        Mon, 28 Jul 2025 13:56:28 -0700 (PDT)
-Received: from [192.168.8.100] ([185.69.144.164])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-af635aa4e7dsm480429666b.108.2025.07.28.13.56.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 28 Jul 2025 13:56:27 -0700 (PDT)
-Message-ID: <8c90f485-192f-4f7a-ac94-8171d78f3c4a@gmail.com>
-Date: Mon, 28 Jul 2025 21:57:49 +0100
+	s=arc-20240116; t=1753737915; c=relaxed/simple;
+	bh=hFGF4ak4iL9Eg7qXDoI/Knr80giZOYy2BcIVSQFdahs=;
+	h=Message-ID:Date:MIME-Version:Subject:References:To:Cc:From:
+	 In-Reply-To:Content-Type; b=k9r3QpkFmhWvXtqULW0inV4HNWKMbm1mbDJ6wTBlxBhsUmLOpZowqtfxQEFDYn3Wn+rLnfL5+nHkgeYhpTcoVV6RroN2y+5IENTuLmoKdoXoz5SiLlDn16zTcGnLjhQo4DpChO/jczMyNQmkxHTwlb7pHM+eRVfFua1jFaH0wGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=AiJGs3Fv; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56SDBOgI027003;
+	Mon, 28 Jul 2025 21:25:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=RsIpm1
+	ZePftr61CV00pezlWbIWceZ1DWlXmXkQqYnbI=; b=AiJGs3Fvcesi9WQsru5oEp
+	mlv3Xk53vRkPhtV8WAHA2L5FvwRemw0lHQCeBV4ifuSKHJoTwq9w0pzaZdVNDeML
+	ZVbVLMbYDmILSsq21Ig5YCc+uNbu5lhXEgDpuNvZ6SX52mtJhHEXjdMO3pfe8nsf
+	mBxFbNZ9Eur0kEckWEbPn7710G11jATj0Clcbb1ezkopZsxM2yt8Im1VLFZ5wOXm
+	dIvuuC/OaVPVhp2/hJNIseI140hbV69NJVWrhnOOg7s8Q0Od153k94+H6SKiNuCt
+	hI29WYghUIa/4zFkJeHHiC740MFD8ODYqC/L4WO288G1p+JyQafZubryoM8Rewlw
+	==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 484qemkayj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 28 Jul 2025 21:25:05 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 56SJAibc018301;
+	Mon, 28 Jul 2025 21:25:04 GMT
+Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 485abnyhhx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 28 Jul 2025 21:25:04 +0000
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 56SLP3lI58327434
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 28 Jul 2025 21:25:03 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8E6865805D;
+	Mon, 28 Jul 2025 21:25:03 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2B91358059;
+	Mon, 28 Jul 2025 21:25:03 +0000 (GMT)
+Received: from [9.24.20.98] (unknown [9.24.20.98])
+	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 28 Jul 2025 21:25:03 +0000 (GMT)
+Message-ID: <c2bba86f-d9d2-4bab-97e4-d983bffbb485@linux.ibm.com>
+Date: Mon, 28 Jul 2025 16:25:02 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,196 +77,115 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC v1 00/22] Large rx buffer support for zcrx
-To: Mina Almasry <almasrymina@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
- io-uring@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- Willem de Bruijn <willemb@google.com>, Paolo Abeni <pabeni@redhat.com>,
- andrew+netdev@lunn.ch, horms@kernel.org, davem@davemloft.net,
- sdf@fomichev.me, dw@davidwei.uk, michael.chan@broadcom.com,
- dtatulea@nvidia.com, ap420073@gmail.com
-References: <cover.1753694913.git.asml.silence@gmail.com>
- <CAHS8izMyhMFA5DwBmHNJpEfPLE6xUmA453V+tF4pdWAenbrV3w@mail.gmail.com>
- <9922111a-63e6-468c-b2de-f9899e5b95cc@gmail.com>
- <CAHS8izMR+PsD12BA+Rq2yixKn=656V1jQhryiVZrC6z05Kq1SQ@mail.gmail.com>
+Subject: vhost: linux-next: kernel crash at vhost_dev_cleanup/kfree
 Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <CAHS8izMR+PsD12BA+Rq2yixKn=656V1jQhryiVZrC6z05Kq1SQ@mail.gmail.com>
+References: <1b28a10e-0cff-405e-9106-0c20e70854f9@linux.ibm.com>
+To: jasowang@redhat.com
+Cc: mst@redhat.com, kvm@vger.kernel.org, virtualization@lists.linux.dev,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        jonah.palmer@oracle.com, Eric Farman <farman@linux.ibm.com>
+From: JAEHOON KIM <jhkim@linux.ibm.com>
+In-Reply-To: <1b28a10e-0cff-405e-9106-0c20e70854f9@linux.ibm.com>
+X-Forwarded-Message-Id: <1b28a10e-0cff-405e-9106-0c20e70854f9@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: JNDVpRasbacsR66uLIqWAC1n7XU-CD_o
+X-Proofpoint-GUID: JNDVpRasbacsR66uLIqWAC1n7XU-CD_o
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzI4MDE1OCBTYWx0ZWRfXwJI2oKzajmWT
+ oqxgMxP28FEyAmTx3ojVVGrhRGA2q1xvu6el+2mPwR39gkjXmRa0myhuKm4JzbFGqu5guMyfrSG
+ mAUb4tCwCUmKig+6BVrXC3eqzgsTHrV3o6x9ocOUF5GprsdLqxYnDjLQOIffwp/Mt+rUvN3+11f
+ IMr+WNPcuQrBuQEVqL+8+LSYmWqiq0kDRgWcL8sgiVcp0cP09ph09B0OkVbRDmYeaMfVfT6BhFf
+ vdB2++r+DkjMQeg5Pa7OJv21pyI/S+lBs1EQEgzamDgmELb9emxFOlYyNj2X6xH2kmFJeTMHk98
+ v9HEBupywZH7KM2xOV5LVWnXautn2MVv6drfF+1v5u2bjTNAP71S6yTC92pkDJxtGvsk8YD1CPi
+ R22E7zwWsf3NnWdxyJBefiSpRoVtjLQ4jDJHBcvH2DE+8YElRjc/D3MJVkm1TQWIMvRQq9E+
+X-Authority-Analysis: v=2.4 cv=BJOzrEQG c=1 sm=1 tr=0 ts=6887eab1 cx=c_pps
+ a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
+ a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=VwQbUJbxAAAA:8 a=8vsdKcPWeYT-9k0nS1MA:9
+ a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-07-28_04,2025-07-28_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 phishscore=0 suspectscore=0 spamscore=0 lowpriorityscore=0
+ mlxlogscore=812 priorityscore=1501 malwarescore=0 mlxscore=0 bulkscore=0
+ adultscore=0 clxscore=1011 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2507280158
 
-On 7/28/25 21:23, Mina Almasry wrote:
-...>>>
->>> - I'm a bit confused that you're not making changes to the core net
->>> stack to support non-PAGE_SIZE netmems. From a quick glance, it seems
->>> that there are potentially a ton of places in the net stack that
->>> assume PAGE_SIZE:
->>
->> The stack already supports large frags and it's not new. Page pools
->> has higher order allocations, see __page_pool_alloc_page_order. The
->> tx path can allocate large pages / coalesce user pages.
-> 
-> Right, large order allocations are not new, but I'm not sure they
-> actually work reliably. AFAICT most drivers set pp_params.order = 0;
-> I'm not sure how well tested multi-order pages are.
-> 
-> It may be reasonable to assume multi order pages just work and see
-> what blows up, though.
-> 
->> Any specific
->> place that concerns you? There are many places legitimately using
->> PAGE_SIZE: kmap'ing folios, shifting it by order to get the size,
->> linear allocations, etc.
->>
-> 
->  From a 5-min look:
-> 
-> - skb_splice_from_iter, this line: size_t part = min_t(size_t,
-> PAGE_SIZE - off, len);
 
-It does it for pages that it got from
-iov_iter_extract_pages() a few lines above, those are PAGE_SIZE'd.
+Dear Jason Wang,
 
-> - skb_pp_cow_data, this line: max_head_size =
-> SKB_WITH_OVERHEAD(PAGE_SIZE - headroom);
+I would like to kindly report a kernel crash issue on our s390x server 
+which seems to be related to the following patch.
+--------------------------------------------------------------------------------------------------------------------------
+   commit 7918bb2d19c9 ("vhost: basic in order support")
+https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git/commit/?id=7918bb2d19c9
+--------------------------------------------------------------------------------------------------------------------------
 
-This one should be about the linear part, not frags
+This patch landed in linux-next between July 16th and 17th. Since then,  
+kernel crash have been observed during stress testing.
+The issue can be confirmed using the following command:
+-------------------------------------------
+   stress-ng --dev 1 -t 10s
+-------------------------------------------
 
-> - skb_seq_read, this line: pg_sz = min_t(unsigned int, pg_sz -
-> st->frag_off, PAGE_SIZE - pg_off
+Crash log and call stack are as follows.
+Additionally, this crash appears similar to the issue discussed in the 
+following thread:
+https://lore.kernel.org/kvm/bvjomrplpsjklglped5pmwttzmljigasdafjiizt2sfmytc5rr@ljpu455kx52j/
 
-That's kmap handling, it can iterate a frag multiple times
-in PAGE_SIZE chunks for high mem archs.
+[ 5413.029569] Unable to handle kernel pointer dereference in virtual 
+kernel address space
+[ 5413.029573] Failing address: 00000328856e8000 TEID: 00000328856e8803
+[ 5413.029576] Fault in home space mode while using kernel ASCE.
+[ 5413.029580] AS:0000000371fdc007 R3:0000000000000024
+[ 5413.029607] Oops: 003b ilc:3 [#1]SMP
+   .......
+[ 5413.029655] CPU: 23 UID: 0 PID: 2339 Comm: stress-ng-dev Not tainted 
+6.16.0-rc6-10099-g60a66ed35d6b #63 NONE
+[ 5413.029659] Hardware name: IBM 3906 M05 780 (LPAR)
+[ 5413.029662] Krnl PSW : 0704e00180000000 0000032714b9f156 
+(kfree+0x66/0x340)
+[ 5413.029673]            R:0 T:1 IO:1 EX:1 Key:0 M:1 W:0 P:0 AS:3 CC:2 
+PM:0 RI:0 EA:3
+[ 5413.029677] Krnl GPRS: 0000000000000002 0000008c056e8000 
+0000262500000000 0000000085bf4610
+[ 5413.029681]            0000000085bf4660 0000000085bf4618 
+0000032716402270 0000032694e0391a
+[ 5413.029683]            0000032716402290 0000032714720000 
+00000328856e8000 0000262500000000
+[ 5413.029685]            000003ff8312cfa8 0000000000000000 
+000023015ba00000 000002a71e8d3ba8
+[ 5413.029697] Krnl Code: 0000032714b9f146: e3e060080008 ag %r14,8(%r6)
+[ 5413.029697]            0000032714b9f14c: ec1e06b93a59 risbgn 
+%r1,%r14,6,185,58
+[ 5413.029697]           #0000032714b9f152: b90800a1 agr %r10,%r1
+[ 5413.029697]           >0000032714b9f156: e320a0080004 lg      %r2,8(%r10)
+[ 5413.029697]            0000032714b9f15c: a7210001 tmll    %r2,1
+[ 5413.029697]            0000032714b9f160: a77400e0 brc 7,0000032714b9f320
+[ 5413.029697]            0000032714b9f164: c004000000ca brcl 
+0,0000032714b9f2f8
+[ 5413.029697]            0000032714b9f16a: 95f5a030 cli 48(%r10),245
+[ 5413.029738] Call Trace:
+[ 5413.029741]  [<0000032714b9f156>] kfree+0x66/0x340
+[ 5413.029747]  [<0000032694e0391a>] vhost_dev_free_iovecs+0x9a/0xc0 [vhost]
+[ 5413.029757]  [<0000032694e05406>] vhost_dev_cleanup+0xb6/0x210 [vhost]
+[ 5413.029763]  [<000003269507000a>] vhost_vsock_dev_release+0x1aa/0x1e0 
+[vhost_vsock]
+[ 5413.029768]  [<0000032714c16ece>] __fput+0xee/0x2e0
+[ 5413.029774]  [<00000327148c0488>] task_work_run+0x88/0xd0
+[ 5413.029783]  [<00000327148977aa>] do_exit+0x18a/0x4e0
+[ 5413.029786]  [<0000032714897cf0>] do_group_exit+0x40/0xc0
+[ 5413.029789]  [<0000032714897dce>] __s390x_sys_exit_group+0x2e/0x30
+[ 5413.029792]  [<00000327156519c6>] __do_syscall+0x136/0x340
+[ 5413.029797]  [<000003271565d5de>] system_call+0x6e/0x90
+[ 5413.029802] Last Breaking-Event-Address:
+[ 5413.029803]  [<0000032694e03914>] vhost_dev_free_iovecs+0x94/0xc0 [vhost]
+[ 5413.029811] Kernel panic - not syncing: Fatal exception: panic_on_oops
 
-> - zerocopy_fill_skb_from_iter, this line: int size = min_t(int,
-> copied, PAGE_SIZE - start);
 
-Pages from iov_iter_get_pages2(), same as with
-skb_splice_from_iter()
-
-> I think the `PAGE_SIZE -` logic in general assumes the memory is
-> PAGE_SIZEd. Although in these cases it seems page specifics, i.e.
-> net_iovs wouldn't be exposed to these particular call sites.
-> 
-> I spent a few weeks acking the net stack for all page-access to prune
-> all of them to add unreadable netmem... are you somewhat confident
-> there are no PAGE_SIZE assumptions in the net stack that affect
-> net_iovs that require a deep look? Or is the approach here to merge
-
-The difference is that this one is already supported and the
-stack is large page aware, while unreadable frags was a new
-concept.
-
-> this and see what/if breaks?
-
-No reason for it not to work. Even if breaks somewhere on that,
-it should be a pre-existent problem, which needs to be fixed
-either way.
-
->>> cd net
->>> ackc "PAGE_SIZE|PAGE_SHIFT" | wc -l
->>> 468
->>>
->>> Are we sure none of these places assuming PAGE_SIZE or PAGE_SHIFT are
->>> concerning?
->>>
->>> - You're not adding a field in the net_iov that tells us how big the
->>> net_iov is. It seems to me you're configuring the driver to set the rx
->>> buffer size, then assuming all the pp allocations are of that size,
->>> then assuming in the rxzc code that all the net_iov are of that size.
->>> I think a few problems may happen?
->>>
->>> (a) what happens if the rx buffer size is re-configured? Does the
->>> io_uring rxrc instance get recreated as well?
->>
->> Any reason you even want it to work? You can't and frankly
->> shouldn't be allowed to, at least in case of io_uring. Unless it's
->> rejected somewhere earlier, in this case it'll fail on the order
->> check while trying to create a page pool with a zcrx provider.
->>
-> 
-> I think it's reasonable to disallow rx-buffer-size reconfiguration
-> when the queue is memory-config bound. I can check to see what this
-> code is doing.
-
-Right, it doesn't make sense to reconfigure zcrx, and we can
-only fail the operation one way or another.
-
->>> (b) what happens with skb coalescing? skb coalescing is already a bit
->>> of a mess. We don't allow coalescing unreadable and readable skbs, but
->>> we do allow coalescing devmem and iozcrx skbs which could lead to some
->>> bugs I'm guessing already. AFAICT as of this patch series we may allow
->>> coalescing of skbs with netmems inside of them of different sizes, but
->>> AFAICT so far, the iozcrx assume the size is constant across all the
->>> netmems it gets, which I'm not sure is always true?
->>
->> It rejects niovs from other providers incl. from any other io_uring
->> instances, so it only assume a uniform size for its own niovs.
-> 
-> Thanks. What is 'it' and where is the code that does the rejection?
-
-zcrx does, you're familiar with this chunk:
-
-io_uring/zcrx.c:
-
-io_zcrx_recv_frag() {
-	if (niov->pp->mp_ops != &io_uring_pp_zc_ops ||
-	    io_pp_to_ifq(niov->pp) != ifq)
-		return -EFAULT;
-}
-
->> The
->> backing memory is verified that it can be chunked.
->>    > For all these reasons I had assumed that we'd need space in the
->>> net_iov that tells us its size: net_iov->size.
->>
->> Nope, not in this case.
->>
->>> And then netmem_size(netmem) would replace all the PAGE_SIZE
->>> assumptions in the net stack, and then we'd disallow coalescing of
->>> skbs with different-sized netmems (else we need to handle them
->>> correctly per the netmem_size).
->> I'm not even sure what's the concern. What's the difference b/w
->> tcp_recvmsg_dmabuf() getting one skb with differently sized frags
->> or same frags in separate skbs? You still need to handle it
->> somehow, even if by failing.
->>
-> 
-> Right, I just wanted to understand what the design is. I guess the
-> design is allowing the netmems in the same skb to have different max
-> frag lens, yes?
-
-Yeah, and it's already allowed for higher order pages.
-
-> I am guessing that it works, even in tcp_recvmsg_dmabuf. I guess the
-
-And you won't see it unless adds support for that, that's why
-I added this:
-
-if (!net_is_devmem_iov(niov)) {
-	err = -ENODEV;
-	goto out;
-}
-
-> frag len is actually in frag->len, so already it may vary from frag to
-> frag. Even if coalescing happens, some frags would have a frag->len =
-> PAGE_SIZE and some > PAGE_SIZE. Seems fine to me off the bat.
-> 
->> Also, we should never coalesce different niovs together regardless
->> of sizes. And for coalescing two chunks of the same niov, it should
->> work just fine even without knowing the length.
->>
-> 
-> Yeah, we should probably not coalesce 2 netmems together, although I
-> vaguely remember reading code in a net stack hepler that does that
-> somewhere already. Whatever.
-
-Let know if that turns out to be true, because it should already
-be broken. You shouldn't coalesce pages from different folios,
-and to check that you need to get the head page / etc., which
-niovs obviously don't have.
-
--- 
-Pavel Begunkov
+Best regards,
+Jaehoon Kim
 
 
