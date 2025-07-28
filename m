@@ -1,85 +1,105 @@
-Return-Path: <netdev+bounces-210621-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210622-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8C72B140E9
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 19:07:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0F00B140FC
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 19:10:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 085093A1E5C
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 17:06:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8E75B7AD299
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 17:08:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 595BD273D65;
-	Mon, 28 Jul 2025 17:07:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF851276050;
+	Mon, 28 Jul 2025 17:10:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="NYW911v0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XhIhpDL4"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1BAC42AA5
-	for <netdev@vger.kernel.org>; Mon, 28 Jul 2025 17:07:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A029275873
+	for <netdev@vger.kernel.org>; Mon, 28 Jul 2025 17:10:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753722423; cv=none; b=AXscEPnQqNkawSUI2fcg1hXjuC9LEgsV05dnhj5bt/40G9BFsTXWPOZjpxYAQCLhYYd/eRQawyp6ZgWXwXCX0G8bynrKUxEzCiPriXuG/qoj8ryCOV7L9rf5SXXK2cY/cqN/FaheY4AQsvVsYn/1gp6EPQlYyc6GnYiSUegqI7A=
+	t=1753722603; cv=none; b=Jbjqw/SIfwn0hhVq3zAf1gQCiPIvdFXYWvFD+waIiwdZBJI3MT/SjhobjKQYBD9aSB7+KL1jcMoiYTROZRJ4NOxq/HaDQgvvp3a+bgdQvWjMl3iwND5qxvzDTcsREvBUr/nHlj1FGbdaDqypg9cO9IclSyU94v2qQQ+yxtRxD+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753722423; c=relaxed/simple;
-	bh=cL1tYcYE+jlRsNtY763UrOL46FUHm8khRTqW0eA7Bag=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZsEQ2HsxeyoXMKmlDAuh432gQIMQXx3zNAytf1SU6iDKcGW2ma0qBaQXa57hGz0NriFxZG1bgI9WWjD2pC/Gqz8Db2jfZRQmrMrv5eEBtS2FBb6Y+uAR24JcnVSQ8bMWBVbqD+STZbngpgDqvJuUk+EtWhEwSy2Ev69z/CgVbck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=NYW911v0; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=9NKVSbJ3EylcastEnGb+9vHs9axW6SpWMaxjBfENn0c=; b=NYW911v0akys02RoniGWSqq53V
-	d3/uE7aOCooTAypvLjOr2Sw128ojLzoRUEVF6hmqkwlv1dg12Z5YwnrdGaNELrz+ZXBLC9SlD4RiK
-	UFyBXEk3HxVIsX3LcY1FKhRhrONwE7YUpD0Bfm1T65OA20yuw+fN5aLjuNtHkT4Z9cKU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1ugRJN-0037IP-Ga; Mon, 28 Jul 2025 19:06:53 +0200
-Date: Mon, 28 Jul 2025 19:06:53 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH RFC net-next 4/7] net: stmmac: remove unnecessary
- "stmmac: wakeup enable" print
-Message-ID: <0822be86-f344-4b38-9cef-732145b78ce6@lunn.ch>
-References: <aIebMKnQgzQxIY3j@shell.armlinux.org.uk>
- <E1ugQ2t-006KDF-H8@rmk-PC.armlinux.org.uk>
+	s=arc-20240116; t=1753722603; c=relaxed/simple;
+	bh=lApmwt35WLiudZ6S7sfG5oBChx24Fb/6m8e+vg0QSWY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=e0C1nO3P7ngG3X+6i47sYFnHltlpCRu6QgZ/mXp21tjha/R5tH+wwMVjd19IeICG0pVTvqX0fbnjCzaTGwQfTz0ur02iLAm1Zf5Yxlu0EHk86Dfswftf8F3I2LGfyARu1ulLMwQvnplki2QGYr+Y5jlemjdmdj3bHebUcg3a1tw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XhIhpDL4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69892C4CEE7;
+	Mon, 28 Jul 2025 17:10:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753722603;
+	bh=lApmwt35WLiudZ6S7sfG5oBChx24Fb/6m8e+vg0QSWY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=XhIhpDL4UGFp2NFLtm3tXDs+YU/iQDEvnqeTqMLma2y66Zn1I64wcA8TEzZiIkYLG
+	 dVb4d7LujhTuZIqLb9UzzJE0JrwyTZIULvQ3CDWmNxEtlRvqpAOHExEJDeDmEiRSkf
+	 XW5z2h9pweYIJtcOHQItk8usBuL5PCfQbUnIo0B9x3xDHP4HzaRNCJvsHaV92HUipK
+	 0sSXElPMKsW6N13IwT5N99nRkvUeaKIJzMW11rXKtwHBfOVKpmp2fdzsHZZLlcy02n
+	 3SQT9SIlY9/LNEiAQv5VYVcuBN5fObcPsYGYMhEnFNW7pDyjgpC1e0dySIuaYTsnKF
+	 p5EuKfxnA/m1Q==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33DE6383BF5F;
+	Mon, 28 Jul 2025 17:10:21 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1ugQ2t-006KDF-H8@rmk-PC.armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH iproute2-next] bridge: fdb: Add support for FDB activity
+ notification control
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175372261974.782645.4776959441968068820.git-patchwork-notify@kernel.org>
+Date: Mon, 28 Jul 2025 17:10:19 +0000
+References: <20250717130509.470850-1-idosch@nvidia.com>
+In-Reply-To: <20250717130509.470850-1-idosch@nvidia.com>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, dsahern@gmail.com, stephen@networkplumber.org,
+ razor@blackwall.org, petrm@nvidia.com
 
-On Mon, Jul 28, 2025 at 04:45:47PM +0100, Russell King (Oracle) wrote:
-> Printing "stmmac: wakeup enable" to the kernel log isn't useful - it
-> doesn't identify the adapter, and is effectively nothing more than a
-> debugging print. This information can be discovered by looking at
-> /sys/device.../power/wakeup as the device_set_wakeup_enable() call
-> updates this sysfs file.
+Hello:
+
+This patch was applied to iproute2/iproute2-next.git (main)
+by David Ahern <dsahern@kernel.org>:
+
+On Thu, 17 Jul 2025 16:05:09 +0300 you wrote:
+> Add support for FDB activity notification control [1].
 > 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> Users can use this to enable activity notifications on a new FDB entry
+> that was learned on an ES (Ethernet Segment) peer and mark it as locally
+> inactive:
+> 
+>  # bridge fdb add 00:11:22:33:44:55 dev bond1 master static activity_notify inactive
+>  $ bridge -d fdb get 00:11:22:33:44:55 br br1
+>  00:11:22:33:44:55 dev bond1 activity_notify inactive master br1 static
+>  $ bridge -d -j -p fdb get 00:11:22:33:44:55 br br1
+>  [ {
+>          "mac": "00:11:22:33:44:55",
+>          "ifname": "bond1",
+>          "activity_notify": true,
+>          "inactive": true,
+>          "flags": [ ],
+>          "master": "br1",
+>          "state": "static"
+>      } ]
+> 
+> [...]
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Here is the summary with links:
+  - [iproute2-next] bridge: fdb: Add support for FDB activity notification control
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=e041178ba6bc
 
-    Andrew
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
