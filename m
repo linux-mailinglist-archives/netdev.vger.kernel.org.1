@@ -1,156 +1,87 @@
-Return-Path: <netdev+bounces-210576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210575-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BE38B13F60
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 18:02:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C544EB13F5D
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 18:02:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 095787A312F
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 16:01:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B48A47A2B2B
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 16:00:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BD5824BD03;
-	Mon, 28 Jul 2025 16:02:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74CA41B4223;
+	Mon, 28 Jul 2025 16:01:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YGUD9hAc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MOX1p73v"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 470AD8479;
-	Mon, 28 Jul 2025 16:02:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 504FF8479
+	for <netdev@vger.kernel.org>; Mon, 28 Jul 2025 16:01:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753718542; cv=none; b=QimHIAUOPRt4Otsy+0I0AjV+mO4usCCkti35dh2Mrn6yfHQrSI6s5ERopOlBmLf+JodlFAYpwEosC8Vd1SYIVH/ETiFifZWGr8FN02CjAXEEsaOUh76q0DvbUDdGhGTuehEEtQ6hsoTHBGRViV9+b8OsiSZlfoT7XjJXI8n4g2g=
+	t=1753718517; cv=none; b=UI1hYoy7b5l136sUfhmKfg9+ojq9YmNA/sH8npPfrNjPhjTM8Y2k2KCl1jqXD4RzxrELiU6t3K83NRp/32wPHWVm9ar59s+mxFtkyY4yyP6w5lrN1J3BWzHri2TwHsZ5JI5N7IM+XgJ3B1SjcMiQwHMorI1HmFeYCvCNFe/bZOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753718542; c=relaxed/simple;
-	bh=W4oDpda6kbCRnn0ODm8ONN7mKwlVwM/eB17fbg3mJL0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JWHVtkU7ibjzzAlpm6a67gUtkjgMWdwP04duli+4y038h6IgmI/vAkOLSjONZ/M4HxPi5Mpbgscczluc4u4vuvPO5k/RG/UdgTmTFuPIq50XbxjkLhjR17Nhh637C48AqxGfuIuWn0BfGw5EhIticeV0sArQCaUtBmfHuJBlutc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YGUD9hAc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D335EC4CEE7;
-	Mon, 28 Jul 2025 16:02:21 +0000 (UTC)
+	s=arc-20240116; t=1753718517; c=relaxed/simple;
+	bh=u/Ou9o5/xihhmZ9YU6hDdCMplh926VAAAaYqkZYD9RE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Ds35WUVFjEiMILQ/wtVceCDETbDMw1rszzH1YkGQED9qwmE8aZBVwpZnF8tPm/QUrgN615RyPXaF7KvLWL1ePudc8gE8sG7dpma7lXAwKQvFFjB6kfQceI9YKs+GZ/WUy+2ikug/fiXlEkd07wh6/ih6C6I2+53dOUln/iZRU0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MOX1p73v; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C84FC4CEE7;
+	Mon, 28 Jul 2025 16:01:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753718541;
-	bh=W4oDpda6kbCRnn0ODm8ONN7mKwlVwM/eB17fbg3mJL0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=YGUD9hAcYppn4ft28tj0m5ByaI8tqR8IiAzQp8jMTNEipwnyGyfFjnFGAFxk4VhGR
-	 UV70rnp+dFLHE1K6J9wxPKnLzLAcI6pauVggFT32JOhc7cF7woqLkHw6C8+iz1YWHl
-	 OGmxh4jiRq3z5mbpgTV4qZzeCUxfuYaidLeo+0KpUh+MdsSitxwO1h5ykM2QmAIdrq
-	 H96V4xtELsYZk7AekMCUod8rLt2/yERc/TmK7FeZr48kTg97O8EBuB4JlAyxso4rax
-	 RJv4hHkVLc5RkwYtT/rjflhYcoD5kjmjOwhTg88LvnludwNI7CCLWNIhZynkgCYlXi
-	 S/uAYuejmqCfQ==
-Received: from mchehab by mail.kernel.org with local (Exim 4.98.2)
-	(envelope-from <mchehab@kernel.org>)
-	id 1ugQIq-00000000Gch-0ygn;
-	Mon, 28 Jul 2025 18:02:16 +0200
-From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-To: "Message-ID :" <cover.1752076293.git.mchehab+huawei@kernel.org>,
-	Linux Doc Mailing List <linux-doc@vger.kernel.org>
-Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-	"Akira Yokosawa" <akiyks@gmail.com>,
-	"Breno Leitao" <leitao@debian.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	"Donald Hunter" <donald.hunter@gmail.com>,
-	"Eric Dumazet" <edumazet@google.com>,
-	"Ignacio Encinas Rubio" <ignacio@iencinas.com>,
-	"Jakub Kicinski" <kuba@kernel.org>,
-	"Jan Stancek" <jstancek@redhat.com>,
-	"Jonathan Corbet" <corbet@lwn.net>,
-	"Marco Elver" <elver@google.com>,
-	"Paolo Abeni" <pabeni@redhat.com>,
-	"Randy Dunlap" <rdunlap@infradead.org>,
-	"Ruben Wauters" <rubenru09@aol.com>,
-	"Shuah Khan" <skhan@linuxfoundation.org>,
-	"Simon Horman" <horms@kernel.org>,
-	joel@joelfernandes.org,
-	linux-kernel-mentees@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	lkmm@lists.linux.dev,
-	netdev@vger.kernel.org,
-	peterz@infradead.org,
-	stern@rowland.harvard.edu
-Subject: [PATCH v10 01/14] docs: netlink: netlink-raw.rst: use :ref: instead of :doc:
-Date: Mon, 28 Jul 2025 18:01:54 +0200
-Message-ID: <1855229cf1ad7a8bdcab43423b5672f2fa55026f.1753718185.git.mchehab+huawei@kernel.org>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <cover.1753718185.git.mchehab+huawei@kernel.org>
-References: <cover.1753718185.git.mchehab+huawei@kernel.org>
+	s=k20201202; t=1753718516;
+	bh=u/Ou9o5/xihhmZ9YU6hDdCMplh926VAAAaYqkZYD9RE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=MOX1p73vIrKPUzVU4QJS6RD3aUuhriCLyBfVTTi9yBhcyTijCycsV8bRJg7x9ClDQ
+	 yZ8nMbZmHKjzIYTLR/jJo7qAxogBJIEzCuM5cNCdJzozxm9Pvt69ot5sYvwSm+sFgl
+	 iQxFkzWC373Qof2abKSXdEK0hULmARexXV1Ds1ecf9SOFLripxyJ4VLg7eEjhuRNNs
+	 8q4eUEwx3z0TGKk2vW7ugbtmczCgs1wyqc8IzSSKe1bLRp4SmTZjlUk1ryLpp/V5zH
+	 88u0Q/O0iAA//awtEMW1m8Up/FpkSB2SA0Opjmi916pT+ZB6wrnW1TExSl6hSiUZo5
+	 B/R7PXQ3xcaEA==
+Date: Mon, 28 Jul 2025 09:01:55 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Krishna Kumar <krikku@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ tom@herbertland.com, pabeni@redhat.com, horms@kernel.org, sdf@fomichev.me,
+ kuniyu@google.com, ahmed.zaki@intel.com, aleksander.lobakin@intel.com,
+ atenart@kernel.org, krishna.ku@flipkart.com
+Subject: Re: [PATCH v6 net-next 1/2] net: Prevent RPS table overwrite for
+ active flows
+Message-ID: <20250728090155.384b2b14@kernel.org>
+In-Reply-To: <CACLgkEY4cRWsRQW=-PSxnE=V6AvRuKuvYzXSuofmB8NMJ=9ZqQ@mail.gmail.com>
+References: <20250723061604.526972-1-krikku@gmail.com>
+	<20250723061604.526972-2-krikku@gmail.com>
+	<20250725154515.0bff0c4d@kernel.org>
+	<CACLgkEY4cRWsRQW=-PSxnE=V6AvRuKuvYzXSuofmB8NMJ=9ZqQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Sender: Mauro Carvalho Chehab <mchehab@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Currently, rt documents are referred with:
+On Mon, 28 Jul 2025 07:43:25 +0530 Krishna Kumar wrote:
+> > > +                             if (hash != READ_ONCE(tmp_rflow->hash) ||
+> > > +                                 next_cpu == tmp_cpu) {
+> > > +                                     /*
+> > > +                                      * Don't unnecessarily reprogram if:
+> > > +                                      * 1. This slot has an active different
+> > > +                                      *    flow.
+> > > +                                      * 2. This slot has the same flow (very
+> > > +                                      *    likely but not guaranteed) and
+> > > +                                      *    the rx-queue# did not change.
+> > > +                                      */  
+> 
+> I took some time to figure out the different paths here as it was a
+> new area for me, hence I put this comment. Shall I keep it as the
+> condition is not very intuitive?
 
-Documentation/userspace-api/netlink/netlink-raw.rst: :doc:`rt-link<../../networking/netlink_spec/rt-link>`
-Documentation/userspace-api/netlink/netlink-raw.rst: :doc:`tc<../../networking/netlink_spec/tc>`
-Documentation/userspace-api/netlink/netlink-raw.rst: :doc:`tc<../../networking/netlink_spec/tc>`
-
-Having :doc: references with relative paths doesn't always work,
-as it may have troubles when O= is used. Also that's hard to
-maintain, and may break if we change the way rst files are
-generated from yaml. Better to use instead a reference for
-the netlink family.
-
-So, replace them by Sphinx cross-reference tag that are
-created by ynl_gen_rst.py.
-
-Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
----
- Documentation/userspace-api/netlink/netlink-raw.rst | 6 +++---
- tools/net/ynl/pyynl/ynl_gen_rst.py                  | 5 +++--
- 2 files changed, 6 insertions(+), 5 deletions(-)
-
-diff --git a/Documentation/userspace-api/netlink/netlink-raw.rst b/Documentation/userspace-api/netlink/netlink-raw.rst
-index 31fc91020eb3..aae296c170c5 100644
---- a/Documentation/userspace-api/netlink/netlink-raw.rst
-+++ b/Documentation/userspace-api/netlink/netlink-raw.rst
-@@ -62,8 +62,8 @@ Sub-messages
- ------------
- 
- Several raw netlink families such as
--:doc:`rt-link<../../networking/netlink_spec/rt-link>` and
--:doc:`tc<../../networking/netlink_spec/tc>` use attribute nesting as an
-+:ref:`rt-link<netlink-rt-link>` and
-+:ref:`tc<netlink-tc>` use attribute nesting as an
- abstraction to carry module specific information.
- 
- Conceptually it looks as follows::
-@@ -162,7 +162,7 @@ then this is an error.
- Nested struct definitions
- -------------------------
- 
--Many raw netlink families such as :doc:`tc<../../networking/netlink_spec/tc>`
-+Many raw netlink families such as :ref:`tc<netlink-tc>`
- make use of nested struct definitions. The ``netlink-raw`` schema makes it
- possible to embed a struct within a struct definition using the ``struct``
- property. For example, the following struct definition embeds the
-diff --git a/tools/net/ynl/pyynl/ynl_gen_rst.py b/tools/net/ynl/pyynl/ynl_gen_rst.py
-index 0cb6348e28d3..7bfb8ceeeefc 100755
---- a/tools/net/ynl/pyynl/ynl_gen_rst.py
-+++ b/tools/net/ynl/pyynl/ynl_gen_rst.py
-@@ -314,10 +314,11 @@ def parse_yaml(obj: Dict[str, Any]) -> str:
- 
-     # Main header
- 
--    lines.append(rst_header())
--
-     family = obj['name']
- 
-+    lines.append(rst_header())
-+    lines.append(rst_label("netlink-" + family))
-+
-     title = f"Family ``{family}`` netlink specification"
-     lines.append(rst_title(title))
-     lines.append(rst_paragraph(".. contents:: :depth: 3\n"))
--- 
-2.49.0
-
+To me it just restates the condition, so not worth keeping the comment.
+You could add the explanation of the logic with more justifications to
+the commit message if you'd like? (perhaps you have it there already..)
 
