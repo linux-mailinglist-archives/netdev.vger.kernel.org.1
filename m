@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-210586-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210588-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC883B13F7F
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 18:04:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D19F1B13F7B
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 18:04:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0B7917A1B12
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 16:02:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 650E13B70CE
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 16:03:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A345276033;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B79B27700C;
 	Mon, 28 Jul 2025 16:02:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RT2bjzc+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pbeGIWVn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFE332741BD;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDA91274671;
 	Mon, 28 Jul 2025 16:02:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753718542; cv=none; b=Ng5JD85joUdncCxWDwWhmg40A7ch7dRtpiaGbWNQqZ7OAq8tBV7+5M9+6W6flqAjGZEZA1p90e/dUcjPnFfsQkQjdrbcBjCVsTrXBSAiPnDa/OynDL5iJSoELLPv0njqJXq2GyWj8M8vWT1bePVjMJFimB4bSxve04HGzolQi6Q=
+	t=1753718543; cv=none; b=qww0nfCgDiXNqN9RwJxNqh0EqDo6WOvn9+gWnNKX6RJYh+InNIRYRiix6ny2iVdl90jzNAsuhIqWMs7iiXI912iiLbWNhWjXQtnssSVbULShlItZ2gKx4iTUZqVAiFoJPoTY446zT70Ck7uvIlMQ5295AAXvM9msU8i/IQt8rmw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753718542; c=relaxed/simple;
-	bh=ogBoG80VZdRt95wsoC2snRc4eLHl6tjexBrTDr8vuXE=;
+	s=arc-20240116; t=1753718543; c=relaxed/simple;
+	bh=I9xfKt4o8uiH29LP7HMJc0AeFwdIlfRvdpCS3v7bSi0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=a3lLPE2ygM3t/dNA9c/GRDn4pQW4jdGgm8Ss6s8YKu3ITjjzTROpJmOAe/QwKyWxZFPWC3gt0RqdTZKOFjumydRiyEIs3/CGs02jxSUvMI64y8OAd93j2+P00oiDJHOCarMzdh94x8W2pWcAQ/HT23SAjH/Jaza/r4Le/nTm+aA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RT2bjzc+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24C32C116C6;
+	 MIME-Version; b=eEGh5ppZu/qpmaVtE+92Fi7yCL7WT/8Ax78Te2Y8PvfDdVTytCAvRxZI3CkYAorUFEPQTJiMCW5IWRHCM2YPrYB/uWpYmpw3oxiTxcICXvVA470VBTtzgy6GSS++opq1o5t07v5UKsH1o+4OYhdjkO4K9hhhm6NNF6fOmtGNP1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pbeGIWVn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D90FC16AAE;
 	Mon, 28 Jul 2025 16:02:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1753718542;
-	bh=ogBoG80VZdRt95wsoC2snRc4eLHl6tjexBrTDr8vuXE=;
+	bh=I9xfKt4o8uiH29LP7HMJc0AeFwdIlfRvdpCS3v7bSi0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=RT2bjzc+oeTp5nVMl3M4RFauOKtPZ7kmyZJ93oJ4DUv+m+vSG7Y6Zbn5JqkvIZlB9
-	 8DBNEXeAyvN+L/xERGkmUW0PROYgfTBxSzb0CVU+XUn7DzW3ZgNYrVKt7HGalyEYuF
-	 Y34ucS6FWlqV7vECKXnxlTQz613DaG6Zabv5APodcmiOB9ayIgtNf7YPwoUZWas02e
-	 Sbb19jcfDMt4MZMt3/IH61gv6AoqPF6m9457wPmMwHCMCIBsOcH4B2F00pUDxHDG0M
-	 NmBgaZSo9tztnk6uGRZQbICx63FjYGUnNQvKdsd0VsJFRk8XLgi2+tdlK52OLSh9Qb
-	 pu6JVnjRE2Hmw==
+	b=pbeGIWVnlZWehVcKLjOJZu2Bty8X8Ic9W+JMytrFnoScOd5VHg1tvQlATG8MFKALr
+	 b0IjAeXVGxmiJMt9eSONgrDWxLT0Y8Qso9Kjp5TaoK8b680xn3CubAtxl3XWhgKEIQ
+	 HZgS9YEMaLmhVHuuN4yAFgfO4g0BAJc3Cwhm3j0jfU4Zu3icB0mtWeKZJ+w00zKBPv
+	 8MJAgouNTqTS5a3s73GX15/Vc/+Unj85ojWsVEJ2CQIduqUXd6jkt7Lcl2/FA4Pt1n
+	 dVU9ik1c897bqlac8IMulzWC7Xqf4uOla0oXwB9KgZLM8FtQMFMxH4u1ERMonQ3l5L
+	 PQJ2V7KRtyyMA==
 Received: from mchehab by mail.kernel.org with local (Exim 4.98.2)
 	(envelope-from <mchehab@kernel.org>)
-	id 1ugQIq-00000000Gd5-1rq7;
+	id 1ugQIq-00000000Gd8-1xzg;
 	Mon, 28 Jul 2025 18:02:16 +0200
 From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 To: "Message-ID :" <cover.1752076293.git.mchehab+huawei@kernel.org>,
@@ -71,9 +71,9 @@ Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
 	netdev@vger.kernel.org,
 	peterz@infradead.org,
 	stern@rowland.harvard.edu
-Subject: [PATCH v10 09/14] docs: netlink: remove obsolete .gitignore from unused directory
-Date: Mon, 28 Jul 2025 18:02:02 +0200
-Message-ID: <8abdef54661349acc7d0240bcd1bb23c2f318548.1753718185.git.mchehab+huawei@kernel.org>
+Subject: [PATCH v10 10/14] MAINTAINERS: add netlink_yml_parser.py to linux-doc
+Date: Mon, 28 Jul 2025 18:02:03 +0200
+Message-ID: <c27f6113ba99e80427a77225d68061b34b6787d0.1753718185.git.mchehab+huawei@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <cover.1753718185.git.mchehab+huawei@kernel.org>
 References: <cover.1753718185.git.mchehab+huawei@kernel.org>
@@ -86,25 +86,32 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: Mauro Carvalho Chehab <mchehab@kernel.org>
 
-The previous code was generating source rst files
-under Documentation/networking/netlink_spec/. With the
-Sphinx YAML parser, this is now gone. So, stop ignoring
-*.rst files inside netlink specs directory.
+The documentation build depends on the parsing code
+at ynl_gen_rst.py. Ensure that changes to it will be c/c
+to linux-doc ML and maintainers by adding an entry for
+it. This way, if a change there would affect the build,
+or the minimal version required for Python, doc developers
+may know in advance.
 
 Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Reviewed-by: Breno Leitao <leitao@debian.org>
 Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
 ---
- Documentation/networking/netlink_spec/.gitignore | 1 -
- 1 file changed, 1 deletion(-)
- delete mode 100644 Documentation/networking/netlink_spec/.gitignore
+ MAINTAINERS | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/Documentation/networking/netlink_spec/.gitignore b/Documentation/networking/netlink_spec/.gitignore
-deleted file mode 100644
-index 30d85567b592..000000000000
---- a/Documentation/networking/netlink_spec/.gitignore
-+++ /dev/null
-@@ -1 +0,0 @@
--*.rst
+diff --git a/MAINTAINERS b/MAINTAINERS
+index b02127967322..f509a16054ec 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -7202,6 +7202,7 @@ F:	scripts/get_abi.py
+ F:	scripts/kernel-doc*
+ F:	scripts/lib/abi/*
+ F:	scripts/lib/kdoc/*
++F:	tools/net/ynl/pyynl/lib/doc_generator.py
+ F:	scripts/sphinx-pre-install
+ X:	Documentation/ABI/
+ X:	Documentation/admin-guide/media/
 -- 
 2.49.0
 
