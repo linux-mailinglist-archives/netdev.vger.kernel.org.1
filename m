@@ -1,138 +1,139 @@
-Return-Path: <netdev+bounces-210639-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210640-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 030CBB141C3
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 20:13:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFAFAB141C6
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 20:15:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 283AB162B66
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 18:13:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2BF603A8BFE
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 18:14:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87C2B221264;
-	Mon, 28 Jul 2025 18:13:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CF5D19AD70;
+	Mon, 28 Jul 2025 18:15:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="2WmjTozz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mn4UnRsG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A910D18FDBE
-	for <netdev@vger.kernel.org>; Mon, 28 Jul 2025 18:13:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0A102F56
+	for <netdev@vger.kernel.org>; Mon, 28 Jul 2025 18:15:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753726390; cv=none; b=WS+zeYTxnRP7piy34KuKUGFo5LIicJCgL13m1uNMm7bZr4oulkwux5GS6kDdriduRzNsPlPnhde0AqcwlXyySi7ICoG0J052j5bpxGJipoEe2tl8o6rVfudySNdmfnL8ctWcD8pfq/WNqtwf+QvXxZd7wI4LYIpCtDoAY9MECrk=
+	t=1753726524; cv=none; b=cT5iRXTcqZG+eWKb6ORSF7bf24MTt30ow8AJ5ocZLQUe0llOMAdxjoa1myJ6UlIa23BloT5naqEjeBhp2wfi+BQ7u0Jj0sTH1x3Yjt5CLh+0XTGgAdh1dzA5KsWO1E8aAF0SqbeYZXsuRXftXn9aW3B+7LT1NoVe6n9hKxku+bQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753726390; c=relaxed/simple;
-	bh=OlqEEkbvwte6AnCgyeLK/LWGj/oL1RODdyBWXYTL0KM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AgY1riEOZX1nkV60YHsed+ShSNkQHSfRRaUzBkksybCNutNGVUG3661bcOcGwhVV82SyRomWBNmJtxS2eL9v8fZUq1kWShzV0ROySoGpeWZHtQbHzTl2iYfxfEHydgmJOl2c2S53A2B0c5hKOw+KYENIoUrKWhsM7yjxie9OT2U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=2WmjTozz; arc=none smtp.client-ip=209.85.160.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-4ab60e97cf8so58878661cf.0
-        for <netdev@vger.kernel.org>; Mon, 28 Jul 2025 11:13:08 -0700 (PDT)
+	s=arc-20240116; t=1753726524; c=relaxed/simple;
+	bh=UnNoLvcqby/AXC2wRhJtbbIz5cI7bNawbd3DeCHbhO0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kvSlPzlfTydDQuclUGyE5yihUBs07bI7Qzco+BHmVEGwSGv89kJFVw2crTDQifjDs+bGxXFFrzhuxmqmH70U1jLHfu/H0HDd8Mfjq0Hp7Om3iU9d8PfApboymDBPlsSanDmEGjI7GNvHlbtReDRpGhrMSIB1vX8L2jcFuv30Bpw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mn4UnRsG; arc=none smtp.client-ip=209.85.166.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-3e2ab85e0b4so1158805ab.1
+        for <netdev@vger.kernel.org>; Mon, 28 Jul 2025 11:15:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1753726387; x=1754331187; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KTpC0yebuj/6W1UbrTwes2FGfVXy9HegcJDQSz0DLmU=;
-        b=2WmjTozzsZQjQYbegGqcy07mIe4VviufA5AfI3lLZBXNGi7RxVp4xZvRlYsA80KS0M
-         NUwMXZPdSytgTpsnqq6bRXgae5pxgDGc5u3eWgURAWMoBs3JG5cTcjrqCKb2PgKTkw1B
-         PHJTMK7b4JXFKG9sXk5P/gsb0RVGB1MkkL+m1fRfTbIIvDklHOrPriPYTViTTTL0LzcE
-         F1tblg027ZdtmF0SbGRLaFh6f2Uf7VLGtKP1qj4FXuDEICe1+OMPvrVmVPvhbgRkw1JT
-         lR5cIi1J5yGROKva/PgDA0F6tCtNU+tyvq8U6hGJ0opunN6AEZfsVJJp5LN+n3iTtHos
-         Mbkg==
+        d=gmail.com; s=20230601; t=1753726521; x=1754331321; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Dk0sIdk7+FbFHz5f62Zg+hacvogZgQoEIWE9iCUDLWY=;
+        b=mn4UnRsG50obeiYV60r083bKmJ6Ro/aLnWsxEZUv82cYJW+BfaoHTA0KAzqYQY7pOs
+         L4YlBmwwWhga6wHjB9VEVMiroS2Mv+uWzF8DSXAhOU+wWteUQUeWtTVYVNfAgaPGgNwq
+         97cE0DGhq1TXJiWMYDnvjVhAy5/Fgm3Zzfv1xuCYCwMKl6vlPXJEEPkf+WciV0sfHBQI
+         LoHUDj4GA9HlOH3toAS41RLo5COXvrWevJS2CH/eTDk96nXl3XZegzI3Q8p51IWPFfse
+         4IxhzdsBO2RmSABzwRObsCzvhwYdWoqH2oXDPXcFnq3M64JoAyn5RYyaXpnQ4Z6ja6Nh
+         xPhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753726387; x=1754331187;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KTpC0yebuj/6W1UbrTwes2FGfVXy9HegcJDQSz0DLmU=;
-        b=GV3ne8e0LylrxI4un++g1EiEwG7tn8mjieAqejgG9tprWE5coTymzcZ8DnWdor6b7f
-         ooFGnWq9FqUzQ49PZR4rKsw7Bykh4aL3OLFhC+nNw0IwVr12Fw9JaxAiQDghPjDQ+VD7
-         fI0ACJVPDINhJiteGMNms+3bS2/LikKMJrh123YwCJvHudcXuXM3AAphefOl2etX0zr6
-         w56ym7e/MflG7ntOVfpgC3x398CQhaieFlQC9Z5lShuxJGShmO86n70rk4F6T5VDioH0
-         d7nB29VzHDr/H2RUK8dWW0qsjbn5QWJa8r6MfTGCwUvVeqsAgeFsWApF793xZt8eTwER
-         D71A==
-X-Forwarded-Encrypted: i=1; AJvYcCXKhpmhmF2jQ08CYitWRv9UeW8hop9EswJdIV2ZJ7EbEAktIqHQ/44cFTAVGtPTJIElGgty4VQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyzova79UIaRwU5NYwafRuNuPMOSi/ZtAtIAeS3Er6/1P4Tu9C1
-	riik5PgtlEZwkO3Gz3AKQDALmNo9Od0RixJankUV0IEHGamqxSznG8ajNob/4dgDlDw=
-X-Gm-Gg: ASbGncvb57XZIGI5U2LTl0T5VPNxLQApuY+kwPjxP1qLVuNxR6sXD3O1LRy5uyGc8Ms
-	jVLm80Iqn+XdqzVJPmIdLRpjUXDlzMYJ+3svmYqPfHk6f5L0KXGBRa57ZjDWonBQ2ywJgAKJuLk
-	WhcTMoSRitftdmBg4WtC4xTPE5lAI3Uu6Nl/096FwKhNmGdzup9r2P1gQQg0lLKKlesJn51FVSU
-	6WIlai+Q4F8SLmUPClhh8vHyM2kmT8OJ7KyBR9mG6Ym3L3f+Bx5CDQPGZuL+1JvsuNxklrWMAGU
-	kSjzpHk/S9VYJB0FdebNZRcxWacxkdeoOL9NvNBtrHvzBXbOdmQPKkcm1r6hxNdNUQU97gsX4dL
-	WDIb1pnQ6xV2dbRncIEc4ONPuaJ9irG+vWGIYGGyL/lvJ3b5Wz6BTbr5SbUVo8RIpW7DkWqxC6J
-	Q7vbHyDm7irw==
-X-Google-Smtp-Source: AGHT+IEjLVd1/EiA8TbHwzh9av9MrUC97c8DtzNYcHm0kSuZZP1gLueDT4IMRyHPlgrecbcvRPio/A==
-X-Received: by 2002:a05:622a:614:b0:4a9:af3b:dcfa with SMTP id d75a77b69052e-4ae8f1c62a2mr148187391cf.48.1753726387147;
-        Mon, 28 Jul 2025 11:13:07 -0700 (PDT)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4ae9966c3cfsm37037221cf.48.2025.07.28.11.13.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Jul 2025 11:13:07 -0700 (PDT)
-Date: Mon, 28 Jul 2025 11:13:03 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-Cc: dsahern@gmail.com, netdev@vger.kernel.org, haiyangz@microsoft.com,
- shradhagupta@linux.microsoft.com, ssengar@microsoft.com,
- ernis@microsoft.com
-Subject: Re: [PATCH iproute2-next] iproute2: Add 'netshaper' command to 'ip
- link' for netdev shaping
-Message-ID: <20250728111303.301f61f2@hermes.local>
-In-Reply-To: <1753694099-14792-1-git-send-email-ernis@linux.microsoft.com>
-References: <1753694099-14792-1-git-send-email-ernis@linux.microsoft.com>
+        d=1e100.net; s=20230601; t=1753726521; x=1754331321;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Dk0sIdk7+FbFHz5f62Zg+hacvogZgQoEIWE9iCUDLWY=;
+        b=nMYJLzSFc+V1EJb8chUIw91QhWFEnCsxcqccadAvZ2CeAVhbh+h0tOdFmkAwRMcZD0
+         dfuhU73UmzA8I0/Q3Y3tDn1DUCkgq5gfrN7076f5tbmam09PO/cmwBIGUDV+6MTqflLx
+         dC7a+ZxTmWWe82ADYcH3AGOc0RlGNwO2RJdPcn5+R10D76k3hbdeJS87y/szibEA0SOh
+         UXvfkz+hIi71tAeF0HKeHxasnKlZDYAWWA9yTetMYGMQmwhG+pFPHEj8Iq1et3bfhHeG
+         TGCMijRnF6nobQgZepRcJl1dSzFdTR/4qjGF2rV0Njs2+tw1hdflyb4lbFWPncSnU9AZ
+         Q3Pw==
+X-Forwarded-Encrypted: i=1; AJvYcCXXG3hhhdC51IuugGP2X+EIvBmOvqqSmLYrU2VkylAcdylu46e0O21Z3dt97h09bDANJ919BzE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyIJqx6o1L0bTtZ8ImggYeuQplUuVc3G+CNa0+gQxB1zcEru+QQ
+	+9HXXuydH9/lYimMzL0RzHe1mE25tm2cqRWSKW7ue93pukv6mtfNshr7/2SXWw==
+X-Gm-Gg: ASbGncvh5p0e3LEshFHa8IVGpbGDxCQ/eVg/+So/jCIz9gCVgmm91v/l7+Dcy5zVF+1
+	zUKhXwJIGZpkj9M1x026SKdNOpXLtRhXITPM5fJiE0rfprceeF7sIVqaSwzz621qqlWnKkib6s0
+	DOrOwxPpFjXzAhRsb29dElHONW3FTMwVf28sp2KA60fssRnVMrtKomyHfsOCehPnPUfIT4ftFZn
+	TBa5rRwx2pJ/nw2KkK9fF+i5ZlJ5keyT6n/F65EoHkVCtbstLvN6cXh6MVyMC1sHsphnuTmlzTk
+	Yb/+zGziPjCAtaJTFN7/qDxC+KdGxBzziJvX663O769oBJjrLcJdFHlVqHDoVCHXXk+AaRjXgQ7
+	dcOsNOVLvIPnfmSVNfBeOCe0XYHtySice/LGISTaMF6VPIFyRCs/SyaR9G3LWzty+T7Gdne3vwd
+	1bFFUMbEU5
+X-Google-Smtp-Source: AGHT+IHwfSFeuAVqPCZjXFPJP61dr3UmRekmwTdvPKLnlkf0U00nXJRCKDowdacBVxakjRM7Y4BQ5Q==
+X-Received: by 2002:a05:6e02:1b05:b0:3e3:b4ff:15e3 with SMTP id e9e14a558f8ab-3e3e92eca13mr7910215ab.4.1753726520688;
+        Mon, 28 Jul 2025 11:15:20 -0700 (PDT)
+Received: from ?IPV6:2601:282:1e02:1040:1122:1338:f1d4:15b5? ([2601:282:1e02:1040:1122:1338:f1d4:15b5])
+        by smtp.googlemail.com with ESMTPSA id e9e14a558f8ab-3e3e4b013a2sm3988965ab.19.2025.07.28.11.15.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 28 Jul 2025 11:15:20 -0700 (PDT)
+Message-ID: <796ca41f-37a1-4bdb-9de2-e52a2c11ff49@gmail.com>
+Date: Mon, 28 Jul 2025 12:15:19 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iproute2-next] iproute2: Add 'netshaper' command to 'ip
+ link' for netdev shaping
+Content-Language: en-US
+To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
+ stephen@networkplumber.org, netdev@vger.kernel.org
+Cc: haiyangz@microsoft.com, shradhagupta@linux.microsoft.com,
+ ssengar@microsoft.com, ernis@microsoft.com
+References: <1753694099-14792-1-git-send-email-ernis@linux.microsoft.com>
+From: David Ahern <dsahern@gmail.com>
+In-Reply-To: <1753694099-14792-1-git-send-email-ernis@linux.microsoft.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On Mon, 28 Jul 2025 02:14:59 -0700
-Erni Sri Satya Vennela <ernis@linux.microsoft.com> wrote:
+On 7/28/25 3:14 AM, Erni Sri Satya Vennela wrote:
+> Add support for the netshaper Generic Netlink
+> family to iproute2. Introduce a new subcommand to `ip link` for
+> configuring netshaper parameters directly from userspace.
+> 
+> This interface allows users to set shaping attributes (such as speed)
+> which are passed to the kernel to perform the corresponding netshaper
+> operation.
+> 
+> Example usage:
+> $ip link netshaper { set | get | delete } dev DEVNAME \
+>                    handle scope SCOPE id ID \
+>                    [ speed SPEED ]
+> 
+> Internally, this triggers a kernel call to apply the shaping
+> configuration to the specified network device.
+> 
+> Currently, the tool supports the following functionalities:
+> - Setting speed in Mbps, enabling bandwidth clamping for
+>   a network device that support netshaper operations.
+> - Deleting the current configuration.
+> - Querying the existing configuration.
+> 
+> Additional netshaper operations will be integrated into the tool
+> as per requirement.
+> 
+> This change enables easy and scriptable configuration of bandwidth
+> shaping for  devices that use the netshaper Netlink family.
+> 
+> Corresponding net-next patches:
+> 1) https://lore.kernel.org/all/cover.1728460186.git.pabeni@redhat.com/
+> 2) https://lore.kernel.org/lkml/1750144656-2021-1-git-send-email-ernis@linux.microsoft.com/
+> 
+> Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+> ---
+>  include/uapi/linux/netshaper.h |  92 +++++++++++++++++
 
-> +
-> +static void print_netshaper_attrs(struct nlmsghdr *answer)
-> +{
-> +	struct genlmsghdr *ghdr = NLMSG_DATA(answer);
-> +	int len = answer->nlmsg_len - NLMSG_LENGTH(GENL_HDRLEN);
-> +	struct rtattr *tb[NET_SHAPER_A_MAX + 1] = {};
-> +	__u32 speed_bps, speed_mbps;
-> +	int ifindex;
-> +
-> +	parse_rtattr(tb, NET_SHAPER_A_MAX, (struct rtattr *)((char *)ghdr + GENL_HDRLEN), len);
-> +
-> +	for (int i = 1; i <= NET_SHAPER_A_MAX; ++i) {
-> +		if (!tb[i])
-> +			continue;
-> +		switch (i) {
-> +		case NET_SHAPER_A_BW_MAX:
-> +		speed_bps = rta_getattr_u32(tb[i]);
-> +		speed_mbps = (speed_bps / 1000000);
-> +		print_uint(PRINT_ANY, "speed", "Current speed (Mbps): %u\n", speed_mbps);
-> +		break;
-> +		case NET_SHAPER_A_IFINDEX:
-> +		ifindex = rta_getattr_u32(tb[i]);
-> +		print_string(PRINT_ANY, "dev", "Device Name: %s\n", ll_index_to_name(ifindex));
+the file in the kernel tree is net_shaper.h? drop it from the patch and
+ask for it to be added to the uapi files when posting the next version.
 
-The display in print is supposed to correlate with command line args.
-Use color for devices if possible.
-
-> +		break;
-> +		default:
-> +		break;
-> +		}
-> +	}
-> +}
-
-Indentation is a mess.
-
-Iproute2 uses kernel coding style.
-Suggest using a tool like clang-format to fix.
 
