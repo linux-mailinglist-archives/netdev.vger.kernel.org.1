@@ -1,253 +1,118 @@
-Return-Path: <netdev+bounces-210520-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210521-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 005DDB13CBA
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 16:16:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0828B13CCA
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 16:17:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC04817EC46
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 14:08:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D2F5D17FE4F
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 14:10:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05C461A5B8B;
-	Mon, 28 Jul 2025 14:08:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B2D0266565;
+	Mon, 28 Jul 2025 14:09:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="aMu0BL8y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iAjRuZ9/"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2057.outbound.protection.outlook.com [40.107.243.57])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com [209.85.219.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63E6A433C4
-	for <netdev@vger.kernel.org>; Mon, 28 Jul 2025 14:07:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.57
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753711680; cv=fail; b=W4dsUcSPNPOcFExR34jSR+2ubtmYR9hq3fLX9LVnAux2LkzZmopYsAvVr/9rx/osOJdOw7nKC/5GEmEEQFURxiPMnouqsp/MtYXgHe1v6Ogi/2fraAY9OXc31fI47/rLBkX7Oj0o5MxBwCewjZGzbi6tCWJl8CLowsbeXClbo4s=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753711680; c=relaxed/simple;
-	bh=DbxMMdW4LkwG81HyV3zAblPlaDWG+3Zt9At4U+n1KkY=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Vy+ap5rq0Ird7ckQ6MQixBV12/czYbmtdLOY/AlXSYW0eTorQAIRvJzyI0BKpMQMeMWdkQjfcpTTsRyOrWnMzWzjhPWpRggrG2oafkVDiZyxQ8rNlx/l7pXRDo5xP1rq9ZDToRSZbV2k8ECOk5qaO/CCI4fOQ6ro923SUSRv/Mw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=aMu0BL8y; arc=fail smtp.client-ip=40.107.243.57
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=IwIxgk72STJ78VtM+YA/jmpz6c4X6WsKyCcfuuKuVkIhud55MRcCANc8rXWNW3QES0YisiLd5dJhtocxaggP4KmDw14XOVRwtLJwlLkWO4FGmUkC/l0HdZcHrnadPkVQX6AmrZfSObUb+vGuoKlRRyGVUrlO+BvFwV5ct4L/4Vm43YJ59yL7jGlUd9EpG7Hmxf8e690tDJJy+4ca5kejAg7XyIC8FkmNMiGgV2OFmEgHSJWUXwPlPxWJS1MXJL2EgJeBgRhDSB69LH8hY5sxkMoj4XdkvUl0CvwRBtcELAqS97YmH9AA43/P6EOZhXZM9SoRmfvLkgOS93hHWh6uIg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=g+2VxpoLHSYaEVg+XIVPbvjWV4Vo0zas+lApOEbX/G8=;
- b=FkXr1ehpc8sauel9M96iuAHOBN45kHS1qelY4ipIYY05O7iRxt9eshE9kkZA45/AIUcmAs16zuU+g99KRrFhpTDJdz5BOJWmYmZaonEYtk6tluJrH+vnHtmbWiAcLFQLbI18+x3tnBDidStPRlm+b+Bb0pAB4pHjRGqZA4D8nkmxG9fj6a5D7tqBbliJ9xIZf2GixddPoa8b5VOsJZ0VwwE9AWkJoh+SBSxfvgN0v7MFZ9qV/kQkc4zk7Z4TZZcZJo9s9rmzzBy0+12vJx1FzQ/rKO0LJixHap4JrGkKEHFg7pwFffLi4frrGctP7W4E9GYdnS9SrMnvKgtuA4Mhpg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=networkplumber.org
- smtp.mailfrom=nvidia.com; dmarc=pass (p=reject sp=reject pct=100) action=none
- header.from=nvidia.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=g+2VxpoLHSYaEVg+XIVPbvjWV4Vo0zas+lApOEbX/G8=;
- b=aMu0BL8yzYV3WJC36t4xDM4BaEx9e/DzhCOF3DM/ZVkQO5Wd8Wo0FY3l/HjI6BH30jzZIJwVFAT19L+GQVPqY5NowdbFyhgUZEfcTbcv/h5OJUXDaVpWSliF6hAYBnxmanDzZ8toAq/WNEFeFPOfXXUIfFog70vWXkgZKYaD4539Toks7KOQN7DBoNut889KRlEAZcyYaMgeCvSFqBtpiFTxkL6mKFy43D6SHjidSb7qIapeXG2EzdY7JPFYlLX+cmqwvqiSxeX049kJIJjfrsYCQzVNjcloGcxYJFQeY9vF2/3JXsIqFIitB+QLLhhhpv74IfQdzCFimeQRg9BmgQ==
-Received: from DM5PR08CA0025.namprd08.prod.outlook.com (2603:10b6:4:60::14) by
- LV8PR12MB9261.namprd12.prod.outlook.com (2603:10b6:408:1ed::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8964.26; Mon, 28 Jul
- 2025 14:07:48 +0000
-Received: from DS1PEPF0001708F.namprd03.prod.outlook.com
- (2603:10b6:4:60:cafe::5c) by DM5PR08CA0025.outlook.office365.com
- (2603:10b6:4:60::14) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8964.26 via Frontend Transport; Mon,
- 28 Jul 2025 14:07:48 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- DS1PEPF0001708F.mail.protection.outlook.com (10.167.17.139) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8989.10 via Frontend Transport; Mon, 28 Jul 2025 14:07:48 +0000
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Mon, 28 Jul
- 2025 07:07:26 -0700
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by rnnvmail202.nvidia.com
- (10.129.68.7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Mon, 28 Jul
- 2025 07:06:35 -0700
-Received: from fedora.mtl.labs.mlnx (10.127.8.11) by mail.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server id 15.2.1544.14 via Frontend
- Transport; Mon, 28 Jul 2025 07:06:34 -0700
-From: Carolina Jubran <cjubran@nvidia.com>
-To: <stephen@networkplumber.org>, <dsahern@gmail.com>
-CC: Jiri Pirko <jiri@nvidia.com>, <netdev@vger.kernel.org>, Tariq Toukan
-	<tariqt@nvidia.com>, Carolina Jubran <cjubran@nvidia.com>
-Subject: [PATCH iproute2-next] devlink: Update uapi headers
-Date: Mon, 28 Jul 2025 17:05:54 +0300
-Message-ID: <20250728140554.2175973-1-cjubran@nvidia.com>
-X-Mailer: git-send-email 2.38.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFC85450F2;
+	Mon, 28 Jul 2025 14:09:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.180
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753711798; cv=none; b=F0MXzcf7OO/YpX302LThu+XPMm7ogrnBJULOhkVgvzOaEC0XawQ1+0+/Z+KeoGmHwVf6DDXRsRYpQb8QeQ239QmaoFz5tjGbO5pJUcEG/KuB0spENHjkzLXyJgdz27sFP2C0O4kq4x/5rgsEn+70lbMHVVjp22h3es7SFnM2zvI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753711798; c=relaxed/simple;
+	bh=NDjCc8R452PUdjbuVaahxAj5XeqbSdHCMwjSCoOTiiw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QBca8g0mDEm5ftibh0QL5u34MqW5SB69UGERphjCqGCEjKbwVXa5FV/yvLmTgOddKdIiKkAuLMwDVi4HGh7f993O3DtBxQTXzuqN60bhpDnvDXWclxwUAPVWwAAGFQcBT4PHaAVsSwgjZs8bz85yhpgwPsmzcWhUZjKc/4LD6wY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iAjRuZ9/; arc=none smtp.client-ip=209.85.219.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f180.google.com with SMTP id 3f1490d57ef6-e8bbb02b887so3816341276.3;
+        Mon, 28 Jul 2025 07:09:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753711796; x=1754316596; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3ReXTO4NOQ1zUGOlq4RJ21yg9LAY5yfcMlvjneoaw50=;
+        b=iAjRuZ9/4S7BA+/07Y3mD4G5382TMKrIVj1Qkskmw0OlcPH+1P/WnTZYO7UnmwZve6
+         rCj6dvhtCQ3iqHyUAaZ8tdGjAocdJG5NfIMoQnmdmPcujmQNeyNDTTIWh2ohTS+ip7em
+         P3tS9FnUHCRyhsyJRWe3hiyRIEuYPJPS5piAImdNNytKw4UW3Sv1D/aGOUwXs3PryRE4
+         w/30v0KwupJdiXbisLaE7grEM2iPTEbW8a1E2P26g8rLhBPfzM/IrhhLCrDw8y9ya8ZA
+         yal9C+Ke/+O5zdnQUQaMHgv6XIIE3pUfG2itUlJOi9K21PjqapG8nf81je2sJJJyAyVR
+         BBCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753711796; x=1754316596;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3ReXTO4NOQ1zUGOlq4RJ21yg9LAY5yfcMlvjneoaw50=;
+        b=Myy3+dL4bBv4BPfC1C/Z3srGM5/Qs+ScbDDwO8iUWGwS7muCa4dsK1L8CEOuIz2giw
+         O2kbadnQ5CBzdbCF+VKJimmTCQcx+ZjSemxMsy8sR+6fKxXsGRMEC2AAMNsbLSJemgix
+         It/HINMzUFxh1gTQl3+4fpwDM9XEfd+7byanEDdXn/uAZniHYnRHAfvRx0g+OTdaj3wX
+         9pvTOoqZU6e8I1REQ+JZ7H2LA/PV4pxabqADLEwe5hKUNSuznplg3mkWYFPKMnS6QKus
+         hlShKDM2Zt7FdKPBoVGQyjjr+sQ1zU92yvpqzzTSSv+Q3qL3/aWCAUBVa2qGWy7dO/0/
+         I3gA==
+X-Forwarded-Encrypted: i=1; AJvYcCUghurWuZzseJ57JSm4SBfio/tdZCvDpjQA0vOfogMu0qVcQCtRVVAeQbUGt464GCRJx6ho7NfV@vger.kernel.org, AJvYcCWqyxqUhzXwyQZCB6T4vWk7hZcx1BjsemG08Tl4EpKVNQczPuajMUnpLlsrhcvXa1oIDzW/b6EyZAcKfuQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx08xcEX7mUbmkCYmY37uZNv9SCMgnpE3DNOI/TsIhFXLbfxm/u
+	y8haLLBMI05lBAGwEwI9bZpEfJAEMN3Aw3k/Q6oECoJb25nOuA0bS9wS
+X-Gm-Gg: ASbGncuTlL6f0YpnTEQjGIsj9L85Jcl+jy4ScLi1JfTNKPK+lbQ396lnp2V5avAHB3A
+	TI4dBAjJpVf0sp506SfHizHEcjY65107/DZdsL1Khg2jSILMyp0/EGcTbnnhQGmuweyDmvOhiMX
+	/inBt2XFFZrlR6/6GNiZQlRJ+BtootUTLW3PpAGH0GrkJsw6Kui8XjCWzuKdsbMpfgVZPwo6Dk+
+	0ZkC729kDs7xpVqh7Fp2Y5vNf7xwQypbGgKc5zDHvrgDwJYY7XDkGfSlmkpnMdBl5/HT1Tn0k7U
+	+H6gCX0xGjov7T7dJyWxsUV7tmoJTp8w7a9SqHlZaRM5Q0Xi59jJSzOISBwGpohKGVbWQgi8j8o
+	idCwLMhvBPzoFGUD+tQTnDdzQ/iMTGMbIeb4jKgR0Mg==
+X-Google-Smtp-Source: AGHT+IEmbcnDjPEVNHVDOcgbY6/zgEo1s/qZUk6+0wtVgdFvPw21hS4A4TmSd1+Eue8XTrBzHOlhvQ==
+X-Received: by 2002:a05:6902:3401:b0:e8b:79cd:ef1e with SMTP id 3f1490d57ef6-e8df138968fmr12541917276.47.1753711795565;
+        Mon, 28 Jul 2025 07:09:55 -0700 (PDT)
+Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
+        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e8df87056ebsm1987427276.40.2025.07.28.07.09.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Jul 2025 07:09:54 -0700 (PDT)
+Date: Mon, 28 Jul 2025 07:09:51 -0700
+From: Richard Cochran <richardcochran@gmail.com>
+To: Jeongjun Park <aha310510@gmail.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, yangbo.lu@nxp.com,
+	vladimir.oltean@nxp.com, anna-maria@linutronix.de,
+	frederic@kernel.org, tglx@linutronix.de, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	syzbot+7cfb66a237c4a5fb22ad@syzkaller.appspotmail.com
+Subject: Re: [PATCH net v4] ptp: prevent possible ABBA deadlock in
+ ptp_clock_freerun()
+Message-ID: <aIeEr0ScB32ysLPu@hoboy.vegasvil.org>
+References: <20250728062649.469882-1-aha310510@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: AnonymousSubmission
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF0001708F:EE_|LV8PR12MB9261:EE_
-X-MS-Office365-Filtering-Correlation-Id: fcadf809-fbc2-4193-dcb3-08ddcde02213
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|82310400026|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?PbDZRc//ey3WncH6PUvlOM+7aOxmmzmZUWx6QIDjmQBhJeiL9slLT5Oq8PCV?=
- =?us-ascii?Q?WMh3JKul9SW/h8tpzBOn3yLIVRz8aU5aZTgXjNzdCJONQs2A9kigGftWTEmg?=
- =?us-ascii?Q?6TnXXHHqzzns6oFujanh01bKP1mLnzm/QbC7lwQicu9zD1nvvU3IrK+bg2hG?=
- =?us-ascii?Q?fiOCbIZBTgGeOBpSdfkOZ7ZmH6oWXFMZJ3Xp88mxTVR4eO93scqygVC6xKOD?=
- =?us-ascii?Q?Xqke0HAJnvOzYm1hR0QercN0HEaZajiPRBUoItahFAmTujBcWaS9fmONV0OG?=
- =?us-ascii?Q?cU3rV+u6kq39FhaV2ktTgV+zmkwRMUOkYqtNUnI3ipXSKrBFX1qWZqSzLvag?=
- =?us-ascii?Q?tkvR/RJ4rGZg1mnCsTcXOmqYgVFy7DEdyqxOT6S8HutkVdBCMUFc/7j45bmv?=
- =?us-ascii?Q?w9uQ6eVXII0dkJWuZm0ZcCKG8nPzPSZeIHtE74ZLpbpgnr0fZe4QfGGYt7zW?=
- =?us-ascii?Q?njlQacEOJtnRz6F1xV5rNoqhNkcAQQF0Z/U9umT3tCfcRKSfoxiUxFkRK8Yd?=
- =?us-ascii?Q?qU1ODlgzV8EhfCXyqvAnChxzzVTFOwJ44XjHQSOsCBuGNVd5hNmCm90Cec6d?=
- =?us-ascii?Q?6+yk5i5PaoeXdtFDVibXiAQlI+WsfBfY8oAmo5doJ6RkWIXoworn8bGQcV3/?=
- =?us-ascii?Q?yLtRg1WjGl8fI9hCww/c87ezKKBMyD3szAhOXaM/WFX5UVEWEKVg2vWsN1ah?=
- =?us-ascii?Q?Pi4mov58gxKEhmWM9Ib1/2yR1V8d6A73iopRTjv2RTZWcMk2K2EdWOsSHwN2?=
- =?us-ascii?Q?Fma3Jy1Nrf+doUi2u6+vt3IBrsdCfW5Ty3zSP7uxqesn2Tk8SvrcnTEHv/J0?=
- =?us-ascii?Q?lolJlKXSy/WgwKnlouL1gofE0X2fdncuYJmr3BU2m0dLb9/u6qoYE7PpmQ4r?=
- =?us-ascii?Q?oV+Smk6oIq/Foz9qcvY06i9tTMJs89kG0BdNCfKQhqcabjLSNCW+3iz1wNSW?=
- =?us-ascii?Q?hLAbZ71TldNKRHNswxAx7gduiLfAjVgSYuifgr2cEDJn26ldmWxU8zzWSe4b?=
- =?us-ascii?Q?7IHUYyytHvioTtYn8gwjs/SaZmnts6XQcQIeTyZUXSlFGH+QDt8JIW0g/lbu?=
- =?us-ascii?Q?lPbYIy106EFNhOxXfiWmBaw36fAtgw2W73AwHEcnyJyTS7o89ECadKYVxtR0?=
- =?us-ascii?Q?1T1CI4pvUty3RhzkhFq4qoePWkkuozFjOAO4xQKp9A7s8Jb4fAB5A+N1+wqL?=
- =?us-ascii?Q?je8wftb36wAcL2+Ts5ptRnU/HwWseJiXnebX9RL1touUeSdIPS06KQj8L/bQ?=
- =?us-ascii?Q?vsO6EF0qX8ffA5oLdbmES2wBdDEs2ffgacpKkrIC8uSfkK843BpKmflsY+sz?=
- =?us-ascii?Q?X08QRHhbtS/lmuxKE/64AACM8rY+pwES88Yp2d6fSvlcc7Xf1tPsfgarvDVk?=
- =?us-ascii?Q?nWiwB47ad+tjgN1z859+PzHLw6jydRONOEMWrVNG5VFirjL4lacFZ8hrtS6T?=
- =?us-ascii?Q?MzSGxeexjYAosxues4EkEK56BPwJnblGEPfDl4QDjJ7N7opTvwlSQM1KM2Pv?=
- =?us-ascii?Q?zmX6nABy/e/2OKwLkNZdJVo+EMlkO40wehaY?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(376014)(82310400026)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jul 2025 14:07:48.3082
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: fcadf809-fbc2-4193-dcb3-08ddcde02213
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DS1PEPF0001708F.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR12MB9261
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250728062649.469882-1-aha310510@gmail.com>
 
-Update devlink.h file up to kernel commit 1bbdb81a9836 ("devlink: Fix
-excessive stack usage in rate TC bandwidth parsing").
+On Mon, Jul 28, 2025 at 03:26:49PM +0900, Jeongjun Park wrote:
 
-Fixes: c83d1477f8b2 ("Add support for 'tc-bw' attribute in devlink-rate")
-Signed-off-by: Carolina Jubran <cjubran@nvidia.com>
----
- devlink/devlink.c            | 39 ++++++++++++++++++++++++++++--------
- include/uapi/linux/devlink.h | 11 ++++++++--
- 2 files changed, 40 insertions(+), 10 deletions(-)
+> However, when unregistering vclocks in n_vclocks_store(), the locking
+> ptp->n_vclocks_mux is a physical clock lock, but clk->rwsem of
+> ptp_clock_unregister() called through device_for_each_child_reverse()
+> is a virtual clock lock.
+> 
+> Therefore, clk->rwsem used in CPU0 and clk->rwsem used in CPU1 are
+> different locks, but in lockdep, a false positive occurs because the
+> possibility of deadlock is determined through lock-class.
+> 
+> To solve this, lock subclass annotation must be added to the posix_clock
+> rwsem of the vclock.
+> 
+> Reported-by: syzbot+7cfb66a237c4a5fb22ad@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=7cfb66a237c4a5fb22ad
+> Fixes: 73f37068d540 ("ptp: support ptp physical/virtual clocks conversion")
+> Signed-off-by: Jeongjun Park <aha310510@gmail.com>
 
-diff --git a/devlink/devlink.c b/devlink/devlink.c
-index fe0c3640..171b8532 100644
---- a/devlink/devlink.c
-+++ b/devlink/devlink.c
-@@ -2773,8 +2773,8 @@ static void dl_opts_put(struct nlmsghdr *nlh, struct dl *dl)
- 			nla_tc_bw_entry =
- 				mnl_attr_nest_start(nlh,
- 						    DEVLINK_ATTR_RATE_TC_BWS);
--			mnl_attr_put_u8(nlh, DEVLINK_ATTR_RATE_TC_INDEX, i);
--			mnl_attr_put_u32(nlh, DEVLINK_ATTR_RATE_TC_BW,
-+			mnl_attr_put_u8(nlh, DEVLINK_RATE_TC_ATTR_INDEX, i);
-+			mnl_attr_put_u32(nlh, DEVLINK_RATE_TC_ATTR_BW,
- 					 opts->rate_tc_bw[i]);
- 			mnl_attr_nest_end(nlh, nla_tc_bw_entry);
- 		}
-@@ -5467,20 +5467,43 @@ static char *port_rate_type_name(uint16_t type)
- 	}
- }
- 
-+static const enum mnl_attr_data_type
-+rate_tc_bws_policy[DEVLINK_RATE_TC_ATTR_BW + 1] = {
-+	[DEVLINK_RATE_TC_ATTR_INDEX] = MNL_TYPE_U8,
-+	[DEVLINK_RATE_TC_ATTR_BW] = MNL_TYPE_U32,
-+};
-+
-+static int rate_tc_bw_attr_cb(const struct nlattr *attr, void *data)
-+{
-+	const struct nlattr **tb = data;
-+	int type;
-+
-+	if (mnl_attr_type_valid(attr, DEVLINK_RATE_TC_ATTR_MAX) < 0)
-+		return MNL_CB_OK;
-+
-+	type = mnl_attr_get_type(attr);
-+
-+	if (mnl_attr_validate(attr, rate_tc_bws_policy[type]) < 0)
-+		return MNL_CB_ERROR;
-+
-+	tb[type] = attr;
-+	return MNL_CB_OK;
-+}
-+
- static int
- parse_rate_tc_bw(struct nlattr *nla_tc_bw, uint8_t *tc_index, uint32_t *tc_bw)
- {
--	struct nlattr *tb_tc_bw[DEVLINK_ATTR_MAX + 1] = {};
-+	struct nlattr *tb_tc_bw[DEVLINK_RATE_TC_ATTR_MAX + 1] = {};
- 
--	if (mnl_attr_parse_nested(nla_tc_bw, attr_cb, tb_tc_bw) != MNL_CB_OK)
-+	if (mnl_attr_parse_nested(nla_tc_bw, rate_tc_bw_attr_cb, tb_tc_bw) != MNL_CB_OK)
- 		return MNL_CB_ERROR;
- 
--	if (!tb_tc_bw[DEVLINK_ATTR_RATE_TC_INDEX] ||
--	    !tb_tc_bw[DEVLINK_ATTR_RATE_TC_BW])
-+	if (!tb_tc_bw[DEVLINK_RATE_TC_ATTR_INDEX] ||
-+	    !tb_tc_bw[DEVLINK_RATE_TC_ATTR_BW])
- 		return MNL_CB_ERROR;
- 
--	*tc_index = mnl_attr_get_u8(tb_tc_bw[DEVLINK_ATTR_RATE_TC_INDEX]);
--	*tc_bw = mnl_attr_get_u32(tb_tc_bw[DEVLINK_ATTR_RATE_TC_BW]);
-+	*tc_index = mnl_attr_get_u8(tb_tc_bw[DEVLINK_RATE_TC_ATTR_INDEX]);
-+	*tc_bw = mnl_attr_get_u32(tb_tc_bw[DEVLINK_RATE_TC_ATTR_BW]);
- 
- 	return MNL_CB_OK;
- }
-diff --git a/include/uapi/linux/devlink.h b/include/uapi/linux/devlink.h
-index 78f505c1..a89df2a7 100644
---- a/include/uapi/linux/devlink.h
-+++ b/include/uapi/linux/devlink.h
-@@ -635,8 +635,6 @@ enum devlink_attr {
- 	DEVLINK_ATTR_REGION_DIRECT,		/* flag */
- 
- 	DEVLINK_ATTR_RATE_TC_BWS,		/* nested */
--	DEVLINK_ATTR_RATE_TC_INDEX,		/* u8 */
--	DEVLINK_ATTR_RATE_TC_BW,		/* u32 */
- 
- 	/* Add new attributes above here, update the spec in
- 	 * Documentation/netlink/specs/devlink.yaml and re-generate
-@@ -647,6 +645,15 @@ enum devlink_attr {
- 	DEVLINK_ATTR_MAX = __DEVLINK_ATTR_MAX - 1
- };
- 
-+enum devlink_rate_tc_attr {
-+	DEVLINK_RATE_TC_ATTR_UNSPEC,
-+	DEVLINK_RATE_TC_ATTR_INDEX,		/* u8 */
-+	DEVLINK_RATE_TC_ATTR_BW,		/* u32 */
-+
-+	__DEVLINK_RATE_TC_ATTR_MAX,
-+	DEVLINK_RATE_TC_ATTR_MAX = __DEVLINK_RATE_TC_ATTR_MAX - 1
-+};
-+
- /* Mapping between internal resource described by the field and system
-  * structure
-  */
--- 
-2.38.1
-
+Acked-by: Richard Cochran <richardcochran@gmail.com>
 
