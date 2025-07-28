@@ -1,79 +1,181 @@
-Return-Path: <netdev+bounces-210573-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210574-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F318B13F51
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 17:58:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34133B13F56
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 18:00:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 195E07A68D2
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 15:57:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D866189AA7B
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 16:00:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AA7E2737F9;
-	Mon, 28 Jul 2025 15:58:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D60D92737E3;
+	Mon, 28 Jul 2025 15:59:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FsFU/0l0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M4gRajOp"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 335EC2727EB;
-	Mon, 28 Jul 2025 15:58:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AB6426FA54;
+	Mon, 28 Jul 2025 15:59:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753718300; cv=none; b=pcSLvc7mG1vJXD3ztIYj6o+Z0D5IHWmjWhfCssFR0JdzVJPXmSDnfAJ7ocHPOkr5nyIdAJ1UoR4zqlScm7+wK1YeYaTrcF32mzYd+HiVk8vFfBYsoRTEa55eAgN4nMKcsvTGIAHGZGXGiqzY4wpw+RMzkevozCnq2KVvDl0SPVU=
+	t=1753718396; cv=none; b=q0CVSV12QdGUuexc2cZiiABB5LojgEeTcuiLK5WmGIZ2VQ1sw5NAmSF0+xAH85+38S13zlOwZdxxmfwIu5IMvFchcdmGTKC6NSNt2DE5T0zp7FEEBiUBUhbHD3BD4UR9HzK7eAsnn5gbgtQL/CWU8fq5ubXw+kB6uFjG2oupYKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753718300; c=relaxed/simple;
-	bh=V+d2rcREysRXtKARHFsAr2HZDjswTxp4mAu7WVwQcLQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Pw9nykQ/kq5cKcza+B1Imww5ktg14gDu/ZSuHBKWvy4+Z4s9kOosnWJIpzMhu6A+czTHaWDSWfFxtiPlepDBCqLrOuGYKBgVLJu/TGbmTHOxeYRWps70hCIjAK80OPhj7FHdkyfQLQw2vzcnqfkUzdC5zo1Xx3cZhB0CnjkihjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FsFU/0l0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4379EC4CEE7;
-	Mon, 28 Jul 2025 15:58:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753718299;
-	bh=V+d2rcREysRXtKARHFsAr2HZDjswTxp4mAu7WVwQcLQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FsFU/0l0JhHv3KnAnvGh9cpDYQdde/ZjdI3aAicUrmd3JLMO9kvxN2dnUFGVg0nb6
-	 hwT1GRV+wSWcnTNqtXJT6NqIcKUVqyD09yR6V7inanEVa5Tyl9FVxqlTZyb0sRB8Iw
-	 0LkJepsCP/izOEN+2HGU/elG6XQ7moL86xFYwSbRxQmYZswsXEK2zrsVcKhMvPmt2X
-	 SXgDWQzWx/r010pE96+/oMBHaXLVkhE3D4N2grCCJ3At2BOdRwbn1O+WvkO6XNmAqg
-	 MEJbJDImzWSQzN3NeoodWSvXhEn/8yn/3zB6u9cx8s36tkXFHMBRmYird8o5GOgq+A
-	 jNm9g6/zcDC5Q==
-Date: Mon, 28 Jul 2025 08:58:18 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre
- Torgue <alexandre.torgue@foss.st.com>, Richard Cochran
- <richardcochran@gmail.com>, <netdev@vger.kernel.org>,
- <linux-stm32@st-md-mailman.stormreply.com>,
- <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 0/2] net: stmmac: allow generation of flexible
- PPS relative to MAC time
-Message-ID: <20250728085818.5c7a1e45@kernel.org>
-In-Reply-To: <424f8bbd-10b2-468c-aac8-edc71296dabb@foss.st.com>
-References: <20250724-relative_flex_pps-v1-0-37ca65773369@foss.st.com>
-	<20250725172547.13d550a4@kernel.org>
-	<424f8bbd-10b2-468c-aac8-edc71296dabb@foss.st.com>
+	s=arc-20240116; t=1753718396; c=relaxed/simple;
+	bh=dNfaG4D18D9CjOcgvaBVkHp+jyn6+cieep0hDJfD19Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QrJESwKPEa0rXCvKmBm4WOHylWkpKo/d0agB82Oy89HnZi6m0y1EpUhYa/gIMWg/h95rhIe4i8AV62bov3oIYUiiOzCESlOxw/+nQIHZmX3yBZinh7rIf5rds2MJ+KZDdgCGOtnO/dh3OdqmaFuJ930vimR8/eJ7fFHyvUniEU0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M4gRajOp; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-3b77b8750acso40948f8f.0;
+        Mon, 28 Jul 2025 08:59:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753718393; x=1754323193; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=tjx13zWedBGyIKTA7New5uvsNC41+GLmdqfifANAW9s=;
+        b=M4gRajOp4eeMeIzpjNSQTJeWyACt8shsG7rWBYSkLTtc7FRTlJqZzuAt9dqQYjfEv7
+         0sNy3tONzt+WkZlDodMI5iVgwdSIh0JDxiTmUfsmOPyRQhfPWir1mlw8Ba8M/k/v08VF
+         29C3KtKr40MSYSKcBVscL8jygzP9X3wa6I8SLWBBFjnw9mHbOT883nsWr3miFT68hRxq
+         Moc0se+Vn1axtPzAYfpvZqff5HvakzJMFR8o5xTqx8XeU6EAFHc8X8RvRAJB/s3Xu0mz
+         q723Zkj6AtdRVhYdRvCG+ckTflW3Iywi/iyRpKJlLxDbPze3ut1LxKAR5FDetu78VE3v
+         WveA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753718393; x=1754323193;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tjx13zWedBGyIKTA7New5uvsNC41+GLmdqfifANAW9s=;
+        b=b6U20+3rloIGgCMsonNkJieQM32mohG3/AH6nGhZoHvaukQPlIAmBc1IciB+GyUV/e
+         SDndWmrLI4O754MZZlStZ2eyScHBSTcGM/CiqmTZTse0fF21Ru6UU8KOeto872sC+YHr
+         0d0h9VdKD+vXYWg3fgL9JAkhddEs5wGSa7XZAAQH0OVphP1DmLgB5U+ri/iBFfXJRbU4
+         L8D31sQCmQiE340XCDUv2YDS2lBW+22D77qMisWhZzfcsF8Sqq1TSWgAU+y1GWO7BtYH
+         34F4+cVSTFlTQpKFLgSSOL+CsdHQ7jHX6KtsBS997TvxQx/r0I9RtFyrOQ24yNmns80l
+         s2cQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV6UkOjkVnZYA85YH2mqtqSJMIKma8V42gDl62Vzervele6hx/+feIDM9iRPUhelO5miJ0=@vger.kernel.org, AJvYcCWBWkVt89awKuBLE6ESIZJkdffQhuk0RFJb1iUtyj9JwZKzzG3O1AhRN26XgKuYyize7sVyORwj@vger.kernel.org, AJvYcCXIdTlachE6OTjyeM+jk1E+tZUJrrRpZNLOxcT/dj0qCJ3FUFe8WFR5Yq7TMHK3ElvKsfeaM+RBw2tjonMvdRwV@vger.kernel.org
+X-Gm-Message-State: AOJu0YzYqxEo/lcs9NXf8WCCXUJjWVRKen+lW3mhActb/qlk/JoI4A3a
+	F2/BvRJO+IlbE025VqGF2LzdiC0sJ96vw/wasFJ4/JUpAy6ffUDbKnPG
+X-Gm-Gg: ASbGncvm2FU2CJSIeD9BD7NbSSXyh1wU5NCUIPS8bhUWWjtZMT+VUaxg8PQ+E+25Prd
+	bqx7W7Erg/Wy5ES02NpOGyzwdcVF+eG7yHJoE3Ug4iHI8L977k5gZ5suEHJtsQgRtG8oOROjIlZ
+	lBGZh3pgmhu/UpJRRfwq/27WgzG5h6J2UlKdbAyWthpvVAF+SWesOTVKq7bpQuSFysw4vmBuiHm
+	70/bS+VRDgC/Rf0WgxTNhE/IVW7U7O6rv4eWLbJnzGtv/Xqu/lZoYZ+JK/RsaNTBjQFvPuNio4l
+	qkY+8VCtMi6CodxVLhCQ/Ev34COQF6Z5YiDQx2fyjUMFDHWzpqqHnAXrekayXYJqlBmiBWaviDM
+	wGE+I+W+TtrzrZ31KGj/pWvTIrY1DHpCFuTnTrsqDBrZXr9KWwlf2NNlVMzkHYhGGGA==
+X-Google-Smtp-Source: AGHT+IHt942cS6W+rTZ71qArgtk78wyYddcCFyLJ6WkmhpsfPuo0O6TXSbk1FwgDtS4bjvFjnrZW7w==
+X-Received: by 2002:a05:6000:459a:b0:3b7:76ac:8b9f with SMTP id ffacd0b85a97d-3b78e60fa69mr61150f8f.25.1753718393105;
+        Mon, 28 Jul 2025 08:59:53 -0700 (PDT)
+Received: from gmail.com (deskosmtp.auranext.com. [195.134.167.217])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b778f04009sm9336711f8f.38.2025.07.28.08.59.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Jul 2025 08:59:52 -0700 (PDT)
+Date: Mon, 28 Jul 2025 17:59:50 +0200
+From: Mahe Tardy <mahe.tardy@gmail.com>
+To: Yonghong Song <yonghong.song@linux.dev>
+Cc: lkp@intel.com, alexei.starovoitov@gmail.com, andrii@kernel.org,
+	ast@kernel.org, bpf@vger.kernel.org, coreteam@netfilter.org,
+	daniel@iogearbox.net, fw@strlen.de, john.fastabend@gmail.com,
+	martin.lau@linux.dev, netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org, oe-kbuild-all@lists.linux.dev,
+	pablo@netfilter.org
+Subject: Re: [PATCH bpf-next v3 4/4] selftests/bpf: add icmp_send_unreach
+ kfunc tests
+Message-ID: <aIeedqGvdfO641Ht@gmail.com>
+References: <202507270940.kXGmRbg5-lkp@intel.com>
+ <20250728094345.46132-1-mahe.tardy@gmail.com>
+ <20250728094345.46132-5-mahe.tardy@gmail.com>
+ <356fe0b5-b66e-475b-b914-919339bb441a@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <356fe0b5-b66e-475b-b914-919339bb441a@linux.dev>
 
-On Mon, 28 Jul 2025 10:15:07 +0200 Gatien CHEVALLIER wrote:
-> Maybe we could compare the time to the current MAC system
-> time and, if the start time is in the past, consider the
-> value to be an offset. Therefore, any value set in the past
-> would be considered as an offset. I see some implementations
-> doing either that or replacing any value set in the past to
-> a safe start + a fixed offset.
+On Mon, Jul 28, 2025 at 08:40:49AM -0700, Yonghong Song wrote:
+> 
+> 
+> On 7/28/25 2:43 AM, Mahe Tardy wrote:
 
-Let's try this.
+[...]
+
+> > +
+> > +void test_icmp_send_unreach_kfunc(void)
+> > +{
+> > +	struct icmp_send_unreach *skel;
+> > +	int cgroup_fd = -1, client_fd = 1, srv_fd = -1;
+> 
+> Should set client_fd = -1? See below ...
+
+Well spotted yes, it's a typo, thank you.
+
+> > +	int *code;
+> > +
+> > +	skel = icmp_send_unreach__open_and_load();
+> > +	if (!ASSERT_OK_PTR(skel, "skel_open"))
+> > +		goto cleanup;
+> > +
+> > +	cgroup_fd = test__join_cgroup("/icmp_send_unreach_cgroup");
+> > +	if (!ASSERT_GE(cgroup_fd, 0, "join_cgroup"))
+> > +		goto cleanup;
+> > +
+> > +	skel->links.egress =
+> > +		bpf_program__attach_cgroup(skel->progs.egress, cgroup_fd);
+> > +	if (!ASSERT_OK_PTR(skel->links.egress, "prog_attach_cgroup"))
+> > +		goto cleanup;
+> > +
+> > +	code = &skel->bss->unreach_code;
+> > +
+> > +	for (*code = 0; *code <= NR_ICMP_UNREACH; (*code)++) {
+> > +		// The TCP stack reacts differently when asking for
+> > +		// fragmentation, let's ignore it for now
+> > +		if (*code == ICMP_FRAG_NEEDED)
+> > +			continue;
+> > +
+> > +		skel->bss->kfunc_ret = -1;
+> > +
+> > +		srv_fd = start_server(AF_INET, SOCK_STREAM, "127.0.0.1",
+> > +				      SRV_PORT, TIMEOUT_MS);
+> > +		if (!ASSERT_GE(srv_fd, 0, "start_server"))
+> > +			goto for_cleanup;
+> 
+> Otherwise if client_fd = 1, goto for_cleanup will close(1).
+> 
+> > +
+> > +		client_fd = socket(AF_INET, SOCK_STREAM, 0);
+> > +		ASSERT_GE(client_fd, 0, "client_socket");
+> 
+> The above two lines are not necessary since client_fd is
+> actually set in the below.
+
+Yep, must have been a leftover from when I was discovering the
+network_helpers, oops!
+
+> > +
+> > +		client_fd = connect_to_fd(srv_fd, 0);
+> > +		if (!ASSERT_GE(client_fd, 0, "client_connect"))
+> > +			goto for_cleanup;
+> > +
+> > +		read_icmp_errqueue(client_fd, *code);
+> > +
+> > +		ASSERT_EQ(skel->bss->kfunc_ret, SK_DROP, "kfunc_ret");
+> > +for_cleanup:
+> > +		close(client_fd);
+> > +		close(srv_fd);
+> > +	}
+> > +
+> > +cleanup:
+> > +	icmp_send_unreach__destroy(skel);
+> > +	close(cgroup_fd);
+> > +}
+> [...]
+
+I'm sending a v4 with those fixed + fixing the builds error when IPv6 is
+built as a module from the kfunc patch. Thanks for the review.
 
