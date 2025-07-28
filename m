@@ -1,217 +1,142 @@
-Return-Path: <netdev+bounces-210506-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210507-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C72C5B13AA7
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 14:40:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE895B13AB7
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 14:46:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D643517397F
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 12:40:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15B9E3B5A92
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 12:46:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ECCB264A9C;
-	Mon, 28 Jul 2025 12:40:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67DF3265298;
+	Mon, 28 Jul 2025 12:46:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bzJ4uFKv"
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=daniel.almeida@collabora.com header.b="d2TpskC8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61A5A8BEC;
-	Mon, 28 Jul 2025 12:40:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753706429; cv=none; b=ZW8sc/szafK36HP3tomSsWSGVSn90tmpH8HTqic1N5HDqjNIMlWjx/zv/KO+Yz8Kyu9xoTpAnGdZWXuPjKlkjSHIG5nx8Rk/wj8E3t4EvNVB89rYpahkkgyEsXqxe6ukhmZfFr9HzLopSU5W5hXIb9DhYP8f+6kJBAwu+cESUk0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753706429; c=relaxed/simple;
-	bh=dTg4wWkdKPCRfym32aJgAHjXglH8povDWDAynj04Cbc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lJ2G3a/dvHI8nYezZSU44GBgmeZoOimuNJGTdCNaoM4CdncS7s1zhNvvj7eN+NPD/Pu3Wf86w9J8AstciAP0rAdGev+/bIl4ny2VvvhG5Yv5OpAtCkYXUgxdOIk3t6+G6sDSwUx2b1x5QHoGcfQSLXYg8tvNxzG67ml4AXOU9Ro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bzJ4uFKv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5AF8EC4CEE7;
-	Mon, 28 Jul 2025 12:40:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753706428;
-	bh=dTg4wWkdKPCRfym32aJgAHjXglH8povDWDAynj04Cbc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=bzJ4uFKvWPrxZswu2/WOHXEn0za6GOHr7iul3iSHpKipGrDHOCdqWFqSlQR2LLv1J
-	 LZ0EmFq6NJSMZkqib/7JgYGPy0LEpdgWKHMDfydtDzwaLaFBcXL8lBTW4wNegSSqxG
-	 sEBa2h1DI7wuXLGNw0PVEBG+mbmqZSaHUjuFvIx8R5n9MWYzBrB4CduNdtSkNgww1g
-	 jE/Oj2VFFC4eOvbr8g5RQFOR1d4H9icwcwWLwzX8tbxruhZpIHmHR2ruxIApWLOvw4
-	 /ONLxRYv6ywGhkkBR4RfSUNWHlOrwHius9M1+wefaij+u3ooAshCyrEMEO0T/DIa1D
-	 o/EAswh8UWkXQ==
-Message-ID: <cabacd59-7cbf-403a-938f-371026980cc7@kernel.org>
-Date: Mon, 28 Jul 2025 14:40:22 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8039413D51E;
+	Mon, 28 Jul 2025 12:46:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753706787; cv=pass; b=fO3lTkUIQSsM1QHJ60t1wYGHEtMVQvwDWL7WNmSr+i9nmu729K1z7du1AKQCppC5c3mE/UVsd1ecOTvd+8UCP6ahbPMUj5Mhb1dhhhht5c1ss3tAiuT1Vf5pjeHkXtgliJb9ATz38yd6yvrXSreVTgslAsCZy/DlEWIlM8GHEFM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753706787; c=relaxed/simple;
+	bh=kV8CJI/+KnMlti7TMONXwOLw9gZXIDDlxj16Vo3N7eY=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=lCGZYLRbCF38E17gbNyxztqMXO3x8YmfohJHFvDR1YQbUgvT+0c3npj/lJJHo1DnnhXYnIGloKn9k5MnwoOjveMRhotShzuYVKuVnlYctxe99KgDuFULMRIH1mTzV+zq2kCcEn4rN7Vpo5p/+IPOdiaZXuWP5XAaU+9QpGx6UEw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=daniel.almeida@collabora.com header.b=d2TpskC8; arc=pass smtp.client-ip=136.143.188.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+ARC-Seal: i=1; a=rsa-sha256; t=1753706704; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=jtdd1t1JN/f4Z96MpnLWjYbm85CyGjLA3c1VeRZEwmeZT0ax+rFOx1jbHw7uwmcEOToL5l/+wd9SW18SBQNkckeu0uKIj4fHrQuuW3gGcHabn58EMRaF2J1ub41c72kfkGNP/yxD+/YV91pn0ULK49IK+kapjRbC5Oe1sSA9KOA=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1753706704; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=kV8CJI/+KnMlti7TMONXwOLw9gZXIDDlxj16Vo3N7eY=; 
+	b=RoIDKrmGatcUCMkxBtBtwjorlqQ1TIUHDX+kEZbxTCNvDuwpaG22d0TX72a9q3X2CBiIXcRVHO0pdtiIbyAcX4SC3H0gKeiOPDMle6I6AWW3Dhrr4s2uhaW17+I7ITutnravNd3EwGWBKYKcvqomhN8jhxIqpsgdyJ1dcC7EAPk=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=collabora.com;
+	spf=pass  smtp.mailfrom=daniel.almeida@collabora.com;
+	dmarc=pass header.from=<daniel.almeida@collabora.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1753706704;
+	s=zohomail; d=collabora.com; i=daniel.almeida@collabora.com;
+	h=Content-Type:Mime-Version:Subject:Subject:From:From:In-Reply-To:Date:Date:Cc:Cc:Content-Transfer-Encoding:Message-Id:Message-Id:References:To:To:Reply-To;
+	bh=kV8CJI/+KnMlti7TMONXwOLw9gZXIDDlxj16Vo3N7eY=;
+	b=d2TpskC8W8Dt/+ME6qROJSfeTd5XSw1E4PiPjd/5VjaB3FSSstCRYKvVfle0y51H
+	ifom2Nnto6ENZDftIF7GQ7QOmQIM7w3FvRUY3KB7JpI5//7fLBjMmgOoIHoqW2X6VKL
+	bG9kINxg5FGH1Bs2HQ6dp5sNl9LBQajWujeqaegE=
+Received: by mx.zohomail.com with SMTPS id 1753706698669132.7674815409531;
+	Mon, 28 Jul 2025 05:44:58 -0700 (PDT)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/5] net: rpmsg-eth: Add basic rpmsg skeleton
-To: MD Danish Anwar <danishanwar@ti.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Mengyuan Lou
- <mengyuanlou@net-swift.com>, Michael Ellerman <mpe@ellerman.id.au>,
- Madhavan Srinivasan <maddy@linux.ibm.com>, Fan Gong <gongfan1@huawei.com>,
- Lee Trager <lee@trager.us>, Lorenzo Bianconi <lorenzo@kernel.org>,
- Geert Uytterhoeven <geert+renesas@glider.be>,
- Lukas Bulwahn <lukas.bulwahn@redhat.com>,
- Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
-Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250723080322.3047826-1-danishanwar@ti.com>
- <20250723080322.3047826-3-danishanwar@ti.com>
- <296d6846-6a28-4e53-9e62-3439ac57d9c1@kernel.org>
- <5f4e1f99-ff71-443f-ba34-39396946e5b4@ti.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <5f4e1f99-ff71-443f-ba34-39396946e5b4@ti.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.600.51.1.1\))
+Subject: Re: [PATCH v11 7/8] rust: Add read_poll_timeout functions
+From: Daniel Almeida <daniel.almeida@collabora.com>
+In-Reply-To: <20250220070611.214262-8-fujita.tomonori@gmail.com>
+Date: Mon, 28 Jul 2025 09:44:39 -0300
+Cc: linux-kernel@vger.kernel.org,
+ rust-for-linux@vger.kernel.org,
+ netdev@vger.kernel.org,
+ andrew@lunn.ch,
+ hkallweit1@gmail.com,
+ tmgross@umich.edu,
+ ojeda@kernel.org,
+ alex.gaynor@gmail.com,
+ gary@garyguo.net,
+ bjorn3_gh@protonmail.com,
+ benno.lossin@proton.me,
+ a.hindborg@samsung.com,
+ aliceryhl@google.com,
+ anna-maria@linutronix.de,
+ frederic@kernel.org,
+ tglx@linutronix.de,
+ arnd@arndb.de,
+ jstultz@google.com,
+ sboyd@kernel.org,
+ mingo@redhat.com,
+ peterz@infradead.org,
+ juri.lelli@redhat.com,
+ vincent.guittot@linaro.org,
+ dietmar.eggemann@arm.com,
+ rostedt@goodmis.org,
+ bsegall@google.com,
+ mgorman@suse.de,
+ vschneid@redhat.com,
+ tgunders@redhat.com,
+ me@kloenk.dev,
+ david.laight.linux@gmail.com
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <FC2BC3FF-21F2-4166-9ACD-E14FE722793D@collabora.com>
+References: <20250220070611.214262-1-fujita.tomonori@gmail.com>
+ <20250220070611.214262-8-fujita.tomonori@gmail.com>
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+X-Mailer: Apple Mail (2.3826.600.51.1.1)
+X-ZohoMailClient: External
 
-On 28/07/2025 10:10, MD Danish Anwar wrote:
-> Hi Krzysztof,
-> 
-> On 25/07/25 12:48 am, Krzysztof Kozlowski wrote:
->> On 23/07/2025 10:03, MD Danish Anwar wrote:
->>> This patch introduces a basic RPMSG Ethernet driver skeleton. It adds
->>
->> Please do not use "This commit/patch/change", but imperative mood. See
->> longer explanation here:
->> https://elixir.bootlin.com/linux/v5.17.1/source/Documentation/process/submitting-patches.rst#L95
->>
-> 
-> Sure. I will fix this in v2.
-> 
->>> support for creating virtual Ethernet devices over RPMSG channels,
->>> allowing user-space programs to send and receive messages using a
->>> standard Ethernet protocol. The driver includes message handling,
->>> probe, and remove functions, along with necessary data structures.
->>>
->>
->>
->> ...
->>
->>> +
->>> +/**
->>> + * rpmsg_eth_get_shm_info - Get shared memory info from device tree
->>> + * @common: Pointer to rpmsg_eth_common structure
->>> + *
->>> + * Return: 0 on success, negative error code on failure
->>> + */
->>> +static int rpmsg_eth_get_shm_info(struct rpmsg_eth_common *common)
->>> +{
->>> +	struct device_node *peer;
->>> +	const __be32 *reg;
->>> +	u64 start_address;
->>> +	int prop_size;
->>> +	int reg_len;
->>> +	u64 size;
->>> +
->>> +	peer = of_find_node_by_name(NULL, "virtual-eth-shm");
->>
->>
->> This is new ABI and I do not see earlier patch documenting it.
->>
->> You cannot add undocumented ABI... but even if you documented it, I am
->> sorry, but I am pretty sure it is wrong. Why are you choosing random
->> nodes just because their name by pure coincidence is "virtual-eth-shm"?
->> I cannot name my ethernet like that?
->>
-> 
-> This series adds a new virtual ethernet driver. The tx / rx happens in a
-> shared memory block. I need to have a way for the driver to know what is
-> the address / size of this block. This driver can be used by any
-> vendors. The vendors can create a new node in their dt and specify the
-> base address / size of the shared memory block.
-> 
-> I wanted to keep the name of the node constant so that the driver can
-> just look for this name and then grab the address and size.
+Hi Fujita,
 
-You should not.
+> On 20 Feb 2025, at 04:06, FUJITA Tomonori <fujita.tomonori@gmail.com> =
+wrote:
+>=20
+> Add read_poll_timeout functions which poll periodically until a
+> condition is met or a timeout is reached.
+>=20
+> The C's read_poll_timeout (include/linux/iopoll.h) is a complicated
+> macro and a simple wrapper for Rust doesn't work. So this implements
+> the same functionality in Rust.
+>=20
+> The C version uses usleep_range() while the Rust version uses
+> fsleep(), which uses the best sleep method so it works with spans that
+> usleep_range() doesn't work nicely with.
+>=20
+> The sleep_before_read argument isn't supported since there is no user
+> for now. It's rarely used in the C version.
+>=20
+> read_poll_timeout() can only be used in a nonatomic context. This
+> requirement is not checked by these abstractions, but it is intended
+> that klint [1] or a similar tool will be used to check it in the
+> future.
+>=20
+> Link: https://rust-for-linux.com/klint [1]
+> Tested-by: Daniel Almeida <daniel.almeida@collabora.com>
+> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
 
-> 
-> I can create a new binding file for this but I didn't create thinking
-> it's a virtual device not a physical and I wasn't sure if bindings can
-> be created for virtual devices.
+This appears to be the last version of this patch. Do you have any plans =
+to
+keep working on it? Is there anything I can do to help? :)
 
-So you added undocumented ABI intentionally, sorry, that's a no go.
+If you don=E2=80=99t have the time to work on this, I can pick it up for =
+you.
 
-> 
-> In my use case, I am reserving this shared memory and during reserving I
-> named the node "virtual-eth-shm". The memory is reserved by the
-> ti_k3_r5_remoteproc.c driver. The DT change is not part of this series
-> but can be found
-> https://gist.github.com/danish-ti/cdd10525ad834fdb20871ab411ff94fb
-> 
-> The idea is any vendor who want to use this driver, should name their dt
-> node as "virtual-eth-shm" (if they also need to reserve the memory) so
-> that the driver can take the address from DT and use it for tx / rx.
-> 
-> If this is not the correct way, can you please let me know of some other
-> way to handle this.
-> 
-> One idea I had was to create a new binding for this node, and use
-> compatible string to access the node in driver. But the device is
-> virtual and not physical so I thought that might not be the way to go so
-> I went with the current approach.
+=E2=80=94 Daniel
 
-virtual devices do not go to DTS anyway. How do you imagine this works?
-You add it to DTS but you do not add bindings and you expect checks to
-succeed?
-
-Provide details how you checked your DTS compliance.
-
-
-
-Best regards,
-Krzysztof
 
