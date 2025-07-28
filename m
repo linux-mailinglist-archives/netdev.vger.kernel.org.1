@@ -1,110 +1,192 @@
-Return-Path: <netdev+bounces-210596-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210597-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2348BB1404A
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 18:30:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4882CB1404C
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 18:30:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68BF93B8A9C
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 16:29:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F82117DE35
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 16:30:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 267F3272803;
-	Mon, 28 Jul 2025 16:29:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84D8F274B4C;
+	Mon, 28 Jul 2025 16:30:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tuNSdIFE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hJ9SZP32"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEE74288A8;
-	Mon, 28 Jul 2025 16:29:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D25C12749DA
+	for <netdev@vger.kernel.org>; Mon, 28 Jul 2025 16:30:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753720198; cv=none; b=rlnaBizstGwbarZL0IcCmWqYodqOJXVl5jOxBwPupvjIUSFtNZQ3qAnOVMja74FG+WoJakRtMUFF7DnGZ1rCQfy7BiDdpHAnGDIMJJzFsdxJUh0Q8Q0kyIyylUpyvYZ4zwzovPY6jH/vCEY2kBxAKUEPqWFwczoeRULNtz6H43E=
+	t=1753720212; cv=none; b=sgrZD5D6cM8TGFdBU9kDvvbraxp8mPaFnLr1R3cDyVCtVELyX1cCXICsFtlwv2eqpSA5ZBK4VNuHcsKXhq5F4nuChF1Wp14UiMdNJrDV8UTV6mS8DON85W/buarWASsDd41gbNYf21zgTXdYJ4NdUJhJ7aFWL/ZThNpdJcwXtSQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753720198; c=relaxed/simple;
-	bh=hTgIClXCO8dhqDTT7ZlkH+dwL+Yk0C5vu+lwUpFYhfY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LyVivLRGXJIN0x1QRPJ0u7e8fcYIMgZio9LaNTpvKlxhy/LxPssBoWb8IcgD4GSW9GihYP3olc4cIQhbbrHcl2VVAqxEMZYCoLecyBzFh2HHP3I0vXrkmdM66bGbVBg+2VWwrElAgWRpYiIBVHWXOHMj3L1lH1FVrKaUW7kbrqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tuNSdIFE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04738C4CEE7;
-	Mon, 28 Jul 2025 16:29:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753720197;
-	bh=hTgIClXCO8dhqDTT7ZlkH+dwL+Yk0C5vu+lwUpFYhfY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=tuNSdIFET1U2kT2pVmIwojDTtndStKas+1v3EUsZypzK8+wtaIdO1gOm5MC4TmNk5
-	 6Q2SGM0r1m+1csYCNsKyeuLrYEX1Ym/QYxTz+Ry/NhfNoByInxHoD7D9/YjERGtMww
-	 qmZoP1sIIVku0Twmj9GNH/4wonZjAbWm6pVcJ1vIsmzl6drFoiwBEWdypflhvrF05m
-	 fPTEnD7PbEizf6clsR4/2s+sFDuL+bQNFYkq+Vpl2fXSasdr6kO4dlv00wyiaoh3UK
-	 sFhmZIHYtjnfw5M18kdqJ4vdUIInNDSPHNji1ytP8hxX9vqTrcMA9LWjIKIoVgTNUh
-	 wozlAuVoFhX8A==
-Date: Mon, 28 Jul 2025 09:29:56 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>, Stanislav Fomichev
- <stfomichev@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <borkmann@iogearbox.net>,
- Eric Dumazet <eric.dumazet@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, sdf@fomichev.me,
- kernel-team@cloudflare.com, arthur@arthurfabre.com, jakub@cloudflare.com,
- Jesse Brandeburg <jbrandeburg@cloudflare.com>
-Subject: Re: [PATCH bpf-next V2 0/7] xdp: Allow BPF to set RX hints for
- XDP_REDIRECTed packets
-Message-ID: <20250728092956.24a7d09b@kernel.org>
-In-Reply-To: <aIdWjTCM1nOjiWfC@lore-desk>
-References: <b1873a92-747d-4f32-91f8-126779947e42@kernel.org>
-	<aGvcb53APFXR8eJb@mini-arch>
-	<aG427EcHHn9yxaDv@lore-desk>
-	<aHE2F1FJlYc37eIz@mini-arch>
-	<aHeKYZY7l2i1xwel@lore-desk>
-	<20250716142015.0b309c71@kernel.org>
-	<fbb026f9-54cf-49ba-b0dc-0df0f54c6961@kernel.org>
-	<20250717182534.4f305f8a@kernel.org>
-	<ebc18aba-d832-4eb6-b626-4ca3a2f27fe2@kernel.org>
-	<20250721181344.24d47fa3@kernel.org>
-	<aIdWjTCM1nOjiWfC@lore-desk>
+	s=arc-20240116; t=1753720212; c=relaxed/simple;
+	bh=gxu376Wxo9Y80Esr75RMD2IOGKqRMPhPnvj/gxqJYDI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cCx8SbroSIbHD/S7IwhZDA2HZGfM4srhYPlmsUUtqKXfoq8hzLR+7hhhgYW09V5EBAhDx9HzIa1wjYOARdTiw6CzlOm2LFMz7o9ucXR92Q+ZWbfOHT02K5Zyav7hFByaFMsUUbjJnnp5ARIx1z85GB/Euo5+SJCQeb4rph0u5M0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hJ9SZP32; arc=none smtp.client-ip=209.85.215.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-b3f7404710aso3124907a12.0
+        for <netdev@vger.kernel.org>; Mon, 28 Jul 2025 09:30:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1753720210; x=1754325010; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8AA96Pn3IqJIuTrEVGzxm5x2ZwPalkRlNNPo73obM1w=;
+        b=hJ9SZP32edUXtOodyb84Ad+o+iwJMoEB7uha3K7gpbTea/heG4y1JH6aCDHFyz8F49
+         7puP/c/8xC/Hx4EPVgkgwDeL3Z7fa9fFTdPTfuiV+iJZK4uGKxCq78WXikoQL5D8FTpi
+         l37Ymtlcs4u1UhLH14WYI+HixGAoSUc1T8QUye5pRsdasJLRYSKL1jIc8QicWtGgIlFN
+         hURwNiFxu8CNQNCw958L4woSGtLRLkxo7l+3vLuY9WZY24I4bB9EbWjg9xzByixX6ffZ
+         FQYJUmUIVXJQ1Dkb0Fk5iPWti8VGCVF6Rz7S7hUqSb36by9k8hy7nT4iqDp6v9d67vAz
+         oLQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753720210; x=1754325010;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8AA96Pn3IqJIuTrEVGzxm5x2ZwPalkRlNNPo73obM1w=;
+        b=E0for01dxBmUpFL4+d17zKQjvtCMt/sJ38IfvBo/KiAOZb87F0Bz2D0U29xS20Z8TH
+         2evFZstqC2GF9xuyYwNtfCKOca2A/AsapPMTIzz2XzBK7WIJKOfpIKrUbqr66YqtTsmt
+         jL+qN+dpVxQa/Ip6GYTHLLnOhjSRbUIlCBe8T+Kvd7mMR9Pf31sATZGKGQAyzP6Qr3XY
+         GuAPpJOGn91hQrFoGF2GFIACgaTE/ivWsWL5KQ5GYoBo6goUyasvKMZR6nOSW5/3e6n1
+         Iqkbexv7iQo3gfa57Ufiw3VN+/aUJIEeshK7P6uO5ol6g+EjFREw2d/Wa1a6BDyA16mc
+         3vXw==
+X-Forwarded-Encrypted: i=1; AJvYcCXY8W8RbaDTZndgmah4P2ia3i6lbELPnG6fZfY3gxEZ1l8Zrv/euI0NwvMShmTkqldTpMPo5XU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz87KdYAWEm8vqzoQgB/1BfMtTWHtoinJFsaKTTuv2kfXkbA/Ox
+	iL9Gh2k2Db2ttS8+ChjyNlHeFaarcTbpB/CggisqIVp82wKwYPedSQtLBGvNMC/iq2fVjDckuxm
+	LRSF7KmRDnkSskosGnxD4wJ8aO9SzRem0bfkakxMb
+X-Gm-Gg: ASbGncsPLtGsFrY+LpDVJ2gmfN7sOKazRuzGfFvsFW3tq3nJk3vodOXJ67+MWbZdEsd
+	FEIX6dbZa3AoFL8yAeX8KGSQ6tH/1+RfPKskHLVG9W/IiOjjBsZQ2fZtvFJdkZSly9zo1s8AZYR
+	bQaM3emALl2A3GCmFi7yrrznu9iqwf+GeFDPb5Ci7VZtT4nqDj+ucaSC33mBi1fm3j05eSzDPc4
+	XBluWW2GhhOnQC4iGF0THbL52K5SGdVJT1Sh0w=
+X-Google-Smtp-Source: AGHT+IEkJwssPX4tHVGEszb8AGnANM8DWuZOTbj3U0xaqvuDMSsFTzXqcnKCF9fxVrrWEUaACWfrmUWlKIIaT8VJUC0=
+X-Received: by 2002:a17:90b:4a88:b0:312:e6f1:c05d with SMTP id
+ 98e67ed59e1d1-31e77a18701mr18134069a91.2.1753720209760; Mon, 28 Jul 2025
+ 09:30:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20250728080727.255138-1-pchelkin@ispras.ru>
+In-Reply-To: <20250728080727.255138-1-pchelkin@ispras.ru>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Mon, 28 Jul 2025 09:29:58 -0700
+X-Gm-Features: Ac12FXyaE83SFy377tIzRlcvS6Sm_sgAJSkqWb-qnNMJgp-9TyQ9im1WytdeRLM
+Message-ID: <CAAVpQUA8cN3-+sK4eUPknHHkepyTjb_vDWJA6PPXkz8=+Q7UoA@mail.gmail.com>
+Subject: Re: [PATCH net] netlink: avoid infinite retry looping in netlink_unicast()
+To: Fedor Pchelkin <pchelkin@ispras.ru>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	lvc-project@linuxtesting.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 28 Jul 2025 12:53:01 +0200 Lorenzo Bianconi wrote:
-> > > I can see why you might think that, but from my perspective, the
-> > > xdp_frame *is* the implementation of the mini-SKB concept. We've been
-> > > building it incrementally for years. It started as the most minimal
-> > > structure possible and has gradually gained more context (e.g. dev_rx,
-> > > mem_info/rxq_info, flags, and also uses skb_shared_info with same layout
-> > > as SKB).  
-> > 
-> > My understanding was that just adding all the fields to xdp_frame was
-> > considered too wasteful. Otherwise we would have done something along
-> > those lines ~10 years ago :S  
-> 
-> Hi Jakub,
-> 
-> sorry for the late reply.
-> I am completely fine to redesign the solution to overcome the problem but I
-> guess this feature will allow us to improve XDP performance in a common/real
-> use-case. Let's consider we want to redirect a packet into a veth and then into
-> a container. Preserving the hw metadata performing XDP_REDIRECT will allow us
-> to avoid recalculating the checksum creating the skb. This will result in a
-> very nice performance improvement.
-> So I guess we should really come up with some idea to add this missing feature.
+On Mon, Jul 28, 2025 at 1:07=E2=80=AFAM Fedor Pchelkin <pchelkin@ispras.ru>=
+ wrote:
+>
+> netlink_attachskb() checks for the socket's read memory allocation
+> constraints. Firstly, it has:
+>
+>   rmem < READ_ONCE(sk->sk_rcvbuf)
+>
+> to check if the just increased rmem value fits into the socket's receive
+> buffer. If not, it proceeds and tries to wait for the memory under:
+>
+>   rmem + skb->truesize > READ_ONCE(sk->sk_rcvbuf)
+>
+> The checks don't cover the case when skb->truesize + sk->sk_rmem_alloc is
+> equal to sk->sk_rcvbuf. Thus the function neither successfully accepts
+> these conditions, nor manages to reschedule the task - and is called in
+> retry loop for indefinite time which is caught as:
+>
+>   rcu: INFO: rcu_sched self-detected stall on CPU
+>   rcu:     0-....: (25999 ticks this GP) idle=3Def2/1/0x4000000000000000 =
+softirq=3D262269/262269 fqs=3D6212
+>   (t=3D26000 jiffies g=3D230833 q=3D259957)
+>   NMI backtrace for cpu 0
+>   CPU: 0 PID: 22 Comm: kauditd Not tainted 5.10.240 #68
+>   Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.17.0-4.fc=
+42 04/01/2014
+>   Call Trace:
+>   <IRQ>
+>   dump_stack lib/dump_stack.c:120
+>   nmi_cpu_backtrace.cold lib/nmi_backtrace.c:105
+>   nmi_trigger_cpumask_backtrace lib/nmi_backtrace.c:62
+>   rcu_dump_cpu_stacks kernel/rcu/tree_stall.h:335
+>   rcu_sched_clock_irq.cold kernel/rcu/tree.c:2590
+>   update_process_times kernel/time/timer.c:1953
+>   tick_sched_handle kernel/time/tick-sched.c:227
+>   tick_sched_timer kernel/time/tick-sched.c:1399
+>   __hrtimer_run_queues kernel/time/hrtimer.c:1652
+>   hrtimer_interrupt kernel/time/hrtimer.c:1717
+>   __sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1113
+>   asm_call_irq_on_stack arch/x86/entry/entry_64.S:808
+>   </IRQ>
+>
+>   netlink_attachskb net/netlink/af_netlink.c:1234
+>   netlink_unicast net/netlink/af_netlink.c:1349
+>   kauditd_send_queue kernel/audit.c:776
+>   kauditd_thread kernel/audit.c:897
+>   kthread kernel/kthread.c:328
+>   ret_from_fork arch/x86/entry/entry_64.S:304
+>
+> Restore the original behavior of the check which commit in Fixes
+> accidentally missed when restructuring the code.
+>
+> Found by Linux Verification Center (linuxtesting.org).
+>
+> Fixes: ae8f160e7eb2 ("netlink: Fix wraparounds of sk->sk_rmem_alloc.")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
+> ---
+>
+> Similar rmem and sk->sk_rcvbuf comparing pattern in
+> netlink_broadcast_deliver() accepts these values being equal, while
+> the netlink_dump() case does not - but it goes all the way down to
+> f9c2288837ba ("netlink: implement memory mapped recvmsg()") and looks
+> like an irrelevant issue without any real consequences. Though might be
+> cleaned up if needed.
 
-I don't think the counter-proposal prevents that. As long as veth
-supports "set" callbacks the program can transfer the metadata over
-to the veth and the second program at veth can communicate them to 
-the driver.
+This should be fixed in a separate patch.  It's weird that one path
+accepts a value =3D=3D SO_RCVBUF but the other path doesn't.
 
-Martin mentioned to me that he had proposed in the past that we allow
-allocating the skb at the XDP level, if the program needs "skb-level
-metadata". That actually seems pretty clean to me.. Was it ever
-explored?
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+
+Thanks!
+
+>
+> Updated sk->sk_rmem_alloc vs sk->sk_rcvbuf checks throughout the kernel
+> diverse in treating the corner case of them being equal.
+>
+>  net/netlink/af_netlink.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
+> index 6332a0e06596..0fc3f045fb65 100644
+> --- a/net/netlink/af_netlink.c
+> +++ b/net/netlink/af_netlink.c
+> @@ -1218,7 +1218,7 @@ int netlink_attachskb(struct sock *sk, struct sk_bu=
+ff *skb,
+>         nlk =3D nlk_sk(sk);
+>         rmem =3D atomic_add_return(skb->truesize, &sk->sk_rmem_alloc);
+>
+> -       if ((rmem =3D=3D skb->truesize || rmem < READ_ONCE(sk->sk_rcvbuf)=
+) &&
+> +       if ((rmem =3D=3D skb->truesize || rmem <=3D READ_ONCE(sk->sk_rcvb=
+uf)) &&
+>             !test_bit(NETLINK_S_CONGESTED, &nlk->state)) {
+>                 netlink_skb_set_owner_r(skb, sk);
+>                 return 0;
+> --
+> 2.50.1
+>
 
