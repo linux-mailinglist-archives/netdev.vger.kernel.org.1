@@ -1,428 +1,244 @@
-Return-Path: <netdev+bounces-210633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03623B1415F
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 19:46:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F2EDB14163
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 19:48:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1655318917FC
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 17:47:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5B2A5425FD
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 17:48:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE9DE21CC57;
-	Mon, 28 Jul 2025 17:46:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17FF125C711;
+	Mon, 28 Jul 2025 17:48:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=etsalapatis-com.20230601.gappssmtp.com header.i=@etsalapatis-com.20230601.gappssmtp.com header.b="kPvtrtm5"
+	dkim=pass (2048-bit key) header.d=kwiboo.se header.i=@kwiboo.se header.b="FsHhCp3y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+Received: from smtp.forwardemail.net (smtp.forwardemail.net [149.28.215.223])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A76C07DA73
-	for <netdev@vger.kernel.org>; Mon, 28 Jul 2025 17:46:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EE3C219A89
+	for <netdev@vger.kernel.org>; Mon, 28 Jul 2025 17:48:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=149.28.215.223
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753724806; cv=none; b=Oz8N4k32nfwF3jVz+s38wh+dhxuAy2rZs3MTExlQ3xRTwMxF9M8kDmXrnuRqMn+aBy+1jmavZiMiO/PsuIhWqXJOjS0a4e8WRSsTlCI98LMqOSNpFc1N7chXhhVV6JndPE2bBjbps6kktrF8JgRjt6jnrcE4A1CP9VuK5XYwgX8=
+	t=1753724896; cv=none; b=ULDC1s2PPCinoFzWGzStr40ZNUAbaRHvYLxrOTBg2Q9XN51vudW2pRme9u4hASFmqTz+HGfe8z4vJD4KgbMpZgeRioZA2FNep73KI3rArsqlqRkLM4u67UEiccaSt7x3Zoxvt3+2WsEgC4QGEgIsHz29MBm6cE1GoegZGl4Asq4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753724806; c=relaxed/simple;
-	bh=G8m6x/njqLJB6f50MSyooofevCGhQ5BHLyCM95fVbkw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Tij2JB1R7L5V1102/ow+ho+rZNqjBqjeejLmur7bSCfoW4SmAr2ivgE+qsm55SCZwdPu9nO4USoAiWOEMmQpJVCa2utonSI1Qh0dM5457VLbR4tLXSBC4Bvu0xGbMTvEbIBdvKAZN1bnLVxSaTLHi1ob2wIj7sAr/fb/OoSph1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=etsalapatis.com; spf=pass smtp.mailfrom=etsalapatis.com; dkim=pass (2048-bit key) header.d=etsalapatis-com.20230601.gappssmtp.com header.i=@etsalapatis-com.20230601.gappssmtp.com header.b=kPvtrtm5; arc=none smtp.client-ip=209.85.128.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=etsalapatis.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=etsalapatis.com
-Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-71a27d982f1so8750587b3.2
-        for <netdev@vger.kernel.org>; Mon, 28 Jul 2025 10:46:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=etsalapatis-com.20230601.gappssmtp.com; s=20230601; t=1753724802; x=1754329602; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=STgXJYEYt4gwSriXEsADj5KWRYvl6r936ozi+VicdNo=;
-        b=kPvtrtm5aRY/4snYCwFCa6NTZeMC+wT3RR21Q6zhdYwTKIAf5I/ngq1T3+CkZKaj03
-         PRs4JAqsgzeYWKiL9yGqlLIqVSNtRDel+dJvt0NjxU79Ju6OwaFEyb3ikKqWbXSCCmUM
-         F/o74NKBX3ujXBr55K2iVzbWOj8dK25gKPgj8kKDNlHRAnfv0P7WtAr2VD0mwsk4baXk
-         AhX4ap+0za7BEpbMzITPro/Fct8FSlfYDAWPZUsz/a9Izw1Bz5/vfQ03PVaXj11p5z91
-         RzhpZD3YfzbYK/Jkxx0Wed9K2ywXu1Cw5dTao25+IFe0MVGbHYpfbhmljFjCMP/i24mY
-         IC8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753724802; x=1754329602;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=STgXJYEYt4gwSriXEsADj5KWRYvl6r936ozi+VicdNo=;
-        b=rPxkQJgPIrzZgvwoVolOWtp8yK7QdRoJCyuM7Gat6jKS1o8kfOT83c+a8t9mA+SuFr
-         bYNRyB9fI7+c3XWmWtS1DfkTARQkp6WZCpc3h+dHyowEJULHRt/R9dATfKOTByGYYUt5
-         7LGfYl/14JcRXcd1k13D9ilBgkDFrAxWBRvdt9NtYIdfaYa2mmmRn1hnIR4usPp8ilcC
-         SokeckqS0GBRFADHLSB1akF4w2EI9RArsNgHJzN7INAIsf02Kg1agANMf8/2jpd3lcMP
-         wcHEeU9l63El71FfRGKlrsNyNq92/CL6ZclLLxDVMxWwkd1icLPd/4aNWNmiEc3/DLEz
-         GCfQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUSB2lm51/Mr9yiZW+UN5t3iy69S86ZMXRhjdFrnO+XADM/pq6FICe+mwOiquFRL5XvWaB8gSg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxbYxkQF5xvgDtLiRY3xh+bfZD9j0eIi4RWNVbYN1Pe6HTVlzfj
-	OGIC2uFcNp6xaMopCulHPecoqMEWuvK52DG5ZIhhtUP3DoEFmCqvkcXl+ireK9Ob5SHl+aem5Jo
-	ufWEC7WMzRxsFnz1lg0Pyzpt7L/5Fi5RrVtlRIuYnJQ==
-X-Gm-Gg: ASbGncsUbyZVySHpNLNXhywXYBfdQz0lep6z/t4kRM+jYuswI/E8aIJh2rXe/zOGbsg
-	lsWdwVQzbvnuv14UHSDI9GJJMikSVu0ZR2rjsu6Ju60+HUwmUIyZjwWlPUvSdtooSJMW0NI7kLa
-	VgX/pBS3QvIqq/XoSRyZF6SKg1Kq4koTKLk5IoWlcMgXLfcBrUhbL1Se2P7MbQhdUixwOIlUQyK
-	VnMHa/KMs+M7mRR/KA=
-X-Google-Smtp-Source: AGHT+IF5+XHSbPKkgJwJ6pVMBYVgYYYJi8NeHdAEMcQoNLg1AGPeSA2IPLnx0NLewL7/myxOolMzVbq1/uVOVxIm1ho=
-X-Received: by 2002:a05:690c:498e:b0:71a:3101:e74c with SMTP id
- 00721157ae682-71a3101ea99mr25331717b3.39.1753724802499; Mon, 28 Jul 2025
- 10:46:42 -0700 (PDT)
+	s=arc-20240116; t=1753724896; c=relaxed/simple;
+	bh=hh6zViyTLFJ5MZJcb9GHpRrQp8Vl4Gt/wvCtOdiR/NU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ExA96VEeeMXwLmLwCsAJI9rJK4LjXeFAwrBtIFPnF2U7KLMK0SULdU66s0imDkE9lGEdfzkzEYriCHM5TjlGnbAapfwv16wOWOXmQ1xEddNyNHn1u8gtHGD1Ud3A3uIlCgBdt3q8PDA8jE2RDfyj0mxqfpo5J4VXviCMOF0Z+3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kwiboo.se; spf=pass smtp.mailfrom=fe-bounces.kwiboo.se; dkim=pass (2048-bit key) header.d=kwiboo.se header.i=@kwiboo.se header.b=FsHhCp3y; arc=none smtp.client-ip=149.28.215.223
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kwiboo.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fe-bounces.kwiboo.se
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kwiboo.se;
+ h=Content-Transfer-Encoding: Content-Type: In-Reply-To: From: References:
+ Cc: To: Subject: MIME-Version: Date: Message-ID; q=dns/txt;
+ s=fe-e1b5cab7be; t=1753724893;
+ bh=CoB5tasYH7GrZPehMHvuHgB7MplGLckmtYJLeYrDXq4=;
+ b=FsHhCp3yRtLLtoRqlbXEX8Q5rFzEEh9QRCR/7Le8sdw5zLwuTuEbXHWurxoX/2ha7byTfyilU
+ CjOcGDZ6/yeLPUb/KLfOJriqfflAd+J3dx0ey+XrASe5slFmUkQ0evgcMUBXzVfw7mKRXOSt+Xg
+ LNKy+7kAhNfMcw7ANedoc0v01k8RZFD8FAQ4ATtM/AJEk7tX0ML5DXysH53gK2wx9/m6t34ymWK
+ 141VK7mIwCDaPW0nG14AsbaPvKXFKolGz8xNS1qE58ONYqqMIeUQPoJoPKVDPFiRAb6UUZBLkrp
+ 9OhLmSXKpa4P7tYBhEr/QgKsS3i353CTP4tEoAunqCOw==
+X-Forward-Email-ID: 6887b7c8351ec66b15a2df24
+X-Forward-Email-Sender: rfc822; jonas@kwiboo.se, smtp.forwardemail.net,
+ 149.28.215.223
+X-Forward-Email-Version: 1.1.8
+X-Forward-Email-Website: https://forwardemail.net
+X-Complaints-To: abuse@forwardemail.net
+X-Report-Abuse: abuse@forwardemail.net
+X-Report-Abuse-To: abuse@forwardemail.net
+Message-ID: <5bdd0009-589f-49bc-914f-62e5dc4469e9@kwiboo.se>
+Date: Mon, 28 Jul 2025 19:47:44 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250717164842.1848817-1-ameryhung@gmail.com> <20250717164842.1848817-3-ameryhung@gmail.com>
-In-Reply-To: <20250717164842.1848817-3-ameryhung@gmail.com>
-From: Emil Tsalapatis <linux-lists@etsalapatis.com>
-Date: Mon, 28 Jul 2025 13:46:31 -0400
-X-Gm-Features: Ac12FXyiYI9FqEB-YPNqiHtvqjlTTmeiIOD2QM-XrFFhaPcrOQhvGx4Q67uCdfM
-Message-ID: <CABFh=a7u=B7VpVJFmZibh1yZ84XgYj2D_Ou7s1a=mH6_=8SKRg@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v6 2/3] selftests/bpf: Test basic task local data operations
-To: Amery Hung <ameryhung@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
-	andrii@kernel.org, daniel@iogearbox.net, tj@kernel.org, memxor@gmail.com, 
-	martin.lau@kernel.org, kernel-team@meta.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/3] arm64: dts: rockchip: Add RTL8367RB-VB switch to
+ Radxa E24C
+To: Chukun Pan <amadeus@jmu.edu.cn>
+Cc: alsi@bang-olufsen.dk, andrew@lunn.ch, conor+dt@kernel.org,
+ davem@davemloft.net, devicetree@vger.kernel.org, edumazet@google.com,
+ heiko@sntech.de, krzk+dt@kernel.org, kuba@kernel.org,
+ linus.walleij@linaro.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, linux-rockchip@lists.infradead.org,
+ netdev@vger.kernel.org, olteanv@gmail.com, pabeni@redhat.com,
+ robh@kernel.org, ziyao@disroot.org
+References: <20250727180305.381483-4-jonas@kwiboo.se>
+ <20250728143020.1007374-1-amadeus@jmu.edu.cn>
+Content-Language: en-US
+From: Jonas Karlman <jonas@kwiboo.se>
+In-Reply-To: <20250728143020.1007374-1-amadeus@jmu.edu.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jul 17, 2025 at 12:49=E2=80=AFPM Amery Hung <ameryhung@gmail.com> w=
-rote:
->
-> Test basic operations of task local data with valid and invalid
-> tld_create_key().
->
-> For invalid calls, make sure they return the right error code and check
-> that the TLDs are not inserted by running tld_get_data("
-> value_not_exists") on the bpf side. The call should a null pointer.
->
-> For valid calls, first make sure the TLDs are created by calling
-> tld_get_data() on the bpf side. The call should return a valid pointer.
->
-> Finally, verify that the TLDs are indeed task-specific (i.e., their
-> addresses do not overlap) with multiple user threads. This done by
-> writing values unique to each thread, reading them from both user space
-> and bpf, and checking if the value read back matches the value written.
->
-> Signed-off-by: Amery Hung <ameryhung@gmail.com>
+Hi Chukun,
 
-Reviewed-by: Emil Tsalapatis <emil@etsalapatis.com>
+On 7/28/2025 4:30 PM, Chukun Pan wrote:
+> Hi,
+> 
+>> Initial testing with iperf3 showed ~930-940 Mbits/sec in one direction
+>> and only around ~1-2 Mbits/sec in the other direction.
+> 
+>> Any mix of MAC (rx/tx delay) and switch (rx/tx internal delay) did not
+>> seem to resolve this speed issue, however dropping snps,tso seems to fix
+>> that issue.
+> 
+> Have you tried setting phy-mode to rgmii? (just for testing)
+> Usually this problem is caused by incorrect rx/tx delay.
 
-> ---
->  .../bpf/prog_tests/test_task_local_data.c     | 192 ++++++++++++++++++
->  .../bpf/progs/test_task_local_data.c          |  65 ++++++
->  2 files changed, 257 insertions(+)
->  create mode 100644 tools/testing/selftests/bpf/prog_tests/test_task_loca=
-l_data.c
->  create mode 100644 tools/testing/selftests/bpf/progs/test_task_local_dat=
-a.c
->
-> diff --git a/tools/testing/selftests/bpf/prog_tests/test_task_local_data.=
-c b/tools/testing/selftests/bpf/prog_tests/test_task_local_data.c
-> new file mode 100644
-> index 000000000000..fde4a030ab42
-> --- /dev/null
-> +++ b/tools/testing/selftests/bpf/prog_tests/test_task_local_data.c
-> @@ -0,0 +1,192 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +#include <pthread.h>
-> +#include <bpf/btf.h>
-> +#include <test_progs.h>
-> +
-> +#define TLD_FREE_DATA_ON_THREAD_EXIT
-> +#define TLD_DYN_DATA_SIZE 4096
-> +#include "task_local_data.h"
-> +
-> +struct test_tld_struct {
-> +       __u64 a;
-> +       __u64 b;
-> +       __u64 c;
-> +       __u64 d;
-> +};
-> +
-> +#include "test_task_local_data.skel.h"
-> +
-> +TLD_DEFINE_KEY(value0_key, "value0", sizeof(int));
-> +
-> +/*
-> + * Reset task local data between subtests by clearing metadata other
-> + * than the statically defined value0. This is safe as subtests run
-> + * sequentially. Users of task local data library should not touch
-> + * library internal.
-> + */
-> +static void reset_tld(void)
-> +{
-> +       if (TLD_READ_ONCE(tld_metadata_p)) {
-> +               /* Remove TLDs created by tld_create_key() */
-> +               tld_metadata_p->cnt =3D 1;
-> +               tld_metadata_p->size =3D TLD_DYN_DATA_SIZE;
-> +               memset(&tld_metadata_p->metadata[1], 0,
-> +                      (TLD_MAX_DATA_CNT - 1) * sizeof(struct tld_metadat=
-a));
-> +       }
-> +}
-> +
-> +/* Serialize access to bpf program's global variables */
-> +static pthread_mutex_t global_mutex;
-> +
-> +static tld_key_t *tld_keys;
-> +
-> +#define TEST_BASIC_THREAD_NUM 32
-> +
-> +void *test_task_local_data_basic_thread(void *arg)
-> +{
-> +       LIBBPF_OPTS(bpf_test_run_opts, opts);
-> +       struct test_task_local_data *skel =3D (struct test_task_local_dat=
-a *)arg;
-> +       int fd, err, tid, *value0, *value1;
-> +       struct test_tld_struct *value2;
-> +
-> +       fd =3D bpf_map__fd(skel->maps.tld_data_map);
-> +
-> +       value0 =3D tld_get_data(fd, value0_key);
-> +       if (!ASSERT_OK_PTR(value0, "tld_get_data"))
-> +               goto out;
-> +
-> +       value1 =3D tld_get_data(fd, tld_keys[1]);
-> +       if (!ASSERT_OK_PTR(value1, "tld_get_data"))
-> +               goto out;
-> +
-> +       value2 =3D tld_get_data(fd, tld_keys[2]);
-> +       if (!ASSERT_OK_PTR(value2, "tld_get_data"))
-> +               goto out;
-> +
-> +       tid =3D gettid();
-> +
-> +       *value0 =3D tid + 0;
-> +       *value1 =3D tid + 1;
-> +       value2->a =3D tid + 2;
-> +       value2->b =3D tid + 3;
-> +       value2->c =3D tid + 4;
-> +       value2->d =3D tid + 5;
-> +
-> +       pthread_mutex_lock(&global_mutex);
-> +       /* Run task_main that read task local data and save to global var=
-iables */
-> +       err =3D bpf_prog_test_run_opts(bpf_program__fd(skel->progs.task_m=
-ain), &opts);
-> +       ASSERT_OK(err, "run task_main");
-> +       ASSERT_OK(opts.retval, "task_main retval");
-> +
-> +       ASSERT_EQ(skel->bss->test_value0, tid + 0, "tld_get_data value0")=
-;
-> +       ASSERT_EQ(skel->bss->test_value1, tid + 1, "tld_get_data value1")=
-;
-> +       ASSERT_EQ(skel->bss->test_value2.a, tid + 2, "tld_get_data value2=
-.a");
-> +       ASSERT_EQ(skel->bss->test_value2.b, tid + 3, "tld_get_data value2=
-.b");
-> +       ASSERT_EQ(skel->bss->test_value2.c, tid + 4, "tld_get_data value2=
-.c");
-> +       ASSERT_EQ(skel->bss->test_value2.d, tid + 5, "tld_get_data value2=
-.d");
-> +       pthread_mutex_unlock(&global_mutex);
-> +
-> +       /* Make sure valueX are indeed local to threads */
-> +       ASSERT_EQ(*value0, tid + 0, "value0");
-> +       ASSERT_EQ(*value1, tid + 1, "value1");
-> +       ASSERT_EQ(value2->a, tid + 2, "value2.a");
-> +       ASSERT_EQ(value2->b, tid + 3, "value2.b");
-> +       ASSERT_EQ(value2->c, tid + 4, "value2.c");
-> +       ASSERT_EQ(value2->d, tid + 5, "value2.d");
-> +
-> +       *value0 =3D tid + 5;
-> +       *value1 =3D tid + 4;
-> +       value2->a =3D tid + 3;
-> +       value2->b =3D tid + 2;
-> +       value2->c =3D tid + 1;
-> +       value2->d =3D tid + 0;
-> +
-> +       /* Run task_main again */
-> +       pthread_mutex_lock(&global_mutex);
-> +       err =3D bpf_prog_test_run_opts(bpf_program__fd(skel->progs.task_m=
-ain), &opts);
-> +       ASSERT_OK(err, "run task_main");
-> +       ASSERT_OK(opts.retval, "task_main retval");
-> +
-> +       ASSERT_EQ(skel->bss->test_value0, tid + 5, "tld_get_data value0")=
-;
-> +       ASSERT_EQ(skel->bss->test_value1, tid + 4, "tld_get_data value1")=
-;
-> +       ASSERT_EQ(skel->bss->test_value2.a, tid + 3, "tld_get_data value2=
-.a");
-> +       ASSERT_EQ(skel->bss->test_value2.b, tid + 2, "tld_get_data value2=
-.b");
-> +       ASSERT_EQ(skel->bss->test_value2.c, tid + 1, "tld_get_data value2=
-.c");
-> +       ASSERT_EQ(skel->bss->test_value2.d, tid + 0, "tld_get_data value2=
-.d");
-> +       pthread_mutex_unlock(&global_mutex);
-> +
-> +out:
-> +       pthread_exit(NULL);
-> +}
-> +
-> +static void test_task_local_data_basic(void)
-> +{
-> +       struct test_task_local_data *skel;
-> +       pthread_t thread[TEST_BASIC_THREAD_NUM];
-> +       char dummy_key_name[TLD_NAME_LEN];
-> +       tld_key_t key;
-> +       int i, err;
-> +
-> +       reset_tld();
-> +
-> +       ASSERT_OK(pthread_mutex_init(&global_mutex, NULL), "pthread_mutex=
-_init");
-> +
-> +       skel =3D test_task_local_data__open_and_load();
-> +       if (!ASSERT_OK_PTR(skel, "skel_open_and_load"))
-> +               return;
-> +
-> +       tld_keys =3D calloc(TLD_MAX_DATA_CNT, sizeof(tld_key_t));
-> +       if (!ASSERT_OK_PTR(tld_keys, "calloc tld_keys"))
-> +               goto out;
-> +
-> +       ASSERT_FALSE(tld_key_is_err(value0_key), "TLD_DEFINE_KEY");
-> +       tld_keys[1] =3D tld_create_key("value1", sizeof(int));
-> +       ASSERT_FALSE(tld_key_is_err(tld_keys[1]), "tld_create_key");
-> +       tld_keys[2] =3D tld_create_key("value2", sizeof(struct test_tld_s=
-truct));
-> +       ASSERT_FALSE(tld_key_is_err(tld_keys[2]), "tld_create_key");
-> +
-> +       /*
-> +        * Shouldn't be able to store data exceed a page. Create a TLD ju=
-st big
-> +        * enough to exceed a page. TLDs already created are int value0, =
-int
-> +        * value1, and struct test_tld_struct value2.
-> +        */
-> +       key =3D tld_create_key("value_not_exist",
-> +                            TLD_PAGE_SIZE - 2 * sizeof(int) - sizeof(str=
-uct test_tld_struct) + 1);
-> +       ASSERT_EQ(tld_key_err_or_zero(key), -E2BIG, "tld_create_key");
-> +
-> +       key =3D tld_create_key("value2", sizeof(struct test_tld_struct));
-> +       ASSERT_EQ(tld_key_err_or_zero(key), -EEXIST, "tld_create_key");
-> +
-> +       /* Shouldn't be able to create the (TLD_MAX_DATA_CNT+1)-th TLD */
-> +       for (i =3D 3; i < TLD_MAX_DATA_CNT; i++) {
-> +               snprintf(dummy_key_name, TLD_NAME_LEN, "dummy_value%d", i=
-);
-> +               tld_keys[i] =3D tld_create_key(dummy_key_name, sizeof(int=
-));
-> +               ASSERT_FALSE(tld_key_is_err(tld_keys[i]), "tld_create_key=
-");
-> +       }
-> +       key =3D tld_create_key("value_not_exist", sizeof(struct test_tld_=
-struct));
-> +       ASSERT_EQ(tld_key_err_or_zero(key), -ENOSPC, "tld_create_key");
-> +
-> +       /* Access TLDs from multiple threads and check if they are thread=
--specific */
-> +       for (i =3D 0; i < TEST_BASIC_THREAD_NUM; i++) {
-> +               err =3D pthread_create(&thread[i], NULL, test_task_local_=
-data_basic_thread, skel);
-> +               if (!ASSERT_OK(err, "pthread_create"))
-> +                       goto out;
-> +       }
-> +
-> +out:
-> +       for (i =3D 0; i < TEST_BASIC_THREAD_NUM; i++)
-> +               pthread_join(thread[i], NULL);
-> +
-> +       if (tld_keys) {
-> +               free(tld_keys);
-> +               tld_keys =3D NULL;
-> +       }
-> +       tld_free();
-> +       test_task_local_data__destroy(skel);
-> +}
-> +
-> +void test_task_local_data(void)
-> +{
-> +       if (test__start_subtest("task_local_data_basic"))
-> +               test_task_local_data_basic();
-> +}
-> diff --git a/tools/testing/selftests/bpf/progs/test_task_local_data.c b/t=
-ools/testing/selftests/bpf/progs/test_task_local_data.c
-> new file mode 100644
-> index 000000000000..fffafc013044
-> --- /dev/null
-> +++ b/tools/testing/selftests/bpf/progs/test_task_local_data.c
-> @@ -0,0 +1,65 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +
-> +#include <vmlinux.h>
-> +#include <errno.h>
-> +#include <bpf/bpf_helpers.h>
-> +
-> +#include "task_local_data.bpf.h"
-> +
-> +struct tld_keys {
-> +       tld_key_t value0;
-> +       tld_key_t value1;
-> +       tld_key_t value2;
-> +       tld_key_t value_not_exist;
-> +};
-> +
-> +struct test_tld_struct {
-> +       __u64 a;
-> +       __u64 b;
-> +       __u64 c;
-> +       __u64 d;
-> +};
-> +
-> +int test_value0;
-> +int test_value1;
-> +struct test_tld_struct test_value2;
-> +
-> +SEC("syscall")
-> +int task_main(void *ctx)
-> +{
-> +       struct tld_object tld_obj;
-> +       struct test_tld_struct *struct_p;
-> +       struct task_struct *task;
-> +       int err, *int_p;
-> +
-> +       task =3D bpf_get_current_task_btf();
-> +       err =3D tld_object_init(task, &tld_obj);
-> +       if (err)
-> +               return 1;
-> +
-> +       int_p =3D tld_get_data(&tld_obj, value0, "value0", sizeof(int));
-> +       if (int_p)
-> +               test_value0 =3D *int_p;
-> +       else
-> +               return 2;
-> +
-> +       int_p =3D tld_get_data(&tld_obj, value1, "value1", sizeof(int));
-> +       if (int_p)
-> +               test_value1 =3D *int_p;
-> +       else
-> +               return 3;
-> +
-> +       struct_p =3D tld_get_data(&tld_obj, value2, "value2", sizeof(stru=
-ct test_tld_struct));
-> +       if (struct_p)
-> +               test_value2 =3D *struct_p;
-> +       else
-> +               return 4;
-> +
-> +       int_p =3D tld_get_data(&tld_obj, value_not_exist, "value_not_exis=
-t", sizeof(int));
-> +       if (int_p)
-> +               return 5;
-> +
-> +       return 0;
-> +}
-> +
-> +char _license[] SEC("license") =3D "GPL";
+The issue is with TSO and RX checksum offload, with those disabled on
+the conduit interface (gmac1/eth0) my issues disappeared.
+
+Use of rgmii-id "RX and TX delays are not provided by the PCB." as
+defined by the dt-bindings seem to most correctly describe the HW.
+
+Describing switches is new to me, so I could be wrong :-)
+
+> 
+>> +	ethernet-switch@1d {
+>> +		compatible = "realtek,rtl8365mb";
+>> +		reg = <0x1d>;
+>> +		pinctrl-names = "default";
+>> +		pinctrl-0 = <&rtl8367rb_eint>;
+> 
+> Shouldn't this pinctrl be written in interrupts?
+
+Not necessarily, in my mind the pinctrl is applied for the switch
+interface to the SoC, not the internal workings of the switch.
+
+> 
+>> +			ethernet-port@6 {
+>> +				reg = <6>;
+>> +				ethernet = <&gmac1>;
+>> +				label = "cpu";
+> 
+> No need for label = "cpu":
+> https://github.com/torvalds/linux/commit/567f38317054e66647fd59cfa4e261219a2a21db
+
+Thanks, will drop in v2.
+
+> 
+>> This series relaxes the realtek dsa drivers requirement of having a mdio
+>> child OF node to probe and instead have it register a user_mii_bus to
+>> make it function when a mdio child OF node is missing.
+> 
+> This is weird, the switch is connected to the gmac via mdio.
+> Can you try the following and see if it works? I tried it on
+> a rk3568 + rtl8367s board and it worked:
+
+With a 'mdio' child node 'make CHECK_DTBS=y' report something like:
+
+   rockchip/rk3528-radxa-e24c.dtb: ethernet-switch@1d (realtek,rtl8365mb): mdio: False schema does not allow { [snip] }
+         from schema $id: http://devicetree.org/schemas/net/dsa/realtek.yaml#
+
+With a mdio node the driver is happy and dtschema is sad, and without
+the mdio node it was the other way around.
+
+The plan is to drop this patch and instead modify the dt-binding to
+allow describing a mdio node when the switch node has a reg prop in v2.
+
+Regards,
+Jonas
+
+> 
+> ```
+> &mdio1 {
+> 	switch@29 {
+> 		compatible = "realtek,rtl8365mb";
+> 		reg = <29>;
+> 		reset-gpios = ...
+> 
+> 		switch_intc: interrupt-controller {
+> 			interrupt-parent = ...
+> 			interrupts = ...
+> 			interrupt-controller;
+> 			#address-cells = <0>;
+> 			#interrupt-cells = <1>;
+> 		};
+> 
+> 		mdio {
+> 			#address-cells = <1>;
+> 			#size-cells = <0>;
+> 
+> 			phy0: ethernet-phy@0 {
+> 				reg = <0>;
+> 				interrupt-parent = <&switch_intc>;
+> 				interrupts = <0>;
+> 			};
+> 
+> 			phy1: ethernet-phy@1 {
+> 				reg = <1>;
+> 				interrupt-parent = <&switch_intc>;
+> 				interrupts = <1>;
+> 			};
+> 
+> 			phy2: ethernet-phy@2 {
+> 				reg = <2>;
+> 				interrupt-parent = <&switch_intc>;
+> 				interrupts = <2>;
+> 			};
+> 
+> 			phy3: ethernet-phy@3 {
+> 				reg = <3>;
+> 				interrupt-parent = <&switch_intc>;
+> 				interrupts = <3>;
+> 			};
+> 		};
+> 
+> 		ports {
+> 			#address-cells = <1>;
+> 			#size-cells = <0>;
+> 
+> 			port@0 {
+> 				reg = <0>;
+> 				label = "wan";
+> 				phy-handle = <&phy0>;
+> 			};
+> 
+> 			port@1 {
+> 				reg = <1>;
+> 				label = "lan1";
+> 				phy-handle = <&phy1>;
+> 			};
+> 
+> 			port@2 {
+> 				reg = <2>;
+> 				label = "lan2";
+> 				phy-handle = <&phy2>;
+> 			};
+> 
+> 			port@3 {
+> 				reg = <3>;
+> 				label = "lan3";
+> 				phy-handle = <&phy3>;
+> 			};
+> 
+> 			port@x {
+> 				reg = <x>;
+> 				ethernet = <&gmac1>;
+> 				phy-mode = "rgmii";
+> 
+> 				fixed-link {
+> 					speed = <1000>;
+> 					full-duplex;
+> 				};
+> 			};
+> 		};
+> 	};
+> };
+> ```
+> 
+> Thanks,
+> Chukun
+> 
 > --
-> 2.47.1
->
->
+> 2.25.1
+> 
+> 
+
 
