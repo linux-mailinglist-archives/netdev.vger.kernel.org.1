@@ -1,141 +1,209 @@
-Return-Path: <netdev+bounces-210420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210421-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B8DDB13349
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 05:01:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F774B13361
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 05:20:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 681C71896808
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 03:02:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C41413AF358
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 03:20:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 085DF20010C;
-	Mon, 28 Jul 2025 03:01:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0C0660DCF;
+	Mon, 28 Jul 2025 03:20:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="i1TEqPCP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eYrN5tyO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 289C0126F0A
-	for <netdev@vger.kernel.org>; Mon, 28 Jul 2025 03:01:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D33882AE97
+	for <netdev@vger.kernel.org>; Mon, 28 Jul 2025 03:20:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753671698; cv=none; b=jAAVYlF+ABl99eyhqnbQJStVPReE+YwYsoFLt22pcRIfC4pXU5sAiUWQWsodPZu10ukdeRabgJ4Zazeyx6xy57JM6MwgM/MSugBgJHWRyn8fn11jtkj9HiBewMC/OH+yNe6q1n4OVxAlRZUwtFZzAZ8yiGfKfiFTozDfCMDDv6I=
+	t=1753672849; cv=none; b=i8mXShMJTo37L4291RSNsGR0TMaa7k4P7xUVVw6TMrI14hlkigFJJYnen+5uoV1BW6d2fiR2Zn6PU8c+AT23WilWTOLaSBQMuw4oRmtHVrFkneXfMHmrDIbPoC2sCwqjHFw6eNxOyWgphX2k31IqPgEhMX/W6DosLfMJp6UEKk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753671698; c=relaxed/simple;
-	bh=0vKfwUHfNQR2JxpeH1mjLInwJuziDSzoCPLeGXD166w=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=STe6gIRVn9y8LYEN1D77Ke1bepM9MYtmHKY4rOsIzxWY74xdCkwzuFgcV9Q1pNFvULmiSYWg4IktroZWtjoe+D9Qv3Rc1bgJ1CDcCIjPefn578av3pYoI3XQemSzH/9Omo0xEvtif4stGkX39Gc84JdYOKU2xYeYufv1CthP7ic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=i1TEqPCP; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4561ed868b5so25334195e9.0
-        for <netdev@vger.kernel.org>; Sun, 27 Jul 2025 20:01:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1753671694; x=1754276494; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oEoci9qMGq3mZsbtJsvexp6JhXmJXNusPRjzxxOh55E=;
-        b=i1TEqPCP7dFx6y1M+V4DDDgQIGYukkyZyCUilAIy7nI8XAniubEi918sU3QqNb/X+J
-         URwHFw9YKVwbWAeCEoibkfjc1a75NNOn4yiWUfUYhLpoJBMQg6JW28lMCQ0VB99HFJ/O
-         LDwjNiK9tuofO4qaCAEuxN/BOWLaEhcUpwcEJrJJ9Uw26C5dkjaN7lCreUcg7aIIsw02
-         0v5RjDf7uAUi8MAlv8vLMmxMIMysC8sEMWy1tQwFRL6a6WxLnusauBHumPjsQ4ad95/3
-         XmIo/0Ls8nVrt9fh656YX1+ChIxh14fQQn1Ps05X4J7sf/GGyi2zyS4CW5oXQaWcOv9H
-         KGJQ==
+	s=arc-20240116; t=1753672849; c=relaxed/simple;
+	bh=15aThoYhzoxdtKRx9/AWEF8DdcN6+PhQOQX9PsPxfmc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aPwpa9HiIZQw/0aWlIoJqz1Poog6V21R3xpbOyGBet8nP3gzwuQ9Ga+BNnd8WD0drbnNmZ/i3JKEwVjomV/wWAU0gWF9jbXm/3scSTQDB8+5m9Xf+y+wpaq4//v4dQN2tmeCZVfg8rLXjT2TMdhIaahNasH8KIyZksQVi4SP2to=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eYrN5tyO; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1753672845;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cR5ChySwuOoNU8WWHST/by+WmVyKoXvqxHdmj8YIWY0=;
+	b=eYrN5tyOtebWjgvrQYEac046XET/GEsPNqtZ24c/Mx5GXl4UZwgICfZ5sempZU/3odi8y2
+	EGUkhq18pDmNZqvOoZZrTrNcfXPZs1inY+TJBYB5x9TTl7Sb9nOb4jE0cdpFCUzwIHWinI
+	XfBBhg0JziBEJrXm32ayMRMvtGW6SY8=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-136-pEkNdEQQNtC-fmcQn26oSQ-1; Sun, 27 Jul 2025 23:20:43 -0400
+X-MC-Unique: pEkNdEQQNtC-fmcQn26oSQ-1
+X-Mimecast-MFC-AGG-ID: pEkNdEQQNtC-fmcQn26oSQ_1753672843
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-31edd69d754so659875a91.1
+        for <netdev@vger.kernel.org>; Sun, 27 Jul 2025 20:20:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753671694; x=1754276494;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1753672842; x=1754277642;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=oEoci9qMGq3mZsbtJsvexp6JhXmJXNusPRjzxxOh55E=;
-        b=czr/UxnmfNx4zV66N7GOoqVwUuBh7NietBjdD9DqRnrXwCkOsR8ayPd3zYPVmL28At
-         Hk/v63PhPMjp2OGB9TBIJv3NYg+yyCj/XXtBwe6PE1mn+JabL10/pgZP7y4h6HHPv7HE
-         2MaIMjC6J6XxU5uS3a/1i758ZrjDC7jH+YEpCffVI8Mbog+4E/XsL+pv8uvF/qJ6YmlN
-         kOP/MgXdj8ZlixyRGZhLipy50sSwNXtqurnoV8uKo0XZemJ7rCRlpi0aosEoDHy8ezFQ
-         NEVR930scal438YBXApKR6E/SYuyVE+txhAK5IO3my9y1QthRFSZ10f845cKbtNIJqiU
-         nqAw==
-X-Forwarded-Encrypted: i=1; AJvYcCXl03zWo1AWEy+I5xpmU3HtafG3TKI2fPckM63p0jDOm+VEI8wIH5KKOpZMzHdYAlhsddmDqSg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxvw0fLnZ/2M43nLJ7eh6mp9L0nGMhI3sxrFaBZBwnk6N8lPpL1
-	gEFKm1P5o6ry6vy6efmuDrc3zKquUcRFwdJz67RsY4XYB3wrEMfCB+2FKA0fvS5N4P0=
-X-Gm-Gg: ASbGncuoDAJlSy786jqD8EiBWHWeJLEA9klZ7RBMl1xuEVANYjDLwEWBfkRv7e3kEOO
-	JduD6ISPeaWVb/KSj4za72OhQ3ZNnlb8/bLMFpygMurobGXQYAA7gOn7s/JI3gefWabiLAEbO8B
-	kZej3Mc+EbFbA+KjLitk4vbUetf9h0ATu81N/xSUoK17cToV3riK2p1307ZDnGptRdgO5Vfo6P6
-	RSqzF+or0VWLjMokMWGXy7c2raX9pgpoH7LHoi9QX0JXB1DpWNzQ7Q90nJKNehpBeaxomisgoKt
-	Gux2kOKui+0LS8TUJlAzvL+TmPZZ2rnH3evKObeqpyqIun4wUitXzNbQYccwVUa3nJ9Il3L2rDt
-	ETW3QhmImc0XdItMgi01c9UF9+tTW2SqA6A64tpuN1FHt28x8d/fUHv8PzDVHqxlbKeEWRU61BW
-	k=
-X-Google-Smtp-Source: AGHT+IGQxNb0uTRmgaXFIWNAxJsx2ABBH3vJc/u5BlArY34ZoKzsrRmq3jNV4kVoBvHvbjNr05ibwQ==
-X-Received: by 2002:a05:600c:6812:b0:456:207e:fd83 with SMTP id 5b1f17b1804b1-458762fcfe9mr81396495e9.4.1753671694214;
-        Sun, 27 Jul 2025 20:01:34 -0700 (PDT)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4587054f2e6sm137373995e9.12.2025.07.27.20.01.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 27 Jul 2025 20:01:33 -0700 (PDT)
-Date: Sun, 27 Jul 2025 20:01:26 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Haiyang Zhang <haiyangz@microsoft.com>, Jason Wang
- <jasowang@redhat.com>, Cindy Lu <lulu@redhat.com>, KY Srinivasan
- <kys@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui
- <decui@microsoft.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Michael Kelley
- <mhklinux@outlook.com>, Shradha Gupta <shradhagupta@linux.microsoft.com>,
- Kees Cook <kees@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Kuniyuki
- Iwashima <kuniyu@google.com>, Alexander Lobakin
- <aleksander.lobakin@intel.com>, Guillaume Nault <gnault@redhat.com>, Joe
- Damato <jdamato@fastly.com>, Ahmed Zaki <ahmed.zaki@intel.com>, "open
- list:Hyper-V/Azure CORE AND DRIVERS" <linux-hyperv@vger.kernel.org>, "open
- list:NETWORKING DRIVERS" <netdev@vger.kernel.org>, open list
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH RESEND] netvsc: transfer lower device max tso size
-Message-ID: <20250727200126.2682aa39@hermes.local>
-In-Reply-To: <20250723151622.0606cc99@kernel.org>
-References: <20250718061812.238412-1-lulu@redhat.com>
-	<20250721162834.484d352a@kernel.org>
-	<CACGkMEtqhjTjdxPc=eqMxPNKFsKKA+5YP+uqWtonm=onm0gCrg@mail.gmail.com>
-	<20250721181807.752af6a4@kernel.org>
-	<CACGkMEtEvkSaYP1s+jq-3RPrX_GAr1gQ+b=b4oytw9_dGnSc_w@mail.gmail.com>
-	<20250723080532.53ecc4f1@kernel.org>
-	<SJ2PR21MB40138F71138A809C3A2D903BCA5FA@SJ2PR21MB4013.namprd21.prod.outlook.com>
-	<20250723151622.0606cc99@kernel.org>
+        bh=cR5ChySwuOoNU8WWHST/by+WmVyKoXvqxHdmj8YIWY0=;
+        b=iBeOYOIZ7V5m1g5u/7B/TzKRK9pbyQQbIEP6z6mWEGC1ITysTwKFNk0DBzqgsBntbc
+         17ooTMXX6QGWGdd80PM3C/MbYZJDU/9WLGOdhowvIRlCRFtovazULDsq6dlJ5u/+4Dj4
+         O20SSiD27b97pvUN9MywlztWOS7vgktwkTgMDPQD52mxZiDJaR4art+P1k9SSWTSWP3d
+         QAV4wLdAdp8QT13Y4Ur8GVu5p3SO9izy/VUCV3quobtV4tVi1W8rWelsqiSCUVYoaZN1
+         5hhJ/2nZ8BJjT2Z5k5ulf6G3r5AHHc4NXZ5Bc2ujTmfTpMnLVntF8v9ObG/iwENbKOxa
+         2/1Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWNPx6OFieUzbAxF78yjaSoseubpqv+GUPchPG01MQABwxMCaQhVaiSw5ZdOomPH849FV/9iTk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwnDrnYil97tPHsuMR9glAPBcJd7Y79C0jwTYDcmDTZrtbgaiae
+	hUzUJ39hBKA9bn6dA2DgUEsZLphmDStVVPKhFeuBKKU2rrttY51XoXS6Q43vroZV6kdYINhS50V
+	e3/osqJP4rOSxHw1INveMcsIy7J8pFEUnquAtfrBqZZu7l8uRko4spSmhSX3QQuYLM2kAsOMula
+	G5JF4NkLMJbb6synIfc53JaCMPLG89qTpg
+X-Gm-Gg: ASbGncsTfpWEv9uj751YE1e9K+X+vs8gojcqKsYSMU9EGvYjlGodVnpeE7nZVK6iMg1
+	gymsGGZgzhR6XslY56ZZC8/Jj/r5WLUrMI3WWWT98qaZUWSTC+IUC7uuP6OFsKUpd6cWUTP6KoF
+	LSwEKkGJeefy0fYqrwvpg=
+X-Received: by 2002:a17:90b:1a84:b0:31c:3872:9411 with SMTP id 98e67ed59e1d1-31e77a2016bmr16652762a91.33.1753672842473;
+        Sun, 27 Jul 2025 20:20:42 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGAqqwiTKZ1k6xyMPcG42f+LD68olHodIchHgf4d4SWVgRBCB8r8cAX9tUvXUmGrbZcChZVuFveu9GSRCmon1A=
+X-Received: by 2002:a17:90b:1a84:b0:31c:3872:9411 with SMTP id
+ 98e67ed59e1d1-31e77a2016bmr16652739a91.33.1753672841989; Sun, 27 Jul 2025
+ 20:20:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20250726010846.1105875-1-kuba@kernel.org>
+In-Reply-To: <20250726010846.1105875-1-kuba@kernel.org>
+From: Jason Wang <jasowang@redhat.com>
+Date: Mon, 28 Jul 2025 11:20:30 +0800
+X-Gm-Features: Ac12FXxZ7m7tyk_9wVgK1BrIwcTzksoj1OgtRrSSKsyAiorgpSJrAPrBYchlCP0
+Message-ID: <CACGkMEuApQn4PPB+H7du7icS16s2Q0c4ee=Gt2gjxVLai+6Bug@mail.gmail.com>
+Subject: Re: [PATCH net v2] netpoll: prevent hanging NAPI when netcons gets enabled
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, 
+	Zigit Zo <zuozhijie@bytedance.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	leitao@debian.org, sdf@fomichev.me
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 23 Jul 2025 15:16:22 -0700
-Jakub Kicinski <kuba@kernel.org> wrote:
+On Sat, Jul 26, 2025 at 9:08=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> Paolo spotted hangs in NIPA running driver tests against virtio.
+> The tests hang in virtnet_close() -> virtnet_napi_tx_disable().
+>
+> The problem is only reproducible if running multiple of our tests
+> in sequence (I used TEST_PROGS=3D"xdp.py ping.py netcons_basic.sh \
+> netpoll_basic.py stats.py"). Initial suspicion was that this is
+> a simple case of double-disable of NAPI, but instrumenting the
+> code reveals:
+>
+>  Deadlocked on NAPI ffff888007cd82c0 (virtnet_poll_tx):
+>    state: 0x37, disabled: false, owner: 0, listed: false, weight: 64
+>
+> The NAPI was not in fact disabled, owner is 0 (rather than -1),
+> so the NAPI "thinks" it's scheduled for CPU 0 but it's not listed
+> (!list_empty(&n->poll_list) =3D> false). It seems odd that normal NAPI
+> processing would wedge itself like this.
+>
+> Better suspicion is that netpoll gets enabled while NAPI is polling,
+> and also grabs the NAPI instance. This confuses napi_complete_done():
+>
+>   [netpoll]                                   [normal NAPI]
+>                                         napi_poll()
+>                                           have =3D netpoll_poll_lock()
+>                                             rcu_access_pointer(dev->npinf=
+o)
+>                                               return NULL # no netpoll
+>                                           __napi_poll()
+>                                             ->poll(->weight)
+>   poll_napi()
+>     cmpxchg(->poll_owner, -1, cpu)
+>       poll_one_napi()
+>         set_bit(NAPI_STATE_NPSVC, ->state)
+>                                               napi_complete_done()
+>                                                 if (NAPIF_STATE_NPSVC)
+>                                                   return false
+>                                            # exit without clearing SCHED
+>
+> This feels very unlikely, but perhaps virtio has some interactions
+> with the hypervisor in the NAPI ->poll that makes the race window
+> larger?
 
-> On Wed, 23 Jul 2025 20:18:03 +0000 Haiyang Zhang wrote:
-> > > > Btw, if I understand this correctly. This is for future development so
-> > > > it's not a blocker for this patch?    
-> > >
-> > > Not a blocker, I'm just giving an example of the netvsc auto-weirdness
-> > > being a source of tech debt and bugs. Commit d7501e076d859d is another
-> > > recent one off the top of my head. IIUC systemd-networkd is broadly
-> > > deployed now. It'd be great if there was some migration plan for moving
-> > > this sort of VM auto-bonding to user space (with the use of the common
-> > > bonding driver, not each hypervisor rolling its own).    
-> > 
-> > Actually, we had used the common bonding driver 9 years ago. But it's
-> > replaced by this kernel/netvsc based "transparent" bonding mode. See
-> > the patches listed below.
-> > 
-> > The user mode bonding scripts were unstable, and difficult to deliver
-> > & update for various distros. So Stephen developed the new "transparent"
-> > bonding mode, which greatly improves the situation.  
-> 
-> I specifically highlighted systemd-networkd as the change in the user
-> space landscape.
+Somehow, for example KVM can schedule out the vcpu that runs normal
+NAPI at this time.
 
-Haiyang tried valiantly but getting every distro to do the right thing
-with VF's bonding and hot plug was impossible to support.
+>
+> Best I could to to prove the theory was to add and trigger this
+> warning in napi_poll (just before netpoll_poll_unlock()):
+>
+>       WARN_ONCE(!have && rcu_access_pointer(n->dev->npinfo) &&
+>                 napi_is_scheduled(n) && list_empty(&n->poll_list),
+>                 "NAPI race with netpoll %px", n);
+>
+> If this warning hits the next virtio_close() will hang.
+>
+> This patch survived 30 test iterations without a hang (without it
+> the longest clean run was around 10). Credit for triggering this
+> goes to Breno's recent netconsole tests.
+>
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Reported-by: Paolo Abeni <pabeni@redhat.com>
+> Link: https://lore.kernel.org/c5a93ed1-9abe-4880-a3bb-8d1678018b1d@redhat=
+.com
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> v2:
+>  - move the sync to netpoll_setup()
+> v1: https://lore.kernel.org/20250725024454.690517-1-kuba@kernel.org
+>
+> CC: Jason Wang <jasowang@redhat.com>
+> CC: Zigit Zo <zuozhijie@bytedance.com>
+> CC: "Michael S. Tsirkin" <mst@redhat.com>
+> CC: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> CC: Eugenio P=C3=A9rez <eperezma@redhat.com>
+>
+> CC: leitao@debian.org
+> CC: sdf@fomichev.me
+> ---
+>  net/core/netpoll.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+>
+> diff --git a/net/core/netpoll.c b/net/core/netpoll.c
+> index a1da97b5b30b..5f65b62346d4 100644
+> --- a/net/core/netpoll.c
+> +++ b/net/core/netpoll.c
+> @@ -768,6 +768,13 @@ int netpoll_setup(struct netpoll *np)
+>         if (err)
+>                 goto flush;
+>         rtnl_unlock();
+> +
+> +       /* Make sure all NAPI polls which started before dev->npinfo
+> +        * was visible have exited before we start calling NAPI poll.
+> +        * NAPI skips locking if dev->npinfo is NULL.
+> +        */
+> +       synchronize_rcu();
+> +
+>         return 0;
+>
+>  flush:
+> --
+> 2.50.1
+>
+
+Acked-by: Jason Wang <jasowang@redhat.com>
+
+Thanks
+
 
