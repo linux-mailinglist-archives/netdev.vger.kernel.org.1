@@ -1,290 +1,949 @@
-Return-Path: <netdev+bounces-210631-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210632-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 128C3B1415B
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 19:45:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73350B1415C
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 19:45:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 891E47A42F6
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 17:44:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D991189A54D
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 17:46:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45B567DA73;
-	Mon, 28 Jul 2025 17:45:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40A95217701;
+	Mon, 28 Jul 2025 17:45:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fYFDhB+T"
+	dkim=pass (2048-bit key) header.d=etsalapatis-com.20230601.gappssmtp.com header.i=@etsalapatis-com.20230601.gappssmtp.com header.b="tjFTEtXY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BBA42E3717;
-	Mon, 28 Jul 2025 17:45:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753724736; cv=fail; b=lwggHLufe8eQD3iLcfxhCbSi5H+TCVmIUJ9YmIR8AcK/CuXQU6BZfa8OjReKzCBrond0JMr4K+0QG+WIijLA/Mp6BVoqPzWz1TKRWznBnRNPY6pFtAQ5vqLDehQGfGNt8uKzgvq4PPnYn4yLcQgVq1+Jn6S/pvDSExfkrU09Mt0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753724736; c=relaxed/simple;
-	bh=Jps0C3qrN8Z8Iegpv7IFx2toqmcieukluRpopmT/5dc=;
-	h=From:Date:To:Message-ID:In-Reply-To:References:Subject:
-	 Content-Type:MIME-Version; b=BS1dLaqS2YbjTj/4tsEI9hq+mXZipE2AzWJzs5UCDaNOF/lFNQolnGJqflaBvVkqx+TYJPXmH6VfZFqzo4dYtUNGbdy/4Wids5D00wP0nzxF+mWWDW9vEJY7PcJKgAdXd03G549+KcrRvmbyc0ZyBksAMZztM7zGszsaTfCskFA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fYFDhB+T; arc=fail smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1753724734; x=1785260734;
-  h=from:date:to:message-id:in-reply-to:references:subject:
-   content-transfer-encoding:mime-version;
-  bh=Jps0C3qrN8Z8Iegpv7IFx2toqmcieukluRpopmT/5dc=;
-  b=fYFDhB+TbAJ8e/aF7+bncyh0/Y13QkiNKB+vv/HJ3ZGat6TJtg9LtwFb
-   CtysSpxeziJzfftT7EQN1Kd2/dFzgWwgq8QJkLEzxovz6mXrgMtwZzmin
-   AqYASzJRMRdLazr7Jb3MWfgEW4s6M0/uTUGFxi85mAIRhN3m0c/ucbivw
-   ZEo0opGKCqT43CeJm263uqs4ClqrDIi1muUiwPnHWRVQg7rGJzRcebO3t
-   SuimqPF/pfUBFAbrEyh3Wd9s/rSrrkcfr+C2BsRDDPemOuG0eyd13n4FM
-   SV+frawygmQLZwLRaFgjBXUvWp8Ypo7V7HqPQEQ2M8dKBODLnjiNelKEO
-   g==;
-X-CSE-ConnectionGUID: 0U5GFtugTsqcvqfZIwic4w==
-X-CSE-MsgGUID: +JGAUWhxR8y86mZ7B+nr3Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11505"; a="81423997"
-X-IronPort-AV: E=Sophos;i="6.16,339,1744095600"; 
-   d="scan'208";a="81423997"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jul 2025 10:45:33 -0700
-X-CSE-ConnectionGUID: LEH5AogVT2+AfUQTFtSzTQ==
-X-CSE-MsgGUID: UCJocTGoTcGkQwT+yWCxOA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,339,1744095600"; 
-   d="scan'208";a="163253393"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by fmviesa010.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jul 2025 10:45:31 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26; Mon, 28 Jul 2025 10:45:30 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26 via Frontend Transport; Mon, 28 Jul 2025 10:45:30 -0700
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (40.107.102.89)
- by edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26; Mon, 28 Jul 2025 10:45:29 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=kyM1GGoKm1SkeHqOQExYvinQeK3XMAI46vzRBbmf2HQM75ejuq5GpB5X0IcfViZDcjhdfxmroYL8GBltwjT7l7b29HkDh710QoFCGg8cy2Qrv8RQE6LaeSPl0Np9KNBCmHtjDo9mqTuqkTaQ73suj9Di1yUlDCwcUDw0hDuEqfiCxob1MyuoXCL5c542f1WaIo/NsZ9O46Tw1kvYliWiDY9QJ8NcJ/1wDXsznUlvUazQP0VLpUM3EI4U2pFfMbzN3M4Ml0bc+8Fqsl5BqxyfXWlgxHIIaqzh5M3op6ALv/YzcaZafoX4D99NuLh9gGGU+Xu/KLgcnv+X4QGM2ZTHQQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=inBeELU+y50dETFZAWnbBE5TJACZV6vmjN2dx85vwzI=;
- b=wtcJtar1t44DRyi3CrF0mH5OLhrlMedWzzxFQeusFj9KEht2NeYLQZrTPLrORjQkIzILyMR8lg66Zt/PbQ15VxUJnU4aPRJ8evSV/9vY86niIycKW6y9XIBbpUkyyj9lIxqr6NTI/ooJZbv/F2sD0c2Ihgri5rytpNJYtdfixgUIivvpw6SYsw8+TjY15iKxHWKMD5jpg1a07jItj1CfiDR2QYU2zbQBe9+RP+0O4KO4DvWvTqzBrgR8+ov7ixZAyj/UCq4MrPjOQBpW/h7/tp660ThvLfY8m1pgi6cwhxMK+/wGbOEORgezn1/cuer5JSC3pmV+V622FXXv+W20mQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH8PR11MB8107.namprd11.prod.outlook.com (2603:10b6:510:256::6)
- by MN2PR11MB4581.namprd11.prod.outlook.com (2603:10b6:208:26c::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8964.24; Mon, 28 Jul
- 2025 17:45:13 +0000
-Received: from PH8PR11MB8107.namprd11.prod.outlook.com
- ([fe80::6b05:74cf:a304:ecd8]) by PH8PR11MB8107.namprd11.prod.outlook.com
- ([fe80::6b05:74cf:a304:ecd8%6]) with mapi id 15.20.8964.019; Mon, 28 Jul 2025
- 17:45:13 +0000
-From: <dan.j.williams@intel.com>
-Date: Mon, 28 Jul 2025 10:45:11 -0700
-To: Alejandro Lucero Palau <alucerop@amd.com>, Dave Jiang
-	<dave.jiang@intel.com>, <alejandro.lucero-palau@amd.com>,
-	<linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<dan.j.williams@intel.com>, <edward.cree@amd.com>, <davem@davemloft.net>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>
-Message-ID: <6887b72724173_11968100cb@dwillia2-mobl4.notmuch>
-In-Reply-To: <a548d317-887f-4b95-a911-4178eee92f0f@amd.com>
-References: <20250624141355.269056-1-alejandro.lucero-palau@amd.com>
- <20250624141355.269056-11-alejandro.lucero-palau@amd.com>
- <30d7f613-4089-4e64-893a-83ebf2e319c1@intel.com>
- <a548d317-887f-4b95-a911-4178eee92f0f@amd.com>
-Subject: Re: [PATCH v17 10/22] cx/memdev: Indicate probe deferral
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BY5PR16CA0032.namprd16.prod.outlook.com
- (2603:10b6:a03:1a0::45) To PH8PR11MB8107.namprd11.prod.outlook.com
- (2603:10b6:510:256::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24B19224FA
+	for <netdev@vger.kernel.org>; Mon, 28 Jul 2025 17:45:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753724751; cv=none; b=b/aIR6TVD3Nn2jbsEoEoxuFVL6egWkWDj1ZJOCHjSuffcqk9DwXj2JsdS15sbO8wxK8n0TaKMl6M5ofmGOedlx9iUwD3+YeuwWsioyWQ7Hv8/84FvaEQrS5wmkwgycUsG1Zk4pm5bN3LORURwLLuAb7Z7Z/NMnqSyR7+mVlGpfc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753724751; c=relaxed/simple;
+	bh=e9bNajSK4qNjPxAd13o8zzXf/8Kl0eINLWQo9pKS5SE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GxlpZAn7+dh5AMp/MXkM0Kg8bWWkPCZI5RN5jXG8YaOvUOd41GlJW2l+3KX8JFn3hcLSHiPc04hrtZQlNjHF5bBVD3drA7DuyPq9exwo3iRZRgoCg45hvqOXw8onQ/AnjFTPOYx/xN0nvkEkZ9yBGNtoUDreAhPd7nlHXxqKFRg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=etsalapatis.com; spf=pass smtp.mailfrom=etsalapatis.com; dkim=pass (2048-bit key) header.d=etsalapatis-com.20230601.gappssmtp.com header.i=@etsalapatis-com.20230601.gappssmtp.com header.b=tjFTEtXY; arc=none smtp.client-ip=209.85.128.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=etsalapatis.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=etsalapatis.com
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-712be7e034cso43692167b3.0
+        for <netdev@vger.kernel.org>; Mon, 28 Jul 2025 10:45:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=etsalapatis-com.20230601.gappssmtp.com; s=20230601; t=1753724747; x=1754329547; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WC/H3MGArqSffa7GXqHIEpGbJjHkF/3lJay3ppqX4yA=;
+        b=tjFTEtXYJ6IQcrtX0gvoa+vI+0e0y6xeFCI94tDxUZZRK7UqD0naQw15OKBwN4kyE3
+         Y+ZwuPHG+7wjTSyCw7Jv6RTelZpJijoxdIIx0kEDFoW0w1VmPkCsTiRBfBGM2QvelRSd
+         nzjfRUFVyCfSQ755fQcnfBdrPLbhfC3NrFtvP0wxsTMrTYl5dghrXuU52e3Nf4M5l3FD
+         +25ObwNNQsyOj1kptXb8UmNqQCcdv/9uTVTSvEVuhIvQ186SbsZVAhSG/x6NUC1yiYRI
+         Yr/WEwyEX1Y22HTMR8FEjy60I+lWYjho5xXHsFWvSF0xYcm/yLEtdGra/uV/hX0LynL9
+         O5lw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753724747; x=1754329547;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WC/H3MGArqSffa7GXqHIEpGbJjHkF/3lJay3ppqX4yA=;
+        b=DJQzRyo0TI/+c2qiJSTXyFeDci+TOwKvgdE48/TE1RkK7zmYJ4K2GZy8bWoIpb1zmE
+         XKgRGFg8LP/dyrjmZTNGc0OQ1eHo75i3YSZ0Smlz0lcqG7yLdt39PUbs/msXHjUzGOil
+         GDRoDhuasrOGPRsWSs5pnrvg444P+Xo8E6KmrAOkiyGOotJBYslfDH4teXwKJ29D2ZH1
+         pYeYj4DDlzITTg5uZqGt02fdSBz5q1WtdQZZSUeSXCwV23SseV9Hx6eAZny0w2fymOQL
+         tpAgfxhr48v3HFYc1IRnkj4i84CYvYN4sqeh8glwrzbaTSWMZTkGFcjVKnnULfgInqvu
+         AicA==
+X-Forwarded-Encrypted: i=1; AJvYcCVdCCyDKatRS9r51sltOuPl01sbsnFQZ2DpbWIpD7DEbvx+BgfrmYbB8J5LijVIKGUkgbmhmkk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz39nHys3eEcaTIvANl54Kr7nn+FAJoe9HeoWvoKrwsKlmIFTv2
+	t4lsSZ1+AveQZunlMGyJwvWcxcRZ3jfXhdec/177ahuQTltAKdQBxIFdme6PJR2nX9kS3+MtyRB
+	39bRUOBqIfg8oHOliylUBIFG9NTbeYxsrMoSHGdpMlA==
+X-Gm-Gg: ASbGncsJcaM3xlEW8Ldao44sZXPJdGFO/tNJBvmn9QM+Y1P9gNi8UCQLvPAmc0OJdwb
+	pyjtq2Ffidxjk4/pzHQlYrgJ1cQqnhfXcIj3uMe1oVqpIPzw4O5BGwq2G5DyAVwRODZGEmXeiKU
+	3mSSIToKQDLSK+YQ6Mk/6A7eCw23kdTLkkotFuvTT+Se5qtOvVfD/gHQcSwOIYFCRuH7Bv3tASy
+	sE71hhx
+X-Google-Smtp-Source: AGHT+IEDU49p/GDGAkPmPV7DnpcjjWO7GhU7MPCROxD6jJj2WJVPxKWlEu54Ou+jJLUbE92v3lEVU+T1GB1fLVagJQY=
+X-Received: by 2002:a05:690c:9c01:b0:70e:6333:64ac with SMTP id
+ 00721157ae682-719e32d15fdmr148968037b3.10.1753724746875; Mon, 28 Jul 2025
+ 10:45:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH8PR11MB8107:EE_|MN2PR11MB4581:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7d9f36c6-1cbe-4dbb-d08a-08ddcdfe812a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024|921020;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?WkdnQTBwRFVQOC92ZTBpMG5pV1lyTmVZQjhIVHozMTNJTHVLOVM3K09wdlpT?=
- =?utf-8?B?NnZKTWZjN0FRNGxZdExzWEZWZU8rZ3ZtUCszYndsd2FQT1FmZmFPbVZmQVVF?=
- =?utf-8?B?c0VCMHNlZ0NXSXkwVUtKQzh2d0ZuTnhyUHVHTlU0V05jODY4WFpCcWdyVSs2?=
- =?utf-8?B?Qm1aQTNHd3ZZL2pQSFIxMGxOdDFackJDeXBadTJibWNrL254YXRCWktaS3lS?=
- =?utf-8?B?eVFTQXZTR09YaGNnQndPTUExNTFmenBhQnRpSlg4Zm1rb09rcGgxQnpBekFa?=
- =?utf-8?B?YjNoUngzMmUvMHh5N1AreENVSU5NSUxESUtHaXFtVnZDSXJzeTJEWnN4TWNM?=
- =?utf-8?B?OTQ1RTFZcXdxaVdiTkZ4VDEwcHdJV2JYbEErMmpnY2JLbHNmc0NhZUdsMVl5?=
- =?utf-8?B?NWRzVnEyeWpxYzFXSzlVWDhRMU0yRHBIakNZQ0FKYlBkK0liOHFVUFQ3RVN4?=
- =?utf-8?B?ZWF1T2YyV0owMGJEaTJtcEJJUkRpcC8vRlpSY2cxenJQNlF2R28wYjhtTXFE?=
- =?utf-8?B?SWFicW1uTGFBTEZrQTdsNEJDdnlJRmR0NzdnMTZ6M3lwMUxaTEhnQ0o2M0lB?=
- =?utf-8?B?cVE1c0pTSDEzWFNSb2lIalhpSW9NbVI1QVo0eXJmSU5KVXNlL0NJUkRWK3ly?=
- =?utf-8?B?VDJ2VUZqWFN6NThLalZPbzBLWHlaTkFybTBNZHJsN0VoQXNOTUZVM1k2eWxL?=
- =?utf-8?B?QkRyUzV2dHBhYmJ0QjVWUTJpRmRIelRDanYwY01xZTRCcGpQcDZsdHR4dnZU?=
- =?utf-8?B?SVBiUkR1cm5wMGxydzZhWEVNa2NsY1JiUjNBN0huZ0x3ZzZjZWx2RmxDTWFs?=
- =?utf-8?B?NGNkNVAvUVhSQkpTSzVEMWI2djFReE5qNmw0clkzeWlxUU83UDlyZWJ3V2Ey?=
- =?utf-8?B?cjltbDh2RHIzbXYzS0lJdTVydW9HVEdGdFRZTWJwenJJc2MzaEVuZmVFZ0FM?=
- =?utf-8?B?Yjh2aXZoSVlVeXh2bWJ1TVFrdUpNQnhGMGhURUVZQ0FtTnpxcFhMTTd6UHVY?=
- =?utf-8?B?MTZ2enUwYXJ0Mlh3eDBma3ZHdUNoclBFUndBTlQxNlZ5OHdZT2Nvd2g5N3E4?=
- =?utf-8?B?SzR2bk5ZUFcrK29jR2ZjbTlXMUVoRlBIVXpCdnlndURSSC8rdC84c3lTa0Vy?=
- =?utf-8?B?cThRNHlWYTM1QlhEWFpoQTdORmQ5aVFHcUpzWFdyQndjOC9lbXRGRzhpTTR2?=
- =?utf-8?B?eHlNMGkrR3RXNjJTaFQ3eW40d2U1N2xZQVJwcTlRaWwySytHTXUycG5maG1X?=
- =?utf-8?B?NGhISHh0QzNCSWR5UHFzUWxRenIzb3F6ckxYMSttY09kTmtiRnMyM2xLdmR3?=
- =?utf-8?B?VXdtLzNoUDhFcko2TFljeTUwRDZjb0FhMzRnb25XbGpXYWhwamxqdlV1NEMx?=
- =?utf-8?B?TFhZRWVQOE1rSjIxekhuT1VDVjRJYUVDL3p0dEtVN3J0emp1dHNqTXNwajM0?=
- =?utf-8?B?cmFpYys3R1QwQks4NFJDVlJhL1dVRDc1WlN3aTEwSUl3dzQwZjVGTzN0R2o3?=
- =?utf-8?B?SGVmTGYzd0pzUWVxY2k0dzNQbEYwQm9NVWxrVTkzam1Dc0lWN0lDSyszSjJt?=
- =?utf-8?B?Q0VITVJuOGEvc1hZemxvRGlOUjU4ejh6RjV4QlNtOXBVN1o1MHdqdmZlazJD?=
- =?utf-8?B?aHNnSGlURDFnWlkweXFJdGE0dk9GYTVJcGdRR2lkbTBSVldEaDdmSlhnYzFL?=
- =?utf-8?B?OUgzMFhlWDJtQ0J0N2t5M1dmWW85QVppSzk4TS90QWpqd25zOGM5Z29NaGps?=
- =?utf-8?B?SU9wUkpzOS9rVmptTHhWNGI5Y1BOdGFwZVdUUHFTZGtkaVRocTlhcVZFZ2Vk?=
- =?utf-8?B?U2xoclpHUytLSEhZNWhPdjBOSmg0V1FxRTB4cDV2QVV6djZ4TzlVb25XS25H?=
- =?utf-8?B?ZEY3c1FMME5leG0zelh6ZEFDWlhrWXpJZjhNY0hUMXU2U3JHTXljZzlOanRH?=
- =?utf-8?B?cjdOQnJCZE9USGNkSG91RFNUQTdQWjJYdVMxVEIxOUpzblExcnRaS045V21X?=
- =?utf-8?B?Q2JYTmN3UHVnPT0=?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB8107.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TTA1SVIrb1dJaE5wUlJpUVE1djNPZmhxalRhVVplZmoxV2cyRUJiWFRlZTR4?=
- =?utf-8?B?VUV2QTlUVFk4NTJnSzF0VjIxOTJ3cjZUbUVPQkZIM1NKZUprVlJPeGhJbzVW?=
- =?utf-8?B?UmZIendoTjlXRFJYSjVRYUlzZmsxcm1ia0RjVUNpYktaTW5VbWIvS2xiZ1o3?=
- =?utf-8?B?K1VuY1JMTFZKNVNheHZ4RkRxQzlmTk5TTXBXSzZiQnlNQkFDd1phNWlzUWdO?=
- =?utf-8?B?ZWR0VGlFcjZmUEo1bDlHOUxlWmVJWTBDK2EzS0pVS3N4cGhQd2NESHkrR0JP?=
- =?utf-8?B?bE4zdzhuQVg0WmtiVkxLOWZlZTRxMHNsNnV0QmYwM3BYb2xxbHZnYnZiaUxZ?=
- =?utf-8?B?eGdjVGUrR3k3bEdtdEk3Tk5QbmVBWi8zWjdKQnBsR2xtTXBBL09MWkdVU2Uy?=
- =?utf-8?B?cnhEL0k1VHQ3ZzRPTzhnb2xCdlNoVDZPNEN6aHJucGJXOHVGRXBBbHR1QlRQ?=
- =?utf-8?B?VG40VFI4anorajdoc2pSWENTNnNZV0hhaXVWVVhrM1p3ei9nSGZZY0Rob0Zv?=
- =?utf-8?B?bXJIZHZFQ041akdBRUJyY1MweGo5clR1R0Q3TEtFbEd2VHZxcnV2SzhDSC8z?=
- =?utf-8?B?YmFDUWx3Z2g1N1VRRkY5UDQ2QjNULytZQzFVNjJDWk52Z2VuKzJXWGdZdnJU?=
- =?utf-8?B?N1RtdjBReHU1aHlSaEVxYkQyY0Z6R3I5U3pQcXQyN0pnazZNMVd6MVBzdXMv?=
- =?utf-8?B?RGF0eHZKOEhSakJ4UlFlR1NSVVZrVFNqL1ZPRmZUZjBwR2pObWJtb2dYOCs3?=
- =?utf-8?B?clVHU2d4UGxEOEtvVHZzRll6ZWFYY0tIaUYvT3B2RzlhcThyY3dQN3Q1azRy?=
- =?utf-8?B?UERuSFNIcUgyWGpIN3dKNEFqSW5XRkIzRFlXY1k4K0lYcElkT1hKVEIzbHpq?=
- =?utf-8?B?U2xmR3EyVjFGbjY3TnRQWVFSUk1oUk9vN09CQklrVm90cFVVU2NCVGdvRmw1?=
- =?utf-8?B?Z001Tmc2VUl2ZzA3RnR0SksrQmR0dzBteDlIVkVPaTBIcksyUFp0eUVNbEJB?=
- =?utf-8?B?QkVuTVZEZG9qQ0Y4b0ZwS00xVG9yN3dQdk1uTUJiL1BSamFLMTlmUThkV3F4?=
- =?utf-8?B?cEQ0RFQvZ0ZFQVZLT1c4NlNEcmYxclJsZFMvN3N1U0NUOUduTVJuMWZ6N0ZG?=
- =?utf-8?B?QmR6d2VPdFJ4bDdHQjUyRWxRYnVMTXM4ZHZsenFPZndub3ZJRnRtYzU4QUN0?=
- =?utf-8?B?V1pJMFA4V1QyLyswc3lEQnkvYmlkNHZBWUFhTTUvY2JkTWgwMkNUY09Kc0tq?=
- =?utf-8?B?ZkRZQUhYWnZzeEVjZmd1N3BZNVRCcEdROW53V3JuN3dYOHpzMWhTSUd2eVc4?=
- =?utf-8?B?TVhhSDlBa0dIbXZITDZZaXQrSllwVlVsVHJrNTJySDFNeFVZeU1QNVJUQk9P?=
- =?utf-8?B?K0oxZmRmWk1oa2taaWJkc1FUbG5PMm91Y2dGeWpMV1RvbXJNRm1Ia0tySlFj?=
- =?utf-8?B?WWpuMlF2d3plcnZhQTl3Ny9kMjM4aGExOGFrV0YrOXIzRGFDa2dOaGNjL1BT?=
- =?utf-8?B?UXdrUzBzb1lnbHgzdXVWQ28ydlhQcXY3R2JzaWMyM1pLc1FOdVJUbjdJU3Fw?=
- =?utf-8?B?SlExVThIUXlUN0lBWFVvL2RMbUdrYllyN2dIaFlCSlNQNGI4c1VucjJ3OTQx?=
- =?utf-8?B?bWVvbDJUbVNZZkFtSHFnZGtIelBUNjNCczVad0l2M3A5anFtN1dJeERHZW0w?=
- =?utf-8?B?Wjd2MkdvVTlTZnUwTEdjazdPTFdLRmQrQ01uNzJpUjFYeU55SkhsdnBGWkFL?=
- =?utf-8?B?UWpFSnVwUkZUVExJaDRjcWJGcC9FanFkQS85WERiNTQ5MDBGaUZ4NFpzRDc3?=
- =?utf-8?B?dVNXUW8xRFBzYS9oUjJ3ODlNL1MxMk55OWRzYmZERXJudmdSU00xWldHRWJj?=
- =?utf-8?B?eC9JZitmYzlRUjlwckNRM0p6MHlzTC9TNTN6THpMazQzMmwyTnorMVp0SFgv?=
- =?utf-8?B?TjRsckVkN3RWbDFwREo3RDJTRjUrTTNSTWd1ZW5qNmYxRktlWkI4endpc21E?=
- =?utf-8?B?M0U4ZTRhdUo1QXNGeDczRm5zMU1OTFJZQjVnaXdNRU1RRFpwOW03N3V6eXI1?=
- =?utf-8?B?Vmg5c1h6U0tNbm9nbVJzYjM1T3pmbEpiNmQ4N1RNYlgySFMxWE1hM3p0L2Fp?=
- =?utf-8?B?UncxZnE4K28rdXEzL1Q4dVJSaWptN0N1c1gxb3BpY3NPZ0s5andaSFJTZ1ZJ?=
- =?utf-8?B?a3c9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7d9f36c6-1cbe-4dbb-d08a-08ddcdfe812a
-X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB8107.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jul 2025 17:45:13.1568
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: smm3Le0PdE1bpeCWoBoKKedmbrukfiTqZTJxuXpJft4GPEnH1JApEoxFmQyajVh7e/PMcO0lCN6LF4c6DyRW1PYUYV1UF94AN5MLDD1kHo0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR11MB4581
-X-OriginatorOrg: intel.com
+References: <20250717164842.1848817-1-ameryhung@gmail.com> <20250717164842.1848817-2-ameryhung@gmail.com>
+In-Reply-To: <20250717164842.1848817-2-ameryhung@gmail.com>
+From: Emil Tsalapatis <linux-lists@etsalapatis.com>
+Date: Mon, 28 Jul 2025 13:45:35 -0400
+X-Gm-Features: Ac12FXxHFYfuBXATciUJRlpc1V--zx9WvF_DBYUHFGVlPoeDIf7iSDCTqXAgmlY
+Message-ID: <CABFh=a59HabocTSqjkHA1myf6xd6_h1aKiPvDRQoDPaM42u3JQ@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v6 1/3] selftests/bpf: Introduce task local data
+To: Amery Hung <ameryhung@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
+	andrii@kernel.org, daniel@iogearbox.net, tj@kernel.org, memxor@gmail.com, 
+	martin.lau@kernel.org, kernel-team@meta.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Alejandro Lucero Palau wrote:
-[..]
-> > Can you please explain how the accelerator driver init path is
-> > different in this instance that it requires cxl_mem driver to defer
-> > probing? Currently with a type3, the cxl_acpi driver will setup the
-> > CXL root, hostbridges and PCI root ports. At that point the memdev
-> > driver will enumerate the rest of the ports and attempt to establish
-> > the hierarchy. However if cxl_acpi is not done, the mem probe will
-> > fail. But, the cxl_acpi probe will trigger a re-probe sequence at
-> > the end when it is done. At that point, the mem probe should
-> > discover all the necessary ports if things are correct. If the
-> > accelerator init path is different, can we introduce some
-> > documentation to explain the difference?
+On Thu, Jul 17, 2025 at 12:49=E2=80=AFPM Amery Hung <ameryhung@gmail.com> w=
+rote:
+>
+> Task local data defines an abstract storage type for storing task-
+> specific data (TLD). This patch provides user space and bpf
+> implementation as header-only libraries for accessing task local data.
+>
+> Task local data is a bpf task local storage map with two UPTRs:
+> 1) u_tld_metadata, shared by all tasks of the same process, consists of
+> the total count of TLDs and an array of metadata of TLDs. A metadata of
+> a TLD comprises the size and the name. The name is used to identify a
+> specific TLD in bpf 2) u_tld_data points to a task-specific memory region
+> for storing TLDs.
+>
+> Below are the core task local data API:
+>
+>                      User space                           BPF
+> Define TLD    TLD_DEFINE_KEY(), tld_create_key()           -
+> Get data           tld_get_data()                    tld_get_data()
+>
+> A TLD is first defined by the user space with TLD_DEFINE_KEY() or
+> tld_create_key(). TLD_DEFINE_KEY() defines a TLD statically and allocates
+> just enough memory during initialization. tld_create_key() allows
+> creating TLDs on the fly, but has a fix memory budget, TLD_DYN_DATA_SIZE.
+> Internally, they all go through the metadata array to check if the TLD ca=
+n
+> be added. The total TLD size needs to fit into a page (limited by UPTR),
+> and no two TLDs can have the same name. It also calculates the offset, th=
+e
+> next available space in u_tld_data, by summing sizes of TLDs. If the TLD
+> can be added, it increases the count using cmpxchg as there may be other
+> concurrent tld_create_key(). After a successful cmpxchg, the last
+> metadata slot now belongs to the calling thread and will be updated.
+> tld_create_key() returns the offset encapsulated as a opaque object key
+> to prevent user misuse.
+>
+> Then, user space can pass the key to tld_get_data() to get a pointer
+> to the TLD. The pointer will remain valid for the lifetime of the
+> thread.
+>
+> BPF programs can also locate the TLD by tld_get_data(), but with both
+> name and key. The first time tld_get_data() is called, the name will
+> be used to lookup the metadata. Then, the key will be saved to a
+> task_local_data map, tld_keys_map. Subsequent call to tld_get_data()
+> will use the key to quickly locate the data.
+>
+> User space task local data library uses a light way approach to ensure
+> thread safety (i.e., atomic operation + compiler and memory barriers).
+> While a metadata is being updated, other threads may also try to read it.
+> To prevent them from seeing incomplete data, metadata::size is used to
+> signal the completion of the update, where 0 means the update is still
+> ongoing. Threads will wait until seeing a non-zero size to read a
+> metadata.
+>
+> Signed-off-by: Amery Hung <ameryhung@gmail.com>
 
-The biggest difference is that devm_cxl_add_memdev() is "hopeful" in the
-cxl_pci case. I.e. cxl_pci_probe() does not fail is the memory device it
-registered does not ever pass cxl_mem_probe().
+Reviewed-by: Emil Tsalapatis <emil@etsalapatis.com>
 
-Accelerators are different. They want to know that the CXL side of the
-house is up and running before enabling driver features that depend on
-it. They also want to safely teardown driver functionality if CXL
-capabilities disappear.
+> ---
+>  .../bpf/prog_tests/task_local_data.h          | 388 ++++++++++++++++++
+>  .../selftests/bpf/progs/task_local_data.bpf.h | 227 ++++++++++
+>  2 files changed, 615 insertions(+)
+>  create mode 100644 tools/testing/selftests/bpf/prog_tests/task_local_dat=
+a.h
+>  create mode 100644 tools/testing/selftests/bpf/progs/task_local_data.bpf=
+.h
+>
+> diff --git a/tools/testing/selftests/bpf/prog_tests/task_local_data.h b/t=
+ools/testing/selftests/bpf/prog_tests/task_local_data.h
+> new file mode 100644
+> index 000000000000..73ee122daf81
+> --- /dev/null
+> +++ b/tools/testing/selftests/bpf/prog_tests/task_local_data.h
+> @@ -0,0 +1,388 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +#ifndef __TASK_LOCAL_DATA_H
+> +#define __TASK_LOCAL_DATA_H
+> +
+> +#include <errno.h>
+> +#include <fcntl.h>
+> +#include <sched.h>
+> +#include <stdatomic.h>
+> +#include <stddef.h>
+> +#include <stdlib.h>
+> +#include <string.h>
+> +#include <unistd.h>
+> +#include <sys/syscall.h>
+> +#include <sys/types.h>
+> +
+> +#ifdef TLD_FREE_DATA_ON_THREAD_EXIT
+> +#include <pthread.h>
+> +#endif
+> +
+> +#include <bpf/bpf.h>
+> +
+> +/*
+> + * OPTIONS
+> + *
+> + *   Define the option before including the header
+> + *
+> + *   TLD_FREE_DATA_ON_THREAD_EXIT - Frees memory on thread exit automati=
+cally
+> + *
+> + *   Thread-specific memory for storing TLD is allocated lazily on the f=
+irst call to
+> + *   tld_get_data(). The thread that calls it must also calls tld_free()=
+ on thread exit
 
-cxl_pci does not know or care if or when cxl_mem::probe() succeeds and
-cxl_mem::remove() is invoked.
+Typo: must also calls -> must also call
 
-> > Also, it seems as long as port topology is not found, it will always
-> > go to deferred probing. At what point do we conclude that things may
-> > be missing/broken and we need to fail?
+> + *   to prevent memory leak. Pthread will be included if the option is d=
+efined. A pthread
+> + *   key will be registered with a destructor that calls tld_free().
+> + *
+> + *
+> + *   TLD_DYN_DATA_SIZE - The maximum size of memory allocated for TLDs c=
+reated dynamically
+> + *   (default: 64 bytes)
+> + *
+> + *   A TLD can be defined statically using TLD_DEFINE_KEY() or created o=
+n the fly using
+> + *   tld_create_key(). As the total size of TLDs created with tld_create=
+_key() cannot be
+> + *   possibly known statically, a memory area of size TLD_DYN_DATA_SIZE =
+will be allocated
+> + *   for these TLDs. This additional memory is allocated for every threa=
+d that calls
+> + *   tld_get_data() even if no tld_create_key are actually called, so be=
+ mindful of
+> + *   potential memory wastage. Use TLD_DEFINE_KEY() whenever possible as=
+ just enough memory
+> + *   will be allocated for TLDs created with it.
+> + *
+> + *
+> + *   TLD_NAME_LEN - The maximum length of the name of a TLD (default: 62=
+)
+> + *
+> + *   Setting TLD_NAME_LEN will affect the maximum number of TLDs a proce=
+ss can store,
+> + *   TLD_MAX_DATA_CNT.
+> + *
+> + *
+> + *   TLD_DATA_USE_ALIGNED_ALLOC - Always use aligned_alloc() instead of =
+malloc()
+> + *
+> + *   When allocating the memory for storing TLDs, we need to make sure t=
+here is a memory
+> + *   region of the X bytes within a page. This is due to the limit posed=
+ by UPTR: memory
+> + *   pinned to the kernel cannot exceed a page nor can it cross the page=
+ boundary. The
+> + *   library normally calls malloc(2*X) given X bytes of total TLDs, and=
+ only uses
+> + *   aligned_alloc(PAGE_SIZE, X) when X >=3D PAGE_SIZE / 2. This is to r=
+educe memory wastage
+> + *   as not all memory allocator can use the exact amount of memory requ=
+ested to fulfill
+> + *   aligned_alloc(). For example, some may round the size up to the ali=
+gnment. Enable the
+> + *   option to always use aligned_alloc() if the implementation has low =
+memory overhead.
+> + */
+> +
+> +#define TLD_PIDFD_THREAD O_EXCL
+> +
 
-Right, at some point the driver needs to give up on CXL ever arriving.
+Is this #define necessary? The alias is used only once in the code and
+passed directly into syscall().
+Is it supposed to be called by the user in any way?
 
- 
-> Hi Dave,
-> 
-> 
-> The patch commit comes from Dan's original one, so I'm afraid I can not 
-> explain it better myself.
-> 
-> 
-> I added this patch again after Dan suggesting with cxl_acquire_endpoint 
-> the initialization by a Type2 can obtain some protection against cxl_mem 
-> or cxl_acpi being removed. I added later protection or handling against 
-> this by the sfc driver after initialization. So this is the main reason 
-> for this patch at least to me.
-> 
-> 
-> Regarding the goal from the original patch, being honest, I can not see 
-> the cxl_acpi problem, although I'm not saying it does not exist. But it 
-> is quite confusing to me and as I said in another patch regarding probe 
-> deferral, supporting that option would add complexity to the current sfc 
-> driver probing. If there exists another workaround for avoiding it, that 
-> would be the way I prefer to follow.
+> +#define TLD_PAGE_SIZE getpagesize()
+> +#define TLD_PAGE_MASK (~(TLD_PAGE_SIZE - 1))
+> +
+> +#define TLD_ROUND_MASK(x, y) ((__typeof__(x))((y) - 1))
+> +#define TLD_ROUND_UP(x, y) ((((x) - 1) | TLD_ROUND_MASK(x, y)) + 1)
+> +
+> +#define TLD_READ_ONCE(x) (*(volatile typeof(x) *)&(x))
+> +
+> +#ifndef TLD_DYN_DATA_SIZE
+> +#define TLD_DYN_DATA_SIZE 64
+> +#endif
+> +
+> +#define TLD_MAX_DATA_CNT (TLD_PAGE_SIZE / sizeof(struct tld_metadata) - =
+1)
+> +
+> +#ifndef TLD_NAME_LEN
+> +#define TLD_NAME_LEN 62
+> +#endif
+> +
+> +#ifdef __cplusplus
+> +extern "C" {
+> +#endif
+> +
+> +typedef struct {
+> +       __s16 off;
+> +} tld_key_t;
+> +
+> +struct tld_metadata {
+> +       char name[TLD_NAME_LEN];
+> +       _Atomic __u16 size;
+> +};
+> +
+> +struct u_tld_metadata {
+> +       _Atomic __u8 cnt;
+> +       __u16 size;
+> +       struct tld_metadata metadata[];
+> +};
+> +
+> +struct u_tld_data {
+> +       __u64 start; /* offset of u_tld_data->data in a page */
+> +       char data[];
+> +};
+> +
+> +struct tld_map_value {
+> +       void *data;
+> +       struct u_tld_metadata *metadata;
+> +};
+> +
+> +struct u_tld_metadata * _Atomic tld_metadata_p __attribute__((weak));
+> +__thread struct u_tld_data *tld_data_p __attribute__((weak));
+> +__thread void *tld_data_alloc_p __attribute__((weak));
+> +
+> +#ifdef TLD_FREE_DATA_ON_THREAD_EXIT
+> +pthread_key_t tld_pthread_key __attribute__((weak));
+> +
+> +static void tld_free(void);
+> +
+> +static void __tld_thread_exit_handler(void *unused)
+> +{
+> +       tld_free();
+> +}
+> +#endif
+> +
+> +static int __tld_init_metadata(void)
 
-The problem is how to handle the "CXL device in PCIe-only mode" problem.
-Even with a CXL endpoint directly attached to a CXL host there is no
-guarantee that the device trains the link in CXL mode. So in addition to
-the software-dynamic problems of module loading and asynchronous driver
-bind/unbind, there is this hardware-dynamic problem.
+Nit: rename it to init_metadata_p? It's about the per-process metadata, not=
+ the
+per-key metadata.
 
-I am losing my nerve with the cxl_acquire_endpoint() approach. Now that
-I see how this driver tried to use it and the questions it generated, it
-pushes too much complexity to leaf drivers. In the end, I want to
-(inspired by faux_device) get to the point where the caller can assume
-that successful devm_cxl_add_memdev() means that CXL is operational and
-any non-interleaved CXL regions have finished auto-assembly/creation.
+> +{
+> +       struct u_tld_metadata *meta, *uninit =3D NULL;
+> +       int err =3D 0;
+> +
+> +       meta =3D (struct u_tld_metadata *)aligned_alloc(TLD_PAGE_SIZE, TL=
+D_PAGE_SIZE);
+> +       if (!meta) {
+> +               err =3D -ENOMEM;
+> +               goto out;
+> +       }
+> +
+> +       memset(meta, 0, TLD_PAGE_SIZE);
+> +       meta->size =3D TLD_DYN_DATA_SIZE;
+> +
+> +       if (!atomic_compare_exchange_strong(&tld_metadata_p, &uninit, met=
+a)) {
+> +               free(meta);
+> +               goto out;
+> +       }
+> +
+> +#ifdef TLD_FREE_DATA_ON_THREAD_EXIT
+> +       pthread_key_create(&tld_pthread_key, __tld_thread_exit_handler);
+> +#endif
+> +out:
+> +       return err;
+> +}
+> +
+> +static int __tld_init_data(int map_fd)
+> +{
+> +       bool use_aligned_alloc =3D false;
+> +       struct tld_map_value map_val;
+> +       struct u_tld_data *data;
+> +       int err, tid_fd =3D -1;
+> +       void *d =3D NULL;
+> +
+> +       tid_fd =3D syscall(SYS_pidfd_open, gettid(), TLD_PIDFD_THREAD);
+> +       if (tid_fd < 0) {
+> +               err =3D -errno;
+> +               goto out;
+> +       }
+> +
+> +#ifdef TLD_DATA_USE_ALIGNED_ALLOC
+> +       use_aligned_alloc =3D true;
+> +#endif
+> +
+> +       /*
+> +        * tld_metadata_p->size =3D TLD_DYN_DATA_SIZE +
+> +        *          total size of TLDs defined via TLD_DEFINE_KEY()
+> +        */
+> +       if (use_aligned_alloc || tld_metadata_p->size >=3D TLD_PAGE_SIZE =
+/ 2)
+> +               d =3D aligned_alloc(TLD_PAGE_SIZE, tld_metadata_p->size);
 
-To get there this needs Terry's patches that set pdev->is_cxl on all
-ancestor devices in order to make a determination that the hardware-CXL
-link is up before going to flush software CXL-link establishment.
+Comment: The manpage for aligned_alloc() says tld_metadata_p->size
+should be a multiple
+of the alignment, but at least glibc doesn't actually enforce that so
+this call should work fine.
 
-> Adding documentation about all this would definitely help, even without 
-> the Type2 case.
+> +       else
+> +               d =3D malloc(tld_metadata_p->size * 2);
+> +       if (!d) {
+> +               err =3D -ENOMEM;
+> +               goto out;
+> +       }
+> +
+> +       /*
+> +        * Always pass a page-aligned address to UPTR since the size of t=
+ld_map_value::data
+> +        * is a page in BTF. If d spans across two pages, use the page th=
+at contains large
+> +        * enough memory.
+> +        */
+> +       if (TLD_PAGE_SIZE - (~TLD_PAGE_MASK & (intptr_t)d) >=3D tld_metad=
+ata_p->size) {
+> +               map_val.data =3D (void *)(TLD_PAGE_MASK & (intptr_t)d);
+> +               data =3D d;
+> +               data->start =3D (~TLD_PAGE_MASK & (intptr_t)d) + offsetof=
+(struct u_tld_data, data);
+> +       } else {
+> +               map_val.data =3D (void *)(TLD_ROUND_UP((intptr_t)d, TLD_P=
+AGE_SIZE));
+> +               data =3D (void *)(TLD_ROUND_UP((intptr_t)d, TLD_PAGE_SIZE=
+));
+> +               data->start =3D offsetof(struct u_tld_data, data);
+> +       }
+> +       map_val.metadata =3D TLD_READ_ONCE(tld_metadata_p);
+> +
+> +       err =3D bpf_map_update_elem(map_fd, &tid_fd, &map_val, 0);
+> +       if (err) {
+> +               free(d);
+> +               goto out;
+> +       }
+> +
+> +       tld_data_p =3D (struct u_tld_data *)data;
+> +       tld_data_alloc_p =3D d;
+> +#ifdef TLD_FREE_DATA_ON_THREAD_EXIT
+> +       pthread_setspecific(tld_pthread_key, (void *)1);
+> +#endif
+> +out:
+> +       if (tid_fd >=3D 0)
+> +               close(tid_fd);
+> +       return err;
+> +}
+> +
+> +static tld_key_t __tld_create_key(const char *name, size_t size, bool dy=
+n_data)
+> +{
+> +       int err, i, sz, off =3D 0;
+> +       __u8 cnt;
+> +
+> +       if (!TLD_READ_ONCE(tld_metadata_p)) {
+> +               err =3D __tld_init_metadata();
+> +               if (err)
+> +                       return (tld_key_t){err};
+> +       }
+> +
+> +       for (i =3D 0; i < TLD_MAX_DATA_CNT; i++) {
+> +retry:
+> +               cnt =3D atomic_load(&tld_metadata_p->cnt);
+> +               if (i < cnt) {
+> +                       /* A metadata is not ready until size is updated =
+with a non-zero value */
+> +                       while (!(sz =3D atomic_load(&tld_metadata_p->meta=
+data[i].size)))
+> +                               sched_yield();
+> +
+> +                       if (!strncmp(tld_metadata_p->metadata[i].name, na=
+me, TLD_NAME_LEN))
+> +                               return (tld_key_t){-EEXIST};
+> +
+> +                       off +=3D TLD_ROUND_UP(sz, 8);
+> +                       continue;
+> +               }
+> +
+> +               /*
+> +                * TLD_DEFINE_KEY() is given memory upto a page while at =
+most
 
-I would ask that you help Terry get the protocol error handling series
-in shape as part of the dependency here is to make sure that there is a
-capable error model for CXL link events.
+Typo: upto -> up to
 
-Meanwhile, I am going to rework devm_cxl_add_memdev() to make it report
-when CXL port arrival is deferred, permanently failed, or successful.
+
+> +                * TLD_DYN_DATA_SIZE is allocated for tld_create_key()
+> +                */
+> +               if (dyn_data) {
+> +                       if (off + TLD_ROUND_UP(size, 8) > tld_metadata_p-=
+>size)
+> +                               return (tld_key_t){-E2BIG};
+> +               } else {
+> +                       if (off + TLD_ROUND_UP(size, 8) > TLD_PAGE_SIZE -=
+ sizeof(struct u_tld_data))
+> +                               return (tld_key_t){-E2BIG};
+> +                       tld_metadata_p->size +=3D TLD_ROUND_UP(size, 8);
+
+Discussion: Would there be advantages to adjusting tld_metadata_p with
+dynamic keys defined before
+__tld_init_data is called? That way we wouldn't have to worry about
+rightsizing TLD_DYN_DATA_SIZE,
+and it may be a reasonable expectation that all dynamic keys are
+defined before the program starts using
+the TLDs. Imo it's not necessary now because we don't know how this
+API will end up being used, but
+just wondering if it is a possibility.
+
+> +               }
+> +
+> +               /*
+> +                * Only one tld_create_key() can increase the current cnt=
+ by one and
+> +                * takes the latest available slot. Other threads will ch=
+eck again if a new
+> +                * TLD can still be added, and then compete for the new s=
+lot after the
+> +                * succeeding thread update the size.
+> +                */
+> +               if (!atomic_compare_exchange_strong(&tld_metadata_p->cnt,=
+ &cnt, cnt + 1))
+> +                       goto retry;
+> +
+> +               strncpy(tld_metadata_p->metadata[i].name, name, TLD_NAME_=
+LEN);
+> +               atomic_store(&tld_metadata_p->metadata[i].size, size);
+> +               return (tld_key_t){(__s16)off};
+> +       }
+> +
+> +       return (tld_key_t){-ENOSPC};
+> +}
+> +
+> +/**
+> + * TLD_DEFINE_KEY() - Define a TLD and a global variable key associated =
+with the TLD.
+> + *
+> + * @name: The name of the TLD
+> + * @size: The size of the TLD
+> + * @key: The variable name of the key. Cannot exceed TLD_NAME_LEN
+> + *
+> + * The macro can only be used in file scope.
+> + *
+> + * A global variable key of opaque type, tld_key_t, will be declared and=
+ initialized before
+> + * main() starts. Use tld_key_is_err() or tld_key_err_or_zero() later to=
+ check if the key
+> + * creation succeeded. Pass the key to tld_get_data() to get a pointer t=
+o the TLD.
+> + * bpf programs can also fetch the same key by name.
+> + *
+> + * The total size of TLDs created using TLD_DEFINE_KEY() cannot exceed a=
+ page. Just
+> + * enough memory will be allocated for each thread on the first call to =
+tld_get_data().
+> + */
+> +#define TLD_DEFINE_KEY(key, name, size)                        \
+> +tld_key_t key;                                         \
+> +                                                       \
+> +__attribute__((constructor))                           \
+> +void __tld_define_key_##key(void)                      \
+> +{                                                      \
+> +       key =3D __tld_create_key(name, size, false);      \
+> +}
+> +
+> +/**
+> + * tld_create_key() - Create a TLD and return a key associated with the =
+TLD.
+> + *
+> + * @name: The name the TLD
+> + * @size: The size of the TLD
+> + *
+> + * Return an opaque object key. Use tld_key_is_err() or tld_key_err_or_z=
+ero() to check
+> + * if the key creation succeeded. Pass the key to tld_get_data() to get =
+a pointer to
+> + * locate the TLD. bpf programs can also fetch the same key by name.
+> + *
+> + * Use tld_create_key() only when a TLD needs to be created dynamically =
+(e.g., @name is
+> + * not known statically or a TLD needs to be created conditionally)
+> + *
+> + * An additional TLD_DYN_DATA_SIZE bytes are allocated per-thread to acc=
+ommodate TLDs
+> + * created dynamically with tld_create_key(). Since only a user page is =
+pinned to the
+> + * kernel, when TLDs created with TLD_DEFINE_KEY() uses more than TLD_PA=
+GE_SIZE -
+> + * TLD_DYN_DATA_SIZE, the buffer size will be limited to the rest of the=
+ page.
+> + */
+> +__attribute__((unused))
+> +static tld_key_t tld_create_key(const char *name, size_t size)
+> +{
+> +       return __tld_create_key(name, size, true);
+> +}
+> +
+> +__attribute__((unused))
+> +static inline bool tld_key_is_err(tld_key_t key)
+> +{
+> +       return key.off < 0;
+> +}
+> +
+> +__attribute__((unused))
+> +static inline int tld_key_err_or_zero(tld_key_t key)
+> +{
+> +       return tld_key_is_err(key) ? key.off : 0;
+> +}
+> +
+> +/**
+> + * tld_get_data() - Get a pointer to the TLD associated with the given k=
+ey of the
+> + * calling thread.
+> + *
+> + * @map_fd: A file descriptor of tld_data_map, the underlying BPF task l=
+ocal storage map
+> + * of task local data.
+> + * @key: A key object created by TLD_DEFINE_KEY() or tld_create_key().
+> + *
+> + * Return a pointer to the TLD if the key is valid; NULL if not enough m=
+emory for TLD
+> + * for this thread, or the key is invalid. The returned pointer is guara=
+nteed to be 8-byte
+> + * aligned.
+> + *
+> + * Threads that call tld_get_data() must call tld_free() on exit to prev=
+ent
+> + * memory leak if TLD_FREE_DATA_ON_THREAD_EXIT is not defined.
+> + */
+> +__attribute__((unused))
+> +static void *tld_get_data(int map_fd, tld_key_t key)
+> +{
+> +       if (!TLD_READ_ONCE(tld_metadata_p))
+> +               return NULL;
+> +
+> +       /* tld_data_p is allocated on the first invocation of tld_get_dat=
+a() */
+> +       if (!tld_data_p && __tld_init_data(map_fd))
+> +               return NULL;
+> +
+> +       return tld_data_p->data + key.off;
+> +}
+> +
+> +/**
+> + * tld_free() - Free task local data memory of the calling thread
+> + *
+> + * For the calling thread, all pointers to TLDs acquired before will bec=
+ome invalid.
+> + *
+> + * Users must call tld_free() on thread exit to prevent memory leak. Alt=
+ernatively,
+> + * define TLD_FREE_DATA_ON_THREAD_EXIT and a thread exit handler will be=
+ registered
+> + * to free the memory automatically.
+> + */
+> +__attribute__((unused))
+> +static void tld_free(void)
+> +{
+> +       if (tld_data_alloc_p) {
+> +               free(tld_data_alloc_p);
+> +               tld_data_alloc_p =3D NULL;
+> +               tld_data_p =3D NULL;
+> +       }
+> +}
+> +
+> +#ifdef __cplusplus
+> +} /* extern "C" */
+> +#endif
+> +
+> +#endif /* __TASK_LOCAL_DATA_H */
+> diff --git a/tools/testing/selftests/bpf/progs/task_local_data.bpf.h b/to=
+ols/testing/selftests/bpf/progs/task_local_data.bpf.h
+> new file mode 100644
+> index 000000000000..2f919fa87a66
+> --- /dev/null
+> +++ b/tools/testing/selftests/bpf/progs/task_local_data.bpf.h
+> @@ -0,0 +1,227 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +#ifndef __TASK_LOCAL_DATA_BPF_H
+> +#define __TASK_LOCAL_DATA_BPF_H
+> +
+> +/*
+> + * Task local data is a library that facilitates sharing per-task data
+> + * between user space and bpf programs.
+> + *
+> + *
+> + * USAGE
+> + *
+> + * A TLD, an entry of data in task local data, first needs to be created=
+ by the
+> + * user space. This is done by calling user space API, TLD_DEFINE_KEY() =
+or
+> + * tld_create_key(), with the name of the TLD and the size.
+> + *
+> + * TLD_DEFINE_KEY(prio, "priority", sizeof(int));
+> + *
+> + * or
+> + *
+> + * void func_call(...) {
+> + *     tld_key_t prio, in_cs;
+> + *
+> + *     prio =3D tld_create_key("priority", sizeof(int));
+> + *     in_cs =3D tld_create_key("in_critical_section", sizeof(bool));
+> + *     ...
+> + *
+> + * A key associated with the TLD, which has an opaque type tld_key_t, wi=
+ll be
+> + * initialized or returned. It can be used to get a pointer to the TLD i=
+n the
+> + * user space by calling tld_get_data().
+> + *
+> + * In a bpf program, tld_object_init() first needs to be called to initi=
+alized a
+> + * tld_object on the stack. Then, TLDs can be accessed by calling tld_ge=
+t_data().
+> + * The API will try to fetch the key by the name and use it to locate th=
+e data.
+> + * A pointer to the TLD will be returned. It also caches the key in a ta=
+sk local
+> + * storage map, tld_key_map, whose value type, struct tld_keys, must be =
+defined
+> + * by the developer.
+> + *
+> + * struct tld_keys {
+> + *     tld_key_t prio;
+> + *     tld_key_t in_cs;
+> + * };
+> + *
+> + * SEC("struct_ops")
+> + * void prog(struct task_struct task, ...)
+> + * {
+> + *     struct tld_object tld_obj;
+> + *     int err, *p;
+> + *
+> + *     err =3D tld_object_init(task, &tld_obj);
+> + *     if (err)
+> + *         return;
+> + *
+> + *     p =3D tld_get_data(&tld_obj, prio, "priority", sizeof(int));
+> + *     if (p)
+> + *         // do something depending on *p
+> + */
+> +#include <errno.h>
+> +#include <bpf/bpf_helpers.h>
+> +
+> +#define TLD_ROUND_MASK(x, y) ((__typeof__(x))((y) - 1))
+> +#define TLD_ROUND_UP(x, y) ((((x) - 1) | TLD_ROUND_MASK(x, y)) + 1)
+> +
+> +#define TLD_MAX_DATA_CNT (__PAGE_SIZE / sizeof(struct tld_metadata) - 1)
+> +
+> +#ifndef TLD_NAME_LEN
+> +#define TLD_NAME_LEN 62
+> +#endif
+> +
+> +typedef struct {
+> +       __s16 off;
+> +} tld_key_t;
+> +
+> +struct tld_metadata {
+> +       char name[TLD_NAME_LEN];
+> +       __u16 size;
+> +};
+> +
+> +struct u_tld_metadata {
+> +       __u8 cnt;
+> +       __u16 size;
+> +       struct tld_metadata metadata[TLD_MAX_DATA_CNT];
+> +};
+> +
+> +struct u_tld_data {
+> +       __u64 start; /* offset of u_tld_data->data in a page */
+> +       char data[__PAGE_SIZE - sizeof(__u64)];
+> +};
+> +
+> +struct tld_map_value {
+> +       struct u_tld_data __uptr *data;
+> +       struct u_tld_metadata __uptr *metadata;
+> +};
+> +
+> +typedef struct tld_uptr_dummy {
+> +       struct u_tld_data data[0];
+> +       struct u_tld_metadata metadata[0];
+> +} *tld_uptr_dummy_t;
+> +
+> +struct tld_object {
+> +       struct tld_map_value *data_map;
+> +       struct tld_keys *key_map;
+> +       /*
+> +        * Force the compiler to generate the actual definition of u_tld_=
+metadata
+> +        * and u_tld_data in BTF. Without it, u_tld_metadata and u_tld_da=
+ta will
+> +        * be BTF_KIND_FWD.
+> +        */
+> +       tld_uptr_dummy_t dummy[0];
+> +};
+> +
+> +/*
+> + * Map value of tld_key_map for caching keys. Must be defined by the dev=
+eloper.
+> + * Members should be tld_key_t and passed to the 3rd argument of tld_fet=
+ch_key().
+> + */
+> +struct tld_keys;
+> +
+> +struct {
+> +       __uint(type, BPF_MAP_TYPE_TASK_STORAGE);
+> +       __uint(map_flags, BPF_F_NO_PREALLOC);
+> +       __type(key, int);
+> +       __type(value, struct tld_map_value);
+> +} tld_data_map SEC(".maps");
+> +
+> +struct {
+> +       __uint(type, BPF_MAP_TYPE_TASK_STORAGE);
+> +       __uint(map_flags, BPF_F_NO_PREALLOC);
+> +       __type(key, int);
+> +       __type(value, struct tld_keys);
+> +} tld_key_map SEC(".maps");
+> +
+> +/**
+> + * tld_object_init() - Initialize a tld_object.
+> + *
+> + * @task: The task_struct of the target task
+> + * @tld_obj: A pointer to a tld_object to be initialized
+> + *
+> + * Return 0 on success; -ENODATA if the user space did not initialize ta=
+sk local data
+> + * for the current task through tld_get_data(); -ENOMEM if the creation =
+of tld_key_map
+> + * fails
+> + */
+> +__attribute__((unused))
+> +static int tld_object_init(struct task_struct *task, struct tld_object *=
+tld_obj)
+> +{
+> +       tld_obj->data_map =3D bpf_task_storage_get(&tld_data_map, task, 0=
+, 0);
+> +       if (!tld_obj->data_map)
+> +               return -ENODATA;
+> +
+> +       tld_obj->key_map =3D bpf_task_storage_get(&tld_key_map, task, 0,
+> +                                               BPF_LOCAL_STORAGE_GET_F_C=
+REATE);
+> +       if (!tld_obj->key_map)
+> +               return -ENOMEM;
+> +
+> +       return 0;
+> +}
+> +
+> +/*
+> + * Return the offset of TLD if @name is found. Otherwise, return the cur=
+rent TLD count
+> + * using the nonpositive range so that the next tld_get_data() can skip =
+fetching key if
+> + * no new TLD is added or start comparing name from the first newly adde=
+d TLD.
+> + */
+> +__attribute__((unused))
+> +static int __tld_fetch_key(struct tld_object *tld_obj, const char *name,=
+ int i_start)
+> +{
+> +       struct tld_metadata *metadata;
+> +       int i, cnt, start, off =3D 0;
+> +
+> +       if (!tld_obj->data_map || !tld_obj->data_map->data || !tld_obj->d=
+ata_map->metadata)
+> +               return 0;
+> +
+> +       start =3D tld_obj->data_map->data->start;
+> +       cnt =3D tld_obj->data_map->metadata->cnt;
+> +       metadata =3D tld_obj->data_map->metadata->metadata;
+> +
+> +       bpf_for(i, 0, cnt) {
+> +               if (i >=3D TLD_MAX_DATA_CNT)
+> +                       break;
+> +
+> +               if (i >=3D i_start && !bpf_strncmp(metadata[i].name, TLD_=
+NAME_LEN, name))
+> +                       return start + off;
+> +
+> +               off +=3D TLD_ROUND_UP(metadata[i].size, 8);
+> +       }
+> +
+> +       return -cnt;
+> +}
+> +
+> +/**
+> + * tld_get_data() - Retrieve a pointer to the TLD associated with the na=
+me.
+> + *
+> + * @tld_obj: A pointer to a valid tld_object initialized by tld_object_i=
+nit()
+> + * @key: The cached key of the TLD in tld_key_map
+> + * @name: The name of the key associated with a TLD
+> + * @size: The size of the TLD. Must be a known constant value
+> + *
+> + * Return a pointer to the TLD associated with @name; NULL if not found =
+or @size is too
+> + * big. @key is used to cache the key if the TLD is found to speed up su=
+bsequent calls.
+> + * It should be defined as an member of tld_keys of tld_key_t type by th=
+e developer.
+> + */
+> +#define tld_get_data(tld_obj, key, name, size)                          =
+               \
+> +       ({                                                               =
+               \
+> +               void *data =3D NULL, *_data =3D (tld_obj)->data_map->data=
+;                  \
+> +               long off =3D (tld_obj)->key_map->key.off;                =
+                 \
+> +               int cnt;                                                 =
+               \
+> +                                                                        =
+               \
+> +               if (likely(_data)) {                                     =
+               \
+> +                       if (likely(off > 0)) {                           =
+               \
+> +                               barrier_var(off);                        =
+               \
+> +                               if (likely(off < __PAGE_SIZE - size))    =
+               \
+> +                                       data =3D _data + off;            =
+                 \
+> +                       } else {                                         =
+               \
+> +                               cnt =3D -(off);                          =
+                 \
+> +                               if (likely((tld_obj)->data_map->metadata)=
+ &&            \
+> +                                   cnt < (tld_obj)->data_map->metadata->=
+cnt) {         \
+> +                                       off =3D __tld_fetch_key(tld_obj, =
+name, cnt);      \
+> +                                       (tld_obj)->key_map->key.off =3D o=
+ff;              \
+> +                                                                        =
+               \
+> +                                       if (likely(off < __PAGE_SIZE - si=
+ze)) {         \
+> +                                               barrier_var(off);        =
+               \
+> +                                               if (off > 0)             =
+               \
+> +                                                       data =3D _data + =
+off;             \
+> +                                       }                                =
+               \
+> +                               }                                        =
+               \
+> +                       }                                                =
+               \
+> +               }                                                        =
+               \
+> +               data;                                                    =
+               \
+> +       })
+> +
+> +#endif
+> --
+> 2.47.1
+>
+>
 
