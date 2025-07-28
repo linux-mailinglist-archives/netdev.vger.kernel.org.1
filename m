@@ -1,162 +1,139 @@
-Return-Path: <netdev+bounces-210548-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210544-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F936B13E13
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 17:19:04 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B62A6B13E09
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 17:17:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C5F4617E451
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 15:18:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B10277A243E
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 15:16:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D354A27381E;
-	Mon, 28 Jul 2025 15:18:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3567B26D4E2;
+	Mon, 28 Jul 2025 15:17:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="wg9Wg3a9";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="QDkxjy9s"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K16BHBpR"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a6-smtp.messagingengine.com (fout-a6-smtp.messagingengine.com [103.168.172.149])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 037712737EA
-	for <netdev@vger.kernel.org>; Mon, 28 Jul 2025 15:18:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.149
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01E8272621;
+	Mon, 28 Jul 2025 15:17:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753715890; cv=none; b=gCstllx/05r9lhqWGSFo6HcCle3GUAUN0oGXvmju3RlvhSczbVcnKBHszEXqI3XTyzDEwUv/pU9udJLtl8q+K5Z8BojuYKisfXhBZF+BqQGofrbfM27s3U6BV+DASdkEEHxynk0MIk8/t4WLHaLnObbnzBOHuexe1AzINKRhXNA=
+	t=1753715871; cv=none; b=HNWVoRY2tg73zW99lcSG2JKWrBxBIlB+zxSm7AhwZXrKU/k6F80vG0mdt7btcHx/YXAMZ420JNjqpsSpwwnjgxe4/wO3xytoE1TkL5rLDrqQb7I2Nu7/wyngOA4pzJ5xayQ6gFmtYaAqdjNwDEOSiOy87mu/Kqnzubvfb6pPfF8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753715890; c=relaxed/simple;
-	bh=vELfsk6qj9NC7bDPljsQYbRA4AjGbBgGFdWX51KP5Fw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=d6MN5ahsH3B1pphxv0ed+7cxkCFbJ4mQteFGPc/0jeDCS4qP6Nu8m/DrC9V+mM1ER907l2cBXUIv3mfG1ax7lC92GCN122zy8SnIsjnOuy7FSDih1DoicHdwmccv6YOWGDrYVWY/h5ITaBBRsLcvOzT2oqmgwDfdTlLPdF9bpfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=wg9Wg3a9; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=QDkxjy9s; arc=none smtp.client-ip=103.168.172.149
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-03.internal (phl-compute-03.phl.internal [10.202.2.43])
-	by mailfout.phl.internal (Postfix) with ESMTP id 04153EC01DE;
-	Mon, 28 Jul 2025 11:18:08 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-03.internal (MEProxy); Mon, 28 Jul 2025 11:18:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-transfer-encoding:content-type:date:date:from
-	:from:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1753715888; x=
-	1753802288; bh=eZGMj8H65pJrTuGqaqWRJirsSm66SzE3MZBCvyjF1dU=; b=w
-	g9Wg3a9GOQvUOqQb7yjblgwYsvlUbe2cclI3TQtkZW+UFHHjSLhb4EthbiA1qv6C
-	yYnMkNR4YaPaXjJefMPQnWWBVU5QgNIWOmctSYm73fBxYTjJipFnIOFPRbtp759J
-	2nTEDbmrt4nZeW2+2QmiEdxsk344wcv2Px9g+646x5A7PFxBp6QpKiMhfNXsK61R
-	lS4uMhVCBJXkKwj+5GnytH5gHAxNqKTe8RC350m4n2/maFnlMlbxnTms2rvBSEU8
-	Q9WTdiGdu1UqxeO25oJTX3WbqC2ZHZfGzxf0/d9otQ7NiSOoa0cWYocTKnijPvm0
-	acqJw0OsNhKVVYQ6auBfw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm3; t=1753715888; x=1753802288; bh=e
-	ZGMj8H65pJrTuGqaqWRJirsSm66SzE3MZBCvyjF1dU=; b=QDkxjy9sHhWjQoXfU
-	WPLU64s2dbHbeHgRAkDSQnIgocb6xteIG48SuPlijOz38cpKAwv7Z3NRwWw66Vvl
-	XgLtl6kXnaKi9Fjph8zE+rOBgcb994Jtcr2N8uWRjVHrLPG0jboKHTp+Wsro7wxz
-	vW1zMCiO/Ka5XSjnOIZzdxuu8YMKtxRc9jlv3rHBKI8BOziTomhjH+AyCJLDJm+V
-	vW/YWLfl17/pX75GQ01L+PgcBW0NEpxMoRn+nrLcN1SI+xw7KGvKnTm29V++gGpr
-	DOSlPlcij13r1aZ+SDBqPXc76sojzyhDV6MsJyK59B/Pb2aXpIWU8qohBKC9PloD
-	JYrdA==
-X-ME-Sender: <xms:r5SHaE2kSXRGH4G-y6FKualqkrAZ79RIw1qMc9HL2kUkoqiYSyP0fA>
-    <xme:r5SHaKxbml2kWVsQq_TwTRKDfCHsrwh4iF5mplsItyv-nT_pi_mXCZT5BI5YOe8rG
-    rhmJhDM5V5VZL1JADc>
-X-ME-Received: <xmr:r5SHaJWRGmRo-kWKBSA1-v_6lugVHRHrN76SulvxhbJe2JNY4oGS8q7OQGBa>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdelvdehudcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpefhvfevufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpefurggsrhhinhgr
-    ucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrihhlrdhnvghtqeenucggtffrrg
-    htthgvrhhnpeevteeuvdegudehieetlefhteevfeevleegjedvtddtjeetiedtjeegheei
-    ueefhfenucffohhmrghinhepkhhnohifrdhnvghtnecuvehluhhsthgvrhfuihiivgeptd
-    enucfrrghrrghmpehmrghilhhfrhhomhepshgusehquhgvrghshihsnhgrihhlrdhnvght
-    pdhnsggprhgtphhtthhopedutddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepnh
-    gvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepshgusehquhgv
-    rghshihsnhgrihhlrdhnvghtpdhrtghpthhtohepughsrghhvghrnheskhgvrhhnvghlrd
-    horhhgpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphht
-    thhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvg
-    guhhgrthdrtghomhdprhgtphhtthhopehhohhrmhhssehkvghrnhgvlhdrohhrghdprhgt
-    phhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtoheprggrth
-    htvghkrgesohhvnhdrohhrgh
-X-ME-Proxy: <xmx:r5SHaG-ylUUA9HD4Iq_TtwNq_LcOV-wR6fHDDglFJAkNC8q8WNdN7A>
-    <xmx:r5SHaMsqY7juWgx0A0_L07IbGWfhNF_FSgZiQhYk__IcoGsZ_KKb4w>
-    <xmx:r5SHaG0DkKvtEx74QJgUQ1btOsUJ4dqff-lYdtd78ZIZJaU6-1BDnA>
-    <xmx:r5SHaBR0U-C7sAc_hgW8RfmlNvY5neBVxL4g9A5pPXVokEGrAdLVvA>
-    <xmx:r5SHaJqZ0UwZeF5ivmQAh4c3mp_awPT1WlK-LsWdpGH5nzc59SqDHinP>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 28 Jul 2025 11:18:07 -0400 (EDT)
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: netdev@vger.kernel.org
-Cc: Sabrina Dubroca <sd@queasysnail.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Ansis Atteka <aatteka@ovn.org>,
-	Steffen Klassert <steffen.klassert@secunet.com>
-Subject: [PATCH ipsec 3/3] udp: also consider secpath when evaluating ipsec use for checksumming
-Date: Mon, 28 Jul 2025 17:17:20 +0200
-Message-ID: <0e8fbdd7e0086f4cc73a46f010a79638d4910498.1753631391.git.sd@queasysnail.net>
-X-Mailer: git-send-email 2.50.0
-In-Reply-To: <cover.1753631391.git.sd@queasysnail.net>
-References: <cover.1753631391.git.sd@queasysnail.net>
+	s=arc-20240116; t=1753715871; c=relaxed/simple;
+	bh=jV727T99qgnh1S0rwWU0da1unCUJvT2tB6hFm2F1/Mo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=aAC0SN+PEKGMFzq/P5EFjNlxB3opBixPIcA8nx4ac7904EwJz1ESbprGSQSBHAO3t3u3KMYqSjx2awITL7KAPb6cNaR1mYIXALfY/Eo49JAD75YHG2mipjpHpIp0jJXGdMaN3lBNk8PznVVl+OzggJFCcHDx5VfBZtrGwPPY6Co=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K16BHBpR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6AE4BC4CEE7;
+	Mon, 28 Jul 2025 15:17:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753715870;
+	bh=jV727T99qgnh1S0rwWU0da1unCUJvT2tB6hFm2F1/Mo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=K16BHBpRBWnNWZUczzVwEQX3lZbsX0KV0ELZ5BY2IxJt2tyDWbAVHAuddklKMUNL/
+	 6rM5XsxGlU5XsvyfafnXLhXviqefHfmIhdkVa4KhSUuVBu5LLvJyWlrmzBbYzTNf7r
+	 XaagVrZ+xz1j5nWqqz0Dq6TMa69amqwuKHy2tBc7XGfjMAtYeDFAjmIWDDjO9mhs8f
+	 emOQG6011CW96Df3b3hpWWoGRNGVqcnLgxD0Zt/1bhC41PEILL3uJxhYqQAlwqsplD
+	 h9vYZa57WBkTku3SZbAIM2C6rGXODXfrcZYVUdsjKWFLj1j2csHBKRuMMWkvR4cgjY
+	 0VQLmrxuroWWQ==
+Date: Mon, 28 Jul 2025 08:17:48 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Tariq Toukan <ttoukan.linux@gmail.com>
+Cc: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Jiri Pirko <jiri@resnulli.us>,
+ Jiri Pirko <jiri@nvidia.com>, Saeed Mahameed <saeed@kernel.org>, Gal
+ Pressman <gal@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Shahar
+ Shitrit <shshitrit@nvidia.com>, Donald Hunter <donald.hunter@gmail.com>,
+ Jonathan Corbet <corbet@lwn.net>, Brett Creeley <brett.creeley@amd.com>,
+ Michael Chan <michael.chan@broadcom.com>, Pavan Chebbi
+ <pavan.chebbi@broadcom.com>, Cai Huoqing <cai.huoqing@linux.dev>, Tony
+ Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Sunil Goutham <sgoutham@marvell.com>, Linu
+ Cherian <lcherian@marvell.com>, Geetha sowjanya <gakula@marvell.com>, Jerin
+ Jacob <jerinj@marvell.com>, hariprasad <hkelam@marvell.com>, Subbaraya
+ Sundeep <sbhatta@marvell.com>, Saeed Mahameed <saeedm@nvidia.com>, Mark
+ Bloch <mbloch@nvidia.com>, Ido Schimmel <idosch@nvidia.com>, Petr Machata
+ <petrm@nvidia.com>, Manish Chopra <manishc@marvell.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+ linux-rdma@vger.kernel.org
+Subject: Re: [PATCH net-next 0/5] Expose grace period delay for devlink
+ health reporter
+Message-ID: <20250728081748.700ad46a@kernel.org>
+In-Reply-To: <3bf6714b-46d7-45ad-9d15-f5ce9d4b74e4@gmail.com>
+References: <1752768442-264413-1-git-send-email-tariqt@nvidia.com>
+	<20250718174737.1d1177cd@kernel.org>
+	<6892bb46-e2eb-4373-9ac0-6c43eca78b8e@gmail.com>
+	<20250724171011.2e8ebca4@kernel.org>
+	<3bf6714b-46d7-45ad-9d15-f5ce9d4b74e4@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Commit b40c5f4fde22 ("udp: disable inner UDP checksum offloads in
-IPsec case") tried to fix checksumming in UFO when the packets are
-going through IPsec, so that we can't rely on offloads because the UDP
-header and payload will be encrypted.
+On Sun, 27 Jul 2025 14:00:11 +0300 Tariq Toukan wrote:
+> I get your suggestion. I agree that it's also pretty simple to 
+> implement, and that it tolerates bursts.
+> 
+> However, I think it softens the grace period role too much. It has an 
+> important disadvantage, as it tolerates non-bursts as well. It lacks the 
+> "burstness" distinguishability.
+> 
+> IMO current grace_period has multiple goals, among them:
+> 
+> a. let the auto-recovery mechanism handle errors as long as they are 
+> followed by some long-enough "healthy" intervals.
+> 
+> b. break infinite loop of auto-recoveries, when the "healthy" interval 
+> is not long enough. Raise a flag to mark the need for admin intervention.
+> 
+> In your proposal, the above doesn't hold.
+> It won't prevent the infinite auto-recovery loop for a buggy system that 
+> has a constant rate of up to X failures in N msecs.
+> 
+> One can argue that this can be addressed by increasing the grace_period. 
+> i.e. a current system with grace_period=N is intuitively moved to 
+> burst_size=X and grace_period=X*N.
+> 
+> But increasing the grace_period by such a large factor has 
+> over-enforcement and hurts legitimate auto-recoveries.
+> 
+> Again, the main point is, it lacks the ability to properly distinguish 
+> between 1. a "burst" followed by a healthy interval, and 2. a buggy 
+> system with a rate of repeated errors.
 
-But when doing a TCP test over VXLAN going through IPsec transport
-mode with GSO enabled (esp4_offload module loaded), I'm seeing broken
-UDP checksums on the encap after successful decryption.
+I suspect this is catching some very mlx5-specific recovery loop,
+so I defer to your judgment on what's better.
 
-The skbs get to udp4_ufo_fragment/__skb_udp_tunnel_segment via
-__dev_queue_xmit -> validate_xmit_skb -> skb_gso_segment and at this
-point we've already dropped the dst (unless the device sets
-IFF_XMIT_DST_RELEASE, which is not common), so need_ipsec is false and
-we proceed with checksum offload.
+As a user I do not know how to configure this health recovery stuff.
+My intuition would be that we just needs to lower the recovery rate
+to prevent filling up logs etc. and the action of taking the machine
+out is really the responsibility of some fleet health monitoring daemon.
+I can't think of any other error reporting facility in the kernel where
+we'd shut down the recovery completely if the rate is high..
 
-Make need_ipsec also check the secpath, which is not dropped on this
-callpath.
+> > Now we add something called "grace period delay" in
+> > some places in the code referred to as "reporter_delay"..
+> > 
+> > It may be more palatable if we named the first period "error burst
+> > period" and, well, the later I suppose it's too late to rename..  
+> It can be named after what it achieves (allows handling of more errors) 
+> or what it is (a shift of the grace_period). I'm fine with both, don't 
+> have strong preference.
 
-Fixes: b40c5f4fde22 ("udp: disable inner UDP checksum offloads in IPsec case")
-Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
----
-Since the issue is related to IPsec and currently not visible since
-GSO is currently broken for SW crypto, I'm including this patch in the
-same series for the ipsec tree. I can split it out if that's prefered,
-just let me know.
+Let's rename to "error burst period", reporter_in_error_burst etc.
 
- net/ipv4/udp_offload.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> I'd call it grace_period in case we didn't have one already :)
 
-diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
-index 85b5aa82d7d7..8758701c67d0 100644
---- a/net/ipv4/udp_offload.c
-+++ b/net/ipv4/udp_offload.c
-@@ -224,7 +224,7 @@ static struct sk_buff *__skb_udp_tunnel_segment(struct sk_buff *skb,
- 	remcsum = !!(skb_shinfo(skb)->gso_type & SKB_GSO_TUNNEL_REMCSUM);
- 	skb->remcsum_offload = remcsum;
- 
--	need_ipsec = skb_dst(skb) && dst_xfrm(skb_dst(skb));
-+	need_ipsec = (skb_dst(skb) && dst_xfrm(skb_dst(skb))) || skb_sec_path(skb);
- 	/* Try to offload checksum if possible */
- 	offload_csum = !!(need_csum &&
- 			  !need_ipsec &&
--- 
-2.50.0
-
+Exactly :)
 
