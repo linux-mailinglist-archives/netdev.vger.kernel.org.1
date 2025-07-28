@@ -1,277 +1,225 @@
-Return-Path: <netdev+bounces-210471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210472-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FC6AB13818
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 11:49:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E41EB138C7
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 12:19:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB841189D30C
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 09:47:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B6EB116E5AA
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 10:19:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28AAD265CAB;
-	Mon, 28 Jul 2025 09:44:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAD122550D7;
+	Mon, 28 Jul 2025 10:17:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZNDiS3DN"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Z/vtH/Ea"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2041.outbound.protection.outlook.com [40.107.101.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01A09264A60;
-	Mon, 28 Jul 2025 09:44:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753695849; cv=none; b=FfIi/0AT1sHdNbEX4JCyBfnb8H56QCQQwrTSCLNV9J9Pv7OTq4mC64lqv4zZQkb++Zx8SE6FCSfOFgVI6/c8yIMXqJGey8EgHKPYeallbkDTgliZvNdZY4qIEc1F+ahBE64y2lmVx+GQqShJXUho3uhjQrDwGKiGP5kroJfLoBE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753695849; c=relaxed/simple;
-	bh=4xXFPYbVAQVFYaiedRqz4YnnUv/G+c2nHre6wAx2+cA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=kBScjMw75vSoge8cm6H7A3OFMOLW23s1ohhucaJj+3uGa6vgsKy4Fc6zAw5sXZHkaU2dU28diZaGJ2k1vBoMjEV8D0MkO4OnJpKPkBph9qdh6iezpacUuQ3FxIaZbT76cApKLlSLjQaGHA5D7JRWAUhi0JSztnYx/uNiO/xQ/nA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZNDiS3DN; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-455fdfb5d04so22982505e9.2;
-        Mon, 28 Jul 2025 02:44:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753695845; x=1754300645; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=l+P1pO0VcptRLVWqzHA93r4jnwUEPVrrjiHiUMAaRCc=;
-        b=ZNDiS3DNxDdgxaB5epiH0XRV0srScgvEIn6sJjjh4Lf8ZeSS/SyyLnsdv4fEzbSYep
-         w3SdwHpydda/hbk3PeU0P1HIkDF7rrfOBna/KJBhBRuRxHUo2Ko4rg/PNNhudXM4IUgZ
-         dpTA1NY//E404M9I1CBpG82hWl73LyVMWQRNx+ZSLKtdSeHNWbqYQr1F/OfRhm8dTZxD
-         Kpmhi7DYpXVZbQTLSbfCdCq0oIHxLMX/a7ztVXzM3RbTmhvbnpWlHxFhtwiZwetqwY9O
-         0pNAZnUM8DukvPS2mdpzw/OfsyGEG7xVywYNdjSvb9y36QJRN/pTW99KlxG/+8l6bp9d
-         byNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753695845; x=1754300645;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=l+P1pO0VcptRLVWqzHA93r4jnwUEPVrrjiHiUMAaRCc=;
-        b=B8MN5mSeeIsXFPiyo+n0bDNGECXVVVgC/TOWLI0mqp8/sEyRiuzehBE8CsxMrYtpiP
-         w9wbDTDnreZf1MZSIomppgsZ0nXdpBhN9jqYnqX8zKrClO57XVQIpK70ytR4774qourQ
-         KSFuTboYe33oKn6Drz2sUcZaQSo3iJqclLRpAPxGMeUsWJRNYpGKuIsPi7zenIylXRmj
-         j/h3B/85PYkJS7gpQjkkJ8mhVPinj64flHW7zeRVW4yq3UGYgKUQU+uGK0AlcxVbuMx/
-         SvLOgxPoiqtxWsffeeR2xd4OssYW0WV56vookgtmyMqvAAmUVqVR0o/PSfZeOH6jTtIL
-         jYqQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU/hm61VwXOAkjf5BMsuGP1Ac6HQQo26tfB5TZ8SYkVjQb/G+RTtU/ks4iys1ONkkmByT6xwzPX6+KWhtHet/ov@vger.kernel.org, AJvYcCWA38u0sgPEwCka3/weQQ95BoSobs3AuMk8Wn+SZZxtUUEUvfOamK4/0L0yCaA2JcbCxDc2dAai@vger.kernel.org, AJvYcCXUXQGq8dGCHD3N2CFcLFU+4i2zmUXcJ2hnRI9P/qmDVgTpF8D/BEKa1RDyrpRoTPCoBGk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1cgFMXSZB507U6kMIc+75Yyl6xnNayUwJ2UsF0rW0UhuTD1y6
-	0/sQPU6rBjZLo6W7ee9itm2TqbkqZcthc8uVEl54IRtezVCcc9jMq/XI
-X-Gm-Gg: ASbGncuYIuGGMAJFDRROE5K/+jb0KssNk8CsI1FzC5z3vqZ5lDyCNHkXbDJrT4FNqY/
-	5n++lZqzKKMhP1ZdSOFH4T0qEgAnWY6o/+dKzd9Os2ym1+szfeiTOOmn6534HfPZ+0Pe8idwGD/
-	pF/0eiC/CQL6IuEMqXz6V0g2QUnXNEoYvyPhrnGOB7sTq2/XxL1oGVJMGioLyGT3jvQTQCHaMQ4
-	i4wsyok5Gz6PH54StBI7MLhwzX11T146glYWPWO39kPfL2kjJJLNW1OyMOSh+Onk17aXhNfq/P0
-	c7CguW/dJYu6ybqWAEtfcp8OjsUWxP7EPscO4jlBE9JOYw2I3v4+sD+ZBOvd6BPZ8y9RKMne2/n
-	br7gTkSzyvysqyvSyBF13L+xujgmqpXeeKv9f282kvXCAMQfSYtBlYHi5Gqs=
-X-Google-Smtp-Source: AGHT+IHzSy4NMd3Qx5rCatTn1WF/YbRKeEsCFDcF0eoLwVoG3FrjFskFfEqD9sCCMOiZbDxG++AB9g==
-X-Received: by 2002:a05:600c:1e89:b0:456:2379:c238 with SMTP id 5b1f17b1804b1-45876439296mr107541165e9.17.1753695844953;
-        Mon, 28 Jul 2025 02:44:04 -0700 (PDT)
-Received: from mtardy-friendly-lvh-runner.c.cilium-dev.internal ([2600:1900:4010:1a8::])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-458705bcbfbsm153422725e9.16.2025.07.28.02.44.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Jul 2025 02:44:04 -0700 (PDT)
-From: Mahe Tardy <mahe.tardy@gmail.com>
-To: lkp@intel.com
-Cc: alexei.starovoitov@gmail.com,
-	andrii@kernel.org,
-	ast@kernel.org,
-	bpf@vger.kernel.org,
-	coreteam@netfilter.org,
-	daniel@iogearbox.net,
-	fw@strlen.de,
-	john.fastabend@gmail.com,
-	mahe.tardy@gmail.com,
-	martin.lau@linux.dev,
-	netdev@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	oe-kbuild-all@lists.linux.dev,
-	pablo@netfilter.org
-Subject: [PATCH bpf-next v3 4/4] selftests/bpf: add icmp_send_unreach kfunc tests
-Date: Mon, 28 Jul 2025 09:43:45 +0000
-Message-Id: <20250728094345.46132-5-mahe.tardy@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250728094345.46132-1-mahe.tardy@gmail.com>
-References: <202507270940.kXGmRbg5-lkp@intel.com>
- <20250728094345.46132-1-mahe.tardy@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C5032550D4;
+	Mon, 28 Jul 2025 10:17:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753697865; cv=fail; b=k/3MEEfACokaKIs7PMwyjvNgSSrE2L1xlXV5OuB8z5qU/8/bbVVTM05YGk75HcfwaIappvMPXw3or0lj4fNpVxeGyasl5vXMoew55CA1/o9fVyOh6q5scfLpFdF6SygwqgQTtpg0+bD5PfDODOiL8U+AAq5QEPhdoNl1DEcurrc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753697865; c=relaxed/simple;
+	bh=cWtclGiH3DxtMAhrCFqDoI+zddLdaT12gDngoIlr/oM=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=JBBReX3MPXS505agbCMeIKJKEHeorf3xMjMfnK3aBsOoL8alaIPEG+19qRrpNqOKKisDI5LqpB3g6sy1+QPtPznk3aTWjFPNZ4Cfy4U5R+8ZY3VwDdePn/zUe3JnbM3Y+Na3Q2ckRhbM282GxFg5YLc7TCUeZE/XJPLMZgoK88Y=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Z/vtH/Ea; arc=fail smtp.client-ip=40.107.101.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=KA+tJY3LO4ZJUSwpgiegFtUtCImIS/T9xQhAFEzfmb+o7fsCc2wKStMJrOYhpFlzIj4ijqY2Gw2PDkcc9ag0Br3VJgHc92uVwBqQjmKRlfcq+VvK197zC9bc7chH2yFQyPX8B0cWZ9p2vduq0efw34Is6NBvhMj28HKuA5qhu6D/lp+quOJO3DTUr/28nmNkB8D45WTPNJ/5ebc/DUMMr+4kMIBwmZCtFValqxLCBpX1mfoVCt9iOYP8IL/J8lXjdyYt8dlzC+W9CQYOcAIfGQyDsBuafLuwji1JuMcIBsnqOjs9HegbOIEVppEX1/R2j3SkJDDtJIN2DGqwLo4BRA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=wmNZansXHkcThP2puBNHitPGcT41uE613MKoUCcuTMQ=;
+ b=VyFMOjVooecwuwmseX7gTEPzufII0ytpIIcbNYuIejzRrPEPqu5TSBje46gwxeBaNKLx0syCdVwZw+4rzOcaxRjDp+EEg5uc1+dDF4ZSBUq5wgPh7DSmRDTh92pBlcal4cXnxrA3WRITauIK+RsM5aJZwJ5mH3I4Vu2cdcjj+FoorRDFXkPKQGLB4XeQ6cdMoem376Qv1ZI0QbLD4JbJzcBqEz8HT+LUuCwWel8IYe9+ZB/JtmJ/Af6kC6uLf52dySNMwHUtds7IBg/UjNEatpKHKJZZUb7man+3yXpnfJr2rwVi5ROUo9fwX82VAAo9VyV+nUzEHq4HV+3skWodGg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=wmNZansXHkcThP2puBNHitPGcT41uE613MKoUCcuTMQ=;
+ b=Z/vtH/EaI7AcxGkX3MZdIHfAHeO7/1FkHt2Tc9eoa1/nmky9wP3yWFPKz848NYdN94ZzphuG4Z7M5RJZ8+7SmCge7RCLjp/kyBoXEWraluHx6c7XZI3U4niwXA364/UyKF3bLQxloPHU/3k9kiTPKfuO+I+yWGRKRGCNFipe0Ps=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from IA1PR12MB9064.namprd12.prod.outlook.com (2603:10b6:208:3a8::19)
+ by BY5PR12MB4290.namprd12.prod.outlook.com (2603:10b6:a03:20e::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8964.27; Mon, 28 Jul
+ 2025 10:17:41 +0000
+Received: from IA1PR12MB9064.namprd12.prod.outlook.com
+ ([fe80::1f25:d062:c8f3:ade3]) by IA1PR12MB9064.namprd12.prod.outlook.com
+ ([fe80::1f25:d062:c8f3:ade3%5]) with mapi id 15.20.8964.019; Mon, 28 Jul 2025
+ 10:17:40 +0000
+Message-ID: <14c50407-9b0a-e3ab-8c62-2943b8592bb2@amd.com>
+Date: Mon, 28 Jul 2025 15:47:31 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.0
+Subject: Re: [PATCH v4 01/14] net: ionic: Create an auxiliary device for rdma
+ driver
+Content-Language: en-US
+To: Shannon Nelson <sln@onemain.com>, shannon.nelson@amd.com,
+ brett.creeley@amd.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net, jgg@ziepe.ca,
+ leon@kernel.org, andrew+netdev@lunn.ch
+Cc: allen.hubbe@amd.com, nikhil.agarwal@amd.com, linux-rdma@vger.kernel.org,
+ netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250723173149.2568776-1-abhijit.gangurde@amd.com>
+ <20250723173149.2568776-2-abhijit.gangurde@amd.com>
+ <3528db67-86b4-47af-b002-87a75bbdc4df@onemain.com>
+From: Abhijit Gangurde <abhijit.gangurde@amd.com>
+In-Reply-To: <3528db67-86b4-47af-b002-87a75bbdc4df@onemain.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: PN4PR01CA0001.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:272::7) To IA1PR12MB9064.namprd12.prod.outlook.com
+ (2603:10b6:208:3a8::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: IA1PR12MB9064:EE_|BY5PR12MB4290:EE_
+X-MS-Office365-Filtering-Correlation-Id: f5b823e7-898a-4daa-fd1d-08ddcdbffbd4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|1800799024|7416014|376014|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?R254eE5ScUtLMjBUVkVlaEo0cS8vY0F6eDQ0SUdkOHJLbkNOcTF2K21yQU9L?=
+ =?utf-8?B?K1lXTFZCWUd1RGhVUnFhcHQwM3BWVG03U1A2d3VobkRaazlFT1JvOE9qT2c3?=
+ =?utf-8?B?bU55cWVzMzBzc1BEam8yM1h3TUlmNi9oSXpnWitpVWViTWRqZVc4S1REUUtz?=
+ =?utf-8?B?R056dFVBTU9UOHJ0cGI3cmsxZXdZOXhzejgyS3lidTNpUWQwODk0TmJLQW5w?=
+ =?utf-8?B?TEJrLzRhR3N0aXpRekxuZkhKWkxhWWJDV2tBM2RjNzN4dy9KcVVBa20zeGZ0?=
+ =?utf-8?B?MWVsODhCM2Y3bDNvdTFWTXRDV21FS2UzNVBXZUU5VlA4cXYxUEF1d2NKeUd0?=
+ =?utf-8?B?T0JvSlhFb3N3dUtZOExoTTUycGwzc2x0dExnb1AwaHUwMmhScEEweVBQbUFi?=
+ =?utf-8?B?enFXazFEbk1kb1VzcFFwcU8yRGhJcm4yTURDbmgvUWNnRW5OQ08zNSs3U1M5?=
+ =?utf-8?B?amhRUjk1UmVPMlF3QUJEbWlRWmIrN3licXNHbmU5akxjTGp4WWdxbUQvRUFF?=
+ =?utf-8?B?akcwbmZRVXdzeUVqcXY3MURaTzlpRDl0SVREVTVrcHpVcVZzcXhQdXdwWHJN?=
+ =?utf-8?B?N3hoRTVCVG1aYTAyTW9WeUY4SHVseG5HeEdRc3NGN2xWY1Bvc2NaRlBVM0cw?=
+ =?utf-8?B?cWdmVTRGYzNaU3BSRTNZTSt3ZEFVSGpldTFqalhXci9qeU5vQ3lKMEdkQWFa?=
+ =?utf-8?B?blpqRFBuVTc5bXBneWJ1ZXdZOGZ0eWxwZ2EveUMydHBHSDUzYW03eHF4eUMr?=
+ =?utf-8?B?NG8zU1VuTUdyVzAwSW1RSWpIQ3hZRkUrNTBvYWxES3Q1ZE9MQVpEQ0ZOZHQy?=
+ =?utf-8?B?anhudkdteUhPeVB3Ym5BMERySDVIS0pwVmt4V25PRGR2eXFPYWJDdHdiaG5B?=
+ =?utf-8?B?OTdWOXg5dCs4ZkxlTkJmTVdxbTVzdk1USERGTGZ1a3ZxK2tneFBWU1cyRUI0?=
+ =?utf-8?B?WTFqQ01sWkdSY1d0OGt2ekorcnNJK0YrYlpwNGMzNTJZWUVNRUdUSjEwcTNF?=
+ =?utf-8?B?dkdJQ21YNUZXdW5GdzNoSW9GeUo4RlVVWCtYMEJkRGFkNjBtV1BrbE9MZGt6?=
+ =?utf-8?B?Q1BzNU9IdTBxM3hwQmVscS8zTURyRDJxbjdoWmJBYk1vWU8rYjJ1Q25GZUs2?=
+ =?utf-8?B?c1ZQcVZidjM5ZzV0SGhoTWtka3AyWHJRUGxxY1MzbkZiM2hnZlJTMThGaEcr?=
+ =?utf-8?B?NXJYQ3FtRmRwbEZzbEFqYjFidmd1a0NMSzYydys1QjZ5TW5IaDRqRm9HWi9U?=
+ =?utf-8?B?YWRmRktZeVpXU2F2dVF5dnRhRTVZVE84QUExQllIclVidDlWL0hkWlVhcWRC?=
+ =?utf-8?B?Zi85d1JsUWRFZ0xuZzZoZCs3OWpNN0dFU1NvOC9RMmpTSnBjVC9QZ1ZRR3pn?=
+ =?utf-8?B?RE5QM1l5ajRZV2VKNnJxUVpkUmNQNDZWOTB0ZFlmNUVMcEdDc0NGMlh5Y0dU?=
+ =?utf-8?B?VXIxY0FTZDlKZXpHR25FS2FyRm40UndrNVZPRGZieXRmSjhTeklwcU1IMVVD?=
+ =?utf-8?B?UktKNlRid20xZUt4dGFhdy9Ma3JaTWlCbGRxRC9ZSE1pRnpRbmdvV1Y5SWcz?=
+ =?utf-8?B?MHU1UUF6RDVEOWpxZzYxT09MbTRPNkNmdHhhbWl5MndRUnFHd0NjZlhWamYy?=
+ =?utf-8?B?WHZMTnViYXA3dWRaS3JsbTlGTmZpWURvYjVxZDl3OWo0NHFtNUtzTXFCVEcr?=
+ =?utf-8?B?K0tjRnZwSEU4VmV2YStBei9FV2h6czNnOGR2M0EwVzJiTGczODFMczd3L0M3?=
+ =?utf-8?B?eEZiTUVncDVMZjhXa2N3YlZoNTBRWXN5cTR4a2p3ZHpxK2c2dUhLVXAvRzFi?=
+ =?utf-8?B?cGNscjZ1bm9VT3pBd2tpYVFmT2NwK3BOTWdGZVBCRVIrelByWFdWTHI0bWkr?=
+ =?utf-8?B?djFudG9ESGlSM2VUOVNQN1pLU0ZkdUdyRmJDSElVOXVFVnNSL2dTTEtCUmtC?=
+ =?utf-8?B?NHhza3dHbVBQbXA5YStXS3N0bmtGcFB2OHduQXlzN3RMeG9HSnJrQVRqWGti?=
+ =?utf-8?B?QTd2RGx6bzBnPT0=?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR12MB9064.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?RkFOK1RjUVdRVkxVVTlGUTVRNGx1RStXc3FscVdZUCt2dURMSU1oV0J6Um4w?=
+ =?utf-8?B?NWNJM05IRzlLVHNCTldKNndiSitFNFdVVUx1TEQxWTNibHpuOWFRMVVRNnNk?=
+ =?utf-8?B?RmhHM3k0dHZRcTE2QkdaU202N2ZQejV5VGlUbm9VN2lpa2F6cTdCbWZFZjVx?=
+ =?utf-8?B?YVowWEE2SlFObnF3ZVVTOXFEZHZLTit3RVJUOElCYW4yMWIvUzgrcnVOLzl4?=
+ =?utf-8?B?Y01Nb1BlY2JGbGtHNEN5dVpWanhTbVAzY0JBeHZmN2pKU3k3WUMvb2IvMnUr?=
+ =?utf-8?B?VlNzNHozTFdLMmh1Zjh0a0xTc2RmL1A3VXdWQ1IvNjNlN1NneFhYelVocUtn?=
+ =?utf-8?B?Y2d3TXlzUWVldXp4dDJoaldzRG5lSDNiNUJKWlpQYy9sbXA1d3RwY3BaV3hX?=
+ =?utf-8?B?aFgvVUw5OVRkR3N1YjJaMDArVTczWHRrSUFRQXhyekZWUURtdGZCQzM1RHBS?=
+ =?utf-8?B?TDJ3Rk1YNlNUa0V3U0VTeGNCSVdkOHR5dzFIaXR2eUZ2K0pkeW9qRElIbjBz?=
+ =?utf-8?B?enFmU1hRakdJd0JoNG9GY3RrZWE4b3Jvakt6c1hhUFNKdjhmcHRzZG0yUkM4?=
+ =?utf-8?B?RytON24xWDZiV05pUVg5bjJqMnVWQ2xtRmZ6eDAya3hrVDM5VTJ3dzg4ZXJw?=
+ =?utf-8?B?MUpoMVNrTjVkcE5ZQWlIZWZBeWMwOWMwS0J3eVJwYUw1cDVYODJvMUU4cWVK?=
+ =?utf-8?B?WHN1cDJFa2h0SGVYWXUrVVFvbVRrVVhhblk4b0F0QlN2a0NYd3hKbGVzWGI3?=
+ =?utf-8?B?SEY2QnNnYS9WL21tb0JQajdtZUg4THh1YXFmMnF6WjVLbENuRWF0SCtEV3E2?=
+ =?utf-8?B?c0NRSlhVejdvWHpVNkxVc1V2V3ZnZTF1OEdtQVJpdStkeXVORE1oSWFxdzZO?=
+ =?utf-8?B?ZFRaZXgzblFQRzlBNTZ1a0RSaWczMjlGTDFCOGxOT0pKTXRKUnBzbGxoM1Zn?=
+ =?utf-8?B?ajhpS1A4ZEVTNUhaMno2anp1a1k0TmpDMm9oZ0hMck5VZ1J5OGpOU3htWmpp?=
+ =?utf-8?B?cGlUVkJMWm5UQ0xDQ1BzeXQxL2xFQXlzZTFuMlFvdDlSK1dTSld5Z2hjY0ta?=
+ =?utf-8?B?OVpTb3VPQVFXWWhkNlE0Z3BpVHgzL1NRZ0NnTGpNT3h4STZ4bkgxUUdiR2tw?=
+ =?utf-8?B?UzRrVkhxR243REExNHFsRkNWbm53QlUzVG4wOG9SY3h3MEFrUjdncHlPaE9h?=
+ =?utf-8?B?UFJxWlh5cnpNcDh2Vk84NXkzMTZ0NUIyYXNkY0c0RFl6dnFTdHJjbG9UWk9j?=
+ =?utf-8?B?elVrdmhJazNWUFhrMllpVVVKVXNMVHR6a0xzMncxblcwUVUyVEdOUVV6dlFC?=
+ =?utf-8?B?MjVGZkVjZHVhamc5U29nS0h5SVQ3aDVrbzU1WDRTd2llN3cwdXlqRW5TZ1Bw?=
+ =?utf-8?B?STQyY1p3UFBzL3k1V2RLbzhGS1pOOHc1cVRaU2psNU5xSk1YVG1rNm1nZFl3?=
+ =?utf-8?B?WGk3ZjNBWmVqVkg2ak1MR1JTSVp3d1R2enNnb0FzbXBHbEFoQWlwMzM1OXVB?=
+ =?utf-8?B?a0drRjI5OHFxTmhuek94ZjErUDZQK2t5dzh0dWJuNEVRRVNHcWo5RGNHaSsy?=
+ =?utf-8?B?TjN5UlRWS3NRbVBnTi9TRDNkT1BnVFNJeDNPMXhZM2orZDhJSmpxTFpuUzBs?=
+ =?utf-8?B?WXZQckhlOEh1YlUrcFdIZWorYU9TczBZWDJzZFMzQWh0TG1CcFgvbEVYWllr?=
+ =?utf-8?B?TW12QUNqeGxhSTNvVW4zenlGdnJqTklaYktYeHBiVDlaY01TMEdMandPVnBv?=
+ =?utf-8?B?UGFSbThQalhXT0M5cFIvTEQ5N2tRNVNUekxiVSs5Nm50bngwc20rT29jK09S?=
+ =?utf-8?B?QmVBbDlHZDdOakpVa3E2U2hhMGcvdmVocEpkQ3ZzT3lJeDFSRU9QSGl4YnFK?=
+ =?utf-8?B?YWdlZFkzMVV5aWxzK3pnQklFNjE0b2RtSGEyRXYwSHdmL2dDREhFdWV3SVRj?=
+ =?utf-8?B?dDFGVEs0V3pJZlVBdFlSR3dwMmdlWEhZcWhsU3ZzMGhhd2E3UTVRalpTblFO?=
+ =?utf-8?B?eUR0UENDN0kxNnRzektiYXVmQlVpZUVwbkd3SGdneEt4dkhnRjhyOXMxSXhK?=
+ =?utf-8?B?bVpVYm5LaHFURnpMb3RkdVV1ZjE1emlyWkNzK0ZGbExmems5dVdYTDZ2cTgw?=
+ =?utf-8?Q?Z8AUo4Ie/qDy4k9ieqh/Ohzsk?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f5b823e7-898a-4daa-fd1d-08ddcdbffbd4
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR12MB9064.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jul 2025 10:17:40.7195
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: JLjZKUGJGsAL3x8JguMtq8wfayo6OCpvXXKs8qYgF7/+7E67xeOJcwKUXv8inn8moavBUzxFNPUFj2DQ7McpgA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4290
 
-This test opens a server and client, attach a cgroup_skb program on
-egress and calls the icmp_send_unreach function from the client egress
-so that an ICMP unreach control message is sent back to the client.
-It then fetches the message from the error queue to confirm the correct
-ICMP unreach code has been sent.
 
-Note that the BPF program returns SK_PASS to let the connection being
-established to finish the test cases quicker. Otherwise, you have to
-wait for the TCP three-way handshake to timeout in the kernel and
-retrieve the errno translated from the unreach code set by the ICMP
-control message.
+On 7/23/25 23:41, Shannon Nelson wrote:
+> On 7/23/25 10:31 AM, Abhijit Gangurde wrote:
+>> To support RDMA capable ethernet device, create an auxiliary device in
+>> the ionic Ethernet driver. The RDMA device is modeled as an auxiliary
+>> device to the Ethernet device.
+>>
+>> Reviewed-by: Shannon Nelson <shannon.nelson@amd.com>
+>> Signed-off-by: Abhijit Gangurde <abhijit.gangurde@amd.com>
+>> ---
+>>   drivers/net/ethernet/pensando/Kconfig         |  1 +
+>>   drivers/net/ethernet/pensando/ionic/Makefile  |  2 +-
+>>   .../net/ethernet/pensando/ionic/ionic_api.h   | 21 ++++
+>>   .../net/ethernet/pensando/ionic/ionic_aux.c   | 95 +++++++++++++++++++
+>>   .../net/ethernet/pensando/ionic/ionic_aux.h   | 10 ++
+>>   .../ethernet/pensando/ionic/ionic_bus_pci.c   |  5 +
+>>   .../net/ethernet/pensando/ionic/ionic_lif.c   |  7 ++
+>>   .../net/ethernet/pensando/ionic/ionic_lif.h   |  3 +
+>>   8 files changed, 143 insertions(+), 1 deletion(-)
+>>   create mode 100644 drivers/net/ethernet/pensando/ionic/ionic_api.h
+>>   create mode 100644 drivers/net/ethernet/pensando/ionic/ionic_aux.c
+>>   create mode 100644 drivers/net/ethernet/pensando/ionic/ionic_aux.h
+>
+> Hi Abhijit,
+>
+> It occurred to me that there should be some discussion added into the 
+> ionic.rst file about this new auxiliary_device support.  You might 
+> look in the amd/pds_core.rst and mellanox/mlx5/switchdev.rst files for 
+> similar examples.  This perhaps isn't a blocker for this patchset, but 
+> should be planned soon, or added if you do another rev for other reasons.
+>
+> (In a similar vein, the pds_core.rst should be updated for the new 
+> pds_core.fwctl auxiliary_device, but that's a different problem)
+>
+> sln
 
-Signed-off-by: Mahe Tardy <mahe.tardy@gmail.com>
----
- .../bpf/prog_tests/icmp_send_unreach_kfunc.c  | 99 +++++++++++++++++++
- .../selftests/bpf/progs/icmp_send_unreach.c   | 36 +++++++
- 2 files changed, 135 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/icmp_send_unreach_kfunc.c
- create mode 100644 tools/testing/selftests/bpf/progs/icmp_send_unreach.c
+Thanks Shannon. I will mention the rdma support via auxiliary device in 
+the ionic.rst in next spin.
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/icmp_send_unreach_kfunc.c b/tools/testing/selftests/bpf/prog_tests/icmp_send_unreach_kfunc.c
-new file mode 100644
-index 000000000000..414c1ed8ced3
---- /dev/null
-+++ b/tools/testing/selftests/bpf/prog_tests/icmp_send_unreach_kfunc.c
-@@ -0,0 +1,99 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include <test_progs.h>
-+#include <network_helpers.h>
-+#include <linux/errqueue.h>
-+#include "icmp_send_unreach.skel.h"
-+
-+#define TIMEOUT_MS 1000
-+#define SRV_PORT 54321
-+
-+#define ICMP_DEST_UNREACH 3
-+
-+#define ICMP_FRAG_NEEDED 4
-+#define NR_ICMP_UNREACH 15
-+
-+static void read_icmp_errqueue(int sockfd, int expected_code)
-+{
-+	ssize_t n;
-+	struct sock_extended_err *sock_err;
-+	struct cmsghdr *cm;
-+	char ctrl_buf[512];
-+	struct msghdr msg = {
-+		.msg_control = ctrl_buf,
-+		.msg_controllen = sizeof(ctrl_buf),
-+	};
-+
-+	n = recvmsg(sockfd, &msg, MSG_ERRQUEUE);
-+	if (!ASSERT_GE(n, 0, "recvmsg_errqueue"))
-+		return;
-+
-+	for (cm = CMSG_FIRSTHDR(&msg); cm; cm = CMSG_NXTHDR(&msg, cm)) {
-+		if (!ASSERT_EQ(cm->cmsg_level, IPPROTO_IP, "cmsg_type") ||
-+		    !ASSERT_EQ(cm->cmsg_type, IP_RECVERR, "cmsg_level"))
-+			continue;
-+
-+		sock_err = (struct sock_extended_err *)CMSG_DATA(cm);
-+
-+		if (!ASSERT_EQ(sock_err->ee_origin, SO_EE_ORIGIN_ICMP,
-+			       "sock_err_origin_icmp"))
-+			return;
-+		if (!ASSERT_EQ(sock_err->ee_type, ICMP_DEST_UNREACH,
-+			       "sock_err_type_dest_unreach"))
-+			return;
-+		ASSERT_EQ(sock_err->ee_code, expected_code, "sock_err_code");
-+	}
-+}
-+
-+void test_icmp_send_unreach_kfunc(void)
-+{
-+	struct icmp_send_unreach *skel;
-+	int cgroup_fd = -1, client_fd = 1, srv_fd = -1;
-+	int *code;
-+
-+	skel = icmp_send_unreach__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "skel_open"))
-+		goto cleanup;
-+
-+	cgroup_fd = test__join_cgroup("/icmp_send_unreach_cgroup");
-+	if (!ASSERT_GE(cgroup_fd, 0, "join_cgroup"))
-+		goto cleanup;
-+
-+	skel->links.egress =
-+		bpf_program__attach_cgroup(skel->progs.egress, cgroup_fd);
-+	if (!ASSERT_OK_PTR(skel->links.egress, "prog_attach_cgroup"))
-+		goto cleanup;
-+
-+	code = &skel->bss->unreach_code;
-+
-+	for (*code = 0; *code <= NR_ICMP_UNREACH; (*code)++) {
-+		// The TCP stack reacts differently when asking for
-+		// fragmentation, let's ignore it for now
-+		if (*code == ICMP_FRAG_NEEDED)
-+			continue;
-+
-+		skel->bss->kfunc_ret = -1;
-+
-+		srv_fd = start_server(AF_INET, SOCK_STREAM, "127.0.0.1",
-+				      SRV_PORT, TIMEOUT_MS);
-+		if (!ASSERT_GE(srv_fd, 0, "start_server"))
-+			goto for_cleanup;
-+
-+		client_fd = socket(AF_INET, SOCK_STREAM, 0);
-+		ASSERT_GE(client_fd, 0, "client_socket");
-+
-+		client_fd = connect_to_fd(srv_fd, 0);
-+		if (!ASSERT_GE(client_fd, 0, "client_connect"))
-+			goto for_cleanup;
-+
-+		read_icmp_errqueue(client_fd, *code);
-+
-+		ASSERT_EQ(skel->bss->kfunc_ret, SK_DROP, "kfunc_ret");
-+for_cleanup:
-+		close(client_fd);
-+		close(srv_fd);
-+	}
-+
-+cleanup:
-+	icmp_send_unreach__destroy(skel);
-+	close(cgroup_fd);
-+}
-diff --git a/tools/testing/selftests/bpf/progs/icmp_send_unreach.c b/tools/testing/selftests/bpf/progs/icmp_send_unreach.c
-new file mode 100644
-index 000000000000..15783e5d1d65
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/icmp_send_unreach.c
-@@ -0,0 +1,36 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include "vmlinux.h"
-+#include <bpf/bpf_helpers.h>
-+#include <bpf/bpf_endian.h>
-+
-+char LICENSE[] SEC("license") = "Dual BSD/GPL";
-+
-+int unreach_code = 0;
-+int kfunc_ret = 0;
-+
-+#define SERVER_PORT 54321
-+#define SERVER_IP 0x7F000001
-+
-+SEC("cgroup_skb/egress")
-+int egress(struct __sk_buff *skb)
-+{
-+	void *data = (void *)(long)skb->data;
-+	void *data_end = (void *)(long)skb->data_end;
-+	struct iphdr *iph;
-+	struct tcphdr *tcph;
-+
-+	iph = data;
-+	if ((void *)(iph + 1) > data_end || iph->version != 4 ||
-+	    iph->protocol != IPPROTO_TCP || iph->daddr != bpf_htonl(SERVER_IP))
-+		return SK_PASS;
-+
-+	tcph = (void *)iph + iph->ihl * 4;
-+	if ((void *)(tcph + 1) > data_end ||
-+	    tcph->dest != bpf_htons(SERVER_PORT))
-+		return SK_PASS;
-+
-+	kfunc_ret = bpf_icmp_send_unreach(skb, unreach_code);
-+
-+	/* returns SK_PASS to execute the test case quicker */
-+	return SK_PASS;
-+}
---
-2.34.1
+Abhijit
+
 
 
