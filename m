@@ -1,249 +1,143 @@
-Return-Path: <netdev+bounces-210456-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210458-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 130E5B13646
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 10:21:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E8F85B136CB
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 10:35:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF4F73B9660
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 08:21:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3926A3A3F79
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 08:35:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39D96236A8B;
-	Mon, 28 Jul 2025 08:21:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22CEC2236F8;
+	Mon, 28 Jul 2025 08:35:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b="gp72qQo3"
+	dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b="iHO4WXGY"
 X-Original-To: netdev@vger.kernel.org
-Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013063.outbound.protection.outlook.com [40.107.159.63])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9A11231858;
-	Mon, 28 Jul 2025 08:21:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.63
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753690893; cv=fail; b=uxq/Ir9k5dM4SG/D31SgSEGzUTJseO4YBWa2cX5YTNjMq8OvvhIaDMPkvq3aZ1xx7h0UNx6Q4KWEhP1y/zDu10yT7grddyiVJu6lu4+7q4/AVaeZvZrkvNjBxxtQdlolgPCXJYOVcpybqO7WAkW3UddyV0huyLienNQT05Wv8vE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753690893; c=relaxed/simple;
-	bh=39sbgf+SXcHpXnHPuINj18OH5LmhvFUgpjMoPYgKgZ4=;
-	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=cLxdv5fR9ItLICvUsEDqcMz//YYJzoJdQ6Xtwr3ikThLiSGRvUnm63/jYE+p4jA3A4SsZjuN3XzQLaoW/ALOGVgyFjD9weavTOLwbHqe2HKgW6EWqaFvcmdMtQKpBOGE75GJ42s3vVYgl1S3qQ6bnBvAF3k/gC18RCxCs1rUuOg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com; spf=fail smtp.mailfrom=nokia-bell-labs.com; dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b=gp72qQo3; arc=fail smtp.client-ip=40.107.159.63
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nokia-bell-labs.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=gmLxqYK6O/JyBCERrV2YDMrJn5aWxIX+oEbnW0YfcyFcim3g+knG3VpmbgEYR/ueHMINp8Z5fY/aXEgzsZ9AV1HCdHm6jy3xfqRKgssKUZscru7bhwLttsTZjR2S0qiD9Lf+m3Gmm8CMNV+JAKv3IAdPuYAeVe3N0uHGKCNO9U/mKvR0ZVJg1BioXD+BomSfvIJZxzfBLmMMFDB0rqNGY2x6awEhKwAlPGzG+dkbmtj5BlRQkdtjCkixEy/oA7WrL4PbcULom9orfAE6YquKtDggIvLkNgvYXaZI7vpRuYEgqz1wgNW5YBpqXTF9c2II9NeIhcMlOTq3WFe9mjdJRA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=39sbgf+SXcHpXnHPuINj18OH5LmhvFUgpjMoPYgKgZ4=;
- b=lqWOYyqMQyMjsnES2TU2AZ7capgDyWO6wCy70uLzcDjJrU1Nw3S1mFWhn9xFVm1mTIK88HsmtX6GDNfdShpsUsfzKYN6nVL1Dq/vMTlsMiQ4XbJdqGNSb3ofsxZvzjlEmXcv3fZ6TamLDsuJaZfQYAoROwUJcS4dJOyrN4Hdj5sH4xdjZmYkxDEp8codU86tu9/EtWyX7i6v3tJTIKSNm2cMtXckGuHrQvFcv4j5RUNqtkSqSUQfnkGAHQor/YY9srwAZroxDuB9vtvFtXI5Sn6Q7JbSOdP828N2dTkvJMWopyVah24e2jN9Oz+Fuij6Sks3vo8XcovMZqXXSv836Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nokia-bell-labs.com; dmarc=pass action=none
- header.from=nokia-bell-labs.com; dkim=pass header.d=nokia-bell-labs.com;
- arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nokia-bell-labs.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=39sbgf+SXcHpXnHPuINj18OH5LmhvFUgpjMoPYgKgZ4=;
- b=gp72qQo3Z8EW20U9JmcDMumaa4tM1dKll7P6Qd3yqDJfBug4JQTuSRScDpoVuXjj1a8HWMdPVl40s42dFW0kKV2VrgQtypU9j1SS/Tj/KPH71TDga0RX2vUNB3hmvitnH8peKjJAW6yPk7KMstc5mD74+uyAlWL8DwEseQMkzg6r1Ql13PTzElabjvIEupYcJwQ/+1BcJP7g8ezxWXyLhH+R5PY2r1ETj2qn7JVoekgXFbgLQ8LN4srKCfC8UOB2U3GGiE8WeUApYOelDTwE3z9yLbvybUCWtjQveJHJ8c1gMLlvEPmgtu/U0JqGR+/OYCMQbQKN69e/hIpaJZZs8w==
-Received: from PAXPR07MB7984.eurprd07.prod.outlook.com (2603:10a6:102:133::12)
- by PAXPR07MB9601.eurprd07.prod.outlook.com (2603:10a6:102:247::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8964.26; Mon, 28 Jul
- 2025 08:21:27 +0000
-Received: from PAXPR07MB7984.eurprd07.prod.outlook.com
- ([fe80::b7f8:dc0a:7e8d:56]) by PAXPR07MB7984.eurprd07.prod.outlook.com
- ([fe80::b7f8:dc0a:7e8d:56%6]) with mapi id 15.20.8964.025; Mon, 28 Jul 2025
- 08:21:27 +0000
-From: "Chia-Yu Chang (Nokia)" <chia-yu.chang@nokia-bell-labs.com>
-To: Paolo Abeni <pabeni@redhat.com>, "edumazet@google.com"
-	<edumazet@google.com>, "linux-doc@vger.kernel.org"
-	<linux-doc@vger.kernel.org>, "corbet@lwn.net" <corbet@lwn.net>,
-	"horms@kernel.org" <horms@kernel.org>, "dsahern@kernel.org"
-	<dsahern@kernel.org>, "kuniyu@amazon.com" <kuniyu@amazon.com>,
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "dave.taht@gmail.com" <dave.taht@gmail.com>,
-	"jhs@mojatatu.com" <jhs@mojatatu.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"stephen@networkplumber.org" <stephen@networkplumber.org>,
-	"xiyou.wangcong@gmail.com" <xiyou.wangcong@gmail.com>, "jiri@resnulli.us"
-	<jiri@resnulli.us>, "davem@davemloft.net" <davem@davemloft.net>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "donald.hunter@gmail.com"
-	<donald.hunter@gmail.com>, "ast@fiberby.net" <ast@fiberby.net>,
-	"liuhangbin@gmail.com" <liuhangbin@gmail.com>, "shuah@kernel.org"
-	<shuah@kernel.org>, "linux-kselftest@vger.kernel.org"
-	<linux-kselftest@vger.kernel.org>, "ij@kernel.org" <ij@kernel.org>,
-	"ncardwell@google.com" <ncardwell@google.com>, "Koen De Schepper (Nokia)"
-	<koen.de_schepper@nokia-bell-labs.com>, "g.white@cablelabs.com"
-	<g.white@cablelabs.com>, "ingemar.s.johansson@ericsson.com"
-	<ingemar.s.johansson@ericsson.com>, "mirja.kuehlewind@ericsson.com"
-	<mirja.kuehlewind@ericsson.com>, "cheshire@apple.com" <cheshire@apple.com>,
-	"rs.ietf@gmx.at" <rs.ietf@gmx.at>, "Jason_Livingood@comcast.com"
-	<Jason_Livingood@comcast.com>, "vidhi_goel@apple.com" <vidhi_goel@apple.com>
-Subject: RE: [PATCH v14 net-next 00/14] AccECN protocol patch series
-Thread-Topic: [PATCH v14 net-next 00/14] AccECN protocol patch series
-Thread-Index: AQHb+u9Wsvbmfakbnk6OyT7s46V2OLRBQusAgAX3ioA=
-Date: Mon, 28 Jul 2025 08:21:27 +0000
-Message-ID:
- <PAXPR07MB798417C584E5949EB903B8E0A35AA@PAXPR07MB7984.eurprd07.prod.outlook.com>
-References: <20250722095931.24510-1-chia-yu.chang@nokia-bell-labs.com>
- <e79b4382-9421-498d-8b8c-6157ff070a34@redhat.com>
-In-Reply-To: <e79b4382-9421-498d-8b8c-6157ff070a34@redhat.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nokia-bell-labs.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PAXPR07MB7984:EE_|PAXPR07MB9601:EE_
-x-ms-office365-filtering-correlation-id: 454a58ba-ea40-46cc-cb9b-08ddcdafbf95
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|376014|7416014|366016|1800799024|921020|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?OOq2TRMwA4CfN1u3Tx8MAPn6It781Uxv+Fq31nNAa1wskO/fHLHDV4Tk42Zq?=
- =?us-ascii?Q?sKXWPoNkoqhH172Js6MMESFop7vA8NrZFBfJSsAu7Zt/ijyjO7lVldAi/+Sa?=
- =?us-ascii?Q?bq3w87WKv9RE9whzYzTu3sKNtURv9hIBlVqFweLXpyIEXalanj2P0NUNAMpn?=
- =?us-ascii?Q?wuexoQO9Zy010PGN2s0TDefLGN6D94pRoYBkvAtEgDPwVBNQEKW7SzGQ1o62?=
- =?us-ascii?Q?ix4aFiGVfVfo4HmwqgQuVy5RO+ypzFJpYznWCGfzgsl6xqF27CGePzXnb/Bs?=
- =?us-ascii?Q?4uh0Q1+ZEl0wutPjbBITJ99wWzgywV3DTdNb+vdzl9WNy7hljy0eZyn7sfWz?=
- =?us-ascii?Q?m67HsoLtzoUjZbrQG6Jghl2YLS37knVlvJKYA3wU5z+RdnJfwviGFdhna280?=
- =?us-ascii?Q?IMjQ+j8dZItPcDtZXCZ5FxDaWvDGBECeGHFHL5hh8Y7ldvnBA0woqWyWvzAq?=
- =?us-ascii?Q?rth5L2w1FC0FJMOhV49CHDm2Rhhap13x52IYWqIXv+YQF3b2zcPXbl4wPFb1?=
- =?us-ascii?Q?eUVu1XB6ZF2LVTX16g7MQ3KO720tt6wqF5Aik5IfmTEy+s6sgBml0ELKpmC6?=
- =?us-ascii?Q?X9Uqdhjto5u++1LHnQL02Q5pAXQYbZW2DQ6o0pgrs83rZIVAW1d9VRmigyct?=
- =?us-ascii?Q?mFT8n02BOQp4PXLNPuXH20NAtMcT71RKkkuVnSiItNWIBFukpRay6N3k/m12?=
- =?us-ascii?Q?nvYzzxnpznEC4vpxMXOEAukiuDx/nhcWyEsQCz1AhnjOZXN/yxU42yb+QnKU?=
- =?us-ascii?Q?5bZLSNiIXEjnnUuQl92nwlOEMUwwdhOJWTsKy/NLphjFm0J9IJOb21jRethe?=
- =?us-ascii?Q?27rNZV8YD5yP0ETmJpUF7v0i6cTGhbQVukOSg7mOUM+N8jSfvGmv9uyAeBYq?=
- =?us-ascii?Q?aG+ie/rmRg8q/fSu312jaic6SX1dXfuJpg5uNmQBnHc/aEU5olOdjLs1Pdbk?=
- =?us-ascii?Q?+luJJl9M8wBpngBFZxmlerynfxIOTwkFX9mGNPGOvkPZ6389brGVIKicGvx2?=
- =?us-ascii?Q?zCDxyAfMByASnyNs84PI5FOlrKxj8vPvRv6onRv3EycRruPegbTkPbUAXy3P?=
- =?us-ascii?Q?d8esL1kHOS58ttcQr2FPRbxBERls6B78PrGompZOz2rDX2LQvdw4jAePRrlE?=
- =?us-ascii?Q?2hC/MmkznEaUfUoN1HnKPBL05TI81v2S9fTl3QTlqTl7vp0krEhpxYGhqQmG?=
- =?us-ascii?Q?rC6uKd/e+ajmjGXFCFu/Dx1NQ5unRAMolREICvUrSlaZacD0c+rNf3lt+Csw?=
- =?us-ascii?Q?JmIfMszm9TteV1YEemzMA9nfs6mM2uDAot0ZYal7BYCgG8gr355JDQ3Y5knU?=
- =?us-ascii?Q?kE7OPnyQXsHOR7jrj+V6fIhhfgUhelp8Cfcrj0pZe2JbQBrJa3jTVBp0WXZy?=
- =?us-ascii?Q?W5odPj8LN69OMY1IviOz383Yzn6AUVNttHJkMfSiDABavOqwoPgKD6CcPlv2?=
- =?us-ascii?Q?mlW6EIGtwEURPGzTT4GXy7xfsmZ9Q33m5WewqfIAnZZewya+NcVwxOjG/Sv7?=
- =?us-ascii?Q?BAc5aUxJ6S/Z3GtA9Jlgb6dVrddZNXzqKT3L?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR07MB7984.eurprd07.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(921020)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?WTnBcm3fhV6ejKuSAl5ZkplOnKj10mPsrkhkrTLjbjj+5c8rVOxLwmLRvN8o?=
- =?us-ascii?Q?0/J78p0EVneNtr/onwNO4WQqCnub1rbrQ3tu9CliNAf/KvriEcY/Gap9Zyco?=
- =?us-ascii?Q?QTkYNx6tdGnaFRdf2HFs6Bk8XtykaM3t9SU1xBRGvIsE1mCeOKX0XnLnvCd0?=
- =?us-ascii?Q?BFscvsVjywvxssHMFelP1/6JvMFpxXVpG/+m0v9VDbXgHn798fxkK2viPJtv?=
- =?us-ascii?Q?PYPeHG1Jwzyz8ho2ZBnzKrbqu8cSYOJMFpEVISOH+7xTM4ckF5gPoYdDiLnE?=
- =?us-ascii?Q?j/1dlvT/nmC7ui+mw3kJoaCRpyQAxGb0RWxQcP/lQaGsUkCIckeGMD8yLWK/?=
- =?us-ascii?Q?UGwdRRSTAB+2F0zrISVKPeuL1095PSyKcU+7LfTQLvzUvDcCMjBuUVYRAy4V?=
- =?us-ascii?Q?PSwRUfc7XpELYQqeYtXB3ic/rF2/t7O6nesB0fSd6cCHHd7jGqfCLlL9bKpV?=
- =?us-ascii?Q?9VEyAK2FgdEGNXJSh87yJpIjBzSofjON1piovW6640XgzMHc5lSBSljYjoM4?=
- =?us-ascii?Q?LSwy8twV3eo+bg4xz8cOLPV1cYZMqKxKRSn5z+w3/EL8VN//Dy6mim7ZwJwu?=
- =?us-ascii?Q?1I9VHFTUSKMvRX5ih1WxiDdoLyPN6+UI33lS8OqNma74L/Tbk4tBzW+TFae1?=
- =?us-ascii?Q?13LWjg91OkGGjoTykVUBvge4gsFxOfp2Pe1mUt4e/nbe62x1bgP0UCzysFNc?=
- =?us-ascii?Q?JESTWj6XL4kCj44WQHT/DkyYTwE1Qlev20Mb2SAZh13QKvvDkDcb/n+pjwvo?=
- =?us-ascii?Q?oWmZIPbRoUVqnrQYyltYmAsji1N39ZkJUIFFgyf2CyYK14Pf1tyAEb46JUbI?=
- =?us-ascii?Q?KHYm/GLqEsmW+HnsL4v8CDl2YI/eF/hCQvP4KxefzlYsZR6pvOOzlc9ODVhh?=
- =?us-ascii?Q?sNmPgwmGfvsXub+1yF1lpMML6nALJue8ld27dZ/hJpzOt2BSGrbkRytoDfUU?=
- =?us-ascii?Q?uIBTwMZAeVkHQ5fxapar2Zotzp7m6uw/ok6DETjIwU3DAJvrPXJvCmvQr7aM?=
- =?us-ascii?Q?dDGCmqA5lLrr3lec4E66A3cmvZr9HRFrpzgPLqY4Mo6aFq98lUIseUjD1H45?=
- =?us-ascii?Q?1vgxFbVDMO4M5tx8Vd1BseHB0UtvGooQcsID/JxVsUfqSAPxDCxmoSt+qkiq?=
- =?us-ascii?Q?jJG9TACXmYr89H8Ns0lT4PFdnnXhcj6dDLglAlrslKfAOCc+kroUtV/KxkIE?=
- =?us-ascii?Q?/PUTyMvYU0+blcxc8SUIGlAXS49WCtxs3kNeNu8JfQCpQGOrIwH0po6Ck6wm?=
- =?us-ascii?Q?ME6ASEodr5llnWU7HHMbaFjLHKDRge1ayE9N/LFzYVQKVdTOuFYEMt3clCTd?=
- =?us-ascii?Q?aiMQMO7zntl8QbMGjKLXs9jRgtSjYj97Zr4f2K99jpNtuwZg6u349wptFZCG?=
- =?us-ascii?Q?jH5m2OuBwqJjdoSAlgIFatYIhm+ICI07wc8Fm4FKGKThnHCMFjubo+c6UTUz?=
- =?us-ascii?Q?I8RstHUmSmTclmuqI/pe/DNBNDwAtIAGbdlcF4QKAIk2AVvcx1GzATFoz4ns?=
- =?us-ascii?Q?rFOLM47d/iV1qNC9b1HFdc/usYOOjnINCyBzsh8htzzvxX75Vl1rF9PIBVFs?=
- =?us-ascii?Q?KXdqm03oJX7TYZgWWw78ckGx6nP/sBUSzbu8qIfA4jw4zIyXqTTwd6d1B229?=
- =?us-ascii?Q?ImT+cXl4Rb4Wbdec49zw9C8=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A5EB2E3715
+	for <netdev@vger.kernel.org>; Mon, 28 Jul 2025 08:35:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753691737; cv=none; b=OqZNZGUHw4QzIouhqdJMDp24+in6GNWfFGS/AUEDPTrmmyzMqVHixWVfCxGNjFRLCHxEy489JcWvo6KARtYw8DpGzoJ7U3gZvCGNlM0Yr6LG1ureHDa+FNZM2cVRbrmhJPawiL/rMnTXYbQGG9E3llRgvkhH+3NiODaBe2IJ3m0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753691737; c=relaxed/simple;
+	bh=uq+ImxcXIDpT7koBCX+UcC0xIpCmcUr0MukPByOa2Mk=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=QBBDFI2fgxYivrYzz4N+qBbyw6W/kq05+MUs5Nq+XLlESZcsuuJ2SpwJ6akWvYpoP5WM4t5m8IaSPa46RkgcTDkEPFvd+0hAn+LdMaMhyvTchUuKhRcYZA9jRX63XAjK+QD6XIlYEBiAEK75sBpYcGPCIMhDtIJK1OyZ8yf2XdQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fairphone.com; spf=pass smtp.mailfrom=fairphone.com; dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b=iHO4WXGY; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fairphone.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fairphone.com
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-60c01b983b6so8853357a12.0
+        for <netdev@vger.kernel.org>; Mon, 28 Jul 2025 01:35:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fairphone.com; s=fair; t=1753691733; x=1754296533; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=O+GMtvbjmv8Vnpzhp5frnyGTe3+Arr4kqBd4arPc9h0=;
+        b=iHO4WXGY17tmTrWpKiCTGLB0bjUBddLJDr0B6lBJppd1FND0bmlXlIFlRHYNPjL63P
+         M4YQ/ceoa2KK6x+u2Nr4KaRCd8ZyDpk/9NRR0l7ysOKUaZBwmVXtt4lzEKmm6ojOTO9n
+         2uk4//BrhSc4jCSA2F5UtreHjuGO76NdbCU2hzAxRO49pHtcljQTc3ss+q4yNYDjwgdf
+         xxiT7bfZD4gmiJ6qglL6OUHql5BUidfOyykhzo1X6ddf1eHJFLAvVVyIxVGwebxAtxFC
+         px/xQ6YNoESAEQ2iq0+H/2C1flqfBRpLSX/ErTewbva/XOueJQIgDIQv21D3667OAEd4
+         FBeA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753691733; x=1754296533;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=O+GMtvbjmv8Vnpzhp5frnyGTe3+Arr4kqBd4arPc9h0=;
+        b=kevTkerirtzBPgIcyiqW6gL2DK95NBH6tfLmqi2ilbiOWulhtlqb+Mx9k7snm30rLD
+         dyhrlNkHB2qVm/1iUnztZVSKjX9kuGRmJMK5oT2HASTJ+IYR7W6MYuruShlYilib+o/W
+         wh4kG5NWFy64k1nuuw4LLIMyqi6ostfRkffNDcjt0EtpjGle7kDfUP4osJWg2NKz0nc7
+         e7zkO2XmcepyJSskNI4zxeYstyaCtSZGRiJ9PauZZYcdzaHMEYGHcYNCMnorBzXe5CFe
+         euumFycy5qggKhbAdtiWyONDckeCtF0Np6als4b0mfRN5rNSSxxjk6VmhQ7W0WT9hzsK
+         2joQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU9DseucYCKHivrtDMc9yN3Dy7nXiegz32KjEjCAjs2jhpyE+woHWYGvUGNelN3qIxjiMv8hyQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw1V4wFBMdxkr+ColWzsvyhlATB914KLc6RYvY29GphOpXrDcZv
+	gqJrtHaHZYv7JT6EZe+2fsXLD3J5Xm4uUPZb92ai1v1+eVIWgD3/5Jrc9k9Ip1O1dK8=
+X-Gm-Gg: ASbGncsjHkdCL1hB8lBU4bcW29ST/sI3GfTuCe5eq2f0oEjefo2UbalF3CeoehAQpph
+	9MLXx7rDaBVLwciesO83E2c0BnZpFlFD/jLEkfKRsovyr6ZGy39dOIMl+0guduu3JLQjmfe1Pf6
+	0PktGVVTn1+Wvwz1EYUykK81NftBDWM5FePAVyGt6GrdQHE8ZmwVnff00tdPnJIal3O/cdZkv0T
+	p3zyKpTFZojuPRxhdrsfudqyDLrL2eCiDi1D7JC9hhsrwXuZvv+vKruoDfdunVdHoJ0JKGRo3sL
+	CXwkmKjRIYiqpXyhi8kE06oKVJ4FuDDHI06pG11bhndXuTXyqcmVHlv2qPuhd4qWTE0N5BkpB1w
+	ibprOZTV6n4A3T4xz8CsNFNolrbNTEDTuO5V6IHkyriBCfqqJSv5zkBRDYVIzQfhszvMT
+X-Google-Smtp-Source: AGHT+IEBOjDm49OG5iajjv5/g2Kv4L9dOcAdyp+LmUUVb1D/Ep2oTi+pZ65JkiAVimwgzoOcYQbOYw==
+X-Received: by 2002:aa7:c6d5:0:b0:615:3a2a:e14e with SMTP id 4fb4d7f45d1cf-6153a2ae3a0mr2467948a12.0.1753691733390;
+        Mon, 28 Jul 2025 01:35:33 -0700 (PDT)
+Received: from otso.local (144-178-202-138.static.ef-service.nl. [144.178.202.138])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-61500a5a014sm2968551a12.20.2025.07.28.01.35.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Jul 2025 01:35:33 -0700 (PDT)
+From: Luca Weiss <luca.weiss@fairphone.com>
+Date: Mon, 28 Jul 2025 10:35:24 +0200
+Subject: [PATCH] net: ipa: add IPA v5.1 and v5.5 to ipa_version_string()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nokia-bell-labs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR07MB7984.eurprd07.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 454a58ba-ea40-46cc-cb9b-08ddcdafbf95
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Jul 2025 08:21:27.3638
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 5d471751-9675-428d-917b-70f44f9630b0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: P2PbMLI00ns+8EokD8rBEDw9so1TFMw2UlEl0+jV+Mn0BmWWMEX+GC04fIr99lX9MKaztwSFRZSR+lrkzrXngNfoEBHao5VgjxkWXmLZsWP66Oz+ljAW1VftJrVPBoga
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR07MB9601
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250728-ipa-5-1-5-5-version_string-v1-1-d7a5623d7ece@fairphone.com>
+X-B4-Tracking: v=1; b=H4sIAEs2h2gC/x2MSQqAMAwAvyI5G7CF4PIVEak2ai5VUhGh+Herh
+ zkMDJMgsgpH6IoEypdE2UMWUxYwby6sjOKzg60sVbVtUA6HhCZDeLF+/RhPlbCiI6r93Ey+NQ7
+ y4FBe5P7n/fA8L5RlE0NsAAAA
+X-Change-ID: 20250728-ipa-5-1-5-5-version_string-a557dc8bd91a
+To: Alex Elder <elder@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org, 
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Luca Weiss <luca.weiss@fairphone.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1753691732; l=1189;
+ i=luca.weiss@fairphone.com; s=20250611; h=from:subject:message-id;
+ bh=uq+ImxcXIDpT7koBCX+UcC0xIpCmcUr0MukPByOa2Mk=;
+ b=G2dTIgCPaZQDwhSQBS8d3RRhaJYTgThtBtF6HvSRKoozUXXxKyIRBsuhIuvD5vSc+6YhRgF8b
+ 69DChLOqCBiAHNo5Qr44J9qFsvTOU6dnTVrTZzCAhGRVB9PCbSuTTns
+X-Developer-Key: i=luca.weiss@fairphone.com; a=ed25519;
+ pk=O1aw+AAust5lEmgrNJ1Bs7PTY0fEsJm+mdkjExA69q8=
 
-> -----Original Message-----
-> From: Paolo Abeni <pabeni@redhat.com>=20
-> Sent: Thursday, July 24, 2025 3:11 PM
-> To: Chia-Yu Chang (Nokia) <chia-yu.chang@nokia-bell-labs.com>; edumazet@g=
-oogle.com; linux-doc@vger.kernel.org; corbet@lwn.net; horms@kernel.org; dsa=
-hern@kernel.org; kuniyu@amazon.com; bpf@vger.kernel.org; netdev@vger.kernel=
-.org; dave.taht@gmail.com; jhs@mojatatu.com; kuba@kernel.org; stephen@netwo=
-rkplumber.org; xiyou.wangcong@gmail.com; jiri@resnulli.us; davem@davemloft.=
-net; andrew+netdev@lunn.ch; donald.hunter@gmail.com; ast@fiberby.net; liuha=
-ngbin@gmail.com; shuah@kernel.org; linux-kselftest@vger.kernel.org; ij@kern=
-el.org; ncardwell@google.com; Koen De Schepper (Nokia) <koen.de_schepper@no=
-kia-bell-labs.com>; g.white@cablelabs.com; ingemar.s.johansson@ericsson.com=
-; mirja.kuehlewind@ericsson.com; cheshire@apple.com; rs.ietf@gmx.at; Jason_=
-Livingood@comcast.com; vidhi_goel@apple.com
-> Subject: Re: [PATCH v14 net-next 00/14] AccECN protocol patch series
->=20
->=20
-> CAUTION: This is an external email. Please be very careful when clicking =
-links or opening attachments. See the URL nok.it/ext for additional informa=
-tion.
->=20
->=20
->=20
-> Hi,
->=20
-> On 7/22/25 11:59 AM, chia-yu.chang@nokia-bell-labs.com wrote:
-> > From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
-> >
-> > Please find the v14 AccECN protocol patch series, which covers the=20
-> > core functionality of Accurate ECN, AccECN negotiation, AccECN TCP=20
-> > options, and AccECN failure handling. The Accurate ECN draft can be=20
-> > found in
-> > https://datatracker.ietf.org/doc/html/draft-ietf-tcpm-accurate-ecn-28
-> >
-> > This patch series is part of the full AccECN patch series, which is=20
-> > available at
-> > https://eur03.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2Fgit=
-h
-> > ub.com%2FL4STeam%2Flinux-net-next%2Fcommits%2Fupstream_l4steam%2F&data
-> > =3D05%7C02%7Cchia-yu.chang%40nokia-bell-labs.com%7Cdea2afda16db47bac335=
-0
-> > 8ddcab38c99%7C5d4717519675428d917b70f44f9630b0%7C0%7C0%7C6388895946950
-> > 64349%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAw
-> > MCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdat
-> > a=3D31iNaKPYVFldNPeSytOPmepH4K4TebzVzevkuiPwV70%3D&reserved=3D0
->=20
-> I don't have any additional comments, but let's wait for Eric's review.
->=20
-> Also we are very far in the development cycle, likely this will have to b=
-e postponed to the next cycle.
->=20
-> Thanks,
->=20
-> Paolo
+Handle the case for v5.1 and v5.5 instead of returning "0.0".
 
-Hi,
+Also reword the comment below since I don't see any evidence of such a
+check happening, and - since 5.5 has been missing - can happen.
 
-Thanks for the feedback, and I see this patch series is now marked as "defe=
-rred".
+Fixes: 3aac8ec1c028 ("net: ipa: add some new IPA versions")
+Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
+---
+ drivers/net/ipa/ipa_sysfs.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-May I ask what shall I do (or just wait for the announcement of the next cy=
-cle) to proceed?
+diff --git a/drivers/net/ipa/ipa_sysfs.c b/drivers/net/ipa/ipa_sysfs.c
+index a59bd215494c9b7cbdd1f000d9f23e100c18ee1e..a53e9e6f6cdf50103e94e496fd06b55636ba02f4 100644
+--- a/drivers/net/ipa/ipa_sysfs.c
++++ b/drivers/net/ipa/ipa_sysfs.c
+@@ -37,8 +37,12 @@ static const char *ipa_version_string(struct ipa *ipa)
+ 		return "4.11";
+ 	case IPA_VERSION_5_0:
+ 		return "5.0";
++	case IPA_VERSION_5_1:
++		return "5.1";
++	case IPA_VERSION_5_5:
++		return "5.5";
+ 	default:
+-		return "0.0";	/* Won't happen (checked at probe time) */
++		return "0.0";	/* Should not happen */
+ 	}
+ }
+ 
 
-Best Regards,
-Chia-Yu
+---
+base-commit: 038d61fd642278bab63ee8ef722c50d10ab01e8f
+change-id: 20250728-ipa-5-1-5-5-version_string-a557dc8bd91a
+
+Best regards,
+-- 
+Luca Weiss <luca.weiss@fairphone.com>
+
 
