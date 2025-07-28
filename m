@@ -1,86 +1,126 @@
-Return-Path: <netdev+bounces-210427-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210428-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3483B1340C
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 07:13:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 069E7B13421
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 07:25:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5677F3AAA2D
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 05:13:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D5EE3A9496
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 05:25:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D12E5218821;
-	Mon, 28 Jul 2025 05:13:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E62D1219A89;
+	Mon, 28 Jul 2025 05:25:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gN7Iq9NC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lWx1qp3v"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A83C6290F;
-	Mon, 28 Jul 2025 05:13:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E47D145346;
+	Mon, 28 Jul 2025 05:25:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753679611; cv=none; b=usDw9xrBKoLM4BiL46ghUBJJV2KFu4PQF2i84G5EUZhtR9YV/9QrwEfhkXyZvp5aoEJaaJ2KIqH8D4v/QBPiILkJvTwa41xare1XtjzJWTEpK2iu+KQit0sh0r9GPeHYG6WOJxntfLHQWNOB4f+6c6E7AbGOgqBmcwykVAGmjnE=
+	t=1753680330; cv=none; b=qzFlr84i7F2RdVYNmNYkwS5EMJ1sn5XAn5BWUdCXa/JiNgl2GKFu4wF/LdaT6mEdEwqCNCjJr6oWyORcGnAGnStsABuO1hY73uLMMLF+M9xVP0FSKdzO6VPYsGj0OJdfTXrZBJu3bfLvJ/HO/naa88Yc8GR/Zgk9fJeNMfZeV3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753679611; c=relaxed/simple;
-	bh=SCnFBh2pOHaMVAfqrFukG2B0hL6vIjUPCh6ccF3qkK8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kR82ekqL2MS65WV3zRfSa3ZX9QtzCUX+zi3U/y1hjFeFVIOX+heole3j6n1e7lGZQHeUodnf5/ojnL1nus2gFamHf01po3X96KhXZf0NbT/oh8sElMsFXbb7NqP6iHPUvI5OITIkwZQNn/GrotiDQ/YMJUTKCYOy4FNuMO9PyXE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gN7Iq9NC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FF7FC4CEE7;
-	Mon, 28 Jul 2025 05:13:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753679611;
-	bh=SCnFBh2pOHaMVAfqrFukG2B0hL6vIjUPCh6ccF3qkK8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gN7Iq9NCeErSi0+I/651qC9gtqQbPYvfmJV/9O29RskqzV2JOSeMUnqJEZ8x5Hmfj
-	 UPXZkvom7b/Ucz+4yw0MAJLkNC0EKS5NRdGb2ZDBd4ke6nOXvxig9Ax55Qr1QSxIIF
-	 K4KfW4nkV0054baygkRJdm3iPcSJeO6UJxQPCi3lFfHmNuZPDHxxpZhG+cbzctyYpC
-	 gwwJBiixcOmqCGMu+ZIaxUB4M0b6n6zAT3mN9Z6UaR5TPGpKQwZdHU1/UkFonUkua0
-	 uqxhfMrnFUcE6Y0EJm6sMPgsXcYiL6vfHEElFG9NMVInU0jERzCxr3qqIlEJu8WxlR
-	 E0/RtxjrwuITA==
-Date: Mon, 28 Jul 2025 07:13:28 +0200
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Simon Horman <horms@kernel.org>, Felix Fietkau <nbd@nbd.name>, 
-	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next v6 1/7] dt-bindings: net: airoha: npu: Add
- memory regions used for wlan offload
-Message-ID: <20250728-pompous-bull-of-argument-ddda6c@kuoka>
-References: <20250727-airoha-en7581-wlan-offlaod-v6-0-6afad96ac176@kernel.org>
- <20250727-airoha-en7581-wlan-offlaod-v6-1-6afad96ac176@kernel.org>
+	s=arc-20240116; t=1753680330; c=relaxed/simple;
+	bh=xAA6hVtIB+bf4Uv+0L9AJ4FbHxMqP42Gq6OfbwGaPIs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UA5NcYH4hw7aTvfuZpslbt4pE/JIyJjlax51BKGWl+QzNqrypLfuLCJDUfnDCezugfUmbacJZPBZOFnLtb2bFw6Za1WTkKJ0oUgt7P5iisGQd4RiLDX0un299J6Ggf4oNbx3ss5d3FUUPCUI85wb61PUfeUyytdT9LcbqYZx+xU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lWx1qp3v; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-ae36dc91dc7so647957466b.2;
+        Sun, 27 Jul 2025 22:25:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753680327; x=1754285127; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=xAA6hVtIB+bf4Uv+0L9AJ4FbHxMqP42Gq6OfbwGaPIs=;
+        b=lWx1qp3vCpUqvA90oMUhCSq3j6443S2s2JKXfm64lfbshY8aPKhJ55uFTZ+ggGpFkt
+         KYF4ulNovo1HsrWoWaCrIF4EsMs9XHM5hlXvYtRxtX4k23UXb33jo3jpdg7ciEhfzOC6
+         NXVJoVR9+/VHjShdS3VZFbe4oOygbwH77GAcl3BsChpTL9K60VXBYTy8s89+lPCj/YHu
+         r4NDxXSUpeOrX+cD4nBBfWx606FJ3R09pThnH6mZ1GfgIR8MhI3PRk0mt989uRDaqDXO
+         8RiJnTwVaVt/hBdjbcHqa/Wgdo0Aay8MpqiNZlgt3K1F86ebrX7yls+bw6bdT9UkjGE0
+         cPnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753680327; x=1754285127;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xAA6hVtIB+bf4Uv+0L9AJ4FbHxMqP42Gq6OfbwGaPIs=;
+        b=eX8h/Fwjmb0bAZLLXTLDs5z5i3cP43PAXPRY0824b6Eo5MNULXeAWHSSAWlSGel+o6
+         Vj/TyRUa4m/Qr6Y+DADUU1sOQZjS2GNlOLt9wdgW7yQUn3CHAZI3PB1qIVMCL8k91yZq
+         dEZbOuVfYJUqvRCtcjdhfzLb+swu4xlGZfmVdTdYoaJq2/gqwF6shC04ldtlItX1KZQY
+         w/junfVg2izowjotmw5a+jyfxob30d8p3WcL1Rip86bzXNZCd/2eOjB/PuPqKiOLng9Z
+         5X6jUEuVRNYwUrtyb2w4C7aPo5QsS7j7mr2wqtx2EXOp6Zb/gPzulvjTl+K8Bx1zNsQw
+         2EPQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUJ+mE+wufj/77NTQwYdBVPMDfkasgl+sxGuncNLskJQLFnrXEkZYZP+05HB1YNVGWpRbddqGqg@vger.kernel.org, AJvYcCUO8ryZ8pxGAlD0/JhdqLUgerW9h2Y1eQD9crJWjePlH1w+slQ9tHwT0IKj2z5UmCp3tDVem6OFaLCY/QI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz/qYgvGopPht+w2/SAMjLzs17TqBLcrq6GbmwyYLJsE7nH8DW3
+	xdQoc9Pf68bvqTM8ET2VSDZMCd/BGJ3MPv7xLow7JNQ4bBKt9nJUml1E2DGJMcATIScFd+wFxzh
+	bvPBl3qjQWJSL577NBDvUEGpABu9rFw==
+X-Gm-Gg: ASbGncskUtcCa/ZiwxLcuZhb0IjLu52zkevv4ts9JWXJdC6HBWtIy4EcxlHk1LiP4in
+	G3wC0p69KAEevECt+B3NdBPuNrDiT4UXS9ZnP1pILk5CsbddD8YEoPpHgH82jaBFND+OpBAlHiH
+	IKWFzUv+Oh8s7ivo3V811VlNN7d3CI773oqcLlXqwFjH9cD83qRFksWrSY5iJysMV0vMFuz/mCK
+	8SGfQqCvcjS1Cc3Lvk=
+X-Google-Smtp-Source: AGHT+IGCMKefX/zChAC12Z/OhqmQYHBtBxzOUWUKWY3mCS3AEPtThfpxG8ut0Ixt1dYFyuaL6ihlrsfRaLOEUVzsXNk=
+X-Received: by 2002:a17:907:7fa1:b0:ae3:5be2:d9e8 with SMTP id
+ a640c23a62f3a-af61c7af16cmr1113886666b.18.1753680327292; Sun, 27 Jul 2025
+ 22:25:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250727-airoha-en7581-wlan-offlaod-v6-1-6afad96ac176@kernel.org>
+References: <68712acf.a00a0220.26a83e.0051.GAE@google.com> <20250727180921.360-1-ujwal.kundur@gmail.com>
+ <e89ca1c2-abb6-4030-9c52-f64c1ca15bf6@lunn.ch>
+In-Reply-To: <e89ca1c2-abb6-4030-9c52-f64c1ca15bf6@lunn.ch>
+From: Ujwal Kundur <ujwal.kundur@gmail.com>
+Date: Mon, 28 Jul 2025 10:55:13 +0530
+X-Gm-Features: Ac12FXzuA330-pvpBxrs3N-OOIgkQ3e6G_xbUJKiPM9_Ccssgmlm5qllwTdDBS8
+Message-ID: <CALkFLL+qhX94cQfFhm7JFLE5s2JtEcgZnf_kfsaaE091xyzNvw@mail.gmail.com>
+Subject: Re: [RFC PATCH] net: team: switch to spinlock in team_change_rx_flags
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: syzbot+8182574047912f805d59@syzkaller.appspotmail.com, davem@davemloft.net, 
+	edumazet@google.com, horms@kernel.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com, jiri@resnulli.us, andrew+netdev@lunn.ch
+Content-Type: text/plain; charset="UTF-8"
 
-On Sun, Jul 27, 2025 at 04:40:46PM +0200, Lorenzo Bianconi wrote:
-> Document memory regions used by Airoha EN7581 NPU for wlan traffic
-> offloading. The brand new added memory regions do not introduce any
-> backward compatibility issues since they will be used just to offload
-> traffic to/from the MT76 wireless NIC and the MT76 probing will not fail
-> if these memory regions are not provide, it will just disable offloading
-> via the NPU module.
-> 
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> ---
->  .../devicetree/bindings/net/airoha,en7581-npu.yaml | 22 ++++++++++++++++++----
+> Did not compile this change? I doubt you did, or you would of get warnings, maybe errors.
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Ah sorry, I shouldn't have relied on static analysis -- clangd did not
+complain so I did not wait for the compilation to succeed.
 
-Best regards,
-Krzysztof
+> And what about all the other users of team->lock?
 
+I see the mutex is defined in `struct team` and cannot be changed as
+I've proposed here. Would switching to a spinlock across the board
+degrade performance?
+From what I understand, the NDO for ndo_change_rx_flags doesn't seem
+to disable BHs unlike ndo_set_rx_mode [1][2] so this seems to occur
+only when a new unicast address is being added via dev_uc_add [3]
+(which does disable BHs).
+Comparing other operations that use mutex_lock / mutex_unlock, looks
+like a few of them do not have RCU protection for their NDOs requiring
+lock / unlock pairs in the code, but none of them disable BHs (AFAICT)
+apart from the operations dealing with unicast / multicast addressing.
+If this is indeed the case, perhaps we can use a dedicated spinlock
+for team_change_rx_flags? Or switch back to rcu_read_lock as I believe
+it's being used in team_set_rx_mode [4] for precisely this reason. To
+be honest, I do not understand the intent behind this change as
+mentioned in 6b1d3c5f675cc794a015138b115afff172fb4c58.
+
+P.S: I'm still trying to get my head around the net subsystem, so
+please let me know if I've misunderstood the whole thing.
+
+[1] https://www.kernel.org/doc/html/v6.3/networking/netdevices.html
+[2] https://elixir.bootlin.com/linux/v6.16-rc7/source/net/core/dev.c#L9382
+[3] https://elixir.bootlin.com/linux/v6.16-rc7/source/net/core/dev_addr_lists.c#L677
+[4] https://elixir.bootlin.com/linux/v6.16-rc7/source/drivers/net/team/team_core.c#L1795
+
+Thanks,
+Ujwal
 
