@@ -1,252 +1,221 @@
-Return-Path: <netdev+bounces-210425-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210426-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C468B13375
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 05:51:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49C37B133A7
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 06:21:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3CA51175F2B
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 03:51:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 258147A6EC2
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 04:19:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2EC7214A6A;
-	Mon, 28 Jul 2025 03:51:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JWf2QjR2"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F2EC1F5842;
+	Mon, 28 Jul 2025 04:21:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE03E1EA7C4;
-	Mon, 28 Jul 2025 03:51:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
+Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71D231C36;
+	Mon, 28 Jul 2025 04:21:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753674681; cv=none; b=kc4CEANhrVJmRyggBM49lxQLWINLON1xPkwuLaT8WSSA0488VT2jjEyimOuXuxIUWIQ6aSLa+RjDXsnPczINvWul4XTl7kwEZ9CEz42PItXE5XgroVaa2uyW7EebFVh3Znlb+5gEgmhAgqijfgJPvhmWfS92H8lESKmbCd3I4fQ=
+	t=1753676477; cv=none; b=XjnLGCCrCPgLZ2QXxX0dPILAI6cj+sc9KThTyvjqR1sS6lqp5B9bWKb9LD+/JdCw0ZzjPhCUKeR8tQ5RblY+uA31/WZfOUXrhKJlquPvXcgnD9v2PJgmoXjCJsN1swrGLtLQ7Vzoq8b/JZFN3fQAo7Ht0k09G6Qn0lvAgJcGntg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753674681; c=relaxed/simple;
-	bh=R+Szdc9IZEupB29lbdW/bHnVnpDKxXmiFUCekZcQk1M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=B9RfIM9Ix5FMQrnHTaQtaVod26jEmPazrQgBvp5szP1NkANnFqCp+fKBNAh+E0ujd8uy4XUZIFKKYQ/BZ6n+SQsaYofGpnSTETpo4AwH5p5s/OboGOlsMSemYrWs9TdCZCUiuc5eK4hmAtDwJA3WxtYwvAWyjgSOC6SLzriC51c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JWf2QjR2; arc=none smtp.client-ip=209.85.128.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-71a04654b82so7523697b3.2;
-        Sun, 27 Jul 2025 20:51:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753674678; x=1754279478; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rrehipaAg9x4RIFKtETchHQEThsc/Gdzu3QWzY579jk=;
-        b=JWf2QjR2gkaAmZOjpw4g1fFfj/DVt02E4Ba7NxG7KSErmhLRv3DDRH/1rH+GdTtlaZ
-         OZqQT9oEJZ0gTkplqnPkseW26KX88HOnciNBkQQe621b2fKxrjhvac/1Ydt/EUCPBdbU
-         Uddj7xv7so7r2KZiJpdCphuwWWot1Bpuvca6FRrXkEJrUvhJaplHDXMvWfGS6HMkqKCi
-         rH3xdCrf49FNCV52ziveHKznRrwPp1qv4MJ7Cl//UMSo+5myhM4UKVpeT9DnYSdVwAk0
-         KalYda+M0xhYJB0yuWDhRctcMJ4/7CVC9XdZVAqo0Q2XAEDDqZ4V5HaHD3b4W+eqTUBq
-         aQOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753674678; x=1754279478;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rrehipaAg9x4RIFKtETchHQEThsc/Gdzu3QWzY579jk=;
-        b=G1JvOgcuH42zrX+9Atq4HQ2n8OHI+i0eMKlzY94oROzMGh6SuFGIVB5AXqzxqNTuvp
-         glODB7z0J+cSqs3H9wg6QXn70QoeeZ0iY1f3i2alnlO6kerYo4hhjt7hIjNXuwZd9UXP
-         Ir4a42fq+ivgfZXysynBRIhzcxtXOmOIRMgDTyiqgrYR453s73o5uroJD92NdAbzVi/r
-         izrwfYb4V+ti9rDiVWKNGvzGj0uEJOyrn9vwWzJehuKFS54kNPcF+3WsZsccrSUjaipE
-         u1YvD7a8pA7o1jic8sxBZUyESZxQEcK+R5rhl6PgW9M5hDxl9hrtw3dXO7zvigYefHn+
-         K0WQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUOrUCLD2wbMNf5uRGeUobgAYtYNRbZR0UjiNZrkL7pD6zL/1DiEm8KgQycM6DxwrRqTHJnW5AwAWxUee0=@vger.kernel.org, AJvYcCVGGWYr8Z5lI4ursjscv/cOO0UB+TRN55201xtcoVxNyFmLA5vE9ecLm04wAmlEway8IW1obd9Z@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyb0m6+lbMZcRyc0cg49B8R8ErO0bb7udwXImvw4b6THyXAcip0
-	MwzaayFe+aY6wsju6BNVQ34JZ2HqgwS9nO29k9GRLhoTU5QZzHoudmf410T9+7Bkh3W6YdGA2+f
-	h2hSMmbJTjrAzwfLMlmEBUx1pbktlhK0=
-X-Gm-Gg: ASbGncsCpENhIzDrfMsSCx20efzjQvPD4D8Nu8Fuc0UkewluVxpcQjK59bWNk4kFfWy
-	VNTAN3UEiDD6+ZpUQ1l6IS3mUrwcO3UDtTozNXnn3eETqjJa2ngwsBLFatLvM2Z2mw5TPDHQfy5
-	v2VSai+gLxN1D40Wu8HfRfKUZRBdMqX1cs4C1p+WpLIYkLd8oRs/NuyfJjqCRNnosEYWzm4HhCy
-	fPY8b2+H+4TEs/Nhdz4aMtklCgdfe7wBCFgDM2vLQ==
-X-Google-Smtp-Source: AGHT+IEe8t4zH9Jep2O4bZaR1QE3V/MNiGneZNNvs4ZGlVtrTRVKeRdxtgbxH/VTFPO9qqV5hxccBCyovNKBN973ZDI=
-X-Received: by 2002:a05:690c:6f02:b0:71a:2c7d:d2a0 with SMTP id
- 00721157ae682-71a2c7e2642mr738037b3.12.1753674677854; Sun, 27 Jul 2025
- 20:51:17 -0700 (PDT)
+	s=arc-20240116; t=1753676477; c=relaxed/simple;
+	bh=w86KR5FHkwPycOHZuKnays9MGzpZ9OSrzPKVwgR4qus=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=RAPsSb9gFfv130tfHbWHOWIcKX4UP/Rj2vyTHjcWwnALhT4SGpLtB81VGb8Gnpu17WkMqxG/NXhgRY0rJ8Ihgli4y8lLpkcb69IEI3TnpoAi3abODOti/BG0R0INFpxg+SzhINBbH7Y5h6vcXnvb5zQtOy5xM9CrQbxUEOsKKyU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-669ff7000002311f-3e-6886faacf898
+From: Byungchul Park <byungchul@sk.com>
+To: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	almasrymina@google.com,
+	hawk@kernel.org,
+	toke@redhat.com,
+	asml.silence@gmail.com
+Subject: [RFC net-next] netmem: replace __netmem_clear_lsb() with netmem_to_nmdesc()
+Date: Mon, 28 Jul 2025 13:20:50 +0900
+Message-Id: <20250728042050.24228-1-byungchul@sk.com>
+X-Mailer: git-send-email 2.17.1
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFuplluLIzCtJLcpLzFFi42LhesuzUHfNr7YMg8n3NSxW/6iwmLNqG6PF
+	nPMtLBZPjz1it9jTvp3Z4lH/CTaLC9v6WC0u75rDZnFsgZjFt9NvGC0uHX7E4sDtsWXlTSaP
+	nbPusnss2FTqsWlVJ5vH+31X2Tw+b5ILYIvisklJzcksSy3St0vgymjYeo2tYIJWxdqV91ga
+	GDcqdzFycEgImEisnZjTxcgJZj6edIAVxGYTUJe4ceMnM4gtImAl0bBxHZDNxcEscIRRYsez
+	t2AJYYEQicaDT1lAbBYBVYmdm7+ygczkFTCV+Pk5BGKmvMTqDQfAeiUE3rJKfLi8gxkiISlx
+	cMUNlgmM3AsYGVYxCmXmleUmZuaY6GVU5mVW6CXn525iBAbSsto/0TsYP10IPsQowMGoxMP7
+	wrwtQ4g1say4MvcQowQHs5IIb8FSoBBvSmJlVWpRfnxRaU5q8SFGaQ4WJXFeo2/lKUIC6Ykl
+	qdmpqQWpRTBZJg5OqQbGebxmdmWPqxWPZ8YyWE0tfbowPKJAOmvWW+/Jp6cs4tRft2S2bktT
+	WU/mrIi9VQt2yF37YJTNaR0i5KSuvjwyZ62LbvID3RvPT7BE2Sv0qXAmfNF04bf7lbzI11Nn
+	v/+bzSW/arfZTcs/H/LsdueJ9r0b1ap+JixX+D/zmdIL/svrZsQq6O5TYinOSDTUYi4qTgQA
+	/9nyhCACAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrNJMWRmVeSWpSXmKPExsXC5WfdrLvmV1uGwdGPcharf1RYzFm1jdFi
+	zvkWFounxx6xW+xp385s8aj/BJvFhW19rBaXd81hszi2QMzi2+k3jBaXDj9iceD22LLyJpPH
+	zll32T0WbCr12LSqk83j/b6rbB6fN8kFsEVx2aSk5mSWpRbp2yVwZTRsvcZWMEGrYu3KeywN
+	jBuVuxg5OSQETCQeTzrACmKzCahL3LjxkxnEFhGwkmjYuA7I5uJgFjjCKLHj2VuwhLBAiETj
+	wacsIDaLgKrEzs1f2boYOTh4BUwlfn4OgZgpL7F6wwHmCYwcCxgZVjGKZOaV5SZm5pjqFWdn
+	VOZlVugl5+duYgQGwbLaPxN3MH657H6IUYCDUYmH94V5W4YQa2JZcWXuIUYJDmYlEd6CpUAh
+	3pTEyqrUovz4otKc1OJDjNIcLErivF7hqQlCAumJJanZqakFqUUwWSYOTqkGRv2P8Sqa9tzJ
+	8bsy5jhPvcz+v/XqJTuB+Zzs2xo7PJVkLiQvsSw+n/jOaWaF6NU3L5aI2PTtmt766kNZUMi7
+	xJwCvqU2O6ddqzZliF0e2rR27fE0til2Ra1PX0g197xc0pzsFqRvqjZjfYk7U+GlLVOC/z3r
+	eKPzlvWStv2OOa+mmL07/eBVuBJLcUaioRZzUXEiAKmXYzj+AQAA
+X-CFilter-Loop: Reflected
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250724083005.3918375-1-wangliang74@huawei.com>
- <688235273230f_39271d29430@willemb.c.googlers.com.notmuch>
- <bef878c0-4d7f-4e9a-a05d-30f6fde31e3c@huawei.com> <68865594e28d8_9f93f29443@willemb.c.googlers.com.notmuch>
- <68865ecee5cc4_b1f6a29442@willemb.c.googlers.com.notmuch> <CACGkMEvAWj5CFPwXx=zWjvZnMUYBORuXm-mMQe89P8xdBRid5w@mail.gmail.com>
-In-Reply-To: <CACGkMEvAWj5CFPwXx=zWjvZnMUYBORuXm-mMQe89P8xdBRid5w@mail.gmail.com>
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Date: Sun, 27 Jul 2025 23:50:40 -0400
-X-Gm-Features: Ac12FXwPKd7szapBYuV4uvG7PKjftRwBqchAR0LB9d-9bKC_MUvlni1NjW3v80o
-Message-ID: <CAF=yD-+Mzk0ibfgByXqiS_y=FoKqLVtATKQF4PPpUL4Pk8hosw@mail.gmail.com>
-Subject: Re: [PATCH net] net: check the minimum value of gso size in virtio_net_hdr_to_skb()
-To: Jason Wang <jasowang@redhat.com>
-Cc: Wang Liang <wangliang74@huawei.com>, mst@redhat.com, xuanzhuo@linux.alibaba.com, 
-	eperezma@redhat.com, pabeni@redhat.com, davem@davemloft.net, 
-	willemb@google.com, atenart@kernel.org, yuehaibing@huawei.com, 
-	zhangchangzhong@huawei.com, netdev@vger.kernel.org, 
-	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	steffen.klassert@secunet.com, tobias@strongswan.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Sun, Jul 27, 2025 at 11:21=E2=80=AFPM Jason Wang <jasowang@redhat.com> w=
-rote:
->
-> On Mon, Jul 28, 2025 at 1:16=E2=80=AFAM Willem de Bruijn
-> <willemdebruijn.kernel@gmail.com> wrote:
-> >
-> > Willem de Bruijn wrote:
-> > > Wang Liang wrote:
-> > > >
-> > > > =E5=9C=A8 2025/7/24 21:29, Willem de Bruijn =E5=86=99=E9=81=93:
-> > > > > Wang Liang wrote:
-> > > > >> When sending a packet with virtio_net_hdr to tun device, if the =
-gso_type
-> > > > >> in virtio_net_hdr is SKB_GSO_UDP and the gso_size is less than u=
-dphdr
-> > > > >> size, below crash may happen.
-> > > > >>
-> > > > > gso_size is the size of the segment payload, excluding the transp=
-ort
-> > > > > header.
-> > > > >
-> > > > > This is probably not the right approach.
-> > > > >
-> > > > > Not sure how a GSO skb can be built that is shorter than even the
-> > > > > transport header. Maybe an skb_dump of the GSO skb can be elucida=
-ting.
-> > > > >>                          return -EINVAL;
-> > > > >>
-> > > > >>                  /* Too small packets are not really GSO ones. *=
-/
-> > > > >> --
-> > > > >> 2.34.1
-> > > > >>
-> > > >
-> > > > Thanks for your review!
-> > >
-> > > Thanks for the dump and repro.
-> > >
-> > > I can indeed reproduce, only with the UDP_ENCAP_ESPINUDP setsockopt.
-> > >
-> > > > Here is the skb_dump result:
-> > > >
-> > > >      skb len=3D4 headroom=3D98 headlen=3D4 tailroom=3D282
-> > > >      mac=3D(64,14) mac_len=3D14 net=3D(78,20) trans=3D98
-> > > >      shinfo(txflags=3D0 nr_frags=3D0 gso(size=3D0 type=3D0 segs=3D0=
-))
-> > > >      csum(0x8c start=3D140 offset=3D0 ip_summed=3D1 complete_sw=3D0=
- valid=3D1 level=3D0)
-> > >
-> > > So this is as expected not the original GSO skb, but a segment,
-> > > after udp_rcv_segment from udp_queue_rcv_skb.
-> > >
-> > > It is a packet with skb->data pointing to the transport header, and
-> > > only 4B length. So this is an illegal UDP packet with length shorter
-> > > than sizeof(struct udphdr).
-> > >
-> > > The packet does not enter xfrm4_gro_udp_encap_rcv, so we can exclude
-> > > that.
-> > >
-> > > It does enter __xfrm4_udp_encap_rcv, which will return 1 because the
-> > > pskb_may_pull will fail. There is a negative integer overflow just
-> > > before that:
-> > >
-> > >         len =3D skb->len - sizeof(struct udphdr);
-> > >         if (!pskb_may_pull(skb, sizeof(struct udphdr) + min(len, 8)))
-> > >                 return 1;
-> > >
-> > > This is true for all the segments btw, not just the last one. On
-> > > return of 1 here, the packet does not enter encap_rcv but gets
-> > > passed to the socket as a normal UDP packet:
-> > >
-> > >       /* If it's a keepalive packet, then just eat it.
-> > >        * If it's an encapsulated packet, then pass it to the
-> > >        * IPsec xfrm input.
-> > >        * Returns 0 if skb passed to xfrm or was dropped.
-> > >        * Returns >0 if skb should be passed to UDP.
-> > >        * Returns <0 if skb should be resubmitted (-ret is protocol)
-> > >        */
-> > >       int xfrm4_udp_encap_rcv(struct sock *sk, struct sk_buff *skb)
-> > >
-> > > But so the real bug, an skb with 4B in the UDP layer happens before
-> > > that.
-> > >
-> > > An skb_dump in udp_queue_rcv_skb of the GSO skb shows
-> > >
-> > > [  174.151409] skb len=3D190 headroom=3D64 headlen=3D190 tailroom=3D6=
-6
-> > > [  174.151409] mac=3D(64,14) mac_len=3D14 net=3D(78,20) trans=3D98
-> > > [  174.151409] shinfo(txflags=3D0 nr_frags=3D0 gso(size=3D4 type=3D65=
-538 segs=3D0))
-> > > [  174.151409] csum(0x8c start=3D140 offset=3D0 ip_summed=3D3 complet=
-e_sw=3D0 valid=3D1 level=3D0)
-> > > [  174.151409] hash(0x0 sw=3D0 l4=3D0) proto=3D0x0800 pkttype=3D2 iif=
-=3D8
-> > > [  174.151409] priority=3D0x0 mark=3D0x0 alloc_cpu=3D1 vlan_all=3D0x0
-> > > [  174.151409] encapsulation=3D0 inner(proto=3D0x0000, mac=3D0, net=
-=3D0, trans=3D0)
-> > > [  174.152101] dev name=3Dtun0 feat=3D0x00002000000048c1
-> > >
-> > > And of segs[0] after segmentation
-> > >
-> > > [  103.081442] skb len=3D38 headroom=3D64 headlen=3D38 tailroom=3D218
-> > > [  103.081442] mac=3D(64,14) mac_len=3D14 net=3D(78,20) trans=3D98
-> > > [  103.081442] shinfo(txflags=3D0 nr_frags=3D0 gso(size=3D0 type=3D0 =
-segs=3D0))
-> > > [  103.081442] csum(0x8c start=3D140 offset=3D0 ip_summed=3D1 complet=
-e_sw=3D0 valid=3D1 level=3D0)
-> > > [  103.081442] hash(0x0 sw=3D0 l4=3D0) proto=3D0x0800 pkttype=3D2 iif=
-=3D8
-> > > [  103.081442] priority=3D0x0 mark=3D0x0 alloc_cpu=3D0 vlan_all=3D0x0
-> > > [  103.081442] encapsulation=3D0 inner(proto=3D0x0000, mac=3D0, net=
-=3D0, trans=3D0)
-> > >
-> > > So here translen is already 38 - (98-64) =3D=3D 38 - 34 =3D=3D 4.
-> > >
-> > > So the bug happens in segmentation.
-> > >
-> > > [ongoing ..]
-> >
-> > Oh of course, this is udp fragmentation offload (UFO):
-> > VIRTIO_NET_HDR_GSO_UDP.
-> >
-> > So only the first packet has an UDP header, and that explains why the
-> > other packets are only 4B.
-> >
-> > They are not UDP packets, but they have already entered the UDP stack
-> > due to this being GSO applied in udp_queue_rcv_skb.
-> >
-> > That was never intended to be used for UFO. Only for GRO, which does
-> > not build such packets.
-> >
-> > Maybe we should just drop UFO (SKB_GSO_UDP) packets in this code path?
-> >
->
-> Just to make sure I understand this. Did you mean to disable UFO for
-> guest -> host path? If yes, it seems can break some appllication.
+Now that we have struct netmem_desc, it'd better access the pp fields
+via struct netmem_desc rather than struct net_iov.
 
-No, I mean inside the special segmentation path inside UDP receive.
+Introduce netmem_to_nmdesc() for safely converting netmem_ref to
+netmem_desc regardless of the type underneath e.i. netmem_desc, net_iov.
 
-I know that we have to keep UFO segmentation around because existing
-guests may generate those packets and these features cannot be
-re-negotiated once enabled, even on migration. But no new kernel
-generates UFO packets.
+While at it, remove __netmem_clear_lsb() and make netmem_to_nmdesc()
+used instead.
 
-Segmentation inside UDP receive was added when UDP_GRO was added, in
-case packets accidentally add up at a local socket receive path that
-does not support large packets.
+Signed-off-by: Byungchul Park <byungchul@sk.com>
+---
+ include/net/netmem.h   | 33 ++++++++++++++++-----------------
+ net/core/netmem_priv.h | 16 ++++++++--------
+ 2 files changed, 24 insertions(+), 25 deletions(-)
 
-Since GRO never builds UFO packets, such packets should not arrive at
-such sockets to begin with.
+diff --git a/include/net/netmem.h b/include/net/netmem.h
+index f7dacc9e75fd..33ae444a9745 100644
+--- a/include/net/netmem.h
++++ b/include/net/netmem.h
+@@ -265,24 +265,23 @@ static inline struct netmem_desc *__netmem_to_nmdesc(netmem_ref netmem)
+ 	return (__force struct netmem_desc *)netmem;
+ }
+ 
+-/* __netmem_clear_lsb - convert netmem_ref to struct net_iov * for access to
+- * common fields.
+- * @netmem: netmem reference to extract as net_iov.
++/* netmem_to_nmdesc - convert netmem_ref to struct netmem_desc * for
++ * access to common fields.
++ * @netmem: netmem reference to get netmem_desc.
+  *
+- * All the sub types of netmem_ref (page, net_iov) have the same pp, pp_magic,
+- * dma_addr, and pp_ref_count fields at the same offsets. Thus, we can access
+- * these fields without a type check to make sure that the underlying mem is
+- * net_iov or page.
++ * All the sub types of netmem_ref (netmem_desc, net_iov) have the same
++ * pp, pp_magic, dma_addr, and pp_ref_count fields via netmem_desc.
+  *
+- * The resulting value of this function can only be used to access the fields
+- * that are NET_IOV_ASSERT_OFFSET'd. Accessing any other fields will result in
+- * undefined behavior.
+- *
+- * Return: the netmem_ref cast to net_iov* regardless of its underlying type.
++ * Return: the pointer to struct netmem_desc * regardless of its
++ * underlying type.
+  */
+-static inline struct net_iov *__netmem_clear_lsb(netmem_ref netmem)
++static inline struct netmem_desc *netmem_to_nmdesc(netmem_ref netmem)
+ {
+-	return (struct net_iov *)((__force unsigned long)netmem & ~NET_IOV);
++	if (netmem_is_net_iov(netmem))
++		return &((struct net_iov *)((__force unsigned long)netmem &
++					    ~NET_IOV))->desc;
++
++	return __netmem_to_nmdesc(netmem);
+ }
+ 
+ /* XXX: How to extract netmem_desc from page must be changed, once
+@@ -320,12 +319,12 @@ static inline struct page_pool *__netmem_get_pp(netmem_ref netmem)
+ 
+ static inline struct page_pool *netmem_get_pp(netmem_ref netmem)
+ {
+-	return __netmem_clear_lsb(netmem)->pp;
++	return netmem_to_nmdesc(netmem)->pp;
+ }
+ 
+ static inline atomic_long_t *netmem_get_pp_ref_count_ref(netmem_ref netmem)
+ {
+-	return &__netmem_clear_lsb(netmem)->pp_ref_count;
++	return &netmem_to_nmdesc(netmem)->pp_ref_count;
+ }
+ 
+ static inline bool netmem_is_pref_nid(netmem_ref netmem, int pref_nid)
+@@ -390,7 +389,7 @@ static inline bool netmem_is_pfmemalloc(netmem_ref netmem)
+ 
+ static inline unsigned long netmem_get_dma_addr(netmem_ref netmem)
+ {
+-	return __netmem_clear_lsb(netmem)->dma_addr;
++	return netmem_to_nmdesc(netmem)->dma_addr;
+ }
+ 
+ void get_netmem(netmem_ref netmem);
+diff --git a/net/core/netmem_priv.h b/net/core/netmem_priv.h
+index cd95394399b4..23175cb2bd86 100644
+--- a/net/core/netmem_priv.h
++++ b/net/core/netmem_priv.h
+@@ -5,19 +5,19 @@
+ 
+ static inline unsigned long netmem_get_pp_magic(netmem_ref netmem)
+ {
+-	return __netmem_clear_lsb(netmem)->pp_magic & ~PP_DMA_INDEX_MASK;
++	return netmem_to_nmdesc(netmem)->pp_magic & ~PP_DMA_INDEX_MASK;
+ }
+ 
+ static inline void netmem_or_pp_magic(netmem_ref netmem, unsigned long pp_magic)
+ {
+-	__netmem_clear_lsb(netmem)->pp_magic |= pp_magic;
++	netmem_to_nmdesc(netmem)->pp_magic |= pp_magic;
+ }
+ 
+ static inline void netmem_clear_pp_magic(netmem_ref netmem)
+ {
+-	WARN_ON_ONCE(__netmem_clear_lsb(netmem)->pp_magic & PP_DMA_INDEX_MASK);
++	WARN_ON_ONCE(netmem_to_nmdesc(netmem)->pp_magic & PP_DMA_INDEX_MASK);
+ 
+-	__netmem_clear_lsb(netmem)->pp_magic = 0;
++	netmem_to_nmdesc(netmem)->pp_magic = 0;
+ }
+ 
+ static inline bool netmem_is_pp(netmem_ref netmem)
+@@ -27,13 +27,13 @@ static inline bool netmem_is_pp(netmem_ref netmem)
+ 
+ static inline void netmem_set_pp(netmem_ref netmem, struct page_pool *pool)
+ {
+-	__netmem_clear_lsb(netmem)->pp = pool;
++	netmem_to_nmdesc(netmem)->pp = pool;
+ }
+ 
+ static inline void netmem_set_dma_addr(netmem_ref netmem,
+ 				       unsigned long dma_addr)
+ {
+-	__netmem_clear_lsb(netmem)->dma_addr = dma_addr;
++	netmem_to_nmdesc(netmem)->dma_addr = dma_addr;
+ }
+ 
+ static inline unsigned long netmem_get_dma_index(netmem_ref netmem)
+@@ -43,7 +43,7 @@ static inline unsigned long netmem_get_dma_index(netmem_ref netmem)
+ 	if (WARN_ON_ONCE(netmem_is_net_iov(netmem)))
+ 		return 0;
+ 
+-	magic = __netmem_clear_lsb(netmem)->pp_magic;
++	magic = netmem_to_nmdesc(netmem)->pp_magic;
+ 
+ 	return (magic & PP_DMA_INDEX_MASK) >> PP_DMA_INDEX_SHIFT;
+ }
+@@ -57,6 +57,6 @@ static inline void netmem_set_dma_index(netmem_ref netmem,
+ 		return;
+ 
+ 	magic = netmem_get_pp_magic(netmem) | (id << PP_DMA_INDEX_SHIFT);
+-	__netmem_clear_lsb(netmem)->pp_magic = magic;
++	netmem_to_nmdesc(netmem)->pp_magic = magic;
+ }
+ #endif
 
-Evidently we forgot about looping virtio_net_hdr packets. They were
-never intended to be supported in this new path, nor clearly have they
-ever worked. We just need to mitigate them without crashing.
+base-commit: fa582ca7e187a15e772e6a72fe035f649b387a60
+-- 
+2.17.1
+
 
