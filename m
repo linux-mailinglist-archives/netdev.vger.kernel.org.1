@@ -1,197 +1,199 @@
-Return-Path: <netdev+bounces-210666-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210667-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA9A8B143D4
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 23:27:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0855FB143DC
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 23:30:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 65D5E7ACA1F
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 21:25:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0EB1F17502C
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 21:30:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F1F3235057;
-	Mon, 28 Jul 2025 21:27:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D6AbPwn8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E79F221550;
+	Mon, 28 Jul 2025 21:30:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA8652264BF;
-	Mon, 28 Jul 2025 21:27:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 328492E370B
+	for <netdev@vger.kernel.org>; Mon, 28 Jul 2025 21:30:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753738034; cv=none; b=CQrU5yCs6zUsumQUCKUSqefhE8odPFhCMGZaDfYDkVsdmQRlwzJJjsyd++/F58byRTQI4p8T2vQ9jxeGPF28tFZELteohQEehsGC4PSKIeXNQN8BMg9VyHAy/5yvQ95shY5Ge3CZnlPF5xkmxju8GJ6r9FzMvvQesQje1L1NyDI=
+	t=1753738231; cv=none; b=fS58q3qxwBJ2NHNFaHaEiQ37ivBwgJbVn9+JZyvdBVuviEXxutNNrcAlk8/y6GNTGB8O+63nB3mrYdtyB5DmhiPQuGxNO8ca6ZFE9anuU6pYppAgs4cU2roUf/wuBouxX01bJZhLbYB3ZOEUwZN1Zm84WeDfmjjUcZ+VEDyH8Ns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753738034; c=relaxed/simple;
-	bh=IzpvrGp8i14VUfruuB3/KLhb8wxZIHRxsrWtief3KGs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=s0rvGAKmaFaBLGaS9uVU1y/d6uhHAAVHYbYPW/pqJJQKCgJi+UyT7DvLlmct0zujcpC3WK0F0TJ/iXqkJAtOR7V2tcSJRWxaMvAWD0AdSk6nKUbCqGDOnC/WDIPinry7043MXtL9NnZb/ECLwRsc1uOA4w1ySfK7+x/i6tsjWZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D6AbPwn8; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-60c5b8ee2d9so10225666a12.2;
-        Mon, 28 Jul 2025 14:27:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753738031; x=1754342831; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=tIQmwnYTc/cYP7oc2ka+tfN0f6pfnJP/yRiTLhorpT0=;
-        b=D6AbPwn8HfjxaQW6K1IRqanr6lk5LsHvPweCHVZFgJlGVe46PbjaLIVHcJ/DOgCRLb
-         or7eyFDXh2KngPzMdgnP/YiwnCbR4vvBL0tMLnLnf4zvyOPK2PTv6nIhxj+GjlQVahtz
-         VyLb4eepxvx+tG2udNe0X+lCvG7N3btx/76I2vaCpGnia7BR19csz+7VqxeKjSj6v1TW
-         K878tCdPehjba5LPn7wZ+WbN5sK+alXj5cW87Osk3vjn6B5RjofbzMscqgh7Db/5rJjU
-         49qUL7Z4Q7pTwmKEjOc8yZjHjPMOg45bbLQlKIyxlLawA/Xt1LCl9v8rig8z4ZKnfZZR
-         kurA==
+	s=arc-20240116; t=1753738231; c=relaxed/simple;
+	bh=VDGn08fZpsOlV9unI3898MnkZMAvBOqyh+AKjJESQKg=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=u5Bg8PbmKCE21GZTEZrIOvxRf7eA1ZXZi5KYA2lMXwakOOc0BUzxwATOPTTeGCMP7mdfmBx5yXWT7dc3CUJl1mVs0veh2njtApOshJlkA6LgVM8EtUk3LpTO3EMTInL1iPzspAZBMDD3PI62LRjKUMhW+VnBT3zmBtW14I2bIb4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3ddc5137992so60466165ab.2
+        for <netdev@vger.kernel.org>; Mon, 28 Jul 2025 14:30:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753738031; x=1754342831;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1753738228; x=1754343028;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tIQmwnYTc/cYP7oc2ka+tfN0f6pfnJP/yRiTLhorpT0=;
-        b=Ddr1Cj62GTrQrDL0+6DaS+yQCicLcowN9HAIaTc7kS/Auy+GA18Zu6+zgHgh/d4iGS
-         kCPSF/IHPJX0JwprlTLPwaoSgWA4Biwh7mhEwInINao/nLTOEARN6mMl53NMvy+WBGsl
-         daSD7kFWnV/7/M0apV/ZpkzT5Dz9zUsM4PKteH/FykC3kjlqvjBOofixNjFPR49aeS+O
-         6Fh/KypbK6Qfdl9gvmEfzgbonrb3h1xMvtosFDPs21+W8bTh1bO076O7YCQsLB4dgNJy
-         zFAbhq31sRReeR83v9pbcZC85K3TIMhoNG3tTzOyZ0Ndkse52MItFt9VBGb7/yuhNdKU
-         p5uQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU341g/niNFRpf4Nvy5jFZNRjRf6Jzi0bYbc+TxWFQBt4hrjBqkj5DscyVsoPA9f9MYLkFFCmHL8A==@vger.kernel.org, AJvYcCWRkj3Ri5KspqdSreM5iWzYtAFRd+2ZwP2ydQUCARL0LY1boPjFu6PlGh37t6uWGwhI5B+VMozz@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz7EeExo1V6uwoc7mcZtPw+awTm1+El5kUR/8jhqRL5xho8+xId
-	wHMG58svwnAOjtV5efi2qpd0BBB4vMn/Dd6iDXVMtoTA+rLcAEsosu3q
-X-Gm-Gg: ASbGncs0yTCbilLkzsyRYw8uplcIid73SoxvR+LHMxSMftnHOASEjoGJeIC/Ufvf+YF
-	KU/fkGN2lRxeP/7DOeAMOnfzeAwYhcOAUbtJNZk8/ZJzXkx/OHXaUcIaENgE6AzTE0/hmsVqYGk
-	psCra5xBatJlkq8YZQnG3ypWwfO2UWNXYfMFxXyLyTBiWvJkXaHCcEM0pFHUHDNhwS2amgiq4o5
-	dYcutbYam2LFvHOgDwRujTh33jWDgQb0zBs3OAlDaSdXgSYxnNiLxFyv7sctpU+WJdnEjIN+Bd5
-	oE8FIsOnYiUXelAKiS3vn6IT5QonVgiGkwRqNTefy29TcqQ6QgvtM97cVE4k6dVMNypNQnO0ect
-	SyEV5uHHnKFY1/YfWBh56wioRgOQhtDU=
-X-Google-Smtp-Source: AGHT+IGam4ANjd1Vl1pbiQeQUrUv5bRUQpJFrhxGJD7I1Bl4dEoOuYd9llkMfRPdZ5ZEkvIAnUgW8A==
-X-Received: by 2002:a17:906:f597:b0:ae3:d021:9b05 with SMTP id a640c23a62f3a-af617502b19mr1629178566b.15.1753738030686;
-        Mon, 28 Jul 2025 14:27:10 -0700 (PDT)
-Received: from [192.168.8.100] ([185.69.144.164])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-af635b4a7fbsm480929266b.148.2025.07.28.14.27.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 28 Jul 2025 14:27:09 -0700 (PDT)
-Message-ID: <0dbb74c0-fcd6-498f-8e1e-3a222985d443@gmail.com>
-Date: Mon, 28 Jul 2025 22:28:30 +0100
+        bh=cAAVpHi2dnL2vQU9XMWpO330RRdxmeuo4AaHAIxsSyk=;
+        b=vFIixgLnJVJQqMx3y6c1VQzmilqizKn93v3Nz7b7cqbn0zTrq9Rwuv/hUKPbVi3zR4
+         dnODaLzhBRrt2YrOb9H3rKy3Vbb/YXNK+sB7sP/bl/HM8y7E+uTnYTiNzJv5/0IdkLmC
+         B1kBbXLTYx/EK8cdNkDfLx4+QsXtWQauKhuo+ZLZAOu1rRKu5dYwwBuPAclM2HVDEv6/
+         uQRoBofdAoknTuQ2rb+Fu/4DaoOKCofMHj4L6TUHcw8oZ8GzocY69eXVPivG7xw0tPYL
+         rWEqtL58R5nIJc9XyxHStqtCp8lvV5ncpwqMvKM8s760SK6H2NXb8gAb7itjC1/axmJg
+         fX4A==
+X-Forwarded-Encrypted: i=1; AJvYcCUduMXh7RGrC4SXcq0ZEmwkf33LQLfNIrxlLlQ0BtDw50Z6JSY/jpsCgKi42dzL92DW9PT/VSg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6AFVPlIlzOC3zMEYcxdZMBFLPnivrMY1sU/WngqFRh36fjY+5
+	lWl0SwH68youkEyxK79+lTzVBosxv3/Z3KTJDPSDmO+AQmBhUoaHEDUZBixBSWQMXivOnwAohUj
+	IvAgBJ/SYYhqH0aV3QmEnaDGK6ahMQASlZ/gRtj0xUkg9aHJlpyKOJg8m3dQ=
+X-Google-Smtp-Source: AGHT+IHlf2gExfOweoRKA8xQ8U2obLJdnB/6OhrAm7XdIqeHnIUBha7KQ8KV8Q29kA1uuaIzMfe1bycPWFiD+3a6gOfQFLxPtl5n
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC v1 00/22] Large rx buffer support for zcrx
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
- io-uring@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- Willem de Bruijn <willemb@google.com>, Paolo Abeni <pabeni@redhat.com>,
- andrew+netdev@lunn.ch, horms@kernel.org, davem@davemloft.net,
- sdf@fomichev.me, almasrymina@google.com, dw@davidwei.uk,
- michael.chan@broadcom.com, dtatulea@nvidia.com, ap420073@gmail.com
-References: <cover.1753694913.git.asml.silence@gmail.com>
- <aIevvoYj7BcURD3F@mini-arch> <df74d6e8-41cc-4840-8aca-ad7e57d387ce@gmail.com>
- <aIfb1Zd3CSAM14nX@mini-arch>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <aIfb1Zd3CSAM14nX@mini-arch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6e02:2681:b0:3dc:7f3b:acb1 with SMTP id
+ e9e14a558f8ab-3e3c52c7ec8mr221635275ab.13.1753738228350; Mon, 28 Jul 2025
+ 14:30:28 -0700 (PDT)
+Date: Mon, 28 Jul 2025 14:30:28 -0700
+In-Reply-To: <6856d355.a00a0220.137b3.007d.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6887ebf4.a00a0220.b12ec.00ae.GAE@google.com>
+Subject: Re: [syzbot] [mm?] INFO: rcu detected stall in exit_to_user_mode_loop
+From: syzbot <syzbot+2642f347f7309b4880dc@syzkaller.appspotmail.com>
+To: akpm@linux-foundation.org, cgroups@vger.kernel.org, hannes@cmpxchg.org, 
+	jackmanb@google.com, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
+	mhocko@kernel.org, mhocko@suse.com, muchun.song@linux.dev, 
+	netdev@vger.kernel.org, roman.gushchin@linux.dev, shakeel.butt@linux.dev, 
+	surenb@google.com, syzkaller-bugs@googlegroups.com, vbabka@suse.cz, 
+	ziy@nvidia.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 7/28/25 21:21, Stanislav Fomichev wrote:
-> On 07/28, Pavel Begunkov wrote:
->> On 7/28/25 18:13, Stanislav Fomichev wrote:
-...>>> Supporting big buffers is the right direction, but I have the same
->>> feedback:
->>
->> Let me actually check the feedback for the queue config RFC...
->>
->> it would be nice to fit a cohesive story for the devmem as well.
->>
->> Only the last patch is zcrx specific, the rest is agnostic,
->> devmem can absolutely reuse that. I don't think there are any
->> issues wiring up devmem?
-> 
-> Right, but the patch number 2 exposes per-queue rx-buf-len which
-> I'm not sure is the right fit for devmem, see below. If all you
+syzbot has found a reproducer for the following issue on:
 
-I guess you're talking about uapi setting it, because as an
-internal per queue parameter IMHO it does make sense for devmem.
+HEAD commit:    afd8c2c9e2e2 Merge branch 'ipv6-f6i-fib6_siblings-and-rt-f..
+git tree:       net
+console output: https://syzkaller.appspot.com/x/log.txt?x=13c71034580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=a4bcc0a11b3192be
+dashboard link: https://syzkaller.appspot.com/bug?extid=2642f347f7309b4880dc
+compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17b284a2580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17c71034580000
 
-> care is exposing it via io_uring, maybe don't expose it from netlink for
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/6f29edec8e85/disk-afd8c2c9.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/8490ef85f5cd/vmlinux-afd8c2c9.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/1357e17669cb/bzImage-afd8c2c9.xz
 
-Sure, I can remove the set operation.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+2642f347f7309b4880dc@syzkaller.appspotmail.com
 
-> now? Although I'm not sure I understand why you're also passing
-> this per-queue value via io_uring. Can you not inherit it from the
-> queue config?
+rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
+rcu: 	0-...!: (3 ticks this GP) idle=8da4/1/0x4000000000000000 softirq=18768/18768 fqs=0
+rcu: 	(detected by 1, t=10502 jiffies, g=13833, q=887 ncpus=2)
+Sending NMI from CPU 1 to CPUs 0:
+NMI backtrace for cpu 0
+CPU: 0 UID: 0 PID: 5983 Comm: syz-executor Not tainted 6.16.0-rc7-syzkaller-00100-gafd8c2c9e2e2 #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
+RIP: 0010:__lock_acquire+0x316/0xd20 kernel/locking/lockdep.c:5188
+Code: 8b 54 24 0c 83 e2 01 c1 e2 12 44 09 e2 41 c1 e6 14 41 09 d6 8b 54 24 10 c1 e2 13 c1 e5 15 09 d5 09 cd 44 09 f5 41 89 6c c7 20 <45> 89 44 c7 24 4c 89 7c 24 10 4d 8d 34 c7 81 e5 ff 1f 00 00 48 0f
+RSP: 0018:ffffc90000007b40 EFLAGS: 00000002
+RAX: 000000000000000a RBX: ffffffff8e13f0e0 RCX: 0000000000000007
+RDX: 0000000000080000 RSI: 0000000000004000 RDI: ffff88802c368000
+RBP: 00000000000a4007 R08: 0000000000000000 R09: ffffffff898d70e8
+R10: dffffc0000000000 R11: ffffed100fc2785e R12: 0000000000024000
+R13: 0000000000000000 R14: 0000000000024000 R15: ffff88802c368af0
+FS:  0000000000000000(0000) GS:ffff888125c23000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000055556e2015c8 CR3: 000000000df38000 CR4: 00000000003526f0
+Call Trace:
+ <IRQ>
+ lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5871
+ rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
+ rcu_read_lock include/linux/rcupdate.h:841 [inline]
+ advance_sched+0xa14/0xc90 net/sched/sch_taprio.c:985
+ __run_hrtimer kernel/time/hrtimer.c:1761 [inline]
+ __hrtimer_run_queues+0x52c/0xc60 kernel/time/hrtimer.c:1825
+ hrtimer_interrupt+0x45b/0xaa0 kernel/time/hrtimer.c:1887
+ local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1039 [inline]
+ __sysvec_apic_timer_interrupt+0x108/0x410 arch/x86/kernel/apic/apic.c:1056
+ instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1050 [inline]
+ sysvec_apic_timer_interrupt+0xa1/0xc0 arch/x86/kernel/apic/apic.c:1050
+ </IRQ>
+ <TASK>
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
+RIP: 0010:debug_lockdep_rcu_enabled+0xf/0x40 kernel/rcu/update.c:320
+Code: cc cc cc cc cc cc cc cc cc cc cc 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa 31 c0 83 3d 17 30 34 04 00 74 1e <83> 3d 3a 60 34 04 00 74 15 65 48 8b 0c 25 08 d0 9f 92 31 c0 83 b9
+RSP: 0018:ffffc90003f0ef70 EFLAGS: 00000202
+RAX: 0000000000000000 RBX: ffffffff90d8d001 RCX: ffffc90003f0ff60
+RDX: ffffc90003f0f001 RSI: dffffc0000000000 RDI: ffffc90003f0f050
+RBP: dffffc0000000000 R08: ffffc90003f0ff48 R09: 0000000000000000
+R10: ffffc90003f0f098 R11: fffff520007e1e15 R12: ffffc90003f0ff58
+R13: ffffc90003f08000 R14: ffffc90003f0f048 R15: ffffffff8172aae5
+ rcu_read_unlock include/linux/rcupdate.h:869 [inline]
+ class_rcu_destructor include/linux/rcupdate.h:1155 [inline]
+ unwind_next_frame+0x195c/0x2390 arch/x86/kernel/unwind_orc.c:680
+ arch_stack_walk+0x11c/0x150 arch/x86/kernel/stacktrace.c:25
+ stack_trace_save+0x9c/0xe0 kernel/stacktrace.c:122
+ save_stack+0xf5/0x1f0 mm/page_owner.c:156
+ __reset_page_owner+0x71/0x1f0 mm/page_owner.c:308
+ reset_page_owner include/linux/page_owner.h:25 [inline]
+ free_pages_prepare mm/page_alloc.c:1248 [inline]
+ free_unref_folios+0xc66/0x14d0 mm/page_alloc.c:2763
+ folios_put_refs+0x559/0x640 mm/swap.c:992
+ free_pages_and_swap_cache+0x277/0x520 mm/swap_state.c:264
+ __tlb_batch_free_encoded_pages mm/mmu_gather.c:136 [inline]
+ tlb_batch_pages_flush mm/mmu_gather.c:149 [inline]
+ tlb_flush_mmu_free mm/mmu_gather.c:397 [inline]
+ tlb_flush_mmu+0x3a0/0x680 mm/mmu_gather.c:404
+ tlb_finish_mmu+0xc3/0x1d0 mm/mmu_gather.c:497
+ exit_mmap+0x44c/0xb50 mm/mmap.c:1297
+ __mmput+0x118/0x420 kernel/fork.c:1121
+ exit_mm+0x1da/0x2c0 kernel/exit.c:581
+ do_exit+0x648/0x22e0 kernel/exit.c:952
+ do_group_exit+0x21c/0x2d0 kernel/exit.c:1105
+ get_signal+0x1286/0x1340 kernel/signal.c:3034
+ arch_do_signal_or_restart+0x9a/0x750 arch/x86/kernel/signal.c:337
+ exit_to_user_mode_loop+0x75/0x110 kernel/entry/common.c:111
+ exit_to_user_mode_prepare include/linux/entry-common.h:330 [inline]
+ syscall_exit_to_user_mode_work include/linux/entry-common.h:414 [inline]
+ syscall_exit_to_user_mode include/linux/entry-common.h:449 [inline]
+ do_syscall_64+0x2bd/0x3b0 arch/x86/entry/syscall_64.c:100
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f730c585213
+Code: Unable to access opcode bytes at 0x7f730c5851e9.
+RSP: 002b:00007ffe0103af48 EFLAGS: 00000246 ORIG_RAX: 0000000000000038
+RAX: fffffffffffffffc RBX: 0000000000000000 RCX: 00007f730c585213
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000001200011
+RBP: 0000000000000001 R08: 0000000000000000 R09: 0000000000000000
+R10: 000055556e1e67d0 R11: 0000000000000246 R12: 0000000000000000
+R13: 00000000000927c0 R14: 000000000003604b R15: 00007ffe0103b0e0
+ </TASK>
+rcu: rcu_preempt kthread timer wakeup didn't happen for 10501 jiffies! g13833 f0x0 RCU_GP_WAIT_FQS(5) ->state=0x402
+rcu: 	Possible timer handling issue on cpu=0 timer-softirq=10563
+rcu: rcu_preempt kthread starved for 10502 jiffies! g13833 f0x0 RCU_GP_WAIT_FQS(5) ->state=0x402 ->cpu=0
+rcu: 	Unless rcu_preempt kthread gets sufficient CPU time, OOM is now expected behavior.
+rcu: RCU grace-period kthread stack dump:
+task:rcu_preempt     state:I stack:26792 pid:16    tgid:16    ppid:2      task_flags:0x208040 flags:0x00004000
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5397 [inline]
+ __schedule+0x16fd/0x4cf0 kernel/sched/core.c:6786
+ __schedule_loop kernel/sched/core.c:6864 [inline]
+ schedule+0x165/0x360 kernel/sched/core.c:6879
+ schedule_timeout+0x12b/0x270 kernel/time/sleep_timeout.c:99
+ rcu_gp_fqs_loop+0x301/0x1540 kernel/rcu/tree.c:2054
+ rcu_gp_kthread+0x99/0x390 kernel/rcu/tree.c:2256
+ kthread+0x70e/0x8a0 kernel/kthread.c:464
+ ret_from_fork+0x3fc/0x770 arch/x86/kernel/process.c:148
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
 
-It's not a great option. It complicates user space with netlink.
-And there are convenience configuration features in the future
-that requires io_uring to parse memory first. E.g. instead of
-user specifying a particular size, it can say "choose the largest
-length under 32K that the backing memory allows".
 
->>> We should also aim for another use-case where we allocate page pool
->>> chunks from the huge page(s),
->>
->> Separate huge page pool is a bit beyond the scope of this series.
->>
->> this should push the perf even more.
->>
->> And not sure about "even more" is from, you can already
->> register a huge page with zcrx, and this will allow to chunk
->> them to 32K or so for hardware. Is it in terms of applicability
->> or you have some perf optimisation ideas?
-> 
-> What I'm looking for is a generic system-wide solution where we can
-> set up the host to use huge pages to back all (even non-zc) networking queues.
-> Not necessary needed, but might be an option to try.
-
-Probably like what Jakub was once suggesting with the initial memory
-provider patch, got it.
-
->>> We need some way to express these things from the UAPI point of view.
->>
->> Can you elaborate?
->>
->>> Flipping the rx-buf-len value seems too fragile - there needs to be
->>> something to request 32K chunks only for devmem case, not for the (default)
->>> CPU memory. And the queues should go back to default 4K pages when the dmabuf
->>> is detached from the queue.
->>
->> That's what the per-queue config is solving. It's not default, zcrx
->> configures it only for the specific queue it allocated, and the value
->> is cleared on restart in netdev_rx_queue_restart(), if not even too
->> aggressively. Maybe I should just stash it into mp_params to make
->> sure it's not cleared if a provider is still attached on a spurious
->> restart.
-> 
-> If we assume that at some point niov can be backed up by chunks larger
-> than PAGE_SIZE, the assumed workflow for devemem is:
-> 1. change rx-buf-len to 32K
->    - this is needed only for devmem, but not for CPU RAM, but we'll have
->      to refill the queues from the main memory anyway
-
-Urgh, that's another reason why I prefer to just pass it through
-zcrx and not netlink. So maybe you can just pass the len to devmem
-on creation, and internally it sets up its queues with it.
-
->    - there is also a question on whether we need to do anything about
->      MAX_PAGE_ORDER/PAGE_ALLOC_COSTLY_ORDER - do we just let the driver
->      allocations fail?
-> 2. attach dmabuf to the queue to refill from dmabuf sgt, essentially wasting
->     all the effort on (1)
-> 3. on detach, something needs to also not forget to reset the rx-buf-len
->    back to PAGE_SIZE
-
-Sure
-
-> I was hoping that maybe we can bind rx-buf-len to dmabuf for devmem,
-> that should avoid all that useless refill from the main memory with
-> large chunks. But I'm not sure it's the right way to go either.
--- 
-Pavel Begunkov
-
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
