@@ -1,189 +1,108 @@
-Return-Path: <netdev+bounces-210672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210673-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45797B14434
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 00:06:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D734B14447
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 00:18:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4906017FDE4
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 22:06:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54CB33BC770
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 22:18:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2345F1A316E;
-	Mon, 28 Jul 2025 22:06:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BD111EE7DC;
+	Mon, 28 Jul 2025 22:18:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q8OWcMbi"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RCRhzBwW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91D7E8488;
-	Mon, 28 Jul 2025 22:06:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 385DB41C69
+	for <netdev@vger.kernel.org>; Mon, 28 Jul 2025 22:18:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753740401; cv=none; b=K1Pf5Ozslwz6oUgYTXTLKnBE90II/DTIZhUqMbPNbDKU7Y5YaaNM1aDZ11OTAPyNDL3WlxPNNG2cQz2nVLivoH09qVRA5I9CRv2kVOoPuwzglAGYCnkSosweuueStGX2WGxy8WKW3WqlMByv7m5v5xGwpj2SnxqMbEI0FuKU/+E=
+	t=1753741115; cv=none; b=S76794kv5HHIbKmNGT8Q5yL2LA8ZsSoB7JGDWu/tR3aeRaIlk1skRj84chNlzzAOV+uL9VS0gCnuoYTpnz19PSDPV9RRV8z9PburwivppW0VYYVTjjmy71/aESYrRu6DgASRkvU921+o53HiGoiGrmTfazcwoYBP341FP3u48p4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753740401; c=relaxed/simple;
-	bh=DzPxSZg9plhhUNL+/1cJzQHxDXAyoRrOHymnWam8ij0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gFrbuTWa6SOOKFhGK3wMpiRMX6DZ9JH5/CIgnjiwwLUD09ToQav1iqLTb0upyA7lTO6noDYgn/BC69D24zAkeENNbuI/jZ/11sJOIWDGcSMnLIVjbfFXusC7kGEIL9mNzZF8MInBCSo99hJ18VF3S5CilvkUKAYCnh8cfMKZE5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q8OWcMbi; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-23dc5bcf49eso67748645ad.2;
-        Mon, 28 Jul 2025 15:06:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753740399; x=1754345199; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XZJ5GElUQmBd+wsZknAbjPYYYEXANeLIyzreKcYGoWg=;
-        b=Q8OWcMbijKWZH5ezKa6FtjcsxK5yJob01MKP6kmhHRS05b3tr9CpoUls9kdz0pOlug
-         VIYZ+FWh/fD4tJL0Oe8K99TzihNINd6u3v7azbSRBYWhEZYqI3ZVr+gHmk2TH0cs+nKO
-         Agp1VWwG277okfwNNCKzJtmjLIrxsUQhCo6b4hoaWz0YmcCvEJjSFr/GK0fxUP9ZbeKW
-         4JlQUPopu9B2TjVyM9UWzXK4VwNAbS4nLuAM/k/FCiGgw8uPE30v9/CA0Vy6cPbwsO4E
-         HH5QnqtplwS7e3gqFHl5WaPEXw5bseuXmbjwHwgp76vRoUEKtcJGb023RoLkY8pAqLuC
-         FF6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753740399; x=1754345199;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XZJ5GElUQmBd+wsZknAbjPYYYEXANeLIyzreKcYGoWg=;
-        b=HokjtOQn3Gc6Qy3TIfgWD/A0pNt5XgJVTPM9Ep76VxrtmpOeT/3x6iOtFySqHAC8aA
-         IRnpKvGMJEX6eftzKfBX7vQFXlMUMHHPZRyeHRX+Bf3Cx1yqr7RI+RR8vEpsHrsaxRIl
-         lIoVqIASuYqADYd9Zkq4CJ2iun2fNRTwa6A+9lMaF53zPZ/ZCD626QEqrh+ctZXXq8Z8
-         30VLuB3mTS5L6NNmuDkOVUnbcLzz/ETDLhdtHTyNyMbiEFfzOftBYbryxI3cZupB8HqC
-         qckPP7OZxwIplg8lXKlxxwS1tJwwzPbq9ci00BHfrZEFgzR4oDkfgRqfsJcogPW8l44d
-         +zJw==
-X-Forwarded-Encrypted: i=1; AJvYcCU6apLvBdcusyQQ98bWZgglzN+zLgoMymD0ronDpSl/J/+RzsrjDoGwrdHyBIolg0KwbWR4HHX5@vger.kernel.org, AJvYcCVUwGQjbLkegAyGw2Dr7rCAms4+njxlEsFHSlfFNjUkIPp2cvNkWigoHekTP39kA+vG2i/kfzq2cA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+ApsGeUKFoHbR0Z7jYg3eIz00/FiYvyRAEoDoEshTYmJ1AePK
-	EFB/M4XvD+NCGIW8EwtR/VfDKWer8/9NapxoO86qhfC8m+nDIVe5noM=
-X-Gm-Gg: ASbGncuj9u5FRvS+VrxIAWzVtdgYP4sTuMgK/fiKchPK54vqZA9ln0lw0WBCPrYGoZb
-	c56EOA6crNaUvEbt8BA7X3h3DOWIclrgXpk11wxXSmqOEULHVhpxMvr11Y/BTf9qTUza6voUGXm
-	2hmXl4qG/MpfPmm7NW/5t95V78MnG81qzpWxsrOo6kT12iML3BttnZDERSYXkBB0XSsi0nCsV76
-	e928ZoGN65wVhYMJYsqZsqJHmRBtROfct/imQLOF0mW8rdxIL0uU2Vq0DTlm4XhqMRK5GwooMCk
-	w4IKbN/4kqABhQx3x0gY/KHc23FbMRNYYgomA9VkzdLu+HbD2E8L3v2E7J6/w/PsqF3DfJ/V+mE
-	1CPIijKnpQ0UggRa0u8rHgKDlXDuddvvBD9PB53SzU0rl8xAkrv/Pj2YzrfcHwjADGBiO8w==
-X-Google-Smtp-Source: AGHT+IEWyvhWmVEUN/7c9sJ3B+KEM+IiQGdvUpKK3+C5fSLQHrtLB49W1oB21c4Rjg23JwUb7LNlBw==
-X-Received: by 2002:a17:902:f70a:b0:240:eea:35f2 with SMTP id d9443c01a7336-2400eea38cfmr105303125ad.24.1753740398706;
-        Mon, 28 Jul 2025 15:06:38 -0700 (PDT)
-Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-23fe5eca766sm50434205ad.211.2025.07.28.15.06.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Jul 2025 15:06:38 -0700 (PDT)
-Date: Mon, 28 Jul 2025 15:06:37 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	io-uring@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Paolo Abeni <pabeni@redhat.com>, andrew+netdev@lunn.ch,
-	horms@kernel.org, davem@davemloft.net, sdf@fomichev.me,
-	almasrymina@google.com, dw@davidwei.uk, michael.chan@broadcom.com,
-	dtatulea@nvidia.com, ap420073@gmail.com
-Subject: Re: [RFC v1 00/22] Large rx buffer support for zcrx
-Message-ID: <aIf0bXkt4bvA-0lC@mini-arch>
-References: <cover.1753694913.git.asml.silence@gmail.com>
- <aIevvoYj7BcURD3F@mini-arch>
- <df74d6e8-41cc-4840-8aca-ad7e57d387ce@gmail.com>
- <aIfb1Zd3CSAM14nX@mini-arch>
- <0dbb74c0-fcd6-498f-8e1e-3a222985d443@gmail.com>
+	s=arc-20240116; t=1753741115; c=relaxed/simple;
+	bh=K89Sbciy9IKPrC7+QLg4lIglWg4Feo3nIoG4lOmFdb8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=bz9nVjb06c5U9fLxd2JVMvN1Ln6IpW2ug2Mt6/NcSCqmxHqBbe5ZrtwvAKf6O6N4uUnz7yeOJoUDOfPPQL0FWzeMS0tRoGnFClM/cTXcVn46W2r+3AsVF5CKWE9nkBz9l4Cuuun0p1g9LeFPYw+5wd1owb4cOtiuzmistwYHZ0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RCRhzBwW; arc=none smtp.client-ip=95.215.58.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1753741110;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=RoBkZ5QUGz1TAZ0kZZyxij8ERJRPO6rkWOERhOGR4E4=;
+	b=RCRhzBwWB66EFMEUo4+SlMC8Wf8eO3Ct6LmhikouZYnDrwGVRTBN39NDKZUtC2PGZLvUoP
+	o37D2sNdjPLPrTPsgw4uY7JEXYbQg7ciI+aqjdEL9DG6NJelWJ0vD+9m6uCcNuoy9Xk7vH
+	ysbM2DLWFBMnjef8LnqeK/K2O6NXsnE=
+From: Sean Anderson <sean.anderson@linux.dev>
+To: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Michal Simek <michal.simek@amd.com>,
+	linux-arm-kernel@lists.infradead.org,
+	Leon Romanovsky <leon@kernel.org>,
+	Sean Anderson <sean.anderson@linux.dev>
+Subject: [PATCH net-next v3 0/7] net: axienet: Fix deferred probe loop
+Date: Mon, 28 Jul 2025 18:18:16 -0400
+Message-Id: <20250728221823.11968-1-sean.anderson@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <0dbb74c0-fcd6-498f-8e1e-3a222985d443@gmail.com>
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On 07/28, Pavel Begunkov wrote:
-> On 7/28/25 21:21, Stanislav Fomichev wrote:
-> > On 07/28, Pavel Begunkov wrote:
-> > > On 7/28/25 18:13, Stanislav Fomichev wrote:
-> ...>>> Supporting big buffers is the right direction, but I have the same
-> > > > feedback:
-> > > 
-> > > Let me actually check the feedback for the queue config RFC...
-> > > 
-> > > it would be nice to fit a cohesive story for the devmem as well.
-> > > 
-> > > Only the last patch is zcrx specific, the rest is agnostic,
-> > > devmem can absolutely reuse that. I don't think there are any
-> > > issues wiring up devmem?
-> > 
-> > Right, but the patch number 2 exposes per-queue rx-buf-len which
-> > I'm not sure is the right fit for devmem, see below. If all you
-> 
-> I guess you're talking about uapi setting it, because as an
-> internal per queue parameter IMHO it does make sense for devmem.
-> 
-> > care is exposing it via io_uring, maybe don't expose it from netlink for
-> 
-> Sure, I can remove the set operation.
-> 
-> > now? Although I'm not sure I understand why you're also passing
-> > this per-queue value via io_uring. Can you not inherit it from the
-> > queue config?
-> 
-> It's not a great option. It complicates user space with netlink.
-> And there are convenience configuration features in the future
-> that requires io_uring to parse memory first. E.g. instead of
-> user specifying a particular size, it can say "choose the largest
-> length under 32K that the backing memory allows".
+Fix a deferred-probe loop by splitting the MAC and MDIO functionality
+into separate drivers. Please refer to the last patch for an extended
+look at the problem this series is attempting to solve.
 
-Don't you already need a bunch of netlink to setup rss and flow
-steering? And if we end up adding queue api, you'll have to call that
-one over netlink also.
+This is a rather large fix for a rather rare bug, so I have sent it
+for net-next. The first patch is a smaller fix, however, and could go
+via net.
 
-> > > > We should also aim for another use-case where we allocate page pool
-> > > > chunks from the huge page(s),
-> > > 
-> > > Separate huge page pool is a bit beyond the scope of this series.
-> > > 
-> > > this should push the perf even more.
-> > > 
-> > > And not sure about "even more" is from, you can already
-> > > register a huge page with zcrx, and this will allow to chunk
-> > > them to 32K or so for hardware. Is it in terms of applicability
-> > > or you have some perf optimisation ideas?
-> > 
-> > What I'm looking for is a generic system-wide solution where we can
-> > set up the host to use huge pages to back all (even non-zc) networking queues.
-> > Not necessary needed, but might be an option to try.
-> 
-> Probably like what Jakub was once suggesting with the initial memory
-> provider patch, got it.
-> 
-> > > > We need some way to express these things from the UAPI point of view.
-> > > 
-> > > Can you elaborate?
-> > > 
-> > > > Flipping the rx-buf-len value seems too fragile - there needs to be
-> > > > something to request 32K chunks only for devmem case, not for the (default)
-> > > > CPU memory. And the queues should go back to default 4K pages when the dmabuf
-> > > > is detached from the queue.
-> > > 
-> > > That's what the per-queue config is solving. It's not default, zcrx
-> > > configures it only for the specific queue it allocated, and the value
-> > > is cleared on restart in netdev_rx_queue_restart(), if not even too
-> > > aggressively. Maybe I should just stash it into mp_params to make
-> > > sure it's not cleared if a provider is still attached on a spurious
-> > > restart.
-> > 
-> > If we assume that at some point niov can be backed up by chunks larger
-> > than PAGE_SIZE, the assumed workflow for devemem is:
-> > 1. change rx-buf-len to 32K
-> >    - this is needed only for devmem, but not for CPU RAM, but we'll have
-> >      to refill the queues from the main memory anyway
-> 
-> Urgh, that's another reason why I prefer to just pass it through
-> zcrx and not netlink. So maybe you can just pass the len to devmem
-> on creation, and internally it sets up its queues with it.
+Changes in v3:
+- Use ioread32/iowrite32 directly in MDIO
+- Use MDIO bus device in prints
+- Use device variable to probe
+- Rework to use a separate axienet_common structure, as netdevs cannot
+  be reused once registered.
+- Use ida_alloc for aux id
 
-But you still need to solve MAX_PAGE_ORDER/PAGE_ALLOC_COSTLY_ORDER I
-think? We don't want the drivers to do PAGE_ALLOC_COSTLY_ORDER costly
-allocation presumably?
+Changes in v2:
+- Fix building as a module
+- Expand commit message with much more info on the problem and possible
+  solutions
+
+Sean Anderson (7):
+  net: axienet: Fix resource release ordering
+  net: axienet: Use ioread32/iowrite32 directly
+  net: axienet: Use MDIO bus device in prints
+  net: axienet: Simplify axienet_mdio_setup
+  net: axienet: Use device variable in probe
+  net: axienet: Rearrange lifetime functions
+  net: axienet: Split into MAC and MDIO drivers
+
+ drivers/net/ethernet/xilinx/Kconfig           |   1 +
+ drivers/net/ethernet/xilinx/xilinx_axienet.h  |  45 +-
+ .../net/ethernet/xilinx/xilinx_axienet_main.c | 383 +++++++++++-------
+ .../net/ethernet/xilinx/xilinx_axienet_mdio.c | 158 ++++----
+ 4 files changed, 350 insertions(+), 237 deletions(-)
+
+-- 
+2.35.1.1320.gc452695387.dirty
+
 
