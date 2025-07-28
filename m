@@ -1,105 +1,172 @@
-Return-Path: <netdev+bounces-210501-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210502-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 907A4B139DB
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 13:29:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0207B139F9
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 13:37:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CBFCF1891522
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 11:30:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BBF457A4943
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 11:35:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A849D25A620;
-	Mon, 28 Jul 2025 11:29:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A81925D1E6;
+	Mon, 28 Jul 2025 11:37:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=cdn77.com header.i=@cdn77.com header.b="uCncNpE5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PcR81GNN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-internal.sh.cz (mail-internal.sh.cz [95.168.196.40])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01319202998;
-	Mon, 28 Jul 2025 11:29:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.168.196.40
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FCED21CA0C;
+	Mon, 28 Jul 2025 11:37:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753702182; cv=none; b=P6uO9Vbs5tuNBms6NjTEHCGl7jMNr1fhv8+lvLNf7vVFuPwqhUTvNNnjYXbB123t9znUe27ht8XO11c4vE9Fb4wayWa/o/Sdj4Jh7mH8CzQv1FG4EposCB1QiCv0VipQkRjaEp9zhYkHujhgw33tYE8f6FB1QSIDENZJF4AyOqQ=
+	t=1753702621; cv=none; b=uQi9P2GuroVsXrb9ET0soxafCFKuNyZfGXL9mLwsXhQcIPhx699ls6JbUB/Ao56NMpLXfXOwohP4IMYcI5IWUJbj3sdsj2n1mDb1PHNeFfuH5gaMmDUPPY+9r5JN5acjKWTML/WdUM/hpLF4Q5Ff+1+jNFryHyykylpLctph1QA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753702182; c=relaxed/simple;
-	bh=1G1bnuP3apPi1qJ1RU6vHZqlaWWEFA7LpVNSzrZV5r4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IZS9hYqbk49C2pdVgjAsLHPQEbOUxEAzh6ITOVqlHmugiAVM7GtZ32rtZpshu6bUedAMQ4kdnt4bmuvJkhgkgx9VtyWOn/8qmj6fKAb3OgnVFq4hsjC8d2TZILpj0kZPiT9w41FHlTWBBU9sBVQQQvgmh/Ykk+/jzn9QWn1vd70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cdn77.com; spf=pass smtp.mailfrom=cdn77.com; dkim=pass (1024-bit key) header.d=cdn77.com header.i=@cdn77.com header.b=uCncNpE5; arc=none smtp.client-ip=95.168.196.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cdn77.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cdn77.com
-DKIM-Signature: a=rsa-sha256; t=1753702172; x=1754306972; s=dkim2019; d=cdn77.com; c=relaxed/relaxed; v=1; bh=KJKiJr+tG3FAfmMlaEVSvdKXkB/PgPhRU4B/I5SDZaA=; h=From:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:In-Reply-To:References;
-   b=uCncNpE5DBkvi37xKEm0B4brCr3ocRD9YpR8NsqYGHOp/DWBSdq7t2hBLNOH7W045BZKntLrkz22QSN9BYkBQGTe6d0h8wRA/4MiZwz6nEJthP3FmCtMKvdu9+3Y0XxOadrVV7RoK+3GILChS2HiEuOo0FKmYAH2+Xzr8QnI6R0=
-Received: from [10.0.5.28] ([95.168.203.222])
-        by mail.sh.cz (14.1.0 build 16 ) with ASMTP (SSL) id 202507281329311901;
-        Mon, 28 Jul 2025 13:29:31 +0200
-Message-ID: <924a8a12-ed89-45e5-900d-6d937108ec3e@cdn77.com>
-Date: Mon, 28 Jul 2025 13:29:29 +0200
+	s=arc-20240116; t=1753702621; c=relaxed/simple;
+	bh=2Jf+hnJN4REnGQk5VFSNOD1c2NERXFX5MULoUGyYvt4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jHxP71+E4BfPTjMb82y45249CiqRRGNw9jjbIoOtU9Lmvh6OXAMbJ51hs4HY2kw4BSl/66nRMNRiNseNcjNcmC6OVogCbfBM5A25qL71SOhDf9qQFpszpHYjbQRHmdRZLefSPSaNy2CLV3iqLzvMANADP1isBH0Hw7xHHCYFSng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PcR81GNN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD842C4CEF6;
+	Mon, 28 Jul 2025 11:36:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753702620;
+	bh=2Jf+hnJN4REnGQk5VFSNOD1c2NERXFX5MULoUGyYvt4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PcR81GNNNE+91UM0GR5CNUwyFAu+Fl23f3VdiVf3BSudX3wKrHrlEzkLMd+NRZ1ZZ
+	 ctKNHOG/ZeL5CcmRvQRN4Hygl9YFAeyzjJ8vg2r91KcdVx1eYWFHQUtECw1S7oMChb
+	 zSmavO3sN6LlJS0OoWwh6RqcFI9Wz2t0MuWwtR/NzDby6EpwDMSceH3cY2flaSo5Mn
+	 yM0aKZiyQogu0VXpBKYryMLnhhlxa6wXA2I4gnZPWTt3Re3DQ3lbl/TEyYcfJyDkSt
+	 QdNCVMyhxHFJeJXTL0f4x5UbEIyLvHjLwOkcmjUOWZp1NUSczcjOXUP4+fktimuuT+
+	 rl4hHrowMemhQ==
+Date: Mon, 28 Jul 2025 12:36:56 +0100
+From: Simon Horman <horms@kernel.org>
+To: Charalampos Mitrodimas <charmitro@posteo.net>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	syzbot+01b0667934cdceb4451c@syzkaller.appspotmail.com
+Subject: Re: [PATCH net v2] net: ipv6: fix buffer overflow in AH output
+Message-ID: <20250728113656.GA1367887@horms.kernel.org>
+References: <20250727-ah6-buffer-overflow-v2-1-c7b5f0984565@posteo.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] memcg: expose socket memory pressure in a cgroup
-To: Tejun Heo <tj@kernel.org>
-Cc: Shakeel Butt <shakeel.butt@linux.dev>, =?UTF-8?Q?Michal_Koutn=C3=BD?=
- <mkoutny@suse.com>, Kuniyuki Iwashima <kuniyu@google.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- Neal Cardwell <ncardwell@google.com>, David Ahern <dsahern@kernel.org>,
- Andrew Morton <akpm@linux-foundation.org>,
- Yosry Ahmed <yosry.ahmed@linux.dev>, linux-mm@kvack.org,
- netdev@vger.kernel.org, Johannes Weiner <hannes@cmpxchg.org>,
- Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>,
- Muchun Song <muchun.song@linux.dev>, cgroups@vger.kernel.org,
- Matyas Hurtik <matyas.hurtik@cdn77.com>
-References: <ni4axiks6hvap3ixl6i23q7grjbki3akeea2xxzhdlkmrj5hpb@qt3vtmiayvpz>
- <telhuoj5bj5eskhicysxkblc4vr6qlcq3vx7pgi6p34g4zfwxw@6vm2r2hg3my4>
- <CAAVpQUBwS3DFs9BENNNgkKFcMtc7tjZBA0PZ-EZ0WY+dCw8hrA@mail.gmail.com>
- <4g63mbix4aut7ye7b7s4m5q7aewfxq542i2vygniow7l5a3zmd@bvis5wmifscy>
- <CAAVpQUCOwFksmo72p_nkr1uJMLRcRo1VAneADon9OxDLoRH0KA@mail.gmail.com>
- <jj5w7cpjjyzxasuweiz64jqqxcz23tm75ca22h3wvfj3u4aums@gnjarnf5gpgq>
- <yruvlyxyy6gsrf2hhtyja5hqnxi2fmdqr63twzxpjrxgffov32@l7gqvdxijs5c>
- <878ca484-a045-4abb-a5bd-7d5ae82607de@cdn77.com>
- <irvyenjca4czrxfew4c7nc23luo5ybgdw3lquq7aoadmhmfu6h@h4mx532ls26h>
- <486bfabc-386c-4fdc-8903-d56ce207951f@cdn77.com>
- <aILTi2-iZ1ge3D8n@slm.duckdns.org>
-Content-Language: en-US
-From: Daniel Sedlak <daniel.sedlak@cdn77.com>
-In-Reply-To: <aILTi2-iZ1ge3D8n@slm.duckdns.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-CTCH: RefID="str=0001.0A002110.68875ED5.0034,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0"; Spam="Unknown"; VOD="Unknown"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250727-ah6-buffer-overflow-v2-1-c7b5f0984565@posteo.net>
 
-On 7/25/25 2:44 AM, Tejun Heo wrote:
-> On Thu, Jul 24, 2025 at 10:43:27AM +0200, Daniel Sedlak wrote:
-> ...
->> Currently, we know the following information:
->>
->> - we know when the pressure starts
->> - and we know when the pressure ends if not rearmed (start time + HZ)
->>
->>  From that, we should be able to calculate a similar triplet to the pressure
->> endpoints in the cgroups (cpu|io|memory|irq).pressure. That is, how much %
->> of time on average was spent under pressure for avg10, avg60, avg300 i.e.
->> average pressure over the past 10 seconds, 60 seconds, and 300 seconds,
->> respectively. (+ total time spent under pressure)
+On Sun, Jul 27, 2025 at 09:51:40PM +0000, Charalampos Mitrodimas wrote:
+> Fix a buffer overflow where extension headers are incorrectly copied
+> to the IPv6 address fields, resulting in a field-spanning write of up
+> to 40 bytes into a 16-byte field (IPv6 address).
 > 
-> Let's just add the cumulative duration that socket pressure was present.
+>   memcpy: detected field-spanning write (size 40) of single field "&top_iph->saddr" at net/ipv6/ah6.c:439 (size 16)
+>   WARNING: CPU: 0 PID: 8838 at net/ipv6/ah6.c:439 ah6_output+0xe7e/0x14e0 net/ipv6/ah6.c:439
 > 
-> Thanks.
+> The issue occurs in ah6_output() and ah6_output_done() where the code
+> attempts to save/restore extension headers by copying them to/from the
+> IPv6 source/destination address fields based on the CONFIG_IPV6_MIP6
+> setting.
 > 
+> Reported-by: syzbot+01b0667934cdceb4451c@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=01b0667934cdceb4451c
+> Signed-off-by: Charalampos Mitrodimas <charmitro@posteo.net>
+> ---
+> Changes in v2:
+> - Link correct syzbot dashboard link in patch tags
+> - Link to v1: https://lore.kernel.org/r/20250727-ah6-buffer-overflow-v1-1-1f3e11fa98db@posteo.net
 
-Ok, I will send it as v4, if no other objections are made. In which 
-units the duration should be? Milliseconds? It can also be microseconds, 
-which are now used in (cpu|io|memory|irq).pressure files.
+You posted two versions of this patch within a few minutes.
+Please don't do that. Rather, please wait 24h to allow review to occur.
 
-Thanks!
-Daniel
+https://docs.kernel.org/process/maintainer-netdev.html
+
+> ---
+>  net/ipv6/ah6.c | 24 +++++-------------------
+>  1 file changed, 5 insertions(+), 19 deletions(-)
+> 
+> diff --git a/net/ipv6/ah6.c b/net/ipv6/ah6.c
+> index eb474f0987ae016b9d800e9f83d70d73171b21d2..0fa3ed3c64c4ed1a1907d73fb3477e11ef0bd5b8 100644
+> --- a/net/ipv6/ah6.c
+> +++ b/net/ipv6/ah6.c
+> @@ -301,13 +301,8 @@ static void ah6_output_done(void *data, int err)
+>  	memcpy(ah->auth_data, icv, ahp->icv_trunc_len);
+>  	memcpy(top_iph, iph_base, IPV6HDR_BASELEN);
+>  
+> -	if (extlen) {
+> -#if IS_ENABLED(CONFIG_IPV6_MIP6)
+> -		memcpy(&top_iph->saddr, iph_ext, extlen);
+> -#else
+> -		memcpy(&top_iph->daddr, iph_ext, extlen);
+> -#endif
+> -	}
+> +	if (extlen)
+> +		memcpy((u8 *)(top_iph + 1), iph_ext, extlen);
+
+nit: The cast seems unnecessary.
+
+>  
+>  	kfree(AH_SKB_CB(skb)->tmp);
+>  	xfrm_output_resume(skb->sk, skb, err);
+
+I am somewhat confused about both your description of the problem,
+and the solution.
+
+It seems to me that:
+
+1. The existing memcpy (two variants, depending on CONFIG_IPV6_MIP6),
+   are copying data to the correct location (else this fetuare would not work).
+2. Due to the structure layout of struct ipv6hdr, syzcaller is warning that
+   the write overruns he end of the structure.
+3. Although that syzcaller is correct about the structure field being too
+   small for the data, there is space to write into.
+
+Are these three points correct?
+
+If so, I don't think it is correct to describe this as a buffer overflow
+in the patch description. But rather a warning about one, that turns
+out to be a false positive. And if so, I think this patch is more of
+a clean-up for ipsec-next, rather than a fix for ipsec or net.
+
+Also, if so, I don't think your patch is correct because it changes the
+destination address that data is written to from towards the end of
+top_iph, to immediately after the end of top_iph (which is further into
+overflow territory, if that is the problem).
+
+I'm unsure of a concise way to resolve this problem, but it seems to me
+that the following is correct (compile tested only!):
+
+diff --git a/net/ipv6/ah6.c b/net/ipv6/ah6.c
+index eb474f0987ae..5bf22b007053 100644
+--- a/net/ipv6/ah6.c
++++ b/net/ipv6/ah6.c
+@@ -303,10 +303,10 @@ static void ah6_output_done(void *data, int err)
+ 
+ 	if (extlen) {
+ #if IS_ENABLED(CONFIG_IPV6_MIP6)
+-		memcpy(&top_iph->saddr, iph_ext, extlen);
+-#else
+-		memcpy(&top_iph->daddr, iph_ext, extlen);
++		top_iph->saddr = iph_ext->saddr;
+ #endif
++		top_iph->daddr = iph_ext->daddr;
++		memcpy(top_iph + 1, &iph_ext->hdrs, extlen - sizeof(*iph_ext));
+ 	}
+ 
+ 	kfree(AH_SKB_CB(skb)->tmp);
+
+I would also suggest adding a helper (or two), to avoid (repeatedly) open
+coding whatever approach is taken.
+
+...
 
