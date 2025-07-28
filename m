@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-210679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210680-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57582B14453
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 00:19:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DC50B14456
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 00:20:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7BC26188AD12
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 22:20:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4AA24E3951
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 22:19:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C96D724A04D;
-	Mon, 28 Jul 2025 22:18:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E88B253950;
+	Mon, 28 Jul 2025 22:18:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rS1cwFPC"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Mw12Y+9d"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49DCE244697
-	for <netdev@vger.kernel.org>; Mon, 28 Jul 2025 22:18:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50742246BDE
+	for <netdev@vger.kernel.org>; Mon, 28 Jul 2025 22:18:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753741127; cv=none; b=r3NXdrBCZbTUd0cvd5+42yDRUQZs4Nqdod4TWRDFDbVoTy6PvnIxg+Bmrl339WteOLsdSasmC7EUWYSgTeHEw9FZ07BMsTq6BUTWZ/oJfI8GR6Tbex0sDkAI45nVMPUzk3EAXMa+fEcIabXso8QAT5Ni9eKC/NjXmvnxMo0OSGo=
+	t=1753741130; cv=none; b=g/lyfQr0mUTBjgsnFEOj2S5GT7qUrlj+p4ekQNJQFg6GAhT3Lek53qszz1aBfjr53NXpw27GU4tRl1AGO3UjaGKZ1R23+sc89moeAN9O1anAztOHJHyopfn476LUby89wtLNLsvUXeIbJ6fnoFz0LE7t96usQW2bnGS9M0+kyyU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753741127; c=relaxed/simple;
-	bh=VgjIJAfhat9oaagbpBOV76xwh+ZSWiXaWBxfJNOZKpo=;
+	s=arc-20240116; t=1753741130; c=relaxed/simple;
+	bh=Du7wSOiVjtgKvcFvEV/Ua5/p9cKvEnHoqJYSycauhl0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Pdo9iVaRZQU4yXgnX+wkwvBuT81cG9U/jb4UwCqK0JxaW0GnUWhz05SvlJydtal5l8Seyleg1AOuDEL8v/lFdcLWXP9I4X02B713R48GtaUaofs6l1heHxQcOV8R+GjcXx8Hr+L7QdiJ9wIrT/Oe/CAc58rynjP86nV4q2cMFeo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rS1cwFPC; arc=none smtp.client-ip=95.215.58.181
+	 MIME-Version; b=J7+3os7cF/7OEUFuMUq852c0yzr45TeWtf5al0iivRKfook+FbEscovTED3ZhxZLb9wHBuchuNsd3gGoEWxcltcv5NE1LBn7LtE/J/fMgzMfSzPVOJ6Svn8BApFY/LTAAm0NWDuIyMUYkOEpJ2Q3p890I+iyn+Tl7RrL0AtOMTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Mw12Y+9d; arc=none smtp.client-ip=95.215.58.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1753741123;
+	t=1753741125;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=b5qR6sSpW8TJQpTI7gicjIvT2YeTf7KcnOssCWqRgzc=;
-	b=rS1cwFPCwK+hGLT6FTjEtZetJWEzqFED5y8zHUQfmF8VNlFZqpUFkeaj5dsJQI71zRZuYZ
-	Xi7z9Zu1lCJ5ILH1lN3sNZbMf0gsdupqvpZ72lUW7c2ZaxrtvLMZE4iQpB4Tn7OANwQCWh
-	AI9G+epkQHzlkaifhwBu0FTCjiIaXM4=
+	bh=n17YgDJ5HzDuuvYFKxWVMhkXCItP/j4fG+awnCjSKSA=;
+	b=Mw12Y+9d3qtWJeTNKwoC2hntKyund/b9S9GlER2ktZPFg2ELwnL18S8r5TuFW8Zopj5c4D
+	reIpMGAd3SbDfAuJMooTHD5rY4RIRtn1SOBtG/TmMYE3GPj8H8co6PVWWncRu77loV4FUH
+	4Jnxrum6CfXHqDPKJtIAZB5l/OriLMA=
 From: Sean Anderson <sean.anderson@linux.dev>
 To: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -56,9 +56,9 @@ Cc: linux-kernel@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	Leon Romanovsky <leon@kernel.org>,
 	Sean Anderson <sean.anderson@linux.dev>
-Subject: [PATCH net-next v3 6/7] net: axienet: Rearrange lifetime functions
-Date: Mon, 28 Jul 2025 18:18:22 -0400
-Message-Id: <20250728221823.11968-7-sean.anderson@linux.dev>
+Subject: [PATCH net-next v3 7/7] net: axienet: Split into MAC and MDIO drivers
+Date: Mon, 28 Jul 2025 18:18:23 -0400
+Message-Id: <20250728221823.11968-8-sean.anderson@linux.dev>
 In-Reply-To: <20250728221823.11968-1-sean.anderson@linux.dev>
 References: <20250728221823.11968-1-sean.anderson@linux.dev>
 Precedence: bulk
@@ -70,522 +70,545 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Rearrange the lifetime functions (probe, remove, etc.) in preparation
-for the next commit. No functional change intended.
+Returning EPROBE_DEFER after probing a bus may result in an infinite
+probe loop if the EPROBE_DEFER error is never resolved. There are two
+mutually-exclusive scenarios (that can both occur in the same system).
+First, the PCS can be attached to our own MDIO bus:
 
+MAC
+ |
+ +->MDIO
+     |
+     +->PCS
+     +->PHY (etc)
+
+In this scenario, we have to probe the MDIO bus before we can look up
+the PCS, since otherwise the PCS will always be missing when we look for
+it. But if we do things in the right order then we can't get
+EPROBE_DEFER, and so there's no risk of a probe loop.
+
+Second, the PCS can be attached to some other MDIO bus:
+
+MAC              MDIO
+ |                 |
+ +->MDIO           +->PCS
+      |
+      +->PHY (etc)
+
+In this scenario, the MDIO bus might not be present for whatever reason
+(module not loaded, error in probe, etc.) and we have the possibility of
+an EPROBE_DEFER error. If that happens, we will end up in a probe loop
+because the PHY on our own MDIO bus incremented deferred_trigger_count
+when it probed successfully:
+
+deferred_probe_work_func()
+  driver_probe_device(MAC)
+    axienet_probe(MAC)
+      mdiobus_register(MDIO)
+        device_add(PHY)
+          (probe successful)
+          driver_bound(PHY)
+            driver_deferred_probe_trigger()
+      return -EPROBE_DEFER
+    driver_deferred_probe_add(MAC)
+    // deferred_trigger_count changed, so...
+    driver_deferred_probe_trigger()
+
+As I see it, this problem could be solved in the following four ways:
+
+- Modify the driver core to detect and mitigate this sort of scenario
+  (NACKed by Greg).
+- Split the driver into MAC and MDIO parts (this commit).
+- Modify phylink to allow connecting a PCS after phylink_create but
+  before phylink_start. This is tricky because the PCS can affect the
+  supported phy interfaces, and phy interfaces are validated in
+  phylink_create.
+- Defer phylink_create to ndo_open. This means that all the
+  netdev/ethtool ops that use phylink now need to check ip the netdev is
+  open and fall back to some other implementation. I don't think we can
+  just return -EINVAL or whatever because using ethtool on a down device
+  has historically worked. I am wary of breaking userspace because some
+  tool assumes it can get_ksettings while the netdev is down.
+
+Aside from the first option, the second one (this commit) has the best
+UX. With the latter two, you could have a netdev that never comes up and
+the user may not have very good insight as to why. For example, it may
+not be obvious that the user should try to bring the netdev up again
+after the PCS is probed. By waiting to create the netdev until after we
+successfully probe the PCS we show up in devices_deferred and the netdev
+can be brought up as usual.
+
+Per the second bullet point above, split the MAC and MDIO functionality
+into separate auxiliary devices. If the MAC fails with EPROBE_DEFER,
+then the MDIO bus will remain bound, preventing a probe loop.
+
+Fixes: 1a02556086fc ("net: axienet: Properly handle PCS/PMA PHY for 1000BaseX mode")
 Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
 ---
 
 Changes in v3:
-- Rework to use a separate axienet_common structure
+- Rework to use a separate axienet_common structure, as netdevs cannot
+  be reused once registered.
+- Use ida_alloc for aux id
 
- drivers/net/ethernet/xilinx/xilinx_axienet.h  |  41 ++++--
- .../net/ethernet/xilinx/xilinx_axienet_main.c | 135 ++++++++++--------
- .../net/ethernet/xilinx/xilinx_axienet_mdio.c |  45 +++---
- 3 files changed, 127 insertions(+), 94 deletions(-)
+Changes in v2:
+- Fix building as a module
+- Expand commit message with much more info on the problem and possible
+  solutions
 
+ drivers/net/ethernet/xilinx/Kconfig           |   1 +
+ drivers/net/ethernet/xilinx/xilinx_axienet.h  |  10 +-
+ .../net/ethernet/xilinx/xilinx_axienet_main.c | 168 ++++++++++++++----
+ .../net/ethernet/xilinx/xilinx_axienet_mdio.c |  59 +++---
+ 4 files changed, 169 insertions(+), 69 deletions(-)
+
+diff --git a/drivers/net/ethernet/xilinx/Kconfig b/drivers/net/ethernet/xilinx/Kconfig
+index 7502214cc7d5..3b940d2d3115 100644
+--- a/drivers/net/ethernet/xilinx/Kconfig
++++ b/drivers/net/ethernet/xilinx/Kconfig
+@@ -27,6 +27,7 @@ config XILINX_AXI_EMAC
+ 	tristate "Xilinx 10/100/1000 AXI Ethernet support"
+ 	depends on HAS_IOMEM
+ 	depends on XILINX_DMA
++	select AUXILIARY_BUS
+ 	select PHYLINK
+ 	select DIMLIB
+ 	help
 diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet.h b/drivers/net/ethernet/xilinx/xilinx_axienet.h
-index 5ff742103beb..d7215dd92ce9 100644
+index d7215dd92ce9..69665c7f264a 100644
 --- a/drivers/net/ethernet/xilinx/xilinx_axienet.h
 +++ b/drivers/net/ethernet/xilinx/xilinx_axienet.h
-@@ -467,6 +467,29 @@ struct skbuf_dma_descriptor {
- 	int sg_len;
- };
+@@ -470,6 +470,7 @@ struct skbuf_dma_descriptor {
+ /**
+  * struct axienet_common - axienet private common data
+  * @pdev: Pointer to common platform device structure
++ * @mac: Pointer to MAC (netdev parent) device structure
+  * @axi_clk: AXI4-Lite bus clock
+  * @reset_lock: Lock held while resetting the device to prevent register access
+  * @mii_bus: Pointer to MII bus structure
+@@ -479,11 +480,12 @@ struct skbuf_dma_descriptor {
+  */
+ struct axienet_common {
+ 	struct platform_device *pdev;
++	struct auxiliary_device mac;
  
-+/**
-+ * struct axienet_common - axienet private common data
-+ * @pdev: Pointer to common platform device structure
-+ * @axi_clk: AXI4-Lite bus clock
-+ * @reset_lock: Lock held while resetting the device to prevent register access
-+ * @mii_bus: Pointer to MII bus structure
-+ * @mii_clk_div: MII bus clock divider value
-+ * @regs_start: Resource start for axienet device addresses
-+ * @regs: Base address for the axienet_local device address space
-+ */
-+struct axienet_common {
-+	struct platform_device *pdev;
-+
-+	struct clk *axi_clk;
-+
-+	struct mutex reset_lock;
-+	struct mii_bus *mii_bus;
-+	u8 mii_clk_div;
-+
-+	void __iomem *regs;
-+	resource_size_t regs_start;
-+};
-+
+ 	struct clk *axi_clk;
+ 
+ 	struct mutex reset_lock;
+-	struct mii_bus *mii_bus;
++	struct auxiliary_device mii_bus;
+ 	u8 mii_clk_div;
+ 
+ 	void __iomem *regs;
+@@ -493,7 +495,7 @@ struct axienet_common {
  /**
   * struct axienet_local - axienet private per device data
   * @ndev:	Pointer for net_device to which it will be attached.
-@@ -549,6 +572,7 @@ struct skbuf_dma_descriptor {
- struct axienet_local {
- 	struct net_device *ndev;
- 	struct device *dev;
-+	struct axienet_common *cp;
+- * @dev:	Pointer to device structure
++ * @dev:	Pointer to parent device structure for DMA access
+  * @phylink:	Pointer to phylink instance
+  * @phylink_config: phylink configuration settings
+  * @pcs_phy:	Reference to PCS/PMA PHY if used
+@@ -752,8 +754,6 @@ static inline void axienet_dma_out_addr(struct axienet_local *lp, off_t reg,
  
- 	struct phylink *phylink;
- 	struct phylink_config phylink_config;
-@@ -558,13 +582,11 @@ struct axienet_local {
- 
- 	bool switch_x_sgmii;
- 
--	struct clk *axi_clk;
- 	struct clk_bulk_data misc_clks[XAE_NUM_MISC_CLOCKS];
- 
- 	struct mii_bus *mii_bus;
- 	u8 mii_clk_div;
- 
--	resource_size_t regs_start;
- 	void __iomem *regs;
- 	void __iomem *dma_regs;
- 
-@@ -654,21 +676,14 @@ static inline u32 axienet_ior(struct axienet_local *lp, off_t offset)
- 	return ioread32(lp->regs + offset);
- }
- 
--static inline u32 axinet_ior_read_mcr(struct axienet_local *lp)
--{
--	return axienet_ior(lp, XAE_MDIO_MCR_OFFSET);
--}
--
- static inline void axienet_lock_mii(struct axienet_local *lp)
- {
--	if (lp->mii_bus)
--		mutex_lock(&lp->mii_bus->mdio_lock);
-+	mutex_lock(&lp->cp->reset_lock);
- }
- 
- static inline void axienet_unlock_mii(struct axienet_local *lp)
- {
--	if (lp->mii_bus)
--		mutex_unlock(&lp->mii_bus->mdio_lock);
-+	mutex_unlock(&lp->cp->reset_lock);
- }
- 
- /**
-@@ -738,7 +753,7 @@ static inline void axienet_dma_out_addr(struct axienet_local *lp, off_t reg,
  #endif /* CONFIG_64BIT */
  
- /* Function prototypes visible in xilinx_axienet_mdio.c for other files */
--int axienet_mdio_setup(struct axienet_local *lp);
--void axienet_mdio_teardown(struct axienet_local *lp);
-+int axienet_mdio_setup(struct axienet_common *lp);
-+void axienet_mdio_teardown(struct axienet_common *lp);
+-/* Function prototypes visible in xilinx_axienet_mdio.c for other files */
+-int axienet_mdio_setup(struct axienet_common *lp);
+-void axienet_mdio_teardown(struct axienet_common *lp);
++extern struct auxiliary_driver xilinx_axienet_mdio;
  
  #endif /* XILINX_AXI_ENET_H */
 diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-index 28927c7c6c41..f235ef15187c 100644
+index f235ef15187c..23e5c8090d45 100644
 --- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
 +++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-@@ -225,8 +225,8 @@ static void axienet_dma_bd_release(struct net_device *ndev)
+@@ -22,6 +22,7 @@
+  *  - Add support for extended VLAN support.
+  */
  
- static u64 axienet_dma_rate(struct axienet_local *lp)
++#include <linux/auxiliary_bus.h>
+ #include <linux/clk.h>
+ #include <linux/delay.h>
+ #include <linux/etherdevice.h>
+@@ -1907,8 +1908,11 @@ static const struct net_device_ops axienet_netdev_dmaengine_ops = {
+ static void axienet_ethtools_get_drvinfo(struct net_device *ndev,
+ 					 struct ethtool_drvinfo *ed)
  {
--	if (lp->axi_clk)
--		return clk_get_rate(lp->axi_clk);
-+	if (lp->cp->axi_clk)
-+		return clk_get_rate(lp->cp->axi_clk);
- 	return 125000000; /* arbitrary guess if no clock rate set */
++	struct axienet_local *lp = netdev_priv(ndev);
++
+ 	strscpy(ed->driver, DRIVER_NAME, sizeof(ed->driver));
+ 	strscpy(ed->version, DRIVER_VERSION, sizeof(ed->version));
++	strscpy(ed->bus_info, dev_name(lp->dev), sizeof(ed->bus_info));
  }
  
-@@ -2749,29 +2749,17 @@ static void axienet_disable_misc(void *clocks)
+ /**
+@@ -2749,10 +2753,12 @@ static void axienet_disable_misc(void *clocks)
  	clk_bulk_disable_unprepare(XAE_NUM_MISC_CLOCKS, clocks);
  }
  
--/**
-- * axienet_probe - Axi Ethernet probe function.
-- * @pdev:	Pointer to platform device structure.
-- *
-- * Return: 0, on success
-- *	    Non-zero error value on failure.
-- *
-- * This is the probe routine for Axi Ethernet driver. This is called before
-- * any other driver routines are invoked. It allocates and sets up the Ethernet
-- * device. Parses through device tree and populates fields of
-- * axienet_local. It registers the Ethernet device.
-- */
--static int axienet_probe(struct platform_device *pdev)
-+static int axienet_mac_probe(struct axienet_common *cp)
+-static int axienet_mac_probe(struct axienet_common *cp)
++static int axienet_mac_probe(struct auxiliary_device *auxdev,
++			     const struct auxiliary_device_id *id)
  {
--	int ret;
-+	struct platform_device *pdev = cp->pdev;
- 	struct device *dev = &pdev->dev;
--	struct device_node *np;
++	struct axienet_common *cp = auxdev->dev.platform_data;
+ 	struct platform_device *pdev = cp->pdev;
+-	struct device *dev = &pdev->dev;
++	struct device *dev = &auxdev->dev;
  	struct axienet_local *lp;
  	struct net_device *ndev;
--	struct resource *ethres;
-+	struct device_node *np;
- 	u8 mac_addr[ETH_ALEN];
- 	int addr_width = 32;
- 	u32 value;
-+	int ret;
- 
- 	ndev = devm_alloc_etherdev(dev, sizeof(*lp));
+ 	struct device_node *np;
+@@ -2765,7 +2771,7 @@ static int axienet_mac_probe(struct axienet_common *cp)
  	if (!ndev)
-@@ -2790,6 +2778,8 @@ static int axienet_probe(struct platform_device *pdev)
+ 		return -ENOMEM;
+ 
+-	platform_set_drvdata(pdev, ndev);
++	auxiliary_set_drvdata(auxdev, ndev);
+ 
+ 	SET_NETDEV_DEV(ndev, dev);
+ 	ndev->features = NETIF_F_SG;
+@@ -2777,7 +2783,7 @@ static int axienet_mac_probe(struct axienet_common *cp)
+ 
  	lp = netdev_priv(ndev);
  	lp->ndev = ndev;
- 	lp->dev = dev;
-+	lp->cp = cp;
-+	lp->regs = cp->regs;
+-	lp->dev = dev;
++	lp->dev = &pdev->dev;
+ 	lp->cp = cp;
+ 	lp->regs = cp->regs;
  	lp->options = XAE_OPTION_DEFAULTS;
- 	lp->rx_bd_num = RX_BD_NUM_DEFAULT;
- 	lp->tx_bd_num = TX_BD_NUM_DEFAULT;
-@@ -2801,17 +2791,6 @@ static int axienet_probe(struct platform_device *pdev)
- 	seqcount_mutex_init(&lp->hw_stats_seqcount, &lp->stats_lock);
- 	INIT_DEFERRABLE_WORK(&lp->stats_work, axienet_refresh_stats);
- 
--	lp->axi_clk = devm_clk_get_optional_enabled(dev, "s_axi_lite_clk");
--	if (!lp->axi_clk) {
--		/* For backward compatibility, if named AXI clock is not present,
--		 * treat the first clock specified as the AXI clock.
--		 */
--		lp->axi_clk = devm_clk_get_optional_enabled(dev, NULL);
--	}
--	if (IS_ERR(lp->axi_clk))
--		return dev_err_probe(dev, PTR_ERR(lp->axi_clk),
--				     "could not get AXI clock\n");
--
- 	lp->misc_clks[0].id = "axis_clk";
- 	lp->misc_clks[1].id = "ref_clk";
- 	lp->misc_clks[2].id = "mgt_clk";
-@@ -2831,12 +2810,6 @@ static int axienet_probe(struct platform_device *pdev)
- 	if (ret)
- 		return ret;
- 
--	/* Map device registers */
--	lp->regs = devm_platform_get_and_ioremap_resource(pdev, 0, &ethres);
--	if (IS_ERR(lp->regs))
--		return PTR_ERR(lp->regs);
--	lp->regs_start = ethres->start;
--
- 	/* Setup checksum offload, but default to off if not specified */
- 	lp->features = 0;
- 
-@@ -3045,11 +3018,6 @@ static int axienet_probe(struct platform_device *pdev)
- 	lp->tx_dma_cr = axienet_calc_cr(lp, XAXIDMA_DFT_TX_THRESHOLD,
- 					XAXIDMA_DFT_TX_USEC);
- 
--	ret = axienet_mdio_setup(lp);
--	if (ret)
--		dev_warn(dev,
--			 "error registering MDIO bus: %d\n", ret);
--
- 	if (lp->phy_mode == PHY_INTERFACE_MODE_SGMII ||
- 	    lp->phy_mode == PHY_INTERFACE_MODE_1000BASEX) {
- 		np = of_parse_phandle(dev->of_node, "pcs-handle", 0);
-@@ -3061,17 +3029,14 @@ static int axienet_probe(struct platform_device *pdev)
- 			np = of_parse_phandle(dev->of_node, "phy-handle", 0);
+@@ -2909,8 +2915,11 @@ static int axienet_mac_probe(struct axienet_common *cp)
+ 			of_node_put(np);
+ 			lp->eth_irq = platform_get_irq_optional(pdev, 0);
+ 		} else {
++			struct resource *dmares;
++
+ 			/* Check for these resources directly on the Ethernet node. */
+-			lp->dma_regs = devm_platform_get_and_ioremap_resource(pdev, 1, NULL);
++			dmares = platform_get_resource(pdev, IORESOURCE_MEM, 1);
++			lp->dma_regs = devm_ioremap_resource(dev, dmares);
+ 			lp->rx_irq = platform_get_irq(pdev, 1);
+ 			lp->tx_irq = platform_get_irq(pdev, 0);
+ 			lp->eth_irq = platform_get_irq_optional(pdev, 2);
+@@ -2925,7 +2934,9 @@ static int axienet_mac_probe(struct axienet_common *cp)
  		}
- 		if (!np) {
--			dev_err(dev, "pcs-handle (preferred) or phy-handle required for 1000BaseX/SGMII\n");
--			ret = -EINVAL;
--			goto cleanup_mdio;
-+			dev_err(dev,
-+				"pcs-handle (preferred) or phy-handle required for 1000BaseX/SGMII\n");
-+			return -EINVAL;
+ 
+ 		/* Reset core now that clocks are enabled, prior to accessing MDIO */
++		axienet_lock_mii(lp);
+ 		ret = __axienet_device_reset(lp);
++		axienet_unlock_mii(lp);
+ 		if (ret)
+ 			return ret;
+ 
+@@ -2957,7 +2968,8 @@ static int axienet_mac_probe(struct axienet_common *cp)
+ 			return -EINVAL;
  		}
- 		lp->pcs_phy = of_mdio_find_device(np);
--		if (!lp->pcs_phy) {
--			ret = -EPROBE_DEFER;
--			of_node_put(np);
--			goto cleanup_mdio;
--		}
- 		of_node_put(np);
-+		if (!lp->pcs_phy)
-+			return -EPROBE_DEFER;
- 		lp->pcs.ops = &axienet_pcs_ops;
- 		lp->pcs.poll = true;
+ 
+-		ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(addr_width));
++		ret = dma_set_mask_and_coherent(lp->dev,
++						DMA_BIT_MASK(addr_width));
+ 		if (ret) {
+ 			dev_err(dev, "No suitable DMA available\n");
+ 			return ret;
+@@ -3055,7 +3067,7 @@ static int axienet_mac_probe(struct axienet_common *cp)
+ 			  lp->phylink_config.supported_interfaces);
  	}
-@@ -3096,7 +3061,7 @@ static int axienet_probe(struct platform_device *pdev)
+ 
+-	lp->phylink = phylink_create(&lp->phylink_config, dev->fwnode,
++	lp->phylink = phylink_create(&lp->phylink_config, dev_fwnode(dev),
+ 				     lp->phy_mode,
+ 				     &axienet_phylink_ops);
  	if (IS_ERR(lp->phylink)) {
- 		ret = PTR_ERR(lp->phylink);
- 		dev_err(dev, "phylink_create error (%i)\n", ret);
--		goto cleanup_mdio;
-+		goto cleanup_pcs;
- 	}
- 
- 	ret = register_netdev(lp->ndev);
-@@ -3109,32 +3074,24 @@ static int axienet_probe(struct platform_device *pdev)
- 
- cleanup_phylink:
- 	phylink_destroy(lp->phylink);
--
--cleanup_mdio:
-+cleanup_pcs:
- 	if (lp->pcs_phy)
- 		put_device(&lp->pcs_phy->dev);
--	if (lp->mii_bus)
--		axienet_mdio_teardown(lp);
+@@ -3080,9 +3092,9 @@ static int axienet_mac_probe(struct axienet_common *cp)
  	return ret;
  }
  
--static void axienet_remove(struct platform_device *pdev)
-+static void axienet_mac_remove(struct platform_device *pdev)
+-static void axienet_mac_remove(struct platform_device *pdev)
++static void axienet_mac_remove(struct auxiliary_device *auxdev)
  {
- 	struct net_device *ndev = platform_get_drvdata(pdev);
+-	struct net_device *ndev = platform_get_drvdata(pdev);
++	struct net_device *ndev = auxiliary_get_drvdata(auxdev);
  	struct axienet_local *lp = netdev_priv(ndev);
  
  	unregister_netdev(ndev);
--
--	if (lp->phylink)
--		phylink_destroy(lp->phylink);
--
-+	phylink_destroy(lp->phylink);
- 	if (lp->pcs_phy)
+@@ -3091,9 +3103,9 @@ static void axienet_mac_remove(struct platform_device *pdev)
  		put_device(&lp->pcs_phy->dev);
--
--	axienet_mdio_teardown(lp);
  }
  
--static void axienet_shutdown(struct platform_device *pdev)
-+static void axienet_mac_shutdown(struct platform_device *pdev)
+-static void axienet_mac_shutdown(struct platform_device *pdev)
++static void axienet_mac_shutdown(struct auxiliary_device *auxdev)
  {
- 	struct net_device *ndev = platform_get_drvdata(pdev);
+-	struct net_device *ndev = platform_get_drvdata(pdev);
++	struct net_device *ndev = auxiliary_get_drvdata(auxdev);
  
-@@ -3182,10 +3139,64 @@ static int axienet_resume(struct device *dev)
+ 	rtnl_lock();
+ 	netif_device_detach(ndev);
+@@ -3139,12 +3151,78 @@ static int axienet_resume(struct device *dev)
  static DEFINE_SIMPLE_DEV_PM_OPS(axienet_pm_ops,
  				axienet_suspend, axienet_resume);
  
-+static int axienet_probe(struct platform_device *pdev)
++static const struct auxiliary_device_id xilinx_axienet_mac_id_table[] = {
++	{ .name = KBUILD_MODNAME ".mac", },
++	{ },
++};
++MODULE_DEVICE_TABLE(auxiliary, xilinx_axienet_mac_id_table);
++
++static struct auxiliary_driver xilinx_axienet_mac = {
++	.name = "mac",
++	.id_table = xilinx_axienet_mac_id_table,
++	.probe = axienet_mac_probe,
++	.remove = axienet_mac_remove,
++	.shutdown = axienet_mac_shutdown,
++	.driver = {
++		.pm = &axienet_pm_ops,
++	},
++};
++
++static DEFINE_IDA(axienet_id);
++
++static void axienet_id_free(void *data)
 +{
-+	struct device *dev = &pdev->dev;
-+	struct axienet_common *cp;
-+	struct resource *ethres;
++	int id = (intptr_t)data;
++
++	ida_free(&axienet_id, id);
++}
++
++static void auxenet_aux_release(struct device *dev) { }
++
++static void axienet_aux_destroy(void *data)
++{
++	struct auxiliary_device *auxdev = data;
++
++	auxiliary_device_delete(auxdev);
++	auxiliary_device_uninit(auxdev);
++	fwnode_handle_put(auxdev->dev.fwnode);
++}
++
++static int axienet_aux_create(struct axienet_common *cp,
++			      struct auxiliary_device *auxdev, const char *name,
++			      int id, struct fwnode_handle *fwnode)
++{
++	struct device *dev = &cp->pdev->dev;
 +	int ret;
 +
-+	cp = devm_kzalloc(dev, sizeof(*cp), GFP_KERNEL);
-+	if (!cp)
-+		return -ENOMEM;
-+
-+	cp->pdev = pdev;
-+	mutex_init(&cp->reset_lock);
-+
-+	cp->axi_clk = devm_clk_get_optional_enabled(dev, "s_axi_lite_clk");
-+	if (!cp->axi_clk) {
-+		/* For backward compatibility, if named AXI clock is not present,
-+		 * treat the first clock specified as the AXI clock.
-+		 */
-+		cp->axi_clk = devm_clk_get_optional_enabled(dev, NULL);
++	auxdev->name = name;
++	auxdev->id = id;
++	auxdev->dev.parent = dev;
++	auxdev->dev.platform_data = cp;
++	auxdev->dev.release = auxenet_aux_release;
++	device_set_node(&auxdev->dev, fwnode);
++	ret = auxiliary_device_init(auxdev);
++	if (ret) {
++		fwnode_handle_put(fwnode);
++		return ret;
 +	}
-+	if (IS_ERR(cp->axi_clk))
-+		return dev_err_probe(dev, PTR_ERR(cp->axi_clk),
-+				     "could not get AXI clock\n");
 +
-+	/* Map device registers */
-+	cp->regs = devm_platform_get_and_ioremap_resource(pdev, 0, &ethres);
-+	if (IS_ERR(cp->regs))
-+		return PTR_ERR(cp->regs);
-+	cp->regs_start = ethres->start;
++	ret = auxiliary_device_add(auxdev);
++	if (ret) {
++		fwnode_handle_put(fwnode);
++		auxiliary_device_uninit(auxdev);
++		return ret;
++	}
 +
-+	ret = axienet_mdio_setup(cp);
++	return devm_add_action_or_reset(dev, axienet_aux_destroy, auxdev);
++}
++
+ static int axienet_probe(struct platform_device *pdev)
+ {
+ 	struct device *dev = &pdev->dev;
+ 	struct axienet_common *cp;
+ 	struct resource *ethres;
+-	int ret;
++	int ret, id;
+ 
+ 	cp = devm_kzalloc(dev, sizeof(*cp), GFP_KERNEL);
+ 	if (!cp)
+@@ -3170,33 +3248,31 @@ static int axienet_probe(struct platform_device *pdev)
+ 		return PTR_ERR(cp->regs);
+ 	cp->regs_start = ethres->start;
+ 
+-	ret = axienet_mdio_setup(cp);
+-	if (ret)
+-		dev_warn(dev, "error registering MDIO bus: %d\n", ret);
++	id = ida_alloc(&axienet_id, GFP_KERNEL);
++	if (id < 0)
++		return dev_err_probe(dev, id, "could not allocate id\n");
+ 
+-	ret = axienet_mac_probe(cp);
+-	if (!ret)
+-		return 0;
++	ret = devm_add_action_or_reset(dev, axienet_id_free,
++				       (void *)(intptr_t)id);
 +	if (ret)
-+		dev_warn(dev, "error registering MDIO bus: %d\n", ret);
-+
-+	ret = axienet_mac_probe(cp);
-+	if (!ret)
-+		return 0;
-+
-+	if (cp->mii_bus)
-+		axienet_mdio_teardown(cp);
-+	return ret;
-+}
-+
-+static void axienet_remove(struct platform_device *pdev)
-+{
-+	struct net_device *ndev = platform_get_drvdata(pdev);
-+	struct axienet_local *lp = netdev_priv(ndev);
-+
-+	axienet_mac_remove(pdev);
-+	if (lp->mii_bus)
-+		axienet_mdio_teardown(lp->cp);
-+}
-+
++		return dev_err_probe(dev, ret,
++				     "could not register id free action\n");
+ 
+-	if (cp->mii_bus)
+-		axienet_mdio_teardown(cp);
+-	return ret;
+-}
++	ret = axienet_aux_create(cp, &cp->mii_bus, "mdio", id,
++				 device_get_named_child_node(dev, "mdio"));
++	if (ret)
++		return dev_err_probe(dev, ret, "could not create mdio bus\n");
+ 
+-static void axienet_remove(struct platform_device *pdev)
+-{
+-	struct net_device *ndev = platform_get_drvdata(pdev);
+-	struct axienet_local *lp = netdev_priv(ndev);
++	ret = axienet_aux_create(cp, &cp->mac, "mac", id,
++				 fwnode_handle_get(dev_fwnode(dev)));
++	if (ret)
++		return dev_err_probe(dev, ret, "could not create MAC\n");
+ 
+-	axienet_mac_remove(pdev);
+-	if (lp->mii_bus)
+-		axienet_mdio_teardown(lp->cp);
++	return 0;
+ }
+ 
  static struct platform_driver axienet_driver = {
  	.probe = axienet_probe,
- 	.remove = axienet_remove,
--	.shutdown = axienet_shutdown,
-+	.shutdown = axienet_mac_shutdown,
+-	.remove = axienet_remove,
+-	.shutdown = axienet_mac_shutdown,
  	.driver = {
  		 .name = "xilinx_axienet",
  		 .pm = &axienet_pm_ops,
+@@ -3204,7 +3280,35 @@ static struct platform_driver axienet_driver = {
+ 	},
+ };
+ 
+-module_platform_driver(axienet_driver);
++static int __init axienet_init(void)
++{
++	int ret;
++
++	ret = auxiliary_driver_register(&xilinx_axienet_mdio);
++	if (ret)
++		return ret;
++
++	ret = auxiliary_driver_register(&xilinx_axienet_mac);
++	if (ret)
++		goto unregister_mdio;
++
++	ret = platform_driver_register(&axienet_driver);
++	if (ret) {
++		auxiliary_driver_unregister(&xilinx_axienet_mac);
++unregister_mdio:
++		auxiliary_driver_unregister(&xilinx_axienet_mdio);
++	}
++	return ret;
++}
++module_init(axienet_init);
++
++static void __exit axienet_exit(void)
++{
++	platform_driver_register(&axienet_driver);
++	auxiliary_driver_unregister(&xilinx_axienet_mac);
++	auxiliary_driver_unregister(&xilinx_axienet_mdio);
++}
++module_exit(axienet_exit);
+ 
+ MODULE_DESCRIPTION("Xilinx Axi Ethernet driver");
+ MODULE_AUTHOR("Xilinx");
 diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_mdio.c b/drivers/net/ethernet/xilinx/xilinx_axienet_mdio.c
-index 2799d168ed9d..d428ce6da639 100644
+index d428ce6da639..cc8a2a70271b 100644
 --- a/drivers/net/ethernet/xilinx/xilinx_axienet_mdio.c
 +++ b/drivers/net/ethernet/xilinx/xilinx_axienet_mdio.c
-@@ -12,6 +12,7 @@
+@@ -9,10 +9,10 @@
+  * Copyright (c) 2010 - 2012 Xilinx, Inc. All rights reserved.
+  */
+ 
++#include <linux/auxiliary_bus.h>
  #include <linux/clk.h>
  #include <linux/of_address.h>
  #include <linux/of_mdio.h>
-+#include <linux/platform_device.h>
+-#include <linux/platform_device.h>
  #include <linux/jiffies.h>
  #include <linux/iopoll.h>
  
-@@ -22,13 +23,13 @@
+@@ -271,19 +271,10 @@ static int axienet_mdio_enable(struct mii_bus *bus, struct device_node *np)
+ 	return ret;
+ }
  
- /**
-  * axienet_mdio_wait_until_ready - MDIO wait function
-- * @lp:	Pointer to axienet local data structure.
-+ * @lp:	Pointer to axienet common data structure.
-  *
-  * Return :	0 on success, Negative value on errors
-  *
-  * Wait till MDIO interface is ready to accept a new transaction.
-  */
--static int axienet_mdio_wait_until_ready(struct axienet_local *lp)
-+static int axienet_mdio_wait_until_ready(struct axienet_common *lp)
+-/**
+- * axienet_mdio_setup - MDIO setup function
+- * @lp:		Pointer to axienet common data structure.
+- *
+- * Return:	0 on success, -ETIMEDOUT on a timeout, -EOVERFLOW on a clock
+- *		divisor overflow, -ENOMEM when mdiobus_alloc (to allocate
+- *		memory for mii bus structure) fails.
+- *
+- * Sets up the MDIO interface by initializing the MDIO clock.
+- * Register the MDIO interface.
+- **/
+-int axienet_mdio_setup(struct axienet_common *lp)
++static int axienet_mdio_probe(struct auxiliary_device *auxdev,
++			      const struct auxiliary_device_id *id)
  {
- 	u32 val;
- 
-@@ -39,11 +40,11 @@ static int axienet_mdio_wait_until_ready(struct axienet_local *lp)
- 
- /**
-  * axienet_mdio_mdc_enable - MDIO MDC enable function
-- * @lp:	Pointer to axienet local data structure.
-+ * @lp:	Pointer to axienet common data structure.
-  *
-  * Enable the MDIO MDC. Called prior to a read/write operation
-  */
--static void axienet_mdio_mdc_enable(struct axienet_local *lp)
-+static void axienet_mdio_mdc_enable(struct axienet_common *lp)
- {
- 	iowrite32((u32)lp->mii_clk_div | XAE_MDIO_MC_MDIOEN_MASK,
- 		  lp->regs + XAE_MDIO_MC_OFFSET);
-@@ -51,11 +52,11 @@ static void axienet_mdio_mdc_enable(struct axienet_local *lp)
- 
- /**
-  * axienet_mdio_mdc_disable - MDIO MDC disable function
-- * @lp:	Pointer to axienet local data structure.
-+ * @lp:	Pointer to axienet common data structure.
-  *
-  * Disable the MDIO MDC. Called after a read/write operation
-  */
--static void axienet_mdio_mdc_disable(struct axienet_local *lp)
-+static void axienet_mdio_mdc_disable(struct axienet_common *lp)
- {
- 	u32 mc_reg;
- 
-@@ -80,8 +81,9 @@ static int axienet_mdio_read(struct mii_bus *bus, int phy_id, int reg)
- {
- 	u32 rc;
- 	int ret;
--	struct axienet_local *lp = bus->priv;
-+	struct axienet_common *lp = bus->priv;
- 
-+	guard(mutex)(&lp->reset_lock);
- 	axienet_mdio_mdc_enable(lp);
- 
- 	ret = axienet_mdio_wait_until_ready(lp);
-@@ -127,13 +129,14 @@ static int axienet_mdio_read(struct mii_bus *bus, int phy_id, int reg)
- static int axienet_mdio_write(struct mii_bus *bus, int phy_id, int reg,
- 			      u16 val)
- {
--	struct axienet_local *lp = bus->priv;
-+	struct axienet_common *lp = bus->priv;
- 	int ret;
- 	u32 mcr;
- 
- 	dev_dbg(&bus->dev, "%s(phy_id=%i, reg=%x, val=%x)\n", __func__,
- 		phy_id, reg, val);
- 
-+	guard(mutex)(&lp->reset_lock);
- 	axienet_mdio_mdc_enable(lp);
- 
- 	ret = axienet_mdio_wait_until_ready(lp);
-@@ -160,7 +163,7 @@ static int axienet_mdio_write(struct mii_bus *bus, int phy_id, int reg,
- 
- /**
-  * axienet_mdio_enable - MDIO hardware setup function
-- * @lp:		Pointer to axienet local data structure.
-+ * @lp:		Pointer to axienet common data structure.
-  * @np:		Pointer to mdio device tree node.
-  *
-  * Return:	0 on success, -ETIMEDOUT on a timeout, -EOVERFLOW on a clock
-@@ -171,7 +174,7 @@ static int axienet_mdio_write(struct mii_bus *bus, int phy_id, int reg,
-  **/
- static int axienet_mdio_enable(struct mii_bus *bus, struct device_node *np)
- {
--	struct axienet_local *lp = bus->priv;
-+	struct axienet_common *lp = bus->priv;
- 	u32 mdio_freq = DEFAULT_MDIO_FREQ;
- 	u32 host_clock;
- 	u32 clk_div;
-@@ -187,7 +190,7 @@ static int axienet_mdio_enable(struct mii_bus *bus, struct device_node *np)
- 		/* Legacy fallback: detect CPU clock frequency and use as AXI
- 		 * bus clock frequency. This only works on certain platforms.
- 		 */
--		np1 = of_find_node_by_name(NULL, "lpu");
-+		np1 = of_find_node_by_name(NULL, "cpu");
- 		if (!np1) {
- 			dev_warn(&bus->dev,
- 				 "Could not find CPU device node.\n");
-@@ -258,6 +261,7 @@ static int axienet_mdio_enable(struct mii_bus *bus, struct device_node *np)
- 		"Setting MDIO clock divisor to %u/%u Hz host clock.\n",
- 		lp->mii_clk_div, host_clock);
- 
-+	guard(mutex)(&lp->reset_lock);
- 	axienet_mdio_mdc_enable(lp);
- 
- 	ret = axienet_mdio_wait_until_ready(lp);
-@@ -269,7 +273,7 @@ static int axienet_mdio_enable(struct mii_bus *bus, struct device_node *np)
- 
- /**
-  * axienet_mdio_setup - MDIO setup function
-- * @lp:		Pointer to axienet local data structure.
-+ * @lp:		Pointer to axienet common data structure.
-  *
-  * Return:	0 on success, -ETIMEDOUT on a timeout, -EOVERFLOW on a clock
-  *		divisor overflow, -ENOMEM when mdiobus_alloc (to allocate
-@@ -278,7 +282,7 @@ static int axienet_mdio_enable(struct mii_bus *bus, struct device_node *np)
-  * Sets up the MDIO interface by initializing the MDIO clock.
-  * Register the MDIO interface.
-  **/
--int axienet_mdio_setup(struct axienet_local *lp)
-+int axienet_mdio_setup(struct axienet_common *lp)
- {
++	struct axienet_common *lp = auxdev->dev.platform_data;
  	struct device_node *mdio_node;
  	struct mii_bus *bus;
-@@ -295,18 +299,21 @@ int axienet_mdio_setup(struct axienet_local *lp)
+ 	int ret;
+@@ -299,36 +290,40 @@ int axienet_mdio_setup(struct axienet_common *lp)
  	bus->name = "Xilinx Axi Ethernet MDIO";
  	bus->read = axienet_mdio_read;
  	bus->write = axienet_mdio_write;
--	bus->parent = lp->dev;
-+	bus->parent = &lp->pdev->dev;
- 	lp->mii_bus = bus;
+-	bus->parent = &lp->pdev->dev;
+-	lp->mii_bus = bus;
++	bus->parent = &auxdev->dev;
++	auxiliary_set_drvdata(auxdev, bus);
  
--	mdio_node = of_get_child_by_name(lp->dev->of_node, "mdio");
--	ret = axienet_mdio_enable(bus, mdio_node);
-+	mdio_node = of_get_child_by_name(lp->pdev->dev.of_node, "mdio");
-+	scoped_guard(mutex, &lp->reset_lock)
-+		ret = axienet_mdio_enable(bus, mdio_node);
+-	mdio_node = of_get_child_by_name(lp->pdev->dev.of_node, "mdio");
+-	scoped_guard(mutex, &lp->reset_lock)
+-		ret = axienet_mdio_enable(bus, mdio_node);
++	mdio_node = dev_of_node(&auxdev->dev);
++	ret = axienet_mdio_enable(bus, mdio_node);
  	if (ret < 0)
  		goto unregister;
  
  	ret = of_mdiobus_register(bus, mdio_node);
- 	of_node_put(mdio_node);
--	axienet_mdio_mdc_disable(lp);
-+	scoped_guard(mutex, &lp->reset_lock)
-+		axienet_mdio_mdc_disable(lp);
- 	if (ret) {
-+unregister:
+-	of_node_put(mdio_node);
+ 	scoped_guard(mutex, &lp->reset_lock)
+ 		axienet_mdio_mdc_disable(lp);
+-	if (ret) {
++	if (ret)
+ unregister:
  		mdiobus_free(bus);
- 		lp->mii_bus = NULL;
- 	}
-@@ -315,11 +322,11 @@ int axienet_mdio_setup(struct axienet_local *lp)
+-		lp->mii_bus = NULL;
+-	}
+ 	return ret;
+ }
  
- /**
-  * axienet_mdio_teardown - MDIO remove function
-- * @lp:		Pointer to axienet local data structure.
-+ * @lp:		Pointer to axienet common data structure.
-  *
-  * Unregisters the MDIO and frees any associate memory for mii bus.
-  */
--void axienet_mdio_teardown(struct axienet_local *lp)
-+void axienet_mdio_teardown(struct axienet_common *lp)
+-/**
+- * axienet_mdio_teardown - MDIO remove function
+- * @lp:		Pointer to axienet common data structure.
+- *
+- * Unregisters the MDIO and frees any associate memory for mii bus.
+- */
+-void axienet_mdio_teardown(struct axienet_common *lp)
++static void axienet_mdio_remove(struct auxiliary_device *auxdev)
  {
- 	mdiobus_unregister(lp->mii_bus);
- 	mdiobus_free(lp->mii_bus);
+-	mdiobus_unregister(lp->mii_bus);
+-	mdiobus_free(lp->mii_bus);
+-	lp->mii_bus = NULL;
++	struct mii_bus *mii_bus = auxiliary_get_drvdata(auxdev);
++
++	mdiobus_unregister(mii_bus);
++	mdiobus_free(mii_bus);
+ }
++
++static const struct auxiliary_device_id xilinx_axienet_mdio_id_table[] = {
++	{ .name = KBUILD_MODNAME ".mdio", },
++	{ },
++};
++MODULE_DEVICE_TABLE(auxiliary, xilinx_axienet_mdio_id_table);
++
++struct auxiliary_driver xilinx_axienet_mdio = {
++	.name = "mdio",
++	.id_table = xilinx_axienet_mdio_id_table,
++	.probe = axienet_mdio_probe,
++	.remove = axienet_mdio_remove,
++};
 -- 
 2.35.1.1320.gc452695387.dirty
 
