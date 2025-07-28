@@ -1,245 +1,105 @@
-Return-Path: <netdev+bounces-210500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210501-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BADBAB1399E
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 13:06:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 907A4B139DB
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 13:29:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4192017CDF3
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 11:05:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CBFCF1891522
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 11:30:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB437246BA5;
-	Mon, 28 Jul 2025 11:03:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A849D25A620;
+	Mon, 28 Jul 2025 11:29:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dmszjQfw"
+	dkim=pass (1024-bit key) header.d=cdn77.com header.i=@cdn77.com header.b="uCncNpE5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-internal.sh.cz (mail-internal.sh.cz [95.168.196.40])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19FA5265CC8;
-	Mon, 28 Jul 2025 11:03:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01319202998;
+	Mon, 28 Jul 2025 11:29:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.168.196.40
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753700628; cv=none; b=jdvA8VF6ex4MVp3jS4Jr1A4yoX6iUt9RGz/VZ/gDQmOetvdpaFzesYU6jdG8flIp9sjhm7EI3ld/o3+F7bnaqmm4kL6AedGc38TFml8BG9tWJke472tRIQx43Z9IB97hH9nd3uKCBkNLg8eyRhfpyoUMlzYyGT3M31EbToQlpu8=
+	t=1753702182; cv=none; b=P6uO9Vbs5tuNBms6NjTEHCGl7jMNr1fhv8+lvLNf7vVFuPwqhUTvNNnjYXbB123t9znUe27ht8XO11c4vE9Fb4wayWa/o/Sdj4Jh7mH8CzQv1FG4EposCB1QiCv0VipQkRjaEp9zhYkHujhgw33tYE8f6FB1QSIDENZJF4AyOqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753700628; c=relaxed/simple;
-	bh=t3AiHcnf9UbGvXBnY7A6WX7EUYHNVlEjDxCmrXiD+0k=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Mv0nU1O3jKTozqUtZkUiJHXrilCxNYhIkoxejFkBOYrpR+mvE8Xon+ObqWx7lT7vaL2175FC3ZZy2h6TIxBqwRRHb3fY5YbIDdWAFGynbYLywqhphkp6CSZCi89u5iP2kihl0KfzrGe4VwDQWInV7/6FdEYuDYp82ZXd2AfDmNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dmszjQfw; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4561a4a8bf2so48253235e9.1;
-        Mon, 28 Jul 2025 04:03:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753700625; x=1754305425; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xCfTsWWTa7wdeH4U61LV0QVujn0Rr5yA6peexPuxYv4=;
-        b=dmszjQfwlLGScX6Rrlqm82H8UxS1LxwgNHl2Z/2+fHAAKlJyxk/aS+wOjRbwnnpGzG
-         AvHAmawQBBbnDyYpZuXbygZbqJNYjCaSPNZCqjYTAQ3ow1c6Qi1qIgNTjtpjExt0e+Yi
-         bdUBSsiMRk3nJ2PVDvGn3EuWbbl4vVW7Ncbgt5svFQaA17HVxwcxsSz//yg4rhz1XnC4
-         PAAHbPJmCDBFQArDxy+dALwhMkCc0XyK+NdCOojq4HdaFpItvUy893qRLGsGC7dNjAOV
-         VJdFf1sBp+5Z/W8yD3ohDB6cD34kTGVw0GKnQ+UI16I/SaFO1cft4A+jiFut0pufcfBs
-         lp5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753700625; x=1754305425;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xCfTsWWTa7wdeH4U61LV0QVujn0Rr5yA6peexPuxYv4=;
-        b=ljod6wDiRPJ7GWsl5cj0Kc0egvTS1+Kky6+c2BtipuBhhCb5o8Ac4XwVUf/q9mk6n1
-         X1sPkYN3CCdLG4ENbH+oD+Sn229XVq6T/Yah+AT14VvyDKxfa0d3vqaIA9gXdCMPpsSW
-         IwkpspZAWbz8wq2cs6nd9UtxWpnAof3QB+cWwxquekggTzJPspZZYJMbX3hfVRksxWqM
-         7EdW03Mu9vfBJEmX14M7KD+JCMiyjbHJVo/AHlqg8IbrWc6J1va6sS6PUOm4LKizo0T8
-         QMIhv13Yu5g30D7hjvyBW45chRhbNXUPXI3lqcpjh07gxhuIM/YB3krTXdUa/kEYar3d
-         H78A==
-X-Forwarded-Encrypted: i=1; AJvYcCUIccihMY+OFiy+0TPRfq7rsryTN6k9YB9BuBeCEw9M0wHYpqMcUHpOIJEJ/olAmXjFPS4BvNuo4g==@vger.kernel.org, AJvYcCVEkf58tTYnz5xbAdo7Rp7btd3Z/IMEzhqZmEjydcKGL9qYN+gBawVZALWGRSKu+mMmfVTIYYDc@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz/lQKmAFWOUdDSX4ZYaOj/p/rJXTKGq7FcOWdjHu3xV+4e9Ysr
-	VooXP9idNFAeCXUTkEiZBJqjeai7EA1T/XeRzKjjpmBt1wsV5fj5G/dy
-X-Gm-Gg: ASbGncu9AppHee+SVWiXZLZ6rXRzjqMwM3OIfWftQoKFlwpGmiLWcryd6knQoCCUGVa
-	ptZmKujYW8a0h/HL6Fuh8oxZHtrG+smAIIcc4xEC8qE174r7CaP/u16uFFdEkV3Y7MOA2lG/VIi
-	GG13SC258q1JURQ83xuEZbZWXKhOMCryFFTLmHNsUxxIOrR3r5lh8zuTOjKAxPgsdLmypbFV6ph
-	yNvnhM44Ojo1zAoeWtDHa2R1BjoFYdl88cEj8MFfYy3Xi5TiAG9744cv/UVHAES2SrRLgPGKOgz
-	Bm+rFI0ChwzvbfFzE+jJBq063Bm6rS1uJn4Z7TENNGVME2MMgXaLFuJ74UDoMxWvgOFUn/6qw6l
-	H7oI=
-X-Google-Smtp-Source: AGHT+IGgyPMOcv8M+bhV3mrP0uIyvmsPwxWYZJ1xn2f8mb0xDTXip8JQuZBdFu0kFSIz0TzLD7WX5Q==
-X-Received: by 2002:a05:600c:a012:b0:456:11cc:360d with SMTP id 5b1f17b1804b1-4587630f640mr104788175e9.9.1753700624962;
-        Mon, 28 Jul 2025 04:03:44 -0700 (PDT)
-Received: from 127.com ([2620:10d:c092:600::1:75])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-458705c4fdasm157410235e9.28.2025.07.28.04.03.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Jul 2025 04:03:44 -0700 (PDT)
-From: Pavel Begunkov <asml.silence@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org
-Cc: asml.silence@gmail.com,
-	io-uring@vger.kernel.org,
-	Eric Dumazet <edumazet@google.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	davem@davemloft.net,
-	sdf@fomichev.me,
-	almasrymina@google.com,
-	dw@davidwei.uk,
-	michael.chan@broadcom.com,
-	dtatulea@nvidia.com,
-	ap420073@gmail.com
-Subject: [RFC v1 22/22] io_uring/zcrx: implement large rx buffer support
-Date: Mon, 28 Jul 2025 12:04:26 +0100
-Message-ID: <f6d352a8eb9f0297196fdaf0eccc6d9e2a44a357.1753694914.git.asml.silence@gmail.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <cover.1753694913.git.asml.silence@gmail.com>
-References: <cover.1753694913.git.asml.silence@gmail.com>
+	s=arc-20240116; t=1753702182; c=relaxed/simple;
+	bh=1G1bnuP3apPi1qJ1RU6vHZqlaWWEFA7LpVNSzrZV5r4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IZS9hYqbk49C2pdVgjAsLHPQEbOUxEAzh6ITOVqlHmugiAVM7GtZ32rtZpshu6bUedAMQ4kdnt4bmuvJkhgkgx9VtyWOn/8qmj6fKAb3OgnVFq4hsjC8d2TZILpj0kZPiT9w41FHlTWBBU9sBVQQQvgmh/Ykk+/jzn9QWn1vd70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cdn77.com; spf=pass smtp.mailfrom=cdn77.com; dkim=pass (1024-bit key) header.d=cdn77.com header.i=@cdn77.com header.b=uCncNpE5; arc=none smtp.client-ip=95.168.196.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cdn77.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cdn77.com
+DKIM-Signature: a=rsa-sha256; t=1753702172; x=1754306972; s=dkim2019; d=cdn77.com; c=relaxed/relaxed; v=1; bh=KJKiJr+tG3FAfmMlaEVSvdKXkB/PgPhRU4B/I5SDZaA=; h=From:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:In-Reply-To:References;
+   b=uCncNpE5DBkvi37xKEm0B4brCr3ocRD9YpR8NsqYGHOp/DWBSdq7t2hBLNOH7W045BZKntLrkz22QSN9BYkBQGTe6d0h8wRA/4MiZwz6nEJthP3FmCtMKvdu9+3Y0XxOadrVV7RoK+3GILChS2HiEuOo0FKmYAH2+Xzr8QnI6R0=
+Received: from [10.0.5.28] ([95.168.203.222])
+        by mail.sh.cz (14.1.0 build 16 ) with ASMTP (SSL) id 202507281329311901;
+        Mon, 28 Jul 2025 13:29:31 +0200
+Message-ID: <924a8a12-ed89-45e5-900d-6d937108ec3e@cdn77.com>
+Date: Mon, 28 Jul 2025 13:29:29 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3] memcg: expose socket memory pressure in a cgroup
+To: Tejun Heo <tj@kernel.org>
+Cc: Shakeel Butt <shakeel.butt@linux.dev>, =?UTF-8?Q?Michal_Koutn=C3=BD?=
+ <mkoutny@suse.com>, Kuniyuki Iwashima <kuniyu@google.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ Neal Cardwell <ncardwell@google.com>, David Ahern <dsahern@kernel.org>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Yosry Ahmed <yosry.ahmed@linux.dev>, linux-mm@kvack.org,
+ netdev@vger.kernel.org, Johannes Weiner <hannes@cmpxchg.org>,
+ Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>,
+ Muchun Song <muchun.song@linux.dev>, cgroups@vger.kernel.org,
+ Matyas Hurtik <matyas.hurtik@cdn77.com>
+References: <ni4axiks6hvap3ixl6i23q7grjbki3akeea2xxzhdlkmrj5hpb@qt3vtmiayvpz>
+ <telhuoj5bj5eskhicysxkblc4vr6qlcq3vx7pgi6p34g4zfwxw@6vm2r2hg3my4>
+ <CAAVpQUBwS3DFs9BENNNgkKFcMtc7tjZBA0PZ-EZ0WY+dCw8hrA@mail.gmail.com>
+ <4g63mbix4aut7ye7b7s4m5q7aewfxq542i2vygniow7l5a3zmd@bvis5wmifscy>
+ <CAAVpQUCOwFksmo72p_nkr1uJMLRcRo1VAneADon9OxDLoRH0KA@mail.gmail.com>
+ <jj5w7cpjjyzxasuweiz64jqqxcz23tm75ca22h3wvfj3u4aums@gnjarnf5gpgq>
+ <yruvlyxyy6gsrf2hhtyja5hqnxi2fmdqr63twzxpjrxgffov32@l7gqvdxijs5c>
+ <878ca484-a045-4abb-a5bd-7d5ae82607de@cdn77.com>
+ <irvyenjca4czrxfew4c7nc23luo5ybgdw3lquq7aoadmhmfu6h@h4mx532ls26h>
+ <486bfabc-386c-4fdc-8903-d56ce207951f@cdn77.com>
+ <aILTi2-iZ1ge3D8n@slm.duckdns.org>
+Content-Language: en-US
+From: Daniel Sedlak <daniel.sedlak@cdn77.com>
+In-Reply-To: <aILTi2-iZ1ge3D8n@slm.duckdns.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-CTCH: RefID="str=0001.0A002110.68875ED5.0034,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0"; Spam="Unknown"; VOD="Unknown"
 
-There are network cards that support receive buffers larger than 4K, and
-that can be vastly beneficial for performance, and benchmarks for this
-patch showed up to 30% CPU util improvement for 32K vs 4K buffers.
+On 7/25/25 2:44 AM, Tejun Heo wrote:
+> On Thu, Jul 24, 2025 at 10:43:27AM +0200, Daniel Sedlak wrote:
+> ...
+>> Currently, we know the following information:
+>>
+>> - we know when the pressure starts
+>> - and we know when the pressure ends if not rearmed (start time + HZ)
+>>
+>>  From that, we should be able to calculate a similar triplet to the pressure
+>> endpoints in the cgroups (cpu|io|memory|irq).pressure. That is, how much %
+>> of time on average was spent under pressure for avg10, avg60, avg300 i.e.
+>> average pressure over the past 10 seconds, 60 seconds, and 300 seconds,
+>> respectively. (+ total time spent under pressure)
+> 
+> Let's just add the cumulative duration that socket pressure was present.
+> 
+> Thanks.
+> 
 
-Allows zcrx users to specify the size in struct
-io_uring_zcrx_ifq_reg::rx_buf_len. If set to zero, zcrx will use a
-default value. zcrx will check and fail if the memory backing the area
-can't be split into physically contiguous chunks of the required size.
-It's more restrictive as it only needs dma addresses to be contig, but
-that's beyond this series.
+Ok, I will send it as v4, if no other objections are made. In which 
+units the duration should be? Milliseconds? It can also be microseconds, 
+which are now used in (cpu|io|memory|irq).pressure files.
 
-Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
----
- include/uapi/linux/io_uring.h |  2 +-
- io_uring/zcrx.c               | 39 +++++++++++++++++++++++++++++------
- 2 files changed, 34 insertions(+), 7 deletions(-)
-
-diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
-index 9d306eb5251c..8e3a342a4ad8 100644
---- a/include/uapi/linux/io_uring.h
-+++ b/include/uapi/linux/io_uring.h
-@@ -1041,7 +1041,7 @@ struct io_uring_zcrx_ifq_reg {
- 
- 	struct io_uring_zcrx_offsets offsets;
- 	__u32	zcrx_id;
--	__u32	__resv2;
-+	__u32	rx_buf_len;
- 	__u64	__resv[3];
- };
- 
-diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
-index a00243e10164..3caa3f472af1 100644
---- a/io_uring/zcrx.c
-+++ b/io_uring/zcrx.c
-@@ -13,6 +13,7 @@
- #include <net/page_pool/memory_provider.h>
- #include <net/netlink.h>
- #include <net/netdev_rx_queue.h>
-+#include <net/netdev_queues.h>
- #include <net/tcp.h>
- #include <net/rps.h>
- 
-@@ -53,6 +54,18 @@ static inline struct page *io_zcrx_iov_page(const struct net_iov *niov)
- 	return area->mem.pages[net_iov_idx(niov) << niov_pages_shift];
- }
- 
-+static int io_area_max_shift(struct io_zcrx_mem *mem)
-+{
-+	struct sg_table *sgt = mem->sgt;
-+	struct scatterlist *sg;
-+	unsigned order = -1U;
-+	unsigned i;
-+
-+	for_each_sgtable_dma_sg(sgt, sg, i)
-+		order = min(order, __ffs(sg->length));
-+	return order;
-+}
-+
- static int io_populate_area_dma(struct io_zcrx_ifq *ifq,
- 				struct io_zcrx_area *area)
- {
-@@ -384,8 +397,10 @@ static int io_zcrx_append_area(struct io_zcrx_ifq *ifq,
- }
- 
- static int io_zcrx_create_area(struct io_zcrx_ifq *ifq,
--			       struct io_uring_zcrx_area_reg *area_reg)
-+			       struct io_uring_zcrx_area_reg *area_reg,
-+			       struct io_uring_zcrx_ifq_reg *reg)
- {
-+	int buf_size_shift = PAGE_SHIFT;
- 	struct io_zcrx_area *area;
- 	unsigned nr_iovs;
- 	int i, ret;
-@@ -400,7 +415,16 @@ static int io_zcrx_create_area(struct io_zcrx_ifq *ifq,
- 	if (ret)
- 		goto err;
- 
--	ifq->niov_shift = PAGE_SHIFT;
-+	if (reg->rx_buf_len) {
-+		if (!is_power_of_2(reg->rx_buf_len) ||
-+		     reg->rx_buf_len < PAGE_SIZE)
-+			return -EINVAL;
-+		buf_size_shift = ilog2(reg->rx_buf_len);
-+	}
-+	if (buf_size_shift > io_area_max_shift(&area->mem))
-+		return -EINVAL;
-+
-+	ifq->niov_shift = buf_size_shift;
- 	nr_iovs = area->mem.size >> ifq->niov_shift;
- 	area->nia.num_niovs = nr_iovs;
- 
-@@ -522,6 +546,7 @@ int io_register_zcrx_ifq(struct io_ring_ctx *ctx,
- 			  struct io_uring_zcrx_ifq_reg __user *arg)
- {
- 	struct pp_memory_provider_params mp_param = {};
-+	struct netdev_queue_config qcfg = {};
- 	struct io_uring_zcrx_area_reg area;
- 	struct io_uring_zcrx_ifq_reg reg;
- 	struct io_uring_region_desc rd;
-@@ -544,8 +569,7 @@ int io_register_zcrx_ifq(struct io_ring_ctx *ctx,
- 		return -EFAULT;
- 	if (copy_from_user(&rd, u64_to_user_ptr(reg.region_ptr), sizeof(rd)))
- 		return -EFAULT;
--	if (!mem_is_zero(&reg.__resv, sizeof(reg.__resv)) ||
--	    reg.__resv2 || reg.zcrx_id)
-+	if (!mem_is_zero(&reg.__resv, sizeof(reg.__resv)) || reg.zcrx_id)
- 		return -EINVAL;
- 	if (reg.if_rxq == -1 || !reg.rq_entries || reg.flags)
- 		return -EINVAL;
-@@ -589,13 +613,14 @@ int io_register_zcrx_ifq(struct io_ring_ctx *ctx,
- 	}
- 	get_device(ifq->dev);
- 
--	ret = io_zcrx_create_area(ifq, &area);
-+	ret = io_zcrx_create_area(ifq, &area, &reg);
- 	if (ret)
- 		goto err;
- 
- 	mp_param.mp_ops = &io_uring_pp_zc_ops;
- 	mp_param.mp_priv = ifq;
--	ret = net_mp_open_rxq(ifq->netdev, reg.if_rxq, &mp_param, NULL);
-+	qcfg.rx_buf_len = 1U << ifq->niov_shift;
-+	ret = net_mp_open_rxq(ifq->netdev, reg.if_rxq, &mp_param, &qcfg);
- 	if (ret)
- 		goto err;
- 	ifq->if_rxq = reg.if_rxq;
-@@ -612,6 +637,8 @@ int io_register_zcrx_ifq(struct io_ring_ctx *ctx,
- 			goto err;
- 	}
- 
-+	reg.rx_buf_len = 1U << ifq->niov_shift;
-+
- 	if (copy_to_user(arg, &reg, sizeof(reg)) ||
- 	    copy_to_user(u64_to_user_ptr(reg.region_ptr), &rd, sizeof(rd)) ||
- 	    copy_to_user(u64_to_user_ptr(reg.area_ptr), &area, sizeof(area))) {
--- 
-2.49.0
-
+Thanks!
+Daniel
 
