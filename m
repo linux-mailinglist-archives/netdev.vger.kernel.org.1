@@ -1,77 +1,75 @@
-Return-Path: <netdev+bounces-210544-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210549-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B62A6B13E09
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 17:17:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9508B13E15
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 17:19:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B10277A243E
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 15:16:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 492E51896D7C
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 15:19:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3567B26D4E2;
-	Mon, 28 Jul 2025 15:17:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AC3226F469;
+	Mon, 28 Jul 2025 15:19:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K16BHBpR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Aod8NwN3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01E8272621;
-	Mon, 28 Jul 2025 15:17:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E44261D5145;
+	Mon, 28 Jul 2025 15:19:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753715871; cv=none; b=HNWVoRY2tg73zW99lcSG2JKWrBxBIlB+zxSm7AhwZXrKU/k6F80vG0mdt7btcHx/YXAMZ420JNjqpsSpwwnjgxe4/wO3xytoE1TkL5rLDrqQb7I2Nu7/wyngOA4pzJ5xayQ6gFmtYaAqdjNwDEOSiOy87mu/Kqnzubvfb6pPfF8=
+	t=1753715949; cv=none; b=R5QD2ekF7d/OlnNRndtvazOikQ0ttkNWOo+83Tmy2GHwW1u/mQW924nLniRX0S0/Q7+pUxkXq99jHCSYe/Qn4/wDjMPaRCIBlEske5nuK8R7tCKjtc9Tin3GI2wVqyV8mKJMJyksqWhK1gE3PhqA4bUI4/ViBUXopA0CAq937Wo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753715871; c=relaxed/simple;
-	bh=jV727T99qgnh1S0rwWU0da1unCUJvT2tB6hFm2F1/Mo=;
+	s=arc-20240116; t=1753715949; c=relaxed/simple;
+	bh=jtQPl9fdZvZtEb/y/9SCQaBctzLJmmM7srwq7qNJiRM=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aAC0SN+PEKGMFzq/P5EFjNlxB3opBixPIcA8nx4ac7904EwJz1ESbprGSQSBHAO3t3u3KMYqSjx2awITL7KAPb6cNaR1mYIXALfY/Eo49JAD75YHG2mipjpHpIp0jJXGdMaN3lBNk8PznVVl+OzggJFCcHDx5VfBZtrGwPPY6Co=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K16BHBpR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6AE4BC4CEE7;
-	Mon, 28 Jul 2025 15:17:49 +0000 (UTC)
+	 MIME-Version:Content-Type; b=jbts4n2dsA9Q0LzgFVQBBmHQyvwwoL29hC1hY98no5gp3jNh6ERu/4s/R8nMMgtxOQCQn9rpJd0ReC5pPil9OiinqQJVynCs8ice6CiX3cTnHwqPrh61j2I66NfgNyApexvlgLEdORjPdcq4fGzC/tc/GGIP1nsgcvOeseA2cLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Aod8NwN3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2AA5C4CEE7;
+	Mon, 28 Jul 2025 15:19:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753715870;
-	bh=jV727T99qgnh1S0rwWU0da1unCUJvT2tB6hFm2F1/Mo=;
+	s=k20201202; t=1753715948;
+	bh=jtQPl9fdZvZtEb/y/9SCQaBctzLJmmM7srwq7qNJiRM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=K16BHBpRBWnNWZUczzVwEQX3lZbsX0KV0ELZ5BY2IxJt2tyDWbAVHAuddklKMUNL/
-	 6rM5XsxGlU5XsvyfafnXLhXviqefHfmIhdkVa4KhSUuVBu5LLvJyWlrmzBbYzTNf7r
-	 XaagVrZ+xz1j5nWqqz0Dq6TMa69amqwuKHy2tBc7XGfjMAtYeDFAjmIWDDjO9mhs8f
-	 emOQG6011CW96Df3b3hpWWoGRNGVqcnLgxD0Zt/1bhC41PEILL3uJxhYqQAlwqsplD
-	 h9vYZa57WBkTku3SZbAIM2C6rGXODXfrcZYVUdsjKWFLj1j2csHBKRuMMWkvR4cgjY
-	 0VQLmrxuroWWQ==
-Date: Mon, 28 Jul 2025 08:17:48 -0700
+	b=Aod8NwN3/JOlahigpX8mZ9sELREBI4cu7rK1H5sM1/q+xT5ZHCVKqfjGNj6GgoJxL
+	 0aPINQS5wd453yRNHlVQBR4AFlgZP8g0O64eaqAqFhB0RK3lUz0/rTB2Zy232Hm+fu
+	 QY063sbsaWf9gh/4DkQcGVaFH6Hx0O4UoWYTCzhjfdxY6HD7zTv7FXQsqYCbKHWdit
+	 Agd6gVeG0xg1uDYFeqXjArZTucP+rbprdsv+oUOodlg5psJ2/FiuHuMCKEmvwypreK
+	 0FPiURxyPmd0niG04uFJs+OQhUvfTdH02fgTPQnc5NmbNMUAaYwbN8KpBdiY57XgPx
+	 rIk9mOR3HyeNA==
+Date: Mon, 28 Jul 2025 08:19:07 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Tariq Toukan <ttoukan.linux@gmail.com>
-Cc: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Jiri Pirko <jiri@resnulli.us>,
- Jiri Pirko <jiri@nvidia.com>, Saeed Mahameed <saeed@kernel.org>, Gal
- Pressman <gal@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Shahar
- Shitrit <shshitrit@nvidia.com>, Donald Hunter <donald.hunter@gmail.com>,
- Jonathan Corbet <corbet@lwn.net>, Brett Creeley <brett.creeley@amd.com>,
- Michael Chan <michael.chan@broadcom.com>, Pavan Chebbi
- <pavan.chebbi@broadcom.com>, Cai Huoqing <cai.huoqing@linux.dev>, Tony
- Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>, Sunil Goutham <sgoutham@marvell.com>, Linu
- Cherian <lcherian@marvell.com>, Geetha sowjanya <gakula@marvell.com>, Jerin
- Jacob <jerinj@marvell.com>, hariprasad <hkelam@marvell.com>, Subbaraya
- Sundeep <sbhatta@marvell.com>, Saeed Mahameed <saeedm@nvidia.com>, Mark
- Bloch <mbloch@nvidia.com>, Ido Schimmel <idosch@nvidia.com>, Petr Machata
- <petrm@nvidia.com>, Manish Chopra <manishc@marvell.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
- linux-rdma@vger.kernel.org
-Subject: Re: [PATCH net-next 0/5] Expose grace period delay for devlink
- health reporter
-Message-ID: <20250728081748.700ad46a@kernel.org>
-In-Reply-To: <3bf6714b-46d7-45ad-9d15-f5ce9d4b74e4@gmail.com>
-References: <1752768442-264413-1-git-send-email-tariqt@nvidia.com>
-	<20250718174737.1d1177cd@kernel.org>
-	<6892bb46-e2eb-4373-9ac0-6c43eca78b8e@gmail.com>
-	<20250724171011.2e8ebca4@kernel.org>
-	<3bf6714b-46d7-45ad-9d15-f5ce9d4b74e4@gmail.com>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: Haiyang Zhang <haiyangz@microsoft.com>, Jason Wang
+ <jasowang@redhat.com>, Cindy Lu <lulu@redhat.com>, KY Srinivasan
+ <kys@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui
+ <decui@microsoft.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Michael Kelley
+ <mhklinux@outlook.com>, Shradha Gupta <shradhagupta@linux.microsoft.com>,
+ Kees Cook <kees@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Kuniyuki
+ Iwashima <kuniyu@google.com>, Alexander Lobakin
+ <aleksander.lobakin@intel.com>, Guillaume Nault <gnault@redhat.com>, Joe
+ Damato <jdamato@fastly.com>, Ahmed Zaki <ahmed.zaki@intel.com>, "open
+ list:Hyper-V/Azure CORE AND DRIVERS" <linux-hyperv@vger.kernel.org>, "open
+ list:NETWORKING DRIVERS" <netdev@vger.kernel.org>, open list
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH RESEND] netvsc: transfer lower device max tso size
+Message-ID: <20250728081907.3de03b67@kernel.org>
+In-Reply-To: <20250727200126.2682aa39@hermes.local>
+References: <20250718061812.238412-1-lulu@redhat.com>
+	<20250721162834.484d352a@kernel.org>
+	<CACGkMEtqhjTjdxPc=eqMxPNKFsKKA+5YP+uqWtonm=onm0gCrg@mail.gmail.com>
+	<20250721181807.752af6a4@kernel.org>
+	<CACGkMEtEvkSaYP1s+jq-3RPrX_GAr1gQ+b=b4oytw9_dGnSc_w@mail.gmail.com>
+	<20250723080532.53ecc4f1@kernel.org>
+	<SJ2PR21MB40138F71138A809C3A2D903BCA5FA@SJ2PR21MB4013.namprd21.prod.outlook.com>
+	<20250723151622.0606cc99@kernel.org>
+	<20250727200126.2682aa39@hermes.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,59 +79,25 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sun, 27 Jul 2025 14:00:11 +0300 Tariq Toukan wrote:
-> I get your suggestion. I agree that it's also pretty simple to 
-> implement, and that it tolerates bursts.
-> 
-> However, I think it softens the grace period role too much. It has an 
-> important disadvantage, as it tolerates non-bursts as well. It lacks the 
-> "burstness" distinguishability.
-> 
-> IMO current grace_period has multiple goals, among them:
-> 
-> a. let the auto-recovery mechanism handle errors as long as they are 
-> followed by some long-enough "healthy" intervals.
-> 
-> b. break infinite loop of auto-recoveries, when the "healthy" interval 
-> is not long enough. Raise a flag to mark the need for admin intervention.
-> 
-> In your proposal, the above doesn't hold.
-> It won't prevent the infinite auto-recovery loop for a buggy system that 
-> has a constant rate of up to X failures in N msecs.
-> 
-> One can argue that this can be addressed by increasing the grace_period. 
-> i.e. a current system with grace_period=N is intuitively moved to 
-> burst_size=X and grace_period=X*N.
-> 
-> But increasing the grace_period by such a large factor has 
-> over-enforcement and hurts legitimate auto-recoveries.
-> 
-> Again, the main point is, it lacks the ability to properly distinguish 
-> between 1. a "burst" followed by a healthy interval, and 2. a buggy 
-> system with a rate of repeated errors.
-
-I suspect this is catching some very mlx5-specific recovery loop,
-so I defer to your judgment on what's better.
-
-As a user I do not know how to configure this health recovery stuff.
-My intuition would be that we just needs to lower the recovery rate
-to prevent filling up logs etc. and the action of taking the machine
-out is really the responsibility of some fleet health monitoring daemon.
-I can't think of any other error reporting facility in the kernel where
-we'd shut down the recovery completely if the rate is high..
-
-> > Now we add something called "grace period delay" in
-> > some places in the code referred to as "reporter_delay"..
+On Sun, 27 Jul 2025 20:01:26 -0700 Stephen Hemminger wrote:
+> On Wed, 23 Jul 2025 15:16:22 -0700
+> Jakub Kicinski <kuba@kernel.org> wrote:
+> >
+> > > Actually, we had used the common bonding driver 9 years ago. But it's
+> > > replaced by this kernel/netvsc based "transparent" bonding mode. See
+> > > the patches listed below.
+> > > 
+> > > The user mode bonding scripts were unstable, and difficult to deliver
+> > > & update for various distros. So Stephen developed the new "transparent"
+> > > bonding mode, which greatly improves the situation.    
 > > 
-> > It may be more palatable if we named the first period "error burst
-> > period" and, well, the later I suppose it's too late to rename..  
-> It can be named after what it achieves (allows handling of more errors) 
-> or what it is (a shift of the grace_period). I'm fine with both, don't 
-> have strong preference.
+> > I specifically highlighted systemd-networkd as the change in the user
+> > space landscape.  
+> 
+> Haiyang tried valiantly but getting every distro to do the right thing
+> with VF's bonding and hot plug was impossible to support.
 
-Let's rename to "error burst period", reporter_in_error_burst etc.
+I understand, but I also don't want it to be an upstream Linux problem.
 
-> I'd call it grace_period in case we didn't have one already :)
-
-Exactly :)
+Again, no other cloud provider seems to have this issue, AFAIU.
 
