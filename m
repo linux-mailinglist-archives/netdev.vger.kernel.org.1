@@ -1,196 +1,116 @@
-Return-Path: <netdev+bounces-210431-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210433-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B723B134E0
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 08:27:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12A9EB13519
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 08:51:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C75C07A842F
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 06:25:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 173CF3A34B9
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 06:51:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F00FE2206B2;
-	Mon, 28 Jul 2025 06:27:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 469CD22126D;
+	Mon, 28 Jul 2025 06:51:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MFO0kElp"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="qZEEM+i4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 730F51922C0;
-	Mon, 28 Jul 2025 06:27:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE75621B9D2;
+	Mon, 28 Jul 2025 06:51:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753684025; cv=none; b=HTirLhaPXAdwqKiJGdaVmFtckzCb3iwjhlw5U+7u1FQ/wi1YzqL4Hmv6Bcsl3vhAqWbicuxG4JX3Ift7nn3JCNt1sRHist/oaiJIY8UDmojXg9NpzZGb2zEL3ruIF8UGxJSumYiqXJ4n9WIgnE9Hl1KrFGAzWB5PwB/4YNo3ir8=
+	t=1753685506; cv=none; b=YK2ycgs/vuo+OkeDzt8a63QEiPMe49bEsvOwN+mQWflP+4ez9ulpztJMGturu//g1qfG7/DorMdqQQS6ChAlBTlXfN5h3D0l99kbo/leP923I244+vch9PxPddDr+e2r39AtVqDSeCXFCJViiLMz3r/T4y8aaKtssTAzxU8UerM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753684025; c=relaxed/simple;
-	bh=PulKr2wj6t/QYlFD3SK90J02qBu3DB0x6RzoCozSKoU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=D+Gs8WGDaG/qQLwFXrH0TbRdsYEdWa146xiPTNk2vssuoKUYX2kXl3rW7FVfhpKc9043HbUm7kQ4Ohc9eLm8gaSsCLKAcuWAD2tJCdJagwSoZOIinZNHZKo/yGY+rGN4kBCY93aj3M+2zN6wbPCUKBNUxyd//s4GK/HeeEiMjrc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MFO0kElp; arc=none smtp.client-ip=209.85.210.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-749068b9b63so2683406b3a.0;
-        Sun, 27 Jul 2025 23:27:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753684024; x=1754288824; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=XKFWnhdu2qeWnQOHWgzpVj2hderL4bRCYnhTpD8a3pM=;
-        b=MFO0kElpe2GAEP3wJnj4tscjxbGqBbrinWWpGqSda1JLm2bZXDkC4FcJhowsgKt/FT
-         QNbWwGNo06ij7BVDkQoGSTecuPe2Y3XVXT+aB0s3Qk5QTFEEGGJQOkwaAL9l7Cp5AW9n
-         hoKxfWn0g3Cc8J4vnFwQs2mYcAvKXQy1zMmm+0YenWTSqPOVLmPWfiPUsLZKQfUyupqx
-         X+Tf0VHaaEKYAC+P3MI73UYtQhEBuk3awJYf3t9nzOjOcM6c26HYUIyDD5yPBSGY+LnL
-         lDbcDV1KvRjLb3iEQaW599IQD+Y+l2hR8UMGLublK/R1vWQ20fcpO3NgLXg0P5i6EVaM
-         KfhA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753684024; x=1754288824;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=XKFWnhdu2qeWnQOHWgzpVj2hderL4bRCYnhTpD8a3pM=;
-        b=m3TYcGN0gdV5G7Lu+1mzQkD81shTydcm+rAi+NuGn4RFqGD9mjhdutWNwvxio9UR0f
-         4ENCluGV8uzf4infPJUFEP8HUFAWkpAv3EtV5C/xIUbKLYb3/aEHX8BlmCYjnX2vAAIv
-         65f6f7wk9DrDNC0IWk6C6kuSJZGXdWCKxzFHJUOfntB7EUiz6fIW9i4JZlrgDre+B+X8
-         Q6lXRx9DS4P2ag5yTqFpa93acm8xvRRMzz2bxXrwIPqmr+V9FLp22fD6JxwSuyuZPM6L
-         EUjcDYXoq7/jQJz4PMBwsOZ/luN8N6sid0Jwhup275pWDsxu1wAkq5/HHRtE1idfYrHK
-         vJjg==
-X-Forwarded-Encrypted: i=1; AJvYcCUMIJjFm05iGIKcdJkHoEaN3Bom21Z4h7HzyefQ11Fwb1vAZCmOeRLTJ+hfPOxfB8IEwH+fo76MITof7PI=@vger.kernel.org, AJvYcCUPi3Nfw5Sw8plBs8eUCnnKrDden9M/Y1mNTcWMbPmV4WNiD5KH6VE46gSg5PVOPRYTYSuZYHhJ@vger.kernel.org
-X-Gm-Message-State: AOJu0YxY2hf1QUNBK+Xga8pj1OlqnmG+5Kri1OGrmEWLoq7d2pw1Mw4R
-	Zdo4idWnEQq/zVjapkjjVfXX+uZ6nvzFlk9wxbutlwBcNxdY3vtek1GI
-X-Gm-Gg: ASbGnctzAt9AWPPSecqDxecULAgGAULe/ir4Y5fX8W3a6snCbqt3rnOLssGXuZHdFX6
-	e//FyOnA9//LCEhXsx1+MlXLRYtbBjvDTS9jTeHJONcuMVyzX59n6Y4qPPU82xpFoNTbp2vhL1l
-	HaTjNc9jpwd7Ebjp4Ccbi4ixiou0pMnsZXxbDtpbGPQBhyobEAyKvBFuN/KMWj4lXVRxlotZM8g
-	FGXyVvccjIP/6YPqgCVFAF0Tn2c6X3Kx6ZTA7GeRXUWoH0QhSxVKo0KO/1RSJ/4dAakQuzEEpzD
-	n5n8znkJvf3YvmxFq17Nl6xvWB2R1ceBpf+CSZikqjxCOYexe2ZYTIGBrCRMO9J1SUKObmgvrUZ
-	W1C498jr53JjSVLUd4KXqZe+BEDemYI//kAjw4gFzTZ3jcaaajA==
-X-Google-Smtp-Source: AGHT+IEVtxsdIMH8xLIszjuppcyttoOjKpE7dKr7Fxe7/nTjeyAUlUVVn86h52QICu7seUIQPij0ag==
-X-Received: by 2002:a05:6a20:2445:b0:232:36e3:9a4e with SMTP id adf61e73a8af0-23d701f8204mr19020742637.40.1753684023541;
-        Sun, 27 Jul 2025 23:27:03 -0700 (PDT)
-Received: from name2965-Precision-7820-Tower.. ([121.185.186.233])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7640b4c8695sm4310177b3a.116.2025.07.27.23.26.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 27 Jul 2025 23:27:03 -0700 (PDT)
-From: Jeongjun Park <aha310510@gmail.com>
-To: richardcochran@gmail.com,
-	andrew+netdev@lunn.ch
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	yangbo.lu@nxp.com,
-	vladimir.oltean@nxp.com,
-	anna-maria@linutronix.de,
-	frederic@kernel.org,
-	tglx@linutronix.de,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	syzbot+7cfb66a237c4a5fb22ad@syzkaller.appspotmail.com,
-	Jeongjun Park <aha310510@gmail.com>
-Subject: [PATCH net v4] ptp: prevent possible ABBA deadlock in ptp_clock_freerun()
-Date: Mon, 28 Jul 2025 15:26:49 +0900
-Message-Id: <20250728062649.469882-1-aha310510@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1753685506; c=relaxed/simple;
+	bh=bXXezclLq7GUihaytnk+fZzRsjecBR4qfRXrwCRq0MM=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uXXqhvQNuAxKXZXQBK7Yt2BbKxvOrxUVCQEgEUdCB3vwGkzggdKZN2ZbuEAcKtxAHVcvjFxAxLDRNBgk/iFeWS6RJBnRkUnMOZzy36ez1OC5NXs9GpluCGc0uo/yRdL0X+O4ihqdWZXBgvzHQTnNQ4M3W7NMRFl3zQwNSeG3JlA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=qZEEM+i4; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1753685504; x=1785221504;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=bXXezclLq7GUihaytnk+fZzRsjecBR4qfRXrwCRq0MM=;
+  b=qZEEM+i4tEbtRC+QORMPfDxbMpoOX2duFHLJ2TTmyPqErlTS14Orn/X+
+   fJGoIEIm26zkpIdYPiBpeO427ACx1AyDvlNUVzDzstDpeRmo8q2Q1l4rC
+   JXI71mNocVEfj/VN6aiqi5NiaGtnNgL6w4szWbfdUrvpf4avsk22p16uh
+   Kg65dbtBhUoDmL+355kygISqnGYKOMC1KFP/MI2nbA6V1ncG2ZA6yo190
+   drFeKYgWDvN4ViHdWOZJKo58jLrVekRrs75MGkKQcbRZWta1ec3MXRGOZ
+   UkUoYuLjGXTHMi0zbqnP+rsfNtfmN7m2v8VgA7ea0XPpnagvnXzko4ppp
+   w==;
+X-CSE-ConnectionGUID: XleGp8bISDuSuljufyssoA==
+X-CSE-MsgGUID: /QZttT4jQQ6frzyes6/K+g==
+X-IronPort-AV: E=Sophos;i="6.16,339,1744095600"; 
+   d="scan'208";a="49824900"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 27 Jul 2025 23:51:38 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Sun, 27 Jul 2025 23:51:27 -0700
+Received: from localhost (10.10.85.11) by chn-vm-ex03.mchp-main.com
+ (10.10.85.151) with Microsoft SMTP Server id 15.1.2507.44 via Frontend
+ Transport; Sun, 27 Jul 2025 23:51:26 -0700
+Date: Mon, 28 Jul 2025 08:48:29 +0200
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: ALOK TIWARI <alok.a.tiwari@oracle.com>
+CC: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <richardcochran@gmail.com>, <o.rempel@pengutronix.de>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v2 4/4] net: phy: micrel: Add support for lan8842
+Message-ID: <20250728064829.wdcatrtypgb6ihcp@DEN-DL-M31836.microchip.com>
+References: <20250724200826.2662658-1-horatiu.vultur@microchip.com>
+ <20250724200826.2662658-5-horatiu.vultur@microchip.com>
+ <2c681a15-71b0-4514-b0ce-ce6d28c74971@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+In-Reply-To: <2c681a15-71b0-4514-b0ce-ce6d28c74971@oracle.com>
 
-syzbot reported the following ABBA deadlock:
+The 07/26/2025 17:23, ALOK TIWARI wrote:
 
-       CPU0                           CPU1
-       ----                           ----
-  n_vclocks_store()
-    lock(&ptp->n_vclocks_mux) [1]
-        (physical clock)
-                                     pc_clock_adjtime()
-                                       lock(&clk->rwsem) [2]
-                                        (physical clock)
-                                       ...
-                                       ptp_clock_freerun()
-                                         ptp_vclock_in_use()
-                                           lock(&ptp->n_vclocks_mux) [3]
-                                              (physical clock)
-    ptp_clock_unregister()
-      posix_clock_unregister()
-        lock(&clk->rwsem) [4]
-          (virtual clock)
+Hi Alok,
 
-Since ptp virtual clock is registered only under ptp physical clock, both
-ptp_clock and posix_clock must be physical clocks for ptp_vclock_in_use()
-to lock &ptp->n_vclocks_mux and check ptp->n_vclocks.
+> 
+> On 7/25/2025 1:38 AM, Horatiu Vultur wrote:
+> > +static void lan8842_get_phy_stats(struct phy_device *phydev,
+> > +                               struct ethtool_eth_phy_stats *eth_stats,
+> > +                               struct ethtool_phy_stats *stats)
+> > +{
+> > +     struct lan8842_priv *priv = phydev->priv;
+> > +
+> > +     stats->rx_packets = priv->phy_stats.rx_packets;
+> > +     stats->rx_errors = priv->phy_stats.rx_errors;
+> > +     stats->tx_packets = priv->phy_stats.tx_packets;
+> > +     stats->tx_errors = priv->phy_stats.rx_errors;
+> 
+> looks like a copy-paste mistake
+> stats->tx_errors = priv->phy_stats.tx_errors;
 
-However, when unregistering vclocks in n_vclocks_store(), the locking
-ptp->n_vclocks_mux is a physical clock lock, but clk->rwsem of
-ptp_clock_unregister() called through device_for_each_child_reverse()
-is a virtual clock lock.
+That is a good catch!
+I will fix it in the next version.
 
-Therefore, clk->rwsem used in CPU0 and clk->rwsem used in CPU1 are
-different locks, but in lockdep, a false positive occurs because the
-possibility of deadlock is determined through lock-class.
+> 
+> > +}
+> > +
+> 
+> 
+> Thanks,
+> Alok
 
-To solve this, lock subclass annotation must be added to the posix_clock
-rwsem of the vclock.
-
-Reported-by: syzbot+7cfb66a237c4a5fb22ad@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=7cfb66a237c4a5fb22ad
-Fixes: 73f37068d540 ("ptp: support ptp physical/virtual clocks conversion")
-Signed-off-by: Jeongjun Park <aha310510@gmail.com>
----
-v4: Remove unnecessary lock class annotation and CC "POSIX CLOCKS and TIMERS" maintainer
-- Link to v3: https://lore.kernel.org/all/20250719124022.1536524-1-aha310510@gmail.com/
-v3: Annotate lock subclass to prevent false positives of lockdep
-- Link to v2: https://lore.kernel.org/all/20250718114958.1473199-1-aha310510@gmail.com/
-v2: Add CC Vladimir
-- Link to v1: https://lore.kernel.org/all/20250705145031.140571-1-aha310510@gmail.com/
----
- drivers/ptp/ptp_private.h | 5 +++++
- drivers/ptp/ptp_vclock.c  | 7 +++++++
- 2 files changed, 12 insertions(+)
-
-diff --git a/drivers/ptp/ptp_private.h b/drivers/ptp/ptp_private.h
-index a6aad743c282..b352df4cd3f9 100644
---- a/drivers/ptp/ptp_private.h
-+++ b/drivers/ptp/ptp_private.h
-@@ -24,6 +24,11 @@
- #define PTP_DEFAULT_MAX_VCLOCKS 20
- #define PTP_MAX_CHANNELS 2048
- 
-+enum {
-+	PTP_LOCK_PHYSICAL = 0,
-+	PTP_LOCK_VIRTUAL,
-+};
-+
- struct timestamp_event_queue {
- 	struct ptp_extts_event buf[PTP_MAX_TIMESTAMPS];
- 	int head;
-diff --git a/drivers/ptp/ptp_vclock.c b/drivers/ptp/ptp_vclock.c
-index 7febfdcbde8b..8ed4b8598924 100644
---- a/drivers/ptp/ptp_vclock.c
-+++ b/drivers/ptp/ptp_vclock.c
-@@ -154,6 +154,11 @@ static long ptp_vclock_refresh(struct ptp_clock_info *ptp)
- 	return PTP_VCLOCK_REFRESH_INTERVAL;
- }
- 
-+static void ptp_vclock_set_subclass(struct ptp_clock *ptp)
-+{
-+	lockdep_set_subclass(&ptp->clock.rwsem, PTP_LOCK_VIRTUAL);
-+}
-+
- static const struct ptp_clock_info ptp_vclock_info = {
- 	.owner		= THIS_MODULE,
- 	.name		= "ptp virtual clock",
-@@ -213,6 +218,8 @@ struct ptp_vclock *ptp_vclock_register(struct ptp_clock *pclock)
- 		return NULL;
- 	}
- 
-+	ptp_vclock_set_subclass(vclock->clock);
-+
- 	timecounter_init(&vclock->tc, &vclock->cc, 0);
- 	ptp_schedule_worker(vclock->clock, PTP_VCLOCK_REFRESH_INTERVAL);
- 
---
+-- 
+/Horatiu
 
