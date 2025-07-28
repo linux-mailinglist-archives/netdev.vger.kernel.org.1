@@ -1,240 +1,155 @@
-Return-Path: <netdev+bounces-210637-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210638-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F035AB141B9
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 20:05:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F02AB141C1
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 20:12:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E36647A6EB2
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 18:00:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7038918C2236
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 18:12:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62B4C21C194;
-	Mon, 28 Jul 2025 18:00:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3E13220694;
+	Mon, 28 Jul 2025 18:11:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=etsalapatis-com.20230601.gappssmtp.com header.i=@etsalapatis-com.20230601.gappssmtp.com header.b="NriczTb3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ks/LWNRP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4019E21D583
-	for <netdev@vger.kernel.org>; Mon, 28 Jul 2025 18:00:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EDDE145346
+	for <netdev@vger.kernel.org>; Mon, 28 Jul 2025 18:11:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753725611; cv=none; b=ZzbDA8vOyjU47c7+iwvLPNlgHUvxiaGap9ntlvP/Z7fMo6HO+OAmYM/iyCb5/7ySFb7jJ1nsuEyGNq/AiHBMUztAnMQkisgauxdLovKkiikrcfJm0/OWJjV7KTTB2SscLF8cwoTQqmCtDE2Znixtk1Jj9i5jV3O2Dw99b4Fqtd0=
+	t=1753726317; cv=none; b=lFGSRFUkqdscMbzKE5UQrw85V/15t6lcXmFz5B0fr74xhaNSjei7COgOVwrwEwon6z1To/St8qgY48T9QF+cOXL9bnSo2KAr8aQIcX+TH1wAKU3QdbxGx8szUHE69BK918sRIIuyWqpBJuqksGf5Ck9s+eCqFUD/UnZGOJBnKos=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753725611; c=relaxed/simple;
-	bh=iKYYXYU3kztPrvshqIoQqsBr9Q3R9Rjku5p1Xr/11eI=;
+	s=arc-20240116; t=1753726317; c=relaxed/simple;
+	bh=E0aZ5ltePXU2tr39eM4OyimHIPNcEOkRmRYfDURu1Nc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=A7rHhES/Jca2A8KUlpcwDbsW06h4BqjmVaIuTeGi8qEqJlJBLJrUifF+42At6WFQ1OSydTtgV3sVI5SYx+m4i57vLJs/dOYhmJUMSs/SjquACbZWrdAwMTpuJbdUDpSL50H4+gyVSrf5o8fRxa3gYdnXudSQW3EnH+ognyl3y88=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=etsalapatis.com; spf=pass smtp.mailfrom=etsalapatis.com; dkim=pass (2048-bit key) header.d=etsalapatis-com.20230601.gappssmtp.com header.i=@etsalapatis-com.20230601.gappssmtp.com header.b=NriczTb3; arc=none smtp.client-ip=209.85.128.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=etsalapatis.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=etsalapatis.com
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-71a11c96da2so14849197b3.2
-        for <netdev@vger.kernel.org>; Mon, 28 Jul 2025 11:00:08 -0700 (PDT)
+	 To:Cc:Content-Type; b=XfGzC2/qL9Fu8h7UItwEGMPqbHAO5T2S715fufXmu8MxvMoayVB97ev9zMgfofDtn/KFtfckqY/cR+b/NQnuaL1/KT+hcDvDRGmfenxUqW/1jFcbcv+404pnSM3sIq2PrZQzYMVdqtR2usbXZcQd+860hrAQUN3pWOC6knwxIwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ks/LWNRP; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-237f18108d2so24415ad.0
+        for <netdev@vger.kernel.org>; Mon, 28 Jul 2025 11:11:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=etsalapatis-com.20230601.gappssmtp.com; s=20230601; t=1753725608; x=1754330408; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1753726315; x=1754331115; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=kPYhbPyoxtTqfzZvkF/q/aqSvB2qPK5VJT7HARAmoyA=;
-        b=NriczTb3ply7dUQir392gfobkXeh6MIRLHZvk7+8OFaImvMZ41OsQqi1zoOnIDU7ei
-         wNQAdOjdRLNU9DCgZ2lQLzgIWtc2u5jdYkUOnGF0thQzNgJ7oJrZulXA4sbkUWHnoSlJ
-         nlEH5Erhjaz/Tnt0MxPv70/qEs5KUfzTE2kuu6ebx/6b2xfQ83RnazEXZy+FQvsu0bxR
-         8+iXLl1jUaqF3rETGdDkWb02jqacdmNonp2gAop6yO4ONH80j0KhA2Nd14i+NhTj91QV
-         qbAo86HffFxmvLv67j8GYp0aWkUu8zSPq9nx8/MKvjDDqrLLjWaKLJoVNldsG72R/m0H
-         BQpw==
+        bh=AWrTGKCGEGfsZ4s2TOJbLUNCxakJMocxAgR9drUPZeQ=;
+        b=ks/LWNRPLsZmDBzViHD6mXGaSWHc3pDG2oHf6TZut176LCmlFEKQ6Ki0TgQfHcFsUF
+         JskzyT7e7jytCF1TEbcvi6PXer0esj5Y+nNQD2sKk9zSu4KeODGaAaDw/t2OHkH12bAw
+         U8NTv1st4OPUDfFa55Hh6JmkPcEFlfFH4RKm0Fb4EN3Bgb3uJ5MYnKk1dCCjS9q+l/d8
+         2ql3Y1+frATAaFeZnR/+PsFvGQKvwz33ss9BRStcq7lp6mRO5mpyqz+9mF8VLu0eyVaV
+         RdpqBCMizeEqk0abIarwCD73PV0p8KXRwjNaClxPVABKyjLCOc4S0CRZtDYhzXglv7UX
+         NngA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753725608; x=1754330408;
+        d=1e100.net; s=20230601; t=1753726315; x=1754331115;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=kPYhbPyoxtTqfzZvkF/q/aqSvB2qPK5VJT7HARAmoyA=;
-        b=JlbK5sx0sJxRDJ3ncOLZ1q5LcKhzfXTEXipn8sKOG7vt6dnz1eHxPj/g14T2fIm/84
-         ddgWG6l3fQijnK6KnqjT7uvH/IzmYHDXtm5DtyRvrASE9U6QytlV7LLUbBqAdR60JH6Q
-         a8S9BRBkqXNZEoZGUzMNJCmKRmvkitdnDZO+mPEKOqTPHfKBpUeqSymV+fT4s00MRT/q
-         nuT+WSKCMfr0joKoSjI03BYJFC+vd+DDqHvbtwTDGlx4Soz24dLvEz62hprbEalzNzJK
-         GfbvxZ+EHu1NnIP8Uhdp8LaspFhxnsjGqQ9mkUHoRekMpWQ7FBVXmFYvITetsvlZlQ2E
-         yLtQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWzSgiibMXg3wDL52uDU5Ynp/csODH0YYhRfETy7CMWsLEHkpW2IW1rqiKbr2iPpd/Zr0ekOJM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywp+IQyRe24/MpJrBf9txVDF24HaWRS3IKWUFOJBPv8tbisBOcf
-	s9Z7hLve/DiwWsKLKye4yxCFWRUYj7y0rzsFpAQN1Hf/xpXYyiQLvsLwAo9uFUJTTXarNIRmfMy
-	OhHrmlyx2L8hwDtZyKWocktmSvcXMwqRHXB7WQHUz3A==
-X-Gm-Gg: ASbGnctfhNaDtHKEt/V+o/DRGwbxj3qqozI8/Y06xfnH/EFf7hTpQud7CQR+eU2nenw
-	FHSYjZi0e9G+8L3/s5lh+G0kKPChMxrr5uHrIxlMQahwzIFUPCkCL+GeSQKmuj3tcatjEv5X/bP
-	l5qyIUZLXUn3B2a5mcnz7xrI/Wbi1G+xeuav49rcMIxG50vaKlO/+5jkzGLa6qbb+1oivvnLgba
-	8w6NsaVFIJWzdYk3GM=
-X-Google-Smtp-Source: AGHT+IFPQMTCbUXEGoNyCs6Sgj4JWecmHBMzlLFFRut2vE4mH8TAAmDpOQ+7bsQ0M3GoHloxaGBllF8iFenr6u3msSw=
-X-Received: by 2002:a05:690c:6f08:b0:71a:3437:af45 with SMTP id
- 00721157ae682-71a3437b484mr9121217b3.25.1753725607990; Mon, 28 Jul 2025
- 11:00:07 -0700 (PDT)
+        bh=AWrTGKCGEGfsZ4s2TOJbLUNCxakJMocxAgR9drUPZeQ=;
+        b=lGqMCD3K5j1dbVbY4iWNaAgum5JEedSUjc83Dj8yzeMhaMCofcMv5R9FW0WV3FzAW9
+         iV0+4z3vVGYXs5lJlW59nlwoDiSUn/uaBOH4OG3z96sbdzIeJsqdA/QqmThSC02QFVvi
+         hLcZy4StUIMst0rMCbJ1Uxc2eMxbLcbUS45v9qBB+XUuOyTYg+Npw0R5uVQtjozEOkIh
+         7wZ/IUo0skTecKwD0qCGZ7wap9ZkxPwJeER0eltEcssP7aivTXXZIms7seUB63O3kkOD
+         IadXpxFDRvqI9P00w/A9T8fkamHO+h+fBW8h5oKBfPeRaFZXBmDiakM5iDJkJBlGw6c+
+         OJgg==
+X-Forwarded-Encrypted: i=1; AJvYcCV5zJ9k4khHhaBeEPAd5YdfIyCwbsXRy8tCzZHX0LoBnfDug+ub5GzQhkZeEF23/Ef0AyHvgfQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx1wlPoyEU+JFlxUep9RerGdZFi9zuZ7GeTgoic1Mxd0ytrtmSb
+	YFePZRZMAnYiQ8Zu1ygIIV7kNeVhDq8e24lU6UTMJXU6sOUCVbIM9DJg5WtfLqz/Nsq5uWeiw2L
+	gO7SoY6ih6JMZEbdI5DriCm/nJ543KGQnyOtn5w2K
+X-Gm-Gg: ASbGnctAu4Lf0XI8G0m5FroJW33xdk1awMMZIfsJBOv/4onOsJ7D0cBYSu+gNc0LBF/
+	/O+++vgCRpz/Milb569oVX0vhuyP8qZSmN+/7ScQe5hntrXLTWFAwB9BRlTzSoB12A3bSCYX8kz
+	rO0OUNrUnm4Wg+rl3iAVrRlln2N4NZnCCzpXRu+sbbHNRFIHmvGPNo//I4UWpwqTlWYJ5Qyr1Rg
+	B3FbLLGwwbnqprBqi4aqwW2l36Kx3+9Jvvnuw==
+X-Google-Smtp-Source: AGHT+IEbF6oW+7FfHRssAd7lvdEZmBJqJX7xc2FzdGeBBdXR/cp8CUttG7vSZuTX1Aoawhbozd8z21A/66I2sgi7yDQ=
+X-Received: by 2002:a17:902:e890:b0:240:3c64:8638 with SMTP id
+ d9443c01a7336-2406789b433mr265765ad.6.1753726315246; Mon, 28 Jul 2025
+ 11:11:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250717164842.1848817-1-ameryhung@gmail.com> <20250717164842.1848817-4-ameryhung@gmail.com>
-In-Reply-To: <20250717164842.1848817-4-ameryhung@gmail.com>
-From: Emil Tsalapatis <linux-lists@etsalapatis.com>
-Date: Mon, 28 Jul 2025 13:59:56 -0400
-X-Gm-Features: Ac12FXyQuNO7tHXoWijJr4Od2sdtWGv39lNKiLZRs78lxqDqNW1mw0ex6fe6PrI
-Message-ID: <CABFh=a75g_EUwEq_3PA+K4O6CPR9HnCq28xU7XY=-VcBknB5DA@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v6 3/3] selftests/bpf: Test concurrent task local
- data key creation
-To: Amery Hung <ameryhung@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
-	andrii@kernel.org, daniel@iogearbox.net, tj@kernel.org, memxor@gmail.com, 
-	martin.lau@kernel.org, kernel-team@meta.com
+References: <cover.1753694913.git.asml.silence@gmail.com> <e131c00d9d0a8cf191c8dbcef41287cbea5ff365.1753694913.git.asml.silence@gmail.com>
+In-Reply-To: <e131c00d9d0a8cf191c8dbcef41287cbea5ff365.1753694913.git.asml.silence@gmail.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Mon, 28 Jul 2025 11:11:42 -0700
+X-Gm-Features: Ac12FXw5Q6EZZJ_i95sjCdIxpCkEiHb1OpsZvkKkuTR8Kp9jbXcTTEN4sj2bIT8
+Message-ID: <CAHS8izO-TyoKd8qu05H3BKrD=eYST3ZKKd3rtdrYZQwuVQ58dA@mail.gmail.com>
+Subject: Re: [RFC v1 01/22] docs: ethtool: document that rx_buf_len must
+ control payload lengths
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, io-uring@vger.kernel.org, 
+	Eric Dumazet <edumazet@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, andrew+netdev@lunn.ch, horms@kernel.org, 
+	davem@davemloft.net, sdf@fomichev.me, dw@davidwei.uk, 
+	michael.chan@broadcom.com, dtatulea@nvidia.com, ap420073@gmail.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 17, 2025 at 12:49=E2=80=AFPM Amery Hung <ameryhung@gmail.com> w=
-rote:
+On Mon, Jul 28, 2025 at 4:03=E2=80=AFAM Pavel Begunkov <asml.silence@gmail.=
+com> wrote:
 >
-> Test thread-safety of tld_create_key(). Since tld_create_key() does
-> not rely on locks but memory barriers and atomic operations to protect
-> the shared metadata, the thread-safety of the function is non-trivial.
-> Make sure concurrent tld_key_create(), both valid and invalid, can not
-> race and corrupt metatada, which may leads to TLDs not being thread-
-> specific or duplicate TLDs with the same name.
+> From: Jakub Kicinski <kuba@kernel.org>
 >
-> Signed-off-by: Amery Hung <ameryhung@gmail.com>
-
-Reviewed-by: Emil Tsalapatis <emil@etsalapatis.com>
-
+> Document the semantics of the rx_buf_len ethtool ring param.
+> Clarify its meaning in case of HDS, where driver may have
+> two separate buffer pools.
+>
+> The various zero-copy TCP Rx schemes we have suffer from memory
+> management overhead. Specifically applications aren't too impressed
+> with the number of 4kB buffers they have to juggle. Zero-copy
+> TCP makes most sense with larger memory transfers so using
+> 16kB or 32kB buffers (with the help of HW-GRO) feels more
+> natural.
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
 > ---
->  .../bpf/prog_tests/test_task_local_data.c     | 105 ++++++++++++++++++
->  1 file changed, 105 insertions(+)
+>  Documentation/networking/ethtool-netlink.rst | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
 >
-> diff --git a/tools/testing/selftests/bpf/prog_tests/test_task_local_data.=
-c b/tools/testing/selftests/bpf/prog_tests/test_task_local_data.c
-> index fde4a030ab42..1d3ccb98b5db 100644
-> --- a/tools/testing/selftests/bpf/prog_tests/test_task_local_data.c
-> +++ b/tools/testing/selftests/bpf/prog_tests/test_task_local_data.c
-> @@ -185,8 +185,113 @@ static void test_task_local_data_basic(void)
->         test_task_local_data__destroy(skel);
->  }
+> diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation=
+/networking/ethtool-netlink.rst
+> index b6e9af4d0f1b..eaa9c17a3cb1 100644
+> --- a/Documentation/networking/ethtool-netlink.rst
+> +++ b/Documentation/networking/ethtool-netlink.rst
+> @@ -957,7 +957,6 @@ Kernel checks that requested ring sizes do not exceed=
+ limits reported by
+>  driver. Driver may impose additional constraints and may not support all
+>  attributes.
 >
-> +#define TEST_RACE_THREAD_NUM (TLD_MAX_DATA_CNT - 3)
-> +
-> +void *test_task_local_data_race_thread(void *arg)
-> +{
-> +       int err =3D 0, id =3D (intptr_t)arg;
-> +       char key_name[32];
-> +       tld_key_t key;
-> +
-> +       key =3D tld_create_key("value_not_exist", TLD_PAGE_SIZE + 1);
-> +       if (tld_key_err_or_zero(key) !=3D -E2BIG) {
-> +               err =3D 1;
-> +               goto out;
-> +       }
-> +
-> +       /* Only one thread will succeed in creating value1 */
-> +       key =3D tld_create_key("value1", sizeof(int));
-> +       if (!tld_key_is_err(key))
-> +               tld_keys[1] =3D key;
-> +
-> +       /* Only one thread will succeed in creating value2 */
-> +       key =3D tld_create_key("value2", sizeof(struct test_tld_struct));
-> +       if (!tld_key_is_err(key))
-> +               tld_keys[2] =3D key;
-> +
-> +       snprintf(key_name, 32, "thread_%d", id);
-> +       tld_keys[id] =3D tld_create_key(key_name, sizeof(int));
-> +       if (tld_key_is_err(tld_keys[id]))
-> +               err =3D 2;
-> +out:
-> +       return (void *)(intptr_t)err;
-> +}
-> +
-> +static void test_task_local_data_race(void)
-> +{
-> +       LIBBPF_OPTS(bpf_test_run_opts, opts);
-> +       pthread_t thread[TEST_RACE_THREAD_NUM];
-> +       struct test_task_local_data *skel;
-> +       int fd, i, j, err, *data;
-> +       void *ret =3D NULL;
-> +
-> +       skel =3D test_task_local_data__open_and_load();
-> +       if (!ASSERT_OK_PTR(skel, "skel_open_and_load"))
-> +               return;
-> +
-> +       tld_keys =3D calloc(TLD_MAX_DATA_CNT, sizeof(tld_key_t));
-> +       if (!ASSERT_OK_PTR(tld_keys, "calloc tld_keys"))
-> +               goto out;
-> +
-> +       fd =3D bpf_map__fd(skel->maps.tld_data_map);
-> +
-> +       ASSERT_FALSE(tld_key_is_err(value0_key), "TLD_DEFINE_KEY");
-> +       tld_keys[0] =3D value0_key;
-> +
-> +       for (j =3D 0; j < 100; j++) {
-> +               reset_tld();
-> +
-> +               for (i =3D 0; i < TEST_RACE_THREAD_NUM; i++) {
-> +                       /*
-> +                        * Try to make tld_create_key() race with each ot=
-her. Call
-> +                        * tld_create_key(), both valid and invalid, from=
- different threads.
-> +                        */
-> +                       err =3D pthread_create(&thread[i], NULL, test_tas=
-k_local_data_race_thread,
-> +                                            (void *)(intptr_t)(i + 3));
-> +                       if (CHECK_FAIL(err))
-> +                               break;
-> +               }
-> +
-> +               /* Wait for all tld_create_key() to return */
-> +               for (i =3D 0; i < TEST_RACE_THREAD_NUM; i++) {
-> +                       pthread_join(thread[i], &ret);
-> +                       if (CHECK_FAIL(ret))
-> +                               break;
-> +               }
-> +
-> +               /* Write a unique number to each TLD */
-> +               for (i =3D 0; i < TLD_MAX_DATA_CNT; i++) {
-> +                       data =3D tld_get_data(fd, tld_keys[i]);
-> +                       if (CHECK_FAIL(!data))
-> +                               break;
-> +                       *data =3D i;
-> +               }
-> +
-> +               /* Read TLDs and check the value to see if any address co=
-llides with another */
-> +               for (i =3D 0; i < TLD_MAX_DATA_CNT; i++) {
-> +                       data =3D tld_get_data(fd, tld_keys[i]);
-> +                       if (CHECK_FAIL(*data !=3D i))
-> +                               break;
-> +               }
-> +
-> +               /* Run task_main to make sure no invalid TLDs are added *=
-/
-> +               err =3D bpf_prog_test_run_opts(bpf_program__fd(skel->prog=
-s.task_main), &opts);
-> +               ASSERT_OK(err, "run task_main");
-> +               ASSERT_OK(opts.retval, "task_main retval");
-> +       }
-> +out:
-> +       if (tld_keys) {
-> +               free(tld_keys);
-> +               tld_keys =3D NULL;
-> +       }
-> +       tld_free();
-> +       test_task_local_data__destroy(skel);
-> +}
-> +
->  void test_task_local_data(void)
->  {
->         if (test__start_subtest("task_local_data_basic"))
->                 test_task_local_data_basic();
-> +       if (test__start_subtest("task_local_data_race"))
-> +               test_task_local_data_race();
->  }
-> --
-> 2.47.1
+> -
+>  ``ETHTOOL_A_RINGS_CQE_SIZE`` specifies the completion queue event size.
+>  Completion queue events (CQE) are the events posted by NIC to indicate t=
+he
+>  completion status of a packet when the packet is sent (like send success=
+ or
+> @@ -971,6 +970,11 @@ completion queue size can be adjusted in the driver =
+if CQE size is modified.
+>  header / data split feature. If a received packet size is larger than th=
+is
+>  threshold value, header and data will be split.
 >
->
+> +``ETHTOOL_A_RINGS_RX_BUF_LEN`` controls the size of the buffer chunks dr=
+iver
+> +uses to receive packets. If the device uses different memory polls for h=
+eaders
+
+pools, not polls.
+
+> +and payload this setting may control the size of the header buffers but =
+must
+> +control the size of the payload buffers.
+> +
+
+
+--=20
+Thanks,
+Mina
 
