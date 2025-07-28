@@ -1,104 +1,200 @@
-Return-Path: <netdev+bounces-210514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210515-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40E18B13B75
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 15:27:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 614F1B13BD6
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 15:47:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78E4516737E
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 13:27:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 45B0517DDBF
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 13:47:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B67CB266565;
-	Mon, 28 Jul 2025 13:27:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7AC826A1BE;
+	Mon, 28 Jul 2025 13:46:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="VrR9kCVE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AhKlu59N"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EEF3264FB5;
-	Mon, 28 Jul 2025 13:27:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0075C266EFA;
+	Mon, 28 Jul 2025 13:46:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753709231; cv=none; b=D8SSvRZ3xnLQNQfv6ynuvGHCwUj66/NZfU1BBKI6+JY3t4S4421vJuInWPpwZ2ht2NRuaaoCr/eFcOJDbipViwoS10SjM1cBkxQEkur5cI8SOfUNc7qO8PenZbjmO8x1Tyw0wYfD8W5yWb1sM+8D0RSpsLwTYatbu0nSyhGhy6M=
+	t=1753710399; cv=none; b=ABvh6C6zHIzxudLLvwPtEcxpsAJCAY64katg/Ulc2L1Q4Y7NlF2N/TWW8ckn7vHUDuU+OCVpLMids2XMcncuCKm4tOapDhLYAAKavHlOJJO3ZppKTAPou9rwVRHgXcMR3XW2aqMM0dd2B53nQ2FFEq7SaGkCC2qYgtEo4UFqbto=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753709231; c=relaxed/simple;
-	bh=KnpOVuLTmoxEh/UdwCPbXWtITz8xrUN/fXAXPmfAYeY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=h9+t1l+A5PoXoJxl0Qqqa41Fzun7jJ8LpHtk+i6kXe/PoC7MyngkfFUMEw3I9/ViwQ8vdra7etpupWk4naRjbRq/7g1AiIkve2hG2ZuNPhWbOFuuIH1p9p9iHzfTjF5/p8deJv5llpav5tnhruhy0+4Lc1vTdop9Oc5eIFXcv3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=VrR9kCVE; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=RwK1KXVV9DfcATRhcZwiQsKsRwhCv003V4YhKjirnLo=; b=VrR9kCVEPI9teFRbKMwKz6V1xM
-	zjZO71Ly5imGqMDfptEjiKSxKeSM1nmZMSaUzxakm3IG3vLugrnSWpp63wutky7J1fkhkiF6Kf+bT
-	VvP8IxAnil/Mxuvn6tc3vXSmTjgSAkjBdiRx6ZTRhJQiY/5kESLyUkwrswG5kM1/doTc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1ugNsY-0035jj-7R; Mon, 28 Jul 2025 15:26:58 +0200
-Date: Mon, 28 Jul 2025 15:26:58 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Ujwal Kundur <ujwal.kundur@gmail.com>
-Cc: syzbot+8182574047912f805d59@syzkaller.appspotmail.com,
-	davem@davemloft.net, edumazet@google.com, horms@kernel.org,
-	kuba@kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, pabeni@redhat.com,
-	syzkaller-bugs@googlegroups.com, jiri@resnulli.us,
-	andrew+netdev@lunn.ch
-Subject: Re: [RFC PATCH] net: team: switch to spinlock in team_change_rx_flags
-Message-ID: <df06dba7-f5bd-4ee1-b9af-c5dd4b5d4434@lunn.ch>
-References: <68712acf.a00a0220.26a83e.0051.GAE@google.com>
- <20250727180921.360-1-ujwal.kundur@gmail.com>
- <e89ca1c2-abb6-4030-9c52-f64c1ca15bf6@lunn.ch>
- <CALkFLL+qhX94cQfFhm7JFLE5s2JtEcgZnf_kfsaaE091xyzNvw@mail.gmail.com>
+	s=arc-20240116; t=1753710399; c=relaxed/simple;
+	bh=KUryzaERAvJqb9dbVsYlQdERkvnmmSExuWttDIH9Lvc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qFon/MGqZixA+osanc4sSLf4bIq5RcJ1g8nck+t0XQmW1D8swX2X8TbhX5cUEsfpBiwbUDaHZaDcgNZkQGEJgjIGYyJke4/ZPDMCHUuO3fyyG63Iiuflyx5Scn+8gFOk0wjfTuqcsrZ/2zeGXFzIiaDEem4BPion48X1Px21BDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AhKlu59N; arc=none smtp.client-ip=209.85.128.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-71a142a3930so11267077b3.3;
+        Mon, 28 Jul 2025 06:46:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753710396; x=1754315196; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nV3Vlrf+Dcp3pYeQ4RJHqSbiWAgiJsKRLGV52Ma67rs=;
+        b=AhKlu59NAUXGZJjK8TmAwu+aTkehIjgUqJl6tgi407BI1WkgsVIAciLKswhpml7csO
+         UDDwt/q96MFt80W9gXyqhuLKGL0hJIP5Jnfx8LkhIEw2gMbSjYrRdzcHX/Jz6DkB2xxf
+         SbsR4PqapO8eCUOdMcat5ZSWNQoW/87i0EkSQ3EI9K5wL0a5OSa3Kc2mZt5BSdfVMTZ+
+         A22iedlfCdjZJYL4uVJybj5cjd9EZiscHGakLVn0SvuJl09/a+UDxURfyCIX5wSL38+A
+         EYZhbNsRRTCYibF4rwOyXpL7cKlQKkOfeF5JZR3aOx2LePD9HMlD4lGEqdCKy0sOeOFg
+         9ung==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753710396; x=1754315196;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nV3Vlrf+Dcp3pYeQ4RJHqSbiWAgiJsKRLGV52Ma67rs=;
+        b=ZFwKG0BOGA47zUJ2xIo5aaXMBqZqU2TRLefSfSkWqRGzsrOe/Tnqw3E10+gakaAJh8
+         ODUdLU54GJGZQ6G7wu4fbrOR31wVQEfOPaVEL1MJ3HHZPg70twJQ286z2fuQLGOzZ1vf
+         580M+WASqjI9z/XiyN7zTT5NNPzAUu/pq5xT6cPbFtRc0InijZkGHMfYUBWJ7glz3I59
+         X7G0f0q2k/pix/enMTSbXnnwESUGlMA/hgd1UDSWQLH8cIVi0IH5qGbLW1iytcoxcW6F
+         WcfdEvjVpNUCZsNJbk5yPpUHmlr02bcGzwSp+axyy1w1TCF/vX4H+VvZPcj/vTlUUWj3
+         X4oA==
+X-Forwarded-Encrypted: i=1; AJvYcCWNXhWdjWWxcnAbpUg/hvzCqbMiGGlEZ9/3MSpcS9dHL1khcXHvUGOI5t0C0hWuppQVsQgHOsoA@vger.kernel.org, AJvYcCWs8j39e0ifrB5R/zf5xEhOZp9ayA/mPntqytG1YNxGV8Arz4exO8+xTjyJ6BZQwd1rkugTznwWAJHapUI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw+rAsOrG4yAYTruiYbtKf4pJa55AsGaFUPlkKa2zzANZXv53p3
+	WGhsWyXD7a+KGM004qvGE7ksbCmAlRsv83q1J9IxBoJRVQ9UR0XWf8xS57htarbnsWPYvrgHOaM
+	8Xu4R0L28VUydC2uO9iGEdSJcv28yVbg=
+X-Gm-Gg: ASbGncu6Yt9AxWtILhNk3KVxM4T02tLuC/7SVwUBnQpnvPMv5BmrWR0aXi3ik2P+4IH
+	0Kwlz5TUz/4wwsXrRax8o+5/nMim0iHBy7HIlqbyZBtO2ALBtQR191AksLDvBTMCl2wY2bYqlsl
+	h3fTd96CFhT1t72TXuB+UrN8D9MBxLn0O0kbrJ8ksNxFBAqVgo3icAT96145h7mVlHu3brS1uEd
+	mjC3kuWVpUBbRL2hTHqZqkFQ3ko0ewvDok1Cb1cDfBau0RoU04=
+X-Google-Smtp-Source: AGHT+IFE0kEBudBOjM2TNjoxisROStovHMmqFEfJnS8J5sKQu01XtZt6jYIMoXIZwjZpSJpgQfkG85ALBTePR/CBzA4=
+X-Received: by 2002:a05:690c:f07:b0:70e:2d17:84b5 with SMTP id
+ 00721157ae682-719e33cc84emr156139947b3.0.1753710395799; Mon, 28 Jul 2025
+ 06:46:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALkFLL+qhX94cQfFhm7JFLE5s2JtEcgZnf_kfsaaE091xyzNvw@mail.gmail.com>
+References: <20250724083005.3918375-1-wangliang74@huawei.com>
+ <688235273230f_39271d29430@willemb.c.googlers.com.notmuch>
+ <bef878c0-4d7f-4e9a-a05d-30f6fde31e3c@huawei.com> <68865594e28d8_9f93f29443@willemb.c.googlers.com.notmuch>
+ <68865ecee5cc4_b1f6a29442@willemb.c.googlers.com.notmuch> <08399323-6bab-44f6-bc21-21faf68cd73d@huawei.com>
+In-Reply-To: <08399323-6bab-44f6-bc21-21faf68cd73d@huawei.com>
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Date: Mon, 28 Jul 2025 09:45:57 -0400
+X-Gm-Features: Ac12FXw0V6XS8_Onoe8FgszTj9Ab1xxkYHQGTXFFWGDo2oo-bNGqseZEqw5fdfM
+Message-ID: <CAF=yD-JUgwSgYhYkOcJUkiuTkDLee6mfR0abikokpZfveCCp4g@mail.gmail.com>
+Subject: Re: [PATCH net] net: check the minimum value of gso size in virtio_net_hdr_to_skb()
+To: Wang Liang <wangliang74@huawei.com>
+Cc: mst@redhat.com, jasowang@redhat.com, xuanzhuo@linux.alibaba.com, 
+	eperezma@redhat.com, pabeni@redhat.com, davem@davemloft.net, 
+	willemb@google.com, atenart@kernel.org, yuehaibing@huawei.com, 
+	zhangchangzhong@huawei.com, netdev@vger.kernel.org, 
+	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	steffen.klassert@secunet.com, tobias@strongswan.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 28, 2025 at 10:55:13AM +0530, Ujwal Kundur wrote:
-> > Did not compile this change? I doubt you did, or you would of get warnings, maybe errors.
-> 
-> Ah sorry, I shouldn't have relied on static analysis -- clangd did not
-> complain so I did not wait for the compilation to succeed.
-> 
-> > And what about all the other users of team->lock?
-> 
-> I see the mutex is defined in `struct team` and cannot be changed as
-> I've proposed here. Would switching to a spinlock across the board
-> degrade performance?
+On Sun, Jul 27, 2025 at 11:36=E2=80=AFPM Wang Liang <wangliang74@huawei.com=
+> wrote:
+>
+>
+> =E5=9C=A8 2025/7/28 1:15, Willem de Bruijn =E5=86=99=E9=81=93:
+> > Willem de Bruijn wrote:
+> >> But so the real bug, an skb with 4B in the UDP layer happens before
+> >> that.
+> >>
+> >> An skb_dump in udp_queue_rcv_skb of the GSO skb shows
+> >>
+> >> [  174.151409] skb len=3D190 headroom=3D64 headlen=3D190 tailroom=3D66
+> >> [  174.151409] mac=3D(64,14) mac_len=3D14 net=3D(78,20) trans=3D98
+> >> [  174.151409] shinfo(txflags=3D0 nr_frags=3D0 gso(size=3D4 type=3D655=
+38 segs=3D0))
+> >> [  174.151409] csum(0x8c start=3D140 offset=3D0 ip_summed=3D3 complete=
+_sw=3D0 valid=3D1 level=3D0)
+> >> [  174.151409] hash(0x0 sw=3D0 l4=3D0) proto=3D0x0800 pkttype=3D2 iif=
+=3D8
+> >> [  174.151409] priority=3D0x0 mark=3D0x0 alloc_cpu=3D1 vlan_all=3D0x0
+> >> [  174.151409] encapsulation=3D0 inner(proto=3D0x0000, mac=3D0, net=3D=
+0, trans=3D0)
+> >> [  174.152101] dev name=3Dtun0 feat=3D0x00002000000048c1
+> >>
+> >> And of segs[0] after segmentation
+> >>
+> >> [  103.081442] skb len=3D38 headroom=3D64 headlen=3D38 tailroom=3D218
+> >> [  103.081442] mac=3D(64,14) mac_len=3D14 net=3D(78,20) trans=3D98
+> >> [  103.081442] shinfo(txflags=3D0 nr_frags=3D0 gso(size=3D0 type=3D0 s=
+egs=3D0))
+> >> [  103.081442] csum(0x8c start=3D140 offset=3D0 ip_summed=3D1 complete=
+_sw=3D0 valid=3D1 level=3D0)
+> >> [  103.081442] hash(0x0 sw=3D0 l4=3D0) proto=3D0x0800 pkttype=3D2 iif=
+=3D8
+> >> [  103.081442] priority=3D0x0 mark=3D0x0 alloc_cpu=3D0 vlan_all=3D0x0
+> >> [  103.081442] encapsulation=3D0 inner(proto=3D0x0000, mac=3D0, net=3D=
+0, trans=3D0)
+> >>
+> >> So here translen is already 38 - (98-64) =3D=3D 38 - 34 =3D=3D 4.
+> >>
+> >> So the bug happens in segmentation.
+> >>
+> >> [ongoing ..]
+> > Oh of course, this is udp fragmentation offload (UFO):
+> > VIRTIO_NET_HDR_GSO_UDP.
+> >
+> > So only the first packet has an UDP header, and that explains why the
+> > other packets are only 4B.
+> >
+> > They are not UDP packets, but they have already entered the UDP stack
+> > due to this being GSO applied in udp_queue_rcv_skb.
+> >
+> > That was never intended to be used for UFO. Only for GRO, which does
+> > not build such packets.
+> >
+> > Maybe we should just drop UFO (SKB_GSO_UDP) packets in this code path?
+>
+>
+> Thank you for your analysis, it is totally right!
+>
+> After segment in udp_queue_rcv_skb(), these segs are not UDP packets, whi=
+ch
+> leads the crash.
+>
+> The packet with VIRTIO_NET_HDR_GSO_UDP type from tun device perhaps shoul=
+d
+> not enter udp_rcv_segment().
+>
+> How about not do segment and pass the packet to udp_queue_rcv_one_skb()
+> directly, like this:
+>
+>    diff --git a/include/linux/udp.h b/include/linux/udp.h
+>    index 4e1a672af4c5..0c27e5194657 100644
+>    --- a/include/linux/udp.h
+>    +++ b/include/linux/udp.h
+>    @@ -186,6 +186,9 @@ static inline bool udp_unexpected_gso(struct sock
+> *sk, struct sk_buff *skb)
+>            if (!skb_is_gso(skb))
+>                    return false;
+>
+>    +       if (skb_shinfo(skb)->gso_type & SKB_GSO_UDP)
+>    +               return false;
+>    +
+>            if (skb_shinfo(skb)->gso_type & SKB_GSO_UDP_L4 &&
+>                !udp_test_bit(ACCEPT_L4, sk))
+>                    return true;
 
-Sorry, team is not my area of expertise. 
+That seemingly is what would have happened before introducing
+udp_unexpected_gso. The same for SKB_GSO_UDP_L4 packets actually.
 
-> >From what I understand, the NDO for ndo_change_rx_flags doesn't seem
-> to disable BHs unlike ndo_set_rx_mode [1][2] so this seems to occur
-> only when a new unicast address is being added via dev_uc_add [3]
-> (which does disable BHs).
-> Comparing other operations that use mutex_lock / mutex_unlock, looks
-> like a few of them do not have RCU protection for their NDOs requiring
-> lock / unlock pairs in the code, but none of them disable BHs (AFAICT)
-> apart from the operations dealing with unicast / multicast addressing.
-> If this is indeed the case, perhaps we can use a dedicated spinlock
-> for team_change_rx_flags? Or switch back to rcu_read_lock as I believe
-> it's being used in team_set_rx_mode [4] for precisely this reason. To
-> be honest, I do not understand the intent behind this change as
-> mentioned in 6b1d3c5f675cc794a015138b115afff172fb4c58.
+It is not in any way an intended use case. And given the longstanding
+breakage clearly not actually used.
 
-I'm guessing, but is this about passing ndo_set_rx_mode from the upper
-device down to the lower devices? Maybe look at how this is
-implemented for other stacked devices. A VLAN interface on a base
-interface for example? A bridge interface on top of an interface.
+UDP sockets do not expect GSO packets, so queuing them might confuse them.
 
-	Andrew
+Specifically for UFO, it can be argued that they are the same as large
+packets that were build by the IP defrag layer.
+
+Still to avoid having to start maintaining an unintentional code path,
+including having to likely fix more reports over time and with that
+likely add complexity to the real UDP hot path as well, I think we
+should instead drop these.
 
