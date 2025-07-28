@@ -1,137 +1,104 @@
-Return-Path: <netdev+bounces-210513-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210514-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 930A9B13B5D
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 15:19:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40E18B13B75
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 15:27:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D09EE189B898
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 13:20:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78E4516737E
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 13:27:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FFE9256C61;
-	Mon, 28 Jul 2025 13:19:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B67CB266565;
+	Mon, 28 Jul 2025 13:27:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KhdyKEvC"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="VrR9kCVE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1F6B24678A;
-	Mon, 28 Jul 2025 13:19:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EEF3264FB5;
+	Mon, 28 Jul 2025 13:27:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753708786; cv=none; b=EvujIYrRYpCB/ekHlJ9cN5sJHjSxf6WSNxkOaaSXGHAUVJ6Bd4ZZ4ZJSQ0rBwuho1/iCiiJgNsx5XwkkjA7AwLcoJPe02p0aBKx0IO8HJmKctLTAEK5phBM1JnA6Wff55LecBTPb9tNdd7R7NIiQHJI0/aSnHxvil98kLKTQuM8=
+	t=1753709231; cv=none; b=D8SSvRZ3xnLQNQfv6ynuvGHCwUj66/NZfU1BBKI6+JY3t4S4421vJuInWPpwZ2ht2NRuaaoCr/eFcOJDbipViwoS10SjM1cBkxQEkur5cI8SOfUNc7qO8PenZbjmO8x1Tyw0wYfD8W5yWb1sM+8D0RSpsLwTYatbu0nSyhGhy6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753708786; c=relaxed/simple;
-	bh=J1lkMDI/BRDa7tWiFtEJ9itXbbeI08A0BYzHRlb95Rs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iqQ7Bb2lZ31CuifVw16n5/uDHZtmnMnNFh0eGHMKcw8AF5BYYjrQkNDzNVRbflZ8s1DP507DYGwXzNsl9F1IveqNXUhNgmF83dfI9G1waT+L4+6imagFqXzvIsyos0bf2Kp9ZZOCpZ/cFI3chdLakWqaBCNCsed4SmL0sYoALnk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KhdyKEvC; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3b78bca0890so303466f8f.3;
-        Mon, 28 Jul 2025 06:19:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753708783; x=1754313583; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Fh8ivYdxvZqAr4NAtGDvGF5i11OMSJKfBEXYWVw7xKc=;
-        b=KhdyKEvC/jJZQPvu2MTkvbM/xNWFlqupDNGyq/P4mfpwM6tQnDCHJ9TP2F05X9ZmDt
-         8d7cqGqm0K15X+X0z28QIAGcaZkbSXSf98dUZA6Mw8X4qwXsPLRYdRZ7dg62RpjfU4Rj
-         TuRZSS3DGlCS3LtwhYX52kCdqNJkHQnMxADiOWvJAovczGKfHV+0vHLEBaAo4S2wfF2k
-         TJbQrch4NKB5BW2XoAVOXTEgyBEOX7v8rGXgn173I4GGMIXSyYwiO5knlGtuKuyaUCnI
-         lS9Jub2QfHfsinDp1+lm8rupiIKv5yrZrw2CDLvfw/vyUOvNVGocrMzlqWsBHLemr16Z
-         LFqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753708783; x=1754313583;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Fh8ivYdxvZqAr4NAtGDvGF5i11OMSJKfBEXYWVw7xKc=;
-        b=ixOTOr7qY9fI1HJrAc7xH377qtiP/fqtaq0nzvIo+h45sAwMwkNYH80GDXTP+MT+h3
-         nGIkY4SUvBiD5HpOde7dMersX1wtDzTshc36suJ8TZooUOisGK8aA8MTl1Oh6Vvo18Ve
-         IWlohCHLEc837NSLvRpDFTwrpe9zk7KXGNY8APye+NngnQQGaNywx0x1HtmqR1+S5VZ5
-         AMYE+vvzjvdNRxOzXcrIgDhbVRE2g6UXNdcfKwKY5F2TT7U+i+zeD5FI6hMJsR6Nt31y
-         DZlNXjqiESh4LI+NW64Ol6Gtg+EAI0pD36QD2AVLW9BRRtGFje9LdeUWseZMPhYRgFYM
-         TO6A==
-X-Forwarded-Encrypted: i=1; AJvYcCXTgF8EExghtX3fQlNEZUo+knzzXZDMjf4r8h9Tffo/+GjrlAce1sHkWeRYYdrHAGDKoDpuGESOF+6OE3M=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxv6iMNL1vl7XhtZfj1kn423WTJlBMkbxzPAS36YM/iq/5Vkh8g
-	nnYMLCcekeG5zFkDN3qRarF9vlPU257/rV4oCk52A7OBtaAHTUNIFRUCWGcLdA==
-X-Gm-Gg: ASbGnct/g9ZcfazWGCKfp9sB2SkLSseqcYZYmgtjxR0kDuUQghVMetIIgb0z9/sSIAr
-	7Cz1H3054IJLZ8kVmYB1IMwonYl+3u+ELlpmXiRFeJdCgtjXMWe863HQn3u2jpy5SweZ33/RFyG
-	F2zF9GrTsnwfF/WhotekDVpzf7PdIIynGwKLtkn8syfFni17V4gLHnLRhnEulywAxLWPbhqLLHv
-	vBnBsbVrwGiN9s1M+BMFoFPV/LEI4kLlcVuRhl9tnoO/ZjaStadoV8Fx6e/yKV3F2V6ER0sMRlx
-	srjGysATp262dZZjZ8YvXw1i1bPudvuCmzC+yQR3i4ZuA95RHQtjarSWaBj/LxIRP28Cj2Irovy
-	eD649EcdWwSyxRAUzrBmmijTaW8jfj0koQvKnJ9ZBax1LGlrLf+5no1HRGKte1n/PUok5eTs6O9
-	eq64acHCYolA==
-X-Google-Smtp-Source: AGHT+IHdYC2ElDuPYayKBgjf57H/wSso+U6gI155XMCYMadu8KVC/igHxS0oKul7GVyBUiaceuDviw==
-X-Received: by 2002:a05:6000:290c:b0:3b7:8525:e9cc with SMTP id ffacd0b85a97d-3b78525edb8mr3914527f8f.18.1753708782629;
-        Mon, 28 Jul 2025 06:19:42 -0700 (PDT)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4587abe7d47sm99942535e9.10.2025.07.28.06.19.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 28 Jul 2025 06:19:42 -0700 (PDT)
-Message-ID: <08deec62-e20a-4a54-a655-38a0335a74cd@gmail.com>
-Date: Mon, 28 Jul 2025 14:19:41 +0100
+	s=arc-20240116; t=1753709231; c=relaxed/simple;
+	bh=KnpOVuLTmoxEh/UdwCPbXWtITz8xrUN/fXAXPmfAYeY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=h9+t1l+A5PoXoJxl0Qqqa41Fzun7jJ8LpHtk+i6kXe/PoC7MyngkfFUMEw3I9/ViwQ8vdra7etpupWk4naRjbRq/7g1AiIkve2hG2ZuNPhWbOFuuIH1p9p9iHzfTjF5/p8deJv5llpav5tnhruhy0+4Lc1vTdop9Oc5eIFXcv3s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=VrR9kCVE; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=RwK1KXVV9DfcATRhcZwiQsKsRwhCv003V4YhKjirnLo=; b=VrR9kCVEPI9teFRbKMwKz6V1xM
+	zjZO71Ly5imGqMDfptEjiKSxKeSM1nmZMSaUzxakm3IG3vLugrnSWpp63wutky7J1fkhkiF6Kf+bT
+	VvP8IxAnil/Mxuvn6tc3vXSmTjgSAkjBdiRx6ZTRhJQiY/5kESLyUkwrswG5kM1/doTc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1ugNsY-0035jj-7R; Mon, 28 Jul 2025 15:26:58 +0200
+Date: Mon, 28 Jul 2025 15:26:58 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Ujwal Kundur <ujwal.kundur@gmail.com>
+Cc: syzbot+8182574047912f805d59@syzkaller.appspotmail.com,
+	davem@davemloft.net, edumazet@google.com, horms@kernel.org,
+	kuba@kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, pabeni@redhat.com,
+	syzkaller-bugs@googlegroups.com, jiri@resnulli.us,
+	andrew+netdev@lunn.ch
+Subject: Re: [RFC PATCH] net: team: switch to spinlock in team_change_rx_flags
+Message-ID: <df06dba7-f5bd-4ee1-b9af-c5dd4b5d4434@lunn.ch>
+References: <68712acf.a00a0220.26a83e.0051.GAE@google.com>
+ <20250727180921.360-1-ujwal.kundur@gmail.com>
+ <e89ca1c2-abb6-4030-9c52-f64c1ca15bf6@lunn.ch>
+ <CALkFLL+qhX94cQfFhm7JFLE5s2JtEcgZnf_kfsaaE091xyzNvw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: Fix typos
-To: Bjorn Helgaas <helgaas@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Bjorn Helgaas <bhelgaas@google.com>
-References: <20250723201528.2908218-1-helgaas@kernel.org>
-Content-Language: en-GB
-From: Edward Cree <ecree.xilinx@gmail.com>
-In-Reply-To: <20250723201528.2908218-1-helgaas@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALkFLL+qhX94cQfFhm7JFLE5s2JtEcgZnf_kfsaaE091xyzNvw@mail.gmail.com>
 
-On 23/07/2025 21:15, Bjorn Helgaas wrote:
-> From: Bjorn Helgaas <bhelgaas@google.com>
+On Mon, Jul 28, 2025 at 10:55:13AM +0530, Ujwal Kundur wrote:
+> > Did not compile this change? I doubt you did, or you would of get warnings, maybe errors.
 > 
-> Fix typos in comments and error messages.
+> Ah sorry, I shouldn't have relied on static analysis -- clangd did not
+> complain so I did not wait for the compilation to succeed.
 > 
-> Signed-off-by: Bjorn Helgaas <bhelgaas@google.com>
+> > And what about all the other users of team->lock?
+> 
+> I see the mutex is defined in `struct team` and cannot be changed as
+> I've proposed here. Would switching to a spinlock across the board
+> degrade performance?
 
-Sorry I wasn't able to get to this in time (had email issues last week).
+Sorry, team is not my area of expertise. 
 
-> diff --git a/drivers/net/ethernet/sfc/mcdi_pcol.h b/drivers/net/ethernet/sfc/mcdi_pcol.h
-> index 9cb339c461fb..b9866e389e6d 100644
-> --- a/drivers/net/ethernet/sfc/mcdi_pcol.h
-> +++ b/drivers/net/ethernet/sfc/mcdi_pcol.h
+> >From what I understand, the NDO for ndo_change_rx_flags doesn't seem
+> to disable BHs unlike ndo_set_rx_mode [1][2] so this seems to occur
+> only when a new unicast address is being added via dev_uc_add [3]
+> (which does disable BHs).
+> Comparing other operations that use mutex_lock / mutex_unlock, looks
+> like a few of them do not have RCU protection for their NDOs requiring
+> lock / unlock pairs in the code, but none of them disable BHs (AFAICT)
+> apart from the operations dealing with unicast / multicast addressing.
+> If this is indeed the case, perhaps we can use a dedicated spinlock
+> for team_change_rx_flags? Or switch back to rcu_read_lock as I believe
+> it's being used in team_set_rx_mode [4] for precisely this reason. To
+> be honest, I do not understand the intent behind this change as
+> mentioned in 6b1d3c5f675cc794a015138b115afff172fb4c58.
 
-mcdi_pcol.h is automatically generated from an external source (it comes
- from the firmware development team), these fixes will likely be
- overwritten next time we pull in updates.  I will try to get them fed
- back into the upstream sources.
+I'm guessing, but is this about passing ndo_set_rx_mode from the upper
+device down to the lower devices? Maybe look at how this is
+implemented for other stacked devices. A VLAN interface on a base
+interface for example? A bridge interface on top of an interface.
 
-> diff --git a/drivers/net/ethernet/sfc/tc_encap_actions.c b/drivers/net/ethernet/sfc/tc_encap_actions.c
-> index 87443f9dfd22..2258f854e5be 100644
-> --- a/drivers/net/ethernet/sfc/tc_encap_actions.c
-> +++ b/drivers/net/ethernet/sfc/tc_encap_actions.c
-> @@ -442,7 +442,7 @@ static void efx_tc_update_encap(struct efx_nic *efx,
->  			rule = container_of(acts, struct efx_tc_flow_rule, acts);
->  			if (rule->fallback)
->  				fallback = rule->fallback;
-> -			else /* fallback fallback: deliver to PF */
-> +			else /* fallback: deliver to PF */
->  				fallback = &efx->tc->facts.pf;
->  			rc = efx_mae_update_rule(efx, fallback->fw_id,
->  						 rule->fw_id);
-
-This wording was intentional, not a type: delivery to the PF is the
- second-layer fallback when there is no fallback action, which makes it
- the fallback to the fallback.
-I will post a partial revert to change this line back.
+	Andrew
 
