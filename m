@@ -1,151 +1,114 @@
-Return-Path: <netdev+bounces-210452-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73CCFB1361B
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 10:13:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A609B1360E
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 10:07:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D76E93A74AF
-	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 08:13:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E1913AAA6E
+	for <lists+netdev@lfdr.de>; Mon, 28 Jul 2025 08:06:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECAC02222A3;
-	Mon, 28 Jul 2025 08:13:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE4F1220F38;
+	Mon, 28 Jul 2025 08:07:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b="jssV+K4G"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="tDzDbQNq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ispras.ru (mail.ispras.ru [83.149.199.84])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DB8A28DD0;
-	Mon, 28 Jul 2025 08:13:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.149.199.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1E8E19E97A
+	for <netdev@vger.kernel.org>; Mon, 28 Jul 2025 08:07:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753690417; cv=none; b=iPb66SEUP1xiP8XVXKynzmOARm1Zsl6JNl/HR3C8h1xSVgqa+2wN3EnKNTPePt1xlvOfHLFlt3lOFysqGherQemkN8z6QI+EfNDTDyv44cNei16RJ5cAu2YOdxbAntVv1SrNLiVNA+Rb/3Ix0Jq5Ktjmwdesg4BLVUzBngesz4g=
+	t=1753690022; cv=none; b=aWaAuF72A6qe3V6UgwnGU1/+I4ilPrkb0IPX0S15GvWnbkd4LBQy/NoU+SGA4e1lZWV/EGl/rPPqvMKQIRbz2HUbNT4lQLgtbynfL1eloL15feFjwrVz3HScLByHmRM2PGDK+a0hYdtKdXQNsBYAkgaKyGCk0pJHlwxlEgp38P4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753690417; c=relaxed/simple;
-	bh=bspyMyfXSuZW3FNveNcAHk2ud17hz9PySexk26AC+cs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YN2May3p5eNMrU3z6afXl5UCvstSR83D7NKhrvbhI0d3ttB0n2UmNcthDTqn5xbeMKJdHQ2fRkdDfPNQMBQUOX65pYnMOxI25k8nevhxZGGHteMKAKByUdjyBimWnPKVYH13qtpa6ikiNIMw2vDrfYdQd2BxmCbQ6zUDXoWtLaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru; spf=pass smtp.mailfrom=ispras.ru; dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b=jssV+K4G; arc=none smtp.client-ip=83.149.199.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ispras.ru
-Received: from fedora.intra.ispras.ru (unknown [10.10.165.5])
-	by mail.ispras.ru (Postfix) with ESMTPSA id F044C552F527;
-	Mon, 28 Jul 2025 08:07:35 +0000 (UTC)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ispras.ru F044C552F527
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ispras.ru;
-	s=default; t=1753690056;
-	bh=/vuzXHoV461VpNRzvkTf8kRcfq0lz2FOYbCpEU5ub5I=;
-	h=From:To:Cc:Subject:Date:From;
-	b=jssV+K4GZbG+RkiBKu8vbd7rShwzQ7Gfnt2aiSizA2k1k71I0y3b3fowxzEz7UhvR
-	 Ff5bGkHEO9hk8FLPBDssrWXQlHeHBXt6I9FrcelDhjY91loj9O8eiuBJYCNCwrATDJ
-	 UWVJ1BlxQDJjkUXx026QPeoWH54AMPQ6v9oTEky0=
-From: Fedor Pchelkin <pchelkin@ispras.ru>
-To: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>
-Cc: Fedor Pchelkin <pchelkin@ispras.ru>,
-	Eric Dumazet <edumazet@google.com>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org,
-	stable@vger.kernel.org
-Subject: [PATCH net] netlink: avoid infinite retry looping in netlink_unicast()
-Date: Mon, 28 Jul 2025 11:06:47 +0300
-Message-ID: <20250728080727.255138-1-pchelkin@ispras.ru>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1753690022; c=relaxed/simple;
+	bh=il6F1V3EZvaPgxXuexkA60ipkgxSFbEms1cYfVuykjc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iFpLExZSWtDF9uerN141qeNY1+eJgf3TzL7zNtYIQXAWrOR6QFS6SkxScVlhONDjMkb/SM1CUW8DiVg4x1M0l966FUOjIA4Rof1eB3k+rAIa62w3lfI87DzGOVc8bYoqVN/0urqFENA6hoRjagUduImTjE/0B98MUdIgQjl48Qk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=tDzDbQNq; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-ae9c2754a00so838128366b.2
+        for <netdev@vger.kernel.org>; Mon, 28 Jul 2025 01:07:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1753690019; x=1754294819; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=pEoNvXLK4SEQ+X3J17Qj8vDT7ozZpc00fO4Rtvit2Lo=;
+        b=tDzDbQNqOgAdBHLygZmJhm1HkFQrsVF0T5czwpZyMaHtCOJFylqaxVEBsugghLbJGt
+         qtcicVTi+RwKNBm2y6rEXBFRM1m9/lGm2Txu5p8TbySfhlzqQLe3jgqdNL7yY7DqFCk7
+         Rs05CI4AwN+qV4yj6/MyyKJ9KLSC4Lck50RR3qntJV6g/05eRNbpgLLjwmoYwlpVWNDC
+         N2+KKNIE4qKwiMQoW8lzBC6CPDNFsP6Nlss75eQ//8pMC6FpKfR+u99Ms9crBSzyn2Gs
+         QZpVCws+ETv+k7AJGYP5S89mB1+wda9qXe6DsL4Ar6fwe8ybUqObZDUBYhJ7TfJCzPiX
+         R3xw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753690019; x=1754294819;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pEoNvXLK4SEQ+X3J17Qj8vDT7ozZpc00fO4Rtvit2Lo=;
+        b=PM6a/XDE7sq0oYbRCXfmhoYKHk06fH5uyiG+up7kxDqP73J+bdwgTgbXa1oTk65IK/
+         V5emzQ2UMFeAaAdOk+XNeslU2+pqAn4n+PM0F9KQ5qcOXrEx16WWvkupvYbp3p3QtRCX
+         bqA0VL6pg3PxudiNCVBA4XgA8ye01tWkHRM7uhr0KaeAHKMY3SCghqwF1XRDVgdWkej6
+         27gAxqcfYzDQlLJZnkA+XHxXdlbR2idiJTPutrhp6j4N0AUWrQdPQbkoKt2sVPbvsDLm
+         b75UOWqRBNRbn9BfuQNnAovDp2Lvdzxov9NwU8PulBrcLbztO3hHQ1AgSGt/7oyaiF6Q
+         5aDg==
+X-Gm-Message-State: AOJu0Yze4WVs9V7arhpGQFXl1X1wE6FbGlZpCPsrT7TEXGXumVUSbYSp
+	Ln+aJmRmm7AHvHc5PH4ISK1BrtKATlpmKqPBj15Ael34TxovJzT9OiDZbcjTLHo8RBw=
+X-Gm-Gg: ASbGncuGXTP6v/uYhhWngNF/RgCAChfoMq6Meoa6GxVifZiguYqk0TW8LUZfKpAMun+
+	sTDxvUORsJ9SXipURMR6Po3e9V8bTsJ4nu04M5J4WR/GcECbzS66YAFdv+KBXDuQUwKysqSL8sa
+	QHgF/srArHlfDylFIaiwX0ejoIbE7l30SZvGw+mLo5gGycxY8u2WDf6V1G8GZRRO8IjIS6HNzI1
+	ZyNs4Th3x9pf3ur9xTMEKAPvZSr2xFe+egFgHOep7k4miHD6Q61Qy9O0caPOjJCnZcdp2FFDOfc
+	P04vvY5jqr5ghQDO+kLeiw8Gf3TjTeQwhvwlrKdcke8Vf5mKJvkJVzhfXekDEM9oFZxicRU445+
+	mPGysFnTyr6dS4XWnUHceS4WjENiKVGjzt0d+42g=
+X-Google-Smtp-Source: AGHT+IERxblnoOCYOHAQiO6rqytlBsYokSKccm9wl4WU+Wi8aQMeTB+VQcGSWt1hqYjD8PuGuUuIDg==
+X-Received: by 2002:a17:907:2d28:b0:af2:5229:bd74 with SMTP id a640c23a62f3a-af617d0491dmr1281521166b.26.1753690018504;
+        Mon, 28 Jul 2025 01:06:58 -0700 (PDT)
+Received: from jiri-mlt ([85.163.81.98])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-af63585ff45sm391864266b.5.2025.07.28.01.06.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Jul 2025 01:06:57 -0700 (PDT)
+Date: Mon, 28 Jul 2025 10:06:56 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
+	linux-can@vger.kernel.org, kernel@pengutronix.de, Jimmy Assarsson <extja@kvaser.com>, 
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Subject: Re: [PATCH net-next 26/27] can: kvaser_usb: Add devlink port support
+Message-ID: <hjhpopnmorqqo65mw7psmlzmqvzhn2d6x22y2aq5miqsevdkmi@oak2s6kxfght>
+References: <20250725161327.4165174-1-mkl@pengutronix.de>
+ <20250725161327.4165174-27-mkl@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250725161327.4165174-27-mkl@pengutronix.de>
 
-netlink_attachskb() checks for the socket's read memory allocation
-constraints. Firstly, it has:
+Fri, Jul 25, 2025 at 06:05:36PM +0200, mkl@pengutronix.de wrote:
+>From: Jimmy Assarsson <extja@kvaser.com>
+>
+>Register each CAN channel of the device as an devlink physical port.
+>This makes it easier to get device information for a given network
+>interface (i.e. can2).
+>
+>Example output:
+>  $ devlink dev
+>  usb/1-1.3:1.0
+>
+>  $ devlink port
+>  usb/1-1.3:1.0/0: type eth netdev can0 flavour physical port 0 splittable false
+>  usb/1-1.3:1.0/1: type eth netdev can1 flavour physical port 1 splittable false
+>
+>  $ devlink port show can1
+>  usb/1-1.3:1.0/1: type eth netdev can1 flavour physical port 0 splittable false
 
-  rmem < READ_ONCE(sk->sk_rcvbuf)
-
-to check if the just increased rmem value fits into the socket's receive
-buffer. If not, it proceeds and tries to wait for the memory under:
-
-  rmem + skb->truesize > READ_ONCE(sk->sk_rcvbuf)
-
-The checks don't cover the case when skb->truesize + sk->sk_rmem_alloc is
-equal to sk->sk_rcvbuf. Thus the function neither successfully accepts
-these conditions, nor manages to reschedule the task - and is called in
-retry loop for indefinite time which is caught as:
-
-  rcu: INFO: rcu_sched self-detected stall on CPU
-  rcu:     0-....: (25999 ticks this GP) idle=ef2/1/0x4000000000000000 softirq=262269/262269 fqs=6212
-  (t=26000 jiffies g=230833 q=259957)
-  NMI backtrace for cpu 0
-  CPU: 0 PID: 22 Comm: kauditd Not tainted 5.10.240 #68
-  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.17.0-4.fc42 04/01/2014
-  Call Trace:
-  <IRQ>
-  dump_stack lib/dump_stack.c:120
-  nmi_cpu_backtrace.cold lib/nmi_backtrace.c:105
-  nmi_trigger_cpumask_backtrace lib/nmi_backtrace.c:62
-  rcu_dump_cpu_stacks kernel/rcu/tree_stall.h:335
-  rcu_sched_clock_irq.cold kernel/rcu/tree.c:2590
-  update_process_times kernel/time/timer.c:1953
-  tick_sched_handle kernel/time/tick-sched.c:227
-  tick_sched_timer kernel/time/tick-sched.c:1399
-  __hrtimer_run_queues kernel/time/hrtimer.c:1652
-  hrtimer_interrupt kernel/time/hrtimer.c:1717
-  __sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1113
-  asm_call_irq_on_stack arch/x86/entry/entry_64.S:808
-  </IRQ>
-
-  netlink_attachskb net/netlink/af_netlink.c:1234
-  netlink_unicast net/netlink/af_netlink.c:1349
-  kauditd_send_queue kernel/audit.c:776
-  kauditd_thread kernel/audit.c:897
-  kthread kernel/kthread.c:328
-  ret_from_fork arch/x86/entry/entry_64.S:304
-
-Restore the original behavior of the check which commit in Fixes
-accidentally missed when restructuring the code.
-
-Found by Linux Verification Center (linuxtesting.org).
-
-Fixes: ae8f160e7eb2 ("netlink: Fix wraparounds of sk->sk_rmem_alloc.")
-Cc: stable@vger.kernel.org
-Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
----
-
-Similar rmem and sk->sk_rcvbuf comparing pattern in
-netlink_broadcast_deliver() accepts these values being equal, while
-the netlink_dump() case does not - but it goes all the way down to
-f9c2288837ba ("netlink: implement memory mapped recvmsg()") and looks
-like an irrelevant issue without any real consequences. Though might be
-cleaned up if needed.
-
-Updated sk->sk_rmem_alloc vs sk->sk_rcvbuf checks throughout the kernel
-diverse in treating the corner case of them being equal.
-
- net/netlink/af_netlink.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
-index 6332a0e06596..0fc3f045fb65 100644
---- a/net/netlink/af_netlink.c
-+++ b/net/netlink/af_netlink.c
-@@ -1218,7 +1218,7 @@ int netlink_attachskb(struct sock *sk, struct sk_buff *skb,
- 	nlk = nlk_sk(sk);
- 	rmem = atomic_add_return(skb->truesize, &sk->sk_rmem_alloc);
- 
--	if ((rmem == skb->truesize || rmem < READ_ONCE(sk->sk_rcvbuf)) &&
-+	if ((rmem == skb->truesize || rmem <= READ_ONCE(sk->sk_rcvbuf)) &&
- 	    !test_bit(NETLINK_S_CONGESTED, &nlk->state)) {
- 		netlink_skb_set_owner_r(skb, sk);
- 		return 0;
--- 
-2.50.1
-
+Looks fine to me. Out of curiosity, do you have some plans to extend use
+of devlink port in the future, or this is it?
 
