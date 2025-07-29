@@ -1,94 +1,142 @@
-Return-Path: <netdev+bounces-210756-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210754-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8268CB14AD8
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 11:11:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E800BB14AD0
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 11:10:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 87FF77A8947
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 09:10:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0972C3ACD3D
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 09:10:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CE4428643C;
-	Tue, 29 Jul 2025 09:11:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E326286404;
+	Tue, 29 Jul 2025 09:10:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jyCvYG50"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5E9410F1;
-	Tue, 29 Jul 2025 09:11:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC8E822ACF3;
+	Tue, 29 Jul 2025 09:10:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753780305; cv=none; b=cjmf8SW0zSmwa91sCyQVIp8Su0lc+w9WdYbiVteywwt+GnYxiPLLeZY6rnUH/36dhMunz9h5QcGIlPwx8uriHsCIYEaI2ULOrKsGyqHJKP4Xls4P4N4vd/gNc4j6+Ie66AYX/SKTPI22B7a/ohtp0dkY7NjCpu51FPvgs4xUXlY=
+	t=1753780233; cv=none; b=RglHWOdRI/vznxb/lEupl2CdBPdShEDAv8U5SonIC6KOZGeABInGAwTDrczz34bu6SeMayn/WAMI99b1swemlE6lRRuIHEx9HUEHhyY1mSUPesBro1Xu0qNcQJFZUvdD5YhSXv6Y8r9b7lFwd56IiYPNh2HSU/BiqL7hbGjdFqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753780305; c=relaxed/simple;
-	bh=AooAinBEhVQgX4xQPKEnqfkbfDa2o/pfSJaoO6cyeHU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ryBWMy5bPmckrtSPAmaS7BITikF7iCEYgNZIPS1PpzOwBniVI7syy+o0pWa++595NtEcp81N/n0cDXcA1SjHre+jaWMK97yGr49vhwsxAMvVMNmoJswZelY2OffMtjBQw6mSHBcVWEyLf0zoQTU3IFATrqeN53WS/Cvf1AkUYEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+	s=arc-20240116; t=1753780233; c=relaxed/simple;
+	bh=T0I9+8eEyw46rOv+JBH8JlwKZx8kdQqKLsYuvjIRixg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=J5zQUMWMBxMEcagZmCBsjv2J3kayi8HEBIXfgQeaGKJiZOleTA/R3D7WZ/nhVpHJqoqnRz/TtxVw4ggBq/RZPNeVfXn33QKNMsY/rKz96i7tg1yo7s5OK2y+BxjnTMb02HlxoPc5GHmSGOwLqI2LbZVMybaiDQ3US47muBppWRI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jyCvYG50; arc=none smtp.client-ip=209.85.221.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-61571192c3aso471477a12.2;
-        Tue, 29 Jul 2025 02:11:43 -0700 (PDT)
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-3b788feab29so1461075f8f.2;
+        Tue, 29 Jul 2025 02:10:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753780230; x=1754385030; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=C5d72/CUGwB9F5w72AiF0d7TRfVgoOjMW++MS+u5Taw=;
+        b=jyCvYG50hhQ2xhlhE7j46/aeHeoXWSbnkxhGYtau7RQJfF5SD7KmyZN2G5V9sDw2II
+         W7+U+X+4+wMLc9kOFm4t96tjD6ix3bfBu+ZK3KHHZUfELE75QgXyQevkUy8v2XsWNv6m
+         cwC04NqV4ZU/D4MXF/qSHQMt9yNScSd0x5jH4bZ+w6718uUKP6NQ3Ev5tL1BJH4MJ9zU
+         D0VRY7oR6DMQzAxKWLb+koXHSbHFZhJl+5s09vIXBgo4xGyvG6yJVtV3Hz6Ok4PnSHAs
+         WkuDNyTX3jyzkO8GUYRxFyRmvvb5sDaZx8JUkZwFiBWoitfZKbz9SusMKFJx9Ji0bhfu
+         FmvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753780302; x=1754385102;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mTe0pbkq2BTo76Iwyv7UU0Sc/vWsm4BTTYdkBS408H0=;
-        b=Fmu4dnGBQ5M1G7nqdnBsroK8y0vdWXLlytt21Kbx6HR38E0dbEKLEVuh6qv/+geU2J
-         dkuA3eWlkCD758dzpNgEnDYUgI9UWWMSbvI5wy5Jg+tbeQFvfhcgVk22fbzODDBn6w8z
-         iL8khJD8ZTPBDYoiC56atG6wgZmgphwOfQx5DvxNZOI7TE0325QFXurTR2vVAhDFCz2X
-         UXH2+BSqdGMheG+6Kt1Nv1CV3eGysFH2Xfk9ov+iEIpf6MRA8RmFcOYTZlLVX14oE4cv
-         fcaf5/NB05eSFnfC7pj8mvr04hYB2FnsAnr9JJiiUcFJ0dmmySjiY1E1mCWLAZ2Gz1s5
-         2b3Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVMj7F1+/V/6xTIHvDTT10CT+oX/vdikNxybT9zRqzc9fjfUQVzBFFqq6+4xbLcOcfKAGxuHpC9@vger.kernel.org, AJvYcCVkj3KHk8Thcym5Ny3cclRYwBZM6iN2qdKRUDs1IFz0GKI69QN2uv2tzPzQlDKinurbEN0=@vger.kernel.org, AJvYcCXSGDQFq4SFLMC3XC77RprBPgjTAYa7U9xXrWLbzHjGntVftXgKcaCd+w3Plt2cB2LlKWWHmthHopHKD+7d@vger.kernel.org
-X-Gm-Message-State: AOJu0YxToQstf0JIimob1wN7hRlIYyUDwbU4iJCJyQMKNy0iF8HaTt2V
-	dUI2D98t67n+zqCjg8HMRPIA1RUc4deejbmKLue+UrFhfAlPUbd6KtRe
-X-Gm-Gg: ASbGncvUc4R7Hmi0VQQ4a/1LZeuA/nOy2vvqswHbYJy8kvOJROf263eNv+NE3TNlaPK
-	DmuA1Sa7VGnIPH42avQGLAgGijgp3tKiPtNo1VWyNb1q/MNo/j//AwgKom6zQ5bYwvRtX2jtdxX
-	0UZJFcf6lwLF9f4yxrwZ0NXPqouGAJx4dQMZz121X0deqnEgAR2UJkQisaKpFcTIr9TmuZ7Yj5s
-	31F5lyv8qvTu/rIJ4nrnH/zS2jYy3rNxc/iaZTCXirfVnmNZcJ+nbnq2F8ByWMjS1wD/k2vQu4y
-	ZDcSUeyojHCkvH7pOx4QQZlea6hVaI16MCKbDOCIHC11iFf+WqkQasZbVpj9xtiJzhIHGn6Ik3n
-	Y3ewvsrwRbBQ+CVVctO+MdQPa
-X-Google-Smtp-Source: AGHT+IHiUSyBteGKx3hNSMSmlbFFC29cVQsp80PeSD3fki0Wu7eWgmkZiAy6HP138mxj1vsKT47V7g==
-X-Received: by 2002:a05:6402:2348:b0:615:357d:5630 with SMTP id 4fb4d7f45d1cf-615357d569dmr8322665a12.28.1753780301941;
-        Tue, 29 Jul 2025 02:11:41 -0700 (PDT)
-Received: from gmail.com ([2a03:2880:30ff:74::])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-61542a59c99sm2146959a12.1.2025.07.29.02.11.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Jul 2025 02:11:41 -0700 (PDT)
-Date: Tue, 29 Jul 2025 02:11:39 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Jason Wang <jasowang@redhat.com>
-Cc: mst@redhat.com, eperezma@redhat.com, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	sgarzare@redhat.com, will@kernel.org, JAEHOON KIM <jhkim@linux.ibm.com>
-Subject: Re: [PATCH] vhost: initialize vq->nheads properly
-Message-ID: <nswdjfxtogobamp7bqktyrihl4w6xs2jnvxjofdvqoxqtvjp5s@vrsdmzuvsvx4>
-References: <20250729073916.80647-1-jasowang@redhat.com>
+        d=1e100.net; s=20230601; t=1753780230; x=1754385030;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=C5d72/CUGwB9F5w72AiF0d7TRfVgoOjMW++MS+u5Taw=;
+        b=kmcgKqQTe2Zychkc7yqVZue/umjrTWrmjgO8uH/pCEwUfWNZnb8uazfYfTJm1cIpNH
+         1IPQjcinxpYTGl6F7jFwCNHbqpUfhuLYbvL1IA/I8JRgWirjESBkXGwCyUeWkeM8vcsZ
+         GAOtrVjbjl1p05+tH/DBZxuC0btlu5tb9WIctp/qX7SplBz4HyukAXDhqQfv3bFhBkbT
+         GPjgQ3hKzn7nzq22g+KprjDPZms9ziL3uPhMZzGA+G0lKOJuLmBP9r7jxhpR23cqr0uX
+         /qtEZrdypMIvPfjjUd7muXgFuwoIdfaD97YabqrA+RDehzwMeBP4J/NRScRebaZP29QS
+         ypsQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU7GarDqlJk3625UfgMdnE0VswDltj8QBUOibrTfZ9gIO5RA4BGLDAvmsle5ibwd308fDbLgQalQ2HeiQ8=@vger.kernel.org, AJvYcCVYCvxHKExDAcb6s2qnY0cesG2Db04xPdtsLNvYwd4uyqExSGvjiHNxmA+Id7b6bsfVWpPmZAWp@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw/o7nat1zsZzO7TqH5z/JD2N5eG6ke3OB4QzEmW0AtFMSV/x26
+	CauKs016+0Xl57DVu/cCeINFbSdPBarCpYgdZadbYcrJ5tiA02kTOIxA
+X-Gm-Gg: ASbGncuL09L/Us7KeZoVI/yPURNZsZRp4/7tF0DGBmCQ1UvvluCHsSlKjIPCnAXto1N
+	uAi+gzj7OwNoNZJPg7P8jtWWKfskRU7QLbrAmtPPTWWu1/SCdlcoAcvNCiGG0f56z84fQQpR2VT
+	H4bWkk5CPVbU6sI77CajZ2XakPa5Ryz1cmH2zvfrxNVB1CDqr7uTFv452QJWmJpbLHMf7EB3GvA
+	hf3J7t45pcKIzd++5FcpFMPQGa/mZZCl6WnYo2GZ4szDEhisOF8PR4bCOp8OaEE8iUd32osJBEk
+	rPhVLEowwRuAR1TxiohOlrJ07ZhBEutmHuMoOcgwQak9ZH50+Q7v4298l8ZIaFNmY35yMG2tF2X
+	gqFljS1Yh4UiBt2lgJxhDfp5bLHE/IVj2YaA=
+X-Google-Smtp-Source: AGHT+IGvibxPDDXvQMAmjPqamEm+8IJtbphJ6txv2EOFbA5FHRGXzhmRky518PKnEwpopYy35jDd1Q==
+X-Received: by 2002:a05:6000:2508:b0:3b7:8481:e365 with SMTP id ffacd0b85a97d-3b78481e380mr5662076f8f.10.1753780229987;
+        Tue, 29 Jul 2025 02:10:29 -0700 (PDT)
+Received: from ?IPV6:2620:10d:c096:325::26f? ([2620:10d:c092:600::1:72ea])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b778f0c477sm11340564f8f.58.2025.07.29.02.10.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 29 Jul 2025 02:10:29 -0700 (PDT)
+Message-ID: <1dbe988f-5703-4ccc-8f53-dea455192983@gmail.com>
+Date: Tue, 29 Jul 2025 10:11:49 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250729073916.80647-1-jasowang@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC net-next] netmem: replace __netmem_clear_lsb() with
+ netmem_to_nmdesc()
+To: Byungchul Park <byungchul@sk.com>
+Cc: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, hawk@kernel.org,
+ toke@redhat.com, kernel_team@skhynix.com
+References: <20250728042050.24228-1-byungchul@sk.com>
+ <CAHS8izPv8zmPaxzCSPAnybiCc0KrqjEZA+x5wpFOE8u=_nM1WA@mail.gmail.com>
+ <b239b40b-0abe-43a5-af41-346283a634f6@gmail.com>
+ <087ca43a-49b7-40c9-915d-558075181fd1@gmail.com>
+ <20250729011711.GE56089@system.software.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20250729011711.GE56089@system.software.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jul 29, 2025 at 03:39:16PM +0800, Jason Wang wrote:
-> Commit 7918bb2d19c9 ("vhost: basic in order support") introduces
-> vq->nheads to store the number of batched used buffers per used elem
-> but it forgets to initialize the vq->nheads to NULL in
-> vhost_dev_init() this will cause kfree() that would try to free it
-> without be allocated if SET_OWNER is not called.
+On 7/29/25 02:17, Byungchul Park wrote:
+> On Mon, Jul 28, 2025 at 07:58:13PM +0100, Pavel Begunkov wrote:
+>> On 7/28/25 19:46, Pavel Begunkov wrote:
+>>> On 7/28/25 18:44, Mina Almasry wrote:
+>>>> On Sun, Jul 27, 2025 at 9:21 PM Byungchul Park <byungchul@sk.com> wrote:
+...>>
+>>
+>>> info to the compiler to optimise it out without assumptions on
+>>> the layouts nor NET_IOV_ASSERT_OFFSET. Currently it's not so bad,
+>>> but we should be able to remove this test+cmove.
+>>>
+>>>       movq    %rdi, %rax    # netmem, tmp105
+>>>       andq    $-2, %rax    #, tmp105
+>>>       testb    $1, %dil    #, netmem
+>>>       cmove    %rdi, %rax    # tmp105,, netmem, <retval>
+>>>       jmp    __x86_return_thunk
+>>
+>> struct netmem_desc *netmem_to_nmdesc(netmem_ref netmem)
+>> {
+>>         void *p = (void *)((__force unsigned long)netmem & ~NET_IOV);
+>>
+>>         if (netmem_is_net_iov(netmem))
+>>                 return &((struct net_iov *)p)->desc;
+>>         return __pp_page_to_nmdesc((struct page *)p);
+>> }
 > 
-> Reported-by: JAEHOON KIM <jhkim@linux.ibm.com>
-> Reported-by: Breno Leitao <leitao@debian.org>
-> Fixes: 7918bb2d19c9 ("vhost: basic in order support")
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> I wanted to remove constraints that can be removed, but Mina want not to
+> add additional overhead more.  So I'm thinking to keep the constraint,
+> 'netmem_desc is the first member of net_iov'.
+> 
+> Thoughts?
 
-Tested-by: Breno Leitao <leitao@debian.org>
+We don't want extra overhead, the function above doesn't add
+any, so just use it. You don't need to explicitly check that
+layouts match.
+
+-- 
+Pavel Begunkov
+
 
