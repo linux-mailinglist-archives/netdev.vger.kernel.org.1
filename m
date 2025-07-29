@@ -1,241 +1,159 @@
-Return-Path: <netdev+bounces-210767-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210768-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A21BEB14B97
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 11:47:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 336FFB14BB0
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 11:53:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF9BD189C040
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 09:48:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4FA161AA4454
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 09:53:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84E6D236A9C;
-	Tue, 29 Jul 2025 09:47:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8D07288514;
+	Tue, 29 Jul 2025 09:53:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="mw/RjNVM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XQA/PbY2"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DF00230D35;
-	Tue, 29 Jul 2025 09:47:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15A252877DA;
+	Tue, 29 Jul 2025 09:53:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753782473; cv=none; b=q85aMdmIQ2zs6QxV/aMvz2kTIY/CEe2xRXCUbYR1kRmOldkVugVHCLwvG9CyifAV4NG01iX+sRZzGsaX5JXIX4fH5A9IGrDW11N+lyC5f6s1IBiFqc71IpITgBMdQIBDm8nHB3EpULtqdE5mYiELePugXTpkmZVmOAdytvAIp5I=
+	t=1753782798; cv=none; b=UeNhvCl22Url+CaltKDJX55im+jTuqVcr2nmFxtUsGPk4YyBf7hOYvo/8sGAWaxy2J8teXFVL0C/7+cnTm+o9f73sXV9I9k0+ZjgwWZ3/RBxf4LNI3jLPZSDI191+r+XCAxQRGAAP1jyfJX9ydH+RAmTwTjnh8L4RIJQoJPu0HU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753782473; c=relaxed/simple;
-	bh=kiAVxOybSUMykd1nOkBhLdpaX405dvJtvP0kD4q0ZUY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=UCZDNHU85gMM67RLfx/hGQik82oRMYg0E8zlPxVe1ZCZ4bUJo3Tyc/vyngaxJoo8eyOgHtZBlcfrk8gnFUO0czka6mpN3LjQfSSKXfuVbVNL0QBzDBhcbpWBrkDPj0Xj/ee60A3bT/fSFgaAqeRXs4WsdsUuY2dWHva3PEMxRAo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=mw/RjNVM; arc=none smtp.client-ip=198.47.23.234
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllvem-sh04.itg.ti.com ([10.64.41.54])
-	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTP id 56T9kaku2518997;
-	Tue, 29 Jul 2025 04:46:36 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1753782396;
-	bh=rW2guRXzVdSnP3kefofJSWnAepPy1N5zFafQ9pBYRpE=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=mw/RjNVMo6aBuUR2RkpjfrSTMPitgl+f7aFpDFUxKhzsrVssKPY2b1hL+Ynt41I6K
-	 AN9uVNpjfRShIoAdvJqECtMXtvknjRxYvDjg1szUFgPr2GmtyofClCn0HatJKKs24K
-	 FkXziYWTbOakABGqOHO5lf2V9OSQHmjMjKJWTnfE=
-Received: from DFLE102.ent.ti.com (dfle102.ent.ti.com [10.64.6.23])
-	by fllvem-sh04.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 56T9kZQe2365503
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
-	Tue, 29 Jul 2025 04:46:35 -0500
-Received: from DFLE103.ent.ti.com (10.64.6.24) by DFLE102.ent.ti.com
- (10.64.6.23) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Tue, 29
- Jul 2025 04:46:35 -0500
-Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DFLE103.ent.ti.com
- (10.64.6.24) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55 via
- Frontend Transport; Tue, 29 Jul 2025 04:46:35 -0500
-Received: from [172.24.231.152] (danish-tpc.dhcp.ti.com [172.24.231.152])
-	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 56T9kTTA3221409;
-	Tue, 29 Jul 2025 04:46:30 -0500
-Message-ID: <66377d5d-b967-451f-99d9-8aea5f8875d3@ti.com>
-Date: Tue, 29 Jul 2025 15:16:28 +0530
+	s=arc-20240116; t=1753782798; c=relaxed/simple;
+	bh=rlndRviMl0UcHdaxHRoggsqdCQNzmSzMZrAcRGb5hqQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bIftiBEKeCOebATaGrDz4g9CXzEyqphXQPf7uK4mQ8Qlm0bDz4q7qACQ3m8bHBA5KulZ49fvqnxpbo+Mlj8t82cmoHnnovXEEkU3SXfM9g+N/G0CLZR3LjChIUgKv26/ZspMPYqLt6dKz/ySt+qfvqeBSis+Au37id014w8QzxE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XQA/PbY2; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4563a57f947so3062325e9.1;
+        Tue, 29 Jul 2025 02:53:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753782795; x=1754387595; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=EE9S7KbhSao+VXArHjxBh/cgveFNCFgRdGsc9h/clf8=;
+        b=XQA/PbY2VY8gIcV2WDayvPks9ywOuz1T8MAcHHw1R8f9Za8LBmx2UhivrZljvar1Eq
+         v/nPbDAHkQeRILzF8Hj5anWqkOcF2hhiweYaR1f6bJT9TQhgzOTCCkdZAZJg4liGgTTb
+         6oQ2KEJzxNo5D4eE8NlqFGbsZ7aL/btKk+SNE+62ZGoBD/XKqWVr8ZC6dIxotT6VdNDd
+         71PwmdvIdI0tYxq0Zwek8G7wgW2nKVNgfpBTRLLrdWJgYZbLKhvwJNmIqHe9rOF4M1SI
+         oUliZFh/mU1Dq5smhHRAa9qBtlUMiq+Ug2VWPXCM3ODITZ4SGPWlgphF/pgyzU1vGOXD
+         /0mw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753782795; x=1754387595;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EE9S7KbhSao+VXArHjxBh/cgveFNCFgRdGsc9h/clf8=;
+        b=c5s9tRoRwWpOu/ZmtfASq0CzzdH3YTm1uS1PQQ6Dn5an5sXvIbcZOBlKxgf5YCUj9t
+         Me55NvAbeT69IJoxhMvW06mK5mkwTN7gt1ff9ulbnHP/uKVksV1e0Um/OVDzkWBnxq6x
+         gIS+Zc1nh4HMA4oO/N50+Ml2Di0/0NnsssTbN+0wxgMIRuCPGCFhS92x+2uj1Fn41PGR
+         iyOa0z8fLZAOGT+FIECK48wFz0V12VaKb10CPZNQds4HcAwVjUXPFxkI2q7gcmupaamx
+         EyQTojyGX16V+S9KVeGqDQ1d7F1pXp83oRTrmW7Lkv4kz7OgoLlNCWd1PZcmqlnWt9mI
+         FLzA==
+X-Forwarded-Encrypted: i=1; AJvYcCWBQH48nyJA9Xuy646/USy/OwOmNGkfWD26+QUBYxJF1wAg+FcyRKpaJTEoOMzsDlJWBOo=@vger.kernel.org, AJvYcCWvk62lNGvR7bMvlHK+z9X/ZLzGPhXDR8PXGF73KM6xcLpfIN2abTjFrSq/pJiqc+WklE1Ke7L2@vger.kernel.org, AJvYcCX5eLWccUqZZq6noRlyAGK/mgP8+V1ETi9ttbQ94yZuI7OEFGyhtt0rVgGvajv7q5oMpPp6ZcnT4mAzX9CpmUTC@vger.kernel.org
+X-Gm-Message-State: AOJu0YzqaGr1FsgFG0lhOTdTaE2FeozOrJSlzUle95UWQWwvNa+VmqfX
+	txp3rGMB6cB2rKe4vZJs+YAvx4G8iwyXewI756CcPJrD2q/o4ADB5qLe
+X-Gm-Gg: ASbGncuuR2tdZOZgzG1U2zEnY8idCpWagXfPXUm5EdklrQg1mM1lBT+XFgOUQUrWkJv
+	wLYjyfhYFtcqFd9k5TnNZBVs1+NbJw9QKOyOtU9yhDWax0e051bXdtseV1yjRzKyE9qBbICprLS
+	0ji6jWJW4zv3obg8US/xUWQkKjjAUxwCljhLyD2+C8nkXMZKToDIPDGXwrl89K9JYi8YZdq0Ta3
+	dL/0XtmjoGZe9hiMwyl80dCJXrkiGLnFyOxO7mH+wB8TCo1Z9BS3kRRDtU5Vof10RDmrwmvNB2w
+	Cap3+rQyacOEFvAAMzCJn3wT3Wkgey/fBZ1vDxZPeT03G8+qYnuMESc/Uqr+Pk2Yi66bo8v3gKc
+	mr3MZp6QFi6IYm6LuniSKW8Lt0flX6YnrY48aAys+hDBJBSz426LV914=
+X-Google-Smtp-Source: AGHT+IGZrlB2YEoAZYXWNimrkcTKG3bFP6Bf59CEiAeLziQfIZ6sdzcDPoKMp80H8l0VyK0C7TQmsQ==
+X-Received: by 2002:a05:6000:240b:b0:3a5:1388:9a55 with SMTP id ffacd0b85a97d-3b78e3d5ac2mr2135420f8f.5.1753782795107;
+        Tue, 29 Jul 2025 02:53:15 -0700 (PDT)
+Received: from gmail.com (deskosmtp.auranext.com. [195.134.167.217])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-458705bcb96sm196872745e9.21.2025.07.29.02.53.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Jul 2025 02:53:14 -0700 (PDT)
+Date: Tue, 29 Jul 2025 11:53:11 +0200
+From: Mahe Tardy <mahe.tardy@gmail.com>
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: alexei.starovoitov@gmail.com, andrii@kernel.org, ast@kernel.org,
+	bpf@vger.kernel.org, coreteam@netfilter.org, daniel@iogearbox.net,
+	fw@strlen.de, john.fastabend@gmail.com, netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org, oe-kbuild-all@lists.linux.dev,
+	pablo@netfilter.org, lkp@intel.com
+Subject: Re: [PATCH bpf-next v3 0/4] bpf: add icmp_send_unreach kfunc
+Message-ID: <aIiaB2QUxKmhvPlx@gmail.com>
+References: <202507270940.kXGmRbg5-lkp@intel.com>
+ <20250728094345.46132-1-mahe.tardy@gmail.com>
+ <b36532a2-506b-4ba5-b6a3-a089386a190e@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/5] net: rpmsg-eth: Add basic rpmsg skeleton
-To: Krzysztof Kozlowski <krzk@kernel.org>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>, Andrew Lunn
-	<andrew+netdev@lunn.ch>,
-        Mengyuan Lou <mengyuanlou@net-swift.com>,
-        Michael
- Ellerman <mpe@ellerman.id.au>,
-        Madhavan Srinivasan <maddy@linux.ibm.com>,
-        Fan
- Gong <gongfan1@huawei.com>, Lee Trager <lee@trager.us>,
-        Lorenzo Bianconi
-	<lorenzo@kernel.org>,
-        Geert Uytterhoeven <geert+renesas@glider.be>,
-        Lukas
- Bulwahn <lukas.bulwahn@redhat.com>,
-        Parthiban Veerasooran
-	<Parthiban.Veerasooran@microchip.com>
-CC: <netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-References: <20250723080322.3047826-1-danishanwar@ti.com>
- <20250723080322.3047826-3-danishanwar@ti.com>
- <296d6846-6a28-4e53-9e62-3439ac57d9c1@kernel.org>
- <5f4e1f99-ff71-443f-ba34-39396946e5b4@ti.com>
- <cabacd59-7cbf-403a-938f-371026980cc7@kernel.org>
-Content-Language: en-US
-From: MD Danish Anwar <danishanwar@ti.com>
-In-Reply-To: <cabacd59-7cbf-403a-938f-371026980cc7@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b36532a2-506b-4ba5-b6a3-a089386a190e@linux.dev>
 
-
-
-On 28/07/25 6:10 pm, Krzysztof Kozlowski wrote:
-> On 28/07/2025 10:10, MD Danish Anwar wrote:
->> Hi Krzysztof,
->>
->> On 25/07/25 12:48 am, Krzysztof Kozlowski wrote:
->>> On 23/07/2025 10:03, MD Danish Anwar wrote:
->>>> This patch introduces a basic RPMSG Ethernet driver skeleton. It adds
->>>
->>> Please do not use "This commit/patch/change", but imperative mood. See
->>> longer explanation here:
->>> https://elixir.bootlin.com/linux/v5.17.1/source/Documentation/process/submitting-patches.rst#L95
->>>
->>
->> Sure. I will fix this in v2.
->>
->>>> support for creating virtual Ethernet devices over RPMSG channels,
->>>> allowing user-space programs to send and receive messages using a
->>>> standard Ethernet protocol. The driver includes message handling,
->>>> probe, and remove functions, along with necessary data structures.
->>>>
->>>
->>>
->>> ...
->>>
->>>> +
->>>> +/**
->>>> + * rpmsg_eth_get_shm_info - Get shared memory info from device tree
->>>> + * @common: Pointer to rpmsg_eth_common structure
->>>> + *
->>>> + * Return: 0 on success, negative error code on failure
->>>> + */
->>>> +static int rpmsg_eth_get_shm_info(struct rpmsg_eth_common *common)
->>>> +{
->>>> +	struct device_node *peer;
->>>> +	const __be32 *reg;
->>>> +	u64 start_address;
->>>> +	int prop_size;
->>>> +	int reg_len;
->>>> +	u64 size;
->>>> +
->>>> +	peer = of_find_node_by_name(NULL, "virtual-eth-shm");
->>>
->>>
->>> This is new ABI and I do not see earlier patch documenting it.
->>>
->>> You cannot add undocumented ABI... but even if you documented it, I am
->>> sorry, but I am pretty sure it is wrong. Why are you choosing random
->>> nodes just because their name by pure coincidence is "virtual-eth-shm"?
->>> I cannot name my ethernet like that?
->>>
->>
->> This series adds a new virtual ethernet driver. The tx / rx happens in a
->> shared memory block. I need to have a way for the driver to know what is
->> the address / size of this block. This driver can be used by any
->> vendors. The vendors can create a new node in their dt and specify the
->> base address / size of the shared memory block.
->>
->> I wanted to keep the name of the node constant so that the driver can
->> just look for this name and then grab the address and size.
+On Mon, Jul 28, 2025 at 06:21:50PM -0700, Martin KaFai Lau wrote:
+> On 7/28/25 2:43 AM, Mahe Tardy wrote:
+> > Hello,
+> > 
+> > This is v3 of adding the icmp_send_unreach kfunc, as suggested during
+> > LSF/MM/BPF 2025[^1]. The goal is to allow cgroup_skb programs to
+> > actively reject east-west traffic, similarly to what is possible to do
+> > with netfilter reject target.
+> > 
+> > The first step to implement this is using ICMP control messages, with
+> > the ICMP_DEST_UNREACH type with various code ICMP_NET_UNREACH,
+> > ICMP_HOST_UNREACH, ICMP_PROT_UNREACH, etc. This is easier to implement
+> > than a TCP RST reply and will already hint the client TCP stack to abort
+> > the connection and not retry extensively.
+> > 
+> > Note that this is different than the sock_destroy kfunc, that along
+> > calls tcp_abort and thus sends a reset, destroying the underlying
+> > socket.
+> > 
+> > Caveats of this kfunc design are that a cgroup_skb program can call this
+> > function N times, thus send N ICMP unreach control messages and that the
+> > program can return from the BPF filter with SK_PASS leading to a
+> > potential confusing situation where the TCP connection was established
+> > while the client received ICMP_DEST_UNREACH messages.
+> > 
+> > Another more sophisticated design idea would be for the kfunc to set the
+> > kernel to send an ICMP_HOST_UNREACH control message with the appropriate
+> > code when the cgroup_skb program terminates with SK_DROP. Creating a new
+> > 'SK_REJECT' return code for cgroup_skb program was generally rejected
+> > and would be too limited for other program types support.
+> > 
+> > We should bear in mind that we want to add a TCP reset kfunc next and
+> > also could extend this kfunc to other program types if wanted.
 > 
-> You should not.
+> Some high level questions.
 > 
->>
->> I can create a new binding file for this but I didn't create thinking
->> it's a virtual device not a physical and I wasn't sure if bindings can
->> be created for virtual devices.
-> 
-> So you added undocumented ABI intentionally, sorry, that's a no go.
-> 
->>
->> In my use case, I am reserving this shared memory and during reserving I
->> named the node "virtual-eth-shm". The memory is reserved by the
->> ti_k3_r5_remoteproc.c driver. The DT change is not part of this series
->> but can be found
->> https://gist.github.com/danish-ti/cdd10525ad834fdb20871ab411ff94fb
->>
->> The idea is any vendor who want to use this driver, should name their dt
->> node as "virtual-eth-shm" (if they also need to reserve the memory) so
->> that the driver can take the address from DT and use it for tx / rx.
->>
->> If this is not the correct way, can you please let me know of some other
->> way to handle this.
->>
->> One idea I had was to create a new binding for this node, and use
->> compatible string to access the node in driver. But the device is
->> virtual and not physical so I thought that might not be the way to go so
->> I went with the current approach.
-> 
-> virtual devices do not go to DTS anyway. How do you imagine this works?
-> You add it to DTS but you do not add bindings and you expect checks to
-> succeed?
-> 
-> Provide details how you checked your DTS compliance.
-> 
-> 
+> Which other program types do you need this kfunc to send icmp and the future
+> tcp rst?
 
-This is my device tree patch [1]. I ran these two commands before and
-after applying the patch and checked the diff.
-
-	make dt_binding_check
-	make dtbs_check
-
-I didn't see any new error / warning getting introduced due to the patch
-
-After applying the patch I also ran,
-
-	make CHECK_DTBS=y ti/k3-am642-evm.dtb
-
-I still don't see any warnings / error.
-
-
-If you look at the DT patch, you'll see I am adding a new node in the
-`reserved-memory`. I am not creating a completely new undocumented node.
-Instead I am creating a new node under reserved-memory as the shared
-memory used by rpmsg-eth driver needs to be reserved first. This memory
-is reserved by the ti_k3_r5_remoteproc driver by k3_reserved_mem_init().
-
-It's just that I am naming this node as "virtual-eth-shm@a0400000" and
-then using the same name in driver to get the base_address and size
-mentioned in this node.
-
+I don't really know, I mostly need this in cgroup_skb for my use case
+but I could see other programs type using this either for simplification
+(for progs that can already rewrite the packet, like tc) or other
+programs types like cgroup_skb, because they can't touch the packet
+themselves.
 
 > 
-> Best regards,
-> Krzysztof
+> This cover letter mentioned sending icmp unreach is easier than sending tcp
+> rst. What problems do you see in sending tcp rst?
+> 
 
+Yes, I based these patches on what net/ipv4/netfilter/ipt_REJECT.c's
+'reject_tg' function does. In the case of sending ICMP unreach
+'nf_send_unreach', the routing step is quite straighforward as they are
+only inverting the daddr and the saddr (that's what my renamed/moved
+ip_route_reply_fetch_dst helper does).
 
-[1]
-https://gist.githubusercontent.com/danish-ti/fd3e630227ae5b165e12eabd91b0dc9d/raw/67d7c15cd1c47a29c0cfd3674d7cd6233ef1bea5/0001-arch-arm64-dts-k3-am64-Add-shared-memory-node.patch
-
--- 
-Thanks and Regards,
-Danish
-
+In the case of sending RST 'nf_send_reset', there are extra steps, first
+the same routing mechanism is done by just inverting the daddr and the
+saddr but later 'ip_route_me_harder' is called which is doing a lot
+more. I'm currently not sure which parts of this must be ported to work
+in our BPF use case so I wanted to start with unreach.
 
