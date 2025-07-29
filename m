@@ -1,171 +1,237 @@
-Return-Path: <netdev+bounces-210851-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210852-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E2C8B151C9
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 19:01:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74F68B151D4
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 19:09:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 87BD2170482
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 17:01:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D207189E968
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 17:10:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A60E22D9E3;
-	Tue, 29 Jul 2025 17:01:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57E18286897;
+	Tue, 29 Jul 2025 17:09:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KG6LmSSD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cy60Tk+v"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8769A221F02
-	for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 17:01:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F300204863;
+	Tue, 29 Jul 2025 17:09:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753808487; cv=none; b=MhkspMQ1/pfbWHi11cNeKQ8FVP8xlYaTnnMqy6uSn3yXKp1SUPL+9Z/tRLv8y123r90Wui35CcYE4xJAslLECDGe09Bej58/xcqGXKMlcPQHc/UR/QYCZWtuJrR9WJ/LymsocULK2qOox4KZa4Nz7FVi5de0ikz2zpARdJwkmmo=
+	t=1753808995; cv=none; b=CTX0owAZnXQQZKJRwTp8sw7NZA6YROeXQfbJtlWX+ZSZhN0ogkSv1I6ONA18sdR+S+KcV950O9H+Fg6qCuoQTaKlk+cCMu6aGF2YouDjfGq1Tf6VPMW38MAvEIQ133Jcja9NELnJ5s1iLQpbykEC0SYz0VW68h+jYlyOs11gchM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753808487; c=relaxed/simple;
-	bh=uLae6rGolk8xBHVpk0k+TCgO/RkNYprItl9+NHm0eIk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sHI5QGH5D4+D/GIz4IlFqQSmVvYL/OEEw1QTEJkxjSy/Tw0qhqud1xZHqXAF9P9i05nABSHJjiYZFkc19n9aFLpBGwFdPCeI4SmAviQV3S2LWSspBoQj6Jgn30adPRh1xckkQFgcpvVACYAKJqrhSjKfGhlHddcVahz+fULWzCQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KG6LmSSD; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-240718d5920so8345ad.1
-        for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 10:01:25 -0700 (PDT)
+	s=arc-20240116; t=1753808995; c=relaxed/simple;
+	bh=fpqxhzWJtHjAYGvLmCUdpdaNmXBiWP8n3lMQKxa+S6U=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=skLZP0msvbHgejdcb/5V05TK1ODt3gptpuWVg69ywqGzwCxRQlrwdqo6HOjAHljdGCJ4MgILhz71ByIswYMC1tNVOFrmc1fyQQ0LrQkPwTM9GkNy3B7jkpyMxszkHvwmzXxGGaKDsLoEqtc7hPNwEHRZ/svm0GoEYIstimve1Ts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cy60Tk+v; arc=none smtp.client-ip=209.85.128.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-71a34087749so10291327b3.2;
+        Tue, 29 Jul 2025 10:09:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753808483; x=1754413283; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1753808992; x=1754413792; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=uLae6rGolk8xBHVpk0k+TCgO/RkNYprItl9+NHm0eIk=;
-        b=KG6LmSSDK+hyjnUs94SNNlRHnC3C9nxsijQy+ZHHQOa8scN8IdSMeh04YHwIGKLy/X
-         WNl84sAa64cRHuD3AHk+C3e4Ysmvhs0/SfQnXasKoNav81aGPpM7kKYkOFPoS7eoRka8
-         e+6kaJM3komxWXxdjrOlZYxPNw2W1ZGRAXF0e7pktkK4Jy49vBFWxSA+9GGAcvUYgJdt
-         7p0RKs0L+1Mcsvnc7+uQbXKUZ346DK4Qh+Kh3NDRxzqSUEoOGdXi8U3fR+a3HGzlaFmL
-         SYOLjVNXw7GR5dElTzge/E9Gqq29JCyN8lMjW7a1iTkaW5IHglK7pfRrxiISxCBZXkBg
-         sGdQ==
+        bh=xHLIBiSL/KtnXCFPIH5IfZKEjXvqhs/FSKlHN+gsWGQ=;
+        b=cy60Tk+vA5rMpFzfZDLdYy1DI+B138LY4q3b3RRm6jc8JhGhtlWKbjxHQ5W6o4yBV4
+         N7AUtSAngjt2GjBQDFhNYoLZSH3zrrkG/ZoP12Nb51kKXkdvoRVYH5tC32lRc6Ebr7KO
+         4/mPeNvwpFZJUkGS9AEsrera0iSNqcyf1/IqNLwWtrw1ugaPtb6cL9wyJzSgzK7q/v40
+         nGVxwWp3GMRFbMZK5alpI225U5m0Yv00TrKIoplhXDuNt3W+b56l+h57xGgiQ0oipumf
+         KX/4IC3QqcOAkKM5ApESQ82eStQm2avbBDb6TXyvnXANbZ+p0gM9WuuoG65BPpSeZFR/
+         Fr5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753808483; x=1754413283;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uLae6rGolk8xBHVpk0k+TCgO/RkNYprItl9+NHm0eIk=;
-        b=sZ69I4fDyASJHwVTPg0X3XgxbDoaml4FylKc32EmzPGbESIniox+vX8Eh9N1/sva56
-         Zd+gj9YSl8kjDolA4OXaDxF6MyJPxyfZxtkJnOBj7tRpzpY9t+OOmtqp419Vuf02ly2I
-         SiC1NarLm6vL9iIb27OEKs+yuhJkILm8XBcQoI8m+ns4ZzUgNsyYNlWQ7LUukpqEV1BW
-         zMHZAQghaIfN9qfkePZri6TSSeeUqQetHsAe/YXdsZvoYC/66Ah24l07qaRgkrVFYx/8
-         9a2dlJ7T3PhGmCaVukPWqyPATXFacXxRUqKMH7xNgeXJiQd1yBpa1EsGZikcDtTmr89C
-         BUBg==
-X-Forwarded-Encrypted: i=1; AJvYcCUBhWa9pJkSXkkYsCuhv3zHU7UnSquTbSrAO8e1ZcVQ9+G0+kdkeDJioqB4SvJKRRGwMdLYOZ4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzfMMnBSuF08azDdzJLjVk9XULHUG8L+2ttHMLByq+m7sK5ulOh
-	nEbRo74HObHrDWIDi24xMgpkh7RvruQx1n2UYQHd27czAYKSmxmPIQqQPYB76TZc13Wh2UWyG2t
-	ILkkI1lqGVANguG8FKb31tu6TpiEKf8CWx8ar+X4U
-X-Gm-Gg: ASbGnctZgjD8pZB1lOYbcpj332KNHlTMN9NNSpMXB17Nr8xSKsKR34duZjG5FQCeULE
-	SEyil7oS09/bkGsdtCuy1F8j8ew87C2eGXmuibIQuNwUXaU5yIEfEZNjEzvEve08D2GcB4Z/0+7
-	CdtCfHvx4NYN//UqCEq4DdeBV9POM64u5Evb7AO9wB+Sn54D6yxVaEvqTdUDvxzMQPC8LAMvluh
-	tWfZcWPrxhATFxBANl1KloWqr26fkgL4KT9xw==
-X-Google-Smtp-Source: AGHT+IH/aIePrtO3DxKPZfMv5xT5hgN2m1/8dW+fivE+rpVDY5hycH/CbbQptXJfzcn/03b0x58bdoKkBVaXd0RCIyo=
-X-Received: by 2002:a17:903:41c1:b0:231:f6bc:5c84 with SMTP id
- d9443c01a7336-2406789c4c3mr4393805ad.8.1753808482526; Tue, 29 Jul 2025
- 10:01:22 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1753808992; x=1754413792;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=xHLIBiSL/KtnXCFPIH5IfZKEjXvqhs/FSKlHN+gsWGQ=;
+        b=Sq5I0dOu971jw1GlIjot/V36TRUN8fJKChU1P+x2LwOxMbYM6uzGLKi+vtMTyXFP3u
+         /y1wThy6Badk4EidXOLMw9C7AZrv1/o2r6v3xJkRN3opFj7C5e2LN0JUCd2aedeWWNsx
+         1zAUSKVYDiGACfKz0CHd2daaTqn91QflFd+y0/EEF8tc2vvpkThqfyYwsw231FuqKsG7
+         YaJ6/Nj1fidA2i24OZU63RTHNBDNV87PUQj97aD0z0Eegjy+IkdrJ4rwkX89KJ6scct4
+         ESeyNKuhd4jIMtBrJwx/ReLLEWm4DAosmvn6TaGt+95RP776O8/7gEf4DmMGoP4cioaW
+         ELcw==
+X-Forwarded-Encrypted: i=1; AJvYcCUzTC/ZHZn9TlHg1zD6qK93hQcWS8rUqf+aOvvgTFATQazwqsTVV+Zx1ZDy3HyorIf3eaRrPVwi@vger.kernel.org, AJvYcCXcZrXWWHbMo3ASQvR/fqOq5L+At8GfTENy+KzE40Feit2uAXO5+rTKybPvv6qldRXM1TLXgcWLyBltiUo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyuDRtIPk2hh1Jy1O3YGYMOl99sSfOSwYJFI+MJ9o3i4V+VkP+6
+	moh0RVyOA3u5jWxAqqf+/tCyMpalXxE8nmXs/5UHOlHcT83QwPGQ22jW
+X-Gm-Gg: ASbGncsmhRqel6w4ZMD4jiNgvIrHnKMN8lkl81fakTlrfZ3TSQzJACdC4rguupK5JT9
+	1toOCcMvmGsVt24NERDo/7xo7KOfM/0OYjpSUIDrux4y/2qsPZ5pnrE0rLW+eM3ZBcrzXZhYjZR
+	AZ7aGwQ07W2iVTFf215wWozL0TUQEnobVMIq7u6gpu2K/Qt1StOqPgwdEHwrkShFrkizQn52tTB
+	0ATBmajCdndZKupEm5jEE1T6/ensBOZaVKg7FqMJ04lQ+ikN17Qjw50MsrexCfoLYxVvf+ogo0Y
+	ZxvHoyDSoX8VHqiU6neo8SgqAvb2a7cHkRpvlBdoZ4Nm1CChFyGVlQ2xGWWTo/yIQxYJnGM2BeP
+	RU8QvJk3NsSFmlE5xzCe8MZSnxxjJT+75WJrEF0PoQAiCnYXIWHb1ojbCxnkW60TzYCay8A==
+X-Google-Smtp-Source: AGHT+IGKt1HTBUsA00vXgZZAeXtiTpikCp3sMNgA8JtHZT8O9Bose0puGZq4nc2U4ukixdxtD42JsQ==
+X-Received: by 2002:a05:690c:4b08:b0:719:635b:a025 with SMTP id 00721157ae682-71a468f6d6amr9151107b3.26.1753808992316;
+        Tue, 29 Jul 2025 10:09:52 -0700 (PDT)
+Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-719f21ae473sm19163377b3.33.2025.07.29.10.09.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Jul 2025 10:09:49 -0700 (PDT)
+Date: Tue, 29 Jul 2025 13:09:48 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Wang Liang <wangliang74@huawei.com>, 
+ willemdebruijn.kernel@gmail.com, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ horms@kernel.org, 
+ atenart@kernel.org
+Cc: yuehaibing@huawei.com, 
+ zhangchangzhong@huawei.com, 
+ wangliang74@huawei.com, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org
+Message-ID: <6889005c9d7f1_1669652947@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250729123907.3318425-1-wangliang74@huawei.com>
+References: <20250729123907.3318425-1-wangliang74@huawei.com>
+Subject: Re: [RFC PATCH net v2] net: drop gso udp packets in udp_rcv_segment()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <cover.1753694913.git.asml.silence@gmail.com> <aIevvoYj7BcURD3F@mini-arch>
- <df74d6e8-41cc-4840-8aca-ad7e57d387ce@gmail.com> <aIfb1Zd3CSAM14nX@mini-arch>
- <0dbb74c0-fcd6-498f-8e1e-3a222985d443@gmail.com> <aIf0bXkt4bvA-0lC@mini-arch>
- <CAHS8izPLxAQn7vK1xy+T2e+rhYnp7uX9RimEojMqNVpihPw4Rg@mail.gmail.com> <aIj5nuJJy1FVqbjC@mini-arch>
-In-Reply-To: <aIj5nuJJy1FVqbjC@mini-arch>
-From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 29 Jul 2025 10:01:09 -0700
-X-Gm-Features: Ac12FXy8tZ7XbjPhzDO9LU7INNX5RkKHJldwZGYBjM7YamieRaoD_r2_UGXNfKQ
-Message-ID: <CAHS8izOh=ix30qQYDofSPG8byGDf1CDKKAdHU2WCovTMUe3oaw@mail.gmail.com>
-Subject: Re: [RFC v1 00/22] Large rx buffer support for zcrx
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: Pavel Begunkov <asml.silence@gmail.com>, Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
-	io-uring@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
-	Willem de Bruijn <willemb@google.com>, Paolo Abeni <pabeni@redhat.com>, andrew+netdev@lunn.ch, 
-	horms@kernel.org, davem@davemloft.net, sdf@fomichev.me, dw@davidwei.uk, 
-	michael.chan@broadcom.com, dtatulea@nvidia.com, ap420073@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jul 29, 2025 at 9:41=E2=80=AFAM Stanislav Fomichev <stfomichev@gmai=
-l.com> wrote:
->
-> On 07/28, Mina Almasry wrote:
-> > On Mon, Jul 28, 2025 at 3:06=E2=80=AFPM Stanislav Fomichev <stfomichev@=
-gmail.com> wrote:
-> > >
-> > > On 07/28, Pavel Begunkov wrote:
-> > > > On 7/28/25 21:21, Stanislav Fomichev wrote:
-> > > > > On 07/28, Pavel Begunkov wrote:
-> > > > > > On 7/28/25 18:13, Stanislav Fomichev wrote:
-> > > > ...>>> Supporting big buffers is the right direction, but I have th=
-e same
-> > > > > > > feedback:
-> > > > > >
-> > > > > > Let me actually check the feedback for the queue config RFC...
-> > > > > >
-> > > > > > it would be nice to fit a cohesive story for the devmem as well=
-.
-> > > > > >
-> > > > > > Only the last patch is zcrx specific, the rest is agnostic,
-> > > > > > devmem can absolutely reuse that. I don't think there are any
-> > > > > > issues wiring up devmem?
-> > > > >
-> > > > > Right, but the patch number 2 exposes per-queue rx-buf-len which
-> > > > > I'm not sure is the right fit for devmem, see below. If all you
-> > > >
-> > > > I guess you're talking about uapi setting it, because as an
-> > > > internal per queue parameter IMHO it does make sense for devmem.
-> > > >
-> > > > > care is exposing it via io_uring, maybe don't expose it from netl=
-ink for
-> > > >
-> > > > Sure, I can remove the set operation.
-> > > >
-> > > > > now? Although I'm not sure I understand why you're also passing
-> > > > > this per-queue value via io_uring. Can you not inherit it from th=
-e
-> > > > > queue config?
-> > > >
-> > > > It's not a great option. It complicates user space with netlink.
-> > > > And there are convenience configuration features in the future
-> > > > that requires io_uring to parse memory first. E.g. instead of
-> > > > user specifying a particular size, it can say "choose the largest
-> > > > length under 32K that the backing memory allows".
-> > >
-> > > Don't you already need a bunch of netlink to setup rss and flow
-> > > steering? And if we end up adding queue api, you'll have to call that
-> > > one over netlink also.
-> > >
-> >
-> > I'm thinking one thing that could work is extending bind-rx with an
-> > optional rx-buf-len arg, which in the code translates into devmem
-> > using the new net_mp_open_rxq variant which not only restarts the
-> > queue but also sets the size. From there the implementation should be
-> > fairly straightforward in devmem. devmem currently rejects any pp for
-> > which pp.order !=3D 0. It would need to start accepting that and
-> > forwarding the order to the gen_pool doing the allocations, etc.
->
-> Right, that's the logical alternative, to put that rx-buf-len on the
-> binding to control the size of the niovs. But then what do we do with
-> the queue's rx-buf-len? bnxt patch in the series does
-> page_pool_dev_alloc_frag(..., bp->rx_page_size). bp->rx_page_size comes
-> from netlink. Does it need to be inherited from the pp in the devmem
-> case somehow?
+Can limit to drop UFO packets, as other GSO packets will get segmented
+correctly.
 
-I need to review the series closely, but the only thing that makes
-sense to me off the bat is that the rx-buf-len option sets the
-rx-buf-len of the queue as if you called the queue-set API in a
-separate call (and the unbind would reset the value to default).
+Wang Liang wrote:
+> When sending a packet with virtio_net_hdr to tun device, if the gso_type
+> in virtio_net_hdr is SKB_GSO_UDP and the gso_size is less than udphdr
+> size, below crash may happen.
+> 
+>   ------------[ cut here ]------------
+>   kernel BUG at net/core/skbuff.c:4572!
+>   Oops: invalid opcode: 0000 [#1] SMP NOPTI
+>   CPU: 0 UID: 0 PID: 62 Comm: mytest Not tainted 6.16.0-rc7 #203 PREEMPT(voluntary)
+>   Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+>   RIP: 0010:skb_pull_rcsum+0x8e/0xa0
+>   Code: 00 00 5b c3 cc cc cc cc 8b 93 88 00 00 00 f7 da e8 37 44 38 00 f7 d8 89 83 88 00 00 00 48 8b 83 c8 00 00 00 5b c3 cc cc cc cc <0f> 0b 0f 0b 66 66 2e 0f 1f 84 00 000
+>   RSP: 0018:ffffc900001fba38 EFLAGS: 00000297
+>   RAX: 0000000000000004 RBX: ffff8880040c1000 RCX: ffffc900001fb948
+>   RDX: ffff888003e6d700 RSI: 0000000000000008 RDI: ffff88800411a062
+>   RBP: ffff8880040c1000 R08: 0000000000000000 R09: 0000000000000001
+>   R10: ffff888003606c00 R11: 0000000000000001 R12: 0000000000000000
+>   R13: ffff888004060900 R14: ffff888004050000 R15: ffff888004060900
+>   FS:  000000002406d3c0(0000) GS:ffff888084a19000(0000) knlGS:0000000000000000
+>   CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>   CR2: 0000000020000040 CR3: 0000000004007000 CR4: 00000000000006f0
+>   Call Trace:
+>    <TASK>
+>    udp_queue_rcv_one_skb+0x176/0x4b0 net/ipv4/udp.c:2445
+>    udp_queue_rcv_skb+0x155/0x1f0 net/ipv4/udp.c:2475
+>    udp_unicast_rcv_skb+0x71/0x90 net/ipv4/udp.c:2626
+>    __udp4_lib_rcv+0x433/0xb00 net/ipv4/udp.c:2690
+>    ip_protocol_deliver_rcu+0xa6/0x160 net/ipv4/ip_input.c:205
+>    ip_local_deliver_finish+0x72/0x90 net/ipv4/ip_input.c:233
+>    ip_sublist_rcv_finish+0x5f/0x70 net/ipv4/ip_input.c:579
+>    ip_sublist_rcv+0x122/0x1b0 net/ipv4/ip_input.c:636
+>    ip_list_rcv+0xf7/0x130 net/ipv4/ip_input.c:670
+>    __netif_receive_skb_list_core+0x21d/0x240 net/core/dev.c:6067
+>    netif_receive_skb_list_internal+0x186/0x2b0 net/core/dev.c:6210
+>    napi_complete_done+0x78/0x180 net/core/dev.c:6580
+>    tun_get_user+0xa63/0x1120 drivers/net/tun.c:1909
+>    tun_chr_write_iter+0x65/0xb0 drivers/net/tun.c:1984
+>    vfs_write+0x300/0x420 fs/read_write.c:593
+>    ksys_write+0x60/0xd0 fs/read_write.c:686
+>    do_syscall_64+0x50/0x1c0 arch/x86/entry/syscall_64.c:63
+>    </TASK>
+> 
+> To trigger gso segment in udp_queue_rcv_skb(), we should also set option
+> UDP_ENCAP_ESPINUDP to enable udp_sk(sk)->encap_rcv. When the encap_rcv
+> hook return 1 in udp_queue_rcv_one_skb(), udp_csum_pull_header() will try
+> to pull udphdr, but the skb size has been segmented to gso size, which
+> leads to this crash.
+> 
+> Previous commit cf329aa42b66 ("udp: cope with UDP GRO packet misdirection")
+> introduces segmentation in UDP receive path only for GRO, which was never
+> intended to be used for UFO, so drop gso udp packets in udp_rcv_segment().
+> 
+> Fixes: cf329aa42b66 ("udp: cope with UDP GRO packet misdirection")
+> Fixes: 3d010c8031e3 ("udp: do not accept non-tunnel GSO skbs landing in a tunnel")
 
---=20
-Thanks,
-Mina
+Only one Fixes tag, to know where to backport too.
+
+The segmentation on receive is introduced in the first commit. I'd
+keep only that.
+
+And please add a Link: to the email thread with the analysis of the
+bug, your v1 (above the ---).
+
+> Suggested-by: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+> Signed-off-by: Wang Liang <wangliang74@huawei.com>
+> ---
+> v1: https://lore.kernel.org/netdev/20250724083005.3918375-1-wangliang74@huawei.com/
+> v2: Drop ufo packets instead of checking min gso size.
+> ---
+>  include/net/udp.h | 22 ++++++++++++++++------
+>  1 file changed, 16 insertions(+), 6 deletions(-)
+> 
+> diff --git a/include/net/udp.h b/include/net/udp.h
+> index a772510b2aa5..e3fcda71f6c1 100644
+> --- a/include/net/udp.h
+> +++ b/include/net/udp.h
+> @@ -587,6 +587,14 @@ static inline struct sk_buff *udp_rcv_segment(struct sock *sk,
+>  {
+>  	netdev_features_t features = NETIF_F_SG;
+>  	struct sk_buff *segs;
+> +	int drop_count = 1;
+
+This is rare, can move initialization into the branch.
+> +
+> +	/*
+> +	 * Segmentation in UDP receive path is only for UDP GRO, drop udp
+> +	 * fragmentation offload (UFO) packets.
+> +	 */
+> +	if (skb_shinfo(skb)->gso_type & (SKB_GSO_UDP | SKB_GSO_UDP_L4))
+
+Only SKB_GSO_UDP.
+
+The purpose of this function is to correctly segment SKB_GSO_UDP_L4
+packets.
+
+> +		goto drop;
+>  
+>  	/* Avoid csum recalculation by skb_segment unless userspace explicitly
+>  	 * asks for the final checksum values
+> @@ -610,16 +618,18 @@ static inline struct sk_buff *udp_rcv_segment(struct sock *sk,
+>  	 */
+>  	segs = __skb_gso_segment(skb, features, false);
+>  	if (IS_ERR_OR_NULL(segs)) {
+> -		int segs_nr = skb_shinfo(skb)->gso_segs;
+> -
+> -		atomic_add(segs_nr, &sk->sk_drops);
+> -		SNMP_ADD_STATS(__UDPX_MIB(sk, ipv4), UDP_MIB_INERRORS, segs_nr);
+> -		kfree_skb(skb);
+> -		return NULL;
+> +		drop_count = skb_shinfo(skb)->gso_segs;
+> +		goto drop;
+>  	}
+>  
+>  	consume_skb(skb);
+>  	return segs;
+> +
+> +drop:
+> +	atomic_add(drop_count, &sk->sk_drops);
+> +	SNMP_ADD_STATS(__UDPX_MIB(sk, ipv4), UDP_MIB_INERRORS, drop_count);
+> +	kfree_skb(skb);
+> +	return NULL;
+>  }
+>  
+>  static inline void udp_post_segment_fix_csum(struct sk_buff *skb)
+> -- 
+> 2.34.1
+> 
+
+
 
