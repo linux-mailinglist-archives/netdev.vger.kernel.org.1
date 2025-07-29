@@ -1,137 +1,90 @@
-Return-Path: <netdev+bounces-210879-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210880-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28979B152DF
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 20:34:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C2F1B15312
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 20:47:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 02CE81889EDE
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 18:34:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 53C86561B7F
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 18:47:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A831242D6E;
-	Tue, 29 Jul 2025 18:34:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FGasT69i"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 261D925394A;
+	Tue, 29 Jul 2025 18:47:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E845220F20;
-	Tue, 29 Jul 2025 18:34:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF4B4237180
+	for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 18:47:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753814052; cv=none; b=rXZC846JfA9tqkR5Oq3kG+MSZCaGTPcBumpJ/2y2TlsaQwquIrGKBK1UnsN65XLET2CMnNxhH0KcOFmgjE9OupQFibZwHb44vObIsgnX1GYrFbSM4LVpYcrKph2yTfxC8LT3Ik1VSCWzEYA00dM78in3umB+RoB47nZSiB7e2HE=
+	t=1753814832; cv=none; b=fkH/2nTcbidLNysUxNvtXS6x15xs7mWzl6tMdiX/vooU8JD4TK4r7W7HFS+At7RUDRKypFkOK3CXCSHRBaSVca7mNnt0oaw+Is3DLdZE7cf2t1ottiJV9Frp+6BGqbpL+gqNCQsn4ItzvO868Oj67jtXByIF4dhYuHQ4eueG6yo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753814052; c=relaxed/simple;
-	bh=FL9N2jUW9ILZvMTN4kv4hjivBOzbZrdxkcak7uxAnuA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=iX1K36Wd/r5Z4D11ZRiRANEI51+XozQLmSsmjzeektWi7HhEZE/WW0Y2qeod3RT4WfetyMnhFtdsXGu37Lumj7369rEnWvtV4nJpq6KSodOTc0p+h74Aai3R9Tq4g6l3HbMioYvbEC2ImxemfU6KMAkfpeNPkH8jICx74hqA6qU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FGasT69i; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id EB641C4CEEF;
-	Tue, 29 Jul 2025 18:34:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753814052;
-	bh=FL9N2jUW9ILZvMTN4kv4hjivBOzbZrdxkcak7uxAnuA=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=FGasT69iyDvEF4s7Z1+JN86M1M4Zcuzi/d4ii0HSEqljoRFMVwN5hcuNLfSUrmd28
-	 1bFR4peXanuSv5H1ehUleXC0g5XgGgwwxsi+vG//QOa9eBNrHY6X+CBDLGlrlJScJG
-	 JdqykLK7y9gKW47nee0B8ZJ0zrcX6ph55DtHlYTr4BGjnja31zWiJuOx8kZmgYgfIA
-	 Ehm5s9c4tdeh5Cb9r9krSm+dv3c2L3JP1hOudUW/kznXz5oXqTqb0hfoz73EONCnl3
-	 bhD19PVxs7D+rne4ETAENYPoCslOELNXuFdNjrpVmkepy1+7/FX5xNhBUHzcsG7/zI
-	 JJjFYUPrcXK7Q==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2178C87FCA;
-	Tue, 29 Jul 2025 18:34:11 +0000 (UTC)
-From: Christoph Paasch via B4 Relay <devnull+cpaasch.openai.com@kernel.org>
-Date: Tue, 29 Jul 2025 11:34:00 -0700
-Subject: [PATCH net] net/mlx5: Correctly set gso_segs when LRO is used
+	s=arc-20240116; t=1753814832; c=relaxed/simple;
+	bh=dJquwTid9tF52hRjBWfKnIo1339t3mzBrAkjXAzfhbI=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=eaXpuRkbM8gLx+oy3F8hd1evmO7yLTVojNUXdxC8Q1Csq4jBDjwjFviYB3+6cNwhxGN+DtccSwOZzQBiu3hk8ivlR8uDExCemSwF0UpANyDB/5GpIgRqUrYnWa1BX+irVVoQip3s/jQ3DJeGT1xPA6175uBLmbFoWEDjyT326H0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3ddc5137992so71409195ab.2
+        for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 11:47:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753814826; x=1754419626;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cKd3St0RrZp1EfD+ZBL0RqGv8txDOXUCQcCl+2+1qpU=;
+        b=VGidCSmt5OUZc3SYKYW2QnVPOk3p9q40yaINzFVhEZAkWGRN1l2vjtUXyv3p1HxKMj
+         tlGjed3djQJiIauXWt466d2WaadkRmK7UBJANf174ihP6RGMJ79hC2U45Ck/deUebcmY
+         SEKhJI/APr951UtsJ3Hlg17m7ZzD0gBnrQdSCn6F0np4GsY4qSLSxerkwneBTJHXK4kO
+         7hsO2F7nDKEtDLWhy3MqRfsPjvz6A6e0Wffp8kr23a1+Q68RpKreAT+RKiSWY8Gs4YOO
+         L2rtnsVgO835tU4UNtGJDKfqXZTnJX8TR72VK3Uj40N2ihTkyE4VlhG4b3tWqSn60TC/
+         PmqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVuvdf2rTSyoNUDFIHH32XLxPM3UnWPxXgorykCimT6hS375nMJdP6ZafpYno2cHRUJxgeJvNg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzR1hp9T1TpVxfaimpi+I1fsOFLjaKQ4POPyhIL93YWvLUlU+LJ
+	z+1pYYMmMs8iFvLNhyIiozfLZdiL2nUCIpIOE6DokuZsjLAcNTZmInIXc0n5tRB2HjRIZOr78fS
+	0HJfHse5+9a3npwdWzOXOV+UsTt7RybN9dude1iupofWjnQoq+2/L9dyCAh8=
+X-Google-Smtp-Source: AGHT+IFEGANFC6sFs0qxttEtpboZ4OLIeGa6jj7ufGyldWSrrqMfY3EEdsLhOqh4ozMAOoH19V6rVvg6f8U2ez4U4YcsJ+stxzpm
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250729-mlx5_gso_segs-v1-1-b48c480c1c12@openai.com>
-X-B4-Tracking: v=1; b=H4sIABcUiWgC/x3MSQqAMBAF0atIrw3EYHC4iog4fGODRkmLCOLdD
- S7fouohQWAI1clDARcL7z4iSxMal947KJ6iyWhjdWEqta237ZzsncCJKmHRmykfqkFTbI6Ame/
- /15DHSe37fvYiHwdkAAAA
-X-Change-ID: 20250729-mlx5_gso_segs-8e5ea2d4b9b0
-To: Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, 
- Mark Bloch <mbloch@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Amir Vadai <amirv@mellanox.com>
-Cc: netdev@vger.kernel.org, linux-rdma@vger.kernel.org, 
- Gal Pressman <gal@nvidia.com>, Christoph Paasch <cpaasch@openai.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1753814051; l=2293;
- i=cpaasch@openai.com; s=20250712; h=from:subject:message-id;
- bh=BEl29bER/lvNXl8OFGctWB+GNXoUpmP6lKzTKh8mgKg=;
- b=yG4Ad4zj5YUqZ8aVs2erdhWF4rIFYiTUjcQ5GjoBH6yq2o/jWDsZQQKaa5fOXpKT2toAU1YBc
- BIRIRVF3CTBAzabqecpVEuwaesH5SNP3pEififo1w7jqr08AnCvRt9H
-X-Developer-Key: i=cpaasch@openai.com; a=ed25519;
- pk=1HRHZlVUZPziMZvsAQFvP7n5+uEosTDAjXmNXykdxdg=
-X-Endpoint-Received: by B4 Relay for cpaasch@openai.com/20250712 with
- auth_id=459
-X-Original-From: Christoph Paasch <cpaasch@openai.com>
-Reply-To: cpaasch@openai.com
+X-Received: by 2002:a05:6e02:5e82:b0:3e2:9f1e:e291 with SMTP id
+ e9e14a558f8ab-3e3f64ae682mr9549805ab.21.1753814826062; Tue, 29 Jul 2025
+ 11:47:06 -0700 (PDT)
+Date: Tue, 29 Jul 2025 11:47:06 -0700
+In-Reply-To: <aIisBdRAM2vZ_VCW@krikkit>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6889172a.a00a0220.26d0e1.000d.GAE@google.com>
+Subject: Re: [syzbot] [net?] WARNING in xfrm_state_fini (3)
+From: syzbot <syzbot+6641a61fe0e2e89ae8c5@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, herbert@gondor.apana.org.au, 
+	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, sd@queasysnail.net, 
+	steffen.klassert@secunet.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-From: Christoph Paasch <cpaasch@openai.com>
+Hello,
 
-When gso_segs is left at 0, a number of assumptions will end up being
-incorrect throughout the stack.
+syzbot has tested the proposed patch and the reproducer did not trigger any issue:
 
-For example, in the GRO-path, we set NAPI_GRO_CB()->count to gso_segs.
-So, if a non-LRO'ed packet followed by an LRO'ed packet is being
-processed in GRO, the first one will have NAPI_GRO_CB()->count set to 1 and
-the next one to 0 (in dev_gro_receive()).
-Since commit 531d0d32de3e
-("net/mlx5: Correctly set gso_size when LRO is used")
-these packets will get merged (as their gso_size now matches).
-So, we end up in gro_complete() with NAPI_GRO_CB()->count == 1 and thus
-don't call inet_gro_complete(). Meaning, checksum-validation in
-tcp_checksum_complete() will fail with a "hw csum failure".
+Reported-by: syzbot+6641a61fe0e2e89ae8c5@syzkaller.appspotmail.com
+Tested-by: syzbot+6641a61fe0e2e89ae8c5@syzkaller.appspotmail.com
 
-Even before the above mentioned commit, incorrect gso_segs means that other
-things like TCP's accounting of incoming packets (tp->segs_in,
-data_segs_in, rcv_ooopack) will be incorrect. Which means that if one
-does bytes_received/data_segs_in, the result will be bigger than the
-MTU.
+Tested on:
 
-Fix this by initializing gso_segs correctly when LRO is used.
+commit:         86aa7218 Merge tag 'chrome-platform-v6.17' of git://gi..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=16eb74a2580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6aef71a615d0cdf2
+dashboard link: https://syzkaller.appspot.com/bug?extid=6641a61fe0e2e89ae8c5
+compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=14b29782580000
 
-Fixes: e586b3b0baee ("net/mlx5: Ethernet Datapath files")
-Reported-by: Gal Pressman <gal@nvidia.com>
-Closes: https://lore.kernel.org/netdev/6583783f-f0fb-4fb1-a415-feec8155bc69@nvidia.com/
-Signed-off-by: Christoph Paasch <cpaasch@openai.com>
----
- drivers/net/ethernet/mellanox/mlx5/core/en_rx.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-index 7462514c7f3d1606339ede13a6207c1629ab65a3..da3e340c99b72ce27861cccaa5bd722c1b446a55 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-@@ -1567,6 +1567,7 @@ static inline void mlx5e_build_rx_skb(struct mlx5_cqe64 *cqe,
- 		unsigned int hdrlen = mlx5e_lro_update_hdr(skb, cqe, cqe_bcnt);
- 
- 		skb_shinfo(skb)->gso_size = DIV_ROUND_UP(cqe_bcnt - hdrlen, lro_num_seg);
-+		skb_shinfo(skb)->gso_segs = lro_num_seg;
- 		/* Subtract one since we already counted this as one
- 		 * "regular" packet in mlx5e_complete_rx_cqe()
- 		 */
-
----
-base-commit: afd8c2c9e2e29c6c7705635bea2960593976dacc
-change-id: 20250729-mlx5_gso_segs-8e5ea2d4b9b0
-
-Best regards,
--- 
-Christoph Paasch <cpaasch@openai.com>
-
-
+Note: testing is done by a robot and is best-effort only.
 
