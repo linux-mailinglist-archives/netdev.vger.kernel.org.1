@@ -1,80 +1,199 @@
-Return-Path: <netdev+bounces-210737-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210734-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F938B149D4
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 10:13:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E149BB149BD
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 10:08:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B4DE7545BB2
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 08:13:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 09FD818A1FA0
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 08:08:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EC93275AE2;
-	Tue, 29 Jul 2025 08:13:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 763F92750F0;
+	Tue, 29 Jul 2025 08:08:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=procento.pl header.i=@procento.pl header.b="apKLXs3u"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LooOaRcD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.procento.pl (mail.procento.pl [51.254.119.53])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AFA9270EA8
-	for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 08:13:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.254.119.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C6811990B7;
+	Tue, 29 Jul 2025 08:07:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753776790; cv=none; b=HYOfeHmC6ixgXJo1hNCBEZTTKbm+fBhbbWXsE1dCJPVzePKEfVycFFlIYJ0Bi+bDY1ksjguFg3muGhqjRxuEXpG/UK3iLVFTEazF61PJF6jve3ggAJf7OBAevMcomj/mJTR+BWyxRvKBNshKVNKw77qmU9BT3rwIYObA+FDfVhE=
+	t=1753776480; cv=none; b=FuixOy2sry35RcT+C5mdyJQJa1Fv1o/08GVlV9MXQ2tOnrnx8ezgUJcWxcI7Aj7Xx4a0y33j//cuN5jfZ8GBBNX2EHIxiGvW6DxeXPzp76IyEqQRweEnIZIN/DE8SED1l4LF/9N5Rk9i7/XhRYaO+GUJV1Ec+TIHUT0FE43roQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753776790; c=relaxed/simple;
-	bh=1LqgaeQowsSJKbhTflijwyTSIB6MHFh4Bku4juBFMJ8=;
-	h=Message-ID:Date:From:To:Subject:MIME-Version:Content-Type; b=ut2HBUbR9+NmmHZODKgK8fh4uAKKqamkdt/dGFWWFZKxN7apBLzTm3dAhc8sz9uEyIH8EJfiXSjz2AV6X+F0za+9fTzbYxIW+UWUuYQ5ia1NqfVyFKJ/CJDkdVqJTGnlYRVvKYrEFxR+NQUl9YbpRhsPRKhv9Y9gZBuHms6XlhI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=procento.pl; spf=pass smtp.mailfrom=procento.pl; dkim=pass (2048-bit key) header.d=procento.pl header.i=@procento.pl header.b=apKLXs3u; arc=none smtp.client-ip=51.254.119.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=procento.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=procento.pl
-Received: by mail.procento.pl (Postfix, from userid 1002)
-	id 263DE22752; Tue, 29 Jul 2025 10:06:11 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=procento.pl; s=mail;
-	t=1753776382; bh=1LqgaeQowsSJKbhTflijwyTSIB6MHFh4Bku4juBFMJ8=;
-	h=Date:From:To:Subject:From;
-	b=apKLXs3uzQhR0caKzDh8eT4weJNe3gIBVKSInvFKA7VyAFzIIXJlTBzR7Wk6zd/js
-	 VBR6XtGVhn6c7a253XdDt/Xgo9TlOvghl1wXRz84zn2QM6PgCIUaph/gEmS3SchVOQ
-	 ieXHS9+n0+vhN8CzLApAYHnhBq2IHxf9O8o3kD7OaKx4r87u3AoVH9ejJG7FietnFR
-	 5BOnn2YP/lGH6mzjvJgnWw/QYQ4uYojN1ldf4PmRYDb4NaXBXLADL9WTeDp6DySogD
-	 RDLKUgxCWizyEdCULohaTwUZFqUpZ6efgp9zpdDNefS0kOfQ+CBi+WixHULn13/25F
-	 xWSqzwUO+VbIQ==
-Received: by mail.procento.pl for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 08:06:06 GMT
-Message-ID: <20250729084500-0.1.li.1tycr.0.y1euka53km@procento.pl>
-Date: Tue, 29 Jul 2025 08:06:06 GMT
-From: "Jolanta Borowczyk" <jolanta.borowczyk@procento.pl>
-To: <netdev@vger.kernel.org>
-Subject: Wstrzymanie rat
-X-Mailer: mail.procento.pl
+	s=arc-20240116; t=1753776480; c=relaxed/simple;
+	bh=LVJKkN36qjkh4TnMJiHplxyR9I2VwOGyfMGru+KsKTo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=m8EMFickttn6o7fM24D/HM/eTk8Ep2CeD6/65mD0AdNp5RiuwhQto7FiF1jVwiXuo4MS2B0gNz14ibanrvKaSVJGHtZst9uBKGuSi6io1DlsmdWxtkvGDHPpYt/a6F7uFAP0isnNaEN5BJFpSJK6nqTc0lMjPt+DtmRfaz9VO3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LooOaRcD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61926C4CEEF;
+	Tue, 29 Jul 2025 08:07:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753776479;
+	bh=LVJKkN36qjkh4TnMJiHplxyR9I2VwOGyfMGru+KsKTo=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=LooOaRcDqVFj6TYPVM4bElH0sal8d+yU3vpj7mh7Po0EyZu3w+oLX5+/zt7nQCzdz
+	 +vAFMS5zL9RlCAWEhdqbuoOM+E5IA5rfCGvgDbvUNJOwIMrsT3cEZGBlnK2qbS4y+7
+	 pA3IYoFMvrwEorSeqRqxmIIDGWzwRDlpEF2aWQGrAe9BDg9PdI3mXGGdTAFlXaWii9
+	 sUzxzVgnR9vETwweQNlTaJk28YK8dGPUWCzcY47eJL3yxe7h5pVNMqHXwH3bhyLSBT
+	 l2JvI4VShASNpPFfvNiAgOg3lfZ8/2jhFBWlA2kuS+yKa4xwC2ZBqGpo3XfIjZPjU3
+	 XXuGk0mW/8JxQ==
+Message-ID: <624296dc-69d6-4bdd-bed1-ffcb747fb96d@kernel.org>
+Date: Tue, 29 Jul 2025 17:07:54 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC 1/4] net/handshake: get negotiated tls record size limit
+To: Wilfred Mallawa <wilfred.opensource@gmail.com>, alistair.francis@wdc.com,
+ chuck.lever@oracle.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ donald.hunter@gmail.com, corbet@lwn.net, kbusch@kernel.org, axboe@kernel.dk,
+ hch@lst.de, sagi@grimberg.me, kch@nvidia.com, borisp@nvidia.com,
+ john.fastabend@gmail.com, jlayton@kernel.org, neil@brown.name,
+ okorniev@redhat.com, Dai.Ngo@oracle.com, tom@talpey.com, trondmy@kernel.org,
+ anna@kernel.org, kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-nvme@lists.infradead.org, linux-nfs@vger.kernel.org,
+ Wilfred Mallawa <wilfred.mallawa@wdc.com>
+References: <20250729024150.222513-2-wilfred.opensource@gmail.com>
+ <20250729024150.222513-4-wilfred.opensource@gmail.com>
+Content-Language: en-US
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <20250729024150.222513-4-wilfred.opensource@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Drodzy Przedsi=C4=99biorcy,
+On 7/29/25 11:41, Wilfred Mallawa wrote:
+> From: Wilfred Mallawa <wilfred.mallawa@wdc.com>
+> 
+> During a handshake, an endpoint may specify a maximum record size limit.
+> Currently, this limit is not visble to the kernel particularly in the case
+> where userspace handles the handshake (tlshd/gnutls). This patch adds
+> support for retrieving the record size limit.
+> 
+> This is the first step in ensuring that the kernel can respect the record
+> size limit imposed by the endpoint.
+> 
+> Signed-off-by: Wilfred Mallawa <wilfred.mallawa@wdc.com>
+> ---
+>  Documentation/netlink/specs/handshake.yaml |  3 +++
+>  Documentation/networking/tls-handshake.rst |  8 +++++++-
+>  drivers/nvme/host/tcp.c                    |  3 ++-
+>  drivers/nvme/target/tcp.c                  |  3 ++-
+>  include/net/handshake.h                    |  4 +++-
+>  include/uapi/linux/handshake.h             |  1 +
+>  net/handshake/genl.c                       |  5 +++--
+>  net/handshake/tlshd.c                      | 15 +++++++++++++--
+>  net/sunrpc/svcsock.c                       |  4 +++-
+>  net/sunrpc/xprtsock.c                      |  4 +++-
+>  10 files changed, 40 insertions(+), 10 deletions(-)
+> 
+> diff --git a/Documentation/netlink/specs/handshake.yaml b/Documentation/netlink/specs/handshake.yaml
+> index b934cc513e3d..35d5eb91a3f9 100644
+> --- a/Documentation/netlink/specs/handshake.yaml
+> +++ b/Documentation/netlink/specs/handshake.yaml
+> @@ -84,6 +84,9 @@ attribute-sets:
+>          name: remote-auth
+>          type: u32
+>          multi-attr: true
+> +      -
+> +        name: record-size-limit
+> +        type: u32
+>  
+>  operations:
+>    list:
+> diff --git a/Documentation/networking/tls-handshake.rst b/Documentation/networking/tls-handshake.rst
+> index 6f5ea1646a47..cd984a137779 100644
+> --- a/Documentation/networking/tls-handshake.rst
+> +++ b/Documentation/networking/tls-handshake.rst
+> @@ -169,7 +169,8 @@ The synopsis of this function is:
+>  .. code-block:: c
+>  
+>    typedef void	(*tls_done_func_t)(void *data, int status,
+> -                                   key_serial_t peerid);
+> +                                   key_serial_t peerid,
+> +                                   size_t tls_record_size_limit);
+>  
+>  The consumer provides a cookie in the @ta_data field of the
+>  tls_handshake_args structure that is returned in the @data parameter of
+> @@ -200,6 +201,11 @@ The @peerid parameter contains the serial number of a key containing the
+>  remote peer's identity or the value TLS_NO_PEERID if the session is not
+>  authenticated.
+>  
+> +The @tls_record_size_limit parameter, if non-zero, exposes the tls max
+> +record size advertised by the endpoint. Record size must not exceed this amount.
+> +A negative value shall indicate that the endpoint did not advertise the
+> +maximum record size limit.
 
-zwracam si=C4=99 do Pa=C5=84stwa z propozycj=C4=85 wsparcia w zakresie re=
-dukcji obci=C4=85=C5=BCe=C5=84 finansowych.=20
+size_t cannot be negative... Did you mean:
+"A value of 0 (TLS_NO_RECORD_SIZE_LIMIT)..."
 
-Nasza kancelaria prawna specjalizuje si=C4=99 w skutecznym wstrzymywaniu =
-rat kredytowych i po=C5=BCyczek, umarzaniu nale=C5=BCno=C5=9Bci odsetkowy=
-ch oraz cz=C4=99=C5=9Bci zad=C5=82u=C5=BCenia, a tak=C5=BCe zabezpieczani=
-u przed zaj=C4=99ciem sk=C5=82adnik=C3=B3w maj=C4=85tkowych przedsi=C4=99=
-biorstw.
+Also note that even if the endpoint does not advertize a record sie limit, we
+still have one (16K was it ?). So I think that the name TLS_NO_RECORD_SIZE_LIMIT
+is a little misleading.
 
-Wsp=C3=B3=C5=82praca z naszym zespo=C5=82em pozwoli Pa=C5=84stwu zachowa=C4=
-=87 p=C5=82ynno=C5=9B=C4=87 finansow=C4=85 i kontynuowa=C4=87 dzia=C5=82a=
-lno=C5=9B=C4=87 bez zb=C4=99dnych przestoj=C3=B3w.
+> +
+>  A best practice is to close and destroy the socket immediately if the
+>  handshake failed.
 
-Czy tego typu wsparcie wzbudza Pa=C5=84stwa zainteresowanie?
+[...]
+
+> diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
+> index e1c85123b445..2014d906ff06 100644
+> --- a/net/sunrpc/svcsock.c
+> +++ b/net/sunrpc/svcsock.c
+> @@ -417,13 +417,15 @@ static void svc_tcp_kill_temp_xprt(struct svc_xprt *xprt)
+>   * @data: address of xprt to wake
+>   * @status: status of handshake
+>   * @peerid: serial number of key containing the remote peer's identity
+> + * @tls_record_size_limit: Max tls_record_size_limit of the endpoint
+
+Please make a proper sentence to describe tls_record_size_limit instead of
+repeating that argument name.
+
+>   *
+>   * If a security policy is specified as an export option, we don't
+>   * have a specific export here to check. So we set a "TLS session
+>   * is present" flag on the xprt and let an upper layer enforce local
+>   * security policy.
+>   */
+> -static void svc_tcp_handshake_done(void *data, int status, key_serial_t peerid)
+> +static void svc_tcp_handshake_done(void *data, int status, key_serial_t peerid,
+> +				   size_t tls_record_size_limit)
+>  {
+>  	struct svc_xprt *xprt = data;
+>  	struct svc_sock *svsk = container_of(xprt, struct svc_sock, sk_xprt);
+> diff --git a/net/sunrpc/xprtsock.c b/net/sunrpc/xprtsock.c
+> index 04ff66758fc3..509aa6269b0a 100644
+> --- a/net/sunrpc/xprtsock.c
+> +++ b/net/sunrpc/xprtsock.c
+> @@ -2569,9 +2569,11 @@ static int xs_tcp_tls_finish_connecting(struct rpc_xprt *lower_xprt,
+>   * @data: address of xprt to wake
+>   * @status: status of handshake
+>   * @peerid: serial number of key containing the remote's identity
+> + * @tls_record_size_limit: Max tls_record_size_limit of the endpoint
+
+Same here.
+
+>   *
+>   */
+> -static void xs_tls_handshake_done(void *data, int status, key_serial_t peerid)
+> +static void xs_tls_handshake_done(void *data, int status, key_serial_t peerid,
+> +				  size_t tls_record_size_limit)
+>  {
+>  	struct rpc_xprt *lower_xprt = data;
+>  	struct sock_xprt *lower_transport =
 
 
-Pozdrawiam
-Jolanta Borowczyk
+-- 
+Damien Le Moal
+Western Digital Research
 
