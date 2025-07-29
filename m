@@ -1,53 +1,93 @@
-Return-Path: <netdev+bounces-210865-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210866-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13692B152A0
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 20:23:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CEC0FB152B9
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 20:26:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C38118A0D34
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 18:24:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC0A318A57B6
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 18:26:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36FBE22FDE8;
-	Tue, 29 Jul 2025 18:23:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7B8F23959D;
+	Tue, 29 Jul 2025 18:25:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bGdet10w"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="euw/hil0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F80B41C71;
-	Tue, 29 Jul 2025 18:23:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AE2D22DA0C;
+	Tue, 29 Jul 2025 18:25:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753813417; cv=none; b=vF1pltVZMEAFHrwf/kZ05RQds/RCYIpjOR0l2mB5DTm9jYUECdUUUXtecU7MDQrYb25GHiOgqANzVx1eqV/mIg7LjU8uY6gvwNMuLpm8hS4gvF9+aFT0m1TwhZiZou92Md53A2BEQfnTDyiHciasbFKLnSloqJnMoJ1eQucJeq4=
+	t=1753813554; cv=none; b=pjQQg7yJX5oIQ9GliSiO7kLJ0BHCW/BzEL+njbm7edUnpEVcq+QxWvCv9w/UYWHNy44o2QT1/FzpwwaCn15ajVAhPZ++SE04Rv0PP3LUW90I/KcRHArt7BVe+dS+EAEU8KJrtYoKI3OgVacl6QyJxOiCCGOlB8vREhEfOXySCSQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753813417; c=relaxed/simple;
-	bh=S1tVaqZobHB8q9zjdGUx4CXCdPJYTMB9/vmvwSE1Ngw=;
-	h=Date:From:To:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hvYqkbp7NP1+RaI8UsKrtr1tsP6Fe7hL0csgbf4tWQVDAK/90h+ulsDkfee2vxlpm0/MXKTA5zEWCewQr5aFjKAvdPbgGXcSJtYTmV8DxqFlA35OFRDVsbQTdh8hnWqJ1vk4ROl5OYrHPRlYDRKWa0lNxVxz5IPcNGmIytct0kM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bGdet10w; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74E77C4CEEF;
-	Tue, 29 Jul 2025 18:23:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753813416;
-	bh=S1tVaqZobHB8q9zjdGUx4CXCdPJYTMB9/vmvwSE1Ngw=;
-	h=Date:From:To:Subject:In-Reply-To:References:From;
-	b=bGdet10w95kEaVqZn66PTWKcCrQ78pas7YX0h5Jj3YVyP1v45ehhoXFa5Mnq4cBGO
-	 Aw2K6KyZ+79DM9hHGkYMzpIaPSOGiyldRvbe3oHecsS0hmX+jQ/otlnpB9wxYH4B9y
-	 +i8B7fALpX8urWnUKgAXO3XKElJmuUs0WTxSvyhOYTPavIZB2KxQkTO+HIAGqw9aHw
-	 fnHpQ6QPc/CNqmvSRcdzy5Byq57LeA6FibVZ5nq/siixmZbr8CB3Nc4Bu+3BTqe+Oi
-	 Spscd9g6Fbeytin+kD23bKs7N6rZm6N3GUtV5FOCEnYOthfGVCxOcJqjT+qDlWhNb6
-	 7Z26rBeuksO0w==
-Date: Tue, 29 Jul 2025 11:23:35 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: netdev@vger.kernel.org, netdev-driver-reviewers@vger.kernel.org
-Subject: Re: [ANN] netdev call - Jul 29th (meeting notes + TSC)
-Message-ID: <20250729112335.19061045@kernel.org>
-In-Reply-To: <20250728085356.3f88e8e4@kernel.org>
-References: <20250728085356.3f88e8e4@kernel.org>
+	s=arc-20240116; t=1753813554; c=relaxed/simple;
+	bh=R8tAAhDsHaChf/6OH1TL9IoKL1OxAGqSUkmeWxj0sQQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=eo5FImfTSk4BGuhPkJbZD7E/bLsf3UavUxHccBZetqmt8y8GuWfU/GfEeF5bCs9DiW1UhMNvHeEdKpCc0br/eIB4l1FZXtqzWLifvUTHIkIkaWsnOsP6zpxzMmLyY8IqmJJveQmKfg9qmmoIh6RYWrfy1FP+2Giy35ZTLdkKoWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=euw/hil0; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-75ce8f8a3cdso3850651b3a.0;
+        Tue, 29 Jul 2025 11:25:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753813552; x=1754418352; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=wceFqw6JNPoeqfDtoYx/iGTWc7FUSt0YkQXDCevlJm4=;
+        b=euw/hil0BzbIFLan2fzwjaWBRQ3eT8E3N45lvOLwjbRJWJPeECS4pm6/x0TKB6ttZ9
+         THAaytH7zwHkuT8Xkn96YAwrnoq6TkPoa0LMSfIu03nc6IqhtjB6OfQ75fK142RWS5YV
+         ASwB6GM+tdS2EgW1BaTqUt6YLJYx61V2gZs0RA53ypHvjnyTGYOQDaJLhhTHuww2pT7z
+         6hh5EsekP2RWkZ8h5FP7Sx80Xdl2cYaIBi+cox4dN55F48WGn+zx4bqUzyO5R19kxZox
+         GFXvsW9Q23lV/f1X2L7yToxvgZdqOdOWGkThmvZbN4Wbmaw7HU5nmbPgD31W7DBW2z6n
+         L3JQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753813552; x=1754418352;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wceFqw6JNPoeqfDtoYx/iGTWc7FUSt0YkQXDCevlJm4=;
+        b=CD4wTvieTCleQUquapUuAevbPmj6yYxJFmfog5TrnhECHcCcIwLitfg9kjwyAUzhZM
+         uVhFgqmCZwlCOkFnx1gsN5lXeLgjF4qD0BndFdklu1TrL1GrqpeZndcTOVDhXJ9GqAzs
+         AfRcDmjz21SI+TEvkp4Cm3vxc7tx1hSXTJpSdxLNaAD7feb+6+O9F3QzsaAR7G4WZT97
+         40InHuCA1Ay74YC6pgAfV1fBbY5hY0vx94xaQ/de/voR0zE7yLJKnHA+9nIzNvw3jLGT
+         AJ23z4QPicdX4b4WwvG/9ZQI+R0QkIWRtru68k6zeXCHogXlfLHeUfhWG7oO7jD3QifE
+         MSUg==
+X-Gm-Message-State: AOJu0Yy6S8opTat3ITPn0GjavXdoaZXA96gZy113anf3fvHybaBN020E
+	hb8DkHCetBr+yZ3TlxvSucCAEcbz3y1hPqaL+xKocRMiTQk9AWXUMFcMl9zLwQ==
+X-Gm-Gg: ASbGncuuihFVs2Oq33R9eB60/W6FG8+qrBlUfZQkE6KB7Exegm/ZSQ1P4nTBpf2KgSV
+	OQy32gBKwZvEsh3IUeBENXaO02S83WEYWCRh6CurF1+WBj7L0fT9EYcATnimsD0LYjAwQdWIynI
+	iev4EnB92dzI4O9eLwRxeM+FOdUayzA4X6yNA2ByoxpL9xP82u41yZAg08EPYvE7u9csRSLsV6h
+	Ldr6ZFQ+rCfDOVDuaYp4VkaGP9yPSJoKgdd7d1sbPPdVmX2sbFTf7PsblXCTCLZzHMMZKG8mN9h
+	b0MzOurx9oT8gin9m+aENPRwUZhr49zyxvLoz8ty1K5zMFq7Sz+tAUttUO14a++qbhf6XzGUN6W
+	xAHy/qPbM7zvr
+X-Google-Smtp-Source: AGHT+IHwuNndI0REEvGYHvlYTy+JJ7RdBybAZT4Kbp0/hn+08beSkIQSgGxQEi/zujfWOgGXriQeGg==
+X-Received: by 2002:a05:6a21:998f:b0:235:b6de:447e with SMTP id adf61e73a8af0-23dc0cf6ef5mr725558637.2.1753813551970;
+        Tue, 29 Jul 2025 11:25:51 -0700 (PDT)
+Received: from localhost ([2a03:2880:ff:7::])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b3f7f6b0361sm7651249a12.48.2025.07.29.11.25.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Jul 2025 11:25:51 -0700 (PDT)
+From: Amery Hung <ameryhung@gmail.com>
+To: bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	alexei.starovoitov@gmail.com,
+	andrii@kernel.org,
+	daniel@iogearbox.net,
+	memxor@gmail.com,
+	kpsingh@kernel.org,
+	martin.lau@kernel.org,
+	yonghong.song@linux.dev,
+	song@kernel.org,
+	haoluo@google.com,
+	ameryhung@gmail.com,
+	kernel-team@meta.com
+Subject: [RFC PATCH bpf-next v1 00/11] Remove task and cgroup local
+Date: Tue, 29 Jul 2025 11:25:38 -0700
+Message-ID: <20250729182550.185356-1-ameryhung@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,100 +95,206 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, 28 Jul 2025 08:53:56 -0700 Jakub Kicinski wrote:
-> The bi-weekly call is scheduled for tomorrow at 8:30 am (PT) /=20
-> 5:30 pm (~EU), at https://bbb.lwn.net/rooms/ldm-chf-zxx-we7/join
->=20
-> We have one agenda topic - Arkadiusz Kubalewski says:
->=20
->   Wanted to meet and discuss the need for clock id on microchip driver
->   provided by Ivan, I hope we could have a meeting to brainstorm some
->   ideas and decide next steps on how to deal with such cases.
->=20
-> I can also provide a quick update on the netdev foundation activities.
+* Motivation *
 
-Agenda items for next meeting (Aug 12th):
- - standalone phylink PCS drivers: as part of phylink? or as standalone
-   subsystem? or not at all?
+The goal of this patchset is to make bpf syscalls and helpers updating
+task and cgroup local storage more robust by removing percpu counters
+in them. Task local storage and cgroup storage each employs a percpu
+counter to prevent deadlock caused by recursion. Since the underlying
+bpf local storage takes spinlocks in various operations, bpf programs
+running recursively may try to take a spinlock which is already taken.
+For example, when a tracing bpf program called recursively during
+bpf_task_storage_get(..., F_CREATE) tries to call
+bpf_task_storage_get(..., F_CREATE) again, it will cause AA deadlock
+if the percpu variable is not in place.
 
-Meeting notes
-DPLL
- - Arkadiusz: The standalone DPLL driver from Ivan doesn't have a
-   unique clock ID, which is supposed to be the handle for the whole DPLL
-   devices. The clock ID works for time appliances. The standalone DPLL
-   device doesn't have a network card, so no MAC address, or ID.
- - Ivan: the device can be connected to multiple controllers, and drive
-   multiple clocks. There=E2=80=99s no ID on the device, no serial even. We=
- use
-   a random number for now, devlink can be used to change it.
- - Andrew: it=E2=80=99s an i2c device? (yes, i2c or SPI) Can we use the add=
-ress?
- - Ivan: yes, but the i2c address is static, so if there are multiple
-   buses or a mux the address will be the same for all devices in the
-   system.
- - Andrew: we can include the full bus address (with the bus).
- - Jakub: can we define the relationship to the netdev port in the DT?
- - Ivan: we could extend the DT note which contains the pins to include the=
- MAC phandle.
- - Andrew: you can use the DSA definition as the sample to steal ideas from.
- - Ivan: the DPLL can drive multiple NICs, which device to pick for the clo=
-ck ID.
- - Andrew: a diagram will be very helpful; Jakub: prefer using an explicit =
-annotation.
-Next step: send an RFC to the DT list..
+However, sometimes, the percpu counter may cause bpf syscalls or helpers
+to return errors spuriously, as soon as another threads is also updating
+the local storage or the local storage map. Ideally, the two threads
+could have taken turn to take the locks and perform their jobs
+respectively. However, due to the percpu counter, the syscalls and
+helpers can return -EBUSY even if one of them does not run recursively
+in another one. All it takes for this to happen is if the two threads run
+on the same CPU. This happened when BPF-CI ran the selftest of task local
+data. Since CI runs the test on VM with 2 CPUs, bpf_task_storage_get(...,
+F_CREATE) can easily fail.
+
+The failure mode is not good for users as they need to add retry logic
+in user space or bpf programs to avoid it. Even with retry, there
+is no guaranteed upper bound of the loop for a succeess call. Therefore,
+this patchset seeks to remove the percpu counter and makes the related
+bpf syscalls and helpers more reliable, while still make sure recursion
+deadlock will not happen, with the help of resilient queued spinlock
+(rqspinlock).
 
 
+* Implementation *
 
-We also had a netdev foundation TSC meeting today, here are the notes:
+To remove the percpu counter without introducing deadlock,
+bpf_local_storage is refactored by changing the locks from raw_spin_lock
+to rqspinlock, which prevents deadlock with deadlock detection and a
+timeout mechanism.
 
-CI migration / HW lab:
- - Simon: we sent the RFQ out, colo is 10-15k, managed solution is
-   double that at least, last minute we got an offer to host the lab
-   for free.
- - Andrew: having a commitment for the free offer for at least a year
-   would be good
- - Johannes: the company is considering joining the Governing Board
-   too, so they should stick around
- - Eric: what is the location?
- - Simon: Chicago and Amsterdam, none of them have our people local
-The HW lab project ($70k regardless of colo selection) is approved for
-funding.
+There are two locks in bpf_local_storage due to the ownership model as
+illustrated in the figure below. A map value, which consists of a
+pointer to the map and the data, is a bpf_local_storage_map_data (sdata)
+stored in a bpf_local_storage_elem (selem). A selem belongs to a
+bpf_local_storage and bpf_local_storage_map at the same time. 
+bpf_local_storage::lock (lock_storage->lock in short) protects the list
+in a bpf_local_storage and bpf_local_storage_map_bucket::lock (b->lock)
+protects the hash bucket in a bpf_local_storage_map.
 
-Small budget items (<$1k/yr total - Google Drive, Plausible subscription):
- - Pay for a Google Drive for TSC docs and Plausible for web analytics
-Approved
 
-New members:
- - The company trying to join made us realize we don't have a process defin=
-ed.
- - There may be contentious applications in future, do we want some control?
- - We have a voting system for electing TSC members, but not to Governing B=
-oard.
-Revisit in next meeting.
+ task_struct
+┌ task1 ───────┐       bpf_local_storage
+│ *bpf_storage │---->┌─────────┐
+└──────────────┘<----│ *owner  │         bpf_local_storage_elem
+                     │ *cache[16]        (selem)              selem
+                     │ *smap   │        ┌──────────┐         ┌──────────┐
+                     │ list    │------->│ snode    │<------->│ snode    │
+                     │ lock    │  ┌---->│ map_node │<--┐ ┌-->│ map_node │
+                     └─────────┘  │     │ sdata =  │   │ │   │ sdata =  │
+ task_struct                      │     │ {&mapA,} │   │ │   │ {&mapB,} │
+┌ task2 ───────┐      bpf_local_storage └──────────┘   │ │   └──────────┘
+│ *bpf_storage │---->┌─────────┐  │                    │ │
+└──────────────┘<----│ *owner  │  │                    │ │
+                     │ *cache[16] │      selem         │ │    selem
+                     │ *smap   │  │     ┌──────────┐   │ │   ┌──────────┐
+                     │ list    │--│---->│ snode    │<--│-│-->│ snode    │
+                     │ lock    │  │ ┌-->│ map_node │   └-│-->│ map_node │
+                     └─────────┘  │ │   │ sdata =  │     │   │ sdata =  │
+ bpf_local_storage_map            │ │   │ {&mapB,} │     │   │ {&mapA,} │
+ (smap)                           │ │   └──────────┘     │   └──────────┘
+┌ mapA ───────┐                   │ │                    │
+│ bpf_map map │      bpf_local_storage_map_bucket        │
+│ *buckets    │---->┌ b[0] ┐      │ │                    │
+└─────────────┘     │ list │------┘ │                    │
+                    │ lock │        │                    │
+                    └──────┘        │                    │
+ smap                 ...           │                    │
+┌ mapB ───────┐                     │                    │
+│ bpf_map map │      bpf_local_storage_map_bucket        │
+│ *buckets    │---->┌ b[0] ┐        │                    │
+└─────────────┘     │ list │--------┘                    │
+                    │ lock │                             │
+                    └──────┘                             │
+                    ┌ b[1] ┐                             │
+                    │ list │-----------------------------┘
+                    │ lock │
+                    └──────┘
+                      ...
 
-Rate / rank other projects on GH:
- - We need a shepherd per project first - assign tickets in github
- - TSC members to "like" projects they want to see done
- - Johannes to add more labels/milestones to mark what's already in progress
-Revisit in next meeting.
 
-How do we engage with the Governing Board:
- - Simon: the GB has a chair elected. Whenever we have a proposal we
-   contact the chair and ask for them to convene.
- - Willem: does the board has a regular meeting?
- - Simon: the cadence is not decided, the default is every 3mo. We can
-   ask to expedite, or even to meet monthly.
- - Willem: if we=E2=80=99re trying to get them to convene we should ask abo=
-ut
-   the membership vote right now. Avoid delays.
- - Ask LF if membership approval is allowed. Ask for simple majority vote.
- - Simon: LF will be involved in the email exchange with GB, we can go
-   direct to GB. Probably want a =E2=85=94 majority, simple majority is too
-   weak, veto is too strong.
- - Jakub: what about renewals. How about also optional =E2=85=94 vote to bl=
-ock renewals,
-   if no vote requested renewals auto-approved.
-Ask the board for: HW lab, small items, and the membership vote amendment.
+The refactoring is divided into three steps.
+
+First, in patch 1-4, local storage helpers that take locks are being
+converted to failable. The functions are changed from returning void to
+returning an int error code with the return value temporarily set to 0.
+In callers where the helpers cannot fail in the middle of an update,
+the helper is open coded. In callers that are not allowed to fail, (i.e.,
+bpf_local_storage_destroy() and bpf_local_storage_map_free(), we make
+sure the functions cannot be called recursively, causing deadlock, and
+assert the return value to be 0.
+
+Then, in patch 5, the locks are changed to rqspinlock, and the error
+returned from raw_res_spin_lock_irqsave() is propogated to the syscalls
+and heleprs.
+
+Finally, in patch 7-8, the percpu counters in task and cgroup local
+storage are removed.
+
+Question:
+
+- In bpf_local_storage_destroy() and bpf_local_storage_map_free(), where
+  it is not allow to fail, I assert that the lock acquisition always
+  succeeds based on the fact that 1) these paths cannot run recursively
+  causing AA deadlock and 2) local_storage->lock and b->lock are always
+  acquired in the same order, but I also notice that rqspinlock has
+  a timeout fallback. Is this assertion an okay thing to do? 
+
+
+* Test *
+
+Task and cgroup local storage selftests have already covered deadlock
+caused by recursion. Patch 9 updates the expected result of task local
+storage selftests as task local storage bpf helpers can now run on the
+same CPU as they don't cause deadlock.
+
+* Patch organization *
+
+  E(exposed) L(local storage lock) B(bucket lock)
+  EL    __bpf_local_storage_insert_cache (skip cache update)
+  ELB   bpf_local_storage_destroy (cannot recur)
+  ELB   bpf_local_storage_map_free (cannot recur)
+  ELB   bpf_selem_unlink                  --> Patch 4
+  E B   bpf_selem_link_map                --> Patch 2
+    B   bpf_selem_unlink_map              --> Patch 1
+   L    bpf_selem_unlink_storage          --> Patch 3
+  
+  During the refactoring, to make sure all exposed functions
+  handle the error returned by raw_res_spin_lock_irqsave(),
+  __must_check is added locally to catch all callers.
+  
+  Patch 1-4
+    Convert local storage helpers to failable, or open-code
+    the helpers
+  
+  Patch 5
+    Change local_storage->lock and b->lock from
+    raw_spin_lock to rqspinlock
+  
+  Patch 6
+    Remove percpu lock in task local storage and remove
+    bpf_task_storage_{get,delete}_recur()
+  
+  Patch 7
+    Remove percpu lock in cgroup local storage
+  
+  Patch 8
+    Remove percpu lock in bpf_local_storage
+  
+  Patch 9
+    Update task local storage recursion test
+  
+  Patch 10
+    Remove task local storage stress test
+  
+  Patch 11
+    Update btf_dump to use another percpu variable
+  
+----
+
+Amery Hung (11):
+  bpf: Convert bpf_selem_unlink_map to failable
+  bpf: Convert bpf_selem_link_map to failable
+  bpf: Open code bpf_selem_unlink_storage in bpf_selem_unlink
+  bpf: Convert bpf_selem_unlink to failable
+  bpf: Change local_storage->lock and b->lock to rqspinlock
+  bpf: Remove task local storage percpu counter
+  bpf: Remove cgroup local storage percpu counter
+  bpf: Remove unused percpu counter from bpf_local_storage_map_free
+  selftests/bpf: Update task_local_storage/recursion test
+  selftests/bpf: Remove test_task_storage_map_stress_lookup
+  selftests/bpf: Choose another percpu variable in bpf for btf_dump test
+
+ include/linux/bpf_local_storage.h             |  14 +-
+ kernel/bpf/bpf_cgrp_storage.c                 |  60 +-----
+ kernel/bpf/bpf_inode_storage.c                |   6 +-
+ kernel/bpf/bpf_local_storage.c                | 202 ++++++++++++------
+ kernel/bpf/bpf_task_storage.c                 | 153 ++-----------
+ kernel/bpf/helpers.c                          |   4 -
+ net/core/bpf_sk_storage.c                     |  10 +-
+ .../bpf/map_tests/task_storage_map.c          | 128 -----------
+ .../selftests/bpf/prog_tests/btf_dump.c       |   4 +-
+ .../bpf/prog_tests/task_local_storage.c       |   8 +-
+ .../bpf/progs/read_bpf_task_storage_busy.c    |  38 ----
+ 11 files changed, 184 insertions(+), 443 deletions(-)
+ delete mode 100644 tools/testing/selftests/bpf/map_tests/task_storage_map.c
+ delete mode 100644 tools/testing/selftests/bpf/progs/read_bpf_task_storage_busy.c
+
+-- 
+2.47.3
+
 
