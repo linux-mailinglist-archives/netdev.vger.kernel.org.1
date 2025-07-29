@@ -1,64 +1,68 @@
-Return-Path: <netdev+bounces-210856-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210857-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1E28B15215
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 19:31:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E516CB15221
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 19:34:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 29AD27B081C
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 17:30:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2458A3BA659
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 17:33:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 089311DE4C3;
-	Tue, 29 Jul 2025 17:31:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7DC322ACEF;
+	Tue, 29 Jul 2025 17:34:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="aGvb/i+J"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eabzNBFb"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 481E24A0C
-	for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 17:31:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79B6B23DE;
+	Tue, 29 Jul 2025 17:34:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753810296; cv=none; b=hIGuhTz5rtGHDJDS8bGnyr+nv1NwwNkRLMtxr+/kG0Xkko27uuM/A3z6WK11m2YS9UmphZsOdoxstWTAR3HbuR7nskv2X5DBU+BH96C8RtsAcijwi1rAVtp4009z9j+sO94jKdpuFP4+MHCbZtDQ7pg0eTsc0zkEXf+LYevRbRA=
+	t=1753810449; cv=none; b=JIETLE5QhfwsyABMsREfJec/l8hFALBbEM4TCbU/1CH66JszEklWT56fxSrdevT3ArftEYdjUQURzlBFCVuXVm4fJCOCLKgFL4M0w1q9Fx81eSHicw0sojQ27hVANZDgHr20eR75i8C/0qVA2zG99WXnK2q8uSr23aS3Oo6wLmA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753810296; c=relaxed/simple;
-	bh=y3bpG+sPzl/fFFBwcwLlONLSVo3kcxpCx4UijUP30lk=;
+	s=arc-20240116; t=1753810449; c=relaxed/simple;
+	bh=gqjJxvrbJzU+Y1NaVhsDYvQYmRoqY8d4rd0tdxvq+Yk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aw0fTwnuboEPkQ/c7I3Ol9dv8x8s7k3m98QFzKg5OswJzXGsmKONSXx/eMp6J9yJjRr9Ig6KTkD9TyGciLiCNHVd8rV1g52Na6CxkDAiTLtjah/3CguUovEWbnYiDl6k7BnhHDrI+lORkWBkyl41QEfJSSZ2gSVzIi0sy3sRgXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=aGvb/i+J; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=aKSxifxHJIONDr0VjJJF1bsS+31GhF1VK0dWldW+/t4=; b=aGvb/i+J7eQlpUuA5uH9y3LVox
-	/Pkdq0soFJwPFlloCPNVy6qQbb8d1+SS/1r3kTbncqkcIENqPABuZqVl9EFrbg0ESJH+tWRt+4pu+
-	aBJwkXm3EFOsVLMoGINPaiD5KWIyVrXzHFOMayInCmr1E9ph6gi1Gj7EUbZ3+w5q9JQw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1ugoAa-003DW2-PA; Tue, 29 Jul 2025 19:31:20 +0200
-Date: Tue, 29 Jul 2025 19:31:20 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: Michael Chan <michael.chan@broadcom.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>,
-	intel-wired-lan@lists.osuosl.org,
-	Donald Hunter <donald.hunter@gmail.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=eakSyGE9z6MkG0gQ6NLc1peEB9jxmkIXZ0WSSxeupP/3QvmFcw0JfIisCzSOGBuQY0/Wk0U0BmrJ/lSsq/NJio0f93kABNiEU0mNxtn+32x97Z8Z6s4o1mtGLgDCRUVUg7hV+XGWo3u2wahHXY0pb7gzworRt4Fe2ka6z6d5KfM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eabzNBFb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCAE0C4CEEF;
+	Tue, 29 Jul 2025 17:34:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753810449;
+	bh=gqjJxvrbJzU+Y1NaVhsDYvQYmRoqY8d4rd0tdxvq+Yk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=eabzNBFbEPWmcOna09473itgkl4JYClURyCLK83NCanQbjgmk90/+qQJY4Atgytqj
+	 rYUAH1qzzNHxQd1yjgU2/kCgl6TPIO0Wi6V37MaKbNVUOxy/qtS4t1CB9eIOH0oS4+
+	 th0zFV34hG1n34QcTIOpj8/6/RppgfpxA9iciNRgDIeuFbjPW3LDT8Owui3zZXUiGi
+	 OuCfrzJ5zARMJfLQaie8aapd8hyBFJwp0TwOqaXm8sPlGpioGvKPZ6kOfwOJxDEW+Q
+	 agWpZZCjjMuS6hAMoOB2K03GV5vtXoQaE6RvdFwuB7KakvFjH9jFdBp8R7hMj5DJIz
+	 0fdzZucjTtp4w==
+Date: Tue, 29 Jul 2025 10:34:07 -0700
+From: Drew Fustini <fustini@kernel.org>
+To: Yao Zi <ziyao@disroot.org>
+Cc: Guo Ren <guoren@kernel.org>, Fu Wei <wefu@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
-Subject: Re: [RFC PATCH] ethtool: add FEC bins histogramm report
-Message-ID: <c52af63b-1350-4574-874e-7d6c41bc615d@lunn.ch>
-References: <20250729102354.771859-1-vadfed@meta.com>
- <982c780a-1ff1-4d79-9104-c61605c7e802@lunn.ch>
- <1a7f0aa0-47ae-4936-9e55-576cdf71f4cc@linux.dev>
- <9c1c8db9-b283-4097-bb3f-db4a295de2a5@lunn.ch>
- <4270ff14-06cd-4a78-afe7-1aa5f254ebb6@linux.dev>
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+	Emil Renner Berthing <emil.renner.berthing@canonical.com>,
+	Jisheng Zhang <jszhang@kernel.org>, linux-riscv@lists.infradead.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net 0/3] Fix broken link with TH1520 GMAC when linkspeed
+ changes
+Message-ID: <aIkGDxstQ9Eimw4p@x1>
+References: <20250729093734.40132-1-ziyao@disroot.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,17 +71,47 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4270ff14-06cd-4a78-afe7-1aa5f254ebb6@linux.dev>
+In-Reply-To: <20250729093734.40132-1-ziyao@disroot.org>
 
-> The only one bin will have negative value is the one to signal the end
-> of the list of the bins, which is not actually put into netlink message.
-> It actually better to change spec to have unsigned values, I believe.
+On Tue, Jul 29, 2025 at 09:37:31AM +0000, Yao Zi wrote:
+> It's noted that on TH1520 SoC, the GMAC's link becomes broken after
+> the link speed is changed (for example, running ethtool -s eth0 speed
+> 100 on the peer when negotiated to 1Gbps), but the GMAC could function
+> normally if the speed is brought back to the initial.
+> 
+> Just like many other SoCs utilizing STMMAC IP, we need to adjust the TX
+> clock supplying TH1520's GMAC through some SoC-specific glue registers
+> when linkspeed changes. But it's found that after the full kernel
+> startup, reading from them results in garbage and writing to them makes
+> no effect, which is the cause of broken link.
+> 
+> Further testing shows perisys-apb4-hclk must be ungated for normal
+> access to Th1520 GMAC APB glue registers, which is neither described in
+> dt-binding nor acquired by the driver.
+> 
+> This series expands the dt-binding of TH1520's GMAC to allow an extra
+> "APB glue registers interface clock", instructs the driver to acquire
+> and enable the clock, and finally supplies CLK_PERISYS_APB4_HCLK for
+> TH1520's GMACs in SoC devicetree.
+> 
+> Yao Zi (3):
+>   dt-bindings: net: thead,th1520-gmac: Describe APB interface clock
+>   net: stmmac: thead: Get and enable APB clock on initialization
+>   riscv: dts: thead: Add APB clocks for TH1520 GMACs
+> 
+>  .../devicetree/bindings/net/thead,th1520-gmac.yaml     |  8 ++++++--
+>  arch/riscv/boot/dts/thead/th1520.dtsi                  | 10 ++++++----
+>  drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c      |  6 ++++++
+>  3 files changed, 18 insertions(+), 6 deletions(-)
+> 
+> -- 
+> 2.50.1
+> 
 
-Can any of these NICs send runt packets? Can any send packets without
-an ethernet header and FCS?
+Thanks for fixing this issue. I've tested this series on next-20250729
+with my LPi4a. I'm able to change the speed from 1000 to 100 and back to
+1000. The network continues to work without any problems through those
+transistions.
 
-Seems to me, the bin (0,0) is meaningless, so can could be considered
-the end marker. You then have unsigned everywhere, keeping it KISS.
-
-	Andrew
+Tested-by: Drew Fustini <fustini@kernel.org>
 
