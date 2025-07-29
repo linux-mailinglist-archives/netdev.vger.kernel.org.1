@@ -1,67 +1,201 @@
-Return-Path: <netdev+bounces-210899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210900-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 567F0B155B4
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 01:06:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A17E1B155C3
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 01:13:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E1941652C1
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 23:06:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA88F17BE42
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 23:13:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B76E9246BA4;
-	Tue, 29 Jul 2025 23:06:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FD9228152A;
+	Tue, 29 Jul 2025 23:13:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fnQIG7sl"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BiEAl4Qm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9415E1DE2BC
-	for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 23:06:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 616CA27FD52
+	for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 23:13:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753830370; cv=none; b=s8Lhh6qZfQKxqINUMn6UuxeJgFaCFJGGTAYJAP5LV3qdal+VR+vXZRvGPuOcW+7+C98am2/ntlRv56g4071O9aHUBycb/87wDJ/SlPxZvgW5s4TJQHDKusUUfudvc/7M/MZluxW0FKvVCtulJFHNOLu+LIC102AGG/q07N+gauE=
+	t=1753830796; cv=none; b=JvxO69fItJuQGpUk5rvdr/5/AGcu/DMC26efLzsujd+y3m1BFYVuiCwolO+nfN5I57XF9D6uFTNKsWelwVYsE1bID+MBH2LW6WE+7mF0WT4sxL24f8clmKYArtJiNQ6w3hkY+zWeZI5phd02U6fEqWKL7zHJ8UPbD5HdDpbXLLM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753830370; c=relaxed/simple;
-	bh=+Wr4K6PcN4qzFFnplG2PSa5iNR1f/ScDM8zomogNbtU=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=NCVG0YE8OuUHNcx75Pfm1dYth0PGnlwC5T/3uxPB2j9tsvWTlRZNGcQnBqQ5Dmwz6+7YFMEgIHG+zQpfgm3xb6BxRiSx65mMIOKVklmnei+jQ3uTjsUSaB+f6yjpXHvr5jC74MbwsJhJcWOaj7bFRa7lPUxYPVxPtbVbT7zm4ps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fnQIG7sl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCDABC4CEEF;
-	Tue, 29 Jul 2025 23:06:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753830370;
-	bh=+Wr4K6PcN4qzFFnplG2PSa5iNR1f/ScDM8zomogNbtU=;
-	h=Date:From:To:Cc:Subject:From;
-	b=fnQIG7slpb3P/KRYP1r0SPZkZEGRpIu/mrhP8YWxkqwCwix66vZm1+25s3vz1TEJ5
-	 eWFAhdEAkW2MaC2gSG2bRBSjuUt+fIoVJKVolmZgPJWQ7ic8KQT8DDhm4OIufGUfzy
-	 ocRXtr5WG8iaqXSgC+lC82t5IZhZpfC2xf5xb6IKBDDoWQmhygOvc1V+kVdhihac5y
-	 rzHM7iFOIlcbHSpxA8ptihurtZzYrNU8FwEl4J05pR67MlepfA1mVXP7O25D0JH2TE
-	 Ppm2HJcr6KrFHRNPfkDjvYLdBX8JeIJHImpUFnShFrg5BdXP+r3ZumTiBGBn9jV+1B
-	 Fu2kvGIdBs7sw==
-Date: Tue, 29 Jul 2025 16:06:09 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Ido Schimmel <idosch@idosch.org>
-Cc: netdev@vger.kernel.org, Kuniyuki Iwashima <kuniyu@google.com>
-Subject: [TEST] netdevsim/nexthop-sh is flaky on debug
-Message-ID: <20250729160609.02e0f157@kernel.org>
+	s=arc-20240116; t=1753830796; c=relaxed/simple;
+	bh=WxvGFF87EU5ki9LEBULBMG8gjNsmrJZkd22aGwiMvlk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ILJUoZZjL6gzJUlg/aDtolvtvMCpbfXWpMItbpq8SUcv5PWpKIlgDinbtR4QwL9G25bS3RJ70n5bKC3d6VZHKmfjJcwfesUk7Y6by0e+7r9E+csU6IaWOfW6i6kzsiODJJz9F6+ge8C5PFbNJA6YnxgUCONLomCpB/qasp3DIMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BiEAl4Qm; arc=none smtp.client-ip=91.218.175.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <df4b0996-3e88-4ea4-983b-82866455a6fc@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1753830792;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yjZl9PRQAkl316Uaa6TzM+hjGmhIkh7ZeU0G7I1jd4M=;
+	b=BiEAl4Qm3PbuOsjicsutjMzchEM7XKBSfoLzdFyUpBR9uGvso774O5UyFJNIOtd2NwzlTT
+	Bcic+Ln0G48LIKHqwWhrCKJ23M07E4r1AmTtIaFcd3/AKrVWpQ99+dyepcr85P1eTuC0WQ
+	sUe6tM/IXZbQhTTvtgXsCgAFVqinD6E=
+Date: Tue, 29 Jul 2025 16:13:06 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [PATCH bpf-next v3 3/4] bpf: add bpf_icmp_send_unreach cgroup_skb
+ kfunc
+To: Mahe Tardy <mahe.tardy@gmail.com>
+Cc: alexei.starovoitov@gmail.com, andrii@kernel.org, ast@kernel.org,
+ bpf@vger.kernel.org, coreteam@netfilter.org, daniel@iogearbox.net,
+ fw@strlen.de, john.fastabend@gmail.com, netdev@vger.kernel.org,
+ netfilter-devel@vger.kernel.org, oe-kbuild-all@lists.linux.dev,
+ pablo@netfilter.org, lkp@intel.com
+References: <202507270940.kXGmRbg5-lkp@intel.com>
+ <20250728094345.46132-1-mahe.tardy@gmail.com>
+ <20250728094345.46132-4-mahe.tardy@gmail.com>
+ <b3f25e61-7b0c-4576-baae-9b498c3b8748@linux.dev> <aIidIq2EM--Ugp6f@gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <aIidIq2EM--Ugp6f@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Hi Ido!
+On 7/29/25 3:06 AM, Mahe Tardy wrote:
+> On Mon, Jul 28, 2025 at 06:05:26PM -0700, Martin KaFai Lau wrote:
+>> On 7/28/25 2:43 AM, Mahe Tardy wrote:
+>>> This is needed in the context of Tetragon to provide improved feedback
+>>> (in contrast to just dropping packets) to east-west traffic when blocked
+>>> by policies using cgroup_skb programs.
+>>>
+>>> This reuse concepts from netfilter reject target codepath with the
+>>> differences that:
+>>> * Packets are cloned since the BPF user can still return SK_PASS from
+>>>     the cgroup_skb progs and the current skb need to stay untouched
+>>
+>> This needs more details. Which field(s) of the skb are changed by the kfunc,
+>> the skb_dst_set in ip[6]_route_reply_fetch_dst() and/or the code path in the
+>> icmp[v6]_send() ?
+> 
+> Okay I can add that: "ip[6]_route_reply_fetch_dst set the dst of the skb
+> by using the saddr as a daddr and routing it", I don't think
+> icmp[v6]_send touches the skb?
 
-Hope you don't mind two reports in a row..
+I also don't think icmp[v6]_send touches the skb. I am still not sure if 
+ip[6]_route_reply_fetch_dst is needed.
 
-Looks like netdevsim/nexthop.sh has gotten a lot flakier on debug
-kernels since around the time of commit 25bf7d7f458c ("Merge branch
-'neighbour-convert-rtm_getneigh-to-rcu-and-make-pneigh-rtnl-free'")
-It has always been a little flaky (4 flakes in May, 7 flakes in June)
-but after the commit in question we got 8 flakes in 2 weeks.
+> 
+>>
+>>>     (cgroup_skb hooks only allow read-only skb payload).
+>>> * Since cgroup_skb programs are called late in the stack, checksums do
+>>>     not need to be computed or verified, and IPv4 fragmentation does not
+>>>     need to be checked (ip_local_deliver should take care of that
+>>>     earlier).
+>>>
+>>> Signed-off-by: Mahe Tardy <mahe.tardy@gmail.com>
+>>> ---
+>>>    net/core/filter.c | 61 +++++++++++++++++++++++++++++++++++++++++++++++
+>>>    1 file changed, 61 insertions(+)
+>>>
+>>> diff --git a/net/core/filter.c b/net/core/filter.c
+>>> index 7a72f766aacf..050872324575 100644
+>>> --- a/net/core/filter.c
+>>> +++ b/net/core/filter.c
+>>> @@ -85,6 +85,10 @@
+>>>    #include <linux/un.h>
+>>>    #include <net/xdp_sock_drv.h>
+>>>    #include <net/inet_dscp.h>
+>>> +#include <linux/icmp.h>
+>>> +#include <net/icmp.h>
+>>> +#include <net/route.h>
+>>> +#include <net/ip6_route.h>
+>>>
+>>>    #include "dev.h"
+>>>
+>>> @@ -12148,6 +12152,53 @@ __bpf_kfunc int bpf_sock_ops_enable_tx_tstamp(struct bpf_sock_ops_kern *skops,
+>>>    	return 0;
+>>>    }
+>>>
+>>> +__bpf_kfunc int bpf_icmp_send_unreach(struct __sk_buff *__skb, int code)
+>>> +{
+>>> +	struct sk_buff *skb = (struct sk_buff *)__skb;
+>>> +	struct sk_buff *nskb;
+>>> +
+>>> +	switch (skb->protocol) {
+>>> +	case htons(ETH_P_IP):
+>>> +		if (code < 0 || code > NR_ICMP_UNREACH)
+>>> +			return -EINVAL;
+>>> +
+>>> +		nskb = skb_clone(skb, GFP_ATOMIC);
+>>> +		if (!nskb)
+>>> +			return -ENOMEM;
+>>> +
+>>> +		if (ip_route_reply_fetch_dst(nskb) < 0) {
+>>> +			kfree_skb(nskb);
+>>> +			return -EHOSTUNREACH;
+>>> +		}
+>>> +
+>>> +		icmp_send(nskb, ICMP_DEST_UNREACH, code, 0);
+>>> +		kfree_skb(nskb);
+>>> +		break;
+>>> +#if IS_ENABLED(CONFIG_IPV6)
+>>> +	case htons(ETH_P_IPV6):
+>>> +		if (code < 0 || code > ICMPV6_REJECT_ROUTE)
+>>> +			return -EINVAL;
+>>> +
+>>> +		nskb = skb_clone(skb, GFP_ATOMIC);
+>>> +		if (!nskb)
+>>> +			return -ENOMEM;
+>>> +
+>>> +		if (ip6_route_reply_fetch_dst(nskb) < 0) {
+>>
+>>  From a very quick look at icmpv6_send(), it does its own route lookup. I
+>> haven't looked at the v4 yet.
+>>
+>> I am likely missing some details. Can you explain why it needs to do a
+>> lookup before calling icmpv6_send()?
+> 
+>  From my understanding, I need to do this to invert the daddr with the
+> saddr to send the unreach message back to the sender.
+
+ From looking at how fl6.{daddr,saddr} are filled and passed to 
+icmpv6_route_lookup in icmpv6_send(), the icmpv6_send() should have done the 
+reverse/invert route lookup. I also don't see icmpv6_send uses the skb_dst() of 
+the original skb. Did I misread the code? The kfunc does not work without 
+ip[6]_route_reply_fetch_dst()? Again, I have not checked the v4 icmp_send. fwiw, 
+the selftest should have both v4 and v6 test.
+
+Note that at cgroup/egress, the skb->_skb_refdst should have been set.
+
+The same should be true for cgroup/ingress for inet proto but it seems 
+BPF_CGROUP_RUN_PROG_"INET"_INGRESS is not called from INET only now. e.g. 
+sk_filter() can be called from af_netlink. It seems like there is a bug.
+
+> 
+>>
+>>> +			kfree_skb(nskb);
+>>> +			return -EHOSTUNREACH;
+>>> +		}
+>>> +
+>>> +		icmpv6_send(nskb, ICMPV6_DEST_UNREACH, code, 0);
+>>> +		kfree_skb(nskb);
+>>> +		break;
+>>> +#endif
+>>> +	default:
+>>> +		return -EPROTONOSUPPORT;
+>>> +	}
+>>> +
+>>> +	return SK_DROP;
+>>> +}
+>>> +
+> 
+
 
