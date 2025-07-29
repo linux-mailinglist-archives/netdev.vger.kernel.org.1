@@ -1,214 +1,159 @@
-Return-Path: <netdev+bounces-210813-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210814-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9ED97B14ED9
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 15:56:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B16F6B14EE6
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 15:58:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C5E3B188BA56
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 13:56:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B537F18A0E0C
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 13:58:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B5D01B413D;
-	Tue, 29 Jul 2025 13:56:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86CC51C862E;
+	Tue, 29 Jul 2025 13:57:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=readmodwrite-com.20230601.gappssmtp.com header.i=@readmodwrite-com.20230601.gappssmtp.com header.b="PTA1ouYO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gnNxdQG0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C04F01A2643
-	for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 13:56:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 490A2259C;
+	Tue, 29 Jul 2025 13:57:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753797381; cv=none; b=MUQ9okl5dM7jOuo5zi3pib4hXeTaVJ318fdbst6GYIql3waz7oKMx8IseTEJ/953WriCoxOYiLVpcQkeUz6leaQ8tBgykeC7MFqZRzR/hA/pwatAz2BA85I548OUYkk5G4a/gVW4aqUUuUl+RXRSWAnOk5TA2IECLcurwNjs45U=
+	t=1753797478; cv=none; b=F9rMrPQVJADt1CjALWOeAwm/yB7/Z+tTG4JHbaGOEMVns4b+2TUmdVfK8+gvL4F309L+XbLfR5VxUQcVc91F8K+FLktAdy0xm48z9PqBVHXfOMjM2i41HQr5tLkwro31zu7yF6dqMPzcJ8aeIuBJVSdQs41MWuo11ah5bbcjhNs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753797381; c=relaxed/simple;
-	bh=5l+kX3TlXyRbsgOTyGA3oWiH4eVSrFAAaoihgsCn8ek=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=K1FnRTo2YcpqVGW8v7Bn14I651W8hz+SdTpyebED1XjClsS8Vwp5wHiwQZ6tbb+d0z0vlkc1T13AJTPi6JVJqj92Ql9PsVA7hB2ip07UNTe5eznwC3LVbV4IU7Zgqm7PzRs1M7SMjoURBmHwrv41TPOFDey8jrDhBGvrNePr/jQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=readmodwrite.com; spf=none smtp.mailfrom=readmodwrite.com; dkim=pass (2048-bit key) header.d=readmodwrite-com.20230601.gappssmtp.com header.i=@readmodwrite-com.20230601.gappssmtp.com header.b=PTA1ouYO; arc=none smtp.client-ip=209.85.215.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=readmodwrite.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=readmodwrite.com
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-b271f3ae786so4710508a12.3
-        for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 06:56:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=readmodwrite-com.20230601.gappssmtp.com; s=20230601; t=1753797379; x=1754402179; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Mv8soW1s35ahL418D8VF6q42tDzqNXV2suiJtYXndw0=;
-        b=PTA1ouYOCta6b9E2k13otpsr1iRxjwhcz9xBk5iuvLUR2TdBxwGpU2kyo9RS2gM3cQ
-         hfE/EERq9kzJltnYLeDIaoveE6nTXYG/21mXimsgKRVL7t5MDADKPBmrcwtaDsEz64Xm
-         6/djBTZMN2XfljN7PYi+70GdCCRJMa13+jsTL+5IBJl8Fo4I0/dHumNgcWKYsYXwArle
-         CZs7gIYEsV/bvIk3yIxMRbICV4kAoaPs5c3EBtyvYmshMCv1q7OvKtfITx9cib4oOmhx
-         0J6QIFbjaBUtetMlc+OQR8ak6BhksrOdb+OoxRJ4et5quIXpzLlfHmbcWqsBRllQbPFS
-         RvZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753797379; x=1754402179;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Mv8soW1s35ahL418D8VF6q42tDzqNXV2suiJtYXndw0=;
-        b=A+RZ1Jq57DixmWWyv1AWRM3UGcLKWsK5R7Xa/6eXDU7UId9aVcgU0VMdQdpgYIVvN3
-         Jwnp3K2ctnhzwqHVjN4yFHFK1OLzate9BerIwAZ5q2biJuQTBIAVtzuVhEf/pTjVftvR
-         EB9lpXpQsouRU0yZPRNE9b722MGYHG0bPLfRUszpzqwCYH9eqnTLxFllFW6jnn1+9aUL
-         ZeisPDlY3idsUwe1jq1082lzW3uQjSS0FKgPj7/7FBSJ4zO0NWvKyT90viqfA+UJaabp
-         jRZTGlz8qK9in5WaWICkVowjciQobYFGSMIJPSfhF9G3/Flv8zVIqky2hx+vxrUgXqkP
-         r7iw==
-X-Forwarded-Encrypted: i=1; AJvYcCU/HzmhytbNKwz0GR+FlPD7aIpdFlu9uzRr0z6PJllu74itTILay5C5DbWZEmVpbzCePiKDanw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YySZnI01uEkJ+wQzd8vA0edqE02Bl4Kd1yyKfdMAgI3YfdCMdOi
-	YAC/DzrcuV3Rcx22fJbijClM67JSJyBGBj+VRhK2wpupJggkTAucI6GiAYQ1I1fFcyUkOySFgAS
-	7J1s1/GPO+FBQlf//BAZmp6/TEglmlSm7E4VPjbiHZQ==
-X-Gm-Gg: ASbGncsJRTVogy31bgpKd0yY27Xjcm5mDOUKcdSP+J9QeAidq1pN310jiHTuEZVe/uc
-	8w6e6VchvPB6u3dFniyOQYqrsNMjqz0JUuZ+s1GAZ64g+NhZDImFI1W5ZuGVAjcdXB4JssxDANA
-	fEbCmM1ayHbQ1uIeUe9GqlyvH4Qo0Nt7AKDW/84QTM1i7bl17YyoaLBw1ZsdY7iLBiaAGsZAYPq
-	cSpqmBNDncaSMwKXt2/pG4=
-X-Google-Smtp-Source: AGHT+IF6uEUYENM3G9dCl88PHF00oq2dRXfczisPYmPfnfZrmOLAxA2y+iiVlrzNEWcQwWHX0TDJK6HbPzYzjVZQifM=
-X-Received: by 2002:a17:902:e0d2:b0:23f:ed09:f7b with SMTP id
- d9443c01a7336-23fed091110mr101344245ad.48.1753797378920; Tue, 29 Jul 2025
- 06:56:18 -0700 (PDT)
+	s=arc-20240116; t=1753797478; c=relaxed/simple;
+	bh=AX7eZDNmkJrEgW0Z7fDJWxMDlVgr1LZpviDEOOeKIL4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XKFgmDzjLflD8PJ9rS2JXkvyBmqapxN+AyU51tTvCKM5pBY2xbo4s6DUT3A1XezRhwxSGfcmB0sxsC0QI/o8ht/gdXLPq9d9dZuzSgIdMy7GSHaaOoD5s8cSNPfzNyG7lrdVsbdM9oLbaekR8fDCbwYQl3zzANEqA7n+Z2agBeA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gnNxdQG0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1644C4CEF4;
+	Tue, 29 Jul 2025 13:57:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753797477;
+	bh=AX7eZDNmkJrEgW0Z7fDJWxMDlVgr1LZpviDEOOeKIL4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=gnNxdQG0DNWnJg+YHdQbXI0C3jbbNqOqJANMAHS0QZmb21lenjqAXFtqtc26lZ8t3
+	 BItM+qaMYFlrtcv8Ad7md1GdJa0vlvcXw7+JO8Z0NtHqajm4EsHO0EetPlD2guvQ6O
+	 3YKxFenQxcWTkErACwte5tqYEOWO4RIpJJfWdSK2nfwYr68XCvQADIsPmS4ouAnbv/
+	 t66m5hucPd29Xdvp78iGK5WQDli5e1W7IEvK7Ajw4tci1yksrRi5o5o5WbHRH7IeMU
+	 CGMIFCtkcgkPk0v2hbNYfJLaEmCNkkH/+4tA4Ej2uDg3Q94MaY3W+s8lvZDrf0tVZi
+	 cnb7UKdSpQEqA==
+Message-ID: <5029ba6e-fa5f-41a5-a1df-bb9117973bd8@kernel.org>
+Date: Tue, 29 Jul 2025 15:57:50 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250722150152.1158205-1-matt@readmodwrite.com> <CAADnVQ+rLJwKVbhd6LyGxDQwGUfg9EANcA5wOpA3C3pjaLdRQw@mail.gmail.com>
-In-Reply-To: <CAADnVQ+rLJwKVbhd6LyGxDQwGUfg9EANcA5wOpA3C3pjaLdRQw@mail.gmail.com>
-From: Matt Fleming <matt@readmodwrite.com>
-Date: Tue, 29 Jul 2025 14:56:07 +0100
-X-Gm-Features: Ac12FXxSY86YYUNk9ahjFEIXjGzaAjdeUoQ5VugkiuP2RpgzCdnBA11sRvUpiYc
-Message-ID: <CAENh_SS2R3aQByV_=WRCO=ZHknk_+pV7RhXA4qx5OGMBN1SnOA@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v3] selftests/bpf: Add LPM trie microbenchmarks
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, Shuah Khan <shuah@kernel.org>, 
-	kernel-team <kernel-team@cloudflare.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
-	bpf <bpf@vger.kernel.org>, Martin KaFai Lau <martin.lau@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, Network Development <netdev@vger.kernel.org>, 
-	Matt Fleming <mfleming@cloudflare.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 05/10] dt-bindings: clock: ipq9574: Rename NSS CC
+ source clocks to drop rate
+To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+ Luo Jie <quic_luoj@quicinc.com>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>
+Cc: Georgi Djakov <djakov@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
+ Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
+ <sboyd@kernel.org>, Anusha Rao <quic_anusha@quicinc.com>,
+ Konrad Dybcio <konradybcio@kernel.org>,
+ Philipp Zabel <p.zabel@pengutronix.de>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ linux-arm-msm@vger.kernel.org, linux-pm@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-clk@vger.kernel.org, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, quic_kkumarcs@quicinc.com,
+ quic_linchen@quicinc.com, quic_leiwei@quicinc.com, quic_pavir@quicinc.com,
+ quic_suruchia@quicinc.com
+References: <20250710-qcom_ipq5424_nsscc-v3-0-f149dc461212@quicinc.com>
+ <20250710-qcom_ipq5424_nsscc-v3-5-f149dc461212@quicinc.com>
+ <20250710225412.GA25762-robh@kernel.org>
+ <93082ccd-40d2-4a6b-a526-c118c1730a45@oss.qualcomm.com>
+ <2f37c7e7-b07b-47c7-904b-5756c4cf5887@quicinc.com>
+ <a383041e-7b70-4ffd-ae15-2412b2f83770@oss.qualcomm.com>
+ <830f3989-d1ac-4b7c-8888-397452fe0abe@quicinc.com>
+ <c67d7d8c-ae39-420f-b48b-d7454deb1fc9@oss.qualcomm.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <c67d7d8c-ae39-420f-b48b-d7454deb1fc9@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jul 28, 2025 at 3:35=E2=80=AFPM Alexei Starovoitov
-<alexei.starovoitov@gmail.com> wrote:
->
-> Please make a full description of what the test does,
-> since it's not trivial to decipher from the code.
-> If I'm reading it correctly, first, the user space
-> makes the LPM completely full and then lookup/update
-> use random key-s within range.
+On 29/07/2025 15:53, Konrad Dybcio wrote:
+>>
+>> We had adopted this proposal in version 2 previously, but as noted in
+>> the discussion linked below, Krzysztof had suggested to avoid using the
+>> clock rate in the clock names when defining the constraints for them.
+>> However I do agree that we should keep the interface for IPQ9574
+>> unchanged and instead use a generic clock name to support the newer
+>> SoCs.
+>>
+>> https://lore.kernel.org/all/20250701-optimistic-esoteric-swallow-d93fc6@krzk-bin/
+>>
+>> Request Krzysztof to provide his comments as well, on whether we can
+>> follow your suggested approach to avoid breaking ABI for IPQ9574.
+> 
+> Krzysztof, should the bindings be improved-through-breaking, or should
 
-Yep, that's correct. I'll provide a more comprehensive description in v4.
 
-> But delete looks different. It seems the kernel delete
-> operation can interleave with user space refilling the LPM,
-> so ...
->
-> >   lookup: throughput    7.423 =C2=B1 0.023 M ops/s (  7.423M ops/prod),=
- latency  134.710 ns/op
-> >   update: throughput    2.643 =C2=B1 0.015 M ops/s (  2.643M ops/prod),=
- latency  378.310 ns/op
-> >   delete: throughput    0.712 =C2=B1 0.008 M ops/s (  0.712M ops/prod),=
- latency 1405.152 ns/op
->
-> this comparison doesn't look like apples to apples,
-> since delete will include user space refill time.
+Unfortunately not, you should not change them for such reason.
 
-Yeah, you're right. Though we only measure the delete time from in the
-BPF prog, delete throughput is essentially blocked while the refill
-happens and because things are measured with a 1-second timer
-(bench.c:sigalarm_handler) the refill time gets accounted for anyway.
-I could try extrapolating the delete time like I've done for the free
-op, i.e. we calculate how many ops were completed in what fraction of
-a second.
+> there simply be a new YAML with un-suffixed entries, where new platforms
+> would be added down the line?
 
-> >     free: throughput    0.574 =C2=B1 0.003 K ops/s (  0.574K ops/prod),=
- latency    1.743 ms/op
->
-> Does this measure the free-ing of full LPM ?
 
-Yes, this measures the total time to free every element in the trie.
+Either new binding file or here with allOf:if:then differences per
+variant. Depends on readability.
 
-> > +static void __lpm_validate(void)
->
-> why double underscore ?
-> Just lpm_validate() ?
 
-The double underscore is used for the common validation parts, but
-I'll rename this to include "_common()" (along with all other uses of
-__).
-
-> > +       /*
-> > +        * Ideally we'd have access to the map ID but that's already
-> > +        * freed before we enter trie_free().
-> > +        */
-> > +       BPF_CORE_READ_STR_INTO(&name, map, name);
-> > +       if (bpf_strncmp(name, BPF_OBJ_NAME_LEN, "trie_free_map"))
-> > +               return 0;
-> > +
-> > +       val =3D bpf_ktime_get_ns();
-> > +       bpf_map_update_elem(&latency_free_start, &map, &val, BPF_ANY);
->
-> Looks like there is only one lpm map.
-> What's the point of that extra map ?
-> Just have a global var for start time ?
-
-Sure, I can make this a global variable for the start time instead.
-
-> bpf_get_prandom_u32() is not free
-> and modulo operation isn't free either.
-> The benchmark includes their time.
-> It's ok to have it, but add a mode where the bench
-> tests linear lookup/update too with simple key.data++
-
-Good idea.
-
-> Since the map suppose to full before we start all keys
-> should be there, right?
-
-Yes.
-
-> Let's add a sanity check that update() succeeds.
-
-Will do.
-
-> > +static int delete (__u32 index, bool *need_refill)
-> > +{
-> > +       struct trie_key key =3D {
-> > +               .data =3D deleted_entries,
-> > +               .prefixlen =3D prefixlen,
-> > +       };
-> > +
-> > +       bpf_map_delete_elem(&trie_map, &key);
-> > +
-> > +       /* Do we need to refill the map? */
-> > +       if (++deleted_entries =3D=3D nr_entries) {
-> > +               /*
-> > +                * Atomicity isn't required because DELETE only support=
-s
-> > +                * one producer running concurrently. What we need is a
-> > +                * way to track how many entries have been deleted from
-> > +                * the trie between consecutive invocations of the BPF
-> > +                * prog because a single bpf_loop() call might not
-> > +                * delete all entries, e.g. when NR_LOOPS < nr_entries.
-> > +                */
-> > +               deleted_entries =3D 0;
-> > +               *need_refill =3D true;
-> > +               return 1;
->
-> This early break is another reason that makes
-> 'delete' op different from 'lookup/update'.
-> Pls make all 3 consistent, so they can be compared to each other.
-
-Hmm.. I'm not quite sure how to do that. lookup/update don't modify
-the number of entries in the map whereas delete does (update only
-updates existing entries, it doesn't create new ones). So when the map
-is empty it needs to be refilled. You're right that somehow the time
-to refill needs to be removed from the delete throughput/latency
-numbers but fundamentally these 3 ops are not the same and I don't see
-how to treat them as such.
+Best regards,
+Krzysztof
 
