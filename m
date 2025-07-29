@@ -1,323 +1,164 @@
-Return-Path: <netdev+bounces-210801-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210802-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC9F1B14DD7
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 14:46:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 094AAB14E11
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 15:06:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2ECB3B6FDF
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 12:45:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8CB417A2AA5
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 13:05:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44E5A6FC5;
-	Tue, 29 Jul 2025 12:46:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B11C1474B8;
+	Tue, 29 Jul 2025 13:06:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ygyXLptN"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Eu+CNTAt"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2070.outbound.protection.outlook.com [40.107.236.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CC6910E9
-	for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 12:46:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753793168; cv=none; b=mj6dmHsqpxwlm/uUxlxanHe4VWTgs5EBv1bcYJWEtaj2RVvuSA46gRTNOcwkjDJwqORmPPFgYzGNn8iFB5pakcixdDZv/QRvc7d09b5mAdtgbAUptZBBU6hCESzYw0ZzWaIQoZnvMbdqY9xMsAcTmBcjBqpj7A+G3XYnEJEzv9Q=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753793168; c=relaxed/simple;
-	bh=N8uU2QwVCVM4Jw8lltZWOoL6xJ3fD0xi+pSMLmG4PNQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TUPZF9Vfuit6KpgQc9ZOpD7aJN3cIvcJVHP236qkd5++HZ2jAO3kZrUBGZFcJnSXXCvYLOEDmh6yz057eWExAKAIOMCJH3Rt6rwV6/hBRK7wSHvIW3JIdWt7iXHA6g6xDJrC4Txc2RUdeqaqi5Gq46sVeJTdQsKHjMCJ5KbDSpk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ygyXLptN; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=PswxPYOya6KsdVbaImLuw/Evrnb6EANrQ2lNtu2xVIg=; b=ygyXLptN2aFVGpvg6kjvjbvzqD
-	FM+shJgq+ptaEHpRfSrYtTFZE/i1SmzZYr/DKU598BNVlACFu61+w6Yplm9Rkqppep2WJutR9pIbN
-	QRuuxJOwhvmKOO7CVv9IJFJeDGCtHS1AzfOCnuUa6rAUDM4Zx90P7vT+Eo0F5UMIYu1lYZcFphBs+
-	q62b9/aCwb37wfMBX4xbCb8Z8jh2uFQM9Z2yRylJ+yhuGJzPjvpYqR5788Im1TQbAM/mVMDbvKyiE
-	CLWaM1HovKtRT+POahZ7E0Zo3RKx7e1sXxUpsye83EOyt4w9T9DDRQzYKkjI0Ey7axZP9I0OOepfY
-	yoxzl7Tw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33078)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1ugjiR-0001vE-1K;
-	Tue, 29 Jul 2025 13:45:59 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1ugjiN-0007QL-2W;
-	Tue, 29 Jul 2025 13:45:55 +0100
-Date: Tue, 29 Jul 2025 13:45:55 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-arm-kernel@lists.infradead.org,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Subject: Re: [Linux-stm32] [PATCH RFC net-next 6/7] net: stmmac: add helpers
- to indicate WoL enable status
-Message-ID: <aIjCg_sjTOge9vd4@shell.armlinux.org.uk>
-References: <aIebMKnQgzQxIY3j@shell.armlinux.org.uk>
- <E1ugQ33-006KDR-Nj@rmk-PC.armlinux.org.uk>
- <eaef1b1b-5366-430c-97dd-cf3b40399ac7@lunn.ch>
- <aIe5SqLITb2cfFQw@shell.armlinux.org.uk>
- <77229e46-6466-4cd4-9b3b-d76aadbe167c@foss.st.com>
- <aIiOWh7tBjlsdZgs@shell.armlinux.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A00381758B
+	for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 13:06:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.70
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753794389; cv=fail; b=fipgt6tN5+rJfvT9xaAFFPvpLhsptvbtzCYLH5d3rH/HE6U8Ywq1kt3xkSmpyZsezmiyYdfTF7pNNINnz0g4iFzV7UaWKJe50RHMjApCww4Xmxwq2fhuLQe0RfyXnl+/b+3rPhymG69FiO2BuK/6Vlywli8Ep8vr3vf1G/3cfJ0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753794389; c=relaxed/simple;
+	bh=GuQtSlxNPY/N5i7ox8bHolh0eXx4AsS38dX324WVBWE=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q1/5qwcjEzUuQ/Bb9YlleQsk/9ePrZw0fYNON+GznMID1PZl7u4MgRx0KtlquPsIkP8zw5T5OpLpB7eP10ilSp0+62qOGMAbbnGLMVEULJp1HjCKNLi1e3WRYkK5op9J8bJ1B5W20b4o0N5zuo32WVWL4Or3C3WveebCMCLLLBE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Eu+CNTAt; arc=fail smtp.client-ip=40.107.236.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=LOPWvbY/2eBMHsW8BH63pT31QUaN2GjUIH3pX7oJr1tj7hOIXsHrHD992JC+QAQ3KFz9Pb8YE8JvApJDANNixjw+/ZlDsy7XDLm7xYjraTROkqT50ciqhzrZz1f59fQ9vjEI+2yaXGjxraHCLQ6hqmmJ4qN6GIWrwCSQry7OyPk0UDonOYJWhHbVJlo6EuG1d8NDR26RTTbH7n2sRqh+ried4QVVaWcNzlrE+qJcehTd1bb5aah2vx8VGCR2vQNjOmNJ8HoRTOwqfbQorVQWjUfi0gSM187HTmC4YxRRYU/QF7Ggmb3JS1K12oitqFYPdYu5wLjnx3QHsTT83hhlsA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=yaF7Z5AWzCBEOhAlcj2aV5/XIg0oMFh8JZfWf7A8BBs=;
+ b=Sfzf+ppS2u4PWs3jNU0ULe70GmtVTDgT51oqhaxZe8mIe9UvDLstn2t7tekYngNxZNjmdPSJYJmvpMuPxM7sh/SP8KjRBRtHM5kxkOLCtrKdX3rxcsyAhVfIfQABtsdmAqeSnQNvqmcSCKOB00Vb92iX94dAjMPMBN+KP/gCPTF0rc4ag+m9yZHR0I1UbjBSdIAunzJjQwJqY79ynQZZv9dogP5Nr8X7JBFpUHKf7TRMY5q9Tb+KntnTVz37YEcSP/y63yVufYEjztB74LomXo8v2ohpWWG511pTZ/u4kNPX0Orjinew4ZZ6YShYjxhmynxYujxn5Bu4EODCFoHxZg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=queasysnail.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yaF7Z5AWzCBEOhAlcj2aV5/XIg0oMFh8JZfWf7A8BBs=;
+ b=Eu+CNTAtYiIa5CZmvnB+IqdkVCn191GNI2qvetInEqXYg0kQXKAYflZtY7EafpMbBZ7f01QIb4xUoqQdixnwebTiKqKPUDF4JUx0m0ZpgP2+XkskEqY46EOPb4XgdMZiQ4paPo14QOTGFTAFoTEBcZY0xMbAzaySMs97iZ7kuZLC1jW4LmhZruF5At2wWi49lA+I/SniulABHmRyYC0XvSfH5xWOX/rc5FXwJ/XTwXejlWwgqbx7C/6OAYAoAjMM5moC0Cpbmkf1I+rAY2gWGHAboQB/YpQUsbaieSXkGy/6gNVN78wQWtMWnQAgLqYiegQA97Si2lFc8/XNbkpxMQ==
+Received: from BL1PR13CA0167.namprd13.prod.outlook.com (2603:10b6:208:2bd::22)
+ by DS0PR12MB7947.namprd12.prod.outlook.com (2603:10b6:8:150::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8964.23; Tue, 29 Jul
+ 2025 13:06:22 +0000
+Received: from BL6PEPF0001AB71.namprd02.prod.outlook.com
+ (2603:10b6:208:2bd:cafe::db) by BL1PR13CA0167.outlook.office365.com
+ (2603:10b6:208:2bd::22) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8989.11 via Frontend Transport; Tue,
+ 29 Jul 2025 13:06:22 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ BL6PEPF0001AB71.mail.protection.outlook.com (10.167.242.164) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8989.10 via Frontend Transport; Tue, 29 Jul 2025 13:06:21 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Tue, 29 Jul
+ 2025 06:05:54 -0700
+Received: from localhost (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Tue, 29 Jul
+ 2025 06:05:53 -0700
+Date: Tue, 29 Jul 2025 16:05:49 +0300
+From: Leon Romanovsky <leonro@nvidia.com>
+To: Sabrina Dubroca <sd@queasysnail.net>
+CC: <netdev@vger.kernel.org>, Zhu Yanjun <yanjun.zhu@linux.dev>, "Steffen
+ Klassert" <steffen.klassert@secunet.com>
+Subject: Re: [PATCH ipsec 1/3] xfrm: restore GSO for SW crypto
+Message-ID: <20250729130549.GM402218@unreal>
+References: <cover.1753631391.git.sd@queasysnail.net>
+ <b5c3f4e2623d940ed51df2b79a2af4cc55b40a55.1753631391.git.sd@queasysnail.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <aIiOWh7tBjlsdZgs@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <b5c3f4e2623d940ed51df2b79a2af4cc55b40a55.1753631391.git.sd@queasysnail.net>
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB71:EE_|DS0PR12MB7947:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9014c538-ed2e-480a-b420-08ddcea0b726
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|82310400026|1800799024|36860700013|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?SfQPflfPOBk8ePUfwU/RshG7H7Dsvli71cpH5KdinYh3fHYn4hnsUe/jbRWP?=
+ =?us-ascii?Q?z7lS6feY78k1BTJAc3Q2YjoVW79B9vTZUn49OYnKlVPPeoBUsujId26QDVnE?=
+ =?us-ascii?Q?iWxdpWsZiqDDRs2388uOisCVVe4f4gBqtXOKCZeAGK/cjboXklTgz6yCNEcG?=
+ =?us-ascii?Q?oQ1NUdQUhfofJIoxzFSsi3EecgtcZVygkm+w6EiLMuxm+5PfxHyrgpxl63rw?=
+ =?us-ascii?Q?Mo9pBuR8GNmSa8CuGvVhKlyGBV1cIBPe7MlrUA8XcfBfE2qggKGW8lRffVpl?=
+ =?us-ascii?Q?v5mCNJ22jJf7wDHklk1vM2gb0NXB5Qsof+pI/mnExoQYIlB53dEJ6p6/WMUC?=
+ =?us-ascii?Q?06AbBJRbUZAGV140ddze181P+dAFCuO1LXeoqlgu+1h94F9SEWkUK02zSool?=
+ =?us-ascii?Q?7yDior51f729w+VBjIi9NZyVUQ1u0Z9Y2k4vKBAJx+6ynaCmRK7zbBYLUcUU?=
+ =?us-ascii?Q?g1E/2zmV/L+Kbx5PAFjBMFqA/slmGQ5QoNV8rGrtNhyYIHcPL52speIyDiXr?=
+ =?us-ascii?Q?1o/d73zhaqNErn9ced757en7icRlAjaxJzoAxmbxIJxygzLAa+9jnq11dBlE?=
+ =?us-ascii?Q?vY8/qYRzPCsftx/jxludzfyN887mqJZQPR9sSUQEOHX8GEqg2AJdTcmndGwX?=
+ =?us-ascii?Q?5/QN+bDGtY+N78D2Zv3e/2u3BcRlhAjRYbZYbR4re2f9d0uFOKec033IB2kA?=
+ =?us-ascii?Q?PCffNzv73LO0J7jrcpgJYZGZjXuaolaVWfrCTdlMaVYjVCvUVMXBZwuLcu5S?=
+ =?us-ascii?Q?9G2KISAVV4WbHdflRq/QwRGYty4maipJ0Njjk9KYrgr22Kl+N6KMJZ6qExNt?=
+ =?us-ascii?Q?JaFB7Oz1Y1ozZvWq2hAfLXy9ryhkuw9XfBDEHNpoZWmYfG2ZkNb6dmZrJi2Q?=
+ =?us-ascii?Q?YtHbkqZl7/cY9zWnWEXG7kL8WPwFzJRoWZpXe2za6QGfMez2Mbx2+9xJA28K?=
+ =?us-ascii?Q?crkRvnsjUbGAQpfHzayW0n+x80oD4efABPBGFfLFVGa61xDN9Je6WMs5aUeP?=
+ =?us-ascii?Q?LoP0SBivqPuHYCD6JkbJfIxcrLxzlag/OXs6EgS0il0PGOMsCECe5Q0D6v5W?=
+ =?us-ascii?Q?Jk+ew3yjDcvoqZpgYSk1PZ5S2fZfsjtSN+dWyW2fM0/lN8/FykYdvklun8g/?=
+ =?us-ascii?Q?Wwp+hjLpk0ALgAa7TQC0PYqRlSMGSxPlp6wr/g9XPnSvNFcRDO+LmAemsHSZ?=
+ =?us-ascii?Q?CsALGZwLY/qrzQsFLtkAiEN8nnhy9ZqY8aRQL+bArZwiGxRy+RDK7Fo0UN/N?=
+ =?us-ascii?Q?JdDY+LM9SEhEibJJJCfYJslM857IPXKlf6OpKozY0A8yTD2Dzke+l2QunoT1?=
+ =?us-ascii?Q?clQmx37U0lqP4VP+UjaPQs3mzaUCV9SQs/VF1k5WxRCIHl4zRdfFHrtbjKkO?=
+ =?us-ascii?Q?R8gvsN73XcYAYG3mOOPo1yWGEBnVwsGn1fGMrvX66yObT1BsQdi7zaqavfTp?=
+ =?us-ascii?Q?QNMGhb1wsni+5+Uuo8B86RfbUnlwr7GnfUCb1B5nEm6xBLt0dhFeCo79CscJ?=
+ =?us-ascii?Q?qu7Gm6GNamkhrCzWdX4EOBcsi+veOxfHTxGH?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(82310400026)(1800799024)(36860700013)(7053199007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jul 2025 13:06:21.7373
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9014c538-ed2e-480a-b420-08ddcea0b726
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL6PEPF0001AB71.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7947
 
-On Tue, Jul 29, 2025 at 10:03:22AM +0100, Russell King (Oracle) wrote:
-> With Thierry's .dts patch, PHY interrupts completely stop working, so
-> we don't get link change notifications anymore - and we still don't
-> seem to be capable of waking the system up with the PHY interrupt
-> being asserted.
+On Mon, Jul 28, 2025 at 05:17:18PM +0200, Sabrina Dubroca wrote:
+> Commit 49431af6c4ef incorrectly assumes that the GSO path is only used
+> by HW offload, but it's also useful for SW crypto.
 > 
-> Without Thierry's .dts patch, as I predicted, enabling WoL at the
-> PHY results in Bad Stuff happening - the code in the realtek driver
-> for WoL is quite simply broken and wrong.
+> This patch re-enables GSO for SW crypto. It's not an exact revert to
+> preserve the other changes made to xfrm_dev_offload_ok afterwards, but
+> it reverts all of its effects.
 > 
-> Switching the pin from INTB mode to PMEB mode results in:
-> - No link change interrupts once WoL is enabled
-> - The interrupt output being stuck at active level, causing an
->   interrupt storm and the interrupt is eventually disabled.
->   The PHY can be configured to pulse the PMEB or hold at an active
->   level until the WoL is cleared - and by default it's the latter.
+> Fixes: 49431af6c4ef ("xfrm: rely on XFRM offload")
+> Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
+> ---
+>  net/xfrm/xfrm_device.c | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
 > 
-> So, switching the interrupt pin to PMEB mode is simply wrong and
-> breaks phylib. I guess the original WoL support was only tested on
-> a system which didn't use the PHY interrupt, only using the interrupt
-> pin for wake-up purposes.
-> 
-> I was working on the realtek driver to fix this, but it's pointless
-> spending time on this until the rest of the system can wake up -
-> and thus the changes can be tested. This is where I got to (and
-> includes work from both Thierry and myself, so please don't pick
-> this up as-is, because I can guarantee that you'll get the sign-offs
-> wrong! It's a work-in-progress, and should be a series for submission.)
 
-Okay, with this patch, wake-up now works on the PHY interrupt line, but
-because normal interrupts aren't processed, the interrupt output from
-the PHY is stuck at active level, so the system immediately wakes up
-from suspend.
-
-Without the normal interrupt problem solved, there's nothing further
-I can do on this.
-
-Some of the open questions are:
-- whether we should configure the WoL interrupt in the suspend/resume
-  function
-- the interaction between the WoL interrupt configuration and the
-  config_intr method (whether on resume, the WoL interrupt enable
-  could get cleared, effectively disabling future WoL, despite it
-  being reported as enabled to userspace)
-- if we don't mark the PHY as wake-up capable, should we indicate
-  that the PHY does not support WoL in .get_wol() and return
-  -EOPNOTSUPP for .set_wol() given that we've had broken WoL support
-  merged in the recent v6.16 release.
-
-I'm pretty sure that we want all PHYs that support WoL to mark
-themselves as a wakeup capable device, so the core wakeup code knows
-that the PHY has capabilities, and control the device wakeup enable.
-Thus, I think we want to have some of this wakeup handling in the
-core phylib code.
-
-However, as normal PHY interrupts don't work, this isn't something I
-can pursue further.
-
-diff --git a/arch/arm64/boot/dts/nvidia/tegra194-p3668.dtsi b/arch/arm64/boot/dts/nvidia/tegra194-p3668.dtsi
-index a410fc335fa3..8ceba83614ed 100644
---- a/arch/arm64/boot/dts/nvidia/tegra194-p3668.dtsi
-+++ b/arch/arm64/boot/dts/nvidia/tegra194-p3668.dtsi
-@@ -39,9 +39,10 @@ mdio {
- 				phy: ethernet-phy@0 {
- 					compatible = "ethernet-phy-ieee802.3-c22";
- 					reg = <0x0>;
--					interrupt-parent = <&gpio>;
--					interrupts = <TEGRA194_MAIN_GPIO(G, 4) IRQ_TYPE_LEVEL_LOW>;
-+					interrupt-parent = <&pmc>;
-+					interrupts = <20 IRQ_TYPE_LEVEL_LOW>;
- 					#phy-cells = <0>;
-+					wakeup-source;
- 				};
- 			};
- 		};
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
-index 09ae16e026eb..bcaa37e08345 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
-@@ -261,7 +261,8 @@ static int tegra_eqos_probe(struct platform_device *pdev,
- 	plat_dat->set_clk_tx_rate = stmmac_set_clk_tx_rate;
- 	plat_dat->bsp_priv = eqos;
- 	plat_dat->flags |= STMMAC_FLAG_SPH_DISABLE |
--			   STMMAC_FLAG_EN_TX_LPI_CLK_PHY_CAP;
-+			   STMMAC_FLAG_EN_TX_LPI_CLK_PHY_CAP |
-+			   STMMAC_FLAG_USE_PHY_WOL;
- 
- 	return 0;
- 
-diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
-index dd0d675149ad..ef10e2c32318 100644
---- a/drivers/net/phy/realtek/realtek_main.c
-+++ b/drivers/net/phy/realtek/realtek_main.c
-@@ -10,6 +10,7 @@
- #include <linux/bitops.h>
- #include <linux/of.h>
- #include <linux/phy.h>
-+#include <linux/pm_wakeirq.h>
- #include <linux/netdevice.h>
- #include <linux/module.h>
- #include <linux/delay.h>
-@@ -31,6 +32,7 @@
- #define RTL821x_INER				0x12
- #define RTL8211B_INER_INIT			0x6400
- #define RTL8211E_INER_LINK_STATUS		BIT(10)
-+#define RTL8211F_INER_WOL			BIT(7)
- #define RTL8211F_INER_LINK_STATUS		BIT(4)
- 
- #define RTL821x_INSR				0x13
-@@ -255,6 +257,28 @@ static int rtl821x_probe(struct phy_device *phydev)
- 	return 0;
- }
- 
-+static int rtl8211f_probe(struct phy_device *phydev)
-+{
-+	struct device *dev = &phydev->mdio.dev;
-+	int ret;
-+
-+	ret = rtl821x_probe(phydev);
-+	if (ret < 0)
-+		return ret;
-+
-+	/* Mark this PHY as wakeup capable and register the interrupt as a
-+	 * wakeup IRQ if the PHY is marked as a wakeup source in firmware,
-+	 * and the interrupt is valid.
-+	 */
-+	if (device_property_read_bool(dev, "wakeup-source") &&
-+	    phy_interrupt_is_valid(phydev)) {
-+		device_set_wakeup_capable(dev, true);
-+		devm_pm_set_wake_irq(dev, phydev->irq);
-+	}
-+
-+	return ret;
-+}
-+
- static int rtl8201_ack_interrupt(struct phy_device *phydev)
- {
- 	int err;
-@@ -426,12 +450,17 @@ static irqreturn_t rtl8211f_handle_interrupt(struct phy_device *phydev)
- 		return IRQ_NONE;
- 	}
- 
--	if (!(irq_status & RTL8211F_INER_LINK_STATUS))
--		return IRQ_NONE;
-+	if (irq_status & RTL8211F_INER_LINK_STATUS) {
-+		phy_trigger_machine(phydev);
-+		return IRQ_HANDLED;
-+	}
- 
--	phy_trigger_machine(phydev);
-+	if (irq_status & RTL8211F_INER_WOL) {
-+		pm_wakeup_event(&phydev->mdio.dev, 0);
-+		return IRQ_HANDLED;
-+	}
- 
--	return IRQ_HANDLED;
-+	return IRQ_NONE;
- }
- 
- static void rtl8211f_get_wol(struct phy_device *dev, struct ethtool_wolinfo *wol)
-@@ -470,12 +499,16 @@ static int rtl8211f_set_wol(struct phy_device *dev, struct ethtool_wolinfo *wol)
- 		__phy_write(dev, RTL8211F_WOL_SETTINGS_STATUS, RTL8211F_WOL_STATUS_RESET);
- 
- 		/* Enable the WOL interrupt */
--		rtl821x_write_page(dev, RTL8211F_INTBCR_PAGE);
--		__phy_set_bits(dev, RTL8211F_INTBCR, RTL8211F_INTBCR_INTB_PMEB);
-+		//rtl821x_write_page(dev, RTL8211F_INTBCR_PAGE);
-+		//__phy_set_bits(dev, RTL8211F_INTBCR, RTL8211F_INTBCR_INTB_PMEB);
-+		rtl821x_write_page(dev, 0xa42);
-+		__phy_set_bits(dev, RTL821x_INER, RTL8211F_INER_WOL);
- 	} else {
- 		/* Disable the WOL interrupt */
--		rtl821x_write_page(dev, RTL8211F_INTBCR_PAGE);
--		__phy_clear_bits(dev, RTL8211F_INTBCR, RTL8211F_INTBCR_INTB_PMEB);
-+		//rtl821x_write_page(dev, RTL8211F_INTBCR_PAGE);
-+		//__phy_clear_bits(dev, RTL8211F_INTBCR, RTL8211F_INTBCR_INTB_PMEB);
-+		rtl821x_write_page(dev, 0xa42);
-+		__phy_clear_bits(dev, RTL821x_INER, RTL8211F_INER_WOL);
- 
- 		/* Disable magic packet matching and reset WOL status */
- 		rtl821x_write_page(dev, RTL8211F_WOL_SETTINGS_PAGE);
-@@ -483,10 +516,30 @@ static int rtl8211f_set_wol(struct phy_device *dev, struct ethtool_wolinfo *wol)
- 		__phy_write(dev, RTL8211F_WOL_SETTINGS_STATUS, RTL8211F_WOL_STATUS_RESET);
- 	}
- 
-+	device_set_wakeup_enable(&dev->mdio.dev, !!(wol->wolopts & WAKE_MAGIC));
-+
- err:
- 	return phy_restore_page(dev, oldpage, 0);
- }
- 
-+static int rtl821x_suspend(struct phy_device *phydev);
-+static int rtl8211f_suspend(struct phy_device *phydev)
-+{
-+	struct rtl821x_priv *priv = phydev->priv;
-+	int ret = rtl821x_suspend(phydev);
-+
-+	return ret;
-+}
-+
-+static int rtl821x_resume(struct phy_device *phydev);
-+static int rtl8211f_resume(struct phy_device *phydev)
-+{
-+	struct rtl821x_priv *priv = phydev->priv;
-+	int ret = rtl821x_resume(phydev);
-+
-+	return ret;
-+}
-+
- static int rtl8211_config_aneg(struct phy_device *phydev)
- {
- 	int ret;
-@@ -1612,15 +1665,15 @@ static struct phy_driver realtek_drvs[] = {
- 	}, {
- 		PHY_ID_MATCH_EXACT(0x001cc916),
- 		.name		= "RTL8211F Gigabit Ethernet",
--		.probe		= rtl821x_probe,
-+		.probe		= rtl8211f_probe,
- 		.config_init	= &rtl8211f_config_init,
- 		.read_status	= rtlgen_read_status,
- 		.config_intr	= &rtl8211f_config_intr,
- 		.handle_interrupt = rtl8211f_handle_interrupt,
- 		.set_wol	= rtl8211f_set_wol,
- 		.get_wol	= rtl8211f_get_wol,
--		.suspend	= rtl821x_suspend,
--		.resume		= rtl821x_resume,
-+		.suspend	= rtl8211f_suspend,
-+		.resume		= rtl8211f_resume,
- 		.read_page	= rtl821x_read_page,
- 		.write_page	= rtl821x_write_page,
- 		.flags		= PHY_ALWAYS_CALL_SUSPEND,
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Thanks,
+Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
 
