@@ -1,165 +1,364 @@
-Return-Path: <netdev+bounces-210803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210804-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E6EDB14E14
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 15:06:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D40FB14E2A
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 15:13:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 798893A1BC0
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 13:06:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 497A018A29A6
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 13:14:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3168114C588;
-	Tue, 29 Jul 2025 13:06:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAFD146447;
+	Tue, 29 Jul 2025 13:13:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="gBg0rlKl"
+	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="WnjH/Q2d"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2044.outbound.protection.outlook.com [40.107.93.44])
+Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D5051442F4
-	for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 13:06:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753794397; cv=fail; b=M4TS9tty/FTYncFbF+JKqWqhrvAb1MWhhl+5OJtj2pYA5U971Pe2fVmNZrMUVV8Enu59M98CgPP+eY5q1SW7TPQ6OedTf5EVqWpK7vryRAQ2diMs6rdtx2ikwirojiFN6qu8mytEQi2dc5dvB8y14ctApGYx7xsIxTUkIMQCJwA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753794397; c=relaxed/simple;
-	bh=h0FIeI4QlKXc5xuOOjUlCk9hhK8fnnDVg7ile2ajPiQ=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oy8KkTGDP8CatOdEMUGmpcWfj7W9NA/eLiqADOSrOvKohA9MpYZZa8Vra7k7IVkogyDsvQNsYp9yy1T2vVkAoG6Jle9lRCUSdFqg3X4bm/932s9kbmAVy6KEWhE5jtZyH3bckzKf7Yxj9VST+5hHZiAWr152QmdIvLZcBMLuevE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=gBg0rlKl; arc=fail smtp.client-ip=40.107.93.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Sm5cE3k2rfeML+3Ci+ftr53RDBGbFYA4Z4gcmPVPFoS0X1r0ZgcX5mIqaH0ar4VS0g9AtU33M5826xyf1Ju9vFxjXh42m6VmKTGjN3HqIOQZn112i7FlnUKJvSQFegSrlytmSxoigoRO4SRBNPX0v7MlkRsZ4kLxLuRxikifIB/jWpgUuOaOHf6hv2JARBSPmEemW9I+kWQ+HDkusdCpEBdeDMJcGUfNrl8l7IAx0bqhUgE0XbNsMs5qSkrS3z7NGpggu20Lw3xQKhEmCShxm4Sx/nTq2yRa6TrA0u3iRaIzHS8mFr5lr13iunwfLRbBATnaJOdFGkuGfoJS2xAzxg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gT77iOO/NzDU7wJxlHfqF+G1XnThZP8Az7CNwoUY0rc=;
- b=STU8EAefNQVIsz6nlHM9I4A5yQyn5r3HXxMGJNXrCZQwLn3QmMr8MhA/61bL/sbQYwV7w3lih3o+oJlOLHu/85ZPnDSapRiSoqNZBjQtjTdLONYBMN6eziEDvvRHJCW06Nb3WjnbBbVkdLy020GmS84qT6AuoV0A09sbcb9R73982fR0ksDl+yiHKQHlLmfBUyxX7tZ3rQmtNWDcdElPdaXyGBd4qJOjy3LNY/5OD5eO/NBERgE5NUfr/k8sJLn28FWI3PaoDQHf3xNqlheGMsF33r5k7I0+UUBYabSGGk0doTl8yK6eTEim3GMkw5bhKEYmpfpWNWZ+qZNNcEHsFg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=queasysnail.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gT77iOO/NzDU7wJxlHfqF+G1XnThZP8Az7CNwoUY0rc=;
- b=gBg0rlKlBrP27d5TZG+vJQ1yfGNinM4uDzBnhTT7dYfIokEgb5mZTmj+aJSHnQtwaYA2ynqBcEnXXPnwHiDi6VkQfQyBYj9dXNbole4KgYP+f/vIUzmQ5LyK4vv7IYeMqeK+hMF7urnK/o4aI8qW9uuL6oaIfMniXgmjhS4sD2aduVcnG8Pt4z4vq2+X87ixTKXruOv9+7WRT4cq4PE8X425ylJlH5516xZYikmUkQx1+SUDbKoaPIuwjT0b1IpJxwYoXC/NTVM+Ye6JsrLtNGJEl/JSWvLs71URaZkDHYGr5K+UuSGLlnFKgnFU8qSeX/i7140cDDm5CokjBgG3dg==
-Received: from MN0PR04CA0011.namprd04.prod.outlook.com (2603:10b6:208:52d::7)
- by DM4PR12MB8499.namprd12.prod.outlook.com (2603:10b6:8:181::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8989.11; Tue, 29 Jul
- 2025 13:06:32 +0000
-Received: from BL6PEPF0001AB76.namprd02.prod.outlook.com
- (2603:10b6:208:52d:cafe::bf) by MN0PR04CA0011.outlook.office365.com
- (2603:10b6:208:52d::7) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8989.11 via Frontend Transport; Tue,
- 29 Jul 2025 13:06:32 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- BL6PEPF0001AB76.mail.protection.outlook.com (10.167.242.169) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8989.10 via Frontend Transport; Tue, 29 Jul 2025 13:06:32 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Tue, 29 Jul
- 2025 06:06:10 -0700
-Received: from localhost (10.126.231.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Tue, 29 Jul
- 2025 06:06:08 -0700
-Date: Tue, 29 Jul 2025 16:06:04 +0300
-From: Leon Romanovsky <leonro@nvidia.com>
-To: Sabrina Dubroca <sd@queasysnail.net>
-CC: <netdev@vger.kernel.org>, Cosmin Ratiu <cratiu@nvidia.com>, "Nikolay
- Aleksandrov" <razor@blackwall.org>, Steffen Klassert
-	<steffen.klassert@secunet.com>
-Subject: Re: [PATCH ipsec 2/3] Revert "xfrm: Remove unneeded device check
- from validate_xmit_xfrm"
-Message-ID: <20250729130604.GN402218@unreal>
-References: <cover.1753631391.git.sd@queasysnail.net>
- <177b1dda148fa828066c72de432b7cb12ca249a9.1753631391.git.sd@queasysnail.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A9021758B
+	for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 13:13:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.132.182.106
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753794826; cv=none; b=tTWrnsYhbsgVCZO2OzbQCSFn4FAGtCYLTRFeVgyFGi3VGFb7SkDidpZ3PeSVjI3E/2q616MVy+K9POMl7HY6zIg1xh0UFbzOEVRIkx2J27t5ZZWg54d7wHO5fL2SYcLpYCWHn5HAjemtNd8JfBv5frTKEHVcGHtVcu5KUo1/Tdg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753794826; c=relaxed/simple;
+	bh=hSch7o2Xc1r2BTjKRfDDV58XTrGoWKEtS3iMrZQ5gnE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=NrOFliYb8PyBYvJQWyclv7iLjg/na7M4cjRHE1qr4AfLU17FtZuhJsmuo4wDsVrISQQnqnxvdzqyNK9Ydknm2yriEgsH9ZBj+30sfzjc0sjDKOVXZ0c5hoVLd9qRdDCw2W37b5KzjGTk9+OxJf7Q5glyDzY+pCfYtb8acfOjmkM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=WnjH/Q2d; arc=none smtp.client-ip=185.132.182.106
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
+Received: from pps.filterd (m0369458.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56TCmGLH000922;
+	Tue, 29 Jul 2025 15:13:11 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=selector1; bh=
+	Ma4q65Oz/loCMB5BOPIxsnfj+s5ECTQC6dNxwWijbSk=; b=WnjH/Q2dhA/T+cZ/
+	RbEXPq7E/gm43Fj29lp4fbD2mrBefbVt5pwdS6ITAlt0vlo8McXaAhp4zeSZS/bB
+	a95LUm17u6gG9fyE94EXblqKhrfZ71p0G7a3NkZLuIswrSwCUQ8P4mxFGozOZN8k
+	77purQNv6qefzvGtbTtSENED2HNE0sv5TL6pd73zXShKn9q5O6DEx6N757muddK/
+	5JxBVJmGkd12Swu43FSu0Xfp/59UgGgD3AOEX11LY02ITqdpeCgDmzKhjpsZk9k6
+	8fLN9pgVcZ+avIWJKwpUoFNfYQhb/fUbq7W+6mD8FlzUJxBOLLKkIPSiTbUTaxCo
+	zhu5pw==
+Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 4858k52d8j-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 29 Jul 2025 15:13:11 +0200 (MEST)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 90D204004B;
+	Tue, 29 Jul 2025 15:11:46 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 84FC576C44A;
+	Tue, 29 Jul 2025 15:10:57 +0200 (CEST)
+Received: from [10.48.87.141] (10.48.87.141) by SHFDAG1NODE1.st.com
+ (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 29 Jul
+ 2025 15:10:56 +0200
+Message-ID: <d300d546-09fa-4b37-b8e0-349daa0cc108@foss.st.com>
+Date: Tue, 29 Jul 2025 15:10:56 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <177b1dda148fa828066c72de432b7cb12ca249a9.1753631391.git.sd@queasysnail.net>
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB76:EE_|DM4PR12MB8499:EE_
-X-MS-Office365-Filtering-Correlation-Id: 821caa91-285a-4163-b9ba-08ddcea0bd84
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|36860700013|376014|82310400026|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?GqssNRIeksCwiGwYCT5G2szL6YJZ/ZU1kDWTvN2PzZeQjYStX/rROhtAiTpr?=
- =?us-ascii?Q?BAkgoTvCcLGH2eRswmMKa86X7Zpng8cK1CkZphHBky3t53SYWyROxf+KZ6TD?=
- =?us-ascii?Q?vjyY4BEnsrfYJ3Nlv8MITinQskEsd9O2aLipHqI5p42fPzhHWYKJAoWgcxeA?=
- =?us-ascii?Q?nuPOPvCow6/ECVeQl2bTDY6YDdWq/GBrdxJjY5LwjBJidRFGsBiT2VxuT4/6?=
- =?us-ascii?Q?cGEVi6HW6r4zPZKBweD2S+CQ1IgOlaSmg0Yw2Ap0SwFFmr27/Z2zeaErWLHE?=
- =?us-ascii?Q?oYYdJM6nbJzO9Nrl0TCMWfBQbUtBuDGKBe0XOSpVAf3AFV2ZIkCel6dAei7E?=
- =?us-ascii?Q?kSXP4j2XxLuqVeTATvcMDZuUvRjBPJ95xFDrXH0fl54zClIYUT8Y4C+M4oFc?=
- =?us-ascii?Q?PstMoMyQLJejPlm1udiQbzteDrPjRirI8Ls7CsVOBCmk5hUbTJPPX4zo0bzo?=
- =?us-ascii?Q?oOIOZumyYgTy1TMx8OZsrEvDPT3xOkyGZyeOpaOiA+RjGp3S+FZ9tHTc00RK?=
- =?us-ascii?Q?xGMRIjyXvmG/UpJMXdWNrl+44uFUwjETccEKPwZn/eUqpoEoDJPfqxDsZoPK?=
- =?us-ascii?Q?F+xNksX9ifszeTc6dR1qFN0PrBceQP1PAsO6dFMCqFV9Gj72vQZ66fmxoy9e?=
- =?us-ascii?Q?Mo0pjiml1IHrR85zVJqtGtc7f+6tQrctmsVDvqQ5739G2iyhLeHcvxuhdpFK?=
- =?us-ascii?Q?i0fRfesM0p5w+GL2JtSkwjLSfi5szoY0jQK1vGYJD83a55Z4zujbQK4ERBv+?=
- =?us-ascii?Q?9APhq6DDQCXIBJSyfdRWh9hSMz73i8n4Ln5ypWU9nlyIpmbwbu0wCUdQNurQ?=
- =?us-ascii?Q?3O77Ne9dCmLvLpU06XtJOF8bGnd/5AWRziAWsCfPeMVI0y5LjSakXG0IteS6?=
- =?us-ascii?Q?1vFIO7Lmfv/IgrFXSo+YrufmaCJSefuYOWlPYiDMoREDLjuPQbtrChKyNe2d?=
- =?us-ascii?Q?7Et6V40EWQzkiWI650YOoyhFeZyiddcUAH0wPxmlFXsaUoIRm1Lr2QUOT+Oj?=
- =?us-ascii?Q?wPu1PqC3/kcsk59zyKA3HJwZVYUbzuuPNQmgfDjUbAlQLBi7HU5fA8vUky9o?=
- =?us-ascii?Q?kS5zAn9P6sflxhs1Iw7GfTmACNtjBmWFhGW/B+e5ebPEzGglb9HseidkTHjb?=
- =?us-ascii?Q?uFQKnuW59D8rMfEhygYSzpaTiSbVfovkSw46PV7yICMlVGyYK4Oi9K2VSbwg?=
- =?us-ascii?Q?Vy2AIX8FHMb3TrtNDMfcorw3MU/9BD0AfBGLuvs11Ir18wuPYjra+tmgslKc?=
- =?us-ascii?Q?W2N9T9ihuKPOGuZYf40jFwwxo+/PruDLKh6tvJyAd2bNEPoNBglnglnlpJ98?=
- =?us-ascii?Q?L+Gs7BwceaYGkmIPBFKZtrIhGRblac+R90KPHggO0zTUfHzUYYK6A3B5rGr5?=
- =?us-ascii?Q?pPkzyDsCDfffXIxGzXqtEKr1ivOSylN+KgZVP6FROda91UhiwK9i45+1itX4?=
- =?us-ascii?Q?Gt9dCdJCRYeoD2oItoARuvd9zV6wU93EtwPzrW6xRnkWWH39sD8l2zpSFqfT?=
- =?us-ascii?Q?fH1UctCkomCdVltA80S+OW2Cr9l5o24HylJh?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(376014)(82310400026)(7053199007);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jul 2025 13:06:32.3175
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 821caa91-285a-4163-b9ba-08ddcea0bd84
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BL6PEPF0001AB76.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB8499
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Linux-stm32] [PATCH RFC net-next 6/7] net: stmmac: add helpers
+ to indicate WoL enable status
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+CC: Andrew Lunn <andrew@lunn.ch>, <netdev@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        Andrew Lunn
+	<andrew+netdev@lunn.ch>,
+        Eric Dumazet <edumazet@google.com>,
+        Maxime Coquelin
+	<mcoquelin.stm32@gmail.com>,
+        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        <linux-arm-kernel@lists.infradead.org>,
+        Heiner Kallweit
+	<hkallweit1@gmail.com>
+References: <aIebMKnQgzQxIY3j@shell.armlinux.org.uk>
+ <E1ugQ33-006KDR-Nj@rmk-PC.armlinux.org.uk>
+ <eaef1b1b-5366-430c-97dd-cf3b40399ac7@lunn.ch>
+ <aIe5SqLITb2cfFQw@shell.armlinux.org.uk>
+ <77229e46-6466-4cd4-9b3b-d76aadbe167c@foss.st.com>
+ <aIiOWh7tBjlsdZgs@shell.armlinux.org.uk>
+ <aIjCg_sjTOge9vd4@shell.armlinux.org.uk>
+Content-Language: en-US
+From: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
+In-Reply-To: <aIjCg_sjTOge9vd4@shell.armlinux.org.uk>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SHFCAS1NODE1.st.com (10.75.129.72) To SHFDAG1NODE1.st.com
+ (10.75.129.69)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-07-29_03,2025-07-28_01,2025-03-28_01
 
-On Mon, Jul 28, 2025 at 05:17:19PM +0200, Sabrina Dubroca wrote:
-> This reverts commit d53dda291bbd993a29b84d358d282076e3d01506.
+
+
+On 7/29/25 14:45, Russell King (Oracle) wrote:
+> On Tue, Jul 29, 2025 at 10:03:22AM +0100, Russell King (Oracle) wrote:
+>> With Thierry's .dts patch, PHY interrupts completely stop working, so
+>> we don't get link change notifications anymore - and we still don't
+>> seem to be capable of waking the system up with the PHY interrupt
+>> being asserted.
+>>
+>> Without Thierry's .dts patch, as I predicted, enabling WoL at the
+>> PHY results in Bad Stuff happening - the code in the realtek driver
+>> for WoL is quite simply broken and wrong.
+>>
+>> Switching the pin from INTB mode to PMEB mode results in:
+>> - No link change interrupts once WoL is enabled
+>> - The interrupt output being stuck at active level, causing an
+>>    interrupt storm and the interrupt is eventually disabled.
+>>    The PHY can be configured to pulse the PMEB or hold at an active
+>>    level until the WoL is cleared - and by default it's the latter.
+>>
+>> So, switching the interrupt pin to PMEB mode is simply wrong and
+>> breaks phylib. I guess the original WoL support was only tested on
+>> a system which didn't use the PHY interrupt, only using the interrupt
+>> pin for wake-up purposes.
+>>
+>> I was working on the realtek driver to fix this, but it's pointless
+>> spending time on this until the rest of the system can wake up -
+>> and thus the changes can be tested. This is where I got to (and
+>> includes work from both Thierry and myself, so please don't pick
+>> this up as-is, because I can guarantee that you'll get the sign-offs
+>> wrong! It's a work-in-progress, and should be a series for submission.)
 > 
-> This change causes traffic using GSO with SW crypto running through a
-> NIC capable of HW offload to no longer get segmented during
-> validate_xmit_xfrm.
-> 
-> Fixes: d53dda291bbd ("xfrm: Remove unneeded device check from validate_xmit_xfrm")
-> Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
-> ---
->  net/xfrm/xfrm_device.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
+> Okay, with this patch, wake-up now works on the PHY interrupt line, but
+> because normal interrupts aren't processed, the interrupt output from
+> the PHY is stuck at active level, so the system immediately wakes up
+> from suspend.
 > 
 
-Thanks,
-Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
+If I'm following correctly, you do not use the PMEB mode and share
+the same pin for WoL and regular interrupts (INTB mode)?
+
+> Without the normal interrupt problem solved, there's nothing further
+> I can do on this.
+> 
+> Some of the open questions are:
+> - whether we should configure the WoL interrupt in the suspend/resume
+>    function
+
+For the LAN8742 PHY with which I worked with, the recommendation when
+using the same pin for WoL and regular interrupt management is to mask
+regular interrupt and enable the WoL IIRC.
+This prevents the PHY from waking up from undesired events while still
+being able use the WoL capability and should be done in suspend() /
+resume() callbacks. I guess this means also that you share the same
+interrupt handler that must manage both WoL events and regular events.
+
+On the other hand, on the stm32mp135f-dk, the nPME pin (equivalent to
+PMEB IIUC) is wired and is different from the nINT pin. Therefore, I
+guess it should not be done during suspend()/resume() and it really
+depends on how the PHY is wired. Because if a WoL event is received at
+runtime, then the PHY must clear the flags otherwise the WoL event won't
+trigger a system wakeup afterwards.
+
+I need to look at how the PHYs can handle two different interrupts.
+
+> - the interaction between the WoL interrupt configuration and the
+>    config_intr method (whether on resume, the WoL interrupt enable
+>    could get cleared, effectively disabling future WoL, despite it
+>    being reported as enabled to userspace)
+> - if we don't mark the PHY as wake-up capable, should we indicate
+>    that the PHY does not support WoL in .get_wol() and return
+>    -EOPNOTSUPP for .set_wol() given that we've had broken WoL support
+>    merged in the recent v6.16 release.
+> 
+> I'm pretty sure that we want all PHYs that support WoL to mark
+> themselves as a wakeup capable device, so the core wakeup code knows
+> that the PHY has capabilities, and control the device wakeup enable.
+
+I agree.
+
+> Thus, I think we want to have some of this wakeup handling in the
+> core phylib code.
+> 
+> However, as normal PHY interrupts don't work, this isn't something I
+> can pursue further.
+> 
+> diff --git a/arch/arm64/boot/dts/nvidia/tegra194-p3668.dtsi b/arch/arm64/boot/dts/nvidia/tegra194-p3668.dtsi
+> index a410fc335fa3..8ceba83614ed 100644
+> --- a/arch/arm64/boot/dts/nvidia/tegra194-p3668.dtsi
+> +++ b/arch/arm64/boot/dts/nvidia/tegra194-p3668.dtsi
+> @@ -39,9 +39,10 @@ mdio {
+>   				phy: ethernet-phy@0 {
+>   					compatible = "ethernet-phy-ieee802.3-c22";
+>   					reg = <0x0>;
+> -					interrupt-parent = <&gpio>;
+> -					interrupts = <TEGRA194_MAIN_GPIO(G, 4) IRQ_TYPE_LEVEL_LOW>;
+> +					interrupt-parent = <&pmc>;
+> +					interrupts = <20 IRQ_TYPE_LEVEL_LOW>;
+>   					#phy-cells = <0>;
+> +					wakeup-source;
+>   				};
+>   			};
+>   		};
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
+> index 09ae16e026eb..bcaa37e08345 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
+> @@ -261,7 +261,8 @@ static int tegra_eqos_probe(struct platform_device *pdev,
+>   	plat_dat->set_clk_tx_rate = stmmac_set_clk_tx_rate;
+>   	plat_dat->bsp_priv = eqos;
+>   	plat_dat->flags |= STMMAC_FLAG_SPH_DISABLE |
+> -			   STMMAC_FLAG_EN_TX_LPI_CLK_PHY_CAP;
+> +			   STMMAC_FLAG_EN_TX_LPI_CLK_PHY_CAP |
+> +			   STMMAC_FLAG_USE_PHY_WOL;
+>   
+>   	return 0;
+>   
+> diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
+> index dd0d675149ad..ef10e2c32318 100644
+> --- a/drivers/net/phy/realtek/realtek_main.c
+> +++ b/drivers/net/phy/realtek/realtek_main.c
+> @@ -10,6 +10,7 @@
+>   #include <linux/bitops.h>
+>   #include <linux/of.h>
+>   #include <linux/phy.h>
+> +#include <linux/pm_wakeirq.h>
+>   #include <linux/netdevice.h>
+>   #include <linux/module.h>
+>   #include <linux/delay.h>
+> @@ -31,6 +32,7 @@
+>   #define RTL821x_INER				0x12
+>   #define RTL8211B_INER_INIT			0x6400
+>   #define RTL8211E_INER_LINK_STATUS		BIT(10)
+> +#define RTL8211F_INER_WOL			BIT(7)
+>   #define RTL8211F_INER_LINK_STATUS		BIT(4)
+>   
+>   #define RTL821x_INSR				0x13
+> @@ -255,6 +257,28 @@ static int rtl821x_probe(struct phy_device *phydev)
+>   	return 0;
+>   }
+>   
+> +static int rtl8211f_probe(struct phy_device *phydev)
+> +{
+> +	struct device *dev = &phydev->mdio.dev;
+> +	int ret;
+> +
+> +	ret = rtl821x_probe(phydev);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	/* Mark this PHY as wakeup capable and register the interrupt as a
+> +	 * wakeup IRQ if the PHY is marked as a wakeup source in firmware,
+> +	 * and the interrupt is valid.
+> +	 */
+> +	if (device_property_read_bool(dev, "wakeup-source") &&
+> +	    phy_interrupt_is_valid(phydev)) {
+> +		device_set_wakeup_capable(dev, true);
+> +		devm_pm_set_wake_irq(dev, phydev->irq);
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+>   static int rtl8201_ack_interrupt(struct phy_device *phydev)
+>   {
+>   	int err;
+> @@ -426,12 +450,17 @@ static irqreturn_t rtl8211f_handle_interrupt(struct phy_device *phydev)
+>   		return IRQ_NONE;
+>   	}
+>   
+> -	if (!(irq_status & RTL8211F_INER_LINK_STATUS))
+> -		return IRQ_NONE;
+> +	if (irq_status & RTL8211F_INER_LINK_STATUS) {
+> +		phy_trigger_machine(phydev);
+> +		return IRQ_HANDLED;
+> +	}
+>   
+> -	phy_trigger_machine(phydev);
+> +	if (irq_status & RTL8211F_INER_WOL) {
+> +		pm_wakeup_event(&phydev->mdio.dev, 0);
+> +		return IRQ_HANDLED;
+> +	}
+>   
+> -	return IRQ_HANDLED;
+> +	return IRQ_NONE;
+>   }
+>   
+>   static void rtl8211f_get_wol(struct phy_device *dev, struct ethtool_wolinfo *wol)
+> @@ -470,12 +499,16 @@ static int rtl8211f_set_wol(struct phy_device *dev, struct ethtool_wolinfo *wol)
+>   		__phy_write(dev, RTL8211F_WOL_SETTINGS_STATUS, RTL8211F_WOL_STATUS_RESET);
+>   
+>   		/* Enable the WOL interrupt */
+> -		rtl821x_write_page(dev, RTL8211F_INTBCR_PAGE);
+> -		__phy_set_bits(dev, RTL8211F_INTBCR, RTL8211F_INTBCR_INTB_PMEB);
+> +		//rtl821x_write_page(dev, RTL8211F_INTBCR_PAGE);
+> +		//__phy_set_bits(dev, RTL8211F_INTBCR, RTL8211F_INTBCR_INTB_PMEB);
+> +		rtl821x_write_page(dev, 0xa42);
+> +		__phy_set_bits(dev, RTL821x_INER, RTL8211F_INER_WOL);
+>   	} else {
+>   		/* Disable the WOL interrupt */
+> -		rtl821x_write_page(dev, RTL8211F_INTBCR_PAGE);
+> -		__phy_clear_bits(dev, RTL8211F_INTBCR, RTL8211F_INTBCR_INTB_PMEB);
+> +		//rtl821x_write_page(dev, RTL8211F_INTBCR_PAGE);
+> +		//__phy_clear_bits(dev, RTL8211F_INTBCR, RTL8211F_INTBCR_INTB_PMEB);
+> +		rtl821x_write_page(dev, 0xa42);
+> +		__phy_clear_bits(dev, RTL821x_INER, RTL8211F_INER_WOL);
+>   
+>   		/* Disable magic packet matching and reset WOL status */
+>   		rtl821x_write_page(dev, RTL8211F_WOL_SETTINGS_PAGE);
+> @@ -483,10 +516,30 @@ static int rtl8211f_set_wol(struct phy_device *dev, struct ethtool_wolinfo *wol)
+>   		__phy_write(dev, RTL8211F_WOL_SETTINGS_STATUS, RTL8211F_WOL_STATUS_RESET);
+>   	}
+>   
+> +	device_set_wakeup_enable(&dev->mdio.dev, !!(wol->wolopts & WAKE_MAGIC));
+> +
+>   err:
+>   	return phy_restore_page(dev, oldpage, 0);
+>   }
+>   
+> +static int rtl821x_suspend(struct phy_device *phydev);
+> +static int rtl8211f_suspend(struct phy_device *phydev)
+> +{
+> +	struct rtl821x_priv *priv = phydev->priv;
+> +	int ret = rtl821x_suspend(phydev);
+> +
+> +	return ret;
+> +}
+> +
+> +static int rtl821x_resume(struct phy_device *phydev);
+> +static int rtl8211f_resume(struct phy_device *phydev)
+> +{
+> +	struct rtl821x_priv *priv = phydev->priv;
+> +	int ret = rtl821x_resume(phydev);
+> +
+> +	return ret;
+> +}
+> +
+>   static int rtl8211_config_aneg(struct phy_device *phydev)
+>   {
+>   	int ret;
+> @@ -1612,15 +1665,15 @@ static struct phy_driver realtek_drvs[] = {
+>   	}, {
+>   		PHY_ID_MATCH_EXACT(0x001cc916),
+>   		.name		= "RTL8211F Gigabit Ethernet",
+> -		.probe		= rtl821x_probe,
+> +		.probe		= rtl8211f_probe,
+>   		.config_init	= &rtl8211f_config_init,
+>   		.read_status	= rtlgen_read_status,
+>   		.config_intr	= &rtl8211f_config_intr,
+>   		.handle_interrupt = rtl8211f_handle_interrupt,
+>   		.set_wol	= rtl8211f_set_wol,
+>   		.get_wol	= rtl8211f_get_wol,
+> -		.suspend	= rtl821x_suspend,
+> -		.resume		= rtl821x_resume,
+> +		.suspend	= rtl8211f_suspend,
+> +		.resume		= rtl8211f_resume,
+>   		.read_page	= rtl821x_read_page,
+>   		.write_page	= rtl821x_write_page,
+>   		.flags		= PHY_ALWAYS_CALL_SUSPEND,
+> 
 
