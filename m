@@ -1,316 +1,283 @@
-Return-Path: <netdev+bounces-210770-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210771-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAF6FB14BC0
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 11:57:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 59538B14BD4
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 12:01:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 015BD4E43E4
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 09:56:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91FA43A9A4B
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 10:01:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADA8526B97D;
-	Tue, 29 Jul 2025 09:57:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62FF61A23AC;
+	Tue, 29 Jul 2025 10:01:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R6vYi1KH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UEiO8i3E"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A24AE1DED5C
-	for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 09:57:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51F072E36E4;
+	Tue, 29 Jul 2025 10:01:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753783043; cv=none; b=HAI12xde1od7bfhtbjy35gGchwgtdXDxE0qb/ID5Ajhu9QGqE8fQ2Qs9uVZCsZJBxLd3WbkxS+kio1Gz4TvIr9SmF+dIfAn+r2ZMPoz+2w6JbUGeSlNDJFOHhNXBMyqmDZw9KuxUKeb6O/H4t1dU9tFxqb05Kq/WVAbf/tpWDc8=
+	t=1753783303; cv=none; b=McLbNFf+18wqrUkn55hPEgjNf75eSwuTwTn6xQbNOxh10wuVX2oGQU67Wq3H9SVPdXtWPM/h1wnZDyEnfHkbJocs+5HXE3/j1m+e71VogCQltIjcTpUCGVfbCnlugjpWwlb0bJNN3Mfe29MtYYZ8J7XXNHjiVp52ZstCJ3xs7RY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753783043; c=relaxed/simple;
-	bh=wyKmD4a7NB+YhEmDAJ4osbh5eWcpv4zkT3EGBXFLvT4=;
+	s=arc-20240116; t=1753783303; c=relaxed/simple;
+	bh=hd3VQT4pVojiEGz/Z3dvMOUICFYUTmk7PYLkJC4Jay4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Csv72c1+6bnRA+ls1xe/gt2/IMZ1+0g9JT+utqzFTVaLFH65bdbdvzq2GquBW0DrJ3+rAScPSRfxlE5H8emQDWWDDsHx5lb/jIP+dFAFhJ31895mLNTt2GCIpKByOxAwneLrI5hTTYQvNGjqlIgOE/6Kch29JoK3fH5+Ao5z+NA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=R6vYi1KH; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1753783040;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=URsAWgibYPK79yqP+L7WxxcSOKa5+XPmtvizT1y+9Fg=;
-	b=R6vYi1KH9tlTzbo79Qw0d+jJopiI+YTwbBbn3BZqZB/77ABYGt0hhTYs0fIdDl61Ko9KV5
-	qeQF6mBvbdvqiIObUYUta6GwyQYyngvxoBxCDmgAtyOpEPVfT+HL4ZdFsUy7nSw2HzAyup
-	2dDJfYVPSJjKDWfKTxZOyrZjqmi81vg=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-523-3PUZJqK3O46K5NtQB2f9TQ-1; Tue, 29 Jul 2025 05:57:19 -0400
-X-MC-Unique: 3PUZJqK3O46K5NtQB2f9TQ-1
-X-Mimecast-MFC-AGG-ID: 3PUZJqK3O46K5NtQB2f9TQ_1753783038
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-ae708b158f2so482104666b.3
-        for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 02:57:19 -0700 (PDT)
+	 Content-Type:Content-Disposition:In-Reply-To; b=I6TNEz7andCxMZCwd6TDnvd3j/DkdqlSlRLc61plo/wZqDQ2zvwuaYT8h7Nlm2wcWWeHtFen9tEbZJi0w5on83KC6gdiRQJGqMJ04RyoNuLQxCRBSypPqejUGS2/hrWZtSvNt6zor5RK1LnHuck5ZClOHT+x+90Wi4hKKFkBUM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UEiO8i3E; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-23dc5bcf49eso73929475ad.2;
+        Tue, 29 Jul 2025 03:01:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753783300; x=1754388100; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=d1d8s18MtuhaX0kZg4OWxHrrMPP6mzme6aHMpmRny7A=;
+        b=UEiO8i3EqvH222wEvffRWtuW+ODUrja2mHpcA8t9IjIoV7rpwGm+nOnuly7Y3jv9E1
+         ohYhCXHT/7lHZJDCPhyez3/GU3x2yZmFeaGaAbiTbe5NC/bv38pCExaqZRhgz3p4PQp+
+         B8LrKR8QMPDVvqS2AQuFnUWqa5u7cOWyhrrgpJzM5wB0hs+mxXG+5Z6nlYE4J21szBdx
+         FAgPxTKCNITtHNhHg6t0AzSNVqNNT0g+LJNkTacIOV0KW1IO1/h8kk/sm626MZqXuPLK
+         QHUl3gFdwI4h4XmmHVdDQ4HGM4vGSnW+4qpl/pA+FDFty3QBaL8IOhuLOXKPp3ZeyIVi
+         rhvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753783038; x=1754387838;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=URsAWgibYPK79yqP+L7WxxcSOKa5+XPmtvizT1y+9Fg=;
-        b=iMoOOpk89fV8Z6/v3iWcIl3iKdEP6OuR+257TGQ699mG8WpezLrfJEHmceUlKlVkDa
-         50rzHVMJ7F24QMpvMOcM2GhSHt9/ioC19Lh3B627kuOhNSGv451M2Xk23vRd5rUqq14g
-         LQycwrWxmOFt5pM6KamiqEB9EHQCUWBEmoI/H8cWEueATrgBRevIsF7ecyN/ou7uJaVR
-         f/cczUq13OGFcRoLZbBBlVNTSTIrNkQTUaNPJYVuiAXO0Gks3k+DKPplipU5p7V1r589
-         0IBFRDpGEbIJzxhcPjMAg7adYLixFOwHmEYyLxYkpXjp1r92TXuZgeO+qSmcvhImv+W/
-         8NqQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUEvM2LxdWWR7Dy/VmFa7UMAe9dAyBCVkuixMLIHCvnlm4yybJ2TAqWeHNWPDcfb5hBOk/OkPI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGAV9OXZAYdiXxlZorUo2KMo2nA0jAtLHCN7xKn/UqN2rsH0Mf
-	1OlS4p1+8xYASV/vUAVhe38wz7iJtS5+YI0Sm24DcSizqCul5xsruI2xE28/7jNj3/R4UxpZ15T
-	hSCdCXJVXj4FAKbca8OeccZwO6hhMZ2sYm5tViECY90yf6tk9ahsw9HMxiQ==
-X-Gm-Gg: ASbGncvbO8rafqHa+uoYPcXrmMEb/0ZN0LDp9l3Mcgc1Ev56acrkIJ/sagtuwK2a36K
-	HXXVwGVzVyVkrBGnBO+W3w4mHxDEQyM7WLmP6p/alQATN5pm/Y3Jbd1GYUSVvXhUTJJ8+cbMIv+
-	1ZYSNK10dfn0BOCfnmH2TjlnYbJEucgIM0vTAj0GfESWlu78bEsHr/HkqBK1+0nhwEs13d4Z+Gr
-	eXk281D3PSqVRRPr3GzMv0MfryAnEnutyIrDTa2rksjLN1acCqimwsPAlPJb+lVkbn5kvZ+ZZxr
-	5I6FmDtNT65eWM8NvvseAFMczFS0cWJNnQbWAOcdJ/ib02mFAU4gttp3rovC7EQlqpp0CSAzJr8
-	hN4w8s0cZZp+TcxA=
-X-Received: by 2002:a17:907:7242:b0:ae0:e18b:e92f with SMTP id a640c23a62f3a-af617704758mr1614775566b.23.1753783037730;
-        Tue, 29 Jul 2025 02:57:17 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFoBdBaDKfVmFM+pFynu3dilLkfDniy2LdbtMDgfHwyAndlS+TmotNvQYGIb3Xp7LnP3gPAnA==
-X-Received: by 2002:a17:907:7242:b0:ae0:e18b:e92f with SMTP id a640c23a62f3a-af617704758mr1614771566b.23.1753783037001;
-        Tue, 29 Jul 2025 02:57:17 -0700 (PDT)
-Received: from sgarzare-redhat (host-79-45-205-118.retail.telecomitalia.it. [79.45.205.118])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6156591fe7bsm952884a12.51.2025.07.29.02.57.15
+        d=1e100.net; s=20230601; t=1753783300; x=1754388100;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=d1d8s18MtuhaX0kZg4OWxHrrMPP6mzme6aHMpmRny7A=;
+        b=w9XBNvTZeFbku+ev7vmQpOPC0/f79Dgz0iY4i3NetWIHt8yDmAH8Oo/4mEV1s5Q/7Q
+         aMDS+JOK/P2FtH6mf9h0+flDQ1USJ2XzqlE95LDhYFalwk20NZyEL+yCNCJrftrK9kZC
+         Q6iW5zbmLK9l+8ADmpZDXOcQcQAuEpntfexEB6a8wl+pFJzHvY0DEftjqWUM6xNBHxgJ
+         7AJhFBvpSeMa7NHPYe5NLY4L5Xi4Y1so0YfjHSSqF7rkAosCNgJuWBbke0t6K2E23qNR
+         d76QW3F9WFDQyTCWNYkEG+jmEtuGgfwcL25GJK3B5aL9cht1pOIQ60JZEd+BnFuxWyvO
+         BBYw==
+X-Forwarded-Encrypted: i=1; AJvYcCV7ArVS94Wf8sNwWfux91LJ34y73LOShi+Tj8K/kzYUYQNRaimset/hbr2zZ8/aVUEqNuMiOAhU@vger.kernel.org, AJvYcCXcwJLtU1Gzo37GNlKu6D7glf2ZArLIRr7Re4JMEbxH0T8WkQsBv9nI0pZ6AY6r9JAT7Sv77drkh+trScg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywv834CE/3K3MPvPV9vwOtbs9k1nGbRhCt04fS4ouitJ5hOWTmP
+	rvDE8aGBmXkY9o4O+P/KcKNiJCtXwcN1I6oZO5wv/KeXfb124voH1KXZ7iC0XdJj1+s=
+X-Gm-Gg: ASbGncspJxgQ7ZFSKYds+QE4518CEJz7mBXEjTDL2qVqthACmCw9wGBEJC5H1EIK1Uf
+	bW/EgrcPCo3tFbpT4aDc4DvQU8MfA6xLAo7gSp9m0wZaIZCnzmO5UYxYW6uooE/eVo2qiDoPgpd
+	iYa7XQkzaKq9FoGNGVQ1BZu2rtXiXn3kSJDcnPZmnpyC3/z6rj2a8sStbNYEYjWiKdJ9lMDphmt
+	TGHBuyJNNQ+I+cReq5LDO3iDnhNQ3bOxT0vxy9onXiDvwwR+q2/dH62stmTMt6MypwtvoNm2ZWw
+	1gqdP4SFWaXoUZU2iiTQfAtKaNtpgufjIlYrenZIj3n3icPs8HuN8+76Qy8m2PcUk0CWSw5xVK8
+	SBgwj0R9CRNnt8UR0T5dBGlhqBB8=
+X-Google-Smtp-Source: AGHT+IE9hYg8cukZ+hl7si3IylaTKnmyWymkGisg4a9Xj40pbJI5mi+qG/0RzKBwsFDp8xroavZ9Cw==
+X-Received: by 2002:a17:902:f70a:b0:240:eea:35f2 with SMTP id d9443c01a7336-2400eea38cfmr131815665ad.24.1753783300121;
+        Tue, 29 Jul 2025 03:01:40 -0700 (PDT)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2405bca90ebsm21740415ad.6.2025.07.29.03.01.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Jul 2025 02:57:16 -0700 (PDT)
-Date: Tue, 29 Jul 2025 11:57:14 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Breno Leitao <leitao@debian.org>, Will Deacon <will@kernel.org>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, eperezma@redhat.com, linux-arm-kernel@lists.infradead.org, 
-	kvm@vger.kernel.org, Stefan Hajnoczi <stefanha@redhat.com>, netdev@vger.kernel.org
-Subject: Re: vhost: linux-next: crash at vhost_dev_cleanup()
-Message-ID: <4hr3olmtvvqccfb4xvqfs3zisozqjlvjbpdgk4tgbhhhv7vra3@haamqnpqtivp>
-References: <vosten2rykookljp6u6qc4hqhsqb6uhdy2iuhpl54plbq2tkr4@kphfpgst3e7c>
- <20250724034659-mutt-send-email-mst@kernel.org>
- <CAGxU2F76ueKm3H30vXL+jxMVsiQBuRkDN9NRfVU8VeTXzTVAWg@mail.gmail.com>
- <20250724042100-mutt-send-email-mst@kernel.org>
- <aIHydjBEnmkTt-P-@willie-the-truck>
- <fv6uhq6lcgjwrdp7fcxmokczjmavbc37ikrqz7zpd7puvrbsml@zkt2lidjrqm6>
- <CAGxU2F5Qy=vMD0z9_HTN2K9wyt+6EH-Yr0N9VqR4OT4O1asqZg@mail.gmail.com>
- <bvjomrplpsjklglped5pmwttzmljigasdafjiizt2sfmytc5rr@ljpu455kx52j>
- <CACGkMEt0ZBtcAUgc1RBU7Gd3JGvC-eszEOexee-kx7TgoiMGtA@mail.gmail.com>
+        Tue, 29 Jul 2025 03:01:39 -0700 (PDT)
+Date: Tue, 29 Jul 2025 10:01:32 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Stanislav Fomichev <sdf@fomichev.me>, Jiri Pirko <jiri@nvidia.com>
+Cc: davem@davemloft.net, edumazet@google.com, horms@kernel.org,
+	kuba@kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, pabeni@redhat.com,
+	syzkaller-bugs@googlegroups.com,
+	syzbot <syzbot+8182574047912f805d59@syzkaller.appspotmail.com>
+Subject: Re: [syzbot] [net?] BUG: sleeping function called from invalid
+ context in team_change_rx_flags (2)
+Message-ID: <aIib_MyMj6jgCOVC@fedora>
+References: <68712acf.a00a0220.26a83e.0051.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACGkMEt0ZBtcAUgc1RBU7Gd3JGvC-eszEOexee-kx7TgoiMGtA@mail.gmail.com>
+In-Reply-To: <68712acf.a00a0220.26a83e.0051.GAE@google.com>
 
-On Tue, Jul 29, 2025 at 03:44:49PM +0800, Jason Wang wrote:
->On Thu, Jul 24, 2025 at 9:50 PM Breno Leitao <leitao@debian.org> wrote:
->>
->> On Thu, Jul 24, 2025 at 02:52:08PM +0200, Stefano Garzarella wrote:
->> > On Thu, 24 Jul 2025 at 14:48, Breno Leitao <leitao@debian.org> wrote:
->> > >
->> > > On Thu, Jul 24, 2025 at 09:44:38AM +0100, Will Deacon wrote:
->> > > > > > On Thu, 24 Jul 2025 at 09:48, Michael S. Tsirkin <mst@redhat.com> wrote:
->> > > > > > >
->> > > > > > > On Wed, Jul 23, 2025 at 08:04:42AM -0700, Breno Leitao wrote:
->> > > > > > > > Hello,
->> > > > > > > >
->> > > > > > > > I've seen a crash in linux-next for a while on my arm64 server, and
->> > > > > > > > I decided to report.
->> > > > > > > >
->> > > > > > > > While running stress-ng on linux-next, I see the crash below.
->> > > > > > > >
->> > > > > > > > This is happening in a kernel configure with some debug options (KASAN,
->> > > > > > > > LOCKDEP and KMEMLEAK).
->> > > > > > > >
->> > > > > > > > Basically running stress-ng in a loop would crash the host in 15-20
->> > > > > > > > minutes:
->> > > > > > > >       # while (true); do stress-ng -r 10 -t 10; done
->> > > > > > > >
->> > > > > > > > >From the early warning "virt_to_phys used for non-linear address",
->> > > > > >
->> > > > > > mmm, we recently added nonlinear SKBs support in vhost-vsock [1],
->> > > > > > @Will can this issue be related?
->> > > > >
->> > > > > Good point.
->> > > > >
->> > > > > Breno, if bisecting is too much trouble, would you mind testing the commits
->> > > > > c76f3c4364fe523cd2782269eab92529c86217aa
->> > > > > and
->> > > > > c7991b44d7b44f9270dec63acd0b2965d29aab43
->> > > > > and telling us if this reproduces?
->> > > >
->> > > > That's definitely worth doing, but we should be careful not to confuse
->> > > > the "non-linear address" from the warning (which refers to virtual
->> > > > addresses that lie outside of the linear mapping of memory, e.g. in the
->> > > > vmalloc space) and "non-linear SKBs" which refer to SKBs with fragment
->> > > > pages.
->> > >
->> > > I've tested both commits above, and I see the crash on both commits
->> > > above, thus, the problem reproduces in both cases. The only difference
->> > > I noted is the fact that I haven't seen the warning before the crash.
->> > >
->> > >
->> > > Log against c76f3c4364fe ("vhost/vsock: Avoid allocating
->> > > arbitrarily-sized SKBs")
->> > >
->> > >          Unable to handle kernel paging request at virtual address 0000001fc0000048
->> > >          Mem abort info:
->> > >            ESR = 0x0000000096000005
->> > >            EC = 0x25: DABT (current EL), IL = 32 bits
->> > >            SET = 0, FnV = 0
->> > >            EA = 0, S1PTW = 0
->> > >            FSC = 0x05: level 1 translation fault
->> > >          Data abort info:
->> > >            ISV = 0, ISS = 0x00000005, ISS2 = 0x00000000
->> > >            CM = 0, WnR = 0, TnD = 0, TagAccess = 0
->> > >            GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
->> > >          user pgtable: 64k pages, 48-bit VAs, pgdp=0000000cdcf2da00
->> > >          [0000001fc0000048] pgd=0000000000000000, p4d=0000000000000000, pud=0000000000000000
->> > >          Internal error: Oops: 0000000096000005 [#1]  SMP
->> > >          Modules linked in: vfio_iommu_type1 vfio md4 crc32_cryptoapi ghash_generic unix_diag vhost_net tun vhost vhost_iotlb tap mpls_gso mpls_iptunnel mpls_router fou sch_fq ghes_edac tls tcp_diag inet_diag act_gact cls_bpf nvidia_c
->> > >          CPU: 34 UID: 0 PID: 1727297 Comm: stress-ng-dev Kdump: loaded Not tainted 6.16.0-rc6-upstream-00027-gc76f3c4364fe #19 NONE
->> > >          pstate: 23401009 (nzCv daif +PAN -UAO +TCO +DIT +SSBS BTYPE=--)
->> > >          pc : kfree+0x48/0x2a8
->> > >          lr : vhost_dev_cleanup+0x138/0x2b8 [vhost]
->> > >          sp : ffff80013a0cfcd0
->> > >          x29: ffff80013a0cfcd0 x28: ffff0008fd0b6240 x27: 0000000000000000
->> > >          x26: 0000000000000000 x25: 0000000000000000 x24: 0000000000000000
->> > >          x23: 00000000040e001f x22: ffffffffffffffff x21: ffff00014f1d4ac0
->> > >          x20: 0000000000000001 x19: ffff00014f1d0000 x18: 0000000000000000
->> > >          x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000000
->> > >          x14: 000000000000001f x13: 000000000000000f x12: 0000000000000001
->> > >          x11: 0000000000000000 x10: 0000000000000402 x9 : ffffffdfc0000000
->> > >          x8 : 0000001fc0000040 x7 : 0000000000000000 x6 : 0000000000000000
->> > >          x5 : ffff000141931840 x4 : 0000000000000000 x3 : 0000000000000008
->> > >          x2 : ffffffffffffffff x1 : ffffffffffffffff x0 : 0000000000010000
->> > >          Call trace:
->> > >           kfree+0x48/0x2a8 (P)
->> > >           vhost_dev_cleanup+0x138/0x2b8 [vhost]
->> > >           vhost_net_release+0xa0/0x1a8 [vhost_net]
->> >
->> > But here is the vhost_net, so I'm confused now.
->> > Do you see the same (vhost_net) also on 9798752 ("Add linux-next
->> > specific files for 20250721") ?
->>
->> I will need to reproduce, but, looking at my logs, I see the following
->> against: c76f3c4364fe ("vhost/vsock: Avoid allocating arbitrarily-sized SKBs").
->> The logs are a bit intermixed, probably there were multiple CPUs hitting
->> the same code path.
->>
->>            virt_to_phys used for non-linear address: 000000001b662678 (0xffe61984a460)
->>            WARNING: CPU: 15 PID: 112846 at arch/arm64/mm/physaddr.c:15 __virt_to_phys+0x80/0xa8
->>            Modules linked in: vhost_vsock(E) vhost(E) vhost_iotlb(E) ghes_edac(E) tls(E) act_gact(E) cls_bpf(E) tcp_diag(E) inet_diag(E) ipmi_ssif(E) ipmi_devintf(E) ipmi_msghandler(E) sch_fq_codel(E) drm(E) backlight(E) drm_panel_orientation_quirks(E) acpi_power_meter(E) loop(E) efivarfs(E) autofs4(E)
->>            CPU: 15 UID: 0 PID: 112846 Comm: stress-ng-dev Kdump: loaded Tainted: G        W   E    N  6.16.0-rc6-upstream-00027-gc76f3c4364fe #16 PREEMPT(none)
->>            Tainted: [W]=WARN, [E]=UNSIGNED_MODULE, [N]=TEST
->>            pstate: 63401009 (nZCv daif +PAN -UAO +TCO +DIT +SSBS BTYPE=--)
->>            pc : __virt_to_phys+0x80/0xa8
->>            lr : __virt_to_phys+0x7c/0xa8
->>            sp : ffff8001184d7a30
->>            x29: ffff8001184d7a30 x28: 00000000000045d8 x27: 1fffe000e7e88014
->>            x26: 1fffe000e7e888f7 x25: ffff0007e578bf00 x24: 1fffe000e7e88013
->>            x23: 0000000000000000 x22: 0000ffe61984a460 x21: ffff00073f440098
->>            x20: ffffff1000080000 x19: 0000ffe61984a460 x18: 0000000000000002
->>            x17: 6666783028203837 x16: 3632363662313030 x15: 0000000000000001
->>            x14: 1fffe006d52e90f2 x13: 0000000000000000 x12: 0000000000000000
->>            x11: ffff6006d52e90f3 x10: 0000000000000002 x9 : cfc659a21c727d00
->>            x8 : ffff800083c19000 x7 : 0000000000000001 x6 : 0000000000000001
->>            x5 : ffff8001184d7398 x4 : ffff800084866d60 x3 : ffff8000805fdd94
->>            x2 : 0000000000000001 x1 : 0000000000000004 x0 : 000000000000004b
->>            Call trace:
->>             __virt_to_phys+0x80/0xa8 (P)
->>             kfree+0xac/0x4b0
->>             vhost_dev_cleanup+0x484/0x8b0 [vhost]
->>             vhost_vsock_dev_release+0x2f4/0x358 [vhost_vsock]
->>             __fput+0x2b4/0x608
->>             fput_close_sync+0xe8/0x1e0
->>             __arm64_sys_close+0x84/0xd0
->>             invoke_syscall+0x8c/0x208
->>             do_el0_svc+0x128/0x1a0
->>             el0_svc+0x58/0x160
->>             el0t_64_sync_handler+0x78/0x108
->>             el0t_64_sync+0x198/0x1a0
->>            irq event stamp: 0
->>            hardirqs last  enabled at (0): [<0000000000000000>] 0x0
->>            hardirqs last disabled at (0): [<ffff8000801d876c>] copy_process+0xd5c/0x29f8
->>            softirqs last  enabled at (0): [<ffff8000801d879c>] copy_process+0xd8c/0x29f8
->>            softirqs last disabled at (0): [<0000000000000000>] 0x0
->>            ---[ end trace 0000000000000000 ]---
->>            Unable to handle kernel paging request at virtual address 0000040053791288
->>            ------------[ cut here ]------------
->>            lr : kfree+0xac/0x4b0
->>            virt_to_phys used for non-linear address: 00000000290839fd (0x2500000000)
->>            WARNING: CPU: 41 PID: 112845 at arch/arm64/mm/physaddr.c:15 __virt_to_phys+0x80/0xa8
->>            Modules linked in: vhost_vsock(E) vhost(E) vhost_iotlb(E) ghes_edac(E) tls(E) act_gact(E) cls_bpf(E) tcp_diag(E) inet_diag(E) ipmi_ssif(E) ipmi_devintf(E) ipmi_msghandler(E) sch_fq_codel(E) drm(E) backlight(E) drm_panel_orientation_quirks(E) acpi_power_meter(E) loop(E) efivarfs(E) autofs4(E)
->>            CPU: 41 UID: 0 PID: 112845 Comm: stress-ng-dev Kdump: loaded Tainted: G        W   E    N  6.16.0-rc6-upstream-00027-gc76f3c4364fe #16 PREEMPT(none)
->>            x23: 0000000000000001
->>            Tainted: [W]=WARN, [E]=UNSIGNED_MODULE, [N]=TEST
->>            pstate: 63401009 (nZCv daif +PAN -UAO +TCO +DIT +SSBS BTYPE=--)
->>            pc : __virt_to_phys+0x80/0xa8
->>            lr : __virt_to_phys+0x7c/0xa8
->>            sp : ffff8001a8277a30
->>            x29: ffff8001a8277a30 x28: 00000000000045d8 x27: 1fffe000e7e3c014
->>            x26: 1fffe000e7e3c8f7 x25: ffff0007bcff0000 x24: 1fffe000e7e3c013
->>            x23: 0000000000000000 x22: 0000002500000000 x21: ffff00073f1e0098
->>            x20: ffffff1000080000 x19: 0000002500000000 x18: 0000000000000004
->>            x17: 00000000ffffffff x16: 0000000000000001 x15: 0000000000000001
->>            x14: 1fffe006d53920f2 x13: 0000000000000000 x12: 0000000000000000
->>            sp : ffff8001184d7a50
->>            x29: ffff8001184d7a60 x28: 00000000000045d8 x27: 1fffe000e7e88014
->>            x26: 1fffe000e7e888f7 x25: ffff0007e578bf00 x24: 1fffe000e7e88013
->>            x23: 0000000000000000 x22: 0000ffe61984a460 x21: ffff00073f440098
->>            x20: 0000040053791280 x19: ffff80000d0b8bbc x18: 0000000000000002
->>            x17: 6666783028203837 x16: 3632363662313030 x15: 0000000000000001
->>             x22: 0000ffe6199a459d
->>            x14: 1fffe006d52e90f2
->>             x21: ffff00073f7f0098
->>            x20: ffffff1000080000 x19: 0000ffe6199a459d x18: 0000000000000004
->>            x17: 54455320203b2d2c x16: 0000000000000011 x15: 0000000000000001
->>            x14: 1fffe006d52bb8f2 x13: 0000000000000000 x12: 0000000000000000
->>            x11: ffff6006d52bb8f3 x10: dfff800000000000 x9 : 77521a2bd3e0be00
->>            x8 : ffff800083c19000 x7 : 0000000000000000 x6 : ffff80008036bc2c
->>            x5 : 0000000000000000 x4 : 0000000000000001 x3 : ffff8000805fdd94
->>            x2 : 0000000000000001 x1 : 0000000000000004 x0 : 000000000000004b
->>            Call trace:
->>             __virt_to_phys+0x80/0xa8 (P)
->>             kfree+0xac/0x4b0
->>             vhost_dev_cleanup+0x484/0x8b0 [vhost]
->>             vhost_vsock_dev_release+0x2f4/0x358 [vhost_vsock]
->>             __fput+0x2b4/0x608
->>            x11: ffff6006d53920f3
->>             fput_close_sync+0xe8/0x1e0
->>             __arm64_sys_close+0x84/0xd0
->>             invoke_syscall+0x8c/0x208
->>             do_el0_svc+0x128/0x1a0
->>             el0_svc+0x58/0x160
->>             el0t_64_sync_handler+0x78/0x108
->>             el0t_64_sync+0x198/0x1a0
->>            irq event stamp: 0
->>             x13: 0000000000000000
->>            hardirqs last  enabled at (0): [<0000000000000000>] 0x0
->>            hardirqs last disabled at (0): [<ffff8000801d876c>] copy_process+0xd5c/0x29f8
->>
->>
->> > The initial report contained only vhost_vsock traces IIUC, so I'm
->> > suspecting something in the vhost core.
->>
->> Right, it seems we are hitting the same code path, on on both
->> vhost_vsock and vhost_net.
->>
->
->I've posted a fix here:
->
->https://lore.kernel.org/virtualization/20250729073916.80647-1-jasowang@redhat.com/T/#u
->
->I think it should address this issue.
-
-Thanks for the fix!
-
-Stefano
-
+Cc Stanislav
+On Fri, Jul 11, 2025 at 08:16:31AM -0700, syzbot wrote:
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    dd831ac8221e net/sched: sch_qfq: Fix null-deref in agg_deq..
+> git tree:       net
+> console output: https://syzkaller.appspot.com/x/log.txt?x=13245bd4580000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=b29b1a0d7330d4a8
+> dashboard link: https://syzkaller.appspot.com/bug?extid=8182574047912f805d59
+> compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+> 
+> Unfortunately, I don't have any reproducer for this issue yet.
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/b7b63815bf2a/disk-dd831ac8.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/f857222aabbb/vmlinux-dd831ac8.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/9071ec6016d0/bzImage-dd831ac8.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+8182574047912f805d59@syzkaller.appspotmail.com
+> 
+> netlink: 8 bytes leftover after parsing attributes in process `syz.1.1814'.
+> macsec0: entered promiscuous mode
+> team0: entered promiscuous mode
+> BUG: sleeping function called from invalid context at kernel/locking/mutex.c:579
+> in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 12326, name: syz.1.1814
+> preempt_count: 201, expected: 0
+> RCU nest depth: 0, expected: 0
+> 3 locks held by syz.1.1814/12326:
+>  #0: ffffffff8fa21eb8 (&ops->srcu#2){.+.+}-{0:0}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
+>  #0: ffffffff8fa21eb8 (&ops->srcu#2){.+.+}-{0:0}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
+>  #0: ffffffff8fa21eb8 (&ops->srcu#2){.+.+}-{0:0}, at: rtnl_link_ops_get+0x23/0x250 net/core/rtnetlink.c:570
+>  #1: ffffffff8f51c5c8 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock net/core/rtnetlink.c:80 [inline]
+>  #1: ffffffff8f51c5c8 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_nets_lock net/core/rtnetlink.c:341 [inline]
+>  #1: ffffffff8f51c5c8 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_newlink+0x8db/0x1c70 net/core/rtnetlink.c:4054
+>  #2: ffff8880635e8368 (&macsec_netdev_addr_lock_key#2/2){+...}-{3:3}, at: netif_addr_lock_bh include/linux/netdevice.h:4805 [inline]
+>  #2: ffff8880635e8368 (&macsec_netdev_addr_lock_key#2/2){+...}-{3:3}, at: dev_uc_add+0x67/0x120 net/core/dev_addr_lists.c:689
+> Preemption disabled at:
+> [<ffffffff895a7d26>] local_bh_disable include/linux/bottom_half.h:20 [inline]
+> [<ffffffff895a7d26>] netif_addr_lock_bh include/linux/netdevice.h:4804 [inline]
+> [<ffffffff895a7d26>] dev_uc_add+0x56/0x120 net/core/dev_addr_lists.c:689
+> CPU: 0 UID: 0 PID: 12326 Comm: syz.1.1814 Not tainted 6.16.0-rc4-syzkaller-00153-gdd831ac8221e #0 PREEMPT(full) 
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
+> Call Trace:
+>  <TASK>
+>  dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
+>  __might_resched+0x495/0x610 kernel/sched/core.c:8800
+>  __mutex_lock_common kernel/locking/mutex.c:579 [inline]
+>  __mutex_lock+0x106/0xe80 kernel/locking/mutex.c:747
+>  team_change_rx_flags+0x38/0x220 drivers/net/team/team_core.c:1781
+>  dev_change_rx_flags net/core/dev.c:9241 [inline]
+>  __dev_set_promiscuity+0x534/0x740 net/core/dev.c:9285
+>  netif_set_promiscuity+0x50/0xe0 net/core/dev.c:9305
+>  dev_set_promiscuity+0x126/0x260 net/core/dev_api.c:287
+>  dev_change_rx_flags net/core/dev.c:9241 [inline]
+>  __dev_set_promiscuity+0x534/0x740 net/core/dev.c:9285
+>  __dev_set_rx_mode+0x17c/0x260 net/core/dev.c:-1
+>  dev_uc_add+0xc8/0x120 net/core/dev_addr_lists.c:693
+>  macsec_dev_open+0xd9/0x530 drivers/net/macsec.c:3634
+>  __dev_open+0x470/0x880 net/core/dev.c:1683
+>  __dev_change_flags+0x1ea/0x6d0 net/core/dev.c:9458
+>  rtnl_configure_link net/core/rtnetlink.c:3577 [inline]
+>  rtnl_newlink_create+0x555/0xb00 net/core/rtnetlink.c:3833
+>  __rtnl_newlink net/core/rtnetlink.c:3940 [inline]
+>  rtnl_newlink+0x16d6/0x1c70 net/core/rtnetlink.c:4055
+>  rtnetlink_rcv_msg+0x7cc/0xb70 net/core/rtnetlink.c:6944
+>  netlink_rcv_skb+0x208/0x470 net/netlink/af_netlink.c:2551
+>  netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
+>  netlink_unicast+0x75c/0x8e0 net/netlink/af_netlink.c:1346
+>  netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1896
+>  sock_sendmsg_nosec net/socket.c:712 [inline]
+>  __sock_sendmsg+0x219/0x270 net/socket.c:727
+>  ____sys_sendmsg+0x505/0x830 net/socket.c:2566
+>  ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2620
+>  __sys_sendmsg net/socket.c:2652 [inline]
+>  __do_sys_sendmsg net/socket.c:2657 [inline]
+>  __se_sys_sendmsg net/socket.c:2655 [inline]
+>  __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2655
+>  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+>  do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> RIP: 0033:0x7f2785b8e929
+> Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+> RSP: 002b:00007f27869d6038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+> RAX: ffffffffffffffda RBX: 00007f2785db5fa0 RCX: 00007f2785b8e929
+> RDX: 0000000000000800 RSI: 0000200000000280 RDI: 0000000000000009
+> RBP: 00007f2785c10b39 R08: 0000000000000000 R09: 0000000000000000
+> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+> R13: 0000000000000000 R14: 00007f2785db5fa0 R15: 00007ffe1c84aa28
+>  </TASK>
+> 
+> =============================
+> [ BUG: Invalid wait context ]
+> 6.16.0-rc4-syzkaller-00153-gdd831ac8221e #0 Tainted: G        W          
+> -----------------------------
+> syz.1.1814/12326 is trying to lock:
+> ffff88802715ce00 (team->team_lock_key#2){+.+.}-{4:4}, at: team_change_rx_flags+0x38/0x220 drivers/net/team/team_core.c:1781
+> other info that might help us debug this:
+> context-{5:5}
+> 3 locks held by syz.1.1814/12326:
+>  #0: ffffffff8fa21eb8 (&ops->srcu#2){.+.+}-{0:0}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
+>  #0: ffffffff8fa21eb8 (&ops->srcu#2){.+.+}-{0:0}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
+>  #0: ffffffff8fa21eb8 (&ops->srcu#2){.+.+}-{0:0}, at: rtnl_link_ops_get+0x23/0x250 net/core/rtnetlink.c:570
+>  #1: ffffffff8f51c5c8 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock net/core/rtnetlink.c:80 [inline]
+>  #1: ffffffff8f51c5c8 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_nets_lock net/core/rtnetlink.c:341 [inline]
+>  #1: ffffffff8f51c5c8 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_newlink+0x8db/0x1c70 net/core/rtnetlink.c:4054
+>  #2: ffff8880635e8368 (&macsec_netdev_addr_lock_key#2/2){+...}-{3:3}, at: netif_addr_lock_bh include/linux/netdevice.h:4805 [inline]
+>  #2: ffff8880635e8368 (&macsec_netdev_addr_lock_key#2/2){+...}-{3:3}, at: dev_uc_add+0x67/0x120 net/core/dev_addr_lists.c:689
+> stack backtrace:
+> CPU: 0 UID: 0 PID: 12326 Comm: syz.1.1814 Tainted: G        W           6.16.0-rc4-syzkaller-00153-gdd831ac8221e #0 PREEMPT(full) 
+> Tainted: [W]=WARN
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
+> Call Trace:
+>  <TASK>
+>  dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
+>  print_lock_invalid_wait_context kernel/locking/lockdep.c:4833 [inline]
+>  check_wait_context kernel/locking/lockdep.c:4905 [inline]
+>  __lock_acquire+0xbcb/0xd20 kernel/locking/lockdep.c:5190
+>  lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5871
+>  __mutex_lock_common kernel/locking/mutex.c:602 [inline]
+>  __mutex_lock+0x182/0xe80 kernel/locking/mutex.c:747
+>  team_change_rx_flags+0x38/0x220 drivers/net/team/team_core.c:1781
+>  dev_change_rx_flags net/core/dev.c:9241 [inline]
+>  __dev_set_promiscuity+0x534/0x740 net/core/dev.c:9285
+>  netif_set_promiscuity+0x50/0xe0 net/core/dev.c:9305
+>  dev_set_promiscuity+0x126/0x260 net/core/dev_api.c:287
+>  dev_change_rx_flags net/core/dev.c:9241 [inline]
+>  __dev_set_promiscuity+0x534/0x740 net/core/dev.c:9285
+>  __dev_set_rx_mode+0x17c/0x260 net/core/dev.c:-1
+>  dev_uc_add+0xc8/0x120 net/core/dev_addr_lists.c:693
+>  macsec_dev_open+0xd9/0x530 drivers/net/macsec.c:3634
+>  __dev_open+0x470/0x880 net/core/dev.c:1683
+>  __dev_change_flags+0x1ea/0x6d0 net/core/dev.c:9458
+>  rtnl_configure_link net/core/rtnetlink.c:3577 [inline]
+>  rtnl_newlink_create+0x555/0xb00 net/core/rtnetlink.c:3833
+>  __rtnl_newlink net/core/rtnetlink.c:3940 [inline]
+>  rtnl_newlink+0x16d6/0x1c70 net/core/rtnetlink.c:4055
+>  rtnetlink_rcv_msg+0x7cc/0xb70 net/core/rtnetlink.c:6944
+>  netlink_rcv_skb+0x208/0x470 net/netlink/af_netlink.c:2551
+>  netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
+>  netlink_unicast+0x75c/0x8e0 net/netlink/af_netlink.c:1346
+>  netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1896
+>  sock_sendmsg_nosec net/socket.c:712 [inline]
+>  __sock_sendmsg+0x219/0x270 net/socket.c:727
+>  ____sys_sendmsg+0x505/0x830 net/socket.c:2566
+>  ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2620
+>  __sys_sendmsg net/socket.c:2652 [inline]
+>  __do_sys_sendmsg net/socket.c:2657 [inline]
+>  __se_sys_sendmsg net/socket.c:2655 [inline]
+>  __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2655
+>  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+>  do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> RIP: 0033:0x7f2785b8e929
+> Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+> RSP: 002b:00007f27869d6038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+> RAX: ffffffffffffffda RBX: 00007f2785db5fa0 RCX: 00007f2785b8e929
+> RDX: 0000000000000800 RSI: 0000200000000280 RDI: 0000000000000009
+> RBP: 00007f2785c10b39 R08: 0000000000000000 R09: 0000000000000000
+> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+> R13: 0000000000000000 R14: 00007f2785db5fa0 R15: 00007ffe1c84aa28
+>  </TASK>
+> 
+> 
+> ---
+> This report is generated by a bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for more information about syzbot.
+> syzbot engineers can be reached at syzkaller@googlegroups.com.
+> 
+> syzbot will keep track of this issue. See:
+> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+> 
+> If the report is already addressed, let syzbot know by replying with:
+> #syz fix: exact-commit-title
+> 
+> If you want to overwrite report's subsystems, reply with:
+> #syz set subsystems: new-subsystem
+> (See the list of subsystem names on the web dashboard)
+> 
+> If the report is a duplicate of another one, reply with:
+> #syz dup: exact-subject-of-another-report
+> 
+> If you want to undo deduplication, reply with:
+> #syz undup
 
