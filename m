@@ -1,242 +1,214 @@
-Return-Path: <netdev+bounces-210812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210813-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A861B14ECD
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 15:54:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9ED97B14ED9
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 15:56:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ADEC43AC7BE
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 13:53:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C5E3B188BA56
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 13:56:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66BB91A8F97;
-	Tue, 29 Jul 2025 13:53:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B5D01B413D;
+	Tue, 29 Jul 2025 13:56:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="f8uyGyDb"
+	dkim=pass (2048-bit key) header.d=readmodwrite-com.20230601.gappssmtp.com header.i=@readmodwrite-com.20230601.gappssmtp.com header.b="PTA1ouYO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD7731A0B0E
-	for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 13:53:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C04F01A2643
+	for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 13:56:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753797232; cv=none; b=Fah+epqvqTvhCNZ7IQaUh7bzBpbf2hUP38qzJlfVlA5kN6AL/LB14HeEprKZbPX9ZcTZrTUKRx8OIgRgW9VRGzG9woH7WpVo3OpiFOMgYmJow6lOWXVLaPt1S89FqttBAMdgb9bSwrvFQtV5xm1L922BO7XB1ta9X60OjDLMKr4=
+	t=1753797381; cv=none; b=MUQ9okl5dM7jOuo5zi3pib4hXeTaVJ318fdbst6GYIql3waz7oKMx8IseTEJ/953WriCoxOYiLVpcQkeUz6leaQ8tBgykeC7MFqZRzR/hA/pwatAz2BA85I548OUYkk5G4a/gVW4aqUUuUl+RXRSWAnOk5TA2IECLcurwNjs45U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753797232; c=relaxed/simple;
-	bh=7KGd7j82dDK+ybam3fPzsTNJLqBsuymq0GgV9H6+e4o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=r17kTa2mvFeJ1jCq7LPTZRfJAUWR0e+Awa/0py7Q0zSBah/2+amsM0LeeSa3Al4yyi8vALHykvv9+D0d1YwuViRFqtol5nwFFwrGrxKNyX13cvJOgt48MlHgZvFHhYS4HltuMNkMFjTMbvP8bathJSH8ilnHuRO842mJK9knY60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=f8uyGyDb; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56T8ORQG018159
-	for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 13:53:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	uIz2sC5rEvjeL5lDn/RzFAavsZ2n0Q13ZJnx4oJFPBI=; b=f8uyGyDbhemwKOn8
-	iFRaSRVt3n5zuPyusne6/n6UyImffomcNSmo7wRFQ8O+DHCdGM+s56Tybz2Yd5nt
-	fXI/5YpxUJow8wXke+xRfygm4WEsrJC6wGzoEKdJ2svj1QOsoyXNbjoAw7ZpbGUs
-	+psQp2QXMj0Ip7Txngg0jOc0jlN3NOTUcmCoh6qVlSdjgFMVWQ+ebEqvGRilmTci
-	5jijlFQKSrlhVHEyBGHXV7ccxUA3odPaj23e+8nu4bVduvmWNqiUdlbu+4FZ2wT2
-	Y2EQizrsFzP5FgrtW4JDMCwg7J9Vm13eR+ojDCuIE5DrKIJRan5oR6qGJv3qN1ix
-	HZdDrA==
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com [209.85.222.199])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 484pbm07d1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 13:53:49 +0000 (GMT)
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-7dfeacb6dbdso28856285a.2
-        for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 06:53:49 -0700 (PDT)
+	s=arc-20240116; t=1753797381; c=relaxed/simple;
+	bh=5l+kX3TlXyRbsgOTyGA3oWiH4eVSrFAAaoihgsCn8ek=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=K1FnRTo2YcpqVGW8v7Bn14I651W8hz+SdTpyebED1XjClsS8Vwp5wHiwQZ6tbb+d0z0vlkc1T13AJTPi6JVJqj92Ql9PsVA7hB2ip07UNTe5eznwC3LVbV4IU7Zgqm7PzRs1M7SMjoURBmHwrv41TPOFDey8jrDhBGvrNePr/jQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=readmodwrite.com; spf=none smtp.mailfrom=readmodwrite.com; dkim=pass (2048-bit key) header.d=readmodwrite-com.20230601.gappssmtp.com header.i=@readmodwrite-com.20230601.gappssmtp.com header.b=PTA1ouYO; arc=none smtp.client-ip=209.85.215.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=readmodwrite.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=readmodwrite.com
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-b271f3ae786so4710508a12.3
+        for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 06:56:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=readmodwrite-com.20230601.gappssmtp.com; s=20230601; t=1753797379; x=1754402179; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Mv8soW1s35ahL418D8VF6q42tDzqNXV2suiJtYXndw0=;
+        b=PTA1ouYOCta6b9E2k13otpsr1iRxjwhcz9xBk5iuvLUR2TdBxwGpU2kyo9RS2gM3cQ
+         hfE/EERq9kzJltnYLeDIaoveE6nTXYG/21mXimsgKRVL7t5MDADKPBmrcwtaDsEz64Xm
+         6/djBTZMN2XfljN7PYi+70GdCCRJMa13+jsTL+5IBJl8Fo4I0/dHumNgcWKYsYXwArle
+         CZs7gIYEsV/bvIk3yIxMRbICV4kAoaPs5c3EBtyvYmshMCv1q7OvKtfITx9cib4oOmhx
+         0J6QIFbjaBUtetMlc+OQR8ak6BhksrOdb+OoxRJ4et5quIXpzLlfHmbcWqsBRllQbPFS
+         RvZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753797229; x=1754402029;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uIz2sC5rEvjeL5lDn/RzFAavsZ2n0Q13ZJnx4oJFPBI=;
-        b=mQ/5pmEexMGqqihnuils3YeessiTbCd/P2plqhA9h2MtTE06YJwzAJ9MLMq2/YuwhG
-         PTa3v00jTosI8BYZlWNEsIezMSJgTKCa13kbsn4YDBlR5jqMn8tpd8jwqd/lNEXphTit
-         yQiGfv6AgID5m/zfoDRQf9I5nu9WkKyW0uPW2+ipg1bS/d9LD2p4EHf04AsgC/gIcmqu
-         gf39ppNjZ/UYFzXCSqL0poQ+fb6esZ1tKn2i9yyy5jiX23Z9YBj2Bqwm3QYD23RS+OI2
-         y1vR+PGuoepGUrCrC1zl721HO0OBp1Abtiqc6yu+h7g16mVsDOC2cNVWKNVDZhcmB8PR
-         AOWQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVlSEvVeCcaDgbRso2TUNPf6BecklV5CXKdpFz2GPiItiRMU719jQ3OhT9iB3hZXizcIyNfOrg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzlHdI+0aIPw9eeUzMRolowYq4vlyx/Y/xiDT37vcRIpo9K0Kcu
-	9kUUo1GQ+mzddOjJ4rFUQ90sZX7TSBhGVxt0JLbThmPg0zYAqI+OIPKQIdX/LxABnLTsPRQd/AS
-	OyeU89fOrtnZXPK6VG6GzPfMjmzBGumy5vpFdK/A6Pd71v7aIvEAqgXDYYK4=
-X-Gm-Gg: ASbGncvDpv0LBAE9rJ91wiZ3aI9uB3xRtNNh44vWMHeOJxuot2xJ0fM0DgFjCkOPtUy
-	ihmnfLBxGD9zA8/wyPOuqEkiNpK8q1Bz15QVC8y3TLbzGETPYrkB3UPVh2GSne9fb/JZOzV2ALn
-	vskINBMFdxGtZyvldAEpPfBeWQsJZadtPZkXpFqh0bZ84kHtb6pu/zaxjVGeD9gZfWzT8ZQCaZ4
-	A4VE+HpfqHEwENjzTksuZtjtJXpZILIEYrfIuSKW3cYb6sHsYIGWqHlAjvrqqcbvUcseuCypCZf
-	JHh/xz7JonODWHcjuCUforTW2DTbV9LFKMOpqWrrWcVnneeUoLKlxND52zyUBlYd+EAiF3oKTfd
-	npnRrTKbCPQc3dXX8Tg==
-X-Received: by 2002:a05:620a:4502:b0:7e3:2e02:4849 with SMTP id af79cd13be357-7e66d73f600mr4098085a.9.1753797228649;
-        Tue, 29 Jul 2025 06:53:48 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG2rZ50HIoP3F9/NtATSvU3RTcoTLz7GUYh9uMTOF98nuj610nPOwpQK2hdrfHtttMfHeiLQw==
-X-Received: by 2002:a05:620a:4502:b0:7e3:2e02:4849 with SMTP id af79cd13be357-7e66d73f600mr4093185a.9.1753797228016;
-        Tue, 29 Jul 2025 06:53:48 -0700 (PDT)
-Received: from [192.168.43.16] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6156591fe7bsm1187250a12.51.2025.07.29.06.53.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 29 Jul 2025 06:53:47 -0700 (PDT)
-Message-ID: <c67d7d8c-ae39-420f-b48b-d7454deb1fc9@oss.qualcomm.com>
-Date: Tue, 29 Jul 2025 15:53:43 +0200
+        d=1e100.net; s=20230601; t=1753797379; x=1754402179;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Mv8soW1s35ahL418D8VF6q42tDzqNXV2suiJtYXndw0=;
+        b=A+RZ1Jq57DixmWWyv1AWRM3UGcLKWsK5R7Xa/6eXDU7UId9aVcgU0VMdQdpgYIVvN3
+         Jwnp3K2ctnhzwqHVjN4yFHFK1OLzate9BerIwAZ5q2biJuQTBIAVtzuVhEf/pTjVftvR
+         EB9lpXpQsouRU0yZPRNE9b722MGYHG0bPLfRUszpzqwCYH9eqnTLxFllFW6jnn1+9aUL
+         ZeisPDlY3idsUwe1jq1082lzW3uQjSS0FKgPj7/7FBSJ4zO0NWvKyT90viqfA+UJaabp
+         jRZTGlz8qK9in5WaWICkVowjciQobYFGSMIJPSfhF9G3/Flv8zVIqky2hx+vxrUgXqkP
+         r7iw==
+X-Forwarded-Encrypted: i=1; AJvYcCU/HzmhytbNKwz0GR+FlPD7aIpdFlu9uzRr0z6PJllu74itTILay5C5DbWZEmVpbzCePiKDanw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YySZnI01uEkJ+wQzd8vA0edqE02Bl4Kd1yyKfdMAgI3YfdCMdOi
+	YAC/DzrcuV3Rcx22fJbijClM67JSJyBGBj+VRhK2wpupJggkTAucI6GiAYQ1I1fFcyUkOySFgAS
+	7J1s1/GPO+FBQlf//BAZmp6/TEglmlSm7E4VPjbiHZQ==
+X-Gm-Gg: ASbGncsJRTVogy31bgpKd0yY27Xjcm5mDOUKcdSP+J9QeAidq1pN310jiHTuEZVe/uc
+	8w6e6VchvPB6u3dFniyOQYqrsNMjqz0JUuZ+s1GAZ64g+NhZDImFI1W5ZuGVAjcdXB4JssxDANA
+	fEbCmM1ayHbQ1uIeUe9GqlyvH4Qo0Nt7AKDW/84QTM1i7bl17YyoaLBw1ZsdY7iLBiaAGsZAYPq
+	cSpqmBNDncaSMwKXt2/pG4=
+X-Google-Smtp-Source: AGHT+IF6uEUYENM3G9dCl88PHF00oq2dRXfczisPYmPfnfZrmOLAxA2y+iiVlrzNEWcQwWHX0TDJK6HbPzYzjVZQifM=
+X-Received: by 2002:a17:902:e0d2:b0:23f:ed09:f7b with SMTP id
+ d9443c01a7336-23fed091110mr101344245ad.48.1753797378920; Tue, 29 Jul 2025
+ 06:56:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 05/10] dt-bindings: clock: ipq9574: Rename NSS CC
- source clocks to drop rate
-To: Luo Jie <quic_luoj@quicinc.com>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>
-Cc: Georgi Djakov <djakov@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley
- <conor+dt@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Michael Turquette <mturquette@baylibre.com>,
-        Stephen Boyd
- <sboyd@kernel.org>, Anusha Rao <quic_anusha@quicinc.com>,
-        Konrad Dybcio <konradybcio@kernel.org>,
-        Philipp Zabel <p.zabel@pengutronix.de>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, linux-arm-msm@vger.kernel.org,
-        linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org,
-        netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        quic_kkumarcs@quicinc.com, quic_linchen@quicinc.com,
-        quic_leiwei@quicinc.com, quic_pavir@quicinc.com,
-        quic_suruchia@quicinc.com
-References: <20250710-qcom_ipq5424_nsscc-v3-0-f149dc461212@quicinc.com>
- <20250710-qcom_ipq5424_nsscc-v3-5-f149dc461212@quicinc.com>
- <20250710225412.GA25762-robh@kernel.org>
- <93082ccd-40d2-4a6b-a526-c118c1730a45@oss.qualcomm.com>
- <2f37c7e7-b07b-47c7-904b-5756c4cf5887@quicinc.com>
- <a383041e-7b70-4ffd-ae15-2412b2f83770@oss.qualcomm.com>
- <830f3989-d1ac-4b7c-8888-397452fe0abe@quicinc.com>
-Content-Language: en-US
-From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-In-Reply-To: <830f3989-d1ac-4b7c-8888-397452fe0abe@quicinc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Authority-Analysis: v=2.4 cv=LsaSymdc c=1 sm=1 tr=0 ts=6888d26d cx=c_pps
- a=HLyN3IcIa5EE8TELMZ618Q==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
- a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=VwQbUJbxAAAA:8 a=RShGOoz45MAMUC7vXQcA:9
- a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 a=bTQJ7kPSJx9SKPbeHEYW:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzI5MDEwNyBTYWx0ZWRfX8Ey4PoyyhVGu
- ObyLBpChlThswuc/z1nqs07o0Mu2ogDAP6Yl57DNG2vfqrnUymegNMzBj9AF61Vp10wvPYCuOE+
- 91qGwxCMYwYcCMQJiT3nqsPq/bVVDTgRQJFfshOCy5IDyw6HcUYdunaYwDUgndda6rbDIDtP5xJ
- NlvhVXrfZ6n3Vd5hqUV/JR3Pv4sIZs8CdoFqK9E4AZXptEf9LpllgueN0HOFEYZfkH9KmhsqWdB
- up0uk/agY+K5vcShLC3p9aCwlBZ1P7h5xp+EpMWZa1jCr6phQFdssrrvOlpgTJwTaU7WhH0gCJi
- 65ur7xWgDF5puv3j0ofglfX6ysScy+5ESieMLCiiAZTx4leLZs8Ko8XPVR4ZO8IPh099ReKSR47
- Q58vqq93gquWrOkDo/7Emk8/JeH4ivlzvpD2L/v4pJFRV/Pb7QJlySBHikGp1mIYZ1spnmay
-X-Proofpoint-ORIG-GUID: 92xb4pJ87fno5RoD2Z0ALoh1ScWUZUHU
-X-Proofpoint-GUID: 92xb4pJ87fno5RoD2Z0ALoh1ScWUZUHU
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-07-29_03,2025-07-28_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 mlxlogscore=999 spamscore=0 phishscore=0 suspectscore=0
- impostorscore=0 adultscore=0 lowpriorityscore=0 priorityscore=1501
- bulkscore=0 mlxscore=0 malwarescore=0 classifier=spam authscore=0 authtc=n/a
- authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2505280000 definitions=main-2507290107
+References: <20250722150152.1158205-1-matt@readmodwrite.com> <CAADnVQ+rLJwKVbhd6LyGxDQwGUfg9EANcA5wOpA3C3pjaLdRQw@mail.gmail.com>
+In-Reply-To: <CAADnVQ+rLJwKVbhd6LyGxDQwGUfg9EANcA5wOpA3C3pjaLdRQw@mail.gmail.com>
+From: Matt Fleming <matt@readmodwrite.com>
+Date: Tue, 29 Jul 2025 14:56:07 +0100
+X-Gm-Features: Ac12FXxSY86YYUNk9ahjFEIXjGzaAjdeUoQ5VugkiuP2RpgzCdnBA11sRvUpiYc
+Message-ID: <CAENh_SS2R3aQByV_=WRCO=ZHknk_+pV7RhXA4qx5OGMBN1SnOA@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v3] selftests/bpf: Add LPM trie microbenchmarks
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+	kernel-team <kernel-team@cloudflare.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	bpf <bpf@vger.kernel.org>, Martin KaFai Lau <martin.lau@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, Network Development <netdev@vger.kernel.org>, 
+	Matt Fleming <mfleming@cloudflare.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 7/18/25 5:51 PM, Luo Jie wrote:
-> 
-> 
-> On 7/18/2025 5:28 PM, Konrad Dybcio wrote:
->> On 7/18/25 11:12 AM, Luo Jie wrote:
->>>
->>>
->>> On 7/11/2025 8:15 PM, Konrad Dybcio wrote:
->>>> On 7/11/25 12:54 AM, Rob Herring wrote:
->>>>> On Thu, Jul 10, 2025 at 08:28:13PM +0800, Luo Jie wrote:
->>>>>> Drop the clock rate suffix from the NSS Clock Controller clock names for
->>>>>> PPE and NSS clocks. A generic name allows for easier extension of support
->>>>>> to additional SoCs that utilize same hardware design.
->>>>>
->>>>> This is an ABI change. You must state that here and provide a reason the
->>>>> change is okay (assuming it is). Otherwise, you are stuck with the name
->>>>> even if not optimal.
->>>>
->>>> The reason here seems to be simplifying the YAML.. which is not a good
->>>> reason really..
->>>>
->>>> I would instead suggest keeping the clocks list as-is for ipq9574 (this
->>>> existing case), whereas improving it for any new additions
->>>>
->>>> Konrad
->>>
->>> Thanks Rob and Konrad for the comments.
->>>
->>> "nss_1200" and "nss" refer to the same clock pin on different SoC.
->>> As per Krzystof's previous comment on V2, including the frequency
->>> as a suffix in the clock name is not required, since only the
->>> frequencies vary across different IPQ SoCs, while the source clock
->>> pins for 'PPE' and 'NSS' clocks are the same. Hence this ABI change
->>> was deemed necessary.
->>>
->>> By removing the frequency suffix, the device tree bindings becomes
->>> more flexible and easier to extend for supporting new hardware
->>> variants in the future.
->>>
->>> Impact due to this ABI change: The NSS clock controller node is only
->>> enabled for the IPQ9574 DTS. In this patch series, the corresponding
->>> DTS changes for IPQ9574 are also included to align with this ABI
->>> change.
->>
->> The point of an ABI is to keep exposing the same interface without
->> any change requirements, i.e. if a customer ships the DT from
->> torvalds/master in firmware and is not willing to update it, they
->> can no longer update the kernel without a workaround.
->>
->>> Please let me know if further clarification or adjustments are needed.
->>
->> What we're asking for is that you don't alter the name on the
->> existing platform, but use a no-suffix version for the ones you
->> introduce going forward
->>
->> i.e. (pseudo-YAML)
->>
->> if:
->>    properties:
->>      compatible:
->>        - const: qcom,ipq9574-nsscc
->> then:
->>    properties:
->>      clock-names:
->>        items:
->>          - clockname_1200
->> else:
->>    properties:
->>      clock-names:
->>        items:
->>          - clockname # no suffix
->>
->> Konrad
-> 
-> We had adopted this proposal in version 2 previously, but as noted in
-> the discussion linked below, Krzysztof had suggested to avoid using the
-> clock rate in the clock names when defining the constraints for them.
-> However I do agree that we should keep the interface for IPQ9574
-> unchanged and instead use a generic clock name to support the newer
-> SoCs.
-> 
-> https://lore.kernel.org/all/20250701-optimistic-esoteric-swallow-d93fc6@krzk-bin/
-> 
-> Request Krzysztof to provide his comments as well, on whether we can
-> follow your suggested approach to avoid breaking ABI for IPQ9574.
+On Mon, Jul 28, 2025 at 3:35=E2=80=AFPM Alexei Starovoitov
+<alexei.starovoitov@gmail.com> wrote:
+>
+> Please make a full description of what the test does,
+> since it's not trivial to decipher from the code.
+> If I'm reading it correctly, first, the user space
+> makes the LPM completely full and then lookup/update
+> use random key-s within range.
 
-Krzysztof, should the bindings be improved-through-breaking, or should
-there simply be a new YAML with un-suffixed entries, where new platforms
-would be added down the line?
+Yep, that's correct. I'll provide a more comprehensive description in v4.
 
-Konrad
+> But delete looks different. It seems the kernel delete
+> operation can interleave with user space refilling the LPM,
+> so ...
+>
+> >   lookup: throughput    7.423 =C2=B1 0.023 M ops/s (  7.423M ops/prod),=
+ latency  134.710 ns/op
+> >   update: throughput    2.643 =C2=B1 0.015 M ops/s (  2.643M ops/prod),=
+ latency  378.310 ns/op
+> >   delete: throughput    0.712 =C2=B1 0.008 M ops/s (  0.712M ops/prod),=
+ latency 1405.152 ns/op
+>
+> this comparison doesn't look like apples to apples,
+> since delete will include user space refill time.
+
+Yeah, you're right. Though we only measure the delete time from in the
+BPF prog, delete throughput is essentially blocked while the refill
+happens and because things are measured with a 1-second timer
+(bench.c:sigalarm_handler) the refill time gets accounted for anyway.
+I could try extrapolating the delete time like I've done for the free
+op, i.e. we calculate how many ops were completed in what fraction of
+a second.
+
+> >     free: throughput    0.574 =C2=B1 0.003 K ops/s (  0.574K ops/prod),=
+ latency    1.743 ms/op
+>
+> Does this measure the free-ing of full LPM ?
+
+Yes, this measures the total time to free every element in the trie.
+
+> > +static void __lpm_validate(void)
+>
+> why double underscore ?
+> Just lpm_validate() ?
+
+The double underscore is used for the common validation parts, but
+I'll rename this to include "_common()" (along with all other uses of
+__).
+
+> > +       /*
+> > +        * Ideally we'd have access to the map ID but that's already
+> > +        * freed before we enter trie_free().
+> > +        */
+> > +       BPF_CORE_READ_STR_INTO(&name, map, name);
+> > +       if (bpf_strncmp(name, BPF_OBJ_NAME_LEN, "trie_free_map"))
+> > +               return 0;
+> > +
+> > +       val =3D bpf_ktime_get_ns();
+> > +       bpf_map_update_elem(&latency_free_start, &map, &val, BPF_ANY);
+>
+> Looks like there is only one lpm map.
+> What's the point of that extra map ?
+> Just have a global var for start time ?
+
+Sure, I can make this a global variable for the start time instead.
+
+> bpf_get_prandom_u32() is not free
+> and modulo operation isn't free either.
+> The benchmark includes their time.
+> It's ok to have it, but add a mode where the bench
+> tests linear lookup/update too with simple key.data++
+
+Good idea.
+
+> Since the map suppose to full before we start all keys
+> should be there, right?
+
+Yes.
+
+> Let's add a sanity check that update() succeeds.
+
+Will do.
+
+> > +static int delete (__u32 index, bool *need_refill)
+> > +{
+> > +       struct trie_key key =3D {
+> > +               .data =3D deleted_entries,
+> > +               .prefixlen =3D prefixlen,
+> > +       };
+> > +
+> > +       bpf_map_delete_elem(&trie_map, &key);
+> > +
+> > +       /* Do we need to refill the map? */
+> > +       if (++deleted_entries =3D=3D nr_entries) {
+> > +               /*
+> > +                * Atomicity isn't required because DELETE only support=
+s
+> > +                * one producer running concurrently. What we need is a
+> > +                * way to track how many entries have been deleted from
+> > +                * the trie between consecutive invocations of the BPF
+> > +                * prog because a single bpf_loop() call might not
+> > +                * delete all entries, e.g. when NR_LOOPS < nr_entries.
+> > +                */
+> > +               deleted_entries =3D 0;
+> > +               *need_refill =3D true;
+> > +               return 1;
+>
+> This early break is another reason that makes
+> 'delete' op different from 'lookup/update'.
+> Pls make all 3 consistent, so they can be compared to each other.
+
+Hmm.. I'm not quite sure how to do that. lookup/update don't modify
+the number of entries in the map whereas delete does (update only
+updates existing entries, it doesn't create new ones). So when the map
+is empty it needs to be refilled. You're right that somehow the time
+to refill needs to be removed from the delete throughput/latency
+numbers but fundamentally these 3 ops are not the same and I don't see
+how to treat them as such.
 
