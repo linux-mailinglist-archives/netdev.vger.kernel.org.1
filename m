@@ -1,100 +1,140 @@
-Return-Path: <netdev+bounces-210808-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210809-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79AB6B14E83
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 15:39:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 422A4B14E95
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 15:43:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 86A3E545F2C
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 13:39:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8FF011896EB8
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 13:43:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 337DA1C2335;
-	Tue, 29 Jul 2025 13:38:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2336A199949;
+	Tue, 29 Jul 2025 13:43:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ryPotRjI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KvF8erXJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07D4A1B87C9;
-	Tue, 29 Jul 2025 13:38:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2092200A3;
+	Tue, 29 Jul 2025 13:43:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753796313; cv=none; b=orx5M+y240fC/bPQY5u1xmHYPOhouNqXfQO1fuHVANGO3rnWiJ7v9AV1VeycipR6AMyzzly3gMRXxry44YKipje9u5Zxh7jXQjsGkzsrmjVHRetRfil/QBQelUVnTb2UJGj1cHeiLEXsI5HJUrbt3kmnzKwoYzZmpragj/m2KRs=
+	t=1753796588; cv=none; b=WSvb0HYutC8bg/8Ez6zpJuCfPkh47T4vAaTFTHH+qXovFG2y3Ouqkbeai0ekO/uf2F3z1GvkbvXSSmLpDfInK+VK1WOVnH/q9EosycYSJi9hZEUddaBYHqWc6KnFF16gjbx60qhDj1YrSbBT7xXYnro0oh63osK/PLddKYEoZCU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753796313; c=relaxed/simple;
-	bh=p+5XkRXQLP3a3M5GCf3pNfYknzNMOKmgGFmi5Hf9phc=;
+	s=arc-20240116; t=1753796588; c=relaxed/simple;
+	bh=8J8WsDaAXuGhIRqih5/Dp7Ehpdk4JivDt91FfVoN60k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UNS/TSFARr+5ceaiq7/Jdv7DC9z6X4rjDAGpAAblXDKQ+TJKCIw1p5euZA1AAXYKHXO3rf5dBJSICQQf6HCJkOS+7TE4Wy8ylZK0avaVT+hzVsw6PdAVsZO8OOfP4ARnnEmVjPGJwecx0D9xRaFIIk62WAY9NTdUqYTK/n12d9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ryPotRjI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8D6AC4CEF5;
-	Tue, 29 Jul 2025 13:38:30 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=Mcfd5VlU+f9LXQ4XWJfx096drDUNXE18VIqqf+/77pQrKoS+9bGkxA0WqUEEaMO4xucW7PewJ6TZxJ3rmfay8wnQUrUttm9ANFUKsVVlo7utVqtEw1fYBTj47TnYAdLoY2QFAbEMI7h9XxSzUFqp6oP5RzYsjneVmQen8AQipns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KvF8erXJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCB20C4CEEF;
+	Tue, 29 Jul 2025 13:43:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753796312;
-	bh=p+5XkRXQLP3a3M5GCf3pNfYknzNMOKmgGFmi5Hf9phc=;
+	s=k20201202; t=1753796587;
+	bh=8J8WsDaAXuGhIRqih5/Dp7Ehpdk4JivDt91FfVoN60k=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ryPotRjI0W/Y0emcM1tilBwyIBs0yucxS6Ez3aR/r7VDKYiuurSLkIlHxz/7/eCSA
-	 HNV6sg6r7I0XHbQZjaezXk9hG9GtDUQIkdAyOc4Hn/vQEdRT426YND12RVAtFsTSJB
-	 qUa91LrY0Uu2CPtF4eF3ou7hhkN9GvfMkfmhyUfMQHCP0uXiG8lwS/cx/lGLz+OD0Z
-	 Lf2YxgIOuaFfqhxT3sypYAVkqe1iMxwN6w82PAVUcA848QDYrHPfaDUd1zAwi4leVV
-	 d7ApHvxshIt5J13jf6PKFbOiu60JBH2QFkNJtv8dL/YTP3qQ7NyD2+6t+a492HyzF4
-	 7bs5eQx7nQK4w==
-Date: Tue, 29 Jul 2025 14:38:28 +0100
+	b=KvF8erXJSXiyMsFzY2yB309WKNyJwtGoE8G+OZv/bP1xEY6CIkwLFx0XngSYK7bFI
+	 tURf/eOoq+792Gul8eJokb9PUQIzpLvpEqjJNqsL3vqU4RgeEmKzCIt1jThoSWqymE
+	 SSCVxpGEjHLE/MBaNWJD7faooOKQnLgVeBNDamaFwa5/Enk1eDe5nSJsHXrpmsp5i9
+	 b3DSzdk8VLhEu/sMpOOtB90J3QOhllvPW4UfC0LDoLaP0ZDn8WM8tV3J0HQajeN527
+	 nh4ywSYmUJGzhZQ4fABjD+Rpwt3A21MnRBXT5AqNs7HOgFp4mZxeUkS8Ls1ZRfQDgn
+	 M3pY+VS2mDAYg==
+Date: Tue, 29 Jul 2025 14:43:02 +0100
 From: Simon Horman <horms@kernel.org>
-To: Tian <27392025k@gmail.com>
-Cc: irusskikh@marvell.com, netdev@vger.kernel.org, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2] net: atlantic: fix overwritten return value in
- Aquantia driver
-Message-ID: <20250729133828.GE1877762@horms.kernel.org>
-References: <20250729005853.33130-1-27392025k@gmail.com>
+To: Bjorn Andersson <andersson@kernel.org>
+Cc: Rob Clark <rob.clark@oss.qualcomm.com>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+	Wasim Nazir <wasim.nazir@oss.qualcomm.com>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	kernel@oss.qualcomm.com
+Subject: Re: [PATCH 1/7] arm64: dts: qcom: Rename sa8775p SoC to "lemans"
+Message-ID: <20250729134302.GF1877762@horms.kernel.org>
+References: <20250722144926.995064-1-wasim.nazir@oss.qualcomm.com>
+ <20250722144926.995064-2-wasim.nazir@oss.qualcomm.com>
+ <20250723-swinging-chirpy-hornet-eed2f2@kuoka>
+ <159eb27b-fca8-4f7e-b604-ba19d6f9ada7@oss.qualcomm.com>
+ <e718d0d8-87e7-435f-9174-7b376bf6fa2f@kernel.org>
+ <CACSVV00jef8so-jqjCaqJehj-XN2OZ562_R+Dod64+C4-dmDhQ@mail.gmail.com>
+ <20250726180451.GM1367887@horms.kernel.org>
+ <keqfco2t254skl6zjxchfze65j5bc5yq4j4t3wzllca7djtybm@zb724ha6khyg>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250729005853.33130-1-27392025k@gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <keqfco2t254skl6zjxchfze65j5bc5yq4j4t3wzllca7djtybm@zb724ha6khyg>
 
-On Mon, Jul 28, 2025 at 05:58:52PM -0700, Tian wrote:
-> From: Tian Liu <27392025k@gmail.com>
+On Mon, Jul 28, 2025 at 09:36:42PM -0500, Bjorn Andersson wrote:
+> On Sat, Jul 26, 2025 at 07:04:51PM +0100, Simon Horman wrote:
+> > On Thu, Jul 24, 2025 at 08:59:38AM -0700, Rob Clark wrote:
+> > > On Thu, Jul 24, 2025 at 5:52 AM Krzysztof Kozlowski <krzk@kernel.org> wrote:
+> > > >
+> > > > On 24/07/2025 14:47, Konrad Dybcio wrote:
+> > > > > On 7/23/25 10:29 AM, 'Krzysztof Kozlowski' via kernel wrote:
+> > > > >> On Tue, Jul 22, 2025 at 08:19:20PM +0530, Wasim Nazir wrote:
+> > > > >>> SA8775P, QCS9100 and QCS9075 are all variants of the same die,
+> > > > >>> collectively referred to as lemans. Most notably, the last of them
+> > > > >>> has the SAIL (Safety Island) fused off, but remains identical
+> > > > >>> otherwise.
+> > > > >>>
+> > > > >>> In an effort to streamline the codebase, rename the SoC DTSI, moving
+> > > > >>> away from less meaningful numerical model identifiers.
+> > > > >>>
+> > > > >>> Signed-off-by: Wasim Nazir <wasim.nazir@oss.qualcomm.com>
+> > > > >>> ---
+> > > > >>>  arch/arm64/boot/dts/qcom/{sa8775p.dtsi => lemans.dtsi} | 0
+> > > > >>>  arch/arm64/boot/dts/qcom/sa8775p-ride.dtsi             | 2 +-
+> > > > >>
+> > > > >> No, stop with this rename.
+> > > > >>
+> > > > >> There is no policy of renaming existing files.
+> > > > >
+> > > > > There's no policy against renaming existing files either.
+> > > >
+> > > > There is, because you break all the users. All the distros, bootloaders
+> > > > using this DTS, people's scripts.
+> > > 
+> > > I think that is a valid argument against renaming the toplevel .dts
+> > > (and therefore .dtb), but renaming .dtsi should be a harmless internal
+> > > detail to the kernel.  And less confusing, IMHO, than
+> > > qsc9100-myboard.dts #including sa8775p.dtsi.
+> > > 
+> > > So wouldn't the sensible way forward be to rename .dtsi but not .dts?
+> > 
+> > FWIIW, and with the dual caveats that: I do not have the full context of
+> > this series; and SoCs are not somewhere where I am active these days:
+> > 
+> > I am also under the impression that, in general, renames to
+> > match product or other organisational changes are a non-starter.
+> > 
 > 
-> In hw_atl_utils.c and hw_atl_utils_fw2x.c, a return value is first assigned
-> to `err`, but then later calls overwrite it unconditionally. As a result,
-> any earlier failure is lost if the later call succeeds. This may cause the
-> driver to proceed when it should have stopped.
+> This is indeed a key reason for the new naming scheme. Until now we've
+> named things based on the "product number" and we're here facing the
+> introduction of the 3rd product name for the same die.
 > 
-> This patch uses `err |=` instead of assignment, so that any earlier error
-> is preserved even if later calls succeed. This is safe because all involved
-> functions return standard negative error codes (e.g. -EIO, -ETIMEDOUT, etc).
-> OR-ing such values does not convert them into success, and preserves the
-> indication that an error occurred.
+> The purpose of this series is to detach from the product naming (and
+> introduce the EVK board).
+
+In general, something detached from product naming, and the whims thereof,
+does seem sensible to me.
+
+> > But reading over this patchset, I also felt that renaming the .dsti files
+> > would improve things. And seems to have little scope to break things for
+> > users.
+> > 
+> > </2c>
 > 
-> Fixes: 6a7f2277313b4 ("net: aquantia: replace AQ_HW_WAIT_FOR with readx_poll_timeout_atomic")
-
-nit: No blank line here
-
-I do agree that the Fixes tag is correct in the case of hw_atl_utils_fw2x.c
-
-But, in the case of hw_atl_utils.c, it seems to me that the correct Fixes
-tag would be as follows, because prior to this commit the value of err was
-not overwritten:
-
-Fixes: e7b5f97e6574 ("net: atlantic: check rpc result and wait for rpc address")
-
-Given the different commits that are being fixed I would suggest splitting
-the patch into two, one per file that is being updated.
-
-> 
-> Signed-off-by: Tian Liu <27392025k@gmail.com>
-
-...
-
--- 
-pw-bot: changes-requested
 
