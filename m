@@ -1,100 +1,88 @@
-Return-Path: <netdev+bounces-210894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210895-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 320AFB15555
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 00:40:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99C1AB1555D
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 00:45:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C2CF17E630
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 22:40:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6F1F4E0205
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 22:44:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AFE7284B46;
-	Tue, 29 Jul 2025 22:40:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 680932853F9;
+	Tue, 29 Jul 2025 22:45:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EQj/4/lg"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="qw4wudlE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CB30EEBD;
-	Tue, 29 Jul 2025 22:40:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADAB41AA1D9;
+	Tue, 29 Jul 2025 22:45:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753828814; cv=none; b=B06LMOHlAH9nvXxwf4h2R4Gc42X/ZgfiuBifXDS3kCfyTwNOEw6Rg49rHOpD3dwOm9si7voCH1zitF2oOQ5NSEf9k6MRdAveG9m2hrfd8TpbHxMI6dMYi5xwH/A9VMHr1PHQv7BwQc7bBfVWd1HUWM14j00nli0uAfGU0CDs+ys=
+	t=1753829102; cv=none; b=JPcUNwgmPW2JQ3RDQP1fbrJ206pp8mQkRDtGg1mHXe3P62TBbtbsyKwwTPhq9HB8o+sMT9BNh5FShZxANMRAHZHgrXSMCYGjaHt6NKSGuZsdC77wzTpdzs2GVmnkvJ7ffWs8x384XomKEOFea+Md5uo6p/xG7JLEghygOOkd/T0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753828814; c=relaxed/simple;
-	bh=jOb4Sdi1sdezTxme6oMaC1Z0bg39zMY/ScYy43NqNgM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dGtjdFanPIWtd2ydlbDHi5Tq6oVrKxbLubxlXE8VZ0zdZdRfpG2KQsTW9nhHxPODw3gZ3D6BczJaXE4+Pg8lxhpIrs+5hzD7qO0pVvISryqTSc0VdqxkXpVWQmoV1028iOyfhmaLqpGG09nQxuB6yA038QUxJb+yvTinhNIHc6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EQj/4/lg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00290C4CEEF;
-	Tue, 29 Jul 2025 22:40:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753828813;
-	bh=jOb4Sdi1sdezTxme6oMaC1Z0bg39zMY/ScYy43NqNgM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=EQj/4/lga5L/o4AivgawUq2S3Y9fzGDdrEG2ttFcUbNP2/yzgPOMovCgxsO+mSzEe
-	 7skS0ZsH1AXoGRr/ZBVHCHZECE5PCeY+OCQe1jzTVWL4N9kJxTQB0HT8he2BEfyC6c
-	 1UtZN5Xx5HFcSbqvhtWWGjDqJQrwlr72x9QIEbX/R0WuO85iNAZlBu3KvDtX+QAMxf
-	 c1giWffl5kfd1Kn34pD1nuqcJlBJkvUxVJqoeoUNi2FNLjRCvX8lDIfUaalUNyepdR
-	 qxDgia8ejX8UoGW+vbdI8xrUgtMX5fedvr7KXzydBI4JaPnLxW8VMeBmXtY8izD7mI
-	 OtsV/zpI6Ka9Q==
-Date: Tue, 29 Jul 2025 15:40:12 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Carolina Jubran <cjubran@nvidia.com>
-Cc: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Saeed Mahameed
- <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Mark Bloch
- <mbloch@nvidia.com>, Richard Cochran <richardcochran@gmail.com>,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 0/3] Support exposing raw cycle counters in PTP
- and mlx5
-Message-ID: <20250729154012.5d540144@kernel.org>
-In-Reply-To: <0c1cea33-6676-4590-8c7c-9fe1a3d88f0b@nvidia.com>
-References: <1752556533-39218-1-git-send-email-tariqt@nvidia.com>
-	<20250721170916.490ce57e@kernel.org>
-	<0c1cea33-6676-4590-8c7c-9fe1a3d88f0b@nvidia.com>
+	s=arc-20240116; t=1753829102; c=relaxed/simple;
+	bh=ObM698zo4DwV01L7bZzYsY6LWsBD229DFotACgPv4oQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VnaXXjIAoxFOfFT/afm8Bh8oNj5lHovkdZclpyq/LwnYMWZZq4ArLtPGZehflGq69NvOmqWr5SugfRqVJZyba7xFdTIhZ122kJxD38N8AcDc/sBtJsdmcwOJR1/9Q1iqJ16jg2ulqAbF8UCw9hMVi9SmmAKE1rKBtwBvPCc5TfE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=qw4wudlE; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=1WtoA09gcOii+21mVafZsCiy4A9k3Vy4kCvJTqQfyDI=; b=qw4wudlEHBvoKZoijh8Lpdu+/W
+	L2ce7YLBzr5ewjMQRc4ROJIaQ+3gAIu5YQ8TQSomEFFFcM4QY7fLtn7puv9f2OKXJLUa3TPmR4ch/
+	d8R9ZrP5gBQaH0wa9wBH6ahJ8waSwhJwugWXYEk0xXPxJHFAZ5Xq0qVOkPXWSeaOPL9Y=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1ugt3x-003Egn-5t; Wed, 30 Jul 2025 00:44:49 +0200
+Date: Wed, 30 Jul 2025 00:44:49 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: netdev@vger.kernel.org, Doug Berger <opendmb@gmail.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net] net: mdio: mdio-bcm-unimac: Correct rate fallback
+ logic
+Message-ID: <775f7ae3-9705-4003-a7e8-aac3c418e48f@lunn.ch>
+References: <20250729213148.3403882-1-florian.fainelli@broadcom.com>
+ <11482de4-2a37-48b5-a98e-ba8a51a355cd@lunn.ch>
+ <9c10c78b-3818-4b97-8d10-bc038ec97947@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9c10c78b-3818-4b97-8d10-bc038ec97947@broadcom.com>
 
-On Tue, 29 Jul 2025 09:57:13 +0300 Carolina Jubran wrote:
-> One concrete use case is monitoring the frequency stability of the=20
-> device clock in FreeRunning mode. User space can periodically sample the=
-=20
-> (cycle, time) pairs returned by the new ioctl to estimate the clock=E2=80=
-=99s=20
-> frequency and detect anomalies, for example, drift caused by temperature=
-=20
-> changes. This is especially useful in holdover scenarios.
+On Tue, Jul 29, 2025 at 03:22:57PM -0700, Florian Fainelli wrote:
+> On 7/29/25 15:20, Andrew Lunn wrote:
+> > On Tue, Jul 29, 2025 at 02:31:48PM -0700, Florian Fainelli wrote:
+> > > In case the rate for the parent clock is zero,
+> > 
+> > Is there a legitimate reason the parent clock would be zero?
+> 
+> Yes there is, the parent clock might be a gated clock that aggregates
+> multiple sub-clocks and therefore has multiple "parents" technically.
+> Because it has multiple parents, we can't really return a particular rate
+> (clock provider is SCMI/firmware).
 
-Because the servo running on the host doesn't know the stability?
-Seems like your real use case is the one below.
+O.K. Maybe add this to the commit message?
 
-> Another practical case is with DPDK. When the hardware is in FreeRunning=
-=20
-> mode, the CQE contains raw cycle counter values. DPDK returns these=20
-> values directly to user space without converting them. The new ioctl=20
-> provides a generic and consistent way to translate those raw values to=20
-> host time.
->=20
-> As for XDP, you=E2=80=99re right that it doesn=E2=80=99t expose raw cycle=
-s today. The=20
-> point here is more future-looking: if drivers ever choose to emit raw=20
-> cycles into metadata for performance, this API gives user space a clean=20
-> way to interpret those timestamps.
-
-Got it, I can see how DPDK / kernel bypass may need this.
-
-Please include this justification in the commit message for v2=20
-and let's see if anyone merges it.
+	Andrew
 
