@@ -1,224 +1,267 @@
-Return-Path: <netdev+bounces-210834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210835-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAC48B15062
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 17:45:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1ED16B15069
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 17:48:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F379516610F
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 15:45:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 53E8E3AE615
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 15:47:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 793B22951B3;
-	Tue, 29 Jul 2025 15:45:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA876294A16;
+	Tue, 29 Jul 2025 15:48:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="UW7u5GrT"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="ajd/XqJz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013027.outbound.protection.outlook.com [40.107.162.27])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 758842949E5
-	for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 15:44:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753803901; cv=none; b=ErR0olxhZbO0wonfAjI+aPaukSzjKGTQExA+svgVJGkKR21+Fa64ZR8bSoGGUWkfviLq5Bz9iZreH8dE50RhVGPsd8vAWOExULNuNLq+Cd+BeQ3B5oX3r9qm+XKgdN0vxjiCNBofLIW4V5QANfL7N1vm0h41RXqiYDmttAt3H74=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753803901; c=relaxed/simple;
-	bh=qu8muXoLR7pnTZ3FB5pPlYtD51+7wbi7KiWh4voe0QU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=ID0aKd1vXItcWtO8+rt8iG2sXXEM1qaF7CDAKkjM2d2hM2dLSkkDuilIhlNcK1cMinHerVFKpNYwOT/nfx4dcE/h3xHo2D3Sv6XkDjNOU0bl11AmUteX54xvJQpIPNId1fDd2G2eGZAoeZpRdel2HUIbbC0TfhK08yhcBE7ZHVY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=UW7u5GrT; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56T9gksK031181;
-	Tue, 29 Jul 2025 15:44:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	DEa4IXBakvY69qnl01DUuxE3PjHKkB2Yhfb9K8+oBAA=; b=UW7u5GrTPbim7T5g
-	qfaRGmG89GAroHth8z8S8qI57jV006htpx7TR6v5MfIrq+HT2lDQoM02dus2qK6j
-	iyFvoy9heWISGZy2MAMintuRY+vPqbyxcEFMO3MKfpRVFBah7A00YlaImLAfbtCp
-	t+3GW+4S3+3Q8LGrOH4yi7WUv4Kqum4D4bLYoOzCG0twQf3kzEzRKuWlt1BHsLrk
-	rGB7ffxK0GgvmQIVlozmG6THo3KNd6eJ2dmmoQhzYIY4LtrMIkdgkQZK6MKwtAPH
-	UylOp99VVxAAEIG8zPs6XJgGEDXqjKfdXTTWYbEcLBsUtGX5fQzVYUbgk5X7PviT
-	xvFG9g==
-Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 484pbm0jwm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 29 Jul 2025 15:44:49 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 56TFimJ7006575
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 29 Jul 2025 15:44:48 GMT
-Received: from [10.216.36.202] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.10; Tue, 29 Jul
- 2025 08:44:45 -0700
-Message-ID: <b6beefcf-7525-4c70-9883-4ab8c8ba38ed@quicinc.com>
-Date: Tue, 29 Jul 2025 21:14:41 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14388295522;
+	Tue, 29 Jul 2025 15:48:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.27
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753804100; cv=fail; b=WCw71RCjZzy6eTN5jHnPBuhFjSLfoyguwq3ljj+NITEBp3WPwG++Z6Of9e0nYje87baE1nuB7HMkQ1nlVOD3aQfdszOBhef4WGX4QxjmB/8jknAouS3XDPuScq6b+vB8tq3ndMRxKH11Hs2KFoPUH/a5+9p6dJk4P9cLYPDpRhk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753804100; c=relaxed/simple;
+	bh=HQfseJlz1F79guhWbjSrAbMHdTJgms5D1Cl7T2qxGsQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=ggK/q7h7y+klExvw/Y12rHe/2gFA3Lt8T9Jmcc0w2UiHB/5XWL98O0ef5AsX870bJ/vcHtNOWI3oHNHKCqDRHd2sHXOkwfkAZo8a/QiQsbq/pd8mR3b3/TWFSH9CqutcBk7maegudn9A6ef/qRDTp15xnmZDRuCbO25M1x6stY4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=ajd/XqJz; arc=fail smtp.client-ip=40.107.162.27
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=NN4bOeCnbfT+b6pBL+3bzvIg4UlhwkT8h8c1AWQ2Bonof4Bl1u/Aop72ZImHHL5lmJAcJs+khjyUt1v8AHxHss8hIlPqzqq5O/ELWAngaaROHBm1r4I4acRG3rUi7LmHOCTiMQ4k+XXqfyhKRiBlo//E1eSwnVMnrixcPwSIVxdudum9+KzASJ9BNVa+ukBQ22bgadM8BZ9L/TrCu6j7IU38/yfcp+qOrCFs5hN5cTyuTJmhKhPv/rqdltlXKJSPIuVyqresIFcNjv+OVoph7OnrGX+m1MxfwUFJsA3hS1b6lEYaHN+n5UWokNPmuDfPF4UU6S305CbvsE3eE34m9g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=TtU11MwECxWpB8N5IuL6lX8VNqiBkIskoL8EgWfrRiU=;
+ b=pC95dyfjCRXFxnELGbFCmWkUPZm0670INKhALp0e3ozQmNesD3lI+mFIeYl9QXwhmTgfe+tTtOBPKOT+Mh4dCu7YgnX9WnTAX6ur3GuHLLCuaxmZ9bdcZlslS/9a2on8hY02rdgFG2t8RxLJ7Xj0ePao+U8qq+MyoXsn6SgMaWD8jAk107HDf887Ixhkoi/8j4hw9G1ww2GMjhZZl8iPJbK/pMfbwYiVnXOHWgXCK8gaU20LJU/w7THf86maS3iUBWAx4GMEdKnaZIHOio3Sj5Pqjaq2HMtIKZeXNPD5g4iQ3YaIxgfMvLA7uTLubl8/nhGOFcHjJVLbJCO9rp2Atg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=TtU11MwECxWpB8N5IuL6lX8VNqiBkIskoL8EgWfrRiU=;
+ b=ajd/XqJzNcgtgBPxIqSnv9WDKcx6iH3i7RPuSiDfjbswJVZGURkgvIuJNLgjLjNxPC7A8PuNQBgGVDuE2gAE1/UmLc3SX6Iqkl3qCN27G6y8n+TMVxV17bUjKNRNfpb4XiwFdlyQK/Chbl84dTdudiYreYWzVfxMNF+J/RhvpwNk5Ibg1SLiI56HYkt3LwskYlOETRrcjhUPvoZCz1oKALK1885YO1pB29MLC0K+CK63gmvK1Tnp1XnNUc0s+i5t/BMWd7hy79A8Zlmu7CvetvgTX5ZOhfN64ZypBWozcJ1axSBcUe3dZ5oPU+KZrQQxSdhztSk55Fp2J73RSxTniA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
+ by PA4PR04MB7518.eurprd04.prod.outlook.com (2603:10a6:102:e4::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8964.26; Tue, 29 Jul
+ 2025 15:48:15 +0000
+Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
+ ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
+ ([fe80::7417:d17f:8d97:44d2%7]) with mapi id 15.20.8964.026; Tue, 29 Jul 2025
+ 15:48:15 +0000
+Date: Tue, 29 Jul 2025 18:48:11 +0300
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Jeongjun Park <aha310510@gmail.com>
+Cc: richardcochran@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	yangbo.lu@nxp.com, anna-maria@linutronix.de, frederic@kernel.org,
+	tglx@linutronix.de, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	syzbot+7cfb66a237c4a5fb22ad@syzkaller.appspotmail.com
+Subject: Re: [PATCH net v4] ptp: prevent possible ABBA deadlock in
+ ptp_clock_freerun()
+Message-ID: <20250729154811.a7lg26iuszzoo2sp@skbuf>
+References: <20250728062649.469882-1-aha310510@gmail.com>
+ <20250728062649.469882-1-aha310510@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250728062649.469882-1-aha310510@gmail.com>
+ <20250728062649.469882-1-aha310510@gmail.com>
+X-ClientProxiedBy: VI1PR07CA0309.eurprd07.prod.outlook.com
+ (2603:10a6:800:130::37) To AM8PR04MB7779.eurprd04.prod.outlook.com
+ (2603:10a6:20b:24b::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] net: Add locking to protect skb->dev access in
- ip_output
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, <davem@davemloft.net>,
-        <dsahern@kernel.org>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <netdev@vger.kernel.org>
-CC: <quic_kapandey@quicinc.com>, <quic_subashab@quicinc.com>
-References: <20250729114251.GA2193@hu-sharathv-hyd.qualcomm.com>
- <6888d4d07c92c_15cf79294cb@willemb.c.googlers.com.notmuch>
-Content-Language: en-US
-From: Sharath Chandra Vurukala <quic_sharathv@quicinc.com>
-In-Reply-To: <6888d4d07c92c_15cf79294cb@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Authority-Analysis: v=2.4 cv=LsaSymdc c=1 sm=1 tr=0 ts=6888ec71 cx=c_pps
- a=ouPCqIW2jiPt+lZRy3xVPw==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17
- a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=COk6AnOGAAAA:8
- a=PpstCEIyj3ptPoRNqVMA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=TjNXssC_j7lpFel5tvFf:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzI5MDExNyBTYWx0ZWRfX1+1NwA9LXEDH
- l7vvX++eV8fbDtZTE03jnjwa/xc1gLFcRtIivs4OR5kErJU4BbTHrWdfXrAbQXx9kYBvR7xloRv
- WcufeQy9wYvoEWWTepEhYYc/TJSj70MLYKTu4isVhXMjmj7N7NjWscY8cbX4d5kPcjixpwcK3M9
- 4LgEnIir8dH28oX1s8pNk4FgK2ehqfCCpVGNndb7jUr18uE/LKff7LNC3EJbFhgc2tKVTkX9Wpo
- N+LY4ftcPgPtkMh+ED+WsEiskXmAIiYGWlo7yfvS04siOpt2wAWF6pGXQjt117eNYeh9hRmKi9L
- vlUf4yXJkzrWhvlvQwzqSuNhA4YHJku1NIRUWB40CKZI800X+4gM163rwd16UV7IfSH1V81oxHy
- 9FAjOFchCKNWZh+qlMEORObVPzpTvj7z6WTm7fqeqU8qtPgOqEl4bUT/jYl+rXBdXbVP3+ha
-X-Proofpoint-ORIG-GUID: NWBpWKbUuAoMoemmzf4aJ1ZgXTmV_Tt3
-X-Proofpoint-GUID: NWBpWKbUuAoMoemmzf4aJ1ZgXTmV_Tt3
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-07-29_03,2025-07-28_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1011 mlxlogscore=999 spamscore=0 phishscore=0 suspectscore=0
- impostorscore=0 adultscore=0 lowpriorityscore=0 priorityscore=1501
- bulkscore=0 mlxscore=0 malwarescore=0 classifier=spam authscore=0 authtc=n/a
- authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2505280000 definitions=main-2507290117
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|PA4PR04MB7518:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1273243e-a1b8-4d68-f40e-08ddceb7547d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|19092799006|376014|10070799003|366016|7416014|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?obpfzJNTqwqHevXJFfry8ZsfuNFS9T4sIjOxYey4F2ufXbo33JvZfYe44EOD?=
+ =?us-ascii?Q?yWhbcaaiLPftfgIl5qKjtwoGQn7aXH5PiFCgOtQ8/qtQtFhKEgdOrgsHLWOp?=
+ =?us-ascii?Q?jvXn712RFwm3o+eIHsPs5HeOibRJTeNxDRCuSVoS7YwzIl4sfZe3TXEV+Dzr?=
+ =?us-ascii?Q?lLAEbWDQyR5wQR20U+aywszzMchMn48B+Av+OWPaevNImyjpknPOh1YjBgMH?=
+ =?us-ascii?Q?yRpV64XTuFdKv+E0h7WH8vxBxrsYNl68Md4CQFNqlgoJ8PcruzHpXISzmJPu?=
+ =?us-ascii?Q?bZ4E1lxV6NzyFBGSSS1iggZY+/5ySrImTTWA+S2gDRNy1Zp/dFANlaJBst9S?=
+ =?us-ascii?Q?YwKGUwZwAU1acMOE39nyRZhmVuVMKXt4sY/2SiCfXE0wtyrFgj7paw8rt/hU?=
+ =?us-ascii?Q?wHV6P2kkcfOYITK4v7R1bwrY9xhMbyjo4IiG/6WvzrxmNcxd8Z0LDVIuqZk1?=
+ =?us-ascii?Q?KdGtUHp4f7wQ+s+rkh0kSBtsc8JFXfuYKn7szaCirj3FQwAFg5wN5a90Qs4V?=
+ =?us-ascii?Q?fqXewe0TUSpQE3Y9BUS30koAMApFmUCuGVmcbqppN9yNz3LFhwUTSLm+oCM9?=
+ =?us-ascii?Q?11EyVy34MU+ciE63QuYLPq1WUSHQsUyu25NbOpxtwGr6D67iXF9Djivi06+C?=
+ =?us-ascii?Q?Gca8LnBoRbteiDhOCBfP0y0Hj/BUM/nRcBC6IflQvaErJAths04RC3yb7lnV?=
+ =?us-ascii?Q?ZWXSN7jyltZCVvLL3CpyKvleL2+hRkiMUg5YCmiV4BarMuqOMAMRYBNm7Ypq?=
+ =?us-ascii?Q?Qf13j0sipuhR+RgrAtI5cJe4LK5x2FF6kmWz4f0LP0Vjk5lVDKDt0Aww0TOQ?=
+ =?us-ascii?Q?LcaoG/M7iSivupqqVImXt4cRUeLK2AlMMzMfMrhJDOvJPECLJhh4Umgu7wJP?=
+ =?us-ascii?Q?YRuv0LUfOcSGdZFl13SC58mrirXMELTFSiy75yfTW5sQakI4gxG2iG7t9D4x?=
+ =?us-ascii?Q?SMaFp/1nYeOQw9KCOAxdg5OG2m6jYRUrBRhXKatSufY6IN1Kvz6y7kKVhHuh?=
+ =?us-ascii?Q?EYIV8CKNdwH0PiBfZrcHw3cEYXmgr6s5gKeQHVyMI+kFiYXZSUzRglxlDhbQ?=
+ =?us-ascii?Q?+xWPGfWLbhnvVlqkIdjg5PpDvyr8Ly5XqWpYVnP90zupdyziHQ32G4JlD+SF?=
+ =?us-ascii?Q?Mvs8BhV1kjrWm26gDH3WMSiGCbDwXww/2/YLn3uCw8ynayXAFrHW6Ujwacl0?=
+ =?us-ascii?Q?2tz2cJkxUktnR7KF8380iL0sguJOtwEceqh2/7bWEmpBCHhlWCSFVuPcYWdv?=
+ =?us-ascii?Q?54Vkw6rwuECZeSJm+AQLuPMipI7uK2ofJv/XuAzUg2A2KAhxiYg0giiZctrs?=
+ =?us-ascii?Q?frDS5PrR/d93e/6jI/zzxmEuH5ZLkvxhgOIwbX0Ii9Qhk5GB945NBkjQIOS9?=
+ =?us-ascii?Q?82935S4=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(19092799006)(376014)(10070799003)(366016)(7416014)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?XUu27VxOm0n37C3ykifsGfcE1ALlddrdj90NUCYFF2l8ZSTSCDWdlATy2AMH?=
+ =?us-ascii?Q?u5Fw8WKOPPmppIMq66DE6BZF+QCTk1D648F18YXQ6btAmRNO4PC06bHN5fnr?=
+ =?us-ascii?Q?26yXOth34+FdXRfWc/LSXdF9uiytoKamQ/M2/qonTdkxUSyrKzS3WWrYIutH?=
+ =?us-ascii?Q?kcdsyqD/CeaVFJivau1nYLJ0ZH4BAB7+MGiQkQUwhKhpY9/UazF9QJ1B20RO?=
+ =?us-ascii?Q?d3znAgf11Pvzxx6Udt4iStqznxaKbw2h8laTJsqn66ZuGx7s/JdaG4u814ZS?=
+ =?us-ascii?Q?i1ZUw6Yq6FqYLiaFnQ+XEHzrVkBdHlvfswRClWgeu6slg1qXN1r6fDxlnHse?=
+ =?us-ascii?Q?qiwgZXltbS2hdhBOvLQgL7IQWFLaWp9KPSud+nvYOhHwQhyZx3yIN9vaHqxx?=
+ =?us-ascii?Q?bUTsQkA80I4EGr8DrrMJ/sWjSAjMDFxgqKj4senWN0JdF+JM3loc0Pop12G9?=
+ =?us-ascii?Q?JGLTz1R4N9/+bgIk97QE+y8DkHMgfyDlXxe7iJggwZxQ7Q4HpYWGBQP9sxr0?=
+ =?us-ascii?Q?ML7Jx/UjV3FxxQf/YneFSBmmAWFWJyMiTqTCb8vMVgdtZkl8NCnu2vV8GXu6?=
+ =?us-ascii?Q?nXIGsS3RILN0EJI20KPVPpklwkgKVpMdTyudjiBRcUvW7PVVV0YHcqUEYBHv?=
+ =?us-ascii?Q?v6QVF2QnSyBWmoMVxvBlQJNA/gY0qZ2A9x3mqAhVMJrp6Qk05WhhyAgq4E/D?=
+ =?us-ascii?Q?lZ8G5f8UPXCPwIW/96C4ZAEqdciwIl45HdzjMY30F1XZ2Cb8YwGbApX7PEQr?=
+ =?us-ascii?Q?At/5YPgqMGdpvqGNipCVXcV1tbKIc/BAHlYtyK0JwyB+yFFbuBEhWbI2OQ6A?=
+ =?us-ascii?Q?zj/x8uApdgAR8WJQbMNIhnYr1z3KizvskwEWAJcId8VjnZItnY1HIjjokdyF?=
+ =?us-ascii?Q?htN6LeyYaZkoKCChdOYpaWOAW2Ljg1enL09IalSy0S8xY3u1ktBPVnWZUZRf?=
+ =?us-ascii?Q?Po8wjiSKwfnoAW3voHl2n/d6++QvVCHX/wRI/feejWDmfcxmzRtDTL4Eu73P?=
+ =?us-ascii?Q?moOmzJ/4XeIDK4tssbaIG5QZxm0PPUPl1RwAdHnguy8CKuYGB5d5fK6ByTr3?=
+ =?us-ascii?Q?S8RktuvGDMa78kvXp51kTuBldgJjo5tGuAA2bDF6RTKRk2ZhvU1nh+sJvefV?=
+ =?us-ascii?Q?ApW6ZUYVOyhcBYQprDLJsBqFBjHedjkHXmvQxFLlJoyA2nX+XgRsb7frhwzz?=
+ =?us-ascii?Q?HWmOiBW9aRNx1dTK75wQH34C/Xd8U0uRjaU3ErBWAvWoU4BGdMm3HKci9GMF?=
+ =?us-ascii?Q?fYmcehxjAAn9VBt0Af66PqQ6O1PtabXFWTKRuzhKqF2+DcOi2hinLZzmfLgF?=
+ =?us-ascii?Q?0+ME7H04TfxGcwjiZpujS089PjPiiMz2S1gme1H8SEZJw0lWvrlO0SEBpXIc?=
+ =?us-ascii?Q?spO2VhmVArjgIdgP7Iaxc3c3dFnUYTg0yawYwVrDrq+Dz1QN33/YiduCSNCO?=
+ =?us-ascii?Q?vvByBpStnFP4wxfWyczpEkXDBevnhtliW9XeO+aDzPkmPOtnZ2qyWGaNXVgK?=
+ =?us-ascii?Q?Bwzsy0RCK4AvERYtH5Z8i0wCzpXmPhJLHNsnKc9il/N9cqk9pgCpjEVi1ksL?=
+ =?us-ascii?Q?HEPC01NnV5v6FR/vEmNuG4EuIYzRKOU+zxGGRa66XK8lBfoANU4RTIPyeq1w?=
+ =?us-ascii?Q?UEFv1FdYN8wTf/lCf/KBXcuzQIB3uPArwSTzDiUkSGptfz/nCXiSF6a7Ap64?=
+ =?us-ascii?Q?WW0HFQ=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1273243e-a1b8-4d68-f40e-08ddceb7547d
+X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jul 2025 15:48:15.2204
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: HZ2faiP/aTbHi6NuNws8XLP6+/s9kctW1y5lBPA6oSObrwOhw1pwHndseB9NkFRTS4PlogtwaFEYFVBDcj99nA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4PR04MB7518
 
+On Mon, Jul 28, 2025 at 03:26:49PM +0900, Jeongjun Park wrote:
+> syzbot reported the following ABBA deadlock:
+> 
+>        CPU0                           CPU1
+>        ----                           ----
+>   n_vclocks_store()
+>     lock(&ptp->n_vclocks_mux) [1]
+>         (physical clock)
+>                                      pc_clock_adjtime()
+>                                        lock(&clk->rwsem) [2]
+>                                         (physical clock)
+>                                        ...
+>                                        ptp_clock_freerun()
+>                                          ptp_vclock_in_use()
+>                                            lock(&ptp->n_vclocks_mux) [3]
+>                                               (physical clock)
+>     ptp_clock_unregister()
+>       posix_clock_unregister()
+>         lock(&clk->rwsem) [4]
+>           (virtual clock)
+> 
+> Since ptp virtual clock is registered only under ptp physical clock, both
+> ptp_clock and posix_clock must be physical clocks for ptp_vclock_in_use()
+> to lock &ptp->n_vclocks_mux and check ptp->n_vclocks.
+> 
+> However, when unregistering vclocks in n_vclocks_store(), the locking
+> ptp->n_vclocks_mux is a physical clock lock, but clk->rwsem of
+> ptp_clock_unregister() called through device_for_each_child_reverse()
+> is a virtual clock lock.
+> 
+> Therefore, clk->rwsem used in CPU0 and clk->rwsem used in CPU1 are
+> different locks, but in lockdep, a false positive occurs because the
+> possibility of deadlock is determined through lock-class.
+> 
+> To solve this, lock subclass annotation must be added to the posix_clock
+> rwsem of the vclock.
+> 
+> Reported-by: syzbot+7cfb66a237c4a5fb22ad@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=7cfb66a237c4a5fb22ad
+> Fixes: 73f37068d540 ("ptp: support ptp physical/virtual clocks conversion")
+> Signed-off-by: Jeongjun Park <aha310510@gmail.com>
+> ---
+> v4: Remove unnecessary lock class annotation and CC "POSIX CLOCKS and TIMERS" maintainer
+> - Link to v3: https://lore.kernel.org/all/20250719124022.1536524-1-aha310510@gmail.com/
+> v3: Annotate lock subclass to prevent false positives of lockdep
+> - Link to v2: https://lore.kernel.org/all/20250718114958.1473199-1-aha310510@gmail.com/
+> v2: Add CC Vladimir
+> - Link to v1: https://lore.kernel.org/all/20250705145031.140571-1-aha310510@gmail.com/
+> ---
 
+For the general idea:
 
-On 7/29/2025 7:34 PM, Willem de Bruijn wrote:
-> Sharath Chandra Vurukala wrote:
->> In ip_output() skb->dev is updated from the skb_dst(skb)->dev
->> this can become invalid when the interface is unregistered and freed,
->>
->> Introduced new skb_dst_dev_rcu() function to be used instead of
->> skb_dst_dev() within rcu_locks in outout.This will ensure that
->> all the skb's associated with the dev being deregistered will
->> be transnmitted out first, before freeing the dev.
->>
->> Multiple panic call stacks were observed when UL traffic was run
->> in concurrency with device deregistration from different functions,
->> pasting one sample for reference.
->>
->> [496733.627565][T13385] Call trace:
->> [496733.627570][T13385] bpf_prog_ce7c9180c3b128ea_cgroupskb_egres+0x24c/0x7f0
->> [496733.627581][T13385] __cgroup_bpf_run_filter_skb+0x128/0x498
->> [496733.627595][T13385] ip_finish_output+0xa4/0xf4
->> [496733.627605][T13385] ip_output+0x100/0x1a0
->> [496733.627613][T13385] ip_send_skb+0x68/0x100
->> [496733.627618][T13385] udp_send_skb+0x1c4/0x384
->> [496733.627625][T13385] udp_sendmsg+0x7b0/0x898
->> [496733.627631][T13385] inet_sendmsg+0x5c/0x7c
->> [496733.627639][T13385] __sys_sendto+0x174/0x1e4
->> [496733.627647][T13385] __arm64_sys_sendto+0x28/0x3c
->> [496733.627653][T13385] invoke_syscall+0x58/0x11c
->> [496733.627662][T13385] el0_svc_common+0x88/0xf4
->> [496733.627669][T13385] do_el0_svc+0x2c/0xb0
->> [496733.627676][T13385] el0_svc+0x2c/0xa4
->> [496733.627683][T13385] el0t_64_sync_handler+0x68/0xb4
->> [496733.627689][T13385] el0t_64_sync+0x1a4/0x1a8
->>
->> Changes in v2:
->> - Addressed review comments from Eric Dumazet
->> - Used READ_ONCE() to prevent potential load/store tearing
->> - Added skb_dst_dev_rcu() and used along with rcu_read_lock() in ip_output
->>
->> Signed-off-by: Sharath Chandra Vurukala <quic_sharathv@quicinc.com>
->> ---
->>  include/net/dst.h    | 12 ++++++++++++
->>  net/ipv4/ip_output.c | 17 ++++++++++++-----
->>  2 files changed, 24 insertions(+), 5 deletions(-)
->>
->> diff --git a/include/net/dst.h b/include/net/dst.h
->> index 00467c1b5093..692ebb1b3f42 100644
->> --- a/include/net/dst.h
->> +++ b/include/net/dst.h
->> @@ -568,11 +568,23 @@ static inline struct net_device *dst_dev(const struct dst_entry *dst)
->>  	return READ_ONCE(dst->dev);
->>  }
->>  
->> +static inline struct net_device *dst_dev_rcu(const struct dst_entry *dst)
->> +{
->> +	/* In the future, use rcu_dereference(dst->dev) */
->> +	WARN_ON(!rcu_read_lock_held());
-> 
-> WARN_ON_ONCE or even DEBUG_NET_WARN_ON_ONCE
-> 
-That makes sense — I will revise the code to use WARN_ON_ONCE() accordingly.>> +	return READ_ONCE(dst->dev);
->> +}
->> +
->>  static inline struct net_device *skb_dst_dev(const struct sk_buff *skb)
->>  {
->>  	return dst_dev(skb_dst(skb));
->>  }
->>  
->> +static inline struct net_device *skb_dst_dev_rcu(const struct sk_buff *skb)
->> +{
->> +	return dst_dev_rcu(skb_dst(skb));
->> +}
->> +
->>  static inline struct net *skb_dst_dev_net(const struct sk_buff *skb)
->>  {
->>  	return dev_net(skb_dst_dev(skb));
->> diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
->> index 10a1d182fd84..d70d79b71897 100644
->> --- a/net/ipv4/ip_output.c
->> +++ b/net/ipv4/ip_output.c
->> @@ -425,15 +425,22 @@ int ip_mc_output(struct net *net, struct sock *sk, struct sk_buff *skb)
->>  
->>  int ip_output(struct net *net, struct sock *sk, struct sk_buff *skb)
->>  {
->> -	struct net_device *dev = skb_dst_dev(skb), *indev = skb->dev;
->> +	struct net_device *dev, *indev = skb->dev;
->> +	int ret_val;
->>  
->> +	IP_UPD_PO_STATS(net, IPSTATS_MIB_OUT, skb->len);
-> 
-> Why introduce this?
-> 
-Apologies for the oversight. The branch I am currently working on is quite outdated, and this line originates from that earlier version.
-This line appears to have been unintentionally included during the preparation of the patch for submission to net-next. Will correct this.>> +
->> +	rcu_read_lock();
->> +	dev = skb_dst_dev_rcu(skb);
->>  	skb->dev = dev;
->>  	skb->protocol = htons(ETH_P_IP);
->>  
->> -	return NF_HOOK_COND(NFPROTO_IPV4, NF_INET_POST_ROUTING,
->> -			    net, sk, skb, indev, dev,
->> -			    ip_finish_output,
->> -			    !(IPCB(skb)->flags & IPSKB_REROUTED));
->> +	ret_val = NF_HOOK_COND(NFPROTO_IPV4, NF_INET_POST_ROUTING,
->> +			       net, sk, skb, indev, dev,
->> +				ip_finish_output,
->> +				!(IPCB(skb)->flags & IPSKB_REROUTED));
->> +	rcu_read_unlock();
->> +	return ret_val;
->>  }
->>  EXPORT_SYMBOL(ip_output);
->>  
-> 
-> 
+Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
+>  drivers/ptp/ptp_private.h | 5 +++++
+>  drivers/ptp/ptp_vclock.c  | 7 +++++++
+>  2 files changed, 12 insertions(+)
+> 
+> diff --git a/drivers/ptp/ptp_private.h b/drivers/ptp/ptp_private.h
+> index a6aad743c282..b352df4cd3f9 100644
+> --- a/drivers/ptp/ptp_private.h
+> +++ b/drivers/ptp/ptp_private.h
+> @@ -24,6 +24,11 @@
+>  #define PTP_DEFAULT_MAX_VCLOCKS 20
+>  #define PTP_MAX_CHANNELS 2048
+>  
+> +enum {
+> +	PTP_LOCK_PHYSICAL = 0,
+> +	PTP_LOCK_VIRTUAL,
+> +};
+> +
+>  struct timestamp_event_queue {
+>  	struct ptp_extts_event buf[PTP_MAX_TIMESTAMPS];
+>  	int head;
+> diff --git a/drivers/ptp/ptp_vclock.c b/drivers/ptp/ptp_vclock.c
+> index 7febfdcbde8b..8ed4b8598924 100644
+> --- a/drivers/ptp/ptp_vclock.c
+> +++ b/drivers/ptp/ptp_vclock.c
+> @@ -154,6 +154,11 @@ static long ptp_vclock_refresh(struct ptp_clock_info *ptp)
+>  	return PTP_VCLOCK_REFRESH_INTERVAL;
+>  }
+>  
+> +static void ptp_vclock_set_subclass(struct ptp_clock *ptp)
+> +{
+> +	lockdep_set_subclass(&ptp->clock.rwsem, PTP_LOCK_VIRTUAL);
+
+Just not sure whether the PTP clock should be exposing this API, or the
+POSIX clock, who actually owns the rwsem.
+
+> +}
+> +
+>  static const struct ptp_clock_info ptp_vclock_info = {
+>  	.owner		= THIS_MODULE,
+>  	.name		= "ptp virtual clock",
+> @@ -213,6 +218,8 @@ struct ptp_vclock *ptp_vclock_register(struct ptp_clock *pclock)
+>  		return NULL;
+>  	}
+>  
+> +	ptp_vclock_set_subclass(vclock->clock);
+> +
+>  	timecounter_init(&vclock->tc, &vclock->cc, 0);
+>  	ptp_schedule_worker(vclock->clock, PTP_VCLOCK_REFRESH_INTERVAL);
+>  
+> --
 
