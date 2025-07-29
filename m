@@ -1,110 +1,76 @@
-Return-Path: <netdev+bounces-210701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210702-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D704B145B9
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 03:22:05 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61BD6B145DE
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 03:39:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 752CB171F8C
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 01:22:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D058E7A4D7F
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 01:38:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0D131DFDAB;
-	Tue, 29 Jul 2025 01:22:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B1111F7554;
+	Tue, 29 Jul 2025 01:39:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="WgE/WML7"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="PXT8XbJ3"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C858E1DED77
-	for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 01:21:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2F3217578;
+	Tue, 29 Jul 2025 01:39:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753752120; cv=none; b=IBxcwSq2w8p2SPiBjHlOdt4BZCqIkYxvSpe6Ong+hQ7hKbbF6J5SckeuCI4sQ3IY05WjDlpSeKt4yK+r6APxOCrapkkDZ6LKTWW71TYbnf7sIBTv1/xcSMv+HZvcs9C2MOZifpPMV7RYQLmQgJ/+YRaXfX5zCKvlLHDlzn9Oxf4=
+	t=1753753156; cv=none; b=Th4aELIlvggcXcZfpOSfv7S91czpVVt5BRLWJ6az/Kbc9sTpTbq+8eVTvcDq4NY/VY/egP3r5AAc4LI6cjMETUHymGGieMek08h27MjjZitXNO+3TqiV2FeIY+0wZCU/9iDPnedOmP7I0ld3/5UUT6TaDGXsMMKcthxN3S7tQbw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753752120; c=relaxed/simple;
-	bh=IyWVg6fv6jorhhnIZt/1wvfudukMy1aGNscDyyEBtYE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fjhegM2bl8K+h7xv2Ck4ma4fjlFChJ2a4VVC1bpQxyJ+p4L4oS+cGJcukC+gWNRfQypDba8mfribWu8NZS6dC2CmAbqjJ/60v7vItbWB56oH+HpRaFJbSV9s6WKemomv1OYb5iQNeoC8RMcRE7GuSSVXdZpwYCqmnNWTuOABJDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=WgE/WML7; arc=none smtp.client-ip=91.218.175.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <b36532a2-506b-4ba5-b6a3-a089386a190e@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1753752116;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GWpYFOkLsYnJ9p2ZFvtVNIwL5tEHltSN8BWwkp1apnw=;
-	b=WgE/WML74rD1+eaiOmDCUACg4lRY0yiI97gO1U4BTY+WlYmnjBk9GHu9qMOaIEi7E9661E
-	S6cdKz7drn5/cAPiiOk2+WOqIqzMlsmvrqZ57k2/fAFBTZcCx12xuwzV1XRIYMfDmU4xlF
-	Y08DWk+rPUj6rmDlY7FOadBKFtCNm+s=
-Date: Mon, 28 Jul 2025 18:21:50 -0700
+	s=arc-20240116; t=1753753156; c=relaxed/simple;
+	bh=AynWej14Z8u6vor1cVo1nb+DdTK/gwxAF0l7UsCdBHA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mfQEHtLEtFqEGjXtkMMy/7O2h4eK8FN+SrK+JCBedVLZa9/EW0RbCbr0qNTwH+gCffLpKVgj2Yl5t3TXCfMT7fJ4WxvI/SULMa+Vs1Axc7JsfpBMyNUUAhlnFAnwqXLxD2ADhy3zjiRDK121/DDBiC0iwdPTNJdT7iTPZ7CCciU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=PXT8XbJ3; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=bDiSGgTwK4oBVoJWbPnfgIkn9cdp9raOCjF1DXXqbno=; b=PXT8XbJ3aykBGDknc/4YVv92Nr
+	+IgTSHbSlgw6iJ4wUqEQ6t22vorhwC9nj0BjNmOScRxAWYmBYqqTWpUHtQkrZFJwClwMRRlS0thlC
+	zxdFoDtIHxGGSFDiJm8vKGKpyUlACN+SmBWjsmaQ+f12aZpvT5P43L8/nQzNvZs4zLhc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1ugZIz-0039Jo-8C; Tue, 29 Jul 2025 03:39:01 +0200
+Date: Tue, 29 Jul 2025 03:39:01 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Tian <27392025k@gmail.com>
+Cc: irusskikh@marvell.com, netdev@vger.kernel.org, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v2] net: atlantic: fix overwritten return value in
+ Aquantia driver
+Message-ID: <3ef5e640-9142-4ebb-9b0d-a6c62e503428@lunn.ch>
+References: <20250729005853.33130-1-27392025k@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v3 0/4] bpf: add icmp_send_unreach kfunc
-To: Mahe Tardy <mahe.tardy@gmail.com>
-Cc: alexei.starovoitov@gmail.com, andrii@kernel.org, ast@kernel.org,
- bpf@vger.kernel.org, coreteam@netfilter.org, daniel@iogearbox.net,
- fw@strlen.de, john.fastabend@gmail.com, netdev@vger.kernel.org,
- netfilter-devel@vger.kernel.org, oe-kbuild-all@lists.linux.dev,
- pablo@netfilter.org, lkp@intel.com
-References: <202507270940.kXGmRbg5-lkp@intel.com>
- <20250728094345.46132-1-mahe.tardy@gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20250728094345.46132-1-mahe.tardy@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250729005853.33130-1-27392025k@gmail.com>
 
-On 7/28/25 2:43 AM, Mahe Tardy wrote:
-> Hello,
-> 
-> This is v3 of adding the icmp_send_unreach kfunc, as suggested during
-> LSF/MM/BPF 2025[^1]. The goal is to allow cgroup_skb programs to
-> actively reject east-west traffic, similarly to what is possible to do
-> with netfilter reject target.
-> 
-> The first step to implement this is using ICMP control messages, with
-> the ICMP_DEST_UNREACH type with various code ICMP_NET_UNREACH,
-> ICMP_HOST_UNREACH, ICMP_PROT_UNREACH, etc. This is easier to implement
-> than a TCP RST reply and will already hint the client TCP stack to abort
-> the connection and not retry extensively.
-> 
-> Note that this is different than the sock_destroy kfunc, that along
-> calls tcp_abort and thus sends a reset, destroying the underlying
-> socket.
-> 
-> Caveats of this kfunc design are that a cgroup_skb program can call this
-> function N times, thus send N ICMP unreach control messages and that the
-> program can return from the BPF filter with SK_PASS leading to a
-> potential confusing situation where the TCP connection was established
-> while the client received ICMP_DEST_UNREACH messages.
-> 
-> Another more sophisticated design idea would be for the kfunc to set the
-> kernel to send an ICMP_HOST_UNREACH control message with the appropriate
-> code when the cgroup_skb program terminates with SK_DROP. Creating a new
-> 'SK_REJECT' return code for cgroup_skb program was generally rejected
-> and would be too limited for other program types support.
-> 
-> We should bear in mind that we want to add a TCP reset kfunc next and
-> also could extend this kfunc to other program types if wanted.
+> This patch uses `err |=` instead of assignment, so that any earlier error
+> is preserved even if later calls succeed. This is safe because all involved
+> functions return standard negative error codes (e.g. -EIO, -ETIMEDOUT, etc).
+> OR-ing such values does not convert them into success, and preserves the
+> indication that an error occurred.
 
-Some high level questions.
+22 | 110 = 132 = ERFKILL
 
-Which other program types do you need this kfunc to send icmp and the future tcp 
-rst?
+How easy will it be for somebody to debug that?
 
-This cover letter mentioned sending icmp unreach is easier than sending tcp rst. 
-What problems do you see in sending tcp rst?
-
+	Andrew
 
