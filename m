@@ -1,179 +1,172 @@
-Return-Path: <netdev+bounces-210799-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210795-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42E55B14DB1
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 14:32:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03C81B14D8B
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 14:18:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A3323BCE55
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 12:31:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F3265418F7
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 12:18:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0E4C28C03A;
-	Tue, 29 Jul 2025 12:32:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HzDiaAFL"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D235A289E2B;
+	Tue, 29 Jul 2025 12:17:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2DAC207A16;
-	Tue, 29 Jul 2025 12:32:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD638230BC9;
+	Tue, 29 Jul 2025 12:17:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753792327; cv=none; b=AcXB8jmgdRO2Q+q++O82WMnFcZdZuG8K2MOnxnNUYR8BG48Agx3tq1eC2ud46EnMjFKZRKi5cT1DhKO85O9/gGbUveuDSHoWx/PaH0iRwiCu/HNEyQ+2LbfbK/REBEBeQXPl1vLzAYxm3WtcWgZL8vKwW5iNhhmbvOal9jAofRA=
+	t=1753791478; cv=none; b=IL9uUykTwxpvICbc3Ic4EtcsY4PAdGDCuIBwv/OyVVrOtyppZknEovQe7px6W+Js77RVEvag0+jKMKUYLNJZ4jyqzRR0W53NIoAmoDVabLM8FtS4jmwdHE2c+DW0f33hZhpOTy1FqOc7VboAHa3Uj0MiLTFyIJpGiJlCB2QdK/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753792327; c=relaxed/simple;
-	bh=XT9EQ8WXkA4HStsq57Texw6Sd59bD7ohg1N8qtNm2Q0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EY8S6eqjZL3S9sc7mG8O/0P1V5KeDNToEAsvCfBao/SAajTfhk4aOKKJEyfsgH3uL7ot1Y6pq0ZtLNWjElk+AaNV0fCwfDV78N6MV8wSH8nZhXZ8hWMvwIiKLpzau/EAqvvsXqZqp2nODgvXGnIPiq6mGqGhf57Se0KwR06bpsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HzDiaAFL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5C45C4CEEF;
-	Tue, 29 Jul 2025 12:32:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753792327;
-	bh=XT9EQ8WXkA4HStsq57Texw6Sd59bD7ohg1N8qtNm2Q0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=HzDiaAFLh0oNOXpVZnobJ15SxiXjx9HsFo0cARdmDJn6QyDL11iA/UnD6BSEIoIBu
-	 69ER9RWiO3BE6veK/1IGEruA8VrYPEAF/0GcbYPWXBwveYku2Me6F5hLuyLtAZmMek
-	 OI5P+SyaDNayrOceCjrmGk3jkp6g8eR6ccrVHNq/cm0wxwXq+wrd4zQTJlbQ0Isnok
-	 7RQdjWtOrXr9mQY0NuSFj1sVvt/Y+dkScu1lePEvLnXUDM5QrGAXOOskn+aqEsCOhB
-	 dQLSTarhpye0DtqNDqXIBnNwWg5OgamRWfEVWUaHv0e9u2B3yQoLUAYiQ4idWKVUEH
-	 diMZ5Kua+PMwA==
-Message-ID: <bc30805a-d785-432f-be0f-97cea35abd51@kernel.org>
-Date: Tue, 29 Jul 2025 14:32:00 +0200
+	s=arc-20240116; t=1753791478; c=relaxed/simple;
+	bh=mBtN64bINwuSONSm2cprCsFVNoJczCQH6S1YQTNCUW8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Sey4l5Kzstf5JQWqsPPJxMBZsxAThSrWapUqYkKzw1Er1tYpJHV32tcU8HoehgI/axornz7c5PNPgow1WjwL2LMQ+OI5CQKJrCIMYSvrXIH9fSNX0fP/zydBLD7jzK6ooqVcVMrDDX1lKsSTlAoV5MItj4EUgLXMigkOBVX3ZiE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.163])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4brvXD2cp5z27j4r;
+	Tue, 29 Jul 2025 20:18:52 +0800 (CST)
+Received: from dggpemf500016.china.huawei.com (unknown [7.185.36.197])
+	by mail.maildlp.com (Postfix) with ESMTPS id 04FB3180044;
+	Tue, 29 Jul 2025 20:17:51 +0800 (CST)
+Received: from huawei.com (10.175.124.27) by dggpemf500016.china.huawei.com
+ (7.185.36.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 29 Jul
+ 2025 20:17:49 +0800
+From: Wang Liang <wangliang74@huawei.com>
+To: <willemdebruijn.kernel@gmail.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<horms@kernel.org>, <atenart@kernel.org>
+CC: <yuehaibing@huawei.com>, <zhangchangzhong@huawei.com>,
+	<wangliang74@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: [RFC PATCH net v2] net: drop gso udp packets in udp_rcv_segment()
+Date: Tue, 29 Jul 2025 20:39:07 +0800
+Message-ID: <20250729123907.3318425-1-wangliang74@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/5] net: rpmsg-eth: Add basic rpmsg skeleton
-To: MD Danish Anwar <danishanwar@ti.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Mengyuan Lou
- <mengyuanlou@net-swift.com>, Michael Ellerman <mpe@ellerman.id.au>,
- Madhavan Srinivasan <maddy@linux.ibm.com>, Fan Gong <gongfan1@huawei.com>,
- Lee Trager <lee@trager.us>, Lorenzo Bianconi <lorenzo@kernel.org>,
- Geert Uytterhoeven <geert+renesas@glider.be>,
- Lukas Bulwahn <lukas.bulwahn@redhat.com>,
- Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
-Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250723080322.3047826-1-danishanwar@ti.com>
- <20250723080322.3047826-3-danishanwar@ti.com>
- <296d6846-6a28-4e53-9e62-3439ac57d9c1@kernel.org>
- <5f4e1f99-ff71-443f-ba34-39396946e5b4@ti.com>
- <cabacd59-7cbf-403a-938f-371026980cc7@kernel.org>
- <66377d5d-b967-451f-99d9-8aea5f8875d3@ti.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <66377d5d-b967-451f-99d9-8aea5f8875d3@ti.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
+ dggpemf500016.china.huawei.com (7.185.36.197)
 
-On 29/07/2025 11:46, MD Danish Anwar wrote:
->>>
->>> One idea I had was to create a new binding for this node, and use
->>> compatible string to access the node in driver. But the device is
->>> virtual and not physical so I thought that might not be the way to go so
->>> I went with the current approach.
->>
->> virtual devices do not go to DTS anyway. How do you imagine this works?
->> You add it to DTS but you do not add bindings and you expect checks to
->> succeed?
->>
->> Provide details how you checked your DTS compliance.
->>
->>
-> 
-> This is my device tree patch [1]. I ran these two commands before and
-> after applying the patch and checked the diff.
-> 
-> 	make dt_binding_check
-> 	make dtbs_check
-> 
-> I didn't see any new error / warning getting introduced due to the patch
-> 
-> After applying the patch I also ran,
-> 
-> 	make CHECK_DTBS=y ti/k3-am642-evm.dtb
-> 
-> I still don't see any warnings / error.
-> 
-> 
-> If you look at the DT patch, you'll see I am adding a new node in the
+When sending a packet with virtio_net_hdr to tun device, if the gso_type
+in virtio_net_hdr is SKB_GSO_UDP and the gso_size is less than udphdr
+size, below crash may happen.
 
-I see. This is so odd syntax... You have the phandle there, so you do
-not need to do any node name checking. I did not really expect you will
-be checking node name for reserved memory!!!
+  ------------[ cut here ]------------
+  kernel BUG at net/core/skbuff.c:4572!
+  Oops: invalid opcode: 0000 [#1] SMP NOPTI
+  CPU: 0 UID: 0 PID: 62 Comm: mytest Not tainted 6.16.0-rc7 #203 PREEMPT(voluntary)
+  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+  RIP: 0010:skb_pull_rcsum+0x8e/0xa0
+  Code: 00 00 5b c3 cc cc cc cc 8b 93 88 00 00 00 f7 da e8 37 44 38 00 f7 d8 89 83 88 00 00 00 48 8b 83 c8 00 00 00 5b c3 cc cc cc cc <0f> 0b 0f 0b 66 66 2e 0f 1f 84 00 000
+  RSP: 0018:ffffc900001fba38 EFLAGS: 00000297
+  RAX: 0000000000000004 RBX: ffff8880040c1000 RCX: ffffc900001fb948
+  RDX: ffff888003e6d700 RSI: 0000000000000008 RDI: ffff88800411a062
+  RBP: ffff8880040c1000 R08: 0000000000000000 R09: 0000000000000001
+  R10: ffff888003606c00 R11: 0000000000000001 R12: 0000000000000000
+  R13: ffff888004060900 R14: ffff888004050000 R15: ffff888004060900
+  FS:  000000002406d3c0(0000) GS:ffff888084a19000(0000) knlGS:0000000000000000
+  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+  CR2: 0000000020000040 CR3: 0000000004007000 CR4: 00000000000006f0
+  Call Trace:
+   <TASK>
+   udp_queue_rcv_one_skb+0x176/0x4b0 net/ipv4/udp.c:2445
+   udp_queue_rcv_skb+0x155/0x1f0 net/ipv4/udp.c:2475
+   udp_unicast_rcv_skb+0x71/0x90 net/ipv4/udp.c:2626
+   __udp4_lib_rcv+0x433/0xb00 net/ipv4/udp.c:2690
+   ip_protocol_deliver_rcu+0xa6/0x160 net/ipv4/ip_input.c:205
+   ip_local_deliver_finish+0x72/0x90 net/ipv4/ip_input.c:233
+   ip_sublist_rcv_finish+0x5f/0x70 net/ipv4/ip_input.c:579
+   ip_sublist_rcv+0x122/0x1b0 net/ipv4/ip_input.c:636
+   ip_list_rcv+0xf7/0x130 net/ipv4/ip_input.c:670
+   __netif_receive_skb_list_core+0x21d/0x240 net/core/dev.c:6067
+   netif_receive_skb_list_internal+0x186/0x2b0 net/core/dev.c:6210
+   napi_complete_done+0x78/0x180 net/core/dev.c:6580
+   tun_get_user+0xa63/0x1120 drivers/net/tun.c:1909
+   tun_chr_write_iter+0x65/0xb0 drivers/net/tun.c:1984
+   vfs_write+0x300/0x420 fs/read_write.c:593
+   ksys_write+0x60/0xd0 fs/read_write.c:686
+   do_syscall_64+0x50/0x1c0 arch/x86/entry/syscall_64.c:63
+   </TASK>
 
-Obviously this will be fine with dt bindings, because such ABI should
-never be constructed.
+To trigger gso segment in udp_queue_rcv_skb(), we should also set option
+UDP_ENCAP_ESPINUDP to enable udp_sk(sk)->encap_rcv. When the encap_rcv
+hook return 1 in udp_queue_rcv_one_skb(), udp_csum_pull_header() will try
+to pull udphdr, but the skb size has been segmented to gso size, which
+leads to this crash.
 
+Previous commit cf329aa42b66 ("udp: cope with UDP GRO packet misdirection")
+introduces segmentation in UDP receive path only for GRO, which was never
+intended to be used for UFO, so drop gso udp packets in udp_rcv_segment().
 
-> `reserved-memory`. I am not creating a completely new undocumented node.
-> Instead I am creating a new node under reserved-memory as the shared
-> memory used by rpmsg-eth driver needs to be reserved first. This memory
-> is reserved by the ti_k3_r5_remoteproc driver by k3_reserved_mem_init().
-> 
-> It's just that I am naming this node as "virtual-eth-shm@a0400000" and
-> then using the same name in driver to get the base_address and size
-> mentioned in this node.
+Fixes: cf329aa42b66 ("udp: cope with UDP GRO packet misdirection")
+Fixes: 3d010c8031e3 ("udp: do not accept non-tunnel GSO skbs landing in a tunnel")
+Suggested-by: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Signed-off-by: Wang Liang <wangliang74@huawei.com>
+---
+v1: https://lore.kernel.org/netdev/20250724083005.3918375-1-wangliang74@huawei.com/
+v2: Drop ufo packets instead of checking min gso size.
+---
+ include/net/udp.h | 22 ++++++++++++++++------
+ 1 file changed, 16 insertions(+), 6 deletions(-)
 
-And how your driver will work with:
+diff --git a/include/net/udp.h b/include/net/udp.h
+index a772510b2aa5..e3fcda71f6c1 100644
+--- a/include/net/udp.h
++++ b/include/net/udp.h
+@@ -587,6 +587,14 @@ static inline struct sk_buff *udp_rcv_segment(struct sock *sk,
+ {
+ 	netdev_features_t features = NETIF_F_SG;
+ 	struct sk_buff *segs;
++	int drop_count = 1;
++
++	/*
++	 * Segmentation in UDP receive path is only for UDP GRO, drop udp
++	 * fragmentation offload (UFO) packets.
++	 */
++	if (skb_shinfo(skb)->gso_type & (SKB_GSO_UDP | SKB_GSO_UDP_L4))
++		goto drop;
+ 
+ 	/* Avoid csum recalculation by skb_segment unless userspace explicitly
+ 	 * asks for the final checksum values
+@@ -610,16 +618,18 @@ static inline struct sk_buff *udp_rcv_segment(struct sock *sk,
+ 	 */
+ 	segs = __skb_gso_segment(skb, features, false);
+ 	if (IS_ERR_OR_NULL(segs)) {
+-		int segs_nr = skb_shinfo(skb)->gso_segs;
+-
+-		atomic_add(segs_nr, &sk->sk_drops);
+-		SNMP_ADD_STATS(__UDPX_MIB(sk, ipv4), UDP_MIB_INERRORS, segs_nr);
+-		kfree_skb(skb);
+-		return NULL;
++		drop_count = skb_shinfo(skb)->gso_segs;
++		goto drop;
+ 	}
+ 
+ 	consume_skb(skb);
+ 	return segs;
++
++drop:
++	atomic_add(drop_count, &sk->sk_drops);
++	SNMP_ADD_STATS(__UDPX_MIB(sk, ipv4), UDP_MIB_INERRORS, drop_count);
++	kfree_skb(skb);
++	return NULL;
+ }
+ 
+ static inline void udp_post_segment_fix_csum(struct sk_buff *skb)
+-- 
+2.34.1
 
-s/virtual-eth-shm@a0400000/whatever@a0400000/
-
-? It will not.
-
-Best regards,
-Krzysztof
 
