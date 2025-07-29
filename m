@@ -1,164 +1,150 @@
-Return-Path: <netdev+bounces-210741-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210742-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 821D9B149FF
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 10:21:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FBAEB14A2E
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 10:36:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ABEB13A6CA0
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 08:21:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5EFB817DE38
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 08:36:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AF4B27C152;
-	Tue, 29 Jul 2025 08:21:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EhdgjGPv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4EFA2749E0;
+	Tue, 29 Jul 2025 08:36:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E1482AF1C;
-	Tue, 29 Jul 2025 08:21:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34729257444
+	for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 08:36:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753777301; cv=none; b=U6jdqcFxcfrKI0ctPWVvwfHT2sANdgaZkPG49UvNfOdHHmYsxpE7HZ0GNuvN7hG6GMgdrhFGaCWsrT8LzQuXuPdF9ZzRVhnRc2YyOUhYbj24VFxHUQhtYrNOLCpIslmqPyY3lP0s9Ieq7AHLSFXcJiJxrimNTcnPXW/gamZRUIc=
+	t=1753778194; cv=none; b=eNoNjLbcfoLBi0Nnt3h40bz7S3HSdMf/OvkWxKaYMGM8bUgXnPWabe1P7RbCHDkiHcGg6BEiaBd3l4+DazKs1fMPIMbm5NS5sRYL1AyxzBCAe31HI1Q0eOck1K/Vh8PmqKsu9q5jwZS8s5zls5QVlJti2gEfg+Tq0yw3u2OHvn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753777301; c=relaxed/simple;
-	bh=3MadP4h48DIdERsGiQK9qL9UflRCokl2zYAzYujjKO8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OZ/hLSWok3ZplfuJTUP07ImfjiISRTGG2QrWbW9lz/y+cBjOlOxS1Nv+giV2toAXgoljgBVG6tAPxKkoMflyjkJn4FBsLqmbH6wOndzzS+tSRgz/5r+kZXzNOKOOr+3/8Vf8levTruzgcbV0iAjLLEcpyJUDxdCTbjoZg1c81hk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EhdgjGPv; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-3b78315ff04so1843616f8f.0;
-        Tue, 29 Jul 2025 01:21:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753777298; x=1754382098; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=tT0dGPVL2JwzDZcMhwQgYP1Gkj3ongsGTyx+y3Z3CrE=;
-        b=EhdgjGPvE5u6i088g2OPrnRSfuAlPv5/5qzVGzrcy9N7BqY+e51xNG3B/SUtneYc29
-         Xrw8y3juyYtZ59d5iQr63WpHne4Iutj7bPWr1z1k4PgjAGrujB/YWTPO7HTh0GfjRMku
-         4EkJBQPZDgmISraaSnuBwqFkqAGv0IBrdoh67/ua167E/60+GbDpEd8ETjw/9zs+SX3s
-         y0HEvHkwATCfgX7YhfboCMsFJ7xpXjSdbHht4Z0n9bk6GpOrJrvyiF6bqDzz3cQyahC9
-         nupl3ocHkveLKeYQWzFwxcbXy617qTVusUaHhvyy2DmemIIfxsioMXzZvoTd+RFacinF
-         rfuA==
+	s=arc-20240116; t=1753778194; c=relaxed/simple;
+	bh=uCrJ+Iqbg5bbX+oCl5/x8BkXkWH6MwITKwrKsxfuTA8=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=HZ7GaDNg4cjIf4hSMHy6Tp6vkIEYJBpj49rxp6TDLJkMbGqCjv2L5vhoYoY7bmbG84xILFSHgu0Vq45Vu2qy/9K9bE0P+peceeAncV6xASco3n2SBFxoLMlUrMMeV/A31ZJ3drbvIH9cW2kTu+u2rXn8CpclVUI7d8uNw8CuDtM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3ddbec809acso62724775ab.2
+        for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 01:36:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753777298; x=1754382098;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=tT0dGPVL2JwzDZcMhwQgYP1Gkj3ongsGTyx+y3Z3CrE=;
-        b=XIkFZE0ivHl7TERU6E/QuwDi1FhfZx0sRKc2Crxd9U6OmJ0uXzh/WodjYKJq+ixGi2
-         RvcprdyLAfp7mgB54mrAcwZpTJDNbKvEHho68XQMtEfglu9J6o/sRkbjPS4PhZNY5nz0
-         CDUMGda4cWaVtjI1gzRNXubZ+3uemki06zB9JDXvErVZRNZ5/BPD2qAmxpyZQFg/B8o3
-         aktQCBHDV0T/9T5EAjokkrGMY+x8jimTRv/84J8QrruIrkf0rlSZGvLR/gHkFhe5n7Jn
-         eJ+69ZTtXxiCUNnq+DgBbuZ3MaXTaVgoT7h0PA00FGW7MR3Dr6Fi5MWkY0Hi01/xxf4F
-         GOZA==
-X-Forwarded-Encrypted: i=1; AJvYcCVLrRXybHzp/Os4xHxq4cKYzBX+dCXjAgsLav6OU5jeqpofR/u4nUjZXH3Ftsx8JeiobvEUnKY5bVCJMKI=@vger.kernel.org, AJvYcCXbXrYIr5cQFBXMT1wjXaaJlaTcb5FjlfJQ4XVDGD+Q7iVQsGvxdtCn8HPxAHOmHqDc8QXOJYHw@vger.kernel.org
-X-Gm-Message-State: AOJu0YwxjfMiohdofm9Qdv2PV++lTrpL6vNyeXOcoZKt2pQOjmyE2vk9
-	zkAdgHLPEMVntxNkz2A46+1qTu/597v+HpyWcTmbKXUdPArpX6syrnyl
-X-Gm-Gg: ASbGncsFHid0nn47tlLivm1qxk19ewC/Ey2bYKFWfU0jiIjDkbC8Rd3XZXt0SY1x8Kn
-	Nw/AVfg3d6evIBsNTXjXRv2k9mAqLUsUCA4x2TvFXTFI8ijLvs5J7jAHRJtyze6xgS/WSSTWWLu
-	O7ErIwpcvDGjxPLOO8cF6bL3fELw9AInScSSMRa1bdnlWg6GFPvHWcHjM+WTFJmwpgbjki3VPHK
-	UMoayXR8+ce/NIGPWWyTdv/77hUt35e00neHcKVYKTQIGDjixTclTE8K4mfTYIzeHXjZeR8KSW/
-	/O/KtU6mM2afjJrXbXIYRsTdBN7VmKKvMSQO/qjblbRai1fumjOWYqlFQsbWmjK0opZBl3sQkJN
-	sD2vQfhUbUf7jUaGY8qHnccpwMVX86xnluHGs3Da7gHLCBuhVGWvERXvmAnqLt4rS5ih82tpWGU
-	Anhw==
-X-Google-Smtp-Source: AGHT+IE3SfkwZGuKiUVH9aKbgdBfmo7svBjLqSORlG/pClNgCFm7LSnPOXcJJ8FgGS2H6kv2vQVYvQ==
-X-Received: by 2002:a05:6000:2411:b0:3a4:bfda:1e9 with SMTP id ffacd0b85a97d-3b77678ba22mr11791862f8f.46.1753777297639;
-        Tue, 29 Jul 2025 01:21:37 -0700 (PDT)
-Received: from Ansuel-XPS24 (host-80-181-255-224.pool80181.interbusiness.it. [80.181.255.224])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3b778eb27f8sm11472037f8f.16.2025.07.29.01.21.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Jul 2025 01:21:36 -0700 (PDT)
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Russell King <linux@armlinux.org.uk>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Christian Marangi <ansuelsmth@gmail.com>
-Subject: [net-next RFC PATCH] net: phylink: add .pcs_link_down PCS OP
-Date: Tue, 29 Jul 2025 10:21:23 +0200
-Message-ID: <20250729082126.2261-1-ansuelsmth@gmail.com>
-X-Mailer: git-send-email 2.50.0
+        d=1e100.net; s=20230601; t=1753778192; x=1754382992;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=WzeBGpjHSeszF/CW4rczNpxcYtUulLTjlrinCLimUgo=;
+        b=M0MBN6vvoZoc+tcA+KivayE1yBEyxam0VLvQtu4uaUYFCZrRw8ACrNs0kOypgLIYLf
+         q5x1cxGqYRITRicWERctIk+JvseSSHReYJ9mR++xb3QgJVq1T2R+JKncZUyvF09Ng+ew
+         cYxQkfI4pgttia5MKt2gRmH6NcLZc35b1ckWYiQwvwxcEPChZK22t/fhZJmkHAcigJhw
+         oTOPa/N+Z42K9AwJwo/onVDWubIgQGEF89SPz62OvLXnM7CBEGt5oeq9M7d0WAu+uh0v
+         xSxtpxpzboeTjMHND+FQmTLREDcnV4kNm0elp06Tmdh9ho2c1KzWsqodPvNHyn7ovE46
+         1Ouw==
+X-Forwarded-Encrypted: i=1; AJvYcCWBDzpx8Ogg/3LniIKko7gCokq0TvzL8rpIEVKs1XfiV/Ufc6ZndTVKQBlY9lJo4NKtKfoIlrc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz4bfEAB4FmHwokWOtNerLhRhrxgmYZXtJoByvrmQYYzQyDe7Sl
+	C9YppPgnjxLJClhxSmo+hR90SMBaz+FJGl0LMaEcLnFBDGh5YKXNdwZ3APklHvMiolqwZwrC/7K
+	3emcjkIfY73NbO9GAJYOHz1Rn8PSCMY7gXPt4qx3iUUjsO7tz5TYcVROMGIM=
+X-Google-Smtp-Source: AGHT+IFhMAyYMoR3RdUP8l3Zi5v8mT3oE9q+69ki7bK73e+G54JA13PhrfXiFN/Ae6VgEeIlazaqNYY/dKIxqWUCL5kHonGwdr5W
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:1789:b0:3e3:d63c:3a35 with SMTP id
+ e9e14a558f8ab-3e3d63c3f36mr161172835ab.22.1753778192366; Tue, 29 Jul 2025
+ 01:36:32 -0700 (PDT)
+Date: Tue, 29 Jul 2025 01:36:32 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68888810.a00a0220.34d93b.0001.GAE@google.com>
+Subject: [syzbot] [wireless?] INFO: task hung in wiphy_register (2)
+From: syzbot <syzbot+e79f3349c93df8969402@syzkaller.appspotmail.com>
+To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Permit for PCS driver to define specific operation to torn down the link
-between the MAC and the PCS.
+Hello,
 
-This might be needed for some PCS that reset counter or require special
-reset to correctly work if the link needs to be restored later.
+syzbot found the following issue on:
 
-On phylink_link_down() call, the additional phylink_pcs_link_down() will
-be called before .mac_link_down to torn down the link.
+HEAD commit:    94ce1ac2c9b4 Merge tag 'pci-v6.16-fixes-4' of git://git.ke..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=14127b82580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=8adfe52da0de2761
+dashboard link: https://syzkaller.appspot.com/bug?extid=e79f3349c93df8969402
+compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12127b82580000
 
-PCS driver will need to define .pcs_link_down to make use of this.
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-94ce1ac2.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/2cc0fa87aefd/vmlinux-94ce1ac2.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/48c3cfe50b21/bzImage-94ce1ac2.xz
 
-Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+e79f3349c93df8969402@syzkaller.appspotmail.com
+
+INFO: task syz-executor:5486 blocked for more than 143 seconds.
+      Not tainted 6.16.0-rc7-syzkaller-00093-g94ce1ac2c9b4 #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor    state:D stack:21640 pid:5486  tgid:5486  ppid:1      task_flags:0x400140 flags:0x00004006
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5397 [inline]
+ __schedule+0x16fd/0x4cf0 kernel/sched/core.c:6786
+ __schedule_loop kernel/sched/core.c:6864 [inline]
+ schedule+0x165/0x360 kernel/sched/core.c:6879
+ schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6936
+ __mutex_lock_common kernel/locking/mutex.c:679 [inline]
+ __mutex_lock+0x724/0xe80 kernel/locking/mutex.c:747
+ wiphy_register+0x1980/0x26b0 net/wireless/core.c:1003
+ ieee80211_register_hw+0x33e1/0x4120 net/mac80211/main.c:1589
+ mac80211_hwsim_new_radio+0x2f0e/0x5340 drivers/net/wireless/virtual/mac80211_hwsim.c:5565
+ hwsim_new_radio_nl+0xea4/0x1b10 drivers/net/wireless/virtual/mac80211_hwsim.c:6249
+ genl_family_rcv_msg_doit+0x212/0x300 net/netlink/genetlink.c:1115
+ genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+ genl_rcv_msg+0x60e/0x790 net/netlink/genetlink.c:1210
+ netlink_rcv_skb+0x208/0x470 net/netlink/af_netlink.c:2552
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+ netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
+ netlink_unicast+0x759/0x8e0 net/netlink/af_netlink.c:1346
+ netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1896
+ sock_sendmsg_nosec net/socket.c:712 [inline]
+ __sock_sendmsg+0x219/0x270 net/socket.c:727
+ __sys_sendto+0x3bd/0x520 net/socket.c:2180
+ __do_sys_sendto net/socket.c:2187 [inline]
+ __se_sys_sendto net/socket.c:2183 [inline]
+ __x64_sys_sendto+0xde/0x100 net/socket.c:2183
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f7c09d9083c
+
+
 ---
- drivers/net/phy/phylink.c | 8 ++++++++
- include/linux/phylink.h   | 2 ++
- 2 files changed, 10 insertions(+)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index c7f867b361dd..6605ee3670fb 100644
---- a/drivers/net/phy/phylink.c
-+++ b/drivers/net/phy/phylink.c
-@@ -927,6 +927,12 @@ static void phylink_pcs_link_up(struct phylink_pcs *pcs, unsigned int neg_mode,
- 		pcs->ops->pcs_link_up(pcs, neg_mode, interface, speed, duplex);
- }
- 
-+static void phylink_pcs_link_down(struct phylink_pcs *pcs)
-+{
-+	if (pcs && pcs->ops->pcs_link_down)
-+		pcs->ops->pcs_link_down(pcs);
-+}
-+
- static void phylink_pcs_disable_eee(struct phylink_pcs *pcs)
- {
- 	if (pcs && pcs->ops->pcs_disable_eee)
-@@ -1566,6 +1572,8 @@ static void phylink_link_down(struct phylink *pl)
- 
- 	phylink_deactivate_lpi(pl);
- 
-+	phylink_pcs_link_down(pl->pcs);
-+
- 	pl->mac_ops->mac_link_down(pl->config, pl->act_link_an_mode,
- 				   pl->cur_interface);
- 	phylink_info(pl, "Link is Down\n");
-diff --git a/include/linux/phylink.h b/include/linux/phylink.h
-index 30659b615fca..73172c398dd6 100644
---- a/include/linux/phylink.h
-+++ b/include/linux/phylink.h
-@@ -484,6 +484,7 @@ struct phylink_pcs {
-  * @pcs_an_restart: restart 802.3z BaseX autonegotiation.
-  * @pcs_link_up: program the PCS for the resolved link configuration
-  *               (where necessary).
-+ * @pcs_link_down: torn down link between MAC and PCS.
-  * @pcs_disable_eee: optional notification to PCS that EEE has been disabled
-  *		     at the MAC.
-  * @pcs_enable_eee: optional notification to PCS that EEE will be enabled at
-@@ -511,6 +512,7 @@ struct phylink_pcs_ops {
- 	void (*pcs_an_restart)(struct phylink_pcs *pcs);
- 	void (*pcs_link_up)(struct phylink_pcs *pcs, unsigned int neg_mode,
- 			    phy_interface_t interface, int speed, int duplex);
-+	void (*pcs_link_down)(struct phylink_pcs *pcs);
- 	void (*pcs_disable_eee)(struct phylink_pcs *pcs);
- 	void (*pcs_enable_eee)(struct phylink_pcs *pcs);
- 	int (*pcs_pre_init)(struct phylink_pcs *pcs);
--- 
-2.50.0
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
