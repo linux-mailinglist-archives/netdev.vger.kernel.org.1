@@ -1,229 +1,162 @@
-Return-Path: <netdev+bounces-210732-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210733-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB240B149A6
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 09:59:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A43C1B149AE
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 10:02:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E435817374A
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 07:59:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5DE73AD806
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 08:01:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 891DE26B766;
-	Tue, 29 Jul 2025 07:59:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1840826AA98;
+	Tue, 29 Jul 2025 08:02:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="Pn3zYbyK";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="onpI5jSb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NZl/kO/L"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4D3B20297C;
-	Tue, 29 Jul 2025 07:59:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70755259CBB
+	for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 08:02:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753775970; cv=none; b=kdvpZsCWCATMlOu6BvaVRVjaZYA5/V8D3QR9qMaUgcLDGePBDGIL8mgJIGC0na8ZGNoIN9eRd2cVBSQ/l4TehAnqMdNxfCKdnPlPCWbN0DYd6V45VJMlJICoJ1QuRg5Jt3jZ5Gn+DsbynqREUkKw5eloNhkUZ9tE+Wmc7W95WdI=
+	t=1753776133; cv=none; b=k4swlu3r1uJvNuP1WHc90fH2hk01B8OMTz3rnirsokFqh3SO8hI6tnTFesiU3bL8jyWnxfKI1WCg9iyoJPT0saYJkWhvAiysaVFcB+bZUPeSGy1+NnzkG7zCMtt5TNEpmwTIsSkTFtl/KKZk5awOrP048FhNjduHntQYEGbQE20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753775970; c=relaxed/simple;
-	bh=FPqcjXKhkRLcOuDTA6vBXwKTB4o5Ha6/+tMcFv3nbxI=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=NmT0eXvYD1KAgt5qHuvu5bSOZ6rR9N5XVcawaJr31DA2MC4LtcNQMVhGHHseQ4VK/aS9ltME2UUZhYN44NVCvNp6Zvei4koRiaXu5T1Ry/RRHW9gofoN/7iqNaQ27Nm/S9ZffAWaIAI+r+mD5DhfmW4Z2A7Rkh2tYx55bumEylk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=Pn3zYbyK; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=onpI5jSb reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
+	s=arc-20240116; t=1753776133; c=relaxed/simple;
+	bh=wVwDOl//elXR1DxYqIj4MJKfPX88vPO6LAXuEFbEh98=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=frmyv//EGbQeyh7Vf7cSzHNpqCZBguyc25F4GO0HZPsC0/wRccF6ZLeju2YYSQXQPNdMpZlyng5waHlH068Tjb5pbHDyjsNULfVqJNU59hB4CbKWb11PM00FVdrRCDkr38IKIdcBb+eYZ31a6bwwBK8Sr2b6JLkH6k5i7tbAFqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NZl/kO/L; arc=none smtp.client-ip=209.85.222.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-7e03ac1bf79so416021185a.3
+        for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 01:02:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
-  t=1753775966; x=1785311966;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=yzGn+uckFKqRkji97cXCPttuxHVubErEE81HxmQmbO0=;
-  b=Pn3zYbyK9ybKVSuCaJ1oA0RTWhGTMRJP4JAgr0Uja20iN10up3OUW8j9
-   ZB68aZ0mBQiZEO45+IXUK67sRfe+w9aoD884MAqa7UAbRADdxscMn/w83
-   R0A9fmjmZsD+CrP4tGS2/A92AmeTAA67RLr05aLvt5pY90+V99lXta5AG
-   wH5RZom292lsF76tZf9v5t6BPVGrG8s1G/P1htozgrXJVI17ihng39ITs
-   ggFurSvPO72cpCPIkBppt9Wjp2RRzwoYQlDLBjdUGDiLoukpU8LXRLCXX
-   +92Q0+EW/lc0JNBnXG0HeEKXgmy6NzisOTeRORCswqvi/l3cK0byNINLf
-   Q==;
-X-CSE-ConnectionGUID: aqYp61tQQwe9N8/Lbw8Z/Q==
-X-CSE-MsgGUID: 5imnZLuPTVeuSYXZuaDLdA==
-X-IronPort-AV: E=Sophos;i="6.16,348,1744063200"; 
-   d="scan'208";a="45466426"
-Received: from vmailcow01.tq-net.de ([10.150.86.48])
-  by mx1.tq-group.com with ESMTP; 29 Jul 2025 09:59:22 +0200
-X-CheckPoint: {68887F5A-3F-9BFD12F6-F51D5FD4}
-X-MAIL-CPID: 8E19EDAB92A753E99AFFFF78DBEFA098_3
-X-Control-Analysis: str=0001.0A00211A.68887F82.006D,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 0FE3F163F99;
-	Tue, 29 Jul 2025 09:59:15 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
-	s=dkim; t=1753775958;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yzGn+uckFKqRkji97cXCPttuxHVubErEE81HxmQmbO0=;
-	b=onpI5jSbR4QCw98mgPPhvGAlgJ+HFSiBbFDMVgPmxLzCgbqQ9IuBXcJJJIm98VMC2r0vq8
-	ruI++YRHfKjJX34tMJPZK83NrpvnEbEqO59zUFyI0vG2AwM3zXwna3LrJQpAti/9mxffai
-	Vhit8pmkHuPjcLT5yc7vzgWL8jNbPU7g7ZB8Pg2SEEsBYptflLi48zpjU7bny993hvjx6j
-	jUCCJNREl0pAeXMA3ITbR8AMC7RUhVSfovy+wQOot4TMWDRp1f7SYUaUCKCy22rkgZVxxF
-	5UoBPpFifAvxeOSactAuW+ot+gHykL5wekEfbSvv/KyU6WFwLAMzWf6OGjTQ1w==
-Message-ID: <d9b845498712e2372967e40e9e7b49ddb1f864c1.camel@ew.tq-group.com>
-Subject: Re: [PATCH net-next] Revert "net: ethernet: ti: am65-cpsw: fixup
- PHY mode for fixed RGMII TX delay"
-From: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-To: Michael Walle <mwalle@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
- Nishanth Menon
-	 <nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>, Tero Kristo
-	 <kristo@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
-	 <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	 <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Roger Quadros
-	 <rogerq@kernel.org>, Simon Horman <horms@kernel.org>, Siddharth Vadapalli
-	 <s-vadapalli@ti.com>, Maxime Chevallier <maxime.chevallier@bootlin.com>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux@ew.tq-group.com
-Date: Tue, 29 Jul 2025 09:59:15 +0200
-In-Reply-To: <DBOD5ICCVSL1.23R4QZPSFPVSM@kernel.org>
-References: <20250728064938.275304-1-mwalle@kernel.org>
-	 <57823bd1-265c-4d01-92d9-9019a2635301@lunn.ch>
-	 <DBOD5ICCVSL1.23R4QZPSFPVSM@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.3-0ubuntu1 
+        d=google.com; s=20230601; t=1753776130; x=1754380930; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=M7TwkNAk8QHVaE8heo5T8sT+VxS3EibT06hIWnrlp3U=;
+        b=NZl/kO/LknzQ4NUugmk0v4bS3CJTQdoKxA6yUTsTF0OtWXp/iKk4DjU5hMtyQhPoic
+         vjM8VNHsblWDjFO5QbyRE6CcBBuWsTDMP/tUX5sSCalQ1g2buxx1uiHnVvBGXK9kDojh
+         /kQwg53aH2uUGKzTd7ZZCy1ILx0yjeng8u/80thcAZzJYwrLddz/3+eDQ8HEJSfLQycC
+         YWdUVB586saGijWQGmvxtHagqdgUcI9QjM2eZ3JUfulWT4I+wH5Xh2NzU0UIaxRFRqhy
+         z5sZyTTO9UwTL4krZsxwNvT4ZsHLa/Jkp6NLRCSzxM8Av1smrq/HxMqp9fXysXSh63KE
+         rPNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753776130; x=1754380930;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=M7TwkNAk8QHVaE8heo5T8sT+VxS3EibT06hIWnrlp3U=;
+        b=tuVjyziXalLhwQpAZgXYmAgtOL7D7awDIjXAAv3HA4PAwZjSQC7iNGPc1spMTyyRxM
+         ib9jH+1s8xFDxF0I9HirVPMq7xsQIYPp6hoWZBhIcEpdcuUVhm7jeK6Mrtg+FVB1Biok
+         9x36zfiXXsaaIkfc6mGOKMACaaVCyAf6OYaX8h1b1W0ncPilmLZvi+Garc3xYzlrAijv
+         DOqCVAjf7CQVIwwQZntSqMHPOhjiCHiqf4qxURalONcXNJ2RO55EsDs6zEr1S3QSB5Hv
+         frY/BhEdHcrlu/iPF+sI32+VgRB3Dyu1jD96al44diTZMzKCV/GZYuTmBM52Y1YV+Shq
+         zzUw==
+X-Forwarded-Encrypted: i=1; AJvYcCUBOaRdoh/GvsrWjqs16A1I2QxhOiOSF7o2KhsMLMvxTY5DZMWV2FExtvbXB13cK26CyKz3Pxo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz2pXb1uHcqDSeU0p7sx26o9t6dHmoezfsdSCwciDjq/xmyEsUz
+	n4KHyMYdkOzUEB+u4S2NZvOfyZlKtketa83/b/emvy12vO9e5uU1w8GnjfGd40rkLI7B8+kN8WT
+	u0lR9P9QbMNoTiA==
+X-Google-Smtp-Source: AGHT+IEPFQFtBHGlNqFXJnRWJRHtZgY+nKvoqO+n560zV/8P23fGx8zuiUmrkz80liYGeFLkMbXa9H214uarMg==
+X-Received: from qkox15.prod.google.com ([2002:a05:620a:258f:b0:7e3:2bff:7905])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:a91b:b0:7e6:2114:d577 with SMTP id af79cd13be357-7e63bf6af25mr1764738285a.19.1753776130417;
+ Tue, 29 Jul 2025 01:02:10 -0700 (PDT)
+Date: Tue, 29 Jul 2025 08:02:07 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Last-TLS-Session-Version: TLSv1.3
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.50.1.487.gc89ff58d15-goog
+Message-ID: <20250729080207.1863408-1-edumazet@google.com>
+Subject: [PATCH net] pptp: ensure minimal skb length in pptp_xmit()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, syzbot+afad90ffc8645324afe5@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, 2025-07-29 at 09:33 +0200, Michael Walle wrote:
-> On Mon Jul 28, 2025 at 4:41 PM CEST, Andrew Lunn wrote:
-> > On Mon, Jul 28, 2025 at 08:49:38AM +0200, Michael Walle wrote:
-> > > This reverts commit ca13b249f291f4920466638d1adbfb3f9c8db6e9.
-> > >=20
-> > > This patch breaks the transmit path on an AM67A/J722S. This SoC has a=
-n
-> > > (undocumented) configurable delay (CTRL_MMR0_CFG0_ENET1_CTRL, bit 4).
-> >=20
-> > Is this undocumented register only on the AM67A/J722S?
->=20
-> I've looked at the AM65x TRM (search for MMR0 or RGMII_ID_MODE),
-> which reads that bit 4 is r/w but only '0' is documented as
-> 'internal transmit delay', value '1' is called "reserved".
->=20
-> I couldn't find anything in the AM64x TRM. Didn't look further.
->=20
-> There has to be a reason why TI states that TX delay is always on
-> and don't document that bit. OTOH, they wrote code to serve that bit
-> in u-boot. Sigh. Someone from TI have to chime in here to shed some
-> light to this.
+Commit aabc6596ffb3 ("net: ppp: Add bound checking for skb data
+on ppp_sync_txmung") fixed ppp_sync_txmunge()
 
-Adding TI K3 maintainers, as am65-cpsw doesn't have a MAINTAINERS entry of =
-its
-own.
+We need a similar fix in pptp_xmit(), otherwise we might
+read uninit data as reported by syzbot.
 
->=20
-> > The patch being reverted says:
-> >=20
-> >    All am65-cpsw controllers have a fixed TX delay
-> >=20
-> > So we have some degree of contradiction here.
->=20
-> I've digged through the old thread and Matthias just references the
-> datasheet saying it is fixed. Matthias, could you actually try to
-> set/read this bit? I'm not sure it is really read-only.
+BUG: KMSAN: uninit-value in pptp_xmit+0xc34/0x2720 drivers/net/ppp/pptp.c:193
+  pptp_xmit+0xc34/0x2720 drivers/net/ppp/pptp.c:193
+  ppp_channel_bridge_input drivers/net/ppp/ppp_generic.c:2290 [inline]
+  ppp_input+0x1d6/0xe60 drivers/net/ppp/ppp_generic.c:2314
+  pppoe_rcv_core+0x1e8/0x760 drivers/net/ppp/pppoe.c:379
+  sk_backlog_rcv+0x142/0x420 include/net/sock.h:1148
+  __release_sock+0x1d3/0x330 net/core/sock.c:3213
+  release_sock+0x6b/0x270 net/core/sock.c:3767
+  pppoe_sendmsg+0x15d/0xcb0 drivers/net/ppp/pppoe.c:904
+  sock_sendmsg_nosec net/socket.c:712 [inline]
+  __sock_sendmsg+0x330/0x3d0 net/socket.c:727
+  ____sys_sendmsg+0x893/0xd80 net/socket.c:2566
+  ___sys_sendmsg+0x271/0x3b0 net/socket.c:2620
+  __sys_sendmmsg+0x2d9/0x7c0 net/socket.c:2709
 
-I just referred to the datasheets of various K3 SoCs, I did not try modifyi=
-ng
-the reserved bits.
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Reported-by: syzbot+afad90ffc8645324afe5@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/netdev/68887d86.a00a0220.b12ec.00cd.GAE@google.com/T/#u
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ drivers/net/ppp/pptp.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
->=20
-> > > The u-boot driver (net/ti/am65-cpsw-nuss.c) will configure the delay =
-in
-> > > am65_cpsw_gmii_sel_k3(). If the u-boot device tree uses rgmii-id this
-> > > patch will break the transmit path because it will disable the PHY de=
-lay
-> > > on the transmit path, but the bootloader has already disabled the MAC
-> > > delay, hence there will be no delay at all.
+diff --git a/drivers/net/ppp/pptp.c b/drivers/net/ppp/pptp.c
+index 5feaa70b5f47e6cd33fbaff33f6715f42c4d71b5..4cd6f67bd5d3520308ee4f8d68547a1bc8a7bfd3 100644
+--- a/drivers/net/ppp/pptp.c
++++ b/drivers/net/ppp/pptp.c
+@@ -159,9 +159,7 @@ static int pptp_xmit(struct ppp_channel *chan, struct sk_buff *skb)
+ 	int len;
+ 	unsigned char *data;
+ 	__u32 seq_recv;
+-
+-
+-	struct rtable *rt;
++	struct rtable *rt = NULL;
+ 	struct net_device *tdev;
+ 	struct iphdr  *iph;
+ 	int    max_headroom;
+@@ -179,16 +177,20 @@ static int pptp_xmit(struct ppp_channel *chan, struct sk_buff *skb)
+ 
+ 	if (skb_headroom(skb) < max_headroom || skb_cloned(skb) || skb_shared(skb)) {
+ 		struct sk_buff *new_skb = skb_realloc_headroom(skb, max_headroom);
+-		if (!new_skb) {
+-			ip_rt_put(rt);
++
++		if (!new_skb)
+ 			goto tx_error;
+-		}
++
+ 		if (skb->sk)
+ 			skb_set_owner_w(new_skb, skb->sk);
+ 		consume_skb(skb);
+ 		skb = new_skb;
+ 	}
+ 
++	/* Ensure we can safely access protocol field and LCP code */
++	if (!pskb_may_pull(skb, 3))
++		goto tx_error;
++
+ 	data = skb->data;
+ 	islcp = ((data[0] << 8) + data[1]) == PPP_LCP && 1 <= data[2] && data[2] <= 7;
+ 
+@@ -262,6 +264,7 @@ static int pptp_xmit(struct ppp_channel *chan, struct sk_buff *skb)
+ 	return 1;
+ 
+ tx_error:
++	ip_rt_put(rt);
+ 	kfree_skb(skb);
+ 	return 1;
+ }
+-- 
+2.50.1.487.gc89ff58d15-goog
 
-I have a patch that removes this piece of U-Boot code and had intended to s=
-ubmit
-that soon to align the U-Boot driver with Linux again. I'll hold off until =
-we
-know how the solution in Linux is going to look.
-
-> >=20
-> > We have maybe 8 weeks to fix this, before it makes it into a released
-> > kernel. So rather than revert, i would prefer to extend the patch to
-> > make it work with all variants of the SoC.
-> >=20
-> > Is CTRL_MMR0_CFG0_ENET1_CTRL in the Ethernet address space?
->=20
-> No, that register is part of the global configuration space (search
-> for phy_gmii_sel in the k3-am62p-j722s-common-main.dtsi), but is
-> modeled after a PHY (not a network PHY). And actually, I've just
-> found out that the PHY driver for that will serve the rgmii_id bit
-> if .features has PHY_GMII_SEL_RGMII_ID_MODE set. So there is already
-> a whitelist (although it's wrong at the moment, because the J722S
-> SoC is not listed as having it). As a side note, the j722s also
-> doesn't have it's own SoC specific compatible it is reusing the
-> am654-phy-gmii-sel compatible. That might or might not bite us now..
->=20
-> I digress..
->=20
-> > Would it be possible for the MAC driver to read it, and know if the del=
-ay has
-> > been disabled? The switch statement can then be made conditional?
-> >=20
-> > If this register actually exists on all SoC variants, can we just
-> > globally disable it, and remove the switch statement?
-
-If we just remove the switch statement, thus actually supporting all the
-different delay modes, we're back at the point where there is no way for th=
-e
-driver to determine whether rgmii-rxid is supposed to be interpreted correc=
-tly
-or not (currently all Device Trees using this driver require the old/incorr=
-ect
-interpretation for Ethernet to work).
-
->=20
-> Given that all the handling is in the PHY subsystem I don't know.
-> You'd have to ask the PHY if it supports that, before patching the
-> phy-interface-mode - before attaching the network PHY I guess?
-
-The previous generation of the CPSW IP handles this in
-drivers/net/ethernet/ti/cpsw-phy-sel.c, which is just a custom platform dev=
-ice
-referenced by the MAC node. The code currently (partially) implements the
-old/incorrect interpretation for phy-mode, enabling the delay on the MAC si=
-de
-for PHY_INTERFACE_MODE_RGMII.
-
->=20
-> If we want to just disable (and I assume with disable you mean
-> disable the MAC delay) it: the PHY is optional, not sure every SoC
-> will have one. And also, the reset default is exactly the opposite
-> and TI says it's fixed to the opposite and there has to be a reason
-> for that.
-
-My preference would be to unconditionally enable the MAC-side delay on Linu=
-x to
-align with the reset default and what the datasheet claims is the only supp=
-orted
-mode, but let's hear what the TI folks think about this.
-
-Best,
-Matthias
-
-
---=20
-TQ-Systems GmbH | M=C3=BChlstra=C3=9Fe 2, Gut Delling | 82229 Seefeld, Germ=
-any
-Amtsgericht M=C3=BCnchen, HRB 105018
-Gesch=C3=A4ftsf=C3=BChrer: Detlef Schneider, R=C3=BCdiger Stahl, Stefan Sch=
-neider
-https://www.tq-group.com/
 
