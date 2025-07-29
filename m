@@ -1,110 +1,92 @@
-Return-Path: <netdev+bounces-210904-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210905-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9B79B155F7
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 01:28:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71AF0B155FD
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 01:29:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7CD6E7AB96B
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 23:27:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 962A3171992
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 23:29:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 727CD286D79;
-	Tue, 29 Jul 2025 23:28:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72D7B27A130;
+	Tue, 29 Jul 2025 23:29:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="f7g6+z49"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QoKoSOF5"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B8A3285417
-	for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 23:28:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EC4B21D001
+	for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 23:29:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753831702; cv=none; b=ZlDWz5A4W6LXSu4Vyx3UG4XbM0DodUXXHloQvI1YXPBjNawTNuugWMF9VRjWSkOo8f8tzilQjpoXpQ6FSV+U5Wt01nXnxmVijB3//pAgNFqYSa0fGgiQXMYWVjAS4S79oesyPPjOjjXnyZccAdNrAL1rbHPuVAwWf9oWgqWsWHs=
+	t=1753831793; cv=none; b=fcYxLS8awUwGizAgyLskbDZdARfuhDGaCTYTmsqznO5LMrVFCXKPC9R31QpPlKEvDSzvKh+In0Wj481S2NOseXYCIUqGx31t+Iaame7AXr9CJISGX7RNLVpvI8edzQnh0sV8lqbzTIW9Jf86uYjvewW4rE3++THloPVlKk7uUPc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753831702; c=relaxed/simple;
-	bh=QOJYG+Uqmdy6u2HwLhbuwUtA5doc1ovpHrwdcomieCk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bOZpyChYqgU5TVye1vJKHo2MqzrIua0cVYXUo+Uki6eVGg/EkoMY1HDe+dw1O+mRGDev9ElWRCMCO5WngY9VNIbZ/zTfjMcrOaVIcrmwO+k3xl27cMDmM4ORJD1ewoLRzMa2mafJKLu1NCk7kYyBtz/kCVKWGxhIgMDaWDWiug8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=f7g6+z49; arc=none smtp.client-ip=95.215.58.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <996bb1dd-e72e-4515-a60f-c5f31b840459@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1753831688;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=koTrP2VFNtdvtaIt/kUv8hV8F56uZXeKg2Yo219B928=;
-	b=f7g6+z49wPWRrvx17RGjj8F+kbO/QBwM26Vk5EjKz/Xz/bm/VJCyCMj0l+yp40MU0dZWuG
-	3lkV8kqTAtwrOdcBXOZWRjmjDgzPNwKpqveKd6KCCMDmdrARMzY6ApL0SSBeg8pizGmPj9
-	RZXRxbd8IA7/PndWtOM3ENEy7PRTsPA=
-Date: Tue, 29 Jul 2025 16:27:40 -0700
+	s=arc-20240116; t=1753831793; c=relaxed/simple;
+	bh=UaT2FKap/VRB4mwyIScTDAZHVsq3GhMugEgAzTSjszk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=qgpVYFj4+dZDpyJwUyB5bn1lZ2NaSWCdVcHnGXNKhpqKlex68xAk4cRooW149MpC7OCYrs5VflnKXPkxvbqGYJiNqijOeQYSmSseqCw1aZBZdgwq/i1HibWc2BLvYmyX9L4i7Cjb94q3wwAwCMRkuzBYKlFEV0+I+1KbHQfOGZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QoKoSOF5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1518C4CEEF;
+	Tue, 29 Jul 2025 23:29:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753831792;
+	bh=UaT2FKap/VRB4mwyIScTDAZHVsq3GhMugEgAzTSjszk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=QoKoSOF5cdeLVqOK/jXffzTde6YEP74+R+lpYzVSIkwv9m+QNe7NrW2Qt8YztKhRK
+	 35ZwIea+JNdVOWCKP8TqjMIEFp8pSfYMpnpUKq6EaKIS19XISuIuzZyyyaKXBbttGc
+	 3OZEtsNGQjqrejdGkptDZTndRHaH0i3pZNd3L6lfeYOLMpWkYn7zmTgMbru2n38OH5
+	 ii3Svb/wEkhWvcGcTUaqWWPw24TvFEuiKqXRxEuNwOo+sIlPA9gQBungspMAs77FrL
+	 cSSKEVFDskSuY5mTnnQh8C4aziRDBGpqkY17Qgo8o7hRadaKgarhg6Dl/q//2UCXIC
+	 2w+QagjLT5qAA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 34BB9383BF5F;
+	Tue, 29 Jul 2025 23:30:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v3 4/4] selftests/bpf: add icmp_send_unreach
- kfunc tests
-To: Mahe Tardy <mahe.tardy@gmail.com>
-Cc: alexei.starovoitov@gmail.com, andrii@kernel.org, ast@kernel.org,
- bpf@vger.kernel.org, coreteam@netfilter.org, daniel@iogearbox.net,
- fw@strlen.de, john.fastabend@gmail.com, netdev@vger.kernel.org,
- netfilter-devel@vger.kernel.org, oe-kbuild-all@lists.linux.dev,
- pablo@netfilter.org, lkp@intel.com
-References: <202507270940.kXGmRbg5-lkp@intel.com>
- <20250728094345.46132-1-mahe.tardy@gmail.com>
- <20250728094345.46132-5-mahe.tardy@gmail.com>
- <382ff228-704c-4e0c-9df3-2eb178adcba8@linux.dev> <aIiP5l24ihrS2x-u@gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <aIiP5l24ihrS2x-u@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH V2 iproute2-next] misc: fix memory leak in ifstat.c
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175383180900.1684209.15145851286092023895.git-patchwork-notify@kernel.org>
+Date: Tue, 29 Jul 2025 23:30:09 +0000
+References: <20250719104212.34058-1-ant.v.moryakov@gmail.com>
+In-Reply-To: <20250719104212.34058-1-ant.v.moryakov@gmail.com>
+To: Anton Moryakov <ant.v.moryakov@gmail.com>
+Cc: netdev@vger.kernel.org
 
-On 7/29/25 2:09 AM, Mahe Tardy wrote:
-> On Mon, Jul 28, 2025 at 06:18:11PM -0700, Martin KaFai Lau wrote:
->> On 7/28/25 2:43 AM, Mahe Tardy wrote:
->>> +SEC("cgroup_skb/egress")
->>> +int egress(struct __sk_buff *skb)
->>> +{
->>> +	void *data = (void *)(long)skb->data;
->>> +	void *data_end = (void *)(long)skb->data_end;
->>> +	struct iphdr *iph;
->>> +	struct tcphdr *tcph;
->>> +
->>> +	iph = data;
->>> +	if ((void *)(iph + 1) > data_end || iph->version != 4 ||
->>> +	    iph->protocol != IPPROTO_TCP || iph->daddr != bpf_htonl(SERVER_IP))
->>> +		return SK_PASS;
->>> +
->>> +	tcph = (void *)iph + iph->ihl * 4;
->>> +	if ((void *)(tcph + 1) > data_end ||
->>> +	    tcph->dest != bpf_htons(SERVER_PORT))
->>> +		return SK_PASS;
->>> +
->>> +	kfunc_ret = bpf_icmp_send_unreach(skb, unreach_code);
->>> +
->>> +	/* returns SK_PASS to execute the test case quicker */
->>
->> Do you know why the user space is slower if 0 (SK_DROP) is used?
-> 
-> I tried to write my understanding of this in the commit description:
-> 
-> "Note that the BPF program returns SK_PASS to let the connection being
-> established to finish the test cases quicker. Otherwise, you have to
-> wait for the TCP three-way handshake to timeout in the kernel and
-> retrieve the errno translated from the unreach code set by the ICMP
-> control message."
+Hello:
 
-This feels like a bit hacky to let the 3WHS finished while the objective of the 
-patch set is to drop it. It is not unusual for people to directly borrow this 
-code. Does non blocking connect() help?
+This patch was applied to iproute2/iproute2-next.git (main)
+by David Ahern <dsahern@kernel.org>:
+
+On Sat, 19 Jul 2025 13:42:12 +0300 you wrote:
+> A memory leak was detected by the static analyzer SVACE in the function
+> get_nlmsg_extended(). The issue occurred when parsing extended interface
+> statistics failed due to a missing nested attribute. In this case,
+> memory allocated for 'n->name' via strdup() was not freed before returning,
+> resulting in a leak.
+> 
+> The fix adds an explicit 'free(n->name)' call before freeing the containing
+> structure in the error path.
+> 
+> [...]
+
+Here is the summary with links:
+  - [V2,iproute2-next] misc: fix memory leak in ifstat.c
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=0b09a1b053a2
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
