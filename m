@@ -1,73 +1,110 @@
-Return-Path: <netdev+bounces-210903-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210904-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8C3AB155F1
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 01:26:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9B79B155F7
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 01:28:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ECFFA3A981F
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 23:25:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7CD6E7AB96B
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 23:27:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0A03285042;
-	Tue, 29 Jul 2025 23:26:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 727CD286D79;
+	Tue, 29 Jul 2025 23:28:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nchip.com header.i=@nchip.com header.b="mgAKwUdM"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="f7g6+z49"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.nchip.com (mail.nchip.com [142.54.180.130])
+Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8448C2AE66
-	for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 23:26:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=142.54.180.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B8A3285417
+	for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 23:28:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753831577; cv=none; b=BzXm3zSkEZTmWp0RpFBfjM5NNjyxsTyzzFJMTy+K7/uVGYr7vY0ihi+0QfM8yxg0qPxhyYwI13pc80p8b2X6th3dN7OiLq/hxlLXPUzbIB8nRpmyQ9fdEG4SBrYBmh+7Typ1qFaCINtNtFP/0rDCtrbDt/tXbqi3D+/ONCcx8qE=
+	t=1753831702; cv=none; b=ZlDWz5A4W6LXSu4Vyx3UG4XbM0DodUXXHloQvI1YXPBjNawTNuugWMF9VRjWSkOo8f8tzilQjpoXpQ6FSV+U5Wt01nXnxmVijB3//pAgNFqYSa0fGgiQXMYWVjAS4S79oesyPPjOjjXnyZccAdNrAL1rbHPuVAwWf9oWgqWsWHs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753831577; c=relaxed/simple;
-	bh=8pVKF4ftFZcMGeOzG6JvAXJoDtR4Op4vQLxC7t1Z2fI=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=OS5Vy83rgHlwBV+2z2X/dxL//8hWGv8qSIQguaVCjVv7Gw5yqNHRa97gvQYfuPwpH94I79RF3rag2G0aWXJ4I3kuhVp1hELZL4jIUnXVVbhTE88v/Y9Vu0VnGdBe5aidSHnAIoO33IoJnbRitByFTG9ju+GEwbD9bhN6qXVknTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=nchip.com; spf=pass smtp.mailfrom=nchip.com; dkim=pass (2048-bit key) header.d=nchip.com header.i=@nchip.com header.b=mgAKwUdM; arc=none smtp.client-ip=142.54.180.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=nchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nchip.com
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 0F4D1FA00E7
-	for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 16:26:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nchip.com; s=dkim;
-	t=1753831575; h=from:subject:date:message-id:to:mime-version:content-type:
-	 content-transfer-encoding:content-language;
-	bh=E2FsirugV8lswUjTaRQj01unhh34/NLWKKSVMs8cl5Q=;
-	b=mgAKwUdMbahpF4gC6VA6a28Mgct5h/XTApiTW08Ib0BQWFEkEVLeNEacaAa031KBCeh9d5
-	eO+xmj1nVhd1YGF61v0IM6ABqjxTmsoNSlQyj7kEotEUAgAsfFbuZve3sIPTyWmofD/+7v
-	AMAQjVK++8yNfAgSZyRo8LdgE0V8k5Nj9MMmXb8V4ev3Owp3g5nxd83U/eImBPSS1cvtym
-	RuYrr+k8T8PpLjzY26hQE5A6k5d7PRR7fkPYbhe/0EDPqissirFYdsY135wGdAOExRewzT
-	PJaHlrSvffk/0iYK8qs3jnYKhjS1bZYEjyTIjnxhFTW1vuUOIu/I/QS1VqtDcg==
-Message-ID: <439babd9-2f47-4881-a541-5cb63b94aa57@nchip.com>
-Date: Tue, 29 Jul 2025 19:26:12 -0400
+	s=arc-20240116; t=1753831702; c=relaxed/simple;
+	bh=QOJYG+Uqmdy6u2HwLhbuwUtA5doc1ovpHrwdcomieCk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bOZpyChYqgU5TVye1vJKHo2MqzrIua0cVYXUo+Uki6eVGg/EkoMY1HDe+dw1O+mRGDev9ElWRCMCO5WngY9VNIbZ/zTfjMcrOaVIcrmwO+k3xl27cMDmM4ORJD1ewoLRzMa2mafJKLu1NCk7kYyBtz/kCVKWGxhIgMDaWDWiug8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=f7g6+z49; arc=none smtp.client-ip=95.215.58.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <996bb1dd-e72e-4515-a60f-c5f31b840459@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1753831688;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=koTrP2VFNtdvtaIt/kUv8hV8F56uZXeKg2Yo219B928=;
+	b=f7g6+z49wPWRrvx17RGjj8F+kbO/QBwM26Vk5EjKz/Xz/bm/VJCyCMj0l+yp40MU0dZWuG
+	3lkV8kqTAtwrOdcBXOZWRjmjDgzPNwKpqveKd6KCCMDmdrARMzY6ApL0SSBeg8pizGmPj9
+	RZXRxbd8IA7/PndWtOM3ENEy7PRTsPA=
+Date: Tue, 29 Jul 2025 16:27:40 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf-next v3 4/4] selftests/bpf: add icmp_send_unreach
+ kfunc tests
+To: Mahe Tardy <mahe.tardy@gmail.com>
+Cc: alexei.starovoitov@gmail.com, andrii@kernel.org, ast@kernel.org,
+ bpf@vger.kernel.org, coreteam@netfilter.org, daniel@iogearbox.net,
+ fw@strlen.de, john.fastabend@gmail.com, netdev@vger.kernel.org,
+ netfilter-devel@vger.kernel.org, oe-kbuild-all@lists.linux.dev,
+ pablo@netfilter.org, lkp@intel.com
+References: <202507270940.kXGmRbg5-lkp@intel.com>
+ <20250728094345.46132-1-mahe.tardy@gmail.com>
+ <20250728094345.46132-5-mahe.tardy@gmail.com>
+ <382ff228-704c-4e0c-9df3-2eb178adcba8@linux.dev> <aIiP5l24ihrS2x-u@gmail.com>
 Content-Language: en-US
-To: netdev@vger.kernel.org
-From: _ <j9@nchip.com>
-Subject: no printk output in dmesg
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <aIiP5l24ihrS2x-u@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+X-Migadu-Flow: FLOW_OUT
 
-Hi
+On 7/29/25 2:09 AM, Mahe Tardy wrote:
+> On Mon, Jul 28, 2025 at 06:18:11PM -0700, Martin KaFai Lau wrote:
+>> On 7/28/25 2:43 AM, Mahe Tardy wrote:
+>>> +SEC("cgroup_skb/egress")
+>>> +int egress(struct __sk_buff *skb)
+>>> +{
+>>> +	void *data = (void *)(long)skb->data;
+>>> +	void *data_end = (void *)(long)skb->data_end;
+>>> +	struct iphdr *iph;
+>>> +	struct tcphdr *tcph;
+>>> +
+>>> +	iph = data;
+>>> +	if ((void *)(iph + 1) > data_end || iph->version != 4 ||
+>>> +	    iph->protocol != IPPROTO_TCP || iph->daddr != bpf_htonl(SERVER_IP))
+>>> +		return SK_PASS;
+>>> +
+>>> +	tcph = (void *)iph + iph->ihl * 4;
+>>> +	if ((void *)(tcph + 1) > data_end ||
+>>> +	    tcph->dest != bpf_htons(SERVER_PORT))
+>>> +		return SK_PASS;
+>>> +
+>>> +	kfunc_ret = bpf_icmp_send_unreach(skb, unreach_code);
+>>> +
+>>> +	/* returns SK_PASS to execute the test case quicker */
+>>
+>> Do you know why the user space is slower if 0 (SK_DROP) is used?
+> 
+> I tried to write my understanding of this in the commit description:
+> 
+> "Note that the BPF program returns SK_PASS to let the connection being
+> established to finish the test cases quicker. Otherwise, you have to
+> wait for the TCP three-way handshake to timeout in the kernel and
+> retrieve the errno translated from the unreach code set by the ICMP
+> control message."
 
-In "stmmac_main.c", in function "stmmac_dvr_probe", after probing is 
-done and "ret = register_netdev(ndev);" is successfully executed I try this
-
-netdev_info(priv->dev, "%s:%d", __func__, __LINE__);
-netdev_alert(priv->dev, "%s:%d", __func__, __LINE__);
-printk(KERN_ALERT "%s : %d", __func__, __LINE__);
-
-But in kernel buffer there is no messages from these 3 function calls
-
-Any suggestions how to make printing work and why these are skipped ?
+This feels like a bit hacky to let the 3WHS finished while the objective of the 
+patch set is to drop it. It is not unusual for people to directly borrow this 
+code. Does non blocking connect() help?
 
