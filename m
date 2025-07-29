@@ -1,152 +1,206 @@
-Return-Path: <netdev+bounces-210744-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210745-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94B88B14A5B
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 10:46:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50E20B14A5E
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 10:47:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 499547AA0B0
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 08:45:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C28F61AA079E
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 08:47:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96F562868B2;
-	Tue, 29 Jul 2025 08:46:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EBA3285CBB;
+	Tue, 29 Jul 2025 08:47:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="XwF5dllE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jfc/wren"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9624F286888
-	for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 08:46:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.132.182.106
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16C0E1B0413;
+	Tue, 29 Jul 2025 08:47:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753778782; cv=none; b=IkLq5r5IyTuTtWD0mZ6BRqIMSgXErDSfcVVpYLdNFnEeox16Vd4NhB3Fn97FTNA1J4Aqa7CR/7GSrhRxv4EZTTIkYN6pONxL+wkFXPRo66L0jhLanKktWaMABIebwMm7bgs8mzOfec70UgyFxnCwcKahkxyD7BS6s2YYdL8rTf4=
+	t=1753778829; cv=none; b=SOmE5WyA5abNplgcouBxfXJGaiOaRvutrbX6ZhJhKAAtXmfzwOyEy0/P1W6MUy72mR0cECSBM+e8o/jQ2FWjsQUempNjCJwk1khU9MUdYUXHKhYgTvKrSUVuGrmjbTR8Ix0Fvz2/L7x9hEEZOMF8cRlsuVD15BUujwyl6KLrtBc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753778782; c=relaxed/simple;
-	bh=WY2UlMLKeLmqAMB/yJuFTN4pS7HC8+jweYlnwQXzRaA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=Xl3uryr+3/m13y12gEwOmbvQyRgP9QfGV+Ic7jdbJzNMv3t87TW5uLA1AyD7mcotWLYIooETBtbhjla6Qf9Qs1BkYQ4iV9djKETA2RyxegwzYIhMa4YCVWBSThGz7f2c9uDuy8nBQggsSCLx4kuiDzEid8rbo0mxl+qAyoIefqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=XwF5dllE; arc=none smtp.client-ip=185.132.182.106
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
-Received: from pps.filterd (m0369458.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56T8YNat014089;
-	Tue, 29 Jul 2025 10:45:49 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=selector1; bh=
-	dZOnwyJc/z92LBdcHXh09X96k4RSZO3Wfpl7wZweE1U=; b=XwF5dllEtECZLCeq
-	JJifgyRlhmk9xDJChmramDEt0vbuK5xkHgtWAt+3NgJRIN5ptXyhNVShV476LLg4
-	Ee384LrKR+nfpswuEJva/XjMRNXgsvo8hbbP8LVl9MEDHrSmFyqzQawtuzsnCBjW
-	3tndnxRP71fnGUcb/gyVjYA66+Zh5ibkl7EA3Dwq1WXEiz+S+B4vFuf6ZYMSZY4a
-	q2laWBj7+d7G208HtTSG+/dDfiFNciLpIqJn7mK7GVivJFGpcouiB626sSwu1a+Y
-	57NhNXArM0o9iq4tAasVLMKdxTWdv5qOCH4m8r6AcB4fgaYCSQk3rJK517Rg2EFg
-	7ivAsw==
-Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 4858k51a3a-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 29 Jul 2025 10:45:49 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 53DFD4004D;
-	Tue, 29 Jul 2025 10:44:24 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 8DA065F4E65;
-	Tue, 29 Jul 2025 10:43:33 +0200 (CEST)
-Received: from [10.48.87.141] (10.48.87.141) by SHFDAG1NODE1.st.com
- (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 29 Jul
- 2025 10:43:32 +0200
-Message-ID: <77229e46-6466-4cd4-9b3b-d76aadbe167c@foss.st.com>
-Date: Tue, 29 Jul 2025 10:43:24 +0200
+	s=arc-20240116; t=1753778829; c=relaxed/simple;
+	bh=j5Nxp3sqxUzkjfdDiLe3WF5WObVWb43UAxAKH67Wjco=;
+	h=Content-Type:Date:Message-Id:From:To:Subject:Cc:References:
+	 In-Reply-To; b=BF7dTUakuyHsggCyU5eAi7D+Wcpemb6OVGpxmLwNpkF113UUFGcZjr4jYdrscdib62j0Pd5PEaeowwL9my6pRnhGiVxYiK6JmCFdsH691vsHXDK2bJRShVeFNtYotNwXpsg2V07lI3jbta8cNkXc3+ZRO9oT5ww/sQ4XrX599yQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jfc/wren; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C66EC4CEF5;
+	Tue, 29 Jul 2025 08:47:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753778828;
+	bh=j5Nxp3sqxUzkjfdDiLe3WF5WObVWb43UAxAKH67Wjco=;
+	h=Date:From:To:Subject:Cc:References:In-Reply-To:From;
+	b=Jfc/wren1LJbaQtPGrfXlPuphqQNuJpRnfOQv1nnLazN+3tTSTJlF0b2eTDtdavR3
+	 annnAuru0Yah2c2M/xwoBtko0DeRnaCb7cLHwzhfdMc5RfxIRizs5KLMqvNH/PDL7n
+	 Ij6BiFlDmUbfiE1BEJRGkn0tGNkRyy592IvscC71gaWvyx4o+Va2AFxzkaUYjnoU7D
+	 tWKVhmZv5YpI68wZiGHGaICzY+ZOCeZTVu3zDDZW/r7qcor32qbHvC/WBl+hnyee88
+	 En7g/rQUrF3GK+fHCiVHKiZi6k6yL4X/K+XfXkE/yibdVX3B3Lk+TIgn5ZyfOZhQTL
+	 3/8Z1Co5COJlQ==
+Content-Type: multipart/signed;
+ boundary=2e705e879b310d7c093d9c723eda778d834dac574dec93290c67c2b07d74;
+ micalg=pgp-sha384; protocol="application/pgp-signature"
+Date: Tue, 29 Jul 2025 10:47:04 +0200
+Message-Id: <DBOEPHG2V5WY.Q47MW1V5ZJZE@kernel.org>
+From: "Michael Walle" <mwalle@kernel.org>
+To: "Matthias Schiffer" <matthias.schiffer@ew.tq-group.com>, "Andrew Lunn"
+ <andrew@lunn.ch>, "Nishanth Menon" <nm@ti.com>, "Vignesh Raghavendra"
+ <vigneshr@ti.com>, "Tero Kristo" <kristo@kernel.org>
+Subject: Re: [PATCH net-next] Revert "net: ethernet: ti: am65-cpsw: fixup
+ PHY mode for fixed RGMII TX delay"
+Cc: "Andrew Lunn" <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Roger
+ Quadros" <rogerq@kernel.org>, "Simon Horman" <horms@kernel.org>, "Siddharth
+ Vadapalli" <s-vadapalli@ti.com>, "Maxime Chevallier"
+ <maxime.chevallier@bootlin.com>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <linux@ew.tq-group.com>
+X-Mailer: aerc 0.16.0
+References: <20250728064938.275304-1-mwalle@kernel.org>
+ <57823bd1-265c-4d01-92d9-9019a2635301@lunn.ch>
+ <DBOD5ICCVSL1.23R4QZPSFPVSM@kernel.org>
+ <d9b845498712e2372967e40e9e7b49ddb1f864c1.camel@ew.tq-group.com>
+In-Reply-To: <d9b845498712e2372967e40e9e7b49ddb1f864c1.camel@ew.tq-group.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Linux-stm32] [PATCH RFC net-next 6/7] net: stmmac: add helpers
- to indicate WoL enable status
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
-        Andrew Lunn
-	<andrew@lunn.ch>
-CC: <netdev@vger.kernel.org>, <linux-stm32@st-md-mailman.stormreply.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        Eric Dumazet <edumazet@google.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        <linux-arm-kernel@lists.infradead.org>,
-        Heiner
- Kallweit <hkallweit1@gmail.com>
-References: <aIebMKnQgzQxIY3j@shell.armlinux.org.uk>
- <E1ugQ33-006KDR-Nj@rmk-PC.armlinux.org.uk>
- <eaef1b1b-5366-430c-97dd-cf3b40399ac7@lunn.ch>
- <aIe5SqLITb2cfFQw@shell.armlinux.org.uk>
-Content-Language: en-US
-From: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
-In-Reply-To: <aIe5SqLITb2cfFQw@shell.armlinux.org.uk>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SHFCAS1NODE1.st.com (10.75.129.72) To SHFDAG1NODE1.st.com
- (10.75.129.69)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-07-29_02,2025-07-28_01,2025-03-28_01
 
+--2e705e879b310d7c093d9c723eda778d834dac574dec93290c67c2b07d74
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
 
+Hi,
 
-On 7/28/25 19:54, Russell King (Oracle) wrote:
-> On Mon, Jul 28, 2025 at 07:28:01PM +0200, Andrew Lunn wrote:
->>> +static inline bool stmmac_wol_enabled_mac(struct stmmac_priv *priv)
->>> +{
->>> +	return priv->plat->pmt && device_may_wakeup(priv->device);
->>> +}
->>> +
->>> +static inline bool stmmac_wol_enabled_phy(struct stmmac_priv *priv)
->>> +{
->>> +	return !priv->plat->pmt && device_may_wakeup(priv->device);
->>> +}
->>
->> I agree this is a direct translation into a helper.
->>
->> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
->>
->> I'm guessing at some point you want to change these two
->> helpers. e.g. at some point, you want to try getting the PHY to do the
->> WoL, independent of !priv->plat->pmt?
->>
->>> -	if (device_may_wakeup(priv->device) && !priv->plat->pmt)
->>> +	if (stmmac_wol_enabled_phy(priv))
->>>   		phylink_speed_down(priv->phylink, false);
->>
->> This might be related to the next patch. But why only do speed down
->> when PHY is doing WoL? If the MAC is doing WoL, you could also do a
->> speed_down.
-> 
-> No idea, but that's what the code currently does, and, as ever with
-> a cleanup series, I try to avoid functional changes in cleanup series.
-> 
-> Also, bear in mind that I can't test any of this.
-> 
-> We haven't yet been successful in getting WoL working in mainline. It
-> _seems_ that the Jetson Xaiver NX platform should be using PHY mode,
-> but the Realtek PHY driver is definitely broken for WoL. Even with
-> that hacked, and along with other fixes that I've been given, I still
-> can't get the SoC to wake up via WoL. In fact, the changes to change
-> DT to specify the PHY interrupt as being routed through the PM
-> controller results in normal PHY link up/down interrupts no longer
-> working.
-> 
-> I'd like someone else to test functional changes!
-> 
+> > > The patch being reverted says:
+> > >=20
+> > >    All am65-cpsw controllers have a fixed TX delay
+> > >=20
+> > > So we have some degree of contradiction here.
+> >=20
+> > I've digged through the old thread and Matthias just references the
+> > datasheet saying it is fixed. Matthias, could you actually try to
+> > set/read this bit? I'm not sure it is really read-only.
+>
+> I just referred to the datasheets of various K3 SoCs, I did not try modif=
+ying
+> the reserved bits.
 
-Hello Russel,
+So can you try to modify them?
 
-First of all, thank you for taking the time to improve this code.
-What exactly do you mean by hacking? Forcing !priv->plat->pmt?
+> > > > The u-boot driver (net/ti/am65-cpsw-nuss.c) will configure the dela=
+y in
+> > > > am65_cpsw_gmii_sel_k3(). If the u-boot device tree uses rgmii-id th=
+is
+> > > > patch will break the transmit path because it will disable the PHY =
+delay
+> > > > on the transmit path, but the bootloader has already disabled the M=
+AC
+> > > > delay, hence there will be no delay at all.
+>
+> I have a patch that removes this piece of U-Boot code and had intended to=
+ submit
+> that soon to align the U-Boot driver with Linux again. I'll hold off unti=
+l we
+> know how the solution in Linux is going to look.
+
+That doesn't fix older bootloaders though. So in linux we still have
+to work around that.
+
+Although I don't get it why you want to remove that feature.
+
+> > > We have maybe 8 weeks to fix this, before it makes it into a released
+> > > kernel. So rather than revert, i would prefer to extend the patch to
+> > > make it work with all variants of the SoC.
+> > >=20
+> > > Is CTRL_MMR0_CFG0_ENET1_CTRL in the Ethernet address space?
+> >=20
+> > No, that register is part of the global configuration space (search
+> > for phy_gmii_sel in the k3-am62p-j722s-common-main.dtsi), but is
+> > modeled after a PHY (not a network PHY). And actually, I've just
+> > found out that the PHY driver for that will serve the rgmii_id bit
+> > if .features has PHY_GMII_SEL_RGMII_ID_MODE set. So there is already
+> > a whitelist (although it's wrong at the moment, because the J722S
+> > SoC is not listed as having it). As a side note, the j722s also
+> > doesn't have it's own SoC specific compatible it is reusing the
+> > am654-phy-gmii-sel compatible. That might or might not bite us now..
+> >=20
+> > I digress..
+> >=20
+> > > Would it be possible for the MAC driver to read it, and know if the d=
+elay has
+> > > been disabled? The switch statement can then be made conditional?
+> > >=20
+> > > If this register actually exists on all SoC variants, can we just
+> > > globally disable it, and remove the switch statement?
+>
+> If we just remove the switch statement, thus actually supporting all the
+> different delay modes, we're back at the point where there is no way for =
+the
+> driver to determine whether rgmii-rxid is supposed to be interpreted corr=
+ectly
+> or not (currently all Device Trees using this driver require the old/inco=
+rrect
+> interpretation for Ethernet to work).
+
+I can't follow you here. Are you assuming that the TX delay is
+fixed? For me, that's still the culprit. Is that a fair assumption?
+And only TI can tell us.
+
+> > Given that all the handling is in the PHY subsystem I don't know.
+> > You'd have to ask the PHY if it supports that, before patching the
+> > phy-interface-mode - before attaching the network PHY I guess?
+>
+> The previous generation of the CPSW IP handles this in
+> drivers/net/ethernet/ti/cpsw-phy-sel.c, which is just a custom platform d=
+evice
+> referenced by the MAC node. The code currently (partially) implements the
+> old/incorrect interpretation for phy-mode, enabling the delay on the MAC =
+side
+> for PHY_INTERFACE_MODE_RGMII.
+>
+> >=20
+> > If we want to just disable (and I assume with disable you mean
+> > disable the MAC delay) it: the PHY is optional, not sure every SoC
+> > will have one. And also, the reset default is exactly the opposite
+> > and TI says it's fixed to the opposite and there has to be a reason
+> > for that.
+>
+> My preference would be to unconditionally enable the MAC-side delay on Li=
+nux to
+> align with the reset default and what the datasheet claims is the only su=
+pported
+> mode, but let's hear what the TI folks think about this.
+
+Which goes against Andrew's "lets to all the delays in the PHY". We
+have rgmii-id in our AM67A based board and we've actually measured
+the signals with and without the MAC delay.
+
+Last week, I've also opened an e2e forum case, maybe we get some
+more insights. Funny enough, TI seem to have a different register
+description where this bit is described.
+https://e2e.ti.com/support/processors-group/processors/f/processors-forum/1=
+544031/am67a-internal-rgmii-delay/
+
+-michael
+
+--2e705e879b310d7c093d9c723eda778d834dac574dec93290c67c2b07d74
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iKgEABMJADAWIQTIVZIcOo5wfU/AngkSJzzuPgIf+AUCaIiKiBIcbXdhbGxlQGtl
+cm5lbC5vcmcACgkQEic87j4CH/hl+wF+ITZLpIYegyZ3XuZ+Vfhowbdn6UY2SnLB
+6Dpab1h4j0uWenCbmv+cOgrQ/C2B7KdnAYDUQ3PLU2QzJSdXWSCyORgpZufahSG8
+w45jv335Buy8k6rrY09HazY/SOWpKFQahHQ=
+=Pkql
+-----END PGP SIGNATURE-----
+
+--2e705e879b310d7c093d9c723eda778d834dac574dec93290c67c2b07d74--
 
