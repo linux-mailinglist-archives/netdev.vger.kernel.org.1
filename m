@@ -1,386 +1,171 @@
-Return-Path: <netdev+bounces-210730-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210731-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9D2BB14954
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 09:45:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FED7B14966
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 09:51:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 49C957A29BE
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 07:43:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A4BDE18A0985
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 07:51:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFB61265CCF;
-	Tue, 29 Jul 2025 07:45:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QE/edrQb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D948F26A0E7;
+	Tue, 29 Jul 2025 07:51:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7AB726657B
-	for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 07:45:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3247826A0BF
+	for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 07:51:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753775108; cv=none; b=EWMG34bDXETNrupd456/XCaFuQfhHV/HRjDtN4j7Jx8tt1bWW/dnjSB4jYDbveU5XJV+ErlLOz2tmpCpiD1iU6MA52/BAt3uWPB8CyPwtE+C4lMc0OYAa767Kb/pw2hjy1SIZFUNMSdbvCAFqP6deUR2At9y3tukkY0a02hGhZw=
+	t=1753775496; cv=none; b=tqNeTkfnzR7UqM+d14GUbAEbjtJ1QCRinVhTvoOOgLqfxhZkphvXlrKrtoAFodcuCGARpNxL6m/12zxFyWDjs2ZcvSLP75eELbs8bVfwHCJ1MMRcw/2pNIjesLnHtrIQnE5M1ElJVIY/5Rl4G2zOlCsJd9HaVYwzkZVTTLxtUzQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753775108; c=relaxed/simple;
-	bh=MMi5FiGdzDvVkxMbm2UbMQGRSTDM28atu70FgTFpdjw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QYvSQgWM5BOgqSPQy9G8EF8MO3ceE6cbrceoZEoomiF8CPhiZq5Pc/o06LuW00aqE11F1tM8pwrd8NWTZFqGT/JViV6i3PckpvYnkQl9xeoZ91qmjsehDimJ8z+9IKVOpyYRtBbipxBIZGaXexWkwuZ7Ec0cLNTSdfKB6acDm/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QE/edrQb; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1753775105;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ob3idF9XXWHk4RqOxwwtYc9gevjLswJQaGVAnhZiFrA=;
-	b=QE/edrQbeE/eTQDhuKP3BWs4enGvOflmC6vuChfkp+XuRIMg6PB8/sog0nlU2mwOCjzCBs
-	39Au458rjvci+S/gCkXJTnAzGKhhq057RlPLNegOWzxe1iDPFcyPw7r2J2AS4aPw3NX4a5
-	Q7GHXRHXe/9E2qDFBGqoulizAScuo4U=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-411-rgGyvic5OcqncuqxTtAVSA-1; Tue, 29 Jul 2025 03:45:03 -0400
-X-MC-Unique: rgGyvic5OcqncuqxTtAVSA-1
-X-Mimecast-MFC-AGG-ID: rgGyvic5OcqncuqxTtAVSA_1753775102
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-31ecb3a3d0aso2240708a91.3
-        for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 00:45:02 -0700 (PDT)
+	s=arc-20240116; t=1753775496; c=relaxed/simple;
+	bh=jcxsM0Frh3Bu1OpIClqfqFLeWmFMomNBaKrHAHVKiRA=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=pUF4xYobLklNd+7d4blM7/hSmNvKENZrtgPmXGnnZ1IONLSjhtjDBTxzVkse0CC5blFt+LugBOQ7LjsuHA147CSk73PD4vO+7v9lfNNfzuYKFqHfZsSVIC75Blv7FDWAG2rX+D8yNm0DxxW6wa2suItpLoewGqqB/mSRhwv9XGM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-3e3f0a3f62aso2002905ab.2
+        for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 00:51:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753775102; x=1754379902;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ob3idF9XXWHk4RqOxwwtYc9gevjLswJQaGVAnhZiFrA=;
-        b=t7CcNvNvXbfXzowMgTQBckmjgOOISisGkAmL+UGdCsTOO0VUYtKVt8gjOoD8KzNEe5
-         W3eY295/rD/dn3TmIQcmtE+h/3GArjkSLoHOm3PCli07DrGhNaJyZIP1sMR9I6X0foEw
-         C3lNBLFBPuw3xfFMLB3k2U00cKQzmbwZTtp03KQkGjXJ9zxmu+HviNDm4ZWqxYcY7mkT
-         gc2rZmeMoXc3tM4Ne3++z2gW03Tun2/qSR6ph1ACMjYG5SNEnFJf+OFWLty2/NwQWJeZ
-         VlbtbFqRLZCdHOhYW/kszX3IH4RdW7MlqcWlrKL3sWiRvsF/uSSndmtg4wptJ4seaY50
-         DrdQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUd4HBO5DXLmFyeUZAXXvEwQpcmtLQZFCgy2NXD9zGBlsN8fc+s17y+2UI/3DH1lIX/zjeLytA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzdlty0NX49ashvlYS9ddW7CuoQwXvgm6V46lYa1JcwDdfxSQfu
-	2na5RgtaksuO3x1uswuIqwP+Z9F1hR1+oSb9N75wvUfaUpp63KC2u/hM6O8anyY74ZoB2VxT9Wj
-	GRfva3ppaBRuoZIyQQi4RWOKICVqXx7/Ea7VwyZ3cHUuglAoQ8ei+uHRYFrOLrM+eBgxKYatarW
-	t7RziNCdALBxfqqu0Srs3uvdNTDTYgquF/
-X-Gm-Gg: ASbGncuofS7Umw34rIVuhFSHAUiklkYPschkYbDtq+HaXtkYEEcqGzufvUShCZtB+S1
-	SolmFEqv+xBPYDcjtG5xS56vUP/HNJ1jwOZRCHn51hTXtxj4PI9138y596eqEDfLYe286ZROY1M
-	ZPjMumBFLDtqShoHeV2PGBrQ==
-X-Received: by 2002:a17:90b:1c07:b0:313:15fe:4c13 with SMTP id 98e67ed59e1d1-31e779fcf83mr20671447a91.27.1753775101866;
-        Tue, 29 Jul 2025 00:45:01 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGc0H8yIs+OFrF04eJQmZ357iPQi6PoOh4VywSUV7VBBrzQ9k5oFdZEBMd1ZkclzA66YT8nwWTYVBp6Ky1rnWw=
-X-Received: by 2002:a17:90b:1c07:b0:313:15fe:4c13 with SMTP id
- 98e67ed59e1d1-31e779fcf83mr20671423a91.27.1753775101413; Tue, 29 Jul 2025
- 00:45:01 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1753775494; x=1754380294;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=nwiZttZ/udedfdRnutqiHE6++E8ELPKNs9T/xXTO6LQ=;
+        b=LxKpiTVH/s+iPhPr54ATBD5VkC6oOIZ+/GZiP3GDLpKLHc7bOr7vcTF34GwAWN5tSQ
+         tQ6+s2rTi2EhjgMUOTBvp/wAqTLirwl4Q3wsIqrKemiHkersrNPL6y9oapf03/mP2vOz
+         3B4s6rdxrGmxAULkNPbZvWWBjRZZixndAXvP69XrdU2gT3WCh2gLVNDW5TwfkbKpL77V
+         nCe79SKLP+7tU1QSApdjv2ZMbGwVj/C2QkmJPDxkIQ/2L2X9JgqzhgPhRWaYlwPZDUpg
+         32+JKv20/mggd0/sVQzaNLbnScGR6ZEBZNgH25VgMP2E5Y1BUCbLPCd2lNBD+5hSwGRz
+         6oqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW+WAii3MOkRAe81rolGm8oBbNvk7L56LoLev+vY5Lp+vUh9Vr1Fsc0ApDQ+9rY+txQN3mONzM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzTrIXneQi4DYTZOeiAARg0bRioejRr5CYx5wpOBoW4+FgEsdFn
+	XJkcxI1HR9UA+9RXdMizZhnDBTdV+WXnaIasWoahcx6QLD+lTNuqTQoEfrAfqdWpC+djBqrCQfh
+	79vU5c0m6agDvrrhCCJwfCNfEYNe9XWC1i6mFf7aLebWYuqW+0l9stnZfnwg=
+X-Google-Smtp-Source: AGHT+IFvSSfKpB1q9X+Ujg9aloTRo5257ymL4mV23VlrgioSXaYg5es+1vpGB7rHN1kHE0qJ2ukqwaigKEw8BM3gEYQI9XwyAY6x
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <vosten2rykookljp6u6qc4hqhsqb6uhdy2iuhpl54plbq2tkr4@kphfpgst3e7c>
- <20250724034659-mutt-send-email-mst@kernel.org> <CAGxU2F76ueKm3H30vXL+jxMVsiQBuRkDN9NRfVU8VeTXzTVAWg@mail.gmail.com>
- <20250724042100-mutt-send-email-mst@kernel.org> <aIHydjBEnmkTt-P-@willie-the-truck>
- <fv6uhq6lcgjwrdp7fcxmokczjmavbc37ikrqz7zpd7puvrbsml@zkt2lidjrqm6>
- <CAGxU2F5Qy=vMD0z9_HTN2K9wyt+6EH-Yr0N9VqR4OT4O1asqZg@mail.gmail.com> <bvjomrplpsjklglped5pmwttzmljigasdafjiizt2sfmytc5rr@ljpu455kx52j>
-In-Reply-To: <bvjomrplpsjklglped5pmwttzmljigasdafjiizt2sfmytc5rr@ljpu455kx52j>
-From: Jason Wang <jasowang@redhat.com>
-Date: Tue, 29 Jul 2025 15:44:49 +0800
-X-Gm-Features: Ac12FXxdPFfyNXZ2ozgXF3pRalQ2Njghxuxni5Ee1R5WFJM0fsuLnvYb-CxqMuk
-Message-ID: <CACGkMEt0ZBtcAUgc1RBU7Gd3JGvC-eszEOexee-kx7TgoiMGtA@mail.gmail.com>
-Subject: Re: vhost: linux-next: crash at vhost_dev_cleanup()
-To: Breno Leitao <leitao@debian.org>
-Cc: Stefano Garzarella <sgarzare@redhat.com>, Will Deacon <will@kernel.org>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, eperezma@redhat.com, linux-arm-kernel@lists.infradead.org, 
-	kvm@vger.kernel.org, Stefan Hajnoczi <stefanha@redhat.com>, netdev@vger.kernel.org
+X-Received: by 2002:a05:6e02:260b:b0:3e3:d246:55fb with SMTP id
+ e9e14a558f8ab-3e3d2465d5cmr194963115ab.15.1753775494338; Tue, 29 Jul 2025
+ 00:51:34 -0700 (PDT)
+Date: Tue, 29 Jul 2025 00:51:34 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68887d86.a00a0220.b12ec.00cd.GAE@google.com>
+Subject: [syzbot] [net?] KMSAN: uninit-value in pptp_xmit (3)
+From: syzbot <syzbot+afad90ffc8645324afe5@syzkaller.appspotmail.com>
+To: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 24, 2025 at 9:50=E2=80=AFPM Breno Leitao <leitao@debian.org> wr=
-ote:
->
-> On Thu, Jul 24, 2025 at 02:52:08PM +0200, Stefano Garzarella wrote:
-> > On Thu, 24 Jul 2025 at 14:48, Breno Leitao <leitao@debian.org> wrote:
-> > >
-> > > On Thu, Jul 24, 2025 at 09:44:38AM +0100, Will Deacon wrote:
-> > > > > > On Thu, 24 Jul 2025 at 09:48, Michael S. Tsirkin <mst@redhat.co=
-m> wrote:
-> > > > > > >
-> > > > > > > On Wed, Jul 23, 2025 at 08:04:42AM -0700, Breno Leitao wrote:
-> > > > > > > > Hello,
-> > > > > > > >
-> > > > > > > > I've seen a crash in linux-next for a while on my arm64 ser=
-ver, and
-> > > > > > > > I decided to report.
-> > > > > > > >
-> > > > > > > > While running stress-ng on linux-next, I see the crash belo=
-w.
-> > > > > > > >
-> > > > > > > > This is happening in a kernel configure with some debug opt=
-ions (KASAN,
-> > > > > > > > LOCKDEP and KMEMLEAK).
-> > > > > > > >
-> > > > > > > > Basically running stress-ng in a loop would crash the host =
-in 15-20
-> > > > > > > > minutes:
-> > > > > > > >       # while (true); do stress-ng -r 10 -t 10; done
-> > > > > > > >
-> > > > > > > > >From the early warning "virt_to_phys used for non-linear a=
-ddress",
-> > > > > >
-> > > > > > mmm, we recently added nonlinear SKBs support in vhost-vsock [1=
-],
-> > > > > > @Will can this issue be related?
-> > > > >
-> > > > > Good point.
-> > > > >
-> > > > > Breno, if bisecting is too much trouble, would you mind testing t=
-he commits
-> > > > > c76f3c4364fe523cd2782269eab92529c86217aa
-> > > > > and
-> > > > > c7991b44d7b44f9270dec63acd0b2965d29aab43
-> > > > > and telling us if this reproduces?
-> > > >
-> > > > That's definitely worth doing, but we should be careful not to conf=
-use
-> > > > the "non-linear address" from the warning (which refers to virtual
-> > > > addresses that lie outside of the linear mapping of memory, e.g. in=
- the
-> > > > vmalloc space) and "non-linear SKBs" which refer to SKBs with fragm=
-ent
-> > > > pages.
-> > >
-> > > I've tested both commits above, and I see the crash on both commits
-> > > above, thus, the problem reproduces in both cases. The only differenc=
-e
-> > > I noted is the fact that I haven't seen the warning before the crash.
-> > >
-> > >
-> > > Log against c76f3c4364fe ("vhost/vsock: Avoid allocating
-> > > arbitrarily-sized SKBs")
-> > >
-> > >          Unable to handle kernel paging request at virtual address 00=
-00001fc0000048
-> > >          Mem abort info:
-> > >            ESR =3D 0x0000000096000005
-> > >            EC =3D 0x25: DABT (current EL), IL =3D 32 bits
-> > >            SET =3D 0, FnV =3D 0
-> > >            EA =3D 0, S1PTW =3D 0
-> > >            FSC =3D 0x05: level 1 translation fault
-> > >          Data abort info:
-> > >            ISV =3D 0, ISS =3D 0x00000005, ISS2 =3D 0x00000000
-> > >            CM =3D 0, WnR =3D 0, TnD =3D 0, TagAccess =3D 0
-> > >            GCS =3D 0, Overlay =3D 0, DirtyBit =3D 0, Xs =3D 0
-> > >          user pgtable: 64k pages, 48-bit VAs, pgdp=3D0000000cdcf2da00
-> > >          [0000001fc0000048] pgd=3D0000000000000000, p4d=3D00000000000=
-00000, pud=3D0000000000000000
-> > >          Internal error: Oops: 0000000096000005 [#1]  SMP
-> > >          Modules linked in: vfio_iommu_type1 vfio md4 crc32_cryptoapi=
- ghash_generic unix_diag vhost_net tun vhost vhost_iotlb tap mpls_gso mpls_=
-iptunnel mpls_router fou sch_fq ghes_edac tls tcp_diag inet_diag act_gact c=
-ls_bpf nvidia_c
-> > >          CPU: 34 UID: 0 PID: 1727297 Comm: stress-ng-dev Kdump: loade=
-d Not tainted 6.16.0-rc6-upstream-00027-gc76f3c4364fe #19 NONE
-> > >          pstate: 23401009 (nzCv daif +PAN -UAO +TCO +DIT +SSBS BTYPE=
-=3D--)
-> > >          pc : kfree+0x48/0x2a8
-> > >          lr : vhost_dev_cleanup+0x138/0x2b8 [vhost]
-> > >          sp : ffff80013a0cfcd0
-> > >          x29: ffff80013a0cfcd0 x28: ffff0008fd0b6240 x27: 00000000000=
-00000
-> > >          x26: 0000000000000000 x25: 0000000000000000 x24: 00000000000=
-00000
-> > >          x23: 00000000040e001f x22: ffffffffffffffff x21: ffff00014f1=
-d4ac0
-> > >          x20: 0000000000000001 x19: ffff00014f1d0000 x18: 00000000000=
-00000
-> > >          x17: 0000000000000000 x16: 0000000000000000 x15: 00000000000=
-00000
-> > >          x14: 000000000000001f x13: 000000000000000f x12: 00000000000=
-00001
-> > >          x11: 0000000000000000 x10: 0000000000000402 x9 : ffffffdfc00=
-00000
-> > >          x8 : 0000001fc0000040 x7 : 0000000000000000 x6 : 00000000000=
-00000
-> > >          x5 : ffff000141931840 x4 : 0000000000000000 x3 : 00000000000=
-00008
-> > >          x2 : ffffffffffffffff x1 : ffffffffffffffff x0 : 00000000000=
-10000
-> > >          Call trace:
-> > >           kfree+0x48/0x2a8 (P)
-> > >           vhost_dev_cleanup+0x138/0x2b8 [vhost]
-> > >           vhost_net_release+0xa0/0x1a8 [vhost_net]
-> >
-> > But here is the vhost_net, so I'm confused now.
-> > Do you see the same (vhost_net) also on 9798752 ("Add linux-next
-> > specific files for 20250721") ?
->
-> I will need to reproduce, but, looking at my logs, I see the following
-> against: c76f3c4364fe ("vhost/vsock: Avoid allocating arbitrarily-sized S=
-KBs").
-> The logs are a bit intermixed, probably there were multiple CPUs hitting
-> the same code path.
->
->            virt_to_phys used for non-linear address: 000000001b662678 (0x=
-ffe61984a460)
->            WARNING: CPU: 15 PID: 112846 at arch/arm64/mm/physaddr.c:15 __=
-virt_to_phys+0x80/0xa8
->            Modules linked in: vhost_vsock(E) vhost(E) vhost_iotlb(E) ghes=
-_edac(E) tls(E) act_gact(E) cls_bpf(E) tcp_diag(E) inet_diag(E) ipmi_ssif(E=
-) ipmi_devintf(E) ipmi_msghandler(E) sch_fq_codel(E) drm(E) backlight(E) dr=
-m_panel_orientation_quirks(E) acpi_power_meter(E) loop(E) efivarfs(E) autof=
-s4(E)
->            CPU: 15 UID: 0 PID: 112846 Comm: stress-ng-dev Kdump: loaded T=
-ainted: G        W   E    N  6.16.0-rc6-upstream-00027-gc76f3c4364fe #16 PR=
-EEMPT(none)
->            Tainted: [W]=3DWARN, [E]=3DUNSIGNED_MODULE, [N]=3DTEST
->            pstate: 63401009 (nZCv daif +PAN -UAO +TCO +DIT +SSBS BTYPE=3D=
---)
->            pc : __virt_to_phys+0x80/0xa8
->            lr : __virt_to_phys+0x7c/0xa8
->            sp : ffff8001184d7a30
->            x29: ffff8001184d7a30 x28: 00000000000045d8 x27: 1fffe000e7e88=
-014
->            x26: 1fffe000e7e888f7 x25: ffff0007e578bf00 x24: 1fffe000e7e88=
-013
->            x23: 0000000000000000 x22: 0000ffe61984a460 x21: ffff00073f440=
-098
->            x20: ffffff1000080000 x19: 0000ffe61984a460 x18: 0000000000000=
-002
->            x17: 6666783028203837 x16: 3632363662313030 x15: 0000000000000=
-001
->            x14: 1fffe006d52e90f2 x13: 0000000000000000 x12: 0000000000000=
-000
->            x11: ffff6006d52e90f3 x10: 0000000000000002 x9 : cfc659a21c727=
-d00
->            x8 : ffff800083c19000 x7 : 0000000000000001 x6 : 0000000000000=
-001
->            x5 : ffff8001184d7398 x4 : ffff800084866d60 x3 : ffff8000805fd=
-d94
->            x2 : 0000000000000001 x1 : 0000000000000004 x0 : 0000000000000=
-04b
->            Call trace:
->             __virt_to_phys+0x80/0xa8 (P)
->             kfree+0xac/0x4b0
->             vhost_dev_cleanup+0x484/0x8b0 [vhost]
->             vhost_vsock_dev_release+0x2f4/0x358 [vhost_vsock]
->             __fput+0x2b4/0x608
->             fput_close_sync+0xe8/0x1e0
->             __arm64_sys_close+0x84/0xd0
->             invoke_syscall+0x8c/0x208
->             do_el0_svc+0x128/0x1a0
->             el0_svc+0x58/0x160
->             el0t_64_sync_handler+0x78/0x108
->             el0t_64_sync+0x198/0x1a0
->            irq event stamp: 0
->            hardirqs last  enabled at (0): [<0000000000000000>] 0x0
->            hardirqs last disabled at (0): [<ffff8000801d876c>] copy_proce=
-ss+0xd5c/0x29f8
->            softirqs last  enabled at (0): [<ffff8000801d879c>] copy_proce=
-ss+0xd8c/0x29f8
->            softirqs last disabled at (0): [<0000000000000000>] 0x0
->            ---[ end trace 0000000000000000 ]---
->            Unable to handle kernel paging request at virtual address 0000=
-040053791288
->            ------------[ cut here ]------------
->            lr : kfree+0xac/0x4b0
->            virt_to_phys used for non-linear address: 00000000290839fd (0x=
-2500000000)
->            WARNING: CPU: 41 PID: 112845 at arch/arm64/mm/physaddr.c:15 __=
-virt_to_phys+0x80/0xa8
->            Modules linked in: vhost_vsock(E) vhost(E) vhost_iotlb(E) ghes=
-_edac(E) tls(E) act_gact(E) cls_bpf(E) tcp_diag(E) inet_diag(E) ipmi_ssif(E=
-) ipmi_devintf(E) ipmi_msghandler(E) sch_fq_codel(E) drm(E) backlight(E) dr=
-m_panel_orientation_quirks(E) acpi_power_meter(E) loop(E) efivarfs(E) autof=
-s4(E)
->            CPU: 41 UID: 0 PID: 112845 Comm: stress-ng-dev Kdump: loaded T=
-ainted: G        W   E    N  6.16.0-rc6-upstream-00027-gc76f3c4364fe #16 PR=
-EEMPT(none)
->            x23: 0000000000000001
->            Tainted: [W]=3DWARN, [E]=3DUNSIGNED_MODULE, [N]=3DTEST
->            pstate: 63401009 (nZCv daif +PAN -UAO +TCO +DIT +SSBS BTYPE=3D=
---)
->            pc : __virt_to_phys+0x80/0xa8
->            lr : __virt_to_phys+0x7c/0xa8
->            sp : ffff8001a8277a30
->            x29: ffff8001a8277a30 x28: 00000000000045d8 x27: 1fffe000e7e3c=
-014
->            x26: 1fffe000e7e3c8f7 x25: ffff0007bcff0000 x24: 1fffe000e7e3c=
-013
->            x23: 0000000000000000 x22: 0000002500000000 x21: ffff00073f1e0=
-098
->            x20: ffffff1000080000 x19: 0000002500000000 x18: 0000000000000=
-004
->            x17: 00000000ffffffff x16: 0000000000000001 x15: 0000000000000=
-001
->            x14: 1fffe006d53920f2 x13: 0000000000000000 x12: 0000000000000=
-000
->            sp : ffff8001184d7a50
->            x29: ffff8001184d7a60 x28: 00000000000045d8 x27: 1fffe000e7e88=
-014
->            x26: 1fffe000e7e888f7 x25: ffff0007e578bf00 x24: 1fffe000e7e88=
-013
->            x23: 0000000000000000 x22: 0000ffe61984a460 x21: ffff00073f440=
-098
->            x20: 0000040053791280 x19: ffff80000d0b8bbc x18: 0000000000000=
-002
->            x17: 6666783028203837 x16: 3632363662313030 x15: 0000000000000=
-001
->             x22: 0000ffe6199a459d
->            x14: 1fffe006d52e90f2
->             x21: ffff00073f7f0098
->            x20: ffffff1000080000 x19: 0000ffe6199a459d x18: 0000000000000=
-004
->            x17: 54455320203b2d2c x16: 0000000000000011 x15: 0000000000000=
-001
->            x14: 1fffe006d52bb8f2 x13: 0000000000000000 x12: 0000000000000=
-000
->            x11: ffff6006d52bb8f3 x10: dfff800000000000 x9 : 77521a2bd3e0b=
-e00
->            x8 : ffff800083c19000 x7 : 0000000000000000 x6 : ffff80008036b=
-c2c
->            x5 : 0000000000000000 x4 : 0000000000000001 x3 : ffff8000805fd=
-d94
->            x2 : 0000000000000001 x1 : 0000000000000004 x0 : 0000000000000=
-04b
->            Call trace:
->             __virt_to_phys+0x80/0xa8 (P)
->             kfree+0xac/0x4b0
->             vhost_dev_cleanup+0x484/0x8b0 [vhost]
->             vhost_vsock_dev_release+0x2f4/0x358 [vhost_vsock]
->             __fput+0x2b4/0x608
->            x11: ffff6006d53920f3
->             fput_close_sync+0xe8/0x1e0
->             __arm64_sys_close+0x84/0xd0
->             invoke_syscall+0x8c/0x208
->             do_el0_svc+0x128/0x1a0
->             el0_svc+0x58/0x160
->             el0t_64_sync_handler+0x78/0x108
->             el0t_64_sync+0x198/0x1a0
->            irq event stamp: 0
->             x13: 0000000000000000
->            hardirqs last  enabled at (0): [<0000000000000000>] 0x0
->            hardirqs last disabled at (0): [<ffff8000801d876c>] copy_proce=
-ss+0xd5c/0x29f8
->
->
-> > The initial report contained only vhost_vsock traces IIUC, so I'm
-> > suspecting something in the vhost core.
->
-> Right, it seems we are hitting the same code path, on on both
-> vhost_vsock and vhost_net.
->
+Hello,
 
-I've posted a fix here:
+syzbot found the following issue on:
 
-https://lore.kernel.org/virtualization/20250729073916.80647-1-jasowang@redh=
-at.com/T/#u
+HEAD commit:    038d61fd6422 Linux 6.16
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=139e9034580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=bc98b07dbc3d5a34
+dashboard link: https://syzkaller.appspot.com/bug?extid=afad90ffc8645324afe5
+compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=163b84a2580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11a594a2580000
 
-I think it should address this issue.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/58944a2f9bd3/disk-038d61fd.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/c9a849a27d33/vmlinux-038d61fd.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/0de16772849a/bzImage-038d61fd.xz
 
-Thanks
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+afad90ffc8645324afe5@syzkaller.appspotmail.com
 
+=====================================================
+BUG: KMSAN: uninit-value in pptp_xmit+0xc34/0x2720 drivers/net/ppp/pptp.c:193
+ pptp_xmit+0xc34/0x2720 drivers/net/ppp/pptp.c:193
+ ppp_channel_bridge_input drivers/net/ppp/ppp_generic.c:2290 [inline]
+ ppp_input+0x1d6/0xe60 drivers/net/ppp/ppp_generic.c:2314
+ pppoe_rcv_core+0x1e8/0x760 drivers/net/ppp/pppoe.c:379
+ sk_backlog_rcv+0x142/0x420 include/net/sock.h:1148
+ __release_sock+0x1d3/0x330 net/core/sock.c:3213
+ release_sock+0x6b/0x270 net/core/sock.c:3767
+ pppoe_sendmsg+0x15d/0xcb0 drivers/net/ppp/pppoe.c:904
+ sock_sendmsg_nosec net/socket.c:712 [inline]
+ __sock_sendmsg+0x330/0x3d0 net/socket.c:727
+ ____sys_sendmsg+0x893/0xd80 net/socket.c:2566
+ ___sys_sendmsg+0x271/0x3b0 net/socket.c:2620
+ __sys_sendmmsg+0x2d9/0x7c0 net/socket.c:2709
+ __do_sys_sendmmsg net/socket.c:2736 [inline]
+ __se_sys_sendmmsg net/socket.c:2733 [inline]
+ __x64_sys_sendmmsg+0xc6/0x150 net/socket.c:2733
+ x64_sys_call+0x3ce7/0x3db0 arch/x86/include/generated/asm/syscalls_64.h:308
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xd9/0x210 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Uninit was created at:
+ slab_post_alloc_hook mm/slub.c:4154 [inline]
+ slab_alloc_node mm/slub.c:4197 [inline]
+ __do_kmalloc_node mm/slub.c:4327 [inline]
+ __kmalloc_node_track_caller_noprof+0x96d/0x12f0 mm/slub.c:4347
+ kmalloc_reserve+0x22f/0x4b0 net/core/skbuff.c:601
+ pskb_expand_head+0x1fc/0x1610 net/core/skbuff.c:2241
+ skb_realloc_headroom+0x152/0x2d0 net/core/skbuff.c:2321
+ pptp_xmit+0x9d4/0x2720 drivers/net/ppp/pptp.c:181
+ ppp_channel_bridge_input drivers/net/ppp/ppp_generic.c:2290 [inline]
+ ppp_input+0x1d6/0xe60 drivers/net/ppp/ppp_generic.c:2314
+ pppoe_rcv_core+0x1e8/0x760 drivers/net/ppp/pppoe.c:379
+ sk_backlog_rcv+0x142/0x420 include/net/sock.h:1148
+ __release_sock+0x1d3/0x330 net/core/sock.c:3213
+ release_sock+0x6b/0x270 net/core/sock.c:3767
+ pppoe_sendmsg+0x15d/0xcb0 drivers/net/ppp/pppoe.c:904
+ sock_sendmsg_nosec net/socket.c:712 [inline]
+ __sock_sendmsg+0x330/0x3d0 net/socket.c:727
+ ____sys_sendmsg+0x893/0xd80 net/socket.c:2566
+ ___sys_sendmsg+0x271/0x3b0 net/socket.c:2620
+ __sys_sendmmsg+0x2d9/0x7c0 net/socket.c:2709
+ __do_sys_sendmmsg net/socket.c:2736 [inline]
+ __se_sys_sendmmsg net/socket.c:2733 [inline]
+ __x64_sys_sendmmsg+0xc6/0x150 net/socket.c:2733
+ x64_sys_call+0x3ce7/0x3db0 arch/x86/include/generated/asm/syscalls_64.h:308
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xd9/0x210 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+CPU: 0 UID: 0 PID: 5830 Comm: syz-executor110 Not tainted 6.16.0-syzkaller #0 PREEMPT(none) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
+=====================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
