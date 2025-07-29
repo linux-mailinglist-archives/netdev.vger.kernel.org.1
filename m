@@ -1,223 +1,164 @@
-Return-Path: <netdev+bounces-210740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210741-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64FB9B149E8
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 10:17:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 821D9B149FF
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 10:21:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A15453A4500
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 08:16:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ABEB13A6CA0
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 08:21:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5649927A46E;
-	Tue, 29 Jul 2025 08:16:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AF4B27C152;
+	Tue, 29 Jul 2025 08:21:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ENbrR8y0";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="r8qxkebH";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="iTaV1cmq";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="4+Bzf8c4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EhdgjGPv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5527619F13F
-	for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 08:16:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E1482AF1C;
+	Tue, 29 Jul 2025 08:21:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753777019; cv=none; b=lkfDV0JLPyZc6tdJqVp4ogAcpjmztbvCY5WDnXmd0AInZVw5GZSVrqV8589dz471vl2+8rjrhEqMrwlPOldJM75iGlsLCnY+0JKMiav4gjHddz5SIi1DEutSXogyK/JyJ6QUt2zoQ8cvWaCYv5EzBXqsnZQHoMfyc36YRY5kS/k=
+	t=1753777301; cv=none; b=U6jdqcFxcfrKI0ctPWVvwfHT2sANdgaZkPG49UvNfOdHHmYsxpE7HZ0GNuvN7hG6GMgdrhFGaCWsrT8LzQuXuPdF9ZzRVhnRc2YyOUhYbj24VFxHUQhtYrNOLCpIslmqPyY3lP0s9Ieq7AHLSFXcJiJxrimNTcnPXW/gamZRUIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753777019; c=relaxed/simple;
-	bh=xEMJxaJq2XYIcXrL4NNIaY5wH7OkEvW+t3Rn+DQhA4g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ii5rxuGx+B+Oy0koHAl1uun95pCjZ7eCPgA+TKRTEVBB4Nk1TEr83wamuyT19NJVEcOUx3VMXja9HF+z49pSrwv8B2QvsWdoX0sfy8yhFbZiEE38+GS9EiVKbW5uLLXVpt426qm0MI0uO5QO9LldmKZZo5znWe9VSqaMuq3OvQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ENbrR8y0; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=r8qxkebH; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=iTaV1cmq; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=4+Bzf8c4; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id F3F17219EE;
-	Tue, 29 Jul 2025 08:16:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1753777010; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DwdTTHdeOVI0z++8NUCczywVnQjEIDhs65XxyQb9Kfc=;
-	b=ENbrR8y0h9sYQ9VqCDBKwiY+mwKM4c9w5COpbioJtplUI+4cGemJvvVj/9muB4CulQiF3i
-	BGJnajQxSRvlfjO2kd0LfezZN7Vn3iiyd395694j9lP6Ifh5UawBWhqZ6OZYw2UqvxoLNH
-	zmvUUQKnZkkFUT7zK8e7oDF1JfRJBMg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1753777010;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DwdTTHdeOVI0z++8NUCczywVnQjEIDhs65XxyQb9Kfc=;
-	b=r8qxkebHUBSbmI/LyFKMwOeB7QlHIAM8pA+/l55u5AeTFIExFe9Wnz/vd62cpB9vgjHW+e
-	o4KA/rY5jOvrQsBQ==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=iTaV1cmq;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=4+Bzf8c4
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1753777009; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DwdTTHdeOVI0z++8NUCczywVnQjEIDhs65XxyQb9Kfc=;
-	b=iTaV1cmqqBGDrMYnlAI1K3KQa47nelnskJQ2pHt0cGSPGd8bjuLUEMan7BTBuJWopIlEQM
-	ocyneezXYvP1lFDYKzHtspkcxYKqU4UtKt2LovCEWIZ4rp4FweeRCsBwIG+jQvHOpuV5Dq
-	ExdcozV81Blcnh/LBidfzKzwjhPdXfo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1753777009;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DwdTTHdeOVI0z++8NUCczywVnQjEIDhs65XxyQb9Kfc=;
-	b=4+Bzf8c4476+e9thuIX+OaX5NFXgGffWpsXoU+yjkXaK5qYtkoexCTbDp3LWN1vIW+3bxH
-	tz6dgX9UkwnqYYBA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 51F9113876;
-	Tue, 29 Jul 2025 08:16:48 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id AmvkEnCDiGhKNwAAD6G6ig
-	(envelope-from <hare@suse.de>); Tue, 29 Jul 2025 08:16:48 +0000
-Message-ID: <3339e2d0-02ac-470a-9511-0e60ed1d0598@suse.de>
-Date: Tue, 29 Jul 2025 10:16:48 +0200
+	s=arc-20240116; t=1753777301; c=relaxed/simple;
+	bh=3MadP4h48DIdERsGiQK9qL9UflRCokl2zYAzYujjKO8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OZ/hLSWok3ZplfuJTUP07ImfjiISRTGG2QrWbW9lz/y+cBjOlOxS1Nv+giV2toAXgoljgBVG6tAPxKkoMflyjkJn4FBsLqmbH6wOndzzS+tSRgz/5r+kZXzNOKOOr+3/8Vf8levTruzgcbV0iAjLLEcpyJUDxdCTbjoZg1c81hk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EhdgjGPv; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-3b78315ff04so1843616f8f.0;
+        Tue, 29 Jul 2025 01:21:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753777298; x=1754382098; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=tT0dGPVL2JwzDZcMhwQgYP1Gkj3ongsGTyx+y3Z3CrE=;
+        b=EhdgjGPvE5u6i088g2OPrnRSfuAlPv5/5qzVGzrcy9N7BqY+e51xNG3B/SUtneYc29
+         Xrw8y3juyYtZ59d5iQr63WpHne4Iutj7bPWr1z1k4PgjAGrujB/YWTPO7HTh0GfjRMku
+         4EkJBQPZDgmISraaSnuBwqFkqAGv0IBrdoh67/ua167E/60+GbDpEd8ETjw/9zs+SX3s
+         y0HEvHkwATCfgX7YhfboCMsFJ7xpXjSdbHht4Z0n9bk6GpOrJrvyiF6bqDzz3cQyahC9
+         nupl3ocHkveLKeYQWzFwxcbXy617qTVusUaHhvyy2DmemIIfxsioMXzZvoTd+RFacinF
+         rfuA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753777298; x=1754382098;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tT0dGPVL2JwzDZcMhwQgYP1Gkj3ongsGTyx+y3Z3CrE=;
+        b=XIkFZE0ivHl7TERU6E/QuwDi1FhfZx0sRKc2Crxd9U6OmJ0uXzh/WodjYKJq+ixGi2
+         RvcprdyLAfp7mgB54mrAcwZpTJDNbKvEHho68XQMtEfglu9J6o/sRkbjPS4PhZNY5nz0
+         CDUMGda4cWaVtjI1gzRNXubZ+3uemki06zB9JDXvErVZRNZ5/BPD2qAmxpyZQFg/B8o3
+         aktQCBHDV0T/9T5EAjokkrGMY+x8jimTRv/84J8QrruIrkf0rlSZGvLR/gHkFhe5n7Jn
+         eJ+69ZTtXxiCUNnq+DgBbuZ3MaXTaVgoT7h0PA00FGW7MR3Dr6Fi5MWkY0Hi01/xxf4F
+         GOZA==
+X-Forwarded-Encrypted: i=1; AJvYcCVLrRXybHzp/Os4xHxq4cKYzBX+dCXjAgsLav6OU5jeqpofR/u4nUjZXH3Ftsx8JeiobvEUnKY5bVCJMKI=@vger.kernel.org, AJvYcCXbXrYIr5cQFBXMT1wjXaaJlaTcb5FjlfJQ4XVDGD+Q7iVQsGvxdtCn8HPxAHOmHqDc8QXOJYHw@vger.kernel.org
+X-Gm-Message-State: AOJu0YwxjfMiohdofm9Qdv2PV++lTrpL6vNyeXOcoZKt2pQOjmyE2vk9
+	zkAdgHLPEMVntxNkz2A46+1qTu/597v+HpyWcTmbKXUdPArpX6syrnyl
+X-Gm-Gg: ASbGncsFHid0nn47tlLivm1qxk19ewC/Ey2bYKFWfU0jiIjDkbC8Rd3XZXt0SY1x8Kn
+	Nw/AVfg3d6evIBsNTXjXRv2k9mAqLUsUCA4x2TvFXTFI8ijLvs5J7jAHRJtyze6xgS/WSSTWWLu
+	O7ErIwpcvDGjxPLOO8cF6bL3fELw9AInScSSMRa1bdnlWg6GFPvHWcHjM+WTFJmwpgbjki3VPHK
+	UMoayXR8+ce/NIGPWWyTdv/77hUt35e00neHcKVYKTQIGDjixTclTE8K4mfTYIzeHXjZeR8KSW/
+	/O/KtU6mM2afjJrXbXIYRsTdBN7VmKKvMSQO/qjblbRai1fumjOWYqlFQsbWmjK0opZBl3sQkJN
+	sD2vQfhUbUf7jUaGY8qHnccpwMVX86xnluHGs3Da7gHLCBuhVGWvERXvmAnqLt4rS5ih82tpWGU
+	Anhw==
+X-Google-Smtp-Source: AGHT+IE3SfkwZGuKiUVH9aKbgdBfmo7svBjLqSORlG/pClNgCFm7LSnPOXcJJ8FgGS2H6kv2vQVYvQ==
+X-Received: by 2002:a05:6000:2411:b0:3a4:bfda:1e9 with SMTP id ffacd0b85a97d-3b77678ba22mr11791862f8f.46.1753777297639;
+        Tue, 29 Jul 2025 01:21:37 -0700 (PDT)
+Received: from Ansuel-XPS24 (host-80-181-255-224.pool80181.interbusiness.it. [80.181.255.224])
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3b778eb27f8sm11472037f8f.16.2025.07.29.01.21.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Jul 2025 01:21:36 -0700 (PDT)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Russell King <linux@armlinux.org.uk>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Christian Marangi <ansuelsmth@gmail.com>
+Subject: [net-next RFC PATCH] net: phylink: add .pcs_link_down PCS OP
+Date: Tue, 29 Jul 2025 10:21:23 +0200
+Message-ID: <20250729082126.2261-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.50.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC 4/4] nvme/target/tcp: set max record size in the tls context
-To: Wilfred Mallawa <wilfred.opensource@gmail.com>, alistair.francis@wdc.com,
- dlemoal@kernel.org, chuck.lever@oracle.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- donald.hunter@gmail.com, corbet@lwn.net, kbusch@kernel.org, axboe@kernel.dk,
- hch@lst.de, sagi@grimberg.me, kch@nvidia.com, borisp@nvidia.com,
- john.fastabend@gmail.com, jlayton@kernel.org, neil@brown.name,
- okorniev@redhat.com, Dai.Ngo@oracle.com, tom@talpey.com, trondmy@kernel.org,
- anna@kernel.org, kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-nvme@lists.infradead.org, linux-nfs@vger.kernel.org,
- Wilfred Mallawa <wilfred.mallawa@wdc.com>
-References: <20250729024150.222513-2-wilfred.opensource@gmail.com>
- <20250729024150.222513-7-wilfred.opensource@gmail.com>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20250729024150.222513-7-wilfred.opensource@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-3.01 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com,wdc.com,kernel.org,oracle.com,davemloft.net,google.com,redhat.com,lwn.net,kernel.dk,lst.de,grimberg.me,nvidia.com,brown.name,talpey.com,lists.linux.dev,vger.kernel.org];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[32];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	ARC_NA(0.00)[];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	RCVD_TLS_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	MID_RHS_MATCH_FROM(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	R_RATELIMIT(0.00)[to_ip_from(RLhu34id7c3duw89qhx7eswje4)];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:dkim,suse.de:email,wdc.com:email,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns]
-X-Spam-Flag: NO
-X-Spam-Level: 
-X-Rspamd-Queue-Id: F3F17219EE
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Action: no action
-X-Spam-Score: -3.01
 
-On 7/29/25 04:41, Wilfred Mallawa wrote:
-> From: Wilfred Mallawa <wilfred.mallawa@wdc.com>
-> 
-> During a tls handshake, a host may specify the tls record size limit
-> using the tls "record_size_limit" extension. Currently, the NVMe target
-> driver does not specify this value to the tls layer.
-> 
-> This patch adds support for setting the tls record size limit into the
-> tls context, such that outgoing records may not exceed this limit
-> specified by the endpoint.
-> 
-> Signed-off-by: Wilfred Mallawa <wilfred.mallawa@wdc.com>
-> ---
->   drivers/nvme/target/tcp.c | 13 +++++++++++++
->   1 file changed, 13 insertions(+)
-> 
-> diff --git a/drivers/nvme/target/tcp.c b/drivers/nvme/target/tcp.c
-> index 60e308401a54..f2ab473ea5de 100644
-> --- a/drivers/nvme/target/tcp.c
-> +++ b/drivers/nvme/target/tcp.c
-> @@ -1784,6 +1784,7 @@ static void nvmet_tcp_tls_handshake_done(void *data, int status,
->   					size_t tls_record_size_limit)
->   {
->   	struct nvmet_tcp_queue *queue = data;
-> +	struct tls_context *tls_ctx = tls_get_ctx(queue->sock->sk);
->   
->   	pr_debug("queue %d: TLS handshake done, key %x, status %d\n",
->   		 queue->idx, peerid, status);
-> @@ -1795,6 +1796,17 @@ static void nvmet_tcp_tls_handshake_done(void *data, int status,
->   	if (!status) {
->   		queue->tls_pskid = peerid;
->   		queue->state = NVMET_TCP_Q_CONNECTING;
-> +
-> +		/* Endpoint has specified a maximum tls record size limit */
-> +		if (tls_record_size_limit > TLS_MAX_PAYLOAD_SIZE) {
-> +			pr_err("queue %d: invalid tls max record size limit: %zu\n",
-> +			       queue->idx, tls_record_size_limit);
-> +			queue->state = NVMET_TCP_Q_FAILED;
-> +		} else if (tls_record_size_limit > 0) {
-> +			tls_ctx->tls_record_size_limit = (u32)tls_record_size_limit;
-> +			pr_debug("queue %d: host specified tls max record size %u\n",
-> +				 queue->idx, tls_ctx->tls_record_size_limit);
-> +		}
->   	} else
->   		queue->state = NVMET_TCP_Q_FAILED;
->   	spin_unlock_bh(&queue->state_lock);
-> @@ -1808,6 +1820,7 @@ static void nvmet_tcp_tls_handshake_done(void *data, int status,
->   		nvmet_tcp_schedule_release_queue(queue);
->   	else
->   		nvmet_tcp_set_queue_sock(queue);
-> +
->   	kref_put(&queue->kref, nvmet_tcp_release_queue);
->   }
->   
-Again, why?
+Permit for PCS driver to define specific operation to torn down the link
+between the MAC and the PCS.
 
-I'd rather have the TLS layer handling that internally.
+This might be needed for some PCS that reset counter or require special
+reset to correctly work if the link needs to be restored later.
 
-Cheers,
+On phylink_link_down() call, the additional phylink_pcs_link_down() will
+be called before .mac_link_down to torn down the link.
 
-Hannes
+PCS driver will need to define .pcs_link_down to make use of this.
+
+Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+---
+ drivers/net/phy/phylink.c | 8 ++++++++
+ include/linux/phylink.h   | 2 ++
+ 2 files changed, 10 insertions(+)
+
+diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+index c7f867b361dd..6605ee3670fb 100644
+--- a/drivers/net/phy/phylink.c
++++ b/drivers/net/phy/phylink.c
+@@ -927,6 +927,12 @@ static void phylink_pcs_link_up(struct phylink_pcs *pcs, unsigned int neg_mode,
+ 		pcs->ops->pcs_link_up(pcs, neg_mode, interface, speed, duplex);
+ }
+ 
++static void phylink_pcs_link_down(struct phylink_pcs *pcs)
++{
++	if (pcs && pcs->ops->pcs_link_down)
++		pcs->ops->pcs_link_down(pcs);
++}
++
+ static void phylink_pcs_disable_eee(struct phylink_pcs *pcs)
+ {
+ 	if (pcs && pcs->ops->pcs_disable_eee)
+@@ -1566,6 +1572,8 @@ static void phylink_link_down(struct phylink *pl)
+ 
+ 	phylink_deactivate_lpi(pl);
+ 
++	phylink_pcs_link_down(pl->pcs);
++
+ 	pl->mac_ops->mac_link_down(pl->config, pl->act_link_an_mode,
+ 				   pl->cur_interface);
+ 	phylink_info(pl, "Link is Down\n");
+diff --git a/include/linux/phylink.h b/include/linux/phylink.h
+index 30659b615fca..73172c398dd6 100644
+--- a/include/linux/phylink.h
++++ b/include/linux/phylink.h
+@@ -484,6 +484,7 @@ struct phylink_pcs {
+  * @pcs_an_restart: restart 802.3z BaseX autonegotiation.
+  * @pcs_link_up: program the PCS for the resolved link configuration
+  *               (where necessary).
++ * @pcs_link_down: torn down link between MAC and PCS.
+  * @pcs_disable_eee: optional notification to PCS that EEE has been disabled
+  *		     at the MAC.
+  * @pcs_enable_eee: optional notification to PCS that EEE will be enabled at
+@@ -511,6 +512,7 @@ struct phylink_pcs_ops {
+ 	void (*pcs_an_restart)(struct phylink_pcs *pcs);
+ 	void (*pcs_link_up)(struct phylink_pcs *pcs, unsigned int neg_mode,
+ 			    phy_interface_t interface, int speed, int duplex);
++	void (*pcs_link_down)(struct phylink_pcs *pcs);
+ 	void (*pcs_disable_eee)(struct phylink_pcs *pcs);
+ 	void (*pcs_enable_eee)(struct phylink_pcs *pcs);
+ 	int (*pcs_pre_init)(struct phylink_pcs *pcs);
 -- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+2.50.0
+
 
