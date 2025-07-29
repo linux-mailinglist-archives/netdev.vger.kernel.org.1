@@ -1,127 +1,142 @@
-Return-Path: <netdev+bounces-210746-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210747-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49C68B14A64
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 10:48:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 926A1B14A6F
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 10:52:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 175B03A31CE
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 08:47:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF4873BB888
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 08:51:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3128F284B42;
-	Tue, 29 Jul 2025 08:48:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C97128541C;
+	Tue, 29 Jul 2025 08:52:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="w9hTs92Q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IoQZHrfg"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6EEC221FD0
-	for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 08:48:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76D1478F34;
+	Tue, 29 Jul 2025 08:52:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753778886; cv=none; b=pCTRxHkyPGdTAnPnXeQ+ryTcAidKXHfLltmsH6lgLlhc4DjJS+Xy4qVjcQFBn+xwpIsI4z3aNoixv7Isz7ObmsdWUDazvymXO1oRlVPZifbLIqg93rPGb/j+N2Kmgwl0jp49rYbtIzeVh/Sfr7cW8KwP8HsdW+SU8egczU9OBy0=
+	t=1753779136; cv=none; b=X4mHdotNtuwIbrqO+417bWfY7IH9z1s8vOdmAZGdQRvktkT8DY0geuD6kVltVzKcV3OW+lCI1vqxJo7Euo5+V2x3ZE40XifI216GEwN1l6ImSJL93tSs3G2fBgrAYWT0yFjsuwfFDXXjoC5jEdbBzOMLMAquOv/tQSUzO4p/VLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753778886; c=relaxed/simple;
-	bh=tyYuT4uDzx3BJT+IF5rTiFFudkRf52hYO6lYK9ugZow=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CRWPTxBDJOqqTKz3FoI3EardsTGuFBlqYDBUdQ+tzc35HiKKyd/+i7X4hN/E8XbovoYjYIFXH3qgrZGb5vMO7frb9hMntJjl+k8NZHYQgBtZtJsHJeTzeso11nY5A7Y9UEVtKfuQ4UBf01G9cBDOEl/nqCJvTB96AbBP9Qrzvwo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=w9hTs92Q; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=P7oOJG5KTLIajgCuDI26bWwy2UJFAttGvQUBB26YlI0=; b=w9hTs92QWrfKsmkOfTZU3IzEK9
-	/NKQF8UfFxhlytprmFOCd75wSELHVG+RUGnz4wM7Dx+2BPss78SGmtPdHHKqXTVoV+8J/kyMTLg/I
-	hRViRpc1b1w3DMsWnVpCv6p54buc+jEfs+NYmwP4vuf7807MxGJTSNKyACuKF7NsdLYmIeK/zwHhi
-	6rTY9HECZiKlsvCvt5yr4ekE9YHDNY01jZOJ1qgJQQMG36r0aFS4MlX9ZudxvFrYkCa2Z9Kux6Z8z
-	zaUq7ikJI+pkp1WYuCTMqBTlJM0X1inAtGKp0jvRfT3AF6NHz39TTUui2BCr/k4YynT5kjqW0JN+N
-	+vUvWBFQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:47240)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1ugg04-0001bH-0U;
-	Tue, 29 Jul 2025 09:47:56 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1ugg01-0007G2-2s;
-	Tue, 29 Jul 2025 09:47:53 +0100
-Date: Tue, 29 Jul 2025 09:47:53 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH RFC net-next 7/7] net: stmmac: explain the
- phylink_speed_down() call in stmmac_release()
-Message-ID: <aIiKuVwyzR4ZSitl@shell.armlinux.org.uk>
-References: <aIebMKnQgzQxIY3j@shell.armlinux.org.uk>
- <E1ugQ38-006KDX-RT@rmk-PC.armlinux.org.uk>
- <b612eaee-17f2-4cab-bc37-a1cb9560ffe1@lunn.ch>
+	s=arc-20240116; t=1753779136; c=relaxed/simple;
+	bh=SN+9wrL45KOmZEoCo+QRSzNzRfauhceyHUari7IM4No=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rZ9QtYtdbkqotDF93dmFZYwbYLiYjysD+eKLJv/7PwaH5JpbL+uQQRa2k9UjLyAGW5V3SLpC00u3p/dWHwb79XIkV8irTZ3TlTJ5pu0Y+9YndDOKBCu0THZXYAkDLN+UywJwDEhSDROACNnLvV9sY/wNzWbU8qnWBHRNeTFYy6U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IoQZHrfg; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4538bc52a8dso39216185e9.2;
+        Tue, 29 Jul 2025 01:52:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753779133; x=1754383933; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=puylhfEeh04//TXk56E+rvqvhJy4E6rc8s7DMainMJQ=;
+        b=IoQZHrfg3xUMzo3PxoRHiOgJNruj8+8No7dvuXU/ywgLZ9s4+iyrb027hnr7Ru2VNm
+         uEn4RIYeFRzEsltJ6X8Oc18tbwHeYZHkQkQb0ryUBGVSJVxXTQuT9rKe2mq6guHFvNZh
+         ONjRThZ+kGZcyO1FRlqinQkOyvc1s0+OAoZ1/vn/Hm4FAd/GNCBnyv+4HxeiWhm7ZBOb
+         N/rIg6LUzjx+WNcb+cgtcE/hhbm+TQZpp3+YxPeu4+UtXXnLBu9BM5isDlj8r3QCRN13
+         2haE/DYebbM2dg6NU19qRIrDsYEWhB+YqC2YbBxes8VRf7kniBQVxbmqHdf+0mVVAp91
+         ON6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753779133; x=1754383933;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=puylhfEeh04//TXk56E+rvqvhJy4E6rc8s7DMainMJQ=;
+        b=ibyLhln2Yy/NRr7eK+5YQlTRI3hDUWnZ7XqwZNs86CGxKjGWQMiSHCx1SHLbKNkwj7
+         A1pC/0KA+usl8BZLNDZj1go+poQ7fSN9El7LVJsLbS5kET45BojZv5Xt+fKO+QnK7KWt
+         wJP9K13xmkQ59ue/40G7yOrtxXMXwVqzw0cnX9mxekHTKm/IVO0wKPhzCOc2i8JVHOKq
+         Jk+b8g3zOnvAFsaANfMMdvYb0XUnF2yaQiNElWMd5d+jddgSGYRr9t59I7phW5wtgytt
+         6e4PKHhS1dKJ+piKQCjzSwovPMFUTSxKPxY5cZPP5bkLcKwNy0Vxv0R8PDDPbd/3ItNQ
+         HoKQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWYygsdA3K43wxJvy47ILUnjxhberk+0eziJ6EQhzy0edlDwLj5ayEIhFadHfoXRQzhvnU=@vger.kernel.org, AJvYcCWjKSOEX1lFel3nJMALPUj2qRtv95LVT62noHdoj445+3igafeRJGUUnRpMwSLF7JtKsffq4FN+@vger.kernel.org, AJvYcCWsDkgKAb4UXtOmCEJ+TZgiWYbYsLRHK8upXjN5dhjnpPfZse9RQbUvHxNV8SICuQgUqprFHNd/A3C35A==@vger.kernel.org, AJvYcCX/KdDNRONkL4WBlBYzh0AIjNKiCamtrH6Sv4u3d7kM6Brs2Vym8he5fZHkqsqVf/s/UP36pc6A/q2zuo/J@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz49sLNNvtJuIteqkfRI/HDVvlwXb+aElvIl/GmeT5CAh11aI/a
+	VXFU8VcrHawNYr3QtBAGR/BNlzVprPthFzB0Cym1KkZL8Gqbme6yW6lk
+X-Gm-Gg: ASbGncvorSVmIyLYDNdGUCSBO6ArhgzmJV3PHeBElJX9qUyes/awTi4UA08QWSJXnK2
+	NXwDNS7d5h72gn5H4a6B1LluOMOZ2gqh5b/mxH9+vCCQsEKizwRHqYkd+BfAiU5Uc5/SJJ4foPX
+	0v27plElWV6qYZ0Lm96KDoxK2aiiEaFfq8eQ9fL0Lm9hx0+J3K/E1nWqPjA8agDt4cp/ByCQKim
+	PCM6LQG34zL6LCT2Wo0A2dhweFvPt5Mk7o8lpEbMhbe45sToloL+aeGCYKb/vstg13NS5tYkhil
+	dWFPHrLndWLjNu66RgyryCyC4nNihMhIa26Dpp8WsxTs5VeQymneKEEWGT86dJwdcVmQ0prBxYt
+	TpCI/TBjKNShqd707vnRMJZEmR6zsa5/Ql8c=
+X-Google-Smtp-Source: AGHT+IEm4VTiD/JSN689v0JLsMbYqbkmePqxtHqQp6IbEjtW00P2+vOo5p+wkfxwZCh3NLYlWmARzg==
+X-Received: by 2002:a05:600c:458d:b0:43d:9d5:474d with SMTP id 5b1f17b1804b1-4587b16efb2mr105032655e9.0.1753779132350;
+        Tue, 29 Jul 2025 01:52:12 -0700 (PDT)
+Received: from ?IPV6:2620:10d:c096:325::26f? ([2620:10d:c092:600::1:72ea])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b77e216516sm10225969f8f.72.2025.07.29.01.52.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 29 Jul 2025 01:52:11 -0700 (PDT)
+Message-ID: <7d7eb3cd-db7e-4a9e-8671-4185b716bbc8@gmail.com>
+Date: Tue, 29 Jul 2025 09:53:31 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b612eaee-17f2-4cab-bc37-a1cb9560ffe1@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] mm, page_pool: introduce a new page type for page pool
+ in page type
+To: Byungchul Park <byungchul@sk.com>
+Cc: Mina Almasry <almasrymina@google.com>, linux-mm@kvack.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ kernel_team@skhynix.com, harry.yoo@oracle.com, ast@kernel.org,
+ daniel@iogearbox.net, davem@davemloft.net, kuba@kernel.org, hawk@kernel.org,
+ john.fastabend@gmail.com, sdf@fomichev.me, saeedm@nvidia.com,
+ leon@kernel.org, tariqt@nvidia.com, mbloch@nvidia.com,
+ andrew+netdev@lunn.ch, edumazet@google.com, pabeni@redhat.com,
+ akpm@linux-foundation.org, david@redhat.com, lorenzo.stoakes@oracle.com,
+ Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org, surenb@google.com,
+ mhocko@suse.com, horms@kernel.org, jackmanb@google.com, hannes@cmpxchg.org,
+ ziy@nvidia.com, ilias.apalodimas@linaro.org, willy@infradead.org,
+ brauner@kernel.org, kas@kernel.org, yuzhao@google.com,
+ usamaarif642@gmail.com, baolin.wang@linux.alibaba.com, toke@redhat.com,
+ bpf@vger.kernel.org, linux-rdma@vger.kernel.org
+References: <20250728052742.81294-1-byungchul@sk.com>
+ <fc1ed731-33f8-4754-949f-2c7e3ed76c7b@gmail.com>
+ <CAHS8izO6t0euQcNyhxXKPbrV7BZ1MfuMjrQiqKr-Y68t5XCGaA@mail.gmail.com>
+ <da4a9efd-64b3-4dc5-a613-b73e17f160d6@gmail.com>
+ <20250729010410.GC56089@system.software.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20250729010410.GC56089@system.software.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jul 28, 2025 at 07:29:09PM +0200, Andrew Lunn wrote:
-> On Mon, Jul 28, 2025 at 04:46:02PM +0100, Russell King (Oracle) wrote:
-> > The call to phylink_speed_down() looks odd on the face of it. Add a
-> > comment to explain why this call is there.
-> > 
-> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> > ---
-> >  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 5 +++++
-> >  1 file changed, 5 insertions(+)
-> > 
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > index f44f8b1b0efa..0da5c29b8cb0 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > @@ -4138,8 +4138,13 @@ static int stmmac_release(struct net_device *dev)
-> >  	struct stmmac_priv *priv = netdev_priv(dev);
-> >  	u32 chan;
-> >  
-> > +	/* If the PHY or MAC has WoL enabled, then the PHY will not be
-> > +	 * suspended when phylink_stop() is called below. Set the PHY
-> > +	 * to its slowest speed to save power.
-> > +	 */
-> >  	if (device_may_wakeup(priv->device))
-> >  		phylink_speed_down(priv->phylink, false);
-> > +
+On 7/29/25 02:04, Byungchul Park wrote:
+> On Mon, Jul 28, 2025 at 07:49:30PM +0100, Pavel Begunkov wrote:
+>> On 7/28/25 19:39, Mina Almasry wrote:
+>>> On Mon, Jul 28, 2025 at 11:35 AM Pavel Begunkov <asml.silence@gmail.com> wrote:
+
+...>>> This may be my bad since I said we should check if it's 0 initialized.
+>>>
+>>> It looks like on the devmem side as well we kvmalloc_array the niovs,
+>>> and if I'm checking through the helpers right, kvmalloc_array does
+>>> 0-initialize indeed.
+>>
+>> I wouldn't rely on that, it's just for zcrx I do:
+>>
+>> kvmalloc_array(...,  GFP_KERNEL | __GFP_ZERO);
 > 
-> Is there a corresponding phylink_speed_up() somewhere else? Does that
-> need a similar comment?
+> For net_devmem_bind_dmabuf(), __GFP_ZERO will add bigger overhead than
+> just assignment, 'niov->pp = NULL'.
 
-__stmmac_open() does:
+That's not a place where you should care about zeroing overhead.
 
-        phylink_start(priv->phylink);
-        /* We may have called phylink_speed_down before */
-        phylink_speed_up(priv->phylink);
+> I'd like to ask you if you are still good with __GFP_ZERO overhead
+> before going ahead.
 
-So yes, there is a corresponding call, and it's unconditional, so such
-a comment there wouldn't make sense.
+However, it might be easier for you to just assign it directly
+for devmem and let Mina add GFP_ZERO if he fancy the idea.
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Pavel Begunkov
+
 
