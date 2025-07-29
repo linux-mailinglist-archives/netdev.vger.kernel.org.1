@@ -1,150 +1,96 @@
-Return-Path: <netdev+bounces-210742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210743-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FBAEB14A2E
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 10:36:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D966B14A37
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 10:37:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5EFB817DE38
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 08:36:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 955E117E907
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 08:37:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4EFA2749E0;
-	Tue, 29 Jul 2025 08:36:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 299E6284B42;
+	Tue, 29 Jul 2025 08:37:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="SgzbsFIO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34729257444
-	for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 08:36:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B446257444;
+	Tue, 29 Jul 2025 08:37:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753778194; cv=none; b=eNoNjLbcfoLBi0Nnt3h40bz7S3HSdMf/OvkWxKaYMGM8bUgXnPWabe1P7RbCHDkiHcGg6BEiaBd3l4+DazKs1fMPIMbm5NS5sRYL1AyxzBCAe31HI1Q0eOck1K/Vh8PmqKsu9q5jwZS8s5zls5QVlJti2gEfg+Tq0yw3u2OHvn4=
+	t=1753778272; cv=none; b=BSZ8+xCRTLdo6RfOopOzOEb+1VuUvj+NM7vsRkOmL3Vu8umUNM8/nLlDG2ZrHuPJDsbpwD06UXGC8EbvZbBSknSbkN1vqmWZS1LiSb/GJpmKajffpnD5DOUHQ71k2sLb5zRfF4nsoUADROVTZglTW5xMDAdMXTQcr57jl9lZM1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753778194; c=relaxed/simple;
-	bh=uCrJ+Iqbg5bbX+oCl5/x8BkXkWH6MwITKwrKsxfuTA8=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=HZ7GaDNg4cjIf4hSMHy6Tp6vkIEYJBpj49rxp6TDLJkMbGqCjv2L5vhoYoY7bmbG84xILFSHgu0Vq45Vu2qy/9K9bE0P+peceeAncV6xASco3n2SBFxoLMlUrMMeV/A31ZJ3drbvIH9cW2kTu+u2rXn8CpclVUI7d8uNw8CuDtM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3ddbec809acso62724775ab.2
-        for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 01:36:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753778192; x=1754382992;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=WzeBGpjHSeszF/CW4rczNpxcYtUulLTjlrinCLimUgo=;
-        b=M0MBN6vvoZoc+tcA+KivayE1yBEyxam0VLvQtu4uaUYFCZrRw8ACrNs0kOypgLIYLf
-         q5x1cxGqYRITRicWERctIk+JvseSSHReYJ9mR++xb3QgJVq1T2R+JKncZUyvF09Ng+ew
-         cYxQkfI4pgttia5MKt2gRmH6NcLZc35b1ckWYiQwvwxcEPChZK22t/fhZJmkHAcigJhw
-         oTOPa/N+Z42K9AwJwo/onVDWubIgQGEF89SPz62OvLXnM7CBEGt5oeq9M7d0WAu+uh0v
-         xSxtpxpzboeTjMHND+FQmTLREDcnV4kNm0elp06Tmdh9ho2c1KzWsqodPvNHyn7ovE46
-         1Ouw==
-X-Forwarded-Encrypted: i=1; AJvYcCWBDzpx8Ogg/3LniIKko7gCokq0TvzL8rpIEVKs1XfiV/Ufc6ZndTVKQBlY9lJo4NKtKfoIlrc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz4bfEAB4FmHwokWOtNerLhRhrxgmYZXtJoByvrmQYYzQyDe7Sl
-	C9YppPgnjxLJClhxSmo+hR90SMBaz+FJGl0LMaEcLnFBDGh5YKXNdwZ3APklHvMiolqwZwrC/7K
-	3emcjkIfY73NbO9GAJYOHz1Rn8PSCMY7gXPt4qx3iUUjsO7tz5TYcVROMGIM=
-X-Google-Smtp-Source: AGHT+IFhMAyYMoR3RdUP8l3Zi5v8mT3oE9q+69ki7bK73e+G54JA13PhrfXiFN/Ae6VgEeIlazaqNYY/dKIxqWUCL5kHonGwdr5W
+	s=arc-20240116; t=1753778272; c=relaxed/simple;
+	bh=y/Y5P0CroU7rC8cmm95jgO2l2qmNjaJJzsY9D8+nsIA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pEEfbel0IljoCFnx6p4RIZGHT1+xlWzAD4FAcFXl21oXA/kRTK1UdKK+jreLYdlDJicmf0HzQkqV4uVbbURrN0feTuW1/C4lROfxyu+HLhWa9gcVaRlE3RlfL34beZIFdLoaLI5hBQZ/Paz0MiMBWvlVvpFvQkMwacJM7bVXFNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=SgzbsFIO; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=tZ00Hjq0cuPOuG6PFQ6g7fs+gf4AGbwqsb/B90LUVb8=; b=SgzbsFIObH7edu8MVUwwjZksCD
+	IKy0+ailYqETjkusyuO1+A+LD4jq8i739OmqohgmgEA580cv2xH+w6VnyXq+aInH6arHdpvuasfOi
+	6E/DgYOH0ufeqYtER2qnhhJytL4bFWazHJkf2G+z+0aAoz24HgIlvR588Y+wqCRV5u+v1zDMykM5b
+	toxjuM6r4Se2efghVUMERX76JnjNkCLUeW1srE3lBcGg5Ky9MQmXmf9xc391pUg3LxWwQSHH2DDM2
+	YIwFWlYiihKPA7sRhDq1FfUtury00VHL67ULCjJZ+y1qxvz2NQJayn24No3jhTn1321AQJlCP5TaM
+	zBdzv5Ww==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:44212)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1ugfq5-0001aV-1N;
+	Tue, 29 Jul 2025 09:37:37 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1ugfq2-0007F0-20;
+	Tue, 29 Jul 2025 09:37:34 +0100
+Date: Tue, 29 Jul 2025 09:37:34 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [net-next RFC PATCH] net: phylink: add .pcs_link_down PCS OP
+Message-ID: <aIiITk-7WPYMzcEl@shell.armlinux.org.uk>
+References: <20250729082126.2261-1-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1789:b0:3e3:d63c:3a35 with SMTP id
- e9e14a558f8ab-3e3d63c3f36mr161172835ab.22.1753778192366; Tue, 29 Jul 2025
- 01:36:32 -0700 (PDT)
-Date: Tue, 29 Jul 2025 01:36:32 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68888810.a00a0220.34d93b.0001.GAE@google.com>
-Subject: [syzbot] [wireless?] INFO: task hung in wiphy_register (2)
-From: syzbot <syzbot+e79f3349c93df8969402@syzkaller.appspotmail.com>
-To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250729082126.2261-1-ansuelsmth@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Hello,
+On Tue, Jul 29, 2025 at 10:21:23AM +0200, Christian Marangi wrote:
+> Permit for PCS driver to define specific operation to torn down the link
+> between the MAC and the PCS.
+> 
+> This might be needed for some PCS that reset counter or require special
+> reset to correctly work if the link needs to be restored later.
+> 
+> On phylink_link_down() call, the additional phylink_pcs_link_down() will
+> be called before .mac_link_down to torn down the link.
+> 
+> PCS driver will need to define .pcs_link_down to make use of this.
 
-syzbot found the following issue on:
+I don't accept new stuff without a user. Please provide the user as
+well. Thanks.
 
-HEAD commit:    94ce1ac2c9b4 Merge tag 'pci-v6.16-fixes-4' of git://git.ke..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=14127b82580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=8adfe52da0de2761
-dashboard link: https://syzkaller.appspot.com/bug?extid=e79f3349c93df8969402
-compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12127b82580000
-
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-94ce1ac2.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/2cc0fa87aefd/vmlinux-94ce1ac2.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/48c3cfe50b21/bzImage-94ce1ac2.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+e79f3349c93df8969402@syzkaller.appspotmail.com
-
-INFO: task syz-executor:5486 blocked for more than 143 seconds.
-      Not tainted 6.16.0-rc7-syzkaller-00093-g94ce1ac2c9b4 #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor    state:D stack:21640 pid:5486  tgid:5486  ppid:1      task_flags:0x400140 flags:0x00004006
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5397 [inline]
- __schedule+0x16fd/0x4cf0 kernel/sched/core.c:6786
- __schedule_loop kernel/sched/core.c:6864 [inline]
- schedule+0x165/0x360 kernel/sched/core.c:6879
- schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6936
- __mutex_lock_common kernel/locking/mutex.c:679 [inline]
- __mutex_lock+0x724/0xe80 kernel/locking/mutex.c:747
- wiphy_register+0x1980/0x26b0 net/wireless/core.c:1003
- ieee80211_register_hw+0x33e1/0x4120 net/mac80211/main.c:1589
- mac80211_hwsim_new_radio+0x2f0e/0x5340 drivers/net/wireless/virtual/mac80211_hwsim.c:5565
- hwsim_new_radio_nl+0xea4/0x1b10 drivers/net/wireless/virtual/mac80211_hwsim.c:6249
- genl_family_rcv_msg_doit+0x212/0x300 net/netlink/genetlink.c:1115
- genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
- genl_rcv_msg+0x60e/0x790 net/netlink/genetlink.c:1210
- netlink_rcv_skb+0x208/0x470 net/netlink/af_netlink.c:2552
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
- netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
- netlink_unicast+0x759/0x8e0 net/netlink/af_netlink.c:1346
- netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1896
- sock_sendmsg_nosec net/socket.c:712 [inline]
- __sock_sendmsg+0x219/0x270 net/socket.c:727
- __sys_sendto+0x3bd/0x520 net/socket.c:2180
- __do_sys_sendto net/socket.c:2187 [inline]
- __se_sys_sendto net/socket.c:2183 [inline]
- __x64_sys_sendto+0xde/0x100 net/socket.c:2183
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f7c09d9083c
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
