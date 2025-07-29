@@ -1,185 +1,149 @@
-Return-Path: <netdev+bounces-210796-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210797-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9A7CB14D93
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 14:22:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5462AB14D9D
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 14:26:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A2714E1DD8
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 12:22:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9460F174210
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 12:26:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23014290BD3;
-	Tue, 29 Jul 2025 12:22:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32E9D290DAC;
+	Tue, 29 Jul 2025 12:26:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rZMzeYqw"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DBE9290BA2;
-	Tue, 29 Jul 2025 12:22:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04708290BBD;
+	Tue, 29 Jul 2025 12:26:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753791774; cv=none; b=qP7F1tatDAtBtY3KMga48wwfP/3D+mj2XvaejbFVJVaWKF2tTlTUuiR+nt7BQK8H9IJqY/m34THwb+hIarucXiUUyJibaZ7IiNOdJg6nQZ1qRngZy9ERpK4yOmbQSNs9X4N/TnDw19eeCszzs7dEPz+jmw1sxt2JmBMYWQiwqQY=
+	t=1753791980; cv=none; b=EB7eqlTIzi1LjbhP3/rXKKYUjvqsVrROLlKeGNKwBdE9V8gU65RBVRRJq0Lor8QsDEIjBizBshYDHcw/m4x/tBISbIXtKvIC/mau8gQaiUDUtMELm7GfQHVYdWBDY519QaJlZr+Zghtz0K5s1tZJY3q0w3rn8wobT+sjMq6K//c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753791774; c=relaxed/simple;
-	bh=FV6g1EBRL1RK/tzC+xm4c6xHhJTIID14Yplsrt/zSew=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=gLvracdg7l60bGslcAsuv35kkGjf4HMG8TbUV1QgLHDaAyXQljls0uG3TysxP8/MULP6eLzEgHilBjqUWbbxtMfS7Xa6PSfY+FVGNwmzBNasQASTeEYmzqp2uUujYikcmNfhdudjnT9Rpo5wg8khoAlUavelRr2/TNHIuZconTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4brvdy1KH4z27j3b;
-	Tue, 29 Jul 2025 20:23:50 +0800 (CST)
-Received: from dggpemf500016.china.huawei.com (unknown [7.185.36.197])
-	by mail.maildlp.com (Postfix) with ESMTPS id D13A81400D2;
-	Tue, 29 Jul 2025 20:22:48 +0800 (CST)
-Received: from [10.174.176.70] (10.174.176.70) by
- dggpemf500016.china.huawei.com (7.185.36.197) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 29 Jul 2025 20:22:47 +0800
-Message-ID: <17042f3d-ce75-4be4-a53e-3d57907488e8@huawei.com>
-Date: Tue, 29 Jul 2025 20:22:46 +0800
+	s=arc-20240116; t=1753791980; c=relaxed/simple;
+	bh=nquTTUMIrwc+nEkVUf/cLkSfGQBgHYB50kSvfwd2NeA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=owxc6ZLVsV6ybqQ2UZJ4SKetWD98VLq/R32YItKcoJvTY3yBVWOKw7ZunkoAR6jNb7Iw1YpX9jljoh/gvVf2tlX1uVNoOFuZ0cMnIsdIwuBQtvw/rWze6aZZKaUinFDBa3RyRvMX3w41Ghzzb7alSMqp7qwBMT1aAQVzfsNYqug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rZMzeYqw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5AA31C4CEF4;
+	Tue, 29 Jul 2025 12:26:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753791979;
+	bh=nquTTUMIrwc+nEkVUf/cLkSfGQBgHYB50kSvfwd2NeA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=rZMzeYqwaOItoGjqO2pD+ucnzn3PyfgDywLUjx7mqsjiXyT8Ptb5Mjmk3iYWo8a0a
+	 A9FDgu8TnyEM/PlcWjON1/nm56nbgMMPVpyp/Z6dVPIwjXq/pGp3te/L3LwUTy7buC
+	 TnURpsEg/Cblwro7tDY/a7uiWj77N11X77G/YFel1HaSh7P0ryrI7YRwyAC4yQcOE9
+	 p7zTIPK20EaLCOBY3Re0sYUq+vDGarEChL2NLMZam38WAJN8BJ0xWQ1+hXeqJuZd5C
+	 yHHpAOua18ye6VTQmVXlLm8jLNSI+wPrwdZLLbhjRgNPR4xgUWT33o049vjCb95oH9
+	 HT7H8xFvxF9Og==
+From: Frederic Weisbecker <frederic@kernel.org>
+To: LKML <linux-kernel@vger.kernel.org>
+Cc: Frederic Weisbecker <frederic@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Simon Horman <horms@verge.net.au>,
+	Julian Anastasov <ja@ssi.bg>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	netdev@vger.kernel.org,
+	lvs-devel@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org
+Subject: [PATCH v2 net] ipvs: Fix estimator kthreads preferred affinity
+Date: Tue, 29 Jul 2025 14:26:11 +0200
+Message-ID: <20250729122611.247368-1-frederic@kernel.org>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: check the minimum value of gso size in
- virtio_net_hdr_to_skb()
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-CC: <yuehaibing@huawei.com>, <zhangchangzhong@huawei.com>,
-	<netdev@vger.kernel.org>, <virtualization@lists.linux.dev>,
-	<linux-kernel@vger.kernel.org>, <mst@redhat.com>, <jasowang@redhat.com>,
-	<eperezma@redhat.com>, <pabeni@redhat.com>, <davem@davemloft.net>,
-	<willemb@google.com>, <atenart@kernel.org>
-References: <20250724083005.3918375-1-wangliang74@huawei.com>
- <1753433749.959542-1-xuanzhuo@linux.alibaba.com>
-From: Wang Liang <wangliang74@huawei.com>
-In-Reply-To: <1753433749.959542-1-xuanzhuo@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
- dggpemf500016.china.huawei.com (7.185.36.197)
 
+The estimator kthreads' affinity are defined by sysctl overwritten
+preferences and applied through a plain call to the scheduler's affinity
+API.
 
-在 2025/7/25 16:55, Xuan Zhuo 写道:
-> On Thu, 24 Jul 2025 16:30:05 +0800, Wang Liang <wangliang74@huawei.com> wrote:
->> When sending a packet with virtio_net_hdr to tun device, if the gso_type
->> in virtio_net_hdr is SKB_GSO_UDP and the gso_size is less than udphdr
->> size, below crash may happen.
->>
->>    ------------[ cut here ]------------
->>    kernel BUG at net/core/skbuff.c:4572!
->>    Oops: invalid opcode: 0000 [#1] SMP NOPTI
->>    CPU: 0 UID: 0 PID: 62 Comm: mytest Not tainted 6.16.0-rc7 #203 PREEMPT(voluntary)
->>    Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
->>    RIP: 0010:skb_pull_rcsum+0x8e/0xa0
->>    Code: 00 00 5b c3 cc cc cc cc 8b 93 88 00 00 00 f7 da e8 37 44 38 00 f7 d8 89 83 88 00 00 00 48 8b 83 c8 00 00 00 5b c3 cc cc cc cc <0f> 0b 0f 0b 66 66 2e 0f 1f 84 00 000
->>    RSP: 0018:ffffc900001fba38 EFLAGS: 00000297
->>    RAX: 0000000000000004 RBX: ffff8880040c1000 RCX: ffffc900001fb948
->>    RDX: ffff888003e6d700 RSI: 0000000000000008 RDI: ffff88800411a062
->>    RBP: ffff8880040c1000 R08: 0000000000000000 R09: 0000000000000001
->>    R10: ffff888003606c00 R11: 0000000000000001 R12: 0000000000000000
->>    R13: ffff888004060900 R14: ffff888004050000 R15: ffff888004060900
->>    FS:  000000002406d3c0(0000) GS:ffff888084a19000(0000) knlGS:0000000000000000
->>    CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->>    CR2: 0000000020000040 CR3: 0000000004007000 CR4: 00000000000006f0
->>    Call Trace:
->>     <TASK>
->>     udp_queue_rcv_one_skb+0x176/0x4b0 net/ipv4/udp.c:2445
->>     udp_queue_rcv_skb+0x155/0x1f0 net/ipv4/udp.c:2475
->>     udp_unicast_rcv_skb+0x71/0x90 net/ipv4/udp.c:2626
->>     __udp4_lib_rcv+0x433/0xb00 net/ipv4/udp.c:2690
->>     ip_protocol_deliver_rcu+0xa6/0x160 net/ipv4/ip_input.c:205
->>     ip_local_deliver_finish+0x72/0x90 net/ipv4/ip_input.c:233
->>     ip_sublist_rcv_finish+0x5f/0x70 net/ipv4/ip_input.c:579
->>     ip_sublist_rcv+0x122/0x1b0 net/ipv4/ip_input.c:636
->>     ip_list_rcv+0xf7/0x130 net/ipv4/ip_input.c:670
->>     __netif_receive_skb_list_core+0x21d/0x240 net/core/dev.c:6067
->>     netif_receive_skb_list_internal+0x186/0x2b0 net/core/dev.c:6210
->>     napi_complete_done+0x78/0x180 net/core/dev.c:6580
->>     tun_get_user+0xa63/0x1120 drivers/net/tun.c:1909
->>     tun_chr_write_iter+0x65/0xb0 drivers/net/tun.c:1984
->>     vfs_write+0x300/0x420 fs/read_write.c:593
->>     ksys_write+0x60/0xd0 fs/read_write.c:686
->>     do_syscall_64+0x50/0x1c0 arch/x86/entry/syscall_64.c:63
->>     </TASK>
->>
->> To trigger gso segment in udp_queue_rcv_skb(), we should also set option
->> UDP_ENCAP_ESPINUDP to enable udp_sk(sk)->encap_rcv. When the encap_rcv
->> hook return 1 in udp_queue_rcv_one_skb(), udp_csum_pull_header() will try
->> to pull udphdr, but the skb size has been segmented to gso size, which
->> leads to this crash.
-> Is it correct to access the checksum of a segmented skb?
->
->> Only udp has this probloem. Add check for the minimum value of gso size in
->> virtio_net_hdr_to_skb().
-> Why tcp has not this problem?
->
->
->> Fixes: cf329aa42b66 ("udp: cope with UDP GRO packet misdirection")
->> Fixes: 3d010c8031e3 ("udp: do not accept non-tunnel GSO skbs landing in a tunnel")
->> Signed-off-by: Wang Liang <wangliang74@huawei.com>
->> ---
->>   include/linux/virtio_net.h | 5 ++++-
->>   1 file changed, 4 insertions(+), 1 deletion(-)
->>
->> diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
->> index 02a9f4dc594d..0533101642bd 100644
->> --- a/include/linux/virtio_net.h
->> +++ b/include/linux/virtio_net.h
->> @@ -157,11 +157,13 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
->>   		u16 gso_size = __virtio16_to_cpu(little_endian, hdr->gso_size);
->>   		unsigned int nh_off = p_off;
->>   		struct skb_shared_info *shinfo = skb_shinfo(skb);
->> +		u16 min_gso_size = 0;
->>
->>   		switch (gso_type & ~SKB_GSO_TCP_ECN) {
->>   		case SKB_GSO_UDP:
->>   			/* UFO may not include transport header in gso_size. */
->>   			nh_off -= thlen;
->> +			min_gso_size = sizeof(struct udphdr) + 1;
->>   			break;
->>   		case SKB_GSO_UDP_L4:
->>   			if (!(hdr->flags & VIRTIO_NET_HDR_F_NEEDS_CSUM))
->> @@ -172,6 +174,7 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
->>   				return -EINVAL;
->>   			if (gso_type != SKB_GSO_UDP_L4)
->>   				return -EINVAL;
->> +			min_gso_size = sizeof(struct udphdr) + 1;
-> why +1?
->
-> Thanks.
+However since the introduction of managed kthreads preferred affinity,
+such a practice shortcuts the kthreads core code which eventually
+overwrites the target to the default unbound affinity.
 
+Fix this with using the appropriate kthread's API.
 
-Hi! Sorry for replying so late.
+Fixes: d1a89197589c ("kthread: Default affine kthread to its preferred NUMA node")
+Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
+---
+ include/net/ip_vs.h            | 13 +++++++++++++
+ kernel/kthread.c               |  1 +
+ net/netfilter/ipvs/ip_vs_est.c |  3 ++-
+ 3 files changed, 16 insertions(+), 1 deletion(-)
 
-The first patch should add RFC, because I am not sure it is the best fix
-method. Set 'min_gso_size = sizeof(struct udphdr) + 1;' to ensure at least
-one byte in payload.
+diff --git a/include/net/ip_vs.h b/include/net/ip_vs.h
+index ff406ef4fd4a..29a36709e7f3 100644
+--- a/include/net/ip_vs.h
++++ b/include/net/ip_vs.h
+@@ -1163,6 +1163,14 @@ static inline const struct cpumask *sysctl_est_cpulist(struct netns_ipvs *ipvs)
+ 		return housekeeping_cpumask(HK_TYPE_KTHREAD);
+ }
+ 
++static inline const struct cpumask *sysctl_est_preferred_cpulist(struct netns_ipvs *ipvs)
++{
++	if (ipvs->est_cpulist_valid)
++		return ipvs->sysctl_est_cpulist;
++	else
++		return NULL;
++}
++
+ static inline int sysctl_est_nice(struct netns_ipvs *ipvs)
+ {
+ 	return ipvs->sysctl_est_nice;
+@@ -1270,6 +1278,11 @@ static inline const struct cpumask *sysctl_est_cpulist(struct netns_ipvs *ipvs)
+ 	return housekeeping_cpumask(HK_TYPE_KTHREAD);
+ }
+ 
++static inline const struct cpumask *sysctl_est_preferred_cpulist(struct netns_ipvs *ipvs)
++{
++	return NULL;
++}
++
+ static inline int sysctl_est_nice(struct netns_ipvs *ipvs)
+ {
+ 	return IPVS_EST_NICE;
+diff --git a/kernel/kthread.c b/kernel/kthread.c
+index 85e29b250107..adf06196b844 100644
+--- a/kernel/kthread.c
++++ b/kernel/kthread.c
+@@ -899,6 +899,7 @@ int kthread_affine_preferred(struct task_struct *p, const struct cpumask *mask)
+ 
+ 	return ret;
+ }
++EXPORT_SYMBOL_GPL(kthread_affine_preferred);
+ 
+ static int kthreads_update_affinity(bool force)
+ {
+diff --git a/net/netfilter/ipvs/ip_vs_est.c b/net/netfilter/ipvs/ip_vs_est.c
+index f821ad2e19b3..15049b826732 100644
+--- a/net/netfilter/ipvs/ip_vs_est.c
++++ b/net/netfilter/ipvs/ip_vs_est.c
+@@ -265,7 +265,8 @@ int ip_vs_est_kthread_start(struct netns_ipvs *ipvs,
+ 	}
+ 
+ 	set_user_nice(kd->task, sysctl_est_nice(ipvs));
+-	set_cpus_allowed_ptr(kd->task, sysctl_est_cpulist(ipvs));
++	if (sysctl_est_preferred_cpulist(ipvs))
++		kthread_affine_preferred(kd->task, sysctl_est_preferred_cpulist(ipvs));
+ 
+ 	pr_info("starting estimator thread %d...\n", kd->id);
+ 	wake_up_process(kd->task);
+-- 
+2.48.1
 
-After discussions in mail list, I send a v2 patch, please check it:
-https://lore.kernel.org/netdev/20250729123907.3318425-1-wangliang74@huawei.com/T/#u
-
-Thanks.
-
->>   			break;
->>   		case SKB_GSO_TCPV4:
->>   		case SKB_GSO_TCPV6:
->> @@ -182,7 +185,7 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
->>   		}
->>
->>   		/* Kernel has a special handling for GSO_BY_FRAGS. */
->> -		if (gso_size == GSO_BY_FRAGS)
->> +		if ((gso_size == GSO_BY_FRAGS) || (gso_size < min_gso_size))
->>   			return -EINVAL;
->>
->>   		/* Too small packets are not really GSO ones. */
->> --
->> 2.34.1
->>
 
