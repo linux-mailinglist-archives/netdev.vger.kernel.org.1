@@ -1,142 +1,88 @@
-Return-Path: <netdev+bounces-210747-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210748-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 926A1B14A6F
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 10:52:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 618B9B14A85
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 10:56:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF4873BB888
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 08:51:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A9DD0188CA2B
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 08:56:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C97128541C;
-	Tue, 29 Jul 2025 08:52:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IoQZHrfg"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1A5A286897;
+	Tue, 29 Jul 2025 08:56:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76D1478F34;
-	Tue, 29 Jul 2025 08:52:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A470285CBD
+	for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 08:56:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753779136; cv=none; b=X4mHdotNtuwIbrqO+417bWfY7IH9z1s8vOdmAZGdQRvktkT8DY0geuD6kVltVzKcV3OW+lCI1vqxJo7Euo5+V2x3ZE40XifI216GEwN1l6ImSJL93tSs3G2fBgrAYWT0yFjsuwfFDXXjoC5jEdbBzOMLMAquOv/tQSUzO4p/VLg=
+	t=1753779364; cv=none; b=I8mG4oC0GH/CUZMYRtT5Z9WeNSreZxlDEbaCExADA+tUA/Q77gvzxfkej8GDxvYJuelH+VkZBq/zohyjcqkI82jtNZKX8U9Agfp3Qve9Gs8VrgMnjUpwnyAwPceaHl2UINsA9MNdPzOWtn1TP3OvqCXxrBGfwCh+fd9Bd3EYChQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753779136; c=relaxed/simple;
-	bh=SN+9wrL45KOmZEoCo+QRSzNzRfauhceyHUari7IM4No=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rZ9QtYtdbkqotDF93dmFZYwbYLiYjysD+eKLJv/7PwaH5JpbL+uQQRa2k9UjLyAGW5V3SLpC00u3p/dWHwb79XIkV8irTZ3TlTJ5pu0Y+9YndDOKBCu0THZXYAkDLN+UywJwDEhSDROACNnLvV9sY/wNzWbU8qnWBHRNeTFYy6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IoQZHrfg; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4538bc52a8dso39216185e9.2;
-        Tue, 29 Jul 2025 01:52:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753779133; x=1754383933; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=puylhfEeh04//TXk56E+rvqvhJy4E6rc8s7DMainMJQ=;
-        b=IoQZHrfg3xUMzo3PxoRHiOgJNruj8+8No7dvuXU/ywgLZ9s4+iyrb027hnr7Ru2VNm
-         uEn4RIYeFRzEsltJ6X8Oc18tbwHeYZHkQkQb0ryUBGVSJVxXTQuT9rKe2mq6guHFvNZh
-         ONjRThZ+kGZcyO1FRlqinQkOyvc1s0+OAoZ1/vn/Hm4FAd/GNCBnyv+4HxeiWhm7ZBOb
-         N/rIg6LUzjx+WNcb+cgtcE/hhbm+TQZpp3+YxPeu4+UtXXnLBu9BM5isDlj8r3QCRN13
-         2haE/DYebbM2dg6NU19qRIrDsYEWhB+YqC2YbBxes8VRf7kniBQVxbmqHdf+0mVVAp91
-         ON6Q==
+	s=arc-20240116; t=1753779364; c=relaxed/simple;
+	bh=uBjlPTSujMJnq+adL8AQHG9GvvL9ojVDTJ8XvBEl+Ig=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=bXJeZ8ANTtK9CoTrY14ok/8/ZCL+FRTWDnkMoej8pLzAGrTK/rSWSG0j/rvbvUodfxNx/dn7yGMYDyyGulKY+jL8z598g+YTBNh/6TI6nAbUMFk3414pEY5eOs5wQ9SK7i7CipJ2UslnoAumtwIFe9vLQdpl/hbjZRyyNwJlY8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-87c0e531fc4so1282936339f.2
+        for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 01:56:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753779133; x=1754383933;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1753779362; x=1754384162;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=puylhfEeh04//TXk56E+rvqvhJy4E6rc8s7DMainMJQ=;
-        b=ibyLhln2Yy/NRr7eK+5YQlTRI3hDUWnZ7XqwZNs86CGxKjGWQMiSHCx1SHLbKNkwj7
-         A1pC/0KA+usl8BZLNDZj1go+poQ7fSN9El7LVJsLbS5kET45BojZv5Xt+fKO+QnK7KWt
-         wJP9K13xmkQ59ue/40G7yOrtxXMXwVqzw0cnX9mxekHTKm/IVO0wKPhzCOc2i8JVHOKq
-         Jk+b8g3zOnvAFsaANfMMdvYb0XUnF2yaQiNElWMd5d+jddgSGYRr9t59I7phW5wtgytt
-         6e4PKHhS1dKJ+piKQCjzSwovPMFUTSxKPxY5cZPP5bkLcKwNy0Vxv0R8PDDPbd/3ItNQ
-         HoKQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWYygsdA3K43wxJvy47ILUnjxhberk+0eziJ6EQhzy0edlDwLj5ayEIhFadHfoXRQzhvnU=@vger.kernel.org, AJvYcCWjKSOEX1lFel3nJMALPUj2qRtv95LVT62noHdoj445+3igafeRJGUUnRpMwSLF7JtKsffq4FN+@vger.kernel.org, AJvYcCWsDkgKAb4UXtOmCEJ+TZgiWYbYsLRHK8upXjN5dhjnpPfZse9RQbUvHxNV8SICuQgUqprFHNd/A3C35A==@vger.kernel.org, AJvYcCX/KdDNRONkL4WBlBYzh0AIjNKiCamtrH6Sv4u3d7kM6Brs2Vym8he5fZHkqsqVf/s/UP36pc6A/q2zuo/J@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz49sLNNvtJuIteqkfRI/HDVvlwXb+aElvIl/GmeT5CAh11aI/a
-	VXFU8VcrHawNYr3QtBAGR/BNlzVprPthFzB0Cym1KkZL8Gqbme6yW6lk
-X-Gm-Gg: ASbGncvorSVmIyLYDNdGUCSBO6ArhgzmJV3PHeBElJX9qUyes/awTi4UA08QWSJXnK2
-	NXwDNS7d5h72gn5H4a6B1LluOMOZ2gqh5b/mxH9+vCCQsEKizwRHqYkd+BfAiU5Uc5/SJJ4foPX
-	0v27plElWV6qYZ0Lm96KDoxK2aiiEaFfq8eQ9fL0Lm9hx0+J3K/E1nWqPjA8agDt4cp/ByCQKim
-	PCM6LQG34zL6LCT2Wo0A2dhweFvPt5Mk7o8lpEbMhbe45sToloL+aeGCYKb/vstg13NS5tYkhil
-	dWFPHrLndWLjNu66RgyryCyC4nNihMhIa26Dpp8WsxTs5VeQymneKEEWGT86dJwdcVmQ0prBxYt
-	TpCI/TBjKNShqd707vnRMJZEmR6zsa5/Ql8c=
-X-Google-Smtp-Source: AGHT+IEm4VTiD/JSN689v0JLsMbYqbkmePqxtHqQp6IbEjtW00P2+vOo5p+wkfxwZCh3NLYlWmARzg==
-X-Received: by 2002:a05:600c:458d:b0:43d:9d5:474d with SMTP id 5b1f17b1804b1-4587b16efb2mr105032655e9.0.1753779132350;
-        Tue, 29 Jul 2025 01:52:12 -0700 (PDT)
-Received: from ?IPV6:2620:10d:c096:325::26f? ([2620:10d:c092:600::1:72ea])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b77e216516sm10225969f8f.72.2025.07.29.01.52.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 29 Jul 2025 01:52:11 -0700 (PDT)
-Message-ID: <7d7eb3cd-db7e-4a9e-8671-4185b716bbc8@gmail.com>
-Date: Tue, 29 Jul 2025 09:53:31 +0100
+        bh=jlHNxi6fbgmpncRlD4B+e2NWpW9TaER/WSxCeS0bgh0=;
+        b=kGp8JinMJlQwtS/iQdyiMDII1H4hGXhJhY2VT86iXYRx/sWyxxi/bbbYHFAhlagNG8
+         19VRCGQfGyUZP9/EPteKOYr3DkRp14pAsT0NhJ8yZeRsGmGbCMEet81SEWq86/u+mx4H
+         jU137q3ooiu7vVezq2MpA2eYIVbJR7bBEgjgBiUAdwKKTxGtgTVROBTnzz0bvkGo6Cu2
+         tSCJS8Qf1K97HVBittcgev4d0TzMBpRWYsoSJM56zITy3snMqMG+PLyNsVk2M65AWb8p
+         +ix5zhhKDKd8F7h78mH1dUO2i/zXESF/jLYF/10LNui9Z8itvhB7qeN+No5FnRfT18JO
+         7lWw==
+X-Forwarded-Encrypted: i=1; AJvYcCWMxVEkczGPw5BlwOHXrfl3o2l/N4jxmR45kljlhnuAOQKct2RXaGkdR328c6xe9WedmQk3SuA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyr+QuRLzmI3xVj+FFiKYFzjNj1qM+PVreRL9urSQ0kxeQUGxJH
+	KNvHCLFEy4ehxq9i/SXHOFY0Q36Xc5nuCHuNolLP5juQVvBccU3EJ91VzFwFeY6a70X5obST7Nl
+	kIbS238IT/SDx1fv+r5uR1bgD1EUBcbNbGe22KNHtFOCKvQQjrERV+BITmYw=
+X-Google-Smtp-Source: AGHT+IEDK/1RkYgL4GVGXQltD8EKmq+l5LGMj/Z/HdZqdOw9HDMwzpgSQ4PEQ5MKZoIuzzePtUJqsR/qq6gvOPv5MKRU/3ZdTqq8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] mm, page_pool: introduce a new page type for page pool
- in page type
-To: Byungchul Park <byungchul@sk.com>
-Cc: Mina Almasry <almasrymina@google.com>, linux-mm@kvack.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- kernel_team@skhynix.com, harry.yoo@oracle.com, ast@kernel.org,
- daniel@iogearbox.net, davem@davemloft.net, kuba@kernel.org, hawk@kernel.org,
- john.fastabend@gmail.com, sdf@fomichev.me, saeedm@nvidia.com,
- leon@kernel.org, tariqt@nvidia.com, mbloch@nvidia.com,
- andrew+netdev@lunn.ch, edumazet@google.com, pabeni@redhat.com,
- akpm@linux-foundation.org, david@redhat.com, lorenzo.stoakes@oracle.com,
- Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org, surenb@google.com,
- mhocko@suse.com, horms@kernel.org, jackmanb@google.com, hannes@cmpxchg.org,
- ziy@nvidia.com, ilias.apalodimas@linaro.org, willy@infradead.org,
- brauner@kernel.org, kas@kernel.org, yuzhao@google.com,
- usamaarif642@gmail.com, baolin.wang@linux.alibaba.com, toke@redhat.com,
- bpf@vger.kernel.org, linux-rdma@vger.kernel.org
-References: <20250728052742.81294-1-byungchul@sk.com>
- <fc1ed731-33f8-4754-949f-2c7e3ed76c7b@gmail.com>
- <CAHS8izO6t0euQcNyhxXKPbrV7BZ1MfuMjrQiqKr-Y68t5XCGaA@mail.gmail.com>
- <da4a9efd-64b3-4dc5-a613-b73e17f160d6@gmail.com>
- <20250729010410.GC56089@system.software.com>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20250729010410.GC56089@system.software.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6602:1408:b0:87c:49fe:cafe with SMTP id
+ ca18e2360f4ac-8802298192emr2690950839f.11.1753779362649; Tue, 29 Jul 2025
+ 01:56:02 -0700 (PDT)
+Date: Tue, 29 Jul 2025 01:56:02 -0700
+In-Reply-To: <20250729072234.90576-1-contact@arnaud-lcm.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68888ca2.a70a0220.13df61.0000.GAE@google.com>
+Subject: Re: [syzbot] [bpf?] KASAN: slab-out-of-bounds Write in __bpf_get_stackid
+From: syzbot <syzbot+c9b724fbb41cf2538b7b@syzkaller.appspotmail.com>
+To: bpf@vger.kernel.org, contact@arnaud-lcm.com, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 7/29/25 02:04, Byungchul Park wrote:
-> On Mon, Jul 28, 2025 at 07:49:30PM +0100, Pavel Begunkov wrote:
->> On 7/28/25 19:39, Mina Almasry wrote:
->>> On Mon, Jul 28, 2025 at 11:35 AM Pavel Begunkov <asml.silence@gmail.com> wrote:
+Hello,
 
-...>>> This may be my bad since I said we should check if it's 0 initialized.
->>>
->>> It looks like on the devmem side as well we kvmalloc_array the niovs,
->>> and if I'm checking through the helpers right, kvmalloc_array does
->>> 0-initialize indeed.
->>
->> I wouldn't rely on that, it's just for zcrx I do:
->>
->> kvmalloc_array(...,  GFP_KERNEL | __GFP_ZERO);
-> 
-> For net_devmem_bind_dmabuf(), __GFP_ZERO will add bigger overhead than
-> just assignment, 'niov->pp = NULL'.
+syzbot has tested the proposed patch and the reproducer did not trigger any issue:
 
-That's not a place where you should care about zeroing overhead.
+Reported-by: syzbot+c9b724fbb41cf2538b7b@syzkaller.appspotmail.com
+Tested-by: syzbot+c9b724fbb41cf2538b7b@syzkaller.appspotmail.com
 
-> I'd like to ask you if you are still good with __GFP_ZERO overhead
-> before going ahead.
+Tested on:
 
-However, it might be easier for you to just assign it directly
-for devmem and let Mina add GFP_ZERO if he fancy the idea.
+commit:         cd7c97f4 Merge branch 'bpf-show-precise-rejected-funct..
+git tree:       bpf-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=15fe44a2580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=934611ae034ab218
+dashboard link: https://syzkaller.appspot.com/bug?extid=c9b724fbb41cf2538b7b
+compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=11bbb4a2580000
 
--- 
-Pavel Begunkov
-
+Note: testing is done by a robot and is best-effort only.
 
