@@ -1,139 +1,171 @@
-Return-Path: <netdev+bounces-210850-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210851-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33F81B151C3
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 18:58:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E2C8B151C9
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 19:01:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A2F33A7000
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 16:57:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 87BD2170482
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 17:01:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D37AF28DF27;
-	Tue, 29 Jul 2025 16:58:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A60E22D9E3;
+	Tue, 29 Jul 2025 17:01:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KlPT85UP"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KG6LmSSD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A440934CF5;
-	Tue, 29 Jul 2025 16:58:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8769A221F02
+	for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 17:01:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753808300; cv=none; b=gsUYRTGPsfi5HYXpvsxuTxdpMM2cU1CedzTmqxG876qokUrKBjVvjDiQHRU05G7KpTyYMwUp1k1dD7sV8JkUX76QIKpAawh5EhwpTDtHnrEiyD2aAAFA78JpLrFoCtZwyO5dmOAoNGuR9mepb9WGQXppAe69bD3o9AeB1Z9OOh8=
+	t=1753808487; cv=none; b=MhkspMQ1/pfbWHi11cNeKQ8FVP8xlYaTnnMqy6uSn3yXKp1SUPL+9Z/tRLv8y123r90Wui35CcYE4xJAslLECDGe09Bej58/xcqGXKMlcPQHc/UR/QYCZWtuJrR9WJ/LymsocULK2qOox4KZa4Nz7FVi5de0ikz2zpARdJwkmmo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753808300; c=relaxed/simple;
-	bh=Hb9smdHf0g56CpF8sBWDOF38RasuaUJ0puvOlmqvOjY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=er+5L2nDPiY9Fiyz6XYKYSuc1tBDDs2MEzKbk2E5oc2WOJ51C5s6qxdsHFGAfoePLV9ccl2ezr2ZsJPZpdEkM1o4A6bwu3RJ/+VcmO0VeDzgiUNS/uPhW30dlpSEBSi83EZ98OY6u/B+g001MfyVDxyNIiwlgtt2Sr9k5cpgl+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KlPT85UP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A35EC4CEF5;
-	Tue, 29 Jul 2025 16:58:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753808296;
-	bh=Hb9smdHf0g56CpF8sBWDOF38RasuaUJ0puvOlmqvOjY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=KlPT85UP6HQLETFTi6OtUJx9aRuyZBcfrc4BG0gLSetfvPPGD3huNlBLFo0yL5k22
-	 Mtx9Bqa1YmgYyOQeni00rZcMrLD1xMmj+A/AcO7/p2AZGoUM57od4OFqJgUlcbZPy1
-	 vwoHTTPkVS1J/e0Wea9moLyTMgW5hPt3gOmatUFpd7vYVdHguB+8uTPSslkTw2M+Nd
-	 AQ9lmMqb8djPioT5MzVN22+r099MIJTq6z508uKiDs1wcvKL++f6Yh4T1g5d9/PNTn
-	 kMtkM/iz68Sx+YMXAHzvOowhlMKSqVIczcTgLwLbXL7BKChTSMwB2V7Xl1e7J3sn/D
-	 v2qe7PZzt4j6A==
-Date: Tue, 29 Jul 2025 17:58:10 +0100
-From: Simon Horman <horms@kernel.org>
-To: Gatien Chevallier <gatien.chevallier@foss.st.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next v2 1/2] drivers: net: stmmac: handle start time
- set in the past for flexible PPS
-Message-ID: <20250729165810.GG1877762@horms.kernel.org>
-References: <20250729-relative_flex_pps-v2-0-3e5f03525c45@foss.st.com>
- <20250729-relative_flex_pps-v2-1-3e5f03525c45@foss.st.com>
+	s=arc-20240116; t=1753808487; c=relaxed/simple;
+	bh=uLae6rGolk8xBHVpk0k+TCgO/RkNYprItl9+NHm0eIk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=sHI5QGH5D4+D/GIz4IlFqQSmVvYL/OEEw1QTEJkxjSy/Tw0qhqud1xZHqXAF9P9i05nABSHJjiYZFkc19n9aFLpBGwFdPCeI4SmAviQV3S2LWSspBoQj6Jgn30adPRh1xckkQFgcpvVACYAKJqrhSjKfGhlHddcVahz+fULWzCQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KG6LmSSD; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-240718d5920so8345ad.1
+        for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 10:01:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1753808483; x=1754413283; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uLae6rGolk8xBHVpk0k+TCgO/RkNYprItl9+NHm0eIk=;
+        b=KG6LmSSDK+hyjnUs94SNNlRHnC3C9nxsijQy+ZHHQOa8scN8IdSMeh04YHwIGKLy/X
+         WNl84sAa64cRHuD3AHk+C3e4Ysmvhs0/SfQnXasKoNav81aGPpM7kKYkOFPoS7eoRka8
+         e+6kaJM3komxWXxdjrOlZYxPNw2W1ZGRAXF0e7pktkK4Jy49vBFWxSA+9GGAcvUYgJdt
+         7p0RKs0L+1Mcsvnc7+uQbXKUZ346DK4Qh+Kh3NDRxzqSUEoOGdXi8U3fR+a3HGzlaFmL
+         SYOLjVNXw7GR5dElTzge/E9Gqq29JCyN8lMjW7a1iTkaW5IHglK7pfRrxiISxCBZXkBg
+         sGdQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753808483; x=1754413283;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uLae6rGolk8xBHVpk0k+TCgO/RkNYprItl9+NHm0eIk=;
+        b=sZ69I4fDyASJHwVTPg0X3XgxbDoaml4FylKc32EmzPGbESIniox+vX8Eh9N1/sva56
+         Zd+gj9YSl8kjDolA4OXaDxF6MyJPxyfZxtkJnOBj7tRpzpY9t+OOmtqp419Vuf02ly2I
+         SiC1NarLm6vL9iIb27OEKs+yuhJkILm8XBcQoI8m+ns4ZzUgNsyYNlWQ7LUukpqEV1BW
+         zMHZAQghaIfN9qfkePZri6TSSeeUqQetHsAe/YXdsZvoYC/66Ah24l07qaRgkrVFYx/8
+         9a2dlJ7T3PhGmCaVukPWqyPATXFacXxRUqKMH7xNgeXJiQd1yBpa1EsGZikcDtTmr89C
+         BUBg==
+X-Forwarded-Encrypted: i=1; AJvYcCUBhWa9pJkSXkkYsCuhv3zHU7UnSquTbSrAO8e1ZcVQ9+G0+kdkeDJioqB4SvJKRRGwMdLYOZ4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzfMMnBSuF08azDdzJLjVk9XULHUG8L+2ttHMLByq+m7sK5ulOh
+	nEbRo74HObHrDWIDi24xMgpkh7RvruQx1n2UYQHd27czAYKSmxmPIQqQPYB76TZc13Wh2UWyG2t
+	ILkkI1lqGVANguG8FKb31tu6TpiEKf8CWx8ar+X4U
+X-Gm-Gg: ASbGnctZgjD8pZB1lOYbcpj332KNHlTMN9NNSpMXB17Nr8xSKsKR34duZjG5FQCeULE
+	SEyil7oS09/bkGsdtCuy1F8j8ew87C2eGXmuibIQuNwUXaU5yIEfEZNjEzvEve08D2GcB4Z/0+7
+	CdtCfHvx4NYN//UqCEq4DdeBV9POM64u5Evb7AO9wB+Sn54D6yxVaEvqTdUDvxzMQPC8LAMvluh
+	tWfZcWPrxhATFxBANl1KloWqr26fkgL4KT9xw==
+X-Google-Smtp-Source: AGHT+IH/aIePrtO3DxKPZfMv5xT5hgN2m1/8dW+fivE+rpVDY5hycH/CbbQptXJfzcn/03b0x58bdoKkBVaXd0RCIyo=
+X-Received: by 2002:a17:903:41c1:b0:231:f6bc:5c84 with SMTP id
+ d9443c01a7336-2406789c4c3mr4393805ad.8.1753808482526; Tue, 29 Jul 2025
+ 10:01:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250729-relative_flex_pps-v2-1-3e5f03525c45@foss.st.com>
+References: <cover.1753694913.git.asml.silence@gmail.com> <aIevvoYj7BcURD3F@mini-arch>
+ <df74d6e8-41cc-4840-8aca-ad7e57d387ce@gmail.com> <aIfb1Zd3CSAM14nX@mini-arch>
+ <0dbb74c0-fcd6-498f-8e1e-3a222985d443@gmail.com> <aIf0bXkt4bvA-0lC@mini-arch>
+ <CAHS8izPLxAQn7vK1xy+T2e+rhYnp7uX9RimEojMqNVpihPw4Rg@mail.gmail.com> <aIj5nuJJy1FVqbjC@mini-arch>
+In-Reply-To: <aIj5nuJJy1FVqbjC@mini-arch>
+From: Mina Almasry <almasrymina@google.com>
+Date: Tue, 29 Jul 2025 10:01:09 -0700
+X-Gm-Features: Ac12FXy8tZ7XbjPhzDO9LU7INNX5RkKHJldwZGYBjM7YamieRaoD_r2_UGXNfKQ
+Message-ID: <CAHS8izOh=ix30qQYDofSPG8byGDf1CDKKAdHU2WCovTMUe3oaw@mail.gmail.com>
+Subject: Re: [RFC v1 00/22] Large rx buffer support for zcrx
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: Pavel Begunkov <asml.silence@gmail.com>, Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
+	io-uring@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
+	Willem de Bruijn <willemb@google.com>, Paolo Abeni <pabeni@redhat.com>, andrew+netdev@lunn.ch, 
+	horms@kernel.org, davem@davemloft.net, sdf@fomichev.me, dw@davidwei.uk, 
+	michael.chan@broadcom.com, dtatulea@nvidia.com, ap420073@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 29, 2025 at 04:52:00PM +0200, Gatien Chevallier wrote:
-> In case the time arguments used for flexible PPS signal generation are in
-> the past, consider the arguments to be a time offset relative to the MAC
-> system time.
-> 
-> This way, past time use case is handled and it avoids the tedious work
-> of passing an absolute time value for the flexible PPS signal generation
-> while not breaking existing scripts that may rely on this behavior.
-> 
-> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c | 31 ++++++++++++++++++++++++
->  1 file changed, 31 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
-> index 3767ba495e78d210b0529ee1754e5331f2dd0a47..5c712b33851081b5ae1dbf2a0988919ae647a9e2 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
-> @@ -10,6 +10,8 @@
->  #include "stmmac.h"
->  #include "stmmac_ptp.h"
->  
-> +#define PTP_SAFE_TIME_OFFSET_NS	500000
-> +
->  /**
->   * stmmac_adjust_freq
->   *
-> @@ -172,6 +174,10 @@ static int stmmac_enable(struct ptp_clock_info *ptp,
->  
->  	switch (rq->type) {
->  	case PTP_CLK_REQ_PEROUT:
-> +		struct timespec64 curr_time;
-> +		u64 target_ns = 0;
-> +		u64 ns = 0;
-> +
+On Tue, Jul 29, 2025 at 9:41=E2=80=AFAM Stanislav Fomichev <stfomichev@gmai=
+l.com> wrote:
+>
+> On 07/28, Mina Almasry wrote:
+> > On Mon, Jul 28, 2025 at 3:06=E2=80=AFPM Stanislav Fomichev <stfomichev@=
+gmail.com> wrote:
+> > >
+> > > On 07/28, Pavel Begunkov wrote:
+> > > > On 7/28/25 21:21, Stanislav Fomichev wrote:
+> > > > > On 07/28, Pavel Begunkov wrote:
+> > > > > > On 7/28/25 18:13, Stanislav Fomichev wrote:
+> > > > ...>>> Supporting big buffers is the right direction, but I have th=
+e same
+> > > > > > > feedback:
+> > > > > >
+> > > > > > Let me actually check the feedback for the queue config RFC...
+> > > > > >
+> > > > > > it would be nice to fit a cohesive story for the devmem as well=
+.
+> > > > > >
+> > > > > > Only the last patch is zcrx specific, the rest is agnostic,
+> > > > > > devmem can absolutely reuse that. I don't think there are any
+> > > > > > issues wiring up devmem?
+> > > > >
+> > > > > Right, but the patch number 2 exposes per-queue rx-buf-len which
+> > > > > I'm not sure is the right fit for devmem, see below. If all you
+> > > >
+> > > > I guess you're talking about uapi setting it, because as an
+> > > > internal per queue parameter IMHO it does make sense for devmem.
+> > > >
+> > > > > care is exposing it via io_uring, maybe don't expose it from netl=
+ink for
+> > > >
+> > > > Sure, I can remove the set operation.
+> > > >
+> > > > > now? Although I'm not sure I understand why you're also passing
+> > > > > this per-queue value via io_uring. Can you not inherit it from th=
+e
+> > > > > queue config?
+> > > >
+> > > > It's not a great option. It complicates user space with netlink.
+> > > > And there are convenience configuration features in the future
+> > > > that requires io_uring to parse memory first. E.g. instead of
+> > > > user specifying a particular size, it can say "choose the largest
+> > > > length under 32K that the backing memory allows".
+> > >
+> > > Don't you already need a bunch of netlink to setup rss and flow
+> > > steering? And if we end up adding queue api, you'll have to call that
+> > > one over netlink also.
+> > >
+> >
+> > I'm thinking one thing that could work is extending bind-rx with an
+> > optional rx-buf-len arg, which in the code translates into devmem
+> > using the new net_mp_open_rxq variant which not only restarts the
+> > queue but also sets the size. From there the implementation should be
+> > fairly straightforward in devmem. devmem currently rejects any pp for
+> > which pp.order !=3D 0. It would need to start accepting that and
+> > forwarding the order to the gen_pool doing the allocations, etc.
+>
+> Right, that's the logical alternative, to put that rx-buf-len on the
+> binding to control the size of the niovs. But then what do we do with
+> the queue's rx-buf-len? bnxt patch in the series does
+> page_pool_dev_alloc_frag(..., bp->rx_page_size). bp->rx_page_size comes
+> from netlink. Does it need to be inherited from the pp in the devmem
+> case somehow?
 
-I think you need to wrap this case in {}, as is already done for the following
-case.
+I need to review the series closely, but the only thing that makes
+sense to me off the bat is that the rx-buf-len option sets the
+rx-buf-len of the queue as if you called the queue-set API in a
+separate call (and the unbind would reset the value to default).
 
-Clang 20.1.8 W=1 build warn about the current arrangement as follows.
-
-  .../stmmac_ptp.c:177:3: warning: label followed by a declaration is a C23 extension [-Wc23-extensions]
-    177 |                 struct timespec64 curr_time;
-        |                 ^
-  1 warning generated.
-
-GCC 8.5.0 (but not 15.1.0) also flags this problem.
-
-Also, please note:
-
-## Form letter - net-next-closed
-
-The merge window for v6.17 has begun and therefore net-next is closed
-for new drivers, features, code refactoring and optimizations. We are
-currently accepting bug fixes only.
-
-Please repost when net-next reopens after 11th August.
-
-RFC patches sent for review only are obviously welcome at any time.
-
-See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
-
--- 
-pw-bot: defer
+--=20
+Thanks,
+Mina
 
