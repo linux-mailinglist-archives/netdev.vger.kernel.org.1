@@ -1,169 +1,178 @@
-Return-Path: <netdev+bounces-210695-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210697-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63097B14588
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 03:05:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E527AB14594
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 03:10:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 97B2617B908
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 01:05:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 376063B9C8F
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 01:10:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C520191484;
-	Tue, 29 Jul 2025 01:05:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="C5+sfeZd"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3936F19EED3;
+	Tue, 29 Jul 2025 01:10:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B1F216A94A
-	for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 01:05:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFE4C19DF8B;
+	Tue, 29 Jul 2025 01:10:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753751147; cv=none; b=d3AxD0pTvjFSdz9FonP//O4CGlBS5Aiuti+N7l1jUiBB+G/J1agSxXBc/e02ZhqkbvQIygtN9cg2Wgjx/at9MlgwcEpUA4Gm8eUE7/YcbpjjdKooDgAbEtKvGwiTpBfv/cgZJZioATQOnzS2TBDTSdcrnOb5Lee/TWNnHWi8v9I=
+	t=1753751434; cv=none; b=j0NJdCGJMr7I6IqeRfYNza4hb4HAXHJRBkWox0jr94NmJl/vHOT0kb5GCg74EGs69oZTmnEnLRRzehX3Ko9jVMelfWBgRTq42gzqipxwAsV27O2/Zn4Un6MdtfPHrcYPRrnJaNCM4HsLkXFAGFEBsgFCHDCjP+8VdtRYVpA/n/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753751147; c=relaxed/simple;
-	bh=7VKZ22ymvE1qR2Je4hYimjGdZHOaHj6ErYIB16GKhT0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZwEM29G49UbOy7PVQzk8odXRom1Cb6zIK7r2JpEVNGS5nspxv7XR44wH2PJLN6hh5gfqkK2+FHck4RGpsSC+8DhRrFrLToa8gu0NTTx14/e8h5A2p1UX88GQ49qONohonLQu5IX7iHUH4umoh0Bjq2x4MAtw2G5y1g+mY9N1ryI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=C5+sfeZd; arc=none smtp.client-ip=91.218.175.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <b3f25e61-7b0c-4576-baae-9b498c3b8748@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1753751133;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+IYY06TwHJU1yH0y4CfYISRGqhDcJ8AL5MaZbCvCfeA=;
-	b=C5+sfeZdfJYiqsUIVtzNbtOitLfUP0dsF/S2g34I0zqcTQJxNDmTjxNlTwkldEu2DKXz+S
-	FtE4wg+Ldb7KzrvNDfFWfb4g7ki3YCVA44vM/8jGQ5PFEBGrMKI8IPHC5X/gx4jPUxrqJo
-	SVu9k2n8jeVvsmM+3N3KtrueN1SWB1s=
-Date: Mon, 28 Jul 2025 18:05:26 -0700
+	s=arc-20240116; t=1753751434; c=relaxed/simple;
+	bh=rFQHPKdHs7l63lkOcvXWDFEenJTQG4Ry3291fBhwk90=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CjleSFWtvUjIXuRpOcs1S29761f2MNDqEczBRBzjuVTpCnPYPYupP1l2doF71Jc4wRWTsIFoP2Au7pQwLiH5ewG0fcU00I8Xc/1w0cITQCTIbmFnFOMCI0D5o4353jGAesJo1umUwajch1PbS58udeibVM2G0uOabgQ4/8lsEsI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-681ff7000002311f-47-68881f858d7e
+Date: Tue, 29 Jul 2025 10:10:24 +0900
+From: Byungchul Park <byungchul@sk.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, hawk@kernel.org,
+	toke@redhat.com, asml.silence@gmail.com, kernel_team@skhynix.com
+Subject: Re: [RFC net-next] netmem: replace __netmem_clear_lsb() with
+ netmem_to_nmdesc()
+Message-ID: <20250729011024.GD56089@system.software.com>
+References: <20250728042050.24228-1-byungchul@sk.com>
+ <CAHS8izPv8zmPaxzCSPAnybiCc0KrqjEZA+x5wpFOE8u=_nM1WA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v3 3/4] bpf: add bpf_icmp_send_unreach cgroup_skb
- kfunc
-To: Mahe Tardy <mahe.tardy@gmail.com>
-Cc: alexei.starovoitov@gmail.com, andrii@kernel.org, ast@kernel.org,
- bpf@vger.kernel.org, coreteam@netfilter.org, daniel@iogearbox.net,
- fw@strlen.de, john.fastabend@gmail.com, netdev@vger.kernel.org,
- netfilter-devel@vger.kernel.org, oe-kbuild-all@lists.linux.dev,
- pablo@netfilter.org, lkp@intel.com
-References: <202507270940.kXGmRbg5-lkp@intel.com>
- <20250728094345.46132-1-mahe.tardy@gmail.com>
- <20250728094345.46132-4-mahe.tardy@gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20250728094345.46132-4-mahe.tardy@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAHS8izPv8zmPaxzCSPAnybiCc0KrqjEZA+x5wpFOE8u=_nM1WA@mail.gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpikeLIzCtJLcpLzFFi42LhesuzSLdVviPD4PwpG4vVPyos5qzaxmgx
+	53wLi8XTY4/YLfa0b2e2eNR/gs3iwrY+VovLu+awWRxbIGbx7fQbRotLhx+xOHB7bFl5k8lj
+	56y77B4LNpV6bFrVyebxft9VNo/Pm+QC2KK4bFJSczLLUov07RK4Mp7s3shSME++4ui8I0wN
+	jJsluhg5OSQETCT2PP/LBmNf7WxjB7FZBFQlOrZ3M4PYbALqEjdu/ASzRQQ0JZbsm8gKYjML
+	fGSUePQntouRg0NYIEpiyxEmkDCvgIXE3j0nGEHCQgI1EpOmp0OEBSVOznzCAtGpLvFn3iVm
+	kBJmAWmJ5f84IMLyEs1bZ4Mt4hQIlDgydRlYuaiAssSBbceBpnMBHXmbTeLppKfMEBdLShxc
+	cYNlAqPgLCQrZiFZMQthxSwkKxYwsqxiFMrMK8tNzMwx0cuozMus0EvOz93ECIyZZbV/oncw
+	froQfIhRgINRiYc3o7M9Q4g1say4MvcQowQHs5IIb8HStgwh3pTEyqrUovz4otKc1OJDjNIc
+	LErivEbfylOEBNITS1KzU1MLUotgskwcnFINjOJXU8u3mbk2SLLlRdWpsy5UKFK7wbNx4etT
+	yZpnCvV1jkh7KT6d+4WLqSMw6eiJFT1LrOK+Bs2ZssR2QUTo3+h5dVY+95J5WucHWp3+pvLm
+	dECXrFj2q6czkuVcF8Wy7Q1kEF59dc635A6Lk44xL0VmN614cSvN9PO8Y0tnLZOdWfbM7ZuG
+	oxJLcUaioRZzUXEiAB6sZxeVAgAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrJLMWRmVeSWpSXmKPExsXC5WfdrNsq35FhcOCigcXqHxUWc1ZtY7SY
+	c76FxeLpsUfsFnvatzNbPOo/wWZxeO5JVosL2/pYLS7vmsNmcWyBmMW3028YLS4dfsTiwOOx
+	ZeVNJo+ds+6yeyzYVOqxaVUnm8f7fVfZPBa/+MDk8XmTXAB7FJdNSmpOZllqkb5dAlfGk90b
+	WQrmyVccnXeEqYFxs0QXIyeHhICJxNXONnYQm0VAVaJjezcziM0moC5x48ZPMFtEQFNiyb6J
+	rCA2s8BHRolHf2K7GDk4hAWiJLYcYQIJ8wpYSOzdc4IRJCwkUCMxaXo6RFhQ4uTMJywQneoS
+	f+ZdYgYpYRaQllj+jwMiLC/RvHU22CJOgUCJI1OXgZWLCihLHNh2nGkCI98sJJNmIZk0C2HS
+	LCSTFjCyrGIUycwry03MzDHVK87OqMzLrNBLzs/dxAiMgGW1fybuYPxy2f0QowAHoxIPb0Zn
+	e4YQa2JZcWXuIUYJDmYlEd6CpW0ZQrwpiZVVqUX58UWlOanFhxilOViUxHm9wlMThATSE0tS
+	s1NTC1KLYLJMHJxSDYwX5uYYbPm06viWxNrH910cjQSu9yRsrmZjslu6xdB8xsozPQ56blp/
+	ZCJkpjwTCRDNnfMs2cXCotq0uEbrf6FAs9WPmBn7AqYY6sQ9N4u+tljsCvv82EkiE7RsVjku
+	jNllPEVv+Q4+s6qLRs9kXpx4stqjuazIq/TrsaigwtNqdgqvdm67X6XEUpyRaKjFXFScCACK
+	rDNefAIAAA==
+X-CFilter-Loop: Reflected
 
-On 7/28/25 2:43 AM, Mahe Tardy wrote:
-> This is needed in the context of Tetragon to provide improved feedback
-> (in contrast to just dropping packets) to east-west traffic when blocked
-> by policies using cgroup_skb programs.
+On Mon, Jul 28, 2025 at 10:44:31AM -0700, Mina Almasry wrote:
+> On Sun, Jul 27, 2025 at 9:21 PM Byungchul Park <byungchul@sk.com> wrote:
+> >
+> > Now that we have struct netmem_desc, it'd better access the pp fields
+> > via struct netmem_desc rather than struct net_iov.
+> >
+> > Introduce netmem_to_nmdesc() for safely converting netmem_ref to
+> > netmem_desc regardless of the type underneath e.i. netmem_desc, net_iov.
+> >
+> > While at it, remove __netmem_clear_lsb() and make netmem_to_nmdesc()
+> > used instead.
+> >
+> > Signed-off-by: Byungchul Park <byungchul@sk.com>
 > 
-> This reuse concepts from netfilter reject target codepath with the
-> differences that:
-> * Packets are cloned since the BPF user can still return SK_PASS from
->    the cgroup_skb progs and the current skb need to stay untouched
+> Thank you for working on paying this tech debt!
 
-This needs more details. Which field(s) of the skb are changed by the kfunc, the 
-skb_dst_set in ip[6]_route_reply_fetch_dst() and/or the code path in the 
-icmp[v6]_send() ?
+I thought it was appropriate to organize the code I modified to some
+extent.
 
->    (cgroup_skb hooks only allow read-only skb payload).
-> * Since cgroup_skb programs are called late in the stack, checksums do
->    not need to be computed or verified, and IPv4 fragmentation does not
->    need to be checked (ip_local_deliver should take care of that
->    earlier).
+> > ---
+> >  include/net/netmem.h   | 33 ++++++++++++++++-----------------
+> >  net/core/netmem_priv.h | 16 ++++++++--------
+> >  2 files changed, 24 insertions(+), 25 deletions(-)
+> >
+> > diff --git a/include/net/netmem.h b/include/net/netmem.h
+> > index f7dacc9e75fd..33ae444a9745 100644
+> > --- a/include/net/netmem.h
+> > +++ b/include/net/netmem.h
+> > @@ -265,24 +265,23 @@ static inline struct netmem_desc *__netmem_to_nmdesc(netmem_ref netmem)
+> >         return (__force struct netmem_desc *)netmem;
+> >  }
+> >
+> > -/* __netmem_clear_lsb - convert netmem_ref to struct net_iov * for access to
+> > - * common fields.
+> > - * @netmem: netmem reference to extract as net_iov.
+> > +/* netmem_to_nmdesc - convert netmem_ref to struct netmem_desc * for
+> > + * access to common fields.
+> > + * @netmem: netmem reference to get netmem_desc.
+> >   *
+> > - * All the sub types of netmem_ref (page, net_iov) have the same pp, pp_magic,
+> > - * dma_addr, and pp_ref_count fields at the same offsets. Thus, we can access
+> > - * these fields without a type check to make sure that the underlying mem is
+> > - * net_iov or page.
+> > + * All the sub types of netmem_ref (netmem_desc, net_iov) have the same
+> > + * pp, pp_magic, dma_addr, and pp_ref_count fields via netmem_desc.
+> >   *
+> > - * The resulting value of this function can only be used to access the fields
+> > - * that are NET_IOV_ASSERT_OFFSET'd. Accessing any other fields will result in
+> > - * undefined behavior.
+> > - *
 > 
-> Signed-off-by: Mahe Tardy <mahe.tardy@gmail.com>
-> ---
->   net/core/filter.c | 61 +++++++++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 61 insertions(+)
-> 
-> diff --git a/net/core/filter.c b/net/core/filter.c
-> index 7a72f766aacf..050872324575 100644
-> --- a/net/core/filter.c
-> +++ b/net/core/filter.c
-> @@ -85,6 +85,10 @@
->   #include <linux/un.h>
->   #include <net/xdp_sock_drv.h>
->   #include <net/inet_dscp.h>
-> +#include <linux/icmp.h>
-> +#include <net/icmp.h>
-> +#include <net/route.h>
-> +#include <net/ip6_route.h>
-> 
->   #include "dev.h"
-> 
-> @@ -12148,6 +12152,53 @@ __bpf_kfunc int bpf_sock_ops_enable_tx_tstamp(struct bpf_sock_ops_kern *skops,
->   	return 0;
->   }
-> 
-> +__bpf_kfunc int bpf_icmp_send_unreach(struct __sk_buff *__skb, int code)
-> +{
-> +	struct sk_buff *skb = (struct sk_buff *)__skb;
-> +	struct sk_buff *nskb;
-> +
-> +	switch (skb->protocol) {
-> +	case htons(ETH_P_IP):
-> +		if (code < 0 || code > NR_ICMP_UNREACH)
-> +			return -EINVAL;
-> +
-> +		nskb = skb_clone(skb, GFP_ATOMIC);
-> +		if (!nskb)
-> +			return -ENOMEM;
-> +
-> +		if (ip_route_reply_fetch_dst(nskb) < 0) {
-> +			kfree_skb(nskb);
-> +			return -EHOSTUNREACH;
-> +		}
-> +
-> +		icmp_send(nskb, ICMP_DEST_UNREACH, code, 0);
-> +		kfree_skb(nskb);
-> +		break;
-> +#if IS_ENABLED(CONFIG_IPV6)
-> +	case htons(ETH_P_IPV6):
-> +		if (code < 0 || code > ICMPV6_REJECT_ROUTE)
-> +			return -EINVAL;
-> +
-> +		nskb = skb_clone(skb, GFP_ATOMIC);
-> +		if (!nskb)
-> +			return -ENOMEM;
-> +
-> +		if (ip6_route_reply_fetch_dst(nskb) < 0) {
+> I think instead of removing this warning, we want to add an
+> NET_IOV_ASSERT_OFFSET that asserts that net_iov->netmem_desc and
+> page->netmem_desc are in the same offset, and then add a note here
+> that this works because we assert that the netmem_desc offset in both
+> net_iov and page are the same.
 
- From a very quick look at icmpv6_send(), it does its own route lookup. I 
-haven't looked at the v4 yet.
+It doesn't have to have the same offset.  Why do you want it?  Is it for
+some optimizaiton?  Or I think it's unnecessary constraint.
 
-I am likely missing some details. Can you explain why it needs to do a lookup 
-before calling icmpv6_send()?
+> > - * Return: the netmem_ref cast to net_iov* regardless of its underlying type.
+> > + * Return: the pointer to struct netmem_desc * regardless of its
+> > + * underlying type.
+> >   */
+> > -static inline struct net_iov *__netmem_clear_lsb(netmem_ref netmem)
+> > +static inline struct netmem_desc *netmem_to_nmdesc(netmem_ref netmem)
+> >  {
+> > -       return (struct net_iov *)((__force unsigned long)netmem & ~NET_IOV);
+> > +       if (netmem_is_net_iov(netmem))
+> > +               return &((struct net_iov *)((__force unsigned long)netmem &
+> > +                                           ~NET_IOV))->desc;
+> > +
+> > +       return __netmem_to_nmdesc(netmem);
+> 
+> The if statement generates overhead. I'd rather avoid it. We can
+> implement netmem_to_nmdesc like this, no?
+> 
+> netmem_to_nmdesc(netmem_ref netmem)
+> {
+>   return (struct netmem_desc)((__force unsigned long)netmem & ~NET_IOV);
+> }
 
-> +			kfree_skb(nskb);
-> +			return -EHOSTUNREACH;
-> +		}
-> +
-> +		icmpv6_send(nskb, ICMPV6_DEST_UNREACH, code, 0);
-> +		kfree_skb(nskb);
-> +		break;
-> +#endif
-> +	default:
-> +		return -EPROTONOSUPPORT;
-> +	}
-> +
-> +	return SK_DROP;
-> +}
-> +
+I see.  You want this kind of optimization.  I will do this way if you
+want.
+
+> Because netmem_desc is the first element in both net_iov and page for
+> the moment. (yes I know that will change eventually, but we don't have
+> to incur overhead of an extra if statement until netmem_desc is
+> removed from page, right?)
+
+Okay.
+
+	Byungchul
+> 
+> 
+> --
+> Thanks,
+> Mina
 
