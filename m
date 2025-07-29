@@ -1,275 +1,652 @@
-Return-Path: <netdev+bounces-210781-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210782-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC13EB14C6B
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 12:42:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 133AAB14C8E
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 12:51:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2830D7A7E7E
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 10:40:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2DABC3A11B5
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 10:51:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFDA2289824;
-	Tue, 29 Jul 2025 10:42:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53D6B28B3EB;
+	Tue, 29 Jul 2025 10:51:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XOC2RLBN"
 X-Original-To: netdev@vger.kernel.org
-Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 106272820B7;
-	Tue, 29 Jul 2025 10:42:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34B2122D79F;
+	Tue, 29 Jul 2025 10:51:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753785736; cv=none; b=EOms82XzYlzyvjQhvHrxZV6cCPf/NvZ+xEwuzfjAhHaQYKgtoaf5meFEG3/3/wSyFwLFINEbRTmjY1CVYAQXqgHsnRC/XHAm7+Wq2ioSbVazXRR1KubI060RTt9alpqB0yldVHbheefbHCa17SJBySKL8zjxFUCp+AfdukVrIMg=
+	t=1753786304; cv=none; b=kEKJI2kVUZYsRNeVZ/Cw/nNgVKWADFlXeoP4U7L3P9tD08qHZPhW5JDEVlz1Be0zOVxTMzrFWEwJiCsLwxfRtyKH1BFvYUNQof2l4F2zvP5gEDAD6EzU4yeXXy8wvRQsqVQ4t++YKi2DJ9tAETsZzYD3enGERtJGTwzgliSH/0M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753785736; c=relaxed/simple;
-	bh=W7YJezJUZzezvdRsFFU0wRAV26gCXMfVG6y8Kv9hR2Q=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=JZjjSUlp/L9mzWOhPkqxmx1dKATWZlNrPvO/s8Lf+pLHm+UJIuhbvcfGUdJtNrtGT3jMD6WqrIcYgcMlO5M2gZvf+WRKzTA07BNzQAdUvp3srGWyS/iZ47PIY+WL6eHqOVU9liPEVhhs0xyHUacrFGOoks0/xaPN4bo4R7ZXdUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-669ff7000002311f-c4-6888a580841f
-From: Byungchul Park <byungchul@sk.com>
-To: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: kernel_team@skhynix.com,
+	s=arc-20240116; t=1753786304; c=relaxed/simple;
+	bh=euClTFKCjc/gTjOTvgcnP1lCy9vOs0inJmAec9++6sg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=fCj/3I6UQP1A1pISdniRvKTCITMm39Bjjhu/D+GhtQIpe4sCnF6GZJDJLZ/HQGhDQ1kjC0oekR2np8e9JFMeIYQb+K9uO+32dmaYciD/JBbvlASBaH9yN3OWEjzG+l5FhLjMqcvgBLOcQorKbIsrOoBWyTDMAMNAuiLkVD4oKr8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XOC2RLBN; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1753786302; x=1785322302;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=euClTFKCjc/gTjOTvgcnP1lCy9vOs0inJmAec9++6sg=;
+  b=XOC2RLBN8CTU5G3bZbQFTCsMIvvzVE7giRUSJA2k4wTNJn87pzc6dfDP
+   nMmvEPQ+He0feI5CPKE0FCVxwUOwbkd5NJ9XWjoKDrjjyjNUKndmY6vW1
+   o6dytGV9FZ8zeFtFM+Glpq6ozTyoK3XMd1bB8TyYS8TE2aW0SZATIoehT
+   oU0PTaTpRa/92u8yKPqTErhwrf8cwSOS59QxPs+uIcvA7ugqj+ejJborV
+   ssDP4qiGrT5vFKY5+YKdutStW+QpGtnJt0V1y/+FfRK0dFmBhStX5hArh
+   nHNphljO3IMoEdFNpfU/iwdWgg4kbY+hNJtC+ZcXJroWWcFGhNo2eoesj
+   g==;
+X-CSE-ConnectionGUID: 4h1/D0tmSnSlUs61/Qtpkg==
+X-CSE-MsgGUID: ycGsIBsnSrGr1aofJoGFYQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11505"; a="81489685"
+X-IronPort-AV: E=Sophos;i="6.16,348,1744095600"; 
+   d="scan'208";a="81489685"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jul 2025 03:51:41 -0700
+X-CSE-ConnectionGUID: kYntZhajTqiABR1+/vn+ag==
+X-CSE-MsgGUID: pDbrRPPuSOi1Ds4GE1AkOA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,348,1744095600"; 
+   d="scan'208";a="163014339"
+Received: from amlin-018-114.igk.intel.com ([10.102.18.114])
+  by fmviesa009.fm.intel.com with ESMTP; 29 Jul 2025 03:51:37 -0700
+From: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+To: anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	horms@kernel.org,
+	sdf@fomichev.me,
 	almasrymina@google.com,
-	hawk@kernel.org,
-	toke@redhat.com,
-	asml.silence@gmail.com
-Subject: [RFC net-next v2] netmem: replace __netmem_clear_lsb() with netmem_to_nmdesc()
-Date: Tue, 29 Jul 2025 19:41:58 +0900
-Message-Id: <20250729104158.14975-1-byungchul@sk.com>
-X-Mailer: git-send-email 2.17.1
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFuphluLIzCtJLcpLzFFi42LhesuzULdhaUeGwduD2harf1RYzFm1jdFi
-	zvkWFounxx6xW+xp385s8aj/BJvFhW19rBaXd81hszi2QMzi2+k3jBaXDj9iceD22LLyJpPH
-	zll32T0WbCr12LSqk83j/b6rbB6fN8kFsEVx2aSk5mSWpRbp2yVwZbx+p1fw2KKi44pMA2Of
-	fhcjB4eEgInE/qe1XYycYOaZ3bNYQWw2AXWJGzd+MoPYIgJWEg0b1wHZXBzMAvcZJZ5cOssG
-	khAWCJc49eMhWAOLgKrEl+Z77CA2r4CpxJn3bxkhhspLrN5wAKxZQuAnq8T11U2sEAlJiYMr
-	brBMYORewMiwilEoM68sNzEzx0QvozIvs0IvOT93EyMwjJbV/onewfjpQvAhRgEORiUe3ozO
-	9gwh1sSy4srcQ4wSHMxKIrwFS9syhHhTEiurUovy44tKc1KLDzFKc7AoifMafStPERJITyxJ
-	zU5NLUgtgskycXBKNTDO+mgyRTM8avs7BeX6j7va7PYaMk/LWlEdNzX4ipPi9/rQlQt/fqw/
-	evJVwxx1wVhb79NvYxmLBH/POp6htT9sT7zZufvXnm+yYL275KJhztqS+adKD1gLx/t3RX3Z
-	1HnwkfjDj2smu544fVNI83pK5EHBT+WR2nd/cK9jYGrczNepO0P0xaJzSizFGYmGWsxFxYkA
-	uKaDcx8CAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrCJMWRmVeSWpSXmKPExsXC5WfdrNuwtCPD4OolWYvVPyos5qzaxmgx
-	53wLi8XTY4/YLfa0b2e2eNR/gs3i8NyTrBYXtvWxWlzeNYfN4tgCMYtvp98wWlw6/IjFgcdj
-	y8qbTB47Z91l91iwqdRj06pONo/3+66yeSx+8YHJ4/MmuQD2KC6blNSczLLUIn27BK6M1+/0
-	Ch5bVHRckWlg7NPvYuTkkBAwkTizexYriM0moC5x48ZPZhBbRMBKomHjOiCbi4NZ4D6jxJNL
-	Z9lAEsIC4RKnfjwEa2ARUJX40nyPHcTmFTCVOPP+LSPEUHmJ1RsOME9g5FjAyLCKUSQzryw3
-	MTPHVK84O6MyL7NCLzk/dxMjMCyW1f6ZuIPxy2X3Q4wCHIxKPLwZne0ZQqyJZcWVuYcYJTiY
-	lUR4C5a2ZQjxpiRWVqUW5ccXleakFh9ilOZgURLn9QpPTRASSE8sSc1OTS1ILYLJMnFwSjUw
-	rq7N3+vrpxT5Rn3Cw7TgePellcVLsvbfV0y6JF5SmPJ7Wv+/8A/WN2cq8Mxt+bxW2fgY8/Ld
-	6+qeyi4W0ecqXrhlR9nhbdkRM+oXOJo7P5SfcUtfd8bbeem9yTLt7t7Sc+PfflmfnPPb5r54
-	YKP+wd0Hdq9s3P2E5YgC37mtuV99co2ehxsxK7EUZyQaajEXFScCAN92Ix0HAgAA
-X-CFilter-Loop: Reflected
+	asml.silence@gmail.com,
+	leitao@debian.org,
+	kuniyu@google.com
+Cc: linux-kernel@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Subject: [RFC PATCH] net: add net-device TX clock source selection framework
+Date: Tue, 29 Jul 2025 12:45:28 +0200
+Message-Id: <20250729104528.1984928-1-arkadiusz.kubalewski@intel.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Changes from RFC:
-	1. Optimize the implementation of netmem_to_nmdesc to use less
-	   instructions (feedbacked by Pavel)
+Add support for user-space control over network device transmit clock
+sources through a new sysfs interface.
+A network device may support multiple TX clock sources (OCXO, SyncE
+reference, external reference clocks) which are critical for
+time-sensitive networking applications and synchronization protocols.
 
----8<---
-From 6a0dbaecbf9a2425afe73565914eaa762c5d15c8 Mon Sep 17 00:00:00 2001
-From: Byungchul Park <byungchul@sk.com>
-Date: Tue, 29 Jul 2025 19:34:12 +0900
-Subject: [RFC net-next v2] netmem: replace __netmem_clear_lsb() with netmem_to_nmdesc()
+This patch introduces:
 
-Now that we have struct netmem_desc, it'd better access the pp fields
-via struct netmem_desc rather than struct net_iov.
+1. Core TX clock framework (net/core/tx_clk.c):
+- per net-device clock source registration and management
+- sysfs interface under /sys/class/net/<device>/tx_clk/
+- thread-safe clock switching by using mutex locking
 
-Introduce netmem_to_nmdesc() for safely converting netmem_ref to
-netmem_desc regardless of the type underneath e.i. netmem_desc, net_iov.
+2. Generic netdev integration:
+- new netdev_tx_clk_ops structure for driver callbacks
+- TX clock list and kobject directory in struct net_device
+- registration/cleanup functions for driver use
 
-While at it, remove __netmem_clear_lsb() and make netmem_to_nmdesc()
-used instead.
+3. Intel ICE driver implementation:
+- support for E825 series network cards
+- three clock sources: OCXO (default), SyncE_ref, ext_ref
+- per-PF clock state management
 
-Suggested-by: Pavel Begunkov <asml.silence@gmail.com>
-Signed-off-by: Byungchul Park <byungchul@sk.com>
+4. Kconfig option NET_TX_CLK:
+- optional feature + user documentation
+
+User interface:
+- Read /sys/class/net/<device>/tx_clk/<clock_name> to get status (0/1)
+- Write "1" to switch to that clock source
+- Writing "0" is not supported (one clock must always be active)
+
+Example usage:
+  # Check current clock status
+  $ cat /sys/class/net/eth0/tx_clk/*
+
+  # Switch to external reference clock
+  $ echo 1 > /sys/class/net/eth0/tx_clk/ext_ref
+
+Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
 ---
- include/net/netmem.h   | 66 +++++++++++++++++++++---------------------
- net/core/netmem_priv.h | 16 +++++-----
- 2 files changed, 41 insertions(+), 41 deletions(-)
+ drivers/net/ethernet/intel/ice/Makefile     |   1 +
+ drivers/net/ethernet/intel/ice/ice.h        |   5 +
+ drivers/net/ethernet/intel/ice/ice_lib.c    |   6 +
+ drivers/net/ethernet/intel/ice/ice_main.c   |   6 +
+ drivers/net/ethernet/intel/ice/ice_tx_clk.c | 113 +++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_tx_clk.h |  17 +++
+ include/linux/netdev_tx_clk.h               |  43 ++++++
+ include/linux/netdevice.h                   |   6 +
+ net/Kconfig                                 |  21 +++
+ net/Makefile                                |   1 +
+ net/core/Makefile                           |   1 +
+ net/core/tx_clk.c                           | 150 ++++++++++++++++++++
+ 12 files changed, 370 insertions(+)
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_tx_clk.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_tx_clk.h
+ create mode 100644 include/linux/netdev_tx_clk.h
+ create mode 100644 net/core/tx_clk.c
 
-diff --git a/include/net/netmem.h b/include/net/netmem.h
-index f7dacc9e75fd..651e2c62d1dd 100644
---- a/include/net/netmem.h
-+++ b/include/net/netmem.h
-@@ -247,6 +247,23 @@ static inline unsigned long netmem_pfn_trace(netmem_ref netmem)
- 	return page_to_pfn(netmem_to_page(netmem));
+diff --git a/drivers/net/ethernet/intel/ice/Makefile b/drivers/net/ethernet/intel/ice/Makefile
+index d0f9c9492363..31f0dc580900 100644
+--- a/drivers/net/ethernet/intel/ice/Makefile
++++ b/drivers/net/ethernet/intel/ice/Makefile
+@@ -60,3 +60,4 @@ ice-$(CONFIG_XDP_SOCKETS) += ice_xsk.o
+ ice-$(CONFIG_ICE_SWITCHDEV) += ice_eswitch.o ice_eswitch_br.o
+ ice-$(CONFIG_GNSS) += ice_gnss.o
+ ice-$(CONFIG_ICE_HWMON) += ice_hwmon.o
++ice-$(CONFIG_NET_TX_CLK) += ice_tx_clk.o
+diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
+index 2098f00b3cd3..116c8668f504 100644
+--- a/drivers/net/ethernet/intel/ice/ice.h
++++ b/drivers/net/ethernet/intel/ice/ice.h
+@@ -204,6 +204,7 @@ enum ice_feature {
+ 	ICE_F_ROCE_LAG,
+ 	ICE_F_SRIOV_LAG,
+ 	ICE_F_MBX_LIMIT,
++	ICE_F_TX_CLK,
+ 	ICE_F_MAX
+ };
+ 
+@@ -661,6 +662,10 @@ struct ice_pf {
+ 	struct device *hwmon_dev;
+ 	struct ice_health health_reporters;
+ 	struct iidc_rdma_core_dev_info *cdev_info;
++#ifdef CONFIG_NET_TX_CLK
++	void *tx_clk_data;  /* Private clock data */
++	u8 tx_clk_active;   /* Currently active TX clock ID */
++#endif
+ 
+ 	u8 num_quanta_prof_used;
+ };
+diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
+index a439b5a61a56..34efba93a450 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_lib.c
+@@ -3943,6 +3943,12 @@ void ice_init_feature_support(struct ice_pf *pf)
+ 		if (ice_gnss_is_module_present(&pf->hw))
+ 			ice_set_feature_support(pf, ICE_F_GNSS);
+ 		break;
++	case ICE_DEV_ID_E825C_BACKPLANE:
++	case ICE_DEV_ID_E825C_QSFP:
++	case ICE_DEV_ID_E825C_SFP:
++	case ICE_DEV_ID_E825C_SGMII:
++		ice_set_feature_support(pf, ICE_F_TX_CLK);
++		break;
+ 	default:
+ 		break;
+ 	}
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index 8e0b06c1e02b..80ed03d7b02e 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -27,6 +27,7 @@
+ #include "ice_tc_lib.h"
+ #include "ice_vsi_vlan_ops.h"
+ #include <net/xdp_sock_drv.h>
++#include "ice_tx_clk.h"
+ 
+ #define DRV_SUMMARY	"Intel(R) Ethernet Connection E800 Series Linux Driver"
+ static const char ice_driver_string[] = DRV_SUMMARY;
+@@ -4854,6 +4855,9 @@ static void ice_init_features(struct ice_pf *pf)
+ 	if (ice_init_lag(pf))
+ 		dev_warn(dev, "Failed to init link aggregation support\n");
+ 
++	if (ice_is_feature_supported(pf, ICE_F_TX_CLK))
++		ice_tx_clk_init(pf);
++
+ 	ice_hwmon_init(pf);
  }
  
-+/* XXX: How to extract netmem_desc from page must be changed, once
-+ * netmem_desc no longer overlays on page and will be allocated through
-+ * slab.
-+ */
-+#define __pp_page_to_nmdesc(p)	(_Generic((p),				\
-+	const struct page * :	(const struct netmem_desc *)(p),	\
-+	struct page * :		(struct netmem_desc *)(p)))
-+
-+/* CAUTION: Check if the page is a pp page before calling this helper or
-+ * know it's a pp page.
-+ */
-+#define pp_page_to_nmdesc(p)						\
-+({									\
-+	DEBUG_NET_WARN_ON_ONCE(!page_pool_page_is_pp(p));		\
-+	__pp_page_to_nmdesc(p);						\
-+})
-+
- /**
-  * __netmem_to_nmdesc - unsafely get pointer to the &netmem_desc backing
-  * @netmem
-@@ -265,42 +282,25 @@ static inline struct netmem_desc *__netmem_to_nmdesc(netmem_ref netmem)
- 	return (__force struct netmem_desc *)netmem;
+@@ -4874,6 +4878,8 @@ static void ice_deinit_features(struct ice_pf *pf)
+ 		ice_dpll_deinit(pf);
+ 	if (pf->eswitch_mode == DEVLINK_ESWITCH_MODE_SWITCHDEV)
+ 		xa_destroy(&pf->eswitch.reprs);
++	if (ice_is_feature_supported(pf, ICE_F_TX_CLK))
++		ice_tx_clk_deinit(pf);
  }
  
--/* __netmem_clear_lsb - convert netmem_ref to struct net_iov * for access to
-- * common fields.
-- * @netmem: netmem reference to extract as net_iov.
-- *
-- * All the sub types of netmem_ref (page, net_iov) have the same pp, pp_magic,
-- * dma_addr, and pp_ref_count fields at the same offsets. Thus, we can access
-- * these fields without a type check to make sure that the underlying mem is
-- * net_iov or page.
-+/* netmem_to_nmdesc - convert netmem_ref to struct netmem_desc * for
-+ * access to common fields.
-+ * @netmem: netmem reference to get netmem_desc.
-  *
-- * The resulting value of this function can only be used to access the fields
-- * that are NET_IOV_ASSERT_OFFSET'd. Accessing any other fields will result in
-- * undefined behavior.
-+ * All the sub types of netmem_ref (netmem_desc, net_iov) have the same
-+ * pp, pp_magic, dma_addr, and pp_ref_count fields via netmem_desc.
-  *
-- * Return: the netmem_ref cast to net_iov* regardless of its underlying type.
-+ * Return: the pointer to struct netmem_desc * regardless of its
-+ * underlying type.
-  */
--static inline struct net_iov *__netmem_clear_lsb(netmem_ref netmem)
-+static inline struct netmem_desc *netmem_to_nmdesc(netmem_ref netmem)
- {
--	return (struct net_iov *)((__force unsigned long)netmem & ~NET_IOV);
--}
-+	void *p = (void *)((__force unsigned long)netmem & ~NET_IOV);
- 
--/* XXX: How to extract netmem_desc from page must be changed, once
-- * netmem_desc no longer overlays on page and will be allocated through
-- * slab.
-- */
--#define __pp_page_to_nmdesc(p)	(_Generic((p),				\
--	const struct page * :	(const struct netmem_desc *)(p),	\
--	struct page * :		(struct netmem_desc *)(p)))
-+	if (netmem_is_net_iov(netmem))
-+		return &((struct net_iov *)p)->desc;
- 
--/* CAUTION: Check if the page is a pp page before calling this helper or
-- * know it's a pp page.
-- */
--#define pp_page_to_nmdesc(p)						\
--({									\
--	DEBUG_NET_WARN_ON_ONCE(!page_pool_page_is_pp(p));		\
--	__pp_page_to_nmdesc(p);						\
--})
-+	return __pp_page_to_nmdesc((struct page *)p);
+ static void ice_init_wakeup(struct ice_pf *pf)
+diff --git a/drivers/net/ethernet/intel/ice/ice_tx_clk.c b/drivers/net/ethernet/intel/ice/ice_tx_clk.c
+new file mode 100644
+index 000000000000..121e9fa0c146
+--- /dev/null
++++ b/drivers/net/ethernet/intel/ice/ice_tx_clk.c
+@@ -0,0 +1,113 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/* Copyright (C) 2025, Intel Corporation. */
++
++#include <linux/netdev_tx_clk.h>
++#include "ice_tx_clk.h"
++
++enum ice_clk_type {
++	ICE_TX_CLK_OCXO = 0,
++	ICE_TX_CLK_SYNCE_REF,
++	ICE_TX_CLK_EXT_REF,
++
++	ICE_TX_CLK_COUNT /* always last */
++};
++
++static const char *ice_clk_names[ICE_TX_CLK_COUNT] = {
++	"ocxo",
++	"SyncE_ref",
++	"ext_ref"
++};
++
++struct ice_tx_clk_data {
++	struct ice_pf *pf;
++	u8 clk_id;
++};
++
++static const struct netdev_tx_clk_ops ice_tx_clk_ops;
++
++static int ice_tx_clk_enable(void *priv_data)
++{
++	struct ice_tx_clk_data *clk_data = priv_data;
++	struct ice_pf *pf = clk_data->pf;
++	u8 clk_id = clk_data->clk_id;
++
++	if (clk_id >= ICE_TX_CLK_COUNT) {
++		dev_err(ice_pf_to_dev(pf), "Invalid clock ID: %d\n", clk_id);
++		return -EINVAL;
++	}
++
++	if (pf->tx_clk_active != clk_id) {
++		dev_dbg(ice_pf_to_dev(pf), "PF%d switching from %s to %s clock\n",
++			pf->hw.pf_id, ice_clk_names[pf->tx_clk_active],
++			ice_clk_names[clk_id]);
++
++		pf->tx_clk_active = clk_id;
++		/* TODO: add TX clock switching logic */
++	}
++
++	return 0;
 +}
++
++static int ice_tx_clk_is_enabled(void *priv_data)
++{
++	struct ice_tx_clk_data *clk_data = priv_data;
++	struct ice_pf *pf = clk_data->pf;
++	u8 clk_id = clk_data->clk_id;
++
++	return (pf->tx_clk_active == clk_id) ? 1 : 0;
++}
++
++static const struct netdev_tx_clk_ops ice_tx_clk_ops = {
++	.enable = ice_tx_clk_enable,
++	.is_enabled = ice_tx_clk_is_enabled,
++};
++
++void ice_tx_clk_init(struct ice_pf *pf)
++{
++	struct ice_vsi *vsi = ice_get_main_vsi(pf);
++	struct ice_tx_clk_data *clk_data[ICE_TX_CLK_COUNT];
++	int i, ret;
++
++	if (!vsi || !vsi->netdev)
++		return;
++
++	for (i = 0; i < ICE_TX_CLK_COUNT; i++) {
++		clk_data[i] = kzalloc(sizeof(*clk_data[i]), GFP_KERNEL);
++		if (!clk_data[i]) {
++			while (--i >= 0)
++				kfree(clk_data[i]);
++			return;
++		}
++
++		clk_data[i]->pf = pf;
++		clk_data[i]->clk_id = i;
++	}
++
++	pf->tx_clk_active = ICE_TX_CLK_OCXO;
++
++	for (i = 0; i < ICE_TX_CLK_COUNT; i++) {
++		ret = netdev_tx_clk_register(vsi->netdev, ice_clk_names[i],
++					     &ice_tx_clk_ops, clk_data[i]);
++		if (ret) {
++			dev_err(ice_pf_to_dev(pf),
++				"Failed to register %s clock: %d\n",
++				ice_clk_names[i], ret);
++		}
++	}
++
++	dev_dbg(ice_pf_to_dev(pf), "ICE TX clocks initialized for PF%d (default: %s)\n",
++		pf->hw.pf_id, ice_clk_names[ICE_TX_CLK_OCXO]);
++}
++
++void ice_tx_clk_deinit(struct ice_pf *pf)
++{
++	struct ice_vsi *vsi = ice_get_main_vsi(pf);
++
++	if (!vsi || !vsi->netdev)
++		return;
++
++	netdev_tx_clk_cleanup(vsi->netdev);
++
++	dev_dbg(ice_pf_to_dev(pf), "ICE TX clocks deinitialized for PF%d\n",
++		pf->hw.pf_id);
++}
+diff --git a/drivers/net/ethernet/intel/ice/ice_tx_clk.h b/drivers/net/ethernet/intel/ice/ice_tx_clk.h
+new file mode 100644
+index 000000000000..02ede41dfefa
+--- /dev/null
++++ b/drivers/net/ethernet/intel/ice/ice_tx_clk.h
+@@ -0,0 +1,17 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/* Copyright (C) 2025, Intel Corporation. */
++
++#ifndef _ICE_TX_CLK_H_
++#define _ICE_TX_CLK_H_
++
++#include "ice.h"
++
++#if IS_ENABLED(CONFIG_NET_TX_CLK)
++void ice_tx_clk_init(struct ice_pf *pf);
++void ice_tx_clk_deinit(struct ice_pf *pf);
++#else
++static inline void ice_tx_clk_init(struct ice_pf *pf) { }
++static inline void ice_tx_clk_deinit(struct ice_pf *pf) { }
++#endif
++
++#endif /* _ICE_TX_CLK_H_ */
+diff --git a/include/linux/netdev_tx_clk.h b/include/linux/netdev_tx_clk.h
+new file mode 100644
+index 000000000000..3ba820b40fed
+--- /dev/null
++++ b/include/linux/netdev_tx_clk.h
+@@ -0,0 +1,43 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ * netdev_tx_clk.h - allow net_device TX clock control
++ * Author: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
++ */
++
++#ifndef __NETDEV_TX_CLK_H
++#define __NETDEV_TX_CLK_H
++
++#include <linux/netdevice.h>
++
++/**
++ * struct netdev_tx_clk_ops - TX clock operations
++ * @enable: switch to this clock (called when user writes "1" to sysfs)
++ * @is_enabled: check if this clock is currently active
++ *
++ * Note: one clock must always be active, writing "0" to disable is not
++ * supported.
++ */
++struct netdev_tx_clk_ops {
++	int (*enable)(void *priv_data);
++	int (*is_enabled)(void *priv_data);
++};
++#if IS_ENABLED(CONFIG_NET_TX_CLK)
++
++int netdev_tx_clk_register(struct net_device *ndev, const char *clk_name,
++			   const struct netdev_tx_clk_ops *ops,
++			   void *priv_data);
++
++void netdev_tx_clk_cleanup(struct net_device *ndev);
++#else
++
++static inline int netdev_tx_clk_register(struct net_device *ndev, const char *clk_name,
++					 const struct netdev_tx_clk_ops *ops,
++					 void *priv_data)
++{
++	return 0;
++}
++
++static inline void netdev_tx_clk_cleanup(struct net_device *ndev) { }
++#endif
++
++#endif /* __NETDEV_TX_CLK_H */
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index 5e5de4b0a433..b09a1eff4d4d 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -23,6 +23,7 @@
  
- /**
-  * __netmem_get_pp - unsafely get pointer to the &page_pool backing @netmem
-@@ -320,12 +320,12 @@ static inline struct page_pool *__netmem_get_pp(netmem_ref netmem)
+ #include <linux/timer.h>
+ #include <linux/bug.h>
++#include <linux/clk.h>
+ #include <linux/delay.h>
+ #include <linux/atomic.h>
+ #include <linux/prefetch.h>
+@@ -2552,6 +2553,11 @@ struct net_device {
  
- static inline struct page_pool *netmem_get_pp(netmem_ref netmem)
- {
--	return __netmem_clear_lsb(netmem)->pp;
-+	return netmem_to_nmdesc(netmem)->pp;
- }
+ 	struct hwtstamp_provider __rcu	*hwprov;
  
- static inline atomic_long_t *netmem_get_pp_ref_count_ref(netmem_ref netmem)
- {
--	return &__netmem_clear_lsb(netmem)->pp_ref_count;
-+	return &netmem_to_nmdesc(netmem)->pp_ref_count;
- }
++#if IS_ENABLED(CONFIG_NET_TX_CLK)
++	struct list_head	tx_clk_list;
++	struct kobject		*tx_clk_dir;
++
++#endif
+ 	u8			priv[] ____cacheline_aligned
+ 				       __counted_by(priv_len);
+ } ____cacheline_aligned;
+diff --git a/net/Kconfig b/net/Kconfig
+index d5865cf19799..b0c7ce6ce046 100644
+--- a/net/Kconfig
++++ b/net/Kconfig
+@@ -541,4 +541,25 @@ config NET_TEST
  
- static inline bool netmem_is_pref_nid(netmem_ref netmem, int pref_nid)
-@@ -390,7 +390,7 @@ static inline bool netmem_is_pfmemalloc(netmem_ref netmem)
+ 	  If unsure, say N.
  
- static inline unsigned long netmem_get_dma_addr(netmem_ref netmem)
- {
--	return __netmem_clear_lsb(netmem)->dma_addr;
-+	return netmem_to_nmdesc(netmem)->dma_addr;
- }
- 
- void get_netmem(netmem_ref netmem);
-diff --git a/net/core/netmem_priv.h b/net/core/netmem_priv.h
-index cd95394399b4..23175cb2bd86 100644
---- a/net/core/netmem_priv.h
-+++ b/net/core/netmem_priv.h
-@@ -5,19 +5,19 @@
- 
- static inline unsigned long netmem_get_pp_magic(netmem_ref netmem)
- {
--	return __netmem_clear_lsb(netmem)->pp_magic & ~PP_DMA_INDEX_MASK;
-+	return netmem_to_nmdesc(netmem)->pp_magic & ~PP_DMA_INDEX_MASK;
- }
- 
- static inline void netmem_or_pp_magic(netmem_ref netmem, unsigned long pp_magic)
- {
--	__netmem_clear_lsb(netmem)->pp_magic |= pp_magic;
-+	netmem_to_nmdesc(netmem)->pp_magic |= pp_magic;
- }
- 
- static inline void netmem_clear_pp_magic(netmem_ref netmem)
- {
--	WARN_ON_ONCE(__netmem_clear_lsb(netmem)->pp_magic & PP_DMA_INDEX_MASK);
-+	WARN_ON_ONCE(netmem_to_nmdesc(netmem)->pp_magic & PP_DMA_INDEX_MASK);
- 
--	__netmem_clear_lsb(netmem)->pp_magic = 0;
-+	netmem_to_nmdesc(netmem)->pp_magic = 0;
- }
- 
- static inline bool netmem_is_pp(netmem_ref netmem)
-@@ -27,13 +27,13 @@ static inline bool netmem_is_pp(netmem_ref netmem)
- 
- static inline void netmem_set_pp(netmem_ref netmem, struct page_pool *pool)
- {
--	__netmem_clear_lsb(netmem)->pp = pool;
-+	netmem_to_nmdesc(netmem)->pp = pool;
- }
- 
- static inline void netmem_set_dma_addr(netmem_ref netmem,
- 				       unsigned long dma_addr)
- {
--	__netmem_clear_lsb(netmem)->dma_addr = dma_addr;
-+	netmem_to_nmdesc(netmem)->dma_addr = dma_addr;
- }
- 
- static inline unsigned long netmem_get_dma_index(netmem_ref netmem)
-@@ -43,7 +43,7 @@ static inline unsigned long netmem_get_dma_index(netmem_ref netmem)
- 	if (WARN_ON_ONCE(netmem_is_net_iov(netmem)))
- 		return 0;
- 
--	magic = __netmem_clear_lsb(netmem)->pp_magic;
-+	magic = netmem_to_nmdesc(netmem)->pp_magic;
- 
- 	return (magic & PP_DMA_INDEX_MASK) >> PP_DMA_INDEX_SHIFT;
- }
-@@ -57,6 +57,6 @@ static inline void netmem_set_dma_index(netmem_ref netmem,
- 		return;
- 
- 	magic = netmem_get_pp_magic(netmem) | (id << PP_DMA_INDEX_SHIFT);
--	__netmem_clear_lsb(netmem)->pp_magic = magic;
-+	netmem_to_nmdesc(netmem)->pp_magic = magic;
- }
- #endif
++config NET_TX_CLK
++	bool "Control over source of TX clock per network device"
++	depends on COMMON_CLK && NET
++	default n
++	help
++	  This feature enables per-device control over TX clock sources in
++	  networking hardware. Network devices may support multiple transmit
++	  clock sources such as different oscillators, OCXOs, PLLs, or
++	  external clock signals provided via onboard pins.
++
++	  When enabled, supported network devices will create a tx_clk
++	  directory under their sysfs entry (/sys/class/net/<device>/tx_clk/).
++	  Users can select an available clock source by writing '1' to the
++	  corresponding file in this directory. The status of each clock
++	  source can be checked by reading the file (0 = disabled, 1 = enabled).
++
++	  This is useful for applications requiring precise timing control,
++	  such as time-sensitive networking (TSN) or synchronization protocols.
++
++	  If unsure, say N.
++
+ endif   # if NET
+diff --git a/net/Makefile b/net/Makefile
+index aac960c41db6..f78f46444efa 100644
+--- a/net/Makefile
++++ b/net/Makefile
+@@ -79,3 +79,4 @@ obj-$(CONFIG_MPTCP)		+= mptcp/
+ obj-$(CONFIG_MCTP)		+= mctp/
+ obj-$(CONFIG_NET_HANDSHAKE)	+= handshake/
+ obj-$(CONFIG_NET_SHAPER)	+= shaper/
++obj-$(CONFIG_PHY_CLK_USER)	+= phy_clk/
+diff --git a/net/core/Makefile b/net/core/Makefile
+index b2a76ce33932..7e4031813b18 100644
+--- a/net/core/Makefile
++++ b/net/core/Makefile
+@@ -47,3 +47,4 @@ obj-$(CONFIG_NET_TEST) += net_test.o
+ obj-$(CONFIG_NET_DEVMEM) += devmem.o
+ obj-$(CONFIG_DEBUG_NET) += lock_debug.o
+ obj-$(CONFIG_FAIL_SKB_REALLOC) += skb_fault_injection.o
++obj-$(CONFIG_NET_TX_CLK) += tx_clk.o
+diff --git a/net/core/tx_clk.c b/net/core/tx_clk.c
+new file mode 100644
+index 000000000000..fbbc6497e563
+--- /dev/null
++++ b/net/core/tx_clk.c
+@@ -0,0 +1,150 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Network device TX clock control framework
++ * Simple sysfs interface for userspace TX clock management
++ * Author: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
++ */
++
++#include <linux/netdevice.h>
++#include <linux/netdev_tx_clk.h>
++#include <linux/sysfs.h>
++#include <linux/kobject.h>
++#include <linux/mutex.h>
++#include <linux/slab.h>
++
++/* Simple clock entry structure */
++struct tx_clk_entry {
++	char name[32];
++	const struct netdev_tx_clk_ops *ops;
++	void *priv_data;
++	struct kobj_attribute attr;
++	struct list_head list;
++};
++
++static DEFINE_MUTEX(tx_clk_mutex);
++
++static ssize_t tx_clk_show(struct kobject *kobj, struct kobj_attribute *attr,
++			   char *buf)
++{
++	struct tx_clk_entry *entry = container_of(attr, struct tx_clk_entry,
++						  attr);
++	int ret = entry->ops->is_enabled(entry->priv_data);
++
++	if (ret != 0 && ret != 1)
++		return ret;
++
++	return sprintf(buf, "%d\n", ret);
++}
++
++static ssize_t tx_clk_store(struct kobject *kobj, struct kobj_attribute *attr,
++			    const char *buf, size_t count)
++{
++	struct tx_clk_entry *entry = container_of(attr, struct tx_clk_entry,
++						  attr);
++	int val, ret;
++
++	ret = kstrtoint(buf, 10, &val);
++	if (ret)
++		return ret;
++
++	/* Cannot disable - one clock must always be active */
++	if (val != 1)
++		return -EINVAL;
++
++	mutex_lock(&tx_clk_mutex);
++	ret = entry->ops->enable(entry->priv_data);
++	mutex_unlock(&tx_clk_mutex);
++
++	return ret ? ret : count;
++}
++
++/**
++ * netdev_tx_clk_register - register a TX clock for a network device
++ * @ndev: network device
++ * @clk_name: clock name (visible in sysfs)
++ * @ops: clock operations
++ * @priv_data: private data for callbacks
++ *
++ * Returns 0 on success, negative error code on failure
++ */
++int netdev_tx_clk_register(struct net_device *ndev, const char *clk_name,
++			   const struct netdev_tx_clk_ops *ops,
++			   void *priv_data)
++{
++	struct tx_clk_entry *entry;
++	int ret;
++
++	if (WARN_ON(!ndev || !clk_name || !ops))
++		return -EINVAL;
++
++	entry = kzalloc(sizeof(*entry), GFP_KERNEL);
++	if (!entry)
++		return -ENOMEM;
++
++	strscpy(entry->name, clk_name, sizeof(entry->name) - 1);
++	entry->ops = ops;
++	entry->priv_data = priv_data;
++	INIT_LIST_HEAD(&entry->list);
++
++	/* Setup sysfs attribute */
++	entry->attr.attr.name = entry->name;
++	entry->attr.attr.mode = 0644;
++	entry->attr.show = tx_clk_show;
++	entry->attr.store = tx_clk_store;
++
++	mutex_lock(&tx_clk_mutex);
++
++	if (!ndev->tx_clk_dir) {
++		INIT_LIST_HEAD(&ndev->tx_clk_list);
++		ndev->tx_clk_dir = kobject_create_and_add("tx_clk", &ndev->dev.kobj);
++		if (!ndev->tx_clk_dir) {
++			kfree(entry);
++			mutex_unlock(&tx_clk_mutex);
++			return -ENOMEM;
++		}
++	}
++
++	/* Add to device's clock list */
++	list_add_tail(&entry->list, &ndev->tx_clk_list);
++
++	/* Create sysfs file */
++	ret = sysfs_create_file(ndev->tx_clk_dir, &entry->attr.attr);
++	if (ret) {
++		list_del(&entry->list);
++		kfree(entry);
++		mutex_unlock(&tx_clk_mutex);
++		return ret;
++	}
++
++	mutex_unlock(&tx_clk_mutex);
++	return 0;
++}
++EXPORT_SYMBOL_GPL(netdev_tx_clk_register);
++
++/**
++ * netdev_tx_clk_cleanup - cleanup all TX clocks for a network device
++ * @ndev: network device
++ */
++void netdev_tx_clk_cleanup(struct net_device *ndev)
++{
++	struct tx_clk_entry *entry, *tmp;
++
++	if (!ndev)
++		return;
++
++	mutex_lock(&tx_clk_mutex);
++
++	list_for_each_entry_safe(entry, tmp, &ndev->tx_clk_list, list) {
++		sysfs_remove_file(ndev->tx_clk_dir, &entry->attr.attr);
++		list_del(&entry->list);
++		kfree(entry);
++	}
++
++	if (ndev->tx_clk_dir) {
++		kobject_put(ndev->tx_clk_dir);
++		ndev->tx_clk_dir = NULL;
++	}
++
++	mutex_unlock(&tx_clk_mutex);
++}
++EXPORT_SYMBOL_GPL(netdev_tx_clk_cleanup);
 
 base-commit: fa582ca7e187a15e772e6a72fe035f649b387a60
 -- 
-2.17.1
+2.38.1
 
 
