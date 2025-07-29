@@ -1,69 +1,89 @@
-Return-Path: <netdev+bounces-210860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210861-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30955B15262
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 19:54:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46585B15264
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 19:55:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD2241885BA0
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 17:54:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A3A9B188718E
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 17:55:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F064298CD5;
-	Tue, 29 Jul 2025 17:54:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C62732989AD;
+	Tue, 29 Jul 2025 17:54:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d4iKMO1R"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nyMNSaUn"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14605298CB1;
-	Tue, 29 Jul 2025 17:54:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB7EC2980B8;
+	Tue, 29 Jul 2025 17:54:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753811655; cv=none; b=J3lRQymJqH2Zm7pFhDZEbRMsC+2jOLwGiOt61XrlRyIRDGbhu48Z1+qhTWPVkWRYXXNfNIEn0i80BTFGh1h74E+H4Rlhrdo4D1n30LCtQzyf5IcVh+1SNL/FeX3/htMxbXksvh3jTPPxqVhNsfOMqAgbkVIL05xrEiqYEUVnLes=
+	t=1753811696; cv=none; b=D+zF634Z964o6V1tisz4ikVFoHJivqXRCsqAmGWuAYLl7OYpse8Ch4Kc5KUdESrUKNL9on7m5g5N6jDG3asOjIqwTRnk3OczJvjMZJOqkAV/gJoYb9we8pDOWODHNSKbPeckigHuXGcfJ3KxrdJDKg5j0X4R1z+2FVhOJcCUO7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753811655; c=relaxed/simple;
-	bh=J6y7muyFDzOpaWbidr++rX+I7mcOedEEEF1hRm5TL9w=;
+	s=arc-20240116; t=1753811696; c=relaxed/simple;
+	bh=6KIbPA/EaHB5zy//h0D6S9v9PCr7IQU7sflH936pN20=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ATncG86X9kYYhA8ASzxi0NamVM52nTPAQKtsEqmuf1Z+/jqKJYkXqlUGrMlRVymwDcM1yFGud4MkLN+QKF09xHpdP5cKuqxRdGwSqoH0+W76QgSHcx4HOV83Vj2rDXIByjhVEB/RQtg6wck0wY9fGxsAQBG6fuzBsIQj1hoaeBE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d4iKMO1R; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 585CDC4CEF4;
-	Tue, 29 Jul 2025 17:54:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753811654;
-	bh=J6y7muyFDzOpaWbidr++rX+I7mcOedEEEF1hRm5TL9w=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=d4iKMO1R9RObKxmf2UyIzWWqHARsbZ+po8iimkSzRynrxyAPla44caaU0nbDr4YvS
-	 MlBR3YcpjA14F/lXXIZnm09ursqrw1Il9rsl32RoTvFMtPwGNwMtSKg8oPakc1b3Cr
-	 k4ZXntCF81Q50cKGaVued3T+Zrg4B5PuXkt0nb+QHTErPx2qadZCcbsce1YhR2ElSg
-	 ubzceejBv/ihLj49353LlJMO9lIEtmHQvuPbDkPKODBRVHmC5fDwbmO0cxk63K/4g9
-	 ZAf0z0wL6S7tnCrnwMhi61F5/rpdUe2u3vxxRmPDAOETpoIowlKEkAFOA7TMpaT0QF
-	 QYBJmSUzyjBcw==
-Date: Tue, 29 Jul 2025 10:54:12 -0700
-From: Drew Fustini <fustini@kernel.org>
-To: Yao Zi <ziyao@disroot.org>
-Cc: Guo Ren <guoren@kernel.org>, Fu Wei <wefu@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
-	Emil Renner Berthing <emil.renner.berthing@canonical.com>,
-	Jisheng Zhang <jszhang@kernel.org>, linux-riscv@lists.infradead.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 1/3] dt-bindings: net: thead,th1520-gmac: Describe
- APB interface clock
-Message-ID: <aIkKxM3zfVjaa1we@x1>
-References: <20250729093734.40132-1-ziyao@disroot.org>
- <20250729093734.40132-2-ziyao@disroot.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=VtJxw9t8hQJuejIAGKFbZiu29FGttZMeYoj9rDjXCsxHa5OepCVrB9TcUD7SW41ie6DIEEjvnJUDF6C6s3WF0HPYMZnspi0UywXtXikjFtXVbFLjIeM1l/WbCSBA1xxqnPib/ULzrHW9fY4rGZRKZkZtk+v919N9Sid+kgP7skg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nyMNSaUn; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1753811694; x=1785347694;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=6KIbPA/EaHB5zy//h0D6S9v9PCr7IQU7sflH936pN20=;
+  b=nyMNSaUn3cD3nq7d/BnNoBGWyQpqcgZFPyIov0ACIoZXj413Hn0xHWex
+   EUcXm1RTo7K5Kx+9Vw+b7Uexg234rjMEN9KUjG4oiA6i/xka2xaunVq1S
+   gy7C4xEpAOYHjLPjiQdQsx/eWBZxVgGnL8nfCyWqSOBEJJirvjNgvbjV0
+   dPluybak/ZKPoR/1P28rMvL3KPOMtc5o4/ez9tyRw2J2RCkmHye9ZA2aG
+   /ncUPsZtouvdNYc0P1XxVJHNOotsTk2D2NsHGCT0XEzvI+5kRIuGCQjYb
+   e0SIEGfOaPn2+4SRaTFniWTZlNmSbQH22zL2QxfT0lz2B0rnd2f8q4DCd
+   Q==;
+X-CSE-ConnectionGUID: ZpOnOSJaTCGMgWtVeUSXpA==
+X-CSE-MsgGUID: 6XwnpZgmQpyR8zYXKANtsw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11506"; a="58719600"
+X-IronPort-AV: E=Sophos;i="6.16,350,1744095600"; 
+   d="scan'208";a="58719600"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jul 2025 10:54:53 -0700
+X-CSE-ConnectionGUID: hKsGkZjiR5yd2xZ2OXwKsg==
+X-CSE-MsgGUID: NIeHohyJTjWA/hm3kYBUAw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,350,1744095600"; 
+   d="scan'208";a="167024455"
+Received: from lkp-server01.sh.intel.com (HELO 160750d4a34c) ([10.239.97.150])
+  by fmviesa005.fm.intel.com with ESMTP; 29 Jul 2025 10:54:49 -0700
+Received: from kbuild by 160750d4a34c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1ugoXG-0001XT-2S;
+	Tue, 29 Jul 2025 17:54:46 +0000
+Date: Wed, 30 Jul 2025 01:54:21 +0800
+From: kernel test robot <lkp@intel.com>
+To: Sami Tolvanen <samitolvanen@google.com>, bpf@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Sami Tolvanen <samitolvanen@google.com>
+Subject: Re: [PATCH bpf-next v3 1/4] bpf: crypto: Use the correct destructor
+ kfunc type
+Message-ID: <202507300122.RpqIKqFR-lkp@intel.com>
+References: <20250728202656.559071-7-samitolvanen@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,67 +92,41 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250729093734.40132-2-ziyao@disroot.org>
+In-Reply-To: <20250728202656.559071-7-samitolvanen@google.com>
 
-On Tue, Jul 29, 2025 at 09:37:32AM +0000, Yao Zi wrote:
-> Besides ones for GMAC core and peripheral registers, the TH1520 GMAC
-> requires one more clock for configuring APB glue registers. Describe
-> it in the binding.
-> 
-> Though the clock is essential for operation, it's not marked as required
-> for now to avoid introducing new dt-binding warnings to existing dts.
-> 
-> Fixes: f920ce04c399 ("dt-bindings: net: Add T-HEAD dwmac support")
-> Signed-off-by: Yao Zi <ziyao@disroot.org>
-> ---
->  .../devicetree/bindings/net/thead,th1520-gmac.yaml        | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/thead,th1520-gmac.yaml b/Documentation/devicetree/bindings/net/thead,th1520-gmac.yaml
-> index 6d9de3303762..fea9fbc1d006 100644
-> --- a/Documentation/devicetree/bindings/net/thead,th1520-gmac.yaml
-> +++ b/Documentation/devicetree/bindings/net/thead,th1520-gmac.yaml
-> @@ -59,14 +59,18 @@ properties:
->        - const: apb
->  
->    clocks:
-> +    minItems: 2
->      items:
->        - description: GMAC main clock
->        - description: Peripheral registers interface clock
-> +      - description: APB glue registers interface clock
->  
->    clock-names:
-> +    minItems: 2
->      items:
->        - const: stmmaceth
->        - const: pclk
-> +      - const: apb
->  
->    interrupts:
->      items:
-> @@ -88,8 +92,8 @@ examples:
->          compatible = "thead,th1520-gmac", "snps,dwmac-3.70a";
->          reg = <0xe7070000 0x2000>, <0xec003000 0x1000>;
->          reg-names = "dwmac", "apb";
-> -        clocks = <&clk 1>, <&clk 2>;
-> -        clock-names = "stmmaceth", "pclk";
-> +        clocks = <&clk 1>, <&clk 2>, <&clk 3>;
-> +        clock-names = "stmmaceth", "pclk", "apb";
->          interrupts = <66>;
->          interrupt-names = "macirq";
->          phy-mode = "rgmii-id";
-> -- 
-> 2.50.1
-> 
+Hi Sami,
 
-Thanks for figuring out that this clock is needed for the APB glue
-registers. The schema passes W=1 dt_binding_check with no warnings.
+kernel test robot noticed the following build warnings:
 
-Regarding minItems, I think it would be okay to change to 3 as the APB
-clock should have been there from the start but I missed it. We can fix
-the in-tree dts at the same time so that seems okay to me. But let's see
-what the dt bindings maintainers think.
+[auto build test WARNING on 5b4c54ac49af7f486806d79e3233fc8a9363961c]
 
--Drew
+url:    https://github.com/intel-lab-lkp/linux/commits/Sami-Tolvanen/bpf-crypto-Use-the-correct-destructor-kfunc-type/20250729-042936
+base:   5b4c54ac49af7f486806d79e3233fc8a9363961c
+patch link:    https://lore.kernel.org/r/20250728202656.559071-7-samitolvanen%40google.com
+patch subject: [PATCH bpf-next v3 1/4] bpf: crypto: Use the correct destructor kfunc type
+config: alpha-randconfig-r111-20250729 (https://download.01.org/0day-ci/archive/20250730/202507300122.RpqIKqFR-lkp@intel.com/config)
+compiler: alpha-linux-gcc (GCC) 8.5.0
+reproduce: (https://download.01.org/0day-ci/archive/20250730/202507300122.RpqIKqFR-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202507300122.RpqIKqFR-lkp@intel.com/
+
+sparse warnings: (new ones prefixed by >>)
+>> kernel/bpf/crypto.c:264:18: sparse: sparse: symbol 'bpf_crypto_ctx_release_dtor' was not declared. Should it be static?
+
+vim +/bpf_crypto_ctx_release_dtor +264 kernel/bpf/crypto.c
+
+   263	
+ > 264	__bpf_kfunc void bpf_crypto_ctx_release_dtor(void *ctx)
+   265	{
+   266		bpf_crypto_ctx_release(ctx);
+   267	}
+   268	CFI_NOSEAL(bpf_crypto_ctx_release_dtor);
+   269	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
