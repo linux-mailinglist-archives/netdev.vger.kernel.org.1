@@ -1,130 +1,139 @@
-Return-Path: <netdev+bounces-210849-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210850-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30743B1518E
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 18:43:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33F81B151C3
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 18:58:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 54963172A8E
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 16:43:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A2F33A7000
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 16:57:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0193028ECD8;
-	Tue, 29 Jul 2025 16:43:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D37AF28DF27;
+	Tue, 29 Jul 2025 16:58:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dd5JqD9M"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KlPT85UP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 709DA25761
-	for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 16:43:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A440934CF5;
+	Tue, 29 Jul 2025 16:58:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753807420; cv=none; b=O/OHlT/ftRFFDTOrRl45R8v+roGFn6dTHSoiixVI2qfEZzq5BVEewP/+TFe0qiZSAtqEdW+zHlj0JKTrWBCKvsdQdIDHvxob6Mk2CoLJ8NJfBhU9InnEZxUScTqHlsRilhg6DhFri9edHHzLlz+616A7qMg22RmeNZSXz6SZBWM=
+	t=1753808300; cv=none; b=gsUYRTGPsfi5HYXpvsxuTxdpMM2cU1CedzTmqxG876qokUrKBjVvjDiQHRU05G7KpTyYMwUp1k1dD7sV8JkUX76QIKpAawh5EhwpTDtHnrEiyD2aAAFA78JpLrFoCtZwyO5dmOAoNGuR9mepb9WGQXppAe69bD3o9AeB1Z9OOh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753807420; c=relaxed/simple;
-	bh=FCIbFdYLhZ8dZkG1o/KAeU8utF5h4qy3DwecnzJGNEs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=R6giwS/B77/3VOPSVbQLLp86ovMDi+qWUWjWi96hRXzSHNt0yz4Bd6Jcu5m2oD2/NPYZXHWg01yRHFvZNjCCY4fVbkfSbY6OK36mE1AzeriUitULAaTmrVe9r242f+eHMvGdQPNwOcWayJAAgeR611XA8vrYipwH8sD3djMzVuU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dd5JqD9M; arc=none smtp.client-ip=209.85.222.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-7e62a1cbf83so577982885a.1
-        for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 09:43:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753807415; x=1754412215; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9+FQCzaL+5dcka0AyrYsOL9Mr5DP3w26SIvvkWKSxQM=;
-        b=dd5JqD9MuJyfBwagAAgfT+/TwNmAxM6Cgy7/z5GvVu/obxxs/5Z7vQoVillT8k4rRA
-         BVXsEwljaYIwW3VpZtySqX9YCA1SHoi/frtKa7GjGBhcUHCFoOCMkYbZre6ip3YJZ7zu
-         kYrkgwyUpV3SiJcT93XJBiEQi4Hb7BbyN7W6gFaWJVTh3TWu1+Ff87BpTv8+zcNM8bR9
-         j2jKGgjF6vtEyQtM41LWK+s9VMYTzNMbvPsSNfIPbbDjlTJSiHHhG7BuEuwl1EIMteAF
-         xpDnjSeul+tovWX1BtW8XFuo02/bGPFztQsetz34bpwaW3qkGiYwZtzF7WlOEt6k9Osy
-         LUqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753807415; x=1754412215;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9+FQCzaL+5dcka0AyrYsOL9Mr5DP3w26SIvvkWKSxQM=;
-        b=UNC65DlAUGrJ0Hh1YMYzpmLwKwATg5MdnBbFNwndebxrufhmcmvHDv7CXCKs4UjuMb
-         b4gu+nuCFGeHLEMLiG2CfOgfXLNO1qITOsQGl0Bk7to+hIcEQMsF+req8EtHg3MbfahW
-         MmQ1Uzg/O2Jswi15exWsvhhNOC0qxb0HDCzpM9/BUxXILXi6HdKLUAWWu/tw2PFGEhAY
-         mznXCf1iIVCHZ5ag+PYQBCRwD2euQvVESQF4jm5wo7MLoZnMvWb2g0XUaktFuo73CPZD
-         zE/4YaEMFHmv/tMIZSSet3qmF576aa/vwqvSi4IhlY7ezP777VEYeGbtvTkgMddzLEyX
-         5z4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU5TvuQ7OAmuckONZmmTt2ow1HkPkKRZ0mPIat4T9AtYoiEEnlwrOgouH8gP10AzWgZbLsYzKE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzO8QifmrG6wh/oWsz0Sx9Nnlr7NEYkUMCmltEN+smsKxwscNzb
-	TIUBluqrkmlVRUzB5FNXQz+QkVV7GCHfZU8xiuFCbJDayx7m+qYXwFQTla3S1Zd2zXw9IP78WZy
-	2yp8rMg79Zfcse0ww6RGu/lfFWjxfH9OZUAdTDDTl
-X-Gm-Gg: ASbGnctxSdIV89+4NnyX8ee0/0z7OZvi9CYCB7bLAHkKR+AzQmFTZO+v4G2+QPTf8Pu
-	y65LpRakcJXelrJwBQq85mKBrRq/hy7+PXLfMQTDzVnYm7979mo8WV7xKnFsfLgp3jp8E57IFcv
-	X1Z27767xjz7N2PrUmlhmpMrwVM1IajuSg0VcAvgVKw8QxPj8WUdbDj6WuU2dOJ3eIeUWRkyrA8
-	ctqzw==
-X-Google-Smtp-Source: AGHT+IGhY4SFPSW9Pbq6/3vmAAUhktF1lj4vRgGgJD6WtAT3Dz36TwNQnp0I26CyYbqhroSoft/o90tJ9vRNEPz4Mkc=
-X-Received: by 2002:a05:620a:a509:b0:7e6:50f1:a871 with SMTP id
- af79cd13be357-7e66ef93f45mr10696185a.6.1753807414997; Tue, 29 Jul 2025
- 09:43:34 -0700 (PDT)
+	s=arc-20240116; t=1753808300; c=relaxed/simple;
+	bh=Hb9smdHf0g56CpF8sBWDOF38RasuaUJ0puvOlmqvOjY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=er+5L2nDPiY9Fiyz6XYKYSuc1tBDDs2MEzKbk2E5oc2WOJ51C5s6qxdsHFGAfoePLV9ccl2ezr2ZsJPZpdEkM1o4A6bwu3RJ/+VcmO0VeDzgiUNS/uPhW30dlpSEBSi83EZ98OY6u/B+g001MfyVDxyNIiwlgtt2Sr9k5cpgl+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KlPT85UP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A35EC4CEF5;
+	Tue, 29 Jul 2025 16:58:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753808296;
+	bh=Hb9smdHf0g56CpF8sBWDOF38RasuaUJ0puvOlmqvOjY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KlPT85UP6HQLETFTi6OtUJx9aRuyZBcfrc4BG0gLSetfvPPGD3huNlBLFo0yL5k22
+	 Mtx9Bqa1YmgYyOQeni00rZcMrLD1xMmj+A/AcO7/p2AZGoUM57od4OFqJgUlcbZPy1
+	 vwoHTTPkVS1J/e0Wea9moLyTMgW5hPt3gOmatUFpd7vYVdHguB+8uTPSslkTw2M+Nd
+	 AQ9lmMqb8djPioT5MzVN22+r099MIJTq6z508uKiDs1wcvKL++f6Yh4T1g5d9/PNTn
+	 kMtkM/iz68Sx+YMXAHzvOowhlMKSqVIczcTgLwLbXL7BKChTSMwB2V7Xl1e7J3sn/D
+	 v2qe7PZzt4j6A==
+Date: Tue, 29 Jul 2025 17:58:10 +0100
+From: Simon Horman <horms@kernel.org>
+To: Gatien Chevallier <gatien.chevallier@foss.st.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next v2 1/2] drivers: net: stmmac: handle start time
+ set in the past for flexible PPS
+Message-ID: <20250729165810.GG1877762@horms.kernel.org>
+References: <20250729-relative_flex_pps-v2-0-3e5f03525c45@foss.st.com>
+ <20250729-relative_flex_pps-v2-1-3e5f03525c45@foss.st.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250729114251.GA2193@hu-sharathv-hyd.qualcomm.com>
- <6888d4d07c92c_15cf79294cb@willemb.c.googlers.com.notmuch>
- <b6beefcf-7525-4c70-9883-4ab8c8ba38ed@quicinc.com> <6888f2c11bd24_16648b29465@willemb.c.googlers.com.notmuch>
- <CANn89iLXLZGvuDhmTJV19A4jBpYGaAYp3hh3kjDUaDDZJqDLKw@mail.gmail.com> <6888f5eb491ac_1676002946c@willemb.c.googlers.com.notmuch>
-In-Reply-To: <6888f5eb491ac_1676002946c@willemb.c.googlers.com.notmuch>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 29 Jul 2025 09:43:23 -0700
-X-Gm-Features: Ac12FXyQBgKJQCYMujTKcIT7pCsVuNcY-zqNdElvzGKgf3xQlJPgHgRVR7ei2a8
-Message-ID: <CANn89iKA9O1jsTjm+vOQqN7ufBJFod7oySUC=2G7wcV2cGTkSw@mail.gmail.com>
-Subject: Re: [PATCH v2] net: Add locking to protect skb->dev access in ip_output
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Sharath Chandra Vurukala <quic_sharathv@quicinc.com>, davem@davemloft.net, dsahern@kernel.org, 
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
-	quic_kapandey@quicinc.com, quic_subashab@quicinc.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250729-relative_flex_pps-v2-1-3e5f03525c45@foss.st.com>
 
-On Tue, Jul 29, 2025 at 9:25=E2=80=AFAM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Eric Dumazet wrote:
-> > On Tue, Jul 29, 2025 at 9:11=E2=80=AFAM Willem de Bruijn
-> > <willemdebruijn.kernel@gmail.com> wrote:
-> > >
-> > > Sharath Chandra Vurukala wrote:
-> > >
-> > > > >> +  rcu_read_lock();
-> > >
-> > > How do we know that all paths taken from here are safe to be run
-> > > inside an rcu readside critical section btw?
-> >
-> > This is totally safe ;)
->
-> I trust that it is. It's just not immediately obvious to me why.
->
-> __dev_queue_xmit_nit calls rcu_read_lock_bh, so the safety of anything
-> downstream is clear.
->
-> But do all protocol stacks do this?
->
-> I see that TCP does, through __ip_queue_xmit. So that means all
-> code downstream of that, including all the modular netfilter code
-> already has to be safe indeed. That should suffice.
->
-> I started by looking at the UDP path and see no equivalent
-> rcu_read_lock call in that path however.
+On Tue, Jul 29, 2025 at 04:52:00PM +0200, Gatien Chevallier wrote:
+> In case the time arguments used for flexible PPS signal generation are in
+> the past, consider the arguments to be a time offset relative to the MAC
+> system time.
+> 
+> This way, past time use case is handled and it avoids the tedious work
+> of passing an absolute time value for the flexible PPS signal generation
+> while not breaking existing scripts that may rely on this behavior.
+> 
+> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c | 31 ++++++++++++++++++++++++
+>  1 file changed, 31 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
+> index 3767ba495e78d210b0529ee1754e5331f2dd0a47..5c712b33851081b5ae1dbf2a0988919ae647a9e2 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
+> @@ -10,6 +10,8 @@
+>  #include "stmmac.h"
+>  #include "stmmac_ptp.h"
+>  
+> +#define PTP_SAFE_TIME_OFFSET_NS	500000
+> +
+>  /**
+>   * stmmac_adjust_freq
+>   *
+> @@ -172,6 +174,10 @@ static int stmmac_enable(struct ptp_clock_info *ptp,
+>  
+>  	switch (rq->type) {
+>  	case PTP_CLK_REQ_PEROUT:
+> +		struct timespec64 curr_time;
+> +		u64 target_ns = 0;
+> +		u64 ns = 0;
+> +
 
-ip_output() can already be called from sections rcu_read_lock() protected,
-or from BH context.
+I think you need to wrap this case in {}, as is already done for the following
+case.
 
-The caller's context does not matter. I am unsure what you were
-looking at in the UDP stack ?
+Clang 20.1.8 W=1 build warn about the current arrangement as follows.
+
+  .../stmmac_ptp.c:177:3: warning: label followed by a declaration is a C23 extension [-Wc23-extensions]
+    177 |                 struct timespec64 curr_time;
+        |                 ^
+  1 warning generated.
+
+GCC 8.5.0 (but not 15.1.0) also flags this problem.
+
+Also, please note:
+
+## Form letter - net-next-closed
+
+The merge window for v6.17 has begun and therefore net-next is closed
+for new drivers, features, code refactoring and optimizations. We are
+currently accepting bug fixes only.
+
+Please repost when net-next reopens after 11th August.
+
+RFC patches sent for review only are obviously welcome at any time.
+
+See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
+
+-- 
+pw-bot: defer
 
