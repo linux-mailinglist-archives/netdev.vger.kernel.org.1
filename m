@@ -1,96 +1,152 @@
-Return-Path: <netdev+bounces-210743-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210744-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D966B14A37
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 10:37:56 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94B88B14A5B
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 10:46:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 955E117E907
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 08:37:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 499547AA0B0
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 08:45:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 299E6284B42;
-	Tue, 29 Jul 2025 08:37:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96F562868B2;
+	Tue, 29 Jul 2025 08:46:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="SgzbsFIO"
+	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="XwF5dllE"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B446257444;
-	Tue, 29 Jul 2025 08:37:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9624F286888
+	for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 08:46:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.132.182.106
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753778272; cv=none; b=BSZ8+xCRTLdo6RfOopOzOEb+1VuUvj+NM7vsRkOmL3Vu8umUNM8/nLlDG2ZrHuPJDsbpwD06UXGC8EbvZbBSknSbkN1vqmWZS1LiSb/GJpmKajffpnD5DOUHQ71k2sLb5zRfF4nsoUADROVTZglTW5xMDAdMXTQcr57jl9lZM1M=
+	t=1753778782; cv=none; b=IkLq5r5IyTuTtWD0mZ6BRqIMSgXErDSfcVVpYLdNFnEeox16Vd4NhB3Fn97FTNA1J4Aqa7CR/7GSrhRxv4EZTTIkYN6pONxL+wkFXPRo66L0jhLanKktWaMABIebwMm7bgs8mzOfec70UgyFxnCwcKahkxyD7BS6s2YYdL8rTf4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753778272; c=relaxed/simple;
-	bh=y/Y5P0CroU7rC8cmm95jgO2l2qmNjaJJzsY9D8+nsIA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pEEfbel0IljoCFnx6p4RIZGHT1+xlWzAD4FAcFXl21oXA/kRTK1UdKK+jreLYdlDJicmf0HzQkqV4uVbbURrN0feTuW1/C4lROfxyu+HLhWa9gcVaRlE3RlfL34beZIFdLoaLI5hBQZ/Paz0MiMBWvlVvpFvQkMwacJM7bVXFNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=SgzbsFIO; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=tZ00Hjq0cuPOuG6PFQ6g7fs+gf4AGbwqsb/B90LUVb8=; b=SgzbsFIObH7edu8MVUwwjZksCD
-	IKy0+ailYqETjkusyuO1+A+LD4jq8i739OmqohgmgEA580cv2xH+w6VnyXq+aInH6arHdpvuasfOi
-	6E/DgYOH0ufeqYtER2qnhhJytL4bFWazHJkf2G+z+0aAoz24HgIlvR588Y+wqCRV5u+v1zDMykM5b
-	toxjuM6r4Se2efghVUMERX76JnjNkCLUeW1srE3lBcGg5Ky9MQmXmf9xc391pUg3LxWwQSHH2DDM2
-	YIwFWlYiihKPA7sRhDq1FfUtury00VHL67ULCjJZ+y1qxvz2NQJayn24No3jhTn1321AQJlCP5TaM
-	zBdzv5Ww==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:44212)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1ugfq5-0001aV-1N;
-	Tue, 29 Jul 2025 09:37:37 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1ugfq2-0007F0-20;
-	Tue, 29 Jul 2025 09:37:34 +0100
-Date: Tue, 29 Jul 2025 09:37:34 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [net-next RFC PATCH] net: phylink: add .pcs_link_down PCS OP
-Message-ID: <aIiITk-7WPYMzcEl@shell.armlinux.org.uk>
-References: <20250729082126.2261-1-ansuelsmth@gmail.com>
+	s=arc-20240116; t=1753778782; c=relaxed/simple;
+	bh=WY2UlMLKeLmqAMB/yJuFTN4pS7HC8+jweYlnwQXzRaA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=Xl3uryr+3/m13y12gEwOmbvQyRgP9QfGV+Ic7jdbJzNMv3t87TW5uLA1AyD7mcotWLYIooETBtbhjla6Qf9Qs1BkYQ4iV9djKETA2RyxegwzYIhMa4YCVWBSThGz7f2c9uDuy8nBQggsSCLx4kuiDzEid8rbo0mxl+qAyoIefqA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=XwF5dllE; arc=none smtp.client-ip=185.132.182.106
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
+Received: from pps.filterd (m0369458.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56T8YNat014089;
+	Tue, 29 Jul 2025 10:45:49 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=selector1; bh=
+	dZOnwyJc/z92LBdcHXh09X96k4RSZO3Wfpl7wZweE1U=; b=XwF5dllEtECZLCeq
+	JJifgyRlhmk9xDJChmramDEt0vbuK5xkHgtWAt+3NgJRIN5ptXyhNVShV476LLg4
+	Ee384LrKR+nfpswuEJva/XjMRNXgsvo8hbbP8LVl9MEDHrSmFyqzQawtuzsnCBjW
+	3tndnxRP71fnGUcb/gyVjYA66+Zh5ibkl7EA3Dwq1WXEiz+S+B4vFuf6ZYMSZY4a
+	q2laWBj7+d7G208HtTSG+/dDfiFNciLpIqJn7mK7GVivJFGpcouiB626sSwu1a+Y
+	57NhNXArM0o9iq4tAasVLMKdxTWdv5qOCH4m8r6AcB4fgaYCSQk3rJK517Rg2EFg
+	7ivAsw==
+Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 4858k51a3a-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 29 Jul 2025 10:45:49 +0200 (MEST)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 53DFD4004D;
+	Tue, 29 Jul 2025 10:44:24 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 8DA065F4E65;
+	Tue, 29 Jul 2025 10:43:33 +0200 (CEST)
+Received: from [10.48.87.141] (10.48.87.141) by SHFDAG1NODE1.st.com
+ (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 29 Jul
+ 2025 10:43:32 +0200
+Message-ID: <77229e46-6466-4cd4-9b3b-d76aadbe167c@foss.st.com>
+Date: Tue, 29 Jul 2025 10:43:24 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250729082126.2261-1-ansuelsmth@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Linux-stm32] [PATCH RFC net-next 6/7] net: stmmac: add helpers
+ to indicate WoL enable status
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+        Andrew Lunn
+	<andrew@lunn.ch>
+CC: <netdev@vger.kernel.org>, <linux-stm32@st-md-mailman.stormreply.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        Eric Dumazet <edumazet@google.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        <linux-arm-kernel@lists.infradead.org>,
+        Heiner
+ Kallweit <hkallweit1@gmail.com>
+References: <aIebMKnQgzQxIY3j@shell.armlinux.org.uk>
+ <E1ugQ33-006KDR-Nj@rmk-PC.armlinux.org.uk>
+ <eaef1b1b-5366-430c-97dd-cf3b40399ac7@lunn.ch>
+ <aIe5SqLITb2cfFQw@shell.armlinux.org.uk>
+Content-Language: en-US
+From: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
+In-Reply-To: <aIe5SqLITb2cfFQw@shell.armlinux.org.uk>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SHFCAS1NODE1.st.com (10.75.129.72) To SHFDAG1NODE1.st.com
+ (10.75.129.69)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-07-29_02,2025-07-28_01,2025-03-28_01
 
-On Tue, Jul 29, 2025 at 10:21:23AM +0200, Christian Marangi wrote:
-> Permit for PCS driver to define specific operation to torn down the link
-> between the MAC and the PCS.
-> 
-> This might be needed for some PCS that reset counter or require special
-> reset to correctly work if the link needs to be restored later.
-> 
-> On phylink_link_down() call, the additional phylink_pcs_link_down() will
-> be called before .mac_link_down to torn down the link.
-> 
-> PCS driver will need to define .pcs_link_down to make use of this.
 
-I don't accept new stuff without a user. Please provide the user as
-well. Thanks.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+On 7/28/25 19:54, Russell King (Oracle) wrote:
+> On Mon, Jul 28, 2025 at 07:28:01PM +0200, Andrew Lunn wrote:
+>>> +static inline bool stmmac_wol_enabled_mac(struct stmmac_priv *priv)
+>>> +{
+>>> +	return priv->plat->pmt && device_may_wakeup(priv->device);
+>>> +}
+>>> +
+>>> +static inline bool stmmac_wol_enabled_phy(struct stmmac_priv *priv)
+>>> +{
+>>> +	return !priv->plat->pmt && device_may_wakeup(priv->device);
+>>> +}
+>>
+>> I agree this is a direct translation into a helper.
+>>
+>> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+>>
+>> I'm guessing at some point you want to change these two
+>> helpers. e.g. at some point, you want to try getting the PHY to do the
+>> WoL, independent of !priv->plat->pmt?
+>>
+>>> -	if (device_may_wakeup(priv->device) && !priv->plat->pmt)
+>>> +	if (stmmac_wol_enabled_phy(priv))
+>>>   		phylink_speed_down(priv->phylink, false);
+>>
+>> This might be related to the next patch. But why only do speed down
+>> when PHY is doing WoL? If the MAC is doing WoL, you could also do a
+>> speed_down.
+> 
+> No idea, but that's what the code currently does, and, as ever with
+> a cleanup series, I try to avoid functional changes in cleanup series.
+> 
+> Also, bear in mind that I can't test any of this.
+> 
+> We haven't yet been successful in getting WoL working in mainline. It
+> _seems_ that the Jetson Xaiver NX platform should be using PHY mode,
+> but the Realtek PHY driver is definitely broken for WoL. Even with
+> that hacked, and along with other fixes that I've been given, I still
+> can't get the SoC to wake up via WoL. In fact, the changes to change
+> DT to specify the PHY interrupt as being routed through the PM
+> controller results in normal PHY link up/down interrupts no longer
+> working.
+> 
+> I'd like someone else to test functional changes!
+> 
+
+Hello Russel,
+
+First of all, thank you for taking the time to improve this code.
+What exactly do you mean by hacking? Forcing !priv->plat->pmt?
 
