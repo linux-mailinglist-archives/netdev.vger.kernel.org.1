@@ -1,180 +1,861 @@
-Return-Path: <netdev+bounces-210719-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210720-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B83A4B14805
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 08:10:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97D08B14861
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 08:44:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E16B01650E1
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 06:10:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D63824E0901
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 06:43:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99F30256C9C;
-	Tue, 29 Jul 2025 06:10:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2845525D535;
+	Tue, 29 Jul 2025 06:44:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="aM9Fmoaw"
+	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="ExJEV+8h";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="bZyLoi0E"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2049.outbound.protection.outlook.com [40.107.212.49])
+Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8CDC1D516F;
-	Tue, 29 Jul 2025 06:10:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.49
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753769445; cv=fail; b=HVgDy8TLz0bVfsUY4WyItOxzw4IBMqCQkIFXXCWkprwY5qwelHaIJvjPL9TBwbmqPQki4Z+K/WvMWdT2gjaEEI4YOa8wrvBh2yq4fHnzVmOjoZneiCi+pbItKOxUrM0vERh+6csZnRAPMyTyxauhNcNHRl5LZb/TCtFQhNxP0S4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753769445; c=relaxed/simple;
-	bh=N/GrxoUKJiu091f5NciCsYEb/Ll/wfKkrTlCnGaTGmo=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=d053N83sAIwLNO23e5LtX2ESfcHQS91vxxlYbYdz0xk8V54AN10elnMnGktEaCYfFg55JLCXvQ0p+H3+GG1EtY1pbfztC4U6uYVfWzPku5HvJD5fhtpnw8/kXsYuNThfj6IM7ViWnrUMK0UbetF1+xWz1aNjXQ/fhteTLPZRhyk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=aM9Fmoaw; arc=fail smtp.client-ip=40.107.212.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=vkxIuWUXR9ZUaDDlLfclix7Wn8+1u16oagyVAPO0KzmqO5xKk7oI/ctS9XPH+Zgjcn26kxj5u2QQQLWaL1XUUmcWyCZB26uN+rxuXY3Jh2xbafRrk41eLnkNWS3U9aUVpKhpzpxsqoPR9FBxQKFJz27C4tZwoh4oDxLUdWc5X6A8Um/5PPt7cUeX7htpbsNVGuqQfbsp+CHCoCNnMcMJxdR0si8dvTLXPAt3JnX3Nuyp/PA9qY8YvZMtIaOxAAEzSIGsKgA2HWHcIwXN52mwed9HvnVFE0Oh1qf1c5koP2xt5MM9Zz6bFBBSl1InNeZU6CLAL/sQhL34LzJnkc8RVw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8Fv1hA/qsjeEkI/16JLSZ1ClD5tjCyrnjtRqHeZDVWs=;
- b=YGOiiCHBH4Q0pHyDjUKh1TJ3GDZrtRbLRmjz1fbcQvb1lz3OckAH9zBYFqyXbo9UW/paHpdASShbOzB03WUEk96cJ0+DR5jzTJd+dPUHHXynoceS+pFssv/UBMuGbk3SKThy7n4LsP3xND+elcLlSvplvyJFLhyV/rFW3gbQKl2ZTRuynkVIBlCwe5T0qgdba/E+P70XxDCFZVezX4j49NlcfdPvNj0AZQAq6beEdB3z+qbRKqFEPUf0R6F/p2jrC+kq5cOqUIfStwKVRF/iEvkMpxQt/+sUZHu4nRqCxZiP1ztdLzp15mo7ZBDx2Fx0EnYGS25xnBpzL3y8Nr0L+w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8Fv1hA/qsjeEkI/16JLSZ1ClD5tjCyrnjtRqHeZDVWs=;
- b=aM9FmoawsCm73BQofwnYJYQ3V80rv9/H6PM44K6xaq3TGzJnxUwTlWAr4u3HOIAeYLp0N/EhbpFXJMpROJR9Lf1+fvFHv2BnNiW2k2p1QypPBBWiBgUkVlwodH/qFskSm4u7zp8m+n56hPr+oKQKviZ7P7lFyg11pTGH+VIQems=
-Received: from CH5P221CA0023.NAMP221.PROD.OUTLOOK.COM (2603:10b6:610:1f2::25)
- by SJ5PPFA5F0E981D.namprd12.prod.outlook.com (2603:10b6:a0f:fc02::99d) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8964.21; Tue, 29 Jul
- 2025 06:10:40 +0000
-Received: from CH1PEPF0000A345.namprd04.prod.outlook.com
- (2603:10b6:610:1f2:cafe::48) by CH5P221CA0023.outlook.office365.com
- (2603:10b6:610:1f2::25) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8943.33 via Frontend Transport; Tue,
- 29 Jul 2025 06:10:40 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CH1PEPF0000A345.mail.protection.outlook.com (10.167.244.8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8989.10 via Frontend Transport; Tue, 29 Jul 2025 06:10:40 +0000
-Received: from SATLEXMB06.amd.com (10.181.40.147) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 29 Jul
- 2025 01:10:39 -0500
-Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB06.amd.com
- (10.181.40.147) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 29 Jul
- 2025 01:10:38 -0500
-Received: from xhdvineethc40.xilinx.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server id 15.1.2507.39 via Frontend
- Transport; Tue, 29 Jul 2025 01:10:35 -0500
-From: Vineeth Karumanchi <vineeth.karumanchi@amd.com>
-To: <git@amd.com>, <vinicius.gomes@intel.com>, <jhs@mojatatu.com>,
-	<xiyou.wangcong@gmail.com>, <jiri@resnulli.us>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<horms@kernel.org>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <vineeth.karumanchi@amd.com>
-Subject: [RFC PATCH net] net: taprio: Validate offload support using NETIF_F_HW_TC in hw_features
-Date: Tue, 29 Jul 2025 11:40:34 +0530
-Message-ID: <20250729061034.3400624-1-vineeth.karumanchi@amd.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACC7019ADBF;
+	Tue, 29 Jul 2025 06:43:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753771440; cv=none; b=mGvnwzxbZmcSTxaYQ2oHnvH/XDgdciqRJjQUjPV5552mgKdSTYO2KcMD9ursV7vXNRTTjXNIWxLaAFkSZRnSBrgKNdwXP4I6E+4pMjZtXdzshqzpu73d7C4txlBu9vLsP9Q47qfPzTUj9x6n93IwlZ0jht5T2CglwoGhpI4HNnY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753771440; c=relaxed/simple;
+	bh=sM+1f1W3wxhedtvqVe4380UbBLWTaVwTmCwcVtH8AE0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EO+yKUGDC8dON5E1ZmQdsxCyDTHVeqcHYJ/w+zn4fH6iTEhpCvFFAzJL7LqOAb2+w2DUqZ5/lQXR3qcFHNBYzTajQdtwySPZACmRzBRbJ6L9hm1SVYMKPvIypqM+qa3CrOxYNijbeHLrIB/ott03a12dxKuUcSIfoDCbGf0Lk6E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=ExJEV+8h; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=bZyLoi0E reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
+  t=1753771436; x=1785307436;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=QDyrCeBw4rnnn/DNJ6kkjkhexz49Zb8SKSCeM7mOOEo=;
+  b=ExJEV+8hYWI1COF3gUVu1IcG6kvwacGExlnM3n00rUwx2C7nRTnQKmcb
+   LvKT0rlV7YkxVpdL+9Gak8qN0dEpMOKLhrUKwL32jIX4s0HwebfTtI0kO
+   BSnMRDjubQl2BQX9cVX7mL4xnCk2/c7cEEWMFGaj8B0JcW1wWF0JhLOQH
+   O/1aB/m6w/RFVnc7zSG3fn9tA9Li091MeU3UUCDDFlIgFi68X1USovMXM
+   iAgzz9OoIHPMCo8dtndmEXv+ka+jLuCt+Nr5Mh9YI7OviQqFXLlPEWBCY
+   KkzGGqstu7Kg3MY8KEgrlIzmQmdQqETc6zOmB/Fn6DTT1dJ9m/+fso3Uv
+   A==;
+X-CSE-ConnectionGUID: ooo67CxaTUe86N+KC2c5Lw==
+X-CSE-MsgGUID: ulODftRJSdiGzpOUpPuoeg==
+X-IronPort-AV: E=Sophos;i="6.16,348,1744063200"; 
+   d="scan'208";a="45463951"
+Received: from vmailcow01.tq-net.de ([10.150.86.48])
+  by mx1.tq-group.com with ESMTP; 29 Jul 2025 08:43:47 +0200
+X-CheckPoint: {68886DA3-7-4FC15ADB-CD71293B}
+X-MAIL-CPID: A6887ACEAF6F7F183E6628380BA7739F_0
+X-Control-Analysis: str=0001.0A00210D.68886D5A.0060,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id F0DB2160D38;
+	Tue, 29 Jul 2025 08:43:37 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
+	s=dkim; t=1753771422;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QDyrCeBw4rnnn/DNJ6kkjkhexz49Zb8SKSCeM7mOOEo=;
+	b=bZyLoi0Emda9peu1R7oYqcIIYhCXKygc1ha0D8MDLHWbMaQ2X9NX0B5lZnN4rXN/6EXdPA
+	axJE2b9Ky8jCf43N16KTgvE71Z4b9Xm9P+ZFyoLpZAjED5dxzEOL0tHJkFODwljhH33rjC
+	VA1WcAxVSIeS9i4Hg4k2iGK9I42dqhVk6WgMbWwUe0dq+VvIbDh2P+rMC+nU+fbnmC4kuX
+	VyM4QHgBmT6LUOLDpi1RGciSg1Vx6HyoIwZ2lv5QvwwtCmljviwpuSeV2N2D0MWCZFvsLb
+	wRUjn9NNYr82vAavZV/NxPyMc1owCCa6+95l5zBVHp8HPwF2FyTqrOmG8WcIEg==
+From: Alexander Stein <alexander.stein@ew.tq-group.com>
+To: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+ shawnguo@kernel.org, s.hauer@pengutronix.de, kernel@pengutronix.de,
+ festevam@gmail.com, peng.fan@nxp.com, richardcochran@gmail.com,
+ catalin.marinas@arm.com, will@kernel.org, ulf.hansson@linaro.org,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
+ alexandre.torgue@foss.st.com, frieder.schrempf@kontron.de,
+ primoz.fiser@norik.com, othacehe@gnu.org, Markus.Niebel@ew.tq-group.com,
+ Joy Zou <joy.zou@nxp.com>
+Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ linux@ew.tq-group.com, netdev@vger.kernel.org, linux-pm@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com, Frank.Li@nxp.com
+Subject:
+ Re: [PATCH v7 06/11] arm64: dts: freescale: add i.MX91 11x11 EVK basic
+ support
+Date: Tue, 29 Jul 2025 08:43:37 +0200
+Message-ID: <2793248.mvXUDI8C0e@steina-w>
+Organization: TQ-Systems GmbH
+In-Reply-To: <20250728071438.2332382-7-joy.zou@nxp.com>
+References:
+ <20250728071438.2332382-1-joy.zou@nxp.com>
+ <20250728071438.2332382-7-joy.zou@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH1PEPF0000A345:EE_|SJ5PPFA5F0E981D:EE_
-X-MS-Office365-Filtering-Correlation-Id: 069bd1c9-d608-4b13-b1cb-08ddce66a50b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|82310400026|1800799024|36860700013|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?q7tEpM+VDRb2vXFLbammzYs6boqSk//gvxZhvZDvcYSAvV61JiRfdJxAKf4T?=
- =?us-ascii?Q?GWoHNm3Dl1eEchbd8DkP0ft1ozAnvVF4V1yCnbupgoP3ikYbxzadN05gwmxD?=
- =?us-ascii?Q?x6K8DeP/QaFEvmWEGDd0sZnwoZin/FMRZF3lDRJ74ZqRLxGCvwfYoXskAgb+?=
- =?us-ascii?Q?JpMamhzq4lE2oMtz/yWcHorkvhy2fiv8OM9kALrrhevqNSpXpsEkCiXSTPWR?=
- =?us-ascii?Q?dyO/+rs9dEpiCXel3dekXjdrKNQcG3XbvT7ddoNUuqZd+1pn2TPq2H/mLPoq?=
- =?us-ascii?Q?x452+R/OhFLvJ5EHU51DND8y5kb7j5zL8oG2T7mI2WkSHm5HURtC6jEkriwx?=
- =?us-ascii?Q?Tns97Ltuiwa32FwIxUXB66EBZsz0d3rAGbrvOCrEJg+Z1+c0eg+SlESXvh7y?=
- =?us-ascii?Q?DTWnVnkxm84EIEx0AQfcLWb8/ArUySwjGglB7YOQDzXXV0IK7TWY7QclIOxd?=
- =?us-ascii?Q?JZkBSGZzv9oj1yCFBsrfFosG5tUBFJ6iwMpIrt83Two3I9wVNtMCE4LTj0Z/?=
- =?us-ascii?Q?ZSyv4FmwPlhVpGuNv0drrgngWfq7FpV+BcjXE47l0UPRohYy8zvLaG4CtSbm?=
- =?us-ascii?Q?niP2OAyJKKj5bKrSRAn2EZ4pK+P0mxkW6kg8+s7ndJ2Na9lci5gJRnGCcQTf?=
- =?us-ascii?Q?rIqRxkkVSM6KlCDvYXYBHjBuh/7Qn4D0e6E6orsxTu/9n9H5wayOm8NKlwGG?=
- =?us-ascii?Q?O6F8ZeQKdBfeZClTVf4FgIYFk1PoUL+Egd/d76q3FKjK2Z7E0ope9LQoChZM?=
- =?us-ascii?Q?ggQCl7RT953Oe6LBAJec6tlzuGrsXFQmHp0cgDqzoF0gMCk65PCMvI8mIqNV?=
- =?us-ascii?Q?5IPOP/Ue8OmfWUVNLrdiy7rwmiMcWN2thh3iFoQNgQkrEXiaDEBx/WZIVuSG?=
- =?us-ascii?Q?/hH86ea3rBLo3Y65QuclBW7xKw1Z7jtJJwmiIBwVI598ue+W4fCrrE4SdXtl?=
- =?us-ascii?Q?7f8DmTz4lQ3VyStVz4tF44qeVnWWegH84lsaegcTE2VUQCIFMAn+nC7rEm8w?=
- =?us-ascii?Q?72Odo90O5CA1OPycuvNFo2fyLwQhIxLP0lRn+DHrr19B96PpQy4nK5cYlGda?=
- =?us-ascii?Q?bIEcHZJL5PpqrxjOmL6JM1M4H15P4B80+tDZO2LeF6q4xhuL1VBgCevRBf9/?=
- =?us-ascii?Q?FzSsEauG1SUSIT2ZUqm4pWJZHX7A4lWNpb3xKPmiWatq7qdo+3gJKzo0KoAm?=
- =?us-ascii?Q?3MCXGR05fKKZKic0WbZNCOXkTMqAC+vGO8wpYiv24HxiYjHd9G10ipyNqCLV?=
- =?us-ascii?Q?VrTCyoDKZUYiqb7zFgkpoPY9BX+x/V1VxURS7vwNBje3/ABY5vOcLj32uamh?=
- =?us-ascii?Q?4dxZE9jPV4SqdmuvSm98mPn9gDtEQMQfrHhivzy2uiW8I/tLvgyHMBPYg/Fu?=
- =?us-ascii?Q?wKo7Q3OQDZ/RRqIWqGPjU7HuQO5Br3GQyB6S/diSbA2tF1zPEkRauH6ARUnN?=
- =?us-ascii?Q?+129KiYx3yz2TJ9EFb7yxzdbDvdcz0E6925hfq6oUiLbK0A7VWGXZMWRgkPO?=
- =?us-ascii?Q?AMLNL7MQz2IYokpcZfMoKhfKj7C0/QXG6MwTllwyouyweXlbPY5R6x1wkg?=
- =?us-ascii?Q?=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(7416014)(376014)(82310400026)(1800799024)(36860700013)(921020);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jul 2025 06:10:40.6925
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 069bd1c9-d608-4b13-b1cb-08ddce66a50b
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH1PEPF0000A345.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ5PPFA5F0E981D
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
+X-Last-TLS-Session-Version: TLSv1.3
 
-The current taprio offload validation relies solely on the presence of
-.ndo_setup_tc, which is insufficient. Some IP versions of a driver expose
-.ndo_setup_tc but lack actual hardware offload support for taprio.
+Hi,
 
-To address this, add a check for NETIF_F_HW_TC in netdev->hw_features.
-This ensures that taprio offload is only enabled on devices that
-explicitly advertise hardware traffic control capabilities.
+Am Montag, 28. Juli 2025, 09:14:33 CEST schrieb Joy Zou:
+> Add i.MX91 11x11 EVK board support.
+> - Enable ADC1.
+> - Enable lpuart1 and lpuart5.
+> - Enable network eqos and fec.
+> - Enable I2C bus and children nodes under I2C bus.
+> - Enable USB and related nodes.
+> - Enable uSDHC1 and uSDHC2.
+> - Enable Watchdog3.
+>=20
+> Signed-off-by: Pengfei Li <pengfei.li_1@nxp.com>
+> Signed-off-by: Joy Zou <joy.zou@nxp.com>
+> ---
+> Changes for v7:
+> 1. remove this unused comments, there are not imx91-11x11-evk-i3c.dts.
+> 2. align all pinctrl value to the same column.
+> 3. add aliases because remove aliases from common dtsi.
+> 4. The 'eee-broken-1000t' flag disables Energy-Efficient Ethernet (EEE) o=
+n 1G
+>    links as a workaround for PTP sync issues on older i.MX6 platforms.
+>    Remove it since the i.MX91 have not such issue.
+>=20
+> Changes for v6:
+> 1. remove unused regulators and pinctrl settings.
+>=20
+> Changes for v5:
+> 1. change node name codec and lsm6dsm into common name audio-codec and
+>    inertial-meter, and add BT compatible string.
+>=20
+> Changes for v4:
+> 1. remove pmic node unused newline.
+> 2. delete the tcpc@50 status property.
+> 3. align pad hex values.
+>=20
+> Changes for v3:
+> 1. format imx91-11x11-evk.dts with the dt-format tool.
+> 2. add lpi2c1 node.
+> ---
+>  arch/arm64/boot/dts/freescale/Makefile        |   1 +
+>  .../boot/dts/freescale/imx91-11x11-evk.dts    | 674 ++++++++++++++++++
+>  2 files changed, 675 insertions(+)
+>  create mode 100644 arch/arm64/boot/dts/freescale/imx91-11x11-evk.dts
+>=20
+> diff --git a/arch/arm64/boot/dts/freescale/Makefile b/arch/arm64/boot/dts=
+/freescale/Makefile
+> index 0b473a23d120..fbedb3493c09 100644
+> --- a/arch/arm64/boot/dts/freescale/Makefile
+> +++ b/arch/arm64/boot/dts/freescale/Makefile
+> @@ -315,6 +315,7 @@ dtb-$(CONFIG_ARCH_MXC) +=3D imx8qxp-tqma8xqp-mba8xx.d=
+tb
+>  dtb-$(CONFIG_ARCH_MXC) +=3D imx8qxp-tqma8xqps-mb-smarc-2.dtb
+>  dtb-$(CONFIG_ARCH_MXC) +=3D imx8ulp-evk.dtb
+>  dtb-$(CONFIG_ARCH_MXC) +=3D imx93-9x9-qsb.dtb
+> +dtb-$(CONFIG_ARCH_MXC) +=3D imx91-11x11-evk.dtb
 
-Note: Some drivers already set NETIF_F_HW_TC alongside .ndo_setup_tc.
-Follow-up patches will be submitted to update remaining drivers if this
-approach is accepted.
+Please add imx91 before imx93, otherwise inserting will be a pain.
 
-Signed-off-by: Vineeth Karumanchi <vineeth.karumanchi@amd.com>
----
- net/sched/sch_taprio.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Best regards,
+Alexander
 
-diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
-index 2b14c81a87e5..a797995bdc8d 100644
---- a/net/sched/sch_taprio.c
-+++ b/net/sched/sch_taprio.c
-@@ -1506,7 +1506,7 @@ static int taprio_enable_offload(struct net_device *dev,
- 	struct tc_taprio_caps caps;
- 	int tc, err = 0;
- 
--	if (!ops->ndo_setup_tc) {
-+	if (!ops->ndo_setup_tc || !(dev->hw_features & NETIF_F_HW_TC)) {
- 		NL_SET_ERR_MSG(extack,
- 			       "Device does not support taprio offload");
- 		return -EOPNOTSUPP;
--- 
-2.34.1
+> =20
+>  imx93-9x9-qsb-i3c-dtbs +=3D imx93-9x9-qsb.dtb imx93-9x9-qsb-i3c.dtbo
+>  dtb-$(CONFIG_ARCH_MXC) +=3D imx93-9x9-qsb-i3c.dtb
+> diff --git a/arch/arm64/boot/dts/freescale/imx91-11x11-evk.dts b/arch/arm=
+64/boot/dts/freescale/imx91-11x11-evk.dts
+> new file mode 100644
+> index 000000000000..aca78768dbd4
+> --- /dev/null
+> +++ b/arch/arm64/boot/dts/freescale/imx91-11x11-evk.dts
+> @@ -0,0 +1,674 @@
+> +// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+> +/*
+> + * Copyright 2025 NXP
+> + */
+> +
+> +/dts-v1/;
+> +
+> +#include <dt-bindings/usb/pd.h>
+> +#include "imx91.dtsi"
+> +
+> +/ {
+> +	compatible =3D "fsl,imx91-11x11-evk", "fsl,imx91";
+> +	model =3D "NXP i.MX91 11X11 EVK board";
+> +
+> +	aliases {
+> +		ethernet0 =3D &fec;
+> +		ethernet1 =3D &eqos;
+> +		gpio0 =3D &gpio1;
+> +		gpio1 =3D &gpio2;
+> +		gpio2 =3D &gpio3;
+> +		i2c0 =3D &lpi2c1;
+> +		i2c1 =3D &lpi2c2;
+> +		i2c2 =3D &lpi2c3;
+> +		mmc0 =3D &usdhc1;
+> +		mmc1 =3D &usdhc2;
+> +		rtc0 =3D &bbnsm_rtc;
+> +		serial0 =3D &lpuart1;
+> +		serial1 =3D &lpuart2;
+> +		serial2 =3D &lpuart3;
+> +		serial3 =3D &lpuart4;
+> +		serial4 =3D &lpuart5;
+> +	};
+> +
+> +	chosen {
+> +		stdout-path =3D &lpuart1;
+> +	};
+> +
+> +	reg_vref_1v8: regulator-adc-vref {
+> +		compatible =3D "regulator-fixed";
+> +		regulator-max-microvolt =3D <1800000>;
+> +		regulator-min-microvolt =3D <1800000>;
+> +		regulator-name =3D "vref_1v8";
+> +	};
+> +
+> +	reg_audio_pwr: regulator-audio-pwr {
+> +		compatible =3D "regulator-fixed";
+> +		regulator-always-on;
+> +		regulator-max-microvolt =3D <3300000>;
+> +		regulator-min-microvolt =3D <3300000>;
+> +		regulator-name =3D "audio-pwr";
+> +		gpio =3D <&adp5585 1 GPIO_ACTIVE_HIGH>;
+> +		enable-active-high;
+> +	};
+> +
+> +	reg_usdhc2_vmmc: regulator-usdhc2 {
+> +		compatible =3D "regulator-fixed";
+> +		off-on-delay-us =3D <12000>;
+> +		pinctrl-0 =3D <&pinctrl_reg_usdhc2_vmmc>;
+> +		pinctrl-names =3D "default";
+> +		regulator-max-microvolt =3D <3300000>;
+> +		regulator-min-microvolt =3D <3300000>;
+> +		regulator-name =3D "VSD_3V3";
+> +		gpio =3D <&gpio3 7 GPIO_ACTIVE_HIGH>;
+> +		enable-active-high;
+> +	};
+> +
+> +	reserved-memory {
+> +		ranges;
+> +		#address-cells =3D <2>;
+> +		#size-cells =3D <2>;
+> +
+> +		linux,cma {
+> +			compatible =3D "shared-dma-pool";
+> +			alloc-ranges =3D <0 0x80000000 0 0x40000000>;
+> +			reusable;
+> +			size =3D <0 0x10000000>;
+> +			linux,cma-default;
+> +		};
+> +	};
+> +};
+> +
+> +&adc1 {
+> +	vref-supply =3D <&reg_vref_1v8>;
+> +	status =3D "okay";
+> +};
+> +
+> +&eqos {
+> +	phy-handle =3D <&ethphy1>;
+> +	phy-mode =3D "rgmii-id";
+> +	pinctrl-0 =3D <&pinctrl_eqos>;
+> +	pinctrl-1 =3D <&pinctrl_eqos_sleep>;
+> +	pinctrl-names =3D "default", "sleep";
+> +	status =3D "okay";
+> +
+> +	mdio {
+> +		compatible =3D "snps,dwmac-mdio";
+> +		#address-cells =3D <1>;
+> +		#size-cells =3D <0>;
+> +		clock-frequency =3D <5000000>;
+> +
+> +		ethphy1: ethernet-phy@1 {
+> +			reg =3D <1>;
+> +			realtek,clkout-disable;
+> +		};
+> +	};
+> +};
+> +
+> +&fec {
+> +	phy-handle =3D <&ethphy2>;
+> +	phy-mode =3D "rgmii-id";
+> +	pinctrl-0 =3D <&pinctrl_fec>;
+> +	pinctrl-1 =3D <&pinctrl_fec_sleep>;
+> +	pinctrl-names =3D "default", "sleep";
+> +	fsl,magic-packet;
+> +	status =3D "okay";
+> +
+> +	mdio {
+> +		#address-cells =3D <1>;
+> +		#size-cells =3D <0>;
+> +		clock-frequency =3D <5000000>;
+> +
+> +		ethphy2: ethernet-phy@2 {
+> +			reg =3D <2>;
+> +			realtek,clkout-disable;
+> +		};
+> +	};
+> +};
+> +
+> +&lpi2c1 {
+> +	clock-frequency =3D <400000>;
+> +	pinctrl-0 =3D <&pinctrl_lpi2c1>;
+> +	pinctrl-names =3D "default";
+> +	status =3D "okay";
+> +
+> +	audio_codec: wm8962@1a {
+> +		compatible =3D "wlf,wm8962";
+> +		reg =3D <0x1a>;
+> +		clocks =3D <&clk IMX93_CLK_SAI3_GATE>;
+> +		AVDD-supply =3D <&reg_audio_pwr>;
+> +		CPVDD-supply =3D <&reg_audio_pwr>;
+> +		DBVDD-supply =3D <&reg_audio_pwr>;
+> +		DCVDD-supply =3D <&reg_audio_pwr>;
+> +		MICVDD-supply =3D <&reg_audio_pwr>;
+> +		PLLVDD-supply =3D <&reg_audio_pwr>;
+> +		SPKVDD1-supply =3D <&reg_audio_pwr>;
+> +		SPKVDD2-supply =3D <&reg_audio_pwr>;
+> +		gpio-cfg =3D <
+> +			0x0000 /* 0:Default */
+> +			0x0000 /* 1:Default */
+> +			0x0000 /* 2:FN_DMICCLK */
+> +			0x0000 /* 3:Default */
+> +			0x0000 /* 4:FN_DMICCDAT */
+> +			0x0000 /* 5:Default */
+> +		>;
+> +	};
+> +
+> +	inertial-meter@6a {
+> +		compatible =3D "st,lsm6dso";
+> +		reg =3D <0x6a>;
+> +	};
+> +};
+> +
+> +&lpi2c2 {
+> +	#address-cells =3D <1>;
+> +	#size-cells =3D <0>;
+> +	clock-frequency =3D <400000>;
+> +	pinctrl-0 =3D <&pinctrl_lpi2c2>;
+> +	pinctrl-names =3D "default";
+> +	status =3D "okay";
+> +
+> +	pcal6524: gpio@22 {
+> +		compatible =3D "nxp,pcal6524";
+> +		reg =3D <0x22>;
+> +		#interrupt-cells =3D <2>;
+> +		interrupt-controller;
+> +		interrupts =3D <27 IRQ_TYPE_LEVEL_LOW>;
+> +		#gpio-cells =3D <2>;
+> +		gpio-controller;
+> +		interrupt-parent =3D <&gpio3>;
+> +		pinctrl-0 =3D <&pinctrl_pcal6524>;
+> +		pinctrl-names =3D "default";
+> +	};
+> +
+> +	pmic@25 {
+> +		compatible =3D "nxp,pca9451a";
+> +		reg =3D <0x25>;
+> +		interrupts =3D <11 IRQ_TYPE_EDGE_FALLING>;
+> +		interrupt-parent =3D <&pcal6524>;
+> +
+> +		regulators {
+> +			buck1: BUCK1 {
+> +				regulator-always-on;
+> +				regulator-boot-on;
+> +				regulator-max-microvolt =3D <2237500>;
+> +				regulator-min-microvolt =3D <650000>;
+> +				regulator-name =3D "BUCK1";
+> +				regulator-ramp-delay =3D <3125>;
+> +			};
+> +
+> +			buck2: BUCK2 {
+> +				regulator-always-on;
+> +				regulator-boot-on;
+> +				regulator-max-microvolt =3D <2187500>;
+> +				regulator-min-microvolt =3D <600000>;
+> +				regulator-name =3D "BUCK2";
+> +				regulator-ramp-delay =3D <3125>;
+> +			};
+> +
+> +			buck4: BUCK4 {
+> +				regulator-always-on;
+> +				regulator-boot-on;
+> +				regulator-max-microvolt =3D <3400000>;
+> +				regulator-min-microvolt =3D <600000>;
+> +				regulator-name =3D "BUCK4";
+> +			};
+> +
+> +			buck5: BUCK5 {
+> +				regulator-always-on;
+> +				regulator-boot-on;
+> +				regulator-max-microvolt =3D <3400000>;
+> +				regulator-min-microvolt =3D <600000>;
+> +				regulator-name =3D "BUCK5";
+> +			};
+> +
+> +			buck6: BUCK6 {
+> +				regulator-always-on;
+> +				regulator-boot-on;
+> +				regulator-max-microvolt =3D <3400000>;
+> +				regulator-min-microvolt =3D <600000>;
+> +				regulator-name =3D "BUCK6";
+> +			};
+> +
+> +			ldo1: LDO1 {
+> +				regulator-always-on;
+> +				regulator-boot-on;
+> +				regulator-max-microvolt =3D <3300000>;
+> +				regulator-min-microvolt =3D <1600000>;
+> +				regulator-name =3D "LDO1";
+> +			};
+> +
+> +			ldo4: LDO4 {
+> +				regulator-always-on;
+> +				regulator-boot-on;
+> +				regulator-max-microvolt =3D <3300000>;
+> +				regulator-min-microvolt =3D <800000>;
+> +				regulator-name =3D "LDO4";
+> +			};
+> +
+> +			ldo5: LDO5 {
+> +				regulator-always-on;
+> +				regulator-boot-on;
+> +				regulator-max-microvolt =3D <3300000>;
+> +				regulator-min-microvolt =3D <1800000>;
+> +				regulator-name =3D "LDO5";
+> +			};
+> +		};
+> +	};
+> +
+> +	adp5585: io-expander@34 {
+> +		compatible =3D "adi,adp5585-00", "adi,adp5585";
+> +		reg =3D <0x34>;
+> +		#gpio-cells =3D <2>;
+> +		gpio-controller;
+> +		#pwm-cells =3D <3>;
+> +		gpio-reserved-ranges =3D <5 1>;
+> +
+> +		exp-sel-hog {
+> +			gpio-hog;
+> +			gpios =3D <4 GPIO_ACTIVE_HIGH>;
+> +			output-low;
+> +		};
+> +	};
+> +};
+> +
+> +&lpi2c3 {
+> +	#address-cells =3D <1>;
+> +	#size-cells =3D <0>;
+> +	clock-frequency =3D <400000>;
+> +	pinctrl-0 =3D <&pinctrl_lpi2c3>;
+> +	pinctrl-names =3D "default";
+> +	status =3D "okay";
+> +
+> +	ptn5110: tcpc@50 {
+> +		compatible =3D "nxp,ptn5110", "tcpci";
+> +		reg =3D <0x50>;
+> +		interrupts =3D <27 IRQ_TYPE_LEVEL_LOW>;
+> +		interrupt-parent =3D <&gpio3>;
+> +
+> +		typec1_con: connector {
+> +			compatible =3D "usb-c-connector";
+> +			data-role =3D "dual";
+> +			label =3D "USB-C";
+> +			op-sink-microwatt =3D <15000000>;
+> +			power-role =3D "dual";
+> +			self-powered;
+> +			sink-pdos =3D <PDO_FIXED(5000, 3000, PDO_FIXED_USB_COMM)
+> +				     PDO_VAR(5000, 20000, 3000)>;
+> +			source-pdos =3D <PDO_FIXED(5000, 3000, PDO_FIXED_USB_COMM)>;
+> +			try-power-role =3D "sink";
+> +
+> +			ports {
+> +				#address-cells =3D <1>;
+> +				#size-cells =3D <0>;
+> +
+> +				port@0 {
+> +					reg =3D <0>;
+> +
+> +					typec1_dr_sw: endpoint {
+> +						remote-endpoint =3D <&usb1_drd_sw>;
+> +					};
+> +				};
+> +			};
+> +		};
+> +	};
+> +
+> +	ptn5110_2: tcpc@51 {
+> +		compatible =3D "nxp,ptn5110", "tcpci";
+> +		reg =3D <0x51>;
+> +		interrupts =3D <27 IRQ_TYPE_LEVEL_LOW>;
+> +		interrupt-parent =3D <&gpio3>;
+> +		status =3D "okay";
+> +
+> +		typec2_con: connector {
+> +			compatible =3D "usb-c-connector";
+> +			data-role =3D "dual";
+> +			label =3D "USB-C";
+> +			op-sink-microwatt =3D <15000000>;
+> +			power-role =3D "dual";
+> +			self-powered;
+> +			sink-pdos =3D <PDO_FIXED(5000, 3000, PDO_FIXED_USB_COMM)
+> +				     PDO_VAR(5000, 20000, 3000)>;
+> +			source-pdos =3D <PDO_FIXED(5000, 3000, PDO_FIXED_USB_COMM)>;
+> +			try-power-role =3D "sink";
+> +
+> +			ports {
+> +				#address-cells =3D <1>;
+> +				#size-cells =3D <0>;
+> +
+> +				port@0 {
+> +					reg =3D <0>;
+> +
+> +					typec2_dr_sw: endpoint {
+> +						remote-endpoint =3D <&usb2_drd_sw>;
+> +					};
+> +				};
+> +			};
+> +		};
+> +	};
+> +
+> +	pcf2131: rtc@53 {
+> +		compatible =3D "nxp,pcf2131";
+> +		reg =3D <0x53>;
+> +		interrupts =3D <1 IRQ_TYPE_EDGE_FALLING>;
+> +		interrupt-parent =3D <&pcal6524>;
+> +		status =3D "okay";
+> +	};
+> +};
+> +
+> +&lpuart1 {
+> +	pinctrl-0 =3D <&pinctrl_uart1>;
+> +	pinctrl-names =3D "default";
+> +	status =3D "okay";
+> +};
+> +
+> +&lpuart5 {
+> +	pinctrl-0 =3D <&pinctrl_uart5>;
+> +	pinctrl-names =3D "default";
+> +	status =3D "okay";
+> +
+> +	bluetooth {
+> +		compatible =3D "nxp,88w8987-bt";
+> +	};
+> +};
+> +
+> +&usbotg1 {
+> +	adp-disable;
+> +	disable-over-current;
+> +	dr_mode =3D "otg";
+> +	hnp-disable;
+> +	srp-disable;
+> +	usb-role-switch;
+> +	samsung,picophy-dc-vol-level-adjust =3D <7>;
+> +	samsung,picophy-pre-emp-curr-control =3D <3>;
+> +	status =3D "okay";
+> +
+> +	port {
+> +		usb1_drd_sw: endpoint {
+> +			remote-endpoint =3D <&typec1_dr_sw>;
+> +		};
+> +	};
+> +};
+> +
+> +&usbotg2 {
+> +	adp-disable;
+> +	disable-over-current;
+> +	dr_mode =3D "otg";
+> +	hnp-disable;
+> +	srp-disable;
+> +	usb-role-switch;
+> +	samsung,picophy-dc-vol-level-adjust =3D <7>;
+> +	samsung,picophy-pre-emp-curr-control =3D <3>;
+> +	status =3D "okay";
+> +
+> +	port {
+> +		usb2_drd_sw: endpoint {
+> +			remote-endpoint =3D <&typec2_dr_sw>;
+> +		};
+> +	};
+> +};
+> +
+> +&usdhc1 {
+> +	bus-width =3D <8>;
+> +	non-removable;
+> +	pinctrl-0 =3D <&pinctrl_usdhc1>;
+> +	pinctrl-1 =3D <&pinctrl_usdhc1_100mhz>;
+> +	pinctrl-2 =3D <&pinctrl_usdhc1_200mhz>;
+> +	pinctrl-names =3D "default", "state_100mhz", "state_200mhz";
+> +	status =3D "okay";
+> +};
+> +
+> +&usdhc2 {
+> +	bus-width =3D <4>;
+> +	cd-gpios =3D <&gpio3 00 GPIO_ACTIVE_LOW>;
+> +	no-mmc;
+> +	no-sdio;
+> +	pinctrl-0 =3D <&pinctrl_usdhc2>, <&pinctrl_usdhc2_gpio>;
+> +	pinctrl-1 =3D <&pinctrl_usdhc2_100mhz>, <&pinctrl_usdhc2_gpio>;
+> +	pinctrl-2 =3D <&pinctrl_usdhc2_200mhz>, <&pinctrl_usdhc2_gpio>;
+> +	pinctrl-3 =3D <&pinctrl_usdhc2_sleep>, <&pinctrl_usdhc2_gpio_sleep>;
+> +	pinctrl-names =3D "default", "state_100mhz", "state_200mhz", "sleep";
+> +	vmmc-supply =3D <&reg_usdhc2_vmmc>;
+> +	status =3D "okay";
+> +};
+> +
+> +&wdog3 {
+> +	fsl,ext-reset-output;
+> +	status =3D "okay";
+> +};
+> +
+> +&iomuxc {
+> +	pinctrl_eqos: eqosgrp {
+> +		fsl,pins =3D <
+> +			MX91_PAD_ENET1_MDC__ENET1_MDC                           0x57e
+> +			MX91_PAD_ENET1_MDIO__ENET_QOS_MDIO                      0x57e
+> +			MX91_PAD_ENET1_RD0__ENET_QOS_RGMII_RD0                  0x57e
+> +			MX91_PAD_ENET1_RD1__ENET_QOS_RGMII_RD1                  0x57e
+> +			MX91_PAD_ENET1_RD2__ENET_QOS_RGMII_RD2                  0x57e
+> +			MX91_PAD_ENET1_RD3__ENET_QOS_RGMII_RD3                  0x57e
+> +			MX91_PAD_ENET1_RXC__ENET_QOS_RGMII_RXC                  0x5fe
+> +			MX91_PAD_ENET1_RX_CTL__ENET_QOS_RGMII_RX_CTL            0x57e
+> +			MX91_PAD_ENET1_TD0__ENET_QOS_RGMII_TD0                  0x57e
+> +			MX91_PAD_ENET1_TD1__ENET1_RGMII_TD1                     0x57e
+> +			MX91_PAD_ENET1_TD2__ENET_QOS_RGMII_TD2                  0x57e
+> +			MX91_PAD_ENET1_TD3__ENET_QOS_RGMII_TD3                  0x57e
+> +			MX91_PAD_ENET1_TXC__CCM_ENET_QOS_CLOCK_GENERATE_TX_CLK  0x5fe
+> +			MX91_PAD_ENET1_TX_CTL__ENET_QOS_RGMII_TX_CTL            0x57e
+> +		>;
+> +	};
+> +
+> +	pinctrl_eqos_sleep: eqossleepgrp {
+> +		fsl,pins =3D <
+> +			MX91_PAD_ENET1_MDC__GPIO4_IO0                           0x31e
+> +			MX91_PAD_ENET1_MDIO__GPIO4_IO1                          0x31e
+> +			MX91_PAD_ENET1_RD0__GPIO4_IO10                          0x31e
+> +			MX91_PAD_ENET1_RD1__GPIO4_IO11                          0x31e
+> +			MX91_PAD_ENET1_RD2__GPIO4_IO12                          0x31e
+> +			MX91_PAD_ENET1_RD3__GPIO4_IO13                          0x31e
+> +			MX91_PAD_ENET1_RXC__GPIO4_IO9                           0x31e
+> +			MX91_PAD_ENET1_RX_CTL__GPIO4_IO8                        0x31e
+> +			MX91_PAD_ENET1_TD0__GPIO4_IO5                           0x31e
+> +			MX91_PAD_ENET1_TD1__GPIO4_IO4                           0x31e
+> +			MX91_PAD_ENET1_TD2__GPIO4_IO3                           0x31e
+> +			MX91_PAD_ENET1_TD3__GPIO4_IO2                           0x31e
+> +			MX91_PAD_ENET1_TXC__GPIO4_IO7                           0x31e
+> +			MX91_PAD_ENET1_TX_CTL__GPIO4_IO6                        0x31e
+> +		>;
+> +	};
+> +
+> +	pinctrl_fec: fecgrp {
+> +		fsl,pins =3D <
+> +			MX91_PAD_ENET2_MDC__ENET2_MDC                           0x57e
+> +			MX91_PAD_ENET2_MDIO__ENET2_MDIO                         0x57e
+> +			MX91_PAD_ENET2_RD0__ENET2_RGMII_RD0                     0x57e
+> +			MX91_PAD_ENET2_RD1__ENET2_RGMII_RD1                     0x57e
+> +			MX91_PAD_ENET2_RD2__ENET2_RGMII_RD2                     0x57e
+> +			MX91_PAD_ENET2_RD3__ENET2_RGMII_RD3                     0x57e
+> +			MX91_PAD_ENET2_RXC__ENET2_RGMII_RXC                     0x5fe
+> +			MX91_PAD_ENET2_RX_CTL__ENET2_RGMII_RX_CTL               0x57e
+> +			MX91_PAD_ENET2_TD0__ENET2_RGMII_TD0                     0x57e
+> +			MX91_PAD_ENET2_TD1__ENET2_RGMII_TD1                     0x57e
+> +			MX91_PAD_ENET2_TD2__ENET2_RGMII_TD2                     0x57e
+> +			MX91_PAD_ENET2_TD3__ENET2_RGMII_TD3                     0x57e
+> +			MX91_PAD_ENET2_TXC__ENET2_RGMII_TXC                     0x5fe
+> +			MX91_PAD_ENET2_TX_CTL__ENET2_RGMII_TX_CTL               0x57e
+> +		>;
+> +	};
+> +
+> +	pinctrl_fec_sleep: fecsleepgrp {
+> +		fsl,pins =3D <
+> +			MX91_PAD_ENET2_MDC__GPIO4_IO14                          0x51e
+> +			MX91_PAD_ENET2_MDIO__GPIO4_IO15                         0x51e
+> +			MX91_PAD_ENET2_RD0__GPIO4_IO24                          0x51e
+> +			MX91_PAD_ENET2_RD1__GPIO4_IO25                          0x51e
+> +			MX91_PAD_ENET2_RD2__GPIO4_IO26                          0x51e
+> +			MX91_PAD_ENET2_RD3__GPIO4_IO27                          0x51e
+> +			MX91_PAD_ENET2_RXC__GPIO4_IO23                          0x51e
+> +			MX91_PAD_ENET2_RX_CTL__GPIO4_IO22                       0x51e
+> +			MX91_PAD_ENET2_TD0__GPIO4_IO19                          0x51e
+> +			MX91_PAD_ENET2_TD1__GPIO4_IO18                          0x51e
+> +			MX91_PAD_ENET2_TD2__GPIO4_IO17                          0x51e
+> +			MX91_PAD_ENET2_TD3__GPIO4_IO16                          0x51e
+> +			MX91_PAD_ENET2_TXC__GPIO4_IO21                          0x51e
+> +			MX91_PAD_ENET2_TX_CTL__GPIO4_IO20                       0x51e
+> +		>;
+> +	};
+> +
+> +	pinctrl_lpi2c1: lpi2c1grp {
+> +		fsl,pins =3D <
+> +			MX91_PAD_I2C1_SCL__LPI2C1_SCL                           0x40000b9e
+> +			MX91_PAD_I2C1_SDA__LPI2C1_SDA                           0x40000b9e
+> +		>;
+> +	};
+> +
+> +	pinctrl_lpi2c2: lpi2c2grp {
+> +		fsl,pins =3D <
+> +			MX91_PAD_I2C2_SCL__LPI2C2_SCL                           0x40000b9e
+> +			MX91_PAD_I2C2_SDA__LPI2C2_SDA                           0x40000b9e
+> +		>;
+> +	};
+> +
+> +	pinctrl_lpi2c3: lpi2c3grp {
+> +		fsl,pins =3D <
+> +			MX91_PAD_GPIO_IO28__LPI2C3_SDA                          0x40000b9e
+> +			MX91_PAD_GPIO_IO29__LPI2C3_SCL                          0x40000b9e
+> +		>;
+> +	};
+> +
+> +	pinctrl_pcal6524: pcal6524grp {
+> +		fsl,pins =3D <
+> +			MX91_PAD_CCM_CLKO2__GPIO3_IO27                          0x31e
+> +		>;
+> +	};
+> +
+> +	pinctrl_reg_usdhc2_vmmc: regusdhc2vmmcgrp {
+> +		fsl,pins =3D <
+> +			MX91_PAD_SD2_RESET_B__GPIO3_IO7                         0x31e
+> +		>;
+> +	};
+> +
+> +	pinctrl_uart1: uart1grp {
+> +		fsl,pins =3D <
+> +			MX91_PAD_UART1_RXD__LPUART1_RX                          0x31e
+> +			MX91_PAD_UART1_TXD__LPUART1_TX                          0x31e
+> +		>;
+> +	};
+> +
+> +	pinctrl_uart5: uart5grp {
+> +		fsl,pins =3D <
+> +			MX91_PAD_DAP_TDO_TRACESWO__LPUART5_TX                   0x31e
+> +			MX91_PAD_DAP_TDI__LPUART5_RX                            0x31e
+> +			MX91_PAD_DAP_TMS_SWDIO__LPUART5_RTS_B                   0x31e
+> +			MX91_PAD_DAP_TCLK_SWCLK__LPUART5_CTS_B                  0x31e
+> +		>;
+> +	};
+> +
+> +	pinctrl_usdhc1_100mhz: usdhc1-100mhzgrp {
+> +		fsl,pins =3D <
+> +			MX91_PAD_SD1_CLK__USDHC1_CLK                            0x158e
+> +			MX91_PAD_SD1_CMD__USDHC1_CMD                            0x138e
+> +			MX91_PAD_SD1_DATA0__USDHC1_DATA0                        0x138e
+> +			MX91_PAD_SD1_DATA1__USDHC1_DATA1                        0x138e
+> +			MX91_PAD_SD1_DATA2__USDHC1_DATA2                        0x138e
+> +			MX91_PAD_SD1_DATA3__USDHC1_DATA3                        0x138e
+> +			MX91_PAD_SD1_DATA4__USDHC1_DATA4                        0x138e
+> +			MX91_PAD_SD1_DATA5__USDHC1_DATA5                        0x138e
+> +			MX91_PAD_SD1_DATA6__USDHC1_DATA6                        0x138e
+> +			MX91_PAD_SD1_DATA7__USDHC1_DATA7                        0x138e
+> +			MX91_PAD_SD1_STROBE__USDHC1_STROBE                      0x158e
+> +		>;
+> +	};
+> +
+> +	pinctrl_usdhc1_200mhz: usdhc1-200mhzgrp {
+> +		fsl,pins =3D <
+> +			MX91_PAD_SD1_CLK__USDHC1_CLK                            0x15fe
+> +			MX91_PAD_SD1_CMD__USDHC1_CMD                            0x13fe
+> +			MX91_PAD_SD1_DATA0__USDHC1_DATA0                        0x13fe
+> +			MX91_PAD_SD1_DATA1__USDHC1_DATA1                        0x13fe
+> +			MX91_PAD_SD1_DATA2__USDHC1_DATA2                        0x13fe
+> +			MX91_PAD_SD1_DATA3__USDHC1_DATA3                        0x13fe
+> +			MX91_PAD_SD1_DATA4__USDHC1_DATA4                        0x13fe
+> +			MX91_PAD_SD1_DATA5__USDHC1_DATA5                        0x13fe
+> +			MX91_PAD_SD1_DATA6__USDHC1_DATA6                        0x13fe
+> +			MX91_PAD_SD1_DATA7__USDHC1_DATA7                        0x13fe
+> +			MX91_PAD_SD1_STROBE__USDHC1_STROBE                      0x15fe
+> +		>;
+> +	};
+> +
+> +	pinctrl_usdhc1: usdhc1grp {
+> +		fsl,pins =3D <
+> +			MX91_PAD_SD1_CLK__USDHC1_CLK                            0x1582
+> +			MX91_PAD_SD1_CMD__USDHC1_CMD                            0x1382
+> +			MX91_PAD_SD1_DATA0__USDHC1_DATA0                        0x1382
+> +			MX91_PAD_SD1_DATA1__USDHC1_DATA1                        0x1382
+> +			MX91_PAD_SD1_DATA2__USDHC1_DATA2                        0x1382
+> +			MX91_PAD_SD1_DATA3__USDHC1_DATA3                        0x1382
+> +			MX91_PAD_SD1_DATA4__USDHC1_DATA4                        0x1382
+> +			MX91_PAD_SD1_DATA5__USDHC1_DATA5                        0x1382
+> +			MX91_PAD_SD1_DATA6__USDHC1_DATA6                        0x1382
+> +			MX91_PAD_SD1_DATA7__USDHC1_DATA7                        0x1382
+> +			MX91_PAD_SD1_STROBE__USDHC1_STROBE                      0x1582
+> +		>;
+> +	};
+> +
+> +	pinctrl_usdhc2_100mhz: usdhc2-100mhzgrp {
+> +		fsl,pins =3D <
+> +			MX91_PAD_SD2_CLK__USDHC2_CLK                            0x158e
+> +			MX91_PAD_SD2_CMD__USDHC2_CMD                            0x138e
+> +			MX91_PAD_SD2_DATA0__USDHC2_DATA0                        0x138e
+> +			MX91_PAD_SD2_DATA1__USDHC2_DATA1                        0x138e
+> +			MX91_PAD_SD2_DATA2__USDHC2_DATA2                        0x138e
+> +			MX91_PAD_SD2_DATA3__USDHC2_DATA3                        0x138e
+> +			MX91_PAD_SD2_VSELECT__USDHC2_VSELECT                    0x51e
+> +		>;
+> +	};
+> +
+> +	pinctrl_usdhc2_200mhz: usdhc2-200mhzgrp {
+> +		fsl,pins =3D <
+> +			MX91_PAD_SD2_CLK__USDHC2_CLK                            0x15fe
+> +			MX91_PAD_SD2_CMD__USDHC2_CMD                            0x13fe
+> +			MX91_PAD_SD2_DATA0__USDHC2_DATA0                        0x13fe
+> +			MX91_PAD_SD2_DATA1__USDHC2_DATA1                        0x13fe
+> +			MX91_PAD_SD2_DATA2__USDHC2_DATA2                        0x13fe
+> +			MX91_PAD_SD2_DATA3__USDHC2_DATA3                        0x13fe
+> +			MX91_PAD_SD2_VSELECT__USDHC2_VSELECT                    0x51e
+> +		>;
+> +	};
+> +
+> +	pinctrl_usdhc2_gpio: usdhc2gpiogrp {
+> +		fsl,pins =3D <
+> +			MX91_PAD_SD2_CD_B__GPIO3_IO0                            0x31e
+> +		>;
+> +	};
+> +
+> +	pinctrl_usdhc2_gpio_sleep: usdhc2gpiosleepgrp {
+> +		fsl,pins =3D <
+> +			MX91_PAD_SD2_CD_B__GPIO3_IO0                            0x51e
+> +		>;
+> +	};
+> +
+> +	pinctrl_usdhc2: usdhc2grp {
+> +		fsl,pins =3D <
+> +			MX91_PAD_SD2_CLK__USDHC2_CLK                            0x1582
+> +			MX91_PAD_SD2_CMD__USDHC2_CMD                            0x1382
+> +			MX91_PAD_SD2_DATA0__USDHC2_DATA0                        0x1382
+> +			MX91_PAD_SD2_DATA1__USDHC2_DATA1                        0x1382
+> +			MX91_PAD_SD2_DATA2__USDHC2_DATA2                        0x1382
+> +			MX91_PAD_SD2_DATA3__USDHC2_DATA3                        0x1382
+> +			MX91_PAD_SD2_VSELECT__USDHC2_VSELECT                    0x51e
+> +		>;
+> +	};
+> +
+> +	pinctrl_usdhc2_sleep: usdhc2sleepgrp {
+> +		fsl,pins =3D <
+> +			MX91_PAD_SD2_CLK__GPIO3_IO1                             0x51e
+> +			MX91_PAD_SD2_CMD__GPIO3_IO2                             0x51e
+> +			MX91_PAD_SD2_DATA0__GPIO3_IO3                           0x51e
+> +			MX91_PAD_SD2_DATA1__GPIO3_IO4                           0x51e
+> +			MX91_PAD_SD2_DATA2__GPIO3_IO5                           0x51e
+> +			MX91_PAD_SD2_DATA3__GPIO3_IO6                           0x51e
+> +			MX91_PAD_SD2_VSELECT__GPIO3_IO19                        0x51e
+> +		>;
+> +	};
+> +
+> +};
+>=20
+
+
+=2D-=20
+TQ-Systems GmbH | M=FChlstra=DFe 2, Gut Delling | 82229 Seefeld, Germany
+Amtsgericht M=FCnchen, HRB 105018
+Gesch=E4ftsf=FChrer: Detlef Schneider, R=FCdiger Stahl, Stefan Schneider
+http://www.tq-group.com/
+
 
 
