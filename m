@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-210855-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210856-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71283B1520E
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 19:27:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1E28B15215
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 19:31:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A531516E008
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 17:27:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 29AD27B081C
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 17:30:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B85A1293462;
-	Tue, 29 Jul 2025 17:27:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 089311DE4C3;
+	Tue, 29 Jul 2025 17:31:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="fUBNgdgw"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="aGvb/i+J"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91C5B2264AD
-	for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 17:27:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 481E24A0C
+	for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 17:31:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753810045; cv=none; b=QChUKLy36YSv2aZeIZ4O9o2D6ChMGmpBy/WsiJv1JZHExTTVanVZ+fyoLhrZSRov11HbKgi5J0PL8/H4hPqjEypkCAj6MCBlrWBXktfEPy4PqURs9azp9PPglhC7ioUzqWAm35oKTjgjfDX9Sv8susECMtq5zsg9jkXi83yIj5w=
+	t=1753810296; cv=none; b=hIGuhTz5rtGHDJDS8bGnyr+nv1NwwNkRLMtxr+/kG0Xkko27uuM/A3z6WK11m2YS9UmphZsOdoxstWTAR3HbuR7nskv2X5DBU+BH96C8RtsAcijwi1rAVtp4009z9j+sO94jKdpuFP4+MHCbZtDQ7pg0eTsc0zkEXf+LYevRbRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753810045; c=relaxed/simple;
-	bh=IdB77h5VXtrobJBKA+6H/+svrP6wUqJ28ykCn3ou1Dg=;
+	s=arc-20240116; t=1753810296; c=relaxed/simple;
+	bh=y3bpG+sPzl/fFFBwcwLlONLSVo3kcxpCx4UijUP30lk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V5l/tB/1LN9sAeGJGTwto4brHvQXZ9XyT8i6RJtdRNv1Q5XO7p5F0auI5FkEwSOy05+9sYoU+Pa8VH05pJ6oUJOPusCCo5Hq6rJlC+GfjO/csojLKxGs1Uz9Qb+gOAGjRNhPttWM5FAxoSx3ZaowM+jK/H37MYk+xxs8aLjJxdw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=fUBNgdgw; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=aw0fTwnuboEPkQ/c7I3Ol9dv8x8s7k3m98QFzKg5OswJzXGsmKONSXx/eMp6J9yJjRr9Ig6KTkD9TyGciLiCNHVd8rV1g52Na6CxkDAiTLtjah/3CguUovEWbnYiDl6k7BnhHDrI+lORkWBkyl41QEfJSSZ2gSVzIi0sy3sRgXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=aGvb/i+J; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,37 +36,29 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=eN8xia2pWS6RYX3WcW0Y0ly9LBsjiwKipKHOrqKEcmU=; b=fUBNgdgwB8JWrKCuOAdz0SVivV
-	nv0YVIGRzpTMTDR2aP+y9xnk32N88CgEQoLoGNV3Hz99QJDMUynddwGxl4bCG7zPPt+DtykhJ30H1
-	Y1mG2NbWq4GANzenNfNDcNjLVT++XSZBhLvpbaz0hxSekWYzicV0KLzaD7/KoyOyI8qY=;
+	bh=aKSxifxHJIONDr0VjJJF1bsS+31GhF1VK0dWldW+/t4=; b=aGvb/i+J7eQlpUuA5uH9y3LVox
+	/Pkdq0soFJwPFlloCPNVy6qQbb8d1+SS/1r3kTbncqkcIENqPABuZqVl9EFrbg0ESJH+tWRt+4pu+
+	aBJwkXm3EFOsVLMoGINPaiD5KWIyVrXzHFOMayInCmr1E9ph6gi1Gj7EUbZ3+w5q9JQw=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1ugo6Z-003DUL-7n; Tue, 29 Jul 2025 19:27:11 +0200
-Date: Tue, 29 Jul 2025 19:27:11 +0200
+	id 1ugoAa-003DW2-PA; Tue, 29 Jul 2025 19:31:20 +0200
+Date: Tue, 29 Jul 2025 19:31:20 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Michael Chan <michael.chan@broadcom.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	intel-wired-lan@lists.osuosl.org,
+	Donald Hunter <donald.hunter@gmail.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-arm-kernel@lists.infradead.org,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Subject: Re: [Linux-stm32] [PATCH RFC net-next 6/7] net: stmmac: add helpers
- to indicate WoL enable status
-Message-ID: <b88160a5-a0b8-4a1a-a489-867b8495a88e@lunn.ch>
-References: <E1ugQ33-006KDR-Nj@rmk-PC.armlinux.org.uk>
- <eaef1b1b-5366-430c-97dd-cf3b40399ac7@lunn.ch>
- <aIe5SqLITb2cfFQw@shell.armlinux.org.uk>
- <77229e46-6466-4cd4-9b3b-d76aadbe167c@foss.st.com>
- <aIiOWh7tBjlsdZgs@shell.armlinux.org.uk>
- <aIjCg_sjTOge9vd4@shell.armlinux.org.uk>
- <d300d546-09fa-4b37-b8e0-349daa0cc108@foss.st.com>
- <aIjePMWG6pEBvna6@shell.armlinux.org.uk>
- <186a2265-8ca8-4b75-b4a2-a81d21ca42eb@foss.st.com>
- <aIj4Q6WzEQkcGYVQ@shell.armlinux.org.uk>
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
+Subject: Re: [RFC PATCH] ethtool: add FEC bins histogramm report
+Message-ID: <c52af63b-1350-4574-874e-7d6c41bc615d@lunn.ch>
+References: <20250729102354.771859-1-vadfed@meta.com>
+ <982c780a-1ff1-4d79-9104-c61605c7e802@lunn.ch>
+ <1a7f0aa0-47ae-4936-9e55-576cdf71f4cc@linux.dev>
+ <9c1c8db9-b283-4097-bb3f-db4a295de2a5@lunn.ch>
+ <4270ff14-06cd-4a78-afe7-1aa5f254ebb6@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,71 +67,17 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aIj4Q6WzEQkcGYVQ@shell.armlinux.org.uk>
+In-Reply-To: <4270ff14-06cd-4a78-afe7-1aa5f254ebb6@linux.dev>
 
-> stmmac gets this wrong right now, but (as I've written previously)
-> this is going to be a *very* difficult problem to solve, because
-> the PHY drivers are - to put it bluntly - "utter crap" when it
-> comes to WoL.
+> The only one bin will have negative value is the one to signal the end
+> of the list of the bins, which is not actually put into netlink message.
+> It actually better to change spec to have unsigned values, I believe.
 
-Agreed.
+Can any of these NICs send runt packets? Can any send packets without
+an ethernet header and FCS?
 
-> I'll take the rtl8211f again as an example - its get_wol()
-> implementation is quite typical of many PHY drivers. Someone comes
-> along and decides to implement WoL support at the PHY. They add the
-> .get_wol() method, which unconditionally returns the PHY's hardware
-> capabilities without regards for the rest of the system.
-> 
-> Consider the case where a PHY supports WoL, but the signalling for
-> WoL to wake up the system is not wired. The .get_wol() method happily
-> says that WoL is supported. Let's say that the PHY supports magic
-> packet, and so does the MAC, and the MAC WoL is functional.
-> 
-> Now, with what Andrew said in his email, and consider what this means.
-> .set_wol() is called, requesting magic packet. The PHY driver says "oh
-> yes, the PHY hardware supports this, I'll program the PHY and return
-> zero". At this point, the MAC thinks the PHY has accepted the WoL
-> configuration.
-> 
-> The user suspends the system. The user sends the correct magic
-> packet. The system does not wake up. The user is now confused.
-
-There are some MAC drivers which simply trust the PHY. They pass
-.get_wol() and .set_wol() direct to the PHY. They don't attempt to
-perform MAC WoL, or the MAC driver does not have any hardware support
-for it. Such systems are going to end up with a confused user when the
-driver says WoL is enabled, but it does not wake.
-
-So while i agree we cannot simply 'fix' stmmac, the issue of PHY
-drivers not behaving properly is a bigger problem across a wide range
-of MAC drivers.
-
-I think we could quickly improve the situation to some degree by
-reviewing the PHY drivers. e.g. the current code in mxl-gpy.c makes it
-clear WoL is just another interrupt source. There is no special
-pin. So get_wol() needs a call to phy_interrupt_is_valid(phydev) and
-return not return any WoL modes if there is not a valid interrupt.
-
-This will not work for all PHYs, e.g. the Marvell 1G PHYs can
-repurposed LED2 for WoL indication.
-
-motorcomm.c looks broken. The code suggests WoL is just another
-interrupt source, but the driver lacks interrupt handling...
-
-The broadcom code looks like it gets it correct.
-bcm54xx_phy_can_wakeup() checks if there is an interrupt or a
-dedicated GPIO, and return no wakeup modes if not. KUDOS to Florians
-team.
-
-dp83822.c appears to be missing a phy_interrupt_is_valid(phydev),
-since WoL appears to be just another interrupt source.
-
-Same for dp83867.c.
-
-And i did notice that the Broadcom code is the only one doing anything
-with enable_irq_wake()/disable_irq_wake(). We need to scatter these
-into the drivers.
+Seems to me, the bin (0,0) is meaningless, so can could be considered
+the end marker. You then have unsigned everywhere, keeping it KISS.
 
 	Andrew
-
 
