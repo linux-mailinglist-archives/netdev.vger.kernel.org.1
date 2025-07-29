@@ -1,106 +1,132 @@
-Return-Path: <netdev+bounces-210704-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210705-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6162DB14649
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 04:34:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E383B14651
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 04:36:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 462031888E92
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 02:34:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A6EAC5425BB
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 02:36:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76C732080C4;
-	Tue, 29 Jul 2025 02:34:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78D4120FA81;
+	Tue, 29 Jul 2025 02:36:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AVa21AuO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O+plK5zr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7CA31D618E;
-	Tue, 29 Jul 2025 02:34:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45AEA79EA;
+	Tue, 29 Jul 2025 02:36:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753756469; cv=none; b=ndvVxdT7dKs6EWHE+FRN3UoO7VSuiZb6OLepruHfKwsZYaT6pUyLUrffB6LlJgb/YhrKKTNS0umAJsQNLCfR+kYtQAobtREj3eWKiK+P80qdmn6sVnJjgCUUaE6GmqZc1zaMitt/5JBGBVkH8yluYQD/ergpId3TG4LyxuiPTeU=
+	t=1753756606; cv=none; b=l1pWciEPYEkvHUVNtFCdIW0U3zqNB1rjYfpbzeoBcMEjXo9dIDW2gBGNYofhJkrgIxITSquLdUss0oREjMzm9thT3iwoOIqnoJRJ2DcFuVOz2OAiTpy4JZ1lIdduBaAA0++LbXQjin/gNzSsqvizYUQHoY6ztTMiEtEWSPcdqjc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753756469; c=relaxed/simple;
-	bh=Vc7/jSBr2YAKmL3/MFoXVVDaZSRF8fN5wWv6+oIPiks=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=V3UuBprWehbdaH3Qx8eiSkdaArH5yLsbd1jwqJ59p863/xOs05WEjx2CK0MviY5Uj/KrBOZgp1hOXQLKqsv/sViKdCbDnPKfwetkdpf3Ifq8YiR7wOBao6HvULI0K5SyNZb1xPtW4F0+a4aTpCiglBlDQJGtug6JyA0DeK0oUUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AVa21AuO; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-3b786421e36so1375963f8f.3;
-        Mon, 28 Jul 2025 19:34:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753756466; x=1754361266; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Vc7/jSBr2YAKmL3/MFoXVVDaZSRF8fN5wWv6+oIPiks=;
-        b=AVa21AuOzyc94LVlKjRlV66Z/E0vuet5/8VIr9C4Ax4Zn29hlk1QdZoQkRnWJ6xZdb
-         gBOupFRW7JKaNxywEJM4w//ByK010SJs5sCUvlnQcGzPxDnmxyYT9lRJtXcTwu9+ymQc
-         MXM+8bvc6yecV0T300w1ehd61EuwJ0O2M2ePKlFi5KyMismJddXOiLv98+cOLyHbV6Sd
-         9CglBn5aMb2MVbIs2eD3cng2byb4gK0lsnT8nJNMnnWpERduFOHCTd70taBT9/WR5ttX
-         ZfyS3uhQ4jApTfVmw9yJM/rruHyDJSj8YcVedi3MMM0dU+c78Ckk33ndBYfCWbMPb+sW
-         SgCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753756466; x=1754361266;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Vc7/jSBr2YAKmL3/MFoXVVDaZSRF8fN5wWv6+oIPiks=;
-        b=fLiWZar5+0N1p0J82E3DDSDtUWVGFd3oWenDg3N6c+A/poJjCp8X1Ri1GBM3KBEMPt
-         xc6By48g6CHE/5lfFV74aUbqtCB+aiP7zytIHpMTCsLf8sKfzUIvODjYH/O1Gr+osp08
-         LysuwQdF5qPQJpAX0+nBOFVEZuiZkvo96sjndjQXlbSpcV2Bp7StLSO7twN88XXtt+JM
-         Bp3pB0FvXw32k/B4/9PwFOx9L2swa1fv+svoWN6+PgNB7uyM4ZaUx3rgumvj8o+VrfqY
-         ptWxMzSAfOBOuyLR/upoHVwPIFeggoF3pIqxBZ1gH1jYOAzk8RX7fW7pgwQ7GINcM4kw
-         GHbA==
-X-Forwarded-Encrypted: i=1; AJvYcCUVL7RGpkUYynqwXrlTtuZ+We+VTLy4oq1n6mstuU47cMsb6thrd6ySCB23N+oS2epVhK2Mc1l4@vger.kernel.org, AJvYcCVraLdaAo6WeayY5RVdifVd6HCwW2x3sXffxC9jubBu5ha3GiDnFOMmua9ExXuqquLH38U=@vger.kernel.org, AJvYcCXRJM3cO3gxXNV/hvm3/mklm/UpoUnCMGKau72SRVMNHPEMdn76tm0a48dEy2rF8wh+CY7SLbFFWJuuBGU/@vger.kernel.org
-X-Gm-Message-State: AOJu0YwjlSbwLYLQZXxTtSn7bXtibzYnfB+gixGaXHEZwlUTaxOxYxl3
-	5bA7cRnfKFhd1MuknSiCwAs5gpMdswJc7DFmHuoRPpJfT918QGqb9S3++vIHC33TtZ9cPvV8Lqs
-	YDznC8FcI8wMWBMwjLGW83NVfVemm2cw=
-X-Gm-Gg: ASbGncuQjI1vIu1kb3vHmFsU4lsZ14BrUDT5EFaaAftXY9LGRSMezSDxkyikbV/ktEK
-	aslliRbgOJdGlx6A0cs5SVSi11wZ8SFeG5Jb3Qa8GPmY6q1N4qjfXms0Id37OmMZevFXRT9awNw
-	ta8K0I53XcVXZgvA6b6JvwNDAVB7K9Enq14CNGcj1D+ajeR71le1mg7CHchM/mZrCsuW5LVY19V
-	JGq1+Bgyly575LPkvtTHwLXJT/DcRIdF5RK
-X-Google-Smtp-Source: AGHT+IFlmtFhzVv+Fp70qB+mZtZWjMEPLOSnkLeaFYVBwJWbNxAuQThOGeVyHmQ9DkjvEvy4Fve6z9tXyoHYkWvehW4=
-X-Received: by 2002:a5d:5f90:0:b0:3b7:75dd:f373 with SMTP id
- ffacd0b85a97d-3b77671c767mr10608771f8f.5.1753756465779; Mon, 28 Jul 2025
- 19:34:25 -0700 (PDT)
+	s=arc-20240116; t=1753756606; c=relaxed/simple;
+	bh=tTjmBX1hi7lfBohsP08/xasKO5OLc1R0iOYa9lFW2ic=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FeMsYPUQgzHoHdJnGrPc5wTQNLd2McLHOFRblw4tbnpqg/Og7cb5M/Dn+IAonQYqPFvrhdhN3ufgEah4zfjCyJAIsxnSE8TzI+65+YRYiETIfRrLUutOkQJ2jNNEO6CLN/yVrxnB9n2ca+Fl6rwIqGRkEN+HJuWu7NiStznG8Zk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O+plK5zr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DE7CC4CEE7;
+	Tue, 29 Jul 2025 02:36:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753756605;
+	bh=tTjmBX1hi7lfBohsP08/xasKO5OLc1R0iOYa9lFW2ic=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=O+plK5zrMIYqi1uBK/nnwUx3VmtKW8rXOFbI3EkuMbsqHdFssmCqkAiOD1n4yycYR
+	 ZTg8w0SzHoPTtmGTpW9ohuwr3EsfoPKoQHiwq6piiJTbd5KKN/arngQwIYBL0bb2M8
+	 IbB1r+m0xdAwJbmdO4C9u6WJo34eTpVgYWKYTg2k1S1nqNVY47yGJS4VvzvIF/8go2
+	 J3qhS97trGZzD8gYfT2DLXBOF5eDLpOLX3gDevA8KUZuvl2AlWiharjHbSEMvsRLRN
+	 kqS4boV8cjsHZXNHIwzk8K0Le+r5UHlrYb7KcWFGwi8I1QbwbQzrSqorGYZoIcuuwg
+	 lFHM58SAGqI0A==
+Date: Mon, 28 Jul 2025 21:36:42 -0500
+From: Bjorn Andersson <andersson@kernel.org>
+To: Simon Horman <horms@kernel.org>
+Cc: Rob Clark <rob.clark@oss.qualcomm.com>, 
+	Krzysztof Kozlowski <krzk@kernel.org>, Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>, 
+	Wasim Nazir <wasim.nazir@oss.qualcomm.com>, Konrad Dybcio <konradybcio@kernel.org>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+	Conor Dooley <conor+dt@kernel.org>, Richard Cochran <richardcochran@gmail.com>, 
+	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, kernel@oss.qualcomm.com
+Subject: Re: [PATCH 1/7] arm64: dts: qcom: Rename sa8775p SoC to "lemans"
+Message-ID: <keqfco2t254skl6zjxchfze65j5bc5yq4j4t3wzllca7djtybm@zb724ha6khyg>
+References: <20250722144926.995064-1-wasim.nazir@oss.qualcomm.com>
+ <20250722144926.995064-2-wasim.nazir@oss.qualcomm.com>
+ <20250723-swinging-chirpy-hornet-eed2f2@kuoka>
+ <159eb27b-fca8-4f7e-b604-ba19d6f9ada7@oss.qualcomm.com>
+ <e718d0d8-87e7-435f-9174-7b376bf6fa2f@kernel.org>
+ <CACSVV00jef8so-jqjCaqJehj-XN2OZ562_R+Dod64+C4-dmDhQ@mail.gmail.com>
+ <20250726180451.GM1367887@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250723144442.1427943-1-chen.dylane@linux.dev> <8e6cd484-43f6-410e-a580-3671642a7e65@linux.dev>
-In-Reply-To: <8e6cd484-43f6-410e-a580-3671642a7e65@linux.dev>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Mon, 28 Jul 2025 19:34:14 -0700
-X-Gm-Features: Ac12FXw0Ilwtg9SXeVcdvKqQnD7OJyuvYkLWwnUMFR3uLFOInTr8tFgcAz3VCFY
-Message-ID: <CAADnVQKTsNvWrt+e77sgnL4N7_tWMcKtOP7zTAkEwTeGrv8nCw@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v4 1/3] bpftool: Add bpf_token show
-To: Tao Chen <chen.dylane@linux.dev>
-Cc: Quentin Monnet <qmo@kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Eduard <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
-	bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250726180451.GM1367887@horms.kernel.org>
 
-On Mon, Jul 28, 2025 at 8:25=E2=80=AFAM Tao Chen <chen.dylane@linux.dev> wr=
-ote:
->
-> =E5=9C=A8 2025/7/23 22:44, Tao Chen =E5=86=99=E9=81=93:
->
-> Ping...
+On Sat, Jul 26, 2025 at 07:04:51PM +0100, Simon Horman wrote:
+> On Thu, Jul 24, 2025 at 08:59:38AM -0700, Rob Clark wrote:
+> > On Thu, Jul 24, 2025 at 5:52 AM Krzysztof Kozlowski <krzk@kernel.org> wrote:
+> > >
+> > > On 24/07/2025 14:47, Konrad Dybcio wrote:
+> > > > On 7/23/25 10:29 AM, 'Krzysztof Kozlowski' via kernel wrote:
+> > > >> On Tue, Jul 22, 2025 at 08:19:20PM +0530, Wasim Nazir wrote:
+> > > >>> SA8775P, QCS9100 and QCS9075 are all variants of the same die,
+> > > >>> collectively referred to as lemans. Most notably, the last of them
+> > > >>> has the SAIL (Safety Island) fused off, but remains identical
+> > > >>> otherwise.
+> > > >>>
+> > > >>> In an effort to streamline the codebase, rename the SoC DTSI, moving
+> > > >>> away from less meaningful numerical model identifiers.
+> > > >>>
+> > > >>> Signed-off-by: Wasim Nazir <wasim.nazir@oss.qualcomm.com>
+> > > >>> ---
+> > > >>>  arch/arm64/boot/dts/qcom/{sa8775p.dtsi => lemans.dtsi} | 0
+> > > >>>  arch/arm64/boot/dts/qcom/sa8775p-ride.dtsi             | 2 +-
+> > > >>
+> > > >> No, stop with this rename.
+> > > >>
+> > > >> There is no policy of renaming existing files.
+> > > >
+> > > > There's no policy against renaming existing files either.
+> > >
+> > > There is, because you break all the users. All the distros, bootloaders
+> > > using this DTS, people's scripts.
+> > 
+> > I think that is a valid argument against renaming the toplevel .dts
+> > (and therefore .dtb), but renaming .dtsi should be a harmless internal
+> > detail to the kernel.  And less confusing, IMHO, than
+> > qsc9100-myboard.dts #including sa8775p.dtsi.
+> > 
+> > So wouldn't the sensible way forward be to rename .dtsi but not .dts?
+> 
+> FWIIW, and with the dual caveats that: I do not have the full context of
+> this series; and SoCs are not somewhere where I am active these days:
+> 
+> I am also under the impression that, in general, renames to
+> match product or other organisational changes are a non-starter.
+> 
 
-5 days in a queue is not a lot. Pls don't ping it again.
-Especially during the merge window.
+This is indeed a key reason for the new naming scheme. Until now we've
+named things based on the "product number" and we're here facing the
+introduction of the 3rd product name for the same die.
+
+The purpose of this series is to detach from the product naming (and
+introduce the EVK board).
+
+Regards,
+Bjorn
+
+> But reading over this patchset, I also felt that renaming the .dsti files
+> would improve things. And seems to have little scope to break things for
+> users.
+> 
+> </2c>
 
