@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-210859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21D0EB15251
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 19:46:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30955B15262
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 19:54:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5925554277E
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 17:46:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD2241885BA0
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 17:54:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FADD22DA0C;
-	Tue, 29 Jul 2025 17:45:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F064298CD5;
+	Tue, 29 Jul 2025 17:54:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c3Svszja"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d4iKMO1R"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 048801A2390;
-	Tue, 29 Jul 2025 17:45:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14605298CB1;
+	Tue, 29 Jul 2025 17:54:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753811157; cv=none; b=CF8Ud+gIWT652tgaBMO9Lo0OwSe1jK8MPzxWyzitRlmtRywM0j18FWHHfpRxnT9k5TDxsgVeWFEvPXvPaDDtj2LYI2MAvStxh3PRRuDx+0vN/UFMhONwm9+oPIDN5SwV2TIucMCPZqQVT/FlMnhK040qUFMVTkI1PL2MRAU8cwE=
+	t=1753811655; cv=none; b=J3lRQymJqH2Zm7pFhDZEbRMsC+2jOLwGiOt61XrlRyIRDGbhu48Z1+qhTWPVkWRYXXNfNIEn0i80BTFGh1h74E+H4Rlhrdo4D1n30LCtQzyf5IcVh+1SNL/FeX3/htMxbXksvh3jTPPxqVhNsfOMqAgbkVIL05xrEiqYEUVnLes=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753811157; c=relaxed/simple;
-	bh=6qjTRlNG6mWLFC8VSGcpPLF+CAKlIypJQcDcbXR/Otw=;
+	s=arc-20240116; t=1753811655; c=relaxed/simple;
+	bh=J6y7muyFDzOpaWbidr++rX+I7mcOedEEEF1hRm5TL9w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DmGa0OYc1pFAOx8CohIBdagUp51W73ubtMzzV/YThjcQspoghfTJotjVJyu0rwrNxBNJSVQaFrg7vpgI7dkO0q5+AAUYwJm4sKGbQpDLEpe7Zo+DQZH1rxzGitCgOCdrMTyPczLtwD2hYfKvZw1ZcO3513oF+OEbCFzcIY3qIOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c3Svszja; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DEF0C4CEF4;
-	Tue, 29 Jul 2025 17:45:56 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=ATncG86X9kYYhA8ASzxi0NamVM52nTPAQKtsEqmuf1Z+/jqKJYkXqlUGrMlRVymwDcM1yFGud4MkLN+QKF09xHpdP5cKuqxRdGwSqoH0+W76QgSHcx4HOV83Vj2rDXIByjhVEB/RQtg6wck0wY9fGxsAQBG6fuzBsIQj1hoaeBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d4iKMO1R; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 585CDC4CEF4;
+	Tue, 29 Jul 2025 17:54:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753811156;
-	bh=6qjTRlNG6mWLFC8VSGcpPLF+CAKlIypJQcDcbXR/Otw=;
+	s=k20201202; t=1753811654;
+	bh=J6y7muyFDzOpaWbidr++rX+I7mcOedEEEF1hRm5TL9w=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=c3SvszjaScYVH2cxvcbjgFbZsEdyFYQ5VRKpfVXyjtjpt0htJIN4mtK1PpeCjDaTh
-	 /46k3styG6mmy/i/SG4QDXuWKob0spuXN4wa2XligKXGNHgB96bSxGvYpmq6t8R4lQ
-	 3LGJp2bUsAMQnQP3EpveRTed/HN+jVc+RK5Axje7AwxBXFws9gYtiLeuLNzj5ly+gV
-	 uF3n3MzkE5o6wlBHY3SHVPJTNsIdjDQ7x+AOQ6MLwrKSSv6sRiRAOhiPeIHS6WkQRB
-	 e9BWt/aD9VViGsaHwERb/lX7n67N7yX90TBLYrc9+y6SYEJx8Lmceif5xxNW4b++Vj
-	 0fP4QaRafx0fg==
-Date: Tue, 29 Jul 2025 10:45:54 -0700
+	b=d4iKMO1R9RObKxmf2UyIzWWqHARsbZ+po8iimkSzRynrxyAPla44caaU0nbDr4YvS
+	 MlBR3YcpjA14F/lXXIZnm09ursqrw1Il9rsl32RoTvFMtPwGNwMtSKg8oPakc1b3Cr
+	 k4ZXntCF81Q50cKGaVued3T+Zrg4B5PuXkt0nb+QHTErPx2qadZCcbsce1YhR2ElSg
+	 ubzceejBv/ihLj49353LlJMO9lIEtmHQvuPbDkPKODBRVHmC5fDwbmO0cxk63K/4g9
+	 ZAf0z0wL6S7tnCrnwMhi61F5/rpdUe2u3vxxRmPDAOETpoIowlKEkAFOA7TMpaT0QF
+	 QYBJmSUzyjBcw==
+Date: Tue, 29 Jul 2025 10:54:12 -0700
 From: Drew Fustini <fustini@kernel.org>
 To: Yao Zi <ziyao@disroot.org>
 Cc: Guo Ren <guoren@kernel.org>, Fu Wei <wefu@redhat.com>,
@@ -59,11 +59,11 @@ Cc: Guo Ren <guoren@kernel.org>, Fu Wei <wefu@redhat.com>,
 	Jisheng Zhang <jszhang@kernel.org>, linux-riscv@lists.infradead.org,
 	netdev@vger.kernel.org, devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 3/3] riscv: dts: thead: Add APB clocks for TH1520
- GMACs
-Message-ID: <aIkI0vHDD1CfxAkl@x1>
+Subject: Re: [PATCH net 1/3] dt-bindings: net: thead,th1520-gmac: Describe
+ APB interface clock
+Message-ID: <aIkKxM3zfVjaa1we@x1>
 References: <20250729093734.40132-1-ziyao@disroot.org>
- <20250729093734.40132-4-ziyao@disroot.org>
+ <20250729093734.40132-2-ziyao@disroot.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,51 +72,67 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250729093734.40132-4-ziyao@disroot.org>
+In-Reply-To: <20250729093734.40132-2-ziyao@disroot.org>
 
-On Tue, Jul 29, 2025 at 09:37:34AM +0000, Yao Zi wrote:
-> Describe perisys-apb4-hclk as the APB clock for TH1520 SoC, which is
-> essential for accessing GMAC glue registers.
+On Tue, Jul 29, 2025 at 09:37:32AM +0000, Yao Zi wrote:
+> Besides ones for GMAC core and peripheral registers, the TH1520 GMAC
+> requires one more clock for configuring APB glue registers. Describe
+> it in the binding.
 > 
-> Fixes: 7e756671a664 ("riscv: dts: thead: Add TH1520 ethernet nodes")
+> Though the clock is essential for operation, it's not marked as required
+> for now to avoid introducing new dt-binding warnings to existing dts.
+> 
+> Fixes: f920ce04c399 ("dt-bindings: net: Add T-HEAD dwmac support")
 > Signed-off-by: Yao Zi <ziyao@disroot.org>
 > ---
->  arch/riscv/boot/dts/thead/th1520.dtsi | 10 ++++++----
->  1 file changed, 6 insertions(+), 4 deletions(-)
+>  .../devicetree/bindings/net/thead,th1520-gmac.yaml        | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
 > 
-> diff --git a/arch/riscv/boot/dts/thead/th1520.dtsi b/arch/riscv/boot/dts/thead/th1520.dtsi
-> index 42724bf7e90e..03f1d7319049 100644
-> --- a/arch/riscv/boot/dts/thead/th1520.dtsi
-> +++ b/arch/riscv/boot/dts/thead/th1520.dtsi
-> @@ -297,8 +297,9 @@ gmac1: ethernet@ffe7060000 {
->  			reg-names = "dwmac", "apb";
->  			interrupts = <67 IRQ_TYPE_LEVEL_HIGH>;
->  			interrupt-names = "macirq";
-> -			clocks = <&clk CLK_GMAC_AXI>, <&clk CLK_GMAC1>;
-> -			clock-names = "stmmaceth", "pclk";
-> +			clocks = <&clk CLK_GMAC_AXI>, <&clk CLK_GMAC1>,
-> +				 <&clk CLK_PERISYS_APB4_HCLK>;
-> +			clock-names = "stmmaceth", "pclk", "apb";
->  			snps,pbl = <32>;
->  			snps,fixed-burst;
->  			snps,multicast-filter-bins = <64>;
-> @@ -319,8 +320,9 @@ gmac0: ethernet@ffe7070000 {
->  			reg-names = "dwmac", "apb";
->  			interrupts = <66 IRQ_TYPE_LEVEL_HIGH>;
->  			interrupt-names = "macirq";
-> -			clocks = <&clk CLK_GMAC_AXI>, <&clk CLK_GMAC0>;
-> -			clock-names = "stmmaceth", "pclk";
-> +			clocks = <&clk CLK_GMAC_AXI>, <&clk CLK_GMAC0>,
-> +				 <&clk CLK_PERISYS_APB4_HCLK>;
-> +			clock-names = "stmmaceth", "pclk", "apb";
->  			snps,pbl = <32>;
->  			snps,fixed-burst;
->  			snps,multicast-filter-bins = <64>;
+> diff --git a/Documentation/devicetree/bindings/net/thead,th1520-gmac.yaml b/Documentation/devicetree/bindings/net/thead,th1520-gmac.yaml
+> index 6d9de3303762..fea9fbc1d006 100644
+> --- a/Documentation/devicetree/bindings/net/thead,th1520-gmac.yaml
+> +++ b/Documentation/devicetree/bindings/net/thead,th1520-gmac.yaml
+> @@ -59,14 +59,18 @@ properties:
+>        - const: apb
+>  
+>    clocks:
+> +    minItems: 2
+>      items:
+>        - description: GMAC main clock
+>        - description: Peripheral registers interface clock
+> +      - description: APB glue registers interface clock
+>  
+>    clock-names:
+> +    minItems: 2
+>      items:
+>        - const: stmmaceth
+>        - const: pclk
+> +      - const: apb
+>  
+>    interrupts:
+>      items:
+> @@ -88,8 +92,8 @@ examples:
+>          compatible = "thead,th1520-gmac", "snps,dwmac-3.70a";
+>          reg = <0xe7070000 0x2000>, <0xec003000 0x1000>;
+>          reg-names = "dwmac", "apb";
+> -        clocks = <&clk 1>, <&clk 2>;
+> -        clock-names = "stmmaceth", "pclk";
+> +        clocks = <&clk 1>, <&clk 2>, <&clk 3>;
+> +        clock-names = "stmmaceth", "pclk", "apb";
+>          interrupts = <66>;
+>          interrupt-names = "macirq";
+>          phy-mode = "rgmii-id";
 > -- 
 > 2.50.1
 > 
 
-Thank you for determining that this clock is needed for the GMAC.
+Thanks for figuring out that this clock is needed for the APB glue
+registers. The schema passes W=1 dt_binding_check with no warnings.
 
-Reviewed-by: Drew Fustini <fustini@kernel.org>
+Regarding minItems, I think it would be okay to change to 3 as the APB
+clock should have been there from the start but I missed it. We can fix
+the in-tree dts at the same time so that seems okay to me. But let's see
+what the dt bindings maintainers think.
+
+-Drew
 
