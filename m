@@ -1,164 +1,130 @@
-Return-Path: <netdev+bounces-210848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210849-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 569E0B15180
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 18:41:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30743B1518E
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 18:43:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 704DB3AA7D8
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 16:40:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 54963172A8E
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 16:43:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10DDF296158;
-	Tue, 29 Jul 2025 16:41:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0193028ECD8;
+	Tue, 29 Jul 2025 16:43:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WHPbkgBP"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dd5JqD9M"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DD74186295;
-	Tue, 29 Jul 2025 16:41:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 709DA25761
+	for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 16:43:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753807266; cv=none; b=fblagQcXJgUsOOXxA7AuhbD+4oQgLYV0nT9cVhNANRMpu7cAcVZT9w7e0A56v9+g66dD8aPGxrS7IaXl95kfx6sxdw/s/obGVk8SOHSCVXd5VbyalFElG4NmZHOkc6MEFgAfXFNl6JellcCobl8FEATqdZjYqVe8tTo1JMi3OWw=
+	t=1753807420; cv=none; b=O/OHlT/ftRFFDTOrRl45R8v+roGFn6dTHSoiixVI2qfEZzq5BVEewP/+TFe0qiZSAtqEdW+zHlj0JKTrWBCKvsdQdIDHvxob6Mk2CoLJ8NJfBhU9InnEZxUScTqHlsRilhg6DhFri9edHHzLlz+616A7qMg22RmeNZSXz6SZBWM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753807266; c=relaxed/simple;
-	bh=Llyr5jaiR1mDdsA/piUhjEcFPCZCD3P3dFT3wnjZNQw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aiwj4IYSIpjdsjjjdr9xU2ra0OUWvLZSzEVxj+k4c4S/uJ+F9lu2JzBuCGEHHyjTS/sKQGbMBgkUqQFj3E/j0uLP5FuM/BLdx2PagLfvo8qbCQ9H52l06ZAqksBXXc6AmFpCu5nuhvEA4BvVlDT9bnDy22x9CWqaozJDpy4cG0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WHPbkgBP; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2400f746440so25017105ad.2;
-        Tue, 29 Jul 2025 09:41:04 -0700 (PDT)
+	s=arc-20240116; t=1753807420; c=relaxed/simple;
+	bh=FCIbFdYLhZ8dZkG1o/KAeU8utF5h4qy3DwecnzJGNEs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=R6giwS/B77/3VOPSVbQLLp86ovMDi+qWUWjWi96hRXzSHNt0yz4Bd6Jcu5m2oD2/NPYZXHWg01yRHFvZNjCCY4fVbkfSbY6OK36mE1AzeriUitULAaTmrVe9r242f+eHMvGdQPNwOcWayJAAgeR611XA8vrYipwH8sD3djMzVuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dd5JqD9M; arc=none smtp.client-ip=209.85.222.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-7e62a1cbf83so577982885a.1
+        for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 09:43:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753807264; x=1754412064; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Ru7FYkhdAigOEVoVfqZe/qLye1UlV/5kW+i8Hi2XMCA=;
-        b=WHPbkgBPbGUanFnE/Kgg61QLBvqpJARDJ7srKnx8nNxIAJMSoBybxf7w6tUDs6oPjY
-         hM7gtm2pwg4T1qmyEcNYVV2z3JwNcLQKNejl0zLr/ra2VJ80JJGSRlhcbu1HkNSiWk7u
-         CiEl78drE3Cfcw60DAcOvY0U94pW0eREm+zTxE1vxRd8y1VPc2I6xjFpzFXdQ7Y3N29N
-         0uHS4i7ef6JJKw+YNFWj7udtC3E/vIobUxKmReFMQVYGyI0ZBHVXQCpnGOKcFPddv+dM
-         ZGW6mOTxPZVINQSuB4Gut43nZurzngBVsVyh736NfoFf6bduj11vF9swHj7RmOviaYk5
-         PLaA==
+        d=google.com; s=20230601; t=1753807415; x=1754412215; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9+FQCzaL+5dcka0AyrYsOL9Mr5DP3w26SIvvkWKSxQM=;
+        b=dd5JqD9MuJyfBwagAAgfT+/TwNmAxM6Cgy7/z5GvVu/obxxs/5Z7vQoVillT8k4rRA
+         BVXsEwljaYIwW3VpZtySqX9YCA1SHoi/frtKa7GjGBhcUHCFoOCMkYbZre6ip3YJZ7zu
+         kYrkgwyUpV3SiJcT93XJBiEQi4Hb7BbyN7W6gFaWJVTh3TWu1+Ff87BpTv8+zcNM8bR9
+         j2jKGgjF6vtEyQtM41LWK+s9VMYTzNMbvPsSNfIPbbDjlTJSiHHhG7BuEuwl1EIMteAF
+         xpDnjSeul+tovWX1BtW8XFuo02/bGPFztQsetz34bpwaW3qkGiYwZtzF7WlOEt6k9Osy
+         LUqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753807264; x=1754412064;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ru7FYkhdAigOEVoVfqZe/qLye1UlV/5kW+i8Hi2XMCA=;
-        b=vXiYkWom4zk91ELurcs1gninW3PM8lieXSpkGmS8DVYU2Moz3FSqiqutKCfA5i7UGo
-         WUm75sMoOG+SZwwO7kGoqmsEP2BNMSndR+BRQ7I4WlhJb7At+9FrNTnEfmOBp2vwfQuE
-         CC5EljKctALKeswLBBgbfM2EqxErq316O939H0aISJ4sSlvszDLHrssyYuX/2Rf8BYDQ
-         NLUNOOpuPZRHlrryMVRzJFRFnTtRntsvVMybYsVRtWeAuFeFpFvwKRZGEo8GXmrN1R+1
-         I+zyWr9eOQ/+eqbyerhqCjqw2R+XOoQoG91L/GV4owwkbtm8C3Ekd6ayU32jiFsHOVJN
-         WK6g==
-X-Forwarded-Encrypted: i=1; AJvYcCUzs53Y6rRktrQGNil30YLFF1+XdynxaR5DR1cqLPAue2su8UTDhnz4775Q0NStm4jAmtKwa+cAng==@vger.kernel.org, AJvYcCXDMmDziLyWYlLjUNlNasZqAq32uzCwn2yIK4fH5vD2ogVZRZl4RM9mi7vxxycNhfo+IfS26jdn@vger.kernel.org
-X-Gm-Message-State: AOJu0YyKCjn8gLdIqVhK7epLcNH9ICxuMESFw5Qu3dfjXGPU1JG2/Pk1
-	B09UHUI2hTgCvOewx40uDMk6XI87yyLZyOA51CmbEueIQoFz1Gi+euk=
-X-Gm-Gg: ASbGncujFr5fYPrMJipgCcq097kPsqPcGxcoI31RmCR9jjZP7uwgx7qLcX4yVZWDdul
-	BztFHpwfw/zlJDotwy9grTzeLjZj3Bwtg8m+OHARd4uCMC2WzguNe3OI3KindcAYjQip8udjNSW
-	xsxI5b1rX6hJsPWvkiBo6NSpc7kSex9oeerFlDkk1mHTnNv8OcWfpBKtXELEs3AWcqvF0JduXWf
-	iIcLBvhFQTA+A0O4Kbp4EFZnbOzYrNJbmGcEVS/V1fBvIjzehI6Q6825PA+XfoTjlSQc7P5eJ10
-	IGt3if2UfZYEQExt+k5S/BVW1V2bSHdlPCSmw9ub7Pfi/slLZkzKYOJWya6ipu1lMRJnhAvTJey
-	HveaQyoTSm5//MQTFkK2Hk3MST2WdoHhGbwaF2dqz3oudT03T3MWrqoGAB14=
-X-Google-Smtp-Source: AGHT+IERa0EOnuLcjvz3JRG/EuKxPZfiOb/TBLMk6UnGG/dNLbvL7o+o+SG+cb0snWBvMJ00DCaTCQ==
-X-Received: by 2002:a17:902:e801:b0:23f:df69:af50 with SMTP id d9443c01a7336-24096b237eamr873835ad.34.1753807263561;
-        Tue, 29 Jul 2025 09:41:03 -0700 (PDT)
-Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id 41be03b00d2f7-b3f7f569d18sm7422028a12.11.2025.07.29.09.41.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Jul 2025 09:41:03 -0700 (PDT)
-Date: Tue, 29 Jul 2025 09:41:02 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: Pavel Begunkov <asml.silence@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	io-uring@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Paolo Abeni <pabeni@redhat.com>, andrew+netdev@lunn.ch,
-	horms@kernel.org, davem@davemloft.net, sdf@fomichev.me,
-	dw@davidwei.uk, michael.chan@broadcom.com, dtatulea@nvidia.com,
-	ap420073@gmail.com
-Subject: Re: [RFC v1 00/22] Large rx buffer support for zcrx
-Message-ID: <aIj5nuJJy1FVqbjC@mini-arch>
-References: <cover.1753694913.git.asml.silence@gmail.com>
- <aIevvoYj7BcURD3F@mini-arch>
- <df74d6e8-41cc-4840-8aca-ad7e57d387ce@gmail.com>
- <aIfb1Zd3CSAM14nX@mini-arch>
- <0dbb74c0-fcd6-498f-8e1e-3a222985d443@gmail.com>
- <aIf0bXkt4bvA-0lC@mini-arch>
- <CAHS8izPLxAQn7vK1xy+T2e+rhYnp7uX9RimEojMqNVpihPw4Rg@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1753807415; x=1754412215;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9+FQCzaL+5dcka0AyrYsOL9Mr5DP3w26SIvvkWKSxQM=;
+        b=UNC65DlAUGrJ0Hh1YMYzpmLwKwATg5MdnBbFNwndebxrufhmcmvHDv7CXCKs4UjuMb
+         b4gu+nuCFGeHLEMLiG2CfOgfXLNO1qITOsQGl0Bk7to+hIcEQMsF+req8EtHg3MbfahW
+         MmQ1Uzg/O2Jswi15exWsvhhNOC0qxb0HDCzpM9/BUxXILXi6HdKLUAWWu/tw2PFGEhAY
+         mznXCf1iIVCHZ5ag+PYQBCRwD2euQvVESQF4jm5wo7MLoZnMvWb2g0XUaktFuo73CPZD
+         zE/4YaEMFHmv/tMIZSSet3qmF576aa/vwqvSi4IhlY7ezP777VEYeGbtvTkgMddzLEyX
+         5z4Q==
+X-Forwarded-Encrypted: i=1; AJvYcCU5TvuQ7OAmuckONZmmTt2ow1HkPkKRZ0mPIat4T9AtYoiEEnlwrOgouH8gP10AzWgZbLsYzKE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzO8QifmrG6wh/oWsz0Sx9Nnlr7NEYkUMCmltEN+smsKxwscNzb
+	TIUBluqrkmlVRUzB5FNXQz+QkVV7GCHfZU8xiuFCbJDayx7m+qYXwFQTla3S1Zd2zXw9IP78WZy
+	2yp8rMg79Zfcse0ww6RGu/lfFWjxfH9OZUAdTDDTl
+X-Gm-Gg: ASbGnctxSdIV89+4NnyX8ee0/0z7OZvi9CYCB7bLAHkKR+AzQmFTZO+v4G2+QPTf8Pu
+	y65LpRakcJXelrJwBQq85mKBrRq/hy7+PXLfMQTDzVnYm7979mo8WV7xKnFsfLgp3jp8E57IFcv
+	X1Z27767xjz7N2PrUmlhmpMrwVM1IajuSg0VcAvgVKw8QxPj8WUdbDj6WuU2dOJ3eIeUWRkyrA8
+	ctqzw==
+X-Google-Smtp-Source: AGHT+IGhY4SFPSW9Pbq6/3vmAAUhktF1lj4vRgGgJD6WtAT3Dz36TwNQnp0I26CyYbqhroSoft/o90tJ9vRNEPz4Mkc=
+X-Received: by 2002:a05:620a:a509:b0:7e6:50f1:a871 with SMTP id
+ af79cd13be357-7e66ef93f45mr10696185a.6.1753807414997; Tue, 29 Jul 2025
+ 09:43:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAHS8izPLxAQn7vK1xy+T2e+rhYnp7uX9RimEojMqNVpihPw4Rg@mail.gmail.com>
+References: <20250729114251.GA2193@hu-sharathv-hyd.qualcomm.com>
+ <6888d4d07c92c_15cf79294cb@willemb.c.googlers.com.notmuch>
+ <b6beefcf-7525-4c70-9883-4ab8c8ba38ed@quicinc.com> <6888f2c11bd24_16648b29465@willemb.c.googlers.com.notmuch>
+ <CANn89iLXLZGvuDhmTJV19A4jBpYGaAYp3hh3kjDUaDDZJqDLKw@mail.gmail.com> <6888f5eb491ac_1676002946c@willemb.c.googlers.com.notmuch>
+In-Reply-To: <6888f5eb491ac_1676002946c@willemb.c.googlers.com.notmuch>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 29 Jul 2025 09:43:23 -0700
+X-Gm-Features: Ac12FXyQBgKJQCYMujTKcIT7pCsVuNcY-zqNdElvzGKgf3xQlJPgHgRVR7ei2a8
+Message-ID: <CANn89iKA9O1jsTjm+vOQqN7ufBJFod7oySUC=2G7wcV2cGTkSw@mail.gmail.com>
+Subject: Re: [PATCH v2] net: Add locking to protect skb->dev access in ip_output
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Sharath Chandra Vurukala <quic_sharathv@quicinc.com>, davem@davemloft.net, dsahern@kernel.org, 
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
+	quic_kapandey@quicinc.com, quic_subashab@quicinc.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 07/28, Mina Almasry wrote:
-> On Mon, Jul 28, 2025 at 3:06 PM Stanislav Fomichev <stfomichev@gmail.com> wrote:
+On Tue, Jul 29, 2025 at 9:25=E2=80=AFAM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Eric Dumazet wrote:
+> > On Tue, Jul 29, 2025 at 9:11=E2=80=AFAM Willem de Bruijn
+> > <willemdebruijn.kernel@gmail.com> wrote:
+> > >
+> > > Sharath Chandra Vurukala wrote:
+> > >
+> > > > >> +  rcu_read_lock();
+> > >
+> > > How do we know that all paths taken from here are safe to be run
+> > > inside an rcu readside critical section btw?
 > >
-> > On 07/28, Pavel Begunkov wrote:
-> > > On 7/28/25 21:21, Stanislav Fomichev wrote:
-> > > > On 07/28, Pavel Begunkov wrote:
-> > > > > On 7/28/25 18:13, Stanislav Fomichev wrote:
-> > > ...>>> Supporting big buffers is the right direction, but I have the same
-> > > > > > feedback:
-> > > > >
-> > > > > Let me actually check the feedback for the queue config RFC...
-> > > > >
-> > > > > it would be nice to fit a cohesive story for the devmem as well.
-> > > > >
-> > > > > Only the last patch is zcrx specific, the rest is agnostic,
-> > > > > devmem can absolutely reuse that. I don't think there are any
-> > > > > issues wiring up devmem?
-> > > >
-> > > > Right, but the patch number 2 exposes per-queue rx-buf-len which
-> > > > I'm not sure is the right fit for devmem, see below. If all you
-> > >
-> > > I guess you're talking about uapi setting it, because as an
-> > > internal per queue parameter IMHO it does make sense for devmem.
-> > >
-> > > > care is exposing it via io_uring, maybe don't expose it from netlink for
-> > >
-> > > Sure, I can remove the set operation.
-> > >
-> > > > now? Although I'm not sure I understand why you're also passing
-> > > > this per-queue value via io_uring. Can you not inherit it from the
-> > > > queue config?
-> > >
-> > > It's not a great option. It complicates user space with netlink.
-> > > And there are convenience configuration features in the future
-> > > that requires io_uring to parse memory first. E.g. instead of
-> > > user specifying a particular size, it can say "choose the largest
-> > > length under 32K that the backing memory allows".
-> >
-> > Don't you already need a bunch of netlink to setup rss and flow
-> > steering? And if we end up adding queue api, you'll have to call that
-> > one over netlink also.
-> >
-> 
-> I'm thinking one thing that could work is extending bind-rx with an
-> optional rx-buf-len arg, which in the code translates into devmem
-> using the new net_mp_open_rxq variant which not only restarts the
-> queue but also sets the size. From there the implementation should be
-> fairly straightforward in devmem. devmem currently rejects any pp for
-> which pp.order != 0. It would need to start accepting that and
-> forwarding the order to the gen_pool doing the allocations, etc.
+> > This is totally safe ;)
+>
+> I trust that it is. It's just not immediately obvious to me why.
+>
+> __dev_queue_xmit_nit calls rcu_read_lock_bh, so the safety of anything
+> downstream is clear.
+>
+> But do all protocol stacks do this?
+>
+> I see that TCP does, through __ip_queue_xmit. So that means all
+> code downstream of that, including all the modular netfilter code
+> already has to be safe indeed. That should suffice.
+>
+> I started by looking at the UDP path and see no equivalent
+> rcu_read_lock call in that path however.
 
-Right, that's the logical alternative, to put that rx-buf-len on the
-binding to control the size of the niovs. But then what do we do with
-the queue's rx-buf-len? bnxt patch in the series does
-page_pool_dev_alloc_frag(..., bp->rx_page_size). bp->rx_page_size comes
-from netlink. Does it need to be inherited from the pp in the devmem
-case somehow?
+ip_output() can already be called from sections rcu_read_lock() protected,
+or from BH context.
+
+The caller's context does not matter. I am unsure what you were
+looking at in the UDP stack ?
 
