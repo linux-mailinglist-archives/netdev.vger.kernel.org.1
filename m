@@ -1,231 +1,241 @@
-Return-Path: <netdev+bounces-210766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210767-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD63CB14B85
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 11:42:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A21BEB14B97
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 11:47:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6F0387A5B55
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 09:41:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF9BD189C040
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 09:48:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A5572882A5;
-	Tue, 29 Jul 2025 09:42:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84E6D236A9C;
+	Tue, 29 Jul 2025 09:47:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Ahb0btml"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="mw/RjNVM"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2053.outbound.protection.outlook.com [40.107.212.53])
+Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79A9D28851B;
-	Tue, 29 Jul 2025 09:42:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.53
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753782162; cv=fail; b=Qhr27jJvCKonRpy+4oSnv4gtBCgFPR8OdCHMsnU9eBFM5f/LTYvEiAr9jw9od+TBqyGGgsp1jSwoSxsbJo2s7zWQUpZDhqk9bTEgIQzG0zofTRZR+ArX6lU2UsKqjMDHWkBac0WUGn1YDhqTSCiVipCLkUKF7nwmOu31bzvVC6E=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753782162; c=relaxed/simple;
-	bh=lY/N7/3kceBIHvs5ETb3ZdzsnlMw+idh4hggdRvMMxQ=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=iEH1ko+1hXOX3bujz5c6Folw0ZEgfgg97RhMvGkxKJAw7EdyP0VB0jXEMSeSzZYbRpz3m6lcz3lUbjPZWYkMAMsAUI/hb9YJqeAukoN221bgm9Rafa8SfmVHvfMKlqiO3U5FDeKijynmEuWd/HfadOcOGoWOd3cWoOIebwvNzXo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Ahb0btml; arc=fail smtp.client-ip=40.107.212.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=poYJz6VkqyK0b94ba0nCJbMCyrNt1yfDsPufmy6/6YDLC11wBYHqom8N4kRsUflEp6qRerNT7ga+iHL+agyjUt4YhvIqGpKTPU6qoQP5DvxXm9ncfQ1o4TgmYKjhGr+Xu5Vs2oCUuuLUuowCMVGgR79dy1QwLebYQNIbRDP84ioNtiYCkuMYjGjPkvo6FDOvT1rs4ytL55kPjIbDG5Yi5+8ktVal7qq4/QAI6p+CZILLB7cVuWJBupu7mUAXVUsj++P7nzT4NNc0xufwi0RPS7F9nppvbNmnF/OEqzBqDnklwcPBeBGc+UmBxCB6Y4zPWEdEawtQss+hlyQWgkdCEA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=a3pGM2SxU8Hi9sF9k0dpW3HwoiBGBSEZSiiTYU5zC10=;
- b=sCEnYzNSijnZ0oz/UAbbVcE+gzw308g3rc9o+3Zt9a23u/FDKCTkVp9inlLFQTZQM59GI3g3tYqhjSoabZIihLEMzZgFEwEXdGSjqDkkQsu0aXJFLmlb1S0G5/qj6GxFoecU1IhbUUckrK7CRpxtKiqD/xEmhGnoW+QTE+GNJcF4N9afoYPAGQgMQ5mo2tAbfa9LZJLNJweC2LA6rMtCOcwVso90Lf5pUt0sAbeC45ezCCk1YegVIAf4uHIsryW8DRHfxisCaJiwq+xIbWrkwcXFLs9+XLm4H8/Tcg6en9eLYIiIKoS12+ojsYEPn9nL1bKiRBGdsywDU1JJoGeqcQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=a3pGM2SxU8Hi9sF9k0dpW3HwoiBGBSEZSiiTYU5zC10=;
- b=Ahb0btmlOemPblZTDCjG6diQaw+gJ0dVaNvwKhmtCndUvVaS98dCpWP9bZjYzLKn+cKLmT/AQykco+NaAitH7dgUIWK7JWLOXn7Rq2LSv1o5VFP63GETw0/LFp38YOhAVzSyAoi7IuRV543kGybuQmqCPEYTkAkMx/+TazmC4ps=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from BL1PR12MB5946.namprd12.prod.outlook.com (2603:10b6:208:399::8)
- by CH3PR12MB8354.namprd12.prod.outlook.com (2603:10b6:610:12f::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8964.26; Tue, 29 Jul
- 2025 09:42:36 +0000
-Received: from BL1PR12MB5946.namprd12.prod.outlook.com
- ([fe80::3e0f:111:5294:e5bf]) by BL1PR12MB5946.namprd12.prod.outlook.com
- ([fe80::3e0f:111:5294:e5bf%4]) with mapi id 15.20.8989.010; Tue, 29 Jul 2025
- 09:42:36 +0000
-Message-ID: <53ee7054-6cdb-4f2e-a4b5-16bfa590df44@amd.com>
-Date: Tue, 29 Jul 2025 15:12:29 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 6/6] net: macb: Add MACB_CAPS_QBV capability flag
- for IEEE 802.1Qbv support
-To: horms@kernel.org, vineeth.karumanchi@amd.com
-Cc: nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, git@amd.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250722154111.1871292-1-vineeth.karumanchi@amd.com>
- <20250722154111.1871292-7-vineeth.karumanchi@amd.com>
- <20250723190500.GM1036606@horms.kernel.org>
-Content-Language: en-US
-From: "Karumanchi, Vineeth" <vineeth@amd.com>
-In-Reply-To: <20250723190500.GM1036606@horms.kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: PN4P287CA0061.INDP287.PROD.OUTLOOK.COM
- (2603:1096:c01:267::10) To BL1PR12MB5946.namprd12.prod.outlook.com
- (2603:10b6:208:399::8)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DF00230D35;
+	Tue, 29 Jul 2025 09:47:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753782473; cv=none; b=q85aMdmIQ2zs6QxV/aMvz2kTIY/CEe2xRXCUbYR1kRmOldkVugVHCLwvG9CyifAV4NG01iX+sRZzGsaX5JXIX4fH5A9IGrDW11N+lyC5f6s1IBiFqc71IpITgBMdQIBDm8nHB3EpULtqdE5mYiELePugXTpkmZVmOAdytvAIp5I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753782473; c=relaxed/simple;
+	bh=kiAVxOybSUMykd1nOkBhLdpaX405dvJtvP0kD4q0ZUY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=UCZDNHU85gMM67RLfx/hGQik82oRMYg0E8zlPxVe1ZCZ4bUJo3Tyc/vyngaxJoo8eyOgHtZBlcfrk8gnFUO0czka6mpN3LjQfSSKXfuVbVNL0QBzDBhcbpWBrkDPj0Xj/ee60A3bT/fSFgaAqeRXs4WsdsUuY2dWHva3PEMxRAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=mw/RjNVM; arc=none smtp.client-ip=198.47.23.234
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllvem-sh04.itg.ti.com ([10.64.41.54])
+	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTP id 56T9kaku2518997;
+	Tue, 29 Jul 2025 04:46:36 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1753782396;
+	bh=rW2guRXzVdSnP3kefofJSWnAepPy1N5zFafQ9pBYRpE=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=mw/RjNVMo6aBuUR2RkpjfrSTMPitgl+f7aFpDFUxKhzsrVssKPY2b1hL+Ynt41I6K
+	 AN9uVNpjfRShIoAdvJqECtMXtvknjRxYvDjg1szUFgPr2GmtyofClCn0HatJKKs24K
+	 FkXziYWTbOakABGqOHO5lf2V9OSQHmjMjKJWTnfE=
+Received: from DFLE102.ent.ti.com (dfle102.ent.ti.com [10.64.6.23])
+	by fllvem-sh04.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 56T9kZQe2365503
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
+	Tue, 29 Jul 2025 04:46:35 -0500
+Received: from DFLE103.ent.ti.com (10.64.6.24) by DFLE102.ent.ti.com
+ (10.64.6.23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Tue, 29
+ Jul 2025 04:46:35 -0500
+Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DFLE103.ent.ti.com
+ (10.64.6.24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55 via
+ Frontend Transport; Tue, 29 Jul 2025 04:46:35 -0500
+Received: from [172.24.231.152] (danish-tpc.dhcp.ti.com [172.24.231.152])
+	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 56T9kTTA3221409;
+	Tue, 29 Jul 2025 04:46:30 -0500
+Message-ID: <66377d5d-b967-451f-99d9-8aea5f8875d3@ti.com>
+Date: Tue, 29 Jul 2025 15:16:28 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5946:EE_|CH3PR12MB8354:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0ec7ec70-5f3b-41a2-b5a1-08ddce843ffd
-X-LD-Processed: 3dd8961f-e488-4e60-8e11-a82d994e183d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?RVF3NDRjM3lIQkRxQzQ1WVVpL0xCdkV6QWh2Z0MyTTVEVmc0QVFFTi9VQkdE?=
- =?utf-8?B?ZXpGYUM3bVkrVTFBVk1UVnB2ZW9oR1BvV1daSjFCbjhLL3NhVnZxZjA3OFE3?=
- =?utf-8?B?MCttYWRsVlNQQm16RHZlU3FNRGxsUVpEWmlFVVVYU3F4VkkrVFNhLytxZGo4?=
- =?utf-8?B?aXFWVlhqQnMzSkRzMEdWMjk1aVVlVWhrZDlORVFEdEx0NkMwSXNRWit1VE5C?=
- =?utf-8?B?S000U3d3YjdWek1XK1Z0YXRWejBhSUhGbTlVVHVVVkE2UUNZcVdRRGF3R2lj?=
- =?utf-8?B?RTR5NVpoZGFOcHBpU2p1YllQQzZaQzkvenhybno1V0RRUVNqM0toZlFjaUhP?=
- =?utf-8?B?TlVubGJuQzRpZXpsaUtrM3F4ZFgwL2lOdG5EakNBRmRaTi9qUHU5QWNTVDdT?=
- =?utf-8?B?RXdnYTBpb3VaZ09lVE9aSWZSWmdZSVdRZGpZSmdxZU5qWURxVFdGT1FReGky?=
- =?utf-8?B?cUJrM3Zpc1ptQ0NNMDRZbnlFRlpNVWZZSDE4MmZHOExwS3FsWStLSUo4clZT?=
- =?utf-8?B?VTQycWI0WkxlOFZZS0ZidmFDZzFTN01LMy9mcnJrUDViYUxmdEFFUmlYdXlm?=
- =?utf-8?B?K1hpVGl0UENKcC9rVm9MVStWSXJpeUFZa21OdTVHSVk3aURFcG84MVc4L29B?=
- =?utf-8?B?WjZsUHdkTG9qbXBXYkRkS1lQSUs3NmZpN3RDcm5lcFU2aVM5Vy9pa2NVYlBH?=
- =?utf-8?B?UjA4a0xjY2taVlEzT2FSUnZQbDltWnkwek5NQlFIcUFzSWxKTkUzZnRwNXdi?=
- =?utf-8?B?M0tRTCtTME9TMEdOSi9OamUzVHNMMjJrNU1PWE55VG5CWmw5aFlFcWxEMG1C?=
- =?utf-8?B?d29rRWlxc1o1T0RobGRxMklwZnBCVjhsZU9qODFrZElVSmJLYnNQZjg4UFd2?=
- =?utf-8?B?MXdmVFlrbFRlcEFJdWVRUVptUW5XUGhLWnFnc21uZ2tDdjNGS1FzWjBEc2Fp?=
- =?utf-8?B?cjVBMkFHYW5nQkhmaVpFTnpaS1hDRnY4c2k0YmNVSmNjVkRJRU83Y29kTVBr?=
- =?utf-8?B?ZGM1MFhhTnVEMk5OdWJ2S01BVHZtUHkvL0VvVkZoUTFEbXNLMHBCTXpPRGFW?=
- =?utf-8?B?Qk9GTW1TcUJmU0J5ZmU4Mlh4cUZoU1RGMjlzaXpUbktUUjFDYXY1eHV1SkhI?=
- =?utf-8?B?b3pBeVllbUpyNXFTRE1raC9Wa2lTOFJ4VitnM0tNaFBHb2lHZlkrNjFRVWEr?=
- =?utf-8?B?WTBSdEM4Mnp0LzJPMWorOVZGaEU2VVpocndOQk0rNTJrdlhGTUcyU2NWaEZn?=
- =?utf-8?B?ZmNQNkNrcnhWOUdxTTFmZkR6MmZqaWpEdWVsSENwdFBhUmNQTFhVYU54YU54?=
- =?utf-8?B?Tk9IdWZnWEdWY3NCdlFjWGppd0NGQU82VTdSdHlxWHl2VWE3TmdvcVA3RG5k?=
- =?utf-8?B?Yi9rT05pMFErNkZtZi9DQitkTWo4dUsyczArNk1qdU9ET0dQT0NxeUVUTms4?=
- =?utf-8?B?ZW94aTBYOUl5bGViZHhlMVl4bVRHanJtMXkyS2RMTFNvT3B1UDVnRU9LQVRk?=
- =?utf-8?B?enJ2cWlRWEdlUW5zK2VYMjVuVFFzSWREQWoxbXpXVzZ4Y0ZjbURlR1VyNHZm?=
- =?utf-8?B?Ry9PRUlRZ2poeUpUNytiMjVLOWZ1eUlPVGZHTC9CUjd6dEJzTmhMU2JiNGdj?=
- =?utf-8?B?UnVqRTVKNyt5bHhSQk1kUkJOQzArV3IxalVwazhvaGVic25YMWoxakFzcVhI?=
- =?utf-8?B?SDA3NDYyYXdaVGlQN0owd25Zbmx0dHZlSXJEcW5tVHg1ejFEckVGQ0g4Nllt?=
- =?utf-8?B?MkYzd0Q4OVlSMmlFVy80eTJqYzRBUWM3Q3B4UVJJSjBGSG9vVmc0SU5OcTVp?=
- =?utf-8?B?NmZUQ0VwMXpUYWVHeUdIbi9IcTZlamE1ZTdXdGtUa0hnOHcwUzZqL0dscTgx?=
- =?utf-8?B?TmFVcEVwR1dKT0xwS0lDZmVCamZCa1FhTSs1MVFtV2ZYZXZxYnkrd2kzRUls?=
- =?utf-8?Q?YWBdd/Jhwfs=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5946.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?MkRBdHVxcXpncXc3ME5hWlBvUnE0TXpSUVQ0eWNJWTJ6aG1OcEtaeVU2Qk9S?=
- =?utf-8?B?bGJrNlVXb3dtQndvbzhocXhJekFOenpOTjJpdnZvYVprRG5zNGRQN3BGN2pK?=
- =?utf-8?B?ZTNNRVE0R3RaWmp4M0MyRm5uT0EvQklBUTV6dXkyRlh6QSszU0RKZkpON2dN?=
- =?utf-8?B?Nk1qdUw5R3ZnN2pDWFNNcTdWbmJrYThCVW90dXBrY1VZNGZEcUFKajZ6VGRn?=
- =?utf-8?B?ckRTL3BpOGpoQTA5dVRzMVBJYUx5U3h0RmMzb29BdEdnb1JwWTRBWlN0YnVH?=
- =?utf-8?B?SGhPMTgzWUU4ODVmTTJVN3lEdEMzM2F2Q2p1NHN3b2M3ZmMyVFhwa2FpMTRa?=
- =?utf-8?B?WkdTeTZBbTU3SGdCSksyVDV6UmZsbmJHMWU3S2tJN2dtU1pHL0ZRYUhRRW5u?=
- =?utf-8?B?eVVQTjY3MDRlRStCdmZMbmZaRW40MmZSMjJUelpXelZYbzAxN0hJN2xTMW8x?=
- =?utf-8?B?bEpjWHZUTmpuR2xFSXQvRXlrUkJVcnY0cnhNWEJIcE1TamRHQTlXTHIzMlNr?=
- =?utf-8?B?SDVEY3BPOVEwWHZUN3pncW8vbmJJOGxnZStCSkhaejNBQ1hKV0ppMWhEUzZv?=
- =?utf-8?B?OFZXSG43OUxJM0RDU1BVc2V3cWZiamg3RjUwRUFxck1BWENKWkVHQnpiakt5?=
- =?utf-8?B?NE1yK1lLdERGSjFRRjVGR3pRNVRZK2FrWGxHUFY2UEZWcWIwSVdLeExXUFBj?=
- =?utf-8?B?TTREdUIycC9pbURZa1NxeFJkb2hveXh3aGpIeEt3czYvdzZ6RDhyZGtGbEwy?=
- =?utf-8?B?UGtlckpWUEhWTXIvM2J2UStwV1dPcHNtUVF6dHpyS0kyTi9zMEozdUtlMHRN?=
- =?utf-8?B?dXNSd3I1NlhtNkx1a3docklqUmNwNkNSU3RuYnNkVzYrbmJFZVJsZVZDMllC?=
- =?utf-8?B?M0NIYjZ3OCtqVDdlY0JveW10NE5FZkprQjExWWJvOXBSS3BNMzZyaFlJejBz?=
- =?utf-8?B?bnVnT2F0emc2dnhkV29iSlNBLys3T242WkxHY3dqZUpZdWFLalhCMGNIYUxq?=
- =?utf-8?B?SG9qWUU5aVdGczljWmtndkNHUlVLTFBFNTJFb0RnVHFzTHN2VTNENnBFWVNI?=
- =?utf-8?B?NjRtSitMQmliVjl6QzduWnRNWm5GUDNIUUhNTklPMlJ2WnZIMS9mVlp4RHhG?=
- =?utf-8?B?cnY5cmlCT0pwY1B5Q3JqRTJQNWVWeFQrTzNudXBoMnlUK3hnM3J1TnkrMGNp?=
- =?utf-8?B?T2FyUlRtaGt2cFVzSENsYmxwVEJRNWhTcVpqR3h2UUNQcjlCZmZxRW5CZjZC?=
- =?utf-8?B?NkkrZ0RvYmsyY1pWTGNVUENqdk56VGM1UTFITGgzdkptTVFxUG5kSWZVbW1S?=
- =?utf-8?B?ZldPQVhMdGpvWmI5aWFvZ1Y1dUxmWnJFajd3YjlhK0JIRHI5QWNtVlRRb1Rz?=
- =?utf-8?B?Z2EzN1RsM0V1bDVxN1hOTnZrL29lOTltUTdpTDV3VW0vdzhtMmxLWjlwQk05?=
- =?utf-8?B?bE9tLzhVa3ljeEJHc0VhYXoyY01oUXE5TW5kaUl2Q1hwRnh5a0I2Z2E2VG5Z?=
- =?utf-8?B?a2JIOUlPKzRINVhmQlJQWDEzQnBObklGVDJ3d09mVlhRNVRQVWRKMmd1emNV?=
- =?utf-8?B?RUkvTlJlTVNobVhNWnNiT1pSbGJUTGdCNDhUelZZTWtObVpVWVdOVXp0S252?=
- =?utf-8?B?a1lieC9GQVJmNi9RaHFGMmZkSmdEaXlaK1dzcENucmRUUlZTb3lEblRocUsz?=
- =?utf-8?B?MklpY2xWbWkyU2tRemFnOEJqTGIxRWN5UHN5aVhJUGlZZVV3dHljRnZjMmlF?=
- =?utf-8?B?eFhuTzlwdHE3ZTJuZndvRVhHTFpiaXJ5YzlLN0JMSjNPbjQ0QWNJUis3Y0Uw?=
- =?utf-8?B?NGQzdlRUaDNHdWFMWlZLZjROV0xONmM5L0xVcnFiWVZqZXNMNzRDdEJzaWJC?=
- =?utf-8?B?UWl0TGQvSEtCVUVjVkhRdVZUREJkbDFacGpYRzFFd2tWUExyUTBOOE1ZSmxC?=
- =?utf-8?B?TUpqTFVHRXNDZXQ0WWNQdmlOakp2d3VGOEQ5aHd5OS9jSGRUaTJ0cGQ2NjlD?=
- =?utf-8?B?NUtrbEtBbmZkTEVOSUhpV243L2R1NTlqMTZ2SnVQdG9NVHJ3VWVVWGROcnJR?=
- =?utf-8?B?ZVFFQ3VnNGYxS3hHTzA2TjlUdUJSS0twQWE3TWQwcHJZNnVoWDdLSENJVzU1?=
- =?utf-8?Q?tOSF3QpoqWsJWVEvjA8rDbzPi?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0ec7ec70-5f3b-41a2-b5a1-08ddce843ffd
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5946.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jul 2025 09:42:36.3300
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: mywcSu1f0Vt3khXa1TpCB09sVDRV6JJLgpdJtnPbrhE3Fle2ljxg8fjwpmZbuTaD
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8354
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/5] net: rpmsg-eth: Add basic rpmsg skeleton
+To: Krzysztof Kozlowski <krzk@kernel.org>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>, Andrew Lunn
+	<andrew+netdev@lunn.ch>,
+        Mengyuan Lou <mengyuanlou@net-swift.com>,
+        Michael
+ Ellerman <mpe@ellerman.id.au>,
+        Madhavan Srinivasan <maddy@linux.ibm.com>,
+        Fan
+ Gong <gongfan1@huawei.com>, Lee Trager <lee@trager.us>,
+        Lorenzo Bianconi
+	<lorenzo@kernel.org>,
+        Geert Uytterhoeven <geert+renesas@glider.be>,
+        Lukas
+ Bulwahn <lukas.bulwahn@redhat.com>,
+        Parthiban Veerasooran
+	<Parthiban.Veerasooran@microchip.com>
+CC: <netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+References: <20250723080322.3047826-1-danishanwar@ti.com>
+ <20250723080322.3047826-3-danishanwar@ti.com>
+ <296d6846-6a28-4e53-9e62-3439ac57d9c1@kernel.org>
+ <5f4e1f99-ff71-443f-ba34-39396946e5b4@ti.com>
+ <cabacd59-7cbf-403a-938f-371026980cc7@kernel.org>
+Content-Language: en-US
+From: MD Danish Anwar <danishanwar@ti.com>
+In-Reply-To: <cabacd59-7cbf-403a-938f-371026980cc7@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-Hi Simon,
 
-On 7/24/2025 12:35 AM, Simon Horman wrote:
 
-<...>
-
->> @@ -5345,7 +5349,7 @@ static const struct macb_config sama7g5_emac_config = {
->>   static const struct macb_config versal_config = {
->>   	.caps = MACB_CAPS_GIGABIT_MODE_AVAILABLE | MACB_CAPS_JUMBO |
->>   		MACB_CAPS_GEM_HAS_PTP | MACB_CAPS_BD_RD_PREFETCH | MACB_CAPS_NEED_TSUCLK |
->> -		MACB_CAPS_QUEUE_DISABLE,
->> +		MACB_CAPS_QUEUE_DISABLE, MACB_CAPS_QBV,
-> Hi Vineeth,
+On 28/07/25 6:10 pm, Krzysztof Kozlowski wrote:
+> On 28/07/2025 10:10, MD Danish Anwar wrote:
+>> Hi Krzysztof,
+>>
+>> On 25/07/25 12:48 am, Krzysztof Kozlowski wrote:
+>>> On 23/07/2025 10:03, MD Danish Anwar wrote:
+>>>> This patch introduces a basic RPMSG Ethernet driver skeleton. It adds
+>>>
+>>> Please do not use "This commit/patch/change", but imperative mood. See
+>>> longer explanation here:
+>>> https://elixir.bootlin.com/linux/v5.17.1/source/Documentation/process/submitting-patches.rst#L95
+>>>
+>>
+>> Sure. I will fix this in v2.
+>>
+>>>> support for creating virtual Ethernet devices over RPMSG channels,
+>>>> allowing user-space programs to send and receive messages using a
+>>>> standard Ethernet protocol. The driver includes message handling,
+>>>> probe, and remove functions, along with necessary data structures.
+>>>>
+>>>
+>>>
+>>> ...
+>>>
+>>>> +
+>>>> +/**
+>>>> + * rpmsg_eth_get_shm_info - Get shared memory info from device tree
+>>>> + * @common: Pointer to rpmsg_eth_common structure
+>>>> + *
+>>>> + * Return: 0 on success, negative error code on failure
+>>>> + */
+>>>> +static int rpmsg_eth_get_shm_info(struct rpmsg_eth_common *common)
+>>>> +{
+>>>> +	struct device_node *peer;
+>>>> +	const __be32 *reg;
+>>>> +	u64 start_address;
+>>>> +	int prop_size;
+>>>> +	int reg_len;
+>>>> +	u64 size;
+>>>> +
+>>>> +	peer = of_find_node_by_name(NULL, "virtual-eth-shm");
+>>>
+>>>
+>>> This is new ABI and I do not see earlier patch documenting it.
+>>>
+>>> You cannot add undocumented ABI... but even if you documented it, I am
+>>> sorry, but I am pretty sure it is wrong. Why are you choosing random
+>>> nodes just because their name by pure coincidence is "virtual-eth-shm"?
+>>> I cannot name my ethernet like that?
+>>>
+>>
+>> This series adds a new virtual ethernet driver. The tx / rx happens in a
+>> shared memory block. I need to have a way for the driver to know what is
+>> the address / size of this block. This driver can be used by any
+>> vendors. The vendors can create a new node in their dt and specify the
+>> base address / size of the shared memory block.
+>>
+>> I wanted to keep the name of the node constant so that the driver can
+>> just look for this name and then grab the address and size.
 > 
-> TL;DR: I think you mean
+> You should not.
 > 
-> 		MACB_CAPS_QUEUE_DISABLE | MACB_CAPS_QBV,
-> 		                       ^^^
+>>
+>> I can create a new binding file for this but I didn't create thinking
+>> it's a virtual device not a physical and I wasn't sure if bindings can
+>> be created for virtual devices.
 > 
-
-Yes, since there's no strict validation for the presence of 
-NETIF_F_HW_TC, the tc add/replace command succeeded. I've submitted an 
-RFC patch to enforce stricter checks for NETIF_F_HW_TC within 
-dev->hw_features
-
-> I assume that the intention here is to set the MACB_CAPS_QBV bit of .caps.
-> However, because there is a comma rather than a pipe between
-> it and MACB_CAPS_QUEUE_DISABLE the effect is to leave .caps as
-> it was before, and set .dma_burst_length to MACB_CAPS_QBV.
-> .dma_burst_length is then overwritten on the following line.
+> So you added undocumented ABI intentionally, sorry, that's a no go.
 > 
-> Flagged by W=1 builds with Clang 20.1.8 and 15.1.0.
+>>
+>> In my use case, I am reserving this shared memory and during reserving I
+>> named the node "virtual-eth-shm". The memory is reserved by the
+>> ti_k3_r5_remoteproc.c driver. The DT change is not part of this series
+>> but can be found
+>> https://gist.github.com/danish-ti/cdd10525ad834fdb20871ab411ff94fb
+>>
+>> The idea is any vendor who want to use this driver, should name their dt
+>> node as "virtual-eth-shm" (if they also need to reserve the memory) so
+>> that the driver can take the address from DT and use it for tx / rx.
+>>
+>> If this is not the correct way, can you please let me know of some other
+>> way to handle this.
+>>
+>> One idea I had was to create a new binding for this node, and use
+>> compatible string to access the node in driver. But the device is
+>> virtual and not physical so I thought that might not be the way to go so
+>> I went with the current approach.
 > 
-> Please build your patches with W=1 and try to avoid adding warnings
-> it flags.
+> virtual devices do not go to DTS anyway. How do you imagine this works?
+> You add it to DTS but you do not add bindings and you expect checks to
+> succeed?
 > 
-> Also, while we are here, it would be nice to fix up the line wrapping so
-> the adjacent code is 80 columns wide or less, as is still preferred in
-> Networking code.
+> Provide details how you checked your DTS compliance.
 > 
-> 	.caps = MACB_CAPS_GIGABIT_MODE_AVAILABLE | MACB_CAPS_JUMBO |
-> 		MACB_CAPS_GEM_HAS_PTP | MACB_CAPS_BD_RD_PREFETCH |
-> 		MACB_CAPS_NEED_TSUCLK | MACB_CAPS_QUEUE_DISABLE |
-> 		MACB_CAPS_QBV,
 > 
 
-OK.
+This is my device tree patch [1]. I ran these two commands before and
+after applying the patch and checked the diff.
 
-Thanks,
+	make dt_binding_check
+	make dtbs_check
+
+I didn't see any new error / warning getting introduced due to the patch
+
+After applying the patch I also ran,
+
+	make CHECK_DTBS=y ti/k3-am642-evm.dtb
+
+I still don't see any warnings / error.
+
+
+If you look at the DT patch, you'll see I am adding a new node in the
+`reserved-memory`. I am not creating a completely new undocumented node.
+Instead I am creating a new node under reserved-memory as the shared
+memory used by rpmsg-eth driver needs to be reserved first. This memory
+is reserved by the ti_k3_r5_remoteproc driver by k3_reserved_mem_init().
+
+It's just that I am naming this node as "virtual-eth-shm@a0400000" and
+then using the same name in driver to get the base_address and size
+mentioned in this node.
+
+
+> 
+> Best regards,
+> Krzysztof
+
+
+[1]
+https://gist.githubusercontent.com/danish-ti/fd3e630227ae5b165e12eabd91b0dc9d/raw/67d7c15cd1c47a29c0cfd3674d7cd6233ef1bea5/0001-arch-arm64-dts-k3-am64-Add-shared-memory-node.patch
+
 -- 
-🙏 vineeth
+Thanks and Regards,
+Danish
 
 
