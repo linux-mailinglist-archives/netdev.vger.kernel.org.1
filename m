@@ -1,131 +1,116 @@
-Return-Path: <netdev+bounces-210759-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210760-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B093FB14B13
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 11:21:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 20046B14B6A
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 11:38:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 05F421889315
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 09:21:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6788D1AA44C2
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 09:38:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38B9B26B97D;
-	Tue, 29 Jul 2025 09:21:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E46F2877E7;
+	Tue, 29 Jul 2025 09:38:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RVLW2e54"
+	dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b="YKOV7A+C"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from layka.disroot.org (layka.disroot.org [178.21.23.139])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C69122538F;
-	Tue, 29 Jul 2025 09:21:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F31102749E0;
+	Tue, 29 Jul 2025 09:38:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.21.23.139
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753780875; cv=none; b=E5FDpugDvc2Xa3y0PYyCBTgWSpl7YutBTtbY7dWvsAoZSIFjA4VH9SVd+dNgyeBdEwzpBb5qdwSBrTaIqt9mz1DXn2HLrzrLsGhsYXi9WICmr5O5BrlCTyBOJXj6vOpbZgbScpmndaQD4w3uOZBw+pbD9bQ4EDFgzi3G09hZ5Kw=
+	t=1753781892; cv=none; b=tO2SQoswHREsdcZQYb72RIpzkbMGgTZRIV11k1dMs7C+vZSCY+24E59AIRi1zl8WKDco9eNoWkpsLcIlFAazCwXeEZ0MIflPWtUysY+f6whre8TS4Ns2tSLCUU8LhQz4R9VgPk1qT58OpqTKVSKFXOC2pSV8ymREzAQTITWIi1s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753780875; c=relaxed/simple;
-	bh=EpKjTlfw0kd8rON0v9QAxAUM6H8C5WKYIrqJkAcA4HY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FIG1qVberHboYdUkWtzczvua1WWPFMEDLPC+QmonuVQ4dDztOSxSlITPqOW+/UsyTnDsBDV6W/3izQ03aV2MtmiUTD1dr/0GG34QiCZ6zuIMzrU33742z7DXS6A2MqziSj6AEqbamnUOMk+GvU8IIB4CR18UN69iqJcGJmaroJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RVLW2e54; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-45618ddd62fso53230115e9.3;
-        Tue, 29 Jul 2025 02:21:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753780872; x=1754385672; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2u4rjqAF5Zc7Kz0jelPex7W70gE8IrEqV1bRA0AwlWo=;
-        b=RVLW2e54oJ/MtM8SI6uUORf1TmYGgy/WiLmhvd6oDr9D9rPtbsLdWE4qbiaHEGpArW
-         t0OCYvYg1sviS30hOhV3/Np5rBIcJYOKSIzlpXsdyU4OEBIqClrw8MpjCil/+AGa77qV
-         THfZA8I4fO5BWhYO0nxTJxE9iNETlX/E0uRFZrKlUR2PmBG5SckrWKUN7hA1WG9OIS1O
-         NhqwUh5iDNBLS5ZLUXyCKt8d+zvF47ktFoMI+AB58dL+6GvTTcAmPqaOOFUbxR9BTFXI
-         Vu5scKnFJjDTE71jsf1BJsyzWvGkxGBFjSynifVLf6nV19rOWkqcesX/mhMbcwE4M/tH
-         Y3cg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753780872; x=1754385672;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2u4rjqAF5Zc7Kz0jelPex7W70gE8IrEqV1bRA0AwlWo=;
-        b=ti/iLyKbD4ctQtpf3VqNy18f7YyZyX47xyhOgn2zy6xad9N47Ppxrw6Ow7oJcJbKEQ
-         SEDHrLzTHM6aEt1Tof6N/wTw0ohMo10wrZbY4oANm43YLVpYwkeOFNBTIWeHq4hRwRyl
-         epiGABWpMpmNtosI63zjHdprKW5sFYufptJe93LkZ040oBkTlN3fVNVyO0hXPHVFH/ln
-         Z90JDRtnrkE3QRMhppZOgfCordpiZTT9ZbmpGJHlvE0bI0SH5n94t4HeCD+FxE7XZz4r
-         u+4vNqRloZhpYSoG+CpQoZr/ZFrcwmGeZXCrLgzRr7ReHmgHSV3Q+UXqD1VE9tXXVEtL
-         lqFw==
-X-Forwarded-Encrypted: i=1; AJvYcCUmrQvGZV/QIHoYymb98JeRb03H4Me/Do0TOE0C6AJ2O5Qkvav+MdwWt04qJ4B+nVqhGjc0dmo5kbCevbsc@vger.kernel.org, AJvYcCUtnOXDZz61yt+zm7NZncpNUCXAqGB6q4QkiWKfUDhj+e31EGMmxvnE2GV/Oeewy85HVqPkFPTIiR+U6g==@vger.kernel.org, AJvYcCVp8xFG1Xph0KqrZl57CeZ2P7c3rxF+yOr2H+ObxZLXt5kXaz/D7Cnz+IK+EokADr1/IsLfiN6E@vger.kernel.org, AJvYcCVu3hKvcY3/wvIs77B0e/6lEDZz25fRXDSn3TSPS22xxyWJeuJsDzr3ySbH5TBzUaLQ94o=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw8hjTxESt/q/5nxJ8YlEDmnDATXEejeSY+dxEEC5Syjr1RCW4x
-	GsuQ37jks4BZLEzwy0JXn16QCAcGXTcfFdLZwVc3S+o6+/Q4oDg4TQZX
-X-Gm-Gg: ASbGnctBVjOAd0ji2xJs5HtWG5yO4102arSzW8SIUs8RB8a0FrCKicv6pis9lzHO410
-	rbxfIVbikKkW+X1wlkAIaPR2e5SBO5DhWxUmPP2s34HjYL//W1eY1yTJgcuJmFTQMWH3uZQmZJ7
-	rsuJJLj/Osl/1y+fyTLpfGrBNJ2CpawjGU/HkvkMxagI2PES495yylmu2R/ZcWw6jVv3uMTmIVU
-	eWQFzC1cCbivu8bp1d2grHXiKEoCZHGnW7o9Ned1+l/xQy6+OIPYz08qeMlPo7hvGgk5a79sHSc
-	40JNq48P2G2ug2BrsXZgoKYzDX/7pjxleW+V9AamqPikvM3UazhKhiDsSCb1VPy42PpBsAV13j2
-	lTooNX8z6rEokXI/e4k55y8d74qhTzpexKt8=
-X-Google-Smtp-Source: AGHT+IEMHicGGzOV7QARfXRDayyJkBXpLEq9lHyvKxQ609TVgvsTQ+QeaMTZZwxl6gjtb3oKoyYgXw==
-X-Received: by 2002:a05:600c:4513:b0:43c:ee3f:2c3 with SMTP id 5b1f17b1804b1-4587630a123mr108515205e9.7.1753780871722;
-        Tue, 29 Jul 2025 02:21:11 -0700 (PDT)
-Received: from ?IPV6:2620:10d:c096:325::26f? ([2620:10d:c092:600::1:72ea])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4588e5b7722sm17504375e9.3.2025.07.29.02.21.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 29 Jul 2025 02:21:11 -0700 (PDT)
-Message-ID: <18eb9e6c-1d60-4db1-81e1-6bce22425afe@gmail.com>
-Date: Tue, 29 Jul 2025 10:22:30 +0100
+	s=arc-20240116; t=1753781892; c=relaxed/simple;
+	bh=idYgMwrXAP8bE9FQUXKFBglumUQ+kyKP5QsLbZJGvcs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=T2PKfhvkRqS3qYBHxde09WTkexSzkgPIMYnpdfzQgHheZQ2uYCmqA/foY0ohvT9OKi2KtocUG5OPqYSe/pWkhGL4RVEw8Pjps/84b2+Urh/XGUms17HkVx+vsYJ0gx57lsI7/CAKvWuqbWGaeZFRQjrqT6ns0+Kcs9PBwnlF82c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org; spf=pass smtp.mailfrom=disroot.org; dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b=YKOV7A+C; arc=none smtp.client-ip=178.21.23.139
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=disroot.org
+Received: from mail01.disroot.lan (localhost [127.0.0.1])
+	by disroot.org (Postfix) with ESMTP id D4DA620075;
+	Tue, 29 Jul 2025 11:38:00 +0200 (CEST)
+X-Virus-Scanned: SPAM Filter at disroot.org
+Received: from layka.disroot.org ([127.0.0.1])
+ by localhost (disroot.org [127.0.0.1]) (amavis, port 10024) with ESMTP
+ id sPFN6c7Zk2KY; Tue, 29 Jul 2025 11:38:00 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=disroot.org; s=mail;
+	t=1753781880; bh=idYgMwrXAP8bE9FQUXKFBglumUQ+kyKP5QsLbZJGvcs=;
+	h=From:To:Cc:Subject:Date;
+	b=YKOV7A+CQgSsnr3Lkw7fjDaarr85dBIoXgyhmipyOE/N6lHiDjQjiS4lX3Z414s3X
+	 0tmUBBgpkNXMkoW2o0i9yiRhdYHcSyriUYlSumAZ033qD8TBQOHl6Mos11XwgTQuGt
+	 vuveUfpsoB3GDsNmJ8+kGP9UbupOShyogZWe7ZrzU5Ri3nMtPYHVdCAhJJG8ihSAfr
+	 yp+UqBfJOD9iiPvl5Acl1M12hdSWWIxG7KPMtaMn6bcvXMPvCZqvyWMO3K0avwgPWz
+	 1ohH0cyoRHhme71uOrhYKoEAWZxbVVLokmW8Icw0fmh2cqbvOUBxmgjTWofAS6LhSy
+	 GSW+/24Pyxzmw==
+From: Yao Zi <ziyao@disroot.org>
+To: Drew Fustini <fustini@kernel.org>,
+	Guo Ren <guoren@kernel.org>,
+	Fu Wei <wefu@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Alexandre Ghiti <alex@ghiti.fr>,
+	Emil Renner Berthing <emil.renner.berthing@canonical.com>,
+	Jisheng Zhang <jszhang@kernel.org>
+Cc: linux-riscv@lists.infradead.org,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Yao Zi <ziyao@disroot.org>
+Subject: [PATCH net 0/3] Fix broken link with TH1520 GMAC when linkspeed changes
+Date: Tue, 29 Jul 2025 09:37:31 +0000
+Message-ID: <20250729093734.40132-1-ziyao@disroot.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] mm, page_pool: introduce a new page type for page pool
- in page type
-To: Byungchul Park <byungchul@sk.com>
-Cc: linux-mm@kvack.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- kernel_team@skhynix.com, harry.yoo@oracle.com, ast@kernel.org,
- daniel@iogearbox.net, davem@davemloft.net, kuba@kernel.org, hawk@kernel.org,
- john.fastabend@gmail.com, sdf@fomichev.me, saeedm@nvidia.com,
- leon@kernel.org, tariqt@nvidia.com, mbloch@nvidia.com,
- andrew+netdev@lunn.ch, edumazet@google.com, pabeni@redhat.com,
- akpm@linux-foundation.org, david@redhat.com, lorenzo.stoakes@oracle.com,
- Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org, surenb@google.com,
- mhocko@suse.com, horms@kernel.org, jackmanb@google.com, hannes@cmpxchg.org,
- ziy@nvidia.com, ilias.apalodimas@linaro.org, willy@infradead.org,
- brauner@kernel.org, kas@kernel.org, yuzhao@google.com,
- usamaarif642@gmail.com, baolin.wang@linux.alibaba.com,
- almasrymina@google.com, toke@redhat.com, bpf@vger.kernel.org,
- linux-rdma@vger.kernel.org
-References: <20250728052742.81294-1-byungchul@sk.com>
- <fc1ed731-33f8-4754-949f-2c7e3ed76c7b@gmail.com>
- <20250729011941.GA74655@system.software.com>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20250729011941.GA74655@system.software.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 7/29/25 02:19, Byungchul Park wrote:
-> On Mon, Jul 28, 2025 at 07:36:54PM +0100, Pavel Begunkov wrote:
->> On 7/28/25 06:27, Byungchul Park wrote:
->>> Changes from v1:
->>>        1. Rebase on linux-next.
->>
->> net-next is closed, looks like until August 11.
-> 
-> Worth noting, this is based on linux-next, not net-next :-)
+It's noted that on TH1520 SoC, the GMAC's link becomes broken after
+the link speed is changed (for example, running ethtool -s eth0 speed
+100 on the peer when negotiated to 1Gbps), but the GMAC could function
+normally if the speed is brought back to the initial.
 
-It doesn't matter, you're still sending it to be merged into
-the net tree. Please read
+Just like many other SoCs utilizing STMMAC IP, we need to adjust the TX
+clock supplying TH1520's GMAC through some SoC-specific glue registers
+when linkspeed changes. But it's found that after the full kernel
+startup, reading from them results in garbage and writing to them makes
+no effect, which is the cause of broken link.
 
-https://docs.kernel.org/process/maintainer-netdev.html
+Further testing shows perisys-apb4-hclk must be ungated for normal
+access to Th1520 GMAC APB glue registers, which is neither described in
+dt-binding nor acquired by the driver.
 
-Especially the "git-trees-and-patch-flow" section.
+This series expands the dt-binding of TH1520's GMAC to allow an extra
+"APB glue registers interface clock", instructs the driver to acquire
+and enable the clock, and finally supplies CLK_PERISYS_APB4_HCLK for
+TH1520's GMACs in SoC devicetree.
+
+Yao Zi (3):
+  dt-bindings: net: thead,th1520-gmac: Describe APB interface clock
+  net: stmmac: thead: Get and enable APB clock on initialization
+  riscv: dts: thead: Add APB clocks for TH1520 GMACs
+
+ .../devicetree/bindings/net/thead,th1520-gmac.yaml     |  8 ++++++--
+ arch/riscv/boot/dts/thead/th1520.dtsi                  | 10 ++++++----
+ drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c      |  6 ++++++
+ 3 files changed, 18 insertions(+), 6 deletions(-)
 
 -- 
-Pavel Begunkov
+2.50.1
 
 
