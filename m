@@ -1,238 +1,296 @@
-Return-Path: <netdev+bounces-210806-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210807-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96BA4B14E76
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 15:37:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D85B2B14E81
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 15:38:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA7153B72EF
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 13:36:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7571B545DC0
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 13:38:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84D1014D2B7;
-	Tue, 29 Jul 2025 13:37:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EED3F19E7D0;
+	Tue, 29 Jul 2025 13:38:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="llxmNNOk"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="UmVlAENa";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="qXuMg+8o"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9C441F956
-	for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 13:37:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753796233; cv=none; b=YJ18rU1PDnrXr3wRDhNEZeYgofbnoSXJUJ6S6Pgp1nei0K3fm0Pk0cen5NNqU12FZ9EQJWYv9UBvbJxV4H3d+CAq/bvbfjlaGcbRp51UP1HUjlEcWlERf3uGHS1u21zjtBculTSFmnS2Yv5OpJ85fJEmggHhBCuqb0vig2bqmvA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753796233; c=relaxed/simple;
-	bh=sfcSdiYGwUTwkGmmHcHk2dk/3fcVKPIU8HYXGnIthNs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fa5bUNAg8RwHa/fnwOqxJQXc+s9N0O67kHhSgGSdvIWznpzCwc7lhfJjGoRKmHQl24yktT5C3fuKq4yYFULuM+LIYapI/p1eb49NZxNUqwIbuSkAoPDBZbbJMRgDN4B7dmfT50LXHSp5WcDmcgGtGk7a7ySCnyVn9/U/i9a4lDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=llxmNNOk; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4ae721c2f10so51474671cf.3
-        for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 06:37:11 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 106D413D2B2;
+	Tue, 29 Jul 2025 13:38:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753796308; cv=fail; b=TjqzN1cXL0j9n+qpHyqAOWRqvIqWwIgx7ykV2Fdscl+5ESaC785R1lyzCY1DLBkoCCjP1ZxGw19io9Q/TqSqsFWUkbpB+Cx+E+a6AirWXDvWI985O3LIimUblN/ejd1V4aNtIUqp0cy25R5RWzKcldJHjpsxJD2kXqwEyiX8b2Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753796308; c=relaxed/simple;
+	bh=P3bC8OWMJSUA+jvJfL1Pc1Jlh7NGYLd214QTjqMaz1o=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=e4zi07tfFizwX1copda83BueIiKKzS+1AIiDbYNiQbcXBtiApBoJ1FCMb2Zkgy1ktBg9RKAdI+7uyXqQZ6MLN0qt4cOSDHKrgaav4hOMrli/73lxSmTHApUOlF4PfTnFGlBix9QLeJHpNMOq1kG7xAMbIX0j5dkP2i8Dkytw3bs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=UmVlAENa; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=qXuMg+8o; arc=fail smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56TDDs9b007541;
+	Tue, 29 Jul 2025 13:37:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=
+	corp-2025-04-25; bh=ByIUZ63Dm2J++lrbpKA7o+byYHjP+evYH5LhDDIY5pQ=; b=
+	UmVlAENaXW+Cb7w/P2tRMTT1w0O6qxc6aKSh2G0r7JTFNVbeKdeHr/sedgIfHZ4B
+	36scbqGzv4b3IQQr8iCIHkRDQFxulZnImOT5RXaMu/e0S6qb60x6pt+ukEa0NcFD
+	C6ThFU41d79xltjJGm5CmOb/aQPXELhRGHuW9TYjr3e6ZSHy1wK2MvaYT3Jvq0vg
+	M4o+B6mWodWC3mxGQeKXmAxbTJnuhbvd2U4xHzK9RSjJ6WsxMTHwPuMaGZtEj5Xv
+	wxZ+e8It3pEZCV7yEoFhmEXzFEgEpveCC0eHfQoqsCCqWvZoEjp0eCjIhw5RDtTy
+	PafbO9toQ9cxwAd8WQj2aA==
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 484q4yfp52-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 29 Jul 2025 13:37:50 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 56TD407p016817;
+	Tue, 29 Jul 2025 13:37:50 GMT
+Received: from nam10-bn7-obe.outbound.protection.outlook.com (mail-bn7nam10on2089.outbound.protection.outlook.com [40.107.92.89])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 484nfg73vh-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 29 Jul 2025 13:37:50 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=sJoiCc0G+VtsOBOE3XlJ5OWdEFzu867ZMT+t0daJtAeHxKocEuQZkCmERahpeUYnB2kS1TUxKw+V3R+Wbha5gwq5iCEs3RKJ6uu4x/s8CSnUq0bbE0EBZhzdMFgxTPFIqZJWJzGMijUnpmFIOuVGYvBs1eZvkPiU4MnaRvF+a7M+eTmtGuKwfaLdzludAYkBIw+wcSKlR5SOHVZ6RuGDl9bRFQxU93wEk8ZGCC2NCe8r4l8bzQRAIcdumpSsOW1TTMG8OO6w+ZeWErQriY1pV+fHrqic0OyShbIoVDQmybgiZqSbioQ9w8vfv7zkVmvR5UgrU/8P/AoakFoorceImQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ByIUZ63Dm2J++lrbpKA7o+byYHjP+evYH5LhDDIY5pQ=;
+ b=J0vjNtaJbjDGNDW+Ag8PabQAHWrhyxOK9BOWA+gEDzVO+MolfjTOfKuOwZB/zBUnCNLjflcW6rrFj2c2Er2oOYKYk3P+G2YSKK69Ky9rbQRb2920DNSX5X/DSZDATfXOTWXQvkCjmJpJ8TnUSzSFgWa0xMR/+UdcclXi2SglY6GkvGXkno35PHABNkTyo9tHzMqZ3xYu+/4dEVdV5RNgmFnbbnj03gXjmA6A0nfq13YOYid9ncCenpMQdZPB47JNp2oMc97sw7IJVaaY10gxkC6BsqFD/pDUSEjMvjkcbAeHXYvZOUF6waSFd1aZA4kdIagZOGH6vl4jKw1Pc+pnIg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753796231; x=1754401031; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YaBlyvkEiQfePUzidGqODFVZvQVFMwMEePnf1F1gAEQ=;
-        b=llxmNNOktbIwTQRa2b3Zbm2M2FIrb+4z/jTwFeQvTb9EglPuBw9biJAYcF9S/PsJsD
-         IUETe7khKZkrZqtF4qtBFOqCZlYwcMogeHS7Vq84L/IjFftNpmYqp/Rlwo4u+b1aGFrI
-         wNqglDpv5VSZqyng83tDRl0qaX/0pCmmCFl3DGsgfb8z4FFc0GyAZaAHHxbFcWPsGlqG
-         j5PWLuBOHAsRaOWrpRkz6FjK/eeKBTTB9ECJE1WONsEAs7MXEE4ZKmd4SlQOjgH9olar
-         w27uCAkL4HYduoylQFfdvZ+X/tlrskLIIYsBjjzaLzLsneFxcIdQfR6AvA7e38WfQdM0
-         j6yw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753796231; x=1754401031;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YaBlyvkEiQfePUzidGqODFVZvQVFMwMEePnf1F1gAEQ=;
-        b=WdGbQ7N0t9RmgVQTtlxLpB3H+XFHZsNIcfDLsuewvaiVcf/B7R61Nh2X0BmHsMhjZp
-         m3RhTSL78AtzevB+Ehb8B5CBYwsFQFCix88DGjFuiCG4ZiNiHWZQ7/ieuEGeWbko9tsm
-         bbjd+KVQjOaAOqPtMz8RVv0hwvQBjTvOg1SsLlIDZsRrdb6U+3pbDxKdBmCMPTXBuuW1
-         f2sb0bGPyFt83WAqUyU76BGLBKfgE3EA4P0VeBNLvP5F8Q6/ZNUlFi2m2yJ4b6WetzK8
-         L6os6KtI7o9eiHOECQRd8ZhlYBEdDUtSSbIpGYvPK2Z7tDCg9nRG5yVjbXajbGkxYla/
-         I/CA==
-X-Forwarded-Encrypted: i=1; AJvYcCUxO+RhT5sClVo48TRSNppGzjCsOSLOJDNKas7YJSA/va1F6i9JYFDKhCsDXiwEZfclULDs6qQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzrlzgP9CcoDArHwy7PaoJ3l6lOE3hTOEu5FwJefkXcukCBfisj
-	l9GAqiBPBC8/MTrH07Dbfn9ofeGmxl062G++HymZx+sIFHa7uLzhPl09PFfdOhecQWSo3UF2bfs
-	mTaavwlIrfX1GvJSQkc/GZJ3jT5fsiqGbnoAAnZsv
-X-Gm-Gg: ASbGncv+aZHBe3ZgwBHQPC98pG3flJzkV4S9pPkVAGTpRm/Anv++53PFqFXIPe3CTst
-	zS1sb4qMR7aakvI+oJuTHvQO85JNrfjEDe/IL8ToAKM3nA0yWyul5HJ66D+F9ym+EZSs+xaoxa1
-	vh3hYDqYB0lTYz5MQr1VOnzjykyEW/kssxJx293O1EIFyVfgCypZqvDAdwAdx3Dz+Or5aU5+dv3
-	hxOnA==
-X-Google-Smtp-Source: AGHT+IEmBCAjpjcUlPp5an3KgbfGQYD4Vu16CcC4U1MeBKdshz7hQy3QLAw3BRoxZMc/zGe32ELcmpu/0mlinSkJUrA=
-X-Received: by 2002:ac8:58cf:0:b0:4ab:5941:a919 with SMTP id
- d75a77b69052e-4ae8f0b4744mr217927011cf.40.1753796230132; Tue, 29 Jul 2025
- 06:37:10 -0700 (PDT)
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ByIUZ63Dm2J++lrbpKA7o+byYHjP+evYH5LhDDIY5pQ=;
+ b=qXuMg+8oHlIIJmxXp1gJlbTNxxS7X/0VcqBddj7OYzxuBuipHffZ5RI0obzUy8y21xNNCeWPCQZXqo7yFTLkF0YUdiPbhwyYW9I0sDdiWZQXq+ryzYT2Mm6V6uxghJLSXkrGkhDV9sy071zSo0dnSc1zyvWITgQnnMeMFf/1PVA=
+Received: from BN0PR10MB5128.namprd10.prod.outlook.com (2603:10b6:408:117::24)
+ by DM3PR10MB7927.namprd10.prod.outlook.com (2603:10b6:0:42::8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8989.11; Tue, 29 Jul 2025 13:37:46 +0000
+Received: from BN0PR10MB5128.namprd10.prod.outlook.com
+ ([fe80::743a:3154:40da:cf90]) by BN0PR10MB5128.namprd10.prod.outlook.com
+ ([fe80::743a:3154:40da:cf90%5]) with mapi id 15.20.8964.026; Tue, 29 Jul 2025
+ 13:37:46 +0000
+Message-ID: <96ca4de7-d647-47ac-b42f-d76284394526@oracle.com>
+Date: Tue, 29 Jul 2025 09:37:41 -0400
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC 0/4] net/tls: add support for the record size limit
+ extension
+To: Wilfred Mallawa <wilfred.opensource@gmail.com>, alistair.francis@wdc.com,
+        dlemoal@kernel.org, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+        donald.hunter@gmail.com, corbet@lwn.net, kbusch@kernel.org,
+        axboe@kernel.dk, hch@lst.de, sagi@grimberg.me, kch@nvidia.com,
+        borisp@nvidia.com, john.fastabend@gmail.com, jlayton@kernel.org,
+        neil@brown.name, okorniev@redhat.com, Dai.Ngo@oracle.com,
+        tom@talpey.com, trondmy@kernel.org, anna@kernel.org,
+        kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-nfs@vger.kernel.org,
+        Wilfred Mallawa <wilfred.mallawa@wdc.com>
+References: <20250729024150.222513-2-wilfred.opensource@gmail.com>
+Content-Language: en-US
+From: Chuck Lever <chuck.lever@oracle.com>
+In-Reply-To: <20250729024150.222513-2-wilfred.opensource@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: CH5P222CA0002.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:610:1ee::22) To BN0PR10MB5128.namprd10.prod.outlook.com
+ (2603:10b6:408:117::24)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250729061034.3400624-1-vineeth.karumanchi@amd.com>
- <CANn89iLhSq4cq4sddOKuKkKsHGVCO7ocMiQ-16VVDyHjCixwgQ@mail.gmail.com> <4ede2cb4-76de-411d-99e4-70a29f97edca@amd.com>
-In-Reply-To: <4ede2cb4-76de-411d-99e4-70a29f97edca@amd.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 29 Jul 2025 06:36:58 -0700
-X-Gm-Features: Ac12FXxozvaQNQQejWHfklYBeLwt6tBZlWJoCbDxOiPv_Ih2vhhcG2CZdwTlU3U
-Message-ID: <CANn89i+FkSb-SNxUu_s9RzjM1qKG4uv5KZau2hhFDEPYXo-=Nw@mail.gmail.com>
-Subject: Re: [RFC PATCH net] net: taprio: Validate offload support using
- NETIF_F_HW_TC in hw_features
-To: "Karumanchi, Vineeth" <vineeth@amd.com>
-Cc: vineeth.karumanchi@amd.com, git@amd.com, vinicius.gomes@intel.com, 
-	jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us, 
-	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN0PR10MB5128:EE_|DM3PR10MB7927:EE_
+X-MS-Office365-Filtering-Correlation-Id: efe7c699-fa26-463b-a520-08ddcea519ac
+X-LD-Processed: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+ BCL:0;ARA:13230040|366016|376014|7416014|1800799024|921020;
+X-Microsoft-Antispam-Message-Info:
+ =?utf-8?B?UFZaUlZndGpqT0hoZDRjVW1scEVFNlpxM1N3VytDY0Z4SVpSd0kwbkEzeDht?=
+ =?utf-8?B?WllIb2J3aC8weHJnUmdhUGhkVHNmVjhvekhrTGtIOVZrRkI1djVqZC9WTFdt?=
+ =?utf-8?B?VEtMZEV2QnpzOGJKdGtlNG82ZENMU0N5TWwzUlluQWVnTGVqVEt6UzdkZDB5?=
+ =?utf-8?B?OTg4K2U5a09CdVJNQmtwaUY0VDR0T3BDY29yTWxkQ0ZTU1VUZlUyYlp0UHFa?=
+ =?utf-8?B?TU1hWmcvcU83bWd5blpHYWptSWVOMTZWMGRscFRhYXhXU0g0b1JUbFdad2hP?=
+ =?utf-8?B?Y1Rydit5dnp5c2dQQTBXWVJRVzlBSkhlNTFEYTJYRG9mNnpTQmJNQjFpNXh5?=
+ =?utf-8?B?ZmR6TkpORWJTb2JxYnZCMEg0SUJYZHkwY0g1em5pa0ZtOWRrQmM0Q3p0SmJl?=
+ =?utf-8?B?bGR6WGFrc2hIc2lCM1dPR0c1R085MmpEZlMxYlE4bTJFSkdWSUNDelYva2ZL?=
+ =?utf-8?B?ZmxQdHlabmdvVHoxSlBwVzV6TDJQZ3RVY0RhalV5VFFkYmEvSGtJZVFCcERz?=
+ =?utf-8?B?SWpZQVZ6NjgvWlRIVHBjL2x6VmszQnFEbSsyRUF6d0hYeFhVOURzV1kxRzVY?=
+ =?utf-8?B?VkV2emV4Wm1YZlB2RkdZT1RERVd4R1RISFRad1NhR09VUkdHS2VMdnBaVW9v?=
+ =?utf-8?B?MFdUSWhvdktRRTVEbEFwT0x3aU9hQU9NV0h6R3Q0cS9RQUZpT0xlRzY2Z3h5?=
+ =?utf-8?B?OVJVdUZ6NTVYbnhZRlRJa003WUpYRkZnekJoM1JjM2V5SDBKWkJYS3pmUkFq?=
+ =?utf-8?B?dGI4bUg5SHJLODVXUHQvQ1pMSUxOb0hIS2ZHbFRvSzNoQnlvQVF2d1d0eGJs?=
+ =?utf-8?B?ZDcyVitaQTc1ak5DZlV5MWRxUytiVkMwR2ZjTGJlNGVnQXhhSTd0R2RDbm9D?=
+ =?utf-8?B?STF2MGJPYkNkejRnTDJKVS84aUcvYUIxc003eWJQWW5TMS9qaFQrZGMrY3Ft?=
+ =?utf-8?B?VDJad08zTk9RN1ltbFBVSGlvSHVCOGo0T3MxNEdBeTRGMUVVa0p6UklXbFZq?=
+ =?utf-8?B?ZHBRMmdZeE9kVU85bjJkc2tkM1Z4bGFRbkJIRlhvVm1OeXpjNlVSTEV3ekRt?=
+ =?utf-8?B?Z01vZkIxNkd3UXI0VWROMzBrQ2QxTCtWSEIwZTQrajczZWVFVWdWcUZQcUxC?=
+ =?utf-8?B?YjBHMmhoQ1R2eHNyYk1VaDhzZUxlMG9MNzlDaHc4V1ZyMWZwekFTTTVDVTQ4?=
+ =?utf-8?B?dmdTYUlhaCtycVlGcE9KR2M4UHppdWo0MHdQS3NhL1NsZHlRZTd3SVVsZS9p?=
+ =?utf-8?B?T3BnVG45bUg3cDZxMm5lc3k3dm92cWYzWUsyMGozYjl5MlJXTDBFdFlkUTRl?=
+ =?utf-8?B?VU15cFcwNCtkeWh1aEdna0g0enpTU2RkVWpTbzNBM2doUkdYeHlkSjVjN2FC?=
+ =?utf-8?B?d3ZvSytteGxkRnExYXp4WnkvaXd2Nkd3MlNWaXd2R2poV0o2RldNcUlQNmR2?=
+ =?utf-8?B?eUNvWmVqaHhaQXB5RFJBeGMwNnZkejhhVVYxU0N3WnJKU1dIN2xFN2hlUUFF?=
+ =?utf-8?B?Y0RBdUdPZEY5Q2hZMnVUNlVXVzFDN0doalQ0eXRhZWluaVNqZzZIYnhOdGZt?=
+ =?utf-8?B?TEpTTkNQMWN1dEZlcFBPdnFwMm1WK0I1OVhFRFYvM3J2dVBhMG5LUXV1eHR4?=
+ =?utf-8?B?TXVhOXpTV2V4cHFwZUtzNWF3blAxVjhaWkcrbE1LdGg1Z0NGMkxUbm8xMkQx?=
+ =?utf-8?B?YUdrN083OHJmc2k0ZGxIWkZoZ1lvNHFkRUFrL0N2Tjl2NnY5N2V5YU54eGRX?=
+ =?utf-8?B?M0lPMnJGVUEyNjQ1S0lmUVM4bWN1dTljWldpYm5zNzBLeU9LMnVTWnltTS8z?=
+ =?utf-8?B?VkpCd0VyckR2eGhreWh6QzBLeDYyQi9hWXhJZEQxYUFVMDZ0cUUyWlhRMnJo?=
+ =?utf-8?B?QXpRdVdCMzh0dFZKRjYwT3lraVB4ZzZBUFIyTE1FeUpDMGZDTVpLNW11U3NI?=
+ =?utf-8?B?ZDh3dkdtUVhabHcvQW5VM0djOGNZamxGVi80NUJSRUcxdFh6MFdFQWFua1lq?=
+ =?utf-8?Q?nfRq98SKxm2/Sd4GqFvEtMoG76OrAs=3D?=
+X-Forefront-Antispam-Report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN0PR10MB5128.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+ =?utf-8?B?bDNCRU1rU00zMWNHb1pKQkRxblRkakZhdngwTUtCNDZnN29IT1lVdDk0eTdk?=
+ =?utf-8?B?YnFwQmRTdnN0d2JOa0dCbTg1RHZpeHRhYWpPdzQrR1kzaFpEZnRwVVBNMUNt?=
+ =?utf-8?B?elQ3WENRcVViREJNOUxoR1hrcVVxSk5zV1RvbUY4bHBydXVPdUxBZjBuWk1W?=
+ =?utf-8?B?RmZ4dzIyWDdidHNNMkx2NVgxZHBiUmVRakVsSmhtN3NmTG9BZHB5aTJhOG1D?=
+ =?utf-8?B?M0ZzdXhsWmFMN004YzZhVFEvMFNlZWEvZnlJQnNkM1hSWDJDRjhYaGFtVkhi?=
+ =?utf-8?B?eVh5SFpvd1hrbmJqSW1abXU4MXJpUllPN0dMYXRMeTh2dlZlcmRBdUJyT2xL?=
+ =?utf-8?B?WW5tS1dMZ3RGWEVscmhYdXlIRTFuOTdTOE5VTkdLcEFya1p3cVRvem91Y2dL?=
+ =?utf-8?B?eWpqVGIrY1lRMjNjYXBHOVk2emJ5ekNSRFJDRlNzQWJRTzdUVkZUNGFtM2Jh?=
+ =?utf-8?B?UDlOL1EzajYva3h5SXdxMlhXM2FhN2E1bUhTMmxnQ1Fka3IyVWxVMlZ0Mlo1?=
+ =?utf-8?B?MzRBN0JWSVptTHN1Y0JoL3UybS9TVmtiajV4d21ZTFVHejZ3Z3l3TUtrR1Zs?=
+ =?utf-8?B?SmxUK1IxSXVUSGlZSitYb3l3cDJRTUtSaXVXanRjbXBJWUtGU0VPZHUrRStX?=
+ =?utf-8?B?N0xQcXpmQUUyYVkvWno5WDQ5am1zeWhPK1NiK1Z3ZlVEcFF3LzhJbkRYcnd0?=
+ =?utf-8?B?QXp1RWdFVThaZmtSajJyZm5jRC9ucGV2a0RqaDBhOUxMYTlraG9DYXVMb1hY?=
+ =?utf-8?B?ak9BdkdRQVRoUktYS2NweHVobEFETFRGNHVEVHhCU0xtc2V6cW5Qdmg2THhx?=
+ =?utf-8?B?djdGWWFScE5LbXhlVW03NVlqSmMrcnpRUlU4YzMvMzJlSmdHYlJkMXVXcU10?=
+ =?utf-8?B?SjA0NUY5MlBFQkJKcUdDSFJIWHlnekpPRERsYktlanVZcGxaVXF0dzZNUnBN?=
+ =?utf-8?B?VGQxRXQ2ZFZEUlFBQUE0TFVaUWtUem10c3hsQlRBUjBsYWVhZlBoa2JqdVpj?=
+ =?utf-8?B?cGZOYnVRL2h0ZC9mZ1YxK1RTenVPSGF4Qzd2Y2FIVGt5SkdtVGx0L0FuSzdV?=
+ =?utf-8?B?cjJuZTMyNElDUEoyQ2NVVjZhTVhydkdqSmFYdWR2dUxPcnJLclNKK01xbi9l?=
+ =?utf-8?B?YjY4TjBScEVUMjBQcldxUXpSMWhOWDlvaWlZMVNNM0FnL3pEMnlPeFZkdG40?=
+ =?utf-8?B?K1hLTmxiLzdDbGZOWWkzM0k0SEg3elZ4ZTVIN0ZKZmdURnlTQzRITUgzT1BQ?=
+ =?utf-8?B?bDdqOWo2akM4bE5yczl0VGdtZE9NN0Z4WFp1R3NJa3k5NXU4Qk9qdlF1RjZJ?=
+ =?utf-8?B?c3E1Sm1BcTlvNVV1ZkpsaXFscGdwWW5nU01xdzdoMFo4MjBKU2FqWTlaRmcx?=
+ =?utf-8?B?ZncrOU5HRzVyOU1aaWFKRURBdmN0allncXlFTGwrY1dGaTNEZnVQbmlJNDlQ?=
+ =?utf-8?B?dHd5NGt3WmxRZ3VxeTV2NXQ4QTFwM0RWVkR6NVVEMGpNVnZUZ21kSlpma3hp?=
+ =?utf-8?B?eDRYZjZVNHhpQ1R1VUprY2VLYkU0cndLaGVmK1RBM0dzcnZsNFgyZERsSkQ3?=
+ =?utf-8?B?VUM4dHFZWmlxNlcrVWpGYlltd2xnMGVBdHlWamJTaTZWOHpJeU83azZIdzdY?=
+ =?utf-8?B?bEYwZEh1Lzl5ZXNDT2lJUUxzdnR2UkxQaktnRGFiVm1Ud1NGLzY4MnExN2VH?=
+ =?utf-8?B?MXRpN0NVYko5WkhmYWRRS1VkTEJoZS84cDdFM3FTUHEzZGRjd0d4Z1FPNUsx?=
+ =?utf-8?B?eExpOGc4N0xsRXFuZ1diWnQ0U3Q3YXU1YkVIV1pvWVg0cGFabUhUcEtRN0JU?=
+ =?utf-8?B?eDJNMUhaZFRTRkw1S05hQnRtc1REV3lVM3hEMW8rdHhNL3dRbFNlT2dWSlNm?=
+ =?utf-8?B?dHBZTDdWVUVyeEd6K0M5eGkzYUZma2w1STRQbmg0aXpWOHArZmlYcXJWcW4w?=
+ =?utf-8?B?eTdYTGthaHlmMmJvRi8wK25PUzF2Z2lDa2tQYVhPZk5iTVAyYTB6bHl3UW42?=
+ =?utf-8?B?UjNRSHNsNy81TjVHSTViL0NHZTk3bEcwT2p1ZDRRd2VFLzhWNlVMMkR3bStT?=
+ =?utf-8?B?T21HVlJ3TTNKa3BhcTYzR2RrMmtVME5qd3ovMnJoSnQzOWdEdjRaV05paC9k?=
+ =?utf-8?B?V2pqNmJycEpRcEVKMUx0ZzhyeFJ4T2ZQTE5rdGJyWXJ0SFdGUkNjR1hKZ3Fv?=
+ =?utf-8?B?NGc9PQ==?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	vKE/ug3fHduDGLNynfA+tMtGynB4sn6BP74gMzAGYqt9EFt9Hkav2eGMHmXLtoznVfJpxtmZ2q4qEaZrw2tNcWTM97JPWxBVhT9x9JVb1zgJm+fslxeUK2iDo5fVnU5eqXg+DYFpFoN6TK+AMizSQc+H/tveGmAVA0p4VwXkhN11HPNQYPEsYciBzwBM4Rolz6uG8WWcykCeU2zxJ2Bgq+BFV0e/ExFcL0VR/ynxE5h5xszxkC2u7btN1rZrCvFJCgaqxo7vHiEIiaYKg/E8HgdoVVx+PfNhSVTDXybTeMVVrVbI1Hu5AjUuuyskPUt0+WLVrA3jNlicNQnCze19AeNWUvlqZ3Ve9ZV7JhuPfz7vDY0Up+XeyT1d5CE8NV2HhiyvHt6iH0fzFbCJpEg5YdQmj/bM/oAUITiUo9g+3nGC5nZhhwv7+eFTrW1A2RaT4jMF/7BNjexd+BARaIo5OJ87D0PX74KSHjpKCCQRCtgBChuLyI51iFq1fAjW8HcUAelbzHYNA98l2GwWFF/GtV8V/NpJReZcl1vmNm29IdkHAXIVg9kK8xAgSWWtVG0vNf04cHTnG5h3ZkJnIgQqSTXaEwxVL5tP4N2YDt8lar0=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: efe7c699-fa26-463b-a520-08ddcea519ac
+X-MS-Exchange-CrossTenant-AuthSource: BN0PR10MB5128.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jul 2025 13:37:45.7254
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1wASd8pkvvwx96XgFk0i+ghDCYuH4zvGNd76+PM5KpBJbwlbDDBdqxMzDDrkhRvG1q6ysxsHANd4k3JjxOi3Kg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PR10MB7927
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-07-29_03,2025-07-28_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 spamscore=0 mlxscore=0
+ phishscore=0 suspectscore=0 mlxlogscore=999 adultscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2505160000
+ definitions=main-2507290105
+X-Proofpoint-GUID: Wvk1AqcKZGIxvIj9fSL3RsRIJfZvr51W
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzI5MDEwNiBTYWx0ZWRfX2J9aKH53MwVF
+ D47RUA5LWDC+PoA2Wu1DrJABJkdpkzdrt1C0UhHux4RUkn5TDy7MagEBRT2aw4dNUIu4iVPHJKF
+ 3w/v3Itq99ykEKkfwOfFkgBa4m+PyXeMN5G/vXy4swSgcLr8q8SHg7EY7CrCOpbn51+n0WJ/MoA
+ DsvKBony83vqeIVJrq5rYJH4Yh6DVF1h8bYQYSRkJG71XXgIhrdTotOO5Xk7oSLGAsnkXsgTMJq
+ uDSEYQXNPvwGoFWoVqHgsNyN6ujbw6i+5nDjmZBZ+H7hGn+wsdcpP2Xnzie6XbEdMF9uRy4uisX
+ +EKgAk54LpReDutT6GLqho6n7I+/2E89cVJikeGfoIZCwrBy3dLiJqyP8b3QvGlpGnTbz0cbwQf
+ mW3/r1YQg529Ho1JmHwZ4c0utO9jWZtFSH+6bIEoVsrwDFGtn7vBjTpUHg2zppE2ra6z/zmZ
+X-Authority-Analysis: v=2.4 cv=ZMjXmW7b c=1 sm=1 tr=0 ts=6888ceae b=1 cx=c_pps
+ a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17
+ a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
+ a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19
+ a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
+ a=Wb1JkmetP80A:10 a=GoEa3M9JfhUA:10 a=BqEg4_3jAAAA:8 a=NEAV23lmAAAA:8
+ a=p0WdMEafAAAA:8 a=JF9118EUAAAA:8 a=uN4QKHQ1erwI98Gt5RIA:9 a=QEXdDO2ut3YA:10
+ a=0mFWnFbQd5xWBqmg7tTt:22 a=xVlTc564ipvMDusKsbsT:22 cc=ntf awl=host:12070
+X-Proofpoint-ORIG-GUID: Wvk1AqcKZGIxvIj9fSL3RsRIJfZvr51W
 
-On Tue, Jul 29, 2025 at 3:41=E2=80=AFAM Karumanchi, Vineeth <vineeth@amd.co=
-m> wrote:
->
-> Hi Eric,
->
-> On 7/29/2025 12:15 PM, Eric Dumazet wrote:
-> > On Mon, Jul 28, 2025 at 11:10=E2=80=AFPM Vineeth Karumanchi
-> > <vineeth.karumanchi@amd.com> wrote:
-> >>
-> >> The current taprio offload validation relies solely on the presence of
-> >> .ndo_setup_tc, which is insufficient. Some IP versions of a driver exp=
-ose
-> >> .ndo_setup_tc but lack actual hardware offload support for taprio.
-> >>
-> >> To address this, add a check for NETIF_F_HW_TC in netdev->hw_features.
-> >> This ensures that taprio offload is only enabled on devices that
-> >> explicitly advertise hardware traffic control capabilities.
-> >>
-> >> Note: Some drivers already set NETIF_F_HW_TC alongside .ndo_setup_tc.
-> >> Follow-up patches will be submitted to update remaining drivers if thi=
-s
-> >> approach is accepted.
-> >
-> > Hi Vineeth
-> >
-> > Could you give more details ? "Some IP versions of a driver" and "Some
-> > drivers" are rather vague.
->
-> At present, I=E2=80=99m only familiar with the GEM IP, which supports TSN=
- Qbv in
-> its later versions. The GEM implementations found in Zynq and ZynqMP
-> devices do not support TSN Qbv, whereas the updated versions integrated
-> into Versal devices do offer TSN Qbv support.
+Hi Wilfred -
 
-Is this an out-of-tree driver ? I do not find macb_taprio_setup_replace()
+On 7/28/25 10:41 PM, Wilfred Mallawa wrote:
+> From: Wilfred Mallawa <wilfred.mallawa@wdc.com>
+> 
+> During a tls handshake, an endpoint may specify a maximum record size limit. As
+> specified by [1]. which allows peers to negotiate a maximum plaintext record
+> size during the TLS handshake. If a TLS endpoint receives a record larger
+> than its advertised limit, it must send a fatal "record_overflow" alert [1].
+> Currently, this limit is not visble to the kernel, particularly in the case
+> where userspace handles the handshake (tlshd/gnutls).
 
-I think most drivers should return -EOPNOTSUPP in this case.
+This paragraph essentially says "The spec says we can, so I'm
+implementing it". Generally we don't implement spec features just
+because they are there.
 
->
-> >
-> > Also what happens without your patch ? Freeze / crash, or nothing at al=
-l ?
-> >
->
-> Crash!
->
-> root $# tc qdisc replace dev end0 parent root handle 100 taprio num_tc 2
-> map 0 1 queues 1@0 1@1 base-time 500 sched-entry S 0x1 100000
-> sched-entry S 0x2 50000 flags 2 cycle-time 250000
->
-> [   31.667952] Internal error: synchronous external abort:
-> 0000000096000210 [#1]  SMP
-> [   31.675529] Modules linked in:
-> [   31.678576] CPU: 0 UID: 0 PID: 660 Comm: tc Not tainted
-> 6.16.0-rc6-01628-g2933e636b919-dirty #14 NONE
-> [   31.687870] Hardware name: ZynqMP ZCU102 Rev1.0 (DT)
-> [   31.692819] pstate: 200000c5 (nzCv daIF -PAN -UAO -TCO -DIT -SSBS
-> BTYPE=3D--)
-> [   31.699771] pc : hw_readl_native+0x8/0x10
-> [   31.703782] lr : macb_taprio_setup_replace+0x2b0/0x508
-> [   31.708912] sp : ffff80008223b4f0
-> [   31.712211] x29: ffff80008223b570 x28: 0000000000000040 x27:
-> 000000003b9aca00
-> [   31.719346] x26: 0000000000000000 x25: ffff00080b5b7048 x24:
-> 00000000000003e8
-> [   31.726473] x23: 0000000000000003 x22: ffff00080b5b49c0 x21:
-> ffff000808727c80
-> [   31.733600] x20: ffff000800150208 x19: 0000000000000000 x18:
-> 020c49ba5e353f7d
-> [   31.740727] x17: 0000000000000002 x16: 00000000000249f0 x15:
-> 0044b82fa09b5a53
-> [   31.747854] x14: 00000000ee6b27ff x13: 000000003e7fe4a7 x12:
-> ffff000808727c90
-> [   31.754981] x11: 0000000000000002 x10: 0000000000024be4 x9 :
-> 0000000000000000
-> [   31.762108] x8 : 0000000000000002 x7 : 00000000000061a8 x6 :
-> 000000000000186a
-> [   31.769235] x5 : 0000000000000000 x4 : 0000000000018894 x3 :
-> 0000000000000000
-> [   31.776362] x2 : ffff800080928d78 x1 : ffff80008190d880 x0 :
-> ffff80008190d000
-> [   31.783490] Call trace:
-> [   31.785921]  hw_readl_native+0x8/0x10 (P)
-> [   31.789922]  macb_setup_tc+0x13c/0x190
-> [   31.793663]  taprio_change+0x768/0xb90
-> [   31.797405]  taprio_init+0x1d0/0x280
-> [   31.800973]  qdisc_create+0x114/0x40c
-> [   31.804627]  tc_modify_qdisc+0x4c8/0x804
-> [   31.808542]  rtnetlink_rcv_msg+0x284/0x374
-> [   31.812631]  netlink_rcv_skb+0x60/0x130
-> [   31.816459]  rtnetlink_rcv+0x18/0x24
-> [   31.820027]  netlink_unicast+0x1e8/0x304
-> [   31.823942]  netlink_sendmsg+0x168/0x3a4
-> [   31.827857]  ____sys_sendmsg+0x220/0x268
-> [   31.831772]  ___sys_sendmsg+0xb0/0x108
-> [   31.835514]  __sys_sendmsg+0x9c/0x100
-> [   31.839168]  __arm64_sys_sendmsg+0x24/0x30
-> [   31.843257]  invoke_syscall+0x48/0x10c
-> [   31.846999]  el0_svc_common.constprop.0+0xc0/0xe0
-> [   31.851695]  do_el0_svc+0x1c/0x28
-> [   31.855003]  el0_svc+0x34/0x104
-> [   31.858136]  el0t_64_sync_handler+0x10c/0x138
-> [   31.862485]  el0t_64_sync+0x198/0x19c
-> [   31.866144] Code: 88dffc00 88dffc00 f9400000 8b21c001 (b9400020)
-> [   31.872227] ---[ end trace 0000000000000000 ]---
-> [   31.876836] note: tc[660] exited with irqs disabled
-> Segmentation fault
->
->
-> >>
-> >> Signed-off-by: Vineeth Karumanchi <vineeth.karumanchi@amd.com>
-> >
-> > Patches targeting net branch should include a Fixes: tag.
-> >
-> > Thanks
-> >
-> >> ---
-> >>   net/sched/sch_taprio.c | 2 +-
-> >>   1 file changed, 1 insertion(+), 1 deletion(-)
-> >>
-> >> diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
-> >> index 2b14c81a87e5..a797995bdc8d 100644
-> >> --- a/net/sched/sch_taprio.c
-> >> +++ b/net/sched/sch_taprio.c
-> >> @@ -1506,7 +1506,7 @@ static int taprio_enable_offload(struct net_devi=
-ce *dev,
-> >>          struct tc_taprio_caps caps;
-> >>          int tc, err =3D 0;
-> >>
-> >> -       if (!ops->ndo_setup_tc) {
-> >> +       if (!ops->ndo_setup_tc || !(dev->hw_features & NETIF_F_HW_TC))=
- {
-> >>                  NL_SET_ERR_MSG(extack,
-> >>                                 "Device does not support taprio offloa=
-d");
-> >>                  return -EOPNOTSUPP;
-> >> --
-> >> 2.34.1
-> >>
->
-> --
-> =F0=9F=99=8F vineeth
->
+What we reviewers need instead is a problem statement. What is not
+working for you, and why is this the best way to solve it?
+
+
+> This series in conjunction with the respective userspace changes for tlshd [2]
+> and gnutls [3], adds support for the kernel the receive the negotiated record
+> size limit through the existing netlink communication layer, and use this
+> value to limit outgoing records to the size specified.
+
+As Hannes asked elsewhere, why is it up to the TLS consumer to be
+aware of this limit? Given the description here, it sounds to me
+like something that should be handled for all consumers by the TLS
+layer.
+
+
+> [1] https://www.rfc-editor.org/rfc/rfc8449
+> [2] https://github.com/oracle/ktls-utils/pull/112
+> [3] https://gitlab.com/gnutls/gnutls/-/merge_requests/1989
+> 
+> Wilfred Mallawa (4):
+>   net/handshake: get negotiated tls record size limit
+>   net/tls/tls_sw: use the record size limit specified
+>   nvme/host/tcp: set max record size in the tls context
+>   nvme/target/tcp: set max record size in the tls context
+> 
+>  Documentation/netlink/specs/handshake.yaml |  3 +++
+>  Documentation/networking/tls-handshake.rst |  8 +++++++-
+>  drivers/nvme/host/tcp.c                    | 18 +++++++++++++++++-
+>  drivers/nvme/target/tcp.c                  | 16 +++++++++++++++-
+>  include/net/handshake.h                    |  4 +++-
+>  include/net/tls.h                          |  1 +
+>  include/uapi/linux/handshake.h             |  1 +
+>  net/handshake/genl.c                       |  5 +++--
+>  net/handshake/tlshd.c                      | 15 +++++++++++++--
+>  net/sunrpc/svcsock.c                       |  4 +++-
+>  net/sunrpc/xprtsock.c                      |  4 +++-
+>  net/tls/tls_sw.c                           | 10 +++++++++-
+>  12 files changed, 78 insertions(+), 11 deletions(-)
+> 
+
+
+-- 
+Chuck Lever
 
