@@ -1,466 +1,167 @@
-Return-Path: <netdev+bounces-210890-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210891-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF320B154DD
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 23:54:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78B04B15508
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 00:01:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E830516C2EF
-	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 21:54:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A43C218A086B
+	for <lists+netdev@lfdr.de>; Tue, 29 Jul 2025 22:02:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41549275867;
-	Tue, 29 Jul 2025 21:54:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9C5F15533F;
+	Tue, 29 Jul 2025 22:01:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BdoKP+7j"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Eyi6URWx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 400431E0E1F;
-	Tue, 29 Jul 2025 21:54:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 424418BEC
+	for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 22:01:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753826095; cv=none; b=h/nv4mU2r6pIQ1LVsXcgCJwUtcAu8wb4BQQn+rET4wX2w5BM8xXqfoyWnmdK6GLXV6t9t9qxd/DbKZxVGMEul1VMhLYiWuuY/QDPY4Sp51b+SStE9Dj5osWgIH1GkE/1sWxlZLTpqvWo/QgpSN92ozKk4WeaUK2QtYqu6FX4vAo=
+	t=1753826509; cv=none; b=CjQxctDxflggjJeToHNMGSVM3D5IBS+smSERhZXsxQcGvfMzVcMY+SYXap9UBFhtBo2x/B1/DdOVVgTDLMcsGJYE9l7MBSR2RHj6CP0E1OTNkmLNVQVB60i3ARLlkB0hvKZCofNo5F0G3pNZB7n+v7efY8S9eTRPDRnFPuGMDUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753826095; c=relaxed/simple;
-	bh=qb5mb2EaljcwtUMNsZzjSZmuPQ5fzF/rKiwIjUyAxfs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oEHTfmnKnlHqNVggBM7cLJzd0OKTAl6VWcPMR13tbOUYc9CqQbakOW5Jt3A4H2FzK52QkY9WETskNkOgw7rhiVHa9jXujAdaBQPTud/U3V+UN/Xa8GcVSaQhKO3XWbhPbD8Q8OKB/YdBVD29VOsRuQLEIo5vdgJ2zNWX9uywrbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BdoKP+7j; arc=none smtp.client-ip=209.85.128.179
+	s=arc-20240116; t=1753826509; c=relaxed/simple;
+	bh=LrpNNRsqiQ70bdA45zmRy0JcOCnzSxsFQSYIliCW08o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qcUCC6LALgdwoUgZYx5LJLb+fiqSVNuQiQtnZ1HuxUakR5R8u9Auxi3LUA/vBIyO/uwbhfbRlhldPO7QHtmmILBB8wIvBER1xhZ+Ddwst8aLoDweBuCUDebK7E9BeqGjZQd4/VhduBJ2UTFTTS8LENZJHME6DHBoMVJKSMmclrE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Eyi6URWx; arc=none smtp.client-ip=209.85.160.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-71a1df028b1so27390097b3.1;
-        Tue, 29 Jul 2025 14:54:52 -0700 (PDT)
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-4ab5953f5dcso58283931cf.0
+        for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 15:01:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753826092; x=1754430892; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fVT6i2GlY6lvtYkZh6mSpqVpndkcAN30ofZVR+tWQEk=;
-        b=BdoKP+7jQnBHUGEj92yZJKJMS+NaXbqzfewRh0RHvExsGbd6xRWxYP1t8LeeFxOi7a
-         CfrF4v0d/O2qgUc39Oc3akWBFTGqZi9KGjMVSQjUjSfwWCX3RUtx669nqQpiTvmDAnki
-         oaB50yEcD7K3Iz5UteQCLvmps1BC2dFGpP+d4SqSoVEmykfXSWOViItcRoiDQNSMNFaP
-         TvjYfERjBrWBNEHyUk0dohp1fhQOU2y4RR0zzmG06SpaHf7QaaT+op1XO01shWp6hzrQ
-         BFLXZ+c9wMw/4xO88Ilx8xUYNCKwR3obxRoIdabYsfOKOvBjDViTwclXcEeOCbi4Qq+p
-         o0bg==
+        d=gmail.com; s=20230601; t=1753826507; x=1754431307; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=MWallFmHDs9ZWDkZSi+x55d0KJtII8ohAMcXEHud3xg=;
+        b=Eyi6URWxhvelCfHs7bcOwgEn5CwUtPTH+XHiFNmgjRloMtb6ezYqg0Z8LaqadTHO5i
+         yS9UJCkkGuMjRDBdpza5jFRCbCkU9/+wGYeAXsCf5k/lGPnTiSXw4m6o1nKZbaiHmDvQ
+         pzJAjfDvTT9Gtz9BE6NnGlQcyS4dU90DhCv4+8yEiLWA7WGw6SjA1zm0bdYoN9s93Zq2
+         nErF5JaMzR5YVMtkh6TFL+p0o3qcnboTN8MbzaKSHOoUfCFPoUKg21F1jF55O9EIdjZR
+         xm0maIQhWY+KmBk+/f2iMcIut/bwBfm0pJDQnpwOdwv3koQ1LrJRu5Bn/jN9qRnAahN6
+         HLow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753826092; x=1754430892;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fVT6i2GlY6lvtYkZh6mSpqVpndkcAN30ofZVR+tWQEk=;
-        b=HdBWBek2+YX4p3PYy5ySmyQ1j2QlAUgC+CQBPWUGxjfGAhmu7WrMjBjlMvGeUa/0jM
-         UbITXRNDc47gmAtv4YhGvJPMwm66nXDafD1DjvISd9I1JzkYv038AbrbtUQ5/mdPZkVv
-         yLF2AQ9yZSkBfeST9BPSVDLdOg+YNor8FExGYk/lfdYNVJ8sovBWaaFn14ipGw9RKCwl
-         qoG9QKvrdQkdmb0y2X/CdhyZx2StmGFQar1zCUsc/7rKcI1Rnm4i9ZN3PXEgPMRCAwwj
-         Wr5to641JveHp44HX6chO0wZU9vVFCrdyNNiV7y5f11az9rPIAbhE3SYl0xxqvrLbADZ
-         RmXQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXj5IyAtCm5tLgQB/vFeVfiLSgRyx02esLpp69Ko5cUhvg4bxoMLCYWvIBh26i5PmdnK20CSqc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxbOpvsfoRFUoTvLwPRmSgFsArji8vWl70HnYZaMlXW0DZIJKbB
-	EvfPojQr7mIKMPKKlhetqm+jN3vdcK5fkR1F5dv2ffO2V+NMGth9xxGy8zdqJbMPNPfSHyPXLnW
-	Xp3GidJPljQvcMF1EesJ4z6UH3FnHv0JmMw==
-X-Gm-Gg: ASbGncvTwMvtEEIzNmppi2aO6m2kjN7ZVf5MJB/T8o3NTwLE47mUII3X+QQCAWvTWU/
-	DEZ6Lqpgeox36Y4YoQi6LVO9op0dKqlwltWba17JmGMRynFqa0dzpsbO/J4NwS2OBSzDi6bshsi
-	ZDsY+6uKNUf8R6lDRmYm5i9BR/6tHQDoX1lQ+1cQNvgBwR2PJB1HvEM9IUeHGTegT4bw0nRksPU
-	/xLEYwpGebC8kPSAobU0t7bHUcYxMXL
-X-Google-Smtp-Source: AGHT+IGQscaDhUhSyylNcgf5FyjRk5i/FVIyVUpAdP0qSoqwm6c9+DcUpu5V/GZ0+4daF1mJG5t19mRKefvD9O3AtOA=
-X-Received: by 2002:a05:690c:700b:b0:719:add8:8573 with SMTP id
- 00721157ae682-71a466e088bmr17827247b3.37.1753826091903; Tue, 29 Jul 2025
- 14:54:51 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1753826507; x=1754431307;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MWallFmHDs9ZWDkZSi+x55d0KJtII8ohAMcXEHud3xg=;
+        b=Coxb0LEvxQXJmZXD0m9neza/fu5EfdJzphO5w3MuOewHlgxvCx0b+O/ShZZmb0DVJp
+         uschg0LhmiDAeH6JbiUTFde7LIgPGgKkVe94RCCbH5d0JAEJ1bfQgbp2XdqQX5hMXVPK
+         7ExM7GGYUthiKB/7RmSjJ0/3u6NOCJXxjJ8xAmCKzNK8xyNZVHU2LdISTUuuN4FNPKPk
+         JkqWA3h1zSaejnyIqNv6vwPZrGOPn7obRL32qeWjT0ZGquxvAbl5qJXtCop11TkehyI5
+         staFe9uLuSBgvqKPyFYaH0paNxDJQDQmkfxPAQbs+6HbRYelHvTcVuEUZFSljKLahBvM
+         +xyQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWlQh4q4vw0nmPvd38WFH/3PuHVqidz5BAXe+gFtvBb/NDS3kvuwFU09E6C5M3hvvzO/GHhYAs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw7QlEzaYel94LUPIugVzH5agm8ew9H3TthZ9kToWB49IF+ZLwy
+	K+3kcfbVBuB8Ucvz242nnrRsf2aDOc8PDntdeTUliUsFZVvgoo8jFHFS
+X-Gm-Gg: ASbGncsep58fLFCkd77gvoUPM4hLi+axoIytj1T7gzd7TZhIvITSJnn06hNJ8M99h3r
+	Vx1TpedsS6NGNug71WO9CTBxT8GWOdLVWKqEPUter2MLuVhPY1uwu8wXOeN7jggCVsxIhcnOsgs
+	wpoWjPt0y3cVLvXeU4z9iwV0ukDwJnyh8Rey++6mLDriLzrF7LEF7NZOQxZSKVdNnW+mSXty/K/
+	SCwUW3OHVX3cM3hx4Y18e9odCLpU8fy+8DFJAkKos5bs4tet/Em7buGvNVnZEDw+OG+m1gh0sLn
+	/i7mFN6ePD1zO3Xv0mCyZbABwy7JpfX+YPWHpLCZ26moS1bp4gqt0JtBaviFSO6WjQ3IgHipm+I
+	kKNVNQdWpwn35f8p976QQXSwU/GjX5gFHGteZEpqmjVFZX73cUHxT9lavwmmd0twRf0ZWkwY=
+X-Google-Smtp-Source: AGHT+IEvdcCG0w/+CuXlf8z4cdBDzm/VOuFAHwLTBB4uMWUEHDzTj5mE8m3z3Zn7Qfciq2gbGNvUqA==
+X-Received: by 2002:a05:622a:15d1:b0:4ab:5888:38fb with SMTP id d75a77b69052e-4aedbc3afb2mr21371981cf.32.1753826506905;
+        Tue, 29 Jul 2025 15:01:46 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4ae9966e30csm55570921cf.55.2025.07.29.15.01.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 29 Jul 2025 15:01:45 -0700 (PDT)
+Message-ID: <5f68f153-c633-45da-96cc-113482e0b6d1@gmail.com>
+Date: Tue, 29 Jul 2025 15:01:43 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250717164842.1848817-1-ameryhung@gmail.com> <CABFh=a5Z7i+Yk4i42=BSt9+9NLQtY-CP73M5kQiroQpNtsELfQ@mail.gmail.com>
-In-Reply-To: <CABFh=a5Z7i+Yk4i42=BSt9+9NLQtY-CP73M5kQiroQpNtsELfQ@mail.gmail.com>
-From: Amery Hung <ameryhung@gmail.com>
-Date: Tue, 29 Jul 2025 14:54:38 -0700
-X-Gm-Features: Ac12FXwb5_CS7kH4GGEAqepR0fSpqVe7H1iBRDXNmSczrXtleZwKLLktjOBpUaQ
-Message-ID: <CAMB2axP-iT=rR+Ks9UbExQ+sRJ_6kjF6+b1CMYKvHMhHR2_iOw@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v6 0/3] Task local data
-To: Emil Tsalapatis <linux-lists@etsalapatis.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
-	andrii@kernel.org, daniel@iogearbox.net, tj@kernel.org, memxor@gmail.com, 
-	martin.lau@kernel.org, kernel-team@meta.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Linux-stm32] [PATCH RFC net-next 6/7] net: stmmac: add helpers
+ to indicate WoL enable status
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>
+Cc: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>,
+ netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ linux-arm-kernel@lists.infradead.org, Heiner Kallweit <hkallweit1@gmail.com>
+References: <eaef1b1b-5366-430c-97dd-cf3b40399ac7@lunn.ch>
+ <aIe5SqLITb2cfFQw@shell.armlinux.org.uk>
+ <77229e46-6466-4cd4-9b3b-d76aadbe167c@foss.st.com>
+ <aIiOWh7tBjlsdZgs@shell.armlinux.org.uk>
+ <aIjCg_sjTOge9vd4@shell.armlinux.org.uk>
+ <d300d546-09fa-4b37-b8e0-349daa0cc108@foss.st.com>
+ <aIjePMWG6pEBvna6@shell.armlinux.org.uk>
+ <186a2265-8ca8-4b75-b4a2-a81d21ca42eb@foss.st.com>
+ <aIj4Q6WzEQkcGYVQ@shell.armlinux.org.uk>
+ <b88160a5-a0b8-4a1a-a489-867b8495a88e@lunn.ch>
+ <aIkQxlqmg9_EFqsI@shell.armlinux.org.uk>
+Content-Language: en-US
+From: Florian Fainelli <f.fainelli@gmail.com>
+Autocrypt: addr=f.fainelli@gmail.com; keydata=
+ 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
+ WlfRzlpjIPmdjgoicA==
+In-Reply-To: <aIkQxlqmg9_EFqsI@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jul 28, 2025 at 6:54=E2=80=AFAM Emil Tsalapatis
-<linux-lists@etsalapatis.com> wrote:
->
-> Some feedback on the cover letter:
->
-> On Thu, Jul 17, 2025 at 12:48=E2=80=AFPM Amery Hung <ameryhung@gmail.com>=
- wrote:
-> >
-> > * Motivation *
-> >
-> > CPU schedulers can potentially make a better decision with hints from
-> > user space process. To support experimenting user space hinting with
-> > sched_ext, there needs a mechanism to pass a "per-task hint" from user
-> > space to the bpf scheduler "efficiently".
-> >
->
-> I think this is underselling the feature a bit, isn't it useful for
-> all BPF users?
-> Otherwise why isn't it in the scx repo?
+On 7/29/25 11:19, Russell King (Oracle) wrote:
+> On Tue, Jul 29, 2025 at 07:27:11PM +0200, Andrew Lunn wrote:
+>> And i did notice that the Broadcom code is the only one doing anything
+>> with enable_irq_wake()/disable_irq_wake(). We need to scatter these
+>> into the drivers.
+> 
+> It's better to use devm_pm_set_wake_irq() in the probe function, and
+> then let the core code (drivers/base/power/wakeup.c and
+> drivers/base/power/wakeirq.c) handle it. This is what I'm doing for
+> the rtl8211f.
+> 
+> IRQ wake gets enabled/disabled at suspend/resume time, rather than
+> when the device wakeup state changes, which I believe is what is
+> preferred.
+> 
 
-Task local data indeed is a generic mechanism to share per-task data
-between user space and bpf.
-
-The v6 cover letter referenced scx to give readers a more concrete
-idea where this patchset comes from and how it will work end to end.
-
-I will make the motivation more centered on TLD as a per-task data
-sharing mechanism.
-
->
-> > The proposed mechanism is task local data. Similar to pthread key or
-> > __thread, it allows users to define thread-specific data. In addition,
-> > the user pages that back task local data are pinned to the kernel to
-> > share with bpf programs directly. As a result, user space programs
-> > can directly update per-thread hints, and then bpf program can read
-> > the hint with little overhead. The diagram in the design section gives
-> > a sneak peek of how it works.
-> >
-> >
-> > * Overview *
-> >
-> > Task local data defines an abstract storage type for storing data speci=
-fic
-> > to each task and provides user space and bpf libraries to access it. Th=
-e
-> > result is a fast and easy way to share per-task data between user space
-> > and bpf programs. The intended use case is sched_ext, where user space
-> > programs will pass hints to sched_ext bpf programs to affect task
-> > scheduling.
-> >
->
-> Same as above, why is this a sched_ext feature? Maybe some of the design
-> choices are informed by it, but there is nothing sched_ext specific in he=
-re.
->
-> > Task local data is built on top of task local storage map and UPTR[0]
-> > to achieve fast per-task data sharing. UPTR is a type of special field
-> > supported in task local storage map value. A user page assigned to a UP=
-TR
-> > will be pinned by the kernel when the map is updated. Therefore, user
-> > space programs can update data seen by bpf programs without syscalls.
-> >
-> > Additionally, unlike most bpf maps, task local data does not require a
-> > static map value definition. This design is driven by sched_ext, which
-> > would like to allow multiple developers to share a storage without the
-> > need to explicitly agree on the layout of it. While a centralized layou=
-t
-> > definition would have worked, the friction of synchronizing it across
-> > different repos is not desirable. This simplify code base management an=
-d
-> > makes experimenting easier.
-> >
->
-> This text is hard to follow because the point it makes belongs in the des=
-ign
-> section, this is a design point that does not really matter at this
-> point in the text.
-> At least make it more abstract maybe?
-
-Thanks for reviewing. I will make it more abstract and move a part of
-it to the design section.
-
->
-> > In the rest of the cover letter, "task local data" is used to refer to
-> > the abstract storage and TLD is used to denote a single data entry in
-> > the storage.
-> >
-> >
-> > * Design *
-> >
-> > Task local data library provides simple APIs for user space and bpf
-> > through two header files, task_local_data.h and task_loca_data.bpf.h,
->
-> Typo: task_loca_data ->task_local_data
->
-> > respectively. The usage is illustrated in the following diagram.
-> > An entry of data in the task local data, TLD, first needs to be defined
-> > with TLD_DEFINE_KEY() with the size of the data and a name associated w=
-ith
-> > the data. The macro defines and initialize an opaque key object of
->
-> Typo: initialize -> initializes
->
-> > tld_key_t type, which can be used to locate a TLD. The same key may be
-> > passed to tld_get_data() in different threads, and a pointer to data
-> > specific to the calling thread will be returned. The pointer will
-> > remain valid until the process terminates, so there is not need to call
->
-> Typo: not need -> no need
->
-> > tld_get_data() in subsequent accesses.
-> >
-> > TLD_DEFINE_KEY() is allowed to define TLDs up to roughly a page. In the
-> > case when a TLD can only be known and created on the fly,
-> > tld_create_key() can be called. Since the total TLD size cannot be know=
-n
-> > beforehand, a memory of size TLD_DYN_DATA_SIZE is allocated for each
-> > thread to accommodate them.
-> >
-> > On the bpf side, programs will use also use tld_get_data() to locate
-> > TLDs. The arugments contain a name and a key to a TLD. The name is
-> > used for the first tld_get_data() to a TLD, which will lookup the TLD
-> > by name and save the corresponding key to a task local data map,
-> > tld_key_map. The map value type, struct tld_keys, __must__ be defined b=
-y
-> > developers. It should contain keys used in the compilation unit.
-> >
-> >
-> >  =E2=94=8C=E2=94=80 Application =E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
-=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
-=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
-=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
-=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
-=94=80=E2=94=90
-> >  =E2=94=82 TLD_DEFINE_KEY(kx, "X", 4);      =E2=94=8C=E2=94=80 library =
-A =E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
-=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=90=E2=94=82
-> >  =E2=94=82                                  =E2=94=82 void func(...)   =
-               =E2=94=82=E2=94=82
-> >  =E2=94=82 int main(...)                    =E2=94=82 {                =
-               =E2=94=82=E2=94=82
-> >  =E2=94=82 {                                =E2=94=82     tld_key_t ky;=
-               =E2=94=82=E2=94=82
-> >  =E2=94=82      int *x;                     =E2=94=82     bool *y;     =
-               =E2=94=82=E2=94=82
-> >  =E2=94=82                                  =E2=94=82                  =
-               =E2=94=82=E2=94=82
-> >  =E2=94=82      x =3D tld_get_data(fd, kx);   =E2=94=82     ky =3D tld_=
-create_key("Y", 1);=E2=94=82=E2=94=82
-> >  =E2=94=82      if (x) *x =3D 123;            =E2=94=82     y =3D tld_g=
-et_data(fd, ky);   =E2=94=82=E2=94=82
-> >  =E2=94=82                         =E2=94=8C=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=A4     if (y) *y =3D tr=
-ue;           =E2=94=82=E2=94=82
-> >  =E2=94=82                         =E2=94=82        =E2=94=94=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
-=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
-=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=98=E2=
-=94=82
-> >  =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
-=80=E2=94=AC=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
-=94=80=E2=94=80=E2=94=82=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
-=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
-=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
-=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=98
-> >          V                 V
-> >  + =E2=94=80 Task local data =E2=94=80 =E2=94=80 =E2=94=80 =E2=94=80 =
-=E2=94=80 +  =E2=94=8C=E2=94=80 BPF program =E2=94=80=E2=94=80=E2=94=80=E2=
-=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
-=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=90
-> >  | =E2=94=8C=E2=94=80 tld_data_map =E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=90 |  =E2=94=
-=82 struct tld_object obj;             =E2=94=82
-> >  | =E2=94=82 BPF Task local storage  =E2=94=82 |  =E2=94=82 bool *y;   =
-                        =E2=94=82
-> >  | =E2=94=82                         =E2=94=82 |  =E2=94=82 int *x;    =
-                        =E2=94=82
-> >  | =E2=94=82 __uptr *data            =E2=94=82 |  =E2=94=82            =
-                        =E2=94=82
-> >  | =E2=94=82 __uptr *metadata        =E2=94=82 |  =E2=94=82 if (tld_ini=
-t_object(task, &obj))   =E2=94=82
-> >  | =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
-=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
-=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=98 |  =E2=94=82     return 0;                     =
- =E2=94=82
-> >  | =E2=94=8C=E2=94=80 tld_key_map =E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=90 | =
- =E2=94=82                                    =E2=94=82
-> >  | =E2=94=82 BPF Task local storage  =E2=94=82 |  =E2=94=82 x =3D tld_g=
-et_data(&obj, kx, "X", 4);=E2=94=82
-> >  | =E2=94=82                         =E2=94=82 |<=E2=94=80=E2=94=A4 if =
-(x) /* do something */          =E2=94=82
-> >  | =E2=94=82 tld_key_t kx;           =E2=94=82 |  =E2=94=82            =
-                        =E2=94=82
-> >  | =E2=94=82 tld_key_t ky;           =E2=94=82 |  =E2=94=82 y =3D tld_g=
-et_data(&obj, ky, "Y", 1);=E2=94=82
-> >  | =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
-=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
-=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=98 |  =E2=94=82 if (y) /* do something */         =
- =E2=94=82
-> >  + =E2=94=80 =E2=94=80 =E2=94=80 =E2=94=80 =E2=94=80 =E2=94=80 =E2=94=
-=80 =E2=94=80 =E2=94=80 =E2=94=80 =E2=94=80 =E2=94=80 =E2=94=80 =E2=94=80 +=
-  =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
-=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
-=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=98
-> >
-> >
-> >
-> > * Implementation *
-> >
-> > Task local data defines the storage to be a task local storage map with
-> > two UPTRs, data and metadata. Data points to a blob of memory for stori=
-ng
-> > TLDs individual to every task with the offset of data in a page. Metada=
-ta,
->
-> Nit: Maybe just use the name of the struct, u_tld_metadata?
-
-Will change.
-
->
-> > individual to each process and shared by its threads, records the total
-> > number and size of TLDs and the metadata of each TLD. Metadata for a
-> > TLD contains the key name and the size of the TLD.
-> >
-> >   struct u_tld_data {
-> >           u64 start;
-> >           char data[PAGE_SIZE - 8];
-> >   };
-> >
-> >   struct u_tld_metadata {
-> >           u8 cnt;
-> >           u16 size;
-> >           struct metadata data[TLD_DATA_CNT];
->
-> Rename data -> metadata? That's how it is in the code.
->
-> >   };
-> >
-> > Both user space and bpf API follow the same protocol when accessing
-> > task local data. A pointer to a TLD is located by a key. tld_key_t
-> > effectively is the offset of a TLD in data. To add a TLD, user space
->
-> typo: user space API -> the user space API
->
-> > API, loops through metadata->data until an empty slot is found and upda=
-te
-> > it. It also adds sizes of prior TLDs along the way to derive the offset=
-.
-> > To locate a TLD in bpf when the first time tld_get_data() is called,
-> > __tld_fetch_key() also loops through metadata->data until the name is
->
-> Same here, isn't it ->metadata?
->
-
-Thanks for catching all the typos!
-
-> > found. The offset is also derived by adding sizes. When the TLD is not
-> > found, the current TLD count is cached instead to skip name comparison
-> > that has been done. The detail of task local data operations can be fou=
-nd
-> > in patch 1.
-> >
-> >
-> > * Misc *
-> >
-> > The metadata can potentially use run-length encoding for names to reduc=
-e
-> > memory wastage and support save more TLDs. I have a version that works,
-> > but the selftest takes a bit longer to finish. More investigation neede=
-d
-> > to find the root cause. I will save this for the future when there is a
-> > need to store more than 63 TLDs.
-> >
-> >
-> > [0] https://lore.kernel.org/bpf/20241023234759.860539-1-martin.lau@linu=
-x.dev/
-> >
->
-> Reviewed-by: Emil Tsalapatis <emil@etsalapatis.com>
->
->
->
-> > ---
-> >
-> > v5 -> v6
-> >   - Address Andrii's comment
-> >   - Fix verification failure in no_alu32
-> >   - Some cleanup
-> >   v5: https://lore.kernel.org/bpf/20250627233958.2602271-1-ameryhung@gm=
-ail.com/
-> >
-> > v4 -> v5
-> >   - Add an option to free memory on thread exit to prevent memory leak
-> >   - Add an option to reduce memory waste if the allocator can
-> >     use just enough memory to fullfill aligned_alloc() (e.g., glibc)
-> >   - Tweak bpf API
-> >       - Remove tld_fetch_key() as it does not work in init_tasl
-> >       - tld_get_data() now tries to fetch key if it is not cached yet
-> >   - Optimize bpf side tld_get_data()
-> >       - Faster fast path
-> >       - Less code
-> >   - Use stdatomic.h in user space library with seq_cst order
-> >   - Introduce TLD_DEFINE_KEY() as the default TLD creation API for
-> >     easier memory management.
-> >       - TLD_DEFINE_KEY() can consume memory up to a page and no memory
-> >         is wasted since their size is known before per-thread data
-> >         allocation.
-> >       - tld_create_key() can only use up to TLD_DYN_DATA_SIZE. Since
-> >         tld_create_key can run any time even after per-thread data
-> >         allocation, it is impossible to predict the total size. A
-> >         configurable size of memory is allocated on top of the total
-> >         size of TLD_DEFINE_KEY() to accommodate dynamic key creation.
-> >   - Add tld prefix to all macros
-> >   - Replace map_update(NO_EXIST) in __tld_init_data() with cmpxchg()
-> >   - No more +1,-1 dance on the bpf side
-> >   - Reduce printf from ASSERT in race test
-> >   - Try implementing run-length encoding for name and decide to
-> >     save it for the future
-> >   v4: https://lore.kernel.org/bpf/20250515211606.2697271-1-ameryhung@gm=
-ail.com/
-> >
-> > v3 -> v4
-> >   - API improvements
-> >       - Simplify API
-> >       - Drop string obfuscation
-> >       - Use opaque type for key
-> >       - Better documentation
-> >   - Implementation
-> >       - Switch to dynamic allocation for per-task data
-> >       - Now offer as header-only libraries
-> >       - No TLS map pinning; leave it to users
-> >   - Drop pthread dependency
-> >   - Add more invalid tld_create_key() test
-> >   - Add a race test for tld_create_key()
-> >   v3: https://lore.kernel.org/bpf/20250425214039.2919818-1-ameryhung@gm=
-ail.com/
-> >
-> >
-> > Amery Hung (3):
-> >   selftests/bpf: Introduce task local data
-> >   selftests/bpf: Test basic task local data operations
-> >   selftests/bpf: Test concurrent task local data key creation
-> >
-> >  .../bpf/prog_tests/task_local_data.h          | 388 ++++++++++++++++++
-> >  .../bpf/prog_tests/test_task_local_data.c     | 297 ++++++++++++++
-> >  .../selftests/bpf/progs/task_local_data.bpf.h | 227 ++++++++++
-> >  .../bpf/progs/test_task_local_data.c          |  65 +++
-> >  4 files changed, 977 insertions(+)
-> >  create mode 100644 tools/testing/selftests/bpf/prog_tests/task_local_d=
-ata.h
-> >  create mode 100644 tools/testing/selftests/bpf/prog_tests/test_task_lo=
-cal_data.c
-> >  create mode 100644 tools/testing/selftests/bpf/progs/task_local_data.b=
-pf.h
-> >  create mode 100644 tools/testing/selftests/bpf/progs/test_task_local_d=
-ata.c
-> >
-> > --
-> > 2.47.1
-> >
-> >
+Sounds reasonable, I will go test that instead of doing the 
+enable_irq_wake()/disable_irq_wake() dance. Thanks!
+-- 
+Florian
 
