@@ -1,355 +1,150 @@
-Return-Path: <netdev+bounces-210936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210937-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76762B15B62
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 11:22:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41EA5B15B6E
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 11:24:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E051560E90
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 09:22:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80C50179E9E
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 09:24:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F66B26E140;
-	Wed, 30 Jul 2025 09:22:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 195212701AB;
+	Wed, 30 Jul 2025 09:22:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="AC+zbWzS"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="OYO6I5Y2"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42E19270EDD
-	for <netdev@vger.kernel.org>; Wed, 30 Jul 2025 09:22:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A776F26F477
+	for <netdev@vger.kernel.org>; Wed, 30 Jul 2025 09:22:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753867325; cv=none; b=EXbHvYqiqq85WBr2Jo8zrPOACPMYz9Zh1P0F69m3tHK2Q4YLGyAPopLQftJ09GPEYySboYA2eFSUUOu1/OcTkMRNjL2zFiJORSLmHIQtYLGpd7jZHybqVrfd/5YwlLuniMZsXGy7Wl5JG+oN01NSX2Wk7o3kDph3sj/G6Xmr5EY=
+	t=1753867368; cv=none; b=qBlppuSBU+eNXn1XmTPXig75MPv8aSNXdepCVTT1mViu4brjxPfSfZok9CZpgU116NAsgmvGbZhQgjWpaJeb388p8b1Npv7MuPYbhURvnQtYMuKW2fvbwDwR3HOS3+7svwo+3SDLKk8aS33fUmzzP1LivvUJ+T57+F18Ibp+rZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753867325; c=relaxed/simple;
-	bh=96UAAGdzkv87RaVVKwjv1M6vf8MWf69/bTa/iDNTumg=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=Imp7On/qe4FoC3l3FTQ6QZjfPcZ/TFSFIg3tlD6Qi4Cuzlw2WTLFSCJxSqhB5Hq+gD2CQjvEfEdTe20HDyXTfqFRTnRdCwyys6mk3y261Y29czOKNexD9HVWhgk2agresKk/nXUBKx87N8yy8EOwC0ZNk90mcJF75Lftj8nzOOQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=AC+zbWzS; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1173)
-	id AE1C02120EA4; Wed, 30 Jul 2025 02:21:57 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com AE1C02120EA4
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1753867317;
-	bh=pf06HfV3pEwrxqrAAC6FHhP/zPnyjQ92WFI6G+UDc5A=;
-	h=From:To:Cc:Subject:Date:From;
-	b=AC+zbWzS9zkJv2SlB1a3gpdtHg3JLydXGz085JeEcuFNi7YTLc6Q9Gd1RlxYxyEwR
-	 DA4txLiIXz9wQrpOSIZrKEVv8/pUEPl0qn73Vt2xACh1qBlzek2yHCb5lzxiZX7YQI
-	 tFVvXm2zNoHD7ng28Fs85nWwWPaVE2jTrpyRfaZk=
-From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-To: stephen@networkplumber.org,
-	dsahern@gmail.com,
-	netdev@vger.kernel.org
-Cc: haiyangz@microsoft.com,
-	shradhagupta@linux.microsoft.com,
-	ssengar@microsoft.com,
-	dipayanroy@microsoft.com,
-	ernis@microsoft.com,
-	Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-Subject: [PATCH iproute2-next v2] iproute2: Add 'netshaper' command to 'ip link' for netdev shaping
-Date: Wed, 30 Jul 2025 02:21:56 -0700
-Message-Id: <1753867316-7828-1-git-send-email-ernis@linux.microsoft.com>
-X-Mailer: git-send-email 1.8.3.1
+	s=arc-20240116; t=1753867368; c=relaxed/simple;
+	bh=0g6yrhcHleSYoJQFukFLDCb6sos/Nm01PM+MbE7gxiA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RC+0o+03dyfVWlhrDhzD8DxY+dejTbYGMY7MosaE7RhMKLdvV29gHx2lWP23Pb4KKCwkKGHRHYvwBEDve19eXpbubPSiI9VhXaFNfWZGMfwtWOTZjaew+HcEFr+IWzELmKFrVJaLi2fR3l05aumCqPZ7GTjZoSAPDZCG7B9vvyo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=OYO6I5Y2; arc=none smtp.client-ip=95.215.58.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <15ca2392-1dbd-4f4d-a478-3d8edc32bc90@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1753867361;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rtrloE9sFpUz4h4rprIGtpQUhs6s4RahC3fvX1JZSkY=;
+	b=OYO6I5Y2fAu0bstwMe43ByGLLWKHievWt+034SohhkqtNmRH2hqsj8WL126qhCJAAfaW4W
+	L5ZUAaGYvyGAnNTo6k14Xmeo9Bcy9nCyKqY2OR8+dS+/G/oSrSJ/YTM8dg8yRsrnyYmrWv
+	RFSFRyzu/0SCSpt6VRQTTSDe5bxC1GA=
+Date: Wed, 30 Jul 2025 10:22:36 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Subject: Re: [RFC PATCH] ethtool: add FEC bins histogramm report
+To: Jakub Kicinski <kuba@kernel.org>, Vadim Fedorenko <vadfed@meta.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Michael Chan <michael.chan@broadcom.com>,
+ Pavan Chebbi <pavan.chebbi@broadcom.com>, Tariq Toukan <tariqt@nvidia.com>,
+ Gal Pressman <gal@nvidia.com>, intel-wired-lan@lists.osuosl.org,
+ Donald Hunter <donald.hunter@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
+References: <20250729102354.771859-1-vadfed@meta.com>
+ <20250729184529.149be2c3@kernel.org>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20250729184529.149be2c3@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Add support for the netshaper Generic Netlink
-family to iproute2. Introduce a new subcommand to `ip link` for
-configuring netshaper parameters directly from userspace.
+On 30/07/2025 02:45, Jakub Kicinski wrote:
+> On Tue, 29 Jul 2025 03:23:54 -0700 Vadim Fedorenko wrote:
+>> diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
+>> index 1063d5d32fea2..3781ced722fee 100644
+>> --- a/Documentation/netlink/specs/ethtool.yaml
+>> +++ b/Documentation/netlink/specs/ethtool.yaml
+>> @@ -1239,6 +1239,30 @@ attribute-sets:
+>>           name: corr-bits
+>>           type: binary
+>>           sub-type: u64
+>> +      -
+>> +        name: hist
+>> +        type: nest
+>> +        multi-attr: True
+>> +        nested-attributes: fec-hist
+>> +      -
+>> +        name: fec-hist-bin-low
+>> +        type: s32
+>> +      -
+>> +        name: fec-hist-bin-high
+>> +        type: s32
+>> +      -
+>> +        name: fec-hist-bin-val
+>> +        type: u64
+>> +  -
+>> +    name: fec-hist
+>> +    subset-of: fec-stat
+> 
+> no need to make this a subset, better to make it its own attr set
 
-This interface allows users to set shaping attributes (such as speed)
-which are passed to the kernel to perform the corresponding netshaper
-operation.
+like a set for general histogram? or still fec-specific?
 
-Example usage:
-$ip link netshaper { set | get | delete } dev DEVNAME \
-                   handle scope SCOPE id ID \
-                   [ speed SPEED ]
+> 
+>> +    attributes:
+>> +      -
+>> +        name: fec-hist-bin-low
+>> +      -
+>> +        name: fec-hist-bin-high
+>> +      -
+>> +        name: fec-hist-bin-val
+>>     -
+>>       name: fec
+>>       attr-cnt-name: __ethtool-a-fec-cnt
+> 
+>> +static const struct ethtool_fec_hist_range netdevsim_fec_ranges[] = {
+>> +	{  0,  0},
+>> +	{  1,  3},
+>> +	{  4,  7},
+>> +	{ -1, -1}
+>> +};
+> 
+> Let's add a define for the terminating element?
 
-Internally, this triggers a kernel call to apply the shaping
-configuration to the specified network device.
+I believe it's about (-1, -1) case. If we end up using (0, 0) then there
+is no need to define anything, right?
 
-Currently, the tool supports the following functionalities:
-- Setting speed in Mbps, enabling bandwidth clamping for
-  a network device that support netshaper operations.
-- Deleting the current configuration.
-- Querying the existing configuration.
+> 
+>> +/**
+>> + * struct ethtool_fec_hist_range - byte range for FEC bins histogram statistics
+> 
+> byte range? thought these are bit errors..
+> 
+>> + * sentinel value of { -1, -1 } is used as marker for end of bins array
+>> + * @low: low bound of the bin (inclusive)
+>> + * @high: high bound of the bin (inclusive)
+>> + */
+> 
+>> +		len += nla_total_size_64bit(sizeof(u64) * ETHTOOL_FEC_HIST_MAX);
+> 
+> I don't think it's right, each attr is its own nla_total_size().
+> Add a nla_total_size(8) to the calculation below
 
-Additional netshaper operations will be integrated into the tool
-as per requirement.
+got it
 
-This change enables easy and scriptable configuration of bandwidth
-shaping for  devices that use the netshaper Netlink family.
-
-Corresponding net-next patches:
-1) https://lore.kernel.org/all/cover.1728460186.git.pabeni@redhat.com/
-2) https://lore.kernel.org/lkml/1750144656-2021-1-git-send-email-ernis@linux.microsoft.com/
-
-Install pkg-config and libmnl* packages to print any kernel extack
-errors to stdout.
-
-Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
----
-Please add include/uapi/linux/net_shaper.h from kernel source tree
-for this patch.
----
-Changes in v2:
-* Use color coding for printing device name in stdout.
-* Use clang-format to format the code inline.
-* Use __u64 for speed_bps.
-* Remove include/uapi/linux/netshaper.h file.
----
- ip/Makefile           |   2 +-
- ip/iplink.c           |  12 +++
- ip/iplink_netshaper.c | 190 ++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 203 insertions(+), 1 deletion(-)
- create mode 100644 ip/iplink_netshaper.c
-
-diff --git a/ip/Makefile b/ip/Makefile
-index 3535ba78..18218c3b 100644
---- a/ip/Makefile
-+++ b/ip/Makefile
-@@ -4,7 +4,7 @@ IPOBJ=ip.o ipaddress.o ipaddrlabel.o iproute.o iprule.o ipnetns.o \
-     ipmaddr.o ipmonitor.o ipmroute.o ipprefix.o iptuntap.o iptoken.o \
-     ipxfrm.o xfrm_state.o xfrm_policy.o xfrm_monitor.o iplink_dummy.o \
-     iplink_ifb.o iplink_nlmon.o iplink_team.o iplink_vcan.o iplink_vxcan.o \
--    iplink_vlan.o link_veth.o link_gre.o iplink_can.o iplink_xdp.o \
-+    iplink_vlan.o iplink_netshaper.o link_veth.o link_gre.o iplink_can.o iplink_xdp.o \
-     iplink_macvlan.o ipl2tp.o link_vti.o link_vti6.o link_xfrm.o \
-     iplink_vxlan.o tcp_metrics.o iplink_ipoib.o ipnetconf.o link_ip6tnl.o \
-     link_iptnl.o link_gre6.o iplink_bond.o iplink_bond_slave.o iplink_hsr.o \
-diff --git a/ip/iplink.c b/ip/iplink.c
-index 59e8caf4..9da6e304 100644
---- a/ip/iplink.c
-+++ b/ip/iplink.c
-@@ -1509,6 +1509,15 @@ static void do_help(int argc, char **argv)
- 		usage();
- }
- 
-+static int iplink_netshaper(int argc, char **argv)
-+{
-+	struct link_util *lu;
-+
-+	lu = get_link_kind("netshaper");
-+
-+	return lu->parse_opt(lu, argc, argv, NULL);
-+}
-+
- int do_iplink(int argc, char **argv)
- {
- 	if (argc < 1)
-@@ -1545,6 +1554,9 @@ int do_iplink(int argc, char **argv)
- 	if (matches(*argv, "property") == 0)
- 		return iplink_prop(argc-1, argv+1);
- 
-+	if (matches(*argv, "netshaper") == 0)
-+		return iplink_netshaper(argc-1, argv+1);
-+
- 	if (matches(*argv, "help") == 0) {
- 		do_help(argc-1, argv+1);
- 		return 0;
-diff --git a/ip/iplink_netshaper.c b/ip/iplink_netshaper.c
-new file mode 100644
-index 00000000..af7d5e09
---- /dev/null
-+++ b/ip/iplink_netshaper.c
-@@ -0,0 +1,190 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * iplink_netshaper.c netshaper H/W shaping support
-+ *
-+ * Authors:        Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-+ */
-+#include <stdio.h>
-+#include <string.h>
-+#include <linux/genetlink.h>
-+#include <linux/netlink.h>
-+#include <linux/rtnetlink.h>
-+#include <uapi/linux/netshaper.h>
-+#include "utils.h"
-+#include "ip_common.h"
-+#include "libgenl.h"
-+
-+/* netlink socket */
-+static struct rtnl_handle gen_rth = { .fd = -1 };
-+static int genl_family = -1;
-+
-+static void usage(void)
-+{
-+	fprintf(stderr,
-+		"Usage:	ip link netshaper set dev DEVNAME handle scope HANDLE_SCOPE id HANDLE_ID speed SPEED\n"
-+		"	ip link netshaper delete dev DEVNAME handle scope HANDLE_SCOPE id HANDLE_ID\n"
-+		"	ip link netshaper get dev DEVNAME handle scope HANDLE_SCOPE id HANDLE_ID\n"
-+		"Where:	DEVNAME		:= STRING\n"
-+		"	HANDLE_SCOPE	:= { netdev | queue | node }\n"
-+		"	HANDLE_ID	:= UINT\n"
-+		"	SPEED		:= UINT (Mega bits per second)\n");
-+
-+	exit(-1);
-+}
-+
-+static void print_netshaper_attrs(struct nlmsghdr *answer)
-+{
-+	struct genlmsghdr *ghdr = NLMSG_DATA(answer);
-+	int len = answer->nlmsg_len - NLMSG_LENGTH(GENL_HDRLEN);
-+	struct rtattr *tb[NET_SHAPER_A_MAX + 1] = {};
-+	__u32 speed_mbps;
-+	__u64 speed_bps;
-+	int ifindex;
-+
-+	parse_rtattr(tb, NET_SHAPER_A_MAX,
-+		     (struct rtattr *)((char *)ghdr + GENL_HDRLEN), len);
-+
-+	for (int i = 1; i <= NET_SHAPER_A_MAX; ++i) {
-+		if (!tb[i])
-+			continue;
-+		switch (i) {
-+		case NET_SHAPER_A_BW_MAX:
-+			speed_bps = rta_getattr_u64(tb[i]);
-+			speed_mbps = (speed_bps / 1000000);
-+			print_uint(PRINT_ANY, "speed", "speed: %u mbps\n",
-+				   speed_mbps);
-+			break;
-+		case NET_SHAPER_A_IFINDEX:
-+			ifindex = rta_getattr_u32(tb[i]);
-+			print_color_string(PRINT_ANY, COLOR_IFNAME, "dev",
-+					   "dev: %s\n",
-+					   ll_index_to_name(ifindex));
-+			break;
-+		default:
-+			break;
-+		}
-+	}
-+}
-+
-+static int do_cmd(int argc, char **argv, struct nlmsghdr *n, int cmd)
-+{
-+	GENL_REQUEST(req, 1024, genl_family, 0, NET_SHAPER_FAMILY_VERSION, cmd,
-+		     NLM_F_REQUEST | NLM_F_ACK);
-+
-+	struct nlmsghdr *answer;
-+	__u32 speed_mbps = 0;
-+	__u64 speed_bps = 0;
-+	int ifindex = -1;
-+	int handle_scope = NET_SHAPER_SCOPE_UNSPEC;
-+	__u32 handle_id = 0;
-+	bool handle_present = false;
-+	int err;
-+
-+	while (argc > 0) {
-+		if (matches(*argv, "dev") == 0) {
-+			NEXT_ARG();
-+			ifindex = ll_name_to_index(*argv);
-+		} else if (matches(*argv, "speed") == 0) {
-+			NEXT_ARG();
-+			if (get_unsigned(&speed_mbps, *argv, 10)) {
-+				fprintf(stderr, "Invalid speed value\n");
-+				return -1;
-+			}
-+			/*Convert Mbps to Bps*/
-+			speed_bps = (((__u64)speed_mbps) * 1000000);
-+		} else if (matches(*argv, "handle") == 0) {
-+			handle_present = true;
-+			NEXT_ARG();
-+			if (matches(*argv, "scope") == 0) {
-+				NEXT_ARG();
-+				if (matches(*argv, "netdev") == 0) {
-+					handle_scope = NET_SHAPER_SCOPE_NETDEV;
-+				} else if (matches(*argv, "queue") == 0) {
-+					handle_scope = NET_SHAPER_SCOPE_QUEUE;
-+				} else if (matches(*argv, "node") == 0) {
-+					handle_scope = NET_SHAPER_SCOPE_NODE;
-+				} else {
-+					fprintf(stderr, "Invalid scope\n");
-+					return -1;
-+				}
-+
-+				NEXT_ARG();
-+				if (matches(*argv, "id") == 0) {
-+					NEXT_ARG();
-+					if (get_unsigned(&handle_id, *argv, 10)) {
-+						fprintf(stderr,
-+							"Invalid handle id\n");
-+						return -1;
-+					}
-+				}
-+			}
-+		} else {
-+			fprintf(stderr, "What is \"%s\"\n", *argv);
-+			usage();
-+		}
-+		argc--;
-+		argv++;
-+	}
-+
-+	if (ifindex == -1)
-+		missarg("dev");
-+
-+	if (!handle_present)
-+		missarg("handle");
-+
-+	if (cmd == NET_SHAPER_CMD_SET && speed_mbps == 0)
-+		missarg("speed");
-+
-+	addattr32(&req.n, sizeof(req), NET_SHAPER_A_IFINDEX, ifindex);
-+
-+	struct rtattr *handle = addattr_nest(&req.n, sizeof(req),
-+					     NET_SHAPER_A_HANDLE | NLA_F_NESTED);
-+	addattr32(&req.n, sizeof(req), NET_SHAPER_A_HANDLE_SCOPE, handle_scope);
-+	addattr32(&req.n, sizeof(req), NET_SHAPER_A_HANDLE_ID, handle_id);
-+	addattr_nest_end(&req.n, handle);
-+
-+	if (cmd == NET_SHAPER_CMD_SET)
-+		addattr64(&req.n, sizeof(req), NET_SHAPER_A_BW_MAX, speed_bps);
-+
-+	err = rtnl_talk(&gen_rth, &req.n, &answer);
-+	if (err < 0) {
-+		printf("Kernel command failed: %d\n", err);
-+		return err;
-+	}
-+
-+	if (cmd == NET_SHAPER_CMD_GET)
-+		print_netshaper_attrs(answer);
-+
-+	return err;
-+}
-+
-+static int netshaper_parse_opt(struct link_util *lu, int argc, char **argv,
-+			       struct nlmsghdr *n)
-+{
-+	if (argc < 1)
-+		usage();
-+	if (matches(*argv, "help") == 0)
-+		usage();
-+
-+	if (genl_init_handle(&gen_rth, NET_SHAPER_FAMILY_NAME, &genl_family))
-+		exit(1);
-+
-+	if (matches(*argv, "set") == 0)
-+		return do_cmd(argc - 1, argv + 1, n, NET_SHAPER_CMD_SET);
-+
-+	if (matches(*argv, "delete") == 0)
-+		return do_cmd(argc - 1, argv + 1, n, NET_SHAPER_CMD_DELETE);
-+
-+	if (matches(*argv, "get") == 0)
-+		return do_cmd(argc - 1, argv + 1, n, NET_SHAPER_CMD_GET);
-+
-+	fprintf(stderr,
-+		"Command \"%s\" is unknown, try \"ip link netshaper help\".\n",
-+		*argv);
-+	exit(-1);
-+}
-+
-+struct link_util netshaper_link_util = {
-+	.id = "netshaper",
-+	.parse_opt = netshaper_parse_opt,
-+};
--- 
-2.43.0
+> 
+>> +		/* add FEC bins information */
+>> +		len += (nla_total_size(0) +  /* _A_FEC_HIST */
+>> +			nla_total_size(4) +  /* _A_FEC_HIST_BIN_LOW */
+>> +			nla_total_size(4)) * /* _A_FEC_HIST_BIN_HI */
+>> +			ETHTOOL_FEC_HIST_MAX;
 
 
