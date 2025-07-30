@@ -1,176 +1,173 @@
-Return-Path: <netdev+bounces-210996-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210997-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69B91B16133
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 15:15:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FA32B1613F
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 15:17:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26A905A4558
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 13:15:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 614711890DEF
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 13:18:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03A8F29AAEA;
-	Wed, 30 Jul 2025 13:14:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63B15170A2B;
+	Wed, 30 Jul 2025 13:17:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f5cckIKo"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OsMyF18B"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com [209.85.219.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C69C829A9D3;
-	Wed, 30 Jul 2025 13:14:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B708A172BB9
+	for <netdev@vger.kernel.org>; Wed, 30 Jul 2025 13:17:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753881256; cv=none; b=myePw5HvC6Cyy2UWJLneTCuHxHehGt9wAE/Iz+2as9XWW5IbeLVqcDEZlBXsQ7NUngm18fMFKujvV3hIR0cQm8jxf11r1GB1eB95NT8dq0UrTYkMPhGJbAF9kI5gRVtC4DY3AwOSK7+PC1LtNLkK0tOsmOZMRTfgJA5UoMVhSyA=
+	t=1753881463; cv=none; b=D3uIIaybrpQiRZj6kcMzxdnBzPsLbAJfPIU0r8XGY+j6xhH8xmC2Vb/XWqJ6Z74rjmEBGHhn6FV7yxOX0uFW2YoeX3VNIoE4Zbsij6tbPKRVMqpScdPlJ1UD6u2RvU476VJ4CXvErHhE80EoJKOo9kUCww+FFt7Y+Z45uyYnQzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753881256; c=relaxed/simple;
-	bh=IhTVuxQMEvHhiCXnC04CN+Xg1LgeL0FXSIMIngGNJ+s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WwhFIzXgOZpV+wGrXqYvwP8CdQDuvg7yehKJ6YIHtjzIgvERLWeHu3Kqo62BkPXE1t0kO50EuQpIQYjDUzhZJghpP/0vFp+hBfsYC0ZhOqGRemJai98RNWeQ/cPRHDJYBnn+5QFdZ34q7UQK1eF/Tqgj5mONnlzAKRAHSCt2MTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f5cckIKo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64C21C4CEE7;
-	Wed, 30 Jul 2025 13:14:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753881256;
-	bh=IhTVuxQMEvHhiCXnC04CN+Xg1LgeL0FXSIMIngGNJ+s=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=f5cckIKoQ87Y4ZO2vnKqJK4ZIO6MYM/c/e1E7Jf5OGr93aTdjIeC3peyz5PXuiLm7
-	 W7iq7IqkY5c4zirBO5gqplSX3MgtBP0C/scPHiJlrBsfsPwQKi4ngn46EkKNOdFaC6
-	 9D7LP26D0VdtSmfICwTupjD92wJLntoXbkQe1AArEbMfTI3+jV6VKhmXXwNeGozGN/
-	 q4QrFiALwPcdk/srRZJNANqItk//2jnGPOhJA28QxPpCH5h8JpYhD5oGUZ7W2XJ67w
-	 hIK0ErJoQO7Z+y+2y/X7//YryzK0NwcYs3BYzrPF0ON8175XL7mqM3DtNMejT4ypN0
-	 xS6IUMcID4eog==
-Message-ID: <e4c5ecc3-fd97-4b13-a057-bb1a3b7f9207@kernel.org>
-Date: Wed, 30 Jul 2025 15:14:10 +0200
+	s=arc-20240116; t=1753881463; c=relaxed/simple;
+	bh=wQV51C2Ib2mpJndbb6jmRVEky7r53Y8+vIDYD2N93es=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=dT/Zwts6Q+n3olKumPtHSjhGi6JgeaL8WDToKDhEcaw8cltEq4OvEYG5D2F0PsSMcN3nLWstenlDdcL9Q4IBlC/xPBqx9I0AWcfPH4uU68oPJzhl8bH3x0o5/cIVKyIWRdBwVUbXbo/Vgfmbg0Xa6Z7dwcmwt5yBYQgErJD8gIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OsMyF18B; arc=none smtp.client-ip=209.85.219.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-707453b0307so60365366d6.3
+        for <netdev@vger.kernel.org>; Wed, 30 Jul 2025 06:17:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1753881460; x=1754486260; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=2ZJgGJWQFeclQw2uoRHesjGOwX1lqWpTyzoKd2zAekY=;
+        b=OsMyF18BO0vf3nOVASswfO5OkxPa4u9K8F1sPsgWBs8mR6twi+VDrfHbVRPkWPmTFX
+         +PIf/Q71C42uCT+rpyxzMUSPJGBCkd0Q3B5wyl0OjHLyU5933Q3Ht6mmSzmdWxCtxIyb
+         PdNt7dHzW3+iJWmbuOoOtdUW77ibVTdTTQLQeiQQMVs8fWgvPOdAaTsS1ag3f1EZFAdh
+         r6DOc8dX0RVS2it+3/xo8KsR1Xvpfd7lBQt2JhEuN7nHrMrL6NXUaHNCO5SnMfDCQFP9
+         RyLz/Jz1k4x6ndeYWxqqGjxsi/4ZupjF7v/zUZt8mN9AGJUqb6g59KPuLqMzckZUmQ3n
+         Skng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753881460; x=1754486260;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2ZJgGJWQFeclQw2uoRHesjGOwX1lqWpTyzoKd2zAekY=;
+        b=PZGTZAEjmZn0rDw9ZlqxnUJ8Ei6+P+/BfZZdRHR6+xw5NEHKNdQDXWr5MeTZViYT4V
+         22CN4PdYMK8zJyz/ICAI1IBvEdlA58pH+NOCuvlW83tvoziFkGv0BNPSOu4UMDzgEvrE
+         fKMnHjhQESHxGvc/ut3IiU2d7NWrbizTmvIOzyBLBR8AOpzMmivoskkVdpHNR79LeMBG
+         MIlLHYfYcJr9ugG5sf/QF7xdsg7KBMp3EclYMCvbKTL10KDtYDRIqGnLOHJHZfMbz//b
+         q4M+cCxGsQEIqspE/ZRFxu3MEWzrpZ1BBx5ky/Qn5eXz/xm/24xLRaJuTD0QJ5wPLqjL
+         B11A==
+X-Forwarded-Encrypted: i=1; AJvYcCUZJtD9qDTO7FbYZt+YFQ0JEZXAE5LT0HgH4TeWR1V2oOZJeU1GvNXMrXRsLrQ1Y21hSHEO830=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxSI7IoMOyqA9BUGxNIelb1KKP2mQF2DWOPxnIBGhs6Z7h9hbJo
+	kgoccitCz9e1vmLPDIPr89BvK5X0tPwYgk/UsebVnqDDOjA46cTpQQcElvaYA6IhqPvBYzqlYeN
+	OYgLcRS/4oXPTaA==
+X-Google-Smtp-Source: AGHT+IGOCBp8/tEEgbLplTinmZ3fumFDewMGJumvdHnr+/W4EklHcimHcrSwWX2SqQhV6dfvZwiF9VDrEgtfZg==
+X-Received: from qvblb13.prod.google.com ([2002:a05:6214:318d:b0:707:3161:5d79])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6214:401a:b0:707:5671:c95e with SMTP id 6a1803df08f44-70767113d4emr46967526d6.27.1753881460258;
+ Wed, 30 Jul 2025 06:17:40 -0700 (PDT)
+Date: Wed, 30 Jul 2025 13:17:38 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 1/3] dt-bindings: sram: qcom,imem: Allow
- modem-tables
-To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
- Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Alex Elder <elder@kernel.org>
-Cc: Marijn Suijten <marijn.suijten@somainline.org>,
- linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- Alex Elder <elder@riscstar.com>
-References: <20250527-topic-ipa_imem-v2-0-6d1aad91b841@oss.qualcomm.com>
- <20250527-topic-ipa_imem-v2-1-6d1aad91b841@oss.qualcomm.com>
- <97724a4d-fad5-4e98-b415-985e5f19f911@kernel.org>
- <e7ee4653-194c-417a-9eda-2666e9f5244d@oss.qualcomm.com>
- <68622599-02d0-45ca-82f5-cf321c153cde@kernel.org>
- <bf78d681-723b-4372-86e0-c0643ecc2399@oss.qualcomm.com>
- <62b0f514-a8a9-4147-a5c0-da9dbe13ce39@kernel.org>
- <747e5221-0fb1-4081-9e98-94b330ebf8c7@oss.qualcomm.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <747e5221-0fb1-4081-9e98-94b330ebf8c7@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.50.1.552.g942d659e1b-goog
+Message-ID: <20250730131738.3385939-1-edumazet@google.com>
+Subject: [PATCH net] ipv6: reject malicious packets in ipv6_gso_segment()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Willem de Bruijn <willemb@google.com>, 
+	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, syzbot+af43e647fd835acc02df@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 30/07/2025 14:07, Konrad Dybcio wrote:
->>>>>>
->>>>>> Missing additionalProperties: false, which would point you that this is
->>>>>> incomplete (or useless because empty).
->>>>>
->>>>> How do I describe a 'stupid' node that is just a reg?
->>>> With "reg" - similarly to many syscon bindings.
->>>
->>> Is this sort of inline style acceptable, or should I introduce
->>> a separate file?
->>
->> It's fine, assuming that it is desired in general. We do not describe
->> individual memory regions of syscon nodes and this is a syscon.
->>
->> If this is NVMEM (which it looks like), then could use NVMEM bindings to
->> describe its cells - individual regions. But otherwise we just don't.
-> 
-> It's volatile on-chip memory
-> 
->> There are many exceptions in other platforms, mostly old or even
->> unreviewed by DT maintainers, so they are not a recommended example.
->>
->> This would need serious justification WHY you need to describe the
->> child. Why phandle to the main node is not enough for consumers.
-> 
-> It's simply a region of the SRAM, which needs to be IOMMU-mapped in a
-> specific manner (should IMEM move away from syscon+simple-mfd to
-> mmio-sram?). Describing slices is the DT way to pass them (like under
-> NVMEM providers).
+syzbot was able to craft a packet with very long IPv6 extension headers
+leading to an overflow of skb->transport_header.
 
+This 16bit field has a limited range.
 
-Then this might be not a syscon, IMO. I don't think mixing syscon and
-SRAM is appropriate, even though Linux could treat it very similar.
+Add skb_reset_transport_header_careful() helper and use it
+from ipv6_gso_segment()
 
-syscon is for registers. mmio-sram is for SRAM or other parts of
-non-volatile RAM.
+WARNING: CPU: 0 PID: 5871 at ./include/linux/skbuff.h:3032 skb_reset_transport_header include/linux/skbuff.h:3032 [inline]
+WARNING: CPU: 0 PID: 5871 at ./include/linux/skbuff.h:3032 ipv6_gso_segment+0x15e2/0x21e0 net/ipv6/ip6_offload.c:151
+Modules linked in:
+CPU: 0 UID: 0 PID: 5871 Comm: syz-executor211 Not tainted 6.16.0-rc6-syzkaller-g7abc678e3084 #0 PREEMPT(full)
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
+ RIP: 0010:skb_reset_transport_header include/linux/skbuff.h:3032 [inline]
+ RIP: 0010:ipv6_gso_segment+0x15e2/0x21e0 net/ipv6/ip6_offload.c:151
+Call Trace:
+ <TASK>
+  skb_mac_gso_segment+0x31c/0x640 net/core/gso.c:53
+  nsh_gso_segment+0x54a/0xe10 net/nsh/nsh.c:110
+  skb_mac_gso_segment+0x31c/0x640 net/core/gso.c:53
+  __skb_gso_segment+0x342/0x510 net/core/gso.c:124
+  skb_gso_segment include/net/gso.h:83 [inline]
+  validate_xmit_skb+0x857/0x11b0 net/core/dev.c:3950
+  validate_xmit_skb_list+0x84/0x120 net/core/dev.c:4000
+  sch_direct_xmit+0xd3/0x4b0 net/sched/sch_generic.c:329
+  __dev_xmit_skb net/core/dev.c:4102 [inline]
+  __dev_queue_xmit+0x17b6/0x3a70 net/core/dev.c:4679
 
-Indeed you might need to move towards mmio-sram.
+Fixes: d1da932ed4ec ("ipv6: Separate ipv6 offload support")
+Reported-by: syzbot+af43e647fd835acc02df@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/netdev/688a1a05.050a0220.5d226.0008.GAE@google.com/T/#u
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ include/linux/skbuff.h | 23 +++++++++++++++++++++++
+ net/ipv6/ip6_offload.c |  4 +++-
+ 2 files changed, 26 insertions(+), 1 deletion(-)
 
-> 
->>
->> If the reason is - to instantiate child device driver - then as well no.
->> This has been NAKed on the lists many times - you need resources if the
->> child should be a separate node. Address space is one resource but not
->> enough, because it can easily be obtained from the parent/main node.
-> 
-> There is no additional driver for this
+diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+index b8b06e71b73ea3fb5210239f585f4ba714395fd7..14b923ddb6dfcc3c031a7c9e4cb5fc4171424616 100644
+--- a/include/linux/skbuff.h
++++ b/include/linux/skbuff.h
+@@ -3033,6 +3033,29 @@ static inline void skb_reset_transport_header(struct sk_buff *skb)
+ 	skb->transport_header = offset;
+ }
+ 
++/**
++ * skb_reset_transport_header_careful - conditionally reset transport header
++ * @skb: buffer to alter
++ *
++ * Hardened version of skb_reset_transport_header().
++ *
++ * Returns: true if the operation was a success.
++ */
++static inline bool __must_check
++skb_reset_transport_header_careful(struct sk_buff *skb)
++{
++	long offset = skb->data - skb->head;
++
++	if (unlikely(offset != (typeof(skb->transport_header))offset))
++		return false;
++
++	if (unlikely(offset == (typeof(skb->transport_header))~0U))
++		return false;
++
++	skb->transport_header = offset;
++	return true;
++}
++
+ static inline void skb_set_transport_header(struct sk_buff *skb,
+ 					    const int offset)
+ {
+diff --git a/net/ipv6/ip6_offload.c b/net/ipv6/ip6_offload.c
+index 9822163428b028d6dbf3f48abe4674bd6c581725..fce91183797a60fcbf271c73e086aeb0aa9d40c6 100644
+--- a/net/ipv6/ip6_offload.c
++++ b/net/ipv6/ip6_offload.c
+@@ -148,7 +148,9 @@ static struct sk_buff *ipv6_gso_segment(struct sk_buff *skb,
+ 
+ 	ops = rcu_dereference(inet6_offloads[proto]);
+ 	if (likely(ops && ops->callbacks.gso_segment)) {
+-		skb_reset_transport_header(skb);
++		if (!skb_reset_transport_header_careful(skb))
++			goto out;
++
+ 		segs = ops->callbacks.gso_segment(skb, features);
+ 		if (!segs)
+ 			skb->network_header = skb_mac_header(skb) + nhoff - skb->head;
+-- 
+2.50.1.552.g942d659e1b-goog
 
-Then it is not a simple-mfd...
-
-Best regards,
-Krzysztof
 
