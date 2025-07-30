@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-211062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211063-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 832DAB1666F
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 20:41:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE5B1B1667E
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 20:46:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C3F57A8590
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 18:39:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 12A871AA4148
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 18:46:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B93C22DFA21;
-	Wed, 30 Jul 2025 18:41:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B53732E0B48;
+	Wed, 30 Jul 2025 18:46:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="f1Ka3DmR"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="QhtqDkFM"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 493A42BCFB
-	for <netdev@vger.kernel.org>; Wed, 30 Jul 2025 18:41:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0F14BE6C
+	for <netdev@vger.kernel.org>; Wed, 30 Jul 2025 18:45:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753900867; cv=none; b=a3qXpsRRFHYdY2NWae04A8nvXaVDVR3EUXQM0MN2BMs3Xh3bjBDa7hrZnyjvv2nQHdf0OVdDiC2qQqD6FXPRPQNnaXXTj2/H66A1cP5CJQXA1DSla+e2SnA9JWJHoJVrKQOBEh7QwzRt5OOdz+7/PJGAKTXgY4ISUZq2KgGBy9w=
+	t=1753901160; cv=none; b=hVj98iQzaE9cEluxVEg+byOWmI3zaoyEah7syK4RJiwj6be9NqZl29EZrQL5NEyl7rjirL2uH/Ac87fQUpOuNQdv7GJa3okPk1zyCAyAPC8sElF9c5xxE5fs5L+c+fX31T9+Smw4dy7wC+9A0r6E1lyYJ9pbUtDRZj9w/v0Aq9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753900867; c=relaxed/simple;
-	bh=IDZVHAUnqA+hvKUpyxjPG3LKpwEKeCQmIrk5w6Arm98=;
+	s=arc-20240116; t=1753901160; c=relaxed/simple;
+	bh=1z1U0obMkiLsmQaExQuoJDPQREdMzdgQHbnAO/wm344=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=t70VWeiaqmmWND0sAX0tFJ6rjjBOifzBQ0HQgZexMcuoCUQUi5yQah5ISDFvYYw4yUVjhC9eOw13u+3Et2zv9ohq838Tr8ibbdl0Pyqc2UFkraA2Gi9uF9H2d41Tp0z29Y7lqjnLOE7kGtiwi3OgFvhHCbJes5Zy4XC/3RLDMUU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=f1Ka3DmR; arc=none smtp.client-ip=209.85.222.171
+	 In-Reply-To:Content-Type; b=aJLJdNNij2/SrrutBS+718rcEt8lgOPapIZdgO8TfuOQwTQVISr57JOqxEMithTKpvuRbj5tFUcCmdcEciqTkfe0MSpYqHop8RSonU3fQGw3Js2WpziFIlN0oeyaRRvy5glS+UcVBIHwmmvhRKJ7UkXcQOg/+bcGeqtrFq/cnyM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=QhtqDkFM; arc=none smtp.client-ip=209.85.222.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-7e34399cdb2so19917085a.3
-        for <netdev@vger.kernel.org>; Wed, 30 Jul 2025 11:41:06 -0700 (PDT)
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-7e62a1cbf83so24722585a.1
+        for <netdev@vger.kernel.org>; Wed, 30 Jul 2025 11:45:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1753900865; x=1754505665; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1753901158; x=1754505958; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=j1hxL5Vx5A9KnVBhUwPUidWdTjrb+vaRaMmz7WAa6Bw=;
-        b=f1Ka3DmRtNb9zOcgqCErfq2cFg6rv04vxsJ8Fto67HG5w42RCxHdou6XGpUQsz/JSI
-         ULvAZMa2kLEAQIrkkTFDFshYuIrqpw7asyAZnK49Ebdo/IjpWiPz5e+BMyy3CV8wKkVn
-         SqqmuJccRnGS5hzxP5fqB1jZEbMCSgv611o3w=
+        bh=F+eATscs7aYEx7D5z9es6qkQ0c9vyiUmimHLhMPiQ9E=;
+        b=QhtqDkFMgftLjZiv5ydmSlGlyPORGC77Wph2JJ5TmQ/nnYApmiGeBEYISOLB3pDB7g
+         mSh9k+GAl5YDm1WEmFMFHREskhXV1554EqEgLeR7/xZZYu9M1cGDuXVAwBpFHh8JNuOT
+         sRHUsvSLgvCBpENAPzN+0/Nc6Tz4R0BHtbUAU=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753900865; x=1754505665;
+        d=1e100.net; s=20230601; t=1753901158; x=1754505958;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=j1hxL5Vx5A9KnVBhUwPUidWdTjrb+vaRaMmz7WAa6Bw=;
-        b=o3EvCcN8eludR8k82XqHEJmdSOupUfqFaa/l132hU8iMC090e1iJO6pwcxzP1msLyv
-         ZNaNKp0N6+X4A1aUluE3cHVXGd85muldBYTlXCGwoQXUVli051LeUGsv5CdJUb1E7IQl
-         ASlciMt2QH81RxujyEnaCuqYXbTYKhXxi18qJm5yuwNQ+tyAO1RTu8CVUfCERoEm5eIz
-         vK6JxWD2IICLWJpxb7J4zIqBlKC8o14etYZRbiC+BnyvOCJpjnQ5rDHwsJrjMR2K/04K
-         vRRfeMJmWbwMkwV0hpnIGceOIJTaL6uaCUl3Z3x3PPhFXsxVG4GQBJeDTJuyTUur4GhH
-         hn0w==
-X-Forwarded-Encrypted: i=1; AJvYcCXZ9JTFaswTsl1hmJh9WU6CdqQW0XVH4TZCFPVqy3IP6J/XxmwupbHrNvV12rlm2JN+CFA2NdM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy55UkS82ez5U0MQQ/0aqbNg43Mt3E00zZwAiG5emZww+B3WGrX
-	Uw+8dv5DKMk8tXSMzqVRJJWemsjXoUwGze8bJm6X8Tz9JRKCwMIDjbkfCneC+e59lg==
-X-Gm-Gg: ASbGncvmqYu5kn3YnOsgoJY1zl4AdRMChZxuIXBwyCTOxdVlznf60lS1cKM3/ES8Tik
-	SoNQe21GiSrJ5lBUGkTbS/q4uPKW7c67iUw9LoLMh2HwJR0qC+xn3GXBj0x3jTkUjq0XPE1wsd8
-	GbeQHzwx1QG65UuP6nrksTN73rlO1+N4DCBUb/hLpnMy0C279uT5zAYssvcdfH5Gp58pLKill+U
-	hdO1bvpXhWCzbmm9wHWyuIxkCiwyOWq5SkggOi1aIF4QmHu0DMO/Im8ll9B2LeTYhG3EkNuUxzD
-	4V1YAjjSqeJ4PnXNkgz+uZlM0S4hedglh/fsTQM9r0uxxFIPh56MTXt/56Ddr2L8eu3vzfvoYHs
-	QnbJERule+SuteN/7C4ZdMxS/oiSo4JxtebHZZ1pMHkmzhI9Ju0aHfutHUWmpcQ==
-X-Google-Smtp-Source: AGHT+IG3MV2lDcwBFqjZSW+SRBYzdliL7B6DW5UaA3OyG1yEKduZx+x6LLWdvH0Y3ExSLnQyDkGKCg==
-X-Received: by 2002:a05:620a:17a6:b0:7e3:4413:e492 with SMTP id af79cd13be357-7e66f3f8bacmr526967585a.62.1753900865037;
-        Wed, 30 Jul 2025 11:41:05 -0700 (PDT)
+        bh=F+eATscs7aYEx7D5z9es6qkQ0c9vyiUmimHLhMPiQ9E=;
+        b=mY1DEKw8s5FNmQW6DIqEQHfnWWNTP7q+MbZPcMA9pHAuqymkAytw/LmyFZqFDNzczp
+         J4mTvQX8p+7uwL+6kWX+44zIP2WXoj5/N09Bd6nkHBnsHw8uwrh38xoMYZdoOHbQkRfF
+         hU1h8E9XeyH4DuTLg7zxhASTDeqFzi8TapjXTzfldvWG7Z71gS0nApZdVcjlf7mukFDI
+         tq5gDFmD6R12bTBVrtMv5+0vBhxlUbnQ8UeNgDR8fOqALOpbsTyTVeqPTiDKW0qwO0zo
+         yVgt3Pz3l9WkBExv7xTy9Pb65eCV40YQWhhJMPFaWuMaXULuUZvVbc0k9rrNDBBwJgE0
+         tLrA==
+X-Forwarded-Encrypted: i=1; AJvYcCU0ixHYIIpqzaccLrVAZyod/N5ZcCOp8A3at9PR28PIwBBH/gbglMMtyxXluazd0EZzoqds+8o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxiucLRPDbn3fsMYOZMTBhUo1W68iB+i7OoPv3nBTC0qDWi7zNV
+	LWmlaWvg+srRYuoX7y3cYTRPiMnY3CRMywW+LgSJ6ma5AzAfuWbDJSDgqrIqXIc0mQ==
+X-Gm-Gg: ASbGncudcLeTmEEkCix4WisIUJPVwpJFgTU9CYS+U5n2tdMniDgtb6z2J//X+3Sd/fZ
+	2E6EkpZLbruSXVlPqjDD+Q4HXAU66eVUh+f/5akevnzNlM2ZPyTED1PUPJQSpkMmMZ/tYEK+jpO
+	aeeOYfzYVxLm34ueVN0wT8zxAADgRfQQ2uPhFmEB0K8Ja2SQwvRQjIyASG1sjFHSPeEwl/siRDo
+	tD/suw1bgVDwT35iSyoe+5pBQg3U9OkDSRjHzp6eXBLmbsnvu/6dx0/3hBBX7wa1WxeRC3PZlEJ
+	tZOzHzyASMeXqj+ZkkCAlpVsV5JI5/Sr0enqwwMLvCQMErhyIhnJ0pBIdPzBFn+mazWXSN0B0RC
+	4dcfmew7hFmweVcq+OGzRPiTKRk1PoX8VLi+wDAnDI5f6Eo1B3/tPEw6mwJjdaA==
+X-Google-Smtp-Source: AGHT+IFOwz0qUu8e6vv/suvXI/Y4ObqQePUsZmD2wb8JPAJegrxE9SglsiFWDWrbhSW1iAvnvddVWA==
+X-Received: by 2002:a05:620a:aa03:b0:7e3:49b5:d53f with SMTP id af79cd13be357-7e66f397d1amr395742785a.34.1753901157460;
+        Wed, 30 Jul 2025 11:45:57 -0700 (PDT)
 Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7e6432a2199sm609191085a.31.2025.07.30.11.41.02
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7e64388e9fesm612736385a.72.2025.07.30.11.45.55
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 30 Jul 2025 11:41:03 -0700 (PDT)
-Message-ID: <ec68a220-53c9-459f-9bb7-7d48da1a3e77@broadcom.com>
-Date: Wed, 30 Jul 2025 11:41:01 -0700
+        Wed, 30 Jul 2025 11:45:56 -0700 (PDT)
+Message-ID: <c02f1bdb-0134-4edf-b3a7-8bb5152c11d0@broadcom.com>
+Date: Wed, 30 Jul 2025 11:45:53 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,16 +80,16 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/2] net: dsa: b53: mmap: Implement bcm63268 gphy
- power control
-To: Kyle Hendry <kylehendrydev@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: noltari@gmail.com, jonas.gorski@gmail.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250730020338.15569-1-kylehendrydev@gmail.com>
- <20250730020338.15569-3-kylehendrydev@gmail.com>
+Subject: Re: [PATCH RFC ???net???] net: phy: realtek: fix wake-on-lan support
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Daniel Braunwarth <daniel.braunwarth@kuka.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Gatien CHEVALLIER <gatien.chevallier@foss.st.com>,
+ Jakub Kicinski <kuba@kernel.org>, Jon Hunter <jonathanh@nvidia.com>,
+ netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+ Thierry Reding <treding@nvidia.com>
+References: <E1uh2Hm-006lvG-PK@rmk-PC.armlinux.org.uk>
 Content-Language: en-US
 From: Florian Fainelli <florian.fainelli@broadcom.com>
 Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
@@ -124,17 +124,83 @@ Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
  MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
  7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
  95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <20250730020338.15569-3-kylehendrydev@gmail.com>
+In-Reply-To: <E1uh2Hm-006lvG-PK@rmk-PC.armlinux.org.uk>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 7/29/25 19:03, Kyle Hendry wrote:
-> Add check for gphy in enable/disable phy calls and set power bits
-> in gphy control register.
+On 7/30/25 01:35, Russell King (Oracle) wrote:
+> Implement Wake-on-Lan correctly. The existing implementation has
+> multiple issues:
 > 
-> Signed-off-by: Kyle Hendry <kylehendrydev@gmail.com>
+> 1. It assumes that Wake-on-Lan can always be used, whether or not the
+>     interrupt is wired, and whether or not the interrupt is capable of
+>     waking the system. This breaks the ability for MAC drivers to detect
+>     whether the PHY WoL is functional.
+> 2. switching the interrupt pin in the .set_wol() method to PMEB mode
+>     immediately silences link-state interrupts, which breaks phylib
+>     when interrupts are being used rather than polling mode.
+> 3. the code claiming to "reset WOL status" was doing nothing of the
+>     sort. Bit 15 in page 0xd8a register 17 controls WoL reset, and
+>     needs to be pulsed low to reset the WoL state. This bit was always
+>     written as '1', resulting in no reset.
+> 4. not resetting WoL state results in the PMEB pin remaining asserted,
+>     which in turn leads to an interrupt storm. Only resetting the WoL
+>     state in .set_wol() is not sufficient.
+> 5. PMEB mode does not allow software detection of the wake-up event as
+>     there is no status bit to indicate we received the WoL packet.
+> 6. across reboots of at least the Jetson Xavier NX system, the WoL
+>     configuration is preserved.
+> 
+> Fix all of these issues by essentially rewriting the support. We:
+> 1. clear the WoL event enable register at probe time.
+> 2. detect whether we can support wake-up by having a valid interrupt,
+>     and the "wakeup-source" property in DT. If we can, then we mark
+>     the MDIO device as wakeup capable, and associate the interrupt
+>     with the wakeup source.
+> 3. arrange for the get_wol() and set_wol() implementations to handle
+>     the case where the MDIO device has not been marked as wakeup
+>     capable (thereby returning no WoL support, and refusing to enable
+>     WoL support.)
+> 4. avoid switching to PMEB mode, instead using INTB mode with the
+>     interrupt enable, reconfiguring the interrupt enables at suspend
+>     time, and restoring their original state at resume time (we track
+>     the state of the interrupt enable register in .config_intr()
+>     register.)
+> 5. move WoL reset from .set_wol() to the suspend function to ensure
+>     that WoL state is cleared prior to suspend. This is necessary
+>     after the PME interrupt has been enabled as a second WoL packet
+>     will not re-raise a previously cleared PME interrupt.
+> 6. when a PME interrupt (for wakeup) is asserted, pass this to the
+>     PM wakeup so it knows which device woke the system.
+> 
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+This looks much better and straightforward to me, thanks!
+
+> ---
+> I've sort-of tested this on the Jetson Xavier NX platform, but it's
+> been difficult because it appears that the whole interrupt/wakeup
+> stuff for the SoC is foobar in mainline. One gets the choice of
+> specifying the GPIO interrupt in DT and have working normal interrupt
+> or the power management controller interrupt for the same line and
+> having wakeup functional. You can't have both together.
+> 
+> I'm not sure whether this change should target the net or net-next
+> tree; what we have currently in 6.16 is totally and utterly broken,
+> so arguably this is a fix - but it's not a regression because 6.16
+> is the first kernel that WoL "support" for RTL8211F is in. This is
+> also a large change.
+> 
+> However, I can't see that it was tested, given all the problems
+> identified above. As a result, I've taken the decision in this patch
+> to not worry about breaking anyone's existing setup.
+> 
+> So, I have no problem with requiring "wakeup-source" to be added to DT
+> for rtl8211f PHYs that are to support wake-up, meaning that they are
+> properly wired to support WoL. We can't tell just from having an
+> interrupt - not all interrupts on all devices may be wake-up capable.
+
+That seems entirely reasonable to me to expect.
 -- 
 Florian
 
