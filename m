@@ -1,174 +1,105 @@
-Return-Path: <netdev+bounces-210989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210990-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C506B16099
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 14:47:55 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42DA5B160D2
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 14:57:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DC09818C845C
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 12:47:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DC8877B10AF
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 12:55:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F44729993E;
-	Wed, 30 Jul 2025 12:46:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C86B6298994;
+	Wed, 30 Jul 2025 12:56:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uyRoU97i"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iN41PW32"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03F19299924;
-	Wed, 30 Jul 2025 12:46:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 587FA25D535
+	for <netdev@vger.kernel.org>; Wed, 30 Jul 2025 12:56:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753879586; cv=none; b=CIxOgBPvi/2NZiUUVOOHDspiqW2rQxZsimGI1aPIuikEwUJqyzfJxzHugGMCpnSLHDR393IsSrLAoihNlhZOE04gGCibANKxKl6iig/6lHDzGDqzMlMJ87rJHPy55Hx9pDiYtR/IFlv/EwaEFdtkWvRr8I7TsCURXGdXPrwaalA=
+	t=1753880188; cv=none; b=TMtKnVDaalw2Ky0NcqkbFjz8X2UxDMxoPrzuSwQ0BqjkjYV6EgigOVdM7p+plX+6DR5xwfLVaAlF090QrawHJtDCKzAkwWtem2/mFqYx8BqQ6lTEkIXxTu9OcdYvd0kjf57L7ALRgFlDn3ALgjspyfX9xPHpUBvpRAQCMAxEy2I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753879586; c=relaxed/simple;
-	bh=50UIteFtNHRUtkmAOTrMYqlbtcxNvyAqWTl8Cdv76Bs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tbPzr4tdUzugz9imGa0rSXeQtpN6ksF8SbufTLqnuF+8syi74xsq2En0lzLiyT/UYkZ+AV9gxEwLgazMPp41NcIDhxF4WHf9UhfQ3J4F6A1dLH+Dr5S+9fbgwByQlLfjfb7JJA83PZo6tjCTpgksxCJEMboA6zZX6sBpMy4cgDM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uyRoU97i; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49E15C4CEF5;
-	Wed, 30 Jul 2025 12:46:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753879585;
-	bh=50UIteFtNHRUtkmAOTrMYqlbtcxNvyAqWTl8Cdv76Bs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=uyRoU97iNW4Q7pfzLuqM2O1mSa8sPr+48oa9cjJ7UPTOrgZMKRsfb8WkWBVqvA01f
-	 MzlmP0wGN6no215r5gQBqmxFkaTrZ2Kyr8qW3YtpFNBGs082lG89/YLR7fkZKtTqDF
-	 MLiLPc1e4nVS+NianvJSsnxq5CKgCRR1OLdYPaBO8dimJ7Jc72R/gq4SXh73kSf4SW
-	 W3S2SqXDZ8JreMPNmRytk0kLOqPMt4pPTM2KwFDLiSdpGYOAhDV7YSFOK+0V2JZWO0
-	 7nF7NDum1ISgff7QbXcGCU3r5HlBsYsM2gVOhodAYG1eR2qlpi+dnrC6ta67PGlcDw
-	 rCWtXseuc1D6g==
-Message-ID: <c8211e69-75d9-439e-a4de-1add711d2a05@kernel.org>
-Date: Wed, 30 Jul 2025 14:46:20 +0200
+	s=arc-20240116; t=1753880188; c=relaxed/simple;
+	bh=zSAAqvx7+WVkof8WJaGgdy/lkwAiHLJS0efBtUvDVRI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hT8lXZLlDBhT51dky8Iq5rMZid8uaSRZdKDgXJETow0BGbNW+PZFhHacHOB/s5ttfe/4W3iVhChbmh4uvL4FsokJpfNW7DRjJ9RBBaqGC6dCaiolXwm8D0kxb8OMKYPvya+9/fc51TEIENswrvqYXQNYbn/C3SvkxF3tTME2xIE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iN41PW32; arc=none smtp.client-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-31f1da6d294so2236942a91.2
+        for <netdev@vger.kernel.org>; Wed, 30 Jul 2025 05:56:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753880186; x=1754484986; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=aYpiCOTMHHGqmnWdnrJ3RKxn0MKiEsCcDqKVDBHVDaw=;
+        b=iN41PW32Hca2xFOmDc3Lm/t7wzmisJcAs13QR8SueShA6U3FARavYh0A7BEvkp1F1o
+         SpHhtdT1YgbjYaAe1JOcAw0HGPM9s/+VI2076ixVg9DqkWP8dzHbtwA7bFHcfaJLoooA
+         mvxYwDgV3VD0IFaaLqnYpF9RMeT3L2aM421IheaLCgVPl3toLIBVwlmokkBdwnWsHV4Z
+         846eas3Rb37skwCjjwMF+EWLodYjYQrXAlG+REcPLnk/Qm5UYQQeGPfUiTVRcfFow1Z5
+         gzWgcMIyva0L40iRwCKA+L/Baz4asX5GkfNBZnDLD6kRp4QOlCJDk0/ol6wRVIm6KFxI
+         vxsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753880186; x=1754484986;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aYpiCOTMHHGqmnWdnrJ3RKxn0MKiEsCcDqKVDBHVDaw=;
+        b=HcT72joZH6zTvuWVt0OVlSZWeuXF3lwrortDbMV8CerFjDeMCusPG83lS6MW0NP6iZ
+         9h4IlkfFdgTHo2DJLgjrha890lN3RFPW7rPiCQ/OHExVLShR97MJfr3I6d+XvRwwU+Yn
+         JjylKRreIzTcafdmUpArzvXNduIxQHWO8Ig3G3UEMfxcMykW2sHC1qNFbtShR+CJV32N
+         hc3fO2v5MxSU9N8fiazdRHMHVKCiT71AUPSzfvaS5EA90E+ULwDMVdvmtZFoSZNs5v3u
+         lTLZIFR3E4/a76aRuIbtO13mclT1VUDUqiDAbxktl1VCVoMwNDq2BoVbCDSEEqwgmD0C
+         rqKA==
+X-Forwarded-Encrypted: i=1; AJvYcCVS7PsEtjA6mQDvqsvCOj2AlzIKnuSj8TVwqnZSNG2b6a0d+Uu6f8NGRS49G3WowS29cl3LGPs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YznnF43IDPKTfTnMbSeAOqlsKs4SivYLe0uIipDKd9vYP5IP97k
+	pjKnETQBXd/zBvvjzYQ14IOFvqRQofSwFtNzjzckfsWccLBeltTG4Z2E
+X-Gm-Gg: ASbGncuhwkSpGipaXkKMYf1WDTrfb0zZZ2gVn2AchGmf2NHKUW9WmfwluEOfg7+V7mr
+	AEnsNocbcuOb5yTgqCfkfSLOR/IGN1jKuw91J7HXmyKDwGw3uYPQJ2s/FzstAffXMpkjnJfecFJ
+	ceF2xBqUpyZeLlBPitjetaJwAqMnZa7ZTMTaWMoPYv/7UdMneweA1jmrvr+mSxiN2bhkpHepjNJ
+	BiKGrjKOeTB0cRbzUo1BGgloqrZz0Mme/W5u9ahg/w9S8MRbcTDHycC8ivle5a+7WnbGAqGuTaZ
+	Y7egHQ+ux9xQgO9wWNRTyJ1OQiIZvgIpE4900FouCqyc2OyLJqMHTPTwWVOa67S1vnkkYtKeRDm
+	lSL8fbN3P/d9Pwq0jC7s8WsOwaNKoMI9r8kyYPw==
+X-Google-Smtp-Source: AGHT+IE1r36xqjJz/GUA05gQwSoThWyW8cE+qNDxOeRVXm0nbbipl/uICAXRevTd5l498frzdpaiMw==
+X-Received: by 2002:a17:90b:17d2:b0:31f:867:d6b4 with SMTP id 98e67ed59e1d1-31f5dd90e75mr4978063a91.10.1753880186485;
+        Wed, 30 Jul 2025 05:56:26 -0700 (PDT)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b3f7f67d30csm7558654a12.34.2025.07.30.05.56.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Jul 2025 05:56:26 -0700 (PDT)
+Date: Wed, 30 Jul 2025 12:56:19 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	eric.dumazet@gmail.com, Dong Chenchen <dongchenchen2@huawei.com>
+Subject: Re: [PATCH net] selftests: avoid using ifconfig
+Message-ID: <aIoWcxoHfToKkjf4@fedora>
+References: <20250730115313.3356036-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 7/7] arm64: dts: qcom: Add lemans evaluation kit (EVK)
- initial board support
-To: Wasim Nazir <wasim.nazir@oss.qualcomm.com>,
- Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Richard Cochran <richardcochran@gmail.com>
-Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- kernel@oss.qualcomm.com, Rakesh Kota <quic_kotarake@quicinc.com>,
- Sayali Lokhande <quic_sayalil@quicinc.com>,
- Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-References: <20250722144926.995064-1-wasim.nazir@oss.qualcomm.com>
- <20250722144926.995064-8-wasim.nazir@oss.qualcomm.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <20250722144926.995064-8-wasim.nazir@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250730115313.3356036-1-edumazet@google.com>
 
-On 22/07/2025 16:49, Wasim Nazir wrote:
-> Lemans EVK is an IoT board without safety monitoring feature of
-> Safety Island(SAIL) subsystem.
+On Wed, Jul 30, 2025 at 11:53:13AM +0000, Eric Dumazet wrote:
+> ifconfig is deprecated and not always present, use ip command instead.
 > 
-> Lemans EVK is single board supporting these peripherals:
->   - Storage: 2 × 128 GB UFS, micro-SD card, EEPROMs for MACs,
->     eMMC on mezzanine card
->   - Audio/Video, Camera & Display ports
->   - Connectivity: RJ45 2.5GbE, WLAN/Bluetooth, CAN/CAN-FD
->   - Sensors: IMU
->   - PCIe ports
->   - USB & UART ports
-> 
-> On top of lemans EVK board additional mezzanine boards can be stacked
-> in future.
-> 
-> Implement basic features like uart/ufs to enable 'boot to shell'.
-> 
-> Co-developed-by: Rakesh Kota <quic_kotarake@quicinc.com>
-> Signed-off-by: Rakesh Kota <quic_kotarake@quicinc.com>
-> Co-developed-by: Sayali Lokhande <quic_sayalil@quicinc.com>
-> Signed-off-by: Sayali Lokhande <quic_sayalil@quicinc.com>
-> Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-> Signed-off-by: Wasim Nazir <wasim.nazir@oss.qualcomm.com>
-> ---
->  arch/arm64/boot/dts/qcom/Makefile       |   1 +
->  arch/arm64/boot/dts/qcom/lemans-evk.dts | 291 ++++++++++++++++++++++++
->  2 files changed, 292 insertions(+)
->  create mode 100644 arch/arm64/boot/dts/qcom/lemans-evk.dts
-> 
-> diff --git a/arch/arm64/boot/dts/qcom/Makefile b/arch/arm64/boot/dts/qcom/Makefile
-> index 2a1941c29537..cbc89c54f92b 100644
-> --- a/arch/arm64/boot/dts/qcom/Makefile
-> +++ b/arch/arm64/boot/dts/qcom/Makefile
-> @@ -31,6 +31,7 @@ dtb-$(CONFIG_ARCH_QCOM)	+= ipq9574-rdp453.dtb
->  dtb-$(CONFIG_ARCH_QCOM)	+= ipq9574-rdp454.dtb
->  dtb-$(CONFIG_ARCH_QCOM)	+= lemans-auto-ride.dtb
->  dtb-$(CONFIG_ARCH_QCOM)	+= lemans-auto-ride-r3.dtb
-> +dtb-$(CONFIG_ARCH_QCOM)	+= lemans-evk.dtb
->  dtb-$(CONFIG_ARCH_QCOM)	+= lemans-ride-r3.dtb
->  dtb-$(CONFIG_ARCH_QCOM)	+= msm8216-samsung-fortuna3g.dtb
->  dtb-$(CONFIG_ARCH_QCOM)	+= msm8916-acer-a1-724.dtb
-> diff --git a/arch/arm64/boot/dts/qcom/lemans-evk.dts b/arch/arm64/boot/dts/qcom/lemans-evk.dts
-> new file mode 100644
-> index 000000000000..dd357d514587
-> --- /dev/null
-> +++ b/arch/arm64/boot/dts/qcom/lemans-evk.dts
-> @@ -0,0 +1,291 @@
-> +// SPDX-License-Identifier: BSD-3-Clause
-> +/*
-> + * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+> Fixes: e0f3b3e5c77a ("selftests: Add test cases for vlan_filter modification during runtime")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Dong Chenchen <dongchenchen2@huawei.com>
 
-Missing date, as discussed in other thread your internal guidelines are
-not relevant here and to my knowledge upstream guidelines (provided in
-other linked discussion) ask for year of first publication.
+Not sure if there is a way to replace the ifconfig in rtnetlink.sh.
 
-Best regards,
-Krzysztof
+Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
 
