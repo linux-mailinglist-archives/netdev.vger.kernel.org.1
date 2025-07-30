@@ -1,338 +1,168 @@
-Return-Path: <netdev+bounces-211010-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211011-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59F0DB162A0
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 16:24:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7E78B162BB
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 16:27:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD70D173F3E
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 14:23:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 31AE91AA1AA1
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 14:27:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA1132D9ECD;
-	Wed, 30 Jul 2025 14:23:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 726BB2D9797;
+	Wed, 30 Jul 2025 14:27:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZZ49GT34"
+	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="66Jzwt4p"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8229C2D8368;
-	Wed, 30 Jul 2025 14:23:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95485263F4E
+	for <netdev@vger.kernel.org>; Wed, 30 Jul 2025 14:27:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.132.182.106
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753885412; cv=none; b=X/9DVeYaN9IG0GMptM5TqDlcXgOjaYhzi3D9ao9/S5AIHhhOIqmshCKVOVlePXdO7IA09ZCq3WMbsOScr+rkxZF9ar9/q2OsZT1le6pgjxDzMROHa1jHrd65gbOG5QKIX2XVjumj+Rp7ViXWglxmENF7zkjrKbaYTRX7ho+cG6s=
+	t=1753885643; cv=none; b=OwaosAl5/o3BTH1alxCVIazm+Be58TGH/5ohoexIqjstQWYnGUbs7Nx1RVZwD2H475WXiUWxV0GKwh5coa8SsKK3fFylxvTIOOkVdJbuYgFiKxR80qDEJR7hUhtRmaUkBmqhFNIR8Kpvdr64UtipZJoBJC9rJrPi5sAnu7wGktk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753885412; c=relaxed/simple;
-	bh=bN3kpeBwpOhmVfqJEu1+fLesJgASyi+hPMoIHv1PTnQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IPWXe9Dvr7civRF68CC7DqtcyidUrnp/qoH3hQOdBoM6nGhnjLbuxfwGh+1M3Zx3aEUvhPh3uM0+O49eLmnQm41b/YNlHXah86TXvhGkTIX8GYeQy2TCRdHhsU4u3MHW6Mix2XV1kN1J1arCMAoX8af2eNqRkBI+MdhRki5LNkQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZZ49GT34; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6230C4CEE7;
-	Wed, 30 Jul 2025 14:23:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753885412;
-	bh=bN3kpeBwpOhmVfqJEu1+fLesJgASyi+hPMoIHv1PTnQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZZ49GT34bpU+9OBIrS+aROiM26mkG8ip1uscxtH0VTiL2gvHo0MoT+8TL4ZWbIwyb
-	 +cw78Y0gveoSajUbNFKLl3wNEc5dL5Qo4FAGloVvopdsXizatNaCONWvomJ0xbiqCl
-	 KyQWVhERFfiSigWxCG45a2/skTYrn+ESmrScseOh/rC1mNKoWGZHXEvECn7cXjFiqz
-	 rAU99WbFZTaS0RsjzEOTbreNZVJcuS+ae9SRG/5oL8tPPsgZ+2MNveymVbrs2x0sA5
-	 78WxI7dnDE7ZTFohCIAv1eQ7AzRBv138vhy4itHbLDjyYL0s5OKkSlMJtVo47zrZcB
-	 lRkhCpakvILIA==
-Date: Wed, 30 Jul 2025 15:23:24 +0100
-From: Simon Horman <horms@kernel.org>
-To: Dipayaan Roy <dipayanroy@linux.microsoft.com>
-Cc: kuba@kernel.org, kys@microsoft.com, haiyangz@microsoft.com,
-	wei.liu@kernel.org, decui@microsoft.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	longli@microsoft.com, kotaranov@microsoft.com, ast@kernel.org,
-	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
-	sdf@fomichev.me, lorenzo@kernel.org, michal.kubiak@intel.com,
-	ernis@linux.microsoft.com, shradhagupta@linux.microsoft.com,
-	shirazsaleem@microsoft.com, rosenp@gmail.com,
-	netdev@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
-	linux-kernel@vger.kernel.org, ssengar@linux.microsoft.com,
-	dipayanroy@microsoft.com
-Subject: Re: [PATCH v3] net: mana: Use page pool fragments for RX buffers
- instead of full pages to improve memory efficiency.
-Message-ID: <20250730142324.GH1877762@horms.kernel.org>
-References: <20250729201410.GA4555@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+	s=arc-20240116; t=1753885643; c=relaxed/simple;
+	bh=IEsS3GavQBhmr4Hn9d18D5V5BjU9JyYWit6IcLcch70=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=Eb1P/EGyNDDciAyEcYfPcu+Bv13/3iPUw+cIr7ddS/7LvvO0GSMWdm1o59tj8NT5TVVD9gxFP1qJ7hVJqL9uF2JtBtZGWBeyfkJbcGVp8Rz2s02A0nowkl8L1fz7pIU8frHlbpE0av71QaY9z3a6Apsq9cbmCzBFfZj+2d7+iNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=66Jzwt4p; arc=none smtp.client-ip=185.132.182.106
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
+Received: from pps.filterd (m0241204.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56UE7Bjh009376;
+	Wed, 30 Jul 2025 16:26:48 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=selector1; bh=
+	DZZ4GqXf7y47QZhCRNieA0XxG6Nm7i3hAzMzrvoMRKA=; b=66Jzwt4p9aAqWnZa
+	jovznjSoYBObAC4bQxUq+uqX3ebgx9xgDeF3+gFrROWR00m0soKjXhjnuKJ+lZTy
+	dJPravJ4nrbuRAqrkOmfxxtrPt45zT4OWwO+xw5iWFbm56XhYOXdCoxue9hIDd32
+	Lybet95DfnapTMoa1kvBdJyGqkIiHECHi1LXoRbf5rIsp5PJonzTZXj7w3vWhWR5
+	Gjb1PfDB9ahzOa+0kvz78K3i8DhQVsWKGCtJdgJyUmT6NsZcNMImyT28StJVTT34
+	sdnmmhvTZMvK5yDRxNK7RL7c+kp3y0c/0HB/XyZToDBFQhYCiDx814NK8Dr4W4ne
+	6scPvQ==
+Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 484pc2jm7s-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 30 Jul 2025 16:26:48 +0200 (MEST)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 10E7E40053;
+	Wed, 30 Jul 2025 16:25:22 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 9C4BC787C1B;
+	Wed, 30 Jul 2025 16:24:33 +0200 (CEST)
+Received: from [10.48.87.141] (10.48.87.141) by SHFDAG1NODE1.st.com
+ (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 30 Jul
+ 2025 16:24:32 +0200
+Message-ID: <27e10ba4-5656-40a8-a709-c1390fee251f@foss.st.com>
+Date: Wed, 30 Jul 2025 16:24:32 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250729201410.GA4555@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC ???net???] net: phy: realtek: fix wake-on-lan support
+To: Andrew Lunn <andrew@lunn.ch>,
+        "Russell King (Oracle)"
+	<rmk+kernel@armlinux.org.uk>
+CC: Heiner Kallweit <hkallweit1@gmail.com>,
+        Daniel Braunwarth
+	<daniel.braunwarth@kuka.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric
+ Dumazet <edumazet@google.com>,
+        Florian Fainelli
+	<florian.fainelli@broadcom.com>,
+        Jakub Kicinski <kuba@kernel.org>, Jon Hunter
+	<jonathanh@nvidia.com>,
+        <netdev@vger.kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>,
+        Thierry Reding <treding@nvidia.com>
+References: <E1uh2Hm-006lvG-PK@rmk-PC.armlinux.org.uk>
+ <a14075fe-a0fc-4c59-b4d3-1060f6fd2676@lunn.ch>
+Content-Language: en-US
+From: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
+In-Reply-To: <a14075fe-a0fc-4c59-b4d3-1060f6fd2676@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SHFCAS1NODE1.st.com (10.75.129.72) To SHFDAG1NODE1.st.com
+ (10.75.129.69)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-07-30_04,2025-07-30_01,2025-03-28_01
 
-On Tue, Jul 29, 2025 at 01:14:10PM -0700, Dipayaan Roy wrote:
-> This patch enhances RX buffer handling in the mana driver by allocating
-> pages from a page pool and slicing them into MTU-sized fragments, rather
-> than dedicating a full page per packet. This approach is especially
-> beneficial on systems with large page sizes like 64KB.
+
+
+On 7/30/25 15:59, Andrew Lunn wrote:
+>> 2. detect whether we can support wake-up by having a valid interrupt,
+>>     and the "wakeup-source" property in DT. If we can, then we mark
+>>     the MDIO device as wakeup capable, and associate the interrupt
+>>     with the wakeup source.
 > 
-> Key improvements:
-> 
-> - Proper integration of page pool for RX buffer allocations.
-> - MTU-sized buffer slicing to improve memory utilization.
-> - Reduce overall per Rx queue memory footprint.
-> - Automatic fallback to full-page buffers when:
->    * Jumbo frames are enabled (MTU > PAGE_SIZE / 2).
->    * The XDP path is active, to avoid complexities with fragment reuse.
-> 
-> Testing on VMs with 64KB pages shows around 200% throughput improvement.
-> Memory efficiency is significantly improved due to reduced wastage in page
-> allocations. Example: We are now able to fit 35 rx buffers in a single 64kb
-> page for MTU size of 1500, instead of 1 rx buffer per page previously.
-> 
-> Tested:
-> 
-> - iperf3, iperf2, and nttcp benchmarks.
-> - Jumbo frames with MTU 9000.
-> - Native XDP programs (XDP_PASS, XDP_DROP, XDP_TX, XDP_REDIRECT) for
->   testing the XDP path in driver.
-> - Memory leak detection (kmemleak).
-> - Driver load/unload, reboot, and stress scenarios.
-> 
-> Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+> We should document "wakeup-source" in ethernet-phy.yaml.
 > 
 
-nit: I'd have put your signed-off-by last,
-     as your're posting it after the Reviewed-by tags were provided
++1
 
-     Also, no blank line between tags please.
+> What are the different hardware architectures?
+> 
+> 1) A single interrupt line from the PHY to the SoC, which does both
+> link status and WoL.
+> 
+> 2) The PHY has a dedicated WoL output pin, which is connected to an
+> interrupt.
+> 
+> 3) The PHY has a dedicated WoL output pin, which is connected directly
+> to a PMIC. No software involved, the pin toggling turns the power back
+> on.
+> 
 
-> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-> Reviewed-by: Saurabh Sengar <ssengar@linux.microsoft.com>
-> Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+Just my 2 cents:
 
-...
+In some cases like the LAN8742, there are some flags that need to be
+cleared when waking up in order to be able to handle another WoL event.
+It can be done either in the suspend()/resume() or in an interrupt
+handler of the PHY. In 3) This suggests that the interrupt is somehow
+forwarded to the Linux kernel.
 
-> diff --git a/drivers/net/ethernet/microsoft/mana/mana_bpf.c b/drivers/net/ethernet/microsoft/mana/mana_bpf.c
-> index d30721d4516f..1cf470b25167 100644
-> --- a/drivers/net/ethernet/microsoft/mana/mana_bpf.c
-> +++ b/drivers/net/ethernet/microsoft/mana/mana_bpf.c
-> @@ -174,6 +174,8 @@ static int mana_xdp_set(struct net_device *ndev, struct bpf_prog *prog,
->  	struct mana_port_context *apc = netdev_priv(ndev);
->  	struct bpf_prog *old_prog;
->  	struct gdma_context *gc;
-> +	int err = 0;
-> +	bool dealloc_rxbufs_pre = false;
+This is what I was ultimately trying to do in two steps with the TEE
+notifying the kernel of that interrupt.
 
-Please arrange local variables in Networking code in reverse xmas tree
-order - longest line to shortest.
+Moreover, if a WoL event occurs when the system is not in a low-power
+mode, then the flags will never be cleared and another WoL event cannot
+be detected while the system is in a low-power mode.
 
-Edward Cree's tool can be of assistance in this area:
-https://github.com/ecree-solarflare/xmastree
+Maybe we can argue that these flags can be cleared in suspend() and
+and resume(). But then, if there's no interrupt to be handled by the
+kernel, how do we know that we have woken up from a WoL event?
 
->  
->  	gc = apc->ac->gdma_dev->gdma_context;
->  
-> @@ -198,15 +200,45 @@ static int mana_xdp_set(struct net_device *ndev, struct bpf_prog *prog,
->  	if (old_prog)
->  		bpf_prog_put(old_prog);
->  
-> -	if (apc->port_is_up)
-> +	if (apc->port_is_up) {
-> +		/* Re-create rxq's after xdp prog was loaded or unloaded.
-> +		 * Ex: re create rxq's to switch from full pages to smaller
-> +		 * size page fragments when xdp prog is unloaded and vice-versa.
-> +		 */
-> +
-> +		/* Pre-allocate buffers to prevent failure in mana_attach later */
+IMHO, I think 3) may optionally declare another interrupt as well
+for WoL events.
 
-As is still preferred for Networking code, please line wrap code so that it
-is 80 columns wide or less, where it can be done without reducing
-readability. This is the case for the line above. But not the netdev_err()
-call below.
+Eventually, 2) and 3) would have 1 interrupt(WoL) if PHY is in polling
+mode and 2 if not?
 
-Flagged by: checkpatch.pl --max-line-length=80
+Please tell me if that makes any sense to you or if I missed something.
 
-> +		err = mana_pre_alloc_rxbufs(apc, ndev->mtu, apc->num_queues);
-> +		if (err) {
-> +			netdev_err(ndev,
-> +				   "Insufficient memory for rx buf config change\n");
-
-I believe that any errors in mana_pre_alloc_rxbufs() will
-relate to memory allocation. And that errors will be logged by
-the mm subsustem. So no log is needed here.
-
-But I do wonder if here, and elsewhere, extack should be set on error.
-
-> +			goto out;
-> +		}
-> +		dealloc_rxbufs_pre = true;
-> +
-> +		err = mana_detach(ndev, false);
-> +		if (err) {
-> +			netdev_err(ndev, "mana_detach failed at xdp set: %d\n", err);
-> +			goto out;
-> +		}
-> +
-> +		err = mana_attach(ndev);
-> +		if (err) {
-> +			netdev_err(ndev, "mana_attach failed at xdp set: %d\n", err);
-> +			goto out;
-> +		}
-> +
->  		mana_chn_setxdp(apc, prog);
-> +	}
->  
->  	if (prog)
->  		ndev->max_mtu = MANA_XDP_MTU_MAX;
->  	else
->  		ndev->max_mtu = gc->adapter_mtu - ETH_HLEN;
->  
-> -	return 0;
-> +out:
-> +	if (dealloc_rxbufs_pre)
-> +		mana_pre_dealloc_rxbufs(apc);
-> +	return err;
->  }
-
-It's subjective to be sure, but I would suggest separating the
-error and non-error paths wrt calling mana_pre_dealloc_rxbufs().
-I feel this is an easier flow to parse (is my proposal correct?),
-and more idiomatic.
-
-I'm suggesting something like this incremental change (compile tested only!).
-
-Suggestion #1
-
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_bpf.c b/drivers/net/ethernet/microsoft/mana/mana_bpf.c
-index b6cbe853dc98..bbe64330a3e1 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_bpf.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_bpf.c
-@@ -174,8 +174,7 @@ static int mana_xdp_set(struct net_device *ndev, struct bpf_prog *prog,
- 	struct mana_port_context *apc = netdev_priv(ndev);
- 	struct bpf_prog *old_prog;
- 	struct gdma_context *gc;
--	int err = 0;
--	bool dealloc_rxbufs_pre = false;
-+	int err;
- 
- 	gc = apc->ac->gdma_dev->gdma_context;
- 
-@@ -211,23 +210,23 @@ static int mana_xdp_set(struct net_device *ndev, struct bpf_prog *prog,
- 		if (err) {
- 			netdev_err(ndev,
- 				   "Insufficient memory for rx buf config change\n");
--			goto out;
-+			return err;
- 		}
--		dealloc_rxbufs_pre = true;
- 
- 		err = mana_detach(ndev, false);
- 		if (err) {
- 			netdev_err(ndev, "mana_detach failed at xdp set: %d\n", err);
--			goto out;
-+			goto err_dealloc_rxbuffs;
- 		}
- 
- 		err = mana_attach(ndev);
- 		if (err) {
- 			netdev_err(ndev, "mana_attach failed at xdp set: %d\n", err);
--			goto out;
-+			goto err_dealloc_rxbuffs;
- 		}
- 
- 		mana_chn_setxdp(apc, prog);
-+		mana_pre_dealloc_rxbufs(apc);
- 	}
- 
- 	if (prog)
-@@ -235,9 +234,10 @@ static int mana_xdp_set(struct net_device *ndev, struct bpf_prog *prog,
- 	else
- 		ndev->max_mtu = gc->adapter_mtu - ETH_HLEN;
- 
--out:
--	if (dealloc_rxbufs_pre)
--		mana_pre_dealloc_rxbufs(apc);
-+	return 0;
-+
-+err_dealloc_rxbuffs:
-+	mana_pre_dealloc_rxbufs(apc);
- 	return err;
- }
-
-Suggestion #2
-
-Looking at the scope of the mana_pre_alloc_rxbufs() allocation,
-it seems to me that it would be nicer to move the rxq recreation
-to a separate function.
-
-Something like this (also compile tested only):
-
-/* Re-create rxq's after xdp prog was loaded or unloaded.
- * Ex: re create rxq's to switch from full pages to smaller size page
- * fragments when xdp prog is unloaded and vice-versa.
- */
-static int mana_recreate_rxqs(struct net_device *ndev, struct bpf_prog *prog)
-{
-	struct mana_port_context *apc = netdev_priv(ndev);
-	int err;
-
-	if (!apc->port_is_up)
-		return 0;
-
-	/* Pre-allocate buffers to prevent failure in mana_attach later */
-	err = mana_pre_alloc_rxbufs(apc, ndev->mtu, apc->num_queues);
-	if (err) {
-		netdev_err(ndev,
-			   "Insufficient memory for rx buf config change\n");
-		return err;
-	}
-
-	err = mana_detach(ndev, false);
-	if (err) {
-		netdev_err(ndev, "mana_detach failed at xdp set: %d\n", err);
-		goto err_dealloc_rxbuffs;
-	}
-
-	err = mana_attach(ndev);
-	if (err) {
-		netdev_err(ndev, "mana_attach failed at xdp set: %d\n", err);
-		goto err_dealloc_rxbuffs;
-	}
-
-	mana_chn_setxdp(apc, prog);
-	mana_pre_dealloc_rxbufs(apc);
-
-	return 0;
-
-err_dealloc_rxbuffs:
-	mana_pre_dealloc_rxbufs(apc);
-	return err;
-}
-
-Note, I still think some thought should be given to setting extack on
-error.  But I didn't address that in my suggestions above.
-
-
-On process, this appears to be an enhancement targeted at net-next.
-It would be best to set the target tree in the subject, like this:
-
-	Subject [PATCH net-next v4] ...
-
-And if so, net-next is currently closed for the merge-window.
-
-## Form letter - net-next-closed
-
-The merge window for v6.17 has begun and therefore net-next is closed
-for new drivers, features, code refactoring and optimizations. We are
-currently accepting bug fixes only.
-
-Please repost when net-next reopens after 11th August.
-
-RFC patches sent for review only are obviously welcome at any time.
-
-See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
-
--- 
-pw-bot: defer
+> For 1), i don't think 'wakeup-source' tells us anything useful. The
+> driver just needs to check that interrupts are in use.
+> 
+> For 2) we should recommend that the wakeup interrupt is called
+> "wakeup", following wakeup-source.txt, and the "wakeup-source"
+> property is present.
+> 
+> For 3) its more magical, there is no interrupt properties involved, so
+> we do need the "wakeup-source" to know that the pin is actually
+> connected to something.
+> 
+> We need to differentiate between drivers newly getting WoL support,
+> and existing drivers. We can be much more strict with new support.
+> 
+> 	Andrew
 
