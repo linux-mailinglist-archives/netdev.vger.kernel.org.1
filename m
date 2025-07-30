@@ -1,271 +1,159 @@
-Return-Path: <netdev+bounces-210924-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210925-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA540B15865
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 07:12:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2972CB15870
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 07:30:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CABE05457B3
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 05:12:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4715D17DAFC
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 05:30:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 585421DDC08;
-	Wed, 30 Jul 2025 05:12:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="sAPZSXOt"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD9261E0DEA;
+	Wed, 30 Jul 2025 05:30:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2050.outbound.protection.outlook.com [40.107.223.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f79.google.com (mail-io1-f79.google.com [209.85.166.79])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D25A15AF6;
-	Wed, 30 Jul 2025 05:12:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.50
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753852338; cv=fail; b=krQJcjLFdo/cCJ7G50cNEboR37eAAWajCMIJ5El3SHG3zQ2nHwyd/XUbk2pwXW83yIi14b5Lxf0obRmgITTbp2HOBPpiesBJaS43o7qsxOSvgumh4saobkKaTj/3qsi6xzm64enEHL45V+0H1J7W38XsNRufkWLyynqNXU8Faq8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753852338; c=relaxed/simple;
-	bh=U66RslzH+ISZJYfFfQ9yxZaEoR0froaCh37tacp+Z7c=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=VRo5iUlwWpUrkhI1T0z2UKFyzH4aT2H0h26HUaV1htzb9F18RQL9I8RvrUiJLEvCETpiARkNcn12xD1mShEl4lPmZCBjE8UThmURwENiN0zPoVMazm7NaokVc/cWErxxAgv+5ryqiitN4OXKGRJCkLPJpSWUQLgtkhQvPDBWPpU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=sAPZSXOt; arc=fail smtp.client-ip=40.107.223.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=S7V+SbftlavNf4R6uAZoJiRT5x6CxvsetMGxn0DMt8xrm8d+f4GAacaAGYGk9Bxg3nhgD31u2Drfa+vNscVt5eMi1XCctX+3iPoWfmKR+YWRlPRScKsV50lJ5W67mMWC5A9ldQjGzZUSP8vkATlytqTCLMSlasOmLgsXu62fG0N98GTN/mHA9zXgk46IoKpSZMw6u3LJPl0fIfHedKSoJsrGYi3jpD0qCBoKRyCvmJ+xsfIoXNZaHYMkYzLfiMX2f8AOFeot4mqpjlGjaXTFvwI3F1FGqiyg5iTvL+ZlpOGhwSwp1JWU5wx0fRk5u95E+8Fa9MyVFRPzly2oR016mQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0dUaCroVle60YM4yzf5FesD/djAS66r+pYhXiLiZ8J8=;
- b=QzJcGVBcBTUi87vq7MEYrvsPnrJyn/LSMbrsK4FelPbGSw1soDgkBGZDvOjKVQlu1VmymFO5FrU4lSLQYUmnURJZoqbdKK/lcQMXOu1Esg5jaxRODZ3EpSiEz6j1c8Jpeb1dZ67VTLaYU5LjnJQQw/cWtGueSxfLTtdHZYt2GpLvwUJhwtIGE9s4ZBi05fxUyzJkKdTnke6g4OrUSDnefvDfF4uIt8ao1ktvPKkF7iorfGGJjWv/7sM0orNJj2RloqCNLj/x7D5ZFhC7RuY25C3LJA2poHMNCJG7LGiSIeZZy3x+m6KfJ6O5kHYLS005NZiQM3/VrdIySSiTGXxCxQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0dUaCroVle60YM4yzf5FesD/djAS66r+pYhXiLiZ8J8=;
- b=sAPZSXOtpAn6sBUYltqdqQRiCryPJGuwfgZkGl9lTE6i5cIHIIsNL3lgoYxrhhcGoivM2LokvnSnYaqf29i0Zk4WPuprlmEaw9UGsSTGKdAB40ge7f57FsbHgCnJbMezEOpfd5RWoQ63VIdzFfIJAbIjEuGxqSBeglUTXh0oZ2c=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from IA1PR12MB9064.namprd12.prod.outlook.com (2603:10b6:208:3a8::19)
- by IA4PR12MB9763.namprd12.prod.outlook.com (2603:10b6:208:55a::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8989.11; Wed, 30 Jul
- 2025 05:12:14 +0000
-Received: from IA1PR12MB9064.namprd12.prod.outlook.com
- ([fe80::1f25:d062:c8f3:ade3]) by IA1PR12MB9064.namprd12.prod.outlook.com
- ([fe80::1f25:d062:c8f3:ade3%5]) with mapi id 15.20.8964.019; Wed, 30 Jul 2025
- 05:12:14 +0000
-Message-ID: <1d64b342-2ec2-b3ed-c341-9c05d36bcbef@amd.com>
-Date: Wed, 30 Jul 2025 10:42:04 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.0
-Subject: Re: [PATCH v4 14/14] RDMA/ionic: Add Makefile/Kconfig to kernel build
- environment
-Content-Language: en-US
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: allen.hubbe@amd.com, nikhil.agarwal@amd.com, linux-rdma@vger.kernel.org,
- netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, shannon.nelson@amd.com, brett.creeley@amd.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, jgg@ziepe.ca, corbet@lwn.net, leon@kernel.org,
- andrew+netdev@lunn.ch
-References: <20250723173149.2568776-1-abhijit.gangurde@amd.com>
- <20250723173149.2568776-15-abhijit.gangurde@amd.com>
- <62345993-46bb-48d9-853b-09a82b03edaf@infradead.org>
-From: Abhijit Gangurde <abhijit.gangurde@amd.com>
-In-Reply-To: <62345993-46bb-48d9-853b-09a82b03edaf@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN3PR01CA0044.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:98::21) To IA1PR12MB9064.namprd12.prod.outlook.com
- (2603:10b6:208:3a8::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28E501F949
+	for <netdev@vger.kernel.org>; Wed, 30 Jul 2025 05:30:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.79
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753853429; cv=none; b=Cm81ZCMRzgmbOWkg2ucWL4Ou7tKBQetGXTVMcZgCjDdgq5rSzUqay4Fk/DD3/Y4iQEy0mMfaRkebbWmlh+z5hU+1ydYSh+nC/F/DyXzC3TDg26UoFE1AUWV1gIwQWD5rScckx3JDEIS3I0oOyEGkSq7rDn17LmgAssiSINLwCns=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753853429; c=relaxed/simple;
+	bh=SWXjA3T0iZABKRIwmCf5Uzft+ycSIlMkdD+XTW84w/o=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=V/MTA9kLcHR485zJQBXkZ4R0KeESqzT9RTetY4e4GrPZM8N7GFuladbxYLbGgdwS7uuPxC7Q8n5fvdaS0/PU7l4jUzg0pSVxfghYo4xtd4jLdbarZdkPSc/MQQ6A33rjjeJS+ElQAVYpX8iSw4TMIW/+0bykO4Icl/u3PUQVwBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f79.google.com with SMTP id ca18e2360f4ac-87c33c0b62eso572652239f.2
+        for <netdev@vger.kernel.org>; Tue, 29 Jul 2025 22:30:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753853427; x=1754458227;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=eu7fGBCIzOPa9YHCMscfdaivYVWI9C4AstnrKLseCYE=;
+        b=JLTMli0zVsCxMoMarVniLiLjjxvinJP31nyQI4yU2hGDWMM4aPwDYHPnPahXgylmpa
+         NjZgoW1AsqmMCz+rQ4pgxVLTClMhgpEneafFmuqivP3fxHWzkLPT9UAsrSbfQibGkBrj
+         ZwZju0oPKo4qZaKg4kr144Z4GjRso7Paj0gt0Wd4k3q/uuQilwyEX6uun+GdUIlrMyZ9
+         oq/NuG91CmJodpgMccv9+2i9hkE0mI+pB+XhLTeRtdYMMBasiKYdEqfAO9gWzU+66oIR
+         CwCjezTqZX28pgsi7gxgreCTxniyBGS76dty6BmmzKz7gBBG3kZSYIm+n/ZoGyFubb65
+         Gk3A==
+X-Forwarded-Encrypted: i=1; AJvYcCXnxek7AzG8d7zHZtjKM/1LZJFzikGKXGI8ioT81rYc1VjXXtjXZ52/DIXrGtskjEF0E8ACFcE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz4gqtKW0gpWeoKqqlky7qO9TP5SABxpy+dT/5LHVtfaz0V6xlg
+	4a/DJugf1qc0yrtwpt9pb+D5IpoxPcbku229KKNpXaEyAd5JWdurGaO/QriMQmQZgNceggCTnT+
+	Bs262lliV2rG3cfJwKARz5easRKH3pJJRZOMNBKhzflmoHeEbTfVRysoBS5w=
+X-Google-Smtp-Source: AGHT+IGbEBXcBVdHTDiadmIrdZtqg/YJT1t5jbW5zXbtps0IXePdqO8BBqN40v43mfu3JJrTWicRPG+91/LmheYL2272IcmGFJuQ
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: IA1PR12MB9064:EE_|IA4PR12MB9763:EE_
-X-MS-Office365-Filtering-Correlation-Id: 74e1da09-edfc-4e57-ef6d-08ddcf27a53f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?SERqdHRPeWtabVRYR3J5SE9NRWxkWVBWeWFTeGV4dlNFaEJXZHFXKzk3R3BM?=
- =?utf-8?B?UWNhZkV6Y3FnVmp2Y0tkOVhoWTZKVC82NkJEREF1L2RNcDJ0b29Ic1oxSU83?=
- =?utf-8?B?SWVrNjlEcithLzc4MWU2WnBiYUl3T0tIOGY1dUI5bHdGQ2pjRG9Ma3pvU2JT?=
- =?utf-8?B?WHdaKzhqZGJPUm5lRzRLVkpMR2E3bE5VclR5cElwbVRqdXJKWjRtdEFQVzdU?=
- =?utf-8?B?MWZoR2NRSDZFTVRtdllHSzFZb3pTS0c4QTRTZXNjZm4zKzd2enFaZXRjVlV6?=
- =?utf-8?B?Vm5xUW14VGNkOHhQdXlPa2Z4VktnUXJORlVCd2ZWQ2JrbmFqQ3c1Sm0zWXB0?=
- =?utf-8?B?aEJ5cWVsU2E0c2tEWENhaTNmb1RLM2tUQnJnQWtPejZNeS9IK2xySVlVcndX?=
- =?utf-8?B?MzFkM2JvaVZHR3dMcEo1YkVFaHhoM3ZuNyt1S0l5disyZ3NHQ1o0UlVCMzFZ?=
- =?utf-8?B?bndUakJmMHdqZldPRnloSTNsdXVaKzRucTFLclB3YTh5WlY4RldBcHJ1Q2Vu?=
- =?utf-8?B?TlVSazc0ZHNZOWFDcW9CUnNKQ1pxNlZ3Ykwrc0RnNGZBVUZpQVcvdEZaSkFD?=
- =?utf-8?B?MFhpNVpsTjd6dzRnSk8xWnFwSVNVTUIxd0kxSm84UTNsT2Y3MTlCTkJZQnpH?=
- =?utf-8?B?OTM4RkNBVldLTTlHNElDbjBvNGlDb0FpRWN1R1IyVVN1RUFlZ1krSmltTzF6?=
- =?utf-8?B?bGtPZ2s0OVg4U3gyV3Ria3NtdkFMclo3SDdySzNoeVVwRFFoZzBvalI4NUJ2?=
- =?utf-8?B?R2xBM2N6K2VBVSt0TitWQmJqWmxUQWliS1hVQzErelJwTlI2SWpSQWJDVm1W?=
- =?utf-8?B?WC8wcFlwVkVJc0NOVEFBeWZIVGFaM1FPclIzcCs1OXdYbDV3TVRtNWwxaVlQ?=
- =?utf-8?B?b0JZbkorWDdiQ1RINWxPVnNDWDhhU21LVEFvejA0dmRYQS93Ujd2QnFPNkZp?=
- =?utf-8?B?ZzcvT2pFN3Rqek1kMFI1QytIMGpnTWJWZ1RBUWp6d3FjSlVmUWtDaDd0d2Vw?=
- =?utf-8?B?dHVEMkVIcHpZQWRoNmwvQ2tacVJLYjRVaisrZWQ3aDRGQ0NxN0ZaSVI3SWYz?=
- =?utf-8?B?UXdQbm5SKzdFZmRmb2diVWdlZ1E5Q2VxTE43SnBpQi9YdDh3bDlkenh1Vy8v?=
- =?utf-8?B?VnBFeDZKaStCTVRTdlIvcmRDS0pjdXdNSDVkL2JKSTdhS3BFelZnc21jTlhv?=
- =?utf-8?B?NFVOQ1BhUjVqM2VHamdielZVMGJNNVMyZDVWemNtVGZZaFNENG1sb3ZhR282?=
- =?utf-8?B?VXg5R0dibHJHYVNrZTFENUZLTURteWdPbGxodHgwaUh4L1BwWHZBVFY3dmoz?=
- =?utf-8?B?MzVQR0FRVjIwamhPd3cxaDVjQVZ4Y1M0QU9QOGNSb1dXbGxTRXQxZGRYOHVI?=
- =?utf-8?B?S1dzbHpFYXQ1cFBUTFErRXQ1SEtUYU84VlBSSDZHUi94YlUvRTRIOWlmWmdS?=
- =?utf-8?B?eE0vYWI4QmNVNlRCTnVGQXV5clhHd3YxeUlxS1BrL2hrbkt4ZUNPNWVGRUg0?=
- =?utf-8?B?VGpod3dibURkelhrU3ZmdGYyZmdwVEUwbUlzTE5QUHZWek5LbzFHUkt0YXAv?=
- =?utf-8?B?ZXptNVJWWkRWNEF3RnlXaHNVT3IvN0pkUGlieUNVcjdEb01RNW9JWVJsWlFl?=
- =?utf-8?B?UDVMTnVLWHFFMmhDMkFoQXRnSERyVGhnc1o5eTNmbVhBUHM2RG5JSThYSFBI?=
- =?utf-8?B?VnhZd0JIMjJoUkpGZ2pzRHZmU1dFN1dxY2lXVDc0ZkJaTXBndHhhT1oyeGVU?=
- =?utf-8?B?dGh0dTZrYnFiZi90dGZXOVR6aThsSk1yMXRzTVVzSjUzb2hFUjZrSjVYcTMr?=
- =?utf-8?B?amVzbWsvK1ROVGVJVHErV2VWOHM3Y3JjSkM4SlZEK1FjR2gvZEoyNHk0L0lR?=
- =?utf-8?B?Z2l1T1l4ek44dUlLK0o1QUJlZVNSY2dDaU9KU3JaRnJPOCtIdDhCdlNUMVRW?=
- =?utf-8?Q?jJKOgGrAgLo=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR12MB9064.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?Y2FKWkowTHl2V0VCYTJiMi92Q3pWakI4N1Z2MVN3eTFIZEgzNkFtbDdlSlRM?=
- =?utf-8?B?RnJMbE5HTk9FR2h6ejBGbVVlL0lHOVNQeldCVlJ4elYwODJNMGhKTktIY2FZ?=
- =?utf-8?B?alRlRHNyd2ZrZEFydVZ6RUNjS2F3Ulk5bEJmYkxqQ05WMHFBcFBYZ090SU9T?=
- =?utf-8?B?Y0dzQklBOXZUcXpzc0trVGQrRVZmWGFTL3QxVGRzZ25oM1VuVS9lT2Jqdy8y?=
- =?utf-8?B?VWFoL0ZwaTM0UEo0U28xSjJpTnVHaGpHTVdNUXJCYnNVUGU5M3ZHOEU1SnhQ?=
- =?utf-8?B?WWRTZTJFRzEvYm9DbE41VDdiaVhkLzFKT1lMUURkRFN6ZTJqSWo3eFArQ1BL?=
- =?utf-8?B?UHV0N0ZaOWpQcWM5ZVVQMW4xcUhhaUlUcFd5QmN4ejNwMUhObU0wQW1hTDk2?=
- =?utf-8?B?RkRiUnRMTkZ5czF6UTVCakJQKzg3T2o2RmpxSVU1a25LWnNkY1BRSDNDYmU1?=
- =?utf-8?B?clNSYVhGeTlTNGxCQ3lPazd3YWUwWFhjcDlwa21LNkFrdWhXVU5CK3gyTEdw?=
- =?utf-8?B?NVk5bmx1NUF6dW9yU1VhQ0R3ZnZ5ZUx6OWZwTFpkTVJEekR6S25pZGFidWh5?=
- =?utf-8?B?ZUZvSEdqOFhlTVMyM2tZV0pqdlNMRDBJT1ZSZ3NRNks1RVBXZFo5SzY3YXd4?=
- =?utf-8?B?c2F6UEtEbW02M0h5NGVBZGJ4eE91RVlJNGlxSmtnUmZnUk4vNkFXcDRzZ1dU?=
- =?utf-8?B?S1pVWS8vOVFkSTg1L0lyZHE0anNOWjRPbkY4MGd4QVVYbEtVeHZBdUZiVjU1?=
- =?utf-8?B?Y0FLaXBLYjZFcGVFaGl2Y2hCdm04TGpPQy90c2lZU0dMM3ltbUdRdzZObVUy?=
- =?utf-8?B?V1I2eURwSTZwbktiNXp4bWR6TW42R2taQ1YrL0Y0U3paR2dSMFV0cUlOc1ZR?=
- =?utf-8?B?ejJwK0plNE81UXJzKy9GRVNDN2NTemxQZEJxdUszaHppdmZIeWFQcnJuVmJ5?=
- =?utf-8?B?L1BFeXFEenloYmFqYXpSL0cyR3A0OU5sOFB3L1RlaCtZSjBBZksxaTg2Q0Ra?=
- =?utf-8?B?LzM0aTYvY2dpVGRpNjYreWdqd0RVdDNtZjluOHVQckN0eEl1WlFDOEhyNllS?=
- =?utf-8?B?U2Rjb0dtc0RCMENZWTdsR2pRMVhEalJjWmk0RCtiOHgrY2kvNCtob09qQ3pv?=
- =?utf-8?B?d2l1TG1aVHhZWXdYMWgyM25MSmgrUnR0T3l0S3E3RHBUMERIbU9VMjFML2lG?=
- =?utf-8?B?ejVzSjZGTnFQNE5UVDVZc0lESjlnUWtOa0NJMjU3UG0vNWMxelovTEptWG50?=
- =?utf-8?B?STFSRklQR1NEU0phNjVLdEVNRTNwRkNiMjVia0xNUDhkT0dlVjd2UmZua0pn?=
- =?utf-8?B?NTRVODQzanhsMmlQNmlFVFJ0U1ozbU1uUVgvZU1IOHM5VlF4cXFxZEFadVlX?=
- =?utf-8?B?b3cxb2c2MUxkWk80OWt5YTlkVVFEZk9oQ0RPN0NVY3RBSnN2aEhwVmlhOWlH?=
- =?utf-8?B?NitRM3dyUXZhbmVjZTB5SDF6STNxSmU2QkQxTGgrME4zNGoxY1g5VXU3NmtR?=
- =?utf-8?B?SWRNOWovUGRrWUtpTmwxMWY0QXc0SHd3SE1aYnYwc1ZFb0Z5bTNPTnRWbDV2?=
- =?utf-8?B?UUdCSmZ6d3FSVmlqRWUySjg4UkZSQmRWUzJ4RitnbWZVcy9wWVVicGlEKzYw?=
- =?utf-8?B?UHFOWFFiK2VSVEIrSTZoSDRSNWUwVXBKN2RvUGV3OVN0NlBqSUdDK0RCd0NK?=
- =?utf-8?B?RWlsbW96aUMwa2dxRUtHaUJMYnFZRmVsTkY3R2M3Q0NpMHZOYWhtR3ZqOGRI?=
- =?utf-8?B?UUhrWFFDRTBUNWh6c3dyMFQ3WktUaFF3ZWF1eU5FNEpJSVQwVFFzWE9yY0d6?=
- =?utf-8?B?VkRyaEhTa1hJS1dnVlNBTkQrSTVyYW9xRUIzM3hrOTZBeTVQQ2JsbnlEUjMy?=
- =?utf-8?B?b3RVamUrMUthNUtWQ3ZKV3FQZ0VraDBkaTdPZ0hqTFN2N2IzNjVPV2FHMDcx?=
- =?utf-8?B?UWQzbmZmMkNpaWlwUzV6NEduK2lIYWlKN1EvR1pCRGxVdmY1SjJDRnRBQ3Yr?=
- =?utf-8?B?eVIwMllZUi9MS0RiQlAySmJ6emwrVmxBSk5aUnJsNzFOWnZ5d0NCMjBlUElG?=
- =?utf-8?B?UjBjcW1tYm9wRHNkdjAvTUdScjQ1ZHNCS1JYMXpJcEtadGhpZ0FqZWJCZ1Jw?=
- =?utf-8?Q?mbKoU55Fjr60GJhE1aaz80al2?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 74e1da09-edfc-4e57-ef6d-08ddcf27a53f
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR12MB9064.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jul 2025 05:12:14.3266
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: maPerKsvS7E2P4v7NVhGF6t0SqW4ZbmYFf0TI/XJIen492XMZTOEka5yl5iDy5hhrywcU8R8K3MgQM+s3Rt5lQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA4PR12MB9763
+X-Received: by 2002:a05:6602:1592:b0:85d:b054:6eb9 with SMTP id
+ ca18e2360f4ac-88138b04598mr386025539f.14.1753853427267; Tue, 29 Jul 2025
+ 22:30:27 -0700 (PDT)
+Date: Tue, 29 Jul 2025 22:30:27 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6889adf3.050a0220.5d226.0002.GAE@google.com>
+Subject: [syzbot] [netfilter?] WARNING in __nf_unregister_net_hook (9)
+From: syzbot <syzbot+78ac1e46d2966eb70fda@syzkaller.appspotmail.com>
+To: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com, 
+	horms@kernel.org, kadlec@netfilter.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    9312ee76490d octeontx2-af: use unsigned int as iterator fo..
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=114b88a2580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=4b71a7f00d74e4f3
+dashboard link: https://syzkaller.appspot.com/bug?extid=78ac1e46d2966eb70fda
+compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/b381ecf9ad30/disk-9312ee76.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/ebd0e7846e92/vmlinux-9312ee76.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/b9c68d721e9c/bzImage-9312ee76.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+78ac1e46d2966eb70fda@syzkaller.appspotmail.com
+
+x_tables: ip6_tables: mh match: only valid for protocol 135
+------------[ cut here ]------------
+hook not found, pf 10 num 1
+WARNING: CPU: 0 PID: 7813 at net/netfilter/core.c:514 __nf_unregister_net_hook+0x30a/0x700 net/netfilter/core.c:514
+Modules linked in:
+CPU: 0 UID: 0 PID: 7813 Comm: syz.1.502 Not tainted 6.16.0-rc7-syzkaller-01904-g9312ee76490d #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
+RIP: 0010:__nf_unregister_net_hook+0x30a/0x700 net/netfilter/core.c:514
+Code: 58 59 ef 05 01 90 48 8b 44 24 10 0f b6 04 28 84 c0 0f 85 e3 03 00 00 41 8b 17 48 c7 c7 60 8f 98 8c 44 89 ee e8 07 46 e7 f7 90 <0f> 0b 90 90 e9 d8 01 00 00 e8 98 bf d3 01 89 c3 31 ff 89 c6 e8 1d
+RSP: 0018:ffffc9000e8a7768 EFLAGS: 00010246
+RAX: d399e8c7c2db4300 RBX: ffff8880688c2400 RCX: ffff88802c435a00
+RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000002
+RBP: dffffc0000000000 R08: 0000000000000003 R09: 0000000000000004
+R10: dffffc0000000000 R11: fffffbfff1bfaa6c R12: ffff888029a72440
+R13: 000000000000000a R14: ffff888029a736c0 R15: ffffffff8c9a21fc
+FS:  00007f5152aa66c0(0000) GS:ffff888125c12000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000000110c34c54a CR3: 0000000027c74000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ nf_unregister_net_hook net/netfilter/core.c:-1 [inline]
+ nf_unregister_net_hooks+0xcb/0x140 net/netfilter/core.c:610
+ synproxy_tg6_destroy+0x58/0xb0 net/ipv6/netfilter/ip6t_SYNPROXY.c:94
+ cleanup_entry+0x265/0x320 net/ipv6/netfilter/ip6_tables.c:669
+ translate_table+0x1e5f/0x2040 net/ipv6/netfilter/ip6_tables.c:744
+ do_replace net/ipv6/netfilter/ip6_tables.c:1154 [inline]
+ do_ip6t_set_ctl+0x970/0xce0 net/ipv6/netfilter/ip6_tables.c:1644
+ nf_setsockopt+0x26f/0x290 net/netfilter/nf_sockopt.c:101
+ do_sock_setsockopt+0x179/0x1b0 net/socket.c:2344
+ __sys_setsockopt net/socket.c:2369 [inline]
+ __do_sys_setsockopt net/socket.c:2375 [inline]
+ __se_sys_setsockopt net/socket.c:2372 [inline]
+ __x64_sys_setsockopt+0x13f/0x1b0 net/socket.c:2372
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f5151b8e9a9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f5152aa6038 EFLAGS: 00000246 ORIG_RAX: 0000000000000036
+RAX: ffffffffffffffda RBX: 00007f5151db6080 RCX: 00007f5151b8e9a9
+RDX: 0000000000000040 RSI: 0000000000000029 RDI: 000000000000000d
+RBP: 00007f5151c10d69 R08: 0000000000000470 R09: 0000000000000000
+R10: 0000200000000480 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 00007f5151db6080 R15: 00007ffc85b4e498
+ </TASK>
 
 
-On 7/23/25 23:40, Randy Dunlap wrote:
->
-> On 7/23/25 10:31 AM, Abhijit Gangurde wrote:
->> Add ionic to the kernel build environment.
->>
->> Co-developed-by: Allen Hubbe <allen.hubbe@amd.com>
->> Signed-off-by: Allen Hubbe <allen.hubbe@amd.com>
->> Signed-off-by: Abhijit Gangurde <abhijit.gangurde@amd.com>
->> ---
->> v2->v3
->>    - Removed select of ethernet driver
->>    - Fixed make htmldocs error
->>
->>   .../device_drivers/ethernet/index.rst         |  1 +
->>   .../ethernet/pensando/ionic_rdma.rst          | 43 +++++++++++++++++++
->>   MAINTAINERS                                   |  9 ++++
->>   drivers/infiniband/Kconfig                    |  1 +
->>   drivers/infiniband/hw/Makefile                |  1 +
->>   drivers/infiniband/hw/ionic/Kconfig           | 15 +++++++
->>   drivers/infiniband/hw/ionic/Makefile          |  9 ++++
->>   7 files changed, 79 insertions(+)
->>   create mode 100644 Documentation/networking/device_drivers/ethernet/pensando/ionic_rdma.rst
->>   create mode 100644 drivers/infiniband/hw/ionic/Kconfig
->>   create mode 100644 drivers/infiniband/hw/ionic/Makefile
->>
->> diff --git a/Documentation/networking/device_drivers/ethernet/pensando/ionic_rdma.rst b/Documentation/networking/device_drivers/ethernet/pensando/ionic_rdma.rst
->> new file mode 100644
->> index 000000000000..80c4d9876d3e
->> --- /dev/null
->> +++ b/Documentation/networking/device_drivers/ethernet/pensando/ionic_rdma.rst
->> @@ -0,0 +1,43 @@
->> +.. SPDX-License-Identifier: GPL-2.0+
->> +
->> +============================================================
->> +Linux Driver for the AMD Pensando(R) Ethernet adapter family
->> +============================================================
-> Please try to differentiate the title of this driver from that of
-> the Pensando ethernet driver:
->
-> ========================================================
-> Linux Driver for the Pensando(R) Ethernet adapter family
-> ========================================================
->
-> Thanks.
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-Thanks. I will correct the title of the RDMA driver.
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-Abhijit
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
->
->> +
->> +AMD Pensando RDMA driver.
->> +Copyright (C) 2018-2025, Advanced Micro Devices, Inc.
->> +
->> +Contents
->> +========
->> +
->> +- Identifying the Adapter
->> +- Enabling the driver
->> +- Support
->> +
->> +Identifying the Adapter
->> +=======================
->> +
->> +See Documentation/networking/device_drivers/ethernet/pensando/ionic.rst
->> +for more information on identifying the adapter.
->> +
->> +Enabling the driver
->> +===================
->> +
->> +The driver is enabled via the standard kernel configuration system,
->> +using the make command::
->> +
->> +  make oldconfig/menuconfig/etc.
->> +
->> +The driver is located in the menu structure at:
->> +
->> +  -> Device Drivers
->> +    -> InfiniBand support
->> +      -> AMD Pensando DSC RDMA/RoCE Support
->> +
->> +Support
->> +=======
->> +
->> +For general Linux rdma support, please use the rdma mailing
->> +list, which is monitored by AMD Pensando personnel::
->> +
->> +  linux-rdma@vger.kernel.org
->
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
