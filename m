@@ -1,179 +1,143 @@
-Return-Path: <netdev+bounces-210941-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210943-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 965A3B15D82
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 11:56:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D312B15E19
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 12:26:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 839CE1883D1A
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 09:54:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C4A7856000D
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 10:26:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D407F29344F;
-	Wed, 30 Jul 2025 09:53:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF88B275867;
+	Wed, 30 Jul 2025 10:26:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="gK/NGT1b";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ha5X9Hc8"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from fout-a1-smtp.messagingengine.com (fout-a1-smtp.messagingengine.com [103.168.172.144])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5188279DA0;
-	Wed, 30 Jul 2025 09:53:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB7E784D13
+	for <netdev@vger.kernel.org>; Wed, 30 Jul 2025 10:26:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.144
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753869230; cv=none; b=qg6RTHx1V7JVzsGJXzx2sPw0aWtf1MqMao//PKqGTmVYuWKow01erdzV8tBnQl/T01ZAqNLvQ4Qe4I4aSOM0rgf4qaQzb/Qg5HDRRTUCyxAiZrz1d2ZD1qwTcIs2CHFcUsvBZlUSZkN4D/3yN5PCufHyNkTORZgKiuvJWz2sojE=
+	t=1753871202; cv=none; b=U9bF9lUw6r1WUTTCC3wkYAuGQUfOm+w/NvfYjAMSfjHRrmNmRnlwGMSu1SdGgV17Q2/WIjEKn7VqYSwOBsDxfmpj0Ag+Pp/IdHIJ3332YO3MrM4FuttHEiqWBxICmQYe/7UtaVE9CAFnmH5adKc2NAnPROlhHrG1jkBbqSgbzzY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753869230; c=relaxed/simple;
-	bh=9/YQMEdlCwdtSKkdx7mDdXAg/jL5Qyiis7+N7izJuYs=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=CNAFa1TruLUW2UFGiuOeba6xHhUce+6I+SVYsnTKS3mVJBUEKN4oz0Y8Q7FBZEmOvdh3cp3JZB/390UsdoPRJr0+25U2XxCJ/4SVfClKtxSs3Fxk54dHMX8CJkENjiJxXPGOI0syvr8RH1iHhu6lW9+R5d9r6o8gMKLBEod3DT0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4bsSBk6Bqtz13Mk3;
-	Wed, 30 Jul 2025 17:50:38 +0800 (CST)
-Received: from dggpemf500016.china.huawei.com (unknown [7.185.36.197])
-	by mail.maildlp.com (Postfix) with ESMTPS id EC8AD14027D;
-	Wed, 30 Jul 2025 17:53:44 +0800 (CST)
-Received: from huawei.com (10.175.124.27) by dggpemf500016.china.huawei.com
- (7.185.36.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Wed, 30 Jul
- 2025 17:53:44 +0800
-From: Wang Liang <wangliang74@huawei.com>
-To: <willemdebruijn.kernel@gmail.com>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<horms@kernel.org>
-CC: <yuehaibing@huawei.com>, <zhangchangzhong@huawei.com>,
-	<wangliang74@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: [PATCH net v3] net: drop UFO packets in udp_rcv_segment()
-Date: Wed, 30 Jul 2025 18:14:58 +0800
-Message-ID: <20250730101458.3470788-1-wangliang74@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1753871202; c=relaxed/simple;
+	bh=jYlby3J5Yujsoi785Td6sYdTpujnP5w3Qxgj12s+Zuk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tsqaKCSRrgsLR30+g9WK54hqkFsct9o26AEaCKiWlIX3TtuKIfj4zqLiyE1OfTpA5OQkfm09iy87tlDLy/kbMPHB4iD/7bu1AvVLuc2XOvaZuKTTLD8rfWvpxaDAzRXQNzN5tILfIRgAnTt5UTc9YNH9sWkdU8eN4kx23mSLQ3s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=gK/NGT1b; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ha5X9Hc8; arc=none smtp.client-ip=103.168.172.144
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-01.internal (phl-compute-01.phl.internal [10.202.2.41])
+	by mailfout.phl.internal (Postfix) with ESMTP id B5ADAEC20F2;
+	Wed, 30 Jul 2025 06:26:36 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-01.internal (MEProxy); Wed, 30 Jul 2025 06:26:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1753871196; x=
+	1753957596; bh=gBs5IB71R0/S8kKi+HXCzIurBgH3zlnTdbgJ4fqb3HA=; b=g
+	K/NGT1bYIt8Z36mUkWgtcvyhetTJdPXtdGcJAwkwENhG91MVZX9/ae/OoplOQ99p
+	o7ZfgD20JohbWN2gR25Ajtz3a8e+PT9TXm426HtTdxk/rbbaD2giq3+UpZaw9dGX
+	FpplBBs5+7KDgs0z+AZiQ3nAlbRPiGvr2392HUcnLJE/i2sezCt4Ruue2FOkme4k
+	2hDm6NhjubkuTMcBrVOd7Z4R60XNUlIDKuHD0F7WwQkXaqja2mm/lcOGGHe9HinE
+	s1aeGfhcg+K/cECU0vhrwPX5INtv397wuG6TSCvWjjJ+kARd6a+9pNFoUBry//Ec
+	hm9g9biuWilYiGsNIEKDQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1753871196; x=1753957596; bh=gBs5IB71R0/S8kKi+HXCzIurBgH3zlnTdbg
+	J4fqb3HA=; b=ha5X9Hc8G6yCXxrgSjAskQ137MxNUV2q/2o1KflqsNofOOg4Olu
+	SneMyPH5tYWezkhn0+V4xCOAfeXjk+9cE15rQ91uKPPqn+nQMAY2LdKndFV1VbKZ
+	HiDqvpB4TISnTZd/AuXToKz53t63wOl+x4U24n/QVDBwRV7tNtt82M+KYMbtkWzX
+	32PjmoyelNpCk+e6uRcsnom+mSEgtQgI3oPTl6AvEgKB8korxoU72Fswx5Eq+Xhg
+	BHc35T2rDUC0bLasARtytBBW9lNzAb1EmDgRt6C9RO/m7tLsjMt23+VewDTf6qpE
+	ENkEYwbOFeFXTh2CpSFonfQM5ejgmoyZAzw==
+X-ME-Sender: <xms:XPOJaBQ-IF3l13r1yNcoMvTBTFwNHPkqTK_16RXH9RngSYTeL-8oYA>
+    <xme:XPOJaGT5AtRtpHSI0A4Vsyx8cDlWeiiei0FypelmWYtxzHdDzvk-l1Bkp_tomjyK8
+    9J2Q_lI3kNuj8HmMAA>
+X-ME-Received: <xmr:XPOJaNQxJReM4kjlPTkOxa1LHY2DPOUOQwGK2Rp_g7R2AWo0Rg2P-YEqIjN5>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdeljeeilecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpeffhffvvefukfhfgggtuggjsehttdortddttdejnecuhfhrohhmpefurggsrhhinhgr
+    ucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrihhlrdhnvghtqeenucggtffrrg
+    htthgvrhhnpeejkeelveelkeefgfeuheevjeeukedvhedvueegvdekleeghfelgeeiveff
+    tdeuudenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    hsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohephedpmhhouggv
+    pehsmhhtphhouhhtpdhrtghpthhtoheptghrrghtihhusehnvhhiughirgdrtghomhdprh
+    gtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthho
+    pehlvghonhhrohesnhhvihguihgrrdgtohhmpdhrtghpthhtoheprhgriihorhessghlrg
+    gtkhifrghllhdrohhrghdprhgtphhtthhopehsthgvfhhfvghnrdhklhgrshhsvghrthes
+    shgvtghunhgvthdrtghomh
+X-ME-Proxy: <xmx:XPOJaD5sIEIzpkoX7nWC4ObP61RCrFXtqklHtqaOGka5WIJBGqu1Mg>
+    <xmx:XPOJaB0kMtrxfndR49I5qdOXgMEOpJCsKJ76Z_EU-4SBTI0FzVORhw>
+    <xmx:XPOJaGC2wLpJoA189MvZb4JWDConykj8DNehmFGjNpQRSE_-rRMJkw>
+    <xmx:XPOJaEMo2f8i8zkXShUenHsJJlSa79xYAG1Xcr4RhXfwtHRnxEtYHQ>
+    <xmx:XPOJaNpxknjAQTzZzd5nuAzA6rm_OTewEjBCzdfL0mGOhImWromQm557>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 30 Jul 2025 06:26:35 -0400 (EDT)
+Date: Wed, 30 Jul 2025 12:26:33 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Cosmin Ratiu <cratiu@nvidia.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	Leon Romanovsky <leonro@nvidia.com>,
+	"razor@blackwall.org" <razor@blackwall.org>,
+	"steffen.klassert@secunet.com" <steffen.klassert@secunet.com>
+Subject: Re: [PATCH ipsec 2/3] Revert "xfrm: Remove unneeded device check
+ from validate_xmit_xfrm"
+Message-ID: <aInzWYscMcTRylVg@krikkit>
+References: <cover.1753631391.git.sd@queasysnail.net>
+ <177b1dda148fa828066c72de432b7cb12ca249a9.1753631391.git.sd@queasysnail.net>
+ <6d307bb5f84cdc4bb2cbd24b27dc00969eabe86e.camel@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
- dggpemf500016.china.huawei.com (7.185.36.197)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <6d307bb5f84cdc4bb2cbd24b27dc00969eabe86e.camel@nvidia.com>
 
-When sending a packet with virtio_net_hdr to tun device, if the gso_type
-in virtio_net_hdr is SKB_GSO_UDP and the gso_size is less than udphdr
-size, below crash may happen.
+2025-07-29, 15:27:39 +0000, Cosmin Ratiu wrote:
+> On Mon, 2025-07-28 at 17:17 +0200, Sabrina Dubroca wrote:
+> > This reverts commit d53dda291bbd993a29b84d358d282076e3d01506.
+> > 
+> > This change causes traffic using GSO with SW crypto running through a
+> > NIC capable of HW offload to no longer get segmented during
+> > validate_xmit_xfrm.
+> > 
+> > Fixes: d53dda291bbd ("xfrm: Remove unneeded device check from
+> > validate_xmit_xfrm")
+> > 
+> 
+> Thanks for the fix, but I'm curious about details.
+> 
+> In that commit, I tried to map all of the possible code paths. Can you
+> please explain what code paths I missed that need real_dev given that
+> only bonding should use it now?
 
-  ------------[ cut here ]------------
-  kernel BUG at net/core/skbuff.c:4572!
-  Oops: invalid opcode: 0000 [#1] SMP NOPTI
-  CPU: 0 UID: 0 PID: 62 Comm: mytest Not tainted 6.16.0-rc7 #203 PREEMPT(voluntary)
-  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
-  RIP: 0010:skb_pull_rcsum+0x8e/0xa0
-  Code: 00 00 5b c3 cc cc cc cc 8b 93 88 00 00 00 f7 da e8 37 44 38 00 f7 d8 89 83 88 00 00 00 48 8b 83 c8 00 00 00 5b c3 cc cc cc cc <0f> 0b 0f 0b 66 66 2e 0f 1f 84 00 000
-  RSP: 0018:ffffc900001fba38 EFLAGS: 00000297
-  RAX: 0000000000000004 RBX: ffff8880040c1000 RCX: ffffc900001fb948
-  RDX: ffff888003e6d700 RSI: 0000000000000008 RDI: ffff88800411a062
-  RBP: ffff8880040c1000 R08: 0000000000000000 R09: 0000000000000001
-  R10: ffff888003606c00 R11: 0000000000000001 R12: 0000000000000000
-  R13: ffff888004060900 R14: ffff888004050000 R15: ffff888004060900
-  FS:  000000002406d3c0(0000) GS:ffff888084a19000(0000) knlGS:0000000000000000
-  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-  CR2: 0000000020000040 CR3: 0000000004007000 CR4: 00000000000006f0
-  Call Trace:
-   <TASK>
-   udp_queue_rcv_one_skb+0x176/0x4b0 net/ipv4/udp.c:2445
-   udp_queue_rcv_skb+0x155/0x1f0 net/ipv4/udp.c:2475
-   udp_unicast_rcv_skb+0x71/0x90 net/ipv4/udp.c:2626
-   __udp4_lib_rcv+0x433/0xb00 net/ipv4/udp.c:2690
-   ip_protocol_deliver_rcu+0xa6/0x160 net/ipv4/ip_input.c:205
-   ip_local_deliver_finish+0x72/0x90 net/ipv4/ip_input.c:233
-   ip_sublist_rcv_finish+0x5f/0x70 net/ipv4/ip_input.c:579
-   ip_sublist_rcv+0x122/0x1b0 net/ipv4/ip_input.c:636
-   ip_list_rcv+0xf7/0x130 net/ipv4/ip_input.c:670
-   __netif_receive_skb_list_core+0x21d/0x240 net/core/dev.c:6067
-   netif_receive_skb_list_internal+0x186/0x2b0 net/core/dev.c:6210
-   napi_complete_done+0x78/0x180 net/core/dev.c:6580
-   tun_get_user+0xa63/0x1120 drivers/net/tun.c:1909
-   tun_chr_write_iter+0x65/0xb0 drivers/net/tun.c:1984
-   vfs_write+0x300/0x420 fs/read_write.c:593
-   ksys_write+0x60/0xd0 fs/read_write.c:686
-   do_syscall_64+0x50/0x1c0 arch/x86/entry/syscall_64.c:63
-   </TASK>
+After running some more tests, it's not about real_dev, it's the other
+check ("unlikely(x->xso.dev != dev)" below) that you also removed in
+that patch that causes the issue in my setup. I don't know how you
+decided that it should be dropped, since it predates bonding's ipsec
+offload.
+The codepath is the usual:
+__dev_queue_xmit -> validate_xmit_skb -> validate_xmit_xfrm
 
-To trigger gso segment in udp_queue_rcv_skb(), we should also set option
-UDP_ENCAP_ESPINUDP to enable udp_sk(sk)->encap_rcv. When the encap_rcv
-hook return 1 in udp_queue_rcv_one_skb(), udp_csum_pull_header() will try
-to pull udphdr, but the skb size has been segmented to gso size, which
-leads to this crash.
+Since the commit message made the incorrect claim "ESP offload off:
+validate_xmit_xfrm returns early on !xo." I didn't check if a partial
+revert was enough to fix the issue. My bad.
 
-Previous commit cf329aa42b66 ("udp: cope with UDP GRO packet misdirection")
-introduces segmentation in UDP receive path only for GRO, which was never
-intended to be used for UFO, so drop UFO packets in udp_rcv_segment().
-
-Link: https://lore.kernel.org/netdev/20250724083005.3918375-1-wangliang74@huawei.com/
-Link: https://lore.kernel.org/netdev/20250729123907.3318425-1-wangliang74@huawei.com/
-Fixes: cf329aa42b66 ("udp: cope with UDP GRO packet misdirection")
-Suggested-by: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Signed-off-by: Wang Liang <wangliang74@huawei.com>
----
-Changes in v2:
-- drop UFO packets instead of checking min gso size.
-Changes in v3:
-- rename commit to limit the drop packets type.
-- modify fix tag.
-- only drop SKB_GSO_UDP packets, keep SKB_GSO_UDP_L4 packets.
----
- include/net/udp.h | 24 ++++++++++++++++++------
- 1 file changed, 18 insertions(+), 6 deletions(-)
-
-diff --git a/include/net/udp.h b/include/net/udp.h
-index a772510b2aa5..7a4524243b19 100644
---- a/include/net/udp.h
-+++ b/include/net/udp.h
-@@ -587,6 +587,16 @@ static inline struct sk_buff *udp_rcv_segment(struct sock *sk,
- {
- 	netdev_features_t features = NETIF_F_SG;
- 	struct sk_buff *segs;
-+	int drop_count;
-+
-+	/*
-+	 * Segmentation in UDP receive path is only for UDP GRO, drop udp
-+	 * fragmentation offload (UFO) packets.
-+	 */
-+	if (skb_shinfo(skb)->gso_type & SKB_GSO_UDP) {
-+		drop_count = 1;
-+		goto drop;
-+	}
- 
- 	/* Avoid csum recalculation by skb_segment unless userspace explicitly
- 	 * asks for the final checksum values
-@@ -610,16 +620,18 @@ static inline struct sk_buff *udp_rcv_segment(struct sock *sk,
- 	 */
- 	segs = __skb_gso_segment(skb, features, false);
- 	if (IS_ERR_OR_NULL(segs)) {
--		int segs_nr = skb_shinfo(skb)->gso_segs;
--
--		atomic_add(segs_nr, &sk->sk_drops);
--		SNMP_ADD_STATS(__UDPX_MIB(sk, ipv4), UDP_MIB_INERRORS, segs_nr);
--		kfree_skb(skb);
--		return NULL;
-+		drop_count = skb_shinfo(skb)->gso_segs;
-+		goto drop;
- 	}
- 
- 	consume_skb(skb);
- 	return segs;
-+
-+drop:
-+	atomic_add(drop_count, &sk->sk_drops);
-+	SNMP_ADD_STATS(__UDPX_MIB(sk, ipv4), UDP_MIB_INERRORS, drop_count);
-+	kfree_skb(skb);
-+	return NULL;
- }
- 
- static inline void udp_post_segment_fix_csum(struct sk_buff *skb)
 -- 
-2.34.1
-
+Sabrina
 
