@@ -1,143 +1,178 @@
-Return-Path: <netdev+bounces-210943-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210944-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D312B15E19
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 12:26:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CE74B15E3E
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 12:35:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C4A7856000D
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 10:26:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A5D4518C3B7F
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 10:35:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF88B275867;
-	Wed, 30 Jul 2025 10:26:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 817832798E5;
+	Wed, 30 Jul 2025 10:35:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="gK/NGT1b";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ha5X9Hc8"
+	dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="kmEFE8z6"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a1-smtp.messagingengine.com (fout-a1-smtp.messagingengine.com [103.168.172.144])
+Received: from mx.ssi.bg (mx.ssi.bg [193.238.174.39])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB7E784D13
-	for <netdev@vger.kernel.org>; Wed, 30 Jul 2025 10:26:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.144
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C430825291C;
+	Wed, 30 Jul 2025 10:35:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.238.174.39
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753871202; cv=none; b=U9bF9lUw6r1WUTTCC3wkYAuGQUfOm+w/NvfYjAMSfjHRrmNmRnlwGMSu1SdGgV17Q2/WIjEKn7VqYSwOBsDxfmpj0Ag+Pp/IdHIJ3332YO3MrM4FuttHEiqWBxICmQYe/7UtaVE9CAFnmH5adKc2NAnPROlhHrG1jkBbqSgbzzY=
+	t=1753871711; cv=none; b=gMoDSYC8JT1Lya/kr7ZVqQV2WyB4DRHJDAovMUx98Zh3Hzp++nhV+3X5LoprFVSMzO+NTdYBfscueiCWJr7P/STISVq8AN+aSUBIh0uIsGJI1LAsbKur8wFtOAbQsFA3Zs6bj4K3G/RFAee36S1QcLOfj/lc2z+pJhA3vRFHSNM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753871202; c=relaxed/simple;
-	bh=jYlby3J5Yujsoi785Td6sYdTpujnP5w3Qxgj12s+Zuk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tsqaKCSRrgsLR30+g9WK54hqkFsct9o26AEaCKiWlIX3TtuKIfj4zqLiyE1OfTpA5OQkfm09iy87tlDLy/kbMPHB4iD/7bu1AvVLuc2XOvaZuKTTLD8rfWvpxaDAzRXQNzN5tILfIRgAnTt5UTc9YNH9sWkdU8eN4kx23mSLQ3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=gK/NGT1b; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ha5X9Hc8; arc=none smtp.client-ip=103.168.172.144
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-01.internal (phl-compute-01.phl.internal [10.202.2.41])
-	by mailfout.phl.internal (Postfix) with ESMTP id B5ADAEC20F2;
-	Wed, 30 Jul 2025 06:26:36 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-01.internal (MEProxy); Wed, 30 Jul 2025 06:26:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1753871196; x=
-	1753957596; bh=gBs5IB71R0/S8kKi+HXCzIurBgH3zlnTdbgJ4fqb3HA=; b=g
-	K/NGT1bYIt8Z36mUkWgtcvyhetTJdPXtdGcJAwkwENhG91MVZX9/ae/OoplOQ99p
-	o7ZfgD20JohbWN2gR25Ajtz3a8e+PT9TXm426HtTdxk/rbbaD2giq3+UpZaw9dGX
-	FpplBBs5+7KDgs0z+AZiQ3nAlbRPiGvr2392HUcnLJE/i2sezCt4Ruue2FOkme4k
-	2hDm6NhjubkuTMcBrVOd7Z4R60XNUlIDKuHD0F7WwQkXaqja2mm/lcOGGHe9HinE
-	s1aeGfhcg+K/cECU0vhrwPX5INtv397wuG6TSCvWjjJ+kARd6a+9pNFoUBry//Ec
-	hm9g9biuWilYiGsNIEKDQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1753871196; x=1753957596; bh=gBs5IB71R0/S8kKi+HXCzIurBgH3zlnTdbg
-	J4fqb3HA=; b=ha5X9Hc8G6yCXxrgSjAskQ137MxNUV2q/2o1KflqsNofOOg4Olu
-	SneMyPH5tYWezkhn0+V4xCOAfeXjk+9cE15rQ91uKPPqn+nQMAY2LdKndFV1VbKZ
-	HiDqvpB4TISnTZd/AuXToKz53t63wOl+x4U24n/QVDBwRV7tNtt82M+KYMbtkWzX
-	32PjmoyelNpCk+e6uRcsnom+mSEgtQgI3oPTl6AvEgKB8korxoU72Fswx5Eq+Xhg
-	BHc35T2rDUC0bLasARtytBBW9lNzAb1EmDgRt6C9RO/m7tLsjMt23+VewDTf6qpE
-	ENkEYwbOFeFXTh2CpSFonfQM5ejgmoyZAzw==
-X-ME-Sender: <xms:XPOJaBQ-IF3l13r1yNcoMvTBTFwNHPkqTK_16RXH9RngSYTeL-8oYA>
-    <xme:XPOJaGT5AtRtpHSI0A4Vsyx8cDlWeiiei0FypelmWYtxzHdDzvk-l1Bkp_tomjyK8
-    9J2Q_lI3kNuj8HmMAA>
-X-ME-Received: <xmr:XPOJaNQxJReM4kjlPTkOxa1LHY2DPOUOQwGK2Rp_g7R2AWo0Rg2P-YEqIjN5>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdeljeeilecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpeffhffvvefukfhfgggtuggjsehttdortddttdejnecuhfhrohhmpefurggsrhhinhgr
-    ucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrihhlrdhnvghtqeenucggtffrrg
-    htthgvrhhnpeejkeelveelkeefgfeuheevjeeukedvhedvueegvdekleeghfelgeeiveff
-    tdeuudenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    hsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohephedpmhhouggv
-    pehsmhhtphhouhhtpdhrtghpthhtoheptghrrghtihhusehnvhhiughirgdrtghomhdprh
-    gtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthho
-    pehlvghonhhrohesnhhvihguihgrrdgtohhmpdhrtghpthhtoheprhgriihorhessghlrg
-    gtkhifrghllhdrohhrghdprhgtphhtthhopehsthgvfhhfvghnrdhklhgrshhsvghrthes
-    shgvtghunhgvthdrtghomh
-X-ME-Proxy: <xmx:XPOJaD5sIEIzpkoX7nWC4ObP61RCrFXtqklHtqaOGka5WIJBGqu1Mg>
-    <xmx:XPOJaB0kMtrxfndR49I5qdOXgMEOpJCsKJ76Z_EU-4SBTI0FzVORhw>
-    <xmx:XPOJaGC2wLpJoA189MvZb4JWDConykj8DNehmFGjNpQRSE_-rRMJkw>
-    <xmx:XPOJaEMo2f8i8zkXShUenHsJJlSa79xYAG1Xcr4RhXfwtHRnxEtYHQ>
-    <xmx:XPOJaNpxknjAQTzZzd5nuAzA6rm_OTewEjBCzdfL0mGOhImWromQm557>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 30 Jul 2025 06:26:35 -0400 (EDT)
-Date: Wed, 30 Jul 2025 12:26:33 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Cosmin Ratiu <cratiu@nvidia.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	"razor@blackwall.org" <razor@blackwall.org>,
-	"steffen.klassert@secunet.com" <steffen.klassert@secunet.com>
-Subject: Re: [PATCH ipsec 2/3] Revert "xfrm: Remove unneeded device check
- from validate_xmit_xfrm"
-Message-ID: <aInzWYscMcTRylVg@krikkit>
-References: <cover.1753631391.git.sd@queasysnail.net>
- <177b1dda148fa828066c72de432b7cb12ca249a9.1753631391.git.sd@queasysnail.net>
- <6d307bb5f84cdc4bb2cbd24b27dc00969eabe86e.camel@nvidia.com>
+	s=arc-20240116; t=1753871711; c=relaxed/simple;
+	bh=VCDnaWwQb4IAWf4f+Mw7mY5/oXqtwhIoiFyzW/Is5/w=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=QuzOFczZD4rt6Zbgu0v2xV4Yh6vmQkAgt/JPsTVPNhH7zBR1Imo8YpWpj2RFUeV6x1178DDmEFrvqujlTOpczwQd7bHyrlzMbjPK7/Z8doPDCBysVak/jm3x8LGUDJVRnUIoGNYA+ldOcakEQW5G04xxNuHUOTZOqAeRYKQJDuE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=kmEFE8z6; arc=none smtp.client-ip=193.238.174.39
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
+Received: from mx.ssi.bg (localhost [127.0.0.1])
+	by mx.ssi.bg (Potsfix) with ESMTP id CA5FD23FB2;
+	Wed, 30 Jul 2025 13:28:32 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ssi.bg; h=cc:cc
+	:content-type:content-type:date:from:from:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=ssi;
+	 bh=g1Z644tULtzZVidxSZOSdrcdRORvDM8i8A0Fz0op/zY=; b=kmEFE8z6yVyT
+	VXkPRtMg/Gi7DjbDcK8+jQTCLGBQvLJMsMA92xpS3N73gcwTn/1VK6++r+YyEXCd
+	Zs4ru/CfYdOZFa8jTE3DhWtuKecEiHR1bMgBdVdnyeOjnMfjk+ZgmF1MjcfSS0UB
+	2rRqrGemEQH6QTAwjg3z0C2ZcJZJPui3VmpHwV2jcUytF+MzdhBrr+GHnuhS2Mw4
+	j1scDhXyc5cCtqo8Y/SRGwWsQBG3vms0mJC0ZRl6DLUSXgFDHwGUG8hqLt6JrbQS
+	APriImgzogsc3tlMEOn6Lk+G87BWr6F98k3H0taTueIZCa8V+S22lCzDbS16Rifc
+	hF8MTB7DPlG8efSfjwAuCJohLw27bNsv1NVvpLNPZwH6uiPU+ZCe/WtHhrvMvjon
+	otOQyHcca7g1dnLNTPmK0BJ5eBnbMafLqxbwNz5dPc6MyUSnFj8iSqZWBWAUTlHm
+	FdWfRVF42Jf++qad/Hrvc7kfmk0YI1+AjPFmRJQcuETbX/udt2T9pKqg5H1xZCRT
+	P++Bp1OFhGwwPk+l9eRf9SHmQZTq+DRgydboMSMsJJN2lsCej9QFtiKgAo9K1+MF
+	OhOUMH01vSIC7l8SO4Kup+ye6ovEdTAarpnzgHNdjz7loM4BWPl7LDe0wVqL5o6e
+	zD0ia0vvYexecfpQBm/Gbw0ZvYN1hvM=
+Received: from box.ssi.bg (box.ssi.bg [193.238.174.46])
+	by mx.ssi.bg (Potsfix) with ESMTPS;
+	Wed, 30 Jul 2025 13:28:31 +0300 (EEST)
+Received: from ja.ssi.bg (unknown [213.16.62.126])
+	by box.ssi.bg (Potsfix) with ESMTPSA id 7C13D64D5C;
+	Wed, 30 Jul 2025 13:28:30 +0300 (EEST)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by ja.ssi.bg (8.18.1/8.18.1) with ESMTP id 56UASGpa011444;
+	Wed, 30 Jul 2025 13:28:17 +0300
+Date: Wed, 30 Jul 2025 13:28:16 +0300 (EEST)
+From: Julian Anastasov <ja@ssi.bg>
+To: Frederic Weisbecker <frederic@kernel.org>
+cc: LKML <linux-kernel@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        David Ahern <dsahern@kernel.org>, Simon Horman <horms@verge.net.au>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>, netdev@vger.kernel.org,
+        lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org,
+        coreteam@netfilter.org
+Subject: Re: [PATCH v2 net] ipvs: Fix estimator kthreads preferred affinity
+In-Reply-To: <20250729122611.247368-1-frederic@kernel.org>
+Message-ID: <2d915ef6-46eb-7487-f235-6b6688e68c58@ssi.bg>
+References: <20250729122611.247368-1-frederic@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <6d307bb5f84cdc4bb2cbd24b27dc00969eabe86e.camel@nvidia.com>
+Content-Type: text/plain; charset=US-ASCII
 
-2025-07-29, 15:27:39 +0000, Cosmin Ratiu wrote:
-> On Mon, 2025-07-28 at 17:17 +0200, Sabrina Dubroca wrote:
-> > This reverts commit d53dda291bbd993a29b84d358d282076e3d01506.
-> > 
-> > This change causes traffic using GSO with SW crypto running through a
-> > NIC capable of HW offload to no longer get segmented during
-> > validate_xmit_xfrm.
-> > 
-> > Fixes: d53dda291bbd ("xfrm: Remove unneeded device check from
-> > validate_xmit_xfrm")
-> > 
+
+	Hello,
+
+On Tue, 29 Jul 2025, Frederic Weisbecker wrote:
+
+> The estimator kthreads' affinity are defined by sysctl overwritten
+> preferences and applied through a plain call to the scheduler's affinity
+> API.
 > 
-> Thanks for the fix, but I'm curious about details.
+> However since the introduction of managed kthreads preferred affinity,
+> such a practice shortcuts the kthreads core code which eventually
+> overwrites the target to the default unbound affinity.
 > 
-> In that commit, I tried to map all of the possible code paths. Can you
-> please explain what code paths I missed that need real_dev given that
-> only bonding should use it now?
+> Fix this with using the appropriate kthread's API.
+> 
+> Fixes: d1a89197589c ("kthread: Default affine kthread to its preferred NUMA node")
+> Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
 
-After running some more tests, it's not about real_dev, it's the other
-check ("unlikely(x->xso.dev != dev)" below) that you also removed in
-that patch that causes the issue in my setup. I don't know how you
-decided that it should be dropped, since it predates bonding's ipsec
-offload.
-The codepath is the usual:
-__dev_queue_xmit -> validate_xmit_skb -> validate_xmit_xfrm
+	Looks good to me for the nf tree, thanks!
 
-Since the commit message made the incorrect claim "ESP offload off:
-validate_xmit_xfrm returns early on !xo." I didn't check if a partial
-revert was enough to fix the issue. My bad.
+Acked-by: Julian Anastasov <ja@ssi.bg>
 
--- 
-Sabrina
+> ---
+>  include/net/ip_vs.h            | 13 +++++++++++++
+>  kernel/kthread.c               |  1 +
+>  net/netfilter/ipvs/ip_vs_est.c |  3 ++-
+>  3 files changed, 16 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/net/ip_vs.h b/include/net/ip_vs.h
+> index ff406ef4fd4a..29a36709e7f3 100644
+> --- a/include/net/ip_vs.h
+> +++ b/include/net/ip_vs.h
+> @@ -1163,6 +1163,14 @@ static inline const struct cpumask *sysctl_est_cpulist(struct netns_ipvs *ipvs)
+>  		return housekeeping_cpumask(HK_TYPE_KTHREAD);
+>  }
+>  
+> +static inline const struct cpumask *sysctl_est_preferred_cpulist(struct netns_ipvs *ipvs)
+> +{
+> +	if (ipvs->est_cpulist_valid)
+> +		return ipvs->sysctl_est_cpulist;
+> +	else
+> +		return NULL;
+> +}
+> +
+>  static inline int sysctl_est_nice(struct netns_ipvs *ipvs)
+>  {
+>  	return ipvs->sysctl_est_nice;
+> @@ -1270,6 +1278,11 @@ static inline const struct cpumask *sysctl_est_cpulist(struct netns_ipvs *ipvs)
+>  	return housekeeping_cpumask(HK_TYPE_KTHREAD);
+>  }
+>  
+> +static inline const struct cpumask *sysctl_est_preferred_cpulist(struct netns_ipvs *ipvs)
+> +{
+> +	return NULL;
+> +}
+> +
+>  static inline int sysctl_est_nice(struct netns_ipvs *ipvs)
+>  {
+>  	return IPVS_EST_NICE;
+> diff --git a/kernel/kthread.c b/kernel/kthread.c
+> index 85e29b250107..adf06196b844 100644
+> --- a/kernel/kthread.c
+> +++ b/kernel/kthread.c
+> @@ -899,6 +899,7 @@ int kthread_affine_preferred(struct task_struct *p, const struct cpumask *mask)
+>  
+>  	return ret;
+>  }
+> +EXPORT_SYMBOL_GPL(kthread_affine_preferred);
+>  
+>  static int kthreads_update_affinity(bool force)
+>  {
+> diff --git a/net/netfilter/ipvs/ip_vs_est.c b/net/netfilter/ipvs/ip_vs_est.c
+> index f821ad2e19b3..15049b826732 100644
+> --- a/net/netfilter/ipvs/ip_vs_est.c
+> +++ b/net/netfilter/ipvs/ip_vs_est.c
+> @@ -265,7 +265,8 @@ int ip_vs_est_kthread_start(struct netns_ipvs *ipvs,
+>  	}
+>  
+>  	set_user_nice(kd->task, sysctl_est_nice(ipvs));
+> -	set_cpus_allowed_ptr(kd->task, sysctl_est_cpulist(ipvs));
+> +	if (sysctl_est_preferred_cpulist(ipvs))
+> +		kthread_affine_preferred(kd->task, sysctl_est_preferred_cpulist(ipvs));
+>  
+>  	pr_info("starting estimator thread %d...\n", kd->id);
+>  	wake_up_process(kd->task);
+> -- 
+> 2.48.1
+
+Regards
+
+--
+Julian Anastasov <ja@ssi.bg>
+
 
