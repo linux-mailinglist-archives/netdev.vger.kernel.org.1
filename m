@@ -1,148 +1,211 @@
-Return-Path: <netdev+bounces-211023-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211024-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA6AAB16375
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 17:15:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4625AB163B8
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 17:28:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A2E85649B3
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 15:15:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D52E17988F
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 15:28:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D8812DCF63;
-	Wed, 30 Jul 2025 15:15:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EA3D2DCBF1;
+	Wed, 30 Jul 2025 15:28:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="OHY6gjjN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SlV/QTYv"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0E152DCF42;
-	Wed, 30 Jul 2025 15:15:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28A252DBF78
+	for <netdev@vger.kernel.org>; Wed, 30 Jul 2025 15:28:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753888510; cv=none; b=lDHT3ODtw0CXQV2ggC6onsMuIxH6ZX3IHLtz0efEgFz9k+jTjPyMuAriRKqXkk3xLLcVnXElP0u/dSQtWOgzKJs8W60DWadk+0TjI7UGA0LuRUsBUeo53qxgY8NnXs/pFdMRMfzyMjNhCaDu8bxxCODGtyvQShi6R+Z65LA+olA=
+	t=1753889333; cv=none; b=Oq6abSdU/uzHqK4pNhpy7Oh0SF2Or3DS5P9cBPUv9y6OuVICd1rZnOszjOm0trGyKkHlbx3U0aD4JJNvEbZvf530ug0YmIzv2d3rt2povSH2YvBq8s1d/oqICmcoJYL+Vuv8+NrdzGRLGF1JviFFrMsSAxKXCSU7YVby8fifdrM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753888510; c=relaxed/simple;
-	bh=fkckccSyliv1upVL1rwY+95w9R7G/KX0DfE2SjKAKN4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=OXoeYIjgkOfIgbTo+tRvmCWwTUL0KWynSa3xo5RpcnzwfqJwOZKtf7Nuq3ExzALjxE8baWbxOrkf0Zls3F4fVnDG/PGBSNp2TEfe8v2WAa3+12VHw19K4YBd6vfapchhRxigsTvIYEHvGXFOqT0hXWYWT5J8Ep7N493kDht6Q2I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=OHY6gjjN; arc=none smtp.client-ip=198.47.23.234
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllvem-sh03.itg.ti.com ([10.64.41.86])
-	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTP id 56UFEGSR2817950;
-	Wed, 30 Jul 2025 10:14:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1753888457;
-	bh=7ua0MFYmmJwgIqN6yZsCwPYOXI20biJTE8N4JNQBlDw=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=OHY6gjjN8f48a5pFEOih/K5sacIY6GHdPtjlSHyoUV9MFCdjpxyGn2bJFzV7DLSw5
-	 9H4L57FBpaKmKf7gPe4dV2kBEa0SCFo6cc2t2Wc1VyBr3WQcAYw+y7o6DcoN1EPjPo
-	 3HWB+1d6IWNAeH/SmYllNdtSSMHaSPFttWlARtLA=
-Received: from DLEE113.ent.ti.com (dlee113.ent.ti.com [157.170.170.24])
-	by fllvem-sh03.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 56UFEGJf2644967
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
-	Wed, 30 Jul 2025 10:14:16 -0500
-Received: from DLEE113.ent.ti.com (157.170.170.24) by DLEE113.ent.ti.com
- (157.170.170.24) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Wed, 30
- Jul 2025 10:14:16 -0500
-Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DLEE113.ent.ti.com
- (157.170.170.24) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55 via
- Frontend Transport; Wed, 30 Jul 2025 10:14:16 -0500
-Received: from [10.24.69.13] (meghana-pc.dhcp.ti.com [10.24.69.13] (may be forged))
-	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 56UFEAqb1134002;
-	Wed, 30 Jul 2025 10:14:11 -0500
-Message-ID: <daee58ee-2d20-4cb0-b5bb-2e4dc1ff7b20@ti.com>
-Date: Wed, 30 Jul 2025 20:44:09 +0530
+	s=arc-20240116; t=1753889333; c=relaxed/simple;
+	bh=Ue+ccx0ZDote0/1x1M5PeVoJWdh1k9mxATHVs7yIKFo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PkpCBiojitvBJTJNINQXx/UVbaONZiSuDjjj+ef7yWSAWJMGnTmJa5oqSV9TbbAHvqMe301YP64jHWHKmLHKuP2pRjznCADrK3U+hHvcEV35r1CiW59sI1COWqS6HHi5Aha47ooL1xhajnaf4AefCpqlckxOUBBxZSSgoi9ezXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SlV/QTYv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03115C4CEF6;
+	Wed, 30 Jul 2025 15:28:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753889332;
+	bh=Ue+ccx0ZDote0/1x1M5PeVoJWdh1k9mxATHVs7yIKFo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SlV/QTYv5iOATY/iv07a54FTPF9zsj9Y11mBVoWBNGAVYJfWNVBBTLK6Cy4JJzZ8R
+	 LrHWic4y2GLCaiPOWbrO48UlpLUVNDhnf/AVXkJtgCjPv9Q4/6LrN8Wj3cDzb5Yjp5
+	 h5B9k7Q3Ly2m+JUyt6uSdTvsckMi9VHNI2KYa5rdA8jh/roCONV4kXHDazAyrXoA66
+	 xbvMr1QIBrPWE8J2ze6WJsJypnlv9IrfkD2qHBW7ZXKW2dUkFqnvHmV89r4NBzQLN/
+	 WLdaGdzDCVvqnb9JfHU+ysQWv+5BBQqhmrun/XNkgZcYBZFgwZi4LCZEAnOwkNgEBi
+	 5UUrbCv2KmQfA==
+Date: Wed, 30 Jul 2025 16:28:48 +0100
+From: Simon Horman <horms@kernel.org>
+To: "Lifshits, Vitaly" <vitaly.lifshits@intel.com>
+Cc: "Ruinskiy, Dima" <dima.ruinskiy@intel.com>,
+	"Keller, Jacob E" <jacob.e.keller@intel.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>
+Subject: Re: [RFC net-next v1 1/1] e1000e: Introduce private flag and module
+ param to disable K1
+Message-ID: <20250730152848.GJ1877762@horms.kernel.org>
+References: <20250710092455.1742136-1-vitaly.lifshits@intel.com>
+ <20250714165505.GR721198@horms.kernel.org>
+ <CO1PR11MB5089BDD57F90FE7BEBE824F5D654A@CO1PR11MB5089.namprd11.prod.outlook.com>
+ <b7265975-d28c-4081-811c-bf7316954192@intel.com>
+ <f44bfb41-d3bd-471c-916e-53fd66b04f27@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: ti: icssg-prueth: Fix skb handling for XDP_PASS
-To: Jakub Kicinski <kuba@kernel.org>
-CC: <namcao@linutronix.de>, <jacob.e.keller@intel.com>, <sdf@fomichev.me>,
-        <john.fastabend@gmail.com>, <hawk@kernel.org>, <daniel@iogearbox.net>,
-        <ast@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
-        <davem@davemloft.net>, <andrew+netdev@lunn.ch>, <bpf@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
-        Vignesh Raghavendra
-	<vigneshr@ti.com>,
-        Roger Quadros <rogerq@kernel.org>, <danishanwar@ti.com>
-References: <20250721124918.3347679-1-m-malladi@ti.com>
- <20250723171947.76995990@kernel.org>
-Content-Language: en-US
-From: Meghana Malladi <m-malladi@ti.com>
-In-Reply-To: <20250723171947.76995990@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <f44bfb41-d3bd-471c-916e-53fd66b04f27@intel.com>
 
-Hi Jakub,
-
-On 7/24/25 05:49, Jakub Kicinski wrote:
-> On Mon, 21 Jul 2025 18:19:18 +0530 Meghana Malladi wrote:
->> diff --git a/drivers/net/ethernet/ti/icssg/icssg_common.c b/drivers/net/ethernet/ti/icssg/icssg_common.c
->> index 12f25cec6255..a0e7def33e8e 100644
->> --- a/drivers/net/ethernet/ti/icssg/icssg_common.c
->> +++ b/drivers/net/ethernet/ti/icssg/icssg_common.c
->> @@ -757,15 +757,12 @@ static int emac_rx_packet(struct prueth_emac *emac, u32 flow_id, u32 *xdp_state)
->>   		xdp_prepare_buff(&xdp, pa, PRUETH_HEADROOM, pkt_len, false);
->>   
->>   		*xdp_state = emac_run_xdp(emac, &xdp, page, &pkt_len);
->> -		if (*xdp_state == ICSSG_XDP_PASS)
->> -			skb = xdp_build_skb_from_buff(&xdp);
->> -		else
->> +		if (*xdp_state != ICSSG_XDP_PASS)
->>   			goto requeue;
->> -	} else {
->> -		/* prepare skb and send to n/w stack */
->> -		skb = napi_build_skb(pa, PAGE_SIZE);
->>   	}
->>   
->> +	/* prepare skb and send to n/w stack */
->> +	skb = napi_build_skb(pa, PAGE_SIZE);
->>   	if (!skb) {
->>   		ndev->stats.rx_dropped++;
->>   		page_pool_recycle_direct(pool, page);
+On Wed, Jul 30, 2025 at 05:11:20PM +0300, Lifshits, Vitaly wrote:
 > 
-> I'm not sure this is correct. We seem to hardcode headroom to
-> PRUETH_HEADROOM lower in this function. If XDP adds or removes
-> network headers and then returns XDP_PASS we'll look for the packet
-> at the wrong offset.
 > 
-
-Yes that makes sense. Thanks for pointing it out. I think I have the 
-right fix in mind. Will post it shortly as v2.
-
-> We just merged some XDP tests, could you try running
-> tools/testing/selftests/drivers/net/xdp.py ?
-> Some general instructions can be found here:
-> https://github.com/linux-netdev/nipa/wiki/Running-driver-tests
+> On 7/16/2025 1:25 PM, Ruinskiy, Dima wrote:
+> > On 15/07/2025 0:30, Keller, Jacob E wrote:
+> > > 
+> > > 
+> > > > -----Original Message-----
+> > > > From: Simon Horman <horms@kernel.org>
+> > > > Sent: Monday, July 14, 2025 9:55 AM
+> > > > To: Lifshits, Vitaly <vitaly.lifshits@intel.com>
+> > > > Cc: andrew+netdev@lunn.ch; davem@davemloft.net; edumazet@google.com;
+> > > > kuba@kernel.org; pabeni@redhat.com; netdev@vger.kernel.org;
+> > > > Ruinskiy, Dima
+> > > > <dima.ruinskiy@intel.com>; Nguyen, Anthony L
+> > > > <anthony.l.nguyen@intel.com>;
+> > > > Keller, Jacob E <jacob.e.keller@intel.com>
+> > > > Subject: Re: [RFC net-next v1 1/1] e1000e: Introduce private
+> > > > flag and module
+> > > > param to disable K1
+> > > > 
+> > > > On Thu, Jul 10, 2025 at 12:24:55PM +0300, Vitaly Lifshits wrote:
+> > > > > The K1 state reduces power consumption on ICH family network
+> > > > > controllers
+> > > > > during idle periods, similarly to L1 state on PCI Express
+> > > > > NICs. Therefore,
+> > > > > it is recommended and enabled by default.
+> > > > > However, on some systems it has been observed to have adverse side
+> > > > > effects, such as packet loss. It has been established
+> > > > > through debug that
+> > > > > the problem may be due to firmware misconfiguration of
+> > > > > specific systems,
+> > > > > interoperability with certain link partners, or marginal electrical
+> > > > > conditions of specific units.
+> > > > > 
+> > > > > These problems typically cannot be fixed in the field, and generic
+> > > > > workarounds to resolve the side effects on all systems,
+> > > > > while keeping K1
+> > > > > enabled, were found infeasible.
+> > > > > Therefore, add the option for system administrators to globally disable
+> > > > > K1 idle state on the adapter.
+> > > > > 
+> > > > > Link: https://lore.kernel.org/intel-wired-
+> > > > lan/CAMqyJG3LVqfgqMcTxeaPur_Jq0oQH7GgdxRuVtRX_6TTH2mX5Q@mail.gmail.
+> > > > com/
+> > > > > Link: https://lore.kernel.org/intel-wired-
+> > > > lan/20250626153544.1853d106@onyx.my.domain/
+> > > > > Link:
+> > > > > https://lore.kernel.org/intel-wired-lan/Z_z9EjcKtwHCQcZR@mail-
+> > > > > itl/
+> > > > > 
+> > > > > Signed-off-by: Vitaly Lifshits <vitaly.lifshits@intel.com>
+> > > > 
+> > > > Hi Vitaly,
+> > > > 
+> > > > If I understand things correctly, this patch adds a new module parameter
+> > > > to the e1000 driver. As adding new module parameters to
+> > > > networking driver
+> > > > is discouraged I'd like to ask if another mechanism can be found.
+> > > > E.g. devlink.
+> > > 
+> > > One motivation for the module parameter is that it is simple to set
+> > > it "permanently" by setting the module parameter to be loaded by
+> > > default. I don't think any distro has something equivalent for
+> > > devlink or ethtool flags. Of course that’s not really the kernel's
+> > > fault.
+> > > 
+> > > I agree that new module parameters are generally discouraged from
+> > > being added. A devlink parameter could work, but it does require
+> > > administrator to script setting the parameter at boot on affected
+> > > systems. This also will require a bit more work to implement because
+> > > the e1000e driver does not expose devlink.
+> > > 
+> > > Would an ethtool private flag on its own be sufficient/accepted..? I
+> > > know those are also generally discouraged because of past attempts
+> > > to avoid implementing generic interfaces.. However I don't think
+> > > there is a "generic" interface for this, at least based on my
+> > > understanding. It appears to be a low power state for the embedded
+> > > device on a platform, which is quite specific to this device and
+> > > hardware design ☹
+> > 
+> > Basically what we are looking for here is, as Jake mentioned, a way for
+> > a system administrator / "power-user" to "permanently" set the driver
+> > option in order to mask the issue on specific systems suffering from it.
+> > 
+> > As it can sometimes manifest during early hardware initialization
+> > stages, I'm concerned that just an ethtool private flag is insufficient,
+> > as it may be 'too late' to set it after 'probe'.
+> > 
+> > Not being familiar enough with devlink, I do not understand if it can be
+> > active already as early as 'probe', but given the fact that e1000e
+> > currently does not implement any devlink stuff, this would require a
+> > bigger (and riskier?) change to the code. The module parameter is fairly
+> > trivial, since e1000e already supports a number of these.
+> > 
+> > I do not know the history and why module parameters are discouraged, but
+> > it seems that there has to be some standardized way to pass user
+> > configuration to kernel modules, which takes effect as soon as the
+> > module is loaded. I always thought module parameters were that
+> > interface; if things have evolved, I would be happy to learn. :)
+> > 
+> > --Dima
 > 
-> Not sure how stable the test is for all NICs but I think the
->   xdp.test_xdp_native_adjst_head_grow_data
-> test case will exercise what I'm suspecting will fail.
+> While I understand that module params are generally discouraged—as
+> Jacob Keller pointed out—implementing the same functionality via devlink
+> presents some challenges. Although it may be technically feasible, it
+> would likely complicate configuration for sysadmins who need to disable
+> K1 on affected systems.
+> 
+> In my view, extending an existing interface in an older driver is a safer
+> and more pragmatic approach than introducing a new one, especially given the
+> legacy nature of the devices involved. These systems are often beyond the
+> scope of our current test coverage, and minimizing the risk of regressions
+> is critical.
+> 
+> Regarding the ethtool private flag: while it may not address all potential
+> link issues, it does help mitigate certain packet loss scenarios. My
+> motivation for proposing it was to offer end-users a straightforward
+> workaround—by setting the flag and retriggering auto-negotiation, they may
+> resolve issues without needing to unload and reload the e1000e module.
 
-It took me some time to install all the dependencies and get this tool 
-running with the fix I mentioned above [1]. But I am not sure the error 
-logs I got [2] are the one which you were expecting or some stability 
-issue with the test. Can you please take a look at it.
+Thanks Vitaly,
 
-[1]: 
-https://gist.github.com/MeghanaMalladiTI/ce6a440f05fbdfb2d4363f672296d7d8
-[2]:https://gist.github.com/MeghanaMalladiTI/52fe9d06c114562be08105d73f91ba62 
+My opinion is that devlink is the correct way to solve this problem.
+However, I do understand from the responses above (3) that this is somewhat
+non-trivial to implement and thus comes with some risks. And I do accept
+your argument that for old drivers, which already use module parameters,
+some pragmatism seems appropriate.
 
+IOW, I drop my objection to using a module parameter in this case.
 
-If the fix I attached here [1] makes sense, I will go ahead and post 
-this as v2.
+What I would suggest is that some consideration is given to adding devlink
+support to this driver. And thus modernising it in that respect. Doing so
+may provide better options for users in future.
 
-Thanks.
+Thanks!
 
