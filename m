@@ -1,211 +1,123 @@
-Return-Path: <netdev+bounces-211007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211009-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F547B16272
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 16:15:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8933CB1629C
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 16:23:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 538F23A9FF2
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 14:14:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D3ED2620031
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 14:22:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BA8C217736;
-	Wed, 30 Jul 2025 14:15:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46B072D9EEA;
+	Wed, 30 Jul 2025 14:23:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YNdGN6DD"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="eE4jNhLU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 419A02C3264;
-	Wed, 30 Jul 2025 14:15:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1309D2D9ECD
+	for <netdev@vger.kernel.org>; Wed, 30 Jul 2025 14:23:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753884916; cv=none; b=aCviZFddU1vJCDGLZdU0S/dxHY52E7jEUV/GxUgVhD88S5gjk92M06XFIIv2l6osaQmT8xDlSlzsi3bBaxWaEUO7Hmvsi+/BQdyz4cslcNYHsjsTdhYCpXh3toPAE3iv4U09285xvY5wa8tKxhZToh4GG2o/1Frrl4lBLPObfzI=
+	t=1753885396; cv=none; b=lyfe0CloRDphYm0f0rOcng0Eq0X9RgsnSGl/UAqGi5Sz4xPwtFiXCln8OXaXON3W9awyXnSl6SS68d8DFQeWYgXK8Bi3+Zdrs5J+U1PLS4Z2944K4KHBLldd6tz2/z1l4aWHJ5jghmpOEVfTzN2uUTfuuMJduzvG3TWmAvQ7qpQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753884916; c=relaxed/simple;
-	bh=Z8WKZF1qAcB2oc/3RY6CB39RFCZu1U0ELTHjaUz8veg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hJhIB/8Mf7mSfF/qxxz1o6axubeVrYxpY90oRp58fiQsd7Rcqb3ZaTueTWG9soCPz9Plcu4Vj4Usg4ZWXixIO7d0/x4KrCWfUBiexsb+BjGEO+YvlQFgCIdVKNd/ikVofj38YNuzpLaAXD+nvq87go/7HAVT7ZRkCriMU8L+V8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YNdGN6DD; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4561607166aso6846285e9.2;
-        Wed, 30 Jul 2025 07:15:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753884912; x=1754489712; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Cj7xuCDwSSUyk/P3n0X0MKFMXCloTe+RUvJmTVUwO7w=;
-        b=YNdGN6DDPu7y+agngfA7hbjbvGxhlXghjczBTAbeI5oG2bAhdgc3p2kOU0fLE1WNfT
-         Pq9WlBe2v8BPCKSSKpykHG5VXFOmPztK+dm7Wvbm4aGXo5N2+lQ4bY5v8ic6j2cwZdpg
-         uD7mQGRNX16jD52sG58myjLBdMU/PWlnkbiUHHBXsHTPp62SDW9UFwqIBL8W5GLyl+Gf
-         8qb6JiuH2tTEX6mt1weyKMsLpcau3Dox6zyC6Yl/xXZKWh0URaoQMO1tXlZU9s0q9qH4
-         UZGLpyr4bb6iXqsfe/v1OAWVflqkOtVD6XpPt/TO2mKDHMC8ya28VF+2zmH4jMroDeg/
-         wXyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753884912; x=1754489712;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Cj7xuCDwSSUyk/P3n0X0MKFMXCloTe+RUvJmTVUwO7w=;
-        b=pnxG+STro2Ymtvj4TYkKoJkJdazvO0VPyPYwqhbSErz4pSbApWLzFOFEovbhtOQoz3
-         4RuWiJwUfinu86i7C03Zgm+5K6BBcSw3aGohN73hvV95APp/xlXJaJ7UQybizspG8mj+
-         gEomZepvkyDaFj/WvWHxSm9glBgbcrfgBOis/tk8kEQAMpqSqt6AXu/Bo4NbmlIHWshF
-         tuXquQbkTvY+LuNN042VLDmcIHIU8Q+9NlQtxYiAko1ZoUJ25JKxKcWLllMXjz7H6rHJ
-         zu7nwUsN0ukCwdSwkwVFlBTHksJQ7OfWZJia5E9rb0Tp6zPBJeE0GkQfSAyThV5O0avX
-         2xcA==
-X-Forwarded-Encrypted: i=1; AJvYcCWKgNrFu7ia8Hz21YOFTJWdRwbtoDZ1bZgNA1QBIPFTCqaB8+Afj9ED1fAQpDge5KWlGuHGWRHijg==@vger.kernel.org, AJvYcCWoMEqyY78ioTu1ImlUgw5Tge0qeRMmFXwIlP/N8DhV+28x+WAsEzR27HVWiTUQwQ+JOX8YYj6M@vger.kernel.org
-X-Gm-Message-State: AOJu0YwE5d/YAOG0M2y5Z6rwKMrztetyKpp7OB92O3Z5VNuS10pgxMR1
-	gTgGWBIlQteXDdPvKs5mqmF6gcWAO05u+blB4EvLBPraNuka7ezfZ+Hi
-X-Gm-Gg: ASbGncsjHSKV08/TsmLO4zn0W3TxTcVcZf3yiKo3ypTiOypoc3BQm26JlR3FK4wq1cE
-	vAABcMEwz2iqBOO138N3t7Hxvm9LGvpSij9i8M/Fmg3mX3FC2V4w0OcxKpnR6Wlf4iOg3SWZ58h
-	3qgxhavdKd4T3kH0OnoKiOn3atQzuGrx8chmwneKbrcvBfRTcKpkuNRFA8bJ0QzwRHO49+9lUIR
-	+2/PC99ZcFyKYpNGj2t0iFCsrxWKNuWbJTSRqOA+QdPHLdoDemf5GU3dU6gvtIV33I231dvvbwe
-	h2YNAFhQeFdCH9eNIa9SQusBJwSkQbZhPi5sq3YWPTf91J13f/yo4Wt6UVNdOpfzJhEHzJ243sW
-	VuUyed38BjjNRUEHzPkAGQYuRHGb36uE=
-X-Google-Smtp-Source: AGHT+IFx7mPxi3CjVwR8c+QyP8py8CNpyrqCbScdwGU3T/I1wbdAvN7Yc1/oaXIxtCZEEJKP6CE9yA==
-X-Received: by 2002:a05:600c:1da2:b0:43c:ec4c:25b4 with SMTP id 5b1f17b1804b1-45892b9dfc9mr45740355e9.10.1753884912086;
-        Wed, 30 Jul 2025 07:15:12 -0700 (PDT)
-Received: from [192.168.8.100] ([185.69.144.165])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4589536bc42sm28991685e9.7.2025.07.30.07.15.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 30 Jul 2025 07:15:11 -0700 (PDT)
-Message-ID: <46fabfb5-ee39-43a2-986e-30df2e4d13ab@gmail.com>
-Date: Wed, 30 Jul 2025 15:16:30 +0100
+	s=arc-20240116; t=1753885396; c=relaxed/simple;
+	bh=JDG6xp9TUSJxGOg4WSyioaRBxUHGXguYSSOTuA67VNw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=W3eeGfriP8kwrjTvlKqmpe0iwm6A3QT7dZS/c+rnqpnlZgU69B8e/On/PxQrTwfnixFV6lxlVmxvHtAgeANAG6tVJ7H7lnfQW1PHwn/EZ1gxPDYqPBR9GMeyi+S5sHRz5zReHPxN9eivWfrCpXGM6EUTKu7wmJpT+qP4BcNR5m4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=eE4jNhLU; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=qFnJTBNOnfCyWGVeulsQ9imeMiSLi8CQ7pnaMQeRwmE=; b=eE4jNhLUzcD4MhHcFEYEDAzpnQ
+	sZiaW5tq8tuCIfaR/KBlD4pqn/1nzSM2GBnDYrhIDw+y8CecCVGI1vdue4r8sbV/vL+QefGicRN9U
+	LbrZFkrcsC8sG4zgLbnt9pdVXuHGslO4K95fnvs01y1p7jH64dBe6vqTH+zcwdgKBhQAkPhbV+gHQ
+	tW6zFg8FhhyjhwB4rxo/TapmheNvUB0pzcKPuvahFgx6VGkS0wGDBtV8ZjK+6QAMSVGE7UphOwROc
+	5y8rhKXeDWZVsrhVFV6jGhPydry/KBDgne5IZm930olrmwoWueRxmRbZVY33yQdGcv8FoBFqqIUvl
+	zjiTYo6w==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33826)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uh7hp-0003ax-2i;
+	Wed, 30 Jul 2025 15:22:57 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uh7hl-0008VF-2P;
+	Wed, 30 Jul 2025 15:22:53 +0100
+Date: Wed, 30 Jul 2025 15:22:53 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Daniel Braunwarth <daniel.braunwarth@kuka.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Gatien CHEVALLIER <gatien.chevallier@foss.st.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jon Hunter <jonathanh@nvidia.com>,
+	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	Thierry Reding <treding@nvidia.com>
+Subject: Re: [PATCH RFC ???net???] net: phy: realtek: fix wake-on-lan support
+Message-ID: <aIoqvaRk3lL1Zeig@shell.armlinux.org.uk>
+References: <E1uh2Hm-006lvG-PK@rmk-PC.armlinux.org.uk>
+ <a14075fe-a0fc-4c59-b4d3-1060f6fd2676@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC v1 00/22] Large rx buffer support for zcrx
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
- io-uring@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- Willem de Bruijn <willemb@google.com>, Paolo Abeni <pabeni@redhat.com>,
- andrew+netdev@lunn.ch, horms@kernel.org, davem@davemloft.net,
- sdf@fomichev.me, almasrymina@google.com, dw@davidwei.uk,
- michael.chan@broadcom.com, dtatulea@nvidia.com, ap420073@gmail.com
-References: <cover.1753694913.git.asml.silence@gmail.com>
- <aIevvoYj7BcURD3F@mini-arch> <df74d6e8-41cc-4840-8aca-ad7e57d387ce@gmail.com>
- <aIfb1Zd3CSAM14nX@mini-arch> <0dbb74c0-fcd6-498f-8e1e-3a222985d443@gmail.com>
- <aIf0bXkt4bvA-0lC@mini-arch> <52597d29-6de4-4292-b3f0-743266a8dcff@gmail.com>
- <aIj3wEHU251DXu18@mini-arch>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <aIj3wEHU251DXu18@mini-arch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a14075fe-a0fc-4c59-b4d3-1060f6fd2676@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 7/29/25 17:33, Stanislav Fomichev wrote:
-> On 07/28, Pavel Begunkov wrote:
->> On 7/28/25 23:06, Stanislav Fomichev wrote:
->>> On 07/28, Pavel Begunkov wrote:
->>>> On 7/28/25 21:21, Stanislav Fomichev wrote:
->>>>> On 07/28, Pavel Begunkov wrote:
->>>>>> On 7/28/25 18:13, Stanislav Fomichev wrote:
->>>> ...>>> Supporting big buffers is the right direction, but I have the same
->>>>>>> feedback:
->>>>>>
->>>>>> Let me actually check the feedback for the queue config RFC...
->>>>>>
->>>>>> it would be nice to fit a cohesive story for the devmem as well.
->>>>>>
->>>>>> Only the last patch is zcrx specific, the rest is agnostic,
->>>>>> devmem can absolutely reuse that. I don't think there are any
->>>>>> issues wiring up devmem?
->>>>>
->>>>> Right, but the patch number 2 exposes per-queue rx-buf-len which
->>>>> I'm not sure is the right fit for devmem, see below. If all you
->>>>
->>>> I guess you're talking about uapi setting it, because as an
->>>> internal per queue parameter IMHO it does make sense for devmem.
->>>>
->>>>> care is exposing it via io_uring, maybe don't expose it from netlink for
->>>>
->>>> Sure, I can remove the set operation.
->>>>
->>>>> now? Although I'm not sure I understand why you're also passing
->>>>> this per-queue value via io_uring. Can you not inherit it from the
->>>>> queue config?
->>>>
->>>> It's not a great option. It complicates user space with netlink.
->>>> And there are convenience configuration features in the future
->>>> that requires io_uring to parse memory first. E.g. instead of
->>>> user specifying a particular size, it can say "choose the largest
->>>> length under 32K that the backing memory allows".
->>>
->>> Don't you already need a bunch of netlink to setup rss and flow
->>
->> Could be needed, but there are cases where configuration and
->> virtual queue selection is done outside the program. I'll need
->> to ask which option we currently use.
+On Wed, Jul 30, 2025 at 03:59:32PM +0200, Andrew Lunn wrote:
+> > 2. detect whether we can support wake-up by having a valid interrupt,
+> >    and the "wakeup-source" property in DT. If we can, then we mark
+> >    the MDIO device as wakeup capable, and associate the interrupt
+> >    with the wakeup source.
 > 
-> If the setup is done outside, you can also setup rx-buf-len outside, no?
-
-You can't do it without assuming the memory layout, and that's
-the application's role to allocate buffers. Not to mention that
-often the app won't know about all specifics either and it'd be
-resolved on zcrx registration.
-
->>> steering? And if we end up adding queue api, you'll have to call that
->>> one over netlink also.
->>
->> There is already a queue api, even though it's cropped IIUC.
->> What kind of extra setup you have in mind?
+> We should document "wakeup-source" in ethernet-phy.yaml.
 > 
-> I'm talking about allocating the queues. Currently the zc/devmem setup is
-> a bit complicated, we need to partition the queues and rss+flow
-> steer into a subset of zerocopy ones. In the future we might add some apis
-> to request a new dedicated queue for the specific flow(s). That should
-> hopefully simplify the design (and make the cleanup of the queues more
-> robust if the application dies).
-
-I see, would be useful indeed, but let's not over complicate things
-until we have to, especially since there are reasons not to. For
-the configuration, I was arguing for a while that it'd be great to
-have an allocated queue wrapped into an fd, so that all
-containerisation / queue passing / security / etc. questions just
-solved in a generic and ubiquitous way.
-
->>>>> If we assume that at some point niov can be backed up by chunks larger
->>>>> than PAGE_SIZE, the assumed workflow for devemem is:
->>>>> 1. change rx-buf-len to 32K
->>>>>      - this is needed only for devmem, but not for CPU RAM, but we'll have
->>>>>        to refill the queues from the main memory anyway
->>>>
->>>> Urgh, that's another reason why I prefer to just pass it through
->>>> zcrx and not netlink. So maybe you can just pass the len to devmem
->>>> on creation, and internally it sets up its queues with it.
->>>
->>> But you still need to solve MAX_PAGE_ORDER/PAGE_ALLOC_COSTLY_ORDER I
->>> think? We don't want the drivers to do PAGE_ALLOC_COSTLY_ORDER costly
->>> allocation presumably?
->>
->> #define PAGE_ALLOC_COSTLY_ORDER 3
->>
->> It's "costly" for the page allocator and not a custom specially
->> cooked memory providers. Nobody should care as long as the length
->> applies to the given provider only. MAX_PAGE_ORDER also seems to
->> be a page allocator thing.
+> What are the different hardware architectures?
 > 
-> By custom memory providers you mean page pool? Thinking about it more,
+> 1) A single interrupt line from the PHY to the SoC, which does both
+> link status and WoL.
+> 
+> 2) The PHY has a dedicated WoL output pin, which is connected to an
+> interrupt.
+> 
+> 3) The PHY has a dedicated WoL output pin, which is connected directly
+> to a PMIC. No software involved, the pin toggling turns the power back
+> on.
+> 
+> For 1), i don't think 'wakeup-source' tells us anything useful. The
+> driver just needs to check that interrupts are in use.
 
-zcrx / devmem. I'm just saying that in situations where zcrx sets
-the size for its queues and that only affects zcrx allocations and
-not normal page pools, PAGE_ALLOC_COSTLY_ORDER is irrelevant.
+Not all interrupts are capable of waking the system up, and there is
+no way for a PHY to know whether it's connected to an interrupt that
+has that ability.
 
-I agreed on dropping the netlink queue size set, which leaves the
-global size set, but that's a separate topic.
+As things currently stand with how Jetson Xavier NX DT describes the
+PHY's connection, it falls into this "it has an interrupt which can't
+wake the system" - so these cases really do exist in the real world.
 
-> maybe it's fine as is as long as we have ndo_queue_cfg_validate that
-> enforces sensible ranges..
+So, we _need_ to have some way to differentiate these two cases, and
+I put the question to you - if not by "wakeup-source" then how do we
+determine whether a PHY, which itself is capable of signalling wakeup
+through its interrupt pin, can actually wake the system, and thus
+should expose WoL functionality?
 
 -- 
-Pavel Begunkov
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
