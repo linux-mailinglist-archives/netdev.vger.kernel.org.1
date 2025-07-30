@@ -1,177 +1,149 @@
-Return-Path: <netdev+bounces-210920-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210921-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE0E0B15765
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 04:04:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8F06B15798
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 04:37:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 206825A1532
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 02:04:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B90118A00C6
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 02:37:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB88A1E2848;
-	Wed, 30 Jul 2025 02:03:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC0D71BD035;
+	Wed, 30 Jul 2025 02:37:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eWXGw78A"
+	dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b="AgwMK+2x"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from layka.disroot.org (layka.disroot.org [178.21.23.139])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 436FE1D5ACE;
-	Wed, 30 Jul 2025 02:03:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EA8E288A2;
+	Wed, 30 Jul 2025 02:37:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.21.23.139
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753841039; cv=none; b=YnGqrGx7XswT9JEpRV7qW4HPK4DnpKo8nboSmUdKgAGuGV2SVVQqDgA8gEPegzMkflTyVFAS9fsJuIGb855vurdGgy29N6YmZ5O/p2R2YnrrkgzfutBop6URv3b4/LYxOnsyu1zV/h/pMmybhfUo+wng20nBru+BcIPjmIHkMTg=
+	t=1753843051; cv=none; b=Lh8rjaNhE/q7TWmxS4kzi9yXc4yfC4hU2V1bJlHHCgEqgIE+fk6MRvqgQ5kcgp+cjYFzOU48fvfI97ruxkePK/xKqEMGmy2psAhYfe6aWzJGAtH949h9lIeGEWWx5+8Vck6mzTXCs1iwREc4ismegAAj9/cMa6O7Fdaj9J4DEtE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753841039; c=relaxed/simple;
-	bh=C2Dh2y7uxmOEcVN2K5+H+xeT0w+sDUBqWX5xNBEpuqQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aPToCXMEz3GP7skSW06YxdTdZvaoHDYLNd4o80YLj6l7yJEHVPjuuqNLnB56REY8rBecjw3bQ5aIjaXw7OGzLtRLOck9l3xAd5yMuwf/rxjl/IKx7dQ28nCgVQydiB4Y27rhYpzvlWvbG/PNJtsYIzT6Ggdk7/mhOvtLro4Qn+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eWXGw78A; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-23fd3fe0d81so32389685ad.3;
-        Tue, 29 Jul 2025 19:03:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753841037; x=1754445837; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NXVHa3hSudv2gKzCVrdcUINEZJnfMmL9RlrwC77Sdpc=;
-        b=eWXGw78AS4dSrFfneD67D4DuEMgWJRyjin13xpc6L5PEkAhI1t4te/+zsJHJ1w9Vew
-         GjuMymCEtEtJ7J7r+qDigLb0eHp2ZYzI7xkqkfDBsFl4H+Z1O7YDjKsSDY6RrPpZLQgD
-         tsgQvj1vm8W0cawZ6diSWHnSLt4e6/157V6K4KYJa2f7uOC0aLmigjrSinMNbQson0ua
-         tj/3SCUXh0q2ZnSoQat+w5tFggYY2+GaoG69VwsD4z9nZsr57e5xD7+vK+iXAHeKkcmX
-         LeLaC2919wgLbMoDKeFc+B/pMPndvG6ZRmKlsebHUGhBNzUro/qhXOml/gcQxkKJ4ajl
-         CTdA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753841037; x=1754445837;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NXVHa3hSudv2gKzCVrdcUINEZJnfMmL9RlrwC77Sdpc=;
-        b=woYE2NVwhS7yI44QTUA7UHdUK5ZccQjJLOUHKsZT8unWWjTuuSsKv3vFprAHLGjYV/
-         ES2JDNkUM0S5GOsJcqJixc3Lwn/CRnRFFkOE6/+O6Bio5a9XYh0G+JRPHVPvktwaofNj
-         63QjKno47URqw67Q784VfZScCCwTS/KuNdBrCaEsuxzhzf+0dp6j8JLESSoN11+Sz/mE
-         yasG2w0l3ECklaJPaUv4xAuxgBiyC4CphDzF7aDRengJWzJGEP2e1xIo6FehgDEr54Sn
-         lWSnqVje9yMrIbG/hXBjavaZ5CcCCqoYq+jDpX5ggQwF87xyCRGmnEfYIskQp3UAkP75
-         ZtcQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWlHsd5iAb4vHRWEDdUHROSjlOJTy35xQtupC7zRqqZpbn2z2KE6mwBmPjD5tqu5lCfblkZRi68jKDp8ew=@vger.kernel.org, AJvYcCXt1q1WZnWSgZmal3pfCxlMEp8oi0xH6OPW6nNhsL69XgiM3e9UjyfnO9LYaMxZ/z3LIP/YsiYk@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy9z5HrS7zdWuHVNUHFGzitD+N/Vl5zGUp8exNmd9/8eABmvjAe
-	tjDsuJqkSOauEkxPKmrAXKwas5fsq7PMyTMxTQv9RZhgv5I0NWi13xpG
-X-Gm-Gg: ASbGncucdgNI/iyDkblsoUrTyS2Z1RBBbpFXzD7vyWEkxy4hXn3mH+Qf6XhmFN2DlCp
-	kgDQllt0OZOwcrdNHBGMXaqYEQiXqcsEAFWAfvGeF/vI8HgEyNDPJp6PcNjV87KF4Hy+D1scygY
-	ntcw67SIqfgvivU25wsDVmtYFs2mI6GQYyV0FqglDRTo83C0Ci7A+KZRngOdwn9A7VG9e2gyM9a
-	k5CWLIkw9Ntqd84UGaaG8UM9/ubLyaAxa6Tx9q2HMFfbdteOzbwKhS4QcQjcpiORINu3FTmmd6s
-	W7Al6GwuXV60LhpJt8Y8ge4dLk04BRrFqh9F+YJtow8HRHMOIHFG0VBY2ohKYFr6fIiBH1XKnaS
-	CygzBKg8019fR/wcsnha/qstlKGB/NND/Q2Xeg3La
-X-Google-Smtp-Source: AGHT+IHF6jK+tnopo4qbjwzbZz/buElWW/vs4XCYurio/x3lKbEc2pbKdzuG822V+ftQuDidwpYaFg==
-X-Received: by 2002:a17:902:cf08:b0:240:6fda:582a with SMTP id d9443c01a7336-24096acc97amr18518555ad.23.1753841037487;
-        Tue, 29 Jul 2025 19:03:57 -0700 (PDT)
-Received: from localhost.localdomain ([207.34.150.221])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23ff71916f0sm70349845ad.147.2025.07.29.19.03.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Jul 2025 19:03:57 -0700 (PDT)
-From: Kyle Hendry <kylehendrydev@gmail.com>
-To: Florian Fainelli <florian.fainelli@broadcom.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
+	s=arc-20240116; t=1753843051; c=relaxed/simple;
+	bh=r6EJUgnKNkBU/gY2vKM1Kph1PWJOeN4y03H/SRXg+vA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qkbXCn1wiWPp+stLbtOkhrxtpp4Itsvi0Aoe6n/GAAvJ4rjS1QRTONcBfh/nqMnGAINbqUNddm69yisBQqVWnu0ukJKlzAVHeG1/uIw/5BwP2stDLPoEViRdvpYkTr+L48OO/J71wPxgpQQTcBtiAGkk1CvPdTk8dvLhgA6pJ1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org; spf=pass smtp.mailfrom=disroot.org; dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b=AgwMK+2x; arc=none smtp.client-ip=178.21.23.139
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=disroot.org
+Received: from mail01.disroot.lan (localhost [127.0.0.1])
+	by disroot.org (Postfix) with ESMTP id 079EC20F9E;
+	Wed, 30 Jul 2025 04:37:26 +0200 (CEST)
+X-Virus-Scanned: SPAM Filter at disroot.org
+Received: from layka.disroot.org ([127.0.0.1])
+ by localhost (disroot.org [127.0.0.1]) (amavis, port 10024) with ESMTP
+ id 8jRGBdc8Sp0M; Wed, 30 Jul 2025 04:37:25 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=disroot.org; s=mail;
+	t=1753843045; bh=r6EJUgnKNkBU/gY2vKM1Kph1PWJOeN4y03H/SRXg+vA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=AgwMK+2xLh/uRypIC/UB7RAXvQhhzpfFuUw3sFrlic/janHA/4c574mpUHzuP2h+r
+	 GNL2CupOEq6B5gdiZV45oHIDI15qtrPbsHYqpwM+J7ZmXSRWqNxJGO71PZTccZ32gv
+	 f9t8yDb2AjhhPWT1+2Edh/9S4pP4zsJ9FmYGq/WgRPGHSR/Cr4mlHMxgoOGaM65pSL
+	 4SJ7xThP+4fULiS0c/geMdiST2UWrUW5oJXk/kIwZL3f7tZtQApxwNbspRarsfTCT3
+	 Sbgzjq328tWP01hPwQEwMF4PU96Rc4IqwCcCbOt9qEoBmyfu/21MlpHaCTnDYEwpF4
+	 EfrzKAF4mIMiw==
+Date: Wed, 30 Jul 2025 02:37:09 +0000
+From: Yao Zi <ziyao@disroot.org>
+To: Conor Dooley <conor@kernel.org>
+Cc: Drew Fustini <fustini@kernel.org>, Guo Ren <guoren@kernel.org>,
+	Fu Wei <wefu@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: noltari@gmail.com,
-	jonas.gorski@gmail.com,
-	Kyle Hendry <kylehendrydev@gmail.com>,
-	netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+	Emil Renner Berthing <emil.renner.berthing@canonical.com>,
+	Jisheng Zhang <jszhang@kernel.org>, linux-riscv@lists.infradead.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 2/2] net: dsa: b53: mmap: Implement bcm63268 gphy power control
-Date: Tue, 29 Jul 2025 19:03:36 -0700
-Message-ID: <20250730020338.15569-3-kylehendrydev@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250730020338.15569-1-kylehendrydev@gmail.com>
-References: <20250730020338.15569-1-kylehendrydev@gmail.com>
+Subject: Re: [PATCH net 1/3] dt-bindings: net: thead,th1520-gmac: Describe
+ APB interface clock
+Message-ID: <aImFVW1Pl_QHijWx@pie>
+References: <20250729093734.40132-1-ziyao@disroot.org>
+ <20250729093734.40132-2-ziyao@disroot.org>
+ <20250729-canal-stimuli-492b4550108c@spud>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250729-canal-stimuli-492b4550108c@spud>
 
-Add check for gphy in enable/disable phy calls and set power bits
-in gphy control register.
+On Tue, Jul 29, 2025 at 06:43:42PM +0100, Conor Dooley wrote:
+> On Tue, Jul 29, 2025 at 09:37:32AM +0000, Yao Zi wrote:
+> > Besides ones for GMAC core and peripheral registers, the TH1520 GMAC
+> > requires one more clock for configuring APB glue registers. Describe
+> > it in the binding.
+> > 
+> > Though the clock is essential for operation, it's not marked as required
+> > for now to avoid introducing new dt-binding warnings to existing dts.
+> 
+> Nah, introduce the warnings. If the clock is required for operation, it
+> should be marked as such. You've made it optional in the driver, which
+> is the important part (backwards compatible) and you've got the dts
+> patch in the series.
 
-Signed-off-by: Kyle Hendry <kylehendrydev@gmail.com>
----
- drivers/net/dsa/b53/b53_mmap.c | 33 +++++++++++++++++++++++++++++----
- 1 file changed, 29 insertions(+), 4 deletions(-)
+Thanks for the confirmation, will remove minItems in v2.
 
-diff --git a/drivers/net/dsa/b53/b53_mmap.c b/drivers/net/dsa/b53/b53_mmap.c
-index 87e1338765c2..f4a59d8fbdd6 100644
---- a/drivers/net/dsa/b53/b53_mmap.c
-+++ b/drivers/net/dsa/b53/b53_mmap.c
-@@ -29,6 +29,10 @@
- #include "b53_priv.h"
- 
- #define BCM63XX_EPHY_REG 0x3C
-+#define BCM63268_GPHY_REG 0x54
-+
-+#define GPHY_CTRL_LOW_PWR	BIT(3)
-+#define GPHY_CTRL_IDDQ_BIAS	BIT(0)
- 
- struct b53_phy_info {
- 	u32 gphy_port_mask;
-@@ -292,13 +296,30 @@ static int bcm63xx_ephy_set(struct b53_device *dev, int port, bool enable)
- 	return regmap_update_bits(gpio_ctrl, BCM63XX_EPHY_REG, mask, val);
- }
- 
-+static int bcm63268_gphy_set(struct b53_device *dev, bool enable)
-+{
-+	struct b53_mmap_priv *priv = dev->priv;
-+	struct regmap *gpio_ctrl = priv->gpio_ctrl;
-+	u32 mask = GPHY_CTRL_IDDQ_BIAS | GPHY_CTRL_LOW_PWR;
-+	u32 val = 0;
-+
-+	if (!enable)
-+		val = mask;
-+
-+	return regmap_update_bits(gpio_ctrl, BCM63268_GPHY_REG, mask, val);
-+}
-+
- static void b53_mmap_phy_enable(struct b53_device *dev, int port)
- {
- 	struct b53_mmap_priv *priv = dev->priv;
- 	int ret = 0;
- 
--	if (priv->phy_info && (BIT(port) & priv->phy_info->ephy_port_mask))
--		ret = bcm63xx_ephy_set(dev, port, true);
-+	if (priv->phy_info) {
-+		if (BIT(port) & priv->phy_info->ephy_port_mask)
-+			ret = bcm63xx_ephy_set(dev, port, true);
-+		else if (BIT(port) & priv->phy_info->gphy_port_mask)
-+			ret = bcm63268_gphy_set(dev, true);
-+	}
- 
- 	if (!ret)
- 		priv->phys_enabled |= BIT(port);
-@@ -309,8 +330,12 @@ static void b53_mmap_phy_disable(struct b53_device *dev, int port)
- 	struct b53_mmap_priv *priv = dev->priv;
- 	int ret = 0;
- 
--	if (priv->phy_info && (BIT(port) & priv->phy_info->ephy_port_mask))
--		ret = bcm63xx_ephy_set(dev, port, false);
-+	if (priv->phy_info) {
-+		if (BIT(port) & priv->phy_info->ephy_port_mask)
-+			ret = bcm63xx_ephy_set(dev, port, false);
-+		else if (BIT(port) & priv->phy_info->gphy_port_mask)
-+			ret = bcm63268_gphy_set(dev, false);
-+	}
- 
- 	if (!ret)
- 		priv->phys_enabled &= ~BIT(port);
--- 
-2.43.0
+Regards,
+Yao Zi
+
+> > 
+> > Fixes: f920ce04c399 ("dt-bindings: net: Add T-HEAD dwmac support")
+> > Signed-off-by: Yao Zi <ziyao@disroot.org>
+> > ---
+> >  .../devicetree/bindings/net/thead,th1520-gmac.yaml        | 8 ++++++--
+> >  1 file changed, 6 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/Documentation/devicetree/bindings/net/thead,th1520-gmac.yaml b/Documentation/devicetree/bindings/net/thead,th1520-gmac.yaml
+> > index 6d9de3303762..fea9fbc1d006 100644
+> > --- a/Documentation/devicetree/bindings/net/thead,th1520-gmac.yaml
+> > +++ b/Documentation/devicetree/bindings/net/thead,th1520-gmac.yaml
+> > @@ -59,14 +59,18 @@ properties:
+> >        - const: apb
+> >  
+> >    clocks:
+> > +    minItems: 2
+> >      items:
+> >        - description: GMAC main clock
+> >        - description: Peripheral registers interface clock
+> > +      - description: APB glue registers interface clock
+> >  
+> >    clock-names:
+> > +    minItems: 2
+> >      items:
+> >        - const: stmmaceth
+> >        - const: pclk
+> > +      - const: apb
+> >  
+> >    interrupts:
+> >      items:
+> > @@ -88,8 +92,8 @@ examples:
+> >          compatible = "thead,th1520-gmac", "snps,dwmac-3.70a";
+> >          reg = <0xe7070000 0x2000>, <0xec003000 0x1000>;
+> >          reg-names = "dwmac", "apb";
+> > -        clocks = <&clk 1>, <&clk 2>;
+> > -        clock-names = "stmmaceth", "pclk";
+> > +        clocks = <&clk 1>, <&clk 2>, <&clk 3>;
+> > +        clock-names = "stmmaceth", "pclk", "apb";
+> >          interrupts = <66>;
+> >          interrupt-names = "macirq";
+> >          phy-mode = "rgmii-id";
+> > -- 
+> > 2.50.1
+> > 
+
 
 
