@@ -1,98 +1,79 @@
-Return-Path: <netdev+bounces-211058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211059-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 172D0B165EC
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 20:01:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B09BB165EB
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 20:01:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81B4258121E
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 18:00:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4624D1AA5FF1
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 18:01:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D06A22E266A;
-	Wed, 30 Jul 2025 17:59:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6A8A2DECC2;
+	Wed, 30 Jul 2025 18:01:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b="s6OB6v3I"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PkrXbAzn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-24421.protonmail.ch (mail-24421.protonmail.ch [109.224.244.21])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 727522E090B
-	for <netdev@vger.kernel.org>; Wed, 30 Jul 2025 17:59:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEA232DA75B;
+	Wed, 30 Jul 2025 18:01:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753898395; cv=none; b=eLCzmKkUMT9EHHlVThlIf0SIPpvce9f/OGT7OvymKodiloF8KYIvJOytcnH5fyL8AoKlCeEBLlJrNeIC5azFIozjjjCjYwYXY04AbNiC9dJVI7uqNvWhDeW4AV0SwOMnD8wnxixZl0eQt8I7k0D3iF1V7cbs4DTfP58Ke3pYuts=
+	t=1753898469; cv=none; b=DArJN+q7XX2D/D/oyv511ZHhyKanH8rr15lDfoGFQmzw7ChaKyGGFEL5Q+D802c7Hq3hf5xIW6yqYV5RSM8veWVGWiAKcJN0p3otiw0gD6yy0jeiSbiaoT4hlE73UX8mkygcl6CjWcHP4AEjggCQOZAWRwy75PTRaKzeH8Z0eLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753898395; c=relaxed/simple;
-	bh=I0ZwDMJqH1cGH965TzuA0norHFP9EqhparS1jc5d+d8=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ksu7nAXDXOKtA9S22pVkWRY+5lipkdA8CrkwKn7qXXEMYslwap/3d4yloDQ6RbpbIyz34kIF8YCrE+LdWSjarmvER7Ga5hey9zZQjt+PcrZSoF0XVkvjM++mQ7nL7g4M0mTFAz51Mxr/AnDNUuaQRQmGZzSGBiL4lduNctcZhUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io; spf=pass smtp.mailfrom=willsroot.io; dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b=s6OB6v3I; arc=none smtp.client-ip=109.224.244.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=willsroot.io
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=willsroot.io;
-	s=protonmail2; t=1753898385; x=1754157585;
-	bh=I0ZwDMJqH1cGH965TzuA0norHFP9EqhparS1jc5d+d8=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=s6OB6v3II/9QPlbMlgLSeP8y5sdgyDq/Em9s5WvXPVWa8AR8S9tl0XwaH4DyEEahI
-	 wI7BhxJG6IMsYUTxYIEed6brmiY/GLSMy+G6EuLW97iI+df9I/Og9kPBBMGaUG1OhQ
-	 HjP6rfE8gWRW0OSAi/kHEAjk9ohTejYtz9Il62pLXMKX16C0eLbq2Y7HdshPavlZsW
-	 Do/heCkUIBtg5HuIT6Hd+zzy5wmOAt08qFT/trNohnd8zd8eSS06uvl8XLPD6xp1zF
-	 eOTOYNRw2/CMlnVjEgscoFBVeIWAKUF1L4sUIt7NC9T1cvJYvv81kIRAH1JApQoGC+
-	 HkLcNcS9OqaVg==
-Date: Wed, 30 Jul 2025 17:59:38 +0000
-To: Cong Wang <xiyou.wangcong@gmail.com>
-From: William Liu <will@willsroot.io>
-Cc: netdev@vger.kernel.org, jhs@mojatatu.com, pabeni@redhat.com, kuba@kernel.org, jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, horms@kernel.org, savy@syst3mfailure.io, victor@mojatatu.com
-Subject: Re: [PATCH net v4 2/2] selftests/tc-testing: Check backlog stats in gso_skb case
-Message-ID: <TEN7juelysWV9lXIS7_4UsroEIbaZrmF-WdmPLPxsm6UBYNcd_kUFDQ59nOufuRqVltQs8v9Dadv4zugCJrcFnBVMZbJXx2bAvXBiP-eNSU=@willsroot.io>
-In-Reply-To: <aIpcTv4ayyP+ya25@pop-os.localdomain>
-References: <20250727235602.216450-1-will@willsroot.io> <20250727235642.216527-1-will@willsroot.io> <aIpcTv4ayyP+ya25@pop-os.localdomain>
-Feedback-ID: 42723359:user:proton
-X-Pm-Message-ID: e9ab501f6eee4590f116ba029664cfe67aa5f799
+	s=arc-20240116; t=1753898469; c=relaxed/simple;
+	bh=rbL0baLyBTSurGbqHr8B/lp7Q3TgiR0gorR/4NnFkSk=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=fQKdfY2anJZ/2k4OSodbc8d1v3uWWp4nrkFSeuXDCemu4ULvseWe9LTE/KHTHtwnQORzy7jWQSXw5j33SzkYQpW49wUUiCgnChgUUVikCWAcxMZBzcFlKdtx6mZCFadQkyJCncpTq6McmtCP+Ty4P21AbQBI7FDPZBJqNIukY7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PkrXbAzn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99CB1C4CEE3;
+	Wed, 30 Jul 2025 18:01:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753898469;
+	bh=rbL0baLyBTSurGbqHr8B/lp7Q3TgiR0gorR/4NnFkSk=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=PkrXbAzn9xfmTioWsFZqjaUU87DKK52P0ngHu6Ah+OsUhB4B4fVze10YHmr2wZlda
+	 X9VZzSnuUMoflqyPbfLVXUIxuOnx6GztgFYUVHuv7AtDk0r2qJImt3wxfsue1OHxMo
+	 zqXfPfuK+EcusOo2MmizvRxW0EJeYkKSMzoIU0zFklgli9BFtfLZSSG4Vclymz+o1f
+	 dH1n0Pke/ZKmvkzzMX2dnJDV0a0D6pRKUtAdD+kiWcEi7gXZm+lJ+NpG1R0j8AnpPX
+	 JBQD36O9tNmHo93wchZ1dqxeM5o3qfg+eXRlAf2m45aRz4rUIVEWxEM+HNrmxe+Np3
+	 BNtUdsCXfyWKA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id DF248383BF61;
+	Wed, 30 Jul 2025 18:01:26 +0000 (UTC)
+Subject: Re: [GIT PULL] Networking for v6.17
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20250727013451.2436467-1-kuba@kernel.org>
+References: <20250727013451.2436467-1-kuba@kernel.org>
+X-PR-Tracked-List-Id: <netdev.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20250727013451.2436467-1-kuba@kernel.org>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git tags/net-next-6.17
+X-PR-Tracked-Commit-Id: fa582ca7e187a15e772e6a72fe035f649b387a60
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 8be4d31cb8aaeea27bde4b7ddb26e28a89062ebf
+Message-Id: <175389848555.2400114.10775447448060364828.pr-tracker-bot@kernel.org>
+Date: Wed, 30 Jul 2025 18:01:25 +0000
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-On Wednesday, July 30th, 2025 at 5:54 PM, Cong Wang <xiyou.wangcong@gmail.c=
-om> wrote:
+The pull request you sent on Sat, 26 Jul 2025 18:34:51 -0700:
 
->=20
->=20
-> On Sun, Jul 27, 2025 at 11:57:10PM +0000, William Liu wrote:
->=20
-> > + "setup": [
-> > + "$IP link set dev $DUMMY up || true",
-> > + "$IP addr add 10.10.11.10/24 dev $DUMMY || true",
-> > + "$TC qdisc add dev $DUMMY root handle 1: tbf rate 8bit burst 100b lat=
-ency 100ms",
-> > + "$TC qdisc replace dev $DUMMY handle 2: parent 1:1 hhf limit 1000",
-> > + [
-> > + "ping -I $DUMMY -c2 10.10.11.11",
-> > + 1
-> > + ],
->=20
->=20
-> Sorry, I still have troubles understanding the magic "1" here, and I
-> don't find any other selftest using it. So why do we need it here?
->=20
-> You said it is in the original reproducer, but the original reproducer
-> is not part of tc-testing. This does not explain to me.
->=20
-> Thanks.
+> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git tags/net-next-6.17
 
-Oh, that was the magic number you were referring to? That is the expected r=
-eturn code for ping in that case, and must be specified if a command in the=
- setup returns non-zero.=20
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/8be4d31cb8aaeea27bde4b7ddb26e28a89062ebf
 
-This behavior is documented in the tc-testing READMEs, under creating-testc=
-ases/AddingTestCases.txt (section SETUP/TEARDOWN errors).
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
