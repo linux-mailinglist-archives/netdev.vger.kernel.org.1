@@ -1,234 +1,226 @@
-Return-Path: <netdev+bounces-210922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210923-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB25FB157DC
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 05:38:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6674BB157F5
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 05:46:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E8744E6991
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 03:37:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9737F18A7531
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 03:46:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B79F61DED53;
-	Wed, 30 Jul 2025 03:37:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91A42CA4E;
+	Wed, 30 Jul 2025 03:46:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GPBIW0Jo"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eSBcUtQP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C38E61D5ACE;
-	Wed, 30 Jul 2025 03:37:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753846648; cv=none; b=kZusPYVBAdZgDWi+PRqwubROCx0ttgNkM4e/ygwImmeOabaEEyIcty3f/ls0c0Tpt9urkjA3Qit+KpCSyqdNUjbVtoBUOtgDG5OCHlpwnEg+8bQK8wF4WSUfInrTA9nLRMv/zU3q2xPIsOkgzx0YBBpzuXUpxCwUYUUnOc/qn+U=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753846648; c=relaxed/simple;
-	bh=Ymk96y7FUWnE0zbfR0VLJRsckN/JMqE00GtgLPj0qRo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tRjW2AZPjDZqx4CHIj5mCCJ4N98FsCGQ9bY+qcWx2HIThGlt/BAUVATRL425Ssjnk1eRx0JmRzTpRk0hSh/WIrtef3vvnN8YqM/Sf9/hpp+0rbDy9KfMaxH+HN2ZsdbHFBijhYVZTGBDOrs1s6czehIb8aI85JvN4dkvwOeJVPU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GPBIW0Jo; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A6C84C62;
+	Wed, 30 Jul 2025 03:46:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753847185; cv=fail; b=msAQEmU2nAIoN7vuCzsAvCV7lq3KwqoHIAGTlZUc/rUWMXxJvJzcZWr0nJAuSAjS9JGarmVruqF/mOhQtr5Zfrov2XRz+Xfq7bGmqeXlBGZBiki/yQEzZBqKfSKmk5Pcpq9+y8Y06H1+HwWH0iLj1YMPf6KXAUZBU89vYpj6jTQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753847185; c=relaxed/simple;
+	bh=fNQQ2t1av8P/NgwoWa8Qjlt0H/fmgK3iFBWkujyA0IY=;
+	h=From:Date:To:Message-ID:In-Reply-To:References:Subject:
+	 Content-Type:MIME-Version; b=ICC68AIRRO2BmwJAw5u0XJZlUTH5QyJZzJeHchDzGoni5JxiAJUmiviKf5NWM4k/DxwF0MUqP9i84l4LCDyylzMy3TTetdav2IKcTexH8X8iSSin3U9H9q/dVhW1DUVlTfmHVHhbY/RjhKfn2jV4KAVihOJ977OA1UsQyxZjc/s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eSBcUtQP; arc=fail smtp.client-ip=192.198.163.8
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1753846646; x=1785382646;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Ymk96y7FUWnE0zbfR0VLJRsckN/JMqE00GtgLPj0qRo=;
-  b=GPBIW0JoswrYZqLOFl7JfU/8JWFEUAfQdQwlfNEopqH/geapbwQuk5NU
-   qRiLceCkZ/ygzPiuB3jxFHvcpK9smITH4ymYNSedD1Cdf4kT5iPkmLXIl
-   FvQT5bGHgb5gyU8V8PZFFFk8ZvfRN+LUtWXiun1t/cZt+8WAj/+nXV8po
-   Ho4f8I0A7+lIvhOKAdPjT4MrqjqLQSLo4lq7TeH8VMR3NolNKqJZ8xMLR
-   /DpVZvgqIwKtrakvlyxocODfa7Rx+orqk7AA0JpWxE6cpKyfe/ctWZC0p
-   c6dox8TWVPN+XDpuYDZlIGmXDVjbN9Qt6OAq/5v61K7l4nPuAs/CvC25Y
-   A==;
-X-CSE-ConnectionGUID: KcpYhl+bRXeBjapDLBHZSA==
-X-CSE-MsgGUID: 4vo5y8HYS0yqgnd6UC4Shw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11506"; a="81578758"
+  t=1753847184; x=1785383184;
+  h=from:date:to:message-id:in-reply-to:references:subject:
+   content-transfer-encoding:mime-version;
+  bh=fNQQ2t1av8P/NgwoWa8Qjlt0H/fmgK3iFBWkujyA0IY=;
+  b=eSBcUtQPuO6MU6svJWWTOLnlQ+MMB5QIgGB76eXpkHYSHdqThc28ITf8
+   ztQtK0h13/RD+Ak3bS9WYK1vkf4IlKXYJtOZWFyELkoK2xipUxb7Fgp3B
+   mtOz++cr8y/CJ0ITalrYvgR+97wqwpm9Uzv8YISTJCzvxziBwkTUbd+ic
+   LZZi+xY1W7koEnDK+4d9YDYQ3294SRqbQMEzqxE57FvzCldbi6RPKPQnI
+   spG9DML28kIlnj/Ut4VkFb7RXgJyk1Q9e97vccqkP0mJrpP1Q/04GmY6l
+   jykK2s468qhyv1ZqfePrpwgDDmo/Y8sKdKSYxQsMvcb1J4KyDWh6RS5sD
+   w==;
+X-CSE-ConnectionGUID: 8Mf1nO/LRE2onV+srz9+oA==
+X-CSE-MsgGUID: 733Tcd3rTb2UjfgTl5a4gQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11506"; a="73726701"
 X-IronPort-AV: E=Sophos;i="6.16,350,1744095600"; 
-   d="scan'208";a="81578758"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jul 2025 20:37:26 -0700
-X-CSE-ConnectionGUID: ar/G3DOGS8uedznncdnXVw==
-X-CSE-MsgGUID: H23rFKPZQJqYSvne5Xy7JA==
+   d="scan'208";a="73726701"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jul 2025 20:46:24 -0700
+X-CSE-ConnectionGUID: 6Yv/WrS0Sca9tsNIPgcaqg==
+X-CSE-MsgGUID: ByM/VFeTSeG5z/r5TTBmWw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,350,1744095600"; 
-   d="scan'208";a="167077052"
-Received: from lkp-server01.sh.intel.com (HELO 160750d4a34c) ([10.239.97.150])
-  by orviesa003.jf.intel.com with ESMTP; 29 Jul 2025 20:37:22 -0700
-Received: from kbuild by 160750d4a34c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1ugxd1-0001y2-21;
-	Wed, 30 Jul 2025 03:37:19 +0000
-Date: Wed, 30 Jul 2025 11:36:21 +0800
-From: kernel test robot <lkp@intel.com>
-To: Gatien Chevallier <gatien.chevallier@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	Gatien Chevallier <gatien.chevallier@foss.st.com>
-Subject: Re: [PATCH net-next v2 1/2] drivers: net: stmmac: handle start time
- set in the past for flexible PPS
-Message-ID: <202507301148.TVzOecMo-lkp@intel.com>
-References: <20250729-relative_flex_pps-v2-1-3e5f03525c45@foss.st.com>
+   d="scan'208";a="162597790"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by orviesa009.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jul 2025 20:46:23 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26; Tue, 29 Jul 2025 20:46:23 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26 via Frontend Transport; Tue, 29 Jul 2025 20:46:22 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (40.107.93.47) by
+ edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26; Tue, 29 Jul 2025 20:46:22 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=VzXGUPJMaioyyZ2+jTAuc5azgenkqsUGjImDr7Y+w0GF2mCZTLMiYUab7dUFH+HdMhWlCiEabXcf7R0yATW4CQRtk1lxHX9uC5DnjnV4tR5+O6RVrpDULvLPrcFigfNeCjj0CS+yBpvYY59/LX4KQtw+QCaPgLLi94/Zv702O9Zknb7P/Zr/aam0XUVaEhro8iLg3Pu2hHH3wsIj/gQQDGVV5B+JU2WgwruQxJg6VvmMzYvVVPVpS+qObHxCP4I+TaoBwZ7MTlMXK+6R5TcuT0o0Rjlz4oUb4cEJ1KHZocHRTrxFUHEvqh+oOskfWTvhN+NurUd1IIq+mSBKbt3P9A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fNQQ2t1av8P/NgwoWa8Qjlt0H/fmgK3iFBWkujyA0IY=;
+ b=Z45uac8nXw8Z6vqAmSNxRpAt23HDlzIKSQIiGeu6hAxaN4CRExD217s+ulQ9zIZCZOnaZqOI1KxUyXbxX+Auj1eL03nRalRWpL9jqD/VE5cV/lPMD3QY/2qt+f1rZHZcYV5Pqb8NVM7p5fcUP7XmnaJLhg8uXwRt+gAhXR3qsvW+mPRP9DqsEk0tVl6i3y/OvSJ9oyVi6945H3Sb+CGOl3p+gWA/eakP1u3dDh5kC5abEOtbnNd+PKG/6TYCc4f1fkaFu/wjiGBAGmQZvYY7pef3uVV/fv7+AL9sMlLCBbGk2HyXqRJiYsnPTOo/EIZU/82zh9w0ODc1CPF17fOQsg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com (2603:10b6:510:256::6)
+ by SA1PR11MB8446.namprd11.prod.outlook.com (2603:10b6:806:3a7::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8989.11; Wed, 30 Jul
+ 2025 03:46:21 +0000
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::6b05:74cf:a304:ecd8]) by PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::6b05:74cf:a304:ecd8%6]) with mapi id 15.20.8989.010; Wed, 30 Jul 2025
+ 03:46:20 +0000
+From: <dan.j.williams@intel.com>
+Date: Tue, 29 Jul 2025 20:46:18 -0700
+To: <dan.j.williams@intel.com>, Alejandro Lucero Palau <alucerop@amd.com>,
+	Dave Jiang <dave.jiang@intel.com>, <alejandro.lucero-palau@amd.com>,
+	<linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<dan.j.williams@intel.com>, <edward.cree@amd.com>, <davem@davemloft.net>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>
+Message-ID: <6889958acca0f_55f09100b2@dwillia2-xfh.jf.intel.com.notmuch>
+In-Reply-To: <6887b72724173_11968100cb@dwillia2-mobl4.notmuch>
+References: <20250624141355.269056-1-alejandro.lucero-palau@amd.com>
+ <20250624141355.269056-11-alejandro.lucero-palau@amd.com>
+ <30d7f613-4089-4e64-893a-83ebf2e319c1@intel.com>
+ <a548d317-887f-4b95-a911-4178eee92f0f@amd.com>
+ <6887b72724173_11968100cb@dwillia2-mobl4.notmuch>
+Subject: Re: [PATCH v17 10/22] cx/memdev: Indicate probe deferral
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BYAPR08CA0060.namprd08.prod.outlook.com
+ (2603:10b6:a03:117::37) To PH8PR11MB8107.namprd11.prod.outlook.com
+ (2603:10b6:510:256::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250729-relative_flex_pps-v2-1-3e5f03525c45@foss.st.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH8PR11MB8107:EE_|SA1PR11MB8446:EE_
+X-MS-Office365-Filtering-Correlation-Id: d97896d1-8363-493c-db1c-08ddcf1ba5b0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|921020;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?VUs0b25JWDZGOUJQVWdSQWdpVlNrc1BRWll0cnJybnpHMGRZTzl5RURRQ2U1?=
+ =?utf-8?B?WExYRytVS2QxbHY1ZmVuYTgzdGczejBqRVNmT2YwdXd5SUpWL3VHTi9SVVNR?=
+ =?utf-8?B?MTRVRk1UenZMRzF2NUlYODRvUHZidEQ4RzlKZTNLK1A4dnZHWkhQTkNsSWJH?=
+ =?utf-8?B?VzRXdXFqcUxvZTRkNGxacWZjS0hob1E5am0rZXhVOXZ4ODlQcjIrSGxxdHla?=
+ =?utf-8?B?dEpscXY3dDByaEFONXBNUWxVMXNKMWw4QlFzcFFOUXdCcTE0ZnBpSHRmM0Ix?=
+ =?utf-8?B?YjE0Sm5xRlV0b2lIR1d3Sk5Bc2RZdWtqcUdnUE1FU3NGYjV6bXMycGFhZkN5?=
+ =?utf-8?B?QUFYTEU1WDJMYWtRZlU4eVF2THFTdGJzMEI0U09RVm5BTElQU1VqaCsvcVZN?=
+ =?utf-8?B?bkpJek5QbkVJOVV4SVNhNCtQOGJKa3ZiTWRFMm5sT0pGQTRqNWZTWFF4d1dJ?=
+ =?utf-8?B?MnQwKzJQS25rQzRqRWxWeGhTMHFyL2ZRQkhueSs3NHlqT1QzeEFaRU56U0V4?=
+ =?utf-8?B?azZRSlQ5VnVxUlFNeVJwbXNCZFBhbURVWDhlR0E0bWhmNlFQNTNKWFBIbkJr?=
+ =?utf-8?B?WWd3cnFYeWZCY0pUUmJaRmVZbk5Pb0FsMVBOOC9uL1R4RDFIUCtuZDRPVTc2?=
+ =?utf-8?B?cUZXcGp2Z2JHT0JKdmlCVXJlQTJQaHR2d0FTMmNSRDgxRVRkWjNJaTFxL3dx?=
+ =?utf-8?B?NnZ5UURRbTY2QXJyZGRQWFJNSjM1TFFQMHVMci9ianIxeFd6ZmtnYklLNlNZ?=
+ =?utf-8?B?SGYvWEtPYjhWaDk4NHJ2WnBFTUtIWWVLTlkxd3NzV29kOEg2RmJlMm5sbUFO?=
+ =?utf-8?B?bEtlb0VLUmJGM3Y1UTJMT3ZXZk9ya0dhenNoSTgvUEdvcXFTQWFTQjBjMFBI?=
+ =?utf-8?B?VkwzVjJMUUpFY0Q0T0NWSi9uaUhTTkZ0RFBZcFV5RHJGcitZSjREbVhpQWtL?=
+ =?utf-8?B?TkFGNkxIdVlRNmh4U2dRak9NZXhuRWFJS0YzZEpiZ3c0YVlBUlErSzBwYmFN?=
+ =?utf-8?B?Z2MwNFF3eEFKT09zTFBZYUFQNG50N2pPY0pkZmtJYkV2ZkU1cENTT1JsMUpk?=
+ =?utf-8?B?OUk4SlRqNDBjWFpNTTM5cjMzMldxTzJsMVN6eG10VzAxMTdKQStIMkNDUHR4?=
+ =?utf-8?B?NU5PQ1o0KzhPT1dtcytaeTVSVTZBYmFQS0hGWGo2YndIc2VUQU9sR3puRkgw?=
+ =?utf-8?B?dmxmc05UM0ZnYXVIRjFnbUE0YnFiVHBOY2k0azVDNU5sUWdBWG5tOXdRRWh0?=
+ =?utf-8?B?bmRoTkJvRS9tdlR4QXpPa3Q0UHBBT0RtZmVQeVVMMFhWTnpyZHBOUEQ4VGds?=
+ =?utf-8?B?Zm0xQ0dvWjBGNituMTRyQU8yRVRtRHFmQ3NzYXB5dmsxcnczb0FSbVJCOUV5?=
+ =?utf-8?B?Y0ZvSWloc21GR0wxRUc4WFp4aUdySVFLMDBiZDhINEdvdEx3ZnNpR2I2OVhr?=
+ =?utf-8?B?L0ZuSHFLSC94YVBqMy9WRnZvcCtoc09aMDJaakJONysvSDRZYnBYcHdsV3Ns?=
+ =?utf-8?B?MTEwd2V2d0twNkd5cUc1M3NQQ05WeGZZNXpaVVkrc29ueXAzemJodEQwTzBj?=
+ =?utf-8?B?UC93WXBYR1oyUjdnYjZ1Z25jejBoTTNOandhTVZHd0JTMFdqS21jUGpDS0lT?=
+ =?utf-8?B?cURTTzFDZEhsRFloa2thNis0Wi9zMVlMN1ZwUkV3K3JRbkRQdW9NLzFQMXk2?=
+ =?utf-8?B?OUNXTU9uaWF5UDNEaUplV1pNYnJDRDBVaU5aU3NZeVg5aXVqeEtQWlo0bC85?=
+ =?utf-8?B?Y2FvN3NSOWtOTlBUWWU2SWpsUW1zYW5FT2Y1KytPOHlOa2hDL3lVS090dUNQ?=
+ =?utf-8?B?YzZmYzZJYnhIallJUTJudHIza0labTJmR3Y1bmMwYkw4MUxoTzlicmVvbDZi?=
+ =?utf-8?B?dngwU2Nqc1BNQno2d2g0azRYUWgxTHVHWHJPYmZodDd6OExTWjc1bWQvWFQ5?=
+ =?utf-8?B?cUg1UkR5LzIwTjFUVFBwOEU1RkxVV2xzd2RCRUh4Sm1DL2ozRlZBR25lem9y?=
+ =?utf-8?B?THozd1M3NXBnPT0=?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB8107.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UStwTTgra2lNbkZFblhKaCtKMWRsWDQyYTJ6U2dheEZwWlp2bDVObnB4WGw1?=
+ =?utf-8?B?VHdObjVpNHRnckNqSG9kamZJY2NFTHpwUlNmTVhYSVpIcUZtcnRzOFE5Smti?=
+ =?utf-8?B?K05EbUVyVDhMcjZXY2ZHckJWZWhWZS9PU2xRcWNXV2JsQTVmK2pvZjNlYUp3?=
+ =?utf-8?B?QnkxSzdDeHRZTWM4T3pQcU0xbHR5c2lLUkNHcVlKL29NYmNLVEJzYUxPaWdx?=
+ =?utf-8?B?N3o1Vmk3aHlISElUUmQybVA4KzZQc0wvZktxbExwVG85OFZBN0F0eHlISGo4?=
+ =?utf-8?B?RlVLeXNMT05CR0lqenR5VDhUaHlqUVFFTkh4Zk1ja3BCMVVCUWNpNXZVRUpK?=
+ =?utf-8?B?blI1ZWtvcEoyaW5udXppTVhLbjdHd3dCRGFGY1lZZW82RlhsV0sxOFZjL0Zl?=
+ =?utf-8?B?VkxPeVMzNldFYjh3anZXNStFTjhmdi9YaVRzb0lFZVVZeGNXSW5YZytZYU1h?=
+ =?utf-8?B?REp3VzBSV1crN1JPTU5wNkZ0dmhLUzU4NWVnREtjMWpyL1dNbnkyYzF4SXFj?=
+ =?utf-8?B?UVBQak5OUWFERFl2MDk1QUFSdmlVZ1BhK3gva3hsL0FhTFg1TWZGaTRxNit5?=
+ =?utf-8?B?UVhuZFB3cndrNTcrc1UwTHNrbmp5d3ZmM0wxR3Y5MERZMlloSEUwdUhoLytK?=
+ =?utf-8?B?b3c5elFXWk13Ym1BY2t0RXFPa2Y5NDRLZ1lUenAyZk9VVE1naDJhT2MvQkhB?=
+ =?utf-8?B?djZxc3VHMGMrQzFFRTl3eTlTelIwNW9oa0JqODBTM2FxdnpZRzF6UzM1WjVp?=
+ =?utf-8?B?Qk5xNFU3d1p6YURsL1hYQVJnRHlkaFJtM1ViN0VlNHNka0htVHVkeWloblRX?=
+ =?utf-8?B?QjJmNHFGYlNvZWRxSEZsU05rU1UyTlRUb3BvTTFPR01WeWNhdjBkRkhvMmJt?=
+ =?utf-8?B?aVFrcU5NY0drZTFmTDdDamU2UnRWZHhqZGJWVmpUbmhRa3o2Ny9DSmdLT0JG?=
+ =?utf-8?B?MHRUR0ZCZXQyZDJiSUpHVTh2RkpySjhiSkR3TGdMdnZ2Z1ZsVk9vZERSM2xU?=
+ =?utf-8?B?Q2xSaDJsTlNpejhFSVNPZUoxaXlDL2VuQUZic1JhVkY1ZEdSejhYSHlvS0Nk?=
+ =?utf-8?B?UGRyTVlxL0NUUk93SXBYRmVyR1U4d3MvVGJleExYWElrRW1NM1dqQnNoVEdV?=
+ =?utf-8?B?eURLbGJZTmdoamFjWmF2T0pSR0dtM3VDcjY5aS9PTzBJOWc0ZCtLNmQxaWIx?=
+ =?utf-8?B?cHVNK2VnM25PRzQ5MVN3a2x1eW15ZzhJK2o5bUJuNHRnenFLMk02UXJYNVg2?=
+ =?utf-8?B?ZlJidkw2bDBMN3hkejBhQmpqYTQxeVFOdWtDYUduZHdHVE1TbVNjSHNGN1h1?=
+ =?utf-8?B?VGVIdy9LTTd2MDJpbmw1TUFjK0hyQ1lxRHAvZFQxdzk1Wm5Kc2Y3WlZTOEkw?=
+ =?utf-8?B?aDRWdVZuOGRFQkdGa2FlcUNWdTVGdS94NGpUbFJUWHQ1dUVwUWNLVWJEbVF3?=
+ =?utf-8?B?dDIxRXc0dldtazA5eWxQa0YwZzB1aWdIcnIzRkptKzZodW9Ma084Tm5iZW9F?=
+ =?utf-8?B?K0RGTXZMK3FxSGxLc0pSTnJUQWpHRjVwMElCdmEwSmdWUFRtM0JhUHNqL21R?=
+ =?utf-8?B?V3hQZnhiR2l1cFY5SWcrYkk5LzhnNEtERXp6cFBETGtPOGhPallwQURxNGcx?=
+ =?utf-8?B?dmVzUGZ4N0VyNFFtbDRVQk1meEpZTUhEcFFlcUloYkt4emIwZUwxU0F1elBG?=
+ =?utf-8?B?cXlxbHBsSndQSGY0VzM5KzArR0hHQi9DUkZHNUNEVEdiemx3UGw1Q0MyMGlh?=
+ =?utf-8?B?Qlk5Qm1paHdJcWU5Vmk0Vlg5Y3F4NFAxdlRNR3RzSkhablp2VTJNZ2NmUmF1?=
+ =?utf-8?B?YWhQOE9hWi9vUWJwTlZTVFVxSkgvNG4wa3FtckJsNDZLbGYyK0hTSzFVckJM?=
+ =?utf-8?B?cmM3RU1TSlRzY3JrQTdOM25pMHhJanhJdkVNK0huZkxwZXFXWkNuaE5tOWtK?=
+ =?utf-8?B?VXpWYWw0RFg5UWZPUkxqZ3R2MmNxNG5nYnNuVjNrd0hJNmE1TmZvTFNEMWNG?=
+ =?utf-8?B?OWdzTVg2R04raFRZT2Q1WS8rN3M2Z2RHQmx4OWkxMnI5TjZNamh6c1lmUHFt?=
+ =?utf-8?B?MTFnOHpGWU1GOXJLanI4cGUrUzQ5Mm8yYXI0emZIV0dtZzZWWGtSM1k2aXNX?=
+ =?utf-8?B?RW5HMkUvMWNsaXQrTmJlV2NaOGpnYURkenlYRXBIOHVhUDEyNGZpMzI4ZmRN?=
+ =?utf-8?B?Qnc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: d97896d1-8363-493c-db1c-08ddcf1ba5b0
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB8107.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jul 2025 03:46:20.8921
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: QeMaKIQOVHFbd4eFn5BJk8Jr8Tajn5BcvEPeUqYtueS9R7nkP1q+qcaaPkubyKYYxMJGRniNkR2lPzZKkiBi8+kj3mgCSTsmtO8E8edH/oc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB8446
+X-OriginatorOrg: intel.com
 
-Hi Gatien,
+dan.j.williams@ wrote:
+[..]
+> Meanwhile, I am going to rework devm_cxl_add_memdev() to make it report
+> when CXL port arrival is deferred, permanently failed, or successful.
 
-kernel test robot noticed the following build warnings:
+Here is a branch with my work-in-progress thoughts on fixing some of
+these module load ordering problems and obviating the need for
+cxl_acquire_endpoint():
 
-[auto build test WARNING on fa582ca7e187a15e772e6a72fe035f649b387a60]
+https://git.kernel.org/pub/scm/linux/kernel/git/cxl/cxl.git/log/?h=for-6.18/cxl-probe-order
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Gatien-Chevallier/drivers-net-stmmac-handle-start-time-set-in-the-past-for-flexible-PPS/20250729-225635
-base:   fa582ca7e187a15e772e6a72fe035f649b387a60
-patch link:    https://lore.kernel.org/r/20250729-relative_flex_pps-v2-1-3e5f03525c45%40foss.st.com
-patch subject: [PATCH net-next v2 1/2] drivers: net: stmmac: handle start time set in the past for flexible PPS
-config: x86_64-buildonly-randconfig-002-20250730 (https://download.01.org/0day-ci/archive/20250730/202507301148.TVzOecMo-lkp@intel.com/config)
-compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250730/202507301148.TVzOecMo-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202507301148.TVzOecMo-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c:177:3: warning: label followed by a declaration is a C23 extension [-Wc23-extensions]
-     177 |                 struct timespec64 curr_time;
-         |                 ^
-   1 warning generated.
-
-
-vim +177 drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
-
-   163	
-   164	static int stmmac_enable(struct ptp_clock_info *ptp,
-   165				 struct ptp_clock_request *rq, int on)
-   166	{
-   167		struct stmmac_priv *priv =
-   168		    container_of(ptp, struct stmmac_priv, ptp_clock_ops);
-   169		void __iomem *ptpaddr = priv->ptpaddr;
-   170		struct stmmac_pps_cfg *cfg;
-   171		int ret = -EOPNOTSUPP;
-   172		unsigned long flags;
-   173		u32 acr_value;
-   174	
-   175		switch (rq->type) {
-   176		case PTP_CLK_REQ_PEROUT:
- > 177			struct timespec64 curr_time;
-   178			u64 target_ns = 0;
-   179			u64 ns = 0;
-   180	
-   181			/* Reject requests with unsupported flags */
-   182			if (rq->perout.flags)
-   183				return -EOPNOTSUPP;
-   184	
-   185			cfg = &priv->pps[rq->perout.index];
-   186	
-   187			cfg->start.tv_sec = rq->perout.start.sec;
-   188			cfg->start.tv_nsec = rq->perout.start.nsec;
-   189	
-   190			/* A time set in the past won't trigger the start of the flexible PPS generation for
-   191			 * the GMAC5. For some reason it does for the GMAC4 but setting a time in the past
-   192			 * should be addressed anyway. Therefore, any value set it the past is considered as
-   193			 * an offset compared to the current MAC system time.
-   194			 * Be aware that an offset too low may not trigger flexible PPS generation
-   195			 * if time spent in this configuration makes the targeted time already outdated.
-   196			 * To address this, add a safe time offset.
-   197			 */
-   198			if (!cfg->start.tv_sec && cfg->start.tv_nsec < PTP_SAFE_TIME_OFFSET_NS)
-   199				cfg->start.tv_nsec += PTP_SAFE_TIME_OFFSET_NS;
-   200	
-   201			target_ns = cfg->start.tv_nsec + ((u64)cfg->start.tv_sec * NSEC_PER_SEC);
-   202	
-   203			stmmac_get_systime(priv, priv->ptpaddr, &ns);
-   204			if (ns > TIME64_MAX - PTP_SAFE_TIME_OFFSET_NS)
-   205				return -EINVAL;
-   206	
-   207			curr_time = ns_to_timespec64(ns);
-   208			if (target_ns < ns + PTP_SAFE_TIME_OFFSET_NS) {
-   209				cfg->start = timespec64_add_safe(cfg->start, curr_time);
-   210				if (cfg->start.tv_sec == TIME64_MAX)
-   211					return -EINVAL;
-   212			}
-   213	
-   214			cfg->period.tv_sec = rq->perout.period.sec;
-   215			cfg->period.tv_nsec = rq->perout.period.nsec;
-   216	
-   217			write_lock_irqsave(&priv->ptp_lock, flags);
-   218			ret = stmmac_flex_pps_config(priv, priv->ioaddr,
-   219						     rq->perout.index, cfg, on,
-   220						     priv->sub_second_inc,
-   221						     priv->systime_flags);
-   222			write_unlock_irqrestore(&priv->ptp_lock, flags);
-   223			break;
-   224		case PTP_CLK_REQ_EXTTS: {
-   225			u8 channel;
-   226	
-   227			mutex_lock(&priv->aux_ts_lock);
-   228			acr_value = readl(ptpaddr + PTP_ACR);
-   229			channel = ilog2(FIELD_GET(PTP_ACR_MASK, acr_value));
-   230			acr_value &= ~PTP_ACR_MASK;
-   231	
-   232			if (on) {
-   233				if (FIELD_GET(PTP_ACR_MASK, acr_value)) {
-   234					netdev_err(priv->dev,
-   235						   "Cannot enable auxiliary snapshot %d as auxiliary snapshot %d is already enabled",
-   236						rq->extts.index, channel);
-   237					mutex_unlock(&priv->aux_ts_lock);
-   238					return -EBUSY;
-   239				}
-   240	
-   241				priv->plat->flags |= STMMAC_FLAG_EXT_SNAPSHOT_EN;
-   242	
-   243				/* Enable External snapshot trigger */
-   244				acr_value |= PTP_ACR_ATSEN(rq->extts.index);
-   245				acr_value |= PTP_ACR_ATSFC;
-   246			} else {
-   247				priv->plat->flags &= ~STMMAC_FLAG_EXT_SNAPSHOT_EN;
-   248			}
-   249			netdev_dbg(priv->dev, "Auxiliary Snapshot %d %s.\n",
-   250				   rq->extts.index, on ? "enabled" : "disabled");
-   251			writel(acr_value, ptpaddr + PTP_ACR);
-   252			mutex_unlock(&priv->aux_ts_lock);
-   253			/* wait for auxts fifo clear to finish */
-   254			ret = readl_poll_timeout(ptpaddr + PTP_ACR, acr_value,
-   255						 !(acr_value & PTP_ACR_ATSFC),
-   256						 10, 10000);
-   257			break;
-   258		}
-   259	
-   260		default:
-   261			break;
-   262		}
-   263	
-   264		return ret;
-   265	}
-   266	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Feel free to steal from that branch and take code upstream with my
+Co-developed-by. The main missing piece is integration with Terry's
+"pdev->is_cxl" enabling to know when it is worth waiting for CXL
+scanning and when to fallback to PCIe only.
 
