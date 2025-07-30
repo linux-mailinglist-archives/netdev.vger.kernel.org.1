@@ -1,258 +1,139 @@
-Return-Path: <netdev+bounces-211060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211061-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24DE6B16631
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 20:25:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A94EAB1666E
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 20:40:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7018D7A62F4
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 18:23:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E33C916B3E1
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 18:40:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D1D82D8DBB;
-	Wed, 30 Jul 2025 18:25:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DCB12E0934;
+	Wed, 30 Jul 2025 18:40:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yPZo6tvZ"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="C+LRz/Fs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 778812DFF18
-	for <netdev@vger.kernel.org>; Wed, 30 Jul 2025 18:25:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 806802BCFB
+	for <netdev@vger.kernel.org>; Wed, 30 Jul 2025 18:40:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753899915; cv=none; b=BReeDfVoewP8cWvx5Magd5fQRj4PQd6Z47byCdn8hQO3iPTUKX/K+3upqVLsWAAtAAFUP6bLzusRBwCNP7KS0WSIlDgB0+ep0VH4f0gF3DVDPhR+2pUxWyc6CYLVMJ++OV2ED8FBNKISdBxBrNciC5apyhbTdvL7BKcHcAdzeFE=
+	t=1753900841; cv=none; b=mCf9mleK6x9AHgU47pBDl1aR2jIQkv+bx0BFW7Z3KTsA7JhcSsnp9TgmIusioXNnbMG+E91FtY2Narq57Lpx7WKLVXtHypJgfpIU/d4y+zqdoTa241nDEBKYd3MpOa5XXG0AYsYpNLnRQu7JYyxHvF0lOdVS5QtSOGv4zqNSGWY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753899915; c=relaxed/simple;
-	bh=xcM07qqQG1QkaQR3uER1UumqgobnRGmBV15fWmy0vLw=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=axGByKGhwu3O141A4NI2T7jnHTdxXTTFhb9Gk6spemy95GTYy1H9L7567Y2u8xSEOcRobQudHfvVAlbBirVMGYDhIaAgYbf63s+yvoE26s21vR+mkwq4mU319G99OBBZ0R7g1DKdmOvN8tOZVSc68saBzH/NGKx47MCXgYLDgC8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--skhawaja.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yPZo6tvZ; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--skhawaja.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-76bb326ad0bso102432b3a.0
-        for <netdev@vger.kernel.org>; Wed, 30 Jul 2025 11:25:13 -0700 (PDT)
+	s=arc-20240116; t=1753900841; c=relaxed/simple;
+	bh=IVM70qYvN/XOAguGi/kqskNt7LzvrV9LGIbn7aH+V8Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sh9TNELMsVU8Fo0yZ+lJfSnIj3+E9qFim/xYqocZmu+sMBaaY2LY85IgFiz8mRcSpr9ToPKxCqGmJQHXOxPBaJYYDwDMGTS48veQ73GwZ5zL2r2CBizhTAzolhnXeD2ygyyLehs0Qf7GgnEL1BqN40r089Qk9Se0a9vQdYzgMpg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=C+LRz/Fs; arc=none smtp.client-ip=209.85.222.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-7e6696eb422so16189085a.1
+        for <netdev@vger.kernel.org>; Wed, 30 Jul 2025 11:40:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1753899913; x=1754504713; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=kyqA2AGC5gxI8a7nMyJB1BOgUw36FQUHf95EQRzfeeY=;
-        b=yPZo6tvZVXD13BFXGrD4nfssSDwNKKysvhxXPasz2laYSqOQmg9lQ5idknSwpdU7u0
-         VG6gyS0IeMaljT1u4DHDR6EdlgOGXgoyTAS7C3j8KrecCBxbIEJ3lltRkp5HSbTwQ8vw
-         WBfF4z1hzZ7Lxzv4MEx9b2o+erpo1fM9Jt3tubGRadk3kDxI4NeCg04LeJlbia936JMI
-         D5ZWQaHLEZuCE4iW6bO+U4lUCTN7GYCNedK3AVCOKcdKxx+rx5aOI5LEBEpW3d8UCxLP
-         lxv9nLSNiEzGHauqQgMOg3ZZNRKREFjs1UnxPCZgnTkhHoo/rvbTjH2PgR5ZVL4KAKU2
-         Am+Q==
+        d=broadcom.com; s=google; t=1753900837; x=1754505637; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=IonUsexfFJI2Qe7J6Ag5z9tijA0TPXif9Ty5AL7Fkk8=;
+        b=C+LRz/FssFd95e6X9dQ9qW7kSlA1OIAg6zHdRnjn4ghMWqt6jfqROQxsDZ5Lzwh2J2
+         p+vsJg1ZhK92WljZZSQvHjKDIrGPu4jRz8iytBaDtYVrcQ1tGf+em2tYT4qmHMIJixV1
+         banbenB8KXjhlMt3SmBQkAH6PJhRi/ZoQpkXQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753899913; x=1754504713;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=kyqA2AGC5gxI8a7nMyJB1BOgUw36FQUHf95EQRzfeeY=;
-        b=G5x5ts8wkKGee8PmoH2LUNXVlXrBZk1Y+zjjg5YQ8hN74Vu8cxq93DXkA5sLOPc3Ps
-         48Fy2p+TvmQdZXmUTUKT4zxdz8ErZ3FojrcBX8iN56+XPkTUPggiQDiDfHcLgLtWdRr7
-         mfT6bnr6cgKUdfZ9/hXR/1ONq2yakZEK1EJP4MkaqrsWlm2UA1ubpQJZv55Mdt6eaOlR
-         poy5BLITZ8umrsYoONT3tG9Yu+psA4/uV75r0N2SvkZNtxRpLzYh72X2aCzL0tDKinGQ
-         yLUJ3jqFZ+5z9iHz2CLO8VZUQtHG1eGPwbgUkgo8M02HQE/Fwdg+1FvTlvEN6LZgrv+q
-         Xe2g==
-X-Forwarded-Encrypted: i=1; AJvYcCWRH+ZKEBXPKE3pk0y8a9rWAPWGhfM0iH/tLV+NM5agGqYhKqCuCHfgZ8M82lWXaAsOXdHjEAA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwQtaC7f2sbv995XnC6lonQPmHOragWie3Y+WniQDcnEFc38CEx
-	TL391ZaRmDwqkNfK6CXu+8EFUELF5Wms2VdQ4gm3eHq/H5oqZ70/LhgzZo0OR+2WUtxKScIPgpx
-	pzW3Ks7clWH5UzA==
-X-Google-Smtp-Source: AGHT+IE/IUxgbD6Nv856GftLdf7rE1dVpJKra7qsVCFjrhxnIZ7rqquJTWAnpl1uuqhqYahf64MhXNav43QuWQ==
-X-Received: from pfgt1.prod.google.com ([2002:a05:6a00:1381:b0:747:a8ac:ca05])
- (user=skhawaja job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a00:acc:b0:769:d4b3:74ef with SMTP id d2e1a72fcca58-76ab101926fmr6012117b3a.5.1753899912575;
- Wed, 30 Jul 2025 11:25:12 -0700 (PDT)
-Date: Wed, 30 Jul 2025 18:25:11 +0000
+        d=1e100.net; s=20230601; t=1753900837; x=1754505637;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IonUsexfFJI2Qe7J6Ag5z9tijA0TPXif9Ty5AL7Fkk8=;
+        b=rShuqF3V5DZqyTuNgBngO8kq82wp1wfmVmu5eNK0DgSNivIceT4O3A2+dUhdYJhAZM
+         z07YCfTb0uDkW/sieVU9SxXkQ9JjDcFtAEl2wM20uh7GWdjRmdHgpB1SRYbuwPv9e42Y
+         /lJ2lxpLQPepK59EFk9kDchNMoar7oNZ9YXS19cru8AWifObzT7wQii1dqok2aSB9XF3
+         iIiu7wV1h66WvXDkysBoVnRubfa6+nHflZcOTacht2aimwmafsTRqcfHFhoACmmLsqFG
+         Dce6z6XwcmMIL7Hqt7hwJNK+JFm0WWQ12pM9VI/kmKfZbX+GGSAFEJmUcuzJhV2OG+vz
+         qM2g==
+X-Forwarded-Encrypted: i=1; AJvYcCVwkzaoj9eFY3+m0dOjPE8bbRMkc5ct7hSyREsRHNho1UpWYXiiosCq9yIV5KnXy7MzSHlyBU0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz5f0iji6I6veoPkUYoMVGseJOT10cykbALNx2Eu5NAjimYglMR
+	DGI1XlVAaSBKzFsolt2+hmG9D/ZddNVfNtqG+svlXTAjWomZVSNTmUcwkQgq+E6GnA==
+X-Gm-Gg: ASbGncv7wuLTBJ5VR7U8BnCs7QJVazNrYdR+ry6BTOSWokfzL/eTDDJdHn7zyI99Fd6
+	TJPeQ+xZjqifkLrUu+3ZIr90vCcDJOfRAm6XI2Lc6ZMhrl1xTWIZ6nteq/ZF4WW22A6ozoKug8H
+	Q2LAqQi2iTebgRIdQjo2lKP8SAVjcgawcJrMGNztlgc7SzHPY6R3B9T2BbaQ9LJIGKejzTG9tE2
+	do590aTOtTYjAYys8y3vN8V9J4lDvwGemeMEG9+e717e5ddlWqt47h0vlBVXpWjxWkpV2aT1moc
+	IQz21T4ydU5fue/qp0DCpMeM/uqd0REZML7LT+pkmXkW4za7+PIJzrHaflus/QAeuCzVgD8Wlyl
+	/I+Ru/PUoprw0E3P82jvlqdyzX8zemBpAv4xGTsp8lu5y9Chn7gIfLytOISqQjMU95IHDBcYo
+X-Google-Smtp-Source: AGHT+IE3inDhWohOYETkhYbohWJXCAMzVVHXaHtt0AxBFNb4I9F3zUPQuGJUH+H69GHCagCIYEv1cg==
+X-Received: by 2002:a05:620a:a20d:b0:7d5:e4a2:2374 with SMTP id af79cd13be357-7e66ef7f88dmr578892785a.8.1753900836997;
+        Wed, 30 Jul 2025 11:40:36 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7e6432928fasm604278385a.21.2025.07.30.11.40.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 30 Jul 2025 11:40:36 -0700 (PDT)
+Message-ID: <1d12c152-d248-499f-a3e0-53d02b7c873f@broadcom.com>
+Date: Wed, 30 Jul 2025 11:40:33 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.50.1.552.g942d659e1b-goog
-Message-ID: <20250730182511.4059693-1-skhawaja@google.com>
-Subject: [PATCH net-next v2] net: Update threaded state in napi config in netif_set_threaded
-From: Samiullah Khawaja <skhawaja@google.com>
-To: Jakub Kicinski <kuba@kernel.org>, "David S . Miller " <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, willemb@google.com
-Cc: almasrymina@google.com, netdev@vger.kernel.org, skhawaja@google.com, 
-	Joe Damato <joe@dama.to>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/2] net: dsa: b53: mmap: Add gphy port to phy
+ info for bcm63268
+To: Kyle Hendry <kylehendrydev@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+ Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: noltari@gmail.com, jonas.gorski@gmail.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250730020338.15569-1-kylehendrydev@gmail.com>
+ <20250730020338.15569-2-kylehendrydev@gmail.com>
+Content-Language: en-US
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
+ xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
+ M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
+ JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
+ PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
+ KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
+ AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
+ IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
+ ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
+ bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
+ Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
+ tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
+ TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
+ zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
+ WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
+ IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
+ U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
+ 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
+ pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
+ MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
+ IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
+ gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
+ obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
+ N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
+ CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
+ C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
+ wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
+ EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
+ fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
+ MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
+ 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
+ 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
+In-Reply-To: <20250730020338.15569-2-kylehendrydev@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Commit 2677010e7793 ("Add support to set NAPI threaded for individual
-NAPI") added support to enable/disable threaded napi using netlink. This
-also extended the napi config save/restore functionality to set the napi
-threaded state. This breaks netdev reset for drivers that use napi
-threaded at device level and also use napi config save/restore on
-napi_disable/napi_enable. Basically on netdev with napi threaded enabled
-at device level, a napi_enable call will get stuck trying to stop the
-napi kthread. This is because the napi->config->threaded is set to
-disabled when threaded is enabled at device level.
+On 7/29/25 19:03, Kyle Hendry wrote:
+> Add gphy mask to bcm63xx phy info struct and add data for bcm63268
+> 
+> Signed-off-by: Kyle Hendry <kylehendrydev@gmail.com>
 
-The issue can be reproduced on virtio-net device using qemu. To
-reproduce the issue run following,
-
-  echo 1 > /sys/class/net/threaded
-  ethtool -L eth0 combined 1
-
-Update the threaded state in napi config in netif_set_threaded and add a
-new test that verifies this scenario.
-
-Tested on qemu with virtio-net:
- NETIF=eth0 ./tools/testing/selftests/drivers/net/napi_threaded.py
- TAP version 13
- 1..2
- ok 1 napi_threaded.change_num_queues
- ok 2 napi_threaded.enable_dev_threaded_disable_napi_threaded
- # Totals: pass:2 fail:0 xfail:0 xpass:0 skip:0 error:0
-
-Fixes: 2677010e7793 ("Add support to set NAPI threaded for individual NAPI")
-Signed-off-by: Samiullah Khawaja <skhawaja@google.com>
-
----
-
-v2:
- - Setting napi threaded state in napi config when enabled at device
-   level instead of skipping napi_set_threaded in napi_restore_config.
- - Added a new test in tools/testing/selftest/drivers/net.
----
- net/core/dev.c                                |   3 +
- .../selftests/drivers/net/napi_threaded.py    | 108 ++++++++++++++++++
- 2 files changed, 111 insertions(+)
- create mode 100755 tools/testing/selftests/drivers/net/napi_threaded.py
-
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 1c6e755841ce..1abba4fc1eec 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -7023,6 +7023,9 @@ int netif_set_threaded(struct net_device *dev,
- 	 * This should not cause hiccups/stalls to the live traffic.
- 	 */
- 	list_for_each_entry(napi, &dev->napi_list, dev_list) {
-+		if (napi->config)
-+			napi->config->threaded = threaded;
-+
- 		if (!threaded && napi->thread)
- 			napi_stop_kthread(napi);
- 		else
-diff --git a/tools/testing/selftests/drivers/net/napi_threaded.py b/tools/testing/selftests/drivers/net/napi_threaded.py
-new file mode 100755
-index 000000000000..f2168864568e
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/napi_threaded.py
-@@ -0,0 +1,108 @@
-+#!/usr/bin/env python3
-+# SPDX-License-Identifier: GPL-2.0
-+
-+"""
-+Test napi threaded states.
-+"""
-+
-+from lib.py import ksft_run, ksft_exit
-+from lib.py import ksft_eq, ksft_ne
-+from lib.py import NetDrvEnv, NetdevFamily
-+from lib.py import cmd, defer, ip
-+
-+
-+def _assert_napi_threaded_enabled(nl, napi_id) -> None:
-+    napi = nl.napi_get({'id': napi_id})
-+    ksft_eq(napi['threaded'], 'enabled')
-+    ksft_ne(napi.get('pid'), None)
-+
-+
-+def _assert_napi_threaded_disabled(nl, napi_id) -> None:
-+    napi = nl.napi_get({'id': napi_id})
-+    ksft_eq(napi['threaded'], 'disabled')
-+    ksft_eq(napi.get('pid'), None)
-+
-+
-+def _set_threaded_state(cfg, threaded) -> None:
-+    cmd(f"echo {threaded} > /sys/class/net/{cfg.ifname}/threaded")
-+
-+
-+def enable_dev_threaded_disable_napi_threaded(cfg, nl) -> None:
-+    """
-+    Test that when napi threaded is enabled at device level and
-+    then disabled at napi level for one napi, the threaded state
-+    of all napis is preserved after a change in number of queues.
-+    """
-+
-+    ip(f"link set dev {cfg.ifname} up")
-+
-+    napis = nl.napi_get({'ifindex': cfg.ifindex}, dump=True)
-+    ksft_eq(len(napis), 2)
-+
-+    napi0_id = napis[0]['id']
-+    napi1_id = napis[1]['id']
-+
-+    threaded = cmd(f"cat /sys/class/net/{cfg.ifname}/threaded").stdout
-+    defer(_set_threaded_state, cfg, threaded)
-+
-+    # set threaded
-+    _set_threaded_state(cfg, 1)
-+
-+    # check napi threaded is set for both napis
-+    _assert_napi_threaded_enabled(nl, napi0_id)
-+    _assert_napi_threaded_enabled(nl, napi1_id)
-+
-+    # disable threaded for napi1
-+    nl.napi_set({'id': napi1_id, 'threaded': 'disabled'})
-+
-+    cmd(f"ethtool -L {cfg.ifname} combined 1")
-+    cmd(f"ethtool -L {cfg.ifname} combined 2")
-+    _assert_napi_threaded_enabled(nl, napi0_id)
-+    _assert_napi_threaded_disabled(nl, napi1_id)
-+
-+
-+def change_num_queues(cfg, nl) -> None:
-+    """
-+    Test that when napi threaded is enabled at device level,
-+    the napi threaded state is preserved after a change in
-+    number of queues.
-+    """
-+
-+    ip(f"link set dev {cfg.ifname} up")
-+
-+    napis = nl.napi_get({'ifindex': cfg.ifindex}, dump=True)
-+    ksft_eq(len(napis), 2)
-+
-+    napi0_id = napis[0]['id']
-+    napi1_id = napis[1]['id']
-+
-+    threaded = cmd(f"cat /sys/class/net/{cfg.ifname}/threaded").stdout
-+    defer(_set_threaded_state, cfg, threaded)
-+
-+    # set threaded
-+    _set_threaded_state(cfg, 1)
-+
-+    # check napi threaded is set for both napis
-+    _assert_napi_threaded_enabled(nl, napi0_id)
-+    _assert_napi_threaded_enabled(nl, napi1_id)
-+
-+    cmd(f"ethtool -L {cfg.ifname} combined 1")
-+    cmd(f"ethtool -L {cfg.ifname} combined 2")
-+
-+    # check napi threaded is set for both napis
-+    _assert_napi_threaded_enabled(nl, napi0_id)
-+    _assert_napi_threaded_enabled(nl, napi1_id)
-+
-+
-+def main() -> None:
-+    """ Ksft boiler plate main """
-+
-+    with NetDrvEnv(__file__, queue_count=2) as cfg:
-+        ksft_run([change_num_queues,
-+                  enable_dev_threaded_disable_napi_threaded],
-+                 args=(cfg, NetdevFamily()))
-+    ksft_exit()
-+
-+
-+if __name__ == "__main__":
-+    main()
-
-base-commit: fa582ca7e187a15e772e6a72fe035f649b387a60
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
 -- 
-2.50.1.552.g942d659e1b-goog
-
+Florian
 
