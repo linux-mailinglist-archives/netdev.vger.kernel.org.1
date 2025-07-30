@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-211049-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211050-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C32AAB164D2
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 18:36:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4A37B164E5
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 18:40:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2F2EC188D676
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 16:36:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 164F87A628B
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 16:39:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E840A2DC358;
-	Wed, 30 Jul 2025 16:36:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6CA32DEA8A;
+	Wed, 30 Jul 2025 16:40:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="5Hurjpjl"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="qvhbE45E"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 021A319007D
-	for <netdev@vger.kernel.org>; Wed, 30 Jul 2025 16:36:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0564C1624E1
+	for <netdev@vger.kernel.org>; Wed, 30 Jul 2025 16:40:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753893386; cv=none; b=BbGOfGWrdL0nyH9FRdkx2Wf3m4/tDq/xLYgGAr6pccqz5WNcvCMFnqHbW2R8BA0tmnEPIvNKkXMEWcg+yShejxsu8O3TsB1+Vwl62fgPVaznF27YHKNY+wLqMJEYdp0UOdjwo0r9dFNAtOSxoznsdFRu09nRTsU5WzzxIEb6f3k=
+	t=1753893646; cv=none; b=WDvna/8yEX1XwoWjJUlsyFMIoGDZXdb09mQJON0XQ9CCVAhARMP1ztKuLFMiBfUR+VbGabb8yvu9BCBzvwIVcjKE++16dKm687Ze1RijJIW5iSzMICsHXLcFyuLvY6FivgRcjU18tHoyRm/R42LX81RWB7RXyvEx6T3XZdYJcJs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753893386; c=relaxed/simple;
-	bh=+kG3EjPP4yusabObSwvJ6Q19DV6QQIO2naL5dcdZ9xE=;
+	s=arc-20240116; t=1753893646; c=relaxed/simple;
+	bh=HJgQa2x3un2LXu2ghjwgsdDs0UVNd66ef/5hYsK3Zkk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P7lwe3DbsYYaZQRZqu3CwLWLxAtXTBIhZDjJfvtUTBs7AeEhWwpiln7RtJE7EJ7xp5WOI1J5/SXPK1grvOxlbrAJG3gvgq21cf7aYdVlFs/99GYHIH3P6Vz4XiwViuSNpQED4DbExviQnhTIoCHblP6BJuzbXQhOoKyg0vDCw+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=5Hurjpjl; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=UNBV6Hca/P3tOOpgAIWfSyciTj/h3S/XCUUb9YNuzYHBuF7IF8Ex+1a7XWmLs2No+tPFTleBkSGzDcCz6f1xVboJ+hyF05DK/WFWmhxndXYVr7wnmlovcJGWbC2pNH/IdJJiDof08f/C41dZzxGlKX3EKJ2mmRlxxL7e8f8/qpo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=qvhbE45E; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,19 +36,19 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=AiyTE7hDe9EeXlJ/W7WjJt4fzpoS/m9yM+nOnIGfHfI=; b=5Hurjpjl0uVTfQYqrPPAVh10u4
-	4+Nv1+HpInZc+0Uegkm4kcTD8i6E7Ni2PQAZ2xvBAWGM1BZgZu8+Hr/bAmeTo6VTFwcBgVUveTDkX
-	aF/BjOaPiUQIctMXNftjC0W/60+EObMi831xHfJeN0I28iPe9LmY2aFHPx9fUB2LO9qM=;
+	bh=N8Kjs3bH8aFQj/NnCgzBcFc93BhH8wPAOXv+ad8CFoI=; b=qvhbE45ExIf57l8RR0rLPUgZzR
+	r42XPwOowj4gQi+TrGpX0eAY6SZXVuNNQiFJAWY9cLR4S16XU+iTgACQL7y0fPPFGZdUS3tLi8bv3
+	FicW37QwCgY69+YSB5mnbxKC5hiONxWpZzaVh98QHdxDZYUXWA3rv8zSKXUxqFzXDKx0=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1uh9mw-003IU6-Ru; Wed, 30 Jul 2025 18:36:22 +0200
-Date: Wed, 30 Jul 2025 18:36:22 +0200
+	id 1uh9r9-003IVR-0f; Wed, 30 Jul 2025 18:40:43 +0200
+Date: Wed, 30 Jul 2025 18:40:43 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: _ <j9@nchip.com>
 Cc: netdev@vger.kernel.org
-Subject: Re: NETDEV WATCHDOG + transmit queue timed out
-Message-ID: <40f61816-8e0e-40ac-87ef-b7058778d056@lunn.ch>
-References: <ce1dba69-b759-485c-bc3b-5558306735bc@nchip.com>
+Subject: Re: no printk output in dmesg
+Message-ID: <6d5c7557-008b-49f5-bedc-912d5c198924@lunn.ch>
+References: <439babd9-2f47-4881-a541-5cb63b94aa57@nchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,43 +57,22 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ce1dba69-b759-485c-bc3b-5558306735bc@nchip.com>
+In-Reply-To: <439babd9-2f47-4881-a541-5cb63b94aa57@nchip.com>
 
-On Tue, Jul 29, 2025 at 07:18:32PM -0400, _ wrote:
+On Tue, Jul 29, 2025 at 07:26:12PM -0400, _ wrote:
 > Hi
 > 
-> When I try to use network interface end0 on kernel version 6.14 for Rockchip
-> RK3588 SoC, I get this in dmesg:
+> In "stmmac_main.c", in function "stmmac_dvr_probe", after probing is done
+> and "ret = register_netdev(ndev);" is successfully executed I try this
 > 
-> "rk_gmac-dwmac fe1c0000.ethernet end0: NETDEV WATCHDOG: CPU: 1: transmit
-> queue 1 timed out 5408 ms"
-> 
-> dmesg:
-> rk_gmac-dwmac fe1c0000.ethernet end0: Link is Up - 10Mbps/Half - flow
-> control off
-> rk_gmac-dwmac fe1c0000.ethernet end0: NETDEV WATCHDOG: CPU: 2: transmit
-> queue 1 timed out 5388 ms
-> rk_gmac-dwmac fe1c0000.ethernet end0: Reset adapter.
-> rk_gmac-dwmac fe1c0000.ethernet end0: Timeout accessing MAC_VLAN_Tag_Filter
-> rk_gmac-dwmac fe1c0000.ethernet end0: failed to kill vid 0081/0
-> rk_gmac-dwmac fe1c0000.ethernet end0: Register MEM_TYPE_PAGE_POOL RxQ-0
-> rk_gmac-dwmac fe1c0000.ethernet end0: Register MEM_TYPE_PAGE_POOL RxQ-1
-> rk_gmac-dwmac fe1c0000.ethernet end0: PHY [stmmac-0:01] driver [RTL8211F
-> Gigabit Ethernet] (irq=POLL)
-> dwmac4: Master AXI performs any burst length
-> rk_gmac-dwmac fe1c0000.ethernet end0: No Safety Features support found
-> rk_gmac-dwmac fe1c0000.ethernet end0: IEEE 1588-2008 Advanced Timestamp
-> supported
-> rk_gmac-dwmac fe1c0000.ethernet end0: registered PTP clock
-> rk_gmac-dwmac fe1c0000.ethernet end0: configuring for phy/rgmii link mode
-> 8021q: adding VLAN 0 to HW filter on device end0
-> rk_gmac-dwmac fe1c0000.ethernet end0: Link is Up - 10Mbps/Half - flow
-> control off
+> netdev_info(priv->dev, "%s:%d", __func__, __LINE__);
+> netdev_alert(priv->dev, "%s:%d", __func__, __LINE__);
+> printk(KERN_ALERT "%s : %d", __func__, __LINE__);
 
-10Mbps/Half is valid, but it is a bit unusual this decade, when most
-networks are now 1G full duplex. What is your link partner, and do you
-expect this slow a link?
+It would be normal to end the strings with "\n". The low level kernel
+print function has some ability to glue together a line from multiple
+parts. It could be without the \n the message is not getting flushed
+out the console device, etc.
 
 	Andrew
-
 
