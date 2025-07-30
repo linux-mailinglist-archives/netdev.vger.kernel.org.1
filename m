@@ -1,206 +1,346 @@
-Return-Path: <netdev+bounces-211063-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211064-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE5B1B1667E
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 20:46:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1A02B1669F
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 20:59:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 12A871AA4148
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 18:46:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 15D6C1AA48E0
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 18:59:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B53732E0B48;
-	Wed, 30 Jul 2025 18:46:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95B262E1C4B;
+	Wed, 30 Jul 2025 18:59:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="QhtqDkFM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SZUJbN0J"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0F14BE6C
-	for <netdev@vger.kernel.org>; Wed, 30 Jul 2025 18:45:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3E672E040D;
+	Wed, 30 Jul 2025 18:59:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753901160; cv=none; b=hVj98iQzaE9cEluxVEg+byOWmI3zaoyEah7syK4RJiwj6be9NqZl29EZrQL5NEyl7rjirL2uH/Ac87fQUpOuNQdv7GJa3okPk1zyCAyAPC8sElF9c5xxE5fs5L+c+fX31T9+Smw4dy7wC+9A0r6E1lyYJ9pbUtDRZj9w/v0Aq9k=
+	t=1753901947; cv=none; b=jqUyBuLJDrHNOswjkEACoey3nE5JNFB2UN2ZcT6HAoXRJLY5DWW717pkTtupAIQ5Ox7N4FITFtJG1RygbkuZJADG6XWUl5dQWsQXkIu+7VbfmyWTcvWQD8WbPPqXvbHmKj5swdQyyWRILEcEl/K1cV9eM2ZPP82Unl/hlY4PJMM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753901160; c=relaxed/simple;
-	bh=1z1U0obMkiLsmQaExQuoJDPQREdMzdgQHbnAO/wm344=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aJLJdNNij2/SrrutBS+718rcEt8lgOPapIZdgO8TfuOQwTQVISr57JOqxEMithTKpvuRbj5tFUcCmdcEciqTkfe0MSpYqHop8RSonU3fQGw3Js2WpziFIlN0oeyaRRvy5glS+UcVBIHwmmvhRKJ7UkXcQOg/+bcGeqtrFq/cnyM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=QhtqDkFM; arc=none smtp.client-ip=209.85.222.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-7e62a1cbf83so24722585a.1
-        for <netdev@vger.kernel.org>; Wed, 30 Jul 2025 11:45:58 -0700 (PDT)
+	s=arc-20240116; t=1753901947; c=relaxed/simple;
+	bh=9sbowcg/drUdkcPedeiHktT4sqUszdVk3khY8gQb71E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=KmXQ7K27LQ6xzjXm2allnBFhk/NtCuF5wzUaSBGHBbjlCc9E5PN105IyjE7yn8lUb+e/JTRz56wYrYEmVjo3U1U6D5N3+qbeNc8Quu7JuaFuzAR8UMJVf+xKy1CpI/PWaJtCqUY4zDFQijfC9zHxCzsPwKDGqegYizw5LDsm4T0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SZUJbN0J; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-23c8f179e1bso2556445ad.1;
+        Wed, 30 Jul 2025 11:59:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1753901158; x=1754505958; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=F+eATscs7aYEx7D5z9es6qkQ0c9vyiUmimHLhMPiQ9E=;
-        b=QhtqDkFMgftLjZiv5ydmSlGlyPORGC77Wph2JJ5TmQ/nnYApmiGeBEYISOLB3pDB7g
-         mSh9k+GAl5YDm1WEmFMFHREskhXV1554EqEgLeR7/xZZYu9M1cGDuXVAwBpFHh8JNuOT
-         sRHUsvSLgvCBpENAPzN+0/Nc6Tz4R0BHtbUAU=
+        d=gmail.com; s=20230601; t=1753901945; x=1754506745; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2Hfk9xLzaTCd2LGwxnk+XQ1fDW+4JKTY7e71FlqF7RY=;
+        b=SZUJbN0J5YjP18zrXafULPXBSMNayzVmFVu3YrOA1ihER6MqyYwMiQ+SqiyhAkj/P5
+         EVvGj0ZsicbjhEJonhAOSkNTn1jrFARibihxyiBjFueYQMHqJQ4RvueHZTKjLrduBFDe
+         2e1iiM9KHd4vkvlChmUTupbaxem++L9HEVD8zTC80oHieVIkzzGXc4iauK2iT1m8fGMA
+         Edz3v92yrs+LH0lffeQymvAg1QZRK3EH5r4SEzA4Q0kmdwkWxocyuCj9lAdVcMdtHdSi
+         XITDv09mb4eDaZNOwi++3nIh9XUTooeplq7SfBxkshMB8DsbLa0+TJnlwGdDAfwkaYJv
+         esmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753901158; x=1754505958;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=F+eATscs7aYEx7D5z9es6qkQ0c9vyiUmimHLhMPiQ9E=;
-        b=mY1DEKw8s5FNmQW6DIqEQHfnWWNTP7q+MbZPcMA9pHAuqymkAytw/LmyFZqFDNzczp
-         J4mTvQX8p+7uwL+6kWX+44zIP2WXoj5/N09Bd6nkHBnsHw8uwrh38xoMYZdoOHbQkRfF
-         hU1h8E9XeyH4DuTLg7zxhASTDeqFzi8TapjXTzfldvWG7Z71gS0nApZdVcjlf7mukFDI
-         tq5gDFmD6R12bTBVrtMv5+0vBhxlUbnQ8UeNgDR8fOqALOpbsTyTVeqPTiDKW0qwO0zo
-         yVgt3Pz3l9WkBExv7xTy9Pb65eCV40YQWhhJMPFaWuMaXULuUZvVbc0k9rrNDBBwJgE0
-         tLrA==
-X-Forwarded-Encrypted: i=1; AJvYcCU0ixHYIIpqzaccLrVAZyod/N5ZcCOp8A3at9PR28PIwBBH/gbglMMtyxXluazd0EZzoqds+8o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxiucLRPDbn3fsMYOZMTBhUo1W68iB+i7OoPv3nBTC0qDWi7zNV
-	LWmlaWvg+srRYuoX7y3cYTRPiMnY3CRMywW+LgSJ6ma5AzAfuWbDJSDgqrIqXIc0mQ==
-X-Gm-Gg: ASbGncudcLeTmEEkCix4WisIUJPVwpJFgTU9CYS+U5n2tdMniDgtb6z2J//X+3Sd/fZ
-	2E6EkpZLbruSXVlPqjDD+Q4HXAU66eVUh+f/5akevnzNlM2ZPyTED1PUPJQSpkMmMZ/tYEK+jpO
-	aeeOYfzYVxLm34ueVN0wT8zxAADgRfQQ2uPhFmEB0K8Ja2SQwvRQjIyASG1sjFHSPeEwl/siRDo
-	tD/suw1bgVDwT35iSyoe+5pBQg3U9OkDSRjHzp6eXBLmbsnvu/6dx0/3hBBX7wa1WxeRC3PZlEJ
-	tZOzHzyASMeXqj+ZkkCAlpVsV5JI5/Sr0enqwwMLvCQMErhyIhnJ0pBIdPzBFn+mazWXSN0B0RC
-	4dcfmew7hFmweVcq+OGzRPiTKRk1PoX8VLi+wDAnDI5f6Eo1B3/tPEw6mwJjdaA==
-X-Google-Smtp-Source: AGHT+IFOwz0qUu8e6vv/suvXI/Y4ObqQePUsZmD2wb8JPAJegrxE9SglsiFWDWrbhSW1iAvnvddVWA==
-X-Received: by 2002:a05:620a:aa03:b0:7e3:49b5:d53f with SMTP id af79cd13be357-7e66f397d1amr395742785a.34.1753901157460;
-        Wed, 30 Jul 2025 11:45:57 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7e64388e9fesm612736385a.72.2025.07.30.11.45.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 30 Jul 2025 11:45:56 -0700 (PDT)
-Message-ID: <c02f1bdb-0134-4edf-b3a7-8bb5152c11d0@broadcom.com>
-Date: Wed, 30 Jul 2025 11:45:53 -0700
+        d=1e100.net; s=20230601; t=1753901945; x=1754506745;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2Hfk9xLzaTCd2LGwxnk+XQ1fDW+4JKTY7e71FlqF7RY=;
+        b=IZJEjwsrjU4dyc7D+d/z2LXg/eiX4e3CK8QnS8pl5R4YfZbBNRDExnwZQU6EFgW6eb
+         i9x1oMiLKWvriXyKNbfrHhKcRgWifjheDZcI9mOAu2jvjRgWhy+5r2vnbL7jSxzzWVHV
+         Hf8/pLw+RQn0HUtnYsYh3LFonaOgljMQLj9jxpxWAemvjOUkEI7LKvkUNj6PbvDzTC3w
+         g/w+/D+IDkutrBkp5uxVEZyRT2xVbAwuvajAAiONu8urY/bMw5J9tgItQ1PWdwxjwXDl
+         I6kq6KMaRXqief6yZtnDlQqrjhUdf1rY9Uv2EjCS7HS/ifQKAwK9ojbXx72l/33zIl6k
+         dPAw==
+X-Gm-Message-State: AOJu0YxgxR9e5fY6rPQDgeEybKUcQKb3XyGWwTyxT/JOcCR68ZyJ7mTD
+	OtWNlc/YxZvcWmiswRoxn3XpwUabj9QjCd015VdNJfDX0F+NxIg6RXYn9JX8mw==
+X-Gm-Gg: ASbGncsY4t2934GJEKTsDG/uOrB5WtqlF4j6BWRhYIo95wCxE/7qnuBzqV+9UCmqoCi
+	miUrN0HAjItsnSPGdSIWE2K+Oxx7jtsCMcV8iOFYF3tksUntfTR0yP83lsIYNUsGgqkMLQf1PWn
+	2puSDfklSjV4bQH94KmVOQZfsSvfdRnLfnG9Y1cRleQU3Fser8KVs1YlQMPnPixi7FH/K3YXDbd
+	lr3H9R7MVQH5aSYbIZDlWMBzuoKw67nP6APhDkv4dZ17oew8e1wN/4e/V8/eCpRkfOpXN9zFmYR
+	5/p+1BzI7IUwAG6W7/Vx5NsiA6bT4WeyTNROpWeZTBR34UA5CzLO/CZbJCFWrjka1UaqlsSnCFG
+	6PBmLQbwQaZIHUA==
+X-Google-Smtp-Source: AGHT+IHAKDrqMlMqLeGkLRavVZX0YSAURApgIielVqjM+DQT5E1sMLNumfmCs6H4rL0Isc9nIZHT2g==
+X-Received: by 2002:a17:902:c94d:b0:240:bc10:804a with SMTP id d9443c01a7336-240bc108482mr25261665ad.43.1753901944532;
+        Wed, 30 Jul 2025 11:59:04 -0700 (PDT)
+Received: from localhost ([2a03:2880:ff:46::])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31f63dbb545sm2687224a91.9.2025.07.30.11.59.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Jul 2025 11:59:04 -0700 (PDT)
+From: Amery Hung <ameryhung@gmail.com>
+To: bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	alexei.starovoitov@gmail.com,
+	andrii@kernel.org,
+	daniel@iogearbox.net,
+	tj@kernel.org,
+	memxor@gmail.com,
+	martin.lau@kernel.org,
+	linux-lists@etsalapatis.com,
+	ameryhung@gmail.com,
+	kernel-team@meta.com
+Subject: [PATCH bpf-next v7 0/4] Task local data
+Date: Wed, 30 Jul 2025 11:58:51 -0700
+Message-ID: <20250730185903.3574598-1-ameryhung@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC ???net???] net: phy: realtek: fix wake-on-lan support
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Daniel Braunwarth <daniel.braunwarth@kuka.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Gatien CHEVALLIER <gatien.chevallier@foss.st.com>,
- Jakub Kicinski <kuba@kernel.org>, Jon Hunter <jonathanh@nvidia.com>,
- netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
- Thierry Reding <treding@nvidia.com>
-References: <E1uh2Hm-006lvG-PK@rmk-PC.armlinux.org.uk>
-Content-Language: en-US
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
- xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
- M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
- JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
- PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
- KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
- AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
- IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
- ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
- bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
- Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
- tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
- TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
- zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
- WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
- IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
- U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
- 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
- pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
- MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
- IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
- gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
- obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
- N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
- CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
- C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
- wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
- EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
- fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
- MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
- 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
- 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <E1uh2Hm-006lvG-PK@rmk-PC.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On 7/30/25 01:35, Russell King (Oracle) wrote:
-> Implement Wake-on-Lan correctly. The existing implementation has
-> multiple issues:
-> 
-> 1. It assumes that Wake-on-Lan can always be used, whether or not the
->     interrupt is wired, and whether or not the interrupt is capable of
->     waking the system. This breaks the ability for MAC drivers to detect
->     whether the PHY WoL is functional.
-> 2. switching the interrupt pin in the .set_wol() method to PMEB mode
->     immediately silences link-state interrupts, which breaks phylib
->     when interrupts are being used rather than polling mode.
-> 3. the code claiming to "reset WOL status" was doing nothing of the
->     sort. Bit 15 in page 0xd8a register 17 controls WoL reset, and
->     needs to be pulsed low to reset the WoL state. This bit was always
->     written as '1', resulting in no reset.
-> 4. not resetting WoL state results in the PMEB pin remaining asserted,
->     which in turn leads to an interrupt storm. Only resetting the WoL
->     state in .set_wol() is not sufficient.
-> 5. PMEB mode does not allow software detection of the wake-up event as
->     there is no status bit to indicate we received the WoL packet.
-> 6. across reboots of at least the Jetson Xavier NX system, the WoL
->     configuration is preserved.
-> 
-> Fix all of these issues by essentially rewriting the support. We:
-> 1. clear the WoL event enable register at probe time.
-> 2. detect whether we can support wake-up by having a valid interrupt,
->     and the "wakeup-source" property in DT. If we can, then we mark
->     the MDIO device as wakeup capable, and associate the interrupt
->     with the wakeup source.
-> 3. arrange for the get_wol() and set_wol() implementations to handle
->     the case where the MDIO device has not been marked as wakeup
->     capable (thereby returning no WoL support, and refusing to enable
->     WoL support.)
-> 4. avoid switching to PMEB mode, instead using INTB mode with the
->     interrupt enable, reconfiguring the interrupt enables at suspend
->     time, and restoring their original state at resume time (we track
->     the state of the interrupt enable register in .config_intr()
->     register.)
-> 5. move WoL reset from .set_wol() to the suspend function to ensure
->     that WoL state is cleared prior to suspend. This is necessary
->     after the PME interrupt has been enabled as a second WoL packet
->     will not re-raise a previously cleared PME interrupt.
-> 6. when a PME interrupt (for wakeup) is asserted, pass this to the
->     PM wakeup so it knows which device woke the system.
-> 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+v6 -> v7
+  - Fix typos and improve the clarity of the cover letter (Emil)
+  - Some variable naming changes to make it less confusing (Emil)
+  - Add retry in tld_obj_init() as bpf_task_storage_get_recur() with
+    BPF_LOCAL_STORAGE_GET_F_CREATE can fail if the task local storage
+    is also being modified by other threads on the same CPU. This can
+    be especially easy to trigger in CI VM that only has two CPUs.
 
-This looks much better and straightforward to me, thanks!
+    Adding bpf_preempt_{disable,enable} around bpf_task_storage_get()
+    does not solve the problem as other threads competing for the percpu
+    counter lock in task local storage may not limit to bpf helpers.
+    Some may be calling bpf_task_storage_free() when threads exit.
 
-> ---
-> I've sort-of tested this on the Jetson Xavier NX platform, but it's
-> been difficult because it appears that the whole interrupt/wakeup
-> stuff for the SoC is foobar in mainline. One gets the choice of
-> specifying the GPIO interrupt in DT and have working normal interrupt
-> or the power management controller interrupt for the same line and
-> having wakeup functional. You can't have both together.
-> 
-> I'm not sure whether this change should target the net or net-next
-> tree; what we have currently in 6.16 is totally and utterly broken,
-> so arguably this is a fix - but it's not a regression because 6.16
-> is the first kernel that WoL "support" for RTL8211F is in. This is
-> also a large change.
-> 
-> However, I can't see that it was tested, given all the problems
-> identified above. As a result, I've taken the decision in this patch
-> to not worry about breaking anyone's existing setup.
-> 
-> So, I have no problem with requiring "wakeup-source" to be added to DT
-> for rtl8211f PHYs that are to support wake-up, meaning that they are
-> properly wired to support WoL. We can't tell just from having an
-> interrupt - not all interrupts on all devices may be wake-up capable.
+    There is no good max retry under heavy contention. For the 1st
+    selftest in this set, the max retry to guarantee success grows
+    linearly with the thread count. A proposal is to remove the percpu
+    counter by changing locks in bpf_local_storage to rqspinlock.
 
-That seems entirely reasonable to me to expect.
+    An alternative is to reduce the probability of failure by allowing
+    bpf syscall and struct_ops programs to use bpf_task_storage_get()
+    instead of the _recur version by modifying bpf_prog_check_recur().
+    This does not solve the problem in tracing programs though.
+
+    v6: https://lore.kernel.org/bpf/20250717164842.1848817-1-ameryhung@gmail.com/
+
+* Overview *
+
+This patchset introduces task local data, an abstract storage type
+shared between user space and bpf programs for storing data specific to
+each task, and implements a library to access it. The goal is to provide
+an abstraction + implementation that is efficient in data sharing and
+easy to use. The motivating use case is user space hinting with
+sched_ext.
+
+
+* Motivating use case *
+
+CPU schedulers can potentially make a better decision with hints from
+user space process. To support experimenting user space hinting with
+sched_ext, there needs a mechanism to pass a "per-task hint" from user
+space to the bpf scheduler "efficiently".
+
+A bpf feature, UPTR [0], supported by task local storage is introduced
+to serve the needs. It allows pinning a user space page to the kernel
+through a special field in task local storage map. This patchset further
+builds an abstraction on top of it to allow user space and bpf programs
+to easily share per-task data.
+
+
+* Design *
+
+Task local data is built on top of task local storage map and UPTR to
+achieve fast per-task data sharing. UPTR is a type of special field
+supported in task local storage map value. A user page assigned to a UPTR
+will be pinned to the kernel when the map is updated. Therefore, user
+space programs can update data that will be seen by bpf programs without
+syscalls.
+
+Additionally, unlike most bpf maps, task local data does not require a
+static map value definition. This design is driven by sched_ext, which
+would like to allow multiple developers to share a storage without the
+need to explicitly agree on the layout of it. While a centralized layout
+definition would have worked, the friction of synchronizing it across
+different repos is not desirable. This simplify code base management and
+makes experimenting easier.
+
+
+* Introduction to task local data library *
+
+Task local data library provides simple APIs for user space and bpf
+through two header files, task_local_data.h and task_local_data.bpf.h,
+respectively. The diagram below illustrates the basic usage.
+
+First, an entry of data in task local data, we call it a TLD, needs to
+be defined in the user space through TLD_DEFINE_KEY() with information
+including the size and the name. The macro will define a global variable
+key of opaque type tld_key_t associated with the TLD and initialize it.
+Then, the user space program can locate the TLD by passing the key to
+tld_get_data() in different thread, where fd is the file descriptor of
+the underlying task local storage map. The API returns a pointer to the
+TLD specific to the calling thread and will remain valid until the
+thread exits. Finally, user space programs can directly read/write the
+TLD without bpf syscalls.
+
+To use task local storage on the bpf side, struct tld_keys, needs to
+be defined first. The structure that will be used to create tld_key_map
+should contain the keys to the TLDs used in a bpf program. In the bpf
+program, tld_init_object() first needs to be called to initialize a
+struct tld_object variable on the stack. Then, tld_get_data() can be
+called to get a pointer to the TLD similar to the user space. The API
+will use the name to lookup task local data and cache the key in task
+local storage map, tld_key_map, to speed up subsequent access. The size
+of the TLD is also needed to prevent out-of-bound access in bpf.
+
+
+ ┌─ Application ───────────────────────────────────────────────────────┐
+ │ TLD_DEFINE_KEY(kx, "X", 4);      ┌─ library A ─────────────────────┐│
+ │                                  │ void func(...)                  ││
+ │ int main(...)                    │ {                               ││
+ │ {                                │     tld_key_t ky;               ││
+ │      int *x;                     │     bool *y;                    ││
+ │                                  │                                 ││
+ │      x = tld_get_data(fd, kx);   │     ky = tld_create_key("Y", 1);││
+ │      if (x) *x = 123;            │     y = tld_get_data(fd, ky);   ││
+ │                         ┌────────┤     if (y) *y = true;           ││
+ │                         │        └─────────────────────────────────┘│
+ └───────┬─────────────────│───────────────────────────────────────────┘
+         V                 V
+ + ─ Task local data ─ ─ ─ ─ ─ +  ┌─ BPF program ──────────────────────┐
+ | ┌─ tld_data_map ──────────┐ |  │ struct tld_object obj;             │
+ | │ BPF Task local storage  │ |  │ bool *y;                           │
+ | │                         │ |  │ int *x;                            │
+ | │ tld_data_u __uptr *data │ |  │                                    │
+ | │ tld_meta_u __uptr *meta │ |  │ if (tld_init_object(task, &obj))   │
+ | └─────────────────────────┘ |  │     return 0;                      │
+ | ┌─ tld_key_map ───────────┐ |  │                                    │
+ | │ BPF Task local storage  │ |  │ x = tld_get_data(&obj, kx, "X", 4);│
+ | │                         │ |<─┤ if (x) /* do something */          │
+ | │ tld_key_t kx;           │ |  │                                    │
+ | │ tld_key_t ky;           │ |  │ y = tld_get_data(&obj, ky, "Y", 1);│
+ | └─────────────────────────┘ |  │ if (y) /* do something */          │
+ + ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ +  └────────────────────────────────────┘
+
+
+* Implementation *
+
+Task local data defines the storage to be a task local storage map with
+two UPTRs pointing to tld_data_u and tld_meta_u. tld_data_u, individual
+to each thread, contains TLD data and the starting offset of data in a
+page. tld_meta_u, shared by threads in a process, consists of the TLD
+counts, total size of TLDs and tld_metadata for each TLD. tld_metadata
+contains the name and the size of a TLD.
+
+  struct tld_data_u {
+          u64 start;
+          char data[PAGE_SIZE - sizeof(u64)];
+  };
+
+  struct tld_meta_u {
+          u8 cnt;
+          u16 size;
+          struct metadata metadata[TLD_DATA_CNT]; 
+  };
+
+Both user space and bpf API follow the same protocol when accessing
+task local data. A pointer to a TLD is located using a key. The key is
+effectively the offset of a TLD in tld_data_u->data. To define a new
+TLD, the user space API TLD_DEFINE_KEY() iterates tld_meta_u->metadata
+until an empty slot is found and then update it. It also adds up sizes
+of prior TLDs to derive the offset (i.e., key). Then, to locate a TLD,
+tld_get_data() can simply return tld_data_u->data + offset.
+
+To locate a TLD in bpf programs, an API with the same name as the user
+space, tld_get_data() can be called. It takes more effort in the first
+invocation as it fetches the key by name. Internal helper,
+__tld_fetch_key() will iterate tld_meta_u->metadata until the name is
+found. Then, the offset is cached as key in another task local storage
+map, tld_key_map. When the search fails, the current TLD count is
+cached instead to skip searching metadata entries that has been searched
+in future invocation. The detail of task local data operations can be
+found in patch 1.
+
+
+* Misc *
+
+The metadata can potentially use run-length encoding for names to reduce
+memory wastage and support save more TLDs. I have a version that works,
+but the selftest takes a bit longer to finish. More investigation needed
+to find the root cause. I will save this for the future when there is a
+need to store more than 63 TLDs.
+
+
+[0] https://lore.kernel.org/bpf/20241023234759.860539-1-martin.lau@linux.dev/
+
+---
+
+v5 -> v6
+  - Address Andrii's comment
+  - Fix verification failure in no_alu32
+  - Some cleanup
+  v5: https://lore.kernel.org/bpf/20250627233958.2602271-1-ameryhung@gmail.com/
+
+v4 -> v5
+  - Add an option to free memory on thread exit to prevent memory leak
+  - Add an option to reduce memory waste if the allocator can
+    use just enough memory to fullfill aligned_alloc() (e.g., glibc)
+  - Tweak bpf API
+      - Remove tld_fetch_key() as it does not work in init_tasl
+      - tld_get_data() now tries to fetch key if it is not cached yet
+  - Optimize bpf side tld_get_data()
+      - Faster fast path
+      - Less code
+  - Use stdatomic.h in user space library with seq_cst order
+  - Introduce TLD_DEFINE_KEY() as the default TLD creation API for
+    easier memory management.
+      - TLD_DEFINE_KEY() can consume memory up to a page and no memory
+        is wasted since their size is known before per-thread data
+        allocation.
+      - tld_create_key() can only use up to TLD_DYN_DATA_SIZE. Since
+        tld_create_key can run any time even after per-thread data
+        allocation, it is impossible to predict the total size. A
+        configurable size of memory is allocated on top of the total
+        size of TLD_DEFINE_KEY() to accommodate dynamic key creation.
+  - Add tld prefix to all macros
+  - Replace map_update(NO_EXIST) in __tld_init_data() with cmpxchg()
+  - No more +1,-1 dance on the bpf side
+  - Reduce printf from ASSERT in race test
+  - Try implementing run-length encoding for name and decide to
+    save it for the future
+  v4: https://lore.kernel.org/bpf/20250515211606.2697271-1-ameryhung@gmail.com/
+
+v3 -> v4
+  - API improvements
+      - Simplify API
+      - Drop string obfuscation
+      - Use opaque type for key
+      - Better documentation
+  - Implementation
+      - Switch to dynamic allocation for per-task data
+      - Now offer as header-only libraries
+      - No TLS map pinning; leave it to users
+  - Drop pthread dependency
+  - Add more invalid tld_create_key() test
+  - Add a race test for tld_create_key()
+  v3: https://lore.kernel.org/bpf/20250425214039.2919818-1-ameryhung@gmail.com/
+
+---
+
+Amery Hung (4):
+  bpf: Allow syscall bpf programs to call non-recur helpers
+  selftests/bpf: Introduce task local data
+  selftests/bpf: Test basic task local data operations
+  selftests/bpf: Test concurrent task local data key creation
+
+ include/linux/bpf_verifier.h                  |   1 +
+ .../bpf/prog_tests/task_local_data.h          | 386 ++++++++++++++++++
+ .../bpf/prog_tests/test_task_local_data.c     | 297 ++++++++++++++
+ .../selftests/bpf/progs/task_local_data.bpf.h | 237 +++++++++++
+ .../bpf/progs/test_task_local_data.c          |  65 +++
+ 5 files changed, 986 insertions(+)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/task_local_data.h
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/test_task_local_data.c
+ create mode 100644 tools/testing/selftests/bpf/progs/task_local_data.bpf.h
+ create mode 100644 tools/testing/selftests/bpf/progs/test_task_local_data.c
+
 -- 
-Florian
+2.47.3
+
 
