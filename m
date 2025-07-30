@@ -1,87 +1,69 @@
-Return-Path: <netdev+bounces-210990-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210991-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42DA5B160D2
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 14:57:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E9D7B160DC
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 14:59:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DC8877B10AF
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 12:55:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B0B77560FB7
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 12:59:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C86B6298994;
-	Wed, 30 Jul 2025 12:56:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAB46256C70;
+	Wed, 30 Jul 2025 12:59:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iN41PW32"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="TMVBu5NE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 587FA25D535
-	for <netdev@vger.kernel.org>; Wed, 30 Jul 2025 12:56:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50A2B153598
+	for <netdev@vger.kernel.org>; Wed, 30 Jul 2025 12:59:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753880188; cv=none; b=TMtKnVDaalw2Ky0NcqkbFjz8X2UxDMxoPrzuSwQ0BqjkjYV6EgigOVdM7p+plX+6DR5xwfLVaAlF090QrawHJtDCKzAkwWtem2/mFqYx8BqQ6lTEkIXxTu9OcdYvd0kjf57L7ALRgFlDn3ALgjspyfX9xPHpUBvpRAQCMAxEy2I=
+	t=1753880375; cv=none; b=BEErpcmsHWqR9nNs/Myk4NF4OHDiPz00EfVnMlVCiWj+5RYrTkH2bw2/Gz+V62Y5jtdfE7yoe4+TaNhYZaWoVamwCeDS/dkNzEGp/gZrx4K9xRTmdJjFOum/QONVTtTJgtmUkaH20JL6VvhIcrHgqrfo1texhJt6dnr1Rm0GJ/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753880188; c=relaxed/simple;
-	bh=zSAAqvx7+WVkof8WJaGgdy/lkwAiHLJS0efBtUvDVRI=;
+	s=arc-20240116; t=1753880375; c=relaxed/simple;
+	bh=Qynl247JVKrvQqgbDgyES1qff+f5qRU7sk5KiM2QPaY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hT8lXZLlDBhT51dky8Iq5rMZid8uaSRZdKDgXJETow0BGbNW+PZFhHacHOB/s5ttfe/4W3iVhChbmh4uvL4FsokJpfNW7DRjJ9RBBaqGC6dCaiolXwm8D0kxb8OMKYPvya+9/fc51TEIENswrvqYXQNYbn/C3SvkxF3tTME2xIE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iN41PW32; arc=none smtp.client-ip=209.85.216.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-31f1da6d294so2236942a91.2
-        for <netdev@vger.kernel.org>; Wed, 30 Jul 2025 05:56:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753880186; x=1754484986; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=aYpiCOTMHHGqmnWdnrJ3RKxn0MKiEsCcDqKVDBHVDaw=;
-        b=iN41PW32Hca2xFOmDc3Lm/t7wzmisJcAs13QR8SueShA6U3FARavYh0A7BEvkp1F1o
-         SpHhtdT1YgbjYaAe1JOcAw0HGPM9s/+VI2076ixVg9DqkWP8dzHbtwA7bFHcfaJLoooA
-         mvxYwDgV3VD0IFaaLqnYpF9RMeT3L2aM421IheaLCgVPl3toLIBVwlmokkBdwnWsHV4Z
-         846eas3Rb37skwCjjwMF+EWLodYjYQrXAlG+REcPLnk/Qm5UYQQeGPfUiTVRcfFow1Z5
-         gzWgcMIyva0L40iRwCKA+L/Baz4asX5GkfNBZnDLD6kRp4QOlCJDk0/ol6wRVIm6KFxI
-         vxsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753880186; x=1754484986;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aYpiCOTMHHGqmnWdnrJ3RKxn0MKiEsCcDqKVDBHVDaw=;
-        b=HcT72joZH6zTvuWVt0OVlSZWeuXF3lwrortDbMV8CerFjDeMCusPG83lS6MW0NP6iZ
-         9h4IlkfFdgTHo2DJLgjrha890lN3RFPW7rPiCQ/OHExVLShR97MJfr3I6d+XvRwwU+Yn
-         JjylKRreIzTcafdmUpArzvXNduIxQHWO8Ig3G3UEMfxcMykW2sHC1qNFbtShR+CJV32N
-         hc3fO2v5MxSU9N8fiazdRHMHVKCiT71AUPSzfvaS5EA90E+ULwDMVdvmtZFoSZNs5v3u
-         lTLZIFR3E4/a76aRuIbtO13mclT1VUDUqiDAbxktl1VCVoMwNDq2BoVbCDSEEqwgmD0C
-         rqKA==
-X-Forwarded-Encrypted: i=1; AJvYcCVS7PsEtjA6mQDvqsvCOj2AlzIKnuSj8TVwqnZSNG2b6a0d+Uu6f8NGRS49G3WowS29cl3LGPs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YznnF43IDPKTfTnMbSeAOqlsKs4SivYLe0uIipDKd9vYP5IP97k
-	pjKnETQBXd/zBvvjzYQ14IOFvqRQofSwFtNzjzckfsWccLBeltTG4Z2E
-X-Gm-Gg: ASbGncuhwkSpGipaXkKMYf1WDTrfb0zZZ2gVn2AchGmf2NHKUW9WmfwluEOfg7+V7mr
-	AEnsNocbcuOb5yTgqCfkfSLOR/IGN1jKuw91J7HXmyKDwGw3uYPQJ2s/FzstAffXMpkjnJfecFJ
-	ceF2xBqUpyZeLlBPitjetaJwAqMnZa7ZTMTaWMoPYv/7UdMneweA1jmrvr+mSxiN2bhkpHepjNJ
-	BiKGrjKOeTB0cRbzUo1BGgloqrZz0Mme/W5u9ahg/w9S8MRbcTDHycC8ivle5a+7WnbGAqGuTaZ
-	Y7egHQ+ux9xQgO9wWNRTyJ1OQiIZvgIpE4900FouCqyc2OyLJqMHTPTwWVOa67S1vnkkYtKeRDm
-	lSL8fbN3P/d9Pwq0jC7s8WsOwaNKoMI9r8kyYPw==
-X-Google-Smtp-Source: AGHT+IE1r36xqjJz/GUA05gQwSoThWyW8cE+qNDxOeRVXm0nbbipl/uICAXRevTd5l498frzdpaiMw==
-X-Received: by 2002:a17:90b:17d2:b0:31f:867:d6b4 with SMTP id 98e67ed59e1d1-31f5dd90e75mr4978063a91.10.1753880186485;
-        Wed, 30 Jul 2025 05:56:26 -0700 (PDT)
-Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b3f7f67d30csm7558654a12.34.2025.07.30.05.56.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Jul 2025 05:56:26 -0700 (PDT)
-Date: Wed, 30 Jul 2025 12:56:19 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	eric.dumazet@gmail.com, Dong Chenchen <dongchenchen2@huawei.com>
-Subject: Re: [PATCH net] selftests: avoid using ifconfig
-Message-ID: <aIoWcxoHfToKkjf4@fedora>
-References: <20250730115313.3356036-1-edumazet@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=d8/pGoxDoH21DLGiTxto7O/XZKfF7b0iQANx4IrvZCw3EycJu1jFzZmt6ymYUhBxKhPZtUc0Dcuq27uePBAzMdfdpL+HAwuGyhCkiy+qfxFr14aaNtdtf1kBGTmw5eStwKF6DaFQz7LYSuvPKZXtd6oM4pkLrYkpgdWx5yjbG1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=TMVBu5NE; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=iADRZ//WWXRXjGs7WIF2HBGPV2WioKL2v6FOCPlk2wo=; b=TMVBu5NEEdA129a6t06UhmSCIZ
+	AtodenEp2SxCUhmZHVV/sJ/952omEbbUaRRigTXa1EdkLUL4wwhVZhJ2M59S0S0ybJRWplvXl7S+b
+	anB1aEU79TnMXfKK6qEDo2ck2EwnJTAn8Ga3qehVpRzn8JUv2S1A6LQEBpAyjQbzgNT4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uh6Or-003HN0-9y; Wed, 30 Jul 2025 14:59:17 +0200
+Date: Wed, 30 Jul 2025 14:59:17 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Gal Pressman <gal@nvidia.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Michael Chan <michael.chan@broadcom.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Tariq Toukan <tariqt@nvidia.com>, intel-wired-lan@lists.osuosl.org,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org
+Subject: Re: [RFC PATCH] ethtool: add FEC bins histogramm report
+Message-ID: <459b5f33-ccb2-4392-9833-f67fcedeaead@lunn.ch>
+References: <20250729102354.771859-1-vadfed@meta.com>
+ <982c780a-1ff1-4d79-9104-c61605c7e802@lunn.ch>
+ <1a7f0aa0-47ae-4936-9e55-576cdf71f4cc@linux.dev>
+ <9c1c8db9-b283-4097-bb3f-db4a295de2a5@lunn.ch>
+ <4270ff14-06cd-4a78-afe7-1aa5f254ebb6@linux.dev>
+ <c52af63b-1350-4574-874e-7d6c41bc615d@lunn.ch>
+ <424e38be-127d-49d8-98bf-1b4a2075d710@linux.dev>
+ <20250729185146.513504e0@kernel.org>
+ <b16f0738-9b73-46f4-93ba-edcf84eb961a@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,16 +72,39 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250730115313.3356036-1-edumazet@google.com>
+In-Reply-To: <b16f0738-9b73-46f4-93ba-edcf84eb961a@nvidia.com>
 
-On Wed, Jul 30, 2025 at 11:53:13AM +0000, Eric Dumazet wrote:
-> ifconfig is deprecated and not always present, use ip command instead.
+On Wed, Jul 30, 2025 at 08:39:25AM +0300, Gal Pressman wrote:
+> On 30/07/2025 4:51, Jakub Kicinski wrote:
+> > On Tue, 29 Jul 2025 19:07:59 +0100 Vadim Fedorenko wrote:
+> >> On 29/07/2025 18:31, Andrew Lunn wrote:
+> >>>> The only one bin will have negative value is the one to signal the end
+> >>>> of the list of the bins, which is not actually put into netlink message.
+> >>>> It actually better to change spec to have unsigned values, I believe.  
+> >>>
+> >>> Can any of these NICs send runt packets? Can any send packets without
+> >>> an ethernet header and FCS?
+> >>>
+> >>> Seems to me, the bin (0,0) is meaningless, so can could be considered
+> >>> the end marker. You then have unsigned everywhere, keeping it KISS.  
+> >>
+> >> I had to revisit the 802.3df-2024, and it looks like you are right:
+> >> "FEC_codeword_error_bin_i, where i=1 to 15, are optional 32-bit
+> >> counters. While align_status is true, for each codeword received with
+> >> exactly i correctable 10-bit symbols"
+> >>
+> >> That means bin (0,0) doesn't exist according to standard, so we can use
+> >> it as a marker even though some vendors provide this bin as part of
+> >> histogram.
+> > 
+> > IDK, 0,0 means all symbols were completely correct.
+> > It may be useful for calculating bit error rate?
 > 
-> Fixes: e0f3b3e5c77a ("selftests: Add test cases for vlan_filter modification during runtime")
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Dong Chenchen <dongchenchen2@huawei.com>
+> Exactly. mlx5 will use (0, 0) for sure.
 
-Not sure if there is a way to replace the ifconfig in rtnetlink.sh.
+Sorry, i did not spend time to read the standard and issued this was
+related to frame length somehow, like the RMON statistics which have
+bins for packet length counts.
 
-Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
+	Andrew
 
