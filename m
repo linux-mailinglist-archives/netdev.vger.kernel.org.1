@@ -1,108 +1,116 @@
-Return-Path: <netdev+bounces-210977-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210978-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8009B15F46
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 13:23:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7ABA1B15F81
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 13:32:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 62A907A9F19
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 11:22:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B00775653B6
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 11:32:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00AAA292B48;
-	Wed, 30 Jul 2025 11:23:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86D2F27877D;
+	Wed, 30 Jul 2025 11:32:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="bukVWX11"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C99AB15383A;
-	Wed, 30 Jul 2025 11:23:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2C1415E96
+	for <netdev@vger.kernel.org>; Wed, 30 Jul 2025 11:32:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753874619; cv=none; b=UWNA/tLH8a4N9NFyp09/+a+HuR84kxgjGxJ0IvsyFF5HEUlAKrqL9zcl/Hg6olvnzaVgMrESlnK/cUPOMR/nLZpnfx8jGjgKaDyimbB5L2vBX+8JTW4F/PZCuTpWfJM2uHJadXhERdKW2k8fMWjWSDMA79E9r0I2CA7SvUbHe+w=
+	t=1753875175; cv=none; b=MOqnncQpvEUsIQWppNFQTk0Sgg0x9us8ptRT4y1/7rZmewpPR9+ltp7JPoyAxGxsuElL+cIcIUbAsUNrwPnvCIiV6vOwGIMyBuT7k0YmaocYcU5TxXqGqXhLnOTxbz5pTd+AklD4933faRuwcxlkKzRxEOPnohF5YxwMEls99CQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753874619; c=relaxed/simple;
-	bh=ado/mW/al6GgtHriar0Rs7TCQCI1FxEm96mQuOFcW2o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tuBbGIhHGSO+DC2sGdaFdMe+ze1uWN9PLVhDYu67j7y9GOcvYISEdC9zeifO2wma/NdMnbljFZdZv0WOslqlW99rEQV5muVyfR+ZskrgnPWjPwH2HB6CIlg9caY2Ks/nFzKhAgs9Ym48BBIWObawVu7UBlO2L66yQH8rEWeggZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BD71C4CEE7;
-	Wed, 30 Jul 2025 11:23:36 +0000 (UTC)
-From: Geert Uytterhoeven <geert+renesas@glider.be>
-To: Ivan Vecera <ivecera@redhat.com>,
-	Prathosh Satish <Prathosh.Satish@microchip.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Conor Dooley <conor.dooley@microchip.com>
-Cc: netdev@vger.kernel.org,
-	linux-spi@vger.kernel.org,
-	linux-i2c@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Geert Uytterhoeven <geert+renesas@glider.be>
-Subject: [PATCH] dpll: Make ZL3073X invisible
-Date: Wed, 30 Jul 2025 13:23:32 +0200
-Message-ID: <97804163aeb262f0e0706d00c29d9bb751844454.1753874405.git.geert+renesas@glider.be>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1753875175; c=relaxed/simple;
+	bh=nsC0IZElzNqZiVyzWCZWUL4M9nsnN0tzZgv/WMalr04=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EfG1QdGQbDZYneJgogssoz2Kf7cO02KKHJsZX9v1X/l7ktkaaEGcfeTJ7hICd7xXQ7Y6XKnii4ABNZZ+fAORRsggLXF8/84qiQi+3Tg1aayC2Iq/iS/qQH4gbbi3TCd/f8WcHh0nqPCobMIjtE+uduJLQ1lNm8wleBDnHnogizU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=bukVWX11; arc=none smtp.client-ip=95.215.58.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <8b22e9d3-e4d2-4726-9622-28881b2cd406@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1753875171;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uHW3kJohF557YGobfQDpyiyx5O/H1BpxwxCIIzE1A1k=;
+	b=bukVWX11iXapIW2wm/IWiowp//jiNbLbLJLMmIY9LeEDVHA1rcLhzj4rcYxfFIO1n2CefM
+	vgUA28+Glk97rQsmJSHzdjLQq/Sa/4vUonVYXMUm27DYo6za5u5zR6RydbMBDLouMeuebL
+	vxEv4qDovEnshA2Q1SJmunSYt9JQcto=
+Date: Wed, 30 Jul 2025 12:32:43 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [RFC PATCH] ethtool: add FEC bins histogramm report
+To: Gal Pressman <gal@nvidia.com>, Andrew Lunn <andrew@lunn.ch>,
+ Michael Chan <michael.chan@broadcom.com>,
+ Pavan Chebbi <pavan.chebbi@broadcom.com>, Tariq Toukan <tariqt@nvidia.com>,
+ intel-wired-lan@lists.osuosl.org, Donald Hunter <donald.hunter@gmail.com>,
+ Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org
+References: <20250729102354.771859-1-vadfed@meta.com>
+ <041f79a2-5f96-4427-b0e2-6a159fbec84a@nvidia.com>
+ <1129bf26-273e-4685-a0b8-ed8b0e4050f3@linux.dev>
+ <3e84a20e-87ea-413c-9e9d-950605a55bf6@nvidia.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <3e84a20e-87ea-413c-9e9d-950605a55bf6@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Currently, the user is always asked about the Microchip Azurite
-DPLL/PTP/SyncE core driver, even when I2C and SPI are disabled, and thus
-the driver cannot be used at all.
+On 30/07/2025 11:42, Gal Pressman wrote:
+> On 30/07/2025 12:29, Vadim Fedorenko wrote:
+>> On 30/07/2025 06:54, Gal Pressman wrote:
+>>> On 29/07/2025 13:23, Vadim Fedorenko wrote:
+>>>> diff --git a/drivers/net/netdevsim/ethtool.c b/drivers/net/netdevsim/
+>>>> ethtool.c
+>>>> index f631d90c428ac..7257de9ea2f44 100644
+>>>> --- a/drivers/net/netdevsim/ethtool.c
+>>>> +++ b/drivers/net/netdevsim/ethtool.c
+>>>> @@ -164,12 +164,25 @@ nsim_set_fecparam(struct net_device *dev,
+>>>> struct ethtool_fecparam *fecparam)
+>>>>        ns->ethtool.fec.active_fec = 1 << (fls(fec) - 1);
+>>>>        return 0;
+>>>>    }
+>>>> +static const struct ethtool_fec_hist_range netdevsim_fec_ranges[] = {
+>>>> +    {  0,  0},
+>>>> +    {  1,  3},
+>>>> +    {  4,  7},
+>>>> +    { -1, -1}
+>>>> +};
+>>>
+>>> The driver-facing API works nicely when the ranges are allocated as
+>>> static arrays, but I expect most drivers will need to allocate it
+>>> dynamically as the ranges will be queried from the device.
+>>> In that case, we need to define who is responsible of freeing the ranges
+>>> array.
+>>
+>> Well, the ranges will not change during link operation, unless the type
+>> of FEC is changed. You may either have static array of FEC ranges per
+>> supported FEC types. Or query it on link-up event and reuse it on every
+>> call for FEC stats. In this case it's pure driver's responsibility to
+>> manage memory allocations. There is definitely no need to re-query
+>> ranges on every single call for stats.
+> 
+> This is just adding unnecessary complexity to the drivers, trying to
+> figure out the right lifetime for this array.
+> It will be much simpler if the core passes an array for the drivers to
+> fill. That way both static and dynamic ranges would work the same.
 
-Fix this by making the Kconfig symbol for the core driver invisible
-(unless compile-testing), and selecting it by the bus glue sub-drivers.
-Drop the modular defaults, as drivers should not default to enabled.
-
-Fixes: 2df8e64e01c10a4b ("dpll: Add basic Microchip ZL3073x support")
-Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
----
- drivers/dpll/zl3073x/Kconfig | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/dpll/zl3073x/Kconfig b/drivers/dpll/zl3073x/Kconfig
-index 7db262ab84582d29..9915f7423dea370c 100644
---- a/drivers/dpll/zl3073x/Kconfig
-+++ b/drivers/dpll/zl3073x/Kconfig
-@@ -1,7 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0-only
- 
- config ZL3073X
--	tristate "Microchip Azurite DPLL/PTP/SyncE devices"
-+	tristate "Microchip Azurite DPLL/PTP/SyncE devices" if COMPILE_TEST
- 	depends on NET
- 	select DPLL
- 	select NET_DEVLINK
-@@ -16,9 +16,9 @@ config ZL3073X
- 
- config ZL3073X_I2C
- 	tristate "I2C bus implementation for Microchip Azurite devices"
--	depends on I2C && ZL3073X
-+	depends on I2C
- 	select REGMAP_I2C
--	default m
-+	select ZL3073X
- 	help
- 	  This is I2C bus implementation for Microchip Azurite DPLL/PTP/SyncE
- 	  devices.
-@@ -28,9 +28,9 @@ config ZL3073X_I2C
- 
- config ZL3073X_SPI
- 	tristate "SPI bus implementation for Microchip Azurite devices"
--	depends on SPI && ZL3073X
-+	depends on SPI
- 	select REGMAP_SPI
--	default m
-+	select ZL3073X
- 	help
- 	  This is SPI bus implementation for Microchip Azurite DPLL/PTP/SyncE
- 	  devices.
--- 
-2.43.0
-
+There is no need to pass huge pre-allocated array for drivers which
+doesn't have support for the histogram. The core doesn't have this info
+about the driver. And again - there is no need to refill ranges array
+every time as it will not change. I believe it's pure driver area of
+knowledge and responsibility.
 
