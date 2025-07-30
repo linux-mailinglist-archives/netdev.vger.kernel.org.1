@@ -1,374 +1,217 @@
-Return-Path: <netdev+bounces-210975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210976-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8AFCB15EFC
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 13:08:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A49FB15F13
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 13:10:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C595156613F
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 11:07:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 29BC056604A
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 11:09:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 611452D23BF;
-	Wed, 30 Jul 2025 10:58:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1352329AAE3;
+	Wed, 30 Jul 2025 11:06:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="Fhrrs3lg"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="jfK81xL7"
 X-Original-To: netdev@vger.kernel.org
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2061.outbound.protection.outlook.com [40.107.93.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FB772D23A3;
-	Wed, 30 Jul 2025 10:58:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753873127; cv=none; b=sPskVDIWOykM/KMpZBHZ/HAjlnLUi33V89vFclW8X7B8hoFASyrbiTkQfYNjNOlTNm1n78D3dv8TKbaM5zsrKiQYXZNpIHqRiDGpSLsaIVDRhSJFzDABm0h7reagV6TEC59P62nVBgUyJoJpT43E3ychsAa9GvM7qmBsI2hEGKk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753873127; c=relaxed/simple;
-	bh=SRyBI5NIhbbZACiV/QBYkv1QDLE8nc/hjl4+RIHRxJo=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SrPRGnf6f7oEs7JwNJRbaYRGDH/OC6o47iTHYzCo0ZjEjkqSoLgy9OQF1sebh6CMdxwXGD6Y7L9t7nNzdWHcrf3B0a1Rr9rZaw9NW3aBsSb0n4oAeGWI+UeglPuLqUtvTDp6skcFgn67cGZ8Ib0oDPmZOVsLBkb+ldjZeMWG7J8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=Fhrrs3lg; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1753873123;
-	bh=SRyBI5NIhbbZACiV/QBYkv1QDLE8nc/hjl4+RIHRxJo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Fhrrs3lglThomlxYMidSmHtHmHrBJ/opJ/3uz73ZEXbbsTIeO+qxGx31w/V/8Ygxg
-	 ENJGc/b3TdlyaMcZJaNWgotJocSCS95idlvmZANZIOEZv+QBO10pHUgmV9zOwF0Ynk
-	 CmD/hfP3VfoMOVCSs5fbqBQ36Eb7UcBsXjn7IFqxvw3tq7Rr6RRnRKvuCIWQGPlGZB
-	 H1kdKkrXW7ZleBmn16tZrB3FXtDogi3ewFqXUcE/4BMmqDnvhQ55a40rmN64x5wmxM
-	 GAKSkXsrPTd50+0YnGG2fYezg/xRNGq7xuu6+2MsjjHxSo7l2C16KboDDbkOOD2z38
-	 xmjz23FtbNT9A==
-Received: from laura.lan (unknown [IPv6:2001:b07:646b:e2:4db2:e926:c82d:3276])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: laura.nao)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 3835417E1511;
-	Wed, 30 Jul 2025 12:58:42 +0200 (CEST)
-From: Laura Nao <laura.nao@collabora.com>
-To: mturquette@baylibre.com,
-	sboyd@kernel.org,
-	robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	matthias.bgg@gmail.com,
-	angelogioacchino.delregno@collabora.com,
-	p.zabel@pengutronix.de,
-	richardcochran@gmail.com
-Cc: guangjie.song@mediatek.com,
-	wenst@chromium.org,
-	linux-clk@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	netdev@vger.kernel.org,
-	kernel@collabora.com,
-	Laura Nao <laura.nao@collabora.com>,
-	=?UTF-8?q?N=C3=ADcolas=20F=20=2E=20R=20=2E=20A=20=2E=20Prado?= <nfraprado@collabora.com>
-Subject: [PATCH v3 27/27] clk: mediatek: Add MT8196 vencsys clock support
-Date: Wed, 30 Jul 2025 12:56:53 +0200
-Message-Id: <20250730105653.64910-28-laura.nao@collabora.com>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250730105653.64910-1-laura.nao@collabora.com>
-References: <20250730105653.64910-1-laura.nao@collabora.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CEE7298CDC;
+	Wed, 30 Jul 2025 11:06:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.61
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753873594; cv=fail; b=JChM9nOqpdmAhOVKCGq5o6/LuDDPVievJe84JkA3xhAJ8qVviQ4QHZywep5OMMsFsqeFkJOMSWiFq5WVzxvSpYCpUgjSWNUuCOLo6ZwlU9D8EjjLqbWFU92xqeTqmoIdN1AWxmOXsILqcs/RRWcpRn5c0BvohX8pfO1awOHAUJ0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753873594; c=relaxed/simple;
+	bh=50IvEomL3sYZY3O5QPc8fBWjgY9pBRlqZu4CWm8HhvA=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=vC6Oy5yaI/w+I1QfzKu7bzMB4IhEGArkD3Fu2pWFY5lr17V9CpwxSYC0xh2VV/76XtrLCO6XdCbEHYGmlfwVrZ/bL/P/+VEwMyAeG0Xev5pmv6tFFn9sDPwmwPUeGD/MWFT51NmOzKBFCUWWr2MqJWZeMNaM7I40OsE+mHNydTs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=jfK81xL7; arc=fail smtp.client-ip=40.107.93.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=FX243uKLZTpK7u6+1wlhIOvq+yKChnfB7YL8J8DGdoAr0dt4Et7KcbpRdXQtElbTWnlE+YyoC1VK6vJJz0C/nls7wWHhJCAhWzdmQwkjjWGefsM9h0CsfVhIyYOFn2jPy2Yydexcg/zgEyH+tuEswqrgcF6Ivzs2Kuu6vhvNjRAZNwMXQrbUbNKJQk/VodMjP71QQz1C75Ky/ejogLk3k+bM+VcEJFQOvVEov7YCUiX7LRvZszrwDRGOvNmK+fVL+6m/wbgmUB7MjYaA/aVeK42mbMb5PHy8Yl2jaoCP4XFA+GxHCogu14bRj/pTURW058MDppkM8n5Cu/wjl3jsTg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=nQgf0SYu1syljYJiLuiOXOWeKyNRnGfbTknJiMXWnKY=;
+ b=wsSxw3ZOmANig8UrcobExnCRgCY741XpMIcqtA/C8jblI/MBNitXL/oo2DJaGBIUo6dx9FrEsF0xSXQngShRnTY9hkZosHzD5edx2EYAE7qmVPOeynK6d2gt1Ve4kh5kdAPj1CX/GRSO3ct6HjMDhlTxJgjzh3jyVCtmW7G5IfOQYSg3Oe7inidFYPZfQoSdrx3sIKIAx4oMq891t//EMCOEIrmZIMw/MDN9GR4mUmVWiadFY+GbIOPaEMn2tOOuWBCfX1NJxOt0Fo44WImx+bbgU6lnMiQE6zVQ99mBzcFZrs+bVinC5+fN2EocCx9EMfYTTJFDJOzej++Vg3ar0g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nQgf0SYu1syljYJiLuiOXOWeKyNRnGfbTknJiMXWnKY=;
+ b=jfK81xL7MDrQy7MEvRocStwLpRMhbBAsive4FbEPn+0WNr6In2F98oDqR9LPudB3ZcfBIEzHTb0UYmsz8sv2tMUf55+iE+ZhDZSnhphVe0hAVPSXqlauMo6mURBEWoNqZAHbAA1XZbwmfNBplhcvp1dslaIu2MNFzioCot1zn+dCts/lMbGkr8HdMddHSoeCfZgn+/hVVSYnHIoCyUTvkJ2yYyLbnO1e4yewp9XQAOMclvJCPT/n+mGQ1l6FUhANhq3CSW8Sv/jmogOPmCV0yQsrvQedsg1jxwt3ONTJPTv5jFU2lPusjBUAi1wkeABiYkJhpPb+m5og3a8vjeQ6Sw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB7500.namprd12.prod.outlook.com (2603:10b6:610:148::17)
+ by MW4PR12MB6729.namprd12.prod.outlook.com (2603:10b6:303:1ed::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8964.27; Wed, 30 Jul
+ 2025 11:06:29 +0000
+Received: from CH3PR12MB7500.namprd12.prod.outlook.com
+ ([fe80::7470:5626:d269:2bf2]) by CH3PR12MB7500.namprd12.prod.outlook.com
+ ([fe80::7470:5626:d269:2bf2%6]) with mapi id 15.20.8989.010; Wed, 30 Jul 2025
+ 11:06:29 +0000
+Message-ID: <195d0388-57ca-4a1a-bc92-65da899443ab@nvidia.com>
+Date: Wed, 30 Jul 2025 14:06:22 +0300
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net/mlx5: Correctly set gso_segs when LRO is used
+To: cpaasch@openai.com, Saeed Mahameed <saeedm@nvidia.com>,
+ Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
+ Leon Romanovsky <leon@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Amir Vadai <amirv@mellanox.com>
+Cc: netdev@vger.kernel.org, linux-rdma@vger.kernel.org
+References: <20250729-mlx5_gso_segs-v1-1-b48c480c1c12@openai.com>
+From: Gal Pressman <gal@nvidia.com>
+Content-Language: en-US
+In-Reply-To: <20250729-mlx5_gso_segs-v1-1-b48c480c1c12@openai.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: TL2P290CA0005.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:2::15) To CH3PR12MB7500.namprd12.prod.outlook.com
+ (2603:10b6:610:148::17)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB7500:EE_|MW4PR12MB6729:EE_
+X-MS-Office365-Filtering-Correlation-Id: fffa3aec-fc69-49d9-2396-08ddcf592208
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|376014|366016|7053199007|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?S0VST0dseXlHLzdTMWFmYUpCdzRpWFdGUDdtZ29mVVBMVEFpZjRBY1JRKzZI?=
+ =?utf-8?B?N0hkMTVQT2VCSjAwM2hXeHJJSHNlTUNTcGh2SldMR0hmOFpNVzFZbTFKMVpI?=
+ =?utf-8?B?d05sU1YvbFFEU0h6Wm5PeHE4SCs1UTRPalRSUzE0YU9xRXBUMW9MWHRiTlQ0?=
+ =?utf-8?B?TzhoU05JdjFDKzRBM2lwKzhyMEtQSXNtN3BVWXpuZXNFVmp1d216QkphTEpu?=
+ =?utf-8?B?YU5GbENYbDNYVDhtanNOTWRIWVFtdW9OZ1RIZ2VFMzQ5OE9CM3hsQlIwOGdp?=
+ =?utf-8?B?aEpBQ2pNYlJyRlRGb1FmWGVPNlpmWDRtZWloWXY3RFNxTXM5KythSmpnUG9j?=
+ =?utf-8?B?MHV2VU5rZHZVdjNLd0ZBMml5aWk5RFh4QXkrVVUwMXlqc0RsYTZxais0VjR2?=
+ =?utf-8?B?TmszVmwvWUpSSDhRdEplUFZnMmhqcmhxeEJGWGNMM2Q1TXh1WmFpUXhvMkt4?=
+ =?utf-8?B?MXdCQWJLRFNMOUJVeC9RZE1nekI1eHBLSWxDbG16N0VOckc5aGdnMm04b3d1?=
+ =?utf-8?B?S0dQRkNvUFc2b2YzUyt3OXJwL1ZJNGhMTHRlSEFTTFpmeVk3U2JXZTNXNXdX?=
+ =?utf-8?B?enJzRXJSb1VTWVN0MEtIUXp4SWpSV01KVGZxbU9IK2ZuQjBHWmFlcVQ4M3Jv?=
+ =?utf-8?B?VWtMbGVPT3k2UDFlT3hqamtwTkhzS3F5aEdXZTgwaTFDajVsalYrVGF5TmVV?=
+ =?utf-8?B?dWs2Z2ZHUU9lWDU2ZFVkOXd6Y2hCb3NRVWoyS2hKM0pRTnFwcGlMSzZGbktx?=
+ =?utf-8?B?WGtPQnBkeXVYYkZQbTNGY3VxZS9RaHZWN2tTU2hTVjBLc0xHRElvQmx0UzlF?=
+ =?utf-8?B?WkN2S3JOdzVzOWk2V2FLakxOMDVhR3l4aVA1UFE5c0Z2UlNRRUUwZkJPbFFB?=
+ =?utf-8?B?Z2o1YnVMejNJM0hGb0hmOEg3ZjVMQlowVm43a0c3WXlEZkFzRGIrQ3hFK1hL?=
+ =?utf-8?B?cTRhR0FYd0hYNFA2UVFyYXY2cHg5Sm1zK2FmUVo2dlBuOWIzbnFPa0hpMlpE?=
+ =?utf-8?B?NHBVeUlxd3JoVXoyL04yVjRsdlhkZkJ2L3BjSkxvTFVjQ0FYVk9TVVFzTWhM?=
+ =?utf-8?B?Nk9lREZFOXVUNmE4cWFFc1Y0VFJEeFpKRHRtRkI3WndoV1g0THZDWGJtUHN0?=
+ =?utf-8?B?UlJoeXdMQmhMajVYYVFGTC94UmI2SWNZS3hRNWpoNE5KcEd1ZEZKNFN4ZzhD?=
+ =?utf-8?B?bGdWZnlxNEhSR1RONWY5Z1BEZEg4VUZuS2lML0d6c2dKcXF0OHEzdFk2Ymly?=
+ =?utf-8?B?clAvQlBZaldMRDRiNDFsRXlndVNTelJGaHRyVHBvay81WkZEV2VtR0FpZzJL?=
+ =?utf-8?B?amZkVUVjbVZ1VWtBcjFUQVN2OEZkSEswUUlSTFNGU2RwdW5UQWRqdFBnM1Fn?=
+ =?utf-8?B?L3p4azdjZFZyQVE2QkRwY3VxendyTjJDa1o2WFBYNTBqQk1abUJBV2ErQk9W?=
+ =?utf-8?B?ZlBLRmR3czJnckQrR3h0UVJCK1hlZ2hzaXFZblZDdEdjclZFc3ZwdnBSei9J?=
+ =?utf-8?B?dWc2RXpYcTVGOWduTkVqQ1Z6dENyRFJDSWw3QjBQa2Z1M1RFOTNPc0Fkck02?=
+ =?utf-8?B?U2JkSkpKQ1hReWwrclQ5TXhLSXA4M0NXd1VCbWt6dERjQ1hvWW5sSlNNMUJX?=
+ =?utf-8?B?S2tRWFN2Q0ZCdlFnYlJEQ2dlWjl1Wi9vbFJtay9CNENvVUpZd2FCWDlKeUlB?=
+ =?utf-8?B?WHpVeGFtc05zRzJNc01zcVlwRjhvZjh1TkorS1JrdkxhdzJWTDNtR3AvMFhU?=
+ =?utf-8?B?bmdHSnJWa0twMjkyZWR5cWozOTRrZWhhbGZCRFA2cHVZeXF4bmtFU0lSY1lY?=
+ =?utf-8?B?Qm9FRHVjTXE5TDVQRlFObEFkQUQ0QkUxN0dCOGVOK2VpYUJQZnlQQ29pTDhE?=
+ =?utf-8?B?ZUVPbUUyK3ZITVVFQmJ1bkt6N2IwUVpnZlQ1NEg5TnlWczkwL2pjM2xRS0RO?=
+ =?utf-8?B?L2tybG53eFJJdkROYStwdjZ5RUpHTDhDZ2c5bmZ4QXoyZ0Y0OHhJcUR2VXJt?=
+ =?utf-8?B?TTVoRzFBRVhRPT0=?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7500.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(7053199007)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?d1ZaaE9TczA5TWVNc1hLbmVPSC9YYWgwNjh0UWsvblNsb0VIYmJMN2M4OXVJ?=
+ =?utf-8?B?WUl5YklNOHl5blpRSXBIUG9oUFJDTWNGditWSXJ4ZEkwYzhXK1VNdlMxQzVY?=
+ =?utf-8?B?OG1JTEJCKy81bi9tYUkrNjVQQjgyODJlNWlOUXY2SjRIaWV5M09lRWhHNVNn?=
+ =?utf-8?B?aGlpd2ZiNXN4U3F0OVh3c2VCd3VDMjkvT3orZFJ2dVFLcWxETFEyRkFVdE04?=
+ =?utf-8?B?cjg2REhCeGMzVE1vODNqY3U1RDhmTitDbWh1QStrVTlwZU5nS0d0S0xnT3RW?=
+ =?utf-8?B?ZkhjRmdBUXdVZXRVRHVSYnRpbUpiZlZIR3BONGRPTFBwUVdnYzRnRXhTUE95?=
+ =?utf-8?B?dTlzd3VodlNNN0ZIN3lCbUEzZWdmb01rS2pzZWw5VmUvN1dvcU53eHB4eWQx?=
+ =?utf-8?B?Y2s0TVpENFU5ditROHdKQTJSWWswcjlMV1krbUMwNUVqZ0xZZjE4ZHFERDNh?=
+ =?utf-8?B?cmhLOFdldG1qZllrUG45R0JQWlBycDVsUWNmSU44UzFLYmRlTjdXaXprNXpM?=
+ =?utf-8?B?VUV3NmNHYjBObS9aZVo5U0ovUnNNYldrSXRvUnMzT1NiT2lmajlYMzh5SWVS?=
+ =?utf-8?B?Q3RvbFV2NmdMVVV2TDlIbjRzME9oeUp5eWpQMEFJTWV3RG4wRjh6R2c1YmFX?=
+ =?utf-8?B?R1FqU0p3ZFdtU0k5dlU1VjEwTzZaSGpoYnJoSGdpb0hRU1gweTB6YlVZcVpj?=
+ =?utf-8?B?WHV1QnFUWmNyUXZ3VjhCcDJSRGhjZVpZU29PS1ppSnEvTFNGcWY3YnBydk1M?=
+ =?utf-8?B?U25DcWo0c09NRlM5cWtDV2RhTDIrRTRIRnAxYW1KMEEwR2FsT1ZITDl5bjhM?=
+ =?utf-8?B?UWNKMm9hby9TbGd2T01aejNXLzFyVGFMUUxzNUtEcHVlOTYyc3JDVGVqSk0r?=
+ =?utf-8?B?NU4rMDdmM2FWbEl6Um9rTFc5VjB5MFZyMXFCWk9sS0RNeUtMWDFGQlZhREN4?=
+ =?utf-8?B?Qml3MDk5aTl1M1JDYVVLTTBwWU9oeE8vL1h0OEtpdkluK1VjcVRoMXMrVE5r?=
+ =?utf-8?B?Y0h1NU04d1pqTC9QRVJFMXF0Z1NUZ0FpYWMrd24xY2xsQll5NHFPSGVMdTdt?=
+ =?utf-8?B?N2RwbldOMVhMdjlzSXo1MHUxbEI4YnRreTd5WEFzRFEyNjlwNXlqeUlLUlJR?=
+ =?utf-8?B?cmRvdldjVDNrNFJ3K2N6QitUdUUzMEtyS3FVSjdXNFk5SmVGY2tvSEYvYy90?=
+ =?utf-8?B?YkZYUUhZMkR4UzFZYWRiQmZ0R09ZcGF0T0pIWEFyT3U3MGhmbGcwSEhEdXVa?=
+ =?utf-8?B?UkFGU3pEZEo5MmFueUk3Q1JXR2djT1lKcVBmTUo5QXVWUzdyRC80UmcyR0dE?=
+ =?utf-8?B?Umt4RlRvK2JkWTZ4b3dOeURzL3Y1MW5BY2FZVkI1Ry9FV2lhV2h2TlBhV0V5?=
+ =?utf-8?B?K3U3bVpzNGk3YUdudjEzUHFwSGVtdk01Yy85a3ZwSmc5TVowQldaczVrWm51?=
+ =?utf-8?B?N3FDazl2aSsrYWlRNzkvOUczT2pXWjdXRU9vVU1BN0ZoS2IxNDhEQ3J4bXZy?=
+ =?utf-8?B?OFJNajQzd05Uek1BeHFVLzRQMkwxZjY3MjRoU1Vpc3NzaGJvckx1RDJuY2c3?=
+ =?utf-8?B?ZUE2d0RFT3N6VkxZOFl1Wkdrak0ySml5TXdNS0o3ckxDWTk0ajVGV2xrck1K?=
+ =?utf-8?B?Y3hYcVJHWmJocm9sL0psT2Y5cmhBZTc0RkFaV2hwL2c2dU1vSlE3RENycnNq?=
+ =?utf-8?B?YTRsQ1FJQ3JSa25UcUVuMkhlV1J0TTRYRFRwWkkrSkNDc0U1N3M2OWFNWXpL?=
+ =?utf-8?B?TkNMWWVlMHA0WlNsSHZYZU1oTHdCcHMzUFZQdC91T3F1eWZRMEdmZHRzeVJ0?=
+ =?utf-8?B?UG9yRngyeHJsaS9zbGMvR2JPcnVKUlpPd2twOGVSRnVrd2ZvYUpMMEc0ZzE5?=
+ =?utf-8?B?MDdCSC9MaVBUa0NvRStKc0VlMHdObU51czFSUjlXN0lTVkdGTlVyU05NQzRG?=
+ =?utf-8?B?R0tySEFCZGsrRnBVSEdvZkVDRW1PSlM5ai80NW16L1ljb0tnbGltN0czQUcy?=
+ =?utf-8?B?Yktmcmg2NWlqOXpSTWxwU1RRbGpCS1RTNHIrbkg3UGhKd2pYa082SXlQQThG?=
+ =?utf-8?B?c2tPWVVxSHRRQndLQzVnVklITk4rM3A0emZVZkZRM1I1U2haTUxBbkQxZEZr?=
+ =?utf-8?Q?ZruAc35UOBK7t+LRPFRbkPFLm?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fffa3aec-fc69-49d9-2396-08ddcf592208
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7500.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jul 2025 11:06:29.0194
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: YkTJ9GD+Gz32Rn4wXTlxDNsN7iWQXG+Dp2PZ3oRFVXrt3Z5po4nAcFALTD2nRGp3
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB6729
 
-Add support for the MT8196 vencsys clock controller, which provides
-clock gate control for the video encoder.
+On 29/07/2025 21:34, Christoph Paasch via B4 Relay wrote:
+> From: Christoph Paasch <cpaasch@openai.com>
+> 
+> When gso_segs is left at 0, a number of assumptions will end up being
+> incorrect throughout the stack.
+> 
+> For example, in the GRO-path, we set NAPI_GRO_CB()->count to gso_segs.
+> So, if a non-LRO'ed packet followed by an LRO'ed packet is being
+> processed in GRO, the first one will have NAPI_GRO_CB()->count set to 1 and
+> the next one to 0 (in dev_gro_receive()).
+> Since commit 531d0d32de3e
+> ("net/mlx5: Correctly set gso_size when LRO is used")
+> these packets will get merged (as their gso_size now matches).
+> So, we end up in gro_complete() with NAPI_GRO_CB()->count == 1 and thus
+> don't call inet_gro_complete(). Meaning, checksum-validation in
+> tcp_checksum_complete() will fail with a "hw csum failure".
+> 
+> Even before the above mentioned commit, incorrect gso_segs means that other
+> things like TCP's accounting of incoming packets (tp->segs_in,
+> data_segs_in, rcv_ooopack) will be incorrect. Which means that if one
+> does bytes_received/data_segs_in, the result will be bigger than the
+> MTU.
+> 
+> Fix this by initializing gso_segs correctly when LRO is used.
+> 
+> Fixes: e586b3b0baee ("net/mlx5: Ethernet Datapath files")
 
-Reviewed-by: Nícolas F. R. A. Prado <nfraprado@collabora.com>
-Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Signed-off-by: Laura Nao <laura.nao@collabora.com>
----
- drivers/clk/mediatek/Kconfig           |   7 +
- drivers/clk/mediatek/Makefile          |   1 +
- drivers/clk/mediatek/clk-mt8196-venc.c | 235 +++++++++++++++++++++++++
- 3 files changed, 243 insertions(+)
- create mode 100644 drivers/clk/mediatek/clk-mt8196-venc.c
+Maybe we should put an additional Fixes line for the gso_size patch?
+It doesn't directly fix it, but it will clearly emphasize the importance
+of picking up this patch together with the other one.
 
-diff --git a/drivers/clk/mediatek/Kconfig b/drivers/clk/mediatek/Kconfig
-index 4c7f6715ed63..53472d7de18c 100644
---- a/drivers/clk/mediatek/Kconfig
-+++ b/drivers/clk/mediatek/Kconfig
-@@ -1124,6 +1124,13 @@ config COMMON_CLK_MT8196_VDECSYS
- 	help
- 	  This driver supports MediaTek MT8196 vdecsys clocks.
- 
-+config COMMON_CLK_MT8196_VENCSYS
-+	tristate "Clock driver for MediaTek MT8196 vencsys"
-+	depends on COMMON_CLK_MT8196
-+	default m
-+	help
-+	  This driver supports MediaTek MT8196 vencsys clocks.
-+
- config COMMON_CLK_MT8365
- 	tristate "Clock driver for MediaTek MT8365"
- 	depends on ARCH_MEDIATEK || COMPILE_TEST
-diff --git a/drivers/clk/mediatek/Makefile b/drivers/clk/mediatek/Makefile
-index 54e895b73ecf..4daba371342f 100644
---- a/drivers/clk/mediatek/Makefile
-+++ b/drivers/clk/mediatek/Makefile
-@@ -172,6 +172,7 @@ obj-$(CONFIG_COMMON_CLK_MT8196_MMSYS) += clk-mt8196-disp0.o clk-mt8196-disp1.o c
- obj-$(CONFIG_COMMON_CLK_MT8196_PEXTPSYS) += clk-mt8196-pextp.o
- obj-$(CONFIG_COMMON_CLK_MT8196_UFSSYS) += clk-mt8196-ufs_ao.o
- obj-$(CONFIG_COMMON_CLK_MT8196_VDECSYS) += clk-mt8196-vdec.o
-+obj-$(CONFIG_COMMON_CLK_MT8196_VENCSYS) += clk-mt8196-venc.o
- obj-$(CONFIG_COMMON_CLK_MT8365) += clk-mt8365-apmixedsys.o clk-mt8365.o
- obj-$(CONFIG_COMMON_CLK_MT8365_APU) += clk-mt8365-apu.o
- obj-$(CONFIG_COMMON_CLK_MT8365_CAM) += clk-mt8365-cam.o
-diff --git a/drivers/clk/mediatek/clk-mt8196-venc.c b/drivers/clk/mediatek/clk-mt8196-venc.c
-new file mode 100644
-index 000000000000..ecbd42629e9f
---- /dev/null
-+++ b/drivers/clk/mediatek/clk-mt8196-venc.c
-@@ -0,0 +1,235 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (c) 2025 MediaTek Inc.
-+ *                    Guangjie Song <guangjie.song@mediatek.com>
-+ * Copyright (c) 2025 Collabora Ltd.
-+ *                    Laura Nao <laura.nao@collabora.com>
-+ */
-+#include <dt-bindings/clock/mediatek,mt8196-clock.h>
-+#include <linux/clk-provider.h>
-+#include <linux/module.h>
-+#include <linux/of_device.h>
-+#include <linux/platform_device.h>
-+
-+#include "clk-gate.h"
-+#include "clk-mtk.h"
-+
-+static const struct mtk_gate_regs ven10_cg_regs = {
-+	.set_ofs = 0x4,
-+	.clr_ofs = 0x8,
-+	.sta_ofs = 0x0,
-+};
-+
-+static const struct mtk_gate_regs ven10_hwv_regs = {
-+	.set_ofs = 0x00b8,
-+	.clr_ofs = 0x00bc,
-+	.sta_ofs = 0x2c5c,
-+};
-+
-+static const struct mtk_gate_regs ven11_cg_regs = {
-+	.set_ofs = 0x10,
-+	.clr_ofs = 0x14,
-+	.sta_ofs = 0x10,
-+};
-+
-+static const struct mtk_gate_regs ven11_hwv_regs = {
-+	.set_ofs = 0x00c0,
-+	.clr_ofs = 0x00c4,
-+	.sta_ofs = 0x2c60,
-+};
-+
-+#define GATE_VEN10(_id, _name, _parent, _shift) {	\
-+		.id = _id,				\
-+		.name = _name,				\
-+		.parent_name = _parent,			\
-+		.regs = &ven10_cg_regs,			\
-+		.shift = _shift,			\
-+		.flags = CLK_OPS_PARENT_ENABLE,		\
-+		.ops = &mtk_clk_gate_ops_setclr_inv,	\
-+	}
-+
-+#define GATE_HWV_VEN10_FLAGS(_id, _name, _parent, _shift, _flags) {	\
-+		.id = _id,						\
-+		.name = _name,						\
-+		.parent_name = _parent,					\
-+		.regs = &ven10_cg_regs,					\
-+		.hwv_regs = &ven10_hwv_regs,				\
-+		.shift = _shift,					\
-+		.ops = &mtk_clk_gate_hwv_ops_setclr_inv,		\
-+		.flags = (_flags) |					\
-+			 CLK_OPS_PARENT_ENABLE,				\
-+	}
-+
-+#define GATE_HWV_VEN10(_id, _name, _parent, _shift)	\
-+	GATE_HWV_VEN10_FLAGS(_id, _name, _parent, _shift, 0)
-+
-+#define GATE_HWV_VEN11(_id, _name, _parent, _shift) {	\
-+		.id = _id,				\
-+		.name = _name,				\
-+		.parent_name = _parent,			\
-+		.regs = &ven11_cg_regs,			\
-+		.hwv_regs = &ven11_hwv_regs,		\
-+		.shift = _shift,			\
-+		.ops = &mtk_clk_gate_hwv_ops_setclr_inv,\
-+		.flags = CLK_OPS_PARENT_ENABLE		\
-+	}
-+
-+static const struct mtk_gate ven1_clks[] = {
-+	/* VEN10 */
-+	GATE_HWV_VEN10(CLK_VEN1_CKE0_LARB, "ven1_larb", "venc", 0),
-+	GATE_HWV_VEN10(CLK_VEN1_CKE1_VENC, "ven1_venc", "venc", 4),
-+	GATE_VEN10(CLK_VEN1_CKE2_JPGENC, "ven1_jpgenc", "venc", 8),
-+	GATE_VEN10(CLK_VEN1_CKE3_JPGDEC, "ven1_jpgdec", "venc", 12),
-+	GATE_VEN10(CLK_VEN1_CKE4_JPGDEC_C1, "ven1_jpgdec_c1", "venc", 16),
-+	GATE_HWV_VEN10(CLK_VEN1_CKE5_GALS, "ven1_gals", "venc", 28),
-+	GATE_HWV_VEN10(CLK_VEN1_CKE29_VENC_ADAB_CTRL, "ven1_venc_adab_ctrl",
-+			"venc", 29),
-+	GATE_HWV_VEN10_FLAGS(CLK_VEN1_CKE29_VENC_XPC_CTRL,
-+			      "ven1_venc_xpc_ctrl", "venc", 30,
-+			      CLK_IGNORE_UNUSED),
-+	GATE_HWV_VEN10(CLK_VEN1_CKE6_GALS_SRAM, "ven1_gals_sram", "venc", 31),
-+	/* VEN11 */
-+	GATE_HWV_VEN11(CLK_VEN1_RES_FLAT, "ven1_res_flat", "venc", 0),
-+};
-+
-+static const struct mtk_clk_desc ven1_mcd = {
-+	.clks = ven1_clks,
-+	.num_clks = ARRAY_SIZE(ven1_clks),
-+	.need_runtime_pm = true,
-+};
-+
-+static const struct mtk_gate_regs ven20_hwv_regs = {
-+	.set_ofs = 0x00c8,
-+	.clr_ofs = 0x00cc,
-+	.sta_ofs = 0x2c64,
-+};
-+
-+static const struct mtk_gate_regs ven21_hwv_regs = {
-+	.set_ofs = 0x00d0,
-+	.clr_ofs = 0x00d4,
-+	.sta_ofs = 0x2c68,
-+};
-+
-+#define GATE_VEN20(_id, _name, _parent, _shift) {	\
-+		.id = _id,				\
-+		.name = _name,				\
-+		.parent_name = _parent,			\
-+		.regs = &ven10_cg_regs,			\
-+		.shift = _shift,			\
-+		.flags = CLK_OPS_PARENT_ENABLE,		\
-+		.ops = &mtk_clk_gate_ops_setclr_inv,	\
-+	}
-+
-+#define GATE_HWV_VEN20(_id, _name, _parent, _shift) {	\
-+		.id = _id,				\
-+		.name = _name,				\
-+		.parent_name = _parent,			\
-+		.regs = &ven10_cg_regs,			\
-+		.hwv_regs = &ven20_hwv_regs,		\
-+		.shift = _shift,			\
-+		.ops = &mtk_clk_gate_hwv_ops_setclr_inv,\
-+		.flags = CLK_OPS_PARENT_ENABLE,		\
-+	}
-+
-+#define GATE_HWV_VEN21(_id, _name, _parent, _shift) {	\
-+		.id = _id,				\
-+		.name = _name,				\
-+		.parent_name = _parent,			\
-+		.regs = &ven11_cg_regs,			\
-+		.hwv_regs = &ven21_hwv_regs,		\
-+		.shift = _shift,			\
-+		.ops = &mtk_clk_gate_hwv_ops_setclr,	\
-+		.flags = CLK_OPS_PARENT_ENABLE		\
-+	}
-+
-+static const struct mtk_gate ven2_clks[] = {
-+	/* VEN20 */
-+	GATE_HWV_VEN20(CLK_VEN2_CKE0_LARB, "ven2_larb", "venc", 0),
-+	GATE_HWV_VEN20(CLK_VEN2_CKE1_VENC, "ven2_venc", "venc", 4),
-+	GATE_VEN20(CLK_VEN2_CKE2_JPGENC, "ven2_jpgenc", "venc", 8),
-+	GATE_VEN20(CLK_VEN2_CKE3_JPGDEC, "ven2_jpgdec", "venc", 12),
-+	GATE_HWV_VEN20(CLK_VEN2_CKE5_GALS, "ven2_gals", "venc", 28),
-+	GATE_HWV_VEN20(CLK_VEN2_CKE29_VENC_XPC_CTRL, "ven2_venc_xpc_ctrl", "venc", 30),
-+	GATE_HWV_VEN20(CLK_VEN2_CKE6_GALS_SRAM, "ven2_gals_sram", "venc", 31),
-+	/* VEN21 */
-+	GATE_HWV_VEN21(CLK_VEN2_RES_FLAT, "ven2_res_flat", "venc", 0),
-+};
-+
-+static const struct mtk_clk_desc ven2_mcd = {
-+	.clks = ven2_clks,
-+	.num_clks = ARRAY_SIZE(ven2_clks),
-+	.need_runtime_pm = true,
-+};
-+
-+static const struct mtk_gate_regs ven_c20_hwv_regs = {
-+	.set_ofs = 0x00d8,
-+	.clr_ofs = 0x00dc,
-+	.sta_ofs = 0x2c6c,
-+};
-+
-+static const struct mtk_gate_regs ven_c21_hwv_regs = {
-+	.set_ofs = 0x00e0,
-+	.clr_ofs = 0x00e4,
-+	.sta_ofs = 0x2c70,
-+};
-+
-+#define GATE_HWV_VEN_C20(_id, _name, _parent, _shift) {\
-+		.id = _id,				\
-+		.name = _name,				\
-+		.parent_name = _parent,			\
-+		.regs = &ven10_cg_regs,		\
-+		.hwv_regs = &ven_c20_hwv_regs,		\
-+		.shift = _shift,			\
-+		.ops = &mtk_clk_gate_hwv_ops_setclr_inv,\
-+		.flags = CLK_OPS_PARENT_ENABLE,		\
-+	}
-+
-+#define GATE_HWV_VEN_C21(_id, _name, _parent, _shift) {\
-+		.id = _id,				\
-+		.name = _name,				\
-+		.parent_name = _parent,			\
-+		.regs = &ven11_cg_regs,		\
-+		.hwv_regs = &ven_c21_hwv_regs,		\
-+		.shift = _shift,			\
-+		.ops = &mtk_clk_gate_hwv_ops_setclr,	\
-+		.flags = CLK_OPS_PARENT_ENABLE,		\
-+	}
-+
-+static const struct mtk_gate ven_c2_clks[] = {
-+	/* VEN_C20 */
-+	GATE_HWV_VEN_C20(CLK_VEN_C2_CKE0_LARB, "ven_c2_larb", "venc", 0),
-+	GATE_HWV_VEN_C20(CLK_VEN_C2_CKE1_VENC, "ven_c2_venc", "venc", 4),
-+	GATE_HWV_VEN_C20(CLK_VEN_C2_CKE5_GALS, "ven_c2_gals", "venc", 28),
-+	GATE_HWV_VEN_C20(CLK_VEN_C2_CKE29_VENC_XPC_CTRL, "ven_c2_venc_xpc_ctrl",
-+			  "venc", 30),
-+	GATE_HWV_VEN_C20(CLK_VEN_C2_CKE6_GALS_SRAM, "ven_c2_gals_sram", "venc", 31),
-+	/* VEN_C21 */
-+	GATE_HWV_VEN_C21(CLK_VEN_C2_RES_FLAT, "ven_c2_res_flat", "venc", 0),
-+};
-+
-+static const struct mtk_clk_desc ven_c2_mcd = {
-+	.clks = ven_c2_clks,
-+	.num_clks = ARRAY_SIZE(ven_c2_clks),
-+	.need_runtime_pm = true,
-+};
-+
-+static const struct of_device_id of_match_clk_mt8196_venc[] = {
-+	{ .compatible = "mediatek,mt8196-vencsys", .data = &ven1_mcd },
-+	{ .compatible = "mediatek,mt8196-vencsys-c1", .data = &ven2_mcd },
-+	{ .compatible = "mediatek,mt8196-vencsys-c2", .data = &ven_c2_mcd },
-+	{ /* sentinel */ }
-+};
-+MODULE_DEVICE_TABLE(of, of_match_clk_mt8196_venc);
-+
-+static struct platform_driver clk_mt8196_venc_drv = {
-+	.probe = mtk_clk_simple_probe,
-+	.remove = mtk_clk_simple_remove,
-+	.driver = {
-+		.name = "clk-mt8196-venc",
-+		.of_match_table = of_match_clk_mt8196_venc,
-+	},
-+};
-+module_platform_driver(clk_mt8196_venc_drv);
-+
-+MODULE_DESCRIPTION("MediaTek MT8196 Video Encoders clocks driver");
-+MODULE_LICENSE("GPL");
--- 
-2.39.5
+> Reported-by: Gal Pressman <gal@nvidia.com>
+> Closes: https://lore.kernel.org/netdev/6583783f-f0fb-4fb1-a415-feec8155bc69@nvidia.com/
+> Signed-off-by: Christoph Paasch <cpaasch@openai.com>
 
+Thanks Christoph,
+Reviewed-by: Gal Pressman <gal@nvidia.com>
 
