@@ -1,116 +1,122 @@
-Return-Path: <netdev+bounces-210917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-210918-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2739B15755
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 03:56:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 597B2B1575F
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 04:04:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 308645612C7
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 01:57:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A75EC18A71B8
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 02:04:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1FD71C5F06;
-	Wed, 30 Jul 2025 01:55:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0E4615853B;
+	Wed, 30 Jul 2025 02:03:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cFW/GKps"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gwyJuPUs"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C07731DED42
-	for <netdev@vger.kernel.org>; Wed, 30 Jul 2025 01:55:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 587CB2E36E0;
+	Wed, 30 Jul 2025 02:03:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753840518; cv=none; b=A7IsvlYQl041iiNAEUIMGDZ+3clbhJ8PYxb+NDEIsQRKEjVRJL5cshkU2VGlHZeGLPHbDZqrMfOTexck7DJM876e56arbBxRSQqf832IkT/yVf/dvx/eK2WNB17gCm9/kBXMcSrrYshbW/jHv2SmYIgjVa5SIhFxoEcv5jqx95o=
+	t=1753841035; cv=none; b=GpMF2u/Oae6kv+NJD5EYcVJfpkjzieefx9zhRqbYbiIittD80JnIlqPzreuxJVbB20vHQ1Qb7gUQcQn0nZD99aQTxqdRRCOu/WjjQA27R6SJQjzVNa735P3LHH6EK+09Iobaj1xXw6EJvazFcFtaTIX6DaAyBfBP6R5omP4+QCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753840518; c=relaxed/simple;
-	bh=revpl56mPq9KLBzHa8CWXLrKv7rkFACf5P5lX0gZwDY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=r2H7fzglkgNZRW7JYnLhmjGnGr7jVg9THFyhHka7bUT171jzDonj+8xiuVsbfjd45Nkn4L30npQhxwewJ0FV17rvyOoIZrqJK24jsRjD+UceqlCAMWnXJU6meiVyFZNRKmvk2rn09TYw6egPZGYElCzRoZUPNV1jnyXnNU9D+QY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cFW/GKps; arc=none smtp.client-ip=91.218.175.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <7083544f-5b0c-432e-bec8-509ca733f316@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1753840504;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bBtDeEQmDVhAbCwRLb1FMhSSfBFoIGvei1/u976ODoM=;
-	b=cFW/GKpstUwfA0eP64NEgFb+fMg5cHQC4yPqe+JA0B2ivT3Pu6QPj4QsfAt9pOakE+i3C0
-	dU5eMBP8v+uNHZpzL7xCNXAd2QmYo+XXYePnIrEtk7Cugeq/oenIX5pjTFwIxkD99xed1T
-	uT3yLlujhn3HJgh+LghAu/0+y8DuyEQ=
-Date: Tue, 29 Jul 2025 18:54:58 -0700
+	s=arc-20240116; t=1753841035; c=relaxed/simple;
+	bh=xXaIo7AxqKyMj8+bQXMWwWo6Bngw5W0l2zetx+mtex4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=H8D/4U7AbBWbUJ88fYB7xyVJm+2ug9N0JhMDKWlvrNHMB0Ix0FfBNDgcujpiOCgpAQ2CqJJaPD43q+72P/PoTN0+ExODpnB4jbplCIrDQn1VTcuIFTVhJ5VcobGSrKVBhE8S8RfkryrrxechCx9ie8E8nMVP2XFCPMTZuu8dE58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gwyJuPUs; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-23ffa7b3b30so34075695ad.1;
+        Tue, 29 Jul 2025 19:03:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753841034; x=1754445834; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=wQMR5/06QpJsbjVrOYuYgkz+PqIxopAOx9Ark4KmgWM=;
+        b=gwyJuPUsgCV6mOT6B7/7qcsZY/K5osfaqCTb+VTcLOPPVyyDyLq8TWfzs536EJijjp
+         mSkDbM/7K3GiQUTw71/k6QzTlVlfPvmTKbbyd8axzoW4CuCAOxFYbRhTTPLdd+ajDc5I
+         mD1Vm33i9wgoak2YK/v/2U6xJdU4zN5XKVvpchwxps38jMZ5AVfN4EMRy8s4AK3L6zKm
+         2tuxbmAryV0zeqV5av++bQnXCUgCvjNepwGssQMlir6sr8+kLRk3Z8ZVAHwOSsS3RIQK
+         O516sE4nvrRb5+GOIjOQbAu0NlK1UBsNICB5iTMViIp2DbNaqHUoa+0HkRpwC41jaLoQ
+         nwxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753841034; x=1754445834;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wQMR5/06QpJsbjVrOYuYgkz+PqIxopAOx9Ark4KmgWM=;
+        b=IP+yF/aHNOFtWnGsnSqEvqO4vPn0DZ37B85ZGCE3Cv/upYO2gxRWXr+lhUWbdDUpWs
+         fXxQE9reoi0poWNgWdaF8GeKD4t2IUkk6DXMedAsJHufINuCsv36Gg0Kn1tn81XPB3wN
+         DT/1VESxyFc7EyeTuRs3QgsmnmBNwvQLdMceC6V2J16IKuklJRZP/p3CQMTFiUlRxH8R
+         uf2KUpnA8r5Qi7HE81eOXWqLxMGpAqZKXnvcziEmQ4EUOA6DFohwN04+Z4A+ILUjXhzZ
+         djxVlO46PjZQZmFa+SAnztrMtUplGUYPNOo1mnP4Wua+7o8+9MIIX+h8PWYT97MHu/XH
+         eVcQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWHiJODhn5zmYTbBDK7KqoIq/p/9uNhgenHBHQYOLaarxDmfqs58gtMdpnFX2EaUIlw3ng/IMtvtYaXS4M=@vger.kernel.org, AJvYcCWa64A4StAm0sul3ba8cUrk4u2v8wE/tO30Pwj/3aXeEtoj3kVg+R4kWuagTM0JM2quG5OGpAWu@vger.kernel.org
+X-Gm-Message-State: AOJu0YxwbRVU0N6/t+8+9GiW+WqedVptamfU9gm8x5WylVvmlS/1KvyP
+	SlD+Nq/uhBuRrMmTX+jPJNoU83cA+VD+nTAmbHTHhJwhT/kATLXbGTU0
+X-Gm-Gg: ASbGncvebC9BDRMiEKQqre0mwaNULwNKYJFz+fJ8UP8+Q9MyfUBe4kfukg8blkw6pKA
+	BgOTkSayAH9n77PAIxb96041p2HSDPtpz2qI6w3uvtV6rLv/0iO/vMrZHqREEclfczJF+DFMwig
+	Dmafr/w53rUXiU+s4uT6xaMJAN6EWB2DyINTkP5BVhXIIv5i/OxiVR0rT11kL7sle9+4Rq1nWPu
+	IgFmRjfOTzGflPoSJqd2CAIgPri5UkkqyaLT4SaFpRPm0/wbeUCMYbJSJsi4quCe2QL+DG7Ui/L
+	Ee/Wcam+NqrMBfVZW8Cy6XeQW+1CEmE6dTmlMmhHXegVX4Jrvf+FSvzzdQOIKyYC0UVdafOGl+K
+	SZlmuPs8OfvKHEhmBpISWtQp3Sz8WRkfVGZyM2wQN
+X-Google-Smtp-Source: AGHT+IFd1qYOnAKt5uSZC0A7/VYniEyztNYcrTCYpdi6eTZWPOegcNnrpele9y2FdxS4XMOL33NnJw==
+X-Received: by 2002:a17:903:240c:b0:240:3ef:e17d with SMTP id d9443c01a7336-24096b3551bmr19479975ad.40.1753841033546;
+        Tue, 29 Jul 2025 19:03:53 -0700 (PDT)
+Received: from localhost.localdomain ([207.34.150.221])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23ff71916f0sm70349845ad.147.2025.07.29.19.03.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Jul 2025 19:03:53 -0700 (PDT)
+From: Kyle Hendry <kylehendrydev@gmail.com>
+To: Florian Fainelli <florian.fainelli@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: noltari@gmail.com,
+	jonas.gorski@gmail.com,
+	Kyle Hendry <kylehendrydev@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next 0/2] net: dsa: b53: mmap: Add bcm63268 GPHY power control
+Date: Tue, 29 Jul 2025 19:03:34 -0700
+Message-ID: <20250730020338.15569-1-kylehendrydev@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v3 0/4] bpf: add icmp_send_unreach kfunc
-To: Mahe Tardy <mahe.tardy@gmail.com>
-Cc: alexei.starovoitov@gmail.com, andrii@kernel.org, ast@kernel.org,
- bpf@vger.kernel.org, coreteam@netfilter.org, daniel@iogearbox.net,
- fw@strlen.de, john.fastabend@gmail.com, netdev@vger.kernel.org,
- netfilter-devel@vger.kernel.org, oe-kbuild-all@lists.linux.dev,
- pablo@netfilter.org, lkp@intel.com
-References: <202507270940.kXGmRbg5-lkp@intel.com>
- <20250728094345.46132-1-mahe.tardy@gmail.com>
- <b36532a2-506b-4ba5-b6a3-a089386a190e@linux.dev> <aIiaB2QUxKmhvPlx@gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <aIiaB2QUxKmhvPlx@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-On 7/29/25 2:53 AM, Mahe Tardy wrote:
->> Which other program types do you need this kfunc to send icmp and the future
->> tcp rst?
-> 
-> I don't really know, I mostly need this in cgroup_skb for my use case
-> but I could see other programs type using this either for simplification
-> (for progs that can already rewrite the packet, like tc) or other
-> programs types like cgroup_skb, because they can't touch the packet
-> themselves.
+The gpio controller on the bcm63268 has a register for 
+controlling the gigabit phy power. These patches disable
+low power mode when enabling the gphy port.
 
-I also don't think the tc needs this kfunc either. The tc should already have 
-ways to do this now.
+This is based on an earlier patch series here:
+https://lore.kernel.org/netdev/20250306053105.41677-1-kylehendrydev@gmail.com/
 
-> 
->>
->> This cover letter mentioned sending icmp unreach is easier than sending tcp
->> rst. What problems do you see in sending tcp rst?
->>
-> 
-> Yes, I based these patches on what net/ipv4/netfilter/ipt_REJECT.c's
-> 'reject_tg' function does. In the case of sending ICMP unreach
-> 'nf_send_unreach', the routing step is quite straighforward as they are
-> only inverting the daddr and the saddr (that's what my renamed/moved
-> ip_route_reply_fetch_dst helper does).
-> 
-> In the case of sending RST 'nf_send_reset', there are extra steps, first
-> the same routing mechanism is done by just inverting the daddr and the
-> saddr but later 'ip_route_me_harder' is called which is doing a lot
-> more. I'm currently not sure which parts of this must be ported to work
-> in our BPF use case so I wanted to start with unreach.
+I have created a new series since many of the changes
+were included in the ephy control patches:
+https://lore.kernel.org/netdev/20250724035300.20497-1-kylehendrydev@gmail.com/
 
-I don't think we necessarily need to completely borrow from nf, the hooks' 
-locations are different and the use case may be different.
+Signed-off-by: Kyle Hendry <kylehendrydev@gmail.com>
 
-A concern that I have is the icmp6_send called by the kfunc. The icmp6_send 
-should eventually call to ip6_finish_output which may call the very same 
-"cgroup/egress" program again in a recursive way. The same for v4 icmp_send.
+Kyle Hendry (2):
+  net: dsa: b53: mmap: Add gphy port to phy info for bcm63268
+  net: dsa: b53: mmap: Implement bcm63268 gphy power control
 
-The icmp packet is sent from an internal kernel sk. I suspect you will see this 
-recursive behavior if the test is done in the default cgroup (/sys/fs/cgroup). I 
-think the is_ineligible(skb) should have stopped the second icmpv6_send from 
-replying to an icmp error and the cgroup hook cannot change the skb. However, I 
-am not sure I want to cross this bridge. Is there a way to avoid the recursive 
-bpf prog?
+ drivers/net/dsa/b53/b53_mmap.c | 35 ++++++++++++++++++++++++++++++----
+ 1 file changed, 31 insertions(+), 4 deletions(-)
 
+-- 
+2.43.0
 
 
