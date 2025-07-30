@@ -1,234 +1,136 @@
-Return-Path: <netdev+bounces-211067-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211069-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82860B166A4
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 20:59:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C0B8B166C4
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 21:17:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F30F7622175
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 18:59:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9E6C57B63B5
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 19:15:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D9A32E3AF0;
-	Wed, 30 Jul 2025 18:59:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A2D62E0916;
+	Wed, 30 Jul 2025 19:17:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KB9t3eVK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eRNcOLu0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A93B52E0400;
-	Wed, 30 Jul 2025 18:59:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 854CD1624C5
+	for <netdev@vger.kernel.org>; Wed, 30 Jul 2025 19:17:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753901951; cv=none; b=eE2Ox6kdsjrRCfxGiOHBr0BjXj2ACh0X0NG1ul0fLlU9IFOMKoSZzpFa3plwVJuslrTBdeKGPiz4jM5OjbV5Y4xqxdLj0RaTYkMQGeFJxcQiCbqMhK9qXwdxZpByEXNrnMc2deu2tjuGzX98SOZ/mG24ayFLyL2v8PY4zC3f7tM=
+	t=1753903035; cv=none; b=J2Fkpitom9DNvH3Z0Qk9QAXqugJ2j+Em1boPrxJ1vS4lBvUKwB6Vmj5/1tzQ7+WNDCr0grsFOKVnR5dAPCxLtGafg3IF1B3fESJ4ylCwWNARX2d8HhWY/KT4IFL/eTfZ950qK2Iqgs0KcXYzE2aLb49Vju28ToKo8q1BzvffABQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753901951; c=relaxed/simple;
-	bh=rvlI8d5DANTyLXYwEkRLTEYIhsqYoYxm1irjYuIbdlA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Z8WV6DMmJyqcPx8rSD9/B2c5/e1xinpr7uqHi1sFHrcAgJ8s72URipt0ZOoND07B3QEC74Wcgt+XY6LDzHjzq6r8LTcKcg0TlKHgzHl5d0zMP2ctSYv/wdg/0Yq8HxQkD//xqWx8fyMB8FsMitEBM++AetSs6O1CEpCoLxMmqLE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KB9t3eVK; arc=none smtp.client-ip=209.85.214.175
+	s=arc-20240116; t=1753903035; c=relaxed/simple;
+	bh=A/I47xL7vY/wIbA0xrAznejeBW1HRXjqz1c98hyof/A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tk0sMU8NpmmHlLywEHiS3QrMg+perZBJgV7180F5LDwMM0iAmmAhY2jlZ2WjVtT6lwxjomk6Zu6UPIXt5tGKD9N22Rf4plDLv1TfBGoP6B23hAcSDHfO1h1fwFMRdgANLw47WiKmAeLWKS8a60XAbtOy4ydZDxDokiURwIHR5qI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eRNcOLu0; arc=none smtp.client-ip=209.85.210.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-23ffa7b3b30so2443055ad.1;
-        Wed, 30 Jul 2025 11:59:09 -0700 (PDT)
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-73c17c770a7so177345b3a.2
+        for <netdev@vger.kernel.org>; Wed, 30 Jul 2025 12:17:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753901949; x=1754506749; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VDWH1zRu6JQl7B7QrSY/f/7bYFARwqxp6h969F7hTj4=;
-        b=KB9t3eVK1F7kAKSi4UJfKSUb7SkYpwv2B5VLDd1B53Bj9yAyDrvsThFN9BnbOFPNS1
-         Z8O5WGg+xQJBOPkFMmOdLbvyUKegM+KgXhsbX4qhW9epsuS9cW1yEAibLac2FYIb6WMm
-         hJRKYirh9+vzK2ZK5KSpqh+DEJH7YgLi9VUr2NsYvhSfxGACcn2VmWuyGr4k4XxPGkly
-         4p3/GkTtYDNFjoWEaMvdFwOerAjg4YzySghLp/YRaulD6DgMbUQlt0XeKvcBS9Wh66OW
-         i+mY9bmJMMan1jX5ltOV/J8lcOTHywCWa1J4bmIXJvH1nW+Y5vv9GgqTykZgyUnBhFjD
-         gRRA==
+        d=gmail.com; s=20230601; t=1753903034; x=1754507834; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=ZQIfhLfTS82wPqaIFJrl1+RkallhR2HEu/Xsc2jgeE4=;
+        b=eRNcOLu0WxXpPcr41hKkbs7MulmM/E9OvGZ3XscCXoKNvWv10UH4UAbZRhktX8rW8G
+         41aFUQCTnMrEgSU3binSL1ScSa4uktu78uVD5QK+shgd/yAU699N/5NPRy3E7ttg50wR
+         Xng4vBfrm8LD8jUELGYHPj0FM0HuzabTTfj2J6jI8XHZ5XbeULkg4v3CRAmPVv7xLMfE
+         N8h9epzB/6SxP0S4m5DxhZoDT7Aer5xlVcn0hWKZLg/TwrbL2gDuhtzYJ0wieGA6pwAP
+         ZxxTqOlrbLewnBO7rjpM8+4aT3ub/j3+3i8vE9YxmGeyiw8vJKteiom9d9MhjGKBeMux
+         AWKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753901949; x=1754506749;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VDWH1zRu6JQl7B7QrSY/f/7bYFARwqxp6h969F7hTj4=;
-        b=hrCHf7f5wx/Ng2nV7jSPYdWhWbYhgZMVRKF904R94O6NeqbdeMyjoJxkktKcK9O8dj
-         YzdpI6p8cV6iwX1Ltl58NzCab+P5txi3+U4ZGcquktJX2K1BTyEJs2RX71ls5lj9yED7
-         WttWFxwQVJEizpjwL49T4C7t3U5t//oq9lV+b7bzVpcIR89F/ShmpvDrz8NbNMQTpi3A
-         uxIwDjiTf4cSE40Ua7EnOQ4pe7YUwYNoQFcSRITilT+zRhE3p2Qiq60rlo4mi0HtMbpG
-         HdvPhSTlYPE8FwxFZZrBmnxIG39lzkLtcT1PJmaAWe2q+pnLUCKEGXxRgpxMNZ4C1bmC
-         JQXQ==
-X-Gm-Message-State: AOJu0YzbiuYL+SwImusmWMC1VdKkpzw1xQYoR/5ozl3asKtnFFtOIY1R
-	WrYPkf9N78a6ICYf72fdlCZ7T4rGzY9cZ+4gmpc14+fPVfKgNiCi/dXMR3ZD+g==
-X-Gm-Gg: ASbGncsLweJl+dcpEORyUH911MtynYzqvqVaH9UPXXJbv9gsCS0rDdNBbaNi4ea8X/Q
-	eu+REn0DHOImgw9Utmybbiqk/zNJr9p3zpf3rhM2B1VeYSJPci9v4NlvHPwORKTM7pM9WGS7S7E
-	W9cYsQxeEOkIATODw9UyBtnAf2j7Oz8+aYpqvM4MfDgyCzC5XKKJkwDwPNpdnMcng6v0OEybaCS
-	oSPbAfDencqCsrXYlUSN2OHWvlt40mt/P5DArP8SfLX3QgdehqW02wjLUmd70u9Bty3BtCwrw0n
-	SbguATOJADujwzOZgu9Xyyl9Q6UfHvYzcpKJ7sseezhie/mY/AcdINHEwinZGtEMNv3JBKxsvlH
-	N6GVSZp+tkGJCLA==
-X-Google-Smtp-Source: AGHT+IGZLzLVn1tdggCunsQhWzdct3HGJDpnQzCrGPseMuIFd+duLUWoFSVekNX46GaBAikBuHd/Lg==
-X-Received: by 2002:a17:903:289:b0:240:418c:b9f6 with SMTP id d9443c01a7336-24096b56b5emr62999175ad.49.1753901948752;
-        Wed, 30 Jul 2025 11:59:08 -0700 (PDT)
-Received: from localhost ([2a03:2880:ff:44::])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23ffa37f13bsm89314095ad.172.2025.07.30.11.59.08
+        d=1e100.net; s=20230601; t=1753903034; x=1754507834;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZQIfhLfTS82wPqaIFJrl1+RkallhR2HEu/Xsc2jgeE4=;
+        b=S+r8iQ3nVIzvzb+tj3y2xuy0WPH3q89+Jy98DEISdQbb3rF3Pp6+2VZ2ikKpLzygph
+         Lo0uYQY+VzqY/L6XVLRDTIgvWffdWabM5V+wHsc7RqoJ/JAjmLXn7f8HTybf7tSnGcGq
+         qzHc/2Xnvgyb+Zd1n0poXzm3dEu6bMdKDplfAHqfRrrmPPimblHMrME4cWTbcZowXsqD
+         mnta8KDmSuQHKa3KS0KOxmlDLk6liwurjbHCkgnGRo1pHQ7UAoa/xiw0/fPJcZEmiz0W
+         b5tiy8SbC9zJL/XpvBaXDUKfdyPtpY+z+yd7peE4Asc5md8ph/BCgmFVMePIBcUbQcix
+         vjcQ==
+X-Gm-Message-State: AOJu0YzZh+gGdbZbncSnFsioGpH1quo57iRzZafoVgbZMpqi3FAhgrs5
+	yG9I440HQ9SnOUbI0Sty/Vsp8p8Mbf46FyK8FebryV3fFgl1MnDRTgBXkMjf0g==
+X-Gm-Gg: ASbGncv5TvVf0m4NWogiZiOk6uwRjfC0v91s3HWHv47JoOTs8hNf4Md8I1234n0VOIs
+	C5Ih2Yq15miYqAUh8HDBW6OvSmwQBlPsZVOUQg9lxHjFEnC6EtQdy3HOjdeZeXH3eXcw6CHqikP
+	DOVQpBQS9EQZASiKwS4Vjael+z/J4ppxcEVQ+XAndjrkZKpGvxTvWrtFsR1CUtR6XGS7fYlfXY2
+	rOx1nuYbYrRbRIAdMDk3a3+ijaDE+2xGnu2tYke5+JYiRA2YEf8XpzbIlR0Z0CgfMA9X9SpE/0B
+	nyHW1+wYZWFbV3t690dOEHiMskPohL4TNYbNdEZa2F+tgiT+6ry/JQ1FupZO3Bm7/qEFdNARId5
+	oOZElf/Js7Ez5YSIt7dQgOzfD3Q==
+X-Google-Smtp-Source: AGHT+IEtFaA1/OrN6I1VVRddZpnGPVBbcbvDLW179Qd9QG5+8UtJgFkCUJXhfcMSYt3Gi2V7fjCEoA==
+X-Received: by 2002:a05:6a21:33a2:b0:235:2cd8:6cb6 with SMTP id adf61e73a8af0-23dc0e7c59cmr7131452637.34.1753903033663;
+        Wed, 30 Jul 2025 12:17:13 -0700 (PDT)
+Received: from localhost ([129.210.115.104])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-76b210e4f94sm2324724b3a.36.2025.07.30.12.17.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Jul 2025 11:59:08 -0700 (PDT)
-From: Amery Hung <ameryhung@gmail.com>
-To: bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	alexei.starovoitov@gmail.com,
-	andrii@kernel.org,
-	daniel@iogearbox.net,
-	tj@kernel.org,
-	memxor@gmail.com,
-	martin.lau@kernel.org,
-	linux-lists@etsalapatis.com,
-	ameryhung@gmail.com,
-	kernel-team@meta.com
-Subject: [PATCH bpf-next v7 4/4] selftests/bpf: Test concurrent task local data key creation
-Date: Wed, 30 Jul 2025 11:58:55 -0700
-Message-ID: <20250730185903.3574598-5-ameryhung@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20250730185903.3574598-1-ameryhung@gmail.com>
-References: <20250730185903.3574598-1-ameryhung@gmail.com>
+        Wed, 30 Jul 2025 12:17:13 -0700 (PDT)
+Date: Wed, 30 Jul 2025 12:17:12 -0700
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: netdev@vger.kernel.org, will@willsroot.io, stephen@networkplumber.org
+Subject: Re: [Patch v4 net 0/6] netem: Fix skb duplication logic and prevent
+ infinite loops
+Message-ID: <aIpvuNyyvud0sJOl@pop-os.localdomain>
+References: <20250719220341.1615951-1-xiyou.wangcong@gmail.com>
+ <CAM0EoMmTZon=nFmLsDPKhDEzHruw701iV9=mq92At9oKo0LGpA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAM0EoMmTZon=nFmLsDPKhDEzHruw701iV9=mq92At9oKo0LGpA@mail.gmail.com>
 
-Test thread-safety of tld_create_key(). Since tld_create_key() does
-not rely on locks but memory barriers and atomic operations to protect
-the shared metadata, the thread-safety of the function is non-trivial.
-Make sure concurrent tld_key_create(), both valid and invalid, can not
-race and corrupt metatada, which may leads to TLDs not being thread-
-specific or duplicate TLDs with the same name.
+On Mon, Jul 21, 2025 at 10:00:30AM -0400, Jamal Hadi Salim wrote:
+> On Sat, Jul 19, 2025 at 6:04 PM Cong Wang <xiyou.wangcong@gmail.com> wrote:
+> >
+> > This patchset fixes the infinite loops due to duplication in netem, the
+> > real root cause of this problem is enqueuing to the root qdisc, which is
+> > now changed to enqueuing to the same qdisc. This is more reasonable,
+> > more predictable from users' perspective, less error-proone and more elegant.
+> >
+> > Please see more details in patch 1/6 which contains two pages of detailed
+> > explanation including why it is safe and better.
+> >
+> > This replaces the patches from William, with much less code and without
+> > any workaround. More importantly, this does not break any use case.
+> >
+> 
+> Cong, you are changing user expected behavior.
+> So instead of sending to the root qdisc, you are looping on the same
+> qdisc. I dont recall what the history is for the decision to go back
+> to the root qdisc - but one reason that sounds sensible is we want to
+> iterate through the tree hierarchy again. Stephen may remember.
+> The fact that the qfq issue is hit indicates the change has
+> consequences - and given the check a few lines above, more than likely
+> you are affecting the qlen by what you did.
 
-Signed-off-by: Amery Hung <ameryhung@gmail.com>
----
- .../bpf/prog_tests/test_task_local_data.c     | 105 ++++++++++++++++++
- 1 file changed, 105 insertions(+)
+Please refer the changelog of patch 1/6, let me quote it here for you:
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/test_task_local_data.c b/tools/testing/selftests/bpf/prog_tests/test_task_local_data.c
-index 2e77d3fa2534..3b5cd2cd89c7 100644
---- a/tools/testing/selftests/bpf/prog_tests/test_task_local_data.c
-+++ b/tools/testing/selftests/bpf/prog_tests/test_task_local_data.c
-@@ -185,8 +185,113 @@ static void test_task_local_data_basic(void)
- 	test_task_local_data__destroy(skel);
- }
- 
-+#define TEST_RACE_THREAD_NUM (TLD_MAX_DATA_CNT - 3)
-+
-+void *test_task_local_data_race_thread(void *arg)
-+{
-+	int err = 0, id = (intptr_t)arg;
-+	char key_name[32];
-+	tld_key_t key;
-+
-+	key = tld_create_key("value_not_exist", TLD_PAGE_SIZE + 1);
-+	if (tld_key_err_or_zero(key) != -E2BIG) {
-+		err = 1;
-+		goto out;
-+	}
-+
-+	/* Only one thread will succeed in creating value1 */
-+	key = tld_create_key("value1", sizeof(int));
-+	if (!tld_key_is_err(key))
-+		tld_keys[1] = key;
-+
-+	/* Only one thread will succeed in creating value2 */
-+	key = tld_create_key("value2", sizeof(struct test_tld_struct));
-+	if (!tld_key_is_err(key))
-+		tld_keys[2] = key;
-+
-+	snprintf(key_name, 32, "thread_%d", id);
-+	tld_keys[id] = tld_create_key(key_name, sizeof(int));
-+	if (tld_key_is_err(tld_keys[id]))
-+		err = 2;
-+out:
-+	return (void *)(intptr_t)err;
-+}
-+
-+static void test_task_local_data_race(void)
-+{
-+	LIBBPF_OPTS(bpf_test_run_opts, opts);
-+	pthread_t thread[TEST_RACE_THREAD_NUM];
-+	struct test_task_local_data *skel;
-+	int fd, i, j, err, *data;
-+	void *ret = NULL;
-+
-+	skel = test_task_local_data__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "skel_open_and_load"))
-+		return;
-+
-+	tld_keys = calloc(TLD_MAX_DATA_CNT, sizeof(tld_key_t));
-+	if (!ASSERT_OK_PTR(tld_keys, "calloc tld_keys"))
-+		goto out;
-+
-+	fd = bpf_map__fd(skel->maps.tld_data_map);
-+
-+	ASSERT_FALSE(tld_key_is_err(value0_key), "TLD_DEFINE_KEY");
-+	tld_keys[0] = value0_key;
-+
-+	for (j = 0; j < 100; j++) {
-+		reset_tld();
-+
-+		for (i = 0; i < TEST_RACE_THREAD_NUM; i++) {
-+			/*
-+			 * Try to make tld_create_key() race with each other. Call
-+			 * tld_create_key(), both valid and invalid, from different threads.
-+			 */
-+			err = pthread_create(&thread[i], NULL, test_task_local_data_race_thread,
-+					     (void *)(intptr_t)(i + 3));
-+			if (CHECK_FAIL(err))
-+				break;
-+		}
-+
-+		/* Wait for all tld_create_key() to return */
-+		for (i = 0; i < TEST_RACE_THREAD_NUM; i++) {
-+			pthread_join(thread[i], &ret);
-+			if (CHECK_FAIL(ret))
-+				break;
-+		}
-+
-+		/* Write a unique number to each TLD */
-+		for (i = 0; i < TLD_MAX_DATA_CNT; i++) {
-+			data = tld_get_data(fd, tld_keys[i]);
-+			if (CHECK_FAIL(!data))
-+				break;
-+			*data = i;
-+		}
-+
-+		/* Read TLDs and check the value to see if any address collides with another */
-+		for (i = 0; i < TLD_MAX_DATA_CNT; i++) {
-+			data = tld_get_data(fd, tld_keys[i]);
-+			if (CHECK_FAIL(*data != i))
-+				break;
-+		}
-+
-+		/* Run task_main to make sure no invalid TLDs are added */
-+		err = bpf_prog_test_run_opts(bpf_program__fd(skel->progs.task_main), &opts);
-+		ASSERT_OK(err, "run task_main");
-+		ASSERT_OK(opts.retval, "task_main retval");
-+	}
-+out:
-+	if (tld_keys) {
-+		free(tld_keys);
-+		tld_keys = NULL;
-+	}
-+	tld_free();
-+	test_task_local_data__destroy(skel);
-+}
-+
- void test_task_local_data(void)
- {
- 	if (test__start_subtest("task_local_data_basic"))
- 		test_task_local_data_basic();
-+	if (test__start_subtest("task_local_data_race"))
-+		test_task_local_data_race();
- }
--- 
-2.47.3
+    The new netem duplication behavior does not break the documented
+    semantics of "creates a copy of the packet before queuing." The man page
+    description remains true since duplication occurs before the queuing
+    process, creating both original and duplicate packets that are then
+    enqueued. The documentation does not specify which qdisc should receive
+    the duplicates, only that copying happens before queuing. The implementation
+    choice to enqueue duplicates to the same qdisc (rather than root) is an
+    internal detail that maintains the documented behavior while preventing
+    infinite loops in hierarchical configurations.
 
+I think it is reasonable to use man page as our agreement with users. I
+am open to other alternative agreements, if you have one. I hope using
+man page is not of my own preference here.
+
+Thanks.
 
