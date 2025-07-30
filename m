@@ -1,136 +1,282 @@
-Return-Path: <netdev+bounces-211069-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211070-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C0B8B166C4
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 21:17:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF12FB16717
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 21:50:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9E6C57B63B5
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 19:15:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 22D2B16EBCD
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 19:50:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A2D62E0916;
-	Wed, 30 Jul 2025 19:17:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69CE61E5711;
+	Wed, 30 Jul 2025 19:50:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eRNcOLu0"
+	dkim=pass (2048-bit key) header.d=manjaro.org header.i=@manjaro.org header.b="jQg5miRR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.manjaro.org (mail.manjaro.org [116.203.91.91])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 854CD1624C5
-	for <netdev@vger.kernel.org>; Wed, 30 Jul 2025 19:17:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC2462AE74;
+	Wed, 30 Jul 2025 19:50:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.203.91.91
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753903035; cv=none; b=J2Fkpitom9DNvH3Z0Qk9QAXqugJ2j+Em1boPrxJ1vS4lBvUKwB6Vmj5/1tzQ7+WNDCr0grsFOKVnR5dAPCxLtGafg3IF1B3fESJ4ylCwWNARX2d8HhWY/KT4IFL/eTfZ950qK2Iqgs0KcXYzE2aLb49Vju28ToKo8q1BzvffABQ=
+	t=1753905042; cv=none; b=KryFNEBihJR6AuEqepa21HCUkmubwFDa82mAj+fG8raeQLcMUorf7NcyhrMwGkxmKkKVw6TH3Yo9upc/VUVj8fedUCQ0dFJN0Ticu3gu79rCP+hHe4YXmrWLcwN/U6QccPKZfitcvNEswS+8MJl7daKzWofePM4UGi8AOVWdwps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753903035; c=relaxed/simple;
-	bh=A/I47xL7vY/wIbA0xrAznejeBW1HRXjqz1c98hyof/A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tk0sMU8NpmmHlLywEHiS3QrMg+perZBJgV7180F5LDwMM0iAmmAhY2jlZ2WjVtT6lwxjomk6Zu6UPIXt5tGKD9N22Rf4plDLv1TfBGoP6B23hAcSDHfO1h1fwFMRdgANLw47WiKmAeLWKS8a60XAbtOy4ydZDxDokiURwIHR5qI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eRNcOLu0; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-73c17c770a7so177345b3a.2
-        for <netdev@vger.kernel.org>; Wed, 30 Jul 2025 12:17:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753903034; x=1754507834; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ZQIfhLfTS82wPqaIFJrl1+RkallhR2HEu/Xsc2jgeE4=;
-        b=eRNcOLu0WxXpPcr41hKkbs7MulmM/E9OvGZ3XscCXoKNvWv10UH4UAbZRhktX8rW8G
-         41aFUQCTnMrEgSU3binSL1ScSa4uktu78uVD5QK+shgd/yAU699N/5NPRy3E7ttg50wR
-         Xng4vBfrm8LD8jUELGYHPj0FM0HuzabTTfj2J6jI8XHZ5XbeULkg4v3CRAmPVv7xLMfE
-         N8h9epzB/6SxP0S4m5DxhZoDT7Aer5xlVcn0hWKZLg/TwrbL2gDuhtzYJ0wieGA6pwAP
-         ZxxTqOlrbLewnBO7rjpM8+4aT3ub/j3+3i8vE9YxmGeyiw8vJKteiom9d9MhjGKBeMux
-         AWKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753903034; x=1754507834;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZQIfhLfTS82wPqaIFJrl1+RkallhR2HEu/Xsc2jgeE4=;
-        b=S+r8iQ3nVIzvzb+tj3y2xuy0WPH3q89+Jy98DEISdQbb3rF3Pp6+2VZ2ikKpLzygph
-         Lo0uYQY+VzqY/L6XVLRDTIgvWffdWabM5V+wHsc7RqoJ/JAjmLXn7f8HTybf7tSnGcGq
-         qzHc/2Xnvgyb+Zd1n0poXzm3dEu6bMdKDplfAHqfRrrmPPimblHMrME4cWTbcZowXsqD
-         mnta8KDmSuQHKa3KS0KOxmlDLk6liwurjbHCkgnGRo1pHQ7UAoa/xiw0/fPJcZEmiz0W
-         b5tiy8SbC9zJL/XpvBaXDUKfdyPtpY+z+yd7peE4Asc5md8ph/BCgmFVMePIBcUbQcix
-         vjcQ==
-X-Gm-Message-State: AOJu0YzZh+gGdbZbncSnFsioGpH1quo57iRzZafoVgbZMpqi3FAhgrs5
-	yG9I440HQ9SnOUbI0Sty/Vsp8p8Mbf46FyK8FebryV3fFgl1MnDRTgBXkMjf0g==
-X-Gm-Gg: ASbGncv5TvVf0m4NWogiZiOk6uwRjfC0v91s3HWHv47JoOTs8hNf4Md8I1234n0VOIs
-	C5Ih2Yq15miYqAUh8HDBW6OvSmwQBlPsZVOUQg9lxHjFEnC6EtQdy3HOjdeZeXH3eXcw6CHqikP
-	DOVQpBQS9EQZASiKwS4Vjael+z/J4ppxcEVQ+XAndjrkZKpGvxTvWrtFsR1CUtR6XGS7fYlfXY2
-	rOx1nuYbYrRbRIAdMDk3a3+ijaDE+2xGnu2tYke5+JYiRA2YEf8XpzbIlR0Z0CgfMA9X9SpE/0B
-	nyHW1+wYZWFbV3t690dOEHiMskPohL4TNYbNdEZa2F+tgiT+6ry/JQ1FupZO3Bm7/qEFdNARId5
-	oOZElf/Js7Ez5YSIt7dQgOzfD3Q==
-X-Google-Smtp-Source: AGHT+IEtFaA1/OrN6I1VVRddZpnGPVBbcbvDLW179Qd9QG5+8UtJgFkCUJXhfcMSYt3Gi2V7fjCEoA==
-X-Received: by 2002:a05:6a21:33a2:b0:235:2cd8:6cb6 with SMTP id adf61e73a8af0-23dc0e7c59cmr7131452637.34.1753903033663;
-        Wed, 30 Jul 2025 12:17:13 -0700 (PDT)
-Received: from localhost ([129.210.115.104])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-76b210e4f94sm2324724b3a.36.2025.07.30.12.17.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Jul 2025 12:17:13 -0700 (PDT)
-Date: Wed, 30 Jul 2025 12:17:12 -0700
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: netdev@vger.kernel.org, will@willsroot.io, stephen@networkplumber.org
-Subject: Re: [Patch v4 net 0/6] netem: Fix skb duplication logic and prevent
- infinite loops
-Message-ID: <aIpvuNyyvud0sJOl@pop-os.localdomain>
-References: <20250719220341.1615951-1-xiyou.wangcong@gmail.com>
- <CAM0EoMmTZon=nFmLsDPKhDEzHruw701iV9=mq92At9oKo0LGpA@mail.gmail.com>
+	s=arc-20240116; t=1753905042; c=relaxed/simple;
+	bh=khtml9RtnRjSSPRRrCR/+QfYGLYLBLAqmAvwfUCjcVo=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=aPMEWbCfD9RQ+953COUmZuwMQyRFcSJvx3oLLEVZueLtrO1/FTruV8xs5qtqjEZUCP/yrbZstelKXdIPhGebAnqolXeyLvE8OHUro0zkriWdsNMDgxNC7AntSJQKCGeuPZR653J8BBBCLzSAYBjYYyN2GVVWNQb1LusDaY7TgGo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manjaro.org; spf=pass smtp.mailfrom=manjaro.org; dkim=pass (2048-bit key) header.d=manjaro.org header.i=@manjaro.org header.b=jQg5miRR; arc=none smtp.client-ip=116.203.91.91
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manjaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manjaro.org
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAM0EoMmTZon=nFmLsDPKhDEzHruw701iV9=mq92At9oKo0LGpA@mail.gmail.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manjaro.org; s=2021;
+	t=1753905027;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/q1/ijPw1e2Q92rioAtt4ZINjgooInrMuTW/Z/Sz9xE=;
+	b=jQg5miRR+84MPUTRh150aKHGLt4ikOIhQHFH9fpBqN92Q6FOwIUw3Uo0o19lX/IChB8Z6I
+	bmj40z2X4yv5x2/EPMGEtL7ZNuMzB1W3lxHps+kfmN6D/ivH4AIUanLXcFqRNuQj8dyDHw
+	AXK6VtpREotTOM8pqEMRgI0HHwDgvmdUHHOuMoH9WfFfs3jBdnzYnMUDqvix3dBASvJ4lo
+	QL+OtiBvzy4slFX8bG4+Hk/TKaAG5QnNZaoAJJJQvkZkEQ4UrV7Ojb77GCdxKzFT9Hb8LG
+	twq1w8QfXiGt72yotjLeokmNVrDGR7xPczBTKy5w9y4+FQ844zVBCyNXSNWxlA==
+Date: Wed, 30 Jul 2025 21:50:25 +0200
+From: Dragan Simic <dsimic@manjaro.org>
+To: Robin Murphy <robin.murphy@arm.com>
+Cc: Diederik de Haas <didi.debian@cknow.org>, Lee Jones <lee@kernel.org>,
+ Pavel Machek <pavel@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ linux-leds@vger.kernel.org, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-rockchip@lists.infradead.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: BUG: Circular locking dependency on netdev led trigger on NanoPi
+ R5S
+In-Reply-To: <6817efe1-f2c2-4686-bdf1-fca11f066e3a@arm.com>
+References: <DBLBPIBKFCJV.36AVW8JY88L7H@cknow.org>
+ <6817efe1-f2c2-4686-bdf1-fca11f066e3a@arm.com>
+Message-ID: <475ee9ae8cdca5ce86b708fe0ade7c9d@manjaro.org>
+X-Sender: dsimic@manjaro.org
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Authentication-Results: ORIGINATING;
+	auth=pass smtp.auth=dsimic@manjaro.org smtp.mailfrom=dsimic@manjaro.org
 
-On Mon, Jul 21, 2025 at 10:00:30AM -0400, Jamal Hadi Salim wrote:
-> On Sat, Jul 19, 2025 at 6:04 PM Cong Wang <xiyou.wangcong@gmail.com> wrote:
-> >
-> > This patchset fixes the infinite loops due to duplication in netem, the
-> > real root cause of this problem is enqueuing to the root qdisc, which is
-> > now changed to enqueuing to the same qdisc. This is more reasonable,
-> > more predictable from users' perspective, less error-proone and more elegant.
-> >
-> > Please see more details in patch 1/6 which contains two pages of detailed
-> > explanation including why it is safe and better.
-> >
-> > This replaces the patches from William, with much less code and without
-> > any workaround. More importantly, this does not break any use case.
-> >
+Hello Robin and Diederik,
+
+On 2025-07-25 20:12, Robin Murphy wrote:
+> On 2025-07-25 6:48 pm, Diederik de Haas wrote:
+>> I have a FriendlyELEC NanoPi R5S (with rk3568 SoC) and in commit
+>> 1631cbdb8089 ("arm64: dts: rockchip: Improve LED config for NanoPi 
+>> R5S")
+>> 
+>> I tried to improve its LED configuration and that included
+>> ``linux,default-trigger = "netdev"``
+>> 
+>> Problem: sometimes I got a 'hung task' error which resulted in the WAN
+>> port not to come up (that's the only one I use) and logging in via
+>> serial also didn't work, so pulling the plug was the only remedy.
+>> 
+>> Robin Murphy quickly identified that it likely had to do with led
+>> triggers and removing those netdev triggers made the problem go 
+>> away[1].
+>> To find out what actually caused it, I built a kernel with 
+>> PROOF_LOCKING
+>> and PRINTK_CALLER enabled, which after adding a patch which fixed an
+>> OOPS [2], showed the underlaying problem:
 > 
-> Cong, you are changing user expected behavior.
-> So instead of sending to the root qdisc, you are looping on the same
-> qdisc. I dont recall what the history is for the decision to go back
-> to the root qdisc - but one reason that sounds sensible is we want to
-> iterate through the tree hierarchy again. Stephen may remember.
-> The fact that the qfq issue is hit indicates the change has
-> consequences - and given the check a few lines above, more than likely
-> you are affecting the qlen by what you did.
+> For the record, I think the actual deadlock condition Diederik's
+> system hits in practice is a shorter cycle, wherein immediately after
+> acquiring pernet_ops_rwsem, thread #0 then tries to take rtnl_mutex,
+> which forms a straight inversion against thread #2 (which holds
+> rtnl_mutex from devinet_ioctl()).
 
-Please refer the changelog of patch 1/6, let me quote it here for you:
+Thanks for the bug report and for the additional insights!
 
-    The new netem duplication behavior does not break the documented
-    semantics of "creates a copy of the packet before queuing." The man page
-    description remains true since duplication occurs before the queuing
-    process, creating both original and duplicate packets that are then
-    enqueued. The documentation does not specify which qdisc should receive
-    the duplicates, only that copying happens before queuing. The implementation
-    choice to enqueue duplicates to the same qdisc (rather than root) is an
-    internal detail that maintains the documented behavior while preventing
-    infinite loops in hierarchical configurations.
+I've spent some time digging through the LED subsystem, which I'm
+already somewhat familiar with, and I think I've narrowed down the
+root cause of this deadlock.
 
-I think it is reasonable to use man page as our agreement with users. I
-am open to other alternative agreements, if you have one. I hope using
-man page is not of my own preference here.
+I'll send a preliminary patch soon, after I make sure that the root
+cause is identified correctly, and I hope Diederik will be willing
+to test the patch.  If so, and if the patch checks out to be the
+cure, I'll prepare and submit a proper patch, of course.
 
-Thanks.
+>>     ======================================================
+>>     WARNING: possible circular locking dependency detected
+>>     6.16-rc7+unreleased-arm64-cknow #1 Not tainted
+>>     ------------------------------------------------------
+>>     modprobe/936 is trying to acquire lock:
+>>     ffffc943e0edc3b0 (pernet_ops_rwsem){++++}-{4:4}, at: 
+>> register_netdevice_notifier+0x38/0x148
+>> 
+>>     but task is already holding lock:
+>>     ffff0001f2762248 (&led_cdev->trigger_lock){+.+.}-{4:4}, at: 
+>> led_trigger_register+0x14c/0x1e0
+>> 
+>>     which lock already depends on the new lock.
+>> 
+>>     the existing dependency chain (in reverse order) is:
+>> 
+>>     -> #3 (&led_cdev->trigger_lock){+.+.}-{4:4}:
+>>            lock_acquire+0x1cc/0x348
+>>            down_write+0x40/0xd8
+>>            led_trigger_set_default+0x5c/0x170
+>>            led_classdev_register_ext+0x340/0x488
+>>            __sdhci_add_host+0x190/0x368 [sdhci]
+>>            dwcmshc_probe+0x2b8/0x6b0 [sdhci_of_dwcmshc]
+>>            platform_probe+0x70/0xe8
+>>            really_probe+0xc8/0x3a0
+>>            __driver_probe_device+0x84/0x160
+>>            driver_probe_device+0x44/0x128
+>>            __device_attach_driver+0xc4/0x170
+>>            bus_for_each_drv+0x90/0xf8
+>>            __device_attach_async_helper+0xc0/0x120
+>>            async_run_entry_fn+0x40/0x180
+>>            process_one_work+0x23c/0x640
+>>            worker_thread+0x1b4/0x360
+>>            kthread+0x150/0x250
+>>            ret_from_fork+0x10/0x20
+>> 
+>>     -> #2 (triggers_list_lock){++++}-{4:4}:
+>>            lock_acquire+0x1cc/0x348
+>>            down_write+0x40/0xd8
+>>            led_trigger_register+0x58/0x1e0
+>>            phy_led_triggers_register+0xf4/0x258 [libphy]
+>>            phy_attach_direct+0x328/0x3a8 [libphy]
+>>            phylink_fwnode_phy_connect+0xb0/0x138 [phylink]
+>>            __stmmac_open+0xec/0x520 [stmmac]
+>>            stmmac_open+0x4c/0xe8 [stmmac]
+>>            __dev_open+0x13c/0x310
+>>            __dev_change_flags+0x1d4/0x260
+>>            netif_change_flags+0x2c/0x80
+>>            dev_change_flags+0x90/0xd0
+>>            devinet_ioctl+0x55c/0x730
+>>            inet_ioctl+0x1e4/0x200
+>>            sock_do_ioctl+0x6c/0x140
+>>            sock_ioctl+0x328/0x3c0
+>>            __arm64_sys_ioctl+0xb4/0x118
+>>            invoke_syscall+0x6c/0x100
+>>            el0_svc_common.constprop.0+0x48/0xf0
+>>            do_el0_svc+0x24/0x38
+>>            el0_svc+0x54/0x1e0
+>>            el0t_64_sync_handler+0x10c/0x140
+>>            el0t_64_sync+0x198/0x1a0
+>> 
+>>     -> #1 (rtnl_mutex){+.+.}-{4:4}:
+>>            lock_acquire+0x1cc/0x348
+>>            __mutex_lock+0xac/0x590
+>>            mutex_lock_nested+0x2c/0x40
+>>            rtnl_lock+0x24/0x38
+>>            register_netdevice_notifier+0x40/0x148
+>>            rtnetlink_init+0x40/0x68
+>>            netlink_proto_init+0x120/0x158
+>>            do_one_initcall+0x88/0x3b8
+>>            kernel_init_freeable+0x2d0/0x340
+>>            kernel_init+0x28/0x160
+>>            ret_from_fork+0x10/0x20
+>> 
+>>     -> #0 (pernet_ops_rwsem){++++}-{4:4}:
+>>            check_prev_add+0x114/0xcb8
+>>            __lock_acquire+0x12e8/0x15f0
+>>            lock_acquire+0x1cc/0x348
+>>            down_write+0x40/0xd8
+>>            register_netdevice_notifier+0x38/0x148
+>>            netdev_trig_activate+0x18c/0x1e8 [ledtrig_netdev]
+>>            led_trigger_set+0x1d4/0x328
+>>            led_trigger_register+0x194/0x1e0
+>>            netdev_led_trigger_init+0x20/0xff8 [ledtrig_netdev]
+>>            do_one_initcall+0x88/0x3b8
+>>            do_init_module+0x5c/0x270
+>>            load_module+0x1ed8/0x2608
+>>            init_module_from_file+0x94/0x100
+>>            idempotent_init_module+0x1e8/0x2f0
+>>            __arm64_sys_finit_module+0x70/0xe8
+>>            invoke_syscall+0x6c/0x100
+>>            el0_svc_common.constprop.0+0x48/0xf0
+>>            do_el0_svc+0x24/0x38
+>>            el0_svc+0x54/0x1e0
+>>            el0t_64_sync_handler+0x10c/0x140
+>>            el0t_64_sync+0x198/0x1a0
+>> 
+>>     other info that might help us debug this:
+>> 
+>>     Chain exists of:
+>>       pernet_ops_rwsem --> triggers_list_lock --> 
+>> &led_cdev->trigger_lock
+>> 
+>>      Possible unsafe locking scenario:
+>> 
+>>            CPU0                    CPU1
+>>            ----                    ----
+>>       lock(&led_cdev->trigger_lock);
+>>                                    lock(triggers_list_lock);
+>>                                    lock(&led_cdev->trigger_lock);
+>>       lock(pernet_ops_rwsem);
+>> 
+>>      *** DEADLOCK ***
+>> 
+>>     2 locks held by modprobe/936:
+>>      #0: ffffc943e0d2baa8 (leds_list_lock){++++}-{4:4}, at: 
+>> led_trigger_register+0x10c/0x1e0
+>>      #1: ffff0001f2762248 (&led_cdev->trigger_lock){+.+.}-{4:4}, at: 
+>> led_trigger_register+0x14c/0x1e0
+>> 
+>>     stack backtrace:
+>>     CPU: 0 UID: 0 PID: 936 Comm: modprobe Not tainted 
+>> 6.16-rc7+unreleased-arm64-cknow #1 PREEMPTLAZY  Debian 6.16~rc7-2~exp1
+>>     Hardware name: FriendlyElec NanoPi R5S (DT)
+>>     Call trace:
+>>      show_stack+0x34/0xa0 (C)
+>>      dump_stack_lvl+0x70/0x98
+>>      dump_stack+0x18/0x24
+>>      print_circular_bug+0x230/0x280
+>>      check_noncircular+0x174/0x188
+>>      check_prev_add+0x114/0xcb8
+>>      __lock_acquire+0x12e8/0x15f0
+>>      lock_acquire+0x1cc/0x348
+>>      down_write+0x40/0xd8
+>>      register_netdevice_notifier+0x38/0x148
+>>      netdev_trig_activate+0x18c/0x1e8 [ledtrig_netdev]
+>>      led_trigger_set+0x1d4/0x328
+>>      led_trigger_register+0x194/0x1e0
+>>      netdev_led_trigger_init+0x20/0xff8 [ledtrig_netdev]
+>>      do_one_initcall+0x88/0x3b8
+>>      do_init_module+0x5c/0x270
+>>      load_module+0x1ed8/0x2608
+>>      init_module_from_file+0x94/0x100
+>>      idempotent_init_module+0x1e8/0x2f0
+>>      __arm64_sys_finit_module+0x70/0xe8
+>>      invoke_syscall+0x6c/0x100
+>>      el0_svc_common.constprop.0+0x48/0xf0
+>>      do_el0_svc+0x24/0x38
+>>      el0_svc+0x54/0x1e0
+>>      el0t_64_sync_handler+0x10c/0x140
+>>      el0t_64_sync+0x198/0x1a0
+>>     leds-gpio gpio-leds: bus: 'platform': really_probe: bound device 
+>> to driver leds-gpio
+>> 
+>> Full serial log can be found at [3] which is quite verbose and the 
+>> boot
+>> took way longer then normal as the following was added to cmdline:
+>> ``dyndbg="file dd.c func really_probe +p" maxcpus=1``
+>> 
+>> Free free to ask for additional info and/or to run tests.
+>> 
+>> [1] 
+>> https://git.kernel.org/pub/scm/linux/kernel/git/soc/soc.git/commit/?h=arm/fixes&id=912b1f2a796ec73530a709b11821cb0c249fb23e
+>> [2] 
+>> https://lore.kernel.org/linux-rockchip/f81b88df-9959-4968-a60a-b7efd3d5ea24@arm.com/
+>> [3] 
+>> https://paste.sr.ht/~diederik/142e92bfb29bbb58bca18a74cdffc5e0ba79081c
 
