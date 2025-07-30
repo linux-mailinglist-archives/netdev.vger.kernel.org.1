@@ -1,108 +1,117 @@
-Return-Path: <netdev+bounces-211021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211019-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 820C7B1635A
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 17:08:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E600B16331
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 16:52:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97DC13A85B1
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 15:08:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EA52918C6DC8
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 14:53:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 987BB2DC345;
-	Wed, 30 Jul 2025 15:08:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AA482D9EDF;
+	Wed, 30 Jul 2025 14:52:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UZ5+2XMV"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ypZM6NTV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77A981AF0A7
-	for <netdev@vger.kernel.org>; Wed, 30 Jul 2025 15:08:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB3562DAFC6
+	for <netdev@vger.kernel.org>; Wed, 30 Jul 2025 14:52:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753888119; cv=none; b=jwmiiDxxd0CbBbovsg40ov4RnriJgMEDXFOnsnnFyJxrCxPH2dbhklMn9GCHkOFmuGOP20aZ+8jhDg/mthX3nc5rGlPN01VXxEnHs9WglJ6unN308YMdqPXcAkIsPnxef3Oi0avkRsgrxYakNW7cAQx67mcOHfNkYTZSlK48SCw=
+	t=1753887161; cv=none; b=C9N9TEO/zdFEK9s9i40G8O8glxKWjVL3t18FMzjeFvk12EpQMp16LPNZk6sQ3JLze/2JXCbUeaiQpiBBg3VIBmfO78+Xh7vxGnoDlJKBCXsSnoBsKu399lqt/074CtOxfbrk2uT7zr3cgudcQuZxh2xP0vOfZyf6qTvvViZnO6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753888119; c=relaxed/simple;
-	bh=RJ3rDAj4sWeP/zmJ+H5foZYfyHgKgRPaIkyolVDqA2o=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=fpM823OBBTgHv+/WchzBxLG9cs8VYrCGNegROTKKsn/LAz/34HEClXUZpyLCQ7VTe0RtmGdXOOyyPROI7zUSe7qUwLWBB3bu0Pwl9r6XA6sLhWZqjNJ/76HOOxbTJLf1NELjL8h3EqPNwuYd2MfXfIEhXaZgyXZXRCTU+9lwu6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UZ5+2XMV; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1753888117; x=1785424117;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=RJ3rDAj4sWeP/zmJ+H5foZYfyHgKgRPaIkyolVDqA2o=;
-  b=UZ5+2XMVcuMLu0R2fXV+M2bCvayNArcotdcXhAywS1g2ldD498Vd7+jl
-   rL+JqVsTpkj1vCEjMbFpkoFZSvndrvuC+/Pi5jDzA1Y0zEj1jnxVRrRW3
-   dROKwGTwWF2Ho5WSjPvjy1+J4K0Vbu4MN4JjzhiZ2CtBN5C9e46fDsBlk
-   Yz76mp44JcMEEaptHuNL215H0txFf/+uOMThxOBymP0Uu4U5nVDR42boT
-   va6jknIp8W/Eat7dE0VNMk+WMbmBttAc2UJ2b3wXlqC4HHe+lTU9kA4iI
-   0M+CyRxCGGpw698EjQRV8us4kglbxjEOICrkn5PCkNl/P2m0JxgI8G50U
-   A==;
-X-CSE-ConnectionGUID: vN1OkWhEQ/C8FhoC9L3Y3Q==
-X-CSE-MsgGUID: BuUypf6bQ9qLSjYTtYaXXQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11507"; a="56079838"
-X-IronPort-AV: E=Sophos;i="6.16,350,1744095600"; 
-   d="scan'208";a="56079838"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jul 2025 08:08:37 -0700
-X-CSE-ConnectionGUID: DllWJNIeRI63WFtRgOKtow==
-X-CSE-MsgGUID: h5LE7lPiRDaTG4t3oXaJ1Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,350,1744095600"; 
-   d="scan'208";a="200184582"
-Received: from os-delivery.igk.intel.com ([10.102.18.218])
-  by orviesa001.jf.intel.com with ESMTP; 30 Jul 2025 08:08:36 -0700
-From: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: anthony.l.nguyen@intel.com,
-	netdev@vger.kernel.org,
-	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: [PATCH iwl-net v1] ixgbe: fix ixgbe_orom_civd_info struct layout
-Date: Wed, 30 Jul 2025 16:52:09 +0200
-Message-Id: <20250730145209.1670909-1-jedrzej.jagielski@intel.com>
-X-Mailer: git-send-email 2.31.1
+	s=arc-20240116; t=1753887161; c=relaxed/simple;
+	bh=fLQiQzpmhB7RlWI+Ow/Ss807qj3Qsx/Lyp55O68nqVw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FlKKO6Eb+IlhqTGFSkdD52/aDC3Eac/b9ESLWZ9lBYCSWttf2GDBjXfnxM1W19dRgkmI/BPtGghxuNEx8fXAFG6x+1zY2pxQvzoGKXXg0aGsjRsxo5GukTafAaqezhbwRQ8ISVy5FM3COnpY4xeZDcYQ4yQylbKgXQhM5EgQVpA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ypZM6NTV; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=8vIErx2k5iLS0e7y1aCzxBVqPv8wgmC5T4/L1t697sg=; b=ypZM6NTV3AtghxivKTkVCYhdRh
+	VRYK1UOvfre/kW7CC7AsOnQI6XAM8Iy8DdDftLZ5M38Y4nJlOKWm6PQnaid8LXXrBnMqr+ogHHnQ5
+	Aoq3ZYPAyyaHjjDn2BOVBnmEPMJE0aoRDtSNwrcZRIP8iVyfbUn4Qu03jfMIbqNcB4BQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uh8AR-003Hxo-4w; Wed, 30 Jul 2025 16:52:31 +0200
+Date: Wed, 30 Jul 2025 16:52:31 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
+Cc: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Daniel Braunwarth <daniel.braunwarth@kuka.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jon Hunter <jonathanh@nvidia.com>,
+	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	Thierry Reding <treding@nvidia.com>
+Subject: Re: [PATCH RFC ???net???] net: phy: realtek: fix wake-on-lan support
+Message-ID: <a1c121e1-cf56-4798-b255-96f29cab80ec@lunn.ch>
+References: <E1uh2Hm-006lvG-PK@rmk-PC.armlinux.org.uk>
+ <a14075fe-a0fc-4c59-b4d3-1060f6fd2676@lunn.ch>
+ <27e10ba4-5656-40a8-a709-c1390fee251f@foss.st.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <27e10ba4-5656-40a8-a709-c1390fee251f@foss.st.com>
 
-The current layout of struct ixgbe_orom_civd_info causes incorrect data
-storage due to compiler-inserted padding. This results in issues when
-writing OROM data into the structure.
+> > 3) The PHY has a dedicated WoL output pin, which is connected directly
+> > to a PMIC. No software involved, the pin toggling turns the power back
+> > on.
+> > 
+> 
+> Just my 2 cents:
+> 
+> In some cases like the LAN8742, there are some flags that need to be
+> cleared when waking up in order to be able to handle another WoL event.
+> It can be done either in the suspend()/resume() or in an interrupt
+> handler of the PHY. In 3) This suggests that the interrupt is somehow
+> forwarded to the Linux kernel.
+> 
+> This is what I was ultimately trying to do in two steps with the TEE
+> notifying the kernel of that interrupt.
+> 
+> Moreover, if a WoL event occurs when the system is not in a low-power
+> mode, then the flags will never be cleared and another WoL event cannot
+> be detected while the system is in a low-power mode.
+> 
+> Maybe we can argue that these flags can be cleared in suspend() and
+> and resume(). But then, if there's no interrupt to be handled by the
+> kernel, how do we know that we have woken up from a WoL event?
+> 
+> IMHO, I think 3) may optionally declare another interrupt as well
+> for WoL events.
 
-Add the __packed attribute to ensure the structure layout matches the
-expected binary format without padding.
+The 3) i've seen is a Marvell based NAS box. It is a long time
+ago. But as far as i remember, the SoC had no idea why it woke up, it
+could not ask the PMIC why the power was turned on. So there was no
+ability to invoke an interrupt handler.
 
-Fixes: 70db0788a262 ("ixgbe: read the OROM version information")
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
----
- drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I've also seen X86/BIOS platforms which are similar. The BIOS swallows
+the interrupt, it never gets delivered to Linux once it is
+running. And the BIOS itself might poke PHY registers.
 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h
-index 09df67f03cf4..38a41d81de0f 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h
-@@ -1150,7 +1150,7 @@ struct ixgbe_orom_civd_info {
- 	__le32 combo_ver;	/* Combo Image Version number */
- 	u8 combo_name_len;	/* Length of the unicode combo image version string, max of 32 */
- 	__le16 combo_name[32];	/* Unicode string representing the Combo Image version */
--};
-+} __packed;
- 
- /* Function specific capabilities */
- struct ixgbe_hw_func_caps {
--- 
-2.31.1
+> Eventually, 2) and 3) would have 1 interrupt(WoL) if PHY is in polling
+> mode and 2 if not?
 
+Nope. These NAS boxed often had 0 PHY interrupts, and polling was
+used. If you have a single ethernet port, you don't care it takes a
+while to know the link is dead. There is nothing you can do, you don't
+have a second interface to fall back to.
+
+     Andrew
 
