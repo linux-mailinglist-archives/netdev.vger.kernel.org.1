@@ -1,97 +1,95 @@
-Return-Path: <netdev+bounces-211052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211053-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D9B9B164F9
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 18:47:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 140D8B16511
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 18:58:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C230C188E11A
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 16:47:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 119815A5EFA
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 16:58:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58FEF279DAE;
-	Wed, 30 Jul 2025 16:47:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF6492DEA7B;
+	Wed, 30 Jul 2025 16:58:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d69V/dzn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BsA40qPD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
+Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B442F1A4F0A;
-	Wed, 30 Jul 2025 16:47:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DCFA2DCF74
+	for <netdev@vger.kernel.org>; Wed, 30 Jul 2025 16:58:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753894038; cv=none; b=rqFBpVrnyEfeLr0eJ39RbezjrL/5PJ5U9xUMarCdlYEfIJr17HlS10v+7yyTw6laaIXmRYl8swotXIO4QYHtgklHVoMKd+KvhUvKVi8juqoXqyAYu3vIu0PIWrPlhVYdFCRq/QjBdWkpOU4esPCEEhiONz4mdN7nek+Z1mDWOOg=
+	t=1753894724; cv=none; b=EFB7NBTgxBqNpwTZ8KjDlhBhEasUyWrDkhfUghcnzJUi70acLdIZWjQeW6mYY37VhBOM4gtW6BscQp9uFu6zw5OtE0kljL8FK/YifrlwEUbBzNOo8BLKcsnqVaPexCTQn0TjWezmhhYbByr6Dr27RP4LZ1Ad8BS05+ZkyVxzIKY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753894038; c=relaxed/simple;
-	bh=u5JLbKMa4Mzuu0WBqXDwBoLi3/fHor3zyRRpEP2LW8M=;
+	s=arc-20240116; t=1753894724; c=relaxed/simple;
+	bh=54v3bzbw0nescITxi85iSTM3fxDNBHHqtZdwYKZ0fB0=;
 	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=l7dbvbvaqLRCMn/tZN4p8TJ3kCmlXVUkLqJtyMwZobLWfubEqDcFhlk9n0Iyl7IH4Pz4W+bEwgIy5yV95KikvA0BqOibl8cS8Kcc5fvgj5OLbTLFRnbn5U2162YYhWX8/w8nyhuLlybft4gwAheVuh1644IaUw8fwL5oIW99jtk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d69V/dzn; arc=none smtp.client-ip=209.85.128.174
+	 Mime-Version:Content-Type; b=VPnfTM47bU11tV/Nzjv1l0jPFpw6cFQwwwPYjq2/E2F/UQFsBfGPGVtF4mEkFXxdKKSIIW4Tcv6PJF549n3vNEgMzLhve2RWOKBbg8sxpzBqCB4b2fW4f6ravI+Rmn3ykFrBcvtNcX9W1l1g6Bv1U4ms6w4wE9nGPPnV0CE1qOQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BsA40qPD; arc=none smtp.client-ip=209.85.128.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-71a455096e0so270907b3.0;
-        Wed, 30 Jul 2025 09:47:15 -0700 (PDT)
+Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-717b580ff2aso400487b3.0
+        for <netdev@vger.kernel.org>; Wed, 30 Jul 2025 09:58:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753894034; x=1754498834; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1753894722; x=1754499522; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=hsaaAb4et8gGNaqaBH6jJtE7btiTy+4sUxZfzw3D3fw=;
-        b=d69V/dznKD7bbYgxvufbhq6FMS/+jml2JXJnecwfd9r35oKvp37tMW+5nLOY8i5h7m
-         9Hi2nhywN+wYvafJhet52/0oKogTVdLB9PdbgHcsle0ViIvbG14GL7yerRfvBf3jCwN2
-         ELBZmWFGnlkpyYBC/Hq9vLmfa/4ZHVTNIDADJ8HxMr+iOf95zbvBbPVGSYddZ3PDCE9O
-         JPiMNX4gI5e7KtuhZUeTryTs5o8cFt0TIHxNlgyIE5hfPc52hbXCWSCqBPQ6T3WYsA6p
-         QsEeffoe0NEX83bgDKyjziP6YotrNaprI3psal0tlztlLmE059LaZqL6SRWflQxMRQ7r
-         RHew==
+        bh=/IWxXiWmVPjESHDim+bjLIHEGiFk0DfaTgae+/iJVmM=;
+        b=BsA40qPDuOFac354tcu8UqFZgVPrAahgYEzhNSRP5fYh+v1hcXJqpm5IS2bbM59M2D
+         lOEfSBfDjDAGrn1k91y1fDUls+J7wxH8Z0gArFYPaM4AirOtnL/8AS7vtzDBiuJmCapw
+         L51j25UmVKdjhkV34pke+J1boCJ1b9HBm/Ok+76qgLDyoXWq2PFUuFBcjaaYpfNM6yZc
+         BXHiICFXuvaHVSUZHBWiiwNKyIE/s0ba1qTTkLOiHwakS7WRJGhNzMAQnXAaeroMkthu
+         nNNwfjcmgwLYplvzHJpRFgp64C/kk6Ok+l0gE07mUu33qBVJg6ajMpNHhPwf5A5tgCDK
+         bCfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753894034; x=1754498834;
+        d=1e100.net; s=20230601; t=1753894722; x=1754499522;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=hsaaAb4et8gGNaqaBH6jJtE7btiTy+4sUxZfzw3D3fw=;
-        b=tEbMnedLapmFutHlyaHjKx8jpNHyA8AT+2u4t/xgkm8BuO6jOFBA+JUb6i4B5t5ZSW
-         MylDHNHjaNDc9DiO9bbn6ZSOGrbIBO9n5Sy4FDQdo1Cv0wiI9e8S+H+Qo1JsrOzoYrAU
-         0VbWyHa7cAtRcNaM0lULlnqganHxAI7wFebH6PxQwuuaLVkm0ZBzcaoEdzBDQX+kbvHi
-         kv2eSX67mgl/MScZuv8WWGmnOF6cpl0vifbLiG1ky+iPzXqs/aaAQs3eHPeB2uGoFTG6
-         bL6jvXbG11oEkyoP0/tyyGIGBBNpGSyi4IvNRvZvilhp2A0E2ZwNbzubYMZJ8cEqWmBa
-         SkWA==
-X-Forwarded-Encrypted: i=1; AJvYcCVopawjzLthpc+99VpvwcebGibvUneJknUPogGOxZmuXcWDVragUKw6rt4HY8N75BneEfBnMIUwRBQ1oqw=@vger.kernel.org, AJvYcCXd78O/i1HcmNZEG8JGxPabwW2SCwGomFv2ntu+nnGaVb6mwQoEbGCDJZFAIPqN8PDOM01P43OX@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzqd3/KOb8sk63XGxL8x3BpZDBm/VZ0iYZILgRGdYUQl6zBDknV
-	IYzciPOL2D4qlhga8ghnP37HzRUiGd3VVdTtPe24BcdOgS8oUfAlJpVS
-X-Gm-Gg: ASbGncv4LuBFNZEldTFg3O5EFka12LQpPuWnNIFYJbO4b8c3sTT+LAxIWAVJtKHKhM4
-	w+T36wg+AcfsedMDfftMw5xyl5WnQq6g/J5iWGvqvRUPgcmQJVxwDOrG1RfjLhsCGonbc/Gjrku
-	hU/RWZ2DglR5aNYa0lfIKKcGwblodB12+9paKVNTa2VekZlJg1ShTMgwJLa0SdIRoj2gXi1h3dt
-	8BZ2SgZhg54OSEDQK8HT46COvKaqetwoudexJMOGTiuQqCOlWlI23fsEeIswMOgoNVinj9/vkQV
-	lwmUnZlT0bxz1IgLFtI7NoffMTvRSy90T5/HEON/vsg/6aljpuqbm0I5B9R+bqzhrHF5UzZdy16
-	FW34gkiVcqkifVBR+vcnlvXMwRA0Z1N3tnBdQwgUQ5fcuZnnBLGHCRP3TxJmLl4y0IRQkCJPfig
-	jdGJWj
-X-Google-Smtp-Source: AGHT+IFQPnS9b0lZWH4xANLsmnDxMGif0mETMnc43nGvRcQDq7RykCdSVIvQkpxT22rx5vBTVN9cIg==
-X-Received: by 2002:a05:690c:9985:b0:710:f55f:7922 with SMTP id 00721157ae682-71a466d5090mr61070237b3.34.1753894034400;
-        Wed, 30 Jul 2025 09:47:14 -0700 (PDT)
+        bh=/IWxXiWmVPjESHDim+bjLIHEGiFk0DfaTgae+/iJVmM=;
+        b=FgXM63JSuM/jln3yuTo6FDwTYNYAOucMI+e20t/ctrzP3/uTvcO8yGK8DwFesjGycy
+         8krlzXO11HmbwuO6qTmH2uuDPc4BrfULgzGIcbYeiuMP+ZwS7XZ1+j4lpTCdUlcfafYv
+         YX4A883GB7mL0MVccgsCV0Tm6Y1abzd0SmM602vyymXqv77Bme1064nmh1yCTv2zBjuo
+         sTE/mg0NzbBNjVC4XbHUqGxVurVPJnpowxrGEQ6lCDca/0goPOhaDdE0jA4/85LyqaTc
+         DMqLf87XMtafgGDQTlyN70lEamezEgBtozjasyIhH9MENjPcN3BGQQvZADkr07wbW5zK
+         9h/A==
+X-Forwarded-Encrypted: i=1; AJvYcCW6KP6na09bqWAt3DEpr7nUM8kT7cW0NpQL37nj+EBaC7XTU9WNyq9wg8pJ/lAf2RybjEj0Kp8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YycyTBxJyVWEnek7qNMBtQvVoAri19Z+Uyk6HJu5bJFR0t0tmGN
+	olr6U9c4ofaB2xQQWzW5OZpvao2UNtYz26zrTmpw9MFdZ7tswJuFhSsT
+X-Gm-Gg: ASbGnctfbtQ8ianD3UAOLOvjtfwjS282lXMdahu00swL1HviXLYsRvFLC5PL5AOJ6Vb
+	XnYX66Tl42IFaeliLgbfEGu7vNGdK2lnzwAM8eJbiQY+QJqscHV+zQee6mcbRGCpm7IZb4uZ13H
+	DNR304d+dIqsfaho94dnqsTPhIdVh50e1Xhr519o+5Sci7lweYhw5F7ST2+bBUP/jji5sORKwTs
+	wM6ibDnYKG3c2bUbVbVClQc+2wD4oaUHiT9Lz+7pfdiC/wGzStJP1xXh237W2yz6p3XhVnKLJEt
+	Dsbr2P7cwntjFqCEBnwd3wfnEu9IhCIjc6va2Y8f4gAWw81Aq3cJKDvzpaz0daVOUq0wBPp+ZQG
+	3LgAufCA7ru3rJWGmYl2C+tZU6S9Oa4PFtoHuzC/a0iRY4FzMmvDPgjVHN32ilqYag9Utzw==
+X-Google-Smtp-Source: AGHT+IG1esaa0jeRYIopiwYvyW8UvJHiwMI3Wms5uLs9CjY4OldOKNvvUVoPC11/K6WavbQA6s6kXw==
+X-Received: by 2002:a05:690c:6909:b0:71a:2d5f:49d0 with SMTP id 00721157ae682-71a465215aamr56873757b3.1.1753894722082;
+        Wed, 30 Jul 2025 09:58:42 -0700 (PDT)
 Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
-        by smtp.gmail.com with UTF8SMTPSA id 3f1490d57ef6-e8df85d7b27sm3713172276.18.2025.07.30.09.47.13
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-719f23e89e6sm24779957b3.85.2025.07.30.09.58.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Jul 2025 09:47:13 -0700 (PDT)
-Date: Wed, 30 Jul 2025 12:47:13 -0400
+        Wed, 30 Jul 2025 09:58:40 -0700 (PDT)
+Date: Wed, 30 Jul 2025 12:58:39 -0400
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Wang Liang <wangliang74@huawei.com>, 
- willemdebruijn.kernel@gmail.com, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- horms@kernel.org
-Cc: yuehaibing@huawei.com, 
- zhangchangzhong@huawei.com, 
- wangliang74@huawei.com, 
+To: Eric Dumazet <edumazet@google.com>, 
+ "David S . Miller" <davem@davemloft.net>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, 
+ Willem de Bruijn <willemb@google.com>, 
+ David Ahern <dsahern@kernel.org>, 
  netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-Message-ID: <688a4c91159bc_1cb795294c7@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250730101458.3470788-1-wangliang74@huawei.com>
-References: <20250730101458.3470788-1-wangliang74@huawei.com>
-Subject: Re: [PATCH net v3] net: drop UFO packets in udp_rcv_segment()
+ eric.dumazet@gmail.com, 
+ Eric Dumazet <edumazet@google.com>, 
+ syzbot+af43e647fd835acc02df@syzkaller.appspotmail.com
+Message-ID: <688a4f3f7d969_1d29db294cf@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250730131738.3385939-1-edumazet@google.com>
+References: <20250730131738.3385939-1-edumazet@google.com>
+Subject: Re: [PATCH net] ipv6: reject malicious packets in ipv6_gso_segment()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -102,64 +100,39 @@ Content-Type: text/plain;
  charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-Wang Liang wrote:
-> When sending a packet with virtio_net_hdr to tun device, if the gso_type
-> in virtio_net_hdr is SKB_GSO_UDP and the gso_size is less than udphdr
-> size, below crash may happen.
+Eric Dumazet wrote:
+> syzbot was able to craft a packet with very long IPv6 extension headers
+> leading to an overflow of skb->transport_header.
 > 
->   ------------[ cut here ]------------
->   kernel BUG at net/core/skbuff.c:4572!
->   Oops: invalid opcode: 0000 [#1] SMP NOPTI
->   CPU: 0 UID: 0 PID: 62 Comm: mytest Not tainted 6.16.0-rc7 #203 PREEMPT(voluntary)
->   Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
->   RIP: 0010:skb_pull_rcsum+0x8e/0xa0
->   Code: 00 00 5b c3 cc cc cc cc 8b 93 88 00 00 00 f7 da e8 37 44 38 00 f7 d8 89 83 88 00 00 00 48 8b 83 c8 00 00 00 5b c3 cc cc cc cc <0f> 0b 0f 0b 66 66 2e 0f 1f 84 00 000
->   RSP: 0018:ffffc900001fba38 EFLAGS: 00000297
->   RAX: 0000000000000004 RBX: ffff8880040c1000 RCX: ffffc900001fb948
->   RDX: ffff888003e6d700 RSI: 0000000000000008 RDI: ffff88800411a062
->   RBP: ffff8880040c1000 R08: 0000000000000000 R09: 0000000000000001
->   R10: ffff888003606c00 R11: 0000000000000001 R12: 0000000000000000
->   R13: ffff888004060900 R14: ffff888004050000 R15: ffff888004060900
->   FS:  000000002406d3c0(0000) GS:ffff888084a19000(0000) knlGS:0000000000000000
->   CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->   CR2: 0000000020000040 CR3: 0000000004007000 CR4: 00000000000006f0
->   Call Trace:
->    <TASK>
->    udp_queue_rcv_one_skb+0x176/0x4b0 net/ipv4/udp.c:2445
->    udp_queue_rcv_skb+0x155/0x1f0 net/ipv4/udp.c:2475
->    udp_unicast_rcv_skb+0x71/0x90 net/ipv4/udp.c:2626
->    __udp4_lib_rcv+0x433/0xb00 net/ipv4/udp.c:2690
->    ip_protocol_deliver_rcu+0xa6/0x160 net/ipv4/ip_input.c:205
->    ip_local_deliver_finish+0x72/0x90 net/ipv4/ip_input.c:233
->    ip_sublist_rcv_finish+0x5f/0x70 net/ipv4/ip_input.c:579
->    ip_sublist_rcv+0x122/0x1b0 net/ipv4/ip_input.c:636
->    ip_list_rcv+0xf7/0x130 net/ipv4/ip_input.c:670
->    __netif_receive_skb_list_core+0x21d/0x240 net/core/dev.c:6067
->    netif_receive_skb_list_internal+0x186/0x2b0 net/core/dev.c:6210
->    napi_complete_done+0x78/0x180 net/core/dev.c:6580
->    tun_get_user+0xa63/0x1120 drivers/net/tun.c:1909
->    tun_chr_write_iter+0x65/0xb0 drivers/net/tun.c:1984
->    vfs_write+0x300/0x420 fs/read_write.c:593
->    ksys_write+0x60/0xd0 fs/read_write.c:686
->    do_syscall_64+0x50/0x1c0 arch/x86/entry/syscall_64.c:63
->    </TASK>
+> This 16bit field has a limited range.
 > 
-> To trigger gso segment in udp_queue_rcv_skb(), we should also set option
-> UDP_ENCAP_ESPINUDP to enable udp_sk(sk)->encap_rcv. When the encap_rcv
-> hook return 1 in udp_queue_rcv_one_skb(), udp_csum_pull_header() will try
-> to pull udphdr, but the skb size has been segmented to gso size, which
-> leads to this crash.
+> Add skb_reset_transport_header_careful() helper and use it
+> from ipv6_gso_segment()
 > 
-> Previous commit cf329aa42b66 ("udp: cope with UDP GRO packet misdirection")
-> introduces segmentation in UDP receive path only for GRO, which was never
-> intended to be used for UFO, so drop UFO packets in udp_rcv_segment().
+> WARNING: CPU: 0 PID: 5871 at ./include/linux/skbuff.h:3032 skb_reset_transport_header include/linux/skbuff.h:3032 [inline]
+> WARNING: CPU: 0 PID: 5871 at ./include/linux/skbuff.h:3032 ipv6_gso_segment+0x15e2/0x21e0 net/ipv6/ip6_offload.c:151
+> Modules linked in:
+> CPU: 0 UID: 0 PID: 5871 Comm: syz-executor211 Not tainted 6.16.0-rc6-syzkaller-g7abc678e3084 #0 PREEMPT(full)
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
+>  RIP: 0010:skb_reset_transport_header include/linux/skbuff.h:3032 [inline]
+>  RIP: 0010:ipv6_gso_segment+0x15e2/0x21e0 net/ipv6/ip6_offload.c:151
+> Call Trace:
+>  <TASK>
+>   skb_mac_gso_segment+0x31c/0x640 net/core/gso.c:53
+>   nsh_gso_segment+0x54a/0xe10 net/nsh/nsh.c:110
+>   skb_mac_gso_segment+0x31c/0x640 net/core/gso.c:53
+>   __skb_gso_segment+0x342/0x510 net/core/gso.c:124
+>   skb_gso_segment include/net/gso.h:83 [inline]
+>   validate_xmit_skb+0x857/0x11b0 net/core/dev.c:3950
+>   validate_xmit_skb_list+0x84/0x120 net/core/dev.c:4000
+>   sch_direct_xmit+0xd3/0x4b0 net/sched/sch_generic.c:329
+>   __dev_xmit_skb net/core/dev.c:4102 [inline]
+>   __dev_queue_xmit+0x17b6/0x3a70 net/core/dev.c:4679
 > 
-> Link: https://lore.kernel.org/netdev/20250724083005.3918375-1-wangliang74@huawei.com/
-> Link: https://lore.kernel.org/netdev/20250729123907.3318425-1-wangliang74@huawei.com/
-> Fixes: cf329aa42b66 ("udp: cope with UDP GRO packet misdirection")
-> Suggested-by: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-> Signed-off-by: Wang Liang <wangliang74@huawei.com>
+> Fixes: d1da932ed4ec ("ipv6: Separate ipv6 offload support")
+> Reported-by: syzbot+af43e647fd835acc02df@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/netdev/688a1a05.050a0220.5d226.0008.GAE@google.com/T/#u
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
 Reviewed-by: Willem de Bruijn <willemb@google.com>
-
 
