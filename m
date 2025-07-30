@@ -1,125 +1,88 @@
-Return-Path: <netdev+bounces-211077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211078-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1851B16793
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 22:25:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29829B167B9
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 22:42:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 20D2C18C2352
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 20:26:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 376483AD4F4
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 20:41:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DAA7202C3E;
-	Wed, 30 Jul 2025 20:25:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA00521FF45;
+	Wed, 30 Jul 2025 20:42:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="cPRVf3nX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qxrV+kta"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay.smtp-ext.broadcom.com (relay.smtp-ext.broadcom.com [192.19.144.207])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0648156CA;
-	Wed, 30 Jul 2025 20:25:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.19.144.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87115214801
+	for <netdev@vger.kernel.org>; Wed, 30 Jul 2025 20:42:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753907139; cv=none; b=UU0F9Z0DuO2VKZFu/mARlm13nby7LkuthNZSi1gM9iCdl/pFBsJyEE2wkh2sk0DQiw+7BAYCWw7VKh0/NI5HK29McknIG4HS6P6xSe2kag0fPs7K7jqr9JyhRtuf754Zei8cNwJGUPAOq1egrj97jF5pl1OHet+DloR/r3WJ3tU=
+	t=1753908135; cv=none; b=rPSLBFlOVTJH9R0FbFbvTaDE92S3QwHqnUcisRb3cDIOl6rBE0F18PlHlhESNjWmwMd/rh6OaFR2SH8Je8qjJXL8KzY0kem9W4Uvx25X4n8i5RKl7YC1c17zrJKRFmVtSyWwGsGuC9ES2PgTmTBR0AZa97UMB8hNBXdpNXLHpQM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753907139; c=relaxed/simple;
-	bh=u12wcI6di+0QI17z5QIslTni50sbtImCXQArA8krxAg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QBMSRYPF4NuFScZqWtDgPheBGyzak+hfYENoC79R8hM5zgDkY+JtW4RpsCmvwmwC2MujMBAjIpfm4XQGFtN0D1D822tXqMhmOioAHikTkXgxxn5lA2iwbQbLI2xSqnLm0RtXIgqCORSwbrmpZwEGsGjFP5ZNWA94d7D6dpPnD+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=cPRVf3nX; arc=none smtp.client-ip=192.19.144.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: from mail-acc-it-01.broadcom.com (mail-acc-it-01.acc.broadcom.net [10.35.36.83])
-	by relay.smtp-ext.broadcom.com (Postfix) with ESMTP id 9EA54C0000F8;
-	Wed, 30 Jul 2025 13:25:36 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 relay.smtp-ext.broadcom.com 9EA54C0000F8
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=broadcom.com;
-	s=dkimrelay; t=1753907136;
-	bh=u12wcI6di+0QI17z5QIslTni50sbtImCXQArA8krxAg=;
-	h=From:To:Cc:Subject:Date:From;
-	b=cPRVf3nXtVoUA42ddkED9sFYrxfTRFIjh/UJ5sXz1So3sABmLpgKpx1yvERSrAfJV
-	 tDZJmqw7jcYT/EQyFt2Ildm7sKmhNsR+6vz6ALZjv1YJqvmONDz1qMIN9gA51Lz1Zi
-	 jmbJqztRyjmPUzfg76c5DpCzpvAOLFRZZx9jtNLc=
-Received: from stbirv-lnx-1.igp.broadcom.net (stbirv-lnx-1.igp.broadcom.net [10.67.48.32])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail-acc-it-01.broadcom.com (Postfix) with ESMTPSA id 88D024002F44;
-	Wed, 30 Jul 2025 16:25:35 -0400 (EDT)
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-To: netdev@vger.kernel.org
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
-	Doug Berger <opendmb@gmail.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net v2] net: mdio: mdio-bcm-unimac: Correct rate fallback logic
-Date: Wed, 30 Jul 2025 13:25:33 -0700
-Message-Id: <20250730202533.3463529-1-florian.fainelli@broadcom.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1753908135; c=relaxed/simple;
+	bh=1aAClxT4psf3EFYQgGOZLBSfvvX4pMIV7tHo+ij758U=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=n37ksnMfLokI7JpVGHvTZISHqYkl1pCba4+if8ZaW2mM3OVcSYpNoEuRtXG9z3PZGX6XqnxZfvmJEpjp/v8R0fL5dEwxXUngMfAxXYyfDucY3P5k4anHvMtM5w76y6wSkKBEyqGDXozKBtjbIG8B4E10xyQo3PJsEee73+6XlGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qxrV+kta; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE7D8C4CEE3;
+	Wed, 30 Jul 2025 20:42:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753908135;
+	bh=1aAClxT4psf3EFYQgGOZLBSfvvX4pMIV7tHo+ij758U=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=qxrV+ktaH63F648frkgSVxyvAEXU9mSlTmC6l9yPlA7lvcOgjkJZDHWTE6ZNyEUuM
+	 RGBxksa378Ha00BkxmFsZ6DkgC+UxA6VcL0AgaM9rkALaNQmbTuu4sEp+C2Qyq43vo
+	 g2/XqghmatowUTv+/7NMcC6vaM4OVKRJNYS7ImIuTlEN8TQxB91nlyuAMT7txczVUI
+	 VyQdbRfP4MHXTHurPtZyi4dKbswOfS0ziMX4/U/r12VlN8v9hwb0WGCp5B5ZpP87qo
+	 LRKOoNaEFZQ9flnx2oOKtsHGcKin68u5Ia0z20LXDVpqgA/20AKsnA8nO+jWvb8Gct
+	 rEg95gM1LQBCw==
+Date: Wed, 30 Jul 2025 13:42:13 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: "Lifshits, Vitaly" <vitaly.lifshits@intel.com>
+Cc: Simon Horman <horms@kernel.org>, "Ruinskiy, Dima"
+ <dima.ruinskiy@intel.com>, "Keller, Jacob E" <jacob.e.keller@intel.com>,
+ "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
+ <davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+ "pabeni@redhat.com" <pabeni@redhat.com>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>
+Subject: Re: [RFC net-next v1 1/1] e1000e: Introduce private flag and module
+ param to disable K1
+Message-ID: <20250730134213.36f1f625@kernel.org>
+In-Reply-To: <20250730152848.GJ1877762@horms.kernel.org>
+References: <20250710092455.1742136-1-vitaly.lifshits@intel.com>
+	<20250714165505.GR721198@horms.kernel.org>
+	<CO1PR11MB5089BDD57F90FE7BEBE824F5D654A@CO1PR11MB5089.namprd11.prod.outlook.com>
+	<b7265975-d28c-4081-811c-bf7316954192@intel.com>
+	<f44bfb41-d3bd-471c-916e-53fd66b04f27@intel.com>
+	<20250730152848.GJ1877762@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-When the parent clock is a gated clock which has multiple parents, the
-clock provider (clk-scmi typically) might return a rate of 0 since there
-is not one of those particular parent clocks that should be chosen for
-returning a rate. Prior to ee975351cf0c ("net: mdio: mdio-bcm-unimac:
-Manage clock around I/O accesses"), we would not always be passing a
-clock reference depending upon how mdio-bcm-unimac was instantiated. In
-that case, we would take the fallback path where the rate is hard coded
-to 250MHz.
+On Wed, 30 Jul 2025 16:28:48 +0100 Simon Horman wrote:
+> My opinion is that devlink is the correct way to solve this problem.
+> However, I do understand from the responses above (3) that this is somewhat
+> non-trivial to implement and thus comes with some risks. And I do accept
+> your argument that for old drivers, which already use module parameters,
+> some pragmatism seems appropriate.
+> 
+> IOW, I drop my objection to using a module parameter in this case.
+> 
+> What I would suggest is that some consideration is given to adding devlink
+> support to this driver. And thus modernising it in that respect. Doing so
+> may provide better options for users in future.
 
-Make sure that we still fallback to using a fixed rate for the divider
-calculation, otherwise we simply ignore the desired MDIO bus clock
-frequency which can prevent us from interfacing with Ethernet PHYs
-properly.
-
-Fixes: ee975351cf0c ("net: mdio: mdio-bcm-unimac: Manage clock around I/O accesses")
-Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
----
-Changes in v2:
-
-- provide additional details as to how a parent clock can have a rate of
-  0 (Andrew)
-
-- incorporate Simon's feedback that an optional clock is NULL and
-  therefore returns a rate of 0 as well
-
- drivers/net/mdio/mdio-bcm-unimac.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/mdio/mdio-bcm-unimac.c b/drivers/net/mdio/mdio-bcm-unimac.c
-index b6e30bdf5325..7baab230008a 100644
---- a/drivers/net/mdio/mdio-bcm-unimac.c
-+++ b/drivers/net/mdio/mdio-bcm-unimac.c
-@@ -209,10 +209,9 @@ static int unimac_mdio_clk_set(struct unimac_mdio_priv *priv)
- 	if (ret)
- 		return ret;
- 
--	if (!priv->clk)
-+	rate = clk_get_rate(priv->clk);
-+	if (!rate)
- 		rate = 250000000;
--	else
--		rate = clk_get_rate(priv->clk);
- 
- 	div = (rate / (2 * priv->clk_freq)) - 1;
- 	if (div & ~MDIO_CLK_DIV_MASK) {
--- 
-2.34.1
-
+FWIW I will still object. The ethtool priv flag is fine, personally 
+I don't have a strong preference on devlink vs ethtool priv flags.
+But if you a module param you'd need a very strong justification..
 
