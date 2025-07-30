@@ -1,301 +1,180 @@
-Return-Path: <netdev+bounces-211074-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211076-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BB01B16768
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 22:10:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EFBCBB16788
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 22:21:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 08C7F188DAC7
-	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 20:10:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 310451890EBC
+	for <lists+netdev@lfdr.de>; Wed, 30 Jul 2025 20:22:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8301721C9E9;
-	Wed, 30 Jul 2025 20:09:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8834B1FDE3D;
+	Wed, 30 Jul 2025 20:21:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eLQ6Fmcg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VVqu95eF"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B875E21B9FF
-	for <netdev@vger.kernel.org>; Wed, 30 Jul 2025 20:09:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1CA21DF754
+	for <netdev@vger.kernel.org>; Wed, 30 Jul 2025 20:21:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753906163; cv=none; b=FhSS6GmB7QBDrXsOktwNZcQ7TU2lT4EtaclUNEb1vMwgfT7cfKFGxEAmrO+zAcF8j0v3ls4L2FK5v5ut74m+1vpv5Y/pQcxSiILbzsI+r/zquHjw+WBt+RpKJGkQjEXwrKlDcbOC2hFYe92SLXXiTZUVt0BawxIAUYfeXHg+5sA=
+	t=1753906905; cv=none; b=suAhcc/hp8HTVFXphG/VbyN8hhXCgV+iRV4B+a9yxbPu60QebXFyVrEHU3UQypUOJfTi0CF/GN4UZIiITOA9/7C8uWfNK0nBVQhtvWe/LjWHNs5G8OshQ8KR4foaLm8ca4mjGCXPTVSDSoWrBIklQjMIn5KwWDd911TLR7+CBak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753906163; c=relaxed/simple;
-	bh=Br7F9dIAhKJJT+mSl3h0YppFwSlqDpSLJZc/uNt2x+k=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=DsghRq5gTRLW0sjX/Q8zphW5ODZIlAwhbho1fuvKr9dT6XF++eDcMxzIdQv+1UyefUioAMG6lVMNRcOp5e7MUq63LHWqEDwpNOnGczPlscjvroqyfK5HL0GxJo2l1qS3UxZEs/tuo1EKBG5xWWL1xAkcjBGeNHA0Uy+9H4I0BA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eLQ6Fmcg; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1753906160;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kKSIqmuSgEQg4gu4BMgEC0v8vEqFkfHDV6d0CHZ8KG4=;
-	b=eLQ6FmcgoEAFwOW1wrdoGznnBru/ekpF2zBWyEZl34JgqMIlq+9AqREj3RzByO1aaVlYT8
-	52u6jUh63cQphyiHbBofPjCiI0fyhoOkgN8uvVgG46c0d4O59FIsdHvRqu301ZRpAS9JsP
-	ugyWI7xCH+7pSkZOL/cEzXvUBIFy06M=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-389-tvP2r0shNlmYoZeTiNAr-g-1; Wed,
- 30 Jul 2025 16:09:16 -0400
-X-MC-Unique: tvP2r0shNlmYoZeTiNAr-g-1
-X-Mimecast-MFC-AGG-ID: tvP2r0shNlmYoZeTiNAr-g_1753906150
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E04F8195608A;
-	Wed, 30 Jul 2025 20:09:09 +0000 (UTC)
-Received: from okorniev-mac.redhat.com (unknown [10.22.90.16])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id EBD1919560A2;
-	Wed, 30 Jul 2025 20:09:04 +0000 (UTC)
-From: Olga Kornievskaia <okorniev@redhat.com>
-To: chuck.lever@oracle.com,
-	jlayton@kernel.org,
-	trondmy@hammerspace.com,
-	anna.schumaker@oracle.com,
-	hch@lst.de,
-	sagi@grimberg.me,
-	kch@nvidia.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: linux-nfs@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	netdev@vger.kernel.org,
-	kernel-tls-handshake@lists.linux.dev,
-	neil@brown.name,
-	Dai.Ngo@oracle.com,
-	tom@talpey.com,
-	hare@suse.de,
-	horms@kernel.org,
-	kbusch@kernel.org
-Subject: [PATCH 4/4] net/handshake: change tls_alert_recv to receive a kvec
-Date: Wed, 30 Jul 2025 16:08:35 -0400
-Message-Id: <20250730200835.80605-5-okorniev@redhat.com>
-In-Reply-To: <20250730200835.80605-1-okorniev@redhat.com>
-References: <20250730200835.80605-1-okorniev@redhat.com>
+	s=arc-20240116; t=1753906905; c=relaxed/simple;
+	bh=NxKe2478qmRI5Yudeskx2LhyyqDBA8HqDWGnIvafIKo=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=cpp9qTiDKWCLyIv2Qj6Jwd48FoqGbrDRf3JMqBkoEWtN0lkLSu4VDUa5ykHCfyb+y3i7UmK/fXsIiGgxVs9Y1wAifVebDHV6i8aW0y3DeeMxcNSosLBfMftQLEr1nHZRWF9dueMiezpcdSfzd4yS0+EIaZOzMEnDsJnIp20paLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VVqu95eF; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-3b78310b296so120231f8f.2
+        for <netdev@vger.kernel.org>; Wed, 30 Jul 2025 13:21:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753906902; x=1754511702; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:autocrypt:subject:from
+         :content-language:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=N1q0g/K1YQpsv2+DtnbG5yRxD/ZgmAOkaRG1PJnaA5o=;
+        b=VVqu95eFsvjI9OrwPMWKw9n4I1GxEL4LLOym7a+id+9SaTM5481qqyXwqzSrE4TgiL
+         iNc2cSUg4D4f99ka5qGlrwEb5cqrbKwO9cWgRHf4XCMe41hMs8tPK0q8FPCGcCIbJgNM
+         vwHEt8w8JW+8qNpIJtJKEpq52i+6A6CKQnhCk9H6m9gwbo/mcf5rc0BhMM9inYpQ7/+i
+         HoeP9SipUMS2ZHf4tGmGsIxrpbncP2vEqAhdiSxenuDnh8DaPb709krUVp6NHuhG7aJL
+         ttFogTrSo1WkCDlQmXwyOneJY7WgQPGUGyzKvuAxTIHu7OFIXoMeKkKFcRjW8tEsUQvP
+         iL2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753906902; x=1754511702;
+        h=content-transfer-encoding:cc:to:autocrypt:subject:from
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=N1q0g/K1YQpsv2+DtnbG5yRxD/ZgmAOkaRG1PJnaA5o=;
+        b=gT6Np71l0p8/bsqXLOTu7WeUmt5kwzkQBaxI2uqJ9fJdi2JAURHGlAIJeevFYsxpMj
+         RfTw+w0YmklpUV5COiciD2vGFgX7MZstldAS9g8LVqcutGveAiAtzpx81NYuFuOM4HKw
+         zKdNEviUIQ+M3DRrk27kTPX/n1pfVTypIpLF4Q9ZO+l1Yy+nfyYxWrL/4O+qCgXm9BSg
+         yI64HfND51sxCNZ0hOr9BzF2q7FyAn8lLDfl9SeTMEB9QYBIZm0WH82iK8V9NvP3No3r
+         2pF0kVsX8Ca4oPDdCXhYRlj3X7lJOamLkRCq1AbS+wrpexGhDbP8jI2uUN5Yi8I5dXiq
+         pczg==
+X-Forwarded-Encrypted: i=1; AJvYcCVz/MxOz+6wwMd4QpD6OkKR8sVx20BfUuNCaV/z1sLeuxHEdG0fCYsZUGuZBXfNd6MTo/c+0hU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyipVJfjMDiX9e0gT3xKVXO+nYuQYqecgJfXsWTVmLWz5cCOK9+
+	YQb3F2V0PtIBKz+I+HwOIzrioI//r+0d14oOZ4D7yVTcDDwLUY/5dtYA
+X-Gm-Gg: ASbGncubbSOkyPXeOx+j8Q3ZciVhLVFjA+wMpD4t7vczqWTOJQjPTuzsUxtq70Qzv0Y
+	NFHuyB+Lk6DmV4ogAMjdHI7/9SqjrMRHvktUmE3qLUsyhnA2DiTWBv8Fgzg4C3QPGQTRkoUAuuD
+	YkOrQkchWtfdlv0A8KKgOYYQxdORjN/p/0ZJQM93PiBREYXr2MEGlvqT03D6bQdS+Tu+2ijCOIu
+	iyw4RQggxXkLC2akEVDzbXoruYWoX2ih1JXSzVR7OEUzdXIRQA/0vCEHvOm11fCQ3ZQexYCBs7c
+	Tqs/hvzfIk2GkkkGc4uyGa7xT27SHey859XyT+IQ2yaUKOclpRM/l7aQKN/uFyXXwLmbLz5SdM1
+	I2qP2u5BQ+uWZdZPwiNdXrzeqqxsQgJ8soCO+Wp48w6xRZX9ouLz1JCybRpUanr29ObdLUHYrEK
+	Dv+p7/1Kn+URiVUGkVdYfRs+JH3/hZ2F3P+WhCT4ZBy9EoMqucDXxPRCSJ2E3pDw==
+X-Google-Smtp-Source: AGHT+IF1xmF7BOYz4F2CwxJBSG7/U0IrPk3tskIiSwflQ8+T8No28sAP+4WCdTDH5dOH8ErPuZEnJg==
+X-Received: by 2002:a05:6000:40da:b0:3a5:8a68:b82d with SMTP id ffacd0b85a97d-3b795028f8bmr3224891f8f.43.1753906901731;
+        Wed, 30 Jul 2025 13:21:41 -0700 (PDT)
+Received: from ?IPV6:2003:ea:8f20:b700:4588:566b:f7a8:c4ac? (p200300ea8f20b7004588566bf7a8c4ac.dip0.t-ipconnect.de. [2003:ea:8f20:b700:4588:566b:f7a8:c4ac])
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3b79c466838sm14343f8f.49.2025.07.30.13.21.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 30 Jul 2025 13:21:41 -0700 (PDT)
+Message-ID: <2b80a77a-06db-4dd7-85dc-3a8e0de55a1d@gmail.com>
+Date: Wed, 30 Jul 2025 22:23:23 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH net] net: ftgmac100: fix potential NULL pointer access in
+ ftgmac100_phy_disconnect
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+To: Andrew Lunn <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>,
+ Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Cc: Jacky Chou <jacky_chou@aspeedtech.com>,
+ Jacob Keller <jacob.e.keller@intel.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Instead of trying to read the data from the msg iterator,
-callers to tls_alert_recv() need to pass in a kvec directly.
+After the call to phy_disconnect() netdev->phydev is reset to NULL.
+So fixed_phy_unregister() would be called with a NULL pointer as argument.
+Therefore cache the phy_device before this call.
 
-Signed-off-by: Olga Kornievskaia <okorniev@redhat.com>
+Fixes: e24a6c874601 ("net: ftgmac100: Get link speed and duplex for NC-SI")
+Cc: stable@vger.kernel.org
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- drivers/nvme/target/tcp.c | 13 +++++--------
- include/net/handshake.h   |  2 +-
- net/handshake/alert.c     |  6 +++---
- net/sunrpc/svcsock.c      | 17 ++++++++---------
- net/sunrpc/xprtsock.c     | 19 +++++++++----------
- 5 files changed, 26 insertions(+), 31 deletions(-)
+ drivers/net/ethernet/faraday/ftgmac100.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/nvme/target/tcp.c b/drivers/nvme/target/tcp.c
-index 055e420d3f2e..b63eda220c40 100644
---- a/drivers/nvme/target/tcp.c
-+++ b/drivers/nvme/target/tcp.c
-@@ -1107,7 +1107,7 @@ static inline bool nvmet_tcp_pdu_valid(u8 type)
- }
- 
- static int nvmet_tcp_tls_record_ok(struct nvmet_tcp_queue *queue,
--		struct msghdr *msg, char *cbuf)
-+		struct kvec *iov, char *cbuf)
+diff --git a/drivers/net/ethernet/faraday/ftgmac100.c b/drivers/net/ethernet/faraday/ftgmac100.c
+index 5d0c09068..a863f7841 100644
+--- a/drivers/net/ethernet/faraday/ftgmac100.c
++++ b/drivers/net/ethernet/faraday/ftgmac100.c
+@@ -1750,16 +1750,17 @@ static int ftgmac100_setup_mdio(struct net_device *netdev)
+ static void ftgmac100_phy_disconnect(struct net_device *netdev)
  {
- 	struct cmsghdr *cmsg = (struct cmsghdr *)cbuf;
- 	u8 ctype, level, description;
-@@ -1120,7 +1120,7 @@ static int nvmet_tcp_tls_record_ok(struct nvmet_tcp_queue *queue,
- 	case TLS_RECORD_TYPE_DATA:
- 		break;
- 	case TLS_RECORD_TYPE_ALERT:
--		tls_alert_recv(queue->sock->sk, msg, &level, &description);
-+		tls_alert_recv(queue->sock->sk, iov, &level, &description);
- 		if (level == TLS_ALERT_LEVEL_FATAL) {
- 			pr_err("queue %d: TLS Alert desc %u\n",
- 			       queue->idx, description);
-@@ -1161,8 +1161,7 @@ static int nvmet_tcp_try_recv_pdu(struct nvmet_tcp_queue *queue)
- 	if (unlikely(len < 0))
- 		return len;
- 	if (queue->tls_pskid) {
--		iov_iter_revert(&msg.msg_iter, len);
--		ret = nvmet_tcp_tls_record_ok(queue, &msg, cbuf);
-+		ret = nvmet_tcp_tls_record_ok(queue, &iov, cbuf);
- 		if (ret < 0)
- 			return ret;
- 	}
-@@ -1277,8 +1276,7 @@ static int nvmet_tcp_try_recv_ddgst(struct nvmet_tcp_queue *queue)
- 	if (unlikely(len < 0))
- 		return len;
- 	if (queue->tls_pskid) {
--		iov_iter_revert(&msg.msg_iter, len);
--		ret = nvmet_tcp_tls_record_ok(queue, &msg, cbuf);
-+		ret = nvmet_tcp_tls_record_ok(queue, &iov, cbuf);
- 		if (ret < 0)
- 			return ret;
- 	}
-@@ -1743,8 +1741,7 @@ static int nvmet_tcp_try_peek_pdu(struct nvmet_tcp_queue *queue)
- 		return len;
- 	}
+ 	struct ftgmac100 *priv = netdev_priv(netdev);
++	struct phy_device *phydev = netdev->phydev;
  
--	iov_iter_revert(&msg.msg_iter, len);
--	ret = nvmet_tcp_tls_record_ok(queue, &msg, cbuf);
-+	ret = nvmet_tcp_tls_record_ok(queue, &iov, cbuf);
- 	if (ret < 0)
- 		return ret;
+-	if (!netdev->phydev)
++	if (!phydev)
+ 		return;
  
-diff --git a/include/net/handshake.h b/include/net/handshake.h
-index 8ebd4f9ed26e..33ffc8e88923 100644
---- a/include/net/handshake.h
-+++ b/include/net/handshake.h
-@@ -43,7 +43,7 @@ bool tls_handshake_cancel(struct sock *sk);
- void tls_handshake_close(struct socket *sock);
+-	phy_disconnect(netdev->phydev);
++	phy_disconnect(phydev);
+ 	if (of_phy_is_fixed_link(priv->dev->of_node))
+ 		of_phy_deregister_fixed_link(priv->dev->of_node);
  
- u8 tls_get_record_type(const struct sock *sk, const struct cmsghdr *msg);
--void tls_alert_recv(const struct sock *sk, const struct msghdr *msg,
-+void tls_alert_recv(const struct sock *sk, const struct kvec *iov,
- 		    u8 *level, u8 *description);
- 
- #endif /* _NET_HANDSHAKE_H */
-diff --git a/net/handshake/alert.c b/net/handshake/alert.c
-index 329d91984683..4662a406b64a 100644
---- a/net/handshake/alert.c
-+++ b/net/handshake/alert.c
-@@ -94,13 +94,13 @@ EXPORT_SYMBOL(tls_get_record_type);
-  * @description: OUT - TLS AlertDescription value
-  *
-  */
--void tls_alert_recv(const struct sock *sk, const struct msghdr *msg,
-+void tls_alert_recv(const struct sock *sk, const struct kvec *iov,
- 		    u8 *level, u8 *description)
- {
--	const struct kvec *iov;
- 	u8 *data;
- 
--	iov = msg->msg_iter.kvec;
-+	if (!iov)
-+		return;
- 	data = iov->iov_base;
- 	*level = data[0];
- 	*description = data[1];
-diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
-index e2c5e0e626f9..8701abd7fff2 100644
---- a/net/sunrpc/svcsock.c
-+++ b/net/sunrpc/svcsock.c
-@@ -228,7 +228,7 @@ static int svc_one_sock_name(struct svc_sock *svsk, char *buf, int remaining)
+ 	if (priv->use_ncsi)
+-		fixed_phy_unregister(netdev->phydev);
++		fixed_phy_unregister(phydev);
  }
  
- static int
--svc_tcp_sock_process_cmsg(struct socket *sock, struct msghdr *msg,
-+svc_tcp_sock_process_cmsg(struct socket *sock, struct kvec *iov,
- 			  struct cmsghdr *cmsg, int ret)
- {
- 	u8 content_type = tls_get_record_type(sock->sk, cmsg);
-@@ -238,14 +238,10 @@ svc_tcp_sock_process_cmsg(struct socket *sock, struct msghdr *msg,
- 	case 0:
- 		break;
- 	case TLS_RECORD_TYPE_DATA:
--		/* TLS sets EOR at the end of each application data
--		 * record, even though there might be more frames
--		 * waiting to be decrypted.
--		 */
--		msg->msg_flags &= ~MSG_EOR;
-+		pr_warn("received TLS DATA; expected TLS control message\n");
- 		break;
- 	case TLS_RECORD_TYPE_ALERT:
--		tls_alert_recv(sock->sk, msg, &level, &description);
-+		tls_alert_recv(sock->sk, iov, &level, &description);
- 		ret = (level == TLS_ALERT_LEVEL_FATAL) ?
- 			-ENOTCONN : -EAGAIN;
- 		break;
-@@ -280,8 +276,7 @@ svc_tcp_sock_recv_cmsg(struct socket *sock, unsigned int *msg_flags)
- 	ret = sock_recvmsg(sock, &msg, MSG_DONTWAIT);
- 	if (ret > 0 &&
- 	    tls_get_record_type(sock->sk, &u.cmsg) == TLS_RECORD_TYPE_ALERT) {
--		iov_iter_revert(&msg.msg_iter, ret);
--		ret = svc_tcp_sock_process_cmsg(sock, &msg, &u.cmsg, -EAGAIN);
-+		ret = svc_tcp_sock_process_cmsg(sock, &alert_kvec, &u.cmsg, -EAGAIN);
- 	}
- 	return ret;
- }
-@@ -294,6 +289,10 @@ svc_tcp_sock_recvmsg(struct svc_sock *svsk, struct msghdr *msg)
- 
- 	ret = sock_recvmsg(sock, msg, MSG_DONTWAIT);
- 	if (msg->msg_flags & MSG_CTRUNC) {
-+		/* TLS sets EOR at the end of each application data
-+		 * record, even though there might be more frames
-+		 * waiting to be decrypted.
-+		 */
- 		msg->msg_flags &= ~(MSG_CTRUNC | MSG_EOR);
- 		if (ret == 0 || ret == -EIO)
- 			ret = svc_tcp_sock_recv_cmsg(sock, &msg->msg_flags);
-diff --git a/net/sunrpc/xprtsock.c b/net/sunrpc/xprtsock.c
-index c5f7bbf5775f..005021773da1 100644
---- a/net/sunrpc/xprtsock.c
-+++ b/net/sunrpc/xprtsock.c
-@@ -357,7 +357,7 @@ xs_alloc_sparse_pages(struct xdr_buf *buf, size_t want, gfp_t gfp)
- }
- 
- static int
--xs_sock_process_cmsg(struct socket *sock, struct msghdr *msg,
-+xs_sock_process_cmsg(struct socket *sock, struct kvec *iov,
- 		     unsigned int *msg_flags, struct cmsghdr *cmsg, int ret)
- {
- 	u8 content_type = tls_get_record_type(sock->sk, cmsg);
-@@ -367,14 +367,10 @@ xs_sock_process_cmsg(struct socket *sock, struct msghdr *msg,
- 	case 0:
- 		break;
- 	case TLS_RECORD_TYPE_DATA:
--		/* TLS sets EOR at the end of each application data
--		 * record, even though there might be more frames
--		 * waiting to be decrypted.
--		 */
--		*msg_flags &= ~MSG_EOR;
-+		pr_warn("received TLS DATA; expected TLS control message\n");
- 		break;
- 	case TLS_RECORD_TYPE_ALERT:
--		tls_alert_recv(sock->sk, msg, &level, &description);
-+		tls_alert_recv(sock->sk, iov, &level, &description);
- 		ret = (level == TLS_ALERT_LEVEL_FATAL) ?
- 			-EACCES : -EAGAIN;
- 		break;
-@@ -409,9 +405,8 @@ xs_sock_recv_cmsg(struct socket *sock, unsigned int *msg_flags, int flags)
- 	ret = sock_recvmsg(sock, &msg, flags);
- 	if (ret > 0 &&
- 	    tls_get_record_type(sock->sk, &u.cmsg) == TLS_RECORD_TYPE_ALERT) {
--		iov_iter_revert(&msg.msg_iter, ret);
--		ret = xs_sock_process_cmsg(sock, &msg, msg_flags, &u.cmsg,
--					   -EAGAIN);
-+		ret = xs_sock_process_cmsg(sock, &alert_kvec, msg_flags,
-+					   &u.cmsg, -EAGAIN);
- 	}
- 	return ret;
- }
-@@ -425,6 +420,10 @@ xs_sock_recvmsg(struct socket *sock, struct msghdr *msg, int flags, size_t seek)
- 	ret = sock_recvmsg(sock, msg, flags);
- 	/* Handle TLS inband control message lazily */
- 	if (msg->msg_flags & MSG_CTRUNC) {
-+		/* TLS sets EOR at the end of each application data
-+		 * ecord, even though there might be more frames
-+		 * waiting to be decrypted.
-+		 */
- 		msg->msg_flags &= ~(MSG_CTRUNC | MSG_EOR);
- 		if (ret == 0 || ret == -EIO)
- 			ret = xs_sock_recv_cmsg(sock, &msg->msg_flags, flags);
+ static void ftgmac100_destroy_mdio(struct net_device *netdev)
 -- 
-2.47.1
+2.50.1
 
 
