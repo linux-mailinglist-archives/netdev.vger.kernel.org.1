@@ -1,99 +1,119 @@
-Return-Path: <netdev+bounces-211145-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211146-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8943B16E42
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 11:14:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E0AA5B16E66
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 11:21:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA5563A61DC
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 09:13:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C970F3B851C
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 09:20:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C74E0275844;
-	Thu, 31 Jul 2025 09:14:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4568428F937;
+	Thu, 31 Jul 2025 09:21:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZxEqLmhS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rbJLOQHD"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EC8C1D618A;
-	Thu, 31 Jul 2025 09:14:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20A6D1E571B
+	for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 09:21:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753953260; cv=none; b=lZSFniUyrOAibAo8BbVO987A3UI1viF/wA5WtW1/3C3Qa0dF5Y0HGmHxLwzbpHf67Yrnabo5BFDgZV7MJwWxVnGmidluKrhmXEawKrzhoy9SjDmKhzgCHqmEJfwLvHPfUVKUBWDGBJ0Jp9Og2i5syLhtM4l0geoXkyRHgkil+mY=
+	t=1753953661; cv=none; b=Sj0o3/thAinz3DL3BbGVBSsHlqyr5Q+1+fU4X0WFB908ujs4dFlim31rTR0FiCOYXFxEnns3syYIhMrwYfYMRhDgYkP1Bdrt1TCqHpN5+uQXjJMJQsxEJ/tofGME3Rsik7UY8XWHhGkD6OGdurBJ1rBt4I6DG8kvfI1suB0qwH0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753953260; c=relaxed/simple;
-	bh=o1GnT/mv5uDo9vZxctWYqJZ/ZVlGC9o4m7b8LxI/dKs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UV1T4xUsa/QzeUoTyrQuXiNG1Z3HQjazUyvIut7XBZ3nckraVbBzZ3aRRJliUnaVFCNt27A0bWOUeK+bMibMiSl+9t8MXVp5E8bxxTs1ODCj7jtH74QJMvkcxI0LA5SgnDl5REZvokhNlAHUEo1QLJiA7xpNzagRD2suc4DcmPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZxEqLmhS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B322C4CEEF;
-	Thu, 31 Jul 2025 09:14:16 +0000 (UTC)
+	s=arc-20240116; t=1753953661; c=relaxed/simple;
+	bh=YQitdJZEqx49z+aEtgIFZrSpHymltedYz+RclMvgrQk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MgDgIGbmelkK5yJWrI2GI0EvBQTOb07frtOSe8ngyAeJjCkf0IKvsiq1IS56849QHPQozW3Oi8zKdnb9ZtbGY/QOceyck3lHjV53srLXqhooOCHS16fDl0BGvBPx+miITFKn/apXtHEiyozsC4OcvWNOiBzCf/WvPSHWmahEyds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rbJLOQHD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C541C4CEEF;
+	Thu, 31 Jul 2025 09:20:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753953260;
-	bh=o1GnT/mv5uDo9vZxctWYqJZ/ZVlGC9o4m7b8LxI/dKs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ZxEqLmhSyJL5s1N7GWltmF+Q9EcbntivFSJS0yqhCHVIu1W76AONTUf2xfJJnmtpT
-	 wzbi7WPDgIdp+YX/M8luyen2O6LTkvIt9plT3bPpk73dKKIvzhtmO4XXcsU68eKeKM
-	 tyHfMQ+k2IhQT12huuVhfvAhC7kthQZK5aHNCMLchCL5Q3Vk6RvVrU5EBOnrEeWtkx
-	 hYlDAA8uJorci4yykWwiWFluwohVErV/NcQL6YklY2Yzw2LWvMJ1dg8VuZl9wmK1Yp
-	 ZOaYflUoPkOp3BvTbUzzJ5aeg/+S+GDn5r31pBIIaTqxyyy0ZsnOs7hbuKghrHLZdz
-	 3OG/PTC2iCByg==
-Message-ID: <a13646af-78f7-4ba7-9767-41d598222b1d@kernel.org>
-Date: Thu, 31 Jul 2025 11:14:14 +0200
+	s=k20201202; t=1753953660;
+	bh=YQitdJZEqx49z+aEtgIFZrSpHymltedYz+RclMvgrQk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rbJLOQHDqprFeguHWI4PoV3aRzwTXcJU6XhvZc7x4IPsLrXsOMrL0wRPExZxowbHD
+	 GXNz6bnZutQbK3/TCxxB9MLMC91Ty6BrQ2gWiadtfLDVTKcMRFoA4CYz80vYEwiv9L
+	 V7eNWJj3DSBru/pqEwz5t2lFvzX6Bil/hG1jyWMVxnVGqjcuQwTenpv6NpkCjcnE7q
+	 7Prto0sYallXr14WCC0MY5umXrDhVYP+/4Le0wPNuuv0w7JY8MOuTQ331gn5e3MVo0
+	 yf08rfB8B/VZIlftPeaoEN8JBLkIDJmVXMScNO3Mc07qhkI5kbVw82LbFAwK1hq62V
+	 37IRTFD5FuhlQ==
+Date: Thu, 31 Jul 2025 11:20:57 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net] net: airoha: Fix PPE table access in
+ airoha_ppe_debugfs_foe_show()
+Message-ID: <aIs1eXkuez-sZtfH@lore-desk>
+References: <20250728-airoha_ppe_foe_get_entry_locked-v1-1-8630ec73f3d1@kernel.org>
+ <20250730181249.78dbe4f2@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] sfc: handle NULL returned by xdp_convert_buff_to_frame()
-To: Edward Cree <ecree@amd.com>, Paolo Abeni <pabeni@redhat.com>,
- Chenyuan Yang <chenyuan0y@gmail.com>, ecree.xilinx@gmail.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, ast@kernel.org, daniel@iogearbox.net,
- john.fastabend@gmail.com, sdf@fomichev.me, lorenzo@kernel.org
-Cc: netdev@vger.kernel.org, linux-net-drivers@amd.com, bpf@vger.kernel.org,
- zzjas98@gmail.com
-References: <20250723003203.1238480-1-chenyuan0y@gmail.com>
- <045d1ff5-bb20-481d-a067-0a42345ab83d@redhat.com>
- <de14f60e-b1f0-432c-80b4-a2f0453e0fe2@amd.com>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <de14f60e-b1f0-432c-80b4-a2f0453e0fe2@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="iy9ceCsbIKdzJyDD"
+Content-Disposition: inline
+In-Reply-To: <20250730181249.78dbe4f2@kernel.org>
 
 
+--iy9ceCsbIKdzJyDD
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 25/07/2025 12.11, Edward Cree wrote:
-> On 7/24/25 10:57, Paolo Abeni wrote:
->> On 7/23/25 2:32 AM, Chenyuan Yang wrote:
->>> The xdp_convert_buff_to_frame() function can return NULL when there is
->>> insufficient headroom in the buffer to store the xdp_frame structure
->>> or when the driver didn't reserve enough tailroom for skb_shared_info.
->>
->> AFAIC the sfc driver reserves both enough headroom and tailroom, but
->> this is after ebpf run, which in turn could consume enough headroom to
->> cause a failure, so I think this makes sense.
-> 
-> Your reasoning seems plausible to me.
+> On Mon, 28 Jul 2025 13:58:08 +0200 Lorenzo Bianconi wrote:
+> > +struct airoha_foe_entry *
+> > +airoha_ppe_foe_get_entry_locked(struct airoha_ppe *ppe, u32 hash)
+>=20
+> Hm, could be just me, but the way we/I used _locked in the core was=20
+> the opposite. _locked means the caller's already taken the lock.
+> Here you seem to be saying that the "callee is locked"..
+> Can we stick to core's interpretation?
 
-Hmm... have you actually tested that XDP/BPF can adjust headroom so much
-that xdp_convert_buff_to_frame() function fails?
+sure, that's fine.
 
-I really doubt this possible for BPF-progs to violate this.
+>=20
+> > +	struct airoha_foe_entry *hwe;
+> > +
+> > +	spin_lock_bh(&ppe_lock);
+> > +	hwe =3D airoha_ppe_foe_get_entry(ppe, hash);
+> > +	spin_unlock_bh(&ppe_lock);
+> > +
+> > +	return hwe;
+>=20
+> Is the lifetime of the hwe object somehow guaranteed in the debugfs
+> code? Looks questionable..
 
-The XDP BPF-prog can only adjust the headroom via the helpers
-bpf_xdp_adjust_head() and bpf_xdp_adjust_meta().  These helpers reserve
-room for sizeof(struct xdp_frame).
+PPE table entries are allocated at driver load and never freed, the hw is j=
+ust
+writing into this DMA area when the entry is binded.
 
-The tailroom can be adjusted via helper bpf_xdp_adjust_tail() and it
-also reserve room for sizeof(struct skb_shared_info) such that BPF-progs
-cannot get access to this area. See define for xdp_data_hard_end.
+Regards,
+Lorenzo
 
---Jesper
+> --=20
+> pw-bot: cr
+
+--iy9ceCsbIKdzJyDD
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaIs1eQAKCRA6cBh0uS2t
+rKE+AP9acbZ1NXEFMJ8nPy6u1cFPCw8RfBLLOGACBYGpxGOffgEAwSwgpDJiqJnM
+Nv8H3NbW2BL1j9z8OroubX6meSBdZwU=
+=PjV9
+-----END PGP SIGNATURE-----
+
+--iy9ceCsbIKdzJyDD--
 
