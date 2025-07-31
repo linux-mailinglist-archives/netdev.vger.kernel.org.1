@@ -1,147 +1,156 @@
-Return-Path: <netdev+bounces-211244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211245-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F7DEB17582
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 19:16:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B102EB175CA
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 19:51:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DFB121AA79E6
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 17:17:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F2A162627D
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 17:51:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DA2523C4E6;
-	Thu, 31 Jul 2025 17:16:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4759B1C6FFD;
+	Thu, 31 Jul 2025 17:51:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XRzq1hbi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hZ3hx76s"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com [209.85.219.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 492327BAEC;
-	Thu, 31 Jul 2025 17:16:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5504101EE;
+	Thu, 31 Jul 2025 17:51:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753982208; cv=none; b=XKowZnVzQxOax+JsEjDsowFaZRVO2wjnmctkBjXqBZy++Ej/Ns1P7FKsCNPTEZeOvURTNQg1Iy16D544Z8yTs1Zdl5Gg7HCIx9T+6yXoX6UqmrNBg+jPexK+l2JSAHFIRu5V0sypKG1VInC/l0Pw4xHLojqK1CLgQyJ9+n/rCyU=
+	t=1753984301; cv=none; b=nmqiFrGtB8/stxkHiT5gfVVrIBU1ejap8muCsehHgf9mhvYGy6mORsPLZokNnKzr5i3mwd7w/GWuugf68EbdMBJs6NjeBvTxRjnVcYfTSBGzihb+nBwt/sJlfQt8D+ddO9PUE/m4qV2NIZsU5MntT9LOe59t2Rs9vWwJXrBpWrg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753982208; c=relaxed/simple;
-	bh=i05QV2naqKp/Ic+OIfkKDRuKNkkmQFkt9rjuiy2vuIg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hwB44IJ/6Ad9jx5gBjzM3Olobhnw4o/BFYQoRCHb1CbpkiSdUjjR0ZqGngTvGN9mIoKDJ+oNQ3jw44Wa23tLmZQvhui+xl6UARE8butWB+LvZbYRiP+LXNRM0RhaPH0DkSrIQAbETiMHeU2K1+2VdGC2PY09AGJBzYbUmcg4HiQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XRzq1hbi; arc=none smtp.client-ip=209.85.128.44
+	s=arc-20240116; t=1753984301; c=relaxed/simple;
+	bh=MvMKRL/py/UYu9reV6xLkU4IhARBfecgqx3hs6eDej0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GkGisw5onwVwZpAhp4GgrxSSUVnldvKcKe10deBY94pCn5+pTiwVLq6KNREUGQ3sqUFkh5frUp6giNVX3UyBNpd62yycpGb9j2aeL7yS+BZePSwAkEDdEu1aGKoom0YBOhuxaA4c5/ikpmB8C4GvYLH9o9j0/RXoHflnva8SZPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hZ3hx76s; arc=none smtp.client-ip=209.85.219.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4562421501fso900115e9.2;
-        Thu, 31 Jul 2025 10:16:46 -0700 (PDT)
+Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-e8bbb605530so2034468276.0;
+        Thu, 31 Jul 2025 10:51:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753982205; x=1754587005; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=z4D/5oUi0rHFvo7R6wGM8D36OwxVlVTV+Fqq7M/vD60=;
-        b=XRzq1hbiVvmJyvHDKYUXHerr3hO5IG1o1ARkWQFC6hsygx2Eh2itjZEBDJ30CFekXI
-         O9f772x0p3EvOAp7QFwj0GqvyR06TAA+V6ZZxLMR9bEDg3lVU4M0CPClU7RjmiVZL4sr
-         hTuJJvJxTYlKbNuJOpd24wf7Pulhx0EP10n+9wjQHsxVa5/L36/FuyBRyfBM8QUbFvYf
-         8nLXkzzF2KJiJuBoaziPC5sJNPBaj3rKWaPER6e3Ywlokb2AxTKQJHGN5tihDGhrx+ZB
-         Dx2WczAkauW4S3RAEOzFQTs05wCkl5KLzMxvN8sgrY1l2ctShqj5CWGl0rQnlnsAUwwZ
-         Q99Q==
+        d=gmail.com; s=20230601; t=1753984299; x=1754589099; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=nIHQvnX6UNEO5bU8VFBoQ/Q+qNFvu+4LpDZCLqUC/A4=;
+        b=hZ3hx76sykEmeoMre98qA4XB46/Pc7OysD7wFIOh5idDAxh+Xfwu6e9py4Brlf6tvw
+         90WG1HRfZMWSChArJEq75IpbkQh619ajiEk7yuC5l/VZtYb1W9/ZQmzVYnsMEEBT/FnV
+         jhaw49qxtfdqcmVXpqODCSryjO6L8PKNKIKHN7HWIN60xqyr3Gg8ZxFshjvFIrGKvchK
+         geyTZyvhzJoKrZSYbeUZKZg+XMws7B1YS99vX46AxmYokyR2QGiq+dgE13LsrHuvX1n+
+         4sSkavuY1DFkqbj67C4Ua8/HyHbxxpIPLOFdQAiF+sTm8gYM0cui3Kb+KllhAzxwvloS
+         qVWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753982205; x=1754587005;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=z4D/5oUi0rHFvo7R6wGM8D36OwxVlVTV+Fqq7M/vD60=;
-        b=fJ1zUchE4JWjGqwXVI5hiG1NB31S2Y85FQHvm2596nqDz1akFn+seAmrUYGLyEmguB
-         BN9l1/6KH8eaC1pNnrw7gO5upbJpduKGBrwGhhW19W2mEZmKko1pSv8OZbn32m0pdppM
-         +FymfJbDNT3S0Gfmg47FjepB/AA0VKcICxnt3BJb8lJXHuuquU6Xp3X4i0XtpnRcEkTI
-         H/IvOXjOmPsrPAVqgnPLZF75lJlMfeF9ak9/FOcSqTsqCzm2yP1aoEApilZdiVIu2+ZL
-         yqeJtyzpOWm6vVnX6AMIxqDb06KrSgzL7eiOPk94PTrwy6pBxug8O2K6H/EeBaL+/G8t
-         c8VQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVCUgsKa1i5541ZaUDTV50Ep2kWt1BAWOnxwRlcNcnnXbq4FJ+fCimzGQjJOUUtrw/xO6w2NMoP@vger.kernel.org, AJvYcCWUQjdAlaWNfFphOpzBaRsT0lJ6m7ANV+dNfJjQ17Lm0NKaoNI/+7+ZBsC2N0IrpTlZVodjkfG7zELl/yU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzvfIn8MjH9WGMcFq5IA1kZm8GG8RNEdyqmtxyYdzr2xHq1Fazc
-	OKzGvqdl+5TYNdTtUZe28dUYd6/whojsERHjWDPw89hIqb6PVJohaXXTx8m7Xw==
-X-Gm-Gg: ASbGncvZuKD3x+Yc3qs7cL++WzMfZ7TB0VwrIDkky4M+EMsYvV903EfkXKiIIsixUJC
-	f9b8IZZ6KVf+R9TLzIGw7MM+CLTsR9Vlp0j/UV4wBONt4Z3exsKEZb1Lwoyp7q4GJx72xm8tBj7
-	woP8AZR9mv95W/9SMfJyW3rlr4mPszUMAyOx1bS+0s9o7HxQF2hJuxeYmLJ7yyfZSrUaAaUA2RF
-	F0+RO9NXOTHnzqlOl8236+y8PjMAo7ARzkEuxLEaXFXzQAPzgZkRDXDh+Pv6/a0YG8cVFH1Cfws
-	gJRUY7QfLfecsA4Fed+m2Xr+51ral4Y6oHUtD6cPSzLbBYtoYfXC9bIZ7km6z03OulJnW+amNb8
-	bpl6MtdhwcCvMF0L9mpR5hjcU
-X-Google-Smtp-Source: AGHT+IGIhr5jXCpKAkOQYJyGNYmApdRKTfdh5g4GBLU3CPVzVN223o14oMVvDO1lPTB9VPzUG9bgHA==
-X-Received: by 2002:a05:600c:4588:b0:456:2137:5662 with SMTP id 5b1f17b1804b1-45899045e20mr27955365e9.7.1753982205199;
-        Thu, 31 Jul 2025 10:16:45 -0700 (PDT)
-Received: from skbuf ([2a02:2f04:d30d:7300:97a:e6c7:bad3:aa51])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4589ee4f0d2sm33144625e9.18.2025.07.31.10.16.43
+        d=1e100.net; s=20230601; t=1753984299; x=1754589099;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=nIHQvnX6UNEO5bU8VFBoQ/Q+qNFvu+4LpDZCLqUC/A4=;
+        b=Nbdyokxx+IVyFACwtZYpgaPL5ChXmt5DxEVDk4n7Tx2xkOs1UgPErvrCKB93WZiVnK
+         KWtdsHxpo7g81xJ2RxkBRpD19nNUMK8MFwKlzFM040XBvyaKIn3FAG0hnSPuwJswcwOM
+         ymavFlaSXMZiHKixvNQAcm6+UJ1ic/MMJEqvrL6zLSmZxztYp67AiW5ExIPqcJj8QJUd
+         nHWVNIZ+xGsyBVztqRRDmY4KxtdWMCIo1JwlGtk9AkCChQFwlxfpJ8Qe/xlrBxZcsHVl
+         4mSWW4CeHU5BmKXMTbCvS9AEjpVWC1m8FNiGvLBaEV+8drG3iDhmZgBt+3vcgUZrFULp
+         Drxg==
+X-Forwarded-Encrypted: i=1; AJvYcCVvLDmo2I4N8kHfElj7o5RZzAcGCOWw12cQezL1LV4z+CyhoMb1zRI80985tzhCNKzHZd5hkuA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxRRg6NzpHfdAxv5/lJTchrB22sMZ9U3EO9DUhvsi6THEYHXAxa
+	LuveWMYeUEtwJHgYNsPAIiOstECX5blM1FJl8FmvztcFW7ntJkYnrL+YXaSv7g==
+X-Gm-Gg: ASbGncsXtJGPmElaydpdhk/LXGt+zTdWnbRzCfXS0hmpGCS9dX0gmn9nviBqBWcOJtk
+	ZuWGD63kDj/OQU7uF0mCJAtpVs8h+ARdRFt/mgfx3xA22cqubjdu34WgygoBQfClEqUQv79UDdo
+	WLtiiRFoarXtY2VkukWl5IDpM18sJ0Jzx8aBVAXKZT+AN2oYEIg5BA+8KMDoGiyr15yLus8yCef
+	01QjtO8yfWKw+s2sCwGbFBodWELZhNHEz4qDUimAeLXzlM5IIyyqxtPjMKMsL9GmRcfnTs86rJa
+	gAjIIarT4Ey8atrDllTaB2+7fUXiKV+/3kREdAQK891onmkTNKDCjkv6IfL7OUANFpTFA8wFm1b
+	gqxQ9TfKx5UN2vR8DKetGmzSgwHxQp1lHFjReIN1yjnMVFTEbTCWUBlignr7F9MEmQaY0eDmcwQ
+	zVKNpPSHsiMoQxYoIe
+X-Google-Smtp-Source: AGHT+IEUq8U2kdt/gh5b5Bn+ATUtvzheojlX3lIyaBt/7IZBzFAP9l/eqYZ5Hd4HR9ymr1WE01at+Q==
+X-Received: by 2002:a05:690c:470e:b0:71a:21f9:572d with SMTP id 00721157ae682-71b5a86e31dmr31899447b3.19.1753984298483;
+        Thu, 31 Jul 2025 10:51:38 -0700 (PDT)
+Received: from willemb.c.googlers.com.com (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-71b5a5f783csm4914407b3.80.2025.07.31.10.51.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 31 Jul 2025 10:16:44 -0700 (PDT)
-Date: Thu, 31 Jul 2025 20:16:42 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Alexander Wilhelm <alexander.wilhelm@westermo.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: Aquantia PHY in OCSGMII mode?
-Message-ID: <20250731171642.2jxmhvrlb554mejz@skbuf>
-References: <aIuEvaSCIQdJWcZx@FUE-ALEWI-WINX>
+        Thu, 31 Jul 2025 10:51:37 -0700 (PDT)
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	Willem de Bruijn <willemb@google.com>,
+	stable@vger.kernel.org,
+	Quang Le <quanglex97@gmail.com>
+Subject: [PATCH net] net/packet: fix a race in packet_set_ring() and packet_notifier()
+Date: Thu, 31 Jul 2025 13:51:09 -0400
+Message-ID: <20250731175132.2592130-1-willemdebruijn.kernel@gmail.com>
+X-Mailer: git-send-email 2.50.1.565.gc32cd1483b-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <aIuEvaSCIQdJWcZx@FUE-ALEWI-WINX>
 
-Hi Alexander,
+From: Willem de Bruijn <willemb@google.com>
 
-On Thu, Jul 31, 2025 at 04:59:09PM +0200, Alexander Wilhelm wrote:
-> Hello devs,
-> 
-> I'm fairly new to Ethernet PHY drivers and would appreciate your help. I'm
-> working with the Aquantia AQR115 PHY. The existing driver already supports the
-> AQR115C, so I reused that code for the AQR115, assuming minimal differences. My
-> goal is to enable 2.5G link speed. The PHY supports OCSGMII mode, which seems to
-> be non-standard.
-> 
-> * Is it possible to use this mode with the current driver?
-> * If yes, what would be the correct DTS entry?
-> * If not, I’d be willing to implement support. Could you suggest a good starting point?
-> 
-> Any hints or guidance would be greatly appreciated.
-> 
-> 
-> Best regards
-> Alexander Wilhelm
-> 
+When packet_set_ring() releases po->bind_lock, another thread can
+run packet_notifier() and process an NETDEV_UP event.
 
-In addition to what Andrew and Russell said:
+This race and the fix are both similar to that of commit 15fe076edea7
+("net/packet: fix a race in packet_bind() and packet_notifier()").
 
-The Aquantia PHY driver is a bit unlike other PHY drivers, in that it
-prefers not to change the hardware configuration, and work with the
-provisioning of the firmware.
+There too the packet_notifier NETDEV_UP event managed to run while a
+po->bind_lock critical section had to be temporarily released. And
+the fix was similarly to temporarily set po->num to zero to keep
+the socket unhooked until the lock is retaken.
 
-Do you know that the PHY firmware was built for OCSGMII, or do you just
-intend to use OCSGMII knowing that the hardware capability is there?
-Because the driver reads the VEND1_GLOBAL_CFG registers in
-aqr107_fill_interface_modes(). These registers tell Linux what host
-interface mode to use for each negotiated link speed on the media side.
+The po->bind_lock in packet_set_ring and packet_notifier precede the
+introduction of git history.
 
-If you haven't already,
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Cc: stable@vger.kernel.org
+Signed-off-by: Quang Le <quanglex97@gmail.com>
+Signed-off-by: Willem de Bruijn <willemb@google.com>
+---
+ net/packet/af_packet.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-[ and I guess you haven't, because you can find there this translation
-  which clearly shows that OCSGMII corresponds to what Linux treats as
-  2500base-x:
+diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
+index bc438d0d96a7..a7017d7f0927 100644
+--- a/net/packet/af_packet.c
++++ b/net/packet/af_packet.c
+@@ -4573,10 +4573,10 @@ static int packet_set_ring(struct sock *sk, union tpacket_req_u *req_u,
+ 	spin_lock(&po->bind_lock);
+ 	was_running = packet_sock_flag(po, PACKET_SOCK_RUNNING);
+ 	num = po->num;
+-	if (was_running) {
+-		WRITE_ONCE(po->num, 0);
++	WRITE_ONCE(po->num, 0);
++	if (was_running)
+ 		__unregister_prot_hook(sk, false);
+-	}
++
+ 	spin_unlock(&po->bind_lock);
+ 
+ 	synchronize_net();
+@@ -4608,10 +4608,10 @@ static int packet_set_ring(struct sock *sk, union tpacket_req_u *req_u,
+ 	mutex_unlock(&po->pg_vec_lock);
+ 
+ 	spin_lock(&po->bind_lock);
+-	if (was_running) {
+-		WRITE_ONCE(po->num, num);
++	WRITE_ONCE(po->num, num);
++	if (was_running)
+ 		register_prot_hook(sk);
+-	}
++
+ 	spin_unlock(&po->bind_lock);
+ 	if (pg_vec && (po->tp_version > TPACKET_V2)) {
+ 		/* Because we don't support block-based V3 on tx-ring */
+-- 
+2.50.1.565.gc32cd1483b-goog
 
-		case VEND1_GLOBAL_CFG_SERDES_MODE_OCSGMII:
-			interface = PHY_INTERFACE_MODE_2500BASEX;
-			break;
-
-]
-
-then you can instrument this function and see what host interface mode
-it detects as configured for VEND1_GLOBAL_CFG_2_5G.
 
