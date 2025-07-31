@@ -1,487 +1,254 @@
-Return-Path: <netdev+bounces-211289-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211290-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF35FB1794D
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 01:11:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1D6FB17A19
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 01:38:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D13E516E4D5
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 23:11:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27D711AA5F86
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 23:38:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7196A264A86;
-	Thu, 31 Jul 2025 23:10:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7462D288CB6;
+	Thu, 31 Jul 2025 23:38:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="exFxiTck"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="utqVJN6C"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 774BB153598
-	for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 23:10:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5940288CB3
+	for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 23:38:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754003459; cv=none; b=DpWxz4Nq8lIlZhSfP/43tGUmGfMEAx0kI7oNgQwS8lnwiPqv4M9jopi/2hfTMpy6KZiLtm06YW9wiNTBmh2XZuVZ3PWYC7XWJnlut35+AZd+Zy6sghncxYFwZzw2Y25+6totuq8WC9dwfk38LsZw5Yrinha4Rr94f1eb/ZjTl2c=
+	t=1754005083; cv=none; b=EEe4QvPaP8VngrZP+j8Rt7lUQw46Wj7JLKECJ6elhQJuYsSPt7CyIrtUIKE23siTqkiYZjAHQZ5nfU7RFuUog6D8VhJpTW48x09vNmjZ8y1UPzHtqf6hX1dNUqBC6KD1UQRLFpWiMXkRXrpQm6P2j8zd93SztH1vNaRrgWkO+o4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754003459; c=relaxed/simple;
-	bh=L8TNhY6WZvac5myRqRj6b7KHBI7OVjvgEsz/iUFpGRs=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tt1vfIzUnUSlA4/FMvLEo35uFX9pwbD2PSXbkEPSWtqK9XcYoIyEJIs4ux6lQcoE7MwhtVEJ6Qzd7kvEVYDKXZtBfJ92fbHZWm1MEvTYkcs5lZ9j2RipC7Ke5GTSdp6zjdyv91h9wMiHQpb36ztFxym1sN7YXL5hMczZv4/alqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=exFxiTck; arc=none smtp.client-ip=67.231.145.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0044012.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56VLms38022008;
-	Thu, 31 Jul 2025 16:10:39 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=s2048-2025-q2; bh=28MZMVZOj1gLAHrp8O
-	9P39qnMPUEHht1sZCfv5+Kw0s=; b=exFxiTckcsIgC2BwjIyLSehc0AnISUY0eU
-	SL3NdKogVsxfRFUj7U7Bh0COGhTuUPhp4KpNSlqeA2k0ZQXOa6j510pZvIvmizsM
-	UKIcIiBMnWWyjSQPPLGCc3n20k30toQqxI+NzsTFYKYkKhIX+SR8yC58djBSX6at
-	CFaQpxqF+k25lDifSmKE9dCMKVEmj8hZTcAbaLjdLHk4SRcFkfYiIrqxlvx95+8p
-	opI41aj5N6xAl27f7r8joaJ4uztw18roy+jop318d68z5PXRjQkhMwSlzLWwUM+J
-	iHoE87WCN39VKGlJGM0GYrk5ZRVYLpc8kx9ZH6ZRwp45UFagFwoA==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 488fcp943g-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Thu, 31 Jul 2025 16:10:39 -0700 (PDT)
-Received: from devvm31871.cln0.facebook.com (2620:10d:c085:108::150d) by
- mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.17; Thu, 31 Jul 2025 23:10:36 +0000
-From: Vadim Fedorenko <vadfed@meta.com>
-To: Andrew Lunn <andrew@lunn.ch>, Michael Chan <michael.chan@broadcom.com>,
-        Pavan Chebbi <pavan.chebbi@broadcom.com>,
-        Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>,
-        <intel-wired-lan@lists.osuosl.org>,
-        Donald
- Hunter <donald.hunter@gmail.com>,
-        Carolina Jubran <cjubran@nvidia.com>,
-        Jakub
- Kicinski <kuba@kernel.org>
-CC: Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-        <netdev@vger.kernel.org>, Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Subject: [RFC PATCH v2] ethtool: add FEC bins histogramm report
-Date: Thu, 31 Jul 2025 16:10:19 -0700
-Message-ID: <20250731231019.1809172-1-vadfed@meta.com>
-X-Mailer: git-send-email 2.47.3
+	s=arc-20240116; t=1754005083; c=relaxed/simple;
+	bh=f6qUX6gGho971LALBNjFf8VqlKQhpBsP6YCT1TMXfg0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SIYzGV+lrWVMMDqnVJF6hqFHTOHHJNZzbbbW06eF15MKdISmGM+WZ5P67GMxI5hLTRZQJDIcx9QT6f/Tt6eT+z0GSzGQksgSd2xf8nqLBg4mZoa60/k+vYF2HPYbIFJrgqAKPqlZyLIFV2KJ1nllUCrYwB8LI63XiSU9REVA1DM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=utqVJN6C; arc=none smtp.client-ip=209.85.215.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-b3f7404710aso1342030a12.0
+        for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 16:38:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1754005081; x=1754609881; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CGJHRsg5iCjQoTSgwUklPXzEBYJzmQNlQF6qaBtA8NE=;
+        b=utqVJN6CGmDyw/nRBnDsno2DQ1sossv5Vq675xHC2mo1uV53fwgWLsz2+ODVT1nW8P
+         oVpDE0RSBQicxoMuyZDT68mIJVPlMrlVPhw0tXJK/Gz84qn5eCn5TfVRBWVF8Dc6SX3V
+         yLz797DRNP+kioQMCmMC8GvLjD8ERAztlhu/mDKtue/g8CITjLPetJM37OcMu6r6XIaV
+         V+x8S4Bd2519bU78Dpdr4//08EuMOimB1WAHmWPFcd1SdqKQjxoH+t0TLDpga4xclUq2
+         6c6h5r+PtNFj4yBiucMA+1xx2B/urQtzTp/WpSCt3wN1/kfGjD1tzjZazSf0w63/nGYD
+         ZjCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754005081; x=1754609881;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CGJHRsg5iCjQoTSgwUklPXzEBYJzmQNlQF6qaBtA8NE=;
+        b=jgoCoKE+CYGpZI86kGfKgMWyG+PLtOPOZ1/31kg/24aZiudc30Fhz6QN4JvDgBO16G
+         cy+T1ffx0OnQO7KGJ1/C9HtMsKMh0gmVYH5jV55UZi8hyvpJmfnwDOPkxwgO/UBXt9Zx
+         J1cjRI1hFrPH9WY5cqfnZsPmgeSc9s7NPPt4nRioVZaZNrObxEv8grJdGOlZDQyCrMhg
+         9KtwkdKdm5FHVuQdEztbmV5fftrxSUpUwOccE/Y6wQCFdlBsaHz9T9ZN1lbDfcBMAo6m
+         M/Gl5HNGXahzrJuP/l2WRvylQYcRo8r5lQiAQFSH2lC8lvdHOErxEhcch3wEvleoghWT
+         /llg==
+X-Forwarded-Encrypted: i=1; AJvYcCUkDFn/hp0/pf7ttcqFkvdSXZbXzSUOTig6ZjjuF1hh2WQnTFOzpdxfoI3U19JvKdJTw6/nreI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw9C6hwMUNWbLji/pKsJVksR5U0Z630ZD+IryAWM3gDYXSnkt3X
+	1rw6FfyxHs/1kr8y4fPMbsDoLAIHLzHC8mPnk30IJnRyPFgai4pfh8BsRyJ6VGI9y2bQFYmRJ1v
+	xZZ8UT560jw8+lwIr/fg2yLO1TYsHNjyQw47e6OCr
+X-Gm-Gg: ASbGnctAfddGzoY5yuAJAWCGHMBYabP2J4s2zgwdOvEVuRz0i6ekSwst2r1EAPqCokE
+	EKcoNou/mtO9FXbfBH6IeqtxWVtsgVuTH4gANlx6TEKVKYnG/QK0wFxjoz6X73fMsIOcWKi5yhc
+	O3cWz5IAcp1D8QXQltfVd49PHghAwQMoWn/eKkMvMJN/JRkn/TtR9H82e7WFcz8h7Vw5DK2ZY3K
+	nJDZNIOqx7UDraNCT558ROBYCJaR2b3zmb2xg==
+X-Google-Smtp-Source: AGHT+IH3+rIwn54Da+ICd4tBOgXwOPHz3yPdEo3e4muMjMz3VkS8jC3tBS6JachPLqAkDX8B7TTY0RFSnjFHVKtvw6Q=
+X-Received: by 2002:a17:90a:d404:b0:31e:3d06:739c with SMTP id
+ 98e67ed59e1d1-31f5de85bbbmr12557172a91.31.1754005080821; Thu, 31 Jul 2025
+ 16:38:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=MvRS63ae c=1 sm=1 tr=0 ts=688bf7ef cx=c_pps a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17 a=Wb1JkmetP80A:10 a=knScvirIuHnn4LIlH3kA:9
-X-Proofpoint-GUID: -xF1ZrNJhDUDksnVv3m_j7vME3SVNhNy
-X-Proofpoint-ORIG-GUID: -xF1ZrNJhDUDksnVv3m_j7vME3SVNhNy
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzMxMDE3MCBTYWx0ZWRfXx+f7id3vLW5z XcrFk+6hDTVQpJXzW2hYBPDD259RxLN5ydEMMkiYzQKbxU3MgO8fudH3MCnnNU0ZQrLd+kIL7sN MOyI2cyW9FweHqP1AV93klNGBBsGPUe1Jlepd54KnB0iBB2xTryDJw/xb7Fjp6G7MAXIxJuGG0e
- Fwqcu+H1MMjS6LB/yGMmWNN9327jvQReoRTV/XEUun4SVy2TAoCMqTdAqdEvP+tN1tV0PSdSSRV cf1KoJcI7mBYumaMZ0MqT/+5eMz8qFzGdsEJe1UNRBkb5dCEDpIkNecjWCYfzqKwOmxzFSxxNcc CDV6TDToL9d1WEZGtLF2TPu+wHOsKAdMFcTQFpWe3B9U/FspwqLQXiCyDylgcsCSFsS8YNqhFFv
- q2+pKkbd86CwqL9l3WhF1KOUXPECI6EeLWKUCWapPCSpRVIOeXHoC29H4Zvo5DyddKm7L3Ud
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-07-31_04,2025-07-31_03,2025-03-28_01
+References: <20250731-no-abstract-v1-1-a4e6e23521a3@gmail.com>
+In-Reply-To: <20250731-no-abstract-v1-1-a4e6e23521a3@gmail.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Thu, 31 Jul 2025 16:37:49 -0700
+X-Gm-Features: Ac12FXw-uBDMi0rpYeSk4vgpVGnOIW87IPuefoui5ML0xX5hXHN7zoUervKq4fU
+Message-ID: <CAAVpQUCLoYa8YbaPSMHJcFQarz9hMo6-BQ1OJiF+GwcF5bb6hQ@mail.gmail.com>
+Subject: Re: [PATCH RFC net] af_unix: allow disabling connections to abstract sockets
+To: demiobenour@gmail.com
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-IEEE 802.3ck-2022 defines counters for FEC bins and 802.3df-2024
-clarifies it a bit further. Implement reporting interface through as
-addition to FEC stats available in ethtool.
+On Thu, Jul 31, 2025 at 4:03=E2=80=AFPM Demi Marie Obenour via B4 Relay
+<devnull+demiobenour.gmail.com@kernel.org> wrote:
+>
+> From: Demi Marie Obenour <demiobenour@gmail.com>
+>
+> Abstract sockets have been a security risk in the past.  Since they
+> aren't associated with filesystem paths, they bypass all filesystem
+> access controls.  This means that they can allow file descriptors to be
+> passed out of sandboxes that do not allow connecting to named sockets.
 
-Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
----
+I just thought that what's you need is unshare(CLONE_NEWNET)
 
-With this RFC I would like to get early feedback from the community
-about implementing FEC histogram statistics while we are waiting for
-some vendors to actually implement it in their drivers. I implemented
-the simplest solution in netdevsim driver to show how API looks like.
-The example query is the same as usual FEC statistics while the answer
-is a bit more verbose:
+and started reading this...
+https://labs.snyk.io/resources/nixos-deep-dive/
 
-[vmuser@archvm9 linux]$ ./tools/net/ynl/pyynl/cli.py --spec Documentation/netlink/specs/ethtool.yaml --do fec-get --json '{"header":{"dev-index": 10, "flags": 4}}'
-{'auto': 0,
- 'header': {'dev-index': 10, 'dev-name': 'eni10np1'},
- 'modes': {'bits': {}, 'nomask': True, 'size': 121},
- 'stats': {'corr-bits': [],
-           'corrected': [123],
-           'hist': [{'bin-high': 0,
-                     'bin-low': 0,
-                     'bin-val': 345,
-                     'bin-val-per-lane': [125, 120, 100, 100]},
-                    {'bin-high': 3, 'bin-low': 1, 'bin-val': 12},
-                    {'bin-high': 7, 'bin-low': 4, 'bin-val': 2}],
-           'uncorr': [4]}}
+and stopped reading here.
 
-RFC v2:
-- adjust yaml spec to avoid nesting histogram attributes and use
-  flexible types
-- add support for per-lane histogram together with total values
-- remove sentinel (-1, -1) and use (0, 0) as common array break.
-  bin (0, 0) is still possible but only as a first element of
-  ranges array
----
- Documentation/netlink/specs/ethtool.yaml      | 24 +++++++++
- Documentation/networking/ethtool-netlink.rst  |  5 ++
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |  3 +-
- .../ethernet/fungible/funeth/funeth_ethtool.c |  3 +-
- .../ethernet/hisilicon/hns3/hns3_ethtool.c    |  3 +-
- drivers/net/ethernet/intel/ice/ice_ethtool.c  |  3 +-
- .../marvell/octeontx2/nic/otx2_ethtool.c      |  3 +-
- .../ethernet/mellanox/mlx5/core/en_ethtool.c  |  3 +-
- drivers/net/ethernet/sfc/ethtool.c            |  3 +-
- drivers/net/ethernet/sfc/siena/ethtool.c      |  3 +-
- drivers/net/netdevsim/ethtool.c               | 15 +++++-
- include/linux/ethtool.h                       | 16 +++++-
- .../uapi/linux/ethtool_netlink_generated.h    |  4 ++
- net/ethtool/fec.c                             | 53 ++++++++++++++++++-
- 14 files changed, 129 insertions(+), 12 deletions(-)
+---8<---
+Nix builds offer a second, slightly less restrictive type of sandbox
+for use in =E2=80=98Fixed output derivations=E2=80=99. These build types ar=
+e expected
+to retrieve files from the internet (for example, cloning a git repository
+for later building); as such, they are not isolated in a network namespace
+and are instead in the main network namespace ...
+---8<---
 
-diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
-index 1063d5d32fea2..69779b51f1dfd 100644
---- a/Documentation/netlink/specs/ethtool.yaml
-+++ b/Documentation/netlink/specs/ethtool.yaml
-@@ -1239,6 +1239,30 @@ attribute-sets:
-         name: corr-bits
-         type: binary
-         sub-type: u64
-+      -
-+        name: hist
-+        type: nest
-+        multi-attr: True
-+        nested-attributes: fec-hist
-+      -
-+        name: fec-hist-bin-low
-+        type: uint
-+      -
-+        name: fec-hist-bin-high
-+        type: uint
-+      -
-+        name: fec-hist-bin-val
-+        type: uint
-+  -
-+    name: fec-hist
-+    subset-of: fec-stat
-+    attributes:
-+      -
-+        name: fec-hist-bin-low
-+      -
-+        name: fec-hist-bin-high
-+      -
-+        name: fec-hist-bin-val
-   -
-     name: fec
-     attr-cnt-name: __ethtool-a-fec-cnt
-diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
-index ab20c644af248..b270886c5f5d5 100644
---- a/Documentation/networking/ethtool-netlink.rst
-+++ b/Documentation/networking/ethtool-netlink.rst
-@@ -1541,6 +1541,11 @@ Drivers fill in the statistics in the following structure:
- .. kernel-doc:: include/linux/ethtool.h
-     :identifiers: ethtool_fec_stats
- 
-+Statistics may have FEC bins histogram attribute ``ETHTOOL_A_FEC_STAT_HIST``
-+as defined in IEEE 802.3ck-2022 and 802.3df-2024. Nested attributes will have
-+the range of FEC errors in the bin (inclusive) and the amount of error events
-+in the bin.
-+
- FEC_SET
- =======
- 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-index 1b37612b1c01f..ff8c0977a1f4a 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-@@ -3185,7 +3185,8 @@ static int bnxt_get_fecparam(struct net_device *dev,
- }
- 
- static void bnxt_get_fec_stats(struct net_device *dev,
--			       struct ethtool_fec_stats *fec_stats)
-+			       struct ethtool_fec_stats *fec_stats,
-+			       const struct ethtool_fec_hist_range **ranges)
- {
- 	struct bnxt *bp = netdev_priv(dev);
- 	u64 *rx;
-diff --git a/drivers/net/ethernet/fungible/funeth/funeth_ethtool.c b/drivers/net/ethernet/fungible/funeth/funeth_ethtool.c
-index ba83dbf4ed222..42027ce2b013d 100644
---- a/drivers/net/ethernet/fungible/funeth/funeth_ethtool.c
-+++ b/drivers/net/ethernet/fungible/funeth/funeth_ethtool.c
-@@ -930,7 +930,8 @@ static void fun_get_rmon_stats(struct net_device *netdev,
- }
- 
- static void fun_get_fec_stats(struct net_device *netdev,
--			      struct ethtool_fec_stats *stats)
-+			      struct ethtool_fec_stats *stats,
-+			      const struct ethtool_fec_hist_range **ranges)
- {
- 	const struct funeth_priv *fp = netdev_priv(netdev);
- 
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c b/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
-index d5454e126c856..c5af42706c179 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
-@@ -1659,7 +1659,8 @@ static void hns3_set_msglevel(struct net_device *netdev, u32 msg_level)
- }
- 
- static void hns3_get_fec_stats(struct net_device *netdev,
--			       struct ethtool_fec_stats *fec_stats)
-+			       struct ethtool_fec_stats *fec_stats,
-+			       const struct ethtool_fec_hist_range **ranges)
- {
- 	struct hnae3_handle *handle = hns3_get_handle(netdev);
- 	struct hnae3_ae_dev *ae_dev = hns3_get_ae_dev(handle);
-diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-index 55e0f2c6af9e5..321704c53a0c2 100644
---- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-@@ -4623,7 +4623,8 @@ static int ice_get_port_fec_stats(struct ice_hw *hw, u16 pcs_quad, u16 pcs_port,
-  *
-  */
- static void ice_get_fec_stats(struct net_device *netdev,
--			      struct ethtool_fec_stats *fec_stats)
-+			      struct ethtool_fec_stats *fec_stats,
-+			      const struct ethtool_fec_hist_range **ranges)
- {
- 	struct ice_netdev_priv *np = netdev_priv(netdev);
- 	struct ice_port_topology port_topology;
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
-index 998c734ff8399..7c6643aa24bfa 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
-@@ -1283,7 +1283,8 @@ static int otx2_set_link_ksettings(struct net_device *netdev,
- }
- 
- static void otx2_get_fec_stats(struct net_device *netdev,
--			       struct ethtool_fec_stats *fec_stats)
-+			       struct ethtool_fec_stats *fec_stats,
-+			       const struct ethtool_fec_hist_range **ranges)
- {
- 	struct otx2_nic *pfvf = netdev_priv(netdev);
- 	struct cgx_fw_data *rsp;
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
-index d507366d773e1..9ad43b40d4ca5 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
-@@ -1927,7 +1927,8 @@ static int mlx5e_set_wol(struct net_device *netdev, struct ethtool_wolinfo *wol)
- }
- 
- static void mlx5e_get_fec_stats(struct net_device *netdev,
--				struct ethtool_fec_stats *fec_stats)
-+				struct ethtool_fec_stats *fec_stats,
-+				const struct ethtool_fec_hist_range **ranges)
- {
- 	struct mlx5e_priv *priv = netdev_priv(netdev);
- 
-diff --git a/drivers/net/ethernet/sfc/ethtool.c b/drivers/net/ethernet/sfc/ethtool.c
-index 23c6a7df78d03..20de19d6a4d70 100644
---- a/drivers/net/ethernet/sfc/ethtool.c
-+++ b/drivers/net/ethernet/sfc/ethtool.c
-@@ -217,7 +217,8 @@ static int efx_ethtool_set_wol(struct net_device *net_dev,
- }
- 
- static void efx_ethtool_get_fec_stats(struct net_device *net_dev,
--				      struct ethtool_fec_stats *fec_stats)
-+				      struct ethtool_fec_stats *fec_stats,
-+				      const struct ethtool_fec_hist_range **ranges)
- {
- 	struct efx_nic *efx = efx_netdev_priv(net_dev);
- 
-diff --git a/drivers/net/ethernet/sfc/siena/ethtool.c b/drivers/net/ethernet/sfc/siena/ethtool.c
-index 994909789bfea..b98271c546738 100644
---- a/drivers/net/ethernet/sfc/siena/ethtool.c
-+++ b/drivers/net/ethernet/sfc/siena/ethtool.c
-@@ -217,7 +217,8 @@ static int efx_ethtool_set_wol(struct net_device *net_dev,
- }
- 
- static void efx_ethtool_get_fec_stats(struct net_device *net_dev,
--				      struct ethtool_fec_stats *fec_stats)
-+				      struct ethtool_fec_stats *fec_stats,
-+				      const struct ethtool_fec_hist_range **ranges)
- {
- 	struct efx_nic *efx = netdev_priv(net_dev);
- 
-diff --git a/drivers/net/netdevsim/ethtool.c b/drivers/net/netdevsim/ethtool.c
-index f631d90c428ac..7257de9ea2f44 100644
---- a/drivers/net/netdevsim/ethtool.c
-+++ b/drivers/net/netdevsim/ethtool.c
-@@ -164,12 +164,25 @@ nsim_set_fecparam(struct net_device *dev, struct ethtool_fecparam *fecparam)
- 	ns->ethtool.fec.active_fec = 1 << (fls(fec) - 1);
- 	return 0;
- }
-+static const struct ethtool_fec_hist_range netdevsim_fec_ranges[] = {
-+	{  0,  0},
-+	{  1,  3},
-+	{  4,  7},
-+	{ -1, -1}
-+};
- 
- static void
--nsim_get_fec_stats(struct net_device *dev, struct ethtool_fec_stats *fec_stats)
-+nsim_get_fec_stats(struct net_device *dev, struct ethtool_fec_stats *fec_stats,
-+		   const struct ethtool_fec_hist_range **ranges)
- {
-+	*ranges = netdevsim_fec_ranges;
-+
- 	fec_stats->corrected_blocks.total = 123;
- 	fec_stats->uncorrectable_blocks.total = 4;
-+
-+	fec_stats->hist[0] = 345;
-+	fec_stats->hist[1] = 12;
-+	fec_stats->hist[2] = 2;
- }
- 
- static int nsim_get_ts_info(struct net_device *dev,
-diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
-index de5bd76a400ca..99ba50dd2cc22 100644
---- a/include/linux/ethtool.h
-+++ b/include/linux/ethtool.h
-@@ -492,6 +492,18 @@ struct ethtool_pause_stats {
- };
- 
- #define ETHTOOL_MAX_LANES	8
-+#define ETHTOOL_FEC_HIST_MAX	18
-+/**
-+ * struct ethtool_fec_hist_range - error bits range for FEC bins histogram
-+ * statistics
-+ * sentinel value of { -1, -1 } is used as marker for end of bins array
-+ * @low: low bound of the bin (inclusive)
-+ * @high: high bound of the bin (inclusive)
-+ */
-+struct ethtool_fec_hist_range {
-+	s16 low;
-+	s16 high;
-+};
- 
- /**
-  * struct ethtool_fec_stats - statistics for IEEE 802.3 FEC
-@@ -524,6 +536,7 @@ struct ethtool_fec_stats {
- 		u64 total;
- 		u64 lanes[ETHTOOL_MAX_LANES];
- 	} corrected_blocks, uncorrectable_blocks, corrected_bits;
-+	u64 hist[ETHTOOL_FEC_HIST_MAX];
- };
- 
- /**
-@@ -1212,7 +1225,8 @@ struct ethtool_ops {
- 	int	(*set_link_ksettings)(struct net_device *,
- 				      const struct ethtool_link_ksettings *);
- 	void	(*get_fec_stats)(struct net_device *dev,
--				 struct ethtool_fec_stats *fec_stats);
-+				 struct ethtool_fec_stats *fec_stats,
-+				 const struct ethtool_fec_hist_range **ranges);
- 	int	(*get_fecparam)(struct net_device *,
- 				      struct ethtool_fecparam *);
- 	int	(*set_fecparam)(struct net_device *,
-diff --git a/include/uapi/linux/ethtool_netlink_generated.h b/include/uapi/linux/ethtool_netlink_generated.h
-index e3b8813465d73..f9babbd2e76f9 100644
---- a/include/uapi/linux/ethtool_netlink_generated.h
-+++ b/include/uapi/linux/ethtool_netlink_generated.h
-@@ -567,6 +567,10 @@ enum {
- 	ETHTOOL_A_FEC_STAT_CORRECTED,
- 	ETHTOOL_A_FEC_STAT_UNCORR,
- 	ETHTOOL_A_FEC_STAT_CORR_BITS,
-+	ETHTOOL_A_FEC_STAT_HIST,
-+	ETHTOOL_A_FEC_STAT_FEC_HIST_BIN_LOW,
-+	ETHTOOL_A_FEC_STAT_FEC_HIST_BIN_HIGH,
-+	ETHTOOL_A_FEC_STAT_FEC_HIST_BIN_VAL,
- 
- 	__ETHTOOL_A_FEC_STAT_CNT,
- 	ETHTOOL_A_FEC_STAT_MAX = (__ETHTOOL_A_FEC_STAT_CNT - 1)
-diff --git a/net/ethtool/fec.c b/net/ethtool/fec.c
-index e7d3f2c352a34..cb930eba780c2 100644
---- a/net/ethtool/fec.c
-+++ b/net/ethtool/fec.c
-@@ -17,6 +17,8 @@ struct fec_reply_data {
- 		u64 stats[1 + ETHTOOL_MAX_LANES];
- 		u8 cnt;
- 	} corr, uncorr, corr_bits;
-+	u64 hist[ETHTOOL_FEC_HIST_MAX];
-+	const struct ethtool_fec_hist_range *fec_ranges;
- };
- 
- #define FEC_REPDATA(__reply_base) \
-@@ -113,11 +115,13 @@ static int fec_prepare_data(const struct ethnl_req_info *req_base,
- 		struct ethtool_fec_stats stats;
- 
- 		ethtool_stats_init((u64 *)&stats, sizeof(stats) / 8);
--		dev->ethtool_ops->get_fec_stats(dev, &stats);
-+		dev->ethtool_ops->get_fec_stats(dev, &stats, &data->fec_ranges);
- 
- 		fec_stats_recalc(&data->corr, &stats.corrected_blocks);
- 		fec_stats_recalc(&data->uncorr, &stats.uncorrectable_blocks);
- 		fec_stats_recalc(&data->corr_bits, &stats.corrected_bits);
-+		if (data->fec_ranges)
-+			memcpy(data->hist, stats.hist, sizeof(stats.hist));
- 	}
- 
- 	WARN_ON_ONCE(fec.reserved);
-@@ -157,13 +161,55 @@ static int fec_reply_size(const struct ethnl_req_info *req_base,
- 	len += nla_total_size(sizeof(u8)) +	/* _FEC_AUTO */
- 	       nla_total_size(sizeof(u32));	/* _FEC_ACTIVE */
- 
--	if (req_base->flags & ETHTOOL_FLAG_STATS)
-+	if (req_base->flags & ETHTOOL_FLAG_STATS) {
- 		len += 3 * nla_total_size_64bit(sizeof(u64) *
- 						(1 + ETHTOOL_MAX_LANES));
-+		/* add FEC bins information */
-+		len += (nla_total_size(0) +  /* _A_FEC_HIST */
-+			nla_total_size(4) +  /* _A_FEC_HIST_BIN_LOW */
-+			nla_total_size(4) +  /* _A_FEC_HIST_BIN_HI */
-+			nla_total_size(8)) * /* _A_FEC_HIST_BIN_VAL */
-+			ETHTOOL_FEC_HIST_MAX;
-+	}
- 
- 	return len;
- }
- 
-+static int fec_put_hist(struct sk_buff *skb, const u64 *hist,
-+			const struct ethtool_fec_hist_range *ranges)
-+{
-+	struct nlattr *nest;
-+	int i;
-+
-+	if (!ranges)
-+		return 0;
-+
-+	for (i = 0; i < ETHTOOL_FEC_HIST_MAX; i++) {
-+		if (ranges[i].low == -1 && ranges[i].high == -1)
-+			break;
-+
-+		nest = nla_nest_start(skb, ETHTOOL_A_FEC_STAT_HIST);
-+		if (!nest)
-+			return -EMSGSIZE;
-+
-+		if (nla_put_uint(skb, ETHTOOL_A_FEC_STAT_FEC_HIST_BIN_LOW,
-+				 ranges[i].low) ||
-+		    nla_put_uint(skb, ETHTOOL_A_FEC_STAT_FEC_HIST_BIN_HIGH,
-+				 ranges[i].high) ||
-+		    nla_put_uint(skb, ETHTOOL_A_FEC_STAT_FEC_HIST_BIN_VAL,
-+			         hist[i]))
-+			goto err_cancel_hist;
-+
-+		nla_nest_end(skb, nest);
-+	}
-+
-+	return 0;
-+
-+err_cancel_hist:
-+	nla_nest_cancel(skb, nest);
-+	return -EMSGSIZE;
-+}
-+
- static int fec_put_stats(struct sk_buff *skb, const struct fec_reply_data *data)
- {
- 	struct nlattr *nest;
-@@ -183,6 +229,9 @@ static int fec_put_stats(struct sk_buff *skb, const struct fec_reply_data *data)
- 			  data->corr_bits.stats, ETHTOOL_A_FEC_STAT_PAD))
- 		goto err_cancel;
- 
-+	if (fec_put_hist(skb, data->hist, data->fec_ranges))
-+		goto err_cancel;
-+
- 	nla_nest_end(skb, nest);
- 	return 0;
- 
--- 
-2.47.3
+The 2nd thought is you just need CLONE_NEWNET and proper
+setup to connect two netns.
 
+
+> On systems using the Nix daemon, this allowed privilege escalation to
+> root, and fixing the bug required Nix to use a complete user-mode
+> network stack.  Furthermore, anyone can bind to any abstract socket
+> path, so anyone connecting to an abstract socket has no idea who they
+> are connecting to.
+>
+> This allows disabling the security hole by preventing all connections to
+> abstract sockets.  For compatibility, it is still possible to bind to
+> abstract socket paths, but such sockets will never receive any
+> connections or datagrams.
+>
+> Signed-off-by: Demi Marie Obenour <demiobenour@gmail.com>
+> ---
+>  net/unix/Kconfig   | 12 ++++++++++++
+>  net/unix/af_unix.c | 18 +++++++++++++-----
+>  2 files changed, 25 insertions(+), 5 deletions(-)
+>
+> diff --git a/net/unix/Kconfig b/net/unix/Kconfig
+> index 6f1783c1659b81c3c3c89cb7634a9ce780144f26..c34f222f21b097ce4a735ce02=
+d8ce11fc71bde19 100644
+> --- a/net/unix/Kconfig
+> +++ b/net/unix/Kconfig
+> @@ -16,6 +16,18 @@ config UNIX
+>
+>           Say Y unless you know what you are doing.
+>
+> +config UNIX_ABSTRACT
+> +       bool "UNIX: abstract sockets"
+> +       depends on UNIX
+> +       default y
+> +       help
+> +         Support for "abstract" sockets (those not bound to a path).
+> +         These have been used in the past, but they can also represent
+> +         a security risk because anyone can bind to any abstract
+> +         socket.  If you disable this option, programs can still bind
+> +         to abstract sockets, but any attempt to connect to one fails
+> +         with -ECONNREFUSED.
+> +
+>  config AF_UNIX_OOB
+>         bool "UNIX: out-of-bound messages"
+>         depends on UNIX
+> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+> index 52b155123985a18632fc12dc986150e38f2fee70..81d55849dac58e4e68c28ed03=
+a9bc978777cfe4f 100644
+> --- a/net/unix/af_unix.c
+> +++ b/net/unix/af_unix.c
+> @@ -332,7 +332,8 @@ static inline void unix_release_addr(struct unix_addr=
+ess *addr)
+>   *             - if started by zero, it is abstract name.
+>   */
+>
+> -static int unix_validate_addr(struct sockaddr_un *sunaddr, int addr_len)
+> +static int unix_validate_addr(struct sockaddr_un *sunaddr, int addr_len,
+> +                             bool bind)
+>  {
+>         if (addr_len <=3D offsetof(struct sockaddr_un, sun_path) ||
+>             addr_len > sizeof(*sunaddr))
+> @@ -341,6 +342,9 @@ static int unix_validate_addr(struct sockaddr_un *sun=
+addr, int addr_len)
+>         if (sunaddr->sun_family !=3D AF_UNIX)
+>                 return -EINVAL;
+>
+> +       if (!bind && !IS_ENABLED(CONFIG_UNIX_ABSTRACT) && !sunaddr->sun_p=
+ath[0])
+> +               return -ECONNREFUSED; /* pretend nobody is listening */
+> +
+>         return 0;
+>  }
+>
+> @@ -1253,6 +1257,8 @@ static struct sock *unix_find_other(struct net *net=
+,
+>
+>         if (sunaddr->sun_path[0])
+>                 sk =3D unix_find_bsd(sunaddr, addr_len, type, flags);
+> +       else if (!IS_ENABLED(CONFIG_UNIX_ABSTRACT))
+> +               sk =3D ERR_PTR(-EPERM);
+>         else
+>                 sk =3D unix_find_abstract(net, sunaddr, addr_len, type);
+>
+> @@ -1444,7 +1450,7 @@ static int unix_bind(struct socket *sock, struct so=
+ckaddr *uaddr, int addr_len)
+>             sunaddr->sun_family =3D=3D AF_UNIX)
+>                 return unix_autobind(sk);
+>
+> -       err =3D unix_validate_addr(sunaddr, addr_len);
+> +       err =3D unix_validate_addr(sunaddr, addr_len, true);
+>         if (err)
+>                 return err;
+>
+> @@ -1493,7 +1499,7 @@ static int unix_dgram_connect(struct socket *sock, =
+struct sockaddr *addr,
+>                 goto out;
+>
+>         if (addr->sa_family !=3D AF_UNSPEC) {
+> -               err =3D unix_validate_addr(sunaddr, alen);
+> +               err =3D unix_validate_addr(sunaddr, alen, false);
+>                 if (err)
+>                         goto out;
+>
+> @@ -1612,7 +1618,7 @@ static int unix_stream_connect(struct socket *sock,=
+ struct sockaddr *uaddr,
+>         long timeo;
+>         int err;
+>
+> -       err =3D unix_validate_addr(sunaddr, addr_len);
+> +       err =3D unix_validate_addr(sunaddr, addr_len, false);
+>         if (err)
+>                 goto out;
+>
+> @@ -2048,7 +2054,9 @@ static int unix_dgram_sendmsg(struct socket *sock, =
+struct msghdr *msg,
+>         }
+>
+>         if (msg->msg_namelen) {
+> -               err =3D unix_validate_addr(msg->msg_name, msg->msg_namele=
+n);
+> +               err =3D unix_validate_addr(msg->msg_name,
+> +                                        msg->msg_namelen,
+> +                                        false);
+>                 if (err)
+>                         goto out;
+>
+>
+> ---
+> base-commit: 038d61fd642278bab63ee8ef722c50d10ab01e8f
+> change-id: 20250731-no-abstract-6672e8ad03e1
+>
+> Best regards,
+> --
+> Demi Marie Obenour <demiobenour@gmail.com>
+>
+>
 
