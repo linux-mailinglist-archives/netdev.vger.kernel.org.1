@@ -1,227 +1,183 @@
-Return-Path: <netdev+bounces-211233-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211234-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD7A5B174AE
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 18:07:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F0167B174C4
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 18:15:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3CD31162116
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 16:06:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 151C8165BE8
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 16:15:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FA0423BD0B;
-	Thu, 31 Jul 2025 16:05:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FB021FAC48;
+	Thu, 31 Jul 2025 16:15:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="a8lx5J5v";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="8Ucsu68e";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="a8lx5J5v";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="8Ucsu68e"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QtxQWSDa"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B30323ABB4
-	for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 16:05:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 480E917C224;
+	Thu, 31 Jul 2025 16:15:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753977938; cv=none; b=ozvyKBoq13xE+vGT900hTeOZwc2bK0J6lsyro4hdYcxrMXMUq8Oh36P+XUpDEN6q7qykJOsN7wVykspbntCnMhUif6Sc2nlG/l5tfjqmwGzlIs/+3U2KFqQa8vp+7epiVNVPb5frA+uuOoK9gyLhdOHJq+ZzwihjPtvYCZMXB48=
+	t=1753978548; cv=none; b=sQ0U5miiWrNPCN8v56Tlygd5IaUI8fGB/qB28SbXiFcsAu5093XaaCQ7VCCPJKpWf/aDyq6Licu7eliZR69i/pJYhwEVHeq3LpwLrAa9D5uXwGwC/hDf3PXoDIAmALy0K/QcHrvaGczU6O7Zq3AyWWijMS2seIaq9r+jSxEjHB0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753977938; c=relaxed/simple;
-	bh=LSPRFR1eYteQW3j8yDFR+JyXn/VCLGCrfTZ4v5IUzMk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Sh/NbewOjO2zICwrLNSIOeW1ZX4V40pEFhs7imDAFi+w8xgIBO5QNRxh6Vvkd+W5I+by5DjuA0l5xltXBD1zhe4Ig9yrp7qnHWaS7UVnXgrE0FjLq5FzmeLLODvKmG7e3CODrfeGqS7YnLIyXil5WI25Ij01jaH73g9WiFDWLcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=a8lx5J5v; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=8Ucsu68e; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=a8lx5J5v; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=8Ucsu68e; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 3903F21CFF;
-	Thu, 31 Jul 2025 16:05:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1753977934; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ls5gCUTjVBeUXhIwXzFVvEfqHedChX+/IDCkmstbyv8=;
-	b=a8lx5J5vx5bM2QH4EzJWlVNkWmu3SamghkittVIRlhEM+qP8UMKXf8aGJ56/iq+X/dD9Ky
-	z/U/52BmcsgGWYyeMjDhRDtNwEgrSpcteb/7U860YFiI7g1wr9mV7j4UfZB/iLHjrsnK16
-	Y349WrTJPiO07+hZwVg6KMaAEmn+sc4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1753977934;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ls5gCUTjVBeUXhIwXzFVvEfqHedChX+/IDCkmstbyv8=;
-	b=8Ucsu68etg4g0tUfbqRT4gXMvNg/h5ug70PtR3WnzAidrq8dWtcEedqA8tjrTK6ZIxGL4x
-	i0FCORpKEqQ4F0Ag==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1753977934; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ls5gCUTjVBeUXhIwXzFVvEfqHedChX+/IDCkmstbyv8=;
-	b=a8lx5J5vx5bM2QH4EzJWlVNkWmu3SamghkittVIRlhEM+qP8UMKXf8aGJ56/iq+X/dD9Ky
-	z/U/52BmcsgGWYyeMjDhRDtNwEgrSpcteb/7U860YFiI7g1wr9mV7j4UfZB/iLHjrsnK16
-	Y349WrTJPiO07+hZwVg6KMaAEmn+sc4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1753977934;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ls5gCUTjVBeUXhIwXzFVvEfqHedChX+/IDCkmstbyv8=;
-	b=8Ucsu68etg4g0tUfbqRT4gXMvNg/h5ug70PtR3WnzAidrq8dWtcEedqA8tjrTK6ZIxGL4x
-	i0FCORpKEqQ4F0Ag==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 9B3FF13A43;
-	Thu, 31 Jul 2025 16:05:33 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 4rwTJE2Ui2i9HwAAD6G6ig
-	(envelope-from <hare@suse.de>); Thu, 31 Jul 2025 16:05:33 +0000
-Message-ID: <9057206c-7173-4f1c-8ff7-ea5e2a29a66d@suse.de>
-Date: Thu, 31 Jul 2025 18:05:33 +0200
+	s=arc-20240116; t=1753978548; c=relaxed/simple;
+	bh=bwRgft/Pi/x7nBERkTEYw8jFv/Btln92ULhS/coUC5I=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Wy7FMAnsVFbNCc0p9VsNbxRL3FPEBB7TQGcKkL6WVtKTmCZC35EEhkg04Lc8Fxi83psGjzfQwBJFVgBiUl/KumY72shhBFNoA7Ui4+Qx+t8yh53JABQtVMx+4Kkpk5mmopM/nXsJFETOsfF/4+LPOr/WsPU2/vwa2pvoND8cd8w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QtxQWSDa; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-3b783d851e6so1214054f8f.0;
+        Thu, 31 Jul 2025 09:15:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753978544; x=1754583344; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cNuGj941i188n74Ov7/xemI3tg0BtOVcDcI4//xk2Xs=;
+        b=QtxQWSDaF17MY3NuUHdPLCJrhGwae2jRgoDMBWo6EvSPKl7FuvVLPzHNTKvnGzT35L
+         6sykxlhEEQQ8ynUMFvgss+cebxoOwtc8Ac5y4u8ZhFIMlq+0Dmjutz4NMTDfh9BV/SrU
+         MzMTVkCwROK/ao0tA9jQLszFemwP4tDYY2BT7jFzeyUcSiKRjyMKtq+IR2iKYuQMQj+C
+         s7N0TbVK8q/1oLVrgfAFgB90xJIXXu5HJUZi/TDm5pEtYWlcLhVE78ug+fiQNO01M237
+         dbSbR+uNWq3O0aRwpwbFiNzM20kYFMXjaHgndmcxwxNpwjFUb9CskK8WXvhjtwa9AROo
+         yoxw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753978544; x=1754583344;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cNuGj941i188n74Ov7/xemI3tg0BtOVcDcI4//xk2Xs=;
+        b=IHER6NVKOyl5BtkZHXiibf752a0luw196PTBo7x1godJp6RrKThIGvlNdM0YhuXAff
+         YjLD4Q40w7NzevodnEbZnoYJKHzZgX2jleIiK1V13F1z6Xg0Fr4t4VcaZEJLutU/Wzk3
+         IuKRfYMZmbjrSUzMMbg/vGVzCSSDp4gsJeZbwwc3EwGtaxPc4SSKus0Rf3JZUwJ375mz
+         dDDTm6JUaxEQm0rzWYIkt/GrLGdkeu+I0XV8Q5VlBIzLFI9HNqO0MPkDu2z5sNkMUH0X
+         /DeFmq0YaEpCi0zy9QPv8SAKWsHWqoGlCHoSPpxRzPHm2ffqhKtqGdyqrfq+gLAW6+VF
+         rIaw==
+X-Forwarded-Encrypted: i=1; AJvYcCU/8LjeIg+pIUKsGCRdvHzX7rTHwxTGDRiG/bLXBZtWWspCfHXxMFBJSNT7U8yB/8nHYRzjtD2igS+5k038@vger.kernel.org, AJvYcCU9NsJdysZO6A6aZP2IoQL4DDBvi7dAOt8+yuksLSccssT3ImCwfmFg2lQm6jWaC5xW0Y6HEvls@vger.kernel.org, AJvYcCWIzzlNBf9K7zAtr+2WY3+D3DuDKPUUUwFvwF34l3n4BsUqxq8mMOITBPFFoC+qOgNMPfg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz2Kmj/I/Sf0NR40KvkMq0PqN2uCAqU9/zIcZ8mSMjbl2bcDKiG
+	lJw3TN+eoNQA9FA2OJRXx0k8rMfkat6eVdTybGL0es4jfTIOCt9G9BydgMn47uFsJ/gSRjCWpOi
+	KxXBqRvDtPL0ItTNAkNKlzZ0uuwrTlq0=
+X-Gm-Gg: ASbGncsHcSKz70S7oJ00/rDA3sGv631QgAlGWuj/DX2MGV2wiOw8k9T11c92T5nnWqA
+	K4dcX8AaFI4Y+nZx2fkypjGOEnFbktB45p2UTr/b1hBIuhi5JfThyeFBmOyQv8Ix6E1Y5TZBwQt
+	8DiB4e6LaGqjxcsHiy9N0Z6RwrMKtQc+KP6pMLLJCqJW0Upr6nq8LHZaF/j7texOEahEXWWcaq3
+	cGIAdyu/x37nSnGgsQdAaQ=
+X-Google-Smtp-Source: AGHT+IH8gdCLh2rqCQDg7vR/GMyUKMJQzTDd+xZxIolJVnM0VwJH/SLLoNQAtJcDtj6AKFBMBGfwsru/gQZmmqcq2Rc=
+X-Received: by 2002:a05:6000:200b:b0:3b7:9617:c9d6 with SMTP id
+ ffacd0b85a97d-3b79617ccdbmr4582282f8f.45.1753978544146; Thu, 31 Jul 2025
+ 09:15:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/4] nvmet-tcp: fix handling of tls alerts
-To: Olga Kornievskaia <okorniev@redhat.com>
-Cc: chuck.lever@oracle.com, jlayton@kernel.org, trondmy@hammerspace.com,
- anna.schumaker@oracle.com, hch@lst.de, sagi@grimberg.me, kch@nvidia.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, linux-nfs@vger.kernel.org,
- linux-nvme@lists.infradead.org, netdev@vger.kernel.org,
- kernel-tls-handshake@lists.linux.dev, neil@brown.name, Dai.Ngo@oracle.com,
- tom@talpey.com, horms@kernel.org, kbusch@kernel.org
-References: <20250730200835.80605-1-okorniev@redhat.com>
- <20250730200835.80605-4-okorniev@redhat.com>
- <cdeb5e12-5c61-4a95-8e31-c56a3a90d6a3@suse.de>
- <CACSpFtCu+it5n2z=OXRARznR02aU4d3r2z7Sok6WzGt24C6-NQ@mail.gmail.com>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <CACSpFtCu+it5n2z=OXRARznR02aU4d3r2z7Sok6WzGt24C6-NQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-0.998];
-	MIME_GOOD(-0.10)[text/plain];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo]
-X-Spam-Flag: NO
-X-Spam-Score: -4.30
+References: <20250703121521.1874196-1-dongml2@chinatelecom.cn>
+ <20250703121521.1874196-3-dongml2@chinatelecom.cn> <CAADnVQKP1-gdmq1xkogFeRM6o3j2zf0Q8Atz=aCEkB0PkVx++A@mail.gmail.com>
+ <45f4d349-7b08-45d3-9bec-3ab75217f9b6@linux.dev> <3bccb986-bea1-4df0-a4fe-1e668498d5d5@linux.dev>
+ <CAADnVQ+Afov4E=9t=3M=zZmO9z4ZqT6imWD5xijDHshTf3J=RA@mail.gmail.com>
+ <20250716182414.GI4105545@noisy.programming.kicks-ass.net>
+ <CAADnVQ+5sEDKHdsJY5ZsfGDO_1SEhhQWHrt2SMBG5SYyQ+jt7w@mail.gmail.com> <CADxym3Za-zShEUyoVE7OoODKYXc1nghD63q2xv_wtHAyT2-Z-Q@mail.gmail.com>
+In-Reply-To: <CADxym3Za-zShEUyoVE7OoODKYXc1nghD63q2xv_wtHAyT2-Z-Q@mail.gmail.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Thu, 31 Jul 2025 09:15:32 -0700
+X-Gm-Features: Ac12FXyPiHGow21qP3zvHf88riIKA6sj8Kry8D13IKq3nkEMMNOVktmjiVoCzRk
+Message-ID: <CAADnVQ+XGYp=ORtA730u7WQKqSGGH6R4=9CtYOPP_uHuJrYAkQ@mail.gmail.com>
+Subject: Re: Inlining migrate_disable/enable. Was: [PATCH bpf-next v2 02/18]
+ x86,bpf: add bpf_global_caller for global trampoline
+To: Menglong Dong <menglong8.dong@gmail.com>
+Cc: Peter Zijlstra <peterz@infradead.org>, Menglong Dong <menglong.dong@linux.dev>, 
+	Steven Rostedt <rostedt@goodmis.org>, Jiri Olsa <jolsa@kernel.org>, bpf <bpf@vger.kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, 
+	LKML <linux-kernel@vger.kernel.org>, Network Development <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 7/31/25 17:29, Olga Kornievskaia wrote:
-> On Thu, Jul 31, 2025 at 2:10 AM Hannes Reinecke <hare@suse.de> wrote:
->>
->> On 7/30/25 22:08, Olga Kornievskaia wrote:
->>> Revert kvec msg iterator before trying to process a TLS alert
->>> when possible.
->>>
->>> In nvmet_tcp_try_recv_data(), it's assumed that no msg control
->>> message buffer is set prior to sock_recvmsg(). Hannes suggested
->>> that upon detecting that TLS control message is received log a
->>> message and error out. Left comments in the code for the future
->>> improvements.
->>>
->>> Fixes: a1c5dd8355b1 ("nvmet-tcp: control messages for recvmsg()")
->>> Suggested-by: Hannes Reinecke <hare@suse.de>
->>> Reviewed-by: Hannes Reinecky <hare@susu.de>
->>> Signed-off-by: Olga Kornievskaia <okorniev@redhat.com>
->>> ---
->>>    drivers/nvme/target/tcp.c | 30 +++++++++++++++++++-----------
->>>    1 file changed, 19 insertions(+), 11 deletions(-)
->>>
->>> diff --git a/drivers/nvme/target/tcp.c b/drivers/nvme/target/tcp.c
->>> index 688033b88d38..055e420d3f2e 100644
->>> --- a/drivers/nvme/target/tcp.c
->>> +++ b/drivers/nvme/target/tcp.c
->>> @@ -1161,6 +1161,7 @@ static int nvmet_tcp_try_recv_pdu(struct nvmet_tcp_queue *queue)
->>>        if (unlikely(len < 0))
->>>                return len;
->>>        if (queue->tls_pskid) {
->>> +             iov_iter_revert(&msg.msg_iter, len);
->>>                ret = nvmet_tcp_tls_record_ok(queue, &msg, cbuf);
->>>                if (ret < 0)
->>>                        return ret;
->>> @@ -1217,19 +1218,28 @@ static void nvmet_tcp_prep_recv_ddgst(struct nvmet_tcp_cmd *cmd)
->>>    static int nvmet_tcp_try_recv_data(struct nvmet_tcp_queue *queue)
->>>    {
->>>        struct nvmet_tcp_cmd  *cmd = queue->cmd;
->>> -     int len, ret;
->>> +     int len;
->>>
->>>        while (msg_data_left(&cmd->recv_msg)) {
->>> +             /* to detect that we received a TlS alert, we assumed that
->>> +              * cmg->recv_msg's control buffer is not setup. kTLS will
->>> +              * return an error when no control buffer is set and
->>> +              * non-tls-data payload is received.
->>> +              */
->>>                len = sock_recvmsg(cmd->queue->sock, &cmd->recv_msg,
->>>                        cmd->recv_msg.msg_flags);
->>> +             if (cmd->recv_msg.msg_flags & MSG_CTRUNC) {
->>> +                     if (len == 0 || len == -EIO) {
->>> +                             pr_err("queue %d: unhandled control message\n",
->>> +                                    queue->idx);
->>> +                             /* note that unconsumed TLS control message such
->>> +                              * as TLS alert is still on the socket.
->>> +                              */
->>
->> Hmm. Will it get cleared when we close the socket?
-> 
-> If the socket is closed then any data on that socket would be freed.
-> 
->> Or shouldn't we rather introduce proper cmsg handling?
-> 
-> That would be what I have originally proposed (I know that was on the
-> private list). But yes, we can setup a dedicated kvec to receive the
-> TLS control message once its been detected and then call
-> nvme_tcp_tls_record_ok().
-> 
-> Let me know if proper cmsg handling is what's desired for this patch.
-> 
->> (If we do, we'll need it to do on the host side, too)
-> 
-No, let's delegate that to a next step. My main concern is that
-data on the socket is freed upon closing (ie on reconnect).
-If that's the case we should leave it for now.
-There is talk to handle TLS new session ticket messages, which probably
-will require some evaluation of TLS messages and will most certainly
-require the updated TLS Alert handling.
+On Mon, Jul 28, 2025 at 2:20=E2=80=AFAM Menglong Dong <menglong8.dong@gmail=
+.com> wrote:
+>
+> On Thu, Jul 17, 2025 at 6:35=E2=80=AFAM Alexei Starovoitov
+> <alexei.starovoitov@gmail.com> wrote:
+> >
+> > On Wed, Jul 16, 2025 at 11:24=E2=80=AFAM Peter Zijlstra <peterz@infrade=
+ad.org> wrote:
+> > >
+> > > On Wed, Jul 16, 2025 at 09:56:11AM -0700, Alexei Starovoitov wrote:
+> > >
+> > > > Maybe Peter has better ideas ?
+> > >
+> > > Is it possible to express runqueues::nr_pinned as an alias?
+> > >
+> > > extern unsigned int __attribute__((alias("runqueues.nr_pinned"))) thi=
+s_nr_pinned;
+> > >
+> > > And use:
+> > >
+> > >         __this_cpu_inc(&this_nr_pinned);
+> > >
+> > >
+> > > This syntax doesn't actually seem to work; but can we construct
+> > > something like that?
+> >
+> > Yeah. Iant is right. It's a string and not a pointer dereference.
+> > It never worked.
+> >
+> > Few options:
+> >
+> > 1.
+> >  struct rq {
+> > +#ifdef CONFIG_SMP
+> > +       unsigned int            nr_pinned;
+> > +#endif
+> >         /* runqueue lock: */
+> >         raw_spinlock_t          __lock;
+> >
+> > @@ -1271,9 +1274,6 @@ struct rq {
+> >         struct cpuidle_state    *idle_state;
+> >  #endif
+> >
+> > -#ifdef CONFIG_SMP
+> > -       unsigned int            nr_pinned;
+> > -#endif
+> >
+> > but ugly...
+> >
+> > 2.
+> > static unsigned int nr_pinned_offset __ro_after_init __used;
+> > RUNTIME_CONST(nr_pinned_offset, nr_pinned_offset)
+> >
+> > overkill for what's needed
+> >
+> > 3.
+> > OFFSET(RQ_nr_pinned, rq, nr_pinned);
+> > then
+> > #include <generated/asm-offsets.h>
+> >
+> > imo the best.
+>
+> I had a try. The struct rq is not visible to asm-offsets.c, so we
+> can't define it in arch/xx/kernel/asm-offsets.c. Do you mean
+> to define a similar rq-offsets.c in kernel/sched/ ? It will be more
+> complex than the way 2, and I think the second way 2 is
+> easier :/
 
-Cheers,
+2 maybe easier, but it's an overkill.
+I still think asm-offset is cleaner.
+arch/xx shouldn't be used, of course, since this nr_pinned should
+be generic for all archs.
+We can do something similar to drivers/memory/emif-asm-offsets.c
+and do that within kernel/sched/.
+rq-offsets.c as you said.
+It will generate rq-offsets.h in a build dir that can be #include-d.
 
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+I thought about another alternative (as a derivative of 1):
+split nr_pinned from 'struct rq' into its own per-cpu variable,
+but I don't think that will work, since rq_has_pinned_tasks()
+doesn't always operate on this_rq().
+So the acceptable choices are realistically 1 and 3 and
+rq-offsets.c seems cleaner.
+Pls give it another try.
 
