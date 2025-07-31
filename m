@@ -1,113 +1,96 @@
-Return-Path: <netdev+bounces-211124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211126-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42EE8B16A9F
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 04:58:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83932B16BA9
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 07:45:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A775B18C3AF0
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 02:59:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82B114E84CC
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 05:45:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4A961B423D;
-	Thu, 31 Jul 2025 02:58:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AB4C198E81;
+	Thu, 31 Jul 2025 05:45:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qODRXZlu"
+	dkim=pass (2048-bit key) header.d=padl.com header.i=@padl.com header.b="lelaJpMI"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
+Received: from us.padl.com (us.padl.com [216.154.215.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E37DA15383A
-	for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 02:58:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8F311D63DD
+	for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 05:45:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.154.215.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753930734; cv=none; b=HTG1reZNzP7SoclpQ5KEYhgGPRNsLGyC4QO+dOhinQwPrDPLypZ7g060k6XLgSmkzd+o0duFz8LR+uyP1RIfbSftV2ZYlIkfXabhWacBFk1S2O29OkvuSrt3TT+ngr0pcMiEpErmWgL+fy22SJeDkxBurFjyoCj/TLAM+3sQy1w=
+	t=1753940736; cv=none; b=HjTD6K/VxdBQPZpV1ldDcbd+7jM/bSCv05spatw4/boUUjfLMHBvC5n2S/W29F40Vu18qY3fduhvMMS4sWXgQ2hq8cAuH1wE1DSc/hvaybfv6yQtDJrlCMrglP+HBXJT29X2hxCVRjk3R/a1HDFFo0dWCqdDnQY0fGcEchlRv4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753930734; c=relaxed/simple;
-	bh=hO4jQq8PLpE3srsD0rPnbC1MtEeo3jkBhYPUfq1jFi8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=oKwvekzmNHVzRrXPy2cgXxj7lxlG3bPDphTdqXIIM5c01tMbIwWwa6LvwjkthgFOsp2xBcSl9L80hstO/7aUG+4eegaworlolkV9Eay06TO+VIyH0dA/68L0Bpkfq+Oe+Rs55G98oAEcQ/QjeKe64g109YN60D+cpmah6c53Mf0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qODRXZlu; arc=none smtp.client-ip=91.218.175.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1753930720;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hO4jQq8PLpE3srsD0rPnbC1MtEeo3jkBhYPUfq1jFi8=;
-	b=qODRXZluoTdZwsqIuRfPB+EmJlGTteKL3nnL/Ucebe10AjPqn+1D455FmrTHJPFgnZI0Jh
-	JMNnJ6aM2zKV+49b9RReayHJAoHS8GgGkLFGaAFI3DdlOr+/X3+3i7whoAoR7V9v4nUV5l
-	Lb4LEniPT+7zzehE3Z3mfWCDC1JYkBE=
-From: Roman Gushchin <roman.gushchin@linux.dev>
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>,  Eric Dumazet
- <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Neal Cardwell
- <ncardwell@google.com>,  Paolo Abeni <pabeni@redhat.com>,  Willem de
- Bruijn <willemb@google.com>,  Matthieu Baerts <matttbe@kernel.org>,  Mat
- Martineau <martineau@kernel.org>,  Johannes Weiner <hannes@cmpxchg.org>,
-  Michal Hocko <mhocko@kernel.org>,  Shakeel Butt <shakeel.butt@linux.dev>,
-  Andrew Morton <akpm@linux-foundation.org>,  Simon Horman
- <horms@kernel.org>,  Geliang Tang <geliang@kernel.org>,  Muchun Song
- <muchun.song@linux.dev>,  Kuniyuki Iwashima <kuni1840@gmail.com>,
-  netdev@vger.kernel.org,  mptcp@lists.linux.dev,  cgroups@vger.kernel.org,
-  linux-mm@kvack.org
-Subject: Re: [PATCH v1 net-next 13/13] net-memcg: Allow decoupling memcg
- from global protocol memory accounting.
-In-Reply-To: <20250721203624.3807041-14-kuniyu@google.com> (Kuniyuki
-	Iwashima's message of "Mon, 21 Jul 2025 20:35:32 +0000")
-References: <20250721203624.3807041-1-kuniyu@google.com>
-	<20250721203624.3807041-14-kuniyu@google.com>
-Date: Wed, 30 Jul 2025 19:58:32 -0700
-Message-ID: <87pldhf4mf.fsf@linux.dev>
+	s=arc-20240116; t=1753940736; c=relaxed/simple;
+	bh=WgocSOUoxr1xtN/4x0z6AOnsdRZFvVxZpjZDb7Kw970=;
+	h=From:Content-Type:Mime-Version:Subject:Message-Id:Date:To; b=cg+zUPZtQueO9n5berNBeoTBgG9/gEy32JiyMUHHkhoFjGTxnX7d+VrN9eEIwI4NPMrqsXQ2WuYy/QorXrJMjJsOqQV+1qURisiJM0v2lcjMhceYbovjLIQJJNW+5C3EmLdsZRRU0uc0Dz89bRfre8s8LL5MzYcwbnDEVEiAyII=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=padl.com; spf=pass smtp.mailfrom=padl.com; dkim=pass (2048-bit key) header.d=padl.com header.i=@padl.com header.b=lelaJpMI; arc=none smtp.client-ip=216.154.215.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=padl.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=padl.com
+Received: from auth (localhost [127.0.0.1]) by us.padl.com (8.14.7/8.14.7) with ESMTP id 56V5ZvYB025982
+	(version=TLSv1/SSLv3 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO)
+	for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 06:35:59 +0100
+DKIM-Filter: OpenDKIM Filter v2.11.0 us.padl.com 56V5ZvYB025982
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=padl.com; s=default;
+	t=1753940160; bh=4t3YDexOIbx5+U9nHkTOd9N9pvBxEfdlQity+Ts6+E0=;
+	h=From:Subject:Date:To:From;
+	b=lelaJpMIPbVoAPOgfQnKpOpZAbEhII/7m3p4w+XzgEoerNo+DtgpUAEZujhYgz/IC
+	 m1+9U3O5WjRyDZpWkEWiTfCicxL6ycPh5u3z7pQ2bkisklQttgXoSxqdQ9fBPpeDe0
+	 iMzoNDZ1afGi7wIU7IwSHlQvyFJ8nGLN9tk37Vdf/qMorJS935pFotQKcds6QQjMKH
+	 HNGW/ACyc70eu5qmg3xN2lKJpP63sKnlennxn5S5Mlc3ZiGl8ktdpr1WwECq312ZMl
+	 gq3ThRYoJHWau1PAd/hs9WXe85qZgahdxmNUgJYrUmsQtHiVzTuBPTzYArS4/vnY+n
+	 hxyukQ1GEqnJg==
+From: Luke Howard <lukeh@padl.com>
+Content-Type: text/plain;
+	charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.600.51.1.1\))
+Subject: [PATCH net] net: dsa: validate source trunk against lags_len
+Message-Id: <DEC3889D-5C54-4648-B09F-44C7C69A1F91@padl.com>
+Date: Thu, 31 Jul 2025 15:35:34 +1000
+To: netdev@vger.kernel.org
+X-Mailer: Apple Mail (2.3826.600.51.1.1)
 
-Kuniyuki Iwashima <kuniyu@google.com> writes:
+A DSA frame with an invalid source trunk ID could cause an out-of-bounds =
+read
+access of dst->lags.
 
-> Some protocols (e.g., TCP, UDP) implement memory accounting for socket
-> buffers and charge memory to per-protocol global counters pointed to by
-> sk->sk_proto->memory_allocated.
->
-> When running under a non-root cgroup, this memory is also charged to the
-> memcg as sock in memory.stat.
->
-> Even when memory usage is controlled by memcg, sockets using such protocols
-> are still subject to global limits (e.g., /proc/sys/net/ipv4/tcp_mem).
->
-> This makes it difficult to accurately estimate and configure appropriate
-> global limits, especially in multi-tenant environments.
->
-> If all workloads were guaranteed to be controlled under memcg, the issue
-> could be worked around by setting tcp_mem[0~2] to UINT_MAX.
->
-> In reality, this assumption does not always hold, and a single workload
-> that opts out of memcg can consume memory up to the global limit,
-> becoming a noisy neighbour.
->
-> Let's decouple memcg from the global per-protocol memory accounting.
->
-> This simplifies memcg configuration while keeping the global limits
-> within a reasonable range.
+This patch adds a check to dsa_lag_by_id() to validate the LAG ID is not =
+zero,
+and is less than or equal to dst->lags_len. (The LAG ID is derived by =
+adding
+one to the source trunk ID.)
 
-I don't think it should be a memcg feature. In fact, it doesn't have
-much to do with cgroups at all (it's not hierarchical, it doesn't
-control the resource allocation, and in the end it controls an
-alternative to memory cgroups memory accounting system).
+Note: this is in the fast path for any frames within a trunk.
 
-Instead, it can be a per-process prctl option.
+Signed-off-by: Luke Howard <lukeh@padl.com>
+---
+ include/net/dsa.h | 3 +++
+ 1 file changed, 3 insertions(+)
 
-(Assuming the feature is really needed - I'm also curious why some
-processes have to be excluded from the memcg accounting - it sounds like
-generally a bad idea).
-
-Thanks
+diff --git a/include/net/dsa.h b/include/net/dsa.h
+index 2e148823c366c..67672c5ff22e5 100644
+--- a/include/net/dsa.h
++++ b/include/net/dsa.h
+@@ -180,6 +180,9 @@ struct dsa_switch_tree {
+ static inline struct dsa_lag *dsa_lag_by_id(struct dsa_switch_tree =
+*dst,
+ 					    unsigned int id)
+ {
++	if (unlikely(id =3D=3D 0 || id > dst->lags_len))
++		return NULL;
++
+ 	/* DSA LAG IDs are one-based, dst->lags is zero-based */
+ 	return dst->lags[id - 1];
+ }
+--=20
+2.43.0=
 
