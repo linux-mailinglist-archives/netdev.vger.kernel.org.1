@@ -1,189 +1,140 @@
-Return-Path: <netdev+bounces-211133-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211134-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA1D6B16D96
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 10:33:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C038CB16DC9
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 10:42:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E62E3B7820
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 08:33:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 366F6188F58C
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 08:43:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF03729CB41;
-	Thu, 31 Jul 2025 08:33:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB74029DB77;
+	Thu, 31 Jul 2025 08:42:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="PL+yU4sX"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="i/rxYP1f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93D923597E
-	for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 08:33:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A728729C35C;
+	Thu, 31 Jul 2025 08:42:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.98
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753950827; cv=none; b=ETNeUzG9pDW2yg6fjIAfzdNI1NjnzonxXlTrCwdhG7ssEdPY4YcPM5K7l/flcGZLwJDFcpQ7gSCJ3qpdvHZnXktA0H8obyI0/2TXNBxP7ojPTXm1dCZFwoIZAFnexDt1Ev8WkoyI6zz1lCU7fYB4uwjJmxyZ4AU76UdUiGOJ6pA=
+	t=1753951373; cv=none; b=C89z+ZzahjCm6tYzXgB6wCyet0Vib70RlGdkWxpsS01ZGUtxl02SDQVnj8fnNjD0yq78u4hVoPMCldt8DDEmykPM+OqPmOcdQZF2HDWNTkCP/8COXAh4wLpxHMGTEpd6Jsxm6dxekHSY8goGXMMEBJFgDRXe55ATBIpOOqzcMDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753950827; c=relaxed/simple;
-	bh=y/zXn2SImyimk9UNJuEfXeNDvLzXETyjaOSknrFWVFQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uw2D8wKrkxPxd3xexDE9haP1qk8HTiGCPoTIL6VHcTzTpK6oSEcMnuWonSdPvmsyeR+seJ45Ljw4CKOI/fxd1KTquIoIqDleaprEJH0IwWS7VnlusB8XWgs8UPuwG/xvgtqeS2Vixi3nqvOYd8up29MEDvcFw054Nk714zH26wU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev; spf=pass smtp.mailfrom=tuxon.dev; dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b=PL+yU4sX; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3b7920354f9so556252f8f.2
-        for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 01:33:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1753950824; x=1754555624; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=tGJP+XM2QRy3xZpyYzAjGI2yVY6aGwV1yQQa+Igvnt0=;
-        b=PL+yU4sXVHINZxJrvXHClWNZFCRoHSNT1rhS293TCjd/6DBV4LvtFpgvLreirKRC6N
-         kJ5tBEvT8fSWGdTMttkkWJmK/ay6ju5M0GpdkdgqM0G9MKC/s8aAFoLkYFgwhaqdu3op
-         Dm5jE48Khx+jQHTHXA9SvxS9bMkdq4jATUZjbh40mwkDeybWtwysLjDQ1tvZC6HhljIF
-         /d5sQKILbgG2z2hRqOphYYzlxAWtj/9Pv2dy0cR/iXgNAIKOPfyH3AQhC+d2QcftOBjZ
-         iADQtGYQnggzSPkaOYoxW3h5Qoq8kyvcYnrIh1qmz67LTpNyi1OIjC9kgmvaOpRNf5G2
-         DfdA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753950824; x=1754555624;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tGJP+XM2QRy3xZpyYzAjGI2yVY6aGwV1yQQa+Igvnt0=;
-        b=aHhbTWdd03y7rTkI4NuCXGPspB9jPMabX0PyleOMZ8zbDD5oF0BmEkHHqj1V+cya7y
-         qMBrFNBpCUj6+w8lmsnf2vVozSkrxGO4llTY7Cza5zf9Bsi9z7w4vM+W/jCtt2bAXe2V
-         3XopwqYsz1HQCX/gRCB9HuInwHPaw8SqGrt3yrHgknM+owKCw4DN1KA18be4CCwv8Mcf
-         tP5UrbI3PjaiZl9wUYfRel6Kw15657BlPfQRyKl3XMmIwu9J8Jg9YLR4olQ1AqHKE+zb
-         EcWg9/mLphCF+tNy++dlLH/56tySAJ3zNYfLWNGg/CcnOFjZNgs2vNBPkI/kNBE8mqzu
-         Gg1Q==
-X-Gm-Message-State: AOJu0Yy5Ac+5sXnr8gTAqMb6Rr49SljPqSDiCLXuzOA1d1W5AXHjAogW
-	c8xSdyMymvkaLDPwC3Q7P+UNiNvsN4wa7tc1wo3H51vIBDn3AT0bAqpSYfVLKWz6+y8=
-X-Gm-Gg: ASbGnct8qXEKfuG0BQv+7JInIVMw1n399gyTPj8/ZExy/dXaSzf6mYopr+zW/KL5IEn
-	54wcroa7cPOqpZpVTv1Kt5/uDb5kdfy0KSOXYZZwqbVqAmWlgrprpCbp8UgjtwvKrVX7m+QYzOj
-	xxY1PS9LGLEG5YKE7FHb8/ES6dBB5WYavp5zndIQg9w+jt6y6ISLuZLQ/Tu4Jm6Z/FMNh4apCj3
-	asZFwBqggb++CHFR6S6Clz/LHf06MYoSxfESE+fIEpB0g2MtRkC8MNLSN8GfxzCv7oB7taPDmme
-	HCcahv5yvqJfTd4ucZDHY28SBuw7O/C6BD59OttlV1/R4N2ydNhEGB/R8uPMS1mtjCs4IgcVhHB
-	tCs5IehMsJMGzWLYfJ/oYVs7J3LD9MoaVw/Fnm3XP
-X-Google-Smtp-Source: AGHT+IFcq/n9pFKDzQrWbt3Evql0rRci2sD+tCY8uF41SfcY8vu514kFil4FRbrrxqY3Zeg5MXv0vw==
-X-Received: by 2002:a05:6000:2907:b0:3b8:893f:a184 with SMTP id ffacd0b85a97d-3b8893fa74bmr257918f8f.52.1753950823904;
-        Thu, 31 Jul 2025 01:33:43 -0700 (PDT)
-Received: from [192.168.50.4] ([82.78.167.30])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b79c47908esm1586755f8f.59.2025.07.31.01.33.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 31 Jul 2025 01:33:43 -0700 (PDT)
-Message-ID: <100aa0d2-68b6-466d-95e6-0acfb259cf12@tuxon.dev>
-Date: Thu, 31 Jul 2025 11:33:41 +0300
+	s=arc-20240116; t=1753951373; c=relaxed/simple;
+	bh=XJ2zGGB/PxqgOFtOSX9h5mswS1Wwp0kU/lMvORm9/t0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OEz+N7wjxqQoe5dup0u+tVtpMtt6O0JK6oVioOKSrj5Q3r0t4eGyce19zF6FU3M9utLX8XohMgm4CI4oq+sqaT1lI/+BCp+0oGdSyUSo/Nxt4sy9Snqjl2WkLnvsvbuCzQaL7AXkCQP5K4i9rFh9+TND193gscbOk2Vld5kX8e8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=i/rxYP1f; arc=none smtp.client-ip=115.124.30.98
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1753951368; h=From:To:Subject:Date:Message-ID:MIME-Version;
+	bh=AU1sjQom/y8TUT5U80ZfkzDLj8w9VkHGHIfk54RL18U=;
+	b=i/rxYP1fqpSAClAnPlBqV0RVIq11xEKCJ3J7pXPSTgRelVMqktviYKO7aKWYGQteX8OcQy7behY9WEv13rMnXOCuGAyiq4OGTILKIOK+TcSSQ3/d6Ca9yQpkDCUX94HwQJxPbPnIs5JV8f/+aqhmIVgKfnDrAtgRP5iAX1zMThk=
+Received: from j66a10360.sqa.eu95.tbsite.net(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WkXYUie_1753951360 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Thu, 31 Jul 2025 16:42:47 +0800
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+To: ast@kernel.org,
+	daniel@iogearbox.net,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	pabeni@redhat.com,
+	song@kernel.org,
+	sdf@google.com,
+	haoluo@google.com,
+	yhs@fb.com,
+	edumazet@google.com,
+	john.fastabend@gmail.com,
+	kpsingh@kernel.org,
+	jolsa@kernel.org,
+	Mahanta.Jambigi@ibm.com,
+	Sidraya.Jayagond@ibm.com,
+	wenjia@linux.ibm.com,
+	wintera@linux.ibm.com,
+	dust.li@linux.alibaba.com,
+	tonylu@linux.alibaba.com,
+	guwen@linux.alibaba.com
+Cc: bpf@vger.kernel.org,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	netdev@vger.kernel.org,
+	jaka@linux.ibm.com
+Subject: [PATCH bpf-next 0/5] net/smc: Introduce smc_hs_ctrl
+Date: Thu, 31 Jul 2025 16:42:35 +0800
+Message-ID: <20250731084240.86550-1-alibuda@linux.alibaba.com>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 4/5] net: cadence: macb: sama7g5_emac: Remove USARIO
- CLKEN flag
-To: Ryan Wanner <ryan.wanner@microchip.com>, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- Nicolas.Ferre@microchip.com, alexandre.belloni@bootlin.com
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-References: <cover.1752510727.git.Ryan.Wanner@microchip.com>
- <1e7a8c324526f631f279925aa8a6aa937d55c796.1752510727.git.Ryan.Wanner@microchip.com>
- <fe20bc48-8532-441d-bc40-e80dd6d30ee0@tuxon.dev>
- <848529cc-0d01-4012-ae87-8a98b1307cbe@microchip.com>
- <681b063c-6eab-459b-a714-1967a735c37d@tuxon.dev>
- <76e7b9fc-e0e2-4d21-ba5a-dac831522bb2@microchip.com>
-From: Claudiu Beznea <claudiu.beznea@tuxon.dev>
-Content-Language: en-US
-In-Reply-To: <76e7b9fc-e0e2-4d21-ba5a-dac831522bb2@microchip.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
+This patch aims to introduce BPF injection capabilities for SMC and
+includes a self-test to ensure code stability.
 
+Since the SMC protocol isn't ideal for every situation, especially
+short-lived ones, most applications can't guarantee the absence of
+such scenarios. Consequently, applications may need specific strategies
+to decide whether to use SMC. For example, an application might limit SMC
+usage to certain IP addresses or ports.
 
-On 29.07.2025 18:51, Ryan Wanner wrote:
-> On 7/26/25 05:56, claudiu beznea wrote:
->> EXTERNAL EMAIL: Do not click links or open attachments unless you know
->> the content is safe
->>
->> Hi, Ryan,
->>
->> On 7/21/25 18:39, Ryan.Wanner@microchip.com wrote:
->>> On 7/18/25 04:00, Claudiu Beznea wrote:
->>>> EXTERNAL EMAIL: Do not click links or open attachments unless you
->>>> know the content is safe
->>>>
->>>> Hi, Ryan,
->>>>
->>>> On 14.07.2025 19:37, Ryan.Wanner@microchip.com wrote:
->>>>> From: Ryan Wanner <Ryan.Wanner@microchip.com>
->>>>>
->>>>> Remove USARIO_CLKEN flag since this is now a device tree argument and
->>>>
->>>> s/USARIO_CLKEN/USRIO_HAS_CLKEN here and in title as well.
->>>>
->>>>> not fixed to the SoC.
->>>>>
->>>>> This will instead be selected by the "cdns,refclk-ext"
->>>>> device tree property.
->>>>>
->>>>> Signed-off-by: Ryan Wanner <Ryan.Wanner@microchip.com>
->>>>> ---
->>>>>   drivers/net/ethernet/cadence/macb_main.c | 3 +--
->>>>>   1 file changed, 1 insertion(+), 2 deletions(-)
->>>>>
->>>>> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/
->>>>> ethernet/cadence/macb_main.c
->>>>> index 51667263c01d..cd54e4065690 100644
->>>>> --- a/drivers/net/ethernet/cadence/macb_main.c
->>>>> +++ b/drivers/net/ethernet/cadence/macb_main.c
->>>>> @@ -5113,8 +5113,7 @@ static const struct macb_config
->>>>> sama7g5_gem_config = {
->>>>>
->>>>>   static const struct macb_config sama7g5_emac_config = {
->>>>>        .caps = MACB_CAPS_USRIO_DEFAULT_IS_MII_GMII |
->>>>> -             MACB_CAPS_USRIO_HAS_CLKEN | MACB_CAPS_MIIONRGMII |
->>>>
->>>> Will old DTBs still work with new kernels with this change?
->>>
->>> That was my assumption, but it seems it would be safer to keep this
->>> property for this IP and implement this dt flag property on IPs that do
->>> not already have  MACB_CAPS_USRIO_HAS_CLKEN property.
->>
->> So, this patch should be reverted, right?
-> 
-> Yes you are right, more testing I see that this could break older DTs. I
-> am new to reverting patches, do I send a patch to revert this and would
-> it be an issue now?
+To maintain the principle of transparent replacement, we want applications
+to remain unaffected even if they need specific SMC strategies. In other
+words, they should not require recompilation of their code.
 
-Not sure about the approach now! Looks like this has already been merged
-https://lore.kernel.org/all/20250727013451.2436467-1-kuba@kernel.org/
+Additionally, we need to ensure the scalability of strategy implementation.
+While using socket options or sysctl might be straightforward, it could
+complicate future expansions.
 
-Thank you,
-Claudiu
+Fortunately, BPF addresses these concerns effectively. Users can write
+their own strategies in eBPF to determine whether to use SMC, and they can
+easily modify those strategies in the future.
 
-> 
-> Ryan
->>
->> Thank you,
->> Claudiu
->>
->>>
->>> Ryan
->>>>
->>>> Thank you,
->>>> Claudiu
->>>>
->>>>> -             MACB_CAPS_GEM_HAS_PTP,
->>>>> +             MACB_CAPS_MIIONRGMII | MACB_CAPS_GEM_HAS_PTP,
->>>>>        .dma_burst_length = 16,
->>>>>        .clk_init = macb_clk_init,
->>>>>        .init = macb_init,
->>>>
->>>
->>
-> 
+This is a rework of the series from [1]. Changes since [1] are limited to
+the SMC parts:
+
+1. Rename smc_ops to smc_hs_ctrl and change interface name.
+2. Squash SMC patches, removing standalone non-BPF hook capability.
+3. Fix typos
+
+[1]: https://lore.kernel.org/bpf/20250123015942.94810-1-alibuda@linux.alibaba.com/#t
+
+D. Wythe (5):
+  bpf: export necessary sympols for modules with struct_ops
+  net/smc: fix UAF on smcsk after smc_listen_out()
+  net/smc: bpf: Introduce generic hook for handshake flow
+  libbpf: fix error when st-prefix_ops and ops from differ btf
+  bpf/selftests: add selftest for bpf_smc_hs_ctrl
+
+ include/net/netns/smc.h                       |   3 +
+ include/net/smc.h                             |  53 +++
+ kernel/bpf/bpf_struct_ops.c                   |   2 +
+ kernel/bpf/syscall.c                          |   1 +
+ net/ipv4/tcp_output.c                         |  18 +-
+ net/smc/Kconfig                               |  12 +
+ net/smc/Makefile                              |   1 +
+ net/smc/af_smc.c                              |  14 +-
+ net/smc/smc_hs_bpf.c                          | 131 ++++++
+ net/smc/smc_hs_bpf.h                          |  31 ++
+ net/smc/smc_sysctl.c                          |  90 ++++
+ tools/lib/bpf/libbpf.c                        |  37 +-
+ tools/testing/selftests/bpf/config            |   4 +
+ .../selftests/bpf/prog_tests/test_bpf_smc.c   | 396 ++++++++++++++++++
+ tools/testing/selftests/bpf/progs/bpf_smc.c   | 117 ++++++
+ 15 files changed, 886 insertions(+), 24 deletions(-)
+ create mode 100644 net/smc/smc_hs_bpf.c
+ create mode 100644 net/smc/smc_hs_bpf.h
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/test_bpf_smc.c
+ create mode 100644 tools/testing/selftests/bpf/progs/bpf_smc.c
+
+-- 
+2.45.0
 
 
