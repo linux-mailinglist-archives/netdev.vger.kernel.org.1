@@ -1,96 +1,76 @@
-Return-Path: <netdev+bounces-211118-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211119-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86317B16A1A
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 03:20:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96E20B16A1D
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 03:20:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 968FB3A7D31
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 01:19:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D7253AA3F8
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 01:20:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D71D189F5C;
-	Thu, 31 Jul 2025 01:19:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D8137F477;
+	Thu, 31 Jul 2025 01:20:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NLo0aw2c"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ZP0j/Obd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0119117CA17;
-	Thu, 31 Jul 2025 01:19:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60BD03C3C;
+	Thu, 31 Jul 2025 01:20:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753924796; cv=none; b=BgotmrrWYPolzEu5sXZc4ptUga3pS6lsYMdDTjnYnESjUMgnxkvkNUMZtdH9kR+IpNnwbRYMlUbpnPpWkzEAkOwdzKz6UJKIRHNOTwDAuk9k9QVYk5/ljoWayVLwlND483qGvNTckfSfdndRKlC8MyQDToKEZM3Gt/T7MJy0RWc=
+	t=1753924847; cv=none; b=Uqk58ZcUcE4LIfo/mwQYYIIv/F0XddMP11iJ1+smNEgv9JG+MT7U+VM92YM+ofPtHUEcryEDec0vWf4waNK332FDq58HxFOUlGVXD6BoBwHNDgz+gVEFhNgbxwcfFiAMj1/oyJL3Yc+jYCANWusaIRWGtiDX1mDWYPPeaTUGyAU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753924796; c=relaxed/simple;
-	bh=5i9mMcyM/3ms0TJF8vEVTMnppesLDAjG8FPBLBlw7CE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=rmgbbWfc5V3laGwgbl7KfDj0wOJdrZNb0JXq5KM1X/LQZcgVG/E3cZUvwlE63lzEwjrW003Y1//smRcVv38z17ff0Vd8xmoOJtJPmzlerDAEREwEpVUwLbYPwGXfLrcPDTwW/m+QNvadw9WcfzFcx0tjkjLATp2DRpu6FV59nJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NLo0aw2c; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 901E9C4CEE7;
-	Thu, 31 Jul 2025 01:19:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753924795;
-	bh=5i9mMcyM/3ms0TJF8vEVTMnppesLDAjG8FPBLBlw7CE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=NLo0aw2cjrQGEdqZQPPoIY0EUGWuziEzXlYREUvkvHfbQVBlnfKqQqpBamJKL5Q+z
-	 Qza+eu1w8BZlL50XeGwHluANvVWo03fnZiShafhTA5W9ShBGpVChUVMnQleMy9Z8xR
-	 Q9kl50OZL5jneP6pzoYUyTP+k6okvcjFMhfBYRsJwhIEUDOVAUp8z36BlFn9URNT7s
-	 xZTC8JN27/dV+Boc6t1qPdtqCzs221eD4LJSABqAg+IJhrfzNkProXgoBy0qHzdQgz
-	 hZDWs2K5ZbANXubjLCDpIp3r5tTGRWdsyh2Ia8dvi6Q1sTI6MAT2jjyLV1HfJOammI
-	 WyigSOcxiW3rA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADB79383BF5F;
-	Thu, 31 Jul 2025 01:20:12 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1753924847; c=relaxed/simple;
+	bh=exdqehG6S26AsJO18p2l4bnLA/RP9WKhT44s/JptwDc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XXSxCwfwZSb/NjMnJgmfRUZjQwQD/2RKMAbaqJGmOTLTzHalDYTmTJScuGnQBWYyhODzH6RXwo1vM0rQALdWYU7yRqw1r65++v2Wr85qNlvAIVawu5GsmES4zVDFkj7LMWF2+cHDhM+5kzjRdNHTB4EP2eRl/OMOz9xob+S7MrE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ZP0j/Obd; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=exdqehG6S26AsJO18p2l4bnLA/RP9WKhT44s/JptwDc=; b=ZP0j/ObdwcNC4neV0D4hiSlDD7
+	Pmb/mcjUL2zfAMaBD5N5eP76L63kvR4ragns7dfFq/VfQA39iaVsWVIwk3pgjAYHjcjgxrGaxQi/7
+	n/mduFhxjg+r/PLwaL5Imc+hJhBm4SdlV3YCZ6htEKedddsQAGPdeTDPxRjlAVHpWvWU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uhHyE-003KO8-PY; Thu, 31 Jul 2025 03:20:34 +0200
+Date: Thu, 31 Jul 2025 03:20:34 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Bence =?iso-8859-1?B?Q3Pza+Fz?= <csokas.bence@prolan.hu>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Rob Herring <robh@kernel.org>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Csaba Buday <buday.csaba@prolan.hu>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net] net: mdio_bus: Use devm for getting reset GPIO
+Message-ID: <78797ee3-ccee-4133-acef-a847e5b244af@lunn.ch>
+References: <20250728153455.47190-2-csokas.bence@prolan.hu>
+ <20250730181645.6d818d6a@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] net: ipa: add IPA v5.1 and v5.5 to ipa_version_string()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175392481149.2568749.3681377728383732917.git-patchwork-notify@kernel.org>
-Date: Thu, 31 Jul 2025 01:20:11 +0000
-References: 
- <20250728-ipa-5-1-5-5-version_string-v1-1-d7a5623d7ece@fairphone.com>
-In-Reply-To: 
- <20250728-ipa-5-1-5-5-version_string-v1-1-d7a5623d7ece@fairphone.com>
-To: Luca Weiss <luca.weiss@fairphone.com>
-Cc: elder@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250730181645.6d818d6a@kernel.org>
 
-Hello:
+> Andrew, you acked what I'm guessing was the v1, still looks good?
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 28 Jul 2025 10:35:24 +0200 you wrote:
-> Handle the case for v5.1 and v5.5 instead of returning "0.0".
-> 
-> Also reword the comment below since I don't see any evidence of such a
-> check happening, and - since 5.5 has been missing - can happen.
-> 
-> Fixes: 3aac8ec1c028 ("net: ipa: add some new IPA versions")
-> Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
-> 
-> [...]
-
-Here is the summary with links:
-  - net: ipa: add IPA v5.1 and v5.5 to ipa_version_string()
-    https://git.kernel.org/netdev/net/c/f2aa00e4f65e
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Yes.
 
