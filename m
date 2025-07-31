@@ -1,265 +1,203 @@
-Return-Path: <netdev+bounces-211261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211262-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6ECCB1766B
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 21:06:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26CC6B17689
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 21:20:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB336A8369D
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 19:05:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 452F4541662
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 19:20:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9115E23C8CE;
-	Thu, 31 Jul 2025 19:05:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5FCC242914;
+	Thu, 31 Jul 2025 19:20:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="USaYSvgb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="byjjAZE0"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2066.outbound.protection.outlook.com [40.107.212.66])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3E2223ABB1;
-	Thu, 31 Jul 2025 19:05:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.66
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753988758; cv=fail; b=rCIQi+rk9wI8DmPXfUMRZgisry2Jp+dCakveoFqPWlOb0FmwLEXCa1N1mTs8HZO7ykQxp81H/CMouMU8udiktix+gye5//nCeQpmF3d0Xc7DQdT2ZQZNL0SEu4NFRJYV+Tz1J3vIxWAmeyQggx4GoNrJsiAO+yiMqm9KCWNQ2Yw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753988758; c=relaxed/simple;
-	bh=ypEGs71s9vLeje9Wa93pFeOH5QFQewBSEpP/59aZD8Q=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=pfumgbO7L504EaSBVURLJQgyfLsfz4JVTJ5LTeD6PoxkJRnklBl1Nwdfoc5TCCN1VP3e3jHNvioZfT8WnVtBV+zveme4hKFCdZG7eNIKIEbbY4mtcdtsHSvJGJYD0bprxf7EcWJlTrH70IhPDtX+1pLLfSJDze+t1tvD9rJAzDw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=USaYSvgb; arc=fail smtp.client-ip=40.107.212.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=dyM06z2b198yJAs7lIH5NJkP3oOjphGlSUPWud7nlyBwvJ6TyxtZAEmKHPOpz5iT7Nl9GTE+xQtnZplTxTDN2zYcmEUiyzzh/dHXrJIFw3LbPm7+cFFEy3oRAXDZqwkLmASxrClZdKzVvNiJpWHPOGLGADrqzGamvizd6YBnmxaiu3LN6BQAgF9QbizHjYfkNsuvmNZ/HHgqlWI/l3h6gDPNviYUj/03c5YaFovURQLkyWkD+pbjUFNarmL0D4Gulw3cArfmPU+nBoJFVBtxwb4Ik7dLYNTmk1vi7mkrm/MUv2Bb+b9DlIZU5kgTEhGKvpOXFiVh/EL7CmO0lEIR+A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=l+snbNEkA2OywW4icEFu5damKgDwklI71bZyljcbrS4=;
- b=UwR2EN5JLJKit80QQZ1hmeXVUWhuqiT+UxXMeV6Lwmsh5SB1MvNAj/eW6lMiBizD7JWucbMD03/ZtZ0weXVzCuV8kQK4OcJWb7bPjtxZtxxNqvRpizX+SJXl1X6NMwjBOxMR5ER0h1gGQBzsbXMp43kDX6GxCAGZ1xYtvAKo65NNGME2Z6I5ObefFNBGROr+b4h3QIOREw5UUgm0Gk9fiTHtdJ8bopITrs74do8tMwvC7A2MOr870uxp0uNpt8ZGE2OaFJ+wpkgwHyzErY3kSHNpmUqeLBre69/q8LqtPolXoOGjUb770MKrrwbUMJn3poLTXQv1xQcmiwmGBqrNag==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=l+snbNEkA2OywW4icEFu5damKgDwklI71bZyljcbrS4=;
- b=USaYSvgb4/dcIu48Bou9O7hwkuHAWp9k62A2Ey5hSyLGrYePXt2La0KDCYfoG2Hbi7zKg2lPum8YxZKfFbmD8ANpUcJ7iqL3+Idmu+93OB0/wHS5LNy08hcq/Cx8W9ng/Tef74F2uekAWcjt38z+9dY+ts0ue5sm7vIqvc7px4NEO5SDvNpgkF0ICXG6OWgfZLBaTAGcFEVn8IDFwENzQh8JXWfErH3UJIWg2aLNsPIH4PNnSNpGUPn7JSr4uty+68NcYW3IBGWaZcQRUGmmEaZLx1D98tpxpv5EA8IJK/EMFU2+HXTkKf+7qDZnzFE3NJxpRCoWhs2buB32Hlg8RQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MW4PR12MB7141.namprd12.prod.outlook.com (2603:10b6:303:213::20)
- by SJ2PR12MB8955.namprd12.prod.outlook.com (2603:10b6:a03:542::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8989.12; Thu, 31 Jul
- 2025 19:05:52 +0000
-Received: from MW4PR12MB7141.namprd12.prod.outlook.com
- ([fe80::932c:7607:9eaa:b1f2]) by MW4PR12MB7141.namprd12.prod.outlook.com
- ([fe80::932c:7607:9eaa:b1f2%5]) with mapi id 15.20.8989.013; Thu, 31 Jul 2025
- 19:05:52 +0000
-Message-ID: <6910b7f3-8e69-4639-bf09-c5cddf1d31ee@nvidia.com>
-Date: Thu, 31 Jul 2025 22:05:45 +0300
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 0/3] Support exposing raw cycle counters in PTP
- and mlx5
-To: Jacob Keller <jacob.e.keller@intel.com>, Jakub Kicinski
- <kuba@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
- Richard Cochran <richardcochran@gmail.com>,
- Thomas Gleixner <tglx@linutronix.de>
-Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Saeed Mahameed <saeedm@nvidia.com>,
- Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org, Vladimir Oltean <vladimir.oltean@nxp.com>
-References: <1752556533-39218-1-git-send-email-tariqt@nvidia.com>
- <20250718162945.0c170473@kernel.org>
- <86471b96-fb30-450f-9934-ec76851791ea@intel.com>
-Content-Language: en-US
-From: Carolina Jubran <cjubran@nvidia.com>
-In-Reply-To: <86471b96-fb30-450f-9934-ec76851791ea@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: TLZP290CA0013.ISRP290.PROD.OUTLOOK.COM (2603:1096:950:9::6)
- To MW4PR12MB7141.namprd12.prod.outlook.com (2603:10b6:303:213::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D52F1A29
+	for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 19:20:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753989641; cv=none; b=hp2gUk6KzK5QS0QuPrRRDPJHNwg/MbsNJkiGOL7LKfYCmW9CG1Itn/eVXy9wDntyWxaaD8jguAZq1lujCWSluVj55j+ixStV8nlRHXAn72pCXCbnnMFxUSetoYWFJP3B8C0xgLQcGaBY207JlP0Ggh2abDVLNGhUaLbE2/u+UmY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753989641; c=relaxed/simple;
+	bh=i9HXTt/WtEa9jEmYlSgCkrJ6sTOfz0LMAeBr6TibgLQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GE2qv2PJFnViQTa71sqG18oq8aiE36UEx0ylyJdNkqto6H0qQ7kxnqQn4fwBybWOCMqZho0NBgcdhAg1TR5PX5D3rcQ1cBAJJNRYzJl9ul4QmLrRonewiFGri0QYaNVke1jfwUjfI3190L5nRCL73hf5d8UicIpPnbk5UKa3lr0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=byjjAZE0; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-3b7892609a5so986344f8f.1
+        for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 12:20:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1753989637; x=1754594437; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=9UMEZr0opwfPKRv0ihnB+Vjf1l6t5J9I2VL8uLtY5rA=;
+        b=byjjAZE0/Qv7yu+gRf1uYVOa2Wq5OtHalaayTM853iR5gpi8JZ2C52JThAdRMLvQnX
+         lM7Xa9m3LN70PCfWQpChY0yLxU4aY58A+5RLs7PzKdPvsMg+EURejY2RiafvqeFIgi/G
+         uLi2hn4bVPxxb9PWk47ewb0xtseUlBYn8/QcfwZLiqR7ZenEf1AS6P6/fJFZcev8mXju
+         Uc5jVN8giMzNPknRhgCV7bspmYtyHoSaW2RrWqMg/qmefvEBoRqoxCaHWcf/mrNMFHOw
+         yGhdkzNTByE8KPhRNX7uFyYL3EemUjROjGbF3mYrNroOj8/+MNMlUFYtA7jRW3k04sA9
+         kfrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753989637; x=1754594437;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9UMEZr0opwfPKRv0ihnB+Vjf1l6t5J9I2VL8uLtY5rA=;
+        b=LKQN214Fb6xOLJWWd4YWy6SzaMZz3MFOZgZrto+JuUcFt29zqFvJ/9R7TzPzBL9kHE
+         3sARacAGGVaMHLXkfX8w/6NAqWwOgHS+ebXIy5FFFPO37CfIgxvKpgROOFRyZSs5Rfd4
+         xF6Npf2TpoGjTEyJWNAZcfWSIlbUsIONHydfeezO4LUWXT8t1SMxVLNJg2m0osB8QGc4
+         CgElyk2Nd9GYbCQ1+TIcTHJ3AIoDD+VGGnf92wqXZpiHG2gCrZeWTV1j616aXgAu1qss
+         jpfISKjPufVUtmMdvH2cY8GQZ/VBd0X9L6djaSj3S2bBMoMQPVJu+dPsP0i/KQgbgokL
+         GkuA==
+X-Forwarded-Encrypted: i=1; AJvYcCUGshDiTJp19f5CRo/h0KLx2hcu32nc5kbwS4MLqgxj2JODrcX7HBMXVVgXlassytScJYXKyMo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyL7ET9bbKQ+1Wl7KZn1+8ImiRkgYFkoUp4UXEkYXCoDe/38HD7
+	EDp/GQjMP7GyNYqqIHySdqdrdkUD7hx9yFwn1tqhnCyb/+KLuCFKT1foAazmbQ==
+X-Gm-Gg: ASbGncsGE6L1v452lwoL1UGYDEs1aQz4EHJPGtnqW++FYJjqVSCbF1d1jtQgeviM681
+	UUzhMT9xjSB9+KxCkYhk3gdsdHQxavnk4K6AYZUEwDc18pWU8U0VHWwR5Z+Z1DbW+3FQj+2helW
+	JKA0EJ9JKhQ/aUKruL5hECg/Y6qNbt8LBnBYlIjQG9zmmZM6KoYZDx6i3zd9XTw7r3c27qfi6mb
+	iHVmtvXKbOyYBLZCIa0ndTj+4spNbA7BUgaaPauKKvb7Y7uHx0sIcmOopcCEysqszxwe4oBvRgj
+	0PQxeDZnD4wH5RBNLaX8TJPrYaCSaq1lbJQ2a69jC2D6a6oUzUXGbnaMnw1j4/qB2q3oDXT34VK
+	Y2y+IFWMPYZA+P0ZxohB9y0jJA+k0TjE7Yl/6hscJf7VzzMtz5FYxMQ4KEP3uDzoptK8+LY3GRc
+	G3orhYO2tB2nN03Einl2JvIURKbIhxEURSU9S2E5Q560cDQ9HQ26WSp5J1FKxi2A==
+X-Google-Smtp-Source: AGHT+IHGL0O4BtNwcAkPoZGy6wg/EvPU0lGhSN8Krx/5o8wihnw9p/wyxb8oBOHEmufvra5x6NAMAw==
+X-Received: by 2002:a05:6000:240b:b0:3b7:b3f2:f8c3 with SMTP id ffacd0b85a97d-3b7b3f2fd1fmr2696260f8f.57.1753989636730;
+        Thu, 31 Jul 2025 12:20:36 -0700 (PDT)
+Received: from ?IPV6:2003:ea:8f46:f500:c1f2:95ad:fcfc:bc63? (p200300ea8f46f500c1f295adfcfcbc63.dip0.t-ipconnect.de. [2003:ea:8f46:f500:c1f2:95ad:fcfc:bc63])
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3b79c3b95f4sm3258499f8f.23.2025.07.31.12.20.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 31 Jul 2025 12:20:36 -0700 (PDT)
+Message-ID: <b16f2601-c876-4959-b40a-58a676903594@gmail.com>
+Date: Thu, 31 Jul 2025 21:22:20 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW4PR12MB7141:EE_|SJ2PR12MB8955:EE_
-X-MS-Office365-Filtering-Correlation-Id: a3909a2a-d237-4a95-3ffd-08ddd06544e5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?K1pQaVZSaVdvT3dNYkkwR1BQcndtZThoYlpSMVVPcUg4bzJhZ0swU0Y3OHQw?=
- =?utf-8?B?Ujdpbjc0TTBpR1E5bTR5dFV4OURoK3FnMEtFSVNPTkpJaWsrTE1FS21TbS9W?=
- =?utf-8?B?VlM4c21CL2JVdkYzdHY0UjFoTDgwKyswUy9FOEUzSS9EKzNPZ2pPLzdVd0gv?=
- =?utf-8?B?cUpVVDhiT01uSVdiTUFqN1QyQnRXai9VT2xPWGJjeHlRVWNaMkZFM3hOcTZN?=
- =?utf-8?B?dWJQVUpRYmJYV3EwdGw4aEVienB2Q2FSTUZrK1NRMUdsUDJLVzFaaWdDeVlZ?=
- =?utf-8?B?VUtTZUVQSUZUTFMxa2ZZakN6N1FNdUdmVytBcnR6a0tlQlZ6ampiNjlNVHQ1?=
- =?utf-8?B?R0Q1NzJaTmdNQVU5ZmVjS3FpMm5xVW45MGk4a1d3a0VtSVVGQzlza0hZT3Fj?=
- =?utf-8?B?M1BER1NNMGRaaTA4WVkvV0crcTdTZ3AybTdmVjdRYU5FWlV4eGh6cUZ4QXRi?=
- =?utf-8?B?UVJ6Z1paRDhpaDdmNjJUa0RURE5MWHg3RkZvM1FpM3RvZVoxY0tNSTRXdWVM?=
- =?utf-8?B?Ui8yUWZwSTN4YzRMViswdklUSkNicTllaHJibzFNcVY3YTRFSVZoUFhxdFRF?=
- =?utf-8?B?TEE5YUJmbjVlZHVWcnRKVVlwVmpVdzJIT1hUdzZ0VUZqMTk1Q1FFTmVMeGVw?=
- =?utf-8?B?cG0zRGpmaXhRd09Xa2FmNVNsM2lIZThvd0tCK2o4OTZlWG15R25SWEZPV1hh?=
- =?utf-8?B?RjhaVFRWS3puMU5TSFF6MkZUS1pkZzBqWmFkck1wRGFhNCsrcStwRE14ZkxZ?=
- =?utf-8?B?cm5VWHZSSloyT0ZBMVM1L0J1TGNNbUIwSXREZXpHR3c0SXcvaklpU0hibE9I?=
- =?utf-8?B?YkJCcDZQcXlFOExZOVR0TVpRUXVsemJPcFlZbUxmYVZKcHQzR3VGcXU5L3ky?=
- =?utf-8?B?eFY5WTlqMEZ5WjJ6OXBWWUFPU0E4NlFra1VGUVI0Z1VzNjlFbWIzM3FGTHFC?=
- =?utf-8?B?OEFlU1ZLU0JlTCtrSjFjS2NtdWFTQ2V5b2pTV2loZndpM05qeTdUeE96bmZ5?=
- =?utf-8?B?cmh6d2xMZ3ZjQURRZlFLeVhTQkowbUdDK1BZemFTZXVibENtVmE0ZTdaenRL?=
- =?utf-8?B?elZVSnI2Q0VhcnV2dmNyL3ZRdlRJaXQzVnViNFA5QUllVXBMQWRkY2lhZ3VS?=
- =?utf-8?B?S25EdmVHYkdqTnlEM1YwQWxJSkFINFJIcDM4Y0dpMjJEcStmOHZlcDd6dTdE?=
- =?utf-8?B?ZlRkWElPUjdoZzRja29JcDJnaFZuOW12SFR1c0dGT2grdVZRemdrNDVyN0xa?=
- =?utf-8?B?d0MxN2hrMUZveWVQMk1waHIra1FrQWJSQmRHS2xLUEwwaUx4anlUbDd0dHhn?=
- =?utf-8?B?dFQxNDB3a1FUYjI3SklYZ1Z5WEk2b3h6QlY0WFBjcGRGWnNybnRQa0FSVXpr?=
- =?utf-8?B?UEJraVI2cnRKd09FZU1QOHZaUnVzS0FrNlJKWndYdDh5dUdsdmZQM3JiaUxn?=
- =?utf-8?B?MElhOEJadzNETTZDNEcxK2w0djBUVnFLckgrZEdSUExMeVJqREU4ZlNOcXFD?=
- =?utf-8?B?bCtTTDNuUWgyckpDVExxR2FaMHpYSnRBL2x1dkNsOEZCTWFLWHJObURtWlB0?=
- =?utf-8?B?NVNsZ3Nta0k3eml0QjlLQXhNa05vUmlMcG9FbjlNR0daVlBhME5Jbk4zVFpQ?=
- =?utf-8?B?dEdxYi9kQkphRTJCVlRqUEpuQUNEZGViMGdZMXVXM2hxOE1nS1ZLa0lxc0JQ?=
- =?utf-8?B?cERUbjZBUzVzelo1SDlhdkxNeXNrQjlTNWdWUzVMRklFQjJpQ1JNYWduaEI5?=
- =?utf-8?B?NDQzalZORUc4bFBZZWl6S0pRVTN4Tm9IeDMrRythUWJvQVN6REh0anZVVWg0?=
- =?utf-8?B?OHRYb21NcHpKVldTdE1JckdjbnROOUduUm1kRndNNXQ4ektTbTRQMjFhTlZB?=
- =?utf-8?B?VzFYLzBJVGFQWTVTWWF5R3FUM0VDVmJpRkpNdU13VVdyTy9tRVdpVTR2WXd6?=
- =?utf-8?Q?kTaAC/iGX9s=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR12MB7141.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?S2hUL1k2Z2tqWHBEL3dCcm5FU2lMTWgwMU1hTk0vZ1UzTWJsUjFhL2R1eWUx?=
- =?utf-8?B?Y2J6TmVPbjVRUUd5Wm9QYWtHTG1OMlB4anBZd3hZR09kS0Q3dGhyQW0xY1hP?=
- =?utf-8?B?cC9uaFlOeFhPRVhSTlp4bHk0ZHBuajd2T2VhUEJ3cHpFcHRLOExiRXJHcnZX?=
- =?utf-8?B?S2dKMElaWVcxUkY3bndIaFltbUFLUTUvK1dNYmEwWncxZGpHMnJVaW1PNlky?=
- =?utf-8?B?cTNCQUxoSmp3TU42dWlwZXRGaUROQ0RUcElwemtKSDkrc3pwZlRjUEZTQi9F?=
- =?utf-8?B?WDh3bFRBcWg4SkhEN09KVHZHL0NSOU5GYWdUNmNqREs2Y1h4aTNBRkdqYXJN?=
- =?utf-8?B?bzBSNzdYVVVBZWFacDlscWc4MDh0c1FLSVdrajlEanpaR3ZZUUdFN0hTRVJm?=
- =?utf-8?B?VmY0NHF5SEJPeHlPSmNEdlAydWhRL2NRNDlHWFdOSzg5cjhBc2JPcWwzQXgv?=
- =?utf-8?B?RWZrMUV2eUx0ZUxwVy9WaWlLMDJWSDdqM09HNUVQTHJ0UFdwRVJVNnZNK012?=
- =?utf-8?B?emJTWWRwcnRFZ1hNQnZoQWFDY0xrQjdlYytTbzRadGNDUjhHYzUwNWZiejNl?=
- =?utf-8?B?UlgxTnVVRHZGcThRbUNtZTBHc0xOYWdFR3R4NmpqSmxBU0ljMHVRdlVDcSts?=
- =?utf-8?B?VDlaWUx6Z3JKSUlsTU8rK2ZVQXh4OUFPRFVYUkYxeERZZ1h0MEMrTzZzYVJz?=
- =?utf-8?B?aTg2YzdCYmc1RXdoNFptd3pmS3VQZmZob3cvMVhGL1dHVy9ldysrYXJqL0cx?=
- =?utf-8?B?QkZNMEwyS2s0SDRtOGwybzJhdlZnK3JOSDNXWkZ5WnVHbWxJVmdmalNqYUE2?=
- =?utf-8?B?WmVwTlYwWEFQTTRTY3c4UjBNTUc3VUFrRyszVjU5eS84dXpBeUMrUXNaRTVN?=
- =?utf-8?B?KzZpV3BZZ3MrdHQyYm9uVHNuZjdwdnBCZ3NTR2dRUVBXRDBDNE52akE5S256?=
- =?utf-8?B?Zzc2TEVUWVExbEVHWVI1Q2xjaTBSZHpNYkw0V0tFUFdYMEhRdUx1NzlyeXhD?=
- =?utf-8?B?U29DOVNqV0RLRUxSUjdrNG9BQWlCcVJyKzJnaUoxdllUUU4za0dOYUpXMUpL?=
- =?utf-8?B?d0JuNEt0RUc4SXg4VzcwZW95WUZpT3ZHZCtUbVBMYmttbVlNTjhOOTNnODJu?=
- =?utf-8?B?dE9iZGszQXVZUXhZRjBPcnl2ejJPanY0RDlHazRkVTJTNkFqRG5hd29nSENQ?=
- =?utf-8?B?TmNuZEZJUkY1T1VBNllobVR6aHI0anRXU2lBTXltUEw3b295WFJFajJYUy9E?=
- =?utf-8?B?WGV6b2pCdVdMS2Q5blhxOVptSlZIaGVMaUx2QnhWMUFLMmlmK0FZbml3NDNk?=
- =?utf-8?B?ZGFKZmN5dlRZcmdBUE9Ram1DSUVmMEZmT1JhNTFmNHF1d2pTQ2o1WlJjTXFi?=
- =?utf-8?B?UUpqenJHNXovaXE3SkpMQUNlZFpPSW9BRWpPcmx6bGRseXhVMTArSFR0ZG9T?=
- =?utf-8?B?Ri9LZ25lMmpac2xRTjZqbFVITnUraFp5WXlncTBrOHlETmUxTGl1aDJuek9h?=
- =?utf-8?B?ZFpnS0xMWTVPMGNJVGIvTEZKSWRVa0t4NmxrVCtIR0UxU0F2dElJbTdVU2h0?=
- =?utf-8?B?RUJXYkN6ckw0VmZLQTcyUzhpZ1Q3Y0czMXM1TlZ1cG11cnhLSDZPQ2hhaENx?=
- =?utf-8?B?RVFkVUVFRUVwRUNTT2t3YURXOVBQSEJBT250WjI4QURsdXF0UzNoTzViSmt6?=
- =?utf-8?B?OFZwVGpwcnMzNFM5NEhzVU91TkxFMUlkT1BNU01CWC9nSExheGNuUTlqS2Jy?=
- =?utf-8?B?UkdIK0RVUVB6eUlRakFZTkxVczc0SmJ2WXlRNnFBR3Z0dEdvbzZKc3V6ZDE0?=
- =?utf-8?B?anlwQnhBOEdScWFWL3JaRVYrK1l4OVEwVEhDM0ZIWGxHcEY2TEQrdVQxVExo?=
- =?utf-8?B?ZlJIV2hQdnNhTTB0cm1BdXErV2pvNzB1MlpqVFlJejkwODhtUW5xR0VxbTI1?=
- =?utf-8?B?d2lVeFZTcDYxSjI4UkgycCtWSEFra0JocVgwSElRRW1FclBQaUg2cWxsUjRR?=
- =?utf-8?B?RHY2VDRXM3A4c0ZDcWovMFhFNVJpVjU5T0R6eVdnMVdXRUNlVC9mcHV0WEF3?=
- =?utf-8?B?NXRDYTl3eFp1U28rTHE0VXFELzh2eGUzQ3hzQkJlcVU1Um5jdmZDRnVxeVJZ?=
- =?utf-8?Q?X5eKvecr+WtbNmQOY47VysnLQ?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a3909a2a-d237-4a95-3ffd-08ddd06544e5
-X-MS-Exchange-CrossTenant-AuthSource: MW4PR12MB7141.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Jul 2025 19:05:52.5746
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: xi5R0lyDW+FEbVDi31g4XmASVxpM0ss03paV1XjzhU9BZALGdMAz+zVw2fhoO3LzyJ+Deu9SKSR1WxECadghYA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8955
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: ftgmac100: fix potential NULL pointer access in
+ ftgmac100_phy_disconnect
+To: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>,
+ Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Cc: Jacky Chou <jacky_chou@aspeedtech.com>,
+ Jacob Keller <jacob.e.keller@intel.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <2b80a77a-06db-4dd7-85dc-3a8e0de55a1d@gmail.com>
+ <ddbfdf8c-53ab-4993-a53a-60c45d36cae9@linux.intel.com>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <ddbfdf8c-53ab-4993-a53a-60c45d36cae9@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-
-
-On 30/07/2025 2:33, Jacob Keller wrote:
+On 7/31/2025 10:58 AM, Dawid Osuchowski wrote:
+> On 2025-07-30 10:23 PM, Heiner Kallweit wrote:
+>> After the call to phy_disconnect() netdev->phydev is reset to NULL.
 > 
+> phy_disconnect() in its flow does not set phydev to NULL, if anywhere it happens in of_phy_deregister_fixed_link(), which already calls fixed_phy_unregister() before setting phydev to NULL
+
+I can't follow this argumentation. Look at phy_detach(), there we have:
+if (phydev->attached_dev)
+	phydev->attached_dev->phydev = NULL;
+So netdev->phydev is NULL after the call to phy_disconnect, provided that the PHY was attached to the netdev before.
+If use_ncsi is true, then fixed_phy_unregister() will be called with a NULL argument.
+
+This is independent of whether of_phy_is_fixed_link() is true or not.
+Very likely it's false in the NCSI case.
+
 > 
-> On 7/18/2025 4:29 PM, Jakub Kicinski wrote:
->> On Tue, 15 Jul 2025 08:15:30 +0300 Tariq Toukan wrote:
->>> This patch series introduces support for exposing the raw free-running
->>> cycle counter of PTP hardware clocks. Some telemetry and low-level
->>> logging use cycle counter timestamps rather than nanoseconds.
->>> Currently, there is no generic interface to correlate these raw values
->>> with system time.
->>>
->>> To address this, the series introduces two new ioctl commands that
->>> allow userspace to query the device's raw cycle counter together with
->>> host time:
->>>
->>>   - PTP_SYS_OFFSET_PRECISE_CYCLES
->>>
->>>   - PTP_SYS_OFFSET_EXTENDED_CYCLES
->>>
->>> These commands work like their existing counterparts but return the
->>> device timestamp in cycle units instead of real-time nanoseconds.
->>>
->>> This can also be useful in the XDP fast path: if a driver inserts the
->>> raw cycle value into metadata instead of a real-time timestamp, it can
->>> avoid the overhead of converting cycles to time in the kernel. Then
->>> userspace can resolve the cycle-to-time mapping using this ioctl when
->>> needed.
->>>
->>> Adds the new PTP ioctls and integrates support in ptp_ioctl():
->>> - ptp: Add ioctl commands to expose raw cycle counter values
->>>
->>> Support for exposing raw cycles in mlx5:
->>> - net/mlx5: Extract MTCTR register read logic into helper function
->>> - net/mlx5: Support getcyclesx and getcrosscycles
+> From my understanding (which very much could be wrong) of ftgmac100_probe(), these two cases are mutually exclusive. The device either uses NCSI or will use a phy based on the DT "fixed-link" property
+
+>> So fixed_phy_unregister() would be called with a NULL pointer as argument.
+> 
+> Given my analysis above, I don't think this case is possible.
+> 
+> Best regards,
+> Dawid
+>> Therefore cache the phy_device before this call.
 >>
->> It'd be great to an Ack from Thomas or Richard on this (or failing that
->> at least other vendors?) Seems like we have a number of parallel
->> efforts to extend the PTP uAPI, I'm not sure how they all square
->> against each other, TBH.
+>> Fixes: e24a6c874601 ("net: ftgmac100: Get link speed and duplex for NC-SI")
+>> Cc: stable@vger.kernel.org
+>> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+>> ---
+>>   drivers/net/ethernet/faraday/ftgmac100.c | 7 ++++---
+>>   1 file changed, 4 insertions(+), 3 deletions(-)
 >>
->> Full thread for folks I CCed in:
->> https://lore.kernel.org/all/1752556533-39218-1-git-send-email-tariqt@nvidia.com/
->>
+>> diff --git a/drivers/net/ethernet/faraday/ftgmac100.c b/drivers/net/ethernet/faraday/ftgmac100.c
+>> index 5d0c09068..a863f7841 100644
+>> --- a/drivers/net/ethernet/faraday/ftgmac100.c
+>> +++ b/drivers/net/ethernet/faraday/ftgmac100.c
+>> @@ -1750,16 +1750,17 @@ static int ftgmac100_setup_mdio(struct net_device *netdev)
+>>   static void ftgmac100_phy_disconnect(struct net_device *netdev)
+>>   {
+>>       struct ftgmac100 *priv = netdev_priv(netdev);
+>> +    struct phy_device *phydev = netdev->phydev;
+>>   -    if (!netdev->phydev)
+>> +    if (!phydev)
+>>           return;
+>>   -    phy_disconnect(netdev->phydev);
+>> +    phy_disconnect(phydev);
+>>       if (of_phy_is_fixed_link(priv->dev->of_node))
+>>           of_phy_deregister_fixed_link(priv->dev->of_node);
+>>         if (priv->use_ncsi)
+>> -        fixed_phy_unregister(netdev->phydev);
+>> +        fixed_phy_unregister(phydev);
+>>   }
+>>     static void ftgmac100_destroy_mdio(struct net_device *netdev)
 > 
-> I agree with Jakub about the need to properly explain the use cases and
-> goals in the commit and cover letter. AFAIK there are no current public
-> APIs for reporting cycles to userspace, so this really only makes sense
-> with something like DPDK. Even the XDP related helpers expect nanosecond
-> units now. Its unclear if we will need other parts of the APIs to also
-> handle cycles, or if simple ability to get the current cycles is sufficient.
-> 
-> The API also doesn't directly provide a way to query the expected or
-> nominal relationship between cycles and clock time.
-> 
-> If you try to just use PTP_SYS_OFFSET_EXTENDED_CYCLES to compare a
-> cycles value to a clock value to adjust a timestamp, that requires that
-> some other process is keeping CLOCK_REALTIME and the PHC clock
-> synchronized. When handled within the driver, the software typically has
-> an assumption about the relationship based on expected frequencies.
-> Thus, a conversion from cycles to time uses this relationship.
-> 
-> You don't appear to expose that relationship through the API, which
-> means you can only infer it either by knowing the device, or by assuming
-> CLOCK_REALTIME is already synchronized with the PHC?
-> 
-> I guess userspace could also simply build its own equivalent of the
-> struct timecounter using this API.. hmm.
 
-Hi Jacob,
-
-You’re right I’m not trying to reason about the nominal frequency.
-The goal is to collect (cycle, system time) pairs and use them to 
-correlate raw device timestamps with host time. This doesn’t require the 
-PHC to be synchronized to CLOCK_REALTIME, but it does assume the user 
-can estimate the drift or nominal frequency from the ioctl data.
-
-I’ll clarify this in v2.
-
-Thanks,
-Carolina
 
