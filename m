@@ -1,147 +1,99 @@
-Return-Path: <netdev+bounces-211144-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211145-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8E8FB16E21
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 11:08:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8943B16E42
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 11:14:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EEEA7561AC7
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 09:08:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA5563A61DC
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 09:13:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B09B28D8E1;
-	Thu, 31 Jul 2025 09:08:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C74E0275844;
+	Thu, 31 Jul 2025 09:14:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DyGkjBmd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZxEqLmhS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C08CB1E231F
-	for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 09:07:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EC8C1D618A;
+	Thu, 31 Jul 2025 09:14:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753952880; cv=none; b=Av125SY1Jt/ILhCQJQ036ZgU93lDRVidaOVUqsJAVcOLbHPTg2FWUD2On7jH7d/uI/3enZL2LEJxE526vttcO/je5Ua8LP+8lt+1IL/umnlYEIKo2nPr/0z3L4LShAvWN/0Nx09IRTd4Egvd5LoQPmiNgjQkxBLBsVuxYL6xELE=
+	t=1753953260; cv=none; b=lZSFniUyrOAibAo8BbVO987A3UI1viF/wA5WtW1/3C3Qa0dF5Y0HGmHxLwzbpHf67Yrnabo5BFDgZV7MJwWxVnGmidluKrhmXEawKrzhoy9SjDmKhzgCHqmEJfwLvHPfUVKUBWDGBJ0Jp9Og2i5syLhtM4l0geoXkyRHgkil+mY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753952880; c=relaxed/simple;
-	bh=yEK4AMqOp+J5XY7duc/7m+8Az7VEwc/OeM52p4k7Myo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UZwNxds/jL5vR3qANpPGEGtxOU0I5MufxsTgE9tZrr5zmgW4LlmTpA6GaGRnLJEohNgVzpg5kpA8iuD9D4ImsqTb85APtpmDGauvCAMSHRiOi0ENQPiDMV7l8kpiwvnY107VR/ISJiKpmhsEnAKfiaL9AzIoJPjUgDDNmUYGQss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DyGkjBmd; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4535fc0485dso1295655e9.0
-        for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 02:07:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753952877; x=1754557677; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=66N593Z0nuoZIAGdEj0IM2jhkW2Pf2fhdI8POkfcCgA=;
-        b=DyGkjBmd2OHzMkuWLU1aYufLXdIcEoF2+8pDJsUJxdqudwalw8gRUmtKHGeBgNmp2M
-         Y7OCJyDqKmCza4gijWElJsJxCWVF15/1GYV/H6e2ocE6PbFLTnEqD4H7vTp/J1ree7Yw
-         6LJMuFVbqPXf7iOQ8FVsjN7oPP9/YYQfrU+iQv2h9ayu0WRkK8sR5IuS4Mac3oX3wqfQ
-         Zh9EUfLZuCUIemYfVFFfGuQ/eDd3CR8+AqZrXRvzqlHd3kUeBodvk+LIqO1mKX8+nniU
-         komQm9Z2oZbIvrePmv3uzzIYQoW5WH617ShywV5GBsxUMVJjlJ8wb/k11Bsb/+zzfMWM
-         Yopw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753952877; x=1754557677;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=66N593Z0nuoZIAGdEj0IM2jhkW2Pf2fhdI8POkfcCgA=;
-        b=qM7gbnAp30e7CkbCvNr2SF+dPqLvvU4zO1yD3HIbf1OJBsNC7/1dah2V9aHC8pd4xM
-         gcyltikl6WsC0UYqUsnS8bEB98Ss4UdwBN4K7VUDiX7r3k7Zk9OZsdTr0n4O+COm0vhY
-         7cNCewFp9Vj/6etV9JHkUEPPceES+rTSQVSBPF5iOMdtnDPatddHiYW+3umDOfPvJBjR
-         M0pVx0FM4X/EefKOXIs/bkkxhJ9Vg0l61Xz6anBL3rWctdSyYImDO1FP/8cd0ScatcN2
-         eWNzcfPBJeOoTCYpsTchHIlXgJVd1WFkxpSZvRiCplbTm4hOvz5okAUTw9Cmb64ThEjk
-         Z/nw==
-X-Gm-Message-State: AOJu0YzldDAChMnHMrMxqPfX+izCu9O8EaKR1SXzNmFhZLjoYC8ok75A
-	WtZilcwFFCOVEV7q9p4DjJTaAUrm9KpB2XmmU3PMFAizpgL+IY+ya3pBvppC/LIW
-X-Gm-Gg: ASbGncto4xMJc7MU/tO1BGj6+j8/INaobBSA7EG8+9v7KMvV3HSNmajLVIQ2/J04jsh
-	dqP3jS63o9VzS3Xa6xPc5ppDEF++54cv+3mlclHK6eQXfdS1XAzj/q1+P6OkcizTz+iu8RsLOTT
-	eaKp8tIf2X55qPdeqvJtF2c4YyaIGORve99RKqWceyOlD5cSnLygFwzD30+Mwaok5JGktb0MF3L
-	T3n2c57OfI/eAdUZ1TFTn3Lmih+qZxNgHwh+6KMXDKl48uz5frbj6sLrr16A39gpul3bZ7fNyRr
-	nuxtzVdi/W4Q3GDOMT/tfN/OQZk1bfhwH32sk2JBUtfgcLwkNQV3JOmD/JZ+/fz2DreRGoD4VUF
-	kbmuiQILECeOKCA==
-X-Google-Smtp-Source: AGHT+IH5b99dvld3S+07jN5Pmj9XZf4fM0rvcAs1w0vfhckHPH0X1aawyeE9WAUaI1bWwxB/nmSj8g==
-X-Received: by 2002:a05:6000:2383:b0:3b7:91b8:1eeb with SMTP id ffacd0b85a97d-3b794fc1336mr1935504f8f.4.1753952876620;
-        Thu, 31 Jul 2025 02:07:56 -0700 (PDT)
-Received: from skbuf ([2a02:2f04:d30d:7300:97a:e6c7:bad3:aa51])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b79c470102sm1704033f8f.53.2025.07.31.02.07.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 31 Jul 2025 02:07:55 -0700 (PDT)
-Date: Thu, 31 Jul 2025 12:07:53 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Luke Howard <lukeh@padl.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH net] net: dsa: validate source trunk against lags_len
-Message-ID: <20250731090753.tr3d37mg4wsumdli@skbuf>
-References: <DEC3889D-5C54-4648-B09F-44C7C69A1F91@padl.com>
+	s=arc-20240116; t=1753953260; c=relaxed/simple;
+	bh=o1GnT/mv5uDo9vZxctWYqJZ/ZVlGC9o4m7b8LxI/dKs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UV1T4xUsa/QzeUoTyrQuXiNG1Z3HQjazUyvIut7XBZ3nckraVbBzZ3aRRJliUnaVFCNt27A0bWOUeK+bMibMiSl+9t8MXVp5E8bxxTs1ODCj7jtH74QJMvkcxI0LA5SgnDl5REZvokhNlAHUEo1QLJiA7xpNzagRD2suc4DcmPw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZxEqLmhS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B322C4CEEF;
+	Thu, 31 Jul 2025 09:14:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753953260;
+	bh=o1GnT/mv5uDo9vZxctWYqJZ/ZVlGC9o4m7b8LxI/dKs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ZxEqLmhSyJL5s1N7GWltmF+Q9EcbntivFSJS0yqhCHVIu1W76AONTUf2xfJJnmtpT
+	 wzbi7WPDgIdp+YX/M8luyen2O6LTkvIt9plT3bPpk73dKKIvzhtmO4XXcsU68eKeKM
+	 tyHfMQ+k2IhQT12huuVhfvAhC7kthQZK5aHNCMLchCL5Q3Vk6RvVrU5EBOnrEeWtkx
+	 hYlDAA8uJorci4yykWwiWFluwohVErV/NcQL6YklY2Yzw2LWvMJ1dg8VuZl9wmK1Yp
+	 ZOaYflUoPkOp3BvTbUzzJ5aeg/+S+GDn5r31pBIIaTqxyyy0ZsnOs7hbuKghrHLZdz
+	 3OG/PTC2iCByg==
+Message-ID: <a13646af-78f7-4ba7-9767-41d598222b1d@kernel.org>
+Date: Thu, 31 Jul 2025 11:14:14 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DEC3889D-5C54-4648-B09F-44C7C69A1F91@padl.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] sfc: handle NULL returned by xdp_convert_buff_to_frame()
+To: Edward Cree <ecree@amd.com>, Paolo Abeni <pabeni@redhat.com>,
+ Chenyuan Yang <chenyuan0y@gmail.com>, ecree.xilinx@gmail.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, ast@kernel.org, daniel@iogearbox.net,
+ john.fastabend@gmail.com, sdf@fomichev.me, lorenzo@kernel.org
+Cc: netdev@vger.kernel.org, linux-net-drivers@amd.com, bpf@vger.kernel.org,
+ zzjas98@gmail.com
+References: <20250723003203.1238480-1-chenyuan0y@gmail.com>
+ <045d1ff5-bb20-481d-a067-0a42345ab83d@redhat.com>
+ <de14f60e-b1f0-432c-80b4-a2f0453e0fe2@amd.com>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <de14f60e-b1f0-432c-80b4-a2f0453e0fe2@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello Luke,
 
-On Thu, Jul 31, 2025 at 03:35:34PM +1000, Luke Howard wrote:
-> A DSA frame with an invalid source trunk ID could cause an out-of-bounds read
-> access of dst->lags.
+
+On 25/07/2025 12.11, Edward Cree wrote:
+> On 7/24/25 10:57, Paolo Abeni wrote:
+>> On 7/23/25 2:32 AM, Chenyuan Yang wrote:
+>>> The xdp_convert_buff_to_frame() function can return NULL when there is
+>>> insufficient headroom in the buffer to store the xdp_frame structure
+>>> or when the driver didn't reserve enough tailroom for skb_shared_info.
+>>
+>> AFAIC the sfc driver reserves both enough headroom and tailroom, but
+>> this is after ebpf run, which in turn could consume enough headroom to
+>> cause a failure, so I think this makes sense.
 > 
-> This patch adds a check to dsa_lag_by_id() to validate the LAG ID is not zero,
-> and is less than or equal to dst->lags_len. (The LAG ID is derived by adding
-> one to the source trunk ID.)
-> 
-> Note: this is in the fast path for any frames within a trunk.
-> 
-> Signed-off-by: Luke Howard <lukeh@padl.com>
-> ---
->  include/net/dsa.h | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/include/net/dsa.h b/include/net/dsa.h
-> index 2e148823c366c..67672c5ff22e5 100644
-> --- a/include/net/dsa.h
-> +++ b/include/net/dsa.h
-> @@ -180,6 +180,9 @@ struct dsa_switch_tree {
->  static inline struct dsa_lag *dsa_lag_by_id(struct dsa_switch_tree *dst,
->  					    unsigned int id)
->  {
-> +	if (unlikely(id == 0 || id > dst->lags_len))
-> +		return NULL;
-> +
->  	/* DSA LAG IDs are one-based, dst->lags is zero-based */
->  	return dst->lags[id - 1];
->  }
-> -- 
-> 2.43.0
+> Your reasoning seems plausible to me.
 
-1. You need to add a Fixes: tag, like the following:
-Fixes: 5b60dadb71db ("net: dsa: tag_dsa: Support reception of packets from LAG devices")
+Hmm... have you actually tested that XDP/BPF can adjust headroom so much
+that xdp_convert_buff_to_frame() function fails?
 
-2. The problem statement must not remain in the theoretical realm if you
-   submit a patch intended as a bug fix. Normally the tagger is used to
-   process data coming from the switch hardware, so to trigger an
-   out-of-bounds array access would imply that the problem is elsewhere.
-   That, or you can make it clear that the patch is to prevent a
-   modified dsa_loop from crashing when receiving crafted packets over a
-   regular network interface. But using dsa_loop with a modified
-   dsa_loop_get_protocol() return value is a developer tool which
-   involves modifying kernel sources. I would say any fix that doesn't
-   fix any real life problem in production systems should be sent to
-   'net-next', not to 'net'. This is in accordance with
-   Documentation/process/stable-kernel-rules.rst.
+I really doubt this possible for BPF-progs to violate this.
 
-3. As per Documentation/process/submitting-patches.rst, you should
-   replace the wording "This patch adds" with the imperative mood.
+The XDP BPF-prog can only adjust the headroom via the helpers
+bpf_xdp_adjust_head() and bpf_xdp_adjust_meta().  These helpers reserve
+room for sizeof(struct xdp_frame).
 
-4. Please use ./scripts/get_maintainer.pl to generate the recipient
-   list, don't send patches just to the mailing list, reviewers might
-   miss them.
+The tailroom can be adjusted via helper bpf_xdp_adjust_tail() and it
+also reserve room for sizeof(struct skb_shared_info) such that BPF-progs
+cannot get access to this area. See define for xdp_data_hard_end.
+
+--Jesper
 
