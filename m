@@ -1,139 +1,210 @@
-Return-Path: <netdev+bounces-211286-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211287-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F074B178BA
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 00:00:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51DD5B17909
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 00:18:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 737903BE5B6
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 22:00:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C07E1C80A48
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 22:19:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5663625CC52;
-	Thu, 31 Jul 2025 21:59:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04FFE276054;
+	Thu, 31 Jul 2025 22:18:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wkennington-com.20230601.gappssmtp.com header.i=@wkennington-com.20230601.gappssmtp.com header.b="R36VtzYo"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DP1UQMC0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B48A27144B
-	for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 21:59:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46942270542;
+	Thu, 31 Jul 2025 22:18:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753999173; cv=none; b=tAO9yTV4V2dFR3eExL/4GmYGkeDeolqN5OaeIV7KQgNz7ZxcKR1wnaW+sX8MLEzmImfa8U/9EDEn7kh5j51h+BSCeZjlWZoPeNlORKOG/DoiRpjQe0TiUviYQJA8CJEoMtgCcfUiRy+B250T9VlQ2q1Yhc3YeIkWeaxOk9esIAk=
+	t=1754000323; cv=none; b=HhucIwIMInnfiuLhxD4N+WwMPfv4O++lhTWc6HDjN32z3Dl40wO/ifI40PTlk3Ilt9MdEg6eVi9KmvIM4KsGUT6WePV6CARCT1gXVmg+dp2w6id7kbG/gBJSo13GtH2kkVuzZUUU8gqGz9WUiRzAf9vcwJbkgGXs4C3lFszwiW8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753999173; c=relaxed/simple;
-	bh=9V6rW63ARqbfmydjM/Tm+7hXZzF5AWBKQYB2xvuevVQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pjdn2wG88r2M5CTA68iwEk3f9ga2oSNH0Zpzt5NJDAMg89oQcTll78wkR460GEp3ZFBxMP1SDgf3rt9y384m3lzBLO83WY30udN9XoKIScDA2agSt/Xu6KaBqm797U3JWnm75CRAMADXvEzzMGGh3H9ZgLAjBpvf4ARHhzeHE/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wkennington.com; spf=none smtp.mailfrom=wkennington.com; dkim=pass (2048-bit key) header.d=wkennington-com.20230601.gappssmtp.com header.i=@wkennington-com.20230601.gappssmtp.com header.b=R36VtzYo; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wkennington.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=wkennington.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2401248e4aaso18498685ad.0
-        for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 14:59:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=wkennington-com.20230601.gappssmtp.com; s=20230601; t=1753999170; x=1754603970; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YjOpiuHEGh+oOf4K6HcfROSNKOwu/C9DgO4MBo+Jjn8=;
-        b=R36VtzYoOrVqh8Cw2jj/Aa+8KwWIQIdfaolimw62ziA82NnJy23LZErovQAEjrLIcd
-         jBHk2Ux41eAGjj584pGPso4C2YS1bl+N+ldWWJt9Myn30tFPs1xMBRCJts6LCS5lWGzU
-         6s0c4bKw2QX5Yu9QUufivJ/wtB8O5aIL0vGCMdMguZ8Ve/1XQE47Yj8RAXmDCibYIpxV
-         OJ1NoBmRfaXGW14KbrmDC/N482lemS6thLSWTvWvX7vZpb4kfoWEWJk8Ptq9CsrKjHj8
-         ug907NwYYwPmd0Rd8Ep06sGEA/B1xJ34XU4OhCHphJt9RxJUsGkRYTGLScXfJdKYqBPL
-         u63g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753999170; x=1754603970;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YjOpiuHEGh+oOf4K6HcfROSNKOwu/C9DgO4MBo+Jjn8=;
-        b=iQgHo12f7S1EQuAwuYBtVxgRnYdhvT5aZHdNkNoc2oCyiH1Ngpf7N8R0F7V+20c4Y1
-         TL4B3LklPPWZN7DW4WbVIJaUaiD16kh1m2B/khbB8CifpSa5xHsPn8aEsdHkoIJ8yFBl
-         ABVKxFQwLdx/+/0stww4+YmEnEdEXU4mrW2XJ33kevJ9RXGiZm0k3oepvffRinsREWy9
-         BziigmDWXJyA/kV9ReOLZeKpW7YEhsFLz5PzJ+WIo3btAfTuQ/BR5ja39p6ka0u8QwEE
-         vjOwwGxGV/Zrn0ceR/MKC9e2ST0bm8Xf9RVhQ5sKkXO+mLeTJ0fWWNifMaGvjdQmOtr8
-         uiiw==
-X-Gm-Message-State: AOJu0Yw6YnZD8T8B1rmN9oLqOEKIpqN6Cjt2nhLdBVhsxrkqfri70c3n
-	SqNXf/wy8KfcwLp+9s7yD0BCEuCH6xtxxZi2dUU/zwIytTOt3oc3D2z7e4Kvx9/rGbiHRAirprx
-	JtYLT
-X-Gm-Gg: ASbGnctgEnc0DUCBqr1qHDmNTFoRVIFUAtN0LIQTaXQP6qICjNwPXFJMlclEQyPoPZ2
-	VN5GliZjd1NcBKZxyou8NkmpDJLv6lsiL7WBP/jUVdhyuetSHRSDxr/gr2lIJiTtaroUpDMIGdo
-	GKUy0nwbyQGMflK4KpDS53nbb6TFn8ocTvib7iygH5mBacWSWxgw5XZbaZczmIWrVCrsFMPYZp6
-	W5XvMbdSoF8s3A0MUCjJj0cbHWLl+AzY/F9iKlrsu2yWVMeD2UgoQJaltUJX20OdtznGs9YBXgO
-	vyKMsDjjbtUJCnVI9iPhprFlVQbU3RR0t/Nal/dFzDFqOm6njZyVZHeV78wy+na2pfp3FeJwQyg
-	gKoF2xUmZdef7XL5IcuUtu0dXsbCBRgR2JEnmXe3mlyudPLC/of2PtzZNVsAHOnSCSmPj8M0yYb
-	dKZkMZ3Ep9Ew==
-X-Google-Smtp-Source: AGHT+IEr6FP7xOwIkvDCQXjBC3zPnHWxrFUqgvLdaWjsTOGldG+TyM3KZJ8Xkv+4X7Bgxwznnnqzmg==
-X-Received: by 2002:a17:903:3c26:b0:240:52c8:255a with SMTP id d9443c01a7336-24096b0cf5emr168331405ad.38.1753999170261;
-        Thu, 31 Jul 2025 14:59:30 -0700 (PDT)
-Received: from wak-linux.svl.corp.google.com ([2a00:79e0:2e5b:9:1387:de4c:755c:9edb])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-241e8976a06sm26705495ad.81.2025.07.31.14.59.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 31 Jul 2025 14:59:29 -0700 (PDT)
-From: "William A. Kennington III" <william@wkennington.com>
-To: netdev@vger.kernel.org
-Cc: "William A. Kennington III" <william@wkennington.com>
-Subject: [PATCH iproute2-next 2/2] ip-monitor: Always monitor links
-Date: Thu, 31 Jul 2025 14:59:20 -0700
-Message-ID: <20250731215920.3675217-2-william@wkennington.com>
-X-Mailer: git-send-email 2.50.1.565.gc32cd1483b-goog
-In-Reply-To: <20250731215920.3675217-1-william@wkennington.com>
-References: <20250731215920.3675217-1-william@wkennington.com>
+	s=arc-20240116; t=1754000323; c=relaxed/simple;
+	bh=YW533d/N8+mABcQxI8sTQIIuyK3oOk+1xYE15uanYMk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JXR5+4Tq6uF285wpDexZBoZ59Dq1xnZkYMte/pzVMbpxDtxj96IldvnoOM7BZCsjVtGwv7zT9Uz7zjfM7dqAvDr+8Joi8Abo14nj2y5VGOp1xeW5eLem5vdNIIn4MSjdO4TMgqZlxYfnMkhcsim7frgRwlRmh09r1Foe6LEt46g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DP1UQMC0; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1754000323; x=1785536323;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=YW533d/N8+mABcQxI8sTQIIuyK3oOk+1xYE15uanYMk=;
+  b=DP1UQMC0CEELuRAKUtduN1AOsr+jiKDFXWAtfHAMq/0st4kwevMvtEiO
+   mpx7JlKyyrCDunCYUvDlKQF6ZjXGPVTB3ZSrLfLxcS3ann6bHtdZlAQB/
+   X5CGy9khIMoNYVaKSArqfJMdDobqomEZo7ednMw0YMgzBYNmCD2EVfspQ
+   ec9nhdjp1e/+K4JGhI5h4g2CoTjR5JSu85qjWWaycJDAbmh1hj/75nZmZ
+   Qmvr99AUKDVCcua40CAHlzWw26rW+hdvFQkY72zmmK7FdfnuOwQRgPk/P
+   eyIsWO02+LtX+grNqyWq5NT2mX6gXzuJcG5elfq32uFVZwpw3rBM/016e
+   A==;
+X-CSE-ConnectionGUID: ubh+KIjITEe4ZSlVmb5nUA==
+X-CSE-MsgGUID: cc04Pao/T5GzbxjETWSn0w==
+X-IronPort-AV: E=McAfee;i="6800,10657,11508"; a="66909733"
+X-IronPort-AV: E=Sophos;i="6.17,255,1747724400"; 
+   d="scan'208";a="66909733"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2025 15:18:42 -0700
+X-CSE-ConnectionGUID: 7lC2KfvkR1KFs60qL+HXTA==
+X-CSE-MsgGUID: Tgvd36kHSHWKQ+2Y62KqQQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,255,1747724400"; 
+   d="scan'208";a="163731560"
+Received: from lkp-server01.sh.intel.com (HELO 160750d4a34c) ([10.239.97.150])
+  by orviesa008.jf.intel.com with ESMTP; 31 Jul 2025 15:18:37 -0700
+Received: from kbuild by 160750d4a34c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uhbbe-00048Q-14;
+	Thu, 31 Jul 2025 22:18:34 +0000
+Date: Fri, 1 Aug 2025 06:18:00 +0800
+From: kernel test robot <lkp@intel.com>
+To: Jakub Sitnicki <jakub@cloudflare.com>, bpf@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Arthur Fabre <arthur@arthurfabre.com>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Jesse Brandeburg <jbrandeburg@cloudflare.com>,
+	Joanne Koong <joannelkoong@gmail.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <thoiland@redhat.com>,
+	Yan Zhai <yan@cloudflare.com>, kernel-team@cloudflare.com,
+	netdev@vger.kernel.org, Stanislav Fomichev <sdf@fomichev.me>
+Subject: Re: [PATCH bpf-next v5 2/9] bpf: Enable read/write access to skb
+ metadata through a dynptr
+Message-ID: <202508010501.YGP8iOar-lkp@intel.com>
+References: <20250731-skb-metadata-thru-dynptr-v5-2-f02f6b5688dc@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250731-skb-metadata-thru-dynptr-v5-2-f02f6b5688dc@cloudflare.com>
 
-We need to watch link changes even if we don't actively print them.
-Otherwise, route changes will not print the correct link name.
+Hi Jakub,
 
-Signed-off-by: William A. Kennington III <william@wkennington.com>
----
- ip/ipmonitor.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+kernel test robot noticed the following build warnings:
 
-diff --git a/ip/ipmonitor.c b/ip/ipmonitor.c
-index 1f4e860f..14aba1f1 100644
---- a/ip/ipmonitor.c
-+++ b/ip/ipmonitor.c
-@@ -25,6 +25,7 @@ static int prefix_banner;
- int listen_all_nsid;
- struct rtnl_ctrl_data *ctrl_data;
- int do_monitor;
-+int print_link;
- 
- static void usage(void)
- {
-@@ -100,7 +101,8 @@ static int accept_msg(struct rtnl_ctrl_data *ctrl,
- 	case RTM_NEWLINK:
- 	case RTM_DELLINK:
- 		ll_remember_index(n, NULL);
--		print_linkinfo(n, arg);
-+		if (print_link)
-+			print_linkinfo(n, arg);
- 		return 0;
- 
- 	case RTM_NEWADDR:
-@@ -263,8 +265,10 @@ int do_ipmonitor(int argc, char **argv)
- 	if (!lmask)
- 		lmask = IPMON_L_ALL;
- 
-+	/* Always monitor links for renaming */
-+	groups |= nl_mgrp(RTNLGRP_LINK);
- 	if (lmask & IPMON_LLINK)
--		groups |= nl_mgrp(RTNLGRP_LINK);
-+		print_link = true;
- 	if (lmask & IPMON_LADDR) {
- 		if (!preferred_family || preferred_family == AF_INET)
- 			groups |= nl_mgrp(RTNLGRP_IPV4_IFADDR);
+[auto build test WARNING on bpf-next/master]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Jakub-Sitnicki/bpf-Add-dynptr-type-for-skb-metadata/20250731-183157
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
+patch link:    https://lore.kernel.org/r/20250731-skb-metadata-thru-dynptr-v5-2-f02f6b5688dc%40cloudflare.com
+patch subject: [PATCH bpf-next v5 2/9] bpf: Enable read/write access to skb metadata through a dynptr
+config: i386-buildonly-randconfig-005-20250801 (https://download.01.org/0day-ci/archive/20250801/202508010501.YGP8iOar-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250801/202508010501.YGP8iOar-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202508010501.YGP8iOar-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   kernel/bpf/helpers.c: In function '____bpf_snprintf':
+   kernel/bpf/helpers.c:1069:9: warning: function '____bpf_snprintf' might be a candidate for 'gnu_printf' format attribute [-Wsuggest-attribute=format]
+    1069 |         err = bstr_printf(str, str_size, fmt, data.bin_args);
+         |         ^~~
+   In file included from include/linux/string.h:382,
+                    from arch/x86/include/asm/page_32.h:18,
+                    from arch/x86/include/asm/page.h:14,
+                    from arch/x86/include/asm/processor.h:20,
+                    from arch/x86/include/asm/timex.h:5,
+                    from include/linux/timex.h:67,
+                    from include/linux/time32.h:13,
+                    from include/linux/time.h:60,
+                    from include/linux/jiffies.h:10,
+                    from include/linux/ktime.h:25,
+                    from include/linux/timer.h:6,
+                    from include/linux/workqueue.h:9,
+                    from include/linux/bpf.h:10,
+                    from kernel/bpf/helpers.c:4:
+   kernel/bpf/helpers.c: In function '__bpf_dynptr_read':
+>> include/linux/fortify-string.h:115:33: warning: argument 2 null where non-null expected [-Wnonnull]
+     115 | #define __underlying_memmove    __builtin_memmove
+         |                                 ^
+   include/linux/fortify-string.h:645:9: note: in expansion of macro '__underlying_memmove'
+     645 |         __underlying_##op(p, q, __copy_size);                           \
+         |         ^~~~~~~~~~~~~
+   include/linux/fortify-string.h:694:27: note: in expansion of macro '__fortify_memcpy_chk'
+     694 | #define memmove(p, q, s)  __fortify_memcpy_chk(p, q, s,                 \
+         |                           ^~~~~~~~~~~~~~~~~~~~
+   kernel/bpf/helpers.c:1784:17: note: in expansion of macro 'memmove'
+    1784 |                 memmove(dst, bpf_skb_meta_pointer(src->data, src->offset + offset), len);
+         |                 ^~~~~~~
+   include/linux/fortify-string.h:115:33: note: in a call to built-in function '__builtin_memmove'
+     115 | #define __underlying_memmove    __builtin_memmove
+         |                                 ^
+   include/linux/fortify-string.h:645:9: note: in expansion of macro '__underlying_memmove'
+     645 |         __underlying_##op(p, q, __copy_size);                           \
+         |         ^~~~~~~~~~~~~
+   include/linux/fortify-string.h:694:27: note: in expansion of macro '__fortify_memcpy_chk'
+     694 | #define memmove(p, q, s)  __fortify_memcpy_chk(p, q, s,                 \
+         |                           ^~~~~~~~~~~~~~~~~~~~
+   kernel/bpf/helpers.c:1784:17: note: in expansion of macro 'memmove'
+    1784 |                 memmove(dst, bpf_skb_meta_pointer(src->data, src->offset + offset), len);
+         |                 ^~~~~~~
+   kernel/bpf/helpers.c: In function '__bpf_dynptr_write':
+   include/linux/fortify-string.h:115:33: warning: argument 1 null where non-null expected [-Wnonnull]
+     115 | #define __underlying_memmove    __builtin_memmove
+         |                                 ^
+   include/linux/fortify-string.h:645:9: note: in expansion of macro '__underlying_memmove'
+     645 |         __underlying_##op(p, q, __copy_size);                           \
+         |         ^~~~~~~~~~~~~
+   include/linux/fortify-string.h:694:27: note: in expansion of macro '__fortify_memcpy_chk'
+     694 | #define memmove(p, q, s)  __fortify_memcpy_chk(p, q, s,                 \
+         |                           ^~~~~~~~~~~~~~~~~~~~
+   kernel/bpf/helpers.c:1845:17: note: in expansion of macro 'memmove'
+    1845 |                 memmove(bpf_skb_meta_pointer(dst->data, dst->offset + offset), src, len);
+         |                 ^~~~~~~
+   include/linux/fortify-string.h:115:33: note: in a call to built-in function '__builtin_memmove'
+     115 | #define __underlying_memmove    __builtin_memmove
+         |                                 ^
+   include/linux/fortify-string.h:645:9: note: in expansion of macro '__underlying_memmove'
+     645 |         __underlying_##op(p, q, __copy_size);                           \
+         |         ^~~~~~~~~~~~~
+   include/linux/fortify-string.h:694:27: note: in expansion of macro '__fortify_memcpy_chk'
+     694 | #define memmove(p, q, s)  __fortify_memcpy_chk(p, q, s,                 \
+         |                           ^~~~~~~~~~~~~~~~~~~~
+   kernel/bpf/helpers.c:1845:17: note: in expansion of macro 'memmove'
+    1845 |                 memmove(bpf_skb_meta_pointer(dst->data, dst->offset + offset), src, len);
+         |                 ^~~~~~~
+
+
+vim +115 include/linux/fortify-string.h
+
+78a498c3a227f2 Alexander Potapenko 2022-10-24  103  
+78a498c3a227f2 Alexander Potapenko 2022-10-24  104  #if defined(__SANITIZE_MEMORY__)
+78a498c3a227f2 Alexander Potapenko 2022-10-24  105  /*
+78a498c3a227f2 Alexander Potapenko 2022-10-24  106   * For KMSAN builds all memcpy/memset/memmove calls should be replaced by the
+78a498c3a227f2 Alexander Potapenko 2022-10-24  107   * corresponding __msan_XXX functions.
+78a498c3a227f2 Alexander Potapenko 2022-10-24  108   */
+78a498c3a227f2 Alexander Potapenko 2022-10-24  109  #include <linux/kmsan_string.h>
+78a498c3a227f2 Alexander Potapenko 2022-10-24  110  #define __underlying_memcpy	__msan_memcpy
+78a498c3a227f2 Alexander Potapenko 2022-10-24  111  #define __underlying_memmove	__msan_memmove
+78a498c3a227f2 Alexander Potapenko 2022-10-24  112  #define __underlying_memset	__msan_memset
+78a498c3a227f2 Alexander Potapenko 2022-10-24  113  #else
+a28a6e860c6cf2 Francis Laniel      2021-02-25  114  #define __underlying_memcpy	__builtin_memcpy
+a28a6e860c6cf2 Francis Laniel      2021-02-25 @115  #define __underlying_memmove	__builtin_memmove
+a28a6e860c6cf2 Francis Laniel      2021-02-25  116  #define __underlying_memset	__builtin_memset
+78a498c3a227f2 Alexander Potapenko 2022-10-24  117  #endif
+78a498c3a227f2 Alexander Potapenko 2022-10-24  118  
+
 -- 
-2.50.1.565.gc32cd1483b-goog
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
