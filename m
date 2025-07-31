@@ -1,211 +1,209 @@
-Return-Path: <netdev+bounces-211149-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211150-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D88CAB16EA2
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 11:29:10 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3384DB16EF7
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 11:47:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2979F18C0ED3
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 09:29:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C42C77B4A15
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 09:46:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9ADCC2BD5BF;
-	Thu, 31 Jul 2025 09:29:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14DAA2BDC25;
+	Thu, 31 Jul 2025 09:47:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jaguarmicro.com header.i=@jaguarmicro.com header.b="DtxP5UG8"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="Tb3mfCR7"
 X-Original-To: netdev@vger.kernel.org
-Received: from SEYPR02CU001.outbound.protection.outlook.com (mail-koreacentralazon11023086.outbound.protection.outlook.com [40.107.44.86])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E927C21CC6D;
-	Thu, 31 Jul 2025 09:28:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.44.86
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753954145; cv=fail; b=YX9BL7FJ/po9BmvJIaLK/qG5p8D8pczBpunL2kavW/uBq05hDIC+xAcpyzww5abH21bBw+ZuOxqzuePBjKNV+LuGP6hwWvP27IGGbEErJgGGH573Iru7k094+uC6F1suPq1iirw0kiY/tEJaZPhOqSeFRdMhXgiPvjKgbqNbGZI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753954145; c=relaxed/simple;
-	bh=1/X9dUZNitEk/DujAsvdZhu88K1fK3oTNhrr6NqC2VU=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=vAh2KOItHefl/DpEoBE78sJjHGtsd7t1Vrf2KqX5dBoedkLWqmIoX0ZlRF88AnvGowEVu8t/6x/KgNg4OaaEu8LSFrxSjhMNzsNjDz/x461Q9mbuBEtkYZdRuGc35gnVOZym0+Hks8gJXLaBzyHy1GCjIHqeJF7tb2xuXhol1OM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=jaguarmicro.com; spf=pass smtp.mailfrom=jaguarmicro.com; dkim=pass (2048-bit key) header.d=jaguarmicro.com header.i=@jaguarmicro.com header.b=DtxP5UG8; arc=fail smtp.client-ip=40.107.44.86
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=jaguarmicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jaguarmicro.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=i57gb8rzWiLv0I6LO4zV6V2iBeAZuzuDA9hBF7SdDBbSLsAwk36bRASG+idgnwp1Q9g58qtnw8/EaU4ST+OAALMMC3ORzAtkubfQZNOHDZTZKYA5MPfpxg7fyq77aCNn00VS3MLo9I4Ni1c6Sz4JvlWNxIPj0tLwosp+jKzHMOp9ro83xoD2NJtaX10RMveR1e/QNkqnHUO4AA/8+JRM24eD1H3lTn4xr788QcG92d6fn+oKPTYJheUHlXaslJiIEw3GZMKTwqMLIQ4USjaPuU1AdLFI56s2pwIFhUKpMbjBQNGag0SRQFyF7zFaW5TcjkUbpkIR2gNGM/4SAWAfhw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=DH53owwCm8eC+HFbT5VoMcck3pkjkFpzD5Uh5bNpKyQ=;
- b=AIe1S6ct63yrZOyHMzcZ4zMpy0cAOIw0TidpzxIFBo0G1vpovOqlqGcAdq5CFHOAz3PuhFeP5XnqgIabIYA5wN4k3McnbxO/c1CZBhKws3J2JQZeS6aKyS1/TfgcdZoJg7nRmAyQW0dI/bVbBL1w1NUiV5tJLPJ2m9V7CvE3HeNkc05gojvNDXtr7gMh8j084CO6r0XPWdbp5y+8o5Ea97DPXMnT52fKTmr+9rOzDVhdYosPue3O8MNvmRRNXaBAD5F2P4d9L4jk7MzUhhXX8Cq2mnBWHwVYNB8BJzft+oa9NgQaJUJfXhRZAXrFZLfzu1sHritzooRyhVUZ3wvaMQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=jaguarmicro.com; dmarc=pass action=none
- header.from=jaguarmicro.com; dkim=pass header.d=jaguarmicro.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jaguarmicro.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DH53owwCm8eC+HFbT5VoMcck3pkjkFpzD5Uh5bNpKyQ=;
- b=DtxP5UG8H1fP/yCNlOJK04fFHDxBLosGOFgCSsxO6Xi8MMGCYiRdkCu6zxEKz/ZAnXVITx0QGck703TVs/AulVLcIkWLW4Z08RCdb+ZXEaumdzNkpGoNpHnVX/vkIzqaLmtAhfpEDfgcCMhj6l7mDYykcrUaCdDjVgELOBHZi3gMRZDPqJZoAgcTtHh9bOWc237JxslYKNYWTF70SkSnCCeV6TaJeH9Pg5NkgsRXHb81Pg7WYXqgbb5E/UtnZFhyOqm3OOvyfpiWymBckweQnpFtjh0IPLDhchUdUa4YrP15UxynrIP9HOZEaVa+aCIl26TiwlnFih40JGtrSC8JHg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=jaguarmicro.com;
-Received: from PSAPR06MB3942.apcprd06.prod.outlook.com (2603:1096:301:2b::5)
- by KL1PR06MB6943.apcprd06.prod.outlook.com (2603:1096:820:127::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8989.13; Thu, 31 Jul
- 2025 09:28:54 +0000
-Received: from PSAPR06MB3942.apcprd06.prod.outlook.com
- ([fe80::9b95:32e5:8e63:7881]) by PSAPR06MB3942.apcprd06.prod.outlook.com
- ([fe80::9b95:32e5:8e63:7881%4]) with mapi id 15.20.8989.011; Thu, 31 Jul 2025
- 09:28:54 +0000
-From: liming.wu@jaguarmicro.com
-To: "Michael S . Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
-Cc: kvm@vger.kernel.org,
-	virtualization@lists.linux-foundation.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	angus.chen@jaguarmicro.com,
-	Liming Wu <liming.wu@jaguarmicro.com>
-Subject: [PATCH] virtio_pci: Fix misleading comment for queue vector
-Date: Thu, 31 Jul 2025 17:27:57 +0800
-Message-ID: <20250731092757.1000-1-liming.wu@jaguarmicro.com>
-X-Mailer: git-send-email 2.49.0.windows.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: KUZPR02CA0014.apcprd02.prod.outlook.com
- (2603:1096:d10:33::12) To PSAPR06MB3942.apcprd06.prod.outlook.com
- (2603:1096:301:2b::5)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F6F3EAF6
+	for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 09:47:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753955247; cv=none; b=pnkNXkHEwcdOrHkk6X0wDghRncjgm4WikFrlMuWNB1pxgOXm5bamdl1/x4HYsS3rpVeQg+gXTb4eZrFjAgXuXw4SOU97rdqgvXaOMyU/e3/q6hfpXpLNWbJxDWcn48ZAhd8eZturvtwPoeTG4im4FFuPYeKhPcESNp7lsZGk/SM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753955247; c=relaxed/simple;
+	bh=IBhBDCDc/hoa49pnfAR+QKQXMndrQBzqnwNrRd0+l6k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=D0o6Tm+0zXilgrv9IoRUaeKp+lOJ7bwV+3hSuTNIicdDVpWmPoTTXWpRK93PJtfw1UuDRmXKQOzzOQsqqYYJZnJna7WnfmshGFD+ktSOEwNxmg+mpMXJ459z3BzUzKNI7cGDbT4fpOkIuvqMBut5SxYKhPcz6xr/nNC4xE6BpIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=Tb3mfCR7; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56V9fKfA007989
+	for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 09:47:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	0MKDZZ+5agMe9RsKHF0PqKWkUAHGtARi3inVO2hvokQ=; b=Tb3mfCR7428xlzQH
+	ZUdxLhxqHLPl8IvDnzHOAiMiT3cElfWFWO7XgwLGbhoibwJvBEBz4lKC+ByoeTZz
+	PbzE1qJKwq6XF/fvsBsz5Tz9xUV4hOIksekA83Z8ELZma87NEza+8BnaFlsZ025m
+	jobPqz8G13bC+bV9M9i5yTEVQud+MgKg5+jhdu/6sc0zY0WrBB63VWSHIZAwBz3z
+	lNYDbfhfWJ5rvWCjjEITV235eVFk6eTCPLI3O85TUYYLTBLFkvVKD7KXlhZeeEKv
+	p3pRq/Pcmyq6qWHyZvL+DS7JJkpaQ6DXP9lftUMyX9XBmowlxQfu3hqGB7kuzZAe
+	O6ZA6g==
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com [209.85.222.197])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 485v1xmq3q-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 09:47:24 +0000 (GMT)
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-7e33e133f42so24616285a.3
+        for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 02:47:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753955243; x=1754560043;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0MKDZZ+5agMe9RsKHF0PqKWkUAHGtARi3inVO2hvokQ=;
+        b=d4v10Lmtv3Ou7f5NyGjsLJETtadum23InrkDxMmAl33CPZV178Fn0bPDwJ/uIP1Zjj
+         pCoyQJfL/CX9adPhhE1/ad9tK+erd2N+kt2D18/ul3Xur0wWeF5v6EoP6zcnWsZoewYc
+         eQw/06iOaAw/y1gM7NlAiqUqeGE5fxefziFlrYsw28z0ZgarMNO0UrYZcTBjNFvq4Ex+
+         OD9xehZAh6XNuKO63de/JozRTVwL5wU+0Pl2kkOIT78z5KvfsDv0u0g+a04lkTpZ3vTW
+         OwY4JuV7yNC2R3w9yUZu80fzBHXVYXwM8NXyP8e6Z0HgNzJUiKB2df8LipfmC13hjlUU
+         tTUQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUlEWdEv3RxUSoWhO3bYNogpApyaiuEnm/5QcHlnr/pz632yUmV619J/pMJvhNlL9O0CDDNOXQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzQWxNB2lghxyLz2g4iiEsNCu0GrbqtAfu5o+XKSgEQIpvn5mi0
+	iCTzl88MSDHJlIV0AJ0tyQLOCh4ht3B/LWuuMqAOJGP2ldi1Qj5Ai+afrvOWJuOfsmr6vzUphG3
+	rNJlNsylwHr31rd+QY9Z0TtxHt2X0XhJ98pOkL0QZmai1ycNLISWyTybSqS8=
+X-Gm-Gg: ASbGncv8dCLn7hx89o3aa/vx+p18ZJ6DhR25QgynXuQPyQmCidtz/ukB4zvpcxAe1Ur
+	qkH11LmFZU4MpgsoAfm/c8Gw/qjUWWA691htbapTAkFPo22e8+e4FY3ArY8qmp5Ib1auE47ytZh
+	qrDuSpvHK52KJK5WFPVK5vhJknyIRlwpr3mzq7Lf30krPvnVstvaWlhsZzd0NEciRMGPXD1I075
+	sXLWTyi04ISMMlk0otkP8DAi8uQxf5q73c/vFt5vJ6NwN4eRdzxrPLl9sVbGQRTM/MnfVV1byHb
+	gn3yYK4IBR0Xgnr/BNBchHYbFwLm5/uoGqrFuuGgAypH17jmEL7yCGXmY6KhqLvRVxL7Mob7J0K
+	+1Z2zueoaKOI+uQeHSA==
+X-Received: by 2002:a05:620a:288d:b0:7e2:1609:a19a with SMTP id af79cd13be357-7e66f3463e9mr498346685a.8.1753955243121;
+        Thu, 31 Jul 2025 02:47:23 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGETYpvGC8UoS+TadB6s1Bo0qeg/xDdxI9K0XTqqvffUNRJhuCXS6dOJHD8ewe0In6BBqm7+g==
+X-Received: by 2002:a05:620a:288d:b0:7e2:1609:a19a with SMTP id af79cd13be357-7e66f3463e9mr498341485a.8.1753955241670;
+        Thu, 31 Jul 2025 02:47:21 -0700 (PDT)
+Received: from [192.168.43.16] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-af91a1e88desm82062066b.71.2025.07.31.02.47.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 31 Jul 2025 02:47:20 -0700 (PDT)
+Message-ID: <f6b16d1d-3730-46d1-81aa-bfaf09c20754@oss.qualcomm.com>
+Date: Thu, 31 Jul 2025 11:47:17 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PSAPR06MB3942:EE_|KL1PR06MB6943:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7837af8e-eb50-4166-1fc1-08ddd014ab17
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|52116014|376014|366016|1800799024|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?Bdr9bL8XsL6EpwsCre9x+qjsfJQYpw9nrGhCKGK4d19BBf2B4sg2jgKILp9R?=
- =?us-ascii?Q?wyYyaOy+2Qs9Eyx2r9wdkReZ0ye936S/DvWmK7mcQuPyXgxAiic2sExUad0A?=
- =?us-ascii?Q?9t/nKhL3D/aeCm215T1tgbWFXxCK/ncdsZJAkRR4lBCYrLFSqwSO6bqn548v?=
- =?us-ascii?Q?kbK6A5jUUqPORQHt6wy8TRrF7p10VWxzngddZPny9xlBjlnM9d9NoEhjMfnY?=
- =?us-ascii?Q?Gy1TEFuPQwmrZ4zL/+YEccgmWnxzVEc20j8UllgoqBJqi8NrOyuaxUqfLXAe?=
- =?us-ascii?Q?aNvm/SPdkXjaFOoeJr+NLaMwlP5xm7tpEVAyRkxYfRjPbZyPeY1CFpmOWRht?=
- =?us-ascii?Q?254AUxuDh49rTecYTi69mfOs6aZq/JQNZ4Wj54B+BodglMYNyd/QAtZfU1nO?=
- =?us-ascii?Q?BVq5sc3281XAWZfghC4/JzkRbmAOWXcbLTN8HyoU/8xEIdoZ/FHEt2S885Xe?=
- =?us-ascii?Q?XZLTPXLCjMl71thVSWHcC+qTueztlCM/Z63Fax9INv6drTz7fgIE6OeQeoHc?=
- =?us-ascii?Q?FkWKzWsuyw2j9AzkWRcMoXKBW6yWLvw/kiDRm1Tbikifbfya2mY2DXLo7fpJ?=
- =?us-ascii?Q?v+P/5A9f1HWXtKMWurCV7nwb7Qjn4dVczTnRtdMQ79gbtiGXFAA+y1zpLuRd?=
- =?us-ascii?Q?wWr3g9iVQI0Jn40DUVXS3NYkfYj/v3Nu0xHVw1pqqK39fdam45BL8UEckpoF?=
- =?us-ascii?Q?fm64VLCHzUxqOFP1+hAfoLiC/I4XYp1bzeLWL90rleb2pN103TO87wiqhdm+?=
- =?us-ascii?Q?M5UtMv5FK3GJMoNkNNzq/DqbgH/G+mlSYq5UPIF4TMq+ldIp/IE6eW0RO8uc?=
- =?us-ascii?Q?uzItOiT3VHcuWGJtCmMkdHnpIPMgxub07URiC8dXzhqP3J3m8FC78tAbF7KQ?=
- =?us-ascii?Q?/ct7a4VAmYge3U3Vp6SMJsFQQjWe54Ay345p2VC9LRfrIwba5xIHYROuCfUm?=
- =?us-ascii?Q?8bbAc/YHrSAssuUVHbQcdrpQhQxPkhxXmUu5OQ83U02cX411ARxlNXPfgVRT?=
- =?us-ascii?Q?ykT+5MtD2bSbeoOZnyH0+s6saGiVEE3GOvhRSuXEi/6FJYrqojUBwAnTcnu0?=
- =?us-ascii?Q?40S6MVbtCr5x00EylilvYwBCatwuv7r0GMBNOPCk9yP7cbqljL6WhOSshI1E?=
- =?us-ascii?Q?hI2ia7tArd9ZU4ZIUEC2/mpKuDT77rLKyCDZSk7T73J5lzf17esfcjJQySe4?=
- =?us-ascii?Q?n6JiX/uFsjRxKpG80ZQqdBFpuNN7TPR/vxXYd2eRtN2oX/49sMqG7xyXTxs2?=
- =?us-ascii?Q?mBHIM/aYE5bpHooFRUP5a9mYY8BtzuzKgGuDG3HpWQ2oyfQVZoikHYd/YzrO?=
- =?us-ascii?Q?lQOTh666xNi2qnIFaAQpebp7z1gjDI8/JTFcm/t/jhfWCtZ8PE+svkzwDhkl?=
- =?us-ascii?Q?n/UqH1/QJI+COlHYQamQ/A/TuMhwTgVR0GTkAWRXVwglKFha/iJcTwBh3PmA?=
- =?us-ascii?Q?gK3cRbtZ/Xarl843SgwwYAYD8VFTKeHdXjJgB/PlREzN80pY2lz19A=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PSAPR06MB3942.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(376014)(366016)(1800799024)(38350700014);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?b9MoICYHTIZCGS3GqIvz6eJScHReaDEuz18DWxKMyd44qSyVqnolP0JV0Yzn?=
- =?us-ascii?Q?wkKFQbDzrpGUHxQLI8a73wwapUiRZbHqAiMrPQ/dVYipJHLsf2RKf5pX8hMI?=
- =?us-ascii?Q?1jmr8eNck2ve5ENsm8aVhmQ8lH9iNt0gOv2ni3b8yjnn9w/U9pVdc5oLXSY5?=
- =?us-ascii?Q?ffF9pJFBM2L2ZUCe4/6PJuQpksZASYTxTE6M+JeYt8jqqcT1qFZRpFxweMLR?=
- =?us-ascii?Q?0GvZxXfqctmLSBE8lC8M2rZ7qYh7uu+Qp71736531fCANgephwsMNEPqAeHy?=
- =?us-ascii?Q?Wn/+Xo9bldVURaYNmRb4tYL3TWO4nsk/CTBEc1YDS+TI2T9FPpTm2le9pUgZ?=
- =?us-ascii?Q?lDOxHHrWiA3M4QTR7eAH9tzWjHbfWQdNpuNL1w5d9GgiJ6s2Fdjc2jLBVGuv?=
- =?us-ascii?Q?K3jyd0hmB7dQFfOuEX1EAvBx9pHRhf7N4rFkonGPLmUDMUj0YjRkyfvNY9oo?=
- =?us-ascii?Q?pWvKiv6tccSr495v/7piDa9t4rdtE6klHb9lXaVczUE/dQdUXqPQCGw1r2KB?=
- =?us-ascii?Q?XvznPaB96RChv58sBrsSITqfRjmEzmK07DwxPmzgD4oEOrGdEDUYgZCibjrS?=
- =?us-ascii?Q?qd4n+iHHdVL/OoatLUAw61TJyb3awgxaC7AXT1IdQyThUx2CQXoUrIkk0K5p?=
- =?us-ascii?Q?tWyiuD9oZcgXqcYYkzpA1RNbgGYV8npGpo+Bh6j2N2l07qEl+qMd/ozkhPDr?=
- =?us-ascii?Q?8+bK/6g+/J2Nx9F8jjIjIaxcqmc7EOYoxLH6HU9ykofkOIRHIZSJCA1Wtgcu?=
- =?us-ascii?Q?cu79zHgK9zlVDXAKr7ewpassc6uzNuEIOv+L7yhZUzVWPz2g5Ao6NoVLvkeS?=
- =?us-ascii?Q?YRUtFz8XH2Kn1GIUKVfDHTvXeoJs7ZeMXxeHmgx4Uq6cPqGVlx0dZLcek82n?=
- =?us-ascii?Q?evH9IiFMblZqXaS9DtJWGzdC8f6ks9OvsOZRUVU+zTxGoT+Xmr0z6yVVFOV4?=
- =?us-ascii?Q?uHFn8qe3WFjDpHufpgKnqsI+sYk9Dexf2/B2j11g/kVhD5MxJJoeo5a9hzVf?=
- =?us-ascii?Q?gs7AMgrUbqnvybZiIeTqffLFYRaUK2RAo6VVmYu/WW0+2IWuDbk9YzqsjPJp?=
- =?us-ascii?Q?0uQwNloeTz9FDMlL1/3+DPxYJ+JTs5CUDrErsLgLbCVklsfxOXIQnOKkdjVQ?=
- =?us-ascii?Q?FjicI23t5ll5hemvN7fPUhFaKW5LPp8HqfVQXn1q8dYpod09GzL7Tm5Pnpef?=
- =?us-ascii?Q?2aIqh90bZeUbh7eUfrU0jZXVeJy1Mz6RaYwZi9LVnn56Nbj1uLJwDnQCHSQX?=
- =?us-ascii?Q?TF10lxbVfh0TneSEN0vzVO1jH/mHtJdNLYtkG/HfvSp3RhAhZCVKqkXAf9Q1?=
- =?us-ascii?Q?3mPpuuNHWC7k8TGtNc0YsKsYQjN0oa1w9oRnRMRDFOBUH2ANlFX9JYdzZ/FG?=
- =?us-ascii?Q?3KlJmMsAmLvaEkdazJQomoiJYMZfMDC1lvgAb22IJSm9EIbR/X7KFnLQ+gZq?=
- =?us-ascii?Q?25KJewLd2u99DRzy5Sx81ybHkDw0gA5LGx1Z979/6UYqcaoOpg5ov6sRRwFy?=
- =?us-ascii?Q?SIWHgpSQAVxBMoYOX8GuWm81oeORO4zNBXL4poUc/pXLj5XIhHUj940YDFQB?=
- =?us-ascii?Q?VV8IDCqn5TM+WJbQjIgJ77W2a6rK87bSscoEDJ4h3wm880w7QOEouDbxOMWp?=
- =?us-ascii?Q?zQ=3D=3D?=
-X-OriginatorOrg: jaguarmicro.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7837af8e-eb50-4166-1fc1-08ddd014ab17
-X-MS-Exchange-CrossTenant-AuthSource: PSAPR06MB3942.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Jul 2025 09:28:54.7409
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 1e45a5c2-d3e1-46b3-a0e6-c5ebf6d8ba7b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: DdNf38dogNAbD9U5bsP1sQgJV+DXJKENh9mIBj3zeY5uRSIurCdXTME4RMksZLuYiKpID5vyq1ZM/k3iz+CJmvQ4HSIsl1uVS2vSHMBF3no=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: KL1PR06MB6943
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 1/3] dt-bindings: sram: qcom,imem: Allow
+ modem-tables
+To: Krzysztof Kozlowski <krzk@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+ <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+ <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Alex Elder <elder@kernel.org>
+Cc: Marijn Suijten <marijn.suijten@somainline.org>,
+        linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        Alex Elder <elder@riscstar.com>
+References: <20250527-topic-ipa_imem-v2-0-6d1aad91b841@oss.qualcomm.com>
+ <20250527-topic-ipa_imem-v2-1-6d1aad91b841@oss.qualcomm.com>
+ <97724a4d-fad5-4e98-b415-985e5f19f911@kernel.org>
+ <e7ee4653-194c-417a-9eda-2666e9f5244d@oss.qualcomm.com>
+ <68622599-02d0-45ca-82f5-cf321c153cde@kernel.org>
+ <bf78d681-723b-4372-86e0-c0643ecc2399@oss.qualcomm.com>
+ <62b0f514-a8a9-4147-a5c0-da9dbe13ce39@kernel.org>
+ <747e5221-0fb1-4081-9e98-94b330ebf8c7@oss.qualcomm.com>
+ <e4c5ecc3-fd97-4b13-a057-bb1a3b7f9207@kernel.org>
+Content-Language: en-US
+From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+In-Reply-To: <e4c5ecc3-fd97-4b13-a057-bb1a3b7f9207@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzMxMDA2NyBTYWx0ZWRfXzBr7IR08JVeE
+ D7HW42+5TugmJ9Eea5awisW+MK+0gvs3lqtEZPNMMrdxY5ikOu6h26VDKqGpPG8zLjL2VFgn1vS
+ JfYfWS5UGLgp6scrT7KR1lC859zVHtfG5wAcZ0Xz1yCtW3PJPj8C4JSyxgeQkERqq6pRYIlOIT7
+ IEj4FMNGO91InHFEpG7hlrmRJVngFSjndzq75SMsIVwjeZEac6tmifFRMCd8wnTNVaQhcPnwpzb
+ m1Sob70RCDySDlKdbsNznPIv6jVzeBUMyI1xrqmE9YppLG1obKefe1ghVgoGxClG0y41qSbcjLS
+ sDIiVIqDmDo0dVA7pCPhQISpUys4EAee8zAqX4JYbV8yI/nAVKSPNeQ63kqaZOtuOlezUT81iJd
+ SMgo4uyH5sMnFrWRAxR6AlnB5+wX+/0Ir7K44H7cZLY2pyjgJZcHK1pVcHQef/p1HUGyeQkS
+X-Authority-Analysis: v=2.4 cv=JKw7s9Kb c=1 sm=1 tr=0 ts=688b3bac cx=c_pps
+ a=50t2pK5VMbmlHzFWWp8p/g==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
+ a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=pyDJoz5GBdBVa8UQv8gA:9
+ a=QEXdDO2ut3YA:10 a=IoWCM6iH3mJn3m4BftBB:22
+X-Proofpoint-ORIG-GUID: NDNJlnXpqNhB76AlZuWoBlIC_N1FUgRf
+X-Proofpoint-GUID: NDNJlnXpqNhB76AlZuWoBlIC_N1FUgRf
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-07-31_01,2025-07-31_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 mlxscore=0 priorityscore=1501 spamscore=0 suspectscore=0
+ phishscore=0 lowpriorityscore=0 bulkscore=0 malwarescore=0 clxscore=1015
+ mlxlogscore=873 adultscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2507310067
 
-From: Liming Wu <liming.wu@jaguarmicro.com>
+On 7/30/25 3:14 PM, Krzysztof Kozlowski wrote:
+> On 30/07/2025 14:07, Konrad Dybcio wrote:
+>>>>>>>
+>>>>>>> Missing additionalProperties: false, which would point you that this is
+>>>>>>> incomplete (or useless because empty).
+>>>>>>
+>>>>>> How do I describe a 'stupid' node that is just a reg?
+>>>>> With "reg" - similarly to many syscon bindings.
+>>>>
+>>>> Is this sort of inline style acceptable, or should I introduce
+>>>> a separate file?
+>>>
+>>> It's fine, assuming that it is desired in general. We do not describe
+>>> individual memory regions of syscon nodes and this is a syscon.
+>>>
+>>> If this is NVMEM (which it looks like), then could use NVMEM bindings to
+>>> describe its cells - individual regions. But otherwise we just don't.
+>>
+>> It's volatile on-chip memory
+>>
+>>> There are many exceptions in other platforms, mostly old or even
+>>> unreviewed by DT maintainers, so they are not a recommended example.
+>>>
+>>> This would need serious justification WHY you need to describe the
+>>> child. Why phandle to the main node is not enough for consumers.
+>>
+>> It's simply a region of the SRAM, which needs to be IOMMU-mapped in a
+>> specific manner (should IMEM move away from syscon+simple-mfd to
+>> mmio-sram?). Describing slices is the DT way to pass them (like under
+>> NVMEM providers).
+> 
+> 
+> Then this might be not a syscon, IMO. I don't think mixing syscon and
+> SRAM is appropriate, even though Linux could treat it very similar.
+> 
+> syscon is for registers. mmio-sram is for SRAM or other parts of
+> non-volatile RAM.
+> 
+> Indeed you might need to move towards mmio-sram.
+> 
+>>
+>>>
+>>> If the reason is - to instantiate child device driver - then as well no.
+>>> This has been NAKed on the lists many times - you need resources if the
+>>> child should be a separate node. Address space is one resource but not
+>>> enough, because it can easily be obtained from the parent/main node.
+>>
+>> There is no additional driver for this
+> 
+> Then it is not a simple-mfd...
 
-This patch fixes misleading comments in both legacy and modern
-virtio-pci device implementations. The comments previously referred to
-the "config vector" for parameters and return values of the
-`vp_legacy_queue_vector()` and `vp_modern_queue_vector()` functions,
-which is incorrect.
+Indeed it's really not
 
-Signed-off-by: Liming Wu <liming.wu@jaguarmicro.com>
----
- drivers/virtio/virtio_pci_legacy_dev.c | 4 ++--
- drivers/virtio/virtio_pci_modern_dev.c | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+I found out however that the computer history museum (i.e.
+qcom-apq8064-asus-nexus7-flo.dts and qcom-msm8974.dtsi) seems to
+have used simple-mfd, so that the subnode (syscon-reboot-mode) is
+matched against a driver
 
-diff --git a/drivers/virtio/virtio_pci_legacy_dev.c b/drivers/virtio/virtio_pci_legacy_dev.c
-index 677d1f68bc9b..bbbf89c22880 100644
---- a/drivers/virtio/virtio_pci_legacy_dev.c
-+++ b/drivers/virtio/virtio_pci_legacy_dev.c
-@@ -140,9 +140,9 @@ EXPORT_SYMBOL_GPL(vp_legacy_set_status);
-  * vp_legacy_queue_vector - set the MSIX vector for a specific virtqueue
-  * @ldev: the legacy virtio-pci device
-  * @index: queue index
-- * @vector: the config vector
-+ * @vector: the queue vector
-  *
-- * Returns the config vector read from the device
-+ * Returns the queue vector read from the device
-  */
- u16 vp_legacy_queue_vector(struct virtio_pci_legacy_device *ldev,
- 			   u16 index, u16 vector)
-diff --git a/drivers/virtio/virtio_pci_modern_dev.c b/drivers/virtio/virtio_pci_modern_dev.c
-index d665f8f73ea8..9e503b7a58d8 100644
---- a/drivers/virtio/virtio_pci_modern_dev.c
-+++ b/drivers/virtio/virtio_pci_modern_dev.c
-@@ -546,9 +546,9 @@ EXPORT_SYMBOL_GPL(vp_modern_set_queue_reset);
-  * vp_modern_queue_vector - set the MSIX vector for a specific virtqueue
-  * @mdev: the modern virtio-pci device
-  * @index: queue index
-- * @vector: the config vector
-+ * @vector: the queue vector
-  *
-- * Returns the config vector read from the device
-+ * Returns the queue vector read from the device
-  */
- u16 vp_modern_queue_vector(struct virtio_pci_modern_device *mdev,
- 			   u16 index, u16 vector)
--- 
-2.34.1
+The same can be achieved if we stick an of_platform_populate() at
+the end of mmio-sram probe - thoughts?
 
+Konrad
 
