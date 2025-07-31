@@ -1,65 +1,80 @@
-Return-Path: <netdev+bounces-211141-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211142-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8227DB16E04
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 10:58:58 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B709BB16E1D
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 11:07:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E0963AC0C7
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 08:58:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DC25A7A1EFD
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 09:05:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A287290DAC;
-	Thu, 31 Jul 2025 08:58:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8866827BF95;
+	Thu, 31 Jul 2025 09:07:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Q2pLdObo"
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="H72m+yrc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6395228FAAB
-	for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 08:58:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3C29242907
+	for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 09:07:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753952334; cv=none; b=FDIwgGQBAxfw0+2GNLuE8GVYrO16kwgtRx8o92EAwjNr/jB31aQFQJK99ipYt1fAxKvUYqlbtmN31IzTLwK1insPuf1bbgdWQ315CULRoZRHndPpOrBKnhF1ost7wvoCpHdZ7vJSZ1SdDZCtpAhUbdzTLkJiXwRIQBqK6EpVzoo=
+	t=1753952840; cv=none; b=VBPeNCGQaF5yynbVXbape52YDyCWs4gGZlbY1isRBrJ+OXSsLCY5c1UZO10vC8TUvCrnqZH8n07IVio4/0pPBQw9DeZWJ/bUYshiTI2FRCa1vYLjPEf5fbHlLPsoiCJcy0euaS9jJHOmS+VH9ZE4n4cOki4hmH2G4/7wa1iv3GY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753952334; c=relaxed/simple;
-	bh=F8AYxq0vS/2LL0CoNCaqeI41ObQNBGIFIOdzELs5dVw=;
+	s=arc-20240116; t=1753952840; c=relaxed/simple;
+	bh=WcDfXVLMMz8sgX9OeZwUfq7M7Rtbqrz5/Fp+VLACIiE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=f6iObnWYN9t00IXQ5ETaaXyMynrJ6D55vqs1FMDLcXjuSAtPRr15U0sWDKf76AGIV5FS+2ctDY6UcEAk72UvygJPNE7ru7CbxxQwepPXFH7Em0u2K8WXyot6FkmFL+KkCHNW2G3P0a/5buZUWnEn4Fm0E6awvGl0H6v8y2w3ZjM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Q2pLdObo; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1753952333; x=1785488333;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=F8AYxq0vS/2LL0CoNCaqeI41ObQNBGIFIOdzELs5dVw=;
-  b=Q2pLdObon6DUdzQjiezewJRwr0kWc87QiYWzrO0S/me4Yb8TFvC0MIJ+
-   +EUKQMDUQ3Ld7KyBwEhlXXTnEBiihzSo21TeSFrmdU/r85QSLzEuBQF4T
-   yvBoLxmp8ZzrB190bid7FlellletWhv+yKJwm/jrL/58ptpp1N9jEYvgx
-   nA9134oxHsM5VMGtXB2+tpVG1sDuwf0Or+lfWv/ErWegXd88WhqY0EdV/
-   5viJnbkRIfepozMlpHJz/Td8pUkGLQnRFHHWh+U0YYQBh5M0GTM94C0pF
-   dkq2rXB8F1dd3D5bxrAKb3dYGCqi/aK0RrZldIQRsEeNX10gkL6eSD8nH
-   Q==;
-X-CSE-ConnectionGUID: dkHM/zc0RxmDc3vsjzD3TA==
-X-CSE-MsgGUID: Fsz4xRluTeqX5ykveiR7Ng==
-X-IronPort-AV: E=McAfee;i="6800,10657,11507"; a="60090155"
-X-IronPort-AV: E=Sophos;i="6.16,353,1744095600"; 
-   d="scan'208";a="60090155"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2025 01:58:53 -0700
-X-CSE-ConnectionGUID: u/y9wipnSeuQWFAa4MsoXQ==
-X-CSE-MsgGUID: 6Iv/F7f5SXGPVbvR37c00A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,353,1744095600"; 
-   d="scan'208";a="163235216"
-Received: from jkuryjak-mobl1.ger.corp.intel.com (HELO [10.245.115.185]) ([10.245.115.185])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2025 01:58:50 -0700
-Message-ID: <ddbfdf8c-53ab-4993-a53a-60c45d36cae9@linux.intel.com>
-Date: Thu, 31 Jul 2025 10:58:47 +0200
+	 In-Reply-To:Content-Type; b=rbKXkldTskCvOeleUxNdfXHCTuUnS8HOGmUqL6UolAUGPkQbXcWC2LR88FV083ebY/FN8xXzkeKQypGPIZm1bMVAnpHpmIcNHJKH2puCBqp3kpObwQShVXfrpBePPMMg12aDMCrdYfPy0UPBqJN0fUITIoBcLN5hgv7SHKOVbgU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev; spf=pass smtp.mailfrom=tuxon.dev; dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b=H72m+yrc; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-604bff84741so266409a12.2
+        for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 02:07:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tuxon.dev; s=google; t=1753952837; x=1754557637; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=W9+jJCHRVMdv8TOL3dTnaLXuCseXbSFSKejYbGwQdjc=;
+        b=H72m+yrcsqpi4jsG+QwMeObofFyiYX7ttOm8+J9gXpRPanemwTsBfHXV7h0qbUDn7j
+         r9y7iLfvcjs7/OrS9q3pVj7n/0TWnoWTYFU4y0rJIHUcKhxPLrCWjXMbPnKSMYEaAXi+
+         vHY51gPw0f/6PC4vemA1cTQAPUEkoChihOC9Lzky8dme/Ak2Ca/9b2fMc2G/bPvj3MWQ
+         V/v0P0xCynXzbfEZm6vl+QvME7wxZuDhL1HIkq1pq0TpVV24c51xBUTKVaObUPIy8atD
+         WQxFcgfZeK7Hb70n6EQuU0E3Zpd+K9ttPeV42ETqIl177SogsS+8+ljibZXDJXIPqOBG
+         oa1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753952837; x=1754557637;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=W9+jJCHRVMdv8TOL3dTnaLXuCseXbSFSKejYbGwQdjc=;
+        b=s/ob5EEnjABdqqCB599+E9j30XHs0Mje1mN32H9xbzYag7nOG2XJdDDpVX4FRT71NG
+         +d65++iCLTaLwMcjc30CZHQzb7x8zbmMyKlhKErcadPbOvMHm9Ey5OHL82xkLdgZqjDG
+         nPnsBlLYh1fnCOmdOpxB+yUG6ELzu0Ap2VFwbYTimV//TllJ9GEE7Q0T3oh5JFNKpdFQ
+         nEvQkC2i4ptk82nxP0e8BtQFgU/hRFwaEgo31hwLOeWAsMw5ZtVyk5hCKPr+NyRGtPHa
+         Hyen2eickhIV3Qe1vpdrSJX28tEAv+7zc1/JtqjnupFxpqTpJqNZDAB+YWy91oT10VV+
+         f7ZA==
+X-Forwarded-Encrypted: i=1; AJvYcCUsIFbmKJVbLz4IecG2B+OT/nzQJRog7jIs0vAYNu3rYJQJVJDgbMPvbi5LByPLvhIYUH2rdfw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyn8ZisntJfzf/xqPfqyXJzgxmtepNd4dPVR5cDfvB96oP2/lQ8
+	O1e642zVKM4Q3gklmeFNft9SUEq8rNa4bCzJOJMrbTND76TY2Un/TCurb79D6h5MR8A=
+X-Gm-Gg: ASbGnctHvsac4+gAES6xbtDcrwUUxU0CglXCHwakV2XbqkUde5/QTCHPSlcaO/CsE82
+	7VN2/gDcOE9DKriJEMhj30AXcVXqbLmeDSJRiNssNbfvPaG4OS+HnOIC9bWRM2iOebISZ1epJ5r
+	wTV7ao2BpkLFQ9v0/HO6NEyS+HKZURatBu77DNzKJg4nI8jMYhS/cy2z074+qdKB0PW/C9iraMw
+	hDR2H8xbNo9At9CkdKouURzw7J9iKndUziWJXn/S6kb1WiI6BthaKx/V5GHigrmJxxS63nSmErZ
+	9DSoBByeoTABsjD+SFgjgefQiYe78WBtjsCMHTIT52j/vgp8yYnxF/FzpQ1ei9NOB641JZFgYqB
+	kPP7pthqpuwLqr8uiYcgdnpdLLmwU0Q==
+X-Google-Smtp-Source: AGHT+IE997x8nYTycvu/BnY+UyTrfIr0figlCHBXehZMXWgIeEYUDt6OKtoUMSjGpZcVTqZcAvbR1g==
+X-Received: by 2002:a05:6402:2802:b0:615:f76:9408 with SMTP id 4fb4d7f45d1cf-6158727399bmr6963737a12.32.1753952836898;
+        Thu, 31 Jul 2025 02:07:16 -0700 (PDT)
+Received: from [192.168.50.4] ([82.78.167.30])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-615a8fe7ac0sm797219a12.35.2025.07.31.02.07.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 31 Jul 2025 02:07:16 -0700 (PDT)
+Message-ID: <61d545dd-c32c-4cc3-94fb-53954eee365b@tuxon.dev>
+Date: Thu, 31 Jul 2025 12:07:15 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,71 +82,154 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: ftgmac100: fix potential NULL pointer access in
- ftgmac100_phy_disconnect
-To: Heiner Kallweit <hkallweit1@gmail.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>,
- Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Cc: Jacky Chou <jacky_chou@aspeedtech.com>,
- Jacob Keller <jacob.e.keller@intel.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <2b80a77a-06db-4dd7-85dc-3a8e0de55a1d@gmail.com>
-Content-Language: pl, en-US
-From: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
-In-Reply-To: <2b80a77a-06db-4dd7-85dc-3a8e0de55a1d@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH net-next 3/6] net: macb: Add IEEE 802.1Qbv TAPRIO REPLACE
+ command offload support
+To: "Karumanchi, Vineeth" <vineeth@amd.com>, vineeth.karumanchi@amd.com,
+ nicolas.ferre@microchip.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: git@amd.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250722154111.1871292-1-vineeth.karumanchi@amd.com>
+ <20250722154111.1871292-4-vineeth.karumanchi@amd.com>
+ <64481774-9791-4453-ab81-e4f0c444a2a6@tuxon.dev>
+ <c296f03f-0146-4416-94ca-df262aa359d4@amd.com>
+From: Claudiu Beznea <claudiu.beznea@tuxon.dev>
+Content-Language: en-US
+In-Reply-To: <c296f03f-0146-4416-94ca-df262aa359d4@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On 2025-07-30 10:23 PM, Heiner Kallweit wrote:
-> After the call to phy_disconnect() netdev->phydev is reset to NULL.
 
-phy_disconnect() in its flow does not set phydev to NULL, if anywhere it 
-happens in of_phy_deregister_fixed_link(), which already calls 
-fixed_phy_unregister() before setting phydev to NULL
 
- From my understanding (which very much could be wrong) of 
-ftgmac100_probe(), these two cases are mutually exclusive. The device 
-either uses NCSI or will use a phy based on the DT "fixed-link" property
-> So fixed_phy_unregister() would be called with a NULL pointer as argument.
-
-Given my analysis above, I don't think this case is possible.
-
-Best regards,
-Dawid
-> Therefore cache the phy_device before this call.
+On 29.07.2025 11:59, Karumanchi, Vineeth wrote:
+> Hi Claudiu,
 > 
-> Fixes: e24a6c874601 ("net: ftgmac100: Get link speed and duplex for NC-SI")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
-> ---
->   drivers/net/ethernet/faraday/ftgmac100.c | 7 ++++---
->   1 file changed, 4 insertions(+), 3 deletions(-)
+> Thanks for the review.
 > 
-> diff --git a/drivers/net/ethernet/faraday/ftgmac100.c b/drivers/net/ethernet/faraday/ftgmac100.c
-> index 5d0c09068..a863f7841 100644
-> --- a/drivers/net/ethernet/faraday/ftgmac100.c
-> +++ b/drivers/net/ethernet/faraday/ftgmac100.c
-> @@ -1750,16 +1750,17 @@ static int ftgmac100_setup_mdio(struct net_device *netdev)
->   static void ftgmac100_phy_disconnect(struct net_device *netdev)
->   {
->   	struct ftgmac100 *priv = netdev_priv(netdev);
-> +	struct phy_device *phydev = netdev->phydev;
->   
-> -	if (!netdev->phydev)
-> +	if (!phydev)
->   		return;
->   
-> -	phy_disconnect(netdev->phydev);
-> +	phy_disconnect(phydev);
->   	if (of_phy_is_fixed_link(priv->dev->of_node))
->   		of_phy_deregister_fixed_link(priv->dev->of_node);
->   
->   	if (priv->use_ncsi)
-> -		fixed_phy_unregister(netdev->phydev);
-> +		fixed_phy_unregister(phydev);
->   }
->   
->   static void ftgmac100_destroy_mdio(struct net_device *netdev)
+> On 7/26/2025 5:55 PM, claudiu beznea (tuxon) wrote:
+>>
+>>
+>> On 7/22/25 18:41, Vineeth Karumanchi wrote:
+>>> Implement Time-Aware Traffic Scheduling (TAPRIO) hardware offload for
+> 
+> <..>
+> 
+>>
+>> as it is used along with conf->num_entries which has size_t type.
+>>
+>>> +
+>>> +    /* Validate queue configuration */
+>>> +    if (bp->num_queues < 1 || bp->num_queues > MACB_MAX_QUEUES) {
+>>
+>> Can this happen?
+> 
+> Yes, GEM in Zynq devices has single queue.
+
+I was asking as it looked to me that this validates the number of queues
+the IP supports, which should have already been validated in probe.
+
+> 
+> Currently, TAPRIO offload validation depends solely on the presence
+> of .ndo_setup_tc. On Zynq-based devices, if the user configures the
+> scheduler using tc replace, the operation fails at this point.
+
+I can't see how. That should translate into:
+
+if (1 < 1 || 1 > 8)
+
+which is in the end:
+
+if (0)
+
+Maybe it fails due to some other condition?
+
+> 
+> <...>
+> 
+>>> +    /* All validations passed - proceed with hardware configuration */
+>>> +    spin_lock_irqsave(&bp->lock, flags);
+>>
+>> You can use guard(spinlock_irqsave)(&bp->lock) or
+>> scoped_guard(spinlock_irqsave, &bp->lock)
+>>
+> 
+> ok, will leverage scoped_guard(spinlock_irqsave, &bp->lock).
+> 
+>>> +
+>>> +    /* Disable ENST queues if running before configuring */
+>>> +    if (gem_readl(bp, ENST_CONTROL))
+>>
+>> Is this read necessary?
+>>
+> 
+> Not necessary, I thought of disabling only if enabled.
+> But, will disable directly.
+> 
+>>> +        gem_writel(bp, ENST_CONTROL,
+>>> +               GENMASK(bp->num_queues - 1, 0) <<
+>>> GEM_ENST_DISABLE_QUEUE_OFFSET);
+>>
+>> This could be replaced by GEM_BF(GENMASK(...), ENST_DISABLE_QUEUE) if you
+>> define GEM_ENST_DISABLE_QUEUE_SIZE along with GEM_ENST_DISABLE_QUEUE_OFFSET.
+>>
+> 
+> I can leverage bp->queue_mask << GEM_ENST_DISABLE_QUEUE_OFFSET.
+> And remove GEM_ENST_ENABLE_QUEUE(hw_q) and GEM_ENST_DISABLE_QUEUE(hw_q)
+> implementations.
+> 
+>>> +
+>>> +    for (i = 0; i < conf->num_entries; i++) {
+>>> +        queue = &bp->queues[enst_queue[i].queue_id];
+>>> +        /* Configure queue timing registers */
+>>> +        queue_writel(queue, ENST_START_TIME,
+>>> enst_queue[i].start_time_mask);
+>>> +        queue_writel(queue, ENST_ON_TIME, enst_queue[i].on_time_bytes);
+>>> +        queue_writel(queue, ENST_OFF_TIME, enst_queue[i].off_time_bytes);
+>>> +    }
+>>> +
+>>> +    /* Enable ENST for all configured queues in one write */
+>>> +    gem_writel(bp, ENST_CONTROL, configured_queues);
+>>
+>> Can this function be executed while other queues are configured? If so,
+>> would the configured_queues contains it (as well as conf)?
+>>
+> 
+> No, the tc add/replace command re-configures all queues, replacing any
+> previous setup. Parameters such as START_TIME, ON_TIME, and CYCLE_TIME are
+> recalculated based on the new configuration.
+> 
+>>> +    spin_unlock_irqrestore(&bp->lock, flags);
+>>> +
+>>> +    netdev_info(ndev, "TAPRIO configuration completed successfully: %lu
+>>> entries, %d queues configured\n",
+>>> +            conf->num_entries, hweight32(configured_queues));
+>>> +
+>>> +cleanup:
+>>> +    kfree(enst_queue);
+>>
+>> With the suggestions above, this could be dropped.
+>>
+> 
+> ok.
+
+Please check the documentation pointed by Andrew. With that, my suggestion
+here should be dropped.
+
+Thank you,
+Claudiu
+
+> 
+> 
+>> Thank you,
+>> Claudiu
+>>
+>>> +    return err;
+>>> +}
+>>> +
+>>>   static const struct net_device_ops macb_netdev_ops = {
+>>>       .ndo_open        = macb_open,
+>>>       .ndo_stop        = macb_close,
+>>
+> 
+> Thanks
 
 
