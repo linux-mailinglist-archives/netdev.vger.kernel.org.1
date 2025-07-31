@@ -1,205 +1,102 @@
-Return-Path: <netdev+bounces-211240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211241-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B39D9B1753E
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 18:49:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E4B6BB17552
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 18:54:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58C273AE38E
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 16:49:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D58BD3B9FED
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 16:53:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2310823B602;
-	Thu, 31 Jul 2025 16:49:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C289423AB85;
+	Thu, 31 Jul 2025 16:54:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="JY54LIN7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nlYAoigh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f41.google.com (mail-oa1-f41.google.com [209.85.160.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 477511D799D
-	for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 16:49:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AA711C07C3;
+	Thu, 31 Jul 2025 16:54:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753980587; cv=none; b=kKztvTuIBOm8De0tVx5/3cbHY9OQB1ynFA1X+HD0fobkTViNwbI/v9mqb9J5Mbn3MMdi1vIU+pgKDJjkA2lLGh7rDY+oFXNUQoqS1X6NDIxxrmhAZhnkjMXEuM1BL3ifJj0utNiLV0A3uV5NRhW8FS0hBPfWB1CIaqGZ/b2N0Bk=
+	t=1753980862; cv=none; b=GrWCG2riOHnI2jb222CpKU9b4pPK1V4Ekifd9JEkzRbrHtBT8Fu5+EuqdwSbo44mfOydwMbbcVVbYK700oQW2vYUwShYYtmgacmI5q5T0UkIJUjBgBoY2UwquW/hjMIQ5LKOHw1hIBhFsUY0pvsQMcxaBlZmbqLVbGG5zYOxaRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753980587; c=relaxed/simple;
-	bh=FJ0p48IFpypKYr1XSk7MfiOUOw0uee+C+NPGoFL7jCY=;
+	s=arc-20240116; t=1753980862; c=relaxed/simple;
+	bh=RFT+unNz9YD8n7J2IfXYOln4J96Jv/o5vG/NxjuMD14=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GOHhqwT3eGd2X/XBsef5DAc/6xb14hDP0LXY47C2etPjAGGd0xdRM/4nAiajIM4I9W6TMVKnmggB5rQbiN6xCp6IH5Q+XJ6aJwMZ8J2mX3s0AkRbrHP9dRuXaGyzP5kOrU+l6sxV0F8lWZyNSO4GPW+MT2XClY+IzatxpOrolUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=JY54LIN7; arc=none smtp.client-ip=209.85.160.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-303058a8649so238539fac.3
-        for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 09:49:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1753980583; x=1754585383; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Rq9sv6xgHcn9tOtceIyiWXx6grAaNVR6jyTAwC4qpWc=;
-        b=JY54LIN7iqPmwr0HtK0py/DPf6m/d63TJprZl7f4cnKvpuYryDfMetQkWCqu2tDJL6
-         g/3mDXWSUp4GPx6vBetKXCEq0QR7c5wkLlVT2roid/4X14AT1WIXfG3ZKPbC3phRAAOP
-         tkR1jDJSqSC7g2ZCuj+ipjHAffol5vQ0BjS/kxcMwt4Q4p76vR8LAnWaYngt3Q39U0YQ
-         yNhdEXYv3RTI/6Fy6OE11n+/lQsaYN78VmVSQP4GBjGBuK/ZGlqZKiYNda7I3dpAeHC/
-         pgVmNZjwdnktH51wNU2ElXGjLjlVOBgPfxtTYsdyssg24JHSjx4VYB9Attcrxd9+pqzS
-         LbwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753980583; x=1754585383;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Rq9sv6xgHcn9tOtceIyiWXx6grAaNVR6jyTAwC4qpWc=;
-        b=QmY2cWFdxFByiq0P0eza4kupVxPa4ywtohli3kVLdBZ68obwhRBniQK6u9/hxyNkhZ
-         Bqhes9+3x0FN4dJ4qe4yH841yb0AlNFl2H2pMZNgmvJD8d6dg1FbTSsr0LeVMdkmIFCP
-         IB47ZPsX2S57Mbfsy7ktY2G3K4Jho6hwqLUZink0w4k4ryULGq+AmrLfFLTniI5rF2RR
-         XPBgUnZa+95o7hnkzr/WGwPDvP6cDgJiq0g934xz6DNcbfxFidaYICwAL1GwUdyLzS5V
-         FMgbvPj2jjwrU2ociywfXTLPPltU2IaCg+RJLvo0dsTttaChPyH83dlyiUz5d8DAFmqk
-         OxIg==
-X-Forwarded-Encrypted: i=1; AJvYcCVgK8gWRM1QR/jaPJLGQiYeREzjuV9qyJlze54W55INDa19wEUARP1QVVCgjlc0kGOpvDOTP2k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyFEMiSfMPlCNRVDA4iRDPArlJ+7G/iW4yLoB7ANfTQqiZWwPaj
-	yJG0keshQyFzYodcyS5f9tgteBifhwqkzjweo8QVPzFbZCljOuG6qabPVka6DOkHmhk=
-X-Gm-Gg: ASbGncvM2aYK4khmzbSHZ5qOZiGcU/FbgAETz5z4REHXVVoAMhCCzqDrbglbyKJxV/p
-	/0CWPK0dZNqb8t1OC7j4p5Xk2rWlwSU8rsCX7AAXXJqpfgP4phIDWdyP9uSQMtufZEDY6bWELhi
-	2qNeb6B7D8nSWvuwLONgwCSLGZcylAjNAV1dK4dt4S/l4GLfAjpZ13ZUGmS8yGtGkFrD840bqRP
-	bykGWRAweCLvh7HTHUAlWbfZw5x6vJ3xrCnF7uou88Hf0ZSxUt680blBKah1LLfW/5kyKck8AVE
-	eBxgJxUBOoNQZvP5jM3zrtPSPjDM9M1HrzlJdlDtL9GVORXjntkP3ypcfI1fdU3Yusy3H9MqSYj
-	8cutnjg==
-X-Google-Smtp-Source: AGHT+IH7mtbXa6i5/8Z2w7KfBpWUW/kdgeknQHSXdTbGEahcNzhyEAXNu9vnj/Kqodt0KUh+ti+RKQ==
-X-Received: by 2002:a05:6871:441a:b0:2ff:9ed6:2268 with SMTP id 586e51a60fabf-30785aaa3c4mr5628886fac.15.1753980583222;
-        Thu, 31 Jul 2025 09:49:43 -0700 (PDT)
-Received: from 861G6M3 ([2a09:bac1:76a0:540::3ce:18])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-307a73ffa37sm457926fac.27.2025.07.31.09.49.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 31 Jul 2025 09:49:42 -0700 (PDT)
-Date: Thu, 31 Jul 2025 11:49:40 -0500
-From: Chris Arges <carges@cloudflare.com>
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: Dragos Tatulea <dtatulea@nvidia.com>,
-	Dipayaan Roy <dipayanroy@linux.microsoft.com>, horms@kernel.org,
-	kuba@kernel.org, kys@microsoft.com, haiyangz@microsoft.com,
-	wei.liu@kernel.org, decui@microsoft.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	longli@microsoft.com, kotaranov@microsoft.com, ast@kernel.org,
-	daniel@iogearbox.net, john.fastabend@gmail.com, sdf@fomichev.me,
-	lorenzo@kernel.org, michal.kubiak@intel.com,
-	ernis@linux.microsoft.com, shradhagupta@linux.microsoft.com,
-	shirazsaleem@microsoft.com, rosenp@gmail.com,
-	netdev@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
-	linux-kernel@vger.kernel.org, ssengar@linux.microsoft.com,
-	dipayanroy@microsoft.com, kernel-team <kernel-team@cloudflare.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Yunsheng Lin <linyunsheng@huawei.com>
-Subject: Re: [PATCH v2] net: mana: Use page pool fragments for RX buffers
- instead of full pages to improve memory efficiency.
-Message-ID: <aIuepME92Q9iR22Z@861G6M3>
-References: <20250723190706.GA5291@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
- <73add9b2-2155-4c4f-92bb-8166138b226b@kernel.org>
- <20250729202007.GA6615@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
- <i5o2nzwpd5ommosp4ci5edrozci34v6lfljteldyilsfe463xd@6qts2hifezz3>
- <01c9284d-58c2-4a90-8833-67439a28e541@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=LbqfC5L7V/gvQzN4+WWKd2MIJqobmM6ruqt322z5kRI+JHUWWyIVrgrFjvxMIWtAtvdcNaskfVhhhIdMa4Lf4pairRRgVzlVY/OnescYRxWv+S56qQzheIaYmMgBQLG2Jki+d2fMzYZ0BEgrkADssaUmIjF7Rf25uu/B+ve7fNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nlYAoigh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07711C4CEEF;
+	Thu, 31 Jul 2025 16:54:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753980862;
+	bh=RFT+unNz9YD8n7J2IfXYOln4J96Jv/o5vG/NxjuMD14=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=nlYAoighajV+2KB/yai024exQXQhpbPmK7A8oy6k3uj9hM2tawrN4In0RGQ67WvEM
+	 7DhBDXejbr8R32LYDPhsFb0p0hrMJ2S+Uo6jz+Dv3gGGRjb32ADxYI1Cwl4xTbkgSG
+	 Tmge34PHiSY1pkDiIWqH/QtrKO4LDkv33+u2dZAKEE0WAA6GzqkedEhrazBlNN6/vo
+	 dIfSGPCmyLO6uwyFbq5g2vitx72P0CHDAQlJPEnuK+pvsRPxyd4Fe05UNP8NLV0LJJ
+	 fqyIy5fyX42VyalhgbrLrRZj1rqHejWpY4jAgJeTfOZ4S6RoteOK0PWjXjOoNg+nKX
+	 6GslmxrM5XmIA==
+Date: Thu, 31 Jul 2025 09:54:21 -0700
+From: Kees Cook <kees@kernel.org>
+To: Jeff Layton <jlayton@kernel.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Jani Nikula <jani.nikula@linux.intel.com>,
+	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Tvrtko Ursulin <tursulin@ursulin.net>,
+	Krzysztof Karas <krzysztof.karas@intel.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Qasim Ijaz <qasdev00@gmail.com>,
+	Nathan Chancellor <nathan@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org
+Subject: Re: [PATCH v15 6/9] ref_tracker: automatically register a file in
+ debugfs for a ref_tracker_dir
+Message-ID: <202507310952.7255AA30@keescook>
+References: <20250618-reftrack-dbgfs-v15-0-24fc37ead144@kernel.org>
+ <20250618-reftrack-dbgfs-v15-6-24fc37ead144@kernel.org>
+ <202507301603.62E553F93@keescook>
+ <6270c853cdf90172d4794e2b601ebc88590b774f.camel@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <01c9284d-58c2-4a90-8833-67439a28e541@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <6270c853cdf90172d4794e2b601ebc88590b774f.camel@kernel.org>
 
-On 2025-07-31 18:36:04, Jesper Dangaard Brouer wrote:
+On Thu, Jul 31, 2025 at 06:29:00AM -0400, Jeff Layton wrote:
+> "If you think you can justify it (in comments and commit log) well
+> enough to stand up to Linus’s scrutiny, maybe you can use “%px”, along
+> with making sure you have sensible permissions."
 > 
-> 
-> On 30/07/2025 09.31, Dragos Tatulea wrote:
-> > On Tue, Jul 29, 2025 at 01:20:07PM -0700, Dipayaan Roy wrote:
-> > > On Tue, Jul 29, 2025 at 12:15:23PM +0200, Jesper Dangaard Brouer wrote:
-> > > > 
-> > > > 
-> > > > On 23/07/2025 21.07, Dipayaan Roy wrote:
-> > > > > This patch enhances RX buffer handling in the mana driver by allocating
-> > > > > pages from a page pool and slicing them into MTU-sized fragments, rather
-> > > > > than dedicating a full page per packet. This approach is especially
-> > > > > beneficial on systems with large page sizes like 64KB.
-> > > > > 
-> > > > > Key improvements:
-> > > > > 
-> > > > > - Proper integration of page pool for RX buffer allocations.
-> > > > > - MTU-sized buffer slicing to improve memory utilization.
-> > > > > - Reduce overall per Rx queue memory footprint.
-> > > > > - Automatic fallback to full-page buffers when:
-> > > > >     * Jumbo frames are enabled (MTU > PAGE_SIZE / 2).
-> > > > >     * The XDP path is active, to avoid complexities with fragment reuse.
-> > > > > - Removal of redundant pre-allocated RX buffers used in scenarios like MTU
-> > > > >    changes, ensuring consistency in RX buffer allocation.
-> > > > > 
-> > > > > Testing on VMs with 64KB pages shows around 200% throughput improvement.
-> > > > > Memory efficiency is significantly improved due to reduced wastage in page
-> > > > > allocations. Example: We are now able to fit 35 rx buffers in a single 64kb
-> > > > > page for MTU size of 1500, instead of 1 rx buffer per page previously.
-> > > > > 
-> > > > > Tested:
-> > > > > 
-> > > > > - iperf3, iperf2, and nttcp benchmarks.
-> > > > > - Jumbo frames with MTU 9000.
-> > > > > - Native XDP programs (XDP_PASS, XDP_DROP, XDP_TX, XDP_REDIRECT) for
-> > > > >    testing the XDP path in driver.
-> > > > > - Page leak detection (kmemleak).
-> > > > > - Driver load/unload, reboot, and stress scenarios.
-> > > > 
-> > > > Chris (Cc) discovered a crash/bug[1] with page pool fragments used
-> > > > from the mlx5 driver.
-> > > > He put together a BPF program that reproduces the issue here:
-> > > > - [2] https://github.com/arges/xdp-redirector
-> > > > 
-> > > > Can I ask you to test that your driver against this reproducer?
-> > > > 
-> > > > 
-> > > > [1] https://lore.kernel.org/all/aIEuZy6fUj_4wtQ6@861G6M3/
-> > > > 
-> > > > --Jesper
-> > > > 
-> > > 
-> > > Hi Jesper,
-> > > 
-> > > I was unable to reproduce this issue on mana driver.
-> > > 
-> > Please note that I had to make a few adjustments to get reprodduction on
-> > mlx5:
-> > 
-> > - Make sure that the veth MACs are recognized by the device. Otherwise
-> >    traffic might be dropped by the device.
-> > 
-> > - Enable GRO on the veth device. Otherwise packets get dropped before
-> >    they reach the devmap BPF program.
-> > 
-> > Try starting the test program with one thread and see if you see packets
-> > coming through veth1-ns1 end of the veth pair.
-> > 
-> 
-> Hi Dipayaan,
-> 
-> Enabling GRO on the veth device is quite important for the test to be valid.
-> 
-> I've asked Chris to fix this in the reproducer. He can report back when
-> he have done this, so you can re-run the test.  It is also good advice
-> from Dragos that you should check packets are coming through the veth
-> pair, to make sure the test is working.
-> 
-> The setup.sh script also need to be modified, as it is loading xdp on a
-> net_device called "ext0" [0], which is specific to our systems (which
-> default also have GRO enabled for veth).
-> 
-> [0] https://github.com/arges/xdp-redirector/blob/main/setup.sh#L28
-> 
-> --Jesper
+> Is making it only accessible by root not sensible enough? What are
+> "sensible permissions" in this instance?
 
+Yes, I should have been more clear (or probably should update the
+document), but root (uid==0) isn't a sufficient permission check, as
+address exposure is supposed to be bounded by capabilities. Putting a
+filename into the tree exposes the address to anything that can get a
+file listing, and DAC access control isn't granular enough.
 
-I pushed some updates to the setup script to make it easier to use. If you have
-issues running the script, please share the output.
+(Thank you again for the fix patch I saw in the other thread!)
 
---chris
-
+-- 
+Kees Cook
 
