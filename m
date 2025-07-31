@@ -1,138 +1,139 @@
-Return-Path: <netdev+bounces-211183-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211182-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF2FEB170E7
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 14:08:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E835B170E5
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 14:08:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE0061C20EFD
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 12:09:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A8BAE7AC42D
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 12:07:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6BE7239E9F;
-	Thu, 31 Jul 2025 12:08:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 708911E32BE;
+	Thu, 31 Jul 2025 12:08:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="S+ASQAb8"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="dAXT7iuS"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
+Received: from fhigh-b7-smtp.messagingengine.com (fhigh-b7-smtp.messagingengine.com [202.12.124.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D34DC233158;
-	Thu, 31 Jul 2025 12:08:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D6471990D8;
+	Thu, 31 Jul 2025 12:08:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753963715; cv=none; b=qOGsYUKEmr0mTXszxneFUMzYWt36LkaupLh/mYpQG1upzyJzC7h0palxZuaWRDg2oqFf76HRNcG2G83TAI1R+euX4FG27T5C/ZwgFTnd5tWLzyfCvydCczcAAzHS8tA8phgMql5c3YmhDboMAYfST+EF4ztjAEFJYpzk1CrXXTs=
+	t=1753963712; cv=none; b=KSD+Xh8FxCL6/ReUPc0TbVUixsOYUWdKXwqBGP7grvx07SFg24eiXk5VTGOtryt90ndXTOHB4tJLDVOK/v/d9F2nTbXICN2vVc+jliRcd35cyYcPEBc7tB1N005iNa90+GF3TtOc7d5YiKfUSMrxLy0Lfjy3bnRcnm0AvzJNHNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753963715; c=relaxed/simple;
-	bh=CnrG0NW6RrCrnMU3nt86I14SqWszkJRx0k1q2LjVyqY=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=DOi1XKuOyUtfJOegC1utwfnM/PodtO852cSFol4hb3YeaWLS/1n6d2AKYConA6Ul+/KS3SgUtEoB/gzmb8E8R5q/47imPd03LgT+1AWFxD1cBNvnOrfSLeLKdUK9JO3sRJ7r4GtedjBac03R1/hl+XE9mgy78MxWSngM8hgNA2A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=S+ASQAb8; arc=none smtp.client-ip=198.47.23.234
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelvem-sh02.itg.ti.com ([10.180.78.226])
-	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTP id 56VC8FOJ3025590;
-	Thu, 31 Jul 2025 07:08:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1753963695;
-	bh=+WVY+FchNflwyhjUu1n/fND1UpVRfjWqymxZncmzm3A=;
-	h=From:To:CC:Subject:Date;
-	b=S+ASQAb8SHTApNSeI96umGhd0hiBOwGZH/GANo5fM89vk/mCjw8Xl/6h34M4RJgaV
-	 xx8D//ni7/ThL/y/i0qnfjnxVFDQzHXtJ3ZcVRzTEpn6VxGoFk4KeNxkOmo//HxsrV
-	 XknKui3i3S1DWFVO+TzeZyzHvbvM+j4CtxRFYoi8=
-Received: from DFLE112.ent.ti.com (dfle112.ent.ti.com [10.64.6.33])
-	by lelvem-sh02.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 56VC8FXl014082
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
-	Thu, 31 Jul 2025 07:08:15 -0500
-Received: from DFLE108.ent.ti.com (10.64.6.29) by DFLE112.ent.ti.com
- (10.64.6.33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Thu, 31
- Jul 2025 07:08:15 -0500
-Received: from fllvem-mr08.itg.ti.com (10.64.41.88) by DFLE108.ent.ti.com
- (10.64.6.29) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55 via
- Frontend Transport; Thu, 31 Jul 2025 07:08:15 -0500
-Received: from fllv0122.itg.ti.com (fllv0122.itg.ti.com [10.247.120.72])
-	by fllvem-mr08.itg.ti.com (8.18.1/8.18.1) with ESMTP id 56VC8Fqh3405092;
-	Thu, 31 Jul 2025 07:08:15 -0500
-Received: from localhost (danish-tpc.dhcp.ti.com [172.24.231.152])
-	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 56VC8E1t016802;
-	Thu, 31 Jul 2025 07:08:14 -0500
-From: MD Danish Anwar <danishanwar@ti.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Meghana Malladi
-	<m-malladi@ti.com>,
-        Himanshu Mittal <h-mittal1@ti.com>,
-        Ravi Gunasekaran
-	<r-gunasekaran@ti.com>
-CC: <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <srk@ti.com>,
-        Vignesh Raghavendra
-	<vigneshr@ti.com>,
-        Roger Quadros <rogerq@kernel.org>, <danishanwar@ti.com>
-Subject: [PATCH net] net: ti: icssg-prueth: Fix emac link speed handling
-Date: Thu, 31 Jul 2025 17:38:12 +0530
-Message-ID: <20250731120812.1606839-1-danishanwar@ti.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1753963712; c=relaxed/simple;
+	bh=eyO1TrLMlEtrenSc1Ru9gF9wqkZNhnimPOg/iczhekE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SP7keT7ICoAxZj7z9ACuSGltOjfeLYWLuwQgdqNl8ziztOT0ckssSiWtGbt/ECyc9eCILj5eCQj0sUBzcCC5AoRv9KsDJHlvPJ+vunWeIa6GZXkCOqePGSr3KByhDl1HKgJyd5znVNiwyc5gIm5YBwGf/DwSHH+0lkLRQqAfZ/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=dAXT7iuS; arc=none smtp.client-ip=202.12.124.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from phl-compute-09.internal (phl-compute-09.phl.internal [10.202.2.49])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 38AF47A232A;
+	Thu, 31 Jul 2025 08:08:29 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-09.internal (MEProxy); Thu, 31 Jul 2025 08:08:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1753963709; x=1754050109; bh=15iezWKQjz6LO3nVAiquccDeiBPZNVR4lsE
+	l6zIpCPE=; b=dAXT7iuSzHJfEsZt9PCgLolr43EJJL7itzi9agwizdMCBbb9tTo
+	r0kLTqXpzMPOv7D0XbArGs+rf0FhfoG+o/IThfJrQnfZhdGTQ0O6i4L/1FytWIJW
+	QVCbX1pWt1QHpJheLY60tdne3dMhqCg+q83zo7Jf7B6SDo5LDQrtm5kg107Wpz0U
+	InZRLhipNWMLCy08StIMdh+Q/Cfo0gNcVNZwX7Qr9/4lf0JsGG+yRl2UEtKLALuw
+	sWwY2BwysGn71HeysRWB7GVFvNaG9xY8p+6wqhFR4zHKQSpRRBKtw4ZbrUjdg+5a
+	8wiMMLW+yS9V6kOoiQRi1yDXYzskyAvyQoQ==
+X-ME-Sender: <xms:vFyLaMvX1k0_24n4BxBrgC8AOeacOZLET8DDJVyZxOiG7j0V2aKFQA>
+    <xme:vFyLaEFz_qRfBjOddlzkmf80FxpRLy5f1_foHJt-uXw4MV1NjQCVrpouaHbh4-Lv6
+    UJ3n6KxQZI7xjI>
+X-ME-Received: <xmr:vFyLaNwucYvecc261KBDmbj7bqAMrekcx3DmBEfnGEtJrbI88g5xR5DexXof_WnmqfxCUmTkwnT8n3w6yvHZkx0V>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgddutddtjeejucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepkfguohcuufgt
+    hhhimhhmvghluceoihguohhstghhsehiughoshgthhdrohhrgheqnecuggftrfgrthhtvg
+    hrnhepvddufeevkeehueegfedtvdevfefgudeifeduieefgfelkeehgeelgeejjeeggefh
+    necuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepihguoh
+    hstghhsehiughoshgthhdrohhrghdpnhgspghrtghpthhtohepledpmhhouggvpehsmhht
+    phhouhhtpdhrtghpthhtohepmhgvnhhglhhonhhgkedrughonhhgsehgmhgrihhlrdgtoh
+    hmpdhrtghpthhtohepughsrghhvghrnheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohep
+    rghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthhopegurghvvghmse
+    gurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhl
+    vgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoh
+    epphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhg
+    vghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvh
+    hgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:vFyLaO2XIdOx8i5zBP5m0Z3RDOtFwwUubMns1oYAOVfrj-C8VM9ISA>
+    <xmx:vFyLaNqEFCDydg8EslYbHZzXiFJFQBAbd7aCoJFl36_Y8p1fv2c7_g>
+    <xmx:vFyLaLWlthAA_wsPMZVgasWgqXoBTDmvrfa3hNOFNFfgqL7NgdNAww>
+    <xmx:vFyLaGot9h_zmjOCLnyae7nkBSlepJuzaKCPhNg4glba5FeW0iZH3w>
+    <xmx:vVyLaOP82C2riJaYNW_SuZkH2ev9UVHHvcf4SH95SIF6SritB7tQFJ1F>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 31 Jul 2025 08:08:27 -0400 (EDT)
+Date: Thu, 31 Jul 2025 15:08:24 +0300
+From: Ido Schimmel <idosch@idosch.org>
+To: Menglong Dong <menglong8.dong@gmail.com>
+Cc: dsahern@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: vrf: don't down netif when add slave
+Message-ID: <aItcuFGx1S7ySE3y@shredder>
+References: <20250731112219.121778-1-dongml2@chinatelecom.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250731112219.121778-1-dongml2@chinatelecom.cn>
 
-When link settings are changed emac->speed is populated by
-emac_adjust_link(). The link speed and other settings are then written into
-the DRAM. However if both ports are brought down after this and brought up
-again or if the operating mode is changed and a firmware reload is needed,
-the DRAM is cleared by icssg_config(). As a result the link settings are
-lost.
+On Thu, Jul 31, 2025 at 07:22:19PM +0800, Menglong Dong wrote:
+> For now, cycle_netdev() will be called to flush the neighbor cache when
+> add slave by downing and upping the slave netdev. When the slave has
+> vlan devices, the data transmission can interrupted.
+> 
+> Optimize it by notifying the NETDEV_CHANGEADDR instead, which will also
+> flush the neighbor cache. It's a little ugly, and maybe we can introduce
+> a new event to do such flush :/
 
-Fix this by calling emac_adjust_link() after icssg_config(). This re
-populates the settings in the DRAM after a new firmware load.
+Cycling the netdev is not only about neighbors, but also about moving
+routes to the correct table (see the comment above the function):
 
-Fixes: 9facce84f406 ("net: ti: icssg-prueth: Fix firmware load sequence.")
-Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
----
-NOTE: emac_adjust_link() is defined after prueth_emac_common_start() as a
-result to call this from prueth_emac_common_start() I am using forward
-declaration of the function. The other alternate is to move the definition
-of emac_adjust_link() before prueth_emac_common_start().
+ip link add name dummy1 up type dummy
+sysctl -wq net.ipv6.conf.dummy1.keep_addr_on_down=1
+ip address add 192.0.2.1/24 dev dummy1
+ip address add 2001:db8:1::1/64 dev dummy1
+ip link add name vrf1 up type vrf table 100
+ip link set dev dummy1 master vrf1
+ip -4 route show table 100
+192.0.2.0/24 dev dummy1 proto kernel scope link src 192.0.2.1 
+local 192.0.2.1 dev dummy1 proto kernel scope host src 192.0.2.1 
+broadcast 192.0.2.255 dev dummy1 proto kernel scope link src 192.0.2.1 
+ip -6 route show table 100
+local 2001:db8:1::1 dev dummy1 proto kernel metric 0 pref medium
+2001:db8:1::/64 dev dummy1 proto kernel metric 256 pref medium
+local fe80::f877:f7ff:fecb:bfb dev dummy1 proto kernel metric 0 pref medium
+fe80::/64 dev dummy1 proto kernel metric 256 pref medium
+multicast ff00::/8 dev dummy1 proto kernel metric 256 pref medium
 
- drivers/net/ethernet/ti/icssg/icssg_prueth.c | 3 +++
- 1 file changed, 3 insertions(+)
+And it doesn't happen with your patch:
 
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-index 2b973d6e2341..8ca0ea768e16 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-@@ -50,6 +50,8 @@
- /* CTRLMMR_ICSSG_RGMII_CTRL register bits */
- #define ICSSG_CTRL_RGMII_ID_MODE                BIT(24)
- 
-+static void emac_adjust_link(struct net_device *ndev);
-+
- static int emac_get_tx_ts(struct prueth_emac *emac,
- 			  struct emac_tx_ts_response *rsp)
- {
-@@ -229,6 +231,7 @@ static int prueth_emac_common_start(struct prueth *prueth)
- 		ret = icssg_config(prueth, emac, slice);
- 		if (ret)
- 			goto disable_class;
-+		emac_adjust_link(emac->ndev);
- 	}
- 
- 	ret = prueth_emac_start(prueth);
+ip link add name dummy1 up type dummy
+sysctl -wq net.ipv6.conf.dummy1.keep_addr_on_down=1
+ip address add 192.0.2.1/24 dev dummy1
+ip address add 2001:db8:1::1/64 dev dummy1
+ip link add name vrf1 up type vrf table 100
+ip link set dev dummy1 master vrf1
+ip -4 route show table 100
+ip -6 route show table 100
 
-base-commit: 759dfc7d04bab1b0b86113f1164dc1fec192b859
--- 
-2.34.1
-
+You can try configuring the VLAN devices with "loose_binding on".
 
