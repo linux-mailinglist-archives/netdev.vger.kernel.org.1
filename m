@@ -1,160 +1,209 @@
-Return-Path: <netdev+bounces-211253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 828B5B1760E
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 20:16:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1825FB1762B
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 20:45:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C584718C3A4C
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 18:17:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0BA651AA65EF
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 18:45:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CA5723E33D;
-	Thu, 31 Jul 2025 18:16:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1F4E23D298;
+	Thu, 31 Jul 2025 18:45:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f79.google.com (mail-io1-f79.google.com [209.85.166.79])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 829251E0DB0;
-	Thu, 31 Jul 2025 18:16:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 232FE15383A
+	for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 18:45:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.79
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753985815; cv=none; b=ngnUc7uQfizxorl9AxM89AlgJ4JXWqUFz59x8qlXfl6N6bwwh8GCxeSGJRQUVIAbsQ4SVQ/5894R+RuLDnd5m6cP9LBeaH9/GIim8pHtTMP+C9bDcKdTV2D9SYCImmmUVYd/6cKkpjGD00B7kkidy0WzrmMK2A1syT79LccqVw0=
+	t=1753987532; cv=none; b=XehJ2Yi0Wf0u/WVI/0/46UiNcume9jeC1RC/2q3R8ME8tYti8iar7unp07zO5OGI3n2wBHN0nESmk9LsUX1qnyqWU0Xa6WAzCFBH8Ef5nUfZUBcvGnvIsHlIAZ8SCQZxo05QyNG2Z0bQaghJspZIPTcuojkUZKGIHJM7NSE7yqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753985815; c=relaxed/simple;
-	bh=S+eAHkUQmIxOmh9BhUcuLHRn/WSy/97Ut9MbCGS8kfs=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=amFc/s9TrMc1A8YU7LmA9Pd5EeBEEiVyNx67KT0ILsS+expiJkK77oPqtMoBoWJlZ/fsWP7fBHQwMGseVC9AmnbzOIquPOv9u+SoMnk1Q9l0rlYZReKL/mkfngss5XT7Cs0Y+2fcEA/pUbb5RymcULDGle1IDWKMu7Mw3UThnHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4btHHN2xzjz6L4t7;
-	Fri,  1 Aug 2025 02:12:32 +0800 (CST)
-Received: from frapeml500005.china.huawei.com (unknown [7.182.85.13])
-	by mail.maildlp.com (Postfix) with ESMTPS id CB0D51404C6;
-	Fri,  1 Aug 2025 02:16:48 +0800 (CST)
-Received: from china (10.220.118.114) by frapeml500005.china.huawei.com
- (7.182.85.13) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Thu, 31 Jul
- 2025 20:16:34 +0200
-From: Gur Stavi <gur.stavi@huawei.com>
-To: <horms@kernel.org>
-CC: <andrew+netdev@lunn.ch>, <christophe.jaillet@wanadoo.fr>,
-	<corbet@lwn.net>, <davem@davemloft.net>, <edumazet@google.com>,
-	<fuguiming@h-partners.com>, <gongfan1@huawei.com>, <guoxin09@huawei.com>,
-	<gur.stavi@huawei.com>, <helgaas@kernel.org>, <jdamato@fastly.com>,
-	<kuba@kernel.org>, <lee@trager.us>, <linux-doc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <luosifu@huawei.com>,
-	<meny.yossefi@huawei.com>, <mpe@ellerman.id.au>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <przemyslaw.kitszel@intel.com>,
-	<shenchenyang1@hisilicon.com>, <shijing34@huawei.com>, <sumang@marvell.com>,
-	<vadim.fedorenko@linux.dev>, <wulike1@huawei.com>, <zhoushuai28@huawei.com>,
-	<zhuyikai1@h-partners.com>
-Subject: Re: [PATCH net-next v10 1/8] hinic3: Async Event Queue interfaces
-Date: Thu, 31 Jul 2025 21:34:20 +0300
-Message-ID: <20250731183420.1138336-1-gur.stavi@huawei.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20250731140404.GD8494@horms.kernel.org>
-References: <20250731140404.GD8494@horms.kernel.org>
+	s=arc-20240116; t=1753987532; c=relaxed/simple;
+	bh=WybObofEF6nvFywm2tz4HM5DS96jOaiXrn8n6S/LZZw=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=pC88Cy2yH50TQw0foF2PrVc9XO5eAVDrivwkaNZVhbEzNffmxs0tLzuEFQxZ+iTeiip+F5WC5TIcTkY4uXb7Ov+UhRcwqESE4BNq6shaxww10jZp+Jxq8vLAQdEi51Qg7Ff2h1sHTY5WP75PLeNMd5cEGfBD3kAgsJFQkfuq/IQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f79.google.com with SMTP id ca18e2360f4ac-8814b2524c6so8745539f.1
+        for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 11:45:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753987530; x=1754592330;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=jnMBY5RRXxi/8Sj7uoCzysAg7Y+uKqRraxHA6vwK1s0=;
+        b=FRycYIddDCHzLkhbo3v150HhmR50kYs9frABmlZC37dhyeWS+5aB9BY5553DOGLDV1
+         yw/BVyFuThV1Et6ERgUCktfVNOBRW28ZFknQN2109QUXSIWvNsSQSCE7vBTNWMY8HdnI
+         sMokXfguwm1fo0HvbxOaIqxFmkJg0iEIwnUl7/m20IZb9m9nPWJYDJ3cbSkfEPG5aLC5
+         hfz2+SnB58YRjjPHjIgkVmi4+eLDT1rEW10cDMf6C/amjGjG8JC6Y0STBrI33/BxHxXW
+         u2U3Hd69Qmsu3ntySsPI3joJ4JX3+99fUIh/utwvVVybdv+xs+Exn4BMu64CjUTC9gfL
+         XZTQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVtiH27aB+kmJDZY3pbeHwJzCTJh88eVf+nMDokJDWz2rFTzQDRk/0Zl4n4KvO6U9I+WYGczfU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzpO+p/6BxDOkDdIWxo9g6bgI5MY2c5h7mjgOVVNBfJMA2zHEAg
+	5PPRzBf8/JCXTuQCOE9VNuCqXJrX9wm6LMOyRVO3wUZ/mADVOzD8glGF4tdDEKLs8vU2c2DK1Z1
+	bowBrbzjJKgHDObfYPu+DssZdQfFQyvircljLdT88G3KTqKeiDuHhdDUCsQg=
+X-Google-Smtp-Source: AGHT+IGLcMun3G9jTmEapcqDIt8ajWP0D/9/CUplr4C2dNL9i7tLTD9mx1FjQhoNydTZ47Ibb+lGZ0ez2iP+gbpo6cVrjZnxO2KX
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
- frapeml500005.china.huawei.com (7.182.85.13)
+X-Received: by 2002:a05:6e02:440c:20b0:3e3:d5f1:9019 with SMTP id
+ e9e14a558f8ab-3e3f62a7e18mr96486075ab.16.1753987530301; Thu, 31 Jul 2025
+ 11:45:30 -0700 (PDT)
+Date: Thu, 31 Jul 2025 11:45:30 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <688bb9ca.a00a0220.26d0e1.0050.GAE@google.com>
+Subject: [syzbot] [net?] BUG: unable to handle kernel paging request in nsim_queue_free
+From: syzbot <syzbot+8aa80c6232008f7b957d@syzkaller.appspotmail.com>
+To: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-> On Thu, Jul 31, 2025 at 03:58:39PM +0300, Gur Stavi wrote:
-> >
-> > Lets define a "coherent struct" as a structure made of fields that makes sense
-> > to human beings. Every field endianity is defined and fields are arranged in
-> > order that "makes sense". Fields can be of any integer size 8,16,32,64 and not
-> > necessarily naturally aligned.
-> >
-> > swab32_array transforms a coherent struct into "byte jumble". Small fields are
-> > reordered and larger (misaligned) fields may be split into 2 (or even 3) parts.
-> > swab32_array is reversible so a 2nd call with byte jumble as input will produce
-> > the original coherent struct.
-> >
-> > hinic3 dma has "swab32_array" built in.
-> > On send-to-device it expects a byte jubmle so the DMA engine will transform it
-> > into a coherent struct.
-> > On receive-from-device it provides a byte jumble so the driver needs
-> > to call swab32_array to transform it into a coherent struct.
-> >
-> > The hinic3_cmdq_buf_swab32 function will work correctly, producing byte jumble,
-> > on little endian and big endian hosts.
-> >
-> > The code that runs prior to hinic3_cmdq_buf_swab32 that initializes a coherent
-> > struct is endianity sensitive. It needs to initialize fields based on their
-> > coherent endianity with or without byte swap. Practically use cpu_to_le or
-> > cpu_to_be based on the coherent definition.
-> >
-> > Specifically, cmdq "coherent structs" in hinic3 use little endian and since
-> > Kconfig currently declares that big endian hosts are not supported then
-> > coherent structs are initialized without explicit cpu_to_le macros.
-> >
-> > And this is what the comment says:
-> >
-> > /* Data provided to/by cmdq is arranged in structs with little endian fields but
-> >  * every dword (32bits) should be swapped since HW swaps it again when it
-> >  * copies it from/to host memory.
-> >  */
-> >
->
-> Thanks, I think I am closer to understanding things now.
->
-> Let me try and express things in my own words:
->
-> 1. On the hardware side, things are stored in a way that may be represented
->    as structures with little-endian values. The members of the structures may
->    have different sizes: 8-bit, 16-bit, 32-bit, ...
->
-> 2. The hardware runs the equivalent of swab32_array() over this data
->    when writing it to (or reading it from) the host. So we get a
->    "byte jumble".
->
-> 3. In this patch, the hinic3_cmdq_buf_swab32 reverses this jumbling
->    by running he equivalent of swab32_array() over this data again.
->
->    As 3 exactly reverses 2, what is left are structures exactly as in 1.
->
+Hello,
 
-Yes. Your understanding matches mine.
+syzbot found the following issue on:
 
-> If so, I agree this makes sense and I am sorry for missing this before.
->
-> And if so, is the intention for the cmdq "coherent structs" in the driver
-> to look something like this.
->
->    struct {
-> 	u8 a;
-> 	u8 b;
-> 	__le16 c;
-> 	__le32 d;
->    };
->
-> If so, this seems sensible to me.
->
-> But I think it would be best so include some code in this patchset
-> that makes use of such structures - sorry if it is there, I couldn't find
-> it just now.
->
-> And, although there is no intention for the driver to run on big endian
-> systems, the __le* fields should be accessed using cpu_to_le*/le*_to_cpu
-> helpers.
+HEAD commit:    e8d780dcd957 Merge tag 'slab-for-6.17' of git://git.kernel..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=14382cf0580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=c99a414773e8e8dd
+dashboard link: https://syzkaller.appspot.com/bug?extid=8aa80c6232008f7b957d
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+userspace arch: i386
 
-There was a long and somewhat heated debate about this issue.
-https://lore.kernel.org/netdev/20241230192326.384fd21d@kernel.org/
-I agree that having __le in the code is better coding practice.
-But flooding the code with cpu_to_le and le_to_cpu does hurt readability.
-And there are precedences of drivers that avoid it.
+Unfortunately, I don't have any reproducer for this issue yet.
 
-However, our dev team (I am mostly an advisor) decided to give it a try anyway.
-I hope they manage to survive it.
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-e8d780dc.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/9d67cb9a6476/vmlinux-e8d780dc.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/5b160fb5034b/bzImage-e8d780dc.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+8aa80c6232008f7b957d@syzkaller.appspotmail.com
+
+netdevsim netdevsim1 netdevsim2 (unregistering): unset [1, 0] type 2 family 0 port 6081 - 0
+netdevsim netdevsim1 netdevsim1 (unregistering): unset [1, 0] type 2 family 0 port 6081 - 0
+netdevsim netdevsim1 netdevsim0 (unregistering): unset [1, 0] type 2 family 0 port 6081 - 0
+BUG: unable to handle page fault for address: ffff88809782c020
+#PF: supervisor write access in kernel mode
+#PF: error_code(0x0002) - not-present page
+PGD 1b401067 P4D 1b401067 PUD 0 
+Oops: Oops: 0002 [#1] SMP KASAN NOPTI
+CPU: 3 UID: 0 PID: 8476 Comm: syz.1.251 Not tainted 6.16.0-syzkaller-06699-ge8d780dcd957 #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+RIP: 0010:local_add arch/x86/include/asm/local.h:33 [inline]
+RIP: 0010:u64_stats_add include/linux/u64_stats_sync.h:89 [inline]
+RIP: 0010:dev_dstats_rx_dropped_add include/linux/netdevice.h:3027 [inline]
+RIP: 0010:nsim_queue_free+0xba/0x120 drivers/net/netdevsim/netdev.c:714
+Code: 07 77 6c 4a 8d 3c ed 20 7e f1 8d 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 80 3c 02 00 75 46 4a 03 1c ed 20 7e f1 8d <4c> 01 63 20 be 00 02 00 00 48 8d 3d 00 00 00 00 e8 61 2f 58 fa 48
+RSP: 0018:ffffc900044af150 EFLAGS: 00010286
+RAX: dffffc0000000000 RBX: ffff88809782c000 RCX: 00000000000079c3
+RDX: 1ffffffff1be2fc7 RSI: ffffffff8c15f380 RDI: ffffffff8df17e38
+RBP: ffff88805f59d000 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000001 R11: 0000000000000001 R12: 0000000000000000
+R13: 0000000000000003 R14: ffff88806ceb3d00 R15: ffffed100dfd308e
+FS:  0000000000000000(0000) GS:ffff88809782c000(0063) knlGS:00000000f505db40
+CS:  0010 DS: 002b ES: 002b CR0: 0000000080050033
+CR2: ffff88809782c020 CR3: 000000006fc6a000 CR4: 0000000000352ef0
+Call Trace:
+ <TASK>
+ nsim_queue_uninit drivers/net/netdevsim/netdev.c:993 [inline]
+ nsim_init_netdevsim drivers/net/netdevsim/netdev.c:1049 [inline]
+ nsim_create+0xd0a/0x1260 drivers/net/netdevsim/netdev.c:1101
+ __nsim_dev_port_add+0x435/0x7d0 drivers/net/netdevsim/dev.c:1438
+ nsim_dev_port_add_all drivers/net/netdevsim/dev.c:1494 [inline]
+ nsim_dev_reload_create drivers/net/netdevsim/dev.c:1546 [inline]
+ nsim_dev_reload_up+0x5b8/0x860 drivers/net/netdevsim/dev.c:1003
+ devlink_reload+0x322/0x7c0 net/devlink/dev.c:474
+ devlink_nl_reload_doit+0xe31/0x1410 net/devlink/dev.c:584
+ genl_family_rcv_msg_doit+0x206/0x2f0 net/netlink/genetlink.c:1115
+ genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+ genl_rcv_msg+0x55c/0x800 net/netlink/genetlink.c:1210
+ netlink_rcv_skb+0x155/0x420 net/netlink/af_netlink.c:2552
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+ netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
+ netlink_unicast+0x5aa/0x870 net/netlink/af_netlink.c:1346
+ netlink_sendmsg+0x8d1/0xdd0 net/netlink/af_netlink.c:1896
+ sock_sendmsg_nosec net/socket.c:714 [inline]
+ __sock_sendmsg net/socket.c:729 [inline]
+ ____sys_sendmsg+0xa95/0xc70 net/socket.c:2614
+ ___sys_sendmsg+0x134/0x1d0 net/socket.c:2668
+ __sys_sendmsg+0x16d/0x220 net/socket.c:2700
+ do_syscall_32_irqs_on arch/x86/entry/syscall_32.c:83 [inline]
+ __do_fast_syscall_32+0x7c/0x3a0 arch/x86/entry/syscall_32.c:306
+ do_fast_syscall_32+0x32/0x80 arch/x86/entry/syscall_32.c:331
+ entry_SYSENTER_compat_after_hwframe+0x84/0x8e
+RIP: 0023:0xf708e579
+Code: b8 01 10 06 03 74 b4 01 10 07 03 74 b0 01 10 08 03 74 d8 01 00 00 00 00 00 00 00 00 00 00 00 00 00 51 52 55 89 e5 0f 34 cd 80 <5d> 5a 59 c3 90 90 90 90 8d b4 26 00 00 00 00 8d b4 26 00 00 00 00
+RSP: 002b:00000000f505d55c EFLAGS: 00000296 ORIG_RAX: 0000000000000172
+RAX: ffffffffffffffda RBX: 0000000000000007 RCX: 0000000080000080
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000296 R12: 0000000000000000
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+ </TASK>
+Modules linked in:
+CR2: ffff88809782c020
+---[ end trace 0000000000000000 ]---
+RIP: 0010:local_add arch/x86/include/asm/local.h:33 [inline]
+RIP: 0010:u64_stats_add include/linux/u64_stats_sync.h:89 [inline]
+RIP: 0010:dev_dstats_rx_dropped_add include/linux/netdevice.h:3027 [inline]
+RIP: 0010:nsim_queue_free+0xba/0x120 drivers/net/netdevsim/netdev.c:714
+Code: 07 77 6c 4a 8d 3c ed 20 7e f1 8d 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 80 3c 02 00 75 46 4a 03 1c ed 20 7e f1 8d <4c> 01 63 20 be 00 02 00 00 48 8d 3d 00 00 00 00 e8 61 2f 58 fa 48
+RSP: 0018:ffffc900044af150 EFLAGS: 00010286
+RAX: dffffc0000000000 RBX: ffff88809782c000 RCX: 00000000000079c3
+RDX: 1ffffffff1be2fc7 RSI: ffffffff8c15f380 RDI: ffffffff8df17e38
+RBP: ffff88805f59d000 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000001 R11: 0000000000000001 R12: 0000000000000000
+R13: 0000000000000003 R14: ffff88806ceb3d00 R15: ffffed100dfd308e
+FS:  0000000000000000(0000) GS:ffff88809782c000(0063) knlGS:00000000f505db40
+CS:  0010 DS: 002b ES: 002b CR0: 0000000080050033
+CR2: ffff88809782c020 CR3: 000000006fc6a000 CR4: 0000000000352ef0
+----------------
+Code disassembly (best guess), 1 bytes skipped:
+   0:	77 6c                	ja     0x6e
+   2:	4a 8d 3c ed 20 7e f1 	lea    -0x720e81e0(,%r13,8),%rdi
+   9:	8d
+   a:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
+  11:	fc ff df
+  14:	48 89 fa             	mov    %rdi,%rdx
+  17:	48 c1 ea 03          	shr    $0x3,%rdx
+  1b:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1)
+  1f:	75 46                	jne    0x67
+  21:	4a 03 1c ed 20 7e f1 	add    -0x720e81e0(,%r13,8),%rbx
+  28:	8d
+* 29:	4c 01 63 20          	add    %r12,0x20(%rbx) <-- trapping instruction
+  2d:	be 00 02 00 00       	mov    $0x200,%esi
+  32:	48 8d 3d 00 00 00 00 	lea    0x0(%rip),%rdi        # 0x39
+  39:	e8 61 2f 58 fa       	call   0xfa582f9f
+  3e:	48                   	rex.W
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
