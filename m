@@ -1,61 +1,64 @@
-Return-Path: <netdev+bounces-211272-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211273-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DEFCB17706
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 22:18:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47D57B17712
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 22:21:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B8021C27790
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 20:19:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 72ED85618B8
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 20:21:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D2FE1ACED9;
-	Thu, 31 Jul 2025 20:18:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50D811C7013;
+	Thu, 31 Jul 2025 20:21:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NbEBB58l"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aEg8S2Bq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62CEA134CF;
-	Thu, 31 Jul 2025 20:18:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 292171DFFC;
+	Thu, 31 Jul 2025 20:21:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753993124; cv=none; b=G67+E8ZHQH6IwB2UeILFIfeu+ClHTh0y/AXtOcwLHT6tH6/Jkpe76TEeuXALyVgH8wTI6iNPledFVUWEjhPG8OKlIc7vr9pqpCYyqbQK8ZpU6CzfrIdDWZSDV1TuiFb3NCtIgeXJ10mUbnWgUvHGKekaA1/sVBCsg911U+XPqjo=
+	t=1753993271; cv=none; b=FvM1YeK0f1jF10CV4oLx5jTB/34rQtRfiKBlzMhnb6PWMlB+Ie9o6sQ8s3ufAX8r/Eurj+xJRmah7+/uQPc6QLho8Go87EQ2LrPXNInx2IBIy4lgtZEqbveaPXKnn2qTPeMzSJlI1+zMHmEUcNqko4475pue4ZVrwp9+ntEF5/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753993124; c=relaxed/simple;
-	bh=wRM/PA6cJ2JEMESFHLAWKFrlHYJBYwYV2kTWQyU87lc=;
+	s=arc-20240116; t=1753993271; c=relaxed/simple;
+	bh=pkj3F6MX7xyahYz+N3j4eQGlY216yfai4OjiWJU+osI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hGLnAYM/f3kNt/hfmQ9I3R2M4hQ4cgOo6LdPGKp8H03kpMhp9bANH/8a6tOCvhD/V7fUG6TALo8gNr9FtdEiQH3EvmoQqbvr62T8pjd3UXoTxn+mQAV1R3KXZcvvCSDPwM418AzodsMngg8nvkZDxYJv89zKTTOz2Dt+0WcW6ts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NbEBB58l; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C60BC4CEEF;
-	Thu, 31 Jul 2025 20:18:41 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=QQ7wj+tVy3nSEtK8jIhdqRLTYQrYJgWtheGxlsypfIs3z3FIn7pP0MOyPjCSZSDhThgaGzgKejQExcLCb6tuBW5PI65WGOIpKiwRDeCm85Suk0qkOjfpVUwWfwORvA3WIw4f6gMlsIHuU0Wewdvh+TlK1UYgNxDOG1m1YMfKars=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aEg8S2Bq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19286C4CEEF;
+	Thu, 31 Jul 2025 20:21:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753993123;
-	bh=wRM/PA6cJ2JEMESFHLAWKFrlHYJBYwYV2kTWQyU87lc=;
+	s=k20201202; t=1753993270;
+	bh=pkj3F6MX7xyahYz+N3j4eQGlY216yfai4OjiWJU+osI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NbEBB58lngVa/0Az1+8+ZmTxAn61RHCjU/CSl5rE7+t7u4Mk2Aayg06G8hGxIJUSU
-	 3jx+qyBMPqmyCYBgNs+C2kLCGsgASoUa49XeBSydXaUIn2COC5HylO/OVwcabDNi/C
-	 iAkSHuERXC6g4GDSbtOBb2ujKa+jr6Ynobue9K7LLq3PL7Uyi7mj98/bDnih6nZGg2
-	 BZlE9DmZA2Yfs44N9TpLwUxyV3Ma83/5xtVi8lmzTCuOOKierW8AKRM4SzxrQIIeTi
-	 9QlhcpD0XaEspNz1yPY8iKXdd0MLCEa/t/AYlPHW0IrxUSl78Ka80L4dr/EAyBbz7J
-	 MWRnxXN7xE1RQ==
-Date: Thu, 31 Jul 2025 21:18:39 +0100
+	b=aEg8S2BqXLrqJIPhdGSam3Umz84kRz8buXaTCtFVeNircIwI1p/95o2aOYhpgmafP
+	 4zHV0zvKynsoRO19YRgUk1r/L9jPkYGcGzGgSv7VJjhZxXiF7cmlw2rsz9kB7ToDP6
+	 LIfhJo9BbuOoQvpaDT8wCMWddLwrD01G/DcPwEXRWb0ShT2b3xYpfZ14+y9FGPQaY4
+	 sXzlXGLjzZvpNz9xyUw+3wl4wKOnWZAP0PVb3Izcv5KJxzsJN9j5G33mQP2NM18dFm
+	 zY+/wfH3wJutWKJerXJNwAzEJacIphEe0HA7L5RxqKIpFboLJ2phvEoiqCAMOuHKI1
+	 hBiwSmXjX6LlQ==
+Date: Thu, 31 Jul 2025 21:21:05 +0100
 From: Simon Horman <horms@kernel.org>
-To: Kyle Hendry <kylehendrydev@gmail.com>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
-	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: netdev@vger.kernel.org, Doug Berger <opendmb@gmail.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	noltari@gmail.com, jonas.gorski@gmail.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 2/2] net: dsa: b53: mmap: Implement bcm63268
- gphy power control
-Message-ID: <20250731201839.GG8494@horms.kernel.org>
-References: <20250730020338.15569-1-kylehendrydev@gmail.com>
- <20250730020338.15569-3-kylehendrydev@gmail.com>
+	Jacob Keller <jacob.e.keller@intel.com>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net v2] net: mdio: mdio-bcm-unimac: Correct rate fallback
+ logic
+Message-ID: <20250731202105.GH8494@horms.kernel.org>
+References: <20250730202533.3463529-1-florian.fainelli@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,91 +67,36 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250730020338.15569-3-kylehendrydev@gmail.com>
+In-Reply-To: <20250730202533.3463529-1-florian.fainelli@broadcom.com>
 
-On Tue, Jul 29, 2025 at 07:03:36PM -0700, Kyle Hendry wrote:
-> Add check for gphy in enable/disable phy calls and set power bits
-> in gphy control register.
+On Wed, Jul 30, 2025 at 01:25:33PM -0700, Florian Fainelli wrote:
+> When the parent clock is a gated clock which has multiple parents, the
+> clock provider (clk-scmi typically) might return a rate of 0 since there
+> is not one of those particular parent clocks that should be chosen for
+> returning a rate. Prior to ee975351cf0c ("net: mdio: mdio-bcm-unimac:
+> Manage clock around I/O accesses"), we would not always be passing a
+> clock reference depending upon how mdio-bcm-unimac was instantiated. In
+> that case, we would take the fallback path where the rate is hard coded
+> to 250MHz.
 > 
-> Signed-off-by: Kyle Hendry <kylehendrydev@gmail.com>
-
-Hi Kyle,
-
-Thanks for your patches.
-
-Unfortunately net-next is currently closed. So I'd like to ask for you to
-post this patchset when it reopens. You should include Florian's tags when
-doing so.
-
-## Form letter - net-next-closed
-
-The merge window for v6.17 has begun and therefore net-next is closed
-for new drivers, features, code refactoring and optimizations. We are
-currently accepting bug fixes only.
-
-Please repost when net-next reopens after 11th August.
-
-RFC patches sent for review only are obviously welcome at any time.
-
-See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
-
+> Make sure that we still fallback to using a fixed rate for the divider
+> calculation, otherwise we simply ignore the desired MDIO bus clock
+> frequency which can prevent us from interfacing with Ethernet PHYs
+> properly.
+> 
+> Fixes: ee975351cf0c ("net: mdio: mdio-bcm-unimac: Manage clock around I/O accesses")
+> Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
 > ---
->  drivers/net/dsa/b53/b53_mmap.c | 33 +++++++++++++++++++++++++++++----
->  1 file changed, 29 insertions(+), 4 deletions(-)
+> Changes in v2:
 > 
-> diff --git a/drivers/net/dsa/b53/b53_mmap.c b/drivers/net/dsa/b53/b53_mmap.c
-> index 87e1338765c2..f4a59d8fbdd6 100644
-> --- a/drivers/net/dsa/b53/b53_mmap.c
-> +++ b/drivers/net/dsa/b53/b53_mmap.c
-> @@ -29,6 +29,10 @@
->  #include "b53_priv.h"
->  
->  #define BCM63XX_EPHY_REG 0x3C
-> +#define BCM63268_GPHY_REG 0x54
-> +
-> +#define GPHY_CTRL_LOW_PWR	BIT(3)
-> +#define GPHY_CTRL_IDDQ_BIAS	BIT(0)
->  
->  struct b53_phy_info {
->  	u32 gphy_port_mask;
-> @@ -292,13 +296,30 @@ static int bcm63xx_ephy_set(struct b53_device *dev, int port, bool enable)
->  	return regmap_update_bits(gpio_ctrl, BCM63XX_EPHY_REG, mask, val);
->  }
->  
-> +static int bcm63268_gphy_set(struct b53_device *dev, bool enable)
-> +{
-> +	struct b53_mmap_priv *priv = dev->priv;
-> +	struct regmap *gpio_ctrl = priv->gpio_ctrl;
-> +	u32 mask = GPHY_CTRL_IDDQ_BIAS | GPHY_CTRL_LOW_PWR;
-> +	u32 val = 0;
+> - provide additional details as to how a parent clock can have a rate of
+>   0 (Andrew)
+> 
+> - incorporate Simon's feedback that an optional clock is NULL and
+>   therefore returns a rate of 0 as well
 
-I'm also wondering if you could update this to follow the
-reverse xmas tree - longest line to shortest - for local variable
-declarations. I realise that isn't followed particularly well
-in this file. But it is preferred for Networking code.
+Thanks for the update.
 
-I think in this case that could be as follows (completely untested!):
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-	u32 mask = GPHY_CTRL_IDDQ_BIAS | GPHY_CTRL_LOW_PWR;
-	struct b53_mmap_priv *priv = dev->priv;
-	struct regmap *gpio_ctrl;
-	u32 val = 0;
-
-	gpio_ctrl = priv->gpio_ctrl;
-
-Edward Cree's tool can be of assistance here.
-https://github.com/ecree-solarflare/xmastree
-
-> +
-> +	if (!enable)
-> +		val = mask;
-> +
-> +	return regmap_update_bits(gpio_ctrl, BCM63268_GPHY_REG, mask, val);
-> +}
-> +
-
-...
-
--- 
-pw-bot: defer
 
