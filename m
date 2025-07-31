@@ -1,137 +1,108 @@
-Return-Path: <netdev+bounces-211177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211178-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D7B3B1704B
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 13:22:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8278B1705D
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 13:28:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E97F3BE7C3
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 11:22:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6093F18C64A8
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 11:29:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F39F2C08A0;
-	Thu, 31 Jul 2025 11:22:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A354C2C032C;
+	Thu, 31 Jul 2025 11:28:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OdYoZ1A/"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="cE9uh/lG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f196.google.com (mail-pg1-f196.google.com [209.85.215.196])
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D5E92248AC;
-	Thu, 31 Jul 2025 11:22:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E65B62BDC38
+	for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 11:28:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753960948; cv=none; b=Ftm9gmhCl81sGUucJemkdYUPiiLC3ZSBg1hhx0Z0Saen864hudbX1Pbh56dtRGFOf8Gk+qcOZ60B8XpzREIRSeZ9Si5vnvSqY/zqzHeZtm/WKe5EzIpO6piVOQqAVFyrm97G7Is7hmIiXbMAJyU29h//nrGyAbwTTWNPbp+b6YA=
+	t=1753961327; cv=none; b=HtRAwB+PnEoDRO+LwXsvJaWWfPOpFbW9jegeR2KRe86D4vJ3wsCySXBoGL4r1U5PwpPnfm2ifIFXRXnCeZzGzfbSSUSkPg/bErejMFHG2rPcLwbqJ/scB1b32XLCZan96E1UaJbPbh8cT/nE1i00mzkVe4AlWR9wGjBHI7BwH18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753960948; c=relaxed/simple;
-	bh=WvRtQA9ZxxxbZQRyydbsPd8vCk/ZKz3GnBrOXB+2pn4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZRkLwZbOEGA8vn/Iq6jCMu0OIW9VAR2BDPT7wtN2jWHrYczrGc2V/Uv/w9Fs5qykzHc0Cf0bi4TVqZjeF+teEFuNKlJ2fP9yrN46hOVOx0dpKSj2h4tkOBxc6ycy/+B3enrqH76+7lLXmnlHIH8VrIdw0UTnCYXmc3JbkLk8eWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OdYoZ1A/; arc=none smtp.client-ip=209.85.215.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f196.google.com with SMTP id 41be03b00d2f7-b31f0ef5f7aso392226a12.3;
-        Thu, 31 Jul 2025 04:22:26 -0700 (PDT)
+	s=arc-20240116; t=1753961327; c=relaxed/simple;
+	bh=DeNrnfxc0yCsmF++d2m59qjNIfz9tjCOKX+Lu1e25hk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=MClyhCEhVl4Btl+jbQ9dUAZ1c4QW04p0XcjwrZEu63laC9/xZNV6d5RYFwMdHFygBhwALc/6Um8uvQl1OVYJpNYtXDeLCEm1agZEQViLueD0NzzucTc6+GV8nHf3w83RqSb5P0XPdUxhdrb0XVrWc6Bb+NLdLRGEAiM/I28AkZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=cE9uh/lG; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-6155e75a9acso394173a12.0
+        for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 04:28:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753960946; x=1754565746; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=qx7n4CRHDkkYFnz021yXqLqPPJ6FUayo+PssJIK5SZQ=;
-        b=OdYoZ1A/TQOoLWk0iLzseJWpJh06BaQNoiqNUJDnkG4YsxfEqToaaGelNRyu4BpVPy
-         GXjGPksoNBwJGZqEQ5vnf4jK8pzOCkK4jSPd8fwDH4qiYQl9Q7alR0qQAQacGWITgE9T
-         BEFKxveRtLognBNW+HP3YDMOStJhHxVVLMHESrYOywBnsudPM8Ps2HIZ/kDLT+oh9bzk
-         SXs/Inao7IABsNACiGuryVjOuG073P7HlnHOpxrgubWFBCCH6JN+bpaI8LwcD0f3ebu8
-         MrHs7xkvhYIyzqNVJPVT/9SOLNGIryEj3TQdgzql9AndMxhKlBNSPxiB4miSCgOm7KHg
-         ub0Q==
+        d=cloudflare.com; s=google09082023; t=1753961324; x=1754566124; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=DeNrnfxc0yCsmF++d2m59qjNIfz9tjCOKX+Lu1e25hk=;
+        b=cE9uh/lGPvCX3am7h/f8TBbK2bPBfGN2uAYgoe+xrD1kFVgAC2ADAPTYT8BHXfYljo
+         0GEY8eKmGAkIHLjnN/Umd4ho8S5B8zZAiua6xStvgYc8q+TCLwTwbanrjtDdfu4+i6En
+         X3SIcHnUeq8WTnqk+5GoDkqBzRJ9VbHqkaxV0d3xEeOiLpqjHDGUVMh6Aeo54LanY7G+
+         epvg07mvL8F2r1ro/RXJmIh3cldp5ggi5N9is6vjGmFnxO9Sex73eRiA8b6oRtfTXozE
+         t+9d1NBHhaahrQv0czPcJe9TU4MVN/eyYc3WrZQN79Sp9VvkTrBsRW+EnNFHN7KH2FDy
+         KXdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753960946; x=1754565746;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qx7n4CRHDkkYFnz021yXqLqPPJ6FUayo+PssJIK5SZQ=;
-        b=FcYliAHQjPmpPT745lRrYsKE83XqER8w0TEKtccLYlInlqnftBm/xJFEM0lV0OEp99
-         tEgRyMHAMh2Z7Tv47GWnxkIqdbXBHIuxgqClApvTjVL3KtCdLPm86rdnijbmlE95+Awc
-         y8c4IHDHSknY1HEt5xxTF/U0JhalwDEMfW3OWkUXHcQkQvdoczs+mXXChiW5V7MjOtxE
-         SxMQKP3FJ4I6MjY5groQpd94ijFeLbmBpSNAqGvo8VmSM04FnwNZpjzdMO0RT1FbBZSV
-         ZMwFFCgcA6UjQ+kKSiQOLD9wQ/i04EtbGKATBjmdHVHzO3qJEQ60Q7SYb5YPQhDI8NWW
-         e6JA==
-X-Forwarded-Encrypted: i=1; AJvYcCU5PV+4EqwRKYbNTlgDP2CBNj0RFxUXAxsdAE/uKjKDSWZPGtwybQ0e4QuymeliG68O2oQbFMqw@vger.kernel.org, AJvYcCVSugap1epqnz/P0wuLagUVRPINAsWZP4gHOnLw2JsVlXq1FDJOlFeYMNlIoAGWGzTq7ySk1AS0gmSXXpY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzz6gbnKePeYE6K669PPohrW4CRXT9c/2rBLkaQ/NJcKQrNjqRe
-	wQaDSoAF94EDfEHMyHvQQj7JO2uFClwucFANWg3ppM4XvNIXKIpRS4/0Iu6rM4YaDko=
-X-Gm-Gg: ASbGncsdh3ntJnYoBLoraBeOz+RbFvkj406uizf3OHouLxXIyvCa2u7tA1nnCngpC2D
-	2QloEAh5Loj2zQwcpGQkNpVrrIagSw+0/6oXLJ3qsQXY/ed4Bq5/QJNH5LO4Nm5bDRvudSG7XbG
-	tIHkkWmWREUgAOOG3flbwpPmGH3zyUUdMq4Y1Ev2r98CdUxPzDE161UoDuQLhRmBA8gFqUYmAty
-	c/f5m0MIcpQ94xdyufo0tiypHEdUdpxUgZhbSgYMxiN5U63/SHuVrqyPN7so3n01glD9ldG5/Sa
-	9lISlTVuKBY73KYQum4jjxPAk0kem4IV7InF2JB7PpBKh9QsuAFXBCSWUKKyuZt31ZwJoPTnm0j
-	c0+RnzLtdSJxk4iGZwTFmiKaaoV7U4A==
-X-Google-Smtp-Source: AGHT+IFp2FFhWBzPgj/8hThSVgk5ganKeeRgJZ7pPj9KrQVGx+T1Zex7R8wNhKbWHfELviIrxmNYTQ==
-X-Received: by 2002:a17:90b:3951:b0:313:1769:eb49 with SMTP id 98e67ed59e1d1-31f5de2f470mr11218009a91.8.1753960945847;
-        Thu, 31 Jul 2025 04:22:25 -0700 (PDT)
-Received: from 7940hx ([43.129.244.20])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3208c170d2esm1746723a91.32.2025.07.31.04.22.23
+        d=1e100.net; s=20230601; t=1753961324; x=1754566124;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DeNrnfxc0yCsmF++d2m59qjNIfz9tjCOKX+Lu1e25hk=;
+        b=ezKFSdQrMpuzwe23jIted5LivEF4q56/umROHTKEbDQ5oACpIBMNSGl5JZdG544ZqT
+         h/f8D9gnhM9J9U335RxT3xPKTL+swGkFcfRSIzCgS2xk+hPPlZTbpSYatED2lupE6X2a
+         A5ce+acK4Uano6ODzXDCkcBCSd1E1reHfW4h5HDXkolHeDp7sP9b2sXcBiYPErXcruwf
+         sR8ie6FRHk9DTH6c5WLhtuNfBckLwiHrR7dlzBt8YrWfk9tV7GKTn//VvFZ7Bhe9xrUG
+         SNayFJApGhOwQi91VsFH3GaXj6RDGy3apd8Wrmwvd+/tVBkWy5P+A10fXCG9adBsceM+
+         ZIGg==
+X-Forwarded-Encrypted: i=1; AJvYcCV2gQbRfxhzI5YGHpXN+VC6fEU7QrImjJwp9lAG4gEXhHDUad9r+BI9z7TcBgE2/NRWLZ9VmH4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwOPsZWpSobvrOfJXMOw7BAr8H4SvABdNyI8p7qAki8W4ALb5yr
+	hp9sQH8FKj3hKJ3YcqxzS3DCUWD9SYWHBVc/MSj7jpsXlyFS5Hg+fsw8kUyjHbX/lNc=
+X-Gm-Gg: ASbGncsZAUmhUV68MGG7+/NRlGh406aUwuVOPunOr+IOcTNurwKm3b7lcQUuCGrqrwZ
+	06jPeQp3m/OGLWWFlTwO3fZG4u8toGviXK6HnQTHmLm9LAIbAFfwjH5vGkpeSqB2mSnWPFLdsZ7
+	FZ71+iHoXiaCqPTHw9irX0hQoDL6JrgGlMmu4CHrEVNbeh0lSqoh1+ns9a6EZWgRW7SRrdv9PlH
+	2v3EXXS9okn/opfFpQT7TyXOCcdkbMMIU63SmJv5pofisIalofyO1zqVr5+zpA8gW8BBcSyw/Ji
+	cb5e0QgZZlfjYgD3+F3Nm9beyuKWUIxkxpV9e+94xArSLhOGyq0m6z7btEooed8wedJkG/r6Ml8
+	nA8fUEbJPeKb/G9U=
+X-Google-Smtp-Source: AGHT+IFQDPIvu+PSiZ2WNlVaBBJOiPn/OH0Qlv3IiM/FRp6ONy3Sa9MaOxjxQdz3RYKV7wwi2Hrj+w==
+X-Received: by 2002:a05:6402:4414:b0:615:5bec:1d5 with SMTP id 4fb4d7f45d1cf-61586ee297emr6880898a12.7.1753961324111;
+        Thu, 31 Jul 2025 04:28:44 -0700 (PDT)
+Received: from cloudflare.com ([2a09:bac5:5063:2432::39b:eb])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-615a8f2b892sm929987a12.25.2025.07.31.04.28.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 31 Jul 2025 04:22:25 -0700 (PDT)
-From: Menglong Dong <menglong8.dong@gmail.com>
-X-Google-Original-From: Menglong Dong <dongml2@chinatelecom.cn>
-To: dsahern@kernel.org
-Cc: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] net: vrf: don't down netif when add slave
-Date: Thu, 31 Jul 2025 19:22:19 +0800
-Message-ID: <20250731112219.121778-1-dongml2@chinatelecom.cn>
-X-Mailer: git-send-email 2.50.1
+        Thu, 31 Jul 2025 04:28:43 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: bpf@vger.kernel.org
+Cc: Alexei Starovoitov <ast@kernel.org>,  Andrii Nakryiko
+ <andrii@kernel.org>,  Arthur Fabre <arthur@arthurfabre.com>,  Daniel
+ Borkmann <daniel@iogearbox.net>,  Eduard Zingerman <eddyz87@gmail.com>,
+  Eric Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,
+  Jesper Dangaard Brouer <hawk@kernel.org>,  Jesse Brandeburg
+ <jbrandeburg@cloudflare.com>,  Joanne Koong <joannelkoong@gmail.com>,
+  Lorenzo Bianconi <lorenzo@kernel.org>,  Martin KaFai Lau
+ <martin.lau@linux.dev>,  Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?=
+ <thoiland@redhat.com>,
+  Yan Zhai <yan@cloudflare.com>,  kernel-team@cloudflare.com,
+  netdev@vger.kernel.org,  Stanislav Fomichev <sdf@fomichev.me>
+Subject: Re: [PATCH bpf-next v5 0/9] Add a dynptr type for skb metadata for
+ TC BPF
+In-Reply-To: <20250731-skb-metadata-thru-dynptr-v5-0-f02f6b5688dc@cloudflare.com>
+	(Jakub Sitnicki's message of "Thu, 31 Jul 2025 12:28:14 +0200")
+References: <20250731-skb-metadata-thru-dynptr-v5-0-f02f6b5688dc@cloudflare.com>
+Date: Thu, 31 Jul 2025 13:28:42 +0200
+Message-ID: <877bzowqdx.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-For now, cycle_netdev() will be called to flush the neighbor cache when
-add slave by downing and upping the slave netdev. When the slave has
-vlan devices, the data transmission can interrupted.
+CI is failing because I forgot to enable NET_ACT_MIRRED in
+selftests/bpf/config* for the newly added tests:
 
-Optimize it by notifying the NETDEV_CHANGEADDR instead, which will also
-flush the neighbor cache. It's a little ugly, and maybe we can introduce
-a new event to do such flush :/
+https://github.com/kernel-patches/bpf/actions/runs/16646787163
 
-Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
----
- drivers/net/vrf.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/net/vrf.c b/drivers/net/vrf.c
-index 3ccd649913b5..d90bdf1fe747 100644
---- a/drivers/net/vrf.c
-+++ b/drivers/net/vrf.c
-@@ -1042,17 +1042,15 @@ static int vrf_rtable_create(struct net_device *dev)
- static void cycle_netdev(struct net_device *dev,
- 			 struct netlink_ext_ack *extack)
- {
--	unsigned int flags = dev->flags;
- 	int ret;
- 
- 	if (!netif_running(dev))
- 		return;
- 
--	ret = dev_change_flags(dev, flags & ~IFF_UP, extack);
--	if (ret >= 0)
--		ret = dev_change_flags(dev, flags, extack);
-+	ret = call_netdevice_notifiers(NETDEV_CHANGEADDR, dev);
-+	ret = notifier_to_errno(ret);
- 
--	if (ret < 0) {
-+	if (ret) {
- 		netdev_err(dev,
- 			   "Failed to cycle device %s; route tables might be wrong!\n",
- 			   dev->name);
--- 
-2.50.1
-
+I will wait a bit before respinning.
 
