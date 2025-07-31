@@ -1,143 +1,227 @@
-Return-Path: <netdev+bounces-211232-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211233-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4661B17497
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 18:04:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD7A5B174AE
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 18:07:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96E25A831D7
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 16:03:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3CD31162116
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 16:06:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A48628E607;
-	Thu, 31 Jul 2025 16:03:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FA0423BD0B;
+	Thu, 31 Jul 2025 16:05:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="1shAKTp5"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="a8lx5J5v";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="8Ucsu68e";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="a8lx5J5v";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="8Ucsu68e"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFFC821B9DB;
-	Thu, 31 Jul 2025 16:03:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B30323ABB4
+	for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 16:05:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753977784; cv=none; b=lygxixKaItuceEqBxawWhPx+a5bh/EpZ5aiin9BWNrOIHeTagVAdbNJ22bboQLSOmZwc+5Xgl5f0wV9PmAlM1z67UMZcIoqBY1KVULB2EcMzuXG62r6TjYIMhHcOd7JouajNClgDxP4nxQSjG5XYObRDdjx/ox67wgoak+rvHls=
+	t=1753977938; cv=none; b=ozvyKBoq13xE+vGT900hTeOZwc2bK0J6lsyro4hdYcxrMXMUq8Oh36P+XUpDEN6q7qykJOsN7wVykspbntCnMhUif6Sc2nlG/l5tfjqmwGzlIs/+3U2KFqQa8vp+7epiVNVPb5frA+uuOoK9gyLhdOHJq+ZzwihjPtvYCZMXB48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753977784; c=relaxed/simple;
-	bh=dGcxc9yB51Zv0XtFk8+LA//+P7TOs76esWrPlEu5FOg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YIzAMIjjUrw9iIkyqvyrOf4D784Ww6bKbwI8HizkkY1GCr2aoGma/fIcbwN/bDVgBSEmROlH1R48bfSQB53jnVC1nuQiOaZWg926A2ybldHmjJi5k/c80hbB7lg4zZd1hYdDJfNwNgQBLOLmlVSe8dzrb9RB+IXWCNc3wc30OGY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=1shAKTp5; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=rzwC8YvskcqQ/u+h5BGJ/oUgeMImwjxx7We2MbfRan8=; b=1shAKTp5nDng5t9KzxwPlg8e/e
-	/tT6QPmdGJ8Y+DYCYLIYRRP9s7N41NKyAA39AVxibdN+LaEdY6VNiPpS8vrSrYYeqLl2feTLRvmR7
-	pHJaZ+P9tF8TcVMLWg6fwm51SREYSxB6aV+bucpu1MbBHX0QC3AM+g8NEd2kGpyNZoKG4UIAKKyuy
-	PecvD2/TaTRg2Zb+9jiIcG4wB20KBzPNerapra07QeVgGiEhHYrdhti5DB9+GJshqZ4+RS3NeoefC
-	N6CIPIbuDTGAV0Gts+mJC1hofznljGMZdI5j0jVHPRBhbdND4TfN036I7mk67EEv71D9wySMIqLDR
-	GbCFjy5A==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46120)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uhVk4-0005EY-2R;
-	Thu, 31 Jul 2025 17:02:52 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uhVk1-00019c-1p;
-	Thu, 31 Jul 2025 17:02:49 +0100
-Date: Thu, 31 Jul 2025 17:02:49 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Alexander Wilhelm <alexander.wilhelm@westermo.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: Aquantia PHY in OCSGMII mode?
-Message-ID: <aIuTqZUWJKCOZYOp@shell.armlinux.org.uk>
-References: <aIuEvaSCIQdJWcZx@FUE-ALEWI-WINX>
- <4acdd002-60f5-49b9-9b4b-9c76e8ce3cda@lunn.ch>
+	s=arc-20240116; t=1753977938; c=relaxed/simple;
+	bh=LSPRFR1eYteQW3j8yDFR+JyXn/VCLGCrfTZ4v5IUzMk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Sh/NbewOjO2zICwrLNSIOeW1ZX4V40pEFhs7imDAFi+w8xgIBO5QNRxh6Vvkd+W5I+by5DjuA0l5xltXBD1zhe4Ig9yrp7qnHWaS7UVnXgrE0FjLq5FzmeLLODvKmG7e3CODrfeGqS7YnLIyXil5WI25Ij01jaH73g9WiFDWLcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=a8lx5J5v; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=8Ucsu68e; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=a8lx5J5v; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=8Ucsu68e; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 3903F21CFF;
+	Thu, 31 Jul 2025 16:05:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1753977934; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ls5gCUTjVBeUXhIwXzFVvEfqHedChX+/IDCkmstbyv8=;
+	b=a8lx5J5vx5bM2QH4EzJWlVNkWmu3SamghkittVIRlhEM+qP8UMKXf8aGJ56/iq+X/dD9Ky
+	z/U/52BmcsgGWYyeMjDhRDtNwEgrSpcteb/7U860YFiI7g1wr9mV7j4UfZB/iLHjrsnK16
+	Y349WrTJPiO07+hZwVg6KMaAEmn+sc4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1753977934;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ls5gCUTjVBeUXhIwXzFVvEfqHedChX+/IDCkmstbyv8=;
+	b=8Ucsu68etg4g0tUfbqRT4gXMvNg/h5ug70PtR3WnzAidrq8dWtcEedqA8tjrTK6ZIxGL4x
+	i0FCORpKEqQ4F0Ag==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1753977934; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ls5gCUTjVBeUXhIwXzFVvEfqHedChX+/IDCkmstbyv8=;
+	b=a8lx5J5vx5bM2QH4EzJWlVNkWmu3SamghkittVIRlhEM+qP8UMKXf8aGJ56/iq+X/dD9Ky
+	z/U/52BmcsgGWYyeMjDhRDtNwEgrSpcteb/7U860YFiI7g1wr9mV7j4UfZB/iLHjrsnK16
+	Y349WrTJPiO07+hZwVg6KMaAEmn+sc4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1753977934;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ls5gCUTjVBeUXhIwXzFVvEfqHedChX+/IDCkmstbyv8=;
+	b=8Ucsu68etg4g0tUfbqRT4gXMvNg/h5ug70PtR3WnzAidrq8dWtcEedqA8tjrTK6ZIxGL4x
+	i0FCORpKEqQ4F0Ag==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 9B3FF13A43;
+	Thu, 31 Jul 2025 16:05:33 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 4rwTJE2Ui2i9HwAAD6G6ig
+	(envelope-from <hare@suse.de>); Thu, 31 Jul 2025 16:05:33 +0000
+Message-ID: <9057206c-7173-4f1c-8ff7-ea5e2a29a66d@suse.de>
+Date: Thu, 31 Jul 2025 18:05:33 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/4] nvmet-tcp: fix handling of tls alerts
+To: Olga Kornievskaia <okorniev@redhat.com>
+Cc: chuck.lever@oracle.com, jlayton@kernel.org, trondmy@hammerspace.com,
+ anna.schumaker@oracle.com, hch@lst.de, sagi@grimberg.me, kch@nvidia.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, linux-nfs@vger.kernel.org,
+ linux-nvme@lists.infradead.org, netdev@vger.kernel.org,
+ kernel-tls-handshake@lists.linux.dev, neil@brown.name, Dai.Ngo@oracle.com,
+ tom@talpey.com, horms@kernel.org, kbusch@kernel.org
+References: <20250730200835.80605-1-okorniev@redhat.com>
+ <20250730200835.80605-4-okorniev@redhat.com>
+ <cdeb5e12-5c61-4a95-8e31-c56a3a90d6a3@suse.de>
+ <CACSpFtCu+it5n2z=OXRARznR02aU4d3r2z7Sok6WzGt24C6-NQ@mail.gmail.com>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <CACSpFtCu+it5n2z=OXRARznR02aU4d3r2z7Sok6WzGt24C6-NQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <4acdd002-60f5-49b9-9b4b-9c76e8ce3cda@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-0.998];
+	MIME_GOOD(-0.10)[text/plain];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo]
+X-Spam-Flag: NO
+X-Spam-Score: -4.30
 
-On Thu, Jul 31, 2025 at 05:14:28PM +0200, Andrew Lunn wrote:
-> On Thu, Jul 31, 2025 at 04:59:09PM +0200, Alexander Wilhelm wrote:
-> > Hello devs,
-> > 
-> > I'm fairly new to Ethernet PHY drivers and would appreciate your help. I'm
-> > working with the Aquantia AQR115 PHY. The existing driver already supports the
-> > AQR115C, so I reused that code for the AQR115, assuming minimal differences. My
-> > goal is to enable 2.5G link speed. The PHY supports OCSGMII mode, which seems to
-> > be non-standard.
-> > 
-> > * Is it possible to use this mode with the current driver?
-> > * If yes, what would be the correct DTS entry?
-> > * If not, I’d be willing to implement support. Could you suggest a good starting point?
+On 7/31/25 17:29, Olga Kornievskaia wrote:
+> On Thu, Jul 31, 2025 at 2:10 AM Hannes Reinecke <hare@suse.de> wrote:
+>>
+>> On 7/30/25 22:08, Olga Kornievskaia wrote:
+>>> Revert kvec msg iterator before trying to process a TLS alert
+>>> when possible.
+>>>
+>>> In nvmet_tcp_try_recv_data(), it's assumed that no msg control
+>>> message buffer is set prior to sock_recvmsg(). Hannes suggested
+>>> that upon detecting that TLS control message is received log a
+>>> message and error out. Left comments in the code for the future
+>>> improvements.
+>>>
+>>> Fixes: a1c5dd8355b1 ("nvmet-tcp: control messages for recvmsg()")
+>>> Suggested-by: Hannes Reinecke <hare@suse.de>
+>>> Reviewed-by: Hannes Reinecky <hare@susu.de>
+>>> Signed-off-by: Olga Kornievskaia <okorniev@redhat.com>
+>>> ---
+>>>    drivers/nvme/target/tcp.c | 30 +++++++++++++++++++-----------
+>>>    1 file changed, 19 insertions(+), 11 deletions(-)
+>>>
+>>> diff --git a/drivers/nvme/target/tcp.c b/drivers/nvme/target/tcp.c
+>>> index 688033b88d38..055e420d3f2e 100644
+>>> --- a/drivers/nvme/target/tcp.c
+>>> +++ b/drivers/nvme/target/tcp.c
+>>> @@ -1161,6 +1161,7 @@ static int nvmet_tcp_try_recv_pdu(struct nvmet_tcp_queue *queue)
+>>>        if (unlikely(len < 0))
+>>>                return len;
+>>>        if (queue->tls_pskid) {
+>>> +             iov_iter_revert(&msg.msg_iter, len);
+>>>                ret = nvmet_tcp_tls_record_ok(queue, &msg, cbuf);
+>>>                if (ret < 0)
+>>>                        return ret;
+>>> @@ -1217,19 +1218,28 @@ static void nvmet_tcp_prep_recv_ddgst(struct nvmet_tcp_cmd *cmd)
+>>>    static int nvmet_tcp_try_recv_data(struct nvmet_tcp_queue *queue)
+>>>    {
+>>>        struct nvmet_tcp_cmd  *cmd = queue->cmd;
+>>> -     int len, ret;
+>>> +     int len;
+>>>
+>>>        while (msg_data_left(&cmd->recv_msg)) {
+>>> +             /* to detect that we received a TlS alert, we assumed that
+>>> +              * cmg->recv_msg's control buffer is not setup. kTLS will
+>>> +              * return an error when no control buffer is set and
+>>> +              * non-tls-data payload is received.
+>>> +              */
+>>>                len = sock_recvmsg(cmd->queue->sock, &cmd->recv_msg,
+>>>                        cmd->recv_msg.msg_flags);
+>>> +             if (cmd->recv_msg.msg_flags & MSG_CTRUNC) {
+>>> +                     if (len == 0 || len == -EIO) {
+>>> +                             pr_err("queue %d: unhandled control message\n",
+>>> +                                    queue->idx);
+>>> +                             /* note that unconsumed TLS control message such
+>>> +                              * as TLS alert is still on the socket.
+>>> +                              */
+>>
+>> Hmm. Will it get cleared when we close the socket?
 > 
-> If the media is using 2500BaseT, the host side generally needs to be
-> using 2500BaseX. There is code which mangles OCSGMII into
-> 2500BaseX. You will need that for AQC115.
+> If the socket is closed then any data on that socket would be freed.
 > 
-> You also need a MAC driver which says it supports 2500BaseX.  There is
-> signalling between the PHY and the MAC about how the host interface
-> should be configured, either SGMII for <= 1G and 2500BaseX for
-> 2.5G.
+>> Or shouldn't we rather introduce proper cmsg handling?
+> 
+> That would be what I have originally proposed (I know that was on the
+> private list). But yes, we can setup a dedicated kvec to receive the
+> TLS control message once its been detected and then call
+> nvme_tcp_tls_record_ok().
+> 
+> Let me know if proper cmsg handling is what's desired for this patch.
+> 
+>> (If we do, we'll need it to do on the host side, too)
+> 
+No, let's delegate that to a next step. My main concern is that
+data on the socket is freed upon closing (ie on reconnect).
+If that's the case we should leave it for now.
+There is talk to handle TLS new session ticket messages, which probably
+will require some evaluation of TLS messages and will most certainly
+require the updated TLS Alert handling.
 
-Not necessarily - if the PHY is configured for rate adaption, then it
-will stay at 2500Base-X and issue pause frames to the MAC driver to
-pace it appropriately.
+Cheers,
 
-Given that it _may_ use rate adaption, I would recommend that the MAC
-driver uses phylink to get all the implementation correct for that
-(one then just needs the MAC driver to do exactly what phylink tells
-it to do, no playing any silly games).
-
-> Just watch out for the hardware being broken, e.g:
-> 
-> static int aqr105_get_features(struct phy_device *phydev)
-> {
->         int ret;
-> 
->         /* Normal feature discovery */
->         ret = genphy_c45_pma_read_abilities(phydev);
->         if (ret)
->                 return ret;
-> 
->         /* The AQR105 PHY misses to indicate the 2.5G and 5G modes, so add them
->          * here
->          */
->         linkmode_set_bit(ETHTOOL_LINK_MODE_5000baseT_Full_BIT,
->                          phydev->supported);
->         linkmode_set_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
->                          phydev->supported);
-> 
-> The AQR115 might support 2.5G, but does it actually announce it
-> supports 2.5G?
-
-I believe it is capable of advertising 2500BASE-T (otherwise it would
-be pretty silly to set the bit in the supported mask.) However, given
-that this is a firmware driven PHY, it likely depends on the firmware
-build.
-
+Hannes
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
 
