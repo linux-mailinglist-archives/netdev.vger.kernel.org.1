@@ -1,150 +1,171 @@
-Return-Path: <netdev+bounces-211200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211201-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84802B17224
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 15:36:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5BD2B17232
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 15:39:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D33C17B69F4
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 13:34:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 500DE3A5EAE
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 13:38:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 589502C3259;
-	Thu, 31 Jul 2025 13:36:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 414CD2D0C84;
+	Thu, 31 Jul 2025 13:39:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j9cu3POg"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="S8AovRPG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B5652C08C5;
-	Thu, 31 Jul 2025 13:36:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0729522425E
+	for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 13:39:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753968963; cv=none; b=WE4dxLp9ER6YKKurneIocbXEs6A9RvJimaC3ZnlAxIWUEWgX8gU8SfagredxFq+5s7ao+CrwwLTIJ44kiUt2pIuo7QeGtNdaJ9IDRbStR8TgYy336VoBNMoi1ioFMV7BIue5/kmxYCiKA70rlOFI28Lsz08GIo5BRL57xsbyUlM=
+	t=1753969144; cv=none; b=LzSXYqtNo1CMHFhxs25BvsCGV7/+yyH+Fwc95PVcWIkHjjPfDoxO4zKxSVYGwMF6JrEwHsCPFDvbscC/NWVEdYPLz2HB88TPKhV0NtHdnjSkLObowzumvZDcshY62cTeQMIP2xTESnanOA1G2PS72XRF6ze5GAhgufGMLva0HEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753968963; c=relaxed/simple;
-	bh=KyS0YK7eZU4aWlqqSlmnifoI1DVY+qASIuVMpm0Wk8M=;
+	s=arc-20240116; t=1753969144; c=relaxed/simple;
+	bh=kOpGIhGHdpLiDUIPN5tfSWZvVyiUegYsJVHK2hDz4Zk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SF5HA9YxFbU19V9mtbzqOG9NlqtfDq7SJxFF8WzGL+uZv63KcLpKbv4c1whgG3g7muQpMWUPi3r9qEqEKjZs1kVI8jOSYRRDeDMAmu3KiygrZne3/1fmVFySb8WOoagNBCJHS4AjHQzIRRp/NT13tDtxiWNsfY0YHIRNZHygew8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j9cu3POg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8990CC4CEF7;
-	Thu, 31 Jul 2025 13:35:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753968962;
-	bh=KyS0YK7eZU4aWlqqSlmnifoI1DVY+qASIuVMpm0Wk8M=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=j9cu3POghgzQfUtBUIplaBzrzNwhGOc6oVLq0yV0K73DS8+xpLh1WGipIheNSEisW
-	 gtaZXhKmUx1YU/UAxlykG793eGPQ6+biMr8w3ElbP2um4WUO7y6muSOoXlPRcn8wfb
-	 PI7fVO5IDluDRqPdQ/jlzm1w3KfxU3j9hn3VMJKjT0es0CxNOfPWUv+oVss251A/f7
-	 vTbIuWvqZ0HtEX2T1K6KURzm9/r8ZG+Vj+4oU5X+92zc3DMJVV1sKsX7drkww4jNZP
-	 /aVpVdG1J0jG9ETgKRb07YclTpS6VYcnBBD+Tl/UVaE8rmnLF3SkZ7INeLcmoJoz38
-	 IbQmg5FEdwA8g==
-Date: Thu, 31 Jul 2025 14:35:57 +0100
-From: Simon Horman <horms@kernel.org>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org,
-	Michal Kubiak <michal.kubiak@intel.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	nxne.cnse.osdt.itp.upstreaming@intel.com, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH iwl-next v3 16/18] idpf: add support for XDP on Rx
-Message-ID: <20250731133557.GB8494@horms.kernel.org>
-References: <20250730160717.28976-1-aleksander.lobakin@intel.com>
- <20250730160717.28976-17-aleksander.lobakin@intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=kL3bRTsbe/3wfM9gZ1v8YBNCnekVTeoWuT3zFsuhyya2kows7+/jipJv9uPoHQLEoDxeu3N56JV5Oi8KMfV5dtBzrOKahkqT1vMsESuRdu57crD9MrzJxEfKDx2/v2knP/8eZgZX4S4dsgAsUMi+Kbv3YghqYFeHOQk8ty8SF9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=S8AovRPG; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-45617887276so5503645e9.2
+        for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 06:39:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1753969140; x=1754573940; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jnez6DValapR3ZUUqRysmzvL+YRs62blvNyrOJaANrI=;
+        b=S8AovRPG45f6NhxVcuX//ZvxSrIcsANJtq5pFbo0l/nMYuky+MCcCw2h5nDDixhMc1
+         tqkqlofVIeel11Cx0GCsU9jmWlLbctw8FmXC+Q8dLjYJTm/kpVCQ+uiLZP79SuqVk59g
+         nXbqxqFiY9YkfX4Xl++Xm573IE5DoU3QqrGPyguGc6sFJh/MQ7JtswMXIvruqO8Kg8qH
+         9+yPQJNSzyOSJxBpZTHU1vmMlD1hpFXNvagu48inn8ndWEMAjVC1xpVuKJYNQFrBjb3b
+         yHHLbEI/xWt3rHTvqBVhpBnhsSz+HgluW8dBya1S0BGVx1+uzJ9rstpw0Md0nKzXgIcA
+         lgjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753969140; x=1754573940;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jnez6DValapR3ZUUqRysmzvL+YRs62blvNyrOJaANrI=;
+        b=w4onQYmbdUijCmIFPqPvMW5mMEFV03IRb+r/umeA5hvw6RksCPv0yajChLJuY/QN9q
+         ffOzu/22o3ttrkZM4S5DqNPAup+UHkAVlL7C/2Y14rZI8L9u1aaCLPCRYfiYYJrIiB9G
+         xE+v4esUm9waZdZad2qDz27zCDLtpXeFCjoWY1nZrEo7+WhQN7gP3QPvXvrDTnnK82f+
+         ehy2F12+nz+ZEIJ+U1zKebSZ/8o2CrjIs+mZHuL2NYoJKGyxvt0GOIx8l0dMGCt9+yiC
+         NCQMMTB9x+Pd0fKLMVgfBtQPqhwUYrbiGvo58/HGU9LIBEmxQNzrAS8F0Az+IUKNPN7D
+         KeTA==
+X-Forwarded-Encrypted: i=1; AJvYcCWo5fetz/hkUJGdO6zeoMAF8yrC0g9hbXdWmW4VAvlKefFcdyp7h+ulx3IPvmTtdVs/fmcpC8k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyvN0yTpUySKy7dDt2z4Rey84B76RzOrCsnvJgG+bxksgCkkzHz
+	nfhDbwJNJB4R6N50EVNfjZJdKBXrTTQXo8z16PfW5FlN8yg2UY/xjT+aR2x3QeTpSbE=
+X-Gm-Gg: ASbGnctVH3oGAXSZVHRzQ2W9DZOcCxyEmj559NchTclWqcIuwxBTuBPDwZmdnlRWJe6
+	wgVOtX1dI6keIzvCRkHk9M3uAKbx6kik4OayysRJA3kH3R2ke0BNBMrKARgycFOSyeFpXWhx/+L
+	WT4DVPyinltZ7meqWuj5HmBL3H3oS4/M/iqRI0k3ICEJB7WlBWM3BzB3vo2mY8CsG8cmDGlt5dU
+	8GzswF3wX4gFIV/2pru3HismPAxvVfQ8Vm8B7AlWF/f3YyEUJbW/oQh3YhnktoqPBXBkb4Of8eB
+	Tb8K+d2ZdFlKSSJwxuYV152BKQ2fIg/H2Xy/QnzucVrKSRPSvjxqApj7LvAvHgs3Jbgr6ShZhNo
+	vkltqzPe5QH6/F9++yI68NzQlN8HIfYBkJHPfps3aDg==
+X-Google-Smtp-Source: AGHT+IFFm9zky0SxbktFrrzQ+NTv6G8i6eERwaMpUiFW2QYSxbmEiN7oSr8vkltvo3nUOZWrxX7dIw==
+X-Received: by 2002:a05:600c:8114:b0:456:23aa:8c8 with SMTP id 5b1f17b1804b1-45892b9e4bcmr69774445e9.13.1753969140187;
+        Thu, 31 Jul 2025 06:39:00 -0700 (PDT)
+Received: from blackdock.suse.cz (nat2.prg.suse.com. [195.250.132.146])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b79c4534b3sm2409107f8f.47.2025.07.31.06.38.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 31 Jul 2025 06:38:59 -0700 (PDT)
+Date: Thu, 31 Jul 2025 15:38:57 +0200
+From: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Neal Cardwell <ncardwell@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Willem de Bruijn <willemb@google.com>, Matthieu Baerts <matttbe@kernel.org>, 
+	Mat Martineau <martineau@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
+	Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>, 
+	Shakeel Butt <shakeel.butt@linux.dev>, Andrew Morton <akpm@linux-foundation.org>, 
+	Simon Horman <horms@kernel.org>, Geliang Tang <geliang@kernel.org>, 
+	Muchun Song <muchun.song@linux.dev>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
+	mptcp@lists.linux.dev, cgroups@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH v1 net-next 13/13] net-memcg: Allow decoupling memcg from
+ global protocol memory accounting.
+Message-ID: <fq3wlkkedbv6ijj7pgc7haopgafoovd7qem7myccqg2ot43kzk@dui4war55ufk>
+References: <20250721203624.3807041-1-kuniyu@google.com>
+ <20250721203624.3807041-14-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="2gxvsfqre7jriys5"
 Content-Disposition: inline
-In-Reply-To: <20250730160717.28976-17-aleksander.lobakin@intel.com>
+In-Reply-To: <20250721203624.3807041-14-kuniyu@google.com>
 
-On Wed, Jul 30, 2025 at 06:07:15PM +0200, Alexander Lobakin wrote:
-> Use libeth XDP infra to support running XDP program on Rx polling.
-> This includes all of the possible verdicts/actions.
-> XDP Tx queues are cleaned only in "lazy" mode when there are less than
-> 1/4 free descriptors left on the ring. libeth helper macros to define
-> driver-specific XDP functions make sure the compiler could uninline
-> them when needed.
-> Use __LIBETH_WORD_ACCESS to parse descriptors more efficiently when
-> applicable. It really gives some good boosts and code size reduction
-> on x86_64.
-> 
-> Co-developed-by: Michal Kubiak <michal.kubiak@intel.com>
-> Signed-off-by: Michal Kubiak <michal.kubiak@intel.com>
-> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 
-...
+--2gxvsfqre7jriys5
+Content-Type: text/plain; protected-headers=v1; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v1 net-next 13/13] net-memcg: Allow decoupling memcg from
+ global protocol memory accounting.
+MIME-Version: 1.0
 
-> diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+On Mon, Jul 21, 2025 at 08:35:32PM +0000, Kuniyuki Iwashima <kuniyu@google.=
+com> wrote:
+> Some protocols (e.g., TCP, UDP) implement memory accounting for socket
+> buffers and charge memory to per-protocol global counters pointed to by
+> sk->sk_proto->memory_allocated.
+>=20
+> When running under a non-root cgroup, this memory is also charged to the
+> memcg as sock in memory.stat.
+>=20
+> Even when memory usage is controlled by memcg, sockets using such protoco=
+ls
+> are still subject to global limits (e.g., /proc/sys/net/ipv4/tcp_mem).
 
-...
+IIUC the envisioned use case is that some cgroups feed from global
+resource and some from their own limit.
+It means the admin knows both:
+  a) how to configure individual cgroup,
+  b) how to configure global limit (for the rest).
+So why cannot they stick to a single model only?
 
-> @@ -3127,14 +3125,12 @@ static bool idpf_rx_process_skb_fields(struct sk_buff *skb,
->  	return !__idpf_rx_process_skb_fields(rxq, skb, xdp->desc);
->  }
->  
-> -static void
-> -idpf_xdp_run_pass(struct libeth_xdp_buff *xdp, struct napi_struct *napi,
-> -		  struct libeth_rq_napi_stats *ss,
-> -		  const struct virtchnl2_rx_flex_desc_adv_nic_3 *desc)
-> -{
-> -	libeth_xdp_run_pass(xdp, NULL, napi, ss, desc, NULL,
-> -			    idpf_rx_process_skb_fields);
-> -}
-> +LIBETH_XDP_DEFINE_START();
-> +LIBETH_XDP_DEFINE_RUN(static idpf_xdp_run_pass, idpf_xdp_run_prog,
-> +		      idpf_xdp_tx_flush_bulk, idpf_rx_process_skb_fields);
-> +LIBETH_XDP_DEFINE_FINALIZE(static idpf_xdp_finalize_rx, idpf_xdp_tx_flush_bulk,
-> +			   idpf_xdp_tx_finalize);
-> +LIBETH_XDP_DEFINE_END();
->  
->  /**
->   * idpf_rx_hsplit_wa - handle header buffer overflows and split errors
-> @@ -3222,7 +3218,10 @@ static int idpf_rx_splitq_clean(struct idpf_rx_queue *rxq, int budget)
->  	struct libeth_rq_napi_stats rs = { };
->  	u16 ntc = rxq->next_to_clean;
->  	LIBETH_XDP_ONSTACK_BUFF(xdp);
-> +	LIBETH_XDP_ONSTACK_BULK(bq);
->  
-> +	libeth_xdp_tx_init_bulk(&bq, rxq->xdp_prog, rxq->xdp_rxq.dev,
-> +				rxq->xdpsqs, rxq->num_xdp_txq);
->  	libeth_xdp_init_buff(xdp, &rxq->xdp, &rxq->xdp_rxq);
->  
->  	/* Process Rx packets bounded by budget */
-> @@ -3318,11 +3317,13 @@ static int idpf_rx_splitq_clean(struct idpf_rx_queue *rxq, int budget)
->  		if (!idpf_rx_splitq_is_eop(rx_desc) || unlikely(!xdp->data))
->  			continue;
->  
-> -		idpf_xdp_run_pass(xdp, rxq->napi, &rs, rx_desc);
-> +		idpf_xdp_run_pass(xdp, &bq, rxq->napi, &rs, rx_desc);
->  	}
->  
->  	rxq->next_to_clean = ntc;
-> +
->  	libeth_xdp_save_buff(&rxq->xdp, xdp);
-> +	idpf_xdp_finalize_rx(&bq);
+> This makes it difficult to accurately estimate and configure appropriate
+> global limits, especially in multi-tenant environments.
+>=20
+> If all workloads were guaranteed to be controlled under memcg, the issue
+> could be worked around by setting tcp_mem[0~2] to UINT_MAX.
+>=20
+> In reality, this assumption does not always hold, and a single workload
+> that opts out of memcg can consume memory up to the global limit,
+> becoming a noisy neighbour.
 
-This will call __libeth_xdp_finalize_rx(), which calls rcu_read_unlock().
-But there doesn't seem to be a corresponding call to rcu_read_lock()
+That doesn't like a good idea to remove limits from possibly noisy
+units.
 
-Flagged by Sparse.
+> Let's decouple memcg from the global per-protocol memory accounting.
+>=20
+> This simplifies memcg configuration while keeping the global limits
+> within a reasonable range.
 
->  
->  	u64_stats_update_begin(&rxq->stats_sync);
->  	u64_stats_add(&rxq->q_stats.packets, rs.packets);
+I think this is a configuration issue only, i.e. instead of preserving
+the global limit because of _some_ memcgs, the configuration management
+could have a default memcg limit that is substituted to those memcgs so
+that there's no risk of runaways even in absence of global limit.
 
-...
+Regards,
+Michal
+
+--2gxvsfqre7jriys5
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQRCE24Fn/AcRjnLivR+PQLnlNv4CAUCaItx7wAKCRB+PQLnlNv4
+COjkAP0UcZBWkhc+vB0FfA1p+pH/BzzZDKA27tR3sA4T4P3PBQEAyknqdHl6GIJ5
+yIxBX8DBx92ijoCOGSF1vaocgD203AQ=
+=iTKX
+-----END PGP SIGNATURE-----
+
+--2gxvsfqre7jriys5--
 
