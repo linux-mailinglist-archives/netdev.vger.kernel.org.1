@@ -1,89 +1,96 @@
-Return-Path: <netdev+bounces-211114-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211115-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0111DB16A11
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 03:16:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 379BDB16A15
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 03:18:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54B153A2BA9
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 01:16:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A71F818C7D2B
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 01:19:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC81486353;
-	Thu, 31 Jul 2025 01:16:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D70338DD1;
+	Thu, 31 Jul 2025 01:18:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F4oxyVZ5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hWoTn6rC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94F28A2D;
-	Thu, 31 Jul 2025 01:16:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3D3017BD9;
+	Thu, 31 Jul 2025 01:18:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753924607; cv=none; b=ZyHZBu6mE9V4rJeYdD3hHBPcE0+5dIyGg5+cWf8IB9Aye5I12gIIA5jSI/DQW05g8QFWgyL2FelCttzv/YJOLF8a2zxzJ4cTnOE/HhFtOyemY0HkJWp8lN+CqKAXX7r+gbLxMzZp/DDLO4LeSUqOfzvLnhYqu9v7epj9owPRgXg=
+	t=1753924716; cv=none; b=LzXuezqaM4yaBumQW/nI8w2RGpcbhcqzqCh5W+7ehTTAP5f0YRwlrMfKducc8BiFqSta9QsdcBZZbA0jZYu6xZl/BuizFOc8HZXVoiROSAc+t8eRaWt/b4Oq11ZE1vajA7eIu7oKHvCqVR3DT0ZMntQqx5mWcUS8T1PpOf9W/kw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753924607; c=relaxed/simple;
-	bh=COC+D0tOb2/vFTOc/902HqJ44i+7C7ex0HaywC+rBg4=;
+	s=arc-20240116; t=1753924716; c=relaxed/simple;
+	bh=uJzyPqF2mcBaFPZMkPf6v0KK/E0/EHwqwDPaWB9pXPo=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Nk+8jAQWWZV67LqYYidYuEM/0/oRAsniwmYuNS1GqvCYlMc9GVsKW9ncAzFK4P3NmFfWfB1fy+wi4oGOmWgjjq+Opnc0SIPh4rPB6OqLBYAsJiFvfJDwQzEchpH48Xmdp3gV7/AHMEHsv/LfBKZXZ/2nE1xx2U+MZaupkQWVYps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F4oxyVZ5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1637C4CEEB;
-	Thu, 31 Jul 2025 01:16:46 +0000 (UTC)
+	 MIME-Version:Content-Type; b=P/ozb8RACx9h8T7QdNiT+dMv7Hu/RgzuLavddAizfUuFNqkuF3VogvRxjg0MAtVvSySId7mxkesV3s2TyPE4kD5qV2wTkUY8bFiV2tqcrwYjDYIVujeqcx7SI7xkfGk2RJtQnNcx+PUAgPhOezqFCG9PvuKQTINzbZC7vck1zQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hWoTn6rC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E772CC4CEE7;
+	Thu, 31 Jul 2025 01:18:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753924607;
-	bh=COC+D0tOb2/vFTOc/902HqJ44i+7C7ex0HaywC+rBg4=;
+	s=k20201202; t=1753924716;
+	bh=uJzyPqF2mcBaFPZMkPf6v0KK/E0/EHwqwDPaWB9pXPo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=F4oxyVZ51Z0qHS4csZf9IemuZKgTGinQNQDcaw2b2LdtccrlrM/xDJK6z8QJD502X
-	 MU8+CymSMyQ+NOYXu9cxSpJZB50YhFL18OIfEyWMGv14KybY423pvGA43vKQgDKCMT
-	 3xlgNeYNBe6ARObTbJEpfGs539qPAJS5zu6+sr/w4sJnMrSMxmLEyUN6YQqUU9fHB0
-	 ops3Ox3pqTbF+9V2WACNxllXSKq5WR0IZDBNUv/HvdvFfqWEeXWw+qOhZj3ZrdYzrt
-	 fw53q7cnZn0rOVLmpvb9VfivhxWDjLFdl30C73QRMF1H2Ac2sJz3MLASYYGl2nzfER
-	 UTpjRXYOaRlVA==
-Date: Wed, 30 Jul 2025 18:16:45 -0700
+	b=hWoTn6rCE2YwljPfnWp96fHuixZshDRtEJ9LgleA79Bcys1VhjAez3XqG733Yb6BA
+	 jazsIf8SVDuuJXOHGqNVVuXOo95pkW6b/XU2cRUp3UJBOHFGlMEoKJH/EeY32w3phb
+	 QztDHctyn3Nj+n38NVYuIZAjwNOjOpNJIAfMHqpDBLiXHIMXHy6r4P+EMx3Sxw17sM
+	 t2Q+Ja5TP4XKeSgMw1hpB7jUrLu7+0of9dT/nC1Ep12CCQ0KLTrAXjhFWKPWT+LghV
+	 Qcgj7LXF0doIXGhHaJhqQNghLW11zhKt5rwhVRm6pNIiv7at4eRAjbW0p5EjDzuYa3
+	 EzjpGmHHnt7mw==
+Date: Wed, 30 Jul 2025 18:18:35 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Bence =?UTF-8?B?Q3PDs2vDoXM=?= <csokas.bence@prolan.hu>, Andrew Lunn
- <andrew@lunn.ch>
-Cc: Geert Uytterhoeven <geert+renesas@glider.be>, Sergei Shtylyov
- <sergei.shtylyov@cogentembedded.com>, "David S. Miller"
- <davem@davemloft.net>, Rob Herring <robh@kernel.org>, Andy Shevchenko
- <andriy.shevchenko@linux.intel.com>, "Dmitry Torokhov"
- <dmitry.torokhov@gmail.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, Csaba Buday <buday.csaba@prolan.hu>, Heiner
- Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net] net: mdio_bus: Use devm for getting reset GPIO
-Message-ID: <20250730181645.6d818d6a@kernel.org>
-In-Reply-To: <20250728153455.47190-2-csokas.bence@prolan.hu>
-References: <20250728153455.47190-2-csokas.bence@prolan.hu>
+To: Jason Wang <jasowang@redhat.com>
+Cc: Cindy Lu <lulu@redhat.com>, "K. Y. Srinivasan" <kys@microsoft.com>,
+ Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+ Dexuan Cui <decui@microsoft.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Michael Kelley <mhklinux@outlook.com>, Shradha Gupta
+ <shradhagupta@linux.microsoft.com>, Kees Cook <kees@kernel.org>, Stanislav
+ Fomichev <sdf@fomichev.me>, Kuniyuki Iwashima <kuniyu@google.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>, Guillaume Nault
+ <gnault@redhat.com>, Joe Damato <jdamato@fastly.com>, Ahmed Zaki
+ <ahmed.zaki@intel.com>, "open list:Hyper-V/Azure CORE AND DRIVERS"
+ <linux-hyperv@vger.kernel.org>, "open list:NETWORKING DRIVERS"
+ <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH RESEND] netvsc: transfer lower device max tso size
+Message-ID: <20250730181835.2423917b@kernel.org>
+In-Reply-To: <CACGkMEuvBU+ke7Pu1yGyhkzpr_hjSEJTq+PcV1jbZWcBFm-k1w@mail.gmail.com>
+References: <20250718061812.238412-1-lulu@redhat.com>
+	<20250721162834.484d352a@kernel.org>
+	<CACGkMEtqhjTjdxPc=eqMxPNKFsKKA+5YP+uqWtonm=onm0gCrg@mail.gmail.com>
+	<20250721181807.752af6a4@kernel.org>
+	<CACGkMEtEvkSaYP1s+jq-3RPrX_GAr1gQ+b=b4oytw9_dGnSc_w@mail.gmail.com>
+	<20250723080532.53ecc4f1@kernel.org>
+	<CACGkMEuvBU+ke7Pu1yGyhkzpr_hjSEJTq+PcV1jbZWcBFm-k1w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, 28 Jul 2025 17:34:55 +0200 Bence Cs=C3=B3k=C3=A1s wrote:
-> Commit bafbdd527d56 ("phylib: Add device reset GPIO support") removed
-> devm_gpiod_get_optional() in favor of the non-devres managed
-> fwnode_get_named_gpiod(). When it was kind-of reverted by commit
-> 40ba6a12a548 ("net: mdio: switch to using gpiod_get_optional()"), the devm
-> functionality was not reinstated. Nor was the GPIO unclaimed on device
-> remove. This leads to the GPIO being claimed indefinitely, even when the
-> device and/or the driver gets removed.
->=20
-> Fixes: bafbdd527d56 ("phylib: Add device reset GPIO support")
-> Fixes: 40ba6a12a548 ("net: mdio: switch to using gpiod_get_optional()")
-> Cc: Csaba Buday <buday.csaba@prolan.hu>
-> Signed-off-by: Bence Cs=C3=B3k=C3=A1s <csokas.bence@prolan.hu>
+On Thu, 31 Jul 2025 09:07:27 +0800 Jason Wang wrote:
+> > > Btw, if I understand this correctly. This is for future development so
+> > > it's not a blocker for this patch?  
+> >
+> > Not a blocker, I'm just giving an example of the netvsc auto-weirdness
+> > being a source of tech debt and bugs. Commit d7501e076d859d is another
+> > recent one off the top of my head. IIUC systemd-networkd is broadly
+> > deployed now. It'd be great if there was some migration plan for moving
+> > this sort of VM auto-bonding to user space (with the use of the common
+> > bonding driver, not each hypervisor rolling its own).
+> >  
+> 
+> Please let me know if you want to merge this patch or not. If not, how
+> to proceed.
 
-Looks like this is a v2 / rewrite of=20
-https://lore.kernel.org/all/20250709133222.48802-3-buday.csaba@prolan.hu/
-? Please try to include more of a change log / history of the changes
-(under the --- marker)
-
-Andrew, you acked what I'm guessing was the v1, still looks good?
+As is its definitely not getting merged.
+Please make it look less burdensome or fix it in user space(!!).
 
