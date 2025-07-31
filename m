@@ -1,58 +1,57 @@
-Return-Path: <netdev+bounces-211107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211108-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD2C4B169CA
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 02:57:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71C06B169CE
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 03:02:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C6C916AB6D
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 00:57:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E00417B263E
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 01:00:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D39422EF5;
-	Thu, 31 Jul 2025 00:57:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E086D18E25;
+	Thu, 31 Jul 2025 01:02:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cyQSZTBU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PTBi/jLQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D62C72905;
-	Thu, 31 Jul 2025 00:57:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B66FE2905;
+	Thu, 31 Jul 2025 01:02:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753923436; cv=none; b=Ou/sxg9at4CArKfnz44Vze7IwMBC6c+qFCxlz1CxcPaBZtXUHLwzMHlhY3yUgRl3wlQq6IgMVsAsJtaytzCBkLMDrhhaIwUD0teaJoNty35D4NMBTXZlD46KU7bF0hu+ombdVk/7mVa6vnlBN1dkW3qHaH5sRsJ97rE+Vqogyso=
+	t=1753923736; cv=none; b=M5inXwQ4XHBYwFoKbOWm4i7eh/tactpOxOs56E4iECtaRJ9ZQsT3x49rGnkKJH/Ad8C/yEdm7CI0mEukwV32WKjkTEK1vLdztR+9SrKww1GkQHVC1UsK634QCbq5cBH5bqIu+pqaNZp0hsWSsyBfSjGj4Ey3fDG8bQ4hbyiUh3w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753923436; c=relaxed/simple;
-	bh=wDCunzODV3WzfX8u+ZDi/8KcT/PKQJWx3VvEoj6LrOk=;
+	s=arc-20240116; t=1753923736; c=relaxed/simple;
+	bh=hmN9l9Vi6ujl6uh+Y+dHiQhFOEZZlDuxLIeFf1SWCzo=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=u5iVRW8SAutjhXCPP8GlMcZu3gXx6MTQx584nrGt2wlNaAWrLqa7yOAXE+vykT6fZORcT/bygWpqqbr3kMmPTJFawSyDL+Zdm2CzwSpIL066Rdh06rBw7xyPeOupoNw0ja8aDoOpZfFDv6WVc2tFKRa2YhzeI2BsImtWBU9YUsc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cyQSZTBU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDE78C4CEEB;
-	Thu, 31 Jul 2025 00:57:13 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Q1n//iXdCo1PlFGkIKxcJM8B0/KW+tmOczO6mc5Z7SOlf/Kf63AnsKiIscBOsGBBwpFSXIPnQfPCOJ4I3pAc3H26UuSmyeCLdDRNKUbngjajkj4qiRuMi2d5a8j8F081vxiLwfRAiz7u3+oA0JPT8d6zRxwUXjk2kDihY9qFHiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PTBi/jLQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4133AC4CEEB;
+	Thu, 31 Jul 2025 01:02:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753923434;
-	bh=wDCunzODV3WzfX8u+ZDi/8KcT/PKQJWx3VvEoj6LrOk=;
+	s=k20201202; t=1753923736;
+	bh=hmN9l9Vi6ujl6uh+Y+dHiQhFOEZZlDuxLIeFf1SWCzo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=cyQSZTBUprASyb3cnu4YqOHRlv9tSJQRFIuXdW5g5Kzhbrnw8cYMAXwoE8QPGFI9e
-	 u1DLnvSrZMvgSL3vw9L3UcEMqJbL51LPkgMGM/zwRCAoHvcH2UwH9mKiDtPL9L0kwI
-	 2P3wxjVhrYTZKoipOAuFHU8W9wz683ux0KtZTM2HD4LdHTuFXgZSGl5M7uiFEiLGfS
-	 /1dHh35A58oHrTucLHRYouwRtZx0xaK3llnZN3iTXWAVe0JxV+h0TokifUfoaDDetB
-	 LTVJaX7xPkji/C/11bI54Mw99Nlp2ng5Y474drQheRU+EUsEQewUrn9s9e+by+Bneg
-	 /qRgWiwNfYybQ==
-Date: Wed, 30 Jul 2025 17:57:12 -0700
+	b=PTBi/jLQfvVNbqKb2x3CtsAB2d52ZNPUJeQ8pochAWk2v/Y5/Ye/8ByEtMs3eoJIH
+	 oWedv8WAm98dUt/i1M21WNqbUVlio/ChIrYXG97otgUdb7wMYROs9caeZqp5zD+2P0
+	 4OjmGpD5LYJgi2M/UscVggyNGNPMcWOmCYg8XE1A/5lsbxYHUlspBtgbvedeZxZs7o
+	 IXy07XINUnDCEXhVXuCXWw2kjrv1jkOPsNEifzr2JxUdh6i9tdw6eSlWvjdQlrHx7e
+	 sZC3daYfwkdNx+wfQZAgx55TxV9ymlJ/2xS7H59nsHI3LYYXby28Fs4lA23DU2tazR
+	 Dyq/bRGTDO2kA==
+Date: Wed, 30 Jul 2025 18:02:15 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Mihai Moldovan <ionic@ionic.de>
-Cc: linux-arm-msm@vger.kernel.org, Manivannan Sadhasivam <mani@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>,
- "David S . Miller" <davem@davemloft.net>, Simon Horman <horms@kernel.org>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v4 00/11] QRTR Multi-endpoint support
-Message-ID: <20250730175712.76c3e2a7@kernel.org>
-In-Reply-To: <cover.1753720934.git.ionic@ionic.de>
-References: <cover.1753720934.git.ionic@ionic.de>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Cong Wang <cong.wang@bytedance.com>, Tom Herbert
+ <tom@herbertland.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] kcm: Fix splice support
+Message-ID: <20250730180215.2ad7df72@kernel.org>
+In-Reply-To: <20250725-kcm-splice-v1-1-9a725ad2ee71@rbox.co>
+References: <20250725-kcm-splice-v1-1-9a725ad2ee71@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,26 +61,23 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 28 Jul 2025 18:45:17 +0200 Mihai Moldovan wrote:
-> I am incredibly thankful for Denis's work on this. To get this back on
-> track and to eventually get it merged, with his permission, I'm
-> resubmitting his patch set with issues in the previous review rounds
-> resolved. This feature is a prerequisite for my work on ath1{1,2}k to
-> allow using multiple devices in one computer.
+On Fri, 25 Jul 2025 12:33:04 +0200 Michal Luczaj wrote:
+> Flags passed in for splice() syscall should not end up in
+> skb_recv_datagram(). As SPLICE_F_NONBLOCK == MSG_PEEK, kernel gets
+> confused: skb isn't unlinked from a receive queue, while strp_msg::offset
+> and strp_msg::full_len are updated.
+> 
+> Unbreak the logic a bit more by mapping both O_NONBLOCK and
+> SPLICE_F_NONBLOCK to MSG_DONTWAIT. This way we align with man splice(2) in
+> regard to errno EAGAIN:
+> 
+>    SPLICE_F_NONBLOCK was specified in flags or one of the file descriptors
+>    had been marked as nonblocking (O_NONBLOCK), and the operation would
+>    block.
 
-## Form letter - net-next-closed
+Coincidentally looks like we're not honoring
 
-We have already submitted our pull request with net-next material for v6.17,
-and therefore net-next is closed for new drivers, features, code refactoring
-and optimizations. We are currently accepting bug fixes only.
+	sock->file->f_flags & O_NONBLOCK 
 
-Please repost when net-next reopens after Aug 11th.
-
-RFC patches sent for review only are obviously welcome at any time.
-
-See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
--- 
-pw-bot: defer
-pv-bot: closed
-
+in TLS..
 
