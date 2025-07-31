@@ -1,145 +1,150 @@
-Return-Path: <netdev+bounces-211267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211269-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FEFFB176CB
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 21:51:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A046B176D4
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 21:56:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 33F335680C4
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 19:51:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A346F586530
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 19:56:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 839D024EA8D;
-	Thu, 31 Jul 2025 19:51:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE8132512D7;
+	Thu, 31 Jul 2025 19:56:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fMh8iAjJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ff7fQ4/D"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 525FE15533F;
-	Thu, 31 Jul 2025 19:51:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31AF223ABB4;
+	Thu, 31 Jul 2025 19:56:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753991510; cv=none; b=MC6mOEZeJgjBw/d8qLPiR4FK6ffr+Bb6KgCmOAPjvrn7OzRjBB4gi5wYBCLPLiWSFOvZCC5//Am+2yPBAgUocxRAi2hLvSlbycXmvy+7HSGpfpYXMwa9shGDmIUUfbJXXYuzIW5+w9/4MnqeN32djeGWo2CF6FPT1tgh1VI+WuI=
+	t=1753991796; cv=none; b=boIE8EW06PcHzzaojYEFA7tVqTR9ndhPxufqpT7eXGugFsVOd3NCmndpClvqVllDwdArxIcqOKKJFqXTieXXpB/yHzyJdDpsRsgCy5+EkxtgZyp6c8p3k/7+QeilGXLZipOt5ZXWLNJwGkI6ymz+Lb53fZ5AvV3yAoQTLwnLjgM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753991510; c=relaxed/simple;
-	bh=1qfpjMOR5vF3iZR9DfglRY8NdvKOMGgslvAE/13smbI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FGOux3QHcW9ysNc/rKn2l2F9c1Pfjq+OZA5s4x6mM5K+pNO3MKKZYO8TijTkHpSRafJaSs9oyKfwDlzxz/uLCaiZszoDZTuJUbsAj5pEHOjkOPnDMtI8iFiQGBVDKAMCJedoPMq716jg5pk44GdVSN3P9vIRIFglh5EqPs6w2jU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fMh8iAjJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87110C4CEEF;
-	Thu, 31 Jul 2025 19:51:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753991510;
-	bh=1qfpjMOR5vF3iZR9DfglRY8NdvKOMGgslvAE/13smbI=;
-	h=From:To:Cc:Subject:Date:From;
-	b=fMh8iAjJIY9hpRrLsQi9rcA2U5YxO6+Q3GXsKqXbR5eZ8epkFgScT7KlWdhF5gUNl
-	 wd5tO3+hyOa/b6L3280JZsr0crgiuSUoaDCBYUYCz+zfmUyx8Zvd2LvhUndIIIdvMG
-	 cWSD6zmJetD82vubKyF3wLBVowt2gIDpumaacSZQxUg8ZtndGUVBr7aweB1zf/+NuR
-	 N8RgffbURpsVWynN5YksLekyDkprDgdFXRbd1IcvxvpYfV70IIz3+S0Ex+vp24FP0G
-	 2UYBvXh0JtI0drr4/NHyg8gVDgwgd5EGHm7Pwtit88TnC0Xz2hG1TQTTfj00F62ptK
-	 u6MX2Zmw1DJ+g==
-From: Eric Biggers <ebiggers@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>,
-	Mat Martineau <martineau@kernel.org>,
-	Geliang Tang <geliang@kernel.org>,
-	netdev@vger.kernel.org,
-	mptcp@lists.linux.dev
-Cc: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH net] mptcp: use HMAC-SHA256 library instead of open-coded HMAC
-Date: Thu, 31 Jul 2025 12:50:54 -0700
-Message-ID: <20250731195054.84119-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1753991796; c=relaxed/simple;
+	bh=vErjyams3kwQ75voWQ/4xnzX0MZwKXtaLAcuOY/iq2s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZV+mZ8muTHNYH6WB2Jb99PobAkwwciLSkX93EycI22DuB/ECPuB25DaqWzstIfWsBziWZcFNRIDcNVkRBys9bAQjMxK0uTk4jT/8C46G+caJT6VX26Xyy+cp05Rjv5FRbY3FEGWxvJEhVPgo74WRznBaljHZaY8QURkgwND03UE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ff7fQ4/D; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1753991795; x=1785527795;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=vErjyams3kwQ75voWQ/4xnzX0MZwKXtaLAcuOY/iq2s=;
+  b=ff7fQ4/DZqU22WdqicQhVJV4f1ccTqflpR4M/fvkasZby8ELYu5hKdem
+   f+1ZFdFAeiTgw6umRsrqcB+dy895E7jQhkBUv4a1fB235Kof1G4bpkBvh
+   l4P5Dpd7MirPLBQngGXE1EJv2qdYae8Sr33A/0Aah4YKivOfxi1qnSpnV
+   h8EwspKaxdyLEf8nvHJ4ZOs8nrnVzKcXprJsOfKNiY7bNoXmSwP+WohPE
+   K95ub2jVan64nHzVT2BBI3YNOfCnA9dOlxxB/c/mELyFxyLkr45PYh83O
+   AvdYbBbLJcxchXHe9nGRokLGs25vZibpVh3BfSLDXfvjPG1/V4kgjQ3Sc
+   Q==;
+X-CSE-ConnectionGUID: NjLuLkBSREyn18RTbcZ0ig==
+X-CSE-MsgGUID: MGXQxY3zT1G1bBFMPHe+Tg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11508"; a="56476765"
+X-IronPort-AV: E=Sophos;i="6.17,255,1747724400"; 
+   d="scan'208";a="56476765"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2025 12:56:34 -0700
+X-CSE-ConnectionGUID: N9A53Q1iTQe4KTcJiiBjuQ==
+X-CSE-MsgGUID: 5xHMQwDNQJOY8k0kjKQhNg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,255,1747724400"; 
+   d="scan'208";a="162627827"
+Received: from lkp-server01.sh.intel.com (HELO 160750d4a34c) ([10.239.97.150])
+  by orviesa006.jf.intel.com with ESMTP; 31 Jul 2025 12:56:25 -0700
+Received: from kbuild by 160750d4a34c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uhZO2-000436-2T;
+	Thu, 31 Jul 2025 19:56:22 +0000
+Date: Fri, 1 Aug 2025 03:55:24 +0800
+From: kernel test robot <lkp@intel.com>
+To: "D. Wythe" <alibuda@linux.alibaba.com>, ast@kernel.org,
+	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
+	pabeni@redhat.com, song@kernel.org, sdf@google.com,
+	haoluo@google.com, yhs@fb.com, edumazet@google.com,
+	john.fastabend@gmail.com, kpsingh@kernel.org, jolsa@kernel.org,
+	Mahanta.Jambigi@ibm.com, Sidraya.Jayagond@ibm.com,
+	wenjia@linux.ibm.com, wintera@linux.ibm.com,
+	dust.li@linux.alibaba.com, tonylu@linux.alibaba.com,
+	guwen@linux.alibaba.com
+Cc: oe-kbuild-all@lists.linux.dev, bpf@vger.kernel.org, davem@davemloft.net,
+	kuba@kernel.org, netdev@vger.kernel.org, jaka@linux.ibm.com
+Subject: Re: [PATCH bpf-next 3/5] net/smc: bpf: Introduce generic hook for
+ handshake flow
+Message-ID: <202508010316.wuSPjSOr-lkp@intel.com>
+References: <20250731084240.86550-4-alibuda@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250731084240.86550-4-alibuda@linux.alibaba.com>
 
-Now that there are easy-to-use HMAC-SHA256 library functions, use these
-in net/mptcp/crypto.c instead of open-coding the HMAC algorithm.
+Hi Wythe,
 
-Remove the WARN_ON_ONCE() for messages longer than SHA256_DIGEST_SIZE.
-The new implementation handles all message lengths correctly.
+kernel test robot noticed the following build warnings:
 
-The mptcp-crypto KUnit test still passes after this change.
+[auto build test WARNING on bpf-next/master]
 
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
- net/mptcp/crypto.c | 35 ++---------------------------------
- 1 file changed, 2 insertions(+), 33 deletions(-)
+url:    https://github.com/intel-lab-lkp/linux/commits/D-Wythe/bpf-export-necessary-sympols-for-modules-with-struct_ops/20250731-164431
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
+patch link:    https://lore.kernel.org/r/20250731084240.86550-4-alibuda%40linux.alibaba.com
+patch subject: [PATCH bpf-next 3/5] net/smc: bpf: Introduce generic hook for handshake flow
+config: arm-randconfig-003-20250801 (https://download.01.org/0day-ci/archive/20250801/202508010316.wuSPjSOr-lkp@intel.com/config)
+compiler: arm-linux-gnueabi-gcc (GCC) 10.5.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250801/202508010316.wuSPjSOr-lkp@intel.com/reproduce)
 
-diff --git a/net/mptcp/crypto.c b/net/mptcp/crypto.c
-index b08ba959ac4fd..31948e18d97da 100644
---- a/net/mptcp/crypto.c
-+++ b/net/mptcp/crypto.c
-@@ -20,11 +20,10 @@
-  *       Brandon Heller <brandonh@stanford.edu>
-  */
- 
- #include <linux/kernel.h>
- #include <crypto/sha2.h>
--#include <linux/unaligned.h>
- 
- #include "protocol.h"
- 
- #define SHA256_DIGEST_WORDS (SHA256_DIGEST_SIZE / 4)
- 
-@@ -41,43 +40,13 @@ void mptcp_crypto_key_sha(u64 key, u32 *token, u64 *idsn)
- 		*idsn = be64_to_cpu(*((__be64 *)&mptcp_hashed_key[6]));
- }
- 
- void mptcp_crypto_hmac_sha(u64 key1, u64 key2, u8 *msg, int len, void *hmac)
- {
--	u8 input[SHA256_BLOCK_SIZE + SHA256_DIGEST_SIZE];
--	u8 key1be[8];
--	u8 key2be[8];
--	int i;
-+	__be64 key[2] = { cpu_to_be64(key1), cpu_to_be64(key2) };
- 
--	if (WARN_ON_ONCE(len > SHA256_DIGEST_SIZE))
--		len = SHA256_DIGEST_SIZE;
--
--	put_unaligned_be64(key1, key1be);
--	put_unaligned_be64(key2, key2be);
--
--	/* Generate key xored with ipad */
--	memset(input, 0x36, SHA256_BLOCK_SIZE);
--	for (i = 0; i < 8; i++)
--		input[i] ^= key1be[i];
--	for (i = 0; i < 8; i++)
--		input[i + 8] ^= key2be[i];
--
--	memcpy(&input[SHA256_BLOCK_SIZE], msg, len);
--
--	/* emit sha256(K1 || msg) on the second input block, so we can
--	 * reuse 'input' for the last hashing
--	 */
--	sha256(input, SHA256_BLOCK_SIZE + len, &input[SHA256_BLOCK_SIZE]);
--
--	/* Prepare second part of hmac */
--	memset(input, 0x5C, SHA256_BLOCK_SIZE);
--	for (i = 0; i < 8; i++)
--		input[i] ^= key1be[i];
--	for (i = 0; i < 8; i++)
--		input[i + 8] ^= key2be[i];
--
--	sha256(input, SHA256_BLOCK_SIZE + SHA256_DIGEST_SIZE, hmac);
-+	hmac_sha256_usingrawkey((const u8 *)key, sizeof(key), msg, len, hmac);
- }
- 
- #if IS_MODULE(CONFIG_MPTCP_KUNIT_TEST)
- EXPORT_SYMBOL_GPL(mptcp_crypto_hmac_sha);
- #endif
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202508010316.wuSPjSOr-lkp@intel.com/
 
-base-commit: d6084bb815c453de27af8071a23163a711586a6c
+All warnings (new ones prefixed by >>):
+
+   net/ipv4/tcp_output.c: In function 'smc_set_option':
+>> net/ipv4/tcp_output.c:773:15: warning: unused variable 'sk' [-Wunused-variable]
+     773 |  struct sock *sk = &tp->inet_conn.icsk_inet.sk;
+         |               ^~
+   net/ipv4/tcp_output.c: In function 'smc_set_option_cond':
+   net/ipv4/tcp_output.c:794:21: warning: unused variable 'sk' [-Wunused-variable]
+     794 |  const struct sock *sk = &tp->inet_conn.icsk_inet.sk;
+         |                     ^~
+
+
+vim +/sk +773 net/ipv4/tcp_output.c
+
+   767	
+   768	static void smc_set_option(struct tcp_sock *tp,
+   769				   struct tcp_out_options *opts,
+   770				   unsigned int *remaining)
+   771	{
+   772	#if IS_ENABLED(CONFIG_SMC)
+ > 773		struct sock *sk = &tp->inet_conn.icsk_inet.sk;
+   774		if (static_branch_unlikely(&tcp_have_smc)) {
+   775			if (tp->syn_smc) {
+   776				tp->syn_smc = !!smc_call_hsbpf(1, sk, syn_option, tp);
+   777				/* re-check syn_smc */
+   778				if (tp->syn_smc &&
+   779				    *remaining >= TCPOLEN_EXP_SMC_BASE_ALIGNED) {
+   780					opts->options |= OPTION_SMC;
+   781					*remaining -= TCPOLEN_EXP_SMC_BASE_ALIGNED;
+   782				}
+   783			}
+   784		}
+   785	#endif
+   786	}
+   787	
+
 -- 
-2.50.1
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
