@@ -1,96 +1,96 @@
-Return-Path: <netdev+bounces-211115-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211116-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 379BDB16A15
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 03:18:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98F30B16A17
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 03:19:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A71F818C7D2B
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 01:19:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB3F05607D7
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 01:19:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D70338DD1;
-	Thu, 31 Jul 2025 01:18:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC2FC2AF19;
+	Thu, 31 Jul 2025 01:19:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hWoTn6rC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DhsyZ5NW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3D3017BD9;
-	Thu, 31 Jul 2025 01:18:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9358A2905;
+	Thu, 31 Jul 2025 01:19:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753924716; cv=none; b=LzXuezqaM4yaBumQW/nI8w2RGpcbhcqzqCh5W+7ehTTAP5f0YRwlrMfKducc8BiFqSta9QsdcBZZbA0jZYu6xZl/BuizFOc8HZXVoiROSAc+t8eRaWt/b4Oq11ZE1vajA7eIu7oKHvCqVR3DT0ZMntQqx5mWcUS8T1PpOf9W/kw=
+	t=1753924793; cv=none; b=agMMaoH4WNxSRuID08/Ls9cj5ovwNCzWU/Sr2WzOW1z1NF9CBSCMnTb/eiFf417OQGIYRYZc6zGSzamNvs75DnJJrU9XR0BRQ3NmE+WLa4YdS7okkuyfHQdgO4G5pbsiRbB6ztWKl7jdSfexbtLJeh367MtuZUyHc8X1bnzklwc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753924716; c=relaxed/simple;
-	bh=uJzyPqF2mcBaFPZMkPf6v0KK/E0/EHwqwDPaWB9pXPo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=P/ozb8RACx9h8T7QdNiT+dMv7Hu/RgzuLavddAizfUuFNqkuF3VogvRxjg0MAtVvSySId7mxkesV3s2TyPE4kD5qV2wTkUY8bFiV2tqcrwYjDYIVujeqcx7SI7xkfGk2RJtQnNcx+PUAgPhOezqFCG9PvuKQTINzbZC7vck1zQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hWoTn6rC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E772CC4CEE7;
-	Thu, 31 Jul 2025 01:18:35 +0000 (UTC)
+	s=arc-20240116; t=1753924793; c=relaxed/simple;
+	bh=k7XvkeKiYXhd0cxDs3X+sMFVkqZGPKJt0md1zrZS4m4=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=tU2aAPpNLp6LMzdTzX05gOD3z3YCSCDnM9lA6ab6uSOJCjHZNTmB2zFR9fmr0urOBjt0ffvprZ5wWiczgCdjuaov3LdMisi7RuBOc5Og0url/9o5QSwgGX2qdMeZoyUTut8Y9s4uzjg36k9Isujm+DP8MMy8rOwqaoyjWgm9wmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DhsyZ5NW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D1A1C4CEE7;
+	Thu, 31 Jul 2025 01:19:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753924716;
-	bh=uJzyPqF2mcBaFPZMkPf6v0KK/E0/EHwqwDPaWB9pXPo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hWoTn6rCE2YwljPfnWp96fHuixZshDRtEJ9LgleA79Bcys1VhjAez3XqG733Yb6BA
-	 jazsIf8SVDuuJXOHGqNVVuXOo95pkW6b/XU2cRUp3UJBOHFGlMEoKJH/EeY32w3phb
-	 QztDHctyn3Nj+n38NVYuIZAjwNOjOpNJIAfMHqpDBLiXHIMXHy6r4P+EMx3Sxw17sM
-	 t2Q+Ja5TP4XKeSgMw1hpB7jUrLu7+0of9dT/nC1Ep12CCQ0KLTrAXjhFWKPWT+LghV
-	 Qcgj7LXF0doIXGhHaJhqQNghLW11zhKt5rwhVRm6pNIiv7at4eRAjbW0p5EjDzuYa3
-	 EzjpGmHHnt7mw==
-Date: Wed, 30 Jul 2025 18:18:35 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Cindy Lu <lulu@redhat.com>, "K. Y. Srinivasan" <kys@microsoft.com>,
- Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
- Dexuan Cui <decui@microsoft.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Michael Kelley <mhklinux@outlook.com>, Shradha Gupta
- <shradhagupta@linux.microsoft.com>, Kees Cook <kees@kernel.org>, Stanislav
- Fomichev <sdf@fomichev.me>, Kuniyuki Iwashima <kuniyu@google.com>,
- Alexander Lobakin <aleksander.lobakin@intel.com>, Guillaume Nault
- <gnault@redhat.com>, Joe Damato <jdamato@fastly.com>, Ahmed Zaki
- <ahmed.zaki@intel.com>, "open list:Hyper-V/Azure CORE AND DRIVERS"
- <linux-hyperv@vger.kernel.org>, "open list:NETWORKING DRIVERS"
- <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH RESEND] netvsc: transfer lower device max tso size
-Message-ID: <20250730181835.2423917b@kernel.org>
-In-Reply-To: <CACGkMEuvBU+ke7Pu1yGyhkzpr_hjSEJTq+PcV1jbZWcBFm-k1w@mail.gmail.com>
-References: <20250718061812.238412-1-lulu@redhat.com>
-	<20250721162834.484d352a@kernel.org>
-	<CACGkMEtqhjTjdxPc=eqMxPNKFsKKA+5YP+uqWtonm=onm0gCrg@mail.gmail.com>
-	<20250721181807.752af6a4@kernel.org>
-	<CACGkMEtEvkSaYP1s+jq-3RPrX_GAr1gQ+b=b4oytw9_dGnSc_w@mail.gmail.com>
-	<20250723080532.53ecc4f1@kernel.org>
-	<CACGkMEuvBU+ke7Pu1yGyhkzpr_hjSEJTq+PcV1jbZWcBFm-k1w@mail.gmail.com>
+	s=k20201202; t=1753924793;
+	bh=k7XvkeKiYXhd0cxDs3X+sMFVkqZGPKJt0md1zrZS4m4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=DhsyZ5NW+Eip6zvXUUfOPWl/dqFaOyR03bvnT74keWa6OYOpSmf04R2reGPO718ky
+	 2G0xAeHCiaTzWTRUCeFoP/flF2RwPgg8A7va+REsslo4Wvo00Jhi889CWdHfOZCHiq
+	 6h9qtEV9ThbEU1Zr0Gh3XezY/v3Kn+7lPITfv/c4+eicj8Vx3lpyJx5HvOlY0omjBN
+	 X8/nSyETFnmWuqHQZXUkSB8TO9/cPYI2a8TxzUBWda1WsApYstaqz/t4wwy25drR1D
+	 yB3mgTtJdOI6I9ePfY9T3ioz84cnJVCbSa9ufyrNjd53Wqk3mxc0EFUJWPXieQWLSI
+	 /2Rj4omRoV1Gw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B15383BF5F;
+	Thu, 31 Jul 2025 01:20:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] phy: mscc: Fix parsing of unicast frames
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175392480901.2568749.13694986949159868365.git-patchwork-notify@kernel.org>
+Date: Thu, 31 Jul 2025 01:20:09 +0000
+References: <20250726140307.3039694-1-horatiu.vultur@microchip.com>
+In-Reply-To: <20250726140307.3039694-1-horatiu.vultur@microchip.com>
+To: Horatiu Vultur <horatiu.vultur@microchip.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ richardcochran@gmail.com, viro@zeniv.linux.org.uk,
+ quentin.schulz@bootlin.com, atenart@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
-On Thu, 31 Jul 2025 09:07:27 +0800 Jason Wang wrote:
-> > > Btw, if I understand this correctly. This is for future development so
-> > > it's not a blocker for this patch?  
-> >
-> > Not a blocker, I'm just giving an example of the netvsc auto-weirdness
-> > being a source of tech debt and bugs. Commit d7501e076d859d is another
-> > recent one off the top of my head. IIUC systemd-networkd is broadly
-> > deployed now. It'd be great if there was some migration plan for moving
-> > this sort of VM auto-bonding to user space (with the use of the common
-> > bonding driver, not each hypervisor rolling its own).
-> >  
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Sat, 26 Jul 2025 16:03:07 +0200 you wrote:
+> According to the 1588 standard, it is possible to use both unicast and
+> multicast frames to send the PTP information. It was noticed that if the
+> frames were unicast they were not processed by the analyzer meaning that
+> they were not timestamped. Therefore fix this to match also these
+> unicast frames.
 > 
-> Please let me know if you want to merge this patch or not. If not, how
-> to proceed.
+> Fixes: ab2bf9339357 ("net: phy: mscc: 1588 block initialization")
+> Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
+> 
+> [...]
 
-As is its definitely not getting merged.
-Please make it look less burdensome or fix it in user space(!!).
+Here is the summary with links:
+  - [net] phy: mscc: Fix parsing of unicast frames
+    https://git.kernel.org/netdev/net/c/6fb5ff63b35b
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
