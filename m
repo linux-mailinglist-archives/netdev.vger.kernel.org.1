@@ -1,178 +1,127 @@
-Return-Path: <netdev+bounces-211189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211192-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF229B17167
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 14:41:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D99E9B171AE
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 15:02:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0E014E3E3B
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 12:40:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 28F861AA60B8
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 13:02:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3092823A563;
-	Thu, 31 Jul 2025 12:41:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59F192C15BE;
+	Thu, 31 Jul 2025 13:02:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NLcpojFu"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E00591C84C5;
-	Thu, 31 Jul 2025 12:41:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBF872BFC8F
+	for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 13:01:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753965676; cv=none; b=EkoX1SpLDJSNPgFuMg6wL4UqPEk8NOdh8XP66YF2fchpNPipkzM7ZmJJlHrBml6AXXBur3kXWm7TuzGNKtDROnfp30fIfhuafreR0vv+jlryC5zcBC7f6Rjk87Oc8XPGCxRj6ITOE4AiqXrIpRWiWQYgwkcT8yUhjQpYxKMiGvU=
+	t=1753966920; cv=none; b=RTbIka+Wl1ZO8N9yF+IxEMYYi1ZAc+6Xb2rxa1F2L+Ml4gzDy7bkTf3SqweP2ghhA1IKXLSFBQrJdsTyiyuSbNBxCseX7zfT8xpYKfcEUmE+jNg0/JKQjoJ5WsUveIT3dOm+vCdebHg7P5WrK1IxH/3oRM36icQ6gWtguCGD+6Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753965676; c=relaxed/simple;
-	bh=A8SPR7x7U/Pf/eDeqxWiI48HRFqavciMy1UGMfaZW60=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FUxh2P56hiAHu8OjD8p4sDfmJaKcb5qW1N0YlMkgcmSHY8GkQ4K58p88nvi6k1PxheUtw50bpKb+v19PGIsoEkKTHUSolDUJDM7sPaR7qI3h/ZkxPLPCHXFu+oTsXW+GPIO9p9KAKHk+L2VZbChzAWiSpaJhypkHpbsCobHQy+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4bt7v64Rk8z6D9Th;
-	Thu, 31 Jul 2025 20:39:30 +0800 (CST)
-Received: from frapeml500005.china.huawei.com (unknown [7.182.85.13])
-	by mail.maildlp.com (Postfix) with ESMTPS id 1A8A91402F4;
-	Thu, 31 Jul 2025 20:41:08 +0800 (CST)
-Received: from china (10.220.118.114) by frapeml500005.china.huawei.com
- (7.182.85.13) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Thu, 31 Jul
- 2025 14:40:53 +0200
-From: Gur Stavi <gur.stavi@huawei.com>
-To: <horms@kernel.org>
-CC: <andrew+netdev@lunn.ch>, <christophe.jaillet@wanadoo.fr>,
-	<corbet@lwn.net>, <davem@davemloft.net>, <edumazet@google.com>,
-	<fuguiming@h-partners.com>, <gongfan1@huawei.com>, <guoxin09@huawei.com>,
-	<gur.stavi@huawei.com>, <helgaas@kernel.org>, <jdamato@fastly.com>,
-	<kuba@kernel.org>, <lee@trager.us>, <linux-doc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <luosifu@huawei.com>,
-	<meny.yossefi@huawei.com>, <mpe@ellerman.id.au>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <przemyslaw.kitszel@intel.com>,
-	<shenchenyang1@hisilicon.com>, <shijing34@huawei.com>, <sumang@marvell.com>,
-	<vadim.fedorenko@linux.dev>, <wulike1@huawei.com>, <zhoushuai28@huawei.com>,
-	<zhuyikai1@h-partners.com>
-Subject: Re: [PATCH net-next v10 1/8] hinic3: Async Event Queue interfaces
-Date: Thu, 31 Jul 2025 15:58:39 +0300
-Message-ID: <20250731125839.1137083-1-gur.stavi@huawei.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20250725152709.GE1367887@horms.kernel.org>
-References: <20250725152709.GE1367887@horms.kernel.org>
+	s=arc-20240116; t=1753966920; c=relaxed/simple;
+	bh=wbrWiEhfPScCVolNfyyjt22cIB4PfoD6ZusxuW+Alzw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lLetwRE2Kj+eu1KuIYezcx/hWbYfMyyLhQOQeXUf6PZTF282XTSsJIFTFVRSk+5olVmkIfYcIDGI2htExCrO3A0kRQXnppblnQojQUth1nuJHlG1h2yAyN8Ik4dxBN1wYGBChQ+NKdD9begVT4Obc/7mVyuSajjHnovYG4wBbaY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NLcpojFu; arc=none smtp.client-ip=209.85.128.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-71b4b36cf83so9576057b3.0
+        for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 06:01:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1753966918; x=1754571718; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=76yABaBlU6UDoYWb5i2vJYe7/HG6gZqjh5DtuXEh0wE=;
+        b=NLcpojFuFw8S/OG/15nv1iVIWYN3JlD4dc2+ppR+dH4lnbLWw5yfvKUijDlN8mdWKB
+         KPCwc1xlgalprjWM8coJuan/v0vb5lkh2gTv6gYaGnxOGozx2PWRYe91F5nXR+D/nOQF
+         V90dUnvsJB3FvYjDKgdmSbnSlllK6h02hNJ1jpooHyQ7nSVbSwl+xv2Nu/T6BOAXILSo
+         suatKbnIWwW+P8dHIvtEpMzj3Me57fFqxWckLgbqpXEhle47zBcqvFQkIlnx3f6sLX4Q
+         h8F7YhJvFhDy7SgDgZqV2lS/KnM/oA26J4gUk6pi9tn8N6+Vxtg6l7nNIqk7u1Q+QPta
+         /u4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753966918; x=1754571718;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=76yABaBlU6UDoYWb5i2vJYe7/HG6gZqjh5DtuXEh0wE=;
+        b=PDCsMrwX//UJzMJlIYtxll2oFX3DYDDK0IkV2gRkifx2Dl6J24Thi5ZtzRStXz0LWJ
+         oKoavMFjJR1rr4C2Pw4ztCrb0tJk8pMejwM+hFvMjUKQhEx0g5Dng3nGgS+l/d/rZVsy
+         5LIJZz6jkuwRehZVBwmxp1zvagft3C+II9oZO5J5SBC3kFbeWAxz229UtnFHl1e9MGUP
+         doHMehCE4jY6LLtkszhVXIWS7P4WYAK9gGs/KSOGC6KX/MODjtrAhQv6wRQz72ITXLTe
+         9OJ3C+oaYRtFMoDRVYC/idJsNJuezcElbgrKo3zwQoHBcbfJpFuZR23orEd3Ppd6INL/
+         i/HA==
+X-Forwarded-Encrypted: i=1; AJvYcCWP8UsJIZt3ZEmn2y0mERL+rakADamJVPewzeE0zX7OStw6XpkqmncUQIjNXpmOxxqAe6MvKqs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyp9uUNSnf0Wqu/MyXmQHP5Z8DIZ/r29NOGZB4ODsJTgt2JXGBx
+	8RKigB/RKZmkHxATrQCP5yn+EqX4jBscRUKxUbFu2114+jpONGdeltLIzFbYX/L/3ORxzedfftB
+	aiaXOpumNp332+0FJ5v3x913kJJ91+8K0MDXGC6Tx
+X-Gm-Gg: ASbGnctuMN4QWyqzgWHa8tkILLl4IXbTlspvbBa4KomKLGxn2bW0Wkl8QNduAxzNsny
+	3P+x94kkHVpon8kWfmtoF3iVKFaGJyKPzpr/L2bUwENMxJ7wt4avRcunwY6hewTn8o7fzvB0CDz
+	k0Qh9tsCzwml/1ajlmSfdW5L/Y4poQ8UibEQ0rrCmV4fP5LYhDiDimETjTL0YHnMUQTvo48NRLD
+	Qt6Rg==
+X-Google-Smtp-Source: AGHT+IFHsQKKy19b+mkI6T4bmaLpNZ271aXwL3PfIOVfg50ihjyeftIyzuwnKyjumfnAE6VOghd4+JlOFr33u9sCgpQ=
+X-Received: by 2002:a05:690c:a84:b0:71a:3484:abfe with SMTP id
+ 00721157ae682-71a466ea559mr100356227b3.38.1753966917367; Thu, 31 Jul 2025
+ 06:01:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
- frapeml500005.china.huawei.com (7.182.85.13)
+References: <20250731123309.184496-1-dongml2@chinatelecom.cn>
+In-Reply-To: <20250731123309.184496-1-dongml2@chinatelecom.cn>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 31 Jul 2025 06:01:46 -0700
+X-Gm-Features: Ac12FXxSBgXO3zoKmReetkU124ejSczJm6Q2NNCXYd_q6u_vkqdJE5hWUIcIcf4
+Message-ID: <CANn89iKRkHyg4nZFwiSWPXsVEyVTSouDcfvULbge4BvOGPEPog@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: ip: lookup the best matched listen socket
+To: Menglong Dong <menglong8.dong@gmail.com>
+Cc: ncardwell@google.com, kuniyu@google.com, davem@davemloft.net, 
+	dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Martin KaFai Lau <kafai@fb.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> On Thu, Jul 24, 2025 at 09:45:51PM +0800, Fan Gong wrote:
-> > > > +
-> > > > +/* Data provided to/by cmdq is arranged in structs with little endian fields but
-> > > > + * every dword (32bits) should be swapped since HW swaps it again when it
-> > > > + * copies it from/to host memory.
-> > > > + */
-> > >
-> > > This scheme may work on little endian hosts.
-> > > But if so it seems unlikely to work on big endian hosts.
-> > >
-> > > I expect you want be32_to_cpu_array() for data coming from hw,
-> > > with a source buffer as an array of __be32 while
-> > > the destination buffer is an array of u32.
-> > >
-> > > And cpu_to_be32_array() for data going to the hw,
-> > > with the types of the source and destination buffers reversed.
-> > >
-> > > If those types don't match your data, then we have
-> > > a framework to have that discussion.
-> > >
-> > >
-> > > That said, it is more usual for drivers to keep structures in the byte
-> > > order they are received. Stored in structures with members with types, in
-> > > this case it seems that would be __be32, and accessed using a combination
-> > > of BIT/GENMASK, FIELD_PREP/FIELD_GET, and cpu_to_be*/be*_to_cpu (in this
-> > > case cpu_to_be32/be32_to_cpu).
-> > >
-> > > An advantage of this approach is that the byte order of
-> > > data is only changed when needed. Another is that it is clear
-> > > what the byte order of data is.
-> >
-> > There is a simplified example:
-> >
-> > Here is a 64 bit little endian that may appear in cmdq:
-> > __le64 x
-> > After the swap it will become:
-> > __be32 x_lo
-> > __be32 x_hi
-> > This is NOT __be64.
-> > __be64 looks like this:
-> > __be32 x_hi
-> > __be32 x_lo
+On Thu, Jul 31, 2025 at 5:33=E2=80=AFAM Menglong Dong <menglong8.dong@gmail=
+.com> wrote:
 >
-> Sure, byte swapping 64 bit entities is different to byte swapping two
-> consecutive 32 bit entities. I completely agree.
+> For now, the socket lookup will terminate if the socket is reuse port in
+> inet_lhash2_lookup(), which makes the socket is not the best match.
 >
-> >
-> > So the swapped data by HW is neither BE or LE. In this case, we should use
-> > swab32 to obtain the correct LE data because our driver currently supports LE.
-> > This is for compensating for bad HW decisions.
+> For example, we have socket1 and socket2 both listen on "0.0.0.0:1234",
+> but socket1 bind on "eth0". We create socket1 first, and then socket2.
+> Then, all connections will goto socket2, which is not expected, as socket=
+1
+> has higher priority.
 >
-> Let us assume that the host is reading data provided by HW.
+> This can cause unexpected behavior if TCP MD5 keys is used, as described
+> in Documentation/networking/vrf.rst -> Applications.
 >
-> If the swab32 approach works on a little endian host
-> to allow the host to access 32-bit values in host byte order.
-> Then this is because it outputs a 32-bit little endian values
-
-Values can be any size. 32 bit is arbitrary.
-.
+> Therefor, we lookup the best matched socket first, and then do the reuse
+> port logic. This can increase some overhead if there are many reuse port
+> socket :/
 >
-> But, given the same input, it will not work on a big endian host.
-> This is because the same little endian output will be produced,
-> while the host byte order is big endian.
->
-> I think you need something based on be32_to_cpu()/cpu_to_be32().
-> This will effectively be swab32 on little endian hosts (no change!).
-> And a no-op on big endian hosts (addressing my point above).
->
-> More specifically, I think you should use be32_to_cpu_array() and
-> cpu_to_be32_array() instead of swab32_array().
->
+> Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
 
-Lets define a "coherent struct" as a structure made of fields that makes sense
-to human beings. Every field endianity is defined and fields are arranged in
-order that "makes sense". Fields can be of any integer size 8,16,32,64 and not
-necessarily naturally aligned.
+I do not think net-next is open yet ?
 
-swab32_array transforms a coherent struct into "byte jumble". Small fields are
-reordered and larger (misaligned) fields may be split into 2 (or even 3) parts.
-swab32_array is reversible so a 2nd call with byte jumble as input will produce
-the original coherent struct.
+It seems this would be net material.
 
-hinic3 dma has "swab32_array" built in.
-On send-to-device it expects a byte jubmle so the DMA engine will transform it
-into a coherent struct.
-On receive-from-device it provides a byte jumble so the driver needs
-to call swab32_array to transform it into a coherent struct.
+Any way you could provide a test ?
 
-The hinic3_cmdq_buf_swab32 function will work correctly, producing byte jumble,
-on little endian and big endian hosts.
+Please CC Martin KaFai Lau <kafai@fb.com>, as this was added in :
 
-The code that runs prior to hinic3_cmdq_buf_swab32 that initializes a coherent
-struct is endianity sensitive. It needs to initialize fields based on their
-coherent endianity with or without byte swap. Practically use cpu_to_le or
-cpu_to_be based on the coherent definition.
+commit 61b7c691c7317529375f90f0a81a331990b1ec1b
+Author: Martin KaFai Lau <kafai@fb.com>
+Date:   Fri Dec 1 12:52:31 2017 -0800
 
-Specifically, cmdq "coherent structs" in hinic3 use little endian and since
-Kconfig currently declares that big endian hosts are not supported then
-coherent structs are initialized without explicit cpu_to_le macros.
-
-And this is what the comment says:
-
-/* Data provided to/by cmdq is arranged in structs with little endian fields but
- * every dword (32bits) should be swapped since HW swaps it again when it
- * copies it from/to host memory.
- */
+    inet: Add a 2nd listener hashtable (port+addr)
 
