@@ -1,47 +1,95 @@
-Return-Path: <netdev+bounces-211127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211128-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DA0BB16BB6
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 07:48:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B531CB16BDB
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 08:10:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EEC83582853
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 05:48:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC276564A0D
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 06:10:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45E5424418E;
-	Thu, 31 Jul 2025 05:48:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA6B723B622;
+	Thu, 31 Jul 2025 06:10:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ionic.de header.i=@ionic.de header.b="KHogmfPc"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Gp3um7Ct";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="yU2k1JZ2";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ganIxKE3";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ev530m5z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ionic.de (ionic.de [145.239.234.145])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37A26243374;
-	Thu, 31 Jul 2025 05:48:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=145.239.234.145
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED9C9235048
+	for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 06:10:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753940889; cv=none; b=P4s13fDP/sBIzUPkqLVHPZBdWv+OA4FYUHh8U+L4a2DIEEVivTAE/oOgCiinx4WpsG3W+maSKFZZ8bIa/skR74ZBw+RNWxSCYt7W05m8iMVjblo5eIBY8HaGfAN0elyBhCsV9y3gvJVx/zm5VC68Yxon+DMse1GzBBFvHP2ZBy0=
+	t=1753942219; cv=none; b=P43ISYnqtCmxO5T3UgtWcBLYCl/QD9XVkLUv1KJtemAFq1Gthmjcw08tjZhnOJnA25m5bzUbofHYzINxA8uC5CzFZF5ufMv/1X7ui/n0bVtWndquHdsDsEBhWkrHwl7pHVzSNJCnd6Sjp4sm7JjCiqhc8aL7y838abSBPSQ/XgY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753940889; c=relaxed/simple;
-	bh=7aeEqTr4fD+3o11ynJbBM+9IIwLzbviHmX/JMQKFJjQ=;
+	s=arc-20240116; t=1753942219; c=relaxed/simple;
+	bh=IDVqxjzwFE5QSPe9jXFEIm/9M8seaIhjzsybAjtKRtI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CrhZpf8edRd009qU+xNKcPjRNMdajTJeKLW+RDQmGLvdiO11dme3yUdBkPFRE+aLt5TID494L/WNlgR1c2E1BwFU9Yg/byoNl1xDxSnvsIrDYWqyQPN2Wp43Kb+m7XQqhHzCRrAVVP1qbEH0IqWY/xQ5wLfsmf2DrFJkii/lZFQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ionic.de; spf=pass smtp.mailfrom=ionic.de; dkim=pass (1024-bit key) header.d=ionic.de header.i=@ionic.de header.b=KHogmfPc; arc=none smtp.client-ip=145.239.234.145
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ionic.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionic.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ionic.de; s=default;
-	t=1753940878; bh=7aeEqTr4fD+3o11ynJbBM+9IIwLzbviHmX/JMQKFJjQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=KHogmfPcfaulr7R+w9gn3F55mD257G2ePms7dxH1rEmo4rdGVsqYCj2sHS0b8Tk7I
-	 2sT9aO5PzUlrPUpYqFPheXD3XxKd+ouUAPWEkbrMOeZGcqkQyp9+89P7rvFh8sW+YF
-	 wr5R/jOxvTLBjh/+8kXe2wSDvioDuMc6te5wY7jc=
-Received: from [172.24.215.49] (unknown [185.102.219.57])
-	by mail.ionic.de (Postfix) with ESMTPSA id 014841480F5B;
-	Thu, 31 Jul 2025 07:47:57 +0200 (CEST)
-Message-ID: <39f3d1e0-f257-4693-971c-af963d03c8eb@ionic.de>
-Date: Thu, 31 Jul 2025 07:47:57 +0200
+	 In-Reply-To:Content-Type; b=pmIE8b9QvZ5QMqev8Ptu8Bm1RvoQmTepQwa9XKHGSAGNwyVBaZGt2lAfQ4vmuDeTCvDieufSyXUdoDQRdAtjiyyVojvI79tg80hvHCmxXN84ESYxpQiKjhLDQ6mzeFASr5j2SmcnAtcsS6+s8O9ZY+xOKsymCZhm6bgywy8EvqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Gp3um7Ct; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=yU2k1JZ2; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ganIxKE3; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ev530m5z; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id DB99C1F814;
+	Thu, 31 Jul 2025 06:10:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1753942216; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=m5peT/4DC5+FF+PRDRM8Nv2vvrMLTiYqMPlHl4IV5MQ=;
+	b=Gp3um7CtjeP/h5EH4NLe08AkG0m9fH7Hfkn9c2T/2KaW/B8469SbtU/M2fXGxsg6xbdYyB
+	xNl0paq+gaf6GPUsZ33Wv0mJoU4oMdPYgIjyKKosn0U/L+XAevwi6eOxBwPu6Mb7rHZ+Me
+	oIOSFRTo+qxZ4Ao8WrD289o90MZYdNk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1753942216;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=m5peT/4DC5+FF+PRDRM8Nv2vvrMLTiYqMPlHl4IV5MQ=;
+	b=yU2k1JZ2h00mrWST2iuYtMPnhYtqA0nM8iR8LLxOR151tm+3plMzLxXU3ASoz1kfZIgv2D
+	XJWMcXN+qL7St3BA==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1753942215; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=m5peT/4DC5+FF+PRDRM8Nv2vvrMLTiYqMPlHl4IV5MQ=;
+	b=ganIxKE39h1A9vjag2QEdleK9lxcMk1koDFT1S2QaUr2hn9Sjjp7iVhbzWLM0M2zzOHRNH
+	Bg4Mm0XkEfT4hoaTxKnFSfwSusYjVL1FG0wTmhKZVdq5wR4abIwfJBmugKb8GoTwLh/R9h
+	fgVX9B742Mxl0ITo16l6mk0gQ89siD0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1753942215;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=m5peT/4DC5+FF+PRDRM8Nv2vvrMLTiYqMPlHl4IV5MQ=;
+	b=ev530m5zITR+U4Of4GaFtzLkpzqwQ1mDJLiBybZEj3nosrqHZu7zh7X4YCL7pFKHGKa/j+
+	KQPvnXQKrw5ZfvAA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 505F113A43;
+	Thu, 31 Jul 2025 06:10:15 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id W8viEccIi2hkWAAAD6G6ig
+	(envelope-from <hare@suse.de>); Thu, 31 Jul 2025 06:10:15 +0000
+Message-ID: <cdeb5e12-5c61-4a95-8e31-c56a3a90d6a3@suse.de>
+Date: Thu, 31 Jul 2025 08:10:14 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -49,77 +97,154 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 00/11] QRTR Multi-endpoint support
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: linux-arm-msm@vger.kernel.org, Manivannan Sadhasivam <mani@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>,
- "David S . Miller" <davem@davemloft.net>, Simon Horman <horms@kernel.org>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-References: <cover.1753720934.git.ionic@ionic.de>
- <20250730175712.76c3e2a7@kernel.org>
+Subject: Re: [PATCH 3/4] nvmet-tcp: fix handling of tls alerts
+To: Olga Kornievskaia <okorniev@redhat.com>, chuck.lever@oracle.com,
+ jlayton@kernel.org, trondmy@hammerspace.com, anna.schumaker@oracle.com,
+ hch@lst.de, sagi@grimberg.me, kch@nvidia.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: linux-nfs@vger.kernel.org, linux-nvme@lists.infradead.org,
+ netdev@vger.kernel.org, kernel-tls-handshake@lists.linux.dev,
+ neil@brown.name, Dai.Ngo@oracle.com, tom@talpey.com, horms@kernel.org,
+ kbusch@kernel.org
+References: <20250730200835.80605-1-okorniev@redhat.com>
+ <20250730200835.80605-4-okorniev@redhat.com>
 Content-Language: en-US
-From: Mihai Moldovan <ionic@ionic.de>
-Autocrypt: addr=ionic@ionic.de; keydata=
- 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
- S0VlnF9z
-In-Reply-To: <20250730175712.76c3e2a7@kernel.org>
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20250730200835.80605-4-okorniev@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-0.997];
+	MIME_GOOD(-0.10)[text/plain];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo]
+X-Spam-Flag: NO
+X-Spam-Score: -4.30
 
-* On 7/31/25 02:57, Jakub Kicinski wrote:
-> Please repost when net-next reopens after Aug 11th.
+On 7/30/25 22:08, Olga Kornievskaia wrote:
+> Revert kvec msg iterator before trying to process a TLS alert
+> when possible.
 > 
-> RFC patches sent for review only are obviously welcome at any time.
+> In nvmet_tcp_try_recv_data(), it's assumed that no msg control
+> message buffer is set prior to sock_recvmsg(). Hannes suggested
+> that upon detecting that TLS control message is received log a
+> message and error out. Left comments in the code for the future
+> improvements.
 > 
-> See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
+> Fixes: a1c5dd8355b1 ("nvmet-tcp: control messages for recvmsg()")
+> Suggested-by: Hannes Reinecke <hare@suse.de>
+> Reviewed-by: Hannes Reinecky <hare@susu.de>
+> Signed-off-by: Olga Kornievskaia <okorniev@redhat.com>
+> ---
+>   drivers/nvme/target/tcp.c | 30 +++++++++++++++++++-----------
+>   1 file changed, 19 insertions(+), 11 deletions(-)
+> 
+> diff --git a/drivers/nvme/target/tcp.c b/drivers/nvme/target/tcp.c
+> index 688033b88d38..055e420d3f2e 100644
+> --- a/drivers/nvme/target/tcp.c
+> +++ b/drivers/nvme/target/tcp.c
+> @@ -1161,6 +1161,7 @@ static int nvmet_tcp_try_recv_pdu(struct nvmet_tcp_queue *queue)
+>   	if (unlikely(len < 0))
+>   		return len;
+>   	if (queue->tls_pskid) {
+> +		iov_iter_revert(&msg.msg_iter, len);
+>   		ret = nvmet_tcp_tls_record_ok(queue, &msg, cbuf);
+>   		if (ret < 0)
+>   			return ret;
+> @@ -1217,19 +1218,28 @@ static void nvmet_tcp_prep_recv_ddgst(struct nvmet_tcp_cmd *cmd)
+>   static int nvmet_tcp_try_recv_data(struct nvmet_tcp_queue *queue)
+>   {
+>   	struct nvmet_tcp_cmd  *cmd = queue->cmd;
+> -	int len, ret;
+> +	int len;
+>   
+>   	while (msg_data_left(&cmd->recv_msg)) {
+> +		/* to detect that we received a TlS alert, we assumed that
+> +		 * cmg->recv_msg's control buffer is not setup. kTLS will
+> +		 * return an error when no control buffer is set and
+> +		 * non-tls-data payload is received.
+> +		 */
+>   		len = sock_recvmsg(cmd->queue->sock, &cmd->recv_msg,
+>   			cmd->recv_msg.msg_flags);
+> +		if (cmd->recv_msg.msg_flags & MSG_CTRUNC) {
+> +			if (len == 0 || len == -EIO) {
+> +				pr_err("queue %d: unhandled control message\n",
+> +				       queue->idx);
+> +				/* note that unconsumed TLS control message such
+> +				 * as TLS alert is still on the socket.
+> +				 */
 
+Hmm. Will it get cleared when we close the socket?
+Or shouldn't we rather introduce proper cmsg handling?
+(If we do, we'll need it to do on the host side, too)
 
-Thanks. Will re-send after Aug 11th with a v5 fixing a few issues/typos in a 
-commit message, as long as no other issues crop up.
+> +				return -EAGAIN;
+> +			}
+> +		}
+>   		if (len <= 0)
+>   			return len;
+> -		if (queue->tls_pskid) {
+> -			ret = nvmet_tcp_tls_record_ok(cmd->queue,
+> -					&cmd->recv_msg, cmd->recv_cbuf);
+> -			if (ret < 0)
+> -				return ret;
+> -		}
+>   
+>   		cmd->pdu_recv += len;
+>   		cmd->rbytes_done += len;
+> @@ -1267,6 +1277,7 @@ static int nvmet_tcp_try_recv_ddgst(struct nvmet_tcp_queue *queue)
+>   	if (unlikely(len < 0))
+>   		return len;
+>   	if (queue->tls_pskid) {
+> +		iov_iter_revert(&msg.msg_iter, len);
+>   		ret = nvmet_tcp_tls_record_ok(queue, &msg, cbuf);
+>   		if (ret < 0)
+>   			return ret;
+> @@ -1453,10 +1464,6 @@ static int nvmet_tcp_alloc_cmd(struct nvmet_tcp_queue *queue,
+>   	if (!c->r2t_pdu)
+>   		goto out_free_data;
+>   
+> -	if (queue->state == NVMET_TCP_Q_TLS_HANDSHAKE) {
+> -		c->recv_msg.msg_control = c->recv_cbuf;
+> -		c->recv_msg.msg_controllen = sizeof(c->recv_cbuf);
+> -	}
 
+As you delete this you can also remove the definition of 'recv_msg'
+from nvmet_tcp_cmd structure.
 
+>   	c->recv_msg.msg_flags = MSG_DONTWAIT | MSG_NOSIGNAL;
+>   
+>   	list_add_tail(&c->entry, &queue->free_list);
+> @@ -1736,6 +1743,7 @@ static int nvmet_tcp_try_peek_pdu(struct nvmet_tcp_queue *queue)
+>   		return len;
+>   	}
+>   
+> +	iov_iter_revert(&msg.msg_iter, len);
+>   	ret = nvmet_tcp_tls_record_ok(queue, &msg, cbuf);
+>   	if (ret < 0)
+>   		return ret;
 
-Mihai
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
 
