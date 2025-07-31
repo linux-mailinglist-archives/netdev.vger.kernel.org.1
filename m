@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-211117-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211118-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2AB7B16A19
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 03:20:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86317B16A1A
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 03:20:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 45BDC7A7547
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 01:18:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 968FB3A7D31
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 01:19:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7B6F17C224;
-	Thu, 31 Jul 2025 01:19:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D71D189F5C;
+	Thu, 31 Jul 2025 01:19:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nUZx5OTs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NLo0aw2c"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C35C91714C6
-	for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 01:19:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0119117CA17;
+	Thu, 31 Jul 2025 01:19:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753924795; cv=none; b=AthvbDPzauKPmM5kqNno9+7qjal6COWUAd0bkf/TMXahj4WB8CxwwkY4ymFiC1PWtQo7S8IAMA0pC5YirUvTdGINUkp43JrM7SA8rnj6Rk5TObD4aaRrYtYQParUbudXkjXUu7s0wb6EbZkZMUpEMz8HHrYpl/wHzIrRvdyHYFQ=
+	t=1753924796; cv=none; b=BgotmrrWYPolzEu5sXZc4ptUga3pS6lsYMdDTjnYnESjUMgnxkvkNUMZtdH9kR+IpNnwbRYMlUbpnPpWkzEAkOwdzKz6UJKIRHNOTwDAuk9k9QVYk5/ljoWayVLwlND483qGvNTckfSfdndRKlC8MyQDToKEZM3Gt/T7MJy0RWc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753924795; c=relaxed/simple;
-	bh=tMDqfwD7elil5jwSZblV+U+YbHU/gJO8gdPiov7DLBw=;
+	s=arc-20240116; t=1753924796; c=relaxed/simple;
+	bh=5i9mMcyM/3ms0TJF8vEVTMnppesLDAjG8FPBLBlw7CE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=gVWnBb0Q/BURRCQVrmOpi6QXj0SBs2Wlr5eU3utqKoIkqtS0oexC5kMt6Sor5KOiZfdrkFY5jiWx488FA95UZZaFaBYEQXNvV3zZAawz8abwWqzrF/9vT+IUx4ZcZYSKhJ8FEbBHBTocBVOSGJvxM+2k4DZFJfcSrJNQVWvS3sg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nUZx5OTs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5AECCC4CEFA;
-	Thu, 31 Jul 2025 01:19:54 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=rmgbbWfc5V3laGwgbl7KfDj0wOJdrZNb0JXq5KM1X/LQZcgVG/E3cZUvwlE63lzEwjrW003Y1//smRcVv38z17ff0Vd8xmoOJtJPmzlerDAEREwEpVUwLbYPwGXfLrcPDTwW/m+QNvadw9WcfzFcx0tjkjLATp2DRpu6FV59nJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NLo0aw2c; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 901E9C4CEE7;
+	Thu, 31 Jul 2025 01:19:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753924794;
-	bh=tMDqfwD7elil5jwSZblV+U+YbHU/gJO8gdPiov7DLBw=;
+	s=k20201202; t=1753924795;
+	bh=5i9mMcyM/3ms0TJF8vEVTMnppesLDAjG8FPBLBlw7CE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=nUZx5OTsbMmhvEV3ehUifBs436AmhqSXhNgGZ0xgAVdRMHref/3nT1daftodul8aZ
-	 qwM6C9p6Kq77LPmSq6CrtJktAuKSzzF+nF/vw2SNykqK9kFVvppcKdSm0RdVyRCOqD
-	 63PYioQM1AiqFOC+uAg1A4N5f3gnaGIHFvhH5rXP4sFmeipVuuBvPf8188wbrUig2N
-	 Ri6MdyVoxMrAwMnJBLdE4LgUs7BJHlsIRg91vvHyv5MICCyWe3HYUa1+XZ27fNabB5
-	 zKI93d3pZaxf4lgfGKUwvkrV45Q7kKzldSemvy+IGoMz4w9C2WsKywKfIc9r7E2gXV
-	 ye2aDbQfaMyoA==
+	b=NLo0aw2cjrQGEdqZQPPoIY0EUGWuziEzXlYREUvkvHfbQVBlnfKqQqpBamJKL5Q+z
+	 Qza+eu1w8BZlL50XeGwHluANvVWo03fnZiShafhTA5W9ShBGpVChUVMnQleMy9Z8xR
+	 Q9kl50OZL5jneP6pzoYUyTP+k6okvcjFMhfBYRsJwhIEUDOVAUp8z36BlFn9URNT7s
+	 xZTC8JN27/dV+Boc6t1qPdtqCzs221eD4LJSABqAg+IJhrfzNkProXgoBy0qHzdQgz
+	 hZDWs2K5ZbANXubjLCDpIp3r5tTGRWdsyh2Ia8dvi6Q1sTI6MAT2jjyLV1HfJOammI
+	 WyigSOcxiW3rA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70AB7383BF5F;
-	Thu, 31 Jul 2025 01:20:11 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADB79383BF5F;
+	Thu, 31 Jul 2025 01:20:12 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,41 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] netpoll: prevent hanging NAPI when netcons gets
- enabled
+Subject: Re: [PATCH] net: ipa: add IPA v5.1 and v5.5 to ipa_version_string()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175392481025.2568749.840711867155556143.git-patchwork-notify@kernel.org>
-Date: Thu, 31 Jul 2025 01:20:10 +0000
-References: <20250726010846.1105875-1-kuba@kernel.org>
-In-Reply-To: <20250726010846.1105875-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- jasowang@redhat.com, zuozhijie@bytedance.com, mst@redhat.com,
- xuanzhuo@linux.alibaba.com, eperezma@redhat.com, leitao@debian.org,
- sdf@fomichev.me
+ <175392481149.2568749.3681377728383732917.git-patchwork-notify@kernel.org>
+Date: Thu, 31 Jul 2025 01:20:11 +0000
+References: 
+ <20250728-ipa-5-1-5-5-version_string-v1-1-d7a5623d7ece@fairphone.com>
+In-Reply-To: 
+ <20250728-ipa-5-1-5-5-version_string-v1-1-d7a5623d7ece@fairphone.com>
+To: Luca Weiss <luca.weiss@fairphone.com>
+Cc: elder@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 25 Jul 2025 18:08:46 -0700 you wrote:
-> Paolo spotted hangs in NIPA running driver tests against virtio.
-> The tests hang in virtnet_close() -> virtnet_napi_tx_disable().
+On Mon, 28 Jul 2025 10:35:24 +0200 you wrote:
+> Handle the case for v5.1 and v5.5 instead of returning "0.0".
 > 
-> The problem is only reproducible if running multiple of our tests
-> in sequence (I used TEST_PROGS="xdp.py ping.py netcons_basic.sh \
-> netpoll_basic.py stats.py"). Initial suspicion was that this is
-> a simple case of double-disable of NAPI, but instrumenting the
-> code reveals:
+> Also reword the comment below since I don't see any evidence of such a
+> check happening, and - since 5.5 has been missing - can happen.
+> 
+> Fixes: 3aac8ec1c028 ("net: ipa: add some new IPA versions")
+> Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] netpoll: prevent hanging NAPI when netcons gets enabled
-    https://git.kernel.org/netdev/net/c/2da4def0f487
+  - net: ipa: add IPA v5.1 and v5.5 to ipa_version_string()
+    https://git.kernel.org/netdev/net/c/f2aa00e4f65e
 
 You are awesome, thank you!
 -- 
