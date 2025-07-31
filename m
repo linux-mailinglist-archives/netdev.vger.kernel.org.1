@@ -1,147 +1,145 @@
-Return-Path: <netdev+bounces-211197-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211198-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3F03B1720F
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 15:29:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 958ACB17215
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 15:32:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26F36585A61
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 13:29:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1969E188EA25
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 13:32:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDCB41A3155;
-	Thu, 31 Jul 2025 13:29:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFBF42C08C5;
+	Thu, 31 Jul 2025 13:32:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="vG5NnCaj"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="x3NX7dX0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1233E2BE633
-	for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 13:29:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60503239E7A;
+	Thu, 31 Jul 2025 13:32:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753968570; cv=none; b=FWqrir3SDhDVVVMTXr/RyAu5LjqvBmo47JRBQKiegezpbFDLpvUUuiLbytPOoAeNRlQT2ETHAmuhCHpeyfbTC37pFbmrC9j6hWo5MIGuOlMSCRhb9ECFarSXPaZtU+rpB7kVpPaFzGY+iXWHGnR1+gs+4eHZWYVIZgjRzqqp1g4=
+	t=1753968723; cv=none; b=RMdpI/+uoCy8p/fz9jAAHhHIOD9nabKz3cblqVQqDiy6I4tsnOLkd2u2ZUzuM45bcIY4MlGkFE8+NHs2gEyVqbJBOAOICsR6O1VFD6LOpoAgACWIqMnvtPpu3mTnq0Kkz4O6KDvdugojW34T03NCZB8fl6Nm2xPeNJKE1kPkjSc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753968570; c=relaxed/simple;
-	bh=YMdW5rU3CIdWkyC3VWbAPmxgS1qn+LWC6rbqbVYQa6k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eHXojTK4U7yVUkMdiVYsaz/c60Lt2RzBoWVlllZueAnyGOURk581GNseKzoFy1DdTt+3elri+Xy9GIhUs0YTYFsx3tIF+3Iva2K+iU22g0yPyJOT7Hs5ZyCrNLVdy6lVJx9puMPp4mto0EkycX2Og5vXOTl/9hpJgM9C2jYHG1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=vG5NnCaj; arc=none smtp.client-ip=209.85.166.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-3e3f6ae4d08so3679595ab.1
-        for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 06:29:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1753968567; x=1754573367; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=kf6j1R5D/tbgbGEyMH2jXV6V2+9rCIaZQZaqfQWq+aU=;
-        b=vG5NnCajnXD95+FqjH2bfNs5PcC3hVbjFdB9eDkTe8k1VyBFdE58YtHyi0sIdqCuBZ
-         9Eh6DgSAYQPCx4myk0h00LG3Md79Z2v3K0Kq6U9naz7x5Rf+BotDUzCgO+d+Hd79SezL
-         n+YwzW+Km8yC5Sw6JwuC0dqz8CHjRSdv85645E3V08I7Xy/v7Nu01qS9EgK4lPLFHZFB
-         q59p/wHkNTC/6TW5zarQab0ryGN+hkPHxHOg9ZGcodBhakzXvDO0Fk+mQsVMrYmVchXZ
-         B+39i+dmRl0YtyzxPwH3axo4eDWelvB+Cb1JZryz/kRvvwwG6ZAtustbunJ2VQZ/Gcs9
-         o8Vg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753968567; x=1754573367;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kf6j1R5D/tbgbGEyMH2jXV6V2+9rCIaZQZaqfQWq+aU=;
-        b=jLCauQXEL4VqsjpeUMXYb7ORnlIIThuyxBOrh7k9EuarY7jmffVxcFMPn2dwBX3WDW
-         5S6G016Zuoxx+09gwRFcqTq6mbRmr+DNWfaYE3NwMeJeN0r/O1XrC+DtVciCM0Vw15Gc
-         qmItNmiwGdZjltZ87El9TXbDSJhpQMrC2BLWXh3ICf1q5EYdYHI0KvlS3yFseFrlgukr
-         xbi3NQKCKvAZ5vgoZ4ofRQf0hBv1FifxgTgHFHdzWRiqfUCBn8CXMsm4PHLzPjZ6OIDF
-         fQe/7QoGyCtIJAXXLwnpkydKTOhSSn86hC42pTcK/ufIcpy69OqcCeqeuFWgRVGMvV4b
-         9ebw==
-X-Forwarded-Encrypted: i=1; AJvYcCXaxZ6ddmiQuRD48SeAF7UMaoPA8etODA7A05BI/RVyCZQnK9V3i5xh6ZA2dkCTaPEmsUiExBA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxJCMyqQtRatLAtav0n3Hu0rIlFYaITFommfvmj8XAstxuoI0N3
-	FKWT7wHejzyCBvAGQWqYSYY448SeZU0qdgC/YtvAk7PB/AeVz76Mle3/h6cUMmEXUP/k6XMp5pj
-	cDO+j
-X-Gm-Gg: ASbGnct6evy1uoMZiUEtPIL9TaYwOrKsSjgluXioB7eshjB3oBWTELS36qmyb67NRZS
-	TkYHd5RG8XyC9w1LD21fZxhvk+7yI6hqXf0qWSn1urMX8h84FUaxlcqq/YoVofnNUz//hGZ56q3
-	0TK3AdEJN7tgt8l3KBjLppH/jOtoLu+JJGzuQjXav++4FuBecxU4WaB4aDaTj7ALJc68UcPaFXq
-	KvMVKdZ03u+Oc0rf3M+JgL15d29HGa/gLt8h1TcbxgAsFZBQSNlItVuGOvpr+cbiFD2mEUYU5g1
-	9nd+Lec5ZIfrM2oEK90R2Iq5hNnoc8Y0s7c2Gt/qK5j8w44E7Ma80/woXVmSWsmVq17sWec02c9
-	/lV3aHMn0VckfEFwPrZE=
-X-Google-Smtp-Source: AGHT+IEerQhtiILzuNpwnLDq8PgdsqS0ljYeqYQb8rsPPKxK0XUHuixbp9UkIkFkN048y/HBRX82Zw==
-X-Received: by 2002:a92:d784:0:b0:3dd:a0fc:1990 with SMTP id e9e14a558f8ab-3e40580a081mr29145025ab.3.1753968566714;
-        Thu, 31 Jul 2025 06:29:26 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-50a55b1ac2esm504759173.1.2025.07.31.06.29.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 31 Jul 2025 06:29:26 -0700 (PDT)
-Message-ID: <d7ddaf65-00a0-4b90-b596-5db1a5169950@kernel.dk>
-Date: Thu, 31 Jul 2025 07:29:25 -0600
+	s=arc-20240116; t=1753968723; c=relaxed/simple;
+	bh=NQF0ivw1/JKZj7VbBqG6KaLfselrKLlIz/Qzt/4hPKE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Mv5ljKCYJ9lE68MtT/d9+lZnExb2AK8GGN4Weg0Lc4QYoCBpaA1pPtk1l/Cd/rnQY9GAKfr+DBY3zN/XuW0JDK82tM2Tfz19G/NzgdGD53pFMdOl+6+N5x8ydJEuBk5cm3Ev/fXpGPhDObAFKFH41P0Dv9Tg50hFyn+VTZznDl0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=x3NX7dX0; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=yfEHBZ02wUVwRXSKBRQb6U57So6qITtjQ8Vyh+zAsHY=; b=x3
+	NX7dX0lbkdeNEwffn13vC0JOlNuFr3f1HVsqcNK8OqvHLEdXSwBn/QQXiGa8FBSzv+ylFNEoLS7Dg
+	OKoeKKITgmI3sB4qVJJgpux2oJguBXJXMW4GU9o09ogE+ldh7Jn1K1+33vCOMBv7zEp9RHE7hXQSB
+	4GtOvSKCAlpfPn8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uhTNw-003N6x-RK; Thu, 31 Jul 2025 15:31:52 +0200
+Date: Thu, 31 Jul 2025 15:31:52 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: =?utf-8?B?5p2O5b+X?= <lizhi2@eswincomputing.com>
+Cc: weishangjuan@eswincomputing.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com, rmk+kernel@armlinux.org.uk,
+	yong.liang.choong@linux.intel.com, vladimir.oltean@nxp.com,
+	jszhang@kernel.org, jan.petrous@oss.nxp.com,
+	prabhakar.mahadev-lad.rj@bp.renesas.com, inochiama@gmail.com,
+	boon.khai.ng@altera.com, dfustini@tenstorrent.com, 0x1207@gmail.com,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, ningyu@eswincomputing.com,
+	linmin@eswincomputing.com, pinkesh.vaghela@einfochips.com
+Subject: Re: Re: Re: Re: Re: [PATCH v3 2/2] ethernet: eswin: Add eic7700
+ ethernet driver
+Message-ID: <bad83fec-afca-4c41-bee4-e4e4f9ced57a@lunn.ch>
+References: <20250703091808.1092-1-weishangjuan@eswincomputing.com>
+ <20250703092015.1200-1-weishangjuan@eswincomputing.com>
+ <c212c50e-52ae-4330-8e67-792e83ab29e4@lunn.ch>
+ <7ccc507d.34b1.1980d6a26c0.Coremail.lizhi2@eswincomputing.com>
+ <e734f2fd-b96f-4981-9f00-a94f3fd03213@lunn.ch>
+ <6c5f12cd.37b0.1982ada38e5.Coremail.lizhi2@eswincomputing.com>
+ <6b3c8130-77f0-4266-b1ed-2de80e0113b0@lunn.ch>
+ <006c01dbfafb$3a99e0e0$afcda2a0$@eswincomputing.com>
+ <28a48738-af05-41a4-be4c-5ca9ec2071d3@lunn.ch>
+ <2b4deeba.3f61.1985fb2e8d4.Coremail.lizhi2@eswincomputing.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v30 03/20] iov_iter: skip copy if src == dst for direct
- data placement
-To: Aurelien Aptel <aaptel@nvidia.com>, linux-nvme@lists.infradead.org,
- netdev@vger.kernel.org, sagi@grimberg.me, hch@lst.de, kbusch@kernel.org,
- axboe@fb.com, chaitanyak@nvidia.com, davem@davemloft.net, kuba@kernel.org
-Cc: aurelien.aptel@gmail.com, smalin@nvidia.com, malin1024@gmail.com,
- ogerlitz@nvidia.com, yorayz@nvidia.com, borisp@nvidia.com,
- galshalom@nvidia.com, mgurtovoy@nvidia.com, tariqt@nvidia.com,
- gus@collabora.com, viro@zeniv.linux.org.uk, akpm@linux-foundation.org
-References: <20250715132750.9619-1-aaptel@nvidia.com>
- <20250715132750.9619-4-aaptel@nvidia.com>
- <59fd61cc-4755-4619-bdb2-6b2091abf002@kernel.dk> <253zfcs2qaw.fsf@nvidia.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <253zfcs2qaw.fsf@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <2b4deeba.3f61.1985fb2e8d4.Coremail.lizhi2@eswincomputing.com>
 
-On 7/25/25 10:22 AM, Aurelien Aptel wrote:
-> Jens Axboe <axboe@kernel.dk> writes:
->> This seems like entirely the wrong place to apply this logic...
+> > You hardware has a lot of flexibility, but none of if should actually
+> > be needed, if you follow the standard.
+> > 
+> > So phy-mode = "rgmii-id"; should be all you need for most boards.
+> > Everything else should be optional, with sensible defaults.
+> > 
 > 
-> I understand it might look strange on first sight to have the check
-> implemented in this low level iterator copy function.
-> 
-> But it is actually where it makes the most sense.
+> On our platform, the vendor-specific attributes eswin,dly-param-* were
+> initially introduced to compensate for board-specific variations in RGMII
+> signal timing, primarily due to differences in PCB trace lengths.
 
-Please stop rationalizing what is a blatant layering violation.
+So it seems like, because you have the flexibility in the hardware,
+you designed your PCB poorly, breaking the standard, so now must have
+these properties.  It would of been much better if you had stuck to
+the standard...
 
-> Let's assume we move it to the caller, nvme-tcp. We now need read our
-> packets from the socket but somehow when we reach the offloaded payload,
-> skip ahead. There is no function for that in the socket API. We can walk
-> the SKB fragments but a single SKB can contain a combination of
-> offloaded and non-offloaded chunks. You now need to re-implement
-> skb_copy_datagram() to know what to copy to and where at the socket
-> layer. Even if you reuse the callback API you have to take care of the
-> destination bvec iterator. You end up duplicating that iterator
-> map/step/advance logic.
-> 
-> Our design is transparent to applications. The application does not need
-> to handle the skipping logic, and the skipping is done in a generic way
-> in the underlying copy function. It also will work for other protocol
-> with no extra code. All the work will happen in the driver, which needs
-> to construct SKBs using the application buffers.  Making drivers
-> communicate information to the upper layer is already a common
-> practice. The SKBs are already assembled by drivers today according to
-> how the data is received from the network.
-> 
-> We have covered some of the design decisions in previous discussion,
-> more recently on v25. I suggest you can take a look [1].
-> 
-> Regarding performances, we were not able to see any measurable
-> differences between fio runs with the CONFIG disabled and enabled.
+Please ensure your default values, when nothing is specified in DT,
+correspond to a board which actually fulfils the standard. The next
+board which is made using this device can then avoid having anything
+special in there DT blob.
 
-I'm not at all worried about performance, I'm worried about littering
-completely generic helper code with random driver checks. And you
-clearly WERE worried about performance, since otherwise why would you
-even add a IS_ENABLED(CONFIG_ULP_DDP) in the first place if not?
+> These attributes allow fine-grained, per-signal delay control for RXD, TXD,
+> TXEN, RXDV, RXCLK, and TXCLK, based on empirically derived optimal phase
+> settings.
+> In our experience, setting phy-mode = "rgmii-id" alone, along with only
+> the standard properties rx-internal-delay-ps and tx-internal-delay-ps,
+> has proven insufficient to meet our hardware's timing requirements.
 
--- 
-Jens Axboe
+You don't need vendor properties for RXCLK and TXCLK, that is what
+tx-internal-delay-ps and rx-internal-delay-ps do. They change the
+clock signal relative to TX and RX data. So you only need properties
+for TXEN and RXDV. You should probably call these
+eswin,txen-internal-delay-ps and eswin,rxdv-internal-delay-ps.  In the
+binding you need to clearly define what these mean, for your hardware,
+i.e.  what is the delay relative to?
+
+> 1. Setting all delay parameters (RXD, TXD, TXEN, RXDV, RXCLK, and TXCLK)
+>    using vendor-specific attributes eswin,dly-param-*.
+>    e.g.
+>    eswin,dly-param-1000m = <0x20202020 0x96205A20 0x20202020>;
+> 2. Setting delay parameters (RXD, TXD, TXEN, RXDV) using vendor-specific
+>    attributes eswin,dly-param-* , RXCLK using rx-internal-delay-ps and
+>    TXCLK using tx-internal-delay-ps.
+>    e.g
+>    eswin,dly-param-1000m = <0x20202020 0x80200020 0x20202020>;
+>    rx-internal-delay-ps = <9000>;
+>    tx-internal-delay-ps = <2200>;
+
+Neither. DT should not contain HW values you poke into registers. They
+should be SI using, in this case, pico seconds. From these delays in
+picoseconds, have the driver calculate what values should be written
+into the registers.
+
+And these delay values are unlikely to be correct. You are using
+rgmii-id, so the PHY is adding 2ns. You want the MAC to make small
+tuning adjustments, so 200 could be reasonable, but 9000ps is way too
+big.
+
+	Andrew
 
