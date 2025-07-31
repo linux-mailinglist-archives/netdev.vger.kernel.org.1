@@ -1,156 +1,197 @@
-Return-Path: <netdev+bounces-211245-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211246-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B102EB175CA
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 19:51:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D2A1FB175CE
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 19:53:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F2A162627D
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 17:51:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DCC36A84044
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 17:52:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4759B1C6FFD;
-	Thu, 31 Jul 2025 17:51:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1D8528DEE4;
+	Thu, 31 Jul 2025 17:53:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hZ3hx76s"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZI5Fj0bl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com [209.85.219.178])
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5504101EE;
-	Thu, 31 Jul 2025 17:51:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AC3123C51F
+	for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 17:52:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753984301; cv=none; b=nmqiFrGtB8/stxkHiT5gfVVrIBU1ejap8muCsehHgf9mhvYGy6mORsPLZokNnKzr5i3mwd7w/GWuugf68EbdMBJs6NjeBvTxRjnVcYfTSBGzihb+nBwt/sJlfQt8D+ddO9PUE/m4qV2NIZsU5MntT9LOe59t2Rs9vWwJXrBpWrg=
+	t=1753984381; cv=none; b=JvVEiWir7OX0dO4uijMj5Fm8omSTjOdhD34zByHuWKiEMoYxnM6Sq3Rc54BuoxViXX3GcgcxU0+N1L8IqvdE4Z4wgtWShfmfYD95eU7Vpy0vPKrtunbPFlZBU6VZlJqpSN7p6xiq8WTkdpqTs3IFZ5CRjYcAF2FscJLGGrxnUfc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753984301; c=relaxed/simple;
-	bh=MvMKRL/py/UYu9reV6xLkU4IhARBfecgqx3hs6eDej0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GkGisw5onwVwZpAhp4GgrxSSUVnldvKcKe10deBY94pCn5+pTiwVLq6KNREUGQ3sqUFkh5frUp6giNVX3UyBNpd62yycpGb9j2aeL7yS+BZePSwAkEDdEu1aGKoom0YBOhuxaA4c5/ikpmB8C4GvYLH9o9j0/RXoHflnva8SZPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hZ3hx76s; arc=none smtp.client-ip=209.85.219.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-e8bbb605530so2034468276.0;
-        Thu, 31 Jul 2025 10:51:39 -0700 (PDT)
+	s=arc-20240116; t=1753984381; c=relaxed/simple;
+	bh=f7I4D5bRrFpVUSnKKWjwbljVl0Vn4LWBPJ3cbkOT234=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=D+LJCnFijFrwXSDoGrvQ0RBY4zMFUTXQiJrtRn/RHlCLY9zQMmb31WMBG+N70MgG+YIr+2q/41tI9YHGgvuRshdotpRhJ5xlsk5Gijz/h0R5JpRlu7w8OvqhTgsU5oGFcGP2sym+WEs1rdHZWSMztq2gQlzr806ZioLJewKnR1g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZI5Fj0bl; arc=none smtp.client-ip=209.85.216.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-31ec651c2a1so3767a91.0
+        for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 10:52:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753984299; x=1754589099; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=nIHQvnX6UNEO5bU8VFBoQ/Q+qNFvu+4LpDZCLqUC/A4=;
-        b=hZ3hx76sykEmeoMre98qA4XB46/Pc7OysD7wFIOh5idDAxh+Xfwu6e9py4Brlf6tvw
-         90WG1HRfZMWSChArJEq75IpbkQh619ajiEk7yuC5l/VZtYb1W9/ZQmzVYnsMEEBT/FnV
-         jhaw49qxtfdqcmVXpqODCSryjO6L8PKNKIKHN7HWIN60xqyr3Gg8ZxFshjvFIrGKvchK
-         geyTZyvhzJoKrZSYbeUZKZg+XMws7B1YS99vX46AxmYokyR2QGiq+dgE13LsrHuvX1n+
-         4sSkavuY1DFkqbj67C4Ua8/HyHbxxpIPLOFdQAiF+sTm8gYM0cui3Kb+KllhAzxwvloS
-         qVWQ==
+        d=google.com; s=20230601; t=1753984379; x=1754589179; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3i96hflCH6rE1VrfIns9QcxJpVAhOLAwN1mOSX1dDKg=;
+        b=ZI5Fj0blrzWfUtPy6doWH9En27RMOyJyqQEfB4ZpaF7N/l42z8avGpucQ6FIE2HZZe
+         jEjUq8FFM9/SCsJ+HPxydGc6BZcYAqM8pCjZRKKjIi5+HkIrSSEs26pVOvOGOT33AnI+
+         Xe0v9gncfn0cl/xhprE7a1LiYEcLvdsApcgGeZQuBCcpzrrSeKvsb5D2Ceh265zCmI3R
+         yuqDID81syK8cxdPOTwbSRImRk7m+kfra1jiU+u76J9bFW4fFIXHSlw0hfxD4SjwQUB5
+         lCrWqTmW8gPqek/v0wZa4HG1CLUpNoMU3hq/mzotoGGIp9UOf28QjILetRqCfuCxiT3Q
+         2nww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753984299; x=1754589099;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=nIHQvnX6UNEO5bU8VFBoQ/Q+qNFvu+4LpDZCLqUC/A4=;
-        b=Nbdyokxx+IVyFACwtZYpgaPL5ChXmt5DxEVDk4n7Tx2xkOs1UgPErvrCKB93WZiVnK
-         KWtdsHxpo7g81xJ2RxkBRpD19nNUMK8MFwKlzFM040XBvyaKIn3FAG0hnSPuwJswcwOM
-         ymavFlaSXMZiHKixvNQAcm6+UJ1ic/MMJEqvrL6zLSmZxztYp67AiW5ExIPqcJj8QJUd
-         nHWVNIZ+xGsyBVztqRRDmY4KxtdWMCIo1JwlGtk9AkCChQFwlxfpJ8Qe/xlrBxZcsHVl
-         4mSWW4CeHU5BmKXMTbCvS9AEjpVWC1m8FNiGvLBaEV+8drG3iDhmZgBt+3vcgUZrFULp
-         Drxg==
-X-Forwarded-Encrypted: i=1; AJvYcCVvLDmo2I4N8kHfElj7o5RZzAcGCOWw12cQezL1LV4z+CyhoMb1zRI80985tzhCNKzHZd5hkuA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxRRg6NzpHfdAxv5/lJTchrB22sMZ9U3EO9DUhvsi6THEYHXAxa
-	LuveWMYeUEtwJHgYNsPAIiOstECX5blM1FJl8FmvztcFW7ntJkYnrL+YXaSv7g==
-X-Gm-Gg: ASbGncsXtJGPmElaydpdhk/LXGt+zTdWnbRzCfXS0hmpGCS9dX0gmn9nviBqBWcOJtk
-	ZuWGD63kDj/OQU7uF0mCJAtpVs8h+ARdRFt/mgfx3xA22cqubjdu34WgygoBQfClEqUQv79UDdo
-	WLtiiRFoarXtY2VkukWl5IDpM18sJ0Jzx8aBVAXKZT+AN2oYEIg5BA+8KMDoGiyr15yLus8yCef
-	01QjtO8yfWKw+s2sCwGbFBodWELZhNHEz4qDUimAeLXzlM5IIyyqxtPjMKMsL9GmRcfnTs86rJa
-	gAjIIarT4Ey8atrDllTaB2+7fUXiKV+/3kREdAQK891onmkTNKDCjkv6IfL7OUANFpTFA8wFm1b
-	gqxQ9TfKx5UN2vR8DKetGmzSgwHxQp1lHFjReIN1yjnMVFTEbTCWUBlignr7F9MEmQaY0eDmcwQ
-	zVKNpPSHsiMoQxYoIe
-X-Google-Smtp-Source: AGHT+IEUq8U2kdt/gh5b5Bn+ATUtvzheojlX3lIyaBt/7IZBzFAP9l/eqYZ5Hd4HR9ymr1WE01at+Q==
-X-Received: by 2002:a05:690c:470e:b0:71a:21f9:572d with SMTP id 00721157ae682-71b5a86e31dmr31899447b3.19.1753984298483;
-        Thu, 31 Jul 2025 10:51:38 -0700 (PDT)
-Received: from willemb.c.googlers.com.com (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-71b5a5f783csm4914407b3.80.2025.07.31.10.51.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 31 Jul 2025 10:51:37 -0700 (PDT)
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	Willem de Bruijn <willemb@google.com>,
-	stable@vger.kernel.org,
-	Quang Le <quanglex97@gmail.com>
-Subject: [PATCH net] net/packet: fix a race in packet_set_ring() and packet_notifier()
-Date: Thu, 31 Jul 2025 13:51:09 -0400
-Message-ID: <20250731175132.2592130-1-willemdebruijn.kernel@gmail.com>
-X-Mailer: git-send-email 2.50.1.565.gc32cd1483b-goog
+        d=1e100.net; s=20230601; t=1753984379; x=1754589179;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3i96hflCH6rE1VrfIns9QcxJpVAhOLAwN1mOSX1dDKg=;
+        b=XlGAhQlEa0/fXc+Y/tLwvaKWBoOCC6jTDB8XBwmUzimu+whZupRoEY9yzKFWPGZ3b6
+         HTeJP2eRu+05gXaBD+nGuiIpJqIaKfIHwHmVBiOXKSI+kSrYdK+93sV2A7DHBZBvZWik
+         ssvTmbUJADFHMHJ8zVlI7G2ziJMZmalsUtJsGT2T7yrGR1Lgm0oPdfHS6fUzOxv3mKMh
+         ygFJ5H6sK/z74JogIeeN0EytWKdZQA12Nb1xj1XVkhsuaWBVeAX5jA8W2SkuN1j3bTQZ
+         ZA24DuJxu66cvpsTHrphKC1PgAVbsY7i1JoD0bORa4lr3uw0XMFBZ/NCf243cmb+xMFB
+         0UpQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUJQN7VNnfGZdPfZ7UVeSA8sLskIoiQxYBdSDGiEMzJyoBDJQbb6KDAVgr5/NI0wp7YV/Qdp5E=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw0GM7SdQh5tKpzP8BmCv3DgekM2TCf87ihBQo3w5fH1P4Q3YPy
+	P/30uwfyZBC0j/9zqQAWoxeP0Y8F0m+PUZRp2FvTR8rh9J4diyIZhfaAGQ8W0QVwwsTwuoWjulm
+	OCX6miiuMJS2L5G+LoqUjp9cSluZlr0nWPLnEuUpZ
+X-Gm-Gg: ASbGncvL2QKczmFMv+/WZKAWHIkzheqaajuV4H0xLgiyW4Cl2dq7DafbiHTaVWX2Gjk
+	qzQ3u8OTYl10zBbfAnHsBJfI6elQw311Njf3kYu4fKbhgTmbVJGgzE57XcsRkWQAWVzyABqXRlo
+	8dIk8D1HGfPGMf7Lk9i2yeIP5T418UjjJZQHAYHWB3pLJ+LJl06ZCaB4vPeyhqj48nPUFVSZL3G
+	q6fEjIYIdeqrG2MYYP23chY+/BylQvophqFRVbZZE9PhQ==
+X-Google-Smtp-Source: AGHT+IHrV92yExpjiYbr6k5wfu4F8hEv9JS3M/1Mh+7JebKT/GmHzDJlkHT5YzyPimtkV08vdLWrhJPoBqzggMNI9to=
+X-Received: by 2002:a17:90b:288b:b0:31e:fac5:5d3f with SMTP id
+ 98e67ed59e1d1-31f5de54b78mr11144099a91.16.1753984379015; Thu, 31 Jul 2025
+ 10:52:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250731123309.184496-1-dongml2@chinatelecom.cn> <CANn89iKRkHyg4nZFwiSWPXsVEyVTSouDcfvULbge4BvOGPEPog@mail.gmail.com>
+In-Reply-To: <CANn89iKRkHyg4nZFwiSWPXsVEyVTSouDcfvULbge4BvOGPEPog@mail.gmail.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Thu, 31 Jul 2025 10:52:46 -0700
+X-Gm-Features: Ac12FXxk6hY81yp_ALLyLIm98qzun7sjQ1BoLWVkmdVqhsT_9Zm5JxGeq6NpJqU
+Message-ID: <CAAVpQUD-x1rCZNvPb1nTpzn276gZZKC1DDNxagdiLdpOp=KLHg@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: ip: lookup the best matched listen socket
+To: Eric Dumazet <edumazet@google.com>
+Cc: Menglong Dong <menglong8.dong@gmail.com>, ncardwell@google.com, davem@davemloft.net, 
+	dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Martin KaFai Lau <kafai@fb.com>, Craig Gallek <kraig@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Willem de Bruijn <willemb@google.com>
+On Thu, Jul 31, 2025 at 6:01=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Thu, Jul 31, 2025 at 5:33=E2=80=AFAM Menglong Dong <menglong8.dong@gma=
+il.com> wrote:
+> >
+> > For now, the socket lookup will terminate if the socket is reuse port i=
+n
+> > inet_lhash2_lookup(), which makes the socket is not the best match.
+> >
+> > For example, we have socket1 and socket2 both listen on "0.0.0.0:1234",
+> > but socket1 bind on "eth0". We create socket1 first, and then socket2.
+> > Then, all connections will goto socket2, which is not expected, as sock=
+et1
+> > has higher priority.
+> >
+> > This can cause unexpected behavior if TCP MD5 keys is used, as describe=
+d
+> > in Documentation/networking/vrf.rst -> Applications.
+> >
+> > Therefor, we lookup the best matched socket first, and then do the reus=
+e
+> > port logic. This can increase some overhead if there are many reuse por=
+t
+> > socket :/
 
-When packet_set_ring() releases po->bind_lock, another thread can
-run packet_notifier() and process an NETDEV_UP event.
+This kills O(1) lookup for reuseport...
 
-This race and the fix are both similar to that of commit 15fe076edea7
-("net/packet: fix a race in packet_bind() and packet_notifier()").
+Another option would be to try hard in __inet_hash() to sort
+reuseport groups.
 
-There too the packet_notifier NETDEV_UP event managed to run while a
-po->bind_lock critical section had to be temporarily released. And
-the fix was similarly to temporarily set po->num to zero to keep
-the socket unhooked until the lock is retaken.
 
-The po->bind_lock in packet_set_ring and packet_notifier precede the
-introduction of git history.
+> >
+> > Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
+>
+> I do not think net-next is open yet ?
+>
+> It seems this would be net material.
+>
+> Any way you could provide a test ?
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Cc: stable@vger.kernel.org
-Signed-off-by: Quang Le <quanglex97@gmail.com>
-Signed-off-by: Willem de Bruijn <willemb@google.com>
----
- net/packet/af_packet.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+Probably it will look like below and make sure we get
+the opposite result:
 
-diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
-index bc438d0d96a7..a7017d7f0927 100644
---- a/net/packet/af_packet.c
-+++ b/net/packet/af_packet.c
-@@ -4573,10 +4573,10 @@ static int packet_set_ring(struct sock *sk, union tpacket_req_u *req_u,
- 	spin_lock(&po->bind_lock);
- 	was_running = packet_sock_flag(po, PACKET_SOCK_RUNNING);
- 	num = po->num;
--	if (was_running) {
--		WRITE_ONCE(po->num, 0);
-+	WRITE_ONCE(po->num, 0);
-+	if (was_running)
- 		__unregister_prot_hook(sk, false);
--	}
-+
- 	spin_unlock(&po->bind_lock);
- 
- 	synchronize_net();
-@@ -4608,10 +4608,10 @@ static int packet_set_ring(struct sock *sk, union tpacket_req_u *req_u,
- 	mutex_unlock(&po->pg_vec_lock);
- 
- 	spin_lock(&po->bind_lock);
--	if (was_running) {
--		WRITE_ONCE(po->num, num);
-+	WRITE_ONCE(po->num, num);
-+	if (was_running)
- 		register_prot_hook(sk);
--	}
-+
- 	spin_unlock(&po->bind_lock);
- 	if (pg_vec && (po->tp_version > TPACKET_V2)) {
- 		/* Because we don't support block-based V3 on tx-ring */
--- 
-2.50.1.565.gc32cd1483b-goog
+# python3
+>>> from socket import *
+>>>
+>>> s1 =3D socket()
+>>> s1.setsockopt(SOL_SOCKET, SO_REUSEPORT, 1)
+>>> s1.bind(('localhost', 8000))
+>>> s1.setsockopt(SOL_SOCKET, SO_BINDTODEVICE, b'lo')
+>>> s1.listen()
+>>>
+>>> s2 =3D socket()
+>>> s2.setsockopt(SOL_SOCKET, SO_REUSEPORT, 1)
+>>> s2.bind(('localhost', 8000))
+>>> s2.listen()
+>>>
+>>> cs =3D []
+>>> for i in range(3):
+...     c =3D socket()
+...     c.connect(('localhost', 8000))
+...     cs.append(c)
+...
+>>> s1.setblocking(False)
+>>> s1.accept()
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "/usr/lib/python3.12/socket.py", line 295, in accept
+    fd, addr =3D self._accept()
+               ^^^^^^^^^^^^^^
+BlockingIOError: [Errno 11] Resource temporarily unavailable
+>>>
+>>> s2.accept()
+(<socket.socket fd=3D15, family=3D2, type=3D1, proto=3D0, laddr=3D('127.0.0=
+.1',
+8000), raddr=3D('127.0.0.1', 44580)>, ('127.0.0.1', 44580))
+>>> s2.accept()
+(<socket.socket fd=3D16, family=3D2, type=3D1, proto=3D0, laddr=3D('127.0.0=
+.1',
+8000), raddr=3D('127.0.0.1', 44584)>, ('127.0.0.1', 44584))
+>>> s2.accept()
+(<socket.socket fd=3D15, family=3D2, type=3D1, proto=3D0, laddr=3D('127.0.0=
+.1',
+8000), raddr=3D('127.0.0.1', 44588)>, ('127.0.0.1', 44588))
 
+
+
+>
+> Please CC Martin KaFai Lau <kafai@fb.com>, as this was added in :
+>
+> commit 61b7c691c7317529375f90f0a81a331990b1ec1b
+> Author: Martin KaFai Lau <kafai@fb.com>
+> Date:   Fri Dec 1 12:52:31 2017 -0800
+>
+>     inet: Add a 2nd listener hashtable (port+addr)
+
+I think this issue exists from day 1 of reuseport support
+
+commit c125e80b88687b25b321795457309eaaee4bf270
+Author: Craig Gallek <kraig@google.com>
+Date:   Wed Feb 10 16:50:40 2016
+
+    soreuseport: fast reuseport TCP socket selection
 
