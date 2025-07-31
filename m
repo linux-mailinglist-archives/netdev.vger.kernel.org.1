@@ -1,146 +1,78 @@
-Return-Path: <netdev+bounces-211221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211222-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13361B17362
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 16:48:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB0ECB17375
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 16:53:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 815FA1C24469
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 14:48:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2567B1C247C7
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 14:53:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC3EE15573F;
-	Thu, 31 Jul 2025 14:48:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 747C01A76D4;
+	Thu, 31 Jul 2025 14:53:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Jm/qyAG5"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Bzp5E1cU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A75DB2905
-	for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 14:48:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FC591AC88B
+	for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 14:53:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753973315; cv=none; b=pWRbcf1bhgGBa7mf4kmEBBCmybXYu2fLmIJHZp/rEZaIhhiwv2ORWcvHmk0zNdWMtR2pynJK0zNwP6kV4RxGRlE85w2w5rARGUnbPye0TMbwzfTzeD2GwN6BSc5vElpWi80GDnhXWKj1knea32fTq4MSMWacwVTlEwX6jYw5c0o=
+	t=1753973584; cv=none; b=iLcz183gD2uwJGxS9DUMECnW8lcHgWNS8b57oVYuKM9Nd8CXf9ZIb0xH6I48+EHuZRAdH5TExJQDyL7kSM8JemYJfDibJ7f8ATgIst9dPx5h4XVAGYvHz5CQRCm9ZZQi2xbz9JU75YeXOdUsvQu8ub7Vul+3MMwjXxL/aJCPryc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753973315; c=relaxed/simple;
-	bh=Ad47tlggEaV4abdj1k11+InzNPst1Kd5QZN68yN2zYI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=uScxRfx/4IMLBPxH+vMVM2JxHHmgxLGIKjpeTQXEvLcn8FoC2HDoskOTsxqMuBwdq8k8q0luDiDBCuVsAal0Uw1Cw/TGqQZ6pstwrhrumXWGVNuKVM4UVtNv5QR+SRqSnHZO5tP/eAPNWRouwNoogHEWzATUrnhGy6O1kyJX4HA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Jm/qyAG5; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1753973314; x=1785509314;
-  h=message-id:date:mime-version:subject:to:references:from:
-   in-reply-to:content-transfer-encoding;
-  bh=Ad47tlggEaV4abdj1k11+InzNPst1Kd5QZN68yN2zYI=;
-  b=Jm/qyAG5yDZ/4C2GHNlsRaoqBmqQDxDJGOtgewnWv+OEBKYYBuhba0mR
-   blvbf15ji/XYpGuj6JRJRmAeszm2wMY47IxRN+avomoZ+q94nCNqB4kmM
-   lIVGrvrO689n7euf2jjxuw4iD/jDAn+UIbD78zLeFIcDrV2Wq/+nLE+cL
-   11cvQP+AspfUpR07fOQ5fMN7nUzHGOThFO2kPEBxUNqA75ZdwoBR8cbiY
-   riSSFktx1+Vq7GwxGBqcP7J9xZpBg6G9aTVvS+XN0eDUl1yAbuff/n397
-   hNFYCPV6cTlryGpmrF7nICT1qckOxG1HXrNJwEDILWJVSTeoMXZMYwGN1
-   w==;
-X-CSE-ConnectionGUID: I3tONP9sSGenmvV+pXAkKg==
-X-CSE-MsgGUID: OCjWYJ61R1CoKbo+L4kTFw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11508"; a="66867289"
-X-IronPort-AV: E=Sophos;i="6.17,353,1747724400"; 
-   d="scan'208";a="66867289"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2025 07:48:33 -0700
-X-CSE-ConnectionGUID: eqI7goXYQzqpdvqnSOlOgA==
-X-CSE-MsgGUID: GK/qOb0/RwSdUvy7tvubCA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,353,1747724400"; 
-   d="scan'208";a="162553560"
-Received: from hlagrand-mobl1.ger.corp.intel.com (HELO [10.245.102.40]) ([10.245.102.40])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2025 07:48:32 -0700
-Message-ID: <62e55634-d36d-49e5-9d2f-d5cb00a0f099@linux.intel.com>
-Date: Thu, 31 Jul 2025 16:48:29 +0200
+	s=arc-20240116; t=1753973584; c=relaxed/simple;
+	bh=ZlUTEskPGG/kUfy3h3Vq31WGFInsyu/NaBo9Rb5ct3s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=M3K7MCF+Yk148f2IlozVTZYc/dFZsVQ1LYdQlEDAjqa6sTlFWK6ARkuaE178RABC8LJPrvdZr95WSvBsUTJCAqWlVpEIjAC6p5A/yS05SpGcrKnNkXHFD1LTt2lSmLjg844KolZlEcNFla2ON2JnwCmBx2sMXw7Nf/0eu8DDvzA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Bzp5E1cU; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=hlM0dB8yb47JDk4czdoq1u0oRL4Jkv/Jn+2f+Y6ruiI=; b=Bzp5E1cU/nr0wPC2eMkkv5w8Sp
+	pgz5XPolNMm5xooZ2YagM0JIlWVkbxXJ6bdY1xu3FN22RZH53VozQ4nB0kCxj9tjZvpRdfN05eVE/
+	j/crKIMf+C0ifBYL56xkO7phRQpy7FvfeHoXcfLP215J8zi4GDZJhqkEEnaJkLLn/Gww=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uhUeH-003NdM-BO; Thu, 31 Jul 2025 16:52:49 +0200
+Date: Thu, 31 Jul 2025 16:52:49 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net] net: airoha: npu: Add missing MODULE_FIRMWARE macros
+Message-ID: <1ef51e54-9ad1-4e98-aaba-63d493e22959@lunn.ch>
+References: <20250731-airoha-npu-missing-module-firmware-v1-1-450c6cc50ce6@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: PATCH: i40e Improve trusted VF MAC addresses logging when limit
- is reached
-To: Dave Hill <davidchill@hotmail.com>, netdev@vger.kernel.org
-References: <CH3P221MB1462BC768A36BFE9E37E2CB6D327A@CH3P221MB1462.NAMP221.PROD.OUTLOOK.COM>
-Content-Language: pl, en-US
-From: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
-In-Reply-To: <CH3P221MB1462BC768A36BFE9E37E2CB6D327A@CH3P221MB1462.NAMP221.PROD.OUTLOOK.COM>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250731-airoha-npu-missing-module-firmware-v1-1-450c6cc50ce6@kernel.org>
 
-Hey David,
-
-On 2025-07-31 4:06 PM, Dave Hill wrote:
-> From: David Hill<dhill@redhat.com>
-
-s/David Hill<dhill@redhat.com>/David Hill <dhill@redhat.com>/g
-
-The patch formatting is really mangled and not possible to be applied 
-with standard tooling.
-
-It is advised to create patches using `git format-patch` and use `git 
-send-email` tool for patch submissions, as it ensures proper formatting.
-
-It is also advised to add the maintainers for a given piece of code to 
-To: or Cc:, you can find them using ./scripts/get_maintainer.pl
-
-Please take a look at 
-https://docs.kernel.org/process/submitting-patches.html on information 
-how to submit patches properly.
-
-> When a VF reaches the limit introduced in this commit [1], the host 
-> reports an error in the syslog but doesn't mention which VF reached its 
-> limit and what the limit is actually is which makes troubleshooting of 
-> networking issue a bit tedious.   This commit simply improves this error 
-> reporting by adding which VF number has reached a limit and what that 
-> limit is.
+On Thu, Jul 31, 2025 at 12:25:21PM +0200, Lorenzo Bianconi wrote:
+> Introduce missing MODULE_FIRMWARE definitions for firmware autoload.
 > 
-> Signed-off-by: David Hill<dhill@redhat.com>
-> 
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/ 
-> drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-> 
-> index 9b8efdeafbcf..dc0e7a80d83a 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-> @@ -2953,7 +2953,8 @@ static inline int i40e_check_vf_permission(struct 
-> i40e_vf *vf,
-> I40E_VC_MAX_MACVLAN_PER_TRUSTED_VF(pf->num_alloc_vfs,
-> hw->num_ports)) {
->                          dev_err(&pf->pdev->dev,
-> -                               "Cannot add more MAC addresses, trusted 
-> VF exhausted it's resources\n");
-> +                               "Cannot add more MAC addresses, trusted 
-> VF %d uses %d out of %d MAC addresses\n", vf->vf_id, 
-> i40e_count_filters(vsi) +
-> +          mac2add_cnt, I40E_VC_MAX_MACVLAN_PER_TRUSTED_VF(pf- 
->  >num_alloc_vfs,num_ports)));
->                          return -EPERM;
->                  }
->          }
-> 
-> [1] commit cfb1d572c986a39fd288f48a6305d81e6f8d04a3
-> Author: Karen Sornek <karen.sornek@intel.com>
-> Date:   Thu Jun 17 09:19:26 2021 +0200
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 
-The above should be just below your signoff tag as follows:
+If this is for net it needs a Fixes: tag.
 
-Signed-off-by: David Hill <dhill@redhat.com>
+    Andrew
+
 ---
-[1] commit cfb1d572c986a39fd288f48a6305d81e6f8d04a3
-Author: Karen Sornek <karen.sornek@intel.com>
-Date:   Thu Jun 17 09:19:26 2021 +0200
----
-
-Best regards,
-Dawid
+pw-bot: cr
 
