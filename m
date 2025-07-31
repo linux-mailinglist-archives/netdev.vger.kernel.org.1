@@ -1,119 +1,198 @@
-Return-Path: <netdev+bounces-211264-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211265-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49E56B176A6
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 21:28:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB4E3B176AE
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 21:34:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 760FB17C84C
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 19:28:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1507016B2E1
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 19:34:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31CD7246770;
-	Thu, 31 Jul 2025 19:27:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5007D2222D7;
+	Thu, 31 Jul 2025 19:34:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LWFyi71i"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MTwxR9K7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76E8F2459E5
-	for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 19:27:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4F4F22A1E1
+	for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 19:34:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753990067; cv=none; b=kI7ougQUjo/xv6tRheMnocDe59Hjw5LwAG4VsGCl/f2C9TeUtJbu1xM8t5HeKRMQV4EN++eFt5oYAfpDgRwg/aldkPRbzJl54CIuqYGj5ab6EPXu55VWpHrt/tHwGLO0T0HP062p/JFBQ6Ro+LUZS0TCv4dwDZ516vQZFzQX3/U=
+	t=1753990473; cv=none; b=c3YisDOpD16p4/xbQm1bP+YrYIJJxc6cYtExQbK5CqJOb2kxZfKF+/GnD4rFD9ggroyr0GFo0jE7G78V+CUwKdR9uK/Jrz0Yh9ICKPx+eeJXBAm/YG4erM5CbBsB0J419eMeopQPK07eaukWymscBIYlQKGKVvrFDysKLPPftDc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753990067; c=relaxed/simple;
-	bh=J+CgDJONEW9adIFLv+Mj07ElvmbXmtk846LMMaix6o8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=LoRuFLsJQ+xsYEtM1Q6ccoDTR1GdGpg6FYhc55Oj/8ES/XfKuxA2Ed71Ox6Cc+Dx4f48BVXdbzXbxSDhRwkSx3AgfxXvIsgf/rVnVPSWuohXp83p+FE+gzREFXZZI78Qvo0TfO+8AF0MWPDgH0XbWGng1uDdpdhcnqsXqFIU9jA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LWFyi71i; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1753990065; x=1785526065;
-  h=from:to:cc:subject:in-reply-to:references:date:
-   message-id:mime-version;
-  bh=J+CgDJONEW9adIFLv+Mj07ElvmbXmtk846LMMaix6o8=;
-  b=LWFyi71iLUrrn8mvimKZ0lETESP1v6xZvVXAAGEjn/ssgYX4LA+mfLzT
-   HGQ5e7FrD5N05HBnGIGmKpBxtxYrmSGNSU3UXkNx5DzA56W2o/RDL00Ax
-   jYDxnAUVC7mUPbEYQlXcgyUo/Omb3BXGM7LoHovPnI6P8enAIZG94+gmu
-   TmzzkFdDnDHY7ybbztAEDv6hLLh1XHSzUqf3BfcyoEMW5dO1SKVQnxWtE
-   jiZFVsaUYJfCuyzRnD7pf6p/iyLaGIlbPp6bDhpDuXqBDCVySOl8zfvqF
-   6qdNuC10V90JBdP70BaZeGef5ZbfiybSf7+ROkt7p5omLY3X9pti3wZUY
-   w==;
-X-CSE-ConnectionGUID: Hw4hpjn4TIKIyLh14OOEXw==
-X-CSE-MsgGUID: 7G9aK3yaQAGvzJbqeSbtNw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11508"; a="66898682"
-X-IronPort-AV: E=Sophos;i="6.17,255,1747724400"; 
-   d="scan'208";a="66898682"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2025 12:27:40 -0700
-X-CSE-ConnectionGUID: if7nJLRBTcyAvSVnwWM08A==
-X-CSE-MsgGUID: O5C24G+nS4WRSfzZCpWuaQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,255,1747724400"; 
-   d="scan'208";a="168628969"
-Received: from gabaabhi-mobl2.amr.corp.intel.com (HELO vcostago-mobl3) ([10.125.109.214])
-  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2025 12:27:39 -0700
-From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-To: Cong Wang <xiyou.wangcong@gmail.com>, Takamitsu Iwai
- <takamitz@amazon.co.jp>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>,
- netdev@vger.kernel.org, Kuniyuki Iwashima <kuniyu@google.com>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Vladimir Oltean <olteanv@gmail.com>,
- takamitz@amazon.com, syzbot+398e1ee4ca2cac05fddb@syzkaller.appspotmail.com
-Subject: Re: [PATCH v3 net] net/sched: taprio: enforce minimum value for
- picos_per_byte
-In-Reply-To: <aIpbK1q47giH8SRg@pop-os.localdomain>
-References: <20250728173149.45585-1-takamitz@amazon.co.jp>
- <aIpbK1q47giH8SRg@pop-os.localdomain>
-Date: Thu, 31 Jul 2025 12:27:39 -0700
-Message-ID: <8734acw47o.fsf@intel.com>
+	s=arc-20240116; t=1753990473; c=relaxed/simple;
+	bh=Kp8+2naWJ1N4EH65MCR9LXz422pGMuaIyGeeJog46NM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aaeXSSK17jv7oluBnQbyNZUZ77rkE1Af2Hez1m4sVAWM/JeuiBMMHjL5kzjET5lEQURUma0WUJfYyaPxi+MNcD4ODAhPb7huTTu+5/8XOR2YqY2ddCp2eRbYdsjUtSHV07ZIVyEzCSE+HV3NdYS+LnwgwFBWE23Lf+p5uYTrHA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MTwxR9K7; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-240718d5920so38105ad.1
+        for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 12:34:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1753990471; x=1754595271; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=T06R5HqpDwsoDzNyfd2pgCLYo7gUEXK5DmZqcx9THVg=;
+        b=MTwxR9K7MDlnlsD2K+1Va74EK9xAzaBc2T3xjLiqd0v5OsyBloQWWsdt2oxEICBDuA
+         ZlXd6SGsmbCcFhFXI3ogvTFvd/2SR5nFCdblqECFlPlHjEz5Qq2kq1iEWjd4JsTClw2x
+         wW7bu1i94K0OPH2JwGlvDefPE0KvaWH/gHfnOOiO5VSRFsrZP0MguclEjFM0ZFfUUHvS
+         nKEhuti47f5xL8Tasu9uWCQoYm5C26PCHX3Ly3kvP3Qujhg4g8PMQzkuu9o8yyxOgd3x
+         zMWzSk+x6masIzEVsA8y8KTGcbdPRSzSBlOn4G3iOOYKyL9oTcFHKz/B1DE/GPg/BjqA
+         Wz9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1753990471; x=1754595271;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=T06R5HqpDwsoDzNyfd2pgCLYo7gUEXK5DmZqcx9THVg=;
+        b=VqNMb6+i2bmsNng/yZk196rKzWApDM1CnvWAPlvEfBouCvpu8qVCVU2Yw51VuQFzve
+         83VWKnLhn/Ths/EztnR3v9SUn6PD2ZgRnQc5RqWkp3GAqGs3p7COtFfqxRKXgwArBrqk
+         C5PnHHuxkVWJDInYFdAemU1UB/CuuuPVuFD62/X8683AxV5VfXuNW1izKPgrJxopHmPD
+         kPRZZfucVMzPQn+fOthq93ZAEkDoA6E4xZrxq1MXPY7C1YaRF3vBSkybvDY3ljLqkyyd
+         1SvyvhOU8Bs4or7OD8xoQ0Tq/9/TMHrFUX65jgAxmg/M0wrT73ZtkTVOHyXFe9SDo/lZ
+         aByQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV5IH0YYiE5XDmS3ILo1L6uU4/7M5t3ZSpzj/Kgd5OxjD9HStrSYuGHslHfl7sYLbm+ScByldE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YweUjXavHbMxLOQ67kA5WpCM0T5QzK/R2qb6bzsMZbe1euRrglr
+	zQASQuqmoudGxHCdASaVkb+iI3O3SB8dk3w4hxKQlRnIBYhUD+1v2Y4IDZaF8IXcd01WHGqlh0A
+	BAoQTBoY4p0B838ekDgtaEDLoutqWjq8TrWxdXGNh
+X-Gm-Gg: ASbGncuMdXvmX9QWHVi/jvLM5jkKSF+f8d+FOgjaWHJNHfsr95Wbamv/oqkf0mFAUEW
+	pKjd14Qea5UHr+niCONrxO8Tz52Xr1cQehrELqh1lG7Jqzko7Jw4OcbYQpmpATuob6IJ8MH6Muu
+	bGKSmahRPGu5QR+A0L1X4dTBDLeL6cFTt26AaYO47d91iHL/e3wGZnnq05fEqOABbi5J/fwK5Rn
+	D42+5EMKyKsgG1wFuv0DE33iLqoNACXtco=
+X-Google-Smtp-Source: AGHT+IEh5BMcpRAg5aLbK0lkZX7HFQ/+58C+lSOdc6FR/ZI+seKQlN1f232UGbxPwvovEJfv/LITvZUnfPDDi5YxVFo=
+X-Received: by 2002:a17:903:2352:b0:240:4464:d48b with SMTP id
+ d9443c01a7336-24227bc725emr668465ad.16.1753990470602; Thu, 31 Jul 2025
+ 12:34:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <cover.1753694913.git.asml.silence@gmail.com> <aIevvoYj7BcURD3F@mini-arch>
+ <df74d6e8-41cc-4840-8aca-ad7e57d387ce@gmail.com> <aIfb1Zd3CSAM14nX@mini-arch>
+ <0dbb74c0-fcd6-498f-8e1e-3a222985d443@gmail.com> <aIf0bXkt4bvA-0lC@mini-arch>
+ <52597d29-6de4-4292-b3f0-743266a8dcff@gmail.com> <aIj3wEHU251DXu18@mini-arch>
+ <46fabfb5-ee39-43a2-986e-30df2e4d13ab@gmail.com> <aIo_RMVBBWOJ7anV@mini-arch>
+In-Reply-To: <aIo_RMVBBWOJ7anV@mini-arch>
+From: Mina Almasry <almasrymina@google.com>
+Date: Thu, 31 Jul 2025 12:34:18 -0700
+X-Gm-Features: Ac12FXz4pVwMESZ6NfAoxj_XHXadYmC5pDjsmNdtqD_xpVMur91xQMwYVfuU530
+Message-ID: <CAHS8izPYahW_GkPogatiVF-eZFRGV-zqH3MA=VNBjw4jfgCzug@mail.gmail.com>
+Subject: Re: [RFC v1 00/22] Large rx buffer support for zcrx
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: Pavel Begunkov <asml.silence@gmail.com>, Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
+	io-uring@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
+	Willem de Bruijn <willemb@google.com>, Paolo Abeni <pabeni@redhat.com>, andrew+netdev@lunn.ch, 
+	horms@kernel.org, davem@davemloft.net, sdf@fomichev.me, dw@davidwei.uk, 
+	michael.chan@broadcom.com, dtatulea@nvidia.com, ap420073@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Cong Wang <xiyou.wangcong@gmail.com> writes:
-
-> On Tue, Jul 29, 2025 at 02:31:49AM +0900, Takamitsu Iwai wrote:
->> Syzbot reported a WARNING in taprio_get_start_time().
->> 
->> When link speed is 470,589 or greater, q->picos_per_byte becomes too
->> small, causing length_to_duration(q, ETH_ZLEN) to return zero.
->> 
->> This zero value leads to validation failures in fill_sched_entry() and
->> parse_taprio_schedule(), allowing arbitrary values to be assigned to
->> entry->interval and cycle_time. As a result, sched->cycle can become zero.
->> 
->> Since SPEED_800000 is the largest defined speed in
->> include/uapi/linux/ethtool.h, this issue can occur in realistic scenarios.
->> 
->> To ensure length_to_duration() returns a non-zero value for minimum-sized
->> Ethernet frames (ETH_ZLEN = 60), picos_per_byte must be at least 17
->> (60 * 17 > PSEC_PER_NSEC which is 1000).
->> 
->> This patch enforces a minimum value of 17 for picos_per_byte when the
->> calculated value would be lower, and adds a warning message to inform
->> users that scheduling accuracy may be affected at very high link speeds.
+On Wed, Jul 30, 2025 at 8:50=E2=80=AFAM Stanislav Fomichev <stfomichev@gmai=
+l.com> wrote:
 >
-> Is it possible to reproduce this with a selftest? If so, please consider
-> adding one.
+> On 07/30, Pavel Begunkov wrote:
+> > On 7/29/25 17:33, Stanislav Fomichev wrote:
+> > > On 07/28, Pavel Begunkov wrote:
+> > > > On 7/28/25 23:06, Stanislav Fomichev wrote:
+> > > > > On 07/28, Pavel Begunkov wrote:
+> > > > > > On 7/28/25 21:21, Stanislav Fomichev wrote:
+> > > > > > > On 07/28, Pavel Begunkov wrote:
+> > > > > > > > On 7/28/25 18:13, Stanislav Fomichev wrote:
+> > > > > > ...>>> Supporting big buffers is the right direction, but I hav=
+e the same
+> > > > > > > > > feedback:
+> > > > > > > >
+> > > > > > > > Let me actually check the feedback for the queue config RFC=
+...
+> > > > > > > >
+> > > > > > > > it would be nice to fit a cohesive story for the devmem as =
+well.
+> > > > > > > >
+> > > > > > > > Only the last patch is zcrx specific, the rest is agnostic,
+> > > > > > > > devmem can absolutely reuse that. I don't think there are a=
+ny
+> > > > > > > > issues wiring up devmem?
+> > > > > > >
+> > > > > > > Right, but the patch number 2 exposes per-queue rx-buf-len wh=
+ich
+> > > > > > > I'm not sure is the right fit for devmem, see below. If all y=
+ou
+> > > > > >
+> > > > > > I guess you're talking about uapi setting it, because as an
+> > > > > > internal per queue parameter IMHO it does make sense for devmem=
+.
+> > > > > >
+> > > > > > > care is exposing it via io_uring, maybe don't expose it from =
+netlink for
+> > > > > >
+> > > > > > Sure, I can remove the set operation.
+> > > > > >
+> > > > > > > now? Although I'm not sure I understand why you're also passi=
+ng
+> > > > > > > this per-queue value via io_uring. Can you not inherit it fro=
+m the
+> > > > > > > queue config?
+> > > > > >
+> > > > > > It's not a great option. It complicates user space with netlink=
+.
+> > > > > > And there are convenience configuration features in the future
+> > > > > > that requires io_uring to parse memory first. E.g. instead of
+> > > > > > user specifying a particular size, it can say "choose the large=
+st
+> > > > > > length under 32K that the backing memory allows".
+> > > > >
+> > > > > Don't you already need a bunch of netlink to setup rss and flow
+> > > >
+> > > > Could be needed, but there are cases where configuration and
+> > > > virtual queue selection is done outside the program. I'll need
+> > > > to ask which option we currently use.
+> > >
+> > > If the setup is done outside, you can also setup rx-buf-len outside, =
+no?
+> >
+> > You can't do it without assuming the memory layout, and that's
+> > the application's role to allocate buffers. Not to mention that
+> > often the app won't know about all specifics either and it'd be
+> > resolved on zcrx registration.
+>
+> I think, fundamentally, we need to distinguish:
+>
+> 1. chunk size of the memory pool (page pool order, niov size)
+> 2. chunk size of the rx queue entries (this is what this series calls
+>    rx-buf-len), mostly influenced by MTU?
+>
+> For devmem (and same for iou?), we want an option to derive (2) from (1):
+> page pools with larger chunks need to generate larger rx entries.
 
-Good idea. From a quick look, it seems that netdevsim doesn't have
-support for .{get,set}_link_ksettings(), so I guess it would be
-something for later.
+To be honest I'm not following. #1 and #2 seem the same to me.
+rx-buf-len is just the size of each rx buffer posted to the NIC.
 
+With pp_params.order =3D 0 (most common configuration today), rx-buf-len
+=3D=3D 4K. Regardless of MTU. With pp_params.order=3D1, I'm guessing 8K
+then, again regardless of MTU.
 
-Cheers,
--- 
-Vinicius
+I think if the user has not configured rx-buf-len, the driver is
+probably free to pick whatever it wants and that can be a derivative
+of the MTU.
+
+When the rx-buf-len is configured by the user, I assume the driver
+puts aside all MTU-related heuristics (if it has them) and uses
+whatever the userspace specified.
+
+Note that the memory provider may reject the request. For example
+iouring and pages providers can only do page-order allocations. Devmem
+can in theory do any byte-aligned allocation, since gen_pool doesn't
+have a restriction AFAIR.
+
+--=20
+Thanks,
+Mina
 
