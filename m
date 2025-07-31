@@ -1,184 +1,147 @@
-Return-Path: <netdev+bounces-211143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211144-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D1C8B16E1F
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 11:07:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8E8FB16E21
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 11:08:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F3515630A7
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 09:07:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EEEA7561AC7
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 09:08:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B418628E5F3;
-	Thu, 31 Jul 2025 09:07:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B09B28D8E1;
+	Thu, 31 Jul 2025 09:08:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="WedJKqHi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DyGkjBmd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F33E626E71A
-	for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 09:07:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C08CB1E231F
+	for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 09:07:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753952853; cv=none; b=Dp8Vdv3RZ6QaQR/9bIrlpQ8sB90l59gL23BOqAYVx04Di2RcKb7C5bjffPALMYeHVJZpXmZoJDOLmb/kTXx4dpMWJhHoglVBs16QJQxYjgspdZFVXrkCSDsPKgqw6sDY9YKpZNQElToWQWy8oMtIanuD9TivBvTanNTEFnbBWro=
+	t=1753952880; cv=none; b=Av125SY1Jt/ILhCQJQ036ZgU93lDRVidaOVUqsJAVcOLbHPTg2FWUD2On7jH7d/uI/3enZL2LEJxE526vttcO/je5Ua8LP+8lt+1IL/umnlYEIKo2nPr/0z3L4LShAvWN/0Nx09IRTd4Egvd5LoQPmiNgjQkxBLBsVuxYL6xELE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753952853; c=relaxed/simple;
-	bh=X1kwN4TxmRWzdYqOdxnTc9uBDdqiUjDYqZ/TFo9+BH4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KxA7SmY/fhDAPFFAQIpHI8yapA8Me/7AWC6CI/Qe+XwHhoCnKOQbVQ972lLlDPn9TsM7vr+XnDY2mpijkFi+3M32/KvaLxTV7/N67gor3MosibDDzdNQ3UTRTFuB+UAyKZnh965jbaexYsU4KoGDenkV6tsvCB5E2KXcaT7bX9s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev; spf=pass smtp.mailfrom=tuxon.dev; dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b=WedJKqHi; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-615622ed677so965845a12.1
-        for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 02:07:31 -0700 (PDT)
+	s=arc-20240116; t=1753952880; c=relaxed/simple;
+	bh=yEK4AMqOp+J5XY7duc/7m+8Az7VEwc/OeM52p4k7Myo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UZwNxds/jL5vR3qANpPGEGtxOU0I5MufxsTgE9tZrr5zmgW4LlmTpA6GaGRnLJEohNgVzpg5kpA8iuD9D4ImsqTb85APtpmDGauvCAMSHRiOi0ENQPiDMV7l8kpiwvnY107VR/ISJiKpmhsEnAKfiaL9AzIoJPjUgDDNmUYGQss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DyGkjBmd; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4535fc0485dso1295655e9.0
+        for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 02:07:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1753952850; x=1754557650; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZzwTiolPuRjB0X7WycrdISjM7D8xvIgiqtSrCy1xiYo=;
-        b=WedJKqHiPIL79Mad3WXB7FaDL4PQ+UBv6fKEkw4J0zftsWYJO053xKv02QiP3/wSai
-         xJCMMtoXVONNjjoN06eXlCxuruv/roIfBgMwTU4l9etuLMkKMLOC0fxxurOBL1qg/6iK
-         DMhL2ly81gSJPGcfp1pBfzt7XAjsqhE4Hao7WJZC/kJD7bXRe4r15ARt6wNPUnws3Hro
-         EtCSa/rjeHm3VvCSdDmbrsjaVVT5zlS4rh9nCWfVEkQeAbv7gtYpTOqbGjcR+p/KA2gg
-         CFj62EZ0z8FiISx5Lg1fHMeoKUEWLsaUAA0cX2nfvdr/kP0nmfBh2xdu2xSQbX13JOVs
-         x9tg==
+        d=gmail.com; s=20230601; t=1753952877; x=1754557677; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=66N593Z0nuoZIAGdEj0IM2jhkW2Pf2fhdI8POkfcCgA=;
+        b=DyGkjBmd2OHzMkuWLU1aYufLXdIcEoF2+8pDJsUJxdqudwalw8gRUmtKHGeBgNmp2M
+         Y7OCJyDqKmCza4gijWElJsJxCWVF15/1GYV/H6e2ocE6PbFLTnEqD4H7vTp/J1ree7Yw
+         6LJMuFVbqPXf7iOQ8FVsjN7oPP9/YYQfrU+iQv2h9ayu0WRkK8sR5IuS4Mac3oX3wqfQ
+         Zh9EUfLZuCUIemYfVFFfGuQ/eDd3CR8+AqZrXRvzqlHd3kUeBodvk+LIqO1mKX8+nniU
+         komQm9Z2oZbIvrePmv3uzzIYQoW5WH617ShywV5GBsxUMVJjlJ8wb/k11Bsb/+zzfMWM
+         Yopw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753952850; x=1754557650;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZzwTiolPuRjB0X7WycrdISjM7D8xvIgiqtSrCy1xiYo=;
-        b=RzRxaR6DuEGy03aR7yZPuqaMePbV5kvDvRqY9srkAuy8Mfgn/lnCEIN6QdcrmZ85gv
-         43aDfigy396Mz86Unmt6KEtLZ82xJKuA6ATXz5qqwW+Vp1R6FUmhKfPTgBF+I9nDzrF1
-         veQMP9SaawGGhDTVbjjTGz3/GhQ/injTRszCoqRftnM7A4RB5wUv28a6Ld1Qqw/WIXR/
-         5nfrgtHIB9TJz08ChUl417Hd/vu9TOz5oLXCOESc9dIYguZ3w/hnCqjcIhGNjlOssxD9
-         Bnv1YDJkfFyvFRYd4zsjk1rjITj9RcTBd2hGbtLFfl3+RY6pOA3tXUHQ8tlioJaM9+5d
-         L2ug==
-X-Forwarded-Encrypted: i=1; AJvYcCV9I//oazxftPqoUUC4PrnUHOL0EzgnvCvUOCnVjNUTIn/oakg7LGglIDyJgW5ayxJlt+5oxEs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwbEMpuNtjXBlwLeKgMEZZJm4q649BBchuRBamU5FNk5lRrrXAW
-	31lAe3MhMTUY6GeR09kDZODs7itfS/5XpfzXZaf3PGlaKka7SaUqDiiFYSIgCsmTwo4=
-X-Gm-Gg: ASbGncu3CnhfSexOZbOmCtD2zElOe+PT62r8jPPftH0CBGDyDBfVFAVpVM9c0AqaTyj
-	qV79MxROFPzQQpeW2Pq8OE9ZL8UqNb6pAYhFXioAKH65/T/Wh3WfTKMBoNZ1pZBp8rl6PQFUJql
-	SLPUMAqGPSkgdCn+ykMR3+8/rlEUDwlEwFLgaAXTqaKyd1Yj0pbNfuyG6cuRnKwnOX/Ugi8xQo9
-	nCPHfFGaPewCpFzljt+UjRtaV0jeu8MYK4h/zCgBxxmLsCDVIfY1uYgqitsM97geX0ySmp6QUFg
-	pr4Et62+/SZaqKJDa6fNSK/rVlQJBN3n7IXhjXV8zBYqDJnFkjGOc0pDaB8S9BUTKDXk2OoX4nU
-	K/AeSVSl/Cdp9Rlb9k4xXjZlEAidtEw==
-X-Google-Smtp-Source: AGHT+IF5S+yNfX8PIBxcKUES4hdUNnQZdC3WoBiygEE9/2AzPO8Uz+wNH44HGfFrLs0jY6f3kUBr+w==
-X-Received: by 2002:a05:6402:7cc:b0:615:4fdb:2163 with SMTP id 4fb4d7f45d1cf-615871efbd4mr5310229a12.29.1753952850302;
-        Thu, 31 Jul 2025 02:07:30 -0700 (PDT)
-Received: from [192.168.50.4] ([82.78.167.30])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-615a8f2b892sm764095a12.25.2025.07.31.02.07.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 31 Jul 2025 02:07:29 -0700 (PDT)
-Message-ID: <7b4d7b89-a69f-453a-bf9c-d0ccdd12d76e@tuxon.dev>
-Date: Thu, 31 Jul 2025 12:07:28 +0300
+        d=1e100.net; s=20230601; t=1753952877; x=1754557677;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=66N593Z0nuoZIAGdEj0IM2jhkW2Pf2fhdI8POkfcCgA=;
+        b=qM7gbnAp30e7CkbCvNr2SF+dPqLvvU4zO1yD3HIbf1OJBsNC7/1dah2V9aHC8pd4xM
+         gcyltikl6WsC0UYqUsnS8bEB98Ss4UdwBN4K7VUDiX7r3k7Zk9OZsdTr0n4O+COm0vhY
+         7cNCewFp9Vj/6etV9JHkUEPPceES+rTSQVSBPF5iOMdtnDPatddHiYW+3umDOfPvJBjR
+         M0pVx0FM4X/EefKOXIs/bkkxhJ9Vg0l61Xz6anBL3rWctdSyYImDO1FP/8cd0ScatcN2
+         eWNzcfPBJeOoTCYpsTchHIlXgJVd1WFkxpSZvRiCplbTm4hOvz5okAUTw9Cmb64ThEjk
+         Z/nw==
+X-Gm-Message-State: AOJu0YzldDAChMnHMrMxqPfX+izCu9O8EaKR1SXzNmFhZLjoYC8ok75A
+	WtZilcwFFCOVEV7q9p4DjJTaAUrm9KpB2XmmU3PMFAizpgL+IY+ya3pBvppC/LIW
+X-Gm-Gg: ASbGncto4xMJc7MU/tO1BGj6+j8/INaobBSA7EG8+9v7KMvV3HSNmajLVIQ2/J04jsh
+	dqP3jS63o9VzS3Xa6xPc5ppDEF++54cv+3mlclHK6eQXfdS1XAzj/q1+P6OkcizTz+iu8RsLOTT
+	eaKp8tIf2X55qPdeqvJtF2c4YyaIGORve99RKqWceyOlD5cSnLygFwzD30+Mwaok5JGktb0MF3L
+	T3n2c57OfI/eAdUZ1TFTn3Lmih+qZxNgHwh+6KMXDKl48uz5frbj6sLrr16A39gpul3bZ7fNyRr
+	nuxtzVdi/W4Q3GDOMT/tfN/OQZk1bfhwH32sk2JBUtfgcLwkNQV3JOmD/JZ+/fz2DreRGoD4VUF
+	kbmuiQILECeOKCA==
+X-Google-Smtp-Source: AGHT+IH5b99dvld3S+07jN5Pmj9XZf4fM0rvcAs1w0vfhckHPH0X1aawyeE9WAUaI1bWwxB/nmSj8g==
+X-Received: by 2002:a05:6000:2383:b0:3b7:91b8:1eeb with SMTP id ffacd0b85a97d-3b794fc1336mr1935504f8f.4.1753952876620;
+        Thu, 31 Jul 2025 02:07:56 -0700 (PDT)
+Received: from skbuf ([2a02:2f04:d30d:7300:97a:e6c7:bad3:aa51])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b79c470102sm1704033f8f.53.2025.07.31.02.07.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 31 Jul 2025 02:07:55 -0700 (PDT)
+Date: Thu, 31 Jul 2025 12:07:53 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Luke Howard <lukeh@padl.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH net] net: dsa: validate source trunk against lags_len
+Message-ID: <20250731090753.tr3d37mg4wsumdli@skbuf>
+References: <DEC3889D-5C54-4648-B09F-44C7C69A1F91@padl.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 5/6] net: macb: Implement TAPRIO TC offload
- command interface
-To: "Karumanchi, Vineeth" <vineeth@amd.com>, vineeth.karumanchi@amd.com,
- nicolas.ferre@microchip.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: git@amd.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250722154111.1871292-1-vineeth.karumanchi@amd.com>
- <20250722154111.1871292-6-vineeth.karumanchi@amd.com>
- <8c34af6e-9cd0-4a2a-b49a-823be099df55@tuxon.dev>
- <c810ec30-51fc-427b-b6f5-15c3284c0ef7@amd.com>
-From: Claudiu Beznea <claudiu.beznea@tuxon.dev>
-Content-Language: en-US
-In-Reply-To: <c810ec30-51fc-427b-b6f5-15c3284c0ef7@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DEC3889D-5C54-4648-B09F-44C7C69A1F91@padl.com>
 
+Hello Luke,
 
+On Thu, Jul 31, 2025 at 03:35:34PM +1000, Luke Howard wrote:
+> A DSA frame with an invalid source trunk ID could cause an out-of-bounds read
+> access of dst->lags.
+> 
+> This patch adds a check to dsa_lag_by_id() to validate the LAG ID is not zero,
+> and is less than or equal to dst->lags_len. (The LAG ID is derived by adding
+> one to the source trunk ID.)
+> 
+> Note: this is in the fast path for any frames within a trunk.
+> 
+> Signed-off-by: Luke Howard <lukeh@padl.com>
+> ---
+>  include/net/dsa.h | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/include/net/dsa.h b/include/net/dsa.h
+> index 2e148823c366c..67672c5ff22e5 100644
+> --- a/include/net/dsa.h
+> +++ b/include/net/dsa.h
+> @@ -180,6 +180,9 @@ struct dsa_switch_tree {
+>  static inline struct dsa_lag *dsa_lag_by_id(struct dsa_switch_tree *dst,
+>  					    unsigned int id)
+>  {
+> +	if (unlikely(id == 0 || id > dst->lags_len))
+> +		return NULL;
+> +
+>  	/* DSA LAG IDs are one-based, dst->lags is zero-based */
+>  	return dst->lags[id - 1];
+>  }
+> -- 
+> 2.43.0
 
-On 29.07.2025 12:38, Karumanchi, Vineeth wrote:
-> Hi Claudiu,
-> 
-> 
-> On 7/26/2025 5:59 PM, claudiu beznea (tuxon) wrote:
-> <...>
->>> +    int err = 0;
->>> +
->>> +    switch (taprio->cmd) {
->>> +    case TAPRIO_CMD_REPLACE:
->>> +        err = macb_taprio_setup_replace(ndev, taprio);
->>> +        break;
->>> +    case TAPRIO_CMD_DESTROY:
->>> +        macb_taprio_destroy(ndev);
->>
->> macb_taprio_setup_replace() along with macb_taprio_destroy() touch HW
->> registers. Could macb_setup_taprio() be called when the interface is
->> runtime suspended?
->>
->>
-> 
-> Nice catch!
-> 
-> I will leverage pm_runtime_suspended(&pdev->dev) check before configuring.
-> 
->>> +        break;
->>> +    default:
->>> +        err = -EOPNOTSUPP;
->>> +    }
->>> +
->>> +    return err;
->>> +}
->>> +
->>> +static int macb_setup_tc(struct net_device *dev, enum tc_setup_type
->>> type, void *type_data)
->>> +{
->>> +    if (!dev || !type_data)
->>> +        return -EINVAL;
->>> +
->>> +    switch (type) {
->>> +    case TC_SETUP_QDISC_TAPRIO:
->>> +        return macb_setup_taprio(dev, type_data);
->>
->> Same here.
->>
->>> +    default:
->>> +        return -EOPNOTSUPP;
->>> +    }
->>> +}
->>> +
->>>   static const struct net_device_ops macb_netdev_ops = {
->>>       .ndo_open        = macb_open,
->>>       .ndo_stop        = macb_close,
->>> @@ -4284,6 +4316,7 @@ static const struct net_device_ops macb_netdev_ops
->>> = {
->>>       .ndo_features_check    = macb_features_check,
->>>       .ndo_hwtstamp_set    = macb_hwtstamp_set,
->>>       .ndo_hwtstamp_get    = macb_hwtstamp_get,
->>> +    .ndo_setup_tc        = macb_setup_tc,
->>
->> This patch (or parts of it) should be merged with the previous ones.
->> Otherwise you introduce patches with code that is unused.
->>
-> 
-> Clubbing all comments on patch organization:
-> I see that patch series gets merged into 2 set only.
-> 
-> 1/6 + 2/6 + 3/6 + 4/6 + 5/6 ==> 1/2
-> 6/6 ==> 2/2
+1. You need to add a Fixes: tag, like the following:
+Fixes: 5b60dadb71db ("net: dsa: tag_dsa: Support reception of packets from LAG devices")
 
-That should be good.
+2. The problem statement must not remain in the theoretical realm if you
+   submit a patch intended as a bug fix. Normally the tagger is used to
+   process data coming from the switch hardware, so to trigger an
+   out-of-bounds array access would imply that the problem is elsewhere.
+   That, or you can make it clear that the patch is to prevent a
+   modified dsa_loop from crashing when receiving crafted packets over a
+   regular network interface. But using dsa_loop with a modified
+   dsa_loop_get_protocol() return value is a developer tool which
+   involves modifying kernel sources. I would say any fix that doesn't
+   fix any real life problem in production systems should be sent to
+   'net-next', not to 'net'. This is in accordance with
+   Documentation/process/stable-kernel-rules.rst.
 
-Thank you,
-Claudiu
+3. As per Documentation/process/submitting-patches.rst, you should
+   replace the wording "This patch adds" with the imperative mood.
 
-> 
-> Please let me know your thoughts or suggestions.
-> 
-> 
-> Thanks
-
+4. Please use ./scripts/get_maintainer.pl to generate the recipient
+   list, don't send patches just to the mailing list, reviewers might
+   miss them.
 
