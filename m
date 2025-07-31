@@ -1,210 +1,209 @@
-Return-Path: <netdev+bounces-211287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51DD5B17909
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 00:18:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C9CAB17939
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 01:03:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C07E1C80A48
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 22:19:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8DDDA7A8BDA
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 23:02:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04FFE276054;
-	Thu, 31 Jul 2025 22:18:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CD6B26CE26;
+	Thu, 31 Jul 2025 23:03:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DP1UQMC0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pq3bKOm9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46942270542;
-	Thu, 31 Jul 2025 22:18:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72918265CCB;
+	Thu, 31 Jul 2025 23:03:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754000323; cv=none; b=HhucIwIMInnfiuLhxD4N+WwMPfv4O++lhTWc6HDjN32z3Dl40wO/ifI40PTlk3Ilt9MdEg6eVi9KmvIM4KsGUT6WePV6CARCT1gXVmg+dp2w6id7kbG/gBJSo13GtH2kkVuzZUUU8gqGz9WUiRzAf9vcwJbkgGXs4C3lFszwiW8=
+	t=1754003010; cv=none; b=kMW12rrvpl/iDmSzmwlI88cMaf3iXTh0AYGYuuAiFyqWzEXNtOIUsEHFgmNO/J4hnc4AaFfSQuAPpggT1XCJbm79FvnZ9OKvdms7rux5oRw3v4CB/RLqD1oYiriXpJX/0nhj9RDTVteC4Gg3jr++MGZ3zDeQI1FehVQe7ffESpE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754000323; c=relaxed/simple;
-	bh=YW533d/N8+mABcQxI8sTQIIuyK3oOk+1xYE15uanYMk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JXR5+4Tq6uF285wpDexZBoZ59Dq1xnZkYMte/pzVMbpxDtxj96IldvnoOM7BZCsjVtGwv7zT9Uz7zjfM7dqAvDr+8Joi8Abo14nj2y5VGOp1xeW5eLem5vdNIIn4MSjdO4TMgqZlxYfnMkhcsim7frgRwlRmh09r1Foe6LEt46g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DP1UQMC0; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1754000323; x=1785536323;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=YW533d/N8+mABcQxI8sTQIIuyK3oOk+1xYE15uanYMk=;
-  b=DP1UQMC0CEELuRAKUtduN1AOsr+jiKDFXWAtfHAMq/0st4kwevMvtEiO
-   mpx7JlKyyrCDunCYUvDlKQF6ZjXGPVTB3ZSrLfLxcS3ann6bHtdZlAQB/
-   X5CGy9khIMoNYVaKSArqfJMdDobqomEZo7ednMw0YMgzBYNmCD2EVfspQ
-   ec9nhdjp1e/+K4JGhI5h4g2CoTjR5JSu85qjWWaycJDAbmh1hj/75nZmZ
-   Qmvr99AUKDVCcua40CAHlzWw26rW+hdvFQkY72zmmK7FdfnuOwQRgPk/P
-   eyIsWO02+LtX+grNqyWq5NT2mX6gXzuJcG5elfq32uFVZwpw3rBM/016e
-   A==;
-X-CSE-ConnectionGUID: ubh+KIjITEe4ZSlVmb5nUA==
-X-CSE-MsgGUID: cc04Pao/T5GzbxjETWSn0w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11508"; a="66909733"
-X-IronPort-AV: E=Sophos;i="6.17,255,1747724400"; 
-   d="scan'208";a="66909733"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2025 15:18:42 -0700
-X-CSE-ConnectionGUID: 7lC2KfvkR1KFs60qL+HXTA==
-X-CSE-MsgGUID: Tgvd36kHSHWKQ+2Y62KqQQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,255,1747724400"; 
-   d="scan'208";a="163731560"
-Received: from lkp-server01.sh.intel.com (HELO 160750d4a34c) ([10.239.97.150])
-  by orviesa008.jf.intel.com with ESMTP; 31 Jul 2025 15:18:37 -0700
-Received: from kbuild by 160750d4a34c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uhbbe-00048Q-14;
-	Thu, 31 Jul 2025 22:18:34 +0000
-Date: Fri, 1 Aug 2025 06:18:00 +0800
-From: kernel test robot <lkp@intel.com>
-To: Jakub Sitnicki <jakub@cloudflare.com>, bpf@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Arthur Fabre <arthur@arthurfabre.com>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Jesse Brandeburg <jbrandeburg@cloudflare.com>,
-	Joanne Koong <joannelkoong@gmail.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <thoiland@redhat.com>,
-	Yan Zhai <yan@cloudflare.com>, kernel-team@cloudflare.com,
-	netdev@vger.kernel.org, Stanislav Fomichev <sdf@fomichev.me>
-Subject: Re: [PATCH bpf-next v5 2/9] bpf: Enable read/write access to skb
- metadata through a dynptr
-Message-ID: <202508010501.YGP8iOar-lkp@intel.com>
-References: <20250731-skb-metadata-thru-dynptr-v5-2-f02f6b5688dc@cloudflare.com>
+	s=arc-20240116; t=1754003010; c=relaxed/simple;
+	bh=bByVB3eFZz3ChERtbjPjYgUzCCYFldGuSuFxTrRGkgE=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=DiJS8MUmGPgY/QTy1NkZoqvzW0zINg08X/XXlICIB4WwTBiOzM+EF7fhfMRdhhJXIakFQ9J/erhBMFBu+f8VSg7Kp/1Sxz78QHX0aRlL/bpBdF67zsV/7mcpTqUXvNumAZgheQmUIPATE658mLDZaFAeN8bgl7jJqEbPrPmVMnc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pq3bKOm9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E2BB9C4CEEF;
+	Thu, 31 Jul 2025 23:03:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754003010;
+	bh=bByVB3eFZz3ChERtbjPjYgUzCCYFldGuSuFxTrRGkgE=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=Pq3bKOm9i4fPKtbkZppBRgIxAd1W85N7EiXpA9c7HcfFcQMWyAoxCWKC3xJNhVL+D
+	 4NQUkA6Wkz5HIzByZbJPcnR/6IUGo8/E3FL4lbXPO172GOCKUzfLbJ5Q9XOqQQOZIN
+	 RcZaNzwoqJuKnA1s3xyN7sSUAJvXkft0VgqOf9CUxdPCyD7r7k0cwOleUKwf052u70
+	 yrNOhbsDbz8Rj4J4BLcMk/KAizyoUHvIIZJQ41TXHG/cb/A/my012IC9cWRpumOd70
+	 /hDiqe5HKZ3e1jtyB0AzYvbbT28Z0soWAeVmGYj5kJu1izGsQUvzQglAwbev7KVDz2
+	 Pd/5Cu+CPD5VA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6DBBC87FD3;
+	Thu, 31 Jul 2025 23:03:29 +0000 (UTC)
+From: Demi Marie Obenour via B4 Relay <devnull+demiobenour.gmail.com@kernel.org>
+Date: Thu, 31 Jul 2025 19:03:29 -0400
+Subject: [PATCH RFC net] af_unix: allow disabling connections to abstract
+ sockets
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250731-skb-metadata-thru-dynptr-v5-2-f02f6b5688dc@cloudflare.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250731-no-abstract-v1-1-a4e6e23521a3@gmail.com>
+X-B4-Tracking: v=1; b=H4sIAED2i2gC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDI1MDc2ND3bx83cSk4pKixOQSXTMzc6NUi8QUA+NUQyWgjoKi1LTMCrBp0Up
+ Bbs4gsbzUEqXY2loAaxSdmmkAAAA=
+X-Change-ID: 20250731-no-abstract-6672e8ad03e1
+To: Kuniyuki Iwashima <kuniyu@google.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Demi Marie Obenour <demiobenour@gmail.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1754003009; l=4404;
+ i=demiobenour@gmail.com; s=20250731; h=from:subject:message-id;
+ bh=P7P0D821FG7jnQ4Yv8OJFhXxaN7sjGrTD1AHkxfAEfw=;
+ b=7rRHXR7v2m3QdnngMduiUvvCOD7xiUK8I0VSnsA1PQXg1x317xH0h1h7Aw1zso3eSG6JCaPHR
+ LJ9H4IVrLe9C20Soet8Ggre9zg2ki4UH9APzOL0+LwTZSzFg/5wwDcL
+X-Developer-Key: i=demiobenour@gmail.com; a=ed25519;
+ pk=4iGY+ynEKxIfs+fIUK9EzsvZ44yGE0GvXLeLTPKKPhI=
+X-Endpoint-Received: by B4 Relay for demiobenour@gmail.com/20250731 with
+ auth_id=473
+X-Original-From: Demi Marie Obenour <demiobenour@gmail.com>
+Reply-To: demiobenour@gmail.com
 
-Hi Jakub,
+From: Demi Marie Obenour <demiobenour@gmail.com>
 
-kernel test robot noticed the following build warnings:
+Abstract sockets have been a security risk in the past.  Since they
+aren't associated with filesystem paths, they bypass all filesystem
+access controls.  This means that they can allow file descriptors to be
+passed out of sandboxes that do not allow connecting to named sockets.
+On systems using the Nix daemon, this allowed privilege escalation to
+root, and fixing the bug required Nix to use a complete user-mode
+network stack.  Furthermore, anyone can bind to any abstract socket
+path, so anyone connecting to an abstract socket has no idea who they
+are connecting to.
 
-[auto build test WARNING on bpf-next/master]
+This allows disabling the security hole by preventing all connections to
+abstract sockets.  For compatibility, it is still possible to bind to
+abstract socket paths, but such sockets will never receive any
+connections or datagrams.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Jakub-Sitnicki/bpf-Add-dynptr-type-for-skb-metadata/20250731-183157
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
-patch link:    https://lore.kernel.org/r/20250731-skb-metadata-thru-dynptr-v5-2-f02f6b5688dc%40cloudflare.com
-patch subject: [PATCH bpf-next v5 2/9] bpf: Enable read/write access to skb metadata through a dynptr
-config: i386-buildonly-randconfig-005-20250801 (https://download.01.org/0day-ci/archive/20250801/202508010501.YGP8iOar-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250801/202508010501.YGP8iOar-lkp@intel.com/reproduce)
+Signed-off-by: Demi Marie Obenour <demiobenour@gmail.com>
+---
+ net/unix/Kconfig   | 12 ++++++++++++
+ net/unix/af_unix.c | 18 +++++++++++++-----
+ 2 files changed, 25 insertions(+), 5 deletions(-)
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202508010501.YGP8iOar-lkp@intel.com/
+diff --git a/net/unix/Kconfig b/net/unix/Kconfig
+index 6f1783c1659b81c3c3c89cb7634a9ce780144f26..c34f222f21b097ce4a735ce02d8ce11fc71bde19 100644
+--- a/net/unix/Kconfig
++++ b/net/unix/Kconfig
+@@ -16,6 +16,18 @@ config UNIX
+ 
+ 	  Say Y unless you know what you are doing.
+ 
++config UNIX_ABSTRACT
++	bool "UNIX: abstract sockets"
++	depends on UNIX
++	default y
++	help
++	  Support for "abstract" sockets (those not bound to a path).
++	  These have been used in the past, but they can also represent
++	  a security risk because anyone can bind to any abstract
++	  socket.  If you disable this option, programs can still bind
++	  to abstract sockets, but any attempt to connect to one fails
++	  with -ECONNREFUSED.
++
+ config	AF_UNIX_OOB
+ 	bool "UNIX: out-of-bound messages"
+ 	depends on UNIX
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index 52b155123985a18632fc12dc986150e38f2fee70..81d55849dac58e4e68c28ed03a9bc978777cfe4f 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -332,7 +332,8 @@ static inline void unix_release_addr(struct unix_address *addr)
+  *		- if started by zero, it is abstract name.
+  */
+ 
+-static int unix_validate_addr(struct sockaddr_un *sunaddr, int addr_len)
++static int unix_validate_addr(struct sockaddr_un *sunaddr, int addr_len,
++			      bool bind)
+ {
+ 	if (addr_len <= offsetof(struct sockaddr_un, sun_path) ||
+ 	    addr_len > sizeof(*sunaddr))
+@@ -341,6 +342,9 @@ static int unix_validate_addr(struct sockaddr_un *sunaddr, int addr_len)
+ 	if (sunaddr->sun_family != AF_UNIX)
+ 		return -EINVAL;
+ 
++	if (!bind && !IS_ENABLED(CONFIG_UNIX_ABSTRACT) && !sunaddr->sun_path[0])
++		return -ECONNREFUSED; /* pretend nobody is listening */
++
+ 	return 0;
+ }
+ 
+@@ -1253,6 +1257,8 @@ static struct sock *unix_find_other(struct net *net,
+ 
+ 	if (sunaddr->sun_path[0])
+ 		sk = unix_find_bsd(sunaddr, addr_len, type, flags);
++	else if (!IS_ENABLED(CONFIG_UNIX_ABSTRACT))
++		sk = ERR_PTR(-EPERM);
+ 	else
+ 		sk = unix_find_abstract(net, sunaddr, addr_len, type);
+ 
+@@ -1444,7 +1450,7 @@ static int unix_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
+ 	    sunaddr->sun_family == AF_UNIX)
+ 		return unix_autobind(sk);
+ 
+-	err = unix_validate_addr(sunaddr, addr_len);
++	err = unix_validate_addr(sunaddr, addr_len, true);
+ 	if (err)
+ 		return err;
+ 
+@@ -1493,7 +1499,7 @@ static int unix_dgram_connect(struct socket *sock, struct sockaddr *addr,
+ 		goto out;
+ 
+ 	if (addr->sa_family != AF_UNSPEC) {
+-		err = unix_validate_addr(sunaddr, alen);
++		err = unix_validate_addr(sunaddr, alen, false);
+ 		if (err)
+ 			goto out;
+ 
+@@ -1612,7 +1618,7 @@ static int unix_stream_connect(struct socket *sock, struct sockaddr *uaddr,
+ 	long timeo;
+ 	int err;
+ 
+-	err = unix_validate_addr(sunaddr, addr_len);
++	err = unix_validate_addr(sunaddr, addr_len, false);
+ 	if (err)
+ 		goto out;
+ 
+@@ -2048,7 +2054,9 @@ static int unix_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
+ 	}
+ 
+ 	if (msg->msg_namelen) {
+-		err = unix_validate_addr(msg->msg_name, msg->msg_namelen);
++		err = unix_validate_addr(msg->msg_name,
++					 msg->msg_namelen,
++					 false);
+ 		if (err)
+ 			goto out;
+ 
 
-All warnings (new ones prefixed by >>):
+---
+base-commit: 038d61fd642278bab63ee8ef722c50d10ab01e8f
+change-id: 20250731-no-abstract-6672e8ad03e1
 
-   kernel/bpf/helpers.c: In function '____bpf_snprintf':
-   kernel/bpf/helpers.c:1069:9: warning: function '____bpf_snprintf' might be a candidate for 'gnu_printf' format attribute [-Wsuggest-attribute=format]
-    1069 |         err = bstr_printf(str, str_size, fmt, data.bin_args);
-         |         ^~~
-   In file included from include/linux/string.h:382,
-                    from arch/x86/include/asm/page_32.h:18,
-                    from arch/x86/include/asm/page.h:14,
-                    from arch/x86/include/asm/processor.h:20,
-                    from arch/x86/include/asm/timex.h:5,
-                    from include/linux/timex.h:67,
-                    from include/linux/time32.h:13,
-                    from include/linux/time.h:60,
-                    from include/linux/jiffies.h:10,
-                    from include/linux/ktime.h:25,
-                    from include/linux/timer.h:6,
-                    from include/linux/workqueue.h:9,
-                    from include/linux/bpf.h:10,
-                    from kernel/bpf/helpers.c:4:
-   kernel/bpf/helpers.c: In function '__bpf_dynptr_read':
->> include/linux/fortify-string.h:115:33: warning: argument 2 null where non-null expected [-Wnonnull]
-     115 | #define __underlying_memmove    __builtin_memmove
-         |                                 ^
-   include/linux/fortify-string.h:645:9: note: in expansion of macro '__underlying_memmove'
-     645 |         __underlying_##op(p, q, __copy_size);                           \
-         |         ^~~~~~~~~~~~~
-   include/linux/fortify-string.h:694:27: note: in expansion of macro '__fortify_memcpy_chk'
-     694 | #define memmove(p, q, s)  __fortify_memcpy_chk(p, q, s,                 \
-         |                           ^~~~~~~~~~~~~~~~~~~~
-   kernel/bpf/helpers.c:1784:17: note: in expansion of macro 'memmove'
-    1784 |                 memmove(dst, bpf_skb_meta_pointer(src->data, src->offset + offset), len);
-         |                 ^~~~~~~
-   include/linux/fortify-string.h:115:33: note: in a call to built-in function '__builtin_memmove'
-     115 | #define __underlying_memmove    __builtin_memmove
-         |                                 ^
-   include/linux/fortify-string.h:645:9: note: in expansion of macro '__underlying_memmove'
-     645 |         __underlying_##op(p, q, __copy_size);                           \
-         |         ^~~~~~~~~~~~~
-   include/linux/fortify-string.h:694:27: note: in expansion of macro '__fortify_memcpy_chk'
-     694 | #define memmove(p, q, s)  __fortify_memcpy_chk(p, q, s,                 \
-         |                           ^~~~~~~~~~~~~~~~~~~~
-   kernel/bpf/helpers.c:1784:17: note: in expansion of macro 'memmove'
-    1784 |                 memmove(dst, bpf_skb_meta_pointer(src->data, src->offset + offset), len);
-         |                 ^~~~~~~
-   kernel/bpf/helpers.c: In function '__bpf_dynptr_write':
-   include/linux/fortify-string.h:115:33: warning: argument 1 null where non-null expected [-Wnonnull]
-     115 | #define __underlying_memmove    __builtin_memmove
-         |                                 ^
-   include/linux/fortify-string.h:645:9: note: in expansion of macro '__underlying_memmove'
-     645 |         __underlying_##op(p, q, __copy_size);                           \
-         |         ^~~~~~~~~~~~~
-   include/linux/fortify-string.h:694:27: note: in expansion of macro '__fortify_memcpy_chk'
-     694 | #define memmove(p, q, s)  __fortify_memcpy_chk(p, q, s,                 \
-         |                           ^~~~~~~~~~~~~~~~~~~~
-   kernel/bpf/helpers.c:1845:17: note: in expansion of macro 'memmove'
-    1845 |                 memmove(bpf_skb_meta_pointer(dst->data, dst->offset + offset), src, len);
-         |                 ^~~~~~~
-   include/linux/fortify-string.h:115:33: note: in a call to built-in function '__builtin_memmove'
-     115 | #define __underlying_memmove    __builtin_memmove
-         |                                 ^
-   include/linux/fortify-string.h:645:9: note: in expansion of macro '__underlying_memmove'
-     645 |         __underlying_##op(p, q, __copy_size);                           \
-         |         ^~~~~~~~~~~~~
-   include/linux/fortify-string.h:694:27: note: in expansion of macro '__fortify_memcpy_chk'
-     694 | #define memmove(p, q, s)  __fortify_memcpy_chk(p, q, s,                 \
-         |                           ^~~~~~~~~~~~~~~~~~~~
-   kernel/bpf/helpers.c:1845:17: note: in expansion of macro 'memmove'
-    1845 |                 memmove(bpf_skb_meta_pointer(dst->data, dst->offset + offset), src, len);
-         |                 ^~~~~~~
-
-
-vim +115 include/linux/fortify-string.h
-
-78a498c3a227f2 Alexander Potapenko 2022-10-24  103  
-78a498c3a227f2 Alexander Potapenko 2022-10-24  104  #if defined(__SANITIZE_MEMORY__)
-78a498c3a227f2 Alexander Potapenko 2022-10-24  105  /*
-78a498c3a227f2 Alexander Potapenko 2022-10-24  106   * For KMSAN builds all memcpy/memset/memmove calls should be replaced by the
-78a498c3a227f2 Alexander Potapenko 2022-10-24  107   * corresponding __msan_XXX functions.
-78a498c3a227f2 Alexander Potapenko 2022-10-24  108   */
-78a498c3a227f2 Alexander Potapenko 2022-10-24  109  #include <linux/kmsan_string.h>
-78a498c3a227f2 Alexander Potapenko 2022-10-24  110  #define __underlying_memcpy	__msan_memcpy
-78a498c3a227f2 Alexander Potapenko 2022-10-24  111  #define __underlying_memmove	__msan_memmove
-78a498c3a227f2 Alexander Potapenko 2022-10-24  112  #define __underlying_memset	__msan_memset
-78a498c3a227f2 Alexander Potapenko 2022-10-24  113  #else
-a28a6e860c6cf2 Francis Laniel      2021-02-25  114  #define __underlying_memcpy	__builtin_memcpy
-a28a6e860c6cf2 Francis Laniel      2021-02-25 @115  #define __underlying_memmove	__builtin_memmove
-a28a6e860c6cf2 Francis Laniel      2021-02-25  116  #define __underlying_memset	__builtin_memset
-78a498c3a227f2 Alexander Potapenko 2022-10-24  117  #endif
-78a498c3a227f2 Alexander Potapenko 2022-10-24  118  
-
+Best regards,
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Demi Marie Obenour <demiobenour@gmail.com>
+
+
 
