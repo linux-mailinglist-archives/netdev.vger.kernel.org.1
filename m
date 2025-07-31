@@ -1,232 +1,165 @@
-Return-Path: <netdev+bounces-211237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211238-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1F2AB17500
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 18:33:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEE8AB17507
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 18:36:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0116254674F
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 16:33:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF4B7624936
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 16:35:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F9A61FAC48;
-	Thu, 31 Jul 2025 16:33:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E31423BCEB;
+	Thu, 31 Jul 2025 16:36:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SPazCWLe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sxd4EsMD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CBBDBA33
-	for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 16:33:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753979613; cv=fail; b=tjy59V7Vmzw7iWOPDD2gvvn0RCBHkLr6MljN0c83y1Uvo7skP/ehf2jxt/HWxv0um44BSYfxonc2p2PZc6TJASgSeTSa9fo9ArliAoEcFx6WmojozhpH/elNohiiXQbzuJzTqrgyATvuvTTP9sTeNkVmJwwjFEIRUJ45OMKTfgk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753979613; c=relaxed/simple;
-	bh=BbMztlehMxW7226RPrCryOlwIsLoYazDeosdh/YR91U=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=YSiIrkllR9sxNIoz1IT+V3hjHIHnEcaAGwH2j+vggkQdsg0VqfLgbmJOAFx1lJVSsqj6R+Px85NUeHYDewcRw9s88ViRiy0X0xGXR38PQonAmfEaWCflmn6bfur0djuBkWKzLSjjBYaHmvam+Uf9dTVF3Y6DRhPaYMc4ISNLzr4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SPazCWLe; arc=fail smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1753979612; x=1785515612;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=BbMztlehMxW7226RPrCryOlwIsLoYazDeosdh/YR91U=;
-  b=SPazCWLeFj8qTJjFjqf/QGzNSJ59IFviP+KfTRkIF7/m11kTb5imTQA/
-   IsGNzqj5RNd4D90EdKNndLE19YOZJMhf9iGtVRz0ON138wN2MzvE2Kszc
-   Qz6JkVa9NJI6Vj4+rjHq7YaNKqcdiJ02r0oYfUP1wsb10iotgjfyy5HUW
-   hY7M8hSiWeNcLBmc1yFKlnOA2gcZYMEMYn2Pe+IbiUWGQn5p6Z86pxCOq
-   0dzWtKPsCdofsZTdlOBRDt57O+P9rRYbyxWMV1CWd5dWHmgNxec4Ky1DR
-   m28oSWL+LhCQziX8f6L8SdJsX40MJY4IA8jUjN2XL+5MI/c53XNHwjRYc
-   Q==;
-X-CSE-ConnectionGUID: 4YbY7t1QQUSsgPhWRnQW0g==
-X-CSE-MsgGUID: 4TEJE8AtTgGAZjjFzni16A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11508"; a="56392784"
-X-IronPort-AV: E=Sophos;i="6.17,254,1747724400"; 
-   d="scan'208";a="56392784"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2025 09:33:23 -0700
-X-CSE-ConnectionGUID: +vWykL8LQeyak+kpr2m/Mw==
-X-CSE-MsgGUID: IH4vOmL/RBiZk5rFWoQkgA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,254,1747724400"; 
-   d="scan'208";a="163019414"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by orviesa009.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2025 09:33:20 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26; Thu, 31 Jul 2025 09:33:19 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26 via Frontend Transport; Thu, 31 Jul 2025 09:33:19 -0700
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (40.107.96.59) by
- edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26; Thu, 31 Jul 2025 09:33:18 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=n3U8+kl755W34DvOOCeb4Gvx2sdibWm6t721a45KZXRsI8WPaVK3alphbh3KjGgcCC/4mykedf8FNotlW+JtkaNi2LDIec5/u31sF3FhODqmnFwjDlmugoOhDQogEclsYmH/ZzGXP5wGfwgStOce5SXwCIohyZG/dJavObEJBMqI3nv5XwSHZHMjgo7KKBSzSg1GzL56heE4KZn77HIk/tHBJn2lZHAoEV1Q3bZTQGrreMNa+bAR8dxuPiHmCIxrY30npugPULLJfFrj64lY0CS0VZJ0pqwSVmvT0dny04KFNxdhw5xI0y5ttvVFx1w2n2r+An07I2FILtnm7l43Bw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=DOAGqjDikKVWMSqRcLSxoq0Ge59+Dhp1y9kw3xGMvIY=;
- b=c4pND+de7Qh26PGrjgNq9ZdI6GAa9J06jXPBhbb/Z+pG8Xsf63Ve2yVGD29iJh9L/NsHgyVx7YI92kYkaj6c9rNM+5C+cYQs4IYNF2PaeapTOdyWhYwaHHh/uF8494db2j1dK5HpkhuI2AfUHdO0OhKiT0zsNFBulQR92gFQNUpgSnIqhEAgx9BmeXHSnpsosPmUh3ehZLu3d9Cra1BYnnJZDq0bFecabXxBXrIpmvN6n461ufyQ4FrZOPnjIEgcnSe1I2nTSRt/p4xrrOILRsSfIBnp0YJiePsGK63l5SfFkTF5HMnZ1eKt7oijSHui7XqptwbYYNLklqaFPPbsBw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from LV3PR11MB8673.namprd11.prod.outlook.com (2603:10b6:408:21c::14)
- by PH7PR11MB7075.namprd11.prod.outlook.com (2603:10b6:510:20e::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8964.22; Thu, 31 Jul
- 2025 16:33:01 +0000
-Received: from LV3PR11MB8673.namprd11.prod.outlook.com
- ([fe80::c098:1901:a40c:505f]) by LV3PR11MB8673.namprd11.prod.outlook.com
- ([fe80::c098:1901:a40c:505f%4]) with mapi id 15.20.8989.011; Thu, 31 Jul 2025
- 16:33:01 +0000
-Date: Thu, 31 Jul 2025 18:32:43 +0200
-From: Michal Kubiak <michal.kubiak@intel.com>
-To: Jacob Keller <jacob.e.keller@intel.com>
-CC: <intel-wired-lan@lists.osuosl.org>, <maciej.fijalkowski@intel.com>,
-	<aleksander.lobakin@intel.com>, <larysa.zaremba@intel.com>,
-	<netdev@vger.kernel.org>, <przemyslaw.kitszel@intel.com>,
-	<anthony.l.nguyen@intel.com>
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next 2/3] ice: drop page splitting
- and recycling
-Message-ID: <aIuaq72FjtkEKRDr@localhost.localdomain>
-References: <20250704161859.871152-1-michal.kubiak@intel.com>
- <20250704161859.871152-3-michal.kubiak@intel.com>
- <83ce2cf3-7942-444f-82c2-9489733c56a7@intel.com>
- <aIuSPt5BGOM-d9Kd@localhost.localdomain>
- <2f53087a-3c71-4844-a5e7-9d01dae0d6e9@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <2f53087a-3c71-4844-a5e7-9d01dae0d6e9@intel.com>
-X-ClientProxiedBy: JN3P275CA0148.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:ce::14)
- To LV3PR11MB8673.namprd11.prod.outlook.com (2603:10b6:408:21c::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14507BA33;
+	Thu, 31 Jul 2025 16:36:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1753979782; cv=none; b=ag7h5K/y87NrTNdh/zPz8yGxV0TKS+Rl0zmbJz0JQiXS+lChSPgD5fP1x/Y0xRHaOH6c55Tz6PGiY1znDluScydt/embvimHqxAFqHtqU9JvRem1+uoh99peMfsJexB/CjQNpJkwvk+kE3R8uZ9JgKl1vvClDLeGzF7SS6+g4dc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1753979782; c=relaxed/simple;
+	bh=qKFf5+2hfKxNT4Eb5ZEf5XOsgGj5gNPOaqPmRXy42VY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=um0pzvvz4q/iuTRbYIJoIQPFekXR+Dcs/v8JOu9BACKFh237qIMz2WSBWhrluhOW2oZd5HLQ4xQCu5DHE2mzj1xuObLZ5U+OcUM50f+AqwV2WZ3PZN6+Z1uttXU3zKK1XVjNDqC+3Jx/JLK/1de35ICuFlnKkDlEwU6pzN+WF0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sxd4EsMD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A06EC4CEEF;
+	Thu, 31 Jul 2025 16:36:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753979780;
+	bh=qKFf5+2hfKxNT4Eb5ZEf5XOsgGj5gNPOaqPmRXy42VY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=sxd4EsMDqnU2bvLSbW+BpwloOtQPP6fzTXv61Wri/xhJvXH5I8EgOG7Xm+TwDTT+y
+	 rAzGCsroB6tjTg6Bnr0P9MKB7vukziqS4p7JnPGEmCRC9CjLjfllhG97nKzXVZ19gu
+	 6/W5ZfSfGIqz9keIjnSBJ2+/UAdC0+8Sno6Rk9ptuviRhR7hKujE44BAqQwDxE8B8F
+	 atveE2SvOOjASYKPceDvkBvdilfAQIJLZh4AHN8dBS0bevxS6pfn+N0m9bg4emfl1N
+	 Fe9DLe8yz4rbR2KaVZC5wBb8a4I4Adk5qtMpcNx+S+iRtvhpuAQFtQFCMybd7fn/lN
+	 yfANoDibolWeA==
+Message-ID: <01c9284d-58c2-4a90-8833-67439a28e541@kernel.org>
+Date: Thu, 31 Jul 2025 18:36:04 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV3PR11MB8673:EE_|PH7PR11MB7075:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1c5e2d61-f56c-4969-09fc-08ddd04fea99
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?s2OLTAKgpK/i+mhZIpfihfdC9F4jBoPn59n+a0O94qwjekTMDokFLSfgL3G6?=
- =?us-ascii?Q?zibMm7p6CDQWhEQ5O5P1B+dddRLh0pcwZh/DwenmOuaRrKB98baCvsXjbehb?=
- =?us-ascii?Q?g9rkZaac3AvGm8uwBpKI+MFQ2Y3yee60cWF7ZqITo9YV3UdRfHDwI/aKoJy3?=
- =?us-ascii?Q?yDANZ3WkM5IIWmySgjqnD5OZf0qMZdzhmrJngo+vDjZGXVHOCVYLb0Foco1Z?=
- =?us-ascii?Q?cb6ZNcrwXU7ZBeHCEiyJ6f4L7QXgZ3JZJgR1gAwf6fzLuqRoxB7yGLMyo0tu?=
- =?us-ascii?Q?A7H0Gjd9bl1hh1nkbsKHSrqxUCwloglIjsxNURkN5jv5oWEG5UFjNVfN/bjf?=
- =?us-ascii?Q?UF40rbh9sfk/78ON/sj3vCOH8PzifdjbjdVx1sHdJhPn/KA0XhgHF/0lT7TH?=
- =?us-ascii?Q?UZg6TGmtGo4aRoPtG8k46M8RYpESR0jKjslaLWlDglP6keGQKhku0xk8LLrv?=
- =?us-ascii?Q?lA593c8T9/yJKY/swVRAhvzKPV3MAo7BWlXqTtzMqVcjCY403+/0nFS3+0t3?=
- =?us-ascii?Q?9nRhIxd+aVChom4PS8i7JQ1u2qV2hIcLGy4ApFAgq8MOqWuL+zq6uzINIJke?=
- =?us-ascii?Q?6GB/ZuQfhewYijSvv7/oSgoo34hFq170t7L4DrzZdC1+L8Kc2U35e2oU0Qti?=
- =?us-ascii?Q?mgUSIwidsS47GLqmc11xolBsyhvcEjtSfR9bdzK/kYpSmhsv3y2fKUTUzvV2?=
- =?us-ascii?Q?Ap2KVWqTk2gVaAOpWqLqMQjnXCS5nURfHgH8hmnxUOsoIwsgxT3c3dZzFw1m?=
- =?us-ascii?Q?doz6RT06Q+kg56/s08wpzj4X3uPy0hzqHCbj3mquAvtN8DVkryRRyO+WpD8n?=
- =?us-ascii?Q?e49RDU2auyzJW/1Q6DqasAbW529g2Appf4PMU4hlgmcObzKavdioceRJh/Dz?=
- =?us-ascii?Q?GtONbQvO0QIAhnM3W0TVS5ObWF2GeKZA826LKfy+ZMS6hKaQDwPOVVW1tPgH?=
- =?us-ascii?Q?aKEvqESKHYTivJoolNAKDfoj/tMBkZEDbfPlLo3sCj5DdpCERtG7KWWmtkcC?=
- =?us-ascii?Q?nDojwRKgZ7jv/M5jZjvpY8hof1ZebWK1GOIzwJEUcRMVoYOxyvEdpSXFVDph?=
- =?us-ascii?Q?xcU1qKT8l+40juij32b55zh0A3Uv/qyS+fCiEODdo7DwJ0D0/yuI2pPlqE3V?=
- =?us-ascii?Q?MBK1fphV1PxefnOCPmsR+8Lgh04UcqrL5Up/gWoYtuQW6oDzrdQGy94X11MK?=
- =?us-ascii?Q?LVa6jVZYhXM6XDPlK/zznfFijKdLzK2YB9vpY2awyMyfUgK6Ol/XxZT/cUts?=
- =?us-ascii?Q?ZHRSe9A/A947s+McPS7BV7NQMHjT4/sqoH+KEcpN58nq8FiqjTUT3ZjlV6oT?=
- =?us-ascii?Q?tbua+HXgw/bWlPs99FmDGxq09c8w8eIT+pPHS/SEHZr34bBo3uz7tg4rziaR?=
- =?us-ascii?Q?+tNa7F7MqFLyrpl3s4Kjpk4TJvnxgjyPzCimdTe/n2NCO0kjdmjDYKdXq4hT?=
- =?us-ascii?Q?Dr8aRiEz76Y=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR11MB8673.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?tEBhyzfuHLZbSx+7oTh+E0wU+ephinXDKyqBoneropNN78766tBfciMd/nex?=
- =?us-ascii?Q?g79KCdMXogyi6PT9f7PTbXDUj/E9WswS1JcjDAkyYG8eSCiNPqE6y92FZlRZ?=
- =?us-ascii?Q?aWKzZOc13sVPkqn1/LgibNTEfAejXHKVKDr22EpNDDaKF3DZzy3PdVQVYs8w?=
- =?us-ascii?Q?Bi0Z+NphyzTArYFb9CyKSm41oQpfQ8VmysWSSvSx5X6jexpmH3yDODJ25HU+?=
- =?us-ascii?Q?wVH1FrAnfvBzT5VZttaZdjdKcn44Le9ctd9nCBq1nMtevUuw1BgVFFAnwZY0?=
- =?us-ascii?Q?4y2ncree99H8d4YKONE9P6e+HxqT3BNYZlkztDcFs+32aKIqKP2JKLUAb2s6?=
- =?us-ascii?Q?r8qUaJGwO23GUYzf9JNuZj+0n87YpT1/v7KWgysfDhl6+eEN3JwovCJb/PfN?=
- =?us-ascii?Q?44st4m5EIkPHyZ+BJwK+sajQ8EI65vNIByM27gooZdCUSpRqUEO9pG0zdEli?=
- =?us-ascii?Q?AI+tEtcGtK5WykkQufUJypp0DpnIhdLwDZCFLqLPIBQVEb0ZEh6Ut5ATI+66?=
- =?us-ascii?Q?etA1QxIoGVokwqEbbbSyUW8bl+1K81e3qJOzI/Qw8mC70WvN0y9evWWYC3Pv?=
- =?us-ascii?Q?IExxrZlad9wzC7vhbhVKT4m+R4Jf603r9vLgLCtySOhrmg//S3dVMF1usBGH?=
- =?us-ascii?Q?aPdcAFGE6C/IZS8jT+OCIU5H/m/62t3lfFhqJQ/gq6LS58TWnfngLPQVSyPP?=
- =?us-ascii?Q?vPH2FO05b6s4ZIrUpUqJ4hUR7tkPWfIhM4MKnhMH3n9m6fwrJW7t4DhhduMF?=
- =?us-ascii?Q?g6Yib3dHfF8dHrrlqK3Oh1cjaKWvLNzvZviLyvGhWClHFwVRg3G+rae3cUh2?=
- =?us-ascii?Q?j/+Q9i0bos4c0gBM23uX7ZL9mGD5CHWj6XUPygG/XYUeH78iJrdf+ucNWse4?=
- =?us-ascii?Q?zJwckLCpSe5SLDbwCnoeOBmj5ev8+Yr8jjepOnTTNKzGeG45mmj3WMzM1qbl?=
- =?us-ascii?Q?/w74dvFjwY+MUsjSLUDLrWfWVv1DV8FbUb+0Ewztkxm1xB0D3szVA5sLev3b?=
- =?us-ascii?Q?8Hxw25zQRU7wwkgKQyzRKB0sFHu7LvxlQeVGFl+JdcyanYkfNzVSinTpRScM?=
- =?us-ascii?Q?vCKvFHpbKZyo9jqkjhZvn47EK/XmkPCD+nTKjGuQlPpLBOjUx4DDLFToa2bc?=
- =?us-ascii?Q?WrfRdhvnfbUIhk933qCYnDLx7BncmW9xoPNhcA59IOzQhx27ntVa863i/arL?=
- =?us-ascii?Q?3ksU1LdDZpoTGF/L5EdxZvrJwvZvkFDgLJ5kShjNpHCtAAdsn1fT8G+n/SpA?=
- =?us-ascii?Q?Tl8t+LCJLu21L8MMnoUOVAE9mnsHQ88ye0fDFuVcJ04uvf0eAjOqo0CXL4Dr?=
- =?us-ascii?Q?kMhZGdR0CyOaHVatOQrcTQJeQuZ0cDoL2sOz3+FpsvC82fr+LOhprj4Jb+be?=
- =?us-ascii?Q?eRC9S8+ZLs5nEPhcbaPnEG7LgVr0MjFGq6lSOEMLyH5yMNiM0VkTdVHOkJ/5?=
- =?us-ascii?Q?1d+1YAiDbLQNiSV/nhoEyPGZNowyu/Z0d0UjctNYoUPVPK3huDUNN3UV5ic5?=
- =?us-ascii?Q?TvYqyLaeLv4ffBK+njotbSDGnQRPxnftmehTJhFmXg8I3RavcCgdIaSboCW0?=
- =?us-ascii?Q?rzQRTkdQEk+YZDlp+EsOsZ/vh3kySzrHr4NIoJOeYJWwA4ncEjVOX8DypTzA?=
- =?us-ascii?Q?cQ=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1c5e2d61-f56c-4969-09fc-08ddd04fea99
-X-MS-Exchange-CrossTenant-AuthSource: LV3PR11MB8673.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Jul 2025 16:33:01.7284
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: p7i0HNW4c+Z1kDeL+seTLViJOrsTRdQr9hYYAgXUHk0ctGGk1OiGUpTABMHxcFqdY9X7G1mw1wQDu9wgWy5VbA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7075
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] net: mana: Use page pool fragments for RX buffers
+ instead of full pages to improve memory efficiency.
+To: Dragos Tatulea <dtatulea@nvidia.com>,
+ Dipayaan Roy <dipayanroy@linux.microsoft.com>
+Cc: horms@kernel.org, kuba@kernel.org, kys@microsoft.com,
+ haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, longli@microsoft.com, kotaranov@microsoft.com,
+ ast@kernel.org, daniel@iogearbox.net, john.fastabend@gmail.com,
+ sdf@fomichev.me, lorenzo@kernel.org, michal.kubiak@intel.com,
+ ernis@linux.microsoft.com, shradhagupta@linux.microsoft.com,
+ shirazsaleem@microsoft.com, rosenp@gmail.com, netdev@vger.kernel.org,
+ linux-hyperv@vger.kernel.org, linux-rdma@vger.kernel.org,
+ bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+ ssengar@linux.microsoft.com, dipayanroy@microsoft.com,
+ Chris Arges <carges@cloudflare.com>, kernel-team
+ <kernel-team@cloudflare.com>, Tariq Toukan <tariqt@nvidia.com>,
+ Saeed Mahameed <saeedm@nvidia.com>, Yunsheng Lin <linyunsheng@huawei.com>
+References: <20250723190706.GA5291@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <73add9b2-2155-4c4f-92bb-8166138b226b@kernel.org>
+ <20250729202007.GA6615@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <i5o2nzwpd5ommosp4ci5edrozci34v6lfljteldyilsfe463xd@6qts2hifezz3>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <i5o2nzwpd5ommosp4ci5edrozci34v6lfljteldyilsfe463xd@6qts2hifezz3>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jul 31, 2025 at 09:17:51AM -0700, Jacob Keller wrote:
+
+
+On 30/07/2025 09.31, Dragos Tatulea wrote:
+> On Tue, Jul 29, 2025 at 01:20:07PM -0700, Dipayaan Roy wrote:
+>> On Tue, Jul 29, 2025 at 12:15:23PM +0200, Jesper Dangaard Brouer wrote:
+>>>
+>>>
+>>> On 23/07/2025 21.07, Dipayaan Roy wrote:
+>>>> This patch enhances RX buffer handling in the mana driver by allocating
+>>>> pages from a page pool and slicing them into MTU-sized fragments, rather
+>>>> than dedicating a full page per packet. This approach is especially
+>>>> beneficial on systems with large page sizes like 64KB.
+>>>>
+>>>> Key improvements:
+>>>>
+>>>> - Proper integration of page pool for RX buffer allocations.
+>>>> - MTU-sized buffer slicing to improve memory utilization.
+>>>> - Reduce overall per Rx queue memory footprint.
+>>>> - Automatic fallback to full-page buffers when:
+>>>>     * Jumbo frames are enabled (MTU > PAGE_SIZE / 2).
+>>>>     * The XDP path is active, to avoid complexities with fragment reuse.
+>>>> - Removal of redundant pre-allocated RX buffers used in scenarios like MTU
+>>>>    changes, ensuring consistency in RX buffer allocation.
+>>>>
+>>>> Testing on VMs with 64KB pages shows around 200% throughput improvement.
+>>>> Memory efficiency is significantly improved due to reduced wastage in page
+>>>> allocations. Example: We are now able to fit 35 rx buffers in a single 64kb
+>>>> page for MTU size of 1500, instead of 1 rx buffer per page previously.
+>>>>
+>>>> Tested:
+>>>>
+>>>> - iperf3, iperf2, and nttcp benchmarks.
+>>>> - Jumbo frames with MTU 9000.
+>>>> - Native XDP programs (XDP_PASS, XDP_DROP, XDP_TX, XDP_REDIRECT) for
+>>>>    testing the XDP path in driver.
+>>>> - Page leak detection (kmemleak).
+>>>> - Driver load/unload, reboot, and stress scenarios.
+>>>
+>>> Chris (Cc) discovered a crash/bug[1] with page pool fragments used
+>>> from the mlx5 driver.
+>>> He put together a BPF program that reproduces the issue here:
+>>> - [2] https://github.com/arges/xdp-redirector
+>>>
+>>> Can I ask you to test that your driver against this reproducer?
+>>>
+>>>
+>>> [1] https://lore.kernel.org/all/aIEuZy6fUj_4wtQ6@861G6M3/
+>>>
+>>> --Jesper
+>>>
+>>
+>> Hi Jesper,
+>>
+>> I was unable to reproduce this issue on mana driver.
+>>
+> Please note that I had to make a few adjustments to get reprodduction on
+> mlx5:
 > 
+> - Make sure that the veth MACs are recognized by the device. Otherwise
+>    traffic might be dropped by the device.
 > 
-> On 7/31/2025 8:56 AM, Michal Kubiak wrote:
-> > On Mon, Jul 07, 2025 at 03:48:36PM -0700, Jacob Keller wrote:
-> >>
-> >>
-> >> On 7/4/2025 9:18 AM, Michal Kubiak wrote:
-> >>> @@ -1100,14 +994,10 @@ static void ice_put_rx_mbuf(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp,
-> >>>  	for (i = 0; i < post_xdp_frags; i++) {
-> >>>  		buf = &rx_ring->rx_buf[idx];
-> >>>  
-> >>> -		if (verdict & (ICE_XDP_TX | ICE_XDP_REDIR)) {
-> >>> -			ice_rx_buf_adjust_pg_offset(buf, xdp->frame_sz);
-> >>> +		if (verdict & (ICE_XDP_TX | ICE_XDP_REDIR))
-> >>>  			*xdp_xmit |= verdict;
-> >>> -		} else if (verdict & ICE_XDP_CONSUMED) {
-> >>> +		else if (verdict & ICE_XDP_CONSUMED)
-> >>>  			buf->pagecnt_bias++;
-> >>
-> >> Why do we still keep pagecnt_bias++ here?
-> > 
-> > My mistake. You're right - as I checked, we never use pagecnt_bias after
-> > applying this patch.
-> > I will remove pagecnt_bias completely in v2.
-> > 
-> > Thanks,
-> > Michal
-> > 
+> - Enable GRO on the veth device. Otherwise packets get dropped before
+>    they reach the devmap BPF program.
 > 
-> I think Olek was also aware of this, but please make sure the v2 has
-> fixed the errors with 9K MTU as well :D
+> Try starting the test program with one thread and see if you see packets
+> coming through veth1-ns1 end of the veth pair.
+> 
 
-Sure! I've already synced with Olek about the large MTU regression.
-BTW, thanks for your report and detailed testing. TBH, I didn't run the
-iperf with 9K MTU before. :)
+Hi Dipayaan,
 
-Before sending the v2, I'll definitely test it the way you suggested.
+Enabling GRO on the veth device is quite important for the test to be valid.
 
+I've asked Chris to fix this in the reproducer. He can report back when
+he have done this, so you can re-run the test.  It is also good advice
+from Dragos that you should check packets are coming through the veth
+pair, to make sure the test is working.
+
+The setup.sh script also need to be modified, as it is loading xdp on a
+net_device called "ext0" [0], which is specific to our systems (which
+default also have GRO enabled for veth).
+
+[0] https://github.com/arges/xdp-redirector/blob/main/setup.sh#L28
+
+--Jesper
 
