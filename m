@@ -1,239 +1,160 @@
-Return-Path: <netdev+bounces-211257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211253-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAF78B1761A
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 20:27:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 828B5B1760E
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 20:16:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4F4C3B4DBB
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 18:27:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C584718C3A4C
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 18:17:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DDC02C1592;
-	Thu, 31 Jul 2025 18:27:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=etsalapatis-com.20230601.gappssmtp.com header.i=@etsalapatis-com.20230601.gappssmtp.com header.b="aQcOYSSU"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CA5723E33D;
+	Thu, 31 Jul 2025 18:16:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com [209.85.219.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1F74285C9C
-	for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 18:27:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 829251E0DB0;
+	Thu, 31 Jul 2025 18:16:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753986475; cv=none; b=bEKwZad2RKHIi8/NVl1TQOGMpWMfiZW6gdm+RVEt0MaJawVHtvMXuS5ujghRazaV+g3MsMBQbituHepJEvsxH+kBa8C2Zv3nfZ+y1U0Zg3ctjHXeki9dMuypcTGt+hXq2/MgMndKO0SgXHGYdYFA2K8HQKb3LnpjKfNy4jVw/w8=
+	t=1753985815; cv=none; b=ngnUc7uQfizxorl9AxM89AlgJ4JXWqUFz59x8qlXfl6N6bwwh8GCxeSGJRQUVIAbsQ4SVQ/5894R+RuLDnd5m6cP9LBeaH9/GIim8pHtTMP+C9bDcKdTV2D9SYCImmmUVYd/6cKkpjGD00B7kkidy0WzrmMK2A1syT79LccqVw0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753986475; c=relaxed/simple;
-	bh=mkul41ig5MZ/oO1QqF4ezjSqut/qfYnZNsFzskZW5Wk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YkIyx/r7UQL0RRKVWkUzGhFZ7f6gQZEXJ7k0xc1D2iutP/R6q/EMqOum3VQQ/eCJRICNsjpi9984fkptXS43GZXl52WQPYSEI5pOEaTo4dC1LhlvTNwEbUKpFzynNQnxGVU2HJRN/dJDynr7f9rSQUrm/JHi2cE+hB7CnZ9gFeQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=etsalapatis.com; spf=pass smtp.mailfrom=etsalapatis.com; dkim=pass (2048-bit key) header.d=etsalapatis-com.20230601.gappssmtp.com header.i=@etsalapatis-com.20230601.gappssmtp.com header.b=aQcOYSSU; arc=none smtp.client-ip=209.85.219.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=etsalapatis.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=etsalapatis.com
-Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-e8e0d209623so1252618276.0
-        for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 11:27:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=etsalapatis-com.20230601.gappssmtp.com; s=20230601; t=1753986472; x=1754591272; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JOejpcVoAEyaqEbZ37G6mLmP8K1nuiYpF+txrVxaF+c=;
-        b=aQcOYSSUgqIbdi/eppUqL/U/mB2sJbkCy4fJGJn2pC3J3vWT9WMTzYLP3Mz6jBMxUc
-         exPSX4RWRvlKhgEI2qzvLSVHBeduD7M3FJM7Jp2KpB5+2/iGHQ93FeJCp+ZTxgXfzTdE
-         oW5jnf9cuOp08kfzMlf/c4YMEAUO/S1c03uqvvUpUp0WtNI+N/LQyUuvWTNp1PwoqAoh
-         nXE83MCy68jwpAGF21hxzY9iY592W6xHtY2jK9EQJyr9f95DweYBPg/Z7CvNqtW+lBxV
-         C+S9V348ihLWP3uWFvmz+KBr/iqLL+tPb3r3xU2ZFWwMZMko277Wevzo0gyC1QH++7bc
-         Bfnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753986472; x=1754591272;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JOejpcVoAEyaqEbZ37G6mLmP8K1nuiYpF+txrVxaF+c=;
-        b=hcnOMqkRS+dyaE3UEGj9hchg0FvVIQ7La+/rLbCOmSHISy6SDuqGL93qqvw/NYE//d
-         jIvUd6ff52kCMGW4R6H/FpspJ0dBIkKd/h/mMBnjpM9edLVKPgFmfYcEK3NmqFdeUwsl
-         oS0OeKbEGIzWcfVkDUjFRxk/FuZCX3d+KSDnBNndRov6CStGM4KBOz0m7Gh/4ZF1pR9v
-         jh0CMwllawWhaY6eUw7JSa4UFV6j/uzDq0Yyl2z8iL+TvhbpReHv2bQaGoCA7+sCsxr4
-         godS3Do0476pWxYK79cQ9NWpOXR8Ae9f8bU4c9j4xekLptPFSGfrNEyq0HUfivpQVME7
-         gPeQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX/GCxHo0P1/5l7M7vXeH6vh8H72vGauUfehXKlrFpc9WuSRE61sWQhGj7rfIIY6lscEEBibzk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwI/JU2lOBs4DpFXC8y/EHo6TGDllLF1c5y0hoHNyYeaS0Ck03D
-	eWivb8nQTKYQaL019ydESEhCBir5i5+RdOFHMlK3c9jkGKxBm8twZsOFtp2KWRRwmuGcb/o8lgI
-	PIezvgASp/0HPqZF4UtokHpIgcSM08rPGoDTiFdrQQA==
-X-Gm-Gg: ASbGncuHCPDp2M/xf2B3FKs7kjWGH9yl3TGfxaXe35KKKabd08ysoi/8DpoUZKcxfqt
-	bIc/62EyBnUbZRFhOQrbm0NKsgvvcy59X1+KpdM2GlXik8d68Z70SS6r/RPBDQs0i4FnCHnWyQJ
-	+zrGNQ8IA4orjFsxXjENh88XwD4UqGWuKAmxPLyTssxCSWTC42TC5zhPf+Xv69afuixY5uBVmX5
-	MuDpQt/
-X-Google-Smtp-Source: AGHT+IHS7Ge0ZKzHwi0IjgT3RBWaUFXtT4trLOqBEHWG7mq96jLInsZOWuST9tHzqvvn4HhKMbEMVCLZoIQBtVOTq0c=
-X-Received: by 2002:a05:690c:4d89:b0:71a:34bb:4277 with SMTP id
- 00721157ae682-71a4659a89cmr107529047b3.18.1753986472359; Thu, 31 Jul 2025
- 11:27:52 -0700 (PDT)
+	s=arc-20240116; t=1753985815; c=relaxed/simple;
+	bh=S+eAHkUQmIxOmh9BhUcuLHRn/WSy/97Ut9MbCGS8kfs=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=amFc/s9TrMc1A8YU7LmA9Pd5EeBEEiVyNx67KT0ILsS+expiJkK77oPqtMoBoWJlZ/fsWP7fBHQwMGseVC9AmnbzOIquPOv9u+SoMnk1Q9l0rlYZReKL/mkfngss5XT7Cs0Y+2fcEA/pUbb5RymcULDGle1IDWKMu7Mw3UThnHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4btHHN2xzjz6L4t7;
+	Fri,  1 Aug 2025 02:12:32 +0800 (CST)
+Received: from frapeml500005.china.huawei.com (unknown [7.182.85.13])
+	by mail.maildlp.com (Postfix) with ESMTPS id CB0D51404C6;
+	Fri,  1 Aug 2025 02:16:48 +0800 (CST)
+Received: from china (10.220.118.114) by frapeml500005.china.huawei.com
+ (7.182.85.13) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Thu, 31 Jul
+ 2025 20:16:34 +0200
+From: Gur Stavi <gur.stavi@huawei.com>
+To: <horms@kernel.org>
+CC: <andrew+netdev@lunn.ch>, <christophe.jaillet@wanadoo.fr>,
+	<corbet@lwn.net>, <davem@davemloft.net>, <edumazet@google.com>,
+	<fuguiming@h-partners.com>, <gongfan1@huawei.com>, <guoxin09@huawei.com>,
+	<gur.stavi@huawei.com>, <helgaas@kernel.org>, <jdamato@fastly.com>,
+	<kuba@kernel.org>, <lee@trager.us>, <linux-doc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <luosifu@huawei.com>,
+	<meny.yossefi@huawei.com>, <mpe@ellerman.id.au>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <przemyslaw.kitszel@intel.com>,
+	<shenchenyang1@hisilicon.com>, <shijing34@huawei.com>, <sumang@marvell.com>,
+	<vadim.fedorenko@linux.dev>, <wulike1@huawei.com>, <zhoushuai28@huawei.com>,
+	<zhuyikai1@h-partners.com>
+Subject: Re: [PATCH net-next v10 1/8] hinic3: Async Event Queue interfaces
+Date: Thu, 31 Jul 2025 21:34:20 +0300
+Message-ID: <20250731183420.1138336-1-gur.stavi@huawei.com>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20250731140404.GD8494@horms.kernel.org>
+References: <20250731140404.GD8494@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250730185903.3574598-1-ameryhung@gmail.com> <20250730185903.3574598-5-ameryhung@gmail.com>
-In-Reply-To: <20250730185903.3574598-5-ameryhung@gmail.com>
-From: Emil Tsalapatis <linux-lists@etsalapatis.com>
-Date: Thu, 31 Jul 2025 14:27:41 -0400
-X-Gm-Features: Ac12FXzXnFl7ODSKMd0hZhDMevfFixQMXjNimv-fJJm5Jw0hr3MvluHBtDoDM3Q
-Message-ID: <CABFh=a4LqeMTfcT2+K_aHBUEfL=rHLrhn3hnDoror_pZVBhhDQ@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v7 4/4] selftests/bpf: Test concurrent task local
- data key creation
-To: Amery Hung <ameryhung@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
-	andrii@kernel.org, daniel@iogearbox.net, tj@kernel.org, memxor@gmail.com, 
-	martin.lau@kernel.org, kernel-team@meta.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ frapeml500005.china.huawei.com (7.182.85.13)
 
-On Wed, Jul 30, 2025 at 2:59=E2=80=AFPM Amery Hung <ameryhung@gmail.com> wr=
-ote:
+> On Thu, Jul 31, 2025 at 03:58:39PM +0300, Gur Stavi wrote:
+> >
+> > Lets define a "coherent struct" as a structure made of fields that makes sense
+> > to human beings. Every field endianity is defined and fields are arranged in
+> > order that "makes sense". Fields can be of any integer size 8,16,32,64 and not
+> > necessarily naturally aligned.
+> >
+> > swab32_array transforms a coherent struct into "byte jumble". Small fields are
+> > reordered and larger (misaligned) fields may be split into 2 (or even 3) parts.
+> > swab32_array is reversible so a 2nd call with byte jumble as input will produce
+> > the original coherent struct.
+> >
+> > hinic3 dma has "swab32_array" built in.
+> > On send-to-device it expects a byte jubmle so the DMA engine will transform it
+> > into a coherent struct.
+> > On receive-from-device it provides a byte jumble so the driver needs
+> > to call swab32_array to transform it into a coherent struct.
+> >
+> > The hinic3_cmdq_buf_swab32 function will work correctly, producing byte jumble,
+> > on little endian and big endian hosts.
+> >
+> > The code that runs prior to hinic3_cmdq_buf_swab32 that initializes a coherent
+> > struct is endianity sensitive. It needs to initialize fields based on their
+> > coherent endianity with or without byte swap. Practically use cpu_to_le or
+> > cpu_to_be based on the coherent definition.
+> >
+> > Specifically, cmdq "coherent structs" in hinic3 use little endian and since
+> > Kconfig currently declares that big endian hosts are not supported then
+> > coherent structs are initialized without explicit cpu_to_le macros.
+> >
+> > And this is what the comment says:
+> >
+> > /* Data provided to/by cmdq is arranged in structs with little endian fields but
+> >  * every dword (32bits) should be swapped since HW swaps it again when it
+> >  * copies it from/to host memory.
+> >  */
+> >
 >
-> Test thread-safety of tld_create_key(). Since tld_create_key() does
-> not rely on locks but memory barriers and atomic operations to protect
-> the shared metadata, the thread-safety of the function is non-trivial.
-> Make sure concurrent tld_key_create(), both valid and invalid, can not
-> race and corrupt metatada, which may leads to TLDs not being thread-
-> specific or duplicate TLDs with the same name.
+> Thanks, I think I am closer to understanding things now.
 >
-> Signed-off-by: Amery Hung <ameryhung@gmail.com>
-Reviewed-by: Emil Tsalapatis <emil@etsalapatis.com>
+> Let me try and express things in my own words:
+>
+> 1. On the hardware side, things are stored in a way that may be represented
+>    as structures with little-endian values. The members of the structures may
+>    have different sizes: 8-bit, 16-bit, 32-bit, ...
+>
+> 2. The hardware runs the equivalent of swab32_array() over this data
+>    when writing it to (or reading it from) the host. So we get a
+>    "byte jumble".
+>
+> 3. In this patch, the hinic3_cmdq_buf_swab32 reverses this jumbling
+>    by running he equivalent of swab32_array() over this data again.
+>
+>    As 3 exactly reverses 2, what is left are structures exactly as in 1.
+>
 
+Yes. Your understanding matches mine.
 
-> ---
->  .../bpf/prog_tests/test_task_local_data.c     | 105 ++++++++++++++++++
->  1 file changed, 105 insertions(+)
+> If so, I agree this makes sense and I am sorry for missing this before.
 >
-> diff --git a/tools/testing/selftests/bpf/prog_tests/test_task_local_data.=
-c b/tools/testing/selftests/bpf/prog_tests/test_task_local_data.c
-> index 2e77d3fa2534..3b5cd2cd89c7 100644
-> --- a/tools/testing/selftests/bpf/prog_tests/test_task_local_data.c
-> +++ b/tools/testing/selftests/bpf/prog_tests/test_task_local_data.c
-> @@ -185,8 +185,113 @@ static void test_task_local_data_basic(void)
->         test_task_local_data__destroy(skel);
->  }
+> And if so, is the intention for the cmdq "coherent structs" in the driver
+> to look something like this.
 >
-> +#define TEST_RACE_THREAD_NUM (TLD_MAX_DATA_CNT - 3)
-> +
-> +void *test_task_local_data_race_thread(void *arg)
-> +{
-> +       int err =3D 0, id =3D (intptr_t)arg;
-> +       char key_name[32];
-> +       tld_key_t key;
-> +
-> +       key =3D tld_create_key("value_not_exist", TLD_PAGE_SIZE + 1);
-> +       if (tld_key_err_or_zero(key) !=3D -E2BIG) {
-> +               err =3D 1;
-> +               goto out;
-> +       }
-> +
-> +       /* Only one thread will succeed in creating value1 */
-> +       key =3D tld_create_key("value1", sizeof(int));
-> +       if (!tld_key_is_err(key))
-> +               tld_keys[1] =3D key;
-> +
-> +       /* Only one thread will succeed in creating value2 */
-> +       key =3D tld_create_key("value2", sizeof(struct test_tld_struct));
-> +       if (!tld_key_is_err(key))
-> +               tld_keys[2] =3D key;
-> +
-> +       snprintf(key_name, 32, "thread_%d", id);
-> +       tld_keys[id] =3D tld_create_key(key_name, sizeof(int));
-> +       if (tld_key_is_err(tld_keys[id]))
-> +               err =3D 2;
-> +out:
-> +       return (void *)(intptr_t)err;
-> +}
-> +
-> +static void test_task_local_data_race(void)
-> +{
-> +       LIBBPF_OPTS(bpf_test_run_opts, opts);
-> +       pthread_t thread[TEST_RACE_THREAD_NUM];
-> +       struct test_task_local_data *skel;
-> +       int fd, i, j, err, *data;
-> +       void *ret =3D NULL;
-> +
-> +       skel =3D test_task_local_data__open_and_load();
-> +       if (!ASSERT_OK_PTR(skel, "skel_open_and_load"))
-> +               return;
-> +
-> +       tld_keys =3D calloc(TLD_MAX_DATA_CNT, sizeof(tld_key_t));
-> +       if (!ASSERT_OK_PTR(tld_keys, "calloc tld_keys"))
-> +               goto out;
-> +
-> +       fd =3D bpf_map__fd(skel->maps.tld_data_map);
-> +
-> +       ASSERT_FALSE(tld_key_is_err(value0_key), "TLD_DEFINE_KEY");
-> +       tld_keys[0] =3D value0_key;
-> +
-> +       for (j =3D 0; j < 100; j++) {
-> +               reset_tld();
-> +
-> +               for (i =3D 0; i < TEST_RACE_THREAD_NUM; i++) {
-> +                       /*
-> +                        * Try to make tld_create_key() race with each ot=
-her. Call
-> +                        * tld_create_key(), both valid and invalid, from=
- different threads.
-> +                        */
-> +                       err =3D pthread_create(&thread[i], NULL, test_tas=
-k_local_data_race_thread,
-> +                                            (void *)(intptr_t)(i + 3));
-> +                       if (CHECK_FAIL(err))
-> +                               break;
-> +               }
-> +
-> +               /* Wait for all tld_create_key() to return */
-> +               for (i =3D 0; i < TEST_RACE_THREAD_NUM; i++) {
-> +                       pthread_join(thread[i], &ret);
-> +                       if (CHECK_FAIL(ret))
-> +                               break;
-> +               }
-> +
-> +               /* Write a unique number to each TLD */
-> +               for (i =3D 0; i < TLD_MAX_DATA_CNT; i++) {
-> +                       data =3D tld_get_data(fd, tld_keys[i]);
-> +                       if (CHECK_FAIL(!data))
-> +                               break;
-> +                       *data =3D i;
-> +               }
-> +
-> +               /* Read TLDs and check the value to see if any address co=
-llides with another */
-> +               for (i =3D 0; i < TLD_MAX_DATA_CNT; i++) {
-> +                       data =3D tld_get_data(fd, tld_keys[i]);
-> +                       if (CHECK_FAIL(*data !=3D i))
-> +                               break;
-> +               }
-> +
-> +               /* Run task_main to make sure no invalid TLDs are added *=
-/
-> +               err =3D bpf_prog_test_run_opts(bpf_program__fd(skel->prog=
-s.task_main), &opts);
-> +               ASSERT_OK(err, "run task_main");
-> +               ASSERT_OK(opts.retval, "task_main retval");
-> +       }
-> +out:
-> +       if (tld_keys) {
-> +               free(tld_keys);
-> +               tld_keys =3D NULL;
-> +       }
-> +       tld_free();
-> +       test_task_local_data__destroy(skel);
-> +}
-> +
->  void test_task_local_data(void)
->  {
->         if (test__start_subtest("task_local_data_basic"))
->                 test_task_local_data_basic();
-> +       if (test__start_subtest("task_local_data_race"))
-> +               test_task_local_data_race();
->  }
-> --
-> 2.47.3
+>    struct {
+> 	u8 a;
+> 	u8 b;
+> 	__le16 c;
+> 	__le32 d;
+>    };
 >
+> If so, this seems sensible to me.
+>
+> But I think it would be best so include some code in this patchset
+> that makes use of such structures - sorry if it is there, I couldn't find
+> it just now.
+>
+> And, although there is no intention for the driver to run on big endian
+> systems, the __le* fields should be accessed using cpu_to_le*/le*_to_cpu
+> helpers.
+
+There was a long and somewhat heated debate about this issue.
+https://lore.kernel.org/netdev/20241230192326.384fd21d@kernel.org/
+I agree that having __le in the code is better coding practice.
+But flooding the code with cpu_to_le and le_to_cpu does hurt readability.
+And there are precedences of drivers that avoid it.
+
+However, our dev team (I am mostly an advisor) decided to give it a try anyway.
+I hope they manage to survive it.
 
