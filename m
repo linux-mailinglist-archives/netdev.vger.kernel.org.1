@@ -1,180 +1,163 @@
-Return-Path: <netdev+bounces-211186-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211187-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D2BEB1714D
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 14:33:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B88AB1715E
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 14:37:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 94B1C7B28BE
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 12:31:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 900A7628390
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 12:37:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 935DE78F5E;
-	Thu, 31 Jul 2025 12:33:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48C43238C2B;
+	Thu, 31 Jul 2025 12:37:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JTflUkqh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JXoftS7d"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f65.google.com (mail-pj1-f65.google.com [209.85.216.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09E3535947;
-	Thu, 31 Jul 2025 12:33:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F39322A7EF;
+	Thu, 31 Jul 2025 12:37:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753965198; cv=none; b=M1OIBH0pi/NdnSfRYQeiEkKgl1MvNE7hEZSKr07BVj6zzwv/OWmjN9peoPVBFMs2swroDElh8mEauQRSu+3THHc1r0U+my3nSVhbI7uNjBJmFISASHnWir4W3A5+Jd/DJktb1T72wYj6jwjXwOS9tb8hhYt6LmoUlZUToyLalJk=
+	t=1753965460; cv=none; b=gjINg2WgXxzMYK6t7Z4Ty+5mIoDrz2sC5JiGVqwct+cpNvYSaL9fDyYS0LE4FuwfqcJXOeNZ2gndr0qtPR1L5QQ3BJQUTDRNmoWh1op7xslY6TIboZ4e8bhPxGYwW/3J92aNiUiRHJFabTvbT3cg4GdDfEZeSOzQwai792dBzqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753965198; c=relaxed/simple;
-	bh=pKQpv4mBRCSizQ3IOrUUmufLAwilKGjREvGRMA/U4Dg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FKVWVZyavBgNw2AHRigObdZswyP1SWzmSqdNno7iNR/9DWaXpRJR2gVeeH3bjBGGeavKISxL+XZEiHFzBK5g8cJR+IPo8WlrmCx9cdaQHpNo4S90JuNjhpTmBdww5X2yUyOXoCn7gUnDzIDO5hN9ICC2vAb414iAEiqo9UzmaGk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JTflUkqh; arc=none smtp.client-ip=209.85.216.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f65.google.com with SMTP id 98e67ed59e1d1-31f28d0495fso919495a91.1;
-        Thu, 31 Jul 2025 05:33:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753965196; x=1754569996; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ClUK06yBBk38woAmuvMsPWyYWzBche2E5s4S41KC+GM=;
-        b=JTflUkqhIvWqsCURa5q8+j9KIJoQACuZXSDM8oR+Ccx06udBZbRIybTQYM5OwG/gU1
-         ZukyDAYo+8G/orRhRyH4lZzUrOn/YWy1oOAq8txc1oE81ruvpyubCVGd+/kMrX6wCxHx
-         01huuDH/jYBvdIkodqon/ZizQEtl5b8uGbJ9TuX+8dZLzWUGRVh9tYuoMxViF4EAIPJM
-         zCQu3ih2M6vWqKPtB0GrMeBzdFtLgq+ucvY41smGLTEyJUInVA6piKQEkvED5tQGVQTA
-         Ia3BRQu3XPicjFePIUAs/oDpBYywJC2I/GgBWl4cd8QV3GQJxm/do7CAvdQL1jS4kF2r
-         8cdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753965196; x=1754569996;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ClUK06yBBk38woAmuvMsPWyYWzBche2E5s4S41KC+GM=;
-        b=GM0aSsFZBbHJhxl9dgIk4VwgZ11dF6/0T+wtlrfVECxTaOzMrqAqZ6r8gfOQv8Z7im
-         dBfFMViEwGvVh2JFdh2jQylhQq10ksM99qGDv4nYeeRkHZPJjer4kU2lEnKgQ/PDlEaP
-         UOj0LkBnGwkgzozo+Z+jHKgbwro4c5fhhadfD0lpKsv/k1tVuVsT55aMJpV31q3faJFl
-         tO4CWswx8EvsMhg1HU/9TdGwbhdGFiSbs3RN+yyG79+WaRVMdXegOhHxMTlOOL8r9JkK
-         UJq4Ulc9C0wWS4uHC0vvL0xRWJBbc9fp/rWGg4ywxhDCscSvRuTTUA/3O6O/JjMbgxp7
-         5TKg==
-X-Forwarded-Encrypted: i=1; AJvYcCV1BIjG6IFYddcpJlkxg9uM37WqX17UDmyiSFFcU6PXCdqpg464ooo/ZfvTP7Xp0NBILbfj4lDq9VHGnG8=@vger.kernel.org, AJvYcCWEVwNQj/vVPNs1rNHww4a52D7d62Nq79vRfLB6QiBPEbzPnpzns1w8z0ESX3P6NqR2UjdsVPoG@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx71DCL+LAVMRmG7mtFHEubr4RI0+hpIfTwXDCi3O8JMNC/242q
-	RSSqs7s9qnju/XT8wDM4/C0s1bVpfzg0Eb/5di1WJvGEhYA9h4gWHOb7
-X-Gm-Gg: ASbGncupkVPQ2EUiNk1wm6mlyb4J3rBfKkklU5RXcZl06KPB9SUj9S1p4P24r+YkIs5
-	qOcVM/e0v7RLviCxdAqWNVv45OiT718luoTbpIP9nL0aaTryWmnpgOOVU0CFtm52dTRNW6O6e7V
-	FhOIi4I9loj3mu4U4wQpcZaai2KgBajK1dPzv4HiyvMjXctUZGEA+TwDhm9sKO6FlkFZmrVbW2J
-	+vfS+OMLeUHqhWnpC/SxHca3YyRFtzrUg8BqWy70z0vg7PjQ3LJ7HdViZooOH5dhdNsr20EscZX
-	RQL85n6l//DtpOTQ5SAAk6paNUjPVsVPNlEaRLV1BnalS7aA0lEjJ95e5v1DkocaXc4mhZISg/E
-	teELLh1/WReE9W/8NcHU=
-X-Google-Smtp-Source: AGHT+IHlm0wyDhGLshRzUedVczQxXaCz+Wx5N5RSFeJMgsRMIpnGGs9S2XWpHCWEAHLMzXMl3EBSgw==
-X-Received: by 2002:a17:90b:1fcf:b0:308:7270:d6ea with SMTP id 98e67ed59e1d1-31f5de7b78cmr9604120a91.30.1753965196211;
-        Thu, 31 Jul 2025 05:33:16 -0700 (PDT)
-Received: from 7940hx ([43.129.244.20])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31f63f0cc41sm4589633a91.32.2025.07.31.05.33.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 31 Jul 2025 05:33:15 -0700 (PDT)
-From: Menglong Dong <menglong8.dong@gmail.com>
-X-Google-Original-From: Menglong Dong <dongml2@chinatelecom.cn>
-To: edumazet@google.com
-Cc: ncardwell@google.com,
-	kuniyu@google.com,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] net: ip: lookup the best matched listen socket
-Date: Thu, 31 Jul 2025 20:33:09 +0800
-Message-ID: <20250731123309.184496-1-dongml2@chinatelecom.cn>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1753965460; c=relaxed/simple;
+	bh=F4N7j7/R3qLxjx+q87bCvU+pu2qGV4lJnYfHs/FMkUE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cuGmyncbkkYcxJpKD1JnaXPDlGf7q0dxROZaT4XBFWGVu98VeIP+qX1yXSmqQM2K5quQSEifDT6sl20pe5BrNfTN0TmfPt9fy6vgaitfqJCguDLkQzTHF3Kg/F1v7LgSI5Jn49/01OQfUkpMsZxkv5FZzDStZ9jGQr6W6wx+tPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JXoftS7d; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F192C4CEEF;
+	Thu, 31 Jul 2025 12:37:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753965459;
+	bh=F4N7j7/R3qLxjx+q87bCvU+pu2qGV4lJnYfHs/FMkUE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JXoftS7d09eZDDde0RkubC0VZ4i2xxqIuOF6q5qj6gKuaj4qQULek3H0nC+TRCw7h
+	 mpmzhVdFQbqqNryB8UMw19P4ZXimeqkuL/x+WWKXSsDQYnaNAFA0xcG+SxQ9SQeDL6
+	 jt9KNxFBXbNn0zJE94zFraiz2qqztJSCsY8XVMHsBqGn+VPrEZXLcW/zCWM2DEwHeD
+	 w/sT+a2v54oKoLYPDDOEsQ4qOhudihIDk/hFVjum3UrRfL/YmbskI7NoPxzgFvHfNN
+	 sSJ4GV1poAd4kYFa7O/NMpLlHkXxr9yrQ73sNlAvnIpi30ge4kQOJrj5ne6yWmG+nj
+	 WuDhERQm2e0JA==
+Date: Thu, 31 Jul 2025 13:37:34 +0100
+From: Simon Horman <horms@kernel.org>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org,
+	Michal Kubiak <michal.kubiak@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	nxne.cnse.osdt.itp.upstreaming@intel.com, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Kees Cook <kees@kernel.org>, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH iwl-next v3 16/18] idpf: add support for XDP on Rx
+Message-ID: <20250731123734.GA8494@horms.kernel.org>
+References: <20250730160717.28976-1-aleksander.lobakin@intel.com>
+ <20250730160717.28976-17-aleksander.lobakin@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250730160717.28976-17-aleksander.lobakin@intel.com>
 
-For now, the socket lookup will terminate if the socket is reuse port in
-inet_lhash2_lookup(), which makes the socket is not the best match.
++ Kees, linux-hardening
 
-For example, we have socket1 and socket2 both listen on "0.0.0.0:1234",
-but socket1 bind on "eth0". We create socket1 first, and then socket2.
-Then, all connections will goto socket2, which is not expected, as socket1
-has higher priority.
+On Wed, Jul 30, 2025 at 06:07:15PM +0200, Alexander Lobakin wrote:
+> Use libeth XDP infra to support running XDP program on Rx polling.
+> This includes all of the possible verdicts/actions.
+> XDP Tx queues are cleaned only in "lazy" mode when there are less than
+> 1/4 free descriptors left on the ring. libeth helper macros to define
+> driver-specific XDP functions make sure the compiler could uninline
+> them when needed.
+> Use __LIBETH_WORD_ACCESS to parse descriptors more efficiently when
+> applicable. It really gives some good boosts and code size reduction
+> on x86_64.
+> 
+> Co-developed-by: Michal Kubiak <michal.kubiak@intel.com>
+> Signed-off-by: Michal Kubiak <michal.kubiak@intel.com>
+> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 
-This can cause unexpected behavior if TCP MD5 keys is used, as described
-in Documentation/networking/vrf.rst -> Applications.
+Hi Alexander, all,
 
-Therefor, we lookup the best matched socket first, and then do the reuse
-port logic. This can increase some overhead if there are many reuse port
-socket :/
+Sorry for providing review of __LIBETH_WORD_ACCESS[1] after the fact.
+I had missed it earlier.
 
-Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
----
- net/ipv4/inet_hashtables.c  | 13 +++++++------
- net/ipv6/inet6_hashtables.c | 13 +++++++------
- 2 files changed, 14 insertions(+), 12 deletions(-)
+While I appreciate the desire for improved performance and nicer code
+generation. I think the idea of writing 64 bits of data to the
+address of a 32 bit member of a structure goes against the direction
+of hardening work by Kees and others.
 
-diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
-index ceeeec9b7290..51751337f394 100644
---- a/net/ipv4/inet_hashtables.c
-+++ b/net/ipv4/inet_hashtables.c
-@@ -389,17 +389,18 @@ static struct sock *inet_lhash2_lookup(const struct net *net,
- 	sk_nulls_for_each_rcu(sk, node, &ilb2->nulls_head) {
- 		score = compute_score(sk, net, hnum, daddr, dif, sdif);
- 		if (score > hiscore) {
--			result = inet_lookup_reuseport(net, sk, skb, doff,
--						       saddr, sport, daddr, hnum, inet_ehashfn);
--			if (result)
--				return result;
+Indeed, it seems to me this is the kind of thing that struct_group()
+aims to avoid.
+
+In this case struct group() doesn't seem like the best option,
+because it would provide a 64-bit buffer that we can memcpy into.
+But it seems altogether better to simply assign u64 value to a u64 member.
+
+So I'm wondering if an approach along the following lines is appropriate
+(Very lightly compile tested only!).
+
+And yes, there is room for improvement of the wording of the comment
+I included below.
+
+diff --git a/include/net/libeth/xdp.h b/include/net/libeth/xdp.h
+index f4880b50e804..a7d3d8e44aa6 100644
+--- a/include/net/libeth/xdp.h
++++ b/include/net/libeth/xdp.h
+@@ -1283,11 +1283,7 @@ static inline void libeth_xdp_prepare_buff(struct libeth_xdp_buff *xdp,
+ 	const struct page *page = __netmem_to_page(fqe->netmem);
+ 
+ #ifdef __LIBETH_WORD_ACCESS
+-	static_assert(offsetofend(typeof(xdp->base), flags) -
+-		      offsetof(typeof(xdp->base), frame_sz) ==
+-		      sizeof(u64));
 -
- 			result = sk;
- 			hiscore = score;
- 		}
- 	}
+-	*(u64 *)&xdp->base.frame_sz = fqe->truesize;
++	xdp->base.frame_sz_le_qword = fqe->truesize;
+ #else
+ 	xdp_init_buff(&xdp->base, fqe->truesize, xdp->base.rxq);
+ #endif
+diff --git a/include/net/xdp.h b/include/net/xdp.h
+index b40f1f96cb11..b5eedeb82c9b 100644
+--- a/include/net/xdp.h
++++ b/include/net/xdp.h
+@@ -85,8 +85,19 @@ struct xdp_buff {
+ 	void *data_hard_start;
+ 	struct xdp_rxq_info *rxq;
+ 	struct xdp_txq_info *txq;
+-	u32 frame_sz; /* frame size to deduce data_hard_end/reserved tailroom*/
+-	u32 flags; /* supported values defined in xdp_buff_flags */
++	union {
++		/* Allow setting frame_sz and flags as a single u64 on
++		 * little endian systems. This may may give optimal
++		 * performance. */
++		u64 frame_sz_le_qword;
++		struct {
++			/* Frame size to deduce data_hard_end/reserved
++			 * tailroom. */
++			u32 frame_sz;
++			/* Supported values defined in xdp_buff_flags. */
++			u32 flags;
++		};
++	};
+ };
  
--	return result;
-+	if (!result)
-+		return NULL;
-+
-+	sk = inet_lookup_reuseport(net, result, skb, doff,
-+				   saddr, sport, daddr, hnum, inet_ehashfn);
-+
-+	return sk ? sk : result;
- }
- 
- struct sock *inet_lookup_run_sk_lookup(const struct net *net,
-diff --git a/net/ipv6/inet6_hashtables.c b/net/ipv6/inet6_hashtables.c
-index 76ee521189eb..2554f26d6c20 100644
---- a/net/ipv6/inet6_hashtables.c
-+++ b/net/ipv6/inet6_hashtables.c
-@@ -161,17 +161,18 @@ static struct sock *inet6_lhash2_lookup(const struct net *net,
- 	sk_nulls_for_each_rcu(sk, node, &ilb2->nulls_head) {
- 		score = compute_score(sk, net, hnum, daddr, dif, sdif);
- 		if (score > hiscore) {
--			result = inet6_lookup_reuseport(net, sk, skb, doff,
--							saddr, sport, daddr, hnum, inet6_ehashfn);
--			if (result)
--				return result;
--
- 			result = sk;
- 			hiscore = score;
- 		}
- 	}
- 
--	return result;
-+	if (!result)
-+		return NULL;
-+
-+	sk = inet6_lookup_reuseport(net, result, skb, doff,
-+				    saddr, sport, daddr, hnum, inet6_ehashfn);
-+
-+	return sk ? sk : result;
- }
- 
- struct sock *inet6_lookup_run_sk_lookup(const struct net *net,
--- 
-2.50.1
+ static __always_inline bool xdp_buff_has_frags(const struct xdp_buff *xdp)
 
+[1] https://git.kernel.org/torvalds/c/80bae9df2108
+
+
+...
 
