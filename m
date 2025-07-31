@@ -1,166 +1,178 @@
-Return-Path: <netdev+bounces-211191-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211189-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABC46B1719F
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 14:58:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF229B17167
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 14:41:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F385F189558D
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 12:58:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0E014E3E3B
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 12:40:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 532ED2BEC2C;
-	Thu, 31 Jul 2025 12:58:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="BBBp0uEZ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3092823A563;
+	Thu, 31 Jul 2025 12:41:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DADBA1E50E;
-	Thu, 31 Jul 2025 12:58:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E00591C84C5;
+	Thu, 31 Jul 2025 12:41:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753966685; cv=none; b=RUMnzDYQPmReJEmOrvYgTfJqxYstLHgGblPa3d4KNp2a+MdMTeCdC1km99I3EezFpRZ+SE50a9s2W6Q9NqdnvnAXGI2LLyyHfp8rQpEiwJSOjcBQmDF73QSaBJi8OlQnH8zy2QkineFnweiDcu1vRqzrtKsQWZ7Z6bk5/wxZiFI=
+	t=1753965676; cv=none; b=EkoX1SpLDJSNPgFuMg6wL4UqPEk8NOdh8XP66YF2fchpNPipkzM7ZmJJlHrBml6AXXBur3kXWm7TuzGNKtDROnfp30fIfhuafreR0vv+jlryC5zcBC7f6Rjk87Oc8XPGCxRj6ITOE4AiqXrIpRWiWQYgwkcT8yUhjQpYxKMiGvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753966685; c=relaxed/simple;
-	bh=YgUwV9lVNl5Xl2yH5INhVfEOnOERNB8Ksx9M00CeVVg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DgTWXdfsWEmDphIM1lCujCPX19jEsFx7fa3yNqo8kN6yaSc2IP6n1vE/rOLKkfOL6gq17i2vzTQzywmuKJT6k/fF37djNujG8itksVPeUYbKcqO6rPMxkK8zIrm4EJhxAjbwjnX2LSev/BgTPEYcajZ9qg6P0gwoNFjpgNc/IkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=BBBp0uEZ; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56VAF9Op022019;
-	Thu, 31 Jul 2025 12:57:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=UCXl25
-	FD/I2+BNSmumkbpeDj3JKwHMBYCbds7n0xUNA=; b=BBBp0uEZH+T57E4laoXvSX
-	04Ph1chgIjmSJmN0lgcSoNtkwu7rw6gNAj+rJg7QqFvqb0+d+Pb+O8yAzl9tdlRE
-	EVryobho2alUl8TA6w4xcLXYDXpkrnkamsdVQZeCLMDJ29quFxre1MbwukrbNO0A
-	nljZQQ+asgRs9X/wcEOHQQRxTC8poy+XUNDp1tF9gIhDd/k4A6u27r0n6qbr3VQV
-	Rnk8TmPcqb2ppyFyGTkIanIfTQirXDCuPFGw7rzCNWOfeDXuqbstmp0ARI+PuOab
-	xHnehEoYECE+mmY/WCD129U4AmKQ4XLSLZew7Cro8Y3vJfaBwPu6B/2nCAWhd12A
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 484qen2nd7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 31 Jul 2025 12:57:38 +0000 (GMT)
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 56VCidAK022814;
-	Thu, 31 Jul 2025 12:57:37 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 484qen2nd1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 31 Jul 2025 12:57:37 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 56VB77wP017282;
-	Thu, 31 Jul 2025 12:57:36 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4859r0ckdg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 31 Jul 2025 12:57:36 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 56VCvWxH39059822
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 31 Jul 2025 12:57:32 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0AF4B2004E;
-	Thu, 31 Jul 2025 12:57:32 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A06312004B;
-	Thu, 31 Jul 2025 12:57:31 +0000 (GMT)
-Received: from [9.152.224.240] (unknown [9.152.224.240])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 31 Jul 2025 12:57:31 +0000 (GMT)
-Message-ID: <174ccf57-6e7c-4dab-8743-33989829de01@linux.ibm.com>
-Date: Thu, 31 Jul 2025 14:57:31 +0200
+	s=arc-20240116; t=1753965676; c=relaxed/simple;
+	bh=A8SPR7x7U/Pf/eDeqxWiI48HRFqavciMy1UGMfaZW60=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FUxh2P56hiAHu8OjD8p4sDfmJaKcb5qW1N0YlMkgcmSHY8GkQ4K58p88nvi6k1PxheUtw50bpKb+v19PGIsoEkKTHUSolDUJDM7sPaR7qI3h/ZkxPLPCHXFu+oTsXW+GPIO9p9KAKHk+L2VZbChzAWiSpaJhypkHpbsCobHQy+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4bt7v64Rk8z6D9Th;
+	Thu, 31 Jul 2025 20:39:30 +0800 (CST)
+Received: from frapeml500005.china.huawei.com (unknown [7.182.85.13])
+	by mail.maildlp.com (Postfix) with ESMTPS id 1A8A91402F4;
+	Thu, 31 Jul 2025 20:41:08 +0800 (CST)
+Received: from china (10.220.118.114) by frapeml500005.china.huawei.com
+ (7.182.85.13) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Thu, 31 Jul
+ 2025 14:40:53 +0200
+From: Gur Stavi <gur.stavi@huawei.com>
+To: <horms@kernel.org>
+CC: <andrew+netdev@lunn.ch>, <christophe.jaillet@wanadoo.fr>,
+	<corbet@lwn.net>, <davem@davemloft.net>, <edumazet@google.com>,
+	<fuguiming@h-partners.com>, <gongfan1@huawei.com>, <guoxin09@huawei.com>,
+	<gur.stavi@huawei.com>, <helgaas@kernel.org>, <jdamato@fastly.com>,
+	<kuba@kernel.org>, <lee@trager.us>, <linux-doc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <luosifu@huawei.com>,
+	<meny.yossefi@huawei.com>, <mpe@ellerman.id.au>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <przemyslaw.kitszel@intel.com>,
+	<shenchenyang1@hisilicon.com>, <shijing34@huawei.com>, <sumang@marvell.com>,
+	<vadim.fedorenko@linux.dev>, <wulike1@huawei.com>, <zhoushuai28@huawei.com>,
+	<zhuyikai1@h-partners.com>
+Subject: Re: [PATCH net-next v10 1/8] hinic3: Async Event Queue interfaces
+Date: Thu, 31 Jul 2025 15:58:39 +0300
+Message-ID: <20250731125839.1137083-1-gur.stavi@huawei.com>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20250725152709.GE1367887@horms.kernel.org>
+References: <20250725152709.GE1367887@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next 2/5] net/smc: fix UAF on smcsk after
- smc_listen_out()
-To: "D. Wythe" <alibuda@linux.alibaba.com>, ast@kernel.org,
-        daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
-        pabeni@redhat.com, song@kernel.org, sdf@google.com, haoluo@google.com,
-        yhs@fb.com, edumazet@google.com, john.fastabend@gmail.com,
-        kpsingh@kernel.org, jolsa@kernel.org, Mahanta.Jambigi@ibm.com,
-        Sidraya.Jayagond@ibm.com, wenjia@linux.ibm.com,
-        dust.li@linux.alibaba.com, tonylu@linux.alibaba.com,
-        guwen@linux.alibaba.com
-Cc: bpf@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-        netdev@vger.kernel.org, jaka@linux.ibm.com
-References: <20250731084240.86550-1-alibuda@linux.alibaba.com>
- <20250731084240.86550-3-alibuda@linux.alibaba.com>
-Content-Language: en-US
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <20250731084240.86550-3-alibuda@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: F75alYSHPZTqgITt2SlGb4waf8QA0Gue
-X-Proofpoint-GUID: YeaxaTg2E5e2N8EZBI3qOIABUypp26g8
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzMxMDA4OCBTYWx0ZWRfX0YxsFdxAH2dj
- BokIFAXp7iJmaYzhJnZgZgiSVkmcX7Qi6yLB1aFW5EzEwN2HxDH/r4413HjjaHecztVTQieowZE
- avPG4vOAkQwCK1BTEKg9WqLoC/H7lYUeu5ImZOmqX8dOz+xZSeqLAFHn6bgXlbLuD7a60+bqeWd
- 1MyC+PSnGAU8Aj2ovuc8aneAz/5MvDwTk2wjHekgnYhkLT7oL/tL2aAFnX8RwO1PTQb76IMWFsr
- nGzCGzlWrwTOxxhoa7Oc1uDyh2SGSdWhPCoL6a+DRDWKtFoAhGV+myUo+tAdoaBIMODpGaP7w4F
- esIG92aP5NRBi1JX28S++5m0fem+05NSh9H3boA0MtTsktfPLoplZdQKnjxnpXadaNMGSpBexTv
- LplIx3x1cjN75Pgm98LEBnrI065pKpO8jVP9VUWkW+fEO/esGoUgUhJtdy0Ol8xf+ndXQcs3
-X-Authority-Analysis: v=2.4 cv=BJOzrEQG c=1 sm=1 tr=0 ts=688b6842 cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=SRrdq9N9AAAA:8 a=VnNF1IyMAAAA:8
- a=YcmFwEUQcJPJyYZLJ3YA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-07-31_02,2025-07-31_02,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 phishscore=0 suspectscore=0 spamscore=0 lowpriorityscore=0
- mlxlogscore=999 priorityscore=1501 malwarescore=0 mlxscore=0 bulkscore=0
- adultscore=0 clxscore=1015 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2507310088
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
+ frapeml500005.china.huawei.com (7.182.85.13)
 
+> On Thu, Jul 24, 2025 at 09:45:51PM +0800, Fan Gong wrote:
+> > > > +
+> > > > +/* Data provided to/by cmdq is arranged in structs with little endian fields but
+> > > > + * every dword (32bits) should be swapped since HW swaps it again when it
+> > > > + * copies it from/to host memory.
+> > > > + */
+> > >
+> > > This scheme may work on little endian hosts.
+> > > But if so it seems unlikely to work on big endian hosts.
+> > >
+> > > I expect you want be32_to_cpu_array() for data coming from hw,
+> > > with a source buffer as an array of __be32 while
+> > > the destination buffer is an array of u32.
+> > >
+> > > And cpu_to_be32_array() for data going to the hw,
+> > > with the types of the source and destination buffers reversed.
+> > >
+> > > If those types don't match your data, then we have
+> > > a framework to have that discussion.
+> > >
+> > >
+> > > That said, it is more usual for drivers to keep structures in the byte
+> > > order they are received. Stored in structures with members with types, in
+> > > this case it seems that would be __be32, and accessed using a combination
+> > > of BIT/GENMASK, FIELD_PREP/FIELD_GET, and cpu_to_be*/be*_to_cpu (in this
+> > > case cpu_to_be32/be32_to_cpu).
+> > >
+> > > An advantage of this approach is that the byte order of
+> > > data is only changed when needed. Another is that it is clear
+> > > what the byte order of data is.
+> >
+> > There is a simplified example:
+> >
+> > Here is a 64 bit little endian that may appear in cmdq:
+> > __le64 x
+> > After the swap it will become:
+> > __be32 x_lo
+> > __be32 x_hi
+> > This is NOT __be64.
+> > __be64 looks like this:
+> > __be32 x_hi
+> > __be32 x_lo
+>
+> Sure, byte swapping 64 bit entities is different to byte swapping two
+> consecutive 32 bit entities. I completely agree.
+>
+> >
+> > So the swapped data by HW is neither BE or LE. In this case, we should use
+> > swab32 to obtain the correct LE data because our driver currently supports LE.
+> > This is for compensating for bad HW decisions.
+>
+> Let us assume that the host is reading data provided by HW.
+>
+> If the swab32 approach works on a little endian host
+> to allow the host to access 32-bit values in host byte order.
+> Then this is because it outputs a 32-bit little endian values
 
+Values can be any size. 32 bit is arbitrary.
+.
+>
+> But, given the same input, it will not work on a big endian host.
+> This is because the same little endian output will be produced,
+> while the host byte order is big endian.
+>
+> I think you need something based on be32_to_cpu()/cpu_to_be32().
+> This will effectively be swab32 on little endian hosts (no change!).
+> And a no-op on big endian hosts (addressing my point above).
+>
+> More specifically, I think you should use be32_to_cpu_array() and
+> cpu_to_be32_array() instead of swab32_array().
+>
 
-On 31.07.25 10:42, D. Wythe wrote:
-> BPF CI testing report a UAF issue:
-> 
-[..]
-> 
-> Fixes: 3b2dec2603d5 ("net/smc: restructure client and server code in af_smc")
-> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
-> Reviewed-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-> ---
->  net/smc/af_smc.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-> index 1882bab8e00e..dc72ff353813 100644
-> --- a/net/smc/af_smc.c
-> +++ b/net/smc/af_smc.c
-> @@ -2568,8 +2568,9 @@ static void smc_listen_work(struct work_struct *work)
->  			goto out_decl;
->  	}
->  
-> -	smc_listen_out_connected(new_smc);
->  	SMC_STAT_SERV_SUCC_INC(sock_net(newclcsock->sk), ini);
-> +	/* smc_listen_out() will release smcsk */
-> +	smc_listen_out_connected(new_smc);
->  	goto out_free;
->  
->  out_unlock:
+Lets define a "coherent struct" as a structure made of fields that makes sense
+to human beings. Every field endianity is defined and fields are arranged in
+order that "makes sense". Fields can be of any integer size 8,16,32,64 and not
+necessarily naturally aligned.
 
+swab32_array transforms a coherent struct into "byte jumble". Small fields are
+reordered and larger (misaligned) fields may be split into 2 (or even 3) parts.
+swab32_array is reversible so a 2nd call with byte jumble as input will produce
+the original coherent struct.
 
-As this is a problem fix, you could send it directly to 'net'
-instead of including it to this series.
+hinic3 dma has "swab32_array" built in.
+On send-to-device it expects a byte jubmle so the DMA engine will transform it
+into a coherent struct.
+On receive-from-device it provides a byte jumble so the driver needs
+to call swab32_array to transform it into a coherent struct.
 
-Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
+The hinic3_cmdq_buf_swab32 function will work correctly, producing byte jumble,
+on little endian and big endian hosts.
 
+The code that runs prior to hinic3_cmdq_buf_swab32 that initializes a coherent
+struct is endianity sensitive. It needs to initialize fields based on their
+coherent endianity with or without byte swap. Practically use cpu_to_le or
+cpu_to_be based on the coherent definition.
+
+Specifically, cmdq "coherent structs" in hinic3 use little endian and since
+Kconfig currently declares that big endian hosts are not supported then
+coherent structs are initialized without explicit cpu_to_le macros.
+
+And this is what the comment says:
+
+/* Data provided to/by cmdq is arranged in structs with little endian fields but
+ * every dword (32bits) should be swapped since HW swaps it again when it
+ * copies it from/to host memory.
+ */
 
