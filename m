@@ -1,82 +1,83 @@
-Return-Path: <netdev+bounces-211162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211163-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACBBBB16F89
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 12:29:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA3A1B16F8E
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 12:29:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 365053B7A51
-	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 10:28:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD006188A4CD
+	for <lists+netdev@lfdr.de>; Thu, 31 Jul 2025 10:29:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07E6B2BEC2E;
-	Thu, 31 Jul 2025 10:28:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE11C2BEFE3;
+	Thu, 31 Jul 2025 10:28:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="PdMpaKXL"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="ItuEXzAE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 429C72BE056
-	for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 10:28:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0960F2BEC43
+	for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 10:28:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753957722; cv=none; b=Mafwlo1pBJFdoCPDP3H0U8COxqQ56rahnpyi6LPWfMzOPjOXQIEIKnJfTZEYQ273Dl44eOYoqSCainf7ZO6qJQCfDkYAj8Ac2KRmLAbwRKZ+osANOyieZkOO48NkZnIvgvSZMZS4hVvx9hk+8eycqePnxt15SGrc1fS+Prs5M08=
+	t=1753957725; cv=none; b=oCe0m50Ya5Xb85TAnoEycUa14a1/zJuYztAL7CCmAfdiYoqoX6ciLcl8v4CCYRkWtEWeogU0Y+Kr7Z8x2BIuwGcYR/K4QAmgDFNSKW/YiKfMmLJ/Vb88mTxQ56edw0sh5LrowBc06HW6x3mOJPexRm7RPAdJ+g/6HlOhQOL/A0o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753957722; c=relaxed/simple;
-	bh=rOgEaue3k1efCvteS9x+AYID405oKjOeQI0S/MAOO/4=;
+	s=arc-20240116; t=1753957725; c=relaxed/simple;
+	bh=Ies+heGyxXCUihSsdFFrXXScyXFQwEfc1FxVWkuz1Ho=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=V4YuBqKKATAtxP4RvXYBT3JrCg41vFskioerK7tK1sMH+Sqsos++SiJzoJo5lr9oPGe2mHNkFT6pNrxjrOhqev31thUW4zHr7v/V8d5SJgocyDoq9+xt6IL+yZ9O40EvGpYk+nvbrNZBiJNZFB2j3r+HtpgZTIO9YNfWyRoBGYU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=PdMpaKXL; arc=none smtp.client-ip=209.85.208.42
+	 In-Reply-To:To:Cc; b=J1LHb93cCmr+L/tSl6wXOaJ9nDnuTUxHGglst/v4Ga0uVgvn/dP8sRMaLC6qeJby7iOFE8yphdGrXuT+nW75q1sk11dNzeAdvAQkRsA6beneapohJgHzeJyHBnYB2dVXavxIkA/YnoxwOT0u+EXLYL0KvHOCB5TEcpOYW1JjqEA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=ItuEXzAE; arc=none smtp.client-ip=209.85.218.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-61576e33ce9so1309278a12.1
-        for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 03:28:40 -0700 (PDT)
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-af922ab4849so31396466b.3
+        for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 03:28:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1753957719; x=1754562519; darn=vger.kernel.org;
+        d=cloudflare.com; s=google09082023; t=1753957721; x=1754562521; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=r0fIqnzU78JFEGt4tPHYQLQeFtpWNKhdVMlxMCo22pY=;
-        b=PdMpaKXLxhIYDGDNM06Ib+aGxJ1Tkdf5xHKA3ne3cbdbZk2Pg3DTQxfTLejszuMsjZ
-         dhLNneE0bI64YhGllx8UtE3a2YZQ6mJS2QV9fRHgbuLyOMGSe7gykC7WpWbE0wp4gpOp
-         ZpitGwtA8o+fnLlskwD0VJcX/r5//6miXtW9Id2ZYlhKWEAUYTmZxGpUHIxfx4UTb/V9
-         5CT6tALFaKlzWvn90p5IA+omV2xvKbBkyl7/R6zLJNtLKTM8XTrE9bgftO+4vAmHkvtd
-         APiKPGPLoPyZVI6FvecHRhAhDl5alriQebAw/agjQkanDkRO/EkxruIvNTP1mmcyX6hm
-         gxCA==
+        bh=FZOVO8FzrCbiLT2nUKnJ8wTwY2dAM9GRGmZiNXnZe0Q=;
+        b=ItuEXzAEpzc7K5+tnjQmYTRz64dKwMl7dJByvuhj7qBKKt6AEPISyh06U2dkmBkD4D
+         bgeZdE5Nl8uTg/+f8mSNm6yhTTRShhFTJeOzPrfkynsXO7lYImjOCW2lEZUM3IckdGYM
+         vjiAmYSDDIBAf4ObyFn5Er9hW8wShH4P73mJ2Q+Luz8FFP9L+ufETw6jDiTWbt9eCcdx
+         tgZSi9sGSqSlXMAmpUUmzo/OkJ59fuoNvYTt907LWkvrRdQ4/hVxUCBAQTpVWQN4Jflq
+         FUA/4JfrikJFlIv273QByxSDd3U9te8Qi+Ppzazes5LxIsHSsWj0gbpW4AXiDHrQ5KSV
+         0tBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753957719; x=1754562519;
+        d=1e100.net; s=20230601; t=1753957721; x=1754562521;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=r0fIqnzU78JFEGt4tPHYQLQeFtpWNKhdVMlxMCo22pY=;
-        b=X0AX8h/9gaVh7lV2FbhYz9T+3dxg5OJzlR+qVxow1dsz+D/FMmFFljwK42X+obUXXm
-         3Z7NS4hy1sYBc815aicDYAAXF31H/ertMjs+Og8OfvxJmNN3BJo/0xv4NLP3MvvQBfHg
-         +oJVN7ieoDiFIMvx1uyavWxzYSQRYooArS95dCGI7lPVbVy3qwNyV2DVMbh/VVpU9nwT
-         c78U5PP6c5SbqkuzlG0cpjsK4zmCIjegzO2poMaqv5pf3XFpluaqmEIzgFNrmQqEKizS
-         DcdqeZoAFQDiRjAAqaz6G1Sv3eeBlztry2yFC0lttAErdhUozMWo/yJ/+03LHZ/p33Bo
-         DcGw==
-X-Forwarded-Encrypted: i=1; AJvYcCWTKRohCIg332D1i4TPRFa+GLR7QIQGBw2uZuORp/eLl1g9uRWGMqDI2hAGzbh5E27KE3D0qNY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy+Y1r9rVWnaek85LjzXp3QwoJ8fw7or093hPYtk5kz0jURQfsg
-	lUVojbddZ8jKTVMnSd3vVgojUeZcOGX1XTjZYl7uX8kt+bosBB4Ya+rpYCtUgAXS9Vc=
-X-Gm-Gg: ASbGncsvCR2WtckPcU++U3NDnkZ+g+c0uG/nyXtbhZX/CnLJvVhXjvcuGrCw98PjMk9
-	VCgs9Ga73oXI9qgubcozn0+jGbOPaLDY/4T0CI0+uDKgtqZlcC5/U+D/GFCtjhf/hm7M5BQCUnQ
-	RvuFF7/2CtL6kbm8A75ATZtRq5qSjiA419bFCQZxaw/OkRAL+mFkiG1onUXIsvyPzGCpCfvJMw/
-	Mb6nlul8OkzzOq1aQZaua3WjFqeGjpvcEtp0ycjZeaO9iBYsTEq6kQwPtLgiYwKenW3XYLq7QZt
-	tYn3s2GxDq42nRLR68nWNQ2OBPaMXAph/0kLZTDtl/uSDSupi3n3us9Fo5fbqboSU2bTivdQDXS
-	zPF9y3fI/jCeM8mGcioeM/RFINDbSpXA=
-X-Google-Smtp-Source: AGHT+IGhAH5I26ny2hIIjbvqe0KyYphTS7bzv7zNKkTwjYIl1KEm19a2egQZ7HxJNxFvEymvhEz8Iw==
-X-Received: by 2002:a17:907:d17:b0:ae3:c777:6e5e with SMTP id a640c23a62f3a-af91be35b77mr186082366b.19.1753957719336;
-        Thu, 31 Jul 2025 03:28:39 -0700 (PDT)
+        bh=FZOVO8FzrCbiLT2nUKnJ8wTwY2dAM9GRGmZiNXnZe0Q=;
+        b=cF0UF5VuREcZSiWLh3QTY87jkljauknOm75GKB9GO/N7ScqDHErRdxAwHRs9CX2B/5
+         K7skcoNdJABnSbDncHDIcckbf3sHs4jRvC/YOw44olamsubEGiuBuBtQOUh6n/DqesoJ
+         9HpV7NI6Lb0u0BmpNGfouKKQxQ9l7Kz/22g4oJdItz0NBwlhg+hSLYrybPb4EsejB78/
+         Oj1tv8etYS2Xi9H/7NqF62ygQMSKjMkNVQo4xFSKyDOa9tmlR7TJWKGN58Jj0KMlDRta
+         lDaU7OgB1vnxQ59ZcQNHNUnw3/RI51LgPa8BzOtm8jXWOEM1uP7xVVo9B76CjfQhLdbJ
+         CLZA==
+X-Forwarded-Encrypted: i=1; AJvYcCVtxNR9QKBf5n9ifIPlbKr5s090ClG+nFVTTKJWKF+9mskyoe0Gsm03cH2XURz+8FgK/E/bLlA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyIHTveejMMbWghvRdyATAUI9rlAfRA7rj8kjl2Jta9ewX/ooBO
+	rLmd1n91IyfypmG8ZyYAU8QkK1AyzuhCbZ7ntifRopVgEkwMvEwnV11ZKw3Lj/Yv28G+UKPvNIn
+	xdOpP
+X-Gm-Gg: ASbGncu9CpLVn3RFLGRCC5vAUPTzS3KCvharvK+oWUkHoj3AYqx6nel1iPMY03abpLL
+	gtUcBIKjuRgjOhEQ5o3Jm3bysZx7Qsfl7JgUGi3lpg/IYhzQRo+SzaOdxE+ANsdUplJ+V5gyWzb
+	t51sxERe6n4LNgiV62l/e8p1fuI1k2kJtF/I2jRCWGwtf16aW+z+qdmZel28Haxq32lzojpJUa+
+	J6Na1I2+Tn4y2c2unxXBPV71A4bP4agKteR/MHYBfgT1YQSdLytsSZ1KvRqil7uuf2IIssvhDEX
+	RsnQ4AtIoq6WFfnSAKYCgyXB/6fQDfRAGLLICgWEA3CylIMrcCjfquMyuC4zcTbgh9B6mdjhefK
+	9c5zaUQL8gwcaUbI=
+X-Google-Smtp-Source: AGHT+IEaYjRkiP9zteQUylEuxWP+uWh3+6GtLivdlr5uogNVh0fky2CJ8uG77q91VxjzwwGeoef16Q==
+X-Received: by 2002:a17:907:9406:b0:ae3:5e70:330d with SMTP id a640c23a62f3a-af8fd691104mr696096366b.12.1753957721211;
+        Thu, 31 Jul 2025 03:28:41 -0700 (PDT)
 Received: from cloudflare.com ([2a09:bac5:5063:2432::39b:eb])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-af91a0a3e80sm88840166b.47.2025.07.31.03.28.38
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-af91a21c0a4sm87360466b.109.2025.07.31.03.28.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 31 Jul 2025 03:28:38 -0700 (PDT)
+        Thu, 31 Jul 2025 03:28:40 -0700 (PDT)
 From: Jakub Sitnicki <jakub@cloudflare.com>
-Date: Thu, 31 Jul 2025 12:28:19 +0200
-Subject: [PATCH bpf-next v5 5/9] selftests/bpf: Parametrize
- test_xdp_context_tuntap
+Date: Thu, 31 Jul 2025 12:28:20 +0200
+Subject: [PATCH bpf-next v5 6/9] selftests/bpf: Cover read access to skb
+ metadata via dynptr
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,7 +86,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250731-skb-metadata-thru-dynptr-v5-5-f02f6b5688dc@cloudflare.com>
+Message-Id: <20250731-skb-metadata-thru-dynptr-v5-6-f02f6b5688dc@cloudflare.com>
 References: <20250731-skb-metadata-thru-dynptr-v5-0-f02f6b5688dc@cloudflare.com>
 In-Reply-To: <20250731-skb-metadata-thru-dynptr-v5-0-f02f6b5688dc@cloudflare.com>
 To: bpf@vger.kernel.org
@@ -103,90 +104,141 @@ Cc: Alexei Starovoitov <ast@kernel.org>,
  netdev@vger.kernel.org, Stanislav Fomichev <sdf@fomichev.me>
 X-Mailer: b4 0.15-dev-07fe9
 
-We want to add more test cases to cover different ways to access the
-metadata area. Prepare for it. Pull up the skeleton management.
+Exercise reading from SKB metadata area in two new ways:
+1. indirectly, with bpf_dynptr_read(), and
+2. directly, with bpf_dynptr_slice().
 
 Acked-by: Eduard Zingerman <eddyz87@gmail.com>
 Reviewed-by: Jesse Brandeburg <jbrandeburg@cloudflare.com>
 Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
 ---
- .../bpf/prog_tests/xdp_context_test_run.c          | 31 +++++++++++++++-------
- 1 file changed, 21 insertions(+), 10 deletions(-)
+ tools/testing/selftests/bpf/bpf_kfuncs.h           |  3 ++
+ .../bpf/prog_tests/xdp_context_test_run.c          | 21 +++++++++++
+ tools/testing/selftests/bpf/progs/test_xdp_meta.c  | 42 ++++++++++++++++++++++
+ 3 files changed, 66 insertions(+)
 
+diff --git a/tools/testing/selftests/bpf/bpf_kfuncs.h b/tools/testing/selftests/bpf/bpf_kfuncs.h
+index 9386dfe8b884..794d44d19c88 100644
+--- a/tools/testing/selftests/bpf/bpf_kfuncs.h
++++ b/tools/testing/selftests/bpf/bpf_kfuncs.h
+@@ -19,6 +19,9 @@ extern int bpf_dynptr_from_skb(struct __sk_buff *skb, __u64 flags,
+ extern int bpf_dynptr_from_xdp(struct xdp_md *xdp, __u64 flags,
+ 			       struct bpf_dynptr *ptr__uninit) __ksym __weak;
+ 
++extern int bpf_dynptr_from_skb_meta(struct __sk_buff *skb, __u64 flags,
++				    struct bpf_dynptr *ptr__uninit) __ksym __weak;
++
+ /* Description
+  *  Obtain a read-only pointer to the dynptr's data
+  * Returns
 diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c b/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c
-index 0134651d94ab..6c66e27e5bc7 100644
+index 6c66e27e5bc7..7e4526461a4c 100644
 --- a/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c
 +++ b/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c
-@@ -256,12 +256,13 @@ void test_xdp_context_veth(void)
- 	netns_free(tx_ns);
+@@ -171,6 +171,18 @@ static void assert_test_result(const struct bpf_map *result_map)
+ 		     "test_result map contains test payload");
  }
  
--void test_xdp_context_tuntap(void)
-+static void test_tuntap(struct bpf_program *xdp_prog,
-+			struct bpf_program *tc_prog,
-+			struct bpf_map *result_map)
++static bool clear_test_result(struct bpf_map *result_map)
++{
++	const __u8 v[sizeof(test_payload)] = {};
++	const __u32 k = 0;
++	int err;
++
++	err = bpf_map__update_elem(result_map, &k, sizeof(k), v, sizeof(v), BPF_ANY);
++	ASSERT_OK(err, "update test_result");
++
++	return err == 0;
++}
++
+ void test_xdp_context_veth(void)
  {
  	LIBBPF_OPTS(bpf_tc_hook, tc_hook, .attach_point = BPF_TC_INGRESS);
- 	LIBBPF_OPTS(bpf_tc_opts, tc_opts, .handle = 1, .priority = 1);
- 	struct netns_obj *ns = NULL;
--	struct test_xdp_meta *skel = NULL;
- 	__u8 packet[sizeof(struct ethhdr) + TEST_PAYLOAD_LEN];
- 	int tap_fd = -1;
+@@ -268,6 +280,9 @@ static void test_tuntap(struct bpf_program *xdp_prog,
  	int tap_ifindex;
-@@ -277,10 +278,6 @@ void test_xdp_context_tuntap(void)
+ 	int ret;
  
- 	SYS(close, "ip link set dev " TAP_NAME " up");
- 
--	skel = test_xdp_meta__open_and_load();
--	if (!ASSERT_OK_PTR(skel, "open and load skeleton"))
--		goto close;
--
- 	tap_ifindex = if_nametoindex(TAP_NAME);
- 	if (!ASSERT_GE(tap_ifindex, 0, "if_nametoindex"))
- 		goto close;
-@@ -290,12 +287,12 @@ void test_xdp_context_tuntap(void)
- 	if (!ASSERT_OK(ret, "bpf_tc_hook_create"))
- 		goto close;
- 
--	tc_opts.prog_fd = bpf_program__fd(skel->progs.ing_cls);
-+	tc_opts.prog_fd = bpf_program__fd(tc_prog);
- 	ret = bpf_tc_attach(&tc_hook, &tc_opts);
- 	if (!ASSERT_OK(ret, "bpf_tc_attach"))
- 		goto close;
- 
--	ret = bpf_xdp_attach(tap_ifindex, bpf_program__fd(skel->progs.ing_xdp),
-+	ret = bpf_xdp_attach(tap_ifindex, bpf_program__fd(xdp_prog),
- 			     0, NULL);
- 	if (!ASSERT_GE(ret, 0, "bpf_xdp_attach"))
- 		goto close;
-@@ -312,11 +309,25 @@ void test_xdp_context_tuntap(void)
- 	if (!ASSERT_EQ(ret, sizeof(packet), "write packet"))
- 		goto close;
- 
--	assert_test_result(skel->maps.test_result);
-+	assert_test_result(result_map);
- 
- close:
- 	if (tap_fd >= 0)
- 		close(tap_fd);
--	test_xdp_meta__destroy(skel);
- 	netns_free(ns);
- }
-+
-+void test_xdp_context_tuntap(void)
-+{
-+	struct test_xdp_meta *skel = NULL;
-+
-+	skel = test_xdp_meta__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "open and load skeleton"))
++	if (!clear_test_result(result_map))
 +		return;
 +
-+	if (test__start_subtest("data_meta"))
-+		test_tuntap(skel->progs.ing_xdp, skel->progs.ing_cls,
+ 	ns = netns_new(TAP_NETNS, true);
+ 	if (!ASSERT_OK_PTR(ns, "create and open ns"))
+ 		return;
+@@ -328,6 +343,12 @@ void test_xdp_context_tuntap(void)
+ 	if (test__start_subtest("data_meta"))
+ 		test_tuntap(skel->progs.ing_xdp, skel->progs.ing_cls,
+ 			    skel->maps.test_result);
++	if (test__start_subtest("dynptr_read"))
++		test_tuntap(skel->progs.ing_xdp, skel->progs.ing_cls_dynptr_read,
 +			    skel->maps.test_result);
++	if (test__start_subtest("dynptr_slice"))
++		test_tuntap(skel->progs.ing_xdp, skel->progs.ing_cls_dynptr_slice,
++			    skel->maps.test_result);
+ 
+ 	test_xdp_meta__destroy(skel);
+ }
+diff --git a/tools/testing/selftests/bpf/progs/test_xdp_meta.c b/tools/testing/selftests/bpf/progs/test_xdp_meta.c
+index fcf6ca14f2ea..0ba647fb1b1d 100644
+--- a/tools/testing/selftests/bpf/progs/test_xdp_meta.c
++++ b/tools/testing/selftests/bpf/progs/test_xdp_meta.c
+@@ -1,8 +1,10 @@
++#include <stdbool.h>
+ #include <linux/bpf.h>
+ #include <linux/if_ether.h>
+ #include <linux/pkt_cls.h>
+ 
+ #include <bpf/bpf_helpers.h>
++#include "bpf_kfuncs.h"
+ 
+ #define META_SIZE 32
+ 
+@@ -40,6 +42,46 @@ int ing_cls(struct __sk_buff *ctx)
+ 	return TC_ACT_SHOT;
+ }
+ 
++/* Read from metadata using bpf_dynptr_read helper */
++SEC("tc")
++int ing_cls_dynptr_read(struct __sk_buff *ctx)
++{
++	struct bpf_dynptr meta;
++	const __u32 zero = 0;
++	__u8 *dst;
 +
-+	test_xdp_meta__destroy(skel);
++	dst = bpf_map_lookup_elem(&test_result, &zero);
++	if (!dst)
++		return TC_ACT_SHOT;
++
++	bpf_dynptr_from_skb_meta(ctx, 0, &meta);
++	bpf_dynptr_read(dst, META_SIZE, &meta, 0, 0);
++
++	return TC_ACT_SHOT;
 +}
++
++/* Read from metadata using read-only dynptr slice */
++SEC("tc")
++int ing_cls_dynptr_slice(struct __sk_buff *ctx)
++{
++	struct bpf_dynptr meta;
++	const __u32 zero = 0;
++	__u8 *dst, *src;
++
++	dst = bpf_map_lookup_elem(&test_result, &zero);
++	if (!dst)
++		return TC_ACT_SHOT;
++
++	bpf_dynptr_from_skb_meta(ctx, 0, &meta);
++	src = bpf_dynptr_slice(&meta, 0, NULL, META_SIZE);
++	if (!src)
++		return TC_ACT_SHOT;
++
++	__builtin_memcpy(dst, src, META_SIZE);
++
++	return TC_ACT_SHOT;
++}
++
+ SEC("xdp")
+ int ing_xdp(struct xdp_md *ctx)
+ {
 
 -- 
 2.43.0
