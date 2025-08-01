@@ -1,139 +1,166 @@
-Return-Path: <netdev+bounces-211360-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211361-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8F0FB18284
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 15:33:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D652B18303
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 15:57:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05EEB587154
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 13:33:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 63F4F5A03FD
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 13:57:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BF5D231856;
-	Fri,  1 Aug 2025 13:32:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC7332561D4;
+	Fri,  1 Aug 2025 13:57:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ep7vkVrE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HYVLna3I"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5C0C22D78F;
-	Fri,  1 Aug 2025 13:32:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EBD411CA0;
+	Fri,  1 Aug 2025 13:57:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754055179; cv=none; b=ZbVYnUxX7i6H3zZOLwrYzGAtHYBtbj5vKjABNmvegkpDMOA97tNUhhzTg4w8VA81KXJLFYIt9/RpBxClPwtdJNmi0qTyXZ/feymixeyvdKwfAHfMNSwxHPAy5Zqcgj+5pbzLCrx5r2RYJAtHJyWqURn38MGlBhja6MUvhIG8qJg=
+	t=1754056630; cv=none; b=d+uO977n+2oMfceOdXrLgPQh4+lus5rt1BPy66NMGRIT6XqCD6n9yF7ROIvhUypMmfNfxpyEjOycMqnfTpmVJmypjWvJky4ugsVsrx5KUDjCN2nmoI6zRTknTeDoKLMTux2IAP5UMXY2Fa4TU9J/2RB1808yA4q+G13Xy869MVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754055179; c=relaxed/simple;
-	bh=qIrQbKlltABNgB9Pqa+YAH5TjC2GEgMe/cjMQfZnjxk=;
+	s=arc-20240116; t=1754056630; c=relaxed/simple;
+	bh=ODFfb+QAAqr6E6So/c4wBLjAbythTMbcmohhbIRP7Z8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=siG+h+RNuKF+ZrYVwy5cGfzv6r9ubxJzRULxaiTTwo6CJBcwgNN+Dgign4wjTUEH53zkdsFMLSGlKLWC++NONDtG9qc2nlIEJj3GSGQKPXg/kYRJlzkViQhzZctG25+Og9K7ASwWp8VfhEAYGU0lP+9bLTXMoIWMUfbVi8sZG6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ep7vkVrE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB0A2C4CEE7;
-	Fri,  1 Aug 2025 13:32:56 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=CpTuik2xBWUMAyKBOyEILeIwM55Gbxyonjzqe158L9+zK3S6EW1OnkUluDAon2Pw8pBLEw8KMJV/kn2bRvhqfv+bVNXwCoh/IUjzNarQlU9xnJJIKh0xWQBN+atQlr5GaSUU0XyRQ+GGjTtW/u9KyFZQsYb97kHtXODgCKYMPkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HYVLna3I; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EC78C4CEE7;
+	Fri,  1 Aug 2025 13:57:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754055178;
-	bh=qIrQbKlltABNgB9Pqa+YAH5TjC2GEgMe/cjMQfZnjxk=;
+	s=k20201202; t=1754056630;
+	bh=ODFfb+QAAqr6E6So/c4wBLjAbythTMbcmohhbIRP7Z8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Ep7vkVrE3UPPCXL7LAD9DrdMnolRhlMIAg9ii5YmV76Xlm+YUYV2t5VWvqLGsJCYw
-	 z9Hb6isdtRbXkVXUdt+2JYq0tZnt9EOLWDge7vskf0j4AJqG63OY3o+BiVTPokx3km
-	 TkrvGwU85nlO0RO7NTKs9yHTF6G6Vr3C0Div5ME3aXGkOxttw0Sx16BbhN7Ta+w1cF
-	 2XOlZNSR229V1f+j7rzfWPxGlCqUJAnlSGTE5dkKlvAvRXuKxtZDEFXe2kQ1h9vEgY
-	 uTWKrT2Jq61gUxX9Zd6VB0F9P7lbIwIa+Iu6iBwdGO5rGLmXN2MjSoORYgaUbKqowx
-	 FoRDJZRvsal0Q==
-Date: Fri, 1 Aug 2025 15:32:54 +0200
-From: Christian Brauner <brauner@kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com
-Subject: Re: [GIT PULL] Networking for v6.17
-Message-ID: <20250801-luftschicht-pochen-b060b1536fe1@brauner>
-References: <20250727013451.2436467-1-kuba@kernel.org>
- <CAHk-=whnXTvh2b0WcNFyjj7t9SKvbPtF8YueBg=_H5a7j_2yuA@mail.gmail.com>
+	b=HYVLna3I2WaENWcmwrOtQHlnHx9n5kSO61/R3IwON8bfkhKmTH5gg/W51WKGenC6K
+	 ftQW4jUfeVAezxjBp/tQ7NzkUv5moGiHVAXVR4J9jTWPOM5zUjtTg02uicu7kR01fP
+	 ERq8Tw2/2u0crORVkjSpEhy+oe/bTUujY2qtq/SUWsiO+4Xd0anTZXK5F+B2g6X0mD
+	 Zxx1SciqjzRF5V2A4rRKT9G5ICLCfr/yg+U4N5B0JzyyrUpSqCFJYT4ON/zDMjEO0M
+	 JwYPSGKiowhLEUtZWPO7atEaRjk2FhNhs3lu+4rMkVDgR/lkVY5NplpQzBQG1quCFJ
+	 woym3/NjsyI3g==
+Date: Fri, 1 Aug 2025 08:57:09 -0500
+From: Rob Herring <robh@kernel.org>
+To: Laura Nao <laura.nao@collabora.com>
+Cc: mturquette@baylibre.com, sboyd@kernel.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, matthias.bgg@gmail.com,
+	angelogioacchino.delregno@collabora.com, p.zabel@pengutronix.de,
+	richardcochran@gmail.com, guangjie.song@mediatek.com,
+	wenst@chromium.org, linux-clk@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+	kernel@collabora.com,
+	=?iso-8859-1?Q?N=EDcolas_F_=2E_R_=2E_A_=2E?= Prado <nfraprado@collabora.com>
+Subject: Re: [PATCH v3 09/27] dt-bindings: clock: mediatek: Describe MT8196
+ clock controllers
+Message-ID: <20250801135604.GA3045005-robh@kernel.org>
+References: <20250730105653.64910-1-laura.nao@collabora.com>
+ <20250730105653.64910-10-laura.nao@collabora.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <CAHk-=whnXTvh2b0WcNFyjj7t9SKvbPtF8YueBg=_H5a7j_2yuA@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250730105653.64910-10-laura.nao@collabora.com>
 
-On Wed, Jul 30, 2025 at 09:20:46AM -0700, Linus Torvalds wrote:
-> On Sat, 26 Jul 2025 at 18:35, Jakub Kicinski <kuba@kernel.org> wrote:
-> >
-> > Networking changes for 6.17.
+On Wed, Jul 30, 2025 at 12:56:35PM +0200, Laura Nao wrote:
+> Add new binding documentation for system clocks, functional clocks and
+> PEXTP0/1 and UFS reset controllers on MediaTek MT8196.
 > 
-> So while merging this, there was a trivial conflict with commit
-> 9b0240b3ccc3 ("netns: use stable inode number for initial mount ns")
-> from the vfs side (acked by networking people).
+> Reviewed-by: Nícolas F. R. A. Prado <nfraprado@collabora.com>
+> Co-developed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+> Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+> Signed-off-by: Laura Nao <laura.nao@collabora.com>
+> ---
+>  .../bindings/clock/mediatek,mt8196-clock.yaml |  86 ++
+>  .../clock/mediatek,mt8196-sys-clock.yaml      |  81 ++
+>  .../dt-bindings/clock/mediatek,mt8196-clock.h | 802 ++++++++++++++++++
+>  .../reset/mediatek,mt8196-resets.h            |  26 +
+>  4 files changed, 995 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/clock/mediatek,mt8196-clock.yaml
+>  create mode 100644 Documentation/devicetree/bindings/clock/mediatek,mt8196-sys-clock.yaml
+>  create mode 100644 include/dt-bindings/clock/mediatek,mt8196-clock.h
+>  create mode 100644 include/dt-bindings/reset/mediatek,mt8196-resets.h
 > 
-> And the conflict wasn't hard to resolve, but while looking at it, I
-> got very unhappy with that conflicting commit from the vfs tree.
-> 
-> Christian - when the "use stable inode number" code triggers, it
-> bypasses ns_alloc_inum() entirely. Fine - except that function *also*
-> does that
-> 
->         WRITE_ONCE(ns->stashed, NULL);
-> 
-> so now ns->stashed isn't initialized any more.
-> 
-> Now, that shouldn't matter here because this only triggers for
-> 'init_net' that is a global data structure and thus initialized to all
-> zeroes anyway, but it makes me very unhappy about that pattern that
-> ends up being about allocating the pid, but also almost incidentally
-> initializing that 'stashed' entry.
-> 
-> I ended up re-organizing the net_ns_net_init() code a bit (because it
-> now does that debugfs setup on success, so the old "return 0" didn't
-> work), and I think the merge is fine, but I think this "don't call
-> ns_alloc_inum()" pattern is wrong.
-> 
-> IOW, I don't think this is a bug, but I think it's not great.
+> diff --git a/Documentation/devicetree/bindings/clock/mediatek,mt8196-clock.yaml b/Documentation/devicetree/bindings/clock/mediatek,mt8196-clock.yaml
+> new file mode 100644
+> index 000000000000..03ee0dff464b
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/clock/mediatek,mt8196-clock.yaml
+> @@ -0,0 +1,86 @@
+> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/clock/mediatek,mt8196-clock.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: MediaTek Functional Clock Controller for MT8196
+> +
+> +maintainers:
+> +  - Guangjie Song <guangjie.song@mediatek.com>
+> +  - Laura Nao <laura.nao@collabora.com>
+> +
+> +description: |
+> +  The clock architecture in MediaTek SoCs is structured like below:
+> +  PLLs -->
+> +          dividers -->
+> +                      muxes
+> +                           -->
+> +                              clock gate
+> +
+> +  The device nodes provide clock gate control in different IP blocks.
+> +
+> +properties:
+> +  compatible:
+> +    items:
+> +      - enum:
+> +          - mediatek,mt8196-imp-iic-wrap-c
+> +          - mediatek,mt8196-imp-iic-wrap-e
+> +          - mediatek,mt8196-imp-iic-wrap-n
+> +          - mediatek,mt8196-imp-iic-wrap-w
+> +          - mediatek,mt8196-mdpsys0
+> +          - mediatek,mt8196-mdpsys1
+> +          - mediatek,mt8196-pericfg-ao
+> +          - mediatek,mt8196-pextp0cfg-ao
+> +          - mediatek,mt8196-pextp1cfg-ao
+> +          - mediatek,mt8196-ufscfg-ao
+> +          - mediatek,mt8196-vencsys
+> +          - mediatek,mt8196-vencsys-c1
+> +          - mediatek,mt8196-vencsys-c2
+> +          - mediatek,mt8196-vdecsys
+> +          - mediatek,mt8196-vdecsys-soc
+> +          - mediatek,mt8196-vdisp-ao
+> +      - const: syscon
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  '#clock-cells':
+> +    const: 1
+> +
+> +  '#reset-cells':
+> +    const: 1
+> +    description:
+> +      Reset lines for PEXTP0/1 and UFS blocks.
+> +
+> +  mediatek,hardware-voter:
+> +    $ref: /schemas/types.yaml#/definitions/phandle
+> +    description:
+> +      On the MT8196 SoC, a Hardware Voter (HWV) backed by a fixed-function
+> +      MCU manages clock and power domain control across the AP and other
+> +      remote processors. By aggregating their votes, it ensures clocks are
+> +      safely enabled/disabled and power domains are active before register
+> +      access.
 
-I think we should not be initializing ns->stashed in ns_alloc_inum().
-The function name is already wrong for that purpose:
+I thought this was going away based on v2 discussion?
 
-static inline int ns_alloc_inum(struct ns_common *ns)
-{
-	WRITE_ONCE(ns->stashed, NULL);
-	return proc_alloc_inum(&ns->inum);
-}
+Rob
 
-That was done a long time ago via atomic_long_set() and I just changed
-it to WRITE_ONCE() when I reworked both nsfs and pidfs.
-
-We let all callers initialize the fields of struct ns_common embedded in
-their respective namespace types already. I see no reason to not just do
-the same thing for ns->stashed and drop that implicit initialization
-from ns_alloc_inum().
-
-But aside from that I think my patch should have probably been:
-
-diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-index 1b6f3826dd0e..5c39fb544f93 100644
---- a/net/core/net_namespace.c
-+++ b/net/core/net_namespace.c
-@@ -815,7 +815,6 @@ static __net_init int net_ns_net_init(struct net *net)
- #ifdef CONFIG_NET_NS
-        net->ns.ops = &netns_operations;
- #endif
--       net->ns.inum = PROC_NET_INIT_INO;
-        if (net != &init_net) {
-                int ret = ns_alloc_inum(&net->ns);
-                if (ret)
-@@ -1283,6 +1282,8 @@ void __init net_ns_init(void)
-        init_net.key_domain = &init_net_key_domain;
- #endif
-        preinit_net(&init_net, &init_user_ns);
-+       init_net.ns.inum = PROC_NET_INIT_INO;
-+       init_net.ns.stashed = NULL;
-
-        down_write(&pernet_ops_rwsem);
-        if (setup_net(&init_net))
-
-so the setup for the initial network namespce happens right where it is
-explicitly initialized.
 
