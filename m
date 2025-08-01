@@ -1,61 +1,72 @@
-Return-Path: <netdev+bounces-211381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5422BB1873E
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 20:16:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FDC0B18748
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 20:22:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81E9156320D
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 18:16:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B0C0A83155
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 18:22:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BAE81A5B8F;
-	Fri,  1 Aug 2025 18:16:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D1B42797AF;
+	Fri,  1 Aug 2025 18:22:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ks4sIqxz"
+	dkim=pass (2048-bit key) header.d=gnuweeb.org header.i=@gnuweeb.org header.b="eq7b4+be"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from server-vie001.gnuweeb.org (server-vie001.gnuweeb.org [89.58.62.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 447BE78F26;
-	Fri,  1 Aug 2025 18:16:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D80F6188CC9;
+	Fri,  1 Aug 2025 18:22:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.62.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754072202; cv=none; b=o0vEh1WswzqNBw85d03jNo03zMKYNqiakb8Q57ZD8xONnQZ4VXiqUtPsgW61vTHMlI5z/td0S4YAWn0h0fWrwcaS/XjhiavgK7A3u/kRhg7O6yW06tbUJeh+Z5GH7jqO+Ja7m5E9KgqMFpeMj04ObU9+lVldI+kFmtmEPMtQNds=
+	t=1754072574; cv=none; b=togK6UiV3MsRzAJmU+kyQwxZsaJQ52T+Qdnwt8S0YAHt46nnhCS/t2J6gTRdhysS0qhXVxB3ZUQjDWrEoKN/kt2HTu4vlXTccd+m7epfdD7J9j2A9TyacCfr3l/QOairf+qKscLuucOpRfa7Tgw3HrRKYyO7vVOvo7FUjY4Bxqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754072202; c=relaxed/simple;
-	bh=0IrsNJBAVrfvJy8OMpogVu+ndt+mu5rYr34n8P4lqHY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ld/SZzOZxMtFjHjXzQDNNU/hO7wTRIXszYL2faECYhmwpm1fQ18Ii0nu5GN9jhcdr+OjoNexLyENkOro/tihDZRohsA1vLneMYDdYTIMCma13XRUjoJXTXM+/7cAh5J6YRcqSVuDcq8vYnCsSGS+OcH5d6KchUn/fJmHpBvdZUg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ks4sIqxz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6561DC4CEE7;
-	Fri,  1 Aug 2025 18:16:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754072201;
-	bh=0IrsNJBAVrfvJy8OMpogVu+ndt+mu5rYr34n8P4lqHY=;
-	h=From:To:Cc:Subject:Date:From;
-	b=ks4sIqxzchENMhb70XAXn7QVWcywSqX61sQTyTlrUrVKF6E3sgQEQctrrdGb2Hxq1
-	 51n0fY3yuRMRDCdJ0EuWwMKWhNNsyUzcVtkTezA3OVlDRBBwwgAR8noQ3mgmDFQQJ6
-	 ENVKnLKJdz8SmGws0Uf97+M6CY7eM86fQRi2YiCIqfRQu/21NXIoIaVpLcMjndhfXa
-	 WvEBIhQ7hqThDpz2rhwPOpVaonJVgYPePoLq8Aj9y6k/+1P5hYiTC0ajLHvdrsJ0GT
-	 0B1Oxn61zoe8FtVpgLht+jVvYjmd05Hpbgk483/M/OzG8yYQJorr8xiJjfFQLraQPV
-	 4ba0hHdSyvEiQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
+	s=arc-20240116; t=1754072574; c=relaxed/simple;
+	bh=WF0QhmeUbVgpA2hYHTvKf+I3icXtibEH9SWu6vSv6bk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=IsB7iGSFTQFwelNjX57g7/uTX6GIFMLvV5SznlIoq0UB0ZQOuHS6FZOrpPwb+PT+SdgdaXCDcveLN2MPEAE0eEg0RtfLtgCouXlTdxz0KZSYPekIqZZV8+CLCDp3eYvbU4soRgTzcSjcsdwvqgvRePM/v4sb0qGqjCgOLnFv/s4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=gnuweeb.org; spf=pass smtp.mailfrom=gnuweeb.org; dkim=pass (2048-bit key) header.d=gnuweeb.org header.i=@gnuweeb.org header.b=eq7b4+be; arc=none smtp.client-ip=89.58.62.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=gnuweeb.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnuweeb.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gnuweeb.org;
+	s=new2025; t=1754072570;
+	bh=WF0QhmeUbVgpA2hYHTvKf+I3icXtibEH9SWu6vSv6bk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:
+	 Content-Transfer-Encoding:Message-ID:Date:From:Reply-To:Subject:To:
+	 Cc:In-Reply-To:References:Resent-Date:Resent-From:Resent-To:
+	 Resent-Cc:User-Agent:Content-Type:Content-Transfer-Encoding;
+	b=eq7b4+be3D8CGX1DnDUvCfReusRDKoHIATKVTrXS8tkld1HUqpgZ/YeqbGBqKZheZ
+	 1BfLYO7crUo3EikNDGwqcsLh5MbBKlqdQDF/9/+w9RxET1p2g2ElcBwvBzGAYiurSJ
+	 8vMtwmTgTwozSV3ZFL/3SH4RhytSAdRIjta+tTS/crPKZ3LpELuZWrCvVGGP1demjR
+	 hUu1FNI4056LLADoQfzlKrQXvqDG12xtMVKEEgY7pIWCvxW52MY+H6zCESWmmOXC3R
+	 sJ8//l4zdG+G1GgTHbtgi0MioKHrQO0u42o/WW+cfGqsqpovEcsRBKCPFrFEIcjXzg
+	 AiP7JRSMrMClA==
+Received: from integral2.. (unknown [182.253.126.229])
+	by server-vie001.gnuweeb.org (Postfix) with ESMTPSA id 921273126FCE;
+	Fri,  1 Aug 2025 18:22:47 +0000 (UTC)
+From: Ammar Faizi <ammarfaizi2@gnuweeb.org>
+To: Oliver Neukum <oneukum@suse.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	shuah@kernel.org,
-	willemb@google.com,
-	matttbe@kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net] selftests: net: packetdrill: xfail all problems on slow machines
-Date: Fri,  1 Aug 2025 11:16:38 -0700
-Message-ID: <20250801181638.2483531-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.50.1
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Ammar Faizi <ammarfaizi2@gnuweeb.org>,
+	John Ernberg <john.ernberg@actia.se>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Linux Netdev Mailing List <netdev@vger.kernel.org>,
+	Linux USB Mailing List <linux-usb@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Armando Budianto <sprite@gnuweeb.org>,
+	gwml@vger.gnuweeb.org,
+	stable@vger.kernel.org
+Subject: [PATCH net v1] net: usbnet: Fix the wrong netif_carrier_on() call placement
+X-Gw-Bpl: wU/cy49Bu1yAPm0bW2qiliFUIEVf+EkEatAboK6pk2H2LSy2bfWlPAiP3YIeQ5aElNkQEhTV9Q==
+Date: Sat,  2 Aug 2025 01:20:44 +0700
+Message-Id: <20250801182044.39420-1-ammarfaizi2@gnuweeb.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,52 +75,62 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-We keep seeing flakes on packetdrill on debug kernels, while
-non-debug kernels are stable, not a single flake in 200 runs.
-Time to give up, debug kernels appear to suffer from 10msec
-latency spikes and any timing-sensitive test is bound to flake.
+The commit in the Fixes tag breaks my laptop (found by git bisect).
+My home RJ45 LAN cable cannot connect after that commit.
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: shuah@kernel.org
-CC: willemb@google.com
-CC: matttbe@kernel.org
-CC: linux-kselftest@vger.kernel.org
----
- .../selftests/net/packetdrill/ksft_runner.sh  | 19 +------------------
- 1 file changed, 1 insertion(+), 18 deletions(-)
+The call to netif_carrier_on() should be done when netif_carrier_ok()
+is false. Not when it's true. Because calling netif_carrier_on() when
+__LINK_STATE_NOCARRIER is not set actually does nothing.
 
-diff --git a/tools/testing/selftests/net/packetdrill/ksft_runner.sh b/tools/testing/selftests/net/packetdrill/ksft_runner.sh
-index c5b01e1bd4c7..a7e790af38ff 100755
---- a/tools/testing/selftests/net/packetdrill/ksft_runner.sh
-+++ b/tools/testing/selftests/net/packetdrill/ksft_runner.sh
-@@ -35,24 +35,7 @@ failfunc=ktap_test_fail
+Cc: Armando Budianto <sprite@gnuweeb.org>
+Cc: stable@vger.kernel.org
+Closes: https://lore.kernel.org/netdev/0752dee6-43d6-4e1f-81d2-4248142cccd2@gnuweeb.org
+Fixes: 0d9cfc9b8cb1 ("net: usbnet: Avoid potential RCU stall on LINK_CHANGE event")
+Signed-off-by: Ammar Faizi <ammarfaizi2@gnuweeb.org>
+---
+ drivers/net/usb/usbnet.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
+index bc1d8631ffe0..1eb98eeb64f9 100644
+--- a/drivers/net/usb/usbnet.c
++++ b/drivers/net/usb/usbnet.c
+@@ -1107,31 +1107,31 @@ static const struct ethtool_ops usbnet_ethtool_ops = {
+ };
  
- if [[ -n "${KSFT_MACHINE_SLOW}" ]]; then
- 	optargs+=('--tolerance_usecs=14000')
+ /*-------------------------------------------------------------------------*/
+ 
+ static void __handle_link_change(struct usbnet *dev)
+ {
+ 	if (!test_bit(EVENT_DEV_OPEN, &dev->flags))
+ 		return;
+ 
+ 	if (!netif_carrier_ok(dev->net)) {
++		if (test_and_clear_bit(EVENT_LINK_CARRIER_ON, &dev->flags))
++			netif_carrier_on(dev->net);
++
+ 		/* kill URBs for reading packets to save bus bandwidth */
+ 		unlink_urbs(dev, &dev->rxq);
+ 
+ 		/*
+ 		 * tx_timeout will unlink URBs for sending packets and
+ 		 * tx queue is stopped by netcore after link becomes off
+ 		 */
+ 	} else {
+-		if (test_and_clear_bit(EVENT_LINK_CARRIER_ON, &dev->flags))
+-			netif_carrier_on(dev->net);
 -
--	# xfail tests that are known flaky with dbg config, not fixable.
--	# still run them for coverage (and expect 100% pass without dbg).
--	declare -ar xfail_list=(
--		"tcp_blocking_blocking-connect.pkt"
--		"tcp_blocking_blocking-read.pkt"
--		"tcp_eor_no-coalesce-retrans.pkt"
--		"tcp_fast_recovery_prr-ss.*.pkt"
--		"tcp_sack_sack-route-refresh-ip-tos.pkt"
--		"tcp_slow_start_slow-start-after-win-update.pkt"
--		"tcp_timestamping.*.pkt"
--		"tcp_user_timeout_user-timeout-probe.pkt"
--		"tcp_zerocopy_cl.*.pkt"
--		"tcp_zerocopy_epoll_.*.pkt"
--		"tcp_tcp_info_tcp-info-.*-limited.pkt"
--	)
--	readonly xfail_regex="^($(printf '%s|' "${xfail_list[@]}"))$"
--	[[ "$script" =~ ${xfail_regex} ]] && failfunc=ktap_test_xfail
-+	failfunc=ktap_test_xfail
- fi
+ 		/* submitting URBs for reading packets */
+ 		tasklet_schedule(&dev->bh);
+ 	}
  
- ktap_print_header
+ 	/* hard_mtu or rx_urb_size may change during link change */
+ 	usbnet_update_max_qlen(dev);
+ 
+ 	clear_bit(EVENT_LINK_CHANGE, &dev->flags);
+ }
+ 
 -- 
-2.50.1
+Ammar Faizi
 
 
