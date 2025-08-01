@@ -1,73 +1,79 @@
-Return-Path: <netdev+bounces-211407-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211408-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DC14B188D0
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 23:35:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AE12B188D1
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 23:36:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 794917ABA77
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 21:34:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D11F517A1CB
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 21:36:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5637B270ED7;
-	Fri,  1 Aug 2025 21:35:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B9D7220F4B;
+	Fri,  1 Aug 2025 21:36:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qvv5V5v3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LKbOGzXg"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32C8128DB78
-	for <netdev@vger.kernel.org>; Fri,  1 Aug 2025 21:35:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 503271A0712;
+	Fri,  1 Aug 2025 21:36:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754084145; cv=none; b=nCCVZpC6YiHc54gAr7OjugrzziyrLqnLW/EIuic/6x03gIU2klEcMjvsDuiHeeej0cZNt8KTvJXOgTxeI9/JH1r9DL5PvhPcl5YPlL05WOFFwf5+P6VkKS32ESPYT45NgrW8UzbH102YOyJKa2oTYtwqbe/CqM3SY7GaZ3Xw04A=
+	t=1754084166; cv=none; b=SKCIgNr0rCTkITEHOP9QXLgLaYiqvbzLm/TYPrcU2hapvdEpqPyEL59ROJGVvT1ihuD5yVE5odJCzbJYN46gyNaOnZ5jgwb4iqWYrIhtjAvxqSbF6U874H9sTtbBNxD7sk8WK6j/0eUgJvv5oOq/bidxh1ozNfapITBwK8MqEgQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754084145; c=relaxed/simple;
-	bh=pD025ITb988BlZDolJqj3imsbpfgRrVjkSaY4rZxmMs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oriRjUFK+OIBPaIgAiOq0PYRdzzF3gcxMHq6H3JaeN7BaAp+zAoIZNH9CdLLj0S0g1doL1EV4yDXFh3KIZkmxPigRY5usfCeWk4MTdukR08hkqBiSgaWTCMRNttEwy1MlEtLl1M8Xs5BrCx5CCOFBKUxPLt9hgn2yODhqNEZjso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qvv5V5v3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F8D8C4CEF4;
-	Fri,  1 Aug 2025 21:35:44 +0000 (UTC)
+	s=arc-20240116; t=1754084166; c=relaxed/simple;
+	bh=OAhxtFG5/w7PuEcTCyyGE3DZIR3gPMJhst9cdG+Sii8=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=Y15skCjxJxrChBjDEjML+V0dr40+BWuyrjunu6xj3I+2ObbzvgFROnvBufcZeXvhVqyeO3iZMsP1zjHv70+dbCWaWkndUCWVBm6M0z8CeGRHqYIBA6xVHrZtOul6F9z1SkzwmX9KG2E+/1pULinvzoDsICXZ1IrIj5K8QRCTNR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LKbOGzXg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3145BC4CEE7;
+	Fri,  1 Aug 2025 21:36:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754084145;
-	bh=pD025ITb988BlZDolJqj3imsbpfgRrVjkSaY4rZxmMs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Qvv5V5v3zyxWC/Y0/IhDW5ENQwd/HZqCUEtrqEsYHrQB8dafGCPMS6hAUI53WPzJM
-	 dSCdnrdA54N/kn9nUyXZAv51kUh11x1SzvoXSNyk4nFiHxdrLp5I5WKQd/h9TsUsuJ
-	 sy7MUddJFp3Iqk45HqCwSleYTszbtH7C/sJIidA6a72MBRtAjOejG8BfFYNcWJNQ5Q
-	 B4dHLHWk5Y5JHrX60Dgphn5L3bG3J7R3D59K3l3bnHPs2njQv7PFahQNJvqV74oMQ1
-	 I8u0BWOo5LayTJqV4SDEOJgr3X/rsjPC4xSRsX6JDFTkVmVlnMqhvyWuHwGCxkc7gQ
-	 g1EapgUYiXusA==
-Date: Fri, 1 Aug 2025 14:35:43 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Krishna Kumar <krikku@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- tom@herbertland.com, pabeni@redhat.com, horms@kernel.org, sdf@fomichev.me,
- kuniyu@google.com, ahmed.zaki@intel.com, aleksander.lobakin@intel.com,
- atenart@kernel.org, krishna.ku@flipkart.com
-Subject: Re: [PATCH v7 net-next 0/2] net: Prevent RPS table overwrite of
- active flows
-Message-ID: <20250801143543.43c6843c@kernel.org>
-In-Reply-To: <20250729104109.1687418-1-krikku@gmail.com>
-References: <20250729104109.1687418-1-krikku@gmail.com>
+	s=k20201202; t=1754084166;
+	bh=OAhxtFG5/w7PuEcTCyyGE3DZIR3gPMJhst9cdG+Sii8=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=LKbOGzXgxsPFW8TtF7VP1qfx/+sHCW+gx/mom/RaRml6ukmz1lpq/rjEGlVoP4HVI
+	 M0GibQPDIEob8KYA5gikYNNvrQ9+6OH9tSatdzwdHZCOxip8I9wx0DFIL/HSQQZBAO
+	 6s9e4PLoo7Y95EXKcghNJ3gZs8AqdnjJrXgZBflyIrd3P9ZXPxa2q2QvtMvRLtRkzN
+	 S7n4RaG7sCWNx5io3KS4U3xzhlzKylo+NcAqQd8YE0v2+8/FNMpmsGUnrQPZza1Uc/
+	 hEDW5+1Lit4nBcozsOGaF5WrPDxPeC7/zmuEi4Rkvw7SuLx0A3CR7/TVdA7/430OBg
+	 ZF5fm4Hdqn3SQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE152383BF56;
+	Fri,  1 Aug 2025 21:36:22 +0000 (UTC)
+Subject: Re: [GIT PULL v2] virtio, vhost: features, fixes
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20250801091318-mutt-send-email-mst@kernel.org>
+References: <20250801091318-mutt-send-email-mst@kernel.org>
+X-PR-Tracked-List-Id: <stable.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20250801091318-mutt-send-email-mst@kernel.org>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+X-PR-Tracked-Commit-Id: 6693731487a8145a9b039bc983d77edc47693855
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 821c9e515db512904250e1d460109a1dc4c7ef6b
+Message-Id: <175408418138.4088284.1058038045286020103.pr-tracker-bot@kernel.org>
+Date: Fri, 01 Aug 2025 21:36:21 +0000
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, alok.a.tiwari@oracle.com, anders.roxell@linaro.org, dtatulea@nvidia.com, eperezma@redhat.com, eric.auger@redhat.com, jasowang@redhat.com, jonah.palmer@oracle.com, kraxel@redhat.com, leiyang@redhat.com, linux@treblig.org, lulu@redhat.com, michael.christie@oracle.com, mst@redhat.com, parav@nvidia.com, si-wei.liu@oracle.com, stable@vger.kernel.org, viresh.kumar@linaro.org, wangyuli@uniontech.com, will@kernel.org, wquan@redhat.com, xiaopei01@kylinos.cn
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
 
-On Tue, 29 Jul 2025 16:11:07 +0530 Krishna Kumar wrote:
-> v7: Improve readability of rps_flow_is_active() and remove some
->     unnecessary comments.
+The pull request you sent on Fri, 1 Aug 2025 09:13:18 -0400:
 
-Thanks for dropping the comments. The 6.17 merge window is open now,
-so we can't apply any patches. Please repost after Aug 11th.
+> https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/821c9e515db512904250e1d460109a1dc4c7ef6b
+
+Thank you!
+
 -- 
-pw-bot: defer
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
