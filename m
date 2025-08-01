@@ -1,103 +1,187 @@
-Return-Path: <netdev+bounces-211336-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211337-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22978B180C9
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 13:17:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07393B180FB
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 13:21:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF6CC3BE0C8
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 11:17:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 29F7E164411
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 11:21:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 883B4242D60;
-	Fri,  1 Aug 2025 11:17:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46D1B221FCA;
+	Fri,  1 Aug 2025 11:21:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FRoHrdfc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ERzDBUPF"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1093217F24
-	for <netdev@vger.kernel.org>; Fri,  1 Aug 2025 11:17:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 230062E36E5
+	for <netdev@vger.kernel.org>; Fri,  1 Aug 2025 11:21:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754047048; cv=none; b=Qrq8tp00Pg9TES5eUlomXRWlLirr8nvRRG1yJxhNKigPKh0K9OGhb0m5amHvNsmJLcqGcVdqszLy+Q9aMkWOk2b9bvaGrZ0XsYWmk/2NOHh5nIDhV76xGREosqtuEstz2kYyADclUU3LrquxGZGPXpHEtncynUVF5W1JbUHt8Cc=
+	t=1754047289; cv=none; b=VgvXp3Sdp4wj5UHq14zRuxubjc17v7Pti5lJU1X1g5Npsoe1OhEnU7mXR4fylVMnc08zEp4bJYdJ7GN4Gsm4/PG7VL1X9Qsvtys/DBH/MJXeviOkgrCrbq1LZeVKMjtldlrPX4cZyfPU29xew0mCrs3pzDvomuzGznUYxA0AQ/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754047048; c=relaxed/simple;
-	bh=8JQsiVWTM3ruJ2jFKdGrmV8VbBNegx7F5yFOdazGfKQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MaAQqQn3hDb2eQ85dYwQLH4SBVkpDvEosXu/CDCk2FoG/SM+xR+pckvVjacba2fvZm8+K/v1tcEeEMhtXX6tt0JNW2L8Qq+xic5ASvy+Tfwt7A8aFsQYmdAhXyGD00AdRkFuCVSXUX4v4DLq22x+jqW8sdRmA2yWbM6NYmVUjTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FRoHrdfc; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1754047045;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TkK4LWOcguxSSKDlgoUZDb5ZXpOEItT6YyrOmMD6H70=;
-	b=FRoHrdfcEA1FqVFAXNN3m/QWbwFp86ghttYaJYIWWQcWX5vcqIY/Ai3TDCOmRRkTuCKNA1
-	c2DQmDQLH60j8nx8ahwLEuhjXsOJS0qU09+emqyp4X1+LUHSGj01wYXMhmoVnqOBxG8jIN
-	hw3FWR0SE23knF+rBe0fM1N4LVp3Zrk=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-578-Dfo5LgvDPfKPJDVYzXvpxA-1; Fri,
- 01 Aug 2025 07:17:22 -0400
-X-MC-Unique: Dfo5LgvDPfKPJDVYzXvpxA-1
-X-Mimecast-MFC-AGG-ID: Dfo5LgvDPfKPJDVYzXvpxA_1754047040
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3F7B21800350;
-	Fri,  1 Aug 2025 11:17:20 +0000 (UTC)
-Received: from [10.44.32.226] (unknown [10.44.32.226])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1732C1955E89;
-	Fri,  1 Aug 2025 11:17:16 +0000 (UTC)
-Message-ID: <9af427df-ad31-46c8-8796-3d7ab55ee9d1@redhat.com>
-Date: Fri, 1 Aug 2025 13:17:15 +0200
+	s=arc-20240116; t=1754047289; c=relaxed/simple;
+	bh=pEp65GNdz3/656yb3ezhgbsXx5CGqU2Gt3GmTVnoYxY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UqWrU0KSpzhvej0K4g089twPIonuNcGVRXPUhMlm8A+b9/NBqSxdwcR5iiqAVsWR5rXAWKYfdzRifH8giG8lThIjQzL5Qdw7hjr4XPGSXrRQbFZMI4setVsIdjpykj8AQKH2zGUf77C0vSbLZiSjyAN9MKkJnfipcZmAs2QYR4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ERzDBUPF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 760B7C4CEE7;
+	Fri,  1 Aug 2025 11:21:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754047288;
+	bh=pEp65GNdz3/656yb3ezhgbsXx5CGqU2Gt3GmTVnoYxY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ERzDBUPFX+gAzf/5o01l60KcG5wcIGEB7V8Nv4UZc5t9OszFE5rDzqMyqx2lPsJ4M
+	 +VX6TPf4eMh59JZMwPhHGFRWODj3bzGTN1NcE7B3OJRGrCmm5vgPTyHtTHOoegC8ow
+	 f88r5s1hj75Z9/FXhYRhBxLqEdmKBKM7E2pKR2xHyC/GaF/PMu4zu8E6IJz8dq/kkt
+	 ydJLyFcXOAzMX+LF3bNt6qt5tfPWIONpkT0JzeXb5JKS4SbvAmzovI7cXuvB945Ept
+	 IIoaW3azFOjyRVq6Gi7sLBOa7IEGRxOvdrq5uqqBtYO+ruMN8u8e8+zc6AfDyeOKEU
+	 KVzXsm7kbIhUg==
+Date: Fri, 1 Aug 2025 12:21:25 +0100
+From: Simon Horman <horms@kernel.org>
+To: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
+	netdev@vger.kernel.org,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Subject: Re: [PATCH iwl-next v1] ixgbe: reduce number of reads when getting
+ OROM data
+Message-ID: <20250801112125.GO8494@horms.kernel.org>
+References: <20250731125025.1683557-1-jedrzej.jagielski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] dpll: Make ZL3073X invisible
-To: Geert Uytterhoeven <geert+renesas@glider.be>,
- Prathosh Satish <Prathosh.Satish@microchip.com>,
- Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kuba@kernel.org>,
- Conor Dooley <conor.dooley@microchip.com>
-Cc: netdev@vger.kernel.org, linux-spi@vger.kernel.org,
- linux-i2c@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <97804163aeb262f0e0706d00c29d9bb751844454.1753874405.git.geert+renesas@glider.be>
-Content-Language: en-US
-From: Ivan Vecera <ivecera@redhat.com>
-In-Reply-To: <97804163aeb262f0e0706d00c29d9bb751844454.1753874405.git.geert+renesas@glider.be>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250731125025.1683557-1-jedrzej.jagielski@intel.com>
 
-On 30. 07. 25 1:23 odp., Geert Uytterhoeven wrote:
-> Currently, the user is always asked about the Microchip Azurite
-> DPLL/PTP/SyncE core driver, even when I2C and SPI are disabled, and thus
-> the driver cannot be used at all.
+On Thu, Jul 31, 2025 at 02:50:25PM +0200, Jedrzej Jagielski wrote:
+> Currently, during locating the CIVD section, the ixgbe driver loops
+> over the OROM area and at each iteration reads only OROM-datastruct-size
+> amount of data. This results in many small reads and is inefficient.
 > 
-> Fix this by making the Kconfig symbol for the core driver invisible
-> (unless compile-testing), and selecting it by the bus glue sub-drivers.
-> Drop the modular defaults, as drivers should not default to enabled.
+> Optimize this by reading the entire OROM bank into memory once before
+> entering the loop. This significantly reduces the probing time.
 > 
-> Fixes: 2df8e64e01c10a4b ("dpll: Add basic Microchip ZL3073x support")
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+
+Thanks, nits below not withstanding, this looks good to me.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+
 > ---
->   drivers/dpll/zl3073x/Kconfig | 10 +++++-----
->   1 file changed, 5 insertions(+), 5 deletions(-)
+>  drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 58 +++++++++++++------
+>  1 file changed, 39 insertions(+), 19 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+> index 87b03c1992a8..048b2aae155a 100644
+> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+> @@ -3006,50 +3006,70 @@ static int ixgbe_get_nvm_srev(struct ixgbe_hw *hw,
+>   * Searches through the Option ROM flash contents to locate the CIVD data for
+>   * the image.
+>   *
+> - * Return: the exit code of the operation.
+> + * Return: -ENOMEM when cannot allocate memory, -EDOM for checksum violation,
+> + *	   -ENODATA when cannot find proper data, -EIO for faulty read or
+> + *	   0 on success.
+> + *
+> + *	   On success @civd stores collected data.
+>   */
+>  static int
+>  ixgbe_get_orom_civd_data(struct ixgbe_hw *hw, enum ixgbe_bank_select bank,
+>  			 struct ixgbe_orom_civd_info *civd)
+>  {
+> -	struct ixgbe_orom_civd_info tmp;
+> +	u32 orom_size = hw->flash.banks.orom_size;
+> +	u8 *orom_data;
+>  	u32 offset;
+>  	int err;
+>  
+> +	orom_data = kzalloc(orom_size, GFP_KERNEL);
+> +	if (!orom_data)
+> +		return -ENOMEM;
+> +
+> +	err = ixgbe_read_flash_module(hw, bank,
+> +				      IXGBE_E610_SR_1ST_OROM_BANK_PTR, 0,
+> +				      orom_data, orom_size);
+> +	if (err) {
+> +		err = -EIO;
+> +		goto cleanup;
+> +	}
+> +
+>  	/* The CIVD section is located in the Option ROM aligned to 512 bytes.
+>  	 * The first 4 bytes must contain the ASCII characters "$CIV".
+>  	 * A simple modulo 256 sum of all of the bytes of the structure must
+>  	 * equal 0.
+>  	 */
+> -	for (offset = 0; (offset + SZ_512) <= hw->flash.banks.orom_size;
+> -	     offset += SZ_512) {
+> +	for (offset = 0; (offset + SZ_512) <= orom_size; offset += SZ_512) {
 
-Please use 'PATCH net'... otherwise:
+nit: while we are here the inner parentheses could be removed
 
-Reviewed by: Ivan Vecera <ivecera@redhat.com>
+> +		struct ixgbe_orom_civd_info *tmp;
+>  		u8 sum = 0;
+>  		u32 i;
+>  
+> -		err = ixgbe_read_flash_module(hw, bank,
+> -					      IXGBE_E610_SR_1ST_OROM_BANK_PTR,
+> -					      offset,
+> -					      (u8 *)&tmp, sizeof(tmp));
+> -		if (err)
+> -			return err;
+> +		BUILD_BUG_ON(sizeof(*tmp) > SZ_512);
+> +
+> +		tmp = (struct ixgbe_orom_civd_info *)&orom_data[offset];
+>  
+>  		/* Skip forward until we find a matching signature */
+> -		if (memcmp(IXGBE_OROM_CIV_SIGNATURE, tmp.signature,
+> -			   sizeof(tmp.signature)))
+> +		if (memcmp(IXGBE_OROM_CIV_SIGNATURE, tmp->signature,
+> +			   sizeof(tmp->signature)))
+>  			continue;
+>  
+>  		/* Verify that the simple checksum is zero */
+> -		for (i = 0; i < sizeof(tmp); i++)
+> -			sum += ((u8 *)&tmp)[i];
+> +		for (i = 0; i < sizeof(*tmp); i++)
+> +			sum += ((u8 *)tmp)[i];
+>  
+> -		if (sum)
+> -			return -EDOM;
+> +		if (sum) {
+> +			err = -EDOM;
+> +			goto cleanup;
+> +		}
+>  
+> -		*civd = tmp;
+> -		return 0;
+> +		*civd = *tmp;
+> +		err = 0;
+> +		goto cleanup;
 
+nit: maybe it's just me, but break feels more natural here.
+
+>  	}
+>  
+> -	return -ENODATA;
+> +	err = -ENODATA;
+> +cleanup:
+> +	kfree(orom_data);
+> +	return err;
+>  }
+>  
+>  /**
+> -- 
+> 2.31.1
+> 
+> 
 
