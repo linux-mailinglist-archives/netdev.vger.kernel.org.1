@@ -1,216 +1,151 @@
-Return-Path: <netdev+bounces-211354-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211356-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30852B18233
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 15:13:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94395B1823B
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 15:15:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4305D58369D
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 13:13:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D7AA57AC696
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 13:13:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38AAE248F5F;
-	Fri,  1 Aug 2025 13:13:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F0B03FB1B;
+	Fri,  1 Aug 2025 13:15:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CKzIlzyd"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="goBBN0+C"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B3E021D3DF
-	for <netdev@vger.kernel.org>; Fri,  1 Aug 2025 13:13:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F2362628D;
+	Fri,  1 Aug 2025 13:15:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754054008; cv=none; b=kPWWxGUIl3xQ6fkRIUTEXDBus+tf917oOcSzdQNjmPSeBoGV3lO8vIRxmRDklCRabbacMu5rCP4Wa7H8VYul3Z55dx0ta94r/4GVG7Pl546+gYZO0jFIOyXSTU9ixxS0NYzcB+q25H21/VpWRCpV7yiQ3aEaOj3dyaYNzxioYsU=
+	t=1754054122; cv=none; b=VJtW2iqtfmxapyzkVVucq8hJ2f70KzM437H/mZX1jDP7PI0TNiPcFB5c9I3XaUshRwxUbnUOBfOPFq8902mwfgDDdykUvUSCsrUXNzE1Zj4O0tcvJlMbWSqI9IwvVV20IYNwO2gfiy1BR2vPI1Ma1/jHcB7b0OPE4FxmRH6nviQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754054008; c=relaxed/simple;
-	bh=NDqaf9lbxEaRm64yxxyEsy03EPkdWuBKt9nEAdu2dVk=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=KjOYmPDYhihh/ClTU19FBzNK8BVKxKU3WhgBhJJfoo3Fnbbhwn3WwxTCFyiwrSVeTV7gzXG68/CIVUu8C6Ilt4zhxGO7Zf1VbpUcX0IAp0FSkqX6zjwMD6v0AeVMf1iN+yD11utCs4+r9sJfElTz4/XU/QnYxHhzaoiIwxRRwG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CKzIlzyd; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1754054005;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=cw5+teQN0AMP87x3H2Uh+QGhf4VtRQnjJ3fqJ5dQbO0=;
-	b=CKzIlzydDaqyGStAMOLNKWdg7Q3+r/Qgi557YRSG4edyDuZD7XWoj8n9kRUIqCXnVUq+k+
-	+WoqporQN9E/WVUVkDCsxc+1aL9PVsKPRU1R8ROkZaC8EdLXR4zvAKuYwqHOFfN788EDgT
-	VzroxEmqiuNp7O6tLpoI5z+/vwTAEFc=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-571-mefb7ivcN0SC2emNq30fvA-1; Fri, 01 Aug 2025 09:13:24 -0400
-X-MC-Unique: mefb7ivcN0SC2emNq30fvA-1
-X-Mimecast-MFC-AGG-ID: mefb7ivcN0SC2emNq30fvA_1754054003
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3b7892c42b7so545526f8f.0
-        for <netdev@vger.kernel.org>; Fri, 01 Aug 2025 06:13:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754054002; x=1754658802;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cw5+teQN0AMP87x3H2Uh+QGhf4VtRQnjJ3fqJ5dQbO0=;
-        b=G3tAk6lfzWBmU9C0Ubx6YlrcSDfqkCuzTCqg68pFAA6y/LB9DXe7B66kyaiB3rLXLM
-         eTpcGIuHXKNZIPhA3I4TAk+pBzjkdP2qeXqguMvq9aFD2USLtOmEV4QHwkD4I8sIGQ6t
-         HF8IpTbeCSplEhk/YUNpqFzkEZ1RbweAZUz1otDdjuL306KiAErlSkLgzUwb24oihDJh
-         QsFtEbDaVRGOildiEdxEQCsSPiqKzkUzudNr9FmHcuZmDl7EqfOyugjEhvtHMJL2EDt6
-         YASHLGiTkzOsjjPtAl8y5lmS5el00nZI9Hm5zw0cOzGSvMoU9nJrpaLUq+z4na3cORk1
-         U0yQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUOg0MWYBBKFB3AfxEZhAkbTLpBejVtsuFqhvkjzlcXiCFt5CjpkWmHN6ggriTaIFrMqpw+5zQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyEx3EMe0tdkp9wUOYO49e9nZgbWJqpH/LFayXLbG8vHzrEYs7D
-	RhKMSqATn+K6mhYCtrKdMAz4KErb4UGEs4Tu+yZTsaB1+7ju1Q6fczUHtPk0fM+8KJDTm/5BQL1
-	JW74DoFM198/CuNPdJdVPh33VxqcMqH2xMF5e6+QTeVDhLRQKLqqX0XJT9A==
-X-Gm-Gg: ASbGncurO8z32vBDFQmhh18fKZFSGnjSygrzitJ0mxmDJxFHSSyBNE4gP5IBXEJPkQ6
-	6MM/VsX0uGkW/6Ey27YwcHxsyMG0WqKsAXlXXUYttP3vjZ+aB6/IX4hw1gH0BH5TC0qihIGOuzA
-	HEb1XRsHSt2KmcD5YzMdBV7tJpzm7yBeGi/CqUjQHQulo5yJbAYSpJR7YcO5O60ZaHlGebSOo6h
-	M+4GpmgwvqNAzfRJkoUuFZdf1T3YTap6HLK22ChFB0AE5yQywfrX2FNsBGYlOKXZbdUV3Vy24Bj
-	nXIA1c1FdHk2amwUwFZ3YVhJUPrT1Gt/
-X-Received: by 2002:a05:6000:2311:b0:3b7:81a6:45c1 with SMTP id ffacd0b85a97d-3b794fc2b76mr8552826f8f.6.1754054002380;
-        Fri, 01 Aug 2025 06:13:22 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGJ3kgk/LB9Em5/+L4oKnLTGpba8hhaIHh5AL+aBInP59wFrNOjQfBJh5ZGXhgf1vfWGUgM8w==
-X-Received: by 2002:a05:6000:2311:b0:3b7:81a6:45c1 with SMTP id ffacd0b85a97d-3b794fc2b76mr8552779f8f.6.1754054001893;
-        Fri, 01 Aug 2025 06:13:21 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc0:1515:7300:62e6:253a:2a96:5e3])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b79c48de68sm5859929f8f.67.2025.08.01.06.13.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Aug 2025 06:13:21 -0700 (PDT)
-Date: Fri, 1 Aug 2025 09:13:18 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	alok.a.tiwari@oracle.com, anders.roxell@linaro.org,
-	dtatulea@nvidia.com, eperezma@redhat.com, eric.auger@redhat.com,
-	jasowang@redhat.com, jonah.palmer@oracle.com, kraxel@redhat.com,
-	leiyang@redhat.com, linux@treblig.org, lulu@redhat.com,
-	michael.christie@oracle.com, mst@redhat.com, parav@nvidia.com,
-	si-wei.liu@oracle.com, stable@vger.kernel.org,
-	viresh.kumar@linaro.org, wangyuli@uniontech.com, will@kernel.org,
-	wquan@redhat.com, xiaopei01@kylinos.cn
-Subject: [GIT PULL v2] virtio, vhost: features, fixes
-Message-ID: <20250801091318-mutt-send-email-mst@kernel.org>
+	s=arc-20240116; t=1754054122; c=relaxed/simple;
+	bh=KpY+pHTlEqtqKPX++6/jobAXDKvdILMuJ5/p/I4i5n0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=d0oa8F168fjo1fsdO5upFjSnmAmVeEKM2KrReTVJbFfirWkq1oUOVS6RZuhtfl5nKaeSQaOVchRTR/+E7tafSaKT2dPoMsn3/DQggOW3VcMDqxaJ+Fv+LN+L2txFk3vdXjZaMMD+99rXKhVMp7e4iAKkUpM28g024hivv4RdDGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=goBBN0+C; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Kad9jR19PDpT1ZcaPhylvlERiT+jB6wY6uHs03XcUFA=; b=goBBN0+CfNCrvTuDwuvuVQJM/z
+	uGPmZwn0XR4bv6YmSUS+73iloqSjMUegnZqe8xyTrVUIhdP6lMGkSqf+BAPQcXir5Jbx7qAr/aO1W
+	TxgWjm/yFITBN8fbzdZ1e+Zoktoq3i/JAR3jOMS5zZub+5yyBdLnqXP5KqB+cJ6FN1jwb+Tbs3X0v
+	OofLtY6MaU7ABSdxm3fQNsrTuNdVUUi4qfmQvcxAc6PgSYzOHs7m3Jwo1aXFNOSDkUhsr7trxyYJz
+	VKVtHHZTeDd7yiozVAh74qzw+d4bTSgfKD+/U1aHcof4z78NCPH5hudMz5sych2k9ZjrWVjTb/eGK
+	TIcYEzrw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:43298)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uhpbJ-0006YZ-28;
+	Fri, 01 Aug 2025 14:15:09 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uhpbG-00026a-0a;
+	Fri, 01 Aug 2025 14:15:06 +0100
+Date: Fri, 1 Aug 2025 14:15:06 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: =?iso-8859-1?B?Q3Pza+Fz?= Bence <csokas.bence@prolan.hu>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
+	Mark Brown <broonie@kernel.org>,
+	Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Rob Herring <robh@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Csaba Buday <buday.csaba@prolan.hu>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net] net: mdio_bus: Use devm for getting reset GPIO
+Message-ID: <aIy92jXyhISZ5mZB@shell.armlinux.org.uk>
+References: <20250728153455.47190-2-csokas.bence@prolan.hu>
+ <95449490-fa58-41d4-9493-c9213c1f2e7d@sirena.org.uk>
+ <CAMuHMdVdsZtRpbbWsRC_YSYgGojA-wxdxRz7eytJvc+xq2uqEw@mail.gmail.com>
+ <aIy0HqFvCggTEyUk@shell.armlinux.org.uk>
+ <86bb6477-56d9-415a-a0ad-9a5d963a285e@prolan.hu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-X-Mutt-Fcc: =sent
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <86bb6477-56d9-415a-a0ad-9a5d963a285e@prolan.hu>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-The following changes since commit 347e9f5043c89695b01e66b3ed111755afcf1911:
+On Fri, Aug 01, 2025 at 03:04:31PM +0200, Csókás Bence wrote:
+> Hi,
+> 
+> On 2025. 08. 01. 14:33, Russell King (Oracle) wrote:
+> > On Fri, Aug 01, 2025 at 02:25:17PM +0200, Geert Uytterhoeven wrote:
+> > > Hi Mark,
+> > > 
+> > > On Fri, 1 Aug 2025 at 14:01, Mark Brown <broonie@kernel.org> wrote:
+> > > > On Mon, Jul 28, 2025 at 05:34:55PM +0200, Bence Csókás wrote:
+> > > > > Commit bafbdd527d56 ("phylib: Add device reset GPIO support") removed
+> > > > > devm_gpiod_get_optional() in favor of the non-devres managed
+> > > > > fwnode_get_named_gpiod(). When it was kind-of reverted by commit
+> > > > > 40ba6a12a548 ("net: mdio: switch to using gpiod_get_optional()"), the devm
+> > > > > functionality was not reinstated. Nor was the GPIO unclaimed on device
+> > > > > remove. This leads to the GPIO being claimed indefinitely, even when the
+> > > > > device and/or the driver gets removed.
+> > > > 
+> > > > I'm seeing multiple platforms including at least Beaglebone Black,
+> > > > Tordax Mallow and Libre Computer Alta printing errors in
+> > > > next/pending-fixes today:
+> > > > 
+> > > > [    3.252885] mdio_bus 4a101000.mdio:00: Resources present before probing
+> > > > 
+> > > > Bisects are pointing to this patch which is 3b98c9352511db in -next,
+> > > 
+> > > My guess is that &mdiodev->dev is not the correct device for
+> > > resource management.
+> > 
+> > No, looking at the patch, the patch is completely wrong.
+> > 
+> > Take for example mdiobus_register_gpiod(). Using devm_*() there is
+> > completely wrong, because this is called from mdiobus_register_device().
+> > This is not the probe function for the device, and thus there is no
+> > code to trigger the release of the resource on unregistration.
+> > 
+> > Moreover, when the mdiodev is eventually probed, if the driver fails
+> > or the driver is unbound, the GPIO will be released, but a reference
+> > will be left behind.
+> > 
+> > Using devm* with a struct device that is *not* currently being probed
+> > is fundamentally wrong - an abuse of devm.
+> 
+> The real question is: why on Earth is mdiobus_register_device() called
+> _before_ the probe()?
 
-  Linux 6.16-rc6 (2025-07-13 14:25:58 -0700)
+Please review the code and *understand* it before making changes. This
+is what any experienced programmer will do, so please get into that
+habbit - it'll help you not to get a bad name in the kernel community.
 
-are available in the Git repository at:
+If you don't understand that mdiobus_register_device() would be called
+outside of the device's probe function, then you need to gain that
+knowledge through research.
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+Please treat this as a learning exercise.
 
-for you to fetch changes up to 6693731487a8145a9b039bc983d77edc47693855:
+First step: grep -r mdiobus_register_device drivers/net/phy
 
-  vsock/virtio: Allocate nonlinear SKBs for handling large transmit buffers (2025-08-01 09:11:09 -0400)
+Thanks.
 
-Changes from v1:
-	drop commits that I put in there by mistake. Sorry!
-
-----------------------------------------------------------------
-virtio, vhost: features, fixes
-
-vhost can now support legacy threading
-	if enabled in Kconfig
-vsock memory allocation strategies for
-	large buffers have been improved,
-	reducing pressure on kmalloc
-vhost now supports the in-order feature
-	guest bits missed the merge window
-
-fixes, cleanups all over the place
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-
-----------------------------------------------------------------
-Alok Tiwari (4):
-      virtio: Fix typo in register_virtio_device() doc comment
-      vhost-scsi: Fix typos and formatting in comments and logs
-      vhost: Fix typos
-      vhost-scsi: Fix check for inline_sg_cnt exceeding preallocated limit
-
-Anders Roxell (1):
-      vdpa: Fix IDR memory leak in VDUSE module exit
-
-Cindy Lu (1):
-      vhost: Reintroduce kthread API and add mode selection
-
-Dr. David Alan Gilbert (2):
-      vhost: vringh: Remove unused iotlb functions
-      vhost: vringh: Remove unused functions
-
-Dragos Tatulea (2):
-      vdpa/mlx5: Fix needs_teardown flag calculation
-      vdpa/mlx5: Fix release of uninitialized resources on error path
-
-Gerd Hoffmann (1):
-      drm/virtio: implement virtio_gpu_shutdown
-
-Jason Wang (3):
-      vhost: fail early when __vhost_add_used() fails
-      vhost: basic in order support
-      vhost_net: basic in_order support
-
-Michael S. Tsirkin (2):
-      virtio: fix comments, readability
-      virtio: document ENOSPC
-
-Mike Christie (1):
-      vhost-scsi: Fix log flooding with target does not exist errors
-
-Pei Xiao (1):
-      vhost: Use ERR_CAST inlined function instead of ERR_PTR(PTR_ERR(...))
-
-Viresh Kumar (2):
-      virtio-mmio: Remove virtqueue list from mmio device
-      virtio-vdpa: Remove virtqueue list
-
-WangYuli (1):
-      virtio: virtio_dma_buf: fix missing parameter documentation
-
-Will Deacon (9):
-      vhost/vsock: Avoid allocating arbitrarily-sized SKBs
-      vsock/virtio: Validate length in packet header before skb_put()
-      vsock/virtio: Move length check to callers of virtio_vsock_skb_rx_put()
-      vsock/virtio: Resize receive buffers so that each SKB fits in a 4K page
-      vsock/virtio: Rename virtio_vsock_alloc_skb()
-      vsock/virtio: Move SKB allocation lower-bound check to callers
-      vhost/vsock: Allocate nonlinear SKBs for handling large receive buffers
-      vsock/virtio: Rename virtio_vsock_skb_rx_put()
-      vsock/virtio: Allocate nonlinear SKBs for handling large transmit buffers
-
- drivers/gpu/drm/virtio/virtgpu_drv.c    |   8 +-
- drivers/vdpa/mlx5/core/mr.c             |   3 +
- drivers/vdpa/mlx5/net/mlx5_vnet.c       |  12 +-
- drivers/vdpa/vdpa_user/vduse_dev.c      |   1 +
- drivers/vhost/Kconfig                   |  18 ++
- drivers/vhost/net.c                     |  88 +++++---
- drivers/vhost/scsi.c                    |  24 +-
- drivers/vhost/vhost.c                   | 377 ++++++++++++++++++++++++++++----
- drivers/vhost/vhost.h                   |  30 ++-
- drivers/vhost/vringh.c                  | 118 ----------
- drivers/vhost/vsock.c                   |  15 +-
- drivers/virtio/virtio.c                 |   7 +-
- drivers/virtio/virtio_dma_buf.c         |   2 +
- drivers/virtio/virtio_mmio.c            |  52 +----
- drivers/virtio/virtio_ring.c            |   4 +
- drivers/virtio/virtio_vdpa.c            |  44 +---
- include/linux/virtio.h                  |   2 +-
- include/linux/virtio_vsock.h            |  46 +++-
- include/linux/vringh.h                  |  12 -
- include/uapi/linux/vhost.h              |  29 +++
- kernel/vhost_task.c                     |   2 +-
- net/vmw_vsock/virtio_transport.c        |  20 +-
- net/vmw_vsock/virtio_transport_common.c |   3 +-
- 23 files changed, 575 insertions(+), 342 deletions(-)
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
