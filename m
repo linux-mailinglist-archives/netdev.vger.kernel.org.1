@@ -1,96 +1,81 @@
-Return-Path: <netdev+bounces-211330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211331-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9135EB1805E
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 12:46:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48E72B18077
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 12:54:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CBC23B726B
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 10:46:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 171D7584653
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 10:54:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B98C218ADE;
-	Fri,  1 Aug 2025 10:46:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E3CF236457;
+	Fri,  1 Aug 2025 10:54:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nyg2FWDl"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2589615DBC1;
-	Fri,  1 Aug 2025 10:46:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A346233D88
+	for <netdev@vger.kernel.org>; Fri,  1 Aug 2025 10:54:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754045182; cv=none; b=vEcpZt5fuqOoisVgptsHD4SBUhYMMiSNP7LwNzzMullqwPH/PqcSBdTEYAC6EjHq5Jn25udTKOS+NQsx6S0m1pJXffkjQeUEVsg3xTDvy3eTncdaBUXbjPup7a14sO70zY6IsFS/ay54nOyxxvPEjt1yEgKAIPtGkKnbNDNEU20=
+	t=1754045680; cv=none; b=WW9O0N7MOU6wt8NPMIgERH4qNz2RJqnBpIxNbZxsRXxnQ8qacWiNElLBNA/6GmYfvXGcIBWdPFk9IY5QCrJmTYhy5n1PtANI8jSgvJHLjnjHxeYwFaSVFsf08RZTQkDa74l5vap5xPGQIuLHL3KIAVM4NoHXTnLzZGZJrvN5+oI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754045182; c=relaxed/simple;
-	bh=O3INA7RvN/wZUo1wVHML2fUr9P9OP2pLkh9o6VnxvOQ=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=sQmg9X3TvjVZK8TkcdpyPcwNI67Ss927/z0fe74MG5y7I4uUlYc3O4cskBynqy50NnWqfj7U/l98V1PwOKni/6K8T0k1bg98jSmJfl836FQU9pDcf/if3db1sFSssWUZNgbAhTUMkuQ1xqYG01YwkeHfwVl6G0qoCYXfTBV5MmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4btjMC4V9zz27j4w;
-	Fri,  1 Aug 2025 18:47:19 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id B2FD41A016C;
-	Fri,  1 Aug 2025 18:46:17 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 1 Aug 2025 18:46:16 +0800
-Message-ID: <3bf4236a-2f68-4c09-a9bc-9534111854f2@huawei.com>
-Date: Fri, 1 Aug 2025 18:46:16 +0800
+	s=arc-20240116; t=1754045680; c=relaxed/simple;
+	bh=YhdJ/lh1lCKEvPdzkfqidOEqCCxiu5UC0mYzu4SNJsY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iNi7V0xmVS/3EAfvPzNwrP+roLSeP7oqYgbG4JcMDeQvk5f1j6OoYRKMTZUA4/Sla4FwH6lG/mr2UoprxIIDzngOZkn0+hx6Zc7KKl7KuSlEVE6labQIZgHglgdDzQ5+2uwqkAVA3jILIeToX8qEV41je33LXRY62A2IEQJ7YjU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nyg2FWDl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61AA7C4CEE7;
+	Fri,  1 Aug 2025 10:54:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754045675;
+	bh=YhdJ/lh1lCKEvPdzkfqidOEqCCxiu5UC0mYzu4SNJsY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=nyg2FWDl2O4iY3JDllnk2KepWIxNSCYpB3sl+Hl88rHq8+n8tIHdvFNGP/9h9DVwQ
+	 sT/1ZrUGQwZ8yoUQU0eopcUt+mPoX//hy7+0bYzTnxpd6S+jIzbwxP4UnDmKVKS2M9
+	 95WSW1B6xf3k7a5BMo6gtM3ehqgrl+ANmNV9W5eY196aespo0KMHz3Tam/1OrSEAp8
+	 jmjRix2XB5msoeA/U7h1btPnPr3r/qKhjxDnwZy8NsehLa0bz0yjxwOloT3vc2SUbR
+	 gZUGX+vSbVqkeEbBcm+O2SCxOqymAGH803e9Q0pwXIBz+w/ttM5/TNa3BYAehVl/eF
+	 MqYxzIWX85+wA==
+Date: Fri, 1 Aug 2025 11:54:30 +0100
+From: Simon Horman <horms@kernel.org>
+To: edward.cree@amd.com
+Cc: linux-net-drivers@amd.com, davem@davemloft.net, kuba@kernel.org,
+	edumazet@google.com, pabeni@redhat.com, andrew+netdev@lunn.ch,
+	Edward Cree <ecree.xilinx@gmail.com>, netdev@vger.kernel.org,
+	bhelgaas@google.com
+Subject: Re: [PATCH net-next] sfc: unfix not-a-typo in comment
+Message-ID: <20250801105430.GM8494@horms.kernel.org>
+References: <20250731144138.2637949-1-edward.cree@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
-	<shenjian15@huawei.com>, <liuyonglong@huawei.com>, <chenhao418@huawei.com>,
-	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
-	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net 2/3] net: hibmcge: fix the division by zero issue
-To: Simon Horman <horms@kernel.org>
-References: <20250731134749.4090041-1-shaojijie@huawei.com>
- <20250731134749.4090041-3-shaojijie@huawei.com>
- <20250801101154.GK8494@horms.kernel.org>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <20250801101154.GK8494@horms.kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
- kwepemk100013.china.huawei.com (7.202.194.61)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250731144138.2637949-1-edward.cree@amd.com>
 
+On Thu, Jul 31, 2025 at 03:41:38PM +0100, edward.cree@amd.com wrote:
+> From: Edward Cree <ecree.xilinx@gmail.com>
+> 
+> Cited commit removed duplicated word 'fallback', but this was not a
+>  typo and change altered the semantic meaning of the comment.
+> Partially revert, using the phrase 'fallback of the fallback' to make
+>  the meaning more clear to future readers so that they won't try to
+>  change it again.
+> 
+> Fixes: fe09560f8241 ("net: Fix typos")
+> Signed-off-by: Edward Cree <ecree.xilinx@gmail.com>
 
-on 2025/8/1 18:11, Simon Horman wrote:
-> On Thu, Jul 31, 2025 at 09:47:48PM +0800, Jijie Shao wrote:
->> When the network port is down, the queue is released, and ring->len is 0.
->> In debugfs, hbg_get_queue_used_num() will be called,
->> which may lead to a division by zero issue.
->>
->> This patch adds a check, if ring->len is 0,
->> hbg_get_queue_used_num() directly returns 0.
->>
->> Fixes: 40735e7543f9 ("net: hibmcge: Implement .ndo_start_xmit function")
->> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
-> Thanks,
->
-> Thinking aloud:
->
-> I see that hbg_get_queue_used_num() can be called for both RX and TX
-> rings via the debugfs code hbg_dbg_ring(). And that hbg_net_stop()
-> clears the RX and TX ring configuration using hbg_txrx_uninit().
+Thanks Edward,
 
-Yes, yes.
+And sorry for not noticing this in my review of the cited commit.
 
-> So I agree that when the port is down ring-len will be 0.
->
-> Reviewed-by: Simon Horman <horms@kernel.org>
->
->
+Reviewed-by: Simon Horman <horms@kernel.org>
 
