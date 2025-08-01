@@ -1,114 +1,102 @@
-Return-Path: <netdev+bounces-211396-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211397-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CBE4B1886C
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 23:00:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F041DB1886E
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 23:01:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2CC91AA51D6
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 21:00:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8ACCC1C84D8B
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 21:01:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C11881E0DD8;
-	Fri,  1 Aug 2025 21:00:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A82ED2147F9;
+	Fri,  1 Aug 2025 21:01:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LG+F2fhn"
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="Hk1SCEXa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44DF0199934;
-	Fri,  1 Aug 2025 21:00:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBDF14207F;
+	Fri,  1 Aug 2025 21:01:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754082038; cv=none; b=Ffltn9RiX0kYsQ++UoE4QCQuDGrzGPyqIw9Cl09uivYkzbTygz9EZHeoIrwXmKd2sLeMiKICd81mTBvT8gouh5evfnf9yIu2SYXMAnMsWj5fAEKyXUH0iieyAGmCZRxnPbFaPaeplHVimxgdbFMn7FizzaA1+nvqSgOJJmEUOHU=
+	t=1754082083; cv=none; b=fKPE4QI6Srn19xR1VDMe3JbzGft7hYmnOaq3S9eLsm2gVZk05s/4KfXTFXGyI0EPzoHdWdwQem9KFTbjyb5kw9Ydv3QIqaA+KV4sN8tOy/EBCh0egmxJHiVNz3Xufr7j5giLJFIQ64WiRQLRXgfQvaMazRTfOXHDJI0oABKZTm8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754082038; c=relaxed/simple;
-	bh=yCsxRMUQIxP548jpPiHUjuRjBaL7jboGbbDfPY0uh5s=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=iqEZCNbs2QAI+a4di8/6HFhTsm0pHKm46mMVyLadW7Q6/l9r4kCH0U2UEQrNYXv10f8GFHt/rjyvjxrUScF9VCukcpdUHuyuM6xYiKDTsXF635CwBL/7Wi9MNWLhm03XWEuzLS0PO3VJpPb+A90lvhPA7N3ffjezF3mWyEnVxTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LG+F2fhn; arc=none smtp.client-ip=209.85.128.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-7180bb37846so13608787b3.3;
-        Fri, 01 Aug 2025 14:00:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1754082036; x=1754686836; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yXiZrswsxQPUUeYFbRHdd6ObCCznOMCn+Fx47vEWLNM=;
-        b=LG+F2fhntgo2wUohOxy3ATveFtLU1W7OrAT92PKysead044Xf+JHjySLegjs9oJimD
-         INZK1NGDgAqjnUuscDPkiU/nRCjWAmGeR4bAlse+G5mKpD4tP/Cf2E+uix0So52ncILL
-         e38yQY0tPlO7Ukn0EMeorltc37HjME6u1Ag/aE4PG9q1tk8D8dOCcdOr+QSSPrv080Dp
-         6E725EzcOqX2t7Exc1qZB3yYakzSxxFU5CNiRi9Ym+ukUgchWqizC7i3tLllPe5tM2WC
-         zimewHMwwx1hRQXUZqvfxbzbA6PerX8ta1xEim5IfFCFT9e0yXtwJNGVsTBwCfY7EBs8
-         /WKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754082036; x=1754686836;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=yXiZrswsxQPUUeYFbRHdd6ObCCznOMCn+Fx47vEWLNM=;
-        b=aVsBQEQ7Sw4IROmceMk4cdHtmkd2bkEVI7wQtiuwpvTfzlUdsjJ14x89MARYZcsSyO
-         rH3seLmZ7P2846U/902AjEWzH2nFQFJVjW/zAYya4QbC0JoGEQyhdkTo75/dV61MES7/
-         JvDkYQUe2ZEUtgefj1n8njDymtGAPZRtjg90/XV9SmLvJ8x7FOI0VtvegRWCybAk53Vh
-         u5dNLbwDlasxNyqOJ13d98d0+YOvb122Uo4G8BUnSpzKrRGtE8pcFm1Rq/ijyeFPXPFw
-         nCIBnvwPz5PlvrYv8fo4Hf0+wKj8wbz8EkD36r13vQLw8zmEYqwHpqnH+8WLaFleb8/c
-         jkMA==
-X-Forwarded-Encrypted: i=1; AJvYcCWyWSFqQbdX39IY5X5/TPbUqG/es2MIflVFH1+V+PAmIhkKPguMtKEUOsc62bfJWH1wAT5tpBWZ/icXFDcd5Z8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzti94+VEDM5+lgZXGyFr8RVh45I3VZ2y1DYcyHK31YQHc/zjef
-	xGdm2gQCfKNIB5Sh6ZF/Dh1WewpZyX9tBIy321I2vQxkSjh5nBNF7rEY
-X-Gm-Gg: ASbGncujyoQBtnhKmLjf42gjqRjDjNOoz+lqm4S5s1BfEdjQTy4SXtJ9jJQD1Pv3CR/
-	zbzdKWQkez9q8BD8lXlwNqMvsv+F61o280WJVL9vblqiPBM5JpuICAuMiyEUK0QW9wEGz94i8LI
-	0HSDJI1Bqvdy+aVaDy2CKefX38wb4nw6Ob8KMViCw7RU4idcFoxHQj3L2CzggXgxymSKhQJqvR2
-	zX/Lem0el0puarA2bKsn7gX1LsLXyHcDplht7z0mN5g2C15GGkebp9y81yHDzb/lJWFqF1YKgeI
-	N6WTh5tnVSvPRucs9E+SO0pzWUtCZEtZ/Ud6FM5ct2aQUj8nTEUFlxDQtLyH6gM0Rz7LMp409+6
-	emca2liECRRyVS9v3o6lJV0a1fZnH1dryi0R0CWWB3++x7bkpEFhDyIvcdPTZQAgZVA93Vg==
-X-Google-Smtp-Source: AGHT+IH/GtIwQeRCat5yRdiTEzdNPzy9xXlmJbxZKcaISJhOGj8/WfAoR/JRPPjmAvN3qT1Hyj2HQg==
-X-Received: by 2002:a05:690c:660c:b0:71b:657c:5878 with SMTP id 00721157ae682-71b7ecdaafcmr15462037b3.4.1754082036006;
-        Fri, 01 Aug 2025 14:00:36 -0700 (PDT)
-Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
-        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-71b5a5ce7b5sm12624577b3.71.2025.08.01.14.00.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Aug 2025 14:00:35 -0700 (PDT)
-Date: Fri, 01 Aug 2025 17:00:35 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, 
- davem@davemloft.net
-Cc: netdev@vger.kernel.org, 
- edumazet@google.com, 
- pabeni@redhat.com, 
- andrew+netdev@lunn.ch, 
- horms@kernel.org, 
- Jakub Kicinski <kuba@kernel.org>, 
- shuah@kernel.org, 
- willemb@google.com, 
- matttbe@kernel.org, 
- linux-kselftest@vger.kernel.org
-Message-ID: <688d2af39aff_2e1a6829416@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250801181638.2483531-1-kuba@kernel.org>
-References: <20250801181638.2483531-1-kuba@kernel.org>
-Subject: Re: [PATCH net] selftests: net: packetdrill: xfail all problems on
- slow machines
+	s=arc-20240116; t=1754082083; c=relaxed/simple;
+	bh=PVeG3LcWV98xhs5CzZv3kX6ost9c8KHyZTHCcL+3rrE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Qh7HEEJvM9/u7t4T90n7z/KMr2Fa83GVuY/wenGE2D5kZ9o5dFoR6FxJUn5rlxclntN8T7wIS+DuCMDjQCpFMSPpfbECYYxqZJI2hfN0RTCucaY+XsItENZMuHY877nLGqq5z7Lq8CgAFhFrRQ5pM282j5x725IER4bcNWry8PA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=Hk1SCEXa; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
+	:Subject; bh=f4EUtpQvfD1GWjXjCaIBDDisUV6m4mX8lVb0bZq8pMw=; b=Hk1SCEXal1ou/150
+	I+6mXB1y9B7k9Q+ydLpadDDD2e2UjgCFVqoCK/ULop1nwGYg6+meyRcdx9E2JDWrfMwNSGungqARM
+	DQKxNDPjOGksuP3j6MIRlG0lxjzdPc8H/sgQeK6PF7hheyOj8vd5gJRveye1hOXa2DVcCd1TMsAaC
+	EDD3hGCccHVa4iLuIIE9VB+qunPwNEkZB1uxmUcCV0y8FCD2fhbtxOwFgS7v7IscuD1OzAKLVTa1B
+	wbog1jbONAgWuO7TmZtMaVwgerXHoTEpwTyTVViy28/Xc1gKjQdo0wwmwH4Yc1Ozr7N1d6rbJWUoX
+	kQ7N6IEHDYyU7XSxMw==;
+Received: from dg by mx.treblig.org with local (Exim 4.96)
+	(envelope-from <dg@treblig.org>)
+	id 1uhwsB-001mFM-00;
+	Fri, 01 Aug 2025 21:01:03 +0000
+Date: Fri, 1 Aug 2025 21:01:02 +0000
+From: "Dr. David Alan Gilbert" <linux@treblig.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org,
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, alok.a.tiwari@oracle.com,
+	anders.roxell@linaro.org, dtatulea@nvidia.com, eperezma@redhat.com,
+	eric.auger@redhat.com, jasowang@redhat.com, jonah.palmer@oracle.com,
+	kraxel@redhat.com, leiyang@redhat.com, lulu@redhat.com,
+	michael.christie@oracle.com, parav@nvidia.com,
+	si-wei.liu@oracle.com, stable@vger.kernel.org,
+	viresh.kumar@linaro.org, wangyuli@uniontech.com, will@kernel.org,
+	wquan@redhat.com, xiaopei01@kylinos.cn
+Subject: Re: [GIT PULL v2] virtio, vhost: features, fixes
+Message-ID: <aI0rDljG8XYyiSvv@gallifrey>
+References: <20250801091318-mutt-send-email-mst@kernel.org>
+ <CAHk-=whgYijnRXoAxbYLsceWFWC8B8in17WOws5-ojsAkdrqTg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <CAHk-=whgYijnRXoAxbYLsceWFWC8B8in17WOws5-ojsAkdrqTg@mail.gmail.com>
+X-Chocolate: 70 percent or better cocoa solids preferably
+X-Operating-System: Linux/6.1.0-34-amd64 (x86_64)
+X-Uptime: 20:59:29 up 96 days,  5:13,  2 users,  load average: 0.00, 0.00,
+ 0.00
+User-Agent: Mutt/2.2.12 (2023-09-09)
 
-Jakub Kicinski wrote:
-> We keep seeing flakes on packetdrill on debug kernels, while
-> non-debug kernels are stable, not a single flake in 200 runs.
-> Time to give up, debug kernels appear to suffer from 10msec
-> latency spikes and any timing-sensitive test is bound to flake.
+* Linus Torvalds (torvalds@linux-foundation.org) wrote:
+> On Fri, 1 Aug 2025 at 06:13, Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> >         drop commits that I put in there by mistake. Sorry!
 > 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> Not only does this mean they were all recently rebased, absolutely
+> *NONE* of this has been in linux-next as fat as I can tell. Not in a
+> rebased form _or_ in the pre-rebased form.
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+My notes say that I saw my two vhost: vringh  deadcode patches in -next
+on 2025-07-17.
+
+Dave
+
+> So no. This is not acceptable, you can try again next time when you do
+> it properly.
+> 
+>             Linus
+> 
+-- 
+ -----Open up your eyes, open up your mind, open up your code -------   
+/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
+\        dave @ treblig.org |                               | In Hex /
+ \ _________________________|_____ http://www.treblig.org   |_______/
 
