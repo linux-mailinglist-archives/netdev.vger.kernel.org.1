@@ -1,59 +1,61 @@
-Return-Path: <netdev+bounces-211399-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211400-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79D83B1888A
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 23:06:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2796BB18892
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 23:14:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 08BD918900A6
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 21:06:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9CA0C1884BB3
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 21:14:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E78728751A;
-	Fri,  1 Aug 2025 21:05:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F016928A724;
+	Fri,  1 Aug 2025 21:14:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U0sGwPvU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kcQQ4o1S"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 558621A01C6;
-	Fri,  1 Aug 2025 21:05:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C872221CC5B
+	for <netdev@vger.kernel.org>; Fri,  1 Aug 2025 21:14:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754082358; cv=none; b=lK6QTDwp2Yhda9n3gRRvoKaOfeM76Llc2B3JJQiVdV0+W+90alAb6wgD1zckNccs65AN4SNmgHxLNrDsk6Q2r9vRlYB6qoo+oXleLJVLlCVS2+qPdIwaS4LX59N19L706FRfF/uTqysD399eSun9DgmqX9ezDdFWf2WKW5fnqyk=
+	t=1754082865; cv=none; b=GP15SK5W0EiiVl4kVBeFVrZcS+KYKayiW57q5M3IZeZ+NwaAWAVM6wh2phmAwM8z0K2D7JE8m+trEVdWb5gdz/sDmgVLGKP3wi8o4FlhDO+H5jaqxJvNbQLS7KBHC6N/x+8LBeL35kqhqvcoU7nFqhYIgN1XmILYvaHxCltDPZw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754082358; c=relaxed/simple;
-	bh=WoLvDfKHC8rXAhX8dU4W9WkDcw3sCXY0/sQU2CyY7GM=;
+	s=arc-20240116; t=1754082865; c=relaxed/simple;
+	bh=y1AEVjbsL2BS+WnEoouveeKQFBU8EqTaIaPX7iArLTo=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TWNxz4299GnvCNVTp2YPUS2A+N6/8Mlej11fTpE2LUFZZKorbSt9vnExlq4+MqFDFjqfEs8ARkx942yL4EY8Psr3qUlGsnLmAfs5PFRiX6RlV3bGePK3xxj6xHt93TFW5VVq9rPE57OzUV3bnfjMjyoeqZll0DL+cmJVVU6xlEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U0sGwPvU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA64FC4CEE7;
-	Fri,  1 Aug 2025 21:05:57 +0000 (UTC)
+	 MIME-Version:Content-Type; b=F7XkUHL7AT574b76ZqVhH0qyiVPDv4SIKLBzo6ouEP9X1d2ds/R+IkBPzS+PuX0fPv9EfBGsdrNlMMmwZfuN1zaL6WoqdKjzdj8GOAZIBAG+/IvSM7/06FLOaXSPdLA3seTPS4KU0H/gGJCeDXILdkhBWu6PpM9bYbOkZVN/W1g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kcQQ4o1S; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2681C4CEE7;
+	Fri,  1 Aug 2025 21:14:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754082358;
-	bh=WoLvDfKHC8rXAhX8dU4W9WkDcw3sCXY0/sQU2CyY7GM=;
+	s=k20201202; t=1754082865;
+	bh=y1AEVjbsL2BS+WnEoouveeKQFBU8EqTaIaPX7iArLTo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=U0sGwPvUhv7vaKp+HEe7l/OhtPY7xcQMPzzJyYcTDBdPgCu4dPut+8xWTFegSxO1C
-	 tGbn+B+Ku0qxJTK8CGHCPkbL5B1TH9v8LI3UXqP4IHzCvw7B9IAwk7kwVEaSucWyNn
-	 YayDUJNAJRoPgyHl7E4/1NTdyDAI6AnXY/zUnbWmfZZpYI5opT36WuKeRoaqTeQqJL
-	 DsPqeWS8ahqoWUpb3HwFTA6f11a8SwiXImm0Ey5jMmEMJp5eS2Ou+Iv2xIHvG9dEa5
-	 73QaDOKf8meRxcgdOPduKqAtY1JYWsqZKL+8idSkvt6CD/uwkE+FTICEW0rqSsjv8B
-	 Ud1VRZsDQtZ3A==
-Date: Fri, 1 Aug 2025 14:05:57 -0700
+	b=kcQQ4o1SI9hAapXtV3G0UtZLWUl0cQU5LoCmvmz5oUxJTiAZNJM2fIpJeMEd7SFLw
+	 E1fI6r1u0jguQ0hXOsss/0CWi+6UJK2EnS6mUAdsT8h9wns/SrTpe4UsjX21dMHEu7
+	 YYSwnYyDIjDvG0RIr1nJiksIvhiJubyi8EPhu1tt5oyCS/0j4E7RO85H5bLZLLIN64
+	 RyWllaCKPR2T0zLLW+8eSBzeJy0GU5ybtU7+PrGDjOj8f/bM9Ra71SINTj0IMxs1ZB
+	 uf7DcS3HRptkZMsb9+lVsdYnr96ipuLwp4xI27Zhf5Uxbc12hsdIC2ZY7opq0U80wb
+	 tujSEOGJQ353g==
+Date: Fri, 1 Aug 2025 14:14:24 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- shuah@kernel.org, willemb@google.com, matttbe@kernel.org,
- linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net] selftests: net: packetdrill: xfail all problems on
- slow machines
-Message-ID: <20250801140557.53a36012@kernel.org>
-In-Reply-To: <688d2af39aff_2e1a6829416@willemb.c.googlers.com.notmuch>
-References: <20250801181638.2483531-1-kuba@kernel.org>
-	<688d2af39aff_2e1a6829416@willemb.c.googlers.com.notmuch>
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ Breno Leitao <leitao@debian.org>, Kuniyuki Iwashima <kuni1840@gmail.com>,
+ netdev@vger.kernel.org,
+ syzbot+8aa80c6232008f7b957d@syzkaller.appspotmail.com
+Subject: Re: [PATCH v1 net] netdevsim: Fix wild pointer access in
+ nsim_queue_free().
+Message-ID: <20250801141424.4531c205@kernel.org>
+In-Reply-To: <CAAVpQUCDNGxtk2Hu0P6f0Ec2-2bOdn9H=uq_hpZ3_P-zcxoiLw@mail.gmail.com>
+References: <20250731184829.1433735-1-kuniyu@google.com>
+	<CANn89iJKYPAMR+ofaJLsQpew2E-0DH4eLh5-QF7tB56-8BfWxg@mail.gmail.com>
+	<CAAVpQUCDNGxtk2Hu0P6f0Ec2-2bOdn9H=uq_hpZ3_P-zcxoiLw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,17 +65,28 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 01 Aug 2025 17:00:35 -0400 Willem de Bruijn wrote:
-> Jakub Kicinski wrote:
-> > We keep seeing flakes on packetdrill on debug kernels, while
-> > non-debug kernels are stable, not a single flake in 200 runs.
-> > Time to give up, debug kernels appear to suffer from 10msec
-> > latency spikes and any timing-sensitive test is bound to flake.
-> > 
-> > Signed-off-by: Jakub Kicinski <kuba@kernel.org>  
+On Fri, 1 Aug 2025 09:29:49 -0700 Kuniyuki Iwashima wrote:
+> > >         hrtimer_cancel(&rq->napi_timer);
+> > > -       local_bh_disable();
+> > > -       dev_dstats_rx_dropped_add(dev, rq->skb_queue.qlen);
+> > > -       local_bh_enable();
+> > > +
+> > > +       if (likely(dev->reg_state != NETREG_UNINITIALIZED)) {  
+> >
+> > I find this test about reg_state a bit fragile...
+> >
+> > I probably would have made dev_dstats_rx_dropped_add() a bit stronger,
+> > it is not used in a fast path.  
 > 
-> Reviewed-by: Willem de Bruijn <willemb@google.com>
+> I thought I should avoid local_bh_disable() too, but yes,
+> it's unlikely and in the slow path.
+> 
+> I'll use the blow diff in v2.
 
-I should have added "Willem was right" 'cause you suggested this 
-a while back. But didn't know how to phrase it in the commit msg :)
+Option 2 :
+
+	if (rq->skb_queue.qlen)
+		dev_dstats_rx_dropped_add(dev, rq->skb_queue.qlen);
+
+since there can't be any packets, yet. Up to you.
 
