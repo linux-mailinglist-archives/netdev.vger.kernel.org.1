@@ -1,102 +1,124 @@
-Return-Path: <netdev+bounces-211410-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211411-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F32FFB188E0
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 23:40:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 719CCB188E5
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 23:44:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7AE981C8364A
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 21:40:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3278E3AA7E4
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 21:44:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFFE128D8F5;
-	Fri,  1 Aug 2025 21:39:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C696028DF0B;
+	Fri,  1 Aug 2025 21:44:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MWCDkr5y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M4zSFKVM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com [209.85.219.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87D66220680;
-	Fri,  1 Aug 2025 21:39:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4302D2E36F8;
+	Fri,  1 Aug 2025 21:44:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754084395; cv=none; b=jqd4Qpnpkc/JihH2TL+0iFVMpidGE7Jct96nxeyf5GFKygSRTCfztLna5oOTN+Z/NZniylgQhgCDXToT14GHBveZ89y7CpIUU3KXGKiZjIAy4lr8En3TpDl54TO70Gn5WQUK1Z79aN0dOQ9II3MxpQpo6jI23FiruT3z0JTqw8I=
+	t=1754084658; cv=none; b=fv00PbwALLrnZL1d2c5RERtLBmEiqf5JNzW97iOxUoXNRSytx2zSBUTlu7sBTtoVTkHQ2oPq0i0Wb0rgHnJXmun9sAh0LRkwxvVrZZo3HfMJXI/0Og2BpQq75G6chZ8/3zgbifWFBM2AZIbbz+FhzLfOzqv1s70K8rLoObYHDDY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754084395; c=relaxed/simple;
-	bh=gU6AkxBeU6Ey08y46Gg6l6o4z/dGQiCsh8KIZLUBQds=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=gB3stLZ25eCSCozpYZv7oWZczilbfAeVACPmJZoj56MUwzCXJfEXOd9T+bn0wtHIXy6eFGpkMpPa/1D3saH7S4J/VaZ/He9WjEBfYEiC/Ku1GYnyDrctGpyEYx5kB6PJyeny5vhqsb6XGx+xw31isS+PUqHnK34BKeVpqQ4Bk/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MWCDkr5y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9F37C4CEE7;
-	Fri,  1 Aug 2025 21:39:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754084395;
-	bh=gU6AkxBeU6Ey08y46Gg6l6o4z/dGQiCsh8KIZLUBQds=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=MWCDkr5y4F8PAd1KfeK7b9DZULmjJ4jdLQjue0sRs+1AaI40WAA45hmjVYbRuVHZ8
-	 bTKwF5DaUevPQ9G52y5CGAfh4Q1DgFR/1YiraRZievXHiq8TYftgmajzVlAawzJX/P
-	 HKM9A3XvnO/LZ4mt7TpRScFfmRxG/rwGebBxk8ywjwzAOkP0DfaydErJ0qltdl6zWo
-	 fu8n0ih9sliGO1tNGg2RBhNuH1Q4Ejsv+mtSAC1aF5C0+K4VkzhzqzKpqINO37V4zH
-	 oVCZ8z9pGg6kR+UtFvcMabywZHB7bZx6DM+1gdUM0NYxSeg17XbLSPykWs1z04O0gk
-	 IRKd/Q32+4RLA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70EDE383BF56;
-	Fri,  1 Aug 2025 21:40:11 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1754084658; c=relaxed/simple;
+	bh=TugDInWfzLtuHmQ5NgSA7Tisgx2UotnZn+XmrZxxWTU=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=CM1eVDDFyNAXOO8MxyoxJYlY0it607bNabuKWNJOo5mTCgXyAUtskeoxiLvwi/3lAZtCahd9fd7CmF4GdqTgduWaz7FbYr7b9+OwQz2GD2ViV7wmph0F9x0qlzoAfR3cgMtEHUIpe4/w4slq3+TkK8/5AN3Ug+fFlZ+Mb2B7Rpk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M4zSFKVM; arc=none smtp.client-ip=209.85.219.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f180.google.com with SMTP id 3f1490d57ef6-e75668006b9so1399104276.3;
+        Fri, 01 Aug 2025 14:44:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1754084656; x=1754689456; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=K76Y2KN/aWyarE1AwOC1zR3geasJuQAhmoAIi56PhCE=;
+        b=M4zSFKVMizh7x86Wow8biEjSgeRq5KNNramecgU3p7qYMIqBSHoVgU3d/dGedJpWZD
+         iKKHnmznXm3ecqRH4zNIX69HedUe562DNecnS3stvYylKMf8ddBhzb8ZiqVuCEacDKwR
+         rOF+hfchgnKoRyLZegJDcdMHuTQR1GcnJMt9g7YC0ipYuhTYRlNdTCk+4nih5UZSCMoV
+         J+CxpVCcR3k5lsnMogFkzPhdMe7rnUctT5afVvWRcbNAKmq5Rhyk+ZmkLyYl9wkvyu/g
+         0Phvc3aYfiRFzY35ee1at4XtetswDp/1vtv6DVQslQgMB7pBKnUDHbZ9SeStn9Ig8Tnb
+         cSZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754084656; x=1754689456;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=K76Y2KN/aWyarE1AwOC1zR3geasJuQAhmoAIi56PhCE=;
+        b=dt5dB4XyLmpiDjs177Arwg+EGlQhZVfNSjpPTqW+CKDhuR+Bzzuq3dJX8OIFLtNPTB
+         Ok9xBTHpXVW5bFvQFP8Jzu4Xrb1wiE9xJ/NVOCX8Hd8SrJDYmcAzmL8cpUmbaVb8103N
+         EAkUPS7HgQVN1DUiVWKxn11fDFkaTun8yJnsQwTuUX7BkOmvtQqX9Jirh4fXAQ3Djj0C
+         lptXRnBp3omtQs+luHleRmbQ0gFI+p8TtfTs02uEAzuDq0wT56X6b7GKwumAm9Ej2Wfn
+         JSh6oAtKG0O3vcONMkzlGHYox/6D0aELR7Crmrm9OBPbn0cC30nJsmYVsxGecU0Y0W3I
+         UdEQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUPmGdQAQeTnOUqY3cSvvkfS3l+BjsgEKkDuzAtI4v0yNLlXDkirhDfste6GJ1I/MiZLYISdupcTihzj0Lb7jI=@vger.kernel.org, AJvYcCWBCBHNMVef3gLRMzxKQvqruV8PuagxQKkxCkMQVmqtYsHw0QPtNj2NAflCaiUYQ02l6kB16Q8O@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxm8L+rczNQEPr+E3Xzfz0/C+Wpc89NpeXilFttoeweq8IMrJLj
+	/XF7JYpRkCarkEZ0Z7z64HvmA+4IbfM0Ojk9Qx7ZLJ/lf/DDAep2Rcv2
+X-Gm-Gg: ASbGncuCP6R059a5BnRO/27ezXNwqz5EAxJoFcZC7PhK0dF/h4lFNdQTtEbe9YFGv9L
+	s8d1i0QtpA3Vs1oaCucWMT4H7IyJJE6VC9HnFS9DfUoPw0CoAFggj0eo4vrkHYKEhVt8J+8845k
+	/1ByxPxxIPnNpItThYR/CtryBxImL0SRDb+AqqrryONvlRq+eUDV0MubByyYVPVqTfKf+GUAw29
+	lYm1lnjwBzp3rjpEc9s/2nWohGEAKf79ujqas9uwrAHj4yYPrpfg3AEm7md/KTkiIPLddzHe3sQ
+	fa9MV8i6jZSOjNZmZ9h05XMgnF+bNpbLHs5xkn3uLwCU4nbjEdG5hjV5nhUWGa0Ok+lNoGg7yf3
+	CI9HgT4aNqOfnk3H9ltiEEzAOyP659VzR6BVui+xz5eC/W1/SfA0vik3RTwa0JCDJhU62bQ==
+X-Google-Smtp-Source: AGHT+IGewaD37pUuA1PuA8zaHerjPVMCnUrtjn2yXhbuyQnF7Y7/8x/fFhfwly9JQGMuzScI12rMiA==
+X-Received: by 2002:a05:6902:12c6:b0:e8b:3e67:b90c with SMTP id 3f1490d57ef6-e8fee10857amr1720026276.16.1754084656121;
+        Fri, 01 Aug 2025 14:44:16 -0700 (PDT)
+Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
+        by smtp.gmail.com with UTF8SMTPSA id 3f1490d57ef6-e8fd3860b42sm1813579276.25.2025.08.01.14.44.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Aug 2025 14:44:15 -0700 (PDT)
+Date: Fri, 01 Aug 2025 17:44:15 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, 
+ netdev@vger.kernel.org, 
+ edumazet@google.com, 
+ pabeni@redhat.com, 
+ andrew+netdev@lunn.ch, 
+ horms@kernel.org, 
+ shuah@kernel.org, 
+ willemb@google.com, 
+ matttbe@kernel.org, 
+ linux-kselftest@vger.kernel.org
+Message-ID: <688d352f2fc3b_2e527e294d5@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250801140557.53a36012@kernel.org>
+References: <20250801181638.2483531-1-kuba@kernel.org>
+ <688d2af39aff_2e1a6829416@willemb.c.googlers.com.notmuch>
+ <20250801140557.53a36012@kernel.org>
+Subject: Re: [PATCH net] selftests: net: packetdrill: xfail all problems on
+ slow machines
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net/mlx5: Correctly set gso_segs when LRO is used
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175408441027.4089984.2960748466316299557.git-patchwork-notify@kernel.org>
-Date: Fri, 01 Aug 2025 21:40:10 +0000
-References: <20250729-mlx5_gso_segs-v1-1-b48c480c1c12@openai.com>
-In-Reply-To: <20250729-mlx5_gso_segs-v1-1-b48c480c1c12@openai.com>
-To: Christoph Paasch <cpaasch@openai.com>
-Cc: saeedm@nvidia.com, tariqt@nvidia.com, mbloch@nvidia.com, leon@kernel.org,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, amirv@mellanox.com,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org, gal@nvidia.com
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Tue, 29 Jul 2025 11:34:00 -0700 you wrote:
-> From: Christoph Paasch <cpaasch@openai.com>
+Jakub Kicinski wrote:
+> On Fri, 01 Aug 2025 17:00:35 -0400 Willem de Bruijn wrote:
+> > Jakub Kicinski wrote:
+> > > We keep seeing flakes on packetdrill on debug kernels, while
+> > > non-debug kernels are stable, not a single flake in 200 runs.
+> > > Time to give up, debug kernels appear to suffer from 10msec
+> > > latency spikes and any timing-sensitive test is bound to flake.
+> > > 
+> > > Signed-off-by: Jakub Kicinski <kuba@kernel.org>  
+> > 
+> > Reviewed-by: Willem de Bruijn <willemb@google.com>
 > 
-> When gso_segs is left at 0, a number of assumptions will end up being
-> incorrect throughout the stack.
-> 
-> For example, in the GRO-path, we set NAPI_GRO_CB()->count to gso_segs.
-> So, if a non-LRO'ed packet followed by an LRO'ed packet is being
-> processed in GRO, the first one will have NAPI_GRO_CB()->count set to 1 and
-> the next one to 0 (in dev_gro_receive()).
-> Since commit 531d0d32de3e
-> ("net/mlx5: Correctly set gso_size when LRO is used")
-> these packets will get merged (as their gso_size now matches).
-> So, we end up in gro_complete() with NAPI_GRO_CB()->count == 1 and thus
-> don't call inet_gro_complete(). Meaning, checksum-validation in
-> tcp_checksum_complete() will fail with a "hw csum failure".
-> 
-> [...]
+> I should have added "Willem was right" 'cause you suggested this 
+> a while back. But didn't know how to phrase it in the commit msg :)
 
-Here is the summary with links:
-  - [net] net/mlx5: Correctly set gso_segs when LRO is used
-    https://git.kernel.org/netdev/net/c/77bf1c55b2ac
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Ha, did I? I was hoping that the short allow-list would work. But if
+latency spikes can happen anytime, then that clearly not.
 
