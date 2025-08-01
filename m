@@ -1,95 +1,123 @@
-Return-Path: <netdev+bounces-211293-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211294-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CF2EB17AA9
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 02:54:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 638BEB17AB2
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 03:06:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B7B2586CA8
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 00:54:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B73D816DA89
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 01:05:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24EFB22301;
-	Fri,  1 Aug 2025 00:54:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D0301DFDE;
+	Fri,  1 Aug 2025 01:05:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="j22yoF36"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A169E360
-	for <netdev@vger.kernel.org>; Fri,  1 Aug 2025 00:54:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79D381E50E
+	for <netdev@vger.kernel.org>; Fri,  1 Aug 2025 01:05:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754009645; cv=none; b=t0Fq0gP9k9dxesMpRt4nXF/3o6K208oZWvC2eBclfvewZRIU9/OtwiLXZD3J9oXRGM2jEyIiR9aEKhQPPIHx31UYKUOd6rXE6NLniLkKQerW5kGh48bU6tluuAkCBLQun4tnmqtxidwY0A5SC00A1WjmMHTGSzI0mBf2UC+wBwU=
+	t=1754010356; cv=none; b=Z8bgm/+7mVb3xAzckFNqcxtLRCZGugKwVQjCw1oQRTz31tTvCRBwimZqO0UQL21T5TDFZDUuon6Xc280OVti6/jadhKbgKmj7Hch9ilwQz7XdaDPSCYCxHFu2aKUeZcBMKQYKlLh/ZOQdXW5BIzncaFFRJmjirJjuC/AbDEL0wA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754009645; c=relaxed/simple;
-	bh=SWWSAxzg0urfm7YQfgJMgzkC5z/Raw2jx2xKLULcbqQ=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=DyRtEYyAz94jptplIFC+71c0nOD+GDP+vZZ5gkgW1D3+awMSfPKuQ+nD/CO6W6f5HMyDwL4wlNjjr4dhrBs+v50LfUsW7qCiWkvW13izenfOGktyGXCC4Y8ziszH/Rw5obLWhyNFxxi84xt4DsKtJelVnQieYc5ue2veTkQs3KA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3e3fcdbeb23so28714575ab.3
-        for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 17:54:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754009643; x=1754614443;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=w+4lsoY/uOE9b0JrS65NlzuPeknd2zacB9YwHmUemzA=;
-        b=UOI3lhrlTEa25YpB9ggynzrK0+WZPXGvmHJBw9QaAZtUeiICqvu8JY1inCdjKo3S03
-         viB7xecPBadCBg8HIQkCE8anBj8eY+hVU/oQmSEm5LBbvlkV/TQHxzHS6F9076oNNw1i
-         GP/Ycg7FQ1nt5lNKkIoBtA0YpTPTtH2QHodmYPH/5ETdqbZgfgeNJbInhSzbemKkuejr
-         DNFb5Fpo3InF48IYA111eQkVUssu2qO92yuaw/aaobVO2QJwEdhahAMW4SzdMljPyTze
-         pNPcFmdV2cVfgrQ3JJpCwyVmW3E7YWGGQvi2Qi4YGnnjCQ0rw8HAapXwIdN70uLWZ+XI
-         z2oQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWgNczGWYT4+MOF9A8RAoyx/Lf7/xPtSODXV+dfZinvRD5aWamuTaeWDwO7YgmZ1XDB9lm5D7s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwdxERCJ66lrck9Nvsb8DDSz9rlflVl//ppxlhv0Rw24cEbXST3
-	BOA3DXRhji3mJDU1fR2+2DQGs85+DF4bqeTH6W78U+O/b52VN4RldM2kvse9Dvz9O/OmJJM9E/M
-	mjor9z0kprFphwa0Rf8U7gaP6y6SrZTL1WmUWqPvCLqVLyN0U173zECIK63c=
-X-Google-Smtp-Source: AGHT+IFaVZdBQYjo1zKx0gGcfXAh4/MccliMcbrduNQGUM94KUkUcjqih+MSl8N2B6gZ6Cc8Vq+QioJtZnXDJZ39XZcejI1qbHLb
+	s=arc-20240116; t=1754010356; c=relaxed/simple;
+	bh=CrqopOqnETrha7sxDqw5g7Qbwci0R9pf8ZjfuY374Gk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=U1XjQDg6qLXJOi7FUDVvwdsJRku6q0/rLYen2xS3jUvH+JrQYNddopy2DvmiF0VaZDhMBD9zJ51GPyiDfm4nSMtckXiLvWFlZasUxy3oya6CzEXhbmIMw23vie/F/wNdrc496ljikmO/BKSyJh4+5e6k1h4GOhhGR6WMLz3Y5bs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=j22yoF36; arc=none smtp.client-ip=91.218.175.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <cd6155cf-f1e0-4d6b-98af-a53c4999c5a3@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1754010351;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mWnfPBYlK3FgFXB+auPIsaTZOIy8G/auRktChN5Wm1g=;
+	b=j22yoF36O7Wl/CWBmjIegSyfMPObwfQUWyL5Alo/iYKLFO7Kj8IDQYfA61MGWRgqI0VcMD
+	/BhGqCqX0miqVasDbasMRXhQNSWG6+tu8s4fznPVgYELQYkV/yMuuJWX2OXdv0CrSANp+w
+	kt18UwdyFUgHgNNnSmH2frTb37SiMfc=
+Date: Thu, 31 Jul 2025 18:05:45 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:2610:b0:3e3:f9fa:2c8c with SMTP id
- e9e14a558f8ab-3e3f9fa2e8amr168893905ab.12.1754009642873; Thu, 31 Jul 2025
- 17:54:02 -0700 (PDT)
-Date: Thu, 31 Jul 2025 17:54:02 -0700
-In-Reply-To: <6888736f.a00a0220.b12ec.00ca.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <688c102a.a00a0220.26d0e1.0056.GAE@google.com>
-Subject: Re: [syzbot] [net?] WARNING in xfrm_state_fini (3)
-From: syzbot <syzbot+6641a61fe0e2e89ae8c5@syzkaller.appspotmail.com>
-To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	hdanton@sina.com, herbert@gondor.apana.org.au, horms@kernel.org, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, sd@queasysnail.net, steffen.klassert@secunet.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [RFC PATCH bpf-next v1 01/11] bpf: Convert bpf_selem_unlink_map
+ to failable
+To: Amery Hung <ameryhung@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
+ alexei.starovoitov@gmail.com, andrii@kernel.org, daniel@iogearbox.net,
+ memxor@gmail.com, kpsingh@kernel.org, martin.lau@kernel.org,
+ yonghong.song@linux.dev, song@kernel.org, haoluo@google.com,
+ kernel-team@meta.com
+References: <20250729182550.185356-1-ameryhung@gmail.com>
+ <20250729182550.185356-2-ameryhung@gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20250729182550.185356-2-ameryhung@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-syzbot has bisected this issue to:
+On 7/29/25 11:25 AM, Amery Hung wrote:
+> - bpf_local_storage_update()
+> 
+>    The three step update process: link_map(new_selem),
+>    link_storage(new_selem), and unlink_map(old_selem) should not fail in
+>    the middle. Hence, lock both b->lock before the update process starts.
+> 
+>    While locking two different buckets decided by the hash function
+>    introduces different locking order, this will not cause ABBA deadlock
+>    since this is performed under local_storage->lock.
 
-commit 2a198bbec6913ae1c90ec963750003c6213668c7
-Author: Sabrina Dubroca <sd@queasysnail.net>
-Date:   Fri Jul 4 14:54:34 2025 +0000
+I am not sure it is always true. e.g. two threads running in different cores can 
+do bpf_local_storage_update() for two different sk, then it will be two 
+different local_storage->lock.
 
-    Revert "xfrm: destroy xfrm_state synchronously on net exit path"
+My current thought is to change the select_bucket() to depend on the owner 
+pointer (e.g. *sk, *task...) or the local_storage pointer instead. The intuitive 
+thinking is the owner pointer is easier to understand than the local_storage 
+pointer. Then the same owner always hash to the same bucket of a map.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1714d2a2580000
-start commit:   038d61fd6422 Linux 6.16
-git tree:       upstream
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=1494d2a2580000
-console output: https://syzkaller.appspot.com/x/log.txt?x=1094d2a2580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=4066f1c76cfbc4fe
-dashboard link: https://syzkaller.appspot.com/bug?extid=6641a61fe0e2e89ae8c5
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16ca1782580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=140194a2580000
+I am not sure the owner pointer is always available in the current setup during 
+delete. This needs to check. iirc, the current setup is that local_storage->lock 
+and bucket lock are not always acquired together. It seems the patch set now 
+needs to acquire both of them together if possible. With this, I suspect 
+something else can be simplified here and also make the owner pointer available 
+during delete (if it is indeed missing in some cases now). Not very sure yet. I 
+need a bit more time to take a closer look.
 
-Reported-by: syzbot+6641a61fe0e2e89ae8c5@syzkaller.appspotmail.com
-Fixes: 2a198bbec691 ("Revert "xfrm: destroy xfrm_state synchronously on net exit path"")
+Thanks for working on this! I think it can simplify the local storage.
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+[ ... ]
+
+> @@ -560,8 +595,9 @@ bpf_local_storage_update(void *owner, struct bpf_local_storage_map *smap,
+>   	struct bpf_local_storage_data *old_sdata = NULL;
+>   	struct bpf_local_storage_elem *alloc_selem, *selem = NULL;
+>   	struct bpf_local_storage *local_storage;
+> +	struct bpf_local_storage_map_bucket *b, *old_b;
+>   	HLIST_HEAD(old_selem_free_list);
+> -	unsigned long flags;
+> +	unsigned long flags, b_flags, old_b_flags;
+>   	int err;
+>   
+>   	/* BPF_EXIST and BPF_NOEXIST cannot be both set */
+> @@ -645,20 +681,31 @@ bpf_local_storage_update(void *owner, struct bpf_local_storage_map *smap,
+>   		goto unlock;
+>   	}
+>   
+> +	b = select_bucket(smap, selem);
+> +	old_b = old_sdata ? select_bucket(smap, SELEM(old_sdata)) : b;
+> +
+> +	raw_spin_lock_irqsave(&b->lock, b_flags);
+> +	if (b != old_b)
+> +		raw_spin_lock_irqsave(&old_b->lock, old_b_flags);
 
