@@ -1,111 +1,139 @@
-Return-Path: <netdev+bounces-211359-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211360-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 319AAB1827F
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 15:32:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C8F0FB18284
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 15:33:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 63AFF586E9C
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 13:32:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05EEB587154
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 13:33:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7693B22759B;
-	Fri,  1 Aug 2025 13:32:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BF5D231856;
+	Fri,  1 Aug 2025 13:32:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ep7vkVrE"
 X-Original-To: netdev@vger.kernel.org
-Received: from alt42.smtp-out.videotron.ca (alt42.smtp-out.videotron.ca [23.233.128.29])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F0CF33D8
-	for <netdev@vger.kernel.org>; Fri,  1 Aug 2025 13:32:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.233.128.29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5C0C22D78F;
+	Fri,  1 Aug 2025 13:32:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754055158; cv=none; b=EgEDYPx6I0KzVo9PHaAM41ulZE3DvEa5Ai6IBieakFvdV3ojM8MYf2motTdgeRwn+cepP5kKSOTFrWNiPDMdoIvh2QePTM3Cehtk7/3J3bDrZv3gxDnKDnwix4GaG3mCbi3rCrjLSq/2FRYq+itBnXif1OgnHXafapPd/PHx1/4=
+	t=1754055179; cv=none; b=ZbVYnUxX7i6H3zZOLwrYzGAtHYBtbj5vKjABNmvegkpDMOA97tNUhhzTg4w8VA81KXJLFYIt9/RpBxClPwtdJNmi0qTyXZ/feymixeyvdKwfAHfMNSwxHPAy5Zqcgj+5pbzLCrx5r2RYJAtHJyWqURn38MGlBhja6MUvhIG8qJg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754055158; c=relaxed/simple;
-	bh=FhZoHEfxKzxylPJtES6oYDqZnyO9ZWHiN0t00emboHg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OkBMo760qzpp7cQF1+ojkK9AxdGVZ+VBk6Q91CsVu1w9qwmz0rVHaDsbHXavLzl81iVjOsXtuWGBbqGbC64POXKwXqf2YtGpf18MCHVhfpFM9jQRB4PSqFbuNuDIuJuSDMtun+5mPfByzmXYYNXyL9SHQiQBcB9L2ZhMOM6wmRw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=redhat.com; spf=fail smtp.mailfrom=redhat.com; arc=none smtp.client-ip=23.233.128.29
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=redhat.com
-Received: from zappa.orion ([24.201.91.161])
-	by Videotron with ESMTP
-	id hpqZu9Bk9MJQQhpqZuv0wZ; Fri, 01 Aug 2025 09:30:58 -0400
-X-ORIG-RCPT: davem@davemloft.net,edumazet@google.com,anthony.l.nguyen@intel.com,przemyslaw.kitszel@intel.com,kuba@kernel.org,andrew+netdev@lunn.ch,dhill@redhat.com,pabeni@redhat.com,netdev@vger.kernel.org
-X-Authority-Analysis: v=2.4 cv=CICJXgrD c=1 sm=1 tr=0 ts=688cc192
- a=OPdtphJVnnJ7kPN51veEEg==:117 a=OPdtphJVnnJ7kPN51veEEg==:17
- a=2OwXVqhp2XgA:10 a=20KFwNOVAAAA:8 a=QyXUC8HyAAAA:8 a=KgM5TV4k-OYgtHylTX4A:9
-Received: from knox.orion (unknown [192.168.1.37])
-	by zappa.orion (Postfix) with ESMTP id E21023FC;
-	Fri, 01 Aug 2025 09:30:18 -0400 (EDT)
-From: David Hill <dhill@redhat.com>
-To: netdev@vger.kernel.org
-Cc: anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	David Hill <dhill@redhat.com>
-Subject: [PATCH] PATCH: i40e Improve trusted VF MAC addresses logging when limit is reached
-Date: Fri,  1 Aug 2025 09:30:17 -0400
-Message-ID: <20250801133017.2107083-1-dhill@redhat.com>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1754055179; c=relaxed/simple;
+	bh=qIrQbKlltABNgB9Pqa+YAH5TjC2GEgMe/cjMQfZnjxk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=siG+h+RNuKF+ZrYVwy5cGfzv6r9ubxJzRULxaiTTwo6CJBcwgNN+Dgign4wjTUEH53zkdsFMLSGlKLWC++NONDtG9qc2nlIEJj3GSGQKPXg/kYRJlzkViQhzZctG25+Og9K7ASwWp8VfhEAYGU0lP+9bLTXMoIWMUfbVi8sZG6Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ep7vkVrE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB0A2C4CEE7;
+	Fri,  1 Aug 2025 13:32:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754055178;
+	bh=qIrQbKlltABNgB9Pqa+YAH5TjC2GEgMe/cjMQfZnjxk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Ep7vkVrE3UPPCXL7LAD9DrdMnolRhlMIAg9ii5YmV76Xlm+YUYV2t5VWvqLGsJCYw
+	 z9Hb6isdtRbXkVXUdt+2JYq0tZnt9EOLWDge7vskf0j4AJqG63OY3o+BiVTPokx3km
+	 TkrvGwU85nlO0RO7NTKs9yHTF6G6Vr3C0Div5ME3aXGkOxttw0Sx16BbhN7Ta+w1cF
+	 2XOlZNSR229V1f+j7rzfWPxGlCqUJAnlSGTE5dkKlvAvRXuKxtZDEFXe2kQ1h9vEgY
+	 uTWKrT2Jq61gUxX9Zd6VB0F9P7lbIwIa+Iu6iBwdGO5rGLmXN2MjSoORYgaUbKqowx
+	 FoRDJZRvsal0Q==
+Date: Fri, 1 Aug 2025 15:32:54 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com
+Subject: Re: [GIT PULL] Networking for v6.17
+Message-ID: <20250801-luftschicht-pochen-b060b1536fe1@brauner>
+References: <20250727013451.2436467-1-kuba@kernel.org>
+ <CAHk-=whnXTvh2b0WcNFyjj7t9SKvbPtF8YueBg=_H5a7j_2yuA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Binarystorm-MailScanner-Information: Please contact the ISP for more information
-X-Binarystorm-MailScanner-ID: E21023FC.A15A1
-X-Binarystorm-MailScanner: Found to be clean
-X-Binarystorm-MailScanner-SpamCheck: not spam, SpamAssassin (not cached,
-	score=-0.01, required 7, ALL_TRUSTED -0.01)
-X-Binarystorm-MailScanner-From: dhill@redhat.com
-X-CMAE-Envelope: MS4xfCKvs5SDCQBQxFoP8Uvt8RWwsKLq+7bwhCzr79jgLIfGDWx1Ajp+Mc/ESgR+xBGrCRPV5Aqzl++ZTf1e5LsQ9fUrIBrPC7+CPKbwv3++alkmwziktFWR
- Ma/9PE3g0rxkkxz1P0hVJHCbeK0F0RBUIbr1bF0NUoUUQQTUAVN1jjGjAYfO2m6HGy+Z3NPSFVuY6AjRSml11qOG8Btq1gQXFDYSclKtEQmJencIr4sDV4yb
- JWWTwyg/4+A9KG4JprRpKLs7Ckfgv/JjqwBPlrsajCcgY52an0l0FOw+RDVvJQK4vEMI24rZ0Pi9ZfCFR4Pz71Ytj9GcB3e9F3fFgxH6UVlhh9LaaMfcG8e3
- SvBeATEK/9/2G6iQJlM3Y3Qm+wlr7R097pd2YYsW9T+kkNeStDIJMsATuwS92eFkpOLWg2gsN48IR+VFTibE84acUIiUbw==
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAHk-=whnXTvh2b0WcNFyjj7t9SKvbPtF8YueBg=_H5a7j_2yuA@mail.gmail.com>
 
-When a VF reaches the limit introduced in this commit [1], the host reports
-an error in the syslog but doesn't mention which VF reached its limit and
-what the limit is actually is which makes troubleshooting of networking
-issue a bit tedious.   This commit simply improves this error reporting
-by adding which VF number has reached a limit and what that limit is.
+On Wed, Jul 30, 2025 at 09:20:46AM -0700, Linus Torvalds wrote:
+> On Sat, 26 Jul 2025 at 18:35, Jakub Kicinski <kuba@kernel.org> wrote:
+> >
+> > Networking changes for 6.17.
+> 
+> So while merging this, there was a trivial conflict with commit
+> 9b0240b3ccc3 ("netns: use stable inode number for initial mount ns")
+> from the vfs side (acked by networking people).
+> 
+> And the conflict wasn't hard to resolve, but while looking at it, I
+> got very unhappy with that conflicting commit from the vfs tree.
+> 
+> Christian - when the "use stable inode number" code triggers, it
+> bypasses ns_alloc_inum() entirely. Fine - except that function *also*
+> does that
+> 
+>         WRITE_ONCE(ns->stashed, NULL);
+> 
+> so now ns->stashed isn't initialized any more.
+> 
+> Now, that shouldn't matter here because this only triggers for
+> 'init_net' that is a global data structure and thus initialized to all
+> zeroes anyway, but it makes me very unhappy about that pattern that
+> ends up being about allocating the pid, but also almost incidentally
+> initializing that 'stashed' entry.
+> 
+> I ended up re-organizing the net_ns_net_init() code a bit (because it
+> now does that debugfs setup on success, so the old "return 0" didn't
+> work), and I think the merge is fine, but I think this "don't call
+> ns_alloc_inum()" pattern is wrong.
+> 
+> IOW, I don't think this is a bug, but I think it's not great.
 
-Signed-off-by: David Hill <dhill@redhat.com>
+I think we should not be initializing ns->stashed in ns_alloc_inum().
+The function name is already wrong for that purpose:
 
-[1] commit cfb1d572c986a39fd288f48a6305d81e6f8d04a3
-Author: Karen Sornek <karen.sornek@intel.com>
-Date:   Thu Jun 17 09:19:26 2021 +0200
----
- drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+static inline int ns_alloc_inum(struct ns_common *ns)
+{
+	WRITE_ONCE(ns->stashed, NULL);
+	return proc_alloc_inum(&ns->inum);
+}
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-index 9b8efdeafbcf..dc0e7a80d83a 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-@@ -2953,7 +2953,8 @@ static inline int i40e_check_vf_permission(struct i40e_vf *vf,
- 		    I40E_VC_MAX_MACVLAN_PER_TRUSTED_VF(pf->num_alloc_vfs,
- 						       hw->num_ports)) {
- 			dev_err(&pf->pdev->dev,
--				"Cannot add more MAC addresses, trusted VF exhausted it's resources\n");
-+				"Cannot add more MAC addresses, trusted VF %d uses %d out of %d MAC addresses\n", vf->vf_id, i40e_count_filters(vsi) +
-+          mac2add_cnt, I40E_VC_MAX_MACVLAN_PER_TRUSTED_VF(pf->num_alloc_vfs,num_ports)));
- 			return -EPERM;
- 		}
- 	}
--- 
-2.50.1
+That was done a long time ago via atomic_long_set() and I just changed
+it to WRITE_ONCE() when I reworked both nsfs and pidfs.
 
+We let all callers initialize the fields of struct ns_common embedded in
+their respective namespace types already. I see no reason to not just do
+the same thing for ns->stashed and drop that implicit initialization
+from ns_alloc_inum().
 
--- 
-This message has been scanned for viruses and
-dangerous content by MailScanner, and is
-believed to be clean.
+But aside from that I think my patch should have probably been:
 
+diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
+index 1b6f3826dd0e..5c39fb544f93 100644
+--- a/net/core/net_namespace.c
++++ b/net/core/net_namespace.c
+@@ -815,7 +815,6 @@ static __net_init int net_ns_net_init(struct net *net)
+ #ifdef CONFIG_NET_NS
+        net->ns.ops = &netns_operations;
+ #endif
+-       net->ns.inum = PROC_NET_INIT_INO;
+        if (net != &init_net) {
+                int ret = ns_alloc_inum(&net->ns);
+                if (ret)
+@@ -1283,6 +1282,8 @@ void __init net_ns_init(void)
+        init_net.key_domain = &init_net_key_domain;
+ #endif
+        preinit_net(&init_net, &init_user_ns);
++       init_net.ns.inum = PROC_NET_INIT_INO;
++       init_net.ns.stashed = NULL;
+
+        down_write(&pernet_ops_rwsem);
+        if (setup_net(&init_net))
+
+so the setup for the initial network namespce happens right where it is
+explicitly initialized.
 
