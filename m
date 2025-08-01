@@ -1,304 +1,178 @@
-Return-Path: <netdev+bounces-211320-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211321-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F89CB17F8C
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 11:46:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7622FB17F95
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 11:47:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC85516610D
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 09:46:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B4666210D8
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 09:47:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A459F2264BD;
-	Fri,  1 Aug 2025 09:46:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FBE51A76DE;
+	Fri,  1 Aug 2025 09:47:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X7sK3xPd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L4yEzCXD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 910511EC018
-	for <netdev@vger.kernel.org>; Fri,  1 Aug 2025 09:46:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C9CF227B8E;
+	Fri,  1 Aug 2025 09:47:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754041602; cv=none; b=dKOgLC7GanOyZXdFDZwGxKzHGefIHGhfCnT1QVgAMeeuksUYGk6E11rjNSV11ak2ty2ux6Ktyt+9+7tz/gmUodbtD0QOonMSU5I7JiD2tPa/XVahw+haq5vS2kuMy8XGDdAg1xe9iyGw/3Kuk2qktYU+XKBKQgl9v02OSK46FKM=
+	t=1754041657; cv=none; b=ngkFfG6KKCyXHQTaH+WbHOv1HvZkFAw2xcOpV1qdTNmflBgIMphEhk1HdE3GZZbfHKSzIzwrUhnpx8eqIP7V4XmP9/Tj/wogwJoktY0M9OLNoRmbEoD2xe2iYIvviIpf/SPiwQqhHv9GiZpM4xp+mg7GyIhCtOA0cH+Dou7jGP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754041602; c=relaxed/simple;
-	bh=659EqXl6yE+K192+p2hXdLrilZLhFeUSbKmGL5IEDuE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aM8UFkWgTyBnqVFj2IFCTpQf8qopgdWNgcl3mva00eZ4EIicshwVQiiQkm0wRobEMOyl/iiWFeeutQvBX3M1esYee+7+focEIWN25NJz+5DbI+8RNze8GL3fi0jFLJ4IaKgmCwpE9A5QTUvMB65gOl2AqK4P3qEdJ1VFCckVFBs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=X7sK3xPd; arc=none smtp.client-ip=209.85.222.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7e29616cc4fso168294685a.0
-        for <netdev@vger.kernel.org>; Fri, 01 Aug 2025 02:46:40 -0700 (PDT)
+	s=arc-20240116; t=1754041657; c=relaxed/simple;
+	bh=6DyjhgNLifkrdFza5N8xAoj6ArULOKmGBFWuEIRzalQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=T4WCypUV/lfvg/QfrIgPoBhBhgQUfM0XWyjDLT98ZfCeyasXoJlPrSvJ6tjayY3T0OTjcCMSKMzB6XeQivXS9jg6qdkZxqgdpT+34LpPxbQdR1xeRNzQwFTfPenx+2K4owrChI4nZEQSca/uaANA08NbDAMW9tkmzDQ37UIP3PY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L4yEzCXD; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4589b3e3820so19072395e9.3;
+        Fri, 01 Aug 2025 02:47:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754041599; x=1754646399; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fPi1aRA1xy91XJSfBFoK3IbCuYOH+ZWgmp1gomg+FIY=;
-        b=X7sK3xPdtIjUIUvE2ICZSNdL+u7DcbZ26VpNBZzAhs/mjgmxfak5b9q580nzmeejQX
-         akBSAhahTe48ru1dsoFCkMJxOm26CmyQy7zm81wR+Jf8gCTMah0WZKT/OL/d1aXahKl2
-         nLT8MwmRaDo1LV1cM3b7EgoTMyUVK2mW8hnSin5n+6PUXsNd1H7vOYn6+/qaJ++7PYge
-         1cBMUH4gZM0K27W54OpOIfOPp6qrJ8K4x14cYRRaJXfqRlB31f0GI62V7ltVDG/tsIV5
-         smXNWeHZsO0IW81rChHSL4yqY/Kybn6GZz89/bL+aL3xyz2/oa+1wqZZ4l+tOSUEi2kz
-         52Sg==
+        d=gmail.com; s=20230601; t=1754041653; x=1754646453; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zecUtrDYIwPD8n4jDgHWgxxJ5RrGHaY2/DknBkuIeTs=;
+        b=L4yEzCXD3mmkVo8mkNFGBALSu++k6IO3xeLPlcjiFvIxYThlG7JiaVe+Iw2U9Zndws
+         8E9OVpRbjnkRC9ym5y25upT3bIoFOYzzX16nvVEiegfLlqugKE9Ro84nvX+JqKbHbYQf
+         FxA8CD+olHUUt/AiFc6GW+om1W0GBhBqnwhEFQEAYc1frQZXk3bZG10MjGNhEv7CUYf1
+         aMPbWJXv9WI2YfThd8OZ09CCoGq67HSaqYQKAStXwSwpWnGln+nS2w8f923L3TREMrO5
+         eV0FUmrfsqz/XNlTLkhQrgA7MmeWu/JoMuHWsGtev2YbciOH2pIvrS2hfA0bV7IDiz0E
+         vkBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754041599; x=1754646399;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fPi1aRA1xy91XJSfBFoK3IbCuYOH+ZWgmp1gomg+FIY=;
-        b=Kd8S4fRl4+x8VdmIklnSG7rttd17/52PorYyBwEHZgkV44l5twClCbUX1MuFa2knlB
-         y7/b0YOizJSq24FpIRCmVTSOtnMAqhLWlH0O0/aGspXxNDatyAHntGcDfU6pB0P35E47
-         CQGWmal9NQl4qNnybWlPHRNf53bWOfoscjiZlMAmO8nTEjmse7hXWV5y9n6or5KfBf9n
-         B/a0Xu9HQmBbj29HPVAugHSq+RpQaji++WBkqF4M0QSFV9pSLV24n+iM8Rcr/u6Ll3Sc
-         FmSe6SlSWfdaWAoTHK8bHL/kCAFSNBG+r2hGeGIvmpv2N/ZfD1qbzLP+Chkzg0u9pFil
-         rLEA==
-X-Forwarded-Encrypted: i=1; AJvYcCXznjpmTdlyUE6gBfbazMVMrZWXcIZHcxaj1FDbXfDcMVV4mZbWElulN3gfFozm2jISOSeNyr8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyoHSoHCrGJBlAvswmph1dWqywVoIMqk8qtthFWTTjPlev4jP5V
-	beFpApnXcIddcKbjkzupGG2JIZulMqgU1/7nED5BIsNoffUy8fAEUmcv2yg5iqPQWHwsgAFTMBk
-	nmrCzXh9Zpzsv2GWivmJxSfXhuWryEwFbu54/YfXN
-X-Gm-Gg: ASbGnctCVfxJYEHDdHW564H/FY2TrzQBDGZQIru9e8o9x8PhrCdBdf12VKFwQLs7cv+
-	wQph8hoDXTORkLFld6vcpiEmc2x53iLBCYS7ydeyFyyNHxPEqOgpmonQXH3sA87iNIwHMWzHTE/
-	HexhgMX3yCwba8ZusuTmlZHjXdo89g8/ArZ3MAHesvFfqy5UasRrWYE3shDoAE4sGliMe1Uqea5
-	QKqyEomoJ+17bviqQ==
-X-Google-Smtp-Source: AGHT+IH5+AVzG2YKzJItrUExqdrxQbWcyIoiCHcENs4Lyz2n4Tl4WHQkFzDLbWs1ZPUbGv2W2sIGATnVtkwCM+4GgD4=
-X-Received: by 2002:a05:620a:a901:b0:7e0:9b88:133f with SMTP id
- af79cd13be357-7e66f397bd8mr1279842385a.39.1754041599054; Fri, 01 Aug 2025
- 02:46:39 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1754041653; x=1754646453;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zecUtrDYIwPD8n4jDgHWgxxJ5RrGHaY2/DknBkuIeTs=;
+        b=QCgZIiUXC0Bi7FQKl1VGJJsEwUN1c6zp/hjWSR8kobESTt9RZBp0jpQIcq3YerX8Kc
+         9oTsAze3b9w4UT4ezwvX0Dd9d8VQOI2+0s3dP6eQ7pU+8qu8i3/JaaY3sB5ZjRLYCYaU
+         YC+Bnl8Zj6Mtnr/jWCS17PaWILmXe0+MHvKrmdQ5FwlwSjPpk+Hb2LCVhstV5lMm1Ha9
+         gH8tWcyEiqv5X6HThyoc+rJTQ1AR0DA//38qlHIRNr787ERfTE2Iog6wGkU0vUTqxKjs
+         34LwwZBO3o02ZbQhgjDioGjn533bW6u0QRG3kpXlnUKLo5j//vcWGs8Y69lbEofdhk8V
+         zPEw==
+X-Forwarded-Encrypted: i=1; AJvYcCWHEnGUue/VRmuOPc5ixy73My19LRmo/VpagkFxrnP9HQqcwp1P3MT8IVoNKKHMXyvjAVQqdAJPEA==@vger.kernel.org, AJvYcCX/4MO4YUnhnHs7KcfAW1l6jOs3emKFxCDVXTD+Hc1hLxQG3cOOotNt9e3S5pca09mmuAm+evt6@vger.kernel.org
+X-Gm-Message-State: AOJu0YyVZznWcKXSiTSCKoFMOkUDaYSH9t6V/iDd0mUARnb6fJNnWZX/
+	0eRByfCJ2ngf008g7aZbbFZ9lS9c6rECBawPOQZyrA9VrpUsutA+o3re
+X-Gm-Gg: ASbGnctAE0i6SQ6pfs3mc3kg00yWftypL0tBspGfWoX6yfrjvq5McP3CYxUpi8dG6A5
+	jTyiYJ8BGPdEbyzHu65RIz4UiypD2sZsOqUTOsyHHz2pbdVjQZNO+JJWJ3R3dtuqF+1C0nDZYdX
+	auXfR9husEezUnmOtSAVMkk8jKCn/b+MdV8toMvIZnprOeS+OjfE+VrKLjmdf1tmUNCS1Uaxe56
+	6zsYATTO6wRKdDviELgcHWJf4EgFsfZ2iDb6r4VHFmrfRZAShmM89eeKsSWrNRryP/hgnTMd9SW
+	dz7MyeYn2+QKOBvc2r0iyNk6vWsBaWU54AN5JGs8a1IrfwRVY+zHe4txZ5JKXF4OFTyN95Zc3Zi
+	2JJ707PCCacxTsqqArCbcChG9rJmzM9kHZpc=
+X-Google-Smtp-Source: AGHT+IHnVdWY07jWG0I30roHvL1+woy1pHD7k4Clu4evEVt6d0GyMELVNVA57fF7wg1ImDwPwbYt8A==
+X-Received: by 2002:a05:600c:1d19:b0:43d:4686:5cfb with SMTP id 5b1f17b1804b1-45892bd6f7fmr95313575e9.27.1754041652323;
+        Fri, 01 Aug 2025 02:47:32 -0700 (PDT)
+Received: from ?IPV6:2620:10d:c096:325::26f? ([2620:10d:c092:600::1:9c1e])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-458a22365c0sm56966435e9.3.2025.08.01.02.47.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 01 Aug 2025 02:47:31 -0700 (PDT)
+Message-ID: <58a592bf-3e88-4ad4-8a6e-37dd9319da99@gmail.com>
+Date: Fri, 1 Aug 2025 10:48:57 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250801090949.129941-1-dongml2@chinatelecom.cn>
-In-Reply-To: <20250801090949.129941-1-dongml2@chinatelecom.cn>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 1 Aug 2025 02:46:27 -0700
-X-Gm-Features: Ac12FXx4oNA4sAnx7B_ITjSBDalU-s3xy4RLLSG5kiFNg6GqhW7MbWEy_QgYKYI
-Message-ID: <CANn89i+1-geie7HrSmZeU-OvT-aDJabbtcwrZaHr-1S16yuRZw@mail.gmail.com>
-Subject: Re: [PATCH net v2] net: ip: order the reuseport socket in __inet_hash
-To: Menglong Dong <menglong8.dong@gmail.com>
-Cc: kuniyu@google.com, kraig@google.com, ncardwell@google.com, 
-	davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, 
-	horms@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC v1 00/22] Large rx buffer support for zcrx
+To: Mina Almasry <almasrymina@google.com>
+Cc: Stanislav Fomichev <stfomichev@gmail.com>,
+ Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+ io-uring@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+ Willem de Bruijn <willemb@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ andrew+netdev@lunn.ch, horms@kernel.org, davem@davemloft.net,
+ sdf@fomichev.me, dw@davidwei.uk, michael.chan@broadcom.com,
+ dtatulea@nvidia.com, ap420073@gmail.com
+References: <cover.1753694913.git.asml.silence@gmail.com>
+ <aIevvoYj7BcURD3F@mini-arch> <df74d6e8-41cc-4840-8aca-ad7e57d387ce@gmail.com>
+ <aIfb1Zd3CSAM14nX@mini-arch> <0dbb74c0-fcd6-498f-8e1e-3a222985d443@gmail.com>
+ <aIf0bXkt4bvA-0lC@mini-arch> <52597d29-6de4-4292-b3f0-743266a8dcff@gmail.com>
+ <aIj3wEHU251DXu18@mini-arch> <46fabfb5-ee39-43a2-986e-30df2e4d13ab@gmail.com>
+ <aIo_RMVBBWOJ7anV@mini-arch>
+ <CAHS8izPYahW_GkPogatiVF-eZFRGV-zqH3MA=VNBjw4jfgCzug@mail.gmail.com>
+ <364568c6-f93e-42e1-a13c-f55d7f912312@gmail.com>
+ <CAHS8izM9238zKuFy1ifyigXmG8sbB8h=A=XqtLz-i0U2WM3vqw@mail.gmail.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <CAHS8izM9238zKuFy1ifyigXmG8sbB8h=A=XqtLz-i0U2WM3vqw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Fri, Aug 1, 2025 at 2:09=E2=80=AFAM Menglong Dong <menglong8.dong@gmail.=
-com> wrote:
->
-> For now, the socket lookup will terminate if the socket is reuse port in
-> inet_lhash2_lookup(), which makes the socket is not the best match.
->
-> For example, we have socket1 and socket2 both listen on "0.0.0.0:1234",
-> but socket1 bind on "eth0". We create socket1 first, and then socket2.
-> Then, all connections will goto socket2, which is not expected, as socket=
-1
-> has higher priority.
->
-> This can cause unexpected behavior if TCP MD5 keys is used, as described
-> in Documentation/networking/vrf.rst -> Applications.
->
-> Therefore, we compute a score for the reuseport socket and add it to the
-> list with order in __inet_hash(). Sockets with high score will be added
-> to the head.
->
-> Link: https://lore.kernel.org/netdev/20250731123309.184496-1-dongml2@chin=
-atelecom.cn/
-> Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
+On 7/31/25 21:05, Mina Almasry wrote:
+> On Thu, Jul 31, 2025 at 12:56 PM Pavel Begunkov <asml.silence@gmail.com> wrote:
+>>
+...>>>>>> If the setup is done outside, you can also setup rx-buf-len outside, no?
+>>>>>
+>>>>> You can't do it without assuming the memory layout, and that's
+>>>>> the application's role to allocate buffers. Not to mention that
+>>>>> often the app won't know about all specifics either and it'd be
+>>>>> resolved on zcrx registration.
+>>>>
+>>>> I think, fundamentally, we need to distinguish:
+>>>>
+>>>> 1. chunk size of the memory pool (page pool order, niov size)
+>>>> 2. chunk size of the rx queue entries (this is what this series calls
+>>>>      rx-buf-len), mostly influenced by MTU?
+>>>>
+>>>> For devmem (and same for iou?), we want an option to derive (2) from (1):
+>>>> page pools with larger chunks need to generate larger rx entries.
+>>>
+>>> To be honest I'm not following. #1 and #2 seem the same to me.
+>>> rx-buf-len is just the size of each rx buffer posted to the NIC.
+>>>
+>>> With pp_params.order = 0 (most common configuration today), rx-buf-len
+>>> == 4K. Regardless of MTU. With pp_params.order=1, I'm guessing 8K
+>>> then, again regardless of MTU.
+>>
+>> There are drivers that fragment the buffer they get from a page
+>> pool and give smaller chunks to the hw. It's surely a good idea to
+>> be more explicit on what's what, but from the whole setup and uapi
+>> perspective I'm not too concerned.
+>>
+>> The parameter the user passes to zcrx must controls 1. As for 2.
+>> I'd expect the driver to use the passed size directly or fail
+>> validation, but even if that's not the case, zcrx / devmem would
+>> just continue to work without any change in uapi, so we have
+>> the freedom to patch up the nuances later on if anything sticks
+>> out.
+>>
+> 
+> I indeed forgot about driver-fragmenting. That does complicate things
+> quite a bit.
+> 
+> So AFAIU the intended behavior is that rx-buf-len refers to the memory
+> size allocated by the driver (and thun memory provider), but not
+> necessarily the one posted by the driver if it's fragmenting that
+> piece of memory? If so, that sounds good to me. Although I wonder if
 
-You forgot a Fixes: tag, and a selftest.
+Yep
 
-> ---
-> v2:
-> - As Kuniyuki advised, sort the reuseport socket in __inet_hash() to keep
->   the lookup for reuseport O(1)
+> that could cause some unexpected behavior... Someone may configure
+> rx-buf-len to 8K on one driver and get actual 8K packets, but then
+> configure rx-buf-len on another driver and get 4K packets because the
+> driver fragmented each buffer into 2...
 
-Keeping sorted the list is difficult, we would have to intercept
-SO_BINDTODEVICE, SO_BINDTOIFINDEX, SO_INCOMING_CPU.
+That already can happen, the user can hope to get whole full buffers
+but shouldn't assume that it will. hw gro can't be 100% reliable in
+this sense for all circumstances. And I don't think it's sane for
+driver implementations to do that. Fragmenting PAGE_SIZE because the
+NIC needs smaller chunks or for some other compatibility reasons?
+Sure, but then I don't see a reason for validating even larger buffers.
 
-This also makes the patch risky to backport to stable versions,
-because it is complex and possibly buggy.
+> I guess in the future there may be a knob that controls how much
+> fragmentation the driver does?
 
-Therefore I prefer your first approach.
+Probably, but hopefully it'll not be needed
 
-> ---
->  include/linux/rculist_nulls.h | 34 ++++++++++++++++++++++++
->  include/net/sock.h            |  5 ++++
->  net/ipv4/inet_hashtables.c    | 49 ++++++++++++++++++++++++++++++++---
->  3 files changed, 84 insertions(+), 4 deletions(-)
->
-> diff --git a/include/linux/rculist_nulls.h b/include/linux/rculist_nulls.=
-h
-> index 89186c499dd4..da500f4ae142 100644
-> --- a/include/linux/rculist_nulls.h
-> +++ b/include/linux/rculist_nulls.h
-> @@ -52,6 +52,13 @@ static inline void hlist_nulls_del_init_rcu(struct hli=
-st_nulls_node *n)
->  #define hlist_nulls_next_rcu(node) \
->         (*((struct hlist_nulls_node __rcu __force **)&(node)->next))
->
-> +/**
-> + * hlist_nulls_pprev_rcu - returns the element of the list after @node.
-> + * @node: element of the list.
-> + */
-> +#define hlist_nulls_pprev_rcu(node) \
-> +       (*((struct hlist_nulls_node __rcu __force **)&(node)->pprev))
-> +
->  /**
->   * hlist_nulls_del_rcu - deletes entry from hash list without re-initial=
-ization
->   * @n: the element to delete from the hash list.
-> @@ -145,6 +152,33 @@ static inline void hlist_nulls_add_tail_rcu(struct h=
-list_nulls_node *n,
->         }
->  }
->
-> +/**
-> + * hlist_nulls_add_before_rcu
-> + * @n: the new element to add to the hash list.
-> + * @next: the existing element to add the new element before.
-> + *
-> + * Description:
-> + * Adds the specified element to the specified hlist
-> + * before the specified node while permitting racing traversals.
-> + *
-> + * The caller must take whatever precautions are necessary
-> + * (such as holding appropriate locks) to avoid racing
-> + * with another list-mutation primitive, such as hlist_nulls_add_head_rc=
-u()
-> + * or hlist_nulls_del_rcu(), running on this same list.
-> + * However, it is perfectly legal to run concurrently with
-> + * the _rcu list-traversal primitives, such as
-> + * hlist_nulls_for_each_entry_rcu(), used to prevent memory-consistency
-> + * problems on Alpha CPUs.
-> + */
-> +static inline void hlist_nulls_add_before_rcu(struct hlist_nulls_node *n=
-,
-> +                                             struct hlist_nulls_node *ne=
-xt)
-> +{
-> +       WRITE_ONCE(n->pprev, next->pprev);
-I do not think WRITE_ONCE() is necessary here, @n is private to this cpu,
-and following rcu_assign_pointer() has the needed barrier.
+-- 
+Pavel Begunkov
 
-> +       n->next =3D next;
-> +       rcu_assign_pointer(hlist_nulls_pprev_rcu(n), n);
-> +       WRITE_ONCE(next->pprev, &n->next);
-> +}
-> +
->  /* after that hlist_nulls_del will work */
->  static inline void hlist_nulls_add_fake(struct hlist_nulls_node *n)
->  {
-> diff --git a/include/net/sock.h b/include/net/sock.h
-> index c8a4b283df6f..42aa1919eeee 100644
-> --- a/include/net/sock.h
-> +++ b/include/net/sock.h
-> @@ -885,6 +885,11 @@ static inline void __sk_nulls_add_node_tail_rcu(stru=
-ct sock *sk, struct hlist_nu
->         hlist_nulls_add_tail_rcu(&sk->sk_nulls_node, list);
->  }
->
-> +static inline void __sk_nulls_add_node_before_rcu(struct sock *sk, struc=
-t sock *next)
-> +{
-> +       hlist_nulls_add_before_rcu(&sk->sk_nulls_node, &next->sk_nulls_no=
-de);
-> +}
-> +
->  static inline void sk_nulls_add_node_rcu(struct sock *sk, struct hlist_n=
-ulls_head *list)
->  {
->         sock_hold(sk);
-> diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
-> index ceeeec9b7290..80d8bec41a58 100644
-> --- a/net/ipv4/inet_hashtables.c
-> +++ b/net/ipv4/inet_hashtables.c
-> @@ -334,6 +334,26 @@ static inline int compute_score(struct sock *sk, con=
-st struct net *net,
->         return score;
->  }
->
-> +static inline int compute_reuseport_score(struct sock *sk)
-> +{
-> +       int score =3D 0;
-> +
-> +       if (sk->sk_bound_dev_if)
-> +               score +=3D 2;
-> +
-> +       if (sk->sk_family =3D=3D PF_INET)
-> +               score +=3D 10;
-> +
-> +       /* the priority of sk_incoming_cpu should be lower than sk_bound_=
-dev_if,
-> +        * as it's optional in compute_score(). Thank God, this is the on=
-ly
-
-Please do not bring God here.
-
-> +        * variable condition, which we can't judge now.
-> +        */
-> +       if (READ_ONCE(sk->sk_incoming_cpu))
-> +               score++;
-> +
-> +       return score;
-> +}
-> +
->  /**
->   * inet_lookup_reuseport() - execute reuseport logic on AF_INET socket i=
-f necessary.
->   * @net: network namespace.
-> @@ -739,6 +759,27 @@ static int inet_reuseport_add_sock(struct sock *sk,
->         return reuseport_alloc(sk, inet_rcv_saddr_any(sk));
->  }
->
-> +static void inet_hash_reuseport(struct sock *sk, struct hlist_nulls_head=
- *head)
-> +{
-> +       const struct hlist_nulls_node *node;
-> +       int score, curscore;
-> +       struct sock *sk2;
-> +
-> +       curscore =3D compute_reuseport_score(sk);
-> +       /* lookup the socket to insert before */
-> +       sk_nulls_for_each_rcu(sk2, node, head) {
-> +               if (!sk2->sk_reuseport)
-> +                       continue;
-> +               score =3D compute_reuseport_score(sk2);
-> +               if (score <=3D curscore) {
-> +                       __sk_nulls_add_node_before_rcu(sk, sk2);
-> +                       return;
-> +               }
-> +       }
-> +
-> +       __sk_nulls_add_node_tail_rcu(sk, head);
-> +}
-> +
->  int __inet_hash(struct sock *sk, struct sock *osk)
->  {
->         struct inet_hashinfo *hashinfo =3D tcp_get_hashinfo(sk);
-> @@ -761,11 +802,11 @@ int __inet_hash(struct sock *sk, struct sock *osk)
->                         goto unlock;
->         }
->         sock_set_flag(sk, SOCK_RCU_FREE);
-> -       if (IS_ENABLED(CONFIG_IPV6) && sk->sk_reuseport &&
-> -               sk->sk_family =3D=3D AF_INET6)
-> -               __sk_nulls_add_node_tail_rcu(sk, &ilb2->nulls_head);
-> -       else
-> +       if (!sk->sk_reuseport)
->                 __sk_nulls_add_node_rcu(sk, &ilb2->nulls_head);
-> +       else
-> +               inet_hash_reuseport(sk, &ilb2->nulls_head);
-> +
->         sock_prot_inuse_add(sock_net(sk), sk->sk_prot, 1);
->  unlock:
->         spin_unlock(&ilb2->lock);
-> --
-> 2.50.1
->
 
