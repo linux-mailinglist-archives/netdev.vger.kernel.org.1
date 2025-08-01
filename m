@@ -1,135 +1,128 @@
-Return-Path: <netdev+bounces-211346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211347-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D92FB181B9
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 14:25:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81DD9B181D5
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 14:33:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F60A172AA6
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 12:25:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4326C3A9244
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 12:33:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE81D23C51B;
-	Fri,  1 Aug 2025 12:25:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1785231832;
+	Fri,  1 Aug 2025 12:33:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="jCleiGto"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f178.google.com (mail-vk1-f178.google.com [209.85.221.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87C5623BCE3;
-	Fri,  1 Aug 2025 12:25:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69B44179A3;
+	Fri,  1 Aug 2025 12:33:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754051133; cv=none; b=GR5HmmTGuuHYBCJfO79xia876rQqw41k3MEOewyd5XLuS8q7iVulcat03FVGkKZYzMT4hhRf7SqywJUpyhJo5AgB3QQRHaIXn906FiZ7Hv+jjp5Qg4J5EUZQvlDuP0Z65iFVpGXC/A/js9tc0X9++tZeUXYIJLIUuq91aQgV3pQ=
+	t=1754051632; cv=none; b=MMN8ggwwLt1b1KF8+8jD4KPBpUnClfg8um+k0uotnJiWSUOhfOfloA4zqq9HPr5MdZQqPmnyYJRUiZ4rBW73FIO+JMyaB/MZhGAVvVuhRziO2dp93QZ9asXEzNq9TKzxe5aE606TnF3ClrHYu/k5ha19g2Z6GewsX6nC5aOE670=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754051133; c=relaxed/simple;
-	bh=U91X4ClFB78bbaMRNQ0V5HfuvYVoKMe+7y1GNkBNfnI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RzlqIf6s3n3mWMIe3Xdcf+4xV6VCV1d/DsnFzwdD2Xo+bEoCWzVuNFya5gYY+ln2pjB4KdBTbOPM6x+mbYCRXV9AsCXpINi3XqKrykGj54FbiB8kv9YmlX4BRpUuo5wlrp8QS5rriOD8oTzyiL0qegfehjf35XX0B63VxM0dZkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f178.google.com with SMTP id 71dfb90a1353d-539360cc274so808159e0c.3;
-        Fri, 01 Aug 2025 05:25:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754051130; x=1754655930;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ccsTt7QMMxp6k9w4VZsz6QJ7TVPvRY3FqOylTrTxO6I=;
-        b=g6OZvKXDUaJMwmBb3v+1CP+TQSjfjzqP4i6VOG6D/BMJw/sSIEQJnbftH7418dFY7t
-         G/g+NQZ3OUP/WaiiuxWhjyQPia1Dc+rRUAJ+kF7fFhn8b21+DhBVIuxJ9eLwPu3kNCL9
-         wtNa39Bh7WayT6gGQWAp1JfClRNb/cbKbgplt1NnGBOWuMgAbzmIGKhZvk8oGn5cPQuv
-         LBrf/8TRIqC/21Ou6KrTApaooOFbrYKxq6JWc0YRqFx8G1KWIiEcyXfEyIenAWjCvDDw
-         KTyLtesSNRcf+x03RwUz6ST/BYjcUYRSM6eP0tkSUkfV3GPlwnLVn2UW/YGTH7behJkx
-         m9Nw==
-X-Forwarded-Encrypted: i=1; AJvYcCUgzWjTbdChpSBcXY/htaIf4gr2vRjA2K8gPcYFEqAYFmtFYX5QFk6xl8wVxKUBvlAn51r9Hf/JzGne6gE=@vger.kernel.org, AJvYcCXxmZDQtiLr49XCOFxG5Z+LOYFzp3m1DzyIeppxX2rBThRT4WE/gQysz2FKJFqEjzOJB/eM/XdF@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzt/BOSH6anr2itA+Uy/jMn7MFGoB0vTmCXgK4kDkxcAo9irQWi
-	wyK/4dZiwQRMftSloKubMRAf7DYK7oOdjZEcudVmaCDYRRUlIs7DWFmo2MBYr0AE
-X-Gm-Gg: ASbGncuU6H+rk7fiv8144kqNPT07BHwG2ZDFEgLfAdoTI7Dc34XsU0wpi1lFmpAz42o
-	3lMbkTVGyL9N8gZjqJy3ISQKZUYpFhZ20mQO7kkIKvy6+vChIwUoonH3BnqvAoSzFOZZbb7Cbgl
-	rxRSUiI7wBa5faaK3mvo7j0Mfg2BkVOai3FQxYZtUfMnT0gPJXd9v4UpWJgJ3t7KEoCV8sNpMb7
-	1U39D7+5mFZkI2ct/LRafCAAEsT2UABLXVtlenxjLhv6NkVK8Mh9w36HnYvI/HnSx/+b7cJ8Xff
-	RIrZ0mWLZzL1U3FhKj4iuX28PuktHyxfXb4lmapNRgYATMBPkam+K0KKK11kGtwAoISRYza2re9
-	F6n4UfXs4xDVTPGB7/rZxd03Ac+JX/lh0lFVnf77t9VAunQ6Jhgg4duNbzGxF
-X-Google-Smtp-Source: AGHT+IEwku6ceq4PfOD67wMF0HvEPiygpEm0qz5dJIxALtGP83zcvgP9odpISVnpiucwomX6ayID9A==
-X-Received: by 2002:a05:6122:903:b0:523:dd87:fe95 with SMTP id 71dfb90a1353d-5391d00d017mr6810694e0c.9.1754051130222;
-        Fri, 01 Aug 2025 05:25:30 -0700 (PDT)
-Received: from mail-ua1-f45.google.com (mail-ua1-f45.google.com. [209.85.222.45])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-53936d4f96bsm1006467e0c.35.2025.08.01.05.25.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 01 Aug 2025 05:25:29 -0700 (PDT)
-Received: by mail-ua1-f45.google.com with SMTP id a1e0cc1a2514c-87f74a28a86so1378663241.2;
-        Fri, 01 Aug 2025 05:25:29 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCXDvFFNKAmuv7QXZhZvxBTp/2qWcXs5NUU3EoC2GRHYqyaWHhDE6vPT8RVtFny5swgwqQLVyHiLzk028r8=@vger.kernel.org, AJvYcCXwZhaUOIOtPEmidFcj0RZUqrZOFP4C/XgxEmVNsaviGPZmEvkbaVD2TI4V46jfV7Loxdtrzvqi@vger.kernel.org
-X-Received: by 2002:a05:6102:b09:b0:4f3:1731:8c01 with SMTP id
- ada2fe7eead31-4fbe87b48camr6625477137.19.1754051129317; Fri, 01 Aug 2025
- 05:25:29 -0700 (PDT)
+	s=arc-20240116; t=1754051632; c=relaxed/simple;
+	bh=tOt/u+92c3Ti/pTeA3NIfthW+H8n/eCQgNhYNHSjaN4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iWsN6rMX85K+QR+9+PPC0lH8QkdISBoK91AbCPst7Lh56oO1pBHDGWAXU3clx1CLqyBLTmMJXMK0M3mBqu6Wwvot8SFzHhgYWyjwv8QA+joru8hgPtKoK+p/2EhnLt9JMrkAankvO/Khr4ZcliimIlUcLbAq27JpVWUa+IF2+tc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=jCleiGto; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=ryXE6yqAKCgV6SrjE/rIPR99+ajWXdRoh/hICBnA/l4=; b=jCleiGto8tJg0yKdcE36wudtEQ
+	egGDioaeZo1u2VmqCH+A583t69h1EM0+EDrz9INhjZmKV58jLnpfJJ5r2XeVrEMQlin9KMB3bmttX
+	tCpcxCfTG9T/jt0MbRmmEXoLFPCCcjFzLqjGhV/kcemVEVB2KL+UcdSUG3TYjQ34q2qG8ZYQM1VWR
+	rF33brDfIRK/Vrdl/tlIfZxqXVCR2xv2guGxWhmX3Wh5JoNYhYxJlPHPkhGRq6EqZpPuDN6yoT81Q
+	UVKssldAW/TDy5jtC0LhviFusZzMW5PjgwFa/8b0HlgRcT8bZo3UzOiz5yiTPFIvgmOrJ7ZcJydOg
+	ZpcM2rsA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:58312)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uhox9-0006US-14;
+	Fri, 01 Aug 2025 13:33:39 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uhox4-00024T-2m;
+	Fri, 01 Aug 2025 13:33:34 +0100
+Date: Fri, 1 Aug 2025 13:33:34 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Mark Brown <broonie@kernel.org>,
+	Bence =?iso-8859-1?B?Q3Pza+Fz?= <csokas.bence@prolan.hu>,
+	Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Rob Herring <robh@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Csaba Buday <buday.csaba@prolan.hu>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net] net: mdio_bus: Use devm for getting reset GPIO
+Message-ID: <aIy0HqFvCggTEyUk@shell.armlinux.org.uk>
+References: <20250728153455.47190-2-csokas.bence@prolan.hu>
+ <95449490-fa58-41d4-9493-c9213c1f2e7d@sirena.org.uk>
+ <CAMuHMdVdsZtRpbbWsRC_YSYgGojA-wxdxRz7eytJvc+xq2uqEw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250728153455.47190-2-csokas.bence@prolan.hu> <95449490-fa58-41d4-9493-c9213c1f2e7d@sirena.org.uk>
-In-Reply-To: <95449490-fa58-41d4-9493-c9213c1f2e7d@sirena.org.uk>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Fri, 1 Aug 2025 14:25:17 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdVdsZtRpbbWsRC_YSYgGojA-wxdxRz7eytJvc+xq2uqEw@mail.gmail.com>
-X-Gm-Features: Ac12FXyU90mDKtUzbqHALW08Hifnf3dt-i3DeXukP-dAn-ISIoIkJfshWRZUYP0
-Message-ID: <CAMuHMdVdsZtRpbbWsRC_YSYgGojA-wxdxRz7eytJvc+xq2uqEw@mail.gmail.com>
-Subject: Re: [PATCH net] net: mdio_bus: Use devm for getting reset GPIO
-To: Mark Brown <broonie@kernel.org>
-Cc: =?UTF-8?B?QmVuY2UgQ3PDs2vDoXM=?= <csokas.bence@prolan.hu>, 
-	Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>, 
-	"David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
-	Dmitry Torokhov <dmitry.torokhov@gmail.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Csaba Buday <buday.csaba@prolan.hu>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAMuHMdVdsZtRpbbWsRC_YSYgGojA-wxdxRz7eytJvc+xq2uqEw@mail.gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Hi Mark,
+On Fri, Aug 01, 2025 at 02:25:17PM +0200, Geert Uytterhoeven wrote:
+> Hi Mark,
+> 
+> On Fri, 1 Aug 2025 at 14:01, Mark Brown <broonie@kernel.org> wrote:
+> > On Mon, Jul 28, 2025 at 05:34:55PM +0200, Bence Csókás wrote:
+> > > Commit bafbdd527d56 ("phylib: Add device reset GPIO support") removed
+> > > devm_gpiod_get_optional() in favor of the non-devres managed
+> > > fwnode_get_named_gpiod(). When it was kind-of reverted by commit
+> > > 40ba6a12a548 ("net: mdio: switch to using gpiod_get_optional()"), the devm
+> > > functionality was not reinstated. Nor was the GPIO unclaimed on device
+> > > remove. This leads to the GPIO being claimed indefinitely, even when the
+> > > device and/or the driver gets removed.
+> >
+> > I'm seeing multiple platforms including at least Beaglebone Black,
+> > Tordax Mallow and Libre Computer Alta printing errors in
+> > next/pending-fixes today:
+> >
+> > [    3.252885] mdio_bus 4a101000.mdio:00: Resources present before probing
+> >
+> > Bisects are pointing to this patch which is 3b98c9352511db in -next,
+> 
+> My guess is that &mdiodev->dev is not the correct device for
+> resource management.
 
-On Fri, 1 Aug 2025 at 14:01, Mark Brown <broonie@kernel.org> wrote:
-> On Mon, Jul 28, 2025 at 05:34:55PM +0200, Bence Cs=C3=B3k=C3=A1s wrote:
-> > Commit bafbdd527d56 ("phylib: Add device reset GPIO support") removed
-> > devm_gpiod_get_optional() in favor of the non-devres managed
-> > fwnode_get_named_gpiod(). When it was kind-of reverted by commit
-> > 40ba6a12a548 ("net: mdio: switch to using gpiod_get_optional()"), the d=
-evm
-> > functionality was not reinstated. Nor was the GPIO unclaimed on device
-> > remove. This leads to the GPIO being claimed indefinitely, even when th=
-e
-> > device and/or the driver gets removed.
->
-> I'm seeing multiple platforms including at least Beaglebone Black,
-> Tordax Mallow and Libre Computer Alta printing errors in
-> next/pending-fixes today:
->
-> [    3.252885] mdio_bus 4a101000.mdio:00: Resources present before probin=
-g
->
-> Bisects are pointing to this patch which is 3b98c9352511db in -next,
+No, looking at the patch, the patch is completely wrong.
 
-My guess is that &mdiodev->dev is not the correct device for
-resource management.
-We had a similar issue before with non-GPIO resets, cfr. commit
-32085f25d7b68404 ("mdio_bus: don't use managed reset-controller").
+Take for example mdiobus_register_gpiod(). Using devm_*() there is
+completely wrong, because this is called from mdiobus_register_device().
+This is not the probe function for the device, and thus there is no
+code to trigger the release of the resource on unregistration.
 
-Gr{oetje,eeting}s,
+Moreover, when the mdiodev is eventually probed, if the driver fails
+or the driver is unbound, the GPIO will be released, but a reference
+will be left behind.
 
-                        Geert
+Using devm* with a struct device that is *not* currently being probed
+is fundamentally wrong - an abuse of devm.
 
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
