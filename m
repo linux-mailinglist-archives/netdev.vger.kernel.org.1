@@ -1,119 +1,120 @@
-Return-Path: <netdev+bounces-211405-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211406-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 644C2B188BC
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 23:27:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F258B188CD
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 23:34:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E864D1C858C8
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 21:28:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1FD1FAA1F5E
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 21:34:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C595B28D8C7;
-	Fri,  1 Aug 2025 21:27:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42F7E28EA67;
+	Fri,  1 Aug 2025 21:34:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PPxqqoFx"
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="ZJk/CQkN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A139528C851
-	for <netdev@vger.kernel.org>; Fri,  1 Aug 2025 21:27:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AAC723B63F
+	for <netdev@vger.kernel.org>; Fri,  1 Aug 2025 21:34:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754083664; cv=none; b=l5PCWVdmJJHamKbGxO2xpeVnp6EClHXnRZ3/PtTloFJMk2gvyfY/jQ8hyRgXx82WwYUxOcO+o2Sq3wie6xOHCzAOJbXfFnb2QPfzUGjCQ07ZBZ4i1VS4lA8bDnJNhPmVmTRE8wMPj6pLG09su/8Alv/TYcSL+wsVW3FCLkm8CEE=
+	t=1754084078; cv=none; b=BO6TSYP2incIYKGUnybK/nO9PY5RIJuyGmY67xLguFQ57j50V2vWSctEyJHnj2Znc8tL/drWtsyIMIufqf0Mf6+oTGddqhC8yZ3OJ6ibLbuZWX2KVlpyUeiIG/Urb1cY4Nmz5vYpMTL6trCZaIlR9zmOWzCT5wGHCXj4h9ZVmY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754083664; c=relaxed/simple;
-	bh=C8XDvOKmcJBECgbnipD22cNIweV0/aoc5e5obigLrW4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XZS2O4lmqSfL1rzs1ABndGz1qG5BXH18BmtnTSzW2jOAhv0n/uryDImxtQz4Y5kDBuQ/hWBIWpcdTLxkRnY+2dPpX2O5t7qWKZDRT36+CgtV+jl0Eg4fAsK93fH2MzuSKjYeHF85X8wNDnulqcrbfmsILIuYMvMPURVqiz4N3hY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PPxqqoFx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7560C4CEE7;
-	Fri,  1 Aug 2025 21:27:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754083664;
-	bh=C8XDvOKmcJBECgbnipD22cNIweV0/aoc5e5obigLrW4=;
-	h=From:To:Cc:Subject:Date:From;
-	b=PPxqqoFxB5K50H0zt/fTLv8oyfCL1mYpbEQRizY1k56969phCSLrGfFF3N0LUhTER
-	 1iZ33ugbawuV6PVEGbM5wWwvqvWFLOzvCAF7gjmBw/dz/v9ugST+Zkb6qkoc2jDafX
-	 hLxPbGkoN3tnKD6YnSkC0Y3rZOMZEY7TuvfoZFbd2GPW65wmcIBsFG3eKix579ActC
-	 ChR1NnIU+BKNS7oDqvzbhfU23D1EQXOzyKBxus1PISeqZMXhqMw4dtSfS892MgcfK2
-	 RgEmCjASUf69kh1+1+KNwbXPfleSMg7YfvxYLtggMPpolQf6RkEcn6CdW9v/0ilb8L
-	 wPQTA1AReYTpg==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	Mark Brown <broonie@kernel.org>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	csokas.bence@prolan.hu,
-	geert@linux-m68k.org
-Subject: [PATCH net] Revert "net: mdio_bus: Use devm for getting reset GPIO"
-Date: Fri,  1 Aug 2025 14:27:42 -0700
-Message-ID: <20250801212742.2607149-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1754084078; c=relaxed/simple;
+	bh=IZkwXQkh8YxYF6KhegHig00grekwiuruDFNARhibles=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=T1Nq8AJvu1iqTLTT5YtD7B55+pG5Rjg6Bzt2JY6awfgkvmRIwtFdOlKhZpMg6PPRNB4kz5zLIoSDL0MZQI/zhhjNV6cbbvakHGMPYa66VJLQa392KP3dnAbENpXAFFzFlqRdpPdZbI5rraMkzVkqB0JtaspIakMF0yP1W/xmqHU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=ZJk/CQkN; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-615d1865b2dso1733266a12.0
+        for <netdev@vger.kernel.org>; Fri, 01 Aug 2025 14:34:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1754084074; x=1754688874; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=WLFHL6fOZFPNrc7teT5UWCBGBPE4FkQnF2Ru0J7QGa4=;
+        b=ZJk/CQkNn759zW48a2JZ+wnGAeFYF/65D4MSSLPZwRDZrb4H2z29VBipHbl/UpS9qM
+         zM/NJ2LyQta0RPM94ipgCU7SJ6pKOHzTcl10VrKjt9Tua628qDUKWg7ZiVjYmaEZeSD6
+         +MdGPgCmO1YSZCIMlC9v6WH/bJ3tyyR2voquc=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754084074; x=1754688874;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WLFHL6fOZFPNrc7teT5UWCBGBPE4FkQnF2Ru0J7QGa4=;
+        b=jhb9/nl24UGWSel/LmiNB/iVnEPSXWz3EHcyLKsH+bWrpfWq84U9IAI6dhNyOQwNhH
+         Ai9WbisdrrWO2pZNzMn+4iuM/ljmc4MVuqfRkfx1/xjRDCMgf7ji8C6bymndPgTn4tEK
+         RVsUG2tzu4Wx539gZofCqeh5Zg9gQBXkzBvLyOMDVNGSfC2nXH98t4CCcOcBwOOB86g0
+         CH8+zPagPiM/EJqcS36yZkv+fqVBQTsiqqoA1cTwrceJ8ZrjpkDIdMpFMsUOqzhcApkR
+         M+Iw+nCVFmhOH0LIh/8AFQJuCIF2Sh0d9GPdXDr3C2VpcdaJkFvuI+Ut1uNsaE0vBr80
+         fTQA==
+X-Forwarded-Encrypted: i=1; AJvYcCUFAkSFhZp8lLLyre8XcXu//B6wwq86jBQHqMZdvVG+sY9ECXHtvI45frIfKguN3q3rWJK733E=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzgw+YxUsBU5ZqxuNuTgAc4yQYbMrm8bK+FdEBHEbJw1gZCWo3R
+	tcodryq8Yk2pcqgM5C2rOeQ9nKmGizVxum48DVzr4NqVEZSiy+jae8SWRftFU1l5Ox+LgHL+Q/1
+	4v9lTJ1A=
+X-Gm-Gg: ASbGncuKxCZPlpnt3vKPmK9N0aawkQHQ2mtVzakJgCR25s7lG/3+wrKSzpLN/JjxyO5
+	sdqj9J7rYVoxPvkDSSJ0Bb3SgbQd7yWyfdryg4VXCqTSmHbsqq6krK+X0Z3DaUu+0FkbtXuucOl
+	rfF0WRFqlLAwbJdTq/dqBiqVpIOPjhlGUZTlmYCvM2N45jQyanlF4+5Ej1bHf90FCoURMDLYX97
+	eDLV0gPYI7CChs0eJ8aXecWgKlsbiRXvyDi6kXOHI0KupF3wGPbM38QPtn6f70e077XIiEGYsj/
+	EYNgqrKNIUtGBz1akiXboQxD/T7EWxv3LP3pbxJKrjblrA+QUDQ5TnJAn279WVDpIWVkoMdkZJi
+	CUJlqph9NwDzfS2Smkyev9CdZ6I3Ow0gvA2QzzM/Zk+ic6zaaVvL+hjpMCZLztYMgELbb8ckSld
+	F40dYiDOVWyhnNsN+Ckg==
+X-Google-Smtp-Source: AGHT+IHnvKAc6/CPi94LikkKvHzS8UPvhMvCT8LGFlWJR/IBuSQwLheEC2/NCOvojlABkeUCqGtG4g==
+X-Received: by 2002:a05:6402:234f:b0:615:7a67:5e6 with SMTP id 4fb4d7f45d1cf-615e6ef19ebmr683132a12.13.1754084074106;
+        Fri, 01 Aug 2025 14:34:34 -0700 (PDT)
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com. [209.85.208.45])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-615a8eff8d3sm3296508a12.6.2025.08.01.14.34.32
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 01 Aug 2025 14:34:32 -0700 (PDT)
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-615622ed677so3640163a12.1
+        for <netdev@vger.kernel.org>; Fri, 01 Aug 2025 14:34:32 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCWYtqZj22OeUv9qf3Tj86BJpjQ6tZ1stbw+2RPR7Y44kkDFjMH/vg5lYEcX8cOuXXLDZqluJsk=@vger.kernel.org
+X-Received: by 2002:a05:6402:2790:b0:615:cc03:e6a2 with SMTP id
+ 4fb4d7f45d1cf-615e6ebec77mr689309a12.1.1754084072420; Fri, 01 Aug 2025
+ 14:34:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250801091318-mutt-send-email-mst@kernel.org>
+ <CAHk-=whgYijnRXoAxbYLsceWFWC8B8in17WOws5-ojsAkdrqTg@mail.gmail.com>
+ <aI0rDljG8XYyiSvv@gallifrey> <CAHk-=wi1sKCKxzrrCKii9zjQiTAcChWpOCrBCASwRRi3KKXH3g@mail.gmail.com>
+In-Reply-To: <CAHk-=wi1sKCKxzrrCKii9zjQiTAcChWpOCrBCASwRRi3KKXH3g@mail.gmail.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Fri, 1 Aug 2025 14:34:16 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wgRtKY+tk0mhnHzrC0YMXef0GtVUFQ6cGW0-4XS30mQ5A@mail.gmail.com>
+X-Gm-Features: Ac12FXyaANs0webz-gagQ0r78-lvtho7QphOSO_s_LZu61Rm94DR5P3bHuE7Emw
+Message-ID: <CAHk-=wgRtKY+tk0mhnHzrC0YMXef0GtVUFQ6cGW0-4XS30mQ5A@mail.gmail.com>
+Subject: Re: [GIT PULL v2] virtio, vhost: features, fixes
+To: "Dr. David Alan Gilbert" <linux@treblig.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, alok.a.tiwari@oracle.com, 
+	anders.roxell@linaro.org, dtatulea@nvidia.com, eperezma@redhat.com, 
+	eric.auger@redhat.com, jasowang@redhat.com, jonah.palmer@oracle.com, 
+	kraxel@redhat.com, leiyang@redhat.com, lulu@redhat.com, 
+	michael.christie@oracle.com, parav@nvidia.com, si-wei.liu@oracle.com, 
+	stable@vger.kernel.org, viresh.kumar@linaro.org, wangyuli@uniontech.com, 
+	will@kernel.org, wquan@redhat.com, xiaopei01@kylinos.cn
+Content-Type: text/plain; charset="UTF-8"
 
-This reverts commit 3b98c9352511db627b606477fc7944b2fa53a165.
+On Fri, 1 Aug 2025 at 14:15, Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
+>
+> My apologies - they are indeed there, and I was simply looking at stale state.
+>
+> So while it's recently rebased, the commits have been in linux-next
+> and I was just wrong.
 
-Russell says:
+Pulled and pushed out. Sorry again for blaming Michael for my own incompetence.
 
-  Using devm_*() [here] is completely wrong, because this is called
-  from mdiobus_register_device(). This is not the probe function
-  for the device, and thus there is no code to trigger the release of
-  the resource on unregistration.
-
-  Moreover, when the mdiodev is eventually probed, if the driver fails
-  or the driver is unbound, the GPIO will be released, but a reference
-  will be left behind.
-
-  Using devm* with a struct device that is *not* currently being probed
-  is fundamentally wrong - an abuse of devm.
-
-Reported-by: Mark Brown <broonie@kernel.org>
-Link: https://lore.kernel.org/95449490-fa58-41d4-9493-c9213c1f2e7d@sirena.org.uk
-Suggested-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-Fixes: 3b98c9352511 ("net: mdio_bus: Use devm for getting reset GPIO")
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: andrew@lunn.ch
-CC: hkallweit1@gmail.com
-CC: linux@armlinux.org.uk
-CC: csokas.bence@prolan.hu
-CC: geert@linux-m68k.org
----
- drivers/net/phy/mdio_bus.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/phy/mdio_bus.c b/drivers/net/phy/mdio_bus.c
-index 24bdab5bdd24..fda2e27c1810 100644
---- a/drivers/net/phy/mdio_bus.c
-+++ b/drivers/net/phy/mdio_bus.c
-@@ -36,8 +36,8 @@
- static int mdiobus_register_gpiod(struct mdio_device *mdiodev)
- {
- 	/* Deassert the optional reset signal */
--	mdiodev->reset_gpio = devm_gpiod_get_optional(&mdiodev->dev,
--						      "reset", GPIOD_OUT_LOW);
-+	mdiodev->reset_gpio = gpiod_get_optional(&mdiodev->dev,
-+						 "reset", GPIOD_OUT_LOW);
- 	if (IS_ERR(mdiodev->reset_gpio))
- 		return PTR_ERR(mdiodev->reset_gpio);
- 
--- 
-2.50.1
-
+            Linus
 
