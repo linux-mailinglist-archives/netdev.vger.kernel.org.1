@@ -1,143 +1,190 @@
-Return-Path: <netdev+bounces-211298-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211299-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8344BB17ADC
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 03:35:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A95CAB17AE6
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 03:43:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0BAF01C24432
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 01:35:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A862D4E8532
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 01:43:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09A9E2E630;
-	Fri,  1 Aug 2025 01:35:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2D6473451;
+	Fri,  1 Aug 2025 01:43:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MGVFD/HI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cl2CgTJu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f195.google.com (mail-yw1-f195.google.com [209.85.128.195])
+Received: from mail-yw1-f194.google.com (mail-yw1-f194.google.com [209.85.128.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6985723AD;
-	Fri,  1 Aug 2025 01:34:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25F183C17;
+	Fri,  1 Aug 2025 01:43:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754012099; cv=none; b=Kgl1yJdr7Jc/MytKB7rzgZhME2S8+/Y6Ak144KauVkzQz9xH5HnPkCHgSoykayerlGbHIAPK5kt6XPPK9bF8qj8ajvzV5DtNbDTCF8fJ1ZetLJejrPman3vRYOx5hw7GcuN2egczh8/4iWGHl8qH19OixRcfKq8hfd0pwihRxT4=
+	t=1754012590; cv=none; b=ov5wGKth+uArVSkQUCPaeB1H4GC6v2FOyEK22OGBuEI88Dp/Svgz+cg9RkNL2faFXLl08cNaSV2WyOzFIiUzrl4snXAcCSdcTUTHihhTXN3+xVTssgIjPtr6iGsyY8q7H+nx5iB22vaXUiL7UHbyO8mbYTK2WZlRoSuz/uh2JeM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754012099; c=relaxed/simple;
-	bh=XjH2O1E86RQUEarkxqbY+gvMmkq/EoShxACAjX4zAFY=;
+	s=arc-20240116; t=1754012590; c=relaxed/simple;
+	bh=N4Q5miAGpxlGfSXr83VjddicIT/BiIK7HPIuYbDoGvY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=unbq1aDpKMwKL90RsRmXrH+gMwI62aLILyOfRZgV+dAnW3Bf9mnUk0u8H7+nSKc/9Z96UGuzbgfUYFRaP0zmGtGfq5+31U2uMX9WPTMqEpelc491t5NV1f/mN2auHrSX/d6EUjwUtvRS8BOki7WjlerSH1qQ101NmeHj7Rn6xlk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MGVFD/HI; arc=none smtp.client-ip=209.85.128.195
+	 To:Cc:Content-Type; b=e4iqF1TQytlFfXQwJOIb/pmY2WMnwOJMw8BgGDe5RUGWt5euK9oG3u3qsv+vrj1YkTojWsYWBt2joqsgKOo1qdDE2D2CFJLbL4vuPwLVVsDOPtrkTmmtfMjMpBLz5spcUHhqRdB/JJFNAMoYcndsLPn7PwE/NNSV4FwnlcynIR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Cl2CgTJu; arc=none smtp.client-ip=209.85.128.194
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f195.google.com with SMTP id 00721157ae682-71b71a8d5f0so227067b3.3;
-        Thu, 31 Jul 2025 18:34:58 -0700 (PDT)
+Received: by mail-yw1-f194.google.com with SMTP id 00721157ae682-71a3f7f0addso15722957b3.2;
+        Thu, 31 Jul 2025 18:43:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1754012097; x=1754616897; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1754012588; x=1754617388; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=08ID5kY3ckc7uruII/wDxPJvnRvUsM8vOn10ourRG5g=;
-        b=MGVFD/HI1CgGooOmYBjJxCg10ZRBb++l2cSjVmN71uyG02k0/CDyM/XkyUc0AnzGiE
-         eOSNV5/0Xq3tMB/l+RSvoqGN2+rQxPjaH69+zbHiXZZHYS45g7efSFtuE0nxXrSkEX90
-         j6oO5OjYVsetSwpFVdxyD1O9H41deqTpeiLQiWULIMjXMug9WUaqp7Gq9DoDHog0v0N9
-         QXlDONcxZyO8TBdzCnaBmszOGwIeOfMpqIVlwvdO6QI2RQ4FKTODj3Lft6tfwu/2mTT9
-         V3ki7Z/Zx0IT5dn2xiyXr33P87KZpO6nKZtBVGzLEeJJjvc/sxmSGMCAoogdYKqrrviz
-         dLRQ==
+        bh=Vg54mcNOWV4pT7SvP9l1EEus3Ufwp4XwJcmkPSo2fik=;
+        b=Cl2CgTJuLD5lXQ5yoziJwyccymk4NhKcRRFOuVmlp7IElmMI7ocYNUL9YDhhkzhIAF
+         Rh3AohvErLwHd61icpBpCNb8pDrsT93TPzvRUpTrqBYhJR8zt6BpSdkTV9qDurVWsL/B
+         YUoDIP9S09mpDcQX0oHLuS2Zykc2+v3XN4Jv2l6G3rATJrlh93vzA421QjT8fvDHFMzQ
+         Ufi826zbsU/m0PONpPxX7pVEjlSWMCGdTjfSej+vKDBY6U8ok63b26ugihmUXHQ+8z3Q
+         jya5HAKIcQ3jdFYKpOEeAksK1Tu2Mrn+rANNKNVVtjiDqlonBlsjhw21R4MRz63SEbF6
+         cYcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754012097; x=1754616897;
+        d=1e100.net; s=20230601; t=1754012588; x=1754617388;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=08ID5kY3ckc7uruII/wDxPJvnRvUsM8vOn10ourRG5g=;
-        b=iurQqfaMUM2ZMdmcKvawoa7PtkQhCGh7F/FeOAkRNgDtSZXXsr8VjYOkfsAUobgeji
-         10ysH6ip/4dJJ/dLrYWh/wHlrAcT/4rv95xSzrYfKow+gEGFRwSBL1OzNdLq4821/FAG
-         zg9FgHvH+dbPuD6u1KSlIYxfw7Oi8ecCeiung0MsN3xefNxVuMQezod5f0eDUTFRr3EK
-         eS7hAiSJBVz1DvskWNHcpsrs4KeMnCy8VyOolUqHn07OnpIJUvbpNtNR8+AwVdDIGs3n
-         K9KKRIAWyUB2aW3Nh8R5J5MfolerRiUH1WgJ9eY2zUAgwIOhg+Em9pBiX7nJNMlHPicN
-         Xq1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUvguO02tYChY1Vu2tPybhPYZ/mJixFtQh2ObQPEgaRpUlHtENL4bb6f1ysXmUg6GqjfC2XXjc37iy6mRQ=@vger.kernel.org, AJvYcCUy2298lKl7O2LTlp24DBMhPxPY7Uzk7RbJWUjZPkpHNYlomjHZClZsPO0umqYi1jH0K+8sbBfP@vger.kernel.org
-X-Gm-Message-State: AOJu0YwY5bt+Ekauld9UMGA0yjVsZctfcTT+NhfnkliMuOhjO/UyCj5I
-	e1lNPeMvZWd0+zdsB3R5EGI6u5Nw8IJrM5JW06oJdEtt57v++Mga61JjINpAAVo/66LMBgqHdEu
-	X55X7Hu8xuPQInKG/xtH/03+uas4NOwg=
-X-Gm-Gg: ASbGnctlHqNPnByMBknXWPIgQMDm6lgqNlZP602FjWAlqQYUuJ+vz6JliMlVwjvHoHM
-	NjvxNQ1DKnFfssLjyOt/fksoejpslIoNYVE6U7Z+bxatJvvJ5Bs+ribL21k85YXzmAJy9s/O04I
-	ZdgC011S5nYhp/DjfStrz7HtJ/gXSAQNuGL2/r83/ASpXuawyrCrsT7dEh2dSU1elth/ZjZZnZR
-	lbMzkCwN0A7nx/q1Q==
-X-Google-Smtp-Source: AGHT+IGstYxmewNf8YiqioIjdzJ2WWwwXJyFgGUwXuc1csHH/OMG7yh4yzpqPLjwKOKrL0GzfhUiTnKyLREnOArAhfo=
-X-Received: by 2002:a05:690c:6909:b0:719:f77b:9395 with SMTP id
- 00721157ae682-71a465edc2emr123888347b3.1.1754012097353; Thu, 31 Jul 2025
- 18:34:57 -0700 (PDT)
+        bh=Vg54mcNOWV4pT7SvP9l1EEus3Ufwp4XwJcmkPSo2fik=;
+        b=dGt2us2/oLke63ddoDm7HVrPxkzZH/A+nN9kg73OEFQSHrRLDRRlVhdsO1imwweKry
+         JF7AWcAzo4vHjuelczHvZbPojH2BfCk1JldbW4YH7ctCFsmaJEdm7RgNSHbTF9K5isUT
+         EfKW0aFyP5nPclPStvYc2cAqWzsg7Bfff30Y+YW34tyrkaz9x04OGhGMdzQ3QdiLK8JA
+         K3hnWNs4wCTXrtiTBKlDwfmDKIVwRWCB6WwnZpaMdzqNbVfj9ivhf6lT/4smNaS1yLwO
+         h1t/6vslQHLBnyzH0D3aIBtF6oyIHZC0wGN1LO8bRS6IBdIpw8/SKk8tKRlGzkP9Uf+O
+         /jiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUrJcJ//hR5OlCikm2RVqsWkf5yd2IbQl9z39Tk/hoHnnPRj+ztR4QsEM5y75q/juQr0bEOpcCl@vger.kernel.org, AJvYcCVpzisn1qDTpIVnZcK64O4Q+p7LRPm2K1A/HJ51yvUwdxj2LmqCNbvAReafc0F7nFqt+Y3hDsQ94BeIvzaN@vger.kernel.org, AJvYcCWmkZ/RE3f7xlXsue0WU86nrzNmJ9kJFOOiFFFQvqbFyrewIT8DAFVxi78tRIFj8TfgO8o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxIZXIPBQ/zcsCNMglSAJUG+8phz/kmX4AOYPqdSbeAsbWZdLoa
+	pfC8+wkHGHeJsRaH2hQXqcyvgmZzIUybcU4XoxJuB7rGf2F7wC8AKeNijpax9Pktt4PcI281ltB
+	43W+DWYWHyCrihyjfhyCY/yD8ARvzTJkMZ64NZ/4=
+X-Gm-Gg: ASbGnctmlqes9SJngRpaM35LYHtRUwtBb/gyYvn84p0IX4VjgrEiftLo1ks4TvsBTD4
+	UZEZEgbkW6o97jIKLETFVzAxvwpn7k02Wq13610K2fN8nLOI2OVilG8QAYK4W2exeQVbqDHOf5Z
+	ygmh8aOj92q9bkhPOvI/YVEYPpFwkEbyK0ueBWN7ynJzHT1ntBxoQN945ZWc2LE+tvpIGimF2yG
+	kh9c0c=
+X-Google-Smtp-Source: AGHT+IG3VYdBG5WRJkmwgqjcOvLij9zCubY0eTDbLYeCX5pOkIV0RjU1PUH4J+wlTs9cCnuBusTUnHpIPoKcXIdWeQ8=
+X-Received: by 2002:a05:690c:7001:b0:71a:1c50:8898 with SMTP id
+ 00721157ae682-71a46659cd3mr132619967b3.20.1754012587918; Thu, 31 Jul 2025
+ 18:43:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250731123309.184496-1-dongml2@chinatelecom.cn> <CANn89iKRkHyg4nZFwiSWPXsVEyVTSouDcfvULbge4BvOGPEPog@mail.gmail.com>
-In-Reply-To: <CANn89iKRkHyg4nZFwiSWPXsVEyVTSouDcfvULbge4BvOGPEPog@mail.gmail.com>
+References: <20250703121521.1874196-1-dongml2@chinatelecom.cn>
+ <20250703121521.1874196-3-dongml2@chinatelecom.cn> <CAADnVQKP1-gdmq1xkogFeRM6o3j2zf0Q8Atz=aCEkB0PkVx++A@mail.gmail.com>
+ <45f4d349-7b08-45d3-9bec-3ab75217f9b6@linux.dev> <3bccb986-bea1-4df0-a4fe-1e668498d5d5@linux.dev>
+ <CAADnVQ+Afov4E=9t=3M=zZmO9z4ZqT6imWD5xijDHshTf3J=RA@mail.gmail.com>
+ <20250716182414.GI4105545@noisy.programming.kicks-ass.net>
+ <CAADnVQ+5sEDKHdsJY5ZsfGDO_1SEhhQWHrt2SMBG5SYyQ+jt7w@mail.gmail.com>
+ <CADxym3Za-zShEUyoVE7OoODKYXc1nghD63q2xv_wtHAyT2-Z-Q@mail.gmail.com> <CAADnVQ+XGYp=ORtA730u7WQKqSGGH6R4=9CtYOPP_uHuJrYAkQ@mail.gmail.com>
+In-Reply-To: <CAADnVQ+XGYp=ORtA730u7WQKqSGGH6R4=9CtYOPP_uHuJrYAkQ@mail.gmail.com>
 From: Menglong Dong <menglong8.dong@gmail.com>
-Date: Fri, 1 Aug 2025 09:34:46 +0800
-X-Gm-Features: Ac12FXwHbdc6SK1C7VCQLRmBkgpDvjiFRQeRV6YmSk9AqntKmjvrLRL__Iw3BxE
-Message-ID: <CADxym3ZY7Lm9mgv83e2db7o3ZZMcLDa=vDf6nJSs1m0_tUk5Bg@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: ip: lookup the best matched listen socket
-To: Eric Dumazet <edumazet@google.com>
-Cc: ncardwell@google.com, kuniyu@google.com, davem@davemloft.net, 
-	dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Martin KaFai Lau <kafai@fb.com>
+Date: Fri, 1 Aug 2025 09:42:57 +0800
+X-Gm-Features: Ac12FXy-vpmSHlsvL-oIX1qMJ0s6c0XklwUy2mr9pJMFQsV90eCj8vUHSIkVBx0
+Message-ID: <CADxym3arEsBB-b0Hr52pcwH7H+Lgg6-NKYczPn6W49WRND-UJg@mail.gmail.com>
+Subject: Re: Inlining migrate_disable/enable. Was: [PATCH bpf-next v2 02/18]
+ x86,bpf: add bpf_global_caller for global trampoline
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Peter Zijlstra <peterz@infradead.org>, Menglong Dong <menglong.dong@linux.dev>, 
+	Steven Rostedt <rostedt@goodmis.org>, Jiri Olsa <jolsa@kernel.org>, bpf <bpf@vger.kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, 
+	LKML <linux-kernel@vger.kernel.org>, Network Development <netdev@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 31, 2025 at 9:01=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
+On Fri, Aug 1, 2025 at 12:15=E2=80=AFAM Alexei Starovoitov
+<alexei.starovoitov@gmail.com> wrote:
 >
-> On Thu, Jul 31, 2025 at 5:33=E2=80=AFAM Menglong Dong <menglong8.dong@gma=
+> On Mon, Jul 28, 2025 at 2:20=E2=80=AFAM Menglong Dong <menglong8.dong@gma=
 il.com> wrote:
 > >
-> > For now, the socket lookup will terminate if the socket is reuse port i=
-n
-> > inet_lhash2_lookup(), which makes the socket is not the best match.
+> > On Thu, Jul 17, 2025 at 6:35=E2=80=AFAM Alexei Starovoitov
+> > <alexei.starovoitov@gmail.com> wrote:
+> > >
+> > > On Wed, Jul 16, 2025 at 11:24=E2=80=AFAM Peter Zijlstra <peterz@infra=
+dead.org> wrote:
+> > > >
+> > > > On Wed, Jul 16, 2025 at 09:56:11AM -0700, Alexei Starovoitov wrote:
+> > > >
+> > > > > Maybe Peter has better ideas ?
+> > > >
+> > > > Is it possible to express runqueues::nr_pinned as an alias?
+> > > >
+> > > > extern unsigned int __attribute__((alias("runqueues.nr_pinned"))) t=
+his_nr_pinned;
+> > > >
+> > > > And use:
+> > > >
+> > > >         __this_cpu_inc(&this_nr_pinned);
+> > > >
+> > > >
+> > > > This syntax doesn't actually seem to work; but can we construct
+> > > > something like that?
+> > >
+> > > Yeah. Iant is right. It's a string and not a pointer dereference.
+> > > It never worked.
+> > >
+> > > Few options:
+> > >
+> > > 1.
+> > >  struct rq {
+> > > +#ifdef CONFIG_SMP
+> > > +       unsigned int            nr_pinned;
+> > > +#endif
+> > >         /* runqueue lock: */
+> > >         raw_spinlock_t          __lock;
+> > >
+> > > @@ -1271,9 +1274,6 @@ struct rq {
+> > >         struct cpuidle_state    *idle_state;
+> > >  #endif
+> > >
+> > > -#ifdef CONFIG_SMP
+> > > -       unsigned int            nr_pinned;
+> > > -#endif
+> > >
+> > > but ugly...
+> > >
+> > > 2.
+> > > static unsigned int nr_pinned_offset __ro_after_init __used;
+> > > RUNTIME_CONST(nr_pinned_offset, nr_pinned_offset)
+> > >
+> > > overkill for what's needed
+> > >
+> > > 3.
+> > > OFFSET(RQ_nr_pinned, rq, nr_pinned);
+> > > then
+> > > #include <generated/asm-offsets.h>
+> > >
+> > > imo the best.
 > >
-> > For example, we have socket1 and socket2 both listen on "0.0.0.0:1234",
-> > but socket1 bind on "eth0". We create socket1 first, and then socket2.
-> > Then, all connections will goto socket2, which is not expected, as sock=
-et1
-> > has higher priority.
-> >
-> > This can cause unexpected behavior if TCP MD5 keys is used, as describe=
-d
-> > in Documentation/networking/vrf.rst -> Applications.
-> >
-> > Therefor, we lookup the best matched socket first, and then do the reus=
-e
-> > port logic. This can increase some overhead if there are many reuse por=
-t
-> > socket :/
-> >
-> > Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
+> > I had a try. The struct rq is not visible to asm-offsets.c, so we
+> > can't define it in arch/xx/kernel/asm-offsets.c. Do you mean
+> > to define a similar rq-offsets.c in kernel/sched/ ? It will be more
+> > complex than the way 2, and I think the second way 2 is
+> > easier :/
 >
-> I do not think net-next is open yet ?
+> 2 maybe easier, but it's an overkill.
+> I still think asm-offset is cleaner.
+> arch/xx shouldn't be used, of course, since this nr_pinned should
+> be generic for all archs.
+> We can do something similar to drivers/memory/emif-asm-offsets.c
 
-Yeah, net-next is closed, which I just realized :/
+Great, I'll have a try on this way!
 
+> and do that within kernel/sched/.
+> rq-offsets.c as you said.
+> It will generate rq-offsets.h in a build dir that can be #include-d.
 >
-> It seems this would be net material.
-
-Ok, I'll send the V2 to the net.
-
-Thanks!
-Menglong Dong
-
->
-> Any way you could provide a test ?
->
-> Please CC Martin KaFai Lau <kafai@fb.com>, as this was added in :
->
-> commit 61b7c691c7317529375f90f0a81a331990b1ec1b
-> Author: Martin KaFai Lau <kafai@fb.com>
-> Date:   Fri Dec 1 12:52:31 2017 -0800
->
->     inet: Add a 2nd listener hashtable (port+addr)
+> I thought about another alternative (as a derivative of 1):
+> split nr_pinned from 'struct rq' into its own per-cpu variable,
+> but I don't think that will work, since rq_has_pinned_tasks()
+> doesn't always operate on this_rq().
+> So the acceptable choices are realistically 1 and 3 and
+> rq-offsets.c seems cleaner.
+> Pls give it another try.
 
