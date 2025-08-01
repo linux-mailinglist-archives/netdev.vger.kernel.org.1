@@ -1,143 +1,103 @@
-Return-Path: <netdev+bounces-211307-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211308-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29A9EB17D10
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 09:00:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCC79B17D55
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 09:14:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5619C58352B
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 07:00:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1933B1C810DC
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 07:14:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6604A1A255C;
-	Fri,  1 Aug 2025 07:00:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C6BA1FCFEF;
+	Fri,  1 Aug 2025 07:12:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Kms3koXp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VZLqfKfi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61F6F6DCE1
-	for <netdev@vger.kernel.org>; Fri,  1 Aug 2025 07:00:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37BBC2E3709
+	for <netdev@vger.kernel.org>; Fri,  1 Aug 2025 07:12:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754031634; cv=none; b=HlSZ0Jo+zq9fYlJqVvQ0rMLBpAntbUKr8cCUuFcjHtp16katpHnTI8fQy/p/KiTm6wEAOKwbWmKEZvTm0N5v3rLXWr0/BTQ+33fO91Mf4+VK+nJtw8Q52yqQv4CcLlgtUfwGhq/8DLLN1LtSh1Voth2aCJLc7M+Doq6MkyIo94g=
+	t=1754032364; cv=none; b=RXtktYmeb05NrYC1e5iCaayetgwvjDPkQrni0hz6dVdGYB4cjggTaxwq9B4i0FHJflOesE49JE+sSGDf5meDMh3MlAI/ar3MnXIR0xqymh7mHNusf10Sn50SRUqJoLtkn6C5jC+gElQypqG27Iycim6OTr9ON7yHPyxwPoozsrk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754031634; c=relaxed/simple;
-	bh=lOdACm39398ZkN2lU2UZXEP/gEQUsiO20iyEfrmnlog=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Zl8BOPOIL7t6cvgx4FHs4Rv6kqi9Btc2IYWsMlI3VbT4AtN38nux2CDLMOl6kTm53SGk6E1WzT+G2kXjgx75oMdCy0YU0P83JfVFlRECCVF/1vqFQW4/WhC/YfIf+6pS+fiK/6FfvAUBobkAlvOHHmB2fE/MluXQbUmazKHHlm4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Kms3koXp; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-3b79bd3b1f7so709510f8f.1
-        for <netdev@vger.kernel.org>; Fri, 01 Aug 2025 00:00:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1754031631; x=1754636431; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lOdACm39398ZkN2lU2UZXEP/gEQUsiO20iyEfrmnlog=;
-        b=Kms3koXpvqhwr78UjSZurzI/4Qba/l7wa/LoZatXgG58B381rD7frdRu3rXKpkyO3S
-         701QdGwW1hwfMVu9fQJigm8BUgDlxV+ITq6QmWifAcvAJlFgU2tRfVV9vyr+42D6Zilt
-         xxpPmLrhGiU0617mdfn+VRoLnRUVJtjGPY7Xf8iIzD8KKGOlFTr0Uj5ywSG9hiWRyytR
-         DZE3C3a2DChwmFPqFJRQYlak9u8h8lr7Oz0CYIT6NrDPne8Va6uf1c8978H+OxThiVBc
-         ACdAtBfillTFJJfiXyBuv3FPDdlHQSNgngSs43dADLbVpwUf0aejWs6Ugr9gBXaDUKRX
-         rYWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754031631; x=1754636431;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lOdACm39398ZkN2lU2UZXEP/gEQUsiO20iyEfrmnlog=;
-        b=JlfvIXeHgkoRw4Mvah1hFLoUrHE3W2zz41NiC2L3eCSD6mP2XmKDBCEwaSG30AGOOJ
-         yWHUqmCI0mliV6yC8jnqNJVCRzoMn9RJlV7RVPpBwOaYExGx1GD8TNgpWey7v6N7Hobk
-         Vz8ZdNqlXJJIYRNg2wKsjw1Y8E6b/hGoxbYB1bjPRYa0EPL18/EKKHl35WCYqBrmRuka
-         WLGVYNHDObpJEBanK8EYNC7HMjxuoLsNUZ9A2vdEeVuFG0cS3moo1lYTc71nHeemhofs
-         hBseqT8JQIKPf5nDs4Q2qC5QDa4OYwxF458BMdp7VdTVBd9/iOYUHb7wczNF+sW3lfS1
-         YTzA==
-X-Forwarded-Encrypted: i=1; AJvYcCXGjSzIbT4D2NNbyb3Kdocnziz1wgAbyUQjvtigr4vBoEsZI8mV+yCmoVFMcGQnOvL2SftfDGM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxBNGWCHVDB8UaCLj/JKtshc+AtNusfvRA+mtuSW7p3aM2KoHOV
-	hVzuhXNaT+Di7V567RkqKmMH8mZJwGO3yhtg3IfKbBBwjA1SJxy5TmJueDLecQEqlUY=
-X-Gm-Gg: ASbGncukCfpTCCHOdopnm5PPO8ygUrpMj+O2cLvNVNF6pm95Kiqx2RFpnhVGIObXcjY
-	Or6k1Rm7rPrgBHh+k8zf2XvSclr4L58MuDZ2AfY0h0tgrnF/LiKWRer8GgL15gtEX/NQmYLaNvq
-	GDGXG2n2t4hS2EbsC5yHFIva2kXuYqfzrBOqCAxkTB6gjZMqnQvmm6h98HsLYksTEBgaozVarJa
-	yDTMNpEnxKUN8KxsuPeKXXZ0US7GpKcmGDkj3WJxlmbesc1gWx1khPy4d02fL5inl1zCi3+PdzJ
-	C6KEXc8MN3FUpdm2AkphBC30V4IvLUJ756XZNScaGL7Su1UdQip/Chx4e3kIY30cA92OVHoPXGz
-	YFo3Nyf+Sx5uYO9tsB/TogwbQajmD4H3Dw5gyGZUSdg==
-X-Google-Smtp-Source: AGHT+IGpo7vCBRl1+3LNZgziFjvZCIsV7Fz+AW0zycTpGAfpOewwiyDA2ffkkvBUhcmMNKx/L1CjEA==
-X-Received: by 2002:a05:6000:4212:b0:3b5:dc07:50a4 with SMTP id ffacd0b85a97d-3b794fbeb87mr9254839f8f.2.1754031630614;
-        Fri, 01 Aug 2025 00:00:30 -0700 (PDT)
-Received: from blackdock.suse.cz (nat2.prg.suse.com. [195.250.132.146])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b79c47ae8esm4762632f8f.61.2025.08.01.00.00.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Aug 2025 00:00:29 -0700 (PDT)
-Date: Fri, 1 Aug 2025 09:00:27 +0200
-From: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Willem de Bruijn <willemb@google.com>, Matthieu Baerts <matttbe@kernel.org>, 
-	Mat Martineau <martineau@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
-	Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>, 
-	Shakeel Butt <shakeel.butt@linux.dev>, Andrew Morton <akpm@linux-foundation.org>, 
-	Simon Horman <horms@kernel.org>, Geliang Tang <geliang@kernel.org>, 
-	Muchun Song <muchun.song@linux.dev>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
-	mptcp@lists.linux.dev, cgroups@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH v1 net-next 13/13] net-memcg: Allow decoupling memcg from
- global protocol memory accounting.
-Message-ID: <ekte46qtwawpvdijdmoqhl2pcwtfhxgl6ubxjkgkiitrtfnvpu@5n7kwkj4fs2t>
-References: <20250721203624.3807041-1-kuniyu@google.com>
- <20250721203624.3807041-14-kuniyu@google.com>
- <fq3wlkkedbv6ijj7pgc7haopgafoovd7qem7myccqg2ot43kzk@dui4war55ufk>
- <CAAVpQUAFAsmPPF0gRMqDNWJmktegk6w=s1TPS9hGJpHQzXT-sg@mail.gmail.com>
+	s=arc-20240116; t=1754032364; c=relaxed/simple;
+	bh=kZ2ssGifWusx+VAn097N3kTz4drLvew5uJnr57tCeTk=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=jdxeXVQ/2VzzzJWiisaxeKvDV/AbOBwmhb7Vy8AWXw9R1LZ7vUIr08GBbztcda3Xg7iiB2gHi36HYthc9wA9qsSsHVCS8UoAkgULL+9Ow0X0OKkZaA250WjV3oUQTgKIrKGBoq5dIL4ahDZ0Cas1Wyh66ecDOC11UbKEJTM7OJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VZLqfKfi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E9F1C4CEE7;
+	Fri,  1 Aug 2025 07:12:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754032362;
+	bh=kZ2ssGifWusx+VAn097N3kTz4drLvew5uJnr57tCeTk=;
+	h=From:Date:Subject:To:Cc:From;
+	b=VZLqfKfiKRLlgY1GsmMNqmcAw+Ljlp+kTbga2cVoFEGFqoZLcyLQLg1lTEBuniLPG
+	 U37aCWmUSTcCCaxJ8fnsdKhBs2jvv0TuUhpX4k0sRbiQU5rmCiha8wMgqYgiuCaiEQ
+	 x9yUzwpZs8nqy0/CjEF48+b/pq0CqtesNohPItUGXL2iyPL+zG0/jlB867lu+18K7z
+	 JZmkXC1n8GFoxta3Zsgc03uRqRKK2Ahrgs9bmnibBwB8ZD6aHGps4sb7hbnc4+zhTB
+	 XAX2irL2hZdpj7WP2LAJxgdmC3hypmnrK6/Axej8UXQuqeoc+rDknJf0n2l96PJcGD
+	 N3QT6otILCZHw==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Date: Fri, 01 Aug 2025 09:12:25 +0200
+Subject: [PATCH net v2] net: airoha: npu: Add missing MODULE_FIRMWARE
+ macros
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="x3o5euvcxbwgpnyi"
-Content-Disposition: inline
-In-Reply-To: <CAAVpQUAFAsmPPF0gRMqDNWJmktegk6w=s1TPS9hGJpHQzXT-sg@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250801-airoha-npu-missing-module-firmware-v2-1-e860c824d515@kernel.org>
+X-B4-Tracking: v=1; b=H4sIANhojGgC/5WNQQ6CMBBFr0Jm7ZgWLCSuvAdhUcsAE6ElU0EN4
+ e5WbuDmJ+8v3tsgkjBFuGYbCK0cOfgE+SkDN1jfE3KbGHKVG1UVGi1LGCz6ecGJY2Tf4xTaZST
+ sWKaXFcKq0ureKmNsYSCJZqGO30ekbhIPHJ9BPkdz1b/3L/2qUePFKFc6l5bK24PE03gO0kOz7
+ /sXfRMOItUAAAA=
+X-Change-ID: 20250731-airoha-npu-missing-module-firmware-7710bd055a35
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+X-Mailer: b4 0.14.2
 
+Introduce missing MODULE_FIRMWARE definitions for firmware autoload.
 
---x3o5euvcxbwgpnyi
-Content-Type: text/plain; protected-headers=v1; charset=us-ascii
-Content-Disposition: inline
-Subject: Re: [PATCH v1 net-next 13/13] net-memcg: Allow decoupling memcg from
- global protocol memory accounting.
-MIME-Version: 1.0
+Fixes: 23290c7bc190d ("net: airoha: Introduce Airoha NPU support")
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+---
+Changes in v2:
+- Add missing Fixes tag
+- Link to v1: https://lore.kernel.org/r/20250731-airoha-npu-missing-module-firmware-v1-1-450c6cc50ce6@kernel.org
+---
+ drivers/net/ethernet/airoha/airoha_npu.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-On Thu, Jul 31, 2025 at 04:51:43PM -0700, Kuniyuki Iwashima <kuniyu@google.com> wrote:
-> Doesn't that end up implementing another tcp_mem[] which now
-> enforce limits on uncontrolled cgroups (memory.max == max) ?
-> Or it will simply end up with the system-wide OOM killer ?
+diff --git a/drivers/net/ethernet/airoha/airoha_npu.c b/drivers/net/ethernet/airoha/airoha_npu.c
+index 9ab964c536e11173e3e3bb4854b4f886c75a0051..a802f95df99dd693293b1c0cc0fbf09afab2c835 100644
+--- a/drivers/net/ethernet/airoha/airoha_npu.c
++++ b/drivers/net/ethernet/airoha/airoha_npu.c
+@@ -579,6 +579,8 @@ static struct platform_driver airoha_npu_driver = {
+ };
+ module_platform_driver(airoha_npu_driver);
+ 
++MODULE_FIRMWARE(NPU_EN7581_FIRMWARE_DATA);
++MODULE_FIRMWARE(NPU_EN7581_FIRMWARE_RV32);
+ MODULE_LICENSE("GPL");
+ MODULE_AUTHOR("Lorenzo Bianconi <lorenzo@kernel.org>");
+ MODULE_DESCRIPTION("Airoha Network Processor Unit driver");
 
-I meant to rely on use the exisiting mem_cgroup_charge_skmem(), i.e.
-there'd be always memory.max < max (ensured by the configuring agent).
-But you're right the OOM _may_ be global if the limit is too loose.
+---
+base-commit: 01051012887329ea78eaca19b1d2eac4c9f601b5
+change-id: 20250731-airoha-npu-missing-module-firmware-7710bd055a35
 
-Actually, as I think about it, another configuration option would be to
-reorganize the memcg tree and put all non-isolated memcgs under one
-ancestor and set its memory.max limit (so that it's shared among them
-like the global limit).
+Best regards,
+-- 
+Lorenzo Bianconi <lorenzo@kernel.org>
 
-HTH,
-Michal
-
---x3o5euvcxbwgpnyi
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQRCE24Fn/AcRjnLivR+PQLnlNv4CAUCaIxl9AAKCRB+PQLnlNv4
-CJZtAQDyxJKYOwR+G5PupdcFpWcem+e2vcVjekmcUSnAefb9SwEAmlcDbWaK+JWZ
-zsvVOKp5n3NQmuq9ouqRPxwf+gbdlAs=
-=J+oe
------END PGP SIGNATURE-----
-
---x3o5euvcxbwgpnyi--
 
