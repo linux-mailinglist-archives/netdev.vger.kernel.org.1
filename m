@@ -1,93 +1,77 @@
-Return-Path: <netdev+bounces-211312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211313-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2328DB17ED9
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 11:10:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECF84B17EED
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 11:13:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CAA1E4E1ECB
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 09:10:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 74EB11C25C13
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 09:13:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5266921FF35;
-	Fri,  1 Aug 2025 09:09:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89313221F06;
+	Fri,  1 Aug 2025 09:13:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JiRWiddG"
+	dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b="LqSjgKsO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f196.google.com (mail-pl1-f196.google.com [209.85.214.196])
+Received: from layka.disroot.org (layka.disroot.org [178.21.23.139])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9623920D50C;
-	Fri,  1 Aug 2025 09:09:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0449221721;
+	Fri,  1 Aug 2025 09:13:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.21.23.139
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754039399; cv=none; b=mvENma3sJFjal2/AU9PqcQ8Y/YpfD8XLfHx7ToXrHjiSxF/jNUGfuPQPTIJFqIIL04AT8Ynp2WuB0yOcbkUm9fGU07dgEJdIQaKFSXYhJkVKVUv0TJat5pN7ixMQ7+0GDWfo4xytrN4JgohZnQsSQzTG+Hjvl1x7XsYWCTH84f4=
+	t=1754039596; cv=none; b=kiXiCYEOIK3mBp+AEdtSEB2dEYJbhuLD1Sm4dIeldRMexm7Z3scgZCjvY7U7wrD+PmZz3tyocbTMDd6VbA2ax3XazC2GYFngkeCWSdrRjRHCv1rkBiPR7mEcZlahV5aTFOcmvJv3vTZx+WVkDLInxt6a8mJC20iaz3EdOlrku6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754039399; c=relaxed/simple;
-	bh=n4Ixi3fYDbUfs+fuzHa0N0j02ntzgphgaIShRouvows=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nhikzQxKBu2UkZoLV81oa3FBCU/OjfkJmzFtg0tXP1xV6NMfYBgSN6fMt3m+4KIxATste0xpjjWlxk9vwJ599M2DJR/XxqbZ78XyMaA1ExqR7K5s4DdWNBWUZ8cwxN+ly/3vU2EqRVSi0K69DsrLZhUc18ynwMtoSnBH9wOT2IY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JiRWiddG; arc=none smtp.client-ip=209.85.214.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f196.google.com with SMTP id d9443c01a7336-2403ca0313aso11908985ad.0;
-        Fri, 01 Aug 2025 02:09:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1754039397; x=1754644197; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=9vP4UDhxH/4RAWHjsHwISLfLYU+GjjD8clL/MRd1n8s=;
-        b=JiRWiddGCHPLipdf4+LsQCTVUyo0G4nQg4C69uyYg/0tGEbM5d8MN7zmC8Wvfwp1By
-         Kie5hSVBU1Yurn9po8yoVEF/lyKunsf3Q0aAG0rClaw53dLKW8LzAbU1g1NrTPM2g7Gt
-         3m0471MEjhIuifEhc6Yp6b03McKL+HGqp8CRuHA4IKty/PVmeFQnYlmxuZi1GmsTBNhA
-         ybUcA26oKFus2QhIkhX+pmTD2UJgbhbMLYiriX4TBqdAPhZo1aA/xDYL7W8EuMCJWffY
-         7eK8lwIw2gNdhmkuvWdTTB3c0G2OU/wMwbSJ/kWWlly4C27MzAUCdGH+eOjjexXD4q96
-         flJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754039397; x=1754644197;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9vP4UDhxH/4RAWHjsHwISLfLYU+GjjD8clL/MRd1n8s=;
-        b=Jv/rEXY1QgsSpUjNHu9nAfsjzsr205ZJwM/VqF+HnuSws//wwg859usHhSTLf1dlXl
-         kfgn4yJv0T0h6vgxQ7PnqYcaDaXFljx/sFdHGhFlthBv+ln72ad03+0jvDNnSFEeakd9
-         lK15BkoiDDLBvhxeUqPRPR4ghWItPJ8U1NYVQ2ZQLmAruK40uEgHf0ix+TbueE9cE7it
-         2PMyIKZhLM0Avb8bI3ndYHgFRudWLFtuij1SN0RXfGxmOHDxUP/7u4lC67pFmWoUf9Om
-         vbXWW9yxb0j/p/0ro1yuOLEViHvjKfRapEVfiDt1ZeF/pQCISgjR0u7zEejsH2pJNnPw
-         nZww==
-X-Forwarded-Encrypted: i=1; AJvYcCWojULafYfYzE7w0XF8FnIxJGpK3PZhol+WZEuXbAOuSKVsUnN0rpFVm95W3eW5fuSvEW2OksXsP264zBg=@vger.kernel.org, AJvYcCXFYHIP5FOUa59Szh699gSiO+ObCU8s7shpGo/+/jACuWb2VsZssI5RieWuYZ30wFtfypWPnwfi@vger.kernel.org
-X-Gm-Message-State: AOJu0YzqVMzBXYGtU0eTGCHWrEsLm7K7wtuKhFo1Wq3GYP2CmKli+SxQ
-	rxDPjOnYEZXq9KnK8RXNhoEeCyNbwAKksEKY30R2kfR94+oNV0Pshogm
-X-Gm-Gg: ASbGncvRs3vMNBJxdDl678irrj587hOhUuvosP1+kiPNNyDIcOlXbJgzsoG1tuHmc6Q
-	KhkvDK1616Y3c91wmVMIHGVG8XY8MvQj0PYxXJoYbfsPcXz0YOwaPzH3WCmHeUyM4iXbAa1XZSq
-	eGubis0LjerlCxqbAnYscfZokg97klfMD1AS2K5qkozQahPupBXi0wpUKm2mNnsnTXz30KfVTm7
-	eMFyJ+9KU9Z5iK5qIgrUsT402sbfnVZH+dz8olc3sjOvUBVabtcIhPN4bZMJcokicdlFcGBYYiq
-	qiaEx9pIZznK2cv9XO2XXYkmWxFiP3Tj1uNW7I8+LiNN5srLZ2mqAy3ZRRjNcz3RjNUHbRt1zd5
-	fsxn++cAfVkVvu3q8kLgceuzuRK/5MQ==
-X-Google-Smtp-Source: AGHT+IHChPwRTNYpUHcgeeM7piFCcgYCUBrVKH+gbNGL2Jnz6aoBql0VB21y+2TzAjiFGYRHyBoQtw==
-X-Received: by 2002:a17:902:e5d2:b0:240:8262:1a46 with SMTP id d9443c01a7336-2422a6a7ddcmr26693015ad.25.1754039396664;
-        Fri, 01 Aug 2025 02:09:56 -0700 (PDT)
-Received: from 7940hx ([43.129.244.20])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-241d1ef65d2sm38019985ad.31.2025.08.01.02.09.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Aug 2025 02:09:56 -0700 (PDT)
-From: Menglong Dong <menglong8.dong@gmail.com>
-X-Google-Original-From: Menglong Dong <dongml2@chinatelecom.cn>
-To: edumazet@google.com,
-	kuniyu@google.com,
-	kraig@google.com
-Cc: ncardwell@google.com,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
+	s=arc-20240116; t=1754039596; c=relaxed/simple;
+	bh=xPvJxuK/PBmyVvnt/ErP5uEKdZ5kX2qWNjIgNy0PW0E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aNCRwmzwFZdcmKAfB0bIxn5BufSILT+OiD0mB9yE6vCSlnzilLuXU+xQazTbb1e+DWzCnj8FuiQGrGZds2zno/jIS1FcrQdR+M8hEFjtVacOH9T8SSrFLKFBXeIAFAwNiM2Nit+aKlP4PNYqT6mykLtA3zMOBlMaULdeWAJobHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org; spf=pass smtp.mailfrom=disroot.org; dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b=LqSjgKsO; arc=none smtp.client-ip=178.21.23.139
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=disroot.org
+Received: from mail01.disroot.lan (localhost [127.0.0.1])
+	by disroot.org (Postfix) with ESMTP id 864F925DDA;
+	Fri,  1 Aug 2025 11:13:05 +0200 (CEST)
+X-Virus-Scanned: SPAM Filter at disroot.org
+Received: from layka.disroot.org ([127.0.0.1])
+ by localhost (disroot.org [127.0.0.1]) (amavis, port 10024) with ESMTP
+ id zh-OSYwXA6vo; Fri,  1 Aug 2025 11:13:04 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=disroot.org; s=mail;
+	t=1754039584; bh=xPvJxuK/PBmyVvnt/ErP5uEKdZ5kX2qWNjIgNy0PW0E=;
+	h=From:To:Cc:Subject:Date;
+	b=LqSjgKsOjo4AMSSRXfragXwK70JyXgtsFbKFcJQhbLaKQR993L2JPqYOdNntEEX5G
+	 dd5tmYAMtqbzd3H7pfUsuut80Zpq5rh0slJ1xNGd9ikw3hqBNIhac335qog7LI7385
+	 KyiNA/0PEN7QJuhHzungsu5HeN+8nqh77nXdV3aBPT4Y4M0mWsZ9G8y1VJ/UViQ2G5
+	 PAct65VfEAPQ8eqt4xf9LTfl8dOygzP/Z64hY2NtSs3vjHVCm6TgdCSG8XnZ8U3KTZ
+	 ni0gJC6G9jlLSMHdh7LzZIveL7ChzAGu9UDo9TibbFsqpZZnOVksVEDG1oohv8Egzh
+	 +EWMYjEL5lCVg==
+From: Yao Zi <ziyao@disroot.org>
+To: Drew Fustini <fustini@kernel.org>,
+	Guo Ren <guoren@kernel.org>,
+	Fu Wei <wefu@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Alexandre Ghiti <alex@ghiti.fr>,
+	Emil Renner Berthing <emil.renner.berthing@canonical.com>,
+	Jisheng Zhang <jszhang@kernel.org>
+Cc: linux-riscv@lists.infradead.org,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net v2] net: ip: order the reuseport socket in __inet_hash
-Date: Fri,  1 Aug 2025 17:09:49 +0800
-Message-ID: <20250801090949.129941-1-dongml2@chinatelecom.cn>
-X-Mailer: git-send-email 2.50.1
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Yao Zi <ziyao@disroot.org>
+Subject: [PATCH net v2 0/3] Fix broken link with TH1520 GMAC when linkspeed changes
+Date: Fri,  1 Aug 2025 09:12:37 +0000
+Message-ID: <20250801091240.46114-1-ziyao@disroot.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,176 +80,41 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-For now, the socket lookup will terminate if the socket is reuse port in
-inet_lhash2_lookup(), which makes the socket is not the best match.
+It's noted that on TH1520 SoC, the GMAC's link becomes broken after
+the link speed is changed (for example, running ethtool -s eth0 speed
+100 on the peer when negotiated to 1Gbps), but the GMAC could function
+normally if the speed is brought back to the initial.
 
-For example, we have socket1 and socket2 both listen on "0.0.0.0:1234",
-but socket1 bind on "eth0". We create socket1 first, and then socket2.
-Then, all connections will goto socket2, which is not expected, as socket1
-has higher priority.
+Just like many other SoCs utilizing STMMAC IP, we need to adjust the TX
+clock supplying TH1520's GMAC through some SoC-specific glue registers
+when linkspeed changes. But it's found that after the full kernel
+startup, reading from them results in garbage and writing to them makes
+no effect, which is the cause of broken link.
 
-This can cause unexpected behavior if TCP MD5 keys is used, as described
-in Documentation/networking/vrf.rst -> Applications.
+Further testing shows perisys-apb4-hclk must be ungated for normal
+access to Th1520 GMAC APB glue registers, which is neither described in
+dt-binding nor acquired by the driver.
 
-Therefore, we compute a score for the reuseport socket and add it to the
-list with order in __inet_hash(). Sockets with high score will be added
-to the head.
+This series expands the dt-binding of TH1520's GMAC to allow an extra
+"APB glue registers interface clock", instructs the driver to acquire
+and enable the clock, and finally supplies CLK_PERISYS_APB4_HCLK for
+TH1520's GMACs in SoC devicetree.
 
-Link: https://lore.kernel.org/netdev/20250731123309.184496-1-dongml2@chinatelecom.cn/
-Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
----
-v2:
-- As Kuniyuki advised, sort the reuseport socket in __inet_hash() to keep
-  the lookup for reuseport O(1)
----
- include/linux/rculist_nulls.h | 34 ++++++++++++++++++++++++
- include/net/sock.h            |  5 ++++
- net/ipv4/inet_hashtables.c    | 49 ++++++++++++++++++++++++++++++++---
- 3 files changed, 84 insertions(+), 4 deletions(-)
+Changed from v1
+- Make apb clock essential in dt-binding
+- Collect review tags
+- Link to v1: https://lore.kernel.org/all/20250729093734.40132-1-ziyao@disroot.org/
 
-diff --git a/include/linux/rculist_nulls.h b/include/linux/rculist_nulls.h
-index 89186c499dd4..da500f4ae142 100644
---- a/include/linux/rculist_nulls.h
-+++ b/include/linux/rculist_nulls.h
-@@ -52,6 +52,13 @@ static inline void hlist_nulls_del_init_rcu(struct hlist_nulls_node *n)
- #define hlist_nulls_next_rcu(node) \
- 	(*((struct hlist_nulls_node __rcu __force **)&(node)->next))
- 
-+/**
-+ * hlist_nulls_pprev_rcu - returns the element of the list after @node.
-+ * @node: element of the list.
-+ */
-+#define hlist_nulls_pprev_rcu(node) \
-+	(*((struct hlist_nulls_node __rcu __force **)&(node)->pprev))
-+
- /**
-  * hlist_nulls_del_rcu - deletes entry from hash list without re-initialization
-  * @n: the element to delete from the hash list.
-@@ -145,6 +152,33 @@ static inline void hlist_nulls_add_tail_rcu(struct hlist_nulls_node *n,
- 	}
- }
- 
-+/**
-+ * hlist_nulls_add_before_rcu
-+ * @n: the new element to add to the hash list.
-+ * @next: the existing element to add the new element before.
-+ *
-+ * Description:
-+ * Adds the specified element to the specified hlist
-+ * before the specified node while permitting racing traversals.
-+ *
-+ * The caller must take whatever precautions are necessary
-+ * (such as holding appropriate locks) to avoid racing
-+ * with another list-mutation primitive, such as hlist_nulls_add_head_rcu()
-+ * or hlist_nulls_del_rcu(), running on this same list.
-+ * However, it is perfectly legal to run concurrently with
-+ * the _rcu list-traversal primitives, such as
-+ * hlist_nulls_for_each_entry_rcu(), used to prevent memory-consistency
-+ * problems on Alpha CPUs.
-+ */
-+static inline void hlist_nulls_add_before_rcu(struct hlist_nulls_node *n,
-+					      struct hlist_nulls_node *next)
-+{
-+	WRITE_ONCE(n->pprev, next->pprev);
-+	n->next = next;
-+	rcu_assign_pointer(hlist_nulls_pprev_rcu(n), n);
-+	WRITE_ONCE(next->pprev, &n->next);
-+}
-+
- /* after that hlist_nulls_del will work */
- static inline void hlist_nulls_add_fake(struct hlist_nulls_node *n)
- {
-diff --git a/include/net/sock.h b/include/net/sock.h
-index c8a4b283df6f..42aa1919eeee 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -885,6 +885,11 @@ static inline void __sk_nulls_add_node_tail_rcu(struct sock *sk, struct hlist_nu
- 	hlist_nulls_add_tail_rcu(&sk->sk_nulls_node, list);
- }
- 
-+static inline void __sk_nulls_add_node_before_rcu(struct sock *sk, struct sock *next)
-+{
-+	hlist_nulls_add_before_rcu(&sk->sk_nulls_node, &next->sk_nulls_node);
-+}
-+
- static inline void sk_nulls_add_node_rcu(struct sock *sk, struct hlist_nulls_head *list)
- {
- 	sock_hold(sk);
-diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
-index ceeeec9b7290..80d8bec41a58 100644
---- a/net/ipv4/inet_hashtables.c
-+++ b/net/ipv4/inet_hashtables.c
-@@ -334,6 +334,26 @@ static inline int compute_score(struct sock *sk, const struct net *net,
- 	return score;
- }
- 
-+static inline int compute_reuseport_score(struct sock *sk)
-+{
-+	int score = 0;
-+
-+	if (sk->sk_bound_dev_if)
-+		score += 2;
-+
-+	if (sk->sk_family == PF_INET)
-+		score += 10;
-+
-+	/* the priority of sk_incoming_cpu should be lower than sk_bound_dev_if,
-+	 * as it's optional in compute_score(). Thank God, this is the only
-+	 * variable condition, which we can't judge now.
-+	 */
-+	if (READ_ONCE(sk->sk_incoming_cpu))
-+		score++;
-+
-+	return score;
-+}
-+
- /**
-  * inet_lookup_reuseport() - execute reuseport logic on AF_INET socket if necessary.
-  * @net: network namespace.
-@@ -739,6 +759,27 @@ static int inet_reuseport_add_sock(struct sock *sk,
- 	return reuseport_alloc(sk, inet_rcv_saddr_any(sk));
- }
- 
-+static void inet_hash_reuseport(struct sock *sk, struct hlist_nulls_head *head)
-+{
-+	const struct hlist_nulls_node *node;
-+	int score, curscore;
-+	struct sock *sk2;
-+
-+	curscore = compute_reuseport_score(sk);
-+	/* lookup the socket to insert before */
-+	sk_nulls_for_each_rcu(sk2, node, head) {
-+		if (!sk2->sk_reuseport)
-+			continue;
-+		score = compute_reuseport_score(sk2);
-+		if (score <= curscore) {
-+			__sk_nulls_add_node_before_rcu(sk, sk2);
-+			return;
-+		}
-+	}
-+
-+	__sk_nulls_add_node_tail_rcu(sk, head);
-+}
-+
- int __inet_hash(struct sock *sk, struct sock *osk)
- {
- 	struct inet_hashinfo *hashinfo = tcp_get_hashinfo(sk);
-@@ -761,11 +802,11 @@ int __inet_hash(struct sock *sk, struct sock *osk)
- 			goto unlock;
- 	}
- 	sock_set_flag(sk, SOCK_RCU_FREE);
--	if (IS_ENABLED(CONFIG_IPV6) && sk->sk_reuseport &&
--		sk->sk_family == AF_INET6)
--		__sk_nulls_add_node_tail_rcu(sk, &ilb2->nulls_head);
--	else
-+	if (!sk->sk_reuseport)
- 		__sk_nulls_add_node_rcu(sk, &ilb2->nulls_head);
-+	else
-+		inet_hash_reuseport(sk, &ilb2->nulls_head);
-+
- 	sock_prot_inuse_add(sock_net(sk), sk->sk_prot, 1);
- unlock:
- 	spin_unlock(&ilb2->lock);
+Yao Zi (3):
+  dt-bindings: net: thead,th1520-gmac: Describe APB interface clock
+  net: stmmac: thead: Get and enable APB clock on initialization
+  riscv: dts: thead: Add APB clocks for TH1520 GMACs
+
+ .../devicetree/bindings/net/thead,th1520-gmac.yaml     |  6 ++++--
+ arch/riscv/boot/dts/thead/th1520.dtsi                  | 10 ++++++----
+ drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c      |  6 ++++++
+ 3 files changed, 16 insertions(+), 6 deletions(-)
+
 -- 
 2.50.1
 
