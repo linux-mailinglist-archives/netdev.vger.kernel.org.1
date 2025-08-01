@@ -1,269 +1,161 @@
-Return-Path: <netdev+bounces-211366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211367-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA16DB18459
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 16:59:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8964EB184D1
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 17:18:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 49D171C83DC5
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 14:59:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBB115A1153
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 15:18:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F129E26FDBD;
-	Fri,  1 Aug 2025 14:59:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A827A270569;
+	Fri,  1 Aug 2025 15:18:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VdvM60Sw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZGbooI8Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD7B426C386;
-	Fri,  1 Aug 2025 14:58:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754060341; cv=fail; b=fvDfO5+K2SVOexNRRGpChOgRicjozY4ALC5Ds6tUfzKwdf/lTMCYu/K4wEIWok6RJGLZRDVebh60OEIRn27s/y+BCZl7+VnqG+zJlo0Oo9uHSiciCxuEA5J3jgVpbqHlDBD4OCEBLFAnX++h7rz+ZH/Rj3HC9tJw9/ZOVhRu4WM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754060341; c=relaxed/simple;
-	bh=+HqShfTxxf70b+X1rZCoNwbSKG0Snm83F0/Oq5seAbc=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=EnnEHjy2od0Xmlclnc/KQBNoyVJ/UQRt5sgavsHF2F16LeqNpNQmyK7mYzXkv2Y8QdnLagKjepDbWjuYtgn6uhFK08Y6DYLM5PDYIEVJwKRLVHfsPFvlvop+bUuxIe98X89aC5mTu2PSSVlNl0SkeC/o6ISYtewdhtw9iYTeGE8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VdvM60Sw; arc=fail smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1754060340; x=1785596340;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=+HqShfTxxf70b+X1rZCoNwbSKG0Snm83F0/Oq5seAbc=;
-  b=VdvM60Swh0b6orBS1EtkDUteiARMIGIdfUUPgW/+wHtT3egeKjbkyqQo
-   HSrPmFJqzZ52fAOGUlTsJwUaNL5YjB6ZwzhwhWTcuDfKMbioJUBso+kSU
-   XEU/p2geZN4E2V0T8wCfyNrXiP8yNgwkvMTKIo3Ec/R4meph4th5uT7UF
-   cUZZkJ9Z+GrQs4Sy79lVPfElMeRwdt+ly1W9KnK63BARuvuGl76ZaZFqj
-   JPhrtIuSKw25dJhId096uF6PLS/Y510PJPYtjavobvmCAwT38OmRS9+aC
-   iDb9L7WqBockCV6n62HKixDw5pFn5sJiwsoO/lCUBHrutbPfBbcDe9Qrr
-   g==;
-X-CSE-ConnectionGUID: fasWMXukR1qeqxhblMDZOA==
-X-CSE-MsgGUID: 2sgjk2IdRIiVYPtUCpCNOQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11509"; a="56367774"
-X-IronPort-AV: E=Sophos;i="6.17,255,1747724400"; 
-   d="scan'208";a="56367774"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2025 07:58:59 -0700
-X-CSE-ConnectionGUID: C+vHUESARXqWiG7CdRw2ZQ==
-X-CSE-MsgGUID: 0VPFOWX+RfyEbDpotFqcnQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,255,1747724400"; 
-   d="scan'208";a="163597921"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by orviesa007.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2025 07:58:59 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26; Fri, 1 Aug 2025 07:58:58 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26 via Frontend Transport; Fri, 1 Aug 2025 07:58:58 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (40.107.93.75) by
- edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26; Fri, 1 Aug 2025 07:58:58 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ZB02/GUYWeTkDHkmfSrL2js5e7LqsOWxudy1aypa004sEs3fDL6bdxCbt2Tz7Yh/A9PkXox0iB4Y3q2trrXY4zgWs8hw5MqEVOCZ1QjCUBIbvPs8iz+BdBEfDoEE4AJ2QoXiiPjryDqUqxgmWTsClkMrXa6jlQwNpgxX3hGXQGISpKSOrrVQKyRrVORQNcqqy3M1nRMybcrMClAlW8X5iGVT4me5g/EjLxjoXAZQBC1vOJ74Zbz5rVzH1Ovzbx3KEfXOVoUB7CtbnFTi4SFseT1C9a/kF6VOhLYmA0wW6BeBhd56oVxtaaOrtTHfbI2HOwW0+MAiXT/jYZ7LWxxOiQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=PjvhiOm4KFoBLzEFr/uEGAFT5Z5K3PLwVYPOq7tRfQ0=;
- b=LAwuJTZ0xdQIp13zq5n+4Xe4WYycCcMIm1yJ9pTTGXqv8716KJnM1ILmPe1mbsFNp6dZjvtQapufEGdvOI5mTfnvWDaCRTalnr0yX6VKmyz8rO2umZx/DJmp2KWvO0HzeT1hBhZ8B9WgsQJoFyH9BDWmQBAvocA+ZMBzbgBu9N4WbuOGPU5YU7moPjnWSJ6iMl0rwJrO7zn9VVNBtVNROtd0dzrz0gEL5HdAymLQ/Qwa0DZzE9xWdg4IBeK8HPx+THhsIuBceXetWzrr33yo5vhACWuE4mwXL2fyziO/JN4zZPzcScFV8hmz2Cvh0UigUHjiS2p4OS/OaoODuoSVXg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DM4PR11MB6455.namprd11.prod.outlook.com (2603:10b6:8:ba::17) by
- CO1PR11MB4947.namprd11.prod.outlook.com (2603:10b6:303:99::11) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8989.16; Fri, 1 Aug 2025 14:58:54 +0000
-Received: from DM4PR11MB6455.namprd11.prod.outlook.com
- ([fe80::304a:afb1:cd4:3425]) by DM4PR11MB6455.namprd11.prod.outlook.com
- ([fe80::304a:afb1:cd4:3425%6]) with mapi id 15.20.8989.013; Fri, 1 Aug 2025
- 14:58:54 +0000
-From: "R, Ramu" <ramu.r@intel.com>
-To: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "Lobakin, Aleksander" <aleksander.lobakin@intel.com>, "Kubiak, Michal"
-	<michal.kubiak@intel.com>, "Fijalkowski, Maciej"
-	<maciej.fijalkowski@intel.com>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Alexei
- Starovoitov" <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, "Simon
- Horman" <horms@kernel.org>, NXNE CNSE OSDT ITP Upstreaming
-	<nxne.cnse.osdt.itp.upstreaming@intel.com>, "bpf@vger.kernel.org"
-	<bpf@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-next v2 01/12] idpf: fix Rx
- descriptor ready check barrier in splitq
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v2 01/12] idpf: fix Rx
- descriptor ready check barrier in splitq
-Thread-Index: AQHb5SeBM4ANbBUdOEGrullY6ZGxlLRHqvgggAZzUyA=
-Date: Fri, 1 Aug 2025 14:58:54 +0000
-Message-ID: <DM4PR11MB645575C89CB32AE88D2BDE4B9826A@DM4PR11MB6455.namprd11.prod.outlook.com>
-References: <20250624164515.2663137-1-aleksander.lobakin@intel.com>
- <20250624164515.2663137-2-aleksander.lobakin@intel.com>
- <PH0PR11MB5013936858D20BB0AB3BD607965AA@PH0PR11MB5013.namprd11.prod.outlook.com>
-In-Reply-To: <PH0PR11MB5013936858D20BB0AB3BD607965AA@PH0PR11MB5013.namprd11.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM4PR11MB6455:EE_|CO1PR11MB4947:EE_
-x-ms-office365-filtering-correlation-id: 1dc116ff-cbb9-4bf6-0dee-08ddd10bef4c
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?Ajps27yV96uk6nnAGYVH+bPbNyVh+oWHcA5KNmtVqum6mCihHEGynOW4+5XI?=
- =?us-ascii?Q?Mbp1rG2E21Xq1I8hvItU8zkKu4275gpDNWdfWUijaD0RSFZgI+7BVaU6bOhf?=
- =?us-ascii?Q?l6iwbikjp7xHoUA5vKOeNSD5rxeSrHz+bhqxBqBXcUN+KV9Okwcj9+7cz6Yv?=
- =?us-ascii?Q?9I1fwe2jgj35Pfv4xHm5IRRzvsKyhGnuOx3IB6D+TTAqaLNYtxIoT3lcyeNi?=
- =?us-ascii?Q?Ky3u1Rl/i7XA5ZE6KPM0S5WT4BIBH9Mi1A/4XgiQ8ZrqgiMySSgK7HCNUzPy?=
- =?us-ascii?Q?f5DJ35WOcCLsu7y9J2Y9qIT+FZq4qpogBO3HLBWDd23t2TO+ZWsNBP/jbhZt?=
- =?us-ascii?Q?MWWy3wD7ZbvtNqwZmsq6ObuS1J5ERGZTpohYtwjp0tzVhjVX8u3c9/5YjPYs?=
- =?us-ascii?Q?c7JxwY7oy+LPgr5T+JzGa6g/VoTyN7kedJsZNWvOxxGW/pnd5iBQ0ZUemRc1?=
- =?us-ascii?Q?pi4Hz207Z5rNWecwqdZj6kc/kVeJ3LC8uKpcYsOPo4OEaCwJBzEpbtYIIo08?=
- =?us-ascii?Q?HLhwKev51CXQ4/78j6H1CIzHqgbPKyznKGkBOYXLAqhvVumxZXqYVYVzSCE6?=
- =?us-ascii?Q?ZGacO2huylYlj3EwUzEG4JAUeRY/6/U3DoRw6mvI4/+oUyrjaovEviEmjTsH?=
- =?us-ascii?Q?xjhdYuK7Q7Nw2XT65AiHpyocD0fCS8/q0np4mOvnRgJVxTGCPSXOKU6Z7/AL?=
- =?us-ascii?Q?gdUGJBYOX9fhkf20/XFZRID+oSrnSWJ/MB13bpBIYZt0L5qzyzRtqQeTUcpz?=
- =?us-ascii?Q?Fsv+y/dAVI1V0DOyAPHTxFQ5t7MpXW2DODruTUb8sDigNTgBffijMwcJfwOs?=
- =?us-ascii?Q?sdXdvDBJmZYVVVS40+ooM5cs0S7vm44ST/cB4Gfm5bdBArKHwqObYGkpeX1u?=
- =?us-ascii?Q?ulLd9cIYNNHT1YhBa8vf5F0NSqNuFvR4S+skMT1mLy4xGZi8aG7bPNWW4Q1T?=
- =?us-ascii?Q?YLNIps3Whob87Os1FxI0eX5dTt4405yamVg6LIEOqJTAX5bpabBmQrbjw6RM?=
- =?us-ascii?Q?4gaHQoh/e8dtAXwccPnuA4gQg4JA9oVBPjvuLWAOAgWoOdw5LMTU7B5qx5he?=
- =?us-ascii?Q?dKaAYf5LD0lQ44XtkaII6e6vilRK8M5l7iTqycjoXQ3Fhmgq/KOvEif/9Eqx?=
- =?us-ascii?Q?KwMxojMBRkqqYltQBaDf5wIRPU7U0hEAu/ysY5ynSMmbDbASBSGx74Gp93kH?=
- =?us-ascii?Q?Zu1DBCd6V9e3xfk+UACVYLEK+FB2IkT7i90aUB3eczG9ncVrsiumTzLJRUjy?=
- =?us-ascii?Q?4jvwBsQrT4923haooXu0iIgYEAnCuOnPmslVmNcFR+uWvmwlf39jRlM5myjU?=
- =?us-ascii?Q?fUd/90MqkbKGOOCzniGVuPiaBlmngE3zm7h+oEa9sKevpuiHr7WIBPpeL9VR?=
- =?us-ascii?Q?09YvA8DaT4nJwlD5oGRPGVSWm8ChYEtY7/PiuBIpcfG1hKKr0Z3H3TPmPV03?=
- =?us-ascii?Q?hwDiADDQvQc8B4eCppODNIXWjRkSHX5LAVSSjR7NPu0fcDIysXKTmw=3D=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6455.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?wCoaO5qNa0jveKYGdTPr8BeCszJaNJ5Yjfbu5Bl7MmYQT4Z0w7r1uY/8iI1e?=
- =?us-ascii?Q?jC/S/hTWbHyH7auCiDc/RWAi+tZDNcYJHwFuKI+shi+8iw24oGWOQ64oU82/?=
- =?us-ascii?Q?3EmnO3V8eCD03cs9Znr8DspBF6JFDl9PVNFm/96QZGZGVJ/bXe/igFt9MbBG?=
- =?us-ascii?Q?H+DuFYAsW8m1pAxRe/fkgf8ZF5GvWVSGftu9bkYNa/yZW6oF9CG1yIAdA6wX?=
- =?us-ascii?Q?7zpPKFXOk78TrJqf+Sq/pWrYOjhGK0FRH2fh0XFLiL9zu/7ao0dSSoyeh2a1?=
- =?us-ascii?Q?ju0tp5I7AkPjrd5tUzdPFefjV+kccJVcdy8d7YEq0QcbnzoEjJeLKBpWVK0n?=
- =?us-ascii?Q?PXJXQLG0SWZt4sE5KdSky0mbDMBsubFQTE39KrVvmA7JjAzAzkE8xPu+Ghz8?=
- =?us-ascii?Q?lfndnbXZBDi6bx8zMmGKE3ELdXlnPMUpcJY3iSNECo/CN+pzr/NioR3wqIuY?=
- =?us-ascii?Q?u2RrDuxsU2KpQ+8P77FrvNrG3go6EMRc3Q7UubbS9IoDlxK3Db0GJsi/JBpu?=
- =?us-ascii?Q?IgcCFdPumXR4laImU27TtG2GqwTiGP1sdv+VD1Bw//LuoniV1lc6OqrbaJZ2?=
- =?us-ascii?Q?sDdJp2f3qXefv9oGdX1Kw79AVWic6LETAtcCne670/dj0eM1Fk09lopTLumL?=
- =?us-ascii?Q?xwRFh9jZeaHYXxZUmdS9ZLF3qsuqKFs7cCRzG1yZO3fkfiC0iGdRetGXJKUQ?=
- =?us-ascii?Q?PV1yka/M215sj+7nS7dttabX7ugjsBZH+QQOCAEv+70dWRTR1A9rcGxu3HaZ?=
- =?us-ascii?Q?Tn7slbJbjdl6nRceDe17wNlg6rbJEmQB/aMylMB99CxhJzGcIkKa7CI/ZIXh?=
- =?us-ascii?Q?owP9YqHbO+3HsYYhtaS+oIeF7fmsYO3/l1tVKvQinML6jCcTGi9kS+VhS3ci?=
- =?us-ascii?Q?9AHeeCVtlnDlOsPFB9i9Ex060Ry6T5pztOkxi0ajSH04z4CbqrB8fG9gmphC?=
- =?us-ascii?Q?oS7uJWIrVHi8HfDXzsIat187GZlqxYFy0ol/ge0OWphS3VdVhZRjGbUhgDfP?=
- =?us-ascii?Q?o+RIraCrBzMmVCXhaTsGKfy0Rxhm2TrfwDwx6oAc1qR7U1/eKut7fLbBcosz?=
- =?us-ascii?Q?gm+KR0EkEXHQkSTrZVtvbcUYCAIO5Q4/8Or5uoiR6E7uOte4GrrxesnbebGz?=
- =?us-ascii?Q?FPAlPGfkVkagyJzAo8JHDysG3c6QwC/rBuP6Ls0za6vU3pOYbWfaviboGwoM?=
- =?us-ascii?Q?/Gzu5DIIlPrVR1fi/ufLVzleXAB20DnKqixDGqDq2h8bx9xsl2tPj/5A0OyD?=
- =?us-ascii?Q?X9rBsBMCwQsxZtyrph+1WhsbEtedvMo8iQAyGVEfVkTrjAmhLaSHya9HavxK?=
- =?us-ascii?Q?2Y1f8HK+AkGcqWauMtu/b/sWGeUPa2PLqigwaKYTmI6gACmFTz0Qb3KDWG6K?=
- =?us-ascii?Q?0vJuG4QpSDymfqo432Nonhezx+l38Jf1R7bxLsrxyWbI8FUMbvn091FavH7e?=
- =?us-ascii?Q?CRmbH80CVzsbgzywMbngpSJxUw3Fe8Uw3ZoU6fgZscfdNk0NOB67Q2ZVjEGf?=
- =?us-ascii?Q?Q+KiDS6kvUaqH+wOHhwLKMqK+GvVtfYaGllmsMYM8j6eIfe1PIOPnB3+6shs?=
- =?us-ascii?Q?bDnOrWn8l1QomC37Z3g=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 754A126FA54;
+	Fri,  1 Aug 2025 15:18:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1754061481; cv=none; b=mjnLvgY4dng4mkr5o6eHWe32Jn5NmYH/ORgfRQ4YFai++sCCUZoVr9m5+t6OY/6m3+0b4W2K+Q9/Ha9GJs0k3186w5ZNuGZlVfVSz7gj5e0mxX9cFqvbyxZIH7T3sKfTirix/S6PNr8gbyNhsfn4VkoKlh1qJI+W+PTzixdmVqU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1754061481; c=relaxed/simple;
+	bh=foIr1t1FXk+cD/2GYbCBY/2aovvYRyH8Hi4VffLVJy0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VzC60TCoyBXYuFFUAiA3WIFM/Qr+99SPU1Y96ejpfREv4titQMSFGqIM1Vv6/tDGNZINrVckM5W3CQerd3fklCswXQemC592y0PgFrOtmXbGQvN/9DljNpn8dXF9iiYonvCCgzvcgO4oJlMZDAQNuEw3+IClX+4xzckvRzBOeUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZGbooI8Y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62BF4C4CEE7;
+	Fri,  1 Aug 2025 15:17:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754061480;
+	bh=foIr1t1FXk+cD/2GYbCBY/2aovvYRyH8Hi4VffLVJy0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ZGbooI8YQVwPLc060y++wBkGU1MgDxOMaZA1jurjIozfZscChLCuSSo7Exq6cJnDD
+	 xa1EepAgTdE6YkUJXBeo2KKGkeYUnea6VmE7kZND9zj0YqQVDtrIztlBalQxHtXsDX
+	 dcTSCJJLCOCXHk2aQ3O15q4VI9bukXXFCq5ackkMYU+ekjhW7+UJJyxVRb1LHGnunl
+	 hlw5KpP/+GyIZa7fTKqhIn1kQ9q48jNk9hHusGKD+YZmONpSxPfbz1Q+xKM5Tc2xxz
+	 xLdBb9nJuAUO3wHVpVnQa00p1lT9dD+sBHzxf9Oz/oXu4vrQ7vPhNIgoHWKZGHaWa4
+	 Ccs0SmimRR8oA==
+Message-ID: <59a973c8-4cf1-46b4-960e-a54c64ffdaed@kernel.org>
+Date: Fri, 1 Aug 2025 17:17:56 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6455.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1dc116ff-cbb9-4bf6-0dee-08ddd10bef4c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Aug 2025 14:58:54.5833
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: nrfegZtql194lb6dtef6gouebxsFgL/fwxlAo4GZjGadiHo6siS17JIP/AciAprnWE2r1nlwX8LIgPezJEqW5g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB4947
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH net] mptcp: use HMAC-SHA256 library instead of open-coded
+ HMAC
+Content-Language: en-GB, fr-BE
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Paolo Abeni <pabeni@redhat.com>, Mat Martineau <martineau@kernel.org>,
+ Geliang Tang <geliang@kernel.org>, netdev@vger.kernel.org,
+ mptcp@lists.linux.dev
+References: <20250731195054.84119-1-ebiggers@kernel.org>
+ <245ef75d-44d5-4b66-9f28-68182f177fad@kernel.org>
+ <20250731214156.GB1312@quark>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20250731214156.GB1312@quark>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Tested-by: R, Ramu <ramu.r@intel.com>
+Hi Eric,
 
------Original Message-----
-From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of Ale=
-xander Lobakin
-Sent: Tuesday, June 24, 2025 10:15 PM
-To: intel-wired-lan@lists.osuosl.org
-Cc: Lobakin, Aleksander <aleksander.lobakin@intel.com>; Kubiak, Michal <mic=
-hal.kubiak@intel.com>; Fijalkowski, Maciej <maciej.fijalkowski@intel.com>; =
-Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw <przemy=
-slaw.kitszel@intel.com>; Andrew Lunn <andrew+netdev@lunn.ch>; David S. Mill=
-er <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Jakub Kicinsk=
-i <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; Alexei Starovoitov <a=
-st@kernel.org>; Daniel Borkmann <daniel@iogearbox.net>; Simon Horman <horms=
-@kernel.org>; NXNE CNSE OSDT ITP Upstreaming <nxne.cnse.osdt.itp.upstreamin=
-g@intel.com>; bpf@vger.kernel.org; netdev@vger.kernel.org; linux-kernel@vge=
-r.kernel.org
-Subject: [Intel-wired-lan] [PATCH iwl-next v2 01/12] idpf: fix Rx descripto=
-r ready check barrier in splitq
+On 31/07/2025 23:41, Eric Biggers wrote:
+> On Thu, Jul 31, 2025 at 11:27:50PM +0200, Matthieu Baerts wrote:
+>> Hi Eric,
+>>
+>> On 31/07/2025 21:50, Eric Biggers wrote:
+>>> Now that there are easy-to-use HMAC-SHA256 library functions, use these
+>>> in net/mptcp/crypto.c instead of open-coding the HMAC algorithm.
+>>>
+>>> Remove the WARN_ON_ONCE() for messages longer than SHA256_DIGEST_SIZE.
+>>> The new implementation handles all message lengths correctly.
+>>>
+>>> The mptcp-crypto KUnit test still passes after this change.
+>>
+>> Thank you for this patch! It is a good idea, and it looks good to me!
+>>
+>> Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+>>
+>> One small detail: net-next is currently closed [1], and I don't think
+>> this patch can be applied in -net. So except if you plan to take it in
+>> the libcrypto tree for 6.17 -- but that's probably strange -- what I can
+>> do is to apply it in the MPTCP tree, and send it to net-next later on.
+>> Is this OK for you?
+>>
+>> [1] https://patchwork.hopto.org/net-next.html
+>>
+>> Cheers,
+>> Matt
+>> --
+> 
+> The MPTCP tree (and then net-next) for 6.18 is fine.  I know this isn't
+> a great time to send patches, but I just happened to have some time now.
 
-No idea what the current barrier position was meant for. At that point, not=
-hing is read from the descriptor, only the pointer to the actual one is fet=
-ched.
-The correct barrier usage here is after the generation check, so that only =
-the first qword is read if the descriptor is not yet ready and we need to s=
-top polling. Debatable on coherent DMA as the Rx descriptor size is <=3D ca=
-cheline size, but anyway, the current barrier position only makes the codeg=
-en worse.
+No problem, having this patch now is fine for MPTCP. I just queued it
+for 6.18.
 
-Fixes: 3a8845af66ed ("idpf: add RX splitq napi poll support")
-Reviewed-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
----
- drivers/net/ethernet/intel/idpf/idpf_txrx.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+Applied in our tree (feat. for net-next):
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethe=
-rnet/intel/idpf/idpf_txrx.c
-index cef9dfb877e8..0ba766fe4f26 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-@@ -3376,18 +3376,14 @@ static int idpf_rx_splitq_clean(struct idpf_rx_queu=
-e *rxq, int budget)
- 		/* get the Rx desc from Rx queue based on 'next_to_clean' */
- 		rx_desc =3D &rxq->rx[ntc].flex_adv_nic_3_wb;
-=20
--		/* This memory barrier is needed to keep us from reading
--		 * any other fields out of the rx_desc
--		 */
--		dma_rmb();
--
- 		/* if the descriptor isn't done, no work yet to do */
- 		gen_id =3D le16_get_bits(rx_desc->pktlen_gen_bufq_id,
- 				       VIRTCHNL2_RX_FLEX_DESC_ADV_GEN_M);
--
- 		if (idpf_queue_has(GEN_CHK, rxq) !=3D gen_id)
- 			break;
-=20
-+		dma_rmb();
-+
- 		rxdid =3D FIELD_GET(VIRTCHNL2_RX_FLEX_DESC_ADV_RXDID_M,
- 				  rx_desc->rxdid_ucast);
- 		if (rxdid !=3D VIRTCHNL2_RXDID_2_FLEX_SPLITQ) {
---
-2.49.0
+New patches for t/upstream:
+- 1eadc6f75c43: mptcp: use HMAC-SHA256 library instead of open-coded HMAC
+- Results: 94c274f914c9..5c7ec796258e (export)
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
 
 
