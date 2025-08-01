@@ -1,162 +1,137 @@
-Return-Path: <netdev+bounces-211351-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211352-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7223B1821E
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 15:04:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B37E2B1821F
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 15:05:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 243B41883E88
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 13:04:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E982B1756CF
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 13:05:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3078247284;
-	Fri,  1 Aug 2025 13:04:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AB0E2472A5;
+	Fri,  1 Aug 2025 13:04:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E6yOPVay"
+	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="l6VvVs2i"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D055247281;
-	Fri,  1 Aug 2025 13:04:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 761F523B611;
+	Fri,  1 Aug 2025 13:04:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754053468; cv=none; b=Ub2Ww2nbG9hsWD4pVSutHZrPwZXejkrMs0KzXoYxEIREkPDUbbC4tDlDdc+UkcDroFTCI2Aa++nPu4zXVrB37M1H2qWa8653CnDkZw5LKM+Tq4vF2aYnraDgDuz2Hov7OhpfD+4fBR97ecdHpT61KOB6tyX1jNrX/ZZc4MZ3a/g=
+	t=1754053485; cv=none; b=FWi3eS2SvgIoUI1aHlexFvWFUKDWJa4C0CXDWxlaIHKlSBTTfhv3JbVj1rmSefYOOkiVKei1WfwKlNKXXQLIBPSiqIU3TGmIwebNTzKgv04xKPrrxhbzNmeW3kjz3L6YsRXJWjCks2+voULAZSSHHQrx5j1tbVfTkp9bAfBkfbo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754053468; c=relaxed/simple;
-	bh=hklL07b+0CTtkzWczUoSMbRgIk1dCU4/BW8hVpuQ3v0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LlgxMljXaB29snvsGZNtkY7Sb2XUPvHcfNsNWwyGe9xJFAmXpufy2ZrjAassXD2A62XiRRjdbFDMcXxZhmRoiAdbiwDHswdktShzlwhuXwsTjZ3au2h5qj0h+6aYgTlrqQ7p+efdXUR4Y3TYL+iNSPJo83s024cyqEM4WW02gVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E6yOPVay; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-45617a1bcdcso3593595e9.1;
-        Fri, 01 Aug 2025 06:04:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1754053464; x=1754658264; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PUesSOzkSssAd9HS+Z1SdyOtRSbJf7OIvCg+b7BgFww=;
-        b=E6yOPVayIWfY+yUTxGEK31MCXQIBRWzajSTDj6m7qhRStSfKHbJ0EidmrctCuT+1DS
-         KzmoF4oldmRSY2VcBraMOnHPQUSM2EktNdbToyZNTi85SmLDHp3XDNB/lHlEDCPjw1AS
-         NgCJY/Ry6yYs2p/XORQ9HCVHMmfpxBmgoXjxjl/ztQ/BGHQyqyI7eABrCWjPMGXT6Zuo
-         0fSMaCuKSrAWZm7zChwWehxJf8b21tNr/YTDQJv5Q1WGA+NXh/2Iok4jJzo+csQuso5l
-         JpwJLhWrlZy1sWfHD+JfKLpvSShkLGqMhn4/O+nsb4u5vo9THj3nr6Vy3NajIkB8gmPI
-         F0bA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754053464; x=1754658264;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PUesSOzkSssAd9HS+Z1SdyOtRSbJf7OIvCg+b7BgFww=;
-        b=wXppgecvxQyjwKEy1x1D59xf2ZbpZo5aLuvF9/F4zkpQbwe9phi8fwQaI3IEU0XYpG
-         UUL5eEK/yjKarr3uRy82W+en1ivKaEZhT/565A7BipK4HzNkEuorB+KaGz3ifR8jEB0t
-         gSS2HJer37FBajgyp8B03xdZDkrmZZOa/wKdM0OOnTcm0yN2ycLC5hhdKADFvq+hOnNI
-         8I7l7huFtGnJRXo8+9TOqjzddPy3yAh5ZINa7R2JMwIAQoKNsaNfWsMZiDeKq+d6MS40
-         vNaP86lGCpAHb/54ZU9wic+duaY17Y+cwBlZpdwon1woF+Aub+gDpI8epQ2fspWiJqEo
-         nzGQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUafVbN7zbxaqWzTF3afIWeWGQSP7CzYeAH8PdlUWuB5vfxgw6rfZrEqnqB3NNx236d/ilkw4LG@vger.kernel.org, AJvYcCWYz25moR1CACguwiRw2vbRPXJXQEoRqx79zVDC34eoGwC9sWof7BjCKUgfm2nIKFsnrSEOc1bzlOfuvGI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxITVShQ60EblUFSPnKHE4QZySivmLKk8wnq3QckzuEtrOSTI7W
-	HwicEV6mul+Ycv3D68Z6ISviVZwxMpq7J9jx07GDncJerT2gxyyXO+4f
-X-Gm-Gg: ASbGnctlA0whLDfkPa5jM8lbkh5a2jhjZfwvgWNg76P+pwARo5auT+MNTVujc0BFDMd
-	HiCaHJ3O1gJAzlUuiojBDesogAvhwPFnP3ZB2ltlAreKGE/T5VAxeN0iwLzHLNpBJyTtq5IKNqq
-	bgxnyPo8tAGb0cgSrNJqu8vRg0W+4Ar3mqNy0qKUszW7Z5eQBZlx2J+mc4206D9isXPEqlA4VgJ
-	BUdOYrxyz1H3cUUTsLJvEDM1L1PXWWaGUGUALwn1cYfrfea8+Uclfu1bQLMcxilJW/248L/3gGC
-	Muq72FFW2PHCP3VlZrWLRcArcbNDuboeTxOqRLscW6H86sSmCIuRk+sDj6XTlgw0l76kHPUtgRo
-	jDApbTNf16poV7l0=
-X-Google-Smtp-Source: AGHT+IHoHoSxN4+QLjvax37vtM5tSSfg4yuohG5h/kV9PN+wb0rNdj6QW5yv5GbkTQHJxma6MC0/ow==
-X-Received: by 2002:a05:600c:4e0e:b0:439:88bb:d00b with SMTP id 5b1f17b1804b1-4589e9ff525mr11864175e9.5.1754053463842;
-        Fri, 01 Aug 2025 06:04:23 -0700 (PDT)
-Received: from skbuf ([2a02:2f04:d30d:7300:b5a7:e112:cd90:eb82])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b79c467994sm5796209f8f.50.2025.08.01.06.04.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Aug 2025 06:04:23 -0700 (PDT)
-Date: Fri, 1 Aug 2025 16:04:20 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Alexander Wilhelm <alexander.wilhelm@westermo.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: Aquantia PHY in OCSGMII mode?
-Message-ID: <20250801130420.m3fbqlvtzbdo5e5d@skbuf>
-References: <aIuEvaSCIQdJWcZx@FUE-ALEWI-WINX>
- <20250731171642.2jxmhvrlb554mejz@skbuf>
- <aIvDcxeBPhHADDik@shell.armlinux.org.uk>
- <20250801110106.ig5n2t5wvzqrsoyj@skbuf>
- <aIyq9Vg8Tqr5z0Zs@FUE-ALEWI-WINX>
- <aIyr33e7BUAep2MI@shell.armlinux.org.uk>
- <aIytuIUN+BSy2Xug@FUE-ALEWI-WINX>
- <aIyx0OLWGw5zKarX@shell.armlinux.org.uk>
+	s=arc-20240116; t=1754053485; c=relaxed/simple;
+	bh=aYl1QhqEmpOLgi8VZ2bX/1UFtuzJMhkXX+iiC5Jlw/4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=m/zB3i6gXkwxV+QL1BrQUSTShfQNz8ww21f5Nt3tg0OU6lcwuRcIo0d8Yzq6n8L666K7zKZ7a+9bv/hHd6D2spqJpeBmnlyAq0Lt9kdLMNvwdqs9JGFq4cN0N/cROkfwL2cHhBo+G8JmSoPhWXS7/9F9zFTKllceTSePsO0RTZ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=l6VvVs2i; arc=none smtp.client-ip=193.68.50.107
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
+Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
+	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id B750CA0A8D;
+	Fri,  1 Aug 2025 15:04:32 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:from:from:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=mail; bh=vuuCUbfqt4x45Bee4k7s
+	/8tQWFwPYbWJe+4a/dGtm4U=; b=l6VvVs2ilY38iEpd526GqUQtUyHpCOH7T4Qu
+	qz2+HDoKnX3Oaia2gy/v/zWAYPLriflIRXIz0vuswLxtmrVUTjvCFfYMCIeaVSge
+	L0tBcugP5tdawUGobooJ6OoHNmDwas96NVkB6lYek01zmlwQpkB82RYD+j/u8V1r
+	OO9RCFn3ITnia4L+DrIY2ur5FriNpqREezI3mNM5L+fxJnYyTX5XWh0TyW9rTymO
+	8nUc87WbS1e3QUsX097NAfB506iPqsaHs+jSPzpv/WP0Da3l9ouQpsE99DDzYrPF
+	5vB4jH1SuofuOw44AciMJAl+gHb2gHjwIt2Q+wsaZc86b9lxm+abBydAY2sa26Us
+	wRx7rLkipE3hrDifN8PIsY9NMCXcne/Xxh/oXZCOwaCnHikkmiSgDmj6Yz3f6Ztk
+	xtxuCL1cPfZ7OTa7R1uZarDvgaJrStaIrv+zJJy9craWmgGiEoosB9ZJUfybo2k4
+	04x78LSlbBDLQS1DbarjcdPZN7uWyxRsxe3Vml5jESFc28oDtDsRLZujGq5o1TdY
+	dvQkT7i8jD5yvmPbRNXAN4VqDSmaNthaU80xyJFEmOVSfvY4BBemNKaFkQ5xxOCM
+	2fMamksH/JvZHTyefOwaniVOZHK1NziTZA709qUnns5S54X1RLdF4adiv48m5NBc
+	15nziEE=
+Message-ID: <86bb6477-56d9-415a-a0ad-9a5d963a285e@prolan.hu>
+Date: Fri, 1 Aug 2025 15:04:31 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aIyx0OLWGw5zKarX@shell.armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: mdio_bus: Use devm for getting reset GPIO
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>, Geert Uytterhoeven
+	<geert@linux-m68k.org>
+CC: Mark Brown <broonie@kernel.org>, Sergei Shtylyov
+	<sergei.shtylyov@cogentembedded.com>, "David S. Miller"
+	<davem@davemloft.net>, Rob Herring <robh@kernel.org>, Andrew Lunn
+	<andrew@lunn.ch>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	"Dmitry Torokhov" <dmitry.torokhov@gmail.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Csaba Buday <buday.csaba@prolan.hu>, "Heiner
+ Kallweit" <hkallweit1@gmail.com>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+References: <20250728153455.47190-2-csokas.bence@prolan.hu>
+ <95449490-fa58-41d4-9493-c9213c1f2e7d@sirena.org.uk>
+ <CAMuHMdVdsZtRpbbWsRC_YSYgGojA-wxdxRz7eytJvc+xq2uqEw@mail.gmail.com>
+ <aIy0HqFvCggTEyUk@shell.armlinux.org.uk>
+Content-Language: en-US
+From: =?UTF-8?B?Q3PDs2vDoXMgQmVuY2U=?= <csokas.bence@prolan.hu>
+In-Reply-To: <aIy0HqFvCggTEyUk@shell.armlinux.org.uk>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: ATLAS.intranet.prolan.hu (10.254.0.229) To
+ ATLAS.intranet.prolan.hu (10.254.0.229)
+X-EsetResult: clean, is OK
+X-EsetId: 37303A296767155E677C65
 
-On Fri, Aug 01, 2025 at 01:23:44PM +0100, Russell King (Oracle) wrote:
-> It looks like memac_select_pcs() and memac_prepare() fail to
-> handle 2500BASEX despite memac_initialization() suggesting the
-> SGMII PCS supports 2500BASEX.
+Hi,
 
-Thanks for pointing this out, it seems to be a regression introduced by
-commit 5d93cfcf7360 ("net: dpaa: Convert to phylink").
+On 2025. 08. 01. 14:33, Russell King (Oracle) wrote:
+> On Fri, Aug 01, 2025 at 02:25:17PM +0200, Geert Uytterhoeven wrote:
+>> Hi Mark,
+>>
+>> On Fri, 1 Aug 2025 at 14:01, Mark Brown <broonie@kernel.org> wrote:
+>>> On Mon, Jul 28, 2025 at 05:34:55PM +0200, Bence Csókás wrote:
+>>>> Commit bafbdd527d56 ("phylib: Add device reset GPIO support") removed
+>>>> devm_gpiod_get_optional() in favor of the non-devres managed
+>>>> fwnode_get_named_gpiod(). When it was kind-of reverted by commit
+>>>> 40ba6a12a548 ("net: mdio: switch to using gpiod_get_optional()"), the devm
+>>>> functionality was not reinstated. Nor was the GPIO unclaimed on device
+>>>> remove. This leads to the GPIO being claimed indefinitely, even when the
+>>>> device and/or the driver gets removed.
+>>>
+>>> I'm seeing multiple platforms including at least Beaglebone Black,
+>>> Tordax Mallow and Libre Computer Alta printing errors in
+>>> next/pending-fixes today:
+>>>
+>>> [    3.252885] mdio_bus 4a101000.mdio:00: Resources present before probing
+>>>
+>>> Bisects are pointing to this patch which is 3b98c9352511db in -next,
+>>
+>> My guess is that &mdiodev->dev is not the correct device for
+>> resource management.
+> 
+> No, looking at the patch, the patch is completely wrong.
+> 
+> Take for example mdiobus_register_gpiod(). Using devm_*() there is
+> completely wrong, because this is called from mdiobus_register_device().
+> This is not the probe function for the device, and thus there is no
+> code to trigger the release of the resource on unregistration.
+> 
+> Moreover, when the mdiodev is eventually probed, if the driver fails
+> or the driver is unbound, the GPIO will be released, but a reference
+> will be left behind.
+> 
+> Using devm* with a struct device that is *not* currently being probed
+> is fundamentally wrong - an abuse of devm.
 
-If there are no other volunteers, I can offer to submit a patch if
-Alexander confirms this fixes his setup.
+The real question is: why on Earth is mdiobus_register_device() called 
+_before_ the probe()? And mdiobus_unregister_device() after the remove()???
 
-> It would also be good if the driver can also use
-> pcs->supported_interfaces which states which modes the PCS layer
-> supports as well.
+Anyways, in this case we could probably put the release of the GPIO into 
+mdiobus_unregister_device() instead. But this inverted logic should 
+probably be dealt with eventually.
 
-The current algorithm in lynx_pcs_create() is too optimistic and
-advertises host interfaces which the PCS may not actually support.
+Bence
 
-static const phy_interface_t lynx_interfaces[] = {
-	PHY_INTERFACE_MODE_SGMII,
-	PHY_INTERFACE_MODE_QSGMII,
-	PHY_INTERFACE_MODE_1000BASEX,
-	PHY_INTERFACE_MODE_2500BASEX,
-	PHY_INTERFACE_MODE_10GBASER,
-	PHY_INTERFACE_MODE_USXGMII,
-};
-
-	for (i = 0; i < ARRAY_SIZE(lynx_interfaces); i++)
-		__set_bit(lynx_interfaces[i], lynx->pcs.supported_interfaces);
-
-I am concerned that if we add logic to the MAC driver which does:
-
-		phy_interface_or(config->supported_interfaces,
-				 config->supported_interfaces,
-				 pcs->supported_interfaces);
-
-then we depart from the physical reality of the board and may end up
-accepting a host interface which we should have rejected.
-
-There is downstream code which refines lynx_pcs_create() to this:
-
-	/* In case we have access to the SerDes phy/lane, then ask the SerDes
-	 * driver what interfaces are supported based on the current PLL
-	 * configuration.
-	 */
-	for (int i = 0; i < ARRAY_SIZE(lynx_interfaces); i++) {
-		phy_interface_t iface = lynx_interfaces[i];
-
-		err = phy_validate(lynx->serdes[PRIMARY_LANE],
-				   PHY_MODE_ETHERNET, iface, NULL);
-		if (err)
-			continue;
-
-		__set_bit(iface, supported_interfaces);
-	}
-
-but the infrastructure (the SerDes driver) is currently lacking upstream.
 
