@@ -1,213 +1,225 @@
-Return-Path: <netdev+bounces-211377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AE2DB186A2
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 19:26:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 007CFB186B6
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 19:30:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 56E911C2278E
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 17:26:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF7CBA856EC
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 17:30:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B12E42874FA;
-	Fri,  1 Aug 2025 17:26:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 879FB26B75B;
+	Fri,  1 Aug 2025 17:30:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IkOKBOqA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KzS92CN2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD56726B95B
-	for <netdev@vger.kernel.org>; Fri,  1 Aug 2025 17:26:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63E1B264A83
+	for <netdev@vger.kernel.org>; Fri,  1 Aug 2025 17:30:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754069171; cv=none; b=qYPb5aBQFLwREvKGLe60PKE7GaOMO7US+4uOIU3bryVZvmVbmnqkqSVnwYMQ5YMeeGztxnn5/TEDNlzW4CLZL/toaTlgfzDdCFt5TOdFe0Gf+Q/ppauYtwFAfwiwzks58Wlfup+c9A3TNMeJ88jARutD7FZHU/1YUlDHVHwNLOo=
+	t=1754069415; cv=none; b=giwOmLgW5+o911kNMGPCUtybfWU1pDiWWcA/LAHX2ddNi464jpn5Z8Ork/el3wllnEzNF1A4ABFmRPsQKgQjFsyC5VlbecK2mPb7dMhXmD+u8o0estJcCMZNVhn/MVMSu2qR7kUnBpHyIrJtJ14GW4gPtLtA4B9V9vI8+nB+tSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754069171; c=relaxed/simple;
-	bh=MdNitGZXzE66cMMSZImFec816f4hFdUUzZFH+WAD/+g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EAdg1ajy2RA23XrfHge6sBJC9Z2dt1N1cqEDwOOkX7LyANDrPaww3zBnPCSHrKprA2Boqyq2m2c79UlA1RHmKuOoTMtb0cuzEEx4LqRlcTwUDvEwatb78b8sCtqS+64nVhan78FRnvKAyOxseWPOSOrrqH3AwEABxeHCK9UXFmA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=IkOKBOqA; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-3b7961cf660so1033367f8f.1
-        for <netdev@vger.kernel.org>; Fri, 01 Aug 2025 10:26:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1754069165; x=1754673965; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6EiM/KJatc+ucR5mZfr0mKK62FA3tKj9rpi2bILnd/A=;
-        b=IkOKBOqAzcPHViCAoMvLjiTvhcxKvRB+ndF6jsurHbldSn/B2XETipealQmRt0RNq6
-         KxnNujv4tNFxG9o+o8htFrQmyuKIDbGwoncpWdAbWPub/MJeWvTJPnWkuRn7AKR9UVN8
-         GxrnIrTKQVg0l8gvn1zkPGayG5ZmnOwS0LYF8chIUrch7wo7OngR3h4axfC7Xh9ad/j3
-         sB+1qrhMONwIsqOtMZSOXgzWmnuXqK/L7eKGHdpOeLiBM9UtPWKlXjUTx4rGToA7jJsY
-         vBxU+gMKjPVIfOZJwN46p/qKe3ptm/XhzdLdUasgW1cOinxr3uQths5A371DMkKEumrM
-         YehQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754069165; x=1754673965;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6EiM/KJatc+ucR5mZfr0mKK62FA3tKj9rpi2bILnd/A=;
-        b=nMIfStyl9JAndk8TWu94uI+JKo+fmVvpcQB9W5iIrjU5vFGxMpPAvJNeIoiEfvg2Rq
-         qnumLb2fhauA2krnog8KPR0qNZexubnTcg5sb9Uo5h2omZhbJZHY/roGSrLsmHLnNylj
-         o/2I+yKGnaswgbEHPgB5JMcHnb9K2pXyxnZ2l4pznGQLHfoC2DP2SVyA0yv01JlwokBn
-         1yFsFivAnVVAdeIGdic6+GpEtb+4ecWwknmEh07o0F1DiGSuHi39c6slYQK/qZ16YYgU
-         kOKCBc86cIcFjcsLLv3xx5LGw9RvI0c18KDPUHvxZ9uGrhSg1G4Y4ZAA6EUf5b4SmNck
-         4Tlw==
-X-Forwarded-Encrypted: i=1; AJvYcCXueONAVK3QPafC4TeYrKPr8LCYQleEbgrwMkXev7yxiBc9bnVJy7JlEwANKkA+wtw2w6kH10s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxbXmWBRvJOtP0ynXm2RZpYp/0hY9dA3bGxV42XBj6PvgvP7f+L
-	ge32e+aSeSxX9H24+0pS9D6vOxETDOsUzTtis7CYaWTUAZmJrAAeE1VJ/diYCbyzsUE=
-X-Gm-Gg: ASbGnct20YGzjXWYx8grLx3Fq1us+pY7oXyXatH4kKlBewGxgkoc7VgeAnEw/pY16Sz
-	g4c/Xn5wDnbvDP0pNXd4DsmF5PnN8YKnHj6MWXaCEwFx+sk0qb/c7QkoPHxLtBpNpIOmrOfVViN
-	hCoAqpH0nxA3T5EojsNHMIPBJISY7nye5Ts/jwxNtNOALK/0JvVMnpg7mD1G/PXo1vrJhk7u3XB
-	rcDfgCL7dJbZd26nHYuks3rcpiOazUWIY9dB/KVQlfHmMn85kO1Fwh2+MRD2i2ITYNRtKJsoFz8
-	Ot5eIIO5oP3WoVNHx7gB0ZQ5FwCX8Puz5O77Ka2YY5EU29c9SgCxKf08BH5RyMLx7wzy850ZT0F
-	F5GVHarXhmQKRGavDrGfLQtoPSRo=
-X-Google-Smtp-Source: AGHT+IHAUeFa6/L6+DPVdGCHqTHNZKP+82EyvT7TFvOoB5/jAHJVvAhOUppBpUCtdqpOWh869tT/Sw==
-X-Received: by 2002:a05:6000:2383:b0:3b7:810f:6caf with SMTP id ffacd0b85a97d-3b8d94bc74bmr495619f8f.32.1754069164946;
-        Fri, 01 Aug 2025 10:26:04 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-4589edf55e4sm72892475e9.2.2025.08.01.10.26.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Aug 2025 10:26:04 -0700 (PDT)
-Date: Fri, 1 Aug 2025 20:25:58 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Simon Horman <horms@kernel.org>
-Cc: Mihai Moldovan <ionic@ionic.de>, linux-arm-msm@vger.kernel.org,
-	Manivannan Sadhasivam <mani@kernel.org>,
-	Denis Kenzior <denkenz@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Willem de Bruijn <willemb@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v3 04/11] net: qrtr: support identical node ids
-Message-ID: <aIz4pj5qgXSNg8mt@stanley.mountain>
-References: <cover.1753312999.git.ionic@ionic.de>
- <8fc53fad3065a9860e3f44cf8853494dd6eb6b47.1753312999.git.ionic@ionic.de>
- <20250724130836.GL1150792@horms.kernel.org>
- <a42d70aa-76b8-4034-9695-2e639e6471a2@ionic.de>
- <20250727144014.GX1367887@horms.kernel.org>
+	s=arc-20240116; t=1754069415; c=relaxed/simple;
+	bh=xM18SgSax23k4i4TIOOrQe19XuENYDNg5Jk+gKDDVus=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pDVFyakNMKQNPPXcUecJVKTZQcOgkoaBcMWwDfuQJiMGP+UWuc4GXYBy2t7OzpHfLdm8GqAnZ9MTI3pTAnZXX65lzZHQn/EmewsuLK+B+75BkAQ0N5DhNnZ6NzdBq34Jwp2Ey/3gqsVwshBH67Fp0x8cKcjwABOb/ceji3+GYnU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KzS92CN2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8037EC4CEE7;
+	Fri,  1 Aug 2025 17:30:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754069414;
+	bh=xM18SgSax23k4i4TIOOrQe19XuENYDNg5Jk+gKDDVus=;
+	h=From:To:Cc:Subject:Date:From;
+	b=KzS92CN2NmogsGUgYjc08tuj0eDerh5GCYgyGOtz2oBLRRCgocBy6r83eRCC2plzi
+	 sXf1xrPwjMX2nS01pX2jx7E+Kwqpa1JsiOzLGs8XJEMbjXdsD+9aHYJdNqEUuGz3mv
+	 AKzmoYZHwMKfvRzHouJoycew+uoGyHo+7A57zMnbv8QJwXvoc+PPoQ59DmX5WJv1v/
+	 s+aCiGglZiOfEqMQGpPcePPnLpgW2vRjrAapgn0rGno1vlV+Lbe/xwcykLL5xjq96v
+	 7Zp2cK9CAuhH/xGvMLU2nnKtct6PdO4RABYKLCNNqv3P21FdxeQSeEoVEHSk1BN6h9
+	 bH4g9NlLtTqSQ==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	David Wei <dw@davidwei.uk>,
+	michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com,
+	hawk@kernel.org,
+	ilias.apalodimas@linaro.org,
+	almasrymina@google.com,
+	sdf@fomichev.me
+Subject: [PATCH net] net: page_pool: allow enabling recycling late, fix false positive warning
+Date: Fri,  1 Aug 2025 10:30:11 -0700
+Message-ID: <20250801173011.2454447-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="r8QhGFlBadusXMk7"
-Content-Disposition: inline
-In-Reply-To: <20250727144014.GX1367887@horms.kernel.org>
+Content-Transfer-Encoding: 8bit
 
+Page pool can have pages "directly" (locklessly) recycled to it,
+if the NAPI that owns the page pool is scheduled to run on the same CPU.
+To make this safe we check that the NAPI is disabled while we destroy
+the page pool. In most cases NAPI and page pool lifetimes are tied
+together so this happens naturally.
 
---r8QhGFlBadusXMk7
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+The queue API expects the following order of calls:
+ -> mem_alloc
+    alloc new pp
+ -> stop
+    napi_disable
+ -> start
+    napi_enable
+ -> mem_free
+    free old pp
 
-On Sun, Jul 27, 2025 at 03:40:14PM +0100, Simon Horman wrote:
-> + Dan Carpenter
-> 
-> On Sun, Jul 27, 2025 at 03:09:38PM +0200, Mihai Moldovan wrote:
-> > * On 7/24/25 15:08, Simon Horman wrote:
-> > > [...]
-> > 
-> > Thank you for the reviews, to both you and Jakub.
-> > 
-> > 
-> > > This will leak holding qrtr_nodes_lock.
-> > 
-> > It certainly does, will be fixed in v4.
-> > 
-> > 
-> > > Flagged by Smatch.
-> > 
-> > I haven't used smatch before, and probably should do so going forward.
-> > 
-> > Curiously, a simple kchecker net/qrtr/ run did not warn about the locking
-> > issue (albeit it being obvious in the patch), while it did warn about the
-> > second issue with ret. Am I missing something?
-> 
-> TL;DR: No, I seem to have been able to reproduce what you see.
-> 
-> I ran Smatch, compiled from a recent Git commit, like this:
-> 
-> kchecker net/qrtr/af_qrtr.o
-> 
-> The warnings I saw (new to this patch) are:
-> 
-> net/qrtr/af_qrtr.c:498 qrtr_node_assign() warn: inconsistent returns 'global &qrtr_nodes_lock'.
->   Locked on  : 484
->   Unlocked on: 498
-> net/qrtr/af_qrtr.c:613 qrtr_endpoint_post() warn: missing error code 'ret'
-> 
-> That was with Smatch compiled from Git [1]
-> commit e1d933013098 ("return_efault: don't rely on the cross function DB")
-> 
-> I tried again with the latest head,
-> commit 2fb2b9093c5d ("sleep_info: The synchronize_srcu() sleeps").
-> And in that case I no longer see the 1st warning, about locking.
-> I think this is what you saw too.
-> 
-> This seems to a regression in Smatch wrt this particular case for this
-> code. I bisected Smatch and it looks like it was introduced in commit
-> d0367cd8a993 ("ranges: use absolute instead implied for possibly_true/false")
-> 
-> I CCed Dan in case he wants to dig into this.
+Here we allocate the page pool in ->mem_alloc and free in ->mem_free.
+But the NAPIs are only stopped between ->stop and ->start. We created
+page_pool_disable_direct_recycling() to safely shut down the recycling
+in ->stop. This way the page_pool_destroy() call in ->mem_free doesn't
+have to worry about recycling any more.
 
-The code looks like this:
+Unfortunately, the page_pool_disable_direct_recycling() is not enough
+to deal with failures which necessitate freeing the _new_ page pool.
+If we hit a failure in ->mem_alloc or ->stop the new page pool has
+to be freed while the NAPI is active (assuming driver attaches the
+page pool to an existing NAPI instance and doesn't reallocate NAPIs).
 
-	spin_lock_irqsave(&qrtr_nodes_lock, flags);
+Freeing the new page pool is technically safe because it hasn't been
+used for any packets, yet, so there can be no recycling. But the check
+in napi_assert_will_not_race() has no way of knowing that. We could
+check if page pool is empty but that'd make the check much less likely
+to trigger during development.
 
-        if (node->ep->id > QRTR_INDEX_HALF_UNSIGNED_MAX ||
-            nid > QRTR_INDEX_HALF_UNSIGNED_MAX)
-                return -EINVAL;
+Add page_pool_enable_direct_recycling(), pairing with
+page_pool_disable_direct_recycling(). It will allow us to create the new
+page pools in "disabled" state and only enable recycling when we know
+the reconfig operation will not fail.
 
-The problem is that QRTR_INDEX_HALF_UNSIGNED_MAX is U32_MAX and
-node->ep->id and nid are both u32 type.  The return statement is dead
-code and I deliberately silenced warnings on impossible paths.
+Coincidentally it will also let us re-enable the recycling for the old
+pool, if the reconfig failed:
 
-The following patch will enable the warning again and I'll test it tonight
-to see what happens.  If it's not too painful then I'll delete it
-properly, but if it's generates a bunch of false positives then, in the
-end, I'm not overly stressed about bugs in dead code.
+ -> mem_alloc (new)
+ -> stop (old)
+    # disables direct recycling for old
+ -> start (new)
+    # fail!!
+ -> start (old)
+    # go back to old pp but direct recycling is lost :(
+ -> mem_free (new)
 
-regards,
-dan carpenter
+Fixes: 40eca00ae605 ("bnxt_en: unlink page pool when stopping Rx queue")
+Tested-by: David Wei <dw@davidwei.uk>
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+Thanks to David Wei for confirming the problem on bnxt and testing
+the fix. I hit this writing the fbnic support for ZC, TBH.
+Any driver where NAPI instance gets reused and not reallocated on each
+queue restart may have this problem. netdevsim doesn't 'cause the
+callbacks can't fail in funny ways there.
 
+CC: michael.chan@broadcom.com
+CC: pavan.chebbi@broadcom.com
+CC: hawk@kernel.org
+CC: ilias.apalodimas@linaro.org
+CC: dw@davidwei.uk
+CC: almasrymina@google.com
+CC: sdf@fomichev.me
+---
+ include/net/page_pool/types.h             |  2 ++
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c |  9 ++++++++-
+ net/core/page_pool.c                      | 13 +++++++++++++
+ 3 files changed, 23 insertions(+), 1 deletion(-)
 
---r8QhGFlBadusXMk7
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: attachment; filename=diff
-
-diff --git a/check_inconsistent_locking.c b/check_inconsistent_locking.c
-index f3cce559d7a6..e95d9110a1e1 100644
---- a/check_inconsistent_locking.c
-+++ b/check_inconsistent_locking.c
-@@ -67,8 +67,8 @@ static void check_lock_bool(const char *name, struct symbol *sym)
- 	FOR_EACH_PTR(get_all_return_strees(), stree) {
- 		orig = __swap_cur_stree(stree);
+diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
+index 431b593de709..1509a536cb85 100644
+--- a/include/net/page_pool/types.h
++++ b/include/net/page_pool/types.h
+@@ -265,6 +265,8 @@ struct page_pool *page_pool_create_percpu(const struct page_pool_params *params,
+ struct xdp_mem_info;
  
--		if (is_impossible_path())
--			goto swap_stree;
-+//		if (is_impossible_path())
-+//			goto swap_stree;
+ #ifdef CONFIG_PAGE_POOL
++void page_pool_enable_direct_recycling(struct page_pool *pool,
++				       struct napi_struct *napi);
+ void page_pool_disable_direct_recycling(struct page_pool *pool);
+ void page_pool_destroy(struct page_pool *pool);
+ void page_pool_use_xdp_mem(struct page_pool *pool, void (*disconnect)(void *),
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index 5578ddcb465d..76a4c5ae8000 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -3819,7 +3819,6 @@ static int bnxt_alloc_rx_page_pool(struct bnxt *bp,
+ 	if (BNXT_RX_PAGE_MODE(bp))
+ 		pp.pool_size += bp->rx_ring_size / rx_size_fac;
+ 	pp.nid = numa_node;
+-	pp.napi = &rxr->bnapi->napi;
+ 	pp.netdev = bp->dev;
+ 	pp.dev = &bp->pdev->dev;
+ 	pp.dma_dir = bp->rx_dir;
+@@ -3851,6 +3850,12 @@ static int bnxt_alloc_rx_page_pool(struct bnxt *bp,
+ 	return PTR_ERR(pool);
+ }
  
- 		return_sm = get_sm_state(RETURN_ID, "return_ranges", NULL);
- 		if (!return_sm)
-@@ -145,8 +145,8 @@ static void check_lock(const char *name, struct symbol *sym)
- 	FOR_EACH_PTR(get_all_return_strees(), stree) {
- 		orig = __swap_cur_stree(stree);
++static void bnxt_enable_rx_page_pool(struct bnxt_rx_ring_info *rxr)
++{
++	page_pool_enable_direct_recycling(rxr->head_pool, &rxr->bnapi->napi);
++	page_pool_enable_direct_recycling(rxr->page_pool, &rxr->bnapi->napi);
++}
++
+ static int bnxt_alloc_rx_agg_bmap(struct bnxt *bp, struct bnxt_rx_ring_info *rxr)
+ {
+ 	u16 mem_size;
+@@ -3889,6 +3894,7 @@ static int bnxt_alloc_rx_rings(struct bnxt *bp)
+ 		rc = bnxt_alloc_rx_page_pool(bp, rxr, cpu_node);
+ 		if (rc)
+ 			return rc;
++		bnxt_enable_rx_page_pool(rxr);
  
--		if (is_impossible_path())
--			goto swap_stree;
-+//		if (is_impossible_path())
-+//			goto swap_stree;
+ 		rc = xdp_rxq_info_reg(&rxr->xdp_rxq, bp->dev, i, 0);
+ 		if (rc < 0)
+@@ -16031,6 +16037,7 @@ static int bnxt_queue_start(struct net_device *dev, void *qmem, int idx)
+ 			goto err_reset;
+ 	}
  
- 		return_sm = get_sm_state(RETURN_ID, "return_ranges", NULL);
- 		if (!return_sm)
++	bnxt_enable_rx_page_pool(rxr);
+ 	napi_enable_locked(&bnapi->napi);
+ 	bnxt_db_nq_arm(bp, &cpr->cp_db, cpr->cp_raw_cons);
+ 
+diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+index 05e2e22a8f7c..c0ff1d0e0a7a 100644
+--- a/net/core/page_pool.c
++++ b/net/core/page_pool.c
+@@ -1201,6 +1201,19 @@ void page_pool_use_xdp_mem(struct page_pool *pool, void (*disconnect)(void *),
+ 	pool->xdp_mem_id = mem->id;
+ }
+ 
++void page_pool_enable_direct_recycling(struct page_pool *pool,
++				       struct napi_struct *napi)
++{
++	if (READ_ONCE(pool->p.napi) == napi)
++		return;
++	WARN_ON_ONCE(!napi || pool->p.napi);
++
++	mutex_lock(&page_pools_lock);
++	WRITE_ONCE(pool->p.napi, napi);
++	mutex_unlock(&page_pools_lock);
++}
++EXPORT_SYMBOL(page_pool_enable_direct_recycling);
++
+ void page_pool_disable_direct_recycling(struct page_pool *pool)
+ {
+ 	/* Disable direct recycling based on pool->cpuid.
+-- 
+2.50.1
 
---r8QhGFlBadusXMk7--
 
