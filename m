@@ -1,118 +1,118 @@
-Return-Path: <netdev+bounces-211391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211392-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AE4FB1881F
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 22:29:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3328BB18835
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 22:38:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7F6C77A4FCB
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 20:27:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E6C253A3D56
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 20:38:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02BA121CC43;
-	Fri,  1 Aug 2025 20:29:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A7771F4CAF;
+	Fri,  1 Aug 2025 20:38:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="WfeXK+oY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ImQd93tY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99C47184524
-	for <netdev@vger.kernel.org>; Fri,  1 Aug 2025 20:29:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70C1315539A;
+	Fri,  1 Aug 2025 20:38:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754080162; cv=none; b=GJed9OQt9GoaHEC7bn+k9N1+Tf86EBhiuYN5Wsf0T00kc555NdldtwxjNeDWKxRC1W725j+lFWAo7TRQLrOtD787LLzqRXT+VOaowyE+UXNNgzZL5p4+iZ3KfmjpMNvM589q9SlzVuoLs4Cj72WrfwQzM382LZszvyWod1Lh7WM=
+	t=1754080685; cv=none; b=eH+xLyNUX4ZSKt1YnxQxHc3XlPvYOQJ8n84EwOY+TGP221RKVvwSglpj/h8vDu2OtZ5jJj14sQRyCEdDvPaTyEmcDb2EZLFsGip/vimDglzJgu1meupyRwZ0AcMpMVuyBMxvqyko2ChK9uexW7PBW66Lr/wYYrIJ6bIOb5LTIGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754080162; c=relaxed/simple;
-	bh=ft1GtVlHTumH5n9zAoqypec1LBFsX5MTL+yaj3JjcSc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ALrNcwvVrYvEbTlPh7Xi/tE6G34sfzZ5hhcv5L+LnwBZ0iCXUbFFzg+GJOt+gvmy5B4IvYeMaFvTzv+vY1SJliAD8wVJ2Fv3/X0hbhK17vig1+CPPU5kVrFa21aGU4VCQ/A5iLzRqY2jzoZjVVYEm8zwzJDECQagnJqz6ZxDAiU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=WfeXK+oY; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-ae360b6249fso465111566b.1
-        for <netdev@vger.kernel.org>; Fri, 01 Aug 2025 13:29:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1754080159; x=1754684959; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=QXkdEcm3dcCFEHiiyHz9se6bX6iRUxFV0EivrOFS6/U=;
-        b=WfeXK+oYRn6j5R2iAmMTFgJ1Ahhv77nVJEhICqjrQZO5VIqUMdCs5h+qtyyK8lDzcu
-         TTy2Pt6c4lmSKtJt+Hh8fXb7zdDSFSe2d3bS22JZAVu3k0jb8A3ZynqvJwqFKA8mG/Oi
-         EgjtDI08AMIjjtMopBspUDGL2tuYUM9ZRIZOQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754080159; x=1754684959;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QXkdEcm3dcCFEHiiyHz9se6bX6iRUxFV0EivrOFS6/U=;
-        b=X+7HMtvPfAPCShVETMNPlPNwy13G5xLIdPoNlsaYxVJJfYg8SBUeRf5xnmU5CYCA3d
-         ASRcnzyOaGp2TVgI8xrsUsTDzAatSjsO4c07aPGtz3m9vCh/Qs1vs4EUsl4h9seB/thR
-         HQdtWoHU2WU3OgBodRQQ65CgJHjJeaQci9wbNd2ngF4+UR1cSEwy6RfcrtC86+3kXQle
-         j+dogtxKBF0kzgewrHwsrywyvAxaL99T4ao8EO8XA883RUhbMhPyi1bHVWIByfKosbVF
-         UXVRzNCB7nh8E085jYVqPCW6mOvZwUZAFi7FsOSYqQxMqaIhjBuZajP4Z/lfLfLCHqdi
-         vikw==
-X-Forwarded-Encrypted: i=1; AJvYcCXmvl1nYwYbZn0gTft1Y1LZW6qQT+mzGP2al4Ea8m1KVz+mdOEs2y1Zpy+B/fGDQD5GBLYrQoU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxMH4JtjfED7gVwzmRJzBKO2yu0oBoVSrjvb8BMcXbIhgHnoKys
-	av9Nsl18qt4E5Yef4yQLUpe0/Co0djQ6gvFWpP5HwCAD6/GlRNFXhjryLdKCNof15aIGtOaP0sI
-	ru4NZ8Xg=
-X-Gm-Gg: ASbGncvNkNSmUbOcr7gWOWNm1GDQ+YSQ14r/yFBwzh43UmkPj8KXbHGzBSMG70X/QmF
-	2HosKy+dRse/GLpZ5jedkoXg92mch53UMX9wsPk61/a2tE3SKzn6QTNwD9SwGJmRIQukkb0HAsc
-	mhQIjCxXgWEBhDnn80+xXyqMu0DsF33tq4cDjg/Vwfp4YwfJGPBW3qcYS6jajBx+bkiYG7E3QaM
-	YMDAct3ZDBcA2QySny3TyMcRV8i/ActwIxCm9drxqvK5cApTuEAYUROOHjql7ke6Nar0KgzogDU
-	oXSISSslFPfcpC0x2s3gWHT3b+3Brgx58P2X+qzHOf3JlAoX7s3VF7O5x7jsk1G1eGU0YN8qKCC
-	VRJFwAyAO9PMerGl45O5NpsTmvLhQuknXI4fpFQoDcPDnSYr5dThqx37fy6uQg5ZILaMhWbYs
-X-Google-Smtp-Source: AGHT+IGWKietm515PWOtaTlKun8I8Lq2cwVfsBoQ+0E7Cctz71ElaVuz93cr61W1DqDdPydMrBmpJQ==
-X-Received: by 2002:a17:907:1ca7:b0:ae3:6f35:36fe with SMTP id a640c23a62f3a-af94020a38bmr127449966b.47.1754080158954;
-        Fri, 01 Aug 2025 13:29:18 -0700 (PDT)
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com. [209.85.208.47])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-af91a218ab4sm333456066b.92.2025.08.01.13.29.18
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 01 Aug 2025 13:29:18 -0700 (PDT)
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-61592ff5ebbso4333194a12.3
-        for <netdev@vger.kernel.org>; Fri, 01 Aug 2025 13:29:18 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVrtmFrkAhw0Eo2uLQNbNpS2v2Z6uUH4usAPEF6deLdxkGxlV53j+V814Rk46eQe4G3XdjBGBQ=@vger.kernel.org
-X-Received: by 2002:aa7:cb0d:0:b0:615:8012:a365 with SMTP id
- 4fb4d7f45d1cf-615e715f7a6mr469886a12.25.1754080158122; Fri, 01 Aug 2025
- 13:29:18 -0700 (PDT)
+	s=arc-20240116; t=1754080685; c=relaxed/simple;
+	bh=8bc+CVO1+yckD3iTqRfIfC9xptHV9H2IE7gf9C/W1Eo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=csjNl0+BLRoqImHp3ek+p2bVn/J0BkDXAhIn9vWfTFl9QhMba+FeJglxxGtAmpJwx6/s6S3rllVOCb3LaMAp8w78mlgPmk9Lc+gtYvZn1W+K2ezK+Jmb2oT80MR7Ws5VWk9JvPkNlSEvM23qcnUTweB2wjulXYlzQ/uTvMBdWaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ImQd93tY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 728C7C4CEE7;
+	Fri,  1 Aug 2025 20:38:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754080685;
+	bh=8bc+CVO1+yckD3iTqRfIfC9xptHV9H2IE7gf9C/W1Eo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ImQd93tY8pJPIcvnqAKlX0U1rT6x4Jj48gsVcfu6rsGBAsuEPaRuuPQHQsua0den1
+	 5V/pqmghJ2zW2gk5e266Y13L5T5VSHWktzvnDbLJq/d6cEPlfNcwIL2fBXzbE+I4Rl
+	 KdOWFQ1cVQdiobtqPGcHpL/cF6+feN/L3DH5A+qbTlW13BWquDgWr2vsDVtZO6Mx+S
+	 xL5zRcy5hpOtGitRVFx0MTltTVmnEAhEjHzHiHdoMGZcCd6bsZPq3XbTD54NDQyIQd
+	 5KPoRC7m1bv6d5PlZNR195llDSQkLMYTCirwZT/I6b90x8oO+u2vh63FebUTb4j9MH
+	 GrsVdc1CFu0bg==
+Date: Fri, 1 Aug 2025 13:38:03 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: Martin KaFai Lau <martin.lau@linux.dev>, Lorenzo Bianconi
+ <lorenzo@kernel.org>, Stanislav Fomichev <stfomichev@gmail.com>,
+ bpf@vger.kernel.org, netdev@vger.kernel.org, Alexei Starovoitov
+ <ast@kernel.org>, Daniel Borkmann <borkmann@iogearbox.net>, Eric Dumazet
+ <eric.dumazet@gmail.com>, "David S. Miller" <davem@davemloft.net>, Paolo
+ Abeni <pabeni@redhat.com>, sdf@fomichev.me, kernel-team@cloudflare.com,
+ arthur@arthurfabre.com, jakub@cloudflare.com, Jesse Brandeburg
+ <jbrandeburg@cloudflare.com>, Andrew Rzeznik <arzeznik@cloudflare.com>
+Subject: Re: [PATCH bpf-next V2 0/7] xdp: Allow BPF to set RX hints for
+ XDP_REDIRECTed packets
+Message-ID: <20250801133803.7570a6fd@kernel.org>
+In-Reply-To: <21f4ee22-84f0-4d5e-8630-9a889ca11e31@kernel.org>
+References: <b1873a92-747d-4f32-91f8-126779947e42@kernel.org>
+	<aGvcb53APFXR8eJb@mini-arch>
+	<aG427EcHHn9yxaDv@lore-desk>
+	<aHE2F1FJlYc37eIz@mini-arch>
+	<aHeKYZY7l2i1xwel@lore-desk>
+	<20250716142015.0b309c71@kernel.org>
+	<fbb026f9-54cf-49ba-b0dc-0df0f54c6961@kernel.org>
+	<20250717182534.4f305f8a@kernel.org>
+	<ebc18aba-d832-4eb6-b626-4ca3a2f27fe2@kernel.org>
+	<20250721181344.24d47fa3@kernel.org>
+	<aIdWjTCM1nOjiWfC@lore-desk>
+	<20250728092956.24a7d09b@kernel.org>
+	<b23ed0e2-05cf-454b-bf7a-a637c9bb48e8@kernel.org>
+	<4eaf6d02-6b4e-4713-a8f8-6b00a031d255@linux.dev>
+	<21f4ee22-84f0-4d5e-8630-9a889ca11e31@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250801091318-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20250801091318-mutt-send-email-mst@kernel.org>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Fri, 1 Aug 2025 13:29:01 -0700
-X-Gmail-Original-Message-ID: <CAHk-=whgYijnRXoAxbYLsceWFWC8B8in17WOws5-ojsAkdrqTg@mail.gmail.com>
-X-Gm-Features: Ac12FXxywlhxHC92NneGnmmt5Hm9rlPrKO5mJOfIsb2I5ZMf5olIOr9KL1pDLfc
-Message-ID: <CAHk-=whgYijnRXoAxbYLsceWFWC8B8in17WOws5-ojsAkdrqTg@mail.gmail.com>
-Subject: Re: [GIT PULL v2] virtio, vhost: features, fixes
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	alok.a.tiwari@oracle.com, anders.roxell@linaro.org, dtatulea@nvidia.com, 
-	eperezma@redhat.com, eric.auger@redhat.com, jasowang@redhat.com, 
-	jonah.palmer@oracle.com, kraxel@redhat.com, leiyang@redhat.com, 
-	linux@treblig.org, lulu@redhat.com, michael.christie@oracle.com, 
-	parav@nvidia.com, si-wei.liu@oracle.com, stable@vger.kernel.org, 
-	viresh.kumar@linaro.org, wangyuli@uniontech.com, will@kernel.org, 
-	wquan@redhat.com, xiaopei01@kylinos.cn
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, 1 Aug 2025 at 06:13, Michael S. Tsirkin <mst@redhat.com> wrote:
+On Thu, 31 Jul 2025 18:27:07 +0200 Jesper Dangaard Brouer wrote:
+> > iirc, a xdp prog can be attached to a cpumap. The skb can be created by 
+> > that xdp prog running on the remote cpu. It should be like a xdp prog 
+> > returning a XDP_PASS + an optional skb. The xdp prog can set some fields 
+> > in the skb. Other than setting fields in the skb, something else may be 
+> > also possible in the future, e.g. look up sk, earlier demux ...etc.
+> 
+> I have strong reservations about having the BPF program itself trigger
+> the SKB allocation. I believe this would fundamentally break the
+> performance model that makes cpumap redirect so effective.
+
+See, I have similar concerns about growing struct xdp_frame.
+
+That's why the guiding principle for me would be to make sure that 
+the features we add, beyond "classic XDP" as needed by DDoS, are
+entirely optional. And if we include the goal of moving skb allocation
+out of the driver to the xdp_frame growth, the drivers will sooner or
+later unconditionally populate the xdp_frame. Decreasing performance
+of "classic XDP"?
+
+> The key to XDP's high performance lies in processing a bulk of
+> xdp_frames in a tight loop to amortize costs. The existing cpumap code
+> on the remote CPU is already highly optimized for this: it performs bulk
+> allocation of SKBs and uses careful prefetching to hide the memory
+> latency. Allowing a BPF program to sometimes trigger a heavyweight SKB
+> alloc+init (4 cache-line misses) would bypass all these existing
+> optimizations. It would introduce significant jitter into the pipeline
+> and disrupt the entire bulk-processing model we rely on for performance.
 >
->         drop commits that I put in there by mistake. Sorry!
+> This performance is not just theoretical; 
 
-Not only does this mean they were all recently rebased, absolutely
-*NONE* of this has been in linux-next as fat as I can tell. Not in a
-rebased form _or_ in the pre-rebased form.
-
-So no. This is not acceptable, you can try again next time when you do
-it properly.
-
-            Linus
+Somewhat off-topic for the architecture, I think, but do you happen 
+to have any real life data for that? IIRC the "listification" was a
+moderate success for the skb path.. Or am I misreading and you have
+other benefits of a tight processing loop in mind?
 
