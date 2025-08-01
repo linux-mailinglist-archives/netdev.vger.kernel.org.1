@@ -1,190 +1,352 @@
-Return-Path: <netdev+bounces-211299-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211300-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A95CAB17AE6
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 03:43:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5443B17BAD
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 06:08:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A862D4E8532
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 01:43:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4A5658504B
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 04:08:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2D6473451;
-	Fri,  1 Aug 2025 01:43:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B3BD1917F4;
+	Fri,  1 Aug 2025 04:08:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cl2CgTJu"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="K2siW37b"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f194.google.com (mail-yw1-f194.google.com [209.85.128.194])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25F183C17;
-	Fri,  1 Aug 2025 01:43:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AB5316A395
+	for <netdev@vger.kernel.org>; Fri,  1 Aug 2025 04:07:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754012590; cv=none; b=ov5wGKth+uArVSkQUCPaeB1H4GC6v2FOyEK22OGBuEI88Dp/Svgz+cg9RkNL2faFXLl08cNaSV2WyOzFIiUzrl4snXAcCSdcTUTHihhTXN3+xVTssgIjPtr6iGsyY8q7H+nx5iB22vaXUiL7UHbyO8mbYTK2WZlRoSuz/uh2JeM=
+	t=1754021281; cv=none; b=tVnjcJjk6V5X1oykgVzijyxe0mnZ43AXx4SG1mEWbSoRD93+mA9gcORO6cgEuT61R8uF3mEJpeozoBTRRGAedada8LgV70pbVdKyqI5vdKf63S36nUHReGS9LAVDzo7ut3b8CU8ONuwPJxmZvzjcFMfhf9LnKXjiJdaEjUVBbEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754012590; c=relaxed/simple;
-	bh=N4Q5miAGpxlGfSXr83VjddicIT/BiIK7HPIuYbDoGvY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=e4iqF1TQytlFfXQwJOIb/pmY2WMnwOJMw8BgGDe5RUGWt5euK9oG3u3qsv+vrj1YkTojWsYWBt2joqsgKOo1qdDE2D2CFJLbL4vuPwLVVsDOPtrkTmmtfMjMpBLz5spcUHhqRdB/JJFNAMoYcndsLPn7PwE/NNSV4FwnlcynIR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Cl2CgTJu; arc=none smtp.client-ip=209.85.128.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f194.google.com with SMTP id 00721157ae682-71a3f7f0addso15722957b3.2;
-        Thu, 31 Jul 2025 18:43:08 -0700 (PDT)
+	s=arc-20240116; t=1754021281; c=relaxed/simple;
+	bh=2viiInw5BigNS6IWeaKOsjKds/VIkaIp04LPlAm+LCw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=ZT9OIw+OYq/P19fDUmoi3FolfzNiMAEqUDVG9kqROQT118wv01fAmZxJBCNkoEvpYgTTMl+k5bm5F1dfalDmPPiagVo+bC11N8Abn7IGQ2RPJREraEr1yoB/kNv66zgjJtvqG5XnlVUCQlmJWVitILMc6/bUHkyEkti/tZprM68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=K2siW37b; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-31f74a64da9so1402989a91.2
+        for <netdev@vger.kernel.org>; Thu, 31 Jul 2025 21:07:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1754012588; x=1754617388; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Vg54mcNOWV4pT7SvP9l1EEus3Ufwp4XwJcmkPSo2fik=;
-        b=Cl2CgTJuLD5lXQ5yoziJwyccymk4NhKcRRFOuVmlp7IElmMI7ocYNUL9YDhhkzhIAF
-         Rh3AohvErLwHd61icpBpCNb8pDrsT93TPzvRUpTrqBYhJR8zt6BpSdkTV9qDurVWsL/B
-         YUoDIP9S09mpDcQX0oHLuS2Zykc2+v3XN4Jv2l6G3rATJrlh93vzA421QjT8fvDHFMzQ
-         Ufi826zbsU/m0PONpPxX7pVEjlSWMCGdTjfSej+vKDBY6U8ok63b26ugihmUXHQ+8z3Q
-         jya5HAKIcQ3jdFYKpOEeAksK1Tu2Mrn+rANNKNVVtjiDqlonBlsjhw21R4MRz63SEbF6
-         cYcQ==
+        d=google.com; s=20230601; t=1754021279; x=1754626079; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+s8Mijk0QvzV+Oz74rDbeiIOf7F9U9mJfUeVnXP3KVc=;
+        b=K2siW37bM8IFH3/g8NIxlPbAZZajLmSQtf1FWw4sa+lRx+NP1p+KagEwjpw7X40sNQ
+         sSSWmETEUspjdEAfJqJ+Alzu+3xWcFoTOpxaQDv5PwHP+jT6huTk5m/OSH6A63q0XTuU
+         daYADV48QmlNF1/sFxmLsP47SoJiA4mmwgc+wJT5ohsyFcHG7be81BsjYHA62Q1n9eSd
+         qNcHqeBMk1gQVWfxQw8TMatmx6GI4fgxl8ziBC7Qsh5tZShM/FPnNvDwwU/GsK284y+W
+         xCuoIVybXXHkhyJNpPR7po5pZuhJ9q/iUaMXmprUTIQo8Z16DdtJQa+5Yutk7yE5diQW
+         JXAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754012588; x=1754617388;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Vg54mcNOWV4pT7SvP9l1EEus3Ufwp4XwJcmkPSo2fik=;
-        b=dGt2us2/oLke63ddoDm7HVrPxkzZH/A+nN9kg73OEFQSHrRLDRRlVhdsO1imwweKry
-         JF7AWcAzo4vHjuelczHvZbPojH2BfCk1JldbW4YH7ctCFsmaJEdm7RgNSHbTF9K5isUT
-         EfKW0aFyP5nPclPStvYc2cAqWzsg7Bfff30Y+YW34tyrkaz9x04OGhGMdzQ3QdiLK8JA
-         K3hnWNs4wCTXrtiTBKlDwfmDKIVwRWCB6WwnZpaMdzqNbVfj9ivhf6lT/4smNaS1yLwO
-         h1t/6vslQHLBnyzH0D3aIBtF6oyIHZC0wGN1LO8bRS6IBdIpw8/SKk8tKRlGzkP9Uf+O
-         /jiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUrJcJ//hR5OlCikm2RVqsWkf5yd2IbQl9z39Tk/hoHnnPRj+ztR4QsEM5y75q/juQr0bEOpcCl@vger.kernel.org, AJvYcCVpzisn1qDTpIVnZcK64O4Q+p7LRPm2K1A/HJ51yvUwdxj2LmqCNbvAReafc0F7nFqt+Y3hDsQ94BeIvzaN@vger.kernel.org, AJvYcCWmkZ/RE3f7xlXsue0WU86nrzNmJ9kJFOOiFFFQvqbFyrewIT8DAFVxi78tRIFj8TfgO8o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxIZXIPBQ/zcsCNMglSAJUG+8phz/kmX4AOYPqdSbeAsbWZdLoa
-	pfC8+wkHGHeJsRaH2hQXqcyvgmZzIUybcU4XoxJuB7rGf2F7wC8AKeNijpax9Pktt4PcI281ltB
-	43W+DWYWHyCrihyjfhyCY/yD8ARvzTJkMZ64NZ/4=
-X-Gm-Gg: ASbGnctmlqes9SJngRpaM35LYHtRUwtBb/gyYvn84p0IX4VjgrEiftLo1ks4TvsBTD4
-	UZEZEgbkW6o97jIKLETFVzAxvwpn7k02Wq13610K2fN8nLOI2OVilG8QAYK4W2exeQVbqDHOf5Z
-	ygmh8aOj92q9bkhPOvI/YVEYPpFwkEbyK0ueBWN7ynJzHT1ntBxoQN945ZWc2LE+tvpIGimF2yG
-	kh9c0c=
-X-Google-Smtp-Source: AGHT+IG3VYdBG5WRJkmwgqjcOvLij9zCubY0eTDbLYeCX5pOkIV0RjU1PUH4J+wlTs9cCnuBusTUnHpIPoKcXIdWeQ8=
-X-Received: by 2002:a05:690c:7001:b0:71a:1c50:8898 with SMTP id
- 00721157ae682-71a46659cd3mr132619967b3.20.1754012587918; Thu, 31 Jul 2025
- 18:43:07 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1754021279; x=1754626079;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=+s8Mijk0QvzV+Oz74rDbeiIOf7F9U9mJfUeVnXP3KVc=;
+        b=nQxGQz1+Vm/QF/Gitdo5+zI+KsFDhyDHuhkFHtYOIw2UB0X6LuQyIadRK23s/7zFSl
+         AGj8QSdCKpVwjoXuzUKT63Ocafo9sLQAZ3ec5oldaGE/B1WPHPyJmRGREtekwnvpu6U+
+         RzvELCrkLJD3osMYDgkJvWcxwD6f3vM8LZxP4kMVZ1BlheXFWhFVqSOTNdIy/t7yMDny
+         1s+xIonaj3BDP1fCzWVD/rZnnGBe+0cpZkAmwc5d2yZfEfpnsPvODuGZASb7m+ponKOf
+         pCwca3jntZmUntQOFMlCf9hcX53sNMCgrQrFyAkWFr6LobWOfpLnv5FFczBnrdefn2z7
+         y2NA==
+X-Forwarded-Encrypted: i=1; AJvYcCUV3GhKdSJVvNAG5vkFA6z/h3tVhDrs35y6c/OQQ9DD3HVNe5UTPIdw5YNb7GKNTU4bjmkofMc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YweIm0qsPipuj1Ef+DcsRviDDKNHtPEUcStt1Mynv7Zr2B8iQMm
+	X6MU9xmS/n+lfm114QzxIWAyZ7tBf8TpDeMCloF3ZemkcERi2jnUhAbCD6sydO+phJaLtrFHHCy
+	ZIOpMMQ==
+X-Google-Smtp-Source: AGHT+IGWQJGuPSbJOHnN83SU5TTHo8b1wLxVgV3oQP3HATmCelBMkngzyt1TjDFWGLnqEgHFLUzdLNeASsE=
+X-Received: from pja8.prod.google.com ([2002:a17:90b:5488:b0:31e:fac4:4723])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3f8c:b0:31f:10e:2c01
+ with SMTP id 98e67ed59e1d1-31f5dd93b46mr14852886a91.8.1754021278576; Thu, 31
+ Jul 2025 21:07:58 -0700 (PDT)
+Date: Fri,  1 Aug 2025 04:06:37 +0000
+In-Reply-To: <CADxym3YgyBpkEgDApyL4LXsLPBhO4r5DU+oX1pF_p6_BsvyVNw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250703121521.1874196-1-dongml2@chinatelecom.cn>
- <20250703121521.1874196-3-dongml2@chinatelecom.cn> <CAADnVQKP1-gdmq1xkogFeRM6o3j2zf0Q8Atz=aCEkB0PkVx++A@mail.gmail.com>
- <45f4d349-7b08-45d3-9bec-3ab75217f9b6@linux.dev> <3bccb986-bea1-4df0-a4fe-1e668498d5d5@linux.dev>
- <CAADnVQ+Afov4E=9t=3M=zZmO9z4ZqT6imWD5xijDHshTf3J=RA@mail.gmail.com>
- <20250716182414.GI4105545@noisy.programming.kicks-ass.net>
- <CAADnVQ+5sEDKHdsJY5ZsfGDO_1SEhhQWHrt2SMBG5SYyQ+jt7w@mail.gmail.com>
- <CADxym3Za-zShEUyoVE7OoODKYXc1nghD63q2xv_wtHAyT2-Z-Q@mail.gmail.com> <CAADnVQ+XGYp=ORtA730u7WQKqSGGH6R4=9CtYOPP_uHuJrYAkQ@mail.gmail.com>
-In-Reply-To: <CAADnVQ+XGYp=ORtA730u7WQKqSGGH6R4=9CtYOPP_uHuJrYAkQ@mail.gmail.com>
-From: Menglong Dong <menglong8.dong@gmail.com>
-Date: Fri, 1 Aug 2025 09:42:57 +0800
-X-Gm-Features: Ac12FXy-vpmSHlsvL-oIX1qMJ0s6c0XklwUy2mr9pJMFQsV90eCj8vUHSIkVBx0
-Message-ID: <CADxym3arEsBB-b0Hr52pcwH7H+Lgg6-NKYczPn6W49WRND-UJg@mail.gmail.com>
-Subject: Re: Inlining migrate_disable/enable. Was: [PATCH bpf-next v2 02/18]
- x86,bpf: add bpf_global_caller for global trampoline
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Peter Zijlstra <peterz@infradead.org>, Menglong Dong <menglong.dong@linux.dev>, 
-	Steven Rostedt <rostedt@goodmis.org>, Jiri Olsa <jolsa@kernel.org>, bpf <bpf@vger.kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, 
-	LKML <linux-kernel@vger.kernel.org>, Network Development <netdev@vger.kernel.org>
+Mime-Version: 1.0
+References: <CADxym3YgyBpkEgDApyL4LXsLPBhO4r5DU+oX1pF_p6_BsvyVNw@mail.gmail.com>
+X-Mailer: git-send-email 2.50.1.565.gc32cd1483b-goog
+Message-ID: <20250801040757.1599996-1-kuniyu@google.com>
+Subject: Re: [PATCH net-next] net: ip: lookup the best matched listen socket
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: menglong8.dong@gmail.com
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
+	horms@kernel.org, kafai@fb.com, kraig@google.com, kuba@kernel.org, 
+	kuniyu@google.com, linux-kernel@vger.kernel.org, ncardwell@google.com, 
+	netdev@vger.kernel.org, pabeni@redhat.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Aug 1, 2025 at 12:15=E2=80=AFAM Alexei Starovoitov
-<alexei.starovoitov@gmail.com> wrote:
->
-> On Mon, Jul 28, 2025 at 2:20=E2=80=AFAM Menglong Dong <menglong8.dong@gma=
-il.com> wrote:
+From: Menglong Dong <menglong8.dong@gmail.com>
+Date: Fri, 1 Aug 2025 09:31:43 +0800
+> On Fri, Aug 1, 2025 at 1:52=E2=80=AFAM Kuniyuki Iwashima <kuniyu@google.c=
+om> wrote:
 > >
-> > On Thu, Jul 17, 2025 at 6:35=E2=80=AFAM Alexei Starovoitov
-> > <alexei.starovoitov@gmail.com> wrote:
+> > On Thu, Jul 31, 2025 at 6:01=E2=80=AFAM Eric Dumazet <edumazet@google.c=
+om> wrote:
 > > >
-> > > On Wed, Jul 16, 2025 at 11:24=E2=80=AFAM Peter Zijlstra <peterz@infra=
-dead.org> wrote:
+> > > On Thu, Jul 31, 2025 at 5:33=E2=80=AFAM Menglong Dong <menglong8.dong=
+@gmail.com> wrote:
 > > > >
-> > > > On Wed, Jul 16, 2025 at 09:56:11AM -0700, Alexei Starovoitov wrote:
+> > > > For now, the socket lookup will terminate if the socket is reuse po=
+rt in
+> > > > inet_lhash2_lookup(), which makes the socket is not the best match.
 > > > >
-> > > > > Maybe Peter has better ideas ?
+> > > > For example, we have socket1 and socket2 both listen on "0.0.0.0:12=
+34",
+> > > > but socket1 bind on "eth0". We create socket1 first, and then socke=
+t2.
+> > > > Then, all connections will goto socket2, which is not expected, as =
+socket1
+> > > > has higher priority.
 > > > >
-> > > > Is it possible to express runqueues::nr_pinned as an alias?
+> > > > This can cause unexpected behavior if TCP MD5 keys is used, as desc=
+ribed
+> > > > in Documentation/networking/vrf.rst -> Applications.
 > > > >
-> > > > extern unsigned int __attribute__((alias("runqueues.nr_pinned"))) t=
-his_nr_pinned;
-> > > >
-> > > > And use:
-> > > >
-> > > >         __this_cpu_inc(&this_nr_pinned);
-> > > >
-> > > >
-> > > > This syntax doesn't actually seem to work; but can we construct
-> > > > something like that?
-> > >
-> > > Yeah. Iant is right. It's a string and not a pointer dereference.
-> > > It never worked.
-> > >
-> > > Few options:
-> > >
-> > > 1.
-> > >  struct rq {
-> > > +#ifdef CONFIG_SMP
-> > > +       unsigned int            nr_pinned;
-> > > +#endif
-> > >         /* runqueue lock: */
-> > >         raw_spinlock_t          __lock;
-> > >
-> > > @@ -1271,9 +1274,6 @@ struct rq {
-> > >         struct cpuidle_state    *idle_state;
-> > >  #endif
-> > >
-> > > -#ifdef CONFIG_SMP
-> > > -       unsigned int            nr_pinned;
-> > > -#endif
-> > >
-> > > but ugly...
-> > >
-> > > 2.
-> > > static unsigned int nr_pinned_offset __ro_after_init __used;
-> > > RUNTIME_CONST(nr_pinned_offset, nr_pinned_offset)
-> > >
-> > > overkill for what's needed
-> > >
-> > > 3.
-> > > OFFSET(RQ_nr_pinned, rq, nr_pinned);
-> > > then
-> > > #include <generated/asm-offsets.h>
-> > >
-> > > imo the best.
+> > > > Therefor, we lookup the best matched socket first, and then do the =
+reuse
+> > > > port logic. This can increase some overhead if there are many reuse=
+ port
+> > > > socket :/
 > >
-> > I had a try. The struct rq is not visible to asm-offsets.c, so we
-> > can't define it in arch/xx/kernel/asm-offsets.c. Do you mean
-> > to define a similar rq-offsets.c in kernel/sched/ ? It will be more
-> > complex than the way 2, and I think the second way 2 is
-> > easier :/
->
-> 2 maybe easier, but it's an overkill.
-> I still think asm-offset is cleaner.
-> arch/xx shouldn't be used, of course, since this nr_pinned should
-> be generic for all archs.
-> We can do something similar to drivers/memory/emif-asm-offsets.c
+> > This kills O(1) lookup for reuseport...
+> >
+> > Another option would be to try hard in __inet_hash() to sort
+> > reuseport groups.
+>=20
+> Good idea. For the reuse port case, we can compute a score
+> for the reuseport sockets and insert the high score to front of
+> the list. I'll have a try this way.
 
-Great, I'll have a try on this way!
+I remember you reported the same issue in Feburary and
+I hacked up a patch below based on a draft diff in my stash.
 
-> and do that within kernel/sched/.
-> rq-offsets.c as you said.
-> It will generate rq-offsets.h in a build dir that can be #include-d.
->
-> I thought about another alternative (as a derivative of 1):
-> split nr_pinned from 'struct rq' into its own per-cpu variable,
-> but I don't think that will work, since rq_has_pinned_tasks()
-> doesn't always operate on this_rq().
-> So the acceptable choices are realistically 1 and 3 and
-> rq-offsets.c seems cleaner.
-> Pls give it another try.
+This fixes the issue, but we still have corner cases where
+SO_REUSEPORT/SO_BINDTODEVICE are changed after listen(),
+which should not be allowed given TCP does not have ->rehash()
+and confuses/breaks the reuseport logic/rule.
+
+---8<---
+diff --git a/include/net/sock.h b/include/net/sock.h
+index c8a4b283df6f..8436e352732f 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -885,6 +885,18 @@ static inline void __sk_nulls_add_node_tail_rcu(struct=
+ sock *sk, struct hlist_nu
+ 	hlist_nulls_add_tail_rcu(&sk->sk_nulls_node, list);
+ }
+=20
++static inline void __sk_nulls_insert_after_node_rcu(struct sock *sk,
++						    struct hlist_nulls_node *prev)
++{
++	struct hlist_nulls_node *n =3D &sk->sk_nulls_node;
++
++	n->next =3D prev->next;
++	n->pprev =3D &prev->next;
++	if (!is_a_nulls(n->next))
++		WRITE_ONCE(n->next->pprev, &n->next);
++	rcu_assign_pointer(hlist_nulls_next_rcu(prev), n);
++}
++
+ static inline void sk_nulls_add_node_rcu(struct sock *sk, struct hlist_nul=
+ls_head *list)
+ {
+ 	sock_hold(sk);
+diff --git a/include/net/sock_reuseport.h b/include/net/sock_reuseport.h
+index 6e4faf3ee76f..4a3e9d6887a6 100644
+--- a/include/net/sock_reuseport.h
++++ b/include/net/sock_reuseport.h
+@@ -23,12 +23,14 @@ struct sock_reuseport {
+ 	unsigned int		synq_overflow_ts;
+ 	/* ID stays the same even after the size of socks[] grows. */
+ 	unsigned int		reuseport_id;
+-	unsigned int		bind_inany:1;
+-	unsigned int		has_conns:1;
++	unsigned short		bind_inany:1;
++	unsigned short		has_conns:1;
++	unsigned short		score;
+ 	struct bpf_prog __rcu	*prog;		/* optional BPF sock selector */
+ 	struct sock		*socks[] __counted_by(max_socks);
+ };
+=20
++unsigned short reuseport_compute_score(struct sock *sk, bool bind_inany);
+ extern int reuseport_alloc(struct sock *sk, bool bind_inany);
+ extern int reuseport_add_sock(struct sock *sk, struct sock *sk2,
+ 			      bool bind_inany);
+diff --git a/net/core/sock_reuseport.c b/net/core/sock_reuseport.c
+index 4211710393a8..df3d1a6f3178 100644
+--- a/net/core/sock_reuseport.c
++++ b/net/core/sock_reuseport.c
+@@ -6,6 +6,7 @@
+  * selecting the socket index from the array of available sockets.
+  */
+=20
++#include <net/addrconf.h>
+ #include <net/ip.h>
+ #include <net/sock_reuseport.h>
+ #include <linux/bpf.h>
+@@ -185,6 +186,25 @@ static struct sock_reuseport *__reuseport_alloc(unsign=
+ed int max_socks)
+ 	return reuse;
+ }
+=20
++unsigned short reuseport_compute_score(struct sock *sk, bool bind_inany)
++{
++	unsigned short score =3D 0;
++
++	if (sk->sk_family =3D=3D AF_INET)
++		score +=3D 10;
++
++	if (ipv6_only_sock(sk))
++		score++;
++
++	if (!bind_inany)
++		score++;
++
++	if (sk->sk_bound_dev_if)
++		score++;
++
++	return score;
++}
++
+ int reuseport_alloc(struct sock *sk, bool bind_inany)
+ {
+ 	struct sock_reuseport *reuse;
+@@ -233,6 +253,7 @@ int reuseport_alloc(struct sock *sk, bool bind_inany)
+ 	reuse->bind_inany =3D bind_inany;
+ 	reuse->socks[0] =3D sk;
+ 	reuse->num_socks =3D 1;
++	reuse->score =3D reuseport_compute_score(sk, bind_inany);
+ 	reuseport_get_incoming_cpu(sk, reuse);
+ 	rcu_assign_pointer(sk->sk_reuseport_cb, reuse);
+=20
+@@ -278,6 +299,7 @@ static struct sock_reuseport *reuseport_grow(struct soc=
+k_reuseport *reuse)
+ 	more_reuse->bind_inany =3D reuse->bind_inany;
+ 	more_reuse->has_conns =3D reuse->has_conns;
+ 	more_reuse->incoming_cpu =3D reuse->incoming_cpu;
++	more_reuse->score =3D reuse->score;
+=20
+ 	memcpy(more_reuse->socks, reuse->socks,
+ 	       reuse->num_socks * sizeof(struct sock *));
+diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
+index ceeeec9b7290..042a65372d00 100644
+--- a/net/ipv4/inet_hashtables.c
++++ b/net/ipv4/inet_hashtables.c
+@@ -739,6 +739,44 @@ static int inet_reuseport_add_sock(struct sock *sk,
+ 	return reuseport_alloc(sk, inet_rcv_saddr_any(sk));
+ }
+=20
++static void inet_reuseport_hash_sock(struct sock *sk,
++				     struct inet_listen_hashbucket *ilb2)
++{
++	struct inet_bind_bucket *tb =3D inet_csk(sk)->icsk_bind_hash;
++	const struct hlist_nulls_node *node;
++	struct sock *sk2, *sk_anchor =3D NULL;
++	unsigned short score, hiscore;
++	struct sock_reuseport *reuse;
++
++	reuse =3D rcu_dereference_protected(sk->sk_reuseport_cb, 1);
++	score =3D reuse->score;
++
++	sk_nulls_for_each_rcu(sk2, node, &ilb2->nulls_head) {
++		if (!sk2->sk_reuseport)
++			continue;
++
++		if (inet_csk(sk2)->icsk_bind_hash !=3D tb)
++			continue;
++
++		reuse =3D rcu_dereference_protected(sk2->sk_reuseport_cb, 1);
++		if (likely(reuse))
++			hiscore =3D reuse->score;
++		else
++			hiscore =3D reuseport_compute_score(sk2,
++							  inet_rcv_saddr_any(sk2));
++
++		if (hiscore <=3D score)
++			break;
++
++		sk_anchor =3D sk2;
++	}
++
++	if (sk_anchor)
++		__sk_nulls_insert_after_node_rcu(sk, &sk_anchor->sk_nulls_node);
++	else
++		__sk_nulls_add_node_rcu(sk, &ilb2->nulls_head);
++}
++
+ int __inet_hash(struct sock *sk, struct sock *osk)
+ {
+ 	struct inet_hashinfo *hashinfo =3D tcp_get_hashinfo(sk);
+@@ -759,13 +797,14 @@ int __inet_hash(struct sock *sk, struct sock *osk)
+ 		err =3D inet_reuseport_add_sock(sk, ilb2);
+ 		if (err)
+ 			goto unlock;
+-	}
+-	sock_set_flag(sk, SOCK_RCU_FREE);
+-	if (IS_ENABLED(CONFIG_IPV6) && sk->sk_reuseport &&
+-		sk->sk_family =3D=3D AF_INET6)
+-		__sk_nulls_add_node_tail_rcu(sk, &ilb2->nulls_head);
+-	else
++
++		sock_set_flag(sk, SOCK_RCU_FREE);
++		inet_reuseport_hash_sock(sk, ilb2);
++	} else {
++		sock_set_flag(sk, SOCK_RCU_FREE);
+ 		__sk_nulls_add_node_rcu(sk, &ilb2->nulls_head);
++	}
++
+ 	sock_prot_inuse_add(sock_net(sk), sk->sk_prot, 1);
+ unlock:
+ 	spin_unlock(&ilb2->lock);
+---8<---
+
+
+Tested:
+
+---8<---
+[root@fedora ~]# cat a.py
+from socket import *
+
+s1 =3D socket()
+s1.setsockopt(SOL_SOCKET, SO_REUSEPORT, 1)
+s1.setsockopt(SOL_SOCKET, SO_BINDTODEVICE, b'lo')
+s1.listen()
+s1.setblocking(False)
+
+s2 =3D socket()
+s2.setsockopt(SOL_SOCKET, SO_REUSEPORT, 1)
+s2.bind(s1.getsockname())
+s2.listen()
+s2.setblocking(False)
+
+for i in range(3):
+    c =3D socket()
+    c.connect(s1.getsockname())
+    try:
+        print("assigned properly:", s1.accept())
+    except:
+        print("wrong assignment")
+[root@fedora ~]# python3 a.py
+assigned properly: (<socket.socket fd=3D6, family=3D2, type=3D1, proto=3D0,=
+ laddr=3D('127.0.0.1', 36733), raddr=3D('127.0.0.1', 39478)>, ('127.0.0.1',=
+ 39478))
+assigned properly: (<socket.socket fd=3D5, family=3D2, type=3D1, proto=3D0,=
+ laddr=3D('127.0.0.1', 36733), raddr=3D('127.0.0.1', 39490)>, ('127.0.0.1',=
+ 39490))
+assigned properly: (<socket.socket fd=3D6, family=3D2, type=3D1, proto=3D0,=
+ laddr=3D('127.0.0.1', 36733), raddr=3D('127.0.0.1', 39506)>, ('127.0.0.1',=
+ 39506))
+---8<---
 
