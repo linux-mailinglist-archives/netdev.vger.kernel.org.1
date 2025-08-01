@@ -1,190 +1,93 @@
-Return-Path: <netdev+bounces-211402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211403-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81A93B1889A
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 23:16:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 442CAB1889F
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 23:19:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 10FF21C8580E
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 21:17:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5669916A091
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 21:19:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B4FD28DF25;
-	Fri,  1 Aug 2025 21:16:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBE66220680;
+	Fri,  1 Aug 2025 21:19:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="D7ROtqjC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oDGdNOjV"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-75.smtpout.orange.fr [80.12.242.75])
-	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0AF41F9F70;
-	Fri,  1 Aug 2025 21:16:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.75
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B65DC1E5B72
+	for <netdev@vger.kernel.org>; Fri,  1 Aug 2025 21:19:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754083005; cv=none; b=TLIjCb/ZlwFqpEcfGzdGWDBAdIqNpiYGvAEbbaO40fQyWm3lfi/5MvH6kVcGu0jhXLmvWl6PL3Vbva1kEbieS73/9Vv2sgh+Uz5oQLxj0hyJt1UX18+UPykEseeivpF3yZWzrnbIQH8XoOY1z8IHdUvzx29YDoToGlwgroM+Id8=
+	t=1754083192; cv=none; b=EjcvQ1w5hP/proFJq8awybt7NWjFiqc9w00lDv6uPoAiEoa5rsVf5peVe5PWV0ERdf0UKoY8Bnh//XhSURIFF6nBtGyC58frpSqkUvRTVYTcF6jVqhISnO08XCNbuFw9EIJ3uL8GOGMQ+QCSKlSzHQJsLSknlhFRNrPINvEOXDQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754083005; c=relaxed/simple;
-	bh=cB8E+IiK84/sjDNniJugMqXQ0plFEnucL0t11Qs/fJA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fKecGtutZp9gOHgWC7+hB9YZH3Re20T02lqJtajq2xu51vYdL95DtVvzZO2ExKv8/Ma+sCQz0i60dEhFggp61sR87THGPDuGZ8JQgn3MLsytQ3zWEi+3JxMW+NKHj+rM0BT1JWm+23o+6yGN+9pSXbzf88WzGz0ZtRsqOptT9kc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=D7ROtqjC; arc=none smtp.client-ip=80.12.242.75
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [IPV6:2a01:cb10:785:b00:8347:f260:7456:7662]
- ([IPv6:2a01:cb10:785:b00:8347:f260:7456:7662])
-	by smtp.orange.fr with ESMTPA
-	id hx64urnIfWKZshx64udVBe; Fri, 01 Aug 2025 23:15:28 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1754082928;
-	bh=zf9gB3Bkl61hWd65WII9gJiaVB7imIErkHdmeSTRZuU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=D7ROtqjCjaehqV0nh9oaauk9Uml9trRFXrv6mKTS9Gfjx8j92DlmWeFG73YoocCpH
-	 YUtNz9dfMS6WL3abzCAvbWq8ljin8p06B9/e+v+H3gdgVPkZzDRuOyZOo6jZECKFb1
-	 LEfuVzeILvzwvifwX5AsJEWxBEaYyEPMkxQ7+CfhnSTeS4nNkr3aPei3Rnd/u8QH2Y
-	 NjuKVWA5R33RgKkgs0/ZQjY14dNXCwUf8b4SvoE7r/ldx1Jykal/1RCTYZ6k6ah/jD
-	 DYyD6Y+rX9RXoHmVCd8UFHCyRwfohP29NAp1DRHS6Uiov6iL6hW9SI4NEbwWiVYuQX
-	 VZ6y/r77kE/Mw==
-X-ME-Helo: [IPV6:2a01:cb10:785:b00:8347:f260:7456:7662]
-X-ME-Auth: bWFyaW9uLmphaWxsZXRAd2FuYWRvby5mcg==
-X-ME-Date: Fri, 01 Aug 2025 23:15:28 +0200
-X-ME-IP: 2a01:cb10:785:b00:8347:f260:7456:7662
-Message-ID: <7044823e-c263-4789-b83c-ecb1eccde04f@wanadoo.fr>
-Date: Fri, 1 Aug 2025 23:15:24 +0200
+	s=arc-20240116; t=1754083192; c=relaxed/simple;
+	bh=gJtzu7d9v6hgThSA0k2QkIjkc1nE4oPsz6fRJ8T1YkI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=bRGeEqxjVkMR1a0aeroruUjMgLatA0/nhMGkLafnetNmdzr/p1FieR7xCRd0tWGF1Q8aIS67Os8XoLNX+x/w7Z32zErXqvIxm7U/fW4ccowEpnW7QsK99IDj8H/ys2qnNhZwu1S4z0Qpt4kYGn3TQwfomA+4TC/NO8n+I13sNPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oDGdNOjV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31AC2C4CEF4;
+	Fri,  1 Aug 2025 21:19:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754083192;
+	bh=gJtzu7d9v6hgThSA0k2QkIjkc1nE4oPsz6fRJ8T1YkI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=oDGdNOjVL16FWxAkQLRhyOXUzeiIW2NbKbbXacmPj5E6exkBhrguVVTAKRCojcdsf
+	 2f6qmcTEMtyUji0P3EhBOwuhlEjy5hB0lruNzRwobzvegXim89m7gtEPCkCHFGMOoJ
+	 PBmCt3Hi4yTesFSqCZ7WPp54YZd+X2gnng2x4waZW34hJ99wuyLplm+jNkGc9I7Vlo
+	 sEJClbQyND3Eyh1OCSFLZsiu3S3rUBrmvW61Gfqr27vUnN4hbh5Vr0QWCsYcy7PZvJ
+	 PBd0Nk6EmjlgQ+bmmbz1xMdchvnBnCaIwMm2LjMW1bx3SLyCIAZyuWSsCS9LT0g5az
+	 bWo/619pAM2Rg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE5A383BF56;
+	Fri,  1 Aug 2025 21:20:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 01/14] net: ionic: Create an auxiliary device for rdma
- driver
-To: Abhijit Gangurde <abhijit.gangurde@amd.com>, shannon.nelson@amd.com,
- brett.creeley@amd.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net, jgg@ziepe.ca,
- leon@kernel.org, andrew+netdev@lunn.ch
-Cc: allen.hubbe@amd.com, nikhil.agarwal@amd.com, linux-rdma@vger.kernel.org,
- netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250723173149.2568776-1-abhijit.gangurde@amd.com>
- <20250723173149.2568776-2-abhijit.gangurde@amd.com>
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Content-Language: en-US, fr-FR
-In-Reply-To: <20250723173149.2568776-2-abhijit.gangurde@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] sfc: unfix not-a-typo in comment
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175408320751.4079639.7810552009122411425.git-patchwork-notify@kernel.org>
+Date: Fri, 01 Aug 2025 21:20:07 +0000
+References: <20250731144138.2637949-1-edward.cree@amd.com>
+In-Reply-To: <20250731144138.2637949-1-edward.cree@amd.com>
+To:  <edward.cree@amd.com>
+Cc: linux-net-drivers@amd.com, davem@davemloft.net, kuba@kernel.org,
+ edumazet@google.com, pabeni@redhat.com, andrew+netdev@lunn.ch,
+ ecree.xilinx@gmail.com, netdev@vger.kernel.org, bhelgaas@google.com
 
-Le 23/07/2025 à 19:31, Abhijit Gangurde a écrit :
-> To support RDMA capable ethernet device, create an auxiliary device in
-> the ionic Ethernet driver. The RDMA device is modeled as an auxiliary
-> device to the Ethernet device.
+Hello:
 
-...
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-> +static DEFINE_IDA(aux_ida);
-> +
-> +static void ionic_auxbus_release(struct device *dev)
-> +{
-> +	struct ionic_aux_dev *ionic_adev;
-> +
-> +	ionic_adev = container_of(dev, struct ionic_aux_dev, adev.dev);
-> +	kfree(ionic_adev);
-> +}
-> +
-> +int ionic_auxbus_register(struct ionic_lif *lif)
+On Thu, 31 Jul 2025 15:41:38 +0100 you wrote:
+> From: Edward Cree <ecree.xilinx@gmail.com>
+> 
+> Cited commit removed duplicated word 'fallback', but this was not a
+>  typo and change altered the semantic meaning of the comment.
+> Partially revert, using the phrase 'fallback of the fallback' to make
+>  the meaning more clear to future readers so that they won't try to
+>  change it again.
+> 
+> [...]
 
-The 2 places that uses thus function don't check its error code.
+Here is the summary with links:
+  - [net-next] sfc: unfix not-a-typo in comment
+    https://git.kernel.org/netdev/net/c/60bda1ba062a
 
-> +{
-> +	struct ionic_aux_dev *ionic_adev;
-> +	struct auxiliary_device *aux_dev;
-> +	int err, id;
-> +
-> +	if (!(le64_to_cpu(lif->ionic->ident.lif.capabilities) & IONIC_LIF_CAP_RDMA))
-> +		return 0;
-> +
-> +	ionic_adev = kzalloc(sizeof(*ionic_adev), GFP_KERNEL);
-> +	if (!ionic_adev)
-> +		return -ENOMEM;
-> +
-> +	aux_dev = &ionic_adev->adev;
-> +
-> +	id = ida_alloc_range(&aux_ida, 0, INT_MAX, GFP_KERNEL);
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Nitpick: why not just: ida_alloc(&aux_ida, GFP_KERNEL);
 
-> +	if (id < 0) {
-> +		dev_err(lif->ionic->dev, "Failed to allocate aux id: %d\n",
-> +			id);
-> +		err = id;
-> +		goto err_adev_free;
-> +	}
-> +
-> +	aux_dev->id = id;
-> +	aux_dev->name = "rdma";
-> +	aux_dev->dev.parent = &lif->ionic->pdev->dev;
-> +	aux_dev->dev.release = ionic_auxbus_release;
-> +	ionic_adev->lif = lif;
-> +	err = auxiliary_device_init(aux_dev);
-> +	if (err) {
-> +		dev_err(lif->ionic->dev, "Failed to initialize %s aux device: %d\n",
-> +			aux_dev->name, err);
-> +		goto err_ida_free;
-> +	}
-> +
-> +	err = auxiliary_device_add(aux_dev);
-> +	if (err) {
-> +		dev_err(lif->ionic->dev, "Failed to add %s aux device: %d\n",
-> +			aux_dev->name, err);
-> +		goto err_aux_uninit;
-> +	}
-> +
-> +	lif->ionic_adev = ionic_adev;
-> +
-> +	return 0;
-> +
-> +err_aux_uninit:
-> +	auxiliary_device_uninit(aux_dev);
-
-I think a return err; is missing here, because, IMOH, 
-auxiliary_device_uninit() will call put_device() that will trigger 
-ionic_auxbus_release(). So kfree(ionic_adev) would be called twice.
-
-I also think that ida_free() should also be ionic_auxbus_release() (just 
-a guess, not checked in details)
-
-> +err_ida_free:
-> +	ida_free(&aux_ida, id);
-> +err_adev_free:
-> +	kfree(ionic_adev);
-> +
-> +	return err;
-> +}
-> +
-> +void ionic_auxbus_unregister(struct ionic_lif *lif)
-> +{
-> +	struct auxiliary_device *aux_dev;
-> +	int id;
-> +
-> +	mutex_lock(&lif->adev_lock);
-> +	if (!lif->ionic_adev)
-> +		goto out;
-> +
-> +	aux_dev = &lif->ionic_adev->adev;
-> +	id = aux_dev->id;
-> +
-> +	auxiliary_device_delete(aux_dev);
-> +	auxiliary_device_uninit(aux_dev);
-> +	ida_free(&aux_ida, id);
-> +
-> +	lif->ionic_adev = NULL;
-> +
-> +out:
-> +	mutex_unlock(&lif->adev_lock);
-> +}
-
-...
-
-CJ
 
