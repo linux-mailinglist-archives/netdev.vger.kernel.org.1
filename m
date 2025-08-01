@@ -1,272 +1,111 @@
-Return-Path: <netdev+bounces-211358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211359-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5632B1825F
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 15:19:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 319AAB1827F
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 15:32:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C5A13A7A10
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 13:19:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 63AFF586E9C
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 13:32:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE583256C71;
-	Fri,  1 Aug 2025 13:19:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U4i2HfIo"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7693B22759B;
+	Fri,  1 Aug 2025 13:32:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from alt42.smtp-out.videotron.ca (alt42.smtp-out.videotron.ca [23.233.128.29])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C747A21B9DB
-	for <netdev@vger.kernel.org>; Fri,  1 Aug 2025 13:19:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F0CF33D8
+	for <netdev@vger.kernel.org>; Fri,  1 Aug 2025 13:32:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.233.128.29
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754054370; cv=none; b=BGHGAaWZvfZomVtfoHjxmnG6HEFsgAFZyqlga63JaHDDJoNOiZz9YLsE8UNcU3nV1jT/b1+vmwLq0O022PdYDYRkMp4LMgjUFeR3mXhJG01SnpiQsH1u201Hnj3kjIlHL2szjA27CV122WSlIKMScNYzsMuUS8Hwi1HSrZvJ37g=
+	t=1754055158; cv=none; b=EgEDYPx6I0KzVo9PHaAM41ulZE3DvEa5Ai6IBieakFvdV3ojM8MYf2motTdgeRwn+cepP5kKSOTFrWNiPDMdoIvh2QePTM3Cehtk7/3J3bDrZv3gxDnKDnwix4GaG3mCbi3rCrjLSq/2FRYq+itBnXif1OgnHXafapPd/PHx1/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754054370; c=relaxed/simple;
-	bh=9NerjbYLuoyk/RKlTefAdXQzfB6NwPQkXItsvzNMysk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XYDQ6TltGzA2CZeJMzxiV8DmXNUgvBGtRmBJfcm9ghA6OWWTJ4y7bdKA/oaIcRMGdMDAQ3fLjMVY/gu2KLec3u3SFiALJJu+Ou6W9rQpwF+wQCAsPjdd6YdOfRfFcyAs5uQCXkTga6TdnrPMlWhWdM12Ps9HKh6H+CyzLDTpbwo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=U4i2HfIo; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1754054366;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YbLdGk22JzqbKEhu/iJYhhYYSjQLfdAdGKKqzGB0K4Q=;
-	b=U4i2HfIoGVR0/5HlTaQYzCZ7oopzDvjfVRxrbMO8qMmkMI6KDYfrbpebum4lqE/+y7Zfil
-	4vKK653OgWt9A33iLoaYZHAs8x0LaF7A5ttClnFqE5iHxJ3qfRsYRuHIvXAZnbvOAxnyLa
-	0gzK0DnqSfiEx3IYbamU01McHB/I7AU=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-132-CdEWaLVgNa6jNgSJMROKaA-1; Fri, 01 Aug 2025 09:19:25 -0400
-X-MC-Unique: CdEWaLVgNa6jNgSJMROKaA-1
-X-Mimecast-MFC-AGG-ID: CdEWaLVgNa6jNgSJMROKaA_1754054364
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-451d3f03b74so10904185e9.3
-        for <netdev@vger.kernel.org>; Fri, 01 Aug 2025 06:19:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754054364; x=1754659164;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YbLdGk22JzqbKEhu/iJYhhYYSjQLfdAdGKKqzGB0K4Q=;
-        b=ADg8qOK7k1v7xYcP7h+QUWUwyOUaJ1s9vVvQJWdrA/7EWKUf8LlYNAR0HPiHDOmXov
-         t7id7wiYCmgNNCEF3xtdLNATLP5J2DRGlWWYz9ZT5rrv12+HLgkC7V/8fHiqUsxfzQIz
-         kRvR4Iqist7Er6N8W2dyRsCDrxdY8iO8eRF0hk44jVoo5HOM/jMNt7VKOzlhvvs4Owmt
-         1Q8v8A9jmDfLRJJNdyWEPkjYXOL7lqiOJweNW8uR4LjZ1VBAK4IHhAa/vwxxDoXyyWkN
-         32v4hhppbO+XgQsl5+GswzbqsKZqg5e3YKnqEF2n9Ve1OFO5PaDkGoAE+hvX6Jos5mb/
-         TtfA==
-X-Forwarded-Encrypted: i=1; AJvYcCU6XFlxhd9FSUICll78SIsznRu5Oyx+5/Tv9nf2EDegqW7Ar5nAL15bFiR8rUkNkaCGfSEaej8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwjqEB95hacf+3H2wCX7p7Cq+PLFfmlhzKNypq2Hx41KRdp0bnE
-	pRy/3FEAiDsJdK7Sxzqbz4+xSYUncFTAl0JnaUaA7KoeBq4gUh3DdflTSOgvxu/9BIzN0FeF1nt
-	Y8q3yPZwYZMC9BXyBudwrQHGuGqq2wtRhdygtlW0J8ukBEmVWHMj7IPunNw==
-X-Gm-Gg: ASbGnct9aYsB7QR0fkCEI3xrqpx8lR+XkGqEBHf0jcOg+mFQgCQYDTgprJyMYGd5bup
-	cjJipTNr49PjZJxOo/ADvxLqaFLfGQ2NF/Rb9cq9rboiZkhSHvB30TSUFgD0r25NsT6gqy2eQ1p
-	h6rxBeuogMdU3o9UQjH6te8XGIRS+grUQE9CR2K8V1zwe2KKtZs6D8J+A9M2xGqUILbLAHViIhg
-	lL7oiiVJ1Chv4iPI/PSbGd58RjnVt8yi5YXpOghMhftke88QzeI5Frb/REaTEQW3hDcBI/psq+3
-	FikClwUqcKBF2wJn0rFG9OWTSuINdO6/
-X-Received: by 2002:a05:600c:3143:b0:458:b2c4:b3df with SMTP id 5b1f17b1804b1-458b2c4b55cmr7065045e9.33.1754054364126;
-        Fri, 01 Aug 2025 06:19:24 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHmZq6SGlI97jjT0xUjwHMnLWo6+mq6NBKRj1ThNjjX/DhoWqBXT6UeApleX2c0S5DJT9fufQ==
-X-Received: by 2002:a05:600c:3143:b0:458:b2c4:b3df with SMTP id 5b1f17b1804b1-458b2c4b55cmr7064765e9.33.1754054363595;
-        Fri, 01 Aug 2025 06:19:23 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc0:1515:7300:62e6:253a:2a96:5e3])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-458af917d20sm11817765e9.2.2025.08.01.06.19.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Aug 2025 06:19:23 -0700 (PDT)
-Date: Fri, 1 Aug 2025 09:19:19 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	acourbot@google.com, alok.a.tiwari@oracle.com,
-	anders.roxell@linaro.org, dtatulea@nvidia.com, eperezma@redhat.com,
-	eric.auger@redhat.com, gnurou@gmail.com, jasowang@redhat.com,
-	jonah.palmer@oracle.com, kraxel@redhat.com, leiyang@redhat.com,
-	linux@treblig.org, lulu@redhat.com, michael.christie@oracle.com,
-	parav@nvidia.com, si-wei.liu@oracle.com, stable@vger.kernel.org,
-	viresh.kumar@linaro.org, wangyuli@uniontech.com, will@kernel.org,
-	wquan@redhat.com, xiaopei01@kylinos.cn
-Subject: Re: [GIT PULL] virtio, vhost: features, fixes
-Message-ID: <20250801091454-mutt-send-email-mst@kernel.org>
-References: <20250801070032-mutt-send-email-mst@kernel.org>
- <20250801090250-mutt-send-email-mst@kernel.org>
+	s=arc-20240116; t=1754055158; c=relaxed/simple;
+	bh=FhZoHEfxKzxylPJtES6oYDqZnyO9ZWHiN0t00emboHg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OkBMo760qzpp7cQF1+ojkK9AxdGVZ+VBk6Q91CsVu1w9qwmz0rVHaDsbHXavLzl81iVjOsXtuWGBbqGbC64POXKwXqf2YtGpf18MCHVhfpFM9jQRB4PSqFbuNuDIuJuSDMtun+5mPfByzmXYYNXyL9SHQiQBcB9L2ZhMOM6wmRw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=redhat.com; spf=fail smtp.mailfrom=redhat.com; arc=none smtp.client-ip=23.233.128.29
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=redhat.com
+Received: from zappa.orion ([24.201.91.161])
+	by Videotron with ESMTP
+	id hpqZu9Bk9MJQQhpqZuv0wZ; Fri, 01 Aug 2025 09:30:58 -0400
+X-ORIG-RCPT: davem@davemloft.net,edumazet@google.com,anthony.l.nguyen@intel.com,przemyslaw.kitszel@intel.com,kuba@kernel.org,andrew+netdev@lunn.ch,dhill@redhat.com,pabeni@redhat.com,netdev@vger.kernel.org
+X-Authority-Analysis: v=2.4 cv=CICJXgrD c=1 sm=1 tr=0 ts=688cc192
+ a=OPdtphJVnnJ7kPN51veEEg==:117 a=OPdtphJVnnJ7kPN51veEEg==:17
+ a=2OwXVqhp2XgA:10 a=20KFwNOVAAAA:8 a=QyXUC8HyAAAA:8 a=KgM5TV4k-OYgtHylTX4A:9
+Received: from knox.orion (unknown [192.168.1.37])
+	by zappa.orion (Postfix) with ESMTP id E21023FC;
+	Fri, 01 Aug 2025 09:30:18 -0400 (EDT)
+From: David Hill <dhill@redhat.com>
+To: netdev@vger.kernel.org
+Cc: anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	David Hill <dhill@redhat.com>
+Subject: [PATCH] PATCH: i40e Improve trusted VF MAC addresses logging when limit is reached
+Date: Fri,  1 Aug 2025 09:30:17 -0400
+Message-ID: <20250801133017.2107083-1-dhill@redhat.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250801090250-mutt-send-email-mst@kernel.org>
+Content-Transfer-Encoding: 8bit
+X-Binarystorm-MailScanner-Information: Please contact the ISP for more information
+X-Binarystorm-MailScanner-ID: E21023FC.A15A1
+X-Binarystorm-MailScanner: Found to be clean
+X-Binarystorm-MailScanner-SpamCheck: not spam, SpamAssassin (not cached,
+	score=-0.01, required 7, ALL_TRUSTED -0.01)
+X-Binarystorm-MailScanner-From: dhill@redhat.com
+X-CMAE-Envelope: MS4xfCKvs5SDCQBQxFoP8Uvt8RWwsKLq+7bwhCzr79jgLIfGDWx1Ajp+Mc/ESgR+xBGrCRPV5Aqzl++ZTf1e5LsQ9fUrIBrPC7+CPKbwv3++alkmwziktFWR
+ Ma/9PE3g0rxkkxz1P0hVJHCbeK0F0RBUIbr1bF0NUoUUQQTUAVN1jjGjAYfO2m6HGy+Z3NPSFVuY6AjRSml11qOG8Btq1gQXFDYSclKtEQmJencIr4sDV4yb
+ JWWTwyg/4+A9KG4JprRpKLs7Ckfgv/JjqwBPlrsajCcgY52an0l0FOw+RDVvJQK4vEMI24rZ0Pi9ZfCFR4Pz71Ytj9GcB3e9F3fFgxH6UVlhh9LaaMfcG8e3
+ SvBeATEK/9/2G6iQJlM3Y3Qm+wlr7R097pd2YYsW9T+kkNeStDIJMsATuwS92eFkpOLWg2gsN48IR+VFTibE84acUIiUbw==
 
-On Fri, Aug 01, 2025 at 09:03:35AM -0400, Michael S. Tsirkin wrote:
-> On Fri, Aug 01, 2025 at 07:00:32AM -0400, Michael S. Tsirkin wrote:
-> > The following changes since commit 347e9f5043c89695b01e66b3ed111755afcf1911:
-> > 
-> >   Linux 6.16-rc6 (2025-07-13 14:25:58 -0700)
-> > 
-> > are available in the Git repository at:
-> > 
-> >   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
-> > 
-> > for you to fetch changes up to c7991b44d7b44f9270dec63acd0b2965d29aab43:
-> > 
-> >   vsock/virtio: Allocate nonlinear SKBs for handling large transmit buffers (2025-07-17 08:33:09 -0400)
-> 
-> Oh no I am sorry! Please ignore, a bad commit snuck in there - it still
-> needs maintainer approval, and I forgot.
-> Will resend.
-> 
+When a VF reaches the limit introduced in this commit [1], the host reports
+an error in the syslog but doesn't mention which VF reached its limit and
+what the limit is actually is which makes troubleshooting of networking
+issue a bit tedious.   This commit simply improves this error reporting
+by adding which VF number has reached a limit and what that limit is.
 
-Sent v2 now.
-I wanted to apologize for this. I mistakenly put bad commits on the
-branch called "master" and when looking at "git log" I did not notice
-I was only looking at commits since "master" and not
-"origin/master".
+Signed-off-by: David Hill <dhill@redhat.com>
 
-I should have reviewed the list of changes in the email before
-sending, but as it's autogenerated as opposed the cover letter part
-that I write myself, I was focusing on the latter and missed the
-bad commits in the former. A less for me to remember to pay attention to that
-part, as well.
+[1] commit cfb1d572c986a39fd288f48a6305d81e6f8d04a3
+Author: Karen Sornek <karen.sornek@intel.com>
+Date:   Thu Jun 17 09:19:26 2021 +0200
+---
+ drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Thanks!
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+index 9b8efdeafbcf..dc0e7a80d83a 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+@@ -2953,7 +2953,8 @@ static inline int i40e_check_vf_permission(struct i40e_vf *vf,
+ 		    I40E_VC_MAX_MACVLAN_PER_TRUSTED_VF(pf->num_alloc_vfs,
+ 						       hw->num_ports)) {
+ 			dev_err(&pf->pdev->dev,
+-				"Cannot add more MAC addresses, trusted VF exhausted it's resources\n");
++				"Cannot add more MAC addresses, trusted VF %d uses %d out of %d MAC addresses\n", vf->vf_id, i40e_count_filters(vsi) +
++          mac2add_cnt, I40E_VC_MAX_MACVLAN_PER_TRUSTED_VF(pf->num_alloc_vfs,num_ports)));
+ 			return -EPERM;
+ 		}
+ 	}
+-- 
+2.50.1
 
-> > ----------------------------------------------------------------
-> > virtio, vhost: features, fixes
-> > 
-> > vhost can now support legacy threading
-> > 	if enabled in Kconfig
-> > vsock memory allocation strategies for
-> > 	large buffers have been improved,
-> > 	reducing pressure on kmalloc
-> > vhost now supports the in-order feature
-> > 	guest bits missed the merge window
-> > 
-> > fixes, cleanups all over the place
-> > 
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > 
-> > ----------------------------------------------------------------
-> > Alexandre Courbot (1):
-> >       media: add virtio-media driver
-> > 
-> > Alok Tiwari (4):
-> >       virtio: Fix typo in register_virtio_device() doc comment
-> >       vhost-scsi: Fix typos and formatting in comments and logs
-> >       vhost: Fix typos
-> >       vhost-scsi: Fix check for inline_sg_cnt exceeding preallocated limit
-> > 
-> > Anders Roxell (1):
-> >       vdpa: Fix IDR memory leak in VDUSE module exit
-> > 
-> > Cindy Lu (1):
-> >       vhost: Reintroduce kthread API and add mode selection
-> > 
-> > Dr. David Alan Gilbert (2):
-> >       vhost: vringh: Remove unused iotlb functions
-> >       vhost: vringh: Remove unused functions
-> > 
-> > Dragos Tatulea (2):
-> >       vdpa/mlx5: Fix needs_teardown flag calculation
-> >       vdpa/mlx5: Fix release of uninitialized resources on error path
-> > 
-> > Gerd Hoffmann (1):
-> >       drm/virtio: implement virtio_gpu_shutdown
-> > 
-> > Jason Wang (3):
-> >       vhost: fail early when __vhost_add_used() fails
-> >       vhost: basic in order support
-> >       vhost_net: basic in_order support
-> > 
-> > Michael S. Tsirkin (6):
-> >       virtio: document ENOSPC
-> >       pci: report surprise removal event
-> >       virtio: fix comments, readability
-> >       virtio: pack config changed flags
-> >       virtio: allow transports to suppress config change
-> >       virtio: support device disconnect
-> > 
-> > Mike Christie (1):
-> >       vhost-scsi: Fix log flooding with target does not exist errors
-> > 
-> > Pei Xiao (1):
-> >       vhost: Use ERR_CAST inlined function instead of ERR_PTR(PTR_ERR(...))
-> > 
-> > Viresh Kumar (2):
-> >       virtio-mmio: Remove virtqueue list from mmio device
-> >       virtio-vdpa: Remove virtqueue list
-> > 
-> > WangYuli (1):
-> >       virtio: virtio_dma_buf: fix missing parameter documentation
-> > 
-> > Will Deacon (9):
-> >       vhost/vsock: Avoid allocating arbitrarily-sized SKBs
-> >       vsock/virtio: Validate length in packet header before skb_put()
-> >       vsock/virtio: Move length check to callers of virtio_vsock_skb_rx_put()
-> >       vsock/virtio: Resize receive buffers so that each SKB fits in a 4K page
-> >       vsock/virtio: Rename virtio_vsock_alloc_skb()
-> >       vsock/virtio: Move SKB allocation lower-bound check to callers
-> >       vhost/vsock: Allocate nonlinear SKBs for handling large receive buffers
-> >       vsock/virtio: Rename virtio_vsock_skb_rx_put()
-> >       vsock/virtio: Allocate nonlinear SKBs for handling large transmit buffers
-> > 
-> >  MAINTAINERS                                |    6 +
-> >  drivers/gpu/drm/virtio/virtgpu_drv.c       |    8 +-
-> >  drivers/media/Kconfig                      |   13 +
-> >  drivers/media/Makefile                     |    2 +
-> >  drivers/media/virtio/Makefile              |    9 +
-> >  drivers/media/virtio/protocol.h            |  288 ++++++
-> >  drivers/media/virtio/scatterlist_builder.c |  563 ++++++++++++
-> >  drivers/media/virtio/scatterlist_builder.h |  111 +++
-> >  drivers/media/virtio/session.h             |  109 +++
-> >  drivers/media/virtio/virtio_media.h        |   93 ++
-> >  drivers/media/virtio/virtio_media_driver.c |  959 ++++++++++++++++++++
-> >  drivers/media/virtio/virtio_media_ioctls.c | 1297 ++++++++++++++++++++++++++++
-> >  drivers/pci/pci.h                          |    6 +
-> >  drivers/vdpa/mlx5/core/mr.c                |    3 +
-> >  drivers/vdpa/mlx5/net/mlx5_vnet.c          |   12 +-
-> >  drivers/vdpa/vdpa_user/vduse_dev.c         |    1 +
-> >  drivers/vhost/Kconfig                      |   18 +
-> >  drivers/vhost/net.c                        |   88 +-
-> >  drivers/vhost/scsi.c                       |   24 +-
-> >  drivers/vhost/vhost.c                      |  377 +++++++-
-> >  drivers/vhost/vhost.h                      |   30 +-
-> >  drivers/vhost/vringh.c                     |  118 ---
-> >  drivers/vhost/vsock.c                      |   15 +-
-> >  drivers/virtio/virtio.c                    |   25 +-
-> >  drivers/virtio/virtio_dma_buf.c            |    2 +
-> >  drivers/virtio/virtio_mmio.c               |   52 +-
-> >  drivers/virtio/virtio_pci_common.c         |   45 +
-> >  drivers/virtio/virtio_pci_common.h         |    3 +
-> >  drivers/virtio/virtio_pci_legacy.c         |    2 +
-> >  drivers/virtio/virtio_pci_modern.c         |    2 +
-> >  drivers/virtio/virtio_ring.c               |    4 +
-> >  drivers/virtio/virtio_vdpa.c               |   44 +-
-> >  include/linux/pci.h                        |   45 +
-> >  include/linux/virtio.h                     |   13 +-
-> >  include/linux/virtio_config.h              |   32 +
-> >  include/linux/virtio_vsock.h               |   46 +-
-> >  include/linux/vringh.h                     |   12 -
-> >  include/uapi/linux/vhost.h                 |   29 +
-> >  include/uapi/linux/virtio_ids.h            |    1 +
-> >  kernel/vhost_task.c                        |    2 +-
-> >  net/vmw_vsock/virtio_transport.c           |   20 +-
-> >  net/vmw_vsock/virtio_transport_common.c    |    3 +-
-> >  42 files changed, 4186 insertions(+), 346 deletions(-)
-> >  create mode 100644 drivers/media/virtio/Makefile
-> >  create mode 100644 drivers/media/virtio/protocol.h
-> >  create mode 100644 drivers/media/virtio/scatterlist_builder.c
-> >  create mode 100644 drivers/media/virtio/scatterlist_builder.h
-> >  create mode 100644 drivers/media/virtio/session.h
-> >  create mode 100644 drivers/media/virtio/virtio_media.h
-> >  create mode 100644 drivers/media/virtio/virtio_media_driver.c
-> >  create mode 100644 drivers/media/virtio/virtio_media_ioctls.c
+
+-- 
+This message has been scanned for viruses and
+dangerous content by MailScanner, and is
+believed to be clean.
 
 
