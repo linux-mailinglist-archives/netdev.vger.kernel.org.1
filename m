@@ -1,58 +1,80 @@
-Return-Path: <netdev+bounces-211373-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211374-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EC70B1864D
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 19:08:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06414B1868E
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 19:22:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 304B43B0EFF
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 17:08:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 357B317266B
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 17:22:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCB741DED47;
-	Fri,  1 Aug 2025 17:07:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAEB31DED47;
+	Fri,  1 Aug 2025 17:22:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uzdIPICz"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Gp/uKjh6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 972821DE3C8
-	for <netdev@vger.kernel.org>; Fri,  1 Aug 2025 17:07:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5213D8F66
+	for <netdev@vger.kernel.org>; Fri,  1 Aug 2025 17:22:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754068078; cv=none; b=kT1i+XLRgLmctdfQ9TtImV/o9DyvYP6CQihvJ+/pFbiLxtIfyetRMJzZWtlGm3nnGhFXthKWHUKRj2jvxDqb5sTxTHT337lfwg4V7JNTtUX+0B01hU3ueYtupVNnSjABHwph69nVKYnPuXaMeh9G7MxpSK/w4pnLGxs2ypDU0tU=
+	t=1754068971; cv=none; b=gEfHeLGlVgpAF1P+OqRkf5GCLlnT2ODSz55sLaxfpRWsBan0GVR/O4Sszb84qCZ3QiQyWe753qGVz9Jmf/pvl74dJ1Eh8774qiuEFJROUgF+6CmXFqNMKGf7I2dnXCHZWPg+mBR4niXH4KYKJDFsUwCY6hsHCLGRw9H9ZJj3D1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754068078; c=relaxed/simple;
-	bh=HyNyjzGPjk28Tm0TAXn34iMnyXtod/2OYBlYsMrTIoQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bftvyhWLNDHMBJwVj1hKW7HBoYxKFSpz+zq1+CJYXecyINej39xLjVBfE+OypOdkabH1iBe6CU36aoImK6rqc3xPvar8Tyh8e2IbnMtgh7ImsRYPdF5XhMG6NtaEhJkfEEQYY6QFvBOvcSa6hbOYtol0dssJGFXs7mWiBxnZMzU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uzdIPICz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2CA3C4CEE7;
-	Fri,  1 Aug 2025 17:07:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754068077;
-	bh=HyNyjzGPjk28Tm0TAXn34iMnyXtod/2OYBlYsMrTIoQ=;
-	h=From:To:Cc:Subject:Date:From;
-	b=uzdIPICzYz3ma5z5klTnOmAYEPIQVoHN9cKlDp52KWIzsHMFmFMkypTsuYg67C4Pm
-	 qfQ9kn3Lw5N69H1UMph3/IL93+YidfSlZzu3GN1N1CV30TaWtAd9zykkAEIzJ+hjIJ
-	 fDk9dBAaorM5ATULTK3kBp05FgfR7ggJMF+iXcY7/PaSg/lOe6ADUVlIeWZ9sOoiAh
-	 RGRe9Is1xAUmPC17pP/FMD2nbAV8Jr5uJpcGyywONzzYa/iUyWnOZ6QPxg44AhaWnl
-	 F+OdReWyU8o5LjFCF29A9gbpVqxamX5NbpWaa1Msi0xQlsJgnmiZtvYw+EBgatFSw9
-	 ZW9vRkx5M1x1g==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
+	s=arc-20240116; t=1754068971; c=relaxed/simple;
+	bh=C2Y43f8+A0TYviky8U5IL18doPyRUKbyPM4d177ATTE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Hz2u1ovmY33IaA6sMwh71G6EOlbOhuspKYfns2sOWNZWQjLjbboWdsJyH/rEIbJT9rivR14T+6E5dkVohUah3EWKTXvjvhUxiJxJ8A87+YpawiOLMIT/wMY/nU9ptBKypqhdZP9YNgGHIaku2dZNkvWZro3P8X3Mw6c2m9rt6d0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Gp/uKjh6; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1754068970; x=1785604970;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=C2Y43f8+A0TYviky8U5IL18doPyRUKbyPM4d177ATTE=;
+  b=Gp/uKjh64CUR4+bhdFyrXuEZDDLliDsL1DzlYd84GO7ePZN2spNB855q
+   qVSayIwRGXiasOCnceQATFQezP9rveMGN650z+lA8LkOaQtOaRE51dT9Z
+   t8RB3RdKH+dexcFqueABSgVqdXYiOhicZLJphTEtXV8H6/w89d7tsbSpm
+   96M/+PKbcbtCL25Ld2ZP358BPyMv6U+K1fVtRAmadH/8GNeZIlDjCqgsl
+   pgH26/GFFYe7nmnDPwz1IORlO104puiXZkkjDuMzfNeHdJtK56VUM4wFn
+   iHrXsvvYFoqctP51C5SOvBlVF1jXdJaPeV7Teq0BToNMSKQQA7LAn7Ews
+   A==;
+X-CSE-ConnectionGUID: hxOSpZZbSyKc3V5dhviwgQ==
+X-CSE-MsgGUID: W4xhZa8YRgKtpNTd9mz98Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11508"; a="59044377"
+X-IronPort-AV: E=Sophos;i="6.17,255,1747724400"; 
+   d="scan'208";a="59044377"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2025 10:22:49 -0700
+X-CSE-ConnectionGUID: xvQF6/tiS0Ok3ogbWiWd0g==
+X-CSE-MsgGUID: ppxpXdXcS4GeAl5TC5YwEw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,255,1747724400"; 
+   d="scan'208";a="168915243"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by fmviesa004.fm.intel.com with ESMTP; 01 Aug 2025 10:22:49 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
 	pabeni@redhat.com,
+	edumazet@google.com,
 	andrew+netdev@lunn.ch,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	jedrzej.jagielski@intel.com,
+	przemyslaw.kitszel@intel.com,
+	jiri@resnulli.us,
 	horms@kernel.org,
-	alexanderduyck@fb.com,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net] eth: fbnic: remove the debugging trick of super high page bias
-Date: Fri,  1 Aug 2025 10:07:54 -0700
-Message-ID: <20250801170754.2439577-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.50.1
+	David.Kaplan@amd.com,
+	dhowells@redhat.com
+Subject: [PATCH net 0/2][pull request] ixgbe: stop interface name changes
+Date: Fri,  1 Aug 2025 10:22:36 -0700
+Message-ID: <20250801172240.3105730-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,59 +83,25 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Alex added page bias of LONG_MAX, which is admittedly quite
-a clever way of catching overflows of the pp ref count.
-The page pool code was "optimized" to leave the ref at 1
-for freed pages so it can't catch basic bugs by itself any more.
-(Something we should probably address under DEBUG_NET...)
+Jedrzej adds the option to not rename devlink ports and opts ixgbe into
+this as some configurations rely on pre-devlink naming which could end up
+broken as a result of the renaming.
 
-Unfortunately for fbnic since commit f7dc3248dcfb ("skbuff: Optimization
-of SKB coalescing for page pool") core _may_ actually take two extra
-pp refcounts, if one of them is returned before driver gives up the bias
-the ret < 0 check in page_pool_unref_netmem() will trigger.
+The following are changes since commit 01051012887329ea78eaca19b1d2eac4c9f601b5:
+  netlink: specs: ethtool: fix module EEPROM input/output arguments
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue 10GbE
 
-While at it add a FBNIC_ to the name of the driver constant.
+Jedrzej Jagielski (2):
+  devlink: allow driver to freely name interfaces
+  ixgbe: prevent from unwanted interface name changes
 
-Fixes: 0cb4c0a13723 ("eth: fbnic: Implement Rx queue alloc/start/stop/free")
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- drivers/net/ethernet/meta/fbnic/fbnic_txrx.h | 6 ++----
- drivers/net/ethernet/meta/fbnic/fbnic_txrx.c | 4 ++--
- 2 files changed, 4 insertions(+), 6 deletions(-)
+ drivers/net/ethernet/intel/ixgbe/devlink/devlink.c | 1 +
+ include/net/devlink.h                              | 7 ++++++-
+ net/devlink/port.c                                 | 3 +++
+ 3 files changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
-index 2e361d6f03ff..34693596e5eb 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
-@@ -91,10 +91,8 @@ struct fbnic_queue_stats {
- 	struct u64_stats_sync syncp;
- };
- 
--/* Pagecnt bias is long max to reserve the last bit to catch overflow
-- * cases where if we overcharge the bias it will flip over to be negative.
-- */
--#define PAGECNT_BIAS_MAX	LONG_MAX
-+#define FBNIC_PAGECNT_BIAS_MAX	PAGE_SIZE
-+
- struct fbnic_rx_buf {
- 	struct page *page;
- 	long pagecnt_bias;
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-index ac11389a764c..f9543d03485f 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-@@ -661,8 +661,8 @@ static void fbnic_page_pool_init(struct fbnic_ring *ring, unsigned int idx,
- {
- 	struct fbnic_rx_buf *rx_buf = &ring->rx_buf[idx];
- 
--	page_pool_fragment_page(page, PAGECNT_BIAS_MAX);
--	rx_buf->pagecnt_bias = PAGECNT_BIAS_MAX;
-+	page_pool_fragment_page(page, FBNIC_PAGECNT_BIAS_MAX);
-+	rx_buf->pagecnt_bias = FBNIC_PAGECNT_BIAS_MAX;
- 	rx_buf->page = page;
- }
- 
 -- 
-2.50.1
+2.47.1
 
 
