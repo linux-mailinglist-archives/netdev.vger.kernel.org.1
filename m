@@ -1,83 +1,113 @@
-Return-Path: <netdev+bounces-211389-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211390-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88DDFB18815
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 22:23:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 809F9B1881C
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 22:28:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 727684E01CC
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 20:23:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B0B705443DE
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 20:28:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D9B0219A6B;
-	Fri,  1 Aug 2025 20:23:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BAC621B9E0;
+	Fri,  1 Aug 2025 20:28:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="epPK9Djq"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="AD7/PbQs"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 425B0128395;
-	Fri,  1 Aug 2025 20:23:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A666A21ABC9
+	for <netdev@vger.kernel.org>; Fri,  1 Aug 2025 20:28:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754079824; cv=none; b=qHnEN3CjsSpGM8SBQhbdTBumTFazhDQ2WA5uUkVidpbpwZ6ZKi9e2CYnGKFYJt9xYq2rzQjib6h2GDOlpXJ1423JUgucFLvTRbSodr0Z87pMLCpTYVuxZoOy8jaBRODezh/oCueUdCftIuzCtb1RRs9A+SJqQt02KH7TJeZ7y4E=
+	t=1754080103; cv=none; b=d62cG3C9rnajcxYDhmt3NMYdBWA1sMgeppSkNJew7A27+/pkivlePz1PNfklcZY1xROs6YTQ/ppeUJ6ijjWq5IA26KC5OhCHCDiJt4lOfQuF5wcZNYGlO4hRdcJPyWWwSqT5e2UkILrQZ0RPYXlTrVtVW9yIj2VEKjXaR1+Av40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754079824; c=relaxed/simple;
-	bh=fthQXt9de8h8yk9ZNeBmjvQawcLsRN2+7oIi0y/MFLU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=poXyyCwjyJtie1otEpDxRKD3bWR65LBZzIZc/DVaOMVMScd1RNRzwQ65PURBMu50JnbEA+04hGpxOc6HA6lJVjDdOmoacDR9Lzyp4c+FOEDmoXwGp4mGPQAxVbYIU7sNy4jobooZ1MEjorympcBrWsGUQ8DAJPml6pTYl5WSmOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=epPK9Djq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52C50C4CEE7;
-	Fri,  1 Aug 2025 20:23:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754079823;
-	bh=fthQXt9de8h8yk9ZNeBmjvQawcLsRN2+7oIi0y/MFLU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=epPK9DjqPFPZwUy7ZfxPxj1AefCIJotbQdbjwGdKwB8rR65nFG/3+cTBFsfCXtfwm
-	 afyW+OGvVwMBA3F0dgz8acatyXck35cURqwgIYLo18EqjvwCAMPR0ce+gfRFu02aCV
-	 5FirFRi5qIT34G0l/Wj/CELNJMuxNANtaHW4m10ETKqxbH5RYIW15dezK+DEooG5Pp
-	 S3xPY6HSLxV6fqpjKOh0CsTtgRmcbLVSaie88gigNxAGfflmrpSDJPn4vWXd9o2/ub
-	 vQRidU1k/4rTnjxaqiWL5Qyr7ipYLML0p9GoMgPKpfwCK01wPVb4sZZXaHQOxgTjPX
-	 2Ai+ZRth0KozA==
-Date: Fri, 1 Aug 2025 13:23:42 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Carolina Jubran <cjubran@nvidia.com>
-Cc: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Saeed Mahameed
- <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Mark Bloch
- <mbloch@nvidia.com>, Richard Cochran <richardcochran@gmail.com>,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 0/3] Support exposing raw cycle counters in PTP
- and mlx5
-Message-ID: <20250801132342.6ad4303b@kernel.org>
-In-Reply-To: <c52004ea-16dd-4131-b58a-4a7f7c6be758@nvidia.com>
-References: <1752556533-39218-1-git-send-email-tariqt@nvidia.com>
-	<20250721170916.490ce57e@kernel.org>
-	<0c1cea33-6676-4590-8c7c-9fe1a3d88f0b@nvidia.com>
-	<20250729154012.5d540144@kernel.org>
-	<c52004ea-16dd-4131-b58a-4a7f7c6be758@nvidia.com>
+	s=arc-20240116; t=1754080103; c=relaxed/simple;
+	bh=4ib4+xzsHC1/0TZhWE3BN4v1BckJxywhLUIMY9sPQWg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Df9uJ7c+74Bv9yuCJYT9KwZ3lmbYOjO0BMaj1+eMeFaBnJOKHUnxoArHq6uo04yh1/Aeguy/2vl6X+7j9A2fSplWoQ5ZJNgUZFiVT42ShjFovTDeMBo+DT3LYRsPTYV7PHfmi3OScvWYcTe2NweRwedg2hMmEZo6sfnyxfbBWwc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=AD7/PbQs; arc=none smtp.client-ip=91.218.175.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <7e995c4d-8245-4e47-88fb-6a735dbc0dda@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1754080100;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9HGI5G6xJ5gNX1PxU74iWvEIs3HCLmfr9kJA+OqtV40=;
+	b=AD7/PbQs7GfdEHxJLn0x2lH4HKdmbtOyabwBdhMLWEyeBLlx66GYyQeUv9sengG0PMOrjm
+	EJnQQoMM/lgTEHwwECiKyQY3lsW0sQlVl4mowjvb6bwwWZzYGY3WyXlYIBaMMLv58Bh73M
+	eHTOjVfq9lw8E+zxgsGjZtPs8tJDu0o=
+Date: Fri, 1 Aug 2025 21:28:17 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [RFC PATCH v2] ethtool: add FEC bins histogramm report
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Michael Chan <michael.chan@broadcom.com>,
+ Pavan Chebbi <pavan.chebbi@broadcom.com>, Tariq Toukan <tariqt@nvidia.com>,
+ Gal Pressman <gal@nvidia.com>, intel-wired-lan@lists.osuosl.org,
+ Donald Hunter <donald.hunter@gmail.com>, Carolina Jubran
+ <cjubran@nvidia.com>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
+References: <20250731231019.1809172-1-vadfed@meta.com>
+ <20250801130648.341995ba@kernel.org>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20250801130648.341995ba@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, 31 Jul 2025 22:03:02 +0300 Carolina Jubran wrote:
-> Additionally, I wanted to mention another relevant use case that wasn=E2=
-=80=99t=20
-> brought up earlier: fwctl can expose event records tagged with raw cycle=
-=20
-> counter timestamps. When the device is in free-running mode, correlating=
-=20
-> those with host time becomes difficult unless user space has access to=20
-> both cycle and system time snapshots.
+On 01/08/2025 21:06, Jakub Kicinski wrote:
+> On Thu, 31 Jul 2025 16:10:19 -0700 Vadim Fedorenko wrote:
+>> - remove sentinel (-1, -1) and use (0, 0) as common array break.
+>>    bin (0, 0) is still possible but only as a first element of
+>>    ranges array
+> 
+> I don't see this change in the diff? It's still -1,-1
+> 
+> Also, not seeing per-lane support here.
 
-Okay, so DPDK and DOCA, got it.
+My bad, didn't commit after testing :(
+I'll wait 24h and submit v3...
+
+
+>> diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
+>> index 1063d5d32fea2..69779b51f1dfd 100644
+>> --- a/Documentation/netlink/specs/ethtool.yaml
+>> +++ b/Documentation/netlink/specs/ethtool.yaml
+>> @@ -1239,6 +1239,30 @@ attribute-sets:
+>>           name: corr-bits
+>>           type: binary
+>>           sub-type: u64
+>> +      -
+>> +        name: hist
+>> +        type: nest
+>> +        multi-attr: True
+>> +        nested-attributes: fec-hist
+>> +      -
+>> +        name: fec-hist-bin-low
+>> +        type: uint
+>> +      -
+>> +        name: fec-hist-bin-high
+>> +        type: uint
+> 
+> The bounds can be u32, TBH. The value really is a u16 but we don't want
+> to waste space on padding in Netlink. Still, no need to go all the way
+> to uint.
+
+Got it
+
+>> +        name: fec-hist-bin-val
+>> +        type: uint
+
 
