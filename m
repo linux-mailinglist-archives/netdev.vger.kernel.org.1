@@ -1,371 +1,126 @@
-Return-Path: <netdev+bounces-211371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211372-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81C55B185FD
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 18:47:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D8D5B1861F
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 19:00:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 895CE189810D
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 16:47:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E6FD62558A
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 17:00:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23B2F1CD208;
-	Fri,  1 Aug 2025 16:46:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC0B91C3BE0;
+	Fri,  1 Aug 2025 17:00:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="V1W1dXQ9"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="BdKQwNse"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 477841C863B
-	for <netdev@vger.kernel.org>; Fri,  1 Aug 2025 16:46:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37F461A08CA
+	for <netdev@vger.kernel.org>; Fri,  1 Aug 2025 17:00:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754066811; cv=none; b=Hq3J+MeSwhlK5aa3xqd7r+2jV3htE9tyRvxRgbwZGkOW+gLO+n6aq1/OpjTwaAtWMLoCAuCPXWF51iT3c2fpdbg7u8GKaUyDp0PsIYnMmWlxfKlRVEVi5+R5gS+lcv+bAoj5e6kGqTEyZfVHiIUmcMuhcRgFjwkNFkKmqzVQxP4=
+	t=1754067618; cv=none; b=GIn8WZj/+P/fw8SQi+VB/UPCw/0cjfcfesmHbuDRE1MgeNkrnaTBbffibkfjdC8Av+iaCj2mVur+TZV4Zg6RGwiUIURK8QpzKKPDttaP1WIKUA5q18bIT0pXVRiTJRwSxtUvZcOYcqLlcqHE7VJSgOctBvg/wN32rBPXGh5d+gs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754066811; c=relaxed/simple;
-	bh=5osWWsY6f3oevs5SRLlQcPTuE1vcvjPPIbSKd8+JQhw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IZqU6Dr8rzGGNco3RyZgc85gSFSeVwXyNDKneR+Ptsc8dBfk7Pbst1/xDpDr7ReIsXUg5l9MaMzTJuWJfecO0pPIbVLZ7cPZvEd8ifxohYQOuLNbZl8oHfA+AAYvfZxRKVQuR2i96R+8bXO6RXX1ciBaUg6yzvp9rUjUrELtblw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=V1W1dXQ9; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-76a3818eb9bso1110514b3a.3
-        for <netdev@vger.kernel.org>; Fri, 01 Aug 2025 09:46:49 -0700 (PDT)
+	s=arc-20240116; t=1754067618; c=relaxed/simple;
+	bh=ixzhB2IWkCoD0F1aKbqXUptaL4fTvucgYZy4AJNb4ck=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KU2LGDPjW+ThQh7nHxYezBrQEOMt9WznYyKY15GzyTG2LbQGhllUMTDH3ER6oFokKf9Rx7NuhKsijuubaItwjpb4M5ldU0AU4/TZVI5cn9oNqao3nU5SFsvOXjyBWW4vIJWO2kg6q5rmdU34fItpd71fg8X9FPKUt2wMa/bhdRA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=BdKQwNse; arc=none smtp.client-ip=209.85.222.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-7e2c920058fso339032785a.0
+        for <netdev@vger.kernel.org>; Fri, 01 Aug 2025 10:00:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754066808; x=1754671608; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OMogduaZqJf0tVoGWvKahCM4C1msXsOSuSwXjLBFk2s=;
-        b=V1W1dXQ9xsyUZltU9ONc5fh3e5ng1VIOIJoxiO2SenzCynce78AsDESo2dcQ7yS6LC
-         91SmmGspInF0gOa6jRF9frU2JhlSPGiviGZyCI6ncEiUVQyjn7iXzVVIjjRVmBan7fhO
-         qZ8mZrSDkYW99hqceMbOPt/SS8HliwZck7zqzu3hqQ3OUXuRMOAFwW1pKnFaXp0lUKJO
-         CasU8+Ud0hEl7KNDlpHmGWXBGsO8BVilBb5dpX61ZiIIJWmMSkcaCY3W7NtGLOA4MlEu
-         pVQCNYF09rMn2w/lF8fJfMkcywPXNoxfDjhzJgNP9i64Jx3AEnlsFBPRlVyFkW4svjCH
-         g/qg==
+        d=ziepe.ca; s=google; t=1754067616; x=1754672416; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=QwE+9sTgjNRdMVVYO7khCffe4vKwvJxjH8fF2V6zz5I=;
+        b=BdKQwNse6pRrj/tOebPDpz5/au+yyTJVkZhAEihoTdxL5JLbjUtin2tHbPSdTwKDZS
+         k+nbnR1YyNnEWE8XAyHqo/lk5tgdlq97oe48JGWIFhhLeW/O/XOGnF2T7ItGvxs7mKpc
+         Hm2g2aS06SNiMrrCVcq9jnvLV0FryY1hWIcL9ksE516v2sOnS7IirX5sA9n7oWY4PFMV
+         97zLmaElZJ+G4Its4Z6Lol3SZJAjPJ3WM5DHoLxE+N4HD9/9nMTTqhml9kpWsJV5C/u1
+         GOQy3m1WTTy+cUzJqdHSZO7bNxEXRa/olGZufNJvzFSbbTHt9DWg9/K4vUiBF5NUxitL
+         J71g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754066808; x=1754671608;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OMogduaZqJf0tVoGWvKahCM4C1msXsOSuSwXjLBFk2s=;
-        b=RPvd6cnj65MqO6Z4ONIanMi+SK7rHwGTGHy/PkO/sqfz+oBm7QP6WpQhdJoH/SGc5D
-         SVeIRar65UYaLkrM4xbgGLHSgys1rbO7Y4r+krZHc8StqSbGuLpsUYmDxVUs3jL49t/4
-         4SDzqEUxRd+XRYnI+gH28RBtxJ3b0o1IWbqUrQotUVAYsvk5de0fWo4Pxf0wv//+ybjH
-         snsoy/uji1JgNwz0M1/f5jRsEgAFz0I52TmRWEjs33T+3ofd1TNQDBx2/aMvzVrqMrIO
-         uqgp0Pht7ey2P4F1sv8ANHryhMFNdAnwWgYwYYZxq5qRzj3OSLzFScpzREyn1oYrGOQt
-         mwBA==
-X-Forwarded-Encrypted: i=1; AJvYcCWpNtgE9tBa6Ln+ct4Kn6knZdEIaSyzE+dpF9Sdpf2obtdfWGJdKT7OBptKSXlX/6Q9LFluP24=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxvqmJ1WP1lsMz+XP2jhX6EgbvWksHD9eG2w+vrgHIfIeqFiI9T
-	tCm7Vmd/xiYGahdzgk2AvuofcusAeYiSieV8lWqpjGfhNdi8kEnQSKilu2uzhXb4LsAuJY9fVI2
-	75NtbUJcT/ojnPTRiq4jhIwTacfXN9Ear4i1fmRBa
-X-Gm-Gg: ASbGncvzOBX8TrgwNW/QnU4klJpDRFjFU8sPElQ3SgcIakvPkCwDgsDM+a0fTN9vShQ
-	IkGtnQ/eY2pP6XZXMZomKyRqVlk1N5dBWldlZ4GG5/pDRHl5nTKHfJ34GEiBxa3D+dRgnD5SunA
-	IDkjlmwHbf31MvTkKe7LCf5sfTL+31jpDJj9VrQRhK2KNbOpQmfh9ivbNZiMfYH0nmmwjWk3p71
-	wEnHzWdb6RZ8dny1p+Uos+85Ga1V5yhL8ZwDzBG
-X-Google-Smtp-Source: AGHT+IFEwpZvnPSfLoN+JYo94UY1/WHDgCraPCEohzoaPzmI/BMQTIf6t0YHUkVbuWkRGynViCwdp7ew0BYFfa3k+40=
-X-Received: by 2002:a05:6a20:7347:b0:23d:f079:60ec with SMTP id
- adf61e73a8af0-23df9141427mr498222637.37.1754066808305; Fri, 01 Aug 2025
- 09:46:48 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1754067616; x=1754672416;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QwE+9sTgjNRdMVVYO7khCffe4vKwvJxjH8fF2V6zz5I=;
+        b=QlUgMgOgPGzk69YeZ/+lqePK/ye/jdXvnwYV+ji3iaJsMVnvZQtvMrhSf28s1VgUMa
+         YjiwANCuC9mKVXQxAU2i/cCHyae6I5yT64lCzwBuTPmJeRcnDMg9WVm3HbLxEFMDlDkB
+         ZMqQztL54xqDR36Tm3JLSgEjNveti1DoY/oFM1x5Vid7uxNc3/3dqaRQt5aozYnSMk0i
+         TWX2tPHA0QNHiHiExkX2tV9NobzCuRvZCo0PULdW5p/xIvtOQWaj9UFrDTiMXZeDRRvL
+         aXF9OEjgrvBfTPUWuBXRQmHhJAkMmNEeaebNdHHu+a1QXeIbomDc2rjg6p8HL0z/2n3s
+         WbuA==
+X-Forwarded-Encrypted: i=1; AJvYcCUrde3X1S4WScsCCGxIKHoHWW2T/eFMRT+HIJL3XIOxCZu4mI6VNxwDPTtGkkr+Q4/PFShbqSQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZkxLwVXhpN3Z+boWz54m89PkHjt8+rDcijKUvPQSeZ6gZFnOi
+	5difUA0I3CKwU7Astus2jvsat5y4Wo+PtsuP2zb2OX/IQNLmQr9LWv9JBUWj0PKGLLA=
+X-Gm-Gg: ASbGnctUaw65+iOEZuMpU3aE5eNQR4mj8ltszD6OknbUtjhOBv3AYIj+TVZndO9uJAF
+	ocFXR5jueaHUyBW093aj+B0K+b+rdENUruFgBw7x+ywc5EnwBsioxa9EeCAQNYVrPDtO6c8gjqo
+	VgBggdcAicBtCdmMARF0F7rjwur7pQuawiS4e1v4C0H8vDfk2uwZq+AilLpxWABvmvXZUgO/83a
+	lpjYbF0DRrjN8vuEBB5ddIOh/WPxgSS6YIvbEAsvlhbPp2z6hwAJ9rckeGpA4gu83XhyO+8bQDC
+	qJnfmHt5xMvHqmSRIOpYUyL8XOI5Ts1rf1YVh9msfDDTSfHMHrFq8G7jg+yZ3UZtFlPy3l2tWAR
+	PGmqclpQBeHs7ZxB6iNP/T1PUS938LFVO+W/2/ZM6W9fcLc95BAnaCByZpSuRoQGXCo4i6PuaZ7
+	SScTs=
+X-Google-Smtp-Source: AGHT+IGeo72sFurahqpXhqOszMWIFx1nBofLsBki44tDG5x4fiYUv0PBxN8jfJdDWgnL5yoXO3nTZg==
+X-Received: by 2002:ae9:f10d:0:b0:7e6:5f1c:4d78 with SMTP id af79cd13be357-7e696650ea8mr57651285a.33.1754067616031;
+        Fri, 01 Aug 2025 10:00:16 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-47-55-120-4.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.120.4])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7e67f75c053sm235155785a.81.2025.08.01.10.00.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Aug 2025 10:00:15 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1uht78-000000013Jb-2qVs;
+	Fri, 01 Aug 2025 14:00:14 -0300
+Date: Fri, 1 Aug 2025 14:00:14 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Simon Horman <horms@kernel.org>
+Cc: Abhijit Gangurde <abhijit.gangurde@amd.com>, shannon.nelson@amd.com,
+	brett.creeley@amd.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net, leon@kernel.org,
+	andrew+netdev@lunn.ch, allen.hubbe@amd.com, nikhil.agarwal@amd.com,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 03/14] net: ionic: Export the APIs from net driver to
+ support device commands
+Message-ID: <20250801170014.GG26511@ziepe.ca>
+References: <20250723173149.2568776-1-abhijit.gangurde@amd.com>
+ <20250723173149.2568776-4-abhijit.gangurde@amd.com>
+ <20250725164106.GI1367887@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250801090949.129941-1-dongml2@chinatelecom.cn>
- <CANn89i+1-geie7HrSmZeU-OvT-aDJabbtcwrZaHr-1S16yuRZw@mail.gmail.com> <CADxym3Y2B+mcR6E_VYowE1VvCsa6X15RieOAr2nEofOswf_qfA@mail.gmail.com>
-In-Reply-To: <CADxym3Y2B+mcR6E_VYowE1VvCsa6X15RieOAr2nEofOswf_qfA@mail.gmail.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Fri, 1 Aug 2025 09:46:37 -0700
-X-Gm-Features: Ac12FXxkLrmiLcpeN8amCoGgfAsHLBVxYdE4e3TWNFSN7GdApxWXwM0Q-sic8vE
-Message-ID: <CAAVpQUC7HkbpVjYdG0q17uwXw0mH8z1nutyKyGcH9YD-CTwH6A@mail.gmail.com>
-Subject: Re: [PATCH net v2] net: ip: order the reuseport socket in __inet_hash
-To: Menglong Dong <menglong8.dong@gmail.com>
-Cc: Eric Dumazet <edumazet@google.com>, kraig@google.com, ncardwell@google.com, 
-	davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, 
-	horms@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250725164106.GI1367887@horms.kernel.org>
 
-On Fri, Aug 1, 2025 at 3:42=E2=80=AFAM Menglong Dong <menglong8.dong@gmail.=
-com> wrote:
->
-> On Fri, Aug 1, 2025 at 5:46=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
- wrote:
-> >
-> > On Fri, Aug 1, 2025 at 2:09=E2=80=AFAM Menglong Dong <menglong8.dong@gm=
-ail.com> wrote:
-> > >
-> > > For now, the socket lookup will terminate if the socket is reuse port=
- in
-> > > inet_lhash2_lookup(), which makes the socket is not the best match.
-> > >
-> > > For example, we have socket1 and socket2 both listen on "0.0.0.0:1234=
-",
-> > > but socket1 bind on "eth0". We create socket1 first, and then socket2=
-.
-> > > Then, all connections will goto socket2, which is not expected, as so=
-cket1
-> > > has higher priority.
-> > >
-> > > This can cause unexpected behavior if TCP MD5 keys is used, as descri=
-bed
-> > > in Documentation/networking/vrf.rst -> Applications.
-> > >
-> > > Therefore, we compute a score for the reuseport socket and add it to =
-the
-> > > list with order in __inet_hash(). Sockets with high score will be add=
-ed
-> > > to the head.
-> > >
-> > > Link: https://lore.kernel.org/netdev/20250731123309.184496-1-dongml2@=
-chinatelecom.cn/
-> > > Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
-> >
-> > You forgot a Fixes: tag, and a selftest.
->
-> I was not sure if it should be a Fixes, I'll add it in the next version.
-> Kuniyuki's test case is nice. Should I put the selftests in the
-> commit log?
+On Fri, Jul 25, 2025 at 05:41:06PM +0100, Simon Horman wrote:
+> On Wed, Jul 23, 2025 at 11:01:38PM +0530, Abhijit Gangurde wrote:
+> > RDMA driver needs to establish admin queues to support admin operations.
+> > Export the APIs to send device commands for the RDMA driver.
+> > 
+> > Reviewed-by: Shannon Nelson <shannon.nelson@amd.com>
+> > Signed-off-by: Abhijit Gangurde <abhijit.gangurde@amd.com>
+> 
+> Hi Abhijit,
+> 
+> Perhaps I misunderstand things, or otherwise am on the wrong track here.
+> But this seems to open the possibility of users of ionic_adminq_post_wait(),
+> outside the Ethernet driver, executing a wide range or admin commands.
+> It seems to me that it would be nice to narrow that surface.
 
-The python example is handy and easy to understand the
-issue, so feel free to add it to the commit log if needed.
+The kernel is monolithic, it is not normal to spend performance
+aggressively policing APIs.
 
-But please add a separate patch to add a test under
-tools/testing/selftest/net/.
+mlx5 and other drivers already have interfaces almost exactly like this.
 
-It will help us not introduce regression in the future as it's
-run for each patch by NIPA CI.
-
-
->
-> >
-> > > ---
-> > > v2:
-> > > - As Kuniyuki advised, sort the reuseport socket in __inet_hash() to =
-keep
-> > >   the lookup for reuseport O(1)
-> >
-> > Keeping sorted the list is difficult, we would have to intercept
-> > SO_BINDTODEVICE, SO_BINDTOIFINDEX, SO_INCOMING_CPU.
-> >
-> > This also makes the patch risky to backport to stable versions,
-> > because it is complex and possibly buggy.
-> >
-> > Therefore I prefer your first approach.
->
-> Kuniyuki also has a similar patch:
-> https://lore.kernel.org/netdev/CADxym3ZY7Lm9mgv83e2db7o3ZZMcLDa=3DvDf6nJS=
-s1m0_tUk5Bg@mail.gmail.com/T/#m56ee67b2fdf85ce568fd1339def92c53232d5b49
->
-> Will his be better and stable? Kuniyuki say the first approach
-> kill the O(1) lookup for reuseport socket :/
-
-At least your compute_reuseport_score() is wrong;
-so_incoming_cpu is not considered to group reuseport
-sockets, it does not take wildcard and ipv6_only into
-account, etc..
-
-And I agree this is net-next material, a bit risky to backport.
-
-Once net-next is open, I'll follow up to restore the O(1)
-lookup with a few more patches to handle corner cases
-that I mentioned in v1 thread.
-
->
-> Anyway, I'll send a V3 with the first approach, and with
-> the Fixes + selftests
-
-nit: The subject prefix should start with "tcp:" as UDP
-and SCTP do not seem to have this issue.
-
-
->
-> Thanks!
-> Menglong Dong
->
-> >
-> > > ---
-> > >  include/linux/rculist_nulls.h | 34 ++++++++++++++++++++++++
-> > >  include/net/sock.h            |  5 ++++
-> > >  net/ipv4/inet_hashtables.c    | 49 ++++++++++++++++++++++++++++++++-=
---
-> > >  3 files changed, 84 insertions(+), 4 deletions(-)
-> > >
-> > > diff --git a/include/linux/rculist_nulls.h b/include/linux/rculist_nu=
-lls.h
-> > > index 89186c499dd4..da500f4ae142 100644
-> > > --- a/include/linux/rculist_nulls.h
-> > > +++ b/include/linux/rculist_nulls.h
-> > > @@ -52,6 +52,13 @@ static inline void hlist_nulls_del_init_rcu(struct=
- hlist_nulls_node *n)
-> > >  #define hlist_nulls_next_rcu(node) \
-> > >         (*((struct hlist_nulls_node __rcu __force **)&(node)->next))
-> > >
-> > > +/**
-> > > + * hlist_nulls_pprev_rcu - returns the element of the list after @no=
-de.
-> > > + * @node: element of the list.
-> > > + */
-> > > +#define hlist_nulls_pprev_rcu(node) \
-> > > +       (*((struct hlist_nulls_node __rcu __force **)&(node)->pprev))
-> > > +
-> > >  /**
-> > >   * hlist_nulls_del_rcu - deletes entry from hash list without re-ini=
-tialization
-> > >   * @n: the element to delete from the hash list.
-> > > @@ -145,6 +152,33 @@ static inline void hlist_nulls_add_tail_rcu(stru=
-ct hlist_nulls_node *n,
-> > >         }
-> > >  }
-> > >
-> > > +/**
-> > > + * hlist_nulls_add_before_rcu
-> > > + * @n: the new element to add to the hash list.
-> > > + * @next: the existing element to add the new element before.
-> > > + *
-> > > + * Description:
-> > > + * Adds the specified element to the specified hlist
-> > > + * before the specified node while permitting racing traversals.
-> > > + *
-> > > + * The caller must take whatever precautions are necessary
-> > > + * (such as holding appropriate locks) to avoid racing
-> > > + * with another list-mutation primitive, such as hlist_nulls_add_hea=
-d_rcu()
-> > > + * or hlist_nulls_del_rcu(), running on this same list.
-> > > + * However, it is perfectly legal to run concurrently with
-> > > + * the _rcu list-traversal primitives, such as
-> > > + * hlist_nulls_for_each_entry_rcu(), used to prevent memory-consiste=
-ncy
-> > > + * problems on Alpha CPUs.
-> > > + */
-> > > +static inline void hlist_nulls_add_before_rcu(struct hlist_nulls_nod=
-e *n,
-> > > +                                             struct hlist_nulls_node=
- *next)
-> > > +{
-> > > +       WRITE_ONCE(n->pprev, next->pprev);
-> > I do not think WRITE_ONCE() is necessary here, @n is private to this cp=
-u,
-> > and following rcu_assign_pointer() has the needed barrier.
-> >
-> > > +       n->next =3D next;
-> > > +       rcu_assign_pointer(hlist_nulls_pprev_rcu(n), n);
-> > > +       WRITE_ONCE(next->pprev, &n->next);
-> > > +}
-> > > +
-> > >  /* after that hlist_nulls_del will work */
-> > >  static inline void hlist_nulls_add_fake(struct hlist_nulls_node *n)
-> > >  {
-> > > diff --git a/include/net/sock.h b/include/net/sock.h
-> > > index c8a4b283df6f..42aa1919eeee 100644
-> > > --- a/include/net/sock.h
-> > > +++ b/include/net/sock.h
-> > > @@ -885,6 +885,11 @@ static inline void __sk_nulls_add_node_tail_rcu(=
-struct sock *sk, struct hlist_nu
-> > >         hlist_nulls_add_tail_rcu(&sk->sk_nulls_node, list);
-> > >  }
-> > >
-> > > +static inline void __sk_nulls_add_node_before_rcu(struct sock *sk, s=
-truct sock *next)
-> > > +{
-> > > +       hlist_nulls_add_before_rcu(&sk->sk_nulls_node, &next->sk_null=
-s_node);
-> > > +}
-> > > +
-> > >  static inline void sk_nulls_add_node_rcu(struct sock *sk, struct hli=
-st_nulls_head *list)
-> > >  {
-> > >         sock_hold(sk);
-> > > diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
-> > > index ceeeec9b7290..80d8bec41a58 100644
-> > > --- a/net/ipv4/inet_hashtables.c
-> > > +++ b/net/ipv4/inet_hashtables.c
-> > > @@ -334,6 +334,26 @@ static inline int compute_score(struct sock *sk,=
- const struct net *net,
-> > >         return score;
-> > >  }
-> > >
-> > > +static inline int compute_reuseport_score(struct sock *sk)
-> > > +{
-> > > +       int score =3D 0;
-> > > +
-> > > +       if (sk->sk_bound_dev_if)
-> > > +               score +=3D 2;
-> > > +
-> > > +       if (sk->sk_family =3D=3D PF_INET)
-> > > +               score +=3D 10;
-> > > +
-> > > +       /* the priority of sk_incoming_cpu should be lower than sk_bo=
-und_dev_if,
-> > > +        * as it's optional in compute_score(). Thank God, this is th=
-e only
-> >
-> > Please do not bring God here.
-> >
-> > > +        * variable condition, which we can't judge now.
-> > > +        */
-> > > +       if (READ_ONCE(sk->sk_incoming_cpu))
-> > > +               score++;
-> > > +
-> > > +       return score;
-> > > +}
-> > > +
-> > >  /**
-> > >   * inet_lookup_reuseport() - execute reuseport logic on AF_INET sock=
-et if necessary.
-> > >   * @net: network namespace.
-> > > @@ -739,6 +759,27 @@ static int inet_reuseport_add_sock(struct sock *=
-sk,
-> > >         return reuseport_alloc(sk, inet_rcv_saddr_any(sk));
-> > >  }
-> > >
-> > > +static void inet_hash_reuseport(struct sock *sk, struct hlist_nulls_=
-head *head)
-> > > +{
-> > > +       const struct hlist_nulls_node *node;
-> > > +       int score, curscore;
-> > > +       struct sock *sk2;
-> > > +
-> > > +       curscore =3D compute_reuseport_score(sk);
-> > > +       /* lookup the socket to insert before */
-> > > +       sk_nulls_for_each_rcu(sk2, node, head) {
-> > > +               if (!sk2->sk_reuseport)
-> > > +                       continue;
-> > > +               score =3D compute_reuseport_score(sk2);
-> > > +               if (score <=3D curscore) {
-> > > +                       __sk_nulls_add_node_before_rcu(sk, sk2);
-> > > +                       return;
-> > > +               }
-> > > +       }
-> > > +
-> > > +       __sk_nulls_add_node_tail_rcu(sk, head);
-> > > +}
-> > > +
-> > >  int __inet_hash(struct sock *sk, struct sock *osk)
-> > >  {
-> > >         struct inet_hashinfo *hashinfo =3D tcp_get_hashinfo(sk);
-> > > @@ -761,11 +802,11 @@ int __inet_hash(struct sock *sk, struct sock *o=
-sk)
-> > >                         goto unlock;
-> > >         }
-> > >         sock_set_flag(sk, SOCK_RCU_FREE);
-> > > -       if (IS_ENABLED(CONFIG_IPV6) && sk->sk_reuseport &&
-> > > -               sk->sk_family =3D=3D AF_INET6)
-> > > -               __sk_nulls_add_node_tail_rcu(sk, &ilb2->nulls_head);
-> > > -       else
-> > > +       if (!sk->sk_reuseport)
-> > >                 __sk_nulls_add_node_rcu(sk, &ilb2->nulls_head);
-> > > +       else
-> > > +               inet_hash_reuseport(sk, &ilb2->nulls_head);
-> > > +
-> > >         sock_prot_inuse_add(sock_net(sk), sk->sk_prot, 1);
-> > >  unlock:
-> > >         spin_unlock(&ilb2->lock);
-> > > --
-> > > 2.50.1
-> > >
+Jason
 
