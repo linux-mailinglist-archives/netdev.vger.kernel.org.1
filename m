@@ -1,232 +1,249 @@
-Return-Path: <netdev+bounces-211341-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211342-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BF04B1816D
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 14:01:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE290B1817A
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 14:06:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF0941C25761
-	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 12:01:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69C5E3A3692
+	for <lists+netdev@lfdr.de>; Fri,  1 Aug 2025 12:06:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F7C01FF1BF;
-	Fri,  1 Aug 2025 12:01:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D70692343B6;
+	Fri,  1 Aug 2025 12:06:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SLrFFQxs"
+	dkim=pass (2048-bit key) header.d=westermo.com header.i=@westermo.com header.b="g6hl2gye";
+	dkim=pass (1024-bit key) header.d=beijerelectronicsab.onmicrosoft.com header.i=@beijerelectronicsab.onmicrosoft.com header.b="C30RJfPk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx08-0057a101.pphosted.com (mx08-0057a101.pphosted.com [185.183.31.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3515580B;
-	Fri,  1 Aug 2025 12:01:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754049683; cv=none; b=nUoQgGOGQb4Qw994B+wlyiHTOOhdDQ4bp/4WDBYJWoV/E8Sv87ffvgQZs6Is2c1+dOVqS88GV8sz0NhrSFzT002maJQPOlkcVmNjNeM+2CfrMJHP43Ge5gK35hDu3uakuQqSeMBqQNkicLaXAv5huBMkbVuztP4Pjzcv9Xa8860=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754049683; c=relaxed/simple;
-	bh=9+Jd99desmQ3vwv0Jdep0nHcwp7vUTWh0+6D7DDQjQA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m4GIVPkUAuIm6+zsct/85w6eRL41VHAryybE2t6ADG4rdTJ6JKv0DpzLKXHccIEv6ez55KWHemsa/BN86EQCsRtkIxvGP/D1igWIChgvVsalANp4J3BUzTL3g7oJcQxTeJuvzfKL853/41o9CKg/84XiAPgPgiRRN1pBoay1sCY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SLrFFQxs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8929EC4CEE7;
-	Fri,  1 Aug 2025 12:01:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754049682;
-	bh=9+Jd99desmQ3vwv0Jdep0nHcwp7vUTWh0+6D7DDQjQA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SLrFFQxsEkx9hV+CzEGnQIwq/jhrwwBBrFJyU5NCqMDbZhyySvEbb/vwlLh3A1v6G
-	 DWPUpakk9uOkQs0GeWjaSCNLvuQV4yYzqJX67eYg7pJCANsMyTNcLRkiL3JfeSujdL
-	 H6AH8QL+A2bQ8Xk/PpsKRAAn5AH4DCD9+xk+tA0NH9OHvjXq4e57NxRoSxgKFwB8zs
-	 mQ37Tph0haB15rKfRUgpIL5fs80gCS/Yerq380S2lWyNp86PtOfSr2RAZqYWcH4fhT
-	 ILGoBaWGs9+RumXeatjl9il/3pBe0ndS+IbN44qxobDReQR/8DoIqyeKjweMOprA8r
-	 dYzHfg4jddGoA==
-Date: Fri, 1 Aug 2025 13:01:16 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Bence =?iso-8859-1?B?Q3Pza+Fz?= <csokas.bence@prolan.hu>
-Cc: Geert Uytterhoeven <geert+renesas@glider.be>,
-	Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Rob Herring <robh@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Dmitry Torokhov <dmitry.torokhov@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Csaba Buday <buday.csaba@prolan.hu>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net] net: mdio_bus: Use devm for getting reset GPIO
-Message-ID: <95449490-fa58-41d4-9493-c9213c1f2e7d@sirena.org.uk>
-References: <20250728153455.47190-2-csokas.bence@prolan.hu>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 146F82EB10;
+	Fri,  1 Aug 2025 12:06:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=185.183.31.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1754050000; cv=fail; b=bh9N9k3yuuoUvDyC9M9m6CLNNT12z78Vs1bj1F2kTA3phZ6/qh5VGAd+pQNr51qq96mXP0ktbfbDPgEShJhNOHrhWKUGGtxz3fyBAe6dMfJOuNVnIUiDdOFwH/fqd1BMFgGVaaOXCYiOAOBTwzSOe5weCZ9RkpzVRetffH9nT7Y=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1754050000; c=relaxed/simple;
+	bh=ojFeS6Da8g5e4anJQvIiHuGNXwAzcEEocsZR1BR3MVg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=nVE1a64ZyJm5oJD4rotuB7C2vEfdo3Dhjzl3CZWHrelbXqH6sHQRAdckfQcQiWfFiGdlqmENHmYFPBmNgqEaUo6y2h4PPd43k2cl0yet4iuMRCaY4MHs63fhLdbJUu/sX/hXhK7wyppuaSHb0GEtuiU9Xf+PZEBA0BPRqVEx1AQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=westermo.com; spf=pass smtp.mailfrom=westermo.com; dkim=pass (2048-bit key) header.d=westermo.com header.i=@westermo.com header.b=g6hl2gye; dkim=pass (1024-bit key) header.d=beijerelectronicsab.onmicrosoft.com header.i=@beijerelectronicsab.onmicrosoft.com header.b=C30RJfPk; arc=fail smtp.client-ip=185.183.31.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=westermo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=westermo.com
+Received: from pps.filterd (m0214196.ppops.net [127.0.0.1])
+	by mx07-0057a101.pphosted.com (8.18.1.8/8.18.1.8) with ESMTP id 571B8xtE3155805;
+	Fri, 1 Aug 2025 14:06:23 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=westermo.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=270620241; bh=QWO+YvIqEgyANLBEtqSZ0Bxd
+	mlEJg3iWynkDxVTmgF4=; b=g6hl2gyeJMtSId0YXq3iF+JsKTxh+TucFE9TmUA0
+	oISEhOVf1oWkQHBXwPRZ1bGn+lSF6dU+NPJyx3Uqts3H5TwsLSj3xaNa7TKfssvs
+	JFUDOphSU7IjOkQ7P6z3yrlfBXKMrvptzraet3/AZhZUnTUe4gJfA+Y07FicVNHC
+	ynfX3Wv74YLFx/eRbsP7CY9i+Td5C1BLNAwPt3xTQXBsAVraEqEJfhyN7mPjduFS
+	/+p71VxoE0i3i8pIk3pEO7NSlOj6ZdHu5dDfZG5xa/ha9RoBS9GDaMJckdaTo1aS
+	cFOuK2vizQHl0DwEWCiA5O1fhtJPJHRQ1qq+Cw1P8kRgJw==
+Received: from eur05-vi1-obe.outbound.protection.outlook.com (mail-vi1eur05on2104.outbound.protection.outlook.com [40.107.21.104])
+	by mx07-0057a101.pphosted.com (PPS) with ESMTPS id 488c9crpc0-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Fri, 01 Aug 2025 14:06:22 +0200 (MEST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=KrPckbPDlNzrHoVB12LfPhPPIS9ftXMg+3M7eqK7QKsc7fzOfTIls1XGxiJ8oZyZEyJSjwAXYBqn1rWSOe6E8S+3EYl2Q0VZK+93jQtMWsoXc0yf1ZroRS57gho0/PLkfm4hIn7EaJmj3QtvLoBScHNr6LlGWM8odltTqDrDJowIMxN60kaaxmF/6urHTQlWvKL71LjKm8MmiGwL+S2cUzDqAgPO9c1EIhPzaLxKVNIdG61QEpg1aA3/n/UKfWLf1DdQQ7hPRtrEUEpX0sQ1T3HKTjA1zZVwOCRzA5A4Jqonhxm45XfAppVaJHQrtnBSe7c6N33XR+5IrJhUPxNOvA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=QWO+YvIqEgyANLBEtqSZ0BxdmlEJg3iWynkDxVTmgF4=;
+ b=rXaKfStrG1zUA6S0xqS76PUMds6MLVdAZ9TjaYi2o12pu0Kt1Nkff3DKybDbZwY8i29BtnWaxcDr3ovW4q0ZsUxjbM+LlpObtzbCvRMHVGon6ktuTljLP5jJhO/h7dCRZiqZ+4MhLFJIjkBCnkO7X1ILiAThiBwS4WP8vYi7EPpe93ivQmJkEbBxDIYh4elx+XYAbsnOSlo2tXxiNJVPCFNP2qqDLZh1G7huVNKIGeE7AtuDeBlPRNn4I1vvbuIqinJ1gNJ7D0qMaDv0VlHuaD3umtbyN6VTZKBgOjkgq+Aox9Y+aaZN1JOYfDMQ2UXGcVYRt3YYi2+Nj+TNN610PA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=westermo.com; dmarc=pass action=none header.from=westermo.com;
+ dkim=pass header.d=westermo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=beijerelectronicsab.onmicrosoft.com;
+ s=selector1-beijerelectronicsab-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QWO+YvIqEgyANLBEtqSZ0BxdmlEJg3iWynkDxVTmgF4=;
+ b=C30RJfPkHWtc8ocGjUQaP8nZHx0sx3HU9UD1xTdODFbI9NMaug085lNkvHv8UHKUMMhStNW6ZEzYtdIwMahtZ4TsFD2x/pdpT961S2aYV2B18j9xqzWB5uE8zVCETAk2ct44b2ht/OhFDTTCXN5gWzKaveQsp0bEgsGCuLPBDms=
+Received: from BESP192MB2977.EURP192.PROD.OUTLOOK.COM (2603:10a6:b10:f1::14)
+ by GVXP192MB1781.EURP192.PROD.OUTLOOK.COM (2603:10a6:150:68::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9009.9; Fri, 1 Aug
+ 2025 12:06:19 +0000
+Received: from BESP192MB2977.EURP192.PROD.OUTLOOK.COM
+ ([fe80::35d9:9fe3:96b3:88b5]) by BESP192MB2977.EURP192.PROD.OUTLOOK.COM
+ ([fe80::35d9:9fe3:96b3:88b5%6]) with mapi id 15.20.9009.003; Fri, 1 Aug 2025
+ 12:06:19 +0000
+Date: Fri, 1 Aug 2025 14:06:16 +0200
+From: Alexander Wilhelm <alexander.wilhelm@westermo.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+        Heiner Kallweit <hkallweit1@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: Aquantia PHY in OCSGMII mode?
+Message-ID: <aIytuIUN+BSy2Xug@FUE-ALEWI-WINX>
+References: <aIuEvaSCIQdJWcZx@FUE-ALEWI-WINX>
+ <20250731171642.2jxmhvrlb554mejz@skbuf>
+ <aIvDcxeBPhHADDik@shell.armlinux.org.uk>
+ <20250801110106.ig5n2t5wvzqrsoyj@skbuf>
+ <aIyq9Vg8Tqr5z0Zs@FUE-ALEWI-WINX>
+ <aIyr33e7BUAep2MI@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aIyr33e7BUAep2MI@shell.armlinux.org.uk>
+User-Agent: Mutt/2.1.4 (2021-12-11)
+X-ClientProxiedBy: GV3P280CA0040.SWEP280.PROD.OUTLOOK.COM
+ (2603:10a6:150:9::14) To BESP192MB2977.EURP192.PROD.OUTLOOK.COM
+ (2603:10a6:b10:f1::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="dTuiP5h9CjyworoS"
-Content-Disposition: inline
-In-Reply-To: <20250728153455.47190-2-csokas.bence@prolan.hu>
-X-Cookie: Go 'way!  You're bothering me!
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BESP192MB2977:EE_|GVXP192MB1781:EE_
+X-MS-Office365-Filtering-Correlation-Id: 23a3cd86-1519-476e-e410-08ddd0f3d2fc
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?0VvvpRidx+/iWAdj67ZGFE6sKrNit5V2M4kr9/GMqb2oHBQgZdP6ask+Z+lZ?=
+ =?us-ascii?Q?9VyzRw+8825LqP5tPMFRa6x6P9ciemgbiZx+OohcE0XqtEYtiiXYqKU1zINi?=
+ =?us-ascii?Q?A7nBc8H8Y95aAOxRxkpBouE8UvQ1g8PqhR67ECy2+Kb4tGY0KEt9NOItbpy8?=
+ =?us-ascii?Q?4jCEJ3iuUvxp/e2zUFP+wFFn6sz3gMIyELXA5zniW/3yeVL+7E18sujS3w1m?=
+ =?us-ascii?Q?eoT3Z+Dca73P67266f3En6ufBWZxJDestmHZg9c8/Fn6o+dABc2JDsDSiqSU?=
+ =?us-ascii?Q?xTCU5NtFKbHWZVfs38VixArF9Jz0MqZ2jRN3GeFUMoOv9B2t4PXc5qYgN9f0?=
+ =?us-ascii?Q?8E2Ulap597cva3sTcBn/JdH90V52WTSL0SGoPyXXV646HGCKvga2dh0BTqVZ?=
+ =?us-ascii?Q?iOfeZx1qx3M60IvkVYuw4YDuxly+ARke2lmuLEaL3Ug9W3Ae2AbuxjUewctp?=
+ =?us-ascii?Q?FcBivRX3R4m2Pn1jTLAJQhtQ8EKetlO64mTJ6/Rwx2CKKE+Unm2KuiUxdtpa?=
+ =?us-ascii?Q?bloWqRlw6j87BOUeJU3hw/E3YIHU886E7nG8+L60yYXOdjV5/Ekt40EdMf2L?=
+ =?us-ascii?Q?rDwW1+U81euYsG5kO4enDktmhM3GnbaCUQtv6Zr26+z+p1+vXLtbiDhSWYc+?=
+ =?us-ascii?Q?T4zwm3ktQloD73HuEnUkxPsNmX07/9Wf0VAX0uyNEqeq5ntal8+H8t9+2mZ+?=
+ =?us-ascii?Q?T7fViNndwcb9a08fqpUm7Zrhhp8eiTjHe03UOH8okkZpKuNOn1SlgPcKIL0V?=
+ =?us-ascii?Q?vcTfmTDHOfMt5JCpg0i3oisGd/ICNVbkdRhHqQNS46mesH/0wTt6EhevB5g9?=
+ =?us-ascii?Q?R38paGJ+5eXWPBecuO06nLXpuQiVqfG2x1wb6zJSRgW+nRLao0zWHt+f8CHj?=
+ =?us-ascii?Q?6IE96FI9R0K4VzKtiNWYIbxXfVJBWAjflBpYQHlBkFVms9DJg3MC37xiUmf6?=
+ =?us-ascii?Q?CVSiHbUnfcqejW/s8mNKbfzCMz4MDF6+AepHR6DpGg+aC8hJDFtLVwGhsK5S?=
+ =?us-ascii?Q?WCv9tGlk+8pEZaQPbzlzEBuQkJcK5lOUS1z233rqAchi5nngXkOEb9dtD4fj?=
+ =?us-ascii?Q?EH+j29WLkCmpoivi7g6jCPQpMJgCVZo5tSbtUnOaQuIwlKVTgu/Q4l1Ekk1e?=
+ =?us-ascii?Q?1R9FlRvTaDdTQ6YdtZV42bAxw9nlLGI8cAW9oAJFHZVMt7zEFZ91xDpyBJM+?=
+ =?us-ascii?Q?ekZ7BX8d+OtrNyPDicIaHqPVqJA8B6mj9pnQSKwG++jh7ZCJILo3hN3CCRwM?=
+ =?us-ascii?Q?ocswibbfgyC59r7bdWtR9EbSVsQYcwQtVIGcHmpruXwOhuPEUQa+7+0+QkcR?=
+ =?us-ascii?Q?IcWtukOGqabDZRk2pjNmWNYhEFPtsELdb0xs9G8VuJ4LbRi5vgIcXH6MihBe?=
+ =?us-ascii?Q?xw/y/FZjrJDjSJ2SGQG+we98iNoBVqh3dDBwCzpBjqh0vRHRdAffEvQQ4S5n?=
+ =?us-ascii?Q?2KvtzmXB9yA=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BESP192MB2977.EURP192.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?0Cq+6QW91suOAsgy4l24HKG7nlKkyrGx8TrV7AnM3qiFzP/mhy3COeJIQSdq?=
+ =?us-ascii?Q?OTXrqHYamDikKxcSLxzVCt+eunawZRAjU4KtsteRHzbJI6JGcQ6ej/uv6PYy?=
+ =?us-ascii?Q?Y1iW+CGClY+3z6hVQnVmKzfACufw2FklhFl8kpn2fW7l4VL5pHF8pbmknvSN?=
+ =?us-ascii?Q?kZRLKjvBHrXuTK0zvGcCRNHBPhsTgLYNNt6hXRESaQVo7RLc+V6aYGmZ7WGZ?=
+ =?us-ascii?Q?ZCGItRqS5wGk2nDxoyMhO+baXkAuLEMCRos/FpGhPf5MVH4vHsR23WiqXdsd?=
+ =?us-ascii?Q?3VSmHA+81Ys7nunphvD2N+2PIBEpAbqA36vV5eGw820ICAnpENb9oIorVkcP?=
+ =?us-ascii?Q?7Bg7oo69OYBAXji/sbizJJbYlT8xs2DQ0ifpagVfth9vIUX6gyFOMqrHwPrb?=
+ =?us-ascii?Q?w8gPXAw0nfCpzkkaKW5Ftr+4K27IZjYrLjWbEw7XzVoLW0s+/4hgcGgZgfcd?=
+ =?us-ascii?Q?Z+d0ZCi8Vn7glF120hRwErumtDyN1AAilfoP2xpEdYCpDPjiuRocNKH/JUNo?=
+ =?us-ascii?Q?F4bWQKTEY4WB9I2++L/uy/U9ofRvrgCgtXup5TIT8Mk28zgmPY2FP1LOZxgC?=
+ =?us-ascii?Q?ryJDuJavJNGtiMZaT4lupHZlj7adO2jIkXIlbCbX2gKI9Uf4EOzl1PQgun/o?=
+ =?us-ascii?Q?aXYgcfPwCLTt5AUipPY7go9oWtFK4ynbEFxRRb9id9dlmV4US+fia/NTsJ3L?=
+ =?us-ascii?Q?FFqHrBcfFhpQx+A/s9a/XJcc+zMqSFouKhi1h7vp+u2fu6d9Z3JoABN0q5i7?=
+ =?us-ascii?Q?xApTXKIph7TJatk01vK0Olq0RNAGkuac3OgO3eDZFgKd//LdRHBAm/Zd+0B2?=
+ =?us-ascii?Q?b91f6OkYnrPvwoKzE3XY3LQJu54M7VikZGJFHv9jqPbMUfib2PKvQo3/hsQc?=
+ =?us-ascii?Q?pvx8dnHMbLgAPgcQXq94h/wvzyFy76JVZZHVnBgTpAZ8dLz0Jy9SniD7ePY4?=
+ =?us-ascii?Q?fiTddVD+jRQIE1htYcW97iELeHxL+DSCcPCPQnVmj3nRLF9R44ZMPHV+jlgr?=
+ =?us-ascii?Q?lPp7OALu6HgH6rKGa0IN1/sP7P5cn6BRJPHYhf15hFnF5/8s7m2YDmayGFyG?=
+ =?us-ascii?Q?2TkTrSU2X3N3Aw02TWMsc7179dK/69s7CYngYLiB7BfxDCn099gpdZK9A9n5?=
+ =?us-ascii?Q?rrj+Ta7SmFdOSgLj+V0jeobXq3/xcnHnea+peGX9WqvX+00U9yeVDhfNl7Fm?=
+ =?us-ascii?Q?ynVHCF6s2uod/Jd1EEtIKOGKLqWqKBDLYApeUEsasG07fCvif06uaxoFaIeF?=
+ =?us-ascii?Q?xY3pfTPBhezCZ0xbKJc5QXPXuLWo33woD2LQMggNuxIShNytAaWKzIXFDqvz?=
+ =?us-ascii?Q?MEwit6KpcVn3agq2Nm0uIyJyq1LVEdHIynlJVYsYZKl3Z2GJBq5IyCJuUUM0?=
+ =?us-ascii?Q?BcPMYvwSb5be0YZ3BCBQF5ct5H3Msy3UePr69LXQX+FcQVm4E7wvuzj1wz9T?=
+ =?us-ascii?Q?4IqgEt/MYzJ2FsO6+ezPbnIBOt/7BatoJwr3E0rO8BXAK0dr05RqW4Yv5Wi8?=
+ =?us-ascii?Q?R2iXxzl+1zNQG0fiekh1p2mZouFQFUBAvLNhO9nh51pGoibJGycNUmpO7b3t?=
+ =?us-ascii?Q?a1TBiRzmHZacpwBv/Y8GrIKh1y6TyQeiGLATlhWG?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	adtKspSHCGYHo568zwSfOheosrC3dtc0p9Ga3IQ6/cG0NlFGZdfipujOIniX5orRs06cs+pOtnGJWGS6sHkJKBqNRHABK0a5lCHMAJr8H3ygzR4gRgFq16GgylNnX/vDt9w2APMKtuOxn8jDEQEbGTSMY/wUZzNDtV5eLJoOnmI1rHx2Gm4HNciKoYFJ/XpaTpI1+rk1KYegSlTh89CzGg1FrCpwkIYlwQe8kV8Qddl4PuRAQkkRolJ9NdtdOKod+3kLgWcoF/yEX+6NORcF2sDU3RefRyR2BPZtAea12h+Hn6PGh+hjXc/jNkC7FyYDMQH/Hx8GmgmQLwPT2EI837x4R4fDMvjXSWFP4sgUnxZXHn38TV+/0Eqmfqehvl2avZRfSf68h0rXqVgzUOwcm/+hZz1BibYr1orM5JsGx/pau1gjNVEMYbNiKuJE1JVqV4c7pIO0wAhUWkdkdL9M6jMfae3Y0pSjgvUA0wuXXb2kOgQSED0Amo2UAh+yjmx9d3JKk8iCwcrEB07Gn+7b4eb/m4i3y5mb3zBWYdgFkxUTTz4h7ZVZ4Ud7LYKU3Fs+FR4q2LQMi4zIWEIu2/jrMwyN0GT1r+EEsaaJ2jKYHoLD/wCcuWILaCIkEkHDux70
+X-OriginatorOrg: westermo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 23a3cd86-1519-476e-e410-08ddd0f3d2fc
+X-MS-Exchange-CrossTenant-AuthSource: BESP192MB2977.EURP192.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Aug 2025 12:06:19.2621
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4b2e9b91-de77-4ca7-8130-c80faee67059
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: bmGt5mdiMkPd+BceybgMBADzYD4duFo5iENp4vOhlSB7l5QDCZxwQhNpaoAyuahXp5Ms1hQEee6ARQECJa29Gw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: GVXP192MB1781
+X-MS-Exchange-CrossPremises-AuthSource: BESP192MB2977.EURP192.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossPremises-AuthAs: Internal
+X-MS-Exchange-CrossPremises-AuthMechanism: 14
+X-MS-Exchange-CrossPremises-Mapi-Admin-Submission:
+X-MS-Exchange-CrossPremises-MessageSource: StoreDriver
+X-MS-Exchange-CrossPremises-BCC:
+X-MS-Exchange-CrossPremises-OriginalClientIPAddress: 104.151.95.196
+X-MS-Exchange-CrossPremises-TransportTrafficType: Email
+X-MS-Exchange-CrossPremises-Antispam-ScanContext:
+	DIR:Originating;SFV:NSPM;SKIP:0;
+X-MS-Exchange-CrossPremises-SCL: 1
+X-MS-Exchange-CrossPremises-Processed-By-Journaling: Journal Agent
+X-OrganizationHeadersPreserved: GVXP192MB1781.EURP192.PROD.OUTLOOK.COM
+X-Proofpoint-GUID: OkKgKVLjj8qlLRikxIOG4WJ0gNvlrI92
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODAxMDA5MCBTYWx0ZWRfXyUN6rf/Cbww1
+ GAaBrHlHarpRNx7vI+crABLaDwpRvOQURLs6DXSZkaqVKhn8LVigea72fVXTMa6S3cs6VgPmwxw
+ AgsOmIWrKk/nQIfQG3K24Kgtbeg74HYFQ+K6v2gcT2z5IpPDTYAFB50cBNC4OA6bt+dRGssVWtA
+ cEc0CHaW4dE5qnMqbvj/5r1hv+P0RCIvUvL89Wq+fEbppfVDPDTcWOhzR7k/TGcO1vEx10+ghBv
+ +vvB0cfmLfsDHa/bPtBI8KsD4M5sea+L9jW+2E76BLmYyDxL0yWwA5Otgcr1dsFOuYmdCGFkxxm
+ JTtRFfU7QWliiUKtZ1vstNOEG6bkhYQOYn6aHqSSDFi7VsntyIbuC62uXet/Y4=
+X-Authority-Analysis: v=2.4 cv=IaeHWXqa c=1 sm=1 tr=0 ts=688cadbe cx=c_pps
+ a=xx55tk8hyb47AkJjldnMnA==:117 a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19
+ a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19
+ a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19
+ a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10 a=2OwXVqhp2XgA:10 a=8gLI3H-aZtYA:10
+ a=G9Su_PKzgMt-2-K_yNIA:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-ORIG-GUID: OkKgKVLjj8qlLRikxIOG4WJ0gNvlrI92
+
+Am Fri, Aug 01, 2025 at 12:58:23PM +0100 schrieb Russell King (Oracle):
+> On Fri, Aug 01, 2025 at 01:54:29PM +0200, Alexander Wilhelm wrote:
+> > Am Fri, Aug 01, 2025 at 02:01:06PM +0300 schrieb Vladimir Oltean:
+> > > On Thu, Jul 31, 2025 at 08:26:43PM +0100, Russell King (Oracle) wrote:
+> > > > and this works. So... we could actually reconfigure the PHY independent
+> > > > of what was programmed into the firmware.
+> > > 
+> > > It does work indeed, the trouble will be adding this code to the common
+> > > mainline kernel driver and then watching various boards break after their
+> > > known-good firmware provisioning was overwritten, from a source of unknown
+> > > applicability to their system.
+> > 
+> > You're right. I've now selected a firmware that uses a different provisioning
+> > table, which already configures the PHY for 2500BASE-X with Flow Control.
+> > According to the documentation, it should support all modes: 10M, 100M, 1G, and
+> > 2.5G.
+> > 
+> > It seems the issue lies with the MAC, as it doesn't appear to handle the
+> > configured PHY_INTERFACE_MODE_2500BASEX correctly. I'm currently investigating
+> > this further.
+> 
+> Which MAC driver, and is it using phylink?
+
+If I understand it correclty, then yes. It is an Freescale FMAN driver that is
+called through phylink callbacks like the following:
+
+    static const struct phylink_mac_ops memac_mac_ops = {
+            .validate = memac_validate,
+            .mac_select_pcs = memac_select_pcs,
+            .mac_prepare = memac_prepare,
+            .mac_config = memac_mac_config,
+            .mac_link_up = memac_link_up,
+            .mac_link_down = memac_link_down,
+    };
 
 
---dTuiP5h9CjyworoS
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, Jul 28, 2025 at 05:34:55PM +0200, Bence Cs=F3k=E1s wrote:
-> Commit bafbdd527d56 ("phylib: Add device reset GPIO support") removed
-> devm_gpiod_get_optional() in favor of the non-devres managed
-> fwnode_get_named_gpiod(). When it was kind-of reverted by commit
-> 40ba6a12a548 ("net: mdio: switch to using gpiod_get_optional()"), the devm
-> functionality was not reinstated. Nor was the GPIO unclaimed on device
-> remove. This leads to the GPIO being claimed indefinitely, even when the
-> device and/or the driver gets removed.
-
-I'm seeing multiple platforms including at least Beaglebone Black,
-Tordax Mallow and Libre Computer Alta printing errors in
-next/pending-fixes today:
-
-[    3.252885] mdio_bus 4a101000.mdio:00: Resources present before probing
-
-Bisects are pointing to this patch which is 3b98c9352511db in -next,
-full log for Beaglebone at:
-
-   https://lava.sirena.org.uk/scheduler/job/1627658
-
-and Mallow at:
-
-   https://lava.sirena.org.uk/scheduler/job/1627696
-
-and a bisect log (this one for Beaglebone):
-
-# bad: [02694a9281c9b3da7f7574f9f39a69cc70e344ce] Merge branch 'dt/linus' o=
-f git://git.kernel.org/pub/scm/linux/kernel/git/robh/linux.git
-# good: [f2d282e1dfb3d8cb95b5ccdea43f2411f27201db] Merge tag 'bitmap-for-6.=
-17' of https://github.com/norov/linux
-# good: [50a479527ef01f9b36dde1803a7e81741a222509] ASoC: SDCA: Add support =
-for -cn- value properties
-# good: [10dfd36f078423c51602a9a21ed85e8e6c947a00] regulator: core: correct=
- convergence check in regulator_set_voltage()
-# good: [11f74f48c14c1f4fe16541900ea5944c42e30ccf] ASoC: Intel: avs: Fix un=
-initialized pointer error in probe()
-# good: [ca592e20659e0304ebd8f4dabb273da4f9385848] ASoC: fsl_xcvr: get chan=
-nel status data when PHY is not exists
-# good: [a735ee58c0d673d630a10ac2939dccb54df0622a] spi: cs42l43: Property e=
-ntry should be a null-terminated array
-# good: [061fade7a67f6cdfe918a675270d84107abbef61] ASoC: SDCA: Fix some hol=
-es in the regmap readable/writeable helpers
-# good: [eb3bb145280b6c857a748731a229698e4a7cf37b] ASoC: SOF: amd: acp-load=
-er: Use GFP_KERNEL for DMA allocations in resume context
-# good: [e95122a32e777309412e30dc638dbc88b9036811] ASoC: codecs: Add acpi_m=
-atch_table for aw88399 driver
-# good: [da98e8b97058c73b5c58e9976af2e7286f1c799b] ASoC: dt-bindings: atmel=
-,at91-ssc: add microchip,sam9x7-ssc
-# good: [926406a85ad895fbe6ee4577cdbc4f55245a0742] MAINTAINERS: Add entries=
- for the RZ/V2H(P) RSPI
-# good: [8d452accd1380e1cb0b15a9876bcd19b14c5fabb] ASoC: wm8962: Clear mast=
-er mode when enter runtime suspend
-# good: [7379907e241d85803efc1d9eb27c28a6322e274f] ASoC: fsl_xcvr: get chan=
-nel status data in two cases
-# good: [2260bc6ea8bd57aec92cbda770de9cc95232f64d] ASoC: imx-card: Add WM85=
-24 support
-# good: [6776ecc9dd587c08a6bb334542f9f8821a091013] ASoC: fsl_xcvr: get chan=
-nel status data with firmware exists
-# good: [1032fa556c37c500bf2b93d95fa18e7d1fd1b4de] More minor SDCA changes
-git bisect start '02694a9281c9b3da7f7574f9f39a69cc70e344ce' 'f2d282e1dfb3d8=
-cb95b5ccdea43f2411f27201db' '50a479527ef01f9b36dde1803a7e81741a222509' '10d=
-fd36f078423c51602a9a21ed85e8e6c947a00' '11f74f48c14c1f4fe16541900ea5944c42e=
-30ccf' 'ca592e20659e0304ebd8f4dabb273da4f9385848' 'a735ee58c0d673d630a10ac2=
-939dccb54df0622a' '061fade7a67f6cdfe918a675270d84107abbef61' 'eb3bb145280b6=
-c857a748731a229698e4a7cf37b' 'e95122a32e777309412e30dc638dbc88b9036811' 'da=
-98e8b97058c73b5c58e9976af2e7286f1c799b' '926406a85ad895fbe6ee4577cdbc4f5524=
-5a0742' '8d452accd1380e1cb0b15a9876bcd19b14c5fabb' '7379907e241d85803efc1d9=
-eb27c28a6322e274f' '2260bc6ea8bd57aec92cbda770de9cc95232f64d' '6776ecc9dd58=
-7c08a6bb334542f9f8821a091013' '1032fa556c37c500bf2b93d95fa18e7d1fd1b4de'
-# test job: [50a479527ef01f9b36dde1803a7e81741a222509] https://lava.sirena.=
-org.uk/scheduler/job/1604113
-# test job: [10dfd36f078423c51602a9a21ed85e8e6c947a00] https://lava.sirena.=
-org.uk/scheduler/job/1617510
-# test job: [11f74f48c14c1f4fe16541900ea5944c42e30ccf] https://lava.sirena.=
-org.uk/scheduler/job/1622131
-# test job: [ca592e20659e0304ebd8f4dabb273da4f9385848] https://lava.sirena.=
-org.uk/scheduler/job/1604636
-# test job: [a735ee58c0d673d630a10ac2939dccb54df0622a] https://lava.sirena.=
-org.uk/scheduler/job/1625798
-# test job: [061fade7a67f6cdfe918a675270d84107abbef61] https://lava.sirena.=
-org.uk/scheduler/job/1604012
-# test job: [eb3bb145280b6c857a748731a229698e4a7cf37b] https://lava.sirena.=
-org.uk/scheduler/job/1614504
-# test job: [e95122a32e777309412e30dc638dbc88b9036811] https://lava.sirena.=
-org.uk/scheduler/job/1607730
-# test job: [da98e8b97058c73b5c58e9976af2e7286f1c799b] https://lava.sirena.=
-org.uk/scheduler/job/1604614
-# test job: [926406a85ad895fbe6ee4577cdbc4f55245a0742] https://lava.sirena.=
-org.uk/scheduler/job/1617649
-# test job: [8d452accd1380e1cb0b15a9876bcd19b14c5fabb] https://lava.sirena.=
-org.uk/scheduler/job/1621163
-# test job: [7379907e241d85803efc1d9eb27c28a6322e274f] https://lava.sirena.=
-org.uk/scheduler/job/1605837
-# test job: [2260bc6ea8bd57aec92cbda770de9cc95232f64d] https://lava.sirena.=
-org.uk/scheduler/job/1604642
-# test job: [6776ecc9dd587c08a6bb334542f9f8821a091013] https://lava.sirena.=
-org.uk/scheduler/job/1604670
-# test job: [1032fa556c37c500bf2b93d95fa18e7d1fd1b4de] https://lava.sirena.=
-org.uk/scheduler/job/1605715
-# test job: [02694a9281c9b3da7f7574f9f39a69cc70e344ce] https://lava.sirena.=
-org.uk/scheduler/job/1627658
-# bad: [02694a9281c9b3da7f7574f9f39a69cc70e344ce] Merge branch 'dt/linus' o=
-f git://git.kernel.org/pub/scm/linux/kernel/git/robh/linux.git
-git bisect bad 02694a9281c9b3da7f7574f9f39a69cc70e344ce
-# test job: [4889166d1aaa4761f1162e01487b129aad7ef6a6] https://lava.sirena.=
-org.uk/scheduler/job/1627868
-# bad: [4889166d1aaa4761f1162e01487b129aad7ef6a6] Merge branch 'main' of gi=
-t://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git
-git bisect bad 4889166d1aaa4761f1162e01487b129aad7ef6a6
-# test job: [29c349380205ced75f66c0ccab821d00ff50d123] https://lava.sirena.=
-org.uk/scheduler/job/1627932
-# good: [29c349380205ced75f66c0ccab821d00ff50d123] Merge branch 'arm/fixes'=
- of git://git.kernel.org/pub/scm/linux/kernel/git/soc/soc.git
-git bisect good 29c349380205ced75f66c0ccab821d00ff50d123
-# test job: [2da4def0f487f24bbb0cece3bb2bcdcb918a0b72] https://lava.sirena.=
-org.uk/scheduler/job/1628009
-# good: [2da4def0f487f24bbb0cece3bb2bcdcb918a0b72] netpoll: prevent hanging=
- NAPI when netcons gets enabled
-git bisect good 2da4def0f487f24bbb0cece3bb2bcdcb918a0b72
-# test job: [3b98c9352511db627b606477fc7944b2fa53a165] https://lava.sirena.=
-org.uk/scheduler/job/1628132
-# bad: [3b98c9352511db627b606477fc7944b2fa53a165] net: mdio_bus: Use devm f=
-or getting reset GPIO
-git bisect bad 3b98c9352511db627b606477fc7944b2fa53a165
-# test job: [f2aa00e4f65efcf25ff6bc8198e21f031e7b9b1b] https://lava.sirena.=
-org.uk/scheduler/job/1628177
-# good: [f2aa00e4f65efcf25ff6bc8198e21f031e7b9b1b] net: ipa: add IPA v5.1 a=
-nd v5.5 to ipa_version_string()
-git bisect good f2aa00e4f65efcf25ff6bc8198e21f031e7b9b1b
-# test job: [57ec5a8735dc5dccd1ee68afdb1114956a3fce0d] https://lava.sirena.=
-org.uk/scheduler/job/1628433
-# good: [57ec5a8735dc5dccd1ee68afdb1114956a3fce0d] net: phy: smsc: add prop=
-er reset flags for LAN8710A
-git bisect good 57ec5a8735dc5dccd1ee68afdb1114956a3fce0d
-# first bad commit: [3b98c9352511db627b606477fc7944b2fa53a165] net: mdio_bu=
-s: Use devm for getting reset GPIO
-
---dTuiP5h9CjyworoS
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmiMrIsACgkQJNaLcl1U
-h9D2+gf/QQvtx1kydJuhj5PdCQQY/VfNhLzsVJlZbIg8bPkUaN780S0y8+WeWei4
-BTdAuZrS7gWYghasXBmSTuqmRYtfiIEISoLDSgCoWbK9Oj59OFREO+C5WzWzMWez
-zKh7vt9t8JxIs3AhT68gDeHxwCjiHWzFu6nZmdNFys52utF7tl5tYjukHdN74JjD
-4mpLO6LVa3R8V3CD25ogELo8Mj9nWgDmj1yy3/uYfbr1jbDAZrFg7CcxRc1FX5y1
-eeYe/Uo+Kz5BHzO5oHgaLzJCuIjUApBTV6+jBK3UWH3Ml5fB3hdeG8iJmbESNyml
-uwMKhxis0YTUh7TCviPAQfWHe+AuGA==
-=zFSS
------END PGP SIGNATURE-----
-
---dTuiP5h9CjyworoS--
+Best regards
+Alexander Wilhelm
 
