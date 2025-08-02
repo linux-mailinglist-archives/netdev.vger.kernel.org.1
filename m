@@ -1,173 +1,205 @@
-Return-Path: <netdev+bounces-211455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211456-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D32EB18BD9
-	for <lists+netdev@lfdr.de>; Sat,  2 Aug 2025 11:28:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 158A8B18E21
+	for <lists+netdev@lfdr.de>; Sat,  2 Aug 2025 13:06:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57C333B5F44
-	for <lists+netdev@lfdr.de>; Sat,  2 Aug 2025 09:28:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C29B9AA25C8
+	for <lists+netdev@lfdr.de>; Sat,  2 Aug 2025 11:06:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62A2723E34C;
-	Sat,  2 Aug 2025 09:24:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6D0F20E00B;
+	Sat,  2 Aug 2025 11:06:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KLuK08i+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JHgaNxMu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f193.google.com (mail-pf1-f193.google.com [209.85.210.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A71623D2BA;
-	Sat,  2 Aug 2025 09:24:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97A8751C5A;
+	Sat,  2 Aug 2025 11:06:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754126695; cv=none; b=r58GfPvI0uRKqMv6gP+7zkIwo8iyvCWz78KqvYx6+i/O7/lfrctdDNB26pB1AzaZbF7uNcJEdquy7RCPh41/lTgQL9WgRZs0qr/oMuVmgHJUwVlrr+hYz40ptC0VTeLb811Q5VK6R8dXJkEzXGpMsXBJP/huScgULldi7hq1xQc=
+	t=1754132772; cv=none; b=Tb32sWVcYpKbXgWYzJ1LXu3ImtFbI/CENdZfn3PEPIGccSKOw32uHRPxcq6emRpbyqnPJeYSr6P3PXO42D607NWXPK7k2Lzol3sxSOTIEacsb8zw8VPm5BVpkbXwmZAmQCec+UdFUfAvwuVhUZHaCioOUryRHzHwDe8admpl2N4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754126695; c=relaxed/simple;
-	bh=aBYekBr5DaBwXFDMz1i8qJlNL8mbGSz7kS+2wTTB4Hc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=S22Z+XUiY8ji2sW9U6Bh3Tz7ejYB2d4GP3PLXQubgG+xn3siQQjEtqCSKTqu/RHkf84ZFC9A6qo/8J/gHN//1SLZlQK4lrcQkBjoPA6G42q3Cha5U72RqrWN3KxnjAJmd2w4f/WkbBReQ4kTEoUS9nb0dMBuINDSxPHHG6xLUMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KLuK08i+; arc=none smtp.client-ip=209.85.210.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f193.google.com with SMTP id d2e1a72fcca58-76a3818eb9bso1562886b3a.3;
-        Sat, 02 Aug 2025 02:24:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1754126693; x=1754731493; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WTD9xpJdl4CvrsFUHVGNuaknAMGABpE3qqQKQMDhcQQ=;
-        b=KLuK08i+MX8gyJWy5NFswtSl4aU5FHriZQwl9+yymVWbQcnkYhX/YvIBTHX+DZMRSK
-         Pf47EnmHvd/w9o/h81Sl1fkWu8vzSIz66aSS1AQK9fBahT+569E8RMfkNdvweDDlY5rr
-         NyoUaUUdosdd+2MOi/Ujv3fBNxVpbGB7CdkI8LwMzuYJjBkDBogXo9PZWBxKn0xLTSlp
-         mhFry7yThL+vZlLuAJEf5qPrqICDQOiNmGYxn3HblZK38XGfkH8qEZ3LZYlpYCNNXf4c
-         LCTUp9PaVsn4OSrM53VL9XeKACyWQFfOLdMfd9PduODRubkk2kpUAXF0plEPHzU6rT4+
-         ZDVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754126693; x=1754731493;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WTD9xpJdl4CvrsFUHVGNuaknAMGABpE3qqQKQMDhcQQ=;
-        b=FVmMxRH3bw9PYHV/uUPH9YJ21dqcRPPEaC0ZLcqHdZz2Qs4f7l4MAQiA5IDmQJqgAm
-         /xApysbsCLJGF1Q7C2BXHNg3yhv4bpvcUkSoiMuAqEG/P0sIbnq6/94U6oRBjHC8MVIB
-         80bIC39psU+V7xx7h+PqIBO7AdnLrcEqazlB5JUUn/rftlMXUaDgReGK3JwhNT9wBGDn
-         SqEAd87uk8S3TVDElSsdI847kiWRC96kgWRw35pigLX1OAhQAtjqC+jriCf4DEUbtH7/
-         TQrSBeWMxBvM0fa6mNa4OW/tXHK07SZjNohBhkxYLPZ4LPMObbbCbBibYaJUVsWbvE2H
-         eGeg==
-X-Forwarded-Encrypted: i=1; AJvYcCUd6tgd0ALVYxebaYoDSYeve5j/Xcx8gVocWFkwgoFjz3Pd9Df+spop5fLQm7p52/ntd/1dD/F3Iz/7tX/NISMh@vger.kernel.org, AJvYcCUlXrvNYj19CV6rPDdyQkYoD/MFvA1NWPvNMlzw/Mb8oxl8ei2FDq6sLIL5zbTJzIumFDGapN7/JLWIghE=@vger.kernel.org, AJvYcCW0a9PUO0NqIU+tnh9yLt2BHSMbDvH69VhH1gIifcnYD/hGEqrEYDvilS3IndB2t9VkI/h2DQ3Q@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7EQEzn5qKcFshBjNUnZQsciyyLLo+djtw8a3OfiR3kh7CPCjq
-	AbNfzy3fHAXMPTU6oanQNUVepvE11WfcoU7wqKYdK39nbk1HFTTz4Thj
-X-Gm-Gg: ASbGncsX7zsB1rVnY/pigr0+5aLFMG/tHFGTnZhCBGFQErby1c0ZLcAoGQ5nEhXr/ed
-	W59uHFVhXsn47YPvHZONA5/2v2SPohDlV9zeBSg5UAtHi3kP5VINYMobWOuol6V7XJG7IrkzyPs
-	BGCBwSWoNqwpO+4E3xGpHOQ7IhhKSmSNIpSs1WyiLEBoWrOtQUgGpkokcRXh5T7ApOpZCKfmPQ6
-	kv8j5b6LeeXFaI6WcpMiwG6ml8+EgTtKmHwyu/MrJ/C6KRC+3SNQ0lcR42EpsATTQRnu8OxnfZ2
-	2Xmqi+FWgckyou3eDafSfEREauzxmiYQy3rnko7914LX5U79DdECCGHqexFyxxkRcc3b3BmppXu
-	jaHoF3ycoPH6TckkWi1E=
-X-Google-Smtp-Source: AGHT+IEvwN516QxbLEFvRKIlIJl7ZUCvjn+yT/uIwUEDcS9ce/63liMn8SrJ97IqlciRzsHW20j4Wg==
-X-Received: by 2002:a05:6a00:2ea4:b0:76b:e561:9e1b with SMTP id d2e1a72fcca58-76bec2f0324mr3148482b3a.1.1754126692597;
-        Sat, 02 Aug 2025 02:24:52 -0700 (PDT)
-Received: from 7950hx ([43.129.244.20])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-76bd7887522sm4799161b3a.20.2025.08.02.02.24.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 02 Aug 2025 02:24:52 -0700 (PDT)
-From: Menglong Dong <menglong8.dong@gmail.com>
-X-Google-Original-From: Menglong Dong <dongml2@chinatelecom.cn>
-To: edumazet@google.com,
-	kuniyu@google.com
-Cc: ncardwell@google.com,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	shuah@kernel.org,
-	kraig@google.com,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net v3 2/2] selftests/net: test TCP reuseport socket selection
-Date: Sat,  2 Aug 2025 17:24:35 +0800
-Message-ID: <20250802092435.288714-3-dongml2@chinatelecom.cn>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20250802092435.288714-1-dongml2@chinatelecom.cn>
-References: <20250802092435.288714-1-dongml2@chinatelecom.cn>
+	s=arc-20240116; t=1754132772; c=relaxed/simple;
+	bh=wO/0xNKUbzTU56dEYazYrjq8PgdNLrb8k5XeUIBX4hY=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:To:From:Subject:
+	 References:In-Reply-To; b=dwKCVeASBq36kcSR4voh0tb8mz1LxI4alS35Kdy5Mm/bTpcGn6o1BzU2HLE7KNQgx/Nyy3gyupvs2xJphSBRky3A4R6kuIjv88Fn1SHXKLwi22j/JkU6zKis7Cx+jFiw40RqZ1vXID+R5buXQMnyHjHTowfwMGhCnyxTWe21et4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JHgaNxMu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6DEBC4CEEF;
+	Sat,  2 Aug 2025 11:06:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754132772;
+	bh=wO/0xNKUbzTU56dEYazYrjq8PgdNLrb8k5XeUIBX4hY=;
+	h=Date:Cc:To:From:Subject:References:In-Reply-To:From;
+	b=JHgaNxMu94KYlx63eWISHMJ9fTc80FBXI4EcixD4Q5AbLlyQtYdChZAaKvSPKtyVv
+	 fmboTehX2+jK8ClaYbjnMWno/80rEcG8WgXPkxjfCPWmgBWBkUhLIWOD5/n48Ptf9s
+	 p5OsqgX2VDUZ1/kqu6peMQx7IY64zk7Z4v3+MMRY0qPF1UX+4WIAc3BQH1La6uP2YX
+	 ioYJXqskS0SBeU3D0OygwxwSh5DRBEvee+RbkYduJ4NbVULdoggBg47hTINFyDmpJv
+	 y9dr/IdbBaYLvuuqdQ3kIheu7gXAKETqt7t20bPmei0OdJ+NEjXD8hT0/wrAEzWsIq
+	 lWJ47xKcFfXXw==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Sat, 02 Aug 2025 13:06:04 +0200
+Message-Id: <DBRW63AMB4D8.2HXGYM6FZRX3Z@kernel.org>
+Cc: <linux-kernel@vger.kernel.org>, <daniel.almeida@collabora.com>,
+ <rust-for-linux@vger.kernel.org>, <netdev@vger.kernel.org>,
+ <andrew@lunn.ch>, <hkallweit1@gmail.com>, <tmgross@umich.edu>,
+ <ojeda@kernel.org>, <alex.gaynor@gmail.com>, <gary@garyguo.net>,
+ <bjorn3_gh@protonmail.com>, <benno.lossin@proton.me>,
+ <a.hindborg@samsung.com>, <aliceryhl@google.com>,
+ <anna-maria@linutronix.de>, <frederic@kernel.org>, <tglx@linutronix.de>,
+ <arnd@arndb.de>, <jstultz@google.com>, <sboyd@kernel.org>,
+ <mingo@redhat.com>, <peterz@infradead.org>, <juri.lelli@redhat.com>,
+ <vincent.guittot@linaro.org>, <dietmar.eggemann@arm.com>,
+ <rostedt@goodmis.org>, <bsegall@google.com>, <mgorman@suse.de>,
+ <vschneid@redhat.com>, <tgunders@redhat.com>, <me@kloenk.dev>,
+ <david.laight.linux@gmail.com>
+To: "FUJITA Tomonori" <fujita.tomonori@gmail.com>
+From: "Danilo Krummrich" <dakr@kernel.org>
+Subject: Re: [PATCH v11 7/8] rust: Add read_poll_timeout functions
+References: <20250220070611.214262-1-fujita.tomonori@gmail.com>
+ <20250220070611.214262-8-fujita.tomonori@gmail.com>
+ <DBNPR4KQZXY5.279JBMO315A12@kernel.org>
+ <20250802.104249.1482605492526656971.fujita.tomonori@gmail.com>
+In-Reply-To: <20250802.104249.1482605492526656971.fujita.tomonori@gmail.com>
 
-The test script is provided by Kuniyuki in [1], which is used to test the
-selection of the TCP reuseport socket problem.
+On Sat Aug 2, 2025 at 3:42 AM CEST, FUJITA Tomonori wrote:
+> On Mon, 28 Jul 2025 15:13:45 +0200
+> "Danilo Krummrich" <dakr@kernel.org> wrote:
+>> On Thu Feb 20, 2025 at 8:06 AM CET, FUJITA Tomonori wrote:
+>>> +/// This process continues until either `cond` returns `true` or the t=
+imeout,
+>>> +/// specified by `timeout_delta`, is reached. If `timeout_delta` is `N=
+one`,
+>>> +/// polling continues indefinitely until `cond` evaluates to `true` or=
+ an error occurs.
+>>> +///
+>>> +/// # Examples
+>>> +///
+>>> +/// ```rust,ignore
+>>=20
+>> Why ignore? This should be possible to compile test.
+>
+> https://lore.kernel.org/rust-for-linux/CEF87294-8580-4C84-BEA3-EB72E63ED7=
+DF@collabora.com/
 
-Link: https://lore.kernel.org/netdev/20250801040757.1599996-1-kuniyu@google.com/ [1]
-Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
----
- tools/testing/selftests/net/Makefile         |  1 +
- tools/testing/selftests/net/tcp_reuseport.py | 36 ++++++++++++++++++++
- 2 files changed, 37 insertions(+)
- create mode 100755 tools/testing/selftests/net/tcp_reuseport.py
+I disagree with that. 'ignore' should only be used if we can't make it comp=
+ile.
 
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index b31a71f2b372..0f4c3eea9709 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -117,6 +117,7 @@ TEST_GEN_FILES += tfo
- TEST_PROGS += tfo_passive.sh
- TEST_PROGS += broadcast_pmtu.sh
- TEST_PROGS += ipv6_force_forwarding.sh
-+TEST_PROGS += tcp_reuseport.py
- 
- # YNL files, must be before "include ..lib.mk"
- YNL_GEN_FILES := busy_poller netlink-dumps
-diff --git a/tools/testing/selftests/net/tcp_reuseport.py b/tools/testing/selftests/net/tcp_reuseport.py
-new file mode 100755
-index 000000000000..eaeb7096382e
---- /dev/null
-+++ b/tools/testing/selftests/net/tcp_reuseport.py
-@@ -0,0 +1,36 @@
-+#!/usr/bin/env python3
-+# SPDX-License-Identifier: GPL-2.0
-+
-+import os
-+
-+from lib.py import ksft_run, ksft_exit
-+from socket import *
-+
-+def test_reuseport_select() -> None:
-+    s1 = socket()
-+    s1.setsockopt(SOL_SOCKET, SO_REUSEPORT, 1)
-+    s1.setsockopt(SOL_SOCKET, SO_BINDTODEVICE, b'lo')
-+    s1.listen()
-+    s1.setblocking(False)
-+
-+    s2 = socket()
-+    s2.setsockopt(SOL_SOCKET, SO_REUSEPORT, 1)
-+    s2.bind(s1.getsockname())
-+    s2.listen()
-+    s2.setblocking(False)
-+
-+    for i in range(3):
-+        c = socket()
-+        c.connect(s1.getsockname())
-+        try:
-+            print("SUCCESS: assigned properly:", s1.accept())
-+        except:
-+            print("FAIL: wrong assignment")
-+            os.sys.exit(1)
-+
-+def main() -> None:
-+    ksft_run([test_reuseport_select])
-+    ksft_exit()
-+
-+if __name__ == "__main__":
-+    main()
--- 
-2.50.1
+In this case we can make it compile, we just can't run it, since there's no=
+ real
+HW underneath that we can read registers from.
 
+An example that isn't compiled will eventually be forgotten to be updated w=
+hen
+things are changed.
+
+>>> +/// fn wait_for_hardware(dev: &mut Device) -> Result<()> {
+>>=20
+>> I think the parameter here can just be `&Io<SIZE>`.
+>>=20
+>>> +///     // The `op` closure reads the value of a specific status regis=
+ter.
+>>> +///     let op =3D || -> Result<u16> { dev.read_ready_register() };
+>>> +///
+>>> +///     // The `cond` closure takes a reference to the value returned =
+by `op`
+>>> +///     // and checks whether the hardware is ready.
+>>> +///     let cond =3D |val: &u16| *val =3D=3D HW_READY;
+>>> +///
+>>> +///     match read_poll_timeout(op, cond, Delta::from_millis(50), Some=
+(Delta::from_secs(3))) {
+>>> +///         Ok(_) =3D> {
+>>> +///             // The hardware is ready. The returned value of the `o=
+p`` closure isn't used.
+>>> +///             Ok(())
+>>> +///         }
+>>> +///         Err(e) =3D> Err(e),
+>>> +///     }
+>>> +/// }
+>>> +/// ```
+>>> +///
+>>> +/// ```rust
+>>> +/// use kernel::io::poll::read_poll_timeout;
+>>> +/// use kernel::time::Delta;
+>>> +/// use kernel::sync::{SpinLock, new_spinlock};
+>>> +///
+>>> +/// let lock =3D KBox::pin_init(new_spinlock!(()), kernel::alloc::flag=
+s::GFP_KERNEL)?;
+>>> +/// let g =3D lock.lock();
+>>> +/// read_poll_timeout(|| Ok(()), |()| true, Delta::from_micros(42), So=
+me(Delta::from_micros(42)));
+>>> +/// drop(g);
+>>> +///
+>>> +/// # Ok::<(), Error>(())
+>>> +/// ```
+>>> +#[track_caller]
+>>> +pub fn read_poll_timeout<Op, Cond, T>(
+>>> +    mut op: Op,
+>>> +    mut cond: Cond,
+>>> +    sleep_delta: Delta,
+>>> +    timeout_delta: Option<Delta>,
+>>> +) -> Result<T>
+>>> +where
+>>> +    Op: FnMut() -> Result<T>,
+>>> +    Cond: FnMut(&T) -> bool,
+>>> +{
+>>> +    let start =3D Instant::now();
+>>> +    let sleep =3D !sleep_delta.is_zero();
+>>> +
+>>> +    if sleep {
+>>> +        might_sleep();
+>>> +    }
+>>=20
+>> I think a conditional might_sleep() is not great.
+>>=20
+>> I also think we can catch this at compile time, if we add two different =
+variants
+>> of read_poll_timeout() instead and be explicit about it. We could get Kl=
+int to
+>> catch such issues for us at compile time.
+>
+> Your point is that functions which cannot be used in atomic context
+> should be clearly separated into different ones. Then Klint might be
+> able to detect such usage at compile time, right?
+>
+> How about dropping the conditional might_sleep() and making
+> read_poll_timeout return an error with zero sleep_delta?
+
+Yes, let's always call might_sleep(), the conditional is very error prone. =
+We
+want to see the warning splat whenever someone calls read_poll_timeout() fr=
+om
+atomic context.
+
+Yes, with zero sleep_delta it could be called from atomic context technical=
+ly,
+but if drivers rely on this and wrap this into higher level helpers it's ve=
+ry
+easy to miss a subtle case and end up with non-zero sleep_delta within an a=
+tomic
+context for some rare condition that then is hard to debug.
+
+As for making read_poll_timeout() return a error with zero sleep_delta, I d=
+on't
+see a reason to do that. If a driver wraps read_poll_timeout() in its own
+function that sometimes sleeps and sometimes does not, based on some condit=
+ion,
+but is never called from atomic context, that's fine.
+
+> Drivers which need busy-loop (without even udelay) can
+> call read_poll_timeout_atomic() with zero delay.
+
+It's not the zero delay or zero sleep_delta that makes the difference  it's
+really the fact the one can be called from atomic context and one can't be.
 
