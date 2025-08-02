@@ -1,164 +1,221 @@
-Return-Path: <netdev+bounces-211451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211452-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25FF1B18B20
-	for <lists+netdev@lfdr.de>; Sat,  2 Aug 2025 09:43:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00855B18B61
+	for <lists+netdev@lfdr.de>; Sat,  2 Aug 2025 10:35:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8AD8626CE1
-	for <lists+netdev@lfdr.de>; Sat,  2 Aug 2025 07:43:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 28BD9167BFD
+	for <lists+netdev@lfdr.de>; Sat,  2 Aug 2025 08:35:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38CBB1F4C98;
-	Sat,  2 Aug 2025 07:43:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83F031F1302;
+	Sat,  2 Aug 2025 08:35:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fFbvRB09"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dllTNh1A"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62A301F17EB
-	for <netdev@vger.kernel.org>; Sat,  2 Aug 2025 07:43:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 852871DDA1E
+	for <netdev@vger.kernel.org>; Sat,  2 Aug 2025 08:35:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754120601; cv=none; b=b2AMCWdpCVnmfiDyIeLbhOYjBgufRb6kMn4Vs+udJuVS0Fim0HcLCaTWMzviD6awORvIazjhBoy8vC5C+qo+W8tFEmegHtE8kyulHV6UzIfW8/hxmpqS3q81VKs01u51FqKkhncMqOvyvnIM7aMvyBvkPifcl/AWr49r97kdF4A=
+	t=1754123751; cv=none; b=Wzu92HjWcm+EoVBr1cWT35z4z5AqYO8f4dMkrg2rDgKcLMQhYeTrqDk0ZwSx7nLrIulVD9arnlVYtnis3YRwHV1ziPsg1BYmO8YoodlIYTLa7my1oOyowa0/+nP/WQfokCIZo7u8OMg0Q0/kgM0VtMXppGykvOjBDO++MFRej7s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754120601; c=relaxed/simple;
-	bh=DWaYsQw/b7CDauqCYLsUDBJRWLxU/MfW6/zTsA2RC/Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eN3xfXQpyOgBMQ5UwmMUiM/WY/sHb68So1C4Z/sPbSaCE2JJ8AdpmJCIfXGtxUeXrjSDJ3DU+G+VddMW/1q4RLYbM6MjK0oEVa64bedo04CYEbBPLaaMVw+acTY8T/z4B6bGxU5zuLEDfuM9b0x0mIunBnmVterhs0Tj8eMFefk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=fFbvRB09; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-458be0dc376so22965e9.1
-        for <netdev@vger.kernel.org>; Sat, 02 Aug 2025 00:43:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1754120596; x=1754725396; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=4tXbfxoTI7BxAQNn3dY0og7zllYrIL3yrRLiAHe0UUI=;
-        b=fFbvRB09gDJk62EVCzg3qYYfKQdT3w8I+KKhCaLWK2hdwOS1s3Ccyp+jXQLUz4h32S
-         N69YtRhlDQa9IoAkWMH/WW3uVEeP8S6fgzmFSRLPtlLHu5Rt9ZPibweUbD1aWj37g3RG
-         IB2dntlbG4Fgt1lMPkfoM1If5hNBlWdJmf2LWsyyiqdlP9r6e51u645q1PN4K+sr68hF
-         fID51W1rlckMov8bjcwikxMQmewknz2z991KVK6PPAEjgDUjBVCicv8o7K97ueDx+O74
-         jgoeA51HrSwdo9g5P9KcvTARPEdj/rKMS47q8ttZj7mSafdamCe0HMoNwzm6K9mCaLgW
-         G55g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754120596; x=1754725396;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4tXbfxoTI7BxAQNn3dY0og7zllYrIL3yrRLiAHe0UUI=;
-        b=MdXektkLcCa4WIiLhZH2ACtBniPoGOeNlB+Ri/95uB7JDygx1b6EGhxilyhN3lxO81
-         n5urDsehMF0CtJDdRUiEPXj3RRy+kPGV6hwYfSwX7hnRD7uLO3DKPVwTZ/8i4yw+RaFL
-         FBmRu7Nbf0NKeR6no8Iqwdmo4huOT18Nz9qnXjmGlmx5tvrxJMTugquIZ/qZCfll1D9x
-         7fMSa/MmGciLWUkoVqDyugHp4EP+xcgIUfybHcja3lnbwPDDtLO7+vFuCRKa2mPsH7Be
-         gt4xVayjDRWKgbcDg/gfjoCSNaBLbnq6Ogop+0Z9wNc2qYZmF1lmo0mvZqLUKw0ho47V
-         Ekyw==
-X-Forwarded-Encrypted: i=1; AJvYcCVK7AykkgA2vgQ53c8BvaGaYLqGbhVz7IsbhCNyn6VJCXC7VPSBzYGzxS2UAytulStgf2QCZLs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFaVqNpJbzza14HIW+ekfXwGh+MPJjWaNsy5+6BNzHAN4xN+r1
-	X30AbIJmIXCUXhHPA/8dbElC3IXno9zkCbloyB8TKssZSdq1Gnz8PGM0hFn8Zt/OBIc=
-X-Gm-Gg: ASbGnctOUvZ6Ac88HnBYGfieRdNNgI7TePzCIEoDOSO99cBclu8h95oxDo1mcroj+oC
-	PEaQS0UjPfJpI7mqUj8hRWJMQhwqnifXAoe/iX18We0nD4Qm4lw6KKa3ETH0cj2tlyUhWGMyJEs
-	O01aQTOx5ZIxxhmuot6g0FMMdc8WQHA6P0YYtMXa7DzPO0BmLgF+vpQQlnSOaucyPVhuOMyNCPZ
-	CSwz3SDrbQydrdfTP43If2HbtntOF4LrgcX+/crhVv7BIl/+veK3oBni3xDjDeheSn0ELyKbkhZ
-	tXr8ZYBbuulX2b5YsUiUMr6j/5VsSh6XEiOF7dUmIpO1iUYkXAOmOHiK/TxaSuGqkBTQ4TU2EFE
-	C56klctbsaP/i8Jon38OmDN4dKQsc+UuwCzemwkZiKZU=
-X-Google-Smtp-Source: AGHT+IF8nbxKKcKzgr46E8sQumi9SAlHJ4sqfPn24btFxKuyKh3hLU9mumOOWIdUpo/Ot/aWxLbd/A==
-X-Received: by 2002:a05:600c:1c89:b0:456:285b:db25 with SMTP id 5b1f17b1804b1-458b6b743e6mr6489135e9.6.1754120595645;
-        Sat, 02 Aug 2025 00:43:15 -0700 (PDT)
-Received: from [192.168.1.29] ([178.197.218.223])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45895377b3csm131252315e9.13.2025.08.02.00.43.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 02 Aug 2025 00:43:15 -0700 (PDT)
-Message-ID: <895ad082-bc6f-48e3-ae1c-29675ff0e949@linaro.org>
-Date: Sat, 2 Aug 2025 09:43:13 +0200
+	s=arc-20240116; t=1754123751; c=relaxed/simple;
+	bh=8bfVxE+mhdN5sUT9N7F8IdeU8CaCWVjVoBf4PN2G9gM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ei2IEXs+DvNBnmwCQ5YNFB3R+yS94sEl3kFA8mNfwfObtzvabzxKIeq0R/Cpik/A+1e1bwfDvj414wajW7zqWWnjWkOKYi22GkVsdNPkS1TDpd9pDNhvlHVhthUkH4j4yIf75wBVYhO3B6sudXsS52xsR/3az1fLYAc/RMbCyl8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dllTNh1A; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1754123749; x=1785659749;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=8bfVxE+mhdN5sUT9N7F8IdeU8CaCWVjVoBf4PN2G9gM=;
+  b=dllTNh1AjMoqD/awS9qJ9ShRo6MJbiZlZxshDb92XxKCYn9rkcOQow6E
+   d2lj+ZAxQcT2Br4beYBIxcyFpqpHJ7ovk6RzTSkHKL3e3+GstH7AZ61xF
+   Q8Wfe8yL1xkw6FMAz0BVIn+RaC6mulXFi3GdS6u8eb4ZDVLhZa/5kWtWv
+   V/C+wxi63dKPv4UtvA2a1bLncfdAUkeW5+35wsJtWURZKXNwZtbzgrZY3
+   FTykk5gVBFCPbWffVGNGQr1Ag78rlqki3SGYohd8mivBCUJPtMf9T1PCI
+   L47UiMfTCSflJr9oUsERfLaU2fkX/eFMF/ShK7V9yP+6QfJz5DR5pM0J/
+   Q==;
+X-CSE-ConnectionGUID: 776Fn4TzTUOOBZYYxSLciA==
+X-CSE-MsgGUID: jnkUQG2aROePjy/ccc1V9g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11508"; a="67033659"
+X-IronPort-AV: E=Sophos;i="6.17,258,1747724400"; 
+   d="scan'208";a="67033659"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2025 01:35:49 -0700
+X-CSE-ConnectionGUID: uxvYRkJ4Sy2XCx4wbUaHAA==
+X-CSE-MsgGUID: e6qkSG7rSjiRQh7UjGZI0w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,258,1747724400"; 
+   d="scan'208";a="169052769"
+Received: from lkp-server01.sh.intel.com (HELO 160750d4a34c) ([10.239.97.150])
+  by fmviesa004.fm.intel.com with ESMTP; 02 Aug 2025 01:35:46 -0700
+Received: from kbuild by 160750d4a34c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1ui7iS-0005GG-0O;
+	Sat, 02 Aug 2025 08:35:44 +0000
+Date: Sat, 2 Aug 2025 16:35:21 +0800
+From: kernel test robot <lkp@intel.com>
+To: David Hill <dhill@redhat.com>, netdev@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, David Hill <dhill@redhat.com>
+Subject: Re: [PATCH] PATCH: i40e Improve trusted VF MAC addresses logging
+ when limit is reached
+Message-ID: <202508021646.pWqgToeU-lkp@intel.com>
+References: <20250801133017.2107083-1-dhill@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] dt-bindings: net: Replace bouncing Alexandru
- Tachici emails
-To: Jakub Kicinski <kuba@kernel.org>,
- Marcelo Schmitt <marcelo.schmitt@analog.com>,
- Cedric Encarnacion <cedricjustine.encarnacion@analog.com>,
- =?UTF-8?Q?Nuno_S=C3=A1?= <nuno.sa@analog.com>
-Cc: Michael Hennerich <michael.hennerich@analog.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250724113758.61874-2-krzysztof.kozlowski@linaro.org>
- <20250801131647.316347ed@kernel.org>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Content-Language: en-US
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- 2+47PN9NZAOyb771QoVr8A==
-In-Reply-To: <20250801131647.316347ed@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250801133017.2107083-1-dhill@redhat.com>
 
-On 01/08/2025 22:16, Jakub Kicinski wrote:
-> On Thu, 24 Jul 2025 13:37:59 +0200 Krzysztof Kozlowski wrote:
->> Marcelo Schmitt, could you confirm that you are okay (or not) with this?
-> 
-> Doesn't look like Marcelo is responding, Marcelo?
+Hi David,
+
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on tnguy-next-queue/dev-queue]
+[also build test ERROR on tnguy-net-queue/dev-queue horms-ipvs/master linus/master v6.16 next-20250801]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/David-Hill/PATCH-i40e-Improve-trusted-VF-MAC-addresses-logging-when-limit-is-reached/20250801-213326
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue.git dev-queue
+patch link:    https://lore.kernel.org/r/20250801133017.2107083-1-dhill%40redhat.com
+patch subject: [PATCH] PATCH: i40e Improve trusted VF MAC addresses logging when limit is reached
+config: x86_64-buildonly-randconfig-003-20250802 (https://download.01.org/0day-ci/archive/20250802/202508021646.pWqgToeU-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250802/202508021646.pWqgToeU-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202508021646.pWqgToeU-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c:2957:77: error: use of undeclared identifier 'num_ports'
+    2957 |           mac2add_cnt, I40E_VC_MAX_MACVLAN_PER_TRUSTED_VF(pf->num_alloc_vfs,num_ports)));
+         |                                                                             ^
+>> drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c:2957:77: error: use of undeclared identifier 'num_ports'
+>> drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c:2957:88: error: extraneous ')' before ';'
+    2957 |           mac2add_cnt, I40E_VC_MAX_MACVLAN_PER_TRUSTED_VF(pf->num_alloc_vfs,num_ports)));
+         |                                                                                        ^
+   3 errors generated.
 
 
-Maybe we should just remove support for these Analog devices?
+vim +/num_ports +2957 drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
 
-Cc two more recent addresses from analog.com.
+  2870	
+  2871	#define I40E_VC_MAX_MACVLAN_PER_TRUSTED_VF(vf_num, num_ports)		\
+  2872	({	typeof(vf_num) vf_num_ = (vf_num);				\
+  2873		typeof(num_ports) num_ports_ = (num_ports);			\
+  2874		((I40E_MAX_MACVLAN_PER_PF(num_ports_) - vf_num_ *		\
+  2875		I40E_VC_MAX_MAC_ADDR_PER_VF) / vf_num_) +			\
+  2876		I40E_VC_MAX_MAC_ADDR_PER_VF; })
+  2877	/**
+  2878	 * i40e_check_vf_permission
+  2879	 * @vf: pointer to the VF info
+  2880	 * @al: MAC address list from virtchnl
+  2881	 *
+  2882	 * Check that the given list of MAC addresses is allowed. Will return -EPERM
+  2883	 * if any address in the list is not valid. Checks the following conditions:
+  2884	 *
+  2885	 * 1) broadcast and zero addresses are never valid
+  2886	 * 2) unicast addresses are not allowed if the VMM has administratively set
+  2887	 *    the VF MAC address, unless the VF is marked as privileged.
+  2888	 * 3) There is enough space to add all the addresses.
+  2889	 *
+  2890	 * Note that to guarantee consistency, it is expected this function be called
+  2891	 * while holding the mac_filter_hash_lock, as otherwise the current number of
+  2892	 * addresses might not be accurate.
+  2893	 **/
+  2894	static inline int i40e_check_vf_permission(struct i40e_vf *vf,
+  2895						   struct virtchnl_ether_addr_list *al)
+  2896	{
+  2897		struct i40e_pf *pf = vf->pf;
+  2898		struct i40e_vsi *vsi = pf->vsi[vf->lan_vsi_idx];
+  2899		struct i40e_hw *hw = &pf->hw;
+  2900		int mac2add_cnt = 0;
+  2901		int i;
+  2902	
+  2903		for (i = 0; i < al->num_elements; i++) {
+  2904			struct i40e_mac_filter *f;
+  2905			u8 *addr = al->list[i].addr;
+  2906	
+  2907			if (is_broadcast_ether_addr(addr) ||
+  2908			    is_zero_ether_addr(addr)) {
+  2909				dev_err(&pf->pdev->dev, "invalid VF MAC addr %pM\n",
+  2910					addr);
+  2911				return -EINVAL;
+  2912			}
+  2913	
+  2914			/* If the host VMM administrator has set the VF MAC address
+  2915			 * administratively via the ndo_set_vf_mac command then deny
+  2916			 * permission to the VF to add or delete unicast MAC addresses.
+  2917			 * Unless the VF is privileged and then it can do whatever.
+  2918			 * The VF may request to set the MAC address filter already
+  2919			 * assigned to it so do not return an error in that case.
+  2920			 */
+  2921			if (!i40e_can_vf_change_mac(vf) &&
+  2922			    !is_multicast_ether_addr(addr) &&
+  2923			    !ether_addr_equal(addr, vf->default_lan_addr.addr)) {
+  2924				dev_err(&pf->pdev->dev,
+  2925					"VF attempting to override administratively set MAC address, bring down and up the VF interface to resume normal operation\n");
+  2926				return -EPERM;
+  2927			}
+  2928	
+  2929			/*count filters that really will be added*/
+  2930			f = i40e_find_mac(vsi, addr);
+  2931			if (!f)
+  2932				++mac2add_cnt;
+  2933		}
+  2934	
+  2935		/* If this VF is not privileged, then we can't add more than a limited
+  2936		 * number of addresses. Check to make sure that the additions do not
+  2937		 * push us over the limit.
+  2938		 */
+  2939		if (!test_bit(I40E_VIRTCHNL_VF_CAP_PRIVILEGE, &vf->vf_caps)) {
+  2940			if ((i40e_count_filters(vsi) + mac2add_cnt) >
+  2941			    I40E_VC_MAX_MAC_ADDR_PER_VF) {
+  2942				dev_err(&pf->pdev->dev,
+  2943					"Cannot add more MAC addresses, VF is not trusted, switch the VF to trusted to add more functionality\n");
+  2944				return -EPERM;
+  2945			}
+  2946		/* If this VF is trusted, it can use more resources than untrusted.
+  2947		 * However to ensure that every trusted VF has appropriate number of
+  2948		 * resources, divide whole pool of resources per port and then across
+  2949		 * all VFs.
+  2950		 */
+  2951		} else {
+  2952			if ((i40e_count_filters(vsi) + mac2add_cnt) >
+  2953			    I40E_VC_MAX_MACVLAN_PER_TRUSTED_VF(pf->num_alloc_vfs,
+  2954							       hw->num_ports)) {
+  2955				dev_err(&pf->pdev->dev,
+  2956					"Cannot add more MAC addresses, trusted VF %d uses %d out of %d MAC addresses\n", vf->vf_id, i40e_count_filters(vsi) +
+> 2957	          mac2add_cnt, I40E_VC_MAX_MACVLAN_PER_TRUSTED_VF(pf->num_alloc_vfs,num_ports)));
+  2958				return -EPERM;
+  2959			}
+  2960		}
+  2961		return 0;
+  2962	}
+  2963	
 
-Best regards,
-Krzysztof
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
