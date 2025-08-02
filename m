@@ -1,172 +1,111 @@
-Return-Path: <netdev+bounces-211462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211463-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46264B18E94
-	for <lists+netdev@lfdr.de>; Sat,  2 Aug 2025 15:06:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4C19B18F14
+	for <lists+netdev@lfdr.de>; Sat,  2 Aug 2025 16:15:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED76AAA4B67
-	for <lists+netdev@lfdr.de>; Sat,  2 Aug 2025 13:06:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E87D1609FC
+	for <lists+netdev@lfdr.de>; Sat,  2 Aug 2025 14:15:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ACA1238149;
-	Sat,  2 Aug 2025 13:06:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LzDCcA0/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6065E41C72;
+	Sat,  2 Aug 2025 14:15:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from alt32.smtp-out.videotron.ca (alt32.smtp-out.videotron.ca [24.53.0.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CF8520296C;
-	Sat,  2 Aug 2025 13:06:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20BE85C96
+	for <netdev@vger.kernel.org>; Sat,  2 Aug 2025 14:15:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=24.53.0.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754139976; cv=none; b=LYi9OK6grZ1fqkDrFHItHVNa8cNNRATvLc9Z9aNpQtoFyTnyNrvY1RnEWDIdkOuHRRGQFDM8D6AWk0Y4qZgTAOjWHLc16xmVnGvZZ/+bT25GpfxFoWnYHtHisEMztejp3lGcfk8XNBrU9FFDzMNpXYMixaJrXk472hqVCVeW/bc=
+	t=1754144146; cv=none; b=KusQDpnvO7OPONsJon/HOKx1vYf9FiduUkOtbKhtuV1oivswMzozZB141mpSRhfpUo/p2gWPlz0k0oPclqqaG/4VHhHw/KuWTWU2kYW1RHquM0L1DgFqP4zYOsjoklR7WOuXCLIp63DhjaI+s09sbGw+Iv59c16fKgFYAfWGKyw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754139976; c=relaxed/simple;
-	bh=4y4BBMpRTlGCIWdhx/iujTMekc86BpwM2Byf2EHcVwI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YAN94vbjYwoau8ObtUD0z0STkEdK3x5EyO9ZA3Aj1Je5HledKxJF+0XL3Mj11yUseZpyR39L8Zyf99M3b2hun6As0Y4FXO7vZfiOUtbvx4WivL2rAsfusTPQqvxav8ujFNgiNq3cCLjpkuDpxFfW+Y5yFaESStj2g36vLUBSEQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LzDCcA0/; arc=none smtp.client-ip=209.85.166.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-3e40ac40940so10551465ab.0;
-        Sat, 02 Aug 2025 06:06:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1754139972; x=1754744772; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zmonmtKoAvELfCzQBfuBaiOtioQAYepmYG58Tt5t4Vk=;
-        b=LzDCcA0/fpMSlq9RWiSG+6iddiJsoy5Y/ej6mgeWlYFJTjCWOwr4L56cj4CRWGRr0x
-         UQIrR/9yIePCqY1LUx5dEOq/8qXjMC3jtkhyCTMm90P3E8OUt4Fv5I769/5qJDdW3vW6
-         V0O9W5I/stwlSCj5FUWn/IXRACNIYahvBiw4KbSa+76+n+FORs+FRmp/cHi6pui7xYHO
-         uKTAAmZm78Brx1HJbcrbWDidnZn/oGzQPGRt99+j5SOuu24uMjdfDZ1ww5gYmvXskLJf
-         lEnWSI87YLYIxBrmmtK+G+EEWpvmZNv/PDzhzzoaDuT3JvL74PdD/z4h8wKWjNcow0O4
-         uNoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754139972; x=1754744772;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zmonmtKoAvELfCzQBfuBaiOtioQAYepmYG58Tt5t4Vk=;
-        b=Nu2+zDc1WjJBcTqGiclXhVF2JtMKxprz03iIx6YavUON99UlN0QURGZ+04C/AjZtYK
-         3RSVkJqGZciFeBTXdZ8RvGb8hzlBk5HcdWUqa3N0ljmNQUOV/dpQy2RJmcLjGmDL0C4W
-         7Y46BMguizlz9E8h5v2w729ST9bkQiTgwbbSWCGMQ/bs6CFifMfhXgUJzLbNG7nwZj+F
-         SuDCm09ccmcfxLN6ptHH5NWFLtG/qycBdpjj2EaFk4nZO10AxxsGfFJiWeioOGwbJqY7
-         YDhkBdLhvEIUjedF/52hU8KxRaspLxAgHq59VmPadAA9FPSAdXA66mx8BAPXL9b5fOEY
-         390Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUq6FYqyRR+VtuOMlqcwmPyD7X7s/oOpaT/LIjbwkrz8AjCRm47MCV3AO+QSUICuFBwU+doPeHlMKAOx1o=@vger.kernel.org, AJvYcCUxR4UPvvEzaOc/b86Q3e9SyNo1bAcBw9BMuHPuq/OBvs3rc/T7WymTtiIvYMFukOkd7a1lhhKr@vger.kernel.org, AJvYcCXPyiswZASiLua80DT9JJa9rFRQn/FKQqXjhv9YsTMToIbUYMFCEvhLpcgkyyqyJyevpE74uCsj4xa1iJTJVr2T@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywk2DUCFble4cpbemOhoNJxOs/XWG+IVgjNXhPAZ94wOVV1zrg5
-	LW1GMJ9iubJUF3zoRMOuFmTNSlkLzv0QtqGo0iUN31N+c+l0/ulVAjhEjXKZgtl9JKdA0zwmENI
-	TTFj8TE77/PpCVwjZh7Vr9LiRaXmDLvY=
-X-Gm-Gg: ASbGnct0MGLUkF8Vovv2TObudf3fohr/4NKoy/kCI9lvn3vKqY/A39yfhsDa4OVS2G6
-	OrXH/+CKJVqebkiX2YO6YFFcTAw5p63J5SP3fqTMZMv/IdXpPfyIhOAQEjw7yiAJlRqBQ4uJS7h
-	CaXduy2zz+2oW4iKCWWnJVG07z4u4pjbBV8pdZ9Se7wPkqbwQgJDtXdWoR2iwN9SMIvYkNvgUNL
-	fZSq/Q60yF+oSQi
-X-Google-Smtp-Source: AGHT+IHpd35+kT9HdI5ApiKpoS8VgCg9bl6wjNctPoyEhnXzMQiFoSmDe+xgrsbVS76z0H4HD3/mJtYGgjbw29dVPsk=
-X-Received: by 2002:a05:6e02:2194:b0:3e3:d224:c652 with SMTP id
- e9e14a558f8ab-3e415e6cca8mr47665065ab.11.1754139972399; Sat, 02 Aug 2025
- 06:06:12 -0700 (PDT)
+	s=arc-20240116; t=1754144146; c=relaxed/simple;
+	bh=GgqnLNRzhfR4Aalq/zIgg7bHTOTwMXGWl7svCv55p/8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=U7j7a8ydxt9L18ZDltY/KpQo8yesQt6nmnd45nWrf/Lsop70glQ05KZTFKE4knA1EEcSBk8V5ZNcYm6EmdSmCdlAevarKJqqkkLTNhxWxyST7rJQOnVvIff6O9die2zr5kXBvR0xj4MZaWqlqfY+bhCTAdebPAhnBZAJVcqyP3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=redhat.com; spf=fail smtp.mailfrom=redhat.com; arc=none smtp.client-ip=24.53.0.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=redhat.com
+Received: from zappa.orion ([24.201.91.161])
+	by Videotron with ESMTP
+	id iCzquCSIaJQOJiCzquf9j8; Sat, 02 Aug 2025 10:14:06 -0400
+X-ORIG-RCPT: davem@davemloft.net,edumazet@google.com,anthony.l.nguyen@intel.com,przemyslaw.kitszel@intel.com,kuba@kernel.org,andrew+netdev@lunn.ch,dhill@redhat.com,pabeni@redhat.com,netdev@vger.kernel.org
+X-Authority-Analysis: v=2.4 cv=YI08ygGx c=1 sm=1 tr=0 ts=688e1d2e
+ a=OPdtphJVnnJ7kPN51veEEg==:117 a=OPdtphJVnnJ7kPN51veEEg==:17
+ a=2OwXVqhp2XgA:10 a=20KFwNOVAAAA:8 a=QyXUC8HyAAAA:8 a=KgM5TV4k-OYgtHylTX4A:9
+Received: from knox.orion (unknown [192.168.1.37])
+	by zappa.orion (Postfix) with ESMTP id 68322D25;
+	Sat, 02 Aug 2025 10:13:27 -0400 (EDT)
+From: David Hill <dhill@redhat.com>
+To: netdev@vger.kernel.org
+Cc: anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	David Hill <dhill@redhat.com>
+Subject: [PATCH] PATCH: i40e Improve trusted VF MAC addresses logging when limit is reached
+Date: Sat,  2 Aug 2025 10:13:22 -0400
+Message-ID: <20250802141322.2216641-1-dhill@redhat.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250802092435.288714-1-dongml2@chinatelecom.cn> <20250802092435.288714-2-dongml2@chinatelecom.cn>
-In-Reply-To: <20250802092435.288714-2-dongml2@chinatelecom.cn>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Sat, 2 Aug 2025 21:05:36 +0800
-X-Gm-Features: Ac12FXyl1Z17710ZsvGZEcG3nKUw1BENEpT2KZPZWCpTbIBZTcW63ECEgxt-fVk
-Message-ID: <CAL+tcoA9Lvc4Cj9zjWVx1FzEQA=d=OnvZRDWA4nE_1GNbEDaRw@mail.gmail.com>
-Subject: Re: [PATCH net v3 1/2] net: tcp: lookup the best matched listen socket
-To: Menglong Dong <menglong8.dong@gmail.com>
-Cc: edumazet@google.com, kuniyu@google.com, ncardwell@google.com, 
-	davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, 
-	horms@kernel.org, shuah@kernel.org, kraig@google.com, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Binarystorm-MailScanner-Information: Please contact the ISP for more information
+X-Binarystorm-MailScanner-ID: 68322D25.AFC28
+X-Binarystorm-MailScanner: Found to be clean
+X-Binarystorm-MailScanner-SpamCheck: not spam, SpamAssassin (not cached,
+	score=-0.01, required 7, ALL_TRUSTED -0.01)
+X-Binarystorm-MailScanner-From: dhill@redhat.com
+X-CMAE-Envelope: MS4xfOJtXWZXz0kC1iBmGNYDsC19QtdMogqrvZG1jltGeneNi8XgdfcUG4mXBQYlRpleFdwOf+Sl+5jwAcyeIofaxKTfKfMUbQNAtUtU6krOLIm6nsbsQMtQ
+ 9eh9034/79TWKI9r8XLallaBTEkU6Q2j5G68CKqee4M3UF5QrdM36/VoWQbRSelc3OQYcSXl3DaYWth8ScuqOSvEolGE6RDkP0WOxyY1kAfMu3ZIo7xAQfGH
+ /K77Oi5ThVXtODoAsTG7ipZlL8V5FnVj1ypvAh83EbL2YjSXwUxfow965Re3N9voEoOc6N82QiuP2//8V1GW8nD6CECmLOGzL22uyuKpzTrbaE5O9dK3usAC
+ MbCflbCkilTLhY5IlovOeMPRGC3/a1gENLbwKUYbxRpek7QcHKZ3UsWuAVrtWRlhZUDrsQzPyQxZm+kMRfIAHyXX8zE+IQ==
 
-Hi Menglong,
+When a VF reaches the limit introduced in this commit [1], the host reports
+an error in the syslog but doesn't mention which VF reached its limit and
+what the limit is actually is which makes troubleshooting of networking
+issue a bit tedious.   This commit simply improves this error reporting
+by adding which VF number has reached a limit and what that limit is.
 
-On Sat, Aug 2, 2025 at 5:28=E2=80=AFPM Menglong Dong <menglong8.dong@gmail.=
-com> wrote:
->
-> For now, the tcp socket lookup will terminate if the socket is reuse port
-> in inet_lhash2_lookup(), which makes the socket is not the best match.
->
-> For example, we have socket1 and socket2 both listen on "0.0.0.0:1234",
-> but socket1 bind on "eth0". We create socket1 first, and then socket2.
-> Then, all connections will goto socket2, which is not expected, as socket=
-1
-> has higher priority.
->
-> This can cause unexpected behavior if TCP MD5 keys is used, as described
-> in Documentation/networking/vrf.rst -> Applications.
->
-> Therefor, we lookup the best matched socket first, and then do the reuse
+Signed-off-by: David Hill <dhill@redhat.com>
 
-s/Therefor/Therefore
+[1] commit cfb1d572c986a39fd288f48a6305d81e6f8d04a3
+Author: Karen Sornek <karen.sornek@intel.com>
+Date:   Thu Jun 17 09:19:26 2021 +0200
+---
+ drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-> port logic. This can increase some overhead if there are many reuse port
-> socket :/
->
-> Fixes: c125e80b8868 ("soreuseport: fast reuseport TCP socket selection")
-> Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
-> ---
-> v3:
-> * use the approach in V1
-> * add the Fixes tag
-> ---
->  net/ipv4/inet_hashtables.c  | 13 +++++++------
->  net/ipv6/inet6_hashtables.c | 13 +++++++------
->  2 files changed, 14 insertions(+), 12 deletions(-)
->
-> diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
-> index ceeeec9b7290..51751337f394 100644
-> --- a/net/ipv4/inet_hashtables.c
-> +++ b/net/ipv4/inet_hashtables.c
-> @@ -389,17 +389,18 @@ static struct sock *inet_lhash2_lookup(const struct=
- net *net,
->         sk_nulls_for_each_rcu(sk, node, &ilb2->nulls_head) {
->                 score =3D compute_score(sk, net, hnum, daddr, dif, sdif);
->                 if (score > hiscore) {
-> -                       result =3D inet_lookup_reuseport(net, sk, skb, do=
-ff,
-> -                                                      saddr, sport, dadd=
-r, hnum, inet_ehashfn);
-> -                       if (result)
-> -                               return result;
-> -
->                         result =3D sk;
->                         hiscore =3D score;
->                 }
->         }
->
-> -       return result;
-> +       if (!result)
-> +               return NULL;
-> +
-> +       sk =3D inet_lookup_reuseport(net, result, skb, doff,
-> +                                  saddr, sport, daddr, hnum, inet_ehashf=
-n);
-> +
-> +       return sk ? sk : result;
->  }
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+index 9b8efdeafbcf..44e3e75e8fb0 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+@@ -2953,7 +2953,8 @@ static inline int i40e_check_vf_permission(struct i40e_vf *vf,
+ 		    I40E_VC_MAX_MACVLAN_PER_TRUSTED_VF(pf->num_alloc_vfs,
+ 						       hw->num_ports)) {
+ 			dev_err(&pf->pdev->dev,
+-				"Cannot add more MAC addresses, trusted VF exhausted it's resources\n");
++				"Cannot add more MAC addresses, trusted VF %d uses %d out of %d MAC addresses\n", vf->vf_id, i40e_count_filters(vsi) +
++          mac2add_cnt, I40E_VC_MAX_MACVLAN_PER_TRUSTED_VF(pf->num_alloc_vfs,hw->num_ports));
+ 			return -EPERM;
+ 		}
+ 	}
+-- 
+2.50.1
 
-IMHO, I don't see it as a bugfix. So can you elaborate on what the exact
-side effect you're faced with is when the algorithm finally prefers
-socket2 (without
-this patch)?
 
-AFAIK, the current approach breaks the initial design and might make
-the whole lookup process take a longer time in certain cases like you menti=
-oned.
+-- 
+This message has been scanned for viruses and
+dangerous content by MailScanner, and is
+believed to be clean.
 
-Thanks,
-Jason
 
