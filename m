@@ -1,127 +1,143 @@
-Return-Path: <netdev+bounces-211435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211436-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79EFCB189EC
-	for <lists+netdev@lfdr.de>; Sat,  2 Aug 2025 02:30:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA291B189FE
+	for <lists+netdev@lfdr.de>; Sat,  2 Aug 2025 02:58:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F026C1C84BAE
-	for <lists+netdev@lfdr.de>; Sat,  2 Aug 2025 00:30:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50C9FAA60F6
+	for <lists+netdev@lfdr.de>; Sat,  2 Aug 2025 00:58:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19D7C5A79B;
-	Sat,  2 Aug 2025 00:29:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C884354262;
+	Sat,  2 Aug 2025 00:58:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JG2hkGU4"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="E/MT3hSy"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E61722AD31;
-	Sat,  2 Aug 2025 00:29:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BD37225D6
+	for <netdev@vger.kernel.org>; Sat,  2 Aug 2025 00:58:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754094597; cv=none; b=tp5qcWHsz5UVagsTEZ3n+wFmtpuqYEfBAzLhXwMo9FS0jx5O93iKY87gTf3knUjZVEcmeRxmBBRWUg3vU9e7n6E7bqVCurDyER/yvKBEKiYUmPGmuVgfvZuPGlCkKytIf2ushiI2A9OnzJ/osQ7AYJlcXld4JqVDv74G2t9Mvs4=
+	t=1754096294; cv=none; b=hA4riLz1OBVjt3re7N5PolL0FVJ8VtfMbFHY0svAKK0RiYMxcup8aOcBsJGwU8G5k5UxOVJZA7H7ew4ON5DvF4niNshFZoSeZBTx6obw6vrIbO3YqV/oosCW93dt9wf07e0NG+l6ECqsd0MCC9Kvge1BY3U16RJOb9SzPQ1PxTM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754094597; c=relaxed/simple;
-	bh=roQYvsCVrYNtMkmVS0fcLUl3ijMdYuW0bC5rF1czNWE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=CCRGwmZTY/c09Z+YtHNc66WWVKC8nLBUvOX1/Ilob2liok5JVgK7xWYllSMAGkkGfi5Iu4puAo4f8clm5Kc1g1lmJVTmFZyxEHgSuIrN4QIIFhfOJx1EQjDtScX9MwU1KnRqHYrMDe4ZfiKy2rEEXGfGup9+4eswDfvO5PR/Bxo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JG2hkGU4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D7A4C4CEF6;
-	Sat,  2 Aug 2025 00:29:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754094596;
-	bh=roQYvsCVrYNtMkmVS0fcLUl3ijMdYuW0bC5rF1czNWE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=JG2hkGU4blThjlox6+ghm/m3jjWaIYdZC27a8oJczfnFp8oL7Ba329fyRrlJLsZLm
-	 LSUrS0eZ3SbSp+ggwlEdFTqRiRzenLfTYrKL/aOAIJFNjqmB6vKkQ22h/fbC+3ya20
-	 EM2GLEEECacot2hDR7722Y+HjR9ZYbj4vpA8EUNBmmzRyd4Tpt3RY8EWGRBPcu/Ehn
-	 lG6bEg1kmJbca9RhcnZob/y3wTUMnrcFotuG82CBA7LkZlq8oTNuE4XUjr4bVeklz3
-	 IKlfLrcXFiKnFarqIE4UhHSImuLDwsFqZy+nFdegdT3HmO7RLvnvpeN+D35GukOgWC
-	 IU1YB+NO26rFg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAEC0383BF56;
-	Sat,  2 Aug 2025 00:30:12 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1754096294; c=relaxed/simple;
+	bh=pSClDl8gMrb+z/iOjmTb4SdYjgpHPZ3SkrELa4PrHDY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WxoLcHqlj55nH5knaR+ojaJqba1WO68AhEgTT/UFXncMD+HVgUjXrSBJXFOUWUjHHHgPqYpco0VCYm/iMPJ1w8I/ifV9YtZtaLJJBQWG7VAEamKUpoVxX5JCuQE7rn+zxVc47vjzVLlT6TB3S52Dsz4JRmkAyrpjTgMh9kEwASA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=E/MT3hSy; arc=none smtp.client-ip=95.215.58.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <8e21c788-5187-4fee-baec-22b8e80be383@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1754096290;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=agr9pEQlcrXuRcRC5LeRoq4JlJKkOSpXMHrBu5wJnLQ=;
+	b=E/MT3hSyyzSZrT/6VXAplchf7UtnxZsm6YaNPBUb7xLOKnbooEpsQpPfy92EdP2IEl0D8w
+	nYvrm9kd4A82Kk/AmQLkSTRDo2bba2SPOhanR+ZbfY3y7gnP4/So5GvGahOFEu0gbzPu5R
+	QcVwjkeD/m1dAPL3/tIWMz4FVbrmlpQ=
+Date: Fri, 1 Aug 2025 17:58:02 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v3] net: drop UFO packets in udp_rcv_segment()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175409461150.4171186.3408701110750793287.git-patchwork-notify@kernel.org>
-Date: Sat, 02 Aug 2025 00:30:11 +0000
-References: <20250730101458.3470788-1-wangliang74@huawei.com>
-In-Reply-To: <20250730101458.3470788-1-wangliang74@huawei.com>
-To: Wang Liang <wangliang74@huawei.com>
-Cc: willemdebruijn.kernel@gmail.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, yuehaibing@huawei.com,
- zhangchangzhong@huawei.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH bpf-next v1 03/11] bpf: Open code
+ bpf_selem_unlink_storage in bpf_selem_unlink
+To: Amery Hung <ameryhung@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
+ alexei.starovoitov@gmail.com, andrii@kernel.org, daniel@iogearbox.net,
+ memxor@gmail.com, kpsingh@kernel.org, martin.lau@kernel.org,
+ yonghong.song@linux.dev, song@kernel.org, haoluo@google.com,
+ kernel-team@meta.com
+References: <20250729182550.185356-1-ameryhung@gmail.com>
+ <20250729182550.185356-4-ameryhung@gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20250729182550.185356-4-ameryhung@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Hello:
+On 7/29/25 11:25 AM, Amery Hung wrote:
+>   void bpf_selem_unlink(struct bpf_local_storage_elem *selem, bool reuse_now)
+>   {
+> +	struct bpf_local_storage_map *storage_smap;
+> +	struct bpf_local_storage *local_storage = NULL;
+> +	bool bpf_ma, free_local_storage = false;
+> +	HLIST_HEAD(selem_free_list);
+>   	struct bpf_local_storage_map_bucket *b;
+> -	struct bpf_local_storage_map *smap;
+> -	unsigned long flags;
+> +	struct bpf_local_storage_map *smap = NULL;
+> +	unsigned long flags, b_flags;
+>   
+>   	if (likely(selem_linked_to_map_lockless(selem))) {
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Can we simplify the bpf_selem_unlink() function by skipping this map_lockless 
+check,
 
-On Wed, 30 Jul 2025 18:14:58 +0800 you wrote:
-> When sending a packet with virtio_net_hdr to tun device, if the gso_type
-> in virtio_net_hdr is SKB_GSO_UDP and the gso_size is less than udphdr
-> size, below crash may happen.
-> 
->   ------------[ cut here ]------------
->   kernel BUG at net/core/skbuff.c:4572!
->   Oops: invalid opcode: 0000 [#1] SMP NOPTI
->   CPU: 0 UID: 0 PID: 62 Comm: mytest Not tainted 6.16.0-rc7 #203 PREEMPT(voluntary)
->   Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
->   RIP: 0010:skb_pull_rcsum+0x8e/0xa0
->   Code: 00 00 5b c3 cc cc cc cc 8b 93 88 00 00 00 f7 da e8 37 44 38 00 f7 d8 89 83 88 00 00 00 48 8b 83 c8 00 00 00 5b c3 cc cc cc cc <0f> 0b 0f 0b 66 66 2e 0f 1f 84 00 000
->   RSP: 0018:ffffc900001fba38 EFLAGS: 00000297
->   RAX: 0000000000000004 RBX: ffff8880040c1000 RCX: ffffc900001fb948
->   RDX: ffff888003e6d700 RSI: 0000000000000008 RDI: ffff88800411a062
->   RBP: ffff8880040c1000 R08: 0000000000000000 R09: 0000000000000001
->   R10: ffff888003606c00 R11: 0000000000000001 R12: 0000000000000000
->   R13: ffff888004060900 R14: ffff888004050000 R15: ffff888004060900
->   FS:  000000002406d3c0(0000) GS:ffff888084a19000(0000) knlGS:0000000000000000
->   CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->   CR2: 0000000020000040 CR3: 0000000004007000 CR4: 00000000000006f0
->   Call Trace:
->    <TASK>
->    udp_queue_rcv_one_skb+0x176/0x4b0 net/ipv4/udp.c:2445
->    udp_queue_rcv_skb+0x155/0x1f0 net/ipv4/udp.c:2475
->    udp_unicast_rcv_skb+0x71/0x90 net/ipv4/udp.c:2626
->    __udp4_lib_rcv+0x433/0xb00 net/ipv4/udp.c:2690
->    ip_protocol_deliver_rcu+0xa6/0x160 net/ipv4/ip_input.c:205
->    ip_local_deliver_finish+0x72/0x90 net/ipv4/ip_input.c:233
->    ip_sublist_rcv_finish+0x5f/0x70 net/ipv4/ip_input.c:579
->    ip_sublist_rcv+0x122/0x1b0 net/ipv4/ip_input.c:636
->    ip_list_rcv+0xf7/0x130 net/ipv4/ip_input.c:670
->    __netif_receive_skb_list_core+0x21d/0x240 net/core/dev.c:6067
->    netif_receive_skb_list_internal+0x186/0x2b0 net/core/dev.c:6210
->    napi_complete_done+0x78/0x180 net/core/dev.c:6580
->    tun_get_user+0xa63/0x1120 drivers/net/tun.c:1909
->    tun_chr_write_iter+0x65/0xb0 drivers/net/tun.c:1984
->    vfs_write+0x300/0x420 fs/read_write.c:593
->    ksys_write+0x60/0xd0 fs/read_write.c:686
->    do_syscall_64+0x50/0x1c0 arch/x86/entry/syscall_64.c:63
->    </TASK>
-> 
-> [...]
+>   		smap = rcu_dereference_check(SDATA(selem)->smap, bpf_rcu_lock_held());
+>   		b = select_bucket(smap, selem);
+> -		raw_spin_lock_irqsave(&b->lock, flags);
+> +	}
+>   
+> -		/* Always unlink from map before unlinking from local_storage
+> -		 * because selem will be freed after successfully unlinked from
+> -		 * the local_storage.
+> -		 */
+> -		bpf_selem_unlink_map_nolock(selem);
+> -		raw_spin_unlock_irqrestore(&b->lock, flags);
+> +	if (likely(selem_linked_to_storage_lockless(selem))) {
 
-Here is the summary with links:
-  - [net,v3] net: drop UFO packets in udp_rcv_segment()
-    https://git.kernel.org/netdev/net/c/d46e51f1c78b
+only depends on this and then proceed to take the lock_storage->lock. Then 
+recheck selem_linked_to_storage(selem), bpf_selem_unlink_map(selem) first, and 
+then bpf_selem_unlink_storage_nolock(selem) last.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Then bpf_selem_unlink_map can use selem->local_storage->owner to select_bucket().
 
+> +		local_storage = rcu_dereference_check(selem->local_storage,
+> +						      bpf_rcu_lock_held());
+> +		storage_smap = rcu_dereference_check(local_storage->smap,
+> +						     bpf_rcu_lock_held());
+> +		bpf_ma = check_storage_bpf_ma(local_storage, storage_smap, selem);
+>   	}
+>   
+> -	bpf_selem_unlink_storage(selem, reuse_now);
+> +	if (local_storage)
+> +		raw_spin_lock_irqsave(&local_storage->lock, flags);
+> +	if (smap)
+> +		raw_spin_lock_irqsave(&b->lock, b_flags);
+> +
+> +	/* Always unlink from map before unlinking from local_storage
+> +	 * because selem will be freed after successfully unlinked from
+> +	 * the local_storage.
+> +	 */
+> +	if (smap)
+> +		bpf_selem_unlink_map_nolock(selem);
+> +	if (local_storage && likely(selem_linked_to_storage(selem)))
+> +		free_local_storage = bpf_selem_unlink_storage_nolock(
+> +			local_storage, selem, true, &selem_free_list);
+> +
+> +	if (smap)
+> +		raw_spin_unlock_irqrestore(&b->lock, b_flags);
+> +	if (local_storage)
+> +		raw_spin_unlock_irqrestore(&local_storage->lock, flags);
+> +
+> +	bpf_selem_free_list(&selem_free_list, reuse_now);
+> +
+> +	if (free_local_storage)
+> +		bpf_local_storage_free(local_storage, storage_smap, bpf_ma, reuse_now);
+>   }
+>   
+>   void __bpf_local_storage_insert_cache(struct bpf_local_storage *local_storage,
 
 
