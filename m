@@ -1,146 +1,104 @@
-Return-Path: <netdev+bounces-211448-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211449-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28D17B18AD1
-	for <lists+netdev@lfdr.de>; Sat,  2 Aug 2025 07:45:09 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33F02B18ADE
+	for <lists+netdev@lfdr.de>; Sat,  2 Aug 2025 08:15:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4651E5659CE
-	for <lists+netdev@lfdr.de>; Sat,  2 Aug 2025 05:45:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2342A7A8903
+	for <lists+netdev@lfdr.de>; Sat,  2 Aug 2025 06:14:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 003471DF751;
-	Sat,  2 Aug 2025 05:45:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D5341B043F;
+	Sat,  2 Aug 2025 06:15:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="ok28SDrJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IHctM0MM"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelvem-ot02.ext.ti.com (lelvem-ot02.ext.ti.com [198.47.23.235])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD70E1CAA7D;
-	Sat,  2 Aug 2025 05:45:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.235
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57EAC182B4;
+	Sat,  2 Aug 2025 06:15:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754113505; cv=none; b=kagJMkeQZau/ggaD+EuK63Tvy1plg52P18uppyTKNsrAfwsKo9te1Weq3/bhEJ4+W3Wr7UAu7UVZ13AqPCy37wR63Dg1tbZqcsWDqcQk+zrA50KhMLjTQ3icJ8chFoPyjCs03j3O7LJuUvwbWqTb9p1dJnPda0faKEWwonxQeVU=
+	t=1754115343; cv=none; b=nD+d1XpS/jJDaxVMK4IUH1B7enHukqfpYn/CExlJSEVzKeA52RIvSU5q8HnTHoRWhB5JTGpJWUlG5F2AZBlULIFqknSJhdcgz4K+F1p9+oIfxsW1rreP0g1LtLBsJZXPg209W2bplKhPSgZExtjK3XzqvFFP+K4lRWd8HGOslGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754113505; c=relaxed/simple;
-	bh=gQzI2gwKNmv9R97Gt9Jlthq8kskAwUNfnmi4KeSKs1g=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F66bH1I+C8/edrHI0sjNfVCx+KFnMVAOjf+YY+M7yI+a6iJk3K7L+WKIqMLMHZmY3G0LjmC5qNNMF93v/kk3MX0fQlFKWAb5sjCOMX0/g6+ncVikXKrA/MMxuS3j/C9/KOr/iEPZ5kN28c/clDzzAE6fecAvq5j5bdZdUQXozfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=ok28SDrJ; arc=none smtp.client-ip=198.47.23.235
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllvem-sh04.itg.ti.com ([10.64.41.54])
-	by lelvem-ot02.ext.ti.com (8.15.2/8.15.2) with ESMTP id 5725iQYO3876820;
-	Sat, 2 Aug 2025 00:44:26 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1754113466;
-	bh=eO+pNC2Kq3EhIuBpo+lO/zj40iLRQifl41nP1SpBuaM=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To;
-	b=ok28SDrJe+vmG2O1YnTK/lD2ZDWMkvePlEA8ubal2tRQxdrOynzzkFKU62Y66zQsp
-	 OrNnubIN6f2BrKZYknXXrHfy274KBFvybrhvsjavpyQu/FfhB1wKhb5xVbJcTbwHGx
-	 jrpiIoEwtMLUcb1+9S9HjLDyN9wwECH6XMtBPCw8=
-Received: from DLEE103.ent.ti.com (dlee103.ent.ti.com [157.170.170.33])
-	by fllvem-sh04.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 5725iQkm1067612
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
-	Sat, 2 Aug 2025 00:44:26 -0500
-Received: from DLEE115.ent.ti.com (157.170.170.26) by DLEE103.ent.ti.com
- (157.170.170.33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Sat, 2
- Aug 2025 00:44:25 -0500
-Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DLEE115.ent.ti.com
- (157.170.170.26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55 via
- Frontend Transport; Sat, 2 Aug 2025 00:44:25 -0500
-Received: from localhost (uda0492258.dhcp.ti.com [172.24.231.84])
-	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 5725iOOf1162612;
-	Sat, 2 Aug 2025 00:44:24 -0500
-Date: Sat, 2 Aug 2025 11:14:23 +0530
-From: Siddharth Vadapalli <s-vadapalli@ti.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
-        Michael Walle
-	<mwalle@kernel.org>, Nishanth Menon <nm@ti.com>,
-        Vignesh Raghavendra
-	<vigneshr@ti.com>,
-        Tero Kristo <kristo@kernel.org>, Andrew Lunn
-	<andrew+netdev@lunn.ch>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>, Roger Quadros <rogerq@kernel.org>,
-        Simon Horman
-	<horms@kernel.org>,
-        Siddharth Vadapalli <s-vadapalli@ti.com>,
-        Maxime
- Chevallier <maxime.chevallier@bootlin.com>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux@ew.tq-group.com>
-Subject: Re: [PATCH net-next] Revert "net: ethernet: ti: am65-cpsw: fixup PHY
- mode for fixed RGMII TX delay"
-Message-ID: <47b0406f-7980-422e-b63b-cc0f37d86b18@ti.com>
-References: <20250728064938.275304-1-mwalle@kernel.org>
- <57823bd1-265c-4d01-92d9-9019a2635301@lunn.ch>
- <DBOD5ICCVSL1.23R4QZPSFPVSM@kernel.org>
- <d9b845498712e2372967e40e9e7b49ddb1f864c1.camel@ew.tq-group.com>
- <DBOEPHG2V5WY.Q47MW1V5ZJZE@kernel.org>
- <2269f445fb233a55e63460351ab983cf3a6a2ed6.camel@ew.tq-group.com>
- <88972e3aa99d7b9f4dd1967fbb445892829a9b47.camel@ew.tq-group.com>
- <84588371-ddae-453e-8de9-2527c5e15740@lunn.ch>
+	s=arc-20240116; t=1754115343; c=relaxed/simple;
+	bh=cEoHIrGwI9Cmfy7uTxfy8BAPSlg9FflWFmdc6B7TtOQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kh+7GCq4xEneYg1bkN7xyUQ6Su7t5iNKHdDQfPGkS1Ow7oR7sg06GwsKgH3Pm05h/A94FX244aH1C+YaiJk2BK79NN+KscG+zcTVlg1Swrs+oS04GvSwSFdhccwRyjCetJJVvZBDJV8GD9YYF/5edS76wbwQOpCPKJ6mDZ2jfGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IHctM0MM; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-af0dc229478so240874766b.1;
+        Fri, 01 Aug 2025 23:15:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1754115341; x=1754720141; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=cEoHIrGwI9Cmfy7uTxfy8BAPSlg9FflWFmdc6B7TtOQ=;
+        b=IHctM0MMDW9uwDYLi228KO2ISAn4KOduXvbqLR2gmQa6rnb/hfDpwc4PLOLar9IyAu
+         aWeW+35OONTIVzEBwqLZYGmVyeVweHJbC3qf90QdP3N9ADdaLBLCBNQd2e7jLR1CiEXp
+         1A3lA0wnYQSb1Pps0RxP4uzFdr4Bk8DvYoctZAZgjZRU6janxAK3z638UAmTUwddNEpW
+         1BTQlee2jLXnPfru/V47DOiwKyRpUCOtAWT+Z79/jOC54uA1NKxjNotpHJsYC/WPOT8D
+         HwnylLG6UaGxsJb0jju44q3OOt9cdiW+CBe0QSrbW/2WNYxKj3sBJTEOJL2DM8ANztHa
+         yKPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754115341; x=1754720141;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cEoHIrGwI9Cmfy7uTxfy8BAPSlg9FflWFmdc6B7TtOQ=;
+        b=sNE8NRNVcDBAoDzSCJtx4zNmaBF7i2xq/gT0sIr1RS8cJEzJ0GOj0OIpwJy+r3YFU3
+         Yhp16h4G6MSBsngC/DVpuR5/6e4OdRgWF1CUujsFIlc9oyeKDpgG6wChaIqLZc6rZyjQ
+         bTT0AOQZSZQrqQxW3/MZYKWc+8VKF8jqXtr+iPpisKPAolqWTt3HVWXo2RaIszqq7i0x
+         8yRKR3tXugHyELtln2vr+Px0p5172tnxWuTy3J1ap+BFn10ZxL9cXC7jr38++PvEGX1B
+         L2x8Yt3lcg/40bXtnwODZcJUgzHUhnH4fGueWfK2DVf/KdUU38dyw1bLCsO9TzPFEFFr
+         W+Dw==
+X-Forwarded-Encrypted: i=1; AJvYcCVRZQ0EOnDc2GHFSEPcTfLwoaprFumyetdlLtdV+CgV6XrylOeJW2EAJ9uoajC3xhzioQsHx9pySMKnd4c=@vger.kernel.org, AJvYcCVpKYHIxdQhSNQpJUZaQyoFrRtpu7RATjwoEs/VHuE7XGwEYD9cJBsAp3s4me3gvmDtFLwbl87E@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy+2MXUE5w6DcJMH2c1AvnT2JmUZw9XgnEUJ/5ZgRjBTCQkyiw/
+	SjRenRZ7dz9RAnQPAlM2g7K0W20jr69UfT1OHYL85kNeZw/8y1LCTRn3DfGvb9CaVH7w41AvzRV
+	FcJpxSxq2l7HuQuCUOnWA9fvBEtgy7g==
+X-Gm-Gg: ASbGncvGrrje13jN2/ZxkwM3uboXNrmy4sweGGxy7uKBDTVduL3rl/K3I+z+YLAuDcV
+	FdCtcx08IQqRI9Bcgg+39HcLpkfD2696aoAkU4aqIg00vZWRrmYh3DVH/gkoP28Y173u5zcLv62
+	O1S48dSXvZsdNEOg9nXnopcluSo5yln4TXTQI8mfcN/LGzGpRNxeExITOX1EEbGfM+OsJGA95M5
+	MUXId0OuSMQ98AatGg=
+X-Google-Smtp-Source: AGHT+IHW9WdtFCyF+F81VNF8OEsDrE1uYicLpSEA/0VyxvhYP4Yby1e7IsG9Oskayq8UFDdTWgJzQoTiV+ShkV6XYVw=
+X-Received: by 2002:a17:906:6a03:b0:af9:1ee4:a30c with SMTP id
+ a640c23a62f3a-af940155f39mr269943566b.36.1754115340366; Fri, 01 Aug 2025
+ 23:15:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <84588371-ddae-453e-8de9-2527c5e15740@lunn.ch>
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+References: <68712acf.a00a0220.26a83e.0051.GAE@google.com> <20250727180921.360-1-ujwal.kundur@gmail.com>
+ <e89ca1c2-abb6-4030-9c52-f64c1ca15bf6@lunn.ch> <CALkFLL+qhX94cQfFhm7JFLE5s2JtEcgZnf_kfsaaE091xyzNvw@mail.gmail.com>
+ <df06dba7-f5bd-4ee1-b9af-c5dd4b5d4434@lunn.ch>
+In-Reply-To: <df06dba7-f5bd-4ee1-b9af-c5dd4b5d4434@lunn.ch>
+From: Ujwal Kundur <ujwal.kundur@gmail.com>
+Date: Sat, 2 Aug 2025 11:45:27 +0530
+X-Gm-Features: Ac12FXzpgl8ZaZQeWyE04wBaP_SNNPuPf_Yaw-jOHv_b-13WN2_K2Iit5eK-6tI
+Message-ID: <CALkFLLLYZBE=EztO_1Ws=G+URhBVaLfdvm0v2xRK6ZEEcNBsSg@mail.gmail.com>
+Subject: Re: [RFC PATCH] net: team: switch to spinlock in team_change_rx_flags
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: syzbot+8182574047912f805d59@syzkaller.appspotmail.com, davem@davemloft.net, 
+	edumazet@google.com, horms@kernel.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com, jiri@resnulli.us, andrew+netdev@lunn.ch
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Jul 30, 2025 at 04:27:52PM +0200, Andrew Lunn wrote:
-> > I can confirm that the undocumented/reserved bit switches the MAC-side TX delay
-> > on and off on the J722S/AM67A.
-> 
-> Thanks.
-> 
-> > I have not checked if there is anything wrong with the undelayed
-> > mode that might explain why TI doesn't want to support it, but
-> > traffic appears to flow through the interface without issue if I
-> > disable the MAC-side and enable the PHY-side delay.
-> 
-> I cannot say this is true for TI, but i've often had vendors say that
-> they want the MAC to do the delay so you can use a PHY which does not
-> implement delays. However, every single RGMII PHY driver in Linux
-> supports all four RGMII modes. So it is a bit of a pointless argument.
-> 
-> And MAC vendors want to make full use of the hardware they have, so
-> naturally want to do the delay in the MAC because they can.
-> 
-> TI is a bit unusual in this, in that they force the delay on. So that
-> adds a little bit of weight towards maybe there being a design issue
-> with it turned off.
+> This is already fixed by:
+> bfb4fb77f9a8 ("team: replace team lock with rtnl lock")
+Thanks for letting me know. I now understand ASSERT_RTNL() is a viable
+alternative.
 
-Based on internal discussions with the SoC and Documentation teams,
-disabling TX delay in the MAC (CPSW) is not officially supported by
-TI. The RGMII switching characteristics have been validated only with
-the TX delay enabled - users are therefore expected not to disable it.
-Disabling the TX delay may or may not result in an operational system.
-This holds true for all SoCs with various CPSW instances that are
-programmed by the am65-cpsw-nuss.c driver along with the phy-gmii-sel.c
-driver.
-
-In addition to the above, I would like to point out the source of
-confusion. When the am65-cpsw-nuss.c driver was written(2020), the
-documentation indicated that the internal delay could be disabled.
-Later on, the documentation was updated to indicate that internal
-delay cannot (should not) be disabled by marking the feature reserved.
-This was done to be consistent with the hardware validation performed.
-As a result, older documentation contains references to the possibility
-of disabling the internal delay whereas newer documentation doesn't.
-
-Regards,
-Siddharth.
+> I'm guessing, but is this about passing ndo_set_rx_mode from the upper
+> device down to the lower devices? Maybe look at how this is
+> implemented for other stacked devices. A VLAN interface on a base
+> interface for example? A bridge interface on top of an interface.
+Oh this is about stacked devices, hence the references to "lower" and
+"upper". Thanks, I'll read more about them.
 
