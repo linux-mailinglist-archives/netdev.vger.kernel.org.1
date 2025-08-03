@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-211471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211472-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27C26B19309
-	for <lists+netdev@lfdr.de>; Sun,  3 Aug 2025 10:15:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 596FFB1930E
+	for <lists+netdev@lfdr.de>; Sun,  3 Aug 2025 10:17:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F015D167156
-	for <lists+netdev@lfdr.de>; Sun,  3 Aug 2025 08:15:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8EE4F16CA4B
+	for <lists+netdev@lfdr.de>; Sun,  3 Aug 2025 08:17:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4351D1D5CC6;
-	Sun,  3 Aug 2025 08:15:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36F191F0E56;
+	Sun,  3 Aug 2025 08:17:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dw6baU3u"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KmaIPYrn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EEBE6ADD;
-	Sun,  3 Aug 2025 08:15:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 065C46ADD;
+	Sun,  3 Aug 2025 08:17:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754208954; cv=none; b=VC10vIs3Swn9gJvmw+kE1F6SCRQYruQLqOOXmPG8Ur/DkKkpU6UVpTeJDeftXMkbC6VdK7U4r0WjePsL6aaQNhJeJNZIZCjmHbLPYuvxpkH5QzV11yA/V5B7GTgYNGj7m8G8Kc3R80dj8C2INUGmMH1YunmGbwAAFVZQLZI5jfw=
+	t=1754209048; cv=none; b=uO9kV0oCOeqbyRjHpYu9ibXKx48Dvl3ap8lKaZReipocBnxVt7Or0vPtsjMrsqod8svy3HyBxE6EdjK8qaRKwYlt/v9hbj9hSJf4hnKXF5RpVldcVv/EFW/Zu7EFG/5ZZKyOnW4DGl2BhhbpSoog4MKzCrGsRp3im48Il0IPik4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754208954; c=relaxed/simple;
-	bh=a+B5Pvv2XMw84hBjmHdDDrvrkZHaY0NB9xp/6axrcn8=;
+	s=arc-20240116; t=1754209048; c=relaxed/simple;
+	bh=dG5Q14Vv2tG8ILJ0dE05rABknNd8Pl7HaZzDqnCNezo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Wesbg00NGtu2aChGfJe6PEuhxpMEYTy1PnVzCwi8ITGIt3tMzEeztwx2d0EVcfAT7P0l7LwHYcQESPLbHxc+Ia7sBgpOTkuh529EpOi1nU7Cq4/FSfIy1ZKF+80TlQOzAIs6HJbGsaCpIjVqnwSM/W7ni7wSR1kaPBiazSd8Qwo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dw6baU3u; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FBD9C4CEEB;
-	Sun,  3 Aug 2025 08:15:49 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=NVcA2HZqsx1hkHvlsXfFchyqJw5vjrddyo8MLQbQPq+NzBUUih5T8VM/szrwBmintstFuYARkV4L8KaEB/7SCvyhVBbTY49YAKSUwQyIuaU2wiypK/o31ye2DZ7nIf+7Uk64qBk691qYFRLNNsUD0KUo1Iuy28Ol7VNILB8Xgp8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KmaIPYrn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D895C4CEF8;
+	Sun,  3 Aug 2025 08:17:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754208953;
-	bh=a+B5Pvv2XMw84hBjmHdDDrvrkZHaY0NB9xp/6axrcn8=;
+	s=k20201202; t=1754209047;
+	bh=dG5Q14Vv2tG8ILJ0dE05rABknNd8Pl7HaZzDqnCNezo=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=dw6baU3uEmA1DcRzroDg3t6hBVCoZ00yM8CBowicsYkWJ0xjZLkkGxMw1o2T8PKPV
-	 m9AAmKhTkIcJT/uOfnZWHtHRRXTV22wX+M7aIa0gYUEojNCiziDs5QYbCtA3ry6ue3
-	 yG1MJOnzcJwoNagZZ8VD7Aisnw4c8WGBmu4i7mvvOKm+3Dm0/+aQXbXBrLPU6S9K3K
-	 Oo0c0LXbJRNYHOfK9EABaJ/NSo1RZPbBs3LHz4A6QxiL3A0VPXItW8bQJuSmV8JgOc
-	 6eBotvvZ736ttai5riAYgCat8OzLlTZq5FfxIOgYEnXOTZUnbYmp71ThouS4RkuNpN
-	 Lx71Xo3AIc+ng==
-Message-ID: <46590c06-a9e5-4469-873a-ec312f70cc9a@kernel.org>
-Date: Sun, 3 Aug 2025 10:15:47 +0200
+	b=KmaIPYrn/8NwQLEGCvtM6+8llJX7vEXD820E83K7OaYX3+LF+MvRhDInEBUjAUF9l
+	 Nh3M9d3WwsKtr9oSZFqBuN2WPdAgnOV2J6VWT276fK3iHSSZYnyaObxp0G1JbAPMq2
+	 bYwmUHrXdurSc0kqW2R4BZlFeC/EX0+o/F2hRaXAK97TUwsoFjJ9wMG1ckJEpwF4Xg
+	 Zlf3GTusnBKNloEvNJAFPVY9s44pLpRhy6OAQ0fEDUMAbDyCwWscksyTLw3psO1PRe
+	 sgfP1C+KN++ZvilYyPucuG0V5Ni3RiEBQWFOl6sNg9sR1uh6SaO2VAqeP/8BHrHCcP
+	 20jsr6CI2zQSg==
+Message-ID: <fbe7b083-bc3f-4156-8056-e45c9adcb607@kernel.org>
+Date: Sun, 3 Aug 2025 10:17:21 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,11 +52,11 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v3 09/27] dt-bindings: clock: mediatek: Describe MT8196
  clock controllers
-To: Laura Nao <laura.nao@collabora.com>, mturquette@baylibre.com,
- sboyd@kernel.org, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
- p.zabel@pengutronix.de, richardcochran@gmail.com
-Cc: guangjie.song@mediatek.com, wenst@chromium.org,
+To: Rob Herring <robh@kernel.org>, Laura Nao <laura.nao@collabora.com>
+Cc: mturquette@baylibre.com, sboyd@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, matthias.bgg@gmail.com,
+ angelogioacchino.delregno@collabora.com, p.zabel@pengutronix.de,
+ richardcochran@gmail.com, guangjie.song@mediatek.com, wenst@chromium.org,
  linux-clk@vger.kernel.org, devicetree@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
  linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
@@ -64,6 +64,7 @@ Cc: guangjie.song@mediatek.com, wenst@chromium.org,
  <nfraprado@collabora.com>
 References: <20250730105653.64910-1-laura.nao@collabora.com>
  <20250730105653.64910-10-laura.nao@collabora.com>
+ <20250801135604.GA3045005-robh@kernel.org>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -109,30 +110,37 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
  zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
  XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <20250730105653.64910-10-laura.nao@collabora.com>
+In-Reply-To: <20250801135604.GA3045005-robh@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 30/07/2025 12:56, Laura Nao wrote:
-> +
-> +  mediatek,hardware-voter:
-> +    $ref: /schemas/types.yaml#/definitions/phandle
-> +    description:
-> +      On the MT8196 SoC, a Hardware Voter (HWV) backed by a fixed-function
-> +      MCU manages clock and power domain control across the AP and other
-> +      remote processors. By aggregating their votes, it ensures clocks are
-> +      safely enabled/disabled and power domains are active before register
-> +      access.
+On 01/08/2025 15:57, Rob Herring wrote:
+>> +  reg:
+>> +    maxItems: 1
+>> +
+>> +  '#clock-cells':
+>> +    const: 1
+>> +
+>> +  '#reset-cells':
+>> +    const: 1
+>> +    description:
+>> +      Reset lines for PEXTP0/1 and UFS blocks.
+>> +
+>> +  mediatek,hardware-voter:
+>> +    $ref: /schemas/types.yaml#/definitions/phandle
+>> +    description:
+>> +      On the MT8196 SoC, a Hardware Voter (HWV) backed by a fixed-function
+>> +      MCU manages clock and power domain control across the AP and other
+>> +      remote processors. By aggregating their votes, it ensures clocks are
+>> +      safely enabled/disabled and power domains are active before register
+>> +      access.
+> 
+> I thought this was going away based on v2 discussion?
 
+Yes, I asked to drop it and do not include it in v3. There was also
+discussion clarifying review.
 
-No improvements, I already commented on this.
-
-I also said:
-
-"I already commented on this, so don't send v3 with the same."
-
-NAK
-
+I am really surprised that review meant nothing and code is still the same.
 
 Best regards,
 Krzysztof
