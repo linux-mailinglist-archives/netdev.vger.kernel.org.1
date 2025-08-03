@@ -1,184 +1,274 @@
-Return-Path: <netdev+bounces-211487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211488-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE3CDB193CE
-	for <lists+netdev@lfdr.de>; Sun,  3 Aug 2025 13:13:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4CC5B193DB
+	for <lists+netdev@lfdr.de>; Sun,  3 Aug 2025 13:24:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 33CFD7AB6D4
-	for <lists+netdev@lfdr.de>; Sun,  3 Aug 2025 11:11:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 525DE3B860D
+	for <lists+netdev@lfdr.de>; Sun,  3 Aug 2025 11:24:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB7CA25B687;
-	Sun,  3 Aug 2025 11:12:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31CA82222B4;
+	Sun,  3 Aug 2025 11:24:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bHuiIEhb"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="kA1aC5WL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2057.outbound.protection.outlook.com [40.107.93.57])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BCC4192B90;
-	Sun,  3 Aug 2025 11:12:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754219569; cv=none; b=VJUOBS8MWIL5Q0wz8nbM5nw3uj7STDYVtEZ03FH9hEYUxNOeL7Wc2d55D/+boJF5TaTBmqUeiCVPOsbK7eZ8y+4fioobY2u2Ckh9u8lL8s8x73fiYMdb6KT64Bgc4xapeVY7v8YqvyXg9QoXfkpE7bNrCSCH89J+wCy/LKshKV0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754219569; c=relaxed/simple;
-	bh=/DuWb1PqPZaSu8+vdQF93J8DpOZRJnKyJD1SGitokQk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HBLvcyytjktXuxSvEmKGdyimU+Cr8VBiUvP/6sub9+8CREGCcpwQtlxkmU3+t/+R7B7dOetubHrS4U8/d+0XqqnXwUlUieRjr31jd6IFbNpBLhrB7PJFgAnYJM61tEP+jGNqFMU1lcl4w2d3JlDJLUaBPgILoaex+TFwJMIaSPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bHuiIEhb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E459C4CEEB;
-	Sun,  3 Aug 2025 11:12:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754219569;
-	bh=/DuWb1PqPZaSu8+vdQF93J8DpOZRJnKyJD1SGitokQk=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=bHuiIEhblA1gkXkFNEpp9tUT5E7hqrgJikoUwwNI38O7V03BCmkkme6O2SqRSNygM
-	 MWLbAUwRxhjhKIRIStlbMJEchhXdR7aMXNysFrf/42PXT2I0V4B/i0v8U++JnVe5kf
-	 JnaH67c/pa5pVZjUeVHQ/dDNSR8GG27yaGVOpoKOrwnoHZALCkjqaZRdf+VyZ845gk
-	 Ch1ui3i2o8jLy7ko8khFXmD7Ug3IM0rEWupS0/aTG/sV2KJLLgtQmGX2MaKed0rZF0
-	 gnAxDFKWbslkPKo1dMualzXAkIczlqL5qrl5McRMBISAJ/oczoMZsXcv1TctdAmYNd
-	 30E7j/4VJFDeQ==
-Message-ID: <db39e1ff-8f83-468c-a8cb-0dd7c5a98b85@kernel.org>
-Date: Sun, 3 Aug 2025 13:12:44 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5622018B12
+	for <netdev@vger.kernel.org>; Sun,  3 Aug 2025 11:24:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.57
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1754220284; cv=fail; b=XL7sh6xoxrmbDOC+opFvVCRbJh0wq95oOtB4itluzBw7AdizCbtjxZZAfF/yiKsLGKvvKdDVD253eZzNYk4wemh7z7DidHy13Imq0ub8Ey6Rubrqgws7kuwt+RBceddNYKQi04+USnEB0rj6gweDNxwmoe+AchvkBwyH2A/0KQ0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1754220284; c=relaxed/simple;
+	bh=S31zFMk7uVP0gZZVGefGkefqfrS2WooZRp9/HMFiADc=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=tmJP4hNpMXupHGA60HLxFaGMQkSpYXNVFXjXd/yOHkl1XXfQzp5lXY2gY+ifLTUo1RwIgMgVMjPW6SSRwGDpk3H8TdOoFxl/FYW0kVIhnQekQk9YweHv4lT2W4rm56Df3/h8XgzTsFAKzZL2QUDRg+rOT08ea/Wt+bfYLBgXRIo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=kA1aC5WL; arc=fail smtp.client-ip=40.107.93.57
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=GXZ7Y2dRkdxqnMLW8mQxDMLbFa0fRIePDnuxrr6GM32rX3uuxDtSsNlm5Z/70S4LgR5kYi9oxuQf4I3UQEx2ounKpQ/bJkcmULF/Fp2HFUdMul0J4rybaFdgLmnGgJ3TO/1jKCPgggdZkLCTW9sNeUVXrALaPI5nbYHyeE1AYsxahV6TspXpez+aRxOraEgsUQkxW5IxlsEBZIN9D2VxAhCe62sRHePpghlNkXxaMrBNn//B4Y3jaExSbQ031yYhsDEjM3JcR1FuWSCBqzCFEkLdkkgvmerRZIiBgXv98nHkYVVKbDc6PgZ1SYUn9KjHjybTnPL1QK9xgJE6paUvdg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=obDwmYdazosW5jaSUPr2sRKkb2fQ5d3qZnUmstQnJFc=;
+ b=kXAAQmrkXa8o9XFuC6yvFdRM4/QcJdhDOaWzGPn1vJQjM0Fcbz+P2F8sx+S0b35f3DhM6tw5DDfVkN552xfds6LV19TofmGYa18/m40l/pgNMYwYYt+ZOJK+qqOWmgggsyTXhs4wF6Vx2qAM+jNu5yJ03e41dQ2eWAi3BYPNqx/Kj5BcF6T2iVCFZQdShIJA2JsQ0mXZHcivQEew2KmjQ5xmrzb7cSxvlB2goTzAxL7tfEkKcdioiqC4aKVxTeM/xOy/LjtoCkTKXpJWbczeXV+laGt+WKYiVwXXiz7+smHTPp+efYrwGXpN56lJzPXee0mPfHyBt2ytz0bQnif7xw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=obDwmYdazosW5jaSUPr2sRKkb2fQ5d3qZnUmstQnJFc=;
+ b=kA1aC5WLBERMFLvqozkrQjB0i6ZG5bs581rTU/+jIuEaGFMFk0Qukc532UFmvUgdyVtR+IXQS0aibm7SGey4lut4rdjUIzFSiQE7HZ/NlYqFQn3Qyb65lly85eaVmlsv+aGr90jSvlxQDbA+ZEg6SAhh5Dt9bZ+7gA0wY7Mmi0ECs8eGj12u9lskSa7hGdGwZwGvA09m/xqlPYExGtdtRk63IwIIcGLQ5GpIBY0gsjDrZSOQI/PPQ2XZtOJwsbAzfDn7eQcHiQ3xBbQkWYPFHMBXI0O7xvkd7UewmbENJsvd3BXi2wT+m1DLtiCDaiXFRPIPYGAC7FNmtdFmSZlHNw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MW4PR12MB7141.namprd12.prod.outlook.com (2603:10b6:303:213::20)
+ by PH7PR12MB8593.namprd12.prod.outlook.com (2603:10b6:510:1b1::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8964.24; Sun, 3 Aug
+ 2025 11:24:38 +0000
+Received: from MW4PR12MB7141.namprd12.prod.outlook.com
+ ([fe80::932c:7607:9eaa:b1f2]) by MW4PR12MB7141.namprd12.prod.outlook.com
+ ([fe80::932c:7607:9eaa:b1f2%5]) with mapi id 15.20.8989.013; Sun, 3 Aug 2025
+ 11:24:38 +0000
+Message-ID: <d3bb8295-bb4f-4817-a2dd-017332c489d4@nvidia.com>
+Date: Sun, 3 Aug 2025 14:24:30 +0300
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v3] ethtool: add FEC bins histogramm report
+To: Vadim Fedorenko <vadfed@meta.com>, Andrew Lunn <andrew@lunn.ch>,
+ Michael Chan <michael.chan@broadcom.com>,
+ Pavan Chebbi <pavan.chebbi@broadcom.com>, Tariq Toukan <tariqt@nvidia.com>,
+ Gal Pressman <gal@nvidia.com>, intel-wired-lan@lists.osuosl.org,
+ Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>
+References: <20250802063024.2423022-1-vadfed@meta.com>
+Content-Language: en-US
+From: Carolina Jubran <cjubran@nvidia.com>
+In-Reply-To: <20250802063024.2423022-1-vadfed@meta.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: TL2P290CA0004.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:2::13) To MW4PR12MB7141.namprd12.prod.outlook.com
+ (2603:10b6:303:213::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/2] dt-bindings: dpll: Add clock ID property
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
- Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Prathosh Satish <Prathosh.Satish@microchip.com>,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- Michal Schmidt <mschmidt@redhat.com>, Petr Oros <poros@redhat.com>
-References: <20250717171100.2245998-1-ivecera@redhat.com>
- <20250717171100.2245998-2-ivecera@redhat.com>
- <5ff2bb3e-789e-4543-a951-e7f2c0cde80d@kernel.org>
- <6937b833-4f3b-46cc-84a6-d259c5dc842a@redhat.com>
- <20250721-lean-strong-sponge-7ab0be@kuoka>
- <804b4a5f-06bc-4943-8801-2582463c28ef@redhat.com>
- <9220f776-8c82-474b-93fc-ad6b84faf5cc@kernel.org>
- <466e293c-122f-4e11-97d2-6f2611a5178e@redhat.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <466e293c-122f-4e11-97d2-6f2611a5178e@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MW4PR12MB7141:EE_|PH7PR12MB8593:EE_
+X-MS-Office365-Filtering-Correlation-Id: 164db1c2-833e-4948-fd4c-08ddd2805519
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?TmsvVzNtU2lHR3J5K2ZmWUJHeG5qVllGcnZiK1VTMUVvTDg4RTJUMlhQUWVO?=
+ =?utf-8?B?TmMweTgyOTduQ1F0a3lKU0NBWDB1bDA1b21xaWVnaG1QNk8zdFM4NEtlUkZH?=
+ =?utf-8?B?RTViY0dydWl3YXJKQk12bzdLNDgzT2R6RUw1K01Cb2FoSTg1bG5COTFzZFE1?=
+ =?utf-8?B?aXVUQ2YzRWM4VXVsa0J3ODNiZjRhUWZUUU9yejh0N0w4NG84Yy9qZmU5R25h?=
+ =?utf-8?B?dllsUnBWUDhqbC9PdnNIT0lycTBYN3A3Q3RyOGxHT3B2VWVHRGJXT0s4QmZS?=
+ =?utf-8?B?MU5aQW4vVThaZVorVERWOEJSczZ1dlU4aXRhTkttVkxiU2pJdmpjUmU3NE1k?=
+ =?utf-8?B?dHRBczBTdW1UeVc3UTNDVm5NbEtEc2dyMUFyN0lVTXIreE9FMnMwNmdVMlRR?=
+ =?utf-8?B?Y0xkQmdlOUZPZGcxYjlndm12MGY0QUM1SkR3UVM0bFA5Yk94KytyRVliQzhO?=
+ =?utf-8?B?MytEckdKQmJTSmZCT0c1UGZURHRhd2xOaDdreUk5U0paZWo1cGlvWVJKUlVR?=
+ =?utf-8?B?cXhzSjkyV2E4dSt0RVFiNHhQYmtpSnJUbER4YzlPYkw4SGlQMmhVd1FjcSt5?=
+ =?utf-8?B?QjBPRzJPdDcwRThMUDd4VDlIU3N6MzIxdE51VVo4YzdQdmtqcFB6SmVhR2Er?=
+ =?utf-8?B?ZVRDekNYd0tnZCtORkVOcGZJVmtydU5MNFZ4MXVTZVV5ejkvUEc5dHZ5dnpE?=
+ =?utf-8?B?eVk5YXR1UGZTSzdaN2JUMjNIOXMyQis4aHIzTko2TlR0bDE2bTVKTEZ6T0dH?=
+ =?utf-8?B?aHBDT1psMVp4OHB5Q0djdktzZENSRm5UK2xKb2V1Z3lwdUIzRmJnWVdPa0Vn?=
+ =?utf-8?B?aGdNdkZyYlJWMEI3RHJFV0ZQVzNDUmxGTytBc0hXYTErdWpMVjdRN2ZJTCtJ?=
+ =?utf-8?B?VUdmVUVPR293OWZTOW1UdkdRSHZxZUIxUmVlUkI4ZVdaaFQrSFlteTA3TVky?=
+ =?utf-8?B?TVdTZWROWElPWEVmdzZXSXlZNGN6eDQ1aExiYkhJUlVkNm1PdmF3ak1yZzVx?=
+ =?utf-8?B?THZLZWlJcjhWNm9McFllWlFBVmhCMlpNdHRNbGVBZmZzL2NpYk0zUUJvY0ww?=
+ =?utf-8?B?aDV5ckJvckpwUm52Vno4aU1TREV4eGhKOFA2c0c1TnBReHdHOXY0QytnTmtR?=
+ =?utf-8?B?Y1AvdWJ5Y21BcmVEZ0hQamJnMkIwRFBrRTZoNURiRUpNY0xCMndxeTFQcm9y?=
+ =?utf-8?B?RXVFZ3N3UTFIa091bEV4NDdtNExJT1YxdGdJS2NnMmI1TnhjRTJmQ1BDS3dS?=
+ =?utf-8?B?eGhtUFBzUW1KQU5VRGRXM0dIN2ltUlZsOXhrUEg0b1l1c2c5TGtBcG9ZMzVC?=
+ =?utf-8?B?UWVRYmMxRHVNNVFUdm9qY2JaaUNUUlpKRTl0NStBZFBxTnpYM041YUJ5SUc1?=
+ =?utf-8?B?RC9IejJ3RzV4dXgwcGhMOWRVbE9nU0JKYmYxU0xBcXdIeE55enJMUWJLMVBr?=
+ =?utf-8?B?RURidjFGMjJYM3hDZGppajJqdWNvVkw4ZlZvajNYa0REWWtRaHQzV0JqbU5Y?=
+ =?utf-8?B?eU8ySm5GMG83WnFSb1NPampVajZ0Qi81R1BDNFcvM0NDdHcxcmhxdU9yUURl?=
+ =?utf-8?B?aU40QjJLWkxDRkhqaUtiM2FNcXVxVVJ3djVSSVh4TmNUU2hpL1NXdGZTK0RP?=
+ =?utf-8?B?Z1JPbG8xRy81M0Q3eFdady9YS3A0dEVkL01BUXZ0WVRmb3hYbC9UcGdhWEJE?=
+ =?utf-8?B?Z0JaSXF4T2o1M0hKaVNhSGVraHd0SFZRcVdNYzNndi8vd3dhNlM1MURiMkdo?=
+ =?utf-8?B?RnpnY08zWmtYS1gzWWh3STVjamxOUFU2SFlDelRxcktabjd4MW4zSzc2ZHdT?=
+ =?utf-8?B?ZW45U0t2T3pHb2NQdlE3T3ZNVmRRTUlQeDQ4M2ZKekJua0JOcDFWYWVhMHQr?=
+ =?utf-8?B?eFpvNHM5bm0wQkg3MURjWVppUWViR282QXl5ejM0NE5IMFlIcDhQMlRRK1ha?=
+ =?utf-8?Q?5um3QZFHyT8=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR12MB7141.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?dDgxc3NxdUhRbEVVUEFZK2dvOWFpSkJMMVZTdnRpbURMUmtnallTaDU3Mlds?=
+ =?utf-8?B?Q1liRjVpS3k2M1NjekV2MExqNDVxcXZrd04zdTVBUWl0UFZTMitvendrcFlW?=
+ =?utf-8?B?L1BpMzR5UVBwZ1N2QUZ3cjdEbWtxSkNPYTFDcHFMclVXZG9DREk4ejhyZnJu?=
+ =?utf-8?B?ZUxscEI1RnNTQWo4M014cXdBTUFlamhOSUJjN2dDSnBqT3ljaUNkVitTY0gw?=
+ =?utf-8?B?SzBkUk5hVFlmUlRaK1duNEltSFM0d2F6NnF0REYza2htR3hPbkhtL2s4bHU3?=
+ =?utf-8?B?c1MxODkyZkcvNEd6RjRGaE5NWkVCbkUvVm9rMGVqVXpsc2xiM3BYKzBGcEVu?=
+ =?utf-8?B?UUVRblE0RkRoaUZvYXI0M0dTK2Y3Z25wcUhQMzdRZWc2akJGTjVoRUxVRzd0?=
+ =?utf-8?B?dVBMeWpxcWk1L3UvSk13bklielNPT0lQYW01aW81OXozN3hpc0ExeGptWndU?=
+ =?utf-8?B?ckdWT0V2NTRKaTFUNlVWOTlDTlhlTVFadWhhSElJcUhSelFzby92a3RtNHlr?=
+ =?utf-8?B?SmlSS3g2TUdkNE91L2pQSitBMGtjaVdyQTdyc1NTTmd2S3h6YUMxaUhkTmdj?=
+ =?utf-8?B?b2hMMS9vbzlYdi9lMjcyZHFyb052cG9ORWRGMTY1c3J4SE9oZnJLcWRqbDlN?=
+ =?utf-8?B?YWpHcWo0Q0NXbm04SllQc2JjWXlKa3FGN1d4bmlVQ21RR1p0ZVBmMklOY2dT?=
+ =?utf-8?B?ZEo1WDl5YlBreFFLZkVlZk9hM3YwaEEzbHdOUTdQTVpVRUNBM3VJMHVkQ2gz?=
+ =?utf-8?B?WUJzSThCcFNiTFl5V2IvbUhvRTFoMyswQm5ENTI1bTY4c1YxMnE0Y1RHSU5E?=
+ =?utf-8?B?Kzd0aFBBNUdCWFlvdUs5eVcwU0dmY2ZpeWd2Zy91UTk4MVZzV2FNd2oyVWJi?=
+ =?utf-8?B?YkZ4Y0dpNCtOTWcvRjFMRzFOdnI3YlVsOWtHa25hYmtaZFhBYmJJWXpXYndr?=
+ =?utf-8?B?SjZUMVpBeU5hUEVsWU1pMmJIN0JBS2I0Q1dKdzlZc0NRTlhYblpTVzJaa2s3?=
+ =?utf-8?B?UU9OSWN5NkdieUt6T3NnNkg1NjdmWTIwMG1uVlhSMUZua0I5MW5CVUl0UkZM?=
+ =?utf-8?B?OFVHWWI5Y1JyUjRZMkZnWHVlUSt4cThwK2VXbHA3eTdDUCtMWnpuRXorL3I1?=
+ =?utf-8?B?SUN5UnZDdS96QlJiLzArY3RFaDNLWnpaU0FHbENPV2tHVjhTRTg3OCt2VTE1?=
+ =?utf-8?B?Z1laV1FlSXNvSjF0bVk4c3J3YUZCcjVqeXdzeWU2MnZTTnZJVFNRcG9lSk9K?=
+ =?utf-8?B?ZUFIVndDSUk5dFdkb3FXcWZTUHFWWTVrMXl5V1dZMHdNMlNPMFhjREtyWlg4?=
+ =?utf-8?B?T21ONGQxTW1ESUpOU2hSTDhNWlhUK3ExTTcxOVk5NjVRbjBkRExTc1JhS05I?=
+ =?utf-8?B?NTVCTzdLbUlEOHhzLzJOZlFCM0NzenBlZGVEdWl6RE03MmRiclF1TlF4WTlQ?=
+ =?utf-8?B?ZFhpdVVySlhVWlJtWUhYUHJ5MXdDMHhrWUxSYVZJQWpDUFNzK2dlV0JubldK?=
+ =?utf-8?B?RURYZS9acXdRYVdwZ3pHT2dLeU1CeUczY2ZZMzRwaXlpQWtoSmZOaWVxNU9v?=
+ =?utf-8?B?NFJORC83THNNZFdxN0NkZzVxUVFYUGFpbzhwOW4zZ2tObHM3bE5MSTgraHdn?=
+ =?utf-8?B?UkJKQTYwV00vWVhuL3N2Z3BGejlWbGtOaElOS2RLNXUzM2VUb1dCYzVTUWZj?=
+ =?utf-8?B?SjRucDRRSzNTZlQxa09FL21EVGpqK1ZOQjFsZ3lLUVgzc3pwRFNGYWxPUGlr?=
+ =?utf-8?B?eDBJRWFLY2xrbUNXcURnbm5pcmFjVDZpc1hGQ0hrTlBVaGgwMisydjViTktq?=
+ =?utf-8?B?SkF5VitSOFovTzVGZS9ZeXlWMW4zUWdUZXVncFhGb3ZXdC91aElrSVRVbFhQ?=
+ =?utf-8?B?NlNDZWVrVkJkTklFYW85ajJVVXVlcllmcmhja0F2dTA0ZE5MNXJOdDd3ZVFo?=
+ =?utf-8?B?R3VOM21zZGY5bVVCOTdVWWt0OHJHOUlTeTVnSWxDemdUV2tQZW5yVkNkd3Bt?=
+ =?utf-8?B?RWpmWGxmTTJXa2xCTzBKdkR2dXdhTU5CUndIZXo2UVlhZFp0NUp1UENrQ01F?=
+ =?utf-8?B?YTFUU3NnSGs2dTJGN1ZNVjl6dzJURis1TEs4UTJkUjRrRVNsSGhIb1JEWVBl?=
+ =?utf-8?Q?gVQN1L/EsOghlGvKq/WGBJp68?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 164db1c2-833e-4948-fd4c-08ddd2805519
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR12MB7141.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Aug 2025 11:24:38.5089
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: BqtdkPGBD9W7FnEWEmGvxAb4UofcsuEGzcJVCCEBppdq61UdRBLuAxXSehf9Z+mne/giaG3GqfXfJv/ZnTV4Mg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB8593
 
-On 23/07/2025 09:23, Ivan Vecera wrote:
-> 
-> 
-> On 23. 07. 25 8:25 dop., Krzysztof Kozlowski wrote:
->> On 21/07/2025 14:54, Ivan Vecera wrote:
->>> On 21. 07. 25 11:23 dop., Krzysztof Kozlowski wrote:
->>>> On Fri, Jul 18, 2025 at 02:16:41PM +0200, Ivan Vecera wrote:
->>>>> Hi Krzysztof,
->>>>>
->>>>> ...
->>>>>
->>>>> The clock-id property name may have been poorly chosen. This ID is used by
->>>>> the DPLL subsystem during the registration of a DPLL channel, along with its
->>>>> channel ID. A driver that provides DPLL functionality can compute this
->>>>> clock-id from any unique chip information, such as a serial number.
->>>>>
->>>>> Currently, other drivers that implement DPLL functionality are network
->>>>> drivers, and they generate the clock-id from one of their MAC addresses by
->>>>> extending it to an EUI-64.
->>>>>
->>>>> A standalone DPLL device, like the zl3073x, could use a unique property such
->>>>> as its serial number, but the zl3073x does not have one. This patch-set is
->>>>> motivated by the need to support such devices by allowing the DPLL device ID
->>>>> to be passed via the Device Tree (DT), which is similar to how NICs without
->>>>> an assigned MAC address are handled.
->>>>
->>>> You use words like "unique" and MAC, thus I fail to see how one fixed
->>>> string for all boards matches this. MACs are unique. Property value set
->>>> in DTS for all devices is not.
->>>>> You also need to explain who assigns this value (MACs are assigned) or
->>>> if no one, then why you cannot use random? I also do not see how this
->>>> property solves this...  One person would set it to value "1", other to
->>>> "2" but third decide to reuse "1"? How do you solve it for all projects
->>>> in the upstream?
->>>
->>> Some background: Any DPLL driver has to use a unique number during the
->>> DPLL device/channel registration. The number must be unique for the
->>> device across a clock domain (e.g., a single PTP network).
->>>
->>> NIC drivers that expose DPLL functionality usually use their MAC address
->>> to generate such a unique ID. A standalone DPLL driver does not have
->>> this option, as there are no NIC ports and therefore no MAC addresses.
->>> Such a driver can use any other source for the ID (e.g., the chip's
->>> serial number). Unfortunately, this is not the case for zl3073x-based
->>> hardware, as its current firmware revisions do not expose information
->>> that could be used to generate the clock ID (this may change in the
->>> future).
->>>
->>> There is no authority that assigns clock ID value ranges similarly to
->>> MAC addresses (OUIs, etc.), but as mentioned above, uniqueness is
->>> required across a single PTP network so duplicates outside this
->>> single network are not a problem.
->>
->> You did not address main concern. You will configure the same value for
->> all boards, so how do you solve uniqueness within PTP network?
-> 
-> This value differs across boards, similar to the local-mac-address. The
-> device tree specifies the entry, and the bootloader or system firmware
-> (like U-Boot) provides the actual value.
-This should be clearly explained in commit msg or pull request to dtschema.
 
-Where are patches for U-Boot? lore gives me 0 results.
 
-Best regards,
-Krzysztof
+On 02/08/2025 9:30, Vadim Fedorenko wrote:
+> diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
+> index ab20c644af248..b270886c5f5d5 100644
+> --- a/Documentation/networking/ethtool-netlink.rst
+> +++ b/Documentation/networking/ethtool-netlink.rst
+> @@ -1541,6 +1541,11 @@ Drivers fill in the statistics in the following structure:
+>   .. kernel-doc:: include/linux/ethtool.h
+>       :identifiers: ethtool_fec_stats
+>   
+> +Statistics may have FEC bins histogram attribute ``ETHTOOL_A_FEC_STAT_HIST``
+> +as defined in IEEE 802.3ck-2022 and 802.3df-2024. Nested attributes will have
+> +the range of FEC errors in the bin (inclusive) and the amount of error events
+> +in the bin.
+> +
+
+Maybe worth mentioning per-lane histograms here.
+
+>   FEC_SET
+>   =======
+>     
+> diff --git a/drivers/net/netdevsim/ethtool.c b/drivers/net/netdevsim/ethtool.c
+> index f631d90c428ac..1dc9a6c126b24 100644
+> --- a/drivers/net/netdevsim/ethtool.c
+> +++ b/drivers/net/netdevsim/ethtool.c
+> @@ -164,12 +164,29 @@ nsim_set_fecparam(struct net_device *dev, struct ethtool_fecparam *fecparam)
+>   	ns->ethtool.fec.active_fec = 1 << (fls(fec) - 1);
+>   	return 0;
+>   }
+> +static const struct ethtool_fec_hist_range netdevsim_fec_ranges[] = {
+> +	{ 0, 0},
+> +	{ 1, 3},
+> +	{ 4, 7},
+> +	{ 0, 0}
+> +};
+>
+
+Following up on the discussion from v1, I agree with Gal's concern about 
+pushing array management into the driver. It adds complexity especially 
+when ranges depend on FEC mode.
+
+The approach Andrew suggested makes sense to me. A simple helper to add 
+a bin would support both static and dynamic cases.
+
+>   static void
+> -nsim_get_fec_stats(struct net_device *dev, struct ethtool_fec_stats *fec_stats)
+> +nsim_get_fec_stats(struct net_device *dev, struct ethtool_fec_stats *fec_stats,
+> +		   const struct ethtool_fec_hist_range **ranges)
+>   {
+> +	*ranges = netdevsim_fec_ranges;
+> +
+>   	fec_stats->corrected_blocks.total = 123;
+>   	fec_stats->uncorrectable_blocks.total = 4;
+> +
+> +	fec_stats->hist[0].bin_value = 345;
+
+bin_value is 345 but the per-lane sum is 445.
+
+> +	fec_stats->hist[1].bin_value = 12;
+> +	fec_stats->hist[2].bin_value = 2;
+> +	fec_stats->hist[0].bin_value_per_lane[0] = 125;
+> +	fec_stats->hist[0].bin_value_per_lane[1] = 120;
+> +	fec_stats->hist[0].bin_value_per_lane[2] = 100;
+> +	fec_stats->hist[0].bin_value_per_lane[3] = 100;
+>   }
+>   
+> +static int fec_put_hist(struct sk_buff *skb, const struct fec_stat_hist *hist,
+> +			const struct ethtool_fec_hist_range *ranges)
+> +{
+> +	struct nlattr *nest;
+> +	int i, j;
+> +
+> +	if (!ranges)
+> +		return 0;
+> +
+> +	for (i = 0; i < ETHTOOL_FEC_HIST_MAX; i++) {
+> +		if (i && !ranges[i].low && !ranges[i].high)
+> +			break;
+> +
+> +		nest = nla_nest_start(skb, ETHTOOL_A_FEC_STAT_HIST);
+> +		if (!nest)
+> +			return -EMSGSIZE;
+> +
+> +		if (nla_put_u32(skb, ETHTOOL_A_FEC_HIST_BIN_LOW,
+> +				 ranges[i].low) ||
+> +		    nla_put_u32(skb, ETHTOOL_A_FEC_HIST_BIN_HIGH,
+> +				 ranges[i].high) ||
+> +		    nla_put_uint(skb, ETHTOOL_A_FEC_HIST_BIN_VAL,
+> +			         hist[i].bin_value))
+
+Should skip bins where hist[i].bin_value isn’t set.
+
+
+Thanks,
+Carolina
 
