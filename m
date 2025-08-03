@@ -1,113 +1,219 @@
-Return-Path: <netdev+bounces-211486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211478-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A11CB193C7
-	for <lists+netdev@lfdr.de>; Sun,  3 Aug 2025 13:11:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DBD6B1939C
+	for <lists+netdev@lfdr.de>; Sun,  3 Aug 2025 13:01:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 607DE174281
-	for <lists+netdev@lfdr.de>; Sun,  3 Aug 2025 11:11:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BCB37174457
+	for <lists+netdev@lfdr.de>; Sun,  3 Aug 2025 11:01:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE86622541F;
-	Sun,  3 Aug 2025 11:11:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F2D725B1DC;
+	Sun,  3 Aug 2025 11:01:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="pCHdnDKS"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="McnLcJt8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B93631EDA3C;
-	Sun,  3 Aug 2025 11:10:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAC971EDA3C;
+	Sun,  3 Aug 2025 11:01:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754219464; cv=none; b=BTU27KMxYc9m4T6bK8dViqVTujeHB6BDYJmXxD+qL1WDVAK8VXUFf/1OoK9tEYitfD/kqYBgJ3MDeeVBV5ldPU5VcxdZp5DyN+bU8KPpABXxhTXk5o3xckVNUxB8jJZ6dYM48vE1M2g/8oNT7K6xrYMNxFQN92ZVFL7kfWLQFyg=
+	t=1754218896; cv=none; b=dF6yd6iiH31bB81dBQ7ppyoSm4VwuD1vwqOZatcfvISmtH18CSCo7NDVtirehL6CtVEjfWnpJyHEQ/0B2kFTL3EMY+p2zi5Kxp943S8aSEVlChsOC9TZH4eidIMQHoQSbW7L3Onb946xQh+WB0RS//+WO5xeJbtLZLQK3iBDysI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754219464; c=relaxed/simple;
-	bh=mH95pA4cftJ6NN9CFstldZceXxZhqt1S9l4BVHuUz3Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TtzTECtDAm54PHPSemKxXB7t5k3oESL177XDFMxb089+QEM71c+YwMl7WOZhGwf7/+fDTAbQEoaRPYPlTcKgepbJqGcKUcEM8QzFf3KcPTtR4Ax10hoS2eWjqem5v6Wn1gi2qBL+OWHkpxsOWllfismBwhz417qFG7fOTYApxaI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=pCHdnDKS; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1uiVWX-003vz3-8i; Sun, 03 Aug 2025 12:01:01 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=EL2StWgKuIJqWqQKx+j/2xqZwCUiP1U+Ud26xxbj8xY=; b=pCHdnDKSQFO018x3pvWq6uST1m
-	zncPtEk6In+1fV6Fjc35EpfscsPPoMNvCXCU40E2qTqGzbg1XCtZhn+uxu6Ygx8P3kbIYeNUHWqly
-	hVCj1LxCgumxoXux0XHJ27BOFRFiMjnZqY+e9eX7as8IcEVaE4SJvYTL7TFCgubWvEnN/aR/EXVyJ
-	TVJ+yWjk5BJIUiFqGaII2YMfaEghgqi3uYg0CKpHhZk5Kfbvco0aXkMrYH8Bqw+DmZMnY2RDK7H4L
-	qRErh/h9O9riaJI82HUGl35NrbY8R9GbdrZ746REt9EBpHbScDXwqW/SsFk2CBzFmH1e2MvRPLvDo
-	4O4w/0mA==;
-Received: from [10.9.9.72] (helo=submission01.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1uiVWW-000606-7S; Sun, 03 Aug 2025 12:01:00 +0200
-Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1uiVWB-002JcU-1D; Sun, 03 Aug 2025 12:00:39 +0200
-Message-ID: <b6a2219b-32dd-4bb6-b848-45325e4e4ab9@rbox.co>
-Date: Sun, 3 Aug 2025 12:00:38 +0200
+	s=arc-20240116; t=1754218896; c=relaxed/simple;
+	bh=BdVTBhN250wTa71M7/gUoWp7//5kAG9/3AKLXJNIMB0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=szNvg82fKaa84vLQTQpoChID06nVmktXizZkblNUckWfAxHNl3WJJYbSm2xZiT7pHQjRzNDW5fFtPI8iEVhFhpv+6ZN4wjUiRg20JV7nh6K6kGTX+9MkNn7rl6hj0mEVwxymENh10m/PaKVCOwRnRtZYQTsxA7voIYfDlCnScbQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=McnLcJt8; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5738qlNi013051;
+	Sun, 3 Aug 2025 11:01:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=WO7SkMKcc1s18E6/eOurgl
+	qFs8lDS/zAgVaiETXpg2Y=; b=McnLcJt8JH+6PGH23LNJZNlVVGdUGPkczNgTc4
+	8JlA46hoAdi8/ik6nzYNzj+ZCWQWcIEk8JZ65wwg4aV0NzA77zqpte9FoPCItC2D
+	zQcXcfM9qMUoRLxZodcuqB1Fs93aiFZA6QDB/pt54YUQ9Efn/EqVCEPU9udeL9Qf
+	nCYLaEBOKVQ0B5iwRL1UDqMIGAuiUOVTyNQzVTbB7SmbHnVmAudsyjg8CJ0tfch0
+	txjQYiDnKpPncwlCuvbdibOdfhgaYukq0izwpTYCtMCBHr01VpH4nfIj6q/Gs0wk
+	Nu58aO7ys6dCcVVUpWccv9wSjZmQGKZJAb08pDW80x0izsqA==
+Received: from apblrppmta01.qualcomm.com (blr-bdr-fw-01_GlobalNAT_AllZones-Outside.qualcomm.com [103.229.18.19])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 489a91t7rs-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 03 Aug 2025 11:01:23 +0000 (GMT)
+Received: from pps.filterd (APBLRPPMTA01.qualcomm.com [127.0.0.1])
+	by APBLRPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTP id 573B1Jhg015300;
+	Sun, 3 Aug 2025 11:01:20 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by APBLRPPMTA01.qualcomm.com (PPS) with ESMTPS id 489brke03q-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 03 Aug 2025 11:01:19 +0000
+Received: from APBLRPPMTA01.qualcomm.com (APBLRPPMTA01.qualcomm.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 573B1JS2015273;
+	Sun, 3 Aug 2025 11:01:19 GMT
+Received: from hu-devc-hyd-u22-c.qualcomm.com (hu-wasimn-hyd.qualcomm.com [10.147.246.180])
+	by APBLRPPMTA01.qualcomm.com (PPS) with ESMTPS id 573B1JSc015269
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 03 Aug 2025 11:01:19 +0000
+Received: by hu-devc-hyd-u22-c.qualcomm.com (Postfix, from userid 3944840)
+	id 727FE5C1; Sun,  3 Aug 2025 16:31:18 +0530 (+0530)
+From: Wasim Nazir <wasim.nazir@oss.qualcomm.com>
+To: Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Richard Cochran <richardcochran@gmail.com>
+Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        kernel@oss.qualcomm.com, Wasim Nazir <wasim.nazir@oss.qualcomm.com>
+Subject: [PATCH v2 0/8] arm64: dts: qcom: Lemans platform refactor and EVK support
+Date: Sun,  3 Aug 2025 16:31:04 +0530
+Message-ID: <20250803110113.401927-1-wasim.nazir@oss.qualcomm.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] kcm: Fix splice support
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Cong Wang <cong.wang@bytedance.com>,
- Tom Herbert <tom@herbertland.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250725-kcm-splice-v1-1-9a725ad2ee71@rbox.co>
- <20250730180215.2ad7df72@kernel.org>
-Content-Language: pl-PL, en-GB
-From: Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <20250730180215.2ad7df72@kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-QCInternal: smtphost
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: hteD-uGUueQJ3sEEvvH0aI_K92W6W2-m
+X-Proofpoint-GUID: hteD-uGUueQJ3sEEvvH0aI_K92W6W2-m
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODAzMDA3MyBTYWx0ZWRfXzTOgNGwNu8Kp
+ GlKT5tP5vfvAzybzVPTFG2XUzPkGBEX5bSKz/sI0xIo9IDH8BrksB+Q23S5UBfgXTvuNLL8odYQ
+ 6JWOn7okrd1fuXocawG9JT0kXKZ8f0hLQ800v00PO1tlfAlPvjgkAHzn/jmL+arj1yP6RNUBOUh
+ 4V53qhZSCeiLXRU3FJ3RGN7rUfIyrNKJCAM73J6I0gJXnfGHRV5p0oyjQ0zA+0IuSL3f98YPj1w
+ 9E5atmOirg1fEJ1dwfShNvKOxLmn1MuAzX3jsQw5dMGtsMEZynel8/W9TEWSqXbwqDwROCJP3MP
+ S1EH6XuXSJN6PWx+A3YmUMZoIk9O/TzI0ntVMnLpZ8ICsnflIj5ZTq4fD6qYEOO3TtizPX37WzH
+ EGsWlNq8MEpGoikSjHLmxTODnZwPSSgAmafJVW6+dYMtxbtLISBvRWAKhbk8Bm3pvTnaVtMT
+X-Authority-Analysis: v=2.4 cv=UdpRSLSN c=1 sm=1 tr=0 ts=688f4183 cx=c_pps
+ a=Ou0eQOY4+eZoSc0qltEV5Q==:117 a=Ou0eQOY4+eZoSc0qltEV5Q==:17
+ a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10 a=VwQbUJbxAAAA:8 a=COk6AnOGAAAA:8
+ a=EUspDBNiAAAA:8 a=9VDwho1jAwe4TvJw1f4A:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-03_03,2025-08-01_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ suspectscore=0 phishscore=0 adultscore=0 spamscore=0 mlxlogscore=999
+ priorityscore=1501 impostorscore=0 bulkscore=0 clxscore=1015
+ lowpriorityscore=0 malwarescore=0 mlxscore=0 classifier=spam authscore=0
+ authtc=n/a authcc= route=outbound adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2505280000 definitions=main-2508030073
 
-On 7/31/25 03:02, Jakub Kicinski wrote:
-> On Fri, 25 Jul 2025 12:33:04 +0200 Michal Luczaj wrote:
->> Flags passed in for splice() syscall should not end up in
->> skb_recv_datagram(). As SPLICE_F_NONBLOCK == MSG_PEEK, kernel gets
->> confused: skb isn't unlinked from a receive queue, while strp_msg::offset
->> and strp_msg::full_len are updated.
->>
->> Unbreak the logic a bit more by mapping both O_NONBLOCK and
->> SPLICE_F_NONBLOCK to MSG_DONTWAIT. This way we align with man splice(2) in
->> regard to errno EAGAIN:
->>
->>    SPLICE_F_NONBLOCK was specified in flags or one of the file descriptors
->>    had been marked as nonblocking (O_NONBLOCK), and the operation would
->>    block.
-> 
-> Coincidentally looks like we're not honoring
-> 
-> 	sock->file->f_flags & O_NONBLOCK 
-> 
-> in TLS..
+This patch series introduces a comprehensive refactor and enhancement of
+the Qualcomm Lemans platform device tree files, aiming to improve
+clarity, modularity, and support for emerging IoT use cases. The
+motivation behind this work stems from the need to unify DTS naming
+conventions, streamline board support across multiple variants, and
+to detach from different product names for similar variants.
 
-I'm a bit confused.
+For example, qcs9100 and qcs9075 differ only in safety features provided by
+the Safety-Island (SAIL) subsystem but safety features are currently
+unsupported, so both can be categorized as the same chip today.
 
-Comparing AF_UNIX and pure (non-TLS) TCP, I see two non-blocking-splice
-interpretations. Unix socket doesn't block on `f_flags & O_NONBLOCK ||
-flags & SPLICE_F_NONBLOCK` (which this patch follows), while TCP, after
-commit 42324c627043 ("net: splice() from tcp to pipe should take into
-account O_NONBLOCK"), honours O_NONBLOCK and ignores SPLICE_F_NONBLOCK.
+To better support IoT platforms, the memory map has been restructured.
+Previously, the automotive memory layout was applied universally, which
+introduced unnecessary carveouts and misaligned memory regions for IoT
+boards. By establishing the IoT memory map i.e lemans.dtsi as the baseline
+and introducing lemans-auto.dtsi for legacy automotive configurations, the
+series ensures that each platform inherits only what it needs.
+Accordingly:
+  - IoT platforms, qcs9100/qcs9075 are categorized as "lemans" with latest
+    memory-map as per IOT requirements.
+  - Automotive platform, sa8775p is categorized as "lemans-auto", that retains
+    the old automotive memory map to support legacy use cases.
+  - Both lemans & lemans-auto are serving as non-safe chip and if needed
+    additional dtsi can be appended in the future to enable safety features.
 
-Should KCM (and TLS) follow TCP behaviour instead?
+Additionally:
+  - Refactor common daughter cards used in Ride/Ride-R3 boards into a
+    common configuration. Also, introduce new files for different ethernet
+    capabilities in Ride/Ride-r3. Since Ethernet functionality in Ride/Ride-r3
+    is currently broken upstream, this patch focuses only on refactoring.
+  - Include support for qcs9075 EVK [1] board as lemans-evk. Currently,
+    basic features are enabled supporting 'boot to shell'.
 
-Thanks,
-Michal
+Funtional impact to current boards with refactoring:
+  - No functional change on automotive boards (i.e sa8775p ride/ride-r3)
+    and it is verified by comparing decompiled DTB (dtx_diff).
+  - qcs9100 ride/ride-r3 are having a new memory-map and rest other
+    functionalities are still same.
+
+
+---
+Changelog
+
+v2:
+  - Update the subject of the series [2] to reflect both the Lemans EVK
+    addition and the broader Lemans refactoring. Also, revise the subject
+    format to align with Qualcomm’s convention for DTS submissions
+    (arm64: dts: qcom:).
+  - Refine the cover letter to emphasize how detaching from product-specific
+    names addresses previous limitations in supporting emerging IoT use cases.
+  - Improve the commit message for patch 2/8 based on Bjorn’s feedback.
+  - Remove board-renaming change to keep backward compatibility intact.
+  - Include separate patch to fix DTS inclusion for IoT boards.
+  - Change copyright format for patch 8/8 as per Krzysztof's feedback.
+  - Carrying Krzysztof's NAK from v1 to only those patches which were preset,
+    though tried to address the concern by retaining the DTB compatibility.
+  - v1-link: [2].
+
+[1] https://lore.kernel.org/all/20250612155437.146925-1-quic_wasimn@quicinc.com/
+[2] https://lore.kernel.org/all/20250722144926.995064-1-wasim.nazir@oss.qualcomm.com/
+
+---
+Wasim Nazir (8):
+  arm64: dts: qcom: Rename sa8775p SoC to "lemans"
+  arm64: dts: qcom: lemans: Update memory-map for IoT platforms
+  arm64: dts: qcom: lemans: Separate out ethernet card for ride &
+    ride-r3
+  arm64: dts: qcom: lemans: Refactor ride/ride-r3 boards based on
+    daughter cards
+  arm64: dts: qcom: lemans: Rename sa8775p-pmics.dtsi to
+    lemans-pmics.dtsi
+  arm64: dts: qcom: lemans: Fix dts inclusion for IoT boards and update
+    memory map
+  dt-bindings: arm: qcom: lemans: Add bindings for Lemans Evaluation Kit
+    (EVK)
+  arm64: dts: qcom: Add lemans evaluation kit (EVK) initial board
+    support
+
+ .../devicetree/bindings/arm/qcom.yaml         |   1 +
+ arch/arm64/boot/dts/qcom/Makefile             |   1 +
+ arch/arm64/boot/dts/qcom/lemans-auto.dtsi     | 104 +++++++
+ arch/arm64/boot/dts/qcom/lemans-evk.dts       | 291 ++++++++++++++++++
+ .../{sa8775p-pmics.dtsi => lemans-pmics.dtsi} |   0
+ ...775p-ride.dtsi => lemans-ride-common.dtsi} | 168 ----------
+ .../qcom/lemans-ride-ethernet-88ea1512.dtsi   | 205 ++++++++++++
+ .../qcom/lemans-ride-ethernet-aqr115c.dtsi    | 205 ++++++++++++
+ .../dts/qcom/{sa8775p.dtsi => lemans.dtsi}    |  75 +++--
+ arch/arm64/boot/dts/qcom/qcs9100-ride-r3.dts  |   9 +-
+ arch/arm64/boot/dts/qcom/qcs9100-ride.dts     |   9 +-
+ arch/arm64/boot/dts/qcom/sa8775p-ride-r3.dts  |  40 +--
+ arch/arm64/boot/dts/qcom/sa8775p-ride.dts     |  40 +--
+ 13 files changed, 875 insertions(+), 273 deletions(-)
+ create mode 100644 arch/arm64/boot/dts/qcom/lemans-auto.dtsi
+ create mode 100644 arch/arm64/boot/dts/qcom/lemans-evk.dts
+ rename arch/arm64/boot/dts/qcom/{sa8775p-pmics.dtsi => lemans-pmics.dtsi} (100%)
+ rename arch/arm64/boot/dts/qcom/{sa8775p-ride.dtsi => lemans-ride-common.dtsi} (87%)
+ create mode 100644 arch/arm64/boot/dts/qcom/lemans-ride-ethernet-88ea1512.dtsi
+ create mode 100644 arch/arm64/boot/dts/qcom/lemans-ride-ethernet-aqr115c.dtsi
+ rename arch/arm64/boot/dts/qcom/{sa8775p.dtsi => lemans.dtsi} (99%)
+
+
+base-commit: 05adbee3ad528100ab0285c15c91100e19e10138
+--
+2.50.1
 
 
