@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-211485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211487-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACC99B193C0
-	for <lists+netdev@lfdr.de>; Sun,  3 Aug 2025 13:05:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE3CDB193CE
+	for <lists+netdev@lfdr.de>; Sun,  3 Aug 2025 13:13:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD8B71896E89
-	for <lists+netdev@lfdr.de>; Sun,  3 Aug 2025 11:05:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 33CFD7AB6D4
+	for <lists+netdev@lfdr.de>; Sun,  3 Aug 2025 11:11:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0779E25EF98;
-	Sun,  3 Aug 2025 11:02:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB7CA25B687;
+	Sun,  3 Aug 2025 11:12:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WskNmZiN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bHuiIEhb"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5BFF25DCE0;
-	Sun,  3 Aug 2025 11:02:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BCC4192B90;
+	Sun,  3 Aug 2025 11:12:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754218970; cv=none; b=EnTDHs8W8OqhLZSWBdval2sZzlvl1Nj1vl0beJJDli4C01WpdQYDgX8CWHPo/IZvY6LcifFeTvqvlQ4Z9931zcZ6SONNxEzOQIc5Puf7UOyr/glH0b24rwONWwk/EuFg/YpOfS29hMXjePTVy5ygHf+Jttg4qNmN6GPvFIAMlLo=
+	t=1754219569; cv=none; b=VJUOBS8MWIL5Q0wz8nbM5nw3uj7STDYVtEZ03FH9hEYUxNOeL7Wc2d55D/+boJF5TaTBmqUeiCVPOsbK7eZ8y+4fioobY2u2Ckh9u8lL8s8x73fiYMdb6KT64Bgc4xapeVY7v8YqvyXg9QoXfkpE7bNrCSCH89J+wCy/LKshKV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754218970; c=relaxed/simple;
-	bh=1+ySFnvEiEj10KiNv6U4p85DKQjzXaK9j7ctTFGfI8c=;
+	s=arc-20240116; t=1754219569; c=relaxed/simple;
+	bh=/DuWb1PqPZaSu8+vdQF93J8DpOZRJnKyJD1SGitokQk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HDVX8oyal3N7MZtPW/ETKOtBInTidQshrcF3XZ+4lsq/mR8jMVCkme2IH+cf6t0dkNkrZsHKfdRjapFCYdv4AYRtcEBzrsrU2JyD2igemfbKUqzbJfCW8jUSqO5NVQshipexnHGqS3qpdCcYkbKQLRPY2JYcPGxkuAg4EpcaqoQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WskNmZiN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7F06C4CEEB;
-	Sun,  3 Aug 2025 11:02:46 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=HBLvcyytjktXuxSvEmKGdyimU+Cr8VBiUvP/6sub9+8CREGCcpwQtlxkmU3+t/+R7B7dOetubHrS4U8/d+0XqqnXwUlUieRjr31jd6IFbNpBLhrB7PJFgAnYJM61tEP+jGNqFMU1lcl4w2d3JlDJLUaBPgILoaex+TFwJMIaSPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bHuiIEhb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E459C4CEEB;
+	Sun,  3 Aug 2025 11:12:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754218970;
-	bh=1+ySFnvEiEj10KiNv6U4p85DKQjzXaK9j7ctTFGfI8c=;
+	s=k20201202; t=1754219569;
+	bh=/DuWb1PqPZaSu8+vdQF93J8DpOZRJnKyJD1SGitokQk=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=WskNmZiNWg2H0K2iaVH9y6OTv6cCowVHkz22V700zSwApyAcxIZbblveBC31L+KTp
-	 y3PSjjrc0vuC7gflpfOOIv8gWegg1rsUX9apkFrB/J18NebwfFjjdcFe6/Mgmi1aY9
-	 b1PCH+5qJfGrTUkO0U2xZeurShMsXGMmxjQlppa5fycSbzMvUEmb9KR+UoucfqWKs/
-	 Bw3FHgwHT44HXVEQol01+mDipQ9koEPpjGGgLW7o1U0gNBJNZYbqwZ7T4bYRgdxfWm
-	 6yTdDDDFwrMDNtl7jYO+S+InRwGhi29U2obHhaNPVTIkXKUHBioj1jh7Sb4TJy1bKx
-	 56JMdAim3/pdQ==
-Message-ID: <4df2a4c8-38be-402b-aa73-f72064e1d8ec@kernel.org>
-Date: Sun, 3 Aug 2025 13:02:44 +0200
+	b=bHuiIEhblA1gkXkFNEpp9tUT5E7hqrgJikoUwwNI38O7V03BCmkkme6O2SqRSNygM
+	 MWLbAUwRxhjhKIRIStlbMJEchhXdR7aMXNysFrf/42PXT2I0V4B/i0v8U++JnVe5kf
+	 JnaH67c/pa5pVZjUeVHQ/dDNSR8GG27yaGVOpoKOrwnoHZALCkjqaZRdf+VyZ845gk
+	 Ch1ui3i2o8jLy7ko8khFXmD7Ug3IM0rEWupS0/aTG/sV2KJLLgtQmGX2MaKed0rZF0
+	 gnAxDFKWbslkPKo1dMualzXAkIczlqL5qrl5McRMBISAJ/oczoMZsXcv1TctdAmYNd
+	 30E7j/4VJFDeQ==
+Message-ID: <db39e1ff-8f83-468c-a8cb-0dd7c5a98b85@kernel.org>
+Date: Sun, 3 Aug 2025 13:12:44 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,21 +50,23 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 8/8] arm64: dts: qcom: Add lemans evaluation kit (EVK)
- initial board support
-To: Wasim Nazir <wasim.nazir@oss.qualcomm.com>,
- Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
+Subject: Re: [PATCH net-next 1/2] dt-bindings: dpll: Add clock ID property
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
  Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Richard Cochran <richardcochran@gmail.com>
-Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- kernel@oss.qualcomm.com, Rakesh Kota <quic_kotarake@quicinc.com>,
- Sayali Lokhande <quic_sayalil@quicinc.com>,
- Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
- Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-References: <20250803110113.401927-1-wasim.nazir@oss.qualcomm.com>
- <20250803110113.401927-9-wasim.nazir@oss.qualcomm.com>
+ <conor+dt@kernel.org>, Prathosh Satish <Prathosh.Satish@microchip.com>,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Michal Schmidt <mschmidt@redhat.com>, Petr Oros <poros@redhat.com>
+References: <20250717171100.2245998-1-ivecera@redhat.com>
+ <20250717171100.2245998-2-ivecera@redhat.com>
+ <5ff2bb3e-789e-4543-a951-e7f2c0cde80d@kernel.org>
+ <6937b833-4f3b-46cc-84a6-d259c5dc842a@redhat.com>
+ <20250721-lean-strong-sponge-7ab0be@kuoka>
+ <804b4a5f-06bc-4943-8801-2582463c28ef@redhat.com>
+ <9220f776-8c82-474b-93fc-ad6b84faf5cc@kernel.org>
+ <466e293c-122f-4e11-97d2-6f2611a5178e@redhat.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -110,36 +112,72 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
  zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
  XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <20250803110113.401927-9-wasim.nazir@oss.qualcomm.com>
+In-Reply-To: <466e293c-122f-4e11-97d2-6f2611a5178e@redhat.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 03/08/2025 13:01, Wasim Nazir wrote:
-> Lemans EVK is an IoT board without safety monitoring feature of
-> Safety Island(SAIL) subsystem.
+On 23/07/2025 09:23, Ivan Vecera wrote:
 > 
-> Lemans EVK is single board supporting these peripherals:
->   - Storage: 2 × 128 GB UFS, micro-SD card, EEPROMs for MACs,
->     eMMC on mezzanine card
->   - Audio/Video, Camera & Display ports
->   - Connectivity: RJ45 2.5GbE, WLAN/Bluetooth, CAN/CAN-FD
->   - Sensors: IMU
->   - PCIe ports
->   - USB & UART ports
 > 
-> On top of lemans EVK board additional mezzanine boards can be stacked
-> in future.
+> On 23. 07. 25 8:25 dop., Krzysztof Kozlowski wrote:
+>> On 21/07/2025 14:54, Ivan Vecera wrote:
+>>> On 21. 07. 25 11:23 dop., Krzysztof Kozlowski wrote:
+>>>> On Fri, Jul 18, 2025 at 02:16:41PM +0200, Ivan Vecera wrote:
+>>>>> Hi Krzysztof,
+>>>>>
+>>>>> ...
+>>>>>
+>>>>> The clock-id property name may have been poorly chosen. This ID is used by
+>>>>> the DPLL subsystem during the registration of a DPLL channel, along with its
+>>>>> channel ID. A driver that provides DPLL functionality can compute this
+>>>>> clock-id from any unique chip information, such as a serial number.
+>>>>>
+>>>>> Currently, other drivers that implement DPLL functionality are network
+>>>>> drivers, and they generate the clock-id from one of their MAC addresses by
+>>>>> extending it to an EUI-64.
+>>>>>
+>>>>> A standalone DPLL device, like the zl3073x, could use a unique property such
+>>>>> as its serial number, but the zl3073x does not have one. This patch-set is
+>>>>> motivated by the need to support such devices by allowing the DPLL device ID
+>>>>> to be passed via the Device Tree (DT), which is similar to how NICs without
+>>>>> an assigned MAC address are handled.
+>>>>
+>>>> You use words like "unique" and MAC, thus I fail to see how one fixed
+>>>> string for all boards matches this. MACs are unique. Property value set
+>>>> in DTS for all devices is not.
+>>>>> You also need to explain who assigns this value (MACs are assigned) or
+>>>> if no one, then why you cannot use random? I also do not see how this
+>>>> property solves this...  One person would set it to value "1", other to
+>>>> "2" but third decide to reuse "1"? How do you solve it for all projects
+>>>> in the upstream?
+>>>
+>>> Some background: Any DPLL driver has to use a unique number during the
+>>> DPLL device/channel registration. The number must be unique for the
+>>> device across a clock domain (e.g., a single PTP network).
+>>>
+>>> NIC drivers that expose DPLL functionality usually use their MAC address
+>>> to generate such a unique ID. A standalone DPLL driver does not have
+>>> this option, as there are no NIC ports and therefore no MAC addresses.
+>>> Such a driver can use any other source for the ID (e.g., the chip's
+>>> serial number). Unfortunately, this is not the case for zl3073x-based
+>>> hardware, as its current firmware revisions do not expose information
+>>> that could be used to generate the clock ID (this may change in the
+>>> future).
+>>>
+>>> There is no authority that assigns clock ID value ranges similarly to
+>>> MAC addresses (OUIs, etc.), but as mentioned above, uniqueness is
+>>> required across a single PTP network so duplicates outside this
+>>> single network are not a problem.
+>>
+>> You did not address main concern. You will configure the same value for
+>> all boards, so how do you solve uniqueness within PTP network?
 > 
-> Implement basic features like uart/ufs to enable 'boot to shell'.
-> 
-> Co-developed-by: Rakesh Kota <quic_kotarake@quicinc.com>
-> Signed-off-by: Rakesh Kota <quic_kotarake@quicinc.com>
-> Co-developed-by: Sayali Lokhande <quic_sayalil@quicinc.com>
-> Signed-off-by: Sayali Lokhande <quic_sayalil@quicinc.com>
-> Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-> Nacked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> This value differs across boards, similar to the local-mac-address. The
+> device tree specifies the entry, and the bootloader or system firmware
+> (like U-Boot) provides the actual value.
+This should be clearly explained in commit msg or pull request to dtschema.
 
-This patch is fine, so let's drop my tag.
+Where are patches for U-Boot? lore gives me 0 results.
 
 Best regards,
 Krzysztof
