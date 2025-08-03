@@ -1,228 +1,196 @@
-Return-Path: <netdev+bounces-211473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211474-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47D48B1931D
-	for <lists+netdev@lfdr.de>; Sun,  3 Aug 2025 10:32:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 147EEB1932D
+	for <lists+netdev@lfdr.de>; Sun,  3 Aug 2025 11:21:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B48797AB64C
-	for <lists+netdev@lfdr.de>; Sun,  3 Aug 2025 08:31:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8EE63B7263
+	for <lists+netdev@lfdr.de>; Sun,  3 Aug 2025 09:21:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 866F5285C9B;
-	Sun,  3 Aug 2025 08:32:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71D782874FC;
+	Sun,  3 Aug 2025 09:21:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PA795Tjv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aw/j3Oeq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A75413BC0C;
-	Sun,  3 Aug 2025 08:32:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C85E2AD3D;
+	Sun,  3 Aug 2025 09:21:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754209968; cv=none; b=dxd2AwgchHP0uLZzLUjiEZMipPTW2j0GXcMPVq1/ITXblackahlYUHgn0N4iSEp4hhVWS8BGg1oZtkIU4M/ctV8xMlllZKoKNdwDo64nqh26Yfrq4/TMXKEbLV1dy97SVQmy7zhwK8I8wDmTbTs0rZ7gxnuyJpd4bl/zqKz7kUs=
+	t=1754212865; cv=none; b=b2UybWkUNW/LXMFYQua08spj9gnSSkOyRhLPE66PSkkWRz7Yii1pUPuEF0WnkDCUKhTP5pouhHoIUF0X5t3rEGD4ESja6V/fQPIUafpIDG/vTQnjXXmvOPKPkQBqxcTo+bv1a8ggjBuBCi/1HrLsY2deZUd7aUn1OgJWZ6UhqvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754209968; c=relaxed/simple;
-	bh=L/tWs7TQXW3M8NXy5kzPNzhdoGE1PBcsCj0Fe5DMbn4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EHVV11I4td4JWqFVeIi0OyAdel80UDgV5J0o1PKm7XZox9wCKgAZSQIko1cD7ihfQkXMqJMG0P2nMN0RUl8w+95VlRaX5gqKw6ahm9y4suu9kKFpmXm9pg90A7vpT81qboENfe8d2eUErbX9frDIQ1/DvI3Fi/dCsU0YWwybxGA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PA795Tjv; arc=none smtp.client-ip=209.85.166.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-3e3e926fdeaso12804485ab.1;
-        Sun, 03 Aug 2025 01:32:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1754209965; x=1754814765; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eGptu4dlFJlN2FLleMGpytAYYl0IldOCnrxkMnkN+SY=;
-        b=PA795TjvY35tE2zWbKRabrWm9Qy/WM/BKpxuGhKNeFUKXEu5SUL2xrTZ7s8DE5i8Gl
-         C7g80/w8N8t3h+lJ5h95JW8ROWmFjF9sIZOkYaJm5xhiR7jNTjMqFfnOhjlkY0SDFn50
-         7ozjumLh7wQmQZGQsurZI1R9HgPCpZTFU1WlAJAfhQ/myKTPfLcvZkwxCL0h5GZMiXFW
-         2KnLNZRX6i9iESHKcQYmHMorwAzfoBD8V8WFozYzJsHo2BaGVWIwztupYxGRansuIrk1
-         txUxaaW3+cVf3CFwjqg35biR+BqAJtPeibZb1uCFPOxb1ChP0FOMNgPkdxRzZ0KMzsBi
-         00tw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754209965; x=1754814765;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eGptu4dlFJlN2FLleMGpytAYYl0IldOCnrxkMnkN+SY=;
-        b=DGyzTHkIncc6SpRhRYRKzCGqTtoAu8w8C+LT4JDcWcokifWsopABaeA31r+VFMzPlg
-         +2ZJPxCsSJCNsswVVWUCUN3sqGEuc/l3MaAN3O5qmzdoRgDjzpsAwzuYc5lr/b6PBeEo
-         0IwlTgeyE6YdDrWf9tfDgdgaUO1aMpDp9LkaFH9Tcep5LPXJeP9YvrnWAu+a84kyS+OB
-         Y2tRWPS3ZMRMSfAhZOGsvdDZDl6gdXrYx8J+1AAEP30gdGudIUnCUCLkFjXTUyLb+UIj
-         hwVjVQ0g12tdo9CB5DLcbz6D24Cul8Tx5/0N+N+qJrNWTLqEa2UTQyxhoWFTkviJGKa5
-         anaw==
-X-Forwarded-Encrypted: i=1; AJvYcCVHVQsoFdCkBNdWqzlhMBhNu9ART2DtSIUrjzQX9+4EC3sjsO7+0UKRNs/ZTHq7gtqRQbOyZowzaeCNIvM=@vger.kernel.org, AJvYcCX4X122g+cE7yrwmtkPhvxnAj3ODynBD3EI/61vOjjkO4MV+U0CjSecrypIsbIT5JMUhT75gzj20YY4fiGjnh3T@vger.kernel.org, AJvYcCXARrOAKPVMJcgFNftCx1nP5OIp+6esa1ula/W8aDTzD2/k7hF6zdwPinWzi20PID3fxQpiwFXh@vger.kernel.org
-X-Gm-Message-State: AOJu0YxXzZ2fH7SvAdcHZqiOHbywHfbHPacGTaj4qsPfmnJeGPpDywo+
-	LGceV6SJCLFyzVl2kJ5loqj/tJOdmvaOzSaiVPhHfXjxN+OLIe0KkbOk9BCpuLZZN4TvUU9XzY8
-	JRDFRd7von9vTrFZKJJzc8FzFHUZn3+c=
-X-Gm-Gg: ASbGncsf9CFsdTMnOcqtVfysFp55DQXKV79GZcYchTqc2r5N8uJJAfFY00Aob6V48fL
-	vvZm0D7fWkz74PRcVw146vj8fasArXt3qaBufVbKuBAG5zPn25XSvdZz3W5qE3676o/YDcxEUzH
-	xmNkCnlTxESwnnvBCFOg2oBBBfZV1MrrYaJk2+kvIwMIMaGTRGCCXAMNtgGhCsHwCpy3Fto01Io
-	r7V/A==
-X-Google-Smtp-Source: AGHT+IFhTkU7l2UqVGfqwF7nCUg1UKwPFl8Nan4P7yDxdVMZoT9FDfcoRochlQjN0/ueyGMb9s6CkkLANpHMO7BH9Vo=
-X-Received: by 2002:a05:6e02:e46:b0:3e3:cc1b:2b5e with SMTP id
- e9e14a558f8ab-3e4161b0466mr75236065ab.15.1754209965117; Sun, 03 Aug 2025
- 01:32:45 -0700 (PDT)
+	s=arc-20240116; t=1754212865; c=relaxed/simple;
+	bh=6SiqmzgUPZiU3wRacVGyFYA2GVYo9ShBH5POmw4XLeQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IDixJWpfR2O4hsV3/PC2VeXjiLatlu4cHPXuHyghAcrrT/e1SSMge6oarIz/Ij5xx5vAt4Y+ZXa1qUtPhFd2SOUOckxRMc9EnnNAdr6yO9SUjH5cr5bm4u8sgcpUnolWNoTxZsYpvOGkibE8BAFQ0fDyZ59CBzfiWBOZ0xF9Wfg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aw/j3Oeq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBF17C4CEF8;
+	Sun,  3 Aug 2025 09:21:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754212864;
+	bh=6SiqmzgUPZiU3wRacVGyFYA2GVYo9ShBH5POmw4XLeQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=aw/j3OeqjQ/iFCgHi/RWGqYq7syYaTdWk/XyaeXaSWa/9B/gULAeCtn3X6d553UIT
+	 zis3vGT82aTx9/lCXCvzYcBu6UkuBARnGc3HWPN89gcd5+5AKhF/uOjCtMv7xIGNf+
+	 6nr3x9rSCH6NIZ4Zu9h/+pq+ejCwjM6eVVraXwfbPEkoX4ERw9PLA5qrzxuXeZId1k
+	 jizU6mOr5TVMPndjKUw94sL3dLiBKouEb3aDrUpApjcD3ItpNOso2S1yhNL+lSnWJr
+	 /QYUSABbIQBwuVFEwEhHlWDn0e8liZTWYDl0K1HOfCZA1XFM6u1z8TXQGIN2fS1Uec
+	 EZfHP5PhhuURA==
+Message-ID: <00f6d696-a8d2-41a5-819a-dc1ed87d35bb@kernel.org>
+Date: Sun, 3 Aug 2025 11:20:59 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250802092435.288714-1-dongml2@chinatelecom.cn>
- <20250802092435.288714-2-dongml2@chinatelecom.cn> <CAL+tcoA9Lvc4Cj9zjWVx1FzEQA=d=OnvZRDWA4nE_1GNbEDaRw@mail.gmail.com>
- <CADxym3bD17eL0U0sQkuSZZgNtg7gmvzt0YAA+CiHf9Lw5-+awA@mail.gmail.com>
- <CAL+tcoD80feEhPA_1L7D55UqkRuLSnZ-Kmmdab5J2v9K6uCzTA@mail.gmail.com> <CADxym3Zv9+6D0hCEx1KzvW+oAQW5oEDgSHBQPyRjHodezH9O1g@mail.gmail.com>
-In-Reply-To: <CADxym3Zv9+6D0hCEx1KzvW+oAQW5oEDgSHBQPyRjHodezH9O1g@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Sun, 3 Aug 2025 16:32:08 +0800
-X-Gm-Features: Ac12FXyvH1wDoI1PwTpkmNtbVXYnUCXDWNJtN74YGyKTIhg8liV-Ucw0p-QDGAc
-Message-ID: <CAL+tcoCCq8Hc3R0_75wZxHUiZrjhfS-q65XFWM69F8pcoJPdyw@mail.gmail.com>
-Subject: Re: [PATCH net v3 1/2] net: tcp: lookup the best matched listen socket
-To: Menglong Dong <menglong8.dong@gmail.com>
-Cc: edumazet@google.com, kuniyu@google.com, ncardwell@google.com, 
-	davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, 
-	horms@kernel.org, shuah@kernel.org, kraig@google.com, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 1/3] dt-bindings: sram: qcom,imem: Allow
+ modem-tables
+To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+ Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Alex Elder <elder@kernel.org>
+Cc: Marijn Suijten <marijn.suijten@somainline.org>,
+ linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ Alex Elder <elder@riscstar.com>
+References: <20250527-topic-ipa_imem-v2-0-6d1aad91b841@oss.qualcomm.com>
+ <20250527-topic-ipa_imem-v2-1-6d1aad91b841@oss.qualcomm.com>
+ <97724a4d-fad5-4e98-b415-985e5f19f911@kernel.org>
+ <e7ee4653-194c-417a-9eda-2666e9f5244d@oss.qualcomm.com>
+ <68622599-02d0-45ca-82f5-cf321c153cde@kernel.org>
+ <bf78d681-723b-4372-86e0-c0643ecc2399@oss.qualcomm.com>
+ <62b0f514-a8a9-4147-a5c0-da9dbe13ce39@kernel.org>
+ <747e5221-0fb1-4081-9e98-94b330ebf8c7@oss.qualcomm.com>
+ <e4c5ecc3-fd97-4b13-a057-bb1a3b7f9207@kernel.org>
+ <f6b16d1d-3730-46d1-81aa-bfaf09c20754@oss.qualcomm.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <f6b16d1d-3730-46d1-81aa-bfaf09c20754@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sun, Aug 3, 2025 at 12:00=E2=80=AFPM Menglong Dong <menglong8.dong@gmail=
-.com> wrote:
->
-> On Sun, Aug 3, 2025 at 10:54=E2=80=AFAM Jason Xing <kerneljasonxing@gmail=
-.com> wrote:
-> >
-> > On Sun, Aug 3, 2025 at 9:59=E2=80=AFAM Menglong Dong <menglong8.dong@gm=
-ail.com> wrote:
-> > >
-> > > On Sat, Aug 2, 2025 at 9:06=E2=80=AFPM Jason Xing <kerneljasonxing@gm=
-ail.com> wrote:
-> > > >
-> > > > Hi Menglong,
-> > > >
-> > > > On Sat, Aug 2, 2025 at 5:28=E2=80=AFPM Menglong Dong <menglong8.don=
-g@gmail.com> wrote:
-> > > > >
-> > > > > For now, the tcp socket lookup will terminate if the socket is re=
-use port
-> > > > > in inet_lhash2_lookup(), which makes the socket is not the best m=
-atch.
-> > > > >
-> > > > > For example, we have socket1 and socket2 both listen on "0.0.0.0:=
-1234",
-> > > > > but socket1 bind on "eth0". We create socket1 first, and then soc=
-ket2.
-> > > > > Then, all connections will goto socket2, which is not expected, a=
-s socket1
-> > > > > has higher priority.
-> > > > >
-> > > > > This can cause unexpected behavior if TCP MD5 keys is used, as de=
-scribed
-> > > > > in Documentation/networking/vrf.rst -> Applications.
-> > > > >
-> > > > > Therefor, we lookup the best matched socket first, and then do th=
-e reuse
-> > > >
-> > > > s/Therefor/Therefore
-> > > >
-> > > > > port logic. This can increase some overhead if there are many reu=
-se port
-> > > > > socket :/
-> > > > >
-> > > > > Fixes: c125e80b8868 ("soreuseport: fast reuseport TCP socket sele=
-ction")
-> > > > > Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
-> > > > > ---
-> > > > > v3:
-> > > > > * use the approach in V1
-> > > > > * add the Fixes tag
-> > > > > ---
-> > > > >  net/ipv4/inet_hashtables.c  | 13 +++++++------
-> > > > >  net/ipv6/inet6_hashtables.c | 13 +++++++------
-> > > > >  2 files changed, 14 insertions(+), 12 deletions(-)
-> > > > >
-> > > > > diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtable=
-s.c
-> > > > > index ceeeec9b7290..51751337f394 100644
-> > > > > --- a/net/ipv4/inet_hashtables.c
-> > > > > +++ b/net/ipv4/inet_hashtables.c
-> > > > > @@ -389,17 +389,18 @@ static struct sock *inet_lhash2_lookup(cons=
-t struct net *net,
-> > > > >         sk_nulls_for_each_rcu(sk, node, &ilb2->nulls_head) {
-> > > > >                 score =3D compute_score(sk, net, hnum, daddr, dif=
-, sdif);
-> > > > >                 if (score > hiscore) {
-> > > > > -                       result =3D inet_lookup_reuseport(net, sk,=
- skb, doff,
-> > > > > -                                                      saddr, spo=
-rt, daddr, hnum, inet_ehashfn);
-> > > > > -                       if (result)
-> > > > > -                               return result;
-> > > > > -
-> > > > >                         result =3D sk;
-> > > > >                         hiscore =3D score;
-> > > > >                 }
-> > > > >         }
-> > > > >
-> > > > > -       return result;
-> > > > > +       if (!result)
-> > > > > +               return NULL;
-> > > > > +
-> > > > > +       sk =3D inet_lookup_reuseport(net, result, skb, doff,
-> > > > > +                                  saddr, sport, daddr, hnum, ine=
-t_ehashfn);
-> > > > > +
-> > > > > +       return sk ? sk : result;
-> > > > >  }
-> > > >
-> > > > IMHO, I don't see it as a bugfix. So can you elaborate on what the =
-exact
-> > > > side effect you're faced with is when the algorithm finally prefers
-> > > > socket2 (without
-> > > > this patch)?
-> > >
-> > > Hi, Jason. The case is that the user has several NIC,
-> > > and there are some sockets that are binded to them,
-> > > who listen on TCP port 6666. And a global socket doesn't
-> > > bind any NIC and listens on TCP port 6666.
-> > >
-> > > In theory, the connection request from the NIC will goto
-> > > the listen socket that is binded on it. When on socket
-> > > is binded on the NIC, it goto the global socket. However,
-> > > the connection request always goto the global socket, which
-> > > is not expected.
-> > >
-> > > What's worse is that when TCP MD5 is used on the socket,
-> > > the connection will fail :/
-> >
-> > I'm trying to picture what the usage can be in the userland as you
-> > pointed out in the MD5 case. As to the client side, it seems weird
-> > since it cannot detect and know the priority of the other side where a
-> > few sockets listen on the same address and port.
->
-> For the server side, it needs to add all the clients information
-> with the TCP_MD5SIG option. For socket1 that binded on the
-> eth0, it will add all the client addresses that come from eth0 to the
-> socket1 with TCP_MD5SIG. So the server knows the clients.
+On 31/07/2025 11:47, Konrad Dybcio wrote:
+> On 7/30/25 3:14 PM, Krzysztof Kozlowski wrote:
+>> On 30/07/2025 14:07, Konrad Dybcio wrote:
+>>>>>>>>
+>>>>>>>> Missing additionalProperties: false, which would point you that this is
+>>>>>>>> incomplete (or useless because empty).
+>>>>>>>
+>>>>>>> How do I describe a 'stupid' node that is just a reg?
+>>>>>> With "reg" - similarly to many syscon bindings.
+>>>>>
+>>>>> Is this sort of inline style acceptable, or should I introduce
+>>>>> a separate file?
+>>>>
+>>>> It's fine, assuming that it is desired in general. We do not describe
+>>>> individual memory regions of syscon nodes and this is a syscon.
+>>>>
+>>>> If this is NVMEM (which it looks like), then could use NVMEM bindings to
+>>>> describe its cells - individual regions. But otherwise we just don't.
+>>>
+>>> It's volatile on-chip memory
+>>>
+>>>> There are many exceptions in other platforms, mostly old or even
+>>>> unreviewed by DT maintainers, so they are not a recommended example.
+>>>>
+>>>> This would need serious justification WHY you need to describe the
+>>>> child. Why phandle to the main node is not enough for consumers.
+>>>
+>>> It's simply a region of the SRAM, which needs to be IOMMU-mapped in a
+>>> specific manner (should IMEM move away from syscon+simple-mfd to
+>>> mmio-sram?). Describing slices is the DT way to pass them (like under
+>>> NVMEM providers).
+>>
+>>
+>> Then this might be not a syscon, IMO. I don't think mixing syscon and
+>> SRAM is appropriate, even though Linux could treat it very similar.
+>>
+>> syscon is for registers. mmio-sram is for SRAM or other parts of
+>> non-volatile RAM.
+>>
+>> Indeed you might need to move towards mmio-sram.
+>>
+>>>
+>>>>
+>>>> If the reason is - to instantiate child device driver - then as well no.
+>>>> This has been NAKed on the lists many times - you need resources if the
+>>>> child should be a separate node. Address space is one resource but not
+>>>> enough, because it can easily be obtained from the parent/main node.
+>>>
+>>> There is no additional driver for this
+>>
+>> Then it is not a simple-mfd...
+> 
+> Indeed it's really not
+> 
+> I found out however that the computer history museum (i.e.
+> qcom-apq8064-asus-nexus7-flo.dts and qcom-msm8974.dtsi) seems to
+> have used simple-mfd, so that the subnode (syscon-reboot-mode) is
+> matched against a driver
+> 
+> The same can be achieved if we stick an of_platform_populate() at
+> the end of mmio-sram probe - thoughts?
+You cannot (or should not) remove simple-mfd from existing binding. But
+the point is that the list should not grow.
 
-Right, but I meant the _client_ side doesn't know the details of the
-other side, that is to say, the server side needs to keep sure the
-client server easily connects to your preferred listener regardless of
-what the selection algorithm looks like. In terms of what you
-depicted, I see your point. One question is if the kernel or API
-provides any rules and instructions to the users that on the server
-side the sk1 must be selected in your case? Is it possible for other
-cases where the sk2 is the preferable/ideal one? I'm not sure if it's
-worth 'fixing' it in the kernel.
+Maybe the binding should receive a comment next to compatible:
+" # Do not grow this, if you add here new compatible, you agree to buy
+round of drinks on next LPC to all upstream maintainers" ?
 
-Thanks,
-Jason
+Best regards,
+Krzysztof
 
