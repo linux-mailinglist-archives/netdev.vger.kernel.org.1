@@ -1,150 +1,113 @@
-Return-Path: <netdev+bounces-211475-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211486-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFBF4B19338
-	for <lists+netdev@lfdr.de>; Sun,  3 Aug 2025 11:39:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A11CB193C7
+	for <lists+netdev@lfdr.de>; Sun,  3 Aug 2025 13:11:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C837C172249
-	for <lists+netdev@lfdr.de>; Sun,  3 Aug 2025 09:39:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 607DE174281
+	for <lists+netdev@lfdr.de>; Sun,  3 Aug 2025 11:11:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2F3E26E718;
-	Sun,  3 Aug 2025 09:39:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE86622541F;
+	Sun,  3 Aug 2025 11:11:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="pCHdnDKS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f79.google.com (mail-io1-f79.google.com [209.85.166.79])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17AC780C02
-	for <netdev@vger.kernel.org>; Sun,  3 Aug 2025 09:39:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.79
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B93631EDA3C;
+	Sun,  3 Aug 2025 11:10:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754213971; cv=none; b=o1hUzmfst5YiV4d1ZRAO4KBcJHi0E8lSUxYm4D0IRkPwdDRW9Q30Whj2/+M8fsQsAO99T6Ge0olRVnCTlnN1Mml1bPln5H50ysOt0TK0+FiB/arcENzA6lNIN1xxiuL5wAlgA9XbOE/z6+QFUYnq+Xn7lwOmhihpQMDeD2Lin+E=
+	t=1754219464; cv=none; b=BTU27KMxYc9m4T6bK8dViqVTujeHB6BDYJmXxD+qL1WDVAK8VXUFf/1OoK9tEYitfD/kqYBgJ3MDeeVBV5ldPU5VcxdZp5DyN+bU8KPpABXxhTXk5o3xckVNUxB8jJZ6dYM48vE1M2g/8oNT7K6xrYMNxFQN92ZVFL7kfWLQFyg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754213971; c=relaxed/simple;
-	bh=me+MDMUhWRUOn6twry0ANbpGXGMjQncaO7/NSz6OS9k=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=jmKlPrCWquDayHWsUex3UdjApW89pF7EQyA1eA+lZNh0pF67L/vbulm9tee/rEL02CL6ueh+Gib+80zwtuGpyVMXfnT+1S9f04gQJlawSBWD1Li+ANQcz8emuh7COxVnvvYgY67heHarQNuYYHjyjBw8UsjrP28aKgCfF1YfCL0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.79
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f79.google.com with SMTP id ca18e2360f4ac-88177d99827so36973039f.3
-        for <netdev@vger.kernel.org>; Sun, 03 Aug 2025 02:39:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754213969; x=1754818769;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=U0LWSoiEUjnDRuPcXhZsxJI/YVjUTAHuiFyMIyM36SQ=;
-        b=Zrhq9L59iZFuYZy+Qu5upogKA2p+KpRiwrYQprQokwobb6uLzpYOKvN+qHDDD5hHDB
-         KimR5h1NYTFK06wm8D5UIV5dEC1iKAbsemkR2ux1nVUmsdq2m3mRLQD+6my7LVem0qm5
-         06b8ZBbqPFg92Rvo1RVOudL4SBd7Osd19wQ/bCqnAO39lHgbgqXVbwEMHD4U+h9LhuaR
-         h7lkw37OuHh/bkzLY89RPhbTNOrnnxHKrEiKss9ihP2y2t09JYUOFSyWOxPG+4ipegB3
-         a6kd+7mnr1Olvf+aFrfBzWAHcr4CzCQ8ACnxA7KcocxGK+IjDhSDU0Io67v7QEah9r7M
-         kkNw==
-X-Forwarded-Encrypted: i=1; AJvYcCXoQ7s94ZyISNf1j96uiJ9wFmrMvl1flspPM3rLbUw8y0QSuj+WokL7eVASXp6IW0AL9LgdrrU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxk1xjr7Uyd/WsjjsZjNIY518+8q7p1ZuWREYnMNnSDyY8UTQP1
-	IZV8uckllQaPYCFvnrD8u4O41uLf5neeUpdJ7VATRSgUTk+NPFHiWQOISL9bGuwdNnjoA1k7R0e
-	ZCHKqt8L2VqTu/Vr15jnpR9FOPuQ4RxLhBMbmjYpCMNalCtDnefZSYarKoxk=
-X-Google-Smtp-Source: AGHT+IFlNsObHPzdzv2suMhd+3PPDPLZO8uF5MVEeqlO7lgZa0M6JGbqSTtaoNkHax1Z8ldtkc+MQUSdBwQDdEgHF+wtCm1FAJux
+	s=arc-20240116; t=1754219464; c=relaxed/simple;
+	bh=mH95pA4cftJ6NN9CFstldZceXxZhqt1S9l4BVHuUz3Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TtzTECtDAm54PHPSemKxXB7t5k3oESL177XDFMxb089+QEM71c+YwMl7WOZhGwf7/+fDTAbQEoaRPYPlTcKgepbJqGcKUcEM8QzFf3KcPTtR4Ax10hoS2eWjqem5v6Wn1gi2qBL+OWHkpxsOWllfismBwhz417qFG7fOTYApxaI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=pCHdnDKS; arc=none smtp.client-ip=185.226.149.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1uiVWX-003vz3-8i; Sun, 03 Aug 2025 12:01:01 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+	bh=EL2StWgKuIJqWqQKx+j/2xqZwCUiP1U+Ud26xxbj8xY=; b=pCHdnDKSQFO018x3pvWq6uST1m
+	zncPtEk6In+1fV6Fjc35EpfscsPPoMNvCXCU40E2qTqGzbg1XCtZhn+uxu6Ygx8P3kbIYeNUHWqly
+	hVCj1LxCgumxoXux0XHJ27BOFRFiMjnZqY+e9eX7as8IcEVaE4SJvYTL7TFCgubWvEnN/aR/EXVyJ
+	TVJ+yWjk5BJIUiFqGaII2YMfaEghgqi3uYg0CKpHhZk5Kfbvco0aXkMrYH8Bqw+DmZMnY2RDK7H4L
+	qRErh/h9O9riaJI82HUGl35NrbY8R9GbdrZ746REt9EBpHbScDXwqW/SsFk2CBzFmH1e2MvRPLvDo
+	4O4w/0mA==;
+Received: from [10.9.9.72] (helo=submission01.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1uiVWW-000606-7S; Sun, 03 Aug 2025 12:01:00 +0200
+Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1uiVWB-002JcU-1D; Sun, 03 Aug 2025 12:00:39 +0200
+Message-ID: <b6a2219b-32dd-4bb6-b848-45325e4e4ab9@rbox.co>
+Date: Sun, 3 Aug 2025 12:00:38 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:26ca:b0:87c:1d65:3aeb with SMTP id
- ca18e2360f4ac-88168318805mr1125317139f.2.1754213969260; Sun, 03 Aug 2025
- 02:39:29 -0700 (PDT)
-Date: Sun, 03 Aug 2025 02:39:29 -0700
-In-Reply-To: <6880f58e.050a0220.248954.0001.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <688f2e51.050a0220.1fc43d.0002.GAE@google.com>
-Subject: Re: [syzbot] [tipc?] KMSAN: uninit-value in tipc_rcv (2)
-From: syzbot <syzbot+9a4fbb77c9d4aacd3388@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	jmaloy@redhat.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
-	tipc-discussion@lists.sourceforge.net
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] kcm: Fix splice support
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Cong Wang <cong.wang@bytedance.com>,
+ Tom Herbert <tom@herbertland.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250725-kcm-splice-v1-1-9a725ad2ee71@rbox.co>
+ <20250730180215.2ad7df72@kernel.org>
+Content-Language: pl-PL, en-GB
+From: Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <20250730180215.2ad7df72@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-syzbot has found a reproducer for the following issue on:
+On 7/31/25 03:02, Jakub Kicinski wrote:
+> On Fri, 25 Jul 2025 12:33:04 +0200 Michal Luczaj wrote:
+>> Flags passed in for splice() syscall should not end up in
+>> skb_recv_datagram(). As SPLICE_F_NONBLOCK == MSG_PEEK, kernel gets
+>> confused: skb isn't unlinked from a receive queue, while strp_msg::offset
+>> and strp_msg::full_len are updated.
+>>
+>> Unbreak the logic a bit more by mapping both O_NONBLOCK and
+>> SPLICE_F_NONBLOCK to MSG_DONTWAIT. This way we align with man splice(2) in
+>> regard to errno EAGAIN:
+>>
+>>    SPLICE_F_NONBLOCK was specified in flags or one of the file descriptors
+>>    had been marked as nonblocking (O_NONBLOCK), and the operation would
+>>    block.
+> 
+> Coincidentally looks like we're not honoring
+> 
+> 	sock->file->f_flags & O_NONBLOCK 
+> 
+> in TLS..
 
-HEAD commit:    89748acdf226 Merge tag 'drm-next-2025-08-01' of https://gi..
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=1395bcf0580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=7ff65239b4835001
-dashboard link: https://syzkaller.appspot.com/bug?extid=9a4fbb77c9d4aacd3388
-compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1625ff82580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=131bb834580000
+I'm a bit confused.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/ce090dd92dc2/disk-89748acd.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/32b5903a7759/vmlinux-89748acd.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/dc68a867773d/bzImage-89748acd.xz
+Comparing AF_UNIX and pure (non-TLS) TCP, I see two non-blocking-splice
+interpretations. Unix socket doesn't block on `f_flags & O_NONBLOCK ||
+flags & SPLICE_F_NONBLOCK` (which this patch follows), while TCP, after
+commit 42324c627043 ("net: splice() from tcp to pipe should take into
+account O_NONBLOCK"), honours O_NONBLOCK and ignores SPLICE_F_NONBLOCK.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+9a4fbb77c9d4aacd3388@syzkaller.appspotmail.com
+Should KCM (and TLS) follow TCP behaviour instead?
 
-tipc: Started in network mode
-tipc: Node identity 4689370d27fe, cluster identity 4711
-tipc: Enabled bearer <eth:syzkaller0>, priority 0
-=====================================================
-BUG: KMSAN: uninit-value in tipc_rcv+0x17fa/0x1ea0 net/tipc/node.c:2132
- tipc_rcv+0x17fa/0x1ea0 net/tipc/node.c:2132
- tipc_l2_rcv_msg+0x213/0x320 net/tipc/bearer.c:668
- __netif_receive_skb_list_ptype net/core/dev.c:6027 [inline]
- __netif_receive_skb_list_core+0x133b/0x16b0 net/core/dev.c:6069
- __netif_receive_skb_list net/core/dev.c:6121 [inline]
- netif_receive_skb_list_internal+0xee7/0x1530 net/core/dev.c:6212
- gro_normal_list include/net/gro.h:532 [inline]
- gro_flush_normal include/net/gro.h:540 [inline]
- napi_complete_done+0x3fb/0x7d0 net/core/dev.c:6581
- napi_complete include/linux/netdevice.h:589 [inline]
- tun_get_user+0x4c0d/0x6ca0 drivers/net/tun.c:1921
- tun_chr_write_iter+0x3e9/0x5c0 drivers/net/tun.c:1996
- do_iter_readv_writev+0x947/0xba0 fs/read_write.c:-1
- vfs_writev+0x52a/0x1500 fs/read_write.c:1057
- do_writev+0x1b5/0x580 fs/read_write.c:1103
- __do_sys_writev fs/read_write.c:1171 [inline]
- __se_sys_writev fs/read_write.c:1168 [inline]
- __x64_sys_writev+0x99/0xf0 fs/read_write.c:1168
- x64_sys_call+0x24b1/0x3e20 arch/x86/include/generated/asm/syscalls_64.h:21
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xd9/0x210 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+Thanks,
+Michal
 
-Uninit was created at:
- slab_post_alloc_hook mm/slub.c:4186 [inline]
- slab_alloc_node mm/slub.c:4229 [inline]
- kmem_cache_alloc_node_noprof+0x818/0xf00 mm/slub.c:4281
- kmalloc_reserve+0x13c/0x4b0 net/core/skbuff.c:578
- __alloc_skb+0x347/0x7d0 net/core/skbuff.c:669
- napi_alloc_skb+0xc1/0x740 net/core/skbuff.c:811
- napi_get_frags+0xab/0x250 net/core/gro.c:673
- tun_napi_alloc_frags drivers/net/tun.c:1404 [inline]
- tun_get_user+0x134f/0x6ca0 drivers/net/tun.c:1784
- tun_chr_write_iter+0x3e9/0x5c0 drivers/net/tun.c:1996
- do_iter_readv_writev+0x947/0xba0 fs/read_write.c:-1
- vfs_writev+0x52a/0x1500 fs/read_write.c:1057
- do_writev+0x1b5/0x580 fs/read_write.c:1103
- __do_sys_writev fs/read_write.c:1171 [inline]
- __se_sys_writev fs/read_write.c:1168 [inline]
- __x64_sys_writev+0x99/0xf0 fs/read_write.c:1168
- x64_sys_call+0x24b1/0x3e20 arch/x86/include/generated/asm/syscalls_64.h:21
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xd9/0x210 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-CPU: 1 UID: 0 PID: 5808 Comm: syz-executor123 Not tainted 6.16.0-syzkaller-10499-g89748acdf226 #0 PREEMPT(none) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
-=====================================================
-
-
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
 
