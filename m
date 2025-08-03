@@ -1,196 +1,150 @@
-Return-Path: <netdev+bounces-211474-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211475-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 147EEB1932D
-	for <lists+netdev@lfdr.de>; Sun,  3 Aug 2025 11:21:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFBF4B19338
+	for <lists+netdev@lfdr.de>; Sun,  3 Aug 2025 11:39:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8EE63B7263
-	for <lists+netdev@lfdr.de>; Sun,  3 Aug 2025 09:21:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C837C172249
+	for <lists+netdev@lfdr.de>; Sun,  3 Aug 2025 09:39:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71D782874FC;
-	Sun,  3 Aug 2025 09:21:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aw/j3Oeq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2F3E26E718;
+	Sun,  3 Aug 2025 09:39:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f79.google.com (mail-io1-f79.google.com [209.85.166.79])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C85E2AD3D;
-	Sun,  3 Aug 2025 09:21:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17AC780C02
+	for <netdev@vger.kernel.org>; Sun,  3 Aug 2025 09:39:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.79
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754212865; cv=none; b=b2UybWkUNW/LXMFYQua08spj9gnSSkOyRhLPE66PSkkWRz7Yii1pUPuEF0WnkDCUKhTP5pouhHoIUF0X5t3rEGD4ESja6V/fQPIUafpIDG/vTQnjXXmvOPKPkQBqxcTo+bv1a8ggjBuBCi/1HrLsY2deZUd7aUn1OgJWZ6UhqvA=
+	t=1754213971; cv=none; b=o1hUzmfst5YiV4d1ZRAO4KBcJHi0E8lSUxYm4D0IRkPwdDRW9Q30Whj2/+M8fsQsAO99T6Ge0olRVnCTlnN1Mml1bPln5H50ysOt0TK0+FiB/arcENzA6lNIN1xxiuL5wAlgA9XbOE/z6+QFUYnq+Xn7lwOmhihpQMDeD2Lin+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754212865; c=relaxed/simple;
-	bh=6SiqmzgUPZiU3wRacVGyFYA2GVYo9ShBH5POmw4XLeQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IDixJWpfR2O4hsV3/PC2VeXjiLatlu4cHPXuHyghAcrrT/e1SSMge6oarIz/Ij5xx5vAt4Y+ZXa1qUtPhFd2SOUOckxRMc9EnnNAdr6yO9SUjH5cr5bm4u8sgcpUnolWNoTxZsYpvOGkibE8BAFQ0fDyZ59CBzfiWBOZ0xF9Wfg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aw/j3Oeq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBF17C4CEF8;
-	Sun,  3 Aug 2025 09:21:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754212864;
-	bh=6SiqmzgUPZiU3wRacVGyFYA2GVYo9ShBH5POmw4XLeQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=aw/j3OeqjQ/iFCgHi/RWGqYq7syYaTdWk/XyaeXaSWa/9B/gULAeCtn3X6d553UIT
-	 zis3vGT82aTx9/lCXCvzYcBu6UkuBARnGc3HWPN89gcd5+5AKhF/uOjCtMv7xIGNf+
-	 6nr3x9rSCH6NIZ4Zu9h/+pq+ejCwjM6eVVraXwfbPEkoX4ERw9PLA5qrzxuXeZId1k
-	 jizU6mOr5TVMPndjKUw94sL3dLiBKouEb3aDrUpApjcD3ItpNOso2S1yhNL+lSnWJr
-	 /QYUSABbIQBwuVFEwEhHlWDn0e8liZTWYDl0K1HOfCZA1XFM6u1z8TXQGIN2fS1Uec
-	 EZfHP5PhhuURA==
-Message-ID: <00f6d696-a8d2-41a5-819a-dc1ed87d35bb@kernel.org>
-Date: Sun, 3 Aug 2025 11:20:59 +0200
+	s=arc-20240116; t=1754213971; c=relaxed/simple;
+	bh=me+MDMUhWRUOn6twry0ANbpGXGMjQncaO7/NSz6OS9k=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=jmKlPrCWquDayHWsUex3UdjApW89pF7EQyA1eA+lZNh0pF67L/vbulm9tee/rEL02CL6ueh+Gib+80zwtuGpyVMXfnT+1S9f04gQJlawSBWD1Li+ANQcz8emuh7COxVnvvYgY67heHarQNuYYHjyjBw8UsjrP28aKgCfF1YfCL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f79.google.com with SMTP id ca18e2360f4ac-88177d99827so36973039f.3
+        for <netdev@vger.kernel.org>; Sun, 03 Aug 2025 02:39:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754213969; x=1754818769;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=U0LWSoiEUjnDRuPcXhZsxJI/YVjUTAHuiFyMIyM36SQ=;
+        b=Zrhq9L59iZFuYZy+Qu5upogKA2p+KpRiwrYQprQokwobb6uLzpYOKvN+qHDDD5hHDB
+         KimR5h1NYTFK06wm8D5UIV5dEC1iKAbsemkR2ux1nVUmsdq2m3mRLQD+6my7LVem0qm5
+         06b8ZBbqPFg92Rvo1RVOudL4SBd7Osd19wQ/bCqnAO39lHgbgqXVbwEMHD4U+h9LhuaR
+         h7lkw37OuHh/bkzLY89RPhbTNOrnnxHKrEiKss9ihP2y2t09JYUOFSyWOxPG+4ipegB3
+         a6kd+7mnr1Olvf+aFrfBzWAHcr4CzCQ8ACnxA7KcocxGK+IjDhSDU0Io67v7QEah9r7M
+         kkNw==
+X-Forwarded-Encrypted: i=1; AJvYcCXoQ7s94ZyISNf1j96uiJ9wFmrMvl1flspPM3rLbUw8y0QSuj+WokL7eVASXp6IW0AL9LgdrrU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxk1xjr7Uyd/WsjjsZjNIY518+8q7p1ZuWREYnMNnSDyY8UTQP1
+	IZV8uckllQaPYCFvnrD8u4O41uLf5neeUpdJ7VATRSgUTk+NPFHiWQOISL9bGuwdNnjoA1k7R0e
+	ZCHKqt8L2VqTu/Vr15jnpR9FOPuQ4RxLhBMbmjYpCMNalCtDnefZSYarKoxk=
+X-Google-Smtp-Source: AGHT+IFlNsObHPzdzv2suMhd+3PPDPLZO8uF5MVEeqlO7lgZa0M6JGbqSTtaoNkHax1Z8ldtkc+MQUSdBwQDdEgHF+wtCm1FAJux
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 1/3] dt-bindings: sram: qcom,imem: Allow
- modem-tables
-To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
- Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Alex Elder <elder@kernel.org>
-Cc: Marijn Suijten <marijn.suijten@somainline.org>,
- linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- Alex Elder <elder@riscstar.com>
-References: <20250527-topic-ipa_imem-v2-0-6d1aad91b841@oss.qualcomm.com>
- <20250527-topic-ipa_imem-v2-1-6d1aad91b841@oss.qualcomm.com>
- <97724a4d-fad5-4e98-b415-985e5f19f911@kernel.org>
- <e7ee4653-194c-417a-9eda-2666e9f5244d@oss.qualcomm.com>
- <68622599-02d0-45ca-82f5-cf321c153cde@kernel.org>
- <bf78d681-723b-4372-86e0-c0643ecc2399@oss.qualcomm.com>
- <62b0f514-a8a9-4147-a5c0-da9dbe13ce39@kernel.org>
- <747e5221-0fb1-4081-9e98-94b330ebf8c7@oss.qualcomm.com>
- <e4c5ecc3-fd97-4b13-a057-bb1a3b7f9207@kernel.org>
- <f6b16d1d-3730-46d1-81aa-bfaf09c20754@oss.qualcomm.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <f6b16d1d-3730-46d1-81aa-bfaf09c20754@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6602:26ca:b0:87c:1d65:3aeb with SMTP id
+ ca18e2360f4ac-88168318805mr1125317139f.2.1754213969260; Sun, 03 Aug 2025
+ 02:39:29 -0700 (PDT)
+Date: Sun, 03 Aug 2025 02:39:29 -0700
+In-Reply-To: <6880f58e.050a0220.248954.0001.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <688f2e51.050a0220.1fc43d.0002.GAE@google.com>
+Subject: Re: [syzbot] [tipc?] KMSAN: uninit-value in tipc_rcv (2)
+From: syzbot <syzbot+9a4fbb77c9d4aacd3388@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	jmaloy@redhat.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
+	tipc-discussion@lists.sourceforge.net
+Content-Type: text/plain; charset="UTF-8"
 
-On 31/07/2025 11:47, Konrad Dybcio wrote:
-> On 7/30/25 3:14 PM, Krzysztof Kozlowski wrote:
->> On 30/07/2025 14:07, Konrad Dybcio wrote:
->>>>>>>>
->>>>>>>> Missing additionalProperties: false, which would point you that this is
->>>>>>>> incomplete (or useless because empty).
->>>>>>>
->>>>>>> How do I describe a 'stupid' node that is just a reg?
->>>>>> With "reg" - similarly to many syscon bindings.
->>>>>
->>>>> Is this sort of inline style acceptable, or should I introduce
->>>>> a separate file?
->>>>
->>>> It's fine, assuming that it is desired in general. We do not describe
->>>> individual memory regions of syscon nodes and this is a syscon.
->>>>
->>>> If this is NVMEM (which it looks like), then could use NVMEM bindings to
->>>> describe its cells - individual regions. But otherwise we just don't.
->>>
->>> It's volatile on-chip memory
->>>
->>>> There are many exceptions in other platforms, mostly old or even
->>>> unreviewed by DT maintainers, so they are not a recommended example.
->>>>
->>>> This would need serious justification WHY you need to describe the
->>>> child. Why phandle to the main node is not enough for consumers.
->>>
->>> It's simply a region of the SRAM, which needs to be IOMMU-mapped in a
->>> specific manner (should IMEM move away from syscon+simple-mfd to
->>> mmio-sram?). Describing slices is the DT way to pass them (like under
->>> NVMEM providers).
->>
->>
->> Then this might be not a syscon, IMO. I don't think mixing syscon and
->> SRAM is appropriate, even though Linux could treat it very similar.
->>
->> syscon is for registers. mmio-sram is for SRAM or other parts of
->> non-volatile RAM.
->>
->> Indeed you might need to move towards mmio-sram.
->>
->>>
->>>>
->>>> If the reason is - to instantiate child device driver - then as well no.
->>>> This has been NAKed on the lists many times - you need resources if the
->>>> child should be a separate node. Address space is one resource but not
->>>> enough, because it can easily be obtained from the parent/main node.
->>>
->>> There is no additional driver for this
->>
->> Then it is not a simple-mfd...
-> 
-> Indeed it's really not
-> 
-> I found out however that the computer history museum (i.e.
-> qcom-apq8064-asus-nexus7-flo.dts and qcom-msm8974.dtsi) seems to
-> have used simple-mfd, so that the subnode (syscon-reboot-mode) is
-> matched against a driver
-> 
-> The same can be achieved if we stick an of_platform_populate() at
-> the end of mmio-sram probe - thoughts?
-You cannot (or should not) remove simple-mfd from existing binding. But
-the point is that the list should not grow.
+syzbot has found a reproducer for the following issue on:
 
-Maybe the binding should receive a comment next to compatible:
-" # Do not grow this, if you add here new compatible, you agree to buy
-round of drinks on next LPC to all upstream maintainers" ?
+HEAD commit:    89748acdf226 Merge tag 'drm-next-2025-08-01' of https://gi..
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=1395bcf0580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=7ff65239b4835001
+dashboard link: https://syzkaller.appspot.com/bug?extid=9a4fbb77c9d4aacd3388
+compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1625ff82580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=131bb834580000
 
-Best regards,
-Krzysztof
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/ce090dd92dc2/disk-89748acd.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/32b5903a7759/vmlinux-89748acd.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/dc68a867773d/bzImage-89748acd.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+9a4fbb77c9d4aacd3388@syzkaller.appspotmail.com
+
+tipc: Started in network mode
+tipc: Node identity 4689370d27fe, cluster identity 4711
+tipc: Enabled bearer <eth:syzkaller0>, priority 0
+=====================================================
+BUG: KMSAN: uninit-value in tipc_rcv+0x17fa/0x1ea0 net/tipc/node.c:2132
+ tipc_rcv+0x17fa/0x1ea0 net/tipc/node.c:2132
+ tipc_l2_rcv_msg+0x213/0x320 net/tipc/bearer.c:668
+ __netif_receive_skb_list_ptype net/core/dev.c:6027 [inline]
+ __netif_receive_skb_list_core+0x133b/0x16b0 net/core/dev.c:6069
+ __netif_receive_skb_list net/core/dev.c:6121 [inline]
+ netif_receive_skb_list_internal+0xee7/0x1530 net/core/dev.c:6212
+ gro_normal_list include/net/gro.h:532 [inline]
+ gro_flush_normal include/net/gro.h:540 [inline]
+ napi_complete_done+0x3fb/0x7d0 net/core/dev.c:6581
+ napi_complete include/linux/netdevice.h:589 [inline]
+ tun_get_user+0x4c0d/0x6ca0 drivers/net/tun.c:1921
+ tun_chr_write_iter+0x3e9/0x5c0 drivers/net/tun.c:1996
+ do_iter_readv_writev+0x947/0xba0 fs/read_write.c:-1
+ vfs_writev+0x52a/0x1500 fs/read_write.c:1057
+ do_writev+0x1b5/0x580 fs/read_write.c:1103
+ __do_sys_writev fs/read_write.c:1171 [inline]
+ __se_sys_writev fs/read_write.c:1168 [inline]
+ __x64_sys_writev+0x99/0xf0 fs/read_write.c:1168
+ x64_sys_call+0x24b1/0x3e20 arch/x86/include/generated/asm/syscalls_64.h:21
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xd9/0x210 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Uninit was created at:
+ slab_post_alloc_hook mm/slub.c:4186 [inline]
+ slab_alloc_node mm/slub.c:4229 [inline]
+ kmem_cache_alloc_node_noprof+0x818/0xf00 mm/slub.c:4281
+ kmalloc_reserve+0x13c/0x4b0 net/core/skbuff.c:578
+ __alloc_skb+0x347/0x7d0 net/core/skbuff.c:669
+ napi_alloc_skb+0xc1/0x740 net/core/skbuff.c:811
+ napi_get_frags+0xab/0x250 net/core/gro.c:673
+ tun_napi_alloc_frags drivers/net/tun.c:1404 [inline]
+ tun_get_user+0x134f/0x6ca0 drivers/net/tun.c:1784
+ tun_chr_write_iter+0x3e9/0x5c0 drivers/net/tun.c:1996
+ do_iter_readv_writev+0x947/0xba0 fs/read_write.c:-1
+ vfs_writev+0x52a/0x1500 fs/read_write.c:1057
+ do_writev+0x1b5/0x580 fs/read_write.c:1103
+ __do_sys_writev fs/read_write.c:1171 [inline]
+ __se_sys_writev fs/read_write.c:1168 [inline]
+ __x64_sys_writev+0x99/0xf0 fs/read_write.c:1168
+ x64_sys_call+0x24b1/0x3e20 arch/x86/include/generated/asm/syscalls_64.h:21
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xd9/0x210 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+CPU: 1 UID: 0 PID: 5808 Comm: syz-executor123 Not tainted 6.16.0-syzkaller-10499-g89748acdf226 #0 PREEMPT(none) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
+=====================================================
+
+
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
