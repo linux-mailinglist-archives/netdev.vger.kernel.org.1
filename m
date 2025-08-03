@@ -1,124 +1,114 @@
-Return-Path: <netdev+bounces-211493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211494-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7130CB194CF
-	for <lists+netdev@lfdr.de>; Sun,  3 Aug 2025 20:46:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7E2AB1967D
+	for <lists+netdev@lfdr.de>; Sun,  3 Aug 2025 23:32:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED9A93B32A2
-	for <lists+netdev@lfdr.de>; Sun,  3 Aug 2025 18:46:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 53BD51894148
+	for <lists+netdev@lfdr.de>; Sun,  3 Aug 2025 21:32:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60D881A08B8;
-	Sun,  3 Aug 2025 18:46:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D7C886359;
+	Sun,  3 Aug 2025 21:32:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MJPYsnLd"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="AYJuuAm2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 324282E36E3;
-	Sun,  3 Aug 2025 18:46:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42FF012E7F
+	for <netdev@vger.kernel.org>; Sun,  3 Aug 2025 21:32:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754246768; cv=none; b=oaKbfQhDPISot/UxVoBkGxtNnJ0JI061HDMMLSWX7aBYOjbOZG1HFmyLDcQPoEgmMuXyYIMkG6aCqiVtTQPwF8HnHh0A+6uqhf6ptiz5beag3H7yTOiSnPu1qKqWycWUaKsIu+gijfOY881iIR6ZJdz6Q85z56VQ7W7jRtUs3pM=
+	t=1754256724; cv=none; b=JsGhO92PpPzYgJh8Zzl7qVepuwXEY7Jvk7AyLihgQwqRPtajzPmag3Mzc3P+++Ba218MGZc3R8wxMlaeD2yb23SDNFyUTcTnFkwAElEJM3x6cRHUMRw1az+oGVfFWG3g8LmmhaSjY/jQBKS7KHLUfhbK6reh9blav5bUG4NknrI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754246768; c=relaxed/simple;
-	bh=otAKeqlFXtkIQt27io/cIsPeuZzPBPKAvYiQNoQ3YCI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UM5TF3uedWpSBkyHeoxriZ7/3a5I8WfWfIT0VBEnI9OqDyydmRLNvWb3kI/UVAdCiuK53Q88Ft69l1m5TsjBhAYvUPWIbn+tQJONVpytbV8tF/PAoUkvBFurWNxb1rJ+SDCZ3DYnLQgNgYk+aBuOE4Yev3eKW48OlZ1vOIPpJ0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MJPYsnLd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59CF1C4CEEB;
-	Sun,  3 Aug 2025 18:46:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754246767;
-	bh=otAKeqlFXtkIQt27io/cIsPeuZzPBPKAvYiQNoQ3YCI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=MJPYsnLd8uSZeRjOt/Yd+mRmyOOQC247UfdgdYfR9pOvWudmYW5TMBA9Qc0rKhqCi
-	 jpgZBWSLoRukVVKu9dFghpJZRK/ZF1cL5wpN8TzVK8eOrM4OcOjMPNx452eny3tBjP
-	 U0lzTxYuzDnvLFwaCUTtkOcnclUGM69ZoHqAgba0h+f7mnrldwLxQCJ3Skux9CpdR+
-	 NHwf4HU8osDsg0C7eHwpAfy+QhOxX3ZotZa4gIpp7REi3rCEMPxZXAjwH26XFP9Go1
-	 HRbRuFqP66AK1HdT8QDglyqhEK4U84IU+b8zd90id+vS+T2wZ7q/HuHsIrvetnqRT1
-	 XscfI0m3saNLw==
-Date: Sun, 3 Aug 2025 11:46:05 -0700
-From: Drew Fustini <fustini@kernel.org>
-To: Rob Herring <robh@kernel.org>
-Cc: Yao Zi <ziyao@disroot.org>, Guo Ren <guoren@kernel.org>,
-	Fu Wei <wefu@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
-	Emil Renner Berthing <emil.renner.berthing@canonical.com>,
-	Jisheng Zhang <jszhang@kernel.org>, linux-riscv@lists.infradead.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2 2/3] net: stmmac: thead: Get and enable APB clock
- on initialization
-Message-ID: <aI-ubdx3FJj_wm3a@gen8>
-References: <20250801091240.46114-1-ziyao@disroot.org>
- <20250801091240.46114-3-ziyao@disroot.org>
- <20250803170206.GA525144-robh@kernel.org>
+	s=arc-20240116; t=1754256724; c=relaxed/simple;
+	bh=kebtq0RuDNNDVlCeB5XanF877Q4p84byR6VUvwFsSHA=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type; b=iUXHBcp+43b7gTpKg+uOEMsrUEurwbBrc48Wc/sP7o/KTwSnGCzx3PIkkTh+oEa3d3iJFByR+VQA7OfONrVfNv0R5UXJSFPG+XLzp0YaQo2eINQa5E/yd8QQwGbMyBzDX5Cyz6XaFSwuJuB01/il0F3hxpDSZe7NO4aFIWFHCA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=AYJuuAm2; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4560d176f97so30238135e9.0
+        for <netdev@vger.kernel.org>; Sun, 03 Aug 2025 14:32:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1754256720; x=1754861520; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:subject:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9P+RNyAbGWRp290LAF4vq0TCqvvldMoZBKGxLp8aZ8I=;
+        b=AYJuuAm2rZxN66KGqZPJN571ZR136Px5CwyXOhpHj/UQFSFgnOeEDURJ9c4PXRh3gg
+         +mbwrHRQQrn9yuxbNVD+3QZoFYOsJi4o3avoZMf6ea5gHwXRvS6Jx7fEodAlfnMXknYM
+         940Tl7mNjLwCB75w5u6iHK0yeBvSdPwXfD5sYGj3gWcscPdU9nNLqefIEK0G20GE2ARf
+         6mGbGl/Jlscg+eTZC4diBJskruc/gITEiBx1dwxCGsCj87cN8EEQa97a3i4OQ4lFtbzA
+         zQjfzBMV2OzJTXo++vMUfP6fMhJpkzDbU7mcBqo+kolc5W9YoeS2Wxzz9LEVk/7IlwZe
+         k+kw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754256720; x=1754861520;
+        h=content-transfer-encoding:mime-version:message-id:subject:to:from
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9P+RNyAbGWRp290LAF4vq0TCqvvldMoZBKGxLp8aZ8I=;
+        b=Jsqb13Syr1D0jfBd6BvhOX0m5fuYuQ42TY7bqoqdw6DeFQXDLapCn1+Rb7PWdtzrE+
+         dGMI8dSZtYkxK6kUJ227SGCi63WoD5RVRD2hnnYUm0eFWYYQOl0YGDI47d8GGAOsA0sX
+         3LzT4Z5/syGtgiKEBAwyH78MNvMhdCT4AFfUbw/EOrLZ67sQAz3TeOL4mgq6wVzHVcDd
+         /VJuqU6P7K0jv9l7x+JOITKdfdWG9wGHGzDSS08KdbImnQ/Cxjo3O2nCa4utCZeXquIY
+         OHpffOhZWRPWyvDmiaw5AQvYXaHfUYGP2uv2GqKQMQC4fthnosjCGcdg3xUap2s7BLN1
+         NvLQ==
+X-Gm-Message-State: AOJu0YwO00RqahtH59hnT99JlWxbiEYscfCmXp/vqY6vrAak29xSB7kt
+	/hIm7rtp1ZlEsD3GyrAhtDqEJxsLmjpjY1NBKWtK/QYkSh2NFeSfW8KAT73je3nsr1T5DyXws7T
+	VClAE
+X-Gm-Gg: ASbGncsvWgjMd442PL/sBvXFtkxAukQ4hbAQsGtBxPhHwo5owtM9g6Fw5b2ZKS+yYIe
+	0S7BOiGjpjkJb0izJeRAdt8VtPf6NbdTZ9mIlSwSggciKq49cwtwAbla508VF3VWSD2RI5mq3S+
+	vDyaC0J6fC0l2S22fAq5DGYkMYkH+bR0g+Ur8YmCYbyshqKh0BZRoXOPo8/33LR/AaWEoeWyv9C
+	qp/jsS4yPPPl5EtGnCNfNbK14+ZCZ66kFzx1dW/isb6R9eRgFzKwqeIFUnY5oYsfzz7ZvBZ7DpA
+	x7cNDlUT6zO8xiMhaM+lsLbsQZE4JvaovQztGEYxH4bs0qUUmOX8Z5LIq35tlLDs1rSJyHz1d9R
+	lFIy9hDPpDOlP7nFsVQIN4gdmeLQioVmCtZpzGSxKv1EJbO3C+YCNL6slgDKdoRV8n43sc4uyx/
+	0=
+X-Google-Smtp-Source: AGHT+IFaoxDij5he+EEMPpOcuPwZYBC5RQxpdLFgykxRkWq9PIhpvNXPJczi5y8U85jKNhAkbKRTig==
+X-Received: by 2002:a05:600c:1554:b0:456:1bca:7faf with SMTP id 5b1f17b1804b1-458b6b330b0mr59423925e9.16.1754256720406;
+        Sun, 03 Aug 2025 14:32:00 -0700 (PDT)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-458f713eb44sm43919645e9.14.2025.08.03.14.31.59
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 03 Aug 2025 14:32:00 -0700 (PDT)
+Date: Sun, 3 Aug 2025 14:31:54 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: netdev@vger.kernel.org
+Subject: [ANNOUNCE] iproute2 6.16
+Message-ID: <20250803143154.2d700ad4@hermes.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250803170206.GA525144-robh@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Sun, Aug 03, 2025 at 12:02:06PM -0500, Rob Herring wrote:
-> On Fri, Aug 01, 2025 at 09:12:39AM +0000, Yao Zi wrote:
-> > It's necessary to adjust the MAC TX clock when the linkspeed changes,
-> > but it's noted such adjustment always fails on TH1520 SoC, and reading
-> > back from APB glue registers that control clock generation results in
-> > garbage, causing broken link.
-> > 
-> > With some testing, it's found a clock must be ungated for access to APB
-> > glue registers. Without any consumer, the clock is automatically
-> > disabled during late kernel startup. Let's get and enable it if it's
-> > described in devicetree.
-> > 
-> > Fixes: 33a1a01e3afa ("net: stmmac: Add glue layer for T-HEAD TH1520 SoC")
-> > Signed-off-by: Yao Zi <ziyao@disroot.org>
-> > Reviewed-by: Drew Fustini <fustini@kernel.org>
-> > Tested-by: Drew Fustini <fustini@kernel.org>
-> > ---
-> >  drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c | 6 ++++++
-> >  1 file changed, 6 insertions(+)
-> > 
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c
-> > index c72ee759aae5..95096244a846 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c
-> > @@ -211,6 +211,7 @@ static int thead_dwmac_probe(struct platform_device *pdev)
-> >  	struct stmmac_resources stmmac_res;
-> >  	struct plat_stmmacenet_data *plat;
-> >  	struct thead_dwmac *dwmac;
-> > +	struct clk *apb_clk;
-> >  	void __iomem *apb;
-> >  	int ret;
-> >  
-> > @@ -224,6 +225,11 @@ static int thead_dwmac_probe(struct platform_device *pdev)
-> >  		return dev_err_probe(&pdev->dev, PTR_ERR(plat),
-> >  				     "dt configuration failed\n");
-> >  
-> > +	apb_clk = devm_clk_get_optional_enabled(&pdev->dev, "apb");
-> 
-> The description sounds like this should not be optional. The binding 
-> change also makes it not optional.
+This is a smaller than normal release of iproute2 corresponding to the 6.16 kernel.
+Some patches delayed until 6.17 because of summer vacations.
 
-Good point, it should be devm_clk_get_enabled() otherwise the link speed
-change bug will be possible. This series also changes the schema and dts
-so I don't think compatibility is a problem.
+Download:
+    https://www.kernel.org/pub/linux/utils/net/iproute2/iproute2-6.16.0.tar.gz
 
-Thanks,
-Drew
+Repository for current release
+    https://github.com/shemminger/iproute2.git
+    git://git.kernel.org/pub/scm/network/iproute2/iproute2.git
+
+And future release (net-next):
+    git://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git
+
+Contributions:
+
+Hemanth Malla (1):
+      Parse FQ band weights correctly
+
+Stephen Hemminger (5):
+      uapi: update headers
+      uapi: update headers to 6.16-rc1
+      bond: fix stack smash in xstats
+      uapi: update from 6.16-rc4
+      v6.16.0
+
 
