@@ -1,121 +1,271 @@
-Return-Path: <netdev+bounces-211619-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211620-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6248B1A829
-	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 18:51:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18171B1A831
+	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 18:52:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9CB973B28A5
-	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 16:49:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED349168F99
+	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 16:51:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAAE92192F4;
-	Mon,  4 Aug 2025 16:49:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="TQ5hNFWs"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9E15286890;
+	Mon,  4 Aug 2025 16:51:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f80.google.com (mail-io1-f80.google.com [209.85.166.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 020F017736;
-	Mon,  4 Aug 2025 16:49:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9F2B28643E
+	for <netdev@vger.kernel.org>; Mon,  4 Aug 2025 16:51:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754326151; cv=none; b=r2BjDLY3pIn5JKy3om4AJR9XbunmvBHtjWEpkq23HBIixSh9ggF9j2wfQk4MrWWRymtUiMkb92YH+Hw5pdWZEIoNPKb9FhRPYXxg0FA8bNYrx6yXWRy1T2nc4oSGdbu5bXchB5t7ZLtDHKmsiJ08zpOeSL92QmlsEtLQhCnZmyU=
+	t=1754326291; cv=none; b=nR1LkztSod1c9cZLqTbahi5hG4BM2iOxMLhvbwXsVg91ntfEW1/BYl28/8ExJLfpq4YTyxDm/yiybn/GuQvUZPkX5TJs5yEi1xkNskAtAUivNr0dWCeobWIBRf7tAzyKXBJQhD57JLQHAwahj7lhKSwCpP4cDcs8lsOgS61qxR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754326151; c=relaxed/simple;
-	bh=+mYVK5PD3Chpbfe99IJyA1KNNQYnDPyxM6vFQOsMCio=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K3pAqhhR/kMmCbmjk1s3EHI4rVeYt4w3XheWWS3QZ0DocX8X+tbnGOiHdVzq7H2m2tHx+LVjhzVMuYgC3XzIER92EHHT3pZuAdtByZYH1g1mXaxngpjIx/Zrv/PQLzmcRlnD1593W4TDIvID9Lb2b7EfrX1Q0HrvhaB4EsLAE58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=TQ5hNFWs; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=y5jNatzr9iPOY+macrl5h9nkF1ONt/HKYGdcJTwX8Mw=; b=TQ5hNFWsQAIW1i2Bm5bN3/y9nF
-	uPhfKJ8TLeiAZ+FGWplQvWoCRvjDfWuq3dH96ECeYolilN0VDNIzEaaPRxSgFXbafytvwTyY7JXp0
-	J5qpapKFZ9R0zv8TkWZDUYUXv5Ch85Xye9a8xoiZ4+zvhRSZXOGW4oxmW1sDZDy0oKUg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uiyMw-003jFL-QO; Mon, 04 Aug 2025 18:49:02 +0200
-Date: Mon, 4 Aug 2025 18:49:02 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: MD Danish Anwar <danishanwar@ti.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Meghana Malladi <m-malladi@ti.com>,
-	Himanshu Mittal <h-mittal1@ti.com>,
-	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, srk@ti.com,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Roger Quadros <rogerq@kernel.org>
-Subject: Re: [PATCH net v2] net: ti: icssg-prueth: Fix emac link speed
- handling
-Message-ID: <be848373-4b7f-4205-b1e4-b08fe161d689@lunn.ch>
-References: <20250801121948.1492261-1-danishanwar@ti.com>
+	s=arc-20240116; t=1754326291; c=relaxed/simple;
+	bh=4Q6rNDSLjXsVdRKjz0bnh9E6M2ebUd9jaHbJxdOUJ1Y=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Km7oihc0h9F0P7T4TEhGgGZv3LtEF5uAt8IeRatv1mwfBgMtJWa9SwWA3pzk3Unhbeboq0mEukCG+7yScDYjbtVzpq+4skU8Cej83Y51zGGgPH6DYoBDsSLNNpdlkyX/MCBOtuthbF6xT34Bvr5msSkTZEoagFfcoBDm4t5R9go=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f80.google.com with SMTP id ca18e2360f4ac-88177d82b26so345612239f.1
+        for <netdev@vger.kernel.org>; Mon, 04 Aug 2025 09:51:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754326289; x=1754931089;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xcI583nK2DqKOjhpdhbr53khX7zj4Q+wiA9oiHxoGdQ=;
+        b=LPJCzEkBruIzAiAlPw/7zlnENJNHcuZh5KpOJTOKHXZ3/8AVdoTP/oN93DHN/grvyK
+         4N4noyciKQmN+NnLeUXdWVy1Q+rcfjjGdnxpezwru+q0Bn4p6LGDxFCGRT21+Qsnpt29
+         mfoxezWVWxo2fNB88KQUD8B0TU0d0FbWtIriqVXvGx1iEDXGrRn2YcaIUwwDQshadvJd
+         H28iQyEf6ksl8KYeE7RlZbUR5Lra/aMl9CY3HU3FyeP2Fady9Ui0pn+ftjLoOdBzBtlV
+         jbm0RouzVjF/H9MkycYFRBSNiyQPLDX8rQcOxiXzxtpklCdC9nx/DcdQMIFqPOmsYBtD
+         dyAw==
+X-Forwarded-Encrypted: i=1; AJvYcCVdcPergNoaNAX6/p5OaQ8TRn0XG1Uv6fhhNPXggyOHNiflxCmNGsczwdmcO0trusI6tCUqllw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxBrIzKEB56j2Kceoigyi1qPq7hsCHMQUfCrRXZ1gtgrsWlITI5
+	au8nj/8otvS+x/38cnuvu6W49/5FLnhyK4bzM9LfN9UadonahdpXzV1ZRJgCypFtAowU++UFClb
+	uPCde8YaMx7pvhLFL2fv3rSBVDcwLT1Ou/oMvU5j8do9NPHBvGbXIZ9aCoq4=
+X-Google-Smtp-Source: AGHT+IHX9T+983Zl/0FTZoPBQ+FoGmYK19ihHhcOe0c+BorbTw+AVtXoy/JWLMXh3MYCmVtjiUcD39m0CGghz+Iq1lXJQuQU6RSL
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250801121948.1492261-1-danishanwar@ti.com>
+X-Received: by 2002:a05:6602:6d14:b0:87c:31ad:abe2 with SMTP id
+ ca18e2360f4ac-88168327832mr1660603939f.5.1754326288983; Mon, 04 Aug 2025
+ 09:51:28 -0700 (PDT)
+Date: Mon, 04 Aug 2025 09:51:28 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6890e510.050a0220.1fc43d.000f.GAE@google.com>
+Subject: [syzbot] [bpf?] [net?] possible deadlock in xsk_diag_dump (2)
+From: syzbot <syzbot+e6300f66a999a6612477@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bjorn@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, davem@davemloft.net, edumazet@google.com, 
+	horms@kernel.org, jonathan.lemon@gmail.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, maciej.fijalkowski@intel.com, 
+	magnus.karlsson@intel.com, netdev@vger.kernel.org, pabeni@redhat.com, 
+	sdf@fomichev.me, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Aug 01, 2025 at 05:49:48PM +0530, MD Danish Anwar wrote:
-> When link settings are changed emac->speed is populated by
-> emac_adjust_link(). The link speed and other settings are then written into
-> the DRAM. However if both ports are brought down after this and brought up
-> again or if the operating mode is changed and a firmware reload is needed,
-> the DRAM is cleared by icssg_config(). As a result the link settings are
-> lost.
-> 
-> Fix this by calling emac_adjust_link() after icssg_config(). This re
-> populates the settings in the DRAM after a new firmware load.
-> 
-> Fixes: 9facce84f406 ("net: ti: icssg-prueth: Fix firmware load sequence.")
-> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
-> ---
-> v1 - v2: Added phydev lock before calling emac_adjust_link() as suggested
-> by Andrew Lunn <andrew@lunn.ch>
-> v1 https://lore.kernel.org/all/20250731120812.1606839-1-danishanwar@ti.com/
-> 
->  drivers/net/ethernet/ti/icssg/icssg_prueth.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-> index 2b973d6e2341..58aec94b7771 100644
-> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-> @@ -50,6 +50,8 @@
->  /* CTRLMMR_ICSSG_RGMII_CTRL register bits */
->  #define ICSSG_CTRL_RGMII_ID_MODE                BIT(24)
->  
-> +static void emac_adjust_link(struct net_device *ndev);
-> +
->  static int emac_get_tx_ts(struct prueth_emac *emac,
->  			  struct emac_tx_ts_response *rsp)
->  {
-> @@ -229,6 +231,12 @@ static int prueth_emac_common_start(struct prueth *prueth)
->  		ret = icssg_config(prueth, emac, slice);
->  		if (ret)
->  			goto disable_class;
-> +
-> +		if (emac->ndev->phydev) {
-> +			mutex_lock(&emac->ndev->phydev->lock);
-> +			emac_adjust_link(emac->ndev);
-> +			mutex_unlock(&emac->ndev->phydev->lock);
-> +		}
+Hello,
 
-What about the else case? The link settings are lost, and the MAC does
-not work?
+syzbot found the following issue on:
 
-	Andrew
+HEAD commit:    d2eedaa3909b Merge tag 'rtc-6.17' of git://git.kernel.org/..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=159482f0580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=75e522434dc68cb9
+dashboard link: https://syzkaller.appspot.com/bug?extid=e6300f66a999a6612477
+compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/3435b26b899d/disk-d2eedaa3.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/531223373575/vmlinux-d2eedaa3.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/e82f9030b8d5/bzImage-d2eedaa3.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+e6300f66a999a6612477@syzkaller.appspotmail.com
+
+======================================================
+WARNING: possible circular locking dependency detected
+6.16.0-syzkaller-11489-gd2eedaa3909b #0 Not tainted
+------------------------------------------------------
+syz.8.4735/22857 is trying to acquire lock:
+ffff8880223e06b8 (&xs->mutex){+.+.}-{4:4}, at: xsk_diag_fill net/xdp/xsk_diag.c:113 [inline]
+ffff8880223e06b8 (&xs->mutex){+.+.}-{4:4}, at: xsk_diag_dump+0x550/0x14d0 net/xdp/xsk_diag.c:166
+
+but task is already holding lock:
+ffff888031291c98 (&net->xdp.lock){+.+.}-{4:4}, at: xsk_diag_dump+0x178/0x14d0 net/xdp/xsk_diag.c:158
+
+which lock already depends on the new lock.
+
+
+the existing dependency chain (in reverse order) is:
+
+-> #2 (&net->xdp.lock){+.+.}-{4:4}:
+       lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5868
+       __mutex_lock_common kernel/locking/mutex.c:598 [inline]
+       __mutex_lock+0x187/0x1360 kernel/locking/mutex.c:760
+       xsk_notifier+0x89/0x230 net/xdp/xsk.c:1664
+       notifier_call_chain+0x1b6/0x3e0 kernel/notifier.c:85
+       call_netdevice_notifiers_extack net/core/dev.c:2267 [inline]
+       call_netdevice_notifiers net/core/dev.c:2281 [inline]
+       unregister_netdevice_many_notify+0x14d7/0x1ff0 net/core/dev.c:12156
+       unregister_netdevice_many net/core/dev.c:12219 [inline]
+       unregister_netdevice_queue+0x33c/0x380 net/core/dev.c:12063
+       register_netdevice+0x1689/0x1ae0 net/core/dev.c:11241
+       bpq_new_device drivers/net/hamradio/bpqether.c:481 [inline]
+       bpq_device_event+0x491/0x600 drivers/net/hamradio/bpqether.c:523
+       notifier_call_chain+0x1b6/0x3e0 kernel/notifier.c:85
+       call_netdevice_notifiers_extack net/core/dev.c:2267 [inline]
+       call_netdevice_notifiers net/core/dev.c:2281 [inline]
+       __dev_notify_flags+0x18d/0x2e0 net/core/dev.c:-1
+       netif_change_flags+0xe8/0x1a0 net/core/dev.c:9608
+       dev_change_flags+0x130/0x260 net/core/dev_api.c:68
+       devinet_ioctl+0xbb4/0x1b50 net/ipv4/devinet.c:1200
+       inet_ioctl+0x3c0/0x4c0 net/ipv4/af_inet.c:1001
+       sock_do_ioctl+0xdc/0x300 net/socket.c:1238
+       sock_ioctl+0x576/0x790 net/socket.c:1359
+       vfs_ioctl fs/ioctl.c:51 [inline]
+       __do_sys_ioctl fs/ioctl.c:598 [inline]
+       __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:584
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+-> #1 (&dev_instance_lock_key#20){+.+.}-{4:4}:
+       lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5868
+       __mutex_lock_common kernel/locking/mutex.c:598 [inline]
+       __mutex_lock+0x187/0x1360 kernel/locking/mutex.c:760
+       netdev_lock include/linux/netdevice.h:2758 [inline]
+       netdev_lock_ops include/net/netdev_lock.h:42 [inline]
+       xsk_bind+0x2f7/0xf90 net/xdp/xsk.c:1193
+       __sys_bind_socket net/socket.c:1858 [inline]
+       __sys_bind+0x2c6/0x3e0 net/socket.c:1889
+       __do_sys_bind net/socket.c:1894 [inline]
+       __se_sys_bind net/socket.c:1892 [inline]
+       __x64_sys_bind+0x7a/0x90 net/socket.c:1892
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+-> #0 (&xs->mutex){+.+.}-{4:4}:
+       check_prev_add kernel/locking/lockdep.c:3165 [inline]
+       check_prevs_add kernel/locking/lockdep.c:3284 [inline]
+       validate_chain+0xb9b/0x2140 kernel/locking/lockdep.c:3908
+       __lock_acquire+0xab9/0xd20 kernel/locking/lockdep.c:5237
+       lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5868
+       __mutex_lock_common kernel/locking/mutex.c:598 [inline]
+       __mutex_lock+0x187/0x1360 kernel/locking/mutex.c:760
+       xsk_diag_fill net/xdp/xsk_diag.c:113 [inline]
+       xsk_diag_dump+0x550/0x14d0 net/xdp/xsk_diag.c:166
+       netlink_dump+0x6e4/0xe90 net/netlink/af_netlink.c:2327
+       __netlink_dump_start+0x5cb/0x7e0 net/netlink/af_netlink.c:2442
+       netlink_dump_start include/linux/netlink.h:341 [inline]
+       xsk_diag_handler_dump+0x183/0x220 net/xdp/xsk_diag.c:193
+       sock_diag_rcv_msg+0x4cc/0x600 net/core/sock_diag.c:-1
+       netlink_rcv_skb+0x208/0x470 net/netlink/af_netlink.c:2552
+       netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
+       netlink_unicast+0x82f/0x9e0 net/netlink/af_netlink.c:1346
+       netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1896
+       sock_sendmsg_nosec net/socket.c:714 [inline]
+       __sock_sendmsg+0x21c/0x270 net/socket.c:729
+       sock_write_iter+0x258/0x330 net/socket.c:1179
+       do_iter_readv_writev+0x56e/0x7f0 fs/read_write.c:-1
+       vfs_writev+0x31a/0x960 fs/read_write.c:1057
+       do_writev+0x14d/0x2d0 fs/read_write.c:1103
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+other info that might help us debug this:
+
+Chain exists of:
+  &xs->mutex --> &dev_instance_lock_key#20 --> &net->xdp.lock
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(&net->xdp.lock);
+                               lock(&dev_instance_lock_key#20);
+                               lock(&net->xdp.lock);
+  lock(&xs->mutex);
+
+ *** DEADLOCK ***
+
+2 locks held by syz.8.4735/22857:
+ #0: ffff8880223e16d0 (nlk_cb_mutex-SOCK_DIAG){+.+.}-{4:4}, at: __netlink_dump_start+0xfe/0x7e0 net/netlink/af_netlink.c:2406
+ #1: ffff888031291c98 (&net->xdp.lock){+.+.}-{4:4}, at: xsk_diag_dump+0x178/0x14d0 net/xdp/xsk_diag.c:158
+
+stack backtrace:
+CPU: 0 UID: 0 PID: 22857 Comm: syz.8.4735 Not tainted 6.16.0-syzkaller-11489-gd2eedaa3909b #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
+ print_circular_bug+0x2ee/0x310 kernel/locking/lockdep.c:2043
+ check_noncircular+0x134/0x160 kernel/locking/lockdep.c:2175
+ check_prev_add kernel/locking/lockdep.c:3165 [inline]
+ check_prevs_add kernel/locking/lockdep.c:3284 [inline]
+ validate_chain+0xb9b/0x2140 kernel/locking/lockdep.c:3908
+ __lock_acquire+0xab9/0xd20 kernel/locking/lockdep.c:5237
+ lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5868
+ __mutex_lock_common kernel/locking/mutex.c:598 [inline]
+ __mutex_lock+0x187/0x1360 kernel/locking/mutex.c:760
+ xsk_diag_fill net/xdp/xsk_diag.c:113 [inline]
+ xsk_diag_dump+0x550/0x14d0 net/xdp/xsk_diag.c:166
+ netlink_dump+0x6e4/0xe90 net/netlink/af_netlink.c:2327
+ __netlink_dump_start+0x5cb/0x7e0 net/netlink/af_netlink.c:2442
+ netlink_dump_start include/linux/netlink.h:341 [inline]
+ xsk_diag_handler_dump+0x183/0x220 net/xdp/xsk_diag.c:193
+ sock_diag_rcv_msg+0x4cc/0x600 net/core/sock_diag.c:-1
+ netlink_rcv_skb+0x208/0x470 net/netlink/af_netlink.c:2552
+ netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
+ netlink_unicast+0x82f/0x9e0 net/netlink/af_netlink.c:1346
+ netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1896
+ sock_sendmsg_nosec net/socket.c:714 [inline]
+ __sock_sendmsg+0x21c/0x270 net/socket.c:729
+ sock_write_iter+0x258/0x330 net/socket.c:1179
+ do_iter_readv_writev+0x56e/0x7f0 fs/read_write.c:-1
+ vfs_writev+0x31a/0x960 fs/read_write.c:1057
+ do_writev+0x14d/0x2d0 fs/read_write.c:1103
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f6e7b38eb69
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f6e791d5038 EFLAGS: 00000246 ORIG_RAX: 0000000000000014
+RAX: ffffffffffffffda RBX: 00007f6e7b5b6160 RCX: 00007f6e7b38eb69
+RDX: 0000000000000001 RSI: 0000200000000140 RDI: 0000000000000007
+RBP: 00007f6e7b411df1 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 00007f6e7b5b6160 R15: 00007ffdbe0ab9a8
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
