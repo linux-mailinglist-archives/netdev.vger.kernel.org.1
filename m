@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-211590-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211591-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64DB0B1A473
-	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 16:19:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B38DB1A47A
+	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 16:21:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AD5CB7A1457
-	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 14:17:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E661A3AB1BF
+	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 14:21:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BEE527145D;
-	Mon,  4 Aug 2025 14:19:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10C0627145E;
+	Mon,  4 Aug 2025 14:21:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="deNP3Dnv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h3vhkvxa"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AE6926E703;
-	Mon,  4 Aug 2025 14:19:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D62E526FA70;
+	Mon,  4 Aug 2025 14:21:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754317159; cv=none; b=RmmKO/JRFu2dsdb7mzaro81EJPLf5ugqJzfwdrXAjuxWAV40yQQqvkKJAB48RodronxA/NPjbqF3Horp+qLbW0wrVp7ebF1C4MXMj1jxoSiOL6zaK2jhYMCnAOMywSVPCecl838mQClyyoGqK8xzZjwRcmdUCZOxRPrMt9VaA/U=
+	t=1754317300; cv=none; b=V1xCO64pu2zE9uRl8adrXTG3x6z+CiTsgBHyflKGFUxjUgKRPTANm+jyf7NJAIkQ7/9qpi0XxCPRmSSfls0+4A1ArhTMOtq2WIe5eUhCuavou7zBdy61Uq4+a8iF3oucAtONY0s3u49vtx97wbEKhKzUPwBl34OvQyy4Aaqiv1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754317159; c=relaxed/simple;
-	bh=SjJSeEYpC8XNqF4m5DqAU8lWdtGSO9pN6bQ0yYPAzdk=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=m0ZxkO5NfBZTjnAJIMjbNcaAYjfYr52cm3CdsVIrB5GQ9o+92Jbshqu+8Vgw9nTIBEwiUWYm7RwJGA9HVn9CZkqNR7pncMX0LjZ9lSjOQJpSnYc4SOSETAt9ACdzHlycYRqNvUK0Q8Q3pl0fdaDSjBNX6hnW/HGvt8/WRi5pp8c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=deNP3Dnv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DA74C4CEE7;
-	Mon,  4 Aug 2025 14:19:12 +0000 (UTC)
+	s=arc-20240116; t=1754317300; c=relaxed/simple;
+	bh=THg8fAXPOZpcU1UGe5NLfNZG1W+ChsloJhTKXS2XCtU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=t9vsr0psCFbzZcZhGfrOLW30/8uMz3Jj3i7shnkqOU7kmoY2XocEJGvC/zbmnc/J2VxFx54yRRdz11cOnf8XUbMRAWl4cFzDepuIuQXha9Vp980auXojyVT4vy/Nlbi1YqGlLDtAixpeaBrg9wOZ6/BeNInkCuLROqZ2BqUmj9k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h3vhkvxa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C83E2C4CEE7;
+	Mon,  4 Aug 2025 14:21:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754317156;
-	bh=SjJSeEYpC8XNqF4m5DqAU8lWdtGSO9pN6bQ0yYPAzdk=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=deNP3DnvHkJ2HSq68I0MNQfdiri4MkDm0lE+b0b8Haf2PfDnyij9j9+1u7N/dfglh
-	 W9yspUm5bXEPmtZn4P5v7oZfotQYBFZJEOTWN7LmaxUFiYiVlmjPvlGrBtGbR7i3WZ
-	 h5l/D4BSA5CkbXtc9WCfSk65924x71zlAxEmZFwp+EefKY0LctMis4XlgU3mOHVQ/9
-	 rvFzE3en6MYB9P1VytSn6hdgnyeVKcvjfoHHKTd55Dz9uCtpJtREqRpAvS0JKErgUm
-	 s/ODUfZdbeIeoPmq5LcB7DN25ZWTm4RphbTrZBeBGzTrIgkQ3gkz8VpdzqfpKyhWt4
-	 jXaTfTuM8ogPg==
-Message-ID: <ed0884fc-e43a-4f5b-8701-3645c406b37d@kernel.org>
-Date: Mon, 4 Aug 2025 16:19:10 +0200
+	s=k20201202; t=1754317296;
+	bh=THg8fAXPOZpcU1UGe5NLfNZG1W+ChsloJhTKXS2XCtU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=h3vhkvxabpJMXDlINEWLQk8ydeeUQRoRcThhCsg5uAbdxXPQbvYpZg5nRyu1GhkbH
+	 xsuhqcazwRf8jzExikPL24G7pd8R3A+M16x7zSGSccfClPUb5CdUSFZACV99cW4OwM
+	 Pg0lkkh+6B8JaE9n6NILQrWXifQkMzoENHQHlejpSMrXhbz90yDtmOEEXyBY6q4aqU
+	 3HkTXAxdODW73D2tUacw6/rNrYztKUSgXZ+pHPX3YG9QB14JFGOW3uDH8je1sOt8ra
+	 n+fuUtxXnIPUB4ArQkE5EloA0CL5QMZcPpzH8JZsUgIscFGshDWRWy79GeWTiCss0m
+	 3/nUg3sie37xA==
+Message-ID: <c16070db-c086-45b8-bc0d-9e3bc02924b6@kernel.org>
+Date: Mon, 4 Aug 2025 16:21:30 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,7 +52,6 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v3 09/27] dt-bindings: clock: mediatek: Describe MT8196
  clock controllers
-From: Krzysztof Kozlowski <krzk@kernel.org>
 To: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
  Laura Nao <laura.nao@collabora.com>, wenst@chromium.org
 Cc: conor+dt@kernel.org, devicetree@vger.kernel.org,
@@ -69,6 +68,8 @@ References: <fbe7b083-bc3f-4156-8056-e45c9adcb607@kernel.org>
  <e9ee33b0-d6b0-4641-aeeb-9803b4d1658a@kernel.org>
  <00a12553-b248-4193-8017-22fea07ee196@collabora.com>
  <2555e9fe-3bc0-4f89-9d0b-2f7f946632e7@kernel.org>
+ <62edb8e3-aff6-4225-b520-f4b73aef145d@collabora.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
@@ -113,49 +114,53 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
  zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
  XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <2555e9fe-3bc0-4f89-9d0b-2f7f946632e7@kernel.org>
+In-Reply-To: <62edb8e3-aff6-4225-b520-f4b73aef145d@collabora.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 04/08/2025 15:58, Krzysztof Kozlowski wrote:
+On 04/08/2025 16:15, AngeloGioacchino Del Regno wrote:
+> Il 04/08/25 15:58, Krzysztof Kozlowski ha scritto:
+>> On 04/08/2025 15:27, AngeloGioacchino Del Regno wrote:
+>>>
+>>> We discussed about aggregating votes, yes, in software - this instead is a
+>>> *broken* hardware that does the aggregation internally and does not require
+>>> nor want external drivers to do the aggregation.
+>>>
+>>>> Maybe it is just the name, so avoid all the confusing "votes" if this is
+>>>> not voting system. If this is a voting system, then don't use custom
+>>>> phandles.
+>>>
+>>> Being it fundamentally *broken*, this being a voting system is what the hardware
+>>> initially wanted to be - but effectively, since it requires YOU to:
+>>>    - Make sure that power supplies are turned on, if not, turn them on by "touching"
+>>>      HW registers (so, without any assistance from the voter MCU), if any;
+>>>    - Turn on parent clocks manually, if any, before using the "voter mcu" to try
+>>>      to ungate that clock; and
+>>>      - Enable the "FENC" manually, after the mcu says that the clock was ungated.
 >>
->> So, what should we do then?
 >>
->> Change it to "mediatek,clock-hw-refcounter", and adding a comment to the binding
->> saying that this is called "Hardware Voter (HWV)" in the datasheets?
->>
->> Or is using the "interconnect" property without any driver in the interconnect API
->> actually legit? - Because to me it doesn't look like being legit (and if it is, it
->> shouldn't be, as I'm sure that everyone would expect an interconnect API driver
->> when encountering an "interconnect" property in DT), and if so, we should just add
+>> I understand that "YOU" as Linux driver, when you want to do something
+>> (e.g. toggle) a clock?
 > 
-> Why you would not add any interconnect driver for interconnect API?
-> Look, the current phandle allows you to poke in some other MMIO space
-> for the purpose of enabling the clock FOO? So interconnect or power
-> domains or whatever allows you to have existing or new driver to receive
-> xlate() and, when requested resources associated with clock FOO.
+> "you" == Linux driver, yes.
+> 
+>> If so this looks a lot like power domain, although with some differences.
+>>
+> 
+> A power domain ungates power to something.
 
-Something got here cut. Last sentence is supposed to be:
-
-"So interconnect or power
-domains or whatever allows you to have existing or new driver to receive
-xlate() and, when requested, toggle the resources associated with clock
-FOO."
+Does more, it is not a simple supply.
 
 > 
-> Instead of the FOO clock driver poking resources, you do
-> clk_prepare_enable() or pm_domain or icc_enable().
+> These are clocks, giving a (x) (M)Hz signal to something.
 
-I looked now at the driver and see your clock drivers poking via regmap
-to other MMIO. That's exactly usecase of syscon and exactly the pattern
-*we are usually discouraging*. It's limited, non-scalable and vendor-driven.
+Your earlier message about "YOU" said:
 
-If this was a power domain provider then:
-1. Your clock drivers would only do runtime PM.
-2. Your MCU would be the power domain controller doing whatever is
-necessary - toggling these set/clr bits - when given clock is enabled.
-And it really looks like what you described...
+"   - Make sure that power supplies are turned on, if not, turn them on
+by "touching"
+     HW registers (so, without any assistance from the voter MCU), if any;"
 
+so not a simple clocks stuff.
 
 Best regards,
 Krzysztof
