@@ -1,118 +1,215 @@
-Return-Path: <netdev+bounces-211514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211515-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66491B19E4E
-	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 11:08:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B46E0B19E5A
+	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 11:08:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EBC64189AC30
-	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 09:08:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B273189B13A
+	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 09:08:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A9FF246768;
-	Mon,  4 Aug 2025 09:06:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA44E242D9E;
+	Mon,  4 Aug 2025 09:08:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LN0P8mM0"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="raTaQQHG"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE6C62472AA
-	for <netdev@vger.kernel.org>; Mon,  4 Aug 2025 09:06:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF980243387
+	for <netdev@vger.kernel.org>; Mon,  4 Aug 2025 09:07:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754298374; cv=none; b=kbTo4qU6YRWJlFk3RkQYTVx7hXkQq2Oddc+CrAu7j9r8Do+ICNoBoJAXJMYthm3/oyvjiGU5NFH+5zfXAezAIbZ0iLvVKvFPK2hftllDnIx+DdDci8OLELHTRp5AXM14lzPXrbNHRqTSoXN/6Cal0YSuCHAJJUb1rKGLayR9DPo=
+	t=1754298481; cv=none; b=HBqgc+iEnQ4Sz5sM7uQWiQI+VUDypQljr3b6pQBK27QifxrtAjta+MZbpUu+ySOWFJccrGYao9QpbDy1aWcBLdMVu+lMBMoX3AyH2ddQWerYnGfd/oOog879SzccbP3on4F5EW7YRfkfPdyOdVaebF44GkzgNTDwDsCq7R8aqOY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754298374; c=relaxed/simple;
-	bh=FC2gKnlK0tlH4AVIjMhG/aH0ST923yLbY61/gTdaWtU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nTwIGtJbEVYDeDpFYiYXP3G8/QCbQrol4nxHgFgeWq18B7YXVYYreiP2pK3uth9tbmg/urgRq9eF+93AIE2BWTnWsVxjoUkWdYKFcxeIkDN8bc7BJq5qk15H8PGwgNYl53NeyCRQRSFmbIQ/bJlqIulN8eP5/JJ5/OT3h5DJFPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LN0P8mM0; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1754298371;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FC2gKnlK0tlH4AVIjMhG/aH0ST923yLbY61/gTdaWtU=;
-	b=LN0P8mM05fuXxVG3KM7mnua5lUZVv3dAPqEojOA+pleWq6Ec7Hr0RCspmUMKJ1NvW4ZNLS
-	7/LnuqrwNV+Ws2s9TDhtGMsMVz1my3B2taDjw8+z4HpiTkcA1LpVsX2SfoF/XQMR+ioEXI
-	g0VUT+y0fwiZ6JzPcvSy2PtfwrLcHto=
-Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
- [209.85.214.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-29-2aJlVT95PWCrI98e4_lRJg-1; Mon, 04 Aug 2025 05:06:10 -0400
-X-MC-Unique: 2aJlVT95PWCrI98e4_lRJg-1
-X-Mimecast-MFC-AGG-ID: 2aJlVT95PWCrI98e4_lRJg_1754298369
-Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-2420cfdafcaso32221515ad.0
-        for <netdev@vger.kernel.org>; Mon, 04 Aug 2025 02:06:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754298369; x=1754903169;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FC2gKnlK0tlH4AVIjMhG/aH0ST923yLbY61/gTdaWtU=;
-        b=cRnXezbOiyRgfZtyavcIJoP6HBQtLzds4b9aczPV9YoujSoiwFnKcjXkwXsxmSpq4P
-         /mEUOSHbwP8HE3az/wJ8SLFtElQlwmoy5yoxzTrrEWjNWHCnEp/VeE0zFGT7CYmTNmib
-         nLNFqZVQ2X5tSD0tFoICTmkFwYNgzo904+bRxG7uW+/RJMpGM2CjcuRnAb1Jw3P0Ms2e
-         h9/rsM16CSzR7lXBWpryF5YhxdoyrT6SDwtNsm4t5GkzkxsGprAmquUE/1UPI0EDBKTk
-         8u7tGjahgOgwpPDEzZ594E1BxKx4IRVaRT35F3mXmJO18BragP8efjB/39+y9eXtGnT4
-         w28Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVUuMRVAG2/xRRw2MJBQIpbYKa3J+swFO7Lz4ZdQU2GmTSczQZjSHdw3ct1OwcleSAO+mIoLLc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwYbsGQaTUZcOZoT6en7HgdRjbnhqw9eyguB3Dnfpn0R75//7qZ
-	SNFdGQlg/13wpz/ji618AWpb/3ULupGXk1oVrEeq/E08T99FJPBwZujKi1ZT55ACTbSJpl9REJi
-	2PanvsW1LkJceZb5qYmzzHXyq/AeGrJNdqdKAXKiHM4Hp/hD+cDOPjGH5NiJsO58yMhwX6KI5PD
-	Nb5tDJ5H9uo/DllWzRW95T6d8+EmaEToQR
-X-Gm-Gg: ASbGncsFc42LWjMhy3z12pGt5tLVNRHq1YxbWSk6HOF37+th4rcnJG4x+SG/qEoZsHT
-	9f5zMBupygbrAfdNDSl8RfRWRiHaiV87U4UQro3a9EQmvofdPRVRlXE7j+PvP2YZL2YZpzQXxZb
-	PaJm6KhRmDJtc8lCCEgupgXw==
-X-Received: by 2002:a17:902:f552:b0:23f:f983:5ca1 with SMTP id d9443c01a7336-24246f5dfb2mr132550085ad.12.1754298369506;
-        Mon, 04 Aug 2025 02:06:09 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFEcYXd+G3MrEs13nVvxY8yeK+0iPt6uzM6BT+j7IwyIkqouuxJCmX+aT/C268Bf+EzVOioFJTajAeAVP8Oj2U=
-X-Received: by 2002:a17:902:f552:b0:23f:f983:5ca1 with SMTP id
- d9443c01a7336-24246f5dfb2mr132549655ad.12.1754298369069; Mon, 04 Aug 2025
- 02:06:09 -0700 (PDT)
+	s=arc-20240116; t=1754298481; c=relaxed/simple;
+	bh=cl/NxNnFX0+amow2/BlxvTWfRiEca6TibWdiIVHZNN8=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=hqq0RcQxCzmqX23jsJpOyhDjqruMiv0YQhdoSm5G9BKqSiono+uz6bYsg1iKYmVQSM7WHMj6up6QoPmId6EmrUSxchx+PHQ0Oz1faVHQfl50ww5CYFs12dJ1NjBsMys3SiySgnZX6qI3WDA61B2Q+b7bW2u4U9d/F3I+Ls4TpYE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=raTaQQHG; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=cl/NxNnFX0+amow2/BlxvTWfRiEca6TibWdiIVHZNN8=; b=raTaQQHG7JiXzoQ+iaSqaHwz5z
+	8sHivqd23IXb+udhezpUsXppH/8qfCEUHWjiAqimI61LPWlYtUt72RxjyegRS+m+UPkj222TTiD27
+	yUK2fOyAHCr1qV5kPp2vURHmE+VUVF3m67E0ctaNTVmKcoIfJTglgvUHaNGHvZSIRnqDJ0moMRJah
+	mNGCkNahFrq9f+UsS5qTQO4vLrqj/o2f4bK/zmUmelRbJoZKWRSez7MQe728jJss/VvNz5U+MfUSk
+	46iGJnZKzko7N0A49DVDJ2LFI13g0gZKDIXjqnEMJn6HANXlEN/mUXwIi/+beG9WiMgAXhnyBS79d
+	vYFL34LA==;
+Received: from 54-240-197-234.amazon.com ([54.240.197.234] helo=u09cd745991455d.ant.amazon.com)
+	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uirAb-0000000Db7B-0v3i;
+	Mon, 04 Aug 2025 09:07:50 +0000
+Message-ID: <f4eae75af72331ea298beb5d91d18055ecd97a33.camel@infradead.org>
+Subject: Re:  [RFC PATCH net-next] ptp: Introduce
+ PTP_SYS_OFFSET_EXTENDED_TRUSTED ioctl
+From: David Woodhouse <dwmw2@infradead.org>
+To: Julien Ridoux <julien@synclab.org>, mlichvar@redhat.com
+Cc: akiyano@amazon.com, aliguori@amazon.com, alisaidi@amazon.com, 
+ amitbern@amazon.com, andrew@lunn.ch, benh@amazon.com, darinzon@amazon.com, 
+ davem@davemloft.net, dwmw@amazon.com, edumazet@google.com,
+ evgenys@amazon.com,  evostrov@amazon.com, joshlev@amazon.com,
+ kuba@kernel.org, matua@amazon.com,  msw@amazon.com, nafea@amazon.com,
+ ndagan@amazon.com, netanel@amazon.com,  netdev@vger.kernel.org,
+ ofirt@amazon.com, pabeni@redhat.com,  richardcochran@gmail.com,
+ ridouxj@amazon.com, saeedb@amazon.com,  tglx@linutronix.de, zorik@amazon.com
+Date: Mon, 04 Aug 2025 10:07:48 +0100
+In-Reply-To: <20250803235142.57900-1-julien@synclab.org>
+References: <aIeInmXyglMdIuxE@localhost>
+	 <20250803235142.57900-1-julien@synclab.org>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+	boundary="=-Iph05W811DZgyBjyIvGb"
+User-Agent: Evolution 3.52.3-0ubuntu1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250729073916.80647-1-jasowang@redhat.com>
-In-Reply-To: <20250729073916.80647-1-jasowang@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 4 Aug 2025 17:05:57 +0800
-X-Gm-Features: Ac12FXy2PpNcxx7Wuo6WWD9onNx5D2Zc4zo6EJWLkWuf_3KiHYfBpugk7fN5otM
-Message-ID: <CACGkMEuNx_7Q_Jq+xcE83fwbFa2uVZkrqr0Nx=1pxcZuFkO91w@mail.gmail.com>
-Subject: Re: [PATCH] vhost: initialize vq->nheads properly
-To: mst@redhat.com, jasowang@redhat.com, eperezma@redhat.com
-Cc: kvm@vger.kernel.org, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, sgarzare@redhat.com, 
-	will@kernel.org, JAEHOON KIM <jhkim@linux.ibm.com>, Breno Leitao <leitao@debian.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+
+
+--=-Iph05W811DZgyBjyIvGb
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Michael:
+On Sun, 2025-08-03 at 16:51 -0700, Julien Ridoux wrote:
+> > On 7/28/25, 7:28 AM, "Miroslav Lichvar"
+> > <mlichvar@redhat.com=C2=A0<mailto:mlichvar@redhat.com>> wrote:
+> >=20
+> > On Thu, Jul 24, 2025 at 02:56:56PM +0300, David Arinzon wrote:
+> > > The proposed PTP_SYS_OFFSET_EXTENDED_TRUSTED ioctl offers the
+> > > same timestamps as the PTP_SYS_OFFSET_EXTENDED ioctl, but extends
+> > > it with a measurement of the PHC device clock accuracy and the
+> > > synchronization status. This supports two objectives.
+> >=20
+> >=20
+> > I have a slight issue with the naming of this new ioctl. TRUSTED
+> > implies to me the other supported ioctls are not to be trusted
+> > for some reason, but that's not the case, right? It's just more
+> > information provided, i.e. it's extended once again. Would
+> > PTP_SYS_OFFSET_EXTENDED3 or PTP_SYS_OFFSET_EXTENDED_ATTRS not work
+> > better?
+>=20
+> That's a fair call. The ioctl can be renamed to
+> PTP_SYS_OFFSET_EXTENDED_ATTRS
 
-On Tue, Jul 29, 2025 at 3:39=E2=80=AFPM Jason Wang <jasowang@redhat.com> wr=
-ote:
->
-> Commit 7918bb2d19c9 ("vhost: basic in order support") introduces
-> vq->nheads to store the number of batched used buffers per used elem
-> but it forgets to initialize the vq->nheads to NULL in
-> vhost_dev_init() this will cause kfree() that would try to free it
-> without be allocated if SET_OWNER is not called.
->
-> Reported-by: JAEHOON KIM <jhkim@linux.ibm.com>
-> Reported-by: Breno Leitao <leitao@debian.org>
-> Fixes: 7918bb2d19c9 ("vhost: basic in order support")
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
+While we're talking about extending the userspace API... I think I'd
+also like a way to use the actual hardware counter (TSC, arch timer) as
+the reference clockid instead of CLOCK_MONOTONIC etc.=20
 
-I didn't see this in your pull request.
+In a hosting environment, I barely even care about calibrating the host
+kernel's timekeeping against the external time reference. What I *do*
+care about calibrating is the hardware counter, so that it can be
+correctly advertised to guests through a vmclock device.
 
-Thanks
+Using vmclock and simply advertising the relationship between the
+hardware counter and precision time, makes *so* much more sense than
+having hundreds of virtual guests on the same machine all performing
+the *same* calibration of precisely the same underlying counter, each
+of them potentially experiencing latency of measurements due to steal
+time while they do so.
 
+--=-Iph05W811DZgyBjyIvGb
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
+ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
+AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
+BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
+MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
+a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
+jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
+GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
+aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
+nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
+8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
+HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
+IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
+KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
+BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
+QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
+QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
+ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
+/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
+uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
+xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
+W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
+c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
+VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
+NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
+DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
+sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
+w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
+i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
+kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
+0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
+ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
+blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
+hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
+VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
+HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
+ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
+AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
+cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
+cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
+AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
+aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
+hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
+iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
+8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
+JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
+xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
+EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
+B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
+MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
+KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
+Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
+nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
+WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
+W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
+nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
+g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
+9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
+9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
+sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
+a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
+ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
+AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
+dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
+Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
+Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
+MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
+YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
+4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
+6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
+QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
+nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
+MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
+VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
+ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDgwNDA5MDc0
+OFowLwYJKoZIhvcNAQkEMSIEIOruhCd6hBOHU8sf+ukpmlZrcoGHnybHJ8uQsJVCOpe9MGQGCSsG
+AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
+cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
+VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
+cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIAHUUBW7gcSwiK
+PEaweQ8p/JUPLVyN1R8CXyGrC050BpSj0vPTKQlMXcjTwOglU2qvQUOBHbd2dNDJGdDc1rhp+d+L
+g6PsjNmep+atD/WQwu7081sFeLpeyJ+Bs640DC4EB02W8SnhzllAmnDCol6//Vuk77APYWMnNkg2
+950b5HUVKwUyCCzttKOCeosyLMTgRsleW9Zmnj5Ka+FpmP9nJX4VPSY8yOyJ1ynPc0qy6N46/49V
+pNGYCY97J2yPlhnZrnxxal3MJJ2poeFHNXMLhx5O4PhOAgCbTtr5GXtyE+uE6b2fPpCHD3RyyNL0
+pkDigXAxgLmp8xDePtXxz5Rn/+wcOad/7NvPKOEUy1OxPtT+DZ7iW5OWQUYFiG3ylMj3ZlJwJcoc
+LwJ75lmZRYNeTFZFSO2iXQNZ62LWchvLaOa+qEunEQ1LN4Om/kznA9qIVjBjQohM13+FzGrHIqUN
+/L9dkV/faSiNRD7eTJZsiF54xDc5U99shNn6D4ywj7mpSRQy7q0//VV89ffbM+j1N+CFtB/Tisgz
+iUQI5S5uOKZmpFVI2gjD3+Q8HiIfDRyxSnWmlKrWVMeZhJm1tFpr1vkjJpSdpDG34VaNNGyhqezf
+Dtqt2Q7tFYAgDDfjlOz1oRayPTqhL+3PIqxCf7XYr6XwM8p8H125er952PJ08GQAAAAAAAA=
+
+
+--=-Iph05W811DZgyBjyIvGb--
 
