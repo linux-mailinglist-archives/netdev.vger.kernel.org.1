@@ -1,167 +1,139 @@
-Return-Path: <netdev+bounces-211591-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211592-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B38DB1A47A
-	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 16:21:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD932B1A484
+	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 16:23:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E661A3AB1BF
-	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 14:21:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09288179892
+	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 14:23:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10C0627145E;
-	Mon,  4 Aug 2025 14:21:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B2E326FA70;
+	Mon,  4 Aug 2025 14:23:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h3vhkvxa"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="heegnlbo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D62E526FA70;
-	Mon,  4 Aug 2025 14:21:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 345AF19B5A7;
+	Mon,  4 Aug 2025 14:23:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754317300; cv=none; b=V1xCO64pu2zE9uRl8adrXTG3x6z+CiTsgBHyflKGFUxjUgKRPTANm+jyf7NJAIkQ7/9qpi0XxCPRmSSfls0+4A1ArhTMOtq2WIe5eUhCuavou7zBdy61Uq4+a8iF3oucAtONY0s3u49vtx97wbEKhKzUPwBl34OvQyy4Aaqiv1M=
+	t=1754317386; cv=none; b=Yl+QwEFLumdk068OkalElptK2MHE1BxkLS9mRZxF2SQxiNa+BcfUk4jm7+mWS8cv4A9LKL5SricdysgqhBlDyYaF8ygFA2JzknyzJzH2fuK+C1TFUTcU3KjIALKLL7Pc+5xv4zHQ9eEs/2FhqFlXYCa4BuqMv8s1hGTAfx1UD9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754317300; c=relaxed/simple;
-	bh=THg8fAXPOZpcU1UGe5NLfNZG1W+ChsloJhTKXS2XCtU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=t9vsr0psCFbzZcZhGfrOLW30/8uMz3Jj3i7shnkqOU7kmoY2XocEJGvC/zbmnc/J2VxFx54yRRdz11cOnf8XUbMRAWl4cFzDepuIuQXha9Vp980auXojyVT4vy/Nlbi1YqGlLDtAixpeaBrg9wOZ6/BeNInkCuLROqZ2BqUmj9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h3vhkvxa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C83E2C4CEE7;
-	Mon,  4 Aug 2025 14:21:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754317296;
-	bh=THg8fAXPOZpcU1UGe5NLfNZG1W+ChsloJhTKXS2XCtU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=h3vhkvxabpJMXDlINEWLQk8ydeeUQRoRcThhCsg5uAbdxXPQbvYpZg5nRyu1GhkbH
-	 xsuhqcazwRf8jzExikPL24G7pd8R3A+M16x7zSGSccfClPUb5CdUSFZACV99cW4OwM
-	 Pg0lkkh+6B8JaE9n6NILQrWXifQkMzoENHQHlejpSMrXhbz90yDtmOEEXyBY6q4aqU
-	 3HkTXAxdODW73D2tUacw6/rNrYztKUSgXZ+pHPX3YG9QB14JFGOW3uDH8je1sOt8ra
-	 n+fuUtxXnIPUB4ArQkE5EloA0CL5QMZcPpzH8JZsUgIscFGshDWRWy79GeWTiCss0m
-	 3/nUg3sie37xA==
-Message-ID: <c16070db-c086-45b8-bc0d-9e3bc02924b6@kernel.org>
-Date: Mon, 4 Aug 2025 16:21:30 +0200
+	s=arc-20240116; t=1754317386; c=relaxed/simple;
+	bh=Cy7/3H0q3cx0Rbvqsw++44rJBoWXnbz+ae5q066m/WU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ka9BmmiwmXWcfk0dIGuaZO6G/a7EQbHtCExYf03ulm8jLyVoATwQ9pjDEbIQb9iNBdRa8crZHr67wEYafc1rG/7Oejy03t9JOd3Cmt7Ixo1QlkFM7r5VO4KpH38uFommjo5S0ZcNBPmWw//f43gdXb8Wsmx2OrMPO+jQ5uJAK3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=heegnlbo; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=et/dI5/h3BCkcc6Ucfe8h5aatgps4oRPy2URF21voK4=; b=heegnlbo3j87JCJFkOZm4ZS10R
+	QRL9oNK14GE6ZRSgdGDZxyMlgo7wsoYafwq/UejM/vrc04Bx2Fvnt8hG/M9Ryw13o/4eAZT80Zruc
+	FEYVFXqsqc5fTx0PgI4AsJ7G8hpUwrPYXgUKY5z2zC9FSQECnHAZZndcYkJeqQmIjyoaCQ5w/Vhqb
+	TFb6DS5USsKNII1sVyyC0HwuhEIvHkwMZIxv6P/pvdszO1qirK08U4tPpj91R8otw/6gkODZffGA/
+	G0WkYetuvB18rtdGOA3yTaeGExKoUnJgSz3MSRlLW2ZLpMmR3jNgkiqX8KdWWKvV4/NIkO6lpDyTD
+	6V5o4OsA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:59986)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uiw5W-0001mI-0v;
+	Mon, 04 Aug 2025 15:22:54 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uiw5S-00058C-1P;
+	Mon, 04 Aug 2025 15:22:50 +0100
+Date: Mon, 4 Aug 2025 15:22:50 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Alexander Wilhelm <alexander.wilhelm@westermo.com>
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: Aquantia PHY in OCSGMII mode?
+Message-ID: <aJDCOoVBLky2eCPS@shell.armlinux.org.uk>
+References: <aJBQiyubjwFe1h27@FUE-ALEWI-WINX>
+ <20250804100139.7frwykbaue7cckfk@skbuf>
+ <aJCvOHDUv8iVNXkb@FUE-ALEWI-WINX>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 09/27] dt-bindings: clock: mediatek: Describe MT8196
- clock controllers
-To: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Laura Nao <laura.nao@collabora.com>, wenst@chromium.org
-Cc: conor+dt@kernel.org, devicetree@vger.kernel.org,
- guangjie.song@mediatek.com, kernel@collabora.com, krzk+dt@kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org,
- matthias.bgg@gmail.com, mturquette@baylibre.com, netdev@vger.kernel.org,
- nfraprado@collabora.com, p.zabel@pengutronix.de, richardcochran@gmail.com,
- robh@kernel.org, sboyd@kernel.org
-References: <fbe7b083-bc3f-4156-8056-e45c9adcb607@kernel.org>
- <20250804083540.19099-1-laura.nao@collabora.com>
- <373f44c3-8a6a-4d52-ba6b-4c9484e2eac1@kernel.org>
- <1db77784-a59a-49bd-89b5-9e81e6d3bafc@collabora.com>
- <e9ee33b0-d6b0-4641-aeeb-9803b4d1658a@kernel.org>
- <00a12553-b248-4193-8017-22fea07ee196@collabora.com>
- <2555e9fe-3bc0-4f89-9d0b-2f7f946632e7@kernel.org>
- <62edb8e3-aff6-4225-b520-f4b73aef145d@collabora.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <62edb8e3-aff6-4225-b520-f4b73aef145d@collabora.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aJCvOHDUv8iVNXkb@FUE-ALEWI-WINX>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 04/08/2025 16:15, AngeloGioacchino Del Regno wrote:
-> Il 04/08/25 15:58, Krzysztof Kozlowski ha scritto:
->> On 04/08/2025 15:27, AngeloGioacchino Del Regno wrote:
->>>
->>> We discussed about aggregating votes, yes, in software - this instead is a
->>> *broken* hardware that does the aggregation internally and does not require
->>> nor want external drivers to do the aggregation.
->>>
->>>> Maybe it is just the name, so avoid all the confusing "votes" if this is
->>>> not voting system. If this is a voting system, then don't use custom
->>>> phandles.
->>>
->>> Being it fundamentally *broken*, this being a voting system is what the hardware
->>> initially wanted to be - but effectively, since it requires YOU to:
->>>    - Make sure that power supplies are turned on, if not, turn them on by "touching"
->>>      HW registers (so, without any assistance from the voter MCU), if any;
->>>    - Turn on parent clocks manually, if any, before using the "voter mcu" to try
->>>      to ungate that clock; and
->>>      - Enable the "FENC" manually, after the mcu says that the clock was ungated.
->>
->>
->> I understand that "YOU" as Linux driver, when you want to do something
->> (e.g. toggle) a clock?
+On Mon, Aug 04, 2025 at 03:01:44PM +0200, Alexander Wilhelm wrote:
+> Am Mon, Aug 04, 2025 at 01:01:39PM +0300 schrieb Vladimir Oltean:
+> > On Mon, Aug 04, 2025 at 08:17:47AM +0200, Alexander Wilhelm wrote:
+> > > Am Fri, Aug 01, 2025 at 04:04:20PM +0300 schrieb Vladimir Oltean:
+> > > > On Fri, Aug 01, 2025 at 01:23:44PM +0100, Russell King (Oracle) wrote:
+> > > > > It looks like memac_select_pcs() and memac_prepare() fail to
+> > > > > handle 2500BASEX despite memac_initialization() suggesting the
+> > > > > SGMII PCS supports 2500BASEX.
+> > > > 
+> > > > Thanks for pointing this out, it seems to be a regression introduced by
+> > > > commit 5d93cfcf7360 ("net: dpaa: Convert to phylink").
+> > > > 
+> > > > If there are no other volunteers, I can offer to submit a patch if
+> > > > Alexander confirms this fixes his setup.
+> > > 
+> > > I'd be happy to help by applying the patch on my system and running some tests.
+> > > Please let me know if there are any specific steps or scenarios you'd like me to
+> > > focus on.
+> > > 
+> > > Best regards
+> > > Alexander Wilhelm
+> > 
+> > Please find the attached patch.
+> [...]
 > 
-> "you" == Linux driver, yes.
+> Hi Vladimir,
 > 
->> If so this looks a lot like power domain, although with some differences.
->>
+> I’ve applied the patch you provided, but it doesn’t seem to fully resolve the
+> issue -- or perhaps I’ve misconfigured something. I’m encountering the following
+> error during initialization:
 > 
-> A power domain ungates power to something.
+>     mdio_bus 0x0000000ffe4e7000:00: AN not supported on 3.125GHz SerDes lane
+>     fsl_dpaa_mac ffe4e6000.ethernet eth0: pcs_config failed: -EOPNOTSUPP
 
-Does more, it is not a simple supply.
+We're falling foul of the historic crap that 2500base-X is (802.3 were
+very very late to the party in "standardising" it, but after there were
+many different implementations with varying capabilities already on the
+market.)
+
+aquantia_main.c needs to implement the .inband_caps() method, and
+report what its actual capabilities are for the supplied interface
+mode according to how it has been provisioned.
 
 > 
-> These are clocks, giving a (x) (M)Hz signal to something.
+> The relevant code is located in `drivers/net/pcs/pcs-lynx.c`, within the
+> `lynx_pcs_config(...)` function. In the case of 2500BASE-X with in-band
+> autonegotiation enabled, the function logs an error and returns -EOPNOTSUPP.
+> 
+> From what I can tell, autonegotiation isn’t supported on a 3.125GHz SerDes lane
+> when using 2500BASE-X.
 
-Your earlier message about "YOU" said:
+Due to the lack of early standardisation, some manufacturers require
+AN, some have it optional, others simply do not support it.
 
-"   - Make sure that power supplies are turned on, if not, turn them on
-by "touching"
-     HW registers (so, without any assistance from the voter MCU), if any;"
-
-so not a simple clocks stuff.
-
-Best regards,
-Krzysztof
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
