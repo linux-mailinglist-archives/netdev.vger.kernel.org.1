@@ -1,139 +1,141 @@
-Return-Path: <netdev+bounces-211592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD932B1A484
-	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 16:23:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B266FB1A4E8
+	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 16:27:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09288179892
-	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 14:23:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BEA7F168F5E
+	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 14:26:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B2E326FA70;
-	Mon,  4 Aug 2025 14:23:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 533532727E9;
+	Mon,  4 Aug 2025 14:25:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="heegnlbo"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="L+twoUC0"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 345AF19B5A7;
-	Mon,  4 Aug 2025 14:23:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BCA1229B02;
+	Mon,  4 Aug 2025 14:25:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754317386; cv=none; b=Yl+QwEFLumdk068OkalElptK2MHE1BxkLS9mRZxF2SQxiNa+BcfUk4jm7+mWS8cv4A9LKL5SricdysgqhBlDyYaF8ygFA2JzknyzJzH2fuK+C1TFUTcU3KjIALKLL7Pc+5xv4zHQ9eEs/2FhqFlXYCa4BuqMv8s1hGTAfx1UD9M=
+	t=1754317536; cv=none; b=g8ZwRVf/p/cltKQ8p8CXtwWBYCP9fiP80GpRBWl6H4FKc/yYZGdNCUC2m/Pbl+UYXQj139k7182+Ht8ULO7pxauv7hgv6O/JC44VZH5FBTcGtS/qq8qFFsS3Pnv1fWQeK2W5Rvxwa0Zlmzz33MpndSo8gqS9NZGUXPJHBQTZCg4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754317386; c=relaxed/simple;
-	bh=Cy7/3H0q3cx0Rbvqsw++44rJBoWXnbz+ae5q066m/WU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ka9BmmiwmXWcfk0dIGuaZO6G/a7EQbHtCExYf03ulm8jLyVoATwQ9pjDEbIQb9iNBdRa8crZHr67wEYafc1rG/7Oejy03t9JOd3Cmt7Ixo1QlkFM7r5VO4KpH38uFommjo5S0ZcNBPmWw//f43gdXb8Wsmx2OrMPO+jQ5uJAK3U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=heegnlbo; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=et/dI5/h3BCkcc6Ucfe8h5aatgps4oRPy2URF21voK4=; b=heegnlbo3j87JCJFkOZm4ZS10R
-	QRL9oNK14GE6ZRSgdGDZxyMlgo7wsoYafwq/UejM/vrc04Bx2Fvnt8hG/M9Ryw13o/4eAZT80Zruc
-	FEYVFXqsqc5fTx0PgI4AsJ7G8hpUwrPYXgUKY5z2zC9FSQECnHAZZndcYkJeqQmIjyoaCQ5w/Vhqb
-	TFb6DS5USsKNII1sVyyC0HwuhEIvHkwMZIxv6P/pvdszO1qirK08U4tPpj91R8otw/6gkODZffGA/
-	G0WkYetuvB18rtdGOA3yTaeGExKoUnJgSz3MSRlLW2ZLpMmR3jNgkiqX8KdWWKvV4/NIkO6lpDyTD
-	6V5o4OsA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:59986)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uiw5W-0001mI-0v;
-	Mon, 04 Aug 2025 15:22:54 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uiw5S-00058C-1P;
-	Mon, 04 Aug 2025 15:22:50 +0100
-Date: Mon, 4 Aug 2025 15:22:50 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Alexander Wilhelm <alexander.wilhelm@westermo.com>
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: Aquantia PHY in OCSGMII mode?
-Message-ID: <aJDCOoVBLky2eCPS@shell.armlinux.org.uk>
-References: <aJBQiyubjwFe1h27@FUE-ALEWI-WINX>
- <20250804100139.7frwykbaue7cckfk@skbuf>
- <aJCvOHDUv8iVNXkb@FUE-ALEWI-WINX>
+	s=arc-20240116; t=1754317536; c=relaxed/simple;
+	bh=4w4UyDIzjxo+3JmIQukX+lOYpSKSPWdj2NvIBHpwDLs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IoSjG+0ygI+GR5p6UhZiQuXFbId1EJxAxZjOek9tvDLTpIDV+EEW/2BqvlfhtJXXxDydcAmXPeOrxPGjNjm9n7s14mZR/7BUeSwiFspcL254WIC7n92w6Wolo5gyTIxIdN4GcvuzMMP2zk5GGfCw4YFZt5r+ZHRkbzj1vtc6Y3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=L+twoUC0; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1754317532;
+	bh=4w4UyDIzjxo+3JmIQukX+lOYpSKSPWdj2NvIBHpwDLs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=L+twoUC0xA5IgdbWFl5hIHuXPsHMLJxr0wFn8/SYfhBCM1lxXB6W3iv+8Y3ew555Z
+	 iidpjcu9JxLy6g9AizgAnFCdZyRNQ9qhjihWqYIbhCCADWn8KxVQPnKwePzvf/d7P5
+	 pPbcvhN8fkHxiCVCnLc6jOkuQR2qP1pLyHuRKu9Re44KVSrfyfQHENP6SWoKWyhHAp
+	 nW62hGmQytUMWxI/a3E/GLo0ccxkfR2rFZ0akabORXAEHOeLu+vEAQ2LAEftTUsd3Q
+	 K6/YkB+4WagTbnSYIFlzQAwpr/c1vzmKPDPnn7sPy2po7t7a7dGDm7SavjWh5ic5qz
+	 pSv5yYrHoek3w==
+Received: from [192.168.1.100] (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: kholk11)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 872B117E046C;
+	Mon,  4 Aug 2025 16:25:31 +0200 (CEST)
+Message-ID: <dfd6b5be-f28b-4451-b548-884043f9715a@collabora.com>
+Date: Mon, 4 Aug 2025 16:25:30 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aJCvOHDUv8iVNXkb@FUE-ALEWI-WINX>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 09/27] dt-bindings: clock: mediatek: Describe MT8196
+ clock controllers
+To: Krzysztof Kozlowski <krzk@kernel.org>, Laura Nao
+ <laura.nao@collabora.com>, wenst@chromium.org
+Cc: conor+dt@kernel.org, devicetree@vger.kernel.org,
+ guangjie.song@mediatek.com, kernel@collabora.com, krzk+dt@kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org,
+ matthias.bgg@gmail.com, mturquette@baylibre.com, netdev@vger.kernel.org,
+ nfraprado@collabora.com, p.zabel@pengutronix.de, richardcochran@gmail.com,
+ robh@kernel.org, sboyd@kernel.org
+References: <fbe7b083-bc3f-4156-8056-e45c9adcb607@kernel.org>
+ <20250804083540.19099-1-laura.nao@collabora.com>
+ <373f44c3-8a6a-4d52-ba6b-4c9484e2eac1@kernel.org>
+ <1db77784-a59a-49bd-89b5-9e81e6d3bafc@collabora.com>
+ <e9ee33b0-d6b0-4641-aeeb-9803b4d1658a@kernel.org>
+ <00a12553-b248-4193-8017-22fea07ee196@collabora.com>
+ <2555e9fe-3bc0-4f89-9d0b-2f7f946632e7@kernel.org>
+ <62edb8e3-aff6-4225-b520-f4b73aef145d@collabora.com>
+ <c16070db-c086-45b8-bc0d-9e3bc02924b6@kernel.org>
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Content-Language: en-US
+In-Reply-To: <c16070db-c086-45b8-bc0d-9e3bc02924b6@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Aug 04, 2025 at 03:01:44PM +0200, Alexander Wilhelm wrote:
-> Am Mon, Aug 04, 2025 at 01:01:39PM +0300 schrieb Vladimir Oltean:
-> > On Mon, Aug 04, 2025 at 08:17:47AM +0200, Alexander Wilhelm wrote:
-> > > Am Fri, Aug 01, 2025 at 04:04:20PM +0300 schrieb Vladimir Oltean:
-> > > > On Fri, Aug 01, 2025 at 01:23:44PM +0100, Russell King (Oracle) wrote:
-> > > > > It looks like memac_select_pcs() and memac_prepare() fail to
-> > > > > handle 2500BASEX despite memac_initialization() suggesting the
-> > > > > SGMII PCS supports 2500BASEX.
-> > > > 
-> > > > Thanks for pointing this out, it seems to be a regression introduced by
-> > > > commit 5d93cfcf7360 ("net: dpaa: Convert to phylink").
-> > > > 
-> > > > If there are no other volunteers, I can offer to submit a patch if
-> > > > Alexander confirms this fixes his setup.
-> > > 
-> > > I'd be happy to help by applying the patch on my system and running some tests.
-> > > Please let me know if there are any specific steps or scenarios you'd like me to
-> > > focus on.
-> > > 
-> > > Best regards
-> > > Alexander Wilhelm
-> > 
-> > Please find the attached patch.
-> [...]
+Il 04/08/25 16:21, Krzysztof Kozlowski ha scritto:
+> On 04/08/2025 16:15, AngeloGioacchino Del Regno wrote:
+>> Il 04/08/25 15:58, Krzysztof Kozlowski ha scritto:
+>>> On 04/08/2025 15:27, AngeloGioacchino Del Regno wrote:
+>>>>
+>>>> We discussed about aggregating votes, yes, in software - this instead is a
+>>>> *broken* hardware that does the aggregation internally and does not require
+>>>> nor want external drivers to do the aggregation.
+>>>>
+>>>>> Maybe it is just the name, so avoid all the confusing "votes" if this is
+>>>>> not voting system. If this is a voting system, then don't use custom
+>>>>> phandles.
+>>>>
+>>>> Being it fundamentally *broken*, this being a voting system is what the hardware
+>>>> initially wanted to be - but effectively, since it requires YOU to:
+>>>>     - Make sure that power supplies are turned on, if not, turn them on by "touching"
+>>>>       HW registers (so, without any assistance from the voter MCU), if any;
+>>>>     - Turn on parent clocks manually, if any, before using the "voter mcu" to try
+>>>>       to ungate that clock; and
+>>>>       - Enable the "FENC" manually, after the mcu says that the clock was ungated.
+>>>
+>>>
+>>> I understand that "YOU" as Linux driver, when you want to do something
+>>> (e.g. toggle) a clock?
+>>
+>> "you" == Linux driver, yes.
+>>
+>>> If so this looks a lot like power domain, although with some differences.
+>>>
+>>
+>> A power domain ungates power to something.
 > 
-> Hi Vladimir,
+> Does more, it is not a simple supply.
 > 
-> I’ve applied the patch you provided, but it doesn’t seem to fully resolve the
-> issue -- or perhaps I’ve misconfigured something. I’m encountering the following
-> error during initialization:
+
+Yes, does more, but still manages power, and not clocks.
+
+>>
+>> These are clocks, giving a (x) (M)Hz signal to something.
 > 
->     mdio_bus 0x0000000ffe4e7000:00: AN not supported on 3.125GHz SerDes lane
->     fsl_dpaa_mac ffe4e6000.ethernet eth0: pcs_config failed: -EOPNOTSUPP
-
-We're falling foul of the historic crap that 2500base-X is (802.3 were
-very very late to the party in "standardising" it, but after there were
-many different implementations with varying capabilities already on the
-market.)
-
-aquantia_main.c needs to implement the .inband_caps() method, and
-report what its actual capabilities are for the supplied interface
-mode according to how it has been provisioned.
-
+> Your earlier message about "YOU" said:
 > 
-> The relevant code is located in `drivers/net/pcs/pcs-lynx.c`, within the
-> `lynx_pcs_config(...)` function. In the case of 2500BASE-X with in-band
-> autonegotiation enabled, the function logs an error and returns -EOPNOTSUPP.
+> "   - Make sure that power supplies are turned on, if not, turn them on
+> by "touching"
+>       HW registers (so, without any assistance from the voter MCU), if any;"
 > 
-> From what I can tell, autonegotiation isn’t supported on a 3.125GHz SerDes lane
-> when using 2500BASE-X.
+> so not a simple clocks stuff.
 
-Due to the lack of early standardisation, some manufacturers require
-AN, some have it optional, others simply do not support it.
+That's a characteristic of MediaTek's clock controllers: each hardware macroblock
+needs to be powered in order to be able to enable clocks.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+This is nothing new in MT8196/MT6991, it's how MediaTek SoCs have always been split
+by hardware, and it's like that since ages.
+
+Some other SoCs have the clock controllers always powered on - MediaTek doesn't.
 
