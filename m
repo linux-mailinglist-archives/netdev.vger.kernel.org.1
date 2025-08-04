@@ -1,102 +1,108 @@
-Return-Path: <netdev+bounces-211519-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211520-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B5A3B19EBD
-	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 11:27:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD480B19EC0
+	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 11:27:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E1549189AA4B
-	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 09:27:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 125BE3AD008
+	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 09:27:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D17724469A;
-	Mon,  4 Aug 2025 09:26:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DA40246BD8;
+	Mon,  4 Aug 2025 09:26:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="uA6laYNZ";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="KDoEBbw/"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="Vb0yADmW";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="bSeObrkl"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b8-smtp.messagingengine.com (fhigh-b8-smtp.messagingengine.com [202.12.124.159])
+Received: from fout-b3-smtp.messagingengine.com (fout-b3-smtp.messagingengine.com [202.12.124.146])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AFDE246BB6
-	for <netdev@vger.kernel.org>; Mon,  4 Aug 2025 09:26:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FC53246BBB
+	for <netdev@vger.kernel.org>; Mon,  4 Aug 2025 09:26:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.146
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754299605; cv=none; b=onDy4iP36xjUIzWvL0rT3Uzte//lC5U5SfTgDck8VxVtiRJahXOKoAE6nG6JVzWgJ1ffV/54PP1uR3w269qz65wSROIi4HOWb+tfFRSe8FSgh1UinseOTRF6lficxpddbGXA3AhJ+StGj7jfWHS4BgU3t4cK2D5wrRsH9HMS6a4=
+	t=1754299607; cv=none; b=DMllvEl1purikdKjFmE3bEdHLid+PTJd1ro4JEu1Sktc9sKPhG4K4PtPzfdFz5Ee3EpDgdScznZEYZJzWmcgtBMhJ9ae3YlyDrVZyjjK3/0ngzV5eeI7EU2chY7P4ymM+N7Y9lesnkkomIfha13hxn21k86pddVFtnsYl7EfQhM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754299605; c=relaxed/simple;
-	bh=vJiIH6oenImrwrjrKl8gajBlshMPRthhQFH/x1ym83I=;
+	s=arc-20240116; t=1754299607; c=relaxed/simple;
+	bh=db5PlqPkTNUoyYEYuVqNrMySmP4fWQ+nA9FqFBy/sNM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tU8iqfShiskeJNAvnOiCJsAMK9BcMBQ46/iv8SyFQh8GYkJJAwH4ocaVcVPtXs9Ll64XsDhS0UkKl+866wbsyn9C/Bpp5OQZKBo8rfna0SW98EK84OLxYjdUB1ToysJX1xSJPkQfxcitdpRErprGsB1R8GmjVXsdni10Fj2R+UI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=uA6laYNZ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=KDoEBbw/; arc=none smtp.client-ip=202.12.124.159
+	 MIME-Version; b=IYdoRNzmkXzBa0dnUsV7P1GiQSqQIhhJpkZ3hYEYH8pcP5eRmkAejag/stT1hlLw9QryKNNgrai+CvJt+7W8sp/CIO/O0HLX58KGWyUxhSwpcO+gwFcj4oqDJO1rj5H1uv5Q4Y+U1XgdTJYlWlQ4c+A33/tF35N9iJaQo5nKKJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=Vb0yADmW; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=bSeObrkl; arc=none smtp.client-ip=202.12.124.146
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-06.internal (phl-compute-06.phl.internal [10.202.2.46])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id EB1E97A00EC;
-	Mon,  4 Aug 2025 05:26:41 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-06.internal (MEProxy); Mon, 04 Aug 2025 05:26:42 -0400
+Received: from phl-compute-03.internal (phl-compute-03.phl.internal [10.202.2.43])
+	by mailfout.stl.internal (Postfix) with ESMTP id 8D3F21D000DD;
+	Mon,  4 Aug 2025 05:26:44 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-03.internal (MEProxy); Mon, 04 Aug 2025 05:26:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
 	 h=cc:cc:content-transfer-encoding:content-type:date:date:from
 	:from:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1754299601; x=
-	1754386001; bh=BkOsXWg34qIrjfxsQxhlFQgZFNiTS3MV8IKcykS7Oeo=; b=u
-	A6laYNZZG7TUadJHkDXg8yGV31r6BweAI89urC6bvwj3jLz6tJc2PPlTt4rMGXGk
-	PXwo5Je+ZxqMjgsNpKwwNwzqAGy43XlUXCEUljuSrAhvngf5XgGEBpFPAOspxdlL
-	RS7cdLb6aXdznZTBkSSFTbUqQ8kzoW90+1Kub95OwJi/Ohb8z9mYnjpmeVec8tKN
-	berhWWW/tKz8feM8g4KAr0D5fc5VuzvPIHtx2lewOmlNUD5uPfxoHThrWkU0bI8L
-	xXjI3Tn194NH0WPJ0JSbTKatTOmNIpmjz7NB+WCN24VX0DVwOo4g7rBMkyGC4LLO
-	W9pZZ/qdrlxUv2b1Gm6TA==
+	:reply-to:subject:subject:to:to; s=fm1; t=1754299604; x=
+	1754386004; bh=RXurMLp793g6gxB35FS0Vs/kZ+MojVMfMZMgGJhqfMY=; b=V
+	b0yADmWliKwN/zVoXWc4Iod/8VDMRyH1oFn/9hs0kHuELsLSWzizeYx89opnTTmh
+	FG392HxMrXw6gavpkI7ov4a35emCV9xxIU4hlmZU6uZWM2y/8e6oJ6PM4ct3W/dV
+	wOl5RpYwkl94iEcEy6fEddoD0kbXhHnl6gftYuTvCcHd1lQIpmaf5DBryykweH4S
+	Lo738XHtgEifgO5gXWK04/tzkDoPphkVH5CLlg7TlwbH+mT/EkalwO0w6XMjYhi6
+	d+aNbnveELUfej8buNnnBdp1oHs+W4Qu7C66t5qcsbLIL5QiidBBpY4htWrrDETF
+	/c50IZgcZ2sCUYw3RYFvA==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:date:date:feedback-id:feedback-id:from:from
 	:in-reply-to:in-reply-to:message-id:mime-version:references
 	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm3; t=1754299601; x=1754386001; bh=B
-	kOsXWg34qIrjfxsQxhlFQgZFNiTS3MV8IKcykS7Oeo=; b=KDoEBbw/xBHFKUYD/
-	0cLQPEtJl9G+FMWKVrbqgBQpWQFGZ1enNS0rv8A8dwsdHCeok4qjxQp/1oFHozTW
-	nTeIKnIyAHbsSviKwJ4Xlfaa1onxXb0T3U0MMt+FH08+fe05kS1Xv/SZZR/T9K7t
-	BYHUV+JiQORSV9DeBiUSk18xRoIIuOlh2LSaCTINOUeHIB1vcy2D5zT6XfnwHqgV
-	9SuWO+vuvbpmlCRfxr7k/fnto/Dyft1ofQ5xQtRse8pRaNmJqav560OaPOjrHbcI
-	ma104nq9IFx/vq4KZq0Wa3smcxJ+Gb+HipGkXwtY94NMpUqHdJenyLldIaxvfmFe
-	mSQfA==
-X-ME-Sender: <xms:0XyQaBfQ8yBG3NySevOlFMw6XAku2oZmf2m7wbA9Vh15ICe2xy2hIA>
-    <xme:0XyQaHqeuyS2FnUSe7Qdwm_M6h0_oTGe5xiYvGTME7OutdisV1iE_0bLtBPNGkYpI
-    bitpI7uDaQbLLf-VHw>
-X-ME-Received: <xmr:0XyQaK-Fqfwn8LyWnN04X8RsmP3Qn3tvT0qXGZPObbUYonBNe6RAHha5lU1p>
+	:x-me-sender:x-sasl-enc; s=fm3; t=1754299604; x=1754386004; bh=R
+	XurMLp793g6gxB35FS0Vs/kZ+MojVMfMZMgGJhqfMY=; b=bSeObrklhN9KzawVG
+	ZrJNupEiYhG4JBb8y1f49uHhdCshe72kmbTKBt7wlE9Ixqfr7A8vdsTu9wMrMvUN
+	UIo5AedV8ZZNm/1+qPxKEi/Poip7sLPxLdcCXvY2J4fLQ7fiLIYDMChSujUdap1s
+	Y4Fd8ZJ7BpVFcJA3DWY6XSqj54ZkIsgJbHkZ8sRllQvAuNrgsNCAaY8oC6/Jie8T
+	CV9zEjTzVgZnAROjQCvi/bR8N4Z/Ur7ViilDLM7mkqQVZ1zZStv9nBVrT8AafNTp
+	nFB8U4J0/8JIWS9Loge5zpTbUiCdSruyeaYumo4i0gEULt5MG+A+7qTAvBtr6skj
+	lLixg==
+X-ME-Sender: <xms:1HyQaOLlD4H9b78Nz6ex65fhyDkHYEVzavDGFk3o05w_maplEvEbMA>
+    <xme:1HyQaJPuGlVA70bGW1HfxX7ASS7aHSKP7gK7HK5bca6tqdn3or1jzwfGP30lvFwZy
+    ZqNKd3--V3lSkF1LXQ>
+X-ME-Received: <xmr:1HyQaJV-cTT6bGecmCX-7EdRcfEyGK4TVE2OZlV3p8oQtaMilluOcYzJ9yfL>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdduudduleefucetufdoteggodetrf
     dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
     rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
     gurhephffvvefufffkofgjfhgggfestdekredtredttdenucfhrhhomhepufgrsghrihhn
     rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepieeiueeiteehtdefheekhffhgeevuefhteevueeljeeijeeiveehgfeh
-    udfghefgnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeeipdhmohgu
-    vgepshhmthhpohhuthdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlh
-    drohhrghdprhgtphhtthhopehsugesqhhuvggrshihshhnrghilhdrnhgvthdprhgtphht
-    thhopegtrhgrthhiuhesnhhvihguihgrrdgtohhmpdhrtghpthhtoheplhgvohhnrhhose
-    hnvhhiughirgdrtghomhdprhgtphhtthhopehrrgiiohhrsegslhgrtghkfigrlhhlrdho
-    rhhgpdhrtghpthhtohepshhtvghffhgvnhdrkhhlrghsshgvrhhtsehsvggtuhhnvghtrd
-    gtohhm
-X-ME-Proxy: <xmx:0XyQaLf0EkiAUBTZ_cYBUVbRdf0dtLeWWIdjzIcUs7akr6UJNU_OKw>
-    <xmx:0XyQaMK60pFyuM6nZot2TjOKJ078s1UPW_ZPHfWKC5IS2oQ8RHzICg>
-    <xmx:0XyQaDhHZN_o-hfK1Y434p4H1z0J9kw-vAVC3ngfwTI64_z9DL-Yew>
-    <xmx:0XyQaCSnHGyjCnYKyTu5AhWfGcavb_fpI3T9dZUDrcmU-rq99Ap25w>
-    <xmx:0XyQaJy4ksBJm25iKIc2cDk1chNScJuWCdFroaK6VGGQlg9JdRTq_UWT>
+    grthhtvghrnhepveetuedvgeduheeiteelhfetveefveelgeejvddttdejteeitdejgeeh
+    ieeufefhnecuffhomhgrihhnpehknhhofidrnhgvthenucevlhhushhtvghrufhiiigvpe
+    dtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgv
+    thdpnhgspghrtghpthhtohepuddtpdhmohguvgepshhmthhpohhuthdprhgtphhtthhope
+    hnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehsugesqhhu
+    vggrshihshhnrghilhdrnhgvthdprhgtphhtthhopegushgrhhgvrhhnsehkvghrnhgvlh
+    drohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghp
+    thhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrh
+    gvughhrghtrdgtohhmpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhr
+    tghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegrrg
+    htthgvkhgrsehovhhnrdhorhhg
+X-ME-Proxy: <xmx:1HyQaPk6awxCWIHtPWgjZ7i-Sg9n4_aKFKtOwYMwXqZYOwZWh8TbHw>
+    <xmx:1HyQaAM78H_TWzbQQZHkFm9YB665GlhMrJRUXM4RJutPI0QR78UEkw>
+    <xmx:1HyQaPLigxF5KC5qj5wvOhOW2rAeL6K8jBLOdppwaeGIYA82fIzi8g>
+    <xmx:1HyQaC3Pn4-mecjpDBp_xwvp0LijsUn5A_oWI6MwksTWxK9ibS9mAg>
+    <xmx:1HyQaOQ1u2giUKu5gemhNJD4y0uZTeet2ZYOckOJRJ13bJGdPdpfW6qH>
 Feedback-ID: i934648bf:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 4 Aug 2025 05:26:41 -0400 (EDT)
+ 4 Aug 2025 05:26:43 -0400 (EDT)
 From: Sabrina Dubroca <sd@queasysnail.net>
 To: netdev@vger.kernel.org
 Cc: Sabrina Dubroca <sd@queasysnail.net>,
-	Cosmin Ratiu <cratiu@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Ansis Atteka <aatteka@ovn.org>,
 	Steffen Klassert <steffen.klassert@secunet.com>
-Subject: [PATCH ipsec v2 2/3] xfrm: bring back device check in validate_xmit_xfrm
-Date: Mon,  4 Aug 2025 11:26:26 +0200
-Message-ID: <692725ef1363566cb2fe8d0c928971271f5dd503.1754297051.git.sd@queasysnail.net>
+Subject: [PATCH ipsec v2 3/3] udp: also consider secpath when evaluating ipsec use for checksumming
+Date: Mon,  4 Aug 2025 11:26:27 +0200
+Message-ID: <fe6740ba307ad0e7b988b874cf713d553924ce0e.1754297051.git.sd@queasysnail.net>
 X-Mailer: git-send-email 2.50.0
 In-Reply-To: <cover.1754297051.git.sd@queasysnail.net>
 References: <cover.1754297051.git.sd@queasysnail.net>
@@ -108,35 +114,50 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This is partial revert of commit d53dda291bbd993a29b84d358d282076e3d01506.
+Commit b40c5f4fde22 ("udp: disable inner UDP checksum offloads in
+IPsec case") tried to fix checksumming in UFO when the packets are
+going through IPsec, so that we can't rely on offloads because the UDP
+header and payload will be encrypted.
 
-This change causes traffic using GSO with SW crypto running through a
-NIC capable of HW offload to no longer get segmented during
-validate_xmit_xfrm, and is unrelated to the bonding use case mentioned
-in the commit.
+But when doing a TCP test over VXLAN going through IPsec transport
+mode with GSO enabled (esp4_offload module loaded), I'm seeing broken
+UDP checksums on the encap after successful decryption.
 
-Fixes: d53dda291bbd ("xfrm: Remove unneeded device check from validate_xmit_xfrm")
+The skbs get to udp4_ufo_fragment/__skb_udp_tunnel_segment via
+__dev_queue_xmit -> validate_xmit_skb -> skb_gso_segment and at this
+point we've already dropped the dst (unless the device sets
+IFF_XMIT_DST_RELEASE, which is not common), so need_ipsec is false and
+we proceed with checksum offload.
+
+Make need_ipsec also check the secpath, which is not dropped on this
+callpath.
+
+Fixes: b40c5f4fde22 ("udp: disable inner UDP checksum offloads in IPsec case")
 Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
 ---
-v2: only revert the unwanted changes
+v2: unchanged
 
- net/xfrm/xfrm_device.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Since the issue is related to IPsec and currently not visible as
+GSO is currently broken for SW crypto, I'm including this patch in the
+same series for the ipsec tree. I can split it out if that's prefered,
+just let me know.
 
-diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
-index 1f88472aaac0..c7a1f080d2de 100644
---- a/net/xfrm/xfrm_device.c
-+++ b/net/xfrm/xfrm_device.c
-@@ -155,7 +155,8 @@ struct sk_buff *validate_xmit_xfrm(struct sk_buff *skb, netdev_features_t featur
- 		return skb;
- 	}
+ net/ipv4/udp_offload.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
+index 85b5aa82d7d7..8758701c67d0 100644
+--- a/net/ipv4/udp_offload.c
++++ b/net/ipv4/udp_offload.c
+@@ -224,7 +224,7 @@ static struct sk_buff *__skb_udp_tunnel_segment(struct sk_buff *skb,
+ 	remcsum = !!(skb_shinfo(skb)->gso_type & SKB_GSO_TUNNEL_REMCSUM);
+ 	skb->remcsum_offload = remcsum;
  
--	if (skb_is_gso(skb) && unlikely(xmit_xfrm_check_overflow(skb))) {
-+	if (skb_is_gso(skb) && (unlikely(x->xso.dev != dev) ||
-+				unlikely(xmit_xfrm_check_overflow(skb)))) {
- 		struct sk_buff *segs;
- 
- 		/* Packet got rerouted, fixup features and segment it. */
+-	need_ipsec = skb_dst(skb) && dst_xfrm(skb_dst(skb));
++	need_ipsec = (skb_dst(skb) && dst_xfrm(skb_dst(skb))) || skb_sec_path(skb);
+ 	/* Try to offload checksum if possible */
+ 	offload_csum = !!(need_csum &&
+ 			  !need_ipsec &&
 -- 
 2.50.0
 
