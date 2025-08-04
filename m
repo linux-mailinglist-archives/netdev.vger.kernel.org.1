@@ -1,157 +1,203 @@
-Return-Path: <netdev+bounces-211504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211505-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4867B19CBD
-	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 09:37:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05C19B19CC9
+	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 09:39:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 009D31771BB
-	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 07:37:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 24D421899221
+	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 07:39:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EEBA238D52;
-	Mon,  4 Aug 2025 07:37:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C70862E3705;
+	Mon,  4 Aug 2025 07:38:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ej79/ZjL"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SElCBBdp"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 579552E3705;
-	Mon,  4 Aug 2025 07:37:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1B8923AB90
+	for <netdev@vger.kernel.org>; Mon,  4 Aug 2025 07:38:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754293053; cv=none; b=bMdl6qoDORvpSikKsHBgmVXqUTnJ7E1v6lhM2Hoer6u8fh0j5JZjf+eHHPzmIWjxApgaCOoQTQjzU0tLXQQT39rC434xZSt4tcRw0SRbwRnoWkcnPezGKlzdYBYBhF3KEW6/qwTCPYtPY8+6AwVXUbMj6Mzw1b2WsegJsC1+AB0=
+	t=1754293132; cv=none; b=hult5/WZkCCs/PqTZpdo5/AyAwkCsIyq26WEchcsRs4s9KNnr/OKumdDcd9dX5ogbP2auyTaW9JpRxDTni0nuJPfcde6OXM4KII9W8WxkUVgr74m0KEYMFDXdDK/c5x6fyZ+JF/wI5FmkJh9Y73FKTW6AhmjBdFqp6L//f6GA9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754293053; c=relaxed/simple;
-	bh=Hy50DwegmXkBEIcfBMpAQwt7iPyBXtj+MWF3Z0JBf2o=;
-	h=Content-Type:Date:Message-Id:Subject:Cc:From:To:References:
-	 In-Reply-To; b=KMgpp7/F2v+kDZTuoQThOUequxSTWuH87OtQeasEYeVce1/vtW6btTqJm1dBRjvnSXQRMeT38Br+4SrnXxDS7N+f3IxAD1ZBu9oxv7QSKn+9bGC4cwywn6d94eS/Ye6o6qGl4mwd9wlgRAXL/77tdcrIgXrPapFB5OAhbwAT1V8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ej79/ZjL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B2C4C4CEE7;
-	Mon,  4 Aug 2025 07:37:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754293052;
-	bh=Hy50DwegmXkBEIcfBMpAQwt7iPyBXtj+MWF3Z0JBf2o=;
-	h=Date:Subject:Cc:From:To:References:In-Reply-To:From;
-	b=Ej79/ZjL7SoWXmTTqxezzowa7FoDmtHvbMzAkNnf8svXiIqmtM+UmfM1uP8RlS3Wg
-	 UFndA2+420DqG7FnR4BX9C+BG/kmAcyvzDTznqf01uxDGoVISJNrD6bm/5PXEvnX4U
-	 D3pZ6unGCBcS6pi6j0cP+OmuK3dU7i0MOvv0AcaOG/AG4GrQBIoPLOUeppf1BnPKCc
-	 MTmO8Ug4oIi1L7FaEUEQ21BM3/9SjbvXjuNJ163E6SBfz6ej5+HWf1ohrrrD3F5dT/
-	 458AszK06u/JQE3/WdYvXZCPRe57FTGdYMZ/CA1M31U3GNvtnFtwmQ1oOvJVQm2LNE
-	 wr2zljuReTrbA==
-Content-Type: multipart/signed;
- boundary=10d157f1bbc1d46e05d56827db4bb5cdcb9554d40060213328a4fcc6eada;
- micalg=pgp-sha384; protocol="application/pgp-signature"
-Date: Mon, 04 Aug 2025 09:37:28 +0200
-Message-Id: <DBTGZGPLGJBX.32VALG3IRURBQ@kernel.org>
-Subject: Re: [PATCH net-next] Revert "net: ethernet: ti: am65-cpsw: fixup
- PHY mode for fixed RGMII TX delay"
-Cc: "Matthias Schiffer" <matthias.schiffer@ew.tq-group.com>, "Nishanth
- Menon" <nm@ti.com>, "Vignesh Raghavendra" <vigneshr@ti.com>, "Tero Kristo"
- <kristo@kernel.org>, "Andrew Lunn" <andrew+netdev@lunn.ch>, "David S .
- Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Roger
- Quadros" <rogerq@kernel.org>, "Simon Horman" <horms@kernel.org>, "Maxime
- Chevallier" <maxime.chevallier@bootlin.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <linux@ew.tq-group.com>
-From: "Michael Walle" <mwalle@kernel.org>
-To: "Siddharth Vadapalli" <s-vadapalli@ti.com>, "Andrew Lunn"
- <andrew@lunn.ch>
-X-Mailer: aerc 0.16.0
-References: <20250728064938.275304-1-mwalle@kernel.org>
- <57823bd1-265c-4d01-92d9-9019a2635301@lunn.ch>
- <DBOD5ICCVSL1.23R4QZPSFPVSM@kernel.org>
- <d9b845498712e2372967e40e9e7b49ddb1f864c1.camel@ew.tq-group.com>
- <DBOEPHG2V5WY.Q47MW1V5ZJZE@kernel.org>
- <2269f445fb233a55e63460351ab983cf3a6a2ed6.camel@ew.tq-group.com>
- <88972e3aa99d7b9f4dd1967fbb445892829a9b47.camel@ew.tq-group.com>
- <84588371-ddae-453e-8de9-2527c5e15740@lunn.ch>
- <47b0406f-7980-422e-b63b-cc0f37d86b18@ti.com>
-In-Reply-To: <47b0406f-7980-422e-b63b-cc0f37d86b18@ti.com>
+	s=arc-20240116; t=1754293132; c=relaxed/simple;
+	bh=1GRAnZqAm+wKVU4tAiU9SelRVltTveNBIebuBfO9Lz8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RtPYudvdfXWt04gq2mfqE6HolzCL3qY53/knoYqCzCValiusEDR0JvKYFI5xvdEixy0jdVJViObyr55k8EWr4IIDUkPopAICnSqiWX8Qfwt5vV80Hw1p5yLhUv/e8dMmayIaTjlYSp5zh9W192o6GXsZDjXIREKK00GQGV9bqKw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SElCBBdp; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1754293129;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=CzK+aHI7pV/260UpuhODkvZhd1+LktSEwZyabmfoWcU=;
+	b=SElCBBdpuiV6CDQ/kgy2eN3GKMub9QPBonykVM3h7FEqUlH4uC6Ln0i9f14aFBQ0NF62d6
+	DzgTRWdgj1757fVsOQMjS0f24WX5yErqyB64kzHzT0KBRgVMR2IJzARNCSeahgOO3O8AK0
+	22Xj354wys7pFbYdfsc78g9UP/zlZCM=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-651-hqjlpqCzPbmPmdf7jNs7Kg-1; Mon, 04 Aug 2025 03:38:47 -0400
+X-MC-Unique: hqjlpqCzPbmPmdf7jNs7Kg-1
+X-Mimecast-MFC-AGG-ID: hqjlpqCzPbmPmdf7jNs7Kg_1754293127
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3b8d5fc4f94so1275915f8f.3
+        for <netdev@vger.kernel.org>; Mon, 04 Aug 2025 00:38:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754293127; x=1754897927;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=CzK+aHI7pV/260UpuhODkvZhd1+LktSEwZyabmfoWcU=;
+        b=rB84x6/Fbxj62HQORU6Icf7L9xtaGMWyBh2mpzj0eV7dRkyvJbMj+yV1YbOX4epEdB
+         +56JjAvxETU+9kjB3PiQDkvRZls8Dyk+dCZdT7+8qFasxiuYeBv0umWPPv1MQhNLxXSg
+         9MMFDYyXel9yOG+fX7F6k+ByJUUu9JSes6LYJcXNuadILHdRDmfYlHKfD/kGeNpxmbJH
+         KO9srfGGY/20tv9+r+ikEi0a9UFD+l5l7JWSMEhyD/aERZ/C2KKtdHUDqG6vgd2yvXeL
+         Ovc8ny/bijmMLnTTKqIkXiVRuRMcOOu7CbhsewqxE3T8MAHye46MADk2OE5YWm5kl9Po
+         6scQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVgz0uABCvQLjSk403J1LlUH1sIhTKBk01uniU1RtNY4mJPoXum87WKfoO9l0lOGixDmR0VIlQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzLfgRkTLx5SyOue3JN2ORIRiFNCKq2KAvopJ8XgeLK/aeHYVtm
+	iwwEPhteudlPkHeS7xfEgQWWz4vRMQ0tbPdrQeTbN5fqsjus1nzNEVi5vcuJhLC7KjGjp47umUh
+	cv1REPKVMJ80dFqYQjK8GZ0SWS4xaxEuTqDCFbqFLfwjnD/OFRAsVzxPYUA==
+X-Gm-Gg: ASbGnctfi/WYOpVBlcCyWUddw56JfBqnolblsuKSwNNFMGwjOk83GRTOoOqyHpNnQwh
+	0pAJTHCFtUQkvpphu6P/I957u7ANF5gJrKE1JHlrdlGLWJXjj/MOokAznXzA/riwWjZfWn9bVS5
+	t9VHnALDUt+JTjB4gEPGdExckM9nMLSF0wu0KSPdc0+5UUs4P+uK/XAIVZ5NQJpxATxM0i5h6ls
+	YrGRNDzk8XNz0wBmNtEsNWvMYDKMULPbH61MMjHtad6Qj42wr4lixM/gEMvau9ABxP5eT6keAQ9
+	Wa3Ql4+Qn4ASSzxjFJ1n4Xsy3TDIpe0Cnz7/OTCYK8+xIMcZjmitkqALCUvroo+SN1TUhEo=
+X-Received: by 2002:a05:6000:26ca:b0:3a4:dc42:a0c3 with SMTP id ffacd0b85a97d-3b8d94ca582mr6319722f8f.56.1754293126680;
+        Mon, 04 Aug 2025 00:38:46 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGrMUdYx9Ob46gquQaFnoCtyHDHDuKowbCd8TC5DD9f1A8ghltY2UwuxdLS8+6L1j4QaRuF2A==
+X-Received: by 2002:a05:6000:26ca:b0:3a4:dc42:a0c3 with SMTP id ffacd0b85a97d-3b8d94ca582mr6319682f8f.56.1754293126157;
+        Mon, 04 Aug 2025 00:38:46 -0700 (PDT)
+Received: from [192.168.3.141] (p4ff1f1eb.dip0.t-ipconnect.de. [79.241.241.235])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b79c47b10asm14296055f8f.60.2025.08.04.00.38.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 04 Aug 2025 00:38:45 -0700 (PDT)
+Message-ID: <8aa31e69-588e-4c7c-9857-553c2d6a2e11@redhat.com>
+Date: Mon, 4 Aug 2025 09:38:42 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH linux-next v3] mm, page_pool: introduce a new page type
+ for page pool in page type
+To: Byungchul Park <byungchul@sk.com>, Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: linux-mm@kvack.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ kernel_team@skhynix.com, harry.yoo@oracle.com, ast@kernel.org,
+ daniel@iogearbox.net, davem@davemloft.net, kuba@kernel.org, hawk@kernel.org,
+ john.fastabend@gmail.com, sdf@fomichev.me, saeedm@nvidia.com,
+ leon@kernel.org, tariqt@nvidia.com, mbloch@nvidia.com,
+ andrew+netdev@lunn.ch, edumazet@google.com, pabeni@redhat.com,
+ akpm@linux-foundation.org, lorenzo.stoakes@oracle.com,
+ Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org, surenb@google.com,
+ mhocko@suse.com, horms@kernel.org, jackmanb@google.com, hannes@cmpxchg.org,
+ ziy@nvidia.com, ilias.apalodimas@linaro.org, willy@infradead.org,
+ brauner@kernel.org, kas@kernel.org, yuzhao@google.com,
+ usamaarif642@gmail.com, baolin.wang@linux.alibaba.com,
+ almasrymina@google.com, toke@redhat.com, asml.silence@gmail.com,
+ bpf@vger.kernel.org, linux-rdma@vger.kernel.org
+References: <20250729110210.48313-1-byungchul@sk.com>
+ <20250802150746.139a71be@canb.auug.org.au>
+ <20250804011730.GB39461@system.software.com>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ g3eXuA==
+Organization: Red Hat
+In-Reply-To: <20250804011730.GB39461@system.software.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
---10d157f1bbc1d46e05d56827db4bb5cdcb9554d40060213328a4fcc6eada
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
+On 04.08.25 03:17, Byungchul Park wrote:
+> On Sat, Aug 02, 2025 at 03:07:46PM +1000, Stephen Rothwell wrote:
+>> Hi,
+>>
+>> On Tue, 29 Jul 2025 20:02:10 +0900 Byungchul Park <byungchul@sk.com> wrote:
+>>>
+>>> Changes from v2:
+>>> 	1. Rebase on linux-next as of Jul 29.
+>>
+>> Why are you basing development work in linux-next.  That is a
+>> constantly rebasing tree.  Please base your work on some stable tree.
+> 
+> Sorry about the confusing.  I misunderstood how to work for patches
+> based on linux-next.
+> 
+> However, basing on linux-next is still required for this work since more
+> than one subsystem is involved, and asked by David Hildenbrand:
+> 
+>     https://lore.kernel.org/all/20250728105701.GA21732@system.software.com/
+> 
+> I will base on linux-next and work aiming at either network or mm tree.
 
-On Sat Aug 2, 2025 at 7:44 AM CEST, Siddharth Vadapalli wrote:
-> On Wed, Jul 30, 2025 at 04:27:52PM +0200, Andrew Lunn wrote:
-> > > I can confirm that the undocumented/reserved bit switches the MAC-sid=
-e TX delay
-> > > on and off on the J722S/AM67A.
-> >=20
-> > Thanks.
-> >=20
-> > > I have not checked if there is anything wrong with the undelayed
-> > > mode that might explain why TI doesn't want to support it, but
-> > > traffic appears to flow through the interface without issue if I
-> > > disable the MAC-side and enable the PHY-side delay.
-> >=20
-> > I cannot say this is true for TI, but i've often had vendors say that
-> > they want the MAC to do the delay so you can use a PHY which does not
-> > implement delays. However, every single RGMII PHY driver in Linux
-> > supports all four RGMII modes. So it is a bit of a pointless argument.
-> >=20
-> > And MAC vendors want to make full use of the hardware they have, so
-> > naturally want to do the delay in the MAC because they can.
-> >=20
-> > TI is a bit unusual in this, in that they force the delay on. So that
-> > adds a little bit of weight towards maybe there being a design issue
-> > with it turned off.
->
-> Based on internal discussions with the SoC and Documentation teams,
-> disabling TX delay in the MAC (CPSW) is not officially supported by
-> TI. The RGMII switching characteristics have been validated only with
-> the TX delay enabled - users are therefore expected not to disable it.
+I think this is the key part: there is nothing wrong on temporarily 
+basing your stuff on linux-next, while we are waiting for this merge 
+window to end and relevant patches showing up in either tree after the 
+rebase.
 
-Of all the myriad settings of the SoC, this was the one which was
-not validated? Anyway, TI should really get that communicated in a
-proper way because in the e2e forum you'll get the exact opposite
-answer, which is, it is a documentation issue. And also, the
-original document available to TI engineers apparently has that setting
-documented (judging by the screenshot in the e2e forum).
+You should mention below the "---" your intentions like "This patch is 
+supposed to go via the XXX tree, but it currently also depends on 
+patches in the YYY tree. For now, this patch is based on linux-next, but 
+will apply cleanly (or get rebased) after XXX was rebased."
 
-> Disabling the TX delay may or may not result in an operational system.
-> This holds true for all SoCs with various CPSW instances that are
-> programmed by the am65-cpsw-nuss.c driver along with the phy-gmii-sel.c
-> driver.
+Also, probably best to indicate the patch as being RFC (instead of 
+linux-next) until there is a stable "base".
 
-In that case u-boot shall be fixed, soon. And to workaround older
-u-boot versions, linux shall always enable that delay, like Andrew
-proposed.
+-- 
+Cheers,
 
-> In addition to the above, I would like to point out the source of
-> confusion. When the am65-cpsw-nuss.c driver was written(2020), the
-> documentation indicated that the internal delay could be disabled.
-> Later on, the documentation was updated to indicate that internal
-> delay cannot (should not) be disabled by marking the feature reserved.
+David / dhildenb
 
-> This was done to be consistent with the hardware validation performed.
-> As a result, older documentation contains references to the possibility
-> of disabling the internal delay whereas newer documentation doesn't.
-
-See above, that seems to be still the case.
-
--michael
-
---10d157f1bbc1d46e05d56827db4bb5cdcb9554d40060213328a4fcc6eada
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iKgEABMJADAWIQTIVZIcOo5wfU/AngkSJzzuPgIf+AUCaJBjORIcbXdhbGxlQGtl
-cm5lbC5vcmcACgkQEic87j4CH/hpXQGAiBriOv6IxHVS6UwhziglQphaJZrmpxYR
-YAbDagIe390sSFp7Pi0Y/oVGf3FwEuHfAYC/fr7B4DQ+HPyxVJof5DCRAUkBIns4
-Ee7ORDQG56K+mXINMqu2MEjWSOkZ3HgzZBw=
-=zjdQ
------END PGP SIGNATURE-----
-
---10d157f1bbc1d46e05d56827db4bb5cdcb9554d40060213328a4fcc6eada--
 
