@@ -1,122 +1,159 @@
-Return-Path: <netdev+bounces-211512-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211513-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B084B19DFF
-	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 10:52:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D49D9B19E4C
+	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 11:07:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C8F57178368
-	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 08:52:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 12A6D16FB11
+	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 09:07:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81B15242D6B;
-	Mon,  4 Aug 2025 08:52:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC70A24469A;
+	Mon,  4 Aug 2025 09:06:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="stE82VZ7";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Jgau77CO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f177.google.com (mail-vk1-f177.google.com [209.85.221.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-b3-smtp.messagingengine.com (fout-b3-smtp.messagingengine.com [202.12.124.146])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9244F23BD13;
-	Mon,  4 Aug 2025 08:52:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D05B246799
+	for <netdev@vger.kernel.org>; Mon,  4 Aug 2025 09:05:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.146
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754297533; cv=none; b=GOoKZs2rTXzpeA/Be53NoO3IzXYAcYfHJojXnFWqscszSivyQyE0iUpruC3uebbK9Y9wagZaL1kJZBLlA61YxDyIP530Rdnm4aAnuM31d44TzPZBl0zbbuvltdSKTuuRrLSnVUYaDbJDxBrsz4ivMNiAR4p3thGYw8u/BESwT4Y=
+	t=1754298362; cv=none; b=GXzWtLXdL+xqwPVQf5ihjk/tKD920QNi9alSpWe/G2C1Aj9SJBmrbwGHw9zl+PM8EBx9yEuwgsctNgzYg02l+TMyswGZqcNn3LoNufX8RcT7cWUz3MJA3gV6CJz5KJsfq+IVzFqYMX4DpaJeQ+WRWBfdmN31f/wHD+ioXLG1WR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754297533; c=relaxed/simple;
-	bh=4IU7flpgXJZ3fJEZAMijk8bAbla+8cir3PEIuaUq/rc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=O66FMvn9BdPCOFRINv1f7bgd7xT/Gb6dMX+cFdrnHUl4RhKv1plbhhOu3i2+JUz7hlFcJmguBrYP2tzYE3dra2Fy7qwD5oavN689ykqU/VCYBwvWzUqQgCmoCpoz7aMnHXKOD82kbADb0o52LW+Hpw0yKgTHGCR6/vInkhfty/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f177.google.com with SMTP id 71dfb90a1353d-539425e3719so1766915e0c.0;
-        Mon, 04 Aug 2025 01:52:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754297530; x=1754902330;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=r5QpB/JqeqeUdWePuoOvkxy8agxOZ5xx1VKurmtRXZE=;
-        b=NZwl7MTh5tNwIsPN8ulLwRuBY72qiV8eKi8GWMzzV4zkPQJF4bEkwvXxtCVHcEs/Nf
-         KyftiIXswGmVhVVsPR267vJdIoh0VkfwEHNVL45OdjATmjtVWjTa9qIq7wzsvQ00CXHX
-         F97ZPvk/WL/3m7OobYORPHOE4R5HMrdgH/lwUSOC10+BQtAMkXdibtn5YlWz5z8xYCaO
-         f3/WD110MEj9aNSjjMkG5KdYcXUjQ55DD0kzPDPe8KTOucTj+jlHKOGNKeXOg0oxwjHz
-         bbr37iTXRVNVXMpkfKJYb3IommdojYrIEr2KprStlVw7QVrOG03vhJnibkr5ki6l3GSM
-         jsRQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU9AO45lFWNp8yz2h5SLA6w8dlzhO3GuL+q6ko6U0Nz9SBUk56jN6ik8k8bRL4Vqc8qhR4GADQ2UtTjoqA=@vger.kernel.org, AJvYcCVhXCoEkUx1+EKTQ72daXdUhY1Ya+LNXal7fbvn0jxhEOdLRkJV6WsVc0DUY1uZ3O7XvfEilasE@vger.kernel.org
-X-Gm-Message-State: AOJu0YybzniOJ/TQCOxYnhyGQMandLBsvftZSGu5tvTUzqn9U4T+Ie9d
-	TIrF3fDrL2a3DlN+EAE0bpLTLqApDdjjCQtZ+d7AdKkk4CJ8OV2+Jo4XnO59y5dU
-X-Gm-Gg: ASbGncsbgThSoDTAnAHaenVKioBxD3UtaYXJ48kqd/Dyx0l5Kb4eTm022rdQN5NzacF
-	3ycqk24jYDppkYGCMIYn1ptVjLoxHoF+ZBLgXP3Az5cwn/T+r5lj2SHvM8Z0pmCAsQPrEoFYiKW
-	Fha1fl1l5mivRt4n/0F6j55YEGtxzhHuicsY5HzQlGHq5qxTdxWYFA5Qc+3wBdxQwfAq5pjBVjE
-	xV7jUta5oPhCT+/+7fSp7t2bjpebbVUv5R94kGOMayLIYpv/f3bq6YLFTH6Q7yai2zM3pejdpbd
-	h2vXDU2slRssJ0Wt5lvHGBDbJWJWbFLTzOQCKja0MTJmjhG+30VBjz1K9yQW70KMWUZ9Lh4TW05
-	H5JPjqnKTiDerQavW1QfZffCyZpffaFBqPvxfAJlk+8quFobFrs/tNRvuQo4e
-X-Google-Smtp-Source: AGHT+IEG94e1NdA1ncJxzW5X3RjeTScjkmDOBRj+mxMcIF3HR8ivv0I8yaujkvqIHvFlNJ+XYIuCcg==
-X-Received: by 2002:a05:6122:62ca:b0:538:e454:ea8e with SMTP id 71dfb90a1353d-53938905a99mr7460158e0c.7.1754297530249;
-        Mon, 04 Aug 2025 01:52:10 -0700 (PDT)
-Received: from mail-ua1-f53.google.com (mail-ua1-f53.google.com. [209.85.222.53])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-53936cbf2dcsm2633683e0c.23.2025.08.04.01.52.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 Aug 2025 01:52:09 -0700 (PDT)
-Received: by mail-ua1-f53.google.com with SMTP id a1e0cc1a2514c-88ba6bb90d6so2966370241.0;
-        Mon, 04 Aug 2025 01:52:09 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVEzdjb0Pd5v/Y5YwMWyJXRzZkY6bjh37nhpNQE1+zLnKuB6nS3YAq1DQW7GuN+8MqrB3b6Oxax@vger.kernel.org, AJvYcCVhzNeh+aMP4uicfYvJOUGk9EVfwdhie1CSPExq4sIVwe+420JR6jRZiPso9KWrSchFRdiCm3B8+DWlO1U=@vger.kernel.org
-X-Received: by 2002:a05:6102:4689:b0:4df:e510:242e with SMTP id
- ada2fe7eead31-4fc0ff376b2mr4798820137.5.1754297529508; Mon, 04 Aug 2025
- 01:52:09 -0700 (PDT)
+	s=arc-20240116; t=1754298362; c=relaxed/simple;
+	bh=UEWNFZuFB3T68g8Jczf1ar/uvZclDkj1aIzuWTtqSr8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=r51RGL4S3AvxKH5pH9bYVVpu8izADPp4qm/6wJ9eSOl4qSoFR1iaEx/DwRJVUEE1S4BPdN1IzyKsULDFu4LvU3MlVEhzOVd76GWUZlTnZFCecV9QJqTV38ug7/zR2XtT4DCKqyjfbyMPmctpt0bJlZ1Kwj6+t7ij5pWILKr9Xjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=stE82VZ7; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Jgau77CO; arc=none smtp.client-ip=202.12.124.146
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-10.internal (phl-compute-10.phl.internal [10.202.2.50])
+	by mailfout.stl.internal (Postfix) with ESMTP id 37C401D000D9;
+	Mon,  4 Aug 2025 05:05:57 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-10.internal (MEProxy); Mon, 04 Aug 2025 05:05:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-transfer-encoding:content-type:date:date:from
+	:from:in-reply-to:message-id:mime-version:reply-to:subject
+	:subject:to:to; s=fm1; t=1754298357; x=1754384757; bh=eFS3d3L/IM
+	mUBqctBUBdM6QArqx14vozeDEmn7cNfaM=; b=stE82VZ7BzAGbxlsTOws2FM0TG
+	mH0677mPof71cpJLG0uwDNUI+luZGdmyiRBAW159Gvnu8jteo9/aTX7psuM5tbEB
+	WK9kld7MW6re2DWKnuW1J1Bj/GOTiEjcldvbuMuehqnScWOoWRL1fU7WBcc/oaSJ
+	vwPYtKY0AWMCwcc7LLkpkNuLdtAa9xwIHsZUeAHCIeePyS2qJgGo+Ma4NiKoDHtI
+	pezqKtiuLYtGaC6cdFqV2+xX8vMmVgdXt7G5KxVthp1PtdzWzjf3xX/z6d741pQK
+	7unNUZBdrGHYVbMrZdyHU577IO7TsZKsK/aWq6tNjyEYnGUkEw7oxQ/x8FUg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1754298357; x=1754384757; bh=eFS3d3L/IMmUBqctBUBdM6QArqx14vozeDE
+	mn7cNfaM=; b=Jgau77CO/OVM5OElJILZNIXtKUmlZ+RawAZ/ipRxQH8dIFJtqdT
+	hks6Itg3WmqHubzZObanVdHHQge8v4UqvVQ9jrpqXZZoBO8sYNgBjXF/xL1PhE5m
+	vt5OKTkiCb358Q4BJwKPnAEkdaVrxIlqjyn/hNM0pkZYy0q6KYBx8ujjYWjy+jgr
+	x+SpSKm+vs5HrKFtytYcazidYctWrZtj/CWGJoRry5EfhcnqBDECPKyABS08oq09
+	1p+raIJmh6CX9Mn/l0Jg9Bo2rQE6XrTHhRydkfQ1yUGUDpa7qJKgj+O7e6WT41xo
+	SmI9rIi6zNWUICf1DNuIYYxImTOGKnniy/w==
+X-ME-Sender: <xms:83eQaJH1Bfw8P2bbPy5_H_PA_50ke0_LdmW6XbUwGP4bypu7FC4VRA>
+    <xme:83eQaLSSYlxaOESDrS_1eNNsSC0VbhjMvr9qfsfUzRALpipkecb6FkHldo5hBq8i4
+    v5N5qosoW3g2MU9d5s>
+X-ME-Received: <xmr:83eQaGxMn7DxmcP3w5RZItPwNL8UHMlFd785i7rGfdMe9qUzltK9aX-2-jZR>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdduuddukeekucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhephffvvefufffkofgggfestdekredtredttdenucfhrhhomhepufgrsghrihhnrgcu
+    ffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrfgrth
+    htvghrnheptefhieejudeileehvefhjefhudduheekleelvedvkeffieevjedvgfeljefh
+    udefnecuffhomhgrihhnpehshiiikhgrlhhlvghrrdgrphhpshhpohhtrdgtohhmnecuve
+    hluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepshgusehquhgv
+    rghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeejpdhmohguvgepshhmthhpoh
+    huthdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgt
+    phhtthhopehsugesqhhuvggrshihshhnrghilhdrnhgvthdprhgtphhtthhopehsthgvfh
+    hfvghnrdhklhgrshhsvghrthesshgvtghunhgvthdrtghomhdprhgtphhtthhopehhvghr
+    sggvrhhtsehgohhnughorhdrrghprghnrgdrohhrghdrrghupdhrtghpthhtohepuggrvh
+    gvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopeigihihohhurdifrghnghgt
+    ohhnghesghhmrghilhdrtghomhdprhgtphhtthhopehshiiisghothdoieeigedurgeiud
+    hfvgdtvgdvvgeklegrvgektgehsehshiiikhgrlhhlvghrrdgrphhpshhpohhtmhgrihhl
+    rdgtohhm
+X-ME-Proxy: <xmx:83eQaHcgS5YeobgwDUkazsUwC2A9frmtSPFSsCDpB__obakvaxxTKQ>
+    <xmx:83eQaJO6k31ksfcfvWsT3T4VrhDBrJeznzbcDkNFXAhYh-fUlMzoAg>
+    <xmx:83eQaCvTzS0XubXhq-b_3XsuvvHezngkNk55YTHkgithlBPhlaiLyA>
+    <xmx:83eQaKBrs5TrIyWSJjiv8-N4-mCy2khq54c_uY4jAwTwhALNqG_cFA>
+    <xmx:9XeQaKWow7V5oER3wHBLBHOmxU-w96DPu40wc9pPKHtcPP3BXegZHeM7>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 4 Aug 2025 05:05:55 -0400 (EDT)
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: netdev@vger.kernel.org
+Cc: Sabrina Dubroca <sd@queasysnail.net>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	syzbot+6641a61fe0e2e89ae8c5@syzkaller.appspotmail.com
+Subject: [PATCH ipsec] xfrm: flush all states in xfrm_state_fini
+Date: Mon,  4 Aug 2025 11:05:43 +0200
+Message-ID: <beb8eb1b675f18281f67665f6181350f33be519f.1753820150.git.sd@queasysnail.net>
+X-Mailer: git-send-email 2.50.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250804083339.3200226-1-arnd@kernel.org>
-In-Reply-To: <20250804083339.3200226-1-arnd@kernel.org>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Mon, 4 Aug 2025 10:51:58 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdVfsx-sNRWRPGPLj=wp-b2jnB8pTBdd7AVqDq4ZZisS+w@mail.gmail.com>
-X-Gm-Features: Ac12FXy411-kQa3rWYorV5SoSgcF9GIrfasroFLsMIq3x61Sc0JlLNlmvUtf7PE
-Message-ID: <CAMuHMdVfsx-sNRWRPGPLj=wp-b2jnB8pTBdd7AVqDq4ZZisS+w@mail.gmail.com>
-Subject: Re: [PATCH] dpll: add back CONFIG_NET dependency
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: Ivan Vecera <ivecera@redhat.com>, Prathosh Satish <Prathosh.Satish@microchip.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Geert Uytterhoeven <geert+renesas@glider.be>, Arnd Bergmann <arnd@arndb.de>, 
-	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hi Arnd,
+While reverting commit f75a2804da39 ("xfrm: destroy xfrm_state
+synchronously on net exit path"), I incorrectly changed
+xfrm_state_flush's "proto" argument back to IPSEC_PROTO_ANY. This
+reverts some of the changes in commit dbb2483b2a46 ("xfrm: clean up
+xfrm protocol checks"), and leads to some states not being removed
+when we exit the netns.
 
-On Mon, 4 Aug 2025 at 10:33, Arnd Bergmann <arnd@kernel.org> wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
->
-> Making the two bus specific front-ends the primary Kconfig symbol
-> results in a build failure when CONFIG_NET is disabled as this now
-> ignores the dependency:
->
-> WARNING: unmet direct dependencies detected for ZL3073X
->   Depends on [n]: NET [=n]
->   Selected by [y]:
->   - ZL3073X_I2C [=y] && I2C [=y]
->
-> Make all of them depend on NET.
->
-> Fixes: a4f0866e3dbb ("dpll: Make ZL3073X invisible")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Pass 0 instead of IPSEC_PROTO_ANY from both xfrm_state_fini
+xfrm6_tunnel_net_exit, so that xfrm_state_flush deletes all states.
 
-Thanks for your patch!
+Fixes: 2a198bbec691 ("Revert "xfrm: destroy xfrm_state synchronously on net exit path"")
+Reported-by: syzbot+6641a61fe0e2e89ae8c5@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=6641a61fe0e2e89ae8c5
+Tested-by: syzbot+6641a61fe0e2e89ae8c5@syzkaller.appspotmail.com
+Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
+---
+ net/ipv6/xfrm6_tunnel.c | 2 +-
+ net/xfrm/xfrm_state.c   | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-I already sent a similar patch two days ago:
-https://lore.kernel.org/all/20250802155302.3673457-1-geert+renesas@glider.be
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
+diff --git a/net/ipv6/xfrm6_tunnel.c b/net/ipv6/xfrm6_tunnel.c
+index 5120a763da0d..0a0eeaed0591 100644
+--- a/net/ipv6/xfrm6_tunnel.c
++++ b/net/ipv6/xfrm6_tunnel.c
+@@ -334,7 +334,7 @@ static void __net_exit xfrm6_tunnel_net_exit(struct net *net)
+ 	struct xfrm6_tunnel_net *xfrm6_tn = xfrm6_tunnel_pernet(net);
+ 	unsigned int i;
+ 
+-	xfrm_state_flush(net, IPSEC_PROTO_ANY, false);
++	xfrm_state_flush(net, 0, false);
+ 	xfrm_flush_gc();
+ 
+ 	for (i = 0; i < XFRM6_TUNNEL_SPI_BYADDR_HSIZE; i++)
+diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+index 97ff756191ba..5f1da305eea8 100644
+--- a/net/xfrm/xfrm_state.c
++++ b/net/xfrm/xfrm_state.c
+@@ -3278,7 +3278,7 @@ void xfrm_state_fini(struct net *net)
+ 	unsigned int sz;
+ 
+ 	flush_work(&net->xfrm.state_hash_work);
+-	xfrm_state_flush(net, IPSEC_PROTO_ANY, false);
++	xfrm_state_flush(net, 0, false);
+ 	flush_work(&xfrm_state_gc_work);
+ 
+ 	WARN_ON(!list_empty(&net->xfrm.state_all));
 -- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+2.50.0
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
 
