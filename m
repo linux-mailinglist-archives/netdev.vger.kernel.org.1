@@ -1,285 +1,232 @@
-Return-Path: <netdev+bounces-211623-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211624-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4AABB1A8EC
-	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 20:08:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2711B1A929
+	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 20:27:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B74562367E
-	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 18:08:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2A1C17DB8F
+	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 18:27:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3868A225A39;
-	Mon,  4 Aug 2025 18:08:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3F3021D3D4;
+	Mon,  4 Aug 2025 18:27:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LX9Jmsj3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f80.google.com (mail-io1-f80.google.com [209.85.166.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F6F52040A8
-	for <netdev@vger.kernel.org>; Mon,  4 Aug 2025 18:08:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AB8028507D
+	for <netdev@vger.kernel.org>; Mon,  4 Aug 2025 18:26:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754330909; cv=none; b=lD+qNCRLYtQ9bs3W/aGlIQzEW5s0eSqrHetm7F2GKPQ8s2WbM1sKBrpovw7pUPFdXx1qbR1QRWRf3CVOSmJkmV517g17zfbuMJsr0lgI1xfgUCxoAGwZy9+P+lsi/q5gK9XCifGnGkKQF+W1hM/vu6gGfVxboSsCkDMngmjkd7k=
+	t=1754332021; cv=none; b=UZLHbC1lulonTWjdJCDsBBobZSZSbwMmh7zHgyWktc5CMCichPm22PfRXNldxGSTOuuyC05quC2ATxNHXw6z9x7h4E4kNjzon0Bqdv+eOnAl2+XqrIE8Het+JY4WYm2elZz5bg2HRLgEYxgmPIERuLAm3Gn4SsPFkXp7mnJggg4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754330909; c=relaxed/simple;
-	bh=66ysC9Q4nIQYXFuIW76nqfbK8r/cKR2ULeQMMla+bRY=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=PPqUW1NGOWKiuxib+OGe2yAcJBjyDoKr5HNg9jZuSPWqHyRliXDZ1MxrjAC6jazxB0TjLQ7S5rcBwwy82BouAgPY8ynfnPCbzfhuz3FlBbdqH+dm62Kvxtpv2Oiv1K+0Ic+pbSshmy2rqXFLICvE4aO6wYnboaIppmJ3wCuxK1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f80.google.com with SMTP id ca18e2360f4ac-881776a2c22so368316839f.3
-        for <netdev@vger.kernel.org>; Mon, 04 Aug 2025 11:08:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754330906; x=1754935706;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pbsA9PsCbbivSzqVX8APYuvJOH1Czyx0s6poCZ4JrCo=;
-        b=plwDsZ9hvbUl96ygQ0z3zUXjgHgywdMWWmxoAYLdOvLu0QCua63pb+NKV/Y1VUMJH0
-         9gCEvaJcs48skwXP5mj1MB0c35yaVy6AEYh3JEPP0L1gSPBaXEtYIcx98AlJHXFnrDEz
-         dUxq3V30H9+6IDBYJPrJOg5Ni8i8BbMJpKZqXCfJdpqCYvVBv28pVkgEWOpBjZ4U34iR
-         4qrtwBj9FnTR6GOF5kIsaGrAvCwTdVpFeUSg0NH04cBaoLRogXGiabKOD3w8UOmJGnU+
-         09ezYRx258nU26kJjiI7b2poxQ2ecEsOPgE9Doqof/9AqW5MdRQpz218grk87+UWV8m7
-         drDA==
-X-Forwarded-Encrypted: i=1; AJvYcCW1lmWxkEK0Mi0PBgsHqwZxSgHmsEYJLBpsulo6rIpyy2qBKp3u3STVTcUV26S4oOahIQWZXLM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+zrzblHJuNa/lM5jSb5HmgBr7uAcLRoRGGTZh9i6Nq1ZIXF0o
-	RVAqiD8N87N7AqRUG3iKA32BUogaeEfcgWHtZAKBcAm2BxQTOR6zFhCE44GO9xD9fLDWLqJIfXg
-	nE/4iQ/QZjoBlI6ofQy3dyku/hgs++ONk3RbDy8BfJwv/cOJDR12dydqMBMo=
-X-Google-Smtp-Source: AGHT+IEto+7Sh8FVausKzc0M6Rfz7inS8Wp0KgIF2Zc9nKqmGtaCby/L63klpJU9T0FMmjSZ/YVoWOtop0xR3myOrw2DMRynEMiZ
+	s=arc-20240116; t=1754332021; c=relaxed/simple;
+	bh=dB9SnGy7bDjV2ukIb32k+gbxItWjYYZUz3Fv/HhcaQ8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=smC/f6uRp25049Xve62hEuRlKC0AQzl+EnMg9Lb6jsafUH49OYsNdRxrFX3NNj2gg/Obzy0ZFAreKSRKqGjIeNm8E7/ylNdsfF2xftguOL6hNbTbUOm/Uwixgm6rF39VdZqTzZIR2JawFMP7nSQLDIYrC7WnY7xIN8+ji5EQCWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LX9Jmsj3; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1754332019;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CRg0w6RoadxtqQ8+K/tTfwdX8XjnbEQ9DKQbLi7rpJA=;
+	b=LX9Jmsj3JdIlW7aynBXIRnESLr73gN9qF3QUtDkrkWhHB48HBpIqbiLnqI+aCzYyfz2k2T
+	T+4/TV/af/Pil0+0cb1FgZNYYkT0HFB93sPwNMdxi8QAVb0+CpDERHLo+DJZA8UWrmU0xO
+	ZMQ/c1IiHtaTkWIC9otQ73i/cfUBGUs=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-108-WQP9F4q9NT6s0R0sbCLD8A-1; Mon,
+ 04 Aug 2025 14:26:53 -0400
+X-MC-Unique: WQP9F4q9NT6s0R0sbCLD8A-1
+X-Mimecast-MFC-AGG-ID: WQP9F4q9NT6s0R0sbCLD8A_1754332012
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AE36219560AE;
+	Mon,  4 Aug 2025 18:26:51 +0000 (UTC)
+Received: from [10.44.33.21] (unknown [10.44.33.21])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 86312180035E;
+	Mon,  4 Aug 2025 18:26:46 +0000 (UTC)
+Message-ID: <f96b3236-f8e6-40c1-afb2-7e76894462f9@redhat.com>
+Date: Mon, 4 Aug 2025 20:26:45 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:6b07:b0:881:7a10:80dd with SMTP id
- ca18e2360f4ac-8817a108a51mr940495439f.5.1754330906497; Mon, 04 Aug 2025
- 11:08:26 -0700 (PDT)
-Date: Mon, 04 Aug 2025 11:08:26 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6890f71a.050a0220.7f033.0010.GAE@google.com>
-Subject: [syzbot] [kernfs?] possible deadlock in kernfs_remove
-From: syzbot <syzbot+2d7d0fbb5fb979113ff3@syzkaller.appspotmail.com>
-To: gregkh@linuxfoundation.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com, tj@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/2] dt-bindings: dpll: Add clock ID property
+To: Krzysztof Kozlowski <krzk@kernel.org>, Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Prathosh Satish <Prathosh.Satish@microchip.com>,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Michal Schmidt <mschmidt@redhat.com>, Petr Oros <poros@redhat.com>
+References: <20250717171100.2245998-1-ivecera@redhat.com>
+ <20250717171100.2245998-2-ivecera@redhat.com>
+ <5ff2bb3e-789e-4543-a951-e7f2c0cde80d@kernel.org>
+ <6937b833-4f3b-46cc-84a6-d259c5dc842a@redhat.com>
+ <20250721-lean-strong-sponge-7ab0be@kuoka>
+ <804b4a5f-06bc-4943-8801-2582463c28ef@redhat.com>
+ <9220f776-8c82-474b-93fc-ad6b84faf5cc@kernel.org>
+ <466e293c-122f-4e11-97d2-6f2611a5178e@redhat.com>
+ <db39e1ff-8f83-468c-a8cb-0dd7c5a98b85@kernel.org>
+Content-Language: en-US
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <db39e1ff-8f83-468c-a8cb-0dd7c5a98b85@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-Hello,
+On 03. 08. 25 1:12 odp., Krzysztof Kozlowski wrote:
+> On 23/07/2025 09:23, Ivan Vecera wrote:
+>>
+>>
+>> On 23. 07. 25 8:25 dop., Krzysztof Kozlowski wrote:
+>>> On 21/07/2025 14:54, Ivan Vecera wrote:
+>>>> On 21. 07. 25 11:23 dop., Krzysztof Kozlowski wrote:
+>>>>> On Fri, Jul 18, 2025 at 02:16:41PM +0200, Ivan Vecera wrote:
+>>>>>> Hi Krzysztof,
+>>>>>>
+>>>>>> ...
+>>>>>>
+>>>>>> The clock-id property name may have been poorly chosen. This ID is used by
+>>>>>> the DPLL subsystem during the registration of a DPLL channel, along with its
+>>>>>> channel ID. A driver that provides DPLL functionality can compute this
+>>>>>> clock-id from any unique chip information, such as a serial number.
+>>>>>>
+>>>>>> Currently, other drivers that implement DPLL functionality are network
+>>>>>> drivers, and they generate the clock-id from one of their MAC addresses by
+>>>>>> extending it to an EUI-64.
+>>>>>>
+>>>>>> A standalone DPLL device, like the zl3073x, could use a unique property such
+>>>>>> as its serial number, but the zl3073x does not have one. This patch-set is
+>>>>>> motivated by the need to support such devices by allowing the DPLL device ID
+>>>>>> to be passed via the Device Tree (DT), which is similar to how NICs without
+>>>>>> an assigned MAC address are handled.
+>>>>>
+>>>>> You use words like "unique" and MAC, thus I fail to see how one fixed
+>>>>> string for all boards matches this. MACs are unique. Property value set
+>>>>> in DTS for all devices is not.
+>>>>>> You also need to explain who assigns this value (MACs are assigned) or
+>>>>> if no one, then why you cannot use random? I also do not see how this
+>>>>> property solves this...  One person would set it to value "1", other to
+>>>>> "2" but third decide to reuse "1"? How do you solve it for all projects
+>>>>> in the upstream?
+>>>>
+>>>> Some background: Any DPLL driver has to use a unique number during the
+>>>> DPLL device/channel registration. The number must be unique for the
+>>>> device across a clock domain (e.g., a single PTP network).
+>>>>
+>>>> NIC drivers that expose DPLL functionality usually use their MAC address
+>>>> to generate such a unique ID. A standalone DPLL driver does not have
+>>>> this option, as there are no NIC ports and therefore no MAC addresses.
+>>>> Such a driver can use any other source for the ID (e.g., the chip's
+>>>> serial number). Unfortunately, this is not the case for zl3073x-based
+>>>> hardware, as its current firmware revisions do not expose information
+>>>> that could be used to generate the clock ID (this may change in the
+>>>> future).
+>>>>
+>>>> There is no authority that assigns clock ID value ranges similarly to
+>>>> MAC addresses (OUIs, etc.), but as mentioned above, uniqueness is
+>>>> required across a single PTP network so duplicates outside this
+>>>> single network are not a problem.
+>>>
+>>> You did not address main concern. You will configure the same value for
+>>> all boards, so how do you solve uniqueness within PTP network?
+>>
+>> This value differs across boards, similar to the local-mac-address. The
+>> device tree specifies the entry, and the bootloader or system firmware
+>> (like U-Boot) provides the actual value.
+> This should be clearly explained in commit msg or pull request to dtschema.
+> 
+> Where are patches for U-Boot? lore gives me 0 results.
 
-syzbot found the following issue on:
+Hi Krzysztof,
 
-HEAD commit:    759dfc7d04ba netlink: avoid infinite retry looping in netl..
-git tree:       net
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=11332f82580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=ac0888b9ad46cd69
-dashboard link: https://syzkaller.appspot.com/bug?extid=2d7d0fbb5fb979113ff3
-compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1136d9bc580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1536d9bc580000
+This was just an idea how to provide such information. But...
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/19f96268d2a7/disk-759dfc7d.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/231a4e67d668/vmlinux-759dfc7d.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/166f12d38b7a/bzImage-759dfc7d.xz
+We had a upstream meeting regarding this issue, how to deal with this
+issue in situations where a DPLL device is used to drive a PHC present
+in a network controller.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+2d7d0fbb5fb979113ff3@syzkaller.appspotmail.com
+Let's say we have a SyncE setup with two network controllers where each
+of them feeds a DPLL channel with recovered clock received from some of
+its PHY. The DPLL channel cleans/stabilizes this input signal (generates
+phase aligned signal locked to the same frequency as the input one) and
+routes it back to the network controller.
 
-======================================================
-WARNING: possible circular locking dependency detected
-6.16.0-syzkaller-06588-g759dfc7d04ba #0 Not tainted
-------------------------------------------------------
-syz-executor258/5840 is trying to acquire lock:
-ffff88801b2ff188 (&root->kernfs_rwsem){++++}-{4:4}, at: kernfs_remove+0x30/0x60 fs/kernfs/dir.c:1549
+     +-----------+
+  +--|   NIC 1   |<-+
+  |  +-----------+  |
+  |                 |
+  | RxCLK     TxCLK |
+  |                 |
+  |  +-----------+  |
+  +->| channel 1 |--+
+     |-- DPLL ---|
+  +->| channel 2 |--+
+  |  +-----------+  |
+  |                 |
+  | RxCLK     TxCLK |
+  |                 |
+  |  +-----------+  |
+  +--|   NIC 2   |<-+
+     +-----------+
 
-but task is already holding lock:
-ffff8881433a4558 (&q->q_usage_counter(io)#49){++++}-{0:0}, at: nbd_start_device+0x17f/0xb10 drivers/block/nbd.c:1478
+The PHCs implemented by the NICs have associated the ClockIdentity
+(according IEEE 1588-2008) whose value is typically derived from
+the NIC's MAC address using EUI-64. The DPLL channel should be
+registered to DPLL subsystem using the same ClockIdentity as the PHC
+it drives. In above example DPLL channel 1 should have the same clock ID
+as NIC1 PHC and channel 2 as NIC2 PHC.
 
-which lock already depends on the new lock.
+During the discussion, Andrew had the idea to provide NIC phandles
+instead of clock ID values.
 
+Something like this:
 
-the existing dependency chain (in reverse order) is:
+diff --git a/Documentation/devicetree/bindings/dpll/dpll-device.yaml 
+b/Documenta
+tion/devicetree/bindings/dpll/dpll-device.yaml
+index fb8d7a9a3693f..159d9253bc8ae 100644
+--- a/Documentation/devicetree/bindings/dpll/dpll-device.yaml
++++ b/Documentation/devicetree/bindings/dpll/dpll-device.yaml
+@@ -33,6 +33,13 @@ properties:
+      items:
+        enum: [pps, eec]
 
--> #2 (&q->q_usage_counter(io)#49){++++}-{0:0}:
-       lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5868
-       blk_alloc_queue+0x538/0x620 block/blk-core.c:461
-       blk_mq_alloc_queue block/blk-mq.c:4400 [inline]
-       __blk_mq_alloc_disk+0x15c/0x340 block/blk-mq.c:4447
-       nbd_dev_add+0x46c/0xae0 drivers/block/nbd.c:1943
-       nbd_init+0x168/0x1f0 drivers/block/nbd.c:2680
-       do_one_initcall+0x233/0x820 init/main.c:1269
-       do_initcall_level+0x104/0x190 init/main.c:1331
-       do_initcalls+0x59/0xa0 init/main.c:1347
-       kernel_init_freeable+0x334/0x4a0 init/main.c:1579
-       kernel_init+0x1d/0x1d0 init/main.c:1469
-       ret_from_fork+0x3fc/0x770 arch/x86/kernel/process.c:148
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
++  ethernet-handles:
++    description:
++      List of phandles to Ethernet devices, one per DPLL instance. Each of
++      these handles identifies Ethernet device that uses particular DPLL
++      instance to synchronize its hardware clock.
++    $ref: /schemas/types.yaml#/definitions/phandle-array
++
+    input-pins:
+      type: object
+      description: DPLL input pins
 
--> #1 (fs_reclaim){+.+.}-{0:0}:
-       lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5868
-       __fs_reclaim_acquire mm/page_alloc.c:4045 [inline]
-       fs_reclaim_acquire+0x72/0x100 mm/page_alloc.c:4059
-       might_alloc include/linux/sched/mm.h:318 [inline]
-       slab_pre_alloc_hook mm/slub.c:4099 [inline]
-       slab_alloc_node mm/slub.c:4177 [inline]
-       kmem_cache_alloc_lru_noprof+0x49/0x3d0 mm/slub.c:4216
-       alloc_inode+0xb8/0x1b0 fs/inode.c:348
-       iget_locked+0xf0/0x570 fs/inode.c:1438
-       kernfs_get_inode+0x4f/0x780 fs/kernfs/inode.c:253
-       kernfs_fill_super fs/kernfs/mount.c:307 [inline]
-       kernfs_get_tree+0x5a9/0x920 fs/kernfs/mount.c:391
-       sysfs_get_tree+0x46/0x110 fs/sysfs/mount.c:31
-       vfs_get_tree+0x8f/0x2b0 fs/super.c:1815
-       do_new_mount+0x2a2/0x9e0 fs/namespace.c:3805
-       do_mount fs/namespace.c:4133 [inline]
-       __do_sys_mount fs/namespace.c:4344 [inline]
-       __se_sys_mount+0x317/0x410 fs/namespace.c:4321
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+A DPLL driver can then use this property to identify a network
+controller, use fwnode_get_mac_address() to get assigned MAC address and
+generate the ClockIdentity for registration from this MAC.
 
--> #0 (&root->kernfs_rwsem){++++}-{4:4}:
-       check_prev_add kernel/locking/lockdep.c:3165 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3284 [inline]
-       validate_chain+0xb9b/0x2140 kernel/locking/lockdep.c:3908
-       __lock_acquire+0xab9/0xd20 kernel/locking/lockdep.c:5237
-       lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5868
-       down_write+0x96/0x1f0 kernel/locking/rwsem.c:1575
-       kernfs_remove+0x30/0x60 fs/kernfs/dir.c:1549
-       __kobject_del+0xe1/0x300 lib/kobject.c:604
-       kobject_del+0x45/0x60 lib/kobject.c:627
-       elv_unregister_queue block/elevator.c:502 [inline]
-       elevator_change_done+0xf2/0x470 block/elevator.c:643
-       elevator_set_none+0x42/0xb0 block/elevator.c:757
-       blk_mq_elv_switch_none block/blk-mq.c:5022 [inline]
-       __blk_mq_update_nr_hw_queues block/blk-mq.c:5063 [inline]
-       blk_mq_update_nr_hw_queues+0x68f/0x1890 block/blk-mq.c:5113
-       nbd_start_device+0x17f/0xb10 drivers/block/nbd.c:1478
-       nbd_genl_connect+0x135b/0x18f0 drivers/block/nbd.c:2228
-       genl_family_rcv_msg_doit+0x215/0x300 net/netlink/genetlink.c:1115
-       genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
-       genl_rcv_msg+0x60e/0x790 net/netlink/genetlink.c:1210
-       netlink_rcv_skb+0x208/0x470 net/netlink/af_netlink.c:2552
-       genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
-       netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
-       netlink_unicast+0x82c/0x9e0 net/netlink/af_netlink.c:1346
-       netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1896
-       sock_sendmsg_nosec net/socket.c:714 [inline]
-       __sock_sendmsg+0x21c/0x270 net/socket.c:729
-       ____sys_sendmsg+0x505/0x830 net/socket.c:2614
-       ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2668
-       __sys_sendmsg net/socket.c:2700 [inline]
-       __do_sys_sendmsg net/socket.c:2705 [inline]
-       __se_sys_sendmsg net/socket.c:2703 [inline]
-       __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2703
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+WDYT about it?
 
-other info that might help us debug this:
+Thanks,
+Ivan
 
-Chain exists of:
-  &root->kernfs_rwsem --> fs_reclaim --> &q->q_usage_counter(io)#49
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&q->q_usage_counter(io)#49);
-                               lock(fs_reclaim);
-                               lock(&q->q_usage_counter(io)#49);
-  lock(&root->kernfs_rwsem);
-
- *** DEADLOCK ***
-
-6 locks held by syz-executor258/5840:
- #0: ffffffff8f56e3f0 (cb_lock){++++}-{4:4}, at: genl_rcv+0x19/0x40 net/netlink/genetlink.c:1218
- #1: ffffffff8f56e208 (genl_mutex){+.+.}-{4:4}, at: genl_lock net/netlink/genetlink.c:35 [inline]
- #1: ffffffff8f56e208 (genl_mutex){+.+.}-{4:4}, at: genl_op_lock net/netlink/genetlink.c:60 [inline]
- #1: ffffffff8f56e208 (genl_mutex){+.+.}-{4:4}, at: genl_rcv_msg+0x10d/0x790 net/netlink/genetlink.c:1209
- #2: ffff888025120988 (&set->update_nr_hwq_lock){++++}-{4:4}, at: blk_mq_update_nr_hw_queues+0xa6/0x1890 block/blk-mq.c:5111
- #3: ffff8880251208d8 (&set->tag_list_lock){+.+.}-{4:4}, at: blk_mq_update_nr_hw_queues+0xb9/0x1890 block/blk-mq.c:5112
- #4: ffff8881433a4558 (&q->q_usage_counter(io)#49){++++}-{0:0}, at: nbd_start_device+0x17f/0xb10 drivers/block/nbd.c:1478
- #5: ffff8881433a4590 (&q->q_usage_counter(queue)){+.+.}-{0:0}, at: nbd_start_device+0x17f/0xb10 drivers/block/nbd.c:1478
-
-stack backtrace:
-CPU: 0 UID: 0 PID: 5840 Comm: syz-executor258 Not tainted 6.16.0-syzkaller-06588-g759dfc7d04ba #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
-Call Trace:
- <TASK>
- dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
- print_circular_bug+0x2ee/0x310 kernel/locking/lockdep.c:2043
- check_noncircular+0x134/0x160 kernel/locking/lockdep.c:2175
- check_prev_add kernel/locking/lockdep.c:3165 [inline]
- check_prevs_add kernel/locking/lockdep.c:3284 [inline]
- validate_chain+0xb9b/0x2140 kernel/locking/lockdep.c:3908
- __lock_acquire+0xab9/0xd20 kernel/locking/lockdep.c:5237
- lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5868
- down_write+0x96/0x1f0 kernel/locking/rwsem.c:1575
- kernfs_remove+0x30/0x60 fs/kernfs/dir.c:1549
- __kobject_del+0xe1/0x300 lib/kobject.c:604
- kobject_del+0x45/0x60 lib/kobject.c:627
- elv_unregister_queue block/elevator.c:502 [inline]
- elevator_change_done+0xf2/0x470 block/elevator.c:643
- elevator_set_none+0x42/0xb0 block/elevator.c:757
- blk_mq_elv_switch_none block/blk-mq.c:5022 [inline]
- __blk_mq_update_nr_hw_queues block/blk-mq.c:5063 [inline]
- blk_mq_update_nr_hw_queues+0x68f/0x1890 block/blk-mq.c:5113
- nbd_start_device+0x17f/0xb10 drivers/block/nbd.c:1478
- nbd_genl_connect+0x135b/0x18f0 drivers/block/nbd.c:2228
- genl_family_rcv_msg_doit+0x215/0x300 net/netlink/genetlink.c:1115
- genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
- genl_rcv_msg+0x60e/0x790 net/netlink/genetlink.c:1210
- netlink_rcv_skb+0x208/0x470 net/netlink/af_netlink.c:2552
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
- netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
- netlink_unicast+0x82c/0x9e0 net/netlink/af_netlink.c:1346
- netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1896
- sock_sendmsg_nosec net/socket.c:714 [inline]
- __sock_sendmsg+0x21c/0x270 net/socket.c:729
- ____sys_sendmsg+0x505/0x830 net/socket.c:2614
- ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2668
- __sys_sendmsg net/socket.c:2700 [inline]
- __do_sys_sendmsg net/socket.c:2705 [inline]
- __se_sys_sendmsg net/socket.c:2703 [inline]
- __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2703
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f773fc67419
-Code: 48 83 c4 28 c3 e8 e7 18 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffc34589e38 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007ffc3458a008 RCX: 00007f773fc67419
-RDX: 0000000020000000 RSI: 0000200000001ac0 RDI: 0000000000000003
-RBP: 00007f773fcda610 R08: 0000000000000008 R09: 00007ffc3458a008
-R10: 000000000000000c R11: 0000000000000246 R12: 0000000000000001
-R13: 00007ffc34589ff8 R14: 0000000000000001 R15: 0000000000000001
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
