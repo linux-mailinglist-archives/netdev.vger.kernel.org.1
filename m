@@ -1,164 +1,165 @@
-Return-Path: <netdev+bounces-211520-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211521-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD480B19EC0
-	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 11:27:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1480B19EC1
+	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 11:28:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 125BE3AD008
-	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 09:27:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CFF171788B4
+	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 09:28:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DA40246BD8;
-	Mon,  4 Aug 2025 09:26:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E8E524469A;
+	Mon,  4 Aug 2025 09:28:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="Vb0yADmW";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="bSeObrkl"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="SL5z7Hhr"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b3-smtp.messagingengine.com (fout-b3-smtp.messagingengine.com [202.12.124.146])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FC53246BBB
-	for <netdev@vger.kernel.org>; Mon,  4 Aug 2025 09:26:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C9AC24337D;
+	Mon,  4 Aug 2025 09:27:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754299607; cv=none; b=DMllvEl1purikdKjFmE3bEdHLid+PTJd1ro4JEu1Sktc9sKPhG4K4PtPzfdFz5Ee3EpDgdScznZEYZJzWmcgtBMhJ9ae3YlyDrVZyjjK3/0ngzV5eeI7EU2chY7P4ymM+N7Y9lesnkkomIfha13hxn21k86pddVFtnsYl7EfQhM=
+	t=1754299682; cv=none; b=hJV7IpZIDf2rdeTJ9+3Dgw7p8alAL60OTR3Sg+heaQ+QCtoDz+Gb7+kxzag8UheIkquqeMcnd9MAQP3OTVRz8z9bYcb1qNa1Vuir0j+iQDNeSSXKeLImKSoNjXm/QpiR0OyeNkMSF/mjW9fIdkKFKHM/ZUYyxiIADhVd94Lwcjk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754299607; c=relaxed/simple;
-	bh=db5PlqPkTNUoyYEYuVqNrMySmP4fWQ+nA9FqFBy/sNM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IYdoRNzmkXzBa0dnUsV7P1GiQSqQIhhJpkZ3hYEYH8pcP5eRmkAejag/stT1hlLw9QryKNNgrai+CvJt+7W8sp/CIO/O0HLX58KGWyUxhSwpcO+gwFcj4oqDJO1rj5H1uv5Q4Y+U1XgdTJYlWlQ4c+A33/tF35N9iJaQo5nKKJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=Vb0yADmW; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=bSeObrkl; arc=none smtp.client-ip=202.12.124.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-03.internal (phl-compute-03.phl.internal [10.202.2.43])
-	by mailfout.stl.internal (Postfix) with ESMTP id 8D3F21D000DD;
-	Mon,  4 Aug 2025 05:26:44 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-03.internal (MEProxy); Mon, 04 Aug 2025 05:26:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-transfer-encoding:content-type:date:date:from
-	:from:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1754299604; x=
-	1754386004; bh=RXurMLp793g6gxB35FS0Vs/kZ+MojVMfMZMgGJhqfMY=; b=V
-	b0yADmWliKwN/zVoXWc4Iod/8VDMRyH1oFn/9hs0kHuELsLSWzizeYx89opnTTmh
-	FG392HxMrXw6gavpkI7ov4a35emCV9xxIU4hlmZU6uZWM2y/8e6oJ6PM4ct3W/dV
-	wOl5RpYwkl94iEcEy6fEddoD0kbXhHnl6gftYuTvCcHd1lQIpmaf5DBryykweH4S
-	Lo738XHtgEifgO5gXWK04/tzkDoPphkVH5CLlg7TlwbH+mT/EkalwO0w6XMjYhi6
-	d+aNbnveELUfej8buNnnBdp1oHs+W4Qu7C66t5qcsbLIL5QiidBBpY4htWrrDETF
-	/c50IZgcZ2sCUYw3RYFvA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm3; t=1754299604; x=1754386004; bh=R
-	XurMLp793g6gxB35FS0Vs/kZ+MojVMfMZMgGJhqfMY=; b=bSeObrklhN9KzawVG
-	ZrJNupEiYhG4JBb8y1f49uHhdCshe72kmbTKBt7wlE9Ixqfr7A8vdsTu9wMrMvUN
-	UIo5AedV8ZZNm/1+qPxKEi/Poip7sLPxLdcCXvY2J4fLQ7fiLIYDMChSujUdap1s
-	Y4Fd8ZJ7BpVFcJA3DWY6XSqj54ZkIsgJbHkZ8sRllQvAuNrgsNCAaY8oC6/Jie8T
-	CV9zEjTzVgZnAROjQCvi/bR8N4Z/Ur7ViilDLM7mkqQVZ1zZStv9nBVrT8AafNTp
-	nFB8U4J0/8JIWS9Loge5zpTbUiCdSruyeaYumo4i0gEULt5MG+A+7qTAvBtr6skj
-	lLixg==
-X-ME-Sender: <xms:1HyQaOLlD4H9b78Nz6ex65fhyDkHYEVzavDGFk3o05w_maplEvEbMA>
-    <xme:1HyQaJPuGlVA70bGW1HfxX7ASS7aHSKP7gK7HK5bca6tqdn3or1jzwfGP30lvFwZy
-    ZqNKd3--V3lSkF1LXQ>
-X-ME-Received: <xmr:1HyQaJV-cTT6bGecmCX-7EdRcfEyGK4TVE2OZlV3p8oQtaMilluOcYzJ9yfL>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdduudduleefucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhephffvvefufffkofgjfhgggfestdekredtredttdenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepveetuedvgeduheeiteelhfetveefveelgeejvddttdejteeitdejgeeh
-    ieeufefhnecuffhomhgrihhnpehknhhofidrnhgvthenucevlhhushhtvghrufhiiigvpe
-    dtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgv
-    thdpnhgspghrtghpthhtohepuddtpdhmohguvgepshhmthhpohhuthdprhgtphhtthhope
-    hnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehsugesqhhu
-    vggrshihshhnrghilhdrnhgvthdprhgtphhtthhopegushgrhhgvrhhnsehkvghrnhgvlh
-    drohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghp
-    thhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrh
-    gvughhrghtrdgtohhmpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhr
-    tghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegrrg
-    htthgvkhgrsehovhhnrdhorhhg
-X-ME-Proxy: <xmx:1HyQaPk6awxCWIHtPWgjZ7i-Sg9n4_aKFKtOwYMwXqZYOwZWh8TbHw>
-    <xmx:1HyQaAM78H_TWzbQQZHkFm9YB665GlhMrJRUXM4RJutPI0QR78UEkw>
-    <xmx:1HyQaPLigxF5KC5qj5wvOhOW2rAeL6K8jBLOdppwaeGIYA82fIzi8g>
-    <xmx:1HyQaC3Pn4-mecjpDBp_xwvp0LijsUn5A_oWI6MwksTWxK9ibS9mAg>
-    <xmx:1HyQaOQ1u2giUKu5gemhNJD4y0uZTeet2ZYOckOJRJ13bJGdPdpfW6qH>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 4 Aug 2025 05:26:43 -0400 (EDT)
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: netdev@vger.kernel.org
-Cc: Sabrina Dubroca <sd@queasysnail.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Ansis Atteka <aatteka@ovn.org>,
-	Steffen Klassert <steffen.klassert@secunet.com>
-Subject: [PATCH ipsec v2 3/3] udp: also consider secpath when evaluating ipsec use for checksumming
-Date: Mon,  4 Aug 2025 11:26:27 +0200
-Message-ID: <fe6740ba307ad0e7b988b874cf713d553924ce0e.1754297051.git.sd@queasysnail.net>
-X-Mailer: git-send-email 2.50.0
-In-Reply-To: <cover.1754297051.git.sd@queasysnail.net>
-References: <cover.1754297051.git.sd@queasysnail.net>
+	s=arc-20240116; t=1754299682; c=relaxed/simple;
+	bh=LH7EqOf3AoVilTrkyp113dp+uJr0ORzeMHBnEtkb4Fw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=o8e0j/Yws2brEOme4N7KiMdMYSFUoCFwvJiA/SDWu0Qg8eB1tNp3P18o+2TvmjbkXJST++1AB+9D+ZrzRSMb2pM9cDak5rsDSf/QyNbEEESR4r3cH273K++vH9KAOElbgNdgxIDPr18Abtgv4hQ0PnX/kwvUkjjh66BFZAyTZng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=SL5z7Hhr; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1754299678;
+	bh=LH7EqOf3AoVilTrkyp113dp+uJr0ORzeMHBnEtkb4Fw=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=SL5z7HhrZCD+bHt6ys6TBTbVFUWFxEV5hkIFT1afE5vLWkcsGZfrwaSoNKmeP/Z0s
+	 WVxm0wU/qm+3r1lr/SF9I5k9ZCsNBI9vnsICfAPNHjiJbLR19PHgzbe786qzU+y1Fq
+	 yZ3fE6eQbBCOyNbJROfvLyTk6VNzvPuaiNaTX7K2MAYBx83M4qkipSvBwniPwV1zYI
+	 a2PlrbQVA1TryfGxwW6edcgmnsYBwsX6Um2fSk4SQ3YK0PZWkbKigly99uIlu3x/w+
+	 yd0KXLZlT29zX74Xzm3t4dyEWRx8fU7+eU/Uy7GTN17BxJrePPiwVoRA4SqGdgJjcV
+	 8Ho6rf6+rUSaw==
+Received: from [192.168.1.100] (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: kholk11)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 18F9617E0B8C;
+	Mon,  4 Aug 2025 11:27:57 +0200 (CEST)
+Message-ID: <1db77784-a59a-49bd-89b5-9e81e6d3bafc@collabora.com>
+Date: Mon, 4 Aug 2025 11:27:56 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 09/27] dt-bindings: clock: mediatek: Describe MT8196
+ clock controllers
+To: Krzysztof Kozlowski <krzk@kernel.org>, Laura Nao
+ <laura.nao@collabora.com>, wenst@chromium.org
+Cc: conor+dt@kernel.org, devicetree@vger.kernel.org,
+ guangjie.song@mediatek.com, kernel@collabora.com, krzk+dt@kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org,
+ matthias.bgg@gmail.com, mturquette@baylibre.com, netdev@vger.kernel.org,
+ nfraprado@collabora.com, p.zabel@pengutronix.de, richardcochran@gmail.com,
+ robh@kernel.org, sboyd@kernel.org
+References: <fbe7b083-bc3f-4156-8056-e45c9adcb607@kernel.org>
+ <20250804083540.19099-1-laura.nao@collabora.com>
+ <373f44c3-8a6a-4d52-ba6b-4c9484e2eac1@kernel.org>
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Content-Language: en-US
+In-Reply-To: <373f44c3-8a6a-4d52-ba6b-4c9484e2eac1@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Commit b40c5f4fde22 ("udp: disable inner UDP checksum offloads in
-IPsec case") tried to fix checksumming in UFO when the packets are
-going through IPsec, so that we can't rely on offloads because the UDP
-header and payload will be encrypted.
+Il 04/08/25 11:16, Krzysztof Kozlowski ha scritto:
+> On 04/08/2025 10:35, Laura Nao wrote:
+>> Hi,
+>>
+>> On 8/3/25 10:17, Krzysztof Kozlowski wrote:
+>>> On 01/08/2025 15:57, Rob Herring wrote:
+>>>>> +  reg:
+>>>>> +    maxItems: 1
+>>>>> +
+>>>>> +  '#clock-cells':
+>>>>> +    const: 1
+>>>>> +
+>>>>> +  '#reset-cells':
+>>>>> +    const: 1
+>>>>> +    description:
+>>>>> +      Reset lines for PEXTP0/1 and UFS blocks.
+>>>>> +
+>>>>> +  mediatek,hardware-voter:
+>>>>> +    $ref: /schemas/types.yaml#/definitions/phandle
+>>>>> +    description:
+>>>>> +      On the MT8196 SoC, a Hardware Voter (HWV) backed by a fixed-function
+>>>>> +      MCU manages clock and power domain control across the AP and other
+>>>>> +      remote processors. By aggregating their votes, it ensures clocks are
+>>>>> +      safely enabled/disabled and power domains are active before register
+>>>>> +      access.
+>>>>
+>>>> I thought this was going away based on v2 discussion?
+>>>
+>>> Yes, I asked to drop it and do not include it in v3. There was also
+>>> discussion clarifying review.
+>>>
+>>> I am really surprised that review meant nothing and code is still the same.
+>>>
+>>
+>> This has been re-submitted as-is, following the outcome of the discussion
+>> here: https://lore.kernel.org/all/242bf682-cf8f-4469-8a0b-9ec982095f04@collabora.com/
+>>
+>> We haven't found a viable alternative to the current approach so far, and
+>> the thread outlines why other options don’t apply. I'm happy to continue
+>> the discussion there if anyone has further suggestions or ideas on how
+>> to address this.
+>>
+> 
+> And where is any of that resolution/new facts in the commit msg? You
+> must clearly reflect long discussions like that in the commit msg.
 
-But when doing a TCP test over VXLAN going through IPsec transport
-mode with GSO enabled (esp4_offload module loaded), I'm seeing broken
-UDP checksums on the encap after successful decryption.
+On that, I agree. That's a miss.
 
-The skbs get to udp4_ufo_fragment/__skb_udp_tunnel_segment via
-__dev_queue_xmit -> validate_xmit_skb -> skb_gso_segment and at this
-point we've already dropped the dst (unless the device sets
-IFF_XMIT_DST_RELEASE, which is not common), so need_ipsec is false and
-we proceed with checksum offload.
+> 
+> There was no objection from Chen to use clocks or power domains as I
+> requested.
 
-Make need_ipsec also check the secpath, which is not dropped on this
-callpath.
+Sorry Krzysztof, but now I really think that you don't understand the basics of
+MediaTek SoCs and how they're split in hardware - and I'm sorry again, but to me
+it really looks like that you're not even trying to understand it.
 
-Fixes: b40c5f4fde22 ("udp: disable inner UDP checksum offloads in IPsec case")
-Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
----
-v2: unchanged
+> The objection was about DUPLICATING interfaces or nodes.
 
-Since the issue is related to IPsec and currently not visible as
-GSO is currently broken for SW crypto, I'm including this patch in the
-same series for the ipsec tree. I can split it out if that's prefered,
-just let me know.
+I don't see that duplication. The interface to each clock controller for each
+of the hardware subdomains of each controller is scattered all around the (broken
+by hardware and by concept, if you missed that in the discussion) HW Voter MMIO.
 
- net/ipv4/udp_offload.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+There are multiple clock controllers in the hardware.
+Each of those has its own interface to the HWV.
 
-diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
-index 85b5aa82d7d7..8758701c67d0 100644
---- a/net/ipv4/udp_offload.c
-+++ b/net/ipv4/udp_offload.c
-@@ -224,7 +224,7 @@ static struct sk_buff *__skb_udp_tunnel_segment(struct sk_buff *skb,
- 	remcsum = !!(skb_shinfo(skb)->gso_type & SKB_GSO_TUNNEL_REMCSUM);
- 	skb->remcsum_offload = remcsum;
- 
--	need_ipsec = skb_dst(skb) && dst_xfrm(skb_dst(skb));
-+	need_ipsec = (skb_dst(skb) && dst_xfrm(skb_dst(skb))) || skb_sec_path(skb);
- 	/* Try to offload checksum if possible */
- 	offload_csum = !!(need_csum &&
- 			  !need_ipsec &&
--- 
-2.50.0
+And there are some that require you to write to both its HWV interface and to the
+clock controller specific MMIO at the same time for the same operation. I explained
+that in the big discussion that Laura linked.
 
+> 
+> And what was the resolution:
+> 
+> "Regarding that to be a single clock controller,"
+> 
+> So where is the clock controller? I still see HW voter!
+
+"especially the mux-gate clocks can't really be put in one single clock controller
+because to manage those we have to write to the HWV *and* to the clock controller
+MMIO"
+
+Clarifying that, "the clock controller" -> "each clock controller of each hardware
+subdomain" (not a single clock controller, excuse my bad wording).
+
+Regards,
+Angelo
 
