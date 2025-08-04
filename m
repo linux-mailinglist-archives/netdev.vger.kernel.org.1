@@ -1,222 +1,156 @@
-Return-Path: <netdev+bounces-211573-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211574-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC3FAB1A335
-	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 15:27:20 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B7DEB1A365
+	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 15:35:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1FD4A1890550
-	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 13:27:39 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 00CED4E1780
+	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 13:35:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 174AB266EFE;
-	Mon,  4 Aug 2025 13:27:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A7BD26D4DE;
+	Mon,  4 Aug 2025 13:34:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="EyfmxvdX"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="JAUh1LIj"
 X-Original-To: netdev@vger.kernel.org
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A999259CA0;
-	Mon,  4 Aug 2025 13:27:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEF7926058D;
+	Mon,  4 Aug 2025 13:34:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754314033; cv=none; b=CwK9G3UbPtC/K75aFRXx7QRQGVs0zJZEDitnb0K/dV6NgGVe5t2kiXHUB0k9bZ36FFVb3kZjV5xvGf/kDZHSJ40cPbeThRRuZUOzLRb2jaq33laOpVnYoyu+WfQgFFBSC1jyBxRyWM40DYbszasUy75/90Pv3gwTcJ948HUyWqw=
+	t=1754314446; cv=none; b=mcCsm5hne73ncQEV/yKFSq/spzyN9iT90fBh6B+1cBhRAYxcnNfRfgXCMOhxlBYOWoTb33IfrMwQEqAH/5bdgtTitmP3yDqXHdJvo25CaCJB9SUXpS8YjQOZBqtTzRTvzlgFLuKel9yEGJ+CLRZVsAfU/MJVvB7+1ADaZ0YuVsc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754314033; c=relaxed/simple;
-	bh=HdvT5261gzhE4aRSmJHv+tFzObgX93mplUmVc06GufI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bJi/S4/2XfIOi0dgcKAhS5b1Zo9+2BUnVVgw2SivzCa6hv8pvdC8BRebuBuUo71VIx0Y2JAOwew7KB0FS8odAgTj0WS9qqcAn9ShplmdqCH3a6yPJQ/bPm86Cl/ZFQYGD8NPceyx428vCW2f9VS27tH6cu/m3ucwDrePhtNWKJI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=EyfmxvdX; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1754314028;
-	bh=HdvT5261gzhE4aRSmJHv+tFzObgX93mplUmVc06GufI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=EyfmxvdXZ+NzDsRzzPqikBca7aExVvjMxp9273QrCTmQDt5W03Ujk77tESdn04Cko
-	 0xSGbdjRQJHSijFEarIcVioaWZakdnvAoCCaSPc/gxCt1hPn64sI47ckjYMeHCmtw/
-	 VRfHcDkV2IjUclj1M2UBJ8IwGDrns57lcScN4xdZbM0UwsciK4xIrPk7151HRdQlmx
-	 lZT6iYkRYJZVLKZq40Ihoygwa70YWtTLZ75HCHrewFFF7J1RtLmn4tIg5xD1HgGJBU
-	 XP2U1JXD+JLDo8+oFCuob8guMEtN+qP5Wn4fxuCJOx727NVTWfCtWG0nC5xNkuFeIC
-	 m42FsuLYnQlzQ==
-Received: from [192.168.1.100] (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
-	(No client certificate requested)
-	(Authenticated sender: kholk11)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 7A25817E01CC;
-	Mon,  4 Aug 2025 15:27:07 +0200 (CEST)
-Message-ID: <00a12553-b248-4193-8017-22fea07ee196@collabora.com>
-Date: Mon, 4 Aug 2025 15:27:07 +0200
+	s=arc-20240116; t=1754314446; c=relaxed/simple;
+	bh=11wdTRrZtYzeH6eb9PhpkmebUR1B+lmtQaeXm6DqDbA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=UaJYGn9PJkpmNzTSWOzAklbbVsodSsPRp28WKtbyobF9+bL5kNAF+60RQSzAFNl7gR5sz9k+nda/dPpu60ldKyMLlf4pLbVUalWox+QfFFuRMSZoGYpjjqgyqrzehooul9befIQ/I93SmgQSLYodJWYQ2XaXXnRwMa8ZPCzZsYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=JAUh1LIj; arc=none smtp.client-ip=217.70.183.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 23EB744278;
+	Mon,  4 Aug 2025 13:33:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1754314440;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=L3F19ni0D0rMQE6sBKRDx0Kq08dUhlD3d42RuDyW7RI=;
+	b=JAUh1LIjf6sGsOeF1M+6HCgaexWuinu/lk6NSlxbE3jGH4S88jLQU9gZfO1w8D7RWs93fj
+	jzkTPbtsGSWQFf+egVqwudIj/F6hANfSBIkTqtPA2GOgPtmgUI0veeF4GKl46le5yeQ5Do
+	9AI4hsZQ32HS/pnkncf9m5AVEUsbCgMDN5GONSwawocMO/mzk6MN9NoZ7nniKjF79jJr2n
+	OJru1HkcpnIeQKmRk5MEfzHpHUhuYJB7vP5sGLTMyY88+gyMibvYYhNjfEf1eQlGc9n/d8
+	C+xRQDPkZS34u4RTd1cvKmmRPIZ/lr+FvXzFH56cE/NT4824/vShpuFXkyWD+A==
+Date: Mon, 4 Aug 2025 15:33:53 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, Jakub Kicinski <kuba@kernel.org>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Russell
+ King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org,
+ Christophe Leroy <christophe.leroy@csgroup.eu>, Herve Codina
+ <herve.codina@bootlin.com>, Florian Fainelli <f.fainelli@gmail.com>, Heiner
+ Kallweit <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Marek
+ =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Oleksij Rempel
+ <o.rempel@pengutronix.de>, =?UTF-8?B?Tmljb2zDsg==?= Veronese
+ <nicveronese@gmail.com>, Simon Horman <horms@kernel.org>,
+ mwojtas@chromium.org, Antoine Tenart <atenart@kernel.org>,
+ devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>, Krzysztof
+ Kozlowski <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>, Romain
+ Gantois <romain.gantois@bootlin.com>, Daniel Golle <daniel@makrotopia.org>,
+ Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+Subject: Re: [PATCH net-next v10 04/15] net: phy: Introduce PHY ports
+ representation
+Message-ID: <20250804153353.1d83f8ab@fedora.home>
+In-Reply-To: <a915e167-1490-4a20-98a8-35b4e5c6c23c@lunn.ch>
+References: <20250722121623.609732-1-maxime.chevallier@bootlin.com>
+	<20250722121623.609732-5-maxime.chevallier@bootlin.com>
+	<a915e167-1490-4a20-98a8-35b4e5c6c23c@lunn.ch>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 09/27] dt-bindings: clock: mediatek: Describe MT8196
- clock controllers
-To: Krzysztof Kozlowski <krzk@kernel.org>, Laura Nao
- <laura.nao@collabora.com>, wenst@chromium.org
-Cc: conor+dt@kernel.org, devicetree@vger.kernel.org,
- guangjie.song@mediatek.com, kernel@collabora.com, krzk+dt@kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org,
- matthias.bgg@gmail.com, mturquette@baylibre.com, netdev@vger.kernel.org,
- nfraprado@collabora.com, p.zabel@pengutronix.de, richardcochran@gmail.com,
- robh@kernel.org, sboyd@kernel.org
-References: <fbe7b083-bc3f-4156-8056-e45c9adcb607@kernel.org>
- <20250804083540.19099-1-laura.nao@collabora.com>
- <373f44c3-8a6a-4d52-ba6b-4c9484e2eac1@kernel.org>
- <1db77784-a59a-49bd-89b5-9e81e6d3bafc@collabora.com>
- <e9ee33b0-d6b0-4641-aeeb-9803b4d1658a@kernel.org>
-From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Content-Language: en-US
-In-Reply-To: <e9ee33b0-d6b0-4641-aeeb-9803b4d1658a@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdduuddvgeduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtjeertdertddvnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgeevledtvdevueehhfevhfelhfekveeftdfgiedufeffieeltddtgfefuefhueeknecukfhppedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjedphhgvlhhopehfvgguohhrrgdrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepfedtpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtp
+ hhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdgrrhhmqdhmshhmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepthhhohhmrghsrdhpvghtrgiiiihonhhisegsohhothhlihhnrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhm
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Il 04/08/25 13:01, Krzysztof Kozlowski ha scritto:
-> On 04/08/2025 11:27, AngeloGioacchino Del Regno wrote:
->> Il 04/08/25 11:16, Krzysztof Kozlowski ha scritto:
->>> On 04/08/2025 10:35, Laura Nao wrote:
->>>> Hi,
->>>>
->>>> On 8/3/25 10:17, Krzysztof Kozlowski wrote:
->>>>> On 01/08/2025 15:57, Rob Herring wrote:
->>>>>>> +  reg:
->>>>>>> +    maxItems: 1
->>>>>>> +
->>>>>>> +  '#clock-cells':
->>>>>>> +    const: 1
->>>>>>> +
->>>>>>> +  '#reset-cells':
->>>>>>> +    const: 1
->>>>>>> +    description:
->>>>>>> +      Reset lines for PEXTP0/1 and UFS blocks.
->>>>>>> +
->>>>>>> +  mediatek,hardware-voter:
->>>>>>> +    $ref: /schemas/types.yaml#/definitions/phandle
->>>>>>> +    description:
->>>>>>> +      On the MT8196 SoC, a Hardware Voter (HWV) backed by a fixed-function
->>>>>>> +      MCU manages clock and power domain control across the AP and other
->>>>>>> +      remote processors. By aggregating their votes, it ensures clocks are
->>>>>>> +      safely enabled/disabled and power domains are active before register
->>>>>>> +      access.
->>>>>>
->>>>>> I thought this was going away based on v2 discussion?
->>>>>
->>>>> Yes, I asked to drop it and do not include it in v3. There was also
->>>>> discussion clarifying review.
->>>>>
->>>>> I am really surprised that review meant nothing and code is still the same.
->>>>>
->>>>
->>>> This has been re-submitted as-is, following the outcome of the discussion
->>>> here: https://lore.kernel.org/all/242bf682-cf8f-4469-8a0b-9ec982095f04@collabora.com/
->>>>
->>>> We haven't found a viable alternative to the current approach so far, and
->>>> the thread outlines why other options don’t apply. I'm happy to continue
->>>> the discussion there if anyone has further suggestions or ideas on how
->>>> to address this.
->>>>
->>>
->>> And where is any of that resolution/new facts in the commit msg? You
->>> must clearly reflect long discussions like that in the commit msg.
->>
->> On that, I agree. That's a miss.
->>
->>>
->>> There was no objection from Chen to use clocks or power domains as I
->>> requested.
->>
->> Sorry Krzysztof, but now I really think that you don't understand the basics of
->> MediaTek SoCs and how they're split in hardware - and I'm sorry again, but to me
->> it really looks like that you're not even trying to understand it.
+On Sat, 26 Jul 2025 22:33:33 +0200
+Andrew Lunn <andrew@lunn.ch> wrote:
+
+> > +
+> > +/**
+> > + * phy_caps_medium_get_supported() - Returns linkmodes supported on a given medium
+> > + * @supported: After this call, contains all possible linkmodes on a given medium,
+> > + *	       and with the given number of lanes.  
 > 
-> There is no DTS here. No diagrams or some simplified drawings to help me
-> understand.
+> Maybe nit picking, but maybe append:
 > 
->>
->>> The objection was about DUPLICATING interfaces or nodes.
->>
->> I don't see that duplication. The interface to each clock controller for each
->> of the hardware subdomains of each controller is scattered all around the (broken
->> by hardware and by concept, if you missed that in the discussion) HW Voter MMIO.
->>
->> There are multiple clock controllers in the hardware.
->> Each of those has its own interface to the HWV.
->>
->> And there are some that require you to write to both its HWV interface and to the
->> clock controller specific MMIO at the same time for the same operation. I explained
->> that in the big discussion that Laura linked.
+> , or less.
 > 
-> That's not what property description says. I discussed that part. Your
-> description says - to aggregate votes.
+> > +		/* For most cases, min_lanes == lanes, except for 10/100BaseT that work
+> > +		 * on 2 lanes but are compatible with 4 lanes mediums
+> > +		 */
+> > +		if (link_mode_params[i].mediums & BIT(medium) &&
+> > +		    link_mode_params[i].lanes >= lanes &&
+> > +		    link_mode_params[i].min_lanes <= lanes) {  
 > 
-
-Yes. That is what the datasheets say, but read down there.
-
-> Above you say that control is split between two different MMIO blocks.
+> We should only care about min_lanes here. I don't think the
+> link_mode_params[i].lanes >= lanes is needed.
 > 
-
-Also yes.
-
-> Aggregating votes is exactly what we discussed last time and you should
-> not use custom phandle for it.
+> Maybe you can add a BUILD_BUG_ON() into the macro to ensure
+> min_lanes <= lanes?
 > 
+> > +struct phy_port *phy_of_parse_port(struct device_node *dn)
+> > +{
+> > +	struct fwnode_handle *fwnode = of_fwnode_handle(dn);
+> > +	enum ethtool_link_medium medium;
+> > +	struct phy_port *port;
+> > +	const char *med_str;
+> > +	u32 lanes, mediums = 0;
+> > +	int ret;
+> > +
+> > +	ret = fwnode_property_read_u32(fwnode, "lanes", &lanes);
+> > +	if (ret)
+> > +		lanes = 0;  
+> 
+> The DT binding says that both properties are required. So i think this
+> should be:
+> 
+> 		return ret;
 
-We discussed about aggregating votes, yes, in software - this instead is a
-*broken* hardware that does the aggregation internally and does not require
-nor want external drivers to do the aggregation.
-
-> Maybe it is just the name, so avoid all the confusing "votes" if this is
-> not voting system. If this is a voting system, then don't use custom
-> phandles.
-
-Being it fundamentally *broken*, this being a voting system is what the hardware
-initially wanted to be - but effectively, since it requires YOU to:
-  - Make sure that power supplies are turned on, if not, turn them on by "touching"
-    HW registers (so, without any assistance from the voter MCU), if any;
-  - Turn on parent clocks manually, if any, before using the "voter mcu" to try
-    to ungate that clock; and
-    - Enable the "FENC" manually, after the mcu says that the clock was ungated.
-
-in the current state, it is just an hardware managed refcounting system and
-nothing else, because the MCU seems to be unfinished, hence, again, b r o k e n.
-
-Note that by "manually" I always mean "with direct writes to a clock controller's
-registerS, and without any automation/assistance from the HWV MCU".
-
-We're using the "hardware-voter" name because this is how MediaTek calls it in the
-datasheets, and no it doesn't really *deserve* that name for what it is exactly in
-MT8196 and MT6991.
-
-And mind you - if using the "interconnect" property for this means that we have to
-add an interconnect driver for it, no, we will not do that, as placing a software
-vote that votes clocks in a a voter MCU that does exactly what the interconnect
-driver would do - then requiring virtual/fake clocks - is not a good solution.
-
-So, what should we do then?
-
-Change it to "mediatek,clock-hw-refcounter", and adding a comment to the binding
-saying that this is called "Hardware Voter (HWV)" in the datasheets?
-
-Or is using the "interconnect" property without any driver in the interconnect API
-actually legit? - Because to me it doesn't look like being legit (and if it is, it
-shouldn't be, as I'm sure that everyone would expect an interconnect API driver
-when encountering an "interconnect" property in DT), and if so, we should just add
-a new "hw-interconnect" or "interconnect-hw" instead to not create confusion.
-
-Regards,
-Angelo
+Ah true indeed, let me fix that then :)
 
 > 
-> Best regards,
-> Krzysztof
+> > + * phy_port_get_type() - get the PORT_* attribut for that port.  
+> 
+> attribut_e_
+> 
+> > +	 * If the port isn't initialized, the port->mediums and port->lanes
+> > +	 * fields must be set, possibly according to stapping information.  
+> 
+> st_r_apping
+> 
+> 	Andrew
 
+Sorry for all the typos, it's a weak excuse but lately my laptop's
+keayboard has been acting up, and it either misses strokes or gets the
+letters stuck in repeat-mode. Russell has similar issues, so I'm still
+unsure if this is a hardware or software thing... I'll install and pass
+spellcheck for the next iteration to avoid that :)
 
+Maxime
 
