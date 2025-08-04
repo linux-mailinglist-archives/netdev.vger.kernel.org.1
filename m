@@ -1,119 +1,77 @@
-Return-Path: <netdev+bounces-211538-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211539-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3174AB19FDF
-	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 12:43:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7380B1A000
+	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 12:49:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 28C964E115B
-	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 10:43:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D8757179B1F
+	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 10:49:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D13D24BC0A;
-	Mon,  4 Aug 2025 10:43:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DF1E242D6F;
+	Mon,  4 Aug 2025 10:49:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="eksKNcVu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SuMpNGzA"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6986242D6C
-	for <netdev@vger.kernel.org>; Mon,  4 Aug 2025 10:43:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24DB320F063;
+	Mon,  4 Aug 2025 10:49:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754304209; cv=none; b=pIPbA2cQhnMOzWEAitpk7dXtS3VeWoWy3ejubxn3IMUtG0krTTSx6/Yl56gJCvC0mQrhA1dlX9YK+qNlFtodSlm+2cx4bbyMwIdYLajLso7jin2eZica7IW9Vo808cz3ScS93j3G6oaZ/BikohnT3KolZjFE7M86F7V/iQAEYfc=
+	t=1754304584; cv=none; b=a4Zh7cxrx1i1zTVrwrow1upYPJ0FDBavvoFzgoysoegCMR4H5j9ON8NaqBjLlCaWARkfYcKsiUJ6MXApxr06SuEOAujilScDca+FD6/McAoWrTDAcJz6tfeR3lKq92tHrB1NqFVl8RGfeFx0D+5n0ebuUYDQrCEEyvEeSM9rxRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754304209; c=relaxed/simple;
-	bh=LB96+Di3hQ5fF0sNfSgu5Q5TIk/SywkEtrDB5PxcLII=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MYWhFeGjCR2MUlLnhnOLSfPDXUOfDceddEebIsXv2rYXa1pX+7IsH5Z9voDr3JKe1+lH0veFmSy9Nt59eMtdXhUQqU7L0xyekW/tokZAs7sIG23avKrAhdW6VzdEbpxv/WZNKyDbUiDFmuNsLGRHArU7HEQnzgNcXb6TZIbmWs4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=eksKNcVu; arc=none smtp.client-ip=91.218.175.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <db583c33-3726-487c-a58f-d57f9a7c5b9c@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1754304204;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OoNroIT4bEA4dsp0NfXJH1mI1a/u9RF3xG7r3lDLIMQ=;
-	b=eksKNcVutLIW4IP3WdZEebZ1zO+hbJYr8F/8QM5wvvzWy3nTBtAcYlSdSyuJtSP4BWgMHl
-	t0EEosaOTTAkfLs5BxlcQBuqNn1jYWHXUTfAOF5Uh84zkC4klw5TYUTXDDOCXF8k4BMoRD
-	zjNKwHkH4A0xr0TEG3njz4mkDb5CxUU=
-Date: Mon, 4 Aug 2025 18:43:16 +0800
+	s=arc-20240116; t=1754304584; c=relaxed/simple;
+	bh=BYwFFiJV4V/E2Ru8AG2PEwqvs2UPmqIVnBQz2HW1sDM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VM+/PyOvqp4YjMDvt6CZdUfvzsHFuzgDWMNPoDVHwTqZqpWp/Yj25VcWp6DgDmcwIq//K+uyOjxRtCGrRA53pv2lDct8dz9HT65Cc8Bzxi939Zc0ZB4qR5/+gcxB7P2S6D3v6tNQnLz8TPgI+0iAKQhfc7w8H9SzAjpj9cucnY4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SuMpNGzA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CAE9C4CEE7;
+	Mon,  4 Aug 2025 10:49:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754304582;
+	bh=BYwFFiJV4V/E2Ru8AG2PEwqvs2UPmqIVnBQz2HW1sDM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SuMpNGzAhAP/Dq5teclu9afjy4IWD6gwByApaDh6NFO2LNV4Nb4Rpg6lLVXpNy162
+	 0W71oTL1mw6/SnyxWvejd99xUgsan0liOmUurX19YgMcScK5qW4Fh61+44ggAxzbRF
+	 iFrrA4hmCuRhDaFwKlw2+Mf1LE6BJZYljJtDCNqZs1X1WLgSkUpzORaMi8XO2LVVBy
+	 A4jLgRYfk+B2m2rt8ZaBlI6egpyRL80PcHYHChWUhK9WN2IJMUyjHPrf98AOcv06EX
+	 44bdc9XcdOpOrUTRJD1AU6nIbvzu3iBn6Ma7UVXaFMKBqFIKSjHhdFMStwdzm3oVzC
+	 jvPRjTA2f8Erw==
+Date: Mon, 4 Aug 2025 11:49:37 +0100
+From: Simon Horman <horms@kernel.org>
+To: maher azz <maherazz04@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>, jiri@resnulli.us,
+	davem@davemloft.net, Eric Dumazet <edumazet@google.com>,
+	pabeni@redhat.com, Ferenc Fejes <fejes@inf.elte.hu>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>
+Subject: Re: [PATCH v2 net] net/sched: mqprio: fix stack out-of-bounds write
+ in tc entry parsing
+Message-ID: <20250804104937.GR8494@horms.kernel.org>
+References: <CAFQ-Uc-5ucm+Dyt2s4vV5AyJKjamF=7E_wCWFROYubR5E1PMUg@mail.gmail.com>
+ <20250801150651.54969a4e@kernel.org>
+ <CAFQ-Uc-15B7eiE9uFWFzPDhj1sfbuzwmWMEA61UXbumybJ=yzw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next] netfilter: clean up returns in
- nf_conntrack_log_invalid_sysctl()
-Content-Language: en-US
-To: Dan Carpenter <dan.carpenter@linaro.org>,
- Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: Jozsef Kadlecsik <kadlec@netfilter.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
- coreteam@netfilter.org, netdev@vger.kernel.org,
- kernel-janitors@vger.kernel.org
-References: <aJCM48RFXO6hjgGm@stanley.mountain>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Lance Yang <lance.yang@linux.dev>
-In-Reply-To: <aJCM48RFXO6hjgGm@stanley.mountain>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFQ-Uc-15B7eiE9uFWFzPDhj1sfbuzwmWMEA61UXbumybJ=yzw@mail.gmail.com>
 
-
-
-On 2025/8/4 18:35, Dan Carpenter wrote:
-> Smatch complains that these look like error paths with missing error
-> codes, especially the one where we return if nf_log_is_registered() is
-> true:
+On Sat, Aug 02, 2025 at 12:25:24AM +0100, maher azz wrote:
+> Can someone please do it instead of me just keep me as the reporter please?
+> this is too complicated, it gets rejected even if im missing a space or a
+> newline
 > 
->      net/netfilter/nf_conntrack_standalone.c:575 nf_conntrack_log_invalid_sysctl()
->      warn: missing error code? 'ret'
-> 
-> In fact, all these return zero deliberately.  Change them to return a
-> literal instead which helps readability as well as silencing the warning.
-> 
-> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+> Thanks for your help and time to review this.
 
-LGTM, feel free to add:
-
-Acked-by: Lance Yang <lance.yang@linux.dev>
-
-> ---
->   net/netfilter/nf_conntrack_standalone.c | 6 +++---
->   1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/net/netfilter/nf_conntrack_standalone.c b/net/netfilter/nf_conntrack_standalone.c
-> index 9b8b10a85233..1f14ef0436c6 100644
-> --- a/net/netfilter/nf_conntrack_standalone.c
-> +++ b/net/netfilter/nf_conntrack_standalone.c
-> @@ -567,16 +567,16 @@ nf_conntrack_log_invalid_sysctl(const struct ctl_table *table, int write,
->   		return ret;
->   
->   	if (*(u8 *)table->data == 0)
-> -		return ret;
-> +		return 0;
->   
->   	/* Load nf_log_syslog only if no logger is currently registered */
->   	for (i = 0; i < NFPROTO_NUMPROTO; i++) {
->   		if (nf_log_is_registered(i))
-> -			return ret;
-> +			return 0;
->   	}
->   	request_module("%s", "nf_log_syslog");
->   
-> -	return ret;
-> +	return 0;
->   }
->   
->   static struct ctl_table_header *nf_ct_netfilter_header;
-
+Sure, will do.
 
