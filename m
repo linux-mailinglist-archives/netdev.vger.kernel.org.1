@@ -1,55 +1,48 @@
-Return-Path: <netdev+bounces-211588-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211589-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A069B1A446
-	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 16:16:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B5ECB1A468
+	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 16:18:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 916AE1704F3
-	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 14:16:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F638180C62
+	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 14:18:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E95B26D4DA;
-	Mon,  4 Aug 2025 14:15:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95C1727054C;
+	Mon,  4 Aug 2025 14:17:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="koaccehe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B2J8rc26"
 X-Original-To: netdev@vger.kernel.org
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7DAE1DED4A;
-	Mon,  4 Aug 2025 14:15:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 710BF25D53C
+	for <netdev@vger.kernel.org>; Mon,  4 Aug 2025 14:17:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754316955; cv=none; b=X8sXxz20v+ZEwtWuZ6nx7uI/f3rwVioK/m7rh5oEAdnmTrQJkobJT9G/curc58HOchenf5gBBFr7ZxOgrWpkoqqMyoIf+AEwBnKnDpLvc7jmZ3OgDf1TdyrFX3FsmZytDdfQR15RM9fCr3SRbzXqdHmxBJQaYZaSOUonIAy5g0Y=
+	t=1754317072; cv=none; b=URfhGx2+98G9ZUgmxOsCVOkQcmuEXfhwBvX+oqfXxoN4F6ozCJETz9hV6tne1EF+KU64ZDUTINi9F/jaF+KlqnIwrby/UgMEL2v2RvfdaMV4oDJL0AS0D7qZbBSrBfk6aQdxtT1TyekRbvbDAaQug4Y6vYkU3nC9HUsIl1jU7M0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754316955; c=relaxed/simple;
-	bh=tRn0xbDxVMK94MG9Cb3SGKBbHQrrDqm+3NMj4MZj5s0=;
+	s=arc-20240116; t=1754317072; c=relaxed/simple;
+	bh=h4l7UFhbf9jvr/iFpJnnx2a2VU5naGmRpVn90WQpP4I=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nfBsy9FbyNFRvKN+ZpJBndGyhvkjCiHeSetLO3eDn9uI+kpW/fFNkwL2114aHQf6cLOfdsz3FmYjusOrc4k5VKU2X5UeiPebLv4O4vEoODLPZZTASv9t6ylKcbt+rTID43uwO8ytyoQ+3dkcyevpToH0NL8AiouhnACZ0Vv7skE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=koaccehe; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1754316950;
-	bh=tRn0xbDxVMK94MG9Cb3SGKBbHQrrDqm+3NMj4MZj5s0=;
+	 In-Reply-To:Content-Type; b=ATJNog2dhaS7R1enwwMENIqaBwxKrc/gDJQmZPGoWJ16JCvgrQlv3wymx4dUC1PEY7NdolPOuESsOXxAgD0dMKmHzXGvH4+Km7iFEBMp86c4JeSs3ACliZ/ocmUscPWOR53bfkN1M8Xk/+KMbltQKxdLjRdMMTtk2wB8L/ZYq9k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B2J8rc26; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DC55C4CEE7;
+	Mon,  4 Aug 2025 14:17:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754317071;
+	bh=h4l7UFhbf9jvr/iFpJnnx2a2VU5naGmRpVn90WQpP4I=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=koaccehefL7o3Jn8URhyuqKY0Yragys0YLh5NB4horLo+SxjExon6RFZ1q1t1pilF
-	 4WTuPyLeOEXOScf9tpixGCN6z++ZlIm3wYpA+LEiG2wI9ARNlb4hav9qlLlasrKN6N
-	 HTWLiNK2qnnKzZ42dIXDvHy//VkIGaTuwnIPIID6YYlcfnVk1jowrpW/YgDYzUdi4f
-	 DHcaKZ5fsGmsp+PSJeBXUY97RuH1U7X6GNxvt/YR8TNR3HnVk3om1Qu+qN/hW5uUMK
-	 KzQ+JiPfAETH+1nvL5Yor2V/03DeynnvCjBlvjsJXTE84z5bBbIZC3TgybCpX3qEUB
-	 p+KaONoIpFM7Q==
-Received: from [192.168.1.100] (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
-	(No client certificate requested)
-	(Authenticated sender: kholk11)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 02B6517E153A;
-	Mon,  4 Aug 2025 16:15:49 +0200 (CEST)
-Message-ID: <62edb8e3-aff6-4225-b520-f4b73aef145d@collabora.com>
-Date: Mon, 4 Aug 2025 16:15:49 +0200
+	b=B2J8rc26MlxBavlmjZzh0pAt/6lleBOOSi4OzRRu5+nAllJK6hxBIoopygnc7jCM9
+	 4QlOF9NnD0JQVSCt7drieRT/itpDMMasB+X8PBP/+CgQynFHFnXVbs/ijhuHUnve1H
+	 9RdM0v2fY72eIp2BHG9l2NtXS9vByRwgs+68R9x6bCQCvNqrQMVotRCsXddby1yMWV
+	 VCJmK66lpvaTazRerk8TggDr/nBMIWFW0xwiIOKJw+uDpEEaB1CDaiM9FTadWf0SKy
+	 oOIXh3EGSd1kCp6gZF+m/ZOUKp0DmuPGa1Q9GQzqAZDBlG//Bd6I7tyJzZ9QUWFC+c
+	 oA6VyHmqesRyg==
+Message-ID: <30c4b5c7-3c83-44f6-a469-f46e463635e5@kernel.org>
+Date: Mon, 4 Aug 2025 16:17:46 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,153 +50,81 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 09/27] dt-bindings: clock: mediatek: Describe MT8196
- clock controllers
-To: Krzysztof Kozlowski <krzk@kernel.org>, Laura Nao
- <laura.nao@collabora.com>, wenst@chromium.org
-Cc: conor+dt@kernel.org, devicetree@vger.kernel.org,
- guangjie.song@mediatek.com, kernel@collabora.com, krzk+dt@kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org,
- matthias.bgg@gmail.com, mturquette@baylibre.com, netdev@vger.kernel.org,
- nfraprado@collabora.com, p.zabel@pengutronix.de, richardcochran@gmail.com,
- robh@kernel.org, sboyd@kernel.org
-References: <fbe7b083-bc3f-4156-8056-e45c9adcb607@kernel.org>
- <20250804083540.19099-1-laura.nao@collabora.com>
- <373f44c3-8a6a-4d52-ba6b-4c9484e2eac1@kernel.org>
- <1db77784-a59a-49bd-89b5-9e81e6d3bafc@collabora.com>
- <e9ee33b0-d6b0-4641-aeeb-9803b4d1658a@kernel.org>
- <00a12553-b248-4193-8017-22fea07ee196@collabora.com>
- <2555e9fe-3bc0-4f89-9d0b-2f7f946632e7@kernel.org>
-From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Subject: Re: [PATCH net] net: page_pool: allow enabling recycling late, fix
+ false positive warning
+To: Stanislav Fomichev <stfomichev@gmail.com>,
+ Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ David Wei <dw@davidwei.uk>, michael.chan@broadcom.com,
+ pavan.chebbi@broadcom.com, ilias.apalodimas@linaro.org,
+ almasrymina@google.com, sdf@fomichev.me
+References: <20250801173011.2454447-1-kuba@kernel.org>
+ <aI0prRzAJkEXdkEa@mini-arch> <20250801140506.5b3e7213@kernel.org>
+ <aI0zVd1QJ-CMVX3u@mini-arch>
 Content-Language: en-US
-In-Reply-To: <2555e9fe-3bc0-4f89-9d0b-2f7f946632e7@kernel.org>
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <aI0zVd1QJ-CMVX3u@mini-arch>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Il 04/08/25 15:58, Krzysztof Kozlowski ha scritto:
-> On 04/08/2025 15:27, AngeloGioacchino Del Regno wrote:
+
+
+On 01/08/2025 23.36, Stanislav Fomichev wrote:
+> On 08/01, Jakub Kicinski wrote:
+>> On Fri, 1 Aug 2025 13:55:09 -0700 Stanislav Fomichev wrote:
+>>>> +static void bnxt_enable_rx_page_pool(struct bnxt_rx_ring_info *rxr)
+>>>> +{
+>>>> +	page_pool_enable_direct_recycling(rxr->head_pool, &rxr->bnapi->napi);
+>>>> +	page_pool_enable_direct_recycling(rxr->page_pool, &rxr->bnapi->napi);
+>>>
+>>> We do bnxt_separate_head_pool check for the disable_direct_recycling
+>>> of head_pool. Is it safe to skip the check here because we always allocate two
+>>> pps from queue_mgmt callbacks? (not clear for me from a quick glance at
+>>> bnxt_alloc_rx_page_pool)
 >>
->> We discussed about aggregating votes, yes, in software - this instead is a
->> *broken* hardware that does the aggregation internally and does not require
->> nor want external drivers to do the aggregation.
+>> It's safe (I hope) because the helper is duplicate-call-friendly:
 >>
->>> Maybe it is just the name, so avoid all the confusing "votes" if this is
->>> not voting system. If this is a voting system, then don't use custom
->>> phandles.
+>> +void page_pool_enable_direct_recycling(struct page_pool *pool,
+>> +				       struct napi_struct *napi)
+>> +{
+>> +	if (READ_ONCE(pool->p.napi) == napi)   <<< right here
+>> +		return;
+>> +	WARN_ON_ONCE(!napi || pool->p.napi);
+
+Why only warn once?
+(this is setup code path, so it should not get invoked a lot)
+
+>> +
+>> +	mutex_lock(&page_pools_lock);
+>> +	WRITE_ONCE(pool->p.napi, napi);
+>> +	mutex_unlock(&page_pools_lock);
+>> +}
 >>
->> Being it fundamentally *broken*, this being a voting system is what the hardware
->> initially wanted to be - but effectively, since it requires YOU to:
->>    - Make sure that power supplies are turned on, if not, turn them on by "touching"
->>      HW registers (so, without any assistance from the voter MCU), if any;
->>    - Turn on parent clocks manually, if any, before using the "voter mcu" to try
->>      to ungate that clock; and
->>      - Enable the "FENC" manually, after the mcu says that the clock was ungated.
-> 
-> 
-> I understand that "YOU" as Linux driver, when you want to do something
-> (e.g. toggle) a clock?
-
-"you" == Linux driver, yes.
-
-> If so this looks a lot like power domain, although with some differences.
-> 
-
-A power domain ungates power to something.
-
-These are clocks, giving a (x) (M)Hz signal to something.
-
+>> We already have a refcount in page pool, I'm planning to add
+>> page_pool_get() in net-next and remove the
 >>
->> in the current state, it is just an hardware managed refcounting system and
->> nothing else, because the MCU seems to be unfinished, hence, again, b r o k e n.
+>> 	if (bnxt_separate_head_pool)
 >>
->> Note that by "manually" I always mean "with direct writes to a clock controller's
->> registerS, and without any automation/assistance from the HWV MCU".
->>
->> We're using the "hardware-voter" name because this is how MediaTek calls it in the
->> datasheets, and no it doesn't really *deserve* that name for what it is exactly in
->> MT8196 and MT6991.
+>> before page_pool_destroy(), too.
 > 
-> Please capture most/all of this in the property description, so it will
-> be clear that we treat it as some sort of exception and other users of
-> that property would need similar rationale.
-> 
-> I am asking for this because I do not want this to be re-used for any
-> other work which would represent something like real voting for
-> resources. I want it to be clear for whoever looks at it later during
-> new SoC bringup.
+> Ah, I see, I missed that fact that page_pool and head_pool point to the
+> same address when we don't have separate pools. Makes sense, thanks!
 
-Okay, now that sounds reasonable, and that sounds like a clear suggestion with
-a clear action to take.
+If you depend on this side-effect of the API, we better document that
+this is the intend of the API.  E.g.
+  Calling this function several time with same page_pool and napi is safe
+and only enables it on the first call.  Other-wise it is no allowed to 
+enable an already enabled page_pool.
 
-Perfect.
+(... that's what the WARN is about right?)
 
-Laura, please do exactly that.
+The bnxt driver code use-case for doing this seems scary and hard to
+follow, e.g. having 'page_pool' and 'head_pool' point to the same
+address, sometimes...  I would also add a comment about this in the
+driver, but I find this optional and up-to the driver maintainer.
 
-P.S.: I understand what you're trying to do here, and I agree; preventing stuff
-like this for things that aren't as broken as this is completely right.
+--Jesper
 
-> 
-> If you send the same code as v4, the same commit msg, just like Laura
-> did twice in v2 and v3, I will just keep NAKing via mutt macro because
-> it's a waste of my time.
-> 
-
-My time isn't infinite, either :-)
-
->>
->> And mind you - if using the "interconnect" property for this means that we have to
->> add an interconnect driver for it, no, we will not do that, as placing a software
-> 
-> Existing driver(s) can be as well interconnect providers. Same with
-> power domains.
-> 
-> I do not talk here how you should implement this in the drivers.
-> 
->> vote that votes clocks in a a voter MCU that does exactly what the interconnect
-> 
-> What is a "software vote"? How did you encode it in DT? Via that phandle?
-> 
->> driver would do - then requiring virtual/fake clocks - is not a good solution.
-> 
-> We do not add "software votes" in DT as separate properties, because
-> they are "software". So maybe that's another problem here...
-> 
-
-Indeed - the point is, the only way to make this *broken* thing to work with an
-interconnect provider would be to place a software vote to place a vote in the HW
-voter, which would be ugly and wrong.
-
-But anyway, a solution was reached. Let's just stop and avoid useless discussions
-about what X could be if hardware Y wasn't broken; that'd be just a waste of time.
-
-Regards,
-Angelo
-
->>
->> So, what should we do then?
->>
->> Change it to "mediatek,clock-hw-refcounter", and adding a comment to the binding
->> saying that this is called "Hardware Voter (HWV)" in the datasheets?
->>
->> Or is using the "interconnect" property without any driver in the interconnect API
->> actually legit? - Because to me it doesn't look like being legit (and if it is, it
->> shouldn't be, as I'm sure that everyone would expect an interconnect API driver
->> when encountering an "interconnect" property in DT), and if so, we should just add
-> 
-> Why you would not add any interconnect driver for interconnect API?
-> Look, the current phandle allows you to poke in some other MMIO space
-> for the purpose of enabling the clock FOO? So interconnect or power
-> domains or whatever allows you to have existing or new driver to receive
-> xlate() and, when requested resources associated with clock FOO.
-> 
-> Instead of the FOO clock driver poking resources, you do
-> clk_prepare_enable() or pm_domain or icc_enable().
-> 
-> 
-> 
-> Best regards,
-> Krzysztof
-
-
+pw-bot: cr
 
