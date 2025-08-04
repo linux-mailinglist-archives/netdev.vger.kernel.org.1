@@ -1,106 +1,333 @@
-Return-Path: <netdev+bounces-211626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211627-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED0C9B1AA35
-	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 22:43:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EBA4B1AA53
+	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 23:18:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A870189CD09
-	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 20:43:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 04AB3620159
+	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 21:18:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A650A234966;
-	Mon,  4 Aug 2025 20:43:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1D8D1E8836;
+	Mon,  4 Aug 2025 21:18:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="Og0pv9Iy"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DoNoBoDC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-10629.protonmail.ch (mail-10629.protonmail.ch [79.135.106.29])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D2F621D5BC
-	for <netdev@vger.kernel.org>; Mon,  4 Aug 2025 20:43:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.29
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754340183; cv=none; b=deDQ51rNDty1OAbdL4nbNT5TbvvdsJOSZQrzXhqQovqXrZkXIPD9k7o46UAKVdw4kT78vzzhbxqaWbDPsxd/1bK6aleLk6OFaYIgQppm+Cw+nx9FvFPId2/3tfU+1dZrEWwAnv4F5s1tvNIQWeYvjunIv4b4n/JP0AJlKfzkKpc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754340183; c=relaxed/simple;
-	bh=1q0AJSmYwpiwEBMDPBrAvoL7wGmF84F98gzMAFhHLOI=;
-	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=YcKw+K+NRWFpS6dV1e3p1PIPUzj59Jt2ibW9d1xDTzQmham804OJtRiGnRhfJ4xdJnXLu0ZthFH+DWmcbgGEZPkq1HFr+vbRiVjQ/ChLJsimwYPkEHY9l3ZMdTKbLdrTxY20nMKntfBjEPU2TxI49M0If0NjYY/jCRc8BDCr+gA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=Og0pv9Iy; arc=none smtp.client-ip=79.135.106.29
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=qjuggcw4ufhxxknibr33maxmii.protonmail; t=1754340178; x=1754599378;
-	bh=10WUjNzk2HF2RaLox2mr9sq+QEXRMLLfRbsEMop6Otc=;
-	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=Og0pv9Iy17lNk2Hvuz3r78HIhRqYaj9Fhla93p6PF4g7i1T3h+8n+FuJ3ZCvUzahx
-	 efbdVkgGl/1aAexrMJ0qL1HHztn+GIxOKAF2NxeK2bWg/pMGku76EwWpIa+5Vu5u6s
-	 CX97OolQ28gPpuQMDQbLlq6gDwJklWSPqdqrLc5zibwccM4AO7zAHbdc7Y98nlzxuQ
-	 yq9WOfrVpzqlfqQRWumjBT5bBxgzzyw85Cr/fQ6BhMOHyyFHi92qKTPLjDDCH/EI6C
-	 qfMjBxuOlLtYVXJ1PCE9PLxGcyTD7o2XNQyHtz462zl9LK/WXAKibjatGMMFUxYB0i
-	 iBJodpsY1WzVw==
-Date: Mon, 04 Aug 2025 20:42:53 +0000
-To: davem@davemloft.net, dsahern@kernel.org
-From: Maksimilijan Marosevic <maksimilijan.marosevic@proton.me>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kernel-mentees@lists.linux.dev, Maksimilijan Marosevic <maksimilijan.marosevic@proton.me>, syzbot+a259a17220263c2d73fc@syzkaller.appspotmail.com
-Subject: [PATCH 1/1] ipv6: Check AF_UNSPEC in ip6_route_multipath_add()
-Message-ID: <20250804204233.1332529-1-maksimilijan.marosevic@proton.me>
-Feedback-ID: 97766065:user:proton
-X-Pm-Message-ID: 14d0a06c66484cfe47a197f02c06aca5859d00cf
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FEAD323E
+	for <netdev@vger.kernel.org>; Mon,  4 Aug 2025 21:18:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1754342303; cv=fail; b=MBIAuBRz8uif6qxThSWTTupJ+Trl7gnjlbHHeY2n16q5M+/4k2HKGx8VTySzgDBMe232mNwHafU16CpvfG7ffiO43LPQBDWOxHIdpYia7seRL/kUg7ZZkG2t8NRPYQJQWKKeS1S+eUGrqK6gPhkDJLZo8ZdEZczSxr1MjKSPCj4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1754342303; c=relaxed/simple;
+	bh=Es2fIMefz65aNvXkscFQEwnPA52iAWq0cyYqVA9aMJs=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=UlFavC8xSKnIp47wegCdrajOZdDlKZ4/6ErWZLzKyaShcbGLyyDhwQ3xkhtp4Sy6isZ5spELw+NL11daK2w/x/HOYluLeiiq3raChXWkfWwIpmk+s3FdewbYqxm9E53aGa/pvmIdBTOu0bo47hwoJwcYEpre1f5XXH1AnAhbh5g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DoNoBoDC; arc=fail smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1754342302; x=1785878302;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=Es2fIMefz65aNvXkscFQEwnPA52iAWq0cyYqVA9aMJs=;
+  b=DoNoBoDCV9A0g21EJmssllzCS59BrINREnIyxRgOWdzcLF9aa76MtYA5
+   UAydSN0Uoue5slGsoFBbJ5CQtIc5o377C/cPpbfYW9oqSWeT4vLCL6a6N
+   1kvcPLjwmmAvPYd/+oRETpjKmTMV9xZCPAc1MdAjOEE0fOzQpGY53ul/H
+   fZIjUDe7sFEjI3LNjt44VgAdRMFwan/RrlQ7FVi3opr8K5eU1FxRLXRZx
+   bAg6StEtDp7+Vuifcb0B5b510143KsEX3n4lTYwODkCetsDSkRpJlZ3Wa
+   /oD3qDe2asXFwxp5PL3m0MJBU1djGIyVgijsJe5VUirNPxr26t1w1OAkN
+   Q==;
+X-CSE-ConnectionGUID: GPxl9qcMSVmvaOh1QrnhXA==
+X-CSE-MsgGUID: TjhPKeXwRYK8eiWfndZISg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11512"; a="60429660"
+X-IronPort-AV: E=Sophos;i="6.17,265,1747724400"; 
+   d="scan'208";a="60429660"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Aug 2025 14:18:21 -0700
+X-CSE-ConnectionGUID: KwkSHDNfQN6/DBoGr0OlOA==
+X-CSE-MsgGUID: EHC2IzySR62yJkGOb/UiRg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,265,1747724400"; 
+   d="scan'208";a="163818902"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by fmviesa007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Aug 2025 14:18:20 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26; Mon, 4 Aug 2025 14:18:20 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26 via Frontend Transport; Mon, 4 Aug 2025 14:18:19 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (40.107.220.68)
+ by edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26; Mon, 4 Aug 2025 14:18:17 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=lGLHBI5iFvj+7kQtRladh/mkrh7sIMC44LRmISHi+g4jD0hR6tr5eJjqWluGpsUMX76viUjv36y+/TKUIlJsPeFDXgVXVukl73gbgAPKRl3tWe8G/XviEgb215/vFIMX1PQRYYiplhTaQG7YTukkTetDHsbizYxN7MU/UX+EPbbpju1ZaWVX6LIsCM3P16qvQ337Xz6OBPnAJkU1BoZRn60JIMae/aYpsfoPzvtQ8CgZjo64qhIoOa2mV7Wbgxy+uDC4bQ8QiDSPYrabHuFPibiP1x9BjbQ5+tEgGGd9nBWhLsWUOb2ncTpbQHU0PjC03sdQJk+tOE/5qnKvljyXAw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=alS0OOEu2l+iLi5QoU7FAt1WbX6Pa8/KbiGF21Z2ji8=;
+ b=heODnIyE2x6rSE1+v8Plx2UW5W98z7mAOYHu1OMG0BmO9+yJ5NjPdnWG7omFNUkucgb9L+h+PrD9s3tutWYEkpzOGhIuApthoqkSNohK1VjLu4WkCSJPCXfBGT4lkl7FKFm1id5Uh0x2vh3TP4vT12knkIXUpoSc/tZjO95d66kAioGbGE6MBc1OgLuqpJ1xG89N35If2NrJJrl8sSQhDodavAbBCRi5YO/yDT5FSWc0edYvcu4I38aWPftmYESsWHpVn1pY0cWrfevLVAZPF9Hto6uWr/eqMlKhIagbei6ivKC7K3MJepjwIR0NHyFiLOjhB+NSnUDbhDuIelzKZA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from BL3PR11MB6435.namprd11.prod.outlook.com (2603:10b6:208:3bb::9)
+ by CY8PR11MB7899.namprd11.prod.outlook.com (2603:10b6:930:7e::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8989.20; Mon, 4 Aug
+ 2025 21:18:16 +0000
+Received: from BL3PR11MB6435.namprd11.prod.outlook.com
+ ([fe80::24ab:bc69:995b:e21]) by BL3PR11MB6435.namprd11.prod.outlook.com
+ ([fe80::24ab:bc69:995b:e21%5]) with mapi id 15.20.8989.017; Mon, 4 Aug 2025
+ 21:18:16 +0000
+Message-ID: <4a9555f6-a494-4ee1-85a0-d95d8f0c5703@intel.com>
+Date: Mon, 4 Aug 2025 14:18:12 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-net] ice: use fixed adapter index for E825C embedded
+ devices
+To: Jacob Keller <jacob.e.keller@intel.com>, Sergey Temerkhanov
+	<sergey.temerkhanov@intel.com>, Przemek Kitszel
+	<przemyslaw.kitszel@intel.com>, Grzegorz Nitka <grzegorz.nitka@intel.com>,
+	<netdev@vger.kernel.org>, Intel Wired LAN <intel-wired-lan@lists.osuosl.org>
+CC: Aleksandr Loktionov <aleksandr.loktionov@intel.com>, Jiri Pirko
+	<jiri@resnulli.us>
+References: <20250801-jk-fix-e825c-ice-adapter-v1-1-f8d4a579e992@intel.com>
+ <8a676506-dd13-4198-813b-b61ad2953603@intel.com>
+Content-Language: en-US
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+In-Reply-To: <8a676506-dd13-4198-813b-b61ad2953603@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR04CA0248.namprd04.prod.outlook.com
+ (2603:10b6:303:88::13) To BL3PR11MB6435.namprd11.prod.outlook.com
+ (2603:10b6:208:3bb::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL3PR11MB6435:EE_|CY8PR11MB7899:EE_
+X-MS-Office365-Filtering-Correlation-Id: ba86084e-1e9f-4bdd-59e3-08ddd39c6d28
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?SHhFdEJXbkovQk8zSGhwM0d2MzlvT3RIUzJJdFMwRDE0a0VQUFNoRDFCdUhR?=
+ =?utf-8?B?MCtGNnRzeCtOd3loSHpLZUszYzJCQzFqQmNpVUlXTmVRMnJjVTArUlR6Skhi?=
+ =?utf-8?B?NERlOEVaU2tzSmtzWW16Wk9pMkEzR2laMzNsNXVMZ1pGcGZ2RWNKbFY5SG9l?=
+ =?utf-8?B?RkR5Y1FTanVTNTNrNkhqOU94bnpaeGRFR0dKU2pMVTYxMzY5dHpodVhRcHhP?=
+ =?utf-8?B?SlRzd05WWXJqTDdoL2lhK2hBWmliOUFVOWtxdS8zZk51Vy93TW5wWGlIMmR6?=
+ =?utf-8?B?ZVFMS1liaFR3b0c2cTg1cWNwUkJOUm1La3Jvbm1ONEsvb2xHT3ZQRndjNDBm?=
+ =?utf-8?B?UlNJKzc4WnRYcHVxendvUXZzWWFtd1FXZHpXYXJMS29xTGRZczk0bzdvK085?=
+ =?utf-8?B?VEJuelVUNEJpSkhPZ3dQcVgxZnN2R0RneTh0bEdkM05sKzNHcGxQSWpjRWhJ?=
+ =?utf-8?B?OG5xSWN2R1VxbVFBR2h6bk5YK1NOdlJoV3AzR1YwSXliYzdiWk9ibkZoekdV?=
+ =?utf-8?B?clBzK2c5NmVlakU1R2MxQUthMlZhRkVkUWFVRHFnejJPN2piYXJGeDlVUEFl?=
+ =?utf-8?B?OTJUTlJOMnNWUUhPUUxaSmZuM3JGbmRlUkorTVpKUHIweEV5a09uVXVIZnRi?=
+ =?utf-8?B?ekszcGQ5ZnloWmJqMHZLbGRLZFFPbmxTMTYzQmJXdk92TE92T2U5MUhXb0dD?=
+ =?utf-8?B?WUxpRlBUbi8wME5RMHJLaExLM05NUTVLdFdPSWQyWUFXTmo0SStNc0Z1dk5U?=
+ =?utf-8?B?eUJLUmloNFlPNS8zZHV4SUJxMzBVc0FSaWZwbkZyd0VuU0orMFNDUmNsY0x0?=
+ =?utf-8?B?V1VTT3V1emNPQzBiajFqa1pXaUFpc01qOFBDWmVpT3JhbmlZN1JCM09la1JC?=
+ =?utf-8?B?bHVEYlYyRkNodmhHR3pRY1ZDeTlEblFaYUlSd0JCM2xQZ1haYUZQeGJLa1p6?=
+ =?utf-8?B?NzlvU2ZCY2ZuS2YxYzJXVjZDZVNLc1BHSUJsYnQ1SCttK3E5RW5wNzMrM3Zi?=
+ =?utf-8?B?dkFZelhjZHZGQmxYbG5RRHNwMVZXMldLZEJwanU4MTF3SE4zRnNIZDBTOVpx?=
+ =?utf-8?B?Z05uTG80T0I5UHRXdnJUbGNhNUNOU2x6RUJXQUFXenQ5bnpLODlicW5BdXNF?=
+ =?utf-8?B?QkxOOGNHTTBJdDRZTzJoOFkwdEU2N0drYis2cExTM283RjBoOUUvVmY1T2Zu?=
+ =?utf-8?B?RXNPcVhBcVd0ZWFiMnFIZUJrOU1IOVVRRkhsYzZKZndJajRnamUwZXhIODMv?=
+ =?utf-8?B?NGEwTlZUWWtDSHEzTjhtdlhXeXVSTyt0RjRwaHQ5aXdVcnJlR3JyV0o3UmZX?=
+ =?utf-8?B?ZVRwc2dLaUUvUlVOY0VsWWJPM3piaXErRElxemRNakVLbWp0cEJyK3hSckwx?=
+ =?utf-8?B?YXRBODhhWTc0dGp0cjBaVUFxSHcwVjYyOG9oU3IvaEY2ZGxXVHZDZG1DNCs3?=
+ =?utf-8?B?Nkl6RTY1YVIxajdnRklzZ2h1WHVHZ2lsMVpvamhlL0dTQnY1ZG5IYkNKYVNQ?=
+ =?utf-8?B?RnBINDRyZnRVM0VXMmQvNTlsWE9adnFGbnY1OVNQNUJKSGxkbExyUm5uayt3?=
+ =?utf-8?B?UkQ1U1VMYU9QVG1mQ0p5bkw0TE9VWi9XdlE3WURJZVVYRDBYREE5N1N5L2tJ?=
+ =?utf-8?B?NE5tZ0wwaExpZHAxZ1E5TmhOVEV1THBTZVUxNFoxNGlKNFc2cTZnam1BSEh0?=
+ =?utf-8?B?QmtxK1ZsZXIxVk5sNWt1dHJ3aVVaUmRBR0lWU2QzN2hySzJ6YzR4enBvQ0c5?=
+ =?utf-8?B?MW9sakZoc0FiYmJTYytrejR3ZjhkSXk5ZEZwNVFRNG84RVhrTzgyQVBJWG05?=
+ =?utf-8?B?SUFOd1Z1dEl0VlZhbFZTMTI3MDBqZWNiZENjTEpGNkdOaXZjcDBIT2t4VkJq?=
+ =?utf-8?B?bVlYQTdhcGhkdEU1eDMzOHlQQnlBUGNsbjJNaFE2Wjloek1HV1JEd2JxMnFV?=
+ =?utf-8?Q?9O5FXhTI0nQ=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR11MB6435.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?L04rY3lLbW1PSnZwWkd0TlZ5WTZIUDJ4KytrS1JncmZEU3lNQ2dEalJJdGNK?=
+ =?utf-8?B?SjB5R3J2YzNBUDErcE9rUS9Nb1cvMUEyZUJrR2lnTGlsQWM1dXI1aXFpVmgv?=
+ =?utf-8?B?UEFmZmx3NHVCb0JxVEswSlVWUy9LQ3l3ZlBwL3JLTk80MWNvK0hVaTZ4QytQ?=
+ =?utf-8?B?RlVnVW0wenk5YkU5NWh3NGxNZkZka0tmSWxQVzR0SEZyWnJndzVUelBqYk9E?=
+ =?utf-8?B?TVo3a3Q1Rzc0ZU1kUGhUNCtuOVpxZ3NNY0dYaHpITmJsTDB6Tkdocit1clhY?=
+ =?utf-8?B?OW8zamlJUFhRL0NQSm1SMm5wNnU4dWZXZWg5OVJEc000NXhRYXlZWDdjNk9q?=
+ =?utf-8?B?c1N6blNBVEw2UlhsbGM1L0NTMlQ1NDRaNEhHM05VZ3Z6LzBLNHRnbTUxU1l3?=
+ =?utf-8?B?U0RlYWQxVURyTTZQK1ZyeHFSVDVic3pva1pYZkhtZk1xRGZFcE9nRUJsUHQz?=
+ =?utf-8?B?L05SR1gwOEt3TndBSENrTWYxcUFpc2d0b3NhTXV1emNSL3dUem83dDB2ZVJq?=
+ =?utf-8?B?MWRmYWVhV2FKcFZKUHR0bGdFeXkxZ1FiQ0FYdnhoM1dzdXlwYzhGa2U4SjNW?=
+ =?utf-8?B?d3lDZmJacXpsYmRpS3pLekNhbDhBOEJSUG9GRzFrOGNiekg5QW1jZVRlTzQ3?=
+ =?utf-8?B?cmM0RmRXQzlOT1VvRlNGamgvMU5LSGZSdnVDNFlmY3Q1TmNwYUZPNFpkeWxj?=
+ =?utf-8?B?RkpiL0VQSzMvdGZWQ2ttRlR2SjBjdmUwR2lVMmRsVlBKcFAwdDljclJOaWVo?=
+ =?utf-8?B?cU1reXhSK1VzSmloRGVVaHY2bjFzaDNDNmtTNVZ5MW1BWEJZSkNlK1Z5eWhQ?=
+ =?utf-8?B?b0E5RkF5KzdGTTdGbldWU1I2NGI5NlRjcXJROGVva3VELytJL3ZlTmttM0RI?=
+ =?utf-8?B?S2oxdVNvRGxQNy8zajNOdlFBbUFWcE5ub1pYWjQ5UEpMYU1VdTU0WUVkVExm?=
+ =?utf-8?B?Smw2NEJGcFNuV0RaVjhCdmdBM1JMUjBGSTVLVWJTK29obGVTVGxjc3I1cEJG?=
+ =?utf-8?B?TGUySjZpeTF5S3ZxVnRKSWdxSStYa1VLa0hjUFNkVGQ3Q1ZKcXFvUHZUY1FB?=
+ =?utf-8?B?Ni9GVUdOWCtEWlN5bDRhUGxjNGZEMVJiSzFkem1sNnhGczY0U0NHOHNJQ3JO?=
+ =?utf-8?B?dEVYdkxId0NBeXpjbDB2dmpnaVUvT0wvZHNSenNaRE93OWprSXkrWHBCY1ZO?=
+ =?utf-8?B?OWVEeEtPYUM5SGxxYlYvSSt6NGpxT0I1YUU0OXlHSFVMbjVTTFh2NU94a2Zp?=
+ =?utf-8?B?TGJYM25jTTc1dW9VVWQwUnVvZHF2bmtLNkMwaFdvK2UvbXB4TnQwU1Npc0h5?=
+ =?utf-8?B?NHh0SlJPNk4yZzdIeGxOZjhmb1A1S0l2VTE3bDNOMVB5Q3pRMVgrVHQvdU5V?=
+ =?utf-8?B?eWRSOXFQR01OZE9YdWZaUGJKWkhza0plUFcyWmZ5NDIzL00vWTVzcm9uck8y?=
+ =?utf-8?B?L1ZETzQ5YmVFdlY3NytacktLUGtYWkJoVnVwSFVWajJQa0VzckRoYW1JQXFm?=
+ =?utf-8?B?NUpsdkplbjIwdFFyTGhGUzBkaS9Cb1ErT0NoOVIrVDQzOHZ0VFY3UXY5cGZl?=
+ =?utf-8?B?Z0FPYW1iRlpqaURkemg0VXhHWU5wQldPTmJGWitrUWZPY2pnQktDN1ZEa2ln?=
+ =?utf-8?B?WitKaWNTTXdId20zeVNwa0x3d3NBQjFWc015dVR4TGR0bWRoNmxtajdmb0pD?=
+ =?utf-8?B?MFMxQXA1TWV0TXc2L29zV2tsT2xvSjhlNVZsMG5tS3VVVkNBNS83YUhraDF0?=
+ =?utf-8?B?WjV4MWdFSk5XM3R4RVh2YUFnS3ZhV29lZmNzZnhVVjlPci9VNTMrVjQwbVJO?=
+ =?utf-8?B?TTVPTWVvV1h3NXViYXp2VTVHN1hXVllLdGFGMFRidmphdGRkU3lSSDVhOFRl?=
+ =?utf-8?B?d1lMSEZNMTBwQzJmQnVldDJQaTJlSE1yQmNWNzB2eVp4T0trTm9rWWlKQjND?=
+ =?utf-8?B?UVFsY2wwMjY0dXBqc3pyVGpKcU9WSmN4a1NIQU1PbFBoWWRXcm1kbVpIL1dr?=
+ =?utf-8?B?QjJOd0NqZXRsdVUrMHpjbWo2SUp3WHZOQzFpL1JZUEhaMkpoVEZYaUUyMTZO?=
+ =?utf-8?B?QWM0WTNUYWg4cjgvakU0WjlxRVh0Tjd0QVVEQjlGc0xDN1VlTnZYMzhHYTRz?=
+ =?utf-8?B?VWMwRXpUQURXaSt5UFVRMkZlS0JaUUJVTWpXTnJ3di9uZjdvd0E3THFUQXRy?=
+ =?utf-8?B?NUE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: ba86084e-1e9f-4bdd-59e3-08ddd39c6d28
+X-MS-Exchange-CrossTenant-AuthSource: BL3PR11MB6435.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Aug 2025 21:18:15.9049
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: cchhKYq3yEJ+KqfpBG9l6wppc3kguYxm896kWNH5lQ0ojfhcUiZ6TnkJLb8CLdVyvzrhTRynGnE95u+j+YHY+HKmIScRfGTFThXvmURQhXU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB7899
+X-OriginatorOrg: intel.com
 
-This check was removed in commit e6f497955fb6 ("ipv6: Check GATEWAY
-in rtm_to_fib6_multipath_config().") as part of rt6_qualify_for ecmp().
-The author correctly recognises that rt6_qualify_for_ecmp() returns
-false if fb_nh_gw_family is set to AF_UNSPEC, but then mistakes
-AF_UNSPEC for AF_INET6 when reasoning that the check is unnecessary.
-This means certain malformed entries don't get caught in
-ip6_route_multipath_add().
 
-This patch reintroduces the AF_UNSPEC check while respecting changes
-of the initial patch.
 
-Reported-by: syzbot+a259a17220263c2d73fc@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=3Da259a17220263c2d73fc
-Fixes: e6f497955fb6 ("ipv6: Check GATEWAY in rtm_to_fib6_multipath_config()=
-.")
-Signed-off-by: Maksimilijan Marosevic <maksimilijan.marosevic@proton.me>
----
- net/ipv6/route.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+On 8/1/2025 4:08 PM, Jacob Keller wrote:
+> On 8/1/2025 3:27 PM, Jacob Keller wrote:
+>> The ice_adapter structure is used by the ice driver to connect multiple
+>> physical functions of a device in software. It was introduced by
+>> commit 0e2bddf9e5f9 ("ice: add ice_adapter for shared data across PFs on
+>> the same NIC") and is primarily used for PTP support, as well as for
+>> handling certain cross-PF synchronization.
+>>
+>> The original design of ice_adapter used PCI address information to
+>> determine which devices should be connected. This was extended to support
+>> E825C devices by commit fdb7f54700b1 ("ice: Initial support for E825C
+>> hardware in ice_adapter"), which used the device ID for E825C devices
+>> instead of the PCI address.
+>>
+>> Later, commit 0093cb194a75 ("ice: use DSN instead of PCI BDF for
+>> ice_adapter index") replaced the use of Bus/Device/Function addressing with
+>> use of the device serial number.
+>>
+>> E825C devices may appear in "Dual NAC" configuration which has multiple
+>> physical devices tied to the same clock source and which need to use the
+>> same ice_adapter. Unfortunately, each "NAC" has its own NVM which has its
+>> own unique Device Serial Number. Thus, use of the DSN for connecting
+>> ice_adapter does not work properly. It "worked" in the pre-production
+>> systems because the DSN was not initialized on the test NVMs and all the
+>> NACs had the same zero'd serial number.
+>>
+>> Since we cannot rely on the DSN, lets fall back to the logic in the
+>> original E825C support which used the device ID. This is safe for E825C
+>> only because of the embedded nature of the device. It isn't a discreet
+>> adapter that can be plugged into an arbitrary system. All E825C devices on
+>> a given system are connected to the same clock source and need to be
+>> configured through the same PTP clock.
+>>
+>> To make this separation clear, reserve bit 63 of the 64-bit index values as
+>> a "fixed index" indicator. Always clear this bit when using the device
+>> serial number as an index.
+>>
+>> For E825C, use a fixed value defined as the 0x579C E825C backplane device
+>> ID bitwise ORed with the fixed index indicator. This is slightly different
+>> than the original logic of just using the device ID directly. Doing so
+>> prevents a potential issue with systems where only one of the NACs is
+>> connected with an external PHY over SGMII. In that case, one NAC would
+>> have the E825C_SGMII device ID, but the other would not.
+>>
+>> Separate the determination of the full 64-bit index from the 32-bit
+>> reduction logic. Provide both ice_adapter_index() and a wrapping
+>> ice_adapter_xa_index() which handles reducing the index to a long on 32-bit
+>> systems. As before, cache the full index value in the adapter structure to
+>> warn about collisions.
+>>
+>> This fixes issues with E825C not initializing PTP on both NACs, due to
+>> failure to connect the appropriate devices to the same ice_adapter.
 
-diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index 3299cfa12e21..d4b988bed920 100644
---- a/net/ipv6/route.c
-+++ b/net/ipv6/route.c
-@@ -5456,6 +5456,14 @@ static int ip6_route_multipath_add(struct fib6_confi=
-g *cfg,
- =09=09=09goto cleanup;
- =09=09}
-=20
-+=09=09if (rt->fib6_nh->fib_nh_gw_family =3D=3D AF_UNSPEC) {
-+=09=09=09err =3D -EINVAL;
-+=09=09=09NL_SET_ERR_MSG(extack,
-+=09=09=09=09       "Device only routes can not be added for IPv6 using the=
- multipath API.");
-+=09=09=09fib6_info_release(rt);
-+=09=09=09goto cleanup;
-+=09=09}
-+
- =09=09rt->fib6_nh->fib_nh_weight =3D rtnh->rtnh_hops + 1;
-=20
- =09=09err =3D ip6_route_info_append(&rt6_nh_list, rt, &r_cfg);
---=20
-2.50.1
+cc Jiri
+>> Fixes: 0093cb194a75 ("ice: use DSN instead of PCI BDF for ice_adapter index")
+>> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+>> Reviewed-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
+>> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+>> ---
+>> It turns out that using the device serial number does not work for E825C
+>> boards. I spoke with the team involved in the NVM image generation, and its
+>> not feasible at this point to change the process for generating the NVMs
+>> for E825C. We're stuck with the case that E825C Dual-NAC boards will have
+>> independent DSN for each NAC.
+>>
+>> As far as I can tell, the only suitable fallback is to rely on the embedded
+>> nature of the E825C device. We know that all current systems with E825C
+>> need to have their ice_adapter connected. There are no plans to build
+>> platforms with multiple E825C devices. The E825C variant is not a discreet
+>> board, so customers can't simply plug an extra in. Thus, this change
+>> reverts back to using the device ID for E825C systems, instead of the
+>> serial number.
+>> ---
+>>   drivers/net/ethernet/intel/ice/ice_adapter.h |  4 +--
+>>   drivers/net/ethernet/intel/ice/ice_adapter.c | 49 +++++++++++++++++++++-------
+>>   2 files changed, 40 insertions(+), 13 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/intel/ice/ice_adapter.h b/drivers/net/ethernet/intel/ice/ice_adapter.h
+>> index db66d03c9f96..e95266c7f20b 100644
+>> --- a/drivers/net/ethernet/intel/ice/ice_adapter.h
+>> +++ b/drivers/net/ethernet/intel/ice/ice_adapter.h
+>> @@ -33,7 +33,7 @@ struct ice_port_list {
+>>    * @txq_ctx_lock: Spinlock protecting access to the GLCOMM_QTX_CNTX_CTL register
+>>    * @ctrl_pf: Control PF of the adapter
+>>    * @ports: Ports list
+>> - * @device_serial_number: DSN cached for collision detection on 32bit systems
+>> + * @index: 64-bit index cached for collision detection on 32bit systems
+>>    */
+>>   struct ice_adapter {
+>>   	refcount_t refcount;
+>> @@ -44,7 +44,7 @@ struct ice_adapter {
+>>   
+>>   	struct ice_pf *ctrl_pf;
+>>   	struct ice_port_list ports;
+>> -	u64 device_serial_number;
+>> +	u64 index;
+>>   };
+>>   
+>>   struct ice_adapter *ice_adapter_get(struct pci_dev *pdev);
+>> diff --git a/drivers/net/ethernet/intel/ice/ice_adapter.c b/drivers/net/ethernet/intel/ice/ice_adapter.c
+>> index 9e4adc43e474..9ec2a815a3f7 100644
+>> --- a/drivers/net/ethernet/intel/ice/ice_adapter.c
+>> +++ b/drivers/net/ethernet/intel/ice/ice_adapter.c
+>> @@ -13,16 +13,45 @@
+>>   static DEFINE_XARRAY(ice_adapters);
+>>   static DEFINE_MUTEX(ice_adapters_mutex);
+>>   
+>> -static unsigned long ice_adapter_index(u64 dsn)
+>> +#define ICE_ADAPTER_FIXED_INDEX	BIT(63)
+>> +
+> 
+> This needs to be BIT_ULL :(
+> 
+> Tony, would it be possible for you to fix this up locally?
 
+Yea, I can do that.
+
+Thanks,
+Tony
 
 
