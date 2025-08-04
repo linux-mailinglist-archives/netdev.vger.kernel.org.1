@@ -1,231 +1,433 @@
-Return-Path: <netdev+bounces-211501-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211502-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4460DB19B80
-	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 08:18:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C743DB19B85
+	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 08:20:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CDE3618973A2
-	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 06:18:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 537A51897BA0
+	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 06:20:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D897F22A4FC;
-	Mon,  4 Aug 2025 06:18:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFF5F2288CB;
+	Mon,  4 Aug 2025 06:20:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=westermo.com header.i=@westermo.com header.b="tKdzh1vh";
-	dkim=pass (1024-bit key) header.d=beijerelectronicsab.onmicrosoft.com header.i=@beijerelectronicsab.onmicrosoft.com header.b="i5D4b79c"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q/EXta6e"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx08-0057a101.pphosted.com (mx08-0057a101.pphosted.com [185.183.31.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9CD42BAF9;
-	Mon,  4 Aug 2025 06:18:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=185.183.31.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754288305; cv=fail; b=QMifu7RMri2L5wRM5qNglTUOIj/IQLZ5iIowP3XmZ58ISQ+gF0uKYcztJLWacji1kxrRmpME+6WTPBfJDXqt2Mv9r53inGzzVyA1P/i05pzqE6rgLBkxpu3Mch+RbIXVw8Q5k8cAdTIwkjb1H0cvFAkDy4i9LjP5AxCFmmWLxI0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754288305; c=relaxed/simple;
-	bh=TNUY+y8zg3+dLuYMJon6UOc2uf/2nS0P9aKY1bgFfmA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=QM9mjxwoNLhYXzv1RQ7YObwlr5CWeOjk+6zNhT7nlC2j5rVodZ4XWfofZV4Peg5YQzm/mmnfnhjPZSz08kMoVo+Aw+fC3r5jUyyxqmOVmpsLi7sFo3MgdPe1WzLQjmWb+iThJJP0YWEp7lxGA8G6NeXRZDC0iVWBe1FnjzXDUfE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=westermo.com; spf=pass smtp.mailfrom=westermo.com; dkim=pass (2048-bit key) header.d=westermo.com header.i=@westermo.com header.b=tKdzh1vh; dkim=pass (1024-bit key) header.d=beijerelectronicsab.onmicrosoft.com header.i=@beijerelectronicsab.onmicrosoft.com header.b=i5D4b79c; arc=fail smtp.client-ip=185.183.31.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=westermo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=westermo.com
-Received: from pps.filterd (m0214196.ppops.net [127.0.0.1])
-	by mx07-0057a101.pphosted.com (8.18.1.8/8.18.1.8) with ESMTP id 5744YdWW1042071;
-	Mon, 4 Aug 2025 08:17:55 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=westermo.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=270620241; bh=nRLR0AqM83QRXEgHS80fACD2
-	sjFrk2GlH76s/vNLwc8=; b=tKdzh1vh5h9OeUxOuTUcXx5bt0czhJ7pJtWPgwVt
-	i+2PuOZBWTYTmgGqLK7U1RRom4USZB/n9PGM1arQl5LfzW+s+tvoO1csi5vTMhWi
-	R2mZmXdF0FE2r0ZaUh0oCzaEINbgsFOpAccbqBldgonn7OwRRgXe9cpV1esA2cis
-	PbemPCCy67pxsUg7Tq7ny5dRiLLBVZ2YPWa+yrrSeQ1mYpdU0pHOwziNZYnwkgMV
-	+h1e7R7jZnyXQAyRz6QLkfwaDk0kbCg0OckekDpJFJ5V/+93dN9mMl+vO0NdUHAB
-	yNOxhjqssRCkGtWH7FFxNqPfPeUKG74caY08Wm8gkXlSqQ==
-Received: from eur05-db8-obe.outbound.protection.outlook.com (mail-db8eur05on2111.outbound.protection.outlook.com [40.107.20.111])
-	by mx07-0057a101.pphosted.com (PPS) with ESMTPS id 4896p1sctr-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Mon, 04 Aug 2025 08:17:54 +0200 (MEST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=LuexuFBGStRiTy6Qq5K3PSrYESYXXWgR7RMI76I0tqzSBbV9RXe/701mE+FLvVCVGO1HlbY2BosZEkyxiaNfeGlZBWqZf1kxokNgtGn3zX9qune0JIbtf1n+yWiFWua05M/BGLBkFhLu7nYWNU8LMgv9pcbQVPd+wTTcIDuxFzm7V5xPMaoj3aH4WoEOrm+D5OdB/4u5QtgTtFIfoOCFbryb9ndZFXWjAbSH0zxeuRDaPEsEicBduzKVSdpPoUdgGlPMPKeOAQGe50BZ+a1/OdBUzl3I+I6GwpTwXpvGZ0gXFOagC49rWUh8e1w4t0FtrUWwdG7jNVAzI5FLZFhOzw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nRLR0AqM83QRXEgHS80fACD2sjFrk2GlH76s/vNLwc8=;
- b=ub2Hbc+lXAy7MIG1n9sVB4WO7LhtA6pMBeJWPxsAD6O/hNuxdmciqtfQ0PIGPCBqvv6oubKenBQvQxv3wm07Bhcvv+JQ5oqySIwijrXwLg4sxF9sivxNRVUQE3c1fUf/4tqz12qCleQ2fuyWT/ivZG7iZqNNtLJ6qaM4PH9np8twoEtCjgIfGxfwVIXUM8sAnUQTPCcsqohe9pE3gyQhxgXCXLY1o44xMO3uhAv+JDXl+BoTHpFb9nqzTSMMBPcR+QWivnPux0Mpbum9al/jFUrQrsPm0YCrqXy2tH0a/QW8zXxdn2U2x7Q5eR3x+Ei+MQbP6FwF53ZiBQeLVD4vyA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=westermo.com; dmarc=pass action=none header.from=westermo.com;
- dkim=pass header.d=westermo.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30ADC126BF7;
+	Mon,  4 Aug 2025 06:20:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1754288415; cv=none; b=MBpERKs9f94UlZysvIidwCHyKCyI1c4ZYGddPCYbmyJ0JIJcNBJAKB/QJRVfvzANBCDwpLzPNHIjckDr+MYtVk0Dz66PMniUCssJ7k4MW3BVOkrad/6No2aIvEvKbI6fpYCmCTWuQ/3CXL4gMpLCUiEle3YQh5Wn8yCiXUCSVMw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1754288415; c=relaxed/simple;
+	bh=OsQwmzZ7HuqGa56xbd02be6tTxlQxMMk2IpavQDSQj0=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=LtNDCvOvniqnsKSBm0UoBuYgS8ptBSkNmk7gGfULeYMmK2B0ivTXtvWRkdJJ4xrbaz95xutlo2PxvdREL4ixF6dYwWhaYifpvUEdyu1ei9vBD5UoZ2yktFQjbplCtI5leIG9/WZ2n4c7zg04GkYD76JDWMo0H8pkIe34AvbKI2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q/EXta6e; arc=none smtp.client-ip=209.85.215.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-b3aa2a0022cso3803150a12.1;
+        Sun, 03 Aug 2025 23:20:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=beijerelectronicsab.onmicrosoft.com;
- s=selector1-beijerelectronicsab-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nRLR0AqM83QRXEgHS80fACD2sjFrk2GlH76s/vNLwc8=;
- b=i5D4b79cNw39KkRt3p/c3TJDPG+ZDAgyYdg8OxjUjRn2jpQWtK6HQ0D7JJJwkkxzABBCzJmXYYLOP9J1OIr0zmQrHjRfg/jEQsIGijF+xoV1jD+ErFnBJDKepg65/EDSS62D2EWiSs+5cV0wZUOq9Y/7bGhAQq1UHrjN3DZwK4g=
-Received: from FRWP192MB2997.EURP192.PROD.OUTLOOK.COM (2603:10a6:d10:17c::10)
- by PA3P192MB3014.EURP192.PROD.OUTLOOK.COM (2603:10a6:102:4b7::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9009.12; Mon, 4 Aug
- 2025 06:17:51 +0000
-Received: from FRWP192MB2997.EURP192.PROD.OUTLOOK.COM
- ([fe80::8e66:c97e:57a6:c2b0]) by FRWP192MB2997.EURP192.PROD.OUTLOOK.COM
- ([fe80::8e66:c97e:57a6:c2b0%5]) with mapi id 15.20.9009.011; Mon, 4 Aug 2025
- 06:17:51 +0000
-Date: Mon, 4 Aug 2025 08:17:47 +0200
-From: Alexander Wilhelm <alexander.wilhelm@westermo.com>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
-        Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: Aquantia PHY in OCSGMII mode?
-Message-ID: <aJBQiyubjwFe1h27@FUE-ALEWI-WINX>
-References: <aIuEvaSCIQdJWcZx@FUE-ALEWI-WINX>
- <20250731171642.2jxmhvrlb554mejz@skbuf>
- <aIvDcxeBPhHADDik@shell.armlinux.org.uk>
- <20250801110106.ig5n2t5wvzqrsoyj@skbuf>
- <aIyq9Vg8Tqr5z0Zs@FUE-ALEWI-WINX>
- <aIyr33e7BUAep2MI@shell.armlinux.org.uk>
- <aIytuIUN+BSy2Xug@FUE-ALEWI-WINX>
- <aIyx0OLWGw5zKarX@shell.armlinux.org.uk>
- <20250801130420.m3fbqlvtzbdo5e5d@skbuf>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250801130420.m3fbqlvtzbdo5e5d@skbuf>
-User-Agent: Mutt/2.1.4 (2021-12-11)
-X-ClientProxiedBy: GVZP280CA0075.SWEP280.PROD.OUTLOOK.COM
- (2603:10a6:150:274::9) To FRWP192MB2997.EURP192.PROD.OUTLOOK.COM
- (2603:10a6:d10:17c::10)
+        d=gmail.com; s=20230601; t=1754288413; x=1754893213; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hyZ1wfZ/5Dw8tz+IpwNXS+3J6yYJpD7tWXtFv8hA0v8=;
+        b=Q/EXta6ezdpdCbi9iXaSaU+/0l0Or2wjgC7S435bbK0WziPUmJB0D98HLlWU7Ar34G
+         bQXcF49kdtBTbU+F9L30vf531JsWvZWBUIrMRBNrDK1cY8PmKVhnX+p8qMdjcqCpClDd
+         bvCzoXMbA64LH7VS5MUmxWagdUlFBKB1AtyY9HCJEmq5aSyIEjimkHvt7mfw5cZCUE1h
+         G9rWhyLnN6eGk7CEpJ2XYPPBHyvgzVOb/xR3mGBV9QjbgPfDnOJRcLGfbuKg7vSER0Fi
+         fv7rNaU8/vZSF7Ecwe3lKPt4TSbeP3RDXHVtEiIrDKZb4B7obvDBqpXdB0zQMOkHzhLZ
+         ymnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754288413; x=1754893213;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hyZ1wfZ/5Dw8tz+IpwNXS+3J6yYJpD7tWXtFv8hA0v8=;
+        b=GfKPKSh22VinBsuxGRONKsXbbCRBob6jrjOa86fdf4cDUyrBROavMMCpXL9KA0RbGD
+         i7taFqWEbVZhU8VmfNPLdd3tqiQjqE+1jm+WyLPkhhP/ZaO8glMd4DGOJcmrLIJAuESk
+         3fC3GeYltsL0nYjAyhxN8uz7QHJwHtPJ2jDqyyNmTamOYs+YsTSkkncA38WbYQ9mUFbx
+         DrKJSZIx7KgNT5nzOu9y3qoWulqBhSui6UApUzuThNz+UtTGlXAx46UWMk/jarQmXEPQ
+         wogIdKkvAdNOs/CjcgkfDbegm4dAaeiaprOm2OASrIjaHb3+0u0qaerjMJIHotadsw09
+         EYBA==
+X-Forwarded-Encrypted: i=1; AJvYcCWlqKhnf+qwNMvUAXJH5YMawxOr5k0RjbT8kX9YgIBZ4K5lzozzuPVM+6D9R+IoB04wB3eZvway@vger.kernel.org, AJvYcCX9pgeOiM6hvMyc/7b8mePZlnSp8gjIyMM1ifQErOdavZQM4wY8iHxClAA0ojhFbVGYRNbV+GonKilT7zI=@vger.kernel.org, AJvYcCXujR+q5uwXyEChNcACUJf+aSrn3FFAXjHOzm8HV9s3BNIcTVjDzndcGHJx/DSdFEZVU96kO+2kro1a@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywk6IcIUgRWDdqyNvSlcJ067x+QjJzJEa/nGET6MiX5+S8AbQx5
+	jd1bLI8U7FunJg3kosUCF8H2T3pMQuPvGI27IYLIEDACf155R28gwMpJ
+X-Gm-Gg: ASbGncsoE9R8dzpZ+8hNZD0uvnHRn5K8vVT2SY5eK+9Qdk0PVGyRb0nTu4GAgLfxICd
+	L4tpEQDRePddKAZnMTcKybAC2KmjULa3H901vOfycUO0k+G4+q+tISd7TriHv83mKdo8thjpXpN
+	VcX4CSZAs+L65m1t6cCig/g+lZodJltSkAH/KQ4a4GmQ8tUePYLwqIcd/QWtTOZ2bRQY7P/fFW9
+	S7TwfSag8pivijhud/24z02Lm9AVPWLcXBxY1H2CyHPQIm1+e7g7p80CoSu3YbZ5f+rcBazrXOo
+	wPERc+Ctd5xHRMWuh3ntmc4fE95KAaXTipsCPmkGzd1DHRi6tQehZKzKMhDnt2XfULKL3IzvJFz
+	OtgefgYDWu2zBtJEDaFTQ1GZqsxEIDR4pz8hrqt4=
+X-Google-Smtp-Source: AGHT+IEhqEUt21jPzfLLMUs7AWlflbVbt0empXSHfpqARw3gkjI7B2Twzxa1Y1/w/LNFQFvScgSbLA==
+X-Received: by 2002:a17:902:f612:b0:240:92f9:7b85 with SMTP id d9443c01a7336-24246e5fb31mr99692585ad.0.1754288413259;
+        Sun, 03 Aug 2025 23:20:13 -0700 (PDT)
+Received: from DESKTOP-09S19U2.localdomain ([223.166.87.204])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-241e8ac02c9sm100000605ad.184.2025.08.03.23.20.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 03 Aug 2025 23:20:12 -0700 (PDT)
+From: Qingfang Deng <dqfext@gmail.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-ppp@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] ppp: remove rwlock usage
+Date: Mon,  4 Aug 2025 14:20:03 +0800
+Message-ID: <20250804062004.29617-1-dqfext@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: FRWP192MB2997:EE_|PA3P192MB3014:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0d9fcb32-cf0a-4431-0913-08ddd31ea422
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?Ah6H6XeAvMF15GQGI1mZOw7qpVhJ+eKxPFRasEsRYgT2+hEAJyzbN5kgbksX?=
- =?us-ascii?Q?LgiWgVkMhihAkPD+Fwy0mN3LvxECZe4xWQ+RtUyttDTd3g02cyi5j3OqxmlC?=
- =?us-ascii?Q?NPGJ7kwU8hdKFlwz05ESzbg0zoPF4lsUsGiWdCbHVX36sZ91bTlqVXYJDm4Q?=
- =?us-ascii?Q?9w9T/65Q2+VtizKqCdyqZQA9oLoFoXyKiLkJqU3iq+ZZYP8Os3REFrgtIKxy?=
- =?us-ascii?Q?99v3gFWzSgaPmbiXFhsdAiqwojOomlHy9Blh0cNMHGYHo/l/pQ6zLCBTcihC?=
- =?us-ascii?Q?cljRUpltN/1PNMtUc0lxMuY/Hnlnf+cBY5CfVSX48/dMAo2EeICO9VQRiYo1?=
- =?us-ascii?Q?rdriovKmPblZQPiRsjTs+dZMyGGfZUNcUqeWsPEGxjMjCBlhAlLWHetRI5hI?=
- =?us-ascii?Q?NNAZ9LTo6mYLgxXhJhlyLy/i7oOp9B5YnPqd7gT8q+O833ihxZqamz2mcO86?=
- =?us-ascii?Q?4cVVxkL16BPuvYE7xrweg1h5mdG3pI4UPUsmwX4N7o332ruP7vJxlsASr2Dt?=
- =?us-ascii?Q?6Hq1J6QorUZ4v/I0QZcsvP0QF92aNCGt8+AQlnW6aL1PFv/butCUpcY99ohl?=
- =?us-ascii?Q?GDw1T9JC/YoJf4B6Ay7iivhxdB57IpIKXrohSt7RfLDnKQnLn3agal02m7OW?=
- =?us-ascii?Q?8qDbeb+ixzjoDRFskWY/eJymnZIaHcWdkkFdcuz6wPQfMLPLkNV6CXsSuE/G?=
- =?us-ascii?Q?FXvYuwC2DHmNulPXvWXFeDiPAeX3OxPu/QKQR8P16Mm6mQOcExxSwnNGEWSi?=
- =?us-ascii?Q?QcV/Qh2MMKwzdGSQSp7HKK3fENlucTNEJBkyQ1NpbazKaaAjGjxDlaBBX/E7?=
- =?us-ascii?Q?UgLvUVpW7xEzFHAbV5ZtgpuFtgrpLjRpZj65NYlMpzkevcRTVUaDJqiVwdih?=
- =?us-ascii?Q?EczSWHhpJD+8rxAdTMNvlmCFNQrHOpj2frSf1AsUhaZwEGZ+ppirU4JytZku?=
- =?us-ascii?Q?LpcxtJZKLrzHKVPT4ZoQukuxluBNapLb6tEy+ZTnv8pdYMv2Hx2MfuSe7ikY?=
- =?us-ascii?Q?hNiQ+QrK6KUrh0MMozCVE5ASIivq+3aRoDpXYPsU+I9MoUdFrpnexoGApkpr?=
- =?us-ascii?Q?W2vnCmqg0cVFB80YVr44dsuHO/N6EsOj/zE8Fp73hf3zpK/FS9Zzxjpoiwlt?=
- =?us-ascii?Q?Us8AHf0GpPm0qjDKnDsB1ncvZUU0AuYnwLVWLmNciXQFroiAqsRVN7e1y+3Y?=
- =?us-ascii?Q?LoXqduAa7lQ9q2oLGauVHRXRwD9rosePFGjqHe0J6Dm2/SpkAu5cxIfx5+Rx?=
- =?us-ascii?Q?nAVC/R0IZ+2pw7U3Fgs2gvCPgM+4nsbv2RXZKRha48YWrQxcO/qZsroCPNmE?=
- =?us-ascii?Q?1Ymt/NNqgUCrR3ep6RhO5gYeQoyAYC2jJiPi0oXdhaX+EaIWRx8dQCVVecS4?=
- =?us-ascii?Q?qRdT/GPJ0jj3iXVbMmm1vNN/V6VkLncMNRzK3H2pnjmgDu2FXw=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:FRWP192MB2997.EURP192.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?ucWmPthV0n6P5KoNwEvwBnFW3cQM2qyBv5FJNlCNTegni+Qwa37Rwtwxb8rR?=
- =?us-ascii?Q?TrSj9vKrDl+HgAltFcDwZWxwk06FwsIcuT240NwVr4Yal68NG5OXKaNASK2/?=
- =?us-ascii?Q?XQ9k7K3svjD7scz/JcdQm2+Ern9LsSDapkWGkPzwmx6Lh13+qJ2EuhvUQYab?=
- =?us-ascii?Q?FARhjltTNSCM1wnjSI730evuxfdFJQHXEOef2sSzIq2DZxk1vuM+9ryFEagG?=
- =?us-ascii?Q?KPY4Ns28dNzttLha1zLsmoXavwPDqUQGtMLInLNM+aRpa9sZoUx0ZA5vkVQO?=
- =?us-ascii?Q?hbVlcj2nSLZKLpVJbGS5FekOmY4GWHj/hrTW8p51/Yl7X+AjYJs71ODEFeo/?=
- =?us-ascii?Q?nL3CVTndXqlHGdHoKF4susRKRMmmRpF8a9xFyC6ZK/76sktCTXtzWGZgcyjB?=
- =?us-ascii?Q?aH4TDx0g0HYixkzYBgAHnysVKYs21ejG2i9LabFRuZfabxBVFRgKb/rYmKBJ?=
- =?us-ascii?Q?70dvzMXfAQX43N99E9rFyV1iYf9Yjrfh1SVaj88685VO0D+Q1CW4FRfRPKXq?=
- =?us-ascii?Q?wH9Cg8mqZWWat1X5amc2Fz4a3kD8gw80b+4ed8J89KG/Y3sdCNwMl6jF9ZCk?=
- =?us-ascii?Q?AFNbCeOpYY5+8OqfelGuoi6He3O7BNdoJUskxSIyM3Mmi0Piim/95AZWPwzk?=
- =?us-ascii?Q?umfl0UHze/Iz3KS6POh9OZ3LW0Wr/fLwA/W3FdQBSN9RcEG6bjsoHO8OxcMR?=
- =?us-ascii?Q?rRXyMTXAGTTfrWzNtzCVcVXWJS2l4IpHg79jLPQbTpSzoqCY88LXm3OjkAVL?=
- =?us-ascii?Q?whWatRQzxjnL5lNf1JdnfVVnKRqoAhaft7PYLxSRY3qfZGfsbv4VpXLBv+BF?=
- =?us-ascii?Q?ZRBJr2puuTHmrDtzlZE4OnWYOF0ojyupSwl3Yzcj/evwo6pAgfQdCcz0h/Nq?=
- =?us-ascii?Q?WegIZuh6t2wREeaw4xEJSZtenPSJI8cBFYOGdH/gT8HqyFtRlR8bDq1dV72W?=
- =?us-ascii?Q?N6AltFLelcdMqHkt7/VqLvi2sCc6mxvE1dpM5KDTK5QR5hn4ljPvpPLr0Oql?=
- =?us-ascii?Q?9Nth42fgoIg4AaJbUw0FaENFXe1bQ1RfMosyKMY3/IluI/uhKgapOeWdZL/s?=
- =?us-ascii?Q?BPQ+MaP0NLs/ZIL+MjNKBBtxIDmLna+MTdG0uBPzyKXQHG08XhAChqScRbTr?=
- =?us-ascii?Q?pUFtb7GPKEExsqyGNeutSG/CZKV4K+opcTl1XDme/ShiovTcDZmOCW7fVHuA?=
- =?us-ascii?Q?3buwCO9ZEL4Nme8yBs6jSjpUBB+DRjE9k/N6poFpepHsGI7VXsAhUzYwBmXy?=
- =?us-ascii?Q?1wAw4fdKTH2P/lKQZtxvMwdEtwB9XnqVi/zmlPLC7uD4znp0JRCfH4xDA29u?=
- =?us-ascii?Q?JmkrP+PYhsfr3FNJrvtxyRAAjOKfCUum+sXK4o4ZbihY4ltgw6zpI+0Owpy4?=
- =?us-ascii?Q?Vf4eJFkd1k2+pY4YcTfKzjFvUZDMIvNfRRmCD2fonwoIf6uWuPZtw7GhaLKZ?=
- =?us-ascii?Q?5NE9ehs91UyNVxcgfcs/dGq1FqkukVqrYRg/G9vV/yh9dWl2c7bfkRdhmVSH?=
- =?us-ascii?Q?/CRLe7gqaNC3nBayBtHzvSl9ZhxPS09+KPf5BISCgUcU0Le4VooQ3nDqIv4K?=
- =?us-ascii?Q?jrvM8O+K9v5VReWXsiMjvhEUhevoI/TqfBEsgXM1?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	0paCOBb8SjoSNBJGgwnkGIrpfTKVIDtJ27oqKCrFqrKIXz4Wy6uvcBiUqqpFaFwK0W1zlc7hOz4TFb8u7Q7EIAesO3GPrkPqpTLiKf8LT2aeQ8trt9HpN8zCF0fD+r3gXW6KEFoNF+2+wfa0EcpJ+UDlJJgaEqUFEBOgJsVUTnV87OkxmJ3iCbzrXbi3XMafzwdYtlM/rbSwc0YKbiC+dsvNzptGKZRTSgLEKfnGvmy7rcN7+BCHAPkCRfeOWDBBJdNKBvVD5fQBnki80R2PbM1yzVuI7x3NbtKHg7XNVuIYlzOvFj/n44Ov1DhP0KbHT6irYD13PDkquUnVxTvn97zMv60bwivB9sxCHPD745ElHQXC2Jja+TMZbSG4I1dgDVg+o6ZXl3j60AmWvVkxlXSPUwtU5tGsPUloboJR2knGGtbhQW8dEGId/pj/794YAcRmKheGLEVXXGOcehnTWt2XBY80rx2I0BegTYjnANyVjAGyEhfg4djn2Z7ytA0R6en3QHz6dPbG44elJHooTMxOuV/FSVfgUOr6MUJ2WlYuDXhINNK5ibzOVq4N8e9URaKDg/Y0ozvciySVHwEFXQflZ1qOadUUgvaKuNKMQ9Z/+PosohQqeKhkcPjZouHf
-X-OriginatorOrg: westermo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0d9fcb32-cf0a-4431-0913-08ddd31ea422
-X-MS-Exchange-CrossTenant-AuthSource: FRWP192MB2997.EURP192.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Aug 2025 06:17:51.3381
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4b2e9b91-de77-4ca7-8130-c80faee67059
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 9kr5NQIz6kx2sY38nUCapp1trgqOcQ8UzfHZGJnNYt4tYv64nZdwHcL726hYPI/6PL3tMatGJ54YyHs+/N54MA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA3P192MB3014
-X-MS-Exchange-CrossPremises-AuthSource: FRWP192MB2997.EURP192.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossPremises-AuthAs: Internal
-X-MS-Exchange-CrossPremises-AuthMechanism: 14
-X-MS-Exchange-CrossPremises-Mapi-Admin-Submission:
-X-MS-Exchange-CrossPremises-MessageSource: StoreDriver
-X-MS-Exchange-CrossPremises-BCC:
-X-MS-Exchange-CrossPremises-OriginalClientIPAddress: 104.151.95.196
-X-MS-Exchange-CrossPremises-TransportTrafficType: Email
-X-MS-Exchange-CrossPremises-Antispam-ScanContext:
-	DIR:Originating;SFV:NSPM;SKIP:0;
-X-MS-Exchange-CrossPremises-SCL: 1
-X-MS-Exchange-CrossPremises-Processed-By-Journaling: Journal Agent
-X-OrganizationHeadersPreserved: PA3P192MB3014.EURP192.PROD.OUTLOOK.COM
-X-Proofpoint-GUID: 6nomlsUi8sN5g8eoSbvtOJosPf9ITulw
-X-Authority-Analysis: v=2.4 cv=O+I5vA9W c=1 sm=1 tr=0 ts=68905093 cx=c_pps
- a=25yvLdp/56i8tqU5tlvOKQ==:117 a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19
- a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19
- a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19
- a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10 a=2OwXVqhp2XgA:10 a=8gLI3H-aZtYA:10
- a=idKTThOK8e33A5pbh1AA:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODA0MDAzMiBTYWx0ZWRfX25r39yIkDS91
- g3jroPqPVrAS393UDFY9Dn/TXoGUQohaCFYz9XouTKdy5AaRyRZwfon73kTlCTkQZ/dc/mtv+8m
- DiUFySi6FAECsn8fPCVmpFSTrcTjB4DcyaputpCyTQEZ4UUVHgssFAASFVLfk+zW0WOH01jj+7E
- NGZQ5yRkIl5tNzDxgTW05yQOSIs4N6SPCSOMK91S8LX9q0jzj3/arCPfX9t/9xZolJPZUM36lGK
- tIW6d7QN1G2M901NajcsD3nDUeKK3Mbxx5YFIkKoApMAobOWl1sSNDkULBic7KjcMmsspNOLEEi
- 0uRWLHUtpj6x5Kaw35zro9oewxalcB5Le6/W/TIxA70hXqvRNaP2WM3BUx9+Ag=
-X-Proofpoint-ORIG-GUID: 6nomlsUi8sN5g8eoSbvtOJosPf9ITulw
+Content-Transfer-Encoding: 8bit
 
-Am Fri, Aug 01, 2025 at 04:04:20PM +0300 schrieb Vladimir Oltean:
-> On Fri, Aug 01, 2025 at 01:23:44PM +0100, Russell King (Oracle) wrote:
-> > It looks like memac_select_pcs() and memac_prepare() fail to
-> > handle 2500BASEX despite memac_initialization() suggesting the
-> > SGMII PCS supports 2500BASEX.
-> 
-> Thanks for pointing this out, it seems to be a regression introduced by
-> commit 5d93cfcf7360 ("net: dpaa: Convert to phylink").
-> 
-> If there are no other volunteers, I can offer to submit a patch if
-> Alexander confirms this fixes his setup.
+In struct channel, the upl lock is implemented using rwlock_t,
+protecting access to pch->ppp and pch->bridge.
 
-I'd be happy to help by applying the patch on my system and running some tests.
-Please let me know if there are any specific steps or scenarios you'd like me to
-focus on.
+As previously discussed on the list, using rwlock in the network fast
+path is not recommended.
+This patch replaces the rwlock with a spinlock for writers, and uses RCU
+for readers.
 
-Best regards
-Alexander Wilhelm
+- pch->ppp and pch->bridge are now declared as __rcu pointers.
+- Readers use rcu_dereference_bh() under rcu_read_lock_bh().
+- Writers use spin_lock_bh() to update, followed by synchronize_rcu()
+  where required.
+
+Signed-off-by: Qingfang Deng <dqfext@gmail.com>
+---
+ drivers/net/ppp/ppp_generic.c | 122 ++++++++++++++++++----------------
+ 1 file changed, 65 insertions(+), 57 deletions(-)
+
+diff --git a/drivers/net/ppp/ppp_generic.c b/drivers/net/ppp/ppp_generic.c
+index 8c98cbd4b06d..ad32abb4bd09 100644
+--- a/drivers/net/ppp/ppp_generic.c
++++ b/drivers/net/ppp/ppp_generic.c
+@@ -178,11 +178,11 @@ struct channel {
+ 	struct ppp_channel *chan;	/* public channel data structure */
+ 	struct rw_semaphore chan_sem;	/* protects `chan' during chan ioctl */
+ 	spinlock_t	downl;		/* protects `chan', file.xq dequeue */
+-	struct ppp	*ppp;		/* ppp unit we're connected to */
++	struct ppp __rcu *ppp;		/* ppp unit we're connected to */
+ 	struct net	*chan_net;	/* the net channel belongs to */
+ 	netns_tracker	ns_tracker;
+ 	struct list_head clist;		/* link in list of channels per unit */
+-	rwlock_t	upl;		/* protects `ppp' and 'bridge' */
++	spinlock_t	upl;		/* protects `ppp' and 'bridge' */
+ 	struct channel __rcu *bridge;	/* "bridged" ppp channel */
+ #ifdef CONFIG_PPP_MULTILINK
+ 	u8		avail;		/* flag used in multilink stuff */
+@@ -644,34 +644,34 @@ static struct bpf_prog *compat_ppp_get_filter(struct sock_fprog32 __user *p)
+  */
+ static int ppp_bridge_channels(struct channel *pch, struct channel *pchb)
+ {
+-	write_lock_bh(&pch->upl);
+-	if (pch->ppp ||
++	spin_lock_bh(&pch->upl);
++	if (rcu_dereference_protected(pch->ppp, lockdep_is_held(&pch->upl)) ||
+ 	    rcu_dereference_protected(pch->bridge, lockdep_is_held(&pch->upl))) {
+-		write_unlock_bh(&pch->upl);
++		spin_unlock_bh(&pch->upl);
+ 		return -EALREADY;
+ 	}
+ 	refcount_inc(&pchb->file.refcnt);
+ 	rcu_assign_pointer(pch->bridge, pchb);
+-	write_unlock_bh(&pch->upl);
++	spin_unlock_bh(&pch->upl);
+ 
+-	write_lock_bh(&pchb->upl);
+-	if (pchb->ppp ||
++	spin_lock_bh(&pchb->upl);
++	if (rcu_dereference_protected(pchb->ppp, lockdep_is_held(&pchb->upl)) ||
+ 	    rcu_dereference_protected(pchb->bridge, lockdep_is_held(&pchb->upl))) {
+-		write_unlock_bh(&pchb->upl);
++		spin_unlock_bh(&pchb->upl);
+ 		goto err_unset;
+ 	}
+ 	refcount_inc(&pch->file.refcnt);
+ 	rcu_assign_pointer(pchb->bridge, pch);
+-	write_unlock_bh(&pchb->upl);
++	spin_unlock_bh(&pchb->upl);
+ 
+ 	return 0;
+ 
+ err_unset:
+-	write_lock_bh(&pch->upl);
++	spin_lock_bh(&pch->upl);
+ 	/* Re-read pch->bridge with upl held in case it was modified concurrently */
+ 	pchb = rcu_dereference_protected(pch->bridge, lockdep_is_held(&pch->upl));
+ 	RCU_INIT_POINTER(pch->bridge, NULL);
+-	write_unlock_bh(&pch->upl);
++	spin_unlock_bh(&pch->upl);
+ 	synchronize_rcu();
+ 
+ 	if (pchb)
+@@ -685,25 +685,25 @@ static int ppp_unbridge_channels(struct channel *pch)
+ {
+ 	struct channel *pchb, *pchbb;
+ 
+-	write_lock_bh(&pch->upl);
++	spin_lock_bh(&pch->upl);
+ 	pchb = rcu_dereference_protected(pch->bridge, lockdep_is_held(&pch->upl));
+ 	if (!pchb) {
+-		write_unlock_bh(&pch->upl);
++		spin_unlock_bh(&pch->upl);
+ 		return -EINVAL;
+ 	}
+ 	RCU_INIT_POINTER(pch->bridge, NULL);
+-	write_unlock_bh(&pch->upl);
++	spin_unlock_bh(&pch->upl);
+ 
+ 	/* Only modify pchb if phcb->bridge points back to pch.
+ 	 * If not, it implies that there has been a race unbridging (and possibly
+ 	 * even rebridging) pchb.  We should leave pchb alone to avoid either a
+ 	 * refcount underflow, or breaking another established bridge instance.
+ 	 */
+-	write_lock_bh(&pchb->upl);
++	spin_lock_bh(&pchb->upl);
+ 	pchbb = rcu_dereference_protected(pchb->bridge, lockdep_is_held(&pchb->upl));
+ 	if (pchbb == pch)
+ 		RCU_INIT_POINTER(pchb->bridge, NULL);
+-	write_unlock_bh(&pchb->upl);
++	spin_unlock_bh(&pchb->upl);
+ 
+ 	synchronize_rcu();
+ 
+@@ -2154,10 +2154,9 @@ static int ppp_mp_explode(struct ppp *ppp, struct sk_buff *skb)
+ #endif /* CONFIG_PPP_MULTILINK */
+ 
+ /* Try to send data out on a channel */
+-static void __ppp_channel_push(struct channel *pch)
++static void __ppp_channel_push(struct channel *pch, struct ppp *ppp)
+ {
+ 	struct sk_buff *skb;
+-	struct ppp *ppp;
+ 
+ 	spin_lock(&pch->downl);
+ 	if (pch->chan) {
+@@ -2176,7 +2175,6 @@ static void __ppp_channel_push(struct channel *pch)
+ 	spin_unlock(&pch->downl);
+ 	/* see if there is anything from the attached unit to be sent */
+ 	if (skb_queue_empty(&pch->file.xq)) {
+-		ppp = pch->ppp;
+ 		if (ppp)
+ 			__ppp_xmit_process(ppp, NULL);
+ 	}
+@@ -2185,19 +2183,21 @@ static void __ppp_channel_push(struct channel *pch)
+ static void ppp_channel_push(struct channel *pch)
+ {
+ 	struct ppp_xmit_recursion *xmit_recursion;
++	struct ppp *ppp;
+ 
+-	read_lock_bh(&pch->upl);
+-	if (pch->ppp) {
+-		xmit_recursion = this_cpu_ptr(pch->ppp->xmit_recursion);
+-		local_lock_nested_bh(&pch->ppp->xmit_recursion->bh_lock);
++	rcu_read_lock_bh();
++	ppp = rcu_dereference_bh(pch->ppp);
++	if (ppp) {
++		xmit_recursion = this_cpu_ptr(ppp->xmit_recursion);
++		local_lock_nested_bh(&ppp->xmit_recursion->bh_lock);
+ 		xmit_recursion->owner = current;
+-		__ppp_channel_push(pch);
++		__ppp_channel_push(pch, ppp);
+ 		xmit_recursion->owner = NULL;
+-		local_unlock_nested_bh(&pch->ppp->xmit_recursion->bh_lock);
++		local_unlock_nested_bh(&ppp->xmit_recursion->bh_lock);
+ 	} else {
+-		__ppp_channel_push(pch);
++		__ppp_channel_push(pch, NULL);
+ 	}
+-	read_unlock_bh(&pch->upl);
++	rcu_read_unlock_bh();
+ }
+ 
+ /*
+@@ -2299,6 +2299,7 @@ void
+ ppp_input(struct ppp_channel *chan, struct sk_buff *skb)
+ {
+ 	struct channel *pch = chan->ppp;
++	struct ppp *ppp;
+ 	int proto;
+ 
+ 	if (!pch) {
+@@ -2310,18 +2311,19 @@ ppp_input(struct ppp_channel *chan, struct sk_buff *skb)
+ 	if (ppp_channel_bridge_input(pch, skb))
+ 		return;
+ 
+-	read_lock_bh(&pch->upl);
++	rcu_read_lock_bh();
++	ppp = rcu_dereference_bh(pch->ppp);
+ 	if (!ppp_decompress_proto(skb)) {
+ 		kfree_skb(skb);
+-		if (pch->ppp) {
+-			++pch->ppp->dev->stats.rx_length_errors;
+-			ppp_receive_error(pch->ppp);
++		if (ppp) {
++			++ppp->dev->stats.rx_length_errors;
++			ppp_receive_error(ppp);
+ 		}
+ 		goto done;
+ 	}
+ 
+ 	proto = PPP_PROTO(skb);
+-	if (!pch->ppp || proto >= 0xc000 || proto == PPP_CCPFRAG) {
++	if (!ppp || proto >= 0xc000 || proto == PPP_CCPFRAG) {
+ 		/* put it on the channel queue */
+ 		skb_queue_tail(&pch->file.rq, skb);
+ 		/* drop old frames if queue too long */
+@@ -2330,11 +2332,11 @@ ppp_input(struct ppp_channel *chan, struct sk_buff *skb)
+ 			kfree_skb(skb);
+ 		wake_up_interruptible(&pch->file.rwait);
+ 	} else {
+-		ppp_do_recv(pch->ppp, skb, pch);
++		ppp_do_recv(ppp, skb, pch);
+ 	}
+ 
+ done:
+-	read_unlock_bh(&pch->upl);
++	rcu_read_unlock_bh();
+ }
+ 
+ /* Put a 0-length skb in the receive queue as an error indication */
+@@ -2343,20 +2345,22 @@ ppp_input_error(struct ppp_channel *chan, int code)
+ {
+ 	struct channel *pch = chan->ppp;
+ 	struct sk_buff *skb;
++	struct ppp *ppp;
+ 
+ 	if (!pch)
+ 		return;
+ 
+-	read_lock_bh(&pch->upl);
+-	if (pch->ppp) {
++	rcu_read_lock_bh();
++	ppp = rcu_dereference_bh(pch->ppp);
++	if (ppp) {
+ 		skb = alloc_skb(0, GFP_ATOMIC);
+ 		if (skb) {
+ 			skb->len = 0;		/* probably unnecessary */
+ 			skb->cb[0] = code;
+-			ppp_do_recv(pch->ppp, skb, pch);
++			ppp_do_recv(ppp, skb, pch);
+ 		}
+ 	}
+-	read_unlock_bh(&pch->upl);
++	rcu_read_unlock_bh();
+ }
+ 
+ /*
+@@ -2904,7 +2908,6 @@ int ppp_register_net_channel(struct net *net, struct ppp_channel *chan)
+ 
+ 	pn = ppp_pernet(net);
+ 
+-	pch->ppp = NULL;
+ 	pch->chan = chan;
+ 	pch->chan_net = get_net_track(net, &pch->ns_tracker, GFP_KERNEL);
+ 	chan->ppp = pch;
+@@ -2915,7 +2918,7 @@ int ppp_register_net_channel(struct net *net, struct ppp_channel *chan)
+ #endif /* CONFIG_PPP_MULTILINK */
+ 	init_rwsem(&pch->chan_sem);
+ 	spin_lock_init(&pch->downl);
+-	rwlock_init(&pch->upl);
++	spin_lock_init(&pch->upl);
+ 
+ 	spin_lock_bh(&pn->all_channels_lock);
+ 	pch->file.index = ++pn->last_channel_index;
+@@ -2944,13 +2947,15 @@ int ppp_channel_index(struct ppp_channel *chan)
+ int ppp_unit_number(struct ppp_channel *chan)
+ {
+ 	struct channel *pch = chan->ppp;
++	struct ppp *ppp;
+ 	int unit = -1;
+ 
+ 	if (pch) {
+-		read_lock_bh(&pch->upl);
+-		if (pch->ppp)
+-			unit = pch->ppp->file.index;
+-		read_unlock_bh(&pch->upl);
++		rcu_read_lock_bh();
++		ppp = rcu_dereference_bh(pch->ppp);
++		if (ppp)
++			unit = ppp->file.index;
++		rcu_read_unlock_bh();
+ 	}
+ 	return unit;
+ }
+@@ -2962,12 +2967,14 @@ char *ppp_dev_name(struct ppp_channel *chan)
+ {
+ 	struct channel *pch = chan->ppp;
+ 	char *name = NULL;
++	struct ppp *ppp;
+ 
+ 	if (pch) {
+-		read_lock_bh(&pch->upl);
+-		if (pch->ppp && pch->ppp->dev)
+-			name = pch->ppp->dev->name;
+-		read_unlock_bh(&pch->upl);
++		rcu_read_lock_bh();
++		ppp = rcu_dereference_bh(pch->ppp);
++		if (ppp && ppp->dev)
++			name = ppp->dev->name;
++		rcu_read_unlock_bh();
+ 	}
+ 	return name;
+ }
+@@ -3490,9 +3497,9 @@ ppp_connect_channel(struct channel *pch, int unit)
+ 	ppp = ppp_find_unit(pn, unit);
+ 	if (!ppp)
+ 		goto out;
+-	write_lock_bh(&pch->upl);
++	spin_lock_bh(&pch->upl);
+ 	ret = -EINVAL;
+-	if (pch->ppp ||
++	if (rcu_dereference_protected(pch->ppp, lockdep_is_held(&pch->upl)) ||
+ 	    rcu_dereference_protected(pch->bridge, lockdep_is_held(&pch->upl)))
+ 		goto outl;
+ 
+@@ -3517,13 +3524,13 @@ ppp_connect_channel(struct channel *pch, int unit)
+ 		ppp->dev->hard_header_len = hdrlen;
+ 	list_add_tail(&pch->clist, &ppp->channels);
+ 	++ppp->n_channels;
+-	pch->ppp = ppp;
++	rcu_assign_pointer(pch->ppp, ppp);
+ 	refcount_inc(&ppp->file.refcnt);
+ 	ppp_unlock(ppp);
+ 	ret = 0;
+ 
+  outl:
+-	write_unlock_bh(&pch->upl);
++	spin_unlock_bh(&pch->upl);
+  out:
+ 	mutex_unlock(&pn->all_ppp_mutex);
+ 	return ret;
+@@ -3538,10 +3545,11 @@ ppp_disconnect_channel(struct channel *pch)
+ 	struct ppp *ppp;
+ 	int err = -EINVAL;
+ 
+-	write_lock_bh(&pch->upl);
+-	ppp = pch->ppp;
+-	pch->ppp = NULL;
+-	write_unlock_bh(&pch->upl);
++	spin_lock_bh(&pch->upl);
++	ppp = rcu_replace_pointer(pch->ppp, NULL, lockdep_is_held(&pch->upl));
++	spin_unlock_bh(&pch->upl);
++	synchronize_rcu();
++
+ 	if (ppp) {
+ 		/* remove it from the ppp unit's list */
+ 		ppp_lock(ppp);
+-- 
+2.43.0
+
 
