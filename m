@@ -1,179 +1,157 @@
-Return-Path: <netdev+bounces-211571-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211572-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34467B1A316
-	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 15:18:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4B47B1A320
+	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 15:21:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 637B23B08F5
-	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 13:18:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9029F1889BE6
+	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 13:21:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93912262FDC;
-	Mon,  4 Aug 2025 13:18:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D10AD265CAB;
+	Mon,  4 Aug 2025 13:21:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cO/bTQ82"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aO7MnoiW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BCCB26136D;
-	Mon,  4 Aug 2025 13:18:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 228C51D6187;
+	Mon,  4 Aug 2025 13:21:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754313521; cv=none; b=r3qeTLk5xoL7GlAq6WkBAgt4YFvXcfTst06ZOFY+QLyISUDAQ9O31F04ORMb4pj02byqXsCxYgU5V3jwuDR/rIyKKYJjF+cxb/MIOWxvhMVATmtDs7Zs7xe86zXOztydzXULd5lupmZZxTsemZVaFOM8dUr49mKGuJ9M/qS20zU=
+	t=1754313692; cv=none; b=V+WuYY/LtCf3p0iTZ9nHJUbnGUpvE34ZuSOuNA+KCRuYhrXBCSUUdfvDMnDqyl7AZA8oYOt1GhfbZ2h5ASrkRI+GVBrgeOm4pI5VVCrK+KzXShtri9/wOqfH8FSmZ+QbEmaP66lUwD5rnbMJtVpb01YuH855/Z5OMsxjef73F50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754313521; c=relaxed/simple;
-	bh=Tkk4+t+dFqTOZm++s1naWey6M4k5HYMwzIAi/9j7gf0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=O8WSsL/uGCRwYjJwE3a3aqXU/Ny2hi+aEb9U96iUdxPhQ880X7AzEBJ5giaBbI2iCnzW9wP9cmVAOLjTUAqM3QGCIM8JlJ1Csbvus7nGQAC8BCVVWD2/NWQ+EHf3uZu5IKzPOr3QE8DBBGKj7zJQmw4L39C2vJ8Cj7qS0UJuYKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cO/bTQ82; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40E68C4CEE7;
-	Mon,  4 Aug 2025 13:18:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754313520;
-	bh=Tkk4+t+dFqTOZm++s1naWey6M4k5HYMwzIAi/9j7gf0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=cO/bTQ82xs8gpbUVqYV4dsg6q8+tweO2XuaoGVVDRv04gznO58G40gRTpe02ud6da
-	 YaKLwBhyNOJC7ccSBuDi92PpdtZIyX8FJ1AXluHXL50HJTccIsESg32lIccEp0ocRW
-	 EreleFElajIdHRm73hj/X/Qi2c6MT8SP6PBoKdOwlBHeEluTObp/jEE/3ZY1DwlZn0
-	 +3wTKuyJM63RhrZiWPt4h/RTpikIFOND9hQYxK/a1h26bq0mIikmF1L1QTOv9whudt
-	 Wci98ZlxRLQuXDOqtWelg+CO4w6ahYNK68ts8lwlu9hbjORfnC5+ZHz6H979W8RUpQ
-	 1aTg8qJ4l/f3A==
-Message-ID: <de68b1d7-86cd-4280-af6a-13f0751228c4@kernel.org>
-Date: Mon, 4 Aug 2025 15:18:35 +0200
+	s=arc-20240116; t=1754313692; c=relaxed/simple;
+	bh=g2sA1Fds1nlSJJEi/ElywiQ6C4KqAI+ujifxQCtypGg=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A83hleVIxIzcaifBr1M3AR6BfEj2o7cnGveU6rOsezyHaxY2RTcwCWG9oJNrGXUFGwQrmyy88dfLgwdm1BGlDWfzCLLBN07Kscdb/0LXYNQHmZWo+ibFjqES47CLRkDcbqNsJgEf5D1tnaa9SY5IrdjlH+EUk4awwWiLrfMXj8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aO7MnoiW; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-af8fd1b80e5so729473866b.2;
+        Mon, 04 Aug 2025 06:21:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1754313689; x=1754918489; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=4HeCvEqJ9PJPJxZO6EghnJ727smuSZ/NKLaIR+eVjtM=;
+        b=aO7MnoiW5Ul/EgbI9wmG8qZG+qsjYhkJzBsLMTKKKAgCpgOR5RO8f0PUpGP8+QPacB
+         YzAWpUPxYtdCPeFirNzEdy4ddaH+zmZud9FBhVpQHkwNY9M/MSpRDan1mzcrdtFbIWqj
+         4Fq42eezmbuSIUnRqgKIycV8daa+S6LTeA3r0RjMFXYfAXKtJjFPXRr1Hkpy9UKqPy+a
+         r7K5FEk7Y+pxihqg6poG0AvTRE9u7/JZxE8U/Z0w6Z4ApyNGw99v40vxSBvyI5Y57fui
+         e4YZBj/6oiNyb7f44pr86gTwodsHeq8TNtQ74Xs5yRJqI6VEZa/iUEkpJM6iwtskeGZ7
+         vMbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754313689; x=1754918489;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4HeCvEqJ9PJPJxZO6EghnJ727smuSZ/NKLaIR+eVjtM=;
+        b=SXuYZrp1SYWwN1vKPkGqnZwqsV0qjvarjbdAfKTlNmr2P/jGnNJaBz0/3vzSzn5MIr
+         kSXXm0ERNCfCaHqf1YLFmgEiAYJjYmxcbo4JJkO6EvAf/hhM7OkR1vxRTXh5tP6sjATW
+         cMlt8h8zNayQiRFwqaVcEYQEPbXqHQZ+tkeY+1iXK/sYV1Gp3Xd6vLB+LCducCNROccL
+         e8ctIxSqv6BC3tucHGLoL3U4eU9ia6Y3iAlPOTm9obz61ORyYRvHMJOPm1CGP/Ini9hD
+         oN91LjFBG1/mCfiw5UIamXuDHeelQXE9P5DMgZ+MBeiNE+FlijSk9jQ63fOtfpOu+hVO
+         hsBA==
+X-Forwarded-Encrypted: i=1; AJvYcCWXQLFUcuvDXrT0mNUVUKJ3BFzhp0A8OX5wAbcNm6wAB4NGnzCmJlJzf2tap3VO9OVN+WA=@vger.kernel.org, AJvYcCXHBk9sz+l12iDpJb8Qx009s+fK0sPDTcgfwWS7c9hWX20qoQrF7Yy8YEI1SMLOCwFUfU8lfR/8@vger.kernel.org, AJvYcCXHiyMEnzaEcuR6sMoF9DarHzmwJgMYDd2vP9wpNlRDY03o2mwBntgfxCkhB7PgIOZE42/l4vMptnXRGvuR@vger.kernel.org
+X-Gm-Message-State: AOJu0YxTZCAkLVAc/9IEMpkGf5LW6PgptvVhbtVByuxUZd0gWx7fsNzB
+	xMrGMO/K+oVTlDOaOk9NsD8Sbf8fo+o4p5QLFR7OY+Jv3jUlBvaXnWNC
+X-Gm-Gg: ASbGncuGk0xVMVlkNsya+d29L1q+6nzjGgu9/+OcS7VFNm8IIF1gb8dcFcAEYOM+aT3
+	3gtnssJvNxXHSXL4aSV1Ff0t3pMwcWOQrFyryFcEO5c8LhKzVbKEZKj72GA+kksKXTnVn4R3+Zr
+	gsKyR6mEYwECTf0Qb4sxHnSXDqT04P/2DXO0txKtxwL4gUxYeOihZClBa8UGD7+EpyEfLP3XZtn
+	/t+9wmymCuRYGCwObef4k2CthFnTiXrBEUvLdHB6DZb654yQt68SUS/+9ypwPPaw5QQmLX7bhqM
+	JEIicYbx47zW+CAFGrgJJtd4Zbjb2WG6cpTpV8YZSW1eX2bMeF8Lxy1vbzCGFTu5Gl6ChR00mQk
+	5RM/yNiHk
+X-Google-Smtp-Source: AGHT+IEqQQxYJKlfzPoqMUFgHU6zIROEhRJl3hS7d/QAoZRcIhvjAFJTl85oWEYcXxqL2Ug3uv6Oaw==
+X-Received: by 2002:a17:907:1c12:b0:af8:f9e8:6fae with SMTP id a640c23a62f3a-af9402077e3mr996033666b.46.1754313688819;
+        Mon, 04 Aug 2025 06:21:28 -0700 (PDT)
+Received: from krava ([173.38.220.40])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-af91a1e89a6sm732669466b.73.2025.08.04.06.21.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Aug 2025 06:21:27 -0700 (PDT)
+From: Jiri Olsa <olsajiri@gmail.com>
+X-Google-Original-From: Jiri Olsa <jolsa@kernel.org>
+Date: Mon, 4 Aug 2025 15:21:25 +0200
+To: Qianfeng Rong <rongqianfeng@vivo.com>
+Cc: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
+	netdev@vger.kernel.org, bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] bpf: Remove redundant __GFP_NOWARN
+Message-ID: <aJCz1cRFjEo-Jm1-@krava>
+References: <20250804122731.460158-1-rongqianfeng@vivo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next V2 0/7] xdp: Allow BPF to set RX hints for
- XDP_REDIRECTed packets
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Martin KaFai Lau <martin.lau@linux.dev>,
- Lorenzo Bianconi <lorenzo@kernel.org>,
- Stanislav Fomichev <stfomichev@gmail.com>, bpf@vger.kernel.org,
- netdev@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <borkmann@iogearbox.net>,
- Eric Dumazet <eric.dumazet@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, sdf@fomichev.me,
- kernel-team@cloudflare.com, arthur@arthurfabre.com, jakub@cloudflare.com,
- Jesse Brandeburg <jbrandeburg@cloudflare.com>,
- Andrew Rzeznik <arzeznik@cloudflare.com>
-References: <b1873a92-747d-4f32-91f8-126779947e42@kernel.org>
- <aGvcb53APFXR8eJb@mini-arch> <aG427EcHHn9yxaDv@lore-desk>
- <aHE2F1FJlYc37eIz@mini-arch> <aHeKYZY7l2i1xwel@lore-desk>
- <20250716142015.0b309c71@kernel.org>
- <fbb026f9-54cf-49ba-b0dc-0df0f54c6961@kernel.org>
- <20250717182534.4f305f8a@kernel.org>
- <ebc18aba-d832-4eb6-b626-4ca3a2f27fe2@kernel.org>
- <20250721181344.24d47fa3@kernel.org> <aIdWjTCM1nOjiWfC@lore-desk>
- <20250728092956.24a7d09b@kernel.org>
- <b23ed0e2-05cf-454b-bf7a-a637c9bb48e8@kernel.org>
- <4eaf6d02-6b4e-4713-a8f8-6b00a031d255@linux.dev>
- <21f4ee22-84f0-4d5e-8630-9a889ca11e31@kernel.org>
- <20250801133803.7570a6fd@kernel.org>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <20250801133803.7570a6fd@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250804122731.460158-1-rongqianfeng@vivo.com>
 
-
-
-On 01/08/2025 22.38, Jakub Kicinski wrote:
-> On Thu, 31 Jul 2025 18:27:07 +0200 Jesper Dangaard Brouer wrote:
->>> iirc, a xdp prog can be attached to a cpumap. The skb can be created by
->>> that xdp prog running on the remote cpu. It should be like a xdp prog
->>> returning a XDP_PASS + an optional skb. The xdp prog can set some fields
->>> in the skb. Other than setting fields in the skb, something else may be
->>> also possible in the future, e.g. look up sk, earlier demux ...etc.
->>
->> I have strong reservations about having the BPF program itself trigger
->> the SKB allocation. I believe this would fundamentally break the
->> performance model that makes cpumap redirect so effective.
+On Mon, Aug 04, 2025 at 08:27:30PM +0800, Qianfeng Rong wrote:
+> Commit 16f5dfbc851b ("gfp: include __GFP_NOWARN in GFP_NOWAIT")
+> made GFP_NOWAIT implicitly include __GFP_NOWARN.
 > 
-> See, I have similar concerns about growing struct xdp_frame.
+> Therefore, explicit __GFP_NOWARN combined with GFP_NOWAIT
+> (e.g., `GFP_NOWAIT | __GFP_NOWARN`) is now redundant. Let's clean
+> up these redundant flags across subsystems.
 > 
-
-IMHO there is a huge difference in doing memory allocs+init vs. growing
-struct xdp_frame.
-
-It very is important to notice that patchset is actually not growing
-xdp_frame, in the traditional sense, instead we are adding an optional
-area to xdp_frame (plus some flags to tell if area is in-use).  Remember
-the xdp_frame area is not allocated or mem-zeroed (except flags).  If
-not used, the members in struct xdp_rx_meta are never touched. Thus,
-there is actually no performance impact in growing struct xdp_frame in
-this way. Do you still have concerns?
-
-
-> That's why the guiding principle for me would be to make sure that
-> the features we add, beyond "classic XDP" as needed by DDoS, are
-> entirely optional. 
-
-Exactly, we agree.  What we do in this patchset is entirely optional.
-These changes does not slowdown "classic XDP" and our DDoS use-case.
-
-
-> And if we include the goal of moving skb allocation
-> out of the driver to the xdp_frame growth, the drivers will sooner or
-> later unconditionally populate the xdp_frame. Decreasing performance
-> of "classic XDP"?
->
-
-No, that is the beauty of this solution, it will not decrease the
-performance of "classic XDP".
-
-Do keep-in-mind that "moving skb allocation out of the driver" is not
-part of this patchset and a moonshot goal that will take a long time
-(but we are already "simulation" this via XDP-redirect for years now).
-Drivers should obviously not unconditionally populate the xdp_frame's
-rx_meta area.  It is first time to populate rx_meta, once driver reach
-XDP_PASS case (normal netstack delivery). Today all drivers will at this
-stage populate the SKB metadata (e.g. rx-hash + vlan) from the RX-
-descriptor anyway.  Thus, I don't see how replacing those writes will
-decrease performance.
-
-
->> The key to XDP's high performance lies in processing a bulk of
->> xdp_frames in a tight loop to amortize costs. The existing cpumap code
->> on the remote CPU is already highly optimized for this: it performs bulk
->> allocation of SKBs and uses careful prefetching to hide the memory
->> latency. Allowing a BPF program to sometimes trigger a heavyweight SKB
->> alloc+init (4 cache-line misses) would bypass all these existing
->> optimizations. It would introduce significant jitter into the pipeline
->> and disrupt the entire bulk-processing model we rely on for performance.
->>
->> This performance is not just theoretical;
+> No functional changes.
 > 
-> Somewhat off-topic for the architecture, I think, but do you happen
-> to have any real life data for that? IIRC the "listification" was a
-> moderate success for the skb path.. Or am I misreading and you have
-> other benefits of a tight processing loop in mind?
+> Signed-off-by: Qianfeng Rong <rongqianfeng@vivo.com>
 
-Our "tight processing loop" for NAPI (net_rx_action/napi_pool) is not
-performing as well as we want. One major reason is that the CPU is being
-stalled each time in the loop when the NIC driver needs to clear the 4
-cache-lines for the SKB.  XDP have shown us that avoiding these steps is
-a huge performance boost.  The "moving skb allocation out of the driver"
-is one step towards improving the NAPI loop. As you hint we also need
-some bulking or "listification".  I'm not a huge fan of SKB
-"listification". XDP-redirect devmap/cpumap uses an array for creating
-an RX bulk "stage".  The SKB listification work was never fully
-completed IMHO.  Back then, I was working on getting PoC for SKB
-forwarding working, but as soon as we reached any of the netfilter hooks
-points the SKB list would get split into individual SKBs. IIRC SKB
-listification only works for the first part of netstack SKB input code
-path. And "late" part of qdisc TX layer, but the netstack code in-
-between will always cause the SKB list would get split into individual
-SKBs.  IIRC only back-pressure during qdisc TX will cause listification
-to be used. It would be great if someone have cycles to work on
-completing more of the SKB listification.
+Acked-by: Jiri Olsa <jolsa@kernel.org>
 
---Jesper
+jirka
 
+
+> ---
+>  kernel/bpf/devmap.c        | 2 +-
+>  kernel/bpf/local_storage.c | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/kernel/bpf/devmap.c b/kernel/bpf/devmap.c
+> index 482d284a1553..2625601de76e 100644
+> --- a/kernel/bpf/devmap.c
+> +++ b/kernel/bpf/devmap.c
+> @@ -865,7 +865,7 @@ static struct bpf_dtab_netdev *__dev_map_alloc_node(struct net *net,
+>  	struct bpf_dtab_netdev *dev;
+>  
+>  	dev = bpf_map_kmalloc_node(&dtab->map, sizeof(*dev),
+> -				   GFP_NOWAIT | __GFP_NOWARN,
+> +				   GFP_NOWAIT,
+>  				   dtab->map.numa_node);
+>  	if (!dev)
+>  		return ERR_PTR(-ENOMEM);
+> diff --git a/kernel/bpf/local_storage.c b/kernel/bpf/local_storage.c
+> index 632d51b05fe9..c93a756e035c 100644
+> --- a/kernel/bpf/local_storage.c
+> +++ b/kernel/bpf/local_storage.c
+> @@ -165,7 +165,7 @@ static long cgroup_storage_update_elem(struct bpf_map *map, void *key,
+>  	}
+>  
+>  	new = bpf_map_kmalloc_node(map, struct_size(new, data, map->value_size),
+> -				   __GFP_ZERO | GFP_NOWAIT | __GFP_NOWARN,
+> +				   __GFP_ZERO | GFP_NOWAIT,
+>  				   map->numa_node);
+>  	if (!new)
+>  		return -ENOMEM;
+> -- 
+> 2.34.1
+> 
 
