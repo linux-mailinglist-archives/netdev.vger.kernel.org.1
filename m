@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-211585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211586-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44E77B1A3F8
-	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 15:59:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8989FB1A40D
+	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 16:05:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3F533A4A38
-	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 13:59:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 21F3418A1042
+	for <lists+netdev@lfdr.de>; Mon,  4 Aug 2025 14:06:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6911F26E6FB;
-	Mon,  4 Aug 2025 13:58:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 149F626F45A;
+	Mon,  4 Aug 2025 14:05:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BEwlJ1FD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k1wMMNog"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3355025C81C;
-	Mon,  4 Aug 2025 13:58:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D40C926E70B;
+	Mon,  4 Aug 2025 14:05:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754315937; cv=none; b=SDR+GkJT9mFLCFCYYdKbEhoGs2EHi0AP+IEUlQDPCVA7rIxHzODKwpc5yI37rGJY5Gb9MaLDuAsyMnpJzRuBmiB0maZA96v4TmMQ+Yt+sQeC8lv0ty0qmyTyt3NjZWUtGH9A2gv1lJTEPucifVLkR60tdaWjmOlSoG83bxn1dj0=
+	t=1754316343; cv=none; b=sO7BiXDe4vWuH084O4zbZoyh1gUsdj/inQTHPOIz20NIH0EMQuuCTGq2lskNO5EkEkQ1ZFKCRSkLAtSy1uluMHVlp1zXNOJuKmr8iN6+8ziHUfCW5rQFdT8kLYzUzsn0ALkbnyAE6Gunq1E34EFXQpzr9KiVf3EtUiNYnFCFpxw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754315937; c=relaxed/simple;
-	bh=7S8Hcavqc28ZL8iVcbrYH0U2GQeImQOnW5wu7/4OZkw=;
+	s=arc-20240116; t=1754316343; c=relaxed/simple;
+	bh=aSpeFYzmnzWbAuUXfyGhDSoww9wl4e8l2al6FOBx+dw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kg4rdJzgCZDcfUG15yBRf5tWI9YCHVgF4jZFGKCCljZUmjlvOeUurzesT3yxV/TGR/jSewfB9YGeqyqvS+53s6h+Eun9Ia+EOFQ3+wLAybDhfj8meHJvJnchumsPNgynvPb+B1oBqKXT7GtlgwvA3HNyQF4B2gdSSyDFO1H4spQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BEwlJ1FD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70D83C4CEF0;
-	Mon,  4 Aug 2025 13:58:52 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=XpTuG9cYRNVV9GNeF0JUX2ee9yIqYbX8AfIrcwsOpfIEGhYCSulguJFR1GLwekjYfE4EHMpz12ibYMHEz87yyv6RpI0ybNboI5SaX/Jd0TLX93nE2zGrKMwFPO25HFrxZHgJWssTXv7SEwsuN/u4W/DSOtR95KN2L6DxkWo6RDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k1wMMNog; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14D3FC4CEE7;
+	Mon,  4 Aug 2025 14:05:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754315936;
-	bh=7S8Hcavqc28ZL8iVcbrYH0U2GQeImQOnW5wu7/4OZkw=;
+	s=k20201202; t=1754316341;
+	bh=aSpeFYzmnzWbAuUXfyGhDSoww9wl4e8l2al6FOBx+dw=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=BEwlJ1FD3tS+6HTum4LGzdjC7wIFsjQdVsrQI4Zqp+9REkPtaLD/cz0FnBqtg7Cr5
-	 DS/0nattZmh8oLk6EqkEcSz9XVbdzqKqDhwgqrke3553t0dIJFwSIO0j8iWBYKp89g
-	 7SSWmlG6IkwBHesquXbRI6v6JE2wzApuNPIMzucigQa6++3Lljsk6tIf515ARTYad+
-	 jAH6aXcbvGPyalEcX6p9YP1C7oJFXB49BmHWKYMydDstgwVgpEChrUPJ/ksNF66T7f
-	 ue/gLZ/q4BwIyVszBuoY6QOct9ZqRpU2K+dlLGiHzYvmaQCm9Q9geAq/yHd73xrwvl
-	 YNQWmFXpebwHg==
-Message-ID: <2555e9fe-3bc0-4f89-9d0b-2f7f946632e7@kernel.org>
-Date: Mon, 4 Aug 2025 15:58:50 +0200
+	b=k1wMMNog8dX1RP3ke5JBZ3nK67PkRyQHn6vwFZJsCCzV1hX4gNh+uIP2AVnbThrfn
+	 MTflPC/iqEVsibo06q8ml+qSwcMlBN1Ae/feJpdB0DdC8ojyqir41qVQgeEOEz18Tn
+	 pGp2/mc9XJIC/eI7uDeXuEvUBi2MnNE7fubme1afBJ55byy9c4ir3WMGjwLHoeyzzN
+	 O2DKY1JlWkIrFSg2e4ts1YpEbjCLKpQBDiktHc6IRsywI0ACnxwKTwEUBa532J7SWd
+	 c430JBb3oCp+EdUuxWg4w6xdRYSFXN7dJUWbC0MCbbnqVhnZuNO2Ms0mrGFndXNUnk
+	 3OEDyz+7VXw4Q==
+Message-ID: <29ad5f60-6148-4e9b-8498-83a30a520536@kernel.org>
+Date: Mon, 4 Aug 2025 16:05:35 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,23 +50,20 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 09/27] dt-bindings: clock: mediatek: Describe MT8196
- clock controllers
-To: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Laura Nao <laura.nao@collabora.com>, wenst@chromium.org
-Cc: conor+dt@kernel.org, devicetree@vger.kernel.org,
- guangjie.song@mediatek.com, kernel@collabora.com, krzk+dt@kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org,
- matthias.bgg@gmail.com, mturquette@baylibre.com, netdev@vger.kernel.org,
- nfraprado@collabora.com, p.zabel@pengutronix.de, richardcochran@gmail.com,
- robh@kernel.org, sboyd@kernel.org
-References: <fbe7b083-bc3f-4156-8056-e45c9adcb607@kernel.org>
- <20250804083540.19099-1-laura.nao@collabora.com>
- <373f44c3-8a6a-4d52-ba6b-4c9484e2eac1@kernel.org>
- <1db77784-a59a-49bd-89b5-9e81e6d3bafc@collabora.com>
- <e9ee33b0-d6b0-4641-aeeb-9803b4d1658a@kernel.org>
- <00a12553-b248-4193-8017-22fea07ee196@collabora.com>
+Subject: Re: [PATCH v3 05/27] clk: mediatek: clk-mux: Add ops for mux gates
+ with HW voter and FENC
+To: Laura Nao <laura.nao@collabora.com>, mturquette@baylibre.com,
+ sboyd@kernel.org, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+ matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
+ p.zabel@pengutronix.de, richardcochran@gmail.com
+Cc: guangjie.song@mediatek.com, wenst@chromium.org,
+ linux-clk@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+ kernel@collabora.com, =?UTF-8?Q?N=C3=ADcolas_F_=2E_R_=2E_A_=2E_Prado?=
+ <nfraprado@collabora.com>
+References: <20250730105653.64910-1-laura.nao@collabora.com>
+ <20250730105653.64910-6-laura.nao@collabora.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -112,94 +109,55 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
  zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
  XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <00a12553-b248-4193-8017-22fea07ee196@collabora.com>
+In-Reply-To: <20250730105653.64910-6-laura.nao@collabora.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 04/08/2025 15:27, AngeloGioacchino Del Regno wrote:
-> 
-> We discussed about aggregating votes, yes, in software - this instead is a
-> *broken* hardware that does the aggregation internally and does not require
-> nor want external drivers to do the aggregation.
-> 
->> Maybe it is just the name, so avoid all the confusing "votes" if this is
->> not voting system. If this is a voting system, then don't use custom
->> phandles.
-> 
-> Being it fundamentally *broken*, this being a voting system is what the hardware
-> initially wanted to be - but effectively, since it requires YOU to:
->   - Make sure that power supplies are turned on, if not, turn them on by "touching"
->     HW registers (so, without any assistance from the voter MCU), if any;
->   - Turn on parent clocks manually, if any, before using the "voter mcu" to try
->     to ungate that clock; and
->     - Enable the "FENC" manually, after the mcu says that the clock was ungated.
+On 30/07/2025 12:56, Laura Nao wrote:
+>  
+>  	clk_mux->regmap = regmap;
+> +	clk_mux->regmap_hwv = regmap_hwv;
+>  	clk_mux->data = mux;
+>  	clk_mux->lock = lock;
+>  	clk_mux->hw.init = &init;
+> @@ -268,6 +329,7 @@ int mtk_clk_register_muxes(struct device *dev,
+>  			   struct clk_hw_onecell_data *clk_data)
+>  {
+>  	struct regmap *regmap;
+> +	struct regmap *regmap_hwv;
+>  	struct clk_hw *hw;
+>  	int i;
+>  
+> @@ -277,6 +339,13 @@ int mtk_clk_register_muxes(struct device *dev,
+>  		return PTR_ERR(regmap);
+>  	}
+>  
+> +	regmap_hwv = mtk_clk_get_hwv_regmap(node);
+> +	if (IS_ERR(regmap_hwv)) {
 
+This is either buggy or fragile. mtk_clk_get_hwv_regmap() returns NULL
+or valid pointer... or error? IS_ERR_OR_NULL is not the wait to go.
 
-I understand that "YOU" as Linux driver, when you want to do something
-(e.g. toggle) a clock?
-If so this looks a lot like power domain, although with some differences.
+Choose one - IS_ERR or NULL, preferrably the first, since you must
+handle deferred probe.
 
-> 
-> in the current state, it is just an hardware managed refcounting system and
-> nothing else, because the MCU seems to be unfinished, hence, again, b r o k e n.
-> 
-> Note that by "manually" I always mean "with direct writes to a clock controller's
-> registerS, and without any automation/assistance from the HWV MCU".
-> 
-> We're using the "hardware-voter" name because this is how MediaTek calls it in the
-> datasheets, and no it doesn't really *deserve* that name for what it is exactly in
-> MT8196 and MT6991.
+> +		pr_err("Cannot find hardware voter regmap for %pOF: %pe\n",
+> +		       node, regmap_hwv);
+> +		return PTR_ERR(regmap_hwv);
+> +	}
+> +
+>  	for (i = 0; i < num; i++) {
+>  		const struct mtk_mux *mux = &muxes[i];
+>  
+> @@ -286,7 +355,7 @@ int mtk_clk_register_muxes(struct device *dev,
+>  			continue;
+>  		}
+>  
+> -		hw = mtk_clk_register_mux(dev, mux, regmap, lock);
+> +		hw = mtk_clk_register_mux(dev, mux, regmap, regmap_hwv, lock);
 
-Please capture most/all of this in the property description, so it will
-be clear that we treat it as some sort of exception and other users of
-that property would need similar rationale.
-
-I am asking for this because I do not want this to be re-used for any
-other work which would represent something like real voting for
-resources. I want it to be clear for whoever looks at it later during
-new SoC bringup.
-
-If you send the same code as v4, the same commit msg, just like Laura
-did twice in v2 and v3, I will just keep NAKing via mutt macro because
-it's a waste of my time.
-
-> 
-> And mind you - if using the "interconnect" property for this means that we have to
-> add an interconnect driver for it, no, we will not do that, as placing a software
-
-Existing driver(s) can be as well interconnect providers. Same with
-power domains.
-
-I do not talk here how you should implement this in the drivers.
-
-> vote that votes clocks in a a voter MCU that does exactly what the interconnect
-
-What is a "software vote"? How did you encode it in DT? Via that phandle?
-
-> driver would do - then requiring virtual/fake clocks - is not a good solution.
-
-We do not add "software votes" in DT as separate properties, because
-they are "software". So maybe that's another problem here...
-
-> 
-> So, what should we do then?
-> 
-> Change it to "mediatek,clock-hw-refcounter", and adding a comment to the binding
-> saying that this is called "Hardware Voter (HWV)" in the datasheets?
-> 
-> Or is using the "interconnect" property without any driver in the interconnect API
-> actually legit? - Because to me it doesn't look like being legit (and if it is, it
-> shouldn't be, as I'm sure that everyone would expect an interconnect API driver
-> when encountering an "interconnect" property in DT), and if so, we should just add
-
-Why you would not add any interconnect driver for interconnect API?
-Look, the current phandle allows you to poke in some other MMIO space
-for the purpose of enabling the clock FOO? So interconnect or power
-domains or whatever allows you to have existing or new driver to receive
-xlate() and, when requested resources associated with clock FOO.
-
-Instead of the FOO clock driver poking resources, you do
-clk_prepare_enable() or pm_domain or icc_enable().
+So NULL is passed and stored... are you sure this is 100% backwards
+compatible?
 
 
 
