@@ -1,179 +1,162 @@
-Return-Path: <netdev+bounces-211655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8401EB1AF40
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 09:16:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1C41B1AF4B
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 09:22:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A36B316A2E1
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 07:16:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7CA88189BECF
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 07:22:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13108238C0D;
-	Tue,  5 Aug 2025 07:15:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 867AE239E61;
+	Tue,  5 Aug 2025 07:22:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dMjmTOyZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e9eLQCdT"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DABB217F36
-	for <netdev@vger.kernel.org>; Tue,  5 Aug 2025 07:15:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 264D622D4C0
+	for <netdev@vger.kernel.org>; Tue,  5 Aug 2025 07:22:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754378158; cv=none; b=m717c+W2QE1cGdA68CeDl1RMRxQUTBZatFdOT7nwqbUopN1WXT8QbI3DesBVfwD0k6nexm5NjVBeX459jGexmM57T8wbEr2P9BLffT693jaloyDkNFfreklE6e9daAmbKRvTqL+pRluDLC960En3nymTGqQVmwmO8n1CIxDjbjM=
+	t=1754378544; cv=none; b=M/EBdt/q/Znkkg+AuMsKRHA94Y7vFIgnGJ7hnZYxolfp631xHT3pk8tfGj3gwALrMoI8fu/sKnHmx+0L/Td6OeBWW2uh/PL7977zSWhjR1YMDnT4nOX8PQ1lZ5kMdGaqHGCR+aH7lOY22AdB6f/fq+m7RzDOkmlyR+9qVXuoTBM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754378158; c=relaxed/simple;
-	bh=ftuIf5p693pbIE28Ca6q+2oPAzEBuJqq8byNCo2RqCc=;
+	s=arc-20240116; t=1754378544; c=relaxed/simple;
+	bh=Rk0SHI+PWqhqEbwPZy9Q1SRiwPsOpKQ9ER7M3n76sCY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QvFAseXwVDmnLd2r4TUIIIpxAhumg3Xl91nYuKxFs0ICpj33Z2bx6470nET75oMcABsGMN99awHqfZ8UTNuJ0KZ/8t9a8TDLJMHDzJwOu+z4Mh3OxqmDH/yiYFfkwQnNJWevztUopg2+0RmUPrfUcclmCTDYK2sy+8XnB/BKp8Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dMjmTOyZ; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=p20S92lR0dPIBaq6XkEdqyG+t0HD1pY86leBSRoU+r5Cs4rq887zC0vk5XXffXhmKq3pVg/GRbhmOgnM7NG0caf/8FuFgU19TwLiwg88ywOIBRnTXUg7U4QFnVXLylbKGdPPJppYQFg58n2W5JGkL6zAm6CoC2aPHAyM96phqjs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e9eLQCdT; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1754378155;
+	s=mimecast20190719; t=1754378541;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=y1lfQQck/gEfvghhrXvc2lp4TNPtdu8JSj2lFK/nD/A=;
-	b=dMjmTOyZeOW5kJHDQH0mYMR8T0v4i6L89cmBUbE8s5qvskEZWjGtC0TRiUgkoDCUTgL1IG
-	M1Z5WdAMZCHkSFOsltzQe8cGrSYuMntVicvd3jljbWQhihg59LOaX/jieK5uU5msY+MhA7
-	f/lIdDgUmNp4qWyekyWstql9VGVKXGo=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=VxjW/XUa/Tox1i570xeV1gDkoladwDp8K5HU/5Xe5bM=;
+	b=e9eLQCdTl9VMlMeMi5EBs8DCdN5Q4CVlEgD/DG2/wL3UeoStEsgF1v2rn1Ta+3LHqkl8XE
+	NQTgWsaMLE5Y0YD8SynBz4NZ/3IazAG/jz4UIIDw5YQr0DtZ8SwSfvbgHYKdeCIhDuezzx
+	kYh2jP1jyfJm9e+gP9TUAxFm37UAoxw=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-538-1omSHB3fOsCDolLQt_aCTg-1; Tue, 05 Aug 2025 03:15:53 -0400
-X-MC-Unique: 1omSHB3fOsCDolLQt_aCTg-1
-X-Mimecast-MFC-AGG-ID: 1omSHB3fOsCDolLQt_aCTg_1754378153
-Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-70743a15d33so85968726d6.0
-        for <netdev@vger.kernel.org>; Tue, 05 Aug 2025 00:15:53 -0700 (PDT)
+ us-mta-351-6KaT8YiuP8O14WFv8JIAKw-1; Tue, 05 Aug 2025 03:22:20 -0400
+X-MC-Unique: 6KaT8YiuP8O14WFv8JIAKw-1
+X-Mimecast-MFC-AGG-ID: 6KaT8YiuP8O14WFv8JIAKw_1754378539
+Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-4aedcff08fdso85389651cf.2
+        for <netdev@vger.kernel.org>; Tue, 05 Aug 2025 00:22:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754378153; x=1754982953;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=y1lfQQck/gEfvghhrXvc2lp4TNPtdu8JSj2lFK/nD/A=;
-        b=fJB3Fbile/z8NEraJ9IFwwho3bBCs/srqN7Tdt6ZwNTZ+3JS+RLkZO1quCkTf9K7b6
-         fQGf4I3NGYRvd2Ag9Cl8r+X65YERt2Ilr+poT3NOqgLw+/sXBXhHyQRowIBlsDu53Q5m
-         BCTtTVbFz0JC4BZmdixVYCdDF19xXW4JluZAKbuxA/iQ64qLV9BRUxAXO4cbn0DfluEp
-         jQnjb+FOEhOu2HmgqCEBiZTIFu+HlVhnk7YbDYgcTn1QhyzvivsPMAULn1RiOoS1tj8H
-         BVz+Veq1QcJGIw8c/E0q9N1P5uYtXTPzu/gseLguff7XqhlCAHzpEJ1Co5nauCSqZ3WE
-         zTPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXu+DWxNZr8uG2teiWTSIfSwum40qFEQavlq6JMg4EDzu8T659ruMGDUn2z5O2qtHAzEGyeCSg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YznApAAQAXu1mBZpc7yVEuqpfVyLQPX7RK/1AMlCqe74VXXzUnb
-	6EmarKeqQsT9N/Z7NNw29fRIdtynmxJnXSyTmp20ddGq1lStQjM+Na3Dt+a2BlscCwtKZ69Vot7
-	AcSleD6+12UMPHPZgtzVKfonjmJ6C+G9N0qmA4DVIyBU+7ThuwVl4w8GRhA==
-X-Gm-Gg: ASbGncuUv0IIlcNntqN3bvWtpQU/Z9nh+hAq/1IFOlBjWjY05t1ou8Jh3qVHZXAw/op
-	kCaHBwL4ycJrd+hryEehbgIyYDj5nW+yVdcSSeyHaO2UOGJpb2gCmZZxSEt6HPbDajfxWpIgjym
-	rAC3bjq0viJLzByLhA5lmx4cSSCeXMUFGF0WsuSJNLgfphbLw2Vi5NlOaAkVmRPyy232tc4BXPM
-	Ih7V8ouk2UJx8RzxUb1SUW0b1gfvHbfo9hu2/kwy2TcRfwxoLVB+1wIC/YcRQjTaWwxbl7NZYl3
-	BZp6RSQVoVH9YuJK62BqfUkVeVz2lxSg2FMQlaoFHCBavb1AMqSQMl4SrZt9cxpXz5N5VoTcolA
-	9nDGhQvxLkZIxf2Q=
-X-Received: by 2002:a05:6214:c47:b0:700:c39c:9d12 with SMTP id 6a1803df08f44-70936327c52mr160762236d6.43.1754378152793;
-        Tue, 05 Aug 2025 00:15:52 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHFZ6fig7Xx657yIfyOJPg7qs7PE+/ypJzBtTrd0P+Slx/GHljmbFT9/ITIdPwSIwQdwRhc6g==
-X-Received: by 2002:a05:6214:c47:b0:700:c39c:9d12 with SMTP id 6a1803df08f44-70936327c52mr160762006d6.43.1754378152227;
-        Tue, 05 Aug 2025 00:15:52 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1754378539; x=1754983339;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VxjW/XUa/Tox1i570xeV1gDkoladwDp8K5HU/5Xe5bM=;
+        b=Ota2ve7FNDKUf/KqxZMZGef/z9dCuE+t/cAP80PK9YA+Gx0/zbsBrw5b56sxGuJkFm
+         L/3nfN903d+dnM7/Do7XTQRRBOG1pT0xbNOyxyOjiIFnVG3byiQF63VDZ2erDdgWM0Ic
+         zCa/WmdDagymSAWuf8fBZrn6p85AKaHGZclQzPmCgHB1nfM7z8bP46/q3hbV+OVgKjn4
+         ygi/NWefLCmLLAkSxWlrbEBMZuFfdqNmfnSbDwM8XtiJP6/xwM/68PlKEk1u+kurOhgU
+         OkujJqtW6tKx45WPc6c1RvwgkD7PLkv1qToFRP2ceKJ24IahEjeALxSVPaKG+wiGkYyA
+         8BNg==
+X-Forwarded-Encrypted: i=1; AJvYcCVgh4P2J91qaB6mBq/ZnqLJ0VMjvwVDxfImRjyKfYTpWmP7iaLSckrtUegufTOiffoQaVZ+S3k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzUbFtlh0Cq8a92Eq8/OSrOtLgblIkBR1qWDdjiDnGJVu7KUU6S
+	Oe2p4afAhsisgBy7Q+NlKhmHqhrbEyZDZgMdhuJHaqiEEu1wigm2bzCcRp/bHME+AGI7EGkNRIQ
+	SPDFrz8aQrHdrIKuFN80E5YD2T47b3o6Z3rh7htQ0awLmQE6xEiLNRmz3GQ==
+X-Gm-Gg: ASbGncvDdxW+pQtoDgOsDpbIkJuZCIFXbPFKyknx1XcbAYgThl0Aif4mduSp8bGADUl
+	v/PwLEcX+T+H9R4txf6gLjFeXEDm7fl8VnbUbhYdk9EDgvfmz5FSNIbFEzM47QndDzgVT6MnoME
+	ZUFbCdVT/7kncQKT1kXANrXFELUYvfSNLeuSQl/laD0xPdVCbO4xYq18cvIViY1kgGkGRa3Oqm+
+	qIeAa2yy8cbZQ0u8JoZ8kso4cS8mN6yG8uzKi/CDWyVyNSmmVOq50k/tpLobSuB7sDrPJdnon5p
+	C9cJziz4kOQZLc3ulOClf+LmbrhLf3bFp3upG35twtllsCb4mBPh7gss80vJZQAIN5VZJQ83Spy
+	TOBNFzdbgZdETZ6M=
+X-Received: by 2002:ac8:598c:0:b0:4b0:7298:1ec4 with SMTP id d75a77b69052e-4b07298225dmr65010501cf.51.1754378539393;
+        Tue, 05 Aug 2025 00:22:19 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGbFGbWbc/7vsrqHQg02yIUPn2Mkudvs+7LqNqnEBlCgK40SEkxmxEpp0vQ/78kK5UTY0baeg==
+X-Received: by 2002:ac8:598c:0:b0:4b0:7298:1ec4 with SMTP id d75a77b69052e-4b07298225dmr65010161cf.51.1754378538873;
+        Tue, 05 Aug 2025 00:22:18 -0700 (PDT)
 Received: from sgarzare-redhat (host-79-45-205-118.retail.telecomitalia.it. [79.45.205.118])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-7077ca464acsm68273536d6.36.2025.08.05.00.15.49
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4b06f790834sm19298781cf.60.2025.08.05.00.22.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Aug 2025 00:15:51 -0700 (PDT)
-Date: Tue, 5 Aug 2025 09:15:44 +0200
+        Tue, 05 Aug 2025 00:22:18 -0700 (PDT)
+Date: Tue, 5 Aug 2025 09:22:10 +0200
 From: Stefano Garzarella <sgarzare@redhat.com>
-To: bsdhenrymartin@gmail.com
-Cc: huntazhang@tencent.com, jitxie@tencent.com, landonsun@tencent.com, 
-	bryan-bt.tan@broadcom.com, vishnu.dasa@broadcom.com, bcm-kernel-feedback-list@broadcom.com, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	horms@kernel.org, linux-kernel@vger.kernel.org, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org, Henry Martin <bsdhenryma@tencent.com>, 
+To: Wang Liang <wangliang74@huawei.com>
+Cc: bsdhenrymartin@gmail.com, huntazhang@tencent.com, jitxie@tencent.com, 
+	landonsun@tencent.com, bryan-bt.tan@broadcom.com, vishnu.dasa@broadcom.com, 
+	bcm-kernel-feedback-list@broadcom.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, horms@kernel.org, linux-kernel@vger.kernel.org, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, Henry Martin <bsdhenryma@tencent.com>, 
 	TCS Robot <tcs_robot@tencent.com>
-Subject: Re: [PATCH v1] VSOCK: fix Out-of-Bounds Read in
- vmci_transport_dgram_dequeue()
-Message-ID: <jqgnivkquty3gdhhedbx3vub7wguhuxyorelkpvwhu6r3mfvzm@q7voouptegpt>
-References: <20250805062041.1804857-1-tcs_kernel@tencent.com>
+Subject: Re: [PATCH] VSOCK: fix Integer Overflow in
+ vmci_transport_recv_dgram_cb()
+Message-ID: <bpm2jqi4qv5mkzikcazchdpzb2ztqhwldpyi6wyfowqsqsaobj@pltf2mfrbf7a>
+References: <20250805041748.1728098-1-tcs_kernel@tencent.com>
+ <ea9768e9-0427-4684-ad42-caad4b679639@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20250805062041.1804857-1-tcs_kernel@tencent.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ea9768e9-0427-4684-ad42-caad4b679639@huawei.com>
 
-On Tue, Aug 05, 2025 at 02:20:41PM +0800, bsdhenrymartin@gmail.com wrote:
->From: Henry Martin <bsdhenryma@tencent.com>
+On Tue, Aug 05, 2025 at 03:07:38PM +0800, Wang Liang wrote:
 >
->vmci_transport_dgram_dequeue lack of buffer length validation before
->accessing `vmci_datagram` header.
+>在 2025/8/5 12:17, bsdhenrymartin@gmail.com 写道:
+>>From: Henry Martin <bsdhenryma@tencent.com>
+>>
+>>The vulnerability is triggered when processing a malicious VMCI datagram
+>>with an extremely large `payload_size` value. The attack path is:
+>>
+>>1. Attacker crafts a malicious `vmci_datagram` with `payload_size` set
+>>    to a value near `SIZE_MAX` (e.g., `SIZE_MAX - offsetof(struct
+>>    vmci_datagram, payload) + 1`)
+>>2. The function calculates: `size = VMCI_DG_SIZE(dg)` Where
+>>    `VMCI_DG_SIZE(dg)` expands to `offsetof(struct vmci_datagram,
+>>    payload) + dg->payload_size`
+>>3. Integer overflow occurs during this addition, making `size` smaller
+>>    than the actual datagram size
+>>
+>>Fixes: d021c344051a ("VSOCK: Introduce VM Sockets")
+>>Reported-by: TCS Robot <tcs_robot@tencent.com>
+>>Signed-off-by: Henry Martin <bsdhenryma@tencent.com>
+>>---
+>>  net/vmw_vsock/vmci_transport.c | 4 ++++
+>>  1 file changed, 4 insertions(+)
+>>
+>>diff --git a/net/vmw_vsock/vmci_transport.c b/net/vmw_vsock/vmci_transport.c
+>>index 7eccd6708d66..07079669dd09 100644
+>>--- a/net/vmw_vsock/vmci_transport.c
+>>+++ b/net/vmw_vsock/vmci_transport.c
+>>@@ -630,6 +630,10 @@ static int vmci_transport_recv_dgram_cb(void *data, struct vmci_datagram *dg)
+>>  	if (!vmci_transport_allow_dgram(vsk, dg->src.context))
+>>  		return VMCI_ERROR_NO_ACCESS;
+>>+	/* Validate payload size to prevent integer overflow */
+>>+	if (dg->payload_size > SIZE_MAX - offsetof(struct vmci_datagram, payload))
+>>+		return VMCI_ERROR_INVALID_ARGS;
+>>+
 >
->Trigger Path:
->1. Attacker sends a datagram with length < sizeof(struct
->   vmci_datagram).
-
-How?
-
->2. `skb_recv_datagram()` returns the malformed sk_buff (skb->len <
->   sizeof(struct vmci_datagram)).
-
-The sk_buff is queued by vmci_transport_recv_dgram_cb() calling
-sk_receive_skb(). And It is allocated with this code:
-
-#define VMCI_DG_HEADERSIZE sizeof(struct vmci_datagram)
-#define VMCI_DG_SIZE(_dg) (VMCI_DG_HEADERSIZE + (size_t)(_dg)->payload_size)
-
-static int vmci_transport_recv_dgram_cb(void *data, struct vmci_datagram *dg)
-{
-	...
-	size = VMCI_DG_SIZE(dg);
-
-	/* Attach the packet to the socket's receive queue as an sk_buff. */
-	skb = alloc_skb(size, GFP_ATOMIC);
-	...
-	skb_put(skb, size);
-	...
-}
-
-So I don't understand what this patch is fixing...
-
->3. Code casts skb->data to struct vmci_datagram *dg without verifying
->   skb->len.
->4. Accessing `dg->payload_size` (Line: `payload_len =
->   dg->payload_size;`) reads out-of-bounds memory.
 >
->Fixes: d021c344051a ("VSOCK: Introduce VM Sockets")
->Reported-by: TCS Robot <tcs_robot@tencent.com>
+>The struct vmci_datagram has no member 'payload'. Your patch may 
+>trigger compile error.
 
-Please fix your robot and also check your patches.
-This is the second no-sense patch from you I reviewed today, I'll start
-to ignore if you continue.
+@Wang thanks for the highlight!
+
+mmm, so this is the 3rd no-sense patch from the same author!
+
+Last advice for the author, please fix your bot and try your patches 
+before submitting it!
 
 Stefano
 
->Signed-off-by: Henry Martin <bsdhenryma@tencent.com>
->---
-> net/vmw_vsock/vmci_transport.c | 5 +++++
-> 1 file changed, 5 insertions(+)
 >
->diff --git a/net/vmw_vsock/vmci_transport.c b/net/vmw_vsock/vmci_transport.c
->index 7eccd6708d66..0be605e19b2e 100644
->--- a/net/vmw_vsock/vmci_transport.c
->+++ b/net/vmw_vsock/vmci_transport.c
->@@ -1749,6 +1749,11 @@ static int vmci_transport_dgram_dequeue(struct vsock_sock *vsk,
-> 	if (!skb)
-> 		return err;
->
->+	if (skb->len < sizeof(struct vmci_datagram)) {
->+		err = -EINVAL;
->+		goto out;
->+	}
->+
-> 	dg = (struct vmci_datagram *)skb->data;
-> 	if (!dg)
-> 		/* err is 0, meaning we read zero bytes. */
->-- 
->2.41.3
+>>  	size = VMCI_DG_SIZE(dg);
+>>  	/* Attach the packet to the socket's receive queue as an sk_buff. */
 >
 
 
