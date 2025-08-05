@@ -1,235 +1,198 @@
-Return-Path: <netdev+bounces-211775-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211776-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C582DB1BAC5
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 21:14:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A263B1BAD9
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 21:20:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 52EAF189616D
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 19:15:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 137D63A5F7B
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 19:20:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 280A9292936;
-	Tue,  5 Aug 2025 19:14:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B4B121FF2D;
+	Tue,  5 Aug 2025 19:20:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G3dPcJal"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="ap8hZIuI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2077.outbound.protection.outlook.com [40.107.236.77])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 046EF2BAF7
-	for <netdev@vger.kernel.org>; Tue,  5 Aug 2025 19:14:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754421284; cv=none; b=SVr3LOvt/zOgpGhln5/o9KqsCUc/UHH1r9Rou7kaBitjfulOBc8zLiIQcB+XMKJir/CZ+OYSrO6SdZ4oegFkQYKhdu3oXmXXsQfgp9Z11gi1t2AF1ShWwiV01ZEwwjdqCi7ZhN/JWDhzklmsCAeCLaZCuCbgjFJQTcjSIaJuvac=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754421284; c=relaxed/simple;
-	bh=AEMRptBFjWgx5a1Ym2+nos+6PWqs3+LMFSgUwIQVLIE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aKm09XyIiM3xuu7s8aLZv/M5vyLAdafgOoF/w2/X7lBPdvarjemLWCpo7aGg5sOKnKjqzZHXpE8xwHCBgQfQ1RXYGcOuifCYsUyqtx2UXg8dJTq0z5gVqgN49cJdRjLnBc4GIUxbB4dLvgZk87mXQrizANwfgdMhXByBX+kJeeY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G3dPcJal; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 756CCC4CEF0;
-	Tue,  5 Aug 2025 19:14:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754421283;
-	bh=AEMRptBFjWgx5a1Ym2+nos+6PWqs3+LMFSgUwIQVLIE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=G3dPcJalG17ku7oEIWTs5Ls+56/huVhNo7/lzR90I0htrrz3cEHs7K3JuTfISRBle
-	 va/0F1/10adpotN5Uc/5tAHF1l7hZ80hMaHe5FJjE83hAH8iOw77tUU6BVmBMjIfeu
-	 qpobc6zP75QG8ccIFWUaKTd+EVQBlBnDhbz6kzWcTnCqQs/RE22Wxf33cicK5O6b3c
-	 3L4U+DNMkCEFq1GsHbV1Zt5ZogZvNmedvWY0Z9RoygIID374LQ6zG7o0q2JBhTSZAA
-	 gZ3veMfODYsLMsmrGsWQJIvc81oegoOaXf21Bi+OaHgGEXEkYHRSBUN5xI7j50jt1g
-	 4L9q5OIRtiLZw==
-Date: Tue, 5 Aug 2025 20:14:36 +0100
-From: Simon Horman <horms@kernel.org>
-To: Mingming Cao <mmc@linux.ibm.com>
-Cc: netdev@vger.kernel.org, bjking1@linux.ibm.com, haren@linux.ibm.com,
-	ricklind@linux.ibm.com, kuba@kernel.org, edumazet@google.com,
-	pabeni@redhat.com, linuxppc-dev@lists.ozlabs.org,
-	maddy@linux.ibm.com, mpe@ellerman.id.au
-Subject: Re: [PATCH v3 net-next] ibmvnic: Increase max subcrq indirect
- entries with fallback
-Message-ID: <20250805191436.GY8494@horms.kernel.org>
-References: <20250804231704.12309-1-mmc@linux.ibm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECC682556E;
+	Tue,  5 Aug 2025 19:20:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.77
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1754421615; cv=fail; b=pnSobOIzsNrjuYRFR7rJ0MOL8Edbb25Ft9VqfwkphYhtpTEtw26Jdeenkdy1cdFxh/kkxlRXVxakONdLpnIyi4s326ECrfgMB/9vyLK5hA2h1PBEUHUz9UzsZ/8zBDhEJv/tD69eBlDd53IqM2keUyNq62zembLBjm7FXg5GSC4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1754421615; c=relaxed/simple;
+	bh=t6NK4gEmEYUAuzyjCICfQ7zVG7bLhfk6EMdIn08lfDo=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=pij6mGGXJsD4TtcK+Lg7339mTNkY2Mo7enOa7/7MFjffXkRiUZeCHu5/qABrZGuR5nDzdIC0Ud3q0LVCav2XRa3EHKn8oQxh37Mgu0DSBjfLLj9r71cU8K1nlnmOay63u3Y4/oVnlxxFJZAqAFSaIWeMzxSafXc+u8Rxx0sXX98=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=ap8hZIuI; arc=fail smtp.client-ip=40.107.236.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=SY/byqbDyzcBrinQcy21QNAARWlLbZquXlALHL7v39uIexGYbHrfOUcOLFxKQ0kxdREIcHmqWclO2Xncp37vtlt8wohGHSEBp7+hzcXqMr+0a3IF85a9S1D8UVVyxYLSjo8NhKC8vjeh2fb7Ih+0jM5KuoUcy8mBNhTLlGXpmBR0D/jLkIw2YosfOAl11OcaNAwmRo7SfK7qJFsWLUnfej3MtZ0NVH1wPsWEAv4QvVFtBVeF6a2cTyFOObmrI/4eR8/xW2ZZ7HbMP27Q4eCFGKvAxLcJyqVuzKrLDRm1GxyLd5fKO9IxdMloA6zx1JekzwzIdjfMiArstbPkPLDtAg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+ghnXTUujMwe7QunMYY2cqp0o8bkLw94Sl4tRZOFUJQ=;
+ b=IM9BsgrFvo3NHhr1cXUzlGJWB0476FQUTESZfqsfrhSqj4j30nVoXDNw9iNsIkxBp7A+ayGFZiaqCxHyAa5q/TY48HE3Zk+XCNNZ7T7sQr6KloT25zAyqrMJN7lyQ6uNFLtAl8OmlQuRQ2lL5T6b13XIOkRAPrD8vXsWJp52YSQktAlJCVQJh9XbgXQKMeaLteQlTfusPC7rAKfN1TbvTBY2VM9I3Msv38OHppxnOUZMwtcIpGpSto+jUEvy9kVzXqoDNVyupRDxuJrUll4r6Mwo+9s2jVfPCtoMllJY4ODNml/4Fh7NCi4C8ykjn3Q0p28KbkClE3bOwr6mnU7DAA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=lunn.ch smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+ghnXTUujMwe7QunMYY2cqp0o8bkLw94Sl4tRZOFUJQ=;
+ b=ap8hZIuI+6raltjYEQ67aYFDH3DgG+9E832Nhq6i19tobVn3NAyGbZ52pGyIh+9quiZAEQLmAGahmav7sjez5+F4sb47iTLImNSTXm4cWp9PI0XhKp/cgZBJbzUGtiex7czJkUmAQgfQTjM0uTpIP5KPOjP3OmMNsA0Q3VaSm0k=
+Received: from BLAPR03CA0180.namprd03.prod.outlook.com (2603:10b6:208:32f::10)
+ by CH0PR12MB8551.namprd12.prod.outlook.com (2603:10b6:610:186::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8989.21; Tue, 5 Aug
+ 2025 19:20:08 +0000
+Received: from BN2PEPF00004FBB.namprd04.prod.outlook.com
+ (2603:10b6:208:32f:cafe::95) by BLAPR03CA0180.outlook.office365.com
+ (2603:10b6:208:32f::10) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9009.13 via Frontend Transport; Tue,
+ 5 Aug 2025 19:20:08 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
+Received: from SATLEXMB03.amd.com (165.204.84.17) by
+ BN2PEPF00004FBB.mail.protection.outlook.com (10.167.243.181) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.9009.8 via Frontend Transport; Tue, 5 Aug 2025 19:20:08 +0000
+Received: from SATLEXMB06.amd.com (10.181.40.147) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 5 Aug
+ 2025 14:20:07 -0500
+Received: from SATLEXMB03.amd.com (10.181.40.144) by SATLEXMB06.amd.com
+ (10.181.40.147) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 5 Aug
+ 2025 14:20:07 -0500
+Received: from xhdsuragupt40.xilinx.com (10.180.168.240) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server id 15.1.2507.39 via Frontend
+ Transport; Tue, 5 Aug 2025 14:20:04 -0500
+From: Suraj Gupta <suraj.gupta2@amd.com>
+To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <michal.simek@amd.com>,
+	<sean.anderson@linux.dev>, <radhey.shyam.pandey@amd.com>, <horms@kernel.org>
+CC: <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>, <harini.katakam@amd.com>
+Subject: [PATCH net] net: xilinx: axienet: Increment Rx skb ring head pointer after BD is successfully allocated in dmaengine flow
+Date: Wed, 6 Aug 2025 00:49:58 +0530
+Message-ID: <20250805191958.412220-1-suraj.gupta2@amd.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250804231704.12309-1-mmc@linux.ibm.com>
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN2PEPF00004FBB:EE_|CH0PR12MB8551:EE_
+X-MS-Office365-Filtering-Correlation-Id: e5118afd-ec5b-48d6-0abe-08ddd4551718
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|1800799024|82310400026|376014|7416014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?ANtDVkKiw8+o34Yqsz++fZ+6+fi7DpurWGTrUkQhy1sAbABw85BOfG5lvtrN?=
+ =?us-ascii?Q?cSOlR9+3I8jafR0u7/2peAuGJyYuBC5TNCfym4VpWLfsHrH7i0emZTe01fCQ?=
+ =?us-ascii?Q?sJtP03Dgx6Msx2YsfAHFgrDVEb+URyeQ4DV8K1327/eW0miiUurEoTBddliq?=
+ =?us-ascii?Q?LXLVxYv1ApqnuiSMK20wcQmn8PDvIZqUfYlrqYlz8vI0LFpqJy5Mu+UIVSjh?=
+ =?us-ascii?Q?X60juCdDpaz/CO1qbT77SngHGLCHGK1UxEfkJckxxulUJ5Xb3W300HkhFSZg?=
+ =?us-ascii?Q?xxxM+nSJNZ0VdrLS+sO1LxVa5g6BXgpJJB6b8zpvXzRkLirG9+bvOBQbUi5W?=
+ =?us-ascii?Q?jMTgc3SGDBQglxXK8tC2aMMk1RtJu5QXiuqEi6998YLqUp6EwjMioWIVaFOY?=
+ =?us-ascii?Q?5nW7vo0xbNI1DcUtEVblwPjinxKPRm+9Qyllhm/bU1/0Q0qPZryFBgt5ft/8?=
+ =?us-ascii?Q?VIXzX+vEdhPgR6zyzH14L0uaNXC5Aux0+hZW7UHlbWJYxqDciTHwMSi3fgHe?=
+ =?us-ascii?Q?npOcpg43kkAQBsUMsxhw5LkS2d92+AsQYGbh9q3xMNKvrBrZhz/wr/YH1Bfu?=
+ =?us-ascii?Q?Gr14NPx4XgyEQiRgNMgmhYfdZhqRn3PCI4IW6n/eng+SzxrN9ofR27lJBA3p?=
+ =?us-ascii?Q?2Ikcp2CfiXFQwKIjvaoeJ5kJEgSTCveXjTBc5x20K0id/HX2vvwhwJ9qtlHI?=
+ =?us-ascii?Q?HyME/PcSy/16u7Ivx+OoCNjIWESs7U/4G+QWcv2TrppxWpZpYmR4H+C0MtsV?=
+ =?us-ascii?Q?1w57rpKyn9gBkcIuJEBSFvt5cdZ96nMm4tYe2GnHl14eJo0/u3flszR7p2ax?=
+ =?us-ascii?Q?b4Vk4RsQ87cNJvZTO0eqSIsu7ownmk4NMfyQhAdy/XH4iDiDtEVIvkJI2tuN?=
+ =?us-ascii?Q?BC9N4LiWHm9Z21UqT9C0oQ7eKZOW74CNeAusmgZysETO9OYmDfkLhDhA41v7?=
+ =?us-ascii?Q?s+VyceMQwf4Qz5XbM2ti2klICTkgQSoFNjuKD/v5kntSMwLtzs/IOZRM9ZF1?=
+ =?us-ascii?Q?lBGBj0el0ENuGzALNduT3JbUSaRrZHL5tMCCniP+EL8SknP2rAMAN/Aia7FV?=
+ =?us-ascii?Q?pCozLliUQyQ27OL/E3dEgQdpG1W63cwPjj9cwP4Z1//Dhn1vL/wx3PISadId?=
+ =?us-ascii?Q?HjS77o41HVHF6cp8ueYpBeAKJVzZmaqWdRle+WbYUdwmbYxpiRWrJRM8ZmVi?=
+ =?us-ascii?Q?olcXr1+aFtRo1hwtUrBhv0/HS6Zw6CBYPUF9hpcvcGLrif8ufBid3nbOh9Fu?=
+ =?us-ascii?Q?69y0pzZ5/todPOv01IX3KM3l2wEq7fedorHYsyO4tmnT5FxOcBJTqZc2NNyk?=
+ =?us-ascii?Q?7kRmyMNL03smrDVnfYyexoL8Ot2c2vEO78RdmF9R+taNKl2gf9L+A1PDoLsN?=
+ =?us-ascii?Q?MhseCKtjfY+JsWG/ykUK+fORA4xaO1GQ6NXxuHmhXo8CYdDRre0A1gOaN7Nz?=
+ =?us-ascii?Q?tDgRWm5fslDDZ+4LGyExJA4rHs7AhX4uLBKAnHRkETBrhCGOep8c9HxvBOz5?=
+ =?us-ascii?Q?W0xb3yZONFcHwLeQItw9vvAn7ZFAnwsn908P?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(82310400026)(376014)(7416014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Aug 2025 19:20:08.0821
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: e5118afd-ec5b-48d6-0abe-08ddd4551718
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN2PEPF00004FBB.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB8551
 
-On Mon, Aug 04, 2025 at 04:17:04PM -0700, Mingming Cao wrote:
-> POWER8 support a maximum of 16 subcrq indirect descriptor entries per
->  H_SEND_SUB_CRQ_INDIRECT call, while POWER9 and newer hypervisors
->  support up to 128 entries. Increasing the max number of indirect
-> descriptor entries improves batching efficiency and reduces
-> hcall overhead, which enhances throughput under large workload on POWER9+.
-> 
-> Currently, ibmvnic driver always uses a fixed number of max indirect
-> descriptor entries (16). send_subcrq_indirect() treats all hypervisor
-> errors the same:
->  - Cleanup and Drop the entire batch of descriptors.
->  - Return an error to the caller.
->  - Rely on TCP/IP retransmissions to recover.
->  - If the hypervisor returns H_PARAMETER (e.g., because 128
->    entries are not supported on POWER8), the driver will continue
->    to drop batches, resulting in unnecessary packet loss.
-> 
-> In this patch:
-> Raise the default maximum indirect entries to 128 to improve ibmvnic
-> batching on morden platform. But also gracefully fall back to
-> 16 entries for Power 8 systems.
-> 
-> Since there is no VIO interface to query the hypervisor’s supported
-> limit, vnic handles send_subcrq_indirect() H_PARAMETER errors:
->  - On first H_PARAMETER failure, log the failure context
->  - Reduce max_indirect_entries to 16 and allow the single batch to drop.
->  - Subsequent calls automatically use the correct lower limit,
->     avoiding repeated drops.
-> 
-> The goal is to  optimizes performance on modern systems while handles
-> falling back for older POWER8 hypervisors.
-> 
-> Performance shows 40% improvements with MTU (1500) on largework load.
-> 
-> --------------------------------------
-> Changes since v2:
-> link to v2: https://www.spinics.net/lists/netdev/msg1104669.html
-> 
-> -- was Patch 4 from a patch series v2. v2 introduced a module parameter
-> for backward compatibility. Based on review feedback, This patch handles
-> older systems fall back case without adding a module parameter.
-> 
-> Signed-off-by: Mingming Cao <mmc@linux.ibm.com>
-> Reviewed-by: Brian King <bjking1@linux.ibm.com>
-> Reviewed-by: Haren Myneni <haren@linux.ibm.com>
-> ---
->  drivers/net/ethernet/ibm/ibmvnic.c | 56 ++++++++++++++++++++++++++----
->  drivers/net/ethernet/ibm/ibmvnic.h |  6 ++--
->  2 files changed, 53 insertions(+), 9 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/ibm/ibmvnic.c b/drivers/net/ethernet/ibm/ibmvnic.c
+In DMAengine flow, AXI DMA driver invokes callback before freeing BD in
+irq handling path.
+In Rx callback (axienet_dma_rx_cb()), axienet driver tries to allocate
+new BD after processing skb.
+This will be problematic if both AXI-DMA and AXI ethernet have same
+BD count as all Rx BDs will be allocated initially and it won't be
+able to allocate new one after Rx irq. Incrementing head pointer w/o
+checking for BD allocation will result in garbage values in skb BD and
+cause the below kernel crash:
 
-...
+Unable to handle kernel paging request at virtual address fffffffffffffffa
+<snip>
+Internal error: Oops: 0000000096000006 [#1]  SMP
+pc : axienet_dma_rx_cb+0x78/0x150
+lr : axienet_dma_rx_cb+0x78/0x150
+ Call trace:
+  axienet_dma_rx_cb+0x78/0x150 (P)
+  xilinx_dma_do_tasklet+0xdc/0x290
+  tasklet_action_common+0x12c/0x178
+  tasklet_action+0x30/0x3c
+  handle_softirqs+0xf8/0x230
+<snip>
 
-> @@ -862,6 +862,19 @@ static void replenish_rx_pool(struct ibmvnic_adapter *adapter,
->  failure:
->  	if (lpar_rc != H_PARAMETER && lpar_rc != H_CLOSED)
->  		dev_err_ratelimited(dev, "rx: replenish packet buffer failed\n");
-> +
-> +	/* Detect platform limit H_PARAMETER */
-> +	if (lpar_rc == H_PARAMETER &&
-> +	    adapter->cur_max_ind_descs > IBMVNIC_MAX_IND_DESC_MIN) {
-> +		netdev_info(adapter->netdev,
-> +			    "H_PARAMETER, set ind desc to safe limit %u\n",
-> +			    IBMVNIC_MAX_IND_DESC_MIN);
-> +		adapter->cur_max_ind_descs = IBMVNIC_MAX_IND_DESC_MIN;
-> +	}
+Fixes: 6a91b846af85 ("net: axienet: Introduce dmaengine support")
+Signed-off-by: Suraj Gupta <suraj.gupta2@amd.com>
+---
+ drivers/net/ethernet/xilinx/xilinx_axienet_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Hi Mingming, all,
-
-The logic above seems to appear twice in this patch.
-I think it would be good to consolidate it somehow.
-E.g. in a helper function.
-
-> +
-> +	/* for all error case, temporarily drop only this batch
-> +	 * Rely on TCP/IP retransmissions to retry and recover
-> +	 */
-
-Thanks for adding this comment.
-Although perhaps 'for' -> 'For'.
-
-Likewise below.
-
->  	for (i = ind_bufp->index - 1; i >= 0; --i) {
->  		struct ibmvnic_rx_buff *rx_buff;
->  
-> @@ -2381,16 +2394,33 @@ static int ibmvnic_tx_scrq_flush(struct ibmvnic_adapter *adapter,
->  		rc = send_subcrq_direct(adapter, handle,
->  					(u64 *)ind_bufp->indir_arr);
->  
-> -	if (rc)
-> +	if (rc) {
-> +		dev_err_ratelimited(&adapter->vdev->dev,
-> +				    "tx_flush failed, rc=%u (%llu entries dma=%pad handle=%llx)\n",
-> +				    rc, entries, &dma_addr, handle);
-> +		/* Detect platform limit H_PARAMETER */
-> +		if (rc == H_PARAMETER &&
-> +		    adapter->cur_max_ind_descs > IBMVNIC_MAX_IND_DESC_MIN) {
-> +			netdev_info(adapter->netdev,
-> +				    "H_PARAMETER, set ind descs to safe limit %u\n",
-> +				    IBMVNIC_MAX_IND_DESC_MIN);
-> +			adapter->cur_max_ind_descs = IBMVNIC_MAX_IND_DESC_MIN;
-> +		}
-> +
-> +		/* for all error case, temporarily drop only this batch
-> +		 * Rely on TCP/IP retransmissions to retry and recover
-> +		 */
->  		ibmvnic_tx_scrq_clean_buffer(adapter, tx_scrq);
-> -	else
-> +	} else {
->  		ind_bufp->index = 0;
-> +	}
->  	return rc;
->  }
-
-...
-
-> @@ -6369,6 +6399,17 @@ static int ibmvnic_reset_init(struct ibmvnic_adapter *adapter, bool reset)
->  			rc = reset_sub_crq_queues(adapter);
->  		}
->  	} else {
-> +		if (adapter->reset_reason == VNIC_RESET_MOBILITY) {
-> +			/* post migrtione reset the max
-> +			 * indirect descriptors per hcall to be default max
-> +			 * (e.g p8 ->p10)
-> +			 * if the destination is on the platform supports
-> +			 * do not support max (e.g. p10->p8) the threshold
-> +			 * will be reduced to safe min limit for p8 later
-> +			 */
-
-nits: Post migration, reset.
-
-      The line breaking seems uneven.
-
-      And if p8 and p10 are POWER8 and POWER10 then I think it would
-      be worth spelling that out.
+diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+index 6011d7eae0c7..acd5be60afec 100644
+--- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
++++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+@@ -1457,7 +1457,6 @@ static void axienet_rx_submit_desc(struct net_device *ndev)
+ 	if (!skbuf_dma)
+ 		return;
  
-> +			adapter->cur_max_ind_descs = IBMVNIC_MAX_IND_DESC_MAX;
-> +		}
-> +
->  		rc = init_sub_crqs(adapter);
->  	}
->  
+-	lp->rx_ring_head++;
+ 	skb = netdev_alloc_skb(ndev, lp->max_frm_size);
+ 	if (!skb)
+ 		return;
+@@ -1482,6 +1481,7 @@ static void axienet_rx_submit_desc(struct net_device *ndev)
+ 	skbuf_dma->desc = dma_rx_desc;
+ 	dma_rx_desc->callback_param = lp;
+ 	dma_rx_desc->callback_result = axienet_dma_rx_cb;
++	lp->rx_ring_head++;
+ 	dmaengine_submit(dma_rx_desc);
+ 
+ 	return;
+-- 
+2.25.1
 
-...
-
-> diff --git a/drivers/net/ethernet/ibm/ibmvnic.h b/drivers/net/ethernet/ibm/ibmvnic.h
-> index 246ddce753f9..829a16116812 100644
-> --- a/drivers/net/ethernet/ibm/ibmvnic.h
-> +++ b/drivers/net/ethernet/ibm/ibmvnic.h
-> @@ -29,8 +29,9 @@
->  #define IBMVNIC_BUFFS_PER_POOL	100
->  #define IBMVNIC_MAX_QUEUES	16
->  #define IBMVNIC_MAX_QUEUE_SZ   4096
-> -#define IBMVNIC_MAX_IND_DESCS  16
-> -#define IBMVNIC_IND_ARR_SZ	(IBMVNIC_MAX_IND_DESCS * 32)
-> +#define IBMVNIC_MAX_IND_DESC_MAX 128
-> +#define IBMVNIC_MAX_IND_DESC_MIN 16
-
-...MAX...{MAX,MIN} seems like an unfortunate name.
-But I don't feel particularly strongly about this one.
-
-> +#define IBMVNIC_IND_MAX_ARR_SZ (IBMVNIC_MAX_IND_DESC_MAX * 32)
->  
->  #define IBMVNIC_TSO_BUF_SZ	65536
->  #define IBMVNIC_TSO_BUFS	64
-
-...
 
