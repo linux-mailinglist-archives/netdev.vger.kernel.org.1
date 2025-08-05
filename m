@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-211636-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211635-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 604ECB1ABBA
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 02:30:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9FDCB1ABB9
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 02:30:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 006123BE042
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 00:30:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F31DC3BE7D0
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 00:30:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90DC61922C4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 735A518E02A;
 	Tue,  5 Aug 2025 00:30:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NB7AQBZt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PM6Qb+Vf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64B1718B464;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A98F189919;
 	Tue,  5 Aug 2025 00:30:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754353805; cv=none; b=AVHac715SL4R+BdKrA0Be3udzxhnaQ86P1ohRP93BQYiv/oB0Lu6jE1ev2pf6BWipe1Jq/Dpkm09KDP5JrouoE/eFRFbUnGvrcZj8SXEK/RtLRYkdhGGrJfYK02aUY7psg3a00WpWosE9S3zeGxV76pzVMTFS7xLeEXHNccXo3A=
+	t=1754353805; cv=none; b=IApPdUBdv73ENXQllRF7Vt/mwK0rjT4H0M5gu86r/CzR51hu4PecJsJgCG3qvBpxY7thI9RU74e4K/dH4ZjWrErphN05eoNF5DqISODyO6bhwnWPogXsdgXNp0LItHk0gGicg6XOZRzXqd+2iKNyhFolAOAG8rO0reFUldhXJ84=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1754353805; c=relaxed/simple;
-	bh=ZZmsioiAVCLf5lQBbdXNC1wttb6c0dEotQM5pn5yPGU=;
+	bh=qfv9KBlrUKsIIJmH9elqLzkRDhOrTL/TkPiwCHb9ohg=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=PnH8t1ork8sFOTwTCZ88yQ3qa9w+3KxmV1g5gq5+PTLLYHlJioXSxURW1naV3Tfz0rUnG4rtrD4sO0+gEtrGL7pqa4sKaq9G79dZRiePb5TNb6HjgYzaI7Qpm2EV5FQBbdnbDWMDKcuZBfGmwiIT3AzlOaqIZY/xquKZlkFT+pE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NB7AQBZt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4DF5C4CEF0;
-	Tue,  5 Aug 2025 00:30:03 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=JBX0CmtHcqSC8MXJTRfpfxaZkh6aRngrqYIbSp8fw12RZwVJcQuoiiu/Y5AOSztQe8Srr4ui68X0dL4Rof7s856zeYHNA+hWvSZfXacRqGT95CSrSUipAOiI1PAApUggFF2pgaQO31nZDiWrRmhcCvjKTev9wBtU6JJ+qiX1tc8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PM6Qb+Vf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2920AC4CEF8;
+	Tue,  5 Aug 2025 00:30:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1754353805;
-	bh=ZZmsioiAVCLf5lQBbdXNC1wttb6c0dEotQM5pn5yPGU=;
+	bh=qfv9KBlrUKsIIJmH9elqLzkRDhOrTL/TkPiwCHb9ohg=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=NB7AQBZteACnc55bMP+fFC4eJVfCrzYH7DetsottTkNRquhHvaqClkAx0Ud6peSRQ
-	 npshHDe1XtUDVXDogdrrRG2MbYMTGPR4LoNFBDFCASZeZinxxeM0vb69khkP6wNyae
-	 ZMtTVxp8YDq3a4OMSjamrLXZsxx7CHsUc5rn5UaSU9U89wYMbzZfgfbVi/hNkEwyBI
-	 aaDYEqOGjJPnazQdhF/vP+TdjfKTetGsgBfuJbObHTD53NtpjMDKMe3tEyk87yvGfx
-	 y3cnjI7dk/CIrUTzGvfSxo4itNA0K9ukxHB/iUYV1sMNWxQ+GnQkspEoL6CmtnxTfP
-	 r6S6vkW8nCLJQ==
+	b=PM6Qb+Vf592INsci5/xIN7v4VN6XFo4qGD7JMCwZXRL/g4qcbu6p6kExESQpVLAgT
+	 /fWslB85tRZIJRxKnxdWDYaIUoKqFVK7b0XyhwgHhQb4aVnImJSRH8YDZgmITYbRGN
+	 WJwhewiYGn2ViAHXmvDM/0EgO4mCiEa070qgXbEoryqI427udvatjG+0Seq8/ccC69
+	 un4LBzbJJJ0ZFHJIoSDKeBydqs2cuA0eKqG1mhv6IPzzSvr1h9ABQADDYV4yAVBM/0
+	 Oo+0D1ywOAWPLoezYugizInh4RzKUM9dua1475izasMpnvX5+k7azwS9J8/K6XpSUm
+	 NiAp2BjIBhlhQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D32383BF63;
-	Tue,  5 Aug 2025 00:30:19 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD59383BF62;
+	Tue,  5 Aug 2025 00:30:20 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,42 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] dpll: zl3073x: ZL3073X_I2C and ZL3073X_SPI should depend
- on
- NET
+Subject: Re: [PATCH] ipa: fix compile-testing with qcom-mdt=m
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175435381825.1400451.8676043781177752154.git-patchwork-notify@kernel.org>
-Date: Tue, 05 Aug 2025 00:30:18 +0000
-References: <20250802155302.3673457-1-geert+renesas@glider.be>
-In-Reply-To: <20250802155302.3673457-1-geert+renesas@glider.be>
-To: Geert Uytterhoeven <geert+renesas@glider.be>
-Cc: ivecera@redhat.com, Prathosh.Satish@microchip.com, kuba@kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, lkp@intel.com
+ <175435381949.1400451.11221507514670781827.git-patchwork-notify@kernel.org>
+Date: Tue, 05 Aug 2025 00:30:19 +0000
+References: <20250731080024.2054904-1-arnd@kernel.org>
+In-Reply-To: <20250731080024.2054904-1-arnd@kernel.org>
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: elder@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ andersson@kernel.org, quic_ppranees@quicinc.com,
+ vasanthakumar.thiagarajan@oss.qualcomm.com, quic_rajkbhag@quicinc.com,
+ quic_bselvara@quicinc.com, jeff.johnson@oss.qualcomm.com, arnd@arndb.de,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sat,  2 Aug 2025 17:53:02 +0200 you wrote:
-> When making ZL3073X invisible, it was overlooked that ZL3073X depends on
-> NET, while ZL3073X_I2C and ZL3073X_SPI do not, causing:
+On Thu, 31 Jul 2025 10:00:20 +0200 you wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
 > 
->     WARNING: unmet direct dependencies detected for ZL3073X when selected by ZL3073X_I2C
->     WARNING: unmet direct dependencies detected for ZL3073X when selected by ZL3073X_SPI
->     WARNING: unmet direct dependencies detected for ZL3073X
-> 	Depends on [n]: NET [=n]
-> 	Selected by [y]:
-> 	- ZL3073X_I2C [=y] && I2C [=y]
-> 	Selected by [y]:
-> 	- ZL3073X_SPI [=y] && SPI [=y]
+> There are multiple drivers that use the qualcomm mdt loader, but they
+> have conflicting ideas of how to deal with that dependency when compile-testing
+> for non-qualcomm targets:
+> 
+> IPA only enables the MDT loader when the kernel config includes ARCH_QCOM,
+> but the newly added ath12k support always enables it, which leads to a
+> link failure with the combination of IPA=y and ATH12K=m:
 > 
 > [...]
 
 Here is the summary with links:
-  - dpll: zl3073x: ZL3073X_I2C and ZL3073X_SPI should depend on NET
-    https://git.kernel.org/netdev/net/c/4eabe4cc0958
+  - ipa: fix compile-testing with qcom-mdt=m
+    https://git.kernel.org/netdev/net/c/2df158047d53
 
 You are awesome, thank you!
 -- 
