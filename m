@@ -1,223 +1,166 @@
-Return-Path: <netdev+bounces-211666-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211667-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2060B1B106
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 11:29:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87721B1B112
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 11:31:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C0603BB92B
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 09:29:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B4931166629
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 09:31:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BC4225D209;
-	Tue,  5 Aug 2025 09:28:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDB8623816E;
+	Tue,  5 Aug 2025 09:31:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BhMFZqAz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eSi+u/3t"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33FB8251799
-	for <netdev@vger.kernel.org>; Tue,  5 Aug 2025 09:28:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9C5A2F30
+	for <netdev@vger.kernel.org>; Tue,  5 Aug 2025 09:31:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754386138; cv=none; b=OSiMl3lIVrueM2Nzceux5WGROUDAIkjwGGsqrGEk06wi5vVu+FUOHUP6w4HtCZdJ99tVVOtqxHH+kVG7wCsPeBCc2ezCQuPhi68JVPCNxVNTTIcBYsiRzrcvjOB7afKpkyv4ktd7+bC5bR/VF8vFKeRv4f36/HWMS78VpSEDykY=
+	t=1754386310; cv=none; b=bXypA7LwL5CIrXIeaFnZkiMkagrUjFgt4raZwjXEg/jyVK9taQ4GLWPtVXOBGeWiWOtioW89+65DJDa3cwlYTQ2CiFaqWTIJ4iIqXJzHfeXUyU346bchjva2jsCVmTOg2umZfKZgWwEPTUoB8x/tHasBEsayfwUe8LHMbLgykDw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754386138; c=relaxed/simple;
-	bh=+/ONE53PJr4Zv3a/0yB3dh+z8LBg5nSOorrUvdMvcoc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TUx258J5RfNzAZzfv4pnTJq4LWPWpacBvN2aSKvk32OQfkkWPRnSJvZy0vSBW6Coz82poqBfH/udI/I4uwh8yOUxMTSUFkb9O3v3EQV93mH3Ut+u2AQ5+6LImmuSokt/GZ5uCQ2bWGVbDgPaIG8Ti7pf18SzWFe/zy2d3nBuEzc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BhMFZqAz; arc=none smtp.client-ip=91.218.175.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <e85af6d4-45f9-4011-a6e4-f06aa6662dad@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1754386134;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eMeyoPAhWUvFydE5qvLWxr4Zd9OGViAzNZI+UazFToM=;
-	b=BhMFZqAz0VDYI+3Pk73GSDzeLrMFq/cm4Y9balxjRDtYgt78/PBY0IVb03XxT3D5rDTzpk
-	KK3T5mDjdU1XFViuCtL2T50SBw9Jg5wxm6SigiFsgO7ney4I41Tc2Y1AC+Q9vWNAOJDSbW
-	dhPH7S8JEKREG/qNLKNZTd5gVHNcUwM=
-Date: Tue, 5 Aug 2025 10:28:50 +0100
+	s=arc-20240116; t=1754386310; c=relaxed/simple;
+	bh=ApLfOZ7rBItbL9w4r66vWFgv3GQHR5w9AFkDNamf+uM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pbW0VKPR+fhWb0gFl2NvPWMzvm1tAavL/yQstBxIBZTBUszNF4fnldxJzv8GgywmhwUegm63o7ZMbPZgxoWoMwzKF3SCsFVIPyYa5VL/qNBQg/HOVgq7RGhkRJntOR8UJA/DpBszuzo9Mm8R6HEdHqhe6joEcdmYE/s4DgNzfX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eSi+u/3t; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F129C4CEF0;
+	Tue,  5 Aug 2025 09:31:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754386310;
+	bh=ApLfOZ7rBItbL9w4r66vWFgv3GQHR5w9AFkDNamf+uM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=eSi+u/3twu+giBzglNsyT2IU7EeO+T4oy/U6XCJZgWWX+j4lGnWmsBYotA5vG4ABt
+	 +lZIpVw9eb7t/TH4kHEEIdVCvrqhEkNT0ypYY3DrUcVHQ4zQ2jDgG+sLoN6RgSzPF/
+	 00uG36nCmfmCQn4DskwIo5XMSaa44czaNr0JzlM+SS+fuCVTtf/H73qB7bT+eDxBxl
+	 ES7pEOIZOMtuLHhKyo3/wAN6sZCQdBJb6clFu4akRlz7W0SFkW4JPyy9L8Ipf5KKQ+
+	 T/dKPZCy44hL6jtv7xib0qfNK2MoeLT2pe7q0fdlEA/tDrBfUHx4WOqEDxe4fM1/mp
+	 U3Q0R7X1TqiqQ==
+Date: Tue, 5 Aug 2025 10:31:45 +0100
+From: Simon Horman <horms@kernel.org>
+To: David Hill <dhill@redhat.com>
+Cc: netdev@vger.kernel.org, anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com
+Subject: Re: [PATCH] PATCH: i40e Improve trusted VF MAC addresses logging
+ when limit is reached
+Message-ID: <20250805093145.GV8494@horms.kernel.org>
+References: <20250802141322.2216641-1-dhill@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [RFC PATCH v3] ethtool: add FEC bins histogramm report
-To: Carolina Jubran <cjubran@nvidia.com>, Andrew Lunn <andrew@lunn.ch>,
- Michael Chan <michael.chan@broadcom.com>,
- Pavan Chebbi <pavan.chebbi@broadcom.com>, Tariq Toukan <tariqt@nvidia.com>,
- Gal Pressman <gal@nvidia.com>, intel-wired-lan@lists.osuosl.org,
- Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org
-References: <20250802063024.2423022-1-vadfed@meta.com>
- <d3bb8295-bb4f-4817-a2dd-017332c489d4@nvidia.com>
- <25ab441c-84e8-4c47-8d13-1b88d78ed4c6@linux.dev>
- <e55b8200-1fed-410c-a5b8-e37cad5d84b0@nvidia.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <e55b8200-1fed-410c-a5b8-e37cad5d84b0@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250802141322.2216641-1-dhill@redhat.com>
 
-On 05/08/2025 10:03, Carolina Jubran wrote:
+On Sat, Aug 02, 2025 at 10:13:22AM -0400, David Hill wrote:
+> When a VF reaches the limit introduced in this commit [1], the host reports
+> an error in the syslog but doesn't mention which VF reached its limit and
+> what the limit is actually is which makes troubleshooting of networking
+> issue a bit tedious.   This commit simply improves this error reporting
+> by adding which VF number has reached a limit and what that limit is.
 > 
+> Signed-off-by: David Hill <dhill@redhat.com>
 > 
-> On 04/08/2025 11:31, Vadim Fedorenko wrote:
->> On 03/08/2025 12:24, Carolina Jubran wrote:
->>>
->>>
->>> On 02/08/2025 9:30, Vadim Fedorenko wrote:
->>>> diff --git a/Documentation/networking/ethtool-netlink.rst b/ 
->>>> Documentation/networking/ethtool-netlink.rst
->>>> index ab20c644af248..b270886c5f5d5 100644
->>>> --- a/Documentation/networking/ethtool-netlink.rst
->>>> +++ b/Documentation/networking/ethtool-netlink.rst
->>>> @@ -1541,6 +1541,11 @@ Drivers fill in the statistics in the 
->>>> following structure:
->>>>   .. kernel-doc:: include/linux/ethtool.h
->>>>       :identifiers: ethtool_fec_stats
->>>> +Statistics may have FEC bins histogram attribute 
->>>> ``ETHTOOL_A_FEC_STAT_HIST``
->>>> +as defined in IEEE 802.3ck-2022 and 802.3df-2024. Nested attributes 
->>>> will have
->>>> +the range of FEC errors in the bin (inclusive) and the amount of 
->>>> error events
->>>> +in the bin.
->>>> +
->>>
->>> Maybe worth mentioning per-lane histograms here.
->>
->> Yep, will do it
->>
->>>
->>>>   FEC_SET
->>>>   =======
->>>> diff --git a/drivers/net/netdevsim/ethtool.c b/drivers/net/ 
->>>> netdevsim/ ethtool.c
->>>> index f631d90c428ac..1dc9a6c126b24 100644
->>>> --- a/drivers/net/netdevsim/ethtool.c
->>>> +++ b/drivers/net/netdevsim/ethtool.c
->>>> @@ -164,12 +164,29 @@ nsim_set_fecparam(struct net_device *dev, 
->>>> struct ethtool_fecparam *fecparam)
->>>>       ns->ethtool.fec.active_fec = 1 << (fls(fec) - 1);
->>>>       return 0;
->>>>   }
->>>> +static const struct ethtool_fec_hist_range netdevsim_fec_ranges[] = {
->>>> +    { 0, 0},
->>>> +    { 1, 3},
->>>> +    { 4, 7},
->>>> +    { 0, 0}
->>>> +};
->>>>
->>>
->>> Following up on the discussion from v1, I agree with Gal's concern 
->>> about pushing array management into the driver. It adds complexity 
->>> especially when ranges depend on FEC mode.
->>
->> Still don't really get the reason. You have finite amount of FEC bin
->> configurations, per hardware per FEC type, you know current FEC type
->> value and can choose static range based on this knowledge. Why do you
->> want to query device over PCIe multiple times to figure out the same
->> configuration every time?
->>
-> 
-> That’s true, we have known FEC modes, but we don’t always know the 
-> actual bin layout, it can vary per device. So the driver still needs to 
-> query the device to get the correct ranges, even if the FEC type is fixed.
+> [1] commit cfb1d572c986a39fd288f48a6305d81e6f8d04a3
+> Author: Karen Sornek <karen.sornek@intel.com>
+> Date:   Thu Jun 17 09:19:26 2021 +0200
 
-Correct me if I'm wrong, but I believe it's not per device but rather
-per device generation. Cutting out old devices which don't support
-reporting FEC histogram at all, and CX7 and CX8 supporting bins layout
-as per standard, I would say there are 4 different variants, plus
-RS(272, 257) for Infiniband. Not much to make it constant and avoid any
-allocations and memory management, and keep maintenance easy for both
-parties...
+Hi David,
 
-On the other side, if you want to dynamically fill in this data, it will
-take proper amount of requests over PCIe: 1 (the amount of bins) + 2 *
-16 (low and high boundary per bin for RS(544,514)) + 2 * 16 (64 bits
-value per bin) = 65. In case of continues monitoring may be potentially
-disruptive for high speed low latency traffic, but I believe we can
-avoid at least half of these transactions.
+Your Signed-off-by, and any other tags, should come at the end of
+the commit message. In this case, immediately before the scissors ("---").
 
->>>
->>> The approach Andrew suggested makes sense to me. A simple helper to 
->>> add a bin would support both static and dynamic cases.
->>>
->>>>   static void
->>>> -nsim_get_fec_stats(struct net_device *dev, struct ethtool_fec_stats 
->>>> *fec_stats)
->>>> +nsim_get_fec_stats(struct net_device *dev, struct ethtool_fec_stats 
->>>> *fec_stats,
->>>> +           const struct ethtool_fec_hist_range **ranges)
->>>>   {
->>>> +    *ranges = netdevsim_fec_ranges;
->>>> +
->>>>       fec_stats->corrected_blocks.total = 123;
->>>>       fec_stats->uncorrectable_blocks.total = 4;
->>>> +
->>>> +    fec_stats->hist[0].bin_value = 345;
->>>
->>> bin_value is 345 but the per-lane sum is 445.
->>
->> ahh.. yeah, will fix it
->>
->>>> +    fec_stats->hist[1].bin_value = 12;
->>>> +    fec_stats->hist[2].bin_value = 2;
->>>> +    fec_stats->hist[0].bin_value_per_lane[0] = 125;
->>>> +    fec_stats->hist[0].bin_value_per_lane[1] = 120;
->>>> +    fec_stats->hist[0].bin_value_per_lane[2] = 100;
->>>> +    fec_stats->hist[0].bin_value_per_lane[3] = 100;
->>>>   }
->>>> +static int fec_put_hist(struct sk_buff *skb, const struct 
->>>> fec_stat_hist *hist,
->>>> +            const struct ethtool_fec_hist_range *ranges)
->>>> +{
->>>> +    struct nlattr *nest;
->>>> +    int i, j;
->>>> +
->>>> +    if (!ranges)
->>>> +        return 0;
->>>> +
->>>> +    for (i = 0; i < ETHTOOL_FEC_HIST_MAX; i++) {
->>>> +        if (i && !ranges[i].low && !ranges[i].high)
->>>> +            break;
->>>> +
->>>> +        nest = nla_nest_start(skb, ETHTOOL_A_FEC_STAT_HIST);
->>>> +        if (!nest)
->>>> +            return -EMSGSIZE;
->>>> +
->>>> +        if (nla_put_u32(skb, ETHTOOL_A_FEC_HIST_BIN_LOW,
->>>> +                 ranges[i].low) ||
->>>> +            nla_put_u32(skb, ETHTOOL_A_FEC_HIST_BIN_HIGH,
->>>> +                 ranges[i].high) ||
->>>> +            nla_put_uint(skb, ETHTOOL_A_FEC_HIST_BIN_VAL,
->>>> +                     hist[i].bin_value))
->>>
->>> Should skip bins where hist[i].bin_value isn’t set.
->>
->> I'm kinda disagree. If the bin is configured, then the HW must provide a
->> value for it. Otherwise we will have inconsistency in user's output.
->>
->> I was thinking of adding WARN_ON_ONCE() for such cases actually.
->>
-> I see your point, yeah I’m good with the WARN_ON_ONCE()
+And the correct form for a commit citation in a commit message is like
+this. Note: There should be 12 or more characters of hash - usually 12 is
+enough to prevent a collision with current hashes; And, unlike a Fixes
+tag it should be line wrapped as appropriate.
+
+commit cfb1d572c986 ("i40e: Add ensurance of MacVlan resources for every
+trusted VF")
+
+> ---
+>  drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
->>>
->>>
->>> Thanks,
->>> Carolina
->>
-> 
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+> index 9b8efdeafbcf..44e3e75e8fb0 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+> @@ -2953,7 +2953,8 @@ static inline int i40e_check_vf_permission(struct i40e_vf *vf,
+>  		    I40E_VC_MAX_MACVLAN_PER_TRUSTED_VF(pf->num_alloc_vfs,
+>  						       hw->num_ports)) {
+>  			dev_err(&pf->pdev->dev,
+> -				"Cannot add more MAC addresses, trusted VF exhausted it's resources\n");
+> +				"Cannot add more MAC addresses, trusted VF %d uses %d out of %d MAC addresses\n", vf->vf_id, i40e_count_filters(vsi) +
+> +          mac2add_cnt, I40E_VC_MAX_MACVLAN_PER_TRUSTED_VF(pf->num_alloc_vfs,hw->num_ports));
+>  			return -EPERM;
+>  		}
+>  	}
+
+I am wondering if we can achieve the same in a slightly less verbose way.
+And follow more closely the preference in Networking code to keep lines
+to 80 columns wide or less, unless it reduces readability (subjective to to
+be sure).
+
+Something like this (compile tested only!):
+
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+index 9b8efdeafbcf..874a0d907496 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+@@ -2896,8 +2896,8 @@ static inline int i40e_check_vf_permission(struct i40e_vf *vf,
+ {
+ 	struct i40e_pf *pf = vf->pf;
+ 	struct i40e_vsi *vsi = pf->vsi[vf->lan_vsi_idx];
++	int mac2add_cnt = i40e_count_filters(vsi);
+ 	struct i40e_hw *hw = &pf->hw;
+-	int mac2add_cnt = 0;
+ 	int i;
+ 
+ 	for (i = 0; i < al->num_elements; i++) {
+@@ -2937,8 +2937,7 @@ static inline int i40e_check_vf_permission(struct i40e_vf *vf,
+ 	 * push us over the limit.
+ 	 */
+ 	if (!test_bit(I40E_VIRTCHNL_VF_CAP_PRIVILEGE, &vf->vf_caps)) {
+-		if ((i40e_count_filters(vsi) + mac2add_cnt) >
+-		    I40E_VC_MAX_MAC_ADDR_PER_VF) {
++		if (mac2add_cnt > I40E_VC_MAX_MAC_ADDR_PER_VF) {
+ 			dev_err(&pf->pdev->dev,
+ 				"Cannot add more MAC addresses, VF is not trusted, switch the VF to trusted to add more functionality\n");
+ 			return -EPERM;
+@@ -2949,11 +2948,14 @@ static inline int i40e_check_vf_permission(struct i40e_vf *vf,
+ 	 * all VFs.
+ 	 */
+ 	} else {
+-		if ((i40e_count_filters(vsi) + mac2add_cnt) >
+-		    I40E_VC_MAX_MACVLAN_PER_TRUSTED_VF(pf->num_alloc_vfs,
+-						       hw->num_ports)) {
++		int add_max;
++
++		add_max = I40E_VC_MAX_MACVLAN_PER_TRUSTED_VF(pf->num_alloc_vfs,
++							     hw->num_ports);
++		if (mac2add_cnt > add_max) {
+ 			dev_err(&pf->pdev->dev,
+-				"Cannot add more MAC addresses, trusted VF exhausted it's resources\n");
++				"Cannot add more MAC addresses, trusted VF %d uses %d out of %d MAC addresses\n",
++				vf->vf_id, mac2add_cnt, add_max);
+ 			return -EPERM;
+ 		}
+ 	}
+
+While sketching-out the above I noticed the dev_err() relating to
+undtrusted VFs (around line 2940). And I'm wondering if you think
+it makes sense to give it the same treatment that your patch
+gives to the dev_err for trusted VFS (around line 2955).
 
 
