@@ -1,53 +1,58 @@
-Return-Path: <netdev+bounces-211741-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211742-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F1A6B1B6FC
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 17:01:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2761FB1B6FE
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 17:02:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D9A43AB351
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 15:01:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5CE851653D0
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 15:02:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC5DD272E5E;
-	Tue,  5 Aug 2025 15:01:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E744923F295;
+	Tue,  5 Aug 2025 15:02:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="sVvo6Hvj"
 X-Original-To: netdev@vger.kernel.org
-Received: from bmailout1.hostsharing.net (bmailout1.hostsharing.net [83.223.95.100])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EFAE85260
-	for <netdev@vger.kernel.org>; Tue,  5 Aug 2025 15:01:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.95.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B88E13B58A
+	for <netdev@vger.kernel.org>; Tue,  5 Aug 2025 15:02:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754406096; cv=none; b=NF9Lm2F4VWyS13vwfRwc9FlS+ZmJSnCe327CXbvXSCqcXKhcU+KsCLFFxakzCOEJUdVfWIGdi1+LRaxWzgwgHHeudbX9L1IRO8aGomKdXcRAxONaTJHlWZYvsRCXgFcDqog1zeX7MGenCxfOIB5nv+vNDkePr9brQ4hutAcJAMg=
+	t=1754406151; cv=none; b=GeBbzK4Z0gZ6oVWxVl3dBpsh8ApwArq4SEArvBvU9+oUtHdWU5bsvhCSp+myrzwVbZYmqw0CDA0se+wDxwBB/ZWXrrmlYL6Y/jywetc/Ugt/3tLsRgjXbKkAmPAo43/xqdxKs6smqYcf6AGsaOAGeSXoLFbDwVD+Ldsgn+0S1aA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754406096; c=relaxed/simple;
-	bh=a3Uz+bhDtLO3f6036QZs0JsOCd6UC/nrk30XAQqav9A=;
+	s=arc-20240116; t=1754406151; c=relaxed/simple;
+	bh=l+KKV8yNCDWGz4aojCC6AEgST+IeHB2vQrGF5ElRnKk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Eqx955DxeKTuMNAsk3s7eA+9f3byL/gkXcx15boTmdoMdr94c5pod65C5oREUwMq16Ise/7KKukJ7FiLOJoQOLbI8dVvtSTYwW/lLrc7dzGmYI/j1+aH/xGkFYzCh2Yq4lNTWF0/5AGLWvaZx6RWLwanPKkXOSjhGqAlKGzAS68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.95.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
-Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
-	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by bmailout1.hostsharing.net (Postfix) with ESMTPS id D040F2C02AC4;
-	Tue,  5 Aug 2025 17:01:30 +0200 (CEST)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id B8919357A5F; Tue,  5 Aug 2025 17:01:30 +0200 (CEST)
-Date: Tue, 5 Aug 2025 17:01:30 +0200
-From: Lukas Wunner <lukas@wunner.de>
-To: Shannon Nelson <shannon.nelson@amd.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	edumazet@google.com, pabeni@redhat.com, brett.creeley@amd.com,
-	drivers@pensando.io
-Subject: Re: [PATCH net-next 1/3] pds_core: add simple AER handler
-Message-ID: <aJIcyjyGxlKm382t@wunner.de>
-References: <20240216222952.72400-1-shannon.nelson@amd.com>
- <20240216222952.72400-2-shannon.nelson@amd.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y2KwYrhX3+h5jE9L8azvWK4awKupH46GWofcVvh17iHIxchn+sNWxjjszBd8Xnh3ASdagZuus6TVrmONjkXfrWP5B3EuD40QAkNw0Lv+fLSNCl54T6M5CnoBF+v6oCoEBUsk9JqkYIlGesEumUuBL49eMP7ssACBHd3Jvr8ayPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=sVvo6Hvj; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=QzGse9mKnJs4fqGvB5U+DSoz52qWSDo3NJf8dxHcs4Q=; b=sVvo6Hvj7V4ADGp9E0a0mMD8s3
+	iaHCb3hQZsAL7Nfr6EBzA/6nwGq/vtIkOWDlBx7sFq9xELn6wDnXECRBLwAA8SpdqUDD3IFzapIyk
+	5OVFnJMviL2N8awMriUr3Rv3vNkaFgnZiQdnjrjrxbiDY1eKpHDqt4jTrYJrFRjaOM+0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1ujJAj-003nfq-4I; Tue, 05 Aug 2025 17:01:49 +0200
+Date: Tue, 5 Aug 2025 17:01:49 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Alok Tiwari <alok.a.tiwari@oracle.com>
+Cc: danishanwar@ti.com, rogerq@kernel.org, m-malladi@ti.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH net] net: ti: icss-iep: Fix incorrect type for return
+ value in extts_enable()
+Message-ID: <7140f850-dd56-4d97-90b9-9c85494dc1a3@lunn.ch>
+References: <20250805142323.1949406-1-alok.a.tiwari@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,38 +61,20 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240216222952.72400-2-shannon.nelson@amd.com>
+In-Reply-To: <20250805142323.1949406-1-alok.a.tiwari@oracle.com>
 
-On Fri, Feb 16, 2024 at 02:29:50PM -0800, Shannon Nelson wrote:
-> Set up the pci_error_handlers error_detected and resume to be
-> useful in handling AER events.
+On Tue, Aug 05, 2025 at 07:23:18AM -0700, Alok Tiwari wrote:
+> The variable ret in icss_iep_extts_enable() was incorrectly declared
+> as u32, while the function returns int and may return negative error
+> codes. This will cause sign extension issues and incorrect error
+> propagation. Update ret to be int to fix error handling.
+> 
+> This change corrects the declaration to avoid potential type mismatch.
+> 
+> Fixes: c1e0230eeaab ("net: ti: icss-iep: Add IEP driver")
+> Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
 
-The above was committed as d740f4be7cf0 ("pds_core: add simple
-AER handler").
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-Just noticed the following while inspecting the pci_error_handlers
-of this driver:
-
-> +static pci_ers_result_t pdsc_pci_error_detected(struct pci_dev *pdev,
-> +						pci_channel_state_t error)
-> +{
-> +	if (error == pci_channel_io_frozen) {
-> +		pdsc_reset_prepare(pdev);
-> +		return PCI_ERS_RESULT_NEED_RESET;
-> +	}
-> +
-> +	return PCI_ERS_RESULT_NONE;
-> +}
-
-The ->error_detected() callback of this driver invokes
-pdsc_reset_prepare(), which unmaps BARs and calls pci_disable_device(),
-but there is no corresponding ->slot_reset() callback which would invoke
-pdsc_reset_done() to re-enable the device after reset recovery.
-
-I don't have this hardware available for testing, hence do not feel
-comfortable submitting a fix.  But this definitely looks broken.
-
-Thanks,
-
-Lukas
+    Andrew
 
