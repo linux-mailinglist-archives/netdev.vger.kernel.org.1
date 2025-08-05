@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-211831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211832-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17C7CB1BD00
-	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 01:20:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 857F1B1BD01
+	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 01:20:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EBC3618522A
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 23:20:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 339D41851E7
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 23:20:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19B162BDC20;
-	Tue,  5 Aug 2025 23:20:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 810992BE028;
+	Tue,  5 Aug 2025 23:20:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ilY1RlqQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W58rDV6M"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA41625B693
-	for <netdev@vger.kernel.org>; Tue,  5 Aug 2025 23:20:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A1F62BDC3F;
+	Tue,  5 Aug 2025 23:20:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754436001; cv=none; b=sR/iSNHEYfM4DXgAcMb7DjyRuffMqowTfNDuWFaaGXumd+iLT6X6Tx6Ku4TqJKcGhQ1Cj/4Lw4sGM2UtKke+wAq3hXfpYs4rBOR3dPvVdjP8WLUSELG+rX3dS0lnxcbtBmvaPpDzCmmE5OGRoDZyVLjnMRzkVZI7lp+OUQWfxcI=
+	t=1754436002; cv=none; b=igC7+LhQFfjpm6ccbEPJvLP4/yKUev4YVsFO37W50O+IYVEK3817qgNnL/nQVTntan4nutxAfltQ+ypGyloBg/UvuJCDEmLD3Vkkjc/9wZZ06OLqk4oP2tXS6BRxFnK9YW2pDWA5Bg1eQT7S8Uo4doXYff1czy53eHQhfXJbrYs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754436001; c=relaxed/simple;
-	bh=zB+3FpwOZTwbAJDKoVi7tZ6E2wiRyIQlCODPhjNRwA4=;
+	s=arc-20240116; t=1754436002; c=relaxed/simple;
+	bh=wvpbLAqIOfvBAJ6bqJ7WNNSzI/BDA8VuN7oo1gaFoWI=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=PMl+1Bko4f7VuisiQxV28oxFY+auclGLa45dtP2ayFZKe+j7UdryemTt1zy64ojZgnnYPsJw7emk06TMrzMkjYyYYq+y0ejo83dIOqvcIeFp8f2KH/wddV1BuRA7RB7o0CoHljPxZIhW4QaXc0FfBinJFIya+UHYK0wJ4OxXNRw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ilY1RlqQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78827C4CEF4;
-	Tue,  5 Aug 2025 23:20:00 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=HOUUwLslCx9QlQy8P6HR3NTmLtG4Ip/1xO/pxZ12PjGKFQoA+8M8AQ5q58qjgkC7rTWgd/oDI6z/J1qBqr0EfJTRyR13N2O0lXCko+myTG2Ti6FiYlDuh842xIZKcueCjVYINtzd17Vp+uPxtBT9+wOFTJ3Hwfx1A/uk/DUtZWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W58rDV6M; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E17EAC4CEF0;
+	Tue,  5 Aug 2025 23:20:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754436000;
-	bh=zB+3FpwOZTwbAJDKoVi7tZ6E2wiRyIQlCODPhjNRwA4=;
+	s=k20201202; t=1754436001;
+	bh=wvpbLAqIOfvBAJ6bqJ7WNNSzI/BDA8VuN7oo1gaFoWI=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ilY1RlqQcWrJX0G2qYW1PWPGIBeP0qqH9BOSSaowMPyf3PU8/czc1wnNFbPC4dfN5
-	 FINCU3wzRJNGIQtyYYaoQ6sN9EC99fdL0lp9QxeleYwRXu5HhuQ/LetjCpapHad158
-	 lhLX+hO1qNjKfqLSrqRErr8K6ZLcRCBLrvyGp3oTFc5G47MfjlKK5EJ5VmSrHfcZAB
-	 3I+b6++Cd47gwAZJRVHIBOuhZ2lFSVNupRQg+dab0GqajH1X+EKbXkUS5tj5M6gTw1
-	 sSdiuJZOhsgkqa7Cc9eRIokLPgCD7lJkbsnSbYJvPN+pILD2PNrH8IUydL0tbvnrhA
-	 HiemuakD6f52A==
+	b=W58rDV6MVusuPqs8SItigX7sIMr6Pfx3tqu7P7QJmvrXKPipkqPrbcGo5CVZpbIm6
+	 UqActsGswlNLAlHZvFJMUwoIXnDHWsMJjKBmXG499Y7hZSm6AQbk23UOgrYvIl7diO
+	 5OXuaZEg9m5zUMw0rc01UJ24zAuxoYpY9odmw6M0q5ZojydXI9+ETogVDtfqk12/XY
+	 ZgH/EGfscyuRvEteSlmQOa7mmXVGh0R2PMLU+0ENMBUO2yQC9KdhOo8canXjTZkgAs
+	 cM21Qx5jrnxJAUW9qxn6UPKjLaazj4VwD6Y/43BqcOJ4+8mIAzV//7cWyF+WQVSQNx
+	 ujtd0ZmGIKnmA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADC3D383BF63;
-	Tue,  5 Aug 2025 23:20:15 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33AE6383BF63;
+	Tue,  5 Aug 2025 23:20:17 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,42 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] eth: fbnic: remove the debugging trick of super high
- page
- bias
+Subject: Re: [PATCH net 0/2] eth: fbnic: Fix drop stats support
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175443601438.2197607.222527424846735387.git-patchwork-notify@kernel.org>
-Date: Tue, 05 Aug 2025 23:20:14 +0000
-References: <20250801170754.2439577-1-kuba@kernel.org>
-In-Reply-To: <20250801170754.2439577-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- alexanderduyck@fb.com
+ <175443601574.2197607.15706911174673052016.git-patchwork-notify@kernel.org>
+Date: Tue, 05 Aug 2025 23:20:15 +0000
+References: <20250802024636.679317-1-mohsin.bashr@gmail.com>
+In-Reply-To: <20250802024636.679317-1-mohsin.bashr@gmail.com>
+To: Mohsin Bashir <mohsin.bashr@gmail.com>
+Cc: netdev@vger.kernel.org, alexanderduyck@fb.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, horms@kernel.org,
+ kernel-team@meta.com, kuba@kernel.org, linux-kernel@vger.kernel.org,
+ pabeni@redhat.com, sdf@fomichev.me, vadim.fedorenko@linux.dev
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri,  1 Aug 2025 10:07:54 -0700 you wrote:
-> Alex added page bias of LONG_MAX, which is admittedly quite
-> a clever way of catching overflows of the pp ref count.
-> The page pool code was "optimized" to leave the ref at 1
-> for freed pages so it can't catch basic bugs by itself any more.
-> (Something we should probably address under DEBUG_NET...)
+On Fri,  1 Aug 2025 19:46:34 -0700 you wrote:
+> Fix hardware drop stats support on the TX path of fbnic by addressing two
+> issues: ensure that tx_dropped stats are correctly copied to the
+> rtnl_link_stats64 struct, and protect the copying of drop stats from
+> fdb->hw_stats to the local variable with the hw_stats_lock to
+> ensure consistency.
 > 
-> Unfortunately for fbnic since commit f7dc3248dcfb ("skbuff: Optimization
-> of SKB coalescing for page pool") core _may_ actually take two extra
-> pp refcounts, if one of them is returned before driver gives up the bias
-> the ret < 0 check in page_pool_unref_netmem() will trigger.
+> Mohsin Bashir (2):
+>   eth: fbnic: Fix tx_dropped reporting
+>   eth: fbnic: Lock the tx_dropped update
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] eth: fbnic: remove the debugging trick of super high page bias
-    https://git.kernel.org/netdev/net/c/e407fceeaf1b
+  - [net,1/2] eth: fbnic: Fix tx_dropped reporting
+    https://git.kernel.org/netdev/net/c/2972395d8fad
+  - [net,2/2] eth: fbnic: Lock the tx_dropped update
+    https://git.kernel.org/netdev/net/c/53abd9c86fd0
 
 You are awesome, thank you!
 -- 
