@@ -1,48 +1,49 @@
-Return-Path: <netdev+bounces-211785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211786-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E640B1BB7A
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 22:39:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AFDCB1BB93
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 22:59:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C135A620D9D
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 20:39:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4EA536203E5
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 20:59:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C09E0230BFF;
-	Tue,  5 Aug 2025 20:39:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12EEC23BF9B;
+	Tue,  5 Aug 2025 20:59:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ri6Zp74n"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="4I88P4ko"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96413222562;
-	Tue,  5 Aug 2025 20:39:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 914FB12E7F;
+	Tue,  5 Aug 2025 20:59:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754426356; cv=none; b=NIbw1mQDVl7O/mmy2G4gxTeU33JQSs3QDHg17KUaS51kh9xG2gaNlX0sEAJ9vydqESMF5LHwSBZsBPYtEP6zqra80SC0XU+HPds42W01+2AFCW6KewjQNmDex02NFqgbogA3BD7a8+L4h9WZxtLElasx5mIPKA2gO6jTDgPQHiw=
+	t=1754427568; cv=none; b=OwWbz4sEu4qDhejBLoGI5UdubmimhHqEJblSMdlJMDDIDKs9hAizTT/Z0IAbb6S+LaiD7Cm4RccL1gA7eoXu8awhq2QrtWUD3XTsTLduB5VAY3+dab6tkP+pvkYWGFFbwDkn4y/gb8pn8DHX9Pz0WqYgdoErvu7WOJShwfECL8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754426356; c=relaxed/simple;
-	bh=VC9sMCvyq68QKkGDQO5hx+0ig5esATmGOVbDNnZWolQ=;
+	s=arc-20240116; t=1754427568; c=relaxed/simple;
+	bh=t7+tqrc2CSh6joUTYTSPNLhj41E9+PZPzVTdBsnSpsc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DhNweAGRtXwx0Hv4w8Y2eLlcaVd8eWieOceHaXaVLFhF2XmC3GD4EBQQ6MCPNdoy3pCp7SGIExGR6ri9oPgf1ro2JTUqAPOlQajq457NnnLiFFRwxk7oRv2oAg9/we8HFKrN/+5PbksHX6gSHbAzQGmbSUmU8MYsKhdrj330VgQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ri6Zp74n; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 071A7C4CEF0;
-	Tue,  5 Aug 2025 20:39:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754426356;
-	bh=VC9sMCvyq68QKkGDQO5hx+0ig5esATmGOVbDNnZWolQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ri6Zp74nT46FUbiLR+aaF791iBqAIektiiglVIX3fe2E/4UfAV9nH0toKROhO/swk
-	 GQbqDMw6bDNyW/cMs55U8fZaFdSXVneaKyoeneYYe5OECAXd7YUo2m+lppas/4dfH+
-	 lNdFXgn/KCiau605XR1FMYrrxdJdWOu3Z6TS3hhOa6/4JhISFXdtxlHARbe4+AOJrI
-	 HCXHFo/wzPdQtzClZ1RhC2Vo9VU3aLXN42leZlVAjhcrqfs/uAARMhlNqqKb5LlpWO
-	 3ul5jSm5+E4LEmvvVmgrKk4NYJb+PcvRMYHaUuijNFWOHZVU/vPt3xWwcTAX9bevNw
-	 LvNJ6P6LlK0Pw==
-Date: Tue, 5 Aug 2025 21:39:12 +0100
-From: Simon Horman <horms@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=jgWjuubVaZky3VQ2g+TxRRG41FX4gQECNxskntnCk9nC8SbJUlVrvoQN7YAh37iXWCrdv6GMDfVmqrAtp6Kp5GiXdYRt8SAtp6VjhC5Jsb1jlpyofUNcBjsMpAidWN3gA81gaWsbKkLCBFZ/+ks9DxNPN8ad04tcT4SropvzbF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=4I88P4ko; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=NWDHZJrVWOBu48yVTIxq5bN4KAAfsVdHWzf5NjnxC7c=; b=4I88P4kotaghdXCFOSfBkDGC4o
+	sFk7rBF3W7vefj3i0SNWceKobbrdFPCKJTu/qjhMpVIKEay54XbYVhw36DjvMzcbQXud9S/1azxVe
+	DKiXLr4lfR3hUd95y8E2leibqEeB+DIWUzcOBwhsW++6DVWlfhakmsiW/XhrQgM65Tsw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1ujOkZ-003pEJ-6T; Tue, 05 Aug 2025 22:59:11 +0200
+Date: Tue, 5 Aug 2025 22:59:11 +0200
+From: Andrew Lunn <andrew@lunn.ch>
 To: Sean Anderson <sean.anderson@linux.dev>
 Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -53,12 +54,13 @@ Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
 	linux-kernel@vger.kernel.org,
 	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	Michal Simek <michal.simek@amd.com>,
-	Leon Romanovsky <leon@kernel.org>
-Subject: Re: [PATCH net-next v4 6/7] net: axienet: Rearrange lifetime
- functions
-Message-ID: <20250805203912.GE61519@horms.kernel.org>
+	Leon Romanovsky <leon@kernel.org>,
+	Suraj Gupta <suraj.gupta2@amd.com>
+Subject: Re: [PATCH net-next v4 1/7] net: axienet: Fix resource release
+ ordering
+Message-ID: <9572f798-d294-4f24-8acb-c7972c1db247@lunn.ch>
 References: <20250805153456.1313661-1-sean.anderson@linux.dev>
- <20250805153456.1313661-7-sean.anderson@linux.dev>
+ <20250805153456.1313661-2-sean.anderson@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,51 +69,35 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250805153456.1313661-7-sean.anderson@linux.dev>
+In-Reply-To: <20250805153456.1313661-2-sean.anderson@linux.dev>
 
-On Tue, Aug 05, 2025 at 11:34:55AM -0400, Sean Anderson wrote:
-> Rearrange the lifetime functions (probe, remove, etc.) in preparation
-> for the next commit. No functional change intended.
-> 
-> Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
-
-...
-
-> diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet.h b/drivers/net/ethernet/xilinx/xilinx_axienet.h
+> +static void axienet_disable_misc(void *clocks)
+> +{
+> +	clk_bulk_disable_unprepare(XAE_NUM_MISC_CLOCKS, clocks);
+> +}
+> +
 
 ...
 
->  /**
->   * struct axienet_local - axienet private per device data
->   * @ndev:	Pointer for net_device to which it will be attached.
-> @@ -549,6 +572,7 @@ struct skbuf_dma_descriptor {
->  struct axienet_local {
->  	struct net_device *ndev;
->  	struct device *dev;
-> +	struct axienet_common *cp;
+>  	ret = devm_clk_bulk_get_optional(&pdev->dev, XAE_NUM_MISC_CLOCKS, lp->misc_clks);
+>  	if (ret)
+> -		goto cleanup_clk;
+> +		return dev_err_probe(&pdev->dev, ret,
+> +				     "could not get misc. clocks\n");
+>  
+>  	ret = clk_bulk_prepare_enable(XAE_NUM_MISC_CLOCKS, lp->misc_clks);
+>  	if (ret)
+> -		goto cleanup_clk;
+> +		return dev_err_probe(&pdev->dev, ret,
+> +				     "could not enable misc. clocks\n");
+> +
+> +	ret = devm_add_action_or_reset(&pdev->dev, axienet_disable_misc,
+> +				       lp->misc_clks);
 
-nit: Please add cp to, and remove axi_clk and regs_start from
-     the Kernel doc for this structure.
+It seems like it would be better to add
+devm_clk_bulk_get_optional_enable(). There is already an
+devm_clk_bulk_get_all_enabled() so it does not seem like too big a
+step.
 
-     Flagged by ./scripts/kernel-doc -none
-
->  
->  	struct phylink *phylink;
->  	struct phylink_config phylink_config;
-> @@ -558,13 +582,11 @@ struct axienet_local {
->  
->  	bool switch_x_sgmii;
->  
-> -	struct clk *axi_clk;
->  	struct clk_bulk_data misc_clks[XAE_NUM_MISC_CLOCKS];
->  
->  	struct mii_bus *mii_bus;
->  	u8 mii_clk_div;
->  
-> -	resource_size_t regs_start;
->  	void __iomem *regs;
->  	void __iomem *dma_regs;
->  
-
-...
+	Andrew
 
