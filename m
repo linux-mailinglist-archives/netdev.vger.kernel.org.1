@@ -1,178 +1,93 @@
-Return-Path: <netdev+bounces-211812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211794-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DF91B1BC31
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 23:55:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BA13CB1BBD5
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 23:41:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 96D18185A69
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 21:55:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6BAD16B5AF
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 21:41:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4742C29616A;
-	Tue,  5 Aug 2025 21:52:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD3A92561B6;
+	Tue,  5 Aug 2025 21:41:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I85WRRYd"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="eXFzQppg"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B090292B2B
-	for <netdev@vger.kernel.org>; Tue,  5 Aug 2025 21:52:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D846722D4C0;
+	Tue,  5 Aug 2025 21:41:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754430755; cv=none; b=WmRDk9QIq8m07E8RMucxCGY5egjI1kRFfqYRKEzHTabSzuU//+cewS/CvBZfXxqrFgpMmZRzAHAxDRLbmo5PVnQhEtHOOjYMfsKq3V2AmusSgSm/9u85QugeF88R+j/vGYO12+hgu9dyCBDmtHxQkC4SWAnz6opYVq3nH8UK2rw=
+	t=1754430066; cv=none; b=MbFQF4Nes3NTn42HJaiYKu//NZKeh4cTF7sjY55hzxw1cCWzjOMnMIL/PQ3aoAlPFLmbHMq1nSccL0Z8Uy7ZB2RuRtESVJjZIa56FJeZ887Blh/E6/6iJ1F555P9AW6GVqjwawm1MphMIQ3NNfzIfb1tmOaFTseMLnTBg0nCE38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754430755; c=relaxed/simple;
-	bh=7dnrdtbKyGFiaqYBltiWE9wtIcqVKUp1hODCsFQQrJM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jwu37IqV+Ptc7xmWf6LI9PSXIG4TUQ3Jt5ZmLJ086qKC3d4kV0pzrT7tKN6eZzd8/HhJry/JeMkdacKH2UhbkB3p5myvG8M39f0mtvkTXPaYBPHi245IRAoHdbpasOpy+3snpm87j3/+Hl4p8Dj3ze3A2pftkWDHuzsN9yJmoN0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=I85WRRYd; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1754430752;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8qmrCLyyu9Yze1ajg0xQIFq16CNCCNzVShP1QbmOTYI=;
-	b=I85WRRYddpI9pk3k9Pqh2Q1FbhyCPkAAkfHZ+GZZg5Oic4fcFn3293tpPfhQyGtm5HGV1G
-	DiGAU0bP2nF2PeaWfwvVl/bT3FmCtWXzVRVPfR2U8eXlWMxCOQOT0InRrbxCyaEXmmQuat
-	IOyZMWZd9lY62OaU7Q269kwp0KjDNYc=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-177-fg8bPuD6NwacrVQh--J9Ng-1; Tue,
- 05 Aug 2025 17:52:29 -0400
-X-MC-Unique: fg8bPuD6NwacrVQh--J9Ng-1
-X-Mimecast-MFC-AGG-ID: fg8bPuD6NwacrVQh--J9Ng_1754430748
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E883D1955F04;
-	Tue,  5 Aug 2025 21:52:27 +0000 (UTC)
-Received: from lima-lima (unknown [10.22.80.60])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 73CC63000199;
-	Tue,  5 Aug 2025 21:52:26 +0000 (UTC)
-From: Dennis Chen <dechen@redhat.com>
-To: netdev@vger.kernel.org
-Cc: dechen@redhat.com,
-	dchen27@ncsu.edu,
-	kuba@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	petrm@nvidia.com
-Subject: [PATCH net-next 3/3] selftests: netdevsim: Add test for ethtool stats
-Date: Tue,  5 Aug 2025 17:33:56 -0400
-Message-ID: <20250805213356.3348348-4-dechen@redhat.com>
-In-Reply-To: <20250805213356.3348348-3-dechen@redhat.com>
-References: <20250805213356.3348348-1-dechen@redhat.com>
- <20250805213356.3348348-2-dechen@redhat.com>
- <20250805213356.3348348-3-dechen@redhat.com>
+	s=arc-20240116; t=1754430066; c=relaxed/simple;
+	bh=8dUpQn9CcS3sXe/4L+ubz1sM5F88oFVde65by5GHwaM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=esAIdF+wXFUEJQ0LBcZMRI9wMYRu6Dna1nerUnSbYKWvgmOX/iv3IyaVxH2vM0Owf/capXxlUgf85FyBYnKKHVgcM5Bb/BvFDsWalH7EcsXEufLIbWdMjYwQSQh1O2ynfyWODSmHJOLoSlBpasbPtz8acRZjcYhsE717dXbRV1k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=eXFzQppg; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=/T32B0iDAc73yD8QSjnheCBq97UTHskJn2BHI0l6/+A=; b=eXFzQppguDZBk4N1x1nydTBhMH
+	4k9rwb2TiweuCZcxlpYtGI6DEj2Tw/lyKgp3Wi7rrb83QJ9iPS+U+bhWb/8x7LK1M3p1KnxwCOnDL
+	YVoF2hVg8//OrxT6UTIN2sNpQ9i68CW9KZ5Pv5f2Fpw/eOarCGp8snbFj1855WW5trIU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1ujPOz-003pTN-UN; Tue, 05 Aug 2025 23:40:57 +0200
+Date: Tue, 5 Aug 2025 23:40:57 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Sean Anderson <sean.anderson@linux.dev>
+Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Michal Simek <michal.simek@amd.com>,
+	Leon Romanovsky <leon@kernel.org>
+Subject: Re: [PATCH net-next v4 7/7] net: axienet: Split into MAC and MDIO
+ drivers
+Message-ID: <c320da3b-6e55-474a-93d6-666092b70774@lunn.ch>
+References: <20250805153456.1313661-1-sean.anderson@linux.dev>
+ <20250805153456.1313661-8-sean.anderson@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250805153456.1313661-8-sean.anderson@linux.dev>
 
-Add a test that verifies ethtool correctly exposes driver-specific
-stats.
+> Fixes: 1a02556086fc ("net: axienet: Properly handle PCS/PMA PHY for 1000BaseX mode")
 
-Signed-off-by: Dennis Chen <dechen@redhat.com>
----
- .../selftests/drivers/net/netdevsim/Makefile  |  1 +
- .../drivers/net/netdevsim/ethtool-common.sh   | 13 +++++++
- .../drivers/net/netdevsim/ethtool-stats.sh    | 36 +++++++++++++++++++
- 3 files changed, 50 insertions(+)
- create mode 100755 tools/testing/selftests/drivers/net/netdevsim/ethtool-stats.sh
+If this is for net-next, please don't have a Fixes: tag.
 
-diff --git a/tools/testing/selftests/drivers/net/netdevsim/Makefile b/tools/testing/selftests/drivers/net/netdevsim/Makefile
-index 07b7c46d3311..67055a403e74 100644
---- a/tools/testing/selftests/drivers/net/netdevsim/Makefile
-+++ b/tools/testing/selftests/drivers/net/netdevsim/Makefile
-@@ -8,6 +8,7 @@ TEST_PROGS = devlink.sh \
- 	ethtool-fec.sh \
- 	ethtool-pause.sh \
- 	ethtool-ring.sh \
-+	ethtool-stats.sh \
- 	fib.sh \
- 	fib_notifications.sh \
- 	hw_stats_l3.sh \
-diff --git a/tools/testing/selftests/drivers/net/netdevsim/ethtool-common.sh b/tools/testing/selftests/drivers/net/netdevsim/ethtool-common.sh
-index 80160579e0cc..556ff74f443d 100644
---- a/tools/testing/selftests/drivers/net/netdevsim/ethtool-common.sh
-+++ b/tools/testing/selftests/drivers/net/netdevsim/ethtool-common.sh
-@@ -42,6 +42,19 @@ function check {
-     ((num_passes++))
- }
- 
-+function check_code {
-+    local code=$1
-+    local msg=$2
-+
-+    if ((err)); then
-+    echo -e $msg
-+    ((num_errors++))
-+    return
-+    fi
-+
-+    ((num_passes++))
-+}
-+
- function make_netdev {
-     # Make a netdevsim
-     old_netdevs=$(ls /sys/class/net)
-diff --git a/tools/testing/selftests/drivers/net/netdevsim/ethtool-stats.sh b/tools/testing/selftests/drivers/net/netdevsim/ethtool-stats.sh
-new file mode 100755
-index 000000000000..281bc24ddcd2
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/netdevsim/ethtool-stats.sh
-@@ -0,0 +1,36 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0-only
-+
-+source ethtool-common.sh
-+
-+set -o pipefail
-+
-+NSIM_NETDEV=$(make_netdev)
-+MOCK_STATS_DFS=$NSIM_DEV_DFS/ethtool/mock_stats/enabled
-+
-+echo y > $MOCK_STATS_DFS
-+
-+stat=$(ethtool -S $NSIM_NETDEV | grep "hw_out_of_buffer" | awk '{print $2}')
-+((stat == 0))
-+check_code $? "ethtool stats show > 0 packets immediately after enabling"
-+
-+sleep 2.5
-+
-+stat=$(ethtool -S $NSIM_NETDEV | grep "hw_out_of_buffer" | awk '{print $2}')
-+((stat >= 20))
-+check_code $? "ethtool stats show < 20 packets after 2.5s passed"
-+
-+echo n > $MOCK_STATS_DFS
-+echo y > $MOCK_STATS_DFS
-+
-+stat=$(ethtool -S $NSIM_NETDEV | grep "hw_out_of_buffer" | awk '{print $2}')
-+((stat == 0))
-+check_code $? "ethtool stats show > 0 packets after disabling and re-enabling"
-+
-+if [ $num_errors -eq 0 ]; then
-+    echo "PASSED all $((num_passes)) checks"
-+    exit 0
-+else
-+    echo "FAILED $num_errors/$((num_errors+num_passes)) checks"
-+    exit 1
-+fi
--- 
-2.50.1
+>  struct axienet_common {
+>  	struct platform_device *pdev;
+> +	struct auxiliary_device mac;
+>  
+>  	struct clk *axi_clk;
+>  
+>  	struct mutex reset_lock;
+> -	struct mii_bus *mii_bus;
+> +	struct auxiliary_device mii_bus;
 
+Keeping the name mii_bus for something which is not an struct mii_bus
+is going to cause confusion. Please give it a different name.
+
+This is another patch which needs splitting up.
+
+   Andrew
 
