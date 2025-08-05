@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-211639-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211640-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5358FB1ABBF
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 02:31:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A10B5B1ABC0
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 02:31:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 92C867A7A95
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 00:29:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C034189FF1A
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 00:31:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFBF71DAC95;
-	Tue,  5 Aug 2025 00:30:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 081711C8604;
+	Tue,  5 Aug 2025 00:30:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SFFv1lk7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EjdBvnh/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABCBA1C8604
-	for <netdev@vger.kernel.org>; Tue,  5 Aug 2025 00:30:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7ADE13B58A
+	for <netdev@vger.kernel.org>; Tue,  5 Aug 2025 00:30:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754353809; cv=none; b=jKbQTwZX5VVTKcY2SpZcT+8YOFO62SJNh0s/kT7G5a1XE5+ssvEmudD64ZwAhU+V0pX+Oco/KDzVeZiGJOiYtTaScpZ8hoRkWxt2mwVDRDKzIPqej+pP6B4jsrK4OXIqzaX7Y5w1Ruk8pS7SKaXKwptA6ZgLtiC63DMjmSnJZXc=
+	t=1754353811; cv=none; b=VXiMd+6aJdZ2z6mmH7lh9bA7BBAmrNdLIXS9WHWE17U2ML3ah3omI6YreyCyczeOhAmhudkqDbg7aOd/MQx7DQA9q10j779T2yxV1HEe+xDJ/3Qsv1+kzQ7BGMwELSKuxIYbI5isZnResRvfxvtcLyVGFRSwRvMglWX+nNtajgg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754353809; c=relaxed/simple;
-	bh=6ex0L8BacR5uN/wRdRqQhHNsH3G1ubCxCVN7zJgPels=;
+	s=arc-20240116; t=1754353811; c=relaxed/simple;
+	bh=+cP0BkhqBrOcReKbHqE04MGISKld/eYhmLB9L7ifbfg=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=JE3SDz75y75pNVHSoQioWkOtqZT/A83xnUQ9lsJdtoKnftOhW93YxCylNHyqZodOqnT0MuAgICB3xYZtROwuhkttE+wFxgu9PsYK0Vz0ADoRR2pByauQ/3I0YttdLDy3soNxw1ROc+XXKS4LSNu3xJ5QRDPGrBsaz8l5Grg0+jw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SFFv1lk7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34420C4CEF0;
-	Tue,  5 Aug 2025 00:30:09 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=gdl8v58/GlwJdowAXJuqX5AHavwJod/jMDgCqDTrqjQm7CqS00NbLwnWo/jeR9IxCyRlCDQumQY3Rtz0RdXNi/edz/Chs2YJKNf54RruJLDQgopADJaaSGw4641NVtG9BDY4YURhJ38OaDBekqo38JoLEtbe6WU3/4hMdfYB2u8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EjdBvnh/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65D7FC4CEF0;
+	Tue,  5 Aug 2025 00:30:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754353809;
-	bh=6ex0L8BacR5uN/wRdRqQhHNsH3G1ubCxCVN7zJgPels=;
+	s=k20201202; t=1754353811;
+	bh=+cP0BkhqBrOcReKbHqE04MGISKld/eYhmLB9L7ifbfg=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=SFFv1lk7dEtVbWQeU+U29dI6QabEC+J7XpAu2aYSBqNmeIqe3VImzOWRIDxAl+l/p
-	 uu4n1H+iSJ/7U3/+ftA0SAk9lD5e9B5jIGwlOiTpVdK0ZW78soK31fVzuPsPwmEMaN
-	 /kxeQek0vAEBBIFtMmng6dfbZ7UHipFkoQgpC8EUYJFpPbhEVgIf6+nU5KZzpERPZC
-	 IbpHNujnuabg489U/6I8JMYh9+7mWSd0uNs6KZ80OrpYxQ1l6pKCi5Rvmnl4tvmLwe
-	 jXS9XZrtCYH2goycTeRSr7JrkeEV0lSrvY8s9gfXakySNBrUGcqHxAl/VzFgOXCHKF
-	 Gwphy9sPz7yvg==
+	b=EjdBvnh/YYVEvuJjVkG4EtNvM74DdfX74cHL3klj/uFRFVqEeodHNhfU7kO9swVfh
+	 XSQ7TIEQO3wWLpBfzDteEim0MyFLjc+IM+FM9ozJ9zmOY7Dkt4Oko71IwD3LpsSMdH
+	 JhuQNrkvGWQVkXviWXDp/3O5MAlb6nGcmYGK7Nag1MSjY/N6tSkd0wTK1nl76KmyFA
+	 GJnnTn2+m8+MsiQUFa473DOt1aGgJzfed07PJmSTILpNtsbIPkABXATMSc4HS+03qx
+	 vlaq+xnj8EeMBUaVCNrDzWd70AoRf/0CyI5stC4j2B04TgW6RvHtP2j65py3cgeGhp
+	 kUevrjNQe/BEg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE1C383BF62;
-	Tue,  5 Aug 2025 00:30:24 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAD65383BF62;
+	Tue,  5 Aug 2025 00:30:25 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,41 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] Revert "net: mdio_bus: Use devm for getting reset
- GPIO"
+Subject: Re: [PATCH net v3] net/sched: mqprio: fix stack out-of-bounds write
+ in tc
+ entry parsing
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175435382325.1400451.12554167872248751085.git-patchwork-notify@kernel.org>
-Date: Tue, 05 Aug 2025 00:30:23 +0000
-References: <20250801212742.2607149-1-kuba@kernel.org>
-In-Reply-To: <20250801212742.2607149-1-kuba@kernel.org>
+ <175435382475.1400451.11317649923147201674.git-patchwork-notify@kernel.org>
+Date: Tue, 05 Aug 2025 00:30:24 +0000
+References: <20250802001857.2702497-1-kuba@kernel.org>
+In-Reply-To: <20250802001857.2702497-1-kuba@kernel.org>
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
  pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- broonie@kernel.org, rmk+kernel@armlinux.org.uk, andrew@lunn.ch,
- hkallweit1@gmail.com, linux@armlinux.org.uk, csokas.bence@prolan.hu,
- geert@linux-m68k.org
+ maherazz04@gmail.com, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
+ jiri@resnulli.us, vladimir.oltean@nxp.com, fejes@inf.elte.hu
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri,  1 Aug 2025 14:27:42 -0700 you wrote:
-> This reverts commit 3b98c9352511db627b606477fc7944b2fa53a165.
+On Fri,  1 Aug 2025 17:18:57 -0700 you wrote:
+> From: Maher Azzouzi <maherazz04@gmail.com>
 > 
-> Russell says:
-> 
->   Using devm_*() [here] is completely wrong, because this is called
->   from mdiobus_register_device(). This is not the probe function
->   for the device, and thus there is no code to trigger the release of
->   the resource on unregistration.
+> TCA_MQPRIO_TC_ENTRY_INDEX is validated using
+> NLA_POLICY_MAX(NLA_U32, TC_QOPT_MAX_QUEUE), which allows the value
+> TC_QOPT_MAX_QUEUE (16). This leads to a 4-byte out-of-bounds stack
+> write in the fp[] array, which only has room for 16 elements (0–15).
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] Revert "net: mdio_bus: Use devm for getting reset GPIO"
-    https://git.kernel.org/netdev/net/c/175811b8f05f
+  - [net,v3] net/sched: mqprio: fix stack out-of-bounds write in tc entry parsing
+    https://git.kernel.org/netdev/net/c/ffd2dc4c6c49
 
 You are awesome, thank you!
 -- 
