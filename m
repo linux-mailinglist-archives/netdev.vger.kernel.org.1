@@ -1,62 +1,66 @@
-Return-Path: <netdev+bounces-211821-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211823-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24B44B1BCC3
-	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 00:44:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34ABCB1BCC5
+	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 00:46:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E8F9018A60C9
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 22:44:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E65116E78F
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 22:46:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99AF224679B;
-	Tue,  5 Aug 2025 22:43:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 002E2221DB6;
+	Tue,  5 Aug 2025 22:46:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YSsfpxLx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f3ciXNWT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70618173;
-	Tue,  5 Aug 2025 22:43:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5C802E36F0;
+	Tue,  5 Aug 2025 22:46:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754433837; cv=none; b=DNn9J3/JGZCTEXP/Cf2BFEBtVa8OWSMZCRPfNqVuZtc5uwOPlTVnkj4IOXUfWR+WwrCHymA+DWhabcFGNB9iVcuRqzedT77SrMoSmV5ttgZro6BWGkj54MTkCBagHtKz7+q2o1/rKDzP9HoqTQuDLIbMq2gz7/hggoor8HK7+ms=
+	t=1754433966; cv=none; b=clZ0n77B5gmiWRNUYYo4UcB0y8yA0XG0MsSCebSOK1RHCLCPqKoVnfLJXtxSs4KIvF77bvUDNFZXlNPZTK7t+jIf5VXbpnjFT86vI27q6MemDdzXUWF3q0g6T+pw425fZ2q02K4AOsncWoG/AyQ8/niT0s/TuPDLfD7ExLYyHNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754433837; c=relaxed/simple;
-	bh=zp9mF9AxbmQANyGSCRsB0NBkIIX7UT18b/iQ51kQp9U=;
+	s=arc-20240116; t=1754433966; c=relaxed/simple;
+	bh=NqAn7xkr0Rfx37RWYqFvxyrYUe9MsAbnMN8SOZ0XZ8A=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aCPqqqVcbH2pCzERwNu2oFCaUucwYPdxGZtSf/xNhOhKQRGuqfYlBWP4tMey5OecYyESjzVh6u5c2QISRMoUGLChkr1f9lf6oZOw8X7FoB8O9/z8gG/8nj8VDQaVd9rxFATG+b5SDyn4DSWtm5Vu2XQn821TlGTO07WhFpo+3eQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YSsfpxLx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BB35C4CEF0;
-	Tue,  5 Aug 2025 22:43:56 +0000 (UTC)
+	 MIME-Version:Content-Type; b=gvtko5+WrWzti0BGVQu3wa4iAiacnckZKay7wtbjVzm9pk/mfvGH54egdtoweGAuXqfJ6Oatczm210JKd9V8Upum527H+LTCsY62UGU3BS16p8RPVABWbxfr0yDxG3bcxb13zpFM0MXGJaS65OkvP0G7POU/6uWMBm/imJW5oLE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f3ciXNWT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4400C4CEF0;
+	Tue,  5 Aug 2025 22:46:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754433837;
-	bh=zp9mF9AxbmQANyGSCRsB0NBkIIX7UT18b/iQ51kQp9U=;
+	s=k20201202; t=1754433966;
+	bh=NqAn7xkr0Rfx37RWYqFvxyrYUe9MsAbnMN8SOZ0XZ8A=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=YSsfpxLxNs4nnQfy21Om9Ai9bSC+GAWaCowC9vlJhg/mdlyEhn8NE9KOXA+U3jcUD
-	 bmEwver1g7MoD13qC+0B0bN3SoUE4W9moSFbtHyyg0nPfg/69r4PG03za2IKnje5ZJ
-	 tO9y1qdK+kQxlRfFeobwjBxsqbiTvKUlyN0Gn2wdyu8GJaoeBiYCmq2RN3mJNq0iH2
-	 VZ58jBswDOjvyNLdnY61Blo1dh4L3beTMicMof3CwmJGj+7dG8IZ4Z9pPK5/ZEuSsR
-	 xfsL2qK0emixyBXQmNL0WvSrtUcV0L2M4faA7xQRY8XEVYj9Xi9PBnfKGdtJTFlkAh
-	 k1Di2z0LS3VNQ==
-Date: Tue, 5 Aug 2025 15:43:55 -0700
+	b=f3ciXNWTApQibSjgZTVBIQ1cfxquSZMI/00XCX77N9oGij/RpxiPKAUV4q3Brivk3
+	 VahaglYpe02/YuF/x1S9+U9CKzsJKDnd0e099GnXRys/MKRtq5QwNcGJrQ+OGkqS3Q
+	 nwSxEwzT4mkMC9oahFyy8cmWtOY+QeZQtuaOohxHzwLjMFMHMbMR4fNKthJ+UAyC8F
+	 70uPWfb/uaah7OOzIMUSOP8Fgyzzb0QM06zlJppwgB7IZco4rh5pX/lsJxWCVO32F0
+	 5TvqJ+3oajZpY1dPkAJNfduWnl4Z/Qp0S9S2WYuZPzoQE5IcujFxxhf1FBoGN+syrX
+	 4N/DDJOwAvRbQ==
+Date: Tue, 5 Aug 2025 15:46:04 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: netdev@vger.kernel.org, io-uring@vger.kernel.org, Eric Dumazet
- <edumazet@google.com>, Willem de Bruijn <willemb@google.com>, Paolo Abeni
- <pabeni@redhat.com>, andrew+netdev@lunn.ch, horms@kernel.org,
- davem@davemloft.net, sdf@fomichev.me, almasrymina@google.com,
- dw@davidwei.uk, michael.chan@broadcom.com, dtatulea@nvidia.com,
- ap420073@gmail.com
-Subject: Re: [RFC v1 21/22] net: parametrise mp open with a queue config
-Message-ID: <20250805154355.3fc1b57a@kernel.org>
-In-Reply-To: <11caecf8-5b81-49c7-8b73-847033151d51@gmail.com>
-References: <cover.1753694913.git.asml.silence@gmail.com>
-	<ca874424e226417fa174ac015ee62cc0e3092400.1753694914.git.asml.silence@gmail.com>
-	<20250801171009.6789bf74@kernel.org>
-	<11caecf8-5b81-49c7-8b73-847033151d51@gmail.com>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: <intel-wired-lan@lists.osuosl.org>, Michal Kubiak
+ <michal.kubiak@intel.com>, Maciej Fijalkowski
+ <maciej.fijalkowski@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, "Paolo Abeni" <pabeni@redhat.com>, Alexei
+ Starovoitov <ast@kernel.org>, "Daniel Borkmann" <daniel@iogearbox.net>,
+ Simon Horman <horms@kernel.org>,
+ <nxne.cnse.osdt.itp.upstreaming@intel.com>, <bpf@vger.kernel.org>,
+ <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH iwl-next v3 16/18] idpf: add support for XDP on Rx
+Message-ID: <20250805154604.680bde07@kernel.org>
+In-Reply-To: <a151336a-eda4-4f44-9ab5-da79e7712838@intel.com>
+References: <20250730160717.28976-1-aleksander.lobakin@intel.com>
+	<20250730160717.28976-17-aleksander.lobakin@intel.com>
+	<20250801153343.74e0884b@kernel.org>
+	<a151336a-eda4-4f44-9ab5-da79e7712838@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,33 +70,23 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 4 Aug 2025 13:50:08 +0100 Pavel Begunkov wrote:
-> > Since we don't allow MP to be replaced atomically today, we don't
-> > actually have to place the mp overrides in the config struct and
-> > involve the whole netdev_reconfig_start() _swap() _free() machinery.
-> > We can just stash the config in the queue state, and "logically"
-> > do what I described above.  
+On Tue, 5 Aug 2025 18:09:40 +0200 Alexander Lobakin wrote:
+> From: Jakub Kicinski <kuba@kernel.org>
+> Date: Fri, 1 Aug 2025 15:33:43 -0700
 > 
-> I was thinking stashing it in struct pp_memory_provider_params and
-> applying in netdev_rx_queue_restart(). Let me try to move it
-> into __netdev_queue_config. Any preference between keeping just
-> the size vs a qcfg pointer in pp_memory_provider_params?
+> > On Wed, 30 Jul 2025 18:07:15 +0200 Alexander Lobakin wrote:  
+> >> Use __LIBETH_WORD_ACCESS to parse descriptors more efficiently when
+> >> applicable. It really gives some good boosts and code size reduction
+> >> on x86_64.  
+> > 
+> > Could you perhaps quantify the goodness of the boost with a number? :)  
 > 
-> struct struct pp_memory_provider_params {
-> 	const struct memory_provider_ops *mp_ops;
-> 	u32 rx_buf_len;
-> };
-> 
-> vs
-> 
-> struct struct pp_memory_provider_params {
-> 	const struct memory_provider_ops *mp_ops;
-> 	// providers will need to allocate and keep the qcfg
-> 	// until it's completely detached from the queues.
-> 	struct netdev_queue_config *qcfg;
-> };
-> 
-> The former one would be simpler for now.
+> Sure, only a matter of switching this definition and running the tests
+> (and bloat-o-meter).
+> Intel doesn't allow us to publish raw numbers (Gbps/Mpps), I hope the
+> diff in percents (+ bloat-o-meter output) would be enough?
 
-+1, I'd stick to the former. We can adjust later if need be.
+Yes, delta is perfect. Absolute numbers aren't very meaningful if you
+don't specify all HW components and FW versions, and direction of wind
+on the day, anyway :$
 
