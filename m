@@ -1,126 +1,196 @@
-Return-Path: <netdev+bounces-211762-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211763-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 245D4B1B866
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 18:23:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE6EEB1B86B
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 18:25:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 83D777B0F88
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 16:21:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 774583A34F8
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 16:25:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD48D291C0F;
-	Tue,  5 Aug 2025 16:23:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6A9128BABE;
+	Tue,  5 Aug 2025 16:25:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="RVeCzVoI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FczdpzMH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ED88242D70
-	for <netdev@vger.kernel.org>; Tue,  5 Aug 2025 16:23:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29FAC72630;
+	Tue,  5 Aug 2025 16:25:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754410991; cv=none; b=AZ/ybP4VfOYloDqFhmPmEz+3fPnocgnBhPhz6RwZhRpE9V41/uVmb0f+579NCcWeLvHFkAFSwSdH3Nc3GjNXLgIpyDoeBzFmO6wsYYjiR5bAIHlx5phN8g07iv4pU0mbS/YSLAqDj1sSdTwfykIePCN4ADr8Q5enh+clMMvPeAo=
+	t=1754411122; cv=none; b=VnuoZS2SyP+7AaM7aLMwsgJfE9vxvV2WEZ1CS+Vyad0GHmCUw7qtCb1F6TJRLJOQ2SznrPassfNUZ2YvbLy+7mVh/dr67S7CAs2K321mK1g/3BqQmr/u3KXYJYuFwbWaT8alSauJp3gecl/TeTkNdpl/Wt0YjtxJy1NRKDuZ/m0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754410991; c=relaxed/simple;
-	bh=ZYOKsmbUJbiBWaVYtF5AN2TeCHP9emZwxMBsR8kvmcc=;
+	s=arc-20240116; t=1754411122; c=relaxed/simple;
+	bh=9hrpuYEUBnOYCWg4yf6BWb1szk1cTso0DQLX/Wm3qnA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OoDsemogZVpIXxtKLxS5jARLSLAw8lytM/o2tdLkxm50IaqeSBqIlM/yLn5G3r677kcDjmFo+XwhcFal1D12bL/drJ5cJybWZhYBhcpSiC8GlOpYIc/4gcZkwYHJ6p98IuzeFynri2gWGmUYtIcgZZAZLCUmyxnWQvjMAny6KBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=RVeCzVoI; arc=none smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-af9842df867so148661466b.1
-        for <netdev@vger.kernel.org>; Tue, 05 Aug 2025 09:23:09 -0700 (PDT)
+	 To:Cc:Content-Type; b=LE+8IegtcJlC6dsIj3p7kfpHYiCNdbb0XVWq0qoC49m60TuQDGfESWtp18nUQUZZUNieGxjtvxi5teXFcdQlo9fEDxMSRw4oeRsDjE59mp4gBMC3C/bmdmge9S6bzlzzhREBbkZkgfeWxuBD/8qzi6XO41yj6UhiciPE3xSDYAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FczdpzMH; arc=none smtp.client-ip=209.85.128.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-71a4742d81aso42817447b3.2;
+        Tue, 05 Aug 2025 09:25:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1754410988; x=1755015788; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=iTDQePGQpdRLJNbAu36X9SMzRWp9+4YjhDCOEhv/2CE=;
-        b=RVeCzVoIJ2Pe/xxgK4EeAqNxZhQfahGLaYYOy3XK5diqmS0255AjHuHW59rTAdqFNQ
-         zMYRX3YpBZeoExva5PYVtkLQ7Np8YgzuETTeDOKj3gjTR/D70O9NE/GWWa7FaelanzlB
-         KGXkve996ANlWb/PJK5528CVijADVGs3V65rA=
+        d=gmail.com; s=20230601; t=1754411120; x=1755015920; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=D236wdOqTlqVNzbn3FgDduS8gC99cQZrkCBqlYfp7bU=;
+        b=FczdpzMHJ7hu9+jkIhhpOd2Sp/PuC/cuXk6FxtHsD1XZY8MDQXufJLT3PandRNYNOs
+         aTBawm6mgbxFMoFueb/BsrXK40u5SZeCGaFxDmGdu1XOD0BhfH3hYnJSAkxKoUGKnBKL
+         /8zOM7JU2hxxQLE9KVVR1coLzgVIsO+oXms8b4EJZqZDzpXFzakzhEAhfoUnr5CQSLj0
+         nPXTld9YepjY0Oye2eg3GHPywSpXz/F1aRF7ibiIkAhwhhJKCLvoTGEw/I4av4PxAMIs
+         569QvgyJRAX4Zmf/uJFypo8VwAaXarSimY7wBTIz8ZBgQx0XwiDYlbHDotETiueV4Zr2
+         NdnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754410988; x=1755015788;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=iTDQePGQpdRLJNbAu36X9SMzRWp9+4YjhDCOEhv/2CE=;
-        b=bBkAvWqpIWildxhDmcxYrU+eFoSrK12Kave+phLgMWHBDOVTVdyJjAvvvY1R21WPgj
-         q6DzcFDj38wYgMl/EU1rHjUOK+TtdLe0K0COuWq1FvEV0DsYzMLuvhOk5vKN/OJ3gPBb
-         WQ6gR0nToZvwsitTPppOc9+wvxGXT1lvsZwuZnmhc2V/PCv6n0/638nfoZ9dXkSzIhrR
-         rzgOKQ9sSv9dh30PPW8JWZdXgXxiSiJOQlbp6IPmEjwJ8DLc5qEQzzq4kyWo/JKm5jcK
-         6IKR4FBeMNZ5PyaIQyO2A13BTJa2luQXfdiWuKcimhAV5KAU2XQ7TXS8PH+AAzJOaWCm
-         KYMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUda12ysGAY+Shhq3XQR0HPFPHJI4ldJt44DWFx7QKP0YudZC15q5uzw/0xy0EI1sd23ZhQnkw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzVuGS6KbMTWHQPG04TuqbKFNmqAAe2ABlqfcSNFwzA7GzH6dxW
-	BrTJWVTcOB4aGWHc7D9MoKL8kmPFTXFqyAbTCLwORof1oAaDwOoZTZ2vOVAb9v3ajxGiN75s5Av
-	ON/7dfL9hVg==
-X-Gm-Gg: ASbGnctYzbAHurMwG+5kuPuYHm3cY6ofzyUZv2px6fbWwCMsaeHUlHtPgvbeK5FiA8A
-	b4ovN6haOxyUZuByP/unA0XYa04od8N8YRRPB/+E+OPJXUniSVoZcZoCeVG796ticlsYVxpR1PD
-	37RwzO/HhNdUIsBlimgw2BolWz8n6n+g+jDVrq/P/2I2SgakDESVQu1hNURIemeLZ8tlX94eDwJ
-	ytCFDOtuqeYi0JF6I5gdQaCcP7uwVoBi4O2adU477yQq6fC6ME1GFVK86ep3eKHu2cRLIDQyJuz
-	PAUmE/clfK1Hg9jWFcUbH2lYYfcZ9UfCTW4lCPn+TZEkQOKZZYCjr5+iwaYCkvI+YmKXP9o/Wdz
-	IxGpPNAKMsmRwpxw7UbwqojUbTn0Ihkgi7YXnZlqrjgrBUAltpiGFW/ZjZIAjDSpA2PAAOtdy
-X-Google-Smtp-Source: AGHT+IGFz2rIaQqlb12fFTWt+YLkxpgQkDvirYh2mHBX7ls5fsjZKJBeNi4pwlw+xvEVVCAIgQkArA==
-X-Received: by 2002:a17:907:3fa2:b0:adb:2e9f:5d11 with SMTP id a640c23a62f3a-af940174eafmr1335510966b.37.1754410987662;
-        Tue, 05 Aug 2025 09:23:07 -0700 (PDT)
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com. [209.85.208.48])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-af91b36e91dsm901521866b.69.2025.08.05.09.23.06
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 Aug 2025 09:23:06 -0700 (PDT)
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-615a115f0c0so9858725a12.0
-        for <netdev@vger.kernel.org>; Tue, 05 Aug 2025 09:23:06 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCX+IQYpnvkyGyp984F1UHKVdDLyHW7Lvw9JV+m0CUz3cjItiuVS3Teo5qclCVQYFTBfwhGC50I=@vger.kernel.org
-X-Received: by 2002:a05:6402:254e:b0:615:aec5:b5bc with SMTP id
- 4fb4d7f45d1cf-615e6cd3968mr11900877a12.0.1754410986307; Tue, 05 Aug 2025
- 09:23:06 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1754411120; x=1755015920;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=D236wdOqTlqVNzbn3FgDduS8gC99cQZrkCBqlYfp7bU=;
+        b=TR8K8XtQrWGFROOcDOeiCyt9bdKEF5U4Y0CQdEBZO0L8u/lgdprDizo/RVXsZ0B3kG
+         8e45NMzJwgYT7H/UILDHAtp1KWcNq7B2IqskVC17ah9fwdJSs9hszFeu2o61solX7l9z
+         rploEVat1Myp+dzqxhijjGjOByV1uyjOQGfZCuEWc7MJLlswGMdUFh4+AtJMyKowa5RJ
+         SyTEZQJ8D1rNuHck2vYnACA2CtPf/dBoaxz86oTd72dILnJoZNM8oLKCoO45rVOancr2
+         4pMoVDXOC1nyDHc9eQl75gv3P9VIkDojqTXv+qCAGR3YRbwXzz0B9AIfx1jKfNa3a4Qd
+         MSdQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWiQ2AvwEM91SoOv6tJfm6VsU84L2CVAO+rLp/K12jWhryE8U67as7XP7KRW5fEqpqvqpusZ9k=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx0WIintZ/pjubQD8vbC+kM46csE8+V0uOL/1q915/BYpSaYFFN
+	dCQTUSC7ZDgasaq48O4CbDnM5L088tamnCYcw3AO90NcIZN5+ST2KrdTZqlgOvpDsh5NSqygjl5
+	nZGfMHLiWMoHI0t2d66++vvHm5j1t8ZE=
+X-Gm-Gg: ASbGncs84TMj/4oxY1dxcpd8zhY/kkAhTAhax0iShtk2CsdOHvETB8PjBBznEmCo0lK
+	k9l/52c9oiv8c6N8oAZOVgKXE2DZRSTzkbQSHRAzWmEwz0v92E5JPPWPA/n30MlH/A+IVLc5Plq
+	VwMCXDDvzKA2nPvbUQxyp/a8HPDIyavAi3Xl65Dv3fw8t8MJlPc8fMDq0FABK6AqkE+V4KyqLJB
+	St0d2/pyw==
+X-Google-Smtp-Source: AGHT+IHZLec7575PSZOET/bFzyVAENXmdNoNPjRRVM4DSb4SxqyeX++NiOB/fqSaozyGdtxcjaotFh2Xvvp7S8H9xUE=
+X-Received: by 2002:a05:690c:6707:b0:71a:51f:81a7 with SMTP id
+ 00721157ae682-71b7f3f89cdmr174526917b3.26.1754411120093; Tue, 05 Aug 2025
+ 09:25:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250727013451.2436467-1-kuba@kernel.org>
-In-Reply-To: <20250727013451.2436467-1-kuba@kernel.org>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Tue, 5 Aug 2025 19:22:48 +0300
-X-Gmail-Original-Message-ID: <CAHk-=wjKh8X4PT_mU1kD4GQrbjivMfPn-_hXa6han_BTDcXddw@mail.gmail.com>
-X-Gm-Features: Ac12FXz_1jhs0pDqBU4Pe5bw2lhDIpnR4A0FLpEopYft4GtNE65Xjr2aEymiyfA
-Message-ID: <CAHk-=wjKh8X4PT_mU1kD4GQrbjivMfPn-_hXa6han_BTDcXddw@mail.gmail.com>
-Subject: Re: [GIT PULL] Networking for v6.17
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	pabeni@redhat.com
+References: <20250729182550.185356-1-ameryhung@gmail.com> <20250729182550.185356-4-ameryhung@gmail.com>
+ <8e21c788-5187-4fee-baec-22b8e80be383@linux.dev>
+In-Reply-To: <8e21c788-5187-4fee-baec-22b8e80be383@linux.dev>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Tue, 5 Aug 2025 09:25:09 -0700
+X-Gm-Features: Ac12FXx0AjfTAeStFJ9HBFme514ZV9-KAgVvbtXCfKCXHzjw_2BQukgiGgjsIOc
+Message-ID: <CAMB2axPTU+HsJ_6nKDaq8xnGhcoXZCgy=X2wiODYNbZMdRkSHg@mail.gmail.com>
+Subject: Re: [RFC PATCH bpf-next v1 03/11] bpf: Open code bpf_selem_unlink_storage
+ in bpf_selem_unlink
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
+	andrii@kernel.org, daniel@iogearbox.net, memxor@gmail.com, kpsingh@kernel.org, 
+	martin.lau@kernel.org, yonghong.song@linux.dev, song@kernel.org, 
+	haoluo@google.com, kernel-team@meta.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, 27 Jul 2025 at 04:35, Jakub Kicinski <kuba@kernel.org> wrote:
+On Fri, Aug 1, 2025 at 5:58=E2=80=AFPM Martin KaFai Lau <martin.lau@linux.d=
+ev> wrote:
 >
-> Networking changes for 6.17.
+> On 7/29/25 11:25 AM, Amery Hung wrote:
+> >   void bpf_selem_unlink(struct bpf_local_storage_elem *selem, bool reus=
+e_now)
+> >   {
+> > +     struct bpf_local_storage_map *storage_smap;
+> > +     struct bpf_local_storage *local_storage =3D NULL;
+> > +     bool bpf_ma, free_local_storage =3D false;
+> > +     HLIST_HEAD(selem_free_list);
+> >       struct bpf_local_storage_map_bucket *b;
+> > -     struct bpf_local_storage_map *smap;
+> > -     unsigned long flags;
+> > +     struct bpf_local_storage_map *smap =3D NULL;
+> > +     unsigned long flags, b_flags;
+> >
+> >       if (likely(selem_linked_to_map_lockless(selem))) {
+>
+> Can we simplify the bpf_selem_unlink() function by skipping this map_lock=
+less
+> check,
+>
+> >               smap =3D rcu_dereference_check(SDATA(selem)->smap, bpf_rc=
+u_lock_held());
+> >               b =3D select_bucket(smap, selem);
+> > -             raw_spin_lock_irqsave(&b->lock, flags);
+> > +     }
+> >
+> > -             /* Always unlink from map before unlinking from local_sto=
+rage
+> > -              * because selem will be freed after successfully unlinke=
+d from
+> > -              * the local_storage.
+> > -              */
+> > -             bpf_selem_unlink_map_nolock(selem);
+> > -             raw_spin_unlock_irqrestore(&b->lock, flags);
+> > +     if (likely(selem_linked_to_storage_lockless(selem))) {
+>
+> only depends on this and then proceed to take the lock_storage->lock. The=
+n
+> recheck selem_linked_to_storage(selem), bpf_selem_unlink_map(selem) first=
+, and
+> then bpf_selem_unlink_storage_nolock(selem) last.
 
-So I found out the hard way while traveling that this networking pull
-seems to have broken USB tethering for me. Which I only use when
-traveling, but then I do often end up relying on my phone as the
-source of internet (the phone being on the single-device flight wifi,
-and tethering to the laptop which is why hotspot doesn't necessarily
-work).
+Thanks for the suggestion. I think it will simplify the function. Just
+making sure I am getting you right, you mean instead of open code both
+unlink_map and unlink_storage, only open code unlink_storage. First,
+grab local_storage->lock and call bpf_selem_unlink_map(). Then, only
+proceed to unlink_storage only If bpf_selem_unlink_map() succeeds.
 
-It *might* be something else, and I'm bisecting it right now, but the
-networking pull is the obvious first suspect, and my first three
-bisection steps have taken me into that pull.
+>
+> Then bpf_selem_unlink_map can use selem->local_storage->owner to select_b=
+ucket().
 
-It could still jump out of that pull - there are non-networking
-changes still in the pile left to be bisected, but I'd be honestly
-surprised if it does.
+Not sure what this part mean. Could you elaborate?
 
-This is very standard usbnet with cdc_ether/ncm/wdm/mbim.
-
-A failing kernel will find the device and talk about it, but then it
-never gets configured and you never get any actual networking.
-
-Any obvious suspects I should look for?
-
-           Linus
+>
+> > +             local_storage =3D rcu_dereference_check(selem->local_stor=
+age,
+> > +                                                   bpf_rcu_lock_held()=
+);
+> > +             storage_smap =3D rcu_dereference_check(local_storage->sma=
+p,
+> > +                                                  bpf_rcu_lock_held())=
+;
+> > +             bpf_ma =3D check_storage_bpf_ma(local_storage, storage_sm=
+ap, selem);
+> >       }
+> >
+> > -     bpf_selem_unlink_storage(selem, reuse_now);
+> > +     if (local_storage)
+> > +             raw_spin_lock_irqsave(&local_storage->lock, flags);
+> > +     if (smap)
+> > +             raw_spin_lock_irqsave(&b->lock, b_flags);
+> > +
+> > +     /* Always unlink from map before unlinking from local_storage
+> > +      * because selem will be freed after successfully unlinked from
+> > +      * the local_storage.
+> > +      */
+> > +     if (smap)
+> > +             bpf_selem_unlink_map_nolock(selem);
+> > +     if (local_storage && likely(selem_linked_to_storage(selem)))
+> > +             free_local_storage =3D bpf_selem_unlink_storage_nolock(
+> > +                     local_storage, selem, true, &selem_free_list);
+> > +
+> > +     if (smap)
+> > +             raw_spin_unlock_irqrestore(&b->lock, b_flags);
+> > +     if (local_storage)
+> > +             raw_spin_unlock_irqrestore(&local_storage->lock, flags);
+> > +
+> > +     bpf_selem_free_list(&selem_free_list, reuse_now);
+> > +
+> > +     if (free_local_storage)
+> > +             bpf_local_storage_free(local_storage, storage_smap, bpf_m=
+a, reuse_now);
+> >   }
+> >
+> >   void __bpf_local_storage_insert_cache(struct bpf_local_storage *local=
+_storage,
+>
 
