@@ -1,50 +1,64 @@
-Return-Path: <netdev+bounces-211642-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211643-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12D8FB1ABC3
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 02:31:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCF8EB1ABC6
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 02:37:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7BA157A7F6D
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 00:29:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6A3A176932
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 00:37:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7D2E1E1E16;
-	Tue,  5 Aug 2025 00:30:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FE9D12F5A5;
+	Tue,  5 Aug 2025 00:37:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cDizL/gq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fWERTjCZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C05182C187;
-	Tue,  5 Aug 2025 00:30:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C5783987D
+	for <netdev@vger.kernel.org>; Tue,  5 Aug 2025 00:36:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754353813; cv=none; b=f97iFe+REkU1wPqL17y4MZtZRm55PkFAztd82cFQiu8XrE9vRNWD92FVXoZxyY0XcZeiJXyARDVul7GCGu2M7BjGtffwFVsJKQKYeeMMf9TI0xd4/vU31ffXjzwzFsnJfpFXLJsnEWJmwBs8f28cwicfdEbDxziorhp322PbAz8=
+	t=1754354220; cv=none; b=rxBU9EeL8KbdEN47HoRdB21PiiRzStBEnKGuXgpafHk7VTvlPv9YNQm3Cm5QGoGbrNIjDev+740XvmXR9j+SL0kn/AkRAlnxAxuOMPT6ZRN8+2LAaWVfpiPg+E1h5IgmT7wj+rNMnxiY2X8MfzHoV3Hs839+zrKhkovDCyL6xt0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754353813; c=relaxed/simple;
-	bh=8UvVcFFBjVIE1CsFt63PPhXCU26O2Zb9/5uNe4y1SNQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=G62baLlMmp0knKuuro1AI1nOILyGX/gpE1TSKzHjo95VRTq9Hz7en/4uDnKPWsjMjI7a3GYJL1CY/TTNWw+LEMTEc6jjrjBCrBjDv4N5BHjxxkJwpEnJs+fEKAiA8p6yi5PkpcdrkzI5mh9g9WtBC58/vzgn0lqNdRQvyK1gcCo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cDizL/gq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63062C4CEE7;
-	Tue,  5 Aug 2025 00:30:13 +0000 (UTC)
+	s=arc-20240116; t=1754354220; c=relaxed/simple;
+	bh=ApVxGSYPbbgnFCTj2Tv2dD4Wn2PEuQ2gXxkiayosYhw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GrVX9q4GY3FtahuiCwyXxzEcyWYQQNYZsKmWgLP3cpvui9CxHxsj02auXpppx6PHdDXsu/B28VXXrQbXOa9K6cPOo68knKo7EWIfVBkXK3qyQ1i0AiAH2W5J1ufkyunkbyJjk2OSxU4r2P0ztVqiGiO3YqD6koAVJF9ecr1kxyU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fWERTjCZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5468AC4CEE7;
+	Tue,  5 Aug 2025 00:36:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754353813;
-	bh=8UvVcFFBjVIE1CsFt63PPhXCU26O2Zb9/5uNe4y1SNQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=cDizL/gq1TSUt34tNIldUWwYgS51iNynejqfHjIsT+i3TwjEdObFLH9SqzCzgF2kF
-	 kou2+0pv5zrsQl96cn4LhDhT7PC96mx98JFW3WKbTENHFImKYdEaAGg+4c7C8mB8GY
-	 nohdX+ilRkstZGCGX1OdZIDxnZxheO+OEVnMissxpZi9KXnk9oyhGT9rHtHEkofKIg
-	 m2iEhoa4oHmUSB/D/EIKDvJZhcBkb+tjzSM7rBs9aiCPVMgwCjwyld8h403OxQ5/WR
-	 SSWXxx6g9cSou86Ripn8CXDPEcvXitKWykeTq2jBBZULyycDD3lNtYgZbJObJTZ+6i
-	 liTWAfZGeQS3w==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB212383BF62;
-	Tue,  5 Aug 2025 00:30:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1754354218;
+	bh=ApVxGSYPbbgnFCTj2Tv2dD4Wn2PEuQ2gXxkiayosYhw=;
+	h=From:To:Cc:Subject:Date:From;
+	b=fWERTjCZZAjrP7Bs3YwRMYU7+UfTB89x7APO374IjtiOYDRlRkyV1RTERHTLu6KaP
+	 bgA1I+Yi1y2Rq2wxcSn1WQKIl4+oc3mfdBkumgngDH0lJi1MuPpdSOvlw47wVxO871
+	 l8YnqDqnu9aKJ3P1o6F8pPpTKORHgPranj/yxE3PmK3nArefbRKa+YplBLGaVgbTDv
+	 8SYBQ0FF8Y7ZVWWyp2RTMG4qyzNF/PCcSbhyzYHNp3NDyfpaYzjpDiaJE06MA1P96C
+	 wYNV117kVoehq5aPZhnWNV6n6kl9Cx8sm0zF+J0cKgywzngf00ujUiBGTb9OSpIq7f
+	 wsns5onbFClsw==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	David Wei <dw@davidwei.uk>,
+	michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com,
+	hawk@kernel.org,
+	ilias.apalodimas@linaro.org,
+	almasrymina@google.com,
+	sdf@fomichev.me
+Subject: [PATCH net v2] net: page_pool: allow enabling recycling late, fix false positive warning
+Date: Mon,  4 Aug 2025 17:36:54 -0700
+Message-ID: <20250805003654.2944974-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,57 +66,186 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] benet: fix BUG when creating VFs
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175435382749.1400451.18307396008220746943.git-patchwork-notify@kernel.org>
-Date: Tue, 05 Aug 2025 00:30:27 +0000
-References: <20250801101338.72502-1-mschmidt@redhat.com>
-In-Reply-To: <20250801101338.72502-1-mschmidt@redhat.com>
-To: Michal Schmidt <mschmidt@redhat.com>
-Cc: ajit.khaparde@broadcom.com, sriharsha.basavapatna@broadcom.com,
- somnath.kotur@broadcom.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, razor@blackwall.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hello:
+Page pool can have pages "directly" (locklessly) recycled to it,
+if the NAPI that owns the page pool is scheduled to run on the same CPU.
+To make this safe we check that the NAPI is disabled while we destroy
+the page pool. In most cases NAPI and page pool lifetimes are tied
+together so this happens naturally.
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+The queue API expects the following order of calls:
+ -> mem_alloc
+    alloc new pp
+ -> stop
+    napi_disable
+ -> start
+    napi_enable
+ -> mem_free
+    free old pp
 
-On Fri,  1 Aug 2025 12:13:37 +0200 you wrote:
-> benet crashes as soon as SRIOV VFs are created:
-> 
->  kernel BUG at mm/vmalloc.c:3457!
->  Oops: invalid opcode: 0000 [#1] SMP KASAN NOPTI
->  CPU: 4 UID: 0 PID: 7408 Comm: test.sh Kdump: loaded Not tainted 6.16.0+ #1 PREEMPT(voluntary)
->  [...]
->  RIP: 0010:vunmap+0x5f/0x70
->  [...]
->  Call Trace:
->   <TASK>
->   __iommu_dma_free+0xe8/0x1c0
->   be_cmd_set_mac_list+0x3fe/0x640 [be2net]
->   be_cmd_set_mac+0xaf/0x110 [be2net]
->   be_vf_eth_addr_config+0x19f/0x330 [be2net]
->   be_vf_setup+0x4f7/0x990 [be2net]
->   be_pci_sriov_configure+0x3a1/0x470 [be2net]
->   sriov_numvfs_store+0x20b/0x380
->   kernfs_fop_write_iter+0x354/0x530
->   vfs_write+0x9b9/0xf60
->   ksys_write+0xf3/0x1d0
->   do_syscall_64+0x8c/0x3d0
-> 
-> [...]
+Here we allocate the page pool in ->mem_alloc and free in ->mem_free.
+But the NAPIs are only stopped between ->stop and ->start. We created
+page_pool_disable_direct_recycling() to safely shut down the recycling
+in ->stop. This way the page_pool_destroy() call in ->mem_free doesn't
+have to worry about recycling any more.
 
-Here is the summary with links:
-  - [net] benet: fix BUG when creating VFs
-    https://git.kernel.org/netdev/net/c/5a40f8af2ba1
+Unfortunately, the page_pool_disable_direct_recycling() is not enough
+to deal with failures which necessitate freeing the _new_ page pool.
+If we hit a failure in ->mem_alloc or ->stop the new page pool has
+to be freed while the NAPI is active (assuming driver attaches the
+page pool to an existing NAPI instance and doesn't reallocate NAPIs).
 
-You are awesome, thank you!
+Freeing the new page pool is technically safe because it hasn't been
+used for any packets, yet, so there can be no recycling. But the check
+in napi_assert_will_not_race() has no way of knowing that. We could
+check if page pool is empty but that'd make the check much less likely
+to trigger during development.
+
+Add page_pool_enable_direct_recycling(), pairing with
+page_pool_disable_direct_recycling(). It will allow us to create the new
+page pools in "disabled" state and only enable recycling when we know
+the reconfig operation will not fail.
+
+Coincidentally it will also let us re-enable the recycling for the old
+pool, if the reconfig failed:
+
+ -> mem_alloc (new)
+ -> stop (old)
+    # disables direct recycling for old
+ -> start (new)
+    # fail!!
+ -> start (old)
+    # go back to old pp but direct recycling is lost :(
+ -> mem_free (new)
+
+The new helper is idempotent to make the life easier for drivers,
+which can operate in HDS mode and support zero-copy Rx.
+The driver can call the helper twice whether there are two pools
+or it has multiple references to a single pool.
+
+Fixes: 40eca00ae605 ("bnxt_en: unlink page pool when stopping Rx queue")
+Tested-by: David Wei <dw@davidwei.uk>
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+v2:
+ - add kdoc
+ - WARN_ON_ONCE -> WARN_ON
+v1: https://lore.kernel.org/20250801173011.2454447-1-kuba@kernel.org
+
+Thanks to David Wei for confirming the problem on bnxt and testing
+the fix. I hit this writing the fbnic support for ZC, TBH.
+Any driver where NAPI instance gets reused and not reallocated on each
+queue restart may have this problem. netdevsim doesn't 'cause the
+callbacks can't fail in funny ways there.
+
+CC: michael.chan@broadcom.com
+CC: pavan.chebbi@broadcom.com
+CC: hawk@kernel.org
+CC: ilias.apalodimas@linaro.org
+CC: dw@davidwei.uk
+CC: almasrymina@google.com
+CC: sdf@fomichev.me
+---
+ include/net/page_pool/types.h             |  2 ++
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c |  9 ++++++-
+ net/core/page_pool.c                      | 29 +++++++++++++++++++++++
+ 3 files changed, 39 insertions(+), 1 deletion(-)
+
+diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
+index 431b593de709..1509a536cb85 100644
+--- a/include/net/page_pool/types.h
++++ b/include/net/page_pool/types.h
+@@ -265,6 +265,8 @@ struct page_pool *page_pool_create_percpu(const struct page_pool_params *params,
+ struct xdp_mem_info;
+ 
+ #ifdef CONFIG_PAGE_POOL
++void page_pool_enable_direct_recycling(struct page_pool *pool,
++				       struct napi_struct *napi);
+ void page_pool_disable_direct_recycling(struct page_pool *pool);
+ void page_pool_destroy(struct page_pool *pool);
+ void page_pool_use_xdp_mem(struct page_pool *pool, void (*disconnect)(void *),
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index 5578ddcb465d..76a4c5ae8000 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -3819,7 +3819,6 @@ static int bnxt_alloc_rx_page_pool(struct bnxt *bp,
+ 	if (BNXT_RX_PAGE_MODE(bp))
+ 		pp.pool_size += bp->rx_ring_size / rx_size_fac;
+ 	pp.nid = numa_node;
+-	pp.napi = &rxr->bnapi->napi;
+ 	pp.netdev = bp->dev;
+ 	pp.dev = &bp->pdev->dev;
+ 	pp.dma_dir = bp->rx_dir;
+@@ -3851,6 +3850,12 @@ static int bnxt_alloc_rx_page_pool(struct bnxt *bp,
+ 	return PTR_ERR(pool);
+ }
+ 
++static void bnxt_enable_rx_page_pool(struct bnxt_rx_ring_info *rxr)
++{
++	page_pool_enable_direct_recycling(rxr->head_pool, &rxr->bnapi->napi);
++	page_pool_enable_direct_recycling(rxr->page_pool, &rxr->bnapi->napi);
++}
++
+ static int bnxt_alloc_rx_agg_bmap(struct bnxt *bp, struct bnxt_rx_ring_info *rxr)
+ {
+ 	u16 mem_size;
+@@ -3889,6 +3894,7 @@ static int bnxt_alloc_rx_rings(struct bnxt *bp)
+ 		rc = bnxt_alloc_rx_page_pool(bp, rxr, cpu_node);
+ 		if (rc)
+ 			return rc;
++		bnxt_enable_rx_page_pool(rxr);
+ 
+ 		rc = xdp_rxq_info_reg(&rxr->xdp_rxq, bp->dev, i, 0);
+ 		if (rc < 0)
+@@ -16031,6 +16037,7 @@ static int bnxt_queue_start(struct net_device *dev, void *qmem, int idx)
+ 			goto err_reset;
+ 	}
+ 
++	bnxt_enable_rx_page_pool(rxr);
+ 	napi_enable_locked(&bnapi->napi);
+ 	bnxt_db_nq_arm(bp, &cpr->cp_db, cpr->cp_raw_cons);
+ 
+diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+index 05e2e22a8f7c..343a6cac21e3 100644
+--- a/net/core/page_pool.c
++++ b/net/core/page_pool.c
+@@ -1201,6 +1201,35 @@ void page_pool_use_xdp_mem(struct page_pool *pool, void (*disconnect)(void *),
+ 	pool->xdp_mem_id = mem->id;
+ }
+ 
++/**
++ * page_pool_enable_direct_recycling() - mark page pool as owned by NAPI
++ * @pool: page pool to modify
++ * @napi: NAPI instance to associate the page pool with
++ *
++ * Associate a page pool with a NAPI instance for lockless page recycling.
++ * This is useful when a new page pool has to be added to a NAPI instance
++ * without disabling that NAPI instance, to mark the point at which control
++ * path "hands over" the page pool to the NAPI instance. In most cases driver
++ * can simply set the @napi field in struct page_pool_params, and does not
++ * have to call this helper.
++ *
++ * The function is idempotent, but does not implement any refcounting.
++ * Single page_pool_disable_direct_recycling() will disable recycling,
++ * no matter how many times enable was called.
++ */
++void page_pool_enable_direct_recycling(struct page_pool *pool,
++				       struct napi_struct *napi)
++{
++	if (READ_ONCE(pool->p.napi) == napi)
++		return;
++	WARN_ON(!napi || pool->p.napi);
++
++	mutex_lock(&page_pools_lock);
++	WRITE_ONCE(pool->p.napi, napi);
++	mutex_unlock(&page_pools_lock);
++}
++EXPORT_SYMBOL(page_pool_enable_direct_recycling);
++
+ void page_pool_disable_direct_recycling(struct page_pool *pool)
+ {
+ 	/* Disable direct recycling based on pool->cpuid.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.50.1
 
 
