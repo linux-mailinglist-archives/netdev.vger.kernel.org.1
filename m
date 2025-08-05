@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-211787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AFE3B1BB99
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 23:04:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCAFEB1BB9D
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 23:07:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7ED057A2C4B
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 21:03:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 898E13AE9F5
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 21:07:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D02672288CB;
-	Tue,  5 Aug 2025 21:04:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50E7D222562;
+	Tue,  5 Aug 2025 21:07:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="cuTvHbcc"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="l5A1mj8q"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D502812E7F;
-	Tue,  5 Aug 2025 21:04:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC398632;
+	Tue,  5 Aug 2025 21:07:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754427870; cv=none; b=j63Zq3fI4kqsfLu7eZFqTRBKVfzgHlXDjvaowXMRECEL+c5Ou9BaS6DIBY16pXJ/J26kMon/UNHu4hvgQLm1F37PB3wm1GhyEFuKHsBfW243/ibtUoO+wtSN0KGChPUrdgr+zZq98ct80allb4/oAMEr6/Uo4FIxih7BnDGQTAw=
+	t=1754428043; cv=none; b=hrlF6UZZq6yd0IsxYU7VIi/7UBajxk/OKSt18JhjNY0G/ya2zXU+gtCV6R37xunZoNroi5RHJP5nREPdY420vEQ/7GKEZzYTUrhbbea+JIbJZL1vcrp7ez9OQSalm4vLJaA1d2lX06wvVGGYenaTdSWYIDBb72pbeskupBNiwjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754427870; c=relaxed/simple;
-	bh=cgwuGOhpWfu0apN7esBs5cph/S74lHc+3lfT2BxkLok=;
+	s=arc-20240116; t=1754428043; c=relaxed/simple;
+	bh=35Fdsr6wjHQ8skd1EwEzUFjigS1x6HVQWmfRkNwHPAM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hHnPr6OGzrgJ+EvfEQv4Ov2Hm4xbTczwjMiRiK5LHlr/7/yxdq8lVylISgFMbOb4TSO7XolcKnL2Mri35U4AQjtPh8BnIP0qx99fi/n74jW44spy0CVk0pUBu9smKhFTTpaH+hTWzUgl8vRfolF/TGgw27pYqCsru96AkF7Eris=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=cuTvHbcc; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=A7qQ6nc/S0Lj7ejwvJ8IW43Ja1RURByeyQzRMBerj6+ORRqL9InOa/b5VIm8oiptSzQ68NYyjpVXi7sEg1+MOLdfqZYwl8GOqULAyh9n702F2x81HSfOw4HqvmbzznNq2hzhBg2TtFDoR1O7/85pds7LeMHNwqtCRHXOyTNAFtI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=l5A1mj8q; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=H8qKwlV/hGv5lXljo6J7UpddwhWoZfFMWWWFX7P5heg=; b=cuTvHbccrdF6uQOVkpI9+6yMTm
-	c2jJLLpXWFVZ4/z3K6/6omlILczdzxF/Gh1fFX9GmKtoxu2P57NfoX7PutyO8kwQuJ0DMwlh9WD73
-	ErW8ZeQUOlW9PgY6X8YS+4YG+8p2XkbqBAdbF3JFEXbAD1TGOQhRog5WPyQa9H8smwOs=;
+	bh=9b9i47N2hN51JYCksU49+E73DkaYdsYznNi6qRyjP2o=; b=l5A1mj8qyUXiNYdEnCROkG0fnc
+	CfxTeZVTkTS3GEMvYksMoX3/JG/ftB6ekDLe/RZkysQlnskMNp031c7eAfC1ZEf0qMGCFK92mCo50
+	MmJjUSV1Yq2KTrepkbA0tuOxDVqLojQRwX/wt696+6X6dgDE2vau+A9h5NpBWd1pOl1w=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1ujOpa-003pIO-6B; Tue, 05 Aug 2025 23:04:22 +0200
-Date: Tue, 5 Aug 2025 23:04:22 +0200
+	id 1ujOsL-003pKI-WA; Tue, 05 Aug 2025 23:07:14 +0200
+Date: Tue, 5 Aug 2025 23:07:13 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Sean Anderson <sean.anderson@linux.dev>
 Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
@@ -55,11 +55,11 @@ Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
 	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	Michal Simek <michal.simek@amd.com>,
 	Leon Romanovsky <leon@kernel.org>
-Subject: Re: [PATCH net-next v4 2/7] net: axienet: Use ioread32/iowrite32
- directly
-Message-ID: <972847fe-53a2-49a6-9e87-31c5ac845289@lunn.ch>
+Subject: Re: [PATCH net-next v4 3/7] net: axienet: Use MDIO bus device in
+ prints
+Message-ID: <8a28ce41-f28d-4089-8a8e-a82ae2ccfc82@lunn.ch>
 References: <20250805153456.1313661-1-sean.anderson@linux.dev>
- <20250805153456.1313661-3-sean.anderson@linux.dev>
+ <20250805153456.1313661-4-sean.anderson@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,15 +68,20 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250805153456.1313661-3-sean.anderson@linux.dev>
+In-Reply-To: <20250805153456.1313661-4-sean.anderson@linux.dev>
 
-> -	return readx_poll_timeout(axinet_ior_read_mcr, lp,
-> +	return readx_poll_timeout(ioread32, lp->regs + XAE_MDIO_MCR_OFFSET,
->  				  val, val & XAE_MDIO_MCR_READY_MASK,
->  				  1, 20000);
+On Tue, Aug 05, 2025 at 11:34:52AM -0400, Sean Anderson wrote:
+> For clarity and to remove the dependency on the parent netdev, use the
+> MDIO bus device in print statements.
 
-I think this change makes axinet_ior_read_mcr() redundant? So it would
-be good to remove it.
+> @@ -186,28 +187,31 @@ static int axienet_mdio_enable(struct axienet_local *lp, struct device_node *np)
+>  		/* Legacy fallback: detect CPU clock frequency and use as AXI
+>  		 * bus clock frequency. This only works on certain platforms.
+>  		 */
+> -		np1 = of_find_node_by_name(NULL, "cpu");
+> +		np1 = of_find_node_by_name(NULL, "lpu");
 
-   Andrew
+There is nothing about dev in this change?
+
+	Andrew
 
