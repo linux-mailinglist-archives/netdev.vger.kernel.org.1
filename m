@@ -1,235 +1,266 @@
-Return-Path: <netdev+bounces-211733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211734-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4330B1B5C3
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 16:06:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EEF8B1B5D3
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 16:07:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3209D625CB7
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 14:05:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 214DD3A1AAB
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 14:06:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2411D279354;
-	Tue,  5 Aug 2025 13:57:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E7BA27AC5A;
+	Tue,  5 Aug 2025 14:02:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="I42mzR5O"
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=daniel.almeida@collabora.com header.b="AZKhwYtC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9CFC27145D
-	for <netdev@vger.kernel.org>; Tue,  5 Aug 2025 13:57:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44C4D27AC3D;
+	Tue,  5 Aug 2025 14:02:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754402228; cv=fail; b=BOjz6nheABoxIlP9gdj+itCVAJkx93dF3BGVl1cWtMu8QuLyZOLYWtnMpJcf3GWYMiBfSz/RqVqMi+3YQOD3/h8A2m2RWSfpLAFVkkLG5kEGLVnACSe3w0ryFF8wkRKgiQcRMB7URTNAmiiFvN0BPBaTtcW5NEem/gLdhEMxdnU=
+	t=1754402579; cv=pass; b=RbHw6iNXSDfEFquaQT5GW1If+R7mp7H+AZLlN2zFAFrmINqBZTyTa+5l+46h7+x/Iwnj3OVG4EpVODQ1NZPKPOstUDzS1tI3UMg34pPqYXrqllZUEA+f2bkoIvUY6W2gBK4c9m6VKxKqUJJ8xz1nw2IbiU0v54eaqFKyEEOreyI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754402228; c=relaxed/simple;
-	bh=z5NbuwI0X2pjn+5M7x6lza3EzvWhfFuP8fRUGfUmzK4=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=Kd8MS/8au5zZU4Wzjy74khH01/AU+M3pSjMlFgkF4JoOR/uWmMfT6nrJQo3KBYKNQcOE8Y7UcjgxjpupEquv4Giyffvo2WcoFPz8YBGH6BI9va9Va6zHP68gdVfeOM7zBzQwwTldxmtewf5SzVw/OkuGQiOQFFEYDEC1zw8tpdM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=I42mzR5O; arc=fail smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1754402226; x=1785938226;
-  h=date:from:to:cc:subject:message-id:references:
-   content-transfer-encoding:in-reply-to:mime-version;
-  bh=z5NbuwI0X2pjn+5M7x6lza3EzvWhfFuP8fRUGfUmzK4=;
-  b=I42mzR5Oxfz1ErsUGmBy+lvarfRVvaczRNSynSbBv7rjTLcU/NPYLRyN
-   BlfUZ44Ev69pUsszhReiuIdcWwBUWZX3OUXhpz8NfIkRAsPKYdhWI7+gl
-   wFtfYwzGWAE5h6lAAT6jCof+FKPAt9CUnytUgDdsFcv8roWfTl2isFlHL
-   SBI1qsy91G/d7ErL6oUPt5vaxd4ZyWcpCi6JtbNlFuPtGdls04O58I5w4
-   f62MiX34A4/sQ/qtGEKRd4xnRjmzcnREl7WUil266sQ0oNb0kNtIFA3MR
-   4ZpTAcS6D8DJGYfjZIJoYjqM+7feswin5nJCekeMrD+YfTcpYHEVIPUT6
-   A==;
-X-CSE-ConnectionGUID: Me7Hgi14QLyltdV3Ow266w==
-X-CSE-MsgGUID: TaA8zUGcS5WR7+7ibhZBQA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11513"; a="56774405"
-X-IronPort-AV: E=Sophos;i="6.17,265,1747724400"; 
-   d="scan'208";a="56774405"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Aug 2025 06:57:05 -0700
-X-CSE-ConnectionGUID: cejFYcVhRcq2CUdHsRnnfw==
-X-CSE-MsgGUID: yDQQ1RPYQvy0ZTpIzRZJeQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,265,1747724400"; 
-   d="scan'208";a="164166664"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by orviesa009.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Aug 2025 06:57:06 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26; Tue, 5 Aug 2025 06:57:05 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26 via Frontend Transport; Tue, 5 Aug 2025 06:57:05 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (40.107.92.54) by
- edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26; Tue, 5 Aug 2025 06:57:03 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=wuVZpqy0W+U2RFyXlTjme2dmIfQYj2eXSZUqmMUaJz07IWYufdC2eLGb4YUtuRm20/SVM5Ylo62X+xCQS6NRXd+HWNURM0SXCBVlXt0ck7NbboTwXdN29bzBmYtJZNO5k8oVnjK1tqXEzWzaf6i5zNgiljIxFLBGaZNnJdN2/oasmbxfwu59U7D3jooV5py17KN80RwTc/tQ4gJuYI7NstWyqlkoT+5Av1TiBGwiBOONSBVrP06sEPje7lTilIm7FsKFCufm4jE4K4WfChM2RO0fo2I4YUZCS2S0v5rvbw7Aci09T4lo+v0SMcN0gSYf5PpGQqyFhI/UjdBMlKqxXA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+3ShyUst+1/FS6gNbkK61rzE18yIBkEhCXtR+xImnfg=;
- b=rt/wnko+bRdJu96qp6J3htAIG5skHm4fpnMUbQWdNJuG5pIbRlocYaJQgb0iQnHbAWmGSkuX9g3Q8pKQwZKcypooSh+VBvUBwn7a7oztTcYws+NCY/cXlpD9ndZR5MmltMn6faxuIS5dzkIFhBQOmpBg98uztINRWtkqi5h5x+xbfG2OOPoe5QTUBrALaMUsZNI6V9u1td885gEFfn+b+rqstb5W6HoViToA0zAXRiKHXxWeFSE32hbJXiQweXUesfOmihMM/g5yR0uvQ6ZFwN78GuNB0HyMGpZcsjTLJUHAOnAowyttujrsOtF1INb39da1IOkMzRDNb9lfRYb7vw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
- CY5PR11MB6161.namprd11.prod.outlook.com (2603:10b6:930:2a::10) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9009.13; Tue, 5 Aug 2025 13:57:01 +0000
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::d19:56fe:5841:77ca]) by DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::d19:56fe:5841:77ca%4]) with mapi id 15.20.9009.013; Tue, 5 Aug 2025
- 13:57:01 +0000
-Date: Tue, 5 Aug 2025 15:56:56 +0200
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-To: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
-CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
-	<anthony.l.nguyen@intel.com>, <magnus.karlsson@intel.com>,
-	<michal.kubiak@intel.com>, <sdn@hetzner-cloud.de>
-Subject: Re: [PATCH iwl-net] ixgbe: fix ndo_xdp_xmit() workloads
-Message-ID: <aJINqLIJLoijWVOm@boxer>
-References: <20250429155205.1444438-1-maciej.fijalkowski@intel.com>
- <bb545742-8878-4780-932e-4261ae226aac@hetzner-cloud.de>
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <bb545742-8878-4780-932e-4261ae226aac@hetzner-cloud.de>
-X-ClientProxiedBy: DUZPR01CA0193.eurprd01.prod.exchangelabs.com
- (2603:10a6:10:4b6::14) To DM4PR11MB6117.namprd11.prod.outlook.com
- (2603:10b6:8:b3::19)
+	s=arc-20240116; t=1754402579; c=relaxed/simple;
+	bh=/QgH0A8R3cgOTDRRPLoaPXVvMdgUw/ShCoYTRlnwe5E=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=unSgfKy3gxMCnLj58I1BnOWU583kpTDRih8Fe6KwiT4798v9OpAKpf9jRd9sPjmScWRpna9b4i0oIEOzP0DYgy0b7ehJcgPh6GhzTXeTUdYKbu4r/IQ3D0CmSLfWTTb6dGS59qtUeSUNkAzP3c3TT7tbfjaS06UWe0QFzXgUXgc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=daniel.almeida@collabora.com header.b=AZKhwYtC; arc=pass smtp.client-ip=136.143.188.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+ARC-Seal: i=1; a=rsa-sha256; t=1754402506; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=nUxhhGeOYWGMSQq4TuGXcvsj5fJLVw6BzO0J2+6PRP7K++lLNSLLyr+hceuGHL1wIvFqdGkri/uKMfzHQFX/QT4eVGVjFWpdkpZz9L0hCDwqJHKRzrQh0z4jwQtQQ4vMxM76jp1x4pLjwtbfXd/+LUw1hNGIFFpFxshpATbOkkc=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1754402506; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=JNx5rDCPViP8TmHGLeMc30Mcr6Nu/C+gsNm2VgM8q3k=; 
+	b=DEg18Hedavq1UC6n5lcYbEs/BcNWiMYH/y5qRJqCMy7XgVYNKOGsxIwtOq6N9bMVovrxWIKboTDrmN5tV4BWVHbcqeM1+wPKrfW6yniB2cEqY3P9TVSgQp30AlSltVbGIb5I2+cko4oY9RNgajDAVfZtxDs8pahb1EMPeR86shk=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=collabora.com;
+	spf=pass  smtp.mailfrom=daniel.almeida@collabora.com;
+	dmarc=pass header.from=<daniel.almeida@collabora.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1754402506;
+	s=zohomail; d=collabora.com; i=daniel.almeida@collabora.com;
+	h=Content-Type:Mime-Version:Subject:Subject:From:From:In-Reply-To:Date:Date:Cc:Cc:Content-Transfer-Encoding:Message-Id:Message-Id:References:To:To:Reply-To;
+	bh=JNx5rDCPViP8TmHGLeMc30Mcr6Nu/C+gsNm2VgM8q3k=;
+	b=AZKhwYtCEHXknT2qM4gusLK3yM7vzwulKxfcIl1gH9XlLuC6UBdcgo+qUDHxYCWT
+	Z2f73JsOnaJwFfNu+hypWleN9q1V1LI6uLP7TPuasyEUD7lQqR2PJNhEmPbhnn1oclO
+	H6aMXIVIx7Oswkej9nvjIHb6ihjbJH+FdRsj3TfM=
+Received: by mx.zohomail.com with SMTPS id 1754402502293977.7687680728351;
+	Tue, 5 Aug 2025 07:01:42 -0700 (PDT)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|CY5PR11MB6161:EE_
-X-MS-Office365-Filtering-Correlation-Id: 43a15db8-4665-4c32-261e-08ddd427f39d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024|7053199007;
-X-Microsoft-Antispam-Message-Info: =?iso-8859-1?Q?ky1FOPVenmRpBK68TUwZzS7CXF6T9pno6b/3+o/jgMcIfUOohdRX4whHbP?=
- =?iso-8859-1?Q?R1mPxywmfgG3ruhNyss+bvR+JuLazhYp2CniZBBueDhGpg14aSNVM4Zisa?=
- =?iso-8859-1?Q?XaR/USYIUtVZfv+Cv3+SW+btM+QAgRj8FREl5/Mllkfi5lasRqi/TKNutG?=
- =?iso-8859-1?Q?JJoJEcjM/97VDeHhB8KmGMut+Bd6WJoeubMHLPZNEpcLfWzEedcBVRSPv4?=
- =?iso-8859-1?Q?iejwQvbedDC2DSsgawg4NnEe6EejQZzaPB/WgMbVeWlO3/JmHX42N+uHFk?=
- =?iso-8859-1?Q?zfj8Uu63JTLvFY3uqNxWk5BM2JbtXV44KMPK+8Q8B3+c+njPPCjogMq1XP?=
- =?iso-8859-1?Q?vL7zmQBGVLQhpJsHGIRMqSUgtizssoWX9FpYIJqYusunHyAjb+IVT8pb8M?=
- =?iso-8859-1?Q?/efAleMpMA5cjFxOlmZc9SGvX4nSWGaIL+bXC8K0dX/ewPFDsfjOXxAc34?=
- =?iso-8859-1?Q?8DGTFQquuyWMfnh62gQCy/KNDR5vrWlqaKdq2UT4fvTwHH1VIaHk1XXWN0?=
- =?iso-8859-1?Q?qeIvhiQvVIKdJpp/oAKUHBWgcouCjeCR3RhIcrjVCfK4W0FmfhhXSPIyA+?=
- =?iso-8859-1?Q?bMCJsAuk6JkjqlEstowb41iHLpAfFNp7+Ko8e3sR2Cik8UsAn7KHZtW5WO?=
- =?iso-8859-1?Q?arHnUpFoLincu0uKXkQBqSMILywKR52B7YcCTGJ4ZTCvaX1JpvwEO+Z5n1?=
- =?iso-8859-1?Q?xHuE5O+LShrK8Wn28gvpmkpyiP6sAh+FZDiZuD2UPz2lhQQUaohSBFvxdH?=
- =?iso-8859-1?Q?d1vNewY4Y3t58bKnFz7DlIYoL5f/ALwYwo/Sg+hC9Y65pX5PYkHMuYcbJj?=
- =?iso-8859-1?Q?E4EwWr9/S+JjtMBmztLxqTOMJwYMkRC7jZ05R+rAf+KE75DJZwQfJTsqL0?=
- =?iso-8859-1?Q?s82h5T92l28+jBKcJ+LCP0zJPQpQViwUiOfGn1WZnCH0SinzRGc+6ceo9m?=
- =?iso-8859-1?Q?DLtoI68GmExYYCz3lAcWVGPXEtUE+BStZLTAUxJ6UIu6YTiyfIAC0LVPei?=
- =?iso-8859-1?Q?0Kg2mnJ+KXGKLp15TPyt7WtaDxEzm0F5Vnb45QlAaveFO3c30shfqnpgAB?=
- =?iso-8859-1?Q?/tPOc/k+TXL4cKHyf9WzEiiwhlmXb2JLzKrmbTUpzah8ahq4XGc5250Pv7?=
- =?iso-8859-1?Q?QRysMlkj+tRO4VYSfLbHciZXkHqxs+NtT9MbT6cngffnwQ9GcSrdP4YSAE?=
- =?iso-8859-1?Q?OCyjCJs84tf+V6psqThMpdeKatNDiYJrFdkHsYl660BlEfAC6bziLwbeDT?=
- =?iso-8859-1?Q?7U+H2pVc1jgaasPMCCMOpRNbpcD65XZ8QEW/SihJ/cKBz1GbLEHxxP9YB1?=
- =?iso-8859-1?Q?6liE30lk6fTYBU3c7wEVHFaXIaQ3hHAyoqNgUnbMkp6HgxLUgnlgCr1U5r?=
- =?iso-8859-1?Q?wq/p0BL2osk7CLTGM36foOP3BKeXfWgOisTxLQGHjq3apJwDZNmw0EJR4U?=
- =?iso-8859-1?Q?e+ooF0Gl0Cc4sHBH7L5GX1OBUa178Nd6Qh+ZR79NmuNA9bfgLJPSAR6TN3?=
- =?iso-8859-1?Q?Q=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?iso-8859-1?Q?PEvUsw1LZqLJMViKkimDQbPpmMGdBDz7dAinvQxthwmYGWxYnt0I5Ll2am?=
- =?iso-8859-1?Q?NiNgmboqxA1/QmtF7eGD3afJcbyMs4k4wrs9oANAW5O+LAzX2iXt+yL4NY?=
- =?iso-8859-1?Q?t4OwMD6tjjsNOgiln8Nx0pQ/+n7jgPjV4a7wqnF3pBmsEm9/VQRnR0m4U8?=
- =?iso-8859-1?Q?gUFSGft2x9nSwkSzMx/INVOw2LbLknwKAHred4LTxU9x2rDvh2W/kCmRaL?=
- =?iso-8859-1?Q?Pgxt06Wg6lJGWaFmeLCEAcQdj5uJrbsAkkjSUaLjCXuBfkIdNIkAy6ZhMr?=
- =?iso-8859-1?Q?qMyYrp6O0+Cz+nL6m1V6kelmdLlE82qapHIgXw9N3fT41+NfG94+7sfOPo?=
- =?iso-8859-1?Q?0jc9FF7EEawjNd5+mizsNRFVaPqhFclEncuhwUAQNuParYy1m28epov8sL?=
- =?iso-8859-1?Q?RsKhEMCmODTqFNokLCoYY7HlmCDi4vbs8lNQ6JuN6mcCXw3tULXA+akaT1?=
- =?iso-8859-1?Q?M2FQ2482QKRdOlINy/V0t0f6zKJFild79AMAbl1fknIs84rQWkD6v9Ughb?=
- =?iso-8859-1?Q?xFSvyef/yCs0pBT1QLWynVPyOWqZDy8RniiPUMlIhVXfthzqlUgtcqobJn?=
- =?iso-8859-1?Q?jwiCUdHwukhAbW5GlP7NUsmAiaSZcIsMqu6emrIAm6u4SSmW4ol6NGyqer?=
- =?iso-8859-1?Q?AJXVy3uM0E3NNjSdXq48IHBo9e1sdmz9CHABeBg75AFTUDzFdE+VZ1rtXU?=
- =?iso-8859-1?Q?GQdjOaBRTWVQkzjJ7Ogd6jPha4FxYEDLGe3q2/Lq+iy4/ge7ABXQJXtNTs?=
- =?iso-8859-1?Q?mTvSyE6Gy32LK1la4+SB9wRZlLuxy52MmiKt7Bfm8VC3EXdyPbASDMYjTR?=
- =?iso-8859-1?Q?nQDvPZZ8+HkBNFwBqbaLDTzcAdOCy1OlP1ZnTSkJz6k4Div3KuATmLlfz2?=
- =?iso-8859-1?Q?/HvPFosxrw/Dzeo7i1oZ2rSFZGWor7zjAdWrKJeBIhAbb8bJwhRtAn56ET?=
- =?iso-8859-1?Q?iVcED1nTgeDTkxsAAGgsVDmspw3mIFPNgubLdlqbpTbO2AU3HrTQ2AqPYm?=
- =?iso-8859-1?Q?Dyj0vwpyGpvvlVY3jYEls30h7nGCnrG0CgvVYSWRhfu9SNxkR7+73cqqfc?=
- =?iso-8859-1?Q?psX0UvmT/VHd38STg5k0NKDSQPSPFTCzNjvAA72Z/lZxfv9KbvjkDCN2zS?=
- =?iso-8859-1?Q?lFjq2bhILP0DtJpqiv22V3fJ7erjXkDtLCGH13oCz2We8UObqHXGHwPDWW?=
- =?iso-8859-1?Q?xmkDCIq0fkLlr5BhrxKIY1EPoyJvMT+0/ROelgYfzu/D/dXPSV6qEzdhrV?=
- =?iso-8859-1?Q?aqkwu8avzLRAa2Jkw3pwtskKlU0Q+icB2EPHm1uUeF9wtqjO5wt4yS37Vd?=
- =?iso-8859-1?Q?sOhgQW0Vrbl8bh2FCU2ez0kecprL/Cm7WfrhQMsyLZxObWkl/4j5ia22YH?=
- =?iso-8859-1?Q?OYD7/y8RlwuZpW5oZ3iciH39UMBlGX/xWQ+JjKC6ZrUVnhtzAXg7LylnrZ?=
- =?iso-8859-1?Q?tWbOt+c1SNb2rp3RFInFf05ANqy54XyF+mQ4iSdG05JxP9k9TARSrb5SzJ?=
- =?iso-8859-1?Q?d+YVbJjw+9Vl4mtha91bq+akBf+r+a7VRIN1cmLgr3ZjLr9sg4M6+RitWY?=
- =?iso-8859-1?Q?kEdD+/rCY/fjZCcHZ7nk6WxVoHfAOGkbnjwRdbzH1TTfcQHPFxJVq6zaDj?=
- =?iso-8859-1?Q?ufnxbVqlKxf6w1dwxQuhCRkahS6DG/aO/P8yeVCw2T1K3uFwYqJ4waEw?=
- =?iso-8859-1?Q?=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 43a15db8-4665-4c32-261e-08ddd427f39d
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Aug 2025 13:57:01.3622
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: U974ioJY/lr2HFDPIG3+ZwuHSwzxV3QfndpLHg/HabfkEWLds6wILYRCuAWXzxV+8ajwhfrZPwPj+Zdj/NYDc8ZHWMjs5YDkAPNDhyvrG18=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR11MB6161
-X-OriginatorOrg: intel.com
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.600.51.1.1\))
+Subject: Re: [PATCH v11 7/8] rust: Add read_poll_timeout functions
+From: Daniel Almeida <daniel.almeida@collabora.com>
+In-Reply-To: <DBRW63AMB4D8.2HXGYM6FZRX3Z@kernel.org>
+Date: Tue, 5 Aug 2025 11:01:22 -0300
+Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>,
+ linux-kernel@vger.kernel.org,
+ rust-for-linux@vger.kernel.org,
+ netdev@vger.kernel.org,
+ andrew@lunn.ch,
+ hkallweit1@gmail.com,
+ tmgross@umich.edu,
+ ojeda@kernel.org,
+ alex.gaynor@gmail.com,
+ gary@garyguo.net,
+ bjorn3_gh@protonmail.com,
+ benno.lossin@proton.me,
+ a.hindborg@samsung.com,
+ aliceryhl@google.com,
+ anna-maria@linutronix.de,
+ frederic@kernel.org,
+ tglx@linutronix.de,
+ arnd@arndb.de,
+ jstultz@google.com,
+ sboyd@kernel.org,
+ mingo@redhat.com,
+ peterz@infradead.org,
+ juri.lelli@redhat.com,
+ vincent.guittot@linaro.org,
+ dietmar.eggemann@arm.com,
+ rostedt@goodmis.org,
+ bsegall@google.com,
+ mgorman@suse.de,
+ vschneid@redhat.com,
+ tgunders@redhat.com,
+ me@kloenk.dev,
+ david.laight.linux@gmail.com
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <DCB831D1-8786-41BC-A95B-44F0BEE71990@collabora.com>
+References: <20250220070611.214262-1-fujita.tomonori@gmail.com>
+ <20250220070611.214262-8-fujita.tomonori@gmail.com>
+ <DBNPR4KQZXY5.279JBMO315A12@kernel.org>
+ <20250802.104249.1482605492526656971.fujita.tomonori@gmail.com>
+ <DBRW63AMB4D8.2HXGYM6FZRX3Z@kernel.org>
+To: Danilo Krummrich <dakr@kernel.org>
+X-Mailer: Apple Mail (2.3826.600.51.1.1)
+X-ZohoMailClient: External
 
-On Tue, Aug 05, 2025 at 03:06:29PM +0200, Marcus Wichelmann wrote:
-> Am 29.04.25 um 17:52 schrieb Maciej Fijalkowski:
-> > Currently ixgbe driver checks periodically in its watchdog subtask if
-> > there is anything to be transmitted (consdidering both Tx and XDP rings)
-> > under state of carrier not being 'ok'. Such event is interpreted as Tx
-> > hang and therefore results in interface reset.
-> > 
-> > This is currently problematic for ndo_xdp_xmit() as it is allowed to
-> > produce descriptors when interface is going through reset or its carrier
-> > is turned off.
-> > 
-> > Furthermore, XDP rings should not really be objects of Tx hang
-> > detection. This mechanism is rather a matter of ndo_tx_timeout() being
-> > called from dev_watchdog against Tx rings exposed to networking stack.
-> > 
-> > Taking into account issues described above, let us have a two fold fix -
-> > do not respect XDP rings in local ixgbe watchdog and do not produce Tx
-> > descriptors in ndo_xdp_xmit callback when there is some problem with
-> > carrier currently. For now, keep the Tx hang checks in clean Tx irq
-> > routine, but adjust it to not execute it for XDP rings.
-> > 
-> > Cc: Tobias Böhm <tobias.boehm@hetzner-cloud.de>
-> > Reported-by: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
-> > Closes: https://lore.kernel.org/netdev/eca1880f-253a-4955-afe6-732d7c6926ee@hetzner-cloud.de/
-> > Fixes: 6453073987ba ("ixgbe: add initial support for xdp redirect")
-> > Fixes: 33fdc82f0883 ("ixgbe: add support for XDP_TX action")
-> > Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-> > [...]
-> 
-> Hi,
-> 
-> could you please consider submitting this patch (or a newer version)
-> for being merged into mainline?
-> 
-> This would help us not having to build our own kernels with this patch
-> for forever.
 
-Somehow I assumed this went through the process and our maintainers took
-care of it - apologies for this inconvenience and let me address it.
 
-> 
-> Thanks!
-> 
-> Marcus
+> On 2 Aug 2025, at 08:06, Danilo Krummrich <dakr@kernel.org> wrote:
+>=20
+> On Sat Aug 2, 2025 at 3:42 AM CEST, FUJITA Tomonori wrote:
+>> On Mon, 28 Jul 2025 15:13:45 +0200
+>> "Danilo Krummrich" <dakr@kernel.org> wrote:
+>>> On Thu Feb 20, 2025 at 8:06 AM CET, FUJITA Tomonori wrote:
+>>>> +/// This process continues until either `cond` returns `true` or =
+the timeout,
+>>>> +/// specified by `timeout_delta`, is reached. If `timeout_delta` =
+is `None`,
+>>>> +/// polling continues indefinitely until `cond` evaluates to =
+`true` or an error occurs.
+>>>> +///
+>>>> +/// # Examples
+>>>> +///
+>>>> +/// ```rust,ignore
+>>>=20
+>>> Why ignore? This should be possible to compile test.
+>>=20
+>> =
+https://lore.kernel.org/rust-for-linux/CEF87294-8580-4C84-BEA3-EB72E63ED7D=
+F@collabora.com/
+>=20
+> I disagree with that. 'ignore' should only be used if we can't make it =
+compile.
+>=20
+> In this case we can make it compile, we just can't run it, since =
+there's no real
+> HW underneath that we can read registers from.
+>=20
+> An example that isn't compiled will eventually be forgotten to be =
+updated when
+> things are changed.
+>=20
+>>>> +/// fn wait_for_hardware(dev: &mut Device) -> Result<()> {
+>>>=20
+>>> I think the parameter here can just be `&Io<SIZE>`.
+>>>=20
+>>>> +///     // The `op` closure reads the value of a specific status =
+register.
+>>>> +///     let op =3D || -> Result<u16> { dev.read_ready_register() =
+};
+>>>> +///
+>>>> +///     // The `cond` closure takes a reference to the value =
+returned by `op`
+>>>> +///     // and checks whether the hardware is ready.
+>>>> +///     let cond =3D |val: &u16| *val =3D=3D HW_READY;
+>>>> +///
+>>>> +///     match read_poll_timeout(op, cond, Delta::from_millis(50), =
+Some(Delta::from_secs(3))) {
+>>>> +///         Ok(_) =3D> {
+>>>> +///             // The hardware is ready. The returned value of =
+the `op`` closure isn't used.
+>>>> +///             Ok(())
+>>>> +///         }
+>>>> +///         Err(e) =3D> Err(e),
+>>>> +///     }
+>>>> +/// }
+>>>> +/// ```
+>>>> +///
+>>>> +/// ```rust
+>>>> +/// use kernel::io::poll::read_poll_timeout;
+>>>> +/// use kernel::time::Delta;
+>>>> +/// use kernel::sync::{SpinLock, new_spinlock};
+>>>> +///
+>>>> +/// let lock =3D KBox::pin_init(new_spinlock!(()), =
+kernel::alloc::flags::GFP_KERNEL)?;
+>>>> +/// let g =3D lock.lock();
+>>>> +/// read_poll_timeout(|| Ok(()), |()| true, =
+Delta::from_micros(42), Some(Delta::from_micros(42)));
+>>>> +/// drop(g);
+>>>> +///
+>>>> +/// # Ok::<(), Error>(())
+>>>> +/// ```
+>>>> +#[track_caller]
+>>>> +pub fn read_poll_timeout<Op, Cond, T>(
+>>>> +    mut op: Op,
+>>>> +    mut cond: Cond,
+>>>> +    sleep_delta: Delta,
+>>>> +    timeout_delta: Option<Delta>,
+>>>> +) -> Result<T>
+>>>> +where
+>>>> +    Op: FnMut() -> Result<T>,
+>>>> +    Cond: FnMut(&T) -> bool,
+>>>> +{
+>>>> +    let start =3D Instant::now();
+>>>> +    let sleep =3D !sleep_delta.is_zero();
+>>>> +
+>>>> +    if sleep {
+>>>> +        might_sleep();
+>>>> +    }
+>>>=20
+>>> I think a conditional might_sleep() is not great.
+>>>=20
+>>> I also think we can catch this at compile time, if we add two =
+different variants
+>>> of read_poll_timeout() instead and be explicit about it. We could =
+get Klint to
+>>> catch such issues for us at compile time.
+>>=20
+>> Your point is that functions which cannot be used in atomic context
+>> should be clearly separated into different ones. Then Klint might be
+>> able to detect such usage at compile time, right?
+>>=20
+>> How about dropping the conditional might_sleep() and making
+>> read_poll_timeout return an error with zero sleep_delta?
+>=20
+> Yes, let's always call might_sleep(), the conditional is very error =
+prone. We
+> want to see the warning splat whenever someone calls =
+read_poll_timeout() from
+> atomic context.
+>=20
+> Yes, with zero sleep_delta it could be called from atomic context =
+technically,
+> but if drivers rely on this and wrap this into higher level helpers =
+it's very
+> easy to miss a subtle case and end up with non-zero sleep_delta within =
+an atomic
+> context for some rare condition that then is hard to debug.
+>=20
+> As for making read_poll_timeout() return a error with zero =
+sleep_delta, I don't
+> see a reason to do that. If a driver wraps read_poll_timeout() in its =
+own
+> function that sometimes sleeps and sometimes does not, based on some =
+condition,
+> but is never called from atomic context, that's fine.
+>=20
+>> Drivers which need busy-loop (without even udelay) can
+>> call read_poll_timeout_atomic() with zero delay.
+>=20
+> It's not the zero delay or zero sleep_delta that makes the difference  =
+it's
+> really the fact the one can be called from atomic context and one =
+can't be.
+
+Perhaps it=E2=80=99s worth it to clarify that in the docs for the future =
+versions?
+
+I feel like =E2=80=9Csleep_delta =3D=3D 0 -> this doesn=E2=80=99t sleep =
+-> it=E2=80=99s fine to
+use this in an atomic context=E2=80=9D is a somewhat expected thought =
+process.
+Also, this will lead to the confusion I mentioned, i.e. =E2=80=9Cwhy do =
+I need to
+use the atomic version if I can pass 0 for sleep_delta?=E2=80=9D
+
+I mean, the added context in this thread explains it, but it=E2=80=99s =
+probably
+worth it to make sure that the docs also do.
+
+Just my humble opinion.
+
+=E2=80=94 Daniel=
 
