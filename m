@@ -1,160 +1,147 @@
-Return-Path: <netdev+bounces-211648-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211649-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBC73B1ADBA
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 07:50:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC0B4B1AE22
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 08:20:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A85CA18A03B3
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 05:50:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7FD19189AA89
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 06:21:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D3512045B7;
-	Tue,  5 Aug 2025 05:50:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E54EE21A420;
+	Tue,  5 Aug 2025 06:20:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="JTWjNN8t"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dxSf78xU"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelvem-ot02.ext.ti.com (lelvem-ot02.ext.ti.com [198.47.23.235])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f66.google.com (mail-pj1-f66.google.com [209.85.216.66])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D91AF2904;
-	Tue,  5 Aug 2025 05:50:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.235
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D375186294;
+	Tue,  5 Aug 2025 06:20:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754373022; cv=none; b=R213eYUtPKwdtbSg4s5WMMe5q1ZOEV3KAKEdqyZ1gDcHjhe69HM9sMmMaF5HEygmLWT1G11iwLIbCSXh5aaJ78UwW1RP9Q5hYY00fWZj1CIKAj5a6Y+mnDapC1FIvWixMwvA6J9BfVxPFmnsDCLsGEQpx1mfT2MZ1+u2sphTKig=
+	t=1754374854; cv=none; b=aZPdpueIvnkeU5QGeiqtT/DoCbcsd4wKe8EcGmj4tLgvYxOQKpg2oYbVnIp+RXzou/Ik7EO/q/jN11VrQZl0A6Pr5xGXalyHTAIYSEYH5suzeMX1XFIoaCjSzWeQk2axoKOG9zwYKPegitzqzK/lpTxP1/Y88vPsxIe6rc5s8xk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754373022; c=relaxed/simple;
-	bh=9UrC8R6/cHhzNeVb7PXG4J7LIKNuc9JI6bEz10hJXQM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=Lj4Od+l3+0HUkby0eup8r9+wIy+7qPpVMrb5F9q5O4EKmnwNNYl6nhqpDFkkFwkN9ezs8G3pGhZmjUdOU0uCdsTDlcAmDfyhfCkPwCqXzPlidvQW2YqJ7A8JdgvnlGl7/Gv7Z7r9VJPiwuDrUNI7XsiMAIJ9vPTqS3Aq+Hvy2xk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=JTWjNN8t; arc=none smtp.client-ip=198.47.23.235
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelvem-sh01.itg.ti.com ([10.180.77.71])
-	by lelvem-ot02.ext.ti.com (8.15.2/8.15.2) with ESMTP id 5755o3L6269191;
-	Tue, 5 Aug 2025 00:50:03 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1754373003;
-	bh=+VTpc+4yMWsn0h4j0qC+icyeqYURleBo3nXl9IU2OF4=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=JTWjNN8tga4OF9jxDBbqtfN4ilgOhDzSsip3w7+sS7Yvkvqeh/bpgVzTDvtwO5kZV
-	 FDif0DZ/CKOZLV0ztlSlMYHviTN7Swc7RZVtVDGnBohuugZpgILAVQsJje2M0gQwLD
-	 VoUAjQFcNXAnWshIUXG+5lpBnmIViv3CIKJNjnRw=
-Received: from DLEE102.ent.ti.com (dlee102.ent.ti.com [157.170.170.32])
-	by lelvem-sh01.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 5755o2lR2071154
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
-	Tue, 5 Aug 2025 00:50:02 -0500
-Received: from DLEE107.ent.ti.com (157.170.170.37) by DLEE102.ent.ti.com
- (157.170.170.32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Tue, 5
- Aug 2025 00:50:02 -0500
-Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DLEE107.ent.ti.com
- (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55 via
- Frontend Transport; Tue, 5 Aug 2025 00:50:02 -0500
-Received: from [172.24.231.152] (danish-tpc.dhcp.ti.com [172.24.231.152])
-	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 5755nvfM1325571;
-	Tue, 5 Aug 2025 00:49:58 -0500
-Message-ID: <40a7cc6c-363e-4516-847d-9ac6164203ef@ti.com>
-Date: Tue, 5 Aug 2025 11:19:57 +0530
+	s=arc-20240116; t=1754374854; c=relaxed/simple;
+	bh=HU3EoErcw718HgQs6DMndFnBksuEYx4Ps3O8g3pWdi4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=b73Qc+iAAanwqqdrq3vtpdbfg30KRgdnQXa4DZSLPMYrgO0XRLJh5aoDf+DwvdVTgj4IY98W7VZh1JYOXU8rWK0s4W301OkselCWX+mxTkrzxGkR3Y5pe2Bwb/lLcip2cjTdzpF9Rw0uQYRuwB33/h/oH8oluRV36lwEWJpZ6IY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dxSf78xU; arc=none smtp.client-ip=209.85.216.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f66.google.com with SMTP id 98e67ed59e1d1-31efc10bb03so3779396a91.0;
+        Mon, 04 Aug 2025 23:20:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1754374852; x=1754979652; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=bxXdvCPPZKEryeBHh/ilhPWl4SN2qoBiCBLYJe9cq58=;
+        b=dxSf78xUTwDt/x9XmyL33jVkaXD9MmNEQtpmR2teXOSQAx6YzoT/g3Nm8zSyV+V6WF
+         5P5QKCk2l9hB/EE9b7o3DVSDgDOdD/c9NIXtrCtOqNtjcZ99pL0obuV8EX3sta0c1F4e
+         GrNlDD0RPyT+X/SnbIHzuqDjVy1nK4S3yjKiWmONTduLPACqUezwOPXNnc/jKPeKbt5g
+         c99Fqgzj2VNzHRKoha9Fje0DevxNyAf7UQvjkNZ906Tt9tb0DpEAwYsVw49GTfFjHT6i
+         0UzraqolW1t/SwmoZoT/gdot/njHxsgF4P4lNp1UpA1WrbiovJvizjIdvwn0XybePL/9
+         8Y0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754374852; x=1754979652;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bxXdvCPPZKEryeBHh/ilhPWl4SN2qoBiCBLYJe9cq58=;
+        b=q1JiBiPrGwwH/2lw6c4uudLPTRKXfAcLz4cLMY8zDA37oH84lWNo4MieAj5vDFmR1w
+         4Be6Ba9XbMd+++7D/C9ncef9Nm+3LHSSxHVwuavgPZBaTGwuydaedeBEUWD6v8iVosI/
+         8h9MmDf8RBnveIMAmTgg2xjz/J6pWXa+vYgDuyTZqtE35dtV6SypNklNGfNRdMaoCiJm
+         iJt4SKu581SCR659KGd55n4ksn8MRzxscNpfKZ6d3+WxejQQoqPe1RbJmMLJ6lK+Q+B1
+         Qj6d8ZRfjMc0OQlM4Y2OT76sX0hUrsQllDCjkE20NXy2q6krxYpSSUolDjsdjyIKNezF
+         uJUQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUsTHhJz7IQ7CqvVUd299TTSZHgTGuYabdqEkTEjTB1b5slmTzoYbq33AAMq2P6LqAy+bs/vww=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyy/0cmACMSYhHALMV6BwbLe0xZTynizMtWqIElV+8CbZxPe33/
+	DjpzGpgDM0y+9ca3Ib3z675UDC+FDE9/hXjscu91tF/FQcTcKhjDYn0Ve5VKtEcfE8c9Wg==
+X-Gm-Gg: ASbGncu9HAqltTVijTERfZ9eMrTRo5vnT7VgWfRx+1IS8UX300ZdTSWVzqLBQZvNhNh
+	C7qXnTmB7IMjn09oD7IV0N8GCnnCTx8sn5sFbajTu+ohQcv1WrtyImlVZUM3EuFCiEHq3lSBF+L
+	nfBX7OncHTGWdCBft5clsCWE7Tqz+KVN/EsH1toC4kHk2CaGvoXUQbAUdiCn8+KtR8XrK9F1yFS
+	mn9WHdig08NTVBAaXZ74i8FKle+LwnjGxooVq4QkHNTWysmqhvI1MqPwxXXbPz4PdoHmrdWK3++
+	+InlP7u2r2kkUhxBGJelLq25ash20sWdd1bp7Nii/9e0UznZoEGnpp/Nka8XRng37xjE6yN1dWE
+	J6VKNrxHvHvs8Te4NJaxwFBDV8vP4JlCt0S04czO0S2d+2kwvgpT9Zx6ZIfGp
+X-Google-Smtp-Source: AGHT+IE6My9ExfIadYycYh55LtSyfalv/17oohhFtIWDUvu7/IXwtZ4gsI1N0BiWTm7Fcv5PWkWCUA==
+X-Received: by 2002:a17:90b:4a11:b0:321:59e7:c5c5 with SMTP id 98e67ed59e1d1-32159e7c72fmr955459a91.27.1754374851535;
+        Mon, 04 Aug 2025 23:20:51 -0700 (PDT)
+Received: from localhost.localdomain ([14.116.239.35])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3207eca6e9asm13095030a91.18.2025.08.04.23.20.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Aug 2025 23:20:51 -0700 (PDT)
+From: bsdhenrymartin@gmail.com
+X-Google-Original-From: tcs_kernel@tencent.com
+To: huntazhang@tencent.com,
+	jitxie@tencent.com,
+	landonsun@tencent.com,
+	bryan-bt.tan@broadcom.com,
+	vishnu.dasa@broadcom.com,
+	bcm-kernel-feedback-list@broadcom.com,
+	sgarzare@redhat.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	netdev@vger.kernel.org,
+	bsdhenrymartin@gmail.com,
+	Henry Martin <bsdhenryma@tencent.com>,
+	TCS Robot <tcs_robot@tencent.com>
+Subject: [PATCH v1] VSOCK: fix Out-of-Bounds Read in vmci_transport_dgram_dequeue()
+Date: Tue,  5 Aug 2025 14:20:41 +0800
+Message-ID: <20250805062041.1804857-1-tcs_kernel@tencent.com>
+X-Mailer: git-send-email 2.41.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] net: ti: icssg-prueth: Fix emac link speed
- handling
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Meghana Malladi
-	<m-malladi@ti.com>,
-        Himanshu Mittal <h-mittal1@ti.com>,
-        <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <srk@ti.com>,
-        Vignesh Raghavendra
-	<vigneshr@ti.com>,
-        Roger Quadros <rogerq@kernel.org>
-References: <20250801121948.1492261-1-danishanwar@ti.com>
- <be848373-4b7f-4205-b1e4-b08fe161d689@lunn.ch>
-Content-Language: en-US
-From: MD Danish Anwar <danishanwar@ti.com>
-In-Reply-To: <be848373-4b7f-4205-b1e4-b08fe161d689@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+Content-Transfer-Encoding: 8bit
 
-Hi Andrew,
+From: Henry Martin <bsdhenryma@tencent.com>
 
-On 04/08/25 10:19 pm, Andrew Lunn wrote:
-> On Fri, Aug 01, 2025 at 05:49:48PM +0530, MD Danish Anwar wrote:
->> When link settings are changed emac->speed is populated by
->> emac_adjust_link(). The link speed and other settings are then written into
->> the DRAM. However if both ports are brought down after this and brought up
->> again or if the operating mode is changed and a firmware reload is needed,
->> the DRAM is cleared by icssg_config(). As a result the link settings are
->> lost.
->>
->> Fix this by calling emac_adjust_link() after icssg_config(). This re
->> populates the settings in the DRAM after a new firmware load.
->>
->> Fixes: 9facce84f406 ("net: ti: icssg-prueth: Fix firmware load sequence.")
->> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
->> ---
->> v1 - v2: Added phydev lock before calling emac_adjust_link() as suggested
->> by Andrew Lunn <andrew@lunn.ch>
->> v1 https://lore.kernel.org/all/20250731120812.1606839-1-danishanwar@ti.com/
->>
->>  drivers/net/ethernet/ti/icssg/icssg_prueth.c | 8 ++++++++
->>  1 file changed, 8 insertions(+)
->>
->> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
->> index 2b973d6e2341..58aec94b7771 100644
->> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
->> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
->> @@ -50,6 +50,8 @@
->>  /* CTRLMMR_ICSSG_RGMII_CTRL register bits */
->>  #define ICSSG_CTRL_RGMII_ID_MODE                BIT(24)
->>  
->> +static void emac_adjust_link(struct net_device *ndev);
->> +
->>  static int emac_get_tx_ts(struct prueth_emac *emac,
->>  			  struct emac_tx_ts_response *rsp)
->>  {
->> @@ -229,6 +231,12 @@ static int prueth_emac_common_start(struct prueth *prueth)
->>  		ret = icssg_config(prueth, emac, slice);
->>  		if (ret)
->>  			goto disable_class;
->> +
->> +		if (emac->ndev->phydev) {
->> +			mutex_lock(&emac->ndev->phydev->lock);
->> +			emac_adjust_link(emac->ndev);
->> +			mutex_unlock(&emac->ndev->phydev->lock);
->> +		}
-> 
-> What about the else case? The link settings are lost, and the MAC does
-> not work?
-> 
+vmci_transport_dgram_dequeue lack of buffer length validation before
+accessing `vmci_datagram` header.
 
-Actually this if else is not needed at all. If phydev == NULL, the
-driver would have already returned -ENODEV in emac_phy_connect() and the
-device's probe would have failed.
+Trigger Path:
+1. Attacker sends a datagram with length < sizeof(struct
+   vmci_datagram).
+2. `skb_recv_datagram()` returns the malformed sk_buff (skb->len <
+   sizeof(struct vmci_datagram)).
+3. Code casts skb->data to struct vmci_datagram *dg without verifying
+   skb->len.
+4. Accessing `dg->payload_size` (Line: `payload_len =
+   dg->payload_size;`) reads out-of-bounds memory.
 
-If we have reached this point that means phydev is not null and there is
-no need for this check.
+Fixes: d021c344051a ("VSOCK: Introduce VM Sockets")
+Reported-by: TCS Robot <tcs_robot@tencent.com>
+Signed-off-by: Henry Martin <bsdhenryma@tencent.com>
+---
+ net/vmw_vsock/vmci_transport.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-I will drop this if check and send a v3.
-
-> 	Andrew
-
+diff --git a/net/vmw_vsock/vmci_transport.c b/net/vmw_vsock/vmci_transport.c
+index 7eccd6708d66..0be605e19b2e 100644
+--- a/net/vmw_vsock/vmci_transport.c
++++ b/net/vmw_vsock/vmci_transport.c
+@@ -1749,6 +1749,11 @@ static int vmci_transport_dgram_dequeue(struct vsock_sock *vsk,
+ 	if (!skb)
+ 		return err;
+ 
++	if (skb->len < sizeof(struct vmci_datagram)) {
++		err = -EINVAL;
++		goto out;
++	}
++
+ 	dg = (struct vmci_datagram *)skb->data;
+ 	if (!dg)
+ 		/* err is 0, meaning we read zero bytes. */
 -- 
-Thanks and Regards,
-Danish
+2.41.3
 
 
