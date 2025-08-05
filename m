@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-211697-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211698-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DE2AB1B4D8
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 15:24:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BA51EB1B4E0
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 15:27:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D1741887BC4
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 13:24:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8229A1891ECF
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 13:27:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89B1D275113;
-	Tue,  5 Aug 2025 13:24:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC50E246BB6;
+	Tue,  5 Aug 2025 13:27:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from alt12.smtp-out.videotron.ca (alt12.smtp-out.videotron.ca [135.19.0.25])
+Received: from alt22.smtp-out.videotron.ca (alt22.smtp-out.videotron.ca [70.80.0.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 395B72750E3
-	for <netdev@vger.kernel.org>; Tue,  5 Aug 2025 13:24:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=135.19.0.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3237D15C15F
+	for <netdev@vger.kernel.org>; Tue,  5 Aug 2025 13:27:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=70.80.0.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754400253; cv=none; b=LeCb+vz6MSYr8WeI3WnKtaenjCcPdpm56WMNuwAfR0E4M/vuolBs+4wHKzdxnj/dVbMWORCPmShSK0KXDpdApnJ3GiG6Z4S8oIPZottbp56gleS2Gd+eeQssuplojroZDFtU/+GO0iAEQnPEbRYkYZK/lywFahbNCRm3oEHANjs=
+	t=1754400440; cv=none; b=cZoF3rSfWzaZKne07xF4x/3rQqv/lSUyibSB9vMmL6U/aVQ9nDbaR0kW39W2QmccMR4YXWbKHjWY0rcqFjxAPem6fWVDG/OmWKZiqufZTOYz4/vmHmypnTFFhAOF9L3RI8eUS8TVScKSkq7aL/BX6mc4nzzheFvB6ffc1YUhdxM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754400253; c=relaxed/simple;
-	bh=g+m/Uo0DITnACavjUWGJ8scSwkJC1S4pNHPbGcI27WU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jJYXtQ/nSwRZvQsQM5G/4bYbtr8pKdnjksuUkWY4LD0rfQSRvjQ94p6VfeMdNmwQk30OIWyQBqZfkhQBTP2zOaLtcQicgbvdRKWm65S2oEE8Y99lbQVLL76Ss5YfOCokdoGA1J6BkziQIU2gJP2DpERrDkIA2XSrAdOYNRUvCt8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=redhat.com; spf=fail smtp.mailfrom=redhat.com; arc=none smtp.client-ip=135.19.0.25
+	s=arc-20240116; t=1754400440; c=relaxed/simple;
+	bh=O7zxHYQBP4r1blYzmk5/ehXT3Nic071pBH3ClmJBZ+0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gmsq4oUvmR7E/zsUQdJcRuUUduhI45S3v6zjZ8midBNTd95ja+BBO64WZIr23MN7nQEN4v8AYTPKnmhZOtBSRlazC1XOWiJ4ZACBKj7JwHuNbaDTVec3QKAjxbDbAY6PlANmSQravV6fc6ExZbiSkz3y0zAbXK8DpMI2w9nqjbY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=redhat.com; spf=fail smtp.mailfrom=redhat.com; arc=none smtp.client-ip=70.80.0.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=redhat.com
 Received: from zappa.orion ([24.201.91.161])
 	by Videotron with ESMTP
-	id jHcbuxpWVQQxnjHcbufsGB; Tue, 05 Aug 2025 09:22:33 -0400
+	id jHfeuqfDX0d8ejHfeuHuwm; Tue, 05 Aug 2025 09:25:41 -0400
 X-ORIG-RCPT: davem@davemloft.net,edumazet@google.com,anthony.l.nguyen@intel.com,przemyslaw.kitszel@intel.com,horms@kernel.org,kuba@kernel.org,andrew+netdev@lunn.ch,dhill@redhat.com,pabeni@redhat.com,netdev@vger.kernel.org
-X-Authority-Analysis: v=2.4 cv=CpwccW4D c=1 sm=1 tr=0 ts=68920599
+X-Authority-Analysis: v=2.4 cv=I/zGR8gg c=1 sm=1 tr=0 ts=68920655
  a=OPdtphJVnnJ7kPN51veEEg==:117 a=OPdtphJVnnJ7kPN51veEEg==:17
  a=2OwXVqhp2XgA:10 a=20KFwNOVAAAA:8 a=B84hUlnxZVGoqRvv9U4A:9
 Received: from knox.orion (unknown [192.168.1.37])
-	by zappa.orion (Postfix) with ESMTP id A52EACEE;
-	Tue, 05 Aug 2025 09:21:52 -0400 (EDT)
+	by zappa.orion (Postfix) with ESMTP id 224071036;
+	Tue, 05 Aug 2025 09:25:05 -0400 (EDT)
 From: David Hill <dhill@redhat.com>
 To: netdev@vger.kernel.org
 Cc: horms@kernel.org,
@@ -50,8 +50,8 @@ Cc: horms@kernel.org,
 	pabeni@redhat.com,
 	David Hill <dhill@redhat.com>
 Subject: [PATCH] PATCH: i40e Improve trusted VF MAC addresses logging when limit is reached
-Date: Tue,  5 Aug 2025 09:21:49 -0400
-Message-ID: <20250805132149.2601995-1-dhill@redhat.com>
+Date: Tue,  5 Aug 2025 09:25:02 -0400
+Message-ID: <20250805132502.2602549-1-dhill@redhat.com>
 X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -61,15 +61,15 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Binarystorm-MailScanner-Information: Please contact the ISP for more information
-X-Binarystorm-MailScanner-ID: A52EACEE.A2EA8
+X-Binarystorm-MailScanner-ID: 224071036.AC969
 X-Binarystorm-MailScanner: Found to be clean
 X-Binarystorm-MailScanner-SpamCheck: not spam, SpamAssassin (not cached,
 	score=-0.01, required 7, ALL_TRUSTED -0.01)
 X-Binarystorm-MailScanner-From: dhill@redhat.com
-X-CMAE-Envelope: MS4xfC3RC9UUwsuJaHoCQVS6+5sVOvmuiuFLlIPVF1ev8DXT0mTDKPdwwUFZOB/QrvjmUtQhUXsUHjXBhQ3Je786g3c5WfL/xhCqx+aNzCBHjrFn+tUAWXtk
- bv7K9Bk8Gr1ypYFObVR8Qs8bHLBq0LBsf+ZOky2VJ7bgvMNrL+HyP+khmyaXjScRYdkQU2cq8N01+r+T95xrS6vtnZIuRAfLcvZxmcqP9wxxPcHFcVLETENe
- FuilqTj/iHnfYesMT1bcXUvLP85AuN1JjFrva0kV7NSjXAsapZEiOs5W2hQABt2WNZ2n2n0xQVuXS7JqG4w1EcneIAJkdx54EAgChsSiMzOvFaihix7MK5yJ
- bVYKLqV1aQwWVvoxg+Wq2ZdwKwWS9EEOGRjOkHjQhO0gMRlNxXWHkaABdOiwd90Izi7e1oSzjIn76BoOxRLGdNl0VWRnU4mgNdrkqcSXuuyse3DRdPs=
+X-CMAE-Envelope: MS4xfFeWlbpwk7R9Vnw7LBlxDI/2EMTSC54CC8fybPDAyOWdb6IrhM5GKCbK0DyEykmRgpL2geZmV/nlAxVMC0InVU9iH5haZETbUzPX9qtb0qXBCL8NocR0
+ 3KXtuMrVgvt+/JK+y3KPI/we/u/vNiRMlFLuQk6NXbhElFM/bRjGcQ/JFe340zxwZQG+8Trdu6D4RAhupQhZ2kdIRXdsv4pwQzjl0A+fNC1bafyjqYbySz2K
+ uZ4DLgCc8Np60EIsFS77vINxFbnGvI1PLxNDkg37CeOIqRDLYm+I3anZ0tHS9a4ABn95CJ5kgCgg6PLG/duV4sbzKJx96B1kEMiUvLjQT3JFMhmhPdDSkt3C
+ 9t87Cv2C1Fkm5wg5xLdRFKOW/ajXztvWad668AkR6drpQZSwgOBxduMbTGEfF0zDrTAYKWbJRhTgReYGSsdzvhq9UaDMCPQUrXtBgSlycvwwQXWCimA=
 
 When a VF reaches the limit introduced in this commit [1], the host reports
 an error in the syslog but doesn't mention which VF reached its limit and
@@ -86,19 +86,17 @@ Signed-off-by: David Hill <dhill@redhat.com>
  1 file changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-index 9b8efdeafbcf..eb587e2bb35f 100644
+index 9b8efdeafbcf..c66c8bbc3993 100644
 --- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
 +++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-@@ -2911,6 +2911,8 @@ static inline int i40e_check_vf_permission(struct i40e_vf *vf,
- 			return -EINVAL;
- 		}
+@@ -2932,13 +2932,14 @@ static inline int i40e_check_vf_permission(struct i40e_vf *vf,
+ 			++mac2add_cnt;
+ 	}
  
-+		int new_count = i40e_count_filters(vsi) + mac2add_cnt;
-+		int max_macvlan = I40E_VC_MAX_MACVLAN_PER_TRUSTED_VF(pf->num_alloc_vfs, hw->num_ports);
- 		/* If the host VMM administrator has set the VF MAC address
- 		 * administratively via the ndo_set_vf_mac command then deny
- 		 * permission to the VF to add or delete unicast MAC addresses.
-@@ -2937,8 +2939,7 @@ static inline int i40e_check_vf_permission(struct i40e_vf *vf,
++	int new_count = i40e_count_filters(vsi) + mac2add_cnt;
++	int max_macvlan = I40E_VC_MAX_MACVLAN_PER_TRUSTED_VF(pf->num_alloc_vfs, hw->num_ports);
+ 	/* If this VF is not privileged, then we can't add more than a limited
+ 	 * number of addresses. Check to make sure that the additions do not
  	 * push us over the limit.
  	 */
  	if (!test_bit(I40E_VIRTCHNL_VF_CAP_PRIVILEGE, &vf->vf_caps)) {
