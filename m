@@ -1,94 +1,145 @@
-Return-Path: <netdev+bounces-211685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3FF1B1B2A1
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 13:34:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C97CDB1B2CF
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 13:53:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id DA3134E052B
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 11:34:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 876EE3B3BD4
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 11:53:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1261246BB6;
-	Tue,  5 Aug 2025 11:34:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 844D224DCF9;
+	Tue,  5 Aug 2025 11:53:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="wwl9iJ+I"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5901F199252
-	for <netdev@vger.kernel.org>; Tue,  5 Aug 2025 11:34:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E4C81D7E5B;
+	Tue,  5 Aug 2025 11:53:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.132.182.106
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754393644; cv=none; b=Cx63f0EwOMAQsj4brPGuS8u6jgyrScl/FmOO0Qe9ccmxVGIu1CK5F8SqvTH/T/RRE+XYwHIsmZvtgT4szVCwmpJHpK2nW2Bpau43rLr1eBmknjxk6jn2gy2Sx1tXHeOrxaQ6AyLU4GPeRq8qS8eB39d9vNdnMFjFsEDEOiAYIv8=
+	t=1754394810; cv=none; b=fGC/YbiqfNINn1pnSCcxrYsPYqKkF4ajRg4XhAp6s4VGkbfkaCXa+Nw2T0vpMFbQ5mefJ4dSOHcTaUHb3+EoFzZyttQfK3oupI34OSz9NJHoYgr/R7w+A1x3w9ev8TvuDibRF147EI1qLF4DhP0UIbwSvjgLxRXD5F5BeACCA/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754393644; c=relaxed/simple;
-	bh=Sflcpsg0PD5XG5dljOG1ybZHenmBO0Bu1t55tSERMg8=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=NbmeowSJqZ+dJup2fttQ7XRZPZ7x87uCB9M1yIc6RsbrC6/ALH4nMj7MHsrWqNYdOVjmHmy5jFe0Nv3ZBh6GP5lLFmLlnRSwbz1heWIktDJgiGU4VAmMRw9SqPwxm1jW/oLH414GTdxYxhW/iBfj/3cIdWVaWApDpB40d2IMt6g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-8760733a107so551928039f.3
-        for <netdev@vger.kernel.org>; Tue, 05 Aug 2025 04:34:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754393642; x=1754998442;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=95FWEmXIfrIEO/zYb45Z4W0pP1aqivE7KsjXCppK0uA=;
-        b=VssjNnTxk+3UZIAnzl2bShepc4FqGPs/9OuSsKWTaMoAc0TBCKxZ2176GUCqiClqJu
-         Mm4cr68gCUVEmO2TINDAXFtq+PIkFqDdnTt/ufZ0zME3oK5Y1UnNhn9x0WBUd3rIIQhr
-         C2UK2Wcl9ZZCm+7rQIAuXTt85mPN6QHXmuZnp9HbGUwm3OHcM1W7OEaArhDkuE33jZe5
-         l1kyT1RFWZtBf/t9yozkmIY2S7ffn/ELM4f/CQ3BRD7tyWjDWDqYx4d1mmNAmP8aHsBB
-         GhhU+PJ9gopGCguh90QKcXcRXWJLMD3nUBGoUiWzvSQ6OAXXupskcxjBSAKNMB4IF3Il
-         5XOg==
-X-Forwarded-Encrypted: i=1; AJvYcCXvFKHZuBwChQsynOhkzjNqgtut7bnUaUnx0EOnCJEgBd4liQb9htrEX16eN5016LfgrO9osUw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJxg8Hlpsd34InYtyxL54RHYAviroDBMXIgvqD3waiGk8M6XsR
-	ko4dtGrVF8ncR3iJf2k/UxfhGGUmfwjh1CnjZ83GKar3ghQT6wBTZx9f1fczuqo3GtNOEo4D4QU
-	gzs7lD7B8+ZLnSKMjsgC/aF24kcbWrMp2LeVumKajvh5Rb+byj8qkJubuE+o=
-X-Google-Smtp-Source: AGHT+IFMu0t0Nn/b9qQTRS7KeyLXQj5B5JqMmtkPaTMaH+YrEoz27P7XhK1L1Ba/Tj2GJG85jei9IWOi9alFMFHti0KIahs+RlUF
+	s=arc-20240116; t=1754394810; c=relaxed/simple;
+	bh=WRdngEMWr5emC4tZA/PBQpV5+c3Yw6c9CnLLz0i9C9w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=HPF1CzVC5G8z3Stsr7+uXIZvslh3VC66WwocVtHHqL7eVtBS01nFZRlleVGRM0eJ5JiufQIwir9Ldm/ozfGo8/nqIgckAbl+2JkiEHLSSpdtqCAurL78pOeH50AUM8WtABFwewfHyOzQVHdbmX/daD6jsJr3OGlriwGQnDej8XY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=wwl9iJ+I; arc=none smtp.client-ip=185.132.182.106
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
+Received: from pps.filterd (m0369458.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5759LHwB006190;
+	Tue, 5 Aug 2025 13:52:48 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=selector1; bh=
+	vYofx1rgOkS6euoEnD5cIWfWqSH84c0L9K8aBMbtQtY=; b=wwl9iJ+ILPZboT9s
+	VKEu1riEx4ojW5MJRXaLYYSUBfJIu7Udwhj68ECEYHqCmhfyyyzFM2QfyiXrVrOk
+	9fiMaEDoapg/dierdu9475AIgK/LFHR29eolkKjkWQ3kSIWb1bFJLLCTQA1nIx0N
+	3AfT0k2w0KxcKfvE152IijrdQvY20wSMOOaPSjPWQALpNbyusyOVsRHxGgGXUma5
+	93LwFNaTONFiqO7vY7OMHGoe3Uutl58Cjnr07T7XrQislLR90oEudhKcTZT8atXI
+	rwhGVeIyOnNlRYVHMfiTCRtJ6ja0S4a+mXUAOoGGvMGZ2xh+QVYn63eHXgHbwzun
+	GNIyFw==
+Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 489v861e7d-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 05 Aug 2025 13:52:48 +0200 (MEST)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 1851740046;
+	Tue,  5 Aug 2025 13:51:21 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 4D13273294D;
+	Tue,  5 Aug 2025 13:50:31 +0200 (CEST)
+Received: from [10.48.87.141] (10.48.87.141) by SHFDAG1NODE1.st.com
+ (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 5 Aug
+ 2025 13:50:30 +0200
+Message-ID: <54530300-82c5-41af-adc6-8d0a45f9b37b@foss.st.com>
+Date: Tue, 5 Aug 2025 13:50:19 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:2507:b0:3e3:c918:e3b6 with SMTP id
- e9e14a558f8ab-3e41607aa64mr220823675ab.0.1754393642206; Tue, 05 Aug 2025
- 04:34:02 -0700 (PDT)
-Date: Tue, 05 Aug 2025 04:34:02 -0700
-In-Reply-To: <67f66c9c.050a0220.25d1c8.0003.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6891ec2a.050a0220.7f033.0021.GAE@google.com>
-Subject: Re: [syzbot] [net?] KASAN: null-ptr-deref Write in rcuref_put (4)
-From: syzbot <syzbot+27d7cfbc93457e472e00@syzkaller.appspotmail.com>
-To: atenart@kernel.org, davem@davemloft.net, dawid.osuchowski@linux.intel.com, 
-	edumazet@google.com, gal@nvidia.com, horms@kernel.org, kuba@kernel.org, 
-	kuniyu@google.com, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/2] drivers: net: stmmac: add
+ STMMAC_RELATIVE_FLEX_PPS
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+CC: Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Maxime Coquelin
+	<mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Richard Cochran <richardcochran@gmail.com>, <netdev@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
+References: <20250724-relative_flex_pps-v1-0-37ca65773369@foss.st.com>
+ <20250724-relative_flex_pps-v1-1-37ca65773369@foss.st.com>
+ <aJHdNMWPqNsU9AiK@shell.armlinux.org.uk>
+Content-Language: en-US
+From: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
+In-Reply-To: <aJHdNMWPqNsU9AiK@shell.armlinux.org.uk>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SHFCAS1NODE1.st.com (10.75.129.72) To SHFDAG1NODE1.st.com
+ (10.75.129.69)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-05_03,2025-08-04_01,2025-03-28_01
 
-syzbot has bisected this issue to:
 
-commit de9c4861fb42f0cd72da844c3c34f692d5895b7b
-Author: Eric Dumazet <edumazet@google.com>
-Date:   Tue Jul 29 08:02:07 2025 +0000
 
-    pptp: ensure minimal skb length in pptp_xmit()
+On 8/5/25 12:30, Russell King (Oracle) wrote:
+> On Thu, Jul 24, 2025 at 02:31:18PM +0200, Gatien Chevallier wrote:
+>> +config STMMAC_RELATIVE_FLEX_PPS
+>> +	bool "Support for STMMAC system time relative flexible PPS generation"
+>> +	default n
+> 
+> There is no need for "default n" because the default default is n.
+>
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=17cb2042580000
-start commit:   5c5a10f0be96 Add linux-next specific files for 20250804
-git tree:       linux-next
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=142b2042580000
-console output: https://syzkaller.appspot.com/x/log.txt?x=102b2042580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=f4ccbd076877954b
-dashboard link: https://syzkaller.appspot.com/bug?extid=27d7cfbc93457e472e00
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1628faa2580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12490434580000
+>> +	help
+>> +	  Say Y to add the MAC system time to the arguments passed to the
+>> +	  PTP driver when requesting a flexible PPS generation. This avoids
+>> +	  the tedious task of passing an absolute time value when using sysfs
+>> +	  entry.
+> 
+> How does a distro decide whether to enable or disable this option? What
+> does it depend on?
+> 
+> If it's only for some platforms and not others (due to causing
+> regressions) then what is a distro supposed to do with their kernels
+> that support multiple platforms?
+> 
 
-Reported-by: syzbot+27d7cfbc93457e472e00@syzkaller.appspotmail.com
-Fixes: de9c4861fb42 ("pptp: ensure minimal skb length in pptp_xmit()")
+Hello Russell,
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+Following Jakub's feedback, I sent a v2 [1] with this config removed.
+The idea now is to compare the time value given to the stmmac_ptp driver
+and compare it to the MAC system time. If the time value is is the past,
+relative to the MAC system time, then it is considered as an offset
+relative the the MAC system time.
+
+It's not ideal as it would have probably been better to always consider
+an offset but I don't know how popular and used this feature currently
+is. Therefore, I did not want to break any existing script by changing
+the current behavior.
+
+I'd be very interested to have your take on this as well.
+
+ From what I observed, it's linked to the MAC version. So enabling this
+config would have meant knowing what MAC version is embedded. Supporting
+multiple platforms then becomes tricky.
+
+[1]: 
+https://lore.kernel.org/all/20250729-relative_flex_pps-v2-0-3e5f03525c45@foss.st.com/
 
