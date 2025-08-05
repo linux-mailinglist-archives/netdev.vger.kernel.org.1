@@ -1,66 +1,57 @@
-Return-Path: <netdev+bounces-211823-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211824-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34ABCB1BCC5
-	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 00:46:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52577B1BCDB
+	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 00:55:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E65116E78F
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 22:46:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0DD103ADD63
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 22:55:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 002E2221DB6;
-	Tue,  5 Aug 2025 22:46:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C926E29B22D;
+	Tue,  5 Aug 2025 22:55:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f3ciXNWT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kz2TlXox"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5C802E36F0;
-	Tue,  5 Aug 2025 22:46:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A52EE29B205
+	for <netdev@vger.kernel.org>; Tue,  5 Aug 2025 22:55:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754433966; cv=none; b=clZ0n77B5gmiWRNUYYo4UcB0y8yA0XG0MsSCebSOK1RHCLCPqKoVnfLJXtxSs4KIvF77bvUDNFZXlNPZTK7t+jIf5VXbpnjFT86vI27q6MemDdzXUWF3q0g6T+pw425fZ2q02K4AOsncWoG/AyQ8/niT0s/TuPDLfD7ExLYyHNw=
+	t=1754434551; cv=none; b=WUP8FsYIBQ6b7+P3h1bn54nteHRbFzAQDgyg/bKZwQSoOKliNerCuBCJNLvCCQKr/I1gEKG4f9oZX3wHeMgtlNw8jjE7o9sKtpBGmY8zXX0+3+KD4Hflrc8Fbe7bl4hKoPANx6IIOoLnPyRxciKNOPY6AKr1uX5f7NRUkr6T7PI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754433966; c=relaxed/simple;
-	bh=NqAn7xkr0Rfx37RWYqFvxyrYUe9MsAbnMN8SOZ0XZ8A=;
+	s=arc-20240116; t=1754434551; c=relaxed/simple;
+	bh=RlUsvQ/Llq5Fl7ttub6wcHVhYvkQdpaoa6I7TUC4vCM=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gvtko5+WrWzti0BGVQu3wa4iAiacnckZKay7wtbjVzm9pk/mfvGH54egdtoweGAuXqfJ6Oatczm210JKd9V8Upum527H+LTCsY62UGU3BS16p8RPVABWbxfr0yDxG3bcxb13zpFM0MXGJaS65OkvP0G7POU/6uWMBm/imJW5oLE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f3ciXNWT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4400C4CEF0;
-	Tue,  5 Aug 2025 22:46:05 +0000 (UTC)
+	 MIME-Version:Content-Type; b=EEqaa657nFZQdaeU34E5E6uc7cxhWZjUU6ObCM3sVPUNAPMpZEHzNStW0QSZCbceSzv5OwFaaboaHhGPK/nIl3F7nanehrDsWLweY5harWynMCturCVe3rwjI/oVvxFehNYtf6Hc+Wa+KMKf0jFQ0N6C0/fPBdRGegRmaj2wlIY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kz2TlXox; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEB8DC4CEF0;
+	Tue,  5 Aug 2025 22:55:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754433966;
-	bh=NqAn7xkr0Rfx37RWYqFvxyrYUe9MsAbnMN8SOZ0XZ8A=;
+	s=k20201202; t=1754434551;
+	bh=RlUsvQ/Llq5Fl7ttub6wcHVhYvkQdpaoa6I7TUC4vCM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=f3ciXNWTApQibSjgZTVBIQ1cfxquSZMI/00XCX77N9oGij/RpxiPKAUV4q3Brivk3
-	 VahaglYpe02/YuF/x1S9+U9CKzsJKDnd0e099GnXRys/MKRtq5QwNcGJrQ+OGkqS3Q
-	 nwSxEwzT4mkMC9oahFyy8cmWtOY+QeZQtuaOohxHzwLjMFMHMbMR4fNKthJ+UAyC8F
-	 70uPWfb/uaah7OOzIMUSOP8Fgyzzb0QM06zlJppwgB7IZco4rh5pX/lsJxWCVO32F0
-	 5TvqJ+3oajZpY1dPkAJNfduWnl4Z/Qp0S9S2WYuZPzoQE5IcujFxxhf1FBoGN+syrX
-	 4N/DDJOwAvRbQ==
-Date: Tue, 5 Aug 2025 15:46:04 -0700
+	b=kz2TlXox2xlCpeaViniyaAIJOAcPEHAbLB3kAYinik9KcjaFyt7WGZd5MuFUQhf9Z
+	 VKc2mod3Em+v+qEItp2OOkl/7QvhlEa6m9e6i8QDwdUe6dyUxpEYXTV84ovJZMmpOx
+	 HG/GzcGlgSykjKW1Is94jPbIcphiiuCRP3LLdOqZZ25qopi+xl2GO2J2mqLDnOimCt
+	 V7byL1CecEaOV2/5B8weIbsV97x2tnJAU4jxKzwz34DrvfcwuA2lpcbuhtO6iz4usq
+	 yJKcrL7fZjAc7f0gyoSsJTa0ZgQCaDUztv+1bAEweNDZnFyz8ci5oIB68MoPKL13vx
+	 DTsAdN5ksZI7w==
+Date: Tue, 5 Aug 2025 15:55:50 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: <intel-wired-lan@lists.osuosl.org>, Michal Kubiak
- <michal.kubiak@intel.com>, Maciej Fijalkowski
- <maciej.fijalkowski@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, "Paolo Abeni" <pabeni@redhat.com>, Alexei
- Starovoitov <ast@kernel.org>, "Daniel Borkmann" <daniel@iogearbox.net>,
- Simon Horman <horms@kernel.org>,
- <nxne.cnse.osdt.itp.upstreaming@intel.com>, <bpf@vger.kernel.org>,
- <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH iwl-next v3 16/18] idpf: add support for XDP on Rx
-Message-ID: <20250805154604.680bde07@kernel.org>
-In-Reply-To: <a151336a-eda4-4f44-9ab5-da79e7712838@intel.com>
-References: <20250730160717.28976-1-aleksander.lobakin@intel.com>
-	<20250730160717.28976-17-aleksander.lobakin@intel.com>
-	<20250801153343.74e0884b@kernel.org>
-	<a151336a-eda4-4f44-9ab5-da79e7712838@intel.com>
+To: Dennis Chen <dechen@redhat.com>
+Cc: netdev@vger.kernel.org, dchen27@ncsu.edu, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, andrew+netdev@lunn.ch,
+ petrm@nvidia.com
+Subject: Re: [PATCH net-next 0/3] netdevsim: Add support for ethtool stats
+ and add
+Message-ID: <20250805155550.3ed93078@kernel.org>
+In-Reply-To: <20250805213356.3348348-1-dechen@redhat.com>
+References: <20250805213356.3348348-1-dechen@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,23 +61,24 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 5 Aug 2025 18:09:40 +0200 Alexander Lobakin wrote:
-> From: Jakub Kicinski <kuba@kernel.org>
-> Date: Fri, 1 Aug 2025 15:33:43 -0700
+On Tue,  5 Aug 2025 17:33:53 -0400 Dennis Chen wrote:
+> This series adds support for querying standard interface stats and
+> driver-specific stats with ethtool -S. This allows hardware-independent
+> testing of ethtool stats reporting. Driver-specific stats are incremented
+> every 100ms once enabled through a debugfs toggle.
 > 
-> > On Wed, 30 Jul 2025 18:07:15 +0200 Alexander Lobakin wrote:  
-> >> Use __LIBETH_WORD_ACCESS to parse descriptors more efficiently when
-> >> applicable. It really gives some good boosts and code size reduction
-> >> on x86_64.  
-> > 
-> > Could you perhaps quantify the goodness of the boost with a number? :)  
+> Also adds a selftest for ethtool -S for netdevsim.
 > 
-> Sure, only a matter of switching this definition and running the tests
-> (and bloat-o-meter).
-> Intel doesn't allow us to publish raw numbers (Gbps/Mpps), I hope the
-> diff in percents (+ bloat-o-meter output) would be enough?
+> The implementation of mock stats is heavily based on the mock L3 stats 
+> support added by commit 1a6d7ae7d63c45("netdevsim: Introduce support for
+> L3 offload xstats").
+> 
+> Note: Further replies will come from my school email address,
+> dchen27@ncsu.edu, as I will soon lose access to my Red Hat email.
 
-Yes, delta is perfect. Absolute numbers aren't very meaningful if you
-don't specify all HW components and FW versions, and direction of wind
-on the day, anyway :$
+The tests for netdevsim must test something meaningful in the kernel.
+This submission really looks like you need it to test some user space
+code.
+-- 
+pw-bot: reject
 
