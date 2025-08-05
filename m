@@ -1,126 +1,135 @@
-Return-Path: <netdev+bounces-211696-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211697-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E92A1B1B4B9
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 15:19:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DE2AB1B4D8
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 15:24:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B2F49188B00A
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 13:19:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D1741887BC4
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 13:24:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9574D2701B1;
-	Tue,  5 Aug 2025 13:18:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nxs7nYMF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89B1D275113;
+	Tue,  5 Aug 2025 13:24:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from alt12.smtp-out.videotron.ca (alt12.smtp-out.videotron.ca [135.19.0.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DBB71400C;
-	Tue,  5 Aug 2025 13:18:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 395B72750E3
+	for <netdev@vger.kernel.org>; Tue,  5 Aug 2025 13:24:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=135.19.0.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754399938; cv=none; b=r6hHkY+VUIzedFwdfIZYMHSzKZ3daWXM524JNcPP2Zc93fPbYq1iNrySzSdAThJ/3DyrapzbcBZUYfbso9V3iZ0bP8eMjYXkfcGRIh1FWCMySjF2f2rB6AOULFnO2qZkr20Kg1xyKxEkdJNoyWLyKP2gtQAfPZVMM0Drak5k7lQ=
+	t=1754400253; cv=none; b=LeCb+vz6MSYr8WeI3WnKtaenjCcPdpm56WMNuwAfR0E4M/vuolBs+4wHKzdxnj/dVbMWORCPmShSK0KXDpdApnJ3GiG6Z4S8oIPZottbp56gleS2Gd+eeQssuplojroZDFtU/+GO0iAEQnPEbRYkYZK/lywFahbNCRm3oEHANjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754399938; c=relaxed/simple;
-	bh=OHjUicsUZlkHwdg4ugCFnjwS/GSbn89jRg68HJnS6Qk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LEwPIJMkd4tIPRF5hT9St+WnoavlFYMv9w9kmq0ZYyCEGQcSof8n2f00PrKGown/2MB0tdavAWakN64F2v3gbkSxWuMjkZadZfC9b6Jc9sEuhiLBNvS+Y446sRzB1cLZn+/ugZnZEB9M4G+pIPr0dN4+YTHeHIwjFukIK3osLiw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nxs7nYMF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEA16C4CEF0;
-	Tue,  5 Aug 2025 13:18:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754399937;
-	bh=OHjUicsUZlkHwdg4ugCFnjwS/GSbn89jRg68HJnS6Qk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nxs7nYMFq3438CqMT1f77mM1aIrryHBbO6BYL/iYXWSkNyDDWV+lyQhBCHvt25Ywf
-	 CWSpxFCQhJ60nR5bBcOkyZdbnsAkbGtwrrmgVG2oj3kuY5yjqCPsQ4KMqh/GR4/ty8
-	 fzBfyCPwOiiSq+5TBPj0s5xR9uPrfbg1JQhyhQOgkKSP6/7Z/pVL5j5Oo+kUV7Y3ch
-	 WFAkKvjWQ27h2O5Gu84+0bTduuB83ciHSetN6izAnClt+jlyfdQSUxbUEyYX63XtQ+
-	 umltHvloGoi7TfGWm4dfEvj7fDz39kdbp0KF8qDIF7hdOdX6VUoHC8geKg2F4Fz7g6
-	 eHW3ahxiK7JJg==
-Date: Tue, 5 Aug 2025 15:18:52 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>,
-	Stanislav Fomichev <stfomichev@gmail.com>, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <borkmann@iogearbox.net>,
-	Eric Dumazet <eric.dumazet@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>, sdf@fomichev.me,
-	kernel-team@cloudflare.com, arthur@arthurfabre.com,
-	jakub@cloudflare.com, Jesse Brandeburg <jbrandeburg@cloudflare.com>
-Subject: Re: [PATCH bpf-next V2 0/7] xdp: Allow BPF to set RX hints for
- XDP_REDIRECTed packets
-Message-ID: <aJIEvK0CU_BqqgPQ@lore-rh-laptop>
-References: <aHeKYZY7l2i1xwel@lore-desk>
- <20250716142015.0b309c71@kernel.org>
- <fbb026f9-54cf-49ba-b0dc-0df0f54c6961@kernel.org>
- <20250717182534.4f305f8a@kernel.org>
- <ebc18aba-d832-4eb6-b626-4ca3a2f27fe2@kernel.org>
- <20250721181344.24d47fa3@kernel.org>
- <aIdWjTCM1nOjiWfC@lore-desk>
- <20250728092956.24a7d09b@kernel.org>
- <aIvdlJts5JQLuzLE@lore-rh-laptop>
- <20250801134045.4344cb44@kernel.org>
+	s=arc-20240116; t=1754400253; c=relaxed/simple;
+	bh=g+m/Uo0DITnACavjUWGJ8scSwkJC1S4pNHPbGcI27WU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jJYXtQ/nSwRZvQsQM5G/4bYbtr8pKdnjksuUkWY4LD0rfQSRvjQ94p6VfeMdNmwQk30OIWyQBqZfkhQBTP2zOaLtcQicgbvdRKWm65S2oEE8Y99lbQVLL76Ss5YfOCokdoGA1J6BkziQIU2gJP2DpERrDkIA2XSrAdOYNRUvCt8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=redhat.com; spf=fail smtp.mailfrom=redhat.com; arc=none smtp.client-ip=135.19.0.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=redhat.com
+Received: from zappa.orion ([24.201.91.161])
+	by Videotron with ESMTP
+	id jHcbuxpWVQQxnjHcbufsGB; Tue, 05 Aug 2025 09:22:33 -0400
+X-ORIG-RCPT: davem@davemloft.net,edumazet@google.com,anthony.l.nguyen@intel.com,przemyslaw.kitszel@intel.com,horms@kernel.org,kuba@kernel.org,andrew+netdev@lunn.ch,dhill@redhat.com,pabeni@redhat.com,netdev@vger.kernel.org
+X-Authority-Analysis: v=2.4 cv=CpwccW4D c=1 sm=1 tr=0 ts=68920599
+ a=OPdtphJVnnJ7kPN51veEEg==:117 a=OPdtphJVnnJ7kPN51veEEg==:17
+ a=2OwXVqhp2XgA:10 a=20KFwNOVAAAA:8 a=B84hUlnxZVGoqRvv9U4A:9
+Received: from knox.orion (unknown [192.168.1.37])
+	by zappa.orion (Postfix) with ESMTP id A52EACEE;
+	Tue, 05 Aug 2025 09:21:52 -0400 (EDT)
+From: David Hill <dhill@redhat.com>
+To: netdev@vger.kernel.org
+Cc: horms@kernel.org,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	David Hill <dhill@redhat.com>
+Subject: [PATCH] PATCH: i40e Improve trusted VF MAC addresses logging when limit is reached
+Date: Tue,  5 Aug 2025 09:21:49 -0400
+Message-ID: <20250805132149.2601995-1-dhill@redhat.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="66vdEE4zFPmram4Z"
-Content-Disposition: inline
-In-Reply-To: <20250801134045.4344cb44@kernel.org>
+Content-Transfer-Encoding: 8bit
+X-Binarystorm-MailScanner-Information: Please contact the ISP for more information
+X-Binarystorm-MailScanner-ID: A52EACEE.A2EA8
+X-Binarystorm-MailScanner: Found to be clean
+X-Binarystorm-MailScanner-SpamCheck: not spam, SpamAssassin (not cached,
+	score=-0.01, required 7, ALL_TRUSTED -0.01)
+X-Binarystorm-MailScanner-From: dhill@redhat.com
+X-CMAE-Envelope: MS4xfC3RC9UUwsuJaHoCQVS6+5sVOvmuiuFLlIPVF1ev8DXT0mTDKPdwwUFZOB/QrvjmUtQhUXsUHjXBhQ3Je786g3c5WfL/xhCqx+aNzCBHjrFn+tUAWXtk
+ bv7K9Bk8Gr1ypYFObVR8Qs8bHLBq0LBsf+ZOky2VJ7bgvMNrL+HyP+khmyaXjScRYdkQU2cq8N01+r+T95xrS6vtnZIuRAfLcvZxmcqP9wxxPcHFcVLETENe
+ FuilqTj/iHnfYesMT1bcXUvLP85AuN1JjFrva0kV7NSjXAsapZEiOs5W2hQABt2WNZ2n2n0xQVuXS7JqG4w1EcneIAJkdx54EAgChsSiMzOvFaihix7MK5yJ
+ bVYKLqV1aQwWVvoxg+Wq2ZdwKwWS9EEOGRjOkHjQhO0gMRlNxXWHkaABdOiwd90Izi7e1oSzjIn76BoOxRLGdNl0VWRnU4mgNdrkqcSXuuyse3DRdPs=
+
+When a VF reaches the limit introduced in this commit [1], the host reports
+an error in the syslog but doesn't mention which VF reached its limit and
+what the limit is actually is which makes troubleshooting of networking
+issue a bit tedious.   This commit simply improves this error reporting
+by adding which VF number has reached a limit and what that limit is.
+
+[1] commit cfb1d572c986 ("i40e: Add ensurance of MacVlan resources for every
+trusted VF")
+
+Signed-off-by: David Hill <dhill@redhat.com>
+---
+ drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+index 9b8efdeafbcf..eb587e2bb35f 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+@@ -2911,6 +2911,8 @@ static inline int i40e_check_vf_permission(struct i40e_vf *vf,
+ 			return -EINVAL;
+ 		}
+ 
++		int new_count = i40e_count_filters(vsi) + mac2add_cnt;
++		int max_macvlan = I40E_VC_MAX_MACVLAN_PER_TRUSTED_VF(pf->num_alloc_vfs, hw->num_ports);
+ 		/* If the host VMM administrator has set the VF MAC address
+ 		 * administratively via the ndo_set_vf_mac command then deny
+ 		 * permission to the VF to add or delete unicast MAC addresses.
+@@ -2937,8 +2939,7 @@ static inline int i40e_check_vf_permission(struct i40e_vf *vf,
+ 	 * push us over the limit.
+ 	 */
+ 	if (!test_bit(I40E_VIRTCHNL_VF_CAP_PRIVILEGE, &vf->vf_caps)) {
+-		if ((i40e_count_filters(vsi) + mac2add_cnt) >
+-		    I40E_VC_MAX_MAC_ADDR_PER_VF) {
++		if ( new_count > I40E_VC_MAX_MAC_ADDR_PER_VF) {
+ 			dev_err(&pf->pdev->dev,
+ 				"Cannot add more MAC addresses, VF is not trusted, switch the VF to trusted to add more functionality\n");
+ 			return -EPERM;
+@@ -2949,11 +2950,10 @@ static inline int i40e_check_vf_permission(struct i40e_vf *vf,
+ 	 * all VFs.
+ 	 */
+ 	} else {
+-		if ((i40e_count_filters(vsi) + mac2add_cnt) >
+-		    I40E_VC_MAX_MACVLAN_PER_TRUSTED_VF(pf->num_alloc_vfs,
+-						       hw->num_ports)) {
++		if (new_count > max_macvlan) {
+ 			dev_err(&pf->pdev->dev,
+-				"Cannot add more MAC addresses, trusted VF exhausted it's resources\n");
++				"Cannot add more MAC addresses, trusted VF %d uses (%d/%d) MAC addresses\n",
++				vf->vf_id, new_count, max_macvlan);
+ 			return -EPERM;
+ 		}
+ 	}
+-- 
+2.50.1
 
 
---66vdEE4zFPmram4Z
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+-- 
+This message has been scanned for viruses and
+dangerous content by MailScanner, and is
+believed to be clean.
 
-On Aug 01, Jakub Kicinski wrote:
-> On Thu, 31 Jul 2025 23:18:12 +0200 Lorenzo Bianconi wrote:
-> > IIUC the 'set' proposal (please correct me if I am wrong), the eBPF pro=
-gram
-> > running on the NIC that is receiving the packet from the wire is suppos=
-ed
-> > to set (or update) the hw metadata info (e.g. RX HASH or RX checksum) in
-> > the RX DMA descriptor associated to the packet to be successively consu=
-med.
-> > Am I right?
->=20
-> I was thinking of doing the SET on the veth side. Basically the
-> metadata has to be understood by the stack only at the xdp->skb
-> transition point. So we can delay the SET until that moment, carrying
-> the information in program-specific format.
-
-ack, I am fine to delay the translation of the HW metadata from a HW
-specific format (the one contained in the DMA descriptor) to the network one
-when they are consumed to create the SKB (the veth driver in this case) but=
- I
-guess we need to copy the info contained in the DMA descriptor into a buffer
-that is still valid when veth driver consumes them since the DMA descriptor
-can be no longer available at that time. Do you agree or am I missing
-something?
-
-Regards,
-Lorenzo
-
---66vdEE4zFPmram4Z
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaJIEuQAKCRA6cBh0uS2t
-rJbPAQCnVy8nP3hB/qWMJSu1eNJ1JX7a1KpWvpfyQyV0rX2bogD8DmdzDldwqaiM
-HpeJWr+DYgj9ZOy59fcG7G3l2SjHoAs=
-=KBt3
------END PGP SIGNATURE-----
-
---66vdEE4zFPmram4Z--
 
