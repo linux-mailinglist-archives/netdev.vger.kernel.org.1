@@ -1,62 +1,71 @@
-Return-Path: <netdev+bounces-211837-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211838-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD784B1BD96
-	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 01:52:31 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04F04B1BD9A
+	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 01:54:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6869C3B4E0A
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 23:52:30 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E2E954E1A4F
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 23:54:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FC0F23C8AA;
-	Tue,  5 Aug 2025 23:52:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CFE0291C1B;
+	Tue,  5 Aug 2025 23:54:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="svnOlu0z"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YV++HVao"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A69E524F;
-	Tue,  5 Aug 2025 23:52:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 651C623C8AA;
+	Tue,  5 Aug 2025 23:54:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754437948; cv=none; b=cELJvMEfHsrLaRjs4rIjTijXmWrZVwP/8dLVgV1iCbWbu0x/ZbClz6mc1uZxwbeiIVth4lCbl/TH3A4oEzY8pn94O42dYZwCR1/te1G4oH5LVdq18nNnbBSphKeLF8kldg4spJSX4+kLXJOSfJF6rIY2ZVW90XZpD7Hjaz/oJH4=
+	t=1754438057; cv=none; b=YiKkEY9oEfAqXB0GQZPUjdhaHlo5WTXGktlXFXYM9YjkYBGV0oywc9mCFrwoxexW+uOODTdYr6UAQBjZ9pRx6iZisDanwujwYdHW0xb9cBKSb3fNIzKpS9EEf1VRXd65yKEV4REVVSW32+EpRzjlyYygeBJuOt7xqFpkz6bNi3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754437948; c=relaxed/simple;
-	bh=5wavID5SgygKJxkFM1G23hW3NF+9pXSnkSpRBS/F6so=;
+	s=arc-20240116; t=1754438057; c=relaxed/simple;
+	bh=7X9W3We3NWsmY4+eufCtinLLAGXHGhJ5FW/kGMQbtPY=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sRmo+t9kMc8iQNuPnFx6M8VfNLwH8ERsyTbJgUowTLIdI3378ftPn1idyIu36DBxjy1GkHuj7/zMH59ajL2BVn/8ToWH1oxUOMfy2Y3nwRSRAWsN6XVhU6Dwa/6PTg+2SWyg4K/qEPrFEpIJdDXHWh/kUo+ULh6V1dwCiWhYq0o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=svnOlu0z; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21025C4CEF0;
-	Tue,  5 Aug 2025 23:52:27 +0000 (UTC)
+	 MIME-Version:Content-Type; b=iwXet49caF+fV7xxsm9ATZhogI5B46CAz9MBvNbZHKAxJCVCTCWpud4mc9+g6SqS/NXTR9nw+0zlsxkASy4a0t+WSkCEY1w227Lc3Kr8dJhzRw+mr7llJuLXHW07zR+VvkqkbXiIH7pmFQLoRbUNeU+2OfYEAzYmG/nj6Ln3wXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YV++HVao; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7EC31C4CEF0;
+	Tue,  5 Aug 2025 23:54:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754437947;
-	bh=5wavID5SgygKJxkFM1G23hW3NF+9pXSnkSpRBS/F6so=;
+	s=k20201202; t=1754438056;
+	bh=7X9W3We3NWsmY4+eufCtinLLAGXHGhJ5FW/kGMQbtPY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=svnOlu0zFg4o4SUroMqabzFjHOZ7aAcQOayqdYK6IDdAVfyQFZkwuGXQ4uqaD/+IT
-	 k88dV+UX8pCZPAXKkqEuacQP85L7Y9I4XBkHu7em8l/N5kGyEqTWBHNTKhymxBPRLs
-	 skkTjzPyySD6PzYWSNQdxY0URpNu+Mkx2c6f0Qn+5dNoVe8YgrEeHmIsuVvU3WPOhB
-	 dbj9J/GFgyW4Q3d7MDFM9IuacQqsIrCbuM1PtMqr8awst6GJttuSEYl04eKqbJOEYp
-	 3t7X9/AsbJTLw9PszjlTHaNHvso+jTWQcH3zBBJLZC/0GjAWJkSkCq3RS3VxJazixL
-	 vtmsR5GlGj2hQ==
-Date: Tue, 5 Aug 2025 16:52:26 -0700
+	b=YV++HVaomwhS7PiSRdY+TWh8cEcAh6VOJfdA3SdtEuGw0YYhE+TbkaDYgnPeWbCOR
+	 tqvDMMx2p7PIoM4STIxgye9b8PCMxbnM/WQZfo5lkaHuqPJ2SrBKZ6f9b5yKMeAwHP
+	 beN2YprFySqA2ut7+bSED319ff7+BM9/ReQYi57jBR8vNDHdWoGfKxFODhJmPO4xoX
+	 NRVZOlPtMI8fLUaJwo+ekTFWG6cGlb4y9a9d3O+hqNuY8YWVIOP4LA2Ebi1NsHCo5q
+	 AuiApcVgl0wL3MzukEnE8x34Pmnja3tu9yp0YBRJiJlkBP3snUWAuVh5Wp0CFSSt3L
+	 703oUiTWUGVEQ==
+Date: Tue, 5 Aug 2025 16:54:14 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: tglx@linutronix.de
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, Jeongjun Park
- <aha310510@gmail.com>, richardcochran@gmail.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- yangbo.lu@nxp.com, anna-maria@linutronix.de, frederic@kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- syzbot+7cfb66a237c4a5fb22ad@syzkaller.appspotmail.com
-Subject: Re: [PATCH net v4] ptp: prevent possible ABBA deadlock in
- ptp_clock_freerun()
-Message-ID: <20250805165226.5e52e8a9@kernel.org>
-In-Reply-To: <20250729154811.a7lg26iuszzoo2sp@skbuf>
-References: <20250728062649.469882-1-aha310510@gmail.com>
-	<20250728062649.469882-1-aha310510@gmail.com>
-	<20250729154811.a7lg26iuszzoo2sp@skbuf>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>, Stanislav Fomichev
+ <stfomichev@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org, Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <borkmann@iogearbox.net>,
+ Eric Dumazet <eric.dumazet@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, sdf@fomichev.me,
+ kernel-team@cloudflare.com, arthur@arthurfabre.com, jakub@cloudflare.com,
+ Jesse Brandeburg <jbrandeburg@cloudflare.com>
+Subject: Re: [PATCH bpf-next V2 0/7] xdp: Allow BPF to set RX hints for
+ XDP_REDIRECTed packets
+Message-ID: <20250805165414.032db0b1@kernel.org>
+In-Reply-To: <aJIEvK0CU_BqqgPQ@lore-rh-laptop>
+References: <aHeKYZY7l2i1xwel@lore-desk>
+	<20250716142015.0b309c71@kernel.org>
+	<fbb026f9-54cf-49ba-b0dc-0df0f54c6961@kernel.org>
+	<20250717182534.4f305f8a@kernel.org>
+	<ebc18aba-d832-4eb6-b626-4ca3a2f27fe2@kernel.org>
+	<20250721181344.24d47fa3@kernel.org>
+	<aIdWjTCM1nOjiWfC@lore-desk>
+	<20250728092956.24a7d09b@kernel.org>
+	<aIvdlJts5JQLuzLE@lore-rh-laptop>
+	<20250801134045.4344cb44@kernel.org>
+	<aJIEvK0CU_BqqgPQ@lore-rh-laptop>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,14 +75,20 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 29 Jul 2025 18:48:11 +0300 Vladimir Oltean wrote:
-> > +static void ptp_vclock_set_subclass(struct ptp_clock *ptp)
-> > +{
-> > +	lockdep_set_subclass(&ptp->clock.rwsem, PTP_LOCK_VIRTUAL);  
+On Tue, 5 Aug 2025 15:18:52 +0200 Lorenzo Bianconi wrote:
+> > I was thinking of doing the SET on the veth side. Basically the
+> > metadata has to be understood by the stack only at the xdp->skb
+> > transition point. So we can delay the SET until that moment, carrying
+> > the information in program-specific format.  
 > 
-> Just not sure whether the PTP clock should be exposing this API, or the
-> POSIX clock, who actually owns the rwsem.
+> ack, I am fine to delay the translation of the HW metadata from a HW
+> specific format (the one contained in the DMA descriptor) to the network one
+> when they are consumed to create the SKB (the veth driver in this case) but I
+> guess we need to copy the info contained in the DMA descriptor into a buffer
+> that is still valid when veth driver consumes them since the DMA descriptor
+> can be no longer available at that time. Do you agree or am I missing
+> something?
 
-Hi Thomas, how do you feel about PTP setting lockdep class on the clock
-rwsem? Link: https://lore.kernel.org/20250728062649.469882-1-aha310510@gmail.com
+That's right, we need to carry the metadata we need with the packet
+(in an XDP program-specific md prepend, presumably).
 
