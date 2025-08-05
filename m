@@ -1,215 +1,235 @@
-Return-Path: <netdev+bounces-211774-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211775-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C66A7B1BA8B
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 21:01:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C582DB1BAC5
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 21:14:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 804013A8686
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 19:01:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 52EAF189616D
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 19:15:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 377082222D1;
-	Tue,  5 Aug 2025 19:01:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 280A9292936;
+	Tue,  5 Aug 2025 19:14:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HliLs8Np"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G3dPcJal"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AB6A1FBEB9
-	for <netdev@vger.kernel.org>; Tue,  5 Aug 2025 19:01:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 046EF2BAF7
+	for <netdev@vger.kernel.org>; Tue,  5 Aug 2025 19:14:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754420465; cv=none; b=A/nM/RM8tsmmAlXd+oVXHxSRdS8k34m/JHw9p+I2nAkFh4mxq+hMlNiPXN+RSaE8YvF+8qOZNMPuySdfZ1COnEGf7FzuB9KLgqh/A4JAGSjDLjPwnY39J9z2IETkpNfuTN12iQUd9bMh8u2FMwqCgWhU+GNDjAYNYBRPKtyKRWA=
+	t=1754421284; cv=none; b=SVr3LOvt/zOgpGhln5/o9KqsCUc/UHH1r9Rou7kaBitjfulOBc8zLiIQcB+XMKJir/CZ+OYSrO6SdZ4oegFkQYKhdu3oXmXXsQfgp9Z11gi1t2AF1ShWwiV01ZEwwjdqCi7ZhN/JWDhzklmsCAeCLaZCuCbgjFJQTcjSIaJuvac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754420465; c=relaxed/simple;
-	bh=1Krwh7FobQRcREyaRrEQ/cZSl+wxFYPAAxZAK3zDSnE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=o/w2GjAbW/vvy6ktZARFdRydDjRKfxqy1ttzkp+TmS13sMx5d99L7UOuNrkeEMZvobTxHueDnXTo5hMGzp0KSYRqwtmZaL4iQY9OJqIKEqXK4Z4PdVtq3pDWxqO2pvxct8dye5h1LAfp2M1Glc5m/Rj2qiJuvvqCwv0C0bdrrTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HliLs8Np; arc=none smtp.client-ip=209.85.215.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-b3be5c0eb99so4649743a12.1
-        for <netdev@vger.kernel.org>; Tue, 05 Aug 2025 12:01:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754420463; x=1755025263; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DqbqG+VYQxLPKNsOYQV05DishlUwU606vMY98kUStrY=;
-        b=HliLs8NpTBAuorR0X6Sg/pvTVZn78RNMb0iiSSPo/aLovWQdcin0PGlFuLDVXgGMWR
-         yZkjJEOehor0GpnNDZvwlpmi+uUOJp/miDZ1+WAwRh3HuP2FsKNM/jjMMlyfvoFSGQ5X
-         qUV//b1u6i/xsH3k4tSnBd/wTWff4i+u+0XxwrsNdFWdr9bgczD+JwyvhYFKJZuHobEh
-         8YsbzXbQn8ceKsfKuYCrWSh4kHQkQCUMhcUsF7fru9j8m3h67ksNp5S8lTi0bpCKark3
-         P7x0qgUgkTP1FYu1b6WRzsyuqAEMCvghiE/OQSanGx/PidOLIZEwUH5xw0uL5mm0vEL+
-         yGBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754420463; x=1755025263;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DqbqG+VYQxLPKNsOYQV05DishlUwU606vMY98kUStrY=;
-        b=B+bd2wGkaNI6px6OwkKbj0w7+0cbfxjWixs7wKo+veC6AfPIpos+yXyfxKpPPEtyft
-         Gs9Evch089/2cQumFdoDxLFaO5L6Hj6CromQmI3aMGDyOpcgQpOnAgqQNJ7q/DCPJK7E
-         q08UkLo1DHjAEWvBifFivXTut83G7UEBxPgvYgsgnM3e6zcCSDMk+v/aCz8MB+pMYzAb
-         4Vr8a19exFA15QzgelRG9Pmu4ZXd8LXxZMU33DXcF9jyDahddaIdpcSDdBbiSmJ2Wqi0
-         x+P68EATm0LJMahMiOO4IQFVWQp9pQs/F5+6yTN/eWn2iM2/swqH58G0+EMEmSeOY4DQ
-         ezoQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU3uQ3VnvZyxoKTVmTgvh6HuqNEzA3eH2wi228gax4dnFWDw0ZAw+SbWyOKtRhilUeYr82j3+0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YweBrl9IxIdIwBjtTwdGd/Qvv754GzBu565XKkr5zYgxABULJvf
-	tYqrTdpmu9c9g/xrBHYaRukBcfooQe13u2c8+zpLT0I8lOVPjwB34KD3tD5GxnVNmJmARDmgLed
-	Aml9xp0j25DAfKRCLbnlhYQFhiO5UdMfgOkfhstzU
-X-Gm-Gg: ASbGnctrbfIvTbszDr3TpRUsTLp7gVLwm9rTyEqvahS93yLbf5caYMy0VYoZTzfcjxn
-	kn19w89giHmp7Pj4bLAJAFr2PMgmQduZy7ITOiLcDnUIbrdpxXGdRic1CKZHqixKI8WyAqtcBFy
-	Pe2QNy5JS7t/Vt+Oe7MMG6d5kNxTYZ+v/kiHHf5m/Qp+f/Oj+N49V0TIt3GjB7n/1eLc5g/AXGX
-	0SVjJMKpOOIg83qKNmmQkZx+fnJqblQtJJNfQ==
-X-Google-Smtp-Source: AGHT+IHCLnUMZEnBTd9aRh9NH9ZiXKIeQVodIqM9YdjvCELP3pwRah8p6LpocyUTBWFy/TFpXkyzkolaS50sngI+iqg=
-X-Received: by 2002:a17:90b:1c10:b0:312:959:dc4f with SMTP id
- 98e67ed59e1d1-321161da11emr16503491a91.5.1754420462096; Tue, 05 Aug 2025
- 12:01:02 -0700 (PDT)
+	s=arc-20240116; t=1754421284; c=relaxed/simple;
+	bh=AEMRptBFjWgx5a1Ym2+nos+6PWqs3+LMFSgUwIQVLIE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aKm09XyIiM3xuu7s8aLZv/M5vyLAdafgOoF/w2/X7lBPdvarjemLWCpo7aGg5sOKnKjqzZHXpE8xwHCBgQfQ1RXYGcOuifCYsUyqtx2UXg8dJTq0z5gVqgN49cJdRjLnBc4GIUxbB4dLvgZk87mXQrizANwfgdMhXByBX+kJeeY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G3dPcJal; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 756CCC4CEF0;
+	Tue,  5 Aug 2025 19:14:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754421283;
+	bh=AEMRptBFjWgx5a1Ym2+nos+6PWqs3+LMFSgUwIQVLIE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=G3dPcJalG17ku7oEIWTs5Ls+56/huVhNo7/lzR90I0htrrz3cEHs7K3JuTfISRBle
+	 va/0F1/10adpotN5Uc/5tAHF1l7hZ80hMaHe5FJjE83hAH8iOw77tUU6BVmBMjIfeu
+	 qpobc6zP75QG8ccIFWUaKTd+EVQBlBnDhbz6kzWcTnCqQs/RE22Wxf33cicK5O6b3c
+	 3L4U+DNMkCEFq1GsHbV1Zt5ZogZvNmedvWY0Z9RoygIID374LQ6zG7o0q2JBhTSZAA
+	 gZ3veMfODYsLMsmrGsWQJIvc81oegoOaXf21Bi+OaHgGEXEkYHRSBUN5xI7j50jt1g
+	 4L9q5OIRtiLZw==
+Date: Tue, 5 Aug 2025 20:14:36 +0100
+From: Simon Horman <horms@kernel.org>
+To: Mingming Cao <mmc@linux.ibm.com>
+Cc: netdev@vger.kernel.org, bjking1@linux.ibm.com, haren@linux.ibm.com,
+	ricklind@linux.ibm.com, kuba@kernel.org, edumazet@google.com,
+	pabeni@redhat.com, linuxppc-dev@lists.ozlabs.org,
+	maddy@linux.ibm.com, mpe@ellerman.id.au
+Subject: Re: [PATCH v3 net-next] ibmvnic: Increase max subcrq indirect
+ entries with fallback
+Message-ID: <20250805191436.GY8494@horms.kernel.org>
+References: <20250804231704.12309-1-mmc@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250802092435.288714-1-dongml2@chinatelecom.cn> <20250802092435.288714-3-dongml2@chinatelecom.cn>
-In-Reply-To: <20250802092435.288714-3-dongml2@chinatelecom.cn>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Tue, 5 Aug 2025 12:00:51 -0700
-X-Gm-Features: Ac12FXzTuA4HMKsW7fdVVKpIo_5_0_S7ESYLcz_iQDdsIdyslQiuGk4V2pjHPR4
-Message-ID: <CAAVpQUBAk=339yyCnG+hDnHEu-O1+WPnAVqX=X9H22T=POQ3Bg@mail.gmail.com>
-Subject: Re: [PATCH net v3 2/2] selftests/net: test TCP reuseport socket selection
-To: Menglong Dong <menglong8.dong@gmail.com>
-Cc: edumazet@google.com, ncardwell@google.com, davem@davemloft.net, 
-	dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	shuah@kernel.org, kraig@google.com, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250804231704.12309-1-mmc@linux.ibm.com>
 
-On Sat, Aug 2, 2025 at 2:24=E2=80=AFAM Menglong Dong <menglong8.dong@gmail.=
-com> wrote:
->
-> The test script is provided by Kuniyuki in [1], which is used to test the
-> selection of the TCP reuseport socket problem.
->
-> Link: https://lore.kernel.org/netdev/20250801040757.1599996-1-kuniyu@goog=
-le.com/ [1]
-> Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
+On Mon, Aug 04, 2025 at 04:17:04PM -0700, Mingming Cao wrote:
+> POWER8 support a maximum of 16 subcrq indirect descriptor entries per
+>  H_SEND_SUB_CRQ_INDIRECT call, while POWER9 and newer hypervisors
+>  support up to 128 entries. Increasing the max number of indirect
+> descriptor entries improves batching efficiency and reduces
+> hcall overhead, which enhances throughput under large workload on POWER9+.
+> 
+> Currently, ibmvnic driver always uses a fixed number of max indirect
+> descriptor entries (16). send_subcrq_indirect() treats all hypervisor
+> errors the same:
+>  - Cleanup and Drop the entire batch of descriptors.
+>  - Return an error to the caller.
+>  - Rely on TCP/IP retransmissions to recover.
+>  - If the hypervisor returns H_PARAMETER (e.g., because 128
+>    entries are not supported on POWER8), the driver will continue
+>    to drop batches, resulting in unnecessary packet loss.
+> 
+> In this patch:
+> Raise the default maximum indirect entries to 128 to improve ibmvnic
+> batching on morden platform. But also gracefully fall back to
+> 16 entries for Power 8 systems.
+> 
+> Since there is no VIO interface to query the hypervisor’s supported
+> limit, vnic handles send_subcrq_indirect() H_PARAMETER errors:
+>  - On first H_PARAMETER failure, log the failure context
+>  - Reduce max_indirect_entries to 16 and allow the single batch to drop.
+>  - Subsequent calls automatically use the correct lower limit,
+>     avoiding repeated drops.
+> 
+> The goal is to  optimizes performance on modern systems while handles
+> falling back for older POWER8 hypervisors.
+> 
+> Performance shows 40% improvements with MTU (1500) on largework load.
+> 
+> --------------------------------------
+> Changes since v2:
+> link to v2: https://www.spinics.net/lists/netdev/msg1104669.html
+> 
+> -- was Patch 4 from a patch series v2. v2 introduced a module parameter
+> for backward compatibility. Based on review feedback, This patch handles
+> older systems fall back case without adding a module parameter.
+> 
+> Signed-off-by: Mingming Cao <mmc@linux.ibm.com>
+> Reviewed-by: Brian King <bjking1@linux.ibm.com>
+> Reviewed-by: Haren Myneni <haren@linux.ibm.com>
 > ---
->  tools/testing/selftests/net/Makefile         |  1 +
->  tools/testing/selftests/net/tcp_reuseport.py | 36 ++++++++++++++++++++
->  2 files changed, 37 insertions(+)
->  create mode 100755 tools/testing/selftests/net/tcp_reuseport.py
->
-> diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftes=
-ts/net/Makefile
-> index b31a71f2b372..0f4c3eea9709 100644
-> --- a/tools/testing/selftests/net/Makefile
-> +++ b/tools/testing/selftests/net/Makefile
-> @@ -117,6 +117,7 @@ TEST_GEN_FILES +=3D tfo
->  TEST_PROGS +=3D tfo_passive.sh
->  TEST_PROGS +=3D broadcast_pmtu.sh
->  TEST_PROGS +=3D ipv6_force_forwarding.sh
-> +TEST_PROGS +=3D tcp_reuseport.py
->
->  # YNL files, must be before "include ..lib.mk"
->  YNL_GEN_FILES :=3D busy_poller netlink-dumps
-> diff --git a/tools/testing/selftests/net/tcp_reuseport.py b/tools/testing=
-/selftests/net/tcp_reuseport.py
-> new file mode 100755
-> index 000000000000..eaeb7096382e
-> --- /dev/null
-> +++ b/tools/testing/selftests/net/tcp_reuseport.py
-> @@ -0,0 +1,36 @@
-> +#!/usr/bin/env python3
-> +# SPDX-License-Identifier: GPL-2.0
+>  drivers/net/ethernet/ibm/ibmvnic.c | 56 ++++++++++++++++++++++++++----
+>  drivers/net/ethernet/ibm/ibmvnic.h |  6 ++--
+>  2 files changed, 53 insertions(+), 9 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/ibm/ibmvnic.c b/drivers/net/ethernet/ibm/ibmvnic.c
+
+...
+
+> @@ -862,6 +862,19 @@ static void replenish_rx_pool(struct ibmvnic_adapter *adapter,
+>  failure:
+>  	if (lpar_rc != H_PARAMETER && lpar_rc != H_CLOSED)
+>  		dev_err_ratelimited(dev, "rx: replenish packet buffer failed\n");
 > +
-> +import os
+> +	/* Detect platform limit H_PARAMETER */
+> +	if (lpar_rc == H_PARAMETER &&
+> +	    adapter->cur_max_ind_descs > IBMVNIC_MAX_IND_DESC_MIN) {
+> +		netdev_info(adapter->netdev,
+> +			    "H_PARAMETER, set ind desc to safe limit %u\n",
+> +			    IBMVNIC_MAX_IND_DESC_MIN);
+> +		adapter->cur_max_ind_descs = IBMVNIC_MAX_IND_DESC_MIN;
+> +	}
+
+Hi Mingming, all,
+
+The logic above seems to appear twice in this patch.
+I think it would be good to consolidate it somehow.
+E.g. in a helper function.
+
 > +
-> +from lib.py import ksft_run, ksft_exit
-> +from socket import *
+> +	/* for all error case, temporarily drop only this batch
+> +	 * Rely on TCP/IP retransmissions to retry and recover
+> +	 */
+
+Thanks for adding this comment.
+Although perhaps 'for' -> 'For'.
+
+Likewise below.
+
+>  	for (i = ind_bufp->index - 1; i >= 0; --i) {
+>  		struct ibmvnic_rx_buff *rx_buff;
+>  
+> @@ -2381,16 +2394,33 @@ static int ibmvnic_tx_scrq_flush(struct ibmvnic_adapter *adapter,
+>  		rc = send_subcrq_direct(adapter, handle,
+>  					(u64 *)ind_bufp->indir_arr);
+>  
+> -	if (rc)
+> +	if (rc) {
+> +		dev_err_ratelimited(&adapter->vdev->dev,
+> +				    "tx_flush failed, rc=%u (%llu entries dma=%pad handle=%llx)\n",
+> +				    rc, entries, &dma_addr, handle);
+> +		/* Detect platform limit H_PARAMETER */
+> +		if (rc == H_PARAMETER &&
+> +		    adapter->cur_max_ind_descs > IBMVNIC_MAX_IND_DESC_MIN) {
+> +			netdev_info(adapter->netdev,
+> +				    "H_PARAMETER, set ind descs to safe limit %u\n",
+> +				    IBMVNIC_MAX_IND_DESC_MIN);
+> +			adapter->cur_max_ind_descs = IBMVNIC_MAX_IND_DESC_MIN;
+> +		}
 > +
-> +def test_reuseport_select() -> None:
-> +    s1 =3D socket()
-> +    s1.setsockopt(SOL_SOCKET, SO_REUSEPORT, 1)
-> +    s1.setsockopt(SOL_SOCKET, SO_BINDTODEVICE, b'lo')
-> +    s1.listen()
-> +    s1.setblocking(False)
+> +		/* for all error case, temporarily drop only this batch
+> +		 * Rely on TCP/IP retransmissions to retry and recover
+> +		 */
+>  		ibmvnic_tx_scrq_clean_buffer(adapter, tx_scrq);
+> -	else
+> +	} else {
+>  		ind_bufp->index = 0;
+> +	}
+>  	return rc;
+>  }
+
+...
+
+> @@ -6369,6 +6399,17 @@ static int ibmvnic_reset_init(struct ibmvnic_adapter *adapter, bool reset)
+>  			rc = reset_sub_crq_queues(adapter);
+>  		}
+>  	} else {
+> +		if (adapter->reset_reason == VNIC_RESET_MOBILITY) {
+> +			/* post migrtione reset the max
+> +			 * indirect descriptors per hcall to be default max
+> +			 * (e.g p8 ->p10)
+> +			 * if the destination is on the platform supports
+> +			 * do not support max (e.g. p10->p8) the threshold
+> +			 * will be reduced to safe min limit for p8 later
+> +			 */
+
+nits: Post migration, reset.
+
+      The line breaking seems uneven.
+
+      And if p8 and p10 are POWER8 and POWER10 then I think it would
+      be worth spelling that out.
+ 
+> +			adapter->cur_max_ind_descs = IBMVNIC_MAX_IND_DESC_MAX;
+> +		}
 > +
-> +    s2 =3D socket()
-> +    s2.setsockopt(SOL_SOCKET, SO_REUSEPORT, 1)
-> +    s2.bind(s1.getsockname())
-> +    s2.listen()
-> +    s2.setblocking(False)
-> +
-> +    for i in range(3):
-> +        c =3D socket()
-> +        c.connect(s1.getsockname())
-> +        try:
-> +            print("SUCCESS: assigned properly:", s1.accept())
-> +        except:
-> +            print("FAIL: wrong assignment")
-> +            os.sys.exit(1)
+>  		rc = init_sub_crqs(adapter);
+>  	}
+>  
 
-It seems you don't need to handle an exception with ksft.
-You can see os.sys.exit(1) triggers another exception when
-you run it without patch 1.
+...
 
-TAP version 13
-1..1
-# timeout set to 3600
-# selftests: net: tcp_reuseport.py
-# TAP version 13
-# 1..1
-# FAIL: wrong assignment
-# # Exception| Traceback (most recent call last):
-# # Exception|   File
-"/root/linux/tools/testing/selftests/net/./tcp_reuseport.py", line 26,
-in test_reuseport_select
-# # Exception|     print("SUCCESS: assigned properly:", s1.accept())
-# # Exception|                                          ~~~~~~~~~^^
-# # Exception|   File "/usr/lib64/python3.13/socket.py", line 295, in accep=
-t
-# # Exception|     fd, addr =3D self._accept()
-# # Exception|                ~~~~~~~~~~~~^^
-# # Exception| BlockingIOError: [Errno 11] Resource temporarily unavailable
-# # Exception|
-# # Exception| During handling of the above exception, another
-exception occurred:
-# # Exception|
-# # Exception| Traceback (most recent call last):
-# # Exception|   File
-"/root/linux/tools/testing/selftests/net/lib/py/ksft.py", line 244, in
-ksft_run
-# # Exception|     case(*args)
-# # Exception|     ~~~~^^^^^^^
-# # Exception|   File
-"/root/linux/tools/testing/selftests/net/./tcp_reuseport.py", line 29,
-in test_reuseport_select
-# # Exception|     os.sys.exit(1)
-# # Exception|     ~~~~~~~~~~~^^^
-# # Exception| SystemExit: 1
-# not ok 1 tcp_reuseport.test_reuseport_select
-# # Totals: pass:0 fail:1 xfail:0 xpass:0 skip:0 error:0
-not ok 1 selftests: net: tcp_reuseport.py # exit=3D1
+> diff --git a/drivers/net/ethernet/ibm/ibmvnic.h b/drivers/net/ethernet/ibm/ibmvnic.h
+> index 246ddce753f9..829a16116812 100644
+> --- a/drivers/net/ethernet/ibm/ibmvnic.h
+> +++ b/drivers/net/ethernet/ibm/ibmvnic.h
+> @@ -29,8 +29,9 @@
+>  #define IBMVNIC_BUFFS_PER_POOL	100
+>  #define IBMVNIC_MAX_QUEUES	16
+>  #define IBMVNIC_MAX_QUEUE_SZ   4096
+> -#define IBMVNIC_MAX_IND_DESCS  16
+> -#define IBMVNIC_IND_ARR_SZ	(IBMVNIC_MAX_IND_DESCS * 32)
+> +#define IBMVNIC_MAX_IND_DESC_MAX 128
+> +#define IBMVNIC_MAX_IND_DESC_MIN 16
 
+...MAX...{MAX,MIN} seems like an unfortunate name.
+But I don't feel particularly strongly about this one.
 
-btw, I'd write an official uAPI selftest in plain C for socket as
-python sometimes does a tricky thing and I don't trust it.
+> +#define IBMVNIC_IND_MAX_ARR_SZ (IBMVNIC_MAX_IND_DESC_MAX * 32)
+>  
+>  #define IBMVNIC_TSO_BUF_SZ	65536
+>  #define IBMVNIC_TSO_BUFS	64
 
-For example, this is...
-
-from socket import *
-
-s =3D socket()
-s.listen(-1)
-
-internally translated to:
-
-socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC, IPPROTO_IP) =3D 3
-listen(3, 0)                            =3D 0
+...
 
