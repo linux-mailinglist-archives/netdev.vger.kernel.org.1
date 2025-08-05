@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-211634-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211636-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A5EEB1ABB7
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 02:30:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 604ECB1ABBA
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 02:30:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54BF63BE696
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 00:30:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 006123BE042
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 00:30:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DE2615ECCC;
-	Tue,  5 Aug 2025 00:30:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90DC61922C4;
+	Tue,  5 Aug 2025 00:30:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Frd1RzSY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NB7AQBZt"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2850C155326
-	for <netdev@vger.kernel.org>; Tue,  5 Aug 2025 00:30:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64B1718B464;
+	Tue,  5 Aug 2025 00:30:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754353804; cv=none; b=NgPQoRGVvathHyVSGzZ39fMzan1ZCEqTGFWYnHKAuezhD6BEJxlDB4LE3d9IH/1Gz70K948Ka47O6d3BYolZWenHnjZz2ZLzFbU1KLHkXNbqoHcBspGZ4qK1kAKyjijQYO/RbS2aJevWoPUokFPcddyQuxfejubAvC2P1/HFug4=
+	t=1754353805; cv=none; b=AVHac715SL4R+BdKrA0Be3udzxhnaQ86P1ohRP93BQYiv/oB0Lu6jE1ev2pf6BWipe1Jq/Dpkm09KDP5JrouoE/eFRFbUnGvrcZj8SXEK/RtLRYkdhGGrJfYK02aUY7psg3a00WpWosE9S3zeGxV76pzVMTFS7xLeEXHNccXo3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754353804; c=relaxed/simple;
-	bh=KOez3NXL+uNqf1znoJqoOIy++cZkegqkXXuvT86mFgw=;
+	s=arc-20240116; t=1754353805; c=relaxed/simple;
+	bh=ZZmsioiAVCLf5lQBbdXNC1wttb6c0dEotQM5pn5yPGU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=u+qilEuTSHzesB4wmIF2t/E8bgMYa3ldB/RIJ9YVGC/6KT+egU4lBqtKm4so5QtXMpqoz1nzT4sOPxxUoRfNmHXag8b9W9IwLlJjscNJatEOzwqdqis8u4M1F5+NMFug3qfhKhZS+F9e04eFBkXCSU2ykN2IpLFQXX4LGuIL6GI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Frd1RzSY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3AEBC4CEE7;
-	Tue,  5 Aug 2025 00:30:02 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=PnH8t1ork8sFOTwTCZ88yQ3qa9w+3KxmV1g5gq5+PTLLYHlJioXSxURW1naV3Tfz0rUnG4rtrD4sO0+gEtrGL7pqa4sKaq9G79dZRiePb5TNb6HjgYzaI7Qpm2EV5FQBbdnbDWMDKcuZBfGmwiIT3AzlOaqIZY/xquKZlkFT+pE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NB7AQBZt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4DF5C4CEF0;
+	Tue,  5 Aug 2025 00:30:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754353803;
-	bh=KOez3NXL+uNqf1znoJqoOIy++cZkegqkXXuvT86mFgw=;
+	s=k20201202; t=1754353805;
+	bh=ZZmsioiAVCLf5lQBbdXNC1wttb6c0dEotQM5pn5yPGU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Frd1RzSYJgpD54VrK3h9w+rgnmyxLTJqfcpG0ywzFNozthUp91zLriJe3CEfjRDcO
-	 0ps5x9xy840beRt6ZmPXHF2GkumPA99fGXfuteGQqO5CnPx1vzeZbwMHYWR127OmTg
-	 B+SMbFmRkxi+JirC2lzhvy3HCmAtm4VnT73U3D3WmZ0sqMLCaYiFfOd3Fa3Qbr1cf5
-	 zv6IoqUOl3EFRRhOsAG2azI8XBg1xIiY5Q1CrDZSCS2yCBg2AUUS45xoZ3QVZMz0rD
-	 l3YYUcGAyBmtoA4eX3rfNFa5vZINPygbB/MzrwDTidv+LuSmvIzQTlF75o+R63CfvP
-	 dEjgo86S/jpKg==
+	b=NB7AQBZteACnc55bMP+fFC4eJVfCrzYH7DetsottTkNRquhHvaqClkAx0Ud6peSRQ
+	 npshHDe1XtUDVXDogdrrRG2MbYMTGPR4LoNFBDFCASZeZinxxeM0vb69khkP6wNyae
+	 ZMtTVxp8YDq3a4OMSjamrLXZsxx7CHsUc5rn5UaSU9U89wYMbzZfgfbVi/hNkEwyBI
+	 aaDYEqOGjJPnazQdhF/vP+TdjfKTetGsgBfuJbObHTD53NtpjMDKMe3tEyk87yvGfx
+	 y3cnjI7dk/CIrUTzGvfSxo4itNA0K9ukxHB/iUYV1sMNWxQ+GnQkspEoL6CmtnxTfP
+	 r6S6vkW8nCLJQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33BD6383BF62;
-	Tue,  5 Aug 2025 00:30:18 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D32383BF63;
+	Tue,  5 Aug 2025 00:30:19 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,38 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: devmem: fix DMA direction on unmapping
+Subject: Re: [PATCH] dpll: zl3073x: ZL3073X_I2C and ZL3073X_SPI should depend
+ on
+ NET
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175435381700.1400451.11085719618072517804.git-patchwork-notify@kernel.org>
-Date: Tue, 05 Aug 2025 00:30:17 +0000
-References: <20250801011335.2267515-1-kuba@kernel.org>
-In-Reply-To: <20250801011335.2267515-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- almasrymina@google.com, asml.silence@gmail.com, sdf@fomichev.me,
- dw@davidwei.uk, kaiyuanz@google.com
+ <175435381825.1400451.8676043781177752154.git-patchwork-notify@kernel.org>
+Date: Tue, 05 Aug 2025 00:30:18 +0000
+References: <20250802155302.3673457-1-geert+renesas@glider.be>
+In-Reply-To: <20250802155302.3673457-1-geert+renesas@glider.be>
+To: Geert Uytterhoeven <geert+renesas@glider.be>
+Cc: ivecera@redhat.com, Prathosh.Satish@microchip.com, kuba@kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, lkp@intel.com
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 31 Jul 2025 18:13:35 -0700 you wrote:
-> Looks like we always unmap the DMA_BUF with DMA_FROM_DEVICE direction.
-> While at it unexport __net_devmem_dmabuf_binding_free(), it's internal.
+On Sat,  2 Aug 2025 17:53:02 +0200 you wrote:
+> When making ZL3073X invisible, it was overlooked that ZL3073X depends on
+> NET, while ZL3073X_I2C and ZL3073X_SPI do not, causing:
 > 
-> Found by code inspection.
-> 
-> Fixes: bd61848900bf ("net: devmem: Implement TX path")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+>     WARNING: unmet direct dependencies detected for ZL3073X when selected by ZL3073X_I2C
+>     WARNING: unmet direct dependencies detected for ZL3073X when selected by ZL3073X_SPI
+>     WARNING: unmet direct dependencies detected for ZL3073X
+> 	Depends on [n]: NET [=n]
+> 	Selected by [y]:
+> 	- ZL3073X_I2C [=y] && I2C [=y]
+> 	Selected by [y]:
+> 	- ZL3073X_SPI [=y] && SPI [=y]
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: devmem: fix DMA direction on unmapping
-    https://git.kernel.org/netdev/net/c/fa516c0d8bf9
+  - dpll: zl3073x: ZL3073X_I2C and ZL3073X_SPI should depend on NET
+    https://git.kernel.org/netdev/net/c/4eabe4cc0958
 
 You are awesome, thank you!
 -- 
