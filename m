@@ -1,126 +1,113 @@
-Return-Path: <netdev+bounces-211793-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211809-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00BE1B1BBC8
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 23:32:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F37A9B1BC2F
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 23:55:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B0C1B3AB941
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 21:32:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD9CA1887E79
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 21:55:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E590B2253E0;
-	Tue,  5 Aug 2025 21:32:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F2FC257AC1;
+	Tue,  5 Aug 2025 21:52:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="UmmtEqGo"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hZVI/Yup"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A6581C8633;
-	Tue,  5 Aug 2025 21:32:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A40D25A340
+	for <netdev@vger.kernel.org>; Tue,  5 Aug 2025 21:52:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754429542; cv=none; b=mbvTCzzqOzqtH8cmFa2aN7+duFu1GmC6oj+wY76hoKk3Wc9thCYnQ1CRMJwU8OTaAQ/kLJSnrVfWUaINGikMnus3clWyMsiAvlK4YPW4pwptJNXdGK5ZvM691j1GYQHeoZubaIRj3Lh/xiax6u8tAVpi8bDWHr0AR2GeNf9F2WE=
+	t=1754430748; cv=none; b=QsALXP5wzTR9y6HiRxjk+CC7M+CVKhXvjcTUl4ugL5HRiJ4LmsCThaUeuGMI1CiMS/YYPODljSQAKuK1Svfp2aPS+VEuvq0oUc1fXTOB8R/jzGChPL3DVyF64h6yCn8ra4I/A9ywb+DHN+hoR/7iUp3gd1jXS1hbPgtpcppn/ZY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754429542; c=relaxed/simple;
-	bh=FKMtt4C7SiHLDtPX/p8cSSP5Ihvqa+3tSZWKlaBZpqQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WCeIWPW0xHyr7m+bPKKugNfAXZJfguogyuUO6Xx3k60LjnFvFTjy1WrnYWzaDAhzAH8lx+/8ykJLykfkbcm4fankMUsAXsXHad8pIeVCQFAq8Lqzc+5wVb3n0zI53kAWTTHx0ETOZAsyXZWD39T2fhLDL4EBmV0QhDffGb0EHgQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=UmmtEqGo; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Ehg7mtVEZG5GkLeNFV5NybHMZ76+3RE7nNoKJBi39vM=; b=UmmtEqGoQCHJCUJD2FPuSpUcxJ
-	kEDJzF3QrGcSGTcRZP4Tm21LpfrkrbMshAqMWfQWUDCS3NDRs9oYEDR7cw+uHekZQ/MiQHVsF8B4i
-	01H8w1v0bMNseWAHoGcrzkEP7+9yNXGgHyAuJsL8MefLvCR0a0gVr/v8RGNVSOjI77v8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1ujPGX-003pQr-Ib; Tue, 05 Aug 2025 23:32:13 +0200
-Date: Tue, 5 Aug 2025 23:32:13 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Sean Anderson <sean.anderson@linux.dev>
-Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Michal Simek <michal.simek@amd.com>,
-	Leon Romanovsky <leon@kernel.org>
-Subject: Re: [PATCH net-next v4 6/7] net: axienet: Rearrange lifetime
- functions
-Message-ID: <69b08e90-ae99-43fd-9779-dd5497a26e1f@lunn.ch>
-References: <20250805153456.1313661-1-sean.anderson@linux.dev>
- <20250805153456.1313661-7-sean.anderson@linux.dev>
+	s=arc-20240116; t=1754430748; c=relaxed/simple;
+	bh=cxw88F86+efxpjCeTqNzsZYFkDz6jHw5LSK433H0MkY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=C/5QbA0L7rPbkWkRR0S8HZoPTjXnMCtgg2JPQBJJJrQdm4N8AuTxz5ytrl428Vroe6Dop+Q3b3xTf66IaD2mTySl9OwqdwiyPqsGqWoFJv4IERDIJ0CIO60wCVTt5fVVo+OVHL8Pn4auIdMz6YGj9KNOm3rc+7kfSHi5TwaPatQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hZVI/Yup; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1754430744;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=mOWTp40JUk6/kR6ncUSjJf2Ac1g7cYUy+ecjSbiK87o=;
+	b=hZVI/YupUHUAmK9OnbjTcyQ9JW3N6eAgjuuvReTmbysSjosgLMtC3lXmf1EU3SFg5dJvuz
+	gcYkL8ni2iciSUWYot6D+bp1or9UxFlfiSiI7KlzdZfWx5f9ZZbxeeA9VC3DNwa051KxW8
+	JP1246iNhgNMjfxVC6yfHrCqq4Gl7Co=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-225-I6eEl55WP6uc6oOb1-V2ZA-1; Tue,
+ 05 Aug 2025 17:52:23 -0400
+X-MC-Unique: I6eEl55WP6uc6oOb1-V2ZA-1
+X-Mimecast-MFC-AGG-ID: I6eEl55WP6uc6oOb1-V2ZA_1754430742
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 24A581955DDD;
+	Tue,  5 Aug 2025 21:52:22 +0000 (UTC)
+Received: from lima-lima (unknown [10.22.80.60])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 62A023000199;
+	Tue,  5 Aug 2025 21:52:20 +0000 (UTC)
+From: Dennis Chen <dechen@redhat.com>
+To: netdev@vger.kernel.org
+Cc: dechen@redhat.com,
+	dchen27@ncsu.edu,
+	kuba@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	petrm@nvidia.com
+Subject: [PATCH net-next 0/3] netdevsim: Add support for ethtool stats and add
+Date: Tue,  5 Aug 2025 17:33:53 -0400
+Message-ID: <20250805213356.3348348-1-dechen@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250805153456.1313661-7-sean.anderson@linux.dev>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Tue, Aug 05, 2025 at 11:34:55AM -0400, Sean Anderson wrote:
-> Rearrange the lifetime functions (probe, remove, etc.) in preparation
-> for the next commit. No functional change intended.
+This series adds support for querying standard interface stats and
+driver-specific stats with ethtool -S. This allows hardware-independent
+testing of ethtool stats reporting. Driver-specific stats are incremented
+every 100ms once enabled through a debugfs toggle.
 
-There is a lot going on in this patch. Can it be broken up a bit more?
+Also adds a selftest for ethtool -S for netdevsim.
 
-The phase "No functional change intended" generally means, its the
-same code, just in a different place in the files. This is not true of
-this patch.
+The implementation of mock stats is heavily based on the mock L3 stats 
+support added by commit 1a6d7ae7d63c45("netdevsim: Introduce support for
+L3 offload xstats").
 
-> +struct axienet_common {
-> +	struct platform_device *pdev;
-> +
-> +	struct clk *axi_clk;
-> +
-> +	struct mutex reset_lock;
+Note: Further replies will come from my school email address,
+dchen27@ncsu.edu, as I will soon lose access to my Red Hat email.
 
->  static inline void axienet_lock_mii(struct axienet_local *lp)
->  {
-> -	if (lp->mii_bus)
-> -		mutex_lock(&lp->mii_bus->mdio_lock);
-> +	mutex_lock(&lp->cp->reset_lock);
+Dennis Chen (2):
+  netdevsim: Add mock stats for ethtool
+  selftests: netdevsim: Add test for ethtool stats
 
-This lock is different to the bus lock. This is definitely not a "no
-functional change".
+Kamal Heib (1):
+  netdevsim: Support ethtool stats
 
-Please make this lock change a patch of its own, with a good commit
-message which considers the consequences of this change of lock.
+ drivers/net/netdevsim/ethtool.c               | 183 ++++++++++++++++++
+ drivers/net/netdevsim/netdev.c                |   1 +
+ drivers/net/netdevsim/netdevsim.h             |  11 ++
+ .../selftests/drivers/net/netdevsim/Makefile  |   1 +
+ .../drivers/net/netdevsim/ethtool-common.sh   |  13 ++
+ .../drivers/net/netdevsim/ethtool-stats.sh    |  36 ++++
+ 6 files changed, 245 insertions(+)
+ create mode 100755 tools/testing/selftests/drivers/net/netdevsim/ethtool-stats.sh
 
->  		if (!np) {
-> -			dev_err(dev, "pcs-handle (preferred) or phy-handle required for 1000BaseX/SGMII\n");
-> -			ret = -EINVAL;
-> -			goto cleanup_mdio;
-> +			dev_err(dev,
-> +				"pcs-handle (preferred) or phy-handle required for 1000BaseX/SGMII\n");
-> +			return -EINVAL;
+-- 
+2.50.1
 
-That looks like a whitespace change. This is a "No functional change
-intended" sort of patch. You can collect all such whitespace changes
-into one patch.
-
->  		}
->  		lp->pcs_phy = of_mdio_find_device(np);
-> -		np1 = of_find_node_by_name(NULL, "lpu");
-> +		np1 = of_find_node_by_name(NULL, "cpu");
-
-Interesting. Maybe you should review your own patches.
-
-
-    Andrew
-
----
-pw-bot: cr
 
