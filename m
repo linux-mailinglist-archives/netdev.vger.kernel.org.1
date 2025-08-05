@@ -1,125 +1,145 @@
-Return-Path: <netdev+bounces-211702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211703-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77AB2B1B51C
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 15:41:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C35D4B1B535
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 15:48:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B75962291B
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 13:41:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB9431832E3
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 13:48:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CD8A27510D;
-	Tue,  5 Aug 2025 13:41:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C45361A3166;
+	Tue,  5 Aug 2025 13:48:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KTJt2iVQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from alt12.smtp-out.videotron.ca (alt12.smtp-out.videotron.ca [135.19.0.25])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83691274658
-	for <netdev@vger.kernel.org>; Tue,  5 Aug 2025 13:41:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=135.19.0.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 962F033997;
+	Tue,  5 Aug 2025 13:48:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754401288; cv=none; b=E4F/Lqj8V6/YHr45qrfAxKUVLtMwd/E218Cb2mUr1Rcw+R+Hyo+4v9nDiHAsawzsGR32HV7P6m6uPc8s2nlqKftelQfAjb/FFMPiF2uvruYLR6v1i8cBT3T9w+wSHhpBw+TZ5SPhBbKFMjuv3hUXZpn6xgIGO6pKVszYf3Uyw+c=
+	t=1754401703; cv=none; b=QpVvaQ+9CSkx4H0W1tzyiba8NOFwHaHuR7jAIK3yZjGm4og+cTRGBg8f3ebljwf+D2xCms0OxNwSUeCrVDjsjLdLUDpfmWQSZukYl0kwJBHoa+lkVSiBPjw2x/el8SPl6dJ3Pdr2z2JR2SFWpCpeW3GYhmGEcLJtRWEMskcOec4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754401288; c=relaxed/simple;
-	bh=F9tcQjwEt/W15+T72cIlqFpsrTG7SV0JZM918Mn0ZBg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NvS/sux5HfRUosHNNl9L5cl5+Jr/wMKpSnYMhzECrKihbqZw/8MrJmnP3I50nKZZRWnmvP6Shv8+uiEG6+fH7Kg/wPeeMfyFXSh7c8EAG94r9Am0ilhBX2o+Kkq0+kgqTEN5W7td8vD6sMBGtZA/mRCenYdSdpXjV8moUMM5Suo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=redhat.com; spf=fail smtp.mailfrom=redhat.com; arc=none smtp.client-ip=135.19.0.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=redhat.com
-Received: from zappa.orion ([24.201.91.161])
-	by Videotron with ESMTP
-	id jHuruxrfKQQxnjHusuft1t; Tue, 05 Aug 2025 09:41:25 -0400
-X-ORIG-RCPT: davem@davemloft.net,edumazet@google.com,anthony.l.nguyen@intel.com,przemyslaw.kitszel@intel.com,horms@kernel.org,kuba@kernel.org,andrew+netdev@lunn.ch,dhill@redhat.com,pabeni@redhat.com,netdev@vger.kernel.org
-X-Authority-Analysis: v=2.4 cv=CpwccW4D c=1 sm=1 tr=0 ts=68920a05
- a=OPdtphJVnnJ7kPN51veEEg==:117 a=OPdtphJVnnJ7kPN51veEEg==:17
- a=2OwXVqhp2XgA:10 a=20KFwNOVAAAA:8 a=TPf_-WkaaP5K8a5Ti-kA:9
-Received: from knox.orion (unknown [192.168.1.37])
-	by zappa.orion (Postfix) with ESMTP id F033D1132;
-	Tue, 05 Aug 2025 09:40:45 -0400 (EDT)
-From: David Hill <dhill@redhat.com>
-To: netdev@vger.kernel.org
-Cc: horms@kernel.org,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	David Hill <dhill@redhat.com>
-Subject: [PATCH 2/2] PATCH: i40e Add module option to disable max VF limit
-Date: Tue,  5 Aug 2025 09:40:42 -0400
-Message-ID: <20250805134042.2604897-2-dhill@redhat.com>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20250805134042.2604897-1-dhill@redhat.com>
-References: <20250805134042.2604897-1-dhill@redhat.com>
+	s=arc-20240116; t=1754401703; c=relaxed/simple;
+	bh=ii7MUREVcea/8UbyeiswMNSULRCwnlO5STpDI2KjI+Y=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
+	 References:In-Reply-To; b=VkM/dA6vNiAQ5Xkh5FTymM3K+JZS0m4x83RppdLFmAMcP+tVfHv3hn6C93e61YRYwX2pguMm5Kqni/dg2P11XtYk5CRbgyaHRCjSjDuhOFC0HmdsSq0oLV099fEPn+xS4C6tmkBZZptNGFps78jjpZw+5us1Bn81+E87x2vA1do=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KTJt2iVQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEF5DC4CEFA;
+	Tue,  5 Aug 2025 13:48:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754401703;
+	bh=ii7MUREVcea/8UbyeiswMNSULRCwnlO5STpDI2KjI+Y=;
+	h=Date:Subject:Cc:To:From:References:In-Reply-To:From;
+	b=KTJt2iVQROAVd34MI+xrBRauI0WnFN229RbBbmHANbt/EaUVfV0h2ElInh1FpVsXF
+	 aoDAOpjcxW8cHvlOGTv6v4GeU0VsdniTMROsBs5gBNGdqgrr5sA4J5Ev5E8WteQWyY
+	 PBmwwdDzPlj4NplJBicGxeo6b7hq+jQINGZLD5f3nr6ocWM+8HzAUe14ls9EoLPkiK
+	 7M9vCIAqztxnLr0Fxu7ETqFPx8faDahNMFLPcKIMgPN6SfD3Z9WiJZK8UNAfwgVIcU
+	 2VaZ3zN4x3tjub1e36NGD8vuH6CBLUplmxhI1qaHCGfhTVPDLloAbikygMT1hOP3c0
+	 7QQEnBtZ77avQ==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Binarystorm-MailScanner-Information: Please contact the ISP for more information
-X-Binarystorm-MailScanner-ID: F033D1132.A0518
-X-Binarystorm-MailScanner: Found to be clean
-X-Binarystorm-MailScanner-SpamCheck: not spam, SpamAssassin (not cached,
-	score=-0.01, required 7, ALL_TRUSTED -0.01)
-X-Binarystorm-MailScanner-From: dhill@redhat.com
-X-CMAE-Envelope: MS4xfHvmsiVNkZFfBM7uVYjYJmmt7Dagx5uf6yO0Bh753kBjLJB7GTk58X/9cScqrDA9UyoyOr7+7UZCOtdZzgcaEtpktNxXMjbrRvJHIo27iM0EA3cDNG4D
- xolHayRvYcdoazUeFEUw6XONwmd5FMK9ag3PkQ3biQoafGEb3mbAhTB5gNX1PynREY7gUJd/LxnuvjtmJrRFWJYJtvlFUJikNCaRK2hzrvWQoURiJQfXaWYB
- FCK0V1fH4zhiD+dVLLXWZX8iXsW3bVKcqMjxRJXs+Z9MOAxMPu2nNlnz9FazKlQ0fUHQ2lC6EJ9XYTchh/bQ7S82wil/BRdG/yBO2OXdAmxWT8odwYsc7alY
- kmgj+VNlT8Ias8kim0ay6Ovo924koyzRsNVyLE9ku+cWpflFBWB7guzS2IiiDau69xX86Slz8rTGXgwiIeSf6Y/RXBpn8bckE7ujIhvTKnPi8opKlws=
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Tue, 05 Aug 2025 15:48:14 +0200
+Message-Id: <DBUJHW6E5XKQ.25IT6RQ5MEUW1@kernel.org>
+Subject: Re: [PATCH v11 7/8] rust: Add read_poll_timeout functions
+Cc: <linux-kernel@vger.kernel.org>, <daniel.almeida@collabora.com>,
+ <rust-for-linux@vger.kernel.org>, <netdev@vger.kernel.org>,
+ <andrew@lunn.ch>, <hkallweit1@gmail.com>, <tmgross@umich.edu>,
+ <ojeda@kernel.org>, <alex.gaynor@gmail.com>, <gary@garyguo.net>,
+ <bjorn3_gh@protonmail.com>, <benno.lossin@proton.me>,
+ <a.hindborg@samsung.com>, <aliceryhl@google.com>,
+ <anna-maria@linutronix.de>, <frederic@kernel.org>, <tglx@linutronix.de>,
+ <arnd@arndb.de>, <jstultz@google.com>, <sboyd@kernel.org>,
+ <mingo@redhat.com>, <peterz@infradead.org>, <juri.lelli@redhat.com>,
+ <vincent.guittot@linaro.org>, <dietmar.eggemann@arm.com>,
+ <rostedt@goodmis.org>, <bsegall@google.com>, <mgorman@suse.de>,
+ <vschneid@redhat.com>, <tgunders@redhat.com>, <me@kloenk.dev>,
+ <david.laight.linux@gmail.com>
+To: "FUJITA Tomonori" <fujita.tomonori@gmail.com>
+From: "Danilo Krummrich" <dakr@kernel.org>
+References: <DBNPR4KQZXY5.279JBMO315A12@kernel.org>
+ <20250802.104249.1482605492526656971.fujita.tomonori@gmail.com>
+ <DBRW63AMB4D8.2HXGYM6FZRX3Z@kernel.org>
+ <20250805.223721.524503114987740782.fujita.tomonori@gmail.com>
+In-Reply-To: <20250805.223721.524503114987740782.fujita.tomonori@gmail.com>
 
-When a VF reaches the limit introduced in this commit [1], the driver
-refuses to add any more MACs to the filter which changes the behavior
-from previous releases and might break some NFVs which sometimes add
-more VFs than the hardcoded limit of 18 and variable limit depending
-on the number of VFs created on a given PF.   Disabling limit_mac_per_vf
-would revert to previous behavior.
+On Tue Aug 5, 2025 at 3:37 PM CEST, FUJITA Tomonori wrote:
+> On Sat, 02 Aug 2025 13:06:04 +0200
+> "Danilo Krummrich" <dakr@kernel.org> wrote:
+>
+>> On Sat Aug 2, 2025 at 3:42 AM CEST, FUJITA Tomonori wrote:
+>>> On Mon, 28 Jul 2025 15:13:45 +0200
+>>> "Danilo Krummrich" <dakr@kernel.org> wrote:
+>>>> On Thu Feb 20, 2025 at 8:06 AM CET, FUJITA Tomonori wrote:
+>>>>> +/// This process continues until either `cond` returns `true` or the=
+ timeout,
+>>>>> +/// specified by `timeout_delta`, is reached. If `timeout_delta` is =
+`None`,
+>>>>> +/// polling continues indefinitely until `cond` evaluates to `true` =
+or an error occurs.
+>>>>> +///
+>>>>> +/// # Examples
+>>>>> +///
+>>>>> +/// ```rust,ignore
+>>>>=20
+>>>> Why ignore? This should be possible to compile test.
+>>>
+>>> https://lore.kernel.org/rust-for-linux/CEF87294-8580-4C84-BEA3-EB72E63E=
+D7DF@collabora.com/
+>>=20
+>> I disagree with that. 'ignore' should only be used if we can't make it c=
+ompile.
+>>=20
+>> In this case we can make it compile, we just can't run it, since there's=
+ no real
+>> HW underneath that we can read registers from.
+>>=20
+>> An example that isn't compiled will eventually be forgotten to be update=
+d when
+>> things are changed.
+>
+> I also prefer the example that can be compiled however I can't think
+> of a compilable example that is similar to actual use cases (for
+> example, waiting for some hardware condition). Do you have any ideas?
 
-[1] commit cfb1d572c986 ("i40e: Add ensurance of MacVlan resources for every
-trusted VF")
+With my suggestion below, it should be compilable.
 
-Signed-off-by: David Hill <dhill@redhat.com>
----
- drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+When you just take a &Io<SIZE> as argument in wait_for_hardware() you can c=
+all
+io.read(). Then define HW_READY as some random value and it should compile.
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-index c66c8bbc3993..fb9eb4a80069 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-@@ -4,6 +4,10 @@
- #include "i40e.h"
- #include "i40e_lan_hmc.h"
- #include "i40e_virtchnl_pf.h"
-+#include <linux/moduleparam.h>
-+
-+bool __read_mostly limit_mac_per_vf = 1;
-+module_param_named(limit_mac_per_vf, limit_mac_per_vf, bool, 0444);
- 
- /*********************notification routines***********************/
- 
-@@ -2950,7 +2954,7 @@ static inline int i40e_check_vf_permission(struct i40e_vf *vf,
- 	 * all VFs.
- 	 */
- 	} else {
--		if (new_count > max_macvlan) {
-+		if (new_count > max_macvlan && limit_mac_per_vf) {
- 			dev_err(&pf->pdev->dev,
- 				"Cannot add more MAC addresses, trusted VF %d uses (%d/%d) MAC addresses\n",
- 				vf->vf_id, new_count, max_macvlan);
--- 
-2.50.1
-
-
--- 
-This message has been scanned for viruses and
-dangerous content by MailScanner, and is
-believed to be clean.
-
+>>>>> +/// fn wait_for_hardware(dev: &mut Device) -> Result<()> {
+>>>>=20
+>>>> I think the parameter here can just be `&Io<SIZE>`.
+>>>>=20
+>>>>> +///     // The `op` closure reads the value of a specific status reg=
+ister.
+>>>>> +///     let op =3D || -> Result<u16> { dev.read_ready_register() };
+>>>>> +///
+>>>>> +///     // The `cond` closure takes a reference to the value returne=
+d by `op`
+>>>>> +///     // and checks whether the hardware is ready.
+>>>>> +///     let cond =3D |val: &u16| *val =3D=3D HW_READY;
+>>>>> +///
+>>>>> +///     match read_poll_timeout(op, cond, Delta::from_millis(50), So=
+me(Delta::from_secs(3))) {
+>>>>> +///         Ok(_) =3D> {
+>>>>> +///             // The hardware is ready. The returned value of the =
+`op`` closure isn't used.
+>>>>> +///             Ok(())
+>>>>> +///         }
+>>>>> +///         Err(e) =3D> Err(e),
+>>>>> +///     }
+>>>>> +/// }
+>>>>> +/// ```
 
