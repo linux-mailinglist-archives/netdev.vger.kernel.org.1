@@ -1,57 +1,58 @@
-Return-Path: <netdev+bounces-211827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211828-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26BB2B1BCE9
-	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 01:03:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6632AB1BCEF
+	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 01:09:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EA75E18A72B0
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 23:04:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A51851620F5
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 23:09:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D65552BD588;
-	Tue,  5 Aug 2025 23:03:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 247E82BD5A8;
+	Tue,  5 Aug 2025 23:09:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pb2mgmIZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ssgplbCF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AACFC285069;
-	Tue,  5 Aug 2025 23:03:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECD4A2BD588;
+	Tue,  5 Aug 2025 23:09:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754435018; cv=none; b=lOj31FDlzQwEb3Ahk2TjoTxVJGPjPbViPxKV4Fs2W5voFqrGfCGa/cHiF+7OGZWTwrbNQyQoeECeay/hrjuvAVcixqUz1qEN1V5gkIJQcMWrOpqKV3AKZG/PtLikMzJ8RUTQBX3MUDLIZ7JUMABcvN4DZ6BX1qar6g1VA2Vz3tQ=
+	t=1754435380; cv=none; b=XoTnq5yrDTrIwbA85NFtPeZMtuiefdQQSRWrPBUIQgrR/Kz/8CLqJTT6KaIDrUbO1lhSteB7f+hCfrnNpuFtiZ1oHVrCDf80vmO/jr9yPNkRz/T3eQXtZcHaAQvb8tLHAzFRbD67dLrsQ0wTNQtXP8dRV3xCREcz0sKLK9F3Bik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754435018; c=relaxed/simple;
-	bh=7Ups/RGUjv1LIIm/fio9SMuzA1Vx0XSASLqIG36D+TQ=;
+	s=arc-20240116; t=1754435380; c=relaxed/simple;
+	bh=b+4gC3jrvqG+83u5Vh0Kk2KArZaArOezV8zzx5Mi8Pw=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iUGuXFVHOoLTbAZ6zQbqygy+ctqbv23J76m6Rr32McaUAT5yb69La8G3Kbll87OOeDXpCQoxC7fz/5LT6FrRDTVm4La4t+NJO9KA+oRlM3frbFkKHYg6/nezuqvRYvTbE57IAGFFFT7eNn/dOme2rSyvKaCVsHN8f3OdNxHf8O8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pb2mgmIZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFCE2C4CEF0;
-	Tue,  5 Aug 2025 23:03:34 +0000 (UTC)
+	 MIME-Version:Content-Type; b=DeFe/hq217zrz5MKS1hXgFwNzFZChpWGB+BEstBmKzCqKs2xsZ8qh0lK5ZdmUpEKoFl8leX7KLNb5hpdd7G9s/JDuypETvG2O9/8FefRq3X2+8SJU6xLaXzLcfbbangW4KrXgPqsgVlW4+nqAnBNGROM2jZn4rLjg6GFKonrH+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ssgplbCF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2717BC4CEF0;
+	Tue,  5 Aug 2025 23:09:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754435015;
-	bh=7Ups/RGUjv1LIIm/fio9SMuzA1Vx0XSASLqIG36D+TQ=;
+	s=k20201202; t=1754435379;
+	bh=b+4gC3jrvqG+83u5Vh0Kk2KArZaArOezV8zzx5Mi8Pw=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Pb2mgmIZSfUa3/mPZ0h/Tx/57asgu2ViqUz2QxOaezyHvTi+lW9NvT7XuogDiWmF4
-	 zUflvO/GEbe/Gqd5qQkz+j83pTaGMqCNAOQZrYMqO7vjt5c0UXISpfADBqO69OtW4a
-	 JvuOuFCbSaQB8xh9KdxP3MInbvLGuTq8cWj1wm38b2aLLaTyA24MFqMEmd9Us9bmkT
-	 Pi5Yl/77t7Y4RH4ydzk0f1x6t/vOv9W6gikWJNEvrS3EsfPycozDX3jYiTkp0dwZQP
-	 Fui+TFCjzrivXpOGyWM8pwbaseWS6LSYCwMoQgE/bojYVH8vVzu61jt/A9EPqfK5Nk
-	 w3ZBsijNYS0Ww==
-Date: Tue, 5 Aug 2025 16:03:33 -0700
+	b=ssgplbCFi6TgjsQZXxa8e5ZrcwMPNsDUh0sVbNcJY/6wIfXMV9HIc9Oyh+CQRgqWW
+	 CFn/E7H+vaNflQdu0HuRxDFgItGFd4cEbxzzA858j4GL9PCVqCNjOoHJjQ21V9neYY
+	 RrhtlUKVQUstu5nrtT+Xv5pol32pPlj6X65ZBc59Bq6tfIblY9xqIBXdOVy3UdjGdM
+	 mVJmoRg4yabba0OeBZ+2DkcAGxSlEee+htvi3KVE1VoIdOPxSuCzp+FeuDB7huV1hZ
+	 wRz4RC3J9fKK8yBmc+MO1GnzZnrcccH4WuxicCsRoCdetYCHSiHuRophBGf//hwztb
+	 OCK8qK3/8CR1Q==
+Date: Tue, 5 Aug 2025 16:09:38 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Qingfang Deng <dqfext@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, linux-ppp@vger.kernel.org, netdev@vger.kernel.org,
+To: Miaoqian Lin <linmq006@gmail.com>
+Cc: Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
  linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2] ppp: remove rwlock usage
-Message-ID: <20250805160333.3bee2d40@kernel.org>
-In-Reply-To: <20250805024933.754-1-dqfext@gmail.com>
-References: <20250805024933.754-1-dqfext@gmail.com>
+Subject: Re: [PATCH] eth: mlx4: Fix IS_ERR() vs NULL check bug in
+ mlx4_en_create_rx_ring
+Message-ID: <20250805160720.0187e36d@kernel.org>
+In-Reply-To: <20250805025057.3659898-1-linmq006@gmail.com>
+References: <20250805025057.3659898-1-linmq006@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,33 +62,18 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue,  5 Aug 2025 10:49:33 +0800 Qingfang Deng wrote:
-> In struct channel, the upl lock is implemented using rwlock_t,
-> protecting access to pch->ppp and pch->bridge.
-> 
-> As previously discussed on the list, using rwlock in the network fast
-> path is not recommended.
-> This patch replaces the rwlock with a spinlock for writers, and uses RCU
-> for readers.
-> 
-> - pch->ppp and pch->bridge are now declared as __rcu pointers.
-> - Readers use rcu_dereference_bh() under rcu_read_lock_bh().
-> - Writers use spin_lock() to update, followed by synchronize_rcu()
->   where required.
+On Tue,  5 Aug 2025 06:50:57 +0400 Miaoqian Lin wrote:
+>  	ring->pp = page_pool_create(&pp);
+> -	if (!ring->pp)
+> +	if (IS_ERR(ring->pp))
+>  		goto err_ring;
 
-## Form letter - net-next-closed
+Thanks for fixing! Looks we previously depended on err being initialized
+to -ENOMEM, but since we have an errno now, I think it'd be better to
+use it:
 
-We have already submitted our pull request with net-next material for v6.17,
-and therefore net-next is closed for new drivers, features, code refactoring
-and optimizations. We are currently accepting bug fixes only.
-
-Please repost when net-next reopens after Aug 11th.
-
-RFC patches sent for review only are obviously welcome at any time.
-
-See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
--- 
-pw-bot: defer
-pv-bot: closed
-
+	if (IS_ERR(ring->pp)) {
+		err = PTR_ERR(ring->pp);
+		goto err_ring;
+	}
 
