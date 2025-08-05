@@ -1,155 +1,113 @@
-Return-Path: <netdev+bounces-211694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211695-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A202B1B479
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 15:13:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8FBAB1B4A4
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 15:16:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E90E53ABCEF
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 13:13:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 035A418A4E33
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 13:16:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7DAD279787;
-	Tue,  5 Aug 2025 13:11:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72E97273D6C;
+	Tue,  5 Aug 2025 13:14:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="1UGnYPFj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O6clb+AZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from forwardcorp1b.mail.yandex.net (forwardcorp1b.mail.yandex.net [178.154.239.136])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FAE2275B0B;
-	Tue,  5 Aug 2025 13:11:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BE1023C50F;
+	Tue,  5 Aug 2025 13:14:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754399505; cv=none; b=tTTxkm3rApqFBrGey+3J0WxAICkHXlsEiC/QWSU02bY4CXr5oge1g1K4fkTt9WYBOV02ylLsa97DM2sqPQQVqf7cAH+j4/ACVdYcEMSB3HsTgtfSzWCG8j61DqkOSrgje+arvCjTZ72egY+XUEYrO5VFoxpimUFKEQQL7/vAx98=
+	t=1754399661; cv=none; b=LchinyrF1QrYc4+Yznj0aUcC8/JNEHBSGlc2biKLggKTQT9kfARkTtuG/WN9YZNnv3GUJhmP6JFVMbaTPRrLzb//Nw2gSGp1tywJoptkw2J4Gvhu2RAZsGwSxDADrOHHClvbb7zvnzoE8QdESU6QaOeqqF75zCYX6/O/FKMKv+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754399505; c=relaxed/simple;
-	bh=YLBQDy6eQNpuqYJmBuJHbdvk6W3dpGmVOLhbuzAjcJU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TTFSBvkJENWaUz/S69TWJHGe76mrBdi+XXxszLjeBBVk5HzkbptY5KZ3BFNp1Vb2d3pXOpLoTwRxB2xOICpRfXiy4W7AUDiLZXIT/wa0k9Hlhdf28EXMi0Ed37Epx0VH/si63qj0oapzcENH/g+SY4F9ZAAmr6XNQRH1rmavwbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex-team.ru; spf=pass smtp.mailfrom=yandex-team.ru; dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b=1UGnYPFj; arc=none smtp.client-ip=178.154.239.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex-team.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex-team.ru
-Received: from mail-nwsmtp-smtp-corp-main-66.iva.yp-c.yandex.net (mail-nwsmtp-smtp-corp-main-66.iva.yp-c.yandex.net [IPv6:2a02:6b8:c0c:29a1:0:640:5fbc:0])
-	by forwardcorp1b.mail.yandex.net (Yandex) with ESMTPS id B5EF080627;
-	Tue, 05 Aug 2025 16:10:23 +0300 (MSK)
-Received: from kniv-nix.yandex-team.ru (unknown [2a02:6bf:8080:849::1:3b])
-	by mail-nwsmtp-smtp-corp-main-66.iva.yp-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id 6AgoJU9GpKo0-4ePcQdmN;
-	Tue, 05 Aug 2025 16:10:22 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
-	s=default; t=1754399422;
-	bh=1fhMX3tvH9apZXuDu7nTQnIUMtDysNPzl2m86b8poH0=;
-	h=Message-Id:Date:Cc:Subject:To:From;
-	b=1UGnYPFjO7Zh2vLJEXLFw6uSfIpf/6yERIuID+XBynFeIndBMTP9ZIQV8adLQCrYi
-	 lRenxXGknUS3kKJKSv+I6l0afbWZSX0c5Q7xrrvWC5xdnyWSlWI87G8RcF3PsSSCRy
-	 fJbLHsR1l/ZhQSlyPSCnsDVbIp/secb0ROJWvGUc=
-Authentication-Results: mail-nwsmtp-smtp-corp-main-66.iva.yp-c.yandex.net; dkim=pass header.i=@yandex-team.ru
-From: Nikolay Kuratov <kniv@yandex-team.ru>
-To: linux-kernel@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	virtualization@lists.linux.dev,
-	kvm@vger.kernel.org,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	Lei Yang <leiyang@redhat.com>,
-	Hillf Danton <hdanton@sina.com>,
-	kniv@yandex-team.ru,
-	stable@vger.kernel.org,
-	Andrey Ryabinin <arbn@yandex-team.com>
-Subject: [PATCH v3] vhost/net: Protect ubufs with rcu read lock in vhost_net_ubuf_put()
-Date: Tue,  5 Aug 2025 16:09:17 +0300
-Message-Id: <20250805130917.727332-1-kniv@yandex-team.ru>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1754399661; c=relaxed/simple;
+	bh=N0CmshDMifKYo7r5by0XPRRXJE8BKzZlpniCDFhyMzQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Hv2qN5ToLX6L/zjMultGd2plEVgxlU6qHVjuWpFTJdOocjAebWkWaPXE8pt7liCAKpt5X5M8MLVblMAyPK7GTB1UXtSXQhvRRlsZ0/CsLr2t3guffXbE0DZBfVZEyCMDm1cdzirOyGPwi/HA9xfxWS1ErfaAI8lVVG71vAceSCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O6clb+AZ; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-24049d16515so34667305ad.1;
+        Tue, 05 Aug 2025 06:14:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1754399659; x=1755004459; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=N0CmshDMifKYo7r5by0XPRRXJE8BKzZlpniCDFhyMzQ=;
+        b=O6clb+AZPveXb0O0NcuVWHXoYgRGuTmL3bFUrnr9DCPKyyr2okwMqTP6SV0iC63eJD
+         9Pb/u70vtOQNJeq6S5C7cWrqDZgGhIIJVLf2GWhs47Z9tuCSYDX9xZ4K9joUmYtrvcyN
+         lVmvjQXj6aMgsZ3qxL/huWGabjtK5Yiq09T3SMCdk6wv7Tv4uvOVqeeOV/N6LLoZE/BU
+         PR9gSyaElDBG/aiOXPEIlvzdAibW2bsEfGtAGPlgLQE8ezyJjn3Ru+AJHzH4mg2eVmUC
+         fCg7S5lHB1JWbVh34SUuMclCvgq3KwYO9xeE52O7xHIycgpDvAnnE+6tVq2lw2PaUKpt
+         fjAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754399659; x=1755004459;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=N0CmshDMifKYo7r5by0XPRRXJE8BKzZlpniCDFhyMzQ=;
+        b=o9R5ZupsGYc+GD2HK5R2tcl52oZlcALxKNLEWDppdiyXYIqgEDzid6X7QIDP+YZfWn
+         83n8/1OEeNdwpOCDIZUSiK8JZGs/z+PnZl1Z+3wIcdJUplgd/85tiv6YCkQxcQYobvjR
+         4o/qBwflX1wyP/kBhBm78vEsxk+D9n2MDNvKRkQJ015amEE++dKblyaZ85L9VVXcph6f
+         1puyf7KsBsNe+rkSW6l02NfEWfE7Un3YG6b8/iYOBrHdZDL1x0sufjJ2HvIpNaq7qbel
+         uzjhbZQPCFMF7+SSY3zEUWTeu+mewCFCWZyjp7yHlpqtuyjXjCW6sw5KaRatkODQOoLt
+         Fr6g==
+X-Forwarded-Encrypted: i=1; AJvYcCVw8rRXcTvuyExYlbnKtyYvM3bRU/HzDHVctozLBvFvD8w0IdHUXqPF5vmtR7lBqedFnj1aysY942fDX0c=@vger.kernel.org, AJvYcCWjdwzo3zM5/pY/qksiZz6HWc3oXAqggHMXW6e8roKp3k9X6D9R7EnCGS97ySS88Ps2FkYVp3N9@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz9ahWqSOgBwV7T15VS6rES7IctNJr8Rt4+nCl1gPB3sZBjIQtM
+	cjX8O1IJv3fxl0WBpQSLTuVKr97/TFM3k8FXdv2JAutWWVxd7x1fZdcR
+X-Gm-Gg: ASbGnct92Fi1qXy8i4efonzPO1e4h5WRuvfcnDgbSSgX8/zWIa8WVCp5cGfh+UZBXhQ
+	zf4pPfx5HkR4FZYEHEM3b3EXGbZ4FuGLAIC2fgrekpZTa4IXpVuchU3dTsMc2/Jkv/EtKur7oFb
+	Yba5UMcbJzNwa3m41y3YHCQnDMT5Pizh4pMAeGgH0gmDgK/sIazjFw25en4kTsgclAGHm7fqAr+
+	tUMwOFEsvpMC8opW8pziF1Miowh+u/m/TWMfmEQtwZyPnYmdaH0MfR64mpvs+mk/l6ef1u4VG2w
+	fQd8KzJjWcazhmrE2jXhfXnJqfhoUM0N/rmRrHF5JhB7Wz7eyfmq4DlAK7/0N8n+ZEuzMPhoHGP
+	aTVi4vm2JcWroAslt5uJE7ygtIUcX0DSYWxZazg==
+X-Google-Smtp-Source: AGHT+IGUPAwX9hcCGJlmaMWO5avt7SqSBzXlpqyr3LHJByHYHNsOaUzGXslC3MQtuITNBEZ2gjb+Dg==
+X-Received: by 2002:a17:902:ea0f:b0:240:296b:cb8a with SMTP id d9443c01a7336-24246fece92mr166585695ad.30.1754399659214;
+        Tue, 05 Aug 2025 06:14:19 -0700 (PDT)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-241d1f1ebc1sm132757795ad.67.2025.08.05.06.14.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Aug 2025 06:14:18 -0700 (PDT)
+Date: Tue, 5 Aug 2025 13:14:08 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Carlos Bilbao <bilbao@vt.edu>
+Cc: carlos.bilbao@kernel.org, jv@jvosburgh.net, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, sforshee@kernel.org
+Subject: Re: [PATCH] bonding: Switch periodic LACPDU state machine from
+ counter to jiffies
+Message-ID: <aJIDoJ4Fp9AWbKWI@fedora>
+References: <20250715205733.50911-1-carlos.bilbao@kernel.org>
+ <c9eac8f6-8e7f-4ed0-b34d-5dc50be8078f@vt.edu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <c9eac8f6-8e7f-4ed0-b34d-5dc50be8078f@vt.edu>
 
-When operating on struct vhost_net_ubuf_ref, the following execution
-sequence is theoretically possible:
-CPU0 is finalizing DMA operation                   CPU1 is doing VHOST_NET_SET_BACKEND
-                             // ubufs->refcount == 2
-vhost_net_ubuf_put()                               vhost_net_ubuf_put_wait_and_free(oldubufs)
-                                                     vhost_net_ubuf_put_and_wait()
-                                                       vhost_net_ubuf_put()
-                                                         int r = atomic_sub_return(1, &ubufs->refcount);
-                                                         // r = 1
-int r = atomic_sub_return(1, &ubufs->refcount);
-// r = 0
-                                                      wait_event(ubufs->wait, !atomic_read(&ubufs->refcount));
-                                                      // no wait occurs here because condition is already true
-                                                    kfree(ubufs);
-if (unlikely(!r))
-  wake_up(&ubufs->wait);  // use-after-free
+On Tue, Jul 15, 2025 at 03:59:39PM -0500, Carlos Bilbao wrote:
+> FYI, I was able to test this locally but couldn’t find any kselftests to
+> stress the bonding state machine. If anyone knows of additional ways to
+> test it, I’d be happy to run them.
 
-This leads to use-after-free on ubufs access. This happens because CPU1
-skips waiting for wake_up() when refcount is already zero.
+Hi Carlos,
 
-To prevent that use a read-side RCU critical section in vhost_net_ubuf_put(),
-as suggested by Hillf Danton. For this lock to take effect, free ubufs with
-kfree_rcu().
+I have wrote a tool[1] to do lacp simulation and state injection. Feel free to
+try it and open feature requests.
 
-Cc: stable@vger.kernel.org
-Fixes: 0ad8b480d6ee9 ("vhost: fix ref cnt checking deadlock")
-Reported-by: Andrey Ryabinin <arbn@yandex-team.com>
-Suggested-by: Hillf Danton <hdanton@sina.com>
-Signed-off-by: Nikolay Kuratov <kniv@yandex-team.ru>
----
-v2:
-* move reinit_completion() into vhost_net_flush(), thanks
-  to Hillf Danton
-* add Tested-by: Lei Yang
-* check that usages of put_and_wait() are consistent across
-  LTS kernels
-v3:
-* use rcu_read_lock() with kfree_rcu() instead of completion,
-  as suggested by Hillf Danton
+[1] lacpd: https://github.com/liuhangbin/lacpd
 
- drivers/vhost/net.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index 6edac0c1ba9b..c6508fe0d5c8 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -99,6 +99,7 @@ struct vhost_net_ubuf_ref {
- 	atomic_t refcount;
- 	wait_queue_head_t wait;
- 	struct vhost_virtqueue *vq;
-+	struct rcu_head rcu;
- };
- 
- #define VHOST_NET_BATCH 64
-@@ -250,9 +251,13 @@ vhost_net_ubuf_alloc(struct vhost_virtqueue *vq, bool zcopy)
- 
- static int vhost_net_ubuf_put(struct vhost_net_ubuf_ref *ubufs)
- {
--	int r = atomic_sub_return(1, &ubufs->refcount);
-+	int r;
-+
-+	rcu_read_lock();
-+	r = atomic_sub_return(1, &ubufs->refcount);
- 	if (unlikely(!r))
- 		wake_up(&ubufs->wait);
-+	rcu_read_unlock();
- 	return r;
- }
- 
-@@ -265,7 +270,7 @@ static void vhost_net_ubuf_put_and_wait(struct vhost_net_ubuf_ref *ubufs)
- static void vhost_net_ubuf_put_wait_and_free(struct vhost_net_ubuf_ref *ubufs)
- {
- 	vhost_net_ubuf_put_and_wait(ubufs);
--	kfree(ubufs);
-+	kfree_rcu(ubufs, rcu);
- }
- 
- static void vhost_net_clear_ubuf_info(struct vhost_net *n)
--- 
-2.34.1
-
+Thanks
+Hangbin
 
