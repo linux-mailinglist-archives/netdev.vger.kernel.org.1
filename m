@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-211635-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211637-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9FDCB1ABB9
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 02:30:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DA96B1ABBD
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 02:30:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F31DC3BE7D0
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 00:30:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 22018180992
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 00:30:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 735A518E02A;
-	Tue,  5 Aug 2025 00:30:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CBEB1BC9E2;
+	Tue,  5 Aug 2025 00:30:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PM6Qb+Vf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rRWxj3J+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A98F189919;
-	Tue,  5 Aug 2025 00:30:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC7FA1AA782
+	for <netdev@vger.kernel.org>; Tue,  5 Aug 2025 00:30:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754353805; cv=none; b=IApPdUBdv73ENXQllRF7Vt/mwK0rjT4H0M5gu86r/CzR51hu4PecJsJgCG3qvBpxY7thI9RU74e4K/dH4ZjWrErphN05eoNF5DqISODyO6bhwnWPogXsdgXNp0LItHk0gGicg6XOZRzXqd+2iKNyhFolAOAG8rO0reFUldhXJ84=
+	t=1754353806; cv=none; b=S2155FviMZoYWs/eehFUTJzP14MA+n/PDO6ALJS3HgGmvY7P6jYLIFSb501cm29adkgi+Ummb3AxMQpmIRMH24H2egaqrVzVSVZEUpk1Usjj7SqazY6wfvmJttOy03H01d+EVoDsptMfrfB48Rg6gKzC+yHrYeAc3JKonW1YQRw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754353805; c=relaxed/simple;
-	bh=qfv9KBlrUKsIIJmH9elqLzkRDhOrTL/TkPiwCHb9ohg=;
+	s=arc-20240116; t=1754353806; c=relaxed/simple;
+	bh=fKvxZcfVZrgBb+Pc1yoIKzuXZevNbI/9BGrxb/fzvws=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=JBX0CmtHcqSC8MXJTRfpfxaZkh6aRngrqYIbSp8fw12RZwVJcQuoiiu/Y5AOSztQe8Srr4ui68X0dL4Rof7s856zeYHNA+hWvSZfXacRqGT95CSrSUipAOiI1PAApUggFF2pgaQO31nZDiWrRmhcCvjKTev9wBtU6JJ+qiX1tc8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PM6Qb+Vf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2920AC4CEF8;
-	Tue,  5 Aug 2025 00:30:05 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=YRnzF3MT2CJeqMo+zGzMLC/obLxTAEzaOUWWeAk11B20/sH+KCTtph/Nw8SiTJtlrM7tahVWkETXDfv1zV/lbNvZ6hIm7vx8nomZIhoZiQtGkCBnDf3l/Krr22TpC5eAqqOlsCO3wUzCUnmb6UUeGAmmfFlqbMFDTwEHtuOM0uI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rRWxj3J+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75B58C4CEE7;
+	Tue,  5 Aug 2025 00:30:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754353805;
-	bh=qfv9KBlrUKsIIJmH9elqLzkRDhOrTL/TkPiwCHb9ohg=;
+	s=k20201202; t=1754353806;
+	bh=fKvxZcfVZrgBb+Pc1yoIKzuXZevNbI/9BGrxb/fzvws=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=PM6Qb+Vf592INsci5/xIN7v4VN6XFo4qGD7JMCwZXRL/g4qcbu6p6kExESQpVLAgT
-	 /fWslB85tRZIJRxKnxdWDYaIUoKqFVK7b0XyhwgHhQb4aVnImJSRH8YDZgmITYbRGN
-	 WJwhewiYGn2ViAHXmvDM/0EgO4mCiEa070qgXbEoryqI427udvatjG+0Seq8/ccC69
-	 un4LBzbJJJ0ZFHJIoSDKeBydqs2cuA0eKqG1mhv6IPzzSvr1h9ABQADDYV4yAVBM/0
-	 Oo+0D1ywOAWPLoezYugizInh4RzKUM9dua1475izasMpnvX5+k7azwS9J8/K6XpSUm
-	 NiAp2BjIBhlhQ==
+	b=rRWxj3J+MapslYLsP4HWazmOQR9sD3c8sPSPzx3EFuo6nUPD720KZmgPvpi61DBXv
+	 nbem0zKLA5wN75wIHRQTNA8ZTEey4BNM0/xioKxY+s/ZwRM+1ljmPqb1y3AV13E1De
+	 g/RPOl7hfCG8KX+tcsh7fDxGypwLsFtyg6Lj3Lzu6YPfI90ybM8Z96TwtcMqd6ZVOE
+	 CPbpCt3e9enXB+C/s9msQwFo7z/clVTED7kCv5XXQQEGukN8Nf75jeh7aKb/e+ryXf
+	 WuJAW5puLMobg5UmdpoZYjgrBVRF6YbUGnm+Ohhed+G5Lk2nzik0vGfUNoeIrDE/Ok
+	 emrtLMF6OvO1Q==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD59383BF62;
-	Tue,  5 Aug 2025 00:30:20 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAEF5383BF62;
+	Tue,  5 Aug 2025 00:30:21 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,42 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] ipa: fix compile-testing with qcom-mdt=m
+Subject: Re: [PATCH net v2] net: airoha: npu: Add missing MODULE_FIRMWARE
+ macros
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175435381949.1400451.11221507514670781827.git-patchwork-notify@kernel.org>
-Date: Tue, 05 Aug 2025 00:30:19 +0000
-References: <20250731080024.2054904-1-arnd@kernel.org>
-In-Reply-To: <20250731080024.2054904-1-arnd@kernel.org>
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: elder@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- andersson@kernel.org, quic_ppranees@quicinc.com,
- vasanthakumar.thiagarajan@oss.qualcomm.com, quic_rajkbhag@quicinc.com,
- quic_bselvara@quicinc.com, jeff.johnson@oss.qualcomm.com, arnd@arndb.de,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+ <175435382075.1400451.14706979312090764224.git-patchwork-notify@kernel.org>
+Date: Tue, 05 Aug 2025 00:30:20 +0000
+References: 
+ <20250801-airoha-npu-missing-module-firmware-v2-1-e860c824d515@kernel.org>
+In-Reply-To: 
+ <20250801-airoha-npu-missing-module-firmware-v2-1-e860c824d515@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 31 Jul 2025 10:00:20 +0200 you wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
+On Fri, 01 Aug 2025 09:12:25 +0200 you wrote:
+> Introduce missing MODULE_FIRMWARE definitions for firmware autoload.
 > 
-> There are multiple drivers that use the qualcomm mdt loader, but they
-> have conflicting ideas of how to deal with that dependency when compile-testing
-> for non-qualcomm targets:
-> 
-> IPA only enables the MDT loader when the kernel config includes ARCH_QCOM,
-> but the newly added ath12k support always enables it, which leads to a
-> link failure with the combination of IPA=y and ATH12K=m:
+> Fixes: 23290c7bc190d ("net: airoha: Introduce Airoha NPU support")
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> ---
+> Changes in v2:
+> - Add missing Fixes tag
+> - Link to v1: https://lore.kernel.org/r/20250731-airoha-npu-missing-module-firmware-v1-1-450c6cc50ce6@kernel.org
 > 
 > [...]
 
 Here is the summary with links:
-  - ipa: fix compile-testing with qcom-mdt=m
-    https://git.kernel.org/netdev/net/c/2df158047d53
+  - [net,v2] net: airoha: npu: Add missing MODULE_FIRMWARE macros
+    https://git.kernel.org/netdev/net/c/4e7e471e2e3f
 
 You are awesome, thank you!
 -- 
