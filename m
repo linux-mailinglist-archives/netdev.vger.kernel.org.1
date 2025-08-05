@@ -1,270 +1,298 @@
-Return-Path: <netdev+bounces-211688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211740-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF3F6B1B32E
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 14:16:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FB4BB1B6F9
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 17:01:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB4E81809CB
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 12:16:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 300F0189F2B6
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 15:01:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB8A823D2B4;
-	Tue,  5 Aug 2025 12:16:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E55BC136351;
+	Tue,  5 Aug 2025 15:01:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R7iLrCA6"
+	dkim=pass (2048-bit key) header.d=analog.com header.i=@analog.com header.b="LfoT7QXA"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-00128a01.pphosted.com (mx0a-00128a01.pphosted.com [148.163.135.77])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C139B23C50A
-	for <netdev@vger.kernel.org>; Tue,  5 Aug 2025 12:16:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754396205; cv=none; b=cuWStl2BB7VVu0mwVVMZWJNwGbmNEeLvkKdASx0KPHcQgqWxosaIDZSpkLAEw+kb9oVDUi2Opf8MwTMvwyRA8YmxMo63NHr36A0EoS7thKRYRTaaDovdgtkBxFbxtBPocNKkMaK2VU9lKMa8XMIvjlXPrveXEe+UAxO8d4T+o7w=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754396205; c=relaxed/simple;
-	bh=CmBCmABcCLnjEROKfmOKByGevm1swRuwvHWiVA31uL0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RWaI+j30RqnOBt0sdLNvXrSyLUgSIifS1MjDSVQM04X+BLdZMh5Bimjki/aFhAD+JzUArvMg3IN95Ova7nqMAZgWcVYzdzRsOGsBKzs8YtOJlUIcO0RP3stp4UOcS2Oxldhy7MLbAGuwtGofH9+Aw71+rQaz4I9PG9C6DGq3Jgw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=R7iLrCA6; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1754396202;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=k44PWZB+SstYXZf2Wo78t/ngrbX6A8TaWIyHMZPnUhA=;
-	b=R7iLrCA6l/UwuqyKucc9JmtVvtKFQt4gjlmkyrkufF5rG87opt77v7Wv6UcZqsNbix9V6n
-	pF7LD7rLGF/PUE3aeVUp2DRGOctn3afR4cKwwIVpnSoMQ1ThaLdkzrlTVhvEsYfHFCvyRe
-	I8OErBQ/D/FaJj04WIV6OY7zkrSVxhY=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-655-6SSmc80lNe6HPJU4U0leBw-1; Tue,
- 05 Aug 2025 08:16:39 -0400
-X-MC-Unique: 6SSmc80lNe6HPJU4U0leBw-1
-X-Mimecast-MFC-AGG-ID: 6SSmc80lNe6HPJU4U0leBw_1754396198
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 855F21955D90;
-	Tue,  5 Aug 2025 12:16:38 +0000 (UTC)
-Received: from jramaseu-thinkpadt14gen5.tpbc.com (unknown [10.67.32.24])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B0B391954B08;
-	Tue,  5 Aug 2025 12:16:33 +0000 (UTC)
-From: Jakub Ramaseuski <jramaseu@redhat.com>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	horms@kernel.org,
-	pabeni@redhat.com,
-	Jakub Ramaseuski <jramaseu@redhat.com>,
-	Tianhao Zhao <tizhao@redhat.com>,
-	Michal Schmidt <mschmidt@redhat.com>
-Subject: [PATCH net] net: mask NETIF_F_IPV6_CSUM flag on irregular packet header size
-Date: Tue,  5 Aug 2025 14:16:27 +0200
-Message-ID: <20250805121627.311053-1-jramaseu@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DDD5AD2C;
+	Tue,  5 Aug 2025 15:00:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.135.77
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1754406060; cv=fail; b=EX3v1tEzKh4yRQiKYjRKCsafRNdmy1JJ6A2HJVhZuvklYsCirk5NiG/nW5tN/rQU5gz6NVU0i3HTvinEkc90Z1enClnoy2GAI3WuvCbCi9usfIvXSfhz2jrNq2jPlo2DuMrQ4TOMRxpclKteznxuQlFkKgObs+ztzlNal0fMOy8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1754406060; c=relaxed/simple;
+	bh=XTreTY23zPGOrMpHKYUAgz4njxnMHQPxHTL8R0m87q0=;
+	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Jonmzhj5FGhCQE3g2nPLsUbpHApaLCewjmAf4ebQQe5llwcyX+6hFwz+0yV4xe9wQwhIOLlJjg4sMVJjdHB6eVNqznssmUP10zq5WQhpzcm0Q6OwC2Vj/ZGxnqh8gF+4NuvOLQ9oeTyRzQy5mLxI9dmBIiFnCjpG+MQcw8iX+l0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=analog.com; spf=pass smtp.mailfrom=analog.com; dkim=pass (2048-bit key) header.d=analog.com header.i=@analog.com header.b=LfoT7QXA; arc=fail smtp.client-ip=148.163.135.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=analog.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=analog.com
+Received: from pps.filterd (m0167088.ppops.net [127.0.0.1])
+	by mx0a-00128a01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 575B6h4e029666;
+	Tue, 5 Aug 2025 08:43:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=analog.com; h=
+	content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=DKIM; bh=ekw8q
+	LCAV/6qtV0cfeMd72RUHf5s+PG60Wlq9jYgfbA=; b=LfoT7QXAL/TWsFgjgdLCY
+	3+JejnqV8vlJrpWQsXLp5RJ0FMVVqegSY46izLI2f+XY+Bg7YvvzBRXwrV0vd6yK
+	/gcmuJ+2J0yU1gI9BYDFLjEYmbJRz8NLqDQpXAZTnduQkDya4tkRoI6ZZlV057JB
+	9tLIFUL2tp9N4miF+vbOdXBh5bM6s81cvWmUOhDG/zIf3xYrcGXMeJIoJzt6s0In
+	jcdeMHjd2U5Op9UCfVQfImgrBXe7m4ypQiL4BPzkghsV7dCAJoYD/DvXtyQv+Uhy
+	6grC3pba+SicllPUZWDraKJQ408qAmCrsRnYpTNRBLvTusMOkowd1H7hhYuuBkx4
+	Q==
+Received: from nam12-bn8-obe.outbound.protection.outlook.com (mail-bn8nam12on2061.outbound.protection.outlook.com [40.107.237.61])
+	by mx0a-00128a01.pphosted.com (PPS) with ESMTPS id 48argh82sw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 05 Aug 2025 08:43:06 -0400 (EDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=SA29h3IsEegcmxN2S5q5Fuu8dPwvF0xgJFY/nvpk1PrLWYPucwLy8OJIhf6imr3gzVc/r7kiPTt343lHcCxLDlaQC6DKmVtjdZ0Q7CBVOaBHNbCGn8jHBfPOb0j0jiqcL7yAbznMoG04XV3n6kB5rfEBY7PVhg9WIEg6gZ0GUEe4UH81yqMi1lFXBgpY0WNZIsqvguqEZtKnSg+Esdjs9NyGY+5S7oGSGlgBo63xHtORvx+KOhW/VvNbKCK5FWKFkNdJi6PzTuUeKjtZRCcqHo1ZASUiWySJmpVcJ0zGbMKNeNCjOLlN4gQvptTXJ6ZsiLqJ/zz8WpR8BJyS47TGoQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ekw8qLCAV/6qtV0cfeMd72RUHf5s+PG60Wlq9jYgfbA=;
+ b=y2asfmZEFz2OzPXClLB9Ye2+JTQcfRDzMbQyS/4Nys8IrsdfTVHh5OlBN+aBqNbzligjj/0VnzMtwTDrGgfu3vdrwA+usHX7+Egh3l1x9ebuyVLmTjc++azM1E2nl3HcZaGmTRBCc4iihFhGyDxV6zcMxzvMs9KMmZ8jBEplmfvyWQ7U+krbrRAZrqMkqSHYfwgayIRoDQtP2tQxdqmLtQA+ssMqYwjQSrKHuvo7reBHbak7fL4cUG4EsQf+zd7xhTBQRTtkrgd5FTUk0eO3S9zV1mshqk3vI1Cizotl0vg794z6ZDqvlJDxrYPSMIOGIYYR/6PD74/3Sh8wvAzmPw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=analog.com; dmarc=pass action=none header.from=analog.com;
+ dkim=pass header.d=analog.com; arc=none
+Received: from PH0PR03MB6938.namprd03.prod.outlook.com (2603:10b6:510:16c::9)
+ by BL1PR03MB6133.namprd03.prod.outlook.com (2603:10b6:208:308::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8964.27; Tue, 5 Aug
+ 2025 12:43:03 +0000
+Received: from PH0PR03MB6938.namprd03.prod.outlook.com
+ ([fe80::966:43bd:a478:b446]) by PH0PR03MB6938.namprd03.prod.outlook.com
+ ([fe80::966:43bd:a478:b446%4]) with mapi id 15.20.8989.018; Tue, 5 Aug 2025
+ 12:43:03 +0000
+From: "Schmitt, Marcelo" <Marcelo.Schmitt@analog.com>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        "Hennerich, Michael"
+	<Michael.Hennerich@analog.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David
+ S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Rob Herring
+	<robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH net-next] dt-bindings: net: Replace bouncing Alexandru
+ Tachici emails
+Thread-Topic: [PATCH net-next] dt-bindings: net: Replace bouncing Alexandru
+ Tachici emails
+Thread-Index: AQHb/I9y42duEFdMLUWHatAmwUddk7RUEnZA
+Date: Tue, 5 Aug 2025 12:43:03 +0000
+Message-ID:
+ <PH0PR03MB693811F7197EECEE85856B149622A@PH0PR03MB6938.namprd03.prod.outlook.com>
+References: <20250724113758.61874-2-krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20250724113758.61874-2-krzysztof.kozlowski@linaro.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-dg-rorf: true
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH0PR03MB6938:EE_|BL1PR03MB6133:EE_
+x-ms-office365-filtering-correlation-id: 68b733be-e60b-4338-2a07-08ddd41d9e76
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|7416014|366016|376014|1800799024|13003099007|38070700018|921020;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?Jl9UYp5/PQ2R1nL9DXwfYYgEtWkvO6Fj9WzcTvl+tiFaqLDY6XMXLs10GZ3S?=
+ =?us-ascii?Q?b7+06u75loaMWoVQhMFJ3Rmb/T+RK0uu2jcYSIDJvw4A+0NGi/GUcLrw8IZF?=
+ =?us-ascii?Q?w9n6kJK7W75nJF6hDgJsHYCNI9JlVvPKL6HW9TmDTQ9xnX7PYk7C74JHmK0o?=
+ =?us-ascii?Q?mdLsL74zI6jXeHIBiP3SCgnYHLSQ65aNGuX4rxPad6WLxn0WUoie1kGMFJ2a?=
+ =?us-ascii?Q?/uOf3qNrGEiIuHV3xk6SECDmff2u07mF6V4Vt/6J59zmZLDKP3acJ4BjxHPY?=
+ =?us-ascii?Q?e7WuGU2tNyYVCmYFYPJNJw7PpP7obwyqkW/QzGAQ+vhF50K0EJzFuk7eDgs8?=
+ =?us-ascii?Q?z6c+QhDorJZSHtl74NnrwFmRmqqHAkJgqFI6/b+F99HAirV5YgBMjdeT+uch?=
+ =?us-ascii?Q?B6L4JsjuaBvIZNjUlI8SBY2simlkKn3WRq0LQnXzoVMblv/17V3KaJ5GiI4X?=
+ =?us-ascii?Q?G0LmkiJDlLDoYaOFZqDglPHvyLdWlj1QLJDTgwqTlBAgezxcCnaUD0zDYNeH?=
+ =?us-ascii?Q?gb+8gKBAE5UIpTTf2AxuqZaPa9Y6oRf8G3QUvxiVIhWVI+LcVG9m5vTtv7rx?=
+ =?us-ascii?Q?B5WUDVVdRyuiY5lYUUYKs/1xxdkznq5HOeQ5Eiyuh1pa5hBL8OZuf6zow0AV?=
+ =?us-ascii?Q?boXWT8J706cyEBUJ0WRvP6sWnx02qQ4HbORBE5Yt3QF+z8Hs/Og9P5xH5fc2?=
+ =?us-ascii?Q?nlEP5qL7w1DTRPHvjhTMMfzGrsVL7EU0umfw+o1yZoWSC+RTue50dHRsgiOo?=
+ =?us-ascii?Q?IblJf3KCkW8Bn1e41uH2dQIABqk+2vvihttZvPeKDiY08CbJeeC1e45xWvi9?=
+ =?us-ascii?Q?DnsI5lA0VXT/pQc6cgh7c8DA2eJ0YOWUgRDnQ6HOkgRswTyu4knyEXvzy5lr?=
+ =?us-ascii?Q?6Ents/jtkCGxWe77+0iZ0QFFiEUN0DweaL7LNuxHV5wSXowCP1dq4rhLbviZ?=
+ =?us-ascii?Q?kBXpNoV6Ahd1c3WxOyvXa7ATsHFB2QoX2vWIfmRcO+trgNmMOXT378V6CJtw?=
+ =?us-ascii?Q?rez7QUffwGUPmJAuKozmKahlGrrNa0eqcYZ9ZTkero8m4yVIh/QMVow/2pjg?=
+ =?us-ascii?Q?Mz9j6wP720zHrIodFXytJ7Kw18wHxz9oHb0JRz782GjC45l4KVRU972YDPzJ?=
+ =?us-ascii?Q?m4OKH8Ew8Fx4CpbbOW7KPgFQsmEBWoVYEacgJ8gqqeAoIRCcmiz9nzXb57tN?=
+ =?us-ascii?Q?qtNadcRJGoiXWfOzwHdEhvRZuxWK3rdMYmAz9Q9uMl8zkmfznXWFolI2TbGe?=
+ =?us-ascii?Q?b0ZvHn1gJ9VQbltQ0LkYL/NIFlgAcKtssWg9YYMz1gBrDgblD2Iom/t6A4gT?=
+ =?us-ascii?Q?Fmav/n4huqRvXVryDQwx1yu6N3msK2+snlYB3dCChieO1ICbkFSPwJdi/07M?=
+ =?us-ascii?Q?Ch5463siNO1w4txeIOc9jRe3vSKirY107bAqoM9pM6Hi5OW2wSt2Ct+7T50x?=
+ =?us-ascii?Q?BAW2trOvPr+cdhSH7HhBlU7EKhGV/Xet?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR03MB6938.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(366016)(376014)(1800799024)(13003099007)(38070700018)(921020);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?n2SPU6gFL0U9EwhUAyKjoaHxPNOKCCAf9ks7kbiegb7DLmKaaWqJGTdvAAmJ?=
+ =?us-ascii?Q?XEkqTkNrZ7sqnNekf9hSJQvL56mlgf1Di1uCzLBLwHpGErdByTB0dpozNC3B?=
+ =?us-ascii?Q?AnF4q08HRdAdfKF7LkURyU5egpgG8O3MNfxYmL8RCSrZCo663QnK5HHLiFRg?=
+ =?us-ascii?Q?Mw6ESnYa9XaQslfGlShUrC7sLS2SfZP6HJ2FxSvtGmTCSxFilujYE3AsyljN?=
+ =?us-ascii?Q?chZdNoNsuCULGMpvXmklObq+Bq/MLbo1IMTOC01e7031WWgzAAHMr7uhA1EH?=
+ =?us-ascii?Q?i2UoLmiyrMQeOjHlNB2n6HpKQtAyL2s6EsiPqXgFP8Dq8xdPDc+17A2ZBtaf?=
+ =?us-ascii?Q?43lRTM+64e+U1BiTpxJmnfW+OsI9etGhdzjKIZe53GWyXHXu5BDgs/UG7YV+?=
+ =?us-ascii?Q?9BP3qdAMennJS+a8IrnfM0XjdfVy/vrFjL04sgDDfsVQ03OGp8Oy9gAyd96X?=
+ =?us-ascii?Q?JwQ0c1/BKbIBbhVvCy0M3msr7gYTkSqky2VPOVr07isBEA7F0rLwQKCYn6M9?=
+ =?us-ascii?Q?Dj42QjSamUy1d4JqptEqMc6irAixQD8nz+M5twZV7fZLsrLBYLoP2fujsD0v?=
+ =?us-ascii?Q?o5OVNicvf44HAlES+asK1XX780bY0FdPC9lXWEKGr3PjYHXX94Ji167AXiej?=
+ =?us-ascii?Q?5itR8enWzz2L75UAygLcGCbNrD7/No/eJeWC2h/N6T4AFpgCiwIYFaHO0PwD?=
+ =?us-ascii?Q?bPGBTI0yL4VT0ao+qWNXGtqKXOdXYQPQ64Uty9jne8x7YN4WrkSLpZK2KdCe?=
+ =?us-ascii?Q?KgArN5tpUwikqQu/A4WQJU7DJGyBXIX4A3pcsfLjyEGzYuG1RcZczwncHsvA?=
+ =?us-ascii?Q?MvvmYTKcQTS8Q1KY0DGr/jBInRMyicKpxqPWOLUWVca2QvDiB0JeoFoatKEp?=
+ =?us-ascii?Q?JpwtQCD5ZYkgRfecS7hr9zjpACv6Z/VbVVJeYRgifwxZbh9/Fjd2eWx2yMxz?=
+ =?us-ascii?Q?ze8k6N71P0KUwztQ4YM+FskgoeDK+L25I470dA5i2rBbwrpXa7I3aW91bMWI?=
+ =?us-ascii?Q?Fo+Vt/S0qaoTKQnFgxOVQCAd/2pmAzuNZU0E4kf9ObgibPqU3WJ11OA8/gNu?=
+ =?us-ascii?Q?hQrN7uYFkYClwIYzJttLAQXFalJFFUZFemxMenhY0TOVjALHiHtE90XUr5SA?=
+ =?us-ascii?Q?gsmtHMFtwTwzALWPaNZZoG7k08viJx4CazHkmh4MrT9x6JrqGtlLqf5Gizl+?=
+ =?us-ascii?Q?9ZVrfHuzc17G32lYb1FmuRc568mSiwA8qm1qIV1bY4A2udWSx0jsU8bb/iSU?=
+ =?us-ascii?Q?hWtJgzidCLImb32fBUDAoGJdu7wjABPE/FKdwg2zCAU7Imz1AP0v1nHszOnc?=
+ =?us-ascii?Q?pprYvBJ5FSskx2kQgtfrgnN7s2u+wnQv9R/OqXXK5j3qjY8dntYwyEOgb7Wg?=
+ =?us-ascii?Q?y1eqfC7rwNoyON+boO+8JaAa+vnk3G8pu1u43FbGDk/XuitjHs+sBmhWAOFe?=
+ =?us-ascii?Q?pPou1J1jA7ujFLT78RHzwZPhEOQke/NOY9VuBTJ+x1T+f24vnRT7xtwbzY+d?=
+ =?us-ascii?Q?EJN8ILsVaOUuF8ALpOE6zsGtdRmMfrJATYooGI6vu8+bucmQr/G+0QRTTCAy?=
+ =?us-ascii?Q?FakbnIFe5rWrxG4/K+YYHUOaVwJS7Rv/7zJey5tDaXYYhHtGidjVOD3kiAMR?=
+ =?us-ascii?Q?Nw=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-OriginatorOrg: analog.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR03MB6938.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 68b733be-e60b-4338-2a07-08ddd41d9e76
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Aug 2025 12:43:03.3568
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: eaa689b4-8f87-40e0-9c6f-7228de4d754a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: M6B+hdAu3naC/l8QR0AByYS9R76SXa1pPOdyOxffCHmcLJlYuWyANPYMJO3HcESsSCQn3vVvszbb4TosQyuSVo+rgxGsueLa+Rwk6kTE/QQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR03MB6133
+X-Authority-Analysis: v=2.4 cv=aObwqa9m c=1 sm=1 tr=0 ts=6891fc5a cx=c_pps
+ a=JVdHkOrRnBzWLs0TqoS/Hw==:117 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
+ a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19
+ a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10
+ a=2OwXVqhp2XgA:10 a=gEfo2CItAAAA:8 a=KKAkSRfTAAAA:8 a=gAnH3GRIAAAA:8
+ a=J1Y8HTJGAAAA:8 a=1XWaLZrsAAAA:8 a=VwQbUJbxAAAA:8 a=20KFwNOVAAAA:8
+ a=zBKkBztrWjV6rEHAp2AA:9 a=CjuIK1q_8ugA:10 a=sptkURWiP4Gy88Gu7hUp:22
+ a=cvBusfyB2V15izCimMoJ:22 a=y1Q9-5lHfBjTkpIzbSAN:22
+X-Proofpoint-ORIG-GUID: K9VOWSScU_VTOqHfkB4EVcMFugQAyGHp
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODA1MDA5MSBTYWx0ZWRfX9lm/NlUvn5n0
+ 4xT43kibhV2SjhJlms5n17YXl616Ab0+Y0+cMXhHbiLjd5HvKM3UXtzu42pn18Jl4yvRWGFASzH
+ hAxULz+VHg/ufj9MVLc7yvYhwvl7NQPGj4BmsJkLaYpTtRGTShqgitLlVj7giWlYmhh5wIu7T7r
+ 1f8fO/OJHTghJA3j/PZkELXOrAR7RZOU7ni/xTVmcvQwpfEUDwJTmZPN+mh53fFd8aJcdpuiWZy
+ aiaYuzLCrlxrJIlS3sWIKegpMyp7hFvdyCocHU0h3n3JNVYG98e80bW+CdcJY9ga+I/QepM7HSK
+ uhrFL7mOAqTdIAtcpA8zyfy9PJSftgncWTQC6XAhKKsHUDc7vxAiuchsRkl+ShTsmTOaEHUlwKL
+ IM5UiC9XzyX+ARRuyiv0V4g01iZGsmkua0WWJxKEm7iuxymCr6jVXnxBLu7l6I76Fo5KG9qM
+X-Proofpoint-GUID: K9VOWSScU_VTOqHfkB4EVcMFugQAyGHp
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-05_03,2025-08-04_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1011 impostorscore=0 spamscore=0 priorityscore=1501
+ lowpriorityscore=0 mlxscore=0 bulkscore=0 suspectscore=0 phishscore=0
+ malwarescore=0 adultscore=0 mlxlogscore=999 classifier=spam authscore=0
+ authtc=n/a authcc= route=outbound adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2505280000 definitions=main-2508050091
 
-Throughput with GRE on IPv6 drops to 0 on NICs that use ice/bnxt_en
-or any driver with NETIF_F_IP_CSUM and NETIF_F_IPV6_CSUM set and with
-NETIF_F_HW_CSUM unset, see following dmesg output for more info.
+Hi All,
 
-bnxt_en: caps=(0x009201c01dd14833, 0x0000000e401d4869)
-WARNING: CPU: 1 PID: 5273 at net/core/dev.c:3535 skb_warn_bad_offload+0x81/0x140
-Modules linked in: ip6_gre gre ip6_tunnel tunnel6 mlx5_ib mlx5_fwctl macsec fwctl rfkill irdma ib_uverbs ib_core amd_atl intel_rapl_msr intel_rapl_common amd64_edac edac_mce_amd kvm_amd ipmi_ssif mlx5_core kvm mlxfw psample acpi_ipmi ice tls ast irqbypass i40e tg3 bnxt_en rapl wmi_bmof i2c_algo_bit pcspkr acpi_cpufreq pci_hyperv_intf ipmi_si i2c_piix4 gnss k10temp i2c_smbus libie ptdma ipmi_devintf ipmi_msghandler joydev sg loop fuse nfnetlink xfs sd_mod ahci libahci libata ghash_clmulni_intel ccp sp5100_tco wmi dm_mirror dm_region_hash dm_log dm_mod
-CPU: 1 UID: 0 PID: 5273 Comm: iperf3 Kdump: loaded Not tainted 6.16.0-0.rc7.60.eln150.x86_64 #1 PREEMPT(lazy)
-Hardware name: Abacus electric, s.r.o. - servis@abacus.cz Super Server/H12SSW-iN, BIOS 2.7 10/25/2023
-RIP: 0010:skb_warn_bad_offload+0x81/0x140
-Code: 8d 88 18 02 00 00 48 85 c0 48 c7 c0 28 43 41 9e 48 0f 44 c8 48 8d 93 b8 00 00 00 4c 89 c6 48 c7 c7 b3 92 a3 9e e8 cf 0e 4e ff <0f> 0b 48 83 c4 08 5b 5d e9 6d b5 2a ff 80 bb 20 01 00 00 00 74 1d
-RSP: 0018:ffffcfed417aef70 EFLAGS: 00010246
-RAX: 0000000000000000 RBX: ffff8ec94e59c000 RCX: 0000000000000000
-RDX: ffff8ed84e66a500 RSI: 0000000000000001 RDI: ffff8ed84e65c200
-RBP: ffff8ecb1716e0e8 R08: 0000000000000000 R09: 00000000ffff7fff
-R10: ffffffff9f265700 R11: ffffcfed417aee08 R12: ffff8ec94e59c000
-R13: ffffcfed417af023 R14: ffff8ec94e59c000 R15: ffffcfed417af023
-FS:  00007f7ee69516c0(0000) GS:ffff8ed8ae504000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f7ee6950f78 CR3: 000000011436c006 CR4: 0000000000f70ef0
-PKRU: 55555554
-Call Trace:
- <TASK>
- skb_checksum_help+0x12a/0x1f0
- ? netif_skb_features+0xc1/0x2e0
- validate_xmit_skb+0x1a3/0x2d0
- validate_xmit_skb_list+0x4f/0x80
- sch_direct_xmit+0x1a2/0x380
- __dev_xmit_skb+0x242/0x670
- __dev_queue_xmit+0x3fc/0x7f0
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? ip6_rt_copy_init+0xf0/0x290
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? selinux_ip_postroute+0x1c5/0x420
- ? srso_alias_return_thunk+0x5/0xfbef5
- ip6_finish_output2+0x25e/0x5d0
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? nf_hook_slow+0x47/0xf0
- ? srso_alias_return_thunk+0x5/0xfbef5
- ip6_finish_output+0x1fc/0x3f0
- ip6_tnl_xmit+0x608/0xc00 [ip6_tunnel]
- ? srso_alias_return_thunk+0x5/0xfbef5
- ip6gre_tunnel_xmit+0x1c0/0x390 [ip6_gre]
- dev_hard_start_xmit+0x63/0x1c0
- __dev_queue_xmit+0x6d0/0x7f0
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? chacha_block_generic+0x72/0xd0
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? selinux_ip_postroute+0x1c5/0x420
- ip6_finish_output2+0x214/0x5d0
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? nf_hook_slow+0x47/0xf0
- ip6_finish_output+0x1fc/0x3f0
- ip6_xmit+0x2ca/0x6f0
- ? __pfx_dst_output+0x10/0x10
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? __sk_dst_check+0x41/0xc0
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? inet6_csk_route_socket+0x12e/0x200
- inet6_csk_xmit+0xeb/0x150
- __tcp_transmit_skb+0x555/0xa80
- tcp_write_xmit+0x32a/0xe90
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? skb_do_copy_data_nocache+0xc9/0x150
- tcp_sendmsg_locked+0x437/0x1110
- ? srso_alias_return_thunk+0x5/0xfbef5
- tcp_sendmsg+0x2f/0x50
- sock_write_iter+0x126/0x1a0
- vfs_write+0x3c8/0x480
- ksys_write+0xbf/0xf0
- do_syscall_64+0x7c/0x970
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? syscall_exit_work+0x143/0x1b0
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? do_syscall_64+0xaf/0x970
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? __rseq_handle_notify_resume+0x39/0x60
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? exit_to_user_mode_loop+0xbf/0x120
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? do_syscall_64+0xaf/0x970
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? drain_stock+0x79/0xa0
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? __mem_cgroup_threshold+0x18/0xf0
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? memcg1_check_events+0x60/0x1b0
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? memcg1_commit_charge+0x6f/0x90
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? mod_memcg_lruvec_state+0x1a4/0x200
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? __lruvec_stat_mod_folio+0x85/0xd0
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? __folio_mod_stat+0x2d/0x90
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? folio_add_new_anon_rmap+0x72/0x1b0
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? do_anonymous_page+0x49c/0x710
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? syscall_exit_work+0x143/0x1b0
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? do_syscall_64+0xaf/0x970
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? count_memcg_events+0x14d/0x1a0
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? handle_mm_fault+0x247/0x360
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? do_user_addr_fault+0x20f/0x6a0
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? irqentry_exit_to_user_mode+0x2c/0x180
- entry_SYSCALL_64_after_hwframe+0x76/0x7e
-RIP: 0033:0x7f7ee713098f
-Code: 89 54 24 18 48 89 74 24 10 89 7c 24 08 e8 39 7a f9 ff 48 8b 54 24 18 48 8b 74 24 10 41 89 c0 8b 7c 24 08 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 31 44 89 c7 48 89 44 24 08 e8 8c 7a f9 ff 48
-RSP: 002b:00007f7ee6950e00 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-RAX: ffffffffffffffda RBX: 0000000000020000 RCX: 00007f7ee713098f
-RDX: 0000000000020000 RSI: 00007f7ee6f11000 RDI: 0000000000000005
-RBP: 00007f7ee6f11000 R08: 0000000000000002 R09: 00007f7ee69516c0
-R10: 0000000000000008 R11: 0000000000000246 R12: 0000000000000005
-R13: 0000000000020000 R14: 00007ffea6ee3400 R15: 00007ffea6ee3507
- </TASK>
----[ end trace 0000000000000000 ]---
-skb len=7018 headroom=182 headlen=138 tailroom=0
-mac=(182,14) mac_len=0 net=(196,48) trans=244
-shinfo(txflags=0 nr_frags=1 gso(size=1376 type=80 segs=5))
-csum(0x100120 start=288 offset=16 ip_summed=3 complete_sw=0 valid=0 level=0)
-hash(0x7ec90a00 sw=0 l4=1) proto=0x86dd pkttype=0 iif=0
-priority=0x0 mark=0x0 alloc_cpu=1 vlan_all=0x0
-encapsulation=1 inner(proto=0xdd86, mac=248, net=248, trans=288)
-dev name=enp1s0f0np0 feat=0x009201c01dd14833
-sk family=10 type=1 proto=6
-skb linear:   00000000: e4 3d 1a 7d ec 30 e4 3d 1a 7e 5d 90 86 dd 60 0e
-skb linear:   00000010: 00 0a 1b 34 3c 40 20 11 00 00 00 00 00 00 00 00
-skb linear:   00000020: 00 00 00 00 00 12 20 11 00 00 00 00 00 00 00 00
-skb linear:   00000030: 00 00 00 00 00 11 2f 00 04 01 04 01 01 00 00 00
-skb linear:   00000040: 86 dd 60 0e 00 0a 1b 00 06 40 20 23 00 00 00 00
-skb linear:   00000050: 00 00 00 00 00 00 00 00 00 12 20 23 00 00 00 00
-skb linear:   00000060: 00 00 00 00 00 00 00 00 00 11 bf 96 14 51 13 f9
-skb linear:   00000070: ae 27 a0 a8 2b e3 80 18 00 40 5b 6f 00 00 01 01
-skb linear:   00000080: 08 0a 42 d4 50 d5 4b 70 f8 1a
-skb frag:     00000000: 80 de bb bd 51 f8 32 e7 5d f5 65 65 a1 22 76 05
-skb frag:     00000010: 02 f8 60 25 e6 37 0b b3 90 05 8e 7f f4 c2 5d 9c
-skb frag:     00000020: e3 24 84 ac 0e 03 9d 14 ac 1e e2 18 4c 45 ef 5f
-skb frag:     00000030: db 95 db ab 1f c9 7f 6d 19 70 1f 0c e7 6e fd 6e
-skb frag:     00000040: f4 ff 73 1e 06 8d a8 06 53 ba bf 58 12 cb b9 59
-skb frag:     00000050: f0 71 7e c3 69 0a f5 19 8b b3 eb b1 fa e5 9c 59
-skb frag:     00000060: 40 bb 1d 11 88 f4 c1 cc 77 91 41 2c bb 7e 9d b7
-skb frag:     00000070: ac 50 1a e3 d1 ce f7 f9 58 e4 d5 5c 62 f4 eb 39
-skb frag:     00000080: 0d 13 2a 31 2c ec
-------------[ cut here ]------------
+Replying from outloock client. Hope it may keep the message in plain text.
 
-Mask NETIF_F_IPV6_CSUM in gso_features_check if the IPv6 header contains
-extension headers. This flag indicates that the network interface
-is capable of computing the checksum only for plain IPv6 headers
-without any extension headers.
+-----Original Message-----
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>=20
+Sent: Thursday, July 24, 2025 8:38 AM
+To: Hennerich, Michael <Michael.Hennerich@analog.com>; Andrew Lunn <andrew+=
+netdev@lunn.ch>; David S. Miller <davem@davemloft.net>; Eric Dumazet <eduma=
+zet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redh=
+at.com>; Rob Herring <robh@kernel.org>; Krzysztof Kozlowski <krzk+dt@kernel=
+.org>; Conor Dooley <conor+dt@kernel.org>; Schmitt, Marcelo <Marcelo.Schmit=
+t@analog.com>; netdev@vger.kernel.org; devicetree@vger.kernel.org; linux-ke=
+rnel@vger.kernel.org
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: [PATCH net-next] dt-bindings: net: Replace bouncing Alexandru Tach=
+ici emails
 
-The exception is a BIG TCP extension, which, as stated in 68e068cabd2c6c53:
-"The feature is only enabled on devices that support BIG TCP TSO.
-The header is only present for PF_PACKET taps like tcpdump,
-and not transmitted by physical devices."
+[External]
 
-Fixes: 04c20a9356f283da ("net: skip offload for NETIF_F_IPV6_CSUM if ipv6 header contains extension")
-Reported-by: Tianhao Zhao <tizhao@redhat.com>
-Suggested-by: Michal Schmidt <mschmidt@redhat.com>
-Signed-off-by: Jakub Ramaseuski <jramaseu@redhat.com>
+Emails to alexandru.tachici@analog.com bounce permanently:
+
+  Remote Server returned '550 5.1.10 RESOLVER.ADR.RecipientNotFound; Recipi=
+ent not found by SMTP address lookup'
+
+so replace him with Marcelo Schmitt from Analog.
+
+Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+
+
+Reviewed-by: Marcelo Schmitt <marcelo.schmitt@analog.com>
+
+
 ---
----
- net/core/dev.c | 4 ++++
- 1 file changed, 4 insertions(+)
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index b28ce68830b2b..118c433c2cb9b 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -3778,6 +3778,10 @@ static netdev_features_t gso_features_check(const struct sk_buff *skb,
- 		if (!(iph->frag_off & htons(IP_DF)))
- 			features &= ~NETIF_F_TSO_MANGLEID;
- 	}
-+	if (vlan_get_protocol(skb) == htons(ETH_P_IPV6) &&
-+		skb_network_header_len(skb) != sizeof(struct ipv6hdr) &&
-+		!ipv6_has_hopopt_jumbo(skb))
-+		features &= ~NETIF_F_IPV6_CSUM;
- 
- 	return features;
- }
--- 
-2.50.1
+I don't know who from Analog should maintain these devices, so I chosen aut=
+hor from Analog of one of last commits.
+
+Marcelo Schmitt, could you confirm that you are okay (or not) with this?
+
+
+Okay, I'll take mainteinership of those.
+
+Thanks,
+Marcelo
+---
+ Documentation/devicetree/bindings/net/adi,adin.yaml     | 2 +-
+ Documentation/devicetree/bindings/net/adi,adin1110.yaml | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Documentation/devicetree/bindings/net/adi,adin.yaml b/Document=
+ation/devicetree/bindings/net/adi,adin.yaml
+index 929cf8c0b0fd..c425a9f1886d 100644
+--- a/Documentation/devicetree/bindings/net/adi,adin.yaml
++++ b/Documentation/devicetree/bindings/net/adi,adin.yaml
+@@ -7,7 +7,7 @@ $schema: https://urldefense.com/v3/__http://devicetree.org/=
+meta-schemas/core.yaml*__;Iw!!A3Ni8CS0y2Y!73gdqTRuQpEL0--RU43XL53e-LqwYNzpe=
+v_m_42IRTa0NKgxZr2OKSqH7g_Rc5ogFapE5tzSZ20mO9jn31d91LFJ8ry9jlxA$
+ title: Analog Devices ADIN1200/ADIN1300 PHY
+=20
+ maintainers:
+-  - Alexandru Tachici <alexandru.tachici@analog.com>
++  - Marcelo Schmitt <marcelo.schmitt@analog.com>
+=20
+ description: |
+   Bindings for Analog Devices Industrial Ethernet PHYs diff --git a/Docume=
+ntation/devicetree/bindings/net/adi,adin1110.yaml b/Documentation/devicetre=
+e/bindings/net/adi,adin1110.yaml
+index 9de865295d7a..0a73e01d7f97 100644
+--- a/Documentation/devicetree/bindings/net/adi,adin1110.yaml
++++ b/Documentation/devicetree/bindings/net/adi,adin1110.yaml
+@@ -7,7 +7,7 @@ $schema: https://urldefense.com/v3/__http://devicetree.org/=
+meta-schemas/core.yaml*__;Iw!!A3Ni8CS0y2Y!73gdqTRuQpEL0--RU43XL53e-LqwYNzpe=
+v_m_42IRTa0NKgxZr2OKSqH7g_Rc5ogFapE5tzSZ20mO9jn31d91LFJ8ry9jlxA$
+ title: ADI ADIN1110 MAC-PHY
+=20
+ maintainers:
+-  - Alexandru Tachici <alexandru.tachici@analog.com>
++  - Marcelo Schmitt <marcelo.schmitt@analog.com>
+=20
+ description: |
+   The ADIN1110 is a low power single port 10BASE-T1L MAC-
+--
+2.48.1
 
 
