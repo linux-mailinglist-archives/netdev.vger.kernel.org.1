@@ -1,121 +1,88 @@
-Return-Path: <netdev+bounces-211778-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211779-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4611EB1BAF7
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 21:33:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08AF8B1BB23
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 21:47:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4050E18A7B8A
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 19:33:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C182D18849B5
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 19:48:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3399C224B1F;
-	Tue,  5 Aug 2025 19:32:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56F2D2264A6;
+	Tue,  5 Aug 2025 19:47:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rVO1Gy+/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="htbK/Ara"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8725D221FB6
-	for <netdev@vger.kernel.org>; Tue,  5 Aug 2025 19:32:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 323B91DFF0
+	for <netdev@vger.kernel.org>; Tue,  5 Aug 2025 19:47:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754422374; cv=none; b=MPixQoD4VgpQDypUx4/njgCpck6himcnbgCXcuuISrUqKlriRKAsPPQ5D/Cq0vjkseDBrJpMWkYMAE6uCgRl3tN5oBPsdN9l55woq+HQJiVaK1QBEqIZbzooqbL864eiRfCFV9URQgUjN0J7ro+acx2E3FrII8/BNwLLGIK8tuY=
+	t=1754423260; cv=none; b=PZYUXgcTG6IumbD7HFifKCwOIX0KaI4cCr7MiBfnpbmKG2jcvYA4Ett2ppJYcEE/cUh8THu85lR908zAQvvHKLua1K3bGWnhGDnpkCc4xbWBBSeEoyk6u+TEG+7hIeSSKRoQhzd1wKAMT97UbKG86XFA0To2+d99QY/pHd9c4Qg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754422374; c=relaxed/simple;
-	bh=f5YTjW9VECJW0G23VM5eCIi2OhPiZ2wKeAH97xCkiHU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kURavsy185SUyoklZyCoOAPob6b82jDxdRygAnN4DigyjcE2H8La/RWjvl+kcCS3gEDn0n3myNjZIv8UNKBfKGlXhFPR1o5THmIFHxsHj2Q+iKRVl3Sapps+X2bI3r5EzOd2dFUTTruVjZFuQTVLIiLV9Pa/re0sfzQWze10Z5g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rVO1Gy+/; arc=none smtp.client-ip=91.218.175.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <08bd431d-c887-4f69-9c1e-4b40a301ecf7@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1754422369;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vYUMZ7E+6vJC5FpLL2HyF+nE/45hsY2ZWy2Xc7WZ050=;
-	b=rVO1Gy+/hQM6eI5atg/ciXvbT7rpZLZEeM39lIPN0WohD6C7XJ489W4czPj/rOnkMi04OR
-	DVNGL/YRdy1/OxMAAdbHeP1fk73KWF7aLMPbsaYZqcmIkJz2fJ7rlmhuYE0mnch2kEv9Yg
-	1J2TJBm7uGAVcGLOyj6bpl7t1riDkqc=
-Date: Tue, 5 Aug 2025 15:32:41 -0400
+	s=arc-20240116; t=1754423260; c=relaxed/simple;
+	bh=2kAmmtJgfM3QTJtTBPTuSG7ml0fYwgF+Z65UNgw8FDw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jPNlqWsQDQTZU/JyUe28ZfFs/GKxJ9pnUH5F3AQDNiR5T5mBV75uzng3/JNQdMPc5/wvdCkpkZMPNxFhOJ7fZH/8UU8Mp3jtbf7PIdAEXsEJkOINDqsQ8qLko50ZYl/FYxIStnZPetQODOZcihTTlJbatPVTOoFiet0JIrZrNPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=htbK/Ara; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1BB4C4CEF0;
+	Tue,  5 Aug 2025 19:47:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754423259;
+	bh=2kAmmtJgfM3QTJtTBPTuSG7ml0fYwgF+Z65UNgw8FDw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=htbK/Ara2v5y5NVGLmKaP5GL+WiOkkGErNmKHxqrqi113hXPqW/yTelDNWCQPN0co
+	 3W2YNHL5oNVB83VbpHnhAyXZsVWXLTMDgGz/2uW86G1jaVaf+0kJOwP1iWqshKhJIt
+	 U/PwvC97kTzO/zTqCi+3W0nmzhz7zCr4rKTQeTagUilL2+KLmvenL2qVgwxyNbuaiX
+	 DW2VVHgs6mX19IdujLrmb6/SlXrl5tHdXQrzz145zxjTpNItK24VT5ChjuFQ4nwm2D
+	 wGiCivbKTPczzem8etuFAnvHPC5QnbNjXnhzImZYfMYJ+8k0mTNOhNhPKvVrzLDuEg
+	 w++WwUBjKBP3Q==
+Date: Tue, 5 Aug 2025 20:47:35 +0100
+From: Simon Horman <horms@kernel.org>
+To: David Hill <dhill@redhat.com>
+Cc: netdev@vger.kernel.org, anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com
+Subject: Re: [PATCH 1/2] PATCH: i40e Improve trusted VF MAC addresses logging
+ when limit is reached
+Message-ID: <20250805194735.GA61519@horms.kernel.org>
+References: <20250805134042.2604897-1-dhill@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net] net: xilinx: axienet: Increment Rx skb ring head
- pointer after BD is successfully allocated in dmaengine flow
-To: Suraj Gupta <suraj.gupta2@amd.com>, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, michal.simek@amd.com, radhey.shyam.pandey@amd.com,
- horms@kernel.org
-Cc: netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, harini.katakam@amd.com
-References: <20250805191958.412220-1-suraj.gupta2@amd.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Sean Anderson <sean.anderson@linux.dev>
-In-Reply-To: <20250805191958.412220-1-suraj.gupta2@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250805134042.2604897-1-dhill@redhat.com>
 
-On 8/5/25 15:19, Suraj Gupta wrote:
-> In DMAengine flow, AXI DMA driver invokes callback before freeing BD in
-> irq handling path.
-> In Rx callback (axienet_dma_rx_cb()), axienet driver tries to allocate
-> new BD after processing skb.
-> This will be problematic if both AXI-DMA and AXI ethernet have same
-> BD count as all Rx BDs will be allocated initially and it won't be
-> able to allocate new one after Rx irq. Incrementing head pointer w/o
-> checking for BD allocation will result in garbage values in skb BD and
-> cause the below kernel crash:
+On Tue, Aug 05, 2025 at 09:40:41AM -0400, David Hill wrote:
+> When a VF reaches the limit introduced in this commit [1], the host reports
+> an error in the syslog but doesn't mention which VF reached its limit and
+> what the limit is actually is which makes troubleshooting of networking
+> issue a bit tedious.   This commit simply improves this error reporting
+> by adding which VF number has reached a limit and what that limit is.
 > 
-> Unable to handle kernel paging request at virtual address fffffffffffffffa
-> <snip>
-> Internal error: Oops: 0000000096000006 [#1]  SMP
-> pc : axienet_dma_rx_cb+0x78/0x150
-> lr : axienet_dma_rx_cb+0x78/0x150
->  Call trace:
->   axienet_dma_rx_cb+0x78/0x150 (P)
->   xilinx_dma_do_tasklet+0xdc/0x290
->   tasklet_action_common+0x12c/0x178
->   tasklet_action+0x30/0x3c
->   handle_softirqs+0xf8/0x230
-> <snip>
+> [1] commit cfb1d572c986 ("i40e: Add ensurance of MacVlan resources for every
+> trusted VF")
 > 
-> Fixes: 6a91b846af85 ("net: axienet: Introduce dmaengine support")
-> Signed-off-by: Suraj Gupta <suraj.gupta2@amd.com>
+> Signed-off-by: David Hill <dhill@redhat.com>
 > ---
->  drivers/net/ethernet/xilinx/xilinx_axienet_main.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-> index 6011d7eae0c7..acd5be60afec 100644
-> --- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-> +++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-> @@ -1457,7 +1457,6 @@ static void axienet_rx_submit_desc(struct net_device *ndev)
->  	if (!skbuf_dma)
->  		return;
->  
-> -	lp->rx_ring_head++;
->  	skb = netdev_alloc_skb(ndev, lp->max_frm_size);
->  	if (!skb)
->  		return;
-> @@ -1482,6 +1481,7 @@ static void axienet_rx_submit_desc(struct net_device *ndev)
->  	skbuf_dma->desc = dma_rx_desc;
->  	dma_rx_desc->callback_param = lp;
->  	dma_rx_desc->callback_result = axienet_dma_rx_cb;
-> +	lp->rx_ring_head++;
->  	dmaengine_submit(dma_rx_desc);
->  
->  	return;
+>  drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
 
-Reviewed-by: Sean Anderson <sean.anderson@linux.dev>
+Reviewed-by: Simon Horman <horms@kernel.org>
+
+For future reference: please observe the rule that there should
+be a delay of 24h between posting versions of a patch to netdev.
+
+https://docs.kernel.org/process/maintainer-netdev.html
+
+...
 
