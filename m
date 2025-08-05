@@ -1,261 +1,314 @@
-Return-Path: <netdev+bounces-211663-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211665-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E344B1B08C
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 10:58:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 63218B1B0A0
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 11:03:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1EEB33A3DFE
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 08:58:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A37B43A67B1
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 09:03:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC242258CF0;
-	Tue,  5 Aug 2025 08:58:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27ECE2594BE;
+	Tue,  5 Aug 2025 09:03:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ik9En4LY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f79.google.com (mail-io1-f79.google.com [209.85.166.79])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2081.outbound.protection.outlook.com [40.107.101.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D08F257AC6
-	for <netdev@vger.kernel.org>; Tue,  5 Aug 2025 08:58:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.79
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754384315; cv=none; b=C4cEAgdnNw6JlMUHgfRU+zp8zklB8tHr+q5D+uF+qkUuikWzWLpdXY1lsQB5OxkrPSiKMlm/A02X38UMfLcpJ/QSqG8mhWmI2ys7N/57KKSBsDk2n/t2b9I9EoV1RDivrYBRhrdM3VFw5gq4pwPVxkFgS/cMqVJVrt0sgycu0dw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754384315; c=relaxed/simple;
-	bh=ROU4usAY7FLO4IEUuf/j0jcf3HhoyxppnIrnbW9Gg4E=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=dtb7xe2//8V3dXfqaDBHdSkRXbhPj33/H+pmOJYx2X++diYW74UoZQ2hOPnJoqcdYs/BqPXiP6idFCaZQH7CuRzqzBhQpJQsXehJUnQmfmZ+lDHC/NCqNhJ1g07WVHextlPzyoZA9X5//1P9UIUE6vUi6Heu2O+qxMubyUMmsm8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.79
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f79.google.com with SMTP id ca18e2360f4ac-87c1c2a4f9dso946871439f.2
-        for <netdev@vger.kernel.org>; Tue, 05 Aug 2025 01:58:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754384312; x=1754989112;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=l1WNoAj0DpZzqc24ya6V8dghZm6KdpNb3dMMcndP+Qo=;
-        b=aCoTG4lHReTGphfyQlQmChwKhrtpt0RfKKXiyscuJcbi770iD63apVrpSNHDeeNrbP
-         W0n1096JzBkD+k9i5stvtmfMGDLup36+zRd/HCBPNL0+fF/tb0fZnbqV2fA8yqRjSLY5
-         MYMUCx50REQ5/oAPXmfAIMJQFoyEBA9CHfGnruITWUBUR+CteuOQ77+dSh1VxlS0Iqed
-         gOb224kE7FZtuRFT944sRODipr+YM9jJv/WDq2EPrczJV+tEHDupDWSVaUoo5vdfmTMx
-         ny5LWs/lAcIQHYutgiaAcK1J/7KhEyp4gYbEVRGPYVkfOJAmibKCz7gMhjEomQRanoqw
-         cg8A==
-X-Forwarded-Encrypted: i=1; AJvYcCVeQhwCo47CGSI/CT52vz1sbxMSk8dQxORt1a5RwY8+njxu55JLD8YyGHgnIB46KWgszbET9Ck=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxJbDZSKF9058PXTRdiRbblNK4cfAY7gDEGNMypuhg1EI1Ok3XE
-	g5BsqJINLVW+BXfMKil6Mbsq6FNHz07HF+e+PgS1hQVIvUl4Ev/iDlUhFneVXnwmPnuZui47/Bh
-	0btoJw8F48IETLm4pgDi2yN7Hp5v8vKhLhQjakP8UoGSGw28/RRveCbwn958=
-X-Google-Smtp-Source: AGHT+IFodmuJvtVjyVs52g4C10q8nTRHjv7OPiVkaIHbKXtYdeEhfRV8PP5epOXl5W2U5ZYRS4Pif1KtqJX7qOnNnnccBhtH8Peu
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81872EEA6
+	for <netdev@vger.kernel.org>; Tue,  5 Aug 2025 09:03:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.81
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1754384607; cv=fail; b=kgoVmR86326EVRJgJ9cz8IlCIsVY9H2IVtJJZyXh859OyYhC5g6YdKZP344iBEoEPv0IqkgwevMUzaCTeq/iJLhI9P7IeeVe6txNbqe+H4mJO+DdsjbAtShIEP8k7L+FWi3Hi9X7oqDZ0hDTVp6TLa28KmBbEvkPCCrgYdnBUN4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1754384607; c=relaxed/simple;
+	bh=yWHqk9H0rNCPPhU0SYIfgMMt3A5blagj6r7fs5bE41o=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=BjZXy5ur+dpHDtUJWWOIez+ZvJz6zuPkgT1fXTW6X0a4t9Jkx1e6KCKsrZ+w3+M7ew/0IKutuU/2Ca4WVZ6CyOeM5z+X1wdlWzPZ46ZKDeFHiS/tnM4FcxND/9+UnV+jFAYBuH960vMMwin6OVgMr2E1cYfcXiJQD79kxIBZDVQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ik9En4LY; arc=fail smtp.client-ip=40.107.101.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=aRW7ujxcTxCX9aoQnQE0IrBVatAhSOKLOghWVOWk8bbZOjG44qLQx7mIYK00VvQvlqPAmy6hQJdDYiy8b4KmAHvhW4ZJbHzvLg2xC5VONlyyHqXil1IPfTj/p05mGMgXe7I51oW6QY5pAa3GVYOc3dxH70bf8/+IpCtj4djB1bZtMXMdNp3G/Y5NUyHdCD7aRJATQzsp+a7kNsy4jZt4Vz9U/h9RVUeU0S9PwPRkbgWe7pcQBFFfzWLbauFkJS/uCpu4b2Ekpwj52mgP8tmVQncOQww2mzcHnvTlPCCEHsziHxjFgzwaJxkNBRENxrezC3KVe2gfvv/m0/qgVfnwxQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=U3G0s5Z4pWmCL3wlE39tjkSk7RflcbxGZphix2rTaSg=;
+ b=lXydUbhmNd3ugeqxWogGxfr23CrEt/upfIrJR+HAGFCVOtmIoXJTuS4mpW0PKBUZILF0avGeP18Ap0zI5InkPunmAVTmU/fg9OhpfgNakj6CC1fN9KVfndvPrSrhzHbAByNp9MAbaQ+A/gnYLdMkpxJjmwabOrfawLrNJ0ybzsBeOslRV9N0jZfCZYFsuN2ord9jdRIlvFlAt3dpsTLQfrO3K2n7VpAfAWGAF80AaV8n8lx4YUOl6HVMkuUX+qk2Fdhony3ccaCEG/3uYpyeT8Bc/dv+etgIl1F7LE2dtxnNSDgTTwXNxhgxHHUXKiq10pc2Z2APptT0o99mM8J95Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=U3G0s5Z4pWmCL3wlE39tjkSk7RflcbxGZphix2rTaSg=;
+ b=ik9En4LYSZNa4MVyBYG5u+XNgbDUhE2UsoWB26UarT25DQqSKtgCILQ+nqgAZg0ZUPCMQrIoqBTHM/3IwlKa0QxOLUide8NcQMLcHJAm6/qNOKTd6hYxCZhfI6Cwkba1vBFopDGEcpuya1U0vtLMn2w/qNIyW3TV0ueJQxGDl2IZoIlxY8zDT2nCJ76Vzm/KZAjKQF0khHKpS7lBrg62VNTcrSQoVAAKQ+/HjTA+j8Jwo8B2wq4D7BWtQoBdUFs9ArujsfVNqS31gLHeC31szWnOeNxrr/9vuSOLBpRwibL/sOX0LokyCWoGu8Vy8wdBglbp0dhGYJ7qMy7STjZNMw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MW4PR12MB7141.namprd12.prod.outlook.com (2603:10b6:303:213::20)
+ by SA1PR12MB7270.namprd12.prod.outlook.com (2603:10b6:806:2b9::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8989.20; Tue, 5 Aug
+ 2025 09:03:21 +0000
+Received: from MW4PR12MB7141.namprd12.prod.outlook.com
+ ([fe80::932c:7607:9eaa:b1f2]) by MW4PR12MB7141.namprd12.prod.outlook.com
+ ([fe80::932c:7607:9eaa:b1f2%5]) with mapi id 15.20.8989.013; Tue, 5 Aug 2025
+ 09:03:21 +0000
+Message-ID: <e55b8200-1fed-410c-a5b8-e37cad5d84b0@nvidia.com>
+Date: Tue, 5 Aug 2025 12:03:11 +0300
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v3] ethtool: add FEC bins histogramm report
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Andrew Lunn
+ <andrew@lunn.ch>, Michael Chan <michael.chan@broadcom.com>,
+ Pavan Chebbi <pavan.chebbi@broadcom.com>, Tariq Toukan <tariqt@nvidia.com>,
+ Gal Pressman <gal@nvidia.com>, intel-wired-lan@lists.osuosl.org,
+ Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org
+References: <20250802063024.2423022-1-vadfed@meta.com>
+ <d3bb8295-bb4f-4817-a2dd-017332c489d4@nvidia.com>
+ <25ab441c-84e8-4c47-8d13-1b88d78ed4c6@linux.dev>
+Content-Language: en-US
+From: Carolina Jubran <cjubran@nvidia.com>
+In-Reply-To: <25ab441c-84e8-4c47-8d13-1b88d78ed4c6@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: TL2P290CA0014.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:2::17) To MW4PR12MB7141.namprd12.prod.outlook.com
+ (2603:10b6:303:213::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:2b89:b0:881:7c17:ef2b with SMTP id
- ca18e2360f4ac-8817c17f0abmr1355865739f.6.1754384312221; Tue, 05 Aug 2025
- 01:58:32 -0700 (PDT)
-Date: Tue, 05 Aug 2025 01:58:32 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6891c7b8.050a0220.7f033.001f.GAE@google.com>
-Subject: [syzbot] [perf?] KASAN: slab-use-after-free Read in __task_pid_nr_ns
-From: syzbot <syzbot+e0378d4f4fe57aa2bdd0@syzkaller.appspotmail.com>
-To: acme@kernel.org, adrian.hunter@intel.com, 
-	alexander.shishkin@linux.intel.com, irogers@google.com, jolsa@kernel.org, 
-	kan.liang@linux.intel.com, linux-kernel@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org, mark.rutland@arm.com, mingo@redhat.com, 
-	namhyung@kernel.org, netdev@vger.kernel.org, peterz@infradead.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    e8d780dcd957 Merge tag 'slab-for-6.17' of git://git.kernel..
-git tree:       bpf-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=12392f82580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=287afdea79829fda
-dashboard link: https://syzkaller.appspot.com/bug?extid=e0378d4f4fe57aa2bdd0
-compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/5aa4922d60a2/disk-e8d780dc.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/f92a03738fad/vmlinux-e8d780dc.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/ac22ca9f709f/bzImage-e8d780dc.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+e0378d4f4fe57aa2bdd0@syzkaller.appspotmail.com
-
-==================================================================
-BUG: KASAN: slab-use-after-free in __task_pid_nr_ns+0x1da/0x470 kernel/pid.c:517
-Read of size 8 at addr ffff888066bbaa28 by task syz.5.936/10344
-
-CPU: 0 UID: 0 PID: 10344 Comm: syz.5.936 Not tainted 6.16.0-syzkaller-ge8d780dcd957 #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
-Call Trace:
- <TASK>
- dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:378 [inline]
- print_report+0xca/0x240 mm/kasan/report.c:482
- kasan_report+0x118/0x150 mm/kasan/report.c:595
- __task_pid_nr_ns+0x1da/0x470 kernel/pid.c:517
- perf_event_pid_type kernel/events/core.c:1431 [inline]
- perf_event_pid kernel/events/core.c:1440 [inline]
- perf_event_read_event kernel/events/core.c:8519 [inline]
- sync_child_event kernel/events/core.c:13962 [inline]
- perf_child_detach kernel/events/core.c:2339 [inline]
- __perf_remove_from_context+0x22e5/0x2a80 kernel/events/core.c:2510
- perf_remove_from_context+0x152/0x1d0 kernel/events/core.c:2559
- perf_event_release_kernel+0x2dd/0x510 kernel/events/core.c:5837
- perf_release+0x38/0x50 kernel/events/core.c:5870
- __fput+0x449/0xa70 fs/file_table.c:468
- task_work_run+0x1d1/0x260 kernel/task_work.c:227
- resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
- exit_to_user_mode_loop+0xec/0x110 kernel/entry/common.c:43
- exit_to_user_mode_prepare include/linux/irq-entry-common.h:208 [inline]
- syscall_exit_to_user_mode_work include/linux/entry-common.h:175 [inline]
- syscall_exit_to_user_mode include/linux/entry-common.h:210 [inline]
- do_syscall_64+0x2bd/0x3b0 arch/x86/entry/syscall_64.c:100
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f1fae18eb69
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fff16a52328 EFLAGS: 00000246 ORIG_RAX: 00000000000001b4
-RAX: 0000000000000000 RBX: 00007f1fae3b7ba0 RCX: 00007f1fae18eb69
-RDX: 0000000000000000 RSI: 000000000000001e RDI: 0000000000000003
-RBP: 00007f1fae3b7ba0 R08: 0000000000000200 R09: 0000001d16a5261f
-R10: 00007f1fae3b7ac0 R11: 0000000000000246 R12: 000000000005b884
-R13: 00007f1fae3b6320 R14: ffffffffffffffff R15: 00007fff16a52440
- </TASK>
-
-Allocated by task 10345:
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x3e/0x80 mm/kasan/common.c:68
- unpoison_slab_object mm/kasan/common.c:319 [inline]
- __kasan_slab_alloc+0x6c/0x80 mm/kasan/common.c:345
- kasan_slab_alloc include/linux/kasan.h:250 [inline]
- slab_post_alloc_hook mm/slub.c:4179 [inline]
- slab_alloc_node mm/slub.c:4228 [inline]
- kmem_cache_alloc_noprof+0x1c1/0x3c0 mm/slub.c:4235
- copy_signal+0x50/0x630 kernel/fork.c:1651
- copy_process+0x16a6/0x3c00 kernel/fork.c:2169
- kernel_clone+0x21e/0x840 kernel/fork.c:2602
- __do_sys_clone kernel/fork.c:2745 [inline]
- __se_sys_clone kernel/fork.c:2729 [inline]
- __x64_sys_clone+0x18b/0x1e0 kernel/fork.c:2729
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Freed by task 10345:
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x3e/0x80 mm/kasan/common.c:68
- kasan_save_free_info+0x46/0x50 mm/kasan/generic.c:576
- poison_slab_object mm/kasan/common.c:247 [inline]
- __kasan_slab_free+0x62/0x70 mm/kasan/common.c:264
- kasan_slab_free include/linux/kasan.h:233 [inline]
- slab_free_hook mm/slub.c:2416 [inline]
- slab_free mm/slub.c:4679 [inline]
- kmem_cache_free+0x18f/0x400 mm/slub.c:4781
- copy_process+0x2953/0x3c00 kernel/fork.c:2455
- kernel_clone+0x21e/0x840 kernel/fork.c:2602
- __do_sys_clone kernel/fork.c:2745 [inline]
- __se_sys_clone kernel/fork.c:2729 [inline]
- __x64_sys_clone+0x18b/0x1e0 kernel/fork.c:2729
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-The buggy address belongs to the object at ffff888066bba880
- which belongs to the cache signal_cache of size 1544
-The buggy address is located 424 bytes inside of
- freed 1544-byte region [ffff888066bba880, ffff888066bbae88)
-
-The buggy address belongs to the physical page:
-page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x66bb8
-head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-memcg:ffff88807df50c01
-flags: 0xfff00000000040(head|node=0|zone=1|lastcpupid=0x7ff)
-page_type: f5(slab)
-raw: 00fff00000000040 ffff88801b6dd780 ffffea00009cb000 dead000000000002
-raw: 0000000000000000 0000000080120012 00000000f5000000 ffff88807df50c01
-head: 00fff00000000040 ffff88801b6dd780 ffffea00009cb000 dead000000000002
-head: 0000000000000000 0000000080120012 00000000f5000000 ffff88807df50c01
-head: 00fff00000000003 ffffea00019aee01 00000000ffffffff 00000000ffffffff
-head: ffffffffffffffff 0000000000000000 00000000ffffffff 0000000000000008
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 3, migratetype Unmovable, gfp_mask 0xd20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 5203, tgid 5203 (S02sysctl), ts 31817104133, free_ts 28252177307
- set_page_owner include/linux/page_owner.h:32 [inline]
- post_alloc_hook+0x240/0x2a0 mm/page_alloc.c:1704
- prep_new_page mm/page_alloc.c:1712 [inline]
- get_page_from_freelist+0x21e4/0x22c0 mm/page_alloc.c:3669
- __alloc_frozen_pages_noprof+0x181/0x370 mm/page_alloc.c:4959
- alloc_pages_mpol+0x232/0x4a0 mm/mempolicy.c:2419
- alloc_slab_page mm/slub.c:2486 [inline]
- allocate_slab+0x8a/0x370 mm/slub.c:2654
- new_slab mm/slub.c:2708 [inline]
- ___slab_alloc+0xbeb/0x1410 mm/slub.c:3890
- __slab_alloc mm/slub.c:3980 [inline]
- __slab_alloc_node mm/slub.c:4055 [inline]
- slab_alloc_node mm/slub.c:4216 [inline]
- kmem_cache_alloc_noprof+0x283/0x3c0 mm/slub.c:4235
- copy_signal+0x50/0x630 kernel/fork.c:1651
- copy_process+0x16a6/0x3c00 kernel/fork.c:2169
- kernel_clone+0x21e/0x840 kernel/fork.c:2602
- __do_sys_clone kernel/fork.c:2745 [inline]
- __se_sys_clone kernel/fork.c:2729 [inline]
- __x64_sys_clone+0x18b/0x1e0 kernel/fork.c:2729
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-page last free pid 1 tgid 1 stack trace:
- reset_page_owner include/linux/page_owner.h:25 [inline]
- free_pages_prepare mm/page_alloc.c:1248 [inline]
- __free_frozen_pages+0xc71/0xe70 mm/page_alloc.c:2706
- __free_pages mm/page_alloc.c:5071 [inline]
- free_contig_range+0x1bd/0x4a0 mm/page_alloc.c:6927
- destroy_args+0x64/0x4a0 mm/debug_vm_pgtable.c:1009
- debug_vm_pgtable+0x3a7/0x3e0 mm/debug_vm_pgtable.c:1389
- do_one_initcall+0x233/0x820 init/main.c:1269
- do_initcall_level+0x104/0x190 init/main.c:1331
- do_initcalls+0x59/0xa0 init/main.c:1347
- kernel_init_freeable+0x334/0x4a0 init/main.c:1579
- kernel_init+0x1d/0x1d0 init/main.c:1469
- ret_from_fork+0x3fc/0x770 arch/x86/kernel/process.c:148
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
-Memory state around the buggy address:
- ffff888066bba900: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff888066bba980: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->ffff888066bbaa00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                                  ^
- ffff888066bbaa80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff888066bbab00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MW4PR12MB7141:EE_|SA1PR12MB7270:EE_
+X-MS-Office365-Filtering-Correlation-Id: 58f1b88f-f008-450b-ffe7-08ddd3feed02
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?a0RWajZuay83ZVliU3pSaDA4WTVMOHIvRW9Lb2M0b1htcTZkeXluUkpJS1pO?=
+ =?utf-8?B?VXp6dHo1eG56U1ZKUFpXam9adm9aeTQrTXhOQkpjb2Z0bk9UcWlzQlhFOFZP?=
+ =?utf-8?B?UytuYm9YSWRTSWVkUmkraGwwK3BqLzl3dVBUdVdzMU9DV0ZZd0xtTDZOdDJq?=
+ =?utf-8?B?OS84OVFnb0VjZ1gyK0ZpdHovZWVaMHpyUUFEY3RyZ1YvZVpNd0xVRWRWNUd4?=
+ =?utf-8?B?NE8wc25MU2Y3cU5VU0JxRUZES0d6bXdUUUxHQ2tYMWFFMlFsQmRrbUZsS0kr?=
+ =?utf-8?B?eVFVWDhnaG44aHBQajF2MTRUWStzREhNVDlZQUJkSE14bFNyTys3eG8xMXQz?=
+ =?utf-8?B?WGR0MVBoUnRJUWduSjk0SVZCMlpsN0krTW9pWDhWQjl5anJuRURSRnZVaHdj?=
+ =?utf-8?B?TG9XV2tVWmVabXhYekUzOVhjeHlYTnRpbWd4OHY2bDZPZDZzTk9RdVN2eUhm?=
+ =?utf-8?B?aFZaampMRm10cGI2MHBia2xJOU5XU2IzZ1luY3ZLUnJHUExzVnJTd3lSNG1j?=
+ =?utf-8?B?RjREbjlQaE9QaDFOSDZrMy9hNC8zc0RxcnJXekoyNTc2VVZkQjZoVUNGUk9U?=
+ =?utf-8?B?TndYajVGK3N6SEVIbjYrU3dqNkErMGpPU0Y0OWd6QW1FcTJYYUYrZkRWWUY5?=
+ =?utf-8?B?ODh1U1Fmb0RJc1lseVpQbXBFMnEvaTdnNWJXV1p3dGJrbSt0OEYwZFNaTjNG?=
+ =?utf-8?B?Qmt3S2JKaThxUTR3NjgvMXlpMEVsVXd3V3ExdUYvWlJ5QzdqUm1wNWloVVY2?=
+ =?utf-8?B?WnR1RlNwTTlCVGhnWmQzUTgzZXV1NmxHSXFrblVNRjR0OHQ0TzBwVHZJWTYr?=
+ =?utf-8?B?UnpmNjlEamlyUGdFR3FPcWlqcG1sQWtmQ1ZZbUNwQnZ3VWE5MmN6eThoZ1VY?=
+ =?utf-8?B?NStjQllkVG5SVU93b21ScmdKWTJsV04wTGZYaWlCZmdZVW1QVGZmSW1IbkRH?=
+ =?utf-8?B?NnVGTndmNHFwSVVYSzl5bk9wMzN3K294N1BhRmcyN2dycHQySDRyRW1NRFRI?=
+ =?utf-8?B?QmpXU0JZQkhiMFpvNFVYMDVqSCtET1ZaQUhUZUdURlJPZEZ0Z0ROdG9yV2gz?=
+ =?utf-8?B?N1puMWNpZWV5UnJTRTlaNWN6Nm1zYjNoQXlKc3Y4elRUbzhWTUt2cHFmR3Qw?=
+ =?utf-8?B?WVR4dnBMQ2tsbUlrR05IMWZlN1pscTVlWmU3R2hsN3pScXR5UlVnTERNNWQy?=
+ =?utf-8?B?RXY2Q0Q1akYwdWJEdW1XUTR3YURVbkpFWS9VYkpKYk50MjhlL1pVZUVDWFpK?=
+ =?utf-8?B?TUR6MWFaTlhOY2Z0VjdoLzI3K2g2NFdnUmhPS24rWTcvVElHTGRZMFpCUXgw?=
+ =?utf-8?B?UjdGWlA1cERNMmFZa1lGZ2NjYW8yNnV1VndzckxPZGRVVGZPNkFBbUVXVTc3?=
+ =?utf-8?B?TEtBMCtBSi9DSjhiZncyMVI1RHVnRmJMUkZMQndOaHhhaFo1SlJTWGdBanNQ?=
+ =?utf-8?B?M1Zjeis4U0lzUE9sVm1UZVNFaGFqanYzdTMyUlFhYzZxUmoxRWNVMjR5Y2Rv?=
+ =?utf-8?B?aWhCdEtTM2t4MGZXTzdIdlRRbFNKd0FoSWk5NWRiMEtPdkg3VWNBWVpsR1pz?=
+ =?utf-8?B?YU1aMFlFQTRPalk4WHBnR1loR3NkcFBwVW4xbG9ZK2dzS3R6ZkZ1ekdIeWhk?=
+ =?utf-8?B?ZEtMaks5ZS9iODVpY3dQMi94NjMxd3Z3OHRjcWQ4akUrbVp4N2dUcW4venlx?=
+ =?utf-8?B?UGVqT01CNjNINTNka2p5WWY5ODl3VVVCbXllcnhjeU10RUo5dS9BZTNrUUpM?=
+ =?utf-8?B?R2xiR0xKZWp3WTBrblpVaG5iYjN5bitJdHdsUWNMYmsrdEhZS2VFdWM0aVRI?=
+ =?utf-8?B?ZEZJMWxLSG81Y3F6NThYVlpTS2tHSDRvSTRuOUM4Q0R5eVJhZGdUTDc0RlVw?=
+ =?utf-8?B?Z1pPRjNvWmpseHJ1Nmh2aDFJT0dFekdZNHlUcVRhWGdaMXJ3WVlYYUtEdUND?=
+ =?utf-8?Q?goVJGfcHsFA=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR12MB7141.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?Z1RaeXp2c0x3QUZzSEE0bWtCS096dlU5NFpIeHk4c2Z4K3FHRDF6NU80ZU5k?=
+ =?utf-8?B?QkYxRitPSW84b2s2bDRjV3BYTU1UamJjMC85bDRhL3pBbkhqY1ZjcXVkaTda?=
+ =?utf-8?B?NUdTTGx6UWdTYmxWZEdqRC82a0ZPL3JkRkxrM2hFbjlVNmk2aEZHRjZlMDdZ?=
+ =?utf-8?B?b2t2K1gxQ0RrV2ZhM0crWnpBazlMTlVRazJRK09ETC83dW9FOUMyZlJkRlpP?=
+ =?utf-8?B?eXVjNXgxci9MeEtlVG9FOVlYK3djc01uYzBQK3lNd1RDVEErSlZ4ZmdFckh4?=
+ =?utf-8?B?UFRibG1TSTIwUDlpdmhsaFJIZVZFQm9xYlh3SjIxRkp5NmE5K05oSkZrZUk2?=
+ =?utf-8?B?cGh2NTZwWUxhVzRudTNxODlUL0JkQ3Jsak52NFBxQjRYM1piclkyUmpMZUpU?=
+ =?utf-8?B?ZVRka0xtSi9rbHl1VUxFeENhcWJlb1FEVGM5eU9JQ3kxRlJ2SFpVSnRJMjND?=
+ =?utf-8?B?UVZCYlc3QkUrTUQzQ2xvUXUxUC9Rc3hzamtubS9aUjVPQnVmaW5xNTQyK2FW?=
+ =?utf-8?B?QXg1aUdTdzd3MlorSm43VU1YZ04xaW42eGpUcUZRNnpDOEZ3b3FBSWhQYnly?=
+ =?utf-8?B?YnN5VXJhZGtNdlZiM2Q1SVYvUzROUDVCV1pzWTNUeTJ1VGQvZWwyS2hLVkxR?=
+ =?utf-8?B?ckZodFc1K0NSZTlPV3dhNWJnSk4zUmJIMmJTR0tFSnRaQmdsbnY4eWVLcU10?=
+ =?utf-8?B?akw2VWNFRWhBeHhyeWtnNldDUzBWeUZYWnJjcy8rdGhlV01qUUlMUytOYWJt?=
+ =?utf-8?B?enFramxaY2xrQnZwRGdTMXZGN2NTTkZURHZPalBKc1ZxblB4bG9MaXBHQW5k?=
+ =?utf-8?B?TFZnSEZGWEVES0JROTVaNUFYekxNMzlyTk05WFR6UE5LcGo4T3YvNGtJQ0o5?=
+ =?utf-8?B?cWhSL1pmQzJ5bDVDV3JrNHZKRTY4bjdudXhvYXozMUdjL3pHL3FnRG0zdG9X?=
+ =?utf-8?B?TFcyM2ladGhLWEdaOGV5SU5heW54d3lRMEcwM0hZN0pPdHVTbHNHdEE4RjBB?=
+ =?utf-8?B?MVhkOEtvQjY4endDQjNMNW9ra2tiSCtvSzRXQkNmMERXVHV2SHIwSFlyaGYx?=
+ =?utf-8?B?RWNQUlZENENUZEFvNnZ2NDUxVjBxMWFwd2dXS0V2RGtSR0s2N28wbGNyMDRi?=
+ =?utf-8?B?bUxFcHBUK3pFaE85aFY4RTBzODVOSDNZR2J3b2src0xYNWJ6NmkwbFJzdW1H?=
+ =?utf-8?B?NlFZaU14cnc4Zjc5NDhrQmtJUnN4YWFDL3FUaU1nNDNmb2xlb0Y1QklsTHFj?=
+ =?utf-8?B?RDNMSnNpZlMvY24yYU5vRTJRTDQ2Zkg0blBtY0NVU2c3SU5kd3IwV1NPOFV1?=
+ =?utf-8?B?QjJZMlIvb1FIRmlXTitRWlJjbEJhekhYK3NsVXJqenF3OWk0YUh4S1d5S2h0?=
+ =?utf-8?B?L3Z3d29EY2o3Z3VYSnREUXFKTGJEOG5tNkpLKzdKbGUzQXJLdUNtZnhKaVBP?=
+ =?utf-8?B?MnRWOTZWdVVMVkNMV3BKRGlyYTg2QmtGRmw0RmprRDRsb3Z2djEzVXlIVjJl?=
+ =?utf-8?B?MXZEVXBCQXR6WVcwTkFMdTNWUWMyRzRlNkhiRmNWM2lIV3NnMWFrUC9mZ0hI?=
+ =?utf-8?B?TUErcm8xQlFwWUtUdnVrMk5Ba29xQWJMT1pNUEg0N2tzeXRMUEFYMXJkY3VO?=
+ =?utf-8?B?R1lxcnorUTVORXZ0L3ZQWldtNy9HcGJrdVJQbG1rZWlEeWs0aFFZbkNNeUt4?=
+ =?utf-8?B?VEt1bkJYYUViOGZjb1ZkZmtueE1SUWRzbHIwVFZEWEhoaDVmcGoyNTUrdVBN?=
+ =?utf-8?B?aGtnRTQxdEVJQUZPNjh3emFVTHNzZ2NjQlFFc2lNQWU2SHgzd21JUHVvUkV4?=
+ =?utf-8?B?RUJsNDExblFtWCtOR1l2WXFDSFM0R05wSlVheDZHUTQybG9tRi8zSFlTQkVx?=
+ =?utf-8?B?UEZUKy9uaVJmb0huU3dQQXNtMWozM0libVVlcUQ2QWtGY2UvNW4zTDVXdFJu?=
+ =?utf-8?B?UDlFZGRqZ2tabXZNZlZ5VDdSZGMvaTBsSzc5WUlrRmRNQXBpaGMyYnNJR0VP?=
+ =?utf-8?B?SEw4RU1CRmlaQnVJMzJ5a29wUk13ZWd0SFBydG1wWVJHWCs2NHZGd3V6UUFj?=
+ =?utf-8?B?RXdXWmxEVEg5WDUwSXBubzRTRlQ3NDhyVU9XMVNLWWZLM3d5MHB0dWpMckJD?=
+ =?utf-8?Q?3QaZ1FqewVtLKzT4nz3C4Eu1w?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 58f1b88f-f008-450b-ffe7-08ddd3feed02
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR12MB7141.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Aug 2025 09:03:21.1118
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 0f7otV61kAI2NCrNfegbB9wlD7fCFP+STPtY6nElpbNXc57gNfFVA7C2DGsBK2KQ1/vYiooNOUbvK0k6cznEsw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7270
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+On 04/08/2025 11:31, Vadim Fedorenko wrote:
+> On 03/08/2025 12:24, Carolina Jubran wrote:
+>>
+>>
+>> On 02/08/2025 9:30, Vadim Fedorenko wrote:
+>>> diff --git a/Documentation/networking/ethtool-netlink.rst b/ 
+>>> Documentation/networking/ethtool-netlink.rst
+>>> index ab20c644af248..b270886c5f5d5 100644
+>>> --- a/Documentation/networking/ethtool-netlink.rst
+>>> +++ b/Documentation/networking/ethtool-netlink.rst
+>>> @@ -1541,6 +1541,11 @@ Drivers fill in the statistics in the 
+>>> following structure:
+>>>   .. kernel-doc:: include/linux/ethtool.h
+>>>       :identifiers: ethtool_fec_stats
+>>> +Statistics may have FEC bins histogram attribute 
+>>> ``ETHTOOL_A_FEC_STAT_HIST``
+>>> +as defined in IEEE 802.3ck-2022 and 802.3df-2024. Nested attributes 
+>>> will have
+>>> +the range of FEC errors in the bin (inclusive) and the amount of 
+>>> error events
+>>> +in the bin.
+>>> +
+>>
+>> Maybe worth mentioning per-lane histograms here.
+> 
+> Yep, will do it
+> 
+>>
+>>>   FEC_SET
+>>>   =======
+>>> diff --git a/drivers/net/netdevsim/ethtool.c b/drivers/net/netdevsim/ 
+>>> ethtool.c
+>>> index f631d90c428ac..1dc9a6c126b24 100644
+>>> --- a/drivers/net/netdevsim/ethtool.c
+>>> +++ b/drivers/net/netdevsim/ethtool.c
+>>> @@ -164,12 +164,29 @@ nsim_set_fecparam(struct net_device *dev, 
+>>> struct ethtool_fecparam *fecparam)
+>>>       ns->ethtool.fec.active_fec = 1 << (fls(fec) - 1);
+>>>       return 0;
+>>>   }
+>>> +static const struct ethtool_fec_hist_range netdevsim_fec_ranges[] = {
+>>> +    { 0, 0},
+>>> +    { 1, 3},
+>>> +    { 4, 7},
+>>> +    { 0, 0}
+>>> +};
+>>>
+>>
+>> Following up on the discussion from v1, I agree with Gal's concern 
+>> about pushing array management into the driver. It adds complexity 
+>> especially when ranges depend on FEC mode.
+> 
+> Still don't really get the reason. You have finite amount of FEC bin
+> configurations, per hardware per FEC type, you know current FEC type
+> value and can choose static range based on this knowledge. Why do you
+> want to query device over PCIe multiple times to figure out the same
+> configuration every time?
+> 
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+That’s true, we have known FEC modes, but we don’t always know the 
+actual bin layout, it can vary per device. So the driver still needs to 
+query the device to get the correct ranges, even if the FEC type is fixed.
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+>>
+>> The approach Andrew suggested makes sense to me. A simple helper to 
+>> add a bin would support both static and dynamic cases.
+>>
+>>>   static void
+>>> -nsim_get_fec_stats(struct net_device *dev, struct ethtool_fec_stats 
+>>> *fec_stats)
+>>> +nsim_get_fec_stats(struct net_device *dev, struct ethtool_fec_stats 
+>>> *fec_stats,
+>>> +           const struct ethtool_fec_hist_range **ranges)
+>>>   {
+>>> +    *ranges = netdevsim_fec_ranges;
+>>> +
+>>>       fec_stats->corrected_blocks.total = 123;
+>>>       fec_stats->uncorrectable_blocks.total = 4;
+>>> +
+>>> +    fec_stats->hist[0].bin_value = 345;
+>>
+>> bin_value is 345 but the per-lane sum is 445.
+> 
+> ahh.. yeah, will fix it
+> 
+>>> +    fec_stats->hist[1].bin_value = 12;
+>>> +    fec_stats->hist[2].bin_value = 2;
+>>> +    fec_stats->hist[0].bin_value_per_lane[0] = 125;
+>>> +    fec_stats->hist[0].bin_value_per_lane[1] = 120;
+>>> +    fec_stats->hist[0].bin_value_per_lane[2] = 100;
+>>> +    fec_stats->hist[0].bin_value_per_lane[3] = 100;
+>>>   }
+>>> +static int fec_put_hist(struct sk_buff *skb, const struct 
+>>> fec_stat_hist *hist,
+>>> +            const struct ethtool_fec_hist_range *ranges)
+>>> +{
+>>> +    struct nlattr *nest;
+>>> +    int i, j;
+>>> +
+>>> +    if (!ranges)
+>>> +        return 0;
+>>> +
+>>> +    for (i = 0; i < ETHTOOL_FEC_HIST_MAX; i++) {
+>>> +        if (i && !ranges[i].low && !ranges[i].high)
+>>> +            break;
+>>> +
+>>> +        nest = nla_nest_start(skb, ETHTOOL_A_FEC_STAT_HIST);
+>>> +        if (!nest)
+>>> +            return -EMSGSIZE;
+>>> +
+>>> +        if (nla_put_u32(skb, ETHTOOL_A_FEC_HIST_BIN_LOW,
+>>> +                 ranges[i].low) ||
+>>> +            nla_put_u32(skb, ETHTOOL_A_FEC_HIST_BIN_HIGH,
+>>> +                 ranges[i].high) ||
+>>> +            nla_put_uint(skb, ETHTOOL_A_FEC_HIST_BIN_VAL,
+>>> +                     hist[i].bin_value))
+>>
+>> Should skip bins where hist[i].bin_value isn’t set.
+> 
+> I'm kinda disagree. If the bin is configured, then the HW must provide a
+> value for it. Otherwise we will have inconsistency in user's output.
+> 
+> I was thinking of adding WARN_ON_ONCE() for such cases actually.
+> 
+I see your point, yeah I’m good with the WARN_ON_ONCE()
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+>>
+>>
+>> Thanks,
+>> Carolina
+> 
 
-If you want to undo deduplication, reply with:
-#syz undup
 
