@@ -1,374 +1,235 @@
-Return-Path: <netdev+bounces-211732-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211733-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF8FBB1B5D2
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 16:07:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4330B1B5C3
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 16:06:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25E9116D9BA
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 14:04:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3209D625CB7
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 14:05:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C756288530;
-	Tue,  5 Aug 2025 13:56:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2411D279354;
+	Tue,  5 Aug 2025 13:57:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="SThfW0P9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="I42mzR5O"
 X-Original-To: netdev@vger.kernel.org
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF7432877C5;
-	Tue,  5 Aug 2025 13:56:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754402174; cv=none; b=ueADXC2oJIzEjXuvmxT3e4pXXMWgKIIgcQ5N3oNT7MJ+twjM2IvVtl6w2BXZAjFrP5VyY4xbVCSuET7M3WNjT9pUq49nUujbRM7rnQXcO2rM4pBehtb5YNHEfrjDyrcRqKfUJF3i728Ro6S9uooK1D9FE4o81WATwJQula4PwcE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754402174; c=relaxed/simple;
-	bh=r8H3+YDpCtjw639WiP3nv8ipbljLkDAhnSg6tlf/o6A=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JOSO0adJMpeC08ckYwZ0pds2VgdC0kAz5kfWs3XXZpkON10t507URlq7AZRRU9P6HXAkmBheI8zSRuPdKX1fwfTtwCc8wPgmn/PRc1RNH5cKtYCzzgkaskAbkvyZQ00Z38l9t+5dWkMreVzZcW5RAkPW1uHO0JrlW0nP2iOFGqs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=SThfW0P9; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1754402170;
-	bh=r8H3+YDpCtjw639WiP3nv8ipbljLkDAhnSg6tlf/o6A=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=SThfW0P9ZoshXuL+4uS/4MulcWJEuYvtt3gHK6xZzvc3+RnuCwPcToKJ4Z8IlLhBD
-	 I4S/BkZ3P1vrmBgM8v/bK03aOFTy4dBOChGwz2QJ73/9SLSmeDhhKjse/nPlHAOiqj
-	 O2p6La2680Mpi+vs88fhYeiMa4ExOUgyODDviqGbKxmsr66/jDS/opdBt9x7vK/l8L
-	 Eb2Glw9fI7NmxE/IPSXdnxq4teoBS+8bauncwq9jonv3gybfy1jO1C3zNc/RDIAW1w
-	 BDyq+NF4J4trMXEAZT7fTWZ7IgCgt7PKCtsk65Hbj8t7+GSRmTlAD8KGJdlvjqrcAg
-	 Lw9R0obsr88aw==
-Received: from laura.lan (unknown [IPv6:2001:b07:646b:e2:1976:d3fe:e682:e398])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: laura.nao)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 70F8A17E04DA;
-	Tue,  5 Aug 2025 15:56:09 +0200 (CEST)
-From: Laura Nao <laura.nao@collabora.com>
-To: mturquette@baylibre.com,
-	sboyd@kernel.org,
-	robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	matthias.bgg@gmail.com,
-	angelogioacchino.delregno@collabora.com,
-	p.zabel@pengutronix.de,
-	richardcochran@gmail.com
-Cc: guangjie.song@mediatek.com,
-	wenst@chromium.org,
-	linux-clk@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	netdev@vger.kernel.org,
-	kernel@collabora.com,
-	Laura Nao <laura.nao@collabora.com>,
-	=?UTF-8?q?N=C3=ADcolas=20F=20=2E=20R=20=2E=20A=20=2E=20Prado?= <nfraprado@collabora.com>
-Subject: [PATCH v4 27/27] clk: mediatek: Add MT8196 vencsys clock support
-Date: Tue,  5 Aug 2025 15:54:47 +0200
-Message-Id: <20250805135447.149231-28-laura.nao@collabora.com>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250805135447.149231-1-laura.nao@collabora.com>
-References: <20250805135447.149231-1-laura.nao@collabora.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9CFC27145D
+	for <netdev@vger.kernel.org>; Tue,  5 Aug 2025 13:57:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.18
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1754402228; cv=fail; b=BOjz6nheABoxIlP9gdj+itCVAJkx93dF3BGVl1cWtMu8QuLyZOLYWtnMpJcf3GWYMiBfSz/RqVqMi+3YQOD3/h8A2m2RWSfpLAFVkkLG5kEGLVnACSe3w0ryFF8wkRKgiQcRMB7URTNAmiiFvN0BPBaTtcW5NEem/gLdhEMxdnU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1754402228; c=relaxed/simple;
+	bh=z5NbuwI0X2pjn+5M7x6lza3EzvWhfFuP8fRUGfUmzK4=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=Kd8MS/8au5zZU4Wzjy74khH01/AU+M3pSjMlFgkF4JoOR/uWmMfT6nrJQo3KBYKNQcOE8Y7UcjgxjpupEquv4Giyffvo2WcoFPz8YBGH6BI9va9Va6zHP68gdVfeOM7zBzQwwTldxmtewf5SzVw/OkuGQiOQFFEYDEC1zw8tpdM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=I42mzR5O; arc=fail smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1754402226; x=1785938226;
+  h=date:from:to:cc:subject:message-id:references:
+   content-transfer-encoding:in-reply-to:mime-version;
+  bh=z5NbuwI0X2pjn+5M7x6lza3EzvWhfFuP8fRUGfUmzK4=;
+  b=I42mzR5Oxfz1ErsUGmBy+lvarfRVvaczRNSynSbBv7rjTLcU/NPYLRyN
+   BlfUZ44Ev69pUsszhReiuIdcWwBUWZX3OUXhpz8NfIkRAsPKYdhWI7+gl
+   wFtfYwzGWAE5h6lAAT6jCof+FKPAt9CUnytUgDdsFcv8roWfTl2isFlHL
+   SBI1qsy91G/d7ErL6oUPt5vaxd4ZyWcpCi6JtbNlFuPtGdls04O58I5w4
+   f62MiX34A4/sQ/qtGEKRd4xnRjmzcnREl7WUil266sQ0oNb0kNtIFA3MR
+   4ZpTAcS6D8DJGYfjZIJoYjqM+7feswin5nJCekeMrD+YfTcpYHEVIPUT6
+   A==;
+X-CSE-ConnectionGUID: Me7Hgi14QLyltdV3Ow266w==
+X-CSE-MsgGUID: TaA8zUGcS5WR7+7ibhZBQA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11513"; a="56774405"
+X-IronPort-AV: E=Sophos;i="6.17,265,1747724400"; 
+   d="scan'208";a="56774405"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Aug 2025 06:57:05 -0700
+X-CSE-ConnectionGUID: cejFYcVhRcq2CUdHsRnnfw==
+X-CSE-MsgGUID: yDQQ1RPYQvy0ZTpIzRZJeQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,265,1747724400"; 
+   d="scan'208";a="164166664"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by orviesa009.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Aug 2025 06:57:06 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26; Tue, 5 Aug 2025 06:57:05 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26 via Frontend Transport; Tue, 5 Aug 2025 06:57:05 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (40.107.92.54) by
+ edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26; Tue, 5 Aug 2025 06:57:03 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=wuVZpqy0W+U2RFyXlTjme2dmIfQYj2eXSZUqmMUaJz07IWYufdC2eLGb4YUtuRm20/SVM5Ylo62X+xCQS6NRXd+HWNURM0SXCBVlXt0ck7NbboTwXdN29bzBmYtJZNO5k8oVnjK1tqXEzWzaf6i5zNgiljIxFLBGaZNnJdN2/oasmbxfwu59U7D3jooV5py17KN80RwTc/tQ4gJuYI7NstWyqlkoT+5Av1TiBGwiBOONSBVrP06sEPje7lTilIm7FsKFCufm4jE4K4WfChM2RO0fo2I4YUZCS2S0v5rvbw7Aci09T4lo+v0SMcN0gSYf5PpGQqyFhI/UjdBMlKqxXA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+3ShyUst+1/FS6gNbkK61rzE18yIBkEhCXtR+xImnfg=;
+ b=rt/wnko+bRdJu96qp6J3htAIG5skHm4fpnMUbQWdNJuG5pIbRlocYaJQgb0iQnHbAWmGSkuX9g3Q8pKQwZKcypooSh+VBvUBwn7a7oztTcYws+NCY/cXlpD9ndZR5MmltMn6faxuIS5dzkIFhBQOmpBg98uztINRWtkqi5h5x+xbfG2OOPoe5QTUBrALaMUsZNI6V9u1td885gEFfn+b+rqstb5W6HoViToA0zAXRiKHXxWeFSE32hbJXiQweXUesfOmihMM/g5yR0uvQ6ZFwN78GuNB0HyMGpZcsjTLJUHAOnAowyttujrsOtF1INb39da1IOkMzRDNb9lfRYb7vw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
+ CY5PR11MB6161.namprd11.prod.outlook.com (2603:10b6:930:2a::10) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9009.13; Tue, 5 Aug 2025 13:57:01 +0000
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::d19:56fe:5841:77ca]) by DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::d19:56fe:5841:77ca%4]) with mapi id 15.20.9009.013; Tue, 5 Aug 2025
+ 13:57:01 +0000
+Date: Tue, 5 Aug 2025 15:56:56 +0200
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
+CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
+	<anthony.l.nguyen@intel.com>, <magnus.karlsson@intel.com>,
+	<michal.kubiak@intel.com>, <sdn@hetzner-cloud.de>
+Subject: Re: [PATCH iwl-net] ixgbe: fix ndo_xdp_xmit() workloads
+Message-ID: <aJINqLIJLoijWVOm@boxer>
+References: <20250429155205.1444438-1-maciej.fijalkowski@intel.com>
+ <bb545742-8878-4780-932e-4261ae226aac@hetzner-cloud.de>
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <bb545742-8878-4780-932e-4261ae226aac@hetzner-cloud.de>
+X-ClientProxiedBy: DUZPR01CA0193.eurprd01.prod.exchangelabs.com
+ (2603:10a6:10:4b6::14) To DM4PR11MB6117.namprd11.prod.outlook.com
+ (2603:10b6:8:b3::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|CY5PR11MB6161:EE_
+X-MS-Office365-Filtering-Correlation-Id: 43a15db8-4665-4c32-261e-08ddd427f39d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024|7053199007;
+X-Microsoft-Antispam-Message-Info: =?iso-8859-1?Q?ky1FOPVenmRpBK68TUwZzS7CXF6T9pno6b/3+o/jgMcIfUOohdRX4whHbP?=
+ =?iso-8859-1?Q?R1mPxywmfgG3ruhNyss+bvR+JuLazhYp2CniZBBueDhGpg14aSNVM4Zisa?=
+ =?iso-8859-1?Q?XaR/USYIUtVZfv+Cv3+SW+btM+QAgRj8FREl5/Mllkfi5lasRqi/TKNutG?=
+ =?iso-8859-1?Q?JJoJEcjM/97VDeHhB8KmGMut+Bd6WJoeubMHLPZNEpcLfWzEedcBVRSPv4?=
+ =?iso-8859-1?Q?iejwQvbedDC2DSsgawg4NnEe6EejQZzaPB/WgMbVeWlO3/JmHX42N+uHFk?=
+ =?iso-8859-1?Q?zfj8Uu63JTLvFY3uqNxWk5BM2JbtXV44KMPK+8Q8B3+c+njPPCjogMq1XP?=
+ =?iso-8859-1?Q?vL7zmQBGVLQhpJsHGIRMqSUgtizssoWX9FpYIJqYusunHyAjb+IVT8pb8M?=
+ =?iso-8859-1?Q?/efAleMpMA5cjFxOlmZc9SGvX4nSWGaIL+bXC8K0dX/ewPFDsfjOXxAc34?=
+ =?iso-8859-1?Q?8DGTFQquuyWMfnh62gQCy/KNDR5vrWlqaKdq2UT4fvTwHH1VIaHk1XXWN0?=
+ =?iso-8859-1?Q?qeIvhiQvVIKdJpp/oAKUHBWgcouCjeCR3RhIcrjVCfK4W0FmfhhXSPIyA+?=
+ =?iso-8859-1?Q?bMCJsAuk6JkjqlEstowb41iHLpAfFNp7+Ko8e3sR2Cik8UsAn7KHZtW5WO?=
+ =?iso-8859-1?Q?arHnUpFoLincu0uKXkQBqSMILywKR52B7YcCTGJ4ZTCvaX1JpvwEO+Z5n1?=
+ =?iso-8859-1?Q?xHuE5O+LShrK8Wn28gvpmkpyiP6sAh+FZDiZuD2UPz2lhQQUaohSBFvxdH?=
+ =?iso-8859-1?Q?d1vNewY4Y3t58bKnFz7DlIYoL5f/ALwYwo/Sg+hC9Y65pX5PYkHMuYcbJj?=
+ =?iso-8859-1?Q?E4EwWr9/S+JjtMBmztLxqTOMJwYMkRC7jZ05R+rAf+KE75DJZwQfJTsqL0?=
+ =?iso-8859-1?Q?s82h5T92l28+jBKcJ+LCP0zJPQpQViwUiOfGn1WZnCH0SinzRGc+6ceo9m?=
+ =?iso-8859-1?Q?DLtoI68GmExYYCz3lAcWVGPXEtUE+BStZLTAUxJ6UIu6YTiyfIAC0LVPei?=
+ =?iso-8859-1?Q?0Kg2mnJ+KXGKLp15TPyt7WtaDxEzm0F5Vnb45QlAaveFO3c30shfqnpgAB?=
+ =?iso-8859-1?Q?/tPOc/k+TXL4cKHyf9WzEiiwhlmXb2JLzKrmbTUpzah8ahq4XGc5250Pv7?=
+ =?iso-8859-1?Q?QRysMlkj+tRO4VYSfLbHciZXkHqxs+NtT9MbT6cngffnwQ9GcSrdP4YSAE?=
+ =?iso-8859-1?Q?OCyjCJs84tf+V6psqThMpdeKatNDiYJrFdkHsYl660BlEfAC6bziLwbeDT?=
+ =?iso-8859-1?Q?7U+H2pVc1jgaasPMCCMOpRNbpcD65XZ8QEW/SihJ/cKBz1GbLEHxxP9YB1?=
+ =?iso-8859-1?Q?6liE30lk6fTYBU3c7wEVHFaXIaQ3hHAyoqNgUnbMkp6HgxLUgnlgCr1U5r?=
+ =?iso-8859-1?Q?wq/p0BL2osk7CLTGM36foOP3BKeXfWgOisTxLQGHjq3apJwDZNmw0EJR4U?=
+ =?iso-8859-1?Q?e+ooF0Gl0Cc4sHBH7L5GX1OBUa178Nd6Qh+ZR79NmuNA9bfgLJPSAR6TN3?=
+ =?iso-8859-1?Q?Q=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?iso-8859-1?Q?PEvUsw1LZqLJMViKkimDQbPpmMGdBDz7dAinvQxthwmYGWxYnt0I5Ll2am?=
+ =?iso-8859-1?Q?NiNgmboqxA1/QmtF7eGD3afJcbyMs4k4wrs9oANAW5O+LAzX2iXt+yL4NY?=
+ =?iso-8859-1?Q?t4OwMD6tjjsNOgiln8Nx0pQ/+n7jgPjV4a7wqnF3pBmsEm9/VQRnR0m4U8?=
+ =?iso-8859-1?Q?gUFSGft2x9nSwkSzMx/INVOw2LbLknwKAHred4LTxU9x2rDvh2W/kCmRaL?=
+ =?iso-8859-1?Q?Pgxt06Wg6lJGWaFmeLCEAcQdj5uJrbsAkkjSUaLjCXuBfkIdNIkAy6ZhMr?=
+ =?iso-8859-1?Q?qMyYrp6O0+Cz+nL6m1V6kelmdLlE82qapHIgXw9N3fT41+NfG94+7sfOPo?=
+ =?iso-8859-1?Q?0jc9FF7EEawjNd5+mizsNRFVaPqhFclEncuhwUAQNuParYy1m28epov8sL?=
+ =?iso-8859-1?Q?RsKhEMCmODTqFNokLCoYY7HlmCDi4vbs8lNQ6JuN6mcCXw3tULXA+akaT1?=
+ =?iso-8859-1?Q?M2FQ2482QKRdOlINy/V0t0f6zKJFild79AMAbl1fknIs84rQWkD6v9Ughb?=
+ =?iso-8859-1?Q?xFSvyef/yCs0pBT1QLWynVPyOWqZDy8RniiPUMlIhVXfthzqlUgtcqobJn?=
+ =?iso-8859-1?Q?jwiCUdHwukhAbW5GlP7NUsmAiaSZcIsMqu6emrIAm6u4SSmW4ol6NGyqer?=
+ =?iso-8859-1?Q?AJXVy3uM0E3NNjSdXq48IHBo9e1sdmz9CHABeBg75AFTUDzFdE+VZ1rtXU?=
+ =?iso-8859-1?Q?GQdjOaBRTWVQkzjJ7Ogd6jPha4FxYEDLGe3q2/Lq+iy4/ge7ABXQJXtNTs?=
+ =?iso-8859-1?Q?mTvSyE6Gy32LK1la4+SB9wRZlLuxy52MmiKt7Bfm8VC3EXdyPbASDMYjTR?=
+ =?iso-8859-1?Q?nQDvPZZ8+HkBNFwBqbaLDTzcAdOCy1OlP1ZnTSkJz6k4Div3KuATmLlfz2?=
+ =?iso-8859-1?Q?/HvPFosxrw/Dzeo7i1oZ2rSFZGWor7zjAdWrKJeBIhAbb8bJwhRtAn56ET?=
+ =?iso-8859-1?Q?iVcED1nTgeDTkxsAAGgsVDmspw3mIFPNgubLdlqbpTbO2AU3HrTQ2AqPYm?=
+ =?iso-8859-1?Q?Dyj0vwpyGpvvlVY3jYEls30h7nGCnrG0CgvVYSWRhfu9SNxkR7+73cqqfc?=
+ =?iso-8859-1?Q?psX0UvmT/VHd38STg5k0NKDSQPSPFTCzNjvAA72Z/lZxfv9KbvjkDCN2zS?=
+ =?iso-8859-1?Q?lFjq2bhILP0DtJpqiv22V3fJ7erjXkDtLCGH13oCz2We8UObqHXGHwPDWW?=
+ =?iso-8859-1?Q?xmkDCIq0fkLlr5BhrxKIY1EPoyJvMT+0/ROelgYfzu/D/dXPSV6qEzdhrV?=
+ =?iso-8859-1?Q?aqkwu8avzLRAa2Jkw3pwtskKlU0Q+icB2EPHm1uUeF9wtqjO5wt4yS37Vd?=
+ =?iso-8859-1?Q?sOhgQW0Vrbl8bh2FCU2ez0kecprL/Cm7WfrhQMsyLZxObWkl/4j5ia22YH?=
+ =?iso-8859-1?Q?OYD7/y8RlwuZpW5oZ3iciH39UMBlGX/xWQ+JjKC6ZrUVnhtzAXg7LylnrZ?=
+ =?iso-8859-1?Q?tWbOt+c1SNb2rp3RFInFf05ANqy54XyF+mQ4iSdG05JxP9k9TARSrb5SzJ?=
+ =?iso-8859-1?Q?d+YVbJjw+9Vl4mtha91bq+akBf+r+a7VRIN1cmLgr3ZjLr9sg4M6+RitWY?=
+ =?iso-8859-1?Q?kEdD+/rCY/fjZCcHZ7nk6WxVoHfAOGkbnjwRdbzH1TTfcQHPFxJVq6zaDj?=
+ =?iso-8859-1?Q?ufnxbVqlKxf6w1dwxQuhCRkahS6DG/aO/P8yeVCw2T1K3uFwYqJ4waEw?=
+ =?iso-8859-1?Q?=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 43a15db8-4665-4c32-261e-08ddd427f39d
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Aug 2025 13:57:01.3622
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: U974ioJY/lr2HFDPIG3+ZwuHSwzxV3QfndpLHg/HabfkEWLds6wILYRCuAWXzxV+8ajwhfrZPwPj+Zdj/NYDc8ZHWMjs5YDkAPNDhyvrG18=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR11MB6161
+X-OriginatorOrg: intel.com
 
-Add support for the MT8196 vencsys clock controller, which provides
-clock gate control for the video encoder.
+On Tue, Aug 05, 2025 at 03:06:29PM +0200, Marcus Wichelmann wrote:
+> Am 29.04.25 um 17:52 schrieb Maciej Fijalkowski:
+> > Currently ixgbe driver checks periodically in its watchdog subtask if
+> > there is anything to be transmitted (consdidering both Tx and XDP rings)
+> > under state of carrier not being 'ok'. Such event is interpreted as Tx
+> > hang and therefore results in interface reset.
+> > 
+> > This is currently problematic for ndo_xdp_xmit() as it is allowed to
+> > produce descriptors when interface is going through reset or its carrier
+> > is turned off.
+> > 
+> > Furthermore, XDP rings should not really be objects of Tx hang
+> > detection. This mechanism is rather a matter of ndo_tx_timeout() being
+> > called from dev_watchdog against Tx rings exposed to networking stack.
+> > 
+> > Taking into account issues described above, let us have a two fold fix -
+> > do not respect XDP rings in local ixgbe watchdog and do not produce Tx
+> > descriptors in ndo_xdp_xmit callback when there is some problem with
+> > carrier currently. For now, keep the Tx hang checks in clean Tx irq
+> > routine, but adjust it to not execute it for XDP rings.
+> > 
+> > Cc: Tobias Böhm <tobias.boehm@hetzner-cloud.de>
+> > Reported-by: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
+> > Closes: https://lore.kernel.org/netdev/eca1880f-253a-4955-afe6-732d7c6926ee@hetzner-cloud.de/
+> > Fixes: 6453073987ba ("ixgbe: add initial support for xdp redirect")
+> > Fixes: 33fdc82f0883 ("ixgbe: add support for XDP_TX action")
+> > Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+> > [...]
+> 
+> Hi,
+> 
+> could you please consider submitting this patch (or a newer version)
+> for being merged into mainline?
+> 
+> This would help us not having to build our own kernels with this patch
+> for forever.
 
-Reviewed-by: NÃ­colas F. R. A. Prado <nfraprado@collabora.com>
-Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Signed-off-by: Laura Nao <laura.nao@collabora.com>
----
- drivers/clk/mediatek/Kconfig           |   7 +
- drivers/clk/mediatek/Makefile          |   1 +
- drivers/clk/mediatek/clk-mt8196-venc.c | 235 +++++++++++++++++++++++++
- 3 files changed, 243 insertions(+)
- create mode 100644 drivers/clk/mediatek/clk-mt8196-venc.c
+Somehow I assumed this went through the process and our maintainers took
+care of it - apologies for this inconvenience and let me address it.
 
-diff --git a/drivers/clk/mediatek/Kconfig b/drivers/clk/mediatek/Kconfig
-index 12d32bc03fc6..a76344cb74a1 100644
---- a/drivers/clk/mediatek/Kconfig
-+++ b/drivers/clk/mediatek/Kconfig
-@@ -1066,6 +1066,13 @@ config COMMON_CLK_MT8196_VDECSYS
- 	help
- 	  This driver supports MediaTek MT8196 vdecsys clocks.
- 
-+config COMMON_CLK_MT8196_VENCSYS
-+	tristate "Clock driver for MediaTek MT8196 vencsys"
-+	depends on COMMON_CLK_MT8196
-+	default m
-+	help
-+	  This driver supports MediaTek MT8196 vencsys clocks.
-+
- config COMMON_CLK_MT8365
- 	tristate "Clock driver for MediaTek MT8365"
- 	depends on ARCH_MEDIATEK || COMPILE_TEST
-diff --git a/drivers/clk/mediatek/Makefile b/drivers/clk/mediatek/Makefile
-index 131582b12783..d8736a060dbd 100644
---- a/drivers/clk/mediatek/Makefile
-+++ b/drivers/clk/mediatek/Makefile
-@@ -162,6 +162,7 @@ obj-$(CONFIG_COMMON_CLK_MT8196_MMSYS) += clk-mt8196-disp0.o clk-mt8196-disp1.o c
- obj-$(CONFIG_COMMON_CLK_MT8196_PEXTPSYS) += clk-mt8196-pextp.o
- obj-$(CONFIG_COMMON_CLK_MT8196_UFSSYS) += clk-mt8196-ufs_ao.o
- obj-$(CONFIG_COMMON_CLK_MT8196_VDECSYS) += clk-mt8196-vdec.o
-+obj-$(CONFIG_COMMON_CLK_MT8196_VENCSYS) += clk-mt8196-venc.o
- obj-$(CONFIG_COMMON_CLK_MT8365) += clk-mt8365-apmixedsys.o clk-mt8365.o
- obj-$(CONFIG_COMMON_CLK_MT8365_APU) += clk-mt8365-apu.o
- obj-$(CONFIG_COMMON_CLK_MT8365_CAM) += clk-mt8365-cam.o
-diff --git a/drivers/clk/mediatek/clk-mt8196-venc.c b/drivers/clk/mediatek/clk-mt8196-venc.c
-new file mode 100644
-index 000000000000..ecbd42629e9f
---- /dev/null
-+++ b/drivers/clk/mediatek/clk-mt8196-venc.c
-@@ -0,0 +1,235 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (c) 2025 MediaTek Inc.
-+ *                    Guangjie Song <guangjie.song@mediatek.com>
-+ * Copyright (c) 2025 Collabora Ltd.
-+ *                    Laura Nao <laura.nao@collabora.com>
-+ */
-+#include <dt-bindings/clock/mediatek,mt8196-clock.h>
-+#include <linux/clk-provider.h>
-+#include <linux/module.h>
-+#include <linux/of_device.h>
-+#include <linux/platform_device.h>
-+
-+#include "clk-gate.h"
-+#include "clk-mtk.h"
-+
-+static const struct mtk_gate_regs ven10_cg_regs = {
-+	.set_ofs = 0x4,
-+	.clr_ofs = 0x8,
-+	.sta_ofs = 0x0,
-+};
-+
-+static const struct mtk_gate_regs ven10_hwv_regs = {
-+	.set_ofs = 0x00b8,
-+	.clr_ofs = 0x00bc,
-+	.sta_ofs = 0x2c5c,
-+};
-+
-+static const struct mtk_gate_regs ven11_cg_regs = {
-+	.set_ofs = 0x10,
-+	.clr_ofs = 0x14,
-+	.sta_ofs = 0x10,
-+};
-+
-+static const struct mtk_gate_regs ven11_hwv_regs = {
-+	.set_ofs = 0x00c0,
-+	.clr_ofs = 0x00c4,
-+	.sta_ofs = 0x2c60,
-+};
-+
-+#define GATE_VEN10(_id, _name, _parent, _shift) {	\
-+		.id = _id,				\
-+		.name = _name,				\
-+		.parent_name = _parent,			\
-+		.regs = &ven10_cg_regs,			\
-+		.shift = _shift,			\
-+		.flags = CLK_OPS_PARENT_ENABLE,		\
-+		.ops = &mtk_clk_gate_ops_setclr_inv,	\
-+	}
-+
-+#define GATE_HWV_VEN10_FLAGS(_id, _name, _parent, _shift, _flags) {	\
-+		.id = _id,						\
-+		.name = _name,						\
-+		.parent_name = _parent,					\
-+		.regs = &ven10_cg_regs,					\
-+		.hwv_regs = &ven10_hwv_regs,				\
-+		.shift = _shift,					\
-+		.ops = &mtk_clk_gate_hwv_ops_setclr_inv,		\
-+		.flags = (_flags) |					\
-+			 CLK_OPS_PARENT_ENABLE,				\
-+	}
-+
-+#define GATE_HWV_VEN10(_id, _name, _parent, _shift)	\
-+	GATE_HWV_VEN10_FLAGS(_id, _name, _parent, _shift, 0)
-+
-+#define GATE_HWV_VEN11(_id, _name, _parent, _shift) {	\
-+		.id = _id,				\
-+		.name = _name,				\
-+		.parent_name = _parent,			\
-+		.regs = &ven11_cg_regs,			\
-+		.hwv_regs = &ven11_hwv_regs,		\
-+		.shift = _shift,			\
-+		.ops = &mtk_clk_gate_hwv_ops_setclr_inv,\
-+		.flags = CLK_OPS_PARENT_ENABLE		\
-+	}
-+
-+static const struct mtk_gate ven1_clks[] = {
-+	/* VEN10 */
-+	GATE_HWV_VEN10(CLK_VEN1_CKE0_LARB, "ven1_larb", "venc", 0),
-+	GATE_HWV_VEN10(CLK_VEN1_CKE1_VENC, "ven1_venc", "venc", 4),
-+	GATE_VEN10(CLK_VEN1_CKE2_JPGENC, "ven1_jpgenc", "venc", 8),
-+	GATE_VEN10(CLK_VEN1_CKE3_JPGDEC, "ven1_jpgdec", "venc", 12),
-+	GATE_VEN10(CLK_VEN1_CKE4_JPGDEC_C1, "ven1_jpgdec_c1", "venc", 16),
-+	GATE_HWV_VEN10(CLK_VEN1_CKE5_GALS, "ven1_gals", "venc", 28),
-+	GATE_HWV_VEN10(CLK_VEN1_CKE29_VENC_ADAB_CTRL, "ven1_venc_adab_ctrl",
-+			"venc", 29),
-+	GATE_HWV_VEN10_FLAGS(CLK_VEN1_CKE29_VENC_XPC_CTRL,
-+			      "ven1_venc_xpc_ctrl", "venc", 30,
-+			      CLK_IGNORE_UNUSED),
-+	GATE_HWV_VEN10(CLK_VEN1_CKE6_GALS_SRAM, "ven1_gals_sram", "venc", 31),
-+	/* VEN11 */
-+	GATE_HWV_VEN11(CLK_VEN1_RES_FLAT, "ven1_res_flat", "venc", 0),
-+};
-+
-+static const struct mtk_clk_desc ven1_mcd = {
-+	.clks = ven1_clks,
-+	.num_clks = ARRAY_SIZE(ven1_clks),
-+	.need_runtime_pm = true,
-+};
-+
-+static const struct mtk_gate_regs ven20_hwv_regs = {
-+	.set_ofs = 0x00c8,
-+	.clr_ofs = 0x00cc,
-+	.sta_ofs = 0x2c64,
-+};
-+
-+static const struct mtk_gate_regs ven21_hwv_regs = {
-+	.set_ofs = 0x00d0,
-+	.clr_ofs = 0x00d4,
-+	.sta_ofs = 0x2c68,
-+};
-+
-+#define GATE_VEN20(_id, _name, _parent, _shift) {	\
-+		.id = _id,				\
-+		.name = _name,				\
-+		.parent_name = _parent,			\
-+		.regs = &ven10_cg_regs,			\
-+		.shift = _shift,			\
-+		.flags = CLK_OPS_PARENT_ENABLE,		\
-+		.ops = &mtk_clk_gate_ops_setclr_inv,	\
-+	}
-+
-+#define GATE_HWV_VEN20(_id, _name, _parent, _shift) {	\
-+		.id = _id,				\
-+		.name = _name,				\
-+		.parent_name = _parent,			\
-+		.regs = &ven10_cg_regs,			\
-+		.hwv_regs = &ven20_hwv_regs,		\
-+		.shift = _shift,			\
-+		.ops = &mtk_clk_gate_hwv_ops_setclr_inv,\
-+		.flags = CLK_OPS_PARENT_ENABLE,		\
-+	}
-+
-+#define GATE_HWV_VEN21(_id, _name, _parent, _shift) {	\
-+		.id = _id,				\
-+		.name = _name,				\
-+		.parent_name = _parent,			\
-+		.regs = &ven11_cg_regs,			\
-+		.hwv_regs = &ven21_hwv_regs,		\
-+		.shift = _shift,			\
-+		.ops = &mtk_clk_gate_hwv_ops_setclr,	\
-+		.flags = CLK_OPS_PARENT_ENABLE		\
-+	}
-+
-+static const struct mtk_gate ven2_clks[] = {
-+	/* VEN20 */
-+	GATE_HWV_VEN20(CLK_VEN2_CKE0_LARB, "ven2_larb", "venc", 0),
-+	GATE_HWV_VEN20(CLK_VEN2_CKE1_VENC, "ven2_venc", "venc", 4),
-+	GATE_VEN20(CLK_VEN2_CKE2_JPGENC, "ven2_jpgenc", "venc", 8),
-+	GATE_VEN20(CLK_VEN2_CKE3_JPGDEC, "ven2_jpgdec", "venc", 12),
-+	GATE_HWV_VEN20(CLK_VEN2_CKE5_GALS, "ven2_gals", "venc", 28),
-+	GATE_HWV_VEN20(CLK_VEN2_CKE29_VENC_XPC_CTRL, "ven2_venc_xpc_ctrl", "venc", 30),
-+	GATE_HWV_VEN20(CLK_VEN2_CKE6_GALS_SRAM, "ven2_gals_sram", "venc", 31),
-+	/* VEN21 */
-+	GATE_HWV_VEN21(CLK_VEN2_RES_FLAT, "ven2_res_flat", "venc", 0),
-+};
-+
-+static const struct mtk_clk_desc ven2_mcd = {
-+	.clks = ven2_clks,
-+	.num_clks = ARRAY_SIZE(ven2_clks),
-+	.need_runtime_pm = true,
-+};
-+
-+static const struct mtk_gate_regs ven_c20_hwv_regs = {
-+	.set_ofs = 0x00d8,
-+	.clr_ofs = 0x00dc,
-+	.sta_ofs = 0x2c6c,
-+};
-+
-+static const struct mtk_gate_regs ven_c21_hwv_regs = {
-+	.set_ofs = 0x00e0,
-+	.clr_ofs = 0x00e4,
-+	.sta_ofs = 0x2c70,
-+};
-+
-+#define GATE_HWV_VEN_C20(_id, _name, _parent, _shift) {\
-+		.id = _id,				\
-+		.name = _name,				\
-+		.parent_name = _parent,			\
-+		.regs = &ven10_cg_regs,		\
-+		.hwv_regs = &ven_c20_hwv_regs,		\
-+		.shift = _shift,			\
-+		.ops = &mtk_clk_gate_hwv_ops_setclr_inv,\
-+		.flags = CLK_OPS_PARENT_ENABLE,		\
-+	}
-+
-+#define GATE_HWV_VEN_C21(_id, _name, _parent, _shift) {\
-+		.id = _id,				\
-+		.name = _name,				\
-+		.parent_name = _parent,			\
-+		.regs = &ven11_cg_regs,		\
-+		.hwv_regs = &ven_c21_hwv_regs,		\
-+		.shift = _shift,			\
-+		.ops = &mtk_clk_gate_hwv_ops_setclr,	\
-+		.flags = CLK_OPS_PARENT_ENABLE,		\
-+	}
-+
-+static const struct mtk_gate ven_c2_clks[] = {
-+	/* VEN_C20 */
-+	GATE_HWV_VEN_C20(CLK_VEN_C2_CKE0_LARB, "ven_c2_larb", "venc", 0),
-+	GATE_HWV_VEN_C20(CLK_VEN_C2_CKE1_VENC, "ven_c2_venc", "venc", 4),
-+	GATE_HWV_VEN_C20(CLK_VEN_C2_CKE5_GALS, "ven_c2_gals", "venc", 28),
-+	GATE_HWV_VEN_C20(CLK_VEN_C2_CKE29_VENC_XPC_CTRL, "ven_c2_venc_xpc_ctrl",
-+			  "venc", 30),
-+	GATE_HWV_VEN_C20(CLK_VEN_C2_CKE6_GALS_SRAM, "ven_c2_gals_sram", "venc", 31),
-+	/* VEN_C21 */
-+	GATE_HWV_VEN_C21(CLK_VEN_C2_RES_FLAT, "ven_c2_res_flat", "venc", 0),
-+};
-+
-+static const struct mtk_clk_desc ven_c2_mcd = {
-+	.clks = ven_c2_clks,
-+	.num_clks = ARRAY_SIZE(ven_c2_clks),
-+	.need_runtime_pm = true,
-+};
-+
-+static const struct of_device_id of_match_clk_mt8196_venc[] = {
-+	{ .compatible = "mediatek,mt8196-vencsys", .data = &ven1_mcd },
-+	{ .compatible = "mediatek,mt8196-vencsys-c1", .data = &ven2_mcd },
-+	{ .compatible = "mediatek,mt8196-vencsys-c2", .data = &ven_c2_mcd },
-+	{ /* sentinel */ }
-+};
-+MODULE_DEVICE_TABLE(of, of_match_clk_mt8196_venc);
-+
-+static struct platform_driver clk_mt8196_venc_drv = {
-+	.probe = mtk_clk_simple_probe,
-+	.remove = mtk_clk_simple_remove,
-+	.driver = {
-+		.name = "clk-mt8196-venc",
-+		.of_match_table = of_match_clk_mt8196_venc,
-+	},
-+};
-+module_platform_driver(clk_mt8196_venc_drv);
-+
-+MODULE_DESCRIPTION("MediaTek MT8196 Video Encoders clocks driver");
-+MODULE_LICENSE("GPL");
--- 
-2.39.5
-
+> 
+> Thanks!
+> 
+> Marcus
 
