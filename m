@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-211786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211787-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AFDCB1BB93
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 22:59:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AFE3B1BB99
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 23:04:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4EA536203E5
-	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 20:59:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7ED057A2C4B
+	for <lists+netdev@lfdr.de>; Tue,  5 Aug 2025 21:03:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12EEC23BF9B;
-	Tue,  5 Aug 2025 20:59:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D02672288CB;
+	Tue,  5 Aug 2025 21:04:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="4I88P4ko"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="cuTvHbcc"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 914FB12E7F;
-	Tue,  5 Aug 2025 20:59:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D502812E7F;
+	Tue,  5 Aug 2025 21:04:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754427568; cv=none; b=OwWbz4sEu4qDhejBLoGI5UdubmimhHqEJblSMdlJMDDIDKs9hAizTT/Z0IAbb6S+LaiD7Cm4RccL1gA7eoXu8awhq2QrtWUD3XTsTLduB5VAY3+dab6tkP+pvkYWGFFbwDkn4y/gb8pn8DHX9Pz0WqYgdoErvu7WOJShwfECL8E=
+	t=1754427870; cv=none; b=j63Zq3fI4kqsfLu7eZFqTRBKVfzgHlXDjvaowXMRECEL+c5Ou9BaS6DIBY16pXJ/J26kMon/UNHu4hvgQLm1F37PB3wm1GhyEFuKHsBfW243/ibtUoO+wtSN0KGChPUrdgr+zZq98ct80allb4/oAMEr6/Uo4FIxih7BnDGQTAw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754427568; c=relaxed/simple;
-	bh=t7+tqrc2CSh6joUTYTSPNLhj41E9+PZPzVTdBsnSpsc=;
+	s=arc-20240116; t=1754427870; c=relaxed/simple;
+	bh=cgwuGOhpWfu0apN7esBs5cph/S74lHc+3lfT2BxkLok=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jgWjuubVaZky3VQ2g+TxRRG41FX4gQECNxskntnCk9nC8SbJUlVrvoQN7YAh37iXWCrdv6GMDfVmqrAtp6Kp5GiXdYRt8SAtp6VjhC5Jsb1jlpyofUNcBjsMpAidWN3gA81gaWsbKkLCBFZ/+ks9DxNPN8ad04tcT4SropvzbF0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=4I88P4ko; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=hHnPr6OGzrgJ+EvfEQv4Ov2Hm4xbTczwjMiRiK5LHlr/7/yxdq8lVylISgFMbOb4TSO7XolcKnL2Mri35U4AQjtPh8BnIP0qx99fi/n74jW44spy0CVk0pUBu9smKhFTTpaH+hTWzUgl8vRfolF/TGgw27pYqCsru96AkF7Eris=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=cuTvHbcc; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=NWDHZJrVWOBu48yVTIxq5bN4KAAfsVdHWzf5NjnxC7c=; b=4I88P4kotaghdXCFOSfBkDGC4o
-	sFk7rBF3W7vefj3i0SNWceKobbrdFPCKJTu/qjhMpVIKEay54XbYVhw36DjvMzcbQXud9S/1azxVe
-	DKiXLr4lfR3hUd95y8E2leibqEeB+DIWUzcOBwhsW++6DVWlfhakmsiW/XhrQgM65Tsw=;
+	bh=H8qKwlV/hGv5lXljo6J7UpddwhWoZfFMWWWFX7P5heg=; b=cuTvHbccrdF6uQOVkpI9+6yMTm
+	c2jJLLpXWFVZ4/z3K6/6omlILczdzxF/Gh1fFX9GmKtoxu2P57NfoX7PutyO8kwQuJ0DMwlh9WD73
+	ErW8ZeQUOlW9PgY6X8YS+4YG+8p2XkbqBAdbF3JFEXbAD1TGOQhRog5WPyQa9H8smwOs=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1ujOkZ-003pEJ-6T; Tue, 05 Aug 2025 22:59:11 +0200
-Date: Tue, 5 Aug 2025 22:59:11 +0200
+	id 1ujOpa-003pIO-6B; Tue, 05 Aug 2025 23:04:22 +0200
+Date: Tue, 5 Aug 2025 23:04:22 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Sean Anderson <sean.anderson@linux.dev>
 Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
@@ -54,13 +54,12 @@ Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
 	linux-kernel@vger.kernel.org,
 	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	Michal Simek <michal.simek@amd.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Suraj Gupta <suraj.gupta2@amd.com>
-Subject: Re: [PATCH net-next v4 1/7] net: axienet: Fix resource release
- ordering
-Message-ID: <9572f798-d294-4f24-8acb-c7972c1db247@lunn.ch>
+	Leon Romanovsky <leon@kernel.org>
+Subject: Re: [PATCH net-next v4 2/7] net: axienet: Use ioread32/iowrite32
+ directly
+Message-ID: <972847fe-53a2-49a6-9e87-31c5ac845289@lunn.ch>
 References: <20250805153456.1313661-1-sean.anderson@linux.dev>
- <20250805153456.1313661-2-sean.anderson@linux.dev>
+ <20250805153456.1313661-3-sean.anderson@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,35 +68,15 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250805153456.1313661-2-sean.anderson@linux.dev>
+In-Reply-To: <20250805153456.1313661-3-sean.anderson@linux.dev>
 
-> +static void axienet_disable_misc(void *clocks)
-> +{
-> +	clk_bulk_disable_unprepare(XAE_NUM_MISC_CLOCKS, clocks);
-> +}
-> +
+> -	return readx_poll_timeout(axinet_ior_read_mcr, lp,
+> +	return readx_poll_timeout(ioread32, lp->regs + XAE_MDIO_MCR_OFFSET,
+>  				  val, val & XAE_MDIO_MCR_READY_MASK,
+>  				  1, 20000);
 
-...
+I think this change makes axinet_ior_read_mcr() redundant? So it would
+be good to remove it.
 
->  	ret = devm_clk_bulk_get_optional(&pdev->dev, XAE_NUM_MISC_CLOCKS, lp->misc_clks);
->  	if (ret)
-> -		goto cleanup_clk;
-> +		return dev_err_probe(&pdev->dev, ret,
-> +				     "could not get misc. clocks\n");
->  
->  	ret = clk_bulk_prepare_enable(XAE_NUM_MISC_CLOCKS, lp->misc_clks);
->  	if (ret)
-> -		goto cleanup_clk;
-> +		return dev_err_probe(&pdev->dev, ret,
-> +				     "could not enable misc. clocks\n");
-> +
-> +	ret = devm_add_action_or_reset(&pdev->dev, axienet_disable_misc,
-> +				       lp->misc_clks);
-
-It seems like it would be better to add
-devm_clk_bulk_get_optional_enable(). There is already an
-devm_clk_bulk_get_all_enabled() so it does not seem like too big a
-step.
-
-	Andrew
+   Andrew
 
