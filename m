@@ -1,136 +1,110 @@
-Return-Path: <netdev+bounces-211964-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211969-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22BB8B1CBEF
-	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 20:30:57 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18D0BB1CC1E
+	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 20:46:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C16173A7C3E
-	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 18:30:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BEB057AA78C
+	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 18:44:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 977A9299928;
-	Wed,  6 Aug 2025 18:30:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEF8223B638;
+	Wed,  6 Aug 2025 18:45:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bLuBDr8R"
+	dkim=pass (1024-bit key) header.d=mork.no header.i=@mork.no header.b="h+EGrClJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dilbert.mork.no (dilbert.mork.no [65.108.154.246])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 093812E36E7
-	for <netdev@vger.kernel.org>; Wed,  6 Aug 2025 18:30:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B5DC2E36E7;
+	Wed,  6 Aug 2025 18:45:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.108.154.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754505053; cv=none; b=YdhijVEyNougV/DttSXLf/NF9oc34hn+M6R3iJPuzv8d9g2QuyMUeuI+vHarm1fj+j/3hoUOHcxy1MAkrNAbTmwZGUdXpl6m8rp/w7ypgpZ68XkRd5MDIn/BQECA/rnNfWnfnpkZWEiiJEloKh1uL5ok4AICMorKwsL8kmJNTbo=
+	t=1754505959; cv=none; b=CqPiZ+4mwyqxQAIlORgt8J1CK6rf6USmRxLM9aPFa3i1V/1biFQjZvJwT6Gb3wd/wHeFrkKFczOon5QU5yc+27+iWqJp5Fjve3xLxpusm3sjrsOJziGYn6fS72fX/Pqm2mMHcjvf8x9Quqgmqm1WSXMVLEapxELszw2rtGcXHLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754505053; c=relaxed/simple;
-	bh=vLj+fdJb2Vks5utREQNrEigpGF6KFgjJSUgqIR6F6UY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FbbDET5vH2UdbG0IxQruMGAwGg3BcgQ+s2Nib4NMX+DfgtWHnJ4u47jL6r4f8LSMt40Fl3IgesJQW8hvSq+WboVGnHYawz3AD7xkEm9Cq6TJrgqUBNgVFZD0VaglgfaD0N4mPmIQ2hmcwUDN8W348AbogEVLnTi27uoAA74OUZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bLuBDr8R; arc=none smtp.client-ip=209.85.167.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-55b7bf0a8d5so922e87.0
-        for <netdev@vger.kernel.org>; Wed, 06 Aug 2025 11:30:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754505050; x=1755109850; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3TDOublo3Q2tG40X6vbYcBf3dOqybzUDofJqFWP7aQk=;
-        b=bLuBDr8R3DPgp9/CRCw6rrvYVEgbPFVcuniJBKND9WjsSe1zGB5Qr2mHPBfRI0Nunp
-         Sb4/FzlMyFzB/8PfUAiIot5J7QxNgVCIbgDEOFK/0O4FrXHq9Vve6oR0riPJlP9HK6Nd
-         N8URHZYkn3Z+1lF4JjmXOOU5gQg4EQO4kcutvKigOzIzx08di4hHXC663pP84hWhmUip
-         BKktcRQmulS1pjpSJW3AvkU2XIgKnAUrNas4UgCwyzAEayP2MOrnLAHDANfTwdgc9bX+
-         5ZQ1fXlJlfPiyolSUjnM2cBCLtz9RyI9i2U0tkYyDS5fpvakwxusKGrywlBsMOdj9Efj
-         lSUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754505050; x=1755109850;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3TDOublo3Q2tG40X6vbYcBf3dOqybzUDofJqFWP7aQk=;
-        b=cPcFW5T0R4GatvBbfTvAI/lFbibX62DJnh1hHtaD89o7ADq+mqUOZI3424WqBaL427
-         zM7Dw6PXuB69G5lh6Gtrj/Suk5b3pJUfapAljeyvYoWJGPCdfzEMJw1kjEG8IFrSXBed
-         xCotZAZ8UhkppigPH2M8V+6AzMm445WQoWqz2EQVHCfJkFsINUpuOhVKNQWdpXg/RXpf
-         FoAT+Y3E5V3ITBNW9l0fCxFyPwvPEEq5HBIn/JUrepUdy3qT80d88Gxr5ejE2b9iVvz0
-         raVnCk9XK7wOSDDmuD3GxwdM0zSQAFpyMhXyhOCyKR+oi3oDstDwKuEI4LCedZDX/T86
-         NCSg==
-X-Forwarded-Encrypted: i=1; AJvYcCWMCyTaxW+Mm2leIc66fs1+5Wig8X/wrxcZT4nx3iFpqRPJ87s+iQ7tA+5gt3kP2JAfJMNs3bs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwNBX8ukJHAsU49loWD8fU914fPzZrAftLJUaWHxuhH+PNN+gZs
-	CeW7XA9kwzXx8oDtxm8p85EpHywM/EO6q3/k0b7AJt8K8o2+U7sEBTUazqM9Nx16W2rsrrd2OTi
-	C7N1zuOFY1xZrMKXnN0o2QhNcAfz20iMu9a6EZDkZ
-X-Gm-Gg: ASbGncuEb75ReMydfap3jTvlvs96zF9gR6sLbHQqCjdC0LeXwF7Qt3IpHlBk+Enlcu1
-	/gw/JuoWntDc3Zw8qt4DqaPLgy7gz/KCVFEh+5z1Objaw8+Q9cBidbJZTjIxXvNDXjQCAFvA2xM
-	F6NXrhR+VMyc//rZdbL34iG5MxZGTPWqGTGfq33haQQxXxGbbziekkoHpQzOICyGPiAsP9WBaX2
-	g95uqHnUS/l+cHkvty0oE8Du5GMGALevlLUYBrQKhp7nvH6
-X-Google-Smtp-Source: AGHT+IGt/wOJpNx7GnnwYBOLWPcP3IZ20CYAR4HnNGLoquJY9uECaHULv4YoLWdZT3k/01JfdD6rDnK0mvdb6p8RQV0=
-X-Received: by 2002:a05:6512:6406:b0:55a:2d72:de56 with SMTP id
- 2adb3069b0e04-55cb6ee8ebamr13453e87.5.1754505049986; Wed, 06 Aug 2025
- 11:30:49 -0700 (PDT)
+	s=arc-20240116; t=1754505959; c=relaxed/simple;
+	bh=sgX957es7+GVKONZFlhAEg1uefyAvzCkSJvyoqskeAQ=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=BauA/w3DZ9uTNOoIC0+8RfkGFPJfaOootJuiGMY9XJ8XHjHmVYfTh1WFo0mjZoxPG0a2ZbuOBel3ztsLpmrf/LbyFYO+Ai6CoyuSYbIHHMK4XqPT4FYtkTbGhLf5mGiyNbTAmJoSLI4/0q5qc6jhfBbODV/pT0yEhADPEAp8NIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mork.no; spf=pass smtp.mailfrom=miraculix.mork.no; dkim=pass (1024-bit key) header.d=mork.no header.i=@mork.no header.b=h+EGrClJ; arc=none smtp.client-ip=65.108.154.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mork.no
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=miraculix.mork.no
+Authentication-Results: dilbert.mork.no;
+	dkim=pass (1024-bit key; secure) header.d=mork.no header.i=@mork.no header.a=rsa-sha256 header.s=b header.b=h+EGrClJ;
+	dkim-atps=neutral
+Received: from canardo.dyn.mork.no ([IPv6:2a01:799:10de:2e00:0:0:0:1])
+	(authenticated bits=0)
+	by dilbert.mork.no (8.18.1/8.18.1) with ESMTPSA id 576IXWRG3356275
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
+	Wed, 6 Aug 2025 19:33:34 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mork.no; s=b;
+	t=1754505212; bh=x5ZJSZGGUboOavAQ6X5at8DOZHYlPYdsBqMz8Z9etXE=;
+	h=From:To:Cc:Subject:References:Date:Message-ID:From;
+	b=h+EGrClJu4U/9bJcFT7RoC2qz+6bJRHrROy6N6qGil7JWVW6GQdGwDcj4mDBcF3FG
+	 IsxvPGbRGnlpEb/6qi8JmplXbrnM0zN6kLxOXLMiW5TgXoTIqnLaAtOwDkyVH5cH7j
+	 jkPeR/3NdMdEICWlM3NhiGN6jIpZ54oINGsbiaLI=
+Received: from miraculix.mork.no ([IPv6:2a01:799:10de:2e0a:149a:2079:3a3a:3457])
+	(authenticated bits=0)
+	by canardo.dyn.mork.no (8.18.1/8.18.1) with ESMTPSA id 576IXWCY960034
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
+	Wed, 6 Aug 2025 20:33:32 +0200
+Received: (nullmailer pid 612794 invoked by uid 1000);
+	Wed, 06 Aug 2025 18:33:32 -0000
+From: =?utf-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>
+To: Fabio Porcedda <fabio.porcedda@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+        linux-usb@vger.kernel.org, Daniele Palmas <dnlplm@gmail.com>,
+        stable@vger.kernel.org
+Subject: Re: [PATCH] net: usb: qmi_wwan: add Telit Cinterion FN990A w/audio
+ composition
+Organization: m
+References: <20250806121445.179532-1-fabio.porcedda@gmail.com>
+Date: Wed, 06 Aug 2025 20:33:32 +0200
+In-Reply-To: <20250806121445.179532-1-fabio.porcedda@gmail.com> (Fabio
+	Porcedda's message of "Wed, 6 Aug 2025 14:14:45 +0200")
+Message-ID: <875xf0i9kz.fsf@miraculix.mork.no>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1753694913.git.asml.silence@gmail.com> <ca874424e226417fa174ac015ee62cc0e3092400.1753694914.git.asml.silence@gmail.com>
- <20250801171009.6789bf74@kernel.org> <11caecf8-5b81-49c7-8b73-847033151d51@gmail.com>
- <CAHS8izNc4oAX2n3Uj=rMu_=c2DZNY6L_YNWk24uOp2OgvDom_Q@mail.gmail.com> <20250806111108.33125aa2@kernel.org>
-In-Reply-To: <20250806111108.33125aa2@kernel.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Wed, 6 Aug 2025 11:30:38 -0700
-X-Gm-Features: Ac12FXxs3PsW0TDpaFvxbsuRlfuu8IOZMcSAN6tdJGrWWtI1P2KBlk8RG97WhOk
-Message-ID: <CAHS8izM-JrPV7R4wk7WnO-Zskb=7gj+HtewoW91cEtsQP1E5rw@mail.gmail.com>
-Subject: Re: [RFC v1 21/22] net: parametrise mp open with a queue config
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Pavel Begunkov <asml.silence@gmail.com>, netdev@vger.kernel.org, 
-	io-uring@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
-	Willem de Bruijn <willemb@google.com>, Paolo Abeni <pabeni@redhat.com>, andrew+netdev@lunn.ch, 
-	horms@kernel.org, davem@davemloft.net, sdf@fomichev.me, dw@davidwei.uk, 
-	michael.chan@broadcom.com, dtatulea@nvidia.com, ap420073@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
+X-Virus-Scanned: clamav-milter 1.0.7 at canardo.mork.no
+X-Virus-Status: Clean
 
-On Wed, Aug 6, 2025 at 11:11=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Wed, 6 Aug 2025 09:48:56 -0700 Mina Almasry wrote:
-> > iouring zcrx and devmem can configure netdev_rx_queue->rx_buf_len in
-> > addition to netdev_rx_queue->mp_params in this scenario.
->
-> Did you not read my message or are you disagreeing that the setting
-> should be separate and form a hierarchy?
+Fabio Porcedda <fabio.porcedda@gmail.com> writes:
 
-Sorry, I was disagreeing. The flow above seems complicated. I'm
-probably missing something that requires this complication. I was
-suggesting an approach I find more straightforward. Something like:
+> diff --git a/drivers/net/usb/qmi_wwan.c b/drivers/net/usb/qmi_wwan.c
+> index f5647ee0adde..e56901bb6ebc 100644
+> --- a/drivers/net/usb/qmi_wwan.c
+> +++ b/drivers/net/usb/qmi_wwan.c
+> @@ -1361,6 +1361,7 @@ static const struct usb_device_id products[] =3D {
+>  	{QMI_QUIRK_SET_DTR(0x1bc7, 0x1057, 2)},	/* Telit FN980 */
+>  	{QMI_QUIRK_SET_DTR(0x1bc7, 0x1060, 2)},	/* Telit LN920 */
+>  	{QMI_QUIRK_SET_DTR(0x1bc7, 0x1070, 2)},	/* Telit FN990A */
+> +	{QMI_QUIRK_SET_DTR(0x1bc7, 0x1077, 2)},	/* Telit FN990A w/audio */
+>  	{QMI_QUIRK_SET_DTR(0x1bc7, 0x1080, 2)}, /* Telit FE990A */
+>  	{QMI_QUIRK_SET_DTR(0x1bc7, 0x10a0, 0)}, /* Telit FN920C04 */
+>  	{QMI_QUIRK_SET_DTR(0x1bc7, 0x10a4, 0)}, /* Telit FN920C04 */
 
-```
-  nedev_config =3D get_driver_defaults()
-  qcfg =3D get_driver_defaults()
+Looks good to me.
 
-  for each setting:
-    if qcfg[i].X is set:
-       use qcfg[i].X
-    else
-      use netdev_config.X
-```
+A note for the stable backport: You might want to cherry-pick these two
+commits changing only the comment text of the two adjacent lines to
+avoid unnecessary conflicts:
 
-APIs that set netdev-global attributes could set netdev_config.X. APIs
-that set per-queue attributes would set qcfg[i].X (after validating
-that the driver supports setting this param on a queue granularity).
 
-With this flow we don't need to duplicate each attribute like
-rx-buf-len in 3 different places and have a delicate hierarchy of
-serving the config. And we treat mp like any other 'X'. It's just a
-setting that exists per-queue but not per netdev.
+ ad1664fb6990 ("net: usb: qmi_wwan: fix Telit Cinterion FN990A name")
+ 5728b289abbb ("net: usb: qmi_wwan: fix Telit Cinterion FE990A name")
 
-Although I don't feel strongly here. If you feel the duplication is
-warranted please do go ahead1 :-D
 
---=20
-Thanks,
-Mina
+Acked-by: Bj=C3=B8rn Mork <bjorn@mork.no>
 
