@@ -1,162 +1,76 @@
-Return-Path: <netdev+bounces-211961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211963-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24B81B1CB9D
-	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 20:05:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3D07B1CBBC
+	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 20:11:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D34A3627D57
-	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 18:05:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 51A30721F5B
+	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 18:11:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D8C528DF0C;
-	Wed,  6 Aug 2025 18:05:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33C4A1114;
+	Wed,  6 Aug 2025 18:11:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NtghpN2c"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P47mGj2I"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 559EB1D47B4;
-	Wed,  6 Aug 2025 18:05:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0881110E4;
+	Wed,  6 Aug 2025 18:11:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754503522; cv=none; b=utXX/0VvmdChaQufx/n3Hj5sf9IgNZNwKPub3NTJtvumqMiTh3UM3ONDL6T29Emf3C7L1HC6SjNSPam7KawB1MDzi1b2/3BQ08+qsPmySrcgdhCfVVhYa0WCLp3MeX0AZsH7VXPCQQ2YiV22qtRcTW8ileg3bpRPDuzh3nC3ugg=
+	t=1754503870; cv=none; b=dCIL56pZURYGAsX9/z5vMzeDYmu0qUIiTCq/EpF8I6cQVE5qpG4pP45+lF2/JmfqMeClsmM61UPyZL+5cedrss5xJWYSMjVceapRsjkAx/FQlsGZtYSocpqG1Mubyt/r6sNnkfLx6bRe4LEaGknTFlo3zMdLAAg/iVSZzHRRysU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754503522; c=relaxed/simple;
-	bh=SwfmDGDbFbfWMtCEiabspD+RCuPytk+hWkDJu2Ixei8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FtdOaYnWEbfTWQEVoEXIVrAQASRr0Dw/zFtGYT3LLXXOTByojKudvSfctIjtgg5I4dXZBSfMVyovWMn49OjIvWhMpfcnxqsBAwVVrWO4b6YI+PgIUCOaa049Vo9nA0wtq/5H4u09QOgVW/So6O2OY6pW6cA5TVvoUap0VGd40vQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NtghpN2c; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92B15C4CEED;
-	Wed,  6 Aug 2025 18:05:21 +0000 (UTC)
+	s=arc-20240116; t=1754503870; c=relaxed/simple;
+	bh=zfOTfbqzLxQrzqYlCJpxFjKQoFwZjiEZuM/1/1OHL1w=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sKKA6aGtYwjle7wK/P0MChbtRpovfWGJ2FyIlY+RzIAb0ZYWT0l7hi/0RSNWjilAV1sGBr712eKpOgs07P+thpiA5N837GG9d3FJMwf2Mskz+MItm+caNgaMhujsaaA9pHVjj1hGcmENcCC7AHlpZe2+wkV6L1fnZEy38SE97RU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P47mGj2I; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1EAC3C4CEE7;
+	Wed,  6 Aug 2025 18:11:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754503522;
-	bh=SwfmDGDbFbfWMtCEiabspD+RCuPytk+hWkDJu2Ixei8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=NtghpN2c2wrUxbYk2RMBM2fujRGO0DNxCKC8m0W8GxcqV8Rwsx3ZJ2mCyOjwqGYlZ
-	 +QL4yJcK/QQunoF6J3S1EdLtj+940j0ZTZLKqE/FZI7JSCH6ZsW1T+dzrkFFx8qDYw
-	 ZqiuNYMdgDR9nSCeAaKtDtiJ5cmmnkCryYQqXaJXUcJink0WC4lroy4RvtP+TExBYA
-	 2dM98VilOQB9gBWik6hZyJsYVjmAmfhdA27KynxuVQ5KW0vM37h0xGgsxJ+ZSQn1fw
-	 1xcxBQnmFcYtsXgHWrNgn6PFr6xTJkJHxI6EXmTkBSlOYZn+UogL8qEsahfP60CRbf
-	 dbBlp5ZIZaOUQ==
+	s=k20201202; t=1754503869;
+	bh=zfOTfbqzLxQrzqYlCJpxFjKQoFwZjiEZuM/1/1OHL1w=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=P47mGj2IRg0wNUvhSIIFMhZFHoN/SrWyiguX797+0R4OCqBdz0cSm3cJgX0ULqCkD
+	 9rmBRhsRC4sA9jYrpXAp28gsCLya5cVNZ30tNvNGn4PfXXgWaqZbBZzQAy2/gOp26T
+	 /SQrmaFU1ebwDNJPqCuXXiUCN6Co1jXyTrH7gqoaeSATv81R0hErmhnmpbUHkxjfwT
+	 ES7+k5LPFnSSOZ29ZSOexnM1nrUvV7F+aZ+HzsrbdozSw1Wwfapmegsbr15Ja1g9ua
+	 Iv47hFlVCK+K10nvtYJq+0wMe6Z82cHbUBSOd/fd8mJL99iYGd6OvOT82iK5SNFLcv
+	 S98GpZvA0D1GQ==
+Date: Wed, 6 Aug 2025 11:11:08 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	borisp@nvidia.com,
-	john.fastabend@gmail.com,
-	shuah@kernel.org,
-	linux-kselftest@vger.kernel.org,
-	sd@queasysnail.net,
-	will@willsroot.io,
-	savy@syst3mfailure.io,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net 2/2] selftests: tls: test TCP stealing data from under the TLS socket
-Date: Wed,  6 Aug 2025 11:05:10 -0700
-Message-ID: <20250806180510.3656677-2-kuba@kernel.org>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20250806180510.3656677-1-kuba@kernel.org>
-References: <20250806180510.3656677-1-kuba@kernel.org>
+To: Mina Almasry <almasrymina@google.com>
+Cc: Pavel Begunkov <asml.silence@gmail.com>, netdev@vger.kernel.org,
+ io-uring@vger.kernel.org, Eric Dumazet <edumazet@google.com>, Willem de
+ Bruijn <willemb@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ andrew+netdev@lunn.ch, horms@kernel.org, davem@davemloft.net,
+ sdf@fomichev.me, dw@davidwei.uk, michael.chan@broadcom.com,
+ dtatulea@nvidia.com, ap420073@gmail.com
+Subject: Re: [RFC v1 21/22] net: parametrise mp open with a queue config
+Message-ID: <20250806111108.33125aa2@kernel.org>
+In-Reply-To: <CAHS8izNc4oAX2n3Uj=rMu_=c2DZNY6L_YNWk24uOp2OgvDom_Q@mail.gmail.com>
+References: <cover.1753694913.git.asml.silence@gmail.com>
+	<ca874424e226417fa174ac015ee62cc0e3092400.1753694914.git.asml.silence@gmail.com>
+	<20250801171009.6789bf74@kernel.org>
+	<11caecf8-5b81-49c7-8b73-847033151d51@gmail.com>
+	<CAHS8izNc4oAX2n3Uj=rMu_=c2DZNY6L_YNWk24uOp2OgvDom_Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Check a race where data disappears from the TCP socket after
-TLS signaled that its ready to receive.
+On Wed, 6 Aug 2025 09:48:56 -0700 Mina Almasry wrote:
+> iouring zcrx and devmem can configure netdev_rx_queue->rx_buf_len in
+> addition to netdev_rx_queue->mp_params in this scenario.
 
-  ok 6 global.data_steal
-  #  RUN           tls_basic.base_base ...
-  #            OK  tls_basic.base_base
-
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- tools/testing/selftests/net/tls.c | 63 +++++++++++++++++++++++++++++++
- 1 file changed, 63 insertions(+)
-
-diff --git a/tools/testing/selftests/net/tls.c b/tools/testing/selftests/net/tls.c
-index 5ded3b3a7538..d8cfcf9bb825 100644
---- a/tools/testing/selftests/net/tls.c
-+++ b/tools/testing/selftests/net/tls.c
-@@ -2708,6 +2708,69 @@ TEST(prequeue) {
- 	close(cfd);
- }
- 
-+TEST(data_steal) {
-+	struct tls_crypto_info_keys tls;
-+	char buf[20000], buf2[20000];
-+	struct sockaddr_in addr;
-+	int sfd, cfd, ret, fd;
-+	int pid, status;
-+	socklen_t len;
-+
-+	len = sizeof(addr);
-+	memrnd(buf, sizeof(buf));
-+
-+	tls_crypto_info_init(TLS_1_2_VERSION, TLS_CIPHER_AES_GCM_256, &tls, 0);
-+
-+	addr.sin_family = AF_INET;
-+	addr.sin_addr.s_addr = htonl(INADDR_ANY);
-+	addr.sin_port = 0;
-+
-+	fd = socket(AF_INET, SOCK_STREAM, 0);
-+	sfd = socket(AF_INET, SOCK_STREAM, 0);
-+
-+	ASSERT_EQ(bind(sfd, &addr, sizeof(addr)), 0);
-+	ASSERT_EQ(listen(sfd, 10), 0);
-+	ASSERT_EQ(getsockname(sfd, &addr, &len), 0);
-+	ASSERT_EQ(connect(fd, &addr, sizeof(addr)), 0);
-+	ASSERT_GE(cfd = accept(sfd, &addr, &len), 0);
-+	close(sfd);
-+
-+	ret = setsockopt(fd, IPPROTO_TCP, TCP_ULP, "tls", sizeof("tls"));
-+	if (ret) {
-+		ASSERT_EQ(errno, ENOENT);
-+		SKIP(return, "no TLS support");
-+	}
-+	ASSERT_EQ(setsockopt(cfd, IPPROTO_TCP, TCP_ULP, "tls", sizeof("tls")), 0);
-+
-+	/* Spawn a child and get it into the read wait path of the underlying
-+	 * TCP socket.
-+	 */
-+	pid = fork();
-+	ASSERT_GE(pid, 0);
-+	if (!pid) {
-+		EXPECT_EQ(recv(cfd, buf, sizeof(buf), MSG_WAITALL),
-+			  sizeof(buf));
-+		exit(!__test_passed(_metadata));
-+	}
-+
-+	usleep(2000);
-+	ASSERT_EQ(setsockopt(fd, SOL_TLS, TLS_TX, &tls, tls.len), 0);
-+	ASSERT_EQ(setsockopt(cfd, SOL_TLS, TLS_RX, &tls, tls.len), 0);
-+
-+	EXPECT_EQ(send(fd, buf, sizeof(buf), 0), sizeof(buf));
-+	usleep(2000);
-+	EXPECT_EQ(recv(cfd, buf2, sizeof(buf2), MSG_DONTWAIT), -1);
-+	/* Don't check errno, the error will be different depending
-+	 * on what random bytes TLS interpreted as the record length.
-+	 */
-+
-+	close(fd);
-+	close(cfd);
-+
-+	EXPECT_EQ(wait(&status), pid);
-+	EXPECT_EQ(status, 0);
-+}
-+
- static void __attribute__((constructor)) fips_check(void) {
- 	int res;
- 	FILE *f;
--- 
-2.50.1
-
+Did you not read my message or are you disagreeing that the setting
+should be separate and form a hierarchy?
 
