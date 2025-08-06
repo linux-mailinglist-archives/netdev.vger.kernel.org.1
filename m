@@ -1,165 +1,218 @@
-Return-Path: <netdev+bounces-211956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211957-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 739D3B1C9FA
-	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 18:49:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB248B1CA30
+	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 18:58:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2ECCA3ABA39
-	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 16:49:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 057157AA026
+	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 16:57:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8F0A29ACCE;
-	Wed,  6 Aug 2025 16:49:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96CC429B8D2;
+	Wed,  6 Aug 2025 16:58:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gkpfckko"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lpncdyqe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF991273804
-	for <netdev@vger.kernel.org>; Wed,  6 Aug 2025 16:49:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B682D3C01
+	for <netdev@vger.kernel.org>; Wed,  6 Aug 2025 16:58:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754498952; cv=none; b=N47MSYwVUhpyW/0Ip9c+Zoot7QHTPfeuS44Djj1+RFZKhhY007fOxFSttoH/+tUnXNsw8lVH4NGip4WM9wLHjBi5NmADLJcoL2iiT1ayebyhgQggEkk+nXQoJiAGGlgHWWYjW1zsoejsA6gwvI5v2asoc9A2Vl7o1WoC0SE52QQ=
+	t=1754499511; cv=none; b=bqTaodkdO02a0joiGKPAMU0Ug+ZdPle/n00SKxpqA0f4Vclzdm9XtHQjmgX0/nBtwvqxbiur+QeNYlsU18g77nsYs0zu/XdeM48TlriQFJsp7NCVtlfD9pu2z/0cnUKwzzrQRsXxU1pmDQ9AH1RIf/qNJKWIeh1vrfHpVSeyyuk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754498952; c=relaxed/simple;
-	bh=ZeSXh39h6xtD2zkk9H9FdoX/x3k8q9HT+wNdGyALMGU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BpcEnQExJU3tyo/dfsxZPyCdNANtRPePvRcUJme42OphPX55z0iP+eYwJaoxXJ1eMvHL5A1/P0gLfOoIV9kmcXeo5v/Bf/bVVTu4Ww4jMrcBn9YsYPJWyxec5tIpNfDBUJU640kYxt39q9ymT4IxNuirs9Dv+7EIGeX1PCFfurY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gkpfckko; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-55b7bf0a8d5so208e87.0
-        for <netdev@vger.kernel.org>; Wed, 06 Aug 2025 09:49:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754498949; x=1755103749; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+B3mKu8ZyXZgyldx1ID9yYSp8otWO+26YrXQxjyJZvw=;
-        b=gkpfckkolCpFpVjcD8liMZ9zH/viIv458SLSDPxqCMCNYq1dPlmV4N9OH6wC7qNyII
-         b3IQ3zqm1KtCWnY2Co7+yQ8e+qG+THw19ryc0JDRDo/gDuCcSuxn2hZmeR7qzD9ppaF/
-         Vzh5tV+XdIfEFKMqOt2WoLooZFC9tsHvjj+mhGO7YUC3mgsPcHJzCqPnUSHDVQjIyAR2
-         K2NZ6OzcMH5HK/LFOzTVwZNLshJFutXVqx++6UhSb/v8h61fOcQbAAK5p2EPOqZ5Tf1O
-         m+HliONRN2az34P+nKBelULmkcKdVbiIe3amgj6yK9C1f8vdjmFClfotMVjT0Xb1UCak
-         7PmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754498949; x=1755103749;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+B3mKu8ZyXZgyldx1ID9yYSp8otWO+26YrXQxjyJZvw=;
-        b=d0x8eIyhpov17jLFghCQYMhswb06DaHjYrHGTtDgkNZ3+9lMDLXMOqFj1sos1Mb5lO
-         HxjUVYej6/Ym+BBLj78AxqM/Fc81yCA/7hNBZYtdErFgiezhn3Lzy9HVuf6R3n4796Qa
-         XOra87hvfXCXr0dDsaZY9kcRt535NIRKKXTKD6fm0qoaqlTfDIbT8RtnDJj0hoW7J6Ju
-         LTGCiaKEp/gPJgbKDut8eOeHstNkCuWAkt63Vue4IFHPco6jgpEnGHH4AmSfgUdvLgbb
-         z1OjyGWZoeD+h04iqezsp+YFEjJMs7UEumnEXF0cBA3+0gp2hjm/UjMhScRKm/XiKcqJ
-         xUpQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUVqpdGRD3i6ZBPilVwllgl+81/O+sBz5V+pa75pPWNzWsxMIYurL7OoYRX5diTx2vBJBtbGg8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxz3z2MykTLeY0ocQhbCg/8hr3h1MVl0UQlzgllk3F0iiSiaYS7
-	hhCMa3qAFgjoslfVSZZPvcVVe7sPIooRNpd39nyAyv6K9sDtUaA2zu3b84jPnjIOtV/5YGxAMef
-	HgQb11FkoEaD1IsE2YLCSBFInBkt8XG4uPro94qgN
-X-Gm-Gg: ASbGnctixbjOjL9JrM8DpUX9q79M4uN6vhHICO87UZA+4i6s+XbOC3Aj4p9ryPsRU/S
-	QbfhBHvMZzllFVdm88RrBgRuycBodQ70NndsmYJFouk+DMpCzr23E7gLSe/Vvs91FU+RrfiikWI
-	8lj60HPZzg2Djjc3xw0H+QedqR8wpT4AJ4R5EzQ6aCRqX3mTBCELBA27Yx/0fUiRXINESfCdYlx
-	TvyjiQcieVX8+YSBsT2fYRV7Sm2F3hBJYLVRswekJmURCQ=
-X-Google-Smtp-Source: AGHT+IGOkbe9dbWGnS6+1s7Wq6OW/Qhyhn3uo+RLlUMybsqoGGjikVLHhoAhtv1rxFzxt9dArPaa1GD+Gkz5VfNZjqc=
-X-Received: by 2002:a19:3844:0:b0:55b:99e4:2584 with SMTP id
- 2adb3069b0e04-55cae73fc3bmr344237e87.2.1754498948708; Wed, 06 Aug 2025
- 09:49:08 -0700 (PDT)
+	s=arc-20240116; t=1754499511; c=relaxed/simple;
+	bh=Jtywj7U0x1vz2tVy17r+y6IHA2w5Bme0QBMXBLn6Afw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=JM27ODdGi/Du5XS6XjJ6p7aqDSfxv3e9tNKuKEMgXXdYzurK9APire4hjKXYTQEsxrftfoAkqRnw04jGYek0LAFpl31A2roC0BsPV3krTi3/KdZGfuwmhzimdrrqlc5q5eIMCf26K2znN/ggSNMIACLJMPlPDMRwprvG6kOs2G0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lpncdyqe; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1754499510; x=1786035510;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Jtywj7U0x1vz2tVy17r+y6IHA2w5Bme0QBMXBLn6Afw=;
+  b=lpncdyqetPMvfC2D/v606UKVwPH/xdXJ3kLO0BoYbvs3dmzMD/Ep8url
+   Wgz9MjYTYPxN1StDZoj5l4Pn/tv1CZLdO9wkjHy9ntJaHV+R8hkIncqJg
+   aviev2ZubHHeiLMdv5Tzkyh0sdeeX0FhEBjqTqJKGPXlx0SByNzc46sTp
+   hVXZELIXgrBD+vJdm+aeMrwgBxhnSPNJmx9IHz6Wn1ugPdDGf4/g9pjWF
+   238flSrtR5+a/JF7zshmtajbl8OOtqmOmssHGYPFRkkbc87JNrJjz5nus
+   zyf2qmaRC+pvkG3nnrz/BtZykzWQ6TBzgL9RzoBQ6EyKsGy1rU1Aq0viM
+   w==;
+X-CSE-ConnectionGUID: HBulZqpEQkeza8xa4daZQg==
+X-CSE-MsgGUID: sShdhKqgT76OIcfffkFvzg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11514"; a="60634942"
+X-IronPort-AV: E=Sophos;i="6.17,268,1747724400"; 
+   d="scan'208";a="60634942"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Aug 2025 09:58:29 -0700
+X-CSE-ConnectionGUID: N/EE/BjnRFWbOoX5MgTAaQ==
+X-CSE-MsgGUID: +sC2r01pT72td3XJE72BIg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,268,1747724400"; 
+   d="scan'208";a="201989936"
+Received: from boxer.igk.intel.com ([10.102.20.173])
+  by orviesa001.jf.intel.com with ESMTP; 06 Aug 2025 09:58:27 -0700
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	magnus.karlsson@intel.com,
+	tobias.boehm@hetzner-cloud.de,
+	marcus.wichelmann@hetzner-cloud.de,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Subject: [PATCH v2 iwl-net] ixgbe: fix ndo_xdp_xmit() workloads
+Date: Wed,  6 Aug 2025 18:58:19 +0200
+Message-Id: <20250806165819.2162027-1-maciej.fijalkowski@intel.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1753694913.git.asml.silence@gmail.com> <ca874424e226417fa174ac015ee62cc0e3092400.1753694914.git.asml.silence@gmail.com>
- <20250801171009.6789bf74@kernel.org> <11caecf8-5b81-49c7-8b73-847033151d51@gmail.com>
-In-Reply-To: <11caecf8-5b81-49c7-8b73-847033151d51@gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Wed, 6 Aug 2025 09:48:56 -0700
-X-Gm-Features: Ac12FXybC97X31wROsEYSpZV1hSDgT6IyYQ4soYHYXhWxQfaz8IZ0d2rVCtC95M
-Message-ID: <CAHS8izNc4oAX2n3Uj=rMu_=c2DZNY6L_YNWk24uOp2OgvDom_Q@mail.gmail.com>
-Subject: Re: [RFC v1 21/22] net: parametrise mp open with a queue config
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, io-uring@vger.kernel.org, 
-	Eric Dumazet <edumazet@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, andrew+netdev@lunn.ch, horms@kernel.org, 
-	davem@davemloft.net, sdf@fomichev.me, dw@davidwei.uk, 
-	michael.chan@broadcom.com, dtatulea@nvidia.com, ap420073@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Mon, Aug 4, 2025 at 5:48=E2=80=AFAM Pavel Begunkov <asml.silence@gmail.c=
-om> wrote:
->
-> On 8/2/25 01:10, Jakub Kicinski wrote:
-> > On Mon, 28 Jul 2025 12:04:25 +0100 Pavel Begunkov wrote:
-> >> This patch allows memory providers to pass a queue config when opening=
- a
-> >> queue. It'll be used in the next patch to pass a custom rx buffer leng=
-th
-> >> from zcrx. As there are many users of netdev_rx_queue_restart(), it's
-> >> allowed to pass a NULL qcfg, in which case the function will use the
-> >> default configuration.
-> >
-> > This is not exactly what I anticipated, TBH, I was thinking of
-> > extending the config stuff with another layer.. Drivers will
-> > restart their queues for most random reasons, so we need to be able
-> > to reconstitute this config easily and serve it up via
->
-> Yeah, also noticed the gap that while replying to Stan.
->
-> > netdev_queue_config(). This was, IIUC, also Mina's first concern.
-> >
-> > My thinking was that the config would be constructed like this:
-> >
-> >    qcfg =3D init_to_defaults()
-> >    drv_def =3D get_driver_defaults()
-> >    for each setting:
-> >      if drv_def.X.set:
-> >         qcfg.X =3D drv_def.X.value
-> >      if dev.config.X.set:
-> >         qcfg.X =3D dev.config.X.value
-> >      if dev.config.qcfg[qid].X.set:
-> >         qcfg.X =3D dev.config.qcfg[qid].X.value
-> >      if dev.config.mp[qid].X.set:               << this was not in my
-> >         qcfg.X =3D dev.config.mp[qid].X.value     << RFC series
-> >
-> > Since we don't allow MP to be replaced atomically today, we don't
-> > actually have to place the mp overrides in the config struct and
-> > involve the whole netdev_reconfig_start() _swap() _free() machinery.
-> > We can just stash the config in the queue state, and "logically"
-> > do what I described above.
->
-> I was thinking stashing it in struct pp_memory_provider_params and
-> applying in netdev_rx_queue_restart(). Let me try to move it
-> into __netdev_queue_config. Any preference between keeping just
-> the size vs a qcfg pointer in pp_memory_provider_params?
->
-> struct struct pp_memory_provider_params {
->         const struct memory_provider_ops *mp_ops;
->         u32 rx_buf_len;
-> };
->
+Currently ixgbe driver checks periodically in its watchdog subtask if
+there is anything to be transmitted (considering both Tx and XDP rings)
+under state of carrier not being 'ok'. Such event is interpreted as Tx
+hang and therefore results in interface reset.
 
-Is this suggesting one more place where we put rx_buf_len, so in
-addition to netdev_config?
+This is currently problematic for ndo_xdp_xmit() as it is allowed to
+produce descriptors when interface is going through reset or its carrier
+is turned off.
 
-Honestly I'm in favor of de-duplicating the info as much as possible,
-to reduce the headache of keeping all the copies in sync.
-pp_memory_provider_params is part of netdev_rx_queue. How about we add
-either all of netdev_config or just rx_buf_len there? And set the
-precedent that queue configs should be in netdev_rx_queue and all
-pieces that need it should grab it from there? Unless the driver needs
-a copy of the param I guess.
+Furthermore, XDP rings should not really be objects of Tx hang
+detection. This mechanism is rather a matter of ndo_tx_timeout() being
+called from dev_watchdog against Tx rings exposed to networking stack.
 
-iouring zcrx and devmem can configure netdev_rx_queue->rx_buf_len in
-addition to netdev_rx_queue->mp_params in this scenario.
+Taking into account issues described above, let us have a two fold fix -
+do not respect XDP rings in local ixgbe watchdog and do not produce Tx
+descriptors in ndo_xdp_xmit callback when there is some problem with
+carrier currently. For now, keep the Tx hang checks in clean Tx irq
+routine, but adjust it to not execute for XDP rings.
 
---=20
-Thanks,
-Mina
+Cc: Tobias Böhm <tobias.boehm@hetzner-cloud.de>
+Reported-by: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
+Closes: https://lore.kernel.org/netdev/eca1880f-253a-4955-afe6-732d7c6926ee@hetzner-cloud.de/
+Fixes: 6453073987ba ("ixgbe: add initial support for xdp redirect")
+Fixes: 33fdc82f0883 ("ixgbe: add support for XDP_TX action")
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Tested-by: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
+Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+---
+v1->v2:
+* collect tags
+* fix typos (Dawid)
+---
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 34 ++++++-------------
+ 1 file changed, 11 insertions(+), 23 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+index 03d31e5b131d..7c0db3b3ee8e 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+@@ -967,10 +967,6 @@ static void ixgbe_update_xoff_rx_lfc(struct ixgbe_adapter *adapter)
+ 	for (i = 0; i < adapter->num_tx_queues; i++)
+ 		clear_bit(__IXGBE_HANG_CHECK_ARMED,
+ 			  &adapter->tx_ring[i]->state);
+-
+-	for (i = 0; i < adapter->num_xdp_queues; i++)
+-		clear_bit(__IXGBE_HANG_CHECK_ARMED,
+-			  &adapter->xdp_ring[i]->state);
+ }
+ 
+ static void ixgbe_update_xoff_received(struct ixgbe_adapter *adapter)
+@@ -1264,10 +1260,13 @@ static bool ixgbe_clean_tx_irq(struct ixgbe_q_vector *q_vector,
+ 				   total_bytes);
+ 	adapter->tx_ipsec += total_ipsec;
+ 
++	if (ring_is_xdp(tx_ring))
++		return !!budget;
++
+ 	if (check_for_tx_hang(tx_ring) && ixgbe_check_tx_hang(tx_ring)) {
+ 		/* schedule immediate reset if we believe we hung */
+ 		struct ixgbe_hw *hw = &adapter->hw;
+-		e_err(drv, "Detected Tx Unit Hang %s\n"
++		e_err(drv, "Detected Tx Unit Hang\n"
+ 			"  Tx Queue             <%d>\n"
+ 			"  TDH, TDT             <%x>, <%x>\n"
+ 			"  next_to_use          <%x>\n"
+@@ -1275,16 +1274,14 @@ static bool ixgbe_clean_tx_irq(struct ixgbe_q_vector *q_vector,
+ 			"tx_buffer_info[next_to_clean]\n"
+ 			"  time_stamp           <%lx>\n"
+ 			"  jiffies              <%lx>\n",
+-			ring_is_xdp(tx_ring) ? "(XDP)" : "",
+ 			tx_ring->queue_index,
+ 			IXGBE_READ_REG(hw, IXGBE_TDH(tx_ring->reg_idx)),
+ 			IXGBE_READ_REG(hw, IXGBE_TDT(tx_ring->reg_idx)),
+ 			tx_ring->next_to_use, i,
+ 			tx_ring->tx_buffer_info[i].time_stamp, jiffies);
+ 
+-		if (!ring_is_xdp(tx_ring))
+-			netif_stop_subqueue(tx_ring->netdev,
+-					    tx_ring->queue_index);
++		netif_stop_subqueue(tx_ring->netdev,
++				    tx_ring->queue_index);
+ 
+ 		e_info(probe,
+ 		       "tx hang %d detected on queue %d, resetting adapter\n",
+@@ -1297,9 +1294,6 @@ static bool ixgbe_clean_tx_irq(struct ixgbe_q_vector *q_vector,
+ 		return true;
+ 	}
+ 
+-	if (ring_is_xdp(tx_ring))
+-		return !!budget;
+-
+ #define TX_WAKE_THRESHOLD (DESC_NEEDED * 2)
+ 	txq = netdev_get_tx_queue(tx_ring->netdev, tx_ring->queue_index);
+ 	if (!__netif_txq_completed_wake(txq, total_packets, total_bytes,
+@@ -7796,12 +7790,9 @@ static void ixgbe_check_hang_subtask(struct ixgbe_adapter *adapter)
+ 		return;
+ 
+ 	/* Force detection of hung controller */
+-	if (netif_carrier_ok(adapter->netdev)) {
++	if (netif_carrier_ok(adapter->netdev))
+ 		for (i = 0; i < adapter->num_tx_queues; i++)
+ 			set_check_for_tx_hang(adapter->tx_ring[i]);
+-		for (i = 0; i < adapter->num_xdp_queues; i++)
+-			set_check_for_tx_hang(adapter->xdp_ring[i]);
+-	}
+ 
+ 	if (!(adapter->flags & IXGBE_FLAG_MSIX_ENABLED)) {
+ 		/*
+@@ -8016,13 +8007,6 @@ static bool ixgbe_ring_tx_pending(struct ixgbe_adapter *adapter)
+ 			return true;
+ 	}
+ 
+-	for (i = 0; i < adapter->num_xdp_queues; i++) {
+-		struct ixgbe_ring *ring = adapter->xdp_ring[i];
+-
+-		if (ring->next_to_use != ring->next_to_clean)
+-			return true;
+-	}
+-
+ 	return false;
+ }
+ 
+@@ -10825,6 +10809,10 @@ static int ixgbe_xdp_xmit(struct net_device *dev, int n,
+ 	if (unlikely(test_bit(__IXGBE_DOWN, &adapter->state)))
+ 		return -ENETDOWN;
+ 
++	if (!netif_carrier_ok(adapter->netdev) ||
++	    !netif_running(adapter->netdev))
++		return -ENETDOWN;
++
+ 	if (unlikely(flags & ~XDP_XMIT_FLAGS_MASK))
+ 		return -EINVAL;
+ 
+-- 
+2.38.1
+
 
