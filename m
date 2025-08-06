@@ -1,169 +1,130 @@
-Return-Path: <netdev+bounces-211921-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211922-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05303B1C81A
-	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 17:02:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47878B1C832
+	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 17:05:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 290C756578B
-	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 15:02:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9E5687A7985
+	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 15:02:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A06B28FA87;
-	Wed,  6 Aug 2025 15:01:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C37E6290D85;
+	Wed,  6 Aug 2025 15:03:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="xfjbSbKw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l/skAZHI"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DE0428F958;
-	Wed,  6 Aug 2025 15:01:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9872928A3EF;
+	Wed,  6 Aug 2025 15:03:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754492493; cv=none; b=NFdQUPjAKj0mGhdDrqTWCZeZphteE1Y8J9q2CA3csW9cTKL91Jwdv/krWjb6roQBZIsaV5cZhiLU4XXLOPkDLoU067DjrrV4udDa+Rbdk8BGes5iaOfSWdDc0CJ3A2rmZxyrOfGdlNlTTB2iI/rA6Ww+xF8huJ9qXtv3e1cWt1Y=
+	t=1754492636; cv=none; b=i0aedQFfSWhjbjbQh+lsb70kehhH8uxY/G9s888+2fNXeYedw6PZ9jaIjPpQMTnPXSlSStARoVhMLvP6vFbm85DFR1J62fms3IPXjvQqCJGEH4FODrSzs9/NKro1F5GGIwRC3STTytAic/5LuhsHF4ioJawundqkuUNjbFxbCoA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754492493; c=relaxed/simple;
-	bh=rQNIJlHRHG4C4FgpSDwf66MC/i7tJ+Xz17XeBAYuppg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iXIzG8MrBnwrqAc3rSR0e8WPzpEBy54KYoUWcUJ8/AYAq67AP1flCDv0Ol/5CY/2f9fx7Br4rogUQMEx5+v32aglJnvZB/vRYqHqka/nKLpu3UtO4GpF53bMTfkjsnmTGQr8iv4xNgol3LC5rOHS/ERGGyOtFTqfrgmsu116lTM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=xfjbSbKw; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Ryoa+Ztf111PO2c6Sqsua4pClHmpT5cAMCQqHL/qJjY=; b=xfjbSbKwbPlNkpJVFJlfUR23Tw
-	i3hDZ6cZZgt2wxW38lWbp3fQuJIms89XGInfbcyuvw7m/OcPaNFemqGVxHKnz48S85CGCdaRJyxOO
-	Er8/xi7Ewr13KUYVqOkpIFuJWs7+asspOM2lOPLID72aIMFL8Cy1jW/twCYr+NigEQlk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1ujfdq-003tJZ-IS; Wed, 06 Aug 2025 17:01:22 +0200
-Date: Wed, 6 Aug 2025 17:01:22 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Xu Yang <xu.yang_2@nxp.com>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, hkallweit1@gmail.com,
-	o.rempel@pengutronix.de, pabeni@redhat.com, netdev@vger.kernel.org,
-	imx@lists.linux.dev, linux-kernel@vger.kernel.org
-Subject: Re: [RESEND] net: phy: fix NULL pointer dereference in
- phy_polling_mode()
-Message-ID: <b9140415-2478-4264-a674-c158ca14eb07@lunn.ch>
-References: <20250806082931.3289134-1-xu.yang_2@nxp.com>
- <aJMWDRNyq9VDlXJm@shell.armlinux.org.uk>
- <ywr5p6ccsbvoxronpzpbtxjqyjlwp5g6ksazbeyh47vmhta6sb@xxl6dzd2hsgg>
- <aJNSDeyJn5aZG7xs@shell.armlinux.org.uk>
- <unh332ly5fvcrjgur4y3lgn4m4zlzi7vym4hyd7yek44xvfrh5@fmavbivvjfjn>
+	s=arc-20240116; t=1754492636; c=relaxed/simple;
+	bh=584uXeN9jsBXBHMuwddffGCP8OVlQsZ+Xp3CN2antyQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uQTQUuMbvfGj5neVRKH0hWXr6NYGAZa1wCc5jlw/7V3v9s7eYEbrk+oLHR96VtOkm6lEy+vIi2sEwXfWjhreL0/qvSJ0Mm/cTktGTCL99Ch2CxCeKUMIdTbF1i9N6UXwtwOMUBRhy00iEEJbuOWyGQHUCPTV/w6aoXMjBPAvD0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l/skAZHI; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-af958127df5so707805066b.2;
+        Wed, 06 Aug 2025 08:03:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1754492631; x=1755097431; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ck5YtWxsbH5j6ULV7+hpajLj2ON81F2VLpNH+npiJkQ=;
+        b=l/skAZHIE23xFtzgeuxwjRsUw3049bR/2j5qSvrkbT5bvbIWsSP/1JUc3UcwhzHaz4
+         AuazwYtg+YBJfbg7bZcaLcQQ7A8Iezl4RTefwdEgGudnozM19cImMMcr7haTsbYeAohB
+         NPtpzZX0G9LsziSB6S5wRgcjbJkkDaPuaX8haEfzeD+3OSM2fjWuA3uXTUv0nat4titu
+         vCQU4mI59biakGYPb2glAuF8NdbNvFKwX5r06sjclcMyHX1wjPTX2olsVNbG80g5P/El
+         bl7mNDPGwGU1Dr3F0oq12PHIVwGEwe+2EeSDL3MPrHXuxYLgDFcr/OwXwcLh2k3ftBab
+         1b0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754492631; x=1755097431;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Ck5YtWxsbH5j6ULV7+hpajLj2ON81F2VLpNH+npiJkQ=;
+        b=MbvMRKHZWYAXkOzSuiBPgzHB8pMlEhmqlrNZXxCqWdqT12NVi4KvekHPkGeDNudNr+
+         yBDBemSiLB/fGJVErMQm302TPhPcGOyL0ZLe8reRcJA55bGqlc/k1jTpK0nQvqdmOxIy
+         v0cGBQiF2xOnjeRGOPp8Z0qjFT7rvBjjz8g4tZzG0pbf9i6jhr2Aqgf5JT9GS0O0Hds/
+         AzjBYouL74oxTrjTgo5aco/+monC31SyxeS2GT5pf31uTpEx5hAeqcJUh6ok1yymkX2K
+         HZqf5eVUJb0vqwfEt6a3+GsxysYTJ5pCGcsyOvLRaNT2SW+RLx/M5W8FhBtpgVwg3mDX
+         +l0g==
+X-Forwarded-Encrypted: i=1; AJvYcCUJWge8uxNxb4BvrpSgtjE+5IfkxyVMIiH6NYey0d+3AxR3VG1REEKYG0agIo4W2AtlWf0=@vger.kernel.org, AJvYcCUbwHbIEFH3Zfxcl48EkhanE81tAFWhDSbhvqDh4C5M3ujWhAszMriwWXLiAHb0NZOt+E17WctmptVv7fBu@vger.kernel.org, AJvYcCVerr6ipjFY03mv74YskNliLitNegssSZHUD5uaQ7DkIdqCBgoDeYo/ZGO+lMthlw836MWP8D9asQil+7E39CP+@vger.kernel.org, AJvYcCWlbEy+39J3r9tuYs9DgE6THwEi67Pcex/DU5jintHDnxanLv+1ZtWWI1P+WN6g+Qxl9P1i3imK@vger.kernel.org
+X-Gm-Message-State: AOJu0YxRwUAWHZihAKr+ueRrLD5e7K06q4du8B8hpE1Zt67JC4TtjKyD
+	uSu7rCuGCNxpfnKOnZUUTinqAurIwfA+rtomt1ASVxvMtqV48eUY8vCImT67AEXdNgcPE8bj0l0
+	q9QXEpVhn0B3MbB/yWWobjAVQJV9Pn+s=
+X-Gm-Gg: ASbGncvuw/8kBRLCTLdvRBvqo+z5ft+zyzPtzZMX2R5eG0cG+Nlt7uINET4cozlGPDN
+	G8ZQnSRzQqOc1O06/fMncXsWWb8B0RBwAgdyondxnCp8U1rIF4eDAfaqLTRaYu7l8B0k9mHAvgr
+	yIE2ECCgLPhSQXrpD8UY2cr6fCgKsTxmrV9lPAGLRs/+4bnzU9ZthRrQShMOD2JFVBmj5dW+Npl
+	S0x5O2wtXO2aMjlsmmtlj9pxbmVudO27MR1
+X-Google-Smtp-Source: AGHT+IFz4XsMafOE7B2cRECu6PsWWMxUp0yBdUzi6JtgASelC8/9mtyaERSLeB8R2LFMi4+R+vaDYy1LHdKJjr/ADtI=
+X-Received: by 2002:a17:906:f58d:b0:af2:b9b5:1c06 with SMTP id
+ a640c23a62f3a-af992aa4a38mr252953366b.14.1754492630424; Wed, 06 Aug 2025
+ 08:03:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <unh332ly5fvcrjgur4y3lgn4m4zlzi7vym4hyd7yek44xvfrh5@fmavbivvjfjn>
+References: <20250806110230.23949-1-pranav.tyagi03@gmail.com>
+In-Reply-To: <20250806110230.23949-1-pranav.tyagi03@gmail.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Wed, 6 Aug 2025 08:03:15 -0700
+X-Gm-Features: Ac12FXwMSvnTnW4mpFr34H5Rcz9AOXGEYUwrsVyBOhRLZUjpNGcPOgXLwZWKDDM
+Message-ID: <CAADnVQJQV5Z_LsrBCa2=UwQ9NhPbkpNvZ9N7nf1sv-QunEj1FQ@mail.gmail.com>
+Subject: Re: [PATCH] selftests/bpf/progs: use __auto_type in swap() macro
+To: Pranav Tyagi <pranav.tyagi03@gmail.com>
+Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	Andrii Nakryiko <andrii@kernel.org>, Eduard <eddyz87@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Mykola Lysenko <mykolal@fb.com>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	linux-kernel-mentees@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> > > Reproduce step is simple:
-> > > 
-> > > 1. connect an USB to Ethernet device to USB port, I'm using "D-Link Corp.
-> > >    DUB-E100 Fast Ethernet Adapter".
+On Wed, Aug 6, 2025 at 4:02=E2=80=AFAM Pranav Tyagi <pranav.tyagi03@gmail.c=
+om> wrote:
+>
+> Replace typeof() with __auto_type in xdp_synproxy_kern.c.
+> __auto_type was introduced in GCC 4.9 and reduces the compile time for
+> all compilers. No functional changes intended.
+>
+> Signed-off-by: Pranav Tyagi <pranav.tyagi03@gmail.com>
+> ---
+>  tools/testing/selftests/bpf/progs/xdp_synproxy_kern.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/tools/testing/selftests/bpf/progs/xdp_synproxy_kern.c b/tool=
+s/testing/selftests/bpf/progs/xdp_synproxy_kern.c
+> index 62b8e29ced9f..b08738f9a0e6 100644
+> --- a/tools/testing/selftests/bpf/progs/xdp_synproxy_kern.c
+> +++ b/tools/testing/selftests/bpf/progs/xdp_synproxy_kern.c
+> @@ -58,7 +58,7 @@
+>  #define MAX_PACKET_OFF 0xffff
+>
+>  #define swap(a, b) \
+> -       do { typeof(a) __tmp =3D (a); (a) =3D (b); (b) =3D __tmp; } while=
+ (0)
+> +       do { __auto_type __tmp =3D (a); (a) =3D (b); (b) =3D __tmp; } whi=
+le (0)
 
-static const struct driver_info dlink_dub_e100_info = {
-        .description = "DLink DUB-E100 USB Ethernet",
-        .bind = ax88172_bind,
-        .status = asix_status,
-        .link_reset = ax88172_link_reset,
-        .reset = ax88172_link_reset,
-        .flags =  FLAG_ETHER | FLAG_LINK_INTR,
-        .data = 0x009f9d9f,
-};
+Sorry, not doing this churn. The code is fine as-is.
 
-{
-        // DLink DUB-E100
-        USB_DEVICE (0x2001, 0x1a00),
-        .driver_info =  (unsigned long) &dlink_dub_e100_info,
-}, {
-
-Is this the device you have?
-
-> > > 2. the asix driver (drivers/net/usb/asix_devices.c) will bind to this USB
-> > >    device.
-> > > 
-> > > root@imx95evk:~# lsusb -t
-> > > /:  Bus 001.Port 001: Dev 001, Class=root_hub, Driver=ci_hdrc/1p, 480M
-> > >     |__ Port 001: Dev 003, If 0, Class=Vendor Specific Class, Driver=asix, 480M
-> > > 
-> > > 3. then the driver will create many mdio devices. 
-> > > 
-> > > root@imx95evk:/sys/bus/mdio_bus# ls -d devices/usb*
-> > > devices/usb-001:005:00  devices/usb-001:005:04  devices/usb-001:005:08  devices/usb-001:005:0c  devices/usb-001:005:10  devices/usb-001:005:14  devices/usb-001:005:18  devices/usb-001:005:1c
-> > > devices/usb-001:005:01  devices/usb-001:005:05  devices/usb-001:005:09  devices/usb-001:005:0d  devices/usb-001:005:11  devices/usb-001:005:15  devices/usb-001:005:19  devices/usb-001:005:1d
-> > > devices/usb-001:005:02  devices/usb-001:005:06  devices/usb-001:005:0a  devices/usb-001:005:0e  devices/usb-001:005:12  devices/usb-001:005:16  devices/usb-001:005:1a  devices/usb-001:005:1e
-> > > devices/usb-001:005:03  devices/usb-001:005:07  devices/usb-001:005:0b  devices/usb-001:005:0f  devices/usb-001:005:13  devices/usb-001:005:17  devices/usb-001:005:1b  devices/usb-001:005:1f
-> > 
-> > This looks broken - please check what
-> > /sys/bus/mdio_bus/devices/usb*/phy_id contains.
-> 
-> root@imx95evk:~# cat /sys/bus/mdio_bus/devices/usb*/phy_id
-> 0x00000000
-> 0x00000000
-> 0x00000000
-> 0x02430c54
-> 0x0c540c54
-> 0x0c540c54
-> 0x0c540c54
-> 0x0c540c54
-
-This suggests which version of the asix device has broken MDIO bus
-access.
-
-The first three 0x00000000 are odd. If there is no device at an
-address you expect to read 0xffffffff. phylib will ignore 0xffffffff
-and not create a device. 0x00000000 suggests something actually is on
-the bus, and is responding to reads of registers 2 and 3, but
-returning 0x0000 is not expected.
-
-And then 0x02430c54 for all other addresses suggests the device is not
-correctly handling the bus address, and is mapping the address
-parameter to a single bus address.
-
-What does asix_read_phy_addr() return?
-
-This is completely untested, not even compiled:
-
-diff --git a/drivers/net/usb/asix_devices.c b/drivers/net/usb/asix_devices.c
-index 9b0318fb50b5..e136b25782d9 100644
---- a/drivers/net/usb/asix_devices.c
-+++ b/drivers/net/usb/asix_devices.c
-@@ -260,13 +260,20 @@ static int ax88172_bind(struct usbnet *dev, struct usb_interface *intf)
-        dev->mii.dev = dev->net;
-        dev->mii.mdio_read = asix_mdio_read;
-        dev->mii.mdio_write = asix_mdio_write;
--       dev->mii.phy_id_mask = 0x3f;
-        dev->mii.reg_num_mask = 0x1f;
- 
-        dev->mii.phy_id = asix_read_phy_addr(dev, true);
-        if (dev->mii.phy_id < 0)
-                return dev->mii.phy_id;
- 
-+       if (dev->mii.phy_id > 31) {
-+               netdev_err(dev->net, "Invalid PHY address %d\n",
-+                          dev->mii.phy_id);
-+               return -EINVAL;
-+       }
-+
-+       dev->mii.phy_id_mask = BIT(dev->mii.phy_id);
-+
-        dev->net->netdev_ops = &ax88172_netdev_ops;
-        dev->net->ethtool_ops = &ax88172_ethtool_ops;
-        dev->net->needed_headroom = 4; /* cf asix_tx_fixup() */
-
-The idea is to limit the scanning of the bus to just the address where
-we expect the PHY to be.  See if this gives you a single PHY, and that
-PHY actually works.
-
-	Andrew
+--
+pw-bot: cr
 
