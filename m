@@ -1,159 +1,97 @@
-Return-Path: <netdev+bounces-211987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211988-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDCA3B1CEE5
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 00:02:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0128BB1CEF2
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 00:05:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 322EF3ABBD7
-	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 22:02:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2F8C37A7D8E
+	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 22:04:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 764BD221269;
-	Wed,  6 Aug 2025 22:01:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 762F6218ACC;
+	Wed,  6 Aug 2025 22:05:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="M49FBrr2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dKKKifhf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 042B91A5B8B
-	for <netdev@vger.kernel.org>; Wed,  6 Aug 2025 22:01:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C5D920E6E2;
+	Wed,  6 Aug 2025 22:05:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754517719; cv=none; b=LvXbLr76sy5SYaRFd954Hj9Rn3IgMlqxEZhwA7FCJLMhQ5H0+vlAD6qa1dah7Pv/yYopSwa/x0F+ms3JGf1gX9taSI4KxpPncL/f7Ht43lR0dNuyQPwK37+xN7rVKFMh91H2iNBuo140dbXq/2ftD/32Piq/5ARuaBSLJugNklU=
+	t=1754517938; cv=none; b=oE6Fh58/5n+vj2a3hYvZHU94TZwrM2SYzMJdhyMQTjaOUscnJX3glQRmudiTgcozjxnmhzouTNOobRS/kgyFxQXLepTDjs3WEVpFFadRZqvL4eI8611oz0FG6J0V57/pdtF0AogSaP6tkIYzmB5Ioqp60p0sKhOKcWHphRJ5Mdw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754517719; c=relaxed/simple;
-	bh=wxmbacTzB5m4yxerqFQOHx/HCzp+RS+1K80LXLTDWKQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Qb3GMTyfEDKn6xNtgPLDE504bAmlRjfD9EPg57AL8Xw55JuQmt/dM0f9bf0DRWgha1EqMK3MZqoFcPJuuXSP2NWFbeLoi3LYI0PNXorjFNckhm+EseyArUhvriaikaFEVBfGHCyYhALbHGu/jqxRHUTU4OugDPzKXL5ad6j6igg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=M49FBrr2; arc=none smtp.client-ip=209.85.215.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-b390136ed88so233588a12.2
-        for <netdev@vger.kernel.org>; Wed, 06 Aug 2025 15:01:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754517716; x=1755122516; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tS5sWoIyqI1LV97Jb4CN01ckOCIdChBVFk4TORl7K0c=;
-        b=M49FBrr2sJ1DWx1r01t3SqTDILRkjGBdq5F4fypoXqFdvtsruxWgOgsgPBleKgy5er
-         r8cCnRa9z3As7ZQ36RbI9wcWO6XI6TvVMggz/+5Gqi6AkMLWc0hdesyfjaY36xNs7d1u
-         BJFxoFczebMjHikoxnSQxu76fq9yn7tyvxLsxA3ZV1cnloJV0MYFnJrwXNLmWEzGVVoN
-         q8A2KCbUIu02xnGgOc0XO84jln02JKc5rqE+btQHyh6B0lg5aO5QFNEef6Mn1mpb8HZA
-         2tduLvpB9mCvDvHnb+46rFItJRQy296R6WP20xnN2F0wi6rTPzGlAn+oDVqxBHlK7A1D
-         Xx/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754517716; x=1755122516;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tS5sWoIyqI1LV97Jb4CN01ckOCIdChBVFk4TORl7K0c=;
-        b=duDfJR+f9VvQ2rPQkLtWPS4LluzKwmGLcBU93khUHB5RFHP73swSBBTq0lXIeMLElY
-         TPDn4Hi7VHolRt91/puzyaFrdUY7tu1pbJ12CTNblRXQNC3sxZM/bzEgDXhBoKh44TJK
-         3f4nfPdjdMGkB5Or367aThKbCJk+czS/SL2eGyksRzloNPEJBH8p2NohoZIM5gYBXasg
-         KKJcGeIFuN/mDAGTfgG7LA6CgVK2IxR6fXrUe7+ePSGs5iPtq04LOcy3WES+Y9JwWESE
-         QaGhZf0v2dmvvIflZmTu/gYjDKGPAr0J3n815xb7Hgrrh4msVy077DbhD7EYINSvldAP
-         Z/Cw==
-X-Forwarded-Encrypted: i=1; AJvYcCVq1vwlUkoCFnJWbU6R99PJsO3s/4YHVGECq6GgKyVIKPJRP2w6d2Q5CFw8IykOu7cuCXtnxxs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzUNK7zpE3UC8sOxxCcsuLiPioQn6RffcOGJgQsSziP3XM67SNV
-	kS1ua3xcAQf7gYf1jNnPmGupp052DELzafJ5+1KMk/S6rGfieKjad7YRB21ibIwuW3/MMcy0nZz
-	/Yzect7NIWRcsWqPOPs0o7SBvF8cUL9nbtzF5/I1D
-X-Gm-Gg: ASbGncv8XhjQ8NBs2o9zkWyP0fS6Fl9PYNA/yoRCTatnyK2dbS5BMUfUvFUrAPpgWVx
-	sJSjHRj2qpMKvbwA5nDkNd6CVQawFQ2zs+1R8OW8pOOcrI+vJnQVZOK719MA4GUtG7IWxpihAnR
-	fde/qmhdcrv1Cq567Vek88vbASdsseEV5dcc209Sn56xiZBjdopaGpLlKGnIJf9in2eQxdpdW/w
-	+ybFey4YIuNVrlpaVDs2UR1AEwgXEcLLwVZcA==
-X-Google-Smtp-Source: AGHT+IHSk7dzFSFXcu4X48id9sXvSiAxg4OZ+/L9B0Yq3eL15/6jfV7hChGejTL37W1MR4sOHnmzKtJZuAb4DsrqR74=
-X-Received: by 2002:a17:903:2f89:b0:23f:d861:bd4b with SMTP id
- d9443c01a7336-2429f2d99a8mr55381415ad.5.1754517715836; Wed, 06 Aug 2025
- 15:01:55 -0700 (PDT)
+	s=arc-20240116; t=1754517938; c=relaxed/simple;
+	bh=on45DUwgwYPDa4uHN4l08kiArDOB9mQ8576Tohd6mAc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=skdYHAO29x9lRnLzM43k/9KOVjaj9YcnoZt/M/JYqdbQkWQD9FVyXXmrgUTR1s7WrvggTtkAa18kZIcuqPwimKtWexnaLkmspYa4owRl08Tlt51xC3Ayj46YfwLHzEFiYb88bup7GgPj7QccF4aATiuAjfWJ128oU+A1xo+31ss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dKKKifhf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DF3BC4CEE7;
+	Wed,  6 Aug 2025 22:05:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754517936;
+	bh=on45DUwgwYPDa4uHN4l08kiArDOB9mQ8576Tohd6mAc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=dKKKifhf7Ybr5W4CMnHQd44iRar6TLvLPv10J/qsUYTNP4IRbXLoiZ1ABdYFGtexm
+	 oaUe17yc1T3DWXW7PZbhpl/IxDTM5cntlCWEFBCs3liI4rcO92BgnG2uIjbH3vCaWY
+	 8gzcLQVwLuo72r9yCRQhD/1zUZTYXxCoB8biH23wJpv94EIQuTsDhLziIN99S86qaa
+	 OmBJQR0LzWIZDsMKXp4bpwKF7x8Wwz6CTggYlTNm5TULwt2AKQ3BZCyNaEjNqN2QGr
+	 EzqJCsyQvvnyf46kQCVSBYIJW0znZpWgwryQgI3sMZ3VmA6lk1HWtvWFROwlStqWRJ
+	 +4Xz0s/nKmnUA==
+Date: Wed, 6 Aug 2025 15:05:35 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Mina Almasry <almasrymina@google.com>
+Cc: Pavel Begunkov <asml.silence@gmail.com>, netdev@vger.kernel.org,
+ io-uring@vger.kernel.org, Eric Dumazet <edumazet@google.com>, Willem de
+ Bruijn <willemb@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ andrew+netdev@lunn.ch, horms@kernel.org, davem@davemloft.net,
+ sdf@fomichev.me, dw@davidwei.uk, michael.chan@broadcom.com,
+ dtatulea@nvidia.com, ap420073@gmail.com
+Subject: Re: [RFC v1 21/22] net: parametrise mp open with a queue config
+Message-ID: <20250806150535.4ce40014@kernel.org>
+In-Reply-To: <CAHS8izM-JrPV7R4wk7WnO-Zskb=7gj+HtewoW91cEtsQP1E5rw@mail.gmail.com>
+References: <cover.1753694913.git.asml.silence@gmail.com>
+	<ca874424e226417fa174ac015ee62cc0e3092400.1753694914.git.asml.silence@gmail.com>
+	<20250801171009.6789bf74@kernel.org>
+	<11caecf8-5b81-49c7-8b73-847033151d51@gmail.com>
+	<CAHS8izNc4oAX2n3Uj=rMu_=c2DZNY6L_YNWk24uOp2OgvDom_Q@mail.gmail.com>
+	<20250806111108.33125aa2@kernel.org>
+	<CAHS8izM-JrPV7R4wk7WnO-Zskb=7gj+HtewoW91cEtsQP1E5rw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250805064429.77876-1-daniel.sedlak@cdn77.com>
- <fcnlbvljynxu5qlzmnjeagll7nf5mje7rwkimbqok6doso37gl@lwepk3ztjga7>
- <CAAVpQUBrNTFw34Kkh=b2bpa8aKd4XSnZUa6a18zkMjVrBqNHWw@mail.gmail.com> <nju55eqv56g6gkmxuavc2z2pcr26qhpmgrt76jt5dte5g4trxs@tjxld2iwdc5c>
-In-Reply-To: <nju55eqv56g6gkmxuavc2z2pcr26qhpmgrt76jt5dte5g4trxs@tjxld2iwdc5c>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Wed, 6 Aug 2025 15:01:44 -0700
-X-Gm-Features: Ac12FXyFJKmVEi3oHI4ogHBbfqPpbXF9V_pMaOAaUcyE_TX_Or4bugRENLRs7x8
-Message-ID: <CAAVpQUCCg-7kvzMeSSsKp3+Fu8pvvE5U-H5wkt=xMryNmnF5CA@mail.gmail.com>
-Subject: Re: [PATCH v4] memcg: expose socket memory pressure in a cgroup
-To: Shakeel Butt <shakeel.butt@linux.dev>
-Cc: Daniel Sedlak <daniel.sedlak@cdn77.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Neal Cardwell <ncardwell@google.com>, 
-	David Ahern <dsahern@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
-	Yosry Ahmed <yosry.ahmed@linux.dev>, linux-mm@kvack.org, netdev@vger.kernel.org, 
-	Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>, 
-	Roman Gushchin <roman.gushchin@linux.dev>, Muchun Song <muchun.song@linux.dev>, 
-	cgroups@vger.kernel.org, Tejun Heo <tj@kernel.org>, 
-	=?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>, 
-	Matyas Hurtik <matyas.hurtik@cdn77.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Aug 6, 2025 at 2:54=E2=80=AFPM Shakeel Butt <shakeel.butt@linux.dev=
-> wrote:
+On Wed, 6 Aug 2025 11:30:38 -0700 Mina Almasry wrote:
+> Sorry, I was disagreeing. The flow above seems complicated. I'm
+> probably missing something that requires this complication. I was
+> suggesting an approach I find more straightforward. 
 >
-> On Wed, Aug 06, 2025 at 12:20:25PM -0700, Kuniyuki Iwashima wrote:
-> > > > -                     WRITE_ONCE(memcg->socket_pressure, jiffies + =
-HZ);
-> > > > +                     socket_pressure =3D jiffies + HZ;
-> > > > +
-> > > > +                     jiffies_diff =3D min(socket_pressure - READ_O=
-NCE(memcg->socket_pressure), HZ);
-> > > > +                     memcg->socket_pressure_duration +=3D jiffies_=
-to_usecs(jiffies_diff);
-> > >
-> > > KCSAN will complain about this. I think we can use atomic_long_add() =
-and
-> > > don't need the one with strict ordering.
-> >
-> > Assuming from atomic_ that vmpressure() could be called concurrently
-> > for the same memcg, should we protect socket_pressure and duration
-> > within the same lock instead of mixing WRITE/READ_ONCE() and
-> > atomic?  Otherwise jiffies_diff could be incorrect (the error is smalle=
-r
-> > than HZ though).
-> >
->
-> Yeah good point. Also this field needs to be hierarchical. So, with lock
-> something like following is needed:
->
->         if (!spin_trylock(memcg->net_pressure_lock))
->                 return;
->
->         socket_pressure =3D jiffies + HZ;
->         diff =3D min(socket_pressure - READ_ONCE(memcg->socket_pressure),=
- HZ);
+> Something like:
+>   nedev_config = get_driver_defaults()
+>   qcfg = get_driver_defaults()
+> 
+>   for each setting:
+>     if qcfg[i].X is set:
+>        use qcfg[i].X
+>     else
+>       use netdev_config.X
 
-READ_ONCE() should be unnecessary here.
+IMO the rules on when to override/update and reset qcfg[i].X will
+get much more complicated than the extra `else if` in this logic.
 
->
->         if (diff) {
->                 WRITE_ONCE(memcg->socket_pressure, socket_pressure);
->                 // mod_memcg_state(memcg, MEMCG_NET_PRESSURE, diff);
->                 // OR
->                 // while (memcg) {
->                 //      memcg->sk_pressure_duration +=3D diff;
->                 //      memcg =3D parent_mem_cgroup(memcg);
+Plus I suspect at some point we may want to add another layer here
+for e.g. a group of queues delegated to the same container interface
+(netkit, veth, ipvlan etc.) So I want to establish a clear model
+rather than "optimize" for the number of u32 variables.
 
-The parents' sk_pressure_duration is not protected by the lock
-taken by trylock.  Maybe we need another global mutex if we want
-the hierarchy ?
-
-
->                 // }
->         }
->
->         spin_unlock(memcg->net_pressure_lock);
->
-> Regarding the hierarchical, we can avoid rstat infra as this code path
-> is not really performance critical.
+Most code (drivers) should never be exposed to any of this, they
+consume a flattened qcfg for a reason.
 
