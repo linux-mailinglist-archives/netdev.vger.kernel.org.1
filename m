@@ -1,77 +1,98 @@
-Return-Path: <netdev+bounces-211841-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211842-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B29AAB1BDB6
-	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 02:05:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A773FB1BDB8
+	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 02:05:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 83D2C189CE3F
-	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 00:05:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4DFC181A60
+	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 00:05:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE67619A;
-	Wed,  6 Aug 2025 00:05:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 511C8137E;
+	Wed,  6 Aug 2025 00:05:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mYaHZHnE"
+	dkim=pass (2048-bit key) header.d=gnuweeb.org header.i=@gnuweeb.org header.b="DHMYWxAz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from server-vie001.gnuweeb.org (server-vie001.gnuweeb.org [89.58.62.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C67131114;
-	Wed,  6 Aug 2025 00:05:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C558D136E;
+	Wed,  6 Aug 2025 00:05:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.62.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754438713; cv=none; b=iJpqvdiworuDeMr7bRmTEkx9lQgblB9QqaigD48bia5Dk3TEAbFzgTrwyFm4abT+b9002nyDHLP5SC5b4H4wm4gDZdUp1xSSz94NALDXbmFO+m9Js2hcnqqy2iFsubcuN50HeBmmLEpbNw7P9i7xGQiSC1s3Vd2k/IHA5wQtofo=
+	t=1754438741; cv=none; b=jaSSSOc2o6hie7yOasOBCK9wdVCwo7OqPKggQEjRt4EeTLIm8aFXzeRXhbb1kqQJzSP1dNZvmKhswDPaQN/akGrwICZb+eP9DHY/F9rvCUkh+TD3/UmVNJ9R1vb4IVRGJXye0FYkd14IXEMWXiRi2J6ieDoT+6iDXTNCXKSjOCg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754438713; c=relaxed/simple;
-	bh=P00i4GtZejZ/n1LkusAVklmnoOuvCTiojcgIjHQOTpU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ffq63IS3+miDwBJuy7jgf+6HJDgriz2oVMHHlZmQo7KXGTuRLVZxbzhl9jxtIsdGtoU4X2cLKOOtSX4z0S8F0My7roGLkhfc5ZF6iB5/LblSJK2DjL0jK6qHmuz8qydgqbZt5cppfl8XPeQ6TdwOb3/l8vplESz4lnP0X2JSucY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mYaHZHnE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBAF2C4CEF0;
-	Wed,  6 Aug 2025 00:05:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754438713;
-	bh=P00i4GtZejZ/n1LkusAVklmnoOuvCTiojcgIjHQOTpU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mYaHZHnEVHImcBFttT9nh2lADoXszkW+AdmZSkil5HEL4e2a1+R2ILrqvkU3H+9Mr
-	 hBue5jzuFH7DSNYJs93mw8wLBxG2o+UIbavu8ahIvHyUy1iGV1gq9uTFXvj09Rffe1
-	 zUviiaDLqTyb0Y8Js+zjglX6sPH6bgk3t2LayL1HRXfdCYnrpYRWKZUy3ZOCyOFqxR
-	 DNIjXgMtG8S5fESEE18URYxvJ6C/zaGEfsXGdm8JwHKUkxyB9M/ywItaWTNwO+oQY8
-	 l25Ieyg5ohaXB1PpagR6RdhWICBC038BHNAtwguVNZH8hc20faaFpsD6PIb19ljWs5
-	 6BkG9DItHrtDA==
-Date: Tue, 5 Aug 2025 17:05:12 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: netdev@vger.kernel.org, io-uring@vger.kernel.org, Eric Dumazet
- <edumazet@google.com>, Willem de Bruijn <willemb@google.com>, Paolo Abeni
- <pabeni@redhat.com>, andrew+netdev@lunn.ch, horms@kernel.org,
- davem@davemloft.net, sdf@fomichev.me, almasrymina@google.com,
- dw@davidwei.uk, michael.chan@broadcom.com, dtatulea@nvidia.com,
- ap420073@gmail.com
-Subject: Re: [RFC v1 21/22] net: parametrise mp open with a queue config
-Message-ID: <20250805170512.37cd1e7e@kernel.org>
-In-Reply-To: <11caecf8-5b81-49c7-8b73-847033151d51@gmail.com>
-References: <cover.1753694913.git.asml.silence@gmail.com>
-	<ca874424e226417fa174ac015ee62cc0e3092400.1753694914.git.asml.silence@gmail.com>
-	<20250801171009.6789bf74@kernel.org>
-	<11caecf8-5b81-49c7-8b73-847033151d51@gmail.com>
+	s=arc-20240116; t=1754438741; c=relaxed/simple;
+	bh=bj+RZzaHVNpoliwAGa9XYm5UNfnwharwglOw4U7Tgek=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KuKH9lZ8XL1+Vl7cT25KeXbatugXLAbNE3wp0T9g+ChhS0gEFL/KVWspRRrQJVal63LBQGomavPjPjp57D9kN3IXTW1PaEFzp5a29phvw+xpISNKrva5cN2BADPulDE5Q0CMyF7kAEqXlKkQUWmLtvwwjA5CunLA43mTPiaM3Lg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=gnuweeb.org; spf=pass smtp.mailfrom=gnuweeb.org; dkim=pass (2048-bit key) header.d=gnuweeb.org header.i=@gnuweeb.org header.b=DHMYWxAz; arc=none smtp.client-ip=89.58.62.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=gnuweeb.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnuweeb.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gnuweeb.org;
+	s=new2025; t=1754438735;
+	bh=bj+RZzaHVNpoliwAGa9XYm5UNfnwharwglOw4U7Tgek=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:In-Reply-To:Message-ID:Date:From:Reply-To:Subject:To:
+	 Cc:In-Reply-To:References:Resent-Date:Resent-From:Resent-To:
+	 Resent-Cc:User-Agent:Content-Type:Content-Transfer-Encoding;
+	b=DHMYWxAzEHmz4jrtg4O2K9dt+cvr7lk8rcZbxE7YxjADTg88lqrB0djeyOMu8zMbl
+	 7QydPwCg4ew9mpGnnokAdOBscZ9CCVFk7mUlUVVL4pj/mv7IdmZc3FsS2VHCPseB02
+	 mdEeOw0aeX1EG5pOH5zHWD2HbdQOBpPqtd2re1Si1JsAw7iIc87jDeG/XsmDEZlwJX
+	 2GCMUGkDDoP7MyEY7QvLtC1gq52P8+0W+znBjcEKdnucdiWYMgmURuu/Q1aIVCrrT7
+	 p9L90MNfz3R5WAA3t1FGqC44hyPwGQFSvs4516pCBVXMt6fvprekpkUO7bAUhLzIAV
+	 E6wm0DosSW6kA==
+Received: from linux.gnuweeb.org (unknown [182.253.126.229])
+	by server-vie001.gnuweeb.org (Postfix) with ESMTPSA id 3F29A3127C24;
+	Wed,  6 Aug 2025 00:05:32 +0000 (UTC)
+X-Gw-Bpl: wU/cy49Bu1yAPm0bW2qiliFUIEVf+EkEatAboK6pk2H2LSy2bfWlPAiP3YIeQ5aElNkQEhTV9Q==
+Date: Wed, 6 Aug 2025 07:05:29 +0700
+From: Ammar Faizi <ammarfaizi2@gnuweeb.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Simon Horman <horms@kernel.org>, Oliver Neukum <oneukum@suse.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Linux Netdev Mailing List <netdev@vger.kernel.org>,
+	Linux USB Mailing List <linux-usb@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Armando Budianto <sprite@gnuweeb.org>, gwml@vger.gnuweeb.org,
+	stable@vger.kernel.org, John Ernberg <john.ernberg@actia.se>
+Subject: Re: [PATCH net v2] net: usbnet: Fix the wrong netif_carrier_on()
+ call placement
+Message-ID: <aJKcSZCirArmH2/c@linux.gnuweeb.org>
+References: <20250801190310.58443-1-ammarfaizi2@gnuweeb.org>
+ <20250804100050.GQ8494@horms.kernel.org>
+ <20250805202848.GC61519@horms.kernel.org>
+ <CAHk-=wjqL4uF0MG_c8+xHX1Vv8==sPYQrtzbdA3kzi96284nuQ@mail.gmail.com>
+ <aJKaHfLteSF842IY@linux.gnuweeb.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aJKaHfLteSF842IY@linux.gnuweeb.org>
+X-Machine-Hash: hUx9VaHkTWcLO7S8CQCslj6OzqBx2hfLChRz45nPESx5VSB/xuJQVOKOB1zSXE3yc9ntP27bV1M1
 
-On Mon, 4 Aug 2025 13:50:08 +0100 Pavel Begunkov wrote:
-> I was thinking stashing it in struct pp_memory_provider_params and
-> applying in netdev_rx_queue_restart().
+On Wed, Aug 06, 2025 at 06:56:20AM +0700, Ammar Faizi wrote:
+> Apart from moving it outside that if-statement, unlink_urbs() call
+> should probably also be guarded as we agreed it makes no sense to call
+> it when we're turning the link on.
 
-Tho, netdev_rx_queue_restart() may not be a great place, it's called
-from multiple points and more will come. net_mp_open_rxq() /
-net_mp_close_rxq() and friends are probably a better place to apply
-and clear MP related overrides.
+Oh, no.
+
+I just realized, it does need to be guarded because if netif_carrier_on()
+is placed before the if (!netif_carrier_ok(dev->net)), it already clears
+__LINK_STATE_NOCARRIER.
+
+-- 
+Ammar Faizi
+
 
