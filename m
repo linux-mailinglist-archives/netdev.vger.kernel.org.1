@@ -1,118 +1,170 @@
-Return-Path: <netdev+bounces-211854-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211855-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3BC3B1BE7B
-	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 03:55:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B275DB1BEF7
+	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 05:03:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A48F318A461E
-	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 01:55:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD131162963
+	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 03:03:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECA891B78F3;
-	Wed,  6 Aug 2025 01:54:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA0DB49620;
+	Wed,  6 Aug 2025 03:03:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="UplxV76y"
+	dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b="Hdj7aSvw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+Received: from layka.disroot.org (layka.disroot.org [178.21.23.139])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11A2B19E992
-	for <netdev@vger.kernel.org>; Wed,  6 Aug 2025 01:54:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8F7B79F2;
+	Wed,  6 Aug 2025 03:03:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.21.23.139
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754445297; cv=none; b=AQqGdT5osrI3fKUqCKTo82PybMQRp5SMWYDBM1Hr894/TYHqxeUXc9WgytWeYYp60iAaTO1y0uJH/1rwh7rI+Y1YcAzGUPGKwCHkBoFUEFiZEOG4WbR/Hgt5hDlDbA39jNIjLlpxbJ90EGJddp6re+E8cmIRNzy/TxaSiuOS3TA=
+	t=1754449395; cv=none; b=t5SnNc0UGI8gsblMxfh0AuYlu9OVlkFb1hwezZ0pTVzrruxx0PTV5jc7OHcp7GhsSDJeTUqmfnrb3KzIuoVontCjqjG8YSgPVQEoYBVqRPIKhmZZemRyUuZgE0arUzO+rdsrycESpD9LpKQNxRXUEQDyOPdJaCLhtuFvN6WLJ44=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754445297; c=relaxed/simple;
-	bh=kQQnVC0izYvjXyrwC7oXu9KciKX+b5K//bAiSMoT01Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=A33aQaJhU11PvPsOWZMWMkri8UsGX9uawqs5EIsHuegaRDpU5BborhvL2Czx4gyhAMozIO0dAtlmS83ld68Dy3KhkPTcHBqU5prDDHmA8ldDfMXpsIxjhfo7fUtICjsoBJio0oHfHtkffunpGgvd69hecprGIXBtzO1LpMWrHBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=UplxV76y; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-af93bcaf678so600827866b.0
-        for <netdev@vger.kernel.org>; Tue, 05 Aug 2025 18:54:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1754445294; x=1755050094; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=L1PkDCTaXOlCgVfN+O/OMDhLH2gXEH5igacRG1rqZxQ=;
-        b=UplxV76yN2gbq+P3s54S4t31K4nY8zSj9LjyaUmLUWVWVNH4Hfm/KF77NfrfAYbCSS
-         pJGfwX9fgHDt9/Ul+XNWdPyJolSCvqozRrfyY3Lj8QHtgTjFo3i2Rfx5qfrItH43NhAD
-         x3Ee0ULrYl7pIUlVOD33r1j/1OClaAPb/20YU=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754445294; x=1755050094;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=L1PkDCTaXOlCgVfN+O/OMDhLH2gXEH5igacRG1rqZxQ=;
-        b=ukJcI07PWbP8DrhSqj9u/+Ce2Qbcl3KVLSU+KujqQVN9tJQ3ZufT4Tf90Hhv+2soa9
-         ocmRkFJ4n+J6RIGSIa5Lh2qSh610jOtmY5pYGqVQ6zBBEpUHQDkbVoEGU4aw0N7Hq+wF
-         bTAgG0B+uAEIHooetTGxBxBp7uhEZJlOyThbMYk/l6Qo4sL5z1v55IbL06uj5jJUed+H
-         erk5ntzj/UAVI4CaouoajMisTTGqU8i6KKonT7/l87b0YYlS0eVY0xKpJ/RTv4isSf60
-         81YIgqAuYQOZXUc17BAX4HFOQfZtiCOtRuHEYltPoUWjp30tXsv9ppV7i0z9q5RVqwHI
-         bnuA==
-X-Forwarded-Encrypted: i=1; AJvYcCVrNW1XFNoQ76PI30Ydp+TYsgp8oKDW5ULw273PpfdnFsvEKmTF+fzz0++/s9kyyOhNw7EQsO8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyNLFV3aL+t3LJ5iMJUhKKn4nW8FOxjJGWvUyhTxMx2+BQ6JRo7
-	bF/SVy4GMb8HQ3cYvdmKop6Ci9SoRsO8QyucKXfBpZBe6FRQQ9pBhCxIg9JgVTyXgMXUi3fPR+A
-	/FuDyJ78zPQ==
-X-Gm-Gg: ASbGncsx0Dc31hiNOn5zXiVJoQo/dSS7W/amoXYaZMvW9MDpxrrzdJiBrp8Zl+U0cJL
-	kuZL4hYgszOOPl+oqAe1cf3xOZoHA7bGjTNywxRBPj3UcAgAQ3IWpSaPP61Er/4zUT0togjilas
-	aVlEYBTD2xQTFa8v5lpmf5opQ6WWoQRjaFPEFKqngfH7pw2zcCmAbtXzkg4Wznou8nZx+Qg3J4z
-	zD9iM5oEe0ASfDEA0+vyKdw+bv3T2OUykqG9O7OJNgtfetrL4yZB8JYG445P0kCITzRdHEo8qIx
-	dpyoEejmFf+7wUiS9++LYfJnHE4dVr9NWKtjrFwlV9Iu7LCl9iZVECTxbb6zE+/6gRJ6JrXBlau
-	aeyYleEZXbeO4Kt3QYWjWsu+OkUEMFo13AYqFcCkNJqT/NfsJGw770Ei+6fA2LQaBvU/DXqlR
-X-Google-Smtp-Source: AGHT+IEZhI1xNgDfeS16Lw8SGIuwuPXU1+Zjwj7ESXcRWCjR+QiCpRITIV4BZVQZy0XMKeDpr78lPQ==
-X-Received: by 2002:a17:907:d1d:b0:ae3:bf5f:ca20 with SMTP id a640c23a62f3a-af990117824mr91887366b.8.1754445294218;
-        Tue, 05 Aug 2025 18:54:54 -0700 (PDT)
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com. [209.85.208.46])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-af985e63730sm172715866b.67.2025.08.05.18.54.52
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 Aug 2025 18:54:52 -0700 (PDT)
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-615622ed70fso9623941a12.3
-        for <netdev@vger.kernel.org>; Tue, 05 Aug 2025 18:54:52 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCX5Z6WCUd/saITYVl4DFSqsDMcGs5JIkhFJksJwu9GjWudbR3L9H5WAHwZEMldgV0fprOkiKiA=@vger.kernel.org
-X-Received: by 2002:aa7:d64b:0:b0:608:6501:6a1f with SMTP id
- 4fb4d7f45d1cf-617960b2169mr747725a12.1.1754445292221; Tue, 05 Aug 2025
- 18:54:52 -0700 (PDT)
+	s=arc-20240116; t=1754449395; c=relaxed/simple;
+	bh=fyIkXN5YxBF92Jk3fC3dvGetl4/UPKeitt9ZBL/oLWQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=t716SKwozL3TkLsiZWg2y5AjnhvHASW8FM7aYNIsV/q5mw8r07K3iB6rOO+X0E24lI+5GEmCIb0hgjTkIOZrNipeGUkEUoocc8IyuuGLpcguFbnB0ds6EJPvAMzO5PlVtvPPjlF8YCfHLntKMpTSZUNsN1QX9TS9feDmlDOFWoY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org; spf=pass smtp.mailfrom=disroot.org; dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b=Hdj7aSvw; arc=none smtp.client-ip=178.21.23.139
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=disroot.org
+Received: from mail01.disroot.lan (localhost [127.0.0.1])
+	by disroot.org (Postfix) with ESMTP id B5984206A5;
+	Wed,  6 Aug 2025 05:03:09 +0200 (CEST)
+X-Virus-Scanned: SPAM Filter at disroot.org
+Received: from layka.disroot.org ([127.0.0.1])
+ by localhost (disroot.org [127.0.0.1]) (amavis, port 10024) with ESMTP
+ id DiazYPl_U3fV; Wed,  6 Aug 2025 05:03:09 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=disroot.org; s=mail;
+	t=1754449383; bh=fyIkXN5YxBF92Jk3fC3dvGetl4/UPKeitt9ZBL/oLWQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=Hdj7aSvwPl9zceSTDOp6/Ns1r+OOpra44MJmXsq39Mjf63o5V2uI9lLbYAU6KCf6s
+	 s6qYgqE5FZTJzT9DCUkZH2Mh5WH4tw7OTHIcWpcOlpaDKotUBo3BVk+bkyWpfDDiKD
+	 w+OrJYkDc+sDFG2WiBmivd1q4Ooq6ZMopyHa7x95KoRjhFXliP/4tYJAvfZ89YCSYR
+	 NlLpc+XCQGuA7MaAGh+kgSOrYdzA3LHS3aaeGF+3RgeNoG9HseUgBy8Cs1APwH1Uys
+	 sHrb05ZOsDzp3ou2CFUDEkaS2ypL1AxqwQPxy8At1PasNfyydI17yBn7yASO+hKJ9C
+	 toKEEnEB9IA2w==
+Date: Wed, 6 Aug 2025 03:02:43 +0000
+From: Yao Zi <ziyao@disroot.org>
+To: Drew Fustini <fustini@kernel.org>
+Cc: Rob Herring <robh@kernel.org>, Guo Ren <guoren@kernel.org>,
+	Fu Wei <wefu@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+	Emil Renner Berthing <emil.renner.berthing@canonical.com>,
+	Jisheng Zhang <jszhang@kernel.org>, linux-riscv@lists.infradead.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v2 2/3] net: stmmac: thead: Get and enable APB clock
+ on initialization
+Message-ID: <aJLF07Sw9IatHmUq@pie>
+References: <20250801091240.46114-1-ziyao@disroot.org>
+ <20250801091240.46114-3-ziyao@disroot.org>
+ <20250803170206.GA525144-robh@kernel.org>
+ <aJBBOptU4IXilK3I@pie>
+ <aJDeZJrKkqH23V/V@x1>
+ <aJJH6wLqMO5XRTeW@x1>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250801190310.58443-1-ammarfaizi2@gnuweeb.org>
- <20250804100050.GQ8494@horms.kernel.org> <20250805202848.GC61519@horms.kernel.org>
- <CAHk-=wjqL4uF0MG_c8+xHX1Vv8==sPYQrtzbdA3kzi96284nuQ@mail.gmail.com> <CAHk-=wh+bnqPjL=9oq3uEkyZ7WB8=F_QMOHsGjHLj98oYk-X3Q@mail.gmail.com>
-In-Reply-To: <CAHk-=wh+bnqPjL=9oq3uEkyZ7WB8=F_QMOHsGjHLj98oYk-X3Q@mail.gmail.com>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Wed, 6 Aug 2025 04:54:36 +0300
-X-Gmail-Original-Message-ID: <CAHk-=wjedw0vsfByNOrxd-QMF9svfNjbSo1szokEZuKtktG7Lw@mail.gmail.com>
-X-Gm-Features: Ac12FXyVcowt5QK4YaVtsfApiqsjcc5RnE4u3G8HT-dXMHsAGYoNHxft3oIBLvY
-Message-ID: <CAHk-=wjedw0vsfByNOrxd-QMF9svfNjbSo1szokEZuKtktG7Lw@mail.gmail.com>
-Subject: Re: [PATCH net v2] net: usbnet: Fix the wrong netif_carrier_on() call placement
-To: Simon Horman <horms@kernel.org>
-Cc: Ammar Faizi <ammarfaizi2@gnuweeb.org>, Oliver Neukum <oneukum@suse.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Linux Netdev Mailing List <netdev@vger.kernel.org>, Linux USB Mailing List <linux-usb@vger.kernel.org>, 
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Armando Budianto <sprite@gnuweeb.org>, gwml@vger.gnuweeb.org, 
-	stable@vger.kernel.org, John Ernberg <john.ernberg@actia.se>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aJJH6wLqMO5XRTeW@x1>
 
-On Wed, 6 Aug 2025 at 04:11, Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
->
-> And yeah, the attached patch also fixes the problem for me and makes
-> more sense to me.
+On Tue, Aug 05, 2025 at 11:05:31AM -0700, Drew Fustini wrote:
+> On Mon, Aug 04, 2025 at 09:23:00AM -0700, Drew Fustini wrote:
+> > On Mon, Aug 04, 2025 at 05:12:26AM +0000, Yao Zi wrote:
+> > > On Sun, Aug 03, 2025 at 12:02:06PM -0500, Rob Herring wrote:
+> > > > On Fri, Aug 01, 2025 at 09:12:39AM +0000, Yao Zi wrote:
+> > > > > It's necessary to adjust the MAC TX clock when the linkspeed changes,
+> > > > > but it's noted such adjustment always fails on TH1520 SoC, and reading
+> > > > > back from APB glue registers that control clock generation results in
+> > > > > garbage, causing broken link.
+> > > > > 
+> > > > > With some testing, it's found a clock must be ungated for access to APB
+> > > > > glue registers. Without any consumer, the clock is automatically
+> > > > > disabled during late kernel startup. Let's get and enable it if it's
+> > > > > described in devicetree.
+> > > > > 
+> > > > > Fixes: 33a1a01e3afa ("net: stmmac: Add glue layer for T-HEAD TH1520 SoC")
+> > > > > Signed-off-by: Yao Zi <ziyao@disroot.org>
+> > > > > Reviewed-by: Drew Fustini <fustini@kernel.org>
+> > > > > Tested-by: Drew Fustini <fustini@kernel.org>
+> > > > > ---
+> > > > >  drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c | 6 ++++++
+> > > > >  1 file changed, 6 insertions(+)
+> > > > > 
+> > > > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c
+> > > > > index c72ee759aae5..95096244a846 100644
+> > > > > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c
+> > > > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c
+> > > > > @@ -211,6 +211,7 @@ static int thead_dwmac_probe(struct platform_device *pdev)
+> > > > >  	struct stmmac_resources stmmac_res;
+> > > > >  	struct plat_stmmacenet_data *plat;
+> > > > >  	struct thead_dwmac *dwmac;
+> > > > > +	struct clk *apb_clk;
+> > > > >  	void __iomem *apb;
+> > > > >  	int ret;
+> > > > >  
+> > > > > @@ -224,6 +225,11 @@ static int thead_dwmac_probe(struct platform_device *pdev)
+> > > > >  		return dev_err_probe(&pdev->dev, PTR_ERR(plat),
+> > > > >  				     "dt configuration failed\n");
+> > > > >  
+> > > > > +	apb_clk = devm_clk_get_optional_enabled(&pdev->dev, "apb");
+> > > > 
+> > > > The description sounds like this should not be optional. The binding 
+> > > > change also makes it not optional.
+> > > 
+> > > Yes, it shouldn't be. But using the non-optional API will cause the
+> > > driver fails to probe with the old (problematic) devicetree, IOW, it
+> > > breaks the ABI. Comparing to unusable ethernet, failing to adjust the
+> > > link speed sounds a minor point to me.
+> > 
+> > I've just read Conor's comment in the v1 again: 
+> > 
+> >  Nah, introduce the warnings. If the clock is required for operation, it
+> >  should be marked as such. You've made it optional in the driver, which
+> >  is the important part (backwards compatible) and you've got the dts
+> >  patch in the series.
+> > 
+> > Thus I think the argument I made in my reply to this thread is
+> > incorrect and the driver should remain backwards compatible.
+> > 
+> > > Maybe we could add a comment to explain why optional API is used, or
+> > > just use the non-optional one if such ABI breakages are acceptable --
+> > > for which I'd like to wait for more opinions.
+> > 
+> > I think a comment in the code about why it uses the optional variant of
+> > the function is a good idea.
+> 
+> I was chatting on devicetree irc channel, and I think that it would be
+> good to add something like this to the commit message:
+> 
+>  For the purposes of backwards compatibility, the probe will not fail if
+>  'apb' is not found, but the link will break if the speed changes after
+>  probe.
+> 
+> Also, if devm_clk_get_optional_enabled("apb") fails, then I think it
+> would be a good idea to warn the user that changing the link speed will
+> not be supported.
 
-Ok, crossed emails because I was reading things in odd orders and
-going back to bed trying to get over jetlag.
+Both sound reasonable to me, and I'll add them in v3, thanks.
 
-Anyway, I've applied Ammar's v3 that ended up the same patch that I also tested,
+> Thanks,
+> Drew
 
-              Linus
+Best regards,
+Yao Zi
 
