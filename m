@@ -1,150 +1,123 @@
-Return-Path: <netdev+bounces-211980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211985-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9584DB1CE36
-	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 23:05:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D107B1CEA4
+	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 23:51:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C1AA47AACBC
-	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 21:03:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 282C918C597B
+	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 21:52:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 811F72253A0;
-	Wed,  6 Aug 2025 21:04:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 939EB221286;
+	Wed,  6 Aug 2025 21:51:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fFzoPzTU"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="TR2mvOlj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD47621FF57;
-	Wed,  6 Aug 2025 21:04:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5671721ABC8
+	for <netdev@vger.kernel.org>; Wed,  6 Aug 2025 21:51:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754514287; cv=none; b=sqPpVNDwY3XeemAucscDQPOKc/v/fPrkG4ybKd6xyK+iS2RoNSmHDCDw66iBNGp0IlgNa4puVq7OimDQgHl6XjxGzQABI+qT3OCaMCnjeV+wFWfGl6VbJzPiEXBsp+gd6x2J+CtpJdMncYvYjo6EQrtmJbViJHl/wTjhFKQyvQw=
+	t=1754517103; cv=none; b=bgFjjDIPMbX7QejMkNNXBGiuSZUhyiYyHMFPe/xXpp+n1wM26MNwpKCerVPsUKIwiSemQPXm8d2+tKrg+uPWmKzx9KaqdyWaqsNFBjDQlNJ+YLtVrtxuHPms36oSLIKVzrLzvFBiE1gdGBhtD145jT3nNCbh6eK/bAuaLXI2WjQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754514287; c=relaxed/simple;
-	bh=BvwC0JqVwXmYHx1CLjC/SFG/BU+TU7ntLRN/Vr6NJyg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HiUL0Uhf3MGxc880wuIC4eUK/NwvFlyIbE4LvqnZvOWOV+26qNnCgWa6XYTEQA5TcFsUelXS/NPs92zXSqS93B8/Ij3Pp6jDEQLvmnAYKwLxUkikYo/szWlWNvjN5qraO6dmTfOUpcCo0bptXG0Rfqddk9xkZOGS0gMmCPRW8RE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fFzoPzTU; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1754514286; x=1786050286;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=BvwC0JqVwXmYHx1CLjC/SFG/BU+TU7ntLRN/Vr6NJyg=;
-  b=fFzoPzTUW2PstpNK7hO/2OaDQuNLU5n17li18LHZ81IFOLdmffZYd8u4
-   l2+gCJiInsIjHSvbyxm6WVchIZDeZWxOMpQbThaCQIC6lSTVWTzNWzLZN
-   AhsAvvorw2HZfDb/NxQHvRUWYzK4bjX2AOEUC2bohto9rURuKlU8YDyCH
-   eQ04PgXmoYeLdYP6Knc71df1PTR/r+YmU8HD4sBZelCb4nojSq4Awdj2I
-   d7m1jH6dK75R2R/+m/VHV63StTtoXLG5bZj/baRQP6Yc8+LYSaBj/yWUT
-   lfTkWEL1A3P3dRbSgr31+Q8/2N3LDIohgBzfu3M5lgko6paHFA1Zqjc9u
-   Q==;
-X-CSE-ConnectionGUID: NCgbnWdCQbabaY5z10jr6A==
-X-CSE-MsgGUID: S0NsdwGGT6y8xIKyFFphDg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11514"; a="59459604"
-X-IronPort-AV: E=Sophos;i="6.17,271,1747724400"; 
-   d="scan'208";a="59459604"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Aug 2025 14:04:45 -0700
-X-CSE-ConnectionGUID: 24nlF0ShST+tysqyxgcqwg==
-X-CSE-MsgGUID: /6d3uZKzQ8KBFInOFLPPxQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,271,1747724400"; 
-   d="scan'208";a="202039038"
-Received: from lkp-server02.sh.intel.com (HELO 4ea60e6ab079) ([10.239.97.151])
-  by orviesa001.jf.intel.com with ESMTP; 06 Aug 2025 14:04:41 -0700
-Received: from kbuild by 4ea60e6ab079 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1ujlJI-00026c-0g;
-	Wed, 06 Aug 2025 21:04:33 +0000
-Date: Thu, 7 Aug 2025 05:03:17 +0800
-From: kernel test robot <lkp@intel.com>
-To: bsdhenrymartin@gmail.com, huntazhang@tencent.com, jitxie@tencent.com,
-	landonsun@tencent.com, bryan-bt.tan@broadcom.com,
-	vishnu.dasa@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
-	sgarzare@redhat.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	Henry Martin <bsdhenryma@tencent.com>,
-	TCS Robot <tcs_robot@tencent.com>
-Subject: Re: [PATCH] VSOCK: fix Integer Overflow in
- vmci_transport_recv_dgram_cb()
-Message-ID: <202508070446.83Vp7qaK-lkp@intel.com>
-References: <20250805041748.1728098-1-tcs_kernel@tencent.com>
+	s=arc-20240116; t=1754517103; c=relaxed/simple;
+	bh=XG2iaiadFFnq9XwRGdlA5z9IM93Tsw6Fk02sG4YudNo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=p0/6HikyD/BdPY/IhtoO+cu2pzRZpfgeHXPJLW5ugs5uyOP1g88QsQ9ICdYat7fS0v7ZOKra9TH7bV7sYU1eUKzblU6fSuDuZQvYcd7kGWgxbrygwy6reXlG/pwfiIoLQtyGAQd9CrAX9wy00E3MPhzWAQA1blf7FWslR/lnCJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=TR2mvOlj; arc=none smtp.client-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1ujlTy-00EXbe-Nw; Wed, 06 Aug 2025 23:15:34 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+	bh=JEAvvLpXo03U5nTOjudQP/w82ZK7J9xTsTdVQJuUPT4=; b=TR2mvOlj/ssM041N+Pq0I/2VhP
+	ZYKARAxo1LGGfMByB7Xg5O/GSN6ltAq2BPKvnxsFNp9DUuSV9TVlK+Dank/E/2ZY+cBgG47o4KdUF
+	tEnMOueLFj2AXzcjMQUHyYHYDhJ386E37KECg3w91t5YP8McSQi+LXzH/tAJvH9kGNstTpScwigzX
+	rkP6pkmG+IcqQFRdGi7JpGFtvoyQdMj3xUHjXFT1cC0zEltgcKQZ8HZXgkndNXoOAU583mqNNAn47
+	/K99dHNuyrUSpZzMU0pzEkA6fjuiEbjmNic7KNFqloTwQ4LIFpzL3Umz69HYaSl4x4DePmsoaX3pO
+	Nx4ZbeDw==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1ujlTx-0000al-Fo; Wed, 06 Aug 2025 23:15:33 +0200
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1ujlTn-00BdRi-Ua; Wed, 06 Aug 2025 23:15:24 +0200
+Message-ID: <54f5b076-4648-4d2b-b50b-e775c4ddb4bf@rbox.co>
+Date: Wed, 6 Aug 2025 23:15:22 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250805041748.1728098-1-tcs_kernel@tencent.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] kcm: Fix splice support
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Cong Wang <cong.wang@bytedance.com>,
+ Tom Herbert <tom@herbertland.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250725-kcm-splice-v1-1-9a725ad2ee71@rbox.co>
+ <20250730180215.2ad7df72@kernel.org>
+ <b6a2219b-32dd-4bb6-b848-45325e4e4ab9@rbox.co>
+ <20250804165155.44a32242@kernel.org>
+Content-Language: pl-PL, en-GB
+From: Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <20250804165155.44a32242@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi,
+On 8/5/25 01:51, Jakub Kicinski wrote:
+> On Sun, 3 Aug 2025 12:00:38 +0200 Michal Luczaj wrote:
+>> On 7/31/25 03:02, Jakub Kicinski wrote:
+>>> On Fri, 25 Jul 2025 12:33:04 +0200 Michal Luczaj wrote:  
+>>>> Flags passed in for splice() syscall should not end up in
+>>>> skb_recv_datagram(). As SPLICE_F_NONBLOCK == MSG_PEEK, kernel gets
+>>>> confused: skb isn't unlinked from a receive queue, while strp_msg::offset
+>>>> and strp_msg::full_len are updated.
+>>>>
+>>>> Unbreak the logic a bit more by mapping both O_NONBLOCK and
+>>>> SPLICE_F_NONBLOCK to MSG_DONTWAIT. This way we align with man splice(2) in
+>>>> regard to errno EAGAIN:
+>>>>
+>>>>    SPLICE_F_NONBLOCK was specified in flags or one of the file descriptors
+>>>>    had been marked as nonblocking (O_NONBLOCK), and the operation would
+>>>>    block.  
+>>>
+>>> Coincidentally looks like we're not honoring
+>>>
+>>> 	sock->file->f_flags & O_NONBLOCK 
+>>>
+>>> in TLS..  
+>>
+>> I'm a bit confused.
+>>
+>> Comparing AF_UNIX and pure (non-TLS) TCP, I see two non-blocking-splice
+>> interpretations. Unix socket doesn't block on `f_flags & O_NONBLOCK ||
+>> flags & SPLICE_F_NONBLOCK` (which this patch follows), while TCP, after
+>> commit 42324c627043 ("net: splice() from tcp to pipe should take into
+>> account O_NONBLOCK"), honours O_NONBLOCK and ignores SPLICE_F_NONBLOCK.
+>>
+>> Should KCM (and TLS) follow TCP behaviour instead?
+> 
+> I didn't look closely, but FWIW - yes, in principle KCM and TLS should
+> copy TCP.
 
-kernel test robot noticed the following build errors:
+Ugh, so this KCM patch is incorrect. Sorry, I'll submit a follow up
+tweaking KCM and TLS, as suggested.
 
-[auto build test ERROR on net-next/main]
-[also build test ERROR on net/main linus/master v6.16 next-20250806]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Note about SPLICE_F_NONBLOCK: besides AF_UNIX, it is also honoured in
+AF_SMC and tracefs.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/bsdhenrymartin-gmail-com/VSOCK-fix-Integer-Overflow-in-vmci_transport_recv_dgram_cb/20250806-105210
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250805041748.1728098-1-tcs_kernel%40tencent.com
-patch subject: [PATCH] VSOCK: fix Integer Overflow in vmci_transport_recv_dgram_cb()
-config: x86_64-rhel-9.4 (https://download.01.org/0day-ci/archive/20250807/202508070446.83Vp7qaK-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250807/202508070446.83Vp7qaK-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202508070446.83Vp7qaK-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   In file included from include/uapi/linux/posix_types.h:5,
-                    from include/uapi/linux/types.h:14,
-                    from include/linux/types.h:6,
-                    from net/vmw_vsock/vmci_transport.c:8:
-   net/vmw_vsock/vmci_transport.c: In function 'vmci_transport_recv_dgram_cb':
->> include/linux/stddef.h:16:33: error: 'struct vmci_datagram' has no member named 'payload'
-      16 | #define offsetof(TYPE, MEMBER)  __builtin_offsetof(TYPE, MEMBER)
-         |                                 ^~~~~~~~~~~~~~~~~~
-   net/vmw_vsock/vmci_transport.c:634:43: note: in expansion of macro 'offsetof'
-     634 |         if (dg->payload_size > SIZE_MAX - offsetof(struct vmci_datagram, payload))
-         |                                           ^~~~~~~~
---
-   In file included from include/uapi/linux/posix_types.h:5,
-                    from include/uapi/linux/types.h:14,
-                    from include/linux/types.h:6,
-                    from vmci_transport.c:8:
-   vmci_transport.c: In function 'vmci_transport_recv_dgram_cb':
->> include/linux/stddef.h:16:33: error: 'struct vmci_datagram' has no member named 'payload'
-      16 | #define offsetof(TYPE, MEMBER)  __builtin_offsetof(TYPE, MEMBER)
-         |                                 ^~~~~~~~~~~~~~~~~~
-   vmci_transport.c:634:43: note: in expansion of macro 'offsetof'
-     634 |         if (dg->payload_size > SIZE_MAX - offsetof(struct vmci_datagram, payload))
-         |                                           ^~~~~~~~
-
-
-vim +16 include/linux/stddef.h
-
-6e218287432472 Richard Knutsson 2006-09-30  14  
-^1da177e4c3f41 Linus Torvalds   2005-04-16  15  #undef offsetof
-14e83077d55ff4 Rasmus Villemoes 2022-03-23 @16  #define offsetof(TYPE, MEMBER)	__builtin_offsetof(TYPE, MEMBER)
-3876488444e712 Denys Vlasenko   2015-03-09  17  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
