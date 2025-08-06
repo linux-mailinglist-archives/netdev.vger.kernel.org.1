@@ -1,41 +1,46 @@
-Return-Path: <netdev+bounces-211862-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211859-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6DABB1C01A
-	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 07:55:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A20CFB1BF78
+	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 06:00:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A03C46287AC
-	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 05:55:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7424818A2A42
+	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 04:01:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE5591FCFEF;
-	Wed,  6 Aug 2025 05:55:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=rock-chips.com header.i=@rock-chips.com header.b="hPZq8Ego"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87A8213B5AE;
+	Wed,  6 Aug 2025 04:00:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-m49208.qiye.163.com (mail-m49208.qiye.163.com [45.254.49.208])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B15BB273FE;
-	Wed,  6 Aug 2025 05:55:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.49.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38C293C1F;
+	Wed,  6 Aug 2025 04:00:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754459733; cv=none; b=YUH58ZiBJ+N2EhcEQsFxTxVz83eDbTHNuS20rRUr+8wu/XfbIHz666jTg65jME1UAII5KM5ITBKAzaS+JZ9133BVGaIRomt3NkRW1gER4Khr0LjEQPBef1ksIoB+V9wbeGO+QE/G1J7MB4f22r+vEUXumBhBcbjnEYJUh+S071g=
+	t=1754452849; cv=none; b=hRvl80ndC8CnKzmOAPlaE4Xr92/S/o2MeK+acKodjwEFs9sjMmR9k23DtY+ruoqSrYYI+PDDXrH4N6v4dTmOurK5TiDFgRZul0RFDug5QvyBCiOYepnxLzgJr/0kj7bHsfvP0BbtN4bvYEaXfL1EzQoMpfqHAWCrFQabFEZX774=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754459733; c=relaxed/simple;
-	bh=tRu2MOTYT8KJYDw5bOFLBDKdTceUlMhJ4Mr7ocKZQiI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Y9K+cy0nFL8jdGOFoDWFPoi99sWpo0MZvK8H2E1Ygl/fkD9Q7J1UMTyPeBmlUikato+s7EQKgtN22AbVKtRUufLrbquAPJaqoGX4rwd9EtEjiTlvAkrPzhuFoTAMXgeGP18+Qu6kCkK27oY0reKxZnGtikakw1/qBLFByVHyCVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rock-chips.com; spf=pass smtp.mailfrom=rock-chips.com; dkim=pass (1024-bit key) header.d=rock-chips.com header.i=@rock-chips.com header.b=hPZq8Ego; arc=none smtp.client-ip=45.254.49.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rock-chips.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rock-chips.com
-Received: from [172.16.12.153] (gy-adaptive-ssl-proxy-2-entmail-virt205.gy.ntes [58.22.7.114])
-	by smtp.qiye.163.com (Hmail) with ESMTP id 1e71dd486;
-	Wed, 6 Aug 2025 11:32:50 +0800 (GMT+08:00)
-Message-ID: <d99c50ed-797b-4086-b1b5-d3df281d3c2a@rock-chips.com>
-Date: Wed, 6 Aug 2025 11:32:47 +0800
+	s=arc-20240116; t=1754452849; c=relaxed/simple;
+	bh=Yuw8bOEfvha+uWGO6FK0lOegX/jPVsfD62YLbYYk224=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=pvRWdVahp7VP2mRSCUJaeRHnLwnHSYTqPU+YXjXhLzcRJ3liNtYr/7Y+XU6r81oac2MkOgNjMNCjbA+xwzGLE3nrIGr2CdvYE3p2UkM+bzVDAq64DcE5eOSdzkXESF/iVx571HUZYozhGDIIzQ3L1miOdLs+AjH2z9U5+qEqRNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4bxc1y55p4z13Mwn;
+	Wed,  6 Aug 2025 11:57:26 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 87A2B1401F4;
+	Wed,  6 Aug 2025 12:00:41 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Wed, 6 Aug 2025 12:00:40 +0800
+Message-ID: <3aa80a19-d2cd-47a2-aaf9-4bc438b7656b@huawei.com>
+Date: Wed, 6 Aug 2025 12:00:40 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -43,111 +48,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: ethernet: stmmac: dwmac-rk: Make the clk_phy could
- be used for external phy
-To: Andrew Lunn <andrew@lunn.ch>, Chaoyi Chen <kernel@airkyi.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- Jonas Karlman <jonas@kwiboo.se>, David Wu <david.wu@rock-chips.com>,
- netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- linux-rockchip@lists.infradead.org
-References: <20250806011405.115-1-kernel@airkyi.com>
- <3c401e82-169f-4540-9c12-175798ac72a6@lunn.ch>
-From: Chaoyi Chen <chaoyi.chen@rock-chips.com>
-In-Reply-To: <3c401e82-169f-4540-9c12-175798ac72a6@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+CC: <shaojijie@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>,
+	<shenjian15@huawei.com>, <liuyonglong@huawei.com>, <chenhao418@huawei.com>,
+	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
+	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH V2 net 2/3] net: hibmcge: fix the division by zero issue
+To: Jakub Kicinski <kuba@kernel.org>
+References: <20250802123226.3386231-1-shaojijie@huawei.com>
+ <20250802123226.3386231-3-shaojijie@huawei.com>
+ <20250805181446.3deaceb9@kernel.org>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <20250805181446.3deaceb9@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-HM-Tid: 0a987d70527103abkunmabbf8f177f0aa3
-X-HM-MType: 1
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFDSUNOT01LS0k3V1ktWUFJV1kPCRoVCBIfWUFZQ00YSVZPT01CTElDHR9MGkpWFRQJFh
-	oXVRMBExYaEhckFA4PWVdZGBILWUFZTkNVSUlVTFVKSk9ZV1kWGg8SFR0UWUFZT0tIVUpLSU9PT0
-	hVSktLVUpCS0tZBg++
-DKIM-Signature: a=rsa-sha256;
-	b=hPZq8Ego38BXBeFh0nPLyfRxD634qAt3/p9YeuZs7mlvK3zqz2UF8JDVcd7x7Iu0ISGWD9ysDjHYSPFFWBw1dte+CwZssdF8F7luxfAtg/yPugeeE0IgJXf027Jg2ikOFGz4g0yofKftPXIpJx14vM5GyRvP0o9O3dLUnYsBFH4=; c=relaxed/relaxed; s=default; d=rock-chips.com; v=1;
-	bh=a1MobyGLfI/GmuK0n7WO7Oiwrjqt/Y28chaKKbEzA5U=;
-	h=date:mime-version:subject:message-id:from;
-
-Hi Andrew,
-
-On 8/6/2025 11:14 AM, Andrew Lunn wrote:
-> On Wed, Aug 06, 2025 at 09:14:05AM +0800, Chaoyi Chen wrote:
->> From: Chaoyi Chen <chaoyi.chen@rock-chips.com>
->>
->> For external phy, clk_phy should be optional, and some external phy
->> need the clock input from clk_phy. This patch adds support for setting
->> clk_phy for external phy.
->>
->> Signed-off-by: David Wu <david.wu@rock-chips.com>
->> Signed-off-by: Chaoyi Chen <chaoyi.chen@rock-chips.com>
-> Please take a read of:
->
-> https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
->
-> net-next is closed at the moment for the merge window.
->
-> You also need the indicate the tree in the Subject: line.
-
-Sorry for that, I will send v2 at an appropriate time.
+X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
 
 
->
->> ---
->>   drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c | 16 ++++++++++++----
->>   1 file changed, 12 insertions(+), 4 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
->> index 700858ff6f7c..703b4b24f3bc 100644
->> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
->> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
->> @@ -1558,6 +1558,7 @@ static int rk_gmac_clk_init(struct plat_stmmacenet_data *plat)
->>   	struct device *dev = &bsp_priv->pdev->dev;
->>   	int phy_iface = bsp_priv->phy_iface;
->>   	int i, j, ret;
->> +	unsigned int rate;
-> Reverse Christmas tree. Longest to shortest.
-
-Will fix in v2.
-
-
->
->>   
->>   	bsp_priv->clk_enabled = false;
->>   
->> @@ -1595,12 +1596,19 @@ static int rk_gmac_clk_init(struct plat_stmmacenet_data *plat)
->>   		clk_set_rate(bsp_priv->clk_mac, 50000000);
->>   	}
->>   
->> -	if (plat->phy_node && bsp_priv->integrated_phy) {
->> +	if (plat->phy_node) {
->>   		bsp_priv->clk_phy = of_clk_get(plat->phy_node, 0);
->>   		ret = PTR_ERR_OR_ZERO(bsp_priv->clk_phy);
->> -		if (ret)
->> -			return dev_err_probe(dev, ret, "Cannot get PHY clock\n");
->> -		clk_set_rate(bsp_priv->clk_phy, 50000000);
->> +		/* If it is not integrated_phy, clk_phy is optional */
->> +		if (bsp_priv->integrated_phy) {
->> +			if (ret)
->> +				return dev_err_probe(dev, ret, "Cannot get PHY clock\n");
+on 2025/8/6 9:14, Jakub Kicinski wrote:
+> On Sat, 2 Aug 2025 20:32:25 +0800 Jijie Shao wrote:
+>>   static inline u32 hbg_get_queue_used_num(struct hbg_ring *ring)
+>>   {
+>> +	if (!ring->len)
+>> +		return 0;
 >> +
->> +			ret = of_property_read_u32(plat->phy_node, "clock-frequency", &rate);
-> Is this property already in the DT binding?
+>>   	return (ring->ntu + ring->len - ring->ntc) % ring->len;
+> This should probably be a READ_ONCE() to a temporary variable.
+> There is no locking in debugfs, AFAICT, the value may change
+> between the test and the division / modulo.
 
-I didn't see explicit binding, but make dtbs_check W=1 didn't generate 
-any warning. I will drop this in v2.
+Yes, there is indeed a very short time window.
+I will add READ_ONCE() to ring->len and read it only once.
+
+Thanks
+Jijie Shao
 
 
->
->
->      Andrew
->
-> ---
-> pw-bot: cr
->
->
 
