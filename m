@@ -1,104 +1,148 @@
-Return-Path: <netdev+bounces-211949-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211950-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0747EB1C968
-	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 17:58:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DCA9B1C9BD
+	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 18:25:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE7BB3A6606
-	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 15:58:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2F1D1189D6AC
+	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 16:26:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41E1F291C39;
-	Wed,  6 Aug 2025 15:58:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D03FB293C67;
+	Wed,  6 Aug 2025 16:25:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Xoo/8ruy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VkSyLfUy"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63DB43AC1C;
-	Wed,  6 Aug 2025 15:58:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55C6D1A3165;
+	Wed,  6 Aug 2025 16:25:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754495912; cv=none; b=Suq0TKMTE3FhDEX6wZ/kFQwxSBYyrrJzj5XjUG1DKZkYxXv4AgoA6SI5pGRIDMyTVv34nB16k7fOzYWzc01j5FwhlyLKDyfHheWHbuVeYmix+fSrTk5kZpj01Mtg3n0lnkd2i0t0zrd0easCflTidj5aSVnoOk1QUZ7wPzKICZ4=
+	t=1754497544; cv=none; b=cVuNmNCUf9PI9smTQlIhxU2nznmEym0H46uOvKJyTyx7IysC+q6BpBnrX0rVI4mmg2KqYC9t4jGdh/FvlkaKzL6h01PayERxMSmaHQpc0icxcPUJj2Rt77sm1n9uW8I/AEIJntJ10scgSt970QqRnCSNwPd96yuqwdcn3Ize1w8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754495912; c=relaxed/simple;
-	bh=sSO/pt/U1+E8OY7Yuo/f4yv1RBvYu7aY/b9o6H2x12A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m/6NSs3xVH9GWdfR/4eVM0hjRhs0YI89HSD7bQUKQo21dBDJSsDdmLG2I9RVeqyVXW515wOWYWZDqH9YS1UAqjWOFC+dEojygVHLCctkHzeR+fc3vcHu1YPb+D52XueU31ba/jqLRROK/Abl9JyLKqgdaQLmsaJkoVO1L11XuUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Xoo/8ruy; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=qIUqhvFZG7Tf90KosIP1Pp2fKw9yMJdI0DLHExSEzSU=; b=Xoo/8ruy02QrcBv6xfNFqClU7E
-	VvEvYIeigEhL4G6r839FL1VZQz2j7odw1TKsKN3xjUdlCq2eiP7Ze+xVjE9HVp4pEoq80XH1moCuu
-	bHe7zrkgKJ6l5eZRTirIuA8jt08UeiFRTiFZyGtKryltz1v/QmSUpcF7o9f712AdE1vc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1ujgWw-003tgX-Px; Wed, 06 Aug 2025 17:58:18 +0200
-Date: Wed, 6 Aug 2025 17:58:18 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Xu Yang <xu.yang_2@nxp.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, max.schulze@online.de,
-	khalasa@piap.pl, o.rempel@pengutronix.de, linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	imx@lists.linux.dev, jun.li@nxp.com
-Subject: Re: [PATCH] net: usb: asix: avoid to call phylink_stop() a second
- time
-Message-ID: <a28f38d5-215b-49fb-aad7-66e0a30247b9@lunn.ch>
-References: <20250806083017.3289300-1-xu.yang_2@nxp.com>
+	s=arc-20240116; t=1754497544; c=relaxed/simple;
+	bh=4YCCQk+eiALFvUeq5bAV46broNlB4B5ZgpOoNKr529U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ij3u1u3TtN6VvUss2/kRluaEGyppjyV/4PjJVmpNswqPEmXo45jTjlbCHe7evqxuYHqIKR8dwD9GG1AgEQ1xREOXRVCnHhlY21boM/fRIbdKDUaLCjUdjMJeyRrdSEOc+2GsSWL1g0yUeNjNgSbvimlgITdlJBu2b/7CRV+7yvg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VkSyLfUy; arc=none smtp.client-ip=209.85.216.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-321461ab4efso110374a91.2;
+        Wed, 06 Aug 2025 09:25:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1754497542; x=1755102342; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=1Lo8WJhIr8SLSfDX9vQjRkT/czyhJoedW+cN+qm4ZTY=;
+        b=VkSyLfUy8iA/YMXqDgHH8G7cxPRc2w+Lcxba0Fy6QwXUHaepXIwSE6EQiGFQZ3z/Jb
+         72iw2wudoGGraoHqnO3uxN0EU5QLvkRWDllbHO0whiKOmkEVdQ/bBY9z3cQF1KnA39Yj
+         aHz+7ZImxw1BBN0MA8S51qFgP6s/d3IYppz7cAmmZIFrdu7gg4tqHYv2LUVcRj4Y1dts
+         E3O9H1O0+X4TV/6gqe2n4gIKa0nZeW9dhrkUgUoWXnWAw5mGzOyZ9ILYTc+GK3xbnueK
+         RkqKwtoO7xR3fu+IqDaqCjDxvYvKVUpLpoJd4pJzy1VYeClkRtwRQHF9nztXU41EldWm
+         i7+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754497542; x=1755102342;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1Lo8WJhIr8SLSfDX9vQjRkT/czyhJoedW+cN+qm4ZTY=;
+        b=nRI4CeXFgYTWY65e1Lb7wxDCAMRj6iwPR/tqPoFdDW7qVpaBNWG4o5MmI/bj53mBZE
+         pMu4yFvFVaJFaHbjgYHB3RcDd7sCQHsW9aoYbmrhzTCdBozjnytRvtiNeMR/L5aeMUga
+         1Viz61vSwgSkzToc9tgs6m6fT2i14Xc0CPpXD4yWG5/cI4480A6hp1oVVgC3MBNz2otn
+         iNRmd7BT8PBDyIyv+ZPqoy6lbYDI7H7Rc9Orm5+v/IR9tbNWVQ9uu94ogCPacFiVSAJh
+         7edefrhXA9ddKxV5hhXBOZAvNFWqkq3xLWyJKXy/sG/g+wW9dlPlqVgCVL3hwiioxEcb
+         KyZQ==
+X-Gm-Message-State: AOJu0Yx/BcnxEgWacB4ZFxfiHj9Q0IlO6ZkwigIR7/KA9Ao3JtX0XRWe
+	ksZyplVL7hQgYK2480jbRVGueRdl1gKLBNZ1CaLZxy7ydCFM5STqSlPTyO+l9w==
+X-Gm-Gg: ASbGnctls/KLf83/zt68DvPe9XsOE2aaWsBV1PQpJC+WoBAR4w9r3GNHj4cWqSRyPmr
+	nBCgrSe96S0qXrJIM9EdWn0GGwyfdirPWKn/sO5cwFWC44EzR1NvoL6d/Td72KX8xkbjDaBSi3s
+	uq2fIOAVRcj7ikD11ioZ0BUKi0Z0qYcp3cNCb/n6gG8X8TracvZ0Yd+ePWhbSZkQVN3ii9ly3zA
+	rXxUABna9oVsZSgQ/ZG6wvh7ojCbQbGLlDh2AwRcqyyHg2x+gzKGII9Ah7Qy81SXspyjSMI8NKO
+	iQvn4eNcm5H+2hf0/TBzMRRLVrpP0iS8tjmdFZl1FUeB4jyllKRJxj6KxL4QbxCd2cOj+iD+RgR
+	u9hWuBD+YVxKl
+X-Google-Smtp-Source: AGHT+IHxeRoUN6E2vqGVAQRWsrCvr7v+JtGfEG269YWRBtBxDsN6M2vpw0aQlcZbwYWrC94DRriZOw==
+X-Received: by 2002:a17:90b:3a45:b0:31e:cc6b:321f with SMTP id 98e67ed59e1d1-32166cdfa47mr4366070a91.29.1754497542184;
+        Wed, 06 Aug 2025 09:25:42 -0700 (PDT)
+Received: from localhost ([2a03:2880:ff:7::])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-32161282b5esm3285824a91.27.2025.08.06.09.25.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Aug 2025 09:25:41 -0700 (PDT)
+From: Amery Hung <ameryhung@gmail.com>
+To: bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	alexei.starovoitov@gmail.com,
+	andrii@kernel.org,
+	daniel@iogearbox.net,
+	tj@kernel.org,
+	memxor@gmail.com,
+	martin.lau@kernel.org,
+	ameryhung@gmail.com,
+	kernel-team@meta.com
+Subject: [PATCH bpf-next v2 0/3] Allow struct_ops to create map id to
+Date: Wed,  6 Aug 2025 09:25:37 -0700
+Message-ID: <20250806162540.681679-1-ameryhung@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250806083017.3289300-1-xu.yang_2@nxp.com>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Aug 06, 2025 at 04:30:17PM +0800, Xu Yang wrote:
-> The kernel will have below dump when system resume if the USB net device
-> was already disconnected during system suspend.
+v1 -> v2
+    Add bpf_struct_ops_id() instead of using bpf_struct_ops_get()
 
-By disconnected, you mean pulled out?
+Hi,
 
-> It's because usb_resume_interface() will be skipped if the USB core found
-> the USB device was already disconnected. In this case, asix_resume() will
-> not be called anymore. So asix_suspend/resume() can't be balanced. When
-> ax88772_stop() is called, the phy device was already stopped. To avoid
-> calling phylink_stop() a second time, check whether usb net device is
-> already in suspend state.
-> 
-> Fixes: e0bffe3e6894 ("net: asix: ax88772: migrate to phylink")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Xu Yang <xu.yang_2@nxp.com>
-> ---
->  drivers/net/usb/asix_devices.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/usb/asix_devices.c b/drivers/net/usb/asix_devices.c
-> index 9b0318fb50b5..ac28f5fe7ac2 100644
-> --- a/drivers/net/usb/asix_devices.c
-> +++ b/drivers/net/usb/asix_devices.c
-> @@ -932,7 +932,8 @@ static int ax88772_stop(struct usbnet *dev)
->  {
->  	struct asix_common_private *priv = dev->driver_priv;
->  
-> -	phylink_stop(priv->phylink);
-> +	if (!dev->suspend_count)
-> +		phylink_stop(priv->phylink);
+This patchset allows struct_ops implementors to get map id from kdata in
+reg(), unreg() and update() so that they create an id to struct_ops
+instance mapping. This in turn allows struct_ops kfuncs to refer to the
+calling instance without passing a pointer to the struct_ops. The selftest
+provides an end-to-end example.
 
-Looking at ax88172a.c, lan78xx.c and smsc95xx.c, they don't have
-anything like this. Is asix special, or are all the others broken as
-well?
+Some struct_ops users extend themselves with other bpf programs, which
+also need to call struct_ops kfuncs. For example, scx_layered uses
+syscall bpf programs as a scx_layered specific control plane and uses
+tracing programs to get additional information for scheduling [0].
+The kfuncs may need to refer to the struct_ops instance and perform
+jobs accordingly. To allow calling struct_ops kfuncs referring to
+specific instances from different program types and context (e.g.,
+struct_ops, tracing, async callbacks), the traditional way is to pass
+the struct_ops pointer to kfuncs.
 
-	Andrew
+This patchset provides an alternative way, through a combination of
+bpf map id and global variable. First, a struct_ops implementor will
+use the map id of the struct_ops map as the id of an instance. Then, 
+it needs to maintain an id to instance mapping: inserting a new mapping
+during reg() and removing it during unreg(). The map id can be acquired
+by calling bpf_struct_ops_id().
+
+[0] https://github.com/sched-ext/scx/blob/main/scheds/rust/scx_layered/src/bpf/main.bpf.c
+
+Amery Hung (3):
+  bpf: Allow struct_ops to get map id by kdata
+  selftests/bpf: Add multi_st_ops that supports multiple instances
+  selftests/bpf: Test multi_st_ops and calling kfuncs from different
+    programs
+
+ include/linux/bpf.h                           |   1 +
+ kernel/bpf/bpf_struct_ops.c                   |  12 ++
+ .../test_struct_ops_id_ops_mapping.c          |  77 +++++++++++++
+ .../bpf/progs/struct_ops_id_ops_mapping1.c    |  59 ++++++++++
+ .../bpf/progs/struct_ops_id_ops_mapping2.c    |  59 ++++++++++
+ .../selftests/bpf/test_kmods/bpf_testmod.c    | 109 ++++++++++++++++++
+ .../selftests/bpf/test_kmods/bpf_testmod.h    |   8 ++
+ .../bpf/test_kmods/bpf_testmod_kfunc.h        |   2 +
+ 8 files changed, 327 insertions(+)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/test_struct_ops_id_ops_mapping.c
+ create mode 100644 tools/testing/selftests/bpf/progs/struct_ops_id_ops_mapping1.c
+ create mode 100644 tools/testing/selftests/bpf/progs/struct_ops_id_ops_mapping2.c
+
+-- 
+2.47.3
+
 
