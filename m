@@ -1,78 +1,66 @@
-Return-Path: <netdev+bounces-211856-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211857-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72EFEB1BF04
-	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 05:05:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 166B3B1BF18
+	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 05:15:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4663E1888475
-	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 03:06:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6708A1892DCD
+	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 03:15:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0184A190676;
-	Wed,  6 Aug 2025 03:05:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E658199FB0;
+	Wed,  6 Aug 2025 03:15:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b="iAwn0t0i"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ygHclmUz"
 X-Original-To: netdev@vger.kernel.org
-Received: from layka.disroot.org (layka.disroot.org [178.21.23.139])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4289A2E3718;
-	Wed,  6 Aug 2025 03:05:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.21.23.139
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A812B1DEFF5;
+	Wed,  6 Aug 2025 03:15:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754449548; cv=none; b=IipRCiby/1cwadlnMfBjX0UK1Mth4BD+LYV7aVbRInBNDRu6U06J0Afvpimmfd1pJJ6WN+pipDkLlkzXInbFuvxUL7rWbxy4qlltwayugD93fVCQdPmyoz87ttjbvPJqcyI3caQOxdnihD1edXGb+xtHd4iAZLSMAYqlH/h0bLk=
+	t=1754450119; cv=none; b=PRlkZY/KYUTBf5J8ZfnUW+bfpek9fl30HskZVsXuyVVlLQHm1cQDx1w6vkA2Jv+q74c18N6VZWaWbPwPQzaeRoQS2TSQIdHpysMcg82tWaDSWePC8kyenrqKiO9MDhydgBrIgra40vjnFQrUJCFvo9lskvjROPxhICKz/K9gE+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754449548; c=relaxed/simple;
-	bh=N/zOvjBqKESD7r48tT7sB0c0pTptIFUp4F/avtfGWho=;
+	s=arc-20240116; t=1754450119; c=relaxed/simple;
+	bh=sPrtmwwARRGLbmpSZeZG+QWuvEgNUV8jtG/H8k73wqs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GDkIVf3y/wVJ0i6TysNyTf2T7cwV9THp/zEwWuwYb7aKgYX4sgHda71yBLTWih2bhdGd538k5TXUuezoNZFJeMY5eE4el/oIukc7D5zEqo7Tpvo9Sqd8/DknEcipllDsmuV1LzWADef5Im5fMaga/Tf9PJJeyFw5OgNzNETVF1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org; spf=pass smtp.mailfrom=disroot.org; dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b=iAwn0t0i; arc=none smtp.client-ip=178.21.23.139
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=disroot.org
-Received: from mail01.disroot.lan (localhost [127.0.0.1])
-	by disroot.org (Postfix) with ESMTP id A08E325D80;
-	Wed,  6 Aug 2025 05:05:45 +0200 (CEST)
-X-Virus-Scanned: SPAM Filter at disroot.org
-Received: from layka.disroot.org ([127.0.0.1])
- by localhost (disroot.org [127.0.0.1]) (amavis, port 10024) with ESMTP
- id YuG87osi2Cgz; Wed,  6 Aug 2025 05:05:45 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=disroot.org; s=mail;
-	t=1754449545; bh=N/zOvjBqKESD7r48tT7sB0c0pTptIFUp4F/avtfGWho=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=iAwn0t0iJnRWyP/ihfobwuarrYwO2EUspOYUMuYMGwREaOXY/pyQMKn8DsSQdELfD
-	 SkNthXwDvifmNnp9j0urPDmxR/8aCuuw602P+hyu8wozhOirVYY/V5a0e64W66ral3
-	 HgZs7TfXBPbUtochyMqNwCHHULB0vcbwDFR1sjMCPjl5ZR0lcC/NB2Q6KRN7Eu+F/h
-	 lPCdvqBl3/ROtqWJR0UHYbLUYK47CJH1W32ywAq7khiRRt5BoD/8iCIhmLC3XIvCqn
-	 gGSBok+P9kS/FPozMXSqyrrgCmQm3zuzDnDtn/xHA0DDlrm6Y2zAcfOAJHYoS3M8Av
-	 j+GeS0n9rvJVg==
-Date: Wed, 6 Aug 2025 03:05:33 +0000
-From: Yao Zi <ziyao@disroot.org>
-To: Drew Fustini <fustini@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Guo Ren <guoren@kernel.org>, Fu Wei <wefu@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZDFGHi+z1ISX02runRZc0ps5D4mDUhDTUNrl9+aFLtgRyI8EGS1rFrIlZGjpkTDy72Cshytx/tL2y6gQk6p52sK5nQab/DQBRuZvF7kKqUZDG5P7G2szWIZ26/84fnTqBjWiBAwwLSkOBc4a/+XixJ/7cgm3+3E0X6XzloCaGKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ygHclmUz; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=oJH5KNGSYO4/UiYFErjzDJ3fGQHDSZzhyyZv4ILcihA=; b=ygHclmUzWU8YQkMYad2J6FVTlp
+	rUSjmHiKNbUM3zFdh2+Cr9HummLeuNCQeaMp54HaQLsBKPxPNYl8OB31xcn4Rs8dfWGiQnmQWJyLW
+	SDVh7XiHYTklCXvRZTXoEZM6QYcghtI1jXvF5e3dmNc79c3zpvvUGqGSTt9B8AJa2PnY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1ujUcD-003quH-UA; Wed, 06 Aug 2025 05:14:57 +0200
+Date: Wed, 6 Aug 2025 05:14:57 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Chaoyi Chen <kernel@airkyi.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
-	Emil Renner Berthing <emil.renner.berthing@canonical.com>,
-	Jisheng Zhang <jszhang@kernel.org>, linux-riscv@lists.infradead.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2 1/3] dt-bindings: net: thead,th1520-gmac: Describe
- APB interface clock
-Message-ID: <aJLGfQaPqeEsX8AX@pie>
-References: <20250801091240.46114-1-ziyao@disroot.org>
- <20250801091240.46114-2-ziyao@disroot.org>
- <20250805-portable-jasmine-marmoset-e34026@kuoka>
- <aJI4WiigJFoYPXU1@x1>
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Jonas Karlman <jonas@kwiboo.se>, David Wu <david.wu@rock-chips.com>,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-rockchip@lists.infradead.org,
+	Chaoyi Chen <chaoyi.chen@rock-chips.com>
+Subject: Re: [PATCH] net: ethernet: stmmac: dwmac-rk: Make the clk_phy could
+ be used for external phy
+Message-ID: <3c401e82-169f-4540-9c12-175798ac72a6@lunn.ch>
+References: <20250806011405.115-1-kernel@airkyi.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,32 +69,68 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aJI4WiigJFoYPXU1@x1>
+In-Reply-To: <20250806011405.115-1-kernel@airkyi.com>
 
-On Tue, Aug 05, 2025 at 09:59:06AM -0700, Drew Fustini wrote:
-> On Tue, Aug 05, 2025 at 08:39:59AM +0200, Krzysztof Kozlowski wrote:
-> > On Fri, Aug 01, 2025 at 09:12:38AM +0000, Yao Zi wrote:
-> > > Besides ones for GMAC core and peripheral registers, the TH1520 GMAC
-> > > requires one more clock for configuring APB glue registers. Describe
-> > > it in the binding.
-> > > 
-> > > Fixes: f920ce04c399 ("dt-bindings: net: Add T-HEAD dwmac support")
-> > > Signed-off-by: Yao Zi <ziyao@disroot.org>
-> > > Tested-by: Drew Fustini <fustini@kernel.org>
-> > 
-> > You cannoy really test the binding, except part of build process and we
-> > do not consider building something equal to testing.
+On Wed, Aug 06, 2025 at 09:14:05AM +0800, Chaoyi Chen wrote:
+> From: Chaoyi Chen <chaoyi.chen@rock-chips.com>
 > 
-> Good point. I've since provided my Reviewed-by: in this v2 thread so the
-> Tested-by: should be dropped if there or is another series or when
-> applying this v2.
+> For external phy, clk_phy should be optional, and some external phy
+> need the clock input from clk_phy. This patch adds support for setting
+> clk_phy for external phy.
+> 
+> Signed-off-by: David Wu <david.wu@rock-chips.com>
+> Signed-off-by: Chaoyi Chen <chaoyi.chen@rock-chips.com>
 
-I'll send v3 of this series soon, dropping the Tested-by and adding
-Krzysztof's Acked-by tag. Thanks for the guidance!
+Please take a read of:
 
-> Thanks,
-> Drew
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
 
-Best regards,
-Yao Zi
+net-next is closed at the moment for the merge window.
+
+You also need the indicate the tree in the Subject: line.
+
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c | 16 ++++++++++++----
+>  1 file changed, 12 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+> index 700858ff6f7c..703b4b24f3bc 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+> @@ -1558,6 +1558,7 @@ static int rk_gmac_clk_init(struct plat_stmmacenet_data *plat)
+>  	struct device *dev = &bsp_priv->pdev->dev;
+>  	int phy_iface = bsp_priv->phy_iface;
+>  	int i, j, ret;
+> +	unsigned int rate;
+
+Reverse Christmas tree. Longest to shortest.
+
+>  
+>  	bsp_priv->clk_enabled = false;
+>  
+> @@ -1595,12 +1596,19 @@ static int rk_gmac_clk_init(struct plat_stmmacenet_data *plat)
+>  		clk_set_rate(bsp_priv->clk_mac, 50000000);
+>  	}
+>  
+> -	if (plat->phy_node && bsp_priv->integrated_phy) {
+> +	if (plat->phy_node) {
+>  		bsp_priv->clk_phy = of_clk_get(plat->phy_node, 0);
+>  		ret = PTR_ERR_OR_ZERO(bsp_priv->clk_phy);
+> -		if (ret)
+> -			return dev_err_probe(dev, ret, "Cannot get PHY clock\n");
+> -		clk_set_rate(bsp_priv->clk_phy, 50000000);
+> +		/* If it is not integrated_phy, clk_phy is optional */
+> +		if (bsp_priv->integrated_phy) {
+> +			if (ret)
+> +				return dev_err_probe(dev, ret, "Cannot get PHY clock\n");
+> +
+> +			ret = of_property_read_u32(plat->phy_node, "clock-frequency", &rate);
+
+Is this property already in the DT binding?
+
+
+    Andrew
+
+---
+pw-bot: cr
 
