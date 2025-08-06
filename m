@@ -1,169 +1,100 @@
-Return-Path: <netdev+bounces-211973-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211974-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E38DB1CC75
-	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 21:22:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C2CFB1CCA3
+	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 21:54:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5F0956460E
-	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 19:22:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22B853AD347
+	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 19:54:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 897DA291C02;
-	Wed,  6 Aug 2025 19:22:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D2ED29B783;
+	Wed,  6 Aug 2025 19:54:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DMZcAcx0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uMMUAJZA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 085E9215F6C
-	for <netdev@vger.kernel.org>; Wed,  6 Aug 2025 19:22:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49B4421ABDD;
+	Wed,  6 Aug 2025 19:54:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754508143; cv=none; b=dpTMzVgs8r8xPKiLosKIe9WS6Y31bKbOpgzTnH8NrDCTmyt7UXVljEjySq2/bNeHxyEI4GJ13/tB368fE9R78jmZx4hJuD0wOsqrTh5MNmI95Bi11OZe/IlPaRdWjwcZ0L0xpquZTcSbw6d/EDrB2fEsKUY3mmQwzOop4sDg6Is=
+	t=1754510073; cv=none; b=WjZI1MmxFbjutPeMVVk+G1gQJEJ8jqnU3wy5m9shVvmn0bWZQJd5R0UzN/Q/pF4b29SG0hol0/ep8h28ZNZwYMSs4O6C5RcHQoocwscB7224Xi5o3wSeDKRvd7LK4t4mTGiRDg1lWO0AJPHgYlGn88M3CTos8vBodPLIPBaYHk4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754508143; c=relaxed/simple;
-	bh=PBgzgXlnFwuVjfkiimgPrmli4Kh0Vf3fNYbs219ZXz4=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=EtvYh3kzd/7KhRUqft4lVh9FwyBPHwyLr5a+or3JAALKFkyihtVbe+6eRLbvFhSysFJY6YoPqulRUaThpZi82WSTTajCEQUW1n0NjJfUQp7HRMjS7KALHhsVu64KM0ntFUDKYebEGy0N/AGqDptWBL987QdB/EqfBKEbKZGM7X8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DMZcAcx0; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1754508142; x=1786044142;
-  h=from:to:cc:subject:date:message-id;
-  bh=PBgzgXlnFwuVjfkiimgPrmli4Kh0Vf3fNYbs219ZXz4=;
-  b=DMZcAcx01ueRNUu4mxQOvKdHJJzzlV8mMi2JdgLf8ssnwdFadWMIakVb
-   7t297jbXGnwgbioawBKUb+w1jPHy7IRNGv7KxXi3MFXllZDm1SnZ5Jx8/
-   W+gfWq5XGYdkJH3t5yixxzNYCgtX/7syCy/j7v0i5zaZlvPpFgWdcc5zC
-   WVFbX5eld5xHBpHNmjZQHg4vjyKwIPlRt5RYH2VMZF8BwP/epQkiz725Z
-   Wf+wi8aKtSrWNxkTFt9nOwPE7mG+vt61QVnq4dFbNjiKLFCpsQv0rfDkN
-   gorXEDUCnAL8ITZ2I28PwCXYzGsiedK5BH4WanNo67ox8B4CUiXwqvStj
-   g==;
-X-CSE-ConnectionGUID: +n9yd/zlSFO7PQSpuXE4Ig==
-X-CSE-MsgGUID: InE4yOA9SvWy+v2DDAghYA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11514"; a="56050244"
-X-IronPort-AV: E=Sophos;i="6.17,271,1747724400"; 
-   d="scan'208";a="56050244"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Aug 2025 12:22:21 -0700
-X-CSE-ConnectionGUID: azGAOUoMSdSZS8fTXhCKdA==
-X-CSE-MsgGUID: 4MemTOF5RUqEYpqi51pEhA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,271,1747724400"; 
-   d="scan'208";a="170123379"
-Received: from estantil-desk.jf.intel.com ([10.166.241.24])
-  by fmviesa004.fm.intel.com with ESMTP; 06 Aug 2025 12:22:21 -0700
-From: Emil Tantilov <emil.s.tantilov@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Aleksandr.Loktionov@intel.com,
-	przemyslaw.kitszel@intel.com,
-	anthony.l.nguyen@intel.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	jianliu@redhat.com,
-	mschmidt@redhat.com,
-	decot@google.com,
-	willemb@google.com
-Subject: [PATCH iwl-net] idpf: set mac type when adding and removing MAC filters
-Date: Wed,  6 Aug 2025 12:21:30 -0700
-Message-Id: <20250806192130.3197-1-emil.s.tantilov@intel.com>
-X-Mailer: git-send-email 2.17.2
+	s=arc-20240116; t=1754510073; c=relaxed/simple;
+	bh=/cOp30dms8uItY/3xX0vKGu+W81HNkXMglBIQQK17j4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gCZrPF32SRJn4/ydLtd6gTPTAT8ZMptqJTvfIN2RweHx+fsIxkl/DSNpCYZFNIzKthb8PouhvJUIBX/ER5E0SO3jI/QhSKyJLKNm9TT8I2njL9AsZlR27sh8VQTdEgYrEPUhBEC7sNCGeEWJax6R3hP5mlYzlhNNEMs+nFSMo3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uMMUAJZA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC8DEC4CEE7;
+	Wed,  6 Aug 2025 19:54:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754510072;
+	bh=/cOp30dms8uItY/3xX0vKGu+W81HNkXMglBIQQK17j4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uMMUAJZADmwrEA56beYBmoyUXMpDChhSxqhSlFM6twGj4izMgh0FzfADAXb/EejWj
+	 ucE7JXNZHAEeguZYuQuYXc14NuDUZGVJv0Wq/jWsjdkmOPLuWhxIN5shWv4nV1gpEX
+	 g5pQdZUM5ir+geRLPdGXUOhye02ZuWwvzopO2onaT7EmGegHe6mLZ1TfYy3nj/zL1h
+	 mn5G6oE84t9YjHh92Fao+E/lvpaSaXqZmxXqvn9m9PLCvAw1Y4YQxv14syfwhT1bMu
+	 BaCemHORXhwMK54PQh42yZt3hjhRGfSOVFLwahvUg0YryJEpprCsh7YerrEwelZ84q
+	 g1/O48Nyqh/7Q==
+Date: Wed, 6 Aug 2025 20:54:27 +0100
+From: Simon Horman <horms@kernel.org>
+To: Ammar Faizi <ammarfaizi2@gnuweeb.org>
+Cc: Oliver Neukum <oneukum@suse.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	John Ernberg <john.ernberg@actia.se>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Linux Netdev Mailing List <netdev@vger.kernel.org>,
+	Linux USB Mailing List <linux-usb@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Armando Budianto <sprite@gnuweeb.org>, gwml@vger.gnuweeb.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH net v3] net: usbnet: Fix the wrong netif_carrier_on() call
+Message-ID: <20250806195427.GH61519@horms.kernel.org>
+References: <20250806003105.15172-1-ammarfaizi2@gnuweeb.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250806003105.15172-1-ammarfaizi2@gnuweeb.org>
 
-On control planes that allow changing the MAC address of the interface,
-the driver must provide a MAC type to avoid errors such as:
+On Wed, Aug 06, 2025 at 07:31:05AM +0700, Ammar Faizi wrote:
+> The commit referenced in the Fixes tag causes usbnet to malfunction
+> (identified via git bisect). Post-commit, my external RJ45 LAN cable
+> fails to connect. Linus also reported the same issue after pulling that
+> commit.
+> 
+> The code has a logic error: netif_carrier_on() is only called when the
+> link is already on. Fix this by moving the netif_carrier_on() call
+> outside the if-statement entirely. This ensures it is always called
+> when EVENT_LINK_CARRIER_ON is set and properly clears it regardless
+> of the link state.
+> 
+> Cc: stable@vger.kernel.org
+> Cc: Armando Budianto <sprite@gnuweeb.org>
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> Suggested-by: Linus Torvalds <torvalds@linux-foundation.org>
+> Link: https://lore.kernel.org/all/CAHk-=wjqL4uF0MG_c8+xHX1Vv8==sPYQrtzbdA3kzi96284nuQ@mail.gmail.com
+> Closes: https://lore.kernel.org/netdev/CAHk-=wjKh8X4PT_mU1kD4GQrbjivMfPn-_hXa6han_BTDcXddw@mail.gmail.com
+> Closes: https://lore.kernel.org/netdev/0752dee6-43d6-4e1f-81d2-4248142cccd2@gnuweeb.org
+> Fixes: 0d9cfc9b8cb1 ("net: usbnet: Avoid potential RCU stall on LINK_CHANGE event")
+> Signed-off-by: Ammar Faizi <ammarfaizi2@gnuweeb.org>
 
-idpf 0000:0a:00.0: Transaction failed (op 535)
-idpf 0000:0a:00.0: Received invalid MAC filter payload (op 535) (len 0)
+FTR, this patch was applied directly by Linus:
 
-These errors occur during driver load or when changing the MAC via:
-ip link set <iface> address <mac>
-
-Add logic to set the MAC type before performing ADD/DEL operations.
-Since only one primary MAC is supported per vport, the driver only needs
-to perform ADD in idpf_set_mac().
-
-Fixes: ce1b75d0635c ("idpf: add ptypes and MAC filter support")
-Reported-by: Jian Liu <jianliu@redhat.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Signed-off-by: Emil Tantilov <emil.s.tantilov@intel.com>
----
- drivers/net/ethernet/intel/idpf/idpf_lib.c      |  6 ++----
- drivers/net/ethernet/intel/idpf/idpf_virtchnl.c | 11 +++++++++++
- 2 files changed, 13 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-index 80382ff4a5fa..77d554b0944b 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-@@ -2284,17 +2284,15 @@ static int idpf_set_mac(struct net_device *netdev, void *p)
- 	if (ether_addr_equal(netdev->dev_addr, addr->sa_data))
- 		goto unlock_mutex;
- 
-+	ether_addr_copy(vport->default_mac_addr, addr->sa_data);
- 	vport_config = vport->adapter->vport_config[vport->idx];
- 	err = idpf_add_mac_filter(vport, np, addr->sa_data, false);
- 	if (err) {
- 		__idpf_del_mac_filter(vport_config, addr->sa_data);
-+		ether_addr_copy(vport->default_mac_addr, netdev->dev_addr);
- 		goto unlock_mutex;
- 	}
- 
--	if (is_valid_ether_addr(vport->default_mac_addr))
--		idpf_del_mac_filter(vport, np, vport->default_mac_addr, false);
--
--	ether_addr_copy(vport->default_mac_addr, addr->sa_data);
- 	eth_hw_addr_set(netdev, addr->sa_data);
- 
- unlock_mutex:
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-index 24febaaa8fbb..7563289dc1e3 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-@@ -3507,6 +3507,15 @@ u32 idpf_get_vport_id(struct idpf_vport *vport)
- 	return le32_to_cpu(vport_msg->vport_id);
- }
- 
-+static void idpf_set_mac_type(struct idpf_vport *vport,
-+			      struct virtchnl2_mac_addr *mac_addr)
-+{
-+	if (ether_addr_equal(vport->default_mac_addr, mac_addr->addr))
-+		mac_addr->type = VIRTCHNL2_MAC_ADDR_PRIMARY;
-+	else
-+		mac_addr->type = VIRTCHNL2_MAC_ADDR_EXTRA;
-+}
-+
- /**
-  * idpf_mac_filter_async_handler - Async callback for mac filters
-  * @adapter: private data struct
-@@ -3636,6 +3645,7 @@ int idpf_add_del_mac_filters(struct idpf_vport *vport,
- 			    list) {
- 		if (add && f->add) {
- 			ether_addr_copy(mac_addr[i].addr, f->macaddr);
-+			idpf_set_mac_type(vport, &mac_addr[i]);
- 			i++;
- 			f->add = false;
- 			if (i == total_filters)
-@@ -3643,6 +3653,7 @@ int idpf_add_del_mac_filters(struct idpf_vport *vport,
- 		}
- 		if (!add && f->remove) {
- 			ether_addr_copy(mac_addr[i].addr, f->macaddr);
-+			idpf_set_mac_type(vport, &mac_addr[i]);
- 			i++;
- 			f->remove = false;
- 			if (i == total_filters)
--- 
-2.37.3
+- net: usbnet: Fix the wrong netif_carrier_on() call
+  https://git.kernel.org/torvalds/c/8466d393700f
 
 
