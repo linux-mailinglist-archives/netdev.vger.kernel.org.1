@@ -1,58 +1,104 @@
-Return-Path: <netdev+bounces-211889-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211893-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B747B1C463
-	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 12:35:20 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F8C5B1C498
+	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 13:02:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 883131834C5
-	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 10:35:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D174D7AB949
+	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 11:01:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE64725D527;
-	Wed,  6 Aug 2025 10:35:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97476274FFE;
+	Wed,  6 Aug 2025 11:02:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lNJk+oys"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B7842571AA;
-	Wed,  6 Aug 2025 10:35:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1396920F067;
+	Wed,  6 Aug 2025 11:02:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754476518; cv=none; b=kVQR6O1IXNxTnCBGK8cClKKdeGOpdt8elyjzugC12n/ZEUSdN+54avxxjS1Zo8UK8r0CW8E6MYgPjPfERqiE1FxeHqZu1vVNWUrK1rApV6+SYCt7Zxl2xKgzmXQfK2IiBROMGkSV6jIRgnEcVht16hdasiEyAfitzxgbP7YzSTs=
+	t=1754478165; cv=none; b=oefTkx52x15YBEdp04xrT/jyQR2KJyZjbiRTWkKILB2vYZ3J1Nm8hut0FhCslOeSVhRs5M4aarfx9GDi4wxwlqka8cfU1G+Ac+tCbHqRwOZs7SQhyGWFwUyEMpaMZ7zw7FKgUMGe+kt5pQeVHxoLcwqv9dxTT9Uvk8Am+6xvcvQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754476518; c=relaxed/simple;
-	bh=aBRqLh7e6J8eZ6mrUnRKX3siBTezwokCwCBIJemL6Dw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DCOTdF7fer9Xz6pkSEQ7ijk5XET6ANKD6YND3NIkFj/SmA3/11oP6nVWG+5Pa8hYhmzAWnWcYHxfWMlYBMmt99QlW30XcduQz8D1HdzOMQgyIplr6UhBnxZwBdgOk5jJdisMGfTGTJCc1BQK6sGES2QO2IHgkwU08KpcJfgvty4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4bxmlF548lz14MCN;
-	Wed,  6 Aug 2025 18:30:17 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id EFC59140155;
-	Wed,  6 Aug 2025 18:35:13 +0800 (CST)
-Received: from localhost.localdomain (10.90.31.46) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 6 Aug 2025 18:35:13 +0800
-From: Jijie Shao <shaojijie@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>
-CC: <shenjian15@huawei.com>, <liuyonglong@huawei.com>,
-	<chenhao418@huawei.com>, <jonathan.cameron@huawei.com>,
-	<shameerali.kolothum.thodi@huawei.com>, <salil.mehta@huawei.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<shaojijie@huawei.com>
-Subject: [PATCH V3 net 3/3] net: hibmcge: fix the np_link_fail error reporting issue
-Date: Wed, 6 Aug 2025 18:27:58 +0800
-Message-ID: <20250806102758.3632674-4-shaojijie@huawei.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20250806102758.3632674-1-shaojijie@huawei.com>
-References: <20250806102758.3632674-1-shaojijie@huawei.com>
+	s=arc-20240116; t=1754478165; c=relaxed/simple;
+	bh=fGwQvuZekVYWNVp+xHF2By/+OhCeDXLdr6UFjCBMrmU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Tl9xh8+4IAabuAyuimm/B8qyenuV+41KEgEeScupcGc3FPnj+B7K0Z/+KSSmAQhEP3P7otfmFTnUlpJS96z+MmjRnsjHTF9/HnTQRoT//uk8omVOVXr1wvsWg8P2dbMVkLN572g+LkCekXEkzDzryVBuwU2tsQhi+y7FAQ66VcU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lNJk+oys; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-7426c44e014so5901751b3a.3;
+        Wed, 06 Aug 2025 04:02:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1754478163; x=1755082963; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=rnS6VYdGfdFt/krsus/FgbrkiOQovzavFwfxL0kycI4=;
+        b=lNJk+oysPEIxA2BkMzFeaDgFAnNLy1VegqLvjQLQUv4ML6OCkKxR6Z0tE0WYxH9teh
+         awzT/PVAdhbcYmzhhcMA9sqn49bnnDRSJqO2IPEnFm8yhfb21Woc7mDGiNyhyIVeiOG2
+         1lsQUFUM+B/VZrr+KptSJFOoAD+tMFrxhEZJ/0/hMqfUAfj5LKq7qNTIFQqjv5ox8dbT
+         IFkrNzaCfWAcDx7BoGQUmkLF7yn4YXaIJ/Rhj7PkrUjfap6yrsAeaZ0sSfBSn5+dBL7a
+         lyTvL+GKoEn71az9Ypx1JceA3h6Z9SdQpz6T06B/k2vXwo3PkPWiUcXW+KhonjdBX5q3
+         x6Bg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754478163; x=1755082963;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rnS6VYdGfdFt/krsus/FgbrkiOQovzavFwfxL0kycI4=;
+        b=cQ/EzbnW8yb9NIB6rsNikuzqmsXS98m0WLl4l9iac8f4IaE7rg4hHFHrE0CG7YcZ1W
+         WfJV94zhb0ctiShxaRNiSCjr/Kwo5bIdtY9sLBW7RMnxR6WB3tgEJjDUvVgz0lblEPj3
+         aaou0JDk2DwR9jHzxwWESnPPbPudtvpoxMVPnOPetuNKM7vDQYZL6c8Z/bTjwxiAlwXI
+         K5E6MWBWVEkaICBhj7nJCqUIY2uKdbhXFZMp+NrojSIUloWEOSl8bv327Y0dVS+YTu/Z
+         tIUKrDnLQ9UQZi6cJxF2dmDntojbSBvadTWxlVSVyFkLBUaftsT4+WPKnj8V3vUh6is4
+         SKFA==
+X-Forwarded-Encrypted: i=1; AJvYcCUvs13vFN0mswKy7LTkRToB7o4XxsqQ0LTUR2iUCrqT7jXU9+R7TzlmfUIhEPY1G8ggBZXqKMeFjVrpn9Va73VI@vger.kernel.org, AJvYcCWsrQ2QLJlQgtDvQgTlc/hZIegceYCCvgMrPVWqhxSktFIaqE4ar53ke0CKKIAVlNX9chHhkSty@vger.kernel.org, AJvYcCXZ1kjUXjXXIqQooEBCMFksND6oPm3UHXL6zDBtR+wDy8H6SB4L3JZr0Ed948hdZaQ7avU8TQ5JrMpwDGH8@vger.kernel.org, AJvYcCXgCuAwuTDiuNllIY72F1It56AYXwyDT5S3SAqy9zdwNmpUHFW1dXc0U6AhU1Zm9oo8Jcc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz0lI/HWcLmPJZKejlsEIjvKvxiVmOJnEYLMYMEyMcI0qO8ttDl
+	aRxYtR+UBpvr25XLe/S01THwW7735yoQdVH4xCxL3DIy5RlF06gojdEw
+X-Gm-Gg: ASbGncs55/BlIDlCD0m/iT1y2aVC0LCJHYHehAkxBNoUmidLhj9lrTuE+QuQLxY6Smd
+	jfoglMYiSUXyLACDJM4fCLUudYYCvJhOgtMNHemcKJf+Eo33e+BJB+2uxH2YjnEyMTzJekCAhOg
+	v5roVJ/mp+LweQOtkWBtud8xmC+RfzhgpLISj3MZ4zeZkDFqp1WNjd8FPvaw//mPBQHWGcqUQbp
+	V1jFXiEZqa9aPUt4xCenyAvDpNG5p6CRThUSqFNxkRDQGXISWRmvjvxkmnnVtpDkLJsBoe9VAOS
+	XjaMhGO/zAWhpFgqS29jFAY/bQxhP9XwmVrXGRSDSjPvAsixIN02lCpuZgnJ+1B0mHJ8jKPS+CL
+	dI/YJxC9RN8dSUpwbfyGxrKpiZ1yDPt7t8yfZqNYhE0M=
+X-Google-Smtp-Source: AGHT+IFjR517vCAUNyZmP/NtQ6JbvJmH4KhkzCA3/4f876CAu+LnOExtfNWpNrpMCkeAqIM3e2h6Sw==
+X-Received: by 2002:a05:6a20:7487:b0:240:30c:276a with SMTP id adf61e73a8af0-24031463e79mr4059373637.39.1754478163258;
+        Wed, 06 Aug 2025 04:02:43 -0700 (PDT)
+Received: from manjaro.domain.name ([2401:4900:1c30:7b0d:6527:282d:9edd:5f40])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-76bcce8de28sm15074948b3a.39.2025.08.06.04.02.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Aug 2025 04:02:42 -0700 (PDT)
+From: Pranav Tyagi <pranav.tyagi03@gmail.com>
+To: ast@kernel.org,
+	daniel@iogearbox.net,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	andrii@kernel.org,
+	eddyz87@gmail.com,
+	shuah@kernel.org
+Cc: sdf@fomichev.me,
+	mykolal@fb.com,
+	martin.lau@linux.dev,
+	song@kernel.org,
+	yonghong.song@linux.dev,
+	kpsingh@kernel.org,
+	haoluo@google.com,
+	jolsa@kernel.org,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kernel-mentees@lists.linux.dev,
+	Pranav Tyagi <pranav.tyagi03@gmail.com>
+Subject: [PATCH] selftests/bpf/progs: use __auto_type in swap() macro
+Date: Wed,  6 Aug 2025 16:32:30 +0530
+Message-ID: <20250806110230.23949-1-pranav.tyagi03@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,65 +106,30 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- kwepemk100013.china.huawei.com (7.202.194.61)
 
-Currently, after modifying device port mode, the np_link_ok state
-is immediately checked. At this point, the device may not yet ready,
-leading to the querying of an intermediate state.
+Replace typeof() with __auto_type in xdp_synproxy_kern.c.
+__auto_type was introduced in GCC 4.9 and reduces the compile time for
+all compilers. No functional changes intended.
 
-This patch will poll to check if np_link is ok after
-modifying device port mode, and only report np_link_fail upon timeout.
-
-Fixes: e0306637e85d ("net: hibmcge: Add support for mac link exception handling feature")
-Signed-off-by: Jijie Shao <shaojijie@huawei.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Pranav Tyagi <pranav.tyagi03@gmail.com>
 ---
- drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c | 15 +++++++++++++--
- 1 file changed, 13 insertions(+), 2 deletions(-)
+ tools/testing/selftests/bpf/progs/xdp_synproxy_kern.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
-index 8cca8316ba40..d0aa0661ecd4 100644
---- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
-+++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
-@@ -12,6 +12,8 @@
+diff --git a/tools/testing/selftests/bpf/progs/xdp_synproxy_kern.c b/tools/testing/selftests/bpf/progs/xdp_synproxy_kern.c
+index 62b8e29ced9f..b08738f9a0e6 100644
+--- a/tools/testing/selftests/bpf/progs/xdp_synproxy_kern.c
++++ b/tools/testing/selftests/bpf/progs/xdp_synproxy_kern.c
+@@ -58,7 +58,7 @@
+ #define MAX_PACKET_OFF 0xffff
  
- #define HBG_HW_EVENT_WAIT_TIMEOUT_US	(2 * 1000 * 1000)
- #define HBG_HW_EVENT_WAIT_INTERVAL_US	(10 * 1000)
-+#define HBG_MAC_LINK_WAIT_TIMEOUT_US	(500 * 1000)
-+#define HBG_MAC_LINK_WAIT_INTERVAL_US	(5 * 1000)
- /* little endian or big endian.
-  * ctrl means packet description, data means skb packet data
-  */
-@@ -228,6 +230,9 @@ void hbg_hw_fill_buffer(struct hbg_priv *priv, u32 buffer_dma_addr)
+ #define swap(a, b) \
+-	do { typeof(a) __tmp = (a); (a) = (b); (b) = __tmp; } while (0)
++	do { __auto_type __tmp = (a); (a) = (b); (b) = __tmp; } while (0)
  
- void hbg_hw_adjust_link(struct hbg_priv *priv, u32 speed, u32 duplex)
- {
-+	u32 link_status;
-+	int ret;
-+
- 	hbg_hw_mac_enable(priv, HBG_STATUS_DISABLE);
- 
- 	hbg_reg_write_field(priv, HBG_REG_PORT_MODE_ADDR,
-@@ -239,8 +244,14 @@ void hbg_hw_adjust_link(struct hbg_priv *priv, u32 speed, u32 duplex)
- 
- 	hbg_hw_mac_enable(priv, HBG_STATUS_ENABLE);
- 
--	if (!hbg_reg_read_field(priv, HBG_REG_AN_NEG_STATE_ADDR,
--				HBG_REG_AN_NEG_STATE_NP_LINK_OK_B))
-+	/* wait MAC link up */
-+	ret = readl_poll_timeout(priv->io_base + HBG_REG_AN_NEG_STATE_ADDR,
-+				 link_status,
-+				 FIELD_GET(HBG_REG_AN_NEG_STATE_NP_LINK_OK_B,
-+					   link_status),
-+				 HBG_MAC_LINK_WAIT_INTERVAL_US,
-+				 HBG_MAC_LINK_WAIT_TIMEOUT_US);
-+	if (ret)
- 		hbg_np_link_fail_task_schedule(priv);
- }
- 
+ #define __get_unaligned_t(type, ptr) ({						\
+ 	const struct { type x; } __attribute__((__packed__)) *__pptr = (typeof(__pptr))(ptr); \
 -- 
-2.33.0
+2.49.0
 
 
