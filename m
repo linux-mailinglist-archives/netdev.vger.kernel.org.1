@@ -1,126 +1,143 @@
-Return-Path: <netdev+bounces-211982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211983-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D02A8B1CE79
-	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 23:32:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1977AB1CE87
+	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 23:37:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 793453AAC83
-	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 21:32:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F2F3818C596F
+	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 21:37:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E350B229B28;
-	Wed,  6 Aug 2025 21:32:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QAmtLUI3"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FD8722B5AC;
+	Wed,  6 Aug 2025 21:37:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74C1F220F57;
-	Wed,  6 Aug 2025 21:31:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78A1721FF33;
+	Wed,  6 Aug 2025 21:37:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754515920; cv=none; b=BNSzzpBqHRp0VZUIP3JYHVa/VwaIOCPQnmcqckuiGJVJKUs4WpyYh02Jur056Q8zLOzEiWZFl2OjsWdMocs/NW+Y93w2ICw9boI9jrhiKfOZTg/MkD3oxKQCAxF55jqnsm72tniT5+IC9sE0wtWr+z2O0lLhvDV0gQIg2+JP06o=
+	t=1754516250; cv=none; b=mMnOTQkosvd82xV+EDLeLwK5mVoXjWXHE75Rgo8fRP1rpOy0SOTl9hpEXiGElmA0z3bhlostCBTbGRerp1SZ8RuJ/LzeMXlb4HDCzC9/l6YqkfNPg9x7fjOFn8OEhctX49HGMhobwnbTDhXpg7yWd2oofBkLKSPfGwXZM7moaC8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754515920; c=relaxed/simple;
-	bh=/giIOQzx6K5sOID8U14r2OeiCF3tDg2h/q4DxXrWByo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BqfR7L8hjK/zuVO8H8KzRGo/Hm2UOlZIQR6d/z0bnymX0e3u6LnJQllWtjEUnSlTuLF1TigdG1PrfF/EiHUFLDWprJHLV1qSCGi1ziuYSKiQVra2J+RrVcChgSikmH7aJkfSaKBeYeEvkmse9qtkCHnamedo9bLaFYl+YcVTJR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QAmtLUI3; arc=none smtp.client-ip=209.85.210.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1754516250; c=relaxed/simple;
+	bh=d08/BzmEk7xsPuga/+Y6sgHIvvOsUVxfjOjKWswdj7c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=m/DbpiY8wAzj1jqag/UQ5z+QrdWDnfUZPGRIUmVwH+go5IgFFfsvM0ct2Hy9jN0o9zWHR9u0AyD5mA9pWRRYqqZ+tg7IPizKYSyEJlVkwT1QLikjURdT+jXndRDAsW5njpgidVPRzPKpkhD/Am6AR1OYZAcRptTa8BZj4r53iuA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.216.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-76bddb92dc1so566691b3a.0;
-        Wed, 06 Aug 2025 14:31:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1754515919; x=1755120719; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=c4QNupblGALoqqGlWBz1ZKrdzPYMUg1WIWZepG7Tblc=;
-        b=QAmtLUI3OIUw9FLj/zImrHt2EXMOc7mzUDNJZKf8a1o8mwYX4w29uar83PIkZhxyd6
-         kO22OIJ6vRocjvH5Atwmmo67KyDuKW1CTd4Ln3PyV6rhrRM9aeYI7R3oDlO7H17iiB/y
-         f0I4NFGv+xqru/Fxbrp2oU/r41AHtYjyEicd6LGnVtR7UgMFyHOmA5PyL/ERtW//8LCq
-         Ji0egi5hUVg5Z8FFkTGwjIQ/bij7nkBSvAIDn3cOumF0QAJho9cySdmC3vLJO+y7PtNC
-         09IedxFusRUlXQ9x1/hJdnU95mYEKH80d9Hj8xpnR/x4BPHD6OMjAj7GAbccenNMpCyr
-         mnjA==
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-31efc10bb03so350243a91.0;
+        Wed, 06 Aug 2025 14:37:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754515919; x=1755120719;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=c4QNupblGALoqqGlWBz1ZKrdzPYMUg1WIWZepG7Tblc=;
-        b=lOfX1kZ0Z2iGyC6oKJLwN8ZL3/mho5T9ggVvM+Lpq0TV9D046uE+eCVw/giK28Eka1
-         SFNZ0mBUV+lW8F4bC/L27AYejCpFSAMxyrT3VEaOh23HDz0r6llDs+wwxBEwx68V0OB+
-         MT2enqlcAyjR90K+Mz2wEMAhjZ+a43cbgn9s0LV9MqR4FDXBgmilApcjsgcGuv6O+TYa
-         lOhOR3ppaHiOmChqiFVD66M9ly2gp/pJYJ2QQFnVkggAL5BhRSBm0QoAl3LZjZceYTdW
-         WZdJizrjj7gjea8WWvo1grnoIgAo0QQgxYKNhtN1LCkGheGv0+f0vZwTTgBhukcB4oww
-         gqZw==
-X-Forwarded-Encrypted: i=1; AJvYcCUOycUnX1i2XXgdScGfWedDsftTOmb3+DJMtl8D/yTa4QOIAnML7fICqJ8ZIkZCLo4JrFQXK9kfCP6+1XPY@vger.kernel.org, AJvYcCVAeAvc41P++I6BZK8LEWLpAjwAOIKYTwPdjTENK2ksUqwh1cres9LgUL+irsXcWcmmXgf4c2Aj0SOjQ4+oK5VT@vger.kernel.org, AJvYcCWIrr7RZxNezxQvXNqGw8fLccB4YeKSrLukVCxpTEc/bv2HwLoMtnA6e7WBNAXCc1jxlBE+fSzDxkU5d30f@vger.kernel.org, AJvYcCX8cMNsgZCHKn9u+RNZZepLBsMdMTppzBMMcM9mgeLZgV3RqAq59G3qrvrSIp3o0fvhRjk=@vger.kernel.org, AJvYcCXiZrEN3MuzfA10dagetgL6rCG6Qs+NLABUmAsI/21cfM+Vu5gJVSxKsStYFSNh/IOBUjaiKgra@vger.kernel.org
-X-Gm-Message-State: AOJu0YyzCAPTvZrjnl9flUsKaLnqahvq5D3+7CDaF/Vh4+qakzuKG5Kz
-	QooAgQYzgj4EVzYjv5UuHTuM9JuARB04oNWRqLguD5rjP+XCLCBrZBg8
-X-Gm-Gg: ASbGncvh4t/B384jae2p68tKmBRr40ez0/HPOUnX4aEFaJJ6cIV89hY3iCT04t+8+pZ
-	piQ37fXeRrElXGy5D1dGDryolBqPfrNXuqfg3iQbOwSGCdhWOesKPl8fcfWnrFwxOSh3+mnnq7X
-	d1AwmfDOUsFSpsO/ZuEMo0JPCIBNUxHn+f6jpmyqssUOfOeO1KIVaaJC0bSaQAh0oKAgSq4rPxs
-	jpou+y6jKgIIoXCOOW21Ddss2jjQWOsvlROyfeX12Hfr47i1kOY3lSXJrCD4YyyUYNbOg7UMi1i
-	xDcCXoTi4W6iZd5fZmG/Rs3HuwaS/7Jf+iZ///1O3EQORNo4PV1/cpc1mGoZPg2W91VMO0cZng4
-	vbQzsBnm+qScUpX/U6T6Wy8/9XaTGekLEZsq620w9
-X-Google-Smtp-Source: AGHT+IGL6cjVW6DkJpKi2u1d7wydoW9gDvkjjcaUvStQY9bO2NaVBu2bNe7BKLheg0BV5EpYrTDCdg==
-X-Received: by 2002:a05:6a20:7fa0:b0:232:b849:b906 with SMTP id adf61e73a8af0-240312526cfmr7106360637.11.1754515918621;
-        Wed, 06 Aug 2025 14:31:58 -0700 (PDT)
-Received: from devvm6216.cco0.facebook.com ([2a03:2880:2ff::])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-76bfcb26905sm9477788b3a.123.2025.08.06.14.31.57
+        d=1e100.net; s=20230601; t=1754516247; x=1755121047;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3qCIvuNBq4ySoSBRMy/pjsnvmjDJSZDTcQbr0YEK14M=;
+        b=i6mtMgnr86o35F8FK5BtyodcWqDD9htO2ZmHSaPeWSkSYSyKxWzatML9LWMZYkq8Jp
+         UkoDVC+awtyh1Xs2jICYEJRhntXNa2bRNGcfFBIkZdjzuYSSjkX86ScV/ePezQHcvr4a
+         eb+vCaY8+kRJgijEmJ6ZzTlSCgJGtvsDeo7TqUA6EhndJULY6UFrWwaE9y9ewYVyX0GN
+         WZrQITlNUopkAcAz2YPN5TVM8e9x7Go5jSw1AvyNwYgsad+HUx6xivfW0Ekp1G+NVI8x
+         FYlzsDf473TX0jGUokHF3eY9oEjSK+wJ6J5oNDMkxek0XZ/XV0KWbfB/zgrx7SVgStY9
+         IdAg==
+X-Forwarded-Encrypted: i=1; AJvYcCVP9lovGFK90NUSS8ezJM1Caihip+8PFolDQ2bLv7mpEQt3WwFlrtkea850tWxgGNilTn/J86acV+2W@vger.kernel.org, AJvYcCWZLT69SMwV3uZtFBXXruyLNHGI9o1Z6sKYi0CsoX29mlrX1gSpaJ7f4SB+/x69MW9Ln3E=@vger.kernel.org, AJvYcCXd4API2ZyRPv2SbGq81RHWBOOkGv25q6U/bi4Wv3vh082JWlvN5GZAKoiPLHXZJ7/1eFlJgnrEgrjXn+dU@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxv5sNgG215oefLQnIs5LHCq9OFmpQEeshhnnafR/04GbYUQqGi
+	nO4EIvm3YoyxnOYPfurM0he/bFvyFwNH1dE+ioNCAJQ8kr7LZMrY3ty0FRpe
+X-Gm-Gg: ASbGncttDbBgl6Y3t+05hP7lc07k2LLF4/hRpd4smqM45CB8FKtk0mfUHaSv0PtKWIQ
+	3H+vYL+0XyEQ94Led96QudMsAlAe6ayZl5mMOAlmwqpJWWwWOFO0SZ/YqSyLWBEUYp8H/av0p+5
+	gnJ2BkUHzJADjP66mmQU1OeRa4hvloY9x4lS31Lv3HsXMpulA2+bELIs9pzWb12a31/zOnSwo+H
+	DQ7HMeYzkfX6/Vq6Huu8mRs6oXY3wkB7ZqWmU19TojJxqyVwEXFp4uWroBlIOliKyZA9ANRvF4U
+	RHwa2B3TnAGesDuezZgEvJKf3a56uevd3i/s8nuyGGvf6qH9J8zWt9yUBAHk3cLpJIIpO4Q+ckx
+	YjLwK0irE1RBpJT/OU9HOz5IEoDjy20onls1N6DtpBUl8LfMiOcXxm4zk+0VZN+Qmdf1eLQ==
+X-Google-Smtp-Source: AGHT+IEpjgR8dCl+AsMMIzBN0nJK2Y2HHQAWkN21Tc/AXTNfQ2pmiR1UrsO/vIBdCRNy0+nydvsumw==
+X-Received: by 2002:a17:90b:524f:b0:312:e8ed:758 with SMTP id 98e67ed59e1d1-32166c20054mr5946894a91.13.1754516247331;
+        Wed, 06 Aug 2025 14:37:27 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-3216126c98fsm3664945a91.21.2025.08.06.14.37.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Aug 2025 14:31:58 -0700 (PDT)
-Date: Wed, 6 Aug 2025 14:31:55 -0700
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Simon Horman <horms@kernel.org>
-Cc: Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Bryan Tan <bryan-bt.tan@broadcom.com>,
-	Vishnu Dasa <vishnu.dasa@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	berrange@redhat.com, Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH RFC net-next v4 00/12] vsock: add namespace support to
- vhost-vsock
-Message-ID: <aJPJy+s0yhvbJK08@devvm6216.cco0.facebook.com>
-References: <20250805-vsock-vmtest-v4-0-059ec51ab111@meta.com>
- <aJJ/uWhqEu1TG1Kz@devvm6216.cco0.facebook.com>
- <20250806191348.GG61519@horms.kernel.org>
+        Wed, 06 Aug 2025 14:37:26 -0700 (PDT)
+From: Stanislav Fomichev <sdf@fomichev.me>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	ms@dev.tdt.de,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	sdf@fomichev.me,
+	aleksander.lobakin@intel.com,
+	linux-kernel@vger.kernel.org,
+	linux-x25@vger.kernel.org,
+	bpf@vger.kernel.org,
+	syzbot+e67ea9c235b13b4f0020@syzkaller.appspotmail.com
+Subject: [PATCH net 1/2] net: lapbether: ignore ops-locked netdevs
+Date: Wed,  6 Aug 2025 14:37:25 -0700
+Message-ID: <20250806213726.1383379-1-sdf@fomichev.me>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250806191348.GG61519@horms.kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Aug 06, 2025 at 08:13:48PM +0100, Simon Horman wrote:
-> On Tue, Aug 05, 2025 at 03:03:37PM -0700, Bobby Eshleman wrote:
-> > On Tue, Aug 05, 2025 at 02:49:08PM -0700, Bobby Eshleman wrote:
+Syzkaller managed to trigger lock dependency in xsk_notify via
+register_netdevice. As discussed in [0], using register_netdevice
+in the notifiers is problematic so skip adding lapbeth for ops-locked
+devices.
 
-...
+       xsk_notifier+0xa4/0x280 net/xdp/xsk.c:1645
+       notifier_call_chain+0xbc/0x410 kernel/notifier.c:85
+       call_netdevice_notifiers_info+0xbe/0x140 net/core/dev.c:2230
+       call_netdevice_notifiers_extack net/core/dev.c:2268 [inline]
+       call_netdevice_notifiers net/core/dev.c:2282 [inline]
+       unregister_netdevice_many_notify+0xf9d/0x2700 net/core/dev.c:12077
+       unregister_netdevice_many net/core/dev.c:12140 [inline]
+       unregister_netdevice_queue+0x305/0x3f0 net/core/dev.c:11984
+       register_netdevice+0x18f1/0x2270 net/core/dev.c:11149
+       lapbeth_new_device drivers/net/wan/lapbether.c:420 [inline]
+       lapbeth_device_event+0x5b1/0xbe0 drivers/net/wan/lapbether.c:462
+       notifier_call_chain+0xbc/0x410 kernel/notifier.c:85
+       call_netdevice_notifiers_info+0xbe/0x140 net/core/dev.c:2230
+       call_netdevice_notifiers_extack net/core/dev.c:2268 [inline]
+       call_netdevice_notifiers net/core/dev.c:2282 [inline]
+       __dev_notify_flags+0x12c/0x2e0 net/core/dev.c:9497
+       netif_change_flags+0x108/0x160 net/core/dev.c:9526
+       dev_change_flags+0xba/0x250 net/core/dev_api.c:68
+       devinet_ioctl+0x11d5/0x1f50 net/ipv4/devinet.c:1200
+       inet_ioctl+0x3a7/0x3f0 net/ipv4/af_inet.c:1001
 
-> 
-> Ack. But net-next is currently closed for the merge-window.
-> 
-> So please don't post non-RFC patches for it until it reopens,
-> around the 11th August.
+0: https://lore.kernel.org/netdev/20250625140357.6203d0af@kernel.org/
+Fixes: 4c975fd70002 ("net: hold instance lock during NETDEV_REGISTER/UP")
+Suggested-by: Jakub Kicinski <kuba@kernel.org>
+Reported-by: syzbot+e67ea9c235b13b4f0020@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=e67ea9c235b13b4f0020
+Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+---
+ drivers/net/wan/lapbether.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Got it, thanks!
+diff --git a/drivers/net/wan/lapbether.c b/drivers/net/wan/lapbether.c
+index 995a7207bdf8..f357a7ac70ac 100644
+--- a/drivers/net/wan/lapbether.c
++++ b/drivers/net/wan/lapbether.c
+@@ -81,7 +81,7 @@ static struct lapbethdev *lapbeth_get_x25_dev(struct net_device *dev)
+ 
+ static __inline__ int dev_is_ethdev(struct net_device *dev)
+ {
+-	return dev->type == ARPHRD_ETHER && strncmp(dev->name, "dummy", 5);
++	return dev->type == ARPHRD_ETHER && !netdev_need_ops_lock(dev);
+ }
+ 
+ /* ------------------------------------------------------------------------ */
+-- 
+2.50.1
+
 
