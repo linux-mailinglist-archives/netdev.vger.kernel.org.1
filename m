@@ -1,72 +1,55 @@
-Return-Path: <netdev+bounces-211860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211861-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 308DAB1C016
-	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 07:52:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A82EB1C018
+	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 07:52:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 563AF7ADB29
-	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 05:50:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 505DD1809A5
+	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 05:52:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1E7B1F5842;
-	Wed,  6 Aug 2025 05:52:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC5B31DEFD2;
+	Wed,  6 Aug 2025 05:52:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="kKuoN1Y3"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="EPY7Sshd"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A191715624D;
-	Wed,  6 Aug 2025 05:52:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B223273FE;
+	Wed,  6 Aug 2025 05:52:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754459524; cv=none; b=jFAxXeZ6tHxjwac7l0DdSgvhC5CUV1d0sVIJ7JtgraZLPFZZuj8EO08LNyWKp31F6g1aagcWTSsIGx0Zml95ORC4Fovq7JiTGqfB0PRBmpZwS8xYrvGa49FsutDBwxfRzImmkRythFNn66zpEHtyiogP5pMW+8oQQC8FGC/b9zw=
+	t=1754459572; cv=none; b=Ux++VAL63iSVPafK8T0ZDLsDYWW88oayZXbBZDjDVrmUPS9HO+z8EFWaLeCQuhnhKyAlXWSN9OCllDebHRlX3otHBHdxTBa6BwUWa/d8umP/81+C6DUB9Kbz33lWMKD8tzmwoQs821RdMqnbEVQ46s7a9vFyyTKqsATtQ+BmdVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754459524; c=relaxed/simple;
-	bh=av+rjzAduX/MRK5UOmKJRcuP0hOK7dbzs34PaJkia7s=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=SJK0kI/DDM7yQ2k4d1wa7N0SuJ3e/2I6W7RO/v2BRPINKPeQY7Siffj41izEQxZ6ENIgKxW910zHZbz1d7waUNpc+FZHpfG6PAVAk+6TXb8y9kCdDBfxD3nLRTk2G4JpaD8AU2SQPhNFuhUNd49mX5I5MPTTrtyDNu/gb1XswgM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=kKuoN1Y3; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1754459522; x=1785995522;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=av+rjzAduX/MRK5UOmKJRcuP0hOK7dbzs34PaJkia7s=;
-  b=kKuoN1Y33Dyw1CsGRE4lFtl7F9Fv7bWgYGmxSDRR1iVSEYcYvl6jW4DF
-   GLxdwBsuRBS5fVLuID4kEzaJGuZKUrDbSMWaAxoBltW7yo0GXp/51klPv
-   HVOoLHJUzk0ZMzSFapGNVR9nbbpxb22PU8PqnDs5bgbkLSzXg6cs7mIEG
-   tjRxTekSHlNCIBirWh9uIXVe2Yg54oB98Afkq7bG2BGdBaI0vh65iJ0F2
-   pfC8FJhbZMd+tAIkMrUjsD3+SvTbTYUOrBjASCINEvyl4r2HF7hISfvXK
-   5SlmXQIyU/qL6UE5C68dTfiAf/su3t3SPSlIys+wUcUGiPGdZkcIbuWzi
-   g==;
-X-CSE-ConnectionGUID: ucXqwNNnQ7+7OQyUEnLR+Q==
-X-CSE-MsgGUID: T/04YB/oT4mGJBo0QXgONw==
-X-IronPort-AV: E=Sophos;i="6.17,268,1747724400"; 
-   d="scan'208";a="50299026"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 05 Aug 2025 22:51:55 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.87.72) by
- chn-vm-ex02.mchp-main.com (10.10.87.72) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Tue, 5 Aug 2025 22:51:18 -0700
-Received: from DEN-DL-M31836.microchip.com (10.10.85.11) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
- 15.1.2507.44 via Frontend Transport; Tue, 5 Aug 2025 22:51:15 -0700
-From: Horatiu Vultur <horatiu.vultur@microchip.com>
-To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <richardcochran@gmail.com>, <viro@zeniv.linux.org.uk>,
-	<atenart@kernel.org>, <quentin.schulz@bootlin.com>, <olteanv@gmail.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Horatiu Vultur
-	<horatiu.vultur@microchip.com>
-Subject: [PATCH net v2] phy: mscc: Fix timestamping for vsc8584
-Date: Wed, 6 Aug 2025 07:46:05 +0200
-Message-ID: <20250806054605.3230782-1-horatiu.vultur@microchip.com>
+	s=arc-20240116; t=1754459572; c=relaxed/simple;
+	bh=YSRcS+dgRhVhp4dFl1VEUiNmKk0BAkoubIC6cIWnVo8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=PtobHYqihRFJiM0o4DjaZxpqMHhQLvC9fVpfbDe6/at6lBxOg+ZKnIomI4vLQnGxbP7a8ZTK8BDjqzTAzYrGTXwJatEQsOljkpLuhgv0WpKik1au5LPojlW9wR/8HHm/tGTOMl2EhbWI5B+C6yi6ogapab/CpKwl+zgOhKFzaHw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=EPY7Sshd; arc=none smtp.client-ip=117.135.210.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=Ao
+	iFMQ50QbQOJteD++Wvjhr3mOpBX4MMEoWbs5t9s3E=; b=EPY7Sshd9Aoc3wQ2CA
+	bZLW/b6cGYHa7dBHecWaF5cOiDBasmK/u4V6O4pkRDX474r5/8s3vZzKoB+ue1gU
+	Mjx5lShT2kAGudx/26sZNuh9smHuMDP32XYVT3A0LvnmZiKlDd90cSxNoafdVb1D
+	97FDzy5vGJ1+Dr2e+ZmRvV2j4=
+Received: from zhaoxin-MS-7E12.. (unknown [])
+	by gzga-smtp-mtada-g1-1 (Coremail) with SMTP id _____wD3f36N7ZJoRYI3AA--.9978S2;
+	Wed, 06 Aug 2025 13:52:14 +0800 (CST)
+From: Xin Zhao <jackzxcui1989@163.com>
+To: willemdebruijn.kernel@gmail.com
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Xin Zhao <jackzxcui1989@163.com>
+Subject: [PATCH] net: af_packet: add af_packet hrtimer mode
+Date: Wed,  6 Aug 2025 13:52:10 +0800
+Message-Id: <20250806055210.1530081-1-jackzxcui1989@163.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -75,154 +58,172 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+X-CM-TRANSID:_____wD3f36N7ZJoRYI3AA--.9978S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxKF1fAF17ZFy5WFykCr15urg_yoW7Zw45pa
+	y5GryxGw43J3Wagw4xJrn7AFyagwn5Ary5W393Xw1Sy3Z3try5t3Wj9F909FWfJFZrJ3y7
+	Ar4vqF15Cr1DX37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0piiSdfUUUUU=
+X-CM-SenderInfo: pmdfy650fxxiqzyzqiywtou0bp/1tbiRxyhCmiS5LpRoQABsl
 
-There was a problem when we received frames and the frames were
-timestamped. The driver is configured to store the nanosecond part of
-the timestmap in the ptp reserved bits and it would take the second part
-by reading the LTC. The problem is that when reading the LTC we are in
-atomic context and to read the second part will go over mdio bus which
-might sleep, so we get an error.
-The fix consists in actually put all the frames in a queue and start the
-aux work and in that work to read the LTC and then calculate the full
-received time.
+In a system with high real-time requirements, the timeout mechanism of
+ordinary timers with jiffies granularity is insufficient to meet the
+demands for real-time performance. Meanwhile, the optimization of CPU
+usage with af_packet is quite significant. Add hrtimer mode to help
+compensate for the shortcomings in real-time performance.
 
-Fixes: 7d272e63e0979d ("net: phy: mscc: timestamping and PHC support")
-Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
-
+Signed-off-by: Xin Zhao <jackzxcui1989@163.com>
 ---
-v1->v2:
-- use sk_buff_head instead of a list_head and spinlock_t
-- stop allocating vsc8431_skb but put the timestamp in skb->cb
----
- drivers/net/phy/mscc/mscc.h     | 12 ++++++++
- drivers/net/phy/mscc/mscc_ptp.c | 50 +++++++++++++++++++++++++--------
- 2 files changed, 50 insertions(+), 12 deletions(-)
+ net/packet/Kconfig     | 10 ++++++++++
+ net/packet/af_packet.c | 39 +++++++++++++++++++++++++++++++++++++++
+ net/packet/internal.h  |  8 ++++++++
+ 3 files changed, 57 insertions(+)
 
-diff --git a/drivers/net/phy/mscc/mscc.h b/drivers/net/phy/mscc/mscc.h
-index 6a3d8a754eb8d..58c6d47fbe046 100644
---- a/drivers/net/phy/mscc/mscc.h
-+++ b/drivers/net/phy/mscc/mscc.h
-@@ -362,6 +362,13 @@ struct vsc85xx_hw_stat {
- 	u16 mask;
- };
+diff --git a/net/packet/Kconfig b/net/packet/Kconfig
+index 2997382d5..5e77ce08e 100644
+--- a/net/packet/Kconfig
++++ b/net/packet/Kconfig
+@@ -23,3 +23,13 @@ config PACKET_DIAG
+ 	help
+ 	  Support for PF_PACKET sockets monitoring interface used by the ss tool.
+ 	  If unsure, say Y.
++
++config PACKET_HRTIMER
++	tristate "Packet: use hrtimer instead of timer"
++	depends on PACKET
++	default n
++	help
++	  Support hrtimer mode for PF_PACKET sockets to improve real-time
++	  performance. The default timeout mechanism with jiffies granularity
++	  is insufficient to meet the demands for real-time performance.
++	  If unsure, say N.
+diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
+index bc438d0d9..5c7e4ef89 100644
+--- a/net/packet/af_packet.c
++++ b/net/packet/af_packet.c
+@@ -203,7 +203,11 @@ static void prb_retire_current_block(struct tpacket_kbdq_core *,
+ static int prb_queue_frozen(struct tpacket_kbdq_core *);
+ static void prb_open_block(struct tpacket_kbdq_core *,
+ 		struct tpacket_block_desc *);
++#ifdef CONFIG_PACKET_HRTIMER
++static enum hrtimer_restart prb_retire_rx_blk_timer_expired(struct hrtimer *);
++#else
+ static void prb_retire_rx_blk_timer_expired(struct timer_list *);
++#endif
+ static void _prb_refresh_rx_retire_blk_timer(struct tpacket_kbdq_core *);
+ static void prb_fill_rxhash(struct tpacket_kbdq_core *, struct tpacket3_hdr *);
+ static void prb_clear_rxhash(struct tpacket_kbdq_core *,
+@@ -581,7 +585,11 @@ static __be16 vlan_get_protocol_dgram(const struct sk_buff *skb)
  
-+struct vsc8531_skb_cb {
-+	u32 ns;
-+};
-+
-+#define VSC8531_SKB_CB(skb) \
-+	((struct vsc8531_skb_cb *)((skb)->cb))
-+
- struct vsc8531_private {
- 	int rate_magic;
- 	u16 supp_led_modes;
-@@ -410,6 +417,11 @@ struct vsc8531_private {
- 	 */
- 	struct mutex ts_lock;
- 	struct mutex phc_lock;
-+
-+	/* list of skbs that were received and need timestamp information but it
-+	 * didn't received it yet
-+	 */
-+	struct sk_buff_head rx_skbs_list;
- };
- 
- /* Shared structure between the PHYs of the same package.
-diff --git a/drivers/net/phy/mscc/mscc_ptp.c b/drivers/net/phy/mscc/mscc_ptp.c
-index 275706de5847c..d368d4fd82e17 100644
---- a/drivers/net/phy/mscc/mscc_ptp.c
-+++ b/drivers/net/phy/mscc/mscc_ptp.c
-@@ -1194,9 +1194,8 @@ static bool vsc85xx_rxtstamp(struct mii_timestamper *mii_ts,
+ static void prb_del_retire_blk_timer(struct tpacket_kbdq_core *pkc)
  {
- 	struct vsc8531_private *vsc8531 =
- 		container_of(mii_ts, struct vsc8531_private, mii_ts);
--	struct skb_shared_hwtstamps *shhwtstamps = NULL;
-+
- 	struct vsc85xx_ptphdr *ptphdr;
--	struct timespec64 ts;
- 	unsigned long ns;
- 
- 	if (!vsc8531->ptp->configured)
-@@ -1206,27 +1205,52 @@ static bool vsc85xx_rxtstamp(struct mii_timestamper *mii_ts,
- 	    type == PTP_CLASS_NONE)
- 		return false;
- 
--	vsc85xx_gettime(&vsc8531->ptp->caps, &ts);
--
- 	ptphdr = get_ptp_header_rx(skb, vsc8531->ptp->rx_filter);
- 	if (!ptphdr)
- 		return false;
- 
--	shhwtstamps = skb_hwtstamps(skb);
--	memset(shhwtstamps, 0, sizeof(struct skb_shared_hwtstamps));
--
- 	ns = ntohl(ptphdr->rsrvd2);
- 
--	/* nsec is in reserved field */
--	if (ts.tv_nsec < ns)
--		ts.tv_sec--;
-+	VSC8531_SKB_CB(skb)->ns = ns;
-+	skb_queue_tail(&vsc8531->rx_skbs_list, skb);
- 
--	shhwtstamps->hwtstamp = ktime_set(ts.tv_sec, ns);
--	netif_rx(skb);
-+	ptp_schedule_worker(vsc8531->ptp->ptp_clock, 0);
- 
- 	return true;
++#ifdef CONFIG_PACKET_HRTIMER
++	hrtimer_cancel(&pkc->retire_blk_timer);
++#else
+ 	timer_delete_sync(&pkc->retire_blk_timer);
++#endif
  }
  
-+static long vsc85xx_do_aux_work(struct ptp_clock_info *info)
-+{
-+	struct vsc85xx_ptp *ptp = container_of(info, struct vsc85xx_ptp, caps);
-+	struct skb_shared_hwtstamps *shhwtstamps = NULL;
-+	struct phy_device *phydev = ptp->phydev;
-+	struct vsc8531_private *priv = phydev->priv;
-+	struct sk_buff_head received;
-+	struct sk_buff *rx_skb;
-+	struct timespec64 ts;
-+	unsigned long flags;
-+
-+	__skb_queue_head_init(&received);
-+	spin_lock_irqsave(&priv->rx_skbs_list.lock, flags);
-+	skb_queue_splice_tail_init(&priv->rx_skbs_list, &received);
-+	spin_unlock_irqrestore(&priv->rx_skbs_list.lock, flags);
-+
-+	vsc85xx_gettime(info, &ts);
-+	while ((rx_skb = __skb_dequeue(&received)) != NULL) {
-+		shhwtstamps = skb_hwtstamps(rx_skb);
-+		memset(shhwtstamps, 0, sizeof(struct skb_shared_hwtstamps));
-+
-+		if (ts.tv_nsec < VSC8531_SKB_CB(rx_skb)->ns)
-+			ts.tv_sec--;
-+
-+		shhwtstamps->hwtstamp = ktime_set(ts.tv_sec,
-+						  VSC8531_SKB_CB(rx_skb)->ns);
-+		netif_rx(rx_skb);
-+	}
-+
-+	return -1;
-+}
-+
- static const struct ptp_clock_info vsc85xx_clk_caps = {
- 	.owner		= THIS_MODULE,
- 	.name		= "VSC85xx timer",
-@@ -1240,6 +1264,7 @@ static const struct ptp_clock_info vsc85xx_clk_caps = {
- 	.adjfine	= &vsc85xx_adjfine,
- 	.gettime64	= &vsc85xx_gettime,
- 	.settime64	= &vsc85xx_settime,
-+	.do_aux_work	= &vsc85xx_do_aux_work,
+ static void prb_shutdown_retire_blk_timer(struct packet_sock *po,
+@@ -603,9 +611,16 @@ static void prb_setup_retire_blk_timer(struct packet_sock *po)
+ 	struct tpacket_kbdq_core *pkc;
+ 
+ 	pkc = GET_PBDQC_FROM_RB(&po->rx_ring);
++#ifdef CONFIG_PACKET_HRTIMER
++	hrtimer_init(&pkc->retire_blk_timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL_SOFT);
++	pkc->retire_blk_timer.function = prb_retire_rx_blk_timer_expired;
++	if (pkc->tov_in_msecs == 0)
++		pkc->tov_in_msecs = jiffies_to_msecs(1);
++#else
+ 	timer_setup(&pkc->retire_blk_timer, prb_retire_rx_blk_timer_expired,
+ 		    0);
+ 	pkc->retire_blk_timer.expires = jiffies;
++#endif
+ }
+ 
+ static int prb_calc_retire_blk_tmo(struct packet_sock *po,
+@@ -676,7 +691,11 @@ static void init_prb_bdqc(struct packet_sock *po,
+ 	else
+ 		p1->retire_blk_tov = prb_calc_retire_blk_tmo(po,
+ 						req_u->req3.tp_block_size);
++#ifdef CONFIG_PACKET_HRTIMER
++	p1->tov_in_msecs = p1->retire_blk_tov;
++#else
+ 	p1->tov_in_jiffies = msecs_to_jiffies(p1->retire_blk_tov);
++#endif
+ 	p1->blk_sizeof_priv = req_u->req3.tp_sizeof_priv;
+ 	rwlock_init(&p1->blk_fill_in_prog_lock);
+ 
+@@ -691,8 +710,15 @@ static void init_prb_bdqc(struct packet_sock *po,
+  */
+ static void _prb_refresh_rx_retire_blk_timer(struct tpacket_kbdq_core *pkc)
+ {
++#ifdef CONFIG_PACKET_HRTIMER
++	hrtimer_start_range_ns(&pkc->retire_blk_timer,
++				ms_to_ktime(pkc->tov_in_msecs),
++				0,
++				HRTIMER_MODE_REL_SOFT);
++#else
+ 	mod_timer(&pkc->retire_blk_timer,
+ 			jiffies + pkc->tov_in_jiffies);
++#endif
+ 	pkc->last_kactive_blk_num = pkc->kactive_blk_num;
+ }
+ 
+@@ -719,8 +745,15 @@ static void _prb_refresh_rx_retire_blk_timer(struct tpacket_kbdq_core *pkc)
+  * prb_calc_retire_blk_tmo() calculates the tmo.
+  *
+  */
++#ifdef CONFIG_PACKET_HRTIMER
++static enum hrtimer_restart prb_retire_rx_blk_timer_expired(struct hrtimer *t)
++#else
+ static void prb_retire_rx_blk_timer_expired(struct timer_list *t)
++#endif
+ {
++#ifdef CONFIG_PACKET_HRTIMER
++	enum hrtimer_restart ret = HRTIMER_RESTART;
++#endif
+ 	struct packet_sock *po =
+ 		timer_container_of(po, t, rx_ring.prb_bdqc.retire_blk_timer);
+ 	struct tpacket_kbdq_core *pkc = GET_PBDQC_FROM_RB(&po->rx_ring);
+@@ -787,9 +820,15 @@ static void prb_retire_rx_blk_timer_expired(struct timer_list *t)
+ 
+ refresh_timer:
+ 	_prb_refresh_rx_retire_blk_timer(pkc);
++#ifdef CONFIG_PACKET_HRTIMER
++	ret = HRTIMER_RESTART;
++#endif
+ 
+ out:
+ 	spin_unlock(&po->sk.sk_receive_queue.lock);
++#ifdef CONFIG_PACKET_HRTIMER
++	return ret;
++#endif
+ }
+ 
+ static void prb_flush_block(struct tpacket_kbdq_core *pkc1,
+diff --git a/net/packet/internal.h b/net/packet/internal.h
+index 1e743d031..d9f2b2492 100644
+--- a/net/packet/internal.h
++++ b/net/packet/internal.h
+@@ -47,10 +47,18 @@ struct tpacket_kbdq_core {
+ 
+ 	unsigned short  retire_blk_tov;
+ 	unsigned short  version;
++#ifdef CONFIG_PACKET_HRTIMER
++	unsigned long	tov_in_msecs;
++#else
+ 	unsigned long	tov_in_jiffies;
++#endif
+ 
+ 	/* timer to retire an outstanding block */
++#ifdef CONFIG_PACKET_HRTIMER
++	struct hrtimer retire_blk_timer;
++#else
+ 	struct timer_list retire_blk_timer;
++#endif
  };
  
- static struct vsc8531_private *vsc8584_base_priv(struct phy_device *phydev)
-@@ -1567,6 +1592,7 @@ int vsc8584_ptp_probe(struct phy_device *phydev)
- 
- 	mutex_init(&vsc8531->phc_lock);
- 	mutex_init(&vsc8531->ts_lock);
-+	skb_queue_head_init(&vsc8531->rx_skbs_list);
- 
- 	/* Retrieve the shared load/save GPIO. Request it as non exclusive as
- 	 * the same GPIO can be requested by all the PHYs of the same package.
+ struct pgv {
 -- 
 2.34.1
 
