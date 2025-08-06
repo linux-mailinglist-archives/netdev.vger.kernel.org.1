@@ -1,44 +1,44 @@
-Return-Path: <netdev+bounces-211892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211889-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1F52B1C467
-	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 12:36:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B747B1C463
+	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 12:35:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F07576277B5
-	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 10:35:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 883131834C5
+	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 10:35:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB86E28BA98;
-	Wed,  6 Aug 2025 10:35:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE64725D527;
+	Wed,  6 Aug 2025 10:35:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC6C92749E8;
-	Wed,  6 Aug 2025 10:35:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B7842571AA;
+	Wed,  6 Aug 2025 10:35:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754476524; cv=none; b=IqPCvfFuKQNelMq3i+yTu90N6gWN8rKkypShasfTvdJ8UIV3cNgULgezJUWPuPckhxtYlwJIxwSrq7g54i0x8H6TsaE7aauDRZE39uAP2UjflFzqV2dkEINivcs86Q5dgj/cyr0jGgEG3hEhersBobkRzFKhrHx3LOhkv/r4MGI=
+	t=1754476518; cv=none; b=kVQR6O1IXNxTnCBGK8cClKKdeGOpdt8elyjzugC12n/ZEUSdN+54avxxjS1Zo8UK8r0CW8E6MYgPjPfERqiE1FxeHqZu1vVNWUrK1rApV6+SYCt7Zxl2xKgzmXQfK2IiBROMGkSV6jIRgnEcVht16hdasiEyAfitzxgbP7YzSTs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754476524; c=relaxed/simple;
-	bh=iTn9Wk1HODQ6O9GS9CwEXWPXuYzARim6MtqLSkmQmWg=;
+	s=arc-20240116; t=1754476518; c=relaxed/simple;
+	bh=aBRqLh7e6J8eZ6mrUnRKX3siBTezwokCwCBIJemL6Dw=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WNPkIN5Htw3qL4ozJ4NEWMGiBFWH4Nb224BMiM6Snyw7IrYspHnX68wOWaH1Rb2eLJp/ZOYa+7X/z4dfKwaUxgRozRJAw80Y6N06Cppqi1I7JgOQPiM0zEDdZWgdCIveuUr6LSoH2g3kMIKJxWEE7I+/LVNIePU7xMnC/I858jI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+	 MIME-Version:Content-Type; b=DCOTdF7fer9Xz6pkSEQ7ijk5XET6ANKD6YND3NIkFj/SmA3/11oP6nVWG+5Pa8hYhmzAWnWcYHxfWMlYBMmt99QlW30XcduQz8D1HdzOMQgyIplr6UhBnxZwBdgOk5jJdisMGfTGTJCc1BQK6sGES2QO2IHgkwU08KpcJfgvty4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.112])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4bxmp23vHHz23jgk;
-	Wed,  6 Aug 2025 18:32:42 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4bxmlF548lz14MCN;
+	Wed,  6 Aug 2025 18:30:17 +0800 (CST)
 Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 5DB1F14011B;
+	by mail.maildlp.com (Postfix) with ESMTPS id EFC59140155;
 	Wed,  6 Aug 2025 18:35:13 +0800 (CST)
 Received: from localhost.localdomain (10.90.31.46) by
  kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 6 Aug 2025 18:35:12 +0800
+ 15.2.1544.11; Wed, 6 Aug 2025 18:35:13 +0800
 From: Jijie Shao <shaojijie@huawei.com>
 To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
 	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>
@@ -47,9 +47,9 @@ CC: <shenjian15@huawei.com>, <liuyonglong@huawei.com>,
 	<shameerali.kolothum.thodi@huawei.com>, <salil.mehta@huawei.com>,
 	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<shaojijie@huawei.com>
-Subject: [PATCH V3 net 2/3] net: hibmcge: fix the division by zero issue
-Date: Wed, 6 Aug 2025 18:27:57 +0800
-Message-ID: <20250806102758.3632674-3-shaojijie@huawei.com>
+Subject: [PATCH V3 net 3/3] net: hibmcge: fix the np_link_fail error reporting issue
+Date: Wed, 6 Aug 2025 18:27:58 +0800
+Message-ID: <20250806102758.3632674-4-shaojijie@huawei.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20250806102758.3632674-1-shaojijie@huawei.com>
 References: <20250806102758.3632674-1-shaojijie@huawei.com>
@@ -64,43 +64,60 @@ Content-Type: text/plain
 X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
  kwepemk100013.china.huawei.com (7.202.194.61)
 
-When the network port is down, the queue is released, and ring->len is 0.
-In debugfs, hbg_get_queue_used_num() will be called,
-which may lead to a division by zero issue.
+Currently, after modifying device port mode, the np_link_ok state
+is immediately checked. At this point, the device may not yet ready,
+leading to the querying of an intermediate state.
 
-This patch adds a check, if ring->len is 0,
-hbg_get_queue_used_num() directly returns 0.
+This patch will poll to check if np_link is ok after
+modifying device port mode, and only report np_link_fail upon timeout.
 
-Fixes: 40735e7543f9 ("net: hibmcge: Implement .ndo_start_xmit function")
+Fixes: e0306637e85d ("net: hibmcge: Add support for mac link exception handling feature")
 Signed-off-by: Jijie Shao <shaojijie@huawei.com>
 Reviewed-by: Simon Horman <horms@kernel.org>
 ---
-ChangeLog:
-v2 -> v3:
-  - Use READ_ONCE() to read temporary variable, suggested by Jakub Kicinski
-  v2: https://lore.kernel.org/all/20250805181446.3deaceb9@kernel.org/
----
- drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.h | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.h b/drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.h
-index 2883a5899ae2..8b6110599e10 100644
---- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.h
-+++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.h
-@@ -29,7 +29,12 @@ static inline bool hbg_fifo_is_full(struct hbg_priv *priv, enum hbg_dir dir)
+diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
+index 8cca8316ba40..d0aa0661ecd4 100644
+--- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
++++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
+@@ -12,6 +12,8 @@
  
- static inline u32 hbg_get_queue_used_num(struct hbg_ring *ring)
+ #define HBG_HW_EVENT_WAIT_TIMEOUT_US	(2 * 1000 * 1000)
+ #define HBG_HW_EVENT_WAIT_INTERVAL_US	(10 * 1000)
++#define HBG_MAC_LINK_WAIT_TIMEOUT_US	(500 * 1000)
++#define HBG_MAC_LINK_WAIT_INTERVAL_US	(5 * 1000)
+ /* little endian or big endian.
+  * ctrl means packet description, data means skb packet data
+  */
+@@ -228,6 +230,9 @@ void hbg_hw_fill_buffer(struct hbg_priv *priv, u32 buffer_dma_addr)
+ 
+ void hbg_hw_adjust_link(struct hbg_priv *priv, u32 speed, u32 duplex)
  {
--	return (ring->ntu + ring->len - ring->ntc) % ring->len;
-+	u32 len = READ_ONCE(ring->len);
++	u32 link_status;
++	int ret;
 +
-+	if (!len)
-+		return 0;
-+
-+	return (READ_ONCE(ring->ntu) + len - READ_ONCE(ring->ntc)) % len;
+ 	hbg_hw_mac_enable(priv, HBG_STATUS_DISABLE);
+ 
+ 	hbg_reg_write_field(priv, HBG_REG_PORT_MODE_ADDR,
+@@ -239,8 +244,14 @@ void hbg_hw_adjust_link(struct hbg_priv *priv, u32 speed, u32 duplex)
+ 
+ 	hbg_hw_mac_enable(priv, HBG_STATUS_ENABLE);
+ 
+-	if (!hbg_reg_read_field(priv, HBG_REG_AN_NEG_STATE_ADDR,
+-				HBG_REG_AN_NEG_STATE_NP_LINK_OK_B))
++	/* wait MAC link up */
++	ret = readl_poll_timeout(priv->io_base + HBG_REG_AN_NEG_STATE_ADDR,
++				 link_status,
++				 FIELD_GET(HBG_REG_AN_NEG_STATE_NP_LINK_OK_B,
++					   link_status),
++				 HBG_MAC_LINK_WAIT_INTERVAL_US,
++				 HBG_MAC_LINK_WAIT_TIMEOUT_US);
++	if (ret)
+ 		hbg_np_link_fail_task_schedule(priv);
  }
  
- netdev_tx_t hbg_net_start_xmit(struct sk_buff *skb, struct net_device *netdev);
 -- 
 2.33.0
 
