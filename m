@@ -1,80 +1,111 @@
-Return-Path: <netdev+bounces-211850-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211852-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2F83B1BE35
-	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 03:14:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF09DB1BE41
+	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 03:24:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E54F617E2C7
-	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 01:14:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC1B5183FD4
+	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 01:24:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78C1313C9C4;
-	Wed,  6 Aug 2025 01:14:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83D93145346;
+	Wed,  6 Aug 2025 01:24:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y9I0GcE5"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="nUtsBIVy"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 518FEA935;
-	Wed,  6 Aug 2025 01:14:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C20391114
+	for <netdev@vger.kernel.org>; Wed,  6 Aug 2025 01:24:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754442888; cv=none; b=Yh5y7fsTxEr+4lUWNiTtTICBBdzFB1Z58LXz1lop2imvZwOLC2eo5j4hpYcQ1/icXqFjrmDwJ/moVyCl+Aro04US1mSvNPRuiOnXFlg12nTLRuKD6K8Zsc9m0IN+DB1btyy61P64n/MkcBACdnrMcipWY3Y3eYGhO4SwlVHrvmY=
+	t=1754443483; cv=none; b=BKT0+cKLGsf/WntEQ4GKlJo7Wyu+OLR7izSwIPesDQ2fmcQijy0DQxxQ6cg3N+McMPTHOnWB4ba66grUdS7NIUeshpvNDUr+n9IyQdR416LGs5WrvcuDOwYFwFVMaSk7cNf6NtKafF1YGZV4pAwSEJgMrXyLxL/Wu6MbZhGvxe8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754442888; c=relaxed/simple;
-	bh=DeKwr281iVQbp6yRLeDouxi56CW0MsFXgIhnGMHe75I=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=F3MJxU9OLbw1PWkKGHD6VxEzAR1hDx+PuFD3w8cX1kZzw75uKkjNBRZnhHBcEMCx8x+EXCNAI7pr/txC2bgvooBD79yiqyae3a/15gtS8gqEw4roJv6SeHJtsEIpqL+6IId5I5DtG8mo726Yojmt24o1qy6gpqcfjQA2fmpB+h8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y9I0GcE5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66E31C4CEF0;
-	Wed,  6 Aug 2025 01:14:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754442887;
-	bh=DeKwr281iVQbp6yRLeDouxi56CW0MsFXgIhnGMHe75I=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Y9I0GcE5V2PNs8RMKo4irgV32OCh1HqPhjDP5nZTpQg54U245ZXkvvygIjtlRaaxl
-	 IdlNYsGP2JKvV5//FhOLXJOovcYWfWwYWrfDGCJc6kM+QfIEY5+Vy2fghxmKL5rK52
-	 fma1yQS6DhDBIKwWlEZ4BM6vVDr2KFIyYKlwLg5phpbLuDeYWfegIFEJJZgmMCxOr9
-	 sNjEAUK2a7YB/gngZecx78O+i8r96yC+0fyh7fVCDZeMcECU2BisxuiWsKwhQ3kVFO
-	 2UCj7qNXBcMpw0VkfVGhPUn6QzQ67tdUA8hafKvX8n9lKZjsgQSS4ioAZIk76njsCB
-	 MC/2yNo15ipFw==
-Date: Tue, 5 Aug 2025 18:14:46 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
- <andrew+netdev@lunn.ch>, <horms@kernel.org>, <shenjian15@huawei.com>,
- <liuyonglong@huawei.com>, <chenhao418@huawei.com>,
- <jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
- <salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH V2 net 2/3] net: hibmcge: fix the division by zero issue
-Message-ID: <20250805181446.3deaceb9@kernel.org>
-In-Reply-To: <20250802123226.3386231-3-shaojijie@huawei.com>
-References: <20250802123226.3386231-1-shaojijie@huawei.com>
-	<20250802123226.3386231-3-shaojijie@huawei.com>
+	s=arc-20240116; t=1754443483; c=relaxed/simple;
+	bh=sfSvyWmOkBnR8370DrNvAJn70vWjKwUFlaCNyyoPdIU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AQlQVkYnnTJ9LazU9D717gZtowyV6IJgH5prec+w+JgtVfdn7hzWASV9toRX6wXeubZzgV21DZdwy5hfCCtS+xWUzoRMfzAOY0wEhFnY7MVu+XITq23CFeFN9e7Ip2pC1Y8QY8w7qNT7Vr9E8dTfg4FS7YD0Ge4qlmqhOssgcIk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=nUtsBIVy; arc=none smtp.client-ip=95.215.58.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <baa409d6-e571-4380-b046-5ea54c0e613d@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1754443469;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uAGMpisIdex9sFjMlYz87CxGsNXYPHq1X/TVZVKvP6M=;
+	b=nUtsBIVydd2s9jJL4R2J8ImLxKViGWPDY1vRCu61zUoJv6Bz4eApXj5yrdv4mgRp7Hz13R
+	MRosDlm6cBRHa/2drjHXvGRqsC7lKD113TPtMaF1RjvXzS96ASqPMNSR2I0h0iTyeKzfbC
+	f6hKc/+RM7sDk+bnDtjkGhitKytwMqM=
+Date: Tue, 5 Aug 2025 18:24:18 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH bpf-next V2 0/7] xdp: Allow BPF to set RX hints for
+ XDP_REDIRECTed packets
+To: Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, Lorenzo Bianconi <lorenzo@kernel.org>,
+ Stanislav Fomichev <stfomichev@gmail.com>, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <borkmann@iogearbox.net>,
+ Eric Dumazet <eric.dumazet@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, sdf@fomichev.me,
+ kernel-team@cloudflare.com, arthur@arthurfabre.com, jakub@cloudflare.com,
+ Jesse Brandeburg <jbrandeburg@cloudflare.com>,
+ Andrew Rzeznik <arzeznik@cloudflare.com>
+References: <b1873a92-747d-4f32-91f8-126779947e42@kernel.org>
+ <aGvcb53APFXR8eJb@mini-arch> <aG427EcHHn9yxaDv@lore-desk>
+ <aHE2F1FJlYc37eIz@mini-arch> <aHeKYZY7l2i1xwel@lore-desk>
+ <20250716142015.0b309c71@kernel.org>
+ <fbb026f9-54cf-49ba-b0dc-0df0f54c6961@kernel.org>
+ <20250717182534.4f305f8a@kernel.org>
+ <ebc18aba-d832-4eb6-b626-4ca3a2f27fe2@kernel.org>
+ <20250721181344.24d47fa3@kernel.org> <aIdWjTCM1nOjiWfC@lore-desk>
+ <20250728092956.24a7d09b@kernel.org>
+ <b23ed0e2-05cf-454b-bf7a-a637c9bb48e8@kernel.org>
+ <4eaf6d02-6b4e-4713-a8f8-6b00a031d255@linux.dev>
+ <21f4ee22-84f0-4d5e-8630-9a889ca11e31@kernel.org>
+ <20250801133803.7570a6fd@kernel.org>
+ <de68b1d7-86cd-4280-af6a-13f0751228c4@kernel.org>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <de68b1d7-86cd-4280-af6a-13f0751228c4@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Sat, 2 Aug 2025 20:32:25 +0800 Jijie Shao wrote:
->  static inline u32 hbg_get_queue_used_num(struct hbg_ring *ring)
->  {
-> +	if (!ring->len)
-> +		return 0;
-> +
->  	return (ring->ntu + ring->len - ring->ntc) % ring->len;
+On 8/4/25 6:18 AM, Jesper Dangaard Brouer wrote:
+> Do keep-in-mind that "moving skb allocation out of the driver" is not
+> part of this patchset and a moonshot goal that will take a long time
+> (but we are already "simulation" this via XDP-redirect for years now).
 
-This should probably be a READ_ONCE() to a temporary variable.
-There is no locking in debugfs, AFAICT, the value may change
-between the test and the division / modulo.
--- 
-pw-bot: cr
+The XDP_PASS was first done in the very early days of BPF in 2016. The 
+XDP-redirect then followed a similar setup. A lot has improved since then. A 
+moonshot in 2016 does not necessarily mean it is still hard to do now. e.g. Loop 
+is feasible. Directly reading/writing skb is also easier.
+
+Let’s first quantify what the performance loss would be if the skb is allocated 
+and field-set by the xdp prog (for the general XDP_PASS case and the 
+redirect+cpumap case). If it’s really worth it, let’s see what it would take for 
+the XDP program to achieve similar optimizations.
+
+> Drivers should obviously not unconditionally populate the xdp_frame's
+> rx_meta area.  It is first time to populate rx_meta, once driver reach
+
+afaict, the rx_meta is reserved regardless though. The xdp prog cannot use that 
+space for data_meta. The rx_meta will grow in time.
+
+My preference is to allow xdp prog to decide what needs to write in data_meta 
+and decides what needs to set in the skb directly. This is the general case it 
+should support first and then optimize.
+
 
