@@ -1,88 +1,88 @@
-Return-Path: <netdev+bounces-211922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211923-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47878B1C832
-	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 17:05:38 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFA89B1C8A8
+	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 17:25:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9E5687A7985
-	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 15:02:50 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 600064E3580
+	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 15:25:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C37E6290D85;
-	Wed,  6 Aug 2025 15:03:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94F8C29117A;
+	Wed,  6 Aug 2025 15:25:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l/skAZHI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L/pKhilf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9872928A3EF;
-	Wed,  6 Aug 2025 15:03:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC678290BAB;
+	Wed,  6 Aug 2025 15:25:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754492636; cv=none; b=i0aedQFfSWhjbjbQh+lsb70kehhH8uxY/G9s888+2fNXeYedw6PZ9jaIjPpQMTnPXSlSStARoVhMLvP6vFbm85DFR1J62fms3IPXjvQqCJGEH4FODrSzs9/NKro1F5GGIwRC3STTytAic/5LuhsHF4ioJawundqkuUNjbFxbCoA=
+	t=1754493947; cv=none; b=fngdYKyL2ujs2nm0LKO6e9XXeYMrtnO/0gGunXvdx7PIMmga0PeWfZCO3kExliFgF7RFrvs+ONz8Wrg/HpF2E7E1Com+QcsWhw0SdOPxU6BIpgzAvMyEfbqUiwGkWlpzRIapuGBLy4f9374B9QgHktzqOoVo03QvUOOLOhk6Ka0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754492636; c=relaxed/simple;
-	bh=584uXeN9jsBXBHMuwddffGCP8OVlQsZ+Xp3CN2antyQ=;
+	s=arc-20240116; t=1754493947; c=relaxed/simple;
+	bh=mKodv+sKlayKFfKvzNuhrQzdX3PKR6NGBRJMnFiQnVw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uQTQUuMbvfGj5neVRKH0hWXr6NYGAZa1wCc5jlw/7V3v9s7eYEbrk+oLHR96VtOkm6lEy+vIi2sEwXfWjhreL0/qvSJ0Mm/cTktGTCL99Ch2CxCeKUMIdTbF1i9N6UXwtwOMUBRhy00iEEJbuOWyGQHUCPTV/w6aoXMjBPAvD0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l/skAZHI; arc=none smtp.client-ip=209.85.218.50
+	 To:Cc:Content-Type; b=qQyeGqyX10KX8NlF7HTpSV+GLH33Ql0UNvman0keh+9hDZPtN8iY2anjOQsyiYHZJM7YGxPeyY5lyvesmrrPjQ2lVEmz442x6MOVYH8A3uCHB9VPbZGsePlowGmUd5BQe1EcnxQMiSNinxXwUrwKyuT+JH8pA+3psbvtL6uv+88=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L/pKhilf; arc=none smtp.client-ip=209.85.167.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-af958127df5so707805066b.2;
-        Wed, 06 Aug 2025 08:03:52 -0700 (PDT)
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-55b79ea50f8so2953e87.0;
+        Wed, 06 Aug 2025 08:25:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1754492631; x=1755097431; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1754493944; x=1755098744; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Ck5YtWxsbH5j6ULV7+hpajLj2ON81F2VLpNH+npiJkQ=;
-        b=l/skAZHIE23xFtzgeuxwjRsUw3049bR/2j5qSvrkbT5bvbIWsSP/1JUc3UcwhzHaz4
-         AuazwYtg+YBJfbg7bZcaLcQQ7A8Iezl4RTefwdEgGudnozM19cImMMcr7haTsbYeAohB
-         NPtpzZX0G9LsziSB6S5wRgcjbJkkDaPuaX8haEfzeD+3OSM2fjWuA3uXTUv0nat4titu
-         vCQU4mI59biakGYPb2glAuF8NdbNvFKwX5r06sjclcMyHX1wjPTX2olsVNbG80g5P/El
-         bl7mNDPGwGU1Dr3F0oq12PHIVwGEwe+2EeSDL3MPrHXuxYLgDFcr/OwXwcLh2k3ftBab
-         1b0Q==
+        bh=0Ak6kkG0Gr5ILhCz9qlDe4Tz2QPMgdqhFKKAgptHzkg=;
+        b=L/pKhilf9irSpygotaDCsaM/tcGbqCXD60babCIKq/vtquCAqJNckxjtqEwGt+aHy9
+         1YV9Lq4g3zGiE0AeQ5g3SQUNoqCn9Xv9YQUBB7heYnuAdSjk0k3cM6bXXBys6t3IL3HK
+         xmr/qyeTSe8Q7fFHm8iiN9f8SaVVcqaWSNCLyxmti4YNGX/BMT/zBpxzdXopRcy89wf0
+         Nwd/b1hJnBRgziogttQxPLtXOaEcXEkS2i357SDzF7usMD4sV7JzqqA584A1JJEJzIbL
+         Lvfz0RpIILxua1TCvR2n8OY1VD5yo9q123CZMWGBVITEtFCj3h/ueTopTgQ6NkIoWyxO
+         JTPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754492631; x=1755097431;
+        d=1e100.net; s=20230601; t=1754493944; x=1755098744;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Ck5YtWxsbH5j6ULV7+hpajLj2ON81F2VLpNH+npiJkQ=;
-        b=MbvMRKHZWYAXkOzSuiBPgzHB8pMlEhmqlrNZXxCqWdqT12NVi4KvekHPkGeDNudNr+
-         yBDBemSiLB/fGJVErMQm302TPhPcGOyL0ZLe8reRcJA55bGqlc/k1jTpK0nQvqdmOxIy
-         v0cGBQiF2xOnjeRGOPp8Z0qjFT7rvBjjz8g4tZzG0pbf9i6jhr2Aqgf5JT9GS0O0Hds/
-         AzjBYouL74oxTrjTgo5aco/+monC31SyxeS2GT5pf31uTpEx5hAeqcJUh6ok1yymkX2K
-         HZqf5eVUJb0vqwfEt6a3+GsxysYTJ5pCGcsyOvLRaNT2SW+RLx/M5W8FhBtpgVwg3mDX
-         +l0g==
-X-Forwarded-Encrypted: i=1; AJvYcCUJWge8uxNxb4BvrpSgtjE+5IfkxyVMIiH6NYey0d+3AxR3VG1REEKYG0agIo4W2AtlWf0=@vger.kernel.org, AJvYcCUbwHbIEFH3Zfxcl48EkhanE81tAFWhDSbhvqDh4C5M3ujWhAszMriwWXLiAHb0NZOt+E17WctmptVv7fBu@vger.kernel.org, AJvYcCVerr6ipjFY03mv74YskNliLitNegssSZHUD5uaQ7DkIdqCBgoDeYo/ZGO+lMthlw836MWP8D9asQil+7E39CP+@vger.kernel.org, AJvYcCWlbEy+39J3r9tuYs9DgE6THwEi67Pcex/DU5jintHDnxanLv+1ZtWWI1P+WN6g+Qxl9P1i3imK@vger.kernel.org
-X-Gm-Message-State: AOJu0YxRwUAWHZihAKr+ueRrLD5e7K06q4du8B8hpE1Zt67JC4TtjKyD
-	uSu7rCuGCNxpfnKOnZUUTinqAurIwfA+rtomt1ASVxvMtqV48eUY8vCImT67AEXdNgcPE8bj0l0
-	q9QXEpVhn0B3MbB/yWWobjAVQJV9Pn+s=
-X-Gm-Gg: ASbGncvuw/8kBRLCTLdvRBvqo+z5ft+zyzPtzZMX2R5eG0cG+Nlt7uINET4cozlGPDN
-	G8ZQnSRzQqOc1O06/fMncXsWWb8B0RBwAgdyondxnCp8U1rIF4eDAfaqLTRaYu7l8B0k9mHAvgr
-	yIE2ECCgLPhSQXrpD8UY2cr6fCgKsTxmrV9lPAGLRs/+4bnzU9ZthRrQShMOD2JFVBmj5dW+Npl
-	S0x5O2wtXO2aMjlsmmtlj9pxbmVudO27MR1
-X-Google-Smtp-Source: AGHT+IFz4XsMafOE7B2cRECu6PsWWMxUp0yBdUzi6JtgASelC8/9mtyaERSLeB8R2LFMi4+R+vaDYy1LHdKJjr/ADtI=
-X-Received: by 2002:a17:906:f58d:b0:af2:b9b5:1c06 with SMTP id
- a640c23a62f3a-af992aa4a38mr252953366b.14.1754492630424; Wed, 06 Aug 2025
- 08:03:50 -0700 (PDT)
+        bh=0Ak6kkG0Gr5ILhCz9qlDe4Tz2QPMgdqhFKKAgptHzkg=;
+        b=HAZUPS0GzryJRJ0usX7mW6zzyyJL7B1WoyCnl0FuziHyzyC+UmBHkxQVCXC6W4HoHa
+         vRaaaK8wsdyuAe2GXCYVf4YYpK+QsA33Fm9HY5buc7gL2HmrYPlaqc/wfiFPXB3B/6xX
+         RCL4cLh98Bfb/pyfax652jd5xW/ONpMUquFnz9QFQOLPEzuyxm6gr01HPpTwuq6fdmKP
+         67/2Xv3RAEgb34x/4LMo57XkpIOohHJc3739l7gWTPjQj37u8A7NBl3R1LRqRklJqaKS
+         JZHadEvo93mLVEuimIHKpHFGAtMZHBs4ZnJLw6ZCUptQt3fJAAKxbO7Z4AAzwjHK1q2s
+         6K/A==
+X-Forwarded-Encrypted: i=1; AJvYcCVrB2+OESANrEUplQhDIzMIMGXw/yFw+vCG43gHlklHXPPN2nAHPeZO7FK0OYaTP9TUAr+Stz2Z@vger.kernel.org, AJvYcCX6hKlW0XX4+DnIIemF4bkv7pDtw1fxQ5BzVZh6rlT6LJJ6I1/xsl8quT/GM4suHtk4+j8=@vger.kernel.org, AJvYcCXCk/5Fo8hXdkCOwDqmcsfkX03W5PPOex26SInLUEFAhxxZ2N5aF2+6OjZM/LqQMtzKdLoEloKm4sM8bt2y@vger.kernel.org, AJvYcCXGg3rolZlhXZX6HSGKf0HKsPEotFVyT9fmx2+jTypK7qKNelewoliSOiHDOebxppJB9IoRPS9Cp1xnVT7TN1mY@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx9kn5B2jKAFs5jDLkdFRohWi4QOa3pM5lFbm3dL1lH786IBAN+
+	GleUcbCWCcF7EZX6xalL5tY7jGVxgcdjOA4G0ednyr4KDGW0EEY0MvGaYpNPx71bwNxnE0pawWc
+	cetCz1lx7/znaPTRunXgRVhuVwTDpy80=
+X-Gm-Gg: ASbGncvNsNv6Zkw3pBiF8QAjRxHwbCrNKb6+HQILW3Ov58+JJCrx5ZwBvzORMUPeHP3
+	+3KwnpHpJyjE8GVVwFsXvwB4qslN03WGIuRMV6gUaF/+2uGHpWzIjBbMJDK8UmxOuAjzjJz2DqF
+	NPe4rwkveu8NUy1V7Vr9g2AHGEzLJuti+BOnp6d9QRcdMQuka9wP10cx5L7wwyVyQTx+uQbZxxn
+	pDOxGAlA8uZSP4TR6LADzw+Pqy0PMOfDc+R2Xit2w==
+X-Google-Smtp-Source: AGHT+IFuXucBMEFtpCtDsz4YxIbE8W+P3+as9anTHGHj6dyv4YdatbL3BW3rJ6ST71SpMX9C+9AlGI3nNgbMQZCuM6E=
+X-Received: by 2002:a05:6512:1589:b0:55b:920c:33eb with SMTP id
+ 2adb3069b0e04-55caf35898amr981949e87.42.1754493943616; Wed, 06 Aug 2025
+ 08:25:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250806110230.23949-1-pranav.tyagi03@gmail.com>
-In-Reply-To: <20250806110230.23949-1-pranav.tyagi03@gmail.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Wed, 6 Aug 2025 08:03:15 -0700
-X-Gm-Features: Ac12FXwMSvnTnW4mpFr34H5Rcz9AOXGEYUwrsVyBOhRLZUjpNGcPOgXLwZWKDDM
-Message-ID: <CAADnVQJQV5Z_LsrBCa2=UwQ9NhPbkpNvZ9N7nf1sv-QunEj1FQ@mail.gmail.com>
+References: <20250806110230.23949-1-pranav.tyagi03@gmail.com> <CAADnVQJQV5Z_LsrBCa2=UwQ9NhPbkpNvZ9N7nf1sv-QunEj1FQ@mail.gmail.com>
+In-Reply-To: <CAADnVQJQV5Z_LsrBCa2=UwQ9NhPbkpNvZ9N7nf1sv-QunEj1FQ@mail.gmail.com>
+From: Pranav Tyagi <pranav.tyagi03@gmail.com>
+Date: Wed, 6 Aug 2025 20:55:31 +0530
+X-Gm-Features: Ac12FXz2S0kDjSFEJFEpV8_XL9LeoNM4mZxNsuwnlSJbqILHu0d2FLO1xgfQ7Tw
+Message-ID: <CAH4c4jKvMBfaRaAoHbBn45vKzCHMBRjJ7UCOqa8FDXXQ7c_L2w@mail.gmail.com>
 Subject: Re: [PATCH] selftests/bpf/progs: use __auto_type in swap() macro
-To: Pranav Tyagi <pranav.tyagi03@gmail.com>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
 Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
 	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
@@ -97,34 +97,39 @@ Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Aug 6, 2025 at 4:02=E2=80=AFAM Pranav Tyagi <pranav.tyagi03@gmail.c=
-om> wrote:
+On Wed, Aug 6, 2025 at 8:33=E2=80=AFPM Alexei Starovoitov
+<alexei.starovoitov@gmail.com> wrote:
 >
-> Replace typeof() with __auto_type in xdp_synproxy_kern.c.
-> __auto_type was introduced in GCC 4.9 and reduces the compile time for
-> all compilers. No functional changes intended.
->
-> Signed-off-by: Pranav Tyagi <pranav.tyagi03@gmail.com>
-> ---
->  tools/testing/selftests/bpf/progs/xdp_synproxy_kern.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/tools/testing/selftests/bpf/progs/xdp_synproxy_kern.c b/tool=
-s/testing/selftests/bpf/progs/xdp_synproxy_kern.c
-> index 62b8e29ced9f..b08738f9a0e6 100644
-> --- a/tools/testing/selftests/bpf/progs/xdp_synproxy_kern.c
-> +++ b/tools/testing/selftests/bpf/progs/xdp_synproxy_kern.c
-> @@ -58,7 +58,7 @@
->  #define MAX_PACKET_OFF 0xffff
->
->  #define swap(a, b) \
-> -       do { typeof(a) __tmp =3D (a); (a) =3D (b); (b) =3D __tmp; } while=
- (0)
-> +       do { __auto_type __tmp =3D (a); (a) =3D (b); (b) =3D __tmp; } whi=
+> On Wed, Aug 6, 2025 at 4:02=E2=80=AFAM Pranav Tyagi <pranav.tyagi03@gmail=
+.com> wrote:
+> >
+> > Replace typeof() with __auto_type in xdp_synproxy_kern.c.
+> > __auto_type was introduced in GCC 4.9 and reduces the compile time for
+> > all compilers. No functional changes intended.
+> >
+> > Signed-off-by: Pranav Tyagi <pranav.tyagi03@gmail.com>
+> > ---
+> >  tools/testing/selftests/bpf/progs/xdp_synproxy_kern.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/tools/testing/selftests/bpf/progs/xdp_synproxy_kern.c b/to=
+ols/testing/selftests/bpf/progs/xdp_synproxy_kern.c
+> > index 62b8e29ced9f..b08738f9a0e6 100644
+> > --- a/tools/testing/selftests/bpf/progs/xdp_synproxy_kern.c
+> > +++ b/tools/testing/selftests/bpf/progs/xdp_synproxy_kern.c
+> > @@ -58,7 +58,7 @@
+> >  #define MAX_PACKET_OFF 0xffff
+> >
+> >  #define swap(a, b) \
+> > -       do { typeof(a) __tmp =3D (a); (a) =3D (b); (b) =3D __tmp; } whi=
 le (0)
+> > +       do { __auto_type __tmp =3D (a); (a) =3D (b); (b) =3D __tmp; } w=
+hile (0)
+>
+> Sorry, not doing this churn. The code is fine as-is.
+>
+> --
+> pw-bot: cr
 
-Sorry, not doing this churn. The code is fine as-is.
-
---
-pw-bot: cr
+I understand. Thanks
 
