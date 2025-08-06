@@ -1,129 +1,143 @@
-Return-Path: <netdev+bounces-211989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211991-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCC29B1CF4E
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 01:17:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36187B1CF5C
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 01:20:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CEF544E1254
-	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 23:17:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 085B97246D7
+	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 23:20:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ABE3263F49;
-	Wed,  6 Aug 2025 23:17:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F4CF26CE12;
+	Wed,  6 Aug 2025 23:20:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ozAk8y4t"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cr6KAsqV"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 619A9253B43
-	for <netdev@vger.kernel.org>; Wed,  6 Aug 2025 23:17:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DAB826A1DD
+	for <netdev@vger.kernel.org>; Wed,  6 Aug 2025 23:20:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754522240; cv=none; b=Q86ORbOyBBNzLplVdYQYU8hguh4drQqLVt4U8UOOaLW5UWmwyn3Mc/qdfU/fl9vQIAgTtK/j2CSqH997R1kYtTBi+clcXQoN+2Qwh5sHxfdqUa6hvP7mEBR9/CrIKB0IGqKxnE+WCuCFD2CqJPivJu+IUikQiD/RYcMcdsR01hc=
+	t=1754522409; cv=none; b=NNLrdqPnG7n3E+Mlnk7eMpZuR5vPTqveiNYMVmrcexJyp6vASmefuCocPORQVAzXm20Em8hTIjdpBX4hI7QgLHuQUA5wcujgNfrx7Qfb5GM3dFERtXlAEqIIove+VoJzOisnpZ1xvSCfl2p9eOslWwg+WbXRwn6CeizpLMApLdI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754522240; c=relaxed/simple;
-	bh=FeCWmPQiD/cqpQoXX+18fO/ItdirJ60NrDGDwnL9tn8=;
+	s=arc-20240116; t=1754522409; c=relaxed/simple;
+	bh=wHsW6SIbPMwkbBblDPt7VXJn9JrfT2AFVFwEQUK6xNM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EwneavG04xT70Xz0IGPDzWTLCsKPVVbrljg5jABHPqX5CpwELk1nZH1btfR77qdP7Ys8xBPvBlphoLFn4OfBkOghkNX4GypZSKP3zbVGzFmKMZ7bR3AmUW3ECtQ1EIXcWICHSjtAT44jW7kJPQ8Y5L14n+EMr0LmP/DM7pmoECU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ozAk8y4t; arc=none smtp.client-ip=95.215.58.178
+	 In-Reply-To:Content-Type; b=dq1+IRTH4CX/EDtW/rFHL+5/u1nuidJVVSXSxRBF4bEOXRQia69zwm9low+ATUWHo5L3FyolRSiI1NiLUMAfABVc4k9OsfVDHVcAt7Un5ydevIJCeD9fflq7U9nMj6YLECDoRoBa7ijWXWOdIVeHT7Bmzg9Vnl2KcHfX9mePUqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cr6KAsqV; arc=none smtp.client-ip=91.218.175.185
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <3dba1e87-5087-4641-ac9b-db800cbbf994@linux.dev>
+Message-ID: <c9140ce6-8352-4aaa-8b18-d35d762c0d63@linux.dev>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1754522224;
+	t=1754522404;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=pxYvcoRoayv+MkFE8DXXWCxjBeMenqdmnelOyMnQHG8=;
-	b=ozAk8y4tmU7Y4eQQeB4Ru/yI+fGj8kIOM/77kHpARmCPMs8aRq9TAy5e9JRXMfCA30s6Yv
-	7n6X7M23dyI6KAnGsm43MHiNqzMfHGWYPk1KqT/2ddNiCj3J1nch9L/DURtgLAX5EUYZ7w
-	edGjBrT3NOtW6u8eAACftYNohdGLYmk=
-Date: Wed, 6 Aug 2025 16:16:57 -0700
+	bh=L2xgw2I4tQxBFyi7ikU0TjxCVGpF6S1DUopFBEFwPM4=;
+	b=cr6KAsqVllTpDNas5Vlq5gcPinIa55t4nbNRJVwBRtIZ6Rvt4IohVMF3yRWOzCLi1TS7gV
+	Mf0tFilHGREtkPl3keKwPZX4MBfVyvFvPrKTcanPCgSMhk0XyTLKKwnTdw0ekKVzNpUjRF
+	7/sWnCIoNYEjrWm0GwdNjOW8VTt9n6E=
+Date: Wed, 6 Aug 2025 16:20:00 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v2 2/3] selftests/bpf: Add multi_st_ops that
- supports multiple instances
+Subject: Re: [PATCH bpf-next v2 3/3] selftests/bpf: Test multi_st_ops and
+ calling kfuncs from different programs
 To: Amery Hung <ameryhung@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
- alexei.starovoitov@gmail.com, andrii@kernel.org, daniel@iogearbox.net,
- tj@kernel.org, memxor@gmail.com, martin.lau@kernel.org, kernel-team@meta.com
+Cc: netdev@vger.kernel.org, alexei.starovoitov@gmail.com, andrii@kernel.org,
+ daniel@iogearbox.net, tj@kernel.org, memxor@gmail.com,
+ martin.lau@kernel.org, kernel-team@meta.com, bpf@vger.kernel.org
 References: <20250806162540.681679-1-ameryhung@gmail.com>
- <20250806162540.681679-3-ameryhung@gmail.com>
+ <20250806162540.681679-4-ameryhung@gmail.com>
 Content-Language: en-US
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20250806162540.681679-3-ameryhung@gmail.com>
+In-Reply-To: <20250806162540.681679-4-ameryhung@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Migadu-Flow: FLOW_OUT
 
 On 8/6/25 9:25 AM, Amery Hung wrote:
-> +int bpf_kfunc_multi_st_ops_test_1(struct st_ops_args *args, u32 id)
+> +static void test_st_ops_id_ops_mapping(void)
 > +{
-> +	struct bpf_testmod_multi_st_ops *st_ops;
-> +	unsigned long flags;
-> +	int ret = -1;
-> +
-> +	spin_lock_irqsave(&multi_st_ops_lock, flags);
-> +	st_ops = multi_st_ops_find_nolock(id);
-> +	if (st_ops)
-> +		ret = st_ops->test_1(args);
+> +	struct struct_ops_id_ops_mapping1 *skel1 = NULL;
+> +	struct struct_ops_id_ops_mapping2 *skel2 = NULL;
+> +	LIBBPF_OPTS(bpf_test_run_opts, topts);
 
-test_1 cannot be NULL,
+A default topts is not needed. Passing NULL is as good, so removed.
 
-> +	spin_unlock_irqrestore(&multi_st_ops_lock, flags);
+> +	struct bpf_map_info info = {};
+> +	__u32 len = sizeof(info);
+> +	int err, pid, prog1_fd, prog2_fd;
 > +
-> +	return ret;
+> +	skel1 = struct_ops_id_ops_mapping1__open_and_load();
+> +	if (!ASSERT_OK_PTR(skel1, "struct_ops_id_ops_mapping1__open"))
+> +		goto out;
+> +
+> +	skel2 = struct_ops_id_ops_mapping2__open_and_load();
+> +	if (!ASSERT_OK_PTR(skel2, "struct_ops_id_ops_mapping2__open"))
+> +		goto out;
+> +
+> +	err = bpf_map_get_info_by_fd(bpf_map__fd(skel1->maps.st_ops_map),
+> +				     &info, &len);
+> +	if (!ASSERT_OK(err, "bpf_map_get_info_by_fd"))
+> +		goto out;
+> +
+> +	skel1->bss->st_ops_id = info.id;
+> +
+> +	err = bpf_map_get_info_by_fd(bpf_map__fd(skel2->maps.st_ops_map),
+> +				     &info, &len);
+> +	if (!ASSERT_OK(err, "bpf_map_get_info_by_fd"))
+> +		goto out;
+> +
+> +	skel2->bss->st_ops_id = info.id;
+> +
+> +	err = struct_ops_id_ops_mapping1__attach(skel1);
+> +	if (!ASSERT_OK(err, "struct_ops_id_ops_mapping1__attach"))
+> +		goto out;
+> +
+> +	err = struct_ops_id_ops_mapping2__attach(skel2);
+> +	if (!ASSERT_OK(err, "struct_ops_id_ops_mapping2__attach"))
+> +		goto out;
+> +
+> +	/* run tracing prog that calls .test_1 and checks return */
+> +	pid = getpid();
+> +	skel1->bss->test_pid = pid;
+> +	skel2->bss->test_pid = pid;
+> +	sys_gettid();
+> +	skel1->bss->test_pid = 0;
+> +	skel2->bss->test_pid = 0;
+> +
+> +	/* run syscall_prog that calls .test_1 and checks return */
+> +	prog1_fd = bpf_program__fd(skel1->progs.syscall_prog);
+> +	err = bpf_prog_test_run_opts(prog1_fd, &topts);
+> +	ASSERT_OK(err, "bpf_prog_test_run_opts");
+> +
+> +	prog2_fd = bpf_program__fd(skel2->progs.syscall_prog);
+> +	err = bpf_prog_test_run_opts(prog2_fd, &topts);
+> +	ASSERT_OK(err, "bpf_prog_test_run_opts");
+> +
+> +	ASSERT_EQ(skel1->bss->test_err, 0, "skel1->bss->test_err");
+> +	ASSERT_EQ(skel2->bss->test_err, 0, "skel2->bss->test_err");
+> +
+> +out:
+> +	if (skel1)
+> +		struct_ops_id_ops_mapping1__destroy(skel1);
+> +	if (skel2)
+
+NULL check on skel[12] is not needed, so removed.
+
+Applied. Thanks.
+
+> +		struct_ops_id_ops_mapping2__destroy(skel2);
 > +}
 > +
-> +static int multi_st_ops_reg(void *kdata, struct bpf_link *link)
-> +{
-> +	struct bpf_testmod_multi_st_ops *st_ops =
-> +		(struct bpf_testmod_multi_st_ops *)kdata;
-> +	unsigned long flags;
-> +	int err = 0;
-> +	u32 id;
-> +
-
-so I added a "if (!st_ops->test_1)" test.
-
-> +	id = bpf_struct_ops_id(kdata);
-> +
-> +	spin_lock_irqsave(&multi_st_ops_lock, flags);
-> +	if (multi_st_ops_find_nolock(id)) {
-> +		pr_err("multi_st_ops(id:%d) has already been registered\n", id);
-> +		err = -EEXIST;
-> +		goto unlock;
-> +	}
-> +
-> +	st_ops->id = id;
-> +	hlist_add_head(&st_ops->node, &multi_st_ops_list);
-> +unlock:
-> +	spin_unlock_irqrestore(&multi_st_ops_lock, flags);
-> +
-> +	return err;
-> +}
-
-
-[ ... ]
-
-> diff --git a/tools/testing/selftests/bpf/test_kmods/bpf_testmod.h b/tools/testing/selftests/bpf/test_kmods/bpf_testmod.h
-> index c9fab51f16e2..b8001ba7c368 100644
-> --- a/tools/testing/selftests/bpf/test_kmods/bpf_testmod.h
-> +++ b/tools/testing/selftests/bpf/test_kmods/bpf_testmod.h
-> @@ -116,4 +116,12 @@ struct bpf_testmod_st_ops {
->   	struct module *owner;
->   };
->   
-> +#define BPF_TESTMOD_NAME_SZ 16
-
-Not sure why it is here. I don't see it is used, so removed.
 
