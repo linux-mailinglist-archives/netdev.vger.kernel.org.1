@@ -1,159 +1,149 @@
-Return-Path: <netdev+bounces-212013-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212014-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E423B1D2E1
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 09:02:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37545B1D3EE
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 10:03:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E117616E4FD
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 07:02:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60CCA166A95
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 08:03:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43451226CFE;
-	Thu,  7 Aug 2025 07:01:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53ACC2236F4;
+	Thu,  7 Aug 2025 08:03:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="J6MsBPLl"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ixx2o0CU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA3E11F0E34;
-	Thu,  7 Aug 2025 07:01:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 624AE4A02
+	for <netdev@vger.kernel.org>; Thu,  7 Aug 2025 08:03:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754550119; cv=none; b=ngyYvzUFhJWBKvejrL0+2Bl856IYFZEncA84jOmiRjdCkohdvGcICFy7jHmrtgQxxZOR+it/ZkdLu4EaVgAhwegIVsrI6+QN3o8EtH5gVG2GBv5xaswLeexnywFeQx+5QgPHfexd0dBzkgby6JAvYMDk+GM2DAn3FQDNUDTnxF8=
+	t=1754553782; cv=none; b=LJTPUe6z0fWrBRYXZwCb5GTAFNHGOtCtq/w37dJ34OgBVNtxOk4BU+feK9ysiL+60x+Ja8TiAZz4vq4TX5LmWmH3486AdCjXl8J39Rn0GPIZgm5Uq9OAjD0I4yDx8fxY4kdCkk5ZXIZDCWbCcijqr8handTHjFL6quCnVj2r3jU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754550119; c=relaxed/simple;
-	bh=RxgJWx/CRPO16SNAZNIMksl/YmJs/4TUq+ajDi59q1U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FoRfTgqBfZO5sKe7oomYFar+/nzS1DYBgo8G1eykj8pDbts6vhLfQBZ92E4IR2O8mjiPRFp4jPRwVJkxeALmY7tqgzEMzwBezPBqZxDQUISeeSBjSz5Q9rJovuIXDGP7yDwpJnY5oN9OIFb9Ku0fjPh1avngaKIsZXiqQWtFIqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=J6MsBPLl; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57743JQG028175;
-	Thu, 7 Aug 2025 07:01:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=HYqzOl
-	Zpv1tnyRF/96MpKpFlFZUSpL6fqTmJlP5wiVM=; b=J6MsBPLlIJIBnKgFnmefrR
-	B/1g/Z6CGO047CS9k8OukAFFIKusislOgAgYQZgBjlNhDF+KrheSSTT0WKtAbR24
-	zyvSl1ZvvFuj7z/iYlyFLiMf0UIRxD04OwulFULfq/3vXlz5mdZBz/g/bIDWeuJs
-	F8QzDAjEKNvHib2whjGg9o4od3cnSI7XszmjxmuscwE6kFz3ZX9Ix83KNMlVBuHO
-	AbiumTydd3rejA73lYciPu7OMicq56rgWjJoq6hfxJgDgciu7SUzHyDcskxcH869
-	ohN6xjGBHUQJulTuUHtQLRb2gufGavV6fj7IerbfWQbL2KJ4KF4xZHCBnHjtbCrg
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48bq610nuc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 07 Aug 2025 07:01:50 +0000 (GMT)
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 5776tL5F032415;
-	Thu, 7 Aug 2025 07:01:49 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48bq610nu7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 07 Aug 2025 07:01:49 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 57754ksk020626;
-	Thu, 7 Aug 2025 07:01:48 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 48bpwmycem-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 07 Aug 2025 07:01:48 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 57771iQ715139074
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 7 Aug 2025 07:01:44 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6498E20043;
-	Thu,  7 Aug 2025 07:01:44 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0F61120040;
-	Thu,  7 Aug 2025 07:01:44 +0000 (GMT)
-Received: from [9.152.224.240] (unknown [9.152.224.240])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  7 Aug 2025 07:01:44 +0000 (GMT)
-Message-ID: <c1a8b08a-680b-4cd6-a0b2-c94388304fe1@linux.ibm.com>
-Date: Thu, 7 Aug 2025 09:01:43 +0200
+	s=arc-20240116; t=1754553782; c=relaxed/simple;
+	bh=xSHLdlTVJtVo8nQl5jpul19NJdAbbaY8TRUqxRCTtpM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rr4ijRdYbvK7Qnl+cZxgyyp+tL29eEQrj7nv6JNKnKHWXHdK4baVmcuog6740qcvNgLF09i1WQ81pZx6fWm24zLh6VBe6nrmvNsmQnfu4WNSmETFzK+RRgCZnC6qfh8TDfoxOurEnr+0xA96VhGVCrdZgO5HPgWQw4JsUzKNkrk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ixx2o0CU; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1754553779;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dSK1iSTNaXrZ4AN3yprnVA4DT/75MZHS1xYFpkZ2lnc=;
+	b=Ixx2o0CU0m567FFVYFr3xZltpT+DamXunWeqH9bdOaDrSI1dEqm+xSUG2qqzkRyHBo7084
+	IFrOEYHZ2GfZuplMjWCAATbG+R2U0EXDivtzPKzlHiDqm0RgNziX7A0B+bXrNy1EMigAI4
+	t34HTsSjVJqyAXlNCalYwL7/JA2LAfY=
+Received: from mail-yw1-f198.google.com (mail-yw1-f198.google.com
+ [209.85.128.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-246-bBh5lS-sPLiEqoISk1hKrQ-1; Thu, 07 Aug 2025 04:02:58 -0400
+X-MC-Unique: bBh5lS-sPLiEqoISk1hKrQ-1
+X-Mimecast-MFC-AGG-ID: bBh5lS-sPLiEqoISk1hKrQ_1754553777
+Received: by mail-yw1-f198.google.com with SMTP id 00721157ae682-719a4ccfcb6so10068717b3.0
+        for <netdev@vger.kernel.org>; Thu, 07 Aug 2025 01:02:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754553777; x=1755158577;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dSK1iSTNaXrZ4AN3yprnVA4DT/75MZHS1xYFpkZ2lnc=;
+        b=V1YVtcdWMslKXAnHVOKBW9M9W/j34ZINq3kuPDptDUxi+PE7YbRJIlgJJ6wdyN9Uh9
+         GlLKyneVFeTUjK+Eq0bEVURH+GVqci48bollSWq09wESq5Z9KSENosWXWkk5NxeDs48l
+         3TS+gGCk0KJD4zGCigRfINLfvr3BpOflyj/YwF/52SI6CBgEBEZVcVvndM4/aTVCOwmU
+         nXTD5vTeTrYpyr1026DyRF6If7tUeAN1NxWiugoq3euYilG2wEdu9JiUFo42biYKhYyp
+         x9lNpbh3svZBTEfGwlHWZoThVrgnxqmWmP4UslA3WepcUHkvKCek1h9uhqvefv811u0N
+         h9Zw==
+X-Gm-Message-State: AOJu0YycruVlTYJzg7PQ3LB9cJd7QIuZHCJjJZ61YjkTS7XCebRbkGPL
+	BjBbsXsUGhYJtwoR2LFzqdofxEzZGXsLwxI7myDbqh6KFYah0iYfZaq66bzik70aDl7yAO78XFF
+	/aRTolTd9p6kJHwDRjk239nrzfzbXVCPhc6RW94Wh0undDviRGiDaczfJdA==
+X-Gm-Gg: ASbGnctmITNm/TvwhCNdbSyUFLO6/5G6tG9LlmLu3EwrryHS7b4gQxo2YGG68ALKu1+
+	r6O/mKN0e/TugID5jX+lm810ahRR75d93xZtUV8pcDHSwnuqcyDG8br3cpHuFNQPlv5M/DCD+C3
+	9QgRcfnZKmG0edsL5Tj/lmZ0CYesHyTAM5uzXliz1Mh+885VPQStIDKs5nXysar2zBBcYqM6tog
+	JLqSWG5YzmLWsmgka0QW2WUPyozYya9p+A5YOIKoWyl4LZxd7Bq8h7awMZy9e0A2CzxfDV1pR9y
+	3NWTTqMrTs/xHC+GEh+pdDZhp3qKgsANCtQeYKbwT5GTw/4ArT7OpjObMjoFIDm6ZZuXynmZKDX
+	N+15w7NsYLOkWjOM=
+X-Received: by 2002:a05:690c:e1e:b0:70d:f3f9:1898 with SMTP id 00721157ae682-71bcc833e83mr77517107b3.35.1754553777287;
+        Thu, 07 Aug 2025 01:02:57 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH1c7TKsMNnBRh62xCcT6/BlQdfdj0ibell23NbQ0F8+CQr1wYoBFjU4y4sktLodjTNK4jqbA==
+X-Received: by 2002:a05:690c:e1e:b0:70d:f3f9:1898 with SMTP id 00721157ae682-71bcc833e83mr77516527b3.35.1754553776614;
+        Thu, 07 Aug 2025 01:02:56 -0700 (PDT)
+Received: from sgarzare-redhat (host-79-45-205-118.retail.telecomitalia.it. [79.45.205.118])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-71b5a59e009sm44344657b3.53.2025.08.07.01.02.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Aug 2025 01:02:56 -0700 (PDT)
+Date: Thu, 7 Aug 2025 10:02:50 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Budimir Markovic <markovicbudimir@gmail.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH net] vsock: Do not allow binding to VMADDR_PORT_ANY
+Message-ID: <5xay32omz7hmdys53oub34dsp6654bw6flelc77e3kk6ltpeeg@n2x3qf5psf52>
+References: <20250807041811.678-1-markovicbudimir@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC net-next 01/17] net/smc: Remove __init marker from
- smc_core_init()
-To: dust.li@linux.alibaba.com, David Miller <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "D. Wythe" <alibuda@linux.alibaba.com>,
-        Sidraya Jayagond <sidraya@linux.ibm.com>,
-        Wenjia Zhang
- <wenjia@linux.ibm.com>,
-        Julian Ruess <julianr@linux.ibm.com>
-Cc: netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Thorsten Winkler <twinkler@linux.ibm.com>,
-        Simon Horman <horms@kernel.org>,
-        Mahanta Jambigi <mjambigi@linux.ibm.com>,
-        Tony Lu
- <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
-        Halil Pasic <pasic@linux.ibm.com>, linux-rdma@vger.kernel.org
-References: <20250806154122.3413330-1-wintera@linux.ibm.com>
- <20250806154122.3413330-2-wintera@linux.ibm.com>
- <aJQex0Ey-eaysumJ@linux.alibaba.com>
-Content-Language: en-US
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <aJQex0Ey-eaysumJ@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: lmR-3Ln4TZeURc2IHvscMh7bjqHpGojR
-X-Proofpoint-ORIG-GUID: talQW7ZRVHpUpI4CcA4rvay4LQqHE8NU
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODA3MDA1MiBTYWx0ZWRfX46nwaotJnd07
- 6NXUIDcmz3Apb++2dNmpu7A+vx5rk9aw357xhr+s+aRCYUewiM364tEMlldNA02f+AReZUg9GJ0
- lket/dWisf4ydY22roNQQOQP91JSFQqR0ApaaHYlxf4SNbsRdux48WGSbdK2OTXtduvA62WHsFH
- btmUlzaGT0rq2hfFDOPahsTPxGE4kB4S3rjdPYdxXz/Nr9ElonP0s9q7Gq6gGLKhYR5wJmPfGmD
- Sq/qTo1/+Uasdh1dAO/3TKgevuFGnAVmaENppEdu+duxPyjq/HeijIYXuLUvWnGdDfvX20H/+jM
- gF36KuV/irVAQxRSixJ8OVoeMBfmAIJqI7MLv7Q+4PrYPzvr9NY375ptOuDoq3mxsAHOXHqnPRe
- sGT3M5XVck42AsdYROzK2b+qcbIxAJYUggSE6n7KvxmmRGdnVWbOXk2Wg+JZzISXyc72fEYI
-X-Authority-Analysis: v=2.4 cv=TayWtQQh c=1 sm=1 tr=0 ts=68944f5e cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
- a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10 a=rCoTjgMRcGilsMQW6BcA:9
- a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-08-06_05,2025-08-06_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 adultscore=0 phishscore=0 impostorscore=0 spamscore=0
- mlxlogscore=670 bulkscore=0 priorityscore=1501 mlxscore=0 lowpriorityscore=0
- malwarescore=0 clxscore=1015 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2507300000
- definitions=main-2508070052
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20250807041811.678-1-markovicbudimir@gmail.com>
 
+On Thu, Aug 07, 2025 at 04:18:11AM +0000, Budimir Markovic wrote:
+>It is possible for a vsock to autobind to VMADDR_PORT_ANY. This can
+>cause a use-after-free when a connection is made to the bound socket.
+>The socket returned by accept() also has port VMADDR_PORT_ANY but is not
+>on the list of unbound sockets. Binding it will result in an extra
+>refcount decrement similar to the one fixed in fcdd2242c023 (vsock: Keep
+>the binding until socket destruction).
+>
+>Modify the check in __vsock_bind_connectible() to also prevent binding
+>to VMADDR_PORT_ANY.
+>
+>Fixes: d021c344051a ("VSOCK: Introduce VM Sockets")
+>Reported-by: Budimir Markovic <markovicbudimir@gmail.com>
+>Signed-off-by: Budimir Markovic <markovicbudimir@gmail.com>
+>---
+> net/vmw_vsock/af_vsock.c | 3 ++-
+> 1 file changed, 2 insertions(+), 1 deletion(-)
 
+Thanks for the fix!
 
-On 07.08.25 05:34, Dust Li wrote:
-> On 2025-08-06 17:41:06, Alexandra Winter wrote:
->> Remove the __init marker because smc_core_init() is not the
->> init function of the smc module and for consistency with
->> smc_core_exit() which neither has an __exit marker.
-> Have you seen a real warning or error because of the __init marker ?
-> 
-> I think the __init marker is just to tell the kernel this function
-> will only be called during initialization. So it doesn't need to
-> be the module's init function.
-> 
-> Best regards,
-> Dust
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
-My bad. Thank you Dust, for pointing this out.
-This patch will be removed from the series.
+Please next time use `./scripts/get_maintainer.pl` to cc all the
+maintainers and mailing lists.
+
+If this patch will not be merged, resend it (with my R-b) to all the
+maintainers/list. I'll be offline for the next 2 weeks, so remember to
+carry my R-b.
+
+Thanks,
+Stefano
+
+>
+>diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>index ead6a3c14..bebb355f3 100644
+>--- a/net/vmw_vsock/af_vsock.c
+>+++ b/net/vmw_vsock/af_vsock.c
+>@@ -689,7 +689,8 @@ static int __vsock_bind_connectible(struct vsock_sock *vsk,
+> 		unsigned int i;
+>
+> 		for (i = 0; i < MAX_PORT_RETRIES; i++) {
+>-			if (port <= LAST_RESERVED_PORT)
+>+			if (port == VMADDR_PORT_ANY ||
+>+			    port <= LAST_RESERVED_PORT)
+> 				port = LAST_RESERVED_PORT + 1;
+>
+> 			new_addr.svm_port = port++;
+>-- 
+>2.49.1
+>
+
 
