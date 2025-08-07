@@ -1,67 +1,50 @@
-Return-Path: <netdev+bounces-212108-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212109-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7598B1DFCE
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 01:29:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F33ECB1DFD3
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 01:48:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 727C37230CF
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 23:29:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CCB20189F75D
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 23:49:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC446262FF6;
-	Thu,  7 Aug 2025 23:29:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A2D420126A;
+	Thu,  7 Aug 2025 23:48:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IV4nXWie"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EMh74DDK"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2D49256C87;
-	Thu,  7 Aug 2025 23:29:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 049EB2EAE5
+	for <netdev@vger.kernel.org>; Thu,  7 Aug 2025 23:48:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754609354; cv=none; b=VREiY6eDns5C0BuFkQdCZVtjdhiqcS0JElGZVQoWvz+DdPpOyHU+828us5CtBQKSwzSpRuQgDukH5vRkre+zC+tuokc1S4O4FjvVNHeqFqe1tkX3anGS3p/BPNJUVU074zLzfkwZvI/1O6mCcpyt/gTm9Nu1E5mYepzoLICmLTk=
+	t=1754610529; cv=none; b=K0i2RltSNreTBK4ST9N8o41U4hiAfVa5qETraHwfUx81Kk28eyyfLnl0BTE4UpxeQSZNCQS7qmEDQJOgB1FxP3/gPeBuRWYT5GhXD3L8EdxiW7jtxHNNAQL5+sdkJGkfkkeGkwdt99ffsUwcWd96ID0W+ZQw9BcCFVb9pBR2L/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754609354; c=relaxed/simple;
-	bh=SwfmDGDbFbfWMtCEiabspD+RCuPytk+hWkDJu2Ixei8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Sg5XuBcAUmZ1OeyMy0Jh/fVlbI1f+IwTpO+VmoRLTPxxlxyX0eoX88u+mIhJKp6ntc9u7XyasflAs9drEeAoJHxXS1GHN7fLtzpDLxyAMXOsSu4bh0AhCkOQDkyFcGuPk7HyU7ENve5u72we9BsWTnBc3xYQFRt7unRUOkLFLcs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IV4nXWie; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B4A2C4CEF6;
-	Thu,  7 Aug 2025 23:29:14 +0000 (UTC)
+	s=arc-20240116; t=1754610529; c=relaxed/simple;
+	bh=UbdMlawSEb+QASl+7DHdn06GeX2jC9mNnnhWX5ZzAtQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=duxyAfdO6uvVAYfkqQtltVRRPJL3e02t35BnI/A2IEN9u41b45wgQgtfKAdj3rndgMykaKVWoHS1JpZN1oDSsy/325BwdvwvXNAAOaT7UxaBMXM0WU5BJ7tmu7QMyYpWYdmyybYmMH+7KetbcrRh7fmV/uuG3b37E1ICT/uyREU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EMh74DDK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 838CBC4CEEB;
+	Thu,  7 Aug 2025 23:48:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754609354;
-	bh=SwfmDGDbFbfWMtCEiabspD+RCuPytk+hWkDJu2Ixei8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=IV4nXWie4LabI3e7R6USg7GJHd2I6ornkz6NhJnQRVmBN4voNlnQiLXfb4MQtj9te
-	 ippmWPJ8AqZHeJp2P1h/pneWftP1j12FdHy0rOcRqqH4PYF3CqK2GU3LMgp5+O2leB
-	 zXMQkb1AYXqMosQNxg5B+hFNt3B2JgHdQ0UcjSRu9BW43PypTck930YYNq8QlKgiKm
-	 QlXT3TYclVSTasy6yL7GFt2QBFR/n4sY5IS0HSYDXb9IyiGDbhipfq6gkluXfC9d54
-	 JQ7eL4uh4t0XiPsjd/rNb2IeQ2Xpx+5s3YFtF2KaNIG1swwD04w2e8sr44ryy3+rtM
-	 cZqLBw2dpnKhw==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	borisp@nvidia.com,
-	john.fastabend@gmail.com,
-	shuah@kernel.org,
-	linux-kselftest@vger.kernel.org,
-	sd@queasysnail.net,
-	will@willsroot.io,
-	savy@syst3mfailure.io,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net v2 2/2] selftests: tls: test TCP stealing data from under the TLS socket
-Date: Thu,  7 Aug 2025 16:29:07 -0700
-Message-ID: <20250807232907.600366-2-kuba@kernel.org>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20250807232907.600366-1-kuba@kernel.org>
-References: <20250807232907.600366-1-kuba@kernel.org>
+	s=k20201202; t=1754610528;
+	bh=UbdMlawSEb+QASl+7DHdn06GeX2jC9mNnnhWX5ZzAtQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=EMh74DDK5JOVM2FY/4NM54Tv8cRJRnyVsou+i0nibrf+HiGjTLRx/jWsAXOPAXPpJ
+	 n0iXy0xlwyobF2h5goziIqFeNM0o88vb61MKtd7ZTbjXbTtLlCWYe5YhxtZbyXvE/W
+	 1SBauBi1RHjuZdfMSueD5clTus18l8decuKHAP0SVeMHE7BXQPMaOBGOOEeaObosRF
+	 93gzdEZs+nPMJKSuF3yukW1+AD9qkMTt0vgkHMRGxLDDMXMrIhAlabdxf39Sib3zMP
+	 JpPJU4R695H+bOsPTRam8S/PN5JuGLIz2J2OYR7TrHSV/XfsGh69fpK8nEfXkm6W0T
+	 N0k3BZYWqlp5w==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B00383BF4E;
+	Thu,  7 Aug 2025 23:49:03 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,94 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH ethtool] netlink: fix print_string when the value is NULL
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175461054201.3719041.4355345326392065104.git-patchwork-notify@kernel.org>
+Date: Thu, 07 Aug 2025 23:49:02 +0000
+References: <aILUS-BlVm5tubAF@maurice.local>
+In-Reply-To: <aILUS-BlVm5tubAF@maurice.local>
+To: Michel Lind <michel@michel-slm.name>
+Cc: mkubecek@suse.cz, netdev@vger.kernel.org, kuba@kernel.org
 
-Check a race where data disappears from the TCP socket after
-TLS signaled that its ready to receive.
+Hello:
 
-  ok 6 global.data_steal
-  #  RUN           tls_basic.base_base ...
-  #            OK  tls_basic.base_base
+This patch was applied to ethtool/ethtool.git (master)
+by Michal Kubecek <mkubecek@suse.cz>:
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- tools/testing/selftests/net/tls.c | 63 +++++++++++++++++++++++++++++++
- 1 file changed, 63 insertions(+)
+On Thu, 24 Jul 2025 19:48:11 -0500 you wrote:
+> The previous fix in commit b70c92866102 ("netlink: fix missing headers
+> in text output") handles the case when value is NULL by still using
+> `fprintf` but passing no value.
+> 
+> This fails if `-Werror=format-security` is passed to gcc, as is the
+> default in distros like Fedora.
+> 
+> [...]
 
-diff --git a/tools/testing/selftests/net/tls.c b/tools/testing/selftests/net/tls.c
-index 5ded3b3a7538..d8cfcf9bb825 100644
---- a/tools/testing/selftests/net/tls.c
-+++ b/tools/testing/selftests/net/tls.c
-@@ -2708,6 +2708,69 @@ TEST(prequeue) {
- 	close(cfd);
- }
- 
-+TEST(data_steal) {
-+	struct tls_crypto_info_keys tls;
-+	char buf[20000], buf2[20000];
-+	struct sockaddr_in addr;
-+	int sfd, cfd, ret, fd;
-+	int pid, status;
-+	socklen_t len;
-+
-+	len = sizeof(addr);
-+	memrnd(buf, sizeof(buf));
-+
-+	tls_crypto_info_init(TLS_1_2_VERSION, TLS_CIPHER_AES_GCM_256, &tls, 0);
-+
-+	addr.sin_family = AF_INET;
-+	addr.sin_addr.s_addr = htonl(INADDR_ANY);
-+	addr.sin_port = 0;
-+
-+	fd = socket(AF_INET, SOCK_STREAM, 0);
-+	sfd = socket(AF_INET, SOCK_STREAM, 0);
-+
-+	ASSERT_EQ(bind(sfd, &addr, sizeof(addr)), 0);
-+	ASSERT_EQ(listen(sfd, 10), 0);
-+	ASSERT_EQ(getsockname(sfd, &addr, &len), 0);
-+	ASSERT_EQ(connect(fd, &addr, sizeof(addr)), 0);
-+	ASSERT_GE(cfd = accept(sfd, &addr, &len), 0);
-+	close(sfd);
-+
-+	ret = setsockopt(fd, IPPROTO_TCP, TCP_ULP, "tls", sizeof("tls"));
-+	if (ret) {
-+		ASSERT_EQ(errno, ENOENT);
-+		SKIP(return, "no TLS support");
-+	}
-+	ASSERT_EQ(setsockopt(cfd, IPPROTO_TCP, TCP_ULP, "tls", sizeof("tls")), 0);
-+
-+	/* Spawn a child and get it into the read wait path of the underlying
-+	 * TCP socket.
-+	 */
-+	pid = fork();
-+	ASSERT_GE(pid, 0);
-+	if (!pid) {
-+		EXPECT_EQ(recv(cfd, buf, sizeof(buf), MSG_WAITALL),
-+			  sizeof(buf));
-+		exit(!__test_passed(_metadata));
-+	}
-+
-+	usleep(2000);
-+	ASSERT_EQ(setsockopt(fd, SOL_TLS, TLS_TX, &tls, tls.len), 0);
-+	ASSERT_EQ(setsockopt(cfd, SOL_TLS, TLS_RX, &tls, tls.len), 0);
-+
-+	EXPECT_EQ(send(fd, buf, sizeof(buf), 0), sizeof(buf));
-+	usleep(2000);
-+	EXPECT_EQ(recv(cfd, buf2, sizeof(buf2), MSG_DONTWAIT), -1);
-+	/* Don't check errno, the error will be different depending
-+	 * on what random bytes TLS interpreted as the record length.
-+	 */
-+
-+	close(fd);
-+	close(cfd);
-+
-+	EXPECT_EQ(wait(&status), pid);
-+	EXPECT_EQ(status, 0);
-+}
-+
- static void __attribute__((constructor)) fips_check(void) {
- 	int res;
- 	FILE *f;
+Here is the summary with links:
+  - [ethtool] netlink: fix print_string when the value is NULL
+    https://git.kernel.org/pub/scm/network/ethtool/ethtool.git/commit/?id=41d6105250c8
+
+You are awesome, thank you!
 -- 
-2.50.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
