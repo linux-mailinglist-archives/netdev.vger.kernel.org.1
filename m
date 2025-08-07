@@ -1,123 +1,156 @@
-Return-Path: <netdev+bounces-212094-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212095-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8217B1DD6A
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 21:15:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CEFC3B1DD89
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 21:40:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 933B17216F0
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 19:15:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D076C566BB1
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 19:40:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEAFE1A8F84;
-	Thu,  7 Aug 2025 19:15:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6F7820A5EC;
+	Thu,  7 Aug 2025 19:40:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="y7R35Ggh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mm+YRI2M"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BE20143748
-	for <netdev@vger.kernel.org>; Thu,  7 Aug 2025 19:15:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1937E4AEE2;
+	Thu,  7 Aug 2025 19:40:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754594144; cv=none; b=J0qZbiZS0lLFgeekPRdSWnD8qSzQ7x0LI2RPyU+mhzh6prBSkaH18cCMZFq26Z7/0L1MpsiW9HGKvYicpXQCYzn6A5Kl3hkCwe3cIkLY1FeQLpuYkBLThyjk4btsJKx6YJNAzzB6BbJQ6KySeM5O/V4r6ay3YN1+FqPyVxqwb3Y=
+	t=1754595616; cv=none; b=k9UyPZPGEhlwNiPz2gGyzXAboiS9fBsHPEcW8XDsLSqMxqwZNZ0MKXM96cjgrjsUN6tNA7TtcQuRjYAxwkXbtJC86clWgowvmuhKn8mrEG395aYh6dRK7x8AYAFTigs+h7e43fe3BkHa/aHhvUjiCsRSRr7NnnY73tWsEjZT5WE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754594144; c=relaxed/simple;
-	bh=kDFfxu37Oy0VOTzAqLpTHhH4gLQwPm1aW+ZU6CGO6gQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Vl8vLedptEp+uYQ8LRL/4b92SX6Y6v020ULakc0bUHmIGbtXcpTWvu236V4D5Qvxf/1wKvnPiKJ7ndgOfhzsdys4QMfmZ0V5CVfrMBN/7TkFz0VQQW179BiOTrR8OXzpaoWXEQCpJztNAKXAB3u0HidNDsHjB1Rdsuh+Ep457EM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=y7R35Ggh; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=VTJAmK/RuqPGqNceQRqXn7WqL1onxDBkB7rg1B+KpRc=; b=y7R35GghiBYgAKpVICZVirOPT8
-	5h7mM1XI90jlP/RPcoTWrygIdPQ5PPobGdFATPVC/YraPpasd6kXlCDSjNTBnIoiqUY8Cn4+tMuNL
-	7ZIjqwrvBr9hqELYrBOGgZxqq5XmvoXEXPTA5clZE5gc4/zm4pBZXQKhckgw2gyJcFFyBhciRfv0U
-	DuE/L63jFzmVKau62VmE6UIC0k2aOX/TUlgheRn9goZuadMp72U5CoYGE2bPIh/Rv5z4+j/6rmGki
-	JBIwT1/sfM3o3toZHau7DVYhIPrhQhnnn3XzL2Z5U8Nr+vZ0uXd5ybIaM2OMr0J7/wgiJxhjRWvjO
-	0f4MKsGA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41228)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uk65A-0006V3-1m;
-	Thu, 07 Aug 2025 20:15:20 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uk654-0008LM-0X;
-	Thu, 07 Aug 2025 20:15:14 +0100
-Date: Thu, 7 Aug 2025 20:15:13 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Simon Horman <horms@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, David Wu <david.wu@rock-chips.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1754595616; c=relaxed/simple;
+	bh=EZIEeOnW1Z0fE8adlPk3i3tVG6j/UoYNBYyEH7vY/Lc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HfHr/FLk1ZAPH81Y43KKhh1gVdvtcj1APpQUv7AqfMIlV84lloBgy/d/ZCCisJLSv9tNQD/JFMPzWO9YbO4Xj3Mu0eCyb+E9ScnN8o4scX5BIy5LjL6iiTJZN5D92XerZnESqaZrRosb9afGXPnOpih1h7t/Yl6Foo2f0vkIYuQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mm+YRI2M; arc=none smtp.client-ip=209.85.219.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-e75668006b9so1447837276.3;
+        Thu, 07 Aug 2025 12:40:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1754595614; x=1755200414; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=fTGv50AjxFne2hYKUgwleceqM6cCsBh+NvLVhbsB/64=;
+        b=Mm+YRI2MV+XOo8zEGpwLg3OX4wk7rAIeRMMT9IGZY3aUKckkvFG3VLizqcs8FyCZPs
+         xluc2YqoukuhXmkHwt6SktKyywOZffKipRlRYDHYUx02Hz9lJm9TciR11+aJkcIX3RBU
+         SPgDQMF0TvQjteCGy/4hhklIqvjtJXuBv7omYHqDLVvhYxn0fzDPPpp9GRa9c5x1TNFg
+         fl2qtRAEsGMmj/dNMJwbYNa0x+//suJF5y3Hn44XvJshzNstRQRYwt3H92J0T8esAJEV
+         +pvbBDKKYRra4cU9XdbN0jMzG5i4MJpS/s4uSgeqCTt+Q1RYLnKl2O95/BdoENeq6eoH
+         AxEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754595614; x=1755200414;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fTGv50AjxFne2hYKUgwleceqM6cCsBh+NvLVhbsB/64=;
+        b=JDEYNDBu7C2JJo+Zbob1QkB8qWKmQU9faPSkDJ15ATkc8pKvWQO/ZRZu6caY9KUYl4
+         lRZFu9R8FppOJnlBanowV+rTgwQxgM+aBOxu4LQsC0WZTqBCkJEcp5UQkQQU7dMQpqz4
+         xVBb8pwL/7igFIKcoknapx67unDQjDf2dIWO2jPCSSzU2i/wlEcFy/0elRQLyCYpkkT/
+         T62NyUqswG/LIHQ8NczCQUMS8g1aCQkxLzzuBiw2fgM6KUQbYBERHDeBAZBfUI5xMtE7
+         4tcrpopfsUGYJSiVaQ+QTaoPQQij8zh4Kds8YCI/sy6dvlmEVQK7yYFRdS/2fy1NOkJ5
+         xO8A==
+X-Forwarded-Encrypted: i=1; AJvYcCXl4XcLEqoZp5R0E8Wp9LkvGTJ8J0SPyMZPndBbnQfMmleMvFYX0j5ypm/oMbT9gZdlfDJvJ0RctCql@vger.kernel.org
+X-Gm-Message-State: AOJu0YxFOzsdShgkt86WkIaRgTddhz6wjFi6I1hG8EDJPpGamtYq8Dak
+	cK0o8dWSOdbLqVNUutgGbUMxZKPx7vClNhiiwCvvOzEFdJXMeQ3SGq4GN7+ngw==
+X-Gm-Gg: ASbGnctcmc6rz/jmeaMi+lwPBmX3l4gC4tGgHlzzbpzrEaDoW3inbLd/gM8uOZp4idm
+	hVT6snH1+LhZ9r0snarSYm4hBD+f5OaxRL/8vCSxaKWAXfPQXGLMye3fIm8/xE4elWJjzQ7655S
+	8xeJK+aR1tb69QxhCI17yZCN2O5a7ByUsYT7DzI2o6Hm1EFEaw0Z+ElQ4ZJnP+21x+mJwXq12iT
+	uRaipL2yVOJLD01NVeISX32O+KdIl9O8bbQqFArMOyXCueYv8WSSi1VXu1G+U5gLuraBHZT8SXF
+	Ze2VoCHVaSDv4fIrupOeDRZ5n1dQ3ops8PTB1cWeakvob3tLoUl2lK7bGjBtAaHXEa80IcvuBCU
+	IkGDvI8VCGNKfIKZVw/XxhfhF+EwFUsMlMRa0IMTR9F02osNwg3WRFT6JnAy946E=
+X-Google-Smtp-Source: AGHT+IGxyN/ZEThXz0KUcvWci5mn4HMf3lqHzYz3qlPewTV14gBqawdMOu/5V9WKX6IK2gkG7TeXAQ==
+X-Received: by 2002:a05:6902:2882:b0:e8e:2a6b:251f with SMTP id 3f1490d57ef6-e904b62e457mr592000276.32.1754595613593;
+        Thu, 07 Aug 2025 12:40:13 -0700 (PDT)
+Received: from wsfd-netdev58.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
+        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e8fe073284fsm6025644276.21.2025.08.07.12.40.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Aug 2025 12:40:13 -0700 (PDT)
+From: Xin Long <lucien.xin@gmail.com>
+To: network dev <netdev@vger.kernel.org>,
+	linux-sctp@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net] net: stmmac: rk: put the PHY clock on remove
-Message-ID: <aJT7QTzT_AHmkS6H@shell.armlinux.org.uk>
-References: <E1ujwIY-007qKa-Ka@rmk-PC.armlinux.org.uk>
- <20250807183359.GO61519@horms.kernel.org>
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+Subject: [PATCH net] sctp: linearize cloned gso packets in sctp_rcv
+Date: Thu,  7 Aug 2025 15:40:11 -0400
+Message-ID: <dd7dc337b99876d4132d0961f776913719f7d225.1754595611.git.lucien.xin@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250807183359.GO61519@horms.kernel.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Aug 07, 2025 at 07:33:59PM +0100, Simon Horman wrote:
-> On Thu, Aug 07, 2025 at 09:48:30AM +0100, Russell King (Oracle) wrote:
-> > The PHY clock (bsp_priv->clk_phy) is obtained using of_clk_get(), which
-> > doesn't take part in the devm release. Therefore, when a device is
-> > unbound, this clock needs to be explicitly put. Fix this.
-> > 
-> > Fixes: fecd4d7eef8b ("net: stmmac: dwmac-rk: Add integrated PHY support")
-> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> > ---
-> > Spotted this resource leak while making other changes to dwmac-rk.
-> > Would be great if the dwmac-rk maintainers can test it.
-> > 
-> >  drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c | 3 +++
-> >  1 file changed, 3 insertions(+)
-> > 
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-> > index 79b92130a03f..4a315c87c4d0 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-> > @@ -1770,6 +1770,9 @@ static void rk_gmac_remove(struct platform_device *pdev)
-> >  	stmmac_dvr_remove(&pdev->dev);
-> >  
-> >  	rk_gmac_powerdown(bsp_priv);
-> > +
-> > +	if (plat->phy_node && bsp_priv->integrated_phy)
-> > +		clk_put(bsp_priv->clk_phy);
-> 
-> Hi Russell,
-> 
-> Something seems a little off here.
-> I don't see plat in this context in net.
+A cloned head skb still shares these frag skbs in fraglist with the
+original head skb. It's not safe to access these frag skbs.
 
-Already have a fix for it, thanks anyway. Today ended up going awol
-due to dentistry stuff. :(
+syzbot reported two use-of-uninitialized-memory bugs caused by this:
 
+  BUG: KMSAN: uninit-value in sctp_inq_pop+0x15b7/0x1920 net/sctp/inqueue.c:211
+   sctp_inq_pop+0x15b7/0x1920 net/sctp/inqueue.c:211
+   sctp_assoc_bh_rcv+0x1a7/0xc50 net/sctp/associola.c:998
+   sctp_inq_push+0x2ef/0x380 net/sctp/inqueue.c:88
+   sctp_backlog_rcv+0x397/0xdb0 net/sctp/input.c:331
+   sk_backlog_rcv+0x13b/0x420 include/net/sock.h:1122
+   __release_sock+0x1da/0x330 net/core/sock.c:3106
+   release_sock+0x6b/0x250 net/core/sock.c:3660
+   sctp_wait_for_connect+0x487/0x820 net/sctp/socket.c:9360
+   sctp_sendmsg_to_asoc+0x1ec1/0x1f00 net/sctp/socket.c:1885
+   sctp_sendmsg+0x32b9/0x4a80 net/sctp/socket.c:2031
+   inet_sendmsg+0x25a/0x280 net/ipv4/af_inet.c:851
+   sock_sendmsg_nosec net/socket.c:718 [inline]
+
+and
+
+  BUG: KMSAN: uninit-value in sctp_assoc_bh_rcv+0x34e/0xbc0 net/sctp/associola.c:987
+   sctp_assoc_bh_rcv+0x34e/0xbc0 net/sctp/associola.c:987
+   sctp_inq_push+0x2a3/0x350 net/sctp/inqueue.c:88
+   sctp_backlog_rcv+0x3c7/0xda0 net/sctp/input.c:331
+   sk_backlog_rcv+0x142/0x420 include/net/sock.h:1148
+   __release_sock+0x1d3/0x330 net/core/sock.c:3213
+   release_sock+0x6b/0x270 net/core/sock.c:3767
+   sctp_wait_for_connect+0x458/0x820 net/sctp/socket.c:9367
+   sctp_sendmsg_to_asoc+0x223a/0x2260 net/sctp/socket.c:1886
+   sctp_sendmsg+0x3910/0x49f0 net/sctp/socket.c:2032
+   inet_sendmsg+0x269/0x2a0 net/ipv4/af_inet.c:851
+   sock_sendmsg_nosec net/socket.c:712 [inline]
+
+This patch fixes it by linearizing cloned gso packets in sctp_rcv().
+
+Fixes: 90017accff61 ("sctp: Add GSO support")
+Reported-by: syzbot+773e51afe420baaf0e2b@syzkaller.appspotmail.com
+Reported-by: syzbot+70a42f45e76bede082be@syzkaller.appspotmail.com
+Signed-off-by: Xin Long <lucien.xin@gmail.com>
+---
+ net/sctp/input.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/sctp/input.c b/net/sctp/input.c
+index 2dc2666988fb..7e99894778d4 100644
+--- a/net/sctp/input.c
++++ b/net/sctp/input.c
+@@ -117,7 +117,7 @@ int sctp_rcv(struct sk_buff *skb)
+ 	 * it's better to just linearize it otherwise crc computing
+ 	 * takes longer.
+ 	 */
+-	if ((!is_gso && skb_linearize(skb)) ||
++	if (((!is_gso || skb_cloned(skb)) && skb_linearize(skb)) ||
+ 	    !pskb_may_pull(skb, sizeof(struct sctphdr)))
+ 		goto discard_it;
+ 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.47.1
+
 
