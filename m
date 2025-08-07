@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-212050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21D16B1D851
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 14:55:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7555B1D86A
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 14:58:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D63D1722DB2
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 12:55:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9CCC81AA409C
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 12:58:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F25112550D5;
-	Thu,  7 Aug 2025 12:55:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 885622561D1;
+	Thu,  7 Aug 2025 12:58:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="jARgqw6C"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="aWNGyfuI"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0937F252287;
-	Thu,  7 Aug 2025 12:55:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D5DC214813;
+	Thu,  7 Aug 2025 12:58:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754571320; cv=none; b=HhzkeLz5WCeANe9MoFRoFOkkFTVAbST1YcE6YNvK55PlwNHo0d0Y/5P535Os6AViuA8SUHgOY1qBIiw4FLeprIoGvZFX2XId5t1FiIOYIdtatoPq4/6tfrjUwVpMf6+9hEDAWTTqBQUKbtmNzmm1tm0ylDzTiJ5mt+7JsVkQBa4=
+	t=1754571493; cv=none; b=a088UQBF3A/d52MVg2glJwKMTf0vAUBXkPjcgJRppi8ZdS0t3+xszmIAK5Ps5COuShRGsgnw4WVXBkgiMfU+AQDV4HwBfd5rwPI3o/FykLnULQZGB4U2MD3CM3wersc4Ch8xdwpW2lkzWzPvN4L9iCx/lrw3Kycl5nFoVeMz/1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754571320; c=relaxed/simple;
-	bh=VP1x1C2TMJw2qzgV/aK2US2O1jwTyKXCW6X2Wq7tbH8=;
+	s=arc-20240116; t=1754571493; c=relaxed/simple;
+	bh=+GiEi5fx67ekIT8julrx4RFZSPiNtm6xOyQGY0aZCf8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PZBYYL1nOWQQPjBBppM2+G3d6YGYqI0gSPgtwSBDPdtDimeMtl8hYXsSSuuWTqFSVAkmwPnrjpqmFNjhbyIcVWSUeFpxIpRXY1MAkYTVvwNlu6wY/LQDk+X+X2ZlIcGMkSe7Tvhs1aRUH4BWM94gNRa/Tqgtod1R6yRVA3dVd5U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=jARgqw6C; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=BBbIiWHR2bVPNT+JjBe/HUuyrA5Zt7hQXU996O6EZsWV2qTcOf72IUpnMlpNQbKrRqvOqPLBLUhIWwKEITKyQUVaY2oyaYsxeBAdIhUawa0zu30s/x/th+o8yCcZ/VHJMIUvZZZlcO7htlzUvmqPgpwIjnhskD/kBijwz/nLUbg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=aWNGyfuI; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,23 +36,23 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=TuW6mAl/8kZ0b8oYSAZYeu8508XdSmqyTX6zbQ3bOI0=; b=jARgqw6C6mCszxBm2Rphmmo7ZB
-	ZvbzzDPxBIN5I6cG/BiWA1OcoEdp21CA4utVWuYKs+SPX3O98fHgP+BD8nQ3G21me5lsJAUpI3R1Z
-	Kh8ddcsNt04TqhZ1hFqP7gm3eH4fANsnBCBjIM5quOqDGfegkCXEPCSqVqvHBvg8eb8s=;
+	bh=aGy12hdeb0T0FjvhNhxL30PNOwV/0qscO7Mccamc3ts=; b=aWNGyfuI6aCddNgTzdLOWfFKZF
+	QKEIO2PRl0y1yQaTk/6Sgeit7uzgEFku87zor86s5yhyAynvrKsT2JPVgzYF2sWX4d1zz1TC73EHu
+	XtFj6X/pPN8Sm24IIgMY7yq3DurP9doKknvpZfX9DDtv0Eyqn1Nj7lJf+vv/eWxbHslo=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1uk09E-003y8D-Tt; Thu, 07 Aug 2025 14:55:08 +0200
-Date: Thu, 7 Aug 2025 14:55:08 +0200
+	id 1uk0C5-003yA0-QI; Thu, 07 Aug 2025 14:58:05 +0200
+Date: Thu, 7 Aug 2025 14:58:05 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Xu Yang <xu.yang_2@nxp.com>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, hkallweit1@gmail.com,
-	o.rempel@pengutronix.de, pabeni@redhat.com, netdev@vger.kernel.org,
-	imx@lists.linux.dev, linux-kernel@vger.kernel.org
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Xu Yang <xu.yang_2@nxp.com>, hkallweit1@gmail.com,
+	pabeni@redhat.com, netdev@vger.kernel.org, imx@lists.linux.dev,
+	linux-kernel@vger.kernel.org
 Subject: Re: [RESEND] net: phy: fix NULL pointer dereference in
  phy_polling_mode()
-Message-ID: <39d7c6be-c3e9-4c2f-b814-e0b2e838ad41@lunn.ch>
-References: <20250806082931.3289134-1-xu.yang_2@nxp.com>
- <aJMWDRNyq9VDlXJm@shell.armlinux.org.uk>
+Message-ID: <d137518b-604b-4be3-9eb1-96d49123a251@lunn.ch>
+References: <aJMWDRNyq9VDlXJm@shell.armlinux.org.uk>
  <ywr5p6ccsbvoxronpzpbtxjqyjlwp5g6ksazbeyh47vmhta6sb@xxl6dzd2hsgg>
  <aJNSDeyJn5aZG7xs@shell.armlinux.org.uk>
  <unh332ly5fvcrjgur4y3lgn4m4zlzi7vym4hyd7yek44xvfrh5@fmavbivvjfjn>
@@ -60,6 +60,8 @@ References: <20250806082931.3289134-1-xu.yang_2@nxp.com>
  <aJOHObGgfzxIDzHW@shell.armlinux.org.uk>
  <2b3fvsi7c47oit4p6drgjqeaxgwyzyopt7czfv3g2a74j2ay5j@qu22cohdcrjs>
  <3mkwdhodm4zl3t6zsavcrrkuawvd3qjxtdvhxwi6gwe42ic7rs@tevlpedpwlag>
+ <aJSSNg4aZNfoqqZh@shell.armlinux.org.uk>
+ <aJSf0JaBl4cKphFi@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,33 +70,26 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3mkwdhodm4zl3t6zsavcrrkuawvd3qjxtdvhxwi6gwe42ic7rs@tevlpedpwlag>
+In-Reply-To: <aJSf0JaBl4cKphFi@pengutronix.de>
 
-> diff --git a/drivers/net/usb/asix_devices.c b/drivers/net/usb/asix_devices.c
-> index 9b0318fb50b5..9fba1cb17134 100644
-> --- a/drivers/net/usb/asix_devices.c
-> +++ b/drivers/net/usb/asix_devices.c
-> @@ -676,6 +676,7 @@ static int ax88772_init_mdio(struct usbnet *dev)
->         priv->mdio->read = &asix_mdio_bus_read;
->         priv->mdio->write = &asix_mdio_bus_write;
->         priv->mdio->name = "Asix MDIO Bus";
-> +       priv->mdio->phy_mask = ~BIT(priv->phy_addr);
->         /* mii bus name is usb-<usb bus number>-<usb device number> */
->         snprintf(priv->mdio->id, MII_BUS_ID_SIZE, "usb-%03d:%03d",
->                  dev->udev->bus->busnum, dev->udev->devnum);
+> Hm, I guess, with this change there will be a subtile regression.
+> In case of an external PHYs the ax88772_init_phy() is using PHYlib to
+> suspend the internal PHY.
 > 
-> Is this the right thing to do?
+> May be:
+>   priv->mdio->phy_mask = ~(BIT(priv->phy_addr) | BIT(AX_EMBD_PHY_ADDR));
 
-This is what i was trying to do, i just put it in the wrong place
-because i had the wrong device.
+I looked at that:
 
-ax88772_init_phy() will only use the PHY at address priv->phy_addr, so
-this appears to be safe.
+	ret = asix_read_phy_addr(dev, true);
+	if (ret < 0)
+		return ret;
 
-The alternative is to have a custom asix_mdio_read() for this device,
-which returns -ENODEV if the phy_id being read does not equal
-priv->phy_addr. That will also prevent these extra PHYs from being
-created.
+	priv->phy_addr = ret;
+	priv->embd_phy = ((priv->phy_addr & 0x1f) == AX_EMBD_PHY_ADDR);
+
+So priv->phy_addr has to be the address of the internal PHY, so this
+should just work without anything special for the embedded PHY.
 
 	Andrew
 
