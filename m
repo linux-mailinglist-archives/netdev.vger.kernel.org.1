@@ -1,252 +1,150 @@
-Return-Path: <netdev+bounces-212015-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212016-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48EB9B1D3FB
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 10:07:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9735BB1D3FC
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 10:07:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0F8847AC579
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 08:05:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC48E3A9FF1
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 08:07:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 565D323A98D;
-	Thu,  7 Aug 2025 08:06:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HKAc6qg2"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CAF724728E;
+	Thu,  7 Aug 2025 08:06:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A4161442F4
-	for <netdev@vger.kernel.org>; Thu,  7 Aug 2025 08:06:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 953FE22D4C0
+	for <netdev@vger.kernel.org>; Thu,  7 Aug 2025 08:06:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754554015; cv=none; b=cblc2wD/8n4sNHyBGMySHbuSOtmWrbRBbEeRbwQ9VOG3MnKna9XgcO2B2pOwIGtxlo591wX7D166Nzzdfmkegmg7uliJODjilA6oTGrb1lZt/89QIBAOUjyZc1DyO7oCcGhiveGQRIiFr2fTVDcogfw1ZM9nob2ZRLWriwiHF2Y=
+	t=1754554016; cv=none; b=kbYKvdMiUAl85bS+VDBM5KEt5VIOFhLytG2xWhCbQevXr7TgxvPdsls+kbZQiAFZKtE6X5W2n978QGZIKDa11VTXI9YMI40fLtETWyMZYaeZAMiIgGKHlA1aUz8i0LnQQWYDKJYyp66YZHiofIhT+hUMG1LtF5e2qApJtUq7DgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754554015; c=relaxed/simple;
-	bh=u2Il4zcXlbBWcOa6mv3Dqk2LkCaGUlZ1IGfaEMSMzMQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uTQw9vzCeN+BBCczlbLqredWQMJY/oP1cFsb2bw0cb5JlaIl0y1a0vH8DsJy6S5ZVoKcLrXuiIAgDdFaAICRLOKoJcIm+57u4KoQCjqpii7Pq7kXaUNsEzcs29MM4WCptcw7wXq6dZxiyq6G8/0rGCKLpAB+zFmFaV1vg++QdGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HKAc6qg2; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1754554012;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7F/nfJfc6zfGggUKAtMQtDXDSwk2D4R5Dz6fv6UQzEk=;
-	b=HKAc6qg2alYovoyH7FXcrsFMvlY2JpPg6GlN0js1oQVj+MFxggooMK9bs+aC79cVra6AzL
-	sxPDB48mQtBT34snAXP/FfKWFj70I8t7AqcOmQ0h28AWwztpmVWyOEDULMNwV4sqkXapLi
-	veRlH5nIreUWoPoYFcVnS1S/IXCe9Kk=
-Received: from mail-yw1-f198.google.com (mail-yw1-f198.google.com
- [209.85.128.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-573-3D5Yv_ufP8C1Do4w8ZmaaQ-1; Thu, 07 Aug 2025 04:06:50 -0400
-X-MC-Unique: 3D5Yv_ufP8C1Do4w8ZmaaQ-1
-X-Mimecast-MFC-AGG-ID: 3D5Yv_ufP8C1Do4w8ZmaaQ_1754554010
-Received: by mail-yw1-f198.google.com with SMTP id 00721157ae682-70e72e81fafso9385627b3.2
-        for <netdev@vger.kernel.org>; Thu, 07 Aug 2025 01:06:50 -0700 (PDT)
+	s=arc-20240116; t=1754554016; c=relaxed/simple;
+	bh=nyJwpKcflWB6KyyIOeLQAdbgo2iU7AbYDHvpbDdnGgs=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=rLwtoSFs7fHM7WbzdNnYJBBhOxqFVf1D3c5+yR/7+ExyKv7AloA77ncCQ8qTXN/YeXOM1Jzn+Uuvgb/h7ot+q0L4s3qU4ndEY+LQQPFJrayzxiC3uoaGfefEpPPpfeF4tW0oQtK97b2zu2CdOCNdZ2K6hY/HOa67q8rQFvqsV8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-8816e763309so65496039f.3
+        for <netdev@vger.kernel.org>; Thu, 07 Aug 2025 01:06:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754554010; x=1755158810;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1754554014; x=1755158814;
+        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7F/nfJfc6zfGggUKAtMQtDXDSwk2D4R5Dz6fv6UQzEk=;
-        b=wZ2+mH04skLQ6IrNwN4QxEg1tJjcDbo0XUcVXljLBFWPnYoOeGLjxnh4io/YXQj0u2
-         nJRNWvfGH5IzYBYpQTPcN0u2EAQFFKiHJTJo/dmhxRYqPS7n+pZrxjKkzidN6oTG+9k9
-         IP/g70JOc41/auNcFjXGx5agRw1XECx8S5ojdsEPafonT/XpRMjXcK3jwmV2pce0kihp
-         O3AwjKO9WgTFb4lGnKWYl+pVk1ZJjghkww2BGsrZGzyoOIeoj62ZXkz27R1ooMBoRZP5
-         gwQGmVGPqRepsBntBSbvQriymiU6pfxTAQm7vdaXtPD7a3a4OaD/D4/HRpe8POV6g4oK
-         pkiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVzSQmfdhy2ZWGocSXd8KYNJzP1oxRPLHF0o0iwmrbYrAXrpjmN5eyRBVAt5uhMDPBA7tNtB2Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxXonNXeAmvG2W+ZhK/by6KIw4xyxd1bCRWLxWZlp2Z7EJeEnoC
-	kr6ofRViIO7xoysl8PJrAtYyfsM9HO9tkgS7ySQFIgaFyR1hHaVbUTdA6JNGnBzBmSKxBZ5LpnN
-	ri3uWxW9ROIoPMMFuqo7ptPa4HnllFV7jTrteIv1QWQfYsjNvfzwdO+hN7Q==
-X-Gm-Gg: ASbGncv/DdmxVe3/KmL9VhiNp4CsspZKvSTXY/pZMaH6omSGMMVHNVhk6WXfHLMqCMT
-	j3+KJ87xCgvPZvyTXNvV+mYOj+cbhLDNPgI8dZShy9s8RXfL/YO/hYBeyH620eteA5CLV5szk4i
-	aezWYS6boDWZq49mPi7IjxYc7FbRGFbTlo5AbT2EpebRqRGY5eFg1TdkDGzw6+hO9FQ6M7cnc0Q
-	1fMeGSlRNDjvCsO/1sFIcfZ9GUVTJq6rTGDnnlhs8rHtVXygEkuppREowjXfGNPYTzGTzNH5cOV
-	ySH8CI8SReKrzWCuubx1smiiY06Ng8rEtFd99ov41XX07cqVndq3YQJgBMKzNzwXFiqjPQ7TpKT
-	eF9humIkCw02cang=
-X-Received: by 2002:a05:690c:6203:b0:71a:a9c:30dd with SMTP id 00721157ae682-71bcc6d6851mr85320937b3.2.1754554009641;
-        Thu, 07 Aug 2025 01:06:49 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHkk4jVdfxkNS66lXJnELQ1c8i2y7wkD6dlYIhb6ZnK84/IDwj2JHOFZ/v+UaqBfCV8rwA6qA==
-X-Received: by 2002:a05:690c:6203:b0:71a:a9c:30dd with SMTP id 00721157ae682-71bcc6d6851mr85319947b3.2.1754554008050;
-        Thu, 07 Aug 2025 01:06:48 -0700 (PDT)
-Received: from sgarzare-redhat (host-79-45-205-118.retail.telecomitalia.it. [79.45.205.118])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-71b5a3a9110sm44916537b3.4.2025.08.07.01.06.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Aug 2025 01:06:47 -0700 (PDT)
-Date: Thu, 7 Aug 2025 10:06:35 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
-	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
-	Bryan Tan <bryan-bt.tan@broadcom.com>, Vishnu Dasa <vishnu.dasa@broadcom.com>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-hyperv@vger.kernel.org, berrange@redhat.com, Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH RFC net-next v4 00/12] vsock: add namespace support to
- vhost-vsock
-Message-ID: <27a6zuc6wwuixgozhkxxd2bmpiegiat4bkwghvjz6y3wugtjqm@az7j7et7hzpq>
-References: <20250805-vsock-vmtest-v4-0-059ec51ab111@meta.com>
+        bh=Y8p3scDZixEMjVu2rPlXknNZevyfYlJKLq4iu1bGSzA=;
+        b=JTboLrzOTEyfselqdSPbTVdkwoD18UKyX5D16RCVBBu5cDY4knSFNxEXgntWC/D+TT
+         rf5r5a1CiG5ltXHKpEhR55La2Azrs0xlssxxfTtBC1bsrb3Jpn9EXdhaJSH/GzKjbq++
+         dy/Mlx0nDmyku2fIpxzQw9nasbMhDTMyDzRYLOBM/jp279XzhPhJ4F8b2kSx04KmJjI+
+         fOSoStGZPPxJsFZSKGpsIxGdeADIV9smWKM+hrpnwe/beaiSbJwFbnnrPASRiX2nUCZa
+         mlESQYEqmHEoIYCAFLjruJ4M6cd8NUfomKCA3UHXx90WwD/i8mwpGq9bvruqcgl3fExS
+         M7aA==
+X-Forwarded-Encrypted: i=1; AJvYcCU4nz0JdwX29iMhvok/wcbu62ULpf6EKE7gdPtpKqCdDXEMgzBgdTWC9pg8IgJUIuEBo9s6pgM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHdkyG0MBKAFJa6P4Qq3AqaoA/ttOSPDL0U/4ntXgEnAZ5TDqo
+	mRxaB14nCWChnIMHw7/iRtLjZAnf8vW7uy+xn+gjLfwGg1I7OvLE5h3n4yLeAM1RTjSZmvlzMqy
+	ZxJIqAX0HyJ7l4wXqigjd7l6VLNEg4LwJ15L9WRekARoR8D1BXol8mLDudRM=
+X-Google-Smtp-Source: AGHT+IFcXOTEo+xm8RJP/u+XlmuT3WzDuANaV73aw2YJGkMV2whuVQ7VV3FiCdxL0Nv6/hCTT0qs7uhnGcjRsHcz75dLqmbnBDfK
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250805-vsock-vmtest-v4-0-059ec51ab111@meta.com>
+X-Received: by 2002:a05:6602:3c4:b0:881:983d:dd7b with SMTP id
+ ca18e2360f4ac-8819f33b7f1mr1088746039f.8.1754554013618; Thu, 07 Aug 2025
+ 01:06:53 -0700 (PDT)
+Date: Thu, 07 Aug 2025 01:06:53 -0700
+In-Reply-To: <20250806154127.2161434-1-maciej.fijalkowski@intel.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68945e9d.050a0220.7f033.0041.GAE@google.com>
+Subject: [syzbot ci] Re: xsk: fix immature cq descriptor production
+From: syzbot ci <syzbot+ci0a6ec7a9d4421fcc@syzkaller.appspotmail.com>
+To: aleksander.lobakin@intel.com, andrii@kernel.org, ast@kernel.org, 
+	bpf@vger.kernel.org, daniel@iogearbox.net, e.kubanski@partner.samsung.com, 
+	maciej.fijalkowski@intel.com, magnus.karlsson@intel.com, 
+	netdev@vger.kernel.org
+Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Bobby,
+syzbot ci has tested the following series
 
-On Tue, Aug 05, 2025 at 02:49:08PM -0700, Bobby Eshleman wrote:
->This series adds namespace support to vhost-vsock. It does not add
->namespaces to any of the guest transports (virtio-vsock, hyperv, or
->vmci).
->
->The current revision only supports two modes: local or global. Local
->mode is complete isolation of namespaces, while global mode is complete
->sharing between namespaces of CIDs (the original behavior).
->
->Future may include supporting a mixed mode, which I expect to be more
->complicated because socket lookups will have to include new logic and
->API changes to behave differently based on if the lookup is part of a
->mixed mode CID allocation, a global CID allocation, a mixed-to-global
->connection (allowed), or a global-to-mixed connection (not allowed).
->
->Modes are per-netns and write-once. This allows a system to configure
->namespaces independently (some may share CIDs, others are completely
->isolated). This also supports future mixed use cases, where there may 
->be
->namespaces in global mode spinning up VMs while there are
->mixed mode namespaces that provide services to the VMs, but are not
->allowed to allocate from the global CID pool.
->
->Thanks again for everyone's help and reviews!
+[v3] xsk: fix immature cq descriptor production
+https://lore.kernel.org/all/20250806154127.2161434-1-maciej.fijalkowski@intel.com
+* [PATCH v3 bpf] xsk: fix immature cq descriptor production
 
-Thanks for your work!
+and found the following issue:
+WARNING in xsk_create
 
-As I mentioned to you, I'll be off for the next 2 weeks, so I'll take a 
-look when I'm back, but feel free to send new versions if you receive 
-enough comments on this.
+Full report is available here:
+https://ci.syzbot.org/series/ed9b41fb-c772-4c8d-ab6b-07919dac7f3f
 
-Thanks,
-Stefano
+***
 
->
->Signed-off-by: Bobby Eshleman <bobbyeshleman@gmail.com>
->To: Stefano Garzarella <sgarzare@redhat.com>
->To: Shuah Khan <shuah@kernel.org>
->To: David S. Miller <davem@davemloft.net>
->To: Eric Dumazet <edumazet@google.com>
->To: Jakub Kicinski <kuba@kernel.org>
->To: Paolo Abeni <pabeni@redhat.com>
->To: Simon Horman <horms@kernel.org>
->To: Stefan Hajnoczi <stefanha@redhat.com>
->To: Michael S. Tsirkin <mst@redhat.com>
->To: Jason Wang <jasowang@redhat.com>
->To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
->To: Eugenio Pérez <eperezma@redhat.com>
->To: K. Y. Srinivasan <kys@microsoft.com>
->To: Haiyang Zhang <haiyangz@microsoft.com>
->To: Wei Liu <wei.liu@kernel.org>
->To: Dexuan Cui <decui@microsoft.com>
->To: Bryan Tan <bryan-bt.tan@broadcom.com>
->To: Vishnu Dasa <vishnu.dasa@broadcom.com>
->To: Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>
->Cc: virtualization@lists.linux.dev
->Cc: netdev@vger.kernel.org
->Cc: linux-kselftest@vger.kernel.org
->Cc: linux-kernel@vger.kernel.org
->Cc: kvm@vger.kernel.org
->Cc: linux-hyperv@vger.kernel.org
->Cc: berrange@redhat.com
->
->Changes in v4:
->- removed RFC tag
->- implemented loopback support
->- renamed new tests to better reflect behavior
->- completed suite of tests with permutations of ns modes and vsock_test
->  as guest/host
->- simplified socat bridging with unix socket instead of tcp + veth
->- only use vsock_test for success case, socat for failure case (context
->  in commit message)
->- lots of cleanup
->
->Changes in v3:
->- add notion of "modes"
->- add procfs /proc/net/vsock_ns_mode
->- local and global modes only
->- no /dev/vhost-vsock-netns
->- vmtest.sh already merged, so new patch just adds new tests for NS
->- Link to v2:
->  https://lore.kernel.org/kvm/20250312-vsock-netns-v2-0-84bffa1aa97a@gmail.com
->
->Changes in v2:
->- only support vhost-vsock namespaces
->- all g2h namespaces retain old behavior, only common API changes
->  impacted by vhost-vsock changes
->- add /dev/vhost-vsock-netns for "opt-in"
->- leave /dev/vhost-vsock to old behavior
->- removed netns module param
->- Link to v1:
->  https://lore.kernel.org/r/20200116172428.311437-1-sgarzare@redhat.com
->
->Changes in v1:
->- added 'netns' module param to vsock.ko to enable the
->  network namespace support (disabled by default)
->- added 'vsock_net_eq()' to check the "net" assigned to a socket
->  only when 'netns' support is enabled
->- Link to RFC: https://patchwork.ozlabs.org/cover/1202235/
->
->---
->Bobby Eshleman (12):
->      vsock: a per-net vsock NS mode state
->      vsock: add net to vsock skb cb
->      vsock: add netns to af_vsock core
->      vsock/virtio: add netns to virtio transport common
->      vhost/vsock: add netns support
->      vsock/virtio: use the global netns
->      hv_sock: add netns hooks
->      vsock/vmci: add netns hooks
->      vsock/loopback: add netns support
->      selftests/vsock: improve logging in vmtest.sh
->      selftests/vsock: invoke vsock_test through helpers
->      selftests/vsock: add namespace tests
->
-> MAINTAINERS                             |    1 +
-> drivers/vhost/vsock.c                   |   48 +-
-> include/linux/virtio_vsock.h            |   12 +
-> include/net/af_vsock.h                  |   59 +-
-> include/net/net_namespace.h             |    4 +
-> include/net/netns/vsock.h               |   21 +
-> net/vmw_vsock/af_vsock.c                |  204 +++++-
-> net/vmw_vsock/hyperv_transport.c        |    2 +-
-> net/vmw_vsock/virtio_transport.c        |    5 +-
-> net/vmw_vsock/virtio_transport_common.c |   14 +-
-> net/vmw_vsock/vmci_transport.c          |    4 +-
-> net/vmw_vsock/vsock_loopback.c          |   59 +-
-> tools/testing/selftests/vsock/vmtest.sh | 1088 ++++++++++++++++++++++++++-----
-> 13 files changed, 1330 insertions(+), 191 deletions(-)
->---
->base-commit: dd500e4aecf25e48e874ca7628697969df679493
->change-id: 20250325-vsock-vmtest-b3a21d2102c2
->
->Best regards,
->-- 
->Bobby Eshleman <bobbyeshleman@meta.com>
->
+WARNING in xsk_create
 
+tree:      bpf
+URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/bpf/bpf.git
+base:      e8d780dcd957d80725ad5dd00bab53b856429bc0
+arch:      amd64
+compiler:  Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+config:    https://ci.syzbot.org/builds/ac640846-151f-4c3e-8a63-10a1d56881e1/config
+syz repro: https://ci.syzbot.org/findings/34ebabe4-f302-4e4b-9951-0a44d704970a/syz_repro
+
+------------[ cut here ]------------
+kmem_cache of name 'xsk_generic_xmit_cache' already exists
+WARNING: CPU: 1 PID: 6031 at mm/slab_common.c:110 kmem_cache_sanity_check mm/slab_common.c:109 [inline]
+WARNING: CPU: 1 PID: 6031 at mm/slab_common.c:110 __kmem_cache_create_args+0xa3/0x320 mm/slab_common.c:307
+Modules linked in:
+CPU: 1 UID: 0 PID: 6031 Comm: syz.2.21 Not tainted 6.16.0-syzkaller-06699-ge8d780dcd957-dirty #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+RIP: 0010:kmem_cache_sanity_check mm/slab_common.c:109 [inline]
+RIP: 0010:__kmem_cache_create_args+0xa3/0x320 mm/slab_common.c:307
+Code: 81 fc 58 a5 22 8e 74 26 49 8b 7c 24 f8 48 89 de e8 32 81 67 09 85 c0 75 e2 90 48 c7 c7 f2 e1 98 8d 48 89 de e8 5e 00 7f ff 90 <0f> 0b 90 90 48 89 df be 20 00 00 00 e8 cc 82 67 09 48 85 c0 0f 85
+RSP: 0018:ffffc90002dffcc8 EFLAGS: 00010246
+RAX: 2d59588130194a00 RBX: ffffffff8cb69260 RCX: ffff888105d20000
+RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000002
+RBP: 0000000000000010 R08: ffffc90002dff9e7 R09: 1ffff920005bff3c
+R10: dffffc0000000000 R11: fffff520005bff3d R12: ffff88801fde6928
+R13: 0000607e5bfbe4c0 R14: ffffc90002dffd60 R15: 0000000000000098
+FS:  00007f455d4c26c0(0000) GS:ffff8881a3c7e000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f455c7b7dac CR3: 0000000106b38000 CR4: 00000000000006f0
+Call Trace:
+ <TASK>
+ __kmem_cache_create include/linux/slab.h:353 [inline]
+ xsk_create+0x67e/0x8d0 net/xdp/xsk.c:1817
+ __sock_create+0x4b3/0x9f0 net/socket.c:1589
+ sock_create net/socket.c:1647 [inline]
+ __sys_socket_create net/socket.c:1684 [inline]
+ __sys_socket+0xd7/0x1b0 net/socket.c:1731
+ __do_sys_socket net/socket.c:1745 [inline]
+ __se_sys_socket net/socket.c:1743 [inline]
+ __x64_sys_socket+0x7a/0x90 net/socket.c:1743
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f455c58ebe9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f455d4c2038 EFLAGS: 00000246 ORIG_RAX: 0000000000000029
+RAX: ffffffffffffffda RBX: 00007f455c7b5fa0 RCX: 00007f455c58ebe9
+RDX: 0000000000000000 RSI: 0000000000000003 RDI: 000000000000002c
+RBP: 00007f455c611e19 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f455c7b6038 R14: 00007f455c7b5fa0 R15: 00007ffd678e28c8
+ </TASK>
+
+
+***
+
+If these findings have caused you to resend the series or submit a
+separate fix, please add the following tag to your commit message:
+Tested-by: syzbot@syzkaller.appspotmail.com
+
+---
+This report is generated by a bot. It may contain errors.
+syzbot ci engineers can be reached at syzkaller@googlegroups.com.
 
