@@ -1,125 +1,108 @@
-Return-Path: <netdev+bounces-212104-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212105-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F8E3B1DEE6
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 23:32:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBEC5B1DF0D
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 23:47:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9DB3E3B66AC
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 21:32:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A44B93B5A1D
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 21:47:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE84C1A08BC;
-	Thu,  7 Aug 2025 21:32:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49795213E7B;
+	Thu,  7 Aug 2025 21:47:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GXPCB5S1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AB632E370A
-	for <netdev@vger.kernel.org>; Thu,  7 Aug 2025 21:32:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB57424B29;
+	Thu,  7 Aug 2025 21:47:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754602347; cv=none; b=BxKH+zFc1+gLEFpWVkLG9mIS9Zq2mliAz9MgiNrwnWm/D8QNyEkAqzgx32zMqebHmnb1TMNL3W9YAgaXB55L0V48OgBUnHItoCSfiJ0HH2vfS2cC6apqNvMqaMB3dixz1n1D5b2yHxTgIormhvSS/VQYqo62/d5RdzHDaVk/9Dk=
+	t=1754603263; cv=none; b=RKlgr6bbd1bS6bwFmDIWqNh5Q5s6fbBGmEePzEVcmcgtIQzYK+ilArMOwCeIkrqQmCyxr9cqCDi6IT8CEhAndBi5XT+4/lS5ouBrttrtEkma1IY2+1w+DbTmzy84xRNYRKpfPYi2PGfTc/CaOCMzIHs18kus2ExCo/IcXySbueM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754602347; c=relaxed/simple;
-	bh=7pVP4/N6YeK3todbA5w2yvuoV5FQL1pyfUZVKxKzjAU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=iXZr/3ffqFF+iCevBk/JYbaI8zu2PxhDCUpSyDpwANXCsW04ucWhxEdsCEZdslOa1oqrLip8CVbTxbOA4BxmQ/iV7mp/ubzPl3gwJ8fDGdnJ2ZXgMlXpzbHu0j32tlqj0FDvWsc88iKSgVeVCsKNiTcSrHEKXfOV/yZCDusFroE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.192] (ip5f5af7c7.dynamic.kabel-deutschland.de [95.90.247.199])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id E5BF860288277;
-	Thu, 07 Aug 2025 23:32:06 +0200 (CEST)
-Message-ID: <7961b079-fb26-4541-b7d3-63bddd484e2a@molgen.mpg.de>
-Date: Thu, 7 Aug 2025 23:32:03 +0200
+	s=arc-20240116; t=1754603263; c=relaxed/simple;
+	bh=hliJGp56g+EsXt7zAi0eCNCEQDrkPtoVAfnkrGjq/Hk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=W5O29T7R3Mb1KAZ4Uho9pRkd5UoDLq6q8ef2iJ9z8uBcwyLqhU20b4f4ctbrXwVvDmU9kXi/JcsO7zDGBcKLznXOvjg9ViEgrNgbHwWfP+nDJOKyUokUhC77P7KmqLEHNwjaE8uBSok0RIrPwQflLyORt9S1S7YnsHH8VjjbxCU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GXPCB5S1; arc=none smtp.client-ip=209.85.215.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-b34c068faf8so1469427a12.2;
+        Thu, 07 Aug 2025 14:47:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1754603261; x=1755208061; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=R5BiksDHPVSLKZXW4mpvxGQA5rtWFHpKt/JSOxrAKLM=;
+        b=GXPCB5S1uGavfY/q542nFA8rqEdYMhPEV/O05DNSxUMatFTP3KjOX0ml6HWJqaFYGQ
+         qyNEwWeOVk1Rqbn6hl0h41j5ludh7VwA40ji+wU5P4/3r2pe3j8DMSwhUMX2gd3r20hV
+         WOxnkgNxGhMnvQ/JJ2tL9jGXYhXkj106wFrlUVl4yt8XqSbuuwwvnZnla09Wgg0uJzU7
+         R9DOguIbx5ESB6YiPj3a+HrtH06ypojRCI9nSnt8zF+aEtS5jLaCc5QJzPnCDfEDaQ6R
+         0A/WuJgjGl/leKpTeuZoMKkMKCqpdsZUmO7Bz2kSTQPamlIayXjepInhXUX809MVkzsj
+         yRXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754603261; x=1755208061;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=R5BiksDHPVSLKZXW4mpvxGQA5rtWFHpKt/JSOxrAKLM=;
+        b=J1ElYAbECgVUwP5WZ7IXifxNgesGm6tYvLE9b+H0njuPgS5ZKQF2+aRUXfEZOPcRKy
+         sq7kvEpFFN8dpbL9qM1tlf55EAMuHdb7Eabms4ZoztW/l74k5T7pa3MIpCuG8L0wrFS0
+         2eXLFYCniHfUOAU+Gn9CZJX+TsmCn9dH5FsKWQqquxVJnNhnp4CoCgd9WLF16dZDVcSH
+         gRCUiEoIoBWdOydCXAcc6VPDnAh84c9Xaim9upFDbXYZ5PwNybUQyiFye87qoMkBK5Oy
+         XGugh7pNRD1fSmm+HsQOiAWV6rJiSYQHGIFn0qjyImSlUL7xO4TVZa+lPVzkOy3MIiId
+         L9Lg==
+X-Forwarded-Encrypted: i=1; AJvYcCUIvSBTEsWFCpAbRxkGsmiKnmi5Tu72MJ2tQQIMNLhZuKYXY4DaXGADdHg2KqmCvxMOvJj5QoFYOwdJ@vger.kernel.org
+X-Gm-Message-State: AOJu0YwM84WdMoEmpRt8nt16gSM3sk2eQZBBBOc75OevEBMISTqjaAL/
+	fS4+JLXKKDglHFgcF5WaYjM70ZjeQt+0ILAfP4qzp+e+PBGb9a8XN/4O
+X-Gm-Gg: ASbGncs9R7Fs/KUIhSCo15VaWSQxIcpj0uBJls8v7BXpbHqzQVqf7FTUlDFrUsnLsBx
+	S3aZ5wlYxQc44UTo910soVvWBzYUGcwxZ60+7aOzOWM1ufjocb1k2EUzQm3BTIE8/rF49c1bSAs
+	OUnTJv5v+el2DUPX7K2glGvWuXPyDBQl4khaUIFOwhyKwdz0u2ovBPsaJTdb5OdQUf5NVS2X6q4
+	YDwsldbbtKeiw/cBnAaQYsyguYzR7qXpEd8LHMgCgRd4OYQaLWLu+ez0w8KcY6/QHee/rIAjPdC
+	8gAJuahqrmmxNDZPMcEHIRtQJgnAmvrgmIbj6fvfcXKi80FaqfezJbiPCXr/wVpTIe+SDk74nSG
+	Y/4YWPSXVuYbnd7ncRm+ljtjx/2Hvyy5gixXx3hGd3BDADQ==
+X-Google-Smtp-Source: AGHT+IHXXWACYIKD7c9rR9mHheqiGtGC+EVeOl6sz8YYPHdaVFVb8PfTwyIPACMKE0hay46jeLFEYw==
+X-Received: by 2002:a17:903:1acf:b0:23d:d348:4567 with SMTP id d9443c01a7336-242c200e932mr6664255ad.19.1754603260952;
+        Thu, 07 Aug 2025 14:47:40 -0700 (PDT)
+Received: from t14s.localdomain ([167.249.65.29])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-241e8aa9257sm194961755ad.153.2025.08.07.14.47.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Aug 2025 14:47:40 -0700 (PDT)
+Received: by t14s.localdomain (Postfix, from userid 1000)
+	id 28EA610926F6; Thu, 07 Aug 2025 18:47:37 -0300 (-03)
+Date: Thu, 7 Aug 2025 18:47:37 -0300
+From: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+To: Xin Long <lucien.xin@gmail.com>
+Cc: network dev <netdev@vger.kernel.org>, linux-sctp@vger.kernel.org,
+	davem@davemloft.net, kuba@kernel.org,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+Subject: Re: [PATCH net] sctp: linearize cloned gso packets in sctp_rcv
+Message-ID: <aJUe-a8aMnIzNnsr@t14s.localdomain>
+References: <dd7dc337b99876d4132d0961f776913719f7d225.1754595611.git.lucien.xin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net 2/2] ice: fix NULL access of
- tx->in_use in ice_ll_ts_intr
-To: Jacob Keller <jacob.e.keller@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Intel Wired LAN <intel-wired-lan@lists.osuosl.org>, netdev@vger.kernel.org
-References: <20250807-jk-ice-fix-tx-tstamp-race-v1-0-730fe20bec11@intel.com>
- <20250807-jk-ice-fix-tx-tstamp-race-v1-2-730fe20bec11@intel.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20250807-jk-ice-fix-tx-tstamp-race-v1-2-730fe20bec11@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <dd7dc337b99876d4132d0961f776913719f7d225.1754595611.git.lucien.xin@gmail.com>
 
-Dear Jacob,
-
-
-Thank you for the patch.
-
-Am 07.08.25 um 19:35 schrieb Jacob Keller:
-> Recent versions of the E810 firmware have support for an extra interrupt to
-> handle report of the "low latency" Tx timestamps coming from the
-> specialized low latency firmware interface. Instead of polling the
-> registers, software can wait until the low latency interrupt is fired.
+On Thu, Aug 07, 2025 at 03:40:11PM -0400, Xin Long wrote:
+...
+> This patch fixes it by linearizing cloned gso packets in sctp_rcv().
 > 
-> This logic makes use of the Tx timestamp tracking structure, ice_ptp_tx, as
-> it uses the same "ready" bitmap to track which Tx timestamps.
+> Fixes: 90017accff61 ("sctp: Add GSO support")
+> Reported-by: syzbot+773e51afe420baaf0e2b@syzkaller.appspotmail.com
+> Reported-by: syzbot+70a42f45e76bede082be@syzkaller.appspotmail.com
+> Signed-off-by: Xin Long <lucien.xin@gmail.com>
 
-Is the last part “to track which Tx timestamps” complete?
-
-> Unfortunately, the ice_ll_ts_intr() function does not check if the
-> tracker is initialized before its first access. This results in NULL
-> dereference or use-after-free bugs similar to the issues fixed in the
-> ice_ptp_ts_irq() function.
-> 
-> Fix this by only checking the in_use bitmap (and other fields) if the
-> tracker is marked as initialized. The reset flow will clear the init field
-> under lock before it tears the tracker down, thus preventing any
-> use-after-free or NULL access.
-> 
-> Fixes: 82e71b226e0e ("ice: Enable SW interrupt from FW for LL TS")
-> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-> ---
->   drivers/net/ethernet/intel/ice/ice_main.c | 12 +++++++-----
->   1 file changed, 7 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-> index 8e0b06c1e02b..7b002127e40d 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_main.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_main.c
-> @@ -3176,12 +3176,14 @@ static irqreturn_t ice_ll_ts_intr(int __always_unused irq, void *data)
->   	hw = &pf->hw;
->   	tx = &pf->ptp.port.tx;
->   	spin_lock_irqsave(&tx->lock, flags);
-> -	ice_ptp_complete_tx_single_tstamp(tx);
-> +	if (tx->init) {
-> +		ice_ptp_complete_tx_single_tstamp(tx);
->   
-> -	idx = find_next_bit_wrap(tx->in_use, tx->len,
-> -				 tx->last_ll_ts_idx_read + 1);
-> -	if (idx != tx->len)
-> -		ice_ptp_req_tx_single_tstamp(tx, idx);
-> +		idx = find_next_bit_wrap(tx->in_use, tx->len,
-> +					 tx->last_ll_ts_idx_read + 1);
-> +		if (idx != tx->len)
-> +			ice_ptp_req_tx_single_tstamp(tx, idx);
-> +	}
->   	spin_unlock_irqrestore(&tx->lock, flags);
->   
->   	val = GLINT_DYN_CTL_INTENA_M | GLINT_DYN_CTL_CLEARPBA_M |
-> 
-
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-
-
-Kind regards,
-
-Paul
+Reviewed-by: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
 
