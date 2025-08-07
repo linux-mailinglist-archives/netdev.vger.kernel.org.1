@@ -1,140 +1,92 @@
-Return-Path: <netdev+bounces-212068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212067-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C2C5B1DAEE
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 17:44:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93DC2B1DAC1
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 17:27:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2415F189A3AF
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 15:45:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5429D3A5366
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 15:27:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0FA426A08D;
-	Thu,  7 Aug 2025 15:44:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59597266581;
+	Thu,  7 Aug 2025 15:27:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="PTYDDxAi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AGQQ+xCF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mslow3.mail.gandi.net (mslow3.mail.gandi.net [217.70.178.249])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0F71262FE6;
-	Thu,  7 Aug 2025 15:44:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.249
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2727379E1;
+	Thu,  7 Aug 2025 15:27:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754581481; cv=none; b=I+LiHAXXqixC1uaV0k2DJ6GF6ztthyAF/hq5PDAqipkjHWrCtcgY9QGF6jB/bcN6g58T8oTebAVHViyVw932kS91HHFEHLqZCndoizmLWZGcCCumvsChzlZKz23E4oO/aEHj5nrie85/KtMSmOnhNYC/aO25yTROVJYq4RxNQZs=
+	t=1754580421; cv=none; b=XvKmaaDcUVSMBvyyzPaGFZyDaAgwqpRufHdo08Bd76i35G0pb6WHRtZCTo8kMtNxN/lx/PLgPyqPZqV73LeLlvSgamM2cW4TutZecUP/ItD6FKXsyXbsFXTGhkM/NK44JoSskodbxeGAEWHXvosq6VqVNBT4W6bmiCn4Sc2i+l0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754581481; c=relaxed/simple;
-	bh=THm1SoEjdEMZZ7ysWdC8VuJNdis7fSw145Sks0ZuOMk=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
-	 References:In-Reply-To; b=dFPBVG+1yut28bDbR9srMQStUJDjsGxWa0Uf1/NZpCDZM3s5xz69iAgCM1iOcuM0a9V69+Xfv2IUbqgnsHeJ+1uGLdO4VC7nHRmW0tTS6/kA1HjVaXvxsPCA2qYajJP6A2fvEB4eYX5fq8xJAIoUb6qZKUfV9c9uolAVffKOoRo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=PTYDDxAi; arc=none smtp.client-ip=217.70.178.249
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::226])
-	by mslow3.mail.gandi.net (Postfix) with ESMTP id E2094580FE0;
-	Thu,  7 Aug 2025 15:24:23 +0000 (UTC)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 7485D442C7;
-	Thu,  7 Aug 2025 15:24:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1754580256;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=THm1SoEjdEMZZ7ysWdC8VuJNdis7fSw145Sks0ZuOMk=;
-	b=PTYDDxAiEqhcHNXakvzEAxIEHtOYnZg0O4FZmg+lsrI3Kn0+/Bup9nOQLSwIjEuQ74IbDk
-	v0Y4OmGGsVrpxb7SxSr0kE8n6MHXpPx0drRvkgtC0H5+6YpNE2K4iM3W0IrCR4FqtxXe/3
-	lvqGvaSsShseE/yzIXQvAsl9IpHOpc7XH+FNd7yGvE0o/UzD+sP73DN4yqsIcN598td+BA
-	9wGEewScVY9ZVVHA5gXjogHYetiBg21SOGk65rONj+2d1989bg7n/32xRMm3cF1vGmDkn4
-	Vn5hsAPPVdGu+daHKdj0yFYdc/je+xtTN5JrVh+Kr5l52rgKZ94cuB8XiD9z6g==
+	s=arc-20240116; t=1754580421; c=relaxed/simple;
+	bh=DKtBAt1he1GWqidXOcvcFrkHmeHlrduKhcDb4KsYqUM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fl5aYAG1CEAWEI+xuwr0kYlsnx1aC08w5Rjobxolf10yQLVhkvx+WaYrTtFUwyXu18MTGv6UopgEZ7rc0znQ40ojb5ZsJN9poTMIB1/AGu0UF6dCHyZlMMJQ7f4h9RWv0y5TzGAz+SOCE6JezKqiFrjSP0naV1dRbiWiob7uvgM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AGQQ+xCF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63763C4CEEB;
+	Thu,  7 Aug 2025 15:27:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754580420;
+	bh=DKtBAt1he1GWqidXOcvcFrkHmeHlrduKhcDb4KsYqUM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=AGQQ+xCFD6bRp6RgDSbTLx07O7SHFvVP2RBvVy0pDUmjcd6sHT2OYh2trUoSZV8kx
+	 VBaSkFd19A0hxzXfefzajUQjMlCsE2loeji1Nv9rgwTDYKYVt95LtQdU4Mc3vTZ7Ir
+	 iW+74tvYInVMa9ebubbo3RMTJPV1+066P+iANb1NM7xNOgYB0sndrWhfsdjSU/8tPl
+	 bKwXiHdICGZurh2GxCPPZAQj7fcg63paks2BmIRPuVx0V6hY78gB2AJDHwX1upFlXV
+	 8Gpve0YsUdoIdf5+g9Mu7XzsHasZ80OkSOLMR+v17j450i+LlOoTn/G+b25lUhT1W/
+	 O0orEl9RAPRTA==
+Date: Thu, 7 Aug 2025 08:26:59 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Aleksandr Nogikh <nogikh@google.com>
+Cc: dvyukov@google.com, linux-kernel-mentees@lists.linux.dev,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot ci] Re: net: Revert tx queue length on partial failure
+ in dev_qdisc_change_tx_queue_len()
+Message-ID: <20250807082659.5557e42b@kernel.org>
+In-Reply-To: <CANp29Y5mZJJgn5LYDiLx11bH__NXZ32ut6VUTsEyXwqrOhksTw@mail.gmail.com>
+References: <20250722100743.38914e9a@kernel.org>
+	<20250723162547.1395048-1-nogikh@google.com>
+	<20250723094720.3e41b6ed@kernel.org>
+	<20250807064116.6aa8e14f@kernel.org>
+	<CANp29Y5mZJJgn5LYDiLx11bH__NXZ32ut6VUTsEyXwqrOhksTw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Thu, 07 Aug 2025 17:24:13 +0200
-Message-Id: <DBWASGS8U4LN.1GMHL8A61VWU8@bootlin.com>
-Subject: Re: [PATCH net-next v2 12/18] net: macb: match skb_reserve(skb,
- NET_IP_ALIGN) with HW alignment
-Cc: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <linux-riscv@lists.infradead.org>,
- <linux-mips@vger.kernel.org>, "Thomas Petazzoni"
- <thomas.petazzoni@bootlin.com>, "Tawfik Bayouk"
- <tawfik.bayouk@mobileye.com>
-To: "Sean Anderson" <sean.anderson@linux.dev>, "Andrew Lunn"
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>, "Rob Herring" <robh@kernel.org>, "Krzysztof
- Kozlowski" <krzk+dt@kernel.org>, "Conor Dooley" <conor+dt@kernel.org>,
- "Nicolas Ferre" <nicolas.ferre@microchip.com>, "Claudiu Beznea"
- <claudiu.beznea@tuxon.dev>, "Paul Walmsley" <paul.walmsley@sifive.com>,
- "Palmer Dabbelt" <palmer@dabbelt.com>, "Albert Ou" <aou@eecs.berkeley.edu>,
- "Alexandre Ghiti" <alex@ghiti.fr>, "Samuel Holland"
- <samuel.holland@sifive.com>, "Richard Cochran" <richardcochran@gmail.com>,
- "Russell King" <linux@armlinux.org.uk>, "Thomas Bogendoerfer"
- <tsbogend@alpha.franken.de>, "Vladimir Kondratiev"
- <vladimir.kondratiev@mobileye.com>, "Gregory CLEMENT"
- <gregory.clement@bootlin.com>, "Cyrille Pitchen"
- <cyrille.pitchen@atmel.com>, "Harini Katakam" <harini.katakam@xilinx.com>,
- "Rafal Ozieblo" <rafalo@cadence.com>, "Haavard Skinnemoen"
- <hskinnemoen@atmel.com>
-From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-X-Mailer: aerc 0.20.1-0-g2ecb8770224a-dirty
-References: <20250627-macb-v2-0-ff8207d0bb77@bootlin.com>
- <20250627-macb-v2-12-ff8207d0bb77@bootlin.com>
- <1a4fe95a-f029-43b2-aed1-594365254b6a@linux.dev>
-In-Reply-To: <1a4fe95a-f029-43b2-aed1-594365254b6a@linux.dev>
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdduvdduvdekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpegggfgtfffkufevvffhofhfjgesthhqredtredtjeenucfhrhhomhepvfhhrohoucfnvggsrhhunhcuoehthhgvohdrlhgvsghruhhnsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeduteeltdevjedvkeelueejhfdvleeiueetvdfgveffffekueeghffhieduleejveenucffohhmrghinhepsghoohhtlhhinhdrtghomhenucfkphepvdgrtddumegtsgdugeemheehieemjegrtddtmeeiieegsgemfhdtfhhfmehfvgdutdemlegvfhgunecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgdugeemheehieemjegrtddtmeeiieegsgemfhdtfhhfmehfvgdutdemlegvfhgupdhhvghloheplhhotggrlhhhohhsthdpmhgrihhlfhhrohhmpehthhgvohdrlhgvsghruhhnsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeefvddprhgtphhtthhopehsvggrnhdrrghnuggvrhhsohhnsehlihhnuhigrdguvghvpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnv
- ghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehrohgshheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhriihkodgutheskhgvrhhnvghlrdhorhhg
-X-GND-Sasl: theo.lebrun@bootlin.com
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue Jul 1, 2025 at 6:40 PM CEST, Sean Anderson wrote:
-> On 6/27/25 05:08, Th=C3=A9o Lebrun wrote:
->> If HW is RSC capable, it cannot add dummy bytes at the start of IP
->
-> Receive-side coalescing? Can you add a brief description of this
-> feature to your commit message?
+On Thu, 7 Aug 2025 17:09:24 +0200 Aleksandr Nogikh wrote:
+> > One more thing, would it be possible to add / correct the DKIM on these
+> > messages? Looks like when our bots load the syzbot ci emails from lore
+> > the DKIM verification fails. I see a X-Google-DKIM-Signature: header,
+> > but no real DKIM-Signature:  
+> 
+> Thanks for letting us know!
+> Do these bots also face DKIM verification issues with regular syzbot
+> emails? We send them absolutely the same way, so the problem must
+> affect all reports.
 
-Yes that is Receive Side Coalescing. Clearly it needs to be mentioned
-out loud, and briefly described.
+I haven't checked, TBH, we don't have any automation for normal
+reports :( For the CI reports I was trying to hook them up to
+some actions, kick the patch out of our test branch unless human
+confirms that the report is a false positive.
 
->> packets. Alignment (ie number of dummy bytes) is configured using the
->> RBOF field inside the NCFGR register.
->>=20
->> On the software side, the skb_reserve(skb, NET_IP_ALIGN) call must only
->> be done if those dummy bytes are added by the hardware; notice the
->> skb_reserve() is done AFTER writing the address to the device.
->>=20
->> We cannot do the skb_reserve() call BEFORE writing the address because
->> the address field ignores the low 2/3 bits. Conclusion: in some cases,
->> we risk not being able to respect the NET_IP_ALIGN value (which is
->> picked based on unaligned CPU access performance).
->>=20
->> Fixes: 4df95131ea80 ("net/macb: change RX path for GEM")
->
-> Do any existing MACBs support RSC? Is this a fix?=20
-
-I have no idea. If any MACB supports RSC, it must be those running with
-NET_IP_ALIGN=3D0, so arm64/powerpc/x86.
-
-Is it a fix? We can guess that all boards fall in either category:
- - Don't support RSC (=3D> RBOF works fine).
- - Support RSC (=3D> RBOF not working) AND NET_IP_ALIGN=3D0.
-
-Both of those are not impacted, so we technically don't fix anything for
-current users.
-
-Regards,
-
---
-Th=C3=A9o Lebrun, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
-
+> We use the GAE Mail API, and its documentation[1] says that it signs
+> emails with DKIM only if a custom domain is configured. Since we send
+> from the default GAE domain, this would explain the verification
+> failures.
+> 
+> We'll explore the ways to fix this.
+> 
+> [1] https://cloud.google.com/appengine/docs/standard/services/mail?tab=go#authentication_with_domainkeys_identified_mail_dkim
 
