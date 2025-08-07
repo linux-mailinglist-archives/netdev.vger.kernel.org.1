@@ -1,240 +1,186 @@
-Return-Path: <netdev+bounces-212077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212078-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 923CFB1DC4F
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 19:06:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BE8FB1DC7B
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 19:33:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 638307B2461
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 17:04:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9C08727A6E
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 17:33:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38AA5272E6B;
-	Thu,  7 Aug 2025 17:05:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA2E626E715;
+	Thu,  7 Aug 2025 17:33:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HfGb6W4c"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f78.google.com (mail-io1-f78.google.com [209.85.166.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54BD813E02D
-	for <netdev@vger.kernel.org>; Thu,  7 Aug 2025 17:05:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA68726D4C6;
+	Thu,  7 Aug 2025 17:33:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754586341; cv=none; b=GgXmsOjK3YW+BeLdvh1xrV8jcxhQlvAeGv5CygIEYLE+A4VQNMbL+VQ89NyhNxLwdusShoCPAfY0ykPbaWjUKgIIZxZ6U4BuKXnnxESMzVKsa1mV9o2jBV2bOyxDi1que7T+TdgwsrFS7WTSrBgn6k9vqWme37ydMDnJ5OvlVrg=
+	t=1754587988; cv=none; b=k4NfyV/IYqIAM33rWo3RaGo/vx1czTcTzASXGnsFE7JWtVYgNptupoAV9C+vzqVGY0RkZ27+6CvzbO8mmxl7lc9dHnXFwk/w5DzQ0gikESZ2qHAGpkSEoK7S8WbWhNc4qECtzJSs6LZwfKMtaCLlELawAYneaUE82WB/MqKC60Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754586341; c=relaxed/simple;
-	bh=OpH+VmOWTeWlhHyubUOQO8A9ywraJL0gvONVJ6EW2QU=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ZnCTok20to2MWgqkudLo4Db1U5UAj7ynorfSmE5TN4ZGlG0KVVUG3v2xhapCnCkeixoft7Ed84Rwv9sDs/8NzFrWRwpZ8Xwp1+D7d0Z20/kUkyaF7UPEBk4yDr97KpD3XnmcPYhsP5kAFbLgMX2skoPEWQwAkurfv/QnpFx7hgk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f78.google.com with SMTP id ca18e2360f4ac-88177c70d63so122894539f.1
-        for <netdev@vger.kernel.org>; Thu, 07 Aug 2025 10:05:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754586338; x=1755191138;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3hbCc7AtsWdvPIjN+0jmVfB8z9Bo/thEn64rIMH7468=;
-        b=woA80bQ/FsiK+YjbK0Ly8cTbBZoyrcgS1/4b9A69JK/nKgdO7DKlZOspbatO4Tz7/M
-         RNHVLc3EdDnazV49osuescuHqhfwPGlJmIUiM2wEuZVVjLdJpU21OhV18cWc0wzL83I0
-         vk9G8KExLuqji57EyKm25K9+8UAvfN+HVN1qWpg6THs/9sH8poBMagiejuO3KgXkMtaF
-         qv5KsohNd4G6f6SmCOUzizkWEXtBSoYexq0lf5xiKWfZBHwz3jyYaeT8hg/zu2E8hCxh
-         OfaSwzaiHKQQslzxD2Zut+FsxCRwNKincMPOFV7ryq9UnSLMH8gsulq9BVlpSHUdCeCa
-         HONA==
-X-Forwarded-Encrypted: i=1; AJvYcCV4ZMW8ONj7LufnybhTsuQizQK4nY9CS25StsHe/7ztTeSuDuOqH9qo79uah9iV4gCRji5qSF0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyj02hbPzA5z+82cGaSWknEAeSW3NgJ8zHlwY3zg3CgCrOTXcvW
-	YznBdt4+igz3RfCwOV62PX7yvCvkT2pYs9tx8DrZqEAui3JonOrRAOZcNPpuvbfP8VXLdCDuMyn
-	1KiuXXxPRAGh9x5fqSAU+2lu/wNKdlnMEfIycob1DlbQdFQp8XKzy3QL997k=
-X-Google-Smtp-Source: AGHT+IH1KGwvGGy0CInwIkKFH4HCXYyl4wJsDnDAR5a7oRQ30bh0MGlNXDCmFVS59wvwzE54ujQ4e9nvwiJ8BfG3cCIVq2C2Gn9b
+	s=arc-20240116; t=1754587988; c=relaxed/simple;
+	bh=DZ6NOr0ehfLg9BnUOTsa6g/71Hf2SIfO/iwKjdaAA7w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=S1426LPeP9902RTZ/iO/ZWzvKAq9tR5r/lMpf4uf0gf8VeMprVQG1iKe03jZyYiJtTpvW/ikssAjrBf/lPvJiqWosDvXCPr9NQMRRb1wvC8Z6bXbPUdI15/COfRSHdnddiHj5a6g2NvQj77KiG0/v+EU5/uSF37PQyD71fGQ64M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HfGb6W4c; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1754587987; x=1786123987;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=DZ6NOr0ehfLg9BnUOTsa6g/71Hf2SIfO/iwKjdaAA7w=;
+  b=HfGb6W4cV7tylg5cGCKpjPtE/1n0kZZXln2BCdauEOOzq7u3WLvNjVyN
+   a2XvGk35jCAL5FLQTZaLLRnLuLCxwDRpu/LcdXPg2/aA5LKjiE0D+hhjh
+   bBCyTA7Ja96tZdv6F7XG/l061PoGdOgitJK1xXoRMAhCrn12SRnCfNYd0
+   +Cx5Ddv5fAe6p6EHWdFU/28LitpmKvsHoM/AC660jQO8U1baiPnl1Wf3K
+   RZlqDJLvCcNXlEkv8lXpRX87a/HYf8NzpGKXgBZPPAVOl4y6R2brWc8RR
+   CcjChceJwjuLoFegaTa1l54kVUfKhU+Hy4mBlYSPXfQGwyetlrKP/V0GA
+   Q==;
+X-CSE-ConnectionGUID: Q4y2qtGbTB+ibtPDnQX2Jg==
+X-CSE-MsgGUID: 5UHDbTKzQcSvn44oqzlRLA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11514"; a="67524295"
+X-IronPort-AV: E=Sophos;i="6.17,271,1747724400"; 
+   d="scan'208";a="67524295"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2025 10:33:06 -0700
+X-CSE-ConnectionGUID: Mtwx5TdMQy6/jwJ7WC8qBg==
+X-CSE-MsgGUID: GbNqTIhZQ2KbqsOwRT42hQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,271,1747724400"; 
+   d="scan'208";a="164367144"
+Received: from lkp-server02.sh.intel.com (HELO 4ea60e6ab079) ([10.239.97.151])
+  by orviesa010.jf.intel.com with ESMTP; 07 Aug 2025 10:33:02 -0700
+Received: from kbuild by 4ea60e6ab079 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uk4U2-000338-31;
+	Thu, 07 Aug 2025 17:32:59 +0000
+Date: Fri, 8 Aug 2025 01:32:12 +0800
+From: kernel test robot <lkp@intel.com>
+To: Menglong Dong <menglong8.dong@gmail.com>, idosch@idosch.org
+Cc: oe-kbuild-all@lists.linux.dev, dsahern@kernel.org,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	sdf@fomichev.me, kuniyu@google.com, ahmed.zaki@intel.com,
+	aleksander.lobakin@intel.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2] net: vrf: don't down the interface when add
+ slave
+Message-ID: <202508080147.1G52KerV-lkp@intel.com>
+References: <20250807055634.113753-1-dongml2@chinatelecom.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:1589:b0:87c:72f3:d5d7 with SMTP id
- ca18e2360f4ac-8819f193dcemr1537872439f.13.1754586338204; Thu, 07 Aug 2025
- 10:05:38 -0700 (PDT)
-Date: Thu, 07 Aug 2025 10:05:38 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6894dce2.050a0220.7f033.0049.GAE@google.com>
-Subject: [syzbot] [net?] [nfc?] KMSAN: uninit-value in nci_dev_up (2)
-From: syzbot <syzbot+740e04c2a93467a0f8c8@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	krzk@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250807055634.113753-1-dongml2@chinatelecom.cn>
 
-Hello,
+Hi Menglong,
 
-syzbot found the following issue on:
+kernel test robot noticed the following build warnings:
 
-HEAD commit:    89748acdf226 Merge tag 'drm-next-2025-08-01' of https://gi..
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=165cfcf0580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=7ff65239b4835001
-dashboard link: https://syzkaller.appspot.com/bug?extid=740e04c2a93467a0f8c8
-compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10b88042580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=115cfcf0580000
+[auto build test WARNING on net-next/main]
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/ce090dd92dc2/disk-89748acd.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/32b5903a7759/vmlinux-89748acd.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/dc68a867773d/bzImage-89748acd.xz
+url:    https://github.com/intel-lab-lkp/linux/commits/Menglong-Dong/net-vrf-don-t-down-the-interface-when-add-slave/20250807-140407
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20250807055634.113753-1-dongml2%40chinatelecom.cn
+patch subject: [PATCH net-next v2] net: vrf: don't down the interface when add slave
+config: arc-randconfig-001-20250808 (https://download.01.org/0day-ci/archive/20250808/202508080147.1G52KerV-lkp@intel.com/config)
+compiler: arc-linux-gcc (GCC) 14.3.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250808/202508080147.1G52KerV-lkp@intel.com/reproduce)
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+740e04c2a93467a0f8c8@syzkaller.appspotmail.com
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202508080147.1G52KerV-lkp@intel.com/
 
-=====================================================
-BUG: KMSAN: uninit-value in nci_init_req net/nfc/nci/core.c:177 [inline]
-BUG: KMSAN: uninit-value in __nci_request net/nfc/nci/core.c:108 [inline]
-BUG: KMSAN: uninit-value in nci_open_device net/nfc/nci/core.c:521 [inline]
-BUG: KMSAN: uninit-value in nci_dev_up+0x13a2/0x1ba0 net/nfc/nci/core.c:632
- nci_init_req net/nfc/nci/core.c:177 [inline]
- __nci_request net/nfc/nci/core.c:108 [inline]
- nci_open_device net/nfc/nci/core.c:521 [inline]
- nci_dev_up+0x13a2/0x1ba0 net/nfc/nci/core.c:632
- nfc_dev_up+0x201/0x3d0 net/nfc/core.c:118
- nfc_genl_dev_up+0xe9/0x1c0 net/nfc/netlink.c:775
- genl_family_rcv_msg_doit+0x335/0x3f0 net/netlink/genetlink.c:1115
- genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
- genl_rcv_msg+0xacf/0xc10 net/netlink/genetlink.c:1210
- netlink_rcv_skb+0x54a/0x680 net/netlink/af_netlink.c:2552
- genl_rcv+0x41/0x60 net/netlink/genetlink.c:1219
- netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
- netlink_unicast+0xf04/0x12b0 net/netlink/af_netlink.c:1346
- netlink_sendmsg+0x10b3/0x1250 net/netlink/af_netlink.c:1896
- sock_sendmsg_nosec net/socket.c:714 [inline]
- __sock_sendmsg+0x333/0x3d0 net/socket.c:729
- ____sys_sendmsg+0x7e0/0xd80 net/socket.c:2614
- ___sys_sendmsg+0x271/0x3b0 net/socket.c:2668
- __sys_sendmsg net/socket.c:2700 [inline]
- __do_sys_sendmsg net/socket.c:2705 [inline]
- __se_sys_sendmsg net/socket.c:2703 [inline]
- __x64_sys_sendmsg+0x211/0x3e0 net/socket.c:2703
- x64_sys_call+0x1dfd/0x3e20 arch/x86/include/generated/asm/syscalls_64.h:47
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xd9/0x210 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+All warnings (new ones prefixed by >>):
 
-Uninit was stored to memory at:
-------------[ cut here ]------------
-WARNING: CPU: 1 PID: 6169 at kernel/stacktrace.c:29 stack_trace_print+0xd4/0xf0 kernel/stacktrace.c:29
-Modules linked in:
-CPU: 1 UID: 0 PID: 6169 Comm: syz-executor421 Not tainted 6.16.0-syzkaller-10499-g89748acdf226 #0 PREEMPT(none) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
-RIP: 0010:stack_trace_print+0xd4/0xf0 kernel/stacktrace.c:29
-Code: 8f bc 03 92 89 de ba 20 00 00 00 4c 89 e1 e8 c3 5d 4d ff 49 83 c6 08 49 ff cd 0f 85 6e ff ff ff eb 0b e8 ff 26 c3 00 eb d4 90 <0f> 0b 90 5b 41 5c 41 5d 41 5e 41 5f 5d e9 9a 33 07 0f cc 66 0f 1f
-RSP: 0018:ffff8881343b31c8 EFLAGS: 00010246
-RAX: ffff888114afac20 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: ffff8881343b31f0 R08: 0000000000000000 R09: 0000000000000000
-R10: ffff888133bb3208 R11: 0000000000000001 R12: 0000000000000000
-R13: 00000000abcd0100 R14: 0000000000000000 R15: 0000000000000000
-FS:  00007f0c264ae6c0(0000) GS:ffff8881aa9a5000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f0c26531650 CR3: 00000001193c6000 CR4: 00000000003526f0
-Call Trace:
- <TASK>
- kmsan_print_origin+0xb0/0x340 mm/kmsan/report.c:133
- kmsan_report+0x1d3/0x320 mm/kmsan/report.c:196
- __msan_warning+0x1b/0x30 mm/kmsan/instrumentation.c:315
- nci_init_req net/nfc/nci/core.c:177 [inline]
- __nci_request net/nfc/nci/core.c:108 [inline]
- nci_open_device net/nfc/nci/core.c:521 [inline]
- nci_dev_up+0x13a2/0x1ba0 net/nfc/nci/core.c:632
- nfc_dev_up+0x201/0x3d0 net/nfc/core.c:118
- nfc_genl_dev_up+0xe9/0x1c0 net/nfc/netlink.c:775
- genl_family_rcv_msg_doit+0x335/0x3f0 net/netlink/genetlink.c:1115
- genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
- genl_rcv_msg+0xacf/0xc10 net/netlink/genetlink.c:1210
- netlink_rcv_skb+0x54a/0x680 net/netlink/af_netlink.c:2552
- genl_rcv+0x41/0x60 net/netlink/genetlink.c:1219
- netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
- netlink_unicast+0xf04/0x12b0 net/netlink/af_netlink.c:1346
- netlink_sendmsg+0x10b3/0x1250 net/netlink/af_netlink.c:1896
- sock_sendmsg_nosec net/socket.c:714 [inline]
- __sock_sendmsg+0x333/0x3d0 net/socket.c:729
- ____sys_sendmsg+0x7e0/0xd80 net/socket.c:2614
- ___sys_sendmsg+0x271/0x3b0 net/socket.c:2668
- __sys_sendmsg net/socket.c:2700 [inline]
- __do_sys_sendmsg net/socket.c:2705 [inline]
- __se_sys_sendmsg net/socket.c:2703 [inline]
- __x64_sys_sendmsg+0x211/0x3e0 net/socket.c:2703
- x64_sys_call+0x1dfd/0x3e20 arch/x86/include/generated/asm/syscalls_64.h:47
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xd9/0x210 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f0c264f62c9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 01 1a 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f0c264ae218 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007f0c2657f368 RCX: 00007f0c264f62c9
-RDX: 0000000000000000 RSI: 0000200000000140 RDI: 0000000000000004
-RBP: 00007f0c2657f360 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007f0c2654c074
-R13: 0000200000000150 R14: 00002000000000c0 R15: 0000200000000300
- </TASK>
----[ end trace 0000000000000000 ]---
-
-Uninit was stored to memory at:
- nci_core_reset_ntf_packet net/nfc/nci/ntf.c:36 [inline]
- nci_ntf_packet+0x179d/0x42b0 net/nfc/nci/ntf.c:812
- nci_rx_work+0x403/0x750 net/nfc/nci/core.c:1555
- process_one_work kernel/workqueue.c:3236 [inline]
- process_scheduled_works+0xb8e/0x1d80 kernel/workqueue.c:3319
- worker_thread+0xedf/0x1590 kernel/workqueue.c:3400
- kthread+0xd5c/0xf00 kernel/kthread.c:464
- ret_from_fork+0x1e0/0x310 arch/x86/kernel/process.c:148
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
-Uninit was created at:
- slab_post_alloc_hook mm/slub.c:4186 [inline]
- slab_alloc_node mm/slub.c:4229 [inline]
- kmem_cache_alloc_node_noprof+0x818/0xf00 mm/slub.c:4281
- kmalloc_reserve+0x13c/0x4b0 net/core/skbuff.c:578
- __alloc_skb+0x347/0x7d0 net/core/skbuff.c:669
- alloc_skb include/linux/skbuff.h:1336 [inline]
- virtual_ncidev_write+0x6b/0x430 drivers/nfc/virtual_ncidev.c:120
- vfs_write+0x463/0x1580 fs/read_write.c:684
- ksys_write fs/read_write.c:738 [inline]
- __do_sys_write fs/read_write.c:749 [inline]
- __se_sys_write fs/read_write.c:746 [inline]
- __x64_sys_write+0x1fb/0x4d0 fs/read_write.c:746
- x64_sys_call+0x3014/0x3e20 arch/x86/include/generated/asm/syscalls_64.h:2
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xd9/0x210 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-CPU: 1 UID: 0 PID: 6169 Comm: syz-executor421 Tainted: G        W           6.16.0-syzkaller-10499-g89748acdf226 #0 PREEMPT(none) 
-Tainted: [W]=WARN
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
-=====================================================
+   net/core/lock_debug.c: In function 'netdev_debug_event':
+>> net/core/lock_debug.c:20:9: warning: enumeration value 'NETDEV_VRF_MASTER' not handled in switch [-Wswitch]
+      20 |         switch (cmd) {
+         |         ^~~~~~
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+vim +/NETDEV_VRF_MASTER +20 net/core/lock_debug.c
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  11  
+1901066aab7654 net/core/lock_debug.c     Stanislav Fomichev 2025-04-01  12  int netdev_debug_event(struct notifier_block *nb, unsigned long event,
+1901066aab7654 net/core/lock_debug.c     Stanislav Fomichev 2025-04-01  13  		       void *ptr)
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  14  {
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  15  	struct net_device *dev = netdev_notifier_info_to_dev(ptr);
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  16  	struct net *net = dev_net(dev);
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  17  	enum netdev_cmd cmd = event;
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  18  
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  19  	/* Keep enum and don't add default to trigger -Werror=switch */
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04 @20  	switch (cmd) {
+22cbc1ee268b7e net/core/lock_debug.c     Jakub Kicinski     2025-04-15  21  	case NETDEV_XDP_FEAT_CHANGE:
+22cbc1ee268b7e net/core/lock_debug.c     Jakub Kicinski     2025-04-15  22  		netdev_assert_locked(dev);
+22cbc1ee268b7e net/core/lock_debug.c     Jakub Kicinski     2025-04-15  23  		fallthrough;
+cb7103298d1c5d net/core/lock_debug.c     Jakub Kicinski     2025-04-10  24  	case NETDEV_CHANGE:
+1901066aab7654 net/core/lock_debug.c     Stanislav Fomichev 2025-04-01  25  	case NETDEV_REGISTER:
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  26  	case NETDEV_UP:
+1901066aab7654 net/core/lock_debug.c     Stanislav Fomichev 2025-04-01  27  		netdev_ops_assert_locked(dev);
+1901066aab7654 net/core/lock_debug.c     Stanislav Fomichev 2025-04-01  28  		fallthrough;
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  29  	case NETDEV_DOWN:
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  30  	case NETDEV_REBOOT:
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  31  	case NETDEV_UNREGISTER:
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  32  	case NETDEV_CHANGEMTU:
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  33  	case NETDEV_CHANGEADDR:
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  34  	case NETDEV_PRE_CHANGEADDR:
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  35  	case NETDEV_GOING_DOWN:
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  36  	case NETDEV_FEAT_CHANGE:
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  37  	case NETDEV_BONDING_FAILOVER:
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  38  	case NETDEV_PRE_UP:
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  39  	case NETDEV_PRE_TYPE_CHANGE:
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  40  	case NETDEV_POST_TYPE_CHANGE:
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  41  	case NETDEV_POST_INIT:
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  42  	case NETDEV_PRE_UNINIT:
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  43  	case NETDEV_RELEASE:
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  44  	case NETDEV_NOTIFY_PEERS:
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  45  	case NETDEV_JOIN:
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  46  	case NETDEV_CHANGEUPPER:
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  47  	case NETDEV_RESEND_IGMP:
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  48  	case NETDEV_PRECHANGEMTU:
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  49  	case NETDEV_CHANGEINFODATA:
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  50  	case NETDEV_BONDING_INFO:
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  51  	case NETDEV_PRECHANGEUPPER:
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  52  	case NETDEV_CHANGELOWERSTATE:
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  53  	case NETDEV_UDP_TUNNEL_PUSH_INFO:
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  54  	case NETDEV_UDP_TUNNEL_DROP_INFO:
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  55  	case NETDEV_CHANGE_TX_QUEUE_LEN:
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  56  	case NETDEV_CVLAN_FILTER_PUSH_INFO:
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  57  	case NETDEV_CVLAN_FILTER_DROP_INFO:
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  58  	case NETDEV_SVLAN_FILTER_PUSH_INFO:
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  59  	case NETDEV_SVLAN_FILTER_DROP_INFO:
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  60  	case NETDEV_OFFLOAD_XSTATS_ENABLE:
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  61  	case NETDEV_OFFLOAD_XSTATS_DISABLE:
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  62  	case NETDEV_OFFLOAD_XSTATS_REPORT_USED:
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  63  	case NETDEV_OFFLOAD_XSTATS_REPORT_DELTA:
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  64  		ASSERT_RTNL();
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  65  		break;
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  66  
+be94cfdb993ff0 net/core/rtnl_net_debug.c Kuniyuki Iwashima  2025-01-15  67  	case NETDEV_CHANGENAME:
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  68  		ASSERT_RTNL_NET(net);
+be94cfdb993ff0 net/core/rtnl_net_debug.c Kuniyuki Iwashima  2025-01-15  69  		break;
+be94cfdb993ff0 net/core/rtnl_net_debug.c Kuniyuki Iwashima  2025-01-15  70  	}
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  71  
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  72  	return NOTIFY_DONE;
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  73  }
+1901066aab7654 net/core/lock_debug.c     Stanislav Fomichev 2025-04-01  74  EXPORT_SYMBOL_NS_GPL(netdev_debug_event, "NETDEV_INTERNAL");
+03fa534856593b net/core/rtnl_net_debug.c Kuniyuki Iwashima  2024-10-04  75  
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
