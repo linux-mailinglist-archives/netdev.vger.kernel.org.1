@@ -1,189 +1,142 @@
-Return-Path: <netdev+bounces-212053-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212054-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3397B1D8A8
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 15:11:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A083AB1D8BF
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 15:15:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7BCA43B56D0
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 13:11:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60D19724146
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 13:15:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B98A259CA7;
-	Thu,  7 Aug 2025 13:11:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 950F6252900;
+	Thu,  7 Aug 2025 13:15:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="FK1nzQ7h"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q+NQsCx2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AE0B214813;
-	Thu,  7 Aug 2025 13:11:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2146191F84;
+	Thu,  7 Aug 2025 13:15:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754572308; cv=none; b=dLdAOcF+1Wy9shSLizxlDNIZ8PmL+IcFXMuXZeDnGWazd5QAUdHr+WVWkXxFTmq8LVrLtpuvDwJeJQgUVRob4k69/6Wcck87Re7LpQv9plmMSVzZIx7+cxrZPuYXbkr/4oSnrqTsAKFzNGfpNRJ8WjG84Vm9xcloU29/d/TUcVI=
+	t=1754572545; cv=none; b=K4zOl+rr9x2TmGHJbt8QO1cgoxjx3Y1DxE0dIywFJIGF1XepYVcW6xI/dHWnAW5vzy5fl2KLy8eAIdccK+zrRs28PIpFa6+s1yzvWIEShN4qoTEcdKy7fGSAE2z31JqWBmyr9fmCaGvlcbc2zdTDDjzAgLL+vIh5RNKdduU0Fcw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754572308; c=relaxed/simple;
-	bh=m26lHftS7IlP7iMGha5zcOVxy2cQ5Y4OefzgkzmDR7k=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=R3IdiuXbUd5P4Y7+DCESIRSOFbmJIqBQN+YQ3lU/N/mwGpVxenlM0VrFnKYZdk2w2GEv6kLU/clf0bvEh52hnEIhjRADGOSZXRAEAW5nNpvlmPN5SWzeKi3BdNBFZ3O5IfsWJ8PiBIo9F4zj/Mi74jraHf4a3oOnDeNcQ4yryd0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=FK1nzQ7h; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5776AYew021685;
-	Thu, 7 Aug 2025 13:11:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=pp1; bh=Hq6l2Vqaq2ClYP24fuqKUawfQczgoqoysESf8KFRt
-	i0=; b=FK1nzQ7hyINYu6PIQ6E99KsFxdmJkNbl3Rl7REfZVeB9Iaw2XadFFNHbB
-	y7CMqFWHFeQDs3gZu6zAqs9VZxFyS9V5S5StF5350uhg8g/WRaIj0xGciMPSLzEV
-	t0ib8lckmzkn8e8Mj84K5F4zbPaSliJ/5x4x0MBbThLt7N2l2HEBOyZms6mx38Iq
-	+ZHQTBkN1AGytgp1WGS/tjNYG1p3fCzbT7CItEaEaocswNHdHIFppagG+nzLcVfv
-	px2dx6PNEhduOXv0npgxONkApz799J3Wgsq4L52n5C44S+R2GCZaT8PmrV95ZSc9
-	APvsZJw4ByRMzd1GK0YRxBmMj5j9g==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48bq63a48s-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 07 Aug 2025 13:11:36 +0000 (GMT)
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 577D9gQ0011197;
-	Thu, 7 Aug 2025 13:11:35 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48bq63a48p-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 07 Aug 2025 13:11:35 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5779eev2022647;
-	Thu, 7 Aug 2025 13:11:34 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 48bpwqgqtr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 07 Aug 2025 13:11:34 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 577DBVJv53150180
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 7 Aug 2025 13:11:31 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E889920043;
-	Thu,  7 Aug 2025 13:11:30 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B4D3A20040;
-	Thu,  7 Aug 2025 13:11:30 +0000 (GMT)
-Received: from tuxmaker.lnxne.boe (unknown [9.152.85.9])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  7 Aug 2025 13:11:30 +0000 (GMT)
-From: Gerd Bayer <gbayer@linux.ibm.com>
-To: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-        Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
-        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Moshe Shemesh <moshe@nvidia.com>, Shay Drori <shayd@nvidia.com>
-Cc: Niklas Schnelle <schnelle@linux.ibm.com>,
-        Alexandra Winter <wintera@linux.ibm.com>,
-        Gerd Bayer <gbayer@linux.ibm.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Yuanyuan Zhong <yzhong@purestorage.com>,
-        Mohamed Khalfella <mkhalfella@purestorage.com>, netdev@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH net] net/mlx5: Avoid deadlock between PCI error recovery and health reporter
-Date: Thu,  7 Aug 2025 15:11:30 +0200
-Message-ID: <20250807131130.4056349-1-gbayer@linux.ibm.com>
-X-Mailer: git-send-email 2.48.1
+	s=arc-20240116; t=1754572545; c=relaxed/simple;
+	bh=PC1Qx3ySQrnwhSPp6gHnIParaisBxDPrG26FiRlnL0g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=oh7y+s+tmVMB7xfElRJgkRH/OqUMIAfVouLdn4sb9Df/gbaFNGaaEJBfD5c0ziFNB/R8tNLB66TgEAhYXVBCiRVW78Jy6QKIC6EMpOXRR/SMNR6Gf9uXodYOm5fEpFZzx9ZQWJadJhLqZaktEVl7nZdf2rQa1sExfF4V3CARkoE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q+NQsCx2; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-459d62184c9so6410405e9.1;
+        Thu, 07 Aug 2025 06:15:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1754572542; x=1755177342; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=T/Elo2MUTB6Vn1PUhDPXwkwYqbWpk8OjBvFLAxfq4Wg=;
+        b=Q+NQsCx2tpiY8T5Lj8o2CkVDDRLeLjKdixsRgqq3PNc3RVoT7Qe0J54+nvGUGHDkf7
+         tp9YqoMNPnxv0qEPsKIzexZmCQ7EhQ8nzh0ZIIecajSB0ErG9DsLmCh6U6Ek7aB0WZPS
+         aPau0L92+/Ah5CNavlDQctIk92n8yA6TA4+ie8qy+ejzA0DYZOKCmL1wGyzy4c0FSB4K
+         wAz8br5EVxwr6KmPGSW9ypUZN7nbc5cvGvfYw6T/48RVRFEH7EqUT7Dm+46JR6b7x58L
+         1niKjjYD38BWBG+XxDFHScYnBwo4eLoevoAnK9bY5WJnMMc8w6b0mNYQE0lfEjz1qZaF
+         WqLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754572542; x=1755177342;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=T/Elo2MUTB6Vn1PUhDPXwkwYqbWpk8OjBvFLAxfq4Wg=;
+        b=DEWOB0MQ5pP1XGubzqpVYb7Clp7+eI4Rk3V3K10D5idswWxmcvnGyFFyKG34aG/GsM
+         I4qjeXz3bt788qQ+nKvD8OPzx+EIjmU36w1NwNAUM4Cyo+6cVTRD0OYPyIcHU6os2xaO
+         qwJi35bY3u5sP55+5mXQt4r6DnHyBRMopW72IS6abCxySlLQkK097ax5Y6u07cwmuSid
+         FmaeaW5LoQvzMx2t6fONX+BKCa7DGLtfFdSTzF19umWOtTS/NUjGYGcM0BLu5MkaZG1q
+         DTiNh2ycQzVhN7Ws4eNCs6L0+Yl+E7VCu9Bozg529iWYTGSNe07EQuhwv/huxPYI9LNc
+         bpyw==
+X-Forwarded-Encrypted: i=1; AJvYcCViu/CY8C9smQvyafzIT1mRHPOEwOmMhn0qldJ9qyeffh6gAnrOpPJma6cwDOngPMC0Yo08wEbdccXdS5c=@vger.kernel.org, AJvYcCWLbivOBithsbLlsL87p+t+H8913Jsr8AXhMlE5rgZLe/TxmwHs2haTmKW+VLj+AaEvUEz5tD68@vger.kernel.org
+X-Gm-Message-State: AOJu0YwO2/4TDZZyWwPd9bxhxYPfK76xbenPh1m2HUafRmoiY835zwV2
+	HBprFRJJjATxt9lAx+jRXbiI37DFdph0snc6tfeV8vQttW6uqrW+yh7/bwH3r8ENl0jTyg==
+X-Gm-Gg: ASbGncsYQsM79f6iUQx/IKAIZJWFbNOXXg8zwW4S0aunGev4UK8lgSB2ZeIHdWm0hvl
+	OboSQrQQ0ej72tJuUDEQsScr+9RdYp2vvMx6C5F12hk3KEZqnPizjdug1JYUzpNKHr1fEyo+Jtu
+	TT0L27znsiypezCzOo8fvyZWosafAMl7+t0rIzMAxzWaG6/3Qy+gK6iuTzRR53AU2feDmZyOU4z
+	ozdNCM52o0QdCtYoJSCv5rPByikKHF8z4JgF20lO3qjDbT79CgmUo/NQ2bB2ClGobhYfjxW1e+l
+	BD4V4hb0HoSXV0pbs1Agzl+8+rR3urJ/xpcJWyBJjkdQ2ipaRvSYxcoXNo9fUEChnWgZSeHop2J
+	0r4Y9hTIrZQE8+arf0ZkBq3+qkRYA6hs=
+X-Google-Smtp-Source: AGHT+IHBZX8/gLxxU0sgoAYhuaC8Y6Xs0eg1d+9FmJDYjXwojNuHv2mfe+sV59j/bpFM8jIHAiU21w==
+X-Received: by 2002:a05:600c:4e8c:b0:459:d709:e5b0 with SMTP id 5b1f17b1804b1-459e707b412mr57851895e9.5.1754572541674;
+        Thu, 07 Aug 2025 06:15:41 -0700 (PDT)
+Received: from localhost ([87.254.0.133])
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-3b79c453aeasm27736616f8f.40.2025.08.07.06.15.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Aug 2025 06:15:41 -0700 (PDT)
+From: Colin Ian King <colin.i.king@gmail.com>
+To: Frank <Frank.Sae@motor-comm.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Cc: kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] net: phy: motorcomm: make const array mac_addr_reg static
+Date: Thu,  7 Aug 2025 14:15:04 +0100
+Message-ID: <20250807131504.463704-1-colin.i.king@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=NInV+16g c=1 sm=1 tr=0 ts=6894a608 cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
- a=2OwXVqhp2XgA:10 a=sWKEhP36mHoA:10 a=VnNF1IyMAAAA:8 a=bw0WNZ3Bkwh0Ihv45_YA:9
-X-Proofpoint-GUID: uvjlW20QgFidYsL1fE9SvzET59v4Ld5R
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODA3MDEwMyBTYWx0ZWRfX/MXrqH9WlIQp
- lWNNAcnNoBsqPjhog3y1ehaA3BpAZW3FR1q9mHd8IJwYPgKuKYt24A/Hj6NS9Me8Ud7O0wUImCF
- sfvZqWzt1mU+ybNt9Qk3GXEy7YqW/m/zYQZaWzvHYuqB+ZISkxr9tu/7Y4mEAyUab6Q3+xx3eN9
- UtpYcT9FjHTPGyW2Jn4gMs3fVJ++FI9Jj4332lHSg33/Gw+Dox/70Teg5QB6MlWyml9wI9ciP/W
- dg30zllj4gMxAk0ytXSRLh7UUUBK+y3FW6zo4tHJMrhtoO+sYdtJUgIEA5DRO+6m5A6zT0u+RK/
- x5sG07h+R4xEjz7IrbN3j+rSG9xL1Il/0pH6rGHEf6BN+4Gv/V+BRg2RdMfMnE7O//sqgtDM2NY
- zByHx093AOjhmJHRCocTuUD81FNb6Rze2HaklRgKYORESUAFFr8vqIBGlGgPzTy+Thx+3hDu
-X-Proofpoint-ORIG-GUID: xNt2Ifd1HMgDAfVOfXdai4ywFg0ik2Yk
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-08-07_02,2025-08-06_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 suspectscore=0 impostorscore=0 mlxlogscore=999
- lowpriorityscore=0 malwarescore=0 clxscore=1011 adultscore=0 mlxscore=0
- bulkscore=0 priorityscore=1501 spamscore=0 classifier=spam authscore=0
- authtc=n/a authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2507300000 definitions=main-2508070103
 
-During error recovery testing a pair of tasks was reported to be hung
-due to a dead-lock situation:
+Don't populate the const read-only arrays mac_addr_reg on the stack at
+run time, instead make them static, this reduces the object code size.
 
-- mlx5_unload_one() trying to acquire devlink lock while the PCI error
-  recovery code had acquired the pci_cfg_access_lock().
-- mlx5_crdump_collect() trying to acquire the pci_cfg_access_lock()
-  while devlink_health_report() had acquired the devlink lock.
+Size before:
+   text	   data	    bss	    dec	    hex	filename
+  65066	  11352	      0	  76418	  12a82	drivers/net/phy/motorcomm.o
 
-Move the check for pci_channel_offline prior to acquiring the
-pci_cfg_access_lock in mlx5_vsc_gw_lock since collecting the crdump will
-fail anyhow while PCI error recovery is running.
+Size after:
+   text	   data	    bss	    dec	    hex	filename
+  64761	  11512	      0	  76273	  129f1	drivers/net/phy/motorcomm.o
 
-Fixes: 33afbfcc105a ("net/mlx5: Stop waiting for PCI if pci channel is offline")
-Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
+Reducton of 145 bytes (gcc 14.2.0 x86-64)
+
+Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
 ---
+ drivers/net/phy/motorcomm.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Hi all,
-
-while the initial hit was recorded during "random" testing, where PCI
-error recovery and poll_health() tripped almost simultaneously, I found
-a way to reproduce a very similar hang at will on s390:
-
-Inject a PCI error recovery event on a Physical Function <BDF> with
-  zpcictl --reset-fw <BDF>
-
-then request a crdump with
-  devlink health dump show pci/<BDF> reporter fw_fatal
-
-With the patch applied I didn't get the hang but kernel logs showed:
-[  792.885743] mlx5_core 000a:00:00.0: mlx5_crdump_collect:51:(pid 1415): crdump: failed to lock vsc gw err -13
-
-and the crdump request ended with:
-kernel answers: Permission denied
-
-Thanks, Gerd
----
- drivers/net/ethernet/mellanox/mlx5/core/lib/pci_vsc.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/pci_vsc.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/pci_vsc.c
-index 432c98f2626d..d2d3b57a57d5 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/lib/pci_vsc.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/pci_vsc.c
-@@ -73,16 +73,15 @@ int mlx5_vsc_gw_lock(struct mlx5_core_dev *dev)
- 	u32 lock_val;
- 	int ret;
- 
-+	if (pci_channel_offline(dev->pdev))
-+		return -EACCES;
-+
- 	pci_cfg_access_lock(dev->pdev);
- 	do {
- 		if (retries > VSC_MAX_RETRIES) {
- 			ret = -EBUSY;
- 			goto pci_unlock;
- 		}
--		if (pci_channel_offline(dev->pdev)) {
--			ret = -EACCES;
--			goto pci_unlock;
--		}
- 
- 		/* Check if semaphore is already locked */
- 		ret = vsc_read(dev, VSC_SEMAPHORE_OFFSET, &lock_val);
+diff --git a/drivers/net/phy/motorcomm.c b/drivers/net/phy/motorcomm.c
+index 0e91f5d1a4fd..aeae7ec897c6 100644
+--- a/drivers/net/phy/motorcomm.c
++++ b/drivers/net/phy/motorcomm.c
+@@ -536,7 +536,7 @@ static void ytphy_get_wol(struct phy_device *phydev,
+ static int ytphy_set_wol(struct phy_device *phydev, struct ethtool_wolinfo *wol)
+ {
+ 	struct net_device *p_attached_dev;
+-	const u16 mac_addr_reg[] = {
++	static const u16 mac_addr_reg[] = {
+ 		YTPHY_WOL_MACADDR2_REG,
+ 		YTPHY_WOL_MACADDR1_REG,
+ 		YTPHY_WOL_MACADDR0_REG,
+@@ -608,7 +608,7 @@ static int ytphy_set_wol(struct phy_device *phydev, struct ethtool_wolinfo *wol)
+ static int yt8531_set_wol(struct phy_device *phydev,
+ 			  struct ethtool_wolinfo *wol)
+ {
+-	const u16 mac_addr_reg[] = {
++	static const u16 mac_addr_reg[] = {
+ 		YTPHY_WOL_MACADDR2_REG,
+ 		YTPHY_WOL_MACADDR1_REG,
+ 		YTPHY_WOL_MACADDR0_REG,
 -- 
-2.48.1
+2.50.1
 
 
