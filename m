@@ -1,156 +1,173 @@
-Return-Path: <netdev+bounces-212095-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212096-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEFC3B1DD89
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 21:40:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CB67B1DDA9
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 21:47:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D076C566BB1
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 19:40:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C90663BF29C
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 19:47:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6F7820A5EC;
-	Thu,  7 Aug 2025 19:40:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 548EF1FBC94;
+	Thu,  7 Aug 2025 19:47:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mm+YRI2M"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sd6i9/EN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1937E4AEE2;
-	Thu,  7 Aug 2025 19:40:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 252254A06;
+	Thu,  7 Aug 2025 19:47:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754595616; cv=none; b=k9UyPZPGEhlwNiPz2gGyzXAboiS9fBsHPEcW8XDsLSqMxqwZNZ0MKXM96cjgrjsUN6tNA7TtcQuRjYAxwkXbtJC86clWgowvmuhKn8mrEG395aYh6dRK7x8AYAFTigs+h7e43fe3BkHa/aHhvUjiCsRSRr7NnnY73tWsEjZT5WE=
+	t=1754596043; cv=none; b=cVS8kF3YKdBRcuZChqZHcV/kKDc2qfPoyZuLy/kfmGQn/fWu6AVqYe/EiG7UBAv759wsXmJrZoUoxGCLvVM/qEIwW0Ry5sH34HVt8OnD05M0oJCZE06J1xqBopWgMUh+r9EhDEPEXN3MFRqBVlI7fZkhUvF7/obc1yErHtUCKPE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754595616; c=relaxed/simple;
-	bh=EZIEeOnW1Z0fE8adlPk3i3tVG6j/UoYNBYyEH7vY/Lc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HfHr/FLk1ZAPH81Y43KKhh1gVdvtcj1APpQUv7AqfMIlV84lloBgy/d/ZCCisJLSv9tNQD/JFMPzWO9YbO4Xj3Mu0eCyb+E9ScnN8o4scX5BIy5LjL6iiTJZN5D92XerZnESqaZrRosb9afGXPnOpih1h7t/Yl6Foo2f0vkIYuQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mm+YRI2M; arc=none smtp.client-ip=209.85.219.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-e75668006b9so1447837276.3;
-        Thu, 07 Aug 2025 12:40:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1754595614; x=1755200414; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=fTGv50AjxFne2hYKUgwleceqM6cCsBh+NvLVhbsB/64=;
-        b=Mm+YRI2MV+XOo8zEGpwLg3OX4wk7rAIeRMMT9IGZY3aUKckkvFG3VLizqcs8FyCZPs
-         xluc2YqoukuhXmkHwt6SktKyywOZffKipRlRYDHYUx02Hz9lJm9TciR11+aJkcIX3RBU
-         SPgDQMF0TvQjteCGy/4hhklIqvjtJXuBv7omYHqDLVvhYxn0fzDPPpp9GRa9c5x1TNFg
-         fl2qtRAEsGMmj/dNMJwbYNa0x+//suJF5y3Hn44XvJshzNstRQRYwt3H92J0T8esAJEV
-         +pvbBDKKYRra4cU9XdbN0jMzG5i4MJpS/s4uSgeqCTt+Q1RYLnKl2O95/BdoENeq6eoH
-         AxEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754595614; x=1755200414;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fTGv50AjxFne2hYKUgwleceqM6cCsBh+NvLVhbsB/64=;
-        b=JDEYNDBu7C2JJo+Zbob1QkB8qWKmQU9faPSkDJ15ATkc8pKvWQO/ZRZu6caY9KUYl4
-         lRZFu9R8FppOJnlBanowV+rTgwQxgM+aBOxu4LQsC0WZTqBCkJEcp5UQkQQU7dMQpqz4
-         xVBb8pwL/7igFIKcoknapx67unDQjDf2dIWO2jPCSSzU2i/wlEcFy/0elRQLyCYpkkT/
-         T62NyUqswG/LIHQ8NczCQUMS8g1aCQkxLzzuBiw2fgM6KUQbYBERHDeBAZBfUI5xMtE7
-         4tcrpopfsUGYJSiVaQ+QTaoPQQij8zh4Kds8YCI/sy6dvlmEVQK7yYFRdS/2fy1NOkJ5
-         xO8A==
-X-Forwarded-Encrypted: i=1; AJvYcCXl4XcLEqoZp5R0E8Wp9LkvGTJ8J0SPyMZPndBbnQfMmleMvFYX0j5ypm/oMbT9gZdlfDJvJ0RctCql@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFOzsdShgkt86WkIaRgTddhz6wjFi6I1hG8EDJPpGamtYq8Dak
-	cK0o8dWSOdbLqVNUutgGbUMxZKPx7vClNhiiwCvvOzEFdJXMeQ3SGq4GN7+ngw==
-X-Gm-Gg: ASbGnctcmc6rz/jmeaMi+lwPBmX3l4gC4tGgHlzzbpzrEaDoW3inbLd/gM8uOZp4idm
-	hVT6snH1+LhZ9r0snarSYm4hBD+f5OaxRL/8vCSxaKWAXfPQXGLMye3fIm8/xE4elWJjzQ7655S
-	8xeJK+aR1tb69QxhCI17yZCN2O5a7ByUsYT7DzI2o6Hm1EFEaw0Z+ElQ4ZJnP+21x+mJwXq12iT
-	uRaipL2yVOJLD01NVeISX32O+KdIl9O8bbQqFArMOyXCueYv8WSSi1VXu1G+U5gLuraBHZT8SXF
-	Ze2VoCHVaSDv4fIrupOeDRZ5n1dQ3ops8PTB1cWeakvob3tLoUl2lK7bGjBtAaHXEa80IcvuBCU
-	IkGDvI8VCGNKfIKZVw/XxhfhF+EwFUsMlMRa0IMTR9F02osNwg3WRFT6JnAy946E=
-X-Google-Smtp-Source: AGHT+IGxyN/ZEThXz0KUcvWci5mn4HMf3lqHzYz3qlPewTV14gBqawdMOu/5V9WKX6IK2gkG7TeXAQ==
-X-Received: by 2002:a05:6902:2882:b0:e8e:2a6b:251f with SMTP id 3f1490d57ef6-e904b62e457mr592000276.32.1754595613593;
-        Thu, 07 Aug 2025 12:40:13 -0700 (PDT)
-Received: from wsfd-netdev58.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
-        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e8fe073284fsm6025644276.21.2025.08.07.12.40.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Aug 2025 12:40:13 -0700 (PDT)
-From: Xin Long <lucien.xin@gmail.com>
-To: network dev <netdev@vger.kernel.org>,
-	linux-sctp@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	Nikita Zhandarovich <n.zhandarovich@fintech.ru>
-Subject: [PATCH net] sctp: linearize cloned gso packets in sctp_rcv
-Date: Thu,  7 Aug 2025 15:40:11 -0400
-Message-ID: <dd7dc337b99876d4132d0961f776913719f7d225.1754595611.git.lucien.xin@gmail.com>
-X-Mailer: git-send-email 2.47.1
+	s=arc-20240116; t=1754596043; c=relaxed/simple;
+	bh=JFuIJpdm0AMR0xv4NMaojaLmRYEny8W2asXb8REMVRo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dSw6XayaA3d2qPKaYSwYBp234SklEz+7fKgWYTrcx2r1UKJ+LfYGqbLt5U8GNNWiXQKIqgfhm9UmiJGNn/KDQIKMtOQ+6MGC28kknVlpezMkF34U5glYsIvOW/xR4EPI30xQ0dkiQARtT42lkffkfzhIfp/NQi4E8ZipUBXtXHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sd6i9/EN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74954C4CEEB;
+	Thu,  7 Aug 2025 19:47:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754596042;
+	bh=JFuIJpdm0AMR0xv4NMaojaLmRYEny8W2asXb8REMVRo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Sd6i9/EN2gOj6JBJ+lYg3Tr0F8+7VpqW8Nc9nqDBmhtP5G7SpfHhJc3zXUznFwEzA
+	 8eUo+1eTGYv0l4oXsC3yhuM+UCVjK4LN268n7r73jkDLwkuAk6uO6OnXIZgP3STcI1
+	 52MTLTKkZcVFruYaQCFz/eTtuTfdamgOztb4WEb8cna0YeZRhBa0UclGOXJQwF3P+x
+	 ZogM+fzJU6OvQZ911dM4hdx/1HOPjZVgsOntaf3PQT+b8xxfQFoH1zjv3PhXuXEj7s
+	 ngCIy9aJTWtzte03OFhHzvcwFw2yYgpSHYl+8eXKxamxJGfDs89t/kOuac6zrh9Rx6
+	 q7/PgvM6ttOZg==
+Date: Thu, 7 Aug 2025 20:47:15 +0100
+From: Simon Horman <horms@kernel.org>
+To: Alexandra Winter <wintera@linux.ibm.com>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"D. Wythe" <alibuda@linux.alibaba.com>,
+	Dust Li <dust.li@linux.alibaba.com>,
+	Sidraya Jayagond <sidraya@linux.ibm.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	Julian Ruess <julianr@linux.ibm.com>, netdev@vger.kernel.org,
+	linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Thorsten Winkler <twinkler@linux.ibm.com>,
+	Mahanta Jambigi <mjambigi@linux.ibm.com>,
+	Tony Lu <tonylu@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>, Halil Pasic <pasic@linux.ibm.com>,
+	linux-rdma@vger.kernel.org
+Subject: Re: [RFC net-next 10/17] net/dibs: Define dibs_client_ops and
+ dibs_dev_ops
+Message-ID: <20250807194715.GP61519@horms.kernel.org>
+References: <20250806154122.3413330-1-wintera@linux.ibm.com>
+ <20250806154122.3413330-11-wintera@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250806154122.3413330-11-wintera@linux.ibm.com>
 
-A cloned head skb still shares these frag skbs in fraglist with the
-original head skb. It's not safe to access these frag skbs.
+On Wed, Aug 06, 2025 at 05:41:15PM +0200, Alexandra Winter wrote:
 
-syzbot reported two use-of-uninitialized-memory bugs caused by this:
+...
 
-  BUG: KMSAN: uninit-value in sctp_inq_pop+0x15b7/0x1920 net/sctp/inqueue.c:211
-   sctp_inq_pop+0x15b7/0x1920 net/sctp/inqueue.c:211
-   sctp_assoc_bh_rcv+0x1a7/0xc50 net/sctp/associola.c:998
-   sctp_inq_push+0x2ef/0x380 net/sctp/inqueue.c:88
-   sctp_backlog_rcv+0x397/0xdb0 net/sctp/input.c:331
-   sk_backlog_rcv+0x13b/0x420 include/net/sock.h:1122
-   __release_sock+0x1da/0x330 net/core/sock.c:3106
-   release_sock+0x6b/0x250 net/core/sock.c:3660
-   sctp_wait_for_connect+0x487/0x820 net/sctp/socket.c:9360
-   sctp_sendmsg_to_asoc+0x1ec1/0x1f00 net/sctp/socket.c:1885
-   sctp_sendmsg+0x32b9/0x4a80 net/sctp/socket.c:2031
-   inet_sendmsg+0x25a/0x280 net/ipv4/af_inet.c:851
-   sock_sendmsg_nosec net/socket.c:718 [inline]
+> diff --git a/net/smc/smc_ism.c b/net/smc/smc_ism.c
 
-and
+...
 
-  BUG: KMSAN: uninit-value in sctp_assoc_bh_rcv+0x34e/0xbc0 net/sctp/associola.c:987
-   sctp_assoc_bh_rcv+0x34e/0xbc0 net/sctp/associola.c:987
-   sctp_inq_push+0x2a3/0x350 net/sctp/inqueue.c:88
-   sctp_backlog_rcv+0x3c7/0xda0 net/sctp/input.c:331
-   sk_backlog_rcv+0x142/0x420 include/net/sock.h:1148
-   __release_sock+0x1d3/0x330 net/core/sock.c:3213
-   release_sock+0x6b/0x270 net/core/sock.c:3767
-   sctp_wait_for_connect+0x458/0x820 net/sctp/socket.c:9367
-   sctp_sendmsg_to_asoc+0x223a/0x2260 net/sctp/socket.c:1886
-   sctp_sendmsg+0x3910/0x49f0 net/sctp/socket.c:2032
-   inet_sendmsg+0x269/0x2a0 net/ipv4/af_inet.c:851
-   sock_sendmsg_nosec net/socket.c:712 [inline]
+> -static void smcd_register_dev(struct ism_dev *ism)
+> +static void smcd_register_dev(struct dibs_dev *dibs)
+>  {
+> -	const struct smcd_ops *ops = ism_get_smcd_ops();
+>  	struct smcd_dev *smcd, *fentry;
+> +	const struct smcd_ops *ops;
+> +	struct smc_lo_dev *smc_lo;
+> +	struct ism_dev *ism;
+>  
+> -	if (!ops)
+> -		return;
+> +	if (smc_ism_is_loopback(dibs)) {
+> +		if (smc_loopback_init(&smc_lo))
+> +			return;
+> +	}
+>  
+> -	smcd = smcd_alloc_dev(&ism->pdev->dev, dev_name(&ism->pdev->dev), ops,
+> -			      ISM_NR_DMBS);
+> +	if (smc_ism_is_loopback(dibs)) {
+> +		ops = smc_lo_get_smcd_ops();
+> +		smcd = smcd_alloc_dev(dev_name(&smc_lo->dev), ops,
+> +				      SMC_LO_MAX_DMBS);
+> +	} else {
+> +		ism = dibs->drv_priv;
+> +		ops = ism_get_smcd_ops();
+> +		smcd = smcd_alloc_dev(dev_name(&ism->pdev->dev), ops,
+> +				      ISM_NR_DMBS);
+> +	}
 
-This patch fixes it by linearizing cloned gso packets in sctp_rcv().
+Hi Alexandra,
 
-Fixes: 90017accff61 ("sctp: Add GSO support")
-Reported-by: syzbot+773e51afe420baaf0e2b@syzkaller.appspotmail.com
-Reported-by: syzbot+70a42f45e76bede082be@syzkaller.appspotmail.com
-Signed-off-by: Xin Long <lucien.xin@gmail.com>
----
- net/sctp/input.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ism is initialised conditionally here.
 
-diff --git a/net/sctp/input.c b/net/sctp/input.c
-index 2dc2666988fb..7e99894778d4 100644
---- a/net/sctp/input.c
-+++ b/net/sctp/input.c
-@@ -117,7 +117,7 @@ int sctp_rcv(struct sk_buff *skb)
- 	 * it's better to just linearize it otherwise crc computing
- 	 * takes longer.
- 	 */
--	if ((!is_gso && skb_linearize(skb)) ||
-+	if (((!is_gso || skb_cloned(skb)) && skb_linearize(skb)) ||
- 	    !pskb_may_pull(skb, sizeof(struct sctphdr)))
- 		goto discard_it;
- 
--- 
-2.47.1
+But towards the end of this function the following dereferences
+ism unconditionally. And it's not clear to me this won't occur
+even if ism wasn't initialised above.
 
+        if (smc_pnet_is_pnetid_set(smcd->pnetid))
+                pr_warn_ratelimited("smc: adding smcd device %s with pnetid %.16s%s\n",
+                                    dev_name(&ism->dev), smcd->pnetid,
+                                    smcd->pnetid_by_user ?
+                                        " (user defined)" :
+                                        "");
+        else
+                pr_warn_ratelimited("smc: adding smcd device %s without pnetid\n",
+                                    dev_name(&ism->dev));
+
+
+>  	if (!smcd)
+>  		return;
+> -	smcd->priv = ism;
+> +
+> +	smcd->dibs = dibs;
+> +	dibs_set_priv(dibs, &smc_dibs_client, smcd);
+> +
+> +	if (smc_ism_is_loopback(dibs)) {
+> +		smcd->priv = smc_lo;
+> +		smc_lo->smcd = smcd;
+> +	} else {
+> +		smcd->priv = ism;
+> +		ism_set_priv(ism, &smc_ism_client, smcd);
+
+This function is now compiled even if CONFIG_ISM is not enabled.
+But smc_ism_client is only defined if CONFIG_ISM is enabled.
+
+I think this code is removed by later patches. But nonetheless
+I also think this leads to a build error and it's best
+to avoid transient build errors as they break bisection.
+
+> +		if (smc_pnetid_by_dev_port(&ism->pdev->dev, 0, smcd->pnetid))
+> +			smc_pnetid_by_table_smcd(smcd);
+> +	}
+> +
+>  	smcd->client = &smc_ism_client;
+
+Ditto.
+
+> -	ism_set_priv(ism, &smc_ism_client, smcd);
+> -	if (smc_pnetid_by_dev_port(&ism->pdev->dev, 0, smcd->pnetid))
+> -		smc_pnetid_by_table_smcd(smcd);
+>  
+>  	if (smcd->ops->supports_v2())
+>  		smc_ism_set_v2_capable();
+
+...
 
