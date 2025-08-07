@@ -1,196 +1,143 @@
-Return-Path: <netdev+bounces-212057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212059-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE17CB1D93E
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 15:42:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A8EFB1D999
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 16:03:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B89AC16EF1B
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 13:42:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A27463BCD53
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 14:03:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 082CD25C81F;
-	Thu,  7 Aug 2025 13:42:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3962A25EF90;
+	Thu,  7 Aug 2025 14:03:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CzHm3B9K"
+	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="sTDPq+Ke"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F815191F84
-	for <netdev@vger.kernel.org>; Thu,  7 Aug 2025 13:42:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CE9725D536;
+	Thu,  7 Aug 2025 14:03:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754574154; cv=none; b=AoRuD/pbSIeED5fgy+L+r6QxvpoaZRi4Whvx1f6HVBcXtzz9dGdkK9dN+/ax6MpZ+fB6QmFWLUQEKo69+x93GFoDVwt9CFsJ4qITeIC4o7O6wmVbKYECsuxaRE/OT6fkx4YPC+/gOFyWgaB1YAonCdODDwz4jZ3Ie5e9mEH9bMA=
+	t=1754575397; cv=none; b=FS3CLPm5nYpuCxKGQ7uDxLH4xQlWJmy3W13C5oB90M6HndxjTdKbSmriOdXXeFyG8FXJCL5Da7CDxENEgRIz84WUPACA/5NmR3JlhMDhgLotLfnNjgt094FvoQuI4RExInp5lvuIt2vnVwca3RPqn5a3/JKNujcCykQFqoKlLeg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754574154; c=relaxed/simple;
-	bh=GvJfhzlulC+BDBGj8y0s9+f+ajpo1xlnxsxPSHrv2vY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Vlbj3a5vvaC2skVeTKv5JyT1+DRiHiJbCbcGxGpFLrn5rxTGS1wOO3z0oROpIMoR296o5dTsCg4Qa6CMo9TZA2Fwj/6ddc8xmnbZnHE1MUC61M7ExhqjZU9C6CjIWGvIlcjyzf/ruDMhCkDBm2tHexfmiJDBz9oGLLakTSq1Sus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CzHm3B9K; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1754574151;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=ritNS/LACz5zZTDC9OonsqyxQ/9g3SvnETW1YwGikxE=;
-	b=CzHm3B9KzctQpriV/pO5zXrO2Xda+UTu1TAFZO7xX80E6H/te1SrsuPF46J99ck8pBKsHg
-	/FCDSj3oIN+t6eDKa9b4QUVnculZJiH5CBydmDEoUYBHFDgTd1jGSRheQ8oW/WLUCv8rmF
-	VVz3TRrMXMFwiD2vOV0dRQj2sWh9ztY=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-34-KwNfLP1TMgSPsJW3m9-2OA-1; Thu,
- 07 Aug 2025 09:42:28 -0400
-X-MC-Unique: KwNfLP1TMgSPsJW3m9-2OA-1
-X-Mimecast-MFC-AGG-ID: KwNfLP1TMgSPsJW3m9-2OA_1754574147
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C1B4318004D4;
-	Thu,  7 Aug 2025 13:42:27 +0000 (UTC)
-Received: from jramaseu-thinkpadt14gen5.tpbc.com (unknown [10.44.32.77])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E95B119560AD;
-	Thu,  7 Aug 2025 13:42:24 +0000 (UTC)
-From: Jakub Ramaseuski <jramaseu@redhat.com>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	horms@kernel.org,
-	pabeni@redhat.com,
-	Jakub Ramaseuski <jramaseu@redhat.com>,
-	Tianhao Zhao <tizhao@redhat.com>,
-	Michal Schmidt <mschmidt@redhat.com>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Subject: [PATCH net v2] net: mask NETIF_F_IPV6_CSUM flag on irregular packet header size
-Date: Thu,  7 Aug 2025 15:41:50 +0200
-Message-ID: <20250807134150.497553-1-jramaseu@redhat.com>
+	s=arc-20240116; t=1754575397; c=relaxed/simple;
+	bh=bjEiiI161dYTrY0Cw3+ZZGVoX2NnHUSvIH1QPcitc9w=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=N6Lm6nmTyJXwz9u5uuemdRKmtcReykE0s//C2TeM1IS+9KnY55c22tOLpFqUgaSOKoeGb916uT/gtDGlvTPOBJ2pCwFgn8v5cL4kL+7bdOh/q+h6gRmosi1fp2faVVqH6l3ThCi49eSJi0oeDdnLHCi2GxK6hwWutoSucUWakcg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=sTDPq+Ke; arc=none smtp.client-ip=193.68.50.107
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
+Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
+	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id 59F64A037B;
+	Thu,  7 Aug 2025 16:03:10 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:from:from:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=mail; bh=H0mVJmCWOicg9EcBRx/NfEzNMf28ZNNzr0DbLGreYW8=; b=
+	sTDPq+KeRzVhg8O8HZh3s+/CBi+XOgzUpJh3dvxLrDj+Zepd0UBhtKG5UhaE5gEq
+	EGTNtMdmWUeCbvzjfmJaM7s6vru4SeO24VeAncROkyH0f2ashTFdZMmUGY1ybR1a
+	3dmA1Cw4q3hyrNnR9yJSAV+N7TYlh+6tnYM7G1bHa7skl0l081x223l5HcMtS9Sc
+	YYqLeyzCsaqFOpJj8s8VKFm7acYeArpWdh5CuNCh+I2IJJwmU9cjpZkNLlx8C+Kf
+	trjs0kEyUBWstsRT47V4N2pOuE1j4rBpFcMcE1V9nr3lFg8+0NwyNZJipQ/WCV6I
+	ZzTLfnXIW/cyK4AcAxKETlnlM13q4/0IHrQspKYfDvQ6RG9yKp25c1yDUodv1duP
+	Eib+g65a9x/wP+xSS4rcTMwiEsaupZNkyfHxwiWAw1tJg1cJHjLu23uLs7/ArPPl
+	vPxe+3+AJfkUHylTxZG9hN2fvacPXWJlbx0GBdHEd2Ld2elQ9mmZ2bt4UhDHNSLE
+	O1nx6rr05auXZyAPSyqYUyLIAl+JplGAbXf//RGyBwOoNKLhWi/8HyaKE+FoyW0Q
+	D/G3FIfOMiHVsBtizDiQ8pFtC8fr4otul9ve1tL8ZKr7kOkxStMf9gUzmrZ3BEuJ
+	PTPWW4g9GzzMx/eOJDt2M/6QQcmb58BEWcIWxsvr+sQ=
+From: =?UTF-8?q?Bence=20Cs=C3=B3k=C3=A1s?= <csokas.bence@prolan.hu>
+To: Rob Herring <robh@kernel.org>, Geert Uytterhoeven
+	<geert+renesas@glider.be>, "David S. Miller" <davem@davemloft.net>, "Sergei
+ Shtylyov" <sergei.shtylyov@cogentembedded.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+CC: Buday Csaba <buday.csaba@prolan.hu>, Andrew Lunn <andrew@lunn.ch>,
+	=?UTF-8?q?Cs=C3=B3k=C3=A1s=20Bence?= <csokas.bence@prolan.hu>, "Heiner
+ Kallweit" <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+Subject: [PATCH net v2] net: mdiobus: release reset_gpio in mdiobus_unregister_device()
+Date: Thu, 7 Aug 2025 15:54:49 +0200
+Message-ID: <20250807135449.254254-2-csokas.bence@prolan.hu>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-ESET-AS: R=OK;S=0;OP=CALC;TIME=1754575389;VERSION=7995;MC=2460790112;ID=765739;TRN=0;CRV=0;IPC=;SP=0;SIPS=0;PI=3;F=0
+X-ESET-Antispam: OK
+X-EsetResult: clean, is OK
+X-EsetId: 37303A2998FD515E667361
 
-On any driver that advertises NETIF_F_IP_CSUM and NETIF_F_IPV6_CSUM but
-not the superseding NETIF_F_HW_CSUM (e.g., ice/bnxt_en), the kernel
-incorrectly attempts GSO on IPv6 packets with extension headers.
-Because the NETIF_F_IPV6_CSUM feature is incompatible with these
-headers, the failure results in a `skb_warn_bad_offload` warning and
-a collapse of throughput, as observed with GREoIPv6 traffic.
+From: Buday Csaba <buday.csaba@prolan.hu>
 
-Mask NETIF_F_IPV6_CSUM, NETIF_F_TSO6 and NETIF_F_GSO_UDP_L4
-in gso_features_check if the IPv6 header contains extension headers.
+reset_gpio is claimed in mdiobus_register_device(), but it is not
+released in mdiobus_unregister_device(). It is instead only
+released when the whole MDIO bus is unregistered.
+When a device uses the reset_gpio property, it becomes impossible
+to unregister it and register it again, because the GPIO remains
+claimed.
+This patch resolves that issue.
 
-The exception is a BIG TCP extension, which, as stated in commit
-68e068cabd2c6c53 (net: reenable NETIF_F_IPV6_CSUM offload for BIG TCP packets):
-"The feature is only enabled on devices that support BIG TCP TSO.
-The header is only present for PF_PACKET taps like tcpdump,
-and not transmitted by physical devices."
-
-kernel log output (truncated):
-WARNING: CPU: 1 PID: 5273 at net/core/dev.c:3535 skb_warn_bad_offload+0x81/0x140
-...
-Call Trace:
- <TASK>
- skb_checksum_help+0x12a/0x1f0
- ? netif_skb_features+0xc1/0x2e0
- validate_xmit_skb+0x1a3/0x2d0
- validate_xmit_skb_list+0x4f/0x80
- sch_direct_xmit+0x1a2/0x380
- __dev_xmit_skb+0x242/0x670
- __dev_queue_xmit+0x3fc/0x7f0
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? ip6_rt_copy_init+0xf0/0x290
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? selinux_ip_postroute+0x1c5/0x420
- ? srso_alias_return_thunk+0x5/0xfbef5
- ip6_finish_output2+0x25e/0x5d0
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? nf_hook_slow+0x47/0xf0
- ? srso_alias_return_thunk+0x5/0xfbef5
- ip6_finish_output+0x1fc/0x3f0
- ip6_tnl_xmit+0x608/0xc00 [ip6_tunnel]
- ? srso_alias_return_thunk+0x5/0xfbef5
- ip6gre_tunnel_xmit+0x1c0/0x390 [ip6_gre]
- dev_hard_start_xmit+0x63/0x1c0
- __dev_queue_xmit+0x6d0/0x7f0
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? chacha_block_generic+0x72/0xd0
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? selinux_ip_postroute+0x1c5/0x420
- ip6_finish_output2+0x214/0x5d0
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? nf_hook_slow+0x47/0xf0
- ip6_finish_output+0x1fc/0x3f0
- ip6_xmit+0x2ca/0x6f0
- ? __pfx_dst_output+0x10/0x10
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? nf_hook_slow+0x47/0xf0
- ip6_finish_output+0x1fc/0x3f0
- ip6_xmit+0x2ca/0x6f0
- ? __pfx_dst_output+0x10/0x10
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? __sk_dst_check+0x41/0xc0
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? inet6_csk_route_socket+0x12e/0x200
- inet6_csk_xmit+0xeb/0x150
- __tcp_transmit_skb+0x555/0xa80
- tcp_write_xmit+0x32a/0xe90
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? skb_do_copy_data_nocache+0xc9/0x150
- tcp_sendmsg_locked+0x437/0x1110
- ? srso_alias_return_thunk+0x5/0xfbef5
- tcp_sendmsg+0x2f/0x50
-...
-skb linear:   00000000: e4 3d 1a 7d ec 30 e4 3d 1a 7e 5d 90 86 dd 60 0e
-skb linear:   00000010: 00 0a 1b 34 3c 40 20 11 00 00 00 00 00 00 00 00
-skb linear:   00000020: 00 00 00 00 00 12 20 11 00 00 00 00 00 00 00 00
-skb linear:   00000030: 00 00 00 00 00 11 2f 00 04 01 04 01 01 00 00 00
-skb linear:   00000040: 86 dd 60 0e 00 0a 1b 00 06 40 20 23 00 00 00 00
-skb linear:   00000050: 00 00 00 00 00 00 00 00 00 12 20 23 00 00 00 00
-skb linear:   00000060: 00 00 00 00 00 00 00 00 00 11 bf 96 14 51 13 f9
-skb linear:   00000070: ae 27 a0 a8 2b e3 80 18 00 40 5b 6f 00 00 01 01
-skb linear:   00000080: 08 0a 42 d4 50 d5 4b 70 f8 1a
-
-Fixes: 04c20a9356f283da ("net: skip offload for NETIF_F_IPV6_CSUM if ipv6 header contains extension")
-Reported-by: Tianhao Zhao <tizhao@redhat.com>
-Suggested-by: Michal Schmidt <mschmidt@redhat.com>
-Suggested-by: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Signed-off-by: Jakub Ramaseuski <jramaseu@redhat.com>
+Fixes: bafbdd527d56 ("phylib: Add device reset GPIO support") # see notes
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Cc: Csókás Bence <csokas.bence@prolan.hu>
+[ csokas.bence: Resolve rebase conflict and clarify msg ]
+Signed-off-by: Buday Csaba <buday.csaba@prolan.hu>
 ---
----
- net/core/dev.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index b28ce68830b2b..1d8a4d1da911e 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -3778,6 +3778,18 @@ static netdev_features_t gso_features_check(const struct sk_buff *skb,
- 		if (!(iph->frag_off & htons(IP_DF)))
- 			features &= ~NETIF_F_TSO_MANGLEID;
- 	}
-+		
-+	/* NETIF_F_IPV6_CSUM does not support IPv6 extension headers,
-+	 * so neither does TSO that depends on it.
-+	 */
-+	if (features & NETIF_F_IPV6_CSUM &&
-+		(skb_shinfo(skb)->gso_type & SKB_GSO_TCPV6 ||
-+		(skb_shinfo(skb)->gso_type & SKB_GSO_UDP_L4 &&
-+		vlan_get_protocol(skb) == htons(ETH_P_IPV6))) &&
-+		skb_transport_header_was_set(skb) &&
-+		skb_network_header_len(skb) != sizeof(struct ipv6hdr) &&
-+		!ipv6_has_hopopt_jumbo(skb))
-+			features &= ~(NETIF_F_IPV6_CSUM | NETIF_F_TSO6 | NETIF_F_GSO_UDP_L4);
+Notes:
+    Changes in v2:
+    * Rebase onto net-next (from 6.12)
+    * Clarify msg after talking with Csaba in person
+    * Collect Andrew's tag
+    
+    Link to v1:
+    https://lore.kernel.org/all/20250709133222.48802-3-buday.csaba@prolan.hu/
+    
+    Note to stable@:
+    * for 6.12 and before, the above v1 patch can be used.
+
+ drivers/net/phy/mdio_bus.c          | 1 +
+ drivers/net/phy/mdio_bus_provider.c | 3 ---
+ 2 files changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/drivers/net/phy/mdio_bus.c b/drivers/net/phy/mdio_bus.c
+index fda2e27c1810..cad6ed3aa10b 100644
+--- a/drivers/net/phy/mdio_bus.c
++++ b/drivers/net/phy/mdio_bus.c
+@@ -91,6 +91,7 @@ int mdiobus_unregister_device(struct mdio_device *mdiodev)
+ 	if (mdiodev->bus->mdio_map[mdiodev->addr] != mdiodev)
+ 		return -EINVAL;
  
- 	return features;
- }
++	gpiod_put(mdiodev->reset_gpio);
+ 	reset_control_put(mdiodev->reset_ctrl);
+ 
+ 	mdiodev->bus->mdio_map[mdiodev->addr] = NULL;
+diff --git a/drivers/net/phy/mdio_bus_provider.c b/drivers/net/phy/mdio_bus_provider.c
+index 48dc4bf85125..f43973e73ea3 100644
+--- a/drivers/net/phy/mdio_bus_provider.c
++++ b/drivers/net/phy/mdio_bus_provider.c
+@@ -443,9 +443,6 @@ void mdiobus_unregister(struct mii_bus *bus)
+ 		if (!mdiodev)
+ 			continue;
+ 
+-		if (mdiodev->reset_gpio)
+-			gpiod_put(mdiodev->reset_gpio);
+-
+ 		mdiodev->device_remove(mdiodev);
+ 		mdiodev->device_free(mdiodev);
+ 	}
+
+base-commit: d9104cec3e8fe4b458b74709853231385779001f
 -- 
-2.50.1
+2.43.0
+
 
 
