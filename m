@@ -1,215 +1,163 @@
-Return-Path: <netdev+bounces-212022-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212023-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59C1CB1D4B4
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 11:28:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FBC2B1D4DA
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 11:34:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D8A71725A2
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 09:28:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFAA03BFD20
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 09:34:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2932221FC7;
-	Thu,  7 Aug 2025 09:28:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="S/zhnXxG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F48825D53B;
+	Thu,  7 Aug 2025 09:34:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from AM0PR02CU008.outbound.protection.outlook.com (mail-westeuropeazon11013048.outbound.protection.outlook.com [52.101.72.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f80.google.com (mail-io1-f80.google.com [209.85.166.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BF4B1400C;
-	Thu,  7 Aug 2025 09:28:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.72.48
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754558931; cv=fail; b=uBdNbG8sC3mJkCxyzagtu9lMI6uF5KCpGBTyw6OVZNlahzEgqqgssypV2BL01OPUE5IcXjz6/USa5Ekvl1AmAidL/uGEMLd3vcr+gqRx4S2DlDlzG9/TUYex37Gz6WaYxuj+6bNp8gYAArjlbab0oCpAZv3lkTS9qT4tKDgDXlw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754558931; c=relaxed/simple;
-	bh=AYwq58YUmVERRbEqror/h90G6ZDnD/e7Uq0+7onORXA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=R1qtLS1GKyLtyCs2WdXpfv8r0jgI5CqJDtpIJhnXNel6n9J3G6c0ecr2BflbK7SJBboKT9uKOXK96ssedoo596PGWKThfrISV/WFuBfuNBtAL6uZ0E2PkVJ/k6Nfe0wgVA+1s75nRLH8/9nRR4YJeiWJktDl13NsfQbSjA4fWls=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=S/zhnXxG; arc=fail smtp.client-ip=52.101.72.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=FDzvTFrMjQZp/04hw6ocs24ObwyTJN0HgWCQ7yR+LFSFXbhAbLU8/7Pq7wVuoQet42L77619A5xGQ5i7l7GY8oBNsjkMM2lCa08dnf//yjVMdbQdotqMbeE+yhUZewr3Yr2SQxEbeqlw0Yc1qm5kuH0lHBJ5sXNtyDZttuk387bGLlL9xBdoPE5If60o52YtGl+cw8HjoQpy+++8YMCMPv5Ue3ovM86ZvRTGlUISP0u4Jz4aDPxO88xATusrp0fGU3aDhmUSviXktOy3o3BQOLqp/Pjj51BbV6Kn+9On4v5hceesx4eRi7P/MX9ekIo8Rnbvd2ZXSzNQA0jFZ5bO0g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=98O8n+BNOyDncmB5LcPswIpNNGSqyMfgwD8gxzbcsqk=;
- b=Y6ZRd8FaK2rbvPKj3A9TzE+xKAVD3sDM4TVEXpcw+MDG7fGtUYztlWwrahpA7ckIvjnkB+9I/6GsHuWzi5YFCtunw8Zt3nRBAGkpmrtnYTmItGgXIXuyGNQ4hErDpHBDvRWPPgFnyO75mBlAJum3KNYoZprbWpU7dzA4ylIqJLZeMbqxQ63KdbFfm0tKp9M2QDGCWDifBGVc5U0nVBs67kYDD3TFq1PIjDyHt9NjjVaPP0T+A/zGGH4YPV2I8eMV2YJer+BomxCi3qt5Kec6ixG0tDW2yLrNDzjtVcRJdhFjd3KZKOa3Jk23Vr/7REQRzNjojX39HegE/404A3RWxg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=98O8n+BNOyDncmB5LcPswIpNNGSqyMfgwD8gxzbcsqk=;
- b=S/zhnXxGzMsGGXsxT+A8P4muOoaRqNfyiRqobJXdEzAZjVcx8UUCEn278JMj0uZ28Lsug5taFS1LzCpYYkYqBT2WG/UV1zVL/3IglXbwmZUxfAEG60SE/Qa+05v7Py9Vj4FOJS9sF7uOSO4WwPuQu2IqAXC3cKolBEPDGzDnG69vDuXYDV5WoVUsaThuUyD9lRv5D2Fhk6jDgFZ3IH0DGpJxLdDvOwCcPmz4DFvIN27HdGhuBiNIFcG30H1rPdR79DDVIqDzce0WqhvcGHPoSjeyY4h46RsjOr5FBGEy/N9qu9oX5jVKOw1qvI+gtSzdjIeh37eM4928p63Fw5C6iA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from DU2PR04MB8822.eurprd04.prod.outlook.com (2603:10a6:10:2e1::11)
- by PA4PR04MB7966.eurprd04.prod.outlook.com (2603:10a6:102:c1::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9009.16; Thu, 7 Aug
- 2025 09:28:46 +0000
-Received: from DU2PR04MB8822.eurprd04.prod.outlook.com
- ([fe80::4e24:c2c7:bd58:c5c7]) by DU2PR04MB8822.eurprd04.prod.outlook.com
- ([fe80::4e24:c2c7:bd58:c5c7%4]) with mapi id 15.20.9009.013; Thu, 7 Aug 2025
- 09:28:46 +0000
-Date: Thu, 7 Aug 2025 17:23:24 +0800
-From: Xu Yang <xu.yang_2@nxp.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, hkallweit1@gmail.com, 
-	o.rempel@pengutronix.de, pabeni@redhat.com, netdev@vger.kernel.org, imx@lists.linux.dev, 
-	linux-kernel@vger.kernel.org
-Subject: Re: [RESEND] net: phy: fix NULL pointer dereference in
- phy_polling_mode()
-Message-ID: <2b3fvsi7c47oit4p6drgjqeaxgwyzyopt7czfv3g2a74j2ay5j@qu22cohdcrjs>
-References: <20250806082931.3289134-1-xu.yang_2@nxp.com>
- <aJMWDRNyq9VDlXJm@shell.armlinux.org.uk>
- <ywr5p6ccsbvoxronpzpbtxjqyjlwp5g6ksazbeyh47vmhta6sb@xxl6dzd2hsgg>
- <aJNSDeyJn5aZG7xs@shell.armlinux.org.uk>
- <unh332ly5fvcrjgur4y3lgn4m4zlzi7vym4hyd7yek44xvfrh5@fmavbivvjfjn>
- <b9140415-2478-4264-a674-c158ca14eb07@lunn.ch>
- <aJOHObGgfzxIDzHW@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aJOHObGgfzxIDzHW@shell.armlinux.org.uk>
-X-ClientProxiedBy: AM0PR02CA0195.eurprd02.prod.outlook.com
- (2603:10a6:20b:28e::32) To DU2PR04MB8822.eurprd04.prod.outlook.com
- (2603:10a6:10:2e1::11)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EAF825C809
+	for <netdev@vger.kernel.org>; Thu,  7 Aug 2025 09:34:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.80
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1754559274; cv=none; b=bcSEX6trmqArGoVOV7lskSQ62TgIdyv488+ZEmqqlm6T9rDMZ1w3Ok6p96oQlUOBk9EU2qgjDqDUUhjSVHWYlGLYxaddmoUNkWXNH6baqMt6E9ca0DzWGklLUP0sO8IbtnJHQC5w31QQu/OpGxgu9uFISXuUeoLzrk0ZyX760Pw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1754559274; c=relaxed/simple;
+	bh=gELV5DYZDqSPBZtY1LBmOo1nEqecEpnLJxkPRWpmJ38=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=SIhxtGvPpsNiH9dwVYBAoZ0ASdGjGi2nWODwkblBY5m1mRJDaHgJ1t+MqQ2vCW2fszgY/IRZkbihrlgdGUpQEsdFe2BmC0z3hjvEY9ST2BzrjfyokEZQYQs81kJHUQWMrp00pXWgXe3rnD8J/lNlvnD+6FuoywiGA4BvpuMw+KQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f80.google.com with SMTP id ca18e2360f4ac-88174f2d224so82184139f.0
+        for <netdev@vger.kernel.org>; Thu, 07 Aug 2025 02:34:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754559271; x=1755164071;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Fjyqg8duMD58S8gtCQt8SefX/SjwKnwP2yTVcNnSrno=;
+        b=bEOeyESWI9/uz+roFANpnJzhDp9ZaHhfXS6o2lRMwBrL+wg0wDE38ORM0i6p8HL/ES
+         enJDJni63gEDpi10vizrms9yjYgDyFGbkIXsciDFu8YrlQ8B2eoCz+gM/QJEyGGhaA7i
+         YUoQAmcZx/R9bBJRsZIo58NGHI/1pyTo1pfh3+zweuB7sDAfFpfJaHzr3r8/bpO/x/7r
+         VAO2dS89tHm+SkOQDx6zCmCRnj6Ix5e8wP6GzoccDNtgP8k8ciRpG7k6e3yaTLzuwIqa
+         BdLYLWuvCx7gEcCkq2y1HXPWLczELn2tEJoAuXb5FSbCloWqC/YB+ms4gvJTYj3mAu5W
+         lXgA==
+X-Forwarded-Encrypted: i=1; AJvYcCW0EdgnTl8/sOotRQ5KW3aADPiIVkijYZPqlcxRx7F2vRUIrJDEvtVrDiJf+yvRRJ5TZybrzSo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1LWwNlO1sHRsM8O8wLFtHpUTDc04Ib2E+WBDUYsPRH0MHBbsn
+	PUl3vmHbpt/PZahsomzyHv5f03O7d3jxT9xZILlZgeojr9Xky7shnKoAmVEv39lfmz/IpkrvaxU
+	etb5EGf9rrbVQwY0gjpbN0AlavFXk8Ny6RWKQTFtRVLBqb+Ae+fQN6/Sz5nk=
+X-Google-Smtp-Source: AGHT+IGUmKSJT+d2iFTfH8WysDJUk7tflpCz4aox3079lXYwbRbYkW5oei9UVRZ+1Qti6tt3sRTcpTmEZrUR7RII+gdYo6AsG1N+
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DU2PR04MB8822:EE_|PA4PR04MB7966:EE_
-X-MS-Office365-Filtering-Correlation-Id: 872c9f20-3587-4258-6699-08ddd594cf37
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|366016|376014|52116014|19092799006|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?ox8seKhoi6FxxMX/w0Xh+TpahIdAKc8IputH+RT1csLFQk6hlHk181wITvGD?=
- =?us-ascii?Q?rleqMwi1dZ0NPBdFha1Mmu9xFUCmuHCR0V7NI0x/z+VX8CIJLhBcEkIM/TVY?=
- =?us-ascii?Q?EtfUhKD80FfvbtWKHWD9zqBOT8hKhmkiIUY5Y9N7YuaJuMSZyntKBKYa7Omi?=
- =?us-ascii?Q?k1MEPV6gxZ/nDXSnQjUWI58saYsLH52S9m/vgJgjF4QEqvjUx5xK1/kbGQ83?=
- =?us-ascii?Q?q8AeTVX7emosn6rrcFSN6Cg0gqyoMjzvFdZm5ksTQF6Pda/2+7rkec9cJWun?=
- =?us-ascii?Q?QmOwGxIPrVxoU7FCIAE4pamByOwGxZqvqjL+BsavhnJIDHCCIN6SzvNOdEtK?=
- =?us-ascii?Q?RCzp7DCLd6Ea5xwpyCjcxW/qjRHZDrNPmvydI+P21imfY1YjP4Sccix+GPm7?=
- =?us-ascii?Q?z3SSXtbkOwdNoC2TxSYxMqeaLHUq1+simUmzVRebG5AUW5mMjdUiRv8drG88?=
- =?us-ascii?Q?grhi4BR7b/Y8r/X4wW8BVTymG7vtU6zQHQNbYuzjcADjuri4qs50JjrpU9sh?=
- =?us-ascii?Q?/USa2aLqk3GNRJ4NHEYINxomsSTIdn5/fPY+DgwCdgLNmOPmfXZcMVt1VEBQ?=
- =?us-ascii?Q?4Fh8jBFCiMdPjcUPXiFmTtSvvlEBhNSVShft89MtjtOaMbX35yyIQTC06HAA?=
- =?us-ascii?Q?62CRnalqqHN5V8HGDqR9j74Gg5TTIqlUmBtIh5wE3T1x8Mch0IBpBwkEGItH?=
- =?us-ascii?Q?DJ/UEkYPLKmNLQQ6Sn1PwX5CS4RG4Enw8iP/IVkWv0mHM/nsCUqYk+vCZWZ+?=
- =?us-ascii?Q?5tqylAWXPmoYrIQficmFfUNO0mehbobxZexQiHN1xNG7H2gRXwIcT3jwP7AY?=
- =?us-ascii?Q?jfgenfHPLfyxlprccL87A0UR+xvI5jpATJzhAQ5H65QhP8zBWCseAFaEv/Eb?=
- =?us-ascii?Q?stDfK+wpED2lz+UcWL3IXf5BvW5iOAW2Hrln/kR1k3/Sk0wYD1rVlapRs2+K?=
- =?us-ascii?Q?bwXp+2XlfDN4sUCZje40QQxA6ARE6CdXyt7rbSU95OE3trHAX06JtmtgGBI8?=
- =?us-ascii?Q?ErVnaBgZVvnAaH8VLeiC3L+BjCP4pdXf0T0Jqhk55IM/GpSy0EBjHYFu+fkE?=
- =?us-ascii?Q?10dQbbhGT3tbYUVzJ3D6Y6HQvpzHVnaaCy9rCt+MS28k83WEx+ll5eFJ6nLU?=
- =?us-ascii?Q?i8GFUGmpqkIsTVShmOayEjktqd0atnYG1iHHW5xqRvKUc5m1NKsEVYqD73p8?=
- =?us-ascii?Q?1zTR7BRH1CWbUuuGJeqPOSIZipxrKcTQTl4EbHQNzej46eJIjKxV3LFcccof?=
- =?us-ascii?Q?G3iuiRVSPjd0/qyrPTMKG9gq2g3VtvwOevEbSqIazvg11rkuLLS79ps/GFp/?=
- =?us-ascii?Q?z7seQwTvmvzT/h5vJIRna+s+Mih1ZqHs017/+FUKvoEwgZx0k1+FAgxYDwA9?=
- =?us-ascii?Q?SukkPlGKx7SCo9PhbSuT1sZuip4O22BiIvEMU8INmZOLTKI5f6OO90kAL1bh?=
- =?us-ascii?Q?cIURlTCuzHQ=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU2PR04MB8822.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(52116014)(19092799006)(38350700014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?9zTAIw5Vj2tCvBMoRzdRIaxuGbIDXHWuKfe7shd7IgbSJ+m+/gh6v0JRqF0O?=
- =?us-ascii?Q?4quJW9RAklFyPP1dXxybS2HbvdsvItWqckQSTIebUmDJMFtYCDjSddTKb75p?=
- =?us-ascii?Q?ushab1dPS9e5iYIg2HYMWrYpbXecDAENgh+MO0Sa18hmxJkXJDrDaklHTgES?=
- =?us-ascii?Q?Xe4pac1ltVNgbOUHS67ZuPF7Pt/7pDYA4EH0s+wqeICUiydJO3o7MA5nCv7n?=
- =?us-ascii?Q?QXD+bx1W80ft197B0d2kgYLjgRujNmZlU3IE42FhRigaDX+qs9U2oBgXYADD?=
- =?us-ascii?Q?MEkzHaioqDWXXR3B7lXStf5zsGsvafNFJ/zjfRHJHoc/ttH/QbXUmTt3WDYX?=
- =?us-ascii?Q?XIHEcMsd0qhzrul1MGITNsLVuBkEXTT5SCKXQ5L9apoIlYTaqCtHuwmaDSxy?=
- =?us-ascii?Q?/1xTTJd3KR9tvBtXWG7wOEy4XhmR5apzKpfzL1Z8MIyS2yBRE6aaLT9cMmwi?=
- =?us-ascii?Q?mJbOtCTesAcxZY3qCaqgX8CPglns+IBv97MRQRID11YVKJhUqjSGZ31Cc7L5?=
- =?us-ascii?Q?h+hOwK/Ma2t7iD7G7NdL2vFzi6S3TgaVMZIkJ7EZYNiMSalc5x6rhSCEg3pF?=
- =?us-ascii?Q?+CdEe94oIhJZGilvOu4MPgDYDvcTzsZiHRou3K0wfbSMHvgZTHjc36vcnVgY?=
- =?us-ascii?Q?tfv9GnwYjJjvKlURMC7YriwJPYOfmk1O8et/eSVpHLxnvi042RhM1t7nz3wR?=
- =?us-ascii?Q?Uh8naT9LmLYgw8Nw7T29lA2hez+MbjJQNVkicWgpoO1vslU1noEjV1/72FL5?=
- =?us-ascii?Q?TI1/uDubJhfwqIBPINp+Z+QYzmEVaJa77kLwGAZ0Dp+6wqHLf0UBE3tBV3vw?=
- =?us-ascii?Q?onIVV+DLWUYCBTjpfO33yOmJYTUhN2bibx6uELJmTRqinnQCo37C9icPotVq?=
- =?us-ascii?Q?AFcyYEq984a+bnlCtEFjzmSH/i+e8uJX8dXEHnTLpbuXAktGVJ04Rtkib6Cg?=
- =?us-ascii?Q?pHgcM4qlgFyDteLadJKGBIbjUDoCEzStkawtu+Ex+h+GQSorxDmVlhqUFM89?=
- =?us-ascii?Q?/3IDTdD9ZavXLJZPd6MSdChkDKKyIaounQrxdl2NxK796C+PXvWwG21bmMh9?=
- =?us-ascii?Q?aJHItdkUQYu3hKugRgtvV3onQAD+KRU8/KJwtqH/Z3kjZc+Z1LrpN6PznEbf?=
- =?us-ascii?Q?EWDEyLvY8XDIfVIFzPpB64/9QHgirNwnIFsc6SSgApaWQrKAZImYVB9AQmTh?=
- =?us-ascii?Q?Qc+8fTsoJGi61lN+KPUbaC8XaeDq0r+DjQ+ia4EG/p8RQhEYAEUIChfiKaBQ?=
- =?us-ascii?Q?gzP9+2sGsIsk5YjF6z2JbBRxF7+1z+5kPYfX3h9WJRjaAED+VpyP7LaxAaa0?=
- =?us-ascii?Q?D29QYmACg8wnlYYrwChdOjX1kxEBkSdoY4MWMy1vhsJ3uXtOcbFbbBmKY2io?=
- =?us-ascii?Q?J+mq1UvwWZG9wDqp++eN2+84/5QH3v2hD2e2QmFwzoTVuzZ5cMXzdO4dmDRl?=
- =?us-ascii?Q?6Hkpse1jBsISnoYW5Uyf4R5LnO7zgjsVp9131jlfUHfHt9NyQEPoHYNYd00g?=
- =?us-ascii?Q?I088nvYO19SxlKI7JqxKWlqy0SxeILX88UBxwvgItq/7KKvii1nqysMCWToB?=
- =?us-ascii?Q?HmGmh1jd+dtEd3e6qfib8IpeSTZhWnGJZIBaGIo/?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 872c9f20-3587-4258-6699-08ddd594cf37
-X-MS-Exchange-CrossTenant-AuthSource: DU2PR04MB8822.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Aug 2025 09:28:46.7098
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: CctuImaogZsU2FEbszyMc4NWSNxKzQ4zaCBah469cdlzp7wnvTD7sx+IGhCmARAEIk8+u9PrNVMmsapapyJsEQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4PR04MB7966
+X-Received: by 2002:a6b:580d:0:b0:861:6f49:626 with SMTP id
+ ca18e2360f4ac-8819f0b93b9mr978115239f.6.1754559271215; Thu, 07 Aug 2025
+ 02:34:31 -0700 (PDT)
+Date: Thu, 07 Aug 2025 02:34:31 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68947327.050a0220.7f033.0042.GAE@google.com>
+Subject: [syzbot] [wireless?] WARNING in ieee80211_recalc_chanctx_chantype
+From: syzbot <syzbot+3e1ddd8aa744da8bec01@syzkaller.appspotmail.com>
+To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Aug 06, 2025 at 05:47:53PM +0100, Russell King (Oracle) wrote:
-> On Wed, Aug 06, 2025 at 05:01:22PM +0200, Andrew Lunn wrote:
-> > > > > Reproduce step is simple:
-> > > > > 
-> > > > > 1. connect an USB to Ethernet device to USB port, I'm using "D-Link Corp.
-> > > > >    DUB-E100 Fast Ethernet Adapter".
-> > 
-> > static const struct driver_info dlink_dub_e100_info = {
-> >         .description = "DLink DUB-E100 USB Ethernet",
-> >         .bind = ax88172_bind,
-> >         .status = asix_status,
-> >         .link_reset = ax88172_link_reset,
-> >         .reset = ax88172_link_reset,
-> >         .flags =  FLAG_ETHER | FLAG_LINK_INTR,
-> >         .data = 0x009f9d9f,
-> > };
-> > 
+Hello,
 
-[...]
+syzbot found the following issue on:
 
-> 
-> Notice that the following return the PHY 3 register 3 value, so
-> I suspect for anything that isn't PHY 3, it just returns whatever
-> data was last read from PHY 3. This makes it an incredibly buggy
-> USB device.
-> 
-> Looking at usbnet_read_cmd(), the above can be the only explanation,
-> as usbnet_read_cmd() memcpy()'s the data into &res, so the value
-> in the kmalloc()'d buf (which likely be poisoned on free, or if not
-> unlikely to reallocate the same memory - that needs to be verified)
-> must be coming from firmware on the device itself.
+HEAD commit:    7e161a991ea7 Merge tag 'i2c-for-6.17-rc1-part2' of git://g..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1489c434580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=62d04834ef6637ed
+dashboard link: https://syzkaller.appspot.com/bug?extid=3e1ddd8aa744da8bec01
+compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
 
-I confirm it's returned by the device. I capture the USB transfer with
-an USB analyzer too.
+Unfortunately, I don't have any reproducer for this issue yet.
 
-> 
-> asix_read_cmd() will catch a short read, and usbnet_read_cmd() will
-> catch a zero-length read as invalid.
-> 
-> So, my conclusion is... broken firmware on this device.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/3e5f109fb8fc/disk-7e161a99.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/051cd2ea2369/vmlinux-7e161a99.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/f4d2819ae9d5/bzImage-7e161a99.xz
 
-The data transfer function works fine on my side. And even if something
-is wrong with this device, the linux system shouldn't be broken down
-because of this.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+3e1ddd8aa744da8bec01@syzkaller.appspotmail.com
 
-Thanks,
-Xu Yang
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 6016 at net/mac80211/chan.c:844 ieee80211_recalc_chanctx_chantype+0x7a7/0xae0 net/mac80211/chan.c:844
+Modules linked in:
+CPU: 1 UID: 0 PID: 6016 Comm: kworker/u8:3 Not tainted 6.16.0-syzkaller-11699-g7e161a991ea7 #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
+Workqueue: netns cleanup_net
+RIP: 0010:ieee80211_recalc_chanctx_chantype+0x7a7/0xae0 net/mac80211/chan.c:844
+Code: 00 00 00 fc ff df 4c 89 fa 48 c1 ea 03 80 3c 02 00 0f 84 6f f9 ff ff 4c 89 ff e8 14 60 0c f7 e9 62 f9 ff ff e8 8a 08 a7 f6 90 <0f> 0b 90 e9 18 fc ff ff e8 7c 08 a7 f6 49 8d bd a0 09 00 00 48 b8
+RSP: 0018:ffffc900047c7098 EFLAGS: 00010293
+RAX: 0000000000000000 RBX: 000000000000000f RCX: ffffffff8b1484e2
+RDX: ffff888030da5a00 RSI: ffffffff8b1489d6 RDI: 0000000000000005
+RBP: dffffc0000000000 R08: 0000000000000005 R09: 000000000000000f
+R10: 000000000000000f R11: 0000000000000000 R12: 1ffff920008f8e1c
+R13: 0000000000000000 R14: ffff88805288a8c0 R15: 0000000000000007
+FS:  0000000000000000(0000) GS:ffff8881247c7000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000200000008000 CR3: 000000000e380000 CR4: 0000000000350ef0
+Call Trace:
+ <TASK>
+ ieee80211_assign_link_chanctx+0xb90/0xf00 net/mac80211/chan.c:944
+ __ieee80211_link_release_channel+0x273/0x4b0 net/mac80211/chan.c:1890
+ ieee80211_link_release_channel+0x128/0x200 net/mac80211/chan.c:2165
+ ieee80211_leave_mesh+0x71/0x150 net/mac80211/cfg.c:2842
+ rdev_leave_mesh net/wireless/rdev-ops.h:372 [inline]
+ cfg80211_leave_mesh+0x23e/0x900 net/wireless/mesh.c:277
+ cfg80211_leave+0x26a/0x3f0 net/wireless/core.c:1383
+ cfg80211_netdev_notifier_call+0x2c1/0x1120 net/wireless/core.c:1567
+ notifier_call_chain+0xbc/0x410 kernel/notifier.c:85
+ call_netdevice_notifiers_info+0xbe/0x140 net/core/dev.c:2229
+ call_netdevice_notifiers_extack net/core/dev.c:2267 [inline]
+ call_netdevice_notifiers net/core/dev.c:2281 [inline]
+ __dev_close_many+0xff/0x770 net/core/dev.c:1726
+ netif_close_many+0x233/0x630 net/core/dev.c:1780
+ netif_close net/core/dev.c:1797 [inline]
+ netif_close+0x17f/0x230 net/core/dev.c:1791
+ dev_close+0xaa/0x240 net/core/dev_api.c:220
+ cfg80211_shutdown_all_interfaces+0x9a/0x220 net/wireless/core.c:277
+ ieee80211_remove_interfaces+0xc3/0x740 net/mac80211/iface.c:2364
+ ieee80211_unregister_hw+0x55/0x3a0 net/mac80211/main.c:1664
+ mac80211_hwsim_del_radio drivers/net/wireless/virtual/mac80211_hwsim.c:5674 [inline]
+ hwsim_exit_net+0x3ac/0x7d0 drivers/net/wireless/virtual/mac80211_hwsim.c:6554
+ ops_exit_list net/core/net_namespace.c:198 [inline]
+ ops_undo_list+0x2ee/0xab0 net/core/net_namespace.c:251
+ cleanup_net+0x408/0x890 net/core/net_namespace.c:682
+ process_one_work+0x9cf/0x1b70 kernel/workqueue.c:3236
+ process_scheduled_works kernel/workqueue.c:3319 [inline]
+ worker_thread+0x6c8/0xf10 kernel/workqueue.c:3400
+ kthread+0x3c5/0x780 kernel/kthread.c:463
+ ret_from_fork+0x5d7/0x6f0 arch/x86/kernel/process.c:148
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
 
-> 
-> -- 
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
