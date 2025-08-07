@@ -1,80 +1,43 @@
-Return-Path: <netdev+bounces-212102-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212103-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94B52B1DED8
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 23:24:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD416B1DEE1
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 23:29:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 91962188E1B1
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 21:24:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C2F4F188DFC3
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 21:30:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD9AA2459E3;
-	Thu,  7 Aug 2025 21:24:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k0RVu/tP"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61B3C23AE9A;
+	Thu,  7 Aug 2025 21:29:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6098D4430
-	for <netdev@vger.kernel.org>; Thu,  7 Aug 2025 21:24:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D78654430
+	for <netdev@vger.kernel.org>; Thu,  7 Aug 2025 21:29:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754601856; cv=none; b=Jd2RRGbdLrddVvfceMPAF0fI5k2ZJQBHklphHiwLL7XhJWy/PvZ1Sqpvzgt6V082S8l2QnOZTX+HEUjI3Mc4eK7MWeI6+tzQlcG+LNqQ24cWsW6Q/yl+GwV1y4GwIKg+gu/UtCs7guujISxRZZj60uyL9tjjIF51JfMtQV+hrHs=
+	t=1754602179; cv=none; b=PlftCulLEW7WHFRB5t7Yck+jZnwuLzZbS7OmT8LmcflImj6ZlXOtsVonAHMMilGLv9K+besKNhlcs3Xp9pCrwkh89vFs6+c5/xOWmaEdXKUKw+ztfWsNpKYMI64truKv+ZOLheqfv7CV9gXXZ4Fjgo3SgsWnIonEsQDrDPmb3Vs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754601856; c=relaxed/simple;
-	bh=RAgIs4cxwD2bUtvRwVCcwRHSprjCKKADXdYyOCP8prw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QjFfFuKFk/A3gPjAaNp/X5CtzHQLJoYLc0THTNzVui6FLIqvxWF7mAQ0wM1qHgGhg6L0EBAfEYVcxs/sSgLyGhGizcPrlYg/YAb+LH0M9YvFp5D3S+5Wwr5Rs75vENcm/6lNJVuR8TqN4y9XIUgWw0t87yqKT3IpudYXVB1LFpI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k0RVu/tP; arc=none smtp.client-ip=209.85.215.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-b42348bae1fso888297a12.0
-        for <netdev@vger.kernel.org>; Thu, 07 Aug 2025 14:24:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1754601854; x=1755206654; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=W4mqmDrnMT7N7suSY0JjehM0twwV9p1yCQtEBzLNajQ=;
-        b=k0RVu/tPrSGVkBZ2uB4Ccp+TKX41IqqwX5DyjJBVn1ZNJdR493uaCqI0LxGIey2t0T
-         0A0d5TXebXaV8qlW01onxzYLHl2cxe4YxB9oG5O2J7H97QRjaveWpSnNU/6HJW0fEMuR
-         Il/sj4S25+wn3cPPa0Dtwx1FeHAB9ihQVXROYVzCp1riEc6TfIEwcwylP9tL1aFupOas
-         mQUvx6Uxokn0DKVzIBAT2o5iwS/Oypq1HqBwBi5qTPdq5Mc7WZHhbkbUh+BUt5W1W18Y
-         8nxv2UeEdfW8psIS2HKdbR7np4aVEnSop/UzkgFP1iwM/vBZ1C2fzJOTkz+LGhOgc47K
-         loag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754601854; x=1755206654;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=W4mqmDrnMT7N7suSY0JjehM0twwV9p1yCQtEBzLNajQ=;
-        b=AwuMkumAyDAF4cQTZF7uGbxRvM6VU2NH5Hjh22c18MO4QeWitLr+rs8WDRmu4yDRmu
-         cS33URQV1S4fV3lvTp/J2Ptq2HTOfuQumY9GmX9lVmDlsCsBNVivH+G0vPak/uom9jV9
-         oAfycLcNbksDeQ28waTPkOpCukqOlROrpu0Myi799kMPLMuUO73cQo4An/9R9oyYHyiK
-         B+eoXlIRhLf3ewxoDZiQ2K8dnrxKLQ5rqRFcHqa0bubHvLH5UZD3IVb5a12/BNhS/lBo
-         52BCaMZ+DcdWM1S92KckuToDHYoMOKftArbovZh/0Es0NLRrjkqiuiYQyZXIghvjFblf
-         Egfw==
-X-Gm-Message-State: AOJu0YzHjkBLJT5OTXwGl2bOOgqwABNUgabUZ1r7IU4vu5rhCNAnnoy1
-	nmVqDFuGvbHxOxSnwfj4Qco7FcqVx8bQantRJZC6FDyjZo+lJKLPAMGC
-X-Gm-Gg: ASbGncuJpNcYHYhhLVM4yjJhd8RtuDpHsB57bmUqmXBn5J1JDE1CIdL9A5/YBQqKk3Y
-	LPzTghXIq0L0ejC92/0sysCkcI5s50aFErTZho7RRftUqQ+BSO+vtEiI2ABtqx2JiEluLVtuNLh
-	m8g8NWP2HW3CsJPSt1vO+BFJ0FqzrMkG9l1RTivij0Qq8Q2dgWX6U0U3lSq/VWcgmoUvF0aDvn3
-	QtiZhb0kXbfqd2w4h5Pf07tfD0x7/TLa5SK4DrtuG4LBBT4at1Mlf3n568mboNDj/Uj1B/3gwtQ
-	Yl5cCM1d0MWlu+ivoERoaKr9sn+bO+4h9dxVoFR7M2jRJtLc6JGU1J6UgtcQuOZsVnWhIHgDsEX
-	dOkt1wK1RcH6v3ANOADA8MXQ0gEq382cOS0X6D/1d2dQFs3A40p2bnC3H336CH0K24/akk7FbUv
-	0=
-X-Google-Smtp-Source: AGHT+IEOeNFEVZzBQA122R9LVuIZox1guk+74+2ywqbXodzsFuK/dGMRqn/SnDojkrUETJ+4aANJSg==
-X-Received: by 2002:a17:902:d484:b0:240:99e6:6bc3 with SMTP id d9443c01a7336-242c204cc8dmr6625285ad.20.1754601854480;
-        Thu, 07 Aug 2025 14:24:14 -0700 (PDT)
-Received: from ?IPV6:2a03:83e0:1151:15:ac:1a3b:4cc3:615e? ([2620:10d:c090:500::5:1df4])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-241d1ef7557sm191965775ad.19.2025.08.07.14.24.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 Aug 2025 14:24:13 -0700 (PDT)
-Message-ID: <a5b3f56f-a7f8-4fa5-8cd6-de9c836db2ac@gmail.com>
-Date: Thu, 7 Aug 2025 14:24:12 -0700
+	s=arc-20240116; t=1754602179; c=relaxed/simple;
+	bh=f2yBH7mNmbBsosSxXQehBIdyuMWEVMx4aW9mfLLzbH0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
+	 In-Reply-To:Content-Type; b=qmoEK0JjuYubHPmidy+winv2xEaQ/scCZzT/imIoHjrTaGUfOAJtLVx1pFRv70Jwg9VS+dDmuIbK5xVbd7QO9U8Jp/KXI6Y7zW0aXNSjJ2uJcCFVboxY5rZNFMiQaE+z0Skxl6XxxcoHt5dePvpW9pWPNL7lTgd4aJKEqNPNJto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.192] (ip5f5af7c7.dynamic.kabel-deutschland.de [95.90.247.199])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id C3D6460288276;
+	Thu, 07 Aug 2025 23:29:10 +0200 (CEST)
+Message-ID: <9e72404e-ab66-43dc-8065-1c7008178db6@molgen.mpg.de>
+Date: Thu, 7 Aug 2025 23:29:06 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,54 +45,96 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 5/9] eth: fbnic: Add XDP pass, drop, abort
- support
-To: Alexander Duyck <alexander.duyck@gmail.com>,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, alexanderduyck@fb.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, horms@kernel.org, vadim.fedorenko@linux.dev,
- jdamato@fastly.com, sdf@fomichev.me, aleksander.lobakin@intel.com,
- ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
- john.fastabend@gmail.com
-References: <20250723145926.4120434-1-mohsin.bashr@gmail.com>
- <20250723145926.4120434-6-mohsin.bashr@gmail.com> <aIEdS6fnblUEuYf5@boxer>
- <d47b541e48002d8edfc8331183c4617fb3d74f8a.camel@gmail.com>
- <aINUysHmm9157btU@boxer>
- <CAKgT0Ud-QVX=xn8QZN-MBkVwHdcxE8FDz_AzhW-vdZJyLrLTkQ@mail.gmail.com>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net 1/2] ice: fix NULL access of
+ tx->in_use in ice_ptp_ts_irq
+To: Jacob Keller <jacob.e.keller@intel.com>
+References: <20250807-jk-ice-fix-tx-tstamp-race-v1-0-730fe20bec11@intel.com>
+ <20250807-jk-ice-fix-tx-tstamp-race-v1-1-730fe20bec11@intel.com>
 Content-Language: en-US
-From: Mohsin Bashir <mohsin.bashr@gmail.com>
-In-Reply-To: <CAKgT0Ud-QVX=xn8QZN-MBkVwHdcxE8FDz_AzhW-vdZJyLrLTkQ@mail.gmail.com>
+Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20250807-jk-ice-fix-tx-tstamp-race-v1-1-730fe20bec11@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
->>>> Hi Mohsin,
->>>>
->>>> I thought we were past the times when we read prog pointer per each
->>>> processed packet and agreed on reading the pointer once per napi loop?
->>>
->>> This is reading the cached pointer from the netdev. Are you saying you
->>> would rather have this as a stack pointer instead? I don't really see
->>> the advantage to making this a once per napi poll session versus just
->>> reading it once per packet.
->>
->> Hi Alex,
->>
->> this is your only reason (at least currently in this patch) to load the
->> cacheline from netdev struct whereas i was just suggesting to piggyback on
->> the fact that bpf prog pointer will not change within single napi loop.
->>
->> it's up to you of course and should be considered as micro-optimization.
+Dear Jacob,
+
+
+Thank you for the patch.
+
+Am 07.08.25 um 19:35 schrieb Jacob Keller:
+> The E810 device has support for a "low latency" firmware interface to
+> access and read the Tx timestamps. This interface does not use the standard
+> Tx timestamp logic, due to the latency overhead of proxying sideband
+> command requests over the firmware AdminQ.
 > 
-> The cost for the "extra cacheline" should be nil as from what I can
-> tell xdp_prog shares the cacheline with gro_max_size and _rx so in
-> either path that cacheline is going to eventually be pulled in anyway
-> regardless of what path it goes with.
+> The logic still makes use of the Tx timestamp tracking structure,
+> ice_ptp_tx, as it uses the same "ready" bitmap to track which Tx
+> timestamps.
+> 
+> Unfortunately, the ice_ptp_ts_irq() function does not check if the tracker
+> is initialized before its first access. This results in NULL dereference or
+> use-after-free bugs similar to the following:
+> 
+> [245977.278756] BUG: kernel NULL pointer dereference, address: 0000000000000000
+> [245977.278774] RIP: 0010:_find_first_bit+0x19/0x40
+> [245977.278796] Call Trace:
+> [245977.278809]  ? ice_misc_intr+0x364/0x380 [ice]
+> 
+> This can occur if a Tx timestamp interrupt races with the driver reset
+> logic.
+
+Do you have a reproducer?
+
+> Fix this by only checking the in_use bitmap (and other fields) if the
+> tracker is marked as initialized. The reset flow will clear the init field
+> under lock before it tears the tracker down, thus preventing any
+> use-after-free or NULL access.
+
+Great commit message. Thank you for taking the time to write this down.
+
+> Fixes: f9472aaabd1f ("ice: Process TSYN IRQ in a separate function")
+> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+> ---
+>   drivers/net/ethernet/intel/ice/ice_ptp.c | 13 ++++++++-----
+>   1 file changed, 8 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
+> index e358eb1d719f..fb0f6365a6d6 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_ptp.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
+> @@ -2701,16 +2701,19 @@ irqreturn_t ice_ptp_ts_irq(struct ice_pf *pf)
+>   		 */
+>   		if (hw->dev_caps.ts_dev_info.ts_ll_int_read) {
+>   			struct ice_ptp_tx *tx = &pf->ptp.port.tx;
+> -			u8 idx;
+> +			u8 idx, last;
+>   
+>   			if (!ice_pf_state_is_nominal(pf))
+>   				return IRQ_HANDLED;
+>   
+>   			spin_lock(&tx->lock);
+> -			idx = find_next_bit_wrap(tx->in_use, tx->len,
+> -						 tx->last_ll_ts_idx_read + 1);
+> -			if (idx != tx->len)
+> -				ice_ptp_req_tx_single_tstamp(tx, idx);
+> +			if (tx->init) {
+> +				last = tx->last_ll_ts_idx_read + 1;
+> +				idx = find_next_bit_wrap(tx->in_use, tx->len,
+> +							 last);
+> +				if (idx != tx->len)
+> +					ice_ptp_req_tx_single_tstamp(tx, idx);
+> +			}
+>   			spin_unlock(&tx->lock);
+>   
+>   			return IRQ_HANDLED;
 > 
 
-Hi Maciej,
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
 
-Appreciate your suggestion regarding the micro-optimization. However, at 
-this time, we are not planning to adopt this change. I am all ears to 
-any further thoughts or concerns you may have about it.
+
+Kind regards,
+
+Paul
 
