@@ -1,142 +1,153 @@
-Return-Path: <netdev+bounces-211994-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-211995-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D07D2B1CF87
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 01:52:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E46BB1CFA3
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 02:03:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 080325675D7
-	for <lists+netdev@lfdr.de>; Wed,  6 Aug 2025 23:52:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0DB83562457
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 00:03:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33E0123BCF8;
-	Wed,  6 Aug 2025 23:52:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF59D211C;
+	Thu,  7 Aug 2025 00:03:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MxuonsxG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SYD/6c5s"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5549614D283
-	for <netdev@vger.kernel.org>; Wed,  6 Aug 2025 23:52:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A91E36D;
+	Thu,  7 Aug 2025 00:03:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754524333; cv=none; b=FWLGp6nA4O1vPWl1tqvpCVxufu1CBVSpI67AgHHfLIdggS9t6dfSm1w3OHH/3dnu9gy1sw303+AMPrGEHx7YKRwffpdexg9i/wol/bGJQ/6ImVlFYenZpSofDIMbW8DP0k6iFL5frU1n5mkC/+0AYY8Z38/Z/Uo0ATRBWnowhy0=
+	t=1754525009; cv=none; b=BMPzdRWsagIqOT+cg39uNPuO1ndMkCGvLq8DXhX4P3VR50j1YOsLtOowpVNlS2mHDclTa1k+mYL4CGoBTrWassT7bZ86cqktLf60C2XLs8gv7mmQPUcO0cwaRyAbVOOlUE3CqYcFyq9Tg6bg2/ImH4Je1OzCljPUCHfxQ/dNAos=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754524333; c=relaxed/simple;
-	bh=H3tUS4tMw+ALA3XFesO6J1gYy/juddA6KF1OWw1DaDk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m2e+1RrKfh6dVmrlm5t3wZIxfXmp9G9NlhZR+MDHHUp4BpE7Q06PzGtwZRfkpC4u/5RhBDwpYzr7f6cpfA1SWOWtF+EGF0IL8HRmI71A8ak+eUyyPIT1Far6dgQbDCg2u60Dz3jkd45TrWn+P0vVN4hDpztBxKZO00SZ5M3kzMI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=MxuonsxG; arc=none smtp.client-ip=91.218.175.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 6 Aug 2025 16:51:33 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1754524318;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2wP0O1tbMn8HVhzrrMtN0N9Bu4W03vBBOSwFroD8yV8=;
-	b=MxuonsxGj9mLWiEibLGLoux3An6eyPmDLEpSO+AXBrUnZHWjMFnsjvIjs3km8kAYy1b3O8
-	/O/7fHFx5NNDWISuRCDlhqVKSwoXL9wIzA7hIHNo4c0o2srnxCM/JTiQ5Bl3GpYykH5kcr
-	FD6toaiINNAAWTaQoYKXpz0KNf4ber0=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Shakeel Butt <shakeel.butt@linux.dev>
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: Daniel Sedlak <daniel.sedlak@cdn77.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Jonathan Corbet <corbet@lwn.net>, Neal Cardwell <ncardwell@google.com>, 
-	David Ahern <dsahern@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
-	Yosry Ahmed <yosry.ahmed@linux.dev>, linux-mm@kvack.org, netdev@vger.kernel.org, 
-	Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>, 
-	Roman Gushchin <roman.gushchin@linux.dev>, Muchun Song <muchun.song@linux.dev>, cgroups@vger.kernel.org, 
-	Tejun Heo <tj@kernel.org>, Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, 
-	Matyas Hurtik <matyas.hurtik@cdn77.com>
-Subject: Re: [PATCH v4] memcg: expose socket memory pressure in a cgroup
-Message-ID: <ai34al6aocctgjxob7pshhm4lyqfnzlytjefhlum6dxwjcx26o@fj2ca5jdqxa7>
-References: <20250805064429.77876-1-daniel.sedlak@cdn77.com>
- <fcnlbvljynxu5qlzmnjeagll7nf5mje7rwkimbqok6doso37gl@lwepk3ztjga7>
- <CAAVpQUBrNTFw34Kkh=b2bpa8aKd4XSnZUa6a18zkMjVrBqNHWw@mail.gmail.com>
- <nju55eqv56g6gkmxuavc2z2pcr26qhpmgrt76jt5dte5g4trxs@tjxld2iwdc5c>
- <CAAVpQUCCg-7kvzMeSSsKp3+Fu8pvvE5U-H5wkt=xMryNmnF5CA@mail.gmail.com>
- <chb7znbpkbsf7pftnzdzkum63gt7cajft2lqiqqfx7zol3ftre@7cdg4czr5k4j>
- <CAAVpQUB_aEcbOJR==z=KbfC1FtWi2NM_wNm_p+9vL1xqfw7cEQ@mail.gmail.com>
+	s=arc-20240116; t=1754525009; c=relaxed/simple;
+	bh=tDY9PLdL7KzBuSVPjaxM+AXpLClNtgGmFkXweb/RZUk=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=CxC6KDz0lHEmAqdT72Q3aJHpNB+15vqwVi2XB7RvI0QrGJS5R7F+i3vNU4NDH0suiFScwdzodHYVW/+12fXEpguabfY2gMSflmfND6th/1EuqmOR0mOOlyXF9KBh+lYNZJ/x9eh+HJRngwGXCgCSCe4R/Tj0KJwKHheHh/fSpX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SYD/6c5s; arc=none smtp.client-ip=209.85.216.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-313bb9b2f5bso585875a91.3;
+        Wed, 06 Aug 2025 17:03:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1754525008; x=1755129808; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=s2nIm9pR2VFff1R0Gt37lG+o36/Td6KpLeuI6lVGeTs=;
+        b=SYD/6c5sb6OM7vfFH11hvFid9lWPAu6jEhebuU3vM38H2UWD0AJETvnsk8/naWwyJB
+         Ctm+i5aQwMVabwK02HFOdliwDLa5YvH819JVJtILe7pFrdxpRipeasPsASCHdAjbz8gg
+         T8mkb2iEOF+meUqYS5qyZi2zgwgXu5waKrjhJfEnIXjtC05B32oqZkzxTChcrt8sKAJ9
+         sDCq1epAJCRA+iKsBGrLY6S+78UvnEw6fBQXbS4cd6TLIukfVDggM8cZtoIDgLJg6vIS
+         tNjI3vNVdXzTxFmDkBa1h1Rxl4yHtMufTzBEemsSeMbx/4gqtrZer28UQQfX0KDz8ZmP
+         3Xnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754525008; x=1755129808;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=s2nIm9pR2VFff1R0Gt37lG+o36/Td6KpLeuI6lVGeTs=;
+        b=lzcd0oiDfMGtB51d04dO8S/4qnuEvgxtoBuAfXZiQNfkZg77got7heumDAy9n5gwE1
+         RvWYYFaiXfua14V1xxMOYyJhi22lj/3DgaGV38wQ1uwpBtg4comgv8G4cwCbSL9ooUme
+         nsVNe1pflEi4YwHFOpVdr3Jwk0YRGbH4kQI5K/8eV5WPGbZ8mrVjewS14fwW74cS1q2b
+         stgHYltZMua1tKSs4VVkVAb/luxDg5Jiwj7qqhyj+kiccNKqju+/9lSog7ZWTfNGEVm+
+         hTD+LXYSc3c8iA/8EZ4jvNcBIekz30jUXk2Em9eFnR2THWeSKAXt8eYRAijrD3SP56f8
+         DUBw==
+X-Forwarded-Encrypted: i=1; AJvYcCUbjf9uHqqVNkpEg0L1YHkoi6NMhRrPfTujJWZSgEkeTgyhklDUJ4U8SQpkZihMq3HnhwKiW9WlPJ+h@vger.kernel.org, AJvYcCVjPEbz1eu9IkLtxuQ2lILw0ABB1EuKjwadrGt+wF50gUhWzjYsxfWxm7PbJOHFnBUxjrOf4ufJ@vger.kernel.org, AJvYcCXGYHXBzjVS1lWrn5JxLAY/WpeaerglgNbiLpI8ktEJfSUozrbB2ASWIeQR61GZD4PEh+SzSitjQtY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxBsA2TKC/1SCpk1jlcqQh8Lkz0dZfnuV1vY07+WDMTBKk8++TS
+	nj6VtnS50SLH1xo0Yt+IO1OubA1M8AXdPr2hTuYj2K+j324+pYldGLgH
+X-Gm-Gg: ASbGncuB0FDDmxC5KikvW/edJiX0NOu64lA30hUQQ+4XzpBgWs8LTuv5WM9hq3rTKW5
+	2tIrWlp2EIPwFIAlMLLLot84qvQSixcMPpaJCVwyyttbzezNBMO2F5pC9DVro0G7R9wiqRrR3/1
+	MMXzgTpeGmcYhPKYTav+ZZMyoaohZYPWaM5S8FSjUA9XJ2c656JGi8ainDnDVZixja3By3PUb8K
+	E4qwbl/ZntpYglYNo35Umv0IitlStZuteQvFz/x2cbQ+cKNh1ZoRxTuVxL56riIj32zVBkEeAtV
+	5epHUK+RzE9Ou24/2ArERkbaGD6N4dC0nNV+PHS39jdw4TwrLffTpOYvQLmMn+1Z+bHnv33Df/L
+	oRPWBrFZFLUFIS/NPs+sMN3s8uKM/bYVCAZIj
+X-Google-Smtp-Source: AGHT+IHndIqzglD98iobqIfSre5A1Dz03NPUiXq1oQdA0qqIpiN9bEtefJ4HDNfGWlO3SOLnCSjtyw==
+X-Received: by 2002:a17:90b:1c85:b0:31f:6f8c:6c92 with SMTP id 98e67ed59e1d1-32166c2b18emr6044750a91.11.1754525007434;
+        Wed, 06 Aug 2025 17:03:27 -0700 (PDT)
+Received: from [192.168.0.69] ([159.196.5.243])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-32102a559bdsm9223807a91.1.2025.08.06.17.03.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Aug 2025 17:03:26 -0700 (PDT)
+Message-ID: <ad14410ef291af926e7185d5d95cb0c932135ee3.camel@gmail.com>
+Subject: Re: [RFC 1/4] net/handshake: get negotiated tls record size limit
+From: Wilfred Mallawa <wilfred.opensource@gmail.com>
+To: Hannes Reinecke <hare@suse.de>, alistair.francis@wdc.com, 
+	dlemoal@kernel.org, chuck.lever@oracle.com, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	donald.hunter@gmail.com, corbet@lwn.net, kbusch@kernel.org,
+ axboe@kernel.dk, 	hch@lst.de, sagi@grimberg.me, kch@nvidia.com,
+ borisp@nvidia.com, 	john.fastabend@gmail.com, jlayton@kernel.org,
+ neil@brown.name, okorniev@redhat.com, 	Dai.Ngo@oracle.com, tom@talpey.com,
+ trondmy@kernel.org, anna@kernel.org, 	kernel-tls-handshake@lists.linux.dev,
+ netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-nvme@lists.infradead.org, linux-nfs@vger.kernel.org
+Date: Thu, 07 Aug 2025 10:03:14 +1000
+In-Reply-To: <2a9c71e0-f29d-46b6-823d-a957b10b4858@suse.de>
+References: <20250729024150.222513-2-wilfred.opensource@gmail.com>
+	 <20250729024150.222513-4-wilfred.opensource@gmail.com>
+	 <2a9c71e0-f29d-46b6-823d-a957b10b4858@suse.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (3.56.2-1.fc42) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAAVpQUB_aEcbOJR==z=KbfC1FtWi2NM_wNm_p+9vL1xqfw7cEQ@mail.gmail.com>
-X-Migadu-Flow: FLOW_OUT
 
-On Wed, Aug 06, 2025 at 04:40:45PM -0700, Kuniyuki Iwashima wrote:
-> On Wed, Aug 6, 2025 at 4:34 PM Shakeel Butt <shakeel.butt@linux.dev> wrote:
-> >
-> > On Wed, Aug 06, 2025 at 03:01:44PM -0700, Kuniyuki Iwashima wrote:
-> > > On Wed, Aug 6, 2025 at 2:54 PM Shakeel Butt <shakeel.butt@linux.dev> wrote:
-> > > >
-> > > > On Wed, Aug 06, 2025 at 12:20:25PM -0700, Kuniyuki Iwashima wrote:
-> > > > > > > -                     WRITE_ONCE(memcg->socket_pressure, jiffies + HZ);
-> > > > > > > +                     socket_pressure = jiffies + HZ;
-> > > > > > > +
-> > > > > > > +                     jiffies_diff = min(socket_pressure - READ_ONCE(memcg->socket_pressure), HZ);
-> > > > > > > +                     memcg->socket_pressure_duration += jiffies_to_usecs(jiffies_diff);
-> > > > > >
-> > > > > > KCSAN will complain about this. I think we can use atomic_long_add() and
-> > > > > > don't need the one with strict ordering.
-> > > > >
-> > > > > Assuming from atomic_ that vmpressure() could be called concurrently
-> > > > > for the same memcg, should we protect socket_pressure and duration
-> > > > > within the same lock instead of mixing WRITE/READ_ONCE() and
-> > > > > atomic?  Otherwise jiffies_diff could be incorrect (the error is smaller
-> > > > > than HZ though).
-> > > > >
-> > > >
-> > > > Yeah good point. Also this field needs to be hierarchical. So, with lock
-> > > > something like following is needed:
-> > > >
-> > > >         if (!spin_trylock(memcg->net_pressure_lock))
-> > > >                 return;
-> > > >
-> > > >         socket_pressure = jiffies + HZ;
-> > > >         diff = min(socket_pressure - READ_ONCE(memcg->socket_pressure), HZ);
-> > >
-> > > READ_ONCE() should be unnecessary here.
-> > >
-> > > >
-> > > >         if (diff) {
-> > > >                 WRITE_ONCE(memcg->socket_pressure, socket_pressure);
-> > > >                 // mod_memcg_state(memcg, MEMCG_NET_PRESSURE, diff);
-> > > >                 // OR
-> > > >                 // while (memcg) {
-> > > >                 //      memcg->sk_pressure_duration += diff;
-> > > >                 //      memcg = parent_mem_cgroup(memcg);
-> > >
-> > > The parents' sk_pressure_duration is not protected by the lock
-> > > taken by trylock.  Maybe we need another global mutex if we want
-> > > the hierarchy ?
-> >
-> > We don't really need lock protection for sk_pressure_duration. The lock
-> > is only giving us consistent value of diff. Once we have computed the
-> > diff, we can add it to sk_pressure_duration of a memcg and all of its
-> > ancestor without lock.
-> 
-> Maybe I'm wrong but I was assuming two vmpressure() called
-> concurrently for cgroup-C and cgroup-D, and one updates
-> cgroup-C's duration and another updates C&D duration.
-> 
-> cgroup-A -> cgroup-B -> cgroup-C -> cgroup-D
-> 
-> Could that happen ?  Even if it's yes, we could use atomic ops.
+On Tue, 2025-07-29 at 10:12 +0200, Hannes Reinecke wrote:
+>=20
+[snip]...
+> > diff --git a/Documentation/networking/tls-handshake.rst
+> > b/Documentation/networking/tls-handshake.rst
+> > index 6f5ea1646a47..cd984a137779 100644
+> > --- a/Documentation/networking/tls-handshake.rst
+> > +++ b/Documentation/networking/tls-handshake.rst
+> > @@ -169,7 +169,8 @@ The synopsis of this function is:
+> > =C2=A0 .. code-block:: c
+> > =C2=A0=20
+> > =C2=A0=C2=A0=C2=A0 typedef void	(*tls_done_func_t)(void *data, int stat=
+us,
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 key_serial_t p=
+eerid);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 key_serial_t p=
+eerid,
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 size_t tls_rec=
+ord_size_limit);
+> > =C2=A0=20
+> > =C2=A0 The consumer provides a cookie in the @ta_data field of the
+> > =C2=A0 tls_handshake_args structure that is returned in the @data
+> > parameter of
+>=20
+> Why is this exposed to the TLS handshake consumer?
+> The TLS record size is surely required for handling and processing
+> TLS
+> streams in net/tls, but the consumer of that (eg NVMe-TCP, NFS)
+> are blissfully unaware that there _are_ such things like TLS records.
+> And they really should keep it that way.
+>=20
+> So I'd really _not_ expose that to any ULP and keep it internal to
+> the TLS layer.
+>=20
+Hey Hannes,
 
-I am not getting the hierarchy you are using but yes concurrent updates
-to sk_pressure_duration can happen and simple atomic_add is good enough
-without any locking.
+Sorry for the delay in response, and thanks for the feedback! Yeah I
+agree it was a bad approach from me. It definitely makes more sense to
+keep things in the TLS layer. I will try to address this in V2.
+
+Regards,
+Wilfred
 
