@@ -1,143 +1,133 @@
-Return-Path: <netdev+bounces-212059-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A8EFB1D999
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 16:03:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D558EB1D997
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 16:02:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A27463BCD53
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 14:03:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED6EC16BB7B
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 14:02:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3962A25EF90;
-	Thu,  7 Aug 2025 14:03:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="sTDPq+Ke"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 449B025C802;
+	Thu,  7 Aug 2025 14:02:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CE9725D536;
-	Thu,  7 Aug 2025 14:03:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BE34238D49
+	for <netdev@vger.kernel.org>; Thu,  7 Aug 2025 14:02:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754575397; cv=none; b=FS3CLPm5nYpuCxKGQ7uDxLH4xQlWJmy3W13C5oB90M6HndxjTdKbSmriOdXXeFyG8FXJCL5Da7CDxENEgRIz84WUPACA/5NmR3JlhMDhgLotLfnNjgt094FvoQuI4RExInp5lvuIt2vnVwca3RPqn5a3/JKNujcCykQFqoKlLeg=
+	t=1754575363; cv=none; b=nUFqAQ+wjIa7lOi4i8I9aUzFotrkyTg7+OWI0TUpRcc+oY0lyOHUtFp1SPcwHTWgXXuVwDwOwX4GMPuIG8ZtD5ZtdQVEZgzuBSwxvTwiVEoMYttcoWQ21jWuSJwdQnmT9uKg3xMOShVYVCbzz0ST6BpuXKf6pPq7Zy76xcPVnCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754575397; c=relaxed/simple;
-	bh=bjEiiI161dYTrY0Cw3+ZZGVoX2NnHUSvIH1QPcitc9w=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=N6Lm6nmTyJXwz9u5uuemdRKmtcReykE0s//C2TeM1IS+9KnY55c22tOLpFqUgaSOKoeGb916uT/gtDGlvTPOBJ2pCwFgn8v5cL4kL+7bdOh/q+h6gRmosi1fp2faVVqH6l3ThCi49eSJi0oeDdnLHCi2GxK6hwWutoSucUWakcg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=sTDPq+Ke; arc=none smtp.client-ip=193.68.50.107
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
-Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
-	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id 59F64A037B;
-	Thu,  7 Aug 2025 16:03:10 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:from:from:message-id:mime-version:reply-to:subject:subject:to
-	:to; s=mail; bh=H0mVJmCWOicg9EcBRx/NfEzNMf28ZNNzr0DbLGreYW8=; b=
-	sTDPq+KeRzVhg8O8HZh3s+/CBi+XOgzUpJh3dvxLrDj+Zepd0UBhtKG5UhaE5gEq
-	EGTNtMdmWUeCbvzjfmJaM7s6vru4SeO24VeAncROkyH0f2ashTFdZMmUGY1ybR1a
-	3dmA1Cw4q3hyrNnR9yJSAV+N7TYlh+6tnYM7G1bHa7skl0l081x223l5HcMtS9Sc
-	YYqLeyzCsaqFOpJj8s8VKFm7acYeArpWdh5CuNCh+I2IJJwmU9cjpZkNLlx8C+Kf
-	trjs0kEyUBWstsRT47V4N2pOuE1j4rBpFcMcE1V9nr3lFg8+0NwyNZJipQ/WCV6I
-	ZzTLfnXIW/cyK4AcAxKETlnlM13q4/0IHrQspKYfDvQ6RG9yKp25c1yDUodv1duP
-	Eib+g65a9x/wP+xSS4rcTMwiEsaupZNkyfHxwiWAw1tJg1cJHjLu23uLs7/ArPPl
-	vPxe+3+AJfkUHylTxZG9hN2fvacPXWJlbx0GBdHEd2Ld2elQ9mmZ2bt4UhDHNSLE
-	O1nx6rr05auXZyAPSyqYUyLIAl+JplGAbXf//RGyBwOoNKLhWi/8HyaKE+FoyW0Q
-	D/G3FIfOMiHVsBtizDiQ8pFtC8fr4otul9ve1tL8ZKr7kOkxStMf9gUzmrZ3BEuJ
-	PTPWW4g9GzzMx/eOJDt2M/6QQcmb58BEWcIWxsvr+sQ=
-From: =?UTF-8?q?Bence=20Cs=C3=B3k=C3=A1s?= <csokas.bence@prolan.hu>
-To: Rob Herring <robh@kernel.org>, Geert Uytterhoeven
-	<geert+renesas@glider.be>, "David S. Miller" <davem@davemloft.net>, "Sergei
- Shtylyov" <sergei.shtylyov@cogentembedded.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-CC: Buday Csaba <buday.csaba@prolan.hu>, Andrew Lunn <andrew@lunn.ch>,
-	=?UTF-8?q?Cs=C3=B3k=C3=A1s=20Bence?= <csokas.bence@prolan.hu>, "Heiner
- Kallweit" <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-Subject: [PATCH net v2] net: mdiobus: release reset_gpio in mdiobus_unregister_device()
-Date: Thu, 7 Aug 2025 15:54:49 +0200
-Message-ID: <20250807135449.254254-2-csokas.bence@prolan.hu>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1754575363; c=relaxed/simple;
+	bh=dUAlM7f0/ek29519zm6XLoUu3GZyva65NIoAYroTzTw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IaK8xk2saSfY/Ws04VeZujqqfueYNovbLJk7xMocoUAmqaKCdKglalzuy55s02pdrrUN3hIVaV0EpShKsyHLhqv/ewFsCR1dqnxMTPZLJ75k+Y2eZQkPWGl5S6/ivtFglduhbksow1Xc6f4p2cFw9fBHpfBwnZVyO7SSZwPuiqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uk1CS-0003WQ-0k; Thu, 07 Aug 2025 16:02:32 +0200
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uk1CR-00CNyt-1P;
+	Thu, 07 Aug 2025 16:02:31 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uk1CR-00EK29-10;
+	Thu, 07 Aug 2025 16:02:31 +0200
+Date: Thu, 7 Aug 2025 16:02:31 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Xu Yang <xu.yang_2@nxp.com>, hkallweit1@gmail.com,
+	pabeni@redhat.com, netdev@vger.kernel.org, imx@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RESEND] net: phy: fix NULL pointer dereference in
+ phy_polling_mode()
+Message-ID: <aJSx9xTrFfFm0dcx@pengutronix.de>
+References: <ywr5p6ccsbvoxronpzpbtxjqyjlwp5g6ksazbeyh47vmhta6sb@xxl6dzd2hsgg>
+ <aJNSDeyJn5aZG7xs@shell.armlinux.org.uk>
+ <unh332ly5fvcrjgur4y3lgn4m4zlzi7vym4hyd7yek44xvfrh5@fmavbivvjfjn>
+ <b9140415-2478-4264-a674-c158ca14eb07@lunn.ch>
+ <aJOHObGgfzxIDzHW@shell.armlinux.org.uk>
+ <2b3fvsi7c47oit4p6drgjqeaxgwyzyopt7czfv3g2a74j2ay5j@qu22cohdcrjs>
+ <3mkwdhodm4zl3t6zsavcrrkuawvd3qjxtdvhxwi6gwe42ic7rs@tevlpedpwlag>
+ <aJSSNg4aZNfoqqZh@shell.armlinux.org.uk>
+ <aJSf0JaBl4cKphFi@pengutronix.de>
+ <d137518b-604b-4be3-9eb1-96d49123a251@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ESET-AS: R=OK;S=0;OP=CALC;TIME=1754575389;VERSION=7995;MC=2460790112;ID=765739;TRN=0;CRV=0;IPC=;SP=0;SIPS=0;PI=3;F=0
-X-ESET-Antispam: OK
-X-EsetResult: clean, is OK
-X-EsetId: 37303A2998FD515E667361
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <d137518b-604b-4be3-9eb1-96d49123a251@lunn.ch>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-From: Buday Csaba <buday.csaba@prolan.hu>
+On Thu, Aug 07, 2025 at 02:58:05PM +0200, Andrew Lunn wrote:
+> > Hm, I guess, with this change there will be a subtile regression.
+> > In case of an external PHYs the ax88772_init_phy() is using PHYlib to
+> > suspend the internal PHY.
+> > 
+> > May be:
+> >   priv->mdio->phy_mask = ~(BIT(priv->phy_addr) | BIT(AX_EMBD_PHY_ADDR));
+> 
+> I looked at that:
 
-reset_gpio is claimed in mdiobus_register_device(), but it is not
-released in mdiobus_unregister_device(). It is instead only
-released when the whole MDIO bus is unregistered.
-When a device uses the reset_gpio property, it becomes impossible
-to unregister it and register it again, because the GPIO remains
-claimed.
-This patch resolves that issue.
+Here we read the primary PHY address from the EEPROM. This offset may
+contain either the internal or external PHY address. See commit
+d0ffff8fddd5 ("USB: asix: Detect internal PHY and enable/use
+accordingly")
 
-Fixes: bafbdd527d56 ("phylib: Add device reset GPIO support") # see notes
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Cc: Csókás Bence <csokas.bence@prolan.hu>
-[ csokas.bence: Resolve rebase conflict and clarify msg ]
-Signed-off-by: Buday Csaba <buday.csaba@prolan.hu>
----
+I need to admit, asix_read_phy_addr(..., bool internal) was originally
+designed to distinguish between internal and external PHYs by setting
+internal = false.  But in practice, most vendors seem to follow the
+existing driver behavior as reference, and only modify the primary PHY
+address in the EEPROM.
 
-Notes:
-    Changes in v2:
-    * Rebase onto net-next (from 6.12)
-    * Clarify msg after talking with Csaba in person
-    * Collect Andrew's tag
-    
-    Link to v1:
-    https://lore.kernel.org/all/20250709133222.48802-3-buday.csaba@prolan.hu/
-    
-    Note to stable@:
-    * for 6.12 and before, the above v1 patch can be used.
+> 	ret = asix_read_phy_addr(dev, true);
+> 	if (ret < 0)
+> 		return ret;
+> 
 
- drivers/net/phy/mdio_bus.c          | 1 +
- drivers/net/phy/mdio_bus_provider.c | 3 ---
- 2 files changed, 1 insertion(+), 3 deletions(-)
+At this point, we store the address of the internal or external PHY:
 
-diff --git a/drivers/net/phy/mdio_bus.c b/drivers/net/phy/mdio_bus.c
-index fda2e27c1810..cad6ed3aa10b 100644
---- a/drivers/net/phy/mdio_bus.c
-+++ b/drivers/net/phy/mdio_bus.c
-@@ -91,6 +91,7 @@ int mdiobus_unregister_device(struct mdio_device *mdiodev)
- 	if (mdiodev->bus->mdio_map[mdiodev->addr] != mdiodev)
- 		return -EINVAL;
- 
-+	gpiod_put(mdiodev->reset_gpio);
- 	reset_control_put(mdiodev->reset_ctrl);
- 
- 	mdiodev->bus->mdio_map[mdiodev->addr] = NULL;
-diff --git a/drivers/net/phy/mdio_bus_provider.c b/drivers/net/phy/mdio_bus_provider.c
-index 48dc4bf85125..f43973e73ea3 100644
---- a/drivers/net/phy/mdio_bus_provider.c
-+++ b/drivers/net/phy/mdio_bus_provider.c
-@@ -443,9 +443,6 @@ void mdiobus_unregister(struct mii_bus *bus)
- 		if (!mdiodev)
- 			continue;
- 
--		if (mdiodev->reset_gpio)
--			gpiod_put(mdiodev->reset_gpio);
--
- 		mdiodev->device_remove(mdiodev);
- 		mdiodev->device_free(mdiodev);
- 	}
+> 	priv->phy_addr = ret;
 
-base-commit: d9104cec3e8fe4b458b74709853231385779001f
+If the PHY address matches the address of the internal PHY, then
+embd_phy is set to true:
+
+> 	priv->embd_phy = ((priv->phy_addr & 0x1f) == AX_EMBD_PHY_ADDR);
+> 
+> So priv->phy_addr has to be the address of the internal PHY, so this
+> should just work without anything special for the embedded PHY.
+
+For most AX88772-based devices, priv->phy_addr is indeed the internal
+PHY. However, on devices with an external PHY - like the "Linux
+Automation GmbH USB 10Base-T1L" - both internal and external PHYs are
+accessible over the MDIO bus.
+
 -- 
-2.43.0
-
-
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
