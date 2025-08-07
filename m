@@ -1,131 +1,140 @@
-Return-Path: <netdev+bounces-212066-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212068-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48060B1DA93
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 17:09:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C2C5B1DAEE
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 17:44:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3D76A7A3EB6
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 15:08:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2415F189A3AF
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 15:45:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F79F264A77;
-	Thu,  7 Aug 2025 15:09:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0FA426A08D;
+	Thu,  7 Aug 2025 15:44:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1J8Wu11l"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="PTYDDxAi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mslow3.mail.gandi.net (mslow3.mail.gandi.net [217.70.178.249])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F32D214884C
-	for <netdev@vger.kernel.org>; Thu,  7 Aug 2025 15:09:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0F71262FE6;
+	Thu,  7 Aug 2025 15:44:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754579379; cv=none; b=CLVWJJHNSjWNNEp8N2kYf7ZVMPevdxwq4kUFPC8j0Wj5Dhww1hYAzDlJZI8+Nnz3DtumN1yyHed89M8aVvhEldEDni6OFfYTwgQop8B5qjLTD/3Ex4jAPwndDDg51WnEM48A+d2HBFOWhNbeZf2E5xvqZGK1eQcRpl7zVjSvBLM=
+	t=1754581481; cv=none; b=I+LiHAXXqixC1uaV0k2DJ6GF6ztthyAF/hq5PDAqipkjHWrCtcgY9QGF6jB/bcN6g58T8oTebAVHViyVw932kS91HHFEHLqZCndoizmLWZGcCCumvsChzlZKz23E4oO/aEHj5nrie85/KtMSmOnhNYC/aO25yTROVJYq4RxNQZs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754579379; c=relaxed/simple;
-	bh=vXI9Zam5eYCmdhXZAZEND+qlnOZtF3m0aq2gFtw/4+4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=r7A2fGRuWarjMcRTh9IbWLP/RCaEO4naerkmzeyM+iVWtVcg8VEIPAVyKzsUm5H8089lxkp5y1raLkFA1/sW/hvh//RhYC3/R1NisOUmaIf+gMCvB4GMlPKWKj+1xTN7+OUTRSImlhiaVd73ERChzOKB53XxMczBteUjBde/m3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1J8Wu11l; arc=none smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-76bf3dafaa5so2239803b3a.0
-        for <netdev@vger.kernel.org>; Thu, 07 Aug 2025 08:09:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754579377; x=1755184177; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vXI9Zam5eYCmdhXZAZEND+qlnOZtF3m0aq2gFtw/4+4=;
-        b=1J8Wu11l6Gy7VVNO/QwqqYEuaa34gA+Cs7/kv3fet3ag6W3hJrZatjQfMUmWECQ7ni
-         soXqdD0BKLYhti0KC+r+cJ6LmVFAFcm+UtRT41bhZ/5s7gHQcOkIlFuRhu1jdLAQI4ga
-         4KAawXhziw/1r4vODcSQZ6L/Qk3raaZ6bN8gOO6jmmacDKfw2rjOjHetC99EJAh1gn0P
-         HiE1iNCQAsXF3SiZ67qnDK0GL+Vwq2ciNUe2z2TY40bfvQBT4LE+RH62T7he1UTHGt/M
-         dYEJ5+QtKwGh0MaT00T7o0dGurtb6XqnugI9YAvOHRGpzMEdn7ybx832QZTQfLh6r0pI
-         myLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754579377; x=1755184177;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vXI9Zam5eYCmdhXZAZEND+qlnOZtF3m0aq2gFtw/4+4=;
-        b=tEpAHztU113E9I0/ONDf2To1ta1h17M5F8NdYwQuBoY+pGAgOFRxjpkuDye4b02ekh
-         EcjjkEpJ6o87Zb6sPZjiv8EEoJbJ0SeQVEi5cGxY7kDnzMrVNRveIuonajjFOG3Ayzto
-         wThzwgvpZc77GReqrcLjtB6IQkrpM+WCLdy8J6PK0FAE1nP5OhHbz+xdJi4DEtoBTM5o
-         xGHeNfS3iLpANRV7QGMEEhiGcBS6vemSleQqQ1uJQLhWEbDcicI7L01/AOjlyNRJzI8E
-         QPw+eLhz3l6V/UAS0ww0pWQAyZWDlHEKcnqHwxmK5BJ5Qr1CE7YbLvULNb4FxQJSVlp+
-         mRSg==
-X-Forwarded-Encrypted: i=1; AJvYcCVBMrSkcLKtz0H4zTtZWNT2T7WZr7YnGdtldBEHg9E36O96GlJH4R9wkZsI/1iCmVeKD/+U+Eg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzjGRXxNbfx4nj8mW8/twlIPv3E1tkAuNpnMz739vMkK/tSqesw
-	VwQsjIfCUxqCekKlG9cCUPkSQ/uj8GzmDH+PqMbX+Ka2RClOv/KiQ0Rb63dHeIwZuSHZd0rukxk
-	kPHmvEyLCbyqHr0OY/+Kf1i+Rh/cnLydDmbMszqFv
-X-Gm-Gg: ASbGncsDP3iQFMGlu9nRU18ES0OZQkByC/au4kk3LKw8cwS5P4RZ9z9oJhiib7vWEKj
-	DUN2JlEH4M/NqblJ+MhcVk11QBZBSzsACHSyo71VQZQ9dw/a6kBGJJgwXIRdyaJ/sgGN+aPrwFH
-	UKkihBpGDgcHXHmBsiDjWqIiY/G6TFwtXLKOxIJ6Tu9DSvQPdcg0IVm2uR07wjwG7DHHD0QcM6X
-	FN3DviNJIwBW9tyuDcheAaq7rjzPrG2OwIDt8J3j5FdeDAL
-X-Google-Smtp-Source: AGHT+IG8QlJyGrI/LcZsqPJ4tTpGg3cKXVWXjR1Ly1wLcsKoXFz1GMnQ///H1MLhMEXGNQE8r3JHiVH9uD53B/zlYEk=
-X-Received: by 2002:a17:902:f64a:b0:240:4d19:8774 with SMTP id
- d9443c01a7336-242b076a24amr47832795ad.24.1754579376834; Thu, 07 Aug 2025
- 08:09:36 -0700 (PDT)
+	s=arc-20240116; t=1754581481; c=relaxed/simple;
+	bh=THm1SoEjdEMZZ7ysWdC8VuJNdis7fSw145Sks0ZuOMk=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
+	 References:In-Reply-To; b=dFPBVG+1yut28bDbR9srMQStUJDjsGxWa0Uf1/NZpCDZM3s5xz69iAgCM1iOcuM0a9V69+Xfv2IUbqgnsHeJ+1uGLdO4VC7nHRmW0tTS6/kA1HjVaXvxsPCA2qYajJP6A2fvEB4eYX5fq8xJAIoUb6qZKUfV9c9uolAVffKOoRo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=PTYDDxAi; arc=none smtp.client-ip=217.70.178.249
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::226])
+	by mslow3.mail.gandi.net (Postfix) with ESMTP id E2094580FE0;
+	Thu,  7 Aug 2025 15:24:23 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 7485D442C7;
+	Thu,  7 Aug 2025 15:24:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1754580256;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=THm1SoEjdEMZZ7ysWdC8VuJNdis7fSw145Sks0ZuOMk=;
+	b=PTYDDxAiEqhcHNXakvzEAxIEHtOYnZg0O4FZmg+lsrI3Kn0+/Bup9nOQLSwIjEuQ74IbDk
+	v0Y4OmGGsVrpxb7SxSr0kE8n6MHXpPx0drRvkgtC0H5+6YpNE2K4iM3W0IrCR4FqtxXe/3
+	lvqGvaSsShseE/yzIXQvAsl9IpHOpc7XH+FNd7yGvE0o/UzD+sP73DN4yqsIcN598td+BA
+	9wGEewScVY9ZVVHA5gXjogHYetiBg21SOGk65rONj+2d1989bg7n/32xRMm3cF1vGmDkn4
+	Vn5hsAPPVdGu+daHKdj0yFYdc/je+xtTN5JrVh+Kr5l52rgKZ94cuB8XiD9z6g==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250722100743.38914e9a@kernel.org> <20250723162547.1395048-1-nogikh@google.com>
- <20250723094720.3e41b6ed@kernel.org> <20250807064116.6aa8e14f@kernel.org>
-In-Reply-To: <20250807064116.6aa8e14f@kernel.org>
-From: Aleksandr Nogikh <nogikh@google.com>
-Date: Thu, 7 Aug 2025 17:09:24 +0200
-X-Gm-Features: Ac12FXyf-LII2oKhENT74R1IUHeqtiItmnUOlh8HIq0rExOfD6gVb883YMc88zw
-Message-ID: <CANp29Y5mZJJgn5LYDiLx11bH__NXZ32ut6VUTsEyXwqrOhksTw@mail.gmail.com>
-Subject: Re: [syzbot ci] Re: net: Revert tx queue length on partial failure in dev_qdisc_change_tx_queue_len()
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: dvyukov@google.com, linux-kernel-mentees@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, syzbot@lists.linux.dev, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Thu, 07 Aug 2025 17:24:13 +0200
+Message-Id: <DBWASGS8U4LN.1GMHL8A61VWU8@bootlin.com>
+Subject: Re: [PATCH net-next v2 12/18] net: macb: match skb_reserve(skb,
+ NET_IP_ALIGN) with HW alignment
+Cc: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <linux-riscv@lists.infradead.org>,
+ <linux-mips@vger.kernel.org>, "Thomas Petazzoni"
+ <thomas.petazzoni@bootlin.com>, "Tawfik Bayouk"
+ <tawfik.bayouk@mobileye.com>
+To: "Sean Anderson" <sean.anderson@linux.dev>, "Andrew Lunn"
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, "Rob Herring" <robh@kernel.org>, "Krzysztof
+ Kozlowski" <krzk+dt@kernel.org>, "Conor Dooley" <conor+dt@kernel.org>,
+ "Nicolas Ferre" <nicolas.ferre@microchip.com>, "Claudiu Beznea"
+ <claudiu.beznea@tuxon.dev>, "Paul Walmsley" <paul.walmsley@sifive.com>,
+ "Palmer Dabbelt" <palmer@dabbelt.com>, "Albert Ou" <aou@eecs.berkeley.edu>,
+ "Alexandre Ghiti" <alex@ghiti.fr>, "Samuel Holland"
+ <samuel.holland@sifive.com>, "Richard Cochran" <richardcochran@gmail.com>,
+ "Russell King" <linux@armlinux.org.uk>, "Thomas Bogendoerfer"
+ <tsbogend@alpha.franken.de>, "Vladimir Kondratiev"
+ <vladimir.kondratiev@mobileye.com>, "Gregory CLEMENT"
+ <gregory.clement@bootlin.com>, "Cyrille Pitchen"
+ <cyrille.pitchen@atmel.com>, "Harini Katakam" <harini.katakam@xilinx.com>,
+ "Rafal Ozieblo" <rafalo@cadence.com>, "Haavard Skinnemoen"
+ <hskinnemoen@atmel.com>
+From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
+X-Mailer: aerc 0.20.1-0-g2ecb8770224a-dirty
+References: <20250627-macb-v2-0-ff8207d0bb77@bootlin.com>
+ <20250627-macb-v2-12-ff8207d0bb77@bootlin.com>
+ <1a4fe95a-f029-43b2-aed1-594365254b6a@linux.dev>
+In-Reply-To: <1a4fe95a-f029-43b2-aed1-594365254b6a@linux.dev>
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdduvdduvdekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpegggfgtfffkufevvffhofhfjgesthhqredtredtjeenucfhrhhomhepvfhhrohoucfnvggsrhhunhcuoehthhgvohdrlhgvsghruhhnsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeduteeltdevjedvkeelueejhfdvleeiueetvdfgveffffekueeghffhieduleejveenucffohhmrghinhepsghoohhtlhhinhdrtghomhenucfkphepvdgrtddumegtsgdugeemheehieemjegrtddtmeeiieegsgemfhdtfhhfmehfvgdutdemlegvfhgunecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgdugeemheehieemjegrtddtmeeiieegsgemfhdtfhhfmehfvgdutdemlegvfhgupdhhvghloheplhhotggrlhhhohhsthdpmhgrihhlfhhrohhmpehthhgvohdrlhgvsghruhhnsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeefvddprhgtphhtthhopehsvggrnhdrrghnuggvrhhsohhnsehlihhnuhigrdguvghvpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnv
+ ghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehrohgshheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhriihkodgutheskhgvrhhnvghlrdhorhhg
+X-GND-Sasl: theo.lebrun@bootlin.com
 
-Hi Jakub,
-
-On Thu, Aug 7, 2025 at 3:41=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
+On Tue Jul 1, 2025 at 6:40 PM CEST, Sean Anderson wrote:
+> On 6/27/25 05:08, Th=C3=A9o Lebrun wrote:
+>> If HW is RSC capable, it cannot add dummy bytes at the start of IP
 >
-> On Wed, 23 Jul 2025 09:47:20 -0700 Jakub Kicinski wrote:
-> > On Wed, 23 Jul 2025 18:25:47 +0200 Aleksandr Nogikh wrote:
-> > > On Tue, 22 Jul 2025 Jakub Kicinski wrote:
-> > > > I think this email is missing a References: header ?
-> > > > It doesn't get threaded properly.
-> > >
-> > > Yes, that was indeed a bug that has now been fixed, thanks for
-> > > reaching out!
-> >
-> > Thank you!
+> Receive-side coalescing? Can you add a brief description of this
+> feature to your commit message?
+
+Yes that is Receive Side Coalescing. Clearly it needs to be mentioned
+out loud, and briefly described.
+
+>> packets. Alignment (ie number of dummy bytes) is configured using the
+>> RBOF field inside the NCFGR register.
+>>=20
+>> On the software side, the skb_reserve(skb, NET_IP_ALIGN) call must only
+>> be done if those dummy bytes are added by the hardware; notice the
+>> skb_reserve() is done AFTER writing the address to the device.
+>>=20
+>> We cannot do the skb_reserve() call BEFORE writing the address because
+>> the address field ignores the low 2/3 bits. Conclusion: in some cases,
+>> we risk not being able to respect the NET_IP_ALIGN value (which is
+>> picked based on unaligned CPU access performance).
+>>=20
+>> Fixes: 4df95131ea80 ("net/macb: change RX path for GEM")
 >
-> One more thing, would it be possible to add / correct the DKIM on these
-> messages? Looks like when our bots load the syzbot ci emails from lore
-> the DKIM verification fails. I see a X-Google-DKIM-Signature: header,
-> but no real DKIM-Signature:
+> Do any existing MACBs support RSC? Is this a fix?=20
 
-Thanks for letting us know!
-Do these bots also face DKIM verification issues with regular syzbot
-emails? We send them absolutely the same way, so the problem must
-affect all reports.
+I have no idea. If any MACB supports RSC, it must be those running with
+NET_IP_ALIGN=3D0, so arm64/powerpc/x86.
 
-We use the GAE Mail API, and its documentation[1] says that it signs
-emails with DKIM only if a custom domain is configured. Since we send
-from the default GAE domain, this would explain the verification
-failures.
+Is it a fix? We can guess that all boards fall in either category:
+ - Don't support RSC (=3D> RBOF works fine).
+ - Support RSC (=3D> RBOF not working) AND NET_IP_ALIGN=3D0.
 
-We'll explore the ways to fix this.
+Both of those are not impacted, so we technically don't fix anything for
+current users.
 
-[1] https://cloud.google.com/appengine/docs/standard/services/mail?tab=3Dgo=
-#authentication_with_domainkeys_identified_mail_dkim
+Regards,
 
---=20
-Aleksandr
+--
+Th=C3=A9o Lebrun, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
+
 
