@@ -1,111 +1,106 @@
-Return-Path: <netdev+bounces-212006-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212007-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0CAAB1D1B6
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 06:50:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DC7AB1D216
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 07:36:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 733783AA36B
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 04:50:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C059726768
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 05:36:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF181198A2F;
-	Thu,  7 Aug 2025 04:50:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4251B20E328;
+	Thu,  7 Aug 2025 05:36:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from bmailout2.hostsharing.net (bmailout2.hostsharing.net [83.223.78.240])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0B0272622
-	for <netdev@vger.kernel.org>; Thu,  7 Aug 2025 04:50:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.78.240
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 736E31EEA54
+	for <netdev@vger.kernel.org>; Thu,  7 Aug 2025 05:36:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754542220; cv=none; b=Ddi+r8JXBoARinyiHvgungY3HxMF1sYeNW72AsezhzoQhFL20u3h8jymyZGbApWN6Q0b3UZ28aCxNm/E8uAoUxUc6n1jC9mqnaeI4a650InOvEvkj+uvZsFHUatlGCD1BFXr2KNTwkaZS/nvVIz8QFlRwM/BJipIaH52FuokZNo=
+	t=1754544998; cv=none; b=HlAxTmLS0MRT6qy889VlY3Jg4wxVhij//KgBWuzc0MuR0RrGZ1ek12l/cb5fLLoit9ZFEq67AXJUkv8zACWKyEBlCBhqICgTGm/ID2sJz05P7u4cT3iVZTfOSWwiL9sH//y/9XrgOp5bwcZ5czS3GuuRVhrq4AdcblpIn8VK0gs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754542220; c=relaxed/simple;
-	bh=6ofBkLaP+Qh3wSD9LlRMfxMZj74oX8KP4UIL5jrjdMo=;
+	s=arc-20240116; t=1754544998; c=relaxed/simple;
+	bh=sIsFthtYJE6uf9WLr5vGByPGTS4JaFDRSkM3TlrWm+8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=coY9SX+fmqEh8Q8Z+jqTMXzdBlIiXzOx9T4jsyZ5MOwZgEVtV09sS4AvFzE6kQ68QVtSvzNjEiJ7vkJLLdiFpV/1dRvUWZ2L9EghLWttpT+PGuFx9LwRLaHJ3iGh/2hpkjS+XDzxSGmewaiT96xqqhrhkd/88bUoTCE/jqaZjys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.78.240
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
-Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
-	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by bmailout2.hostsharing.net (Postfix) with ESMTPS id 10B01200A446;
-	Thu,  7 Aug 2025 06:50:10 +0200 (CEST)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id 088D3493353; Thu,  7 Aug 2025 06:50:09 +0200 (CEST)
-Date: Thu, 7 Aug 2025 06:50:09 +0200
-From: Lukas Wunner <lukas@wunner.de>
-To: Thinh Tran <thinhtr@linux.ibm.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, anthony.l.nguyen@intel.com,
-	aleksandr.loktionov@intel.com, przemyslaw.kitszel@intel.com,
-	pmenzel@molgen.mpg.de, jesse.brandeburg@intel.com,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	intel-wired-lan@lists.osuosl.org, rob.thomas@ibm.com,
-	Jacob Keller <jacob.e.keller@intel.com>
-Subject: Re: [PATCH iwl-net V4,2/2] i40e: Fully suspend and resume IO
- operations in EEH case
-Message-ID: <aJQwgTbRY59C196Z@wunner.de>
-References: <20240515210705.620-1-thinhtr@linux.ibm.com>
- <20240515210705.620-3-thinhtr@linux.ibm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=aY6pwcEa40uxnoFkzfYhFcgh2W6+qljlISnw6FcQH1huw6ZVUBb+MgP/SjEPRM91if1iHWo5dL5OVg7K7W21uLktxex9BIUF2Y2MG+dbKRK3v8bQVtZCvbi8d4PVcTx7q6Ce8xJHk3d25FsCnl/A28NOw4VA9yvPuVGh0+aayeA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1ujtIZ-0006I9-Mn; Thu, 07 Aug 2025 07:36:19 +0200
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1ujtIX-00CKCp-3A;
+	Thu, 07 Aug 2025 07:36:17 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1ujtIX-00ECto-2i;
+	Thu, 07 Aug 2025 07:36:17 +0200
+Date: Thu, 7 Aug 2025 07:36:17 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Tristram.Ha@microchip.com
+Cc: Oleksij Rempel <linux@rempel-privat.de>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v2] net: dsa: microchip: Fix KSZ8863 reset problem
+Message-ID: <aJQ7UQvkTRhSIT9K@pengutronix.de>
+References: <20250807005453.8306-1-Tristram.Ha@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240515210705.620-3-thinhtr@linux.ibm.com>
+In-Reply-To: <20250807005453.8306-1-Tristram.Ha@microchip.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Wed, May 15, 2024 at 04:07:05PM -0500, Thinh Tran wrote:
-> When EEH events occurs, the callback functions in the i40e, which are
-> managed by the EEH driver, will completely suspend and resume all IO
-> operations.
+On Wed, Aug 06, 2025 at 05:54:53PM -0700, Tristram.Ha@microchip.com wrote:
+> From: Tristram Ha <tristram.ha@microchip.com>
 > 
-> - In the PCI error detected callback, replaced i40e_prep_for_reset()
->   with i40e_io_suspend(). The change is to fully suspend all I/O
->   operations
-> - In the PCI error slot reset callback, replaced pci_enable_device_mem()
->   with pci_enable_device(). This change enables both I/O and memory of
->   the device.
-> - In the PCI error resume callback, replaced i40e_handle_reset_warning()
->   with i40e_io_resume(). This change allows the system to resume I/O
->   operations
+> ksz8873_valid_regs[] was added for register access for KSZ8863/KSZ8873
+> switches, but the reset register is not in the list so
+> ksz8_reset_switch() does not take any effect.
+> 
+> Replace regmap_update_bits() using ksz_regmap_8 with ksz_rmw8() so that
+> an error message will be given if the register is not defined.
+> 
+> A side effect of not resetting the switch is the static MAC table is not
+> cleared.  Further additions to the table will show write error as there
+> are only 8 entries in the table.
+> 
+> Fixes: d0dec3333040 ("net: dsa: microchip: Add register access control for KSZ8873 chip")
+> Signed-off-by: Tristram Ha <tristram.ha@microchip.com>
 
-The above was applied as commit c80b6538d35a.
+Reviewed-by: Oleksij Rempel <o.rempel@pengutronix.de>
 
-> @@ -16481,7 +16483,8 @@ static pci_ers_result_t i40e_pci_error_slot_reset(struct pci_dev *pdev)
->  	u32 reg;
->  
->  	dev_dbg(&pdev->dev, "%s\n", __func__);
-> -	if (pci_enable_device_mem(pdev)) {
-> +	/* enable I/O and memory of the device  */
-> +	if (pci_enable_device(pdev)) {
->  		dev_info(&pdev->dev,
->  			 "Cannot re-enable PCI device after reset.\n");
->  		result = PCI_ERS_RESULT_DISCONNECT;
+Thank you!
 
-Why was this change made?
-
-The driver calls pci_enable_device_mem() in i40e_probe(),
-so calling pci_enable_device() here doesn't seem to make any sense.
-
-The difference between pci_enable_device() and pci_enable_device_mem()
-is that the former also enables access to the I/O Space of the device.
-However I/O Space access is usually not used outside of x86.
-And your patch targets powerpc because you seek to support EEH,
-a powerpc-specific mechanism.
-
-Unfortunately the commit message is not helpful at all because it
-merely lists the code changes in prose form but doesn't explain
-the *reason* for the change.
-
-Thanks,
-
-Lukas
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
