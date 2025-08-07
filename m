@@ -1,130 +1,112 @@
-Return-Path: <netdev+bounces-212017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212018-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0DFEB1D40A
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 10:09:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E954B1D418
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 10:12:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F1DF91687E1
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 08:09:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E59EA188D31A
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 08:13:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EF2F24A04D;
-	Thu,  7 Aug 2025 08:09:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4B242459D2;
+	Thu,  7 Aug 2025 08:12:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JnyTN5lo"
+	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="dDDGVCXu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45EC5246BB7
-	for <netdev@vger.kernel.org>; Thu,  7 Aug 2025 08:09:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E91F242D8C;
+	Thu,  7 Aug 2025 08:12:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754554181; cv=none; b=jFJu6yorCjF1HBKeYlt7tNB4kSFvsmIc3rrMNdVsR/IOQwWqMqezY4eMVGV8z4tTY5aYX70VKe1s4RJb7gc8+SMTeOEQniFYwYEf70oOYFYWPNl5jKndF1kRiq72aU5VGP1Mb42QIaX8KytiiwhVK0soe3Lw/AMaz39U/1ioGxw=
+	t=1754554370; cv=none; b=kAnAYM8WQKExtrG7azeyZm4QNi6FJ0NsV6zw0x+J6uMaXtfFn/2GA1+JT40VA1UFd+HpMjIbvmp/Ir+f9QjWV+96nl7oDh9Jj0z4+v+R2GcSV/Zy2s5q9PfGpTDDTAZ9QhraPvOhBWr8T3J8xjNa4pA/CFMjgP1LkYGwWj7beLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754554181; c=relaxed/simple;
-	bh=NG8aMCDYi/WL5efK/Uu3n3eKEM6SXtiTD1GUBeg7nR4=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=jbjsKp90ClMFY+Rzfa2/FZ9V+Mkgh26bCyzKPwYgayOMVQFIAZAPv2CXsZXm7FMy/HOT0NQR6pW6ohWK7GYepDMX6Xk5Gr3NxF31oe4w2SQJOh+lhqgyBSUqPxHF7QjHlyodb2iuy0lf70zoztMFt6hQNtxnLLyHdwyNvsLUdPc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--wakel.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JnyTN5lo; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--wakel.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3217ba6843cso199284a91.2
-        for <netdev@vger.kernel.org>; Thu, 07 Aug 2025 01:09:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754554178; x=1755158978; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=VLNRGdnrrrHWLpewd/Xb7yM5Du12QJz86ZRVs5IOSyk=;
-        b=JnyTN5loA/U/zeh9EeRsprpZCyI2pJlOp6FFJmTzOB2Veeb9Wk9B6rrKu2CyOf4KYO
-         oQ2w6ntg47wJMWr8I5I6NdClUJ/teNpVldLR7UHMBkykcYLVMcBGxyT3l9v7uckP+C5C
-         2tuMMTgglLr9VW5vIMVpQ8rp1E0W7KaOeWSw82/hhAGnb5zQkLbjExnUMb3b6Nzx4AZl
-         HY5AOgb68tmbxUo52bwyedurzoCokZxCTSSgEZee8UILfQHKRaKT7t4uO8CdvCd9IJiJ
-         YZrGsDelopxNu0O7py9I7I2rREQNW/J5Es7XFfi1edBGXVRHqTSTIn5F4sUqZTb0csAj
-         EdPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754554178; x=1755158978;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=VLNRGdnrrrHWLpewd/Xb7yM5Du12QJz86ZRVs5IOSyk=;
-        b=OzCjHqnvnp1xfRA6XaGHx9j2oUXQ6IAO3X7iRLCRPZGSGG/wR33j41ACo/3E9zidxW
-         Y4h98/+jTasWT8+iOW8wH3uvOPao3M8eaMurAoEhV2IFd/KvJvwmaE5hmHaiE+cBJdaL
-         QU2Gj81tfymOf7hseAtg6dLb685DdtMK+f38H6RH+J8aqw9AZNgil2N1ouvtaJLr7m/9
-         qRQqTHe53hxyxabjNXW46ZuXLme6ISfaQQiPXaDQ+SmxcNPSFbZHXTJKllYuLp2Y+bOj
-         gbIXBX7CyltMYgFCPHpA5gCSlx9fa1iTXdh7GaIfsTWy9MxDVjF5eK65QZt/iOIXi6p+
-         h4Vw==
-X-Forwarded-Encrypted: i=1; AJvYcCWbZtOHNeC+NF9VMjUqxmk8PQSB6dRVkWJiv1GJPCfvKopdT7dJvs7ZxjMdr42EvlK9s8K4h78=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyVQauDy5wpBlLzL2fIat3j0BFnTac0x6HWxkx1xf7wXFNVCD6K
-	NGieZ0pfQTZR8aMCXuetUQXreEMxLlyJE9HRfQP4lvRqNprmX5BVevwCaPg8UW3EfSJInV9JVSt
-	pIA==
-X-Google-Smtp-Source: AGHT+IG8sljjPjemytxJ6EepEkRImkq0DnvG/hG3DgghsQDxt5WKavU7F2Clp5GAwSB/brbaER3yPagxfw==
-X-Received: from pjbta7.prod.google.com ([2002:a17:90b:4ec7:b0:314:d44:4108])
- (user=wakel job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4e85:b0:31e:326e:4d2d
- with SMTP id 98e67ed59e1d1-321763087famr3140808a91.5.1754554178483; Thu, 07
- Aug 2025 01:09:38 -0700 (PDT)
-Date: Thu,  7 Aug 2025 16:09:32 +0800
+	s=arc-20240116; t=1754554370; c=relaxed/simple;
+	bh=7EdlOcRR0NwYJwD8hYbF7warJbChcL56i1E37eWEx/A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=hEd4Bo0kjT5yHQKMDVPuSS5SaCNExHOOFNft93f+bgg1N2yHQDdOQIg0+w0faF93ev3+OGdBtYmuY1uVp+GqXzIdmsfPqLFrGGtYafLJgiATHaNRp8iBJDfK7Bx/v/GJHGR1yGfv9rzryT9grk1Pg7N1+3siBnzsJnS2G0whrUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=dDDGVCXu; arc=none smtp.client-ip=193.68.50.107
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
+Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
+	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id 38C56A037B;
+	Thu,  7 Aug 2025 10:12:39 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:from:from:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=mail; bh=UuRqPb6SX7syB2TiesZJ
+	ExxNgF2tJCZyFOUHLCx1+As=; b=dDDGVCXu8G/3AJDBLLZ5h5sPkNz/9EgA0A/3
+	CKUPObCBjSpfp0U0g6abhE451Xe5OZnECt+8WIFGVcTZ0XhOxKc/ObBab7SXRICX
+	In/ct3ZKdYcW1XJoM66ptAcGCmg9dqIoNTIpB457vmv5lwC9J9EVZz1kryg7kTU2
+	sXlqV6tIJzV+4dGb6d0rxps/102kAmL+7X1o8Zg1ryho45VeXkkgMODkVDss3r4L
+	fB1J9OAw0rBi8q9bnaTDFa8X9lP4YwHDvAmD4xlRt6ujq26d3js6SWyZE5gFAzMw
+	u481iug4I+HAFAIv+lT+TUmnBYBxAiAt7DDnNyLWrtqGEiN8TJDDVBAztjNLzQLF
+	TsJfbu+t+abdExZaWnLkT3vILeaKqy+12EUpXqZoPXzzS+eUUD/h/KzDUclNViKE
+	ZjnoJ4Dci7iLrProypXcenQv8RC1ca5nPS6BH2grbXVUTvgvlJDYvif9rYgFt9Qg
+	I749EWTcmiMvbSj2Ds9ACwecMJkIUL7wulwqEPqjaHcZcNQO71BNbsAjJoHxYPnL
+	x6ywM9UBq/Rbg4AVkHpj+lHrg9HIK5mwywslaioW2Psx71rdi29gL4LGg8J0BwkO
+	pEB/2+qf8FpxLR1NT4Jaqg1iZPB31RPgyrZtexVwpT8kbplKgSBHM3t7VaGpnyvk
+	63LwwKI=
+Message-ID: <5600f2ea-eaa2-4a8d-8092-e9f3d3cb42d1@prolan.hu>
+Date: Thu, 7 Aug 2025 10:12:37 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.50.1.703.g449372360f-goog
-Message-ID: <20250807080932.1678178-1-wakel@google.com>
-Subject: [PATCH] selftests/net: Replace non-standard __WORDSIZE with
- sizeof(long) * 8
-From: Wake Liu <wakel@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>
-Cc: Simon Horman <horms@kernel.org>, Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
-	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, netdev@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	llvm@lists.linux.dev, wakel@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: mdio_bus: Use devm for getting reset GPIO
+To: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>
+CC: Geert Uytterhoeven <geert+renesas@glider.be>, Sergei Shtylyov
+	<sergei.shtylyov@cogentembedded.com>, "David S. Miller"
+	<davem@davemloft.net>, Rob Herring <robh@kernel.org>, Andy Shevchenko
+	<andriy.shevchenko@linux.intel.com>, Dmitry Torokhov
+	<dmitry.torokhov@gmail.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Csaba Buday <buday.csaba@prolan.hu>, "Heiner
+ Kallweit" <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, "Eric
+ Dumazet" <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "Geert
+ Uytterhoeven" <geert@linux-m68k.org>, Mark Brown <broonie@kernel.org>
+References: <20250728153455.47190-2-csokas.bence@prolan.hu>
+ <20250730181645.6d818d6a@kernel.org>
+Content-Language: en-US
+From: =?UTF-8?B?Q3PDs2vDoXMgQmVuY2U=?= <csokas.bence@prolan.hu>
+In-Reply-To: <20250730181645.6d818d6a@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: ATLAS.intranet.prolan.hu (10.254.0.229) To
+ ATLAS.intranet.prolan.hu (10.254.0.229)
+X-EsetResult: clean, is OK
+X-EsetId: 37303A296767155E66706B
 
-The `__WORDSIZE` macro, defined in the non-standard `<bits/wordsize.h>`
-header, is a GNU extension and not universally available with all
-toolchains, such as Clang when used with musl libc.
+Hi,
 
-This can lead to build failures in environments where this header is
-missing.
+On 2025. 07. 31. 3:16, Jakub Kicinski wrote:
+> On Mon, 28 Jul 2025 17:34:55 +0200 Bence Csókás wrote:
+>> Commit bafbdd527d56 ("phylib: Add device reset GPIO support") removed
+>> devm_gpiod_get_optional() in favor of the non-devres managed
+>> fwnode_get_named_gpiod(). When it was kind-of reverted by commit
+>> 40ba6a12a548 ("net: mdio: switch to using gpiod_get_optional()"), the devm
+>> functionality was not reinstated. Nor was the GPIO unclaimed on device
+>> remove. This leads to the GPIO being claimed indefinitely, even when the
+>> device and/or the driver gets removed.
+>>
+>> Fixes: bafbdd527d56 ("phylib: Add device reset GPIO support")
+>> Fixes: 40ba6a12a548 ("net: mdio: switch to using gpiod_get_optional()")
+>> Cc: Csaba Buday <buday.csaba@prolan.hu>
+>> Signed-off-by: Bence Csókás <csokas.bence@prolan.hu>
+> 
+> Looks like this is a v2 / rewrite of
+> https://lore.kernel.org/all/20250709133222.48802-3-buday.csaba@prolan.hu/
+> ? Please try to include more of a change log / history of the changes
+> (under the --- marker)
 
-The intention of the code is to determine the bit width of a C `long`.
-Replace the non-portable `__WORDSIZE` with the standard and portable
-`sizeof(long) * 8` expression to achieve the same result.
+I talked with Csaba, and now I realize I shouldn't have modified the 
+original. I will resubmit that instead.
 
-This change also removes the inclusion of the now-unused
-`<bits/wordsize.h>` header.
-
-Signed-off-by: Wake Liu <wakel@google.com>
----
- tools/testing/selftests/net/psock_tpacket.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/tools/testing/selftests/net/psock_tpacket.c b/tools/testing/selftests/net/psock_tpacket.c
-index 221270cee3ea..0dd909e325d9 100644
---- a/tools/testing/selftests/net/psock_tpacket.c
-+++ b/tools/testing/selftests/net/psock_tpacket.c
-@@ -33,7 +33,6 @@
- #include <ctype.h>
- #include <fcntl.h>
- #include <unistd.h>
--#include <bits/wordsize.h>
- #include <net/ethernet.h>
- #include <netinet/ip.h>
- #include <arpa/inet.h>
-@@ -785,7 +784,7 @@ static int test_kernel_bit_width(void)
- 
- static int test_user_bit_width(void)
- {
--	return __WORDSIZE;
-+	return sizeof(long) * 8;
- }
- 
- static const char *tpacket_str[] = {
--- 
-2.50.1.703.g449372360f-goog
+Bence
 
 
