@@ -1,126 +1,402 @@
-Return-Path: <netdev+bounces-212074-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212075-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D7BAB1DBDB
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 18:37:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2608BB1DBDF
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 18:37:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 30F9518893A3
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 16:37:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB1E0188977F
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 16:37:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F3D3256C6C;
-	Thu,  7 Aug 2025 16:37:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DD9926D4FB;
+	Thu,  7 Aug 2025 16:37:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gO52dCIa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nmLgIvYb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 459711E51E1;
-	Thu,  7 Aug 2025 16:37:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5642049641;
+	Thu,  7 Aug 2025 16:37:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754584627; cv=none; b=UWAWD2n+nsYjTCBDLZZXVKzP1HAtqOPjED1q6Ru0ylyLV8RowaUpZSxmLJ34X+SWoPZ14wS+6q7EueNi55zvAMwkNmUH3erTFJx6qKBzogld2TTxudeJkGhMpQZDHB2Yop5LvJAkEPffW7Pfx1ia3VOCETAcl2QwWpYvQKXZXR0=
+	t=1754584644; cv=none; b=ID6pN2c+F6/4twyA66uLTKL9D//dGoAgTDSfwVK9ulAo0uyyZOzO6eUk5SCFEaWCA/j4nzG4KZKEqM1Chc9bEg9b1nZ1Jeob1COOA6NlbYvkN60mpF2/CrHuVV69DLLJQ0SAMd6ThYY+N7bmEnfkZnwDeEpFY9LXltgNBHlGXAg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754584627; c=relaxed/simple;
-	bh=zomcDO4/e6tVYDJ09eowMniQElY2LtXTQlGbYTzf2h4=;
+	s=arc-20240116; t=1754584644; c=relaxed/simple;
+	bh=9xVcEE8dHvCKgLw3A2EtjL1F3dWcGsp/NdKexBm+kGw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hnxztwqxOralZC2EoIOBfBh3I5NDA9MTW/UDVvYk7hKA+RW49+oXYn/LOevlUjmrR+Pjoy17yO2X+PUQywDmqbXzAETNl8QWX+B+8tQrFspd4njo74uZ86nR4zlZSvjH5KYWy9wL5Z3WKpPcsxGp401cfDLPw0yhuxWzFYtbb18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gO52dCIa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C44AC4CEEB;
-	Thu,  7 Aug 2025 16:37:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754584626;
-	bh=zomcDO4/e6tVYDJ09eowMniQElY2LtXTQlGbYTzf2h4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gO52dCIaKqa26qqpxLkhG8XwAQ80fNIKVuSaPVpx+Edgoc6cXl+P6huyeiJBe+PhM
-	 RFdIqJ6b7PLsYnfHXqkfE1+hw3SqZ8ohukCgPrQAPI3lhMXPzVs6tNyFbDRRCWQSml
-	 m6N/kvK7/nrL57PWIRF/pK3558oPZsYEyjT8pQcLKWlLs2YuYu+qC6Q91kLYqRwfqw
-	 tGLCQUaeoPMB3B3Io4/ci1XmRUAqrWX+GnRkieIJs3JtH3taNAQ18Nemzya+qLGTyK
-	 KtW5LnVziFBlrX45eNzd0xFcTu2pVMG4dfDNLuOx0vgP0fUk1BQIqAFtaIDeYHRKNu
-	 8nAjgfz8GM/sg==
-Date: Thu, 7 Aug 2025 17:37:00 +0100
-From: Simon Horman <horms@kernel.org>
-To: Alexandra Winter <wintera@linux.ibm.com>
-Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Dust Li <dust.li@linux.alibaba.com>,
-	Sidraya Jayagond <sidraya@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	Julian Ruess <julianr@linux.ibm.com>, netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Thorsten Winkler <twinkler@linux.ibm.com>,
-	Mahanta Jambigi <mjambigi@linux.ibm.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>, Halil Pasic <pasic@linux.ibm.com>,
-	linux-rdma@vger.kernel.org
-Subject: Re: [RFC net-next 08/17] net/dibs: Register ism as dibs device
-Message-ID: <20250807163700.GL61519@horms.kernel.org>
-References: <20250806154122.3413330-1-wintera@linux.ibm.com>
- <20250806154122.3413330-9-wintera@linux.ibm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=W7Yf1QKLRNn7f+Gs3eZAm3OLkXzA9qGej6aw0u556vvp4K8U1UKCqR4PVQcMxG87BASrGeST47T9d/F/e4qqVJQECQDSBN9/W15hFirSlNkuD/LmJdzwKaO+cF3Hc8khI2VLcg2EOEsGI0kKgIM/ug2tFsJXwVCUGGBkE7Y0RSg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nmLgIvYb; arc=none smtp.client-ip=209.85.216.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-32129c4e9a4so1101635a91.1;
+        Thu, 07 Aug 2025 09:37:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1754584641; x=1755189441; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=j4Rv2UkLd+l2ALaEMAF3ScNbQvUgSCzzygPBpAZvWR8=;
+        b=nmLgIvYbUhoZshECy513JB+nKX9+zji7+zToT0NvxyHm70B7rVoCC93/w7tTFp+7d/
+         MOKSNNXDVzZS0uu2cISXoosVuzNUnoxgPIeQwhL4wsWc+++kLM7LHBnzmZrMAeNo9pqv
+         Uq8+l3zKWxqxxOC73qoM9dds6YJGwac+srO2mqXrjt3vYlc+/ASgckNWXqrWaIesd8AN
+         Vu9QTieTszVwpUwc0lrzPGkAc7iGjB9JK+YUS8KDyuOczUrIlKfsrm1x8w23KLHZwuW5
+         SUBVkEnN5oNAKCcN199i2QupR199GD8Xb6g5nDVb/9Boazn7kjdBVXwmjwRlCrkFasJC
+         WbiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754584641; x=1755189441;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=j4Rv2UkLd+l2ALaEMAF3ScNbQvUgSCzzygPBpAZvWR8=;
+        b=iKr6FjyWw+2ApJsnYXQymkGKmAigX6l59Y7pJCDnmsuJRO3u3+cSyTupqrmHoeWjil
+         M/LIkwGhI5Pr5XEtWAXaEOVwd51muol1K40wrM4ThTleA8MfOIy6Mv8Wzy2iPJwNBaMM
+         +MjnLiww1+ucX5JyZDZJ9Uac085R2pnkfg2gsXwQsjz8apZ3qjWHQWiiM8qNIJhkx7AZ
+         56B07N54BJKm8fgPaYLfhUbiaGYQO0C9P8X52YCwPmINYEmH+IhYXcz4SjPFpSUVmlmS
+         LoK9r5Edt7WDs6A8YR2e+dGfXwjl3zQDAJ5Ryc+6Vye/vozavMtlJNwD0jlGtb38yAaj
+         dFAw==
+X-Forwarded-Encrypted: i=1; AJvYcCUiwTY3CraysK779gWMDCEd0rSDqbecFBHuTJbet9NdBU8rIIjRjbjSHWAejGI2tBYS3SzXAvs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxz5+1pQ1VyzZ6dID/DTBPt/MZYKwtmgVFrx71dJSK2YLkyCNr5
+	FiZXxSyX6vOTiHEYW91IpHXK5YOivzLGp2sy2wyEWop7bAtUypjWIfbx+A2m
+X-Gm-Gg: ASbGncsfz6RyeSKrIGBRSZzuFbv/rMvtTivLSn2/r5gO5DJwcpVJuMe6vqn9egI8XlA
+	hSLUJq0UuqvbiheNVqlQ7XTUYQKjrHguDbrwcFgpX2twuVNSzKDx3QTrKBEQNPdhlHHAGGVU/HK
+	NBwZ9+sw4C1e4wuZUgoIh+jtJLaKyNObj+TsGn5vDyFou/goF87WpISB9HHiULYUe3G0OZJU0Su
+	duG7bOwqId8Lr2Tq3BK4r6v0UOaEp/PHlCGJzLjliodGSfCaL+OQJttxMHi45Me67aU5H68pU42
+	Ad3QiSH+98iLo0O+X5V9E4GbgIPsrwxnZRFXD6OzD8XJkFJjCwrotx5PRHguwxaG1f7NofgMBUm
+	YWkIgp0MdhTcxdUBTn96XQXfrBuNrLBBxgYY8d22mCup0xmWkwkzEU/xCDD8=
+X-Google-Smtp-Source: AGHT+IHm5nQ9zhzeq3xyETtEVEjWc+Z7onw9qIBlv6Qu/bmTEvJS1+sCQGif9pFvcoxqmgjH0V21WA==
+X-Received: by 2002:a17:90b:380d:b0:312:f0d0:bb0 with SMTP id 98e67ed59e1d1-321673f595amr10074590a91.12.1754584641123;
+        Thu, 07 Aug 2025 09:37:21 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-31f63da57b4sm23210460a91.5.2025.08.07.09.37.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Aug 2025 09:37:20 -0700 (PDT)
+Date: Thu, 7 Aug 2025 09:37:20 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
+	andrii@kernel.org, netdev@vger.kernel.org,
+	magnus.karlsson@intel.com, aleksander.lobakin@intel.com,
+	Eryk Kubanski <e.kubanski@partner.samsung.com>
+Subject: Re: [PATCH v3 bpf] xsk: fix immature cq descriptor production
+Message-ID: <aJTWQDcpkz3Q4eNU@mini-arch>
+References: <20250806154127.2161434-1-maciej.fijalkowski@intel.com>
+ <aJOGSRsXic53tkH7@mini-arch>
+ <aJO+Uq6qNMqTsgtI@boxer>
+ <aJSVhY4wWCLQLla4@boxer>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250806154122.3413330-9-wintera@linux.ibm.com>
+In-Reply-To: <aJSVhY4wWCLQLla4@boxer>
 
-On Wed, Aug 06, 2025 at 05:41:13PM +0200, Alexandra Winter wrote:
-> Register ism devices with the dibs layer. Follow-on patches will move
-> functionality to the dibs layer.
+On 08/07, Maciej Fijalkowski wrote:
+> On Wed, Aug 06, 2025 at 10:42:58PM +0200, Maciej Fijalkowski wrote:
+> > On Wed, Aug 06, 2025 at 09:43:53AM -0700, Stanislav Fomichev wrote:
+> > > On 08/06, Maciej Fijalkowski wrote:
+> > > > Eryk reported an issue that I have put under Closes: tag, related to
+> > > > umem addrs being prematurely produced onto pool's completion queue.
+> > > > Let us make the skb's destructor responsible for producing all addrs
+> > > > that given skb used.
+> > > > 
+> > > > Introduce struct xsk_addrs which will carry descriptor count with array
+> > > > of addresses taken from processed descriptors that will be carried via
+> > > > skb_shared_info::destructor_arg. This way we can refer to it within
+> > > > xsk_destruct_skb(). In order to mitigate the overhead that will be
+> > > > coming from memory allocations, let us introduce kmem_cache of xsk_addrs
+> > > > onto xdp_sock. Utilize the existing struct hole in xdp_sock for that.
+> > > > 
+> > > > Commit from fixes tag introduced the buggy behavior, it was not broken
+> > > > from day 1, but rather when xsk multi-buffer got introduced.
+> > > > 
+> > > > Fixes: b7f72a30e9ac ("xsk: introduce wrappers and helpers for supporting multi-buffer in Tx path")
+> > > > Reported-by: Eryk Kubanski <e.kubanski@partner.samsung.com>
+> > > > Closes: https://lore.kernel.org/netdev/20250530103456.53564-1-e.kubanski@partner.samsung.com/
+> > > > Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+> > > > ---
+> > > > v1:
+> > > > https://lore.kernel.org/bpf/20250702101648.1942562-1-maciej.fijalkowski@intel.com/
+> > > > v2:
+> > > > https://lore.kernel.org/bpf/20250705135512.1963216-1-maciej.fijalkowski@intel.com/
+> > > > 
+> > > > v1->v2:
+> > > > * store addrs in array carried via destructor_arg instead having them
+> > > >   stored in skb headroom; cleaner and less hacky approach;
+> > > > v2->v3:
+> > > > * use kmem_cache for xsk_addrs allocation (Stan/Olek)
+> > > > * set err when xsk_addrs allocation fails (Dan)
+> > > > * change xsk_addrs layout to avoid holes
+> > > > * free xsk_addrs on error path
+> > > > * rebase
+> > > > ---
+> > > >  include/net/xdp_sock.h |  1 +
+> > > >  net/xdp/xsk.c          | 94 ++++++++++++++++++++++++++++++++++--------
+> > > >  net/xdp/xsk_queue.h    | 12 ++++++
+> > > >  3 files changed, 89 insertions(+), 18 deletions(-)
+> > > > 
+> > > > diff --git a/include/net/xdp_sock.h b/include/net/xdp_sock.h
+> > > > index ce587a225661..5ba9ad4c110f 100644
+> > > > --- a/include/net/xdp_sock.h
+> > > > +++ b/include/net/xdp_sock.h
+> > > > @@ -61,6 +61,7 @@ struct xdp_sock {
+> > > >  		XSK_BOUND,
+> > > >  		XSK_UNBOUND,
+> > > >  	} state;
+> > > > +	struct kmem_cache *xsk_addrs_cache;
+> > > >  
+> > > >  	struct xsk_queue *tx ____cacheline_aligned_in_smp;
+> > > >  	struct list_head tx_list;
+> > > > diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+> > > > index 9c3acecc14b1..d77cde0131be 100644
+> > > > --- a/net/xdp/xsk.c
+> > > > +++ b/net/xdp/xsk.c
+> > > > @@ -36,6 +36,11 @@
+> > > >  #define TX_BATCH_SIZE 32
+> > > >  #define MAX_PER_SOCKET_BUDGET 32
+> > > >  
+> > > > +struct xsk_addrs {
+> > > > +	u64 addrs[MAX_SKB_FRAGS + 1];
+> > > > +	u32 num_descs;
+> > > > +};
+> > > > +
+> > > >  void xsk_set_rx_need_wakeup(struct xsk_buff_pool *pool)
+> > > >  {
+> > > >  	if (pool->cached_need_wakeup & XDP_WAKEUP_RX)
+> > > > @@ -532,25 +537,39 @@ static int xsk_wakeup(struct xdp_sock *xs, u8 flags)
+> > > >  	return dev->netdev_ops->ndo_xsk_wakeup(dev, xs->queue_id, flags);
+> > > >  }
+> > > >  
+> > > > -static int xsk_cq_reserve_addr_locked(struct xsk_buff_pool *pool, u64 addr)
+> > > > +static int xsk_cq_reserve_locked(struct xsk_buff_pool *pool)
+> > > >  {
+> > > >  	unsigned long flags;
+> > > >  	int ret;
+> > > >  
+> > > >  	spin_lock_irqsave(&pool->cq_lock, flags);
+> > > > -	ret = xskq_prod_reserve_addr(pool->cq, addr);
+> > > > +	ret = xskq_prod_reserve(pool->cq);
+> > > >  	spin_unlock_irqrestore(&pool->cq_lock, flags);
+> > > >  
+> > > >  	return ret;
+> > > >  }
+> > > >  
+> > > > -static void xsk_cq_submit_locked(struct xsk_buff_pool *pool, u32 n)
+> > > > +static void xsk_cq_submit_addr_locked(struct xdp_sock *xs,
+> > > > +				      struct sk_buff *skb)
+> > > >  {
+> > > > +	struct xsk_buff_pool *pool = xs->pool;
+> > > > +	struct xsk_addrs *xsk_addrs;
+> > > >  	unsigned long flags;
+> > > > +	u32 num_desc, i;
+> > > > +	u32 idx;
+> > > > +
+> > > > +	xsk_addrs = (struct xsk_addrs *)skb_shinfo(skb)->destructor_arg;
+> > > > +	num_desc = xsk_addrs->num_descs;
+> > > >  
+> > > >  	spin_lock_irqsave(&pool->cq_lock, flags);
+> > > > -	xskq_prod_submit_n(pool->cq, n);
+> > > > +	idx = xskq_get_prod(pool->cq);
+> > > > +
+> > > > +	for (i = 0; i < num_desc; i++, idx++)
+> > > > +		xskq_prod_write_addr(pool->cq, idx, xsk_addrs->addrs[i]);
+> > > 
+> > > optional nit: maybe do xskq_prod_write_addr(, idx+i, ) instead of 'idx++'
+> > > in the loop? I got a bit confused here until I spotted that idx++..
+> > > But up to you, feel free to ignore, maybe it's just me.
 > 
-> As DIBS is only a shim layer without any dependencies, we can depend ISM
-> on DIBS without adding indirect dependencies. A follow-on patch will
-> remove implication of SMC by ISM.
+> ugh i missed these comments. sure i can do that.
 > 
-> Define struct dibs_dev. Follow-on patches will move more content into
-> dibs_dev.  The goal of follow-on patches is that ism_dev will only
-> contain fields that are special for this device driver. The same concept
-> will apply to other dibs device drivers.
+> > > 
+> > > > +	xskq_prod_submit_n(pool->cq, num_desc);
+> > > > +
+> > > >  	spin_unlock_irqrestore(&pool->cq_lock, flags);
+> > > > +	kmem_cache_free(xs->xsk_addrs_cache, xsk_addrs);
+> > > >  }
+> > > >  
+> > > >  static void xsk_cq_cancel_locked(struct xsk_buff_pool *pool, u32 n)
+> > > > @@ -562,35 +581,45 @@ static void xsk_cq_cancel_locked(struct xsk_buff_pool *pool, u32 n)
+> > > >  	spin_unlock_irqrestore(&pool->cq_lock, flags);
+> > > >  }
+> > > >  
+> > > > -static u32 xsk_get_num_desc(struct sk_buff *skb)
+> > > > -{
+> > > > -	return skb ? (long)skb_shinfo(skb)->destructor_arg : 0;
+> > > > -}
+> > > > -
+> > > >  static void xsk_destruct_skb(struct sk_buff *skb)
+> > > >  {
+> > > >  	struct xsk_tx_metadata_compl *compl = &skb_shinfo(skb)->xsk_meta;
+> > > >  
+> > > 
+> > > [..]
+> > > 
+> > > > -	if (compl->tx_timestamp) {
+> > > > +	if (compl->tx_timestamp)
+> > > >  		/* sw completion timestamp, not a real one */
+> > > >  		*compl->tx_timestamp = ktime_get_tai_fast_ns();
+> > > > -	}
+> > > 
+> > > Seems to be unrelated, can probably drop if you happen to respin?
 > 
-> Define dibs_dev_alloc(), dibs_dev_add() and dibs_dev_del() to be called
-> by dibs device drivers and call them from ism_drv.c
-> Use ism_dev.dibs for a pointer to dibs_dev.
+> yes, i'll pull out this sophisticated change to separate commit:P
 > 
-> Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
+> > > 
+> > > > -	xsk_cq_submit_locked(xdp_sk(skb->sk)->pool, xsk_get_num_desc(skb));
+> > > > +	xsk_cq_submit_addr_locked(xdp_sk(skb->sk), skb);
+> > > >  	sock_wfree(skb);
+> > > >  }
+> > > >  
+> > > > -static void xsk_set_destructor_arg(struct sk_buff *skb)
+> > > > +static u32 xsk_get_num_desc(struct sk_buff *skb)
+> > > > +{
+> > > > +	struct xsk_addrs *addrs;
+> > > > +
+> > > > +	addrs = (struct xsk_addrs *)skb_shinfo(skb)->destructor_arg;
+> > > > +	return addrs->num_descs;
+> > > > +}
+> > > > +
+> > > > +static void xsk_set_destructor_arg(struct sk_buff *skb, struct xsk_addrs *addrs)
+> > > >  {
+> > > > -	long num = xsk_get_num_desc(xdp_sk(skb->sk)->skb) + 1;
+> > > > +	skb_shinfo(skb)->destructor_arg = (void *)addrs;
+> > > > +}
+> > > > +
+> > > > +static void xsk_inc_skb_descs(struct sk_buff *skb)
+> > > > +{
+> > > > +	struct xsk_addrs *addrs;
+> > > >  
+> > > > -	skb_shinfo(skb)->destructor_arg = (void *)num;
+> > > > +	addrs = (struct xsk_addrs *)skb_shinfo(skb)->destructor_arg;
+> > > > +	addrs->num_descs++;
+> > > >  }
+> > > >  
+> > > >  static void xsk_consume_skb(struct sk_buff *skb)
+> > > >  {
+> > > >  	struct xdp_sock *xs = xdp_sk(skb->sk);
+> > > >  
+> > > > +	kmem_cache_free(xs->xsk_addrs_cache,
+> > > > +			(struct xsk_addrs *)skb_shinfo(skb)->destructor_arg);
+> > > >  	skb->destructor = sock_wfree;
+> > > >  	xsk_cq_cancel_locked(xs->pool, xsk_get_num_desc(skb));
+> > > >  	/* Free skb without triggering the perf drop trace */
+> > > > @@ -609,6 +638,7 @@ static struct sk_buff *xsk_build_skb_zerocopy(struct xdp_sock *xs,
+> > > >  {
+> > > >  	struct xsk_buff_pool *pool = xs->pool;
+> > > >  	u32 hr, len, ts, offset, copy, copied;
+> > > > +	struct xsk_addrs *addrs = NULL;
+> > > >  	struct sk_buff *skb = xs->skb;
+> > > >  	struct page *page;
+> > > >  	void *buffer;
+> > > > @@ -623,6 +653,12 @@ static struct sk_buff *xsk_build_skb_zerocopy(struct xdp_sock *xs,
+> > > >  			return ERR_PTR(err);
+> > > >  
+> > > >  		skb_reserve(skb, hr);
+> > > > +
+> > > > +		addrs = kmem_cache_zalloc(xs->xsk_addrs_cache, GFP_KERNEL);
+> > > > +		if (!addrs)
+> > > > +			return ERR_PTR(-ENOMEM);
+> > > > +
+> > > > +		xsk_set_destructor_arg(skb, addrs);
+> > > >  	}
+> > > >  
+> > > >  	addr = desc->addr;
+> > > > @@ -662,6 +698,7 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+> > > >  {
+> > > >  	struct xsk_tx_metadata *meta = NULL;
+> > > >  	struct net_device *dev = xs->dev;
+> > > > +	struct xsk_addrs *addrs = NULL;
+> > > >  	struct sk_buff *skb = xs->skb;
+> > > >  	bool first_frag = false;
+> > > >  	int err;
+> > > > @@ -694,6 +731,15 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+> > > >  			err = skb_store_bits(skb, 0, buffer, len);
+> > > >  			if (unlikely(err))
+> > > >  				goto free_err;
+> > > > +
+> > > > +			addrs = kmem_cache_zalloc(xs->xsk_addrs_cache, GFP_KERNEL);
+> > > > +			if (!addrs) {
+> > > > +				err = -ENOMEM;
+> > > > +				goto free_err;
+> > > > +			}
+> > > > +
+> > > > +			xsk_set_destructor_arg(skb, addrs);
+> > > > +
+> > > >  		} else {
+> > > >  			int nr_frags = skb_shinfo(skb)->nr_frags;
+> > > >  			struct page *page;
+> > > > @@ -759,7 +805,9 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+> > > >  	skb->mark = READ_ONCE(xs->sk.sk_mark);
+> > > >  	skb->destructor = xsk_destruct_skb;
+> > > >  	xsk_tx_metadata_to_compl(meta, &skb_shinfo(skb)->xsk_meta);
+> > > > -	xsk_set_destructor_arg(skb);
+> > > > +
+> > > > +	addrs = (struct xsk_addrs *)skb_shinfo(skb)->destructor_arg;
+> > > > +	addrs->addrs[addrs->num_descs++] = desc->addr;
+> > > >  
+> > > >  	return skb;
+> > > >  
+> > > > @@ -769,7 +817,7 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+> > > >  
+> > > >  	if (err == -EOVERFLOW) {
+> > > >  		/* Drop the packet */
+> > > > -		xsk_set_destructor_arg(xs->skb);
+> > > > +		xsk_inc_skb_descs(xs->skb);
+> > > >  		xsk_drop_skb(xs->skb);
+> > > >  		xskq_cons_release(xs->tx);
+> > > >  	} else {
+> > > > @@ -812,7 +860,7 @@ static int __xsk_generic_xmit(struct sock *sk)
+> > > >  		 * if there is space in it. This avoids having to implement
+> > > >  		 * any buffering in the Tx path.
+> > > >  		 */
+> > > > -		err = xsk_cq_reserve_addr_locked(xs->pool, desc.addr);
+> > > > +		err = xsk_cq_reserve_locked(xs->pool);
+> > > >  		if (err) {
+> > > >  			err = -EAGAIN;
+> > > >  			goto out;
+> > > > @@ -1122,6 +1170,7 @@ static int xsk_release(struct socket *sock)
+> > > >  	xskq_destroy(xs->tx);
+> > > >  	xskq_destroy(xs->fq_tmp);
+> > > >  	xskq_destroy(xs->cq_tmp);
+> > > > +	kmem_cache_destroy(xs->xsk_addrs_cache);
+> > > >  
+> > > >  	sock_orphan(sk);
+> > > >  	sock->sk = NULL;
+> > > > @@ -1765,6 +1814,15 @@ static int xsk_create(struct net *net, struct socket *sock, int protocol,
+> > > >  
+> > > >  	sock_prot_inuse_add(net, &xsk_proto, 1);
+> > > >  
+> > > 
+> > > [..]
+> > > 
+> > > > +	xs->xsk_addrs_cache = kmem_cache_create("xsk_generic_xmit_cache",
+> > > > +						sizeof(struct xsk_addrs), 0,
+> > > > +						SLAB_HWCACHE_ALIGN, NULL);
+> > > > +
+> > > > +	if (!xs->xsk_addrs_cache) {
+> > > > +		sk_free(sk);
+> > > > +		return -ENOMEM;
+> > > > +	}
+> > > 
+> > > Should we move this up to happen before sk_add_node_rcu? Otherwise we
+> > > also have to do sk_del_node_init_rcu on !xs->xsk_addrs_cache here?
+> > > 
+> > > Btw, alternatively, why not make this happen at bind time when we know
+> > > whether the socket is gonna be copy or zc? And do it only for the copy
+> > > mode?
+> > 
+> > thanks for quick review Stan. makes sense to do it for copy mode only.
+> > i'll send next revision tomorrow.
+> 
+> FWIW syzbot reported an issue that "xsk_generic_xmit_cache" exists, so
+> probably we should include queue id within name so that each socket gets
+> its own cache with unique name.
 
-...
-
-> diff --git a/net/dibs/dibs_main.c b/net/dibs/dibs_main.c
-
-...
-
-> @@ -56,6 +65,33 @@ int dibs_unregister_client(struct dibs_client *client)
->  }
->  EXPORT_SYMBOL_GPL(dibs_unregister_client);
->  
-> +struct dibs_dev *dibs_dev_alloc(void)
-> +{
-> +	struct dibs_dev *dibs;
-> +
-> +	dibs = kzalloc(sizeof(*dibs), GFP_KERNEL);
-
-Hi Alexandra,
-
-It is not the case for x86_64, arm64, or s390 (at least).
-But for x86_32 and arm (at least) it seems that linux/slab.h should
-be included in order for kzalloc to be available for compilation.
-
-
-> +	return dibs;
-> +}
-> +EXPORT_SYMBOL_GPL(dibs_dev_alloc);
-
-...
+Interesting. I was wondering whether it's gonna be confusing to see
+multiple "xsk_generic_xmit_cache" entries in /proc/slabinfo, but looks
+like it's not allowed :-)
 
