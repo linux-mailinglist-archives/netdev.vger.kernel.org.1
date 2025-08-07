@@ -1,102 +1,113 @@
-Return-Path: <netdev+bounces-212010-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212011-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54843B1D245
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 08:04:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DC307B1D267
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 08:20:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 85DDA5626CE
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 06:04:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 12DEA16167F
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 06:20:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C6EA18FDBE;
-	Thu,  7 Aug 2025 06:04:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="Uq7Lr5Qx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B98D22147E6;
+	Thu,  7 Aug 2025 06:20:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+Received: from bmailout2.hostsharing.net (bmailout2.hostsharing.net [83.223.78.240])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DECE23DE
-	for <netdev@vger.kernel.org>; Thu,  7 Aug 2025 06:04:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 361701A705C
+	for <netdev@vger.kernel.org>; Thu,  7 Aug 2025 06:20:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.78.240
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754546655; cv=none; b=dgZsdN33FEtVfk87oSR04rGcxjFmx3A4i5E7cEOfyxnZ5f7co1aL9yLahcTTckESpwDtFpIYKjEnw6pGUN8dg24cJtEm1LIPM6hWfwqcX6qrgkueDCefO2qIJoIKonVyPG6IhO90TMLQoWKoHwnQDGEndUbFEdbTWMR/sLyYQq0=
+	t=1754547651; cv=none; b=Dz+KbY092WBy15T3rEQMHo+0dM/Aza1+BBy2wNnHOJ7MRBCqqtVnjYKVZgZAPmr9zhwUS34wTwEWEx80i8RpcqY+jthKWrEBwRfGitVgSmSJUU9X22h0bic8eFXA+NKnb6LeTHDyp9vssZhjFKc3OR0sIYw40yFm9VhyQYYSbNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754546655; c=relaxed/simple;
-	bh=B8kiJasimrUmxscYgRIyCG+/HkqpoYjim0+O2SqlafU=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oUl3SvYXLTeGoFLszlweSlar4622RzBAP3zaN+NQjIFRh18r8PiI93INUaHV8JlWjsySbvf9m1gpJtz/ZF0FMZqDMK0gUuXEkv1gzLRTL/kh97ST67Iwau2LrmJamect6JnQRdOQFg0TKhk34w2G7ey0vV2shRrxXcSMRlx0Qro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=Uq7Lr5Qx; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id D7DDC2087C;
-	Thu,  7 Aug 2025 08:04:03 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Mq4rwd_QFXQk; Thu,  7 Aug 2025 08:04:03 +0200 (CEST)
-Received: from EXCH-01.secunet.de (unknown [10.32.0.231])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id F2DB62083E;
-	Thu,  7 Aug 2025 08:04:02 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com F2DB62083E
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1754546643;
-	bh=KbnCBawYixmdjUZ7YuT1MDbmpTybFu6XKrvKDoG/1y4=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=Uq7Lr5QxilbYWQF+U/8twt7r/Gkywuu2M8wsq5uASVW0PRND7BpA4GGTM7J3Yrh4/
-	 XAR5euvdTWv89G7xA30wSWL0XlwR8ugtSB+MBEIdL6IYb6YFLjfCz9k+U8y1Y7mmfD
-	 FgPILGPjsj4fYUjamo1hDLrLbbsxqjLT2YJxkjFeVC22AV5onnRmxF9rXaOpIYiEWa
-	 voHgb4hAgzGWpZdh93iQy6Nd6Y6+O/L/mFdqRIGhUvmmVznTT6kycjq3C9PKP1mufD
-	 xZKloDzwloszIiXvrObU+UeRx3SJfOwZ02OIvZgrqrtkvx82nRmOoM73fN+E9+dLNm
-	 OmVWsSR2BGVKg==
-Received: from gauss2.secunet.de (10.182.7.193) by EXCH-01.secunet.de
- (10.32.0.171) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.1748.10; Thu, 7 Aug
- 2025 08:04:02 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 604353183E3E; Thu,  7 Aug 2025 08:04:02 +0200 (CEST)
-Date: Thu, 7 Aug 2025 08:04:02 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Sabrina Dubroca <sd@queasysnail.net>
-CC: <netdev@vger.kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, "David
- S. Miller" <davem@davemloft.net>, Cong Wang <xiyou.wangcong@gmail.com>,
-	<syzbot+6641a61fe0e2e89ae8c5@syzkaller.appspotmail.com>
-Subject: Re: [PATCH ipsec] xfrm: flush all states in xfrm_state_fini
-Message-ID: <aJRB0q1ouPGR_ll_@gauss3.secunet.de>
-References: <beb8eb1b675f18281f67665f6181350f33be519f.1753820150.git.sd@queasysnail.net>
+	s=arc-20240116; t=1754547651; c=relaxed/simple;
+	bh=Pbb/7E0PL4v5H4esXE+QrmXjVLcgWQPCAUQgzROjKV4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XYFV+MkWN0aO/Lynbef8DcB0JNcbye9xAUgrpUiQj7/u+gXHEpW4FXxxVebdshgMG4fF2qsWfc495dM/WOZNg7YxFI+I6zJFcbZyX40zAUC/5T/CIGeBWGFc33euNChcRGJ2aTj/5Slp2VYdOFcFXv0ajQmXuqW2AR3OUu0EDfw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.78.240
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
+Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
+	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
+	by bmailout2.hostsharing.net (Postfix) with ESMTPS id 36D86200A446;
+	Thu,  7 Aug 2025 08:20:46 +0200 (CEST)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+	id 28FD54953CB; Thu,  7 Aug 2025 08:20:46 +0200 (CEST)
+Date: Thu, 7 Aug 2025 08:20:46 +0200
+From: Lukas Wunner <lukas@wunner.de>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, Akeem G Abodunrin <akeem.g.abodunrin@intel.com>,
+	netdev@vger.kernel.org, nhorman@redhat.com, sassmann@redhat.com,
+	jeffrey.t.kirsher@intel.com,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Andrew Bowers <andrewx.bowers@intel.com>
+Subject: Re: [net-next 04/15] ice: Add advanced power mgmt for WoL
+Message-ID: <aJRFvuh8F-jQd0rz@wunner.de>
+References: <20200723234720.1547308-1-anthony.l.nguyen@intel.com>
+ <20200723234720.1547308-5-anthony.l.nguyen@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <beb8eb1b675f18281f67665f6181350f33be519f.1753820150.git.sd@queasysnail.net>
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
- EXCH-01.secunet.de (10.32.0.171)
+In-Reply-To: <20200723234720.1547308-5-anthony.l.nguyen@intel.com>
 
-On Mon, Aug 04, 2025 at 11:05:43AM +0200, Sabrina Dubroca wrote:
-> While reverting commit f75a2804da39 ("xfrm: destroy xfrm_state
-> synchronously on net exit path"), I incorrectly changed
-> xfrm_state_flush's "proto" argument back to IPSEC_PROTO_ANY. This
-> reverts some of the changes in commit dbb2483b2a46 ("xfrm: clean up
-> xfrm protocol checks"), and leads to some states not being removed
-> when we exit the netns.
+On Thu, Jul 23, 2020 at 04:47:09PM -0700, Tony Nguyen wrote:
+> From: Akeem G Abodunrin <akeem.g.abodunrin@intel.com>
 > 
-> Pass 0 instead of IPSEC_PROTO_ANY from both xfrm_state_fini
-> xfrm6_tunnel_net_exit, so that xfrm_state_flush deletes all states.
-> 
-> Fixes: 2a198bbec691 ("Revert "xfrm: destroy xfrm_state synchronously on net exit path"")
-> Reported-by: syzbot+6641a61fe0e2e89ae8c5@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=6641a61fe0e2e89ae8c5
-> Tested-by: syzbot+6641a61fe0e2e89ae8c5@syzkaller.appspotmail.com
-> Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
+> Add callbacks needed to support advanced power management for Wake on LAN.
+> Also make ice_pf_state_is_nominal function available for all configurations
+> not just CONFIG_PCI_IOV.
 
-Applied, thanks a lot Sabrina!
+The above was applied as commit 769c500dcc1e.
+
+> +static int ice_resume(struct device *dev)
+> +{
+> +	struct pci_dev *pdev = to_pci_dev(dev);
+> +	enum ice_reset_req reset_type;
+> +	struct ice_pf *pf;
+> +	struct ice_hw *hw;
+> +	int ret;
+> +
+> +	pci_set_power_state(pdev, PCI_D0);
+> +	pci_restore_state(pdev);
+> +	pci_save_state(pdev);
+> +
+> +	if (!pci_device_is_present(pdev))
+> +		return -ENODEV;
+> +
+> +	ret = pci_enable_device_mem(pdev);
+> +	if (ret) {
+> +		dev_err(dev, "Cannot enable device after suspend\n");
+> +		return ret;
+> +	}
+
+You're calling pci_enable_device_mem() on resume without having called
+pci_disable_device() on suspend.  This leads to an imbalance of the
+enable_cnt kept internally in the PCI core.
+
+Every time you suspend, the enable_cnt keeps growing.
+
+The user-visible effect is that if you suspend the device at least once
+and then unbind the driver, pci_disable_device() isn't called because
+the enable_cnt hasn't reached zero (and will never reach it again).
+
+I recommend removing the call to pci_enable_device_mem() in ice_resume():
+The call to pci_restore_state() should already be sufficient to set the
+Memory Space bit in the Command register again on resume.
+
+I cannot test this for lack of hardware but can provide a patch if you
+want me to.
+
+Thanks,
+
+Lukas
 
