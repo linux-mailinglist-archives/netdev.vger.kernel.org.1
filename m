@@ -1,135 +1,124 @@
-Return-Path: <netdev+bounces-212047-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212048-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23E83B1D82C
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 14:45:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28D93B1D837
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 14:47:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3135A17EDC6
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 12:45:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4A4817AD781
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 12:46:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 140AE253939;
-	Thu,  7 Aug 2025 12:45:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D85A52571BF;
+	Thu,  7 Aug 2025 12:47:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F+nGFL1O"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AAD22522B4
-	for <netdev@vger.kernel.org>; Thu,  7 Aug 2025 12:45:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77B1F2566E2
+	for <netdev@vger.kernel.org>; Thu,  7 Aug 2025 12:47:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754570729; cv=none; b=hpE04iMBEwhDeknxD1e7KzulscwOlhsd974Z8Zpa+AqtuQeetBT3yjZCqANf1uOrCKKGXTDMcht9YomE1UrwRRhTFOY3Gs+oTHRgv+My+uwVq3t1YdgwxAb5xC5Kp36hHURhvCIhvCUf/SURnSwTfK/kfdvDoQsBOHOjQQDSi1M=
+	t=1754570850; cv=none; b=mNTKXwIhTivwuDXzpH/wtTywFcV7jbH6h9RS3ocI9LZjXsWLs1nv0D+O/NbiHVhd3yUsUizUaH9aauy5jB3kr4vCr4wnXq/uXR1W5VnGW1jTNq+gEkZ5/tld2LKLMNySBpAdAK4PSRBAB5Nj+h7zfjlgPBn50UXzFe+BtOEiQSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754570729; c=relaxed/simple;
-	bh=Y4YLzyteEcWT1U2UnCNBtRt82dIF4KnUK/CPV4evvjQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EYi2tRpCT/bFxoAgMRZ/J3YnY+wIiEKGSd0jlNjHv0rChlqNPPdPgGG+hAVXgByCVtRF/lOpRcZSjS6aqmdIG607mlNPOx4CG1FPCMHOf/bF8YpT94k6/GMaJvMN6ifqsOXEfAC/3KNKHqFlVvQROd0Bfxed4BIHv5DWALfpzQs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1ujzzV-0003GE-FK; Thu, 07 Aug 2025 14:45:05 +0200
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1ujzzU-00CNVQ-37;
-	Thu, 07 Aug 2025 14:45:04 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1ujzzU-00EJ2f-2h;
-	Thu, 07 Aug 2025 14:45:04 +0200
-Date: Thu, 7 Aug 2025 14:45:04 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Xu Yang <xu.yang_2@nxp.com>, Andrew Lunn <andrew@lunn.ch>,
-	hkallweit1@gmail.com, pabeni@redhat.com, netdev@vger.kernel.org,
-	imx@lists.linux.dev, linux-kernel@vger.kernel.org
-Subject: Re: [RESEND] net: phy: fix NULL pointer dereference in
- phy_polling_mode()
-Message-ID: <aJSf0JaBl4cKphFi@pengutronix.de>
-References: <20250806082931.3289134-1-xu.yang_2@nxp.com>
- <aJMWDRNyq9VDlXJm@shell.armlinux.org.uk>
- <ywr5p6ccsbvoxronpzpbtxjqyjlwp5g6ksazbeyh47vmhta6sb@xxl6dzd2hsgg>
- <aJNSDeyJn5aZG7xs@shell.armlinux.org.uk>
- <unh332ly5fvcrjgur4y3lgn4m4zlzi7vym4hyd7yek44xvfrh5@fmavbivvjfjn>
- <b9140415-2478-4264-a674-c158ca14eb07@lunn.ch>
- <aJOHObGgfzxIDzHW@shell.armlinux.org.uk>
- <2b3fvsi7c47oit4p6drgjqeaxgwyzyopt7czfv3g2a74j2ay5j@qu22cohdcrjs>
- <3mkwdhodm4zl3t6zsavcrrkuawvd3qjxtdvhxwi6gwe42ic7rs@tevlpedpwlag>
- <aJSSNg4aZNfoqqZh@shell.armlinux.org.uk>
+	s=arc-20240116; t=1754570850; c=relaxed/simple;
+	bh=un3RrEaBjFQNWnpFNJaSEVX8CHxrowanZGwCtU3ENaQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=nUkQvdJRQOc1JKI/fhjCXpVl/nQw/RfC/IFRBUfQt/QB3L3cwBuJh3AhBDJYQSjrTZo3bb1x7WN/1SsPU+p5rNCIB4MuuG08sCzt8tTfP20r72VsOqlCDz9CRJbyMN2eCLrLnl9l3TNVwu7DLhjGLVt4NO6uInGZLKUJa22AL2o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=F+nGFL1O; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1754570847;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=aTK69kQaFZtjtvMSMDYC7o+QFQbEWEankqiOa7dNWH4=;
+	b=F+nGFL1O2otRqpfrcqPVxpXrKDNGDTW1qF14NO5224K5lJR0xcoka33xxsxRTIbaQEDwhJ
+	rEF4CSKWe4kPUOgtFJVpj8wimaGX2Dwxq1mi0kHbL5GTZ6w66S0s8fcECwBB3oSXrS3URO
+	rxWyZ7T3OMJEhZdlDPWUk6FKRnP7JXk=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-644-HnTOFgA3OTGqm0KqQqT1nA-1; Thu, 07 Aug 2025 08:47:26 -0400
+X-MC-Unique: HnTOFgA3OTGqm0KqQqT1nA-1
+X-Mimecast-MFC-AGG-ID: HnTOFgA3OTGqm0KqQqT1nA_1754570845
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-459de0d5fb1so9044525e9.0
+        for <netdev@vger.kernel.org>; Thu, 07 Aug 2025 05:47:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754570845; x=1755175645;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aTK69kQaFZtjtvMSMDYC7o+QFQbEWEankqiOa7dNWH4=;
+        b=EyjunTcMQj0umuu+BWO3EYm7d5SscuY9CEfDPx7wzf/nLINqFxI2QLRRW0WIrCcN2+
+         sbxcH14ocEvQNf5KMQPc7z5XZwFOd+SKzVtk9eEGAkP+GNxUgAiluyfa56C0tZ96a3OW
+         OZB7rA1i36u/w/QMsQmSv71NOXsEpOPU1bW7Ucfk8g+mKBBVXADMGFVbdi3jDlcy21NM
+         JNZ84q5mm1BaF35hczE0CYYML2iFrA2tvgt2ltLf0/eHrnT9QDS4KFqrdKb26rR7octp
+         Wu0umiP7kGTGNwQtYs78GFLxNwZAA2GeP8cisuoLAzMjduHoUC3qQgjnrQ7Gq/HGBVTa
+         9udg==
+X-Forwarded-Encrypted: i=1; AJvYcCWbArytzACfqHoSD0z3A62iLc+vcrGLUyveQkUpxyIEjb1d4hOe5xo6hO83Vy8VGd4GosbTuhs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyFF4p6lZqWcvV6JUWioUsSCOaY1UkmgcvtTMf6zWYU9DSpJBpj
+	4eMwHblEIIyKnGb1HnAnHkH42ZYaFhyLjrLmjLN/+QQXYlCC3+ZFwvPJs1iv+8jOVpNwSuF7DwV
+	XHWkMnerGSohAC8HKw3zR4kC6q1LRKo1bmd1Bcp3SdSlWZGsd/BYqSVyAhA==
+X-Gm-Gg: ASbGncs5airChJwbtsaI4AylFQrX/V2YoxmokZPIYhTXHQYkDSefO1wyZoY8OM/LyxM
+	gFp4uorFGZJdzYXzYLD0oyjo7ExhYAobhyFVtpy7K0qDpmGIRD7UlJQyrYgvkXQmYGgerNXcEt5
+	Y8IiEnwaCcYcOzVEMGIuWlJhsfqX2I9a8Ps6u09HRBJYWZkvB1Ut6SKc6p16FN5Rhfhacif0ik/
+	O9MBO1zaN6hKWXj1uu2n39zYcGbwxOJJ6o8EbraokakNq+aMix+R+CWRAzWlN0NKp5tVLf4EwzA
+	qgDY5BRG5O1lpiWdlG9zgn0fTs+Az7YL
+X-Received: by 2002:a05:600c:468b:b0:456:1ac8:cace with SMTP id 5b1f17b1804b1-459ebd12934mr46363005e9.12.1754570845007;
+        Thu, 07 Aug 2025 05:47:25 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG09B4jVXtQ521CCCpSOE6UxD7Ba5Baj1YjRug6kR2oAgnAlGT6bbB3OaejRPpTTtCumhOhhg==
+X-Received: by 2002:a05:600c:468b:b0:456:1ac8:cace with SMTP id 5b1f17b1804b1-459ebd12934mr46362755e9.12.1754570844604;
+        Thu, 07 Aug 2025 05:47:24 -0700 (PDT)
+Received: from redhat.com ([2a0d:6fc0:1515:7300:62e6:253a:2a96:5e3])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-459e0a24bf1sm120608885e9.1.2025.08.07.05.47.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Aug 2025 05:47:23 -0700 (PDT)
+Date: Thu, 7 Aug 2025 08:47:21 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	jasowang@redhat.com, jhkim@linux.ibm.com, leitao@debian.org,
+	mst@redhat.com
+Subject: [GIT PULL] vhost: bugfix
+Message-ID: <20250807084721-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aJSSNg4aZNfoqqZh@shell.armlinux.org.uk>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Mutt-Fcc: =sent
 
-On Thu, Aug 07, 2025 at 12:47:02PM +0100, Russell King (Oracle) wrote:
-> On Thu, Aug 07, 2025 at 07:21:46PM +0800, Xu Yang wrote:
-> > Hi Russell and Andrew,
-> > 
-> > With more debug on why asix_devices.c driver is creating so many mdio devices,
-> > I found the mdio->phy_mask setting may be missing.
-> 
-> mdio->phy_mask is really only a workaround/optimisation to prevent
-> the automatic scanning of the MDIO bus.
-> 
-> If we know for certain that we're only interested in a PHY at a
-> certain set of addresses, then it's appropriate to tell the MDIO/phylib
-> layer not to bother scanning the other addresses, but this will mean
-> if the driver uses e.g. phy_find_first(), it will find the first PHY
-> amongst those that phy_mask allows to be scanned, rather than the first
-> on the bus.
-> 
-> In other words... it's dependent on the driver.
-> 
-> > diff --git a/drivers/net/usb/asix_devices.c b/drivers/net/usb/asix_devices.c
-> > index 9b0318fb50b5..9fba1cb17134 100644
-> > --- a/drivers/net/usb/asix_devices.c
-> > +++ b/drivers/net/usb/asix_devices.c
-> > @@ -676,6 +676,7 @@ static int ax88772_init_mdio(struct usbnet *dev)
-> >         priv->mdio->read = &asix_mdio_bus_read;
-> >         priv->mdio->write = &asix_mdio_bus_write;
-> >         priv->mdio->name = "Asix MDIO Bus";
-> > +       priv->mdio->phy_mask = ~BIT(priv->phy_addr);
-> >         /* mii bus name is usb-<usb bus number>-<usb device number> */
-> >         snprintf(priv->mdio->id, MII_BUS_ID_SIZE, "usb-%03d:%03d",
-> >                  dev->udev->bus->busnum, dev->udev->devnum);
-> > 
-> > Is this the right thing to do?
-> 
-> If we're only expecting a MDIO device at priv->phy_addr, then I
-> guess it's fine. Looking at the driver, I don't understand the
-> mixture of dev->mii.* and priv->mdio->*, and sadly I don't have
-> time to look in depth at this driver to work that out.
+The following changes since commit 7e161a991ea71e6ec526abc8f40c6852ebe3d946:
 
-Hm, I guess, with this change there will be a subtile regression.
-In case of an external PHYs the ax88772_init_phy() is using PHYlib to
-suspend the internal PHY.
+  Merge tag 'i2c-for-6.17-rc1-part2' of git://git.kernel.org/pub/scm/linux/kernel/git/wsa/linux (2025-08-04 16:37:29 -0700)
 
-May be:
-  priv->mdio->phy_mask = ~(BIT(priv->phy_addr) | BIT(AX_EMBD_PHY_ADDR));
+are available in the Git repository at:
 
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+
+for you to fetch changes up to 6a20f9fca30c4047488a616b5225acb82367ef6b:
+
+  vhost: initialize vq->nheads properly (2025-08-05 05:57:40 -0400)
+
+----------------------------------------------------------------
+vhost: bugfix
+
+A single fix for a regression in vhost.
+
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+----------------------------------------------------------------
+Jason Wang (1):
+      vhost: initialize vq->nheads properly
+
+ drivers/vhost/vhost.c | 1 +
+ 1 file changed, 1 insertion(+)
+
 
