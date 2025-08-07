@@ -1,201 +1,169 @@
-Return-Path: <netdev+bounces-212106-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212107-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EF2FB1DFB0
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 01:06:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB90DB1DFCC
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 01:29:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D71A161EBA
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 23:06:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8977C18C1E8A
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 23:29:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DBC91E7C34;
-	Thu,  7 Aug 2025 23:05:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA3C0248F72;
+	Thu,  7 Aug 2025 23:29:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="s9Pd4lBg";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="FzTsUgUJ";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="QSiR1wIP";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="Oyk/6C+N"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dwR1KqbM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D686635898
-	for <netdev@vger.kernel.org>; Thu,  7 Aug 2025 23:05:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CD0D1946AA;
+	Thu,  7 Aug 2025 23:29:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754607957; cv=none; b=upDi7ULUWyxeGw8lMbK5tjxTb8LTliwNMCTSPrYEo/Pm7k/HH0UPd7fRL6LV04TMlaO25PnXOMX2Ix2403Zgt6Wg+1Y3Cem/oAp8D+7xdZyr53mSgI6VUs7rkM6sxJ8fSClVfOvvSV59IutDN+3SeV3m+AqIL0gurcKw1hGtTbA=
+	t=1754609354; cv=none; b=lUq6YJ7QiayseShd5Kbr14wfIE5N988Uf00hdWkQ7OUsaOEdbuAjBsI0M16DT7kTolpWcfUD0G8reRm9cNm0dNVEIIMvruJk86shCrZ7TVn5n/kWsWJWBImIy/z09SDqgQFRJX51cuahKC6qpv4Y7W4Pim+MJiSLGgoKjV234hg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754607957; c=relaxed/simple;
-	bh=9YK8BkerrXI3VWUUxFqjvSp5nfYDyPM3moXkjjbENRg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=c89okWwRnIUuyZmEHMRRmV163Y8fSQ/xz9tBBHoyyWV6+EQZOGtRejMHIdNcoTvKiPgc7X/RVz2vKb1hZZXdZr7Q69gDEr4RHXwsdEkIHgKXBjQWidOF9rK/DFwKeJjM81jamjyVRvL3IBsbBkDrF1LaJtXO7cUEkTgoQ5TCJ04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=s9Pd4lBg; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=FzTsUgUJ; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=QSiR1wIP; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=Oyk/6C+N; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from lion.mk-sys.cz (unknown [10.100.225.114])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id E28BC33933;
-	Thu,  7 Aug 2025 23:05:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1754607953; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PHAzBDvOLrs+7C4wfnIzfgVqikB8GIUwjVOcMVH2lBo=;
-	b=s9Pd4lBgq2Yt35L/01eUHenZaXCt9yHgb4gWa8e1DVn+jcSwOuImhkITYeoT9Y76sMaGwy
-	+2wBJsd14T9kSbk9Goiz1yVtQtr8EGfwZdQvINttmO5wfnSe2S8fMicOEzeNRpUTWiEEaD
-	2W5T+S9xuMJtvvOSVABhDeaLX9NQitE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1754607953;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PHAzBDvOLrs+7C4wfnIzfgVqikB8GIUwjVOcMVH2lBo=;
-	b=FzTsUgUJeRw9UCTFOJenbjP4CSahM4pRwy5kWIwDDMYyjcf80pgqOiwiJ6KADwYRfFLu4C
-	cNpkSycmUnqRUpCA==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1754607952; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PHAzBDvOLrs+7C4wfnIzfgVqikB8GIUwjVOcMVH2lBo=;
-	b=QSiR1wIPzlG/w3mP6m8Pgksnqzecm89nwZ4u7K1lkQc07zo3+PbFAosydxtwT7HhOjX2tD
-	ec9k8FakiK0HchduC6QkdQHLzm2fx0HzGF74e9usIZ4P+0glL+jIscBRUR5gu8D1sWfRhT
-	eyOKA0e5nQbzaVZWpXIf558uWbH1vwQ=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1754607952;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PHAzBDvOLrs+7C4wfnIzfgVqikB8GIUwjVOcMVH2lBo=;
-	b=Oyk/6C+N1X992IFRkSH+H58A3CnHi7zSJCUfw/fcGQ+N3AXygL7i1eFjQVvGVzDEaKAPxS
-	vV3f19GU4sFzjkDg==
-Received: by lion.mk-sys.cz (Postfix, from userid 1000)
-	id B425F20057; Fri, 08 Aug 2025 01:05:52 +0200 (CEST)
-Date: Fri, 8 Aug 2025 01:05:52 +0200
-From: Michal Kubecek <mkubecek@suse.cz>
-To: Michel Lind <michel@michel-slm.name>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>
-Subject: Re: [PATCH ethtool] netlink: fix print_string when the value is NULL
-Message-ID: <lwicuyi63qrip45nfwhifujhgtravqojbv4sud5acdqpmn7tpi@7ghj23b3hhdx>
-References: <aILUS-BlVm5tubAF@maurice.local>
+	s=arc-20240116; t=1754609354; c=relaxed/simple;
+	bh=PhDpiyL0MBpJa7eaWVLsZ/q8aJ7n9LWGGzQBtX3leTI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jDEfIghr+BQDQ9w74E93VzcQCfHrgHv/nZV6IdGl6bhvLBVJwCKpsAh0LdUBG46f8+yEcynHN+8edRO00OM+9e+2DSMb2LwvZK6Qg3jxmdWqt5hHLUrfeSTX895KHZP7rV+ukk+b9LVryiayyAU0ftzVVUS5w9zWqFhhCR8NqAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dwR1KqbM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36744C4CEEB;
+	Thu,  7 Aug 2025 23:29:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754609353;
+	bh=PhDpiyL0MBpJa7eaWVLsZ/q8aJ7n9LWGGzQBtX3leTI=;
+	h=From:To:Cc:Subject:Date:From;
+	b=dwR1KqbMjdUu8aMe/X5dL7K0vv+K32lbbX/yc08LxPTNwlGtkVUzsfWqvwMdXaKLV
+	 elDgNZXtyS/xd2sAp4vTKxxkOOHicD/CsUwmO7lK3FblWJJxftiRbCHj0mgyoPF2k+
+	 QdFFfawd5Gt24mDOuD0zmzK4kIGDlZ7PbRiQa8NxNI7KBY1gfHN8LhVzlJGIDragc3
+	 jU7qlXNrqgnsqbtz64ut3YGuGXCcF9ghP1eNV2UNg/XYR58CEETQMbvyfnsniQVzXP
+	 1jmPtd48YmZcpblTcNqj7MJ+s8it2S/1i4cXnJ/SAE9uaiOq0ftdy1TzNPzhQC7bOE
+	 +K4GTT6gKleKw==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	borisp@nvidia.com,
+	john.fastabend@gmail.com,
+	shuah@kernel.org,
+	linux-kselftest@vger.kernel.org,
+	sd@queasysnail.net,
+	will@willsroot.io,
+	savy@syst3mfailure.io,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net v2 1/2] tls: handle data disappearing from under the TLS ULP
+Date: Thu,  7 Aug 2025 16:29:06 -0700
+Message-ID: <20250807232907.600366-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="vlrcuo3cj2jpl7oh"
-Content-Disposition: inline
-In-Reply-To: <aILUS-BlVm5tubAF@maurice.local>
-X-Spam-Level: 
-X-Spamd-Result: default: False [-5.90 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	SIGNED_PGP(-2.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	NEURAL_HAM_SHORT(-0.20)[-0.993];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_ONE(0.00)[1];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	ARC_NA(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	RCVD_TLS_LAST(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3]
-X-Spam-Flag: NO
-X-Spam-Score: -5.90
+Content-Transfer-Encoding: 8bit
 
+TLS expects that it owns the receive queue of the TCP socket.
+This cannot be guaranteed in case the reader of the TCP socket
+entered before the TLS ULP was installed, or uses some non-standard
+read API (eg. zerocopy ones). Replace the WARN_ON() and a buggy
+early exit (which leaves anchor pointing to a freed skb) with real
+error handling. Wipe the parsing state and tell the reader to retry.
 
---vlrcuo3cj2jpl7oh
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+We already reload the anchor every time we (re)acquire the socket lock,
+so the only condition we need to avoid is an out of bounds read
+(not having enough bytes in the socket for previously parsed record len).
 
-On Thu, Jul 24, 2025 at 07:48:11PM GMT, Michel Lind wrote:
-> The previous fix in commit b70c92866102 ("netlink: fix missing headers
-> in text output") handles the case when value is NULL by still using
-> `fprintf` but passing no value.
->=20
-> This fails if `-Werror=3Dformat-security` is passed to gcc, as is the
-> default in distros like Fedora.
->=20
-> ```
-> json_print.c: In function 'print_string':
-> json_print.c:147:25: error: format not a string literal and no format arg=
-uments [-Werror=3Dformat-security]
->   147 |                         fprintf(stdout, fmt);
->       |
-> ```
->=20
-> Use `fprintf(stdout, "%s", fmt)` instead, using the format string as the
-> value, since in this case we know it is just a string without format
-> chracters.
->=20
-> Reviewed-by: Jakub Kicinski <kuba@kernel.org>
-> Signed-off-by: Michel Lind <michel@michel-slm.name>
+If some data was read from under TLS but there's enough in the queue
+we'll reload and decrypt what is most likely not a valid TLS record.
+Leading to some undefined behavior from TLS perspective (corrupting
+a stream? missing an alert? missing an attack?) but no kernel crash
+should take place.
 
-Applied, thank you.
+Reported-by: William Liu <will@willsroot.io>
+Reported-by: Savino Dicanosa <savy@syst3mfailure.io>
+Link: https://lore.kernel.org/tFjq_kf7sWIG3A7CrCg_egb8CVsT_gsmHAK0_wxDPJXfIzxFAMxqmLwp3MlU5EHiet0AwwJldaaFdgyHpeIUCS-3m3llsmRzp9xIOBR4lAI=@syst3mfailure.io
+Fixes: 84c61fe1a75b ("tls: rx: do not use the standard strparser")
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+v2:
+ - fix the reporter tags
+ - drop the copied_seq nonsense, just correct the error handling
+v1: https://lore.kernel.org/20250806180510.3656677-1-kuba@kernel.org
+---
+ net/tls/tls.h      |  2 +-
+ net/tls/tls_strp.c | 11 ++++++++---
+ net/tls/tls_sw.c   |  3 ++-
+ 3 files changed, 11 insertions(+), 5 deletions(-)
 
-It's a bit surprising that I didn't hit this problem as I always test
-building with "-Wall -Wextra -Werror". I suppose this option is not
-contained in -Wall or -Wextra.
+diff --git a/net/tls/tls.h b/net/tls/tls.h
+index 774859b63f0d..4e077068e6d9 100644
+--- a/net/tls/tls.h
++++ b/net/tls/tls.h
+@@ -196,7 +196,7 @@ void tls_strp_msg_done(struct tls_strparser *strp);
+ int tls_rx_msg_size(struct tls_strparser *strp, struct sk_buff *skb);
+ void tls_rx_msg_ready(struct tls_strparser *strp);
+ 
+-void tls_strp_msg_load(struct tls_strparser *strp, bool force_refresh);
++bool tls_strp_msg_load(struct tls_strparser *strp, bool force_refresh);
+ int tls_strp_msg_cow(struct tls_sw_context_rx *ctx);
+ struct sk_buff *tls_strp_msg_detach(struct tls_sw_context_rx *ctx);
+ int tls_strp_msg_hold(struct tls_strparser *strp, struct sk_buff_head *dst);
+diff --git a/net/tls/tls_strp.c b/net/tls/tls_strp.c
+index 095cf31bae0b..d71643b494a1 100644
+--- a/net/tls/tls_strp.c
++++ b/net/tls/tls_strp.c
+@@ -475,7 +475,7 @@ static void tls_strp_load_anchor_with_queue(struct tls_strparser *strp, int len)
+ 	strp->stm.offset = offset;
+ }
+ 
+-void tls_strp_msg_load(struct tls_strparser *strp, bool force_refresh)
++bool tls_strp_msg_load(struct tls_strparser *strp, bool force_refresh)
+ {
+ 	struct strp_msg *rxm;
+ 	struct tls_msg *tlm;
+@@ -484,8 +484,11 @@ void tls_strp_msg_load(struct tls_strparser *strp, bool force_refresh)
+ 	DEBUG_NET_WARN_ON_ONCE(!strp->stm.full_len);
+ 
+ 	if (!strp->copy_mode && force_refresh) {
+-		if (WARN_ON(tcp_inq(strp->sk) < strp->stm.full_len))
+-			return;
++		if (unlikely(tcp_inq(strp->sk) < strp->stm.full_len)) {
++			WRITE_ONCE(strp->msg_ready, 0);
++			memset(&strp->stm, 0, sizeof(strp->stm));
++			return false;
++		}
+ 
+ 		tls_strp_load_anchor_with_queue(strp, strp->stm.full_len);
+ 	}
+@@ -495,6 +498,8 @@ void tls_strp_msg_load(struct tls_strparser *strp, bool force_refresh)
+ 	rxm->offset	= strp->stm.offset;
+ 	tlm = tls_msg(strp->anchor);
+ 	tlm->control	= strp->mark;
++
++	return true;
+ }
+ 
+ /* Called with lock held on lower socket */
+diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+index 549d1ea01a72..51c98a007dda 100644
+--- a/net/tls/tls_sw.c
++++ b/net/tls/tls_sw.c
+@@ -1384,7 +1384,8 @@ tls_rx_rec_wait(struct sock *sk, struct sk_psock *psock, bool nonblock,
+ 			return sock_intr_errno(timeo);
+ 	}
+ 
+-	tls_strp_msg_load(&ctx->strp, released);
++	if (unlikely(!tls_strp_msg_load(&ctx->strp, released)))
++		return tls_rx_rec_wait(sk, psock, nonblock, false);
+ 
+ 	return 1;
+ }
+-- 
+2.50.1
 
-Michal
-
-> ---
->  json_print.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/json_print.c b/json_print.c
-> index e07c651..75e6cd9 100644
-> --- a/json_print.c
-> +++ b/json_print.c
-> @@ -144,7 +144,7 @@ void print_string(enum output_type type,
->  		if (value)
->  			fprintf(stdout, fmt, value);
->  		else
-> -			fprintf(stdout, fmt);
-> +			fprintf(stdout, "%s", fmt);
->  	}
->  }
-> =20
-> --=20
-> 2.50.1
->=20
->=20
-> --=20
->  _o) Michel Lind
-> _( ) identities: https://keyoxide.org/5dce2e7e9c3b1cffd335c1d78b229d2f7cc=
-c04f2
->      README:     https://fedoraproject.org/wiki/User:Salimma#README
-
-
-
---vlrcuo3cj2jpl7oh
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCAAdFiEEWN3j3bieVmp26mKO538sG/LRdpUFAmiVMU0ACgkQ538sG/LR
-dpUxAQgApAEqC/kmzS6c1JcEozLpdc8ElGJwjMkzT+n/zt3G8qkcph/SUBmrR2yE
-NkznlKaccAUmPEiNSW6eS74xflRq4/nE0BWgF/A37zzhiVBJY7v1xdcdVAijucNj
-fp4j8FyxkH2DP7rCqL4wJVvA+5fEqhqCOxGXUzknDLyzAojsF+uazwfKP8GJYGW0
-KgLNeydqpHFilZYmlffJ5zt2Q5JJldzojIPXJmto0s+mh6pt/D1YDf5a+KHCxapp
-CaFO9mdbLhONhcBcGRf23/pGftus4YOCO5QR20P7jIOxK0PlIPuI0pXReFNJ7GTG
-nULVUG0+WR5jYn72+YnTN8FeG9r8MA==
-=8bVf
------END PGP SIGNATURE-----
-
---vlrcuo3cj2jpl7oh--
 
