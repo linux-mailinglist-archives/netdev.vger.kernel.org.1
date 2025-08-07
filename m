@@ -1,161 +1,94 @@
-Return-Path: <netdev+bounces-212092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212093-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADD68B1DD58
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 21:08:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 48FFEB1DD62
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 21:10:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C8B3F166396
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 19:08:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 736611716B6
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 19:10:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA78D2571A0;
-	Thu,  7 Aug 2025 19:08:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16F39273D79;
+	Thu,  7 Aug 2025 19:10:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D9SZRRT4"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="jdBvcNXr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C067B4438B;
-	Thu,  7 Aug 2025 19:08:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 986752222DA
+	for <netdev@vger.kernel.org>; Thu,  7 Aug 2025 19:10:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754593684; cv=none; b=izoNYpE/RAK1reMvZWrgaiKP0h2lql/XcwYY5GFUjGfR77nDbBQOr7nEONitwG+rAjZNdQCjUQYNeU/ak+KYM+NH+O27N0oHAqf864QvrGsx07XwOugViVPhp2hSKnWPmRXnfFDrxoCufSGoxkk2bpKLp66G4r1rz7AqqdCfk94=
+	t=1754593808; cv=none; b=byHFhQrjUkKU4OJGztZ9IjGAuTQ+r0O+cy1tEMyzZUZpFDA5VoSPqpoR+xcAcsDA8sgtgHqyfLBKHj5jMh70LY6BOqymZG8i2ZSTl2WERIoaS2WAl3QegkSNKOOGjXebh30riJzZnJ4+K3Gn+COhzaWeE7c+kkbYJhglGCF4ckU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754593684; c=relaxed/simple;
-	bh=lINnFZ7ww0dKIl+Yla/gKVikbcud51Ye/UUgQcJ+O6k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HYglLBXtKX+bNH3uLZ5DxHMtkbJX4e1TxK5arsMFPyhLS+MBB5XeyNy/rX0FN5iDLvYhiLE/N+eF6byj4yB2Bt4mLgklL5oK45voRoDnhBxo2OdY/6gR+dWc4Ks9dvscMqgC6mtnv5Is4jef+ttp6AhfcXcLpuua1VeBrDuOyGM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D9SZRRT4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 406CBC4CEEB;
-	Thu,  7 Aug 2025 19:08:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754593684;
-	bh=lINnFZ7ww0dKIl+Yla/gKVikbcud51Ye/UUgQcJ+O6k=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=D9SZRRT4HcUSutIYyt4k5rVPHIT4OQTkLI96nWEBCRPOjtU7SpOmQAb4VQAN34rdF
-	 3g1WtqRcPVYhzS6EyOwQUyACqhixT+gb3Oalr6HbpHELG1+ChE9DtU2zFjgKQAqRA6
-	 v5p23B/J9ufWT/csXbO50ZHPXkdlQU1kyF8kRDPrlPiYpKBmY/btBwzdK5AhCMEiye
-	 zUh/WIQrkE5jixpdLYjT1XqK5nQY5sxUWElPTkxrDO1+V8EF5T4pHR6QsN7eTw+gC2
-	 4Ho9x4ASJ4migAIE6ceWBBDRJyJMbKgWF7fSUJbjzY0L3q44/vVBLZ8DgDLV91x8mm
-	 Bz+tNWHo9Izxw==
-Message-ID: <20a3558f-43c5-46a2-8395-c6d966ea5caf@kernel.org>
-Date: Thu, 7 Aug 2025 21:07:58 +0200
+	s=arc-20240116; t=1754593808; c=relaxed/simple;
+	bh=c76/hHoP/RBPhhRMBt/Due3sbEDvxQkMXI6SupRPytE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OVWbnHs4xdSGTbJt5VESfTC9A4Cd1KRf9hbl+BHs6eyUduAAGmQL7dgpv0wR3kyp1ebtiGOmbxxVkCVA/wnf7n5tP/TQ4Mz2WPHGIhnLWbnj9jBlY668RqtJUKOH1EjU3oN0ff+kAYycw+9K0Z5tGjLNYnUK1FqRRfy1icsBzEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=jdBvcNXr; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1173)
+	id 2EC50201BC69; Thu,  7 Aug 2025 12:10:06 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 2EC50201BC69
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1754593806;
+	bh=/4gUKl8+lJjjJ6U4OO1ti/JUseeSyM0QIqkqGQWHPKc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=jdBvcNXruqeGB6NQhACTUgDsQ9VvKTJiQc4JtaGGtbIm0/ds51mBAtAFtZ3+oUhK2
+	 RmwTYIXvSmeLlSQJ5HKLWvUBRTe/uQ27msgCNncujd13JGBNz9nyIeG4ouD7grAkkl
+	 iMqaqaA9H8VQqgtHbk8rWD8O1s6n71RUOcM5v3vA=
+Date: Thu, 7 Aug 2025 12:10:06 -0700
+From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: dsahern@gmail.com, netdev@vger.kernel.org, haiyangz@microsoft.com,
+	shradhagupta@linux.microsoft.com, ssengar@microsoft.com,
+	dipayanroy@microsoft.com, ernis@microsoft.com
+Subject: Re: [PATCH iproute2-next v2] iproute2: Add 'netshaper' command to
+ 'ip link' for netdev shaping
+Message-ID: <20250807191006.GA15844@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1753867316-7828-1-git-send-email-ernis@linux.microsoft.com>
+ <20250805110331.348499c9@hermes.local>
+ <20250807180740.GA31890@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next V2 0/7] xdp: Allow BPF to set RX hints for
- XDP_REDIRECTed packets
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: Jakub Kicinski <kuba@kernel.org>, Lorenzo Bianconi <lorenzo@kernel.org>,
- Stanislav Fomichev <stfomichev@gmail.com>, bpf@vger.kernel.org,
- netdev@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <borkmann@iogearbox.net>,
- Eric Dumazet <eric.dumazet@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, sdf@fomichev.me,
- kernel-team@cloudflare.com, arthur@arthurfabre.com, jakub@cloudflare.com,
- Jesse Brandeburg <jbrandeburg@cloudflare.com>,
- Andrew Rzeznik <arzeznik@cloudflare.com>
-References: <b1873a92-747d-4f32-91f8-126779947e42@kernel.org>
- <aGvcb53APFXR8eJb@mini-arch> <aG427EcHHn9yxaDv@lore-desk>
- <aHE2F1FJlYc37eIz@mini-arch> <aHeKYZY7l2i1xwel@lore-desk>
- <20250716142015.0b309c71@kernel.org>
- <fbb026f9-54cf-49ba-b0dc-0df0f54c6961@kernel.org>
- <20250717182534.4f305f8a@kernel.org>
- <ebc18aba-d832-4eb6-b626-4ca3a2f27fe2@kernel.org>
- <20250721181344.24d47fa3@kernel.org> <aIdWjTCM1nOjiWfC@lore-desk>
- <20250728092956.24a7d09b@kernel.org>
- <b23ed0e2-05cf-454b-bf7a-a637c9bb48e8@kernel.org>
- <4eaf6d02-6b4e-4713-a8f8-6b00a031d255@linux.dev>
- <21f4ee22-84f0-4d5e-8630-9a889ca11e31@kernel.org>
- <20250801133803.7570a6fd@kernel.org>
- <de68b1d7-86cd-4280-af6a-13f0751228c4@kernel.org>
- <baa409d6-e571-4380-b046-5ea54c0e613d@linux.dev>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <baa409d6-e571-4380-b046-5ea54c0e613d@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250807180740.GA31890@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
+On Thu, Aug 07, 2025 at 11:07:40AM -0700, Erni Sri Satya Vennela wrote:
+ > 
+> > > +			NEXT_ARG();
+> > > +			if (get_unsigned(&speed_mbps, *argv, 10)) {
+> > > +				fprintf(stderr, "Invalid speed value\n");
+> > > +				return -1;
+> > > +			}
+> > 
+> > Could you change this code to use the get_rate() in lib/utils_math.c
+> > That routine handles wide variety of suffixes.
+> > 
+> > > +			/*Convert Mbps to Bps*/
+> > 
+There is a typo in this above comment. It should be "Convert Mbps to bps"
 
-
-On 06/08/2025 03.24, Martin KaFai Lau wrote:
-> On 8/4/25 6:18 AM, Jesper Dangaard Brouer wrote:
->> Do keep-in-mind that "moving skb allocation out of the driver" is not
->> part of this patchset and a moonshot goal that will take a long time
->> (but we are already "simulation" this via XDP-redirect for years now).
+> > Won't need this if you use get_rate() or get_rate64
 > 
-> The XDP_PASS was first done in the very early days of BPF in 2016. The 
-> XDP-redirect then followed a similar setup. A lot has improved since 
-> then. A moonshot in 2016 does not necessarily mean it is still hard to 
-> do now. e.g. Loop is feasible. Directly reading/writing skb is also easier.
-> 
+> Okay I'll make the changes accordingly.
 
-Please enlighten me. How can easily give XDP-progs access to the SKB
-data-structure.  What changes do we need?
-You mentioned XDP returning an SKB pointer, but that will need changes
-to every XDP driver, right?
+Looks like get_rate64 or get_rate returns the rate in Bytes per second.
+But netshaper supports rate in bits per second.
 
-
-> Let’s first quantify what the performance loss would be if the skb is 
-> allocated and field-set by the xdp prog (for the general XDP_PASS case 
-> and the redirect+cpumap case). If it’s really worth it, let’s see what 
-> it would take for the XDP program to achieve similar optimizations.
-> 
->> Drivers should obviously not unconditionally populate the xdp_frame's
->> rx_meta area.  It is first time to populate rx_meta, once driver reach
-> 
-> afaict, the rx_meta is reserved regardless though. The xdp prog cannot 
-> use that space for data_meta. The rx_meta will grow in time.
-> 
-
-My view is that we a memory area of minimum 192 bytes available as
-headroom, that we are currently not using, that seems a waste.  The
-data_meta was limited to 32 bytes for a long time without complaints, so
-I don't think that is a concern.  If rx_meta grows, we propose changing
-to the traits implementation, which gives us a dynamic compressed struct.
-
-
-> My preference is to allow xdp prog to decide what needs to write in 
-> data_meta and decides what needs to set in the skb directly. This is the 
-> general case it should support first and then optimize.
-> 
-
-Yan and I have previously[1] (Oct 2024) explored adding a common
-callback to XDP drivers, which have access to both the xdp_buff and SKB
-in the function call. (Ignore the GRO disable bit, focus on callback)
-
-We named the functions: xdp_buff_fixup_skb_offloading() and
-  xdp_frame_fixup_skb_offloading()
-We implemented the driver changes for [bnxt], [mlx5], [ice] and [veth].
-
-What do you think of the idea of adding a BPF-hook, at this callback,
-which have access to both the XDP and SKB pointer.
-That would allow us to implement your idea, right?
-
---Jesper
-
-
-[1] https://lore.kernel.org/all/cover.1718919473.git.yan@cloudflare.com/#r
-
-[bnxt] 
-https://lore.kernel.org/all/f804c22ca168ec3aedb0ee754bfbee71764eb894.1718919473.git.yan@cloudflare.com/
-
-[mlx5] 
-https://lore.kernel.org/all/17595a278ee72964b83c0bd0b502152aa025f600.1718919473.git.yan@cloudflare.com/
-
-[ice] 
-https://lore.kernel.org/all/a9eba425bfd3bfac7e7be38fe86ad5dbff3ae01f.1718919473.git.yan@cloudflare.com/
-
-[veth] 
-https://lore.kernel.org/all/b7c75daecca9c4e36ef79af683d288653a9b5b82.1718919473.git.yan@cloudflare.com/
-
-
-
+I will use get_rate64 and multiply the result by 8 to get bps which
+also avoids using an extra speed_mbps variable.
+> > 
+> > > +			speed_bps = (((__u64)speed_mbps) * 1000000);
+> > > +		} else if (matches(*argv, "handle") == 0) {
+> > > +			handle_present = true;
+ 
 
