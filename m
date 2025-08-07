@@ -1,126 +1,257 @@
-Return-Path: <netdev+bounces-212041-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212042-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E6D3B1D6E4
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 13:47:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0671CB1D6E9
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 13:49:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 73BA118973D2
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 11:47:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 21CC056052F
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 11:49:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39F0C20B7F9;
-	Thu,  7 Aug 2025 11:47:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F10301F4615;
+	Thu,  7 Aug 2025 11:49:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="SOQ/bEIE"
+	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="U60vL/HY";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="YZEKvmbQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B73731AAE17;
-	Thu,  7 Aug 2025 11:47:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A46C20B7F9;
+	Thu,  7 Aug 2025 11:49:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754567235; cv=none; b=odB88PBZCrtzyz1/a3b1o2EYYaH1BzFinFV0pc/rFc0sk5LBRhm9GmZPYsu2WUMFjgP4OtwGy5xeGJqyKBIZJPnmKmDRn/jNJeIYJIIcTin2gO9nqMVDL5yor8yEd2zcekX5hY4xCDpzyrVLz25VXVkuVbY8NwctWQ96QnMy/tI=
+	t=1754567345; cv=none; b=PLRUsBWbO+rCoOELNau5Uj1p0PaOCzatpj/NBYgOuAWTE+vOOjA9HQ9ckhO3SwDC0Wi+c8UyOIaXGAZPoE44XPGayxjRFFFHhx9gLG85ktGfIWT1B/KHKNujd2WOsuIXR1x5g5j7usLZTK6JZ6IiMwRBfDEWP+VNOghAwlff6YM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754567235; c=relaxed/simple;
-	bh=CaekhXMweGEbATse0Ot72S3jQtMglVWzZIiE6Ss2x3Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KokRyLJ1o/fvFVBTGowBpMGoJZo/k9eFdSyvUecfMTTcvHCu4SOZSBJMttlSuzgLJNdDcMHftEffXSFTV5YkLbUkh5gIdppdR9yc7z40k46lOeDyprI1yIiYynZoKAVkDaGZBjMkpfE02Xp1jSm27D+LSzRFxoiL2A1OPolT3OQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=SOQ/bEIE; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=F55w2O7FP54zLnSv0RQaIMc8o0k83eet7kxdJLTSrDQ=; b=SOQ/bEIERLfEtrsw8VCWsMERFC
-	HG0U/2splUQG/TUua8sz+wxDsDVSNHxEDlUVj1HgSAosKi2DyPSD895afUXx0hI+bVarIdR8piwJF
-	Mc+SSd0Kkz0WElFQHLMj50fS6LwCALLUGWVQeds5QEjTMM5OlP60ZBvS3JPtgvDJ3j9DJuS9cNDfJ
-	j39TEHKHUzeda1tY3FXPnTLBlh5n7vWTcBvyCDsWviU25jmWfqCu9GaFDdXVetVatE7/LYFSHKlXP
-	v74zXGnPp6BiQda04ImRtVHwkTEzwOq04dWJsB8AmNnjbtlTyvBTqCy9ZfrByVGy2EPZoz5vLbpeQ
-	+SAJpBvQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:34792)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1ujz5O-00061v-11;
-	Thu, 07 Aug 2025 12:47:06 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1ujz5K-00085X-32;
-	Thu, 07 Aug 2025 12:47:03 +0100
-Date: Thu, 7 Aug 2025 12:47:02 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Xu Yang <xu.yang_2@nxp.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, hkallweit1@gmail.com,
-	o.rempel@pengutronix.de, pabeni@redhat.com, netdev@vger.kernel.org,
-	imx@lists.linux.dev, linux-kernel@vger.kernel.org
-Subject: Re: [RESEND] net: phy: fix NULL pointer dereference in
- phy_polling_mode()
-Message-ID: <aJSSNg4aZNfoqqZh@shell.armlinux.org.uk>
-References: <20250806082931.3289134-1-xu.yang_2@nxp.com>
- <aJMWDRNyq9VDlXJm@shell.armlinux.org.uk>
- <ywr5p6ccsbvoxronpzpbtxjqyjlwp5g6ksazbeyh47vmhta6sb@xxl6dzd2hsgg>
- <aJNSDeyJn5aZG7xs@shell.armlinux.org.uk>
- <unh332ly5fvcrjgur4y3lgn4m4zlzi7vym4hyd7yek44xvfrh5@fmavbivvjfjn>
- <b9140415-2478-4264-a674-c158ca14eb07@lunn.ch>
- <aJOHObGgfzxIDzHW@shell.armlinux.org.uk>
- <2b3fvsi7c47oit4p6drgjqeaxgwyzyopt7czfv3g2a74j2ay5j@qu22cohdcrjs>
- <3mkwdhodm4zl3t6zsavcrrkuawvd3qjxtdvhxwi6gwe42ic7rs@tevlpedpwlag>
+	s=arc-20240116; t=1754567345; c=relaxed/simple;
+	bh=4Dfm16dtenqZus4B42uNTr1IMVz5WLJ9W5cHmjdS4zM=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=tUjy1erseDRZECm03k1weXmqJvh+ths5vumb2iZ+0M2lHXuvUyI7DdL/SJBxE6oI1UWPLIMfmVN3dn29fn2PA7BFMBao8b3BojSMPW/7JJ52sPrAL9tposKjVzu0Ev41PRQHrTolAxyPcPZZUIm/I+ebNap3cp87J1j51FPh9U4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=U60vL/HY; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=YZEKvmbQ reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
+  t=1754567341; x=1786103341;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=i4uPAJ9IW9vl88ePcdpKzjtiZLMIb7GgbwNe3+1BvWY=;
+  b=U60vL/HYE98SySrBhYoGQydt9LI2SAjQu4ASfJojDgKjV9Vtf/Nl9pp8
+   DgRz+ZD/9tkc+EiAWkz5WUI5nJyPv+wjBtAhn3z49uLTbjcWn4y0Tz2xT
+   BjfLiREaKoFxhhwI8Hr1Nz6C8xLaysvDCA1cW2JMxl3dNdwnaB4Ku9/th
+   aQNXwx+d27jgEiNPsX3SgYQ3AFExXz9unp8lcH85Z7dFCTLbM3suNy2vA
+   05G2qgIA7dOvRsFfX3QpT+nQeYgBzoM63OMg6o1zs0e3/qefculF8TWsl
+   XtfASwLJaM3rJeSWitOU0oZ+Jhgy+T5XFVMDlcYOi3/dFHeLIewEhPvtZ
+   A==;
+X-CSE-ConnectionGUID: JhyOYoELRGids6Bki+OUFQ==
+X-CSE-MsgGUID: MWiHtDpCT6Gx+H7wzZdvGQ==
+X-IronPort-AV: E=Sophos;i="6.17,271,1747692000"; 
+   d="scan'208";a="45636873"
+Received: from vmailcow01.tq-net.de ([10.150.86.48])
+  by mx1.tq-group.com with ESMTP; 07 Aug 2025 13:48:58 +0200
+X-CheckPoint: {689492AA-4-410E8DD8-CEA8F0F8}
+X-MAIL-CPID: DB5FC63FD761EBF6D413EA6E6EFE8B37_3
+X-Control-Analysis: str=0001.0A00211B.6894924C.001C,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 8A688160F56;
+	Thu,  7 Aug 2025 13:48:52 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
+	s=dkim; t=1754567333;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=i4uPAJ9IW9vl88ePcdpKzjtiZLMIb7GgbwNe3+1BvWY=;
+	b=YZEKvmbQVMlloS5TBtRx2jH63mxAKDXRmp81JNNnnORSKU65/CXFVB4N7q/JCJyI8NtVIg
+	lE9IhQN6SaJRWHltDgRY/9dDZO43cbUlx8KQ32bnqCGyfiIMaI7eiwGu33SIot7wwgVQ/o
+	b4IxJib7SlKv3XFzErmdh1nIgwXsb/uVwGLgB5j2DbEXG6p+WChtd300JvPe/vR9t/4T/A
+	vjpFiTogyMpRD4ccus+sBNvweEOpOmdnsRy76uyrnHo8uDsGuuH3wfZ2r/Dvz6WjB1tF9x
+	vT6Wk/a1+ulF4sGtukHQE2vvb9J+LlSn5GAvOnp0YFtBRbxjYs/gAFt69n7qkw==
+Message-ID: <e659763b2535701e9061d0a19e1ce9c285d92045.camel@ew.tq-group.com>
+Subject: Re: [PATCH v2] phy: ti: gmii-sel: Force RGMII TX delay
+From: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+To: Michael Walle <mwalle@kernel.org>
+Cc: Siddharth Vadapalli <s-vadapalli@ti.com>, Andrew Lunn <andrew@lunn.ch>, 
+ linux-phy@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, nm@ti.com, vigneshr@ti.com, Vinod Koul
+ <vkoul@kernel.org>,  Kishon Vijay Abraham I <kishon@kernel.org>
+Date: Thu, 07 Aug 2025 13:48:52 +0200
+In-Reply-To: <20250806135913.662340-1-mwalle@kernel.org>
+References: <20250806135913.662340-1-mwalle@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.3-0ubuntu1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3mkwdhodm4zl3t6zsavcrrkuawvd3qjxtdvhxwi6gwe42ic7rs@tevlpedpwlag>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Thu, Aug 07, 2025 at 07:21:46PM +0800, Xu Yang wrote:
-> Hi Russell and Andrew,
-> 
-> With more debug on why asix_devices.c driver is creating so many mdio devices,
-> I found the mdio->phy_mask setting may be missing.
+On Wed, 2025-08-06 at 15:59 +0200, Michael Walle wrote:
+> Some SoCs are just validated with the TX delay enabled. With commit
+> ca13b249f291 ("net: ethernet: ti: am65-cpsw: fixup PHY mode for fixed
+> RGMII TX delay"), the network driver will patch the delay setting on the
+> fly assuming that the TX delay is fixed. In reality, the TX delay is
+> configurable and just skipped in the documentation. There are
+> bootloaders, which will disable the TX delay and this will lead to a
+> transmit path which doesn't add any delays at all. Fix that by always
+> forcing the TX delay to be enabled.
+>=20
+> This is safe to do and shouldn't break any boards in mainline because
+> the fixed delay is only introduced for gmii-sel compatibles which are
+> used together with the am65-cpsw-nuss driver and are affected by the
+> commit above.
+>=20
+> Fixes: ca13b249f291 ("net: ethernet: ti: am65-cpsw: fixup PHY mode for fi=
+xed RGMII TX delay")
+> Signed-off-by: Michael Walle <mwalle@kernel.org>
+> ---
+> v2:
+>  - reject invalid PHY modes. Thanks Matthias.
+>  - add a paragraph to the commit message that this patch shouldn't
+>    break any existing boards. Thanks Andrew.
+>=20
+>  drivers/phy/ti/phy-gmii-sel.c | 58 ++++++++++++++++++++++++++++++-----
+>  1 file changed, 50 insertions(+), 8 deletions(-)
+>=20
+> diff --git a/drivers/phy/ti/phy-gmii-sel.c b/drivers/phy/ti/phy-gmii-sel.=
+c
+> index ff5d5e29629f..ed078475c4cb 100644
+> --- a/drivers/phy/ti/phy-gmii-sel.c
+> +++ b/drivers/phy/ti/phy-gmii-sel.c
+> @@ -34,6 +34,7 @@ enum {
+>  	PHY_GMII_SEL_PORT_MODE =3D 0,
+>  	PHY_GMII_SEL_RGMII_ID_MODE,
+>  	PHY_GMII_SEL_RMII_IO_CLK_EN,
+> +	PHY_GMII_SEL_FIXED_TX_DELAY,
+>  	PHY_GMII_SEL_LAST,
+>  };
+> =20
+> @@ -127,6 +128,22 @@ static int phy_gmii_sel_mode(struct phy *phy, enum p=
+hy_mode mode, int submode)
+>  		goto unsupported;
+>  	}
+> =20
+> +	/*
+> +	 * Some SoCs only support fixed MAC side TX delays. According to the
+> +	 * datasheet, they are always enabled, but that turns out not to be the
+> +	 * case and the delay is configurable. But according to the vendor that
+> +	 * mode is not validated and might not work. Some bootloaders disable
+> +	 * this bit. To work around that, enable it again.
+> +	 */
+> +	if (soc_data->features & BIT(PHY_GMII_SEL_FIXED_TX_DELAY)) {
+> +		/* With a fixed delay, some modes are not supported at all. */
+> +		if (submode =3D=3D PHY_INTERFACE_MODE_RGMII_ID ||
+> +		    submode =3D=3D PHY_INTERFACE_MODE_RGMII_TXID)
+> +			return -EINVAL;
+> +
+> +		rgmii_id =3D 0;
 
-mdio->phy_mask is really only a workaround/optimisation to prevent
-the automatic scanning of the MDIO bus.
+Can't this just be the following? (maybe with an error message)
 
-If we know for certain that we're only interested in a PHY at a
-certain set of addresses, then it's appropriate to tell the MDIO/phylib
-layer not to bother scanning the other addresses, but this will mean
-if the driver uses e.g. phy_find_first(), it will find the first PHY
-amongst those that phy_mask allows to be scanned, rather than the first
-on the bus.
+if (soc_data->features & BIT(PHY_GMII_SEL_FIXED_TX_DELAY)) {
+	if (rgmii_id !=3D 0)
+		return -EINVAL;
+}
 
-In other words... it's dependent on the driver.
 
-> diff --git a/drivers/net/usb/asix_devices.c b/drivers/net/usb/asix_devices.c
-> index 9b0318fb50b5..9fba1cb17134 100644
-> --- a/drivers/net/usb/asix_devices.c
-> +++ b/drivers/net/usb/asix_devices.c
-> @@ -676,6 +676,7 @@ static int ax88772_init_mdio(struct usbnet *dev)
->         priv->mdio->read = &asix_mdio_bus_read;
->         priv->mdio->write = &asix_mdio_bus_write;
->         priv->mdio->name = "Asix MDIO Bus";
-> +       priv->mdio->phy_mask = ~BIT(priv->phy_addr);
->         /* mii bus name is usb-<usb bus number>-<usb device number> */
->         snprintf(priv->mdio->id, MII_BUS_ID_SIZE, "usb-%03d:%03d",
->                  dev->udev->bus->busnum, dev->udev->devnum);
-> 
-> Is this the right thing to do?
 
-If we're only expecting a MDIO device at priv->phy_addr, then I
-guess it's fine. Looking at the driver, I don't understand the
-mixture of dev->mii.* and priv->mdio->*, and sadly I don't have
-time to look in depth at this driver to work that out.
+Best,
+Matthias
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+> +	}
+> +
+>  	if_phy->phy_if_mode =3D submode;
+> =20
+>  	dev_dbg(dev, "%s id:%u mode:%u rgmii_id:%d rmii_clk_ext:%d\n",
+> @@ -210,25 +227,46 @@ struct phy_gmii_sel_soc_data phy_gmii_sel_soc_dm814=
+ =3D {
+> =20
+>  static const
+>  struct reg_field phy_gmii_sel_fields_am654[][PHY_GMII_SEL_LAST] =3D {
+> -	{ [PHY_GMII_SEL_PORT_MODE] =3D REG_FIELD(0x0, 0, 2), },
+> -	{ [PHY_GMII_SEL_PORT_MODE] =3D REG_FIELD(0x4, 0, 2), },
+> -	{ [PHY_GMII_SEL_PORT_MODE] =3D REG_FIELD(0x8, 0, 2), },
+> -	{ [PHY_GMII_SEL_PORT_MODE] =3D REG_FIELD(0xC, 0, 2), },
+> -	{ [PHY_GMII_SEL_PORT_MODE] =3D REG_FIELD(0x10, 0, 2), },
+> -	{ [PHY_GMII_SEL_PORT_MODE] =3D REG_FIELD(0x14, 0, 2), },
+> -	{ [PHY_GMII_SEL_PORT_MODE] =3D REG_FIELD(0x18, 0, 2), },
+> -	{ [PHY_GMII_SEL_PORT_MODE] =3D REG_FIELD(0x1C, 0, 2), },
+> +	{
+> +		[PHY_GMII_SEL_PORT_MODE] =3D REG_FIELD(0x0, 0, 2),
+> +		[PHY_GMII_SEL_RGMII_ID_MODE] =3D REG_FIELD(0x0, 4, 4),
+> +	}, {
+> +		[PHY_GMII_SEL_PORT_MODE] =3D REG_FIELD(0x4, 0, 2),
+> +		[PHY_GMII_SEL_RGMII_ID_MODE] =3D REG_FIELD(0x4, 4, 4),
+> +	}, {
+> +		[PHY_GMII_SEL_PORT_MODE] =3D REG_FIELD(0x8, 0, 2),
+> +		[PHY_GMII_SEL_RGMII_ID_MODE] =3D REG_FIELD(0x8, 4, 4),
+> +	}, {
+> +		[PHY_GMII_SEL_PORT_MODE] =3D REG_FIELD(0xC, 0, 2),
+> +		[PHY_GMII_SEL_RGMII_ID_MODE] =3D REG_FIELD(0xC, 4, 4),
+> +	}, {
+> +		[PHY_GMII_SEL_PORT_MODE] =3D REG_FIELD(0x10, 0, 2),
+> +		[PHY_GMII_SEL_RGMII_ID_MODE] =3D REG_FIELD(0x10, 4, 4),
+> +	}, {
+> +		[PHY_GMII_SEL_PORT_MODE] =3D REG_FIELD(0x14, 0, 2),
+> +		[PHY_GMII_SEL_RGMII_ID_MODE] =3D REG_FIELD(0x14, 4, 4),
+> +	}, {
+> +		[PHY_GMII_SEL_PORT_MODE] =3D REG_FIELD(0x18, 0, 2),
+> +		[PHY_GMII_SEL_RGMII_ID_MODE] =3D REG_FIELD(0x18, 4, 4),
+> +	}, {
+> +		[PHY_GMII_SEL_PORT_MODE] =3D REG_FIELD(0x1C, 0, 2),
+> +		[PHY_GMII_SEL_RGMII_ID_MODE] =3D REG_FIELD(0x1C, 4, 4),
+> +	},
+>  };
+> =20
+>  static const
+>  struct phy_gmii_sel_soc_data phy_gmii_sel_soc_am654 =3D {
+>  	.use_of_data =3D true,
+> +	.features =3D BIT(PHY_GMII_SEL_RGMII_ID_MODE) |
+> +		    BIT(PHY_GMII_SEL_FIXED_TX_DELAY),
+>  	.regfields =3D phy_gmii_sel_fields_am654,
+>  };
+> =20
+>  static const
+>  struct phy_gmii_sel_soc_data phy_gmii_sel_cpsw5g_soc_j7200 =3D {
+>  	.use_of_data =3D true,
+> +	.features =3D BIT(PHY_GMII_SEL_RGMII_ID_MODE) |
+> +		    BIT(PHY_GMII_SEL_FIXED_TX_DELAY),
+>  	.regfields =3D phy_gmii_sel_fields_am654,
+>  	.extra_modes =3D BIT(PHY_INTERFACE_MODE_QSGMII) | BIT(PHY_INTERFACE_MOD=
+E_SGMII) |
+>  		       BIT(PHY_INTERFACE_MODE_USXGMII),
+> @@ -239,6 +277,8 @@ struct phy_gmii_sel_soc_data phy_gmii_sel_cpsw5g_soc_=
+j7200 =3D {
+>  static const
+>  struct phy_gmii_sel_soc_data phy_gmii_sel_cpsw9g_soc_j721e =3D {
+>  	.use_of_data =3D true,
+> +	.features =3D BIT(PHY_GMII_SEL_RGMII_ID_MODE) |
+> +		    BIT(PHY_GMII_SEL_FIXED_TX_DELAY),
+>  	.regfields =3D phy_gmii_sel_fields_am654,
+>  	.extra_modes =3D BIT(PHY_INTERFACE_MODE_QSGMII) | BIT(PHY_INTERFACE_MOD=
+E_SGMII),
+>  	.num_ports =3D 8,
+> @@ -248,6 +288,8 @@ struct phy_gmii_sel_soc_data phy_gmii_sel_cpsw9g_soc_=
+j721e =3D {
+>  static const
+>  struct phy_gmii_sel_soc_data phy_gmii_sel_cpsw9g_soc_j784s4 =3D {
+>  	.use_of_data =3D true,
+> +	.features =3D BIT(PHY_GMII_SEL_RGMII_ID_MODE) |
+> +		    BIT(PHY_GMII_SEL_FIXED_TX_DELAY),
+>  	.regfields =3D phy_gmii_sel_fields_am654,
+>  	.extra_modes =3D BIT(PHY_INTERFACE_MODE_QSGMII) | BIT(PHY_INTERFACE_MOD=
+E_SGMII) |
+>  		       BIT(PHY_INTERFACE_MODE_USXGMII),
+
+--=20
+TQ-Systems GmbH | M=C3=BChlstra=C3=9Fe 2, Gut Delling | 82229 Seefeld, Germ=
+any
+Amtsgericht M=C3=BCnchen, HRB 105018
+Gesch=C3=A4ftsf=C3=BChrer: Detlef Schneider, R=C3=BCdiger Stahl, Stefan Sch=
+neider
+https://www.tq-group.com/
 
