@@ -1,200 +1,100 @@
-Return-Path: <netdev+bounces-212049-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212050-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95FF2B1D83A
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 14:48:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21D16B1D851
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 14:55:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5526E1AA3FE0
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 12:48:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D63D1722DB2
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 12:55:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 307B5254AE4;
-	Thu,  7 Aug 2025 12:47:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F25112550D5;
+	Thu,  7 Aug 2025 12:55:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i8wUd7ug"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="jARgqw6C"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A68625393E
-	for <netdev@vger.kernel.org>; Thu,  7 Aug 2025 12:47:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0937F252287;
+	Thu,  7 Aug 2025 12:55:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754570869; cv=none; b=TZqSAtFj7maqbN2h++Ce2FjwegVqYlbUa5yhLnETvd4vyY8c/csMp8Ngn3SHKmEXAQd5zudPpTUsWhGi2m/dGNnRpvTdiTrPUD7wAH/hlnwpJ9fWjvNx+yH4EJOGntToT9qCp2oZsgu0qZ5NrZ8l3YHbn8cS/italRwCMhZuSTs=
+	t=1754571320; cv=none; b=HhzkeLz5WCeANe9MoFRoFOkkFTVAbST1YcE6YNvK55PlwNHo0d0Y/5P535Os6AViuA8SUHgOY1qBIiw4FLeprIoGvZFX2XId5t1FiIOYIdtatoPq4/6tfrjUwVpMf6+9hEDAWTTqBQUKbtmNzmm1tm0ylDzTiJ5mt+7JsVkQBa4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754570869; c=relaxed/simple;
-	bh=+egBy+RMpqLtNh79AR9yQ2T/2DAqtjLVFMqu+wyMIP8=;
+	s=arc-20240116; t=1754571320; c=relaxed/simple;
+	bh=VP1x1C2TMJw2qzgV/aK2US2O1jwTyKXCW6X2Wq7tbH8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MB2UIl1tMMFO46Ye438pyZjjBs7GwrExCRGgdiCmPglJsVh6Lz/wjeeMBIxUCc+o4UJSx46QBkYmuB5UPpzCayxyt/6rV5rIHdR7YYRBk922q3X3F72RGIV/jB2ByE2Hlly8egBBRVIq4u51mUapDftt2LUFRRqDOQUKOl5ZP8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i8wUd7ug; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5277DC4CEEB;
-	Thu,  7 Aug 2025 12:47:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754570868;
-	bh=+egBy+RMpqLtNh79AR9yQ2T/2DAqtjLVFMqu+wyMIP8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=i8wUd7ugI+2eJCVQlgR+OWX8+BpJQNJTOm6DQpGqSByBgbhWZ4JMAe4XUxtOwcUHQ
-	 ZamyIuuHFEKz0UhGPx01ZSJcNMDpG+tPY0tqtokc6dam69DCtoqxhjzWwIpA5biQ9r
-	 CMBRVoGYIdMh68PaqAxLX62m1Xy6PI9Iiu1llWywiYt+A8zMlqmCW/v5nvmeSv7r1b
-	 5F/Iq1i3cCuCQONi46KeKCIyflVwZ+3RqCLqYGUKKHEXYLkUqgrDstXnlmXLb4wOSw
-	 DgBDrwpoig72ZM19FeM5ZOgqTzP3lAEA6ac22715rowvudm/PNG4umLM6RC3iFDwY+
-	 i8DGTMrazccHw==
-Date: Thu, 7 Aug 2025 13:47:44 +0100
-From: Simon Horman <horms@kernel.org>
-To: Mingming Cao <mmc@linux.ibm.com>
-Cc: netdev@vger.kernel.org, bjking1@linux.ibm.com, haren@linux.ibm.com,
-	ricklind@linux.ibm.com, kuba@kernel.org, edumazet@google.com,
-	pabeni@redhat.com, linuxppc-dev@lists.ozlabs.org,
-	maddy@linux.ibm.com, mpe@ellerman.id.au
-Subject: Re: [PATCH net-next v4] ibmvnic: Increase max subcrq indirect
- entries with fallback
-Message-ID: <20250807124744.GJ61519@horms.kernel.org>
-References: <20250806184449.94278-1-mmc@linux.ibm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=PZBYYL1nOWQQPjBBppM2+G3d6YGYqI0gSPgtwSBDPdtDimeMtl8hYXsSSuuWTqFSVAkmwPnrjpqmFNjhbyIcVWSUeFpxIpRXY1MAkYTVvwNlu6wY/LQDk+X+X2ZlIcGMkSe7Tvhs1aRUH4BWM94gNRa/Tqgtod1R6yRVA3dVd5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=jARgqw6C; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=TuW6mAl/8kZ0b8oYSAZYeu8508XdSmqyTX6zbQ3bOI0=; b=jARgqw6C6mCszxBm2Rphmmo7ZB
+	ZvbzzDPxBIN5I6cG/BiWA1OcoEdp21CA4utVWuYKs+SPX3O98fHgP+BD8nQ3G21me5lsJAUpI3R1Z
+	Kh8ddcsNt04TqhZ1hFqP7gm3eH4fANsnBCBjIM5quOqDGfegkCXEPCSqVqvHBvg8eb8s=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uk09E-003y8D-Tt; Thu, 07 Aug 2025 14:55:08 +0200
+Date: Thu, 7 Aug 2025 14:55:08 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Xu Yang <xu.yang_2@nxp.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, hkallweit1@gmail.com,
+	o.rempel@pengutronix.de, pabeni@redhat.com, netdev@vger.kernel.org,
+	imx@lists.linux.dev, linux-kernel@vger.kernel.org
+Subject: Re: [RESEND] net: phy: fix NULL pointer dereference in
+ phy_polling_mode()
+Message-ID: <39d7c6be-c3e9-4c2f-b814-e0b2e838ad41@lunn.ch>
+References: <20250806082931.3289134-1-xu.yang_2@nxp.com>
+ <aJMWDRNyq9VDlXJm@shell.armlinux.org.uk>
+ <ywr5p6ccsbvoxronpzpbtxjqyjlwp5g6ksazbeyh47vmhta6sb@xxl6dzd2hsgg>
+ <aJNSDeyJn5aZG7xs@shell.armlinux.org.uk>
+ <unh332ly5fvcrjgur4y3lgn4m4zlzi7vym4hyd7yek44xvfrh5@fmavbivvjfjn>
+ <b9140415-2478-4264-a674-c158ca14eb07@lunn.ch>
+ <aJOHObGgfzxIDzHW@shell.armlinux.org.uk>
+ <2b3fvsi7c47oit4p6drgjqeaxgwyzyopt7czfv3g2a74j2ay5j@qu22cohdcrjs>
+ <3mkwdhodm4zl3t6zsavcrrkuawvd3qjxtdvhxwi6gwe42ic7rs@tevlpedpwlag>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250806184449.94278-1-mmc@linux.ibm.com>
+In-Reply-To: <3mkwdhodm4zl3t6zsavcrrkuawvd3qjxtdvhxwi6gwe42ic7rs@tevlpedpwlag>
 
-On Wed, Aug 06, 2025 at 11:44:49AM -0700, Mingming Cao wrote:
-> POWER8 support a maximum of 16 subcrq indirect descriptor entries per
->  H_SEND_SUB_CRQ_INDIRECT call, while POWER9 and newer hypervisors
->  support up to 128 entries. Increasing the max number of indirect
-> descriptor entries improves batching efficiency and reduces
-> hcall overhead, which enhances throughput under large workload on POWER9+.
+> diff --git a/drivers/net/usb/asix_devices.c b/drivers/net/usb/asix_devices.c
+> index 9b0318fb50b5..9fba1cb17134 100644
+> --- a/drivers/net/usb/asix_devices.c
+> +++ b/drivers/net/usb/asix_devices.c
+> @@ -676,6 +676,7 @@ static int ax88772_init_mdio(struct usbnet *dev)
+>         priv->mdio->read = &asix_mdio_bus_read;
+>         priv->mdio->write = &asix_mdio_bus_write;
+>         priv->mdio->name = "Asix MDIO Bus";
+> +       priv->mdio->phy_mask = ~BIT(priv->phy_addr);
+>         /* mii bus name is usb-<usb bus number>-<usb device number> */
+>         snprintf(priv->mdio->id, MII_BUS_ID_SIZE, "usb-%03d:%03d",
+>                  dev->udev->bus->busnum, dev->udev->devnum);
 > 
-> Currently, ibmvnic driver always uses a fixed number of max indirect
-> descriptor entries (16). send_subcrq_indirect() treats all hypervisor
-> errors the same:
->  - Cleanup and Drop the entire batch of descriptors.
->  - Return an error to the caller.
->  - Rely on TCP/IP retransmissions to recover.
->  - If the hypervisor returns H_PARAMETER (e.g., because 128
->    entries are not supported on POWER8), the driver will continue
->    to drop batches, resulting in unnecessary packet loss.
-> 
-> In this patch:
-> Raise the default maximum indirect entries to 128 to improve ibmvnic
-> batching on morden platform. But also gracefully fall back to
-> 16 entries for Power 8 systems.
-> 
-> Since there is no VIO interface to query the hypervisor’s supported
-> limit, vnic handles send_subcrq_indirect() H_PARAMETER errors:
->  - On first H_PARAMETER failure, log the failure context
->  - Reduce max_indirect_entries to 16 and allow the single batch to drop.
->  - Subsequent calls automatically use the correct lower limit,
->     avoiding repeated drops.
-> 
-> The goal is to  optimizes performance on modern systems while handles
-> falling back for older POWER8 hypervisors.
-> 
-> Performance shows 40% improvements with MTU (1500) on largework load.
-> 
-> --------------------------------------
-> Changes since v3:
-> Link to v3: https://www.spinics.net/lists/netdev/msg1112828.html
-> - consolidate H_PARAMTER handling & subcrq ind desc limit reset for RX/TX
->   into a helper function
-> - Cleanup and clarify comments in post migration case
-> - Renamed the limits to be a clear and simple name
+> Is this the right thing to do?
 
-Thanks for the updates.
+This is what i was trying to do, i just put it in the wrong place
+because i had the wrong device.
 
-I'm sorry for not mentioning this in my review of v3, but net-next
-is currently closed for the merge window. Could you please repost,
-or post a v4, once it re-opens. That should happen once v6.17-rc1
-has been released. Probably early next week (week of 11th August).
+ax88772_init_phy() will only use the PHY at address priv->phy_addr, so
+this appears to be safe.
 
-My minor nits below notwithstanding this looks good to me.
-So feel free to include.
+The alternative is to have a custom asix_mdio_read() for this device,
+which returns -ENODEV if the phy_id being read does not equal
+priv->phy_addr. That will also prevent these extra PHYs from being
+created.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
-
-N.b.: I will be on a break when net-next reopens.
-      So please don't wait for feedback from me then.
-
-> 
-> Changes since v2:
-> link to v2: https://www.spinics.net/lists/netdev/msg1104669.html
-> 
-> -- was Patch 4 from a patch series v2. v2 introduced a module parameter
-> for backward compatibility. Based on review feedback, This patch handles
-> older systems fall back case without adding a module parameter.
-> 
-> Signed-off-by: Mingming Cao <mmc@linux.ibm.com>
-> Reviewed-by: Brian King <bjking1@linux.ibm.com>
-> Reviewed-by: Haren Myneni <haren@linux.ibm.com>
-> ---
-
-These days it is preferable to put the revision history here.
-Rather than above your Signed-off-by line, as is currently the case.
-
->  drivers/net/ethernet/ibm/ibmvnic.c | 59 ++++++++++++++++++++++++++----
->  drivers/net/ethernet/ibm/ibmvnic.h |  6 ++-
->  2 files changed, 56 insertions(+), 9 deletions(-)
-
-Or here.
-
-> 
-> diff --git a/drivers/net/ethernet/ibm/ibmvnic.c b/drivers/net/ethernet/ibm/ibmvnic.c
-
-...
-
-> @@ -6369,6 +6400,19 @@ static int ibmvnic_reset_init(struct ibmvnic_adapter *adapter, bool reset)
->  			rc = reset_sub_crq_queues(adapter);
->  		}
->  	} else {
-> +		if (adapter->reset_reason == VNIC_RESET_MOBILITY) {
-> +			/* After an LPM, reset the max number of indirect
-> +			 * subcrq descriptors per H_SEND_SUB_CRQ_INDIRECT
-> +			 * hcall to the default max (e.g POWER8 -> POWER10)
-> +			 *
-> +			 * If the new destination platform does not support
-> +			 * the higher limit max (e.g. POWER10-> POWER8 LPM)
-> +			 * H_PARAMETER will trigger automatic fallback to the
-> +			 * safe minimium limit.
-
-minimum
-
-> +			 */
-> +			adapter->cur_max_ind_descs = IBMVNIC_MAX_IND_DESCS;
-> +		}
-> +
->  		rc = init_sub_crqs(adapter);
->  	}
-
-...
-
-> diff --git a/drivers/net/ethernet/ibm/ibmvnic.h b/drivers/net/ethernet/ibm/ibmvnic.h
-
-> index 246ddce753f9..480dc587078f 100644
-> --- a/drivers/net/ethernet/ibm/ibmvnic.h
-> +++ b/drivers/net/ethernet/ibm/ibmvnic.h
-> @@ -29,8 +29,9 @@
->  #define IBMVNIC_BUFFS_PER_POOL	100
->  #define IBMVNIC_MAX_QUEUES	16
->  #define IBMVNIC_MAX_QUEUE_SZ   4096
-> -#define IBMVNIC_MAX_IND_DESCS  16
-> -#define IBMVNIC_IND_ARR_SZ	(IBMVNIC_MAX_IND_DESCS * 32)
-> +#define IBMVNIC_MAX_IND_DESCS 128
-> +#define IBMVNIC_SAFE_IND_DESC 16
-> +#define IBMVNIC_IND_MAX_ARR_SZ (IBMVNIC_MAX_IND_DESCS * 32)
-
-nit: maybe move towards using tabs before the values here?
-
-+#define IBMVNIC_MAX_IND_DESCS	128
-+#define IBMVNIC_SAFE_IND_DESC	16
-+#define IBMVNIC_IND_MAX_ARR_SZ	(IBMVNIC_MAX_IND_DESCS * 32)
-
-...
-
--- 
-pw-bot: deferred
+	Andrew
 
