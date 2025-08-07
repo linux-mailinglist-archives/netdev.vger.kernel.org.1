@@ -1,251 +1,138 @@
-Return-Path: <netdev+bounces-212026-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212027-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D57E0B1D547
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 11:50:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FD43B1D5BA
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 12:22:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E049916B1D1
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 09:50:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BBE8C3AC257
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 10:22:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 351172248BA;
-	Thu,  7 Aug 2025 09:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05EA822A4E1;
+	Thu,  7 Aug 2025 10:22:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sntech.de header.i=@sntech.de header.b="Ur8avi2j"
+	dkim=pass (1024-bit key) header.d=cdn77.com header.i=@cdn77.com header.b="7OrwcfrK"
 X-Original-To: netdev@vger.kernel.org
-Received: from gloria.sntech.de (gloria.sntech.de [185.11.138.130])
+Received: from mail-internal.sh.cz (mail-internal.sh.cz [95.168.196.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88A611DED5C;
-	Thu,  7 Aug 2025 09:50:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.11.138.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D755145329;
+	Thu,  7 Aug 2025 10:22:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.168.196.40
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754560227; cv=none; b=ecJ8NCe3vejM107uMeZzDlMjIQQqze6zelpNcQOQeJgvQLMLTXi1L1nNSlw7NssvS0m82RJjlYheEOee6gNZAruuMxUYYPxHP0WccWkJxKod2uVt132X0ul4JkAVSGVWyn0QGigLwCsZ9afQN5EfzN8HLe6+UcboJb1WUZXldOo=
+	t=1754562137; cv=none; b=bA9tvPwXJfCVe3afoPYOGMFarRY2q27jlmS0M508j2/JirvrIEikwRWBSzcFRpQFgi9Mn4E7lXij0OGMKKBTN3h+CLEIfoZU6NmhbRkiuCgoQkp8lAFY04dPLWGSP8UYCkM7kOZIFUm3VT/bVpzggVyCzZvxPxLWEnRMd1KkIYo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754560227; c=relaxed/simple;
-	bh=zNlml1UCdpfFEi8OpKphMeqD2CluP70X/mlWqFfABf0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Kd1nzgq2UytQSnCVxjoEftCeyAAhfI5sMhBJO7l6zbbRU9amXlaTz2IQzUJXZyMCiuvbq6al2sj9XE3ThBtjgQxtKqjnGREVDAXxnb/XDdYjmBJY6RpjmH9VOLf3OQDAW2jVi/NEmLGME78Q9nUTp7wR5/R5FaU0BoUQkvmUJbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sntech.de; spf=pass smtp.mailfrom=sntech.de; dkim=pass (2048-bit key) header.d=sntech.de header.i=@sntech.de header.b=Ur8avi2j; arc=none smtp.client-ip=185.11.138.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sntech.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sntech.de
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=sntech.de;
-	s=gloria202408; h=Content-Type:Content-Transfer-Encoding:MIME-Version:
-	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Reply-To;
-	bh=KGDncYSsxc1ieNgfCKAG+ROM7VI2/GSPqA10lbXeo/8=; b=Ur8avi2jIr7rJcClT5zqUgfiTf
-	5OdTsiHg4ofdRsA5qF0vl+bWhAORYX+r0VoLxzTYm5rsLl/1sRcZWB1Rjuju5imafvsp5DL8MbXmG
-	uP5RfDczseyIPsUIdxRAJ2YejisCirz0DS9hgAkaI4r6yvJR4Ot+HyZa81Brb4oiponV+Yi6ctdt4
-	UoW3xk1yBFbuwKXXFfgiAFJhnIbpN6yA+RNoIEKnpTBseMKw/UBdsHMH2bfiz/uFg70PdV36K4ZDR
-	8wPwBsgHuRX2LmNlNzgII8Q2NCDtAPZd15W4m9ql1bQ3JbNfkK9ANJS4FkSEFd2zEDMyHb693ztpM
-	25xQXmSA==;
-Received: from i53875a15.versanet.de ([83.135.90.21] helo=diego.localnet)
-	by gloria.sntech.de with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <heiko@sntech.de>)
-	id 1ujxGB-00078w-Kn; Thu, 07 Aug 2025 11:50:07 +0200
-From: Heiko =?UTF-8?B?U3TDvGJuZXI=?= <heiko@sntech.de>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- Frank.Sae@motor-comm.com, hkallweit1@gmail.com, linux@armlinux.org.uk,
- Jijie Shao <shaojijie@huawei.com>
-Cc: shenjian15@huawei.com, liuyonglong@huawei.com, chenhao418@huawei.com,
- jonathan.cameron@huawei.com, shameerali.kolothum.thodi@huawei.com,
- salil.mehta@huawei.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- shaojijie@huawei.com
-Subject:
- Re: [PATCH net-next 1/2] net: phy: motorcomm: Add support for PHY LEDs on
- YT8521
-Date: Thu, 07 Aug 2025 11:50:06 +0200
-Message-ID: <7978337.lvqk35OSZv@diego>
-In-Reply-To: <20250716100041.2833168-2-shaojijie@huawei.com>
-References:
- <20250716100041.2833168-1-shaojijie@huawei.com>
- <20250716100041.2833168-2-shaojijie@huawei.com>
+	s=arc-20240116; t=1754562137; c=relaxed/simple;
+	bh=XKJfQp0qgtOPO/tDYguu/9W0tHefgC09tDUtsbJX3Qc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UagMXNDxr6ty9PYHfBTSPs2oI0chIR2SduliUYx7TacY5sd/QPpkmVy7XitUnfJdNq/bGqZ6c93m0TEMdLf8Mn6Usa/MxbAZ2NcnS2r4V1F49G+WlcDAY/MKbsAYa9H9Zsvuah+xCPVkJ6l6Jc7I4e4PH3DmL5IliDHFblRDA8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cdn77.com; spf=pass smtp.mailfrom=cdn77.com; dkim=pass (1024-bit key) header.d=cdn77.com header.i=@cdn77.com header.b=7OrwcfrK; arc=none smtp.client-ip=95.168.196.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cdn77.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cdn77.com
+DKIM-Signature: a=rsa-sha256; t=1754562125; x=1755166925; s=dkim2019; d=cdn77.com; c=relaxed/relaxed; v=1; bh=UA01ZK7YVnyKFfoAYOxQGgqOGupBnkexzr8LbdxiehY=; h=From:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:In-Reply-To:References;
+   b=7OrwcfrKJV0FeENW6OBLqjmfQFZVrhBSb/hdRQXsWdHAjQ3H9fAQIWbf6piwCvXzs+lmG7wRAqW8Wx76B/mahwB9XlVVP0zFRuMWkxyQmYss2BxRsbS0avNG/TF5m4SFxZkHEIPnxUPgbkpLvpWsaffyaOlUzO1zO5k2XJZVFCY=
+Received: from [10.0.5.28] ([95.168.203.222])
+        by mail.sh.cz (14.1.0 build 16 ) with ASMTP (SSL) id 202508071222029266;
+        Thu, 07 Aug 2025 12:22:02 +0200
+Message-ID: <0f6a8c37-95e0-4009-a13b-99ce0e25ea47@cdn77.com>
+Date: Thu, 7 Aug 2025 12:22:01 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4] memcg: expose socket memory pressure in a cgroup
+To: Shakeel Butt <shakeel.butt@linux.dev>,
+ Kuniyuki Iwashima <kuniyu@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Neal Cardwell <ncardwell@google.com>,
+ David Ahern <dsahern@kernel.org>, Andrew Morton <akpm@linux-foundation.org>,
+ Yosry Ahmed <yosry.ahmed@linux.dev>, linux-mm@kvack.org,
+ netdev@vger.kernel.org, Johannes Weiner <hannes@cmpxchg.org>,
+ Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>,
+ Muchun Song <muchun.song@linux.dev>, cgroups@vger.kernel.org,
+ Tejun Heo <tj@kernel.org>, =?UTF-8?Q?Michal_Koutn=C3=BD?=
+ <mkoutny@suse.com>, Matyas Hurtik <matyas.hurtik@cdn77.com>
+References: <20250805064429.77876-1-daniel.sedlak@cdn77.com>
+ <fcnlbvljynxu5qlzmnjeagll7nf5mje7rwkimbqok6doso37gl@lwepk3ztjga7>
+ <CAAVpQUBrNTFw34Kkh=b2bpa8aKd4XSnZUa6a18zkMjVrBqNHWw@mail.gmail.com>
+ <nju55eqv56g6gkmxuavc2z2pcr26qhpmgrt76jt5dte5g4trxs@tjxld2iwdc5c>
+ <CAAVpQUCCg-7kvzMeSSsKp3+Fu8pvvE5U-H5wkt=xMryNmnF5CA@mail.gmail.com>
+ <chb7znbpkbsf7pftnzdzkum63gt7cajft2lqiqqfx7zol3ftre@7cdg4czr5k4j>
+Content-Language: en-US
+From: Daniel Sedlak <daniel.sedlak@cdn77.com>
+In-Reply-To: <chb7znbpkbsf7pftnzdzkum63gt7cajft2lqiqqfx7zol3ftre@7cdg4czr5k4j>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CTCH: RefID="str=0001.0A00210F.68947DBB.0039,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0"; Spam="Unknown"; VOD="Unknown"
 
-Am Mittwoch, 16. Juli 2025, 12:00:40 Mitteleurop=C3=A4ische Sommerzeit schr=
-ieb Jijie Shao:
-> Add minimal LED controller driver supporting
-> the most common uses with the 'netdev' trigger.
->=20
-> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+On 8/7/25 1:34 AM, Shakeel Butt wrote:
+> On Wed, Aug 06, 2025 at 03:01:44PM -0700, Kuniyuki Iwashima wrote:
+>> On Wed, Aug 6, 2025 at 2:54 PM Shakeel Butt <shakeel.butt@linux.dev> wrote:
+>>>
+>>> On Wed, Aug 06, 2025 at 12:20:25PM -0700, Kuniyuki Iwashima wrote:
+>>>>>> -                     WRITE_ONCE(memcg->socket_pressure, jiffies + HZ);
+>>>>>> +                     socket_pressure = jiffies + HZ;
+>>>>>> +
+>>>>>> +                     jiffies_diff = min(socket_pressure - READ_ONCE(memcg->socket_pressure), HZ);
+>>>>>> +                     memcg->socket_pressure_duration += jiffies_to_usecs(jiffies_diff);
+>>>>>
+>>>>> KCSAN will complain about this. I think we can use atomic_long_add() and
+>>>>> don't need the one with strict ordering.
 
-On a Qnap TS233 NAS using this phy, I get the expected device LEDs
-to light up (with appropriate config via sysfs), so
+Thanks for the KCSAN recommendation, I didn't know about this sanitizer.
 
-Tested-by: Heiko Stuebner <heiko@sntech.de>
+>>>>
+>>>> Assuming from atomic_ that vmpressure() could be called concurrently
+>>>> for the same memcg, should we protect socket_pressure and duration
+>>>> within the same lock instead of mixing WRITE/READ_ONCE() and
+>>>> atomic?  Otherwise jiffies_diff could be incorrect (the error is smaller
+>>>> than HZ though).
+>>>>
+>>>
+>>> Yeah good point. Also this field needs to be hierarchical. So, with lock
+>>> something like following is needed:
 
-(haven't found a v2 yet yesterday, so hopefully still the right thread
-to reply to ;-) )
+Thanks for the snippet, will incorporate it.
 
-Thanks
-Heiko
+>>>
+>>>          if (!spin_trylock(memcg->net_pressure_lock))
+>>>                  return;
+>>>
+>>>          socket_pressure = jiffies + HZ;
+>>>          diff = min(socket_pressure - READ_ONCE(memcg->socket_pressure), HZ);
+>>
+>> READ_ONCE() should be unnecessary here.
+>>
+>>>
+>>>          if (diff) {
+>>>                  WRITE_ONCE(memcg->socket_pressure, socket_pressure);
+>>>                  // mod_memcg_state(memcg, MEMCG_NET_PRESSURE, diff);
+>>>                  // OR
+>>>                  // while (memcg) {
+>>>                  //      memcg->sk_pressure_duration += diff;
+>>>                  //      memcg = parent_mem_cgroup(memcg);
+>>
+>> The parents' sk_pressure_duration is not protected by the lock
+>> taken by trylock.  Maybe we need another global mutex if we want
+>> the hierarchy ?
+> 
+> We don't really need lock protection for sk_pressure_duration. The lock
 
+By this you mean that we don't need the possible new global lock or the 
+local memcg->net_pressure_lock?
 
-> ---
->  drivers/net/phy/motorcomm.c | 120 ++++++++++++++++++++++++++++++++++++
->  1 file changed, 120 insertions(+)
->=20
-> diff --git a/drivers/net/phy/motorcomm.c b/drivers/net/phy/motorcomm.c
-> index 0e91f5d1a4fd..e1a1c3a1c9d0 100644
-> --- a/drivers/net/phy/motorcomm.c
-> +++ b/drivers/net/phy/motorcomm.c
-> @@ -213,6 +213,23 @@
->  #define YT8521_RC1R_RGMII_2_100_NS		14
->  #define YT8521_RC1R_RGMII_2_250_NS		15
-> =20
-> +/* LED CONFIG */
-> +#define YT8521_MAX_LEDS				3
-> +#define YT8521_LED0_CFG_REG			0xA00C
-> +#define YT8521_LED1_CFG_REG			0xA00D
-> +#define YT8521_LED2_CFG_REG			0xA00E
-> +#define YT8521_LED_ACT_BLK_IND			BIT(13)
-> +#define YT8521_LED_FDX_ON_EN			BIT(12)
-> +#define YT8521_LED_HDX_ON_EN			BIT(11)
-> +#define YT8521_LED_TXACT_BLK_EN			BIT(10)
-> +#define YT8521_LED_RXACT_BLK_EN			BIT(9)
-> +/* 1000Mbps */
-> +#define YT8521_LED_GT_ON_EN			BIT(6)
-> +/* 100Mbps */
-> +#define YT8521_LED_HT_ON_EN			BIT(5)
-> +/* 10Mbps */
-> +#define YT8521_LED_BT_ON_EN			BIT(4)
-> +
->  #define YTPHY_MISC_CONFIG_REG			0xA006
->  #define YTPHY_MCR_FIBER_SPEED_MASK		BIT(0)
->  #define YTPHY_MCR_FIBER_1000BX			(0x1 << 0)
-> @@ -1681,6 +1698,106 @@ static int yt8521_config_init(struct phy_device *=
-phydev)
->  	return phy_restore_page(phydev, old_page, ret);
->  }
-> =20
-> +static const unsigned long supported_trgs =3D (BIT(TRIGGER_NETDEV_FULL_D=
-UPLEX) |
-> +					     BIT(TRIGGER_NETDEV_HALF_DUPLEX) |
-> +					     BIT(TRIGGER_NETDEV_LINK)        |
-> +					     BIT(TRIGGER_NETDEV_LINK_10)     |
-> +					     BIT(TRIGGER_NETDEV_LINK_100)    |
-> +					     BIT(TRIGGER_NETDEV_LINK_1000)   |
-> +					     BIT(TRIGGER_NETDEV_RX)          |
-> +					     BIT(TRIGGER_NETDEV_TX));
-> +
-> +static int yt8521_led_hw_is_supported(struct phy_device *phydev, u8 inde=
-x,
-> +				      unsigned long rules)
-> +{
-> +	if (index >=3D YT8521_MAX_LEDS)
-> +		return -EINVAL;
-> +
-> +	/* All combinations of the supported triggers are allowed */
-> +	if (rules & ~supported_trgs)
-> +		return -EOPNOTSUPP;
-> +
-> +	return 0;
-> +}
-> +
-> +static int yt8521_led_hw_control_set(struct phy_device *phydev, u8 index,
-> +				     unsigned long rules)
-> +{
-> +	u16 val =3D 0;
-> +
-> +	if (index >=3D YT8521_MAX_LEDS)
-> +		return -EINVAL;
-> +
-> +	if (test_bit(TRIGGER_NETDEV_LINK, &rules)) {
-> +		val |=3D YT8521_LED_BT_ON_EN;
-> +		val |=3D YT8521_LED_HT_ON_EN;
-> +		val |=3D YT8521_LED_GT_ON_EN;
-> +	}
-> +
-> +	if (test_bit(TRIGGER_NETDEV_LINK_10, &rules))
-> +		val |=3D YT8521_LED_BT_ON_EN;
-> +
-> +	if (test_bit(TRIGGER_NETDEV_LINK_100, &rules))
-> +		val |=3D YT8521_LED_HT_ON_EN;
-> +
-> +	if (test_bit(TRIGGER_NETDEV_LINK_1000, &rules))
-> +		val |=3D YT8521_LED_GT_ON_EN;
-> +
-> +	if (test_bit(TRIGGER_NETDEV_FULL_DUPLEX, &rules))
-> +		val |=3D YT8521_LED_HDX_ON_EN;
-> +
-> +	if (test_bit(TRIGGER_NETDEV_HALF_DUPLEX, &rules))
-> +		val |=3D YT8521_LED_FDX_ON_EN;
-> +
-> +	if (test_bit(TRIGGER_NETDEV_TX, &rules) ||
-> +	    test_bit(TRIGGER_NETDEV_RX, &rules))
-> +		val |=3D YT8521_LED_ACT_BLK_IND;
-> +
-> +	if (test_bit(TRIGGER_NETDEV_TX, &rules))
-> +		val |=3D YT8521_LED_TXACT_BLK_EN;
-> +
-> +	if (test_bit(TRIGGER_NETDEV_RX, &rules))
-> +		val |=3D YT8521_LED_RXACT_BLK_EN;
-> +
-> +	return ytphy_write_ext(phydev, YT8521_LED0_CFG_REG + index, val);
-> +}
-> +
-> +static int yt8521_led_hw_control_get(struct phy_device *phydev, u8 index,
-> +				     unsigned long *rules)
-> +{
-> +	int val;
-> +
-> +	if (index >=3D YT8521_MAX_LEDS)
-> +		return -EINVAL;
-> +
-> +	val =3D ytphy_read_ext(phydev, YT8521_LED0_CFG_REG + index);
-> +	if (val < 0)
-> +		return val;
-> +
-> +	if (val & YT8521_LED_TXACT_BLK_EN)
-> +		set_bit(TRIGGER_NETDEV_TX, rules);
-> +
-> +	if (val & YT8521_LED_RXACT_BLK_EN)
-> +		set_bit(TRIGGER_NETDEV_RX, rules);
-> +
-> +	if (val & YT8521_LED_FDX_ON_EN)
-> +		set_bit(TRIGGER_NETDEV_FULL_DUPLEX, rules);
-> +
-> +	if (val & YT8521_LED_HDX_ON_EN)
-> +		set_bit(TRIGGER_NETDEV_HALF_DUPLEX, rules);
-> +
-> +	if (val & YT8521_LED_GT_ON_EN)
-> +		set_bit(TRIGGER_NETDEV_LINK_1000, rules);
-> +
-> +	if (val & YT8521_LED_HT_ON_EN)
-> +		set_bit(TRIGGER_NETDEV_LINK_100, rules);
-> +
-> +	if (val & YT8521_LED_BT_ON_EN)
-> +		set_bit(TRIGGER_NETDEV_LINK_10, rules);
-> +
-> +	return 0;
-> +}
-> +
->  static int yt8531_config_init(struct phy_device *phydev)
->  {
->  	struct device_node *node =3D phydev->mdio.dev.of_node;
-> @@ -2920,6 +3037,9 @@ static struct phy_driver motorcomm_phy_drvs[] =3D {
->  		.soft_reset	=3D yt8521_soft_reset,
->  		.suspend	=3D yt8521_suspend,
->  		.resume		=3D yt8521_resume,
-> +		.led_hw_is_supported =3D yt8521_led_hw_is_supported,
-> +		.led_hw_control_set =3D yt8521_led_hw_control_set,
-> +		.led_hw_control_get =3D yt8521_led_hw_control_get,
->  	},
->  	{
->  		PHY_ID_MATCH_EXACT(PHY_ID_YT8531),
->=20
+> is only giving us consistent value of diff. Once we have computed the
+> diff, we can add it to sk_pressure_duration of a memcg and all of its
+> ancestor without lock.
 
-
-
+Thanks!
+Daniel
 
 
