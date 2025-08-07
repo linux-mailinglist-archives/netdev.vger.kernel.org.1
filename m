@@ -1,333 +1,393 @@
-Return-Path: <netdev+bounces-212084-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212085-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15ECDB1DCBC
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 19:56:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EC5BB1DCE0
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 20:07:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C56973AFE07
-	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 17:56:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A5791766BD
+	for <lists+netdev@lfdr.de>; Thu,  7 Aug 2025 18:07:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C51E7200BBC;
-	Thu,  7 Aug 2025 17:56:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A3C5221737;
+	Thu,  7 Aug 2025 18:07:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HNjiTvaL"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="pHf5C7To"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 386801FE44D
-	for <netdev@vger.kernel.org>; Thu,  7 Aug 2025 17:56:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.18
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754589377; cv=fail; b=q51lkY5cNNlv6/hP7ISq89DeloiNgNqAH0Kgk+5rjzBhObwySJT0B6CVZxiVuC1luFcVYdCqGg1rZt/tdMwVzYZE41+11OAJ6YpkLsb8+Wwj3Sgvdku8O0GMQdsSYRh6EJn8XlGESEN9nh3z7vVZ/wqmm651SV/JaBSSjsKACj4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754589377; c=relaxed/simple;
-	bh=+PYRkHwt23M27fNOxskgAK4Y4PfX0QQF0G1h/gM3zPk=;
-	h=Message-ID:Date:Subject:To:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=eqbpODSzdESB2i9B/lxU2kiIOemgSEdN54zt7tNF77O6BA4RbIhCqrrLK9b3OmY1IwEXSLhRYW4r84BbswOTJtoREMWM4mcz+HlcZjDaM4b8n6luDT0jxCmszP0QTEkDf5LuOR0iHj1ttR2V+IkAEqtkwTgIywh0jIFjsL+FmZY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HNjiTvaL; arc=fail smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1754589376; x=1786125376;
-  h=message-id:date:subject:to:references:from:in-reply-to:
-   mime-version;
-  bh=+PYRkHwt23M27fNOxskgAK4Y4PfX0QQF0G1h/gM3zPk=;
-  b=HNjiTvaLia3UYZz9NfUZG6odDC2jafKYW0oSwa4aj0lPP6rll631riFF
-   1Hsn/Hz/bdStTZdbqhowqxGrqrCi6t15sPr1wK2t8YxAsJntMy2oibk1z
-   UWJSKnFFscjSZ+wTJGUsWoUAcZaRtIsLK9sOSwa69bfK3jDeCBcW1gHv0
-   AJ/qnfWWz6mV49U6D/qP81oAyBhRHW/iCbGq04WwbHK8oNLu5jK3HVlAm
-   iL8zFbl0OqR6lZkseIDXhyy1g/ZPTim1om5KGi8Xu3RgzkRNKG0lMnfvj
-   gqrbVhCtNqpLF/GqOXIrJgsqR6LB2uKmvbIKm0xQoOPUsAi0/F5pjCsmn
-   w==;
-X-CSE-ConnectionGUID: h7gDBOsHSQ6bkt4X7ErZ/w==
-X-CSE-MsgGUID: xoelrUbIQCuzqLjoqT22dQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11514"; a="56141704"
-X-IronPort-AV: E=Sophos;i="6.17,271,1747724400"; 
-   d="asc'?scan'208";a="56141704"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2025 10:56:14 -0700
-X-CSE-ConnectionGUID: NAhAcRBvQoOFkYa449GPVQ==
-X-CSE-MsgGUID: bLANc/ILTd+hGrS4cst/FQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,271,1747724400"; 
-   d="asc'?scan'208";a="202289889"
-Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
-  by orviesa001.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2025 10:56:14 -0700
-Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
- fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26; Thu, 7 Aug 2025 10:56:13 -0700
-Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
- FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26 via Frontend Transport; Thu, 7 Aug 2025 10:56:13 -0700
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (40.107.96.78) by
- edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26; Thu, 7 Aug 2025 10:56:13 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=qVWV2qfJzRww2uARSWVVo9hFOdYbdwf7wWo7RQxaAIa4QBh6tD/GYBmujkJzg2NgcbBnT7NaANnVoA4TOr9qV7bfTu483VUwSSGvHUCW5fSuj9GBaG8M694Hz8lc8e/3doPcVGLARoj6PQa3CGMtepZEoFFoqOB6SjpjTbF0OqlLh2qSaup+VzpjoY+PEGAJx+7se4xnNYsCXsnMEFaM5Ge2feoFfk16/XUUDwwv8uqqXGMxabj4duaFrtq2JnEf9OWgQoY44K4gYYUUdk1c3sYUdPo6L6FPWFLyYUgxbyd+Bm1nl+aaj9ql9TzHlaFGSpbxaxeZ+HWnhexowb9D9w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6EfgI5tK+2niE7QfKJNMU9PyPCZWtWFuBVssKZEHLl4=;
- b=NLOmLlaET9w5Aw8OA7RbHlEjpxf3vpucbikGw2vq1BSa/+jYu30tyAYXA6lb+sVhB7e9Ohl1ukdQt8cI/ya4E2yGjckLWPvffxwNUXB8j1JV+3B/cBdPxL4i+s0FwO2hflCKrIChgMSbHX56M9y6hacuPHZQSVfU5+D2bbu1EYzc5cWHSswf5jhMtpIaL2p8wfW2db7K+s93agPOgLmoDz5mKNDffT0yQzot83e2cHIRNKnxZMU38RWmaJ7Ku7ps0gUX7hfN+NFMpJi9x0gwuqepIWOB1v+iZ/JlT+LhjREKC2MpOB33C6f5026TCG1PKVC5AvTZStFWIZuy+wOt3w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by IA1PR11MB7294.namprd11.prod.outlook.com (2603:10b6:208:429::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9009.15; Thu, 7 Aug
- 2025 17:56:11 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::81f7:c6c0:ca43:11c3]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::81f7:c6c0:ca43:11c3%5]) with mapi id 15.20.9009.013; Thu, 7 Aug 2025
- 17:56:11 +0000
-Message-ID: <a59d0242-b89e-4789-8269-43ee3534b843@intel.com>
-Date: Thu, 7 Aug 2025 10:56:09 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-net 1/2] ice: fix NULL access of tx->in_use in
- ice_ptp_ts_irq
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>, Intel Wired LAN
-	<intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>
-References: <20250807-jk-ice-fix-tx-tstamp-race-v1-0-730fe20bec11@intel.com>
- <20250807-jk-ice-fix-tx-tstamp-race-v1-1-730fe20bec11@intel.com>
-Content-Language: en-US
-From: Jacob Keller <jacob.e.keller@intel.com>
-Autocrypt: addr=jacob.e.keller@intel.com; keydata=
- xjMEaFx9ShYJKwYBBAHaRw8BAQdAE+TQsi9s60VNWijGeBIKU6hsXLwMt/JY9ni1wnsVd7nN
- J0phY29iIEtlbGxlciA8amFjb2IuZS5rZWxsZXJAaW50ZWwuY29tPsKTBBMWCgA7FiEEIEBU
- qdczkFYq7EMeapZdPm8PKOgFAmhcfUoCGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AA
- CgkQapZdPm8PKOiZAAEA4UV0uM2PhFAw+tlK81gP+fgRqBVYlhmMyroXadv0lH4BAIf4jLxI
- UPEL4+zzp4ekaw8IyFz+mRMUBaS2l+cpoBUBzjgEaFx9ShIKKwYBBAGXVQEFAQEHQF386lYe
- MPZBiQHGXwjbBWS5OMBems5rgajcBMKc4W4aAwEIB8J4BBgWCgAgFiEEIEBUqdczkFYq7EMe
- apZdPm8PKOgFAmhcfUoCGwwACgkQapZdPm8PKOjbUQD+MsPBANqBUiNt+7w0dC73R6UcQzbg
- cFx4Yvms6cJjeD4BAKf193xbq7W3T7r9BdfTw6HRFYDiHXgkyoc/2Q4/T+8H
-In-Reply-To: <20250807-jk-ice-fix-tx-tstamp-race-v1-1-730fe20bec11@intel.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="------------V0J34TFF1NwycsNiNgRjXGZK"
-X-ClientProxiedBy: MW4PR03CA0308.namprd03.prod.outlook.com
- (2603:10b6:303:dd::13) To CO1PR11MB5089.namprd11.prod.outlook.com
- (2603:10b6:303:9b::16)
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E52220299E
+	for <netdev@vger.kernel.org>; Thu,  7 Aug 2025 18:07:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1754590068; cv=none; b=ad8Nrxp158Ny4NkGHn1TRJNMA9dcmRoOkPamjFe/mOvFyaBRsmbMjEIcMX8lxFqM+2mMj7o+umoUtSEMKvWZ/SmnxIJccjeH5HA1oLTfkrK1zBg2DW+ug3hv/Dgcw6JS69YX83HBXyOkshjai8F/xLxHMyK0UVpWs3m2Owfo4b0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1754590068; c=relaxed/simple;
+	bh=o07gW5CeaUxJHdtrzStFU07fVdoN6TQsRjyjuc6LqEs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nVkxSHTgJq4mVPiVciw3nJHGEJmCKQ4T/WHIMpXmVKYQi8eM6CWY0y27V2cRewkgU9k7fbi97Nt0S0i5U6ofrwR1QaXf9LFgkBKp8884IVF6srZjsRe33Uoxv1XVQO7RwnPMkJGUezH7ywsPd4HVWcw7dg8825JxaYqSzABMmSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=pHf5C7To; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1173)
+	id 922572030EBB; Thu,  7 Aug 2025 11:07:40 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 922572030EBB
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1754590060;
+	bh=R8kmUUknyIUxarxkRSZmUQNsAO1hMEB7pudWMCx51/Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=pHf5C7ToZc+xOHcPxIOqJDhzyFhGXz6bq8yAidGoRRH+BV9vIPdWNlCtx8xN9rJux
+	 AZoO8sxM4uwuTQheHCYk5o7ir9zVjNMNlpRDSRIMKhobcsNAnKUX5RTlLerGIGKDvi
+	 T2iFK1hM9rTj7uF/QuQ+NPA2O9KD6hciRsz3fqG4=
+Date: Thu, 7 Aug 2025 11:07:40 -0700
+From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: dsahern@gmail.com, netdev@vger.kernel.org, haiyangz@microsoft.com,
+	shradhagupta@linux.microsoft.com, ssengar@microsoft.com,
+	dipayanroy@microsoft.com, ernis@microsoft.com
+Subject: Re: [PATCH iproute2-next v2] iproute2: Add 'netshaper' command to
+ 'ip link' for netdev shaping
+Message-ID: <20250807180740.GA31890@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1753867316-7828-1-git-send-email-ernis@linux.microsoft.com>
+ <20250805110331.348499c9@hermes.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|IA1PR11MB7294:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8c5a0c3f-f91f-44b7-f852-08ddd5dbb18c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?a25PMERDMDZPWlM4dTQ5cmFqaWpocE9lVmxKU1E2eXc4d3RyS3NOWk5KU3VD?=
- =?utf-8?B?L0d5azluL3hxaUJPeVNTMkRoTjVYcnNYUUpIcjRmcU9ydlByTFRwUm1lNHBT?=
- =?utf-8?B?L0c1cGMxQ2pwVmdTVVE2TnZPS0JNUG82eXh5d2ZEdmFhODNvaTlzemRaY0o4?=
- =?utf-8?B?UG5nblAvd2ltRGs4eHptdVY3SFFVM0NaR0N3UXc2ZnRzcC9jU20vbjhvVVph?=
- =?utf-8?B?L3laMEZWTFlNV011cjQyWGhNSWFneW9GS1dRajlsdEdtZVRlUS9hb2NOQmRk?=
- =?utf-8?B?WThSWC9tRVFBMlNvaWVsajhmL08wclZSNTdMTlJDaU5VY2F6Q1Zic0IzanZq?=
- =?utf-8?B?d0VaZVNOdEluWmZ5anR6YVBEQlBtSkMzRi9DRHF5OWRHMWQwdUJSRjRLVTl6?=
- =?utf-8?B?ZlFRc2N6ZHBQR0Q2dmpKeUVlZ3JiWkxVT25wM00wNUl5UzRwUGpuNzJWZm56?=
- =?utf-8?B?WE1hN1pnTkN3NkN4b081LzdXM2xRbEpveDhtbkxmSTF5amo1RnlwT25mVFdD?=
- =?utf-8?B?ZVF3c1E2bjg4WFVQZFFMckNQWmpOczJEbFdWN1VwT29IUTJJYm1UM0JzWERj?=
- =?utf-8?B?Y1JSbWg1VzVUaWRuSGVIdW1vSlZ0MGIwWGxZc2M1cTNvbDdKNGtna3praTFn?=
- =?utf-8?B?UVRVcnN6MktmUGdtL1pQbFA3dGMzSXFWTjU4Z05WU1IxTDBhc0k4S1d6QkFH?=
- =?utf-8?B?cTNuLzV0Y2xVdVZWaDRQZEZZSE9Sc29ySDZpeGo5ZG1KdHdvK21lelNaWlBG?=
- =?utf-8?B?a0NiOEdDdkxkMXNaZ3BQbUpxT3hoeUlFbHRKSG41aUpLd2twZU1Kdnl0d2JS?=
- =?utf-8?B?eGk2ZVJhLzFKd2NTcjF1QlVSSkJjUmhIYXBxZFlza3h3cEg1VVc0SzJaVXpz?=
- =?utf-8?B?QzJ1M1FnR0hPQi9CS2lmcVRPRWZyWjIyM3FHNXQyYkl5bGtMWmZQYzRRNDRY?=
- =?utf-8?B?RWI0STczMU10MXJGTjJadDZxTlozVkloZEZBWVZBakhNWi9rNnBKdWg4ZzE3?=
- =?utf-8?B?d0VlOWttM0c3L2NZRzQ5aFJGaXBiUXpMbmhwSktIbkduV1ZDVnVxM0VyRTR4?=
- =?utf-8?B?SW8xQnV4MjdFOUFqYzFiRCtCS2JMdnpmbkF1Z1ZMYzZJZDVBa1BNWk5taFZG?=
- =?utf-8?B?VE5SYUFpNjRkaDFUSC9MZzhyY1JBTzV1bEFjYW85TjFzSkVsQUN4Q0ZNaVhI?=
- =?utf-8?B?UVNNWVdHRVd6cFQ0Nm1tU3VwR2MrVC83ckw0MThMTk9CVHF1YmN4L280QXla?=
- =?utf-8?B?bXVIOEhlSmE5ZWJuMWZOMGNVOUZaaElvRkxQTngxckRjS2Nlb2tmY0lYL0wr?=
- =?utf-8?B?TVZ1S1d4bm4xNkd4Um1CdGVNOU5KcFJyNHFVWkJOSTltSU5DL3BQWDAyYUx4?=
- =?utf-8?B?MzFNVEZaS3FRTnNrZVBSNnBSZ256S1l6Szh5a2Z2aERaUFNaTmd5QVB2MDRL?=
- =?utf-8?B?OW92U0JsSWxyREtyRlBmNVBibU9CYm5zSXhnZFdBZytPdmpqcFBBdUMwOGNp?=
- =?utf-8?B?dWtySkRKREVwQmpBQUFUbXh2cGtmUkZkRDVtUXpwVkF4UzdxT09uWE4rTFNr?=
- =?utf-8?B?RURBV0NJNnA2dG01NTRpcHRqeGhrTFlDSnd2eWxKSWY3VlRNN21pRmRFV1N0?=
- =?utf-8?B?eU54SFlya0RUcHp2cmN5MkxpRUNjWnNrZE9IZmk1aXhvTFZwUnAwdFViQnA5?=
- =?utf-8?B?YXBPa1hKUXlUeUVUQ0hha2RnRGhwd2ljcnFQQXRjSzdkb0tmRXVKSWxkVGc4?=
- =?utf-8?B?R3llRkRJTEpRSXBxVC9Cd2dLVlphOVlSZ2tkMUJrMUdVOXhJQnVyVVRtNmJS?=
- =?utf-8?B?TWZVTEsvN1hEd3hTbFd2ZGdHSUJhYVFtWHIvbnJqMitpdDUzbWJWWHVWZEZE?=
- =?utf-8?B?ZG1lZG90MWlhd2F3TWd4azhQV25PL1VXcHppV2JSTjdocUxOTW5iM1c1TVd2?=
- =?utf-8?Q?In7BbwkBsLQ=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bmtBQUtUSWhKUDh4aFVpRU1yUFpnN0RCNmVCSGVPVWhmbXhDaFdUcHpGQjV5?=
- =?utf-8?B?Yy9nVGhYQzJyU21sNFdqcmdndHJoWWZnODVJRmJndXBkckRlSUlHZ3JLWGtE?=
- =?utf-8?B?U0lHT0cxVVh4aW5xYXpLZXpxOHJHS2hZeFFYOTdGYnBMWUxyR01GbWFNTk13?=
- =?utf-8?B?N0VNUlc0QU93amVMK2FURjdFbXgrK1hrSi9kY1B2c0l1VUpWZUtBRTQ1NVNY?=
- =?utf-8?B?ekVIQmc2RzE5eFJza1plRVJGNG9CZ0tiZVM1UCsreWxiOVAwM3NTNmtPYWhD?=
- =?utf-8?B?VWlwaWI2NVVmOVZjTlhPS2RzZ3NuYlVUaTkzRkRaVHMzVWtPQVgrZnJUREFJ?=
- =?utf-8?B?cUxzN3FvQVN3cEJiUXVRZ0F2WFpJQzdQWnk5enpnamRkRE55dG1jYWdhWXB6?=
- =?utf-8?B?dEc0b3ppa2htUnNGeXprVFo1SmxvUTlZeGkyZVhVWWpXdGxVZkw4QkNFTUdk?=
- =?utf-8?B?VVdYOHMxM0ZvNUhpZHp2MWp6bURLTTdXNUxyUkxwN3BVQ2ZtWVhRMXdlaUEw?=
- =?utf-8?B?UXVGeGFjODVTQlF2aEw2MTVmNnhGSXZObS81SkM5RDlzWDNHSmRVU0JFaFlT?=
- =?utf-8?B?OXJpanFOd1VzWU0yeGVLRVQ0NFc4ME94dVI3T2ZWNy9iRyt2dHkrVmNNZXda?=
- =?utf-8?B?VlpBeDgzditJeUxYV1BKaWQ2dE5Cdmo2L1QxZzZoZDlwbjNxci9DUEl0Yzkv?=
- =?utf-8?B?bTVab1VrSlFPVmcwNGtFTlBXQVhMYlQ5NU8yaFQ3SEdvYjFEdTNsMEJDWDNB?=
- =?utf-8?B?U0Z1V1ZJN0lFOFh1QnJXU0s5anR0OGxHVTFQRXRLcUt2S1JvMitQZU8xUUpo?=
- =?utf-8?B?cmR0ZzNnSzlvVENiQmxtUlRuTm5YYnFnWjJHMHdGbUR1YnZYek9TQ3VJYVRI?=
- =?utf-8?B?MUx1YlhLUUN0VFBvVXcvRVk3S1Fja1BTcnpUMlpScFd2bm5CZ3dnQ083dWhQ?=
- =?utf-8?B?RUVkbVhzV3h6S0wvNUdOYSt0Qm52bkVDU2tTNVpLbVBSYWVkVHU2blBlNG5M?=
- =?utf-8?B?QWxtczJRRmpqQUxMS0w4WENtVTBRVE85UGM4VjhVUlF1MU5lREQ2TU5CdGZs?=
- =?utf-8?B?U0tBSjdJZzNPd1dGcWFyaENVTHQ0cncyc0RPYWl4ZmJXbUF5VHMyb0VDa2Y2?=
- =?utf-8?B?YmhzZVJMTlM5YVU1bkMwakFjRG56Rmtsa1hZVlUzOUM4bE1GOUhBaFpldldz?=
- =?utf-8?B?UkJ1QUdzMkhRcVk1SkhXTldQeU9ib2lSUDErTDdXVytGb09RSDRoeE5sb2dY?=
- =?utf-8?B?RGtIdE5NNjBSdjYxV2IxNE9pL0YxekEvYUpIMlc0MmhTSEkvWGx4S2oxU2pG?=
- =?utf-8?B?QWkxYkxxVisyN0MvNmwrV1B3RVVNb0xGNE1yOUFMMEFjUTFSZVYzcXhteUlI?=
- =?utf-8?B?Q0xCVjY4NkZ2VVh4aVVIZEZzYjg1V2t2WFB2Mk5MdXRmSVZ5YXBib3pnYkMv?=
- =?utf-8?B?V0krcG1MN21Zb0pzMDI2Q21oVDR0NVNVeTZhMFUrMzM5andRamxQTFdPeFFI?=
- =?utf-8?B?N1h4VXNXN3U3NTJHSlM2dEVLeGQyNlZ5N1NWS3BKb0ZTQkxYcFJZVkVFZmRS?=
- =?utf-8?B?ODhFaVRCOVQ3Nm9qaE4zLzhBdm5NM0NxSGN5QmdwVW1pUzVYMnF1N3VoVEl2?=
- =?utf-8?B?a0tTcHlaU0FSU0kzNXRHNVkzbUVncFkza2kvN2h3SWZjVDdOZE9rR1hMaldt?=
- =?utf-8?B?SUZaOEFsMURYOUt5R0lkQWxsMHhhQUZjZU5FbXJEZGpON0J1UWtWc1NkNVZj?=
- =?utf-8?B?RkZxaCtOREtYS0pCcjkwL2NvQjQ4aEN3aVQyeXEzUXp4UzZlOGRxTDFUbnZo?=
- =?utf-8?B?VWJ0bW1idFhsZG5tMmdtOHVveHNMMmdNNm5NcS9ndmtBUmkwa3AwZHNxcWFE?=
- =?utf-8?B?bnhVS0IrNUsxQmd3QjdGRTJzMnpCUHNSSHBjMmVnMndtRUNOVzBydUZVV292?=
- =?utf-8?B?QkwxMlJoQS91VllDK3RjRUdybGxsYVJlMm5vbW1KclNGZU5FUS9wc3NkRUk3?=
- =?utf-8?B?THRzR1BqV3d0ZnBKVEpOZSs3dTZ3RHh3ZW16aWJPd3o1bG5Gd202M2dsaElP?=
- =?utf-8?B?eGppcTZSNnl0dkJMUW9NT0pGTVY1MW1zSnpuZCtCQWNNelVmSUY3TEtMUVc0?=
- =?utf-8?B?b3Q2Ym5yM2tWWWtvQUJuaXlkQVZwazRrNDlLT3htQVZvdmtoNnFiOTJBcmV5?=
- =?utf-8?B?N3c9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8c5a0c3f-f91f-44b7-f852-08ddd5dbb18c
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Aug 2025 17:56:11.1579
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: OdkX6vc/xylE0vB8FfbMhitqND1TOMTPw1RjOJ4qwJoy3eSLmtVBzcWucaQJcyGUdJonIBaTIpylHXcClvUl/ntFcEHH1Mkv2+OsGGvwg0c=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB7294
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250805110331.348499c9@hermes.local>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
---------------V0J34TFF1NwycsNiNgRjXGZK
-Content-Type: multipart/mixed; boundary="------------jofBe6nMuKgELBdZLE6eACvl";
- protected-headers="v1"
-From: Jacob Keller <jacob.e.keller@intel.com>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Intel Wired LAN <intel-wired-lan@lists.osuosl.org>, netdev@vger.kernel.org
-Message-ID: <a59d0242-b89e-4789-8269-43ee3534b843@intel.com>
-Subject: Re: [PATCH iwl-net 1/2] ice: fix NULL access of tx->in_use in
- ice_ptp_ts_irq
-References: <20250807-jk-ice-fix-tx-tstamp-race-v1-0-730fe20bec11@intel.com>
- <20250807-jk-ice-fix-tx-tstamp-race-v1-1-730fe20bec11@intel.com>
-In-Reply-To: <20250807-jk-ice-fix-tx-tstamp-race-v1-1-730fe20bec11@intel.com>
+On Tue, Aug 05, 2025 at 11:03:31AM -0700, Stephen Hemminger wrote:
+> On Wed, 30 Jul 2025 02:21:56 -0700
+> Erni Sri Satya Vennela <ernis@linux.microsoft.com> wrote:
+> 
+> > Add support for the netshaper Generic Netlink
+> > family to iproute2. Introduce a new subcommand to `ip link` for
+> > configuring netshaper parameters directly from userspace.
+> > 
+> > This interface allows users to set shaping attributes (such as speed)
+> > which are passed to the kernel to perform the corresponding netshaper
+> > operation.
+> > 
+> > Example usage:
+> > $ip link netshaper { set | get | delete } dev DEVNAME \
+> >                    handle scope SCOPE id ID \
+> >                    [ speed SPEED ]
+> > 
+> > Internally, this triggers a kernel call to apply the shaping
+> > configuration to the specified network device.
+> > 
+> > Currently, the tool supports the following functionalities:
+> > - Setting speed in Mbps, enabling bandwidth clamping for
+> >   a network device that support netshaper operations.
+> > - Deleting the current configuration.
+> > - Querying the existing configuration.
+> > 
+> > Additional netshaper operations will be integrated into the tool
+> > as per requirement.
+> > 
+> > This change enables easy and scriptable configuration of bandwidth
+> > shaping for  devices that use the netshaper Netlink family.
+> > 
+> > Corresponding net-next patches:
+> > 1) https://lore.kernel.org/all/cover.1728460186.git.pabeni@redhat.com/
+> > 2) https://lore.kernel.org/lkml/1750144656-2021-1-git-send-email-ernis@linux.microsoft.com/
+> > 
+> > Install pkg-config and libmnl* packages to print any kernel extack
+> > errors to stdout.
+> > 
+> > Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+> > ---
+> > Please add include/uapi/linux/net_shaper.h from kernel source tree
+> > for this patch.
+> > ---
+> > Changes in v2:
+> > * Use color coding for printing device name in stdout.
+> > * Use clang-format to format the code inline.
+> > * Use __u64 for speed_bps.
+> > * Remove include/uapi/linux/netshaper.h file.
+> > ---
+> >  ip/Makefile           |   2 +-
+> >  ip/iplink.c           |  12 +++
+> >  ip/iplink_netshaper.c | 190 ++++++++++++++++++++++++++++++++++++++++++
+> >  3 files changed, 203 insertions(+), 1 deletion(-)
+> >  create mode 100644 ip/iplink_netshaper.c
+> 
+> Good start but changes needed.
+> 
+> > 
+> > diff --git a/ip/Makefile b/ip/Makefile
+> > index 3535ba78..18218c3b 100644
+> > --- a/ip/Makefile
+> > +++ b/ip/Makefile
+> > @@ -4,7 +4,7 @@ IPOBJ=ip.o ipaddress.o ipaddrlabel.o iproute.o iprule.o ipnetns.o \
+> >      ipmaddr.o ipmonitor.o ipmroute.o ipprefix.o iptuntap.o iptoken.o \
+> >      ipxfrm.o xfrm_state.o xfrm_policy.o xfrm_monitor.o iplink_dummy.o \
+> >      iplink_ifb.o iplink_nlmon.o iplink_team.o iplink_vcan.o iplink_vxcan.o \
+> > -    iplink_vlan.o link_veth.o link_gre.o iplink_can.o iplink_xdp.o \
+> > +    iplink_vlan.o iplink_netshaper.o link_veth.o link_gre.o iplink_can.o iplink_xdp.o \
+> >      iplink_macvlan.o ipl2tp.o link_vti.o link_vti6.o link_xfrm.o \
+> >      iplink_vxlan.o tcp_metrics.o iplink_ipoib.o ipnetconf.o link_ip6tnl.o \
+> >      link_iptnl.o link_gre6.o iplink_bond.o iplink_bond_slave.o iplink_hsr.o \
+> > diff --git a/ip/iplink.c b/ip/iplink.c
+> > index 59e8caf4..9da6e304 100644
+> > --- a/ip/iplink.c
+> > +++ b/ip/iplink.c
+> > @@ -1509,6 +1509,15 @@ static void do_help(int argc, char **argv)
+> >  		usage();
+> >  }
+> >  
+> > +static int iplink_netshaper(int argc, char **argv)
+> > +{
+> > +	struct link_util *lu;
+> > +
+> > +	lu = get_link_kind("netshaper");
+> > +
+> > +	return lu->parse_opt(lu, argc, argv, NULL);
+> > +}
+> > +
+> >  int do_iplink(int argc, char **argv)
+> >  {
+> >  	if (argc < 1)
+> > @@ -1545,6 +1554,9 @@ int do_iplink(int argc, char **argv)
+> >  	if (matches(*argv, "property") == 0)
+> >  		return iplink_prop(argc-1, argv+1);
+> >  
+> > +	if (matches(*argv, "netshaper") == 0)
+> > +		return iplink_netshaper(argc-1, argv+1);
+> > +
+> 
+> Matches() can cause issues, prefer strcmp() for new code.
 
---------------jofBe6nMuKgELBdZLE6eACvl
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Okay, I'll make this change in the the next version.
+> 
+> >  	if (matches(*argv, "help") == 0) {
+> >  		do_help(argc-1, argv+1);
+> >  		return 0;
+> > diff --git a/ip/iplink_netshaper.c b/ip/iplink_netshaper.c
+> > new file mode 100644
+> > index 00000000..af7d5e09
+> > --- /dev/null
+> > +++ b/ip/iplink_netshaper.c
+> > @@ -0,0 +1,190 @@
+> > +/* SPDX-License-Identifier: GPL-2.0 */
+> > +/*
+> > + * iplink_netshaper.c netshaper H/W shaping support
+> > + *
+> > + * Authors:        Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+> > + */
+> > +#include <stdio.h>
+> > +#include <string.h>
+> > +#include <linux/genetlink.h>
+> > +#include <linux/netlink.h>
+> > +#include <linux/rtnetlink.h>
+> > +#include <uapi/linux/netshaper.h>
+> > +#include "utils.h"
+> > +#include "ip_common.h"
+> > +#include "libgenl.h"
+> > +
+> > +/* netlink socket */
+> > +static struct rtnl_handle gen_rth = { .fd = -1 };
+> > +static int genl_family = -1;
+> > +
+> > +static void usage(void)
+> > +{
+> > +	fprintf(stderr,
+> > +		"Usage:	ip link netshaper set dev DEVNAME handle scope HANDLE_SCOPE id HANDLE_ID speed SPEED\n"
+> > +		"	ip link netshaper delete dev DEVNAME handle scope HANDLE_SCOPE id HANDLE_ID\n"
+> > +		"	ip link netshaper get dev DEVNAME handle scope HANDLE_SCOPE id HANDLE_ID\n"
+> > +		"Where:	DEVNAME		:= STRING\n"
+> > +		"	HANDLE_SCOPE	:= { netdev | queue | node }\n"
+> > +		"	HANDLE_ID	:= UINT\n"
+> > +		"	SPEED		:= UINT (Mega bits per second)\n");
+> > +
+> > +	exit(-1);
+> > +}
+> > +
+> > +static void print_netshaper_attrs(struct nlmsghdr *answer)
+> > +{
+> > +	struct genlmsghdr *ghdr = NLMSG_DATA(answer);
+> > +	int len = answer->nlmsg_len - NLMSG_LENGTH(GENL_HDRLEN);
+> > +	struct rtattr *tb[NET_SHAPER_A_MAX + 1] = {};
+> > +	__u32 speed_mbps;
+> > +	__u64 speed_bps;
+> > +	int ifindex;
+> > +
+> > +	parse_rtattr(tb, NET_SHAPER_A_MAX,
+> > +		     (struct rtattr *)((char *)ghdr + GENL_HDRLEN), len);
+> > +
+> > +	for (int i = 1; i <= NET_SHAPER_A_MAX; ++i) {
+> > +		if (!tb[i])
+> > +			continue;
+> > +		switch (i) {
+> > +		case NET_SHAPER_A_BW_MAX:
+> > +			speed_bps = rta_getattr_u64(tb[i]);
+> > +			speed_mbps = (speed_bps / 1000000);
+> > +			print_uint(PRINT_ANY, "speed", "speed: %u mbps\n",
+> > +				   speed_mbps);
+> > +			break;
+> > +		case NET_SHAPER_A_IFINDEX:
+> > +			ifindex = rta_getattr_u32(tb[i]);
+> > +			print_color_string(PRINT_ANY, COLOR_IFNAME, "dev",
+> > +					   "dev: %s\n",
+> > +					   ll_index_to_name(ifindex));
+> > +			break;
+> > +		default:
+> > +			break;
+> > +		}
+> > +	}
+> > +}
+> > +
+> > +static int do_cmd(int argc, char **argv, struct nlmsghdr *n, int cmd)
+> > +{
+> > +	GENL_REQUEST(req, 1024, genl_family, 0, NET_SHAPER_FAMILY_VERSION, cmd,
+> > +		     NLM_F_REQUEST | NLM_F_ACK);
+> > +
+> > +	struct nlmsghdr *answer;
+> > +	__u32 speed_mbps = 0;
+> > +	__u64 speed_bps = 0;
+> > +	int ifindex = -1;
+> > +	int handle_scope = NET_SHAPER_SCOPE_UNSPEC;
+> > +	__u32 handle_id = 0;
+> > +	bool handle_present = false;
+> > +	int err;
+> > +
+> > +	while (argc > 0) {
+> > +		if (matches(*argv, "dev") == 0) {
+> > +			NEXT_ARG();
+> > +			ifindex = ll_name_to_index(*argv);
+> > +		} else if (matches(*argv, "speed") == 0) {
+> 
+> Iproute2 no longer allows shortcut matches on new commands.
+> Shortcuts have lead to lots of confusion where there are multiple matches possible.
 
+Thanks for the clarification. I'll will update my usage accordingly to
+avoid ambiguity.
+> 
+> > +			NEXT_ARG();
+> > +			if (get_unsigned(&speed_mbps, *argv, 10)) {
+> > +				fprintf(stderr, "Invalid speed value\n");
+> > +				return -1;
+> > +			}
+> 
+> Could you change this code to use the get_rate() in lib/utils_math.c
+> That routine handles wide variety of suffixes.
+> 
+> > +			/*Convert Mbps to Bps*/
+> 
+> Won't need this if you use get_rate() or get_rate64
 
+Okay I'll make the changes accordingly.
+> 
+> > +			speed_bps = (((__u64)speed_mbps) * 1000000);
+> > +		} else if (matches(*argv, "handle") == 0) {
+> > +			handle_present = true;
+> > +			NEXT_ARG();
+> > +			if (matches(*argv, "scope") == 0) {
+> > +				NEXT_ARG();
+> > +				if (matches(*argv, "netdev") == 0) {
+> > +					handle_scope = NET_SHAPER_SCOPE_NETDEV;
+> > +				} else if (matches(*argv, "queue") == 0) {
+> > +					handle_scope = NET_SHAPER_SCOPE_QUEUE;
+> > +				} else if (matches(*argv, "node") == 0) {
+> > +					handle_scope = NET_SHAPER_SCOPE_NODE;
+> > +				} else {
+> > +					fprintf(stderr, "Invalid scope\n");
+> > +					return -1;
+> > +				}
+> > +
+> > +				NEXT_ARG();
+> > +				if (matches(*argv, "id") == 0) {
+> > +					NEXT_ARG();
+> > +					if (get_unsigned(&handle_id, *argv, 10)) {
+> > +						fprintf(stderr,
+> > +							"Invalid handle id\n");
+> > +						return -1;
+> > +					}
+> > +				}
+> > +			}
+> > +		} else {
+> > +			fprintf(stderr, "What is \"%s\"\n", *argv);
+> > +			usage();
+> > +		}
+> > +		argc--;
+> > +		argv++;
+> > +	}
+> > +
+> > +	if (ifindex == -1)
+> > +		missarg("dev");
+> > +
+> > +	if (!handle_present)
+> > +		missarg("handle");
+> > +
+> > +	if (cmd == NET_SHAPER_CMD_SET && speed_mbps == 0)
+> > +		missarg("speed");
+> > +
+> > +	addattr32(&req.n, sizeof(req), NET_SHAPER_A_IFINDEX, ifindex);
+> > +
+> > +	struct rtattr *handle = addattr_nest(&req.n, sizeof(req),
+> > +					     NET_SHAPER_A_HANDLE | NLA_F_NESTED);
+> > +	addattr32(&req.n, sizeof(req), NET_SHAPER_A_HANDLE_SCOPE, handle_scope);
+> > +	addattr32(&req.n, sizeof(req), NET_SHAPER_A_HANDLE_ID, handle_id);
+> > +	addattr_nest_end(&req.n, handle);
+> > +
+> > +	if (cmd == NET_SHAPER_CMD_SET)
+> > +		addattr64(&req.n, sizeof(req), NET_SHAPER_A_BW_MAX, speed_bps);
+> > +
+> > +	err = rtnl_talk(&gen_rth, &req.n, &answer);
+> > +	if (err < 0) {
+> > +		printf("Kernel command failed: %d\n", err);
+> > +		return err;
+> > +	}
+> > +
+> > +	if (cmd == NET_SHAPER_CMD_GET)
+> > +		print_netshaper_attrs(answer);
+> > +
+> > +	return err;
+> > +}
+> > +
+> > +static int netshaper_parse_opt(struct link_util *lu, int argc, char **argv,
+> > +			       struct nlmsghdr *n)
+> > +{
+> > +	if (argc < 1)
+> > +		usage();
+> > +	if (matches(*argv, "help") == 0)
+> > +		usage();
+> > +
+> > +	if (genl_init_handle(&gen_rth, NET_SHAPER_FAMILY_NAME, &genl_family))
+> > +		exit(1);
+> > +
+> > +	if (matches(*argv, "set") == 0)
+> > +		return do_cmd(argc - 1, argv + 1, n, NET_SHAPER_CMD_SET);
+> > +
+> > +	if (matches(*argv, "delete") == 0)
+> > +		return do_cmd(argc - 1, argv + 1, n, NET_SHAPER_CMD_DELETE);
+> > +
+> > +	if (matches(*argv, "get") == 0)
+> > +		return do_cmd(argc - 1, argv + 1, n, NET_SHAPER_CMD_GET);
+> 
+> No matches shortcuts
+Okay.
+> 
+> > +
+> > +	fprintf(stderr,
+> > +		"Command \"%s\" is unknown, try \"ip link netshaper help\".\n",
+> > +		*argv);
+> > +	exit(-1);
+> > +}
+> > +
+> > +struct link_util netshaper_link_util = {
+> > +	.id = "netshaper",
+> > +	.parse_opt = netshaper_parse_opt,
+> > +};
+> 
+> Where is the print function. You should be able to print current shaper
+> state?
+The current shaper state can be retrieved from the get opearation like:
+"ip link netshaper get dev <interface> handle scope <scope> id <id>"
 
-On 8/7/2025 10:35 AM, Jacob Keller wrote:
-> The E810 device has support for a "low latency" firmware interface to
-> access and read the Tx timestamps. This interface does not use the stan=
-dard
-> Tx timestamp logic, due to the latency overhead of proxying sideband
-> command requests over the firmware AdminQ.
->=20
-> The logic still makes use of the Tx timestamp tracking structure,
-> ice_ptp_tx, as it uses the same "ready" bitmap to track which Tx
-> timestamps.
->=20
-> Unfortunately, the ice_ptp_ts_irq() function does not check if the trac=
-ker
-> is initialized before its first access. This results in NULL dereferenc=
-e or
-> use-after-free bugs similar to the following:
->=20
-> [245977.278756] BUG: kernel NULL pointer dereference, address: 00000000=
-00000000
-> [245977.278774] RIP: 0010:_find_first_bit+0x19/0x40
-> [245977.278796] Call Trace:
-> [245977.278809]  ? ice_misc_intr+0x364/0x380 [ice]
->=20
-> This can occur if a Tx timestamp interrupt races with the driver reset
-> logic.
->=20
-> Fix this by only checking the in_use bitmap (and other fields) if the
-> tracker is marked as initialized. The reset flow will clear the init fi=
-eld
-> under lock before it tears the tracker down, thus preventing any
-> use-after-free or NULL access.
->=20
-> Fixes: f9472aaabd1f ("ice: Process TSYN IRQ in a separate function")
-
-Prior to f9472aaabd1f this same code was in ice_main.c, which means that
-strictly speaking, the bug exists in 82e71b226e0e ("ice: Enable SW
-interrupt from FW for LL TS"). This fix only applies to v6.15, but we
-will want to fix the stable tree for v6.12, since the original bug has
-existed since v6.12
-
-I guess after this merges, I will need to make a stable request with the
-targeted fix for the v6.12 kernel separately.
-
-> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-> ---
->  drivers/net/ethernet/intel/ice/ice_ptp.c | 13 ++++++++-----
->  1 file changed, 8 insertions(+), 5 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/eth=
-ernet/intel/ice/ice_ptp.c
-> index e358eb1d719f..fb0f6365a6d6 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-> @@ -2701,16 +2701,19 @@ irqreturn_t ice_ptp_ts_irq(struct ice_pf *pf)
->  		 */
->  		if (hw->dev_caps.ts_dev_info.ts_ll_int_read) {
->  			struct ice_ptp_tx *tx =3D &pf->ptp.port.tx;
-> -			u8 idx;
-> +			u8 idx, last;
-> =20
->  			if (!ice_pf_state_is_nominal(pf))
->  				return IRQ_HANDLED;
-> =20
->  			spin_lock(&tx->lock);
-> -			idx =3D find_next_bit_wrap(tx->in_use, tx->len,
-> -						 tx->last_ll_ts_idx_read + 1);
-> -			if (idx !=3D tx->len)
-> -				ice_ptp_req_tx_single_tstamp(tx, idx);
-> +			if (tx->init) {
-> +				last =3D tx->last_ll_ts_idx_read + 1;
-> +				idx =3D find_next_bit_wrap(tx->in_use, tx->len,
-> +							 last);
-> +				if (idx !=3D tx->len)
-> +					ice_ptp_req_tx_single_tstamp(tx, idx);
-> +			}
->  			spin_unlock(&tx->lock);
-> =20
->  			return IRQ_HANDLED;
->=20
-
-
---------------jofBe6nMuKgELBdZLE6eACvl--
-
---------------V0J34TFF1NwycsNiNgRjXGZK
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-wnsEABYIACMWIQQgQFSp1zOQVirsQx5qll0+bw8o6AUCaJTougUDAAAAAAAKCRBqll0+bw8o6IjH
-AP9a/rUVwfmafftffa4NHdARknRnBFcs9HpMpumsgfvNJAEAqx5CJoaaiFnxDeZwI8QrEsPEjJuu
-ZHgq1FgvsmQ2yg8=
-=U0sN
------END PGP SIGNATURE-----
-
---------------V0J34TFF1NwycsNiNgRjXGZK--
 
