@@ -1,86 +1,132 @@
-Return-Path: <netdev+bounces-212140-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212141-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B62CB1E57F
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 11:18:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F5E4B1E5CE
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 11:44:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A7C21638B2
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 09:18:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 02BC17A7078
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 09:43:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A913920C010;
-	Fri,  8 Aug 2025 09:18:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2DCC26FA6A;
+	Fri,  8 Aug 2025 09:44:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b="lQkxiJ7G"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from layka.disroot.org (layka.disroot.org [178.21.23.139])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78DAB2AE74
-	for <netdev@vger.kernel.org>; Fri,  8 Aug 2025 09:18:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B333234964;
+	Fri,  8 Aug 2025 09:44:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.21.23.139
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754644708; cv=none; b=FYXPa4FmFIANJBn3XBZPRoxnnrGDIcmu9E3oqKlVrNVs8BUe7IKv8/Bvo8OWBqWX2bwwu4Jtox2dqC4R0ogqXfdUE35C1v/AIyw9lMrDmyeak+YkmEyI8BjWxC4Wv2qYWHAd44QwmpjAFZ8B09Xe2MkfMcXuJDvKVkW240fR/5M=
+	t=1754646261; cv=none; b=ha4WcImKcN5J79/JlP4sVobk5c5p4n2iU0GyISQQDbgIQKGiMfBILOb+yh9+wuweBWljBfjvOn/qJU652txoc+SWtukEp9sWvDkzDwHWdLoGW4XHZsfLAvV8zUjpvtAHMN3TjoIQQrRGCwKBWhqQNrPZO5rqjk6MqS3pT735GnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754644708; c=relaxed/simple;
-	bh=rsxhN9P+El3D4jSAs2XETN3TyFDNDfI8wH8S43ftxkM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qHko5oaClJExOJultjRQB9lsV1NTbR8HXaJZVF0yqVP9D2iguj2erlhc7wrxa8WhUT2Vfyd4RzJRq/ahOaMcH1tXRe2TLdwlSefsZzLgLCzaVj2z4TAwdNHygCSUUi/tiV8nsD5gn/slUB2YNhZii4CAgd+ulU0ILc99eaS7mKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.192] (ip5f5af14c.dynamic.kabel-deutschland.de [95.90.241.76])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 0D77F6028827A;
-	Fri, 08 Aug 2025 11:17:57 +0200 (CEST)
-Message-ID: <8e4ec57e-dc14-470c-b56e-9f594a7a8390@molgen.mpg.de>
-Date: Fri, 8 Aug 2025 11:17:56 +0200
+	s=arc-20240116; t=1754646261; c=relaxed/simple;
+	bh=6F4MMCjDeOJQTOBiI/kQboYeE8sVAqRfvejXM0WLAGY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=e8IjaOpjd4pPDhuh0DpPe3gdENFkkd60UE3dAgV9s7xmE01zF9c2WuayqXjuZ0NpFLu9r9dOK+18off28sI9rT3rrjA4X2NmyJComCs0BkKrMxp/0xoqrHUF2DHoVlLUoXA27tYiM5IDn+xuXdtAn+voFBH3eENE6FMl2zKfzL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org; spf=pass smtp.mailfrom=disroot.org; dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b=lQkxiJ7G; arc=none smtp.client-ip=178.21.23.139
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=disroot.org
+Received: from mail01.disroot.lan (localhost [127.0.0.1])
+	by disroot.org (Postfix) with ESMTP id DCCE225B19;
+	Fri,  8 Aug 2025 11:44:14 +0200 (CEST)
+X-Virus-Scanned: SPAM Filter at disroot.org
+Received: from layka.disroot.org ([127.0.0.1])
+ by localhost (disroot.org [127.0.0.1]) (amavis, port 10024) with ESMTP
+ id v-OBsePsy6H5; Fri,  8 Aug 2025 11:44:13 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=disroot.org; s=mail;
+	t=1754646253; bh=6F4MMCjDeOJQTOBiI/kQboYeE8sVAqRfvejXM0WLAGY=;
+	h=From:To:Cc:Subject:Date;
+	b=lQkxiJ7GL8amk1iNsM0f1VFSXFUbtqeVC9w+I4T/U8Z+AFfrKQQje2rzWNzNiYEah
+	 nxgYnsfL6EiaBivK4JdDs0FiOeboMG2FDp6t86MwxqsovXsJje+BJuMKUugHhvLBfl
+	 0d41UVPpYU5Cgk5+P7H/0DYtCwUYXwUvhvg4WycX1uCqWT5SR9mYv5uhA/uDM6J05Q
+	 vkcMbk/7CxLjkn1A/GE71bEunM9BGStgv70g6R+Slb6uEVuTZDUe5WFQTdfg22YnBk
+	 Oj4YEgEAZ+0tbkLaChdnB8q8IvAPHei2yHp3glhPAS91hBxC3VLTZwl1OOUSrqjOpn
+	 tRyYcegkOWIbw==
+From: Yao Zi <ziyao@disroot.org>
+To: Drew Fustini <fustini@kernel.org>,
+	Guo Ren <guoren@kernel.org>,
+	Fu Wei <wefu@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Alexandre Ghiti <alex@ghiti.fr>,
+	Emil Renner Berthing <emil.renner.berthing@canonical.com>,
+	Jisheng Zhang <jszhang@kernel.org>
+Cc: linux-riscv@lists.infradead.org,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Yao Zi <ziyao@disroot.org>
+Subject: [PATCH net v3 0/3] Fix broken link with TH1520 GMAC when linkspeed changes
+Date: Fri,  8 Aug 2025 09:36:53 +0000
+Message-ID: <20250808093655.48074-2-ziyao@disroot.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH v8 iwl-next] ice: add recovery clock and
- clock 1588 control for E825c
-To: Grzegorz Nitka <grzegorz.nitka@intel.com>,
- Przemyslaw Korba <przemyslaw.korba@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
- Anthony L Nguyen <anthony.l.nguyen@intel.com>,
- Przemyslaw Kitszel <przemyslaw.kitszel@intel.com>,
- Milena Olech <milena.olech@intel.com>
-References: <20250724122736.3398010-1-grzegorz.nitka@intel.com>
- <dff2578f-2336-4384-a1c3-427fc92dc1f2@molgen.mpg.de>
- <IA1PR11MB62193480CBF232FDCB54111E9227A@IA1PR11MB6219.namprd11.prod.outlook.com>
- <IA1PR11MB6219A68EFD8E72E5298842A9922CA@IA1PR11MB6219.namprd11.prod.outlook.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <IA1PR11MB6219A68EFD8E72E5298842A9922CA@IA1PR11MB6219.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Dear Grzegorz,
+It's noted that on TH1520 SoC, the GMAC's link becomes broken after
+the link speed is changed (for example, running ethtool -s eth0 speed
+100 on the peer when negotiated to 1Gbps), but the GMAC could function
+normally if the speed is brought back to the initial.
 
+Just like many other SoCs utilizing STMMAC IP, we need to adjust the TX
+clock supplying TH1520's GMAC through some SoC-specific glue registers
+when linkspeed changes. But it's found that after the full kernel
+startup, reading from them results in garbage and writing to them makes
+no effect, which is the cause of broken link.
 
-Am 07.08.25 um 10:35 schrieb Nitka, Grzegorz:
->> -----Original Message-----
->> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of Nitka, Grzegorz
->> Sent: Thursday, July 31, 2025 5:36 PM
+Further testing shows perisys-apb4-hclk must be ungated for normal
+access to Th1520 GMAC APB glue registers, which is neither described in
+dt-binding nor acquired by the driver.
 
-[…]
+This series expands the dt-binding of TH1520's GMAC to allow an extra
+"APB glue registers interface clock", instructs the driver to acquire
+and enable the clock, and finally supplies CLK_PERISYS_APB4_HCLK for
+TH1520's GMACs in SoC devicetree.
 
->> My responses in-line. I'm going to address your comments in v9.
+Changed from v2
+- dt-binding: Drop the Tested-by tag
+- driver
+  - Improve the commit message to mention the dt-compatibility problem
+  - Add a comment about the dt-compatibility problem
+  - Emit a warning when failed to get APB clock
+  - Stop using the optional clock-getting API since it doesn't help much
+    when we need to handle the missing case.
+- Collect review tags
+- Link to v2: https://lore.kernel.org/netdev/20250801091240.46114-1-ziyao@disroot.org/
 
-Thank you for digging into this, and your replies. I am looking forward 
-to v9.
+Changed from v1
+- Make apb clock essential in dt-binding
+- Collect review tags
+- Link to v1: https://lore.kernel.org/all/20250729093734.40132-1-ziyao@disroot.org/
 
+Yao Zi (3):
+  dt-bindings: net: thead,th1520-gmac: Describe APB interface clock
+  net: stmmac: thead: Get and enable APB clock on initialization
+  riscv: dts: thead: Add APB clocks for TH1520 GMACs
 
-Kind regards,
+ .../devicetree/bindings/net/thead,th1520-gmac.yaml |  6 ++++--
+ arch/riscv/boot/dts/thead/th1520.dtsi              | 10 ++++++----
+ drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c  | 14 ++++++++++++++
+ 3 files changed, 24 insertions(+), 6 deletions(-)
 
-Paul
+-- 
+2.50.1
+
 
