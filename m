@@ -1,114 +1,109 @@
-Return-Path: <netdev+bounces-212263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212264-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D06C8B1EDFD
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 19:43:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67C6CB1EE00
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 19:45:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21D273A779A
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 17:43:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 725725A123A
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 17:45:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDDA41E5B6D;
-	Fri,  8 Aug 2025 17:43:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 095661F4CAA;
+	Fri,  8 Aug 2025 17:45:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X4YXEO43"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="U5t870wP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA697199385
-	for <netdev@vger.kernel.org>; Fri,  8 Aug 2025 17:43:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D43541E1E19;
+	Fri,  8 Aug 2025 17:45:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754675020; cv=none; b=SllYU1WSKMqINFkMwc/DVjM0hnt4dUauoCNY7M+BiCqG7ywKcdNG4LHKGbpBKC1g+1Lo7ToTIB3QCkJ9S7UNyv37ZYUZ+fFxFPtLyHfSOuUuwWHvZUSaTlGv0I5yy0+Lo2v/BraNrgAtdsBNS7WAchYjHhQvT3i5gju9gbFS1po=
+	t=1754675117; cv=none; b=ZVhblmz1qcjlVqFauBeoVTnnua3o/jNhVxKY0zmdSIrtkY0F7JSa0fcsg1zcrRtcNiBrq0pgj1sHVFniDMP3Pf8kwck0+lADBSTHnGtpIbIVMWLLMxZRnPw7u/uCsyT17SFjjWaPUIKqkQHRvf44a1N4sc2CsPP1Qq319qkPT1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754675020; c=relaxed/simple;
-	bh=5kv1IGXIbqBpf3Qi9bhmMq35g6UahFmF7scWWT+Am6o=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=siY3m75SmafOUMPeg/MeL9q38rMykAfxrN8NiQoKE6KwtlfAVW36Zyy3Jf50FbVlxTkKb4Ti3COh1/S1/0VuOW3SkrA7kbDN3FdDd/FZeBq+9fC1VcYGms/t8gQO8zrAPxmMLrSSyxvNruv4LABL+Dt22IWExXsJhXcb6JasM0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X4YXEO43; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD36BC4CEED;
-	Fri,  8 Aug 2025 17:43:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754675020;
-	bh=5kv1IGXIbqBpf3Qi9bhmMq35g6UahFmF7scWWT+Am6o=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=X4YXEO43Hr3qsix4/XNSWxiyHKHOsw8OwxqKcUfP9ii4fmXPHjWAmKKFY/Koa/5vO
-	 eS/ih+rVtHcMXqtjsq3vwftWRYAHUGWjRgRiZOELOyeSkiqMzsI/pnmXHoNFTXniIu
-	 weKxZP78Bw7kSFeMJlAnQOV+Cj4iRAvZGKgprsj5bCUEQUCH8tkM0xRfvQ+rnlg9oi
-	 7KigMyQOPTGdfcgYP9Qp8AmNGafKsTKFSeZOgXevNZHk/SlgmnNEoDHNJcUYVSw+kU
-	 FpyIpfbleMeRX4lZgAv2yqrUmcgoGlHGK5+CnAXNT4GkPBzDeEKitKD2cpEuxVnXgC
-	 KsI3bBy+oUU3A==
-Date: Fri, 8 Aug 2025 10:43:38 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: David Wilder <wilder@us.ibm.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "jv@jvosburgh.net"
- <jv@jvosburgh.net>, "pradeeps@linux.vnet.ibm.com"
- <pradeeps@linux.vnet.ibm.com>, Pradeep Satyanarayana <pradeep@us.ibm.com>,
- "i.maximets@ovn.org" <i.maximets@ovn.org>, Adrian Moreno Zapata
- <amorenoz@redhat.com>, Hangbin Liu <haliu@redhat.com>,
- "stephen@networkplumber.org" <stephen@networkplumber.org>,
- "horms@kernel.org" <horms@kernel.org>
-Subject: Re: [PATCH net-next v6 7/7] bonding: Selftest and documentation for
- the arp_ip_target parameter.
-Message-ID: <20250808104338.1340070d@kernel.org>
-In-Reply-To: <MW3PR15MB39137E1CD22773D13515DD5AFA2FA@MW3PR15MB3913.namprd15.prod.outlook.com>
-References: <20250718212430.1968853-1-wilder@us.ibm.com>
-	<20250718212430.1968853-8-wilder@us.ibm.com>
-	<20250718183313.227c00f4@kernel.org>
-	<MW3PR15MB3913774256A62C63A607245EFA5DA@MW3PR15MB3913.namprd15.prod.outlook.com>
-	<20250721130800.021609ee@kernel.org>
-	<MW3PR15MB39137E1CD22773D13515DD5AFA2FA@MW3PR15MB3913.namprd15.prod.outlook.com>
+	s=arc-20240116; t=1754675117; c=relaxed/simple;
+	bh=UVukXqaBHBLJSuReTQ6CWOB4K+vGCgV0gGvwymfp5kg=;
+	h=Subject:To:Cc:From:Date:Message-Id; b=Z8XpBjpBqYVHRr19UYqpybcFURNb7UUJuFIAK2OTsZBJFPZBhspkIuoXM5Qk1nSgi3RspE25bjZU0Ib3IG+I4cLAGfUdRbQDv+XXIWRJLVnxXD7Vmf0cvVAy/MdHJ/v8v2SDm+Vr77uL+H40iRKUx6M4zJqCtsDt/51Va4fsH7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=U5t870wP; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1754675116; x=1786211116;
+  h=subject:to:cc:from:date:message-id;
+  bh=UVukXqaBHBLJSuReTQ6CWOB4K+vGCgV0gGvwymfp5kg=;
+  b=U5t870wPq0IXa7LJTqLEcZxx52bCxxSGZoHnqfcEw69xVS5APj0blTYy
+   eAYR8SS4/Jq0ixajkAxFWjAgAglQ4EracGgGBRcGUav1SE9HwHz+ekZ0N
+   OBv8C4eLEluww5OBQDBpiPXpkHwopqtAnVd5GE3aPN6i4sV+lpm9iSJuJ
+   5UoElXfieiKgqm7UjIQVDqoXpwuB7P611Bs+oYPU+P2hSbCXV1bIjD+oA
+   o95sm3ihxagsZ00pxw5S/3YuWj0u4fzz/SSPz8roRCApqWHgi6ukVg/yQ
+   JUYtL6HoqxlvKnalycAwXiYdSJgQ50CpR443HvfryZ8OQyQU4Mjj2HJ+c
+   w==;
+X-CSE-ConnectionGUID: ZQpU4ZprQf+3l9jf//EL2A==
+X-CSE-MsgGUID: oQYdc7azQIebBmTDIgdIlw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11515"; a="56063838"
+X-IronPort-AV: E=Sophos;i="6.17,274,1747724400"; 
+   d="scan'208";a="56063838"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2025 10:45:12 -0700
+X-CSE-ConnectionGUID: KGThBB1MTaSUiBXU8o2YZQ==
+X-CSE-MsgGUID: /PEAKnKnQIKNHm2+tWd+KQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,274,1747724400"; 
+   d="scan'208";a="202566839"
+Received: from davehans-spike.ostc.intel.com (HELO localhost.localdomain) ([10.165.164.11])
+  by orviesa001.jf.intel.com with ESMTP; 08 Aug 2025 10:45:05 -0700
+Subject: [PATCH] MAINTAINERS: Mark Intel WWAN IOSM driver as orphaned
+To: linux-kernel@vger.kernel.org
+Cc: Dave Hansen <dave.hansen@linux.intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Johannes Berg <johannes@sipsolutions.net>, Loic Poulain <loic.poulain@oss.qualcomm.com>, netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, Sergey Ryazanov <ryazanov.s.a@gmail.com>
+From: Dave Hansen <dave.hansen@linux.intel.com>
+Date: Fri, 08 Aug 2025 10:45:05 -0700
+Message-Id: <20250808174505.C9FF434F@davehans-spike.ostc.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
 
-On Fri, 8 Aug 2025 17:32:08 +0000 David Wilder wrote:
-> > iproute2 is built from source a month ago, with some pending patches,
-> > but not yours. Presumably building from source without your patches
-> > should give similar effect (IIRC the patches I applied related
-> > to MC routing)
-> >  
-> > > Can I access the logs from the CI run?  
-> >
-> > Yes
-> >
-> > https://netdev.bots.linux.dev/contest.html?pw-n=0&branch=net-next-2025-07-19--00-00 
-> >  
-> > > Is there a way I can debug in you CI environment?  
-> >
-> > Not at this point, unfortunately.
-> >  
-> > > Can I submit debug patches?  
-> >
-> > https://github.com/linux-netdev/nipa/wiki/How-to-run-netdev-selftests-CI-style   
-> 
-> I am able to run my tests in this environment, but sadly I still cant reproduce the failure.
-> Can you tell me more about the environment you are using for CI?  What version of GCC is used?
-> What distro and release is the environment build from?
 
-Not sure the compiler and distro matters here:
+From: Dave Hansen <dave.hansen@linux.intel.com>
 
-the bond options tests prints a bunch of:
+This maintainer's email no longer works. Remove it from MAINTAINERS.
 
-# RTNETLINK answers: Message too long
-# Cannot send link get request: Message too long
-# RTNETLINK answers: Message too long
-# Cannot send link get request: Message too long
-# Not enough information: "dev" argument is required.
-# RTNETLINK answers: Message too long
+I've been unable to locate a new maintainer for this at Intel. Mark
+the driver as Orphaned.
 
-> I have made some changes to the function that is failing In an attempt to fix the problem.
-> If the problem continues with my next version would it be possible to save the build artifacts
-> used in the test (vmlinux)?
+Signed-off-by: Dave Hansen <dave.hansen@linux.intel.com>
+Cc: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Cc: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+Cc: Johannes Berg <johannes@sipsolutions.net>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org
+---
 
-Right, let's see if the problem persists. I updated iproute2 recently
-too, so maybe that will help.
+ b/MAINTAINERS |    3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff -puN MAINTAINERS~MAINTAINERS-20250707-5 MAINTAINERS
+--- a/MAINTAINERS~MAINTAINERS-20250707-5	2025-08-08 10:39:37.235217068 -0700
++++ b/MAINTAINERS	2025-08-08 10:39:37.253218644 -0700
+@@ -12722,9 +12722,8 @@ S:	Maintained
+ F:	drivers/platform/x86/intel/wmi/thunderbolt.c
+ 
+ INTEL WWAN IOSM DRIVER
+-M:	M Chetan Kumar <m.chetan.kumar@intel.com>
+ L:	netdev@vger.kernel.org
+-S:	Maintained
++S:	Orphan
+ F:	drivers/net/wwan/iosm/
+ 
+ INTEL(R) FLEXIBLE RETURN AND EVENT DELIVERY
+_
 
