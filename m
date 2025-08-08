@@ -1,94 +1,107 @@
-Return-Path: <netdev+bounces-212274-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212275-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 287BCB1EE78
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 20:48:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 107D5B1EE7E
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 20:50:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E55418C4278
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 18:48:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 32DB3587097
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 18:50:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D372921E0BB;
-	Fri,  8 Aug 2025 18:48:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30C2E21E0BB;
+	Fri,  8 Aug 2025 18:50:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gbIAef7r"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I/fWEduk"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A498B1361;
-	Fri,  8 Aug 2025 18:48:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0692C1F1317;
+	Fri,  8 Aug 2025 18:50:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754678891; cv=none; b=OyH/XavRrb6YvmVx4OTT7LjZib4VorH1FzJvP5EUiu1e/CPGZPLcK97OVpp7EIGboL4vJGijPJNrAcNy0B8XIZOj0qAGGWMfr4x3yTvgszZyhlO4kd/pH8fQxCJg0UUfBEjt3pdvblF2Tfp0KD0TjSjl+JMtdHRDM4fmRZ1BiEw=
+	t=1754679003; cv=none; b=O7mwodBp0LZf3aSqxwBfYEncSWbn79EGoRDL2jTanggQC2zmNRdAU3/x5N3kt7LkYGyNY3Cp1nK3vTyAigzAqy5oKeTG2pXVIWrYSGnBwieAWhM1n0hOgdPBa1lx5Z+H2eo6/PCwcJrq66KTQ3tPBF5w6yLWtkjx18uV0iWydaM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754678891; c=relaxed/simple;
-	bh=hyBvZwGcxhxV1L8C60kPaohAML2mGrY2ZK5limPy77A=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SBukrKPsH3JujVdr7CQ4vR0OrffzWtjFlIdjoEpspsd0nfhNN54QHfD0BVQ6isE+lbb7E2Esk5OX2G6R6QKtSQ6oym+x8B64bi6DDZnX+u/odP4H8Rq8D2RD6SA5YOO+qxvDrg7gHn0MlutEhLeByP9zhpsr3DcYWmveLNDQaiw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gbIAef7r; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5617C4CEED;
-	Fri,  8 Aug 2025 18:48:09 +0000 (UTC)
+	s=arc-20240116; t=1754679003; c=relaxed/simple;
+	bh=fnWtwW0wfggDVHKFx3Huq8TZ0yT+EucVO8J2pjU5PBI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=c+tTm3DwTHBeKHu6nRXY0yBUt5G3DeBZYTelVrXn2PtzHGBKTp3oU6ORIrEdmJxy4JuhkHkpy8VXDMJKgvrYgKKxTibX0tJ8bhRlQIElRezhetLGujTxGp/X72ScmJtdz5EHQi17kVjOVcqPoDQlDNVNsF1h9BQH5+05r0MNkHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I/fWEduk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82180C4CEED;
+	Fri,  8 Aug 2025 18:50:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754678890;
-	bh=hyBvZwGcxhxV1L8C60kPaohAML2mGrY2ZK5limPy77A=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gbIAef7rOE+RfpOUvbgaPPfB2chDrtUcB85xtoDL1B6wmN2X3JKd5u+oyUxBzTgHx
-	 7zAhsGp2w2tCcT8WGOpkhHp4BqHqe1yJODwvUawF06JPMTGREh/7OQhF72+sgP4flR
-	 0NR8TKh/Rmu6pzOFRkkkihXHlEolyPzNKMEv9jW5vT/96au6aVT4lygp7B2vxCiMjC
-	 wKr9+aNoMKWjf+GTR92TSJi5l4DJmusTckZoosP11Ha/K8Et2sPPQeusMReU3KvYTo
-	 wXBsnNyCYWvttQv2mJ1GQfdN3CaFhkX28cVZ+hrO7JXGLRVuAyZF8xEoTn14k6sjiy
-	 IEgOEckOi59ng==
-Date: Fri, 8 Aug 2025 11:48:09 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Colin Ian King <colin.i.king@gmail.com>
-Cc: Frank <Frank.Sae@motor-comm.com>, Andrew Lunn <andrew@lunn.ch>, Heiner
- Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: phy: motorcomm: make const array mac_addr_reg
- static
-Message-ID: <20250808114809.1035a3a1@kernel.org>
-In-Reply-To: <20250807131504.463704-1-colin.i.king@gmail.com>
-References: <20250807131504.463704-1-colin.i.king@gmail.com>
+	s=k20201202; t=1754679002;
+	bh=fnWtwW0wfggDVHKFx3Huq8TZ0yT+EucVO8J2pjU5PBI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=I/fWEdukJ+XYaeB0+zkq4tqb4/3xPDsdmSCxzfqdw4shrPTrhSXwCKmLsxIZq9qky
+	 IRrielCw40h/vX+NKnm4qeQdau+1vd0uXlWkTAFzvhmAAn+eASHaLO1iaRslg/e3ML
+	 NA8/yMJ1DzAsV/BRNA/Ye/acorOyBFXM0waMJSR6JXktY49tdiOOVkWGSmtHN0K0/4
+	 v6+2yP4AbtBiJem5cgkPvk4ckd2Jw5PomXqoEmqXiRGupuXaddy5udaNocEUBAVu5v
+	 1n9WCAwD/d+JR70fOCrYcY3JaZAJLGOqqzIFUJsDKsnIFHq3ruCoVn1ttb5uHfQkl/
+	 FPe5qwpDvs9mQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF20383BF5A;
+	Fri,  8 Aug 2025 18:50:16 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 1/7] MAINTAINERS: resurrect my netfilter maintainer
+ entry
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175467901577.231968.2283299992667493309.git-patchwork-notify@kernel.org>
+Date: Fri, 08 Aug 2025 18:50:15 +0000
+References: <20250807112948.1400523-2-pablo@netfilter.org>
+In-Reply-To: <20250807112948.1400523-2-pablo@netfilter.org>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
+ netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, fw@strlen.de, horms@kernel.org
 
-On Thu,  7 Aug 2025 14:15:04 +0100 Colin Ian King wrote:
-> Don't populate the const read-only arrays mac_addr_reg on the stack at
-> run time, instead make them static, this reduces the object code size.
+Hello:
+
+This series was applied to netdev/net.git (main)
+by Pablo Neira Ayuso <pablo@netfilter.org>:
+
+On Thu,  7 Aug 2025 13:29:42 +0200 you wrote:
+> From: Florian Westphal <fw@strlen.de>
 > 
-> Size before:
->    text	   data	    bss	    dec	    hex	filename
->   65066	  11352	      0	  76418	  12a82	drivers/net/phy/motorcomm.o
+> This reverts commit b5048d27872a9734d142540ea23c3e897e47e05c.
+> Its been more than a year, hope my motivation lasts a bit longer than
+> last time :-)
 > 
-> Size after:
->    text	   data	    bss	    dec	    hex	filename
->   64761	  11512	      0	  76273	  129f1	drivers/net/phy/motorcomm.o
+> Signed-off-by: Florian Westphal <fw@strlen.de>
+> Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+> 
+> [...]
 
-## Form letter - net-next-closed
+Here is the summary with links:
+  - [net,1/7] MAINTAINERS: resurrect my netfilter maintainer entry
+    https://git.kernel.org/netdev/net/c/f752adfaf5f7
+  - [net,2/7] netfilter: add back NETFILTER_XTABLES dependencies
+    https://git.kernel.org/netdev/net/c/25a8b88f000c
+  - [net,3/7] netfilter: ctnetlink: fix refcount leak on table dump
+    https://git.kernel.org/netdev/net/c/de788b2e6227
+  - [net,4/7] netfilter: ctnetlink: remove refcounting in expectation dumpers
+    https://git.kernel.org/netdev/net/c/1492e3dcb2be
+  - [net,5/7] netfilter: nft_set_pipapo: don't return bogus extension pointer
+    https://git.kernel.org/netdev/net/c/c8a7c2c60818
+  - [net,6/7] netfilter: conntrack: clean up returns in nf_conntrack_log_invalid_sysctl()
+    https://git.kernel.org/netdev/net/c/f54186df806f
+  - [net,7/7] netfilter: nft_socket: remove WARN_ON_ONCE with huge level value
+    https://git.kernel.org/netdev/net/c/1dee968d22ea
 
-We have already submitted our pull request with net-next material for v6.17,
-and therefore net-next is closed for new drivers, features, code refactoring
-and optimizations. We are currently accepting bug fixes only.
-
-Please repost when net-next reopens after Aug 11th.
-
-RFC patches sent for review only are obviously welcome at any time.
-
-See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
+You are awesome, thank you!
 -- 
-pw-bot: defer
-pv-bot: closed
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
