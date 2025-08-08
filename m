@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-212276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212277-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78DA0B1EE90
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 20:52:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C05CB1EE91
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 20:53:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6EAA0170AC2
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 18:52:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BB7E916AC4D
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 18:53:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AE06280A3B;
-	Fri,  8 Aug 2025 18:52:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A54E9222577;
+	Fri,  8 Aug 2025 18:53:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZSZktX3f"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Aqz1hdbo"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 275F127B500
-	for <netdev@vger.kernel.org>; Fri,  8 Aug 2025 18:52:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F8881E32DB
+	for <netdev@vger.kernel.org>; Fri,  8 Aug 2025 18:53:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754679168; cv=none; b=mvLRnYQWcm3uhflarLTuQZVbOfiKjtVaEbAwixLCEriAgrwUr4yzf3yN094PWraUpxgGcrPqPx3ZGE15DnWbSaKZMKMcOSlhXbbYDC9K7So2fkUt+ysXsDWYKiwh3C7s1dsYfu5Lbd3/3eNn/HUqFRYd3oKghmMbZXgqU9IsGVE=
+	t=1754679220; cv=none; b=LKSJtv5MD6lWwaLCGsd55xfxTNPbWUKZTKE4EFif64xgfBm0+EJjwHpDW5bwJ/f4xEclfBzF0UaucbYViVnkkh2/vcj5/yQSHF6Mkm1ICEgqP8OcdOUnF9l0Kre59j6MyIs6Gk8MeYOE0rdc+aAjeCX2bUOuVpOTHbl3XKY2MPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754679168; c=relaxed/simple;
-	bh=YhbYQJP5+AQN0JpAOtiFJsxdb7GrVzXjGiCCWjHuPT4=;
+	s=arc-20240116; t=1754679220; c=relaxed/simple;
+	bh=nYAv4YhqZB4fcdkzXa3rOYswHlxV1SkG2ZD65PZgeME=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZGABg1X3J81pRTypslnWYogqZJ6BRWq0tjHPKkymx12G2wcT1fdTIO65zvgGTr0luPmdKV4gI03XMxXpJxOIHIZre541ZU4Wt2Leetp1ra9EN88cxSOB2rkUTmCrp3lZCX7wWRKKcH0MuL/WXxDHhkhTq5/dutsA0XbCZSzFejg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZSZktX3f; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 283B1C4CEED;
-	Fri,  8 Aug 2025 18:52:47 +0000 (UTC)
+	 MIME-Version:Content-Type; b=UsvioKasKaW/KPvTDNt6zeYZxRuWmnsOdGG/DQIhI9v6AGA3mDi/tsmRRAY13uXDhUuM3TAOAm2EWrIhGqBwShv2aIXZFH1m8P8ECqJupcqv0afQ4Ykk8CHt9kPc1HDvuXOFIn7kq9QSlj0C2caXB19Qn/uZKwt+bJZTwAhl7iw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Aqz1hdbo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E722C4CEED;
+	Fri,  8 Aug 2025 18:53:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754679167;
-	bh=YhbYQJP5+AQN0JpAOtiFJsxdb7GrVzXjGiCCWjHuPT4=;
+	s=k20201202; t=1754679220;
+	bh=nYAv4YhqZB4fcdkzXa3rOYswHlxV1SkG2ZD65PZgeME=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ZSZktX3fY0369+VctQu//ySe0E3FcOTfLnSQMmRExR+xAas2dCEXSH6olZHWesPjv
-	 hEkjdGSQwwULoH8wMlx5fiJ0hx5OdQyfntxGiRCC4vX3WyLr0gcFBdv5Qm3sr7CYX0
-	 UkBAVy0LRr1fITlPZu3TJPJ3Axz4zXgY3Kuuq40IOFXF3luXKtJZYhabYGv6dg2MaE
-	 oHfXiV1pspM/62v8zwWNMMpnPyimV3bAQJoG8I5PdjXhp9EE/9Xb3LCwlZ+A9zEqeB
-	 V9EjzAjPbHVbVq3OstSQsPfFDCFtcHOZN2ZO7VM3DrDz6U0ComL1TA6hrm6AKOD/DS
-	 d0ATOU3ZpOayQ==
-Date: Fri, 8 Aug 2025 11:52:46 -0700
+	b=Aqz1hdboWI5+7nAWBuS0wSh/hBhjEyY3D8mFwjQl1CcnMwzfwMzOTzYizQDRG9/kY
+	 CB57uMySkvjXTichvtEE2A+C6lk5ikn0amQP8me5SjgbyyN4jnbdkvxxK5cs1lh6Fo
+	 3drFYtEH64baXlG2slhXJ6WBM7odyI1NAD+23NMlCZzILtxwnBm2EurpApeeQ7182U
+	 EHAj/pSMlKA/hk1Ya1gyn5xbR8oP81gY994+dyLudEzUyPp3mNjk43awBTV1ScPIxa
+	 XnBmF41WJY+uG8LkMiBI8Yu2UVK2CUhBMpOBG5LF2ZDNR7B/+35vdTU+h0a+wvVOwZ
+	 bT5XF9kWrglEw==
+Date: Fri, 8 Aug 2025 11:53:38 -0700
 From: Jakub Kicinski <kuba@kernel.org>
 To: Tony Nguyen <anthony.l.nguyen@intel.com>
 Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
@@ -52,7 +52,7 @@ Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
  <jacob.e.keller@intel.com>
 Subject: Re: [PATCH net v2 1/2] devlink: let driver opt out of automatic
  phys_port_name generation
-Message-ID: <20250808115246.67f56cb6@kernel.org>
+Message-ID: <20250808115338.044a5fc8@kernel.org>
 In-Reply-To: <20250805223346.3293091-2-anthony.l.nguyen@intel.com>
 References: <20250805223346.3293091-1-anthony.l.nguyen@intel.com>
 	<20250805223346.3293091-2-anthony.l.nguyen@intel.com>
@@ -66,7 +66,10 @@ Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
 On Tue,  5 Aug 2025 15:33:41 -0700 Tony Nguyen wrote:
-> + * @no_phys_port_name: skip automatic phys_port_name generation; for compatibility only,
+> +	if (devlink_port->attrs.no_phys_port_name)
+> +		return 0;
 
-line over 80 chars
+Why are you returning 0 rather than -EOPNOTSUPP?
+Driver which doesn't implement phys_port_name would normally return
+-EOPNOTSUPP when user tries to read the sysfs file.
 
