@@ -1,158 +1,137 @@
-Return-Path: <netdev+bounces-212127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212128-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43023B1E1E7
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 08:01:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DEEBB1E256
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 08:32:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D3895722379
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 06:01:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF19E166CC2
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 06:32:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E00912185BD;
-	Fri,  8 Aug 2025 06:01:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD94121B9DE;
+	Fri,  8 Aug 2025 06:32:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mhvXsAiT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wi6PMwGt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
+Received: from mail-yb1-f194.google.com (mail-yb1-f194.google.com [209.85.219.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C338367
-	for <netdev@vger.kernel.org>; Fri,  8 Aug 2025 06:01:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 453EC26AFB;
+	Fri,  8 Aug 2025 06:32:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754632905; cv=none; b=L4IW1VEVt+/l0B48aHxJ+aL/DlIqKKy+2vSKBRVRCxFs4o/s0kMxE6toN2Sq2LqJHGTbVZmCCtCcVTjoGOHKRsCg7Z+4Jxt2ic1h/gfnan0U04Ng/8HDPc9hIbkXFDQUCiVDHJyMoUH0eMPAcJuaxAdTDEwN0Hq+kQ64D/oqan4=
+	t=1754634754; cv=none; b=taH8K05VxRJdwwo7/fG+hbL9IiG7AmmuM/HKFFWaGyoQsXYpMuxMPCFjbqfSSonwXWa6/lm9NPSwBgs7CISfm4sIolBMcopIDqa15m2Rh0Li5Xke9y/US6sOIIVELH+NUEOy6Nz9KJe3RsE93mQlrXy/ey5Ed3uEXVqhdAIOL/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754632905; c=relaxed/simple;
-	bh=wJ2ShD0lLGDBURenwS/7QYIiH7Qe2dT/+RsxUmG5uog=;
+	s=arc-20240116; t=1754634754; c=relaxed/simple;
+	bh=09vs+9wIX3El3CMG5NovDOr2gXAnypcPwnQ1hqFo3vU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FD3e1aKNQoizgsm61tV+MveoxdliybnHWHKGWIHer1aAaW0jZlw006kwNsL16aJkTNNEZq2iA6P00ozLe4CkNgdSjAkK2V9hdA8ZX1ZVe20N1oRSSXkPkFn6xqReofLHexCT9Ef+4icx9fAvPw/FAqR8taeHJ14BPm4YpArSSaQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mhvXsAiT; arc=none smtp.client-ip=209.85.222.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-7e809baeef7so209802085a.0
-        for <netdev@vger.kernel.org>; Thu, 07 Aug 2025 23:01:43 -0700 (PDT)
+	 To:Cc:Content-Type; b=BjlJwU+ce81Xr7jVsoffj9kLL4gBzp05eT3aZmXDKFkWSXPGyh2gTdU4jlutTinsztK9o/aPrFdFTkUL3dH0o+NHpdc+4VZzb5plSJw/3mZ1ZN06z0Leesow0EDosxQG3aaoqrLOEpZre1qhtPorkL6Puf/uij+98qyT9MRw4jY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wi6PMwGt; arc=none smtp.client-ip=209.85.219.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f194.google.com with SMTP id 3f1490d57ef6-e8da1fd7b6bso1629948276.2;
+        Thu, 07 Aug 2025 23:32:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754632902; x=1755237702; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1754634752; x=1755239552; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wJ2ShD0lLGDBURenwS/7QYIiH7Qe2dT/+RsxUmG5uog=;
-        b=mhvXsAiTyyCltGekgP5vGsznpH72GLqDpPA2ScFAgVDcdl33KP+mRKP2V99JQkzBWr
-         pDOpZP4dpZlJV2ldfHrAy7LeR5gd+RmuAuaSwJSbzFLVCPBulgPsw3LrcL0lpc2R1H3S
-         fqF0DimLRRY8oGGLf2DrOUoKf6s57qKDZQQcXL66yHnjg+AY/4JDhs0KU5X6uhEjUM0g
-         +B0hA5d8X54pd1D0iYfBeKeiaiUKPVLWSMmHE9UHFCrkJAFpGclGEB6b0+cm+lzrzlPN
-         yPoj13HpUG1afgurzTJfQ/JQqsNgUM/ptrzu/53wJyCOIuLiD5SATikwJJpU2Qinp+VH
-         dO/g==
+        bh=Gt9ZsO1nheudsEaJUBPemdj5Cga+NzjEQIUdFfDdTBU=;
+        b=Wi6PMwGt4OX6Osc31o9UGcN4MfTQMfUcEH/LAmaT+OgUKcYqIzNWp0th9+ba5HSgzy
+         +p9SaAxKM9hNG6k2zc+PU/UT1l5RfGFwDOSSxkNemSYnf3uaJ9NExj+eORAUUZcuEHvM
+         ufkEvstg24cAMg0JNg7x/mZQxQiafl2fHrLeQ1MuR1/5WwsmDv69BpOW/+s5yrCi7GpV
+         ZjK4f5aKDhod/hs3aNzn2Zfc1FkMN5BrHJmDe1+/YJ6emcIgcsZ0OF0ck03sqoSr3C8U
+         VAw42oryG5Utn46+bn5J3P2rjOQZphZE8l6FO50Q4HSMj5/msGg7QoBpYVQvDDrDhQS6
+         811w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754632902; x=1755237702;
+        d=1e100.net; s=20230601; t=1754634752; x=1755239552;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=wJ2ShD0lLGDBURenwS/7QYIiH7Qe2dT/+RsxUmG5uog=;
-        b=UBuY5bgOux6riEfN39TzzLTGhsJm7tROXHVW/2cBr7KkB5XybSUrx/IihvsvAafJZF
-         0fV+L8xPJx7Q1mpfwmFOcAUjPxjiW4qLxf1+hyeVCtcLS7c9FL1AOC+M+M/2eSBjCfmm
-         yhgmfMiqSZVzflqaMQJs3SoVWO6Q+MUDCC7SZWGxXqtbsZHlCMVpaCYtbvLZv2/36qpX
-         J01ZcGiq8ThVFoCj4LzVWEagr8rAFuTn2rlZ5M5umJ4jPxwKhfIKxP3s2h5Te2zq6sMe
-         o9gWdGPdo1ZXsVY2hwC3DBKwP+SEWcHexzbnt2p9gAtebMzr2y9hoXS5eVFIJn+o6nql
-         wmfg==
-X-Forwarded-Encrypted: i=1; AJvYcCVJ3OQW38c9dcQIyVSJpv4cdg/k6cq2HsYdZQrCviPqOWzlrTq4U9SnFR7QvqTIcq6kc5eAUJw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwEyjH7WFdNJAnHwRPrw/rrPvgPR3BS6M6mj89UG5O4phiRTq4+
-	nRIBghQ6OKB2NiE3sU2ALdNtUB0orRgtlZQr/CKwaSs4KrIUM0WPgXQShEM1wg4kRL/Z1dxuiDk
-	RG5xeIzI3LmgnZLZrly4P8Kft8mdfo0WAPiot/DFL
-X-Gm-Gg: ASbGnctEqpz3rcThBGhj0nn1YxtICpydbu5qxpAzRHsUWTnTf5/X0MUx8TMh91h6Oey
-	97zw2dH781UAkucCypay4wMSj8Ev+NntlDfESI8UtmpbGnGofb1qd8tyOUmBvNCDVoxt7F6kL0b
-	3lsfhYOgTdHgb7wk0Jw548BAd0ds/z/HT/pyLxzhH1jOK0L7Cu0y3FUyk7fiLGIxzi3peOiWNpe
-	k+TRDg8IzlnpLQ=
-X-Google-Smtp-Source: AGHT+IEDMiWQQp2ySXxb5hGnl3PYQ6rBZyTUMmWdkPYFxZ7Pz87uL93oO/sOKthE6Pw8L97g+0HrGG9ouzcdFiM1VfY=
-X-Received: by 2002:a05:622a:548:b0:4b0:86b4:2513 with SMTP id
- d75a77b69052e-4b0aec8e37amr25739601cf.26.1754632901644; Thu, 07 Aug 2025
- 23:01:41 -0700 (PDT)
+        bh=Gt9ZsO1nheudsEaJUBPemdj5Cga+NzjEQIUdFfDdTBU=;
+        b=DxdLLHQfO+uikTwim5LM/UNgeoGOE/jCy3Kr8F61RC0mnEs3UxRjJ9lYqXJH/Wg10/
+         1ma/MrKzMxjDv8QlicWcoLk5TetWn4BpPZwAYW7Peavm1g6MsXgQL5wVm3G1gflNNVOr
+         xDUpdnEdcvICDC61pvQK2in/aS54EkYkST+wDV2yV3ANDCKSdR2UqTLpAqEkK5KKExQz
+         Sh4cTMmgXvrOu5diFxwzUmNMVbg5Ch3gY4OcHV+tF+pDMPsl7mT+CBR5Fp60myqjiDH3
+         rVqkoliKl4QLK0NNZ62qSLpnEopkbNCVcNrGMBukTJvGHNoFY0ENwwg5aI0+bs3yJVsG
+         c4zQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUYh47jUnAMQvPkrtF3QrnKWkboOPpcwRdkfJBerqGx6XJXOq6BvLpEw35KwKlX4NIox5Q=@vger.kernel.org, AJvYcCWkZW2J0vBrhJtyuxyv5rtoNFqw848HvdvqpIaI2HIfpTTzTGu/9QSaCBQl8F+Q8d5YRq6mXr5s@vger.kernel.org, AJvYcCX/fDTvxyECykFIRk6uNeXjExXHaITRYixaEMEWPUKS3IreeF5gkA34/7nsylbkkQKTS3FNZEBbGIH04XmD@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy5uBn9IWISs5ISO0btP/zfYeG2AgSRSB4zgpCTLcRXEYv14rXC
+	lfErikJQWPs33dcbUYHuY2aG04+b+SK4zpdfczZCP3p+1wtTAxrSudD/EL/QGFXUHuw21gABAks
+	Y/jHT1zIvQdBbD0dra+ENsbQSc/NNY58=
+X-Gm-Gg: ASbGncuY/BQh8q+XJJ8Hb35PpU6mSBoLgz4u3mqzl4tiU9cDWgJPjGapCG8ZMl8b5I0
+	djaoaadpgrVkFwcQ7AZnts0cQ9Q+bjOhGgURl1iELKpn65M0eo1GeGtP54+9jF9KXos2AswkAHb
+	BCDWvhPmA0xq2TfsojbS2DnyxDoHbwc60kwKGy/blDw6hzHJySzcqgjPLPZpvk+zXcyVQTO0/cy
+	rNAAEI=
+X-Google-Smtp-Source: AGHT+IGGsvIuBG2qPoh9zkwtLYd/BaFKSVD7NsRlik0Wc2DWUjl7M+XIqzQ3GfSaZPJk1SAoGmtLVwOPrcP+iuITA0A=
+X-Received: by 2002:a05:690c:28b:b0:712:c55c:4e65 with SMTP id
+ 00721157ae682-71bf0d36b00mr24377697b3.16.1754634752182; Thu, 07 Aug 2025
+ 23:32:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250808050643.107481-1-jackzxcui1989@163.com>
-In-Reply-To: <20250808050643.107481-1-jackzxcui1989@163.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 7 Aug 2025 23:01:29 -0700
-X-Gm-Features: Ac12FXzPxlznul3dZErM2k6olLDrdWJ9vANmmhMhx7XFW35iEJNW8Zi8ExY3IM0
-Message-ID: <CANn89iLJHBDqEzumoURtc4ehdZKkchA8hW4ufDZKj=nEzJ=sjg@mail.gmail.com>
-Subject: Re: [PATCH] net: af_packet: add af_packet hrtimer mode
-To: Xin Zhao <jackzxcui1989@163.com>
-Cc: willemdebruijn.kernel@gmail.com, ferenc@fejes.dev, davem@davemloft.net, 
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+References: <20250703121521.1874196-1-dongml2@chinatelecom.cn>
+ <20250703121521.1874196-3-dongml2@chinatelecom.cn> <CAADnVQKP1-gdmq1xkogFeRM6o3j2zf0Q8Atz=aCEkB0PkVx++A@mail.gmail.com>
+ <45f4d349-7b08-45d3-9bec-3ab75217f9b6@linux.dev> <3bccb986-bea1-4df0-a4fe-1e668498d5d5@linux.dev>
+ <CAADnVQ+Afov4E=9t=3M=zZmO9z4ZqT6imWD5xijDHshTf3J=RA@mail.gmail.com>
+ <20250716182414.GI4105545@noisy.programming.kicks-ass.net>
+ <CAADnVQ+5sEDKHdsJY5ZsfGDO_1SEhhQWHrt2SMBG5SYyQ+jt7w@mail.gmail.com>
+ <CADxym3Za-zShEUyoVE7OoODKYXc1nghD63q2xv_wtHAyT2-Z-Q@mail.gmail.com>
+ <CAADnVQ+XGYp=ORtA730u7WQKqSGGH6R4=9CtYOPP_uHuJrYAkQ@mail.gmail.com>
+ <CADxym3YMaz8_YkOidJVbKYAXiFLKp4KvYopR3rJRYkiYJvenWw@mail.gmail.com> <CAADnVQL_tMbi-xh_znjGwvvY1GkMTUm6EvOUU1x7rNPx53eePQ@mail.gmail.com>
+In-Reply-To: <CAADnVQL_tMbi-xh_znjGwvvY1GkMTUm6EvOUU1x7rNPx53eePQ@mail.gmail.com>
+From: Menglong Dong <menglong8.dong@gmail.com>
+Date: Fri, 8 Aug 2025 14:32:20 +0800
+X-Gm-Features: Ac12FXy3mxx2F-b20OU8lIsb12E-iGNTqf76Dos-9H44ul6naxHyqyk4jZEAUY8
+Message-ID: <CADxym3ZeuoSXDS3j+Sv-Au-FbJzKjkh7TPmM619gRODuRCKzJw@mail.gmail.com>
+Subject: Re: Inlining migrate_disable/enable. Was: [PATCH bpf-next v2 02/18]
+ x86,bpf: add bpf_global_caller for global trampoline
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Peter Zijlstra <peterz@infradead.org>, Menglong Dong <menglong.dong@linux.dev>, 
+	Steven Rostedt <rostedt@goodmis.org>, Jiri Olsa <jolsa@kernel.org>, bpf <bpf@vger.kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, 
+	LKML <linux-kernel@vger.kernel.org>, Network Development <netdev@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 7, 2025 at 10:07=E2=80=AFPM Xin Zhao <jackzxcui1989@163.com> wr=
-ote:
+On Fri, Aug 8, 2025 at 8:58=E2=80=AFAM Alexei Starovoitov
+<alexei.starovoitov@gmail.com> wrote:
 >
-> On Wed, 2025-08-06 at 16:51 +0800, Ferenc wrote:
+[......]
+> > +{
+> > +    DEFINE(RQ_nr_pinned, offsetof(struct rq, nr_pinned));
 >
-> > I doubt we need another CONFIG option ?
-> >
-> > Also this seems to be beneficial for HZ=3D100 or HZ=3D250 configuration=
-,
-> > maybe worth mentioning in the changelog.
-> >
-> > But more importantly, I think you should explain what difference this
-> > really makes,
-> > in which circumstances this timer needs to fire...
-> >
-> > If real-time is a concern, maybe using a timer to perform GC-style oper=
-ation
-> > is a no go anyway...
+> This part looks nice and sweet. Not sure what you were concerned about.
 >
-> Dear Eric,
+> Respin it as a proper patch targeting tip tree.
 >
-> I've thought about it, and I really didn't foresee any obvious drawbacks
-> after switching to hrtimer, so in PATCH v1, I removed that config and dir=
-ectly
-> changed it to hrtimer.
-> As you mentioned, this issue is indeed more pronounced on systems with HZ=
-=3D250
-> or HZ=3D100. Our testing environment was also based on a system with HZ=
-=3D250,
-> which is still quite common in embedded systems.
+> And explain the motivation in commit log with detailed
+> 'perf report' before/after along with 111M/s to 121M/s speed up,
 >
-> Regarding the benefits of using hrtimer, I already provided the test data=
- and
-> testing environment in my previous reply to Ferenc, and the improvements =
-are
-> quite significant.
->
-> As for when the retire timer expires, I've reviewed this logic. From my
-> perspective, the existing mechanism in AF_PACKET is complete. In the
-> prb_retire_rx_blk_timer_expired function, there is a check to see if ther=
-e are
-> any packets in the current block. If there are packets, the status will b=
-e
-> reported to user space. By switching to hrtimer, I aimed to ensure that t=
-he
-> timeout handling in the prb_retire_rx_blk_timer_expired function can be
-> executed in a more timely manner.
->
+> I suspect with my other __set_cpus_allowed_ptr() suggestion
+> the speed up should be even bigger.
 
-I have some doubts why AF_PACKET timer would be involved in the performance
-of an application.
+Much better.
 
-Are you sure about your requirements ?
+Before:
+fentry         :  113.030 =C2=B1 0.149M/s
+fentry         :  112.501 =C2=B1 0.187M/s
+fentry         :  112.828 =C2=B1 0.267M/s
+fentry         :  115.287 =C2=B1 0.241M/s
 
-I do not know what application you are running, but I wonder if using
-TX timestamps,
-and EDT model to deliver your packets in a more accurate way would be bette=
-r.
+After:
+fentry         :  143.644 =C2=B1 0.670M/s
+fentry         :  149.764 =C2=B1 0.362M/s
+fentry         :  149.642 =C2=B1 0.156M/s
+fentry         :  145.263 =C2=B1 0.221M/s
+fentry         :  145.558 =C2=B1 0.145M/s
 
-Some qdiscs already use hrtimer and get sub 50 usec latency out of the box,
-or whatever time a cpu sleeping in deep state takes to wake up.
-
-
-> Thanks
-> Xin Zhao
 >
+> > +    return 0;
+> > +}
 
