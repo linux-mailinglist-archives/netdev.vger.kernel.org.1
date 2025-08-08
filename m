@@ -1,154 +1,93 @@
-Return-Path: <netdev+bounces-212300-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212301-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FC36B1F03D
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 23:31:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4566B1F06F
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 23:53:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1793B1C26653
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 21:32:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5BF2A7AE6B7
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 21:52:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2DF61E008B;
-	Fri,  8 Aug 2025 21:31:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="iEeY/Q2I"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A08B289833;
+	Fri,  8 Aug 2025 21:53:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81BD81EA91
-	for <netdev@vger.kernel.org>; Fri,  8 Aug 2025 21:31:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A20BA24DD1B
+	for <netdev@vger.kernel.org>; Fri,  8 Aug 2025 21:53:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754688705; cv=none; b=KV3m4tAky8xOe6qz31lcUB0MZkLQDjg1Pbb4oJbrGreRH8LpJKtk9V4oVeSXPAwqMcX71YWgHgXI9op5KFEpd4qG2f16wwl3obVvzeX08ij6InXfBCS4thL44ixlTQfuasP4EbpUBcoG39QYJAUI+EkPbNsjbMV3yQY5lzlIG8I=
+	t=1754689987; cv=none; b=UXPY91hRi18IO1cPwdJYQiW4RzVR7PIa+Vf/3LyNA8tsYVatABl/Bc4jdujuWO4W8XND9ycN5vF/+iJlxeoOHsoJ8ZldkFGvw8mKqaC69Krbb68UAH6ZHPmSesR9TSZ4HmkxC//RMEMzhWAhO3+zNIBLU9hmSTiKtgX2LfxMmFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754688705; c=relaxed/simple;
-	bh=SZz6YrdANxo2wtVekMvJalu96H0sxblAmKiPlZuVZd8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YScRjlC9Qgwjrq7hs6eJsfeJlhucAFv7m8ZWyqMiDQntHlgaCgKcXR64kO1R2wTBEXyALVnb5mXKZbPMg9qeZrjxxg6p5qFtTgsWPuNB9SabShdXNUc26NU7bZLWQD8MeRIDbaSCXoCqT7IRGgN9iazxC4bFJEarLZGOOnknLuM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=iEeY/Q2I; arc=none smtp.client-ip=91.218.175.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <e30d66a8-c4de-4d81-880d-36d996b67854@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1754688700;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hy1OHQn7a5mHql5BsO+HMy70fvmaW3m2Pja8vp+9DMU=;
-	b=iEeY/Q2I8GwwRClmOrXUu+XjsYzrjQ47UrRmiiwh0quB+ga9T5mmRMMOq08RJG5/KkTc/q
-	nFDCihZTT1vdvZjTDEsBJgA8CJR0fYx6HAW4CDjHidMX70XLt6fSFipRkmOakYtSaO5Q0y
-	vflz3SA6Fgjo13LPm4srDIx1hIRKO2w=
-Date: Fri, 8 Aug 2025 14:31:33 -0700
+	s=arc-20240116; t=1754689987; c=relaxed/simple;
+	bh=ZzjdYrxYEcxo99s9h1GnuOAWn45kMBSUB24pYO67++U=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=BTkciU5Ztw6NwXMvCj5P+KhqI6Vcur7SIbHvwFiHBzNfWzSDm2Y225BWRe8B5l96511jsOk2McqN8X2VFRXR1hngJKDts84lxmxWwILYWSIL6K+AP7ju2YRYHD2wCkR6VbgAAHE7ZLJkgEv60bluQyWRjH5/5TUVEvH1qOme4EM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-88178b5ce20so448440639f.3
+        for <netdev@vger.kernel.org>; Fri, 08 Aug 2025 14:53:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754689985; x=1755294785;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fBCMcg0k4PNCUZ4EcEMcgDzn+4NHxC7yQYWs8JkG+bc=;
+        b=Ci5TqzBYOIE6qB9lEa+ZcLSOL5oz/Ep/2h4g3ftA3FPC6JxdJ68UelHB5BeG9G3GiU
+         tA6ndsVmi2EAL50CTJY7j6xXFxYPI26R6okFkhxiLO5rsAOLQ0aqMe5yJxwdlJ1ZgbKF
+         rSPpxuQkppVPfQVZgzuo+Sf3BD0q0q1VuHkCVZGfDYxcnDQ9tqIB5ehmzM3IRXtcjN+U
+         AXwSWG80N6tE6ZWSZS66cUnJSrfkqr4ktdzah5kdhJxAVbCPRjQ41/ZEXi3gdCctkNXL
+         QZHFlJ4+RRVFYTfgjYqA0/3f+4s99PYNmn7ZD28i2tNryrpOSMBfngDJfs5ixexiig+P
+         v/4g==
+X-Forwarded-Encrypted: i=1; AJvYcCU2MqRx8K1rylIlZSMLzVq9VlvtNBMpI7OVX2H019pGZO1Hf+G1i092dYrvna8dwgrbaAzQquU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxFv4xELjGwhvNgSwUoGf9wJAv/Cu8znr//jiV/gEL7RCtsxgyy
+	l896G7zIc15saGh8TJjvhpaDshd0Ba6H4/pDOISdRBoGjcbusTGF+XFO2eTgbgd7PbUrYqxi3Qm
+	oev5DhROXS5MvnD+ccsjVPIPo/WXs3bTyKR/kQLt2ZCowPMgJRrUJWtWrQ8U=
+X-Google-Smtp-Source: AGHT+IEF1na4CL596K5tr9vAfldDM2eKsOY8NzKJNyOz392+5p4iZ2zo9TIo+Y+YiykN5IC1WA2v5EXCr9l6aXuaz9h/U5aUXy/9
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v6 9/9] selftests/bpf: Cover metadata access from
- a modified skb clone
-To: Jakub Sitnicki <jakub@cloudflare.com>
-Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Arthur Fabre <arthur@arthurfabre.com>, Daniel Borkmann
- <daniel@iogearbox.net>, Eduard Zingerman <eddyz87@gmail.com>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Jesse Brandeburg <jbrandeburg@cloudflare.com>,
- Joanne Koong <joannelkoong@gmail.com>, Lorenzo Bianconi
- <lorenzo@kernel.org>, =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?=
- <thoiland@redhat.com>, Yan Zhai <yan@cloudflare.com>,
- kernel-team@cloudflare.com, netdev@vger.kernel.org, bpf@vger.kernel.org,
- Stanislav Fomichev <sdf@fomichev.me>
-References: <20250804-skb-metadata-thru-dynptr-v6-0-05da400bfa4b@cloudflare.com>
- <20250804-skb-metadata-thru-dynptr-v6-9-05da400bfa4b@cloudflare.com>
- <7a73fb00-9433-40d7-acb7-691f32f198ff@linux.dev>
- <87h5yi82gp.fsf@cloudflare.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <87h5yi82gp.fsf@cloudflare.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+X-Received: by 2002:a05:6602:1591:b0:881:8e2c:9995 with SMTP id
+ ca18e2360f4ac-883f12552ccmr907971639f.11.1754689984923; Fri, 08 Aug 2025
+ 14:53:04 -0700 (PDT)
+Date: Fri, 08 Aug 2025 14:53:04 -0700
+In-Reply-To: <6871b125.a00a0220.26a83e.0066.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <689671c0.050a0220.7f033.008b.GAE@google.com>
+Subject: Re: [syzbot] [net?] WARNING in rt_set_nexthop
+From: syzbot <syzbot+97bf275720e06ad75f63@syzkaller.appspotmail.com>
+To: davem@davemloft.net, dhowells@redhat.com, dsahern@kernel.org, 
+	edumazet@google.com, hdanton@sina.com, horms@kernel.org, jaltman@auristor.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 8/8/25 4:41 AM, Jakub Sitnicki wrote:
-> On Thu, Aug 07, 2025 at 05:33 PM -07, Martin KaFai Lau wrote:
->> On 8/4/25 5:52 AM, Jakub Sitnicki wrote:
->>> +/* Check that skb_meta dynptr is empty */
->>> +SEC("tc")
->>> +int ing_cls_dynptr_empty(struct __sk_buff *ctx)
->>> +{
->>> +	struct bpf_dynptr data, meta;
->>> +	struct ethhdr *eth;
->>> +
->>> +	bpf_dynptr_from_skb(ctx, 0, &data);
->>> +	eth = bpf_dynptr_slice_rdwr(&data, 0, NULL, sizeof(*eth));
->>
->> If this is bpf_dynptr_slice() instead of bpf_dynptr_slice_rdwr() and...
->>
->>> +	if (!eth)
->>> +		goto out;
->>> +	/* Ignore non-test packets */
->>> +	if (eth->h_proto != 0)
->>> +		goto out;
->>> +	/* Packet write to trigger unclone in prologue */
->>> +	eth->h_proto = 42;
->>
->> ... remove this eth->h_proto write.
->>
->> Then bpf_dynptr_write() will succeed. like,
->>
->>          bpf_dynptr_from_skb(ctx, 0, &data);
->>          eth = bpf_dynptr_slice(&data, 0, NULL, sizeof(*eth));
->> 	if (!eth)
->>                  goto out;
->>
->> 	/* Ignore non-test packets */
->>          if (eth->h_proto != 0)
->> 		goto out;
->>
->>          bpf_dynptr_from_skb_meta(ctx, 0, &meta);
->>          /* Expect write to fail because skb is a clone. */
->>          err = bpf_dynptr_write(&meta, 0, (void *)eth, sizeof(*eth), 0);
->>
->> The bpf_dynptr_write for a skb dynptr will do the pskb_expand_head(). The
->> skb_meta dynptr write is only a memmove. It probably can also do
->> pskb_expand_head() and change it to keep the data_meta.
->>
->> Another option is to set the DYNPTR_RDONLY_BIT in bpf_dynptr_from_skb_meta() for
->> a clone skb. This restriction can be removed in the future.
-> 
-> Ah, crap. Forgot that bpf_dynptr_write->bpf_skb_store_bytes calls
-> bpf_try_make_writable(skb) behind the scenes.
-> 
-> OK, so the head page copy for skb clone happens either in BPF prologue
-> or lazily inside bpf_dynptr_write() call today.
-> 
-> Best if I make it consistent for skb_meta from the start, no?
-> 
-> Happy to take a shot at tweaking pskb_expand_head() to keep the metadata
-> in tact, while at it.
+syzbot suspects this issue was fixed by commit:
 
-There is no write helper for the data_meta now. It must directly write to 
-skb->data_meta, so data_meta is a read-only for a clone now. I guess the current 
-use case is mostly for tc to read the data_meta immediately after the xdp prog 
-has added it (fwiw, it is how we tried to use it also), so it is usually not a 
-clone (?). Not even sure if it currently has a write use case considering, 1) 
-there is no bpf_"skb"_adjust_meta, and 2) the upper layer cannot use it.
+commit e4d2878369d590bf8455e3678a644e503172eafa
+Author: David Howells <dhowells@redhat.com>
+Date:   Thu Jul 17 07:43:41 2025 +0000
 
-No strong opinion to either copy the metadata on a clone or set the dynptr 
-rdonly for a clone. I am ok with either way.
+    rxrpc: Fix irq-disabled in local_bh_enable()
 
-A brain dump:
-On one hand, it is hard to comment without visibility on how will it look like 
-when data_meta can be preserved in the future, e.g. what may be the overhead but 
-there is flags in bpf_dynptr_from_skb_meta and bpf_dynptr_write, so there is 
-some flexibility. On the other hand, having a copy will be less surprise on the 
-clone skb like what we have discovered in this and the earlier email thread but 
-I suspect there is actually no write use case on the skb data_meta now.
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=11a4c1a2580000
+start commit:   d7b8f8e20813 Linux 6.16-rc5
+git tree:       upstream
+kernel config:  https://syzkaller.appspot.com/x/.config?x=f6cfc97245100778
+dashboard link: https://syzkaller.appspot.com/bug?extid=97bf275720e06ad75f63
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1532c28c580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=148f9582580000
 
+If the result looks correct, please mark the issue as fixed by replying with:
+
+#syz fix: rxrpc: Fix irq-disabled in local_bh_enable()
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
