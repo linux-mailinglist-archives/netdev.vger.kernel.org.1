@@ -1,192 +1,166 @@
-Return-Path: <netdev+bounces-212266-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212267-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF66CB1EE1A
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 19:58:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBB18B1EE26
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 20:03:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5AA0B7A3F9C
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 17:56:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8ACB55A3C75
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 18:03:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08598287269;
-	Fri,  8 Aug 2025 17:57:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E273A1DE8A4;
+	Fri,  8 Aug 2025 18:03:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="St1vQHwS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NA+6lfXh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DF9227FB37
-	for <netdev@vger.kernel.org>; Fri,  8 Aug 2025 17:57:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C2721DA3D;
+	Fri,  8 Aug 2025 18:03:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754675876; cv=none; b=hEqE8Rv3zXy7edLIHIwxwquFLLnjbFEZNyLpUYb2aPGmULdf0dJyFzmq0Fc36bOMzwFSfRris3V3jD8Li1ltSaPKF4BQxSIxAo79kQaMTTsqH8o2OKFkdCdtOVVeYmUlmEAWX9tG0W02W+iG2jjuNa2Aw/3+rsBU+Rs8hk3e4Vk=
+	t=1754676206; cv=none; b=IGtZx46XZ7MOZPbui4S1RYW8Tn5pNgZba5a79Wrux0uj3HleSF5e8UXPREY6jV0c8tTCWAGSVCx5AO5W+GDwqh95zxaPjFPhz+cPchxF3rCY0mjL6MNEjvGS5CAcPSpOWk1htlQtJqZrSxaOZ9uGT9gLuY/pRTj+XZYL5T26jZw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754675876; c=relaxed/simple;
-	bh=qWqV/cCg9Bg1mfVGpZAit/gBF2fPmoGWUXgNrlU0GJ0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lAQGMDGO1CPUzYe7dg+0vzewDojh09Qr4EY4HKqt5ljVSloVTdxRqos5L18tis+68wSaGOT5G8A66WHNWtLZxP2JJGxs4e/CZVyLs8LkxDfHtzKur5NQ4lfE4ZNBEBxgSNcnIKXARLopC8BjOaE2/ecTMJZAxg9rWwTPFp90I3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=St1vQHwS; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-55ba0f2f081so644e87.1
-        for <netdev@vger.kernel.org>; Fri, 08 Aug 2025 10:57:54 -0700 (PDT)
+	s=arc-20240116; t=1754676206; c=relaxed/simple;
+	bh=jquBVnZjCw255TTTcDjpqQS3Zd2zougjDfYAO2Kqa4s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LyQfR6A38Lrq78K1KyPlDOFqoOq18w1zhky9ppNBH79tFl6sS2zbrYxHbsDSp6j3GKbKJoQkB2FIFybQFEyByqmJm0JgvHFiIxPNs+UoiVbT2x92vZf0jIBQd1O+OXyf2rn5sDbnB4AGd58hpu750EmInL0EyZdLgD9xELML3+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NA+6lfXh; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-76bdc73f363so2410528b3a.3;
+        Fri, 08 Aug 2025 11:03:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754675873; x=1755280673; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qXaRHIxKHmo+v71n2kAA1c+fGSZPzmAH7E7N7+TC49Y=;
-        b=St1vQHwSpEJFml8S7syE1ghc0Sor/AD1X6fqA8Ktsv0Hb+w6/x6xwxJ1Pfw+Ff3LhI
-         ima7XrIYaCbxJj16dKHZN8orlCbpsIGtTCdwC3V1/AIHsRwX2BCk7WMRfbX2/1ytJUUd
-         K+kasc43yKrlW9/r7vkA6LmNd8o2dUCpFxSDEQ0Nlm4Akf3YLl9dAtXE8sz+6BwLmu1D
-         +LDQKHh35cIKXAU2fmt3CWe/enuNIrIrnaf8+SFL/rPs/4qX8DcSL21E3050RdhCi1h0
-         zo36FvmlSErKpiAOKCyKbZ9YcQwVSMR4zkDdmiWLoxIpOdKHQIsshyIYEUPfys1PyKnz
-         LT5Q==
+        d=gmail.com; s=20230601; t=1754676205; x=1755281005; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=bdpbMeYSMpsMt1914y/TUI6RCSE8LWRE4aRT+cIx/ic=;
+        b=NA+6lfXhps6200YcmpgjXqI32+Oace2R2xUnYSkq9q4VhNhTNWb9PEwAKAnwPa+WGS
+         rZvt0FsIXnnUDzVf2hqsMzbt60bD11EtACRbGrTBp1PohdHhXtTUbvHPQx2st4PM6kV+
+         BKxKXuOuH8YUJuzBVAcxTlo291c34X65r15WBVpnpTJGEfj2fb+mE6ZdRR/ej2XIkbwp
+         G1vPW1joqoeZXHt5gasCxvPhvoBs1+gQIiL/Hh+HlAp9I9h4KfDH7fheobKWZz4dc8r+
+         7hTndt7GJrIJwBci8wMqNS9014W3ZhwXqO8I2Ew/9t58baUsx4Hi9ddMQ4TAcm2biN/r
+         lhuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754675873; x=1755280673;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qXaRHIxKHmo+v71n2kAA1c+fGSZPzmAH7E7N7+TC49Y=;
-        b=hBURAqTa9DVV9d/vYtnQur106ERy3vby08wxRxlZobjheGmtFi8gkAwg9Ff4mvAVUO
-         bPrrGCHn6qqt3IH555hRYxv2ReL+G2gm5zBjjivpnTyvhB0XQtRCTi15YazETAfmbU2Y
-         pSGdi6m1a/RNEhy+gU09IVf1qSyZgJICYVxV1PbmC/TI/sp6BTVcn3TTtQY/W3tb/kuf
-         YKBXOuUqofHXFMkKGqzWxS32Vtj2LsuzEEGoc12VtI6488HQO8bI0cu35DhGI4E4cDZr
-         kSVbgMlh1i6Cm8XiKVM2zRwc/tqzcFtK399WLpV21NY9izG6AAgweaDhLt91LVe5cFO/
-         GPzg==
-X-Forwarded-Encrypted: i=1; AJvYcCWdIo030KLlR81XOwf38v64GLKcAP2t0nvTQy+ehnxqhsqUflgLqGcVDp5SfUEkVX77WtBewsg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy7gG86eIyp1v3OKVOjjYl4McWxraluUmJbF0Vcx14QEZrDgu4i
-	uhhuxXn1O95s3fX/4RBKuHgyYfdq03WPydWF8adQ1TXXhCacATRkMreWDL3mGgV9jx8oQrJs/Ty
-	yuiDlgmQvWqT69c+F6ZRnudzDayoG0NOdqvGvB6Ji
-X-Gm-Gg: ASbGncvyN1SUze7kQDjvlk0jHjQi0ry9Tr/mJMIVhBKZTFCF1xgaEtl2nCRDcrgRBcx
-	cgr6eprT4kyKMedNapwwRqqVMwUiqIpXZ02qB6wpGYfuwrS09dKsSDf/Q+FIUu6fuxHydbHFoCU
-	bS/dDEhwTUHz629PDA6ktxvaePzCkikDC5vFEJ/u5F34bXfXhyfXLM/oYNDc3PjBu4EGNW3wFYS
-	HrQ/eFKc0ZBV9LpbSzULq6ywlRDW+yTkNg=
-X-Google-Smtp-Source: AGHT+IHH/Bdfwpdrye1XnlPV3h9HpFB1/06JHSyWIEdcjNIJ0rmEv5ndWkpAOlHZcLVkI6FjX6YHe5vd+NN3G3A6EIU=
-X-Received: by 2002:a05:6512:3683:b0:55b:5e26:ed7b with SMTP id
- 2adb3069b0e04-55cc77c7fafmr13830e87.0.1754675872884; Fri, 08 Aug 2025
- 10:57:52 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1754676205; x=1755281005;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bdpbMeYSMpsMt1914y/TUI6RCSE8LWRE4aRT+cIx/ic=;
+        b=j11tA+pbGC7zmaJ+N/iNbxpf/+u6X9Rr54TDxfsn5vVLLs2l0q2X9anyw6l1pcEemk
+         1m7Yf6K+5p37aNqcC8k2WH0S0I5ZgJdy6F8SXJk7pWxNoeCzw88nr+uhXN38h3nl/qHn
+         t1yZeCF3+OmDz+JrdYK99Hyj0xBsWuYNzTMCeZYx4DuOfMukdxW+XVE3nzsw4FDis4mb
+         nE/Y82V2sglNKM9KpbSLjb8Q9YOwhDF+yZaeltNaOg+lf5G3FJp/UKiw12Hn2h8OkDHp
+         8FqaXYoBHjKfMfypJ7CtMFTjQGHLhFQA39FZ9Odog0NV3nXYqtzIXBswYCMWo6mzP/R/
+         JDlw==
+X-Forwarded-Encrypted: i=1; AJvYcCUVwBYygclPXSejW9MgU9RFnp2f6Yf32mLyHgytqYQYcNI3MYvSW4HbO2bHaHfcuozpr33AAOlmCyx4D2Y=@vger.kernel.org, AJvYcCWbUYHX3vWA0VFO3Hoa1AZWhJn+wHqRA86rcnva/qQvgibG19AzHRCb/oQTQgcPfloBAjsHvKGl@vger.kernel.org
+X-Gm-Message-State: AOJu0YyxZrBgZ2/t6mm/qqmD2afRvW3VSfk02l56ijRYMdxIAqXo2+Yp
+	WVm9NKwcP7e/7eW6IUvbzjcVvxXdYCMcASIPIrqLJAU9PSGG0h0ykSU=
+X-Gm-Gg: ASbGncs8ixvCC2WZRGANjPHKhe4710T8QN05GRzJdgbVPgO20TXNYzALJ+8x3qiH9G1
+	Q7S5J8CQViwuPHbZMDlxVti4RqQncRpUdvJtjH3TD1PDx3cFsMc0Gx0+Li7at90Zfd7TDhMlHvk
+	tAiEEhHpnuN2OpAq/8NCfK1KARE6KlXgFKfuVBLcrOW/aP1QxsZuHrXiHA4KPC4fevRLpFT9IWE
+	EFFNdQkrrPSLdXMVmU0SxbidJPFNx6n9M7Ta3HY15HP/QnpctlZ3PRpd7eSX2qDz5nXo71+mQ3y
+	bPYl6NFA9UneBqOD3/jsvWdqm83e/G7zovhCJ/u+ZunQO4n5g21ylK+FlRDCxZJBu/2ho89P/i+
+	rDDAlVjPfN16r0sUUWhAgRlzSUPyChbSErAaHJq1EAB7xMUt2MbgUp5omzzU=
+X-Google-Smtp-Source: AGHT+IHwRCSZIVwRHSDexCtbMuOZq1L8Uj0GNw8FVAMbiq1XD+XdtS2qexDakcJP0OcpbKwfqsrQ5w==
+X-Received: by 2002:a05:6a20:94c7:b0:23d:f987:b033 with SMTP id adf61e73a8af0-24055230871mr6512250637.40.1754676204462;
+        Fri, 08 Aug 2025 11:03:24 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-76be2f2a4c2sm17968735b3a.110.2025.08.08.11.03.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Aug 2025 11:03:24 -0700 (PDT)
+Date: Fri, 8 Aug 2025 11:03:23 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Paolo Abeni <pabeni@redhat.com>, andrew+netdev@lunn.ch,
+	horms@kernel.org, davem@davemloft.net, sdf@fomichev.me,
+	almasrymina@google.com, dw@davidwei.uk, michael.chan@broadcom.com,
+	dtatulea@nvidia.com, ap420073@gmail.com,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC v2 17/24] eth: bnxt: adjust the fill level of agg queues
+ with larger buffers
+Message-ID: <aJY767C6oiezskdM@mini-arch>
+References: <cover.1754657711.git.asml.silence@gmail.com>
+ <0a4a4b58fa469dffea76535411c188429138cc81.1754657711.git.asml.silence@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <2869548.1754658999@warthog.procyon.org.uk>
-In-Reply-To: <2869548.1754658999@warthog.procyon.org.uk>
-From: Mina Almasry <almasrymina@google.com>
-Date: Fri, 8 Aug 2025 10:57:40 -0700
-X-Gm-Features: Ac12FXxXcgcstidfh2aNH0PAqgqSvM--1mzTOrN4RVQkgf4ePB5KwUufWkqhH1w
-Message-ID: <CAHS8izN89j9deyODUjxQroKrLoiAq1kF+RVowuvVecmg4tNAUg@mail.gmail.com>
-Subject: Re: Network filesystems and netmem
-To: David Howells <dhowells@redhat.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>
-Cc: willy@infradead.org, hch@infradead.org, Jakub Kicinski <kuba@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, Byungchul Park <byungchul@sk.com>, netfs@lists.linux.dev, 
-	netdev@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <0a4a4b58fa469dffea76535411c188429138cc81.1754657711.git.asml.silence@gmail.com>
 
-On Fri, Aug 8, 2025 at 6:16=E2=80=AFAM David Howells <dhowells@redhat.com> =
-wrote:
->
-> Hi Mina,
->
-> Apologies for not keeping up with the stuff I proposed, but I had to go a=
-nd do
-> a load of bugfixing.  Anyway, that gave me time to think about the netmem
-> allocator and how *that* may be something network filesystems can make us=
-e of.
-> I particularly like the way it can do DMA/IOMMU mapping in bulk (at least=
-, if
-> I understand it aright).
->
+On 08/08, Pavel Begunkov wrote:
+> From: Jakub Kicinski <kuba@kernel.org>
+> 
+> The driver tries to provision more agg buffers than header buffers
+> since multiple agg segments can reuse the same header. The calculation
+> / heuristic tries to provide enough pages for 65k of data for each header
+> (or 4 frags per header if the result is too big). This calculation is
+> currently global to the adapter. If we increase the buffer sizes 8x
+> we don't want 8x the amount of memory sitting on the rings.
+> Luckily we don't have to fill the rings completely, adjust
+> the fill level dynamically in case particular queue has buffers
+> larger than the global size.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> [pavel: rebase on top of agg_size_fac, assert agg_size_fac]
+> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+> ---
+>  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 27 +++++++++++++++++++----
+>  1 file changed, 23 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> index 40cfc48cd439..a00c2a829b6b 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> @@ -3805,16 +3805,33 @@ static void bnxt_free_rx_rings(struct bnxt *bp)
+>  	}
+>  }
+>  
+> +static int bnxt_rx_agg_ring_fill_level(struct bnxt *bp,
+> +				       struct bnxt_rx_ring_info *rxr)
+> +{
+> +	/* User may have chosen larger than default rx_page_size,
+> +	 * we keep the ring sizes uniform and also want uniform amount
+> +	 * of bytes consumed per ring, so cap how much of the rings we fill.
+> +	 */
+> +	int fill_level = bp->rx_agg_ring_size;
+> +
+> +	if (rxr->rx_page_size > bp->rx_page_size)
+> +		fill_level /= rxr->rx_page_size / bp->rx_page_size;
+> +
+> +	return fill_level;
+> +}
+> +
+>  static int bnxt_alloc_rx_page_pool(struct bnxt *bp,
+>  				   struct bnxt_rx_ring_info *rxr,
+>  				   int numa_node)
+>  {
+> -	const unsigned int agg_size_fac = PAGE_SIZE / BNXT_RX_PAGE_SIZE;
+> +	const unsigned int agg_size_fac = rxr->rx_page_size / BNXT_RX_PAGE_SIZE;
+>  	const unsigned int rx_size_fac = PAGE_SIZE / SZ_4K;
+>  	struct page_pool_params pp = { 0 };
+>  	struct page_pool *pool;
+>  
+> -	pp.pool_size = bp->rx_agg_ring_size / agg_size_fac;
 
-What are you referring to as the netmem allocator? Is it the page_pool
-in net/core/page_pool.c? That one can indeed alloc in bulk via
-alloc_pages_bulk_node, but then just loops over them to do DMA mapping
-individually. It does allow you to fragment a piece of dma-mapped
-memory via page_pool_fragment_netmem though. Probably that's what
-you're referring to.
+[..]
 
-I have had an ambition to reuse the netmem_ref infra we recently
-developed to upgrade the page_pool such that it actually allocs a
-hugepage and maps it once and reuses shards of that chunk, but never
-got around to implementing that.
+> +	WARN_ON_ONCE(agg_size_fac == 0);
 
-> So what I'm thinking of is changing the network filesystems - at least th=
-e
-> ones I can - from using kmalloc() to allocate memory for protocol fragmen=
-ts to
-> using the netmem allocator.  However, I think this might need to be
-> parameterisable by:
->
->  (1) The socket.  We might want to group allocations relating to the same
->      socket or destined to route through the same NIC together.
->
->  (2) The destination address.  Again, we might need to group by NIC.  For=
- TCP
->      sockets, this likely doesn't matter as a connected TCP socket alread=
-y
->      knows this, but for a UDP socket, you can set that in sendmsg() (and
->      indeed AF_RXRPC does just that).
->
+nit: do we need to make this if (WARN_ON_ONCE(...)) agg_size_fac = 1?
+Otherwise you're gonna divide by zero on the next line. Or properly
+return some EINVAL instead?
 
-the page_pool model groups memory by NIC (struct netdev), not socket
-or destination address. It may be feasible to extend it to be
-per-socket, but I don't immediately understand what that entails
-exactly. The page_pool uses the netdev for dma-mapping, i'm not sure
-what it would use the socket or destination address for (unless it's
-to grab the netdev :P).
-
->  (3) The lifetime.  On a crude level, I would provide a hint flag that
->      indicates whether it may be retained for some time (e.g. rxrpc DATA
->      packets or TCP data) or whether the data is something we aren't goin=
-g to
->      retain (e.g. rxrpc ACK packets) as we might want to group these
->      differently.
->
-
-Today the page_pool doesn't really care how long you hold onto the mem
-allocated from it. It kinda has to, because the mem goes to different
-sockets ,and some of these sockets are used by applications that will
-read the memory and free it immediately, and some sockets may not be
-read for a while (or leaked from the userspace entirely - eek). AFAIU
-the page_pool lets you hold onto any mem you
-
-> So what I'm thinking of is creating a net core API that looks something l=
-ike:
->
->         #define NETMEM_HINT_UNRETAINED 0x1
->         void *netmem_alloc(struct socket *sock, size_t len, unsigned int =
-hints);
->         void *netmem_free(void *mem);
->
-> though I'm tempted to make it:
->
->         int netmem_alloc(struct socket *sock, size_t len, unsigned int hi=
-nts,
->                          struct bio_vec *bv);
->         void netmem_free(struct bio_vec *bv);
->
-> to accommodate Christoph's plans for the future of bio_vec.
->
-
-Honestly the subject of whether to extend the page_pool or implement a
-new allocator kinda comes up every once in a while.
-
-The key issue is that the page_pool has quite strict benchmarks for
-how fast it does recycling, see
-tools/testing/selftests/net/bench/page_pool/. Changes that don't
-introduce overhead to the fast-path could be accomodated, I think. I
-don't know how the maintainers are going to feel about extending its
-uses even further. It took a bit of convincing to get the zerocopy
-memory provider stuff in as-is :D
-
---=20
-Thanks,
-Mina
+> +
+> +	pp.pool_size = bnxt_rx_agg_ring_fill_level(bp, rxr) / agg_size_fac;
 
