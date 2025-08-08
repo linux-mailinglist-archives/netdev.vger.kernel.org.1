@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-212247-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212250-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F158B1ED64
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 18:54:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EC0CB1ED6F
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 18:55:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0076A4E22C4
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 16:54:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 162A7A01341
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 16:55:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DB8528A1C9;
-	Fri,  8 Aug 2025 16:52:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72D3228B41E;
+	Fri,  8 Aug 2025 16:52:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="JFXo40aE"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="gOnnceHO"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38F33288C24;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D19E289358;
 	Fri,  8 Aug 2025 16:52:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754671973; cv=none; b=n4Q6fx0ln7Y5kHIqGwP77/DO+sZhA2biMsUWluJVWC7unPSZmTHusz12FKXlvx2SBKJRtNxsasja+tDwfU9SuAKOkFtz1feaiIS6clTKZZkeIWKay3aBxubfooqIZjlbzTxZNm5Sr8EQ4/VqyYRqKl30lOXoTw7+9jEr8cPod2A=
+	t=1754671974; cv=none; b=stES+wBI62z+BsfH760B+a6XKyM1YAXIopcx7LMW637Jq6QeCvPWN+bsgGBETAUIOgSK0AeGcu4vMQzB/XtWaYuUm4lsnro791N24pLLLpufl+cQhozx/j/Xo0EfUTlrdZEVkcglDRPT1TgQFHYaVXr9zHIp9KK08h5unI7CBuM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754671973; c=relaxed/simple;
-	bh=le0o8Po8o3p/FfIcM1xv4e5RDq5L76dYGm0o7046dqw=;
+	s=arc-20240116; t=1754671974; c=relaxed/simple;
+	bh=wWxw1zqOxfhTMJBCsJ80BVvUh99lXkWx9aE9ViPsbXw=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=qS+zs1tdteYrvq5VxMy5mdERzsaqFltW7pdZetHFiZFZSJQJtw0Ib1ravVvFCD8OIbZA/VTiYxxTCXEU7c6QYAekkbZlBm0pW98IEjWj0R4iSMZqQXz09jp1757q5oTSrZ7yPQQ4VuRLUrWxGvhQkBrW0/DeaFw7WNfQ1hpV9fM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=JFXo40aE; arc=none smtp.client-ip=217.70.183.198
+	 In-Reply-To:To:Cc; b=GkgsvJprTDBk9YEvurR+0/K+VWJGbYvmbmbWJ/1AoAZjajv6UozdO9kYmWVMCQaymjVM40WY/IqLSPyisu0idi1y7OjAn9EQCEIIaecA4w5E4K5Sux/e8PFoAryAYAoMzB985yJ4yq9xLxFsvboobp3SjEJQrHvHRnB7+agD8bQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=gOnnceHO; arc=none smtp.client-ip=217.70.183.198
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id D9A2C442E8;
-	Fri,  8 Aug 2025 16:52:48 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id BD0EA442D2;
+	Fri,  8 Aug 2025 16:52:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1754671969;
+	t=1754671970;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=5d6u3uGQg1DubNdLsV6kUMwGavnwdweMuDIdc8xPzpw=;
-	b=JFXo40aEkmEFogvwyM3bsfcaV0e+ggfHijQZd+jN/WvbfwpxSjFIT86R667JLD4J/qJI3E
-	0IYP2Nwz2OFkaOoZK7TdfRkqWQeT906jtNjEA4pZVyWEI7AmocrjaYAI3Fo3t8hMgAsrY0
-	veryE9zcwpgb7ZCIGd5A6t2kOL6z81CXAGM36hRSL57Bkp2AmDMBivtUQMMmPD8T/EnVc4
-	XaVVzL7M51Dr2Pkw0MMenk5IIXq9CGXl6TQAUkksmGgzXbPsgfJNWIl1z6wZOIFhFlFwMt
-	a++Dn2ayqHIVHeQ2rbOW1ANTxPSv9rAVTvFBh66o93LiY8aTpULDPswcu8Z7LA==
+	bh=cmWKJ8h4sXPk9KSRKagb3SBVcXspmrZ21Rgq9zHnLW8=;
+	b=gOnnceHOVC+Q9sPVIqXvNcxZb9yVZcjCSoUGqtw+V12nyMQG9QiKhRki1Mo6431LmFTcIp
+	uhINEMBDMovqESLkoMsmy1EyOEiU0vTfJuDgoNcid9cOPB9Typg6iFE3AU93sc1Dsk04VR
+	s7rBGyZtu2A7Y10vUyBBocVnUrg5tm49RTsSDjIRcBAl3p3ZjFd7TbQoPea7NZg7Ue4fiK
+	NNiiuq9EjP4LX2oS2t6l2EZ9VMOPA4PxevsbXxW8nn3tS/+vaEpUh9Y4jfSxvZ63IoWki8
+	RSGMukDX5SMYSo1+pWiHhm3GLLaRGEW0JZHcO9Yiu4uKaixpvvifA/3jN18pQw==
 From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-Date: Fri, 08 Aug 2025 18:52:44 +0200
-Subject: [PATCH net v3 12/16] net: macb: simplify macb_dma_desc_get_size()
+Date: Fri, 08 Aug 2025 18:52:45 +0200
+Subject: [PATCH net v3 13/16] net: macb: simplify macb_adj_dma_desc_idx()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,7 +56,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-Id: <20250808-macb-fixes-v3-12-08f1fcb5179f@bootlin.com>
+Message-Id: <20250808-macb-fixes-v3-13-08f1fcb5179f@bootlin.com>
 References: <20250808-macb-fixes-v3-0-08f1fcb5179f@bootlin.com>
 In-Reply-To: <20250808-macb-fixes-v3-0-08f1fcb5179f@bootlin.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -82,60 +82,53 @@ X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdduvdegfeegucetufdoteggode
  hdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegtlhgruhguihhurdgsvgiinhgvrgesthhugihonhdruggvvhdprhgtphhtthhopehrohgshheskhgvrhhnvghlrdhorhhg
 X-GND-Sasl: theo.lebrun@bootlin.com
 
-macb_dma_desc_get_size() does a switch on bp->hw_dma_cap and covers all
-four cases: 0, 64B, PTP, 64B+PTP. It also covers the #ifndef
-MACB_EXT_DESC separately, making it four codepaths.
+The function body uses a switch statement on bp->hw_dma_cap and handles
+its four possible values: 0, is_64b, is_ptp, is_64b && is_ptp.
 
-Instead, notice the descriptor size grows with enabled features and use
-plain if-statements on 64B and PTP flags.
+Instead, refactor by noticing that the return value is:
+	desc_size * MULT
+with MULT equal to 3 if is_64b && is_ptp,
+                   2 if is_64b || is_ptp,
+                   1 otherwise.
+
+MULT can be expressed as:
+	1 + is_64b + is_ptp
 
 Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
 ---
- drivers/net/ethernet/cadence/macb_main.c | 29 ++++++++---------------------
- 1 file changed, 8 insertions(+), 21 deletions(-)
+ drivers/net/ethernet/cadence/macb_main.c | 18 ++++++------------
+ 1 file changed, 6 insertions(+), 12 deletions(-)
 
 diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index 52270b20d9a1818c961525ae6de6f7d0557ddc54..dfa6b6d2cfedc8d240f55a04f2ada9fa28c55309 100644
+index dfa6b6d2cfedc8d240f55a04f2ada9fa28c55309..e3cf62253bb96ff245e49730dd4c4b232ce89712 100644
 --- a/drivers/net/ethernet/cadence/macb_main.c
 +++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -120,29 +120,16 @@ struct sifive_fu540_macb_mgmt {
-  */
- static unsigned int macb_dma_desc_get_size(struct macb *bp)
+@@ -135,19 +135,13 @@ static unsigned int macb_dma_desc_get_size(struct macb *bp)
+ static unsigned int macb_adj_dma_desc_idx(struct macb *bp, unsigned int desc_idx)
  {
--#ifdef MACB_EXT_DESC
--	unsigned int desc_size;
-+	unsigned int desc_size = sizeof(struct macb_dma_desc);
- 
+ #ifdef MACB_EXT_DESC
 -	switch (bp->hw_dma_cap) {
 -	case HW_DMA_CAP_64B:
--		desc_size = sizeof(struct macb_dma_desc)
--			+ sizeof(struct macb_dma_desc_64);
--		break;
 -	case HW_DMA_CAP_PTP:
--		desc_size = sizeof(struct macb_dma_desc)
--			+ sizeof(struct macb_dma_desc_ptp);
+-		desc_idx <<= 1;
 -		break;
 -	case HW_DMA_CAP_64B_PTP:
--		desc_size = sizeof(struct macb_dma_desc)
--			+ sizeof(struct macb_dma_desc_64)
--			+ sizeof(struct macb_dma_desc_ptp);
+-		desc_idx *= 3;
 -		break;
 -	default:
--		desc_size = sizeof(struct macb_dma_desc);
+-		break;
 -	}
--	return desc_size;
-+#ifdef MACB_EXT_DESC
-+	if (bp->hw_dma_cap & HW_DMA_CAP_64B)
-+		desc_size += sizeof(struct macb_dma_desc_64);
-+	if (bp->hw_dma_cap & HW_DMA_CAP_PTP)
-+		desc_size += sizeof(struct macb_dma_desc_ptp);
- #endif
--	return sizeof(struct macb_dma_desc);
+-#endif
++	bool is_ptp = bp->hw_dma_cap & HW_DMA_CAP_PTP;
++	bool is_64b = bp->hw_dma_cap & HW_DMA_CAP_64B;
 +
-+	return desc_size;
++	return desc_idx * (1 + is_64b + is_ptp);
++#else
+ 	return desc_idx;
++#endif
  }
  
- static unsigned int macb_adj_dma_desc_idx(struct macb *bp, unsigned int desc_idx)
+ #ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
 
 -- 
 2.50.1
