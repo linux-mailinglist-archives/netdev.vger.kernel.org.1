@@ -1,179 +1,106 @@
-Return-Path: <netdev+bounces-212269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FEC8B1EE44
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 20:15:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 857CCB1EE50
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 20:20:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AC03A7ACD03
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 18:13:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 560191AA2FC3
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 18:20:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C883A1F3D58;
-	Fri,  8 Aug 2025 18:15:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5539421FF23;
+	Fri,  8 Aug 2025 18:19:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="gVINE/2k"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cfC27LuA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 996992874ED
-	for <netdev@vger.kernel.org>; Fri,  8 Aug 2025 18:15:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B57B218EBF;
+	Fri,  8 Aug 2025 18:19:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754676922; cv=none; b=k8fkuDHbeI6bdL6tUXTs0fPKrl2tGL21i9BJzBUiodTmbZWfxFFtqJDGMlW620XM7we/qVxHt/TE7YO0fgnmBfuopkuujXRVBzaa6w+TliVyTkXBpEsO9xHKcnyrNP+71RjBVdTLaAKuq43NeqVKZpdgE5qnZjLJi8zJIvXIYLE=
+	t=1754677195; cv=none; b=cbq7QgfYUWOVW03Kv0bPpcatsiaizOlDgbyuyxaNDcW8i+VD37/aQuCUyNaCuOjv+ZZHQOC6rRKHj9kMFDu3J9HRW4vKMAFWB8UxJTFO9+GAnj0qgWfsovVd8X7mB9xPv4skyl9sGX5VbuqXzQ2fjLYrPZlxlAsFsZoWQMsJu+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754676922; c=relaxed/simple;
-	bh=dtgFsQfsqHLSElf0tnmUkTGDukphrFReGLAS1nSXGMs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=sl61bcEgoltjZqxB9cIDd8ZZDmyiS1kD4NKhZP2LdH1JXR456SNy/9BFGBgYW/aX/qnK1tPhOK6c3oKaYJ8wLPOp+tp8AZ3xoOlwjLqEN+fhHGqTVqFfu71tBCDQ4ONZdHGlF3ebvOHg35Xf1Bu/0FvsBXOFn/UWUV8MYHLwKkc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=gVINE/2k; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-769a21bd4d5so2556312b3a.0
-        for <netdev@vger.kernel.org>; Fri, 08 Aug 2025 11:15:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1754676920; x=1755281720; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ZWFrX7PGj/MT0Wa+tYjds3jRVLsOgCIYmkrjuoBOkpA=;
-        b=gVINE/2k5L7EdZRRCvu4JPK/sAfeYzMLp8/VJFmZ6sJdFdZywR41BF0SxBK3ZkyquF
-         rGw7US4EUP0kIhQsWm29MxeKI/O8RE0UArZgMIjpaUOD3BU7/4lKTQA1Y2SIUx3L3F+K
-         xn82g+7C8tClcJNudNTtsLjoDO+Z/MwPxSI2Ex3WCdai5CXrF6gFyfXvlImIU+ojNcCV
-         jBK7sePIFn66GtJPqt4X93O2Lnsj1sLoTjt8u02kMEgCo/5Xp2suBi+xFXAPYBhxo4hr
-         HgHQ2Oxz0nqYRXJrir8RIbrMiHATXNnt4khgkye3iQjlX6d5q7jxI+pGt402mYx79Xdl
-         l/mQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754676920; x=1755281720;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZWFrX7PGj/MT0Wa+tYjds3jRVLsOgCIYmkrjuoBOkpA=;
-        b=alD+kwBb4cKwCwzWeTDfqaHcfwyMUemtCnIcMNMGdnChlGVu8aQieOZdE4WWs7zXIr
-         sVYqEmVxJJjMP7SFpsgP5jICXOBVB5cXI6PhAtZaTmV/1kUsiIkn+rb24GjlSZPxDfCj
-         ofdSPVQFG1vT3bKAgTxgv+jCxm6jswSUwPC9mgj13Ag5G+pCpv3J3TsmqbK8j9ITfu69
-         TPffA+9uuPSjduHZj75KUcc9CwcT/0Xn/m0A48xn53Um9+6zyQmWdUG38OCl8Cp9CYpx
-         CadtmHwEaK+3jyYjPYo8G8vrJPEl+uQ36Pbsn3HVbU8ZkO38Q8xxtFWqLK7tilLKzivI
-         9kog==
-X-Forwarded-Encrypted: i=1; AJvYcCVzsRztrWeVTGFU0kjbwPE1JL94zyvx4OcjC7DZECtp1s9LkNYi4izGojFHQcpfhNBL0YQMGGg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyXOZ5vpy5cWBAttRzfjyd1DigUn3tyZ/35jCetYeJfuiJivUlm
-	NxmBiEJL0s0KpWfAO0frVGxfg8k4eZlth1/7BQ/HvitGXq2YG6Hlgv4UgDHqKZll7w==
-X-Gm-Gg: ASbGncvUnBlg8kUfo3O0+jxMTuzdW3SFsitxQdKE/4/i3XhUCqm3hpzjal4UBuCNYzB
-	OFaWE1JoQrnebvAvbr1gJ0JMOgQ/OKnbI/nSd16Oui0b9kWl0U9fsQ8FUfydhB7GGwJIyIV9T3Y
-	t1qS5Y0dDX5qqCCzy8O+O1jOaPaxsh1E4E4Jr6b1EHIS0EeY4gCeF+gnSe5/nzgjVCerHQgZohQ
-	noaOFiZfLZf2xriBfGYoZD6bgmzEyiGcAnz/8rZi1oVuQCMdZvQF8zmE/y9bKpYBVJF7siKgTEZ
-	1NfC+OVwsE/VQuC/2G8gE+fhRzeIWxqsXCuTpvWNJYJVtwBaNP0u2wHUJqg69rmIxysZJ/BYGXi
-	XUEKa5Fo5WAvAoQlsZkIc3uzINY0h0o1mma60Wpe3KP/WjbXSyK620Ma1xaztPvBvtd7RczQuPU
-	Xxvak=
-X-Google-Smtp-Source: AGHT+IGpIqGI9hF4AtTbAsvIIyY9OVWXoxx+vMnJys5sRfp/rIbF7CE2izpb8IzwSk2YK89wF/ghuQ==
-X-Received: by 2002:a05:6a21:33a8:b0:240:d14:c7e3 with SMTP id adf61e73a8af0-24055133697mr6492361637.24.1754676919541;
-        Fri, 08 Aug 2025 11:15:19 -0700 (PDT)
-Received: from ?IPV6:2804:7f1:e2c3:a11c:ddd8:43e3:ca5c:f6ea? ([2804:7f1:e2c3:a11c:ddd8:43e3:ca5c:f6ea])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-76bd733580fsm19679104b3a.7.2025.08.08.11.15.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 Aug 2025 11:15:19 -0700 (PDT)
-Message-ID: <8d76538b-678f-4a98-9308-d7209b5ebee9@mojatatu.com>
-Date: Fri, 8 Aug 2025 15:15:13 -0300
+	s=arc-20240116; t=1754677195; c=relaxed/simple;
+	bh=pNRpBCH+11HQ62i/eKnNGeatXPFMO65FgC7hQ2/stmY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=fpExLQ2JDfcnD6ahPBgkNwkJ0T/PA5HPTQatdi3yU/En704C0jhfnxSLwvXiB3Xd/AKMRVnVoy6ZfJiqHhCx6NqjBjHiBNaVzWOKD634vk8wUMxNNLpJySO4Uih9jEGz/svprUiPwQPzsbpHftkFbrJRnCCUrc5jwgU1ke9lRl0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cfC27LuA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B819FC4CEED;
+	Fri,  8 Aug 2025 18:19:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754677194;
+	bh=pNRpBCH+11HQ62i/eKnNGeatXPFMO65FgC7hQ2/stmY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=cfC27LuAz0KUY9df/QNZP1cLBaplvql/KXs8Bko0GWC5z16sUHy1ct987GJuwjhJx
+	 qKl3pXuJhsLpyZ/PKmsJPteOlsLARbo3OKkwyz8tDX4XmVvYG8MPoG+5CKkc4ku9Nl
+	 Dzd7BvIrIKKoqJahwgP0mcQr5QUnaITAQ762czNLss+WU1wwd0litj4d8pIFhNaHKb
+	 b4jSPTvNc0aWrMb1/r6XxzgLkRVaLoD1gf265SzZOqrq+b/uMMLFSxiMjSFos318Ed
+	 6nxFqMYcfbIbRwKVszbHNIJXIR3XH5KkwvGBpLRKtvRTfanPrq/Ft3VAk72c6zFBLd
+	 h7cRLB+07ILeg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3435D383BF5A;
+	Fri,  8 Aug 2025 18:20:09 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/sched: ets: use old 'nbands' while purging unused
- classes
-To: Davide Caratti <dcaratti@redhat.com>, Jamal Hadi Salim
- <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
- Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Lion Ackermann <nnamrec@gmail.com>, Petr Machata <petrm@mellanox.com>,
- netdev@vger.kernel.org, Ivan Vecera <ivecera@redhat.com>,
- Li Shuang <shuali@redhat.com>
-References: <f3b9bacc73145f265c19ab80785933da5b7cbdec.1754581577.git.dcaratti@redhat.com>
-Content-Language: en-US
-From: Victor Nogueira <victor@mojatatu.com>
-In-Reply-To: <f3b9bacc73145f265c19ab80785933da5b7cbdec.1754581577.git.dcaratti@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v12 iproute2-next 0/3] DUALPI2 iproute2 patch
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175467720800.225370.4571833137902033089.git-patchwork-notify@kernel.org>
+Date: Fri, 08 Aug 2025 18:20:08 +0000
+References: <20250804122019.57829-1-chia-yu.chang@nokia-bell-labs.com>
+In-Reply-To: <20250804122019.57829-1-chia-yu.chang@nokia-bell-labs.com>
+To: Chia-Yu Chang (Nokia) <chia-yu.chang@nokia-bell-labs.com>
+Cc: dsahern@kernel.org, alok.a.tiwari@oracle.com, donald.hunter@gmail.com,
+ xandfury@gmail.com, netdev@vger.kernel.org, dave.taht@gmail.com,
+ pabeni@redhat.com, jhs@mojatatu.com, kuba@kernel.org,
+ stephen@networkplumber.org, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+ davem@davemloft.net, edumazet@google.com, horms@kernel.org,
+ andrew+netdev@lunn.ch, ast@fiberby.net, liuhangbin@gmail.com,
+ shuah@kernel.org, linux-kselftest@vger.kernel.org, ij@kernel.org,
+ ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
+ g.white@cablelabs.com, ingemar.s.johansson@ericsson.com,
+ mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
+ Jason_Livingood@comcast.com, vidhi_goel@apple.com
 
-On 8/7/25 12:48, Davide Caratti wrote:
-> Shuang reported sch_ets test-case [1] crashing in ets_class_qlen_notify()
-> after recent changes from Lion [2]. The problem is: in ets_qdisc_change()
-> we purge unused DWRR queues; the value of 'q->nbands' is the new one, and
-> the cleanup should be done with the old one. The problem is here since my
-> first attempts to fix ets_qdisc_change(), but it surfaced again after the
-> recent qdisc len accounting fixes. Fix it purging idle DWRR queues before
-> assigning a new value of 'q->nbands', so that all purge operations find a
-> consistent configuration:
-> 
->   - old 'q->nbands' because it's needed by ets_class_find()
->   - old 'q->nstrict' because it's needed by ets_class_is_strict()
-> 
->   BUG: kernel NULL pointer dereference, address: 0000000000000000
->   #PF: supervisor read access in kernel mode
->   #PF: error_code(0x0000) - not-present page
->   PGD 0 P4D 0
->   Oops: Oops: 0000 [#1] SMP NOPTI
->   CPU: 62 UID: 0 PID: 39457 Comm: tc Kdump: loaded Not tainted 6.12.0-116.el10.x86_64 #1 PREEMPT(voluntary)
->   Hardware name: Dell Inc. PowerEdge R640/06DKY5, BIOS 2.12.2 07/09/2021
->   RIP: 0010:__list_del_entry_valid_or_report+0x4/0x80
->   Code: ff 4c 39 c7 0f 84 39 19 8e ff b8 01 00 00 00 c3 cc cc cc cc 66 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa <48> 8b 17 48 8b 4f 08 48 85 d2 0f 84 56 19 8e ff 48 85 c9 0f 84 ab
->   RSP: 0018:ffffba186009f400 EFLAGS: 00010202
->   RAX: 00000000000000d6 RBX: 0000000000000000 RCX: 0000000000000004
->   RDX: ffff9f0fa29b69c0 RSI: 0000000000000000 RDI: 0000000000000000
->   RBP: ffffffffc12c2400 R08: 0000000000000008 R09: 0000000000000004
->   R10: ffffffffffffffff R11: 0000000000000004 R12: 0000000000000000
->   R13: ffff9f0f8cfe0000 R14: 0000000000100005 R15: 0000000000000000
->   FS:  00007f2154f37480(0000) GS:ffff9f269c1c0000(0000) knlGS:0000000000000000
->   CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->   CR2: 0000000000000000 CR3: 00000001530be001 CR4: 00000000007726f0
->   DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
->   DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
->   PKRU: 55555554
->   Call Trace:
->    <TASK>
->    ets_class_qlen_notify+0x65/0x90 [sch_ets]
->    qdisc_tree_reduce_backlog+0x74/0x110
->    ets_qdisc_change+0x630/0xa40 [sch_ets]
->    __tc_modify_qdisc.constprop.0+0x216/0x7f0
->    tc_modify_qdisc+0x7c/0x120
->    rtnetlink_rcv_msg+0x145/0x3f0
->    netlink_rcv_skb+0x53/0x100
->    netlink_unicast+0x245/0x390
->    netlink_sendmsg+0x21b/0x470
->    ____sys_sendmsg+0x39d/0x3d0
->    ___sys_sendmsg+0x9a/0xe0
->    __sys_sendmsg+0x7a/0xd0
->    do_syscall_64+0x7d/0x160
->    entry_SYSCALL_64_after_hwframe+0x76/0x7e
->   RIP: 0033:0x7f2155114084
->   Code: 89 02 b8 ff ff ff ff eb bb 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 f3 0f 1e fa 80 3d 25 f0 0c 00 00 74 13 b8 2e 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 54 c3 0f 1f 00 48 83 ec 28 89 54 24 1c 48 89
->   RSP: 002b:00007fff1fd7a988 EFLAGS: 00000202 ORIG_RAX: 000000000000002e
->   RAX: ffffffffffffffda RBX: 0000560ec063e5e0 RCX: 00007f2155114084
->   RDX: 0000000000000000 RSI: 00007fff1fd7a9f0 RDI: 0000000000000003
->   RBP: 00007fff1fd7aa60 R08: 0000000000000010 R09: 000000000000003f
->   R10: 0000560ee9b3a010 R11: 0000000000000202 R12: 00007fff1fd7aae0
->   R13: 000000006891ccde R14: 0000560ec063e5e0 R15: 00007fff1fd7aad0
->    </TASK>
-> 
->   [1] https://lore.kernel.org/netdev/e08c7f4a6882f260011909a868311c6e9b54f3e4.1639153474.git.dcaratti@redhat.com/
->   [2] https://lore.kernel.org/netdev/d912cbd7-193b-4269-9857-525bee8bbb6a@gmail.com/
-> 
-> Fixes: 103406b38c60 ("net/sched: Always pass notifications when child class becomes empty")
-> Fixes: c062f2a0b04d ("net/sched: sch_ets: don't remove idle classes from the round-robin list")
-> Fixes: dcc68b4d8084 ("net: sch_ets: Add a new Qdisc")
-> Reported-by: Li Shuang <shuali@redhat.com>
-> Closes: https://issues.redhat.com/browse/RHEL-108026
-> Co-developed-by: Ivan Vecera <ivecera@redhat.com>
-> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
-> Signed-off-by: Davide Caratti <dcaratti@redhat.com>
+Hello:
 
-Can you submit a tdc test case for this bug?
+This series was applied to iproute2/iproute2.git (main)
+by Stephen Hemminger <stephen@networkplumber.org>:
 
-cheers,
-Victor
+On Mon,  4 Aug 2025 14:20:16 +0200 you wrote:
+> From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+> 
+> Hello,
+> 
+> Please find DUALPI2 iproute2 patch v12.
+> 
+> For more details of DualPI2, please refer IETF RFC9332
+> (https://datatracker.ietf.org/doc/html/rfc9332).
+> 
+> [...]
+
+Here is the summary with links:
+  - [v12,iproute2-next,1/3] Move get_float() from ip/iplink_can.c to lib/utils.c
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=86527787f1fb
+  - [v12,iproute2-next,2/3] Add get_float_min_max() in lib/utils.c
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=3dfc7dad0a6a
+  - [v12,iproute2-next,3/3] tc: add dualpi2 scheduler module
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=0ad8fef32236
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
