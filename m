@@ -1,202 +1,119 @@
-Return-Path: <netdev+bounces-212162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212164-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B1FEB1E7FA
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 14:06:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E651AB1E808
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 14:11:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C0A01886A98
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 12:06:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DCF9718C8681
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 12:11:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 125AD273D76;
-	Fri,  8 Aug 2025 12:06:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48EBD275B17;
+	Fri,  8 Aug 2025 12:11:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="ARApjKpk"
+	dkim=pass (2048-bit key) header.d=machnikowski.net header.i=maciek@machnikowski.net header.b="dZZfc0PL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sender4-of-o52.zoho.com (sender4-of-o52.zoho.com [136.143.188.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A12A2367B6
-	for <netdev@vger.kernel.org>; Fri,  8 Aug 2025 12:06:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754654792; cv=none; b=alStC7BwTMkIY8u7BU/MubqZ7N3Ts64ePBrP3H4fHrlrDxvqZw+i86NMToz2eZfR99UBXjvhTq4M/9AEyvMAKQw6iYv+BcAJFeLquayGNerImhiGPKiZ9fnYozm2LhmSKhjqXMKVajX521JjUFiP3i2w1ZsEl9Iieay7BcgCUYw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754654792; c=relaxed/simple;
-	bh=9iX/2zD8IZ81LXy32+nDxaJNS7D8NeL+z01yIP2uNfE=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=UQWsm8rGPOimDuyWRiLA5cL625tedqAJrM8UAthXfFwyfNhzzl86fUYfTSgosv3DtQU3t230cAvnYGsY1nyJeunrD6WQ9SWl55PJTDBaZcbmvD6A0o2tIZcq8OUVrndRdcSD0K80xme1op4O8lzHCqU6b0GtwqGQ+pMp8JXw3KE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=ARApjKpk; arc=none smtp.client-ip=209.85.128.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-718389fb988so21497827b3.1
-        for <netdev@vger.kernel.org>; Fri, 08 Aug 2025 05:06:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1754654789; x=1755259589; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xvaZlLzP+vvkpSEZHVakEZfieqU9bOniFnZQL558zxE=;
-        b=ARApjKpk/BfeNWfxCUKe6CNbimLSMGJsnDdkQKKoQKJtyR4Ht0UYoN8JaEAMgJVqXy
-         STo9yfAHibHWLaTQE60Y5tuBpLfhKAoM0QzE+4ejXBukMLuBCTJfdSNJ3Z7ephPvZUjX
-         3Zqug9aKgcESYNy7lmN0huhINAmDg851KntOHrf7QuuNxinsWUwfG8EQ+5JwJNuG8Rzu
-         cskG0vGLK5uTpMy5GT0zr+c+U/DdSdenocgHwOMacfEslZublcjMdD/5GSUj8rD0bu/l
-         YxTtXui0Uc5VggMzL0WTFeoMNg4fYAb/XaAiAm7IyEqQsXjfWbNToXCA0rK4uFPvthXa
-         Od9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754654789; x=1755259589;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xvaZlLzP+vvkpSEZHVakEZfieqU9bOniFnZQL558zxE=;
-        b=cf2iBehQO0wtqwOeHYC+BrouU+xle1bh6kExwOBqDuSzhAG7UN94Iwveuxzqv+Teah
-         FJKGB1aNvcjWj/++sPKud6HecIQv81aqKCj30v7/Ij0GIBBgPlV8FhnHXAxlN8I4pGJK
-         QBUJDhw34MI/wxDSlFzDSo9j7z0OcgbtjYttgIIEJiXLT0aS7FrcjadSrymjqFHY4GVj
-         2MkbzWWNUu88mzd4oXnjI75urDn1iD6Ge9u17BmaiO1caeP04OIrvtOQp1LFSSNOKF4S
-         svvL07yW8ZF3ns33trJe9uVEMB299W/okdd+8vtf+CwRqzZSuJApmyy9c7ErrLF9GnD6
-         JzUA==
-X-Gm-Message-State: AOJu0YyaTFsCnM67Cyn6g06sd2rIvrBRkhn6Fu3CCpOAK5Ph/DisKIxN
-	lgqrTRVfD1QMvwVddzat62KDjLicLMYdG2S0q9/dFLhkXHFv7FBQwRcrNk6Ffpk+L0k=
-X-Gm-Gg: ASbGncu+tCl9+5EWjZdoG10QCk54s+tfjoex/N1tfAgP9SjvIFwPo80ukj/mjgU3tkX
-	XUXoEgqrtoAfo1p1+o9noqPSAhfvz9H2U8vMjgIPN5U01vLySrujaQtcJ2U3rQP8Wd+FVfC/+tz
-	MZPn7/DsRZVMkAH2o7LEkodHkbopTRklmK5eJLgW+Oh1KScKwyjQxoX1xPRIg08PihsSrnn3k/o
-	fzJhMcE0HBioaOC4sR1yIuY7wxWEHVnsmsKnbErMkz6g7uYZidri1KQjA/9JXciN5qsAD9QitkJ
-	a1fcHtHBoZRNUUx5iRoBB7JQZjs69SMK7x4GDcFcxx+oJP9RiMTR3QZWv8gqg2pyhkszzvUZiUS
-	aaJUR0KhbOR+FCis=
-X-Google-Smtp-Source: AGHT+IEsUP0CS551X+aKkksDkIKHQ4zufnsa8wtb1RB/2n6bAhz7yIvoRZ3309/Nr/g85HA80vOuKQ==
-X-Received: by 2002:a05:690c:6488:b0:70e:2d30:43d6 with SMTP id 00721157ae682-71bf0ef4141mr32331187b3.38.1754654789185;
-        Fri, 08 Aug 2025 05:06:29 -0700 (PDT)
-Received: from cloudflare.com ([2a09:bac5:5063:2432::39b:9d])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-71bf6c00033sm2275197b3.17.2025.08.08.05.06.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Aug 2025 05:06:28 -0700 (PDT)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org,  "David S. Miller" <davem@davemloft.net>,  Jakub
- Kicinski <kuba@kernel.org>,  Kuniyuki Iwashima <kuniyu@google.com>,  Neal
- Cardwell <ncardwell@google.com>,  Paolo Abeni <pabeni@redhat.com>,
-  kernel-team@cloudflare.com,  Lee Valentine <lvalentine@cloudflare.com>
-Subject: Re: [PATCH RFC net-next 1/2] tcp: Update bind bucket state on port
- release
-In-Reply-To: <CANn89iJd1Wsc552rYjSQSKXMZ92PmU0NczJp+Y-0n07Njaoc8A@mail.gmail.com>
-	(Eric Dumazet's message of "Fri, 8 Aug 2025 04:43:57 -0700")
-References: <20250808-update-bind-bucket-state-on-unhash-v1-0-faf85099d61b@cloudflare.com>
-	<20250808-update-bind-bucket-state-on-unhash-v1-1-faf85099d61b@cloudflare.com>
-	<CANn89iJd1Wsc552rYjSQSKXMZ92PmU0NczJp+Y-0n07Njaoc8A@mail.gmail.com>
-Date: Fri, 08 Aug 2025 14:06:25 +0200
-Message-ID: <87cy9681by.fsf@cloudflare.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 910EB275B0D
+	for <netdev@vger.kernel.org>; Fri,  8 Aug 2025 12:11:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.52
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1754655079; cv=pass; b=URoeNcvoJrdtTLH8bDNFVppezhtxrSkeN9qomCDDiFKsNhuvHcbblLWO4v5M2+K/bgsNIzvZ18/lJR3RHio6iAFTJ2HnqU13/DfcNcgQXA8YMzgB1XUwPpn0ajnSgX8rMzR6GV83pPL3fcufAe9wBq4DyquAN2EKWX72t+nq7po=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1754655079; c=relaxed/simple;
+	bh=kFNdj7zsofbq4xqsJGF+WhNPUU6uRG3Ad84WahwFgYk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BMetLDU64TGUbj2/gy+Vgs4QtXo+9hVGfnHIVvq8jL2Wqva+BzMrhag7phIsVE3RLa6nzrmyBVND4XT8Jxd9cimWs4FP7VcPENeI1/UeO5ghOFKOrvM15/WN3a6l3JMJ2K9lI22REmjnXyd61W1Lke85iG1wvpXeOVOnbdMUSro=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=machnikowski.net; spf=pass smtp.mailfrom=machnikowski.net; dkim=pass (2048-bit key) header.d=machnikowski.net header.i=maciek@machnikowski.net header.b=dZZfc0PL; arc=pass smtp.client-ip=136.143.188.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=machnikowski.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=machnikowski.net
+ARC-Seal: i=1; a=rsa-sha256; t=1754655027; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=Q3d+nrl3B1mHKjEuK6JqO+MrcLeYXLHzGAgpN1yv6E64JnVgoMx0Xl4INfybZAZyU8KAZMRjsEVKVhVTeXYrbADvS0foLUm8mHh+GNk76YUQmRIN2qD7nhuZu7Y6YJxe1rmYJkK0uE/6C2wabM86UvqO7JqHSRun27PKTGB2qjw=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1754655027; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=fURTIr4AGdhw8D8qa3WbrFc09ZmCpIV3CYwifJ9V2sE=; 
+	b=WIe0jWueD/fKI1qO0f/R7n3ODDmyA8KYIa7L2M3S877RRzIOkKdOVdcdxxY8msAMkibnT4VedyeRdKjW37yQ18sY+DfL9GMoqt05z5hyVYCBthMOg8T4W4Jio2cjswvO6F8V5VwOHDrbULgDbAtWMv4ZxlHxCER1QasXdE7heFs=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=machnikowski.net;
+	spf=pass  smtp.mailfrom=maciek@machnikowski.net;
+	dmarc=pass header.from=<maciek@machnikowski.net>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1754655027;
+	s=zoho; d=machnikowski.net; i=maciek@machnikowski.net;
+	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=fURTIr4AGdhw8D8qa3WbrFc09ZmCpIV3CYwifJ9V2sE=;
+	b=dZZfc0PLr3/XOd0EjAMyo12vGlKqLRh62saTF9ZjPPK5/4Puo2plM8eZpyUpe2bx
+	x7vgY5GNms2vvWMQl7gwodpD2WWZdvvKqTUFZWuuo1P7Id52TIBXhpiQJOZq6butvb4
+	kTztgwhI14zmEZ9J4Ct2XB3KglBJiz9xvjauhLfQppJ5yMjjcCg/FBZy+CduN4cc5pZ
+	KdrAbXsVzi3Vt4kumxc5wzUtz9jZaH/F5pHqi9QQJodmI4x6Tm564G8YYHrYoVzPnJs
+	suH0GxD6IXjmDIbd13CSuNX46vqWwFQUDPcQQx6azzrkV5rJZgjXHipIwV21xIX5yWw
+	SAECTnpQIQ==
+Received: by mx.zohomail.com with SMTPS id 1754655024162304.97716570204375;
+	Fri, 8 Aug 2025 05:10:24 -0700 (PDT)
+Message-ID: <bd1d44bf-1014-4df8-94bb-a8acba000883@machnikowski.net>
+Date: Fri, 8 Aug 2025 14:10:19 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH net-next] ptp: Introduce
+ PTP_SYS_OFFSET_EXTENDED_TRUSTED ioctl
+To: Richard Cochran <richardcochran@gmail.com>,
+ David Woodhouse <dwmw2@infradead.org>
+Cc: David Arinzon <darinzon@amazon.com>, David Miller <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, "Woodhouse, David" <dwmw@amazon.com>,
+ Andrew Lunn <andrew@lunn.ch>, Miroslav Lichvar <mlichvar@redhat.com>,
+ Thomas Gleixner <tglx@linutronix.de>, netdev@vger.kernel.org,
+ "Machulsky, Zorik" <zorik@amazon.com>,
+ "Matushevsky, Alexander" <matua@amazon.com>, Saeed Bshara
+ <saeedb@amazon.com>, "Wilson, Matt" <msw@amazon.com>,
+ "Liguori, Anthony" <aliguori@amazon.com>, "Bshara, Nafea"
+ <nafea@amazon.com>, "Schmeilin, Evgeny" <evgenys@amazon.com>,
+ "Belgazal, Netanel" <netanel@amazon.com>, "Saidi, Ali"
+ <alisaidi@amazon.com>, "Herrenschmidt, Benjamin" <benh@amazon.com>,
+ "Kiyanovski, Arthur" <akiyano@amazon.com>, "Dagan, Noam"
+ <ndagan@amazon.com>, "Bernstein, Amit" <amitbern@amazon.com>,
+ "Ostrovsky, Evgeny" <evostrov@amazon.com>, "Tabachnik, Ofir"
+ <ofirt@amazon.com>, Julien Ridoux <ridouxj@amazon.com>,
+ Josh Levinson <joshlev@amazon.com>
+References: <20250724115657.150-1-darinzon@amazon.com>
+ <aIMDc8JC4prOmpLQ@hoboy.vegasvil.org>
+ <3f722a52642dc42ad8d5e23ab06c14050d7bf8a6.camel@infradead.org>
+ <aIhGJ9BzR1wY7ij_@hoboy.vegasvil.org>
+Content-Language: en-US
+From: Maciek Machnikowski <maciek@machnikowski.net>
+In-Reply-To: <aIhGJ9BzR1wY7ij_@hoboy.vegasvil.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ZohoMailClient: External
 
-On Fri, Aug 08, 2025 at 04:43 AM -07, Eric Dumazet wrote:
-> On Fri, Aug 8, 2025 at 2:10=E2=80=AFAM Jakub Sitnicki <jakub@cloudflare.c=
-om> wrote:
+On 7/29/2025 5:55 AM, Richard Cochran wrote:
+> On Fri, Jul 25, 2025 at 11:25:24AM +0200, David Woodhouse wrote:
+>> The vmclock enlightenment also exposes the same information.
 >>
->> Currently, when an inet_bind_bucket enters a state where fastreuse >=3D =
-0 or
->> fastreuseport >=3D 0, after a socket explicitly binds to a port, it stay=
-s in
->> that state until all associated sockets are removed and the bucket is
->> destroyed.
->>
->> In this state, the bucket is skipped during ephemeral port selection in
->> connect(). For applications using a small ephemeral port range (via
->> IP_LOCAL_PORT_RANGE option), this can lead to quicker port exhaustion
->> because "blocked" buckets remain excluded from reuse.
->>
->> The reason for not updating the bucket state on port release is unclear.=
- It
->> may have been a performance trade-off to avoid scanning bucket owners, or
->> simply an oversight.
->>
->> Address it by recalculating the bind bucket state when a socket releases=
- a
->> port. To minimize overhead, use a divide-and-conquer strategy: duplicate
->> the (fastreuse, fastreuseport) state in each inet_bind2_bucket. On port
->> release, we only need to scan the relevant port-addr bucket, and the
->> overall port bucket state can be derived from those.
->>
->> Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
->> ---
->>  include/net/inet_connection_sock.h |  5 +++--
->>  include/net/inet_hashtables.h      |  2 ++
->>  include/net/inet_sock.h            |  2 ++
->>  include/net/inet_timewait_sock.h   |  3 ++-
->>  include/net/tcp.h                  | 12 ++++++++++++
->>  net/ipv4/inet_connection_sock.c    | 12 ++++++++----
->>  net/ipv4/inet_hashtables.c         | 31 ++++++++++++++++++++++++++++++-
->>  net/ipv4/inet_timewait_sock.c      |  1 +
->>  8 files changed, 60 insertions(+), 8 deletions(-)
->>
->> diff --git a/include/net/inet_connection_sock.h b/include/net/inet_conne=
-ction_sock.h
->> index 1735db332aab..072347f16483 100644
->> --- a/include/net/inet_connection_sock.h
->> +++ b/include/net/inet_connection_sock.h
->> @@ -322,8 +322,9 @@ int inet_csk_listen_start(struct sock *sk);
->>  void inet_csk_listen_stop(struct sock *sk);
->>
->>  /* update the fast reuse flag when adding a socket */
->> -void inet_csk_update_fastreuse(struct inet_bind_bucket *tb,
->> -                              struct sock *sk);
->> +void inet_csk_update_fastreuse(const struct sock *sk,
->> +                              struct inet_bind_bucket *tb,
->> +                              struct inet_bind2_bucket *tb2);
->>
->>  struct dst_entry *inet_csk_update_pmtu(struct sock *sk, u32 mtu);
->>
->> diff --git a/include/net/inet_hashtables.h b/include/net/inet_hashtables=
-.h
->> index 19dbd9081d5a..d6676746dabf 100644
->> --- a/include/net/inet_hashtables.h
->> +++ b/include/net/inet_hashtables.h
->> @@ -108,6 +108,8 @@ struct inet_bind2_bucket {
->>         struct hlist_node       bhash_node;
->>         /* List of sockets hashed to this bucket */
->>         struct hlist_head       owners;
->> +       signed char             fastreuse;
->> +       signed char             fastreuseport;
->>  };
->>
->>  static inline struct net *ib_net(const struct inet_bind_bucket *ib)
->> diff --git a/include/net/inet_sock.h b/include/net/inet_sock.h
->> index 1086256549fa..73f1dbc1a04b 100644
->> --- a/include/net/inet_sock.h
->> +++ b/include/net/inet_sock.h
->> @@ -279,6 +279,8 @@ enum {
->>         INET_FLAGS_RTALERT_ISOLATE =3D 28,
->>         INET_FLAGS_SNDFLOW      =3D 29,
->>         INET_FLAGS_RTALERT      =3D 30,
->> +       /* socket bound to a port at connect() time */
->> +       INET_FLAGS_LAZY_BIND    =3D 31,
->
-> I am not a huge fan of this name. I think we already use something
-> like autobind.
+>> David, your RFC should probably have included that implementation
+>> shouldn't it? 
+> 
+> Yes, a patch series with the new ioctl and two drivers that implement
+> it would be more compelling.
+> 
+> Thanks,
+> Richard
+> 
+> 
+> 
+Wouldn't it be more useful if it came with the API to set these values?
+This way a clock could be controlled by ptp4l and the set the clock
+quality parameters and other apps could get it from there.
 
-Now that I think of it - it is just another autobind path. Will change.
-
-> I have not seen where you clear this bit, once it has been set, it
-> sticks forever ?
->
-> Perhaps add in the selftest something to call tcp_disconnect() :)
->
-> fd =3D socket()
-> connect(fd ...) // this sets the 'autobind' bit
-> connect(fd ... AF_UNSPEC ..)  // disconnects
-> // reuse fd
-> bind(fd, .... port=3DX)
-> connect(fd ...) // after this point 'autobind' should not be set.
-
-You're right. That's not handled correctly at all. The bit should be
-cleared on disconnect. Completely missed that scenario.
-
-Thanks for reviewing!
+Thanks,
+Maciek
 
