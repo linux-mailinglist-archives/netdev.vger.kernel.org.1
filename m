@@ -1,141 +1,103 @@
-Return-Path: <netdev+bounces-212135-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212136-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30EC5B1E3EA
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 09:53:42 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D38FEB1E4A5
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 10:48:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C23E4725B08
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 07:53:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A2ACC7B07FF
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 08:47:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F49424EABC;
-	Fri,  8 Aug 2025 07:53:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AC2C252900;
+	Fri,  8 Aug 2025 08:48:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="pA07gkxg";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="VhlU5wGj"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="AT7r8TR5"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96B032165E2;
-	Fri,  8 Aug 2025 07:53:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46D0614885D
+	for <netdev@vger.kernel.org>; Fri,  8 Aug 2025 08:48:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754639589; cv=none; b=feRrpc90X1so6reWKeAi1DAczIYtIvA1AFJED4G5RoGLZxCXFAKkT5w8BEec7nEECiN9f2VJmT06hY+9OUaULzpZw7miL0ar0ZhHN7SUal3x3JFusqqFMX5g6U0kz8mbVtLTSxIsn8+RzDS3ajMXfjzHWPcve1+yJf38215KmJw=
+	t=1754642911; cv=none; b=Kx3mpW24MBvCFjpfNeBVlrD4lpIJecgHIpr/G8vkb0r2G+p6KdLpZVuSuhDwY5JbaDr2A/RMFrE3f5oyy6sq/i2nK5DCsYHAGe6lz6XP6F77h/YPQwj9esvE+CQGjtW3fJxRpw9PuO6ShKxWVfebhWyaNaqP4+Czk6cN/9WbdVg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754639589; c=relaxed/simple;
-	bh=/7ClYfMiSxAa1wTucVb/CJkSZIYnrq/mU6F7bRSsfVg=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=SMiq0F/y71lGT7K35PsSxXV031x5LtVOSbcm1qx/3XZQLPXV4XAgkwWE4ygXJN5m6nBjCMUs+F5Rp1Yat/NTQkeZNFaopFP0EouX3C14AOS/ziVQDlU2uyG6MLU4n4j2T0HkEWzDCAnGtQgkoP2b77AWIDESaXI5tojHIigkhy8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=pA07gkxg; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=VhlU5wGj; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Nam Cao <namcao@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1754639585;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tgvQLFtkKGmmjE3l2Crv/yMEwEOMbKI3kuWlY+rtSxg=;
-	b=pA07gkxguS3KtmYy7DLtM3wOXtdxVrciLNp/FtkZahkbj6Kf7LF2NUuVKjMnnI+hqxPs7e
-	LewPqsAecVNYzcK3HOixoJVeBSWrhwMA6GrAkyYOs+9XI6QwpNHGFehO/ZAVteWr3IsRBt
-	zlfySEeLabBq8kgLjnRvwOKldUsyHI3lWAy+jaoadoYMXQJ4rYCyPFaKwBBdintNF8qMoG
-	SDhZ1MygrIkyTk8UG7FOFVzsKWHOxTAHwjF7PJSTQRbpbF9GuXyRob1Y76tNy88yojNa2h
-	8YmU4MH4jCJlQG8jUn5ZY7a8cmqCZhiaH+thf9ZRHHSeWBuXg+XUKxgSXTdsBA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1754639585;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tgvQLFtkKGmmjE3l2Crv/yMEwEOMbKI3kuWlY+rtSxg=;
-	b=VhlU5wGjtK/wzDzetlc9swBMxQ6cBYQO3ymCTc+Zh76HQkZDdEyYZS43X9ClrJyprKJicG
-	E6TwEJT4BCySPVDg==
-To: kernel test robot <oliver.sang@intel.com>, Gabriele Monaco
- <gmonaco@redhat.com>
-Cc: oe-lkp@lists.linux.dev, lkp@intel.com, linux-kernel@vger.kernel.org,
- Steven Rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>,
- Peter
- Zijlstra <peterz@infradead.org>, Masami Hiramatsu <mhiramat@kernel.org>,
- Tomas Glozar <tglozar@redhat.com>, Juri
- Lelli <jlelli@redhat.com>, Clark Williams <williams@redhat.com>, John Kacur
- <jkacur@redhat.com>, linux-trace-kernel@vger.kernel.org,
- aubrey.li@linux.intel.com, yu.c.chen@intel.com, oliver.sang@intel.com,
- Steen Hegelund <Steen.Hegelund@microchip.com>, Daniel Machon
- <daniel.machon@microchip.com>, UNGLinuxDriver@microchip.com, Andrew Lunn
- <andrew+netdev@lunn.ch>, David S. Miller <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, linux-arm-kernel@lists.infradead.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [linus:master] [sched]  adcc3bfa88:
- kunit.VCAP_API_DebugFS_Testsuite.vcap_api_show_admin_raw_test.fail
-In-Reply-To: <202508070739.4c6e0633-lkp@intel.com>
-References: <202508070739.4c6e0633-lkp@intel.com>
-Date: Fri, 08 Aug 2025 09:52:53 +0200
-Message-ID: <87a54ap7vu.fsf@yellow.woof>
+	s=arc-20240116; t=1754642911; c=relaxed/simple;
+	bh=Mz0PghuF+ANqwt35/zGA/RG4c1NSUB2AcWBXisKGPnc=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JBiv1V0svnT2Bye9w+Etm0Gq65iV6fjtxsjq0HvVgeYR8smXBB+8iGGO1btf26Lukmhyj2bGsP5/AFK4mAyh3gU3F+HXX8GBFWYnQsGe+KitZ64sCPQvzT0rVViVWz6NoZUCvepwM00EMCo/rjdqn1JmSKyx2mGQXbVcKZDWyCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=AT7r8TR5; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by mx1.secunet.com (Postfix) with ESMTP id 48E5B2087C;
+	Fri,  8 Aug 2025 10:48:20 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from mx1.secunet.com ([127.0.0.1])
+ by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 0PL2q1hjn-jx; Fri,  8 Aug 2025 10:48:19 +0200 (CEST)
+Received: from EXCH-01.secunet.de (unknown [10.32.0.231])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.secunet.com (Postfix) with ESMTPS id BFEAC2074F;
+	Fri,  8 Aug 2025 10:48:19 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com BFEAC2074F
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1754642899;
+	bh=W3qeK3IdHEozwDR7qfatYbHn4cCK1rEMt8rTSIcHzXI=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=AT7r8TR5HQvKDymQ6i1w0KTUU+1lmX0wNEQoXONBV7NDSWqknIeY7DjpOxS6FApZ2
+	 1s1NL+jr8h70UhiGIRUCRjrAA1oYzA8pWi3ABZBAU31NkHeSHENbGKWKH2/N5Df1Hf
+	 0h7Pa9a7c2Dm1eAMXWqHkZ/JP4q6KGgfhrDzcHo7qJBddr/t6ckxQOY0CW9BoiVdSt
+	 ZYVVQHMsyL8OpnW95AaNq6p6yN9zVcTRaZVkRxngTZGEXDx519EavpQ3LtNZaSa+bi
+	 6qswwZzyIOTF/zqEwfelfeMN2QeOoCzReucCZWPfNEC3k+vkN+qJn8qH2Djoe1X4x7
+	 rBSlzIWqsvVzg==
+Received: from gauss2.secunet.de (10.182.7.193) by EXCH-01.secunet.de
+ (10.32.0.171) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.1748.10; Fri, 8 Aug
+ 2025 10:48:19 +0200
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+	id D9AE63182B18; Fri,  8 Aug 2025 10:48:18 +0200 (CEST)
+Date: Fri, 8 Aug 2025 10:48:18 +0200
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Sabrina Dubroca <sd@queasysnail.net>
+CC: <netdev@vger.kernel.org>, David Ahern <dsahern@kernel.org>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, "David S. Miller"
+	<davem@davemloft.net>
+Subject: Re: [PATCH ipsec v2 0/3] xfrm: some fixes for GSO with SW crypto
+Message-ID: <aJW50reSmi-VBNCC@gauss3.secunet.de>
+References: <cover.1754297051.git.sd@queasysnail.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <cover.1754297051.git.sd@queasysnail.net>
+X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
+ EXCH-01.secunet.de (10.32.0.171)
 
+On Mon, Aug 04, 2025 at 11:26:24AM +0200, Sabrina Dubroca wrote:
+> This series fixes a few issues with GSO. Some recent patches made the
+> incorrect assumption that GSO is only used by offload. The first two
+> patches in this series restore the old behavior.
+> 
+> The final patch is in the UDP GSO code, but fixes an issue with IPsec
+> that is currently masked by the lack of GSO for SW crypto. With GSO,
+> VXLAN over IPsec doesn't get checksummed.
+> 
+> v2: only revert the unwanted changes from commit
+> d53dda291bbd ("xfrm: Remove unneeded device check from validate_xmit_xfrm")
+> 
+> Sabrina Dubroca (3):
+>   xfrm: restore GSO for SW crypto
+>   xfrm: bring back device check in validate_xmit_xfrm
+>   udp: also consider secpath when evaluating ipsec use for checksumming
 
-Cc: netdev folks
-
-I don't see any connection between the reported commit and the
-problem. This looks like the driver's problem.
-
-kernel test robot <oliver.sang@intel.com> writes:
-
-> Hello,
->
-> kernel test robot noticed "kunit.VCAP_API_DebugFS_Testsuite.vcap_api_show_admin_raw_test.fail" on:
->
-> commit: adcc3bfa8806761ac21aa271f78454113ec6936e ("sched: Adapt sched tracepoints for RV task model")
-> https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git master
->
-> [test failed on linus/master      6a68cec16b647791d448102376a7eec2820e874f]
-> [test failed on linux-next/master 84b92a499e7eca54ba1df6f6c6e01766025943f1]
->
-> in testcase: kunit
-> version: 
-> with following parameters:
->
-> 	group: group-03
->
->
->
-> config: x86_64-rhel-9.4-kunit
-> compiler: gcc-12
-> test machine: 8 threads 1 sockets Intel(R) Core(TM) i7-3770K CPU @ 3.50GHz (Ivy Bridge) with 16G memory
->
-> (please refer to attached dmesg/kmsg for entire log/backtrace)
->
->
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <oliver.sang@intel.com>
-> | Closes: https://lore.kernel.org/oe-lkp/202508070739.4c6e0633-lkp@intel.com
->
->
-> [   80.925851]     # vcap_api_show_admin_raw_test: EXPECTATION FAILED at drivers/net/ethernet/microchip/vcap/vcap_api_debugfs_kunit.c:377
->                    Expected test_expected == test_pr_buffer[0], but
->                        test_expected == "  addr: 786, X6 rule, keysets: VCAP_KFS_MAC_ETYPE
->                "
->                        test_pr_buffer[0] == ""
-> [   80.926182]     not ok 2 vcap_api_show_admin_raw_test
->
->
->
-> The kernel config and materials to reproduce are available at:
-> https://download.01.org/0day-ci/archive/20250807/202508070739.4c6e0633-lkp@intel.com
->
->
->
-> -- 
-> 0-DAY CI Kernel Test Service
-> https://github.com/intel/lkp-tests/wiki
+Series applied, thanks Sabrina!
 
