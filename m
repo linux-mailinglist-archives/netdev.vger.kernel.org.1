@@ -1,51 +1,52 @@
-Return-Path: <netdev+bounces-212141-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212142-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F5E4B1E5CE
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 11:44:34 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38047B1E5D4
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 11:44:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 02BC17A7078
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 09:43:02 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 226FF4E3F02
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 09:44:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2DCC26FA6A;
-	Fri,  8 Aug 2025 09:44:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0865C2737E4;
+	Fri,  8 Aug 2025 09:44:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b="lQkxiJ7G"
+	dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b="cj+huHdm"
 X-Original-To: netdev@vger.kernel.org
 Received: from layka.disroot.org (layka.disroot.org [178.21.23.139])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B333234964;
-	Fri,  8 Aug 2025 09:44:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D991327147A;
+	Fri,  8 Aug 2025 09:44:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.21.23.139
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754646261; cv=none; b=ha4WcImKcN5J79/JlP4sVobk5c5p4n2iU0GyISQQDbgIQKGiMfBILOb+yh9+wuweBWljBfjvOn/qJU652txoc+SWtukEp9sWvDkzDwHWdLoGW4XHZsfLAvV8zUjpvtAHMN3TjoIQQrRGCwKBWhqQNrPZO5rqjk6MqS3pT735GnI=
+	t=1754646267; cv=none; b=jtzXsRfyGVd3UAs+hwBd/Jp5eQdolzqPhuGG2XGWj6kFyPuDls9Xb6sXSYs0y4jt1j9p4cm/mq7XSMn9WZ/anvCmXYJ2kWG6tLrZViAOVzLklbURtQQN6vEoozSkV1su+JAMxahjPi1tGb1eQHskycxeSV9l7PBdkKsgk7T06/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754646261; c=relaxed/simple;
-	bh=6F4MMCjDeOJQTOBiI/kQboYeE8sVAqRfvejXM0WLAGY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=e8IjaOpjd4pPDhuh0DpPe3gdENFkkd60UE3dAgV9s7xmE01zF9c2WuayqXjuZ0NpFLu9r9dOK+18off28sI9rT3rrjA4X2NmyJComCs0BkKrMxp/0xoqrHUF2DHoVlLUoXA27tYiM5IDn+xuXdtAn+voFBH3eENE6FMl2zKfzL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org; spf=pass smtp.mailfrom=disroot.org; dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b=lQkxiJ7G; arc=none smtp.client-ip=178.21.23.139
+	s=arc-20240116; t=1754646267; c=relaxed/simple;
+	bh=bvjn31etsIDthI47vSBHLCji4m9GlQ5217Yq/HieC5o=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Oz+mYgBm7aGksmCQJ4Ipt4ZAR3ADyfu7rKJxc3QdnIQXoi/9XL60AwqGaB6pRanlVMavy00pi4blD+NVnpgH9w1NG72tz7mWocXvfsp1wTLeJg9zmqvzn1eyb9/7jV/5+Ng0LXxG+AUyEyam6nBkViWOt0aeWe18BoSqA6diQsI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org; spf=pass smtp.mailfrom=disroot.org; dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b=cj+huHdm; arc=none smtp.client-ip=178.21.23.139
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=disroot.org
 Received: from mail01.disroot.lan (localhost [127.0.0.1])
-	by disroot.org (Postfix) with ESMTP id DCCE225B19;
-	Fri,  8 Aug 2025 11:44:14 +0200 (CEST)
+	by disroot.org (Postfix) with ESMTP id ED81925B19;
+	Fri,  8 Aug 2025 11:44:23 +0200 (CEST)
 X-Virus-Scanned: SPAM Filter at disroot.org
 Received: from layka.disroot.org ([127.0.0.1])
  by localhost (disroot.org [127.0.0.1]) (amavis, port 10024) with ESMTP
- id v-OBsePsy6H5; Fri,  8 Aug 2025 11:44:13 +0200 (CEST)
+ id Lu_epiSKnSqX; Fri,  8 Aug 2025 11:44:23 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=disroot.org; s=mail;
-	t=1754646253; bh=6F4MMCjDeOJQTOBiI/kQboYeE8sVAqRfvejXM0WLAGY=;
-	h=From:To:Cc:Subject:Date;
-	b=lQkxiJ7GL8amk1iNsM0f1VFSXFUbtqeVC9w+I4T/U8Z+AFfrKQQje2rzWNzNiYEah
-	 nxgYnsfL6EiaBivK4JdDs0FiOeboMG2FDp6t86MwxqsovXsJje+BJuMKUugHhvLBfl
-	 0d41UVPpYU5Cgk5+P7H/0DYtCwUYXwUvhvg4WycX1uCqWT5SR9mYv5uhA/uDM6J05Q
-	 vkcMbk/7CxLjkn1A/GE71bEunM9BGStgv70g6R+Slb6uEVuTZDUe5WFQTdfg22YnBk
-	 Oj4YEgEAZ+0tbkLaChdnB8q8IvAPHei2yHp3glhPAS91hBxC3VLTZwl1OOUSrqjOpn
-	 tRyYcegkOWIbw==
+	t=1754646263; bh=bvjn31etsIDthI47vSBHLCji4m9GlQ5217Yq/HieC5o=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=cj+huHdmkhARCGiOcrZcGJSUuR3pusyK9Uv8Xv/zJgYFvsJoIyX4vxFogismahLxZ
+	 18uyN6wFHzItDLknPaabQMd4cl9ag/m/eeR48DG9Gu+WhwnrvRplJsGGAArwI9Npjb
+	 0+VpHXImP1Qaq7dW/bsd6VsjumQjcBHhlyiZOtwx3PxGyG8I0ebAasxbH8KHZNkJLs
+	 T4pEL37ABg4guftpTvAfVJpFAGwdiph0Bs1aQ/z6BhkoCI41DfwDP6XSJsjOiC1wEl
+	 Uw8d6o3WghJ4/DzlO8FbPa24twqdlbbHjJQ1yHqsQ38eJZyZvOR4ePo525tR0JE6Op
+	 mIkpuGoHaaWzw==
 From: Yao Zi <ziyao@disroot.org>
 To: Drew Fustini <fustini@kernel.org>,
 	Guo Ren <guoren@kernel.org>,
@@ -68,10 +69,13 @@ Cc: linux-riscv@lists.infradead.org,
 	netdev@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Yao Zi <ziyao@disroot.org>
-Subject: [PATCH net v3 0/3] Fix broken link with TH1520 GMAC when linkspeed changes
-Date: Fri,  8 Aug 2025 09:36:53 +0000
-Message-ID: <20250808093655.48074-2-ziyao@disroot.org>
+	Yao Zi <ziyao@disroot.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: [PATCH net v3 1/3] dt-bindings: net: thead,th1520-gmac: Describe APB interface clock
+Date: Fri,  8 Aug 2025 09:36:54 +0000
+Message-ID: <20250808093655.48074-3-ziyao@disroot.org>
+In-Reply-To: <20250808093655.48074-2-ziyao@disroot.org>
+References: <20250808093655.48074-2-ziyao@disroot.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,52 +84,47 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-It's noted that on TH1520 SoC, the GMAC's link becomes broken after
-the link speed is changed (for example, running ethtool -s eth0 speed
-100 on the peer when negotiated to 1Gbps), but the GMAC could function
-normally if the speed is brought back to the initial.
+Besides ones for GMAC core and peripheral registers, the TH1520 GMAC
+requires one more clock for configuring APB glue registers. Describe
+it in the binding.
 
-Just like many other SoCs utilizing STMMAC IP, we need to adjust the TX
-clock supplying TH1520's GMAC through some SoC-specific glue registers
-when linkspeed changes. But it's found that after the full kernel
-startup, reading from them results in garbage and writing to them makes
-no effect, which is the cause of broken link.
+Fixes: f920ce04c399 ("dt-bindings: net: Add T-HEAD dwmac support")
+Signed-off-by: Yao Zi <ziyao@disroot.org>
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Reviewed-by: Drew Fustini <fustini@kernel.org>
+---
+ .../devicetree/bindings/net/thead,th1520-gmac.yaml          | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-Further testing shows perisys-apb4-hclk must be ungated for normal
-access to Th1520 GMAC APB glue registers, which is neither described in
-dt-binding nor acquired by the driver.
-
-This series expands the dt-binding of TH1520's GMAC to allow an extra
-"APB glue registers interface clock", instructs the driver to acquire
-and enable the clock, and finally supplies CLK_PERISYS_APB4_HCLK for
-TH1520's GMACs in SoC devicetree.
-
-Changed from v2
-- dt-binding: Drop the Tested-by tag
-- driver
-  - Improve the commit message to mention the dt-compatibility problem
-  - Add a comment about the dt-compatibility problem
-  - Emit a warning when failed to get APB clock
-  - Stop using the optional clock-getting API since it doesn't help much
-    when we need to handle the missing case.
-- Collect review tags
-- Link to v2: https://lore.kernel.org/netdev/20250801091240.46114-1-ziyao@disroot.org/
-
-Changed from v1
-- Make apb clock essential in dt-binding
-- Collect review tags
-- Link to v1: https://lore.kernel.org/all/20250729093734.40132-1-ziyao@disroot.org/
-
-Yao Zi (3):
-  dt-bindings: net: thead,th1520-gmac: Describe APB interface clock
-  net: stmmac: thead: Get and enable APB clock on initialization
-  riscv: dts: thead: Add APB clocks for TH1520 GMACs
-
- .../devicetree/bindings/net/thead,th1520-gmac.yaml |  6 ++++--
- arch/riscv/boot/dts/thead/th1520.dtsi              | 10 ++++++----
- drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c  | 14 ++++++++++++++
- 3 files changed, 24 insertions(+), 6 deletions(-)
-
+diff --git a/Documentation/devicetree/bindings/net/thead,th1520-gmac.yaml b/Documentation/devicetree/bindings/net/thead,th1520-gmac.yaml
+index 6d9de3303762..b3492a9aa4ef 100644
+--- a/Documentation/devicetree/bindings/net/thead,th1520-gmac.yaml
++++ b/Documentation/devicetree/bindings/net/thead,th1520-gmac.yaml
+@@ -62,11 +62,13 @@ properties:
+     items:
+       - description: GMAC main clock
+       - description: Peripheral registers interface clock
++      - description: APB glue registers interface clock
+ 
+   clock-names:
+     items:
+       - const: stmmaceth
+       - const: pclk
++      - const: apb
+ 
+   interrupts:
+     items:
+@@ -88,8 +90,8 @@ examples:
+         compatible = "thead,th1520-gmac", "snps,dwmac-3.70a";
+         reg = <0xe7070000 0x2000>, <0xec003000 0x1000>;
+         reg-names = "dwmac", "apb";
+-        clocks = <&clk 1>, <&clk 2>;
+-        clock-names = "stmmaceth", "pclk";
++        clocks = <&clk 1>, <&clk 2>, <&clk 3>;
++        clock-names = "stmmaceth", "pclk", "apb";
+         interrupts = <66>;
+         interrupt-names = "macirq";
+         phy-mode = "rgmii-id";
 -- 
 2.50.1
 
