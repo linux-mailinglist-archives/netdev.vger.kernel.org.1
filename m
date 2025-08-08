@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-212249-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212248-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE550B1ED6B
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 18:55:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BAE2B1ED70
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 18:55:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF21662182D
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 16:55:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F82D18813FB
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 16:55:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34B4728A738;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05F3828A70C;
 	Fri,  8 Aug 2025 16:52:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="kq8UM5hH"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="gHzNnLdN"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CE06288511;
-	Fri,  8 Aug 2025 16:52:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BD66288C3A;
+	Fri,  8 Aug 2025 16:52:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754671974; cv=none; b=b8ztjobzOznPGaChifuqRYtZRqzMl6WQJ/e3r6y2t1m1M9QfjmsQl5YtcHOW+gAnszip0+qqbpprJQwy2Vnj5e3Wb/J2xjkvCNo5LhRKEOOidvMsZUP8yZvnaldJC1WmtlBRV4r4s2g1k6OlEcLunWSyRimmMjEqWo5DNSv6hP0=
+	t=1754671973; cv=none; b=h+F46peLgQO7KoFKdc3k4gDf4sOPyvcYUqn6qWKhZ49LJOH8TCPTT/BWbyUcdI2GKTq/V49Iqn5SgQEXrZZluVFEFm05R0I5MqmVle35kyofKoKDe6NviqUdBHnqtI12zKLvwPAY2TVGG/aAjH5xRCXGoVmHVdx2ke9Xvd29cTE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754671974; c=relaxed/simple;
-	bh=0hM99pSXe3MoDTd3JkMvodSuzqeIqeVYB8pPjlCV4M8=;
+	s=arc-20240116; t=1754671973; c=relaxed/simple;
+	bh=8IE9QHAIUObwIV/HwEsLYyQTxAWBN0yBBXMSF/TIBCE=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=JevIfD+yXpuJa3CY3fwG669GzsDpj5B6ib0/UmHWG5hAU6nykjuPwdjhqdkiRmPgO4/kzxTiw6O4Q0cFwr0e55r/tvw9atigUkrKLd17z0Pk1+51QQNKiIBQHCmDtWSOb1YZJh37DcGYCfLNocFEG+XNzMBzNNj1/cWqxZOnkbw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=kq8UM5hH; arc=none smtp.client-ip=217.70.183.198
+	 In-Reply-To:To:Cc; b=p2dPgDwMuyF0aNjOlxFAzmvYH1FybH7HtbB/a4v+qd0eRMB8qCkQ4Zf+x5UMRgysysFQgoyYxZm3UKoiZMfLh/uQvDkouOOZxZCh17M5EogGnI0vU0vktpN9ZZKhlayTzJrUjD3FACIep+D4Xf9JdASQd6NdDY6bQPRcSY/sItQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=gHzNnLdN; arc=none smtp.client-ip=217.70.183.198
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 6DB36442E2;
-	Fri,  8 Aug 2025 16:52:42 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 57B7C442E4;
+	Fri,  8 Aug 2025 16:52:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1754671963;
+	t=1754671964;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=bWdgFVMiZvFWAGQtMPCT3BvmGcKPd7ar0MMJlqpN7RQ=;
-	b=kq8UM5hHaZqa841crbWiM5dHqxR9NAQZatWus0VTsSy5/ANegpyvXjwmiwmAb9f8P3cKoQ
-	fje51S6bR6KvLs+YKi1ryOIf2HWUCkgQ6J4tj4oR/4fRHpCChZVkWQPGF4vbaw2MH+uN2A
-	gKUhTKOn8yHc0XqwFRoknYdeYdHy+cWl4jBp/Y6Cg/9uXSttcew6+KVFLj9A3eabdhg2os
-	uJsjDgI1eHIWVZL0bcc1tv1zprg0PO+wyYN2bibabGDR54a//SMnkEV+S7+w18bPK7EVPB
-	a7QCQBKw0aUCMt8USTXaWWmj+5h79xRVCjEqzqlo0UxtwAuW1YdewNYWPS1Gbg==
+	bh=imrhdc9yfbCCwsbSbUFh46GGjQWhAJDcr6uFv++Yd7Y=;
+	b=gHzNnLdNz4al7jaWBVADKhfQaT3tvxBW7qcOE9Yy99M2uiQKIa4b9hv7N1cqgzJ85dtLIp
+	3e9FE4nFqEEY0P7cx9LrTS4IinTuDbUtwUA9xd/uMhLPMDTysfrXMlHqvmDtftVm1eXZm7
+	uYS52fgmhd2bIRYAE7h/detnLDatZVWThePz8ndd/+f92PZBCQP8XkunKcRpmgyYIa410G
+	sgy8qJhU6SeGRuRgWjt5Uq+IeUZdvTIq1430qfYTE5rsZaON5F09JED0Hup9jf6XV/Sl5b
+	UHURYsZf7fJNVaf3U04zMF8UTDhpKl795BFqQqXKDnO84jzroU6UtMyIfQQw0Q==
 From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-Date: Fri, 08 Aug 2025 18:52:37 +0200
-Subject: [PATCH net v3 05/16] net: macb: single dma_alloc_coherent() for
- DMA descriptors
+Date: Fri, 08 Aug 2025 18:52:38 +0200
+Subject: [PATCH net v3 06/16] net: macb: match skb_reserve(skb,
+ NET_IP_ALIGN) with HW alignment
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,7 +57,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-Id: <20250808-macb-fixes-v3-5-08f1fcb5179f@bootlin.com>
+Message-Id: <20250808-macb-fixes-v3-6-08f1fcb5179f@bootlin.com>
 References: <20250808-macb-fixes-v3-0-08f1fcb5179f@bootlin.com>
 In-Reply-To: <20250808-macb-fixes-v3-0-08f1fcb5179f@bootlin.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -75,174 +75,104 @@ Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
  linux-kernel@vger.kernel.org, 
  Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
  Tawfik Bayouk <tawfik.bayouk@mobileye.com>, 
- =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>, 
- Sean Anderson <sean.anderson@linux.dev>
+ =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
 X-Mailer: b4 0.14.2
 X-GND-State: clean
 X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdduvdegfeegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhfffugggtgffkfhgjvfevofesthekredtredtjeenucfhrhhomhepvfhhrohoucfnvggsrhhunhcuoehthhgvohdrlhgvsghruhhnsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeelvefhkeeufedvkefghefhgfdukeejlefgtdehtdeivddtteetgedvieelieeuhfenucfkphepvdgrtddumegtsgdugeemheehieemjegrtddtmeeiieegsgemfhdtfhhfmehfvgdutdemlegvfhgunecuvehluhhsthgvrhfuihiivgepvdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgdugeemheehieemjegrtddtmeeiieegsgemfhdtfhhfmehfvgdutdemlegvfhgupdhhvghloheplgduledvrdduieekrddutddrvddvudgnpdhmrghilhhfrhhomhepthhhvghordhlvggsrhhunhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvddupdhrtghpthhtohepghgvvghrtheslhhinhhugidqmheikehkrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhhitgholhgrshdrfhgvrhhrvgesmhhitghrohgthhhiphdrtghom
- hdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegtlhgruhguihhurdgsvgiinhgvrgesthhugihonhdruggvvhdprhgtphhtthhopehsvggrnhdrrghnuggvrhhsohhnsehlihhnuhigrdguvghv
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdduvdegfeegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhfffugggtgffkfhgjvfevofesthekredtredtjeenucfhrhhomhepvfhhrohoucfnvggsrhhunhcuoehthhgvohdrlhgvsghruhhnsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeelvefhkeeufedvkefghefhgfdukeejlefgtdehtdeivddtteetgedvieelieeuhfenucfkphepvdgrtddumegtsgdugeemheehieemjegrtddtmeeiieegsgemfhdtfhhfmehfvgdutdemlegvfhgunecuvehluhhsthgvrhfuihiivgepvdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgdugeemheehieemjegrtddtmeeiieegsgemfhdtfhhfmehfvgdutdemlegvfhgupdhhvghloheplgduledvrdduieekrddutddrvddvudgnpdhmrghilhhfrhhomhepthhhvghordhlvggsrhhunhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvddtpdhrtghpthhtohepghgvvghrtheslhhinhhugidqmheikehkrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhhitgholhgrshdrfhgvrhhrvgesmhhitghrohgthhhiphdrtghom
+ hdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegtlhgruhguihhurdgsvgiinhgvrgesthhugihonhdruggvvhdprhgtphhtthhopehrohgshheskhgvrhhnvghlrdhorhhg
 X-GND-Sasl: theo.lebrun@bootlin.com
 
-Move from 2*NUM_QUEUES dma_alloc_coherent() for DMA descriptor rings to
-2 calls overall.
+If HW is Receive-Side-Coalescing capable, it cannot add dummy bytes at
+the start of IP packets. Alignment (ie number of dummy bytes) is
+configured using the RBOF field inside the NCFGR register.
 
-Issue is with how all queues share the same register for configuring the
-upper 32-bits of Tx/Rx descriptor rings. Taking Tx, notice how TBQPH
-does *not* depend on the queue index:
+On the software side, the skb_reserve(skb, NET_IP_ALIGN) call must only
+be done if those dummy bytes are added by the hardware; notice the
+skb_reserve() is done AFTER writing the address to the device.
 
-	#define GEM_TBQP(hw_q)		(0x0440 + ((hw_q) << 2))
-	#define GEM_TBQPH(hw_q)		(0x04C8)
+We cannot do the skb_reserve() call BEFORE writing the address because
+the address field ignores the low 2/3 bits. Conclusion: in some cases,
+we risk not being able to respect the NET_IP_ALIGN value (which is
+picked based on unaligned CPU access performance).
 
-	queue_writel(queue, TBQP, lower_32_bits(queue->tx_ring_dma));
-	#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
-	if (bp->hw_dma_cap & HW_DMA_CAP_64B)
-		queue_writel(queue, TBQPH, upper_32_bits(queue->tx_ring_dma));
-	#endif
+Current hardware (assuming it is working) falls in either category:
+ - RSC-incapable or,
+ - RSC-capable and NET_IP_ALIGN=0 (arm64/powerpc/x86).
 
-To maximise our chances of getting valid DMA addresses, we do a single
-dma_alloc_coherent() across queues. This improves the odds because
-alloc_pages() guarantees natural alignment. Other codepaths (IOMMU or
-dev/arch dma_map_ops) don't give high enough guarantees
-(even page-aligned isn't enough).
-
-Two consideration:
-
- - dma_alloc_coherent() gives us page alignment. Here we remove this
-   constraint meaning each queue's ring won't be page-aligned anymore.
-
- - This can save some tiny amounts of memory. Fewer allocations means
-   (1) less overhead (constant cost per alloc) and (2) less wasted bytes
-   due to alignment constraints.
-
-   Example for (2): 4 queues, default ring size (512), 64-bit DMA
-   descriptors, 16K pages:
-    - Before: 8 allocs of 8K, each rounded to 16K => 64K wasted.
-    - After:  2 allocs of 32K => 0K wasted.
-
-Fixes: 02c958dd3446 ("net/macb: add TX multiqueue support for gem")
-Reviewed-by: Sean Anderson <sean.anderson@linux.dev>
+Fixes: 4df95131ea80 ("net/macb: change RX path for GEM")
 Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
 ---
- drivers/net/ethernet/cadence/macb_main.c | 76 +++++++++++++++++---------------
- 1 file changed, 41 insertions(+), 35 deletions(-)
+ drivers/net/ethernet/cadence/macb.h      |  3 +++
+ drivers/net/ethernet/cadence/macb_main.c | 20 +++++++++++++++++---
+ 2 files changed, 20 insertions(+), 3 deletions(-)
 
+diff --git a/drivers/net/ethernet/cadence/macb.h b/drivers/net/ethernet/cadence/macb.h
+index a7e845fee4b3a2e3d14abb49abdbaf3e8e6ea02b..a773d640d4738f158649e225ae4257164a6ef809 100644
+--- a/drivers/net/ethernet/cadence/macb.h
++++ b/drivers/net/ethernet/cadence/macb.h
+@@ -527,6 +527,8 @@
+ /* Bitfields in DCFG6. */
+ #define GEM_PBUF_LSO_OFFSET			27
+ #define GEM_PBUF_LSO_SIZE			1
++#define GEM_PBUF_RSC_OFFSET			26
++#define GEM_PBUF_RSC_SIZE			1
+ #define GEM_PBUF_CUTTHRU_OFFSET			25
+ #define GEM_PBUF_CUTTHRU_SIZE			1
+ #define GEM_DAW64_OFFSET			23
+@@ -737,6 +739,7 @@
+ #define MACB_CAPS_MIIONRGMII			0x00000200
+ #define MACB_CAPS_NEED_TSUCLK			0x00000400
+ #define MACB_CAPS_QUEUE_DISABLE			0x00000800
++#define MACB_CAPS_RSC				0x00001000
+ #define MACB_CAPS_PCS				0x01000000
+ #define MACB_CAPS_HIGH_SPEED			0x02000000
+ #define MACB_CAPS_CLK_HW_CHG			0x04000000
 diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index 1ba26f8ad600936070f57ff0762c03719921dd48..aa0b5aea48888eb2d1aa3edef45c804ae519f70d 100644
+index aa0b5aea48888eb2d1aa3edef45c804ae519f70d..1e19ebcaf3810ca87729bad0ef0e13db49c548e4 100644
 --- a/drivers/net/ethernet/cadence/macb_main.c
 +++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -2472,32 +2472,30 @@ static unsigned int macb_rx_ring_size_per_queue(struct macb *bp)
+@@ -1332,8 +1332,18 @@ static void gem_rx_refill(struct macb_queue *queue)
+ 			dma_wmb();
+ 			macb_set_addr(bp, desc, paddr);
  
- static void macb_free_consistent(struct macb *bp)
- {
-+	struct device *dev = &bp->pdev->dev;
- 	struct macb_queue *queue;
- 	unsigned int q;
-+	size_t size;
+-			/* properly align Ethernet header */
+-			skb_reserve(skb, NET_IP_ALIGN);
++			/* Properly align Ethernet header.
++			 *
++			 * Hardware can add dummy bytes if asked using the RBOF
++			 * field inside the NCFGR register. That feature isn't
++			 * available if hardware is RSC capable.
++			 *
++			 * We cannot fallback to doing the 2-byte shift before
++			 * DMA mapping because the address field does not allow
++			 * setting the low 2 (or 3 if DMA) bits.
++			 */
++			if (!(bp->caps & MACB_CAPS_RSC))
++				skb_reserve(skb, NET_IP_ALIGN);
+ 		} else {
+ 			desc->ctrl = 0;
+ 			dma_wmb();
+@@ -2814,7 +2824,9 @@ static void macb_init_hw(struct macb *bp)
+ 	macb_set_hwaddr(bp);
  
- 	if (bp->rx_ring_tieoff) {
--		dma_free_coherent(&bp->pdev->dev, macb_dma_desc_get_size(bp),
-+		dma_free_coherent(dev, macb_dma_desc_get_size(bp),
- 				  bp->rx_ring_tieoff, bp->rx_ring_tieoff_dma);
- 		bp->rx_ring_tieoff = NULL;
- 	}
- 
- 	bp->macbgem_ops.mog_free_rx_buffers(bp);
- 
-+	size = bp->num_queues * macb_tx_ring_size_per_queue(bp);
-+	dma_free_coherent(dev, size, bp->queues[0].tx_ring, bp->queues[0].tx_ring_dma);
-+
-+	size = bp->num_queues * macb_rx_ring_size_per_queue(bp);
-+	dma_free_coherent(dev, size, bp->queues[0].rx_ring, bp->queues[0].rx_ring_dma);
-+
- 	for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue) {
- 		kfree(queue->tx_skb);
- 		queue->tx_skb = NULL;
--		if (queue->tx_ring) {
--			dma_free_coherent(&bp->pdev->dev,
--					  macb_tx_ring_size_per_queue(bp),
--					  queue->tx_ring, queue->tx_ring_dma);
--			queue->tx_ring = NULL;
--		}
--		if (queue->rx_ring) {
--			dma_free_coherent(&bp->pdev->dev,
--					  macb_rx_ring_size_per_queue(bp),
--					  queue->rx_ring, queue->rx_ring_dma);
--			queue->rx_ring = NULL;
--		}
-+		queue->tx_ring = NULL;
-+		queue->rx_ring = NULL;
- 	}
- }
- 
-@@ -2539,37 +2537,45 @@ static int macb_alloc_rx_buffers(struct macb *bp)
- 
- static int macb_alloc_consistent(struct macb *bp)
- {
-+	struct device *dev = &bp->pdev->dev;
-+	dma_addr_t tx_dma, rx_dma;
- 	struct macb_queue *queue;
- 	unsigned int q;
--	int size;
-+	void *tx, *rx;
-+	size_t size;
-+
-+	/*
-+	 * Upper 32-bits of Tx/Rx DMA descriptor for each queues much match!
-+	 * We cannot enforce this guarantee, the best we can do is do a single
-+	 * allocation and hope it will land into alloc_pages() that guarantees
-+	 * natural alignment of physical addresses.
-+	 */
-+
-+	size = bp->num_queues * macb_tx_ring_size_per_queue(bp);
-+	tx = dma_alloc_coherent(dev, size, &tx_dma, GFP_KERNEL);
-+	if (!tx || upper_32_bits(tx_dma) != upper_32_bits(tx_dma + size - 1))
-+		goto out_err;
-+	netdev_dbg(bp->dev, "Allocated %zu bytes for %u TX rings at %08lx (mapped %p)\n",
-+		   size, bp->num_queues, (unsigned long)tx_dma, tx);
-+
-+	size = bp->num_queues * macb_rx_ring_size_per_queue(bp);
-+	rx = dma_alloc_coherent(dev, size, &rx_dma, GFP_KERNEL);
-+	if (!rx || upper_32_bits(rx_dma) != upper_32_bits(rx_dma + size - 1))
-+		goto out_err;
-+	netdev_dbg(bp->dev, "Allocated %zu bytes for %u RX rings at %08lx (mapped %p)\n",
-+		   size, bp->num_queues, (unsigned long)rx_dma, rx);
- 
- 	for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue) {
--		size = macb_tx_ring_size_per_queue(bp);
--		queue->tx_ring = dma_alloc_coherent(&bp->pdev->dev, size,
--						    &queue->tx_ring_dma,
--						    GFP_KERNEL);
--		if (!queue->tx_ring ||
--		    upper_32_bits(queue->tx_ring_dma) != upper_32_bits(bp->queues[0].tx_ring_dma))
--			goto out_err;
--		netdev_dbg(bp->dev,
--			   "Allocated TX ring for queue %u of %d bytes at %08lx (mapped %p)\n",
--			   q, size, (unsigned long)queue->tx_ring_dma,
--			   queue->tx_ring);
-+		queue->tx_ring = tx + macb_tx_ring_size_per_queue(bp) * q;
-+		queue->tx_ring_dma = tx_dma + macb_tx_ring_size_per_queue(bp) * q;
-+
-+		queue->rx_ring = rx + macb_rx_ring_size_per_queue(bp) * q;
-+		queue->rx_ring_dma = rx_dma + macb_rx_ring_size_per_queue(bp) * q;
- 
- 		size = bp->tx_ring_size * sizeof(struct macb_tx_skb);
- 		queue->tx_skb = kmalloc(size, GFP_KERNEL);
- 		if (!queue->tx_skb)
- 			goto out_err;
--
--		size = macb_rx_ring_size_per_queue(bp);
--		queue->rx_ring = dma_alloc_coherent(&bp->pdev->dev, size,
--						    &queue->rx_ring_dma, GFP_KERNEL);
--		if (!queue->rx_ring ||
--		    upper_32_bits(queue->rx_ring_dma) != upper_32_bits(bp->queues[0].rx_ring_dma))
--			goto out_err;
--		netdev_dbg(bp->dev,
--			   "Allocated RX ring of %d bytes at %08lx (mapped %p)\n",
--			   size, (unsigned long)queue->rx_ring_dma, queue->rx_ring);
- 	}
- 	if (bp->macbgem_ops.mog_alloc_rx_buffers(bp))
- 		goto out_err;
+ 	config = macb_mdc_clk_div(bp);
+-	config |= MACB_BF(RBOF, NET_IP_ALIGN);	/* Make eth data aligned */
++	/* Make eth data aligned. If RSC capable, that offset is ignored by HW. */
++	if (!(bp->caps & MACB_CAPS_RSC))
++		config |= MACB_BF(RBOF, NET_IP_ALIGN);
+ 	config |= MACB_BIT(DRFCS);		/* Discard Rx FCS */
+ 	if (bp->caps & MACB_CAPS_JUMBO)
+ 		config |= MACB_BIT(JFRAME);	/* Enable jumbo frames */
+@@ -4139,6 +4151,8 @@ static void macb_configure_caps(struct macb *bp,
+ 		dcfg = gem_readl(bp, DCFG2);
+ 		if ((dcfg & (GEM_BIT(RX_PKT_BUFF) | GEM_BIT(TX_PKT_BUFF))) == 0)
+ 			bp->caps |= MACB_CAPS_FIFO_MODE;
++		if (GEM_BFEXT(PBUF_RSC, gem_readl(bp, DCFG6)))
++			bp->caps |= MACB_CAPS_RSC;
+ 		if (gem_has_ptp(bp)) {
+ 			if (!GEM_BFEXT(TSU, gem_readl(bp, DCFG5)))
+ 				dev_err(&bp->pdev->dev,
 
 -- 
 2.50.1
