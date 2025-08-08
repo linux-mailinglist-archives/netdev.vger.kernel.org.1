@@ -1,137 +1,132 @@
-Return-Path: <netdev+bounces-212112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212113-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFAD1B1DFE4
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 02:02:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41AB4B1DFF5
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 02:34:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E8BF05615F5
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 00:02:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 09B7D3A9139
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 00:33:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA5152E36EE;
-	Fri,  8 Aug 2025 00:02:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AA77CA52;
+	Fri,  8 Aug 2025 00:33:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GhVniutn"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="I6Wn3Xt2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14A8C2E36E7
-	for <netdev@vger.kernel.org>; Fri,  8 Aug 2025 00:02:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA42F1754B
+	for <netdev@vger.kernel.org>; Fri,  8 Aug 2025 00:33:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754611323; cv=none; b=Af+DVVmuHYkalOYasN96MpzReD+xwzL6wj/4Snmr5HrgLzgSPCAvN08XEAchjmjDTrJKi6L41A4Iipzn9Ce8anLmdHUCvqUTLDGkNnnXLzNbOB2U0G1Iih/vNgfjspTkpv6Pqu+iB3CvTPIaMZ04TTsf9C7O60op6VUrojiX2Gs=
+	t=1754613236; cv=none; b=j0/gmr+9+yDkypNC2iuGrodlo31yXa6gpO8QyHgIJn7BC9jjtRe0XIpqJRU+oCX72/6n6BQHdR1F9A2S45AJD9OK2D4EXy6OFrWwy7hygtSOCC6CktKE5hWGRxw9avrIGu/k4cVtSrNXxVom+VsmGEtlCDMZftA6t0/DDD7ynqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754611323; c=relaxed/simple;
-	bh=OVvKRnCZPCkUikFXoenXFVKIrczw+FKb6AEftfO2P4w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JWaApskS+prf6Vq5mdUAM8gohuIJnsX36EZN6QprE71LAga6QX+V7UW3ltGfhhiTp7fGgWFgKWI2Dz5fuOYDuaPH4NKkDYB5ikqoRvyIFe3iCujIJ757nRuJHRP4kniYVsN12MCdJG7ehFvvfY11UhyV1cubW128tPnZboCyStw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GhVniutn; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1754611323; x=1786147323;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=OVvKRnCZPCkUikFXoenXFVKIrczw+FKb6AEftfO2P4w=;
-  b=GhVniutntO7O1vzG948mOEMMSVl9vWick/3Qpr5W0mNmO2ENrrDeQImA
-   qHHzi1zNTyPO2tphcmG17Vf42jkwPDdZYvpTqh2O+QyxHyjZW5lJVYc1M
-   HOoN1dHtS4VFlu43FeBtdyKq67a00108lQxAuVVpgQ0MlqortBxIzu3Fm
-   +UFAOl9hy2CwkK6csdSjwjC6DrQ0nGPWzWo6C2dYUnpZP+tpEdmW4/2N1
-   ndzlEmtRhVFEcOV5XFb6E3Po4nJ7Yi0piA/ERcAxunM14HDX0g0ikGzVj
-   8E6I5oKzSu/gKoGeD1VZFP2LJKuUw/Q1ohO+rcHX5hNeyOqTnigqiq/9/
-   w==;
-X-CSE-ConnectionGUID: YoiADrq3QbG/lYw5Z5pBJQ==
-X-CSE-MsgGUID: +xl66YYTR0KKGuyCKk752w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11514"; a="74414989"
-X-IronPort-AV: E=Sophos;i="6.17,274,1747724400"; 
-   d="scan'208";a="74414989"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2025 17:02:00 -0700
-X-CSE-ConnectionGUID: K9G9rRQIT+mYRaMSHQtB3w==
-X-CSE-MsgGUID: q4VJ23B+QR6CUoOx9V79fQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,274,1747724400"; 
-   d="scan'208";a="202356501"
-Received: from lkp-server02.sh.intel.com (HELO 4ea60e6ab079) ([10.239.97.151])
-  by orviesa001.jf.intel.com with ESMTP; 07 Aug 2025 17:01:55 -0700
-Received: from kbuild by 4ea60e6ab079 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1ukAYS-0003NS-0k;
-	Fri, 08 Aug 2025 00:01:52 +0000
-Date: Fri, 8 Aug 2025 08:00:51 +0800
-From: kernel test robot <lkp@intel.com>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Andrew Lunn <andrew@lunn.ch>, David Wu <david.wu@rock-chips.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net] net: stmmac: rk: put the PHY clock on remove
-Message-ID: <202508080746.BIDlKMy5-lkp@intel.com>
-References: <E1ujwIY-007qKa-Ka@rmk-PC.armlinux.org.uk>
+	s=arc-20240116; t=1754613236; c=relaxed/simple;
+	bh=uez1LvaW4jPtLA5JVOmIdQe7itBGXB8ohZV6CUz0uTY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WF4r/i5nmAvjFW/R9Xp8RI3kDBMMoOHqAdL40ztFDmimC57UBehSr9ndqUQmM2S9rD1/1PXIZEXYhrC0klM4WAPatS9Z0YmSHwRVXDMvDrcObefl71vXR/vt4EWJUWD0fIrWH+5ePQ4B5OiFuId218uP/ZPaHYZ4+BuKu3U9vtg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=I6Wn3Xt2; arc=none smtp.client-ip=91.218.175.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <7a73fb00-9433-40d7-acb7-691f32f198ff@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1754613230;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dTkHCXnD4M7V2JUeyQeb5nt8PCy7/rijGCweadvB5Tc=;
+	b=I6Wn3Xt2/rPBxDgdVN+x9jihodYyJKkQkSLtXC2MjYCKfSmZmr0ETKCJyZHjNu/7Lk8ZMn
+	UAT913CnQy87LPrvcauokPHq5yMqvOpjFwY7DcEzTelaIFO8GH17s/3bjhgzbn1+7pCozW
+	/2pHa9Pv0HxQ5OLAtlhIlADgZHJD3v0=
+Date: Thu, 7 Aug 2025 17:33:43 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1ujwIY-007qKa-Ka@rmk-PC.armlinux.org.uk>
+Subject: Re: [PATCH bpf-next v6 9/9] selftests/bpf: Cover metadata access from
+ a modified skb clone
+To: Jakub Sitnicki <jakub@cloudflare.com>
+Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
+ Arthur Fabre <arthur@arthurfabre.com>, Daniel Borkmann
+ <daniel@iogearbox.net>, Eduard Zingerman <eddyz87@gmail.com>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Jesse Brandeburg <jbrandeburg@cloudflare.com>,
+ Joanne Koong <joannelkoong@gmail.com>, Lorenzo Bianconi
+ <lorenzo@kernel.org>, =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?=
+ <thoiland@redhat.com>, Yan Zhai <yan@cloudflare.com>,
+ kernel-team@cloudflare.com, netdev@vger.kernel.org, bpf@vger.kernel.org,
+ Stanislav Fomichev <sdf@fomichev.me>
+References: <20250804-skb-metadata-thru-dynptr-v6-0-05da400bfa4b@cloudflare.com>
+ <20250804-skb-metadata-thru-dynptr-v6-9-05da400bfa4b@cloudflare.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Content-Language: en-US
+In-Reply-To: <20250804-skb-metadata-thru-dynptr-v6-9-05da400bfa4b@cloudflare.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Hi Russell,
+On 8/4/25 5:52 AM, Jakub Sitnicki wrote:
+> +/* Check that skb_meta dynptr is empty */
+> +SEC("tc")
+> +int ing_cls_dynptr_empty(struct __sk_buff *ctx)
+> +{
+> +	struct bpf_dynptr data, meta;
+> +	struct ethhdr *eth;
+> +
+> +	bpf_dynptr_from_skb(ctx, 0, &data);
+> +	eth = bpf_dynptr_slice_rdwr(&data, 0, NULL, sizeof(*eth));
 
-kernel test robot noticed the following build errors:
+If this is bpf_dynptr_slice() instead of bpf_dynptr_slice_rdwr() and...
 
-[auto build test ERROR on net/main]
+> +	if (!eth)
+> +		goto out;
+> +	/* Ignore non-test packets */
+> +	if (eth->h_proto != 0)
+> +		goto out;
+> +	/* Packet write to trigger unclone in prologue */
+> +	eth->h_proto = 42;
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Russell-King-Oracle/net-stmmac-rk-put-the-PHY-clock-on-remove/20250807-165054
-base:   net/main
-patch link:    https://lore.kernel.org/r/E1ujwIY-007qKa-Ka%40rmk-PC.armlinux.org.uk
-patch subject: [PATCH net] net: stmmac: rk: put the PHY clock on remove
-config: arm-defconfig (https://download.01.org/0day-ci/archive/20250808/202508080746.BIDlKMy5-lkp@intel.com/config)
-compiler: clang version 22.0.0git (https://github.com/llvm/llvm-project 7b8dea265e72c3037b6b1e54d5ab51b7e14f328b)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250808/202508080746.BIDlKMy5-lkp@intel.com/reproduce)
+... remove this eth->h_proto write.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202508080746.BIDlKMy5-lkp@intel.com/
+Then bpf_dynptr_write() will succeed. like,
 
-All errors (new ones prefixed by >>):
+         bpf_dynptr_from_skb(ctx, 0, &data);
+         eth = bpf_dynptr_slice(&data, 0, NULL, sizeof(*eth));
+	if (!eth)
+                 goto out;
 
->> drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c:1774:6: error: use of undeclared identifier 'plat'
-    1774 |         if (plat->phy_node && bsp_priv->integrated_phy)
-         |             ^~~~
-   1 error generated.
+	/* Ignore non-test packets */
+         if (eth->h_proto != 0)
+		goto out;
 
+         bpf_dynptr_from_skb_meta(ctx, 0, &meta);
+         /* Expect write to fail because skb is a clone. */
+         err = bpf_dynptr_write(&meta, 0, (void *)eth, sizeof(*eth), 0);
 
-vim +/plat +1774 drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+The bpf_dynptr_write for a skb dynptr will do the pskb_expand_head(). The 
+skb_meta dynptr write is only a memmove. It probably can also do 
+pskb_expand_head() and change it to keep the data_meta.
 
-  1765	
-  1766	static void rk_gmac_remove(struct platform_device *pdev)
-  1767	{
-  1768		struct rk_priv_data *bsp_priv = get_stmmac_bsp_priv(&pdev->dev);
-  1769	
-  1770		stmmac_dvr_remove(&pdev->dev);
-  1771	
-  1772		rk_gmac_powerdown(bsp_priv);
-  1773	
-> 1774		if (plat->phy_node && bsp_priv->integrated_phy)
-  1775			clk_put(bsp_priv->clk_phy);
-  1776	}
-  1777	
+Another option is to set the DYNPTR_RDONLY_BIT in bpf_dynptr_from_skb_meta() for 
+a clone skb. This restriction can be removed in the future.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+> +
+> +	/* Expect no metadata */
+> +	bpf_dynptr_from_skb_meta(ctx, 0, &meta);
+> +	if (bpf_dynptr_size(&meta) > 0)
+> +		goto out;
+> +
+> +	test_pass = true;
+> +out:
+> +	return TC_ACT_SHOT;
+> +}
+
 
