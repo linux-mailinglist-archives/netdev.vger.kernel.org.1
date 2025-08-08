@@ -1,186 +1,84 @@
-Return-Path: <netdev+bounces-212284-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212285-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAE87B1EEED
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 21:34:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 07A2EB1EF0F
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 21:53:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9558B3B59C9
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 19:34:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F155A05969
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 19:52:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2217217701;
-	Fri,  8 Aug 2025 19:33:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7709228851D;
+	Fri,  8 Aug 2025 19:52:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hgk4dUpx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ADC21D54E9
-	for <netdev@vger.kernel.org>; Fri,  8 Aug 2025 19:33:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45B2E2877E5;
+	Fri,  8 Aug 2025 19:52:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754681632; cv=none; b=QBMUp4buK18w7N0/pyk2MjZzwtYbu7kQKPUI1bHIa3fmUyj5wcqwOQsNz17Hx9tJ3l2EjBCewjRPaN+DzmcZ2uJwt4vGuuSn61QsQHvrWuyl5Q7vb4kN62XNCB2V6lEaFjQdQtkfGL5y9ltioMXZ7WlwBiwzPOgFGTk1VETYC5o=
+	t=1754682773; cv=none; b=thsn6atLP5Nk2bo3wyssrwvzp/lRJiiIYng3NEvBgYb0MtdcutuxQbl4AsyuZd0lzc/5HfZOTNlGgISzX/SHSBuzA2hfnM1BL8538HlNgBu9R0wrAn8XWYpJgnEe1qVMwA4z5kuw6QVg9WntmzbeSWsqQLenL7XoOWEtAt3WYZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754681632; c=relaxed/simple;
-	bh=ms/pVaoQqOgGiV430f2WqbB8SnyVC07S3OsBQ6xzaHg=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=uwMBm8Uvva0puTItYuTOJhXhxICTJ2JpkutCv57TPV7BlbvjCUJRjB2mFa/bGfolBm040VmZdcW2ISazEJng4XjcZS5Sgt88DM867KUDV+UbeoXuS/qq5gfGxjNLFcHbtBvjSlW9b+JxJuHC7i08V5Sn+ece8tV7BtMswLTEcj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-8816e763309so236379939f.3
-        for <netdev@vger.kernel.org>; Fri, 08 Aug 2025 12:33:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754681630; x=1755286430;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PJ4QNSucLp3lg6gtIXtQ36rPonTR5UPedNLhb5Hvpj0=;
-        b=ZPdLd5WHkH+1qBn8FgpGupC2xjx2bmo9u+ZBCLZlB1JNjY+1X9dUiNzd96roZxv/mf
-         k3Qeaju6IUZn41sfxsRVkXIY/tvfZ+zORnMAykp5887URGMPoTGfjoPl5Ddhvlbbhovu
-         6ApxVkOIzsEFDPTA0ZMk7hvC4iopauVjdZxQMmu/+fCl9eN2Lf+ZeUqWsMusIuokRzz3
-         dAS6u5Y6ebAEKB2UFOoeBUR2pg+BZK7geYpydjxwr+On04wx+9xDlw/nJrz8wzCRHsrv
-         tLk6bk4Ky+VzLDix2g3gJ7dGO9WTObRokBvLvfCMscGRDtMYvqnJl1YGUDSr8C8k0wKO
-         jvbQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU9RESxG2ZwbIascfmZwYkKf1QK4EkJyiZkJgHuuz8+NyzwjtI3tB9VBlHc3KaG14R3SbczPVw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyWN4JidTXsAv7Jr86+PUyNjp1kfo80M89oXWoPv9UrTrzk84ou
-	uck+suLfkh1df4zaUPP0GjHyBK/K0a5GeRo6675rvTFd5OGD3idOst+B+DgBPTvKIl8EhGUlgSa
-	H7/6ai880D5/4boHA7oB+09tUZOnEWYx8piPOD77XoMaB+fYgTAdWC6ZbDIo=
-X-Google-Smtp-Source: AGHT+IHDARiz/A/iKJftayzfILsno7n236kXIpOHO40uVKmHagaNTInRIv43JxuhI44oxt4yszG8HR7wlKSNUew80GHGyKx/KLJf
+	s=arc-20240116; t=1754682773; c=relaxed/simple;
+	bh=sSGceVwWr8E8AI5m4Dn7u6VzglTM5soJAk6hGXZRXiI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RQ2SqgAu4iId0+EC1OeGpClt2+KbbOL/JDrHHZ6Ss+GwsFnHdSA15bBaLmGNVdT+EjeFFaXGW9offVe2rikOSXjG3yFYpwH+dR7ErLCJlRMRz0yqX9uZ+EddfzNKRHVuVz1j2vNwKzB8GjkoUbhn5g7dHJ5Yf2prUsy+H+3xDsc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hgk4dUpx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81A3DC4CEED;
+	Fri,  8 Aug 2025 19:52:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754682772;
+	bh=sSGceVwWr8E8AI5m4Dn7u6VzglTM5soJAk6hGXZRXiI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=hgk4dUpxc6WBzwvc1EIGtU53EuFoWun386wNek/OLT6LoFvKVz9joCcejevvioXZA
+	 rnrOv6lCI70Hv3YtRv0vjgOBQ4euBJVuQmVP0g5ofa2vi7LOYvPqYQ3ZuYb2REIZJH
+	 iJ9IijJ+RIB22sNgdzDunotR1slieLkS/3fWgbf0a0CCTEZEutYtORzvXB+D6CsJ1p
+	 thowon2alk3PNwlqUoM91qEDrQbDAx/jRZVu7JNiFhZGGcyLJXRqyZEFGwYgK5dQFC
+	 YHQIOnmWA+XYK1tJ13kpyofaNDN3nQjIqCVv/VQ6VFe8Wtsvt3rEqPBKOr2119NDcX
+	 RuW88K0sESgFw==
+Date: Fri, 8 Aug 2025 12:52:51 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: <zhang.enpei@zte.com.cn>
+Cc: <chessman@tux.org>, <andrew+netdev@lunn.ch>, <davem@davemloft.net>,
+ <edumazet@google.com>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] ethernet: tlan: Convert to use jiffies macro
+Message-ID: <20250808125251.527e8ecf@kernel.org>
+In-Reply-To: <20250807201722468rYsJszSAHXqlVrVHEIuAz@zte.com.cn>
+References: <20250807201722468rYsJszSAHXqlVrVHEIuAz@zte.com.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:1595:b0:881:99eb:e212 with SMTP id
- ca18e2360f4ac-883f12550d5mr771824239f.9.1754681630334; Fri, 08 Aug 2025
- 12:33:50 -0700 (PDT)
-Date: Fri, 08 Aug 2025 12:33:50 -0700
-In-Reply-To: <20250808153721.261334-1-simon.schippers@tu-dortmund.de>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6896511e.050a0220.7f033.0088.GAE@google.com>
-Subject: [syzbot ci] Re: TUN/TAP: Improving throughput and latency by avoiding
- SKB drops
-From: syzbot ci <syzbot+cieaa424e2117e71dd@syzkaller.appspotmail.com>
-To: jasowang@redhat.com, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	simon.schippers@tu-dortmund.de, tim.gebauer@tu-dortmund.de, 
-	willemdebruijn.kernel@gmail.com
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-syzbot ci has tested the following series
+On Thu, 7 Aug 2025 20:17:22 +0800 (CST) zhang.enpei@zte.com.cn wrote:
+> From: Zhang Enpei <zhang.enpei@zte.com.cn>
+> 
+> Use time_after_eq macro instead of using jiffies directly to handle
+> wraparound.
 
-[v1] TUN/TAP: Improving throughput and latency by avoiding SKB drops
-https://lore.kernel.org/all/20250808153721.261334-1-simon.schippers@tu-dortmund.de
-* [PATCH net] TUN/TAP: Improving throughput and latency by avoiding SKB drops
+## Form letter - net-next-closed
 
-and found the following issue:
-general protection fault in tun_net_xmit
+We have already submitted our pull request with net-next material for v6.17,
+and therefore net-next is closed for new drivers, features, code refactoring
+and optimizations. We are currently accepting bug fixes only.
 
-Full report is available here:
-https://ci.syzbot.org/series/4a9dd6ad-3c81-4957-b447-4d1e8e9ee7a2
+Please repost when net-next reopens after Aug 11th.
 
-***
+RFC patches sent for review only are obviously welcome at any time.
 
-general protection fault in tun_net_xmit
+See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
+-- 
+pw-bot: defer
+pv-bot: closed
 
-tree:      net
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net.git
-base:      ae633388cae349886f1a3cfb27aa092854b24c1b
-arch:      amd64
-compiler:  Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
-config:    https://ci.syzbot.org/builds/f35af9e4-44af-4a13-8842-d9d36ecb06e7/config
-C repro:   https://ci.syzbot.org/findings/e400bf02-40dc-43bb-8c15-d21b7ecb7304/c_repro
-syz repro: https://ci.syzbot.org/findings/e400bf02-40dc-43bb-8c15-d21b7ecb7304/syz_repro
-
-Oops: general protection fault, probably for non-canonical address 0xdffffc0000000002: 0000 [#1] SMP KASAN PTI
-KASAN: null-ptr-deref in range [0x0000000000000010-0x0000000000000017]
-CPU: 1 UID: 0 PID: 12 Comm: kworker/u8:0 Not tainted 6.16.0-syzkaller-06620-gae633388cae3-dirty #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-Workqueue: ipv6_addrconf addrconf_dad_work
-RIP: 0010:__ptr_ring_full include/linux/ptr_ring.h:51 [inline]
-RIP: 0010:ptr_ring_full include/linux/ptr_ring.h:59 [inline]
-RIP: 0010:tun_net_xmit+0x3ee/0x19c0 drivers/net/tun.c:1026
-Code: 54 24 18 48 89 d0 48 c1 e8 03 48 89 44 24 58 42 0f b6 04 28 84 c0 0f 85 f9 11 00 00 48 63 02 48 8d 1c c3 48 89 d8 48 c1 e8 03 <42> 80 3c 28 00 74 08 48 89 df e8 d3 0f ac fb 48 8b 1b 48 8b 7c 24
-RSP: 0018:ffffc900000f6f00 EFLAGS: 00010202
-RAX: 0000000000000002 RBX: 0000000000000010 RCX: dffffc0000000000
-RDX: ffff88811bf90940 RSI: 0000000000000004 RDI: ffffc900000f6e80
-RBP: ffffc900000f7050 R08: 0000000000000003 R09: 0000000000000004
-R10: dffffc0000000000 R11: fffff5200001edd0 R12: 0000000000000000
-R13: dffffc0000000000 R14: ffff8881054c8000 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff8881a3c80000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000200000002280 CR3: 0000000110b70000 CR4: 00000000000006f0
-Call Trace:
- <TASK>
- __netdev_start_xmit include/linux/netdevice.h:5219 [inline]
- netdev_start_xmit include/linux/netdevice.h:5228 [inline]
- xmit_one net/core/dev.c:3827 [inline]
- dev_hard_start_xmit+0x2d7/0x830 net/core/dev.c:3843
- sch_direct_xmit+0x241/0x4b0 net/sched/sch_generic.c:344
- __dev_xmit_skb net/core/dev.c:4102 [inline]
- __dev_queue_xmit+0x1857/0x3b50 net/core/dev.c:4679
- neigh_output include/net/neighbour.h:547 [inline]
- ip6_finish_output2+0x11fe/0x16a0 net/ipv6/ip6_output.c:141
- NF_HOOK include/linux/netfilter.h:318 [inline]
- ndisc_send_skb+0xb54/0x1440 net/ipv6/ndisc.c:512
- addrconf_dad_completed+0x7ae/0xd60 net/ipv6/addrconf.c:4360
- addrconf_dad_work+0xc36/0x14b0 net/ipv6/addrconf.c:-1
- process_one_work kernel/workqueue.c:3238 [inline]
- process_scheduled_works+0xae1/0x17b0 kernel/workqueue.c:3321
- worker_thread+0x8a0/0xda0 kernel/workqueue.c:3402
- kthread+0x711/0x8a0 kernel/kthread.c:464
- ret_from_fork+0x3fc/0x770 arch/x86/kernel/process.c:148
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:__ptr_ring_full include/linux/ptr_ring.h:51 [inline]
-RIP: 0010:ptr_ring_full include/linux/ptr_ring.h:59 [inline]
-RIP: 0010:tun_net_xmit+0x3ee/0x19c0 drivers/net/tun.c:1026
-Code: 54 24 18 48 89 d0 48 c1 e8 03 48 89 44 24 58 42 0f b6 04 28 84 c0 0f 85 f9 11 00 00 48 63 02 48 8d 1c c3 48 89 d8 48 c1 e8 03 <42> 80 3c 28 00 74 08 48 89 df e8 d3 0f ac fb 48 8b 1b 48 8b 7c 24
-RSP: 0018:ffffc900000f6f00 EFLAGS: 00010202
-RAX: 0000000000000002 RBX: 0000000000000010 RCX: dffffc0000000000
-RDX: ffff88811bf90940 RSI: 0000000000000004 RDI: ffffc900000f6e80
-RBP: ffffc900000f7050 R08: 0000000000000003 R09: 0000000000000004
-R10: dffffc0000000000 R11: fffff5200001edd0 R12: 0000000000000000
-R13: dffffc0000000000 R14: ffff8881054c8000 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff8881a3c80000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000200000002280 CR3: 0000000110b70000 CR4: 00000000000006f0
-----------------
-Code disassembly (best guess):
-   0:	54                   	push   %rsp
-   1:	24 18                	and    $0x18,%al
-   3:	48 89 d0             	mov    %rdx,%rax
-   6:	48 c1 e8 03          	shr    $0x3,%rax
-   a:	48 89 44 24 58       	mov    %rax,0x58(%rsp)
-   f:	42 0f b6 04 28       	movzbl (%rax,%r13,1),%eax
-  14:	84 c0                	test   %al,%al
-  16:	0f 85 f9 11 00 00    	jne    0x1215
-  1c:	48 63 02             	movslq (%rdx),%rax
-  1f:	48 8d 1c c3          	lea    (%rbx,%rax,8),%rbx
-  23:	48 89 d8             	mov    %rbx,%rax
-  26:	48 c1 e8 03          	shr    $0x3,%rax
-* 2a:	42 80 3c 28 00       	cmpb   $0x0,(%rax,%r13,1) <-- trapping instruction
-  2f:	74 08                	je     0x39
-  31:	48 89 df             	mov    %rbx,%rdi
-  34:	e8 d3 0f ac fb       	call   0xfbac100c
-  39:	48 8b 1b             	mov    (%rbx),%rbx
-  3c:	48                   	rex.W
-  3d:	8b                   	.byte 0x8b
-  3e:	7c 24                	jl     0x64
-
-
-***
-
-If these findings have caused you to resend the series or submit a
-separate fix, please add the following tag to your commit message:
-Tested-by: syzbot@syzkaller.appspotmail.com
-
----
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
 
