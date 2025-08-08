@@ -1,75 +1,121 @@
-Return-Path: <netdev+bounces-212277-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212278-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C05CB1EE91
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 20:53:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 931F3B1EE98
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 20:58:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BB7E916AC4D
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 18:53:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52A3C3B2484
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 18:58:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A54E9222577;
-	Fri,  8 Aug 2025 18:53:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0378D222577;
+	Fri,  8 Aug 2025 18:58:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Aqz1hdbo"
+	dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b="AUEODd49"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F8881E32DB
-	for <netdev@vger.kernel.org>; Fri,  8 Aug 2025 18:53:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A0B2276030
+	for <netdev@vger.kernel.org>; Fri,  8 Aug 2025 18:58:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754679220; cv=none; b=LKSJtv5MD6lWwaLCGsd55xfxTNPbWUKZTKE4EFif64xgfBm0+EJjwHpDW5bwJ/f4xEclfBzF0UaucbYViVnkkh2/vcj5/yQSHF6Mkm1ICEgqP8OcdOUnF9l0Kre59j6MyIs6Gk8MeYOE0rdc+aAjeCX2bUOuVpOTHbl3XKY2MPw=
+	t=1754679490; cv=none; b=X+ZU2mwgSLaXkYWg1nObK+iXcqTb4HINc+74c/3tkqkp4nhGFWB9XA+moi0YRB5qv/BfFwIw9f83vJjGKnrNJLwqMtmnqnUEATiJ+IibFu1BgLd0O44hv5z1adFVSt3TrOY9rUjTyClTmfbI3Tub2zljKxb84kih759a6Ur/nFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754679220; c=relaxed/simple;
-	bh=nYAv4YhqZB4fcdkzXa3rOYswHlxV1SkG2ZD65PZgeME=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UsvioKasKaW/KPvTDNt6zeYZxRuWmnsOdGG/DQIhI9v6AGA3mDi/tsmRRAY13uXDhUuM3TAOAm2EWrIhGqBwShv2aIXZFH1m8P8ECqJupcqv0afQ4Ykk8CHt9kPc1HDvuXOFIn7kq9QSlj0C2caXB19Qn/uZKwt+bJZTwAhl7iw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Aqz1hdbo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E722C4CEED;
-	Fri,  8 Aug 2025 18:53:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754679220;
-	bh=nYAv4YhqZB4fcdkzXa3rOYswHlxV1SkG2ZD65PZgeME=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Aqz1hdboWI5+7nAWBuS0wSh/hBhjEyY3D8mFwjQl1CcnMwzfwMzOTzYizQDRG9/kY
-	 CB57uMySkvjXTichvtEE2A+C6lk5ikn0amQP8me5SjgbyyN4jnbdkvxxK5cs1lh6Fo
-	 3drFYtEH64baXlG2slhXJ6WBM7odyI1NAD+23NMlCZzILtxwnBm2EurpApeeQ7182U
-	 EHAj/pSMlKA/hk1Ya1gyn5xbR8oP81gY994+dyLudEzUyPp3mNjk43awBTV1ScPIxa
-	 XnBmF41WJY+uG8LkMiBI8Yu2UVK2CUhBMpOBG5LF2ZDNR7B/+35vdTU+h0a+wvVOwZ
-	 bT5XF9kWrglEw==
-Date: Fri, 8 Aug 2025 11:53:38 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
- andrew+netdev@lunn.ch, netdev@vger.kernel.org, Jedrzej Jagielski
- <jedrzej.jagielski@intel.com>, przemyslaw.kitszel@intel.com,
- jiri@resnulli.us, horms@kernel.org, David.Kaplan@amd.com,
- dhowells@redhat.com, Paul Menzel <pmenzel@molgen.mpg.de>, Jacob Keller
- <jacob.e.keller@intel.com>
-Subject: Re: [PATCH net v2 1/2] devlink: let driver opt out of automatic
- phys_port_name generation
-Message-ID: <20250808115338.044a5fc8@kernel.org>
-In-Reply-To: <20250805223346.3293091-2-anthony.l.nguyen@intel.com>
-References: <20250805223346.3293091-1-anthony.l.nguyen@intel.com>
-	<20250805223346.3293091-2-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1754679490; c=relaxed/simple;
+	bh=zF9NRZgCk+PXK2zvVFzI2ry7Xxx7BQPV4t5GvfMgoFE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=II5X06yhEwnezFqwgC0/fwT2z69H+RZPf6jOcRErnctp3q94JA5GWeQhll4rZ8jNCdGjRuJlSlBW02CD99FKieY4C4WlxhGJ5ekzbEqQXmyTPvfIAGlqvO5s/kog2e9lFOCqOp57dbJCCxp6flM74ltJo/s42t73PhD4hyfI+aM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b=AUEODd49; arc=none smtp.client-ip=209.85.215.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=jrife.io
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-b42309a87easo450453a12.1
+        for <netdev@vger.kernel.org>; Fri, 08 Aug 2025 11:58:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=jrife-io.20230601.gappssmtp.com; s=20230601; t=1754679488; x=1755284288; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2NmIm6mjKZ8t7laHhfHgyGiZS5qOBWvDfmnil0ZPEDA=;
+        b=AUEODd49DNcr7y/gCwb3GL9NPipJ202gO89pOcH1Vo7CUjBodbTtvjgNz695cwGFTj
+         N7PD91KlA9nz9eZ/u0cLwkum4AI8VgMepJwgSJ79TYaXWqST0N4f4aQRQuoyj5b8RbC4
+         wdOiyvyhG8mznww4CTwTy9v858R19ee/L0FEIVvJqPuQyiZFyeWs9kIFsjNkP0GH3tkA
+         mtrGAaNaNzdvFjVr5Gp9oPfd/86K4MiUCUnkczFWDAzcuV6pZNbf3uq2a8+OV43lS7lO
+         dmmB8M5HpIHM/Tlhh8mYxlw69pxLKOgWfYbEAjzfYQU0K9QIO/bVp4x7S6Pr5Tz4IJ25
+         45ew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754679488; x=1755284288;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2NmIm6mjKZ8t7laHhfHgyGiZS5qOBWvDfmnil0ZPEDA=;
+        b=jTk2eC3j2HSr4Pwp7jNG9blAk1GBslHZd/KAiAXPG03NTUIe2Wo/MMrmQb1Ww3sg6P
+         O29JZIITn8IhomgoMDHWPehX1HjBNqajRODZK9nnWLvTxx1oW+I3pZFQN4jv1HGAsgdb
+         t6glXdt7A29cbAqA2wviCNNPScUcfEKvzac1FoYYTrxJ+kxnR6eyYPVQlxk6848OqY0C
+         JC3xxR+HFhjFBvNn/cn6lRX4tk1YunAYpuHk5ZQEvP+M1VJiO6zjmEe+StZ7BUKIUbO/
+         LDTQ9QIqFDI3zFJNbYLHVHRxlUkcq/rHmuEQYoFpY5oEiUilMH6QcdM2cAUvygf8RXoi
+         wM1A==
+X-Gm-Message-State: AOJu0Yz6JSUA6J26FgG8CQWCAjrBnbL3VyPYvJUKDc5pnO5Y0V3c3TN+
+	hY2/SAZV2MKX+zYqGGjhyzCKbMAfPQ62TpqYNtfHVCnlT8XTRoYbjcSWX3yxuwhrGxeooQzEA1r
+	C9SKH
+X-Gm-Gg: ASbGnctNsHhT8aSyWrbqRqZsPoyv9LiqreDX7DkVzGfcVNcPaZ+pRHQ0ooqukowYQHI
+	DAzhW+YoNKtaP3tb7R4yUVW+4pWjewhBtF95ZvgMnGNf57/Q34l8LnXw0KvROO6EcuAP+wrUgkv
+	hsLUDKB8w/oduJotjWIIBNYQC5Q1//NuU2R6VOn4P2d1n+6OViUkHfGd+FulgfP3pP1fMDoy4My
+	R4GTOFhvG+CrC+KffROHQITXuvux2ejdY8t1XmcCOEl6A0zx1lK9WpOcdl1RF8ZLxDnhz3aPqYW
+	zISmRkX+K4Cacaljg4/+h8M07G8sR8KxtLffaeZIZj6MvXTW61DfRPdoWSoMwu+xweDP+ApDqpO
+	ZC7bOcXEetvxumTq1pascnw==
+X-Google-Smtp-Source: AGHT+IESlMBhrVvWWMUFLmfaYHZAFxWuSbX6lIqwC5h+YluH3f9UNWN0R2ay0Ti14Qt+x6St7mSQwg==
+X-Received: by 2002:a05:6a20:3c8e:b0:240:1a3a:d7d4 with SMTP id adf61e73a8af0-240550452e2mr3172428637.2.1754679488423;
+        Fri, 08 Aug 2025 11:58:08 -0700 (PDT)
+Received: from t14.. ([2001:5a8:4528:b100:a6ee:dea7:7646:6889])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b422bb0a4b0sm18344803a12.59.2025.08.08.11.58.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Aug 2025 11:58:08 -0700 (PDT)
+From: Jordan Rife <jordan@jrife.io>
+To: netdev@vger.kernel.org
+Cc: Jordan Rife <jordan@jrife.io>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Jonathan Corbet <corbet@lwn.net>
+Subject: [PATCH v2 net] docs: Fix name for net.ipv4.udp_child_hash_entries
+Date: Fri,  8 Aug 2025 11:57:56 -0700
+Message-ID: <20250808185800.1189042-1-jordan@jrife.io>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Tue,  5 Aug 2025 15:33:41 -0700 Tony Nguyen wrote:
-> +	if (devlink_port->attrs.no_phys_port_name)
-> +		return 0;
+udp_child_ehash_entries -> udp_child_hash_entries
 
-Why are you returning 0 rather than -EOPNOTSUPP?
-Driver which doesn't implement phys_port_name would normally return
--EOPNOTSUPP when user tries to read the sysfs file.
+v1 -> v2: Target net instead of net-next (Kuniyuki)
+
+Fixes: 9804985bf27f ("udp: Introduce optional per-netns hash table.")
+Signed-off-by: Jordan Rife <jordan@jrife.io>
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+---
+ Documentation/networking/ip-sysctl.rst | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
+index bb620f554598..9756d16e3df1 100644
+--- a/Documentation/networking/ip-sysctl.rst
++++ b/Documentation/networking/ip-sysctl.rst
+@@ -1420,7 +1420,7 @@ udp_hash_entries - INTEGER
+ 	A negative value means the networking namespace does not own its
+ 	hash buckets and shares the initial networking namespace's one.
+ 
+-udp_child_ehash_entries - INTEGER
++udp_child_hash_entries - INTEGER
+ 	Control the number of hash buckets for UDP sockets in the child
+ 	networking namespace, which must be set before clone() or unshare().
+ 
+-- 
+2.43.0
+
 
