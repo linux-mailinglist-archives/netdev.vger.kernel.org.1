@@ -1,133 +1,162 @@
-Return-Path: <netdev+bounces-212298-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212299-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1FBFB1F022
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 23:04:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CB64B1F03B
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 23:27:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A9CB166F48
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 21:04:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F49656356A
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 21:27:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80AC7242D75;
-	Fri,  8 Aug 2025 21:04:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F163528934D;
+	Fri,  8 Aug 2025 21:27:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q/qwuqF2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iee8MpQ2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC9F91DE4E0;
-	Fri,  8 Aug 2025 21:04:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDE6B288C33
+	for <netdev@vger.kernel.org>; Fri,  8 Aug 2025 21:27:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754687055; cv=none; b=ec9HCpHMrbtGLe09pBEYGb7KN76PPjLCUKybcRBjZjqVN5Z3DlunKtSjdnC1Dl5+IEeroLREzmbWMkSZVGLKpsF6/u9blD+tQdYe0HG/ztNhOIe5ofwNGDN9idjsFoEwVg6TWtScsSx28UlxV6qMNCFOoQAsuxu0YmWBMZW2Pko=
+	t=1754688467; cv=none; b=U04F6yui9dVrdyqaTf5iP08KiqwLRUuEsgUBMFpJCm1bLfZlDYDRP72B8SJr53P1l4kJYONfcSPMu1/mMTwKhHypRfj3qk4iHOh7127hbnf/I97yGSSlrAkE9iz3xSpcjWxSUckNWIoxXEXlyhFQySLvUINqH79ZG/Ho3rayL3E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754687055; c=relaxed/simple;
-	bh=0R9DVJRVv1zIZSGbH4MTRtSYFNAxYWfrefpd6OVZMEU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nWnKiicRqvDto2tXV9b+X4pcO053GHdzM3BnnpgfyXLgF7UGb/7Rmxd4mtzaTwcRsLmnN/bdeiTAdK3ORT6NI7M9kfGzndIjRsNM6Osi4+DolBCT8+sMRCXhZh21Hh33c00lgBAi+MtjIWwmdNxFFUpvYkyoaZu6+xTz3g/ydZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q/qwuqF2; arc=none smtp.client-ip=209.85.218.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-adfb562266cso361219566b.0;
-        Fri, 08 Aug 2025 14:04:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1754687052; x=1755291852; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=o0kJ5OO6wKbrt+83v3pvG5co9xDM/9SYe+KlEk9T5G0=;
-        b=Q/qwuqF2JGDQ/RglEbN+1gy4Yat21jXU7bWpGRMjhaHckWOVVM2TkXxibkI/ONCy4u
-         sx0Dlk1NkEafKzNLAf3oojcJTVwIVYhjL8qsJree7/Fx4tUvZEA7i+18TND4nOLwINem
-         1m5lWWbJl9jppOEf/kPNT09JkoLU1gK+N5jJzvVEMn6nX3YM/NOnLprst+KgfWcE3gFA
-         ddr/4M7XyeS0XZfQVq0inB9rPj6d2h00T9l59c3id8o5BJgO3oMfELCu8AtgmSbGfwCi
-         kB/2p1XAhhixzLNh+57JQUQ+GkzM62gpyVc1hVfYZhkB+OBYNbZn0yAajgtm9rV9sPw3
-         YP0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754687052; x=1755291852;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=o0kJ5OO6wKbrt+83v3pvG5co9xDM/9SYe+KlEk9T5G0=;
-        b=b/2Hgw51S28E/pyOcJY8gUBwpIxuOQs3lQkdUUyy3kLkS8z0gNwOa/aCt5RcXFbcGy
-         Nvy7oUMz8bVjbOspF0Dm8PkYWNTLEud0ANTPBWrmgKuv6IzKluApEeFCmsbuD+G8d1jF
-         0t29EXV0+uXgdTEUF5MK7MDiCHuJho1akYqw5KUJVGXHGAU1zAhQPs6vopt9MIwkHemw
-         qVzJdzn3J2cHhBCnmiAU8+/Cv8ubvW5XdjymyOvA1mMtbAp+NF+7FYI9SpdxAy5fdkBB
-         kV8jzjTjLypiHowDw5pcAj7rxYms+llaRApSfxmGITdFGGpJ6FzY5uGancq0SLDZJpZo
-         /d2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUMUDaPc+LRTjujP8nUZ5wb9VWpIUV+208oWvokmPTscTVmVOgjhnGaGeiA13HVcumrBUoWeuW8F0cZTJQ=@vger.kernel.org, AJvYcCWVoId7pIr0Jh9wmuhL+qCac2jYPi8/5aBVpoOMjORFZkCemXo1xgieU8nfrwp4/puGHpB5DJDb@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZ3KFLqJgFZ9tauG9CPXhrkHtlPEgBIp1D1b7ppSzZAPgM12LW
-	WLqQfgQS4xLBvlQK8Y9IjO4hocsJFG/3OopflscBn3ybuCeCSeUIHvkI
-X-Gm-Gg: ASbGncsq4qjC/rKkKsHc3FgAsj4jXr+cEAt2/mBanNhVmDSlzLj5f3SA5TDlKilIisz
-	8z+YvGkqeZFPw+shsnsfpYhwihvKrUj0d927KNGdwX5C0N7Ccr7FXDcY1GUn8EkTu6P869jpOt/
-	pVXGAIZ2UO3MJ/4yZsUW2Xf9vTD3T6sPfthG/cGCilvAbzYiTSoUbKc2vb7UwL7XM0jKdGH6t9Q
-	dm1X656IABbVpYAcBDHzIc3tvjxflwdcdWcosQJkUsyyTDek4G0xfxyvPT6spt9L+e6cRaDVG9X
-	JvhXDW8iKJM+cmjy0ABj+4RElJl+/o9wjPeg97REigG/bCOeV1NftUkU740LehQGMqMOdLy8YPy
-	KdbZXW5oXpIk5EVR3Z4DMzXox4aptYoSBZhBwrmpBZvk=
-X-Google-Smtp-Source: AGHT+IFdd53FaNfAT88WuN7ZC8Ft9J01HNDj+u6Ek36Jguxg9UxK2LS0fk4D/82//PotxynSRfss1A==
-X-Received: by 2002:a17:907:a03:b0:af9:32bc:a365 with SMTP id a640c23a62f3a-af9c6506369mr381516466b.54.1754687047261;
-        Fri, 08 Aug 2025 14:04:07 -0700 (PDT)
-Received: from [192.168.8.100] ([148.252.141.111])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-af91a0763d8sm1573385766b.2.2025.08.08.14.04.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 Aug 2025 14:04:06 -0700 (PDT)
-Message-ID: <26725f8c-03e7-46d1-a017-8c36241ead92@gmail.com>
-Date: Fri, 8 Aug 2025 22:05:31 +0100
+	s=arc-20240116; t=1754688467; c=relaxed/simple;
+	bh=5Glh8oUPVFGMn/iG5XH/bkyb8EKbs15Myhy4Dn8Yxqw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=r+hHJKbqo54dmc+6ELqu2UlA6vvF5ZutNUUzU/9eNzzEBCFARD1sQ7W7rxndiWNsm6LZkusWE22DA44Gax4PXrgxiCqc90kcWeGtdqqC2P1dcRJ7sSdZP4ggUfbXn6G0Vcjjt02cIXi/jJm/pXm25IcAkKVycyfbkX+xCph1U6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iee8MpQ2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED2DAC4CEED;
+	Fri,  8 Aug 2025 21:27:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754688467;
+	bh=5Glh8oUPVFGMn/iG5XH/bkyb8EKbs15Myhy4Dn8Yxqw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=iee8MpQ2p5a5ryT2oJ3kGbz6yNvx0vl1IBamSvbeLPIoQ13t2dmjr4JNPaXAehyG6
+	 kFRNYzNBn3X8TLIN83ETZuTBVYknZsa9jh3F8X9/z765PGSLVx0CnuxjmlomfW5PLu
+	 RwtT3NFVDeLm9JpoPLS9lTuQIqKH5RR9gQa09DPAGpmP5Znn7KcZcE7PWw6u+4wEk3
+	 UNeg5QBYPH2Coludy9LUiabz89bmIr0/S89/TOG3lYm1YkzQi41QZW6czqpnNNXfY0
+	 4U0hoabELniDbBCHhw0MmTzDwNgqGOdZ+f37MwH0MeV7FgaAF7PZ0iW6jRfIsKn+0o
+	 eCQE0qhJILfKg==
+Date: Fri, 8 Aug 2025 14:27:46 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: William Liu <will@willsroot.io>
+Cc: netdev@vger.kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
+ pabeni@redhat.com, jiri@resnulli.us, davem@davemloft.net,
+ edumazet@google.com, horms@kernel.org, savy@syst3mfailure.io,
+ victor@mojatatu.com
+Subject: Re: [PATCH net v4 1/2] net/sched: Fix backlog accounting in
+ qdisc_dequeue_internal
+Message-ID: <20250808142746.6b76eae1@kernel.org>
+In-Reply-To: <20250727235602.216450-1-will@willsroot.io>
+References: <20250727235602.216450-1-will@willsroot.io>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC v2 17/24] eth: bnxt: adjust the fill level of agg queues
- with larger buffers
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
- Eric Dumazet <edumazet@google.com>, Willem de Bruijn <willemb@google.com>,
- Paolo Abeni <pabeni@redhat.com>, andrew+netdev@lunn.ch, horms@kernel.org,
- davem@davemloft.net, sdf@fomichev.me, almasrymina@google.com,
- dw@davidwei.uk, michael.chan@broadcom.com, dtatulea@nvidia.com,
- ap420073@gmail.com, linux-kernel@vger.kernel.org
-References: <cover.1754657711.git.asml.silence@gmail.com>
- <0a4a4b58fa469dffea76535411c188429138cc81.1754657711.git.asml.silence@gmail.com>
- <aJY767C6oiezskdM@mini-arch>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <aJY767C6oiezskdM@mini-arch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 8/8/25 19:03, Stanislav Fomichev wrote:
-> On 08/08, Pavel Begunkov wrote:
-...>>   static int bnxt_alloc_rx_page_pool(struct bnxt *bp,
->>   				   struct bnxt_rx_ring_info *rxr,
->>   				   int numa_node)
->>   {
->> -	const unsigned int agg_size_fac = PAGE_SIZE / BNXT_RX_PAGE_SIZE;
->> +	const unsigned int agg_size_fac = rxr->rx_page_size / BNXT_RX_PAGE_SIZE;
->>   	const unsigned int rx_size_fac = PAGE_SIZE / SZ_4K;
->>   	struct page_pool_params pp = { 0 };
->>   	struct page_pool *pool;
->>   
->> -	pp.pool_size = bp->rx_agg_ring_size / agg_size_fac;
-> 
-> [..]
-> 
->> +	WARN_ON_ONCE(agg_size_fac == 0);
-> 
-> nit: do we need to make this if (WARN_ON_ONCE(...)) agg_size_fac = 1?
-> Otherwise you're gonna divide by zero on the next line. Or properly
-> return some EINVAL instead?
-I can add it to be safe, but fwiw it shouldn't happen either way
+On Sun, 27 Jul 2025 23:56:32 +0000 William Liu wrote:
+> Special care is taken for fq_codel_dequeue to account for the
+> qdisc_tree_reduce_backlog call in its dequeue handler. The
+> cstats reset is moved from the end to the beginning of
+> fq_codel_dequeue, so the change handler can use cstats for
+> proper backlog reduction accounting purposes. The drop_len and
+> drop_count fields are not used elsewhere so this reordering in
+> fq_codel_dequeue is ok.
 
-> 
->> +
->> +	pp.pool_size = bnxt_rx_agg_ring_fill_level(bp, rxr) / agg_size_fac;
+Using local variables like we do in other qdiscs will not work?
+I think your change will break drop accounting during normal dequeue?
 
+> diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
+> index 638948be4c50..a24094a638dc 100644
+> --- a/include/net/sch_generic.h
+> +++ b/include/net/sch_generic.h
+> @@ -1038,10 +1038,15 @@ static inline struct sk_buff *qdisc_dequeue_internal(struct Qdisc *sch, bool dir
+>  	skb = __skb_dequeue(&sch->gso_skb);
+>  	if (skb) {
+>  		sch->q.qlen--;
+> +		qdisc_qstats_backlog_dec(sch, skb);
+> +		return skb;
+> +	}
+> +	if (direct) {
+> +		skb = __qdisc_dequeue_head(&sch->q);
+> +		if (skb)
+> +			qdisc_qstats_backlog_dec(sch, skb);
+>  		return skb;
+>  	}
+> -	if (direct)
+> -		return __qdisc_dequeue_head(&sch->q);
+>  	else
+
+sorry for a late nit, it wasn't very clear from the diff but
+we end up with
+
+	if (direct) {
+		...
+	}
+	else
+		return ..;
+
+Please reformat:
+
+	if (direct) {
+		...
+	} else {
+		...
+	}
+
+>  		return sch->dequeue(sch);
+>  }
+
+> diff --git a/net/sched/sch_fq.c b/net/sched/sch_fq.c
+> index 902ff5470607..986e71e3362c 100644
+> --- a/net/sched/sch_fq.c
+> +++ b/net/sched/sch_fq.c
+> @@ -1014,10 +1014,10 @@ static int fq_change(struct Qdisc *sch, struct nlattr *opt,
+>  		     struct netlink_ext_ack *extack)
+>  {
+>  	struct fq_sched_data *q = qdisc_priv(sch);
+> +	unsigned int prev_qlen, prev_backlog;
+>  	struct nlattr *tb[TCA_FQ_MAX + 1];
+> -	int err, drop_count = 0;
+> -	unsigned drop_len = 0;
+>  	u32 fq_log;
+> +	int err;
+>  
+>  	err = nla_parse_nested_deprecated(tb, TCA_FQ_MAX, opt, fq_policy,
+>  					  NULL);
+> @@ -1135,16 +1135,16 @@ static int fq_change(struct Qdisc *sch, struct nlattr *opt,
+>  		err = fq_resize(sch, fq_log);
+>  		sch_tree_lock(sch);
+>  	}
+> +
+> +	prev_qlen = sch->q.qlen;
+> +	prev_backlog = sch->qstats.backlog;
+>  	while (sch->q.qlen > sch->limit) {
+>  		struct sk_buff *skb = qdisc_dequeue_internal(sch, false);
+>  
+> -		if (!skb)
+> -			break;
+
+The break conditions is removed to align the code across the qdiscs?
+
+> -		drop_len += qdisc_pkt_len(skb);
+>  		rtnl_kfree_skbs(skb, skb);
+> -		drop_count++;
+>  	}
+> -	qdisc_tree_reduce_backlog(sch, drop_count, drop_len);
+> +	qdisc_tree_reduce_backlog(sch, prev_qlen - sch->q.qlen,
+> +				  prev_backlog - sch->qstats.backlog);
+
+There is no real change in the math here, right?
+Again, you're just changing this to align across the qdiscs?
 -- 
-Pavel Begunkov
-
+pw-bot: cr
 
