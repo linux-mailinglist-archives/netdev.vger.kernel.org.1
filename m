@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-212121-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212122-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C2D0B1E10F
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 05:59:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00748B1E13D
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 06:30:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D526567281
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 03:59:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 682A26275BE
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 04:30:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 605501A4F0A;
-	Fri,  8 Aug 2025 03:59:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD3DD78F4A;
+	Fri,  8 Aug 2025 04:30:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ON9M83+X"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q+6IqODI"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3439D2AE74;
-	Fri,  8 Aug 2025 03:59:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84B5C288CC;
+	Fri,  8 Aug 2025 04:30:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754625556; cv=none; b=seHTQfqrs4WRh06RjBE4Zrg5lgbGO2Z2RZMCsiHTduwStLprnb9rpfxSAhGGq2gxY7K+lQ85ItT8dD8AGAbOwZJ0rAL7rVAVyeJF0us34VQgX0C9EBCn0Bsd3Px14VhtXqRJNo/mtYOR1UctkpVE3cGIFHswX6B24RkiFLYSKqQ=
+	t=1754627449; cv=none; b=p2nG3oAM/sIcqxEHVmmOyIu3BSYQMVoVDJud3YXslIk/jRzJoIL8t710TgbjVJjLu9CYNntQIjhwvTcV25/Idm40BONJejsgV5AYHC1Ht5iTRmKmeN+Jyf+HaEEuQ/nc3ECOHU4Z+BTQ3jlbE5DrtHzP81PxrQr3j8rAgWcWFL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754625556; c=relaxed/simple;
-	bh=ljvdP6Lnfm1PY+j0GIMGtIa6gjo7I2ezz1+J9fW+I0Y=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=F+dZFsgiJYEODOS0GwLZq/Yq0EqGzpswVWQqBdw2xW9NfIjWhDx68df0dPw8mJ526q1381P3m9pBehCKh/biFxYJR2vZGlizJV6beHi3UegSCzDQrEjwmu9ORg0PcTB3lZYQJNVOAa1MNpesE8dNqW/VyG2rlF4xOSiR9VjL1nQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ON9M83+X; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13A7EC4CEF0;
-	Fri,  8 Aug 2025 03:59:16 +0000 (UTC)
+	s=arc-20240116; t=1754627449; c=relaxed/simple;
+	bh=4ymvK8BInbX4lIIBa433a4zgHJB0+Ap83rZk2BwhMMs=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=ERCmtMHg+aWczODEDmLsLaUEaZp7TsTMY/AaiYLU3j+80s45/yqh3wqTgzdjz6q8n88aqj4p+1MpNxWKBB3t9ovRNgZjRHYtgz/rF5Uf5+mIGjhuqAWymYsfwGqVtc/d3uUpIoLBTCtxoldNlk4AKMFTN7F2kkQs5KERKlDwzAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q+6IqODI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB682C4CEED;
+	Fri,  8 Aug 2025 04:30:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754625556;
-	bh=ljvdP6Lnfm1PY+j0GIMGtIa6gjo7I2ezz1+J9fW+I0Y=;
+	s=k20201202; t=1754627449;
+	bh=4ymvK8BInbX4lIIBa433a4zgHJB0+Ap83rZk2BwhMMs=;
 	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=ON9M83+XrEhayMhNPS+DYqM/xZAX2QUjmvIaqnBANau7hdVbSbGjIVhuPSIgAxP1V
-	 w4gcxgIWgpI9b5Dx05z610LcKh6LrRO7/lHz6LNwURJEyQhY9LxwT/e1UVfyaAVhK3
-	 7YDzgBC6JgbtokQ2hTVMIBOwSxMuqI2dCKKK5ao8q45krvB5vCqZ6a+guxX9iYUdv+
-	 9Ty6ayWsvv1L8S8p4xKETc71WaXqJ+QMUgrGyfBeYOMzFaBV6sIxqnhe8NmWJV9O/6
-	 D8Bp2O/xORr9+ZqOnPcEbmDFo5C/MJnmqOqAI5JWN/6lXu0VUftAHilrHTElVcE/VP
-	 KNUjcsNTEUpFA==
+	b=q+6IqODIpJXzMKkBiGmrfDwbEA1v3m+nY87fjSymVVV1RXDtYUgbEPoY5v5kn61wi
+	 DklWxeSdEnvjwfw86eHPDRkGZsPeZHQj6xeATVWYIV3g9VHcqePl0wedOsBztNPfQO
+	 e/eCszQey3AmOpWk05+j9lYfjXoQJbYvZ8ht/m/6Ad8Zz08ArQmHY5CT1z3d9RVCqi
+	 xIYJEGuMPZ2xymwTqQxZi2Bc4yOLuCaxukW49kjN36AOQmdocunnQyuWQaaQ0QpUsY
+	 rm93KsjLI7bmAOLCJ49aST5aFNDB/GdjGZvy21YdqbzTT+BvxzDjcCHKbLRBqILeIC
+	 YmH1vILbUmVkA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE0CB383BF4E;
-	Fri,  8 Aug 2025 03:59:30 +0000 (UTC)
-Subject: Re: [GIT PULL] vhost: bugfix
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 74B19383BF5A;
+	Fri,  8 Aug 2025 04:31:03 +0000 (UTC)
+Subject: Re: [GIT PULL] Networking for v6.17-rc1
 From: pr-tracker-bot@kernel.org
-In-Reply-To: <20250807084721-mutt-send-email-mst@kernel.org>
-References: <20250807084721-mutt-send-email-mst@kernel.org>
-X-PR-Tracked-List-Id: <kvm.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20250807084721-mutt-send-email-mst@kernel.org>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
-X-PR-Tracked-Commit-Id: 6a20f9fca30c4047488a616b5225acb82367ef6b
+In-Reply-To: <20250807144345.806381-1-kuba@kernel.org>
+References: <20250807144345.806381-1-kuba@kernel.org>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20250807144345.806381-1-kuba@kernel.org>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.17-rc1
+X-PR-Tracked-Commit-Id: d942fe13f72bec92f6c689fbd74c5ec38228c16a
 X-PR-Merge-Tree: torvalds/linux.git
 X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: b1e06c19abd2efbdd080047b2e70195c04ac2139
-Message-Id: <175462556918.3795225.10405999923797232759.pr-tracker-bot@kernel.org>
-Date: Fri, 08 Aug 2025 03:59:29 +0000
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, jasowang@redhat.com, jhkim@linux.ibm.com, leitao@debian.org, mst@redhat.com
+X-PR-Merge-Commit-Id: ae633388cae349886f1a3cfb27aa092854b24c1b
+Message-Id: <175462746203.4027442.16716797683985916411.pr-tracker-bot@kernel.org>
+Date: Fri, 08 Aug 2025 04:31:02 +0000
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 
-The pull request you sent on Thu, 7 Aug 2025 08:47:21 -0400:
+The pull request you sent on Thu,  7 Aug 2025 07:43:45 -0700:
 
-> https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.17-rc1
 
 has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/b1e06c19abd2efbdd080047b2e70195c04ac2139
+https://git.kernel.org/torvalds/c/ae633388cae349886f1a3cfb27aa092854b24c1b
 
 Thank you!
 
