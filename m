@@ -1,54 +1,53 @@
-Return-Path: <netdev+bounces-212245-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212246-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 806DBB1ED63
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 18:54:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 187F6B1ED60
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 18:54:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E1ECA000F0
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 16:54:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C5355853B1
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 16:54:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE7DC289832;
-	Fri,  8 Aug 2025 16:52:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23CDE289E12;
+	Fri,  8 Aug 2025 16:52:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="fWnSUk42"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="SoLmo2kl"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BB60288521;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8B36288538;
 	Fri,  8 Aug 2025 16:52:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754671972; cv=none; b=LzmoibFDeoBNwCuZpxsd66VaBG8srSjnZkSnhEBmEFKMiQ9IprPOfA/LN+7TNm9guCavZHsZeLDRq3QBrOdIIDEHhgvvZrMt/Oc++U1tHIgbw3bheqRuPgQsnGyZZ/wLV5jBwsNwwAH7+uR68qf3/Yg3BCPtzzHl4CIjiA4jX9M=
+	t=1754671973; cv=none; b=gNumq5HvYN5gcUUiqrMMg4jteZ0/H3pF19s4RJP6aflgcsZyTRBc875aQI+wMZ9HwoQQ3cCC8eENDVy/XDp0IbTIUGOhnpD10xKm9tlMY0AVh0l9S7cTRFf0poEnISF3euQbYy3dTE7gAUa8wfBLsVlSDQUMIvETjazMxGDa7DM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754671972; c=relaxed/simple;
-	bh=01ulugO5HPsgOo03HicDHzahKitBt2jFNwb5p2b4ET0=;
+	s=arc-20240116; t=1754671973; c=relaxed/simple;
+	bh=aKGyydWoqCGijDa+MJYiS28Ow00BNgT9WAzKyA2HAYs=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=iDka5gyZSxbDKXbxqyRVfg9nnOcAM5JUiUUPq7BQGNYeEKxb1pfy5y/AAreORD808Woks0AaeRgkDyYkYrIspyjRO4Nqh84LC//UdndrK11FTx7bXGea+JvZ6bjO0ZTk6xWQkDeVa/Hk2u9aEjQgrB10inSWMzp2/4vaRvewlwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=fWnSUk42; arc=none smtp.client-ip=217.70.183.198
+	 In-Reply-To:To:Cc; b=cyBFWX8lyO7ZJRvuBiGb0Fr8jGWUeIeMNghA9t8Eh9GWKDMb3sNkFJMlS4fJdhatAT2NhG4JQzqP7jZVPyL+TNmSn9UNdM2YKMlBmYmkKjrhD2fDBOpWIpVTJ6kBUvlMxruCyMM4Hk2iEUkly5HzxHKmjPAIB6qr5Acly3mK5Qg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=SoLmo2kl; arc=none smtp.client-ip=217.70.183.198
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 03605442E3;
-	Fri,  8 Aug 2025 16:52:46 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id E3DC7442E7;
+	Fri,  8 Aug 2025 16:52:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1754671967;
+	t=1754671968;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=abq7spjWRkfTk/ksFybEILGPwn8fAaOVAq7+bWm7RWQ=;
-	b=fWnSUk42u9TIKhCEkSSoPleyIjvLjKAMTfuuWK4zRjxebFws8qWg9yZXsfjmy08Zg2ysoe
-	XDhV+KJLNGa6T9V4eUvdxiZZAOF8BV5cZzojKiung8mhO1CzI00oP7eeembCJ0FI0vLdht
-	fK3gZZpjHK5hdliSu2VFPU7D6qm3cqF7ic9n2CmyFj+jdSoUvhrP3qOJlocglpyIJK+Em8
-	fZ0ZkkFnTr/IjP5l1vbHgG5OsNCcv4FqS5ORxwGuMbe/LSYbj1EnYHu7lXYjcQWw1F6HMZ
-	+lGpUVuYHg4WO/9YMN1AG8jjbdYRQWEh1y/XjjwkcixL0gxGXmRpu2WuTrlW9g==
+	bh=vUfwnh4wlvhJ6QtYdHimz2QulNwPskPeWcdinFBBCns=;
+	b=SoLmo2klI6N+Q+cTGcrCBvEdu+gsa47dnzjz+cMDLK0aQqIMJ4FJr3Abdta1TdB2Q8nBvd
+	Dhrigou72o5gqQsrzvMpk80AtG0chmc6efWl/HDvz0rOX6f5ad8byW64GqCS5NoPYj0LFp
+	+mYZbdM4nu7TURAqjdB2w3YwK0+zQitVnwEXwd5MicchhFcoCtgNqmqCHgB8hiR5XbXHaW
+	Qf4p6Bacx+ILwjHB0NTgoxNzU+hUbzCRu5UA9lkHylFQvlIGvQtUNahFeKskHjqYG6zXgB
+	428TbpTTxsmadc5C71bzadnyriiIJhfwGauEWb5xsaSXWshEWCuAvPalapjBLw==
 From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-Date: Fri, 08 Aug 2025 18:52:42 +0200
-Subject: [PATCH net v3 10/16] net: macb: Remove local variables clk_init
- and init in macb_probe()
+Date: Fri, 08 Aug 2025 18:52:43 +0200
+Subject: [PATCH net v3 11/16] net: macb: drop macb_config NULL checking
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,7 +56,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-Id: <20250808-macb-fixes-v3-10-08f1fcb5179f@bootlin.com>
+Message-Id: <20250808-macb-fixes-v3-11-08f1fcb5179f@bootlin.com>
 References: <20250808-macb-fixes-v3-0-08f1fcb5179f@bootlin.com>
 In-Reply-To: <20250808-macb-fixes-v3-0-08f1fcb5179f@bootlin.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -84,56 +83,38 @@ X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdduvdegfeegucetufdoteggode
  hdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegtlhgruhguihhurdgsvgiinhgvrgesthhugihonhdruggvvhdprhgtphhtthhopehsvggrnhdrrghnuggvrhhsohhnsehlihhnuhigrdguvghv
 X-GND-Sasl: theo.lebrun@bootlin.com
 
-Remove local variables clk_init and init. Those function pointers are
-always equivalent to macb_config->clk_init and macb_config->init.
+Remove NULL checks on macb_config as it is always valid:
+ - either it is its default value &default_gem_config,
+ - or it got overridden using match data.
 
 Reviewed-by: Sean Anderson <sean.anderson@linux.dev>
 Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
 ---
- drivers/net/ethernet/cadence/macb_main.c | 13 +++----------
- 1 file changed, 3 insertions(+), 10 deletions(-)
+ drivers/net/ethernet/cadence/macb_main.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index 4d8b4b764e0d5768a91f72fb6a5642f755ef3a5b..8c190ed201c1095ecb56749a4cf7f28112ae41d7 100644
+index 8c190ed201c1095ecb56749a4cf7f28112ae41d7..52270b20d9a1818c961525ae6de6f7d0557ddc54 100644
 --- a/drivers/net/ethernet/cadence/macb_main.c
 +++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -5182,10 +5182,6 @@ static const struct macb_config default_gem_config = {
- static int macb_probe(struct platform_device *pdev)
- {
- 	const struct macb_config *macb_config = &default_gem_config;
--	int (*clk_init)(struct platform_device *, struct clk **,
--			struct clk **, struct clk **,  struct clk **,
--			struct clk **) = macb_config->clk_init;
--	int (*init)(struct platform_device *) = macb_config->init;
- 	struct device_node *np = pdev->dev.of_node;
- 	struct clk *pclk, *hclk = NULL, *tx_clk = NULL, *rx_clk = NULL;
- 	struct clk *tsu_clk = NULL;
-@@ -5207,14 +5203,11 @@ static int macb_probe(struct platform_device *pdev)
- 		const struct of_device_id *match;
- 
- 		match = of_match_node(macb_dt_ids, np);
--		if (match && match->data) {
-+		if (match && match->data)
- 			macb_config = match->data;
--			clk_init = macb_config->clk_init;
--			init = macb_config->init;
--		}
+@@ -5243,15 +5243,13 @@ static int macb_probe(struct platform_device *pdev)
  	}
+ 	bp->num_queues = num_queues;
+ 	bp->queue_mask = queue_mask;
+-	if (macb_config)
+-		bp->dma_burst_length = macb_config->dma_burst_length;
++	bp->dma_burst_length = macb_config->dma_burst_length;
+ 	bp->pclk = pclk;
+ 	bp->hclk = hclk;
+ 	bp->tx_clk = tx_clk;
+ 	bp->rx_clk = rx_clk;
+ 	bp->tsu_clk = tsu_clk;
+-	if (macb_config)
+-		bp->jumbo_max_len = macb_config->jumbo_max_len;
++	bp->jumbo_max_len = macb_config->jumbo_max_len;
  
--	err = clk_init(pdev, &pclk, &hclk, &tx_clk, &rx_clk, &tsu_clk);
-+	err = macb_config->clk_init(pdev, &pclk, &hclk, &tx_clk, &rx_clk, &tsu_clk);
- 	if (err)
- 		return err;
- 
-@@ -5352,7 +5345,7 @@ static int macb_probe(struct platform_device *pdev)
- 		bp->phy_interface = interface;
- 
- 	/* IP specific init */
--	err = init(pdev);
-+	err = macb_config->init(pdev);
- 	if (err)
- 		goto err_out_free_netdev;
- 
+ 	if (!hw_is_gem(bp->regs, bp->native_io))
+ 		bp->max_tx_length = MACB_MAX_TX_LEN;
 
 -- 
 2.50.1
