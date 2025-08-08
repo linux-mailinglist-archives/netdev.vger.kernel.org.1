@@ -1,144 +1,113 @@
-Return-Path: <netdev+bounces-212226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212227-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48F23B1EC65
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 17:51:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id ABA11B1EC82
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 17:54:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 442E4566554
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 15:51:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 90660580592
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 15:54:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F7A628541C;
-	Fri,  8 Aug 2025 15:51:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 913FE286416;
+	Fri,  8 Aug 2025 15:54:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RIYeKXV4"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XGyNFvlW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EBCF225A29;
-	Fri,  8 Aug 2025 15:51:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D96A6285CB9
+	for <netdev@vger.kernel.org>; Fri,  8 Aug 2025 15:54:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754668291; cv=none; b=INb3n4leueQ5L7CTdkwRYsc1qyA7cTnOw65KhiYzZFNtizAyA1zOM/ep/6DaquMlvbJHqwYYiz8n52uT8zhAXMB4O+YeoyxRJ1WV7NCOWJrGbkXWp/DSMawVuf3y12yXTuXhkqHlVxWqGiQbrXtCCBoTqnepZj9gQMNujbCKNHQ=
+	t=1754668457; cv=none; b=RnCXKfWFtZVAXiIYqUhTkyIuVgTe3/fgcnGsI1/iJBKfCXmmQFWf4pFbmOJtupRM5UqrnvkpgkjODk6FLTssafT1vPLWQkprZT/sXC/wKNr6Ng6JgugJbN42rCaeNPoWeHuuJpjIsUGOKGGs4c1JO+zVCFmat3eyvo8850Eawq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754668291; c=relaxed/simple;
-	bh=9M9vj6O/7T0eVWhnTNWZUnrhO3VOhOj0y1nq7m5+/KE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Mtw26uGjRKLMSh79p+/Dbv8ZGssce/JkNUo3CaJtVv73ntfbIBiLWdUWEPepW1I6ug5JeL2KmaNPkylJRmFClklHk5Qg9Wnx7Iu8Xglwfh8JtIoC5fVHvhxCgFB+HjtMO96k6/UufHjjKl0kE9dHjaUosSpCvCmuW2/625JYf5U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RIYeKXV4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B2BCC4CEED;
-	Fri,  8 Aug 2025 15:51:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754668290;
-	bh=9M9vj6O/7T0eVWhnTNWZUnrhO3VOhOj0y1nq7m5+/KE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=RIYeKXV4q5z6kKHjTlMG66L4ft6xNwRXRWfVR048a8Np9uvX7sWmdyRaDON/yfP/m
-	 g0YV6UoqFXXYmCbmEwDzuAbrXJXPZmpYuAT27k0f/gBIokFEtVOMAfFXnxn8K7wCiZ
-	 58M+8+qi56hsrVR5Nd4QfXhVoHWdDiojV4KV0ebpRH/m6uBWZiuBtHR4jSm75ADUwv
-	 Oau/agS+PvoN62brSbn3k7ONiFAzFZ5Ek+B2hb+9QJEOV1SE5gINQnXLtD8GVVoo0J
-	 3boyH2aZpnco9cbOim8xX1c6NzgGQB2rkHI2j7dPqoVy/Nf30OjCw2sMdYXh6v5T5D
-	 Ee02sCv1R0rXQ==
-Message-ID: <94048354-2385-4f65-9c36-64424985613c@kernel.org>
-Date: Fri, 8 Aug 2025 17:51:25 +0200
+	s=arc-20240116; t=1754668457; c=relaxed/simple;
+	bh=BHJY+KSo4oQqORjyQr7L3Ta1mYn3O21VYHEvy/pabXI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=e7ETcavrt8XRfcJ8+bhQD5ZXGKLc6UO01gg+Dq8DUCMiAnA6vi2GPPvzGx5jNw7LyOSfk6eCdoJXFpWiEdgkuuKzERDYl9imIjPk2S9qPxy2u1My9z8ysV3PDGY/MHoN6Kvte8oDh9WvHLK8yY7g05nbaGc5OYx3QdgX/Fqu1ww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XGyNFvlW; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1754668456; x=1786204456;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=BHJY+KSo4oQqORjyQr7L3Ta1mYn3O21VYHEvy/pabXI=;
+  b=XGyNFvlWnXY4jzrjntn6vBOaQoECwGXUuXnZIC8tJ3v2HZ169t5Pq1lu
+   oRCu+FRIX1jhWFsrwdb8Mko+7fSOLp0dDIRcagWDgIMOxUoghmfXGnwg3
+   JQgjCG1TC8kcbnqh4eks+XSmVV78BC2YnrQcDEDfqp+jvm4rtImISmzGG
+   JjUXvDwk5qwvYGW+DuatsIuHb9XyKcXJnN4TKn4+jON150uw80XY1s6NQ
+   pL1/MFS0H1Ll2SDBSZ0P5BeCvfJSdj29tWm3ctLKGEw/VT8+Hqb3RoUhq
+   LghcD5/Dj0ouq3r1urxWHGS+2yRyUq8VaAXF+eTLOJTRlMMjwZ3cOmr2y
+   w==;
+X-CSE-ConnectionGUID: UqXMX2ppQFmxv7DfyDOkhw==
+X-CSE-MsgGUID: LUlcGU7gS1O8984pLsREEg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11515"; a="68476102"
+X-IronPort-AV: E=Sophos;i="6.17,274,1747724400"; 
+   d="scan'208";a="68476102"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2025 08:53:51 -0700
+X-CSE-ConnectionGUID: 7nyJYSelSF+DKucgdfCiUA==
+X-CSE-MsgGUID: Vx0jAeNMRpyJlEhzux7Xow==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,274,1747724400"; 
+   d="scan'208";a="165680810"
+Received: from gk3153-pr4-x299-22869.igk.intel.com (HELO localhost.igk.intel.com) ([10.102.21.130])
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2025 08:53:48 -0700
+From: Michal Kubiak <michal.kubiak@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: maciej.fijalkowski@intel.com,
+	netdev@vger.kernel.org,
+	przemyslaw.kitszel@intel.com,
+	jacob.e.keller@intel.com,
+	aleksander.lobakin@intel.com,
+	anthony.l.nguyen@intel.com,
+	Michal Kubiak <michal.kubiak@intel.com>,
+	Paul Menzel <pmenzel@molgen.mpg.de>
+Subject: [PATCH iwl-net] ice: fix incorrect counter for buffer allocation failures
+Date: Fri,  8 Aug 2025 17:53:10 +0200
+Message-ID: <20250808155310.1053477-1-michal.kubiak@intel.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next v3] selftests/bpf: Add LPM trie microbenchmarks
-To: Matt Fleming <matt@readmodwrite.com>, Alexei Starovoitov
- <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>
-Cc: Shuah Khan <shuah@kernel.org>, kernel-team@cloudflare.com,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org, Martin KaFai Lau <martin.lau@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>, netdev@vger.kernel.org,
- Matt Fleming <mfleming@cloudflare.com>
-References: <20250722150152.1158205-1-matt@readmodwrite.com>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <20250722150152.1158205-1-matt@readmodwrite.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
+Currently, the driver increments `alloc_page_failed` when buffer allocation fails
+in `ice_clean_rx_irq()`. However, this counter is intended for page allocation
+failures, not buffer allocation issues.
 
+This patch corrects the counter by incrementing `alloc_buf_failed` instead,
+ensuring accurate statistics reporting for buffer allocation failures.
 
-On 22/07/2025 17.01, Matt Fleming wrote:
-> From: Matt Fleming<mfleming@cloudflare.com>
-> 
-> Add benchmarks for the standard set of operations: lookup, update,
-> delete. Also, include a benchmark for trie_free() which is known to have
-> terrible performance for maps with many entries.
-> 
-> Benchmarks operate on tries without gaps in the key range, i.e. each
-> test begins with a trie with valid keys in the range [0, nr_entries).
-> This is intended to cause maximum branching when traversing the trie.
-> 
-> All measurements are recorded inside the kernel to remove syscall
-> overhead.
-> 
-> Most benchmarks run an XDP program to generate stats but free needs to
-> collect latencies using fentry/fexit on map_free_deferred() because it's
-> not possible to use fentry directly on lpm_trie.c since commit
-> c83508da5620 ("bpf: Avoid deadlock caused by nested kprobe and fentry
-> bpf programs") and there's no way to create/destroy a map from within an
-> XDP program.
-> 
-> Here is example output from an AMD EPYC 9684X 96-Core machine for each
-> of the benchmarks using a trie with 10K entries and a 32-bit prefix
-> length, e.g.
-> 
->    $ ./bench lpm-trie-$op \
->    	--prefix_len=32  \
-> 	--producers=1     \
-> 	--nr_entries=10000
-> 
->    lookup: throughput    7.423 ± 0.023 M ops/s (  7.423M ops/prod), latency  134.710 ns/op
->    update: throughput    2.643 ± 0.015 M ops/s (  2.643M ops/prod), latency  378.310 ns/op
->    delete: throughput    0.712 ± 0.008 M ops/s (  0.712M ops/prod), latency 1405.152 ns/op
->      free: throughput    0.574 ± 0.003 K ops/s (  0.574K ops/prod), latency    1.743 ms/op
-> 
-> Tested-by: Jesper Dangaard Brouer<hawk@kernel.org>
+Fixes: 2fba7dc5157b ("ice: Add support for XDP multi-buffer on Rx side")
+Reported-by: Jacob Keller <jacob.e.keller@intel.com>
+Suggested-by: Paul Menzel <pmenzel@molgen.mpg.de>
+Signed-off-by: Michal Kubiak <michal.kubiak@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_txrx.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I've run a lot more benchmarks.
-
-I've used a slightly updated version[1] written by Matt, that improve
-the "delete" operation accounting that Alexei complain about, but I
-guess Matt isn't 100% happy with his approach (as I don't see a V4).
-The below "delete" numbers have improved compared to above.
-
-Results from[2] with default 10,000 entries:
-  lookup	7.598 ± 0.004 M ops/s	131.608 ns/op
-  update	3.247 ± 0.029 M ops/s	308.008 ns/op
-  delete	1.747 ± 0.053 M ops/s	572.519 ns/op
-  free	0.294 ± 0.055 K ops/s	3.521 ms/op
-
-  [1] 
-https://github.com/xdp-project/xdp-project/blob/main/areas/bench/patches/bench-lpm-trie-V3-adjusted.patch
-  [2] 
-https://github.com/xdp-project/xdp-project/blob/main/areas/bench/bench01_lpm-trie.org
-
-I'm mostly interested in the fast-path lookup performance. Documented
-here [3] and links to plots[4]. People seeing these per operations
-costs, remember that this includes the get random number cost. That said
-is very clear from my data, that LPM trie have problems with cache-line
-trashing as number of entries increase.
-
-  [3] 
-https://github.com/xdp-project/xdp-project/blob/main/areas/bench/bench02_lpm-trie-lookup.org
-  [4] 
-https://github.com/xdp-project/xdp-project/blob/main/areas/bench/bench02_lpm-trie-lookup.org#plotting-results
-
-I've also documented the "bench" harness a little[5].
-
-  [5] 
-https://github.com/xdp-project/xdp-project/blob/main/areas/bench/README.org
-
---Jesper
+diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
+index 93907ab2eac7..1b1ebfd347ef 100644
+--- a/drivers/net/ethernet/intel/ice/ice_txrx.c
++++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
+@@ -1337,7 +1337,7 @@ static int ice_clean_rx_irq(struct ice_rx_ring *rx_ring, int budget)
+ 			skb = ice_construct_skb(rx_ring, xdp);
+ 		/* exit if we failed to retrieve a buffer */
+ 		if (!skb) {
+-			rx_ring->ring_stats->rx_stats.alloc_page_failed++;
++			rx_ring->ring_stats->rx_stats.alloc_buf_failed++;
+ 			xdp_verdict = ICE_XDP_CONSUMED;
+ 		}
+ 		ice_put_rx_mbuf(rx_ring, xdp, ntc, xdp_verdict);
+-- 
+2.45.2
 
 
