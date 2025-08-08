@@ -1,62 +1,88 @@
-Return-Path: <netdev+bounces-212221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212222-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E533B1EBC5
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 17:26:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9390B1EC17
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 17:33:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id DFEA04E4B05
-	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 15:26:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B23718843B3
+	for <lists+netdev@lfdr.de>; Fri,  8 Aug 2025 15:28:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0499728507D;
-	Fri,  8 Aug 2025 15:24:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 619BD27990A;
+	Fri,  8 Aug 2025 15:27:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rqMjSejV"
+	dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b="0Yds9pAB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB418285068;
-	Fri,  8 Aug 2025 15:24:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5E13283C90
+	for <netdev@vger.kernel.org>; Fri,  8 Aug 2025 15:27:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754666656; cv=none; b=pyWwZF5gmGjqsJkKEGoxvdkDORC+d+yGIQKaJ4N0RTU6U+2RgU+ocwZH6ju7Ct1NrBDaeICpbNU+FQ5FWSyQv+T/akSBy7x4s18ZcrmeNo2vaMxYYNA6APkdzgxE+MXRBuiH9qmf0wRYzbD3dUpPQY4BEeO5/vHoBQ/JzyEPikE=
+	t=1754666860; cv=none; b=LkyZLkjIF0mzlRC6TwJTTHggdTHK9Nw9IpgwMBpIWWy7Qwu/Je9+QKNe2MWAwydLu5+yBIogNNOI32c/mKXdEv0e1umxjE2cWnaUT9M+g4cszUwGxg5RJabI0JLjl/A0fUaWbuQqGr9W6tuCglZvnH0aC92NuvHrYd85sPrmvhU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754666656; c=relaxed/simple;
-	bh=Z6bqzKh73A7mDRbKN2x3ZXyov++aLEtSEolhGHyxyB0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ketbXA8LZxzSXfv+ccgel671gY0WrgXS/fBdIGRzc+uImze1u0Kr5FpVf3ra78g5Ly4YiFadKKzjnAACzaJMhVkhvo6almsdAbA5Oy5cK5Me+FfUT6kOEcVSreqZ71iUP3QmQpmLlCwBoxP2zF65eG+j45YZoHlks4N+6rvuBiM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rqMjSejV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80A71C4CEED;
-	Fri,  8 Aug 2025 15:24:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754666656;
-	bh=Z6bqzKh73A7mDRbKN2x3ZXyov++aLEtSEolhGHyxyB0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=rqMjSejVYW8eeHalSrTc8ajJ06Vv7MhVmpcZFMsAHBbomw1S6tEVL+QUj/mWpdaO7
-	 AOkYLldb4nraEYkt1dDprFcdXI3eO0o38qOW8v0VgDqgdLoacc7S4A6PL3WGn056Ru
-	 an+RTTOCd3HBM1o1QclRT9Imb+JxPyrWWteW/5MeLPsX3GdJz1CWjmRmIwpWoasJkc
-	 F+2ThC5HW7Z0HfEPVa4z6M4y2AKo3E9Tae5DT9WczuvVp6coEEmnFsPfscwTDcZV/9
-	 p7T6FIDo2raNDaqLgzs+QBJh2hSTmu3DqcolGKhf70Ji3v7QYkwYga9nH8HYqagFCU
-	 m5q8GKs1qsTQw==
-From: Arnd Bergmann <arnd@kernel.org>
-To: Bartosz Golaszewski <brgl@bgdev.pl>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	linux-gpio@vger.kernel.org,
-	Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	Sumanth Gavini <sumanth.gavini@yahoo.com>,
+	s=arc-20240116; t=1754666860; c=relaxed/simple;
+	bh=4t8msaBVgUkmaVN2L8z2i/VlUwqqFe1rWYYu/ZCt5uk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=b0PkEMBG+Zg9E+nliABWXAByTkPzbBwfKH3AktQ1CkvnHirrg18YPOSUEh9krhnq8dSeAA6X1hmuSpaamdBn6NC4qrdHO7qDu1HCu/adT8VnahkHtW06IstTtiLpdDUJNeFlTXoJo5tk2Bw+PcvYh1zH5GCSBbTeqJ2XpMf1ODg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b=0Yds9pAB; arc=none smtp.client-ip=209.85.216.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=jrife.io
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-31f3f978cd1so460361a91.2
+        for <netdev@vger.kernel.org>; Fri, 08 Aug 2025 08:27:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=jrife-io.20230601.gappssmtp.com; s=20230601; t=1754666858; x=1755271658; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Jd5QA0/uPh92ea5alhlb4TcCs4dDLGLbN0YRHZShzYo=;
+        b=0Yds9pABqzsmyn+K6k45xiKHiWpsQP+98GKErwwaxF5HHPtWmrIaeyLWM/OBCy8kLm
+         qgtTfjABvQCi+BukTMTDY8ji/8xrWQs6mS5FdwZ6fDjiOGMSwrfjXjgYj/tDnC21/Lmz
+         UxchhdLVF/GDOEP9+V9YE2cnNtwTktQsihY37OTsT6RrdRDU4wwrJOSXbSiFKiC+7ThU
+         vUETP3jrfZFRHO6j2rta21KvNuG2OMiF6V47lLL1xbjK7GCiSY3MWnd9gcdyzHjIDsD6
+         C3QqgPn7f9gHbtic7Gl/8rt3cU0r8AGuA9WmulutcYowoRQC3kRbPNuhVVTzlBoh/362
+         1gQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754666858; x=1755271658;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Jd5QA0/uPh92ea5alhlb4TcCs4dDLGLbN0YRHZShzYo=;
+        b=NO1UBVTRCvMQB6ghNtF3qoP/QR2pVvjkpraNIOVpSeZu0+URGQlfDRk3ZdP4ten/ln
+         Nc7J801+rJMQdFwfAu0SvCgTxvtuhL8CQY+VGYLb9z92FZ4XntDC5MEZu7fnbr+5Q79f
+         v06nw398Vh0kSw/AxDO6hFi5Y1GuGT6QMgOLsuFo12U2mehxnIzhqtjLkTa027Yh90xe
+         4T/a29SDMn8+YsOIQOpCVebuVuqHRodO/NCIxUkUNjNSp1PRlAs9nmysgXLgaxpXYeHu
+         YfY9eLeRlcmQZ6G5QVdGZktleKBZKckN2gFmcbuf2PoQSx5tJX2/OsAwy5M4N3H8rnYP
+         TldA==
+X-Gm-Message-State: AOJu0Yy/8O37vMRvFkv4kSO4TGVkho32zi5LB6ac9LoejqEumWUHMe5J
+	KPLg4j5RYk6I12rHCt5Uu7jYF7gxPqXNUgT6+RyXdNAUCOLQaQW+LErxYqM12KJX5lG8yDtbiNr
+	4rGzo
+X-Gm-Gg: ASbGnctGIVjLyEP/n6VsOmUd24JdNKTcwclQxpw+5Ia0DkU7Im4woDmKFzJNxaobd14
+	tT2EjGZQpfYr8aI4P9clwjuCwOQhDrhNORLV7HMeVVqoS3HUTPcjFGSp1j61/VETzf5hPu5nCzM
+	MnIKlGfyPyqtG+13EVhhfMPzgOcfe/LitFdERdV2SBX/HkzTULiIC3pemWVq6BP2hJBuw/r8Ncz
+	bpWoOwAus0ZrRrH76iCXHjx2sBEOiyhbKmBUL5DKPNJpLKYsSw2Z6c4ErF0/gH47coRpeyJ1o9O
+	cOi4lNf/u2Og+eoKRurHQjxfGAJEAfBWZy0/xfUE/qy27ybYNyuZFxeEp4ZHl28bU7eDjaXBGpu
+	oVrebtwZofAmh6gFv7QWz1w==
+X-Google-Smtp-Source: AGHT+IE7AisudfhrjtmZ8/XzRABhre5cpUkwJtQT/Peqr8JcvNYwui5dSUdTH83jcRJNuYrIYjUvNQ==
+X-Received: by 2002:a17:902:d4c8:b0:231:c9bb:6105 with SMTP id d9443c01a7336-242c2380410mr26553315ad.0.1754666857517;
+        Fri, 08 Aug 2025 08:27:37 -0700 (PDT)
+Received: from t14.. ([2001:5a8:4528:b100:a6ee:dea7:7646:6889])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-241e8aab185sm213111295ad.164.2025.08.08.08.27.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Aug 2025 08:27:37 -0700 (PDT)
+From: Jordan Rife <jordan@jrife.io>
+To: netdev@vger.kernel.org
+Cc: Jordan Rife <jordan@jrife.io>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 18/21] nfc: s3fwrn5: convert to gpio descriptors
-Date: Fri,  8 Aug 2025 17:18:02 +0200
-Message-Id: <20250808151822.536879-19-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250808151822.536879-1-arnd@kernel.org>
-References: <20250808151822.536879-1-arnd@kernel.org>
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Jonathan Corbet <corbet@lwn.net>
+Subject: [PATCH v1 net-next] docs: Fix name for net.ipv4.udp_child_hash_entries
+Date: Fri,  8 Aug 2025 08:27:25 -0700
+Message-ID: <20250808152726.1138329-1-jordan@jrife.io>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,205 +91,28 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Arnd Bergmann <arnd@arndb.de>
+udp_child_ehash_entries -> udp_child_hash_entries
 
-There is no need for this driver to still use the legacy interfaces,
-so convert all the legacy calls into their modern equivalents.
-
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Fixes: 9804985bf27f ("udp: Introduce optional per-netns hash table.")
+Signed-off-by: Jordan Rife <jordan@jrife.io>
 ---
- drivers/nfc/s3fwrn5/i2c.c        | 42 +++++++++-----------------------
- drivers/nfc/s3fwrn5/phy_common.c | 12 ++++-----
- drivers/nfc/s3fwrn5/phy_common.h |  4 +--
- drivers/nfc/s3fwrn5/uart.c       | 30 ++++++-----------------
- 4 files changed, 28 insertions(+), 60 deletions(-)
+ Documentation/networking/ip-sysctl.rst | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/nfc/s3fwrn5/i2c.c b/drivers/nfc/s3fwrn5/i2c.c
-index 110d086cfe5b..411be709b397 100644
---- a/drivers/nfc/s3fwrn5/i2c.c
-+++ b/drivers/nfc/s3fwrn5/i2c.c
-@@ -8,7 +8,7 @@
+diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
+index bb620f554598..9756d16e3df1 100644
+--- a/Documentation/networking/ip-sysctl.rst
++++ b/Documentation/networking/ip-sysctl.rst
+@@ -1420,7 +1420,7 @@ udp_hash_entries - INTEGER
+ 	A negative value means the networking namespace does not own its
+ 	hash buckets and shares the initial networking namespace's one.
  
- #include <linux/clk.h>
- #include <linux/i2c.h>
--#include <linux/gpio.h>
-+#include <linux/gpio/consumer.h>
- #include <linux/delay.h>
- #include <linux/of_gpio.h>
- #include <linux/of_irq.h>
-@@ -149,29 +149,22 @@ static irqreturn_t s3fwrn5_i2c_irq_thread_fn(int irq, void *phy_id)
- static int s3fwrn5_i2c_parse_dt(struct i2c_client *client)
- {
- 	struct s3fwrn5_i2c_phy *phy = i2c_get_clientdata(client);
--	struct device_node *np = client->dev.of_node;
-+	struct device *dev = &client->dev;
+-udp_child_ehash_entries - INTEGER
++udp_child_hash_entries - INTEGER
+ 	Control the number of hash buckets for UDP sockets in the child
+ 	networking namespace, which must be set before clone() or unshare().
  
--	if (!np)
--		return -ENODEV;
--
--	phy->common.gpio_en = of_get_named_gpio(np, "en-gpios", 0);
--	if (!gpio_is_valid(phy->common.gpio_en)) {
-+	phy->common.gpio_en = devm_gpiod_get(dev, "en", GPIOD_OUT_HIGH);
-+	if (IS_ERR(phy->common.gpio_en)) {
- 		/* Support also deprecated property */
--		phy->common.gpio_en = of_get_named_gpio(np,
--							"s3fwrn5,en-gpios",
--							0);
--		if (!gpio_is_valid(phy->common.gpio_en))
--			return -ENODEV;
-+		phy->common.gpio_en = devm_gpiod_get(dev, "s3fwrn5,en", GPIOD_OUT_HIGH);
-+		if (IS_ERR(phy->common.gpio_en))
-+			return PTR_ERR(phy->common.gpio_en);
- 	}
- 
--	phy->common.gpio_fw_wake = of_get_named_gpio(np, "wake-gpios", 0);
--	if (!gpio_is_valid(phy->common.gpio_fw_wake)) {
-+	phy->common.gpio_fw_wake = devm_gpiod_get(dev, "wake", GPIOD_OUT_LOW);
-+	if (IS_ERR(phy->common.gpio_fw_wake)) {
- 		/* Support also deprecated property */
--		phy->common.gpio_fw_wake = of_get_named_gpio(np,
--							     "s3fwrn5,fw-gpios",
--							     0);
--		if (!gpio_is_valid(phy->common.gpio_fw_wake))
--			return -ENODEV;
-+		phy->common.gpio_fw_wake = devm_gpiod_get(dev, "s3fwrn5,fw", GPIOD_OUT_LOW);
-+		if (IS_ERR(phy->common.gpio_fw_wake))
-+			return PTR_ERR(phy->common.gpio_en);
- 	}
- 
- 	return 0;
-@@ -197,17 +190,6 @@ static int s3fwrn5_i2c_probe(struct i2c_client *client)
- 	if (ret < 0)
- 		return ret;
- 
--	ret = devm_gpio_request_one(&phy->i2c_dev->dev, phy->common.gpio_en,
--				    GPIOF_OUT_INIT_HIGH, "s3fwrn5_en");
--	if (ret < 0)
--		return ret;
--
--	ret = devm_gpio_request_one(&phy->i2c_dev->dev,
--				    phy->common.gpio_fw_wake,
--				    GPIOF_OUT_INIT_LOW, "s3fwrn5_fw_wake");
--	if (ret < 0)
--		return ret;
--
- 	/*
- 	 * S3FWRN5 depends on a clock input ("XI" pin) to function properly.
- 	 * Depending on the hardware configuration this could be an always-on
-diff --git a/drivers/nfc/s3fwrn5/phy_common.c b/drivers/nfc/s3fwrn5/phy_common.c
-index deb2c039f0fd..e802b4e609c8 100644
---- a/drivers/nfc/s3fwrn5/phy_common.c
-+++ b/drivers/nfc/s3fwrn5/phy_common.c
-@@ -8,7 +8,7 @@
-  * Bongsu Jeon <bongsu.jeon@samsung.com>
-  */
- 
--#include <linux/gpio.h>
-+#include <linux/gpio/consumer.h>
- #include <linux/delay.h>
- #include <linux/module.h>
- 
-@@ -19,7 +19,7 @@ void s3fwrn5_phy_set_wake(void *phy_id, bool wake)
- 	struct phy_common *phy = phy_id;
- 
- 	mutex_lock(&phy->mutex);
--	gpio_set_value(phy->gpio_fw_wake, wake);
-+	gpiod_set_value(phy->gpio_fw_wake, wake);
- 	if (wake)
- 		msleep(S3FWRN5_EN_WAIT_TIME);
- 	mutex_unlock(&phy->mutex);
-@@ -33,14 +33,14 @@ bool s3fwrn5_phy_power_ctrl(struct phy_common *phy, enum s3fwrn5_mode mode)
- 
- 	phy->mode = mode;
- 
--	gpio_set_value(phy->gpio_en, 1);
--	gpio_set_value(phy->gpio_fw_wake, 0);
-+	gpiod_set_value(phy->gpio_en, 1);
-+	gpiod_set_value(phy->gpio_fw_wake, 0);
- 	if (mode == S3FWRN5_MODE_FW)
--		gpio_set_value(phy->gpio_fw_wake, 1);
-+		gpiod_set_value(phy->gpio_fw_wake, 1);
- 
- 	if (mode != S3FWRN5_MODE_COLD) {
- 		msleep(S3FWRN5_EN_WAIT_TIME);
--		gpio_set_value(phy->gpio_en, 0);
-+		gpiod_set_value(phy->gpio_en, 0);
- 		msleep(S3FWRN5_EN_WAIT_TIME);
- 	}
- 
-diff --git a/drivers/nfc/s3fwrn5/phy_common.h b/drivers/nfc/s3fwrn5/phy_common.h
-index 9cef25436bf9..5451f46f7e27 100644
---- a/drivers/nfc/s3fwrn5/phy_common.h
-+++ b/drivers/nfc/s3fwrn5/phy_common.h
-@@ -21,8 +21,8 @@
- struct phy_common {
- 	struct nci_dev *ndev;
- 
--	int gpio_en;
--	int gpio_fw_wake;
-+	struct gpio_desc *gpio_en;
-+	struct gpio_desc *gpio_fw_wake;
- 
- 	struct mutex mutex;
- 
-diff --git a/drivers/nfc/s3fwrn5/uart.c b/drivers/nfc/s3fwrn5/uart.c
-index 9c09c10c2a46..39e3a64c4f4c 100644
---- a/drivers/nfc/s3fwrn5/uart.c
-+++ b/drivers/nfc/s3fwrn5/uart.c
-@@ -15,7 +15,7 @@
- #include <linux/netdevice.h>
- #include <linux/of.h>
- #include <linux/serdev.h>
--#include <linux/gpio.h>
-+#include <linux/gpio/consumer.h>
- #include <linux/of_gpio.h>
- 
- #include "phy_common.h"
-@@ -91,18 +91,15 @@ MODULE_DEVICE_TABLE(of, s3fwrn82_uart_of_match);
- static int s3fwrn82_uart_parse_dt(struct serdev_device *serdev)
- {
- 	struct s3fwrn82_uart_phy *phy = serdev_device_get_drvdata(serdev);
--	struct device_node *np = serdev->dev.of_node;
-+	struct device *dev = &serdev->dev;
- 
--	if (!np)
--		return -ENODEV;
-+	phy->common.gpio_en = devm_gpiod_get(dev, "en", GPIOD_OUT_HIGH);
-+	if (IS_ERR(phy->common.gpio_en))
-+		return PTR_ERR(phy->common.gpio_en);
- 
--	phy->common.gpio_en = of_get_named_gpio(np, "en-gpios", 0);
--	if (!gpio_is_valid(phy->common.gpio_en))
--		return -ENODEV;
--
--	phy->common.gpio_fw_wake = of_get_named_gpio(np, "wake-gpios", 0);
--	if (!gpio_is_valid(phy->common.gpio_fw_wake))
--		return -ENODEV;
-+	phy->common.gpio_fw_wake = devm_gpiod_get(dev, "wake", GPIOD_OUT_LOW);
-+	if (IS_ERR(phy->common.gpio_fw_wake))
-+		return PTR_ERR(phy->common.gpio_fw_wake);
- 
- 	return 0;
- }
-@@ -144,17 +141,6 @@ static int s3fwrn82_uart_probe(struct serdev_device *serdev)
- 	if (ret < 0)
- 		goto err_serdev;
- 
--	ret = devm_gpio_request_one(&phy->ser_dev->dev, phy->common.gpio_en,
--				    GPIOF_OUT_INIT_HIGH, "s3fwrn82_en");
--	if (ret < 0)
--		goto err_serdev;
--
--	ret = devm_gpio_request_one(&phy->ser_dev->dev,
--				    phy->common.gpio_fw_wake,
--				    GPIOF_OUT_INIT_LOW, "s3fwrn82_fw_wake");
--	if (ret < 0)
--		goto err_serdev;
--
- 	ret = s3fwrn5_probe(&phy->common.ndev, phy, &phy->ser_dev->dev,
- 			    &uart_phy_ops);
- 	if (ret < 0)
 -- 
-2.39.5
+2.43.0
 
 
