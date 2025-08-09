@@ -1,117 +1,144 @@
-Return-Path: <netdev+bounces-212314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD2CCB1F287
-	for <lists+netdev@lfdr.de>; Sat,  9 Aug 2025 08:20:25 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD2F6B1F29A
+	for <lists+netdev@lfdr.de>; Sat,  9 Aug 2025 08:45:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA7BF565C9C
-	for <lists+netdev@lfdr.de>; Sat,  9 Aug 2025 06:20:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6B5977AB91A
+	for <lists+netdev@lfdr.de>; Sat,  9 Aug 2025 06:44:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC67E1DE4EC;
-	Sat,  9 Aug 2025 06:20:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41B6A245038;
+	Sat,  9 Aug 2025 06:45:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="k8UC3STb"
+	dkim=pass (2048-bit key) header.d=stegemann.de header.i=@stegemann.de header.b="UTROeoPN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from dd41718.kasserver.com (dd41718.kasserver.com [85.13.145.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 765DFAD5A
-	for <netdev@vger.kernel.org>; Sat,  9 Aug 2025 06:20:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A5D21D432D;
+	Sat,  9 Aug 2025 06:45:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.13.145.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754720420; cv=none; b=cgmj2Dq47x/dD/HgzrYXbXsArA1dv8NCx4yn87L0fp5FMBn3U9qPCUFLtMgV/o0fOskoZet9wjINUL95p/4FgMqs4fYGjo3vGLbqqUmVAtSIxfl2MAfLApZ4rLRaBDw//1bF0Hcr4mprneVzoqkDqXA+m4hL6AC+wIsc1rq6bZ0=
+	t=1754721928; cv=none; b=M5gcRoXxd6W5D2f4P//zYko9ZbhDTSS7GDWjo8envemWgNHYAI7tUgCojO2On0WxQjT9yYFz3A/DOZRvOwLfDN/dduFiUTxgHY3GOow0SrMSXilbtM1s3V10QqyXKq2LfWeb0p8mmPhP+lWVxhacFNWJ/qALmqHrhrnbNal5rs0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754720420; c=relaxed/simple;
-	bh=Vsi4bvt3i+4MCaiXSH90HhxJh3VZvI/UVulnMlqMVIY=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=nPGoXVhhEUtQdJCvI0jtxJAr22rwAfmQ5lWdxP+LrWdiFMlK/zcm3siQWaNByWfsYNdPWmgRiIvJ+znp7mWJ7vgweaFx4OPb1q3kzYWgVUV+l3nDgpCUfSWTcNVcv75Hwk9W/OxRx7/Dz5it15DTQ2GUZDzQ/mUfA1aF/SJjUFs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--wakel.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=k8UC3STb; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--wakel.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b42a097bbb1so1405423a12.2
-        for <netdev@vger.kernel.org>; Fri, 08 Aug 2025 23:20:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754720419; x=1755325219; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=QZ+FYSIf313DQiqdHJ8DSGaBKM3x0ZwAaKOEdduY9g8=;
-        b=k8UC3STb/zwvhpkFm5jYbO+Tv0pV57gkxGT1VMVuY5/muQ9E8z1ibvzTp8N7f3OeTC
-         6CnXsSEJehPHiLEbtwqepqJ89ECxL8wiu/Pyuar89N/Xa17d5pde2gH3k2Hbqja15E72
-         qNx44vbECxy7SDcQt89qFN/NJql1NfdWRiDgfY0P9FVcTho8oggd0hNAtYZvPV9qMeYM
-         Nm7TNWb7/HwwLLU6JyAIVKR3ftSWHsbw5G2L1K6NL3jSJHn8psBCCTjoW98uPzYeclDw
-         l5GO3aj4c7Xee63UI3Tv0/vk7XCXy+WtjGZdqYKjd+yvHS3nhMmmLJH7dbUH6EYb8QO8
-         uqDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754720419; x=1755325219;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=QZ+FYSIf313DQiqdHJ8DSGaBKM3x0ZwAaKOEdduY9g8=;
-        b=Suu4hjkiOw1HS6hoCv9fwdguKscdNlsurasZxd8r1Oi1P149gxWZfsMyo3GpAXEE/h
-         0LqgBv+orbz/9ItihaE5pvErMLRAafZJPz0LDTHHzV9vVhjguMa6JTiT8eiRPfiN8AHF
-         MfiZ0EB9qiBoodkJaaT2cMUq72Mvv59ledhQNKt5tMpekISVkBIP36Qn9q15KpjdR1YX
-         JF74VYYlewncblGKCznqzf1Xi0fAEtXHJhP3CWG1wGjsvGmQT+CEuKjrz/ZxB3DU7ruO
-         x+FQWn5iD4J8Q4S/ayrC7R9S6+xAzkJkmXdFr1wDdnmnA8C86k50ROh+JtxLkut1oNBI
-         gUnQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXYvmP8urvCkAYLMppKHSbcer4HRsCaVmUGdoH4Xgh67wq8PQpxzVC1CGs/BSfN+gXM75pWj40=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwQXn8OdTHkaL38oyRahBbnzq9nC/aRfRW6oKJmx/InwKNaDfds
-	Y9yl6d77PQUTo5/PLWY++uAgw6EA2e7wEHF7+2PgKSUhYCZpeaRLhji5Ifa2m03D4MR6DULBwcv
-	uAw==
-X-Google-Smtp-Source: AGHT+IFp9mOjKmTbOVKDY9cjbMKEgm8xFNc/WIg9McOlmcwo7mRCu5csxBYCyKRXT/VavkWSZ41LJUaxiw==
-X-Received: from pgx12.prod.google.com ([2002:a63:174c:0:b0:b43:f9b:89d2])
- (user=wakel job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:a124:b0:230:3710:9aa9
- with SMTP id adf61e73a8af0-2405500e326mr9508565637.4.1754720418731; Fri, 08
- Aug 2025 23:20:18 -0700 (PDT)
-Date: Sat,  9 Aug 2025 14:20:13 +0800
+	s=arc-20240116; t=1754721928; c=relaxed/simple;
+	bh=zvx995jZvhgpw8Zwg3xEmNPHpXPuVOefVTjpESQ6GRw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=r7ST82aRzX4eL3P65HOfvbz1uOo8RU7fjqyIqfIy58DNiqxn1OOPwhLvkm1GEu0UFp6cBl6vWDEBSmyNRMzWc0zIQXLiGLotCZ9IW3+jiGO/3/JhZpJQwqBGlMWqZiy/j16RRRqKfcbvxdRtneXz16L8LvHfsxK7Wvbt+v9yYjQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=stegemann.de; spf=pass smtp.mailfrom=stegemann.de; dkim=pass (2048-bit key) header.d=stegemann.de header.i=@stegemann.de header.b=UTROeoPN; arc=none smtp.client-ip=85.13.145.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=stegemann.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stegemann.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=stegemann.de;
+	s=kas202307141421; t=1754721419;
+	bh=Bir3wHohf1pjvDnOTZ+u3N0JcfX4O2/ic9Nnk3OTI5E=;
+	h=From:To:Cc:Subject:Date:From;
+	b=UTROeoPNRVJO237G02ghc80x1KYzBs/kuZO4reW9Z3OpcLBIzOenG9tNY4ajg0R6d
+	 /nvAUmStAGN6n1bdzrkWQkWM/82JxKBPmquxBn5hzPqw+aW5WihecdjSWQbnR9vlEx
+	 0lijWxzOge5kYziJKM5u29/Vu3Z13yIzGjnpuIoJAQDaVkuRZ7mNFUeEtXrg2dl7/M
+	 sZbA/PVZH9t/5P6VeOSiVw9mM95KDMl32Hun5NDdfvaVxCkVw+partGmFvlkzqrNQN
+	 9vE+lBHOqC/W5HHrKaNMIDYi3BpN1oWdwkeN1mB0FXhXShVn1UW9nfPEm0021aQOZ2
+	 dE+pYLJcbsVAA==
+Received: from DESKTOP-I55TJV0.localdomain (p5b2eae0a.dip0.t-ipconnect.de [91.46.174.10])
+	by dd41718.kasserver.com (Postfix) with ESMTPSA id 5DD6055E0014;
+	Sat,  9 Aug 2025 08:36:59 +0200 (CEST)
+From: Sven Stegemann <sven@stegemann.de>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Sven Stegemann <sven@stegemann.de>,
+	syzbot+e62c9db591c30e174662@syzkaller.appspotmail.com,
+	syzbot+d199b52665b6c3069b94@syzkaller.appspotmail.com
+Subject: [PATCH net-next] net: kcm: Fix race condition in kcm_unattach()
+Date: Sat,  9 Aug 2025 08:36:19 +0200
+Message-ID: <20250809063622.117420-1-sven@stegemann.de>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.50.1.703.g449372360f-goog
-Message-ID: <20250809062013.2407822-1-wakel@google.com>
-Subject: [PATCH v2] selftests/net: Ensure assert() triggers in psock_tpacket.c
-From: Wake Liu <wakel@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Wake Liu <wakel@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spamd-Bar: +++++
+X-Spam: Yes
 
-The get_next_frame() function in psock_tpacket.c was missing a return
-statement in its default switch case, leading to a compiler warning.
+syzbot found a race condition when kcm_unattach(psock)
+and kcm_release(kcm) are executed at the same time.
 
-This was caused by a `bug_on(1)` call, which is defined as an
-`assert()`, being compiled out because NDEBUG is defined during the
-build.
+kcm_unattach is missing a check of the flag
+kcm->tx_stopped before calling queue_work().
 
-Instead of adding a `return NULL;` which would silently hide the error
-and could lead to crashes later, this change restores the original
-author's intent. By adding `#undef NDEBUG` before including <assert.h>,
-we ensure the assertion is active and will cause the test to abort if
-this unreachable code is ever executed.
+If the kcm has a reserved psock, kcm_unattach() might get executed
+between cancel_work_sync() and unreserve_psock() in kcm_release(),
+requeuing kcm->tx_work right before kcm gets freed in kcm_done().
 
-Signed-off-by: Wake Liu <wakel@google.com>
+Remove kcm->tx_stopped and replace it by the less
+error-prone disable_work().
+
+Fixes: ab7ac4eb9832 ("kcm: Kernel Connection Multiplexor module")
+Reported-by: syzbot+e62c9db591c30e174662@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=e62c9db591c30e174662
+Reported-by: syzbot+d199b52665b6c3069b94@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=d199b52665b6c3069b94
+Signed-off-by: Sven Stegemann <sven@stegemann.de>
 ---
- tools/testing/selftests/net/psock_tpacket.c | 1 +
- 1 file changed, 1 insertion(+)
+ include/net/kcm.h | 1 -
+ net/kcm/kcmsock.c | 9 ++-------
+ 2 files changed, 2 insertions(+), 8 deletions(-)
 
-diff --git a/tools/testing/selftests/net/psock_tpacket.c b/tools/testing/selftests/net/psock_tpacket.c
-index 0dd909e325d9..2938045c5cf9 100644
---- a/tools/testing/selftests/net/psock_tpacket.c
-+++ b/tools/testing/selftests/net/psock_tpacket.c
-@@ -22,6 +22,7 @@
-  *   - TPACKET_V3: RX_RING
-  */
+diff --git a/include/net/kcm.h b/include/net/kcm.h
+index 441e993be634..d9c35e71ecea 100644
+--- a/include/net/kcm.h
++++ b/include/net/kcm.h
+@@ -71,7 +71,6 @@ struct kcm_sock {
+ 	struct list_head wait_psock_list;
+ 	struct sk_buff *seq_skb;
+ 	struct mutex tx_mutex;
+-	u32 tx_stopped : 1;
  
-+#undef NDEBUG
- #include <stdio.h>
- #include <stdlib.h>
- #include <sys/types.h>
+ 	/* Don't use bit fields here, these are set under different locks */
+ 	bool tx_wait;
+diff --git a/net/kcm/kcmsock.c b/net/kcm/kcmsock.c
+index a4971e6fa943..2f66b5279f2a 100644
+--- a/net/kcm/kcmsock.c
++++ b/net/kcm/kcmsock.c
+@@ -430,7 +430,7 @@ static void psock_write_space(struct sock *sk)
+ 
+ 	/* Check if the socket is reserved so someone is waiting for sending. */
+ 	kcm = psock->tx_kcm;
+-	if (kcm && !unlikely(kcm->tx_stopped))
++	if (kcm)
+ 		queue_work(kcm_wq, &kcm->tx_work);
+ 
+ 	spin_unlock_bh(&mux->lock);
+@@ -1693,12 +1693,6 @@ static int kcm_release(struct socket *sock)
+ 	 */
+ 	__skb_queue_purge(&sk->sk_write_queue);
+ 
+-	/* Set tx_stopped. This is checked when psock is bound to a kcm and we
+-	 * get a writespace callback. This prevents further work being queued
+-	 * from the callback (unbinding the psock occurs after canceling work.
+-	 */
+-	kcm->tx_stopped = 1;
+-
+ 	release_sock(sk);
+ 
+ 	spin_lock_bh(&mux->lock);
+@@ -1714,6 +1708,7 @@ static int kcm_release(struct socket *sock)
+ 	/* Cancel work. After this point there should be no outside references
+ 	 * to the kcm socket.
+ 	 */
++	disable_work(&kcm->tx_work);
+ 	cancel_work_sync(&kcm->tx_work);
+ 
+ 	lock_sock(sk);
 -- 
-2.50.1.703.g449372360f-goog
+2.50.1
 
 
