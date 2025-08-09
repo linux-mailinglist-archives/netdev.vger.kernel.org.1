@@ -1,283 +1,152 @@
-Return-Path: <netdev+bounces-212321-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212322-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EAECB1F402
-	for <lists+netdev@lfdr.de>; Sat,  9 Aug 2025 12:02:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C591BB1F40A
+	for <lists+netdev@lfdr.de>; Sat,  9 Aug 2025 12:09:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0EE04188886E
-	for <lists+netdev@lfdr.de>; Sat,  9 Aug 2025 10:02:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E5CDE566C56
+	for <lists+netdev@lfdr.de>; Sat,  9 Aug 2025 10:09:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CA01235046;
-	Sat,  9 Aug 2025 10:02:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fitt2TNv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 174E12405E7;
+	Sat,  9 Aug 2025 10:09:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f181.google.com (mail-yb1-f181.google.com [209.85.219.181])
+Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66044199385;
-	Sat,  9 Aug 2025 10:02:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7151D146A72
+	for <netdev@vger.kernel.org>; Sat,  9 Aug 2025 10:09:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754733730; cv=none; b=WIOd8olA1sPdR2kBZzT50EW5iohxYgQ0pz301Agac8eem8BsytGUHAsvRy703+rHNNd43dhhG0S8rVQeGbq5G3mRI4psPB1yqcaS4B9hbRd1s8EFXbbrE5uogaR1f3Xh2Gn5lAzPQFZXWDjLoz7j+xwA1sHSw0frfY0px/e5GSk=
+	t=1754734169; cv=none; b=QJgV2TE1rrauXAFMg0He9xxygv9N1nfQE4OD7Z4P+JIr68QzyBRCDIXliACZpKs8W8JDbKgw5Y8ppgKlIfcExjSuZIMJkLTER493W7GhdwMGGOi5O5um/ZX7zGBsmkJTpYPcj2HlLR3GCbef/4PzL/fWb4DePVlyqcsdTtBM1lA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754733730; c=relaxed/simple;
-	bh=rWnVsumdqjPqNv0KYemo0Q9clJgfsIbPT7/Dqu4N7Jw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BZULuNide+0qTUZkc4OoEsKzVfsgOtq37Vq7NNCPsip92Y+SS7kwJkzbZSnmSY/qkUKF/AEWYYY+ZOvje71EaKWw3JMpIElPdrcCwxA1g5t2tnxkeYSsxHGZlBKUvW4IsI6ao2ywFoYNFS+z37OdXccG15KQ5+hNiR/e2s++W44=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fitt2TNv; arc=none smtp.client-ip=209.85.219.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f181.google.com with SMTP id 3f1490d57ef6-e8fe3aeffb6so2520505276.3;
-        Sat, 09 Aug 2025 03:02:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1754733727; x=1755338527; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zSkMWknnYSUf2lZq1a4lCsdL5osmbnj812suMnHzavQ=;
-        b=fitt2TNviqbuPevduMTzrQoU056MDie1O7LO3/QJXKGmh4MWuQ25owyPymnGtmo//Y
-         2DEdZQZfrwoRLp+WhMvq0++IxUDVCgUTIlJLNZAjWdPL/VWMBs7a82OzfQ59FU0Lr9lw
-         9DcLXoiK5Hk0hiyqF5lSzcLaoJoN5A/PWhQGQo2C1vinLHGesFWTHq9Rmm+CU7Ewa6N+
-         3+8K4bTTIMXkaNVno77BpNhlH0NQGN/Q6Bh/f7tt6N2GnHKtJJ+xaSM0/+qtCWSzupSG
-         Qi5sg/UqLRSXjF/grASbVGwVxOFL4AWFlexi0qtceGUo2Oy1IV77mviumVyDsAYHvm5b
-         I8PQ==
+	s=arc-20240116; t=1754734169; c=relaxed/simple;
+	bh=UfVDSP4tIy+sLTTalushrExNwVMUpip9xKfPEYvuhfo=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=RbAWk8XT3XexsLcXoQTX8vM5wSOTXWdoEmhpzkf1soJRb6f86FJwr5il0gsHGW+IkVTDqlOAfJ3KPl2yJ3HmG0NaLjuqsTUkMd2D4UBrzhnOvyqO7H90N0NdNIbIZa4ZHLGg5TJwjy0BtxlzwNjZ83ypyD6ng/8dpcVGZrfkbLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-3e3f5d36dc9so27977845ab.0
+        for <netdev@vger.kernel.org>; Sat, 09 Aug 2025 03:09:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754733727; x=1755338527;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zSkMWknnYSUf2lZq1a4lCsdL5osmbnj812suMnHzavQ=;
-        b=hR889OQyHkq0u3kV/LV7OBQzpbr9HGAb4+Lx3z/uafoZVocAwxWnodYjvAnfqXJOM+
-         ZFOBvEcRX2rjmoBewk1s6di6QeEZ4T+rFpLsdpCuJnVZrrbelO4PkDSTl4g8smQJVT2N
-         tBOxTVDKN3MESXnJlOB/GDXEKUPXsg7IU8XEzqfihCqIjQ9clJ9NwnToEGq/NKWou9JX
-         vn3q8lxZvdpWRrPyRlOQyr6r5EOVF/K20sqWsXpUC/B9NrAS8ybQovA62t6huu2aF83Z
-         uKqdvZddBAP8CaUenLYumKZDEIp9SzxKFwnvJEL8ptceNapqgHAzcZvvB9E6C2IDWkNu
-         GNxw==
-X-Forwarded-Encrypted: i=1; AJvYcCV6nBFNm+U4VtHR5M0UuVEEOFo4fKSNiU6ducW2R+tdE6JVldkqhcIov6bU13js61t8t46uxGmyi/mPjALW@vger.kernel.org, AJvYcCW5jJgYbe73nqmqLkJU6HU1rNt60Dww8APR/Ap1kErmAC+8wdnbwd52KT37xXQHqImgXaXVppU6UuEA@vger.kernel.org, AJvYcCWKyNWDYSW5bURx66CkSDwkSh0x8G5h8gQpSKLtbUfP/ORsW/ANxhjSmXdfoKiv1y55XV2qoXKQ@vger.kernel.org
-X-Gm-Message-State: AOJu0YyDx1JBu7A+uh7lyeiFmzR4l3vFTqzzZFhJ7cPJ8mUAg7eyQ2zp
-	tFXWWSdJ1dowk3ou/6jFx5Fxy8D+kdUN1FBIjWPU9PS8O4YXFPAkTJ9e3XqcuKl76rfUB+htLcz
-	hND4bHJQRXWcxzwDD2YbXNjIAnTihFBw=
-X-Gm-Gg: ASbGncuaU0Oj/hOK0Up74bwCSVPCw0hFDPeyfbnV/SLY9v8YD4adAoR48h8DQGpvVpy
-	eGCbovpqk3lu3iUFjA0zK7UeO8PkBQtw6y2SItvYUY8j1rz/0VosK5NHINoBrlvZqBHoAIKLVoJ
-	fD5hKumTrdtqGQCR3j8Y/UiRtHbLkUhHx9zj+wvHRNwsNPb5jSyG2uXB+IBr00eSgTRBsN6wCsv
-	yu+
-X-Google-Smtp-Source: AGHT+IEq3XjX4upo2YSVsW6CpA715v2LsfL1aZ4Q6bj+CoEfkG4yHbTlEC9EYHJHqngVycka5L9ve6buivYpr3X1pW0=
-X-Received: by 2002:a05:690c:338f:b0:71b:d6a0:976f with SMTP id
- 00721157ae682-71bf0e5e808mr72142237b3.27.1754733726958; Sat, 09 Aug 2025
- 03:02:06 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1754734166; x=1755338966;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=t51EWKdiMX8nQRomsdgyFHzvsopLtn3pV7NsndEVukY=;
+        b=P6rZlMWhY4rKsMYMCcpq51N+oT8sMD1DLdoM5KDjijDEoCkQPQ+oe2+WmkT1slfO8F
+         /eFLdfnGfusDlCEcwWsfKuRFGB5Mz98RZo9ZdqWGpSFqgTEVXEKuGdcE5Xx7KFjN0wHm
+         t3MLcs28R8I28mSrt7ZK6JjZAEI3vlSofuQSl0/4/Rgb1O3Ztt0ZDE7LSLo9tQK5dZdT
+         7EMSmIKoZkGU2CUSI0rWZrVYWVaMTgU+tuSH549o3L4JyQANQstH6z92qnTTUxrJugSu
+         9+C8KQBRFDyZIckU7SKwSAfe0kVpRQFn68L57OztPSvj/U2DT4QX7HgtSZ0oo83dXKvP
+         6D2Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWJak8v/nAuKxp6vRLu6xpEXw8OGVxzc19+X/RPdUav6O/+djELHtLrO8EuhCj+rpuO569PWRs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwrKfquMjfyHmirfbzsDE2cFoU8Z3Fu7XtU4vJoX5HMA+16lf91
+	4kRkmKAhPJkXKXpP9jbdvBDtHfQEqwTNAafT2KBNMj+Fc4D0s9qVri3EnG/zc2LAqcuW9nJCLYk
+	2hcp0EdagHlaakKl6s/aTzKpEC0LmWadLl8IYgiu0VvqlOR6rkeGk4JLqrKU=
+X-Google-Smtp-Source: AGHT+IGjJNcZOEDHQQseb3CPm4CzDqqSikXlC+huCp9wdB3KnMfVdDqcLNqnUzd1KP0JNZFs++TQ2wlXBLHuOr+oV/byGlYd5fmJ
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250808151822.536879-1-arnd@kernel.org> <20250808151822.536879-16-arnd@kernel.org>
-In-Reply-To: <20250808151822.536879-16-arnd@kernel.org>
-From: Jonas Gorski <jonas.gorski@gmail.com>
-Date: Sat, 9 Aug 2025 12:01:54 +0200
-X-Gm-Features: Ac12FXx89RiUsC_ywdzagTtcyRhUd_jdTXMZ-cncEq7BwXm7L-XXN8b0kdvzu9I
-Message-ID: <CAOiHx=mW8B2vQ7UhauPJpJ9KmtxTZ2-1MC3Vf2uNF9RaJ4WQ5A@mail.gmail.com>
-Subject: Re: [PATCH 15/21] dsa: b53: hide legacy gpiolib usage on non-mips
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: Bartosz Golaszewski <brgl@bgdev.pl>, Linus Walleij <linus.walleij@linaro.org>, linux-gpio@vger.kernel.org, 
-	Florian Fainelli <florian.fainelli@broadcom.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Arnd Bergmann <arnd@arndb.de>, =?UTF-8?B?w4FsdmFybyBGZXJuw6FuZGV6IFJvamFz?= <noltari@gmail.com>, 
-	Kyle Hendry <kylehendrydev@gmail.com>, 
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+X-Received: by 2002:a05:6e02:1789:b0:3e3:d7e9:f305 with SMTP id
+ e9e14a558f8ab-3e5331e7a5amr123556025ab.21.1754734166615; Sat, 09 Aug 2025
+ 03:09:26 -0700 (PDT)
+Date: Sat, 09 Aug 2025 03:09:26 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68971e56.a70a0220.7865.0031.GAE@google.com>
+Subject: [syzbot] [wireless?] WARNING in ieee80211_free_keys (2)
+From: syzbot <syzbot+de3ee5362db09487ea37@syzkaller.appspotmail.com>
+To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi,
+Hello,
 
-On Fri, Aug 8, 2025 at 5:23=E2=80=AFPM Arnd Bergmann <arnd@kernel.org> wrot=
-e:
->
-> From: Arnd Bergmann <arnd@arndb.de>
->
-> The MIPS bcm53xx platform still uses the legacy gpiolib interfaces based
-> on gpio numbers, but other platforms do not.
->
-> Hide these interfaces inside of the existing #ifdef block and use the
-> modern interfaces in the common parts of the driver to allow building
-> it when the gpio_set_value() is left out of the kernel.
+syzbot found the following issue on:
 
-Looks reasonable, but doesn't compile:
+HEAD commit:    d2eedaa3909b Merge tag 'rtc-6.17' of git://git.kernel.org/..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=178886a2580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=75e522434dc68cb9
+dashboard link: https://syzkaller.appspot.com/bug?extid=de3ee5362db09487ea37
+compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
 
-  CC      drivers/net/dsa/b53/b53_spi.o
-In file included from drivers/net/dsa/b53/b53_spi.c:27:
-drivers/net/dsa/b53/b53_priv.h:378:15: error: unknown type name 'gpio_desc'
-  378 | static inline gpio_desc *b53_switch_get_reset_gpio(struct
-b53_device *dev)
-      |               ^~~~~~~~~
-drivers/net/dsa/b53/b53_priv.h: In function 'b53_switch_get_reset_gpio':
-drivers/net/dsa/b53/b53_priv.h:392:14: error: implicit declaration of
-function 'gpio_is_valid'; did you mean 'uuid_is_valid'?
-[-Wimplicit-function-declaration]
-  392 |         if (!gpio_is_valid(gpio))
-      |              ^~~~~~~~~~~~~
-      |              uuid_is_valid
-drivers/net/dsa/b53/b53_priv.h:395:15: error: implicit declaration of
-function 'devm_gpiod_request_one' [-Wimplicit-function-declaration]
-  395 |         ret =3D devm_gpiod_request_one(dev->dev, gpio,
-      |               ^~~~~~~~~~~~~~~~~~~~~~
-drivers/net/dsa/b53/b53_priv.h:396:38: error: 'GPIOF_OUT_INIT_HIGH'
-undeclared (first use in this function); did you mean
-'GPIOD_OUT_HIGH'?
-  396 |                                      GPIOF_OUT_INIT_HIGH, "robo_res=
-et");
-      |                                      ^~~~~~~~~~~~~~~~~~~
-      |                                      GPIOD_OUT_HIGH
-drivers/net/dsa/b53/b53_priv.h:396:38: note: each undeclared
-identifier is reported only once for each function it appears in
-drivers/net/dsa/b53/b53_priv.h:400:16: error: returning 'struct
-gpio_desc *' from a function with incompatible return type 'int *'
-[-Wincompatible-pointer-types]
-  400 |         return gpio_to_desc(gpio);
-      |                ^~~~~~~~~~~~~~~~~~
+Unfortunately, I don't have any reproducer for this issue yet.
 
->
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
->  drivers/net/dsa/b53/b53_common.c | 17 +++++------------
->  drivers/net/dsa/b53/b53_priv.h   | 24 ++++++++++++++++++------
->  2 files changed, 23 insertions(+), 18 deletions(-)
->
-> diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53_c=
-ommon.c
-> index 9942fb6f7f4b..cb57bcc56c63 100644
-> --- a/drivers/net/dsa/b53/b53_common.c
-> +++ b/drivers/net/dsa/b53/b53_common.c
-> @@ -19,7 +19,7 @@
->
->  #include <linux/delay.h>
->  #include <linux/export.h>
-> -#include <linux/gpio.h>
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/73ccac85e612/disk-d2eedaa3.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/33b13def715b/vmlinux-d2eedaa3.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/930b192c99ba/bzImage-d2eedaa3.xz
 
-this include is now needed for b53_priv.h.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+de3ee5362db09487ea37@syzkaller.appspotmail.com
 
-> +#include <linux/gpio/consumer.h>
->  #include <linux/kernel.h>
->  #include <linux/math.h>
->  #include <linux/minmax.h>
-> @@ -948,17 +948,17 @@ EXPORT_SYMBOL(b53_configure_vlan);
->
->  static void b53_switch_reset_gpio(struct b53_device *dev)
->  {
-> -       int gpio =3D dev->reset_gpio;
-> +       struct gpio_desc *gpio =3D dev->reset_gpio;
->
-> -       if (gpio < 0)
-> +       if (IS_ERR(gpio))
->                 return;
->
->         /* Reset sequence: RESET low(50ms)->high(20ms)
->          */
-> -       gpio_set_value(gpio, 0);
-> +       gpiod_set_value(gpio, 0);
->         mdelay(50);
->
-> -       gpio_set_value(gpio, 1);
-> +       gpiod_set_value(gpio, 1);
->         mdelay(20);
->
->         dev->current_page =3D 0xff;
-> @@ -2925,7 +2925,6 @@ static int b53_switch_init(struct b53_device *dev)
->  {
->         u32 chip_id =3D dev->chip_id;
->         unsigned int i;
-> -       int ret;
->
->         if (is63xx(dev))
->                 chip_id =3D BCM63XX_DEVICE_ID;
-> @@ -3005,12 +3004,6 @@ static int b53_switch_init(struct b53_device *dev)
->                 return -ENOMEM;
->
->         dev->reset_gpio =3D b53_switch_get_reset_gpio(dev);
-> -       if (dev->reset_gpio >=3D 0) {
-> -               ret =3D devm_gpio_request_one(dev->dev, dev->reset_gpio,
-> -                                           GPIOF_OUT_INIT_HIGH, "robo_re=
-set");
-> -               if (ret)
-> -                       return ret;
-> -       }
->
->         return 0;
->  }
-> diff --git a/drivers/net/dsa/b53/b53_priv.h b/drivers/net/dsa/b53/b53_pri=
-v.h
-> index 458775f95164..16e82653a7c6 100644
-> --- a/drivers/net/dsa/b53/b53_priv.h
-> +++ b/drivers/net/dsa/b53/b53_priv.h
-> @@ -136,7 +136,7 @@ struct b53_device {
->         u8 duplex_reg;
->         u8 jumbo_pm_reg;
->         u8 jumbo_size_reg;
-> -       int reset_gpio;
-> +       struct gpio_desc *reset_gpio;
->         u8 num_arl_bins;
->         u16 num_arl_buckets;
->         enum dsa_tag_protocol tag_protocol;
-> @@ -375,22 +375,34 @@ static inline void b53_arl_from_entry_25(u64 *mac_v=
-id,
->
->  #include <linux/bcm47xx_nvram.h>
->  #include <bcm47xx_board.h>
-> -static inline int b53_switch_get_reset_gpio(struct b53_device *dev)
-> +static inline gpio_desc *b53_switch_get_reset_gpio(struct b53_device *de=
-v)
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 12058 at net/mac80211/key.c:1163 ieee80211_free_keys+0x536/0x650 net/mac80211/key.c:1162
+Modules linked in:
+CPU: 0 UID: 0 PID: 12058 Comm: kworker/u8:17 Not tainted 6.16.0-syzkaller-11489-gd2eedaa3909b #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
+Workqueue: netns cleanup_net
+RIP: 0010:ieee80211_free_keys+0x536/0x650 net/mac80211/key.c:1162
+Code: 00 00 48 8d 65 d8 5b 41 5c 41 5d 41 5e 41 5f 5d c3 cc cc cc cc cc e8 f9 3c c7 f6 90 0f 0b 90 e9 46 fc ff ff e8 eb 3c c7 f6 90 <0f> 0b 90 4c 8b 24 24 e9 7c fe ff ff e8 d9 3c c7 f6 e9 2f fe ff ff
+RSP: 0000:ffffc90004aff040 EFLAGS: 00010293
+RAX: ffffffff8af86d55 RBX: dffffc0000000000 RCX: ffff88802bd2da00
+RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000002
+RBP: ffffc90004aff0f0 R08: ffffc90004afede7 R09: 1ffff9200095fdbc
+R10: dffffc0000000000 R11: fffff5200095fdbd R12: 0000000000000002
+R13: ffff8880534569d0 R14: 1ffff1100a68ad3a R15: 0000000000000001
+FS:  0000000000000000(0000) GS:ffff888125c28000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fcb75946040 CR3: 000000007e27c000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ ieee80211_do_stop+0xf47/0x1fb0 net/mac80211/iface.c:584
+ ieee80211_stop+0x1b1/0x240 net/mac80211/iface.c:814
+ __dev_close_many+0x361/0x6f0 net/core/dev.c:1755
+ netif_close_many+0x225/0x410 net/core/dev.c:1780
+ netif_close+0x158/0x210 net/core/dev.c:1797
+ dev_close+0x10a/0x220 net/core/dev_api.c:220
+ cfg80211_shutdown_all_interfaces+0xd4/0x220 net/wireless/core.c:277
+ ieee80211_remove_interfaces+0x109/0x6e0 net/mac80211/iface.c:2364
+ ieee80211_unregister_hw+0x5d/0x2c0 net/mac80211/main.c:1664
+ mac80211_hwsim_del_radio+0x275/0x460 drivers/net/wireless/virtual/mac80211_hwsim.c:5674
+ hwsim_exit_net+0x584/0x640 drivers/net/wireless/virtual/mac80211_hwsim.c:6554
+ ops_exit_list net/core/net_namespace.c:198 [inline]
+ ops_undo_list+0x497/0x990 net/core/net_namespace.c:251
+ cleanup_net+0x4c5/0x800 net/core/net_namespace.c:682
+ process_one_work kernel/workqueue.c:3236 [inline]
+ process_scheduled_works+0xade/0x17b0 kernel/workqueue.c:3319
+ worker_thread+0x8a0/0xda0 kernel/workqueue.c:3400
+ kthread+0x711/0x8a0 kernel/kthread.c:463
+ ret_from_fork+0x3f9/0x770 arch/x86/kernel/process.c:148
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
 
-s/gpio_desc/struct gpio_desc/
 
->  {
->         enum bcm47xx_board board =3D bcm47xx_board_get();
-> +       int gpio, ret;
->
->         switch (board) {
->         case BCM47XX_BOARD_LINKSYS_WRT300NV11:
->         case BCM47XX_BOARD_LINKSYS_WRT310NV1:
-> -               return 8;
-> +               gpio =3D 8;
-> +               break;
->         default:
-> -               return bcm47xx_nvram_gpio_pin("robo_reset");
-> +               gpio =3D bcm47xx_nvram_gpio_pin("robo_reset");
->         }
-> +
-> +       if (!gpio_is_valid(gpio))
-> +               return ERR_PTR(-EINVAL);
-> +
-> +       ret =3D devm_gpiod_request_one(dev->dev, gpio,
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-s/devm_gpiod_request_one/devm_gpio_request_one/
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-> +                                    GPIOF_OUT_INIT_HIGH, "robo_reset");
-> +       if (ret)
-> +               return ERR_PTR(ret);
-> +
-> +       return gpio_to_desc(gpio);
->  }
->  #else
-> -static inline int b53_switch_get_reset_gpio(struct b53_device *dev)
-> +static inline struct gpio_desc *b53_switch_get_reset_gpio(struct b53_dev=
-ice *dev)
->  {
-> -       return -ENOENT;
-> +       return ERR_PTR(-ENODEV);
->  }
->  #endif
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-Can't really test this (no matching hardware), but with the code issues fix=
-ed
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
-Reviewed-by: Jonas Gorski <jonas.gorski@gmail.com>
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
 
-Best regards,
-Jonas
+If you want to undo deduplication, reply with:
+#syz undup
 
