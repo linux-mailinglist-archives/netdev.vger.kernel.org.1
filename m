@@ -1,197 +1,117 @@
-Return-Path: <netdev+bounces-212387-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212388-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D109B1FC1B
-	for <lists+netdev@lfdr.de>; Sun, 10 Aug 2025 23:07:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FAF9B1FC52
+	for <lists+netdev@lfdr.de>; Sun, 10 Aug 2025 23:17:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E866E3AD907
-	for <lists+netdev@lfdr.de>; Sun, 10 Aug 2025 21:07:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B80687AC071
+	for <lists+netdev@lfdr.de>; Sun, 10 Aug 2025 21:14:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3E8F1F237A;
-	Sun, 10 Aug 2025 21:07:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 195D8225409;
+	Sun, 10 Aug 2025 21:13:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b="bIikNoKh"
+	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="fhbLTKp0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-10626.protonmail.ch (mail-10626.protonmail.ch [79.135.106.26])
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C89501A76BC
-	for <netdev@vger.kernel.org>; Sun, 10 Aug 2025 21:07:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.26
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 082861C07C3;
+	Sun, 10 Aug 2025 21:13:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754860034; cv=none; b=WzOcMDug0sf8r6Fp+eNLHZooVWy7VvAy4JUxk+cNT3VHWJ2gqi0gIpI0+vYKasM9nT7jG7437pXrOSHmpVroxh5YRXSb+FKX58HQZ3td58q5lDgjIQMr1gEgLJsbdKJXKK5A8F3hEFIEsilDom68O90AFIakKZKlQfolUW9bPfQ=
+	t=1754860389; cv=none; b=ic7/eJNSLgpRzcdya1LeJcUR5HuXCQECW4S2/XyO03LHGG55XoV8LwRnea8gu7C5lkzpnco9YvHJ/kA23o7RfKYiThWhDwqSsAII3ZrZV/47kPfJKDYKt5fNtFnVAytbXe2xuxnTz+6hTCi4enbutko5BplM+sCwOaXb5DnUb4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754860034; c=relaxed/simple;
-	bh=hS+oeFgCOm6BBlq3GaBir9qH3vCdjhIaHvfbIhnfbzk=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=I+GHF/9bTxBKAku620bzyEyhORsx6ohFmWefnWytxxFCmWCSjJG0NKC75nsXraC2FalCtVPrfYoeplLdw8o3J2AM59y4kgGzyfekw7u4Am4aD72rTWMLrqMTMuSum+p9OGJ8qEs9IPVyl4O/n6VcVo7JOyqWTHoio7E4fDkThWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io; spf=pass smtp.mailfrom=willsroot.io; dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b=bIikNoKh; arc=none smtp.client-ip=79.135.106.26
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=willsroot.io
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=willsroot.io;
-	s=protonmail2; t=1754860021; x=1755119221;
-	bh=hS+oeFgCOm6BBlq3GaBir9qH3vCdjhIaHvfbIhnfbzk=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=bIikNoKh2qSLRFLRd7LrrBjrJlqsUxUh1QrEf5NGXmnyVNjOec9kBxkVPySFysrhf
-	 hYsLeHolV4gsrjwzOX5zvw2ERj8abRisUMuFBTidYd88silIiuM1soRaarh83o/9hE
-	 SrtiKrrkX/QV7uWJt0YbcrYLkIQ/vjkHK8wGi7EeUQgR1tAnudNMD45bICAIAOwqTb
-	 9sD+rN4gk5xU98a4Ddiib2DbLYQrxXE0AA4SjNtCLqGPirrMWKNDmyucvk0j7Pzgku
-	 OOXLQccIwyMyU/Wo2RAAjUVGO51bZpxCMUUSz3ukfRzMtP8G5q7FcmJm0ytChukMA2
-	 s1Cit5FPOaePg==
-Date: Sun, 10 Aug 2025 21:06:57 +0000
-To: Jakub Kicinski <kuba@kernel.org>
-From: William Liu <will@willsroot.io>
-Cc: netdev@vger.kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com, pabeni@redhat.com, jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, horms@kernel.org, savy@syst3mfailure.io, victor@mojatatu.com
-Subject: Re: [PATCH net v4 1/2] net/sched: Fix backlog accounting in qdisc_dequeue_internal
-Message-ID: <n-GjVW0_1R1-ujkLgZIEgnaQKSsNtQ9-7UZiTmDCJsy1EutoUtiGOSahNSxpz2yANsp5olbxItT2X9apTC9btIRepMGAZZVBqWx6ueYE5O4=@willsroot.io>
-In-Reply-To: <20250808142746.6b76eae1@kernel.org>
-References: <20250727235602.216450-1-will@willsroot.io> <20250808142746.6b76eae1@kernel.org>
-Feedback-ID: 42723359:user:proton
-X-Pm-Message-ID: 2b88b8cfb5058f78acf9ad978513c55da13ba5fe
+	s=arc-20240116; t=1754860389; c=relaxed/simple;
+	bh=MCn7L2oMDXqpaBL68ifUAKfNI6ZgEO9AvUjGAwdqGzI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KHHwm0DHZfGyKSLrxYTczDbWJMB/8dkjgS5fjNlN6H7I13rLlaZ3716wIf7G2cQp4Y/f7UZf7FFoe9fsBWmSyVC9kkR8e1VTbkpQxW4Di8YjVWg+6FbksW/FpNekQTREI5gACmPl76KWVtmw6HY7PcrebPOn6y2FFRwDJPq/KSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=fhbLTKp0; arc=none smtp.client-ip=62.89.141.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=a08pxIKssvva7WGMOpdQs7q50iSGhijNpUjVdmBVafU=; b=fhbLTKp0cHKqEl0SQ3eao1jBUI
+	U3VY98wdyOIDCYXjKKGLsw8r3dtC6OyQZ19VzOA4mJutCclYgT5mTevdbGCfVT5XFOElCLc+z4aBW
+	liI0zxI5TPxQi9ChdMOb/RWDOXdeVQirMml2aP0ydzD89E3tKJ2L9G4JjGfzJo3gGa5+S1LQ6XJdc
+	wCHfIGYv/GZsKMHuqGNuSiRTJ1YgaBzO/S2PM4wb+9vg5IJdXoICZxCGOIYy3rK96NzD/1TjgkGl9
+	jjAk0rmXZSr499Fs074dnjGssHkUZJWAIUTUNSlc1F5u2AeoF8TYNKeHPCl7kT4QUNWviG9JC54fS
+	qV7QEa0g==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1ulDLi-0000000AWXo-29XN;
+	Sun, 10 Aug 2025 21:13:02 +0000
+Date: Sun, 10 Aug 2025 22:13:02 +0100
+From: Al Viro <viro@zeniv.linux.org.uk>
+To: Ujwal Kundur <ujwal.kundur@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, allison.henderson@oracle.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] rds: Fix endian annotations across various
+ assignments
+Message-ID: <20250810211302.GQ222315@ZenIV>
+References: <20250810171155.3263-1-ujwal.kundur@gmail.com>
+ <20250810174705.GK222315@ZenIV>
+ <20250810182506.GL222315@ZenIV>
+ <398e53d8-906d-43c9-9395-f6115dcb945b@lunn.ch>
+ <CALkFLLJkGqA7T5JhRQOs4spa+ihr-6RXA9xWwQRbRp6upLXBaw@mail.gmail.com>
+ <20250810210058.GP222315@ZenIV>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250810210058.GP222315@ZenIV>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 
-On Friday, August 8th, 2025 at 9:27 PM, Jakub Kicinski <kuba@kernel.org> wr=
-ote:
+On Sun, Aug 10, 2025 at 10:00:58PM +0100, Al Viro wrote:
+> On Mon, Aug 11, 2025 at 01:01:01AM +0530, Ujwal Kundur wrote:
+> 
+> > > It took me about 60 seconds to prove the POLLERR change was wrong, and
+> > > i know nothing about this code base. So it is in fact not a lot of
+> > > effort.
+> > I looked up the definition of POLLERR on Elixir [1] and it seemed like
+> > a valid Sparse report to me. I wasn't aware of EPOLLERR, and now
+> > realize all the other operations are prefixed with EPOLL* in af_rds.c.
+> > I look forward to reviews/critiques to learn from them but being
+> > accused of using LLMs is kinda disheartening.
+> 
+> As for the POLLERR part of that, the thing about POLL* constants is that
+> beyond the first 6 (IN/PRI/OUT/ERR/HUP/NVAL) they are arch-dependent,
+> and not just in a sense of bit assignments.
 
->=20
->=20
-> On Sun, 27 Jul 2025 23:56:32 +0000 William Liu wrote:
->=20
-> > Special care is taken for fq_codel_dequeue to account for the
-> > qdisc_tree_reduce_backlog call in its dequeue handler. The
-> > cstats reset is moved from the end to the beginning of
-> > fq_codel_dequeue, so the change handler can use cstats for
-> > proper backlog reduction accounting purposes. The drop_len and
-> > drop_count fields are not used elsewhere so this reordering in
-> > fq_codel_dequeue is ok.
->=20
->=20
-> Using local variables like we do in other qdiscs will not work?
-> I think your change will break drop accounting during normal dequeue?
+> generic:
+> IN  PRI  OUT  ERR  HUP  NVAL  RDNORM  RDBAND WRNORM  WRBAND  MSG  REMOVE  RDHUP
+> 0   1    2    3    4    5     6       7      8       9       10   11      12
+> sparc:
+> 0   1    2    3    4    5     6       7      =OUT    8       9    10      11
+> mips,m68k:
+> 0   1    2    3    4    5     6       7      =OUT    8       10   11      13
+> xtensa:
+> 0   1    2    3    4    5     6       7      =OUT    8       10   11      12
 
-Can you elaborate on this?=20
+Ugh...
 
-I just moved the reset of two cstats fields from the dequeue handler epilog=
-ue to the prologue. Those specific cstats fields are not used elsewhere so =
-they should be fine, but we need to accumulate their values during limit ad=
-justment. Otherwise the limit adjustment loop could perform erroneous accou=
-nting in the final qdisc_tree_reduce_backlog because the dequeue path could=
- have already triggered qdisc_tree_reduce_backlog calls.
+My apologies - messed table above in the last two columns.
 
->=20
-> > diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
-> > index 638948be4c50..a24094a638dc 100644
-> > --- a/include/net/sch_generic.h
-> > +++ b/include/net/sch_generic.h
-> > @@ -1038,10 +1038,15 @@ static inline struct sk_buff *qdisc_dequeue_int=
-ernal(struct Qdisc *sch, bool dir
-> > skb =3D __skb_dequeue(&sch->gso_skb);
-> > if (skb) {
-> > sch->q.qlen--;
-> > + qdisc_qstats_backlog_dec(sch, skb);
-> > + return skb;
-> > + }
-> > + if (direct) {
-> > + skb =3D __qdisc_dequeue_head(&sch->q);
-> > + if (skb)
-> > + qdisc_qstats_backlog_dec(sch, skb);
-> > return skb;
-> > }
-> > - if (direct)
-> > - return __qdisc_dequeue_head(&sch->q);
-> > else
->=20
->=20
-> sorry for a late nit, it wasn't very clear from the diff but
-> we end up with
->=20
-> if (direct) {
-> ...
-> }
-> else
-> return ..;
->=20
-> Please reformat:
->=20
-> if (direct) {
-> ...
-> } else {
-> ...
-> }
->=20
+REMOVE is 10 for sparc, 11 for xtensa and 12 for everybody else.
+RDHUP is 11 for sparc and 13 for everybody else.
 
-Ok noted.
-
-> > return sch->dequeue(sch);
-> > }
->=20
-> > diff --git a/net/sched/sch_fq.c b/net/sched/sch_fq.c
-> > index 902ff5470607..986e71e3362c 100644
-> > --- a/net/sched/sch_fq.c
-> > +++ b/net/sched/sch_fq.c
-> > @@ -1014,10 +1014,10 @@ static int fq_change(struct Qdisc *sch, struct =
-nlattr *opt,
-> > struct netlink_ext_ack *extack)
-> > {
-> > struct fq_sched_data *q =3D qdisc_priv(sch);
-> > + unsigned int prev_qlen, prev_backlog;
-> > struct nlattr *tb[TCA_FQ_MAX + 1];
-> > - int err, drop_count =3D 0;
-> > - unsigned drop_len =3D 0;
-> > u32 fq_log;
-> > + int err;
-> >=20
-> > err =3D nla_parse_nested_deprecated(tb, TCA_FQ_MAX, opt, fq_policy,
-> > NULL);
-> > @@ -1135,16 +1135,16 @@ static int fq_change(struct Qdisc *sch, struct =
-nlattr *opt,
-> > err =3D fq_resize(sch, fq_log);
-> > sch_tree_lock(sch);
-> > }
-> > +
-> > + prev_qlen =3D sch->q.qlen;
-> > + prev_backlog =3D sch->qstats.backlog;
-> > while (sch->q.qlen > sch->limit) {
-> > struct sk_buff *skb =3D qdisc_dequeue_internal(sch, false);
-> >=20
-> > - if (!skb)
-> > - break;
->=20
->=20
-> The break conditions is removed to align the code across the qdiscs?
-
-That break is no longer needed because qdisc_internal_dequeue handles all t=
-he length and backlog size adjustments. The check existed there because of =
-the qdisc_pkt_len call.
-
->=20
-> > - drop_len +=3D qdisc_pkt_len(skb);
-> > rtnl_kfree_skbs(skb, skb);
-> > - drop_count++;
-> > }
-> > - qdisc_tree_reduce_backlog(sch, drop_count, drop_len);
-> > + qdisc_tree_reduce_backlog(sch, prev_qlen - sch->q.qlen,
-> > + prev_backlog - sch->qstats.backlog);
->=20
->=20
-> There is no real change in the math here, right?
-> Again, you're just changing this to align across the qdiscs?
-
-Yep, asides from using a properly updated qlen and backlog from the revampe=
-d qdisc_dequeue_internal.
-
-> --
-> pw-bot: cr
+generic:
+IN  PRI  OUT  ERR  HUP  NVAL  RDNORM  RDBAND WRNORM  WRBAND  MSG  REMOVE  RDHUP
+0   1    2    3    4    5     6       7      8       9       10   12      13
+sparc:
+0   1    2    3    4    5     6       7      =OUT    8       9    10      11
+mips,m68k:
+0   1    2    3    4    5     6       7      =OUT    8       10   12      13
+xtensa:
+0   1    2    3    4    5     6       7      =OUT    8       10   11      13
 
