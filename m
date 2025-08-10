@@ -1,209 +1,170 @@
-Return-Path: <netdev+bounces-212348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212349-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B539EB1F8D7
-	for <lists+netdev@lfdr.de>; Sun, 10 Aug 2025 09:30:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9251FB1F8F3
+	for <lists+netdev@lfdr.de>; Sun, 10 Aug 2025 09:42:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1488176557
-	for <lists+netdev@lfdr.de>; Sun, 10 Aug 2025 07:30:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9CBD01780A6
+	for <lists+netdev@lfdr.de>; Sun, 10 Aug 2025 07:42:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01778238C29;
-	Sun, 10 Aug 2025 07:30:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5C26227563;
+	Sun, 10 Aug 2025 07:41:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b="gfzz8JWm"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="FykBMwph"
 X-Original-To: netdev@vger.kernel.org
-Received: from OS8PR02CU002.outbound.protection.outlook.com (mail-japanwestazon11012035.outbound.protection.outlook.com [40.107.75.35])
+Received: from fout-b2-smtp.messagingengine.com (fout-b2-smtp.messagingengine.com [202.12.124.145])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C47A23816C;
-	Sun, 10 Aug 2025 07:30:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.75.35
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754811012; cv=fail; b=UdXMQxpYRTWmxv8Pr+jJpW0ejlorLRRYPm095wh6whviVbqYIMUVLKV3tBA4hF8gydKv/4XtQfBXTi2ZswnPC885lItOEgqud2rvrJLPoPkhwyjNK5+kOJprSHc0E3MdkYTMwud/FdsQTE8vN7RZPpDv3vbbySGLRIZdWAXj4O8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754811012; c=relaxed/simple;
-	bh=dtw/Z6Arvokvg3SB94PHMTSg1w5dyToSjTJfqKqKJdo=;
-	h=From:To:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ZMnLHgETPEKej+M8+Emy2DUVaQHLqmevL8/dKMi2WV4Gcdf/6SJUteex6nKE2/UWEqbDR4vGcebAQNYAuvp0f0/SAM1L4k3EUocLjiojt0pNTtwzq7Mn7bj6yMUXcax1gd6tPjzn2npmT4moorIORyhIWCClRmWi64TdEE5l+4k=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com; spf=pass smtp.mailfrom=vivo.com; dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b=gfzz8JWm; arc=fail smtp.client-ip=40.107.75.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vivo.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=W+2scD6psuk2quT2WyJWMv0tRKnzyfnEqixlOZicZ7jnaSLa5TvpH13T0aXzAOqvyQ9cF6rVsdnQADfgTk2/MUhvW9e9SMGsJIJaneiUTwcOXK+DNBf0oLs0sYl7TNNGlYk/bITCtwiyL/rfvtJhWzrbz5IsZ4743rq9H8SrHxLJjF1xC7e1HPdCpbmZ0I2xGpSxfi9Bjeyu3v0Kpr8lfrS9FjVodYzxTHXlqhu1BY6EF8Nx8n8GrDW7PvO17g6VBT2MTC/VC/EVDkUrSdWUzqt9HK85GPCtAEW4MIGmpWt+ppbb1VGIoeB0VKpxRe4cjzmvL62bs1mbI1Yl7ltjyw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hwxeiwQERY0r5ozBHYGRJHsIYIn4n9Cb6wcwDEJuLb0=;
- b=GjAh+/O1es0Hw+j9kLhk1OtaAeMfEwSrxFkr2iLMl1HZdz9j3UzxKawBlKbzFdAPSnk4m9baJ0Kh/+rjhAvOX4e9Z8OPo14dI2nhDFDJRigf4srKY/3TtqGCrKyT/2JoPdF5EZ6bJurTagiKsrDQK1aOiAeigTktrLJyVcyLWKf6w3oTwD8JGX1CJtMX7modGPN5x10ioLAHddIMX1+QzgytZAVcsYHGkzNX+RLdR0UG9mombSnMc9YJB9VcpPAT+czPXwd+LEFbrWaqlFP6kieRaVu3vaq7M9JT+i2i/pKh8Ea0oKe2z0bFrLb9ZF3SvioNHeVUdO9SVHcQ2UkZ9A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
- dkim=pass header.d=vivo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hwxeiwQERY0r5ozBHYGRJHsIYIn4n9Cb6wcwDEJuLb0=;
- b=gfzz8JWm2GYBgr5//bRz4BieL9I5dURfheV7H61GbthhSrQbTQgcLL42muBA7eHhYY3IkQoctJdIulgie/34MWf5cetD2FIOcgc0V79exyCZXWGYggSKhuG5zZ4Edb5/ak+i0SnEIj7chVfbtJwLRxtjUfT2+1O5YDogK3//3Wp+ySMECfE5/o0lVe/0PRT1Jgzzs609LYmvF9UewVMioDL0uUn9YywK+70jhPFd6WIc9++WK20TKrnfFwU+YGU3T+KBbu2AvWsTYoRARXyvwd+w/mbn1xbrCysyx7S5807+NvsMkhLk4/zpbU3k3942n7nxSWg7qPQJ6Lu5QYWc+w==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=vivo.com;
-Received: from SI2PR06MB5140.apcprd06.prod.outlook.com (2603:1096:4:1af::9) by
- TYSPR06MB6576.apcprd06.prod.outlook.com (2603:1096:400:47b::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9009.20; Sun, 10 Aug
- 2025 07:30:09 +0000
-Received: from SI2PR06MB5140.apcprd06.prod.outlook.com
- ([fe80::468a:88be:bec:666]) by SI2PR06MB5140.apcprd06.prod.outlook.com
- ([fe80::468a:88be:bec:666%4]) with mapi id 15.20.9009.018; Sun, 10 Aug 2025
- 07:30:09 +0000
-From: Qianfeng Rong <rongqianfeng@vivo.com>
-To: Chuck Lever <chuck.lever@oracle.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	NeilBrown <neil@brown.name>,
-	Olga Kornievskaia <okorniev@redhat.com>,
-	Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>,
-	Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Qianfeng Rong <rongqianfeng@vivo.com>,
-	linux-nfs@vger.kernel.org (open list:KERNEL NFSD, SUNRPC, AND LOCKD SERVERS),
-	netdev@vger.kernel.org (open list:NETWORKING [GENERAL]),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH 3/3] SUNRPC: Remove redundant __GFP_NOWARN
-Date: Sun, 10 Aug 2025 15:29:42 +0800
-Message-Id: <20250810072944.438574-4-rongqianfeng@vivo.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250810072944.438574-1-rongqianfeng@vivo.com>
-References: <20250810072944.438574-1-rongqianfeng@vivo.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SI2PR06CA0003.apcprd06.prod.outlook.com
- (2603:1096:4:186::14) To SI2PR06MB5140.apcprd06.prod.outlook.com
- (2603:1096:4:1af::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B47981E7C19;
+	Sun, 10 Aug 2025 07:41:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.145
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1754811718; cv=none; b=iBm0qEkn4r30UmPCquJtfUDt8nmMA/VtnMi9kSmcdDggnMbTYM9Y3V7+biDa169VFU+RkPuj8PMaPpZqp2edse0XEu5UX5f9CjHP4GW1NqNT4Geq04Tveys6hmnGr38lJDOPctfwjV5UOnXKAKUs3oNbovI2cssKSBNLYjExXT8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1754811718; c=relaxed/simple;
+	bh=LHgDFxP3XNY/BaNZDOHVAHZ0/bMk5RECcQRqMjPp2kM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Tyi5gextIN9mPdyV1hfPfhTJuTPoP5Tl0jGF+/JO1ndHi+fBzGgPBwLI/CeWfxzL9j3/lTM0X2j8Sjcu1CRkaZcTaeuTxxBfgzd0W7hgt1U1YeN9Be8oSJ6TTlGs5MkSqdLO31VaDWIljAV9fM8SdwQs4Y6csqY+YVxT1mSLWEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=FykBMwph; arc=none smtp.client-ip=202.12.124.145
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailfout.stl.internal (Postfix) with ESMTP id 532E21D00027;
+	Sun, 10 Aug 2025 03:41:55 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-02.internal (MEProxy); Sun, 10 Aug 2025 03:41:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1754811715; x=1754898115; bh=ZBpDMWwG52ZlaidcpEch1+eTaLrx9B9nAIB
+	cLcWcipQ=; b=FykBMwphm94LCK9WWheVlz2z/mmSjeophpu8qZSqSQPaA+Zjhwy
+	MdhD+bk/WEKBDjfWQNpiSk8ShcTXacERf6ZiSWwv5hteB6zhMQ8MqhD6FZhAc91d
+	oHww/m79p9DyrxHcSIE14DE+pc5XawSv/rpmemr7gbgLPu8o2sCp5eC8wl8HShT+
+	WlpCB2utNFCp7tadhiya4P4lssEtTk9SQLRPGxaXpIOmXtBAX4wCftxX/+70lKxz
+	l1qfIba3QFTZfJuDt1yscWPlbWIHnAlc49ZUenv1E+e5fnmQKqY0h6xaD4ZPM4kE
+	2XWK9xq5TjteoNYLDDojA1SPeWHcyrLPXpQ==
+X-ME-Sender: <xms:QU2YaAxDmBrN_Gdo59KNbwK8oSA925CfNUc0lpcIB6tBthT-YX7uKQ>
+    <xme:QU2YaCzci3WgluqKFvPRQ-ptDLSEkKFpN7N_jHf0_nXwkAgd7ClnFsy4DDLUTuV7-
+    JLU2_scfh5aUZo>
+X-ME-Received: <xmr:QU2YaN2FCnP6cEDo5l6Kmgakp5zJqw0rJkBwY1ezHu6BSwYhuN0Z4W3ymhSw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdduvdeltddtucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepkfguohcuufgt
+    hhhimhhmvghluceoihguohhstghhsehiughoshgthhdrohhrgheqnecuggftrfgrthhtvg
+    hrnhepvddufeevkeehueegfedtvdevfefgudeifeduieefgfelkeehgeelgeejjeeggefh
+    necuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepihguoh
+    hstghhsehiughoshgthhdrohhrghdpnhgspghrtghpthhtohepudegpdhmohguvgepshhm
+    thhpohhuthdprhgtphhtthhopehmvghnghhlohhnghekrdguohhnghesghhmrghilhdrtg
+    homhdprhgtphhtthhopegushgrhhgvrhhnsehkvghrnhgvlhdrohhrghdprhgtphhtthho
+    pegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmh
+    esuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhg
+    lhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtth
+    hopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohephhhorhhmsheskhgv
+    rhhnvghlrdhorhhgpdhrtghpthhtohepshgufhesfhhomhhitghhvghvrdhmvg
+X-ME-Proxy: <xmx:QU2YaIog91-BIcvRmTWF3_hMp8s0wmdDdffT4VB2LH_X6GPm998mVw>
+    <xmx:QU2YaLBWjc_8J9vgx0iF2tw-9NFDIkmyg5GCV-Up9X2vxFfD12KKcg>
+    <xmx:QU2YaBqaCyiAlhv1_6jseAnjUMkHT-F1gbmMCtC_ySUOqQMnnxL6qw>
+    <xmx:QU2YaOANkZyBf0O2BVa0EaQy33d1usHbXvY8AtvS4HJThfRKg1383A>
+    <xmx:Q02YaEgm8MnVzXVJVdBy5_QPGIo7mWPiiZ8Uad5OU71HtI-TumyJ_ATK>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
+ 10 Aug 2025 03:41:53 -0400 (EDT)
+Date: Sun, 10 Aug 2025 10:41:51 +0300
+From: Ido Schimmel <idosch@idosch.org>
+To: Menglong Dong <menglong8.dong@gmail.com>
+Cc: dsahern@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, sdf@fomichev.me, kuniyu@google.com,
+	ahmed.zaki@intel.com, aleksander.lobakin@intel.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2] net: vrf: don't down the interface when add
+ slave
+Message-ID: <aJhNP_xQyENLSF6d@shredder>
+References: <20250807055634.113753-1-dongml2@chinatelecom.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SI2PR06MB5140:EE_|TYSPR06MB6576:EE_
-X-MS-Office365-Filtering-Correlation-Id: e03c2198-d634-4346-e8db-08ddd7dfbbf1
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|52116014|376014|1800799024|366016|38350700014|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?gjEgArU55NWUC8x9QP4JryL/jwfD6gFux3XKojj36lI7BNmOU7rzr6oPqFEP?=
- =?us-ascii?Q?Ak7z6CM0Nv9F2xRbD9QZVLfJRHGJ0lUCWOlWzfyuODE01rQ9rcKBKJOx4l4j?=
- =?us-ascii?Q?Cv1tu/La8HPuamQ4DTYiZQTzlGl3ta6f0ZrH7gHFKwKBmkXUdCX4vnBZhuss?=
- =?us-ascii?Q?4nOL2tIfcJVXPOe9480lh/tOHeYudigf3sPHvpBVuz2tWOpJZE96T6c09TnL?=
- =?us-ascii?Q?p4/6p1rOWW22bC2PZKqM3tlhKWE0f0DsPn40HyBn9QX9OJVkx0ZyipPOeZaQ?=
- =?us-ascii?Q?akyXtEv32MRFB0gQjd3zh0obB3wrgbg0QQHRUfZG3qfxfKTAfPL5kmMKWX77?=
- =?us-ascii?Q?f5jv6eRjlEaUJ57hY1owZoAq+xcr3Dipny0XHJDXIbmioIC377yk17ke07TS?=
- =?us-ascii?Q?KscBCTlGodKBSviveVnaJQFiLR2eAxgB/R9uINaqMmodAESpJbEab2s1PeH0?=
- =?us-ascii?Q?OlMapfpcy9gUzg4cPd3ZPxWac9Acrp8M/wEP8Jj8vlRE1KIlUHVQhkEwpy/x?=
- =?us-ascii?Q?oXWRyz+JAvp/OHa4PUHBjBUGVp+0fFHktLuP/WTI/Du7VxWb+5nUgoNQ+8KP?=
- =?us-ascii?Q?avTVf/YYv9iVqpePi+CgWrvM9a4+nfvzuojFS1D6ktAe8WtSAaI0WA5JVeoi?=
- =?us-ascii?Q?sttl70stNUGpWWLEg8D9B4fzSU2E90H8t33JpUCZqKUZSoxpmx4TDsRb5tNY?=
- =?us-ascii?Q?BjsxhgpUhNR9+/4daTLbM6xvzovhCYUMETM0iSH3Rn6IbtdTcsXd+tFuo/qR?=
- =?us-ascii?Q?qHCIobwO3jJEwJAclUXmm1TgCBDDwUwdsx/4rE3hLKQw68s+8y+V9ctGfYpq?=
- =?us-ascii?Q?ZsKQw+qv2m7lgy3hmgneXl7gYHiD+gZZ3GXmBHjMgmpsQahhIs1XSyWQN/OQ?=
- =?us-ascii?Q?q39EVD7SydayhB1yJUDH1A3NUkFIYHhpXVsZ+XCOXcnxGE7s9DbNU8ICATOG?=
- =?us-ascii?Q?995Cs3rJ/lK0v+ycgP6sNfJS2favNBV1UA2Xzq/c4WqDmALzE2AjEAeHOIkI?=
- =?us-ascii?Q?VRr9OXKbZESR9DP2gxDHYmDv2KBIwOdw40UItRkQW1QDFDaExv2Diq8d/DTA?=
- =?us-ascii?Q?hKakJTAEU3YcjcwNVylQOG1hIbRzMitzAf9h7Ay6rGdNSr3ZpQUJ4xLlSMRm?=
- =?us-ascii?Q?Gfg4iuv0YfInxhvoj2s2BNCvVk27LjskeuR0Uklb1NxZ/I8KUVUFJL80awf7?=
- =?us-ascii?Q?KBpAqOoojKc1lDR7nJuef+UyVw+PAXBwcG/05Y0Y/mu5MOYt7vJtDewpmWEv?=
- =?us-ascii?Q?5lXybH9fdBI2SHCW4CMVMm3mOm+lYtuqR+cTsd4lbwb3vEyHvRTEMZhwjHi9?=
- =?us-ascii?Q?KBjMbaapMVnnZOuPWc6XGCo14xeXa1XOQOll2Z8UyJdpVLMl2NAs/b6T77JO?=
- =?us-ascii?Q?k4zDgrhKCiflVY63UbW7+dzneQQDAr0KF157YjB+ijxYAaBczROUqsuZWW3i?=
- =?us-ascii?Q?6SSVf/VlGiUA4YNbSexG9sRaxNi0JeJ3oHYgmP55Y4Sx+bBB1r2kgOdEwaKT?=
- =?us-ascii?Q?t7ibvo8xTrN0cZM=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SI2PR06MB5140.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(52116014)(376014)(1800799024)(366016)(38350700014)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?2F5Zjy/VCfP2AZtNdsFWtsGxxqRCN5+vQgvtUy1BXv7yfmibZnaQXd0DwxAg?=
- =?us-ascii?Q?nBdmenmnugm07Ok4uCggLCzHlhCQTr+FODNzHJHUzuhJE4S83RR0/46plu+U?=
- =?us-ascii?Q?+PQoYBAsOTqMD9a4n9g5fKaCM8EqMPK88E5StPdrnoJEUpL2H0YwhDqLM78F?=
- =?us-ascii?Q?J83l55gQ7cU+YLQJOqXpkORuzsIH7GGhefcZpztYbO7w/9vqi6kGGTw30BVT?=
- =?us-ascii?Q?ja4ScDd7NBNcZFDE/M/dl1PXVR3USaWbzyJrEjQjzkW8Dr2hxY5F/RQ/Gx2n?=
- =?us-ascii?Q?oOOtEKjjgYDKB1VHwnD1mAiP1XxLm1ukg84GZyfpmlPLBVhLPDRv+cOefDwd?=
- =?us-ascii?Q?lObeDuQjHZt694Pubwkui3U/U/eNZni2YcaSSAztOJFxBQjS17zXPQEntiZ1?=
- =?us-ascii?Q?XJohkAGEr4ItD05JL7pwGGogcoJ9TlKG5AgC5QlO9qN687+nciByBQQVqlQK?=
- =?us-ascii?Q?h6LAl8hQuTlNVt/oO/EjF7zZ4m+9hvNszXkyzVoH31/HP91BF4e/qe1eKNzE?=
- =?us-ascii?Q?Pr1uT4W7qHH4BYk+XvCff21BsBGp3f/Ee03oUVdcfnivQowMFTYTRgiSlQx2?=
- =?us-ascii?Q?vc09c7jKSoguJXySeuAv2n3ZJ11+E/rx67iqvZr133HH4hKvKyOpVaQm+2+E?=
- =?us-ascii?Q?nQbe9MILC10m9JQiN2IiltCYU4dMkaj8RgfIYLjTV1Q1WBqPMeW2TRhp+YZ4?=
- =?us-ascii?Q?OWm1d28T9RzC8AGinlKnCeZIlZUgXdGWNJrlF3tMhS7Dn+I89l5P6alGkFaF?=
- =?us-ascii?Q?fwcAI6+tZcTBPeV3qotl36dXXT8NB7A2wi2RDAUokcmLQ1GuA9+FWA8h/fqE?=
- =?us-ascii?Q?qbKd6hhtIk2hqo7ydP+7jtcek/CNcXhTV5IHUs3Pt9gnJ7DSEGYDaeo1YF3x?=
- =?us-ascii?Q?7/1SZD0/QMOY4KLBYzhXdOeTP2pVQpmEMBr+QPd2U4QvfTUIpsJDs33rGJVp?=
- =?us-ascii?Q?X+BefRnZk4X7rR/S0398Ye6ZqPuEFd1jYE3sr9KGpD1T8RRB/nWPT97S46Zv?=
- =?us-ascii?Q?uS0v2oaewU6eVb8zBZ1M2g985jILSfLr8Gn+oSywooTVDMxzujgFarh4bnNw?=
- =?us-ascii?Q?KIAbvHuKtQDvI9dCnJwqPjVmEhtHj/jgOiq4cbGTp7lYibJX6qRq+u8XVUV9?=
- =?us-ascii?Q?vc5oJZ8DzNvCCmdH5RKjMeqvVypq0cjLNFpy6CpkAVRUZ3p/JhYtUwDunMnQ?=
- =?us-ascii?Q?JUX/KKfSHt94DFcVh1hHicuiRKAkJ/sXtuVC0FHWgc3WZl/bhpdN2qH5ZAfI?=
- =?us-ascii?Q?vyl3FNnr/I1DLXOD/Wz+2DpgP/ciJkCo5l0wKm+F+mhgYYLN1TwyFLX1X2nA?=
- =?us-ascii?Q?gompsGFWHXQjbHiRO27/DXwaVyP4ShX3sULox36RqalTeXmTodpwM1JbqGU3?=
- =?us-ascii?Q?RcWw0n6uH23gChE0Amqr5fHmJ2m5ZC2Cns+L0oVSSU17jEoxdDiEDwKKcIIj?=
- =?us-ascii?Q?0soPwlW5346V6zgGlJqIksQjFYvW8xvPcKMP6L8RlAG5xacz1m9UyDlSwyOj?=
- =?us-ascii?Q?310uXD18OIcOGNyXZHMtgWg3sOzCNKIo0nm/zU9e/OpO92x74/oDst81vtkC?=
- =?us-ascii?Q?BLtUMwT5hWVxkHOns8fdWaBJLGIECo7+UnRVb7qx?=
-X-OriginatorOrg: vivo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e03c2198-d634-4346-e8db-08ddd7dfbbf1
-X-MS-Exchange-CrossTenant-AuthSource: SI2PR06MB5140.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Aug 2025 07:30:08.9434
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Jg0jbytN6iNa5eK4nzyNHtqx1tz4j/VB2CEt4saa5rAthdTyaiDeMkRo1YXY7ucR2vmOVPnCc9kbvEmM6toVKw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYSPR06MB6576
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250807055634.113753-1-dongml2@chinatelecom.cn>
 
-GFP_NOWAIT already includes __GFP_NOWARN, so let's remove the redundant
-__GFP_NOWARN.
+On Thu, Aug 07, 2025 at 01:56:34PM +0800, Menglong Dong wrote:
+> For now, cycle_netdev() will be called to flush the neighbor cache when
+> add slave by downing and upping the slave netdev. When the slave has
+> vlan devices, the data transmission can interrupted.
 
-Signed-off-by: Qianfeng Rong <rongqianfeng@vivo.com>
----
- net/sunrpc/socklib.c           | 2 +-
- net/sunrpc/xprtrdma/rpc_rdma.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+OK, but can you provide more details on the production use case for
+enslaving the real device to a VRF during runtime? Usually this kind of
+configuration is performed before data transmission begins. I suspect
+this is why nobody complained about this behavior despite being present
+in the VRF driver since its initial submission almost a decade ago.
 
-diff --git a/net/sunrpc/socklib.c b/net/sunrpc/socklib.c
-index 4e92e2a50168..d8d8842c7de5 100644
---- a/net/sunrpc/socklib.c
-+++ b/net/sunrpc/socklib.c
-@@ -86,7 +86,7 @@ xdr_partial_copy_from_skb(struct xdr_buf *xdr, struct xdr_skb_reader *desc)
- 		/* ACL likes to be lazy in allocating pages - ACLs
- 		 * are small by default but can get huge. */
- 		if ((xdr->flags & XDRBUF_SPARSE_PAGES) && *ppage == NULL) {
--			*ppage = alloc_page(GFP_NOWAIT | __GFP_NOWARN);
-+			*ppage = alloc_page(GFP_NOWAIT);
- 			if (unlikely(*ppage == NULL)) {
- 				if (copied == 0)
- 					return -ENOMEM;
-diff --git a/net/sunrpc/xprtrdma/rpc_rdma.c b/net/sunrpc/xprtrdma/rpc_rdma.c
-index 1478c41c7e9d..3aac1456e23e 100644
---- a/net/sunrpc/xprtrdma/rpc_rdma.c
-+++ b/net/sunrpc/xprtrdma/rpc_rdma.c
-@@ -190,7 +190,7 @@ rpcrdma_alloc_sparse_pages(struct xdr_buf *buf)
- 	ppages = buf->pages + (buf->page_base >> PAGE_SHIFT);
- 	while (len > 0) {
- 		if (!*ppages)
--			*ppages = alloc_page(GFP_NOWAIT | __GFP_NOWARN);
-+			*ppages = alloc_page(GFP_NOWAIT);
- 		if (!*ppages)
- 			return -ENOBUFS;
- 		ppages++;
--- 
-2.34.1
+I'm asking because the potential for regressions from this patch seems
+quite high to me. For example, before this patch nexthop objects using
+the enslaved device would get flushed, but now they persist. This can
+impact offload of nexthop objects and it's possible I'm missing more
+potential regressions.
 
+Before:
+
+# ip link add name dummy1 up type dummy
+# ip link add name vrf1 up type vrf table 100
+# ip address add 192.0.2.1/24 dev dummy1
+# ip nexthop add id 1 via 192.0.2.2 dev dummy1
+# ip nexthop
+id 1 via 192.0.2.2 dev dummy1 scope link
+# ip link set dev dummy1 master vrf1
+# ip nexthop
+# echo $?
+0
+
+After:
+
+# ip link add name dummy1 up type dummy
+# ip link add name vrf1 up type vrf table 100
+# ip address add 192.0.2.1/24 dev dummy1
+# ip nexthop add id 1 via 192.0.2.2 dev dummy1
+# ip nexthop
+id 1 via 192.0.2.2 dev dummy1 scope link 
+# ip link set dev dummy1 master vrf1
+# ip nexthop
+id 1 via 192.0.2.2 dev dummy1 scope link 
+
+> 
+> Optimize it by introducing the NETDEV_VRF_MASTER event. When a net device
+> is added to the slave of the vrf, the NETDEV_VRF_MASTER event will be
+> triggered, and the neighbor cache will be flushed, and the routes will be
+> moved to the corresponding table.
+> 
+> The moving of the routes across tables is tested with following command:
+> 
+>   $ ip link add name dummy1 up type dummy
+>   $ sysctl -wq net.ipv6.conf.dummy1.keep_addr_on_down=1
+>   $ ip address add 192.0.2.1/24 dev dummy1
+>   $ ip address add 2001:db8:1::1/64 dev dummy1
+>   $ ip link add name vrf1 up type vrf table 100
+>   $ ip link set dev dummy1 master vrf1
+> 
+>   $ ip -6 r show table 100
+>   local 2001:db8:1::1 dev dummy1 proto kernel metric 0 pref medium
+>   2001:db8:1::/64 dev dummy1 proto kernel metric 256 pref medium
+>   local fe80::cc26:8ff:fe02:ae95 dev dummy1 proto kernel metric 0 pref medium
+>   fe80::/64 dev dummy1 proto kernel metric 256 pref medium
+>   multicast ff00::/8 dev dummy1 proto kernel metric 256 pref medium
+> 
+>   $ ip -4 r show table 100
+>   192.0.2.0/24 dev dummy1 proto kernel scope link src 192.0.2.1
+>   local 192.0.2.1 dev dummy1 proto kernel scope host src 192.0.2.1
+>   broadcast 192.0.2.255 dev dummy1 proto kernel scope link src 192.0.2.1
+> 
+> Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
 
