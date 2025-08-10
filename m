@@ -1,129 +1,148 @@
-Return-Path: <netdev+bounces-212373-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212374-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6961B1FB86
-	for <lists+netdev@lfdr.de>; Sun, 10 Aug 2025 20:04:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1ACD5B1FBA6
+	for <lists+netdev@lfdr.de>; Sun, 10 Aug 2025 20:25:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 98C6C3B8F4B
-	for <lists+netdev@lfdr.de>; Sun, 10 Aug 2025 18:04:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3959B1899249
+	for <lists+netdev@lfdr.de>; Sun, 10 Aug 2025 18:25:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB6AB1F03D8;
-	Sun, 10 Aug 2025 18:03:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 340962475C3;
+	Sun, 10 Aug 2025 18:25:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f7ZfHMBm"
+	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="fIaNi4tQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58A5920326;
-	Sun, 10 Aug 2025 18:03:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E0611B3930;
+	Sun, 10 Aug 2025 18:25:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754849036; cv=none; b=XzluhA8G454rp5Wpxpx0XXErze/20GqlQfwTISms7O5wGMNgTFXMUPjszUbjUAZWdW0ZCYYdfCFLl/VhsQO08uk9vnLwtt4aO3zgwq7Qk3AHRAMn75M0EIMuN9MHO1vGFuTiPkWqHnepIzv9ibMGDDY5SHByoE74Gn/vuEhU05I=
+	t=1754850315; cv=none; b=ZbPp5hngAi249uC/NwCFSoZM6BI2tKNECnxPsf2ERVU3GXPIW1AzPv1SIo71zQfb/cqv7nLBL6C/0Qb3Vm6D4eFgRBQ0/ghykFotD/pwLs+clRfBZvszzKGWMO0B2QIhUDsdxFTz/VT5iNB5mFRi0hs4UuBjKLSxanJGFuEBOH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754849036; c=relaxed/simple;
-	bh=gaYOoHtzTnOvXU48a18BZKN8A69dA/OT/XQFvRAYK0w=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NJaUEXr9NLFZu2xy7S8zRskVMA+CnLysYW529a4+22u7uBa1ulg+gH+6nH6m1x9gM/M9U2XKTDGIy2pgpgiKijrf5Y/u9dKt18OkSr11GIxX5Nk0KOBOFw7jBKP5fRIAfL3oIHO8YO8j70d1FTC+L7uLFnYWnlG6tmsKMlrZ9zU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f7ZfHMBm; arc=none smtp.client-ip=209.85.216.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-320dfa8cfa3so3473089a91.3;
-        Sun, 10 Aug 2025 11:03:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1754849034; x=1755453834; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=8iCC178+oHgUid4yigF5hFbaYT7QTZQRpFLb7VJp988=;
-        b=f7ZfHMBmjmeagRKRqTn0XbUEqDELgd/2QLSqlRKatl4YbY0Fokg/ZVi/7+HYEPsXlm
-         EzSeuTa1nU5YyaZi4zn6TaiXdGVeJxfNZXrIIlrmHOZjZY20JP/cWRGNk4SWrfVeJGxk
-         RP87FfCFpuw/lfSYQMMQyT/xgRH1FsEtArmELPoK4Jd6O58+unH0RVjpHUe/WtVJ4S4B
-         7taJiFz8AVkC5Jmm8wTsMTZR8uSeCWUPdqng++6mESbzXV7hUMB3k1hhjXxk15iqef64
-         AKxbhsIUBcBQ/pvsYEhEPKrxQ/Raw6ncMSu+DhgMHPEfHIzKODAQRu5d+XLVxMMxMwPW
-         0uGQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754849034; x=1755453834;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8iCC178+oHgUid4yigF5hFbaYT7QTZQRpFLb7VJp988=;
-        b=R/nQjvxHCp++K8fuHt/2LpKgG0/8XCZJ1OdK/Dygx8Cg9+ThWTY/9tjUGkqn0DFDEZ
-         QhdSFlcFgFTDpZlierNpg/WIchvYbqL3vlXOJgTcUCwulj7Y5uSE0Z+pt5mJYoDcoI3N
-         GFFhAP9oLIiNUhWlAfNq+DRJlnvaIYhOoonf41377TbKUn3aNOjyi7JFnT3ZEMKzsXmA
-         VqZGjKvNwAN8LOvFYaUisxgb2nfGwyABIiawFFrDSA5ky/VlFENlYV0nt044YyYSrFQr
-         vEtZ9tFYS97+chT8H5h0VHlDjSGTqwFJb/M51eU0vsBcZj+MTAO04UCTUpuVqpsQRqaX
-         YD8A==
-X-Forwarded-Encrypted: i=1; AJvYcCUnyfF5EWmwpgAd/jb/3t4BUxvxMa6UDwip778dkI2ZzfyUq2n7UjKmBF8wK/AFvz0Uj873TeIO5ZkIPg4=@vger.kernel.org, AJvYcCWHTyaFjWUsgfTpAGg8L7ezmJsmN5mbhmxgicZ2wa/aCzlo3RYl5NI4pqwdDapTIXZ//ebRiC8t@vger.kernel.org
-X-Gm-Message-State: AOJu0YwZ3mjTE6dT49Sn01cog3zsfHN8kALBuALvlPV7men1t08lCRzs
-	HH4IRsM+s2rAcf57qIVPh1HZe5u0nBhm8tH8DRTIA+kn3Rt2oLf3mBHWS1oj33S+
-X-Gm-Gg: ASbGnctSgcuegzqj/a4BTpTGo/LvKwMgtfmE/MQWTYJzueZAkef7YS8U/rToY8N58k5
-	q1nVbFw9f0XiIKzcnHgbke3T/DwKiM9DGrc+SsEKmQu6YVmmeSENwVeu4g2dQE943ijys4c2PZg
-	SY45pIeMzrz6GRwuhRhOdJuaqnPqFuU9A0bDNWFLxeJ5MNd5n51ZaftbEd9Af4/3pZoNiZeVsib
-	iIngtVXqpiQeRJcSud4+7KkJc7MuL7AbNhkm2b+9CPEm1GA9dly30TCWnmu28IBzZzO7Sajupn0
-	XbmWCE3BEhYpyw6gENK77Dn5cdXvLETyfbhvUkUKCL7JoMjZ8krCeKATg3oyTxmlYdy5JSYNN2l
-	C6A40Wq2/jdR5tDfKpD3+5Lj6n52QvvDiQnonaPhy6LR8yPiTxlxPxAg=
-X-Google-Smtp-Source: AGHT+IFbmMq9se1Gfprc0dkctpXAIoLrgj2/vUGkJmxiyPVwrDO/BYSwEweScA9h1dNxojoUAJO8kg==
-X-Received: by 2002:a17:90b:3c83:b0:31e:f193:1822 with SMTP id 98e67ed59e1d1-32183c48368mr14203717a91.28.1754849034415;
-        Sun, 10 Aug 2025 11:03:54 -0700 (PDT)
-Received: from chandra-mohan-sundar.. ([2401:4900:1cba:adf9:80de:8778:334d:8ba1])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b43c54fbce4sm3256987a12.55.2025.08.10.11.03.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 10 Aug 2025 11:03:54 -0700 (PDT)
-From: Chandra Mohan Sundar <chandramohan.explore@gmail.com>
-To: sgoutham@marvell.com,
-	lcherian@marvell.com,
-	gakula@marvell.com,
-	jerinj@marvell.com,
-	hkelam@marvell.com,
-	sbhatta@marvell.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	shuah@kernel.org
-Cc: Chandra Mohan Sundar <chandramohan.explore@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kernel-mentees@lists.linux.dev
-Subject: [PATCH net] Octeontx2-af: Fix negative array index read warning
-Date: Sun, 10 Aug 2025 23:33:27 +0530
-Message-ID: <20250810180339.228231-1-chandramohan.explore@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1754850315; c=relaxed/simple;
+	bh=TyvCHPY9P3lMRaF6lSp0JQKuHHe/JAv74uMi9eYnFm0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hKV/cdVBelHt3i/X7BXQv9ZB2Cy6NGFGuidBXYG9ValBwlmDUBcr5NuBVhz3jUR/oL3RCPZwwG8YnBUdmd9zQkEQelqFwF9Vls7PJLhly/zgIajL13W6zXG3+Y9v5AoZFGLNHTyvasT+iAHP41Jc79HEwGDpAQUjDjrdT67lC3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=fIaNi4tQ; arc=none smtp.client-ip=62.89.141.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=tmF4w1SpmzwBXdBcTEr+W1a6c89LE5d+jxlzQIeWzEY=; b=fIaNi4tQOldJ6q8G6UTrNYayA4
+	i4C1TYPv8fk4I4rzyGjacsUA8/dNh8D/i80DPZu7pkdH1DdWe9RE3XNZ8sBEITQk9mkHxCPI9Dfew
+	qTa+M26dKGI9/6v2Ye8wVMNcKNKqUoYFZd8eTWRgK7qnm9BFuRH8IUwuyHCn7aEEL+AI0ODO0zgFC
+	7WpsAzkCkuuzkhE84qXwfI67+/zQj9RbPlnxSK/8hX3hMUjBCSBtiHFi5PDLQkjt5N2rSYuhHE/fD
+	F8iiXzySp64WerkMRpeV+PPqzw+QAqXhzXT5m8IbWpXu8ir6z3TXtWSz8WxUcOEY5Oe0ysiAFPUf9
+	3nISP7Xw==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1ulAjC-00000009Kir-2Ztg;
+	Sun, 10 Aug 2025 18:25:06 +0000
+Date: Sun, 10 Aug 2025 19:25:06 +0100
+From: Al Viro <viro@zeniv.linux.org.uk>
+To: Ujwal Kundur <ujwal.kundur@gmail.com>
+Cc: allison.henderson@oracle.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+	rds-devel@oss.oracle.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] rds: Fix endian annotations across various
+ assignments
+Message-ID: <20250810182506.GL222315@ZenIV>
+References: <20250810171155.3263-1-ujwal.kundur@gmail.com>
+ <20250810174705.GK222315@ZenIV>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250810174705.GK222315@ZenIV>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 
-The cgx_get_cgxid function may return a negative value.
-Using this value directly as an array index triggers Coverity warnings.
+On Sun, Aug 10, 2025 at 06:47:05PM +0100, Al Viro wrote:
 
-Validate the returned value and handle the case gracefully.
+> >  		switch (type) {
+> >  		case RDS_EXTHDR_NPATHS:
+> >  			conn->c_npaths = min_t(int, RDS_MPATH_WORKERS,
+> > -					       be16_to_cpu(buffer.rds_npaths));
+> > +					      (__force __u16)buffer.rds_npaths);
+> 
+> No.  It will break on little-endian.  That's over-the-wire data you are
+> dealing with; it's *NOT* going to be host-endian.  Fix the buggered
+> annotations instead.
 
-Signed-off-by: Chandra Mohan Sundar <chandramohan.explore@gmail.com>
----
- drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c | 2 ++
- 1 file changed, 2 insertions(+)
+PS: be16_to_cpu() is not the same thing as a cast.  On a big-endian box,
+a 16bit number 1000 (0x3e8) is stored as {3, 0xe8}; on a little-endian it's
+{3, 0xe8} instead; {0xe8, 3} means 59395 there (0xe8 * 256 + 3).
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-index 8375f18c8e07..b14de93a2481 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-@@ -3005,6 +3005,8 @@ static int cgx_print_fwdata(struct seq_file *s, int lmac_id)
- 		return -EAGAIN;
- 
- 	cgx_id = cgx_get_cgxid(cgxd);
-+	if (cgx_id < 0)
-+		return -EINVAL;
- 
- 	if (rvu->hw->lmac_per_cgx == CGX_LMACS_USX)
- 		fwdata =  &rvu->fwdata->cgx_fw_data_usx[cgx_id][lmac_id];
--- 
-2.43.0
+be16_to_cpu() is a no-op on big-endian; on little-endian it converts the
+big-endian 16bit to host-endian (internally it's a byteswap).
 
+If over-the-wire data is stored in big-endian order (bits 8..15 in the
+first byte, bits 0..7 in the second one) and you want to do any kind
+of arithmetics with the value you've received, you can't blindly treat
+it as u16 (unsigned short) field of structure - on big-endian boxen
+it would work, but on little-endian it would give the wrong values
+(59395 when sender had meant 1000).  be16_to_cpu() adjusts for that.
+
+In the above, you have ->c_npaths definitely used as a number - this
+net/rds/connection.c:924:       } while (++i < conn->c_npaths);
+alone is enough to be convincing.  All other uses are of the same
+sort - it's used in comparisons, so places using it are expecting
+host-endian integer.
+
+Assignment you've modified sets it to lesser of RDS_MPATH_WORKERS (8,
+apparently) and the value of buffer.rds_npaths decoded as big-endian.
+
+"buffer" is declared as
+        union {
+		struct rds_ext_header_version version;
+		u16 rds_npaths;
+		u32 rds_gen_num;
+	} buffer;
+and the value in it comes from
+                type = rds_message_next_extension(hdr, &pos, &buffer, &len);
+Then we look at the return value of that rds_message_next_extension() thing
+and if it's RDS_EXTHDR_NPATHS we hit that branch.
+
+That smells like parsing the incoming package, doesn't it?  A look at
+rds_message_next_extension() seems to confirm that - we fetch the next
+byte (that's our return value), then pick the corresponding size from
+rds_exthdr_size[that_byte] and copy that many following bytes.
+
+That code clearly expects the data to be stored in big-endian order -
+it is not entirely impossible that somehow it gets host-endian (in
+which case be16_to_cpu() would be a bug), but that's very unlikely.
+
+*IF* that's over-the-wire data, the code is actually correct and the
+problem is with wrong annotations -
+        union {
+		struct rds_ext_header_version version;
+		__be16 rds_npaths;
+		__be32 rds_gen_num;
+	} buffer;
+to reflect the actual data layout to be found in there.  Probably
+static unsigned int     rds_exthdr_size[__RDS_EXTHDR_MAX] = {
+[RDS_EXTHDR_NONE]       = 0,
+[RDS_EXTHDR_VERSION]    = sizeof(struct rds_ext_header_version),
+[RDS_EXTHDR_RDMA]       = sizeof(struct rds_ext_header_rdma),
+[RDS_EXTHDR_RDMA_DEST]  = sizeof(struct rds_ext_header_rdma_dest),
+[RDS_EXTHDR_NPATHS]     = sizeof(__be16),
+[RDS_EXTHDR_GEN_NUM]    = sizeof(__be32),
+};
+for consistency sake.  Note that e.g. struct rds_ext_header_rdma_dest
+is
+struct rds_ext_header_rdma_dest {
+        __be32                  h_rdma_rkey;
+	__be32                  h_rdma_offset;
+};
+which also points towards "protocol data, fixed-endian"...
 
