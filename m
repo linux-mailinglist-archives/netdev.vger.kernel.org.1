@@ -1,57 +1,95 @@
-Return-Path: <netdev+bounces-212339-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212340-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13682B1F725
-	for <lists+netdev@lfdr.de>; Sun, 10 Aug 2025 01:01:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFB32B1F7FA
+	for <lists+netdev@lfdr.de>; Sun, 10 Aug 2025 03:59:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A16A84E0369
-	for <lists+netdev@lfdr.de>; Sat,  9 Aug 2025 23:01:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1638A17AD8A
+	for <lists+netdev@lfdr.de>; Sun, 10 Aug 2025 01:59:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ADD6224225;
-	Sat,  9 Aug 2025 23:01:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD77A1624C0;
+	Sun, 10 Aug 2025 01:59:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="BjTMkCr8"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B9EE186294;
-	Sat,  9 Aug 2025 23:01:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A75623A6
+	for <netdev@vger.kernel.org>; Sun, 10 Aug 2025 01:59:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754780506; cv=none; b=Ah44hAwUPZVydf9fOdUrw6U2dSqX3gDYOcCZacLoEOlsC9C/in23oFXruSpZ0qG6tTMD17ZWtrN9XjKfL4RvP7txcMoTKteZ+PpTFCvS2QAsIMGvU1EK4Ct7ciG5q5aXlz/GVqjWAtgPxZtUgOny+LLRR+7GAdjvci2L7nuzWH8=
+	t=1754791172; cv=none; b=V9xfUmZXPlHMzYpRWfELG7L5xANl4RKee2SsNdyGbrJfIchdIxmmN3JRJ9as/9xSVh0h0AeeGnSrhwc1ksOf+zdinXE04vwYD9oCqobHaixTt3LmQt4wuYW9IDFOExgFJpG4VZdtCdsaf2Rq4swQva81yS/R5bssOkEYMbkM9EY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754780506; c=relaxed/simple;
-	bh=CjJsvcst6MRZmo+FQY5M+ytxwUkRquRR0/OqVbCuUKY=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=R/Y/CTUWILbQ1lVZqHAdVzHgbaaXHWau1jkd6oxgWUrem3q1TFeT68I7CtkRp9dPnc8IHQeIQunVApOxJp8HOsU5M7hWwZPb4KYYUVgDE2CIZ2g3nu2g5i1IdWE3lmJe/2cJbUbX1X3VMC7YrJypavjOhPTrPQDdqWWJasfNXd4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1uksAA-000000002Cb-2BOp;
-	Sat, 09 Aug 2025 22:35:42 +0000
-Date: Sat, 9 Aug 2025 23:35:28 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Arkadi Sharshevsky <arkadis@mellanox.com>,
-	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Andreas Schirm <andreas.schirm@siemens.com>,
-	Alexander Sverdlin <alexander.sverdlin@siemens.com>,
-	Lukas Stockmann <lukas.stockmann@siemens.com>,
-	John Crispin <john@phrozen.org>
-Subject: [PATCH/RFC net] net: dsa: lantiq_gswip: honor dsa_db passed to
- port_fdb_{add,del}
-Message-ID: <aJfNMLNoi1VOsPrN@pidgin.makrotopia.org>
+	s=arc-20240116; t=1754791172; c=relaxed/simple;
+	bh=qlrKx2M8TZtGZwjSkB8IuXtRhhT1GxtXi9jWa6jR08E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DliQ9lfP0ekTrcXSxOMmKNUThHonn6z2fArgzSCPNcMiPbFdZSaM+FTWWj9TYMF40Qu/6kJdFz04o1jSSmK+U5ayk2wj9GnvwfAKvjpd3KYEYYOUHw4cRCLvKlTsnHLBXTcYSuWsVN2dDwHSaQR7zTeMQwtV04nQ/1izuNa3iWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=BjTMkCr8; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-76b8d289f73so3067553b3a.1
+        for <netdev@vger.kernel.org>; Sat, 09 Aug 2025 18:59:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1754791171; x=1755395971; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eF8pKdQjv4NqMNkyPa2+QQHFgfWeKJGjpAH9U0wK9Zw=;
+        b=BjTMkCr8FB3QbJ4ZRRC1qb8vblTmcRi9Lvta9wvXmuqsZmZ6xhtgy+CVUyAcXmKxAy
+         5bcJbcdarfNMhMUN2kHpuzzkiY0OR0j6w80ogF/PocTJCWrOaYGRmTNxHG4MdYMSaQZF
+         SFrjvxg2nLEsJmJTXeNnEMIrz7u5ZAoOUPtire7M99i8/l1qxPlLwSbsDtjMS+869BGd
+         wd8bL8y3JSIsTOtshT2xoAmuBqbt62l+dDG/O2Lh+7uk+fqm9cQwVTePh3KaGZQVKVK5
+         JVqGTHUajbq8llh48XMOQtdALMfQVXasPSnTISaxIYe/iC5S/j5UrF3SYNYQyuRg4rdU
+         SArg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754791171; x=1755395971;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=eF8pKdQjv4NqMNkyPa2+QQHFgfWeKJGjpAH9U0wK9Zw=;
+        b=dmz/9UY69E+unOSEc608oaeeOrex4X08+v1k4QsRqMOjoATQD5zwrAWK8tAQjVi7BZ
+         6Imcyk9ja4b8c5d9zJfHzJ7rk0Op8hU0ae3dUDN3wOfq0vrYKHoXLUePhD7nGmquM6ru
+         oV+93ZOuzbof5jOHuw6mEvh+q9RmziekUFL4pGQTvQVRFZOwoms7IJhUh5o6bpdDAdfT
+         OtI5kKKtKFS5TWkwzVwfGNRiRCqV4HTo1VnY5hRSRvW7TWOEj7i33Xr8kMKMfhNAD70Z
+         4F8F0dl+ysUTFrfd2R105ej9fxV7R9ry973QUDlG+InKbzh3dCN/ttz/bDEJkL/jG3+6
+         cxCg==
+X-Forwarded-Encrypted: i=1; AJvYcCV7rkpV5sEdKAbsbVsLKOH9h4h2bMDjGcRfNoK6lcxzc6LH8wGDqL6DO2KatwDxnrxe1VD/bD4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzpyrRDhov+n04ywLml3567/3tECve6cmFJodF2VKvAvXmFLKbO
+	697sBIFxqa2GZq4cGxiCCnbTSq8BsSRt5VKeLzMzlvXzFuIzLsCecUmEA3lYdPBQbYU=
+X-Gm-Gg: ASbGnct2sGktcCPlf/4CzGI+rqf1pHFANjelREJWBMiK2FAf43wDbdx3YWrFvonaUA6
+	KjsL5vQT3j2plgtsSRuN5WrlFC+U54RgbOWduePIxfWCMc1aQtVnysTS+uCekoRZTc6ejxETh7O
+	xPHuoVPgc10qvIu7FXKjpefJykb14t3GqQOflbVD8SRBpzj6z0ZJlyY3JqYlfugKPrHYZfN+dNC
+	+pYRymrbYvS9UQNi/WRYnuefQ9zWLU+LMhJdzRxZUm2XMdSGVHcoNwhDdpsCKs1afhFVG6sTAu+
+	ULtuY4B8vSI1hXBikw61y933IwUjrACVjkoNU/pkVNX3IdJuockwSkKc3EqxrLCz5Fh/i/uRyvu
+	CTMGqBI/9+8euVl3bvj968a436KxhM0C8qkwWTc5s6ao29sycSdsPmBzXR2pvDE3BBFBMMQiM
+X-Google-Smtp-Source: AGHT+IH/pB2pixkyF2YL9XgfIkRFvD7SRAfHbBOLp/SPkXfC/H0pz69TSJ/YVnczmdr9I/SN4PereA==
+X-Received: by 2002:a05:6a21:6da9:b0:23d:3513:935c with SMTP id adf61e73a8af0-2405500059dmr10796388637.6.1754791170739;
+        Sat, 09 Aug 2025 18:59:30 -0700 (PDT)
+Received: from MacBook-Air.local (c-73-222-201-58.hsd1.ca.comcast.net. [73.222.201.58])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-76be629a1b6sm19735996b3a.11.2025.08.09.18.59.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 09 Aug 2025 18:59:30 -0700 (PDT)
+Date: Sat, 9 Aug 2025 18:59:27 -0700
+From: Joe Damato <joe@dama.to>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	willemdebruijn.kernel@gmail.com, skhawaja@google.com,
+	sdf@fomichev.me, shuah@kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net v2 0/3] net: prevent deadlocks and mis-configuration
+ with per-NAPI threaded config
+Message-ID: <aJf8_ypOuSrsQnIM@MacBook-Air.local>
+Mail-Followup-To: Joe Damato <joe@dama.to>,
+	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, horms@kernel.org,
+	willemdebruijn.kernel@gmail.com, skhawaja@google.com,
+	sdf@fomichev.me, shuah@kernel.org, linux-kselftest@vger.kernel.org
+References: <20250809001205.1147153-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,142 +98,20 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20250809001205.1147153-1-kuba@kernel.org>
 
-Commit c9eb3e0f8701 ("net: dsa: Add support for learning FDB through
-notification") added a dev_close() call "to indicate inconsistent
-situation" when we could not delete an FDB entry from the port. In case
-of the lantiq_gswip driver this is problematic on standalone ports for
-which all calls to either .port_fdb_add() or .port_fdb_del() would just
-always return -EINVAL as adding or removing FDB entries is currently
-only supported for ports which are a member of a bridge.
+On Fri, Aug 08, 2025 at 05:12:02PM -0700, Jakub Kicinski wrote:
+> Running the test added with a recent fix on a driver with persistent
+> NAPI config leads to a deadlock. The deadlock is fixed by patch 3,
+> patch 2 is I think a more fundamental problem with the way we
+> implemented the config.
+> 
+> I hope the fix makes sense, my own thinking is definitely colored
+> by my preference (IOW how the per-queue config RFC was implemented).
 
-As since commit c26933639b54 ("net: dsa: request drivers to perform FDB
-isolation") the dsa_db is passed to the .port_fdb_add() or
-.port_fdb_del() calls we can use that to set the FID accordingly,
-similar to how it was for bridge ports, and to FID 0 for standalone
-ports. In order for FID 0 to work at all we also need to set bit 1 in
-val[1], so always set it.
+Maybe it's too late now, but I am open to revisiting how the whole per-queue
+NAPI config works after a conversation we had a couple months ago (IIRC ?).
 
-This solution was found in a downstream driver provided by MaxLinear
-(which is the current owner of the former Lantiq switch IP) under
-GPL-2.0. Import the implementation and the copyright headers from that
-driver.
-
-Fixes: c9eb3e0f8701 ("net: dsa: Add support for learning FDB through notification")
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
----
- drivers/net/dsa/lantiq_gswip.c | 55 ++++++++++++++++++++--------------
- 1 file changed, 33 insertions(+), 22 deletions(-)
-
-diff --git a/drivers/net/dsa/lantiq_gswip.c b/drivers/net/dsa/lantiq_gswip.c
-index 6eb3140d4044..fed86b2d78fc 100644
---- a/drivers/net/dsa/lantiq_gswip.c
-+++ b/drivers/net/dsa/lantiq_gswip.c
-@@ -2,9 +2,11 @@
- /*
-  * Lantiq / Intel GSWIP switch driver for VRX200, xRX300 and xRX330 SoCs
-  *
-- * Copyright (C) 2010 Lantiq Deutschland
-- * Copyright (C) 2012 John Crispin <john@phrozen.org>
-+ * Copyright (C) 2023 - 2024 MaxLinear Inc.
-+ * Copyright (C) 2022 Snap One, LLC.  All rights reserved.
-  * Copyright (C) 2017 - 2019 Hauke Mehrtens <hauke@hauke-m.de>
-+ * Copyright (C) 2012 John Crispin <john@phrozen.org>
-+ * Copyright (C) 2010 Lantiq Deutschland
-  *
-  * The VLAN and bridge model the GSWIP hardware uses does not directly
-  * matches the model DSA uses.
-@@ -239,6 +241,7 @@
- #define  GSWIP_TABLE_MAC_BRIDGE_KEY3_FID	GENMASK(5, 0)	/* Filtering identifier */
- #define  GSWIP_TABLE_MAC_BRIDGE_VAL0_PORT	GENMASK(7, 4)	/* Port on learned entries */
- #define  GSWIP_TABLE_MAC_BRIDGE_VAL1_STATIC	BIT(0)		/* Static, non-aging entry */
-+#define  GSWIP_TABLE_MAC_BRIDGE_VAL1_VALID	BIT(1)		/* Valid bit */
- 
- #define XRX200_GPHY_FW_ALIGN	(16 * 1024)
- 
-@@ -1349,30 +1352,37 @@ static void gswip_port_stp_state_set(struct dsa_switch *ds, int port, u8 state)
- }
- 
- static int gswip_port_fdb(struct dsa_switch *ds, int port,
--			  const unsigned char *addr, u16 vid, bool add)
-+			  const unsigned char *addr, u16 vid, struct dsa_db db,
-+			  bool add)
- {
--	struct net_device *bridge = dsa_port_bridge_dev_get(dsa_to_port(ds, port));
- 	struct gswip_priv *priv = ds->priv;
- 	struct gswip_pce_table_entry mac_bridge = {0,};
--	unsigned int max_ports = priv->hw_info->max_ports;
- 	int fid = -1;
--	int i;
- 	int err;
-+	int i;
- 
--	if (!bridge)
--		return -EINVAL;
--
--	for (i = max_ports; i < ARRAY_SIZE(priv->vlans); i++) {
--		if (priv->vlans[i].bridge == bridge) {
--			fid = priv->vlans[i].fid;
--			break;
-+	switch (db.type) {
-+	case DSA_DB_BRIDGE:
-+		for (i = 0; i < ARRAY_SIZE(priv->vlans); i++) {
-+			if (priv->vlans[i].bridge == db.bridge.dev) {
-+				fid = priv->vlans[i].fid;
-+				break;
-+			}
- 		}
--	}
--
--	if (fid == -1) {
--		dev_err(priv->dev, "no FID found for bridge %s\n",
--			bridge->name);
--		return -EINVAL;
-+		if (fid == -1) {
-+			dev_err(priv->dev, "Port %d not part of a bridge\n", port);
-+			return -EINVAL;
-+		}
-+		break;
-+	case DSA_DB_PORT:
-+		if (dsa_is_cpu_port(ds, port) &&
-+			dsa_fdb_present_in_other_db(ds, port, addr, vid, db))
-+			return 0;
-+		/* FID of a standalone / single port bridge */
-+		fid = 0;
-+		break;
-+	default:
-+		return -EOPNOTSUPP;
- 	}
- 
- 	mac_bridge.table = GSWIP_TABLE_MAC_BRIDGE;
-@@ -1382,7 +1392,8 @@ static int gswip_port_fdb(struct dsa_switch *ds, int port,
- 	mac_bridge.key[2] = addr[1] | (addr[0] << 8);
- 	mac_bridge.key[3] = FIELD_PREP(GSWIP_TABLE_MAC_BRIDGE_KEY3_FID, fid);
- 	mac_bridge.val[0] = add ? BIT(port) : 0; /* port map */
--	mac_bridge.val[1] = GSWIP_TABLE_MAC_BRIDGE_VAL1_STATIC;
-+	mac_bridge.val[1] = add ? (GSWIP_TABLE_MAC_BRIDGE_VAL1_STATIC |
-+				   GSWIP_TABLE_MAC_BRIDGE_VAL1_VALID) : 0;
- 	mac_bridge.valid = add;
- 
- 	err = gswip_pce_table_entry_write(priv, &mac_bridge);
-@@ -1396,14 +1407,14 @@ static int gswip_port_fdb_add(struct dsa_switch *ds, int port,
- 			      const unsigned char *addr, u16 vid,
- 			      struct dsa_db db)
- {
--	return gswip_port_fdb(ds, port, addr, vid, true);
-+	return gswip_port_fdb(ds, port, addr, vid, db, true);
- }
- 
- static int gswip_port_fdb_del(struct dsa_switch *ds, int port,
- 			      const unsigned char *addr, u16 vid,
- 			      struct dsa_db db)
- {
--	return gswip_port_fdb(ds, port, addr, vid, false);
-+	return gswip_port_fdb(ds, port, addr, vid, db, false);
- }
- 
- static int gswip_port_fdb_dump(struct dsa_switch *ds, int port,
--- 
-2.50.1
-
+I think you had proposed something that made sense to me at the time (although
+I can't recall what that was or what thread that was in).
 
