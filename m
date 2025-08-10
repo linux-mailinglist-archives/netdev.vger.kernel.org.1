@@ -1,114 +1,160 @@
-Return-Path: <netdev+bounces-212366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212367-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3646EB1FB0E
-	for <lists+netdev@lfdr.de>; Sun, 10 Aug 2025 18:49:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 19D17B1FB20
+	for <lists+netdev@lfdr.de>; Sun, 10 Aug 2025 18:52:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 57B7D1894646
-	for <lists+netdev@lfdr.de>; Sun, 10 Aug 2025 16:50:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C18A21896BAE
+	for <lists+netdev@lfdr.de>; Sun, 10 Aug 2025 16:52:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C34C9247281;
-	Sun, 10 Aug 2025 16:49:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ACA226E179;
+	Sun, 10 Aug 2025 16:52:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PVAi8pJH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ch24JM3d"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A8FB1AA7BF;
-	Sun, 10 Aug 2025 16:49:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F00C25EF97;
+	Sun, 10 Aug 2025 16:52:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754844588; cv=none; b=ZAFPnYKTySXb0mF1NM662PubiFfvMvtApjdWophkbf8junzB9XzWIMnmcZixdOEhvzCB5fqo4bzK3RyWD+eQepPCOtPlDH2Sx/E/dR/xmEsCn+ZwyyZaFxwXSF+w0ZHoRpARiRN23cuUGF/cR/MMe6djN9HrtiIHhEUjua3f+vk=
+	t=1754844748; cv=none; b=j6ZdqBBXFAveTV1uo8mpw/UbxshLe2ptteQ1pUI3ehLaKM9qd/ntXPW0WIlUdgc9fb6TjcfV1Nmsm+RNYepMTZMb08kDdZmREBJ4zZoYIeoE+ic8oUaoN9HqD1a94DmKWNNAqiGUaplZ4zaBhzzKsGq1J1hW57oCoN+jDasJ+gw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754844588; c=relaxed/simple;
-	bh=1O7Ir2JV9F3FRquanCEG57N9yilLJmRdcXyWCErqjXM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ktRrpiw2+IMHqgRh9m7qVKotK4BKj5RJEg+0pSgaN4riycFHI6XKTCcHS9+ZiZCdQ80xPN2YaTqyuyZZHvwc0LYUqDMEdz/hfyKX3GpcDzzX0ME3vTIi2HNbnc0obPyzw/rlIUUvBkFZUZGahEe1R5ze9jYeoVAB/kclw8Wr/1s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PVAi8pJH; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-3b788fdcc2dso265748f8f.1;
-        Sun, 10 Aug 2025 09:49:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1754844585; x=1755449385; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1O7Ir2JV9F3FRquanCEG57N9yilLJmRdcXyWCErqjXM=;
-        b=PVAi8pJHHY/8oHFlvuQvUSML7QDWKPFusHDklGm/f2/hVcBxddUGv2l69duDGRQzgU
-         lcRS6JJ311x16P9T9iGrScxL7HypsU3m/ni27o9rAahBAvFBlxZ/hrT6py+Mhvz/BPyr
-         uvOk7VRn91TNpZ4tRywZ+zETSmBbMKQBmr+fj0FfRzlur41hnk5fmC57a9H/bw4yno2S
-         sLajvFyyC3ySesrSDPANAbqZCWNNhQ9JM3h7WmcDdQYjPrplAxSrZ76mxcKb0EKvpy3d
-         SeVhcL26buhC1G8vybDgOv2XfgntQDNU2PUkER0QkTpTipw5lGG8KN/XPt+mw8VuPsjL
-         iA7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754844585; x=1755449385;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1O7Ir2JV9F3FRquanCEG57N9yilLJmRdcXyWCErqjXM=;
-        b=kTq7IYcgQg+WPajneWiRyEdjigf9al7ArWA/qJrdV3EuaAyWXWuTNMhCVzPn3AXzxE
-         tlcdrjHrOuho80lf+qXXH5ui+A9xXBVbnx4bb5nOPbRdH3PTCIG9ObFkAAvw06SGB4gt
-         nKm8py4eqgpS8oAbGOLxBIXUszoRwdOa1OnJXs86fwDfmaEZAXIq0ymyopIRRQjdm4I9
-         WG1htbB+SmohSpgcNYlSMv2wlr8seTIt6iMu2ZNx9wVsFRQwwg36baWOyyBxcoJmecMc
-         jiXWj67x6WFLeD/pLyPQrX4sdt+a/JBzWazXiMS7+VXvg18XNMvBREFGpl1wbOM/aufs
-         EulA==
-X-Forwarded-Encrypted: i=1; AJvYcCUo+aKCmMWWcIkOxElHZexShrdGnhfDyfUFnD3yVnDEzK/XGf13fofxfnN7IJOLvWbJcYMvtWAF@vger.kernel.org, AJvYcCVltb8Gvn/dpWJmpPDhkBMgTaAgb4QjRp+lyjKd6U0zKmCkWLGtukUDYCCj1IJjKPtLDDmoHjXHVajq@vger.kernel.org, AJvYcCXl594th+50gUpVpj1yyjvdXKLKRxVyHayYUuYUfjn+vyQKvlLJNNN0P8Qk1rasXasAuYdeJDAah/fqq3xY@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx4aWw3RsEiO2KL4VsqGallW4BGF6utf8QsbXbVQqnyxWirvlDM
-	Yjuw6BMuCwrDMogeD5BATzXfIy3PHbTUuTdOC3iZ68BI/Pc4yRKxGoUg
-X-Gm-Gg: ASbGncsAJNPTSupt75YRxQozq8SIzLHwvR2SCTmOGix+tKtRO6QGAdnhwEN0beyNx5U
-	k4s/xrXOCvpJyCZtDKx4zHV8jDDYUKAsJ30byYNCWmnSJTGratqs51izYgoFyH2aCR8X5SMjNNb
-	6pXyGanb36p6N9/f7JYDwlRrNn2vqbJJx/SB955DKrm34cJOeMCO/256IZDd4F2UjfPy6dE8Fk5
-	/P/lt9mHfStcebm6TcoNChdrFCX45mAMAcJzXi9j3AGAuZzdEc+OOhxmACtgQqCs9902r77nPmv
-	xCJIs1xFNBq9sGb35xN7KsjJxedc5fcSHoSoUzvIDe7wD/0J2SMA7gFX0fsXUtWBopUjgGTOXBs
-	1xaHVLgGbMZe1YMc=
-X-Google-Smtp-Source: AGHT+IF3CiPbtmzEifmcmnCZ6v8i8GbiWTGaqS99ZpLMhFYLskKAThOPIcEoj6BjqGlkH2y/M2FuGw==
-X-Received: by 2002:a05:600c:820a:b0:456:1a00:c745 with SMTP id 5b1f17b1804b1-459fd04c3e9mr22165455e9.3.1754844584509;
-        Sun, 10 Aug 2025 09:49:44 -0700 (PDT)
-Received: from skbuf ([2a02:2f04:d005:3b00:f9ef:f5a3:456e:8480])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b79c3bc12csm38395980f8f.28.2025.08.10.09.49.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 10 Aug 2025 09:49:43 -0700 (PDT)
-Date: Sun, 10 Aug 2025 19:49:41 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Chukun Pan <amadeus@jmu.edu.cn>, jonas@kwiboo.se, alsi@bang-olufsen.dk,
-	conor+dt@kernel.org, davem@davemloft.net,
-	devicetree@vger.kernel.org, edumazet@google.com, heiko@sntech.de,
-	krzk+dt@kernel.org, kuba@kernel.org, linus.walleij@linaro.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-rockchip@lists.infradead.org, netdev@vger.kernel.org,
-	pabeni@redhat.com, robh@kernel.org, ziyao@disroot.org
-Subject: Re: [PATCH 3/3] arm64: dts: rockchip: Add RTL8367RB-VB switch to
- Radxa E24C
-Message-ID: <20250810164941.4oezju3c4vhnunrx@skbuf>
-References: <db1f42c3-c8bb-43ef-a605-12bfc8cd0d46@kwiboo.se>
- <20250810140115.661635-1-amadeus@jmu.edu.cn>
- <1f2f8eda-3056-48bd-9c86-3fb699f043f3@lunn.ch>
+	s=arc-20240116; t=1754844748; c=relaxed/simple;
+	bh=nYgR7em2aeS0YyUudfHaKy0auQKd/qpw6ZkRCDvdQHE=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=c+mGQdXpANffrsTJ+PGNnrYdSM0VYUuL0fC/KVmIOnXO/YuMdCErTrTsIk5gZ88E45B4ohrFieAbd16JibF8vnm52Edwf5HjuDL6iXwPPKvrT3Ek8bNpu1358FdK3T3tDWggDOLCPq6QaWk9oYYn7wUttBbyxmbfYly6Lt7jT44=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ch24JM3d; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B261DC4CEF7;
+	Sun, 10 Aug 2025 16:52:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754844748;
+	bh=nYgR7em2aeS0YyUudfHaKy0auQKd/qpw6ZkRCDvdQHE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=ch24JM3d4KGIhQogYDFg2M/l2WhFSVZUyieDr3V+LJ27t+lNGGN+IDB+Nu5JDd8s/
+	 gOnuIO0idkD4abl3sxb59yqXSgLX258q2KXtcEyTDPxt1xgq+C+Dr5stkZIwDqD8NJ
+	 QFVTuEhqUhTH3gem0Mgh8zaW4Bm+G4XZY5Lj85r2pYNlpL1igzVqxuJ2RUaXhHVPo/
+	 7yHCaRBq0i9vKtGmqibFah2p/uRpLABOodsv32Ia5MIIs2jy22DyFhE0BF522H2DSb
+	 LuYZlr1kQxH70v8ge3U6XzolfEShXQuMnHk3eLFMHBl0uYXhOKD0jD8ZSQOp3/0Zom
+	 vhAGnfIoo4ljw==
+From: Sasha Levin <sashal@kernel.org>
+To: patches@lists.linux.dev,
+	stable@vger.kernel.org
+Cc: Buday Csaba <buday.csaba@prolan.hu>,
+	=?UTF-8?q?Cs=C3=B3k=C3=A1s=20Bence?= <csokas.bence@prolan.hu>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Sasha Levin <sashal@kernel.org>,
+	hkallweit1@gmail.com,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.16-5.4] net: phy: smsc: add proper reset flags for LAN8710A
+Date: Sun, 10 Aug 2025 12:51:51 -0400
+Message-Id: <20250810165158.1888206-9-sashal@kernel.org>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250810165158.1888206-1-sashal@kernel.org>
+References: <20250810165158.1888206-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1f2f8eda-3056-48bd-9c86-3fb699f043f3@lunn.ch>
+Content-Type: text/plain; charset=UTF-8
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.16
+Content-Transfer-Encoding: 8bit
 
-On Sun, Aug 10, 2025 at 05:15:59PM +0200, Andrew Lunn wrote:
-> Just a guess, but maybe it is a DSA tagger bug? Maybe the user frame
-> is a VLAN frame. The tagger is placing the VLAN tag into the DSA
-> header, so in effect, the frame is no longer a VLAN frame. But it is
-> not calling __vlan_hwaccel_clear_tag() to indicate the skbuf no longer
-> needs VLAN processing?
+From: Buday Csaba <buday.csaba@prolan.hu>
 
-For the original skb to have had a VLAN hwaccel tag, validate_xmit_vlan()
-would have had to not push it inside, so vlan_hw_offload_capable() must
-have been true for DSA user ports. But we advertise neither the
-NETIF_F_HW_VLAN_CTAG_TX nor the NETIF_F_HW_VLAN_STAG_TX netdev feature.
-So the VLAN tags in skbs transmitted through DSA user ports should all
-be in the skb head.
+[ Upstream commit 57ec5a8735dc5dccd1ee68afdb1114956a3fce0d ]
+
+According to the LAN8710A datasheet (Rev. B, section 3.8.5.1), a hardware
+reset is required after power-on, and the reference clock (REF_CLK) must be
+established before asserting reset.
+
+Signed-off-by: Buday Csaba <buday.csaba@prolan.hu>
+Cc: Csókás Bence <csokas.bence@prolan.hu>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Link: https://patch.msgid.link/20250728152916.46249-2-csokas.bence@prolan.hu
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+
+LLM Generated explanations, may be completely bogus:
+
+**YES**
+
+This commit should be backported to stable kernel trees for the
+following reasons:
+
+1. **Hardware Requirement Fix**: The commit addresses a documented
+   hardware requirement from the LAN8710A datasheet (section 3.8.5.1)
+   that specifies a hardware reset is required after power-on with the
+   reference clock established before asserting reset. This is fixing
+   incorrect hardware initialization that could lead to device
+   malfunction.
+
+2. **Regression Fix**: Looking at the git history, the
+   `PHY_RST_AFTER_CLK_EN` flag was:
+   - Originally added in commit 7f64e5b18ebb (2017) for LAN8710/20 based
+     on datasheet requirements
+   - Removed in commit d65af21842f8 (2020) when refclk support was
+     added, with the assumption that the refclk mechanism would handle
+     the reset
+   - Still present for LAN8740 (added in commit 76db2d466f6a in 2019)
+
+   The removal in 2020 appears to have been premature, as it relied on
+optional clock provider support that may not be configured in all
+systems. This commit re-adds the flag specifically for LAN8710A,
+restoring proper hardware initialization.
+
+3. **Minimal and Contained Change**: The fix is a single-line addition
+   of the `PHY_RST_AFTER_CLK_EN` flag to the driver structure for the
+   LAN8710/LAN8720 PHY entry. This flag is already used by other PHYs in
+   the same driver (LAN8740) and has well-established kernel
+   infrastructure to handle it properly through
+   `phy_reset_after_clk_enable()`.
+
+4. **Bug Fix Nature**: This fixes a real hardware initialization issue
+   that could cause the PHY to not work properly if the reference clock
+   timing requirements aren't met. Systems without proper clock provider
+   configuration would experience PHY initialization failures.
+
+5. **Low Risk**: The change only affects the specific PHY model
+   (LAN8710/LAN8720) and uses an existing, well-tested mechanism
+   (`PHY_RST_AFTER_CLK_EN` flag). The flag is already successfully used
+   by LAN8740 in the same driver, demonstrating its safety and
+   effectiveness.
+
+6. **Clear Problem Statement**: The commit message clearly documents the
+   hardware requirement from the datasheet, making it evident this is
+   fixing a specification compliance issue rather than adding a new
+   feature.
+
+The commit meets stable kernel criteria as it fixes a hardware
+initialization bug with minimal risk and a very contained change scope.
+
+ drivers/net/phy/smsc.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/net/phy/smsc.c b/drivers/net/phy/smsc.c
+index b6489da5cfcd..48487149c225 100644
+--- a/drivers/net/phy/smsc.c
++++ b/drivers/net/phy/smsc.c
+@@ -785,6 +785,7 @@ static struct phy_driver smsc_phy_driver[] = {
+ 
+ 	/* PHY_BASIC_FEATURES */
+ 
++	.flags		= PHY_RST_AFTER_CLK_EN,
+ 	.probe		= smsc_phy_probe,
+ 
+ 	/* basic functions */
+-- 
+2.39.5
+
 
