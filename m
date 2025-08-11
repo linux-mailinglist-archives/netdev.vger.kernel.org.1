@@ -1,104 +1,56 @@
-Return-Path: <netdev+bounces-212632-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212633-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE6C6B217BE
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 23:57:13 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B49CB217E8
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 00:04:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F1F981A20275
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 21:57:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 145987A4983
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 22:03:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 193AB2E3B11;
-	Mon, 11 Aug 2025 21:57:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64A2C27D771;
+	Mon, 11 Aug 2025 22:04:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A9H3H+sj"
+	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="M4iS+utp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5524F2E3AEF;
-	Mon, 11 Aug 2025 21:57:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3FBB1EF0A6;
+	Mon, 11 Aug 2025 22:04:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754949430; cv=none; b=LjRNDIq0VvdYaVDZAkrlVYkGoDHzDBiXxuyXhrwhZAbLuFI7KRKQ0bWKlbdVuOJjohtqIbERkJUCIxXSgUTHhbnj6SGU/bfWBPIRjFUNk9URWuEVgrRIK32iCCkkGaVVM6a/msDZ9O06Rpgbp/jo+bx1eb4wEWQBGhW+FeE0vWs=
+	t=1754949889; cv=none; b=iUEDMKYcDSJhYoDCG9MOIu0955ZZbtNtNM5WK4dN2Fz5iyErAlMpHo//7Rbwk7oEDxYTOVrajOacy75QLrxvz+d+H3ej/uKpUTXcJ2IDf25ql1U3PXAvT+6VFbnvsNQ8Zypr/F0MrLWsj7YJHRs4XgoHHmspPR5GjhcMZbksWbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754949430; c=relaxed/simple;
-	bh=VTu1YlP6cbBxPd8KlY7/RgMoLKQvCZlYMTO6Lr73lws=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YhEjb8sVLuASfd5mlH6XnFcHfke0aqqi3eupfl+524aXenne+g78SmpnUYbrt9UpqTRQD2K1mvWx2D/17CjrFpo524xACsu+/dArkmvFEAGSisElnxt/Ce7CXfhKxeoeCicr55+fyb8pihwNQfXMIJubB8qXzNg9J2KMTYPhJi4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A9H3H+sj; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-459d4d7c745so44688705e9.1;
-        Mon, 11 Aug 2025 14:57:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1754949426; x=1755554226; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rtjUK0AZOjm4eF0vnry/hWr4fc/ZinEdNV9kmjIXNAY=;
-        b=A9H3H+sjRH3SHEolvAxTDZFzalmqQohvCx9Zw5MPrOxoDpiQTnwPTM3+cLu+aJBA3Q
-         oDsH5fFGiJ4GJ/6TRopGzgQ6Opl8NrjrC5/brfKHPRc179Sbh9O/l92Mr5S9GfNnuKcB
-         HWHJ7Mgg+rV0Z2YJ1J+B9chwj3sYSPsb0OqD5BPLmdEQTdlgMYEM0KiPFCGeVVwcOpYY
-         LpmoLAmEMEFmVY41bNflJkn3gNcMMKVeZ/htlDp1sdrT9LzM0moWYr5XW5iIkme0EsBh
-         X2l28VMe2+bVnV9y3P1TkdHSoJkxgTEo0zcQ2PIm9ReZ4jrCYX+Ug/jy7FHUwVdG6v6u
-         bD0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754949426; x=1755554226;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rtjUK0AZOjm4eF0vnry/hWr4fc/ZinEdNV9kmjIXNAY=;
-        b=K2xLE0PHx25fpCTYW5Xx0ldcbrwxmzY2jDKvrO14I/b1K9EUyYrgkRvaJxdRc9fIX3
-         to1hAwYOgJtt4Bokm7WK3d3nsAbeCy16HeabTSaFx/4mRumjRYz74JX/9ayC34roAGnh
-         ZKkAavTjN2WaDkYRgVtwM6U5CsYG2cpYKouThRzlPT2yOPSjqeLOJykoPaiKmZKeHMUz
-         Z1E5MVZ9Gs2MJWPY9Vr1qGdu4+cBAhfwU/UgxDIRYbjwwOZ+VO456xMKv4bynlfpRMT4
-         Y0ud8VjXY5yMkpBHnUBaQtu23WtNfqDa5zDvVW0wnBLXPdWbji2sOcjyL6lv1Bzs/gwu
-         paVw==
-X-Forwarded-Encrypted: i=1; AJvYcCV00Mz/mbdQTPGTtmAIzns38qA5czJoi3M/NptJHclpLxFMiCPTMp7p0B89gedB7yYzTyI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxiaJBRZaXGQnJkjbnX/MtLdsHtCX8AYmDdq2IGd9Se6bjNJ4W4
-	oRl8PSY6GxTwRj6mBvxK8WDMMrRokOpOAS0FIvdgLkfvSTCQmaaLfXWeWafq9wVk
-X-Gm-Gg: ASbGncsFf34lPlqd8Qp4Em/dnIrbNX2EDRPSGOzO5qw3Wwl3CJCzVrzM+DcbfXVCtpV
-	DiaB2l0kGMRxr85T21sZF+WftWBQZpqVMTovEzbNg+Hjr4M66CYKX1FLkGqaG7YmeN3l+S/w0M2
-	PQ7FNmVxozQhHn5660OQ6iaecb7rqiM4YePQHUFgtRtQmfRtmqWpRpAFcQCh7VnXRxXw//u/9RB
-	Pp9lS80lJPCD7Vh5f2Bw8TlrEYNbq/kPdiF4Ym+v09lnBY1CJ4WcBJR1uUXbdrcKBcrUzx9j0En
-	KyFryOVVMtrjueqnd3dRcVGXOpzPTCFC7se9gAFn2iCJKgP53zDz+WlKUdtozP7ZbshKNwDvhVK
-	cZ6aVwLn/kD4DTRXLGR4=
-X-Google-Smtp-Source: AGHT+IGzVY3VtjvHrvlwIemUXQkAqyXoAKgVgWE2uQMrAMznJ52e9vgWC5xGiEFYyN+ybcJz0L19ww==
-X-Received: by 2002:a05:600c:3b97:b0:458:bfb1:1fb6 with SMTP id 5b1f17b1804b1-45a11e79ac3mr177265e9.2.1754949426086;
-        Mon, 11 Aug 2025 14:57:06 -0700 (PDT)
-Received: from localhost ([2a03:2880:31ff:7::])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b79c485444sm42454096f8f.66.2025.08.11.14.57.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Aug 2025 14:57:05 -0700 (PDT)
-From: Mohsin Bashir <mohsin.bashr@gmail.com>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	alexanderduyck@fb.com,
-	andrew+netdev@lunn.ch,
-	ast@kernel.org,
-	bpf@vger.kernel.org,
-	corbet@lwn.net,
-	daniel@iogearbox.net,
-	davem@davemloft.net,
-	edumazet@google.com,
-	hawk@kernel.org,
-	horms@kernel.org,
-	john.fastabend@gmail.com,
-	kernel-team@meta.com,
-	mohsin.bashr@gmail.com,
-	pabeni@redhat.com,
-	sdf@fomichev.me,
-	vadim.fedorenko@linux.dev,
-	aleksander.lobakin@intel.com
-Subject: [PATCH net-next V2 9/9] eth: fbnic: Report XDP stats via ethtool
-Date: Mon, 11 Aug 2025 14:57:03 -0700
-Message-ID: <20250811215703.1065830-1-mohsin.bashr@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20250811211338.857992-1-mohsin.bashr@gmail.com>
-References: <20250811211338.857992-1-mohsin.bashr@gmail.com>
+	s=arc-20240116; t=1754949889; c=relaxed/simple;
+	bh=qxH/vUlWNOPD+oS7i4N7nf5PewbWQYYpSRYIIS0+nro=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Q9L4fXWdLC3QYwyM58X43XuPPDxQGMnlapGoUXRwSC/Y6pyzPUWXiGe2Spa+LVkbVfUK1GmeEkkq04MeNnHQp4UmwEx63JQ/w3bgR3ww651pYr0LEEYB4BG6w1ahDxmUzRUhYn/atKoe2i6gS8d2ooPQDyM527sIsNB9MYpyCkg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=M4iS+utp; arc=none smtp.client-ip=129.217.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
+Received: from simon-Latitude-5450.. (tmo-072-64.customers.d1-online.com [80.187.72.64])
+	(authenticated bits=0)
+	by unimail.uni-dortmund.de (8.18.1.10/8.18.1.10) with ESMTPSA id 57BM4dre019850
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Tue, 12 Aug 2025 00:04:40 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
+	s=unimail; t=1754949881;
+	bh=qxH/vUlWNOPD+oS7i4N7nf5PewbWQYYpSRYIIS0+nro=;
+	h=From:To:Cc:Subject:Date;
+	b=M4iS+utpvMKRprFS897/nIpqmPhimUh5UlmDeWV2cmcxkgMIQdNNfvVo/T8P2iZVv
+	 9SlwnRcaJHb2sd8dlK/EP6MGlt1kVACpzbtR92b8hBuERDTFyOAnP20ajkGlbw5IgE
+	 ah1VsoRgkIve6SIXvEH4coa+U0QLuqIxVtDjvFuw=
+From: Simon Schippers <simon.schippers@tu-dortmund.de>
+To: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Simon Schippers <simon.schippers@tu-dortmund.de>,
+        Tim Gebauer <tim.gebauer@tu-dortmund.de>
+Subject: [PATCH net v2] TUN/TAP: Improving throughput and latency by avoiding SKB drops
+Date: Tue, 12 Aug 2025 00:03:48 +0200
+Message-ID: <20250811220430.14063-1-simon.schippers@tu-dortmund.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -107,115 +59,171 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add support to collect XDP stats via ethtool API. We record
-packets and bytes sent, and packets dropped on the XDP_TX path.
+This patch is the result of our paper with the title "The NODROP Patch:
+Hardening Secure Networking for Real-time Teleoperation by Preventing
+Packet Drops in the Linux TUN Driver" [1].
+It deals with the tun_net_xmit function which drops SKB's with the reason
+SKB_DROP_REASON_FULL_RING whenever the tx_ring (TUN queue) is full,
+resulting in reduced TCP performance and packet loss for bursty video
+streams when used over VPN's.
 
-ethtool -S eth0 | grep xdp | grep -v "0"
-     xdp_tx_queue_13_packets: 2
-     xdp_tx_queue_13_bytes: 16126
+The abstract reads as follows:
+"Throughput-critical teleoperation requires robust and low-latency
+communication to ensure safety and performance. Often, these kinds of
+applications are implemented in Linux-based operating systems and transmit
+over virtual private networks, which ensure encryption and ease of use by
+providing a dedicated tunneling interface (TUN) to user space
+applications. In this work, we identified a specific behavior in the Linux
+TUN driver, which results in significant performance degradation due to
+the sender stack silently dropping packets. This design issue drastically
+impacts real-time video streaming, inducing up to 29 % packet loss with
+noticeable video artifacts when the internal queue of the TUN driver is
+reduced to 25 packets to minimize latency. Furthermore, a small queue
+length also drastically reduces the throughput of TCP traffic due to many
+retransmissions. Instead, with our open-source NODROP Patch, we propose
+generating backpressure in case of burst traffic or network congestion.
+The patch effectively addresses the packet-dropping behavior, hardening
+real-time video streaming and improving TCP throughput by 36 % in high
+latency scenarios."
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
+In addition to the mentioned performance and latency improvements for VPN
+applications, this patch also allows the proper usage of qdisc's. For
+example a fq_codel can not control the queuing delay when packets are
+already dropped in the TUN driver. This issue is also described in [2].
+
+The performance evaluation of the paper (see Fig. 4) showed a 4%
+performance hit for a single queue TUN with the default TUN queue size of
+500 packets. However it is important to notice that with the proposed
+patch no packet drop ever occurred even with a TUN queue size of 1 packet.
+The utilized validation pipeline is available under [3].
+
+As the reduction of the TUN queue to a size of down to 5 packets showed no
+further performance hit in the paper, a reduction of the default TUN queue
+size might be desirable accompanying this patch. A reduction would
+obviously reduce buffer bloat and memory requirements.
+
+Implementation details:
+- The netdev queue start/stop flow control is utilized.
+- Compatible with multi-queue by only stopping/waking the specific
+netdevice subqueue.
+- No additional locking is used.
+
+In the tun_net_xmit function:
+- Stopping the subqueue is done when the tx_ring gets full after inserting
+the SKB into the tx_ring.
+- In the unlikely case when the insertion with ptr_ring_produce fails, the
+old dropping behavior is used for this SKB.
+
+In the tun_ring_recv function:
+- Waking the subqueue is done after consuming a SKB from the tx_ring when
+the tx_ring is empty. Waking the subqueue when the tx_ring has any
+available space, so when it is not full, showed crashes in our testing. We
+are open to suggestions.
+- When the tx_ring is configured to be small (for example to hold 1 SKB),
+queuing might be stopped in the tun_net_xmit function while at the same
+time, ptr_ring_consume is not able to grab a SKB. This prevents
+tun_net_xmit from being called again and causes tun_ring_recv to wait
+indefinitely for a SKB in the blocking wait queue. Therefore, the netdev
+queue is woken in the wait queue if it has stopped.
+- Because the tun_struct is required to get the tx_queue into the new txq
+pointer, the tun_struct is passed in tun_do_read aswell. This is likely
+faster then trying to get it via the tun_file tfile because it utilizes a
+rcu lock.
+
+We are open to suggestions regarding the implementation :)
+Thank you for your work!
+
+[1] Link:
+https://cni.etit.tu-dortmund.de/storages/cni-etit/r/Research/Publications/2025/Gebauer_2025_VTCFall/Gebauer_VTCFall2025_AuthorsVersion.pdf
+[2] Link:
+https://unix.stackexchange.com/questions/762935/traffic-shaping-ineffective-on-tun-device
+[3] Link: https://github.com/tudo-cni/nodrop
+
+Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
 ---
- .../net/ethernet/meta/fbnic/fbnic_ethtool.c   | 50 ++++++++++++++++++-
- 1 file changed, 49 insertions(+), 1 deletion(-)
+V1 -> V2: Removed NETDEV_TX_BUSY return case in tun_net_xmit and removed 
+unnecessary netif_tx_wake_queue in tun_ring_recv.
 
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-index 742b557d0e56..ceb8f88ae41c 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-@@ -112,6 +112,20 @@ static const struct fbnic_stat fbnic_gstrings_hw_q_stats[] = {
- 	 FBNIC_HW_RXB_DEQUEUE_STATS_LEN * FBNIC_RXB_DEQUEUE_INDICES + \
- 	 FBNIC_HW_Q_STATS_LEN * FBNIC_MAX_QUEUES)
+ drivers/net/tun.c | 21 +++++++++++++++++----
+ 1 file changed, 17 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+index cc6c50180663..81abdd3f9aca 100644
+--- a/drivers/net/tun.c
++++ b/drivers/net/tun.c
+@@ -1060,13 +1060,16 @@ static netdev_tx_t tun_net_xmit(struct sk_buff *skb, struct net_device *dev)
  
-+#define FBNIC_QUEUE_STAT(name, stat) \
-+	FBNIC_STAT_FIELDS(fbnic_ring, name, stat)
-+
-+static const struct fbnic_stat fbnic_gstrings_xdp_stats[] = {
-+	FBNIC_QUEUE_STAT("xdp_tx_queue_%u_packets", stats.packets),
-+	FBNIC_QUEUE_STAT("xdp_tx_queue_%u_bytes", stats.bytes),
-+	FBNIC_QUEUE_STAT("xdp_tx_queue_%u_dropped", stats.dropped),
-+};
-+
-+#define FBNIC_XDP_STATS_LEN ARRAY_SIZE(fbnic_gstrings_xdp_stats)
-+
-+#define FBNIC_STATS_LEN \
-+	(FBNIC_HW_STATS_LEN + FBNIC_XDP_STATS_LEN * FBNIC_MAX_XDPQS)
-+
- static void
- fbnic_get_drvinfo(struct net_device *netdev, struct ethtool_drvinfo *drvinfo)
- {
-@@ -422,6 +436,16 @@ static void fbnic_get_rxb_dequeue_strings(u8 **data, unsigned int idx)
- 		ethtool_sprintf(data, stat->string, idx);
- }
+ 	nf_reset_ct(skb);
  
-+static void fbnic_get_xdp_queue_strings(u8 **data, unsigned int idx)
-+{
-+	const struct fbnic_stat *stat;
-+	int i;
-+
-+	stat = fbnic_gstrings_xdp_stats;
-+	for (i = 0; i < FBNIC_XDP_STATS_LEN; i++, stat++)
-+		ethtool_sprintf(data, stat->string, idx);
-+}
-+
- static void fbnic_get_strings(struct net_device *dev, u32 sset, u8 *data)
- {
- 	const struct fbnic_stat *stat;
-@@ -447,6 +471,9 @@ static void fbnic_get_strings(struct net_device *dev, u32 sset, u8 *data)
- 			for (i = 0; i < FBNIC_HW_Q_STATS_LEN; i++, stat++)
- 				ethtool_sprintf(&data, stat->string, idx);
- 		}
-+
-+		for (i = 0; i < FBNIC_MAX_XDPQS; i++)
-+			fbnic_get_xdp_queue_strings(&data, i);
- 		break;
+-	if (ptr_ring_produce(&tfile->tx_ring, skb)) {
++	queue = netdev_get_tx_queue(dev, txq);
++	if (unlikely(ptr_ring_produce(&tfile->tx_ring, skb))) {
++		netif_tx_stop_queue(queue);
+ 		drop_reason = SKB_DROP_REASON_FULL_RING;
+ 		goto drop;
  	}
- }
-@@ -464,6 +491,24 @@ static void fbnic_report_hw_stats(const struct fbnic_stat *stat,
- 	}
++	if (ptr_ring_full(&tfile->tx_ring))
++		netif_tx_stop_queue(queue);
+ 
+ 	/* dev->lltx requires to do our own update of trans_start */
+-	queue = netdev_get_tx_queue(dev, txq);
+ 	txq_trans_cond_update(queue);
+ 
+ 	/* Notify and wake up reader process */
+@@ -2110,9 +2113,10 @@ static ssize_t tun_put_user(struct tun_struct *tun,
+ 	return total;
  }
  
-+static void fbnic_get_xdp_queue_stats(struct fbnic_ring *ring, u64 **data)
-+{
-+	const struct fbnic_stat *stat;
-+	int i;
+-static void *tun_ring_recv(struct tun_file *tfile, int noblock, int *err)
++static void *tun_ring_recv(struct tun_struct *tun, struct tun_file *tfile, int noblock, int *err)
+ {
+ 	DECLARE_WAITQUEUE(wait, current);
++	struct netdev_queue *txq;
+ 	void *ptr = NULL;
+ 	int error = 0;
+ 
+@@ -2124,6 +2128,7 @@ static void *tun_ring_recv(struct tun_file *tfile, int noblock, int *err)
+ 		goto out;
+ 	}
+ 
++	txq = netdev_get_tx_queue(tun->dev, tfile->queue_index);
+ 	add_wait_queue(&tfile->socket.wq.wait, &wait);
+ 
+ 	while (1) {
+@@ -2131,6 +2136,10 @@ static void *tun_ring_recv(struct tun_file *tfile, int noblock, int *err)
+ 		ptr = ptr_ring_consume(&tfile->tx_ring);
+ 		if (ptr)
+ 			break;
 +
-+	if (!ring) {
-+		*data += FBNIC_XDP_STATS_LEN;
-+		return;
++		if (unlikely(netif_tx_queue_stopped(txq)))
++			netif_tx_wake_queue(txq);
++
+ 		if (signal_pending(current)) {
+ 			error = -ERESTARTSYS;
+ 			break;
+@@ -2147,6 +2156,10 @@ static void *tun_ring_recv(struct tun_file *tfile, int noblock, int *err)
+ 	remove_wait_queue(&tfile->socket.wq.wait, &wait);
+ 
+ out:
++	if (ptr_ring_empty(&tfile->tx_ring)) {
++		txq = netdev_get_tx_queue(tun->dev, tfile->queue_index);
++		netif_tx_wake_queue(txq);
 +	}
-+
-+	stat = fbnic_gstrings_xdp_stats;
-+	for (i = 0; i < FBNIC_XDP_STATS_LEN; i++, stat++, (*data)++) {
-+		u8 *p = (u8 *)ring + stat->offset;
-+
-+		**data = *(u64 *)p;
-+	}
-+}
-+
- static void fbnic_get_ethtool_stats(struct net_device *dev,
- 				    struct ethtool_stats *stats, u64 *data)
- {
-@@ -511,13 +556,16 @@ static void fbnic_get_ethtool_stats(struct net_device *dev,
- 				      FBNIC_HW_Q_STATS_LEN, &data);
- 	}
- 	spin_unlock(&fbd->hw_stats_lock);
-+
-+	for (i = 0; i < FBNIC_MAX_XDPQS; i++)
-+		fbnic_get_xdp_queue_stats(fbn->tx[i + FBNIC_MAX_TXQS], &data);
+ 	*err = error;
+ 	return ptr;
  }
+@@ -2165,7 +2178,7 @@ static ssize_t tun_do_read(struct tun_struct *tun, struct tun_file *tfile,
  
- static int fbnic_get_sset_count(struct net_device *dev, int sset)
- {
- 	switch (sset) {
- 	case ETH_SS_STATS:
--		return FBNIC_HW_STATS_LEN;
-+		return FBNIC_STATS_LEN;
- 	default:
- 		return -EOPNOTSUPP;
+ 	if (!ptr) {
+ 		/* Read frames from ring */
+-		ptr = tun_ring_recv(tfile, noblock, &err);
++		ptr = tun_ring_recv(tun, tfile, noblock, &err);
+ 		if (!ptr)
+ 			return err;
  	}
 -- 
-2.47.3
+2.43.0
 
 
