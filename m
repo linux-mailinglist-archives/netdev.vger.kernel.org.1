@@ -1,279 +1,368 @@
-Return-Path: <netdev+bounces-212453-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212452-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A7C9B2084F
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 14:06:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4241AB2084D
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 14:04:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D5BC4245CF
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 12:06:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 44B1E188A935
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 12:05:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8B5E2D323D;
-	Mon, 11 Aug 2025 12:05:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46F392D23A6;
+	Mon, 11 Aug 2025 12:04:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Wphenp0G"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="uyGIc+Bj"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2042.outbound.protection.outlook.com [40.107.236.42])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2067.outbound.protection.outlook.com [40.107.236.67])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E7432253A9;
-	Mon, 11 Aug 2025 12:05:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BC2120D50C;
+	Mon, 11 Aug 2025 12:04:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.67
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754913959; cv=fail; b=SVg6skwgPiZQ9pWOVXDpr9UQ/U0KZcRSU7SPXyz42imMjKHNCGtsIlMcMWv/MzBrcgBNhFYuUsSMP61Eb/zah/1Y8MP7K2hfMoXZpAC3nH74hrOFVMD++3brqmuebMroRAK5Kd4gimqeK7cQEudqQ6fyDwwK4gLfrD7gTIk5dTs=
+	t=1754913889; cv=fail; b=cJOwgMV9FEhHmcRWY8kEMCMpW/aNGY/pBMVLXPZAFsyziScdJkZWJolP+cglrFEi7hxuqidfMOMMfx0/iLjwECkQ7LlhsqmPwmkGxInFbO/0ts6KmzCfRmB1p2ia02M20FWRFgsEytH4OZelB3qzgiBQW6ME/x8GeHKEiiWvDbA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754913959; c=relaxed/simple;
-	bh=mvx/7GAFEjpOnB2AJyg4GuZae8hjFKr0FJS60/dz/nI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=n/OWLKkZZXpasLJQzPDTQoHpuEeuaiFGJHiU2GzoAFndpQgDufEksnTTQVuYSdWhrOqx4nmqeA6gu78dl+5pGnzwLTPK/6BefkQmw46++NqllEr5RxoShic3fkA32M5ir2Bwp86tb1YO/glmgC1DjnqDfsoc81COzhKL9z/DMQk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Wphenp0G; arc=fail smtp.client-ip=40.107.236.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	s=arc-20240116; t=1754913889; c=relaxed/simple;
+	bh=C5jb3mn1a+SCwHebUqhpa2F46aBTi7r1xBIGx8VCyHw=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=q87tSE4WWxxQ6pIwHQWQEv40TLPvuqgPfZjnuZTb/h2VE+WJU07NmtqmH9zE1Uxc0WxrR9rhmmH8hCFg9XAUqO9y4HX9uaLGrskzca1Yo106DbqAzk0MfroA9YEznct/B8K2DOIkqsUwEViYWGs2RZUtKyUHEpqCmDxRf9n2TBE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=uyGIc+Bj; arc=fail smtp.client-ip=40.107.236.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=tCO13ojlrvbWentScAbUPnNSiGwdcwIOfh/rH+GOHXP5+Svv+RwnT/S/gIaGI7apKNdsBv4XPj+pzOb1HCqy2+U31s4LqAwoQPO1aV6rKQbUGzuj1Xzq7S5TDFNmV5b7tvAf+R7JOA9KpTkk+I/yvOEoV9KE6jULtS+yg8TLbG3O+X1+fFFzniFCF4OwyEcsJX1XMX9Zq6UpzrXiROc4KocKMmwMB6j2yUzO/C683gGN3uj2IBWtPwk91No5YpGPn5ZHZ5xFFzxVrV6HoJEsfadEVSa6zavlMC+rvhJlPxrisHzBR2wkZsE8iqqVjWG+yVKx1qD2CA/Z3ViRU08Wig==
+ b=mmLz+RJhKXt/aRm+CiSJcCyPiFXqdobLQwS/AHaegjUAXk+WDA/V1JcngzhSdaIhtav0jsJPEMW66e0k/xnutNa4579U1vRq1NQTmbRnOroeGDAM9lxZfswNlICieCvQ4Mo0A0gejIi0WoI0hMIZ9U9prmgWjjhf5CB2pCyYv3PUgGpO0N9DbKwywe/tceK74RIYUwimO1D5190NDCl4MKr236dH3+QX3224xLnRJo66SNtCL6Yrq1BOWMMSRKZQ+leBfyZLo56cMK9+4kIXpdZUAFL/4IHDUsYQzYNZHq6M2vzGi3V14WolowawiCK/i8hLDvZKtWGmpMQ+CtUTxg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ysp5b21zJbotB4ycMpWNAAo/cBHP+NlNGRCrzAcf9Mg=;
- b=ipHJVrkW2N6CgK5dtBwmUw8mnncUW0kEwnlj6/vxqznkNb59aMO/uC8YhDraM3WrCGGooPSp+5yKMSj96yGpwYzsXIM9aa3j0/SD896+bph3h3ev0tAE1rItNwa76fbO45dXxux0Ms4xc5BJzRQVUK7eh5TowzNK6yyluFqtpzVLzU0inw/CYUz2xWDzwuvufotkilq0i6yBAd47U6I47mW5Ce3/z0EJ5CRL0pEfjQAmRA5ekeH4/PAAbJc20QnDiegFmz5ubfX2Vr6O2U96b/Zxxn7H94+ye7fY+hO8O1ud5HH1dzS4m/0eowfk0TzQ1hB2cVevqpKotTPPPKT+eg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=linux.ibm.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ bh=KkL7rLbzx79ihECib9Bp87E7Rqmh3Q6OJ9bEBR4qE4M=;
+ b=G+mqAxcbteFq9n+eONbJVwi0yUc9IBE/yoMVC24nZk7HGpU/Flss8NM4x0Ox7XiNAhcxrLSVZ7WD6GCDjsH2VF8McSk9VEvsTeJ+tS05qA5fkaihZMzk6q8z0AeO1QlIUcWd+ZBiVF5Vph+69T4MwXQ+aSCeIdaJRUzjCeiJ49xp0sqiOqs8a7BxlVVyZz42HsBm8FRg0LDuI0ATwoXTRnH2h+IE/3gcaNrzrsPrQyrcbIKwo1HkJqHf/USmmuWMEbEUAPgEEhRvSMOEbppy2aMWzIbp3VtRrprr+6A3fHcfqgw37IsYC8+88uXPdhtIxKyTgnypKvXWzfcJnlBD1g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ysp5b21zJbotB4ycMpWNAAo/cBHP+NlNGRCrzAcf9Mg=;
- b=Wphenp0G39i+8I9aLGMMzHGIU+rkr62GGymrWYVGEtmQBjA/OgehU08OfuvbLuDwLNfuOYwTwA5WoUFlTpxgMp693bAmyo2UTF/hlrDqT8vU1VMkNOfuJksnJLiXXfSjgjs5ulSwk8hmq5PvKuF6QhAP/hSnHaxAvEih7PKUxhlr0IP9lz9mCV0+It+vbx9n+/DKr+M9a0fefe2wBrT6so/imCfRFcnN+4QVpnoKy91kMixfgcrAs0Tjjqzl+ceroRGAo2KHJUFvXdWPej5LMmVOGQgLMRVyFjqqIumKUnL+oSzEPlvCCpGW10c0T8++rwZPTdV1ABGsYtFu4CGxjg==
-Received: from BN0PR03CA0023.namprd03.prod.outlook.com (2603:10b6:408:e6::28)
- by IA1PR12MB8587.namprd12.prod.outlook.com (2603:10b6:208:450::14) with
+ bh=KkL7rLbzx79ihECib9Bp87E7Rqmh3Q6OJ9bEBR4qE4M=;
+ b=uyGIc+Bj5KlOjH5uVXxlngxqQBnumpWuNUH6/o951rXey1snmfcd/54ArZlOob4+pBBWIs3VaFAq0i29amnAivGAdm8Wn04par5QNc7xSRKr9iXVV2AWBnCnF6JgXB6hYmhktWGcafjQBG9kKjroiJJVgvb72CBG6pPSqTe89EE=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
+ by BL1PR12MB5924.namprd12.prod.outlook.com (2603:10b6:208:39b::15) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9009.18; Mon, 11 Aug
- 2025 12:05:55 +0000
-Received: from BN1PEPF00006002.namprd05.prod.outlook.com
- (2603:10b6:408:e6:cafe::2a) by BN0PR03CA0023.outlook.office365.com
- (2603:10b6:408:e6::28) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9009.21 via Frontend Transport; Mon,
- 11 Aug 2025 12:05:55 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- BN1PEPF00006002.mail.protection.outlook.com (10.167.243.234) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9031.11 via Frontend Transport; Mon, 11 Aug 2025 12:05:55 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Mon, 11 Aug
- 2025 05:05:36 -0700
-Received: from [172.27.33.48] (10.126.230.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Mon, 11 Aug
- 2025 05:05:28 -0700
-Message-ID: <2fa90540-0560-4d5b-9f3a-27ade6c92d01@nvidia.com>
-Date: Mon, 11 Aug 2025 15:04:23 +0300
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9009.21; Mon, 11 Aug
+ 2025 12:04:43 +0000
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79%6]) with mapi id 15.20.9009.018; Mon, 11 Aug 2025
+ 12:04:43 +0000
+Message-ID: <38a14584-0638-417c-b9e6-ecc6b711b25b@amd.com>
+Date: Mon, 11 Aug 2025 13:04:38 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v17 11/22] cxl: Define a driver interface for HPA free
+ space enumeration
+Content-Language: en-US
+To: dan.j.williams@intel.com, alejandro.lucero-palau@amd.com,
+ linux-cxl@vger.kernel.org, netdev@vger.kernel.org, edward.cree@amd.com,
+ davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, dave.jiang@intel.com
+Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+References: <20250624141355.269056-1-alejandro.lucero-palau@amd.com>
+ <20250624141355.269056-12-alejandro.lucero-palau@amd.com>
+ <68922e004131f_cff991001e@dwillia2-xfh.jf.intel.com.notmuch>
+From: Alejandro Lucero Palau <alucerop@amd.com>
+In-Reply-To: <68922e004131f_cff991001e@dwillia2-xfh.jf.intel.com.notmuch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PA7P264CA0326.FRAP264.PROD.OUTLOOK.COM
+ (2603:10a6:102:39a::8) To DM6PR12MB4202.namprd12.prod.outlook.com
+ (2603:10b6:5:219::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/mlx5: Avoid deadlock between PCI error recovery
- and health reporter
-To: Gerd Bayer <gbayer@linux.ibm.com>, Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, "Mark
- Bloch" <mbloch@nvidia.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Moshe Shemesh <moshe@nvidia.com>
-CC: Niklas Schnelle <schnelle@linux.ibm.com>, Alexandra Winter
-	<wintera@linux.ibm.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Yuanyuan
- Zhong" <yzhong@purestorage.com>, Mohamed Khalfella
-	<mkhalfella@purestorage.com>, <netdev@vger.kernel.org>,
-	<linux-rdma@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20250807131130.4056349-1-gbayer@linux.ibm.com>
- <44d0f39d-890e-446b-a2a1-3d52e2592a95@nvidia.com>
- <ef665e6ab7744cc32b44b8f5865726a0e3d97fc8.camel@linux.ibm.com>
-Content-Language: en-US
-From: Shay Drori <shayd@nvidia.com>
-In-Reply-To: <ef665e6ab7744cc32b44b8f5865726a0e3d97fc8.camel@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN1PEPF00006002:EE_|IA1PR12MB8587:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0e1fb320-988f-4f3c-78ea-08ddd8cf6d04
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|BL1PR12MB5924:EE_
+X-MS-Office365-Filtering-Correlation-Id: 08022d0a-6559-4190-9f22-08ddd8cf4201
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|7416014|1800799024|82310400026|36860700013;
+	BCL:0;ARA:13230040|366016|1800799024|376014|921020|7053199007;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?ZjNHL1VHajBJUTBIUGF0bVhZcmpJeFUvV1dSK0pacmFiWm91SHpGeXg2dTBH?=
- =?utf-8?B?TWU1ZzRoT1NSR3VzZUt0aEpuZHdsOVNDaHdxcUlNcG9nc0lmc0xjSWhLUndP?=
- =?utf-8?B?T2VycDlYTm1McGkyUE9zY2t4a2NzNkxONElnaXVlUEswRWZsODVBQWFhb0FX?=
- =?utf-8?B?L2s4UXZoVFVyTStXYUR5VWdxTm8weUxzVTJ0eG1selUzUUlONStSTVNQRS9z?=
- =?utf-8?B?eU1ONkxmREVvYlB4NXFxWmFMTTFBS1d5clFQTkZpd013cER0UXNlVE1sTmRn?=
- =?utf-8?B?NnErTGd0WVJiZ1lRY0o2QlI0KzloNjlWUkFFOU93M0Mxakc3QWc0Sk0wTFlo?=
- =?utf-8?B?SjdDNW5obnZZOE1CZ0VVNmVNWVR0Qmc3UjV5RzdSMjlld3IyL25EYnF4OGZ1?=
- =?utf-8?B?bis1SklleFllSjQ5Y0p5YVY3VEFpK2NFaHNzcWp6dndGUFJjajcxc3QxVFg0?=
- =?utf-8?B?YWFmdm5JakdLMWNSMUJ2OU5MRXBraHhqT3RWZDc2VUZtZzBBeE5FU0JGYkcv?=
- =?utf-8?B?L29YMmJBbmtpN1dHNmdkOER6U2NlSkJmWldDdXBOUVFRNnhYckpjUU1xZHJZ?=
- =?utf-8?B?Ym1RWW1FRFlUMzNZWStCTG5iNVhlZVZpVTNaeDczRkJ4bHNoRytoTDdqQ0h1?=
- =?utf-8?B?YkJ4MTV3bjNvU2RvLytMeitleURxb2g5ckhCV0t1czY5cXMwTmRhWGx5WGhX?=
- =?utf-8?B?MUNpcWFucFFGSXc1OW42aUo1am9nNE9tN29GUXR3RmRDNDA4RXovZWtENzM3?=
- =?utf-8?B?ajJsbGFWc0I2TXI1VW5TMDhOQmlFbnhHb3loV28zN1pCQ2E4M0VuY1psajNj?=
- =?utf-8?B?SmJXZVR4eG9yMWRUQTV2NHBFamZ0alJRV0FQVktDa2FmS3NRWTE3M3BCU2Vv?=
- =?utf-8?B?V0FhZVBJQWI0N1BOZlE5QVpQRndiaW1ETWV2anBnc2tHUUVueFR0SldFYm5V?=
- =?utf-8?B?Nm40SjdRbms3amlTQm1GNmxOUG1yRVRXbnpZRitObkdqejVVcmNCQ2l2LzUr?=
- =?utf-8?B?VzN1K09WaGV2ck44UXZzaWFBWWdXcHF3NGpJRjk2MzFtZ0JnbURLdnpic3dD?=
- =?utf-8?B?Q243ekQ2SjAvRkdOa2ZONjZNQ24wUzBlU2d5NlFqRmtZL0tnNm5vMVVxVnJH?=
- =?utf-8?B?ckNWV040UWc3UjdnblRlcHJYdlJJMDFYZ1R4YmRpNml6eGxCTmIwUEw1cWk3?=
- =?utf-8?B?SnFIRnM1c3pJb0FyUmhUS0UzK1QySHNYRWN4Q2NTU1RJYTBseVFEaUMrUzly?=
- =?utf-8?B?MjdkMDRHeHNNS09YdFhTM00xL21FaE4zMk1VditQTjBuQ1FRUXRTQThaemJy?=
- =?utf-8?B?WUJqejIrUTdRcFJWRTZUM2R0N0RRYkhiU25lMkIvcWZ2dkt2cEt4N0hEd2RP?=
- =?utf-8?B?dFdSZ2hndWtHZXZlWm9udENnTGxTT0tXcDNJd1Z1QUdSNDczR3VydFZKeCs0?=
- =?utf-8?B?elNEQzBoR1loOFQ0TldhV2c3MUhyYTRVYkFYai9idWhZOTZZR0RYaTRQbDNH?=
- =?utf-8?B?ZkpaMzI4cktmcnlFZE9kbldTVm5jR2puY3ZSdWZnMWx2dGZHSnZ6d3I4N054?=
- =?utf-8?B?cXc3dFhUN3AvY1VQc2RxRU9nMGsrU3EvSjVTSHZDWE51bVJsNUhxVjRKQnlY?=
- =?utf-8?B?MzRLZy9sVW9meUhFbmRLNGFRdHBVb1JTV2M4WEoyY2ZEQ1FXMk5pblZkK0lm?=
- =?utf-8?B?TDdUTkVkL0IxdEpnWmYwUXA4ODMrTWdHNFU5dHNxWWRoUklYL0RZaFRmVUtW?=
- =?utf-8?B?cGpLY25nTDk3S0E1cVdxd0wxaEJLWmtpMUxFYmpRdVltaFEzVUlpVWJEL3Aw?=
- =?utf-8?B?TTdOb3d0NW4rUUZBelhmL21lallSVXdVb3lDMUptMGZWUXUydUd3MGVZK3dR?=
- =?utf-8?B?YXd3ZUVVUWU5bVdHaXVHT1JWMEdWQlVnUFQwSDRQS05sandSR2JCSzk0Vzlm?=
- =?utf-8?B?bWNOSkdvOC9Fd2pFSVh3MFBra1RnV0NrU2xZY2p2bHJ6Tnh0alROeGlYSzZq?=
- =?utf-8?B?SVVpeFZvR0R0RUxiRmJGdlNMOXBnV3NSYXJ6aktHSWFDZGRyelB3NTIxblNV?=
- =?utf-8?Q?9NHV4v?=
+	=?utf-8?B?S1BuWmhhUUVXYnIyQVNXSU96cVRzK0prbzEvbmc1bjBsck5EWXB2Y2dOaHI0?=
+ =?utf-8?B?MkhLWXBpZWJ2N282a3gyODNreUgwYWtDc2hyTk9XVnRkMWV0Um1BZHdjRmV4?=
+ =?utf-8?B?N2IrdVo2d3BUdGo3RXBmL3FkbG9udTkyZUdZbFpkL0FoY2FqMFBUMXBXZ1R1?=
+ =?utf-8?B?RnRpMGtvNGpjZStVVEJiVkVkYnFiaVRyY01zdm1PdVZ2WkJhUVBMSEs1SlJ0?=
+ =?utf-8?B?SnRiRHEzMTVNOW4wc1hKY0w5SkRGdGFHbE5xSWRHWGZHa1k4YlF6cmwyYm1O?=
+ =?utf-8?B?QlVmVXVrSXJRS0Z5T2VCZ2l3eDlCWTQwMkV1YUpuU0h4ejZCbXRhdHlWalZX?=
+ =?utf-8?B?cXBZbk9nTkM3MTBjdk93bURzZlNyWDlOeDNDUHVpK21FUUo0N1RXY25PMEtP?=
+ =?utf-8?B?d3RIb2NlSHBocTNkMmVVUEhoR2M4dUZmdFY5MS9Na2o1NlRTU2JKckpCaXAz?=
+ =?utf-8?B?N2NidGJWVHZSeVZKc2ZMaXArOVNteDZuZUNLY3BVMk91Mys3OERiZDdSKzJ0?=
+ =?utf-8?B?ZmtQZENEZVZJTjVUeFdJM1JZTEl3NkJERHd4MjMwaUJ2ell1RFkvUFVzY1Vn?=
+ =?utf-8?B?SHhoWStOT0FIT2NueTE4UWVpWmdMRHhyV3FxbDBML09JZGJjemtEVktwamFU?=
+ =?utf-8?B?d3VkcGg2aXFNaXJUY3RLanM2M3J6dldBekprbnJpTTk2dTU5dkhNN1BoSHRl?=
+ =?utf-8?B?WW1kaHE0T1RHTFRzM21ORGRYWCswQ2FqRi92d0NHNlJsZDVGZzRUVWp3T2RQ?=
+ =?utf-8?B?VFUrRlNSZXYxYmNoMU5aWjJWYkRJb2pibElJU05LaHVxRnhkNjN1WlFWM1Z4?=
+ =?utf-8?B?RkwzQlNOODNLTWhiNlk3MzZiYmZyTmIwZEtYekhHNmVxaHZGcURnalMzUUhC?=
+ =?utf-8?B?aTkrMGlGeFRPTTdGRTYrYm1JMWQvcm9aRDY4U2FkWjk0cU1EbXVFK1p1Q1pM?=
+ =?utf-8?B?OWhSR1pOV1l1UENBTnMzM2M2YmxGdVdheFlVRG15d1FzLy9FVVppU1FqQWdT?=
+ =?utf-8?B?aFhDTEgwZGRmZGl0MnhKS1pkZTlXOTRsZ1d3dk54TlFmb0pXMm9UZHNGOTd4?=
+ =?utf-8?B?cFRoK1VqUHF4REt3ZmZZbllpWmZrTzB6SkZzaFZBZFJEQUZGbnZ4aGd1dzg2?=
+ =?utf-8?B?eit0UE5SYk04dHp6VjZ5VThLM21KZG1hL2ROSnZCYkJreERZQUtBYjNNVE5x?=
+ =?utf-8?B?enFGcTdsOHY1T1NBRHpTTS9PMkJ4K0JPNHp2NUhPS3FwdnFSNTFKQlpWUzBM?=
+ =?utf-8?B?d0FyQ3V0UWMyMHI2NVNWVnhocjhiS0ljZWdkNkQ0d0pSc0ZCSFhGYVBEZzNR?=
+ =?utf-8?B?QllLM0N6R3ltd0dhdHZrOVJPYW1FaDdhMEdpVEZkNlFYM25FZW41c2pZOFlF?=
+ =?utf-8?B?ZHM2VVJsVjFwWUVzVjlOYXZNcEJTY0hMbStseXExUjJsZkNXcDM4Vm5MMUhj?=
+ =?utf-8?B?VmFIQ0ZvVjY2MmM2TmdGYmhieGd6VjZkcnlhTDlGdlB5YlJLdFpVTTgyWmN2?=
+ =?utf-8?B?SGhFOUJLcGYydW1zcmdXeE85ZWhiWkZFSnh1ZjhscVZYK1dnWjBsSTFrZklE?=
+ =?utf-8?B?aGh6YTh4NTJ2VmxJcUhyZlQvNHQ1ZWo5U3Nkb3IzQVJmbDFwWUNjQmpPNE9u?=
+ =?utf-8?B?NEFCeGVkSU9aT0crQmozM0U5dDFydEcraVhHdEhkOVJpWEJSOFRySE4rbkdz?=
+ =?utf-8?B?cm5HZEtnOUl2bnhXWmhnOWNLYjkvcTJRaHc1Sld0aUZXSVZPK1p1NXEvd2Rp?=
+ =?utf-8?B?Z3RHYXN0QUQ1eTdxQnN6ZERqSWxLYmlqdWFHZ2ZEUDhVemI3MVo5T0UwdnZ5?=
+ =?utf-8?B?TllvRUtFY0tnclg1alFud2JON005bTcwN2pXNEZkY1ErbWRLWlFjdGJFK01z?=
+ =?utf-8?B?SXBHcmtoTE9XMllEUUdCTkwvUk9FaTQ2TXFObWtzaTdxN2k4ZExPYVVnNHZu?=
+ =?utf-8?B?a3YrSDZPdG5MMy9CNUVPWm9pMFRuMVJ3dzNxUmlPNjVEKzljcGVIYTlNd09Y?=
+ =?utf-8?B?ZUZGeFMxc2V3PT0=?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(82310400026)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Aug 2025 12:05:55.2074
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(921020)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?WmhEOER0V0tUaVZodGVOcHlMZlh4ZDFyY0duTUJUQWdZVWxDSitJNXZWR29B?=
+ =?utf-8?B?REp4SEg3Znl4cGdIeVV5dHhwbSs5QzhZS0NoaGlzU1ZxbWNzOFRjQ2dHeVcv?=
+ =?utf-8?B?SUxzY3ZsY0FONGlxOXJrM0h2YWJZcHBtNEYySS9lVDIvZXJqZVhUMnJCU3RK?=
+ =?utf-8?B?SkdQdlF3c2lsS2trTEZ6a3ZyUkFHNzFjZGgxOTk2Y2hQUkdBb1R0VjdxNnBO?=
+ =?utf-8?B?ZTJ1TXZxbFFIenRYbENKYkRMNDdrOStoSXY5M3h3dVM0dzdKZ2VramZUeVJV?=
+ =?utf-8?B?Rk1aNGpRU1RkR3VsazhXZmpJRFdhb0pwUnJjbU8ySXBla3J3ai9aSjcxSGpB?=
+ =?utf-8?B?NzdiQXRubFdYMEI4a2Rsa2dWcmp1c1hRZ0JRWWZEY1dvSjRha01YSVlxbTM1?=
+ =?utf-8?B?ZWR0OEROSjNQV0RhWWhkMDJRMGpVVngzdk1DQ3RrOHFheHM0U0Z3TGovMjQr?=
+ =?utf-8?B?azlkbVdyZFpUbnI1NHQ1RThZSzVsOHBGMkhQQldLSHV6S0RIUm1YMHRxcWFy?=
+ =?utf-8?B?SGgwTy9qVElkZXpKL2h3WWltbjRaMlVkWXFISUpZdXlITDJoQ2xlZWJxT0Vn?=
+ =?utf-8?B?dkg1b3J2eE1LSHoyUUZVMXhaK2pLSi8xdXV3QnFQY1ZqQXhHNG9NcnppVG1a?=
+ =?utf-8?B?QUhhMjVXMWl5TW8vZTQrck9vZ2V3TWlVWEFJQkY4VXFBZWxsTERNSVJNb21m?=
+ =?utf-8?B?RUIyOVRCdDZoQ1ltREZKREZJN3dXL1YvM2NXU2xFS0ExVmNoVVV3MTA0QWlK?=
+ =?utf-8?B?TEVkM3lLWkIyaWkyUGprMVhnK3NzQlNyd0pMa2hlUWpybzRQMkZvQlZDNXNk?=
+ =?utf-8?B?MDJSa3kzNzYxeXJYa2F2cjRkckZKamVmQW1sbjNKUm5KT2VJVk5nMnBtSDIr?=
+ =?utf-8?B?YlNYbDlCd0FPUU5kbUFia1pJOWx2TkNaRXpLME5sTG1GWWtQWVpuR2Nlai9U?=
+ =?utf-8?B?aTZ2aGxvZDJMdXFJQ01vQ21wUDdTRU5RNXAyUllMallnVHJua1BtM3lWOUVx?=
+ =?utf-8?B?cUsxeTRCVmFLckQzSmsxQmx3Wnc0RWFiL296UnUvUzBNN3VYbUpiRTUvdXpt?=
+ =?utf-8?B?dFdPa2RPUmR0QTdZM2tFTEF4enZ6MUZNK0FLVHZmdS9DNzdLeEZnSHhOMmJs?=
+ =?utf-8?B?M2JIVng2ekh4QTRHSXV5V2ZBakwxaWd4bTJmUDBDZysyUEJQSTN5S2lPME5y?=
+ =?utf-8?B?WjAwVEFzYXo0cXp6dW9LZUtqMnFjNnlFNnBoRUsxYWVnZWJ0b2QwVkRUUVIx?=
+ =?utf-8?B?TEVkczh1bE9kekRzYklacyszM0V4ZUdmcFZzbjJxVFFzeFpVVTFKRjBMUWdC?=
+ =?utf-8?B?NHRoMVFYdGFmdzRqS08wZXR3dzJPMTJmQmN6NHdudXUvZzVPT2NkY2dFTjdV?=
+ =?utf-8?B?Z1JnbGNjVHVCaER2bW1IVkx3eXJRWjZhN2xac1RUejNNM3BmQlhTdGVzRnFN?=
+ =?utf-8?B?WmJpUmMxcEhYWVE3MXE1U2tPL01TZnI4MGErTWxIYnRETHFHbGs1c25DZkJ2?=
+ =?utf-8?B?YlBQT01wbHRSaGV6NUN2UTdPRnI0UGNDeHI2T1lnVU1OQ0Ird0FBVHpJbWtC?=
+ =?utf-8?B?ZUVLM0tUOFZCUWRDWFZPRno4TWY0cjV3K09TaEcrLy84OTFwTWNsSm9aSkdS?=
+ =?utf-8?B?cy9nbExpTzVMdktxcnBhSmZZZ0ZLSXE2Z1FQamxZZlVod0VYbjY5R1dHMXMw?=
+ =?utf-8?B?b2xsN1RqZ0tHL0JKN1V0OG52WUxBQzBPWkVjd2JaYUVOL2h4UFNleDJia01w?=
+ =?utf-8?B?WDM5aXNCZWdjdVgxa3oyL3BJZmVMQndhUjJQaGdIN3drb1hFU3lHQmt2Q3NJ?=
+ =?utf-8?B?TnhTTmNVZWVod0RJOEVoNEVOTWtKM3NRNDg0ME42c2JXSml6czZBV1lZU1NC?=
+ =?utf-8?B?SW1jem5CemV6OGNkWlFqd3RZNnhBRlJuczBRU1B1bkR2WVpnay9vMkRoRHpv?=
+ =?utf-8?B?TDBNSHZXeXc1dWxYSGhMS2hPU0VWMmhGVFNCUjJrSno0bnBwcjRHLzladVRk?=
+ =?utf-8?B?UjhlR09RdzVJZjBmd01sdzZIZGwrQ1NZKzJrS1E1Z0RZYlJmV2gzZEw1QWRI?=
+ =?utf-8?B?dGJJY1dMY1d1aXY2bXhEMmRHZFBCTXNwZ0xIZWpKdGJYOXJoREIxRFo4K3E0?=
+ =?utf-8?Q?wx/X63lCu65/ySI1bNSUkr1Em?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 08022d0a-6559-4190-9f22-08ddd8cf4201
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Aug 2025 12:04:43.7408
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0e1fb320-988f-4f3c-78ea-08ddd8cf6d04
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BN1PEPF00006002.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB8587
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: FCZPT3zxnlWLkRdlO2yY/lkxImsJf/nR7JXAaBDrkLZJYytNZ6A8HvnBTqp/oW9D5O7AA8iHG8W0Hs3Wr7w8DQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5924
 
 
-
-On 11/08/2025 10:29, Gerd Bayer wrote:
-> External email: Use caution opening links or attachments
-> 
-> 
-> On Sun, 2025-08-10 at 14:51 +0300, Shay Drori wrote:
->> On 07/08/2025 16:11, Gerd Bayer wrote:
->>> External email: Use caution opening links or attachments
->>>
->>>
->>> During error recovery testing a pair of tasks was reported to be hung
->>> due to a dead-lock situation:
->>>
->>> - mlx5_unload_one() trying to acquire devlink lock while the PCI error
->>>     recovery code had acquired the pci_cfg_access_lock().
+On 8/5/25 17:14, dan.j.williams@intel.com wrote:
+> alejandro.lucero-palau@ wrote:
+>> From: Alejandro Lucero <alucerop@amd.com>
 >>
->> could you please add traces here?
->> I looked at the code and didn't see where pci_cfg_access_lock() is
->> taken...
-> 
-> Sure thing. This is the original hung task message:
-> 
-> 10144.859042] mlx5_core 0000:00:00.1: mlx5_health_try_recover:338:(pid 5553): health recovery flow aborted, PCI reads still not working
-> [10320.359160] INFO: task kmcheck:72 blocked for more than 122 seconds.
-> [10320.359169]       Not tainted 5.14.0-570.12.1.bringup7.el9.s390x #1
-> [10320.359171] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-> [10320.359172] task:kmcheck         state:D stack:0     pid:72    tgid:72    ppid:2      flags:0x00000000
-> [10320.359176] Call Trace:
-> [10320.359178]  [<000000065256f030>] __schedule+0x2a0/0x590
-> [10320.359187]  [<000000065256f356>] schedule+0x36/0xe0
-> [10320.359189]  [<000000065256f572>] schedule_preempt_disabled+0x22/0x30
-> [10320.359192]  [<0000000652570a94>] __mutex_lock.constprop.0+0x484/0x8a8
-> [10320.359194]  [<000003ff800673a4>] mlx5_unload_one+0x34/0x58 [mlx5_core]
-> [10320.359360]  [<000003ff8006745c>] mlx5_pci_err_detected+0x94/0x140 [mlx5_core]
-> [10320.359400]  [<0000000652556c5a>] zpci_event_attempt_error_recovery+0xf2/0x398
-> [10320.359406]  [<0000000651b9184a>] __zpci_event_error+0x23a/0x2c0
-> [10320.359411]  [<00000006522b3958>] chsc_process_event_information.constprop.0+0x1c8/0x1e8
-> [10320.359416]  [<00000006522baf1a>] crw_collect_info+0x272/0x338
-> [10320.359418]  [<0000000651bc9de0>] kthread+0x108/0x110
-> [10320.359422]  [<0000000651b42ea4>] __ret_from_fork+0x3c/0x58
-> [10320.359425]  [<0000000652576642>] ret_from_fork+0xa/0x30
-> [10320.359440] INFO: task kworker/u1664:6:1514 blocked for more than 122 seconds.
-> [10320.359441]       Not tainted 5.14.0-570.12.1.bringup7.el9.s390x #1
-> [10320.359442] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-> [10320.359443] task:kworker/u1664:6 state:D stack:0     pid:1514  tgid:1514  ppid:2      flags:0x00000000
-> [10320.359447] Workqueue: mlx5_health0000:00:00.0 mlx5_fw_fatal_reporter_err_work [mlx5_core]
-> [10320.359492] Call Trace:
-> [10320.359521]  [<000000065256f030>] __schedule+0x2a0/0x590
-> [10320.359524]  [<000000065256f356>] schedule+0x36/0xe0
-> [10320.359526]  [<0000000652172e28>] pci_wait_cfg+0x80/0xe8
-> [10320.359532]  [<0000000652172f94>] pci_cfg_access_lock+0x74/0x88
-> [10320.359534]  [<000003ff800916b6>] mlx5_vsc_gw_lock+0x36/0x178 [mlx5_core]
-> [10320.359585]  [<000003ff80098824>] mlx5_crdump_collect+0x34/0x1c8 [mlx5_core]
-> [10320.359637]  [<000003ff80074b62>] mlx5_fw_fatal_reporter_dump+0x6a/0xe8 [mlx5_core]
-> [10320.359680]  [<0000000652512242>] devlink_health_do_dump.part.0+0x82/0x168
-> [10320.359683]  [<0000000652513212>] devlink_health_report+0x19a/0x230
-> [10320.359685]  [<000003ff80075a12>] mlx5_fw_fatal_reporter_err_work+0xba/0x1b0 [mlx5_core]
-> [10320.359728]  [<0000000651bbf852>] process_one_work+0x1c2/0x458
-> [10320.359733]  [<0000000651bc073e>] worker_thread+0x3ce/0x528
-> [10320.359735]  [<0000000651bc9de0>] kthread+0x108/0x110
-> [10320.359737]  [<0000000651b42ea4>] __ret_from_fork+0x3c/0x58
-> [10320.359739]  [<0000000652576642>] ret_from_fork+0xa/0x30
-> 
-> The pci_config_access_lock() is acquired in zpci_event_attempt_error_recovery() by way of pci_dev_lock().
+>> CXL region creation involves allocating capacity from device DPA
+>> (device-physical-address space) and assigning it to decode a given HPA
+>> (host-physical-address space). Before determining how much DPA to
+>> allocate the amount of available HPA must be determined. Also, not all
+>> HPA is created equal, some specifically targets RAM, some target PMEM,
+>> some is prepared for device-memory flows like HDM-D and HDM-DB, and some
+>> is host-only (HDM-H).
+>>
+>> In order to support Type2 CXL devices, wrap all of those concerns into
+>> an API that retrieves a root decoder (platform CXL window) that fits the
+>> specified constraints and the capacity available for a new region.
+>>
+>> Add a complementary function for releasing the reference to such root
+>> decoder.
+>>
+>> Based on https://lore.kernel.org/linux-cxl/168592159290.1948938.13522227102445462976.stgit@dwillia2-xfh.jf.intel.com/
+>>
+>> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+>> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+>> ---
+>>   drivers/cxl/core/region.c | 169 ++++++++++++++++++++++++++++++++++++++
+>>   drivers/cxl/cxl.h         |   3 +
+>>   include/cxl/cxl.h         |  11 +++
+>>   3 files changed, 183 insertions(+)
+>>
+>> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
+>> index c3f4dc244df7..03e058ab697e 100644
+>> --- a/drivers/cxl/core/region.c
+>> +++ b/drivers/cxl/core/region.c
+>> @@ -695,6 +695,175 @@ static int free_hpa(struct cxl_region *cxlr)
+>>   	return 0;
+>>   }
+>>   
+>> +struct cxlrd_max_context {
+>> +	struct device * const *host_bridges;
+>> +	int interleave_ways;
+>> +	unsigned long flags;
+>> +	resource_size_t max_hpa;
+>> +	struct cxl_root_decoder *cxlrd;
+>> +};
+>> +
+>> +static int find_max_hpa(struct device *dev, void *data)
+>> +{
+>> +	struct cxlrd_max_context *ctx = data;
+>> +	struct cxl_switch_decoder *cxlsd;
+>> +	struct cxl_root_decoder *cxlrd;
+>> +	struct resource *res, *prev;
+>> +	struct cxl_decoder *cxld;
+>> +	resource_size_t max;
+>> +	int found = 0;
+>> +
+>> +	if (!is_root_decoder(dev))
+>> +		return 0;
+>> +
+>> +	cxlrd = to_cxl_root_decoder(dev);
+>> +	cxlsd = &cxlrd->cxlsd;
+>> +	cxld = &cxlsd->cxld;
+>> +
+>> +	/*
+>> +	 * Flags are single unsigned longs. As CXL_DECODER_F_MAX is less than
+>> +	 * 32 bits, the bitmap functions can be used.
+>> +	 */
+> Comments are supposed to explain the code, not repeat the code in
+> natural language.
+>
+>> +	if (!bitmap_subset(&ctx->flags, &cxld->flags, CXL_DECODER_F_MAX)) {
+>> +		dev_dbg(dev, "flags not matching: %08lx vs %08lx\n",
+>> +			cxld->flags, ctx->flags);
+>> +		return 0;
+>> +	}
+> How is this easier to read than:
+>
+> 	if ((cxld->flags & ctx->flags) != ctx->flags)
+> 		return 0;
+>
+> ?
 
-Thanks a lot!
-can you please add the above to the commit message?
 
-snip
-<...>
+I think it is not!
 
 
->>> ---
->>>    drivers/net/ethernet/mellanox/mlx5/core/lib/pci_vsc.c | 7 +++----
->>>    1 file changed, 3 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/pci_vsc.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/pci_vsc.c
->>> index 432c98f2626d..d2d3b57a57d5 100644
->>> --- a/drivers/net/ethernet/mellanox/mlx5/core/lib/pci_vsc.c
->>> +++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/pci_vsc.c
->>> @@ -73,16 +73,15 @@ int mlx5_vsc_gw_lock(struct mlx5_core_dev *dev)
->>>           u32 lock_val;
->>>           int ret;
->>>
->>> +       if (pci_channel_offline(dev->pdev))
->>> +               return -EACCES;
->>> +
-
-There is still a race here.
-it is possible that mlx5 have passed the above check, while
-zpci_event_attempt_error_recovery() already took the cfg_look but still
-didn't change the pdev to error state :(
+I'll simplify the code with your suggestion.
 
 
->>>           pci_cfg_access_lock(dev->pdev);
->>>           do {
->>>                   if (retries > VSC_MAX_RETRIES) {
->>>                           ret = -EBUSY;
->>>                           goto pci_unlock;
->>>                   }
->>> -               if (pci_channel_offline(dev->pdev)) {
->>> -                       ret = -EACCES;
->>> -                       goto pci_unlock;
->>> -               }
->>>
->>>                   /* Check if semaphore is already locked */
->>>                   ret = vsc_read(dev, VSC_SEMAPHORE_OFFSET, &lock_val);
->>> --
->>> 2.48.1
->>>
+Thanks!
+
+
+(more comments below)
+
+
+>
+>> +
+>> +	for (int i = 0; i < ctx->interleave_ways; i++) {
+>> +		for (int j = 0; j < ctx->interleave_ways; j++) {
+>> +			if (ctx->host_bridges[i] == cxlsd->target[j]->dport_dev) {
+>> +				found++;
+>> +				break;
+>> +			}
+>> +		}
+>> +	}
+>> +
+>> +	if (found != ctx->interleave_ways) {
+>> +		dev_dbg(dev,
+>> +			"Not enough host bridges. Found %d for %d interleave ways requested\n",
+>> +			found, ctx->interleave_ways);
+>> +		return 0;
+>> +	}
+>> +
+>> +	/*
+>> +	 * Walk the root decoder resource range relying on cxl_region_rwsem to
+>> +	 * preclude sibling arrival/departure and find the largest free space
+>> +	 * gap.
+>> +	 */
+>> +	lockdep_assert_held_read(&cxl_region_rwsem);
+>> +	res = cxlrd->res->child;
+>> +
+>> +	/* With no resource child the whole parent resource is available */
+>> +	if (!res)
+>> +		max = resource_size(cxlrd->res);
+>> +	else
+>> +		max = 0;
+>> +
+>> +	for (prev = NULL; res; prev = res, res = res->sibling) {
+>> +		struct resource *next = res->sibling;
+>> +		resource_size_t free = 0;
+>> +
+>> +		/*
+>> +		 * Sanity check for preventing arithmetic problems below as a
+>> +		 * resource with size 0 could imply using the end field below
+>> +		 * when set to unsigned zero - 1 or all f in hex.
+>> +		 */
+>> +		if (prev && !resource_size(prev))
+>> +			continue;
+>> +
+>> +		if (!prev && res->start > cxlrd->res->start) {
+>> +			free = res->start - cxlrd->res->start;
+>> +			max = max(free, max);
+>> +		}
+>> +		if (prev && res->start > prev->end + 1) {
+>> +			free = res->start - prev->end + 1;
+>> +			max = max(free, max);
+>> +		}
+>> +		if (next && res->end + 1 < next->start) {
+>> +			free = next->start - res->end + 1;
+>> +			max = max(free, max);
+>> +		}
+>> +		if (!next && res->end + 1 < cxlrd->res->end + 1) {
+>> +			free = cxlrd->res->end + 1 - res->end + 1;
+>> +			max = max(free, max);
+>> +		}
+>> +	}
+> With the benefit of time to reflect, and looking at this again after all
+> this time it strikes me that it is simply duplicating
+> get_free_mem_region() and in a way that can still fail later.
+>
+> Does it simplify the implementation if this just attempts to
+> allocate the capacity in each window that might support the mapping
+> constraints and then pass that allocation to the region construction
+> routine?
+>
+> Otherwise, this completes a survey of the capacity that is not
+> guaranteed to be present when the region finally gets allocated.
+
+
+If we use alloc_free_mem_region the resource is reserved so it will not 
+fail later.
+
+
+But this requires a major change in the current approach since if we 
+keep trying to get a suitable root decoder, the one with larger 
+available hpa, we need to release the previous allocation once we obtain 
+a new one. Then, because allocated DPA will likely be smaller, another 
+release will be needed later on. I would say it is not going to simplify 
+things.
+
+
+IMO, although such change makes sense and it will be needed when CXL is 
+hopefully massively deployed, the risk of the HPA allocation hint not 
+being there is quite low at this moment. The function is explaining the 
+potential problem as well, so I would prefer to not try to get the 
+perfect implementation at this point, and to leave such a improvement 
+for a follow-up work which I will be happy to work on.
 
 
