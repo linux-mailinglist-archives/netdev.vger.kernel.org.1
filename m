@@ -1,240 +1,188 @@
-Return-Path: <netdev+bounces-212618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212620-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF75FB21781
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 23:37:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58B03B21799
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 23:44:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A85223A4EB6
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 21:37:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 75396190565F
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 21:44:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24BAF2E2DFD;
-	Mon, 11 Aug 2025 21:37:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C74D82E338F;
+	Mon, 11 Aug 2025 21:43:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aVvMRcdD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M8ROvVv3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2667311C0E
-	for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 21:37:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.13
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754948230; cv=fail; b=GYwshs5ixDnkcL10Vf3qPEdGUVw+W5zELBIDY2D5IcseWtUM1i+fXG/+uCd/36b5xr1kKIduIYbD9yVYKqHj8pG0/MEPUHRyRr7nzZ8tNbz/glhEHRGTFnUk2lU7+AtsG0rbfAhzf3tzVSjSFibsT5ClaFpcYRtok9kKjrYPo0A=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754948230; c=relaxed/simple;
-	bh=jhSGqf3RDIydYgzJVgat26EFqnhjN1AVu2+gbTGAYn4=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=MtnaDdOKuplcDIc3Rm/a71Wzu4QiBpiujvt/XLpZhG+TVbaa0sw4VH2TeOpKyvaLW4pFpuMctq5quZbPBadyMK13D4paspPAYkm7y7F/WiMvORXezzoeUQi8uCjjO4FDFaj7uXj0DK9Lkk5KGDZbc0KXGaiYoIfx33T/1jNZRK4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aVvMRcdD; arc=fail smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1754948228; x=1786484228;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=jhSGqf3RDIydYgzJVgat26EFqnhjN1AVu2+gbTGAYn4=;
-  b=aVvMRcdDXpSHU+nFMKFg5AY7xiJh1PbufZsDfJh0RMg8nZKl6QmKg8KJ
-   ZJ9aDIuZl8+eoCP3J6R/nnugij5b+8+EZaqVDJnEuPzjtSiTtboPSKqts
-   x4i0p7ceQD/1vRiktMDUfyvG4dEQrNXF3RK9pXkILbmqlQ5NPl5UNkqGA
-   wkGgCYqiVa0paE23MBtIP3PF7j4zywYBivtVszQHw9NlNUYmU6NbfyECs
-   SI8WXxCFea9BIf0YhSYNMOfSYeYFUCigeuMJwmry09KMTq/YCo1j63z1c
-   EXozEgjUligJdTCYpU2ylnsN4TMbLh4OUqzx3WuxUCop6YyUox62ETGhp
-   Q==;
-X-CSE-ConnectionGUID: HZToboeSRHq3D36Iwbtukw==
-X-CSE-MsgGUID: /MJWl9D7RYq/sMNXJJ9XJg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11518"; a="68289897"
-X-IronPort-AV: E=Sophos;i="6.17,284,1747724400"; 
-   d="scan'208";a="68289897"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2025 14:37:08 -0700
-X-CSE-ConnectionGUID: VwYHrRLaQm+tjccISAqCNw==
-X-CSE-MsgGUID: wmWe0k94TTu267ymGinD4w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,284,1747724400"; 
-   d="scan'208";a="171371097"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by orviesa005.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2025 14:37:08 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26; Mon, 11 Aug 2025 14:37:07 -0700
-Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26 via Frontend Transport; Mon, 11 Aug 2025 14:37:07 -0700
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (40.107.95.71) by
- edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Mon, 11 Aug 2025 14:37:07 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=XWdt9O1NwxnQw+27/ea1Azjd3NhSMS21Ks3YmFJjZrKSIEZWrdrA+4mgz4etPLVL85bxl2m485cJFLePcVjPJMzrIF+9zyMMlvd25ajONIVCjd5TSlzWLsijL528n8zsmF/lKlUxqWephweBiT88xJ42e2C/+GeUBv0bCC3UyjAZYIZ6UDkWi2Rode8M3TMtkvUx2Msqc6H8SqmeBKXJAceuNtLPTwaSNmBZpPV30qaavL22jnHAzRYduGpPbDuc1Dlja5pXF9/xqTSBeGOrUq91R/Xh27jgGU48tw5mjcx9equtgjd1lof2eig0WNWTt3tPkiKyIVVv2EdwJeKeeQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xq0ZMTf0Cu4Epvks8QAf5V9UAPRO3yLc7vXBJf6ZzxI=;
- b=iQ469BeS/HD2w51LG/cLwqx7psmaAbP0+dsYNSDVIsapdLQMPniVIsOfHl9/tY5qOhavrI2lzskeWep/DDN3I0YglDCZup9ExREcS/k+2ERGcOJG6a1nsPTUnWCorWLa5XzfaDuG+DQmjxOLBoq2435wuoEH+buQsYBOa+I8rZrMsUDKjbDvA/TQJy0oMKlATAGZB/9Kj1EG+0Y1TkoejZkW3P94/f87jm7/xM7jeUIcKEreNqR7+k/6T5rXvEoIZsDIW66cVIO8dnMMqCq36+vkraL3t1F9KDIh+gJI05yFztW2zA8Bpvanck5Rq9tHhj9YdHrtPxEiVlm/cc7kYg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
- by DM3PPFF2E67D388.namprd11.prod.outlook.com (2603:10b6:f:fc00::f60) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9009.21; Mon, 11 Aug
- 2025 21:37:05 +0000
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6%6]) with mapi id 15.20.9009.018; Mon, 11 Aug 2025
- 21:37:05 +0000
-Message-ID: <fe773700-40c4-486e-b9f6-5e2f2022596e@intel.com>
-Date: Mon, 11 Aug 2025 23:37:00 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 1/2] devlink: let driver opt out of automatic
- phys_port_name generation
-To: Tony Nguyen <anthony.l.nguyen@intel.com>, Jakub Kicinski <kuba@kernel.org>
-CC: <davem@davemloft.net>, <pabeni@redhat.com>, <edumazet@google.com>,
-	<andrew+netdev@lunn.ch>, <netdev@vger.kernel.org>, Jedrzej Jagielski
-	<jedrzej.jagielski@intel.com>, <jiri@resnulli.us>, <horms@kernel.org>,
-	<David.Kaplan@amd.com>, <dhowells@redhat.com>, Paul Menzel
-	<pmenzel@molgen.mpg.de>, Jacob Keller <jacob.e.keller@intel.com>
-References: <20250805223346.3293091-1-anthony.l.nguyen@intel.com>
- <20250805223346.3293091-2-anthony.l.nguyen@intel.com>
- <20250808115338.044a5fc8@kernel.org>
- <c8473c7e-0432-481d-9db2-656c3ad7305b@intel.com>
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Content-Language: en-US
-In-Reply-To: <c8473c7e-0432-481d-9db2-656c3ad7305b@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: DU2PR04CA0184.eurprd04.prod.outlook.com
- (2603:10a6:10:28d::9) To MN6PR11MB8102.namprd11.prod.outlook.com
- (2603:10b6:208:46d::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A61628505F;
+	Mon, 11 Aug 2025 21:43:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1754948636; cv=none; b=Lyxg1dd22X7zNFfq9lglpGoeDqaUh+NVGpbDLtuRzS8ea1n1D1vYuxHoeFGEAsg5jaB78Zx01g9a4zUyb1mGVD8xyI9saMTWJa/7DJokIAq9VTVFpoXTZyLJRd6a7UZZakpBb57gDx+AXHnWzgdcSEoB/TbouZiBgv31xFuMVEI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1754948636; c=relaxed/simple;
+	bh=7OGQk8bopsot7CutcJAcqxqmBdgPuJE0EaLcO0LDgxU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BqTEHVk8TP08+bMO3i+8xewnFnBUSMIeSclaNa0APl1FVQGrJq+A+aFs7WoK0UtLuwgp433ky0o1ST2/NQy3WmDP2P9LIYKXsEw5ppQHo4SHZed8kJOKDFB95V5LM/RydOsXIVcBtUSavaB1pf0BeO9VSK3F8LTXBgphwK0jP7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M8ROvVv3; arc=none smtp.client-ip=209.85.216.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-31f255eb191so5003819a91.0;
+        Mon, 11 Aug 2025 14:43:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1754948634; x=1755553434; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=V6rK+nf0PE/yzZMOCn9QAPItrRWLBQkSNHhJvIS5DoM=;
+        b=M8ROvVv3V1ge8lyv4/8erKw1qjhL1eHf/cjCsnMmA8kdS/z8tjhxLVC4cIXjOOpVCH
+         yBwm4F/pAN5+9FSG2SsmfzVuIn/T4pafUM5jgfl/Ob+Rs0anh7GJZ5p1+qrar5LgWNgp
+         kBlyuLr5wyntsLIvQiH7P5LxU2sUPFzA+lj8FplAVw3lieDnRAFPuJHByzvZ9l97y1OL
+         QDydYwlttIb7e1xQHjw7H2Wf40ZxZH4ut3UVbFzZTIQqmvobWImd5XNk3D3r1QU5UPFj
+         85JljJ96gnCogY6Q4Np5FtNFBTcQkpIgP27Cdb53v67m7ucAGdQTiWPN3glVcbOVO+T3
+         rzOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754948634; x=1755553434;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=V6rK+nf0PE/yzZMOCn9QAPItrRWLBQkSNHhJvIS5DoM=;
+        b=j/BbkjfZlzyQXgbWcdFhTGdXmRleupS6ogkX0ajkZRSPdp3fXgRd8J09v/RyEfdXUT
+         AS+h81clun85MhwbUMpr6KCpIW6iQC/9FYuWU+Y3/gECPrWVDYjQK3Yr81qao62jujKv
+         7qB3PLfpd8rfYZDXDtzpM+YanO4Sh9xE88ktnSswbDwJqkbFLGhWJdw80dZuyL9Smh65
+         hxjDc0QWLZaPBlffMP2mErIiIl/riJhU2oXymRWpDAzLgUmXtWdeLS356sITEyRY9yf0
+         KdUDG6jrHplXVRLRZ1tST0k1+L0fPVUUG1yNOEswSnYQ6ti2x6ROFoV2osOf43Hiz6Us
+         dcDQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUrqEiU0HfXMFlmQMM67awwpK6Acu3MPKLTTFu10b6tpQhdwQtzA+5cjzQvs/JwCIX6xIKYhqwsSS24@vger.kernel.org, AJvYcCVSs839xSisPcVVnA7HUDR5xnUh2S3+vPjzS0PA0wNU2Up9u4YyaShPI2Wp1Ng+Tnyn1V5x/5UEEmxhEdkH@vger.kernel.org, AJvYcCVyDXTvy37zVcxsdcmvEof2nKpefJMasONY16O7IKEsrfbDSvqHXXgYzCsfGeW8m/aLncns+CGr@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw9m1W7PoT6OoLU6QAufEP2nRi8I4GP4s7rUjZZo3FQvcrJakmD
+	CiMraSaUUTK3hMCNLp2AebEt0Eo5SqmfoXRSzi7aRBWpJH3ggkJFQyAl
+X-Gm-Gg: ASbGncuyrmYPjmnzSa5Z2qraWG2TmZqCtl4tfNKe3/NkNayDqK43ygJzxbLLvT6l1DQ
+	ws4iROro6h2ys5uQz4QSHVuCXm+wGvCsQxU75kaFWKuA+w8yxnLYzyCSnBoPGXmBqohJtoFsUiy
+	4gJ5PZn2s3aA1lE6KmM0qXvMX58IyT7hRl2EINbYb8a12tKN7wuFIvwCotOjRl7uuyBVqHd6xWL
+	6weecq7AeT4MkVpD454+3r3+9sYRonyxMwAH3kgcrBsrepgSN8MkedliE4aWVZR/O28swdkMN3r
+	eWhUxLGIFqy91kowbvcOj/BYohhytHbaeILcSZ8nH73xe/LxUbFDFGzsvTzBry+/h+tE++HdyIP
+	FVFRd1ivfz0AIQuebP0bQXCg8yD+MK1B7eQ==
+X-Google-Smtp-Source: AGHT+IFsi78NN+fBY0LS4y+P8YMijCEFQnCo74evdIk8ObOIJFSgyoxfkygQTtZGUK1jp2bVcfARVQ==
+X-Received: by 2002:a17:90b:3842:b0:311:9c1f:8522 with SMTP id 98e67ed59e1d1-321c09fc527mr1556132a91.10.1754948634369;
+        Mon, 11 Aug 2025 14:43:54 -0700 (PDT)
+Received: from google.com ([2620:15c:9d:2:69d7:30de:b05e:915b])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3218c3c2d58sm8359383a91.16.2025.08.11.14.43.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Aug 2025 14:43:54 -0700 (PDT)
+Date: Mon, 11 Aug 2025 14:43:51 -0700
+From: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Arnd Bergmann <arnd@kernel.org>, Bartosz Golaszewski <brgl@bgdev.pl>, 
+	Linus Walleij <linus.walleij@linaro.org>, linux-gpio@vger.kernel.org, 
+	Krzysztof Kozlowski <krzk@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Jakub Kicinski <kuba@kernel.org>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 17/21] nfc: marvell: convert to gpio descriptors
+Message-ID: <yf5coptfembueds4ozpsphdv7vggyzfezdxv66uuqzjv3gpw62@x4s6iylxahrv>
+References: <20250808151822.536879-1-arnd@kernel.org>
+ <20250808151822.536879-18-arnd@kernel.org>
+ <aJcea90siAod5Apw@smile.fi.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|DM3PPFF2E67D388:EE_
-X-MS-Office365-Filtering-Correlation-Id: 32ae7372-7e9b-41a4-8c8b-08ddd91f3789
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?b2NkTFl6TllJSGNuNUxrTFQ3SGE4ejlGelQzdUh3ZEdsRVFSWmtFYzBqM1JS?=
- =?utf-8?B?QzU2SHJRV05xNCtxUE5jdUo1eGRndnhNTkJvM0p0WFhVSGZLS0gybUtNRkFC?=
- =?utf-8?B?aXFXV0RJdUZaS0lhWDI0N042UG9XTEYzbGlHandCOTQ2SGJIZ2wxTmJnZUxY?=
- =?utf-8?B?bkk1TlNiVU9xdFZ6dU40WDBSVU1YQTdncHdrd1NnWGdWZXVzbE9XVEhDWklL?=
- =?utf-8?B?ejYvK3ZqeFQ3bUhORWpEUWFRLytPN1p0VjBpMXN2UGM3Vkc4YXdiY0ljakFX?=
- =?utf-8?B?RTRRL1dFVlhkS1MxYTBPYUpsOVdmL3NtSHRqb0FHcWJvMVJnN3lxV1JxVHVa?=
- =?utf-8?B?bUhsRHB5Z2tnM2V6bFVvOVo2UjNRS0xWcDZWSWh6dlBpTEVGUTR5ZHFrT3VN?=
- =?utf-8?B?aHEyNHo4bUlkVUE4YkhmY2lCME51WTZrczRGVXdCa2kyWWFwbVpCS3A0bm5q?=
- =?utf-8?B?LzJPZzNpMG5PcDFIZDY3RktZUU9NbmNvY0U0S3JIQW5GQ1lQVGd6ZEpjUkdZ?=
- =?utf-8?B?ZWo4bW9lQmp5VEdPRklscXBjd3pGTitOcTAzcHRtLzJXZjhOZ2RrUDNMazdw?=
- =?utf-8?B?NEdWbGNCSE4rYW1JMUtxa3FpVlhVd3pXdkd0MU5aMW1XTGxWUFptdGo2cjZF?=
- =?utf-8?B?K2d3WFBUblJvZHZ2aDFVaDdKWi9aSE1kMDk0d1A2aHJjY0wvZjBYT3FCbzJP?=
- =?utf-8?B?SXpWUXozcGJIVkdOR2Jab2lBbkhVNFdCbHlmUnBseVNiUyt4SXZpenFudXhJ?=
- =?utf-8?B?MnB4dnJsYWJVYUt5MCtMZjBvekNqZXRvTGxiN0ZwNTh2MStrNW8zZFBBcW53?=
- =?utf-8?B?MC9JNHRXRlR6ZWVBRk1ydFlZd2ZLZzJTL1BFQlhlY1V1eWxVbTBWbEVXRjda?=
- =?utf-8?B?VUNFRnBwaFBhUnNyNnVrTGt2bUxEYTlSVG5zODdSZTFQOTNkVVEvckFHVFpX?=
- =?utf-8?B?Mmx3RjMzb2I1NkNLL0JTSmt6RFo3RUNUWmEzZVFlcUhZc0srTTgxV2JQM05r?=
- =?utf-8?B?aCtOUTZ4TjExaE9TK1kxMEo3VUd1Tmw3aWRxZ3dibW5hYWRPeEZ2Y0JEb0tM?=
- =?utf-8?B?cHBweUxkaDVacG90bFc2U1FCMzU1d0NmK2gyME5OZkpLOU1jV2FLb3F5YU4x?=
- =?utf-8?B?SE05bjlRQk5XTStwK0t3QXBiaWh4eTY2MWl6c2RZU25qUmV0ZVZQNzJXenN0?=
- =?utf-8?B?RmpRRmZvb1M0THQ4MkxxQ29pMmFuUUtzNkQyaWs2QUttRzBqMEYxOFFVYWtL?=
- =?utf-8?B?MWVlcGNPNHF3aFBwZ3hvcHBZZVhWeUlMaENJYW05M2NIbm94eGNNcGxCajV4?=
- =?utf-8?B?Vkd0TGlvaTVIWjN6SDVnS3dablNTMnlVM0R4OTFrQUVVQ2FGN0s1bFllK2xh?=
- =?utf-8?B?NE16V1kxUEtuMXA4MVBiS3B4ZDhGYUk0MW9CeW9MbmdObjI0ZFUwQk4vTzlH?=
- =?utf-8?B?MlVENFdJbVRYS2JnSmhoRGN0UUFJOS94dzlTTE1ibkVBMW9rdG5OazB2MlJR?=
- =?utf-8?B?YmdmZEZDR3BzankxTklmOGw1c2pCdUhsQzBHVElOT2NUN1pTb2RXTDhOTDU4?=
- =?utf-8?B?ekduNjB3SjN2TGFyb3pBaWxjeGljc3UzcnpVcFR3VjRsejhPaDNDYTdlWlJp?=
- =?utf-8?B?WkxCVWp1ZDRDRkZud2xKdDBuNzNUSmFqUVZTNkhkMDNjckI1S0Z2cDc3WEFo?=
- =?utf-8?B?R0VXMkc0RWRDMXpQOWRnWDJhbkRRc0YrNU0rRDNsZ09vZU96UW9WYnV5bDRh?=
- =?utf-8?B?V1ptUlFTdi8vdmdLamJkMEFFSGxIOTBnYm5WNXBxUkRpaWEvRm9UYUhJOElS?=
- =?utf-8?B?WDJoTVdXRzBWTmpVdjJrL09MeU94NGlMNGlFYWhsenc0ZXd1a01ua3R2UnMz?=
- =?utf-8?B?TDMwTXhTOXpzZDZSOWRLU0I1U3MyMzh6Wlo0UVp0UGRnQXBvRWhKOWNodVZE?=
- =?utf-8?Q?Cyn9LSN2OD4=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VlJSblNhMllOSjZVZkNMNEhveCtDVFNQMWRoN0tiVWFpV2tCbTNBQ2R1WEpa?=
- =?utf-8?B?S0djNHVDR2ptWE1vVWVHYXc1NWdLbWNtVVVhbEJxa3BJMDA3ZHNqbnRsSHEv?=
- =?utf-8?B?aitYM3YrbTdvMFdoVDAzcllRM1J1M2NzVDhPMVcvVEpZbSthbUsxM0k4elBx?=
- =?utf-8?B?akQ4N1hCRFllZEhoODhSTTRFeXlBMHdKVm5WYktvZDRTUHo1VmVmaEtQYkNs?=
- =?utf-8?B?N1I4bCs3TEQ5aUZHaWFEZnFodzVFM1lDNVM1VkZGdUZxMStCVkE5SjlzejQv?=
- =?utf-8?B?YzFmK0ZodTVCVGNoWHV6a1lYNnFCbEFpZG12NWFpRllkeTBGNEpBWjRkMFRk?=
- =?utf-8?B?TFBHTWp0SHVOM1h5RUducjV5b2U5aWl3Uy8zRllkdEZoaHRWUUEyMk1jZHZi?=
- =?utf-8?B?RW84V3ozUEJUN3dMdTNQZGI4ZU5jODVTZHgwNG8vMWVFa2wvV00zR3BheTBY?=
- =?utf-8?B?YWV3ZU5SNGpjN2lyWE1sSmRnS2taV2RhamFHd05VQ05uenRhdWtNajRrRUhL?=
- =?utf-8?B?enNjaVRyd2N6QmwvWXY3c0NhbG5hYUdJNWRWQmYxNG5yV2g2Ukk0bFVjQUU2?=
- =?utf-8?B?UG92TDc4dllicWtkMmVxVldwU3NISU9DTWRHR1p2dHJXMjJZbjU0UGFHTlR6?=
- =?utf-8?B?dm1yS1VYYlIzdnQvUzlJamRJNlhTMU5vNXFrL3NUSm0zWUdUUU5WL1pUT0RI?=
- =?utf-8?B?TGxuNGY2czcvRzcvYjhoeENyN09oWDY0WjA1bndqK3pPNWhsWHJsWGFZQy9P?=
- =?utf-8?B?UnVMcWg2dUtJVEExUEtWdzNYWEJCcy8vdG8wSFIzMVZ4WTdpbEY3bGx6SHpk?=
- =?utf-8?B?eko3YTJ1RVlTRHFJRnNEc1dOZm54c3ZaTUxNbCt4M3ZFMG8zRHBoV3ZZWUZB?=
- =?utf-8?B?d0sySU1KeElVZ3F2UGtOT09ZWERqK3VYOXo5UTFwZ0cyV3AvSnVrbjNIbCtw?=
- =?utf-8?B?aW56SWlKS1hsL0RmSGJBNDhNdlRDRnVJVm1QQ0k2Nm5zOXNZUDZUazZVRnZ1?=
- =?utf-8?B?Nm1CcHJBdzdSNmhkU2t6QmdCanhUZ05IYWo2UlgwanVUZG9qS3JXSWs0NllX?=
- =?utf-8?B?d1dhWk9kRENXQUJZK3QrL3hlRncrZkZkUHBQWFV6VGlodkYvcWl1TFBjSUUw?=
- =?utf-8?B?VXNVN0hxdnJsamtZTWQxVC9JNmVRTlZOYm9mNTNMN2NqUFFLZUl1aHNPZDUv?=
- =?utf-8?B?a3B6Uy96ZFpOTVZacmIrdVNlRk5ka1J6aVFSdkthQ3pIaElOUGZWZVlRendC?=
- =?utf-8?B?aUJHZ1FNNDgxTkVCTEx1Ujc5NjNpdEFGWWpaOThHMnZIYjZ5dkh4Q3dPTEQ0?=
- =?utf-8?B?dmlQT01nSEwxM2JOcFZ6eWtkbjlIemZKaWJlR2ZhUU56dDJ5aGZzdVV0UFU5?=
- =?utf-8?B?d3hzMzU1K0RxTjgrb29UN0hneWEvM0dtTFptUEs5N2NWRkEzaExybjRnVlBs?=
- =?utf-8?B?REpzUWwrWFRIZG0vS0pGR0IxR0wybWp3MXVaRkVwSFQ4a2swMWJDazFPcEhL?=
- =?utf-8?B?WWY2aC9vYTZsWFFPMGpZcWEyV2FaWEpoQXU1UTFESXVwWk4veGlhbzNaTTF2?=
- =?utf-8?B?cE9HVGNiemM0Q3duL1ZNenlyZmxtK3dkakV0ZktLUlJ4WkY2ekZSR1RTd1Fa?=
- =?utf-8?B?QWpyNi9qYUtrSks5WWxScnVFY0I3UnA0OXNzUSt0VEFXNzFXa0hINFN6cURl?=
- =?utf-8?B?Q0FydFFzMXB5aktIT29nTWlWV01WNnZiZk9CRUtuK2orSERNSWhSekQ2ZnJT?=
- =?utf-8?B?Sk1SamZaNmdGZE80cXlRRURmUlFsb25GUWVWU3F6KzB5cmZ6QlJYc3dHdklt?=
- =?utf-8?B?SVFlWnZneVF0MWUwc2pCNWFhcnR5d0s1QitOUnVRSm5UVGJYZUxwSlVjUDRL?=
- =?utf-8?B?cmZycHFuSVZqRGFxcWJlNDdMNDJEdkhyazd0TnNuSGdxZTI3YVJIUEhlS2ZN?=
- =?utf-8?B?c3U0d1V2RCsrZ3RidXVjQTR4SzlQSXhjbmxiTWJaejJzTVBlc3Q0NGRqZVlL?=
- =?utf-8?B?TFFTRFNXdkJqME9mVktCVEpxYWpDRm1wbmxBR2NYSDhPc245Tld2bGRjQkJK?=
- =?utf-8?B?N3puc0sxaDY3Y01FM0EyZlhIUWR1YTZpV1pycHFFMkxGSFpya2xUTE9PdnlU?=
- =?utf-8?B?L0JFWUg5QjQzVHQ2K2x5RlJLUTAvazJLbUJUdFI2V3NlU3pEdGVnTUJEVmNv?=
- =?utf-8?Q?DqGsQLs5IuNbNqLMd7T8e8g=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 32ae7372-7e9b-41a4-8c8b-08ddd91f3789
-X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Aug 2025 21:37:05.7246
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 5IdGSj0iYX+1IUuyTDWU+rzTdJJQDrWNdAcR2S0km74bMP5IbQT4Mh67CcdofvddBUbZrp0eH3Zo/mXaOk9OaoQ72waXuyJDAwUOYHvHJLc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PPFF2E67D388
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aJcea90siAod5Apw@smile.fi.intel.com>
 
-On 8/11/25 23:27, Tony Nguyen wrote:
+On Sat, Aug 09, 2025 at 01:09:47PM +0300, Andy Shevchenko wrote:
+> On Fri, Aug 08, 2025 at 05:18:01PM +0200, Arnd Bergmann wrote:
+> > From: Arnd Bergmann <arnd@arndb.de>
+> > 
+> > The only reason this driver seems to still use the legacy gpio
+> > numbers is for the module parameter that lets users pass a different
+> > reset gpio.
+> > 
+> > Since the fixed numbers are on their way out, and none of the platforms
+> > this driver is used on would have them any more, remove the module
+> > parameter and instead just use the reset information from firmware.
 > 
+> This patch is my love in the series, thanks for doing it!
+> Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 > 
-> On 8/8/2025 11:53 AM, Jakub Kicinski wrote:
->> On Tue,  5 Aug 2025 15:33:41 -0700 Tony Nguyen wrote:
->>> +    if (devlink_port->attrs.no_phys_port_name)
->>> +        return 0;
->>
->> Why are you returning 0 rather than -EOPNOTSUPP?
->> Driver which doesn't implement phys_port_name would normally return
->> -EOPNOTSUPP when user tries to read the sysfs file.
+> But note some comments below.
 > 
-> Jedrek is out so I'm not sure the reason, but it does seem
-> -EOPNOTSUPP would be more appropriate so I'll make that change.
+> ...
+> 
+> > -	if (gpio_is_valid(priv->config.reset_n_io)) {
+> > -		rc = gpio_request_one(priv->config.reset_n_io,
+> > -				      GPIOF_OUT_INIT_LOW,
+> > -				      "nfcmrvl_reset_n");
+> > -		if (rc < 0) {
+> > -			priv->config.reset_n_io = -EINVAL;
+> > -			nfc_err(dev, "failed to request reset_n io\n");
+> > -		}
+> > +	priv->reset_n_io = gpiod_get_optional(dev, "reset-n-io", GPIOD_OUT_LOW);
 
-when it was a driver callback, returning a 0 was short-circuiting
-further (devlink) name computations
+No, this should be "reset". gpiolib-of.c has a quirk to resolve to naked
+"reset-n-io", otherwise this will resolve to "reset-n-io-gpios" in the
+bowels of gpiolib.
 
-but in current form (v2), it is indeed better (at least wrt outcomes)
-to return -EOPNOTSUPP, as that aligns with both sysfs and devlink output
+> > +	if (IS_ERR(priv->reset_n_io)) {
+> > +		nfc_err(dev, "failed to get reset_n gpio\n");
+> > +		return ERR_CAST(priv->reset_n_io);
+> >  	}
+> 
+> This also needs a call to gpiod_set_consumer_name(), IIRC the API name.
 
-so, good to update, thank you!
+It does not have to... I am not sure who pays attention to names.
 
 > 
-> Thanks,
-> Tony
+> ...
+> 
+> > -	if (gpio_is_valid(priv->config.reset_n_io)) {
+> > -		nfc_info(priv->dev, "reset the chip\n");
+> > -		gpio_set_value(priv->config.reset_n_io, 0);
+> > -		usleep_range(5000, 10000);
+> > -		gpio_set_value(priv->config.reset_n_io, 1);
+> > -	} else
+> > -		nfc_info(priv->dev, "no reset available on this interface\n");
+> > +	nfc_info(priv->dev, "reset the chip\n");
+> > +	gpiod_set_value(priv->reset_n_io, 0);
+> > +	usleep_range(5000, 10000);
+> 
+> Side note, this would be nice to use fsleep(), but I see that's just a
+> copy'n'paste of the original piece.
+> 
+> > +	gpiod_set_value(priv->reset_n_io, 1);
 
+Nope, this is not going to work. See
+Documentation/devicetree/bindings/net/nfc/marvell,nci.yaml, this GPIO is
+active low. We do not have any "live" DTS examples so I am not sure what
+polarity is used in the wild. So either use logical level (my
+preference) or switch to "_raw()" variant.
+
+> 
+> ...
+> 
+> >  void nfcmrvl_chip_halt(struct nfcmrvl_private *priv)
+> >  {
+> > -	if (gpio_is_valid(priv->config.reset_n_io))
+> > -		gpio_set_value(priv->config.reset_n_io, 0);
+> > +	if (priv->reset_n_io)
+> 
+> Not sure why we need this dup check.
+
+I personally feel very uneasy when dealing with optional GPIO and not
+checking if it exists or not, even though gpiod_set_value() handles
+this. I think check makes logic clearer.
+
+> 
+> > +		gpiod_set_value(priv->reset_n_io, 0);
+> >  }
+> 
+
+Thanks.
+
+-- 
+Dmitry
 
