@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-212579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212580-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16386B214EA
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 20:52:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6471AB214EC
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 20:52:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C8821A23149
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 18:52:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8E0C21A231BB
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 18:52:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A44D42E2856;
-	Mon, 11 Aug 2025 18:51:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7586F2E2DCD;
+	Mon, 11 Aug 2025 18:51:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ZclpzZR8"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="i+dwIOA2"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E77C238C16
-	for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 18:51:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E9842E2DC8
+	for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 18:51:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754938311; cv=none; b=Et3g03iLMZUYtoXqcYsKoSDZd63K2t1+m/E72oZlr5J2DWNDDN5BHGj8UMmjP4SYE87EkmVo2z7Ng71Zi0zr86aLCMGab6lYMgdNqLVT4zYXmtv02n9UgEkitmRzx/Z2R0s6e/oArdj8ksZjWyf4UilcDmTwpaZPhVM7T73CJgA=
+	t=1754938318; cv=none; b=Q+mHtY+C1qycA4SFSnK0cvW2dIdLzjuaALLQGm0K0vq4ipUOursrIvaS3eauDQBr676zROvW3NQ50DdLiJJ3OKUeYsAV3SYVuBLM+QLQ0uc48EWlBRTu3DMre5pRXfzaf3m8QubBQmftpFoYEh1qWMPCNaFyjNNdLFzj/cFMt9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754938311; c=relaxed/simple;
-	bh=wsm5YKCfAV1TpgwM9M03dR6cdurP2OTlzhgmrpmt7dI=;
+	s=arc-20240116; t=1754938318; c=relaxed/simple;
+	bh=+8hKBgrpSDl210c6qhk5K8B26tvCznaX2QF5AcVepr4=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=kjVfF46N8PzjK5olM9g7zjPSvezHOHcIUpMwfTtV8epLp+EJmT/rgJkyl4Xw5Uo03mJ7y9I3SRYSJA4uU6GGiEbCzEkq9/vwvn1w75CuVwwM5Q+AVTF3MlV9mdNBkPlNzZgCkqaTILpqtSCtujddklQo0uO2MLSUjSlI0pZtBc8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ZclpzZR8; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=sNpIsfn/+UTiGpiZqGRj3U4E4np9/UgUzKIS2KAYDLoYCE1RSfbZNQe3y0LAMPgtAB2td/5g1wKd79+uK3AK2iUD9cT1yWRtct6Y3aBvErJcnZlkhmaL2FtpcnJwWovnCB7AiGTTdxqlHEnj8Jta5eUupNHZjGAQUXQv8PVVYYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=i+dwIOA2; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,21 +37,21 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Rt9Yy6R8MPl+O9p7xSfuOwLgdGUHQrVEfhCC9Y5SaqU=; b=ZclpzZR87eO8oSI9PCC/xzcO/Q
-	4Wf4j71P2pGrb3AqlwoVYrLeUZF6RxH9FMHgdP9oBNpEE3RnXRcYJbZdGtU8oDa1DaPEJ8g3AEDD7
-	wyLBrSrm7/jDAzsVfq/7+Gzna6Dk77yKNATBgAOll6rV6EMut8mNIs3Vx81Mq0mREkyvZ+if+OLCQ
-	odb5RxfcoqBEYqO2ifMCij0CE+U1nPDARLXmZeF4deWupqUtfM1DPMxspMPOgWrynrTcUNS8D3Fih
-	QgmjlcDCDANkNfU34NwT+CUBm3qftjxQyCshORNGBwnoLgnDXvljXvycBilOhbs+SH6AXQwnBC+1N
-	1+8dFugA==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:41012 helo=rmk-PC.armlinux.org.uk)
+	bh=O+ZWjlAiVXaiMSqihZGqMuzI69Y869sPCzWPUrdL1jM=; b=i+dwIOA2KDyihbulA8F6anitXB
+	sfqlks2vOIC857Xg/6Kani+onWeW78iXcjgnIhgXQSUlUeVI0MQQqx5z1EnJ+lc4G04vku/hs8a8M
+	/eM4ZNa0yp7hn5k7zd57tBPVqaR6oNBXjzdnyv0RtzYQdOTrUbATuTbvAJVXO9Uied0JaFi90CsRP
+	Tan9z4iTsyv4hXIglxTNtPoE2gcr+75ChSM0DGVWOIG7arVDshxhVrAEd1VPSE1yj8k0yb+Qs5rN8
+	AJ/X42IWzEbR8BjHob4VktXGZNnucJdoz0PNHBE7Ya056I8v/pNdKNVHUiMISkuXPxgqR/OjGOSS9
+	MgmSFqfA==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:41016 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1ulXcQ-0003au-1g;
-	Mon, 11 Aug 2025 19:51:38 +0100
+	id 1ulXcW-0003bD-1Q;
+	Mon, 11 Aug 2025 19:51:44 +0100
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1ulXbh-008gql-LO; Mon, 11 Aug 2025 19:50:53 +0100
+	id 1ulXbm-008gqs-P9; Mon, 11 Aug 2025 19:50:58 +0100
 In-Reply-To: <aJo7kvoub5voHOUQ@shell.armlinux.org.uk>
 References: <aJo7kvoub5voHOUQ@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -70,7 +70,7 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
 	netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next 3/9] net: stmmac: platform: legacy hooks for
+Subject: [PATCH net-next 4/9] net: stmmac: intel: convert to
  suspend()/resume() methods
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -81,120 +81,126 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1ulXbh-008gql-LO@rmk-PC.armlinux.org.uk>
+Message-Id: <E1ulXbm-008gqs-P9@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Mon, 11 Aug 2025 19:50:53 +0100
+Date: Mon, 11 Aug 2025 19:50:58 +0100
 
-Add legacy hooks for the suspend() and resume() methods to forward
-these calls to the init() and exit() methods when the platform code
-hasn't populated the two former methods. This allows us to get rid
-of stmmac_pltfr_suspend() and stmmac_pltfr_resume().
+Convert intel to use the new suspend() and resume() methods rather
+than implementing these in custom wrappers around the main driver's
+suspend/resume methods. This allows this driver to use the stmmac
+simple PM ops structure.
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- .../ethernet/stmicro/stmmac/stmmac_platform.c | 68 ++++++-------------
- 1 file changed, 22 insertions(+), 46 deletions(-)
+ .../net/ethernet/stmicro/stmmac/dwmac-intel.c | 74 +++++++++----------
+ 1 file changed, 35 insertions(+), 39 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-index 21df052eeed0..c849676d98e8 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-@@ -811,6 +811,22 @@ static void stmmac_pltfr_exit(struct platform_device *pdev,
- 		plat->exit(pdev, plat->bsp_priv);
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+index ea33ae39be6b..3fac3945cbfa 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+@@ -1231,6 +1231,37 @@ static int stmmac_config_multi_msi(struct pci_dev *pdev,
+ 	return 0;
  }
  
-+static int stmmac_plat_suspend(struct device *dev, void *bsp_priv)
++static int intel_eth_pci_suspend(struct device *dev, void *bsp_priv)
 +{
-+	struct stmmac_priv *priv = netdev_priv(dev_get_drvdata(dev));
++	struct pci_dev *pdev = to_pci_dev(dev);
++	int ret;
 +
-+	stmmac_pltfr_exit(to_platform_device(dev), priv->plat);
++	ret = pci_save_state(pdev);
++	if (ret)
++		return ret;
++
++	pci_wake_from_d3(pdev, true);
++	pci_set_power_state(pdev, PCI_D3hot);
++	return 0;
++}
++
++static int intel_eth_pci_resume(struct device *dev, void *bsp_priv)
++{
++	struct pci_dev *pdev = to_pci_dev(dev);
++	int ret;
++
++	pci_restore_state(pdev);
++	pci_set_power_state(pdev, PCI_D0);
++
++	ret = pcim_enable_device(pdev);
++	if (ret)
++		return ret;
++
++	pci_set_master(pdev);
 +
 +	return 0;
 +}
 +
-+static int stmmac_plat_resume(struct device *dev, void *bsp_priv)
-+{
-+	struct stmmac_priv *priv = netdev_priv(dev_get_drvdata(dev));
-+
-+	return stmmac_pltfr_init(to_platform_device(dev), priv->plat);
-+}
-+
  /**
-  * stmmac_pltfr_probe
-  * @pdev: platform device pointer
-@@ -825,6 +841,11 @@ int stmmac_pltfr_probe(struct platform_device *pdev,
- {
- 	int ret;
+  * intel_eth_pci_probe
+  *
+@@ -1292,6 +1323,9 @@ static int intel_eth_pci_probe(struct pci_dev *pdev,
+ 	pci_set_master(pdev);
  
-+	if (!plat->suspend && plat->exit)
-+		plat->suspend = stmmac_plat_suspend;
-+	if (!plat->resume && plat->init)
-+		plat->resume = stmmac_plat_resume;
+ 	plat->bsp_priv = intel_priv;
++	plat->suspend = intel_eth_pci_suspend;
++	plat->resume = intel_eth_pci_resume;
 +
- 	ret = stmmac_pltfr_init(pdev, plat);
- 	if (ret)
- 		return ret;
-@@ -886,51 +907,6 @@ void stmmac_pltfr_remove(struct platform_device *pdev)
- }
- EXPORT_SYMBOL_GPL(stmmac_pltfr_remove);
+ 	intel_priv->mdio_adhoc_addr = INTEL_MGBE_ADHOC_ADDR;
+ 	intel_priv->crossts_adj = 1;
  
--/**
-- * stmmac_pltfr_suspend
-- * @dev: device pointer
-- * Description: this function is invoked when suspend the driver and it direcly
-- * call the main suspend function and then, if required, on some platform, it
-- * can call an exit helper.
-- */
--static int __maybe_unused stmmac_pltfr_suspend(struct device *dev)
+@@ -1355,44 +1389,6 @@ static void intel_eth_pci_remove(struct pci_dev *pdev)
+ 	clk_unregister_fixed_rate(priv->plat->stmmac_clk);
+ }
+ 
+-static int __maybe_unused intel_eth_pci_suspend(struct device *dev)
 -{
+-	struct pci_dev *pdev = to_pci_dev(dev);
 -	int ret;
--	struct net_device *ndev = dev_get_drvdata(dev);
--	struct stmmac_priv *priv = netdev_priv(ndev);
--	struct platform_device *pdev = to_platform_device(dev);
 -
 -	ret = stmmac_suspend(dev);
+-	if (ret)
+-		return ret;
 -
--	if (!priv->plat->suspend)
--		stmmac_pltfr_exit(pdev, priv->plat);
+-	ret = pci_save_state(pdev);
+-	if (ret)
+-		return ret;
 -
--	return ret;
+-	pci_wake_from_d3(pdev, true);
+-	pci_set_power_state(pdev, PCI_D3hot);
+-	return 0;
 -}
 -
--/**
-- * stmmac_pltfr_resume
-- * @dev: device pointer
-- * Description: this function is invoked when resume the driver before calling
-- * the main resume function, on some platforms, it can call own init helper
-- * if required.
-- */
--static int __maybe_unused stmmac_pltfr_resume(struct device *dev)
+-static int __maybe_unused intel_eth_pci_resume(struct device *dev)
 -{
--	struct net_device *ndev = dev_get_drvdata(dev);
--	struct stmmac_priv *priv = netdev_priv(ndev);
--	struct platform_device *pdev = to_platform_device(dev);
+-	struct pci_dev *pdev = to_pci_dev(dev);
 -	int ret;
 -
--	if (!priv->plat->resume) {
--		ret = stmmac_pltfr_init(pdev, priv->plat);
--		if (ret)
--			return ret;
--	}
+-	pci_restore_state(pdev);
+-	pci_set_power_state(pdev, PCI_D0);
+-
+-	ret = pcim_enable_device(pdev);
+-	if (ret)
+-		return ret;
+-
+-	pci_set_master(pdev);
 -
 -	return stmmac_resume(dev);
 -}
 -
- static int __maybe_unused stmmac_runtime_suspend(struct device *dev)
- {
- 	struct net_device *ndev = dev_get_drvdata(dev);
-@@ -998,7 +974,7 @@ static int __maybe_unused stmmac_pltfr_noirq_resume(struct device *dev)
- }
- 
- const struct dev_pm_ops stmmac_pltfr_pm_ops = {
--	SET_SYSTEM_SLEEP_PM_OPS(stmmac_pltfr_suspend, stmmac_pltfr_resume)
-+	SET_SYSTEM_SLEEP_PM_OPS(stmmac_suspend, stmmac_resume)
- 	SET_RUNTIME_PM_OPS(stmmac_runtime_suspend, stmmac_runtime_resume, NULL)
- 	SET_NOIRQ_SYSTEM_SLEEP_PM_OPS(stmmac_pltfr_noirq_suspend, stmmac_pltfr_noirq_resume)
+-static SIMPLE_DEV_PM_OPS(intel_eth_pm_ops, intel_eth_pci_suspend,
+-			 intel_eth_pci_resume);
+-
+ #define PCI_DEVICE_ID_INTEL_QUARK		0x0937
+ #define PCI_DEVICE_ID_INTEL_EHL_RGMII1G		0x4b30
+ #define PCI_DEVICE_ID_INTEL_EHL_SGMII1G		0x4b31
+@@ -1442,7 +1438,7 @@ static struct pci_driver intel_eth_pci_driver = {
+ 	.probe = intel_eth_pci_probe,
+ 	.remove = intel_eth_pci_remove,
+ 	.driver         = {
+-		.pm     = &intel_eth_pm_ops,
++		.pm     = &stmmac_simple_pm_ops,
+ 	},
  };
+ 
 -- 
 2.30.2
 
