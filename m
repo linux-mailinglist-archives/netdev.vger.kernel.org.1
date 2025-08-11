@@ -1,229 +1,239 @@
-Return-Path: <netdev+bounces-212633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B49CB217E8
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 00:04:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F717B217EF
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 00:09:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 145987A4983
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 22:03:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06DD0623432
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 22:09:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64A2C27D771;
-	Mon, 11 Aug 2025 22:04:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E7382D47F3;
+	Mon, 11 Aug 2025 22:09:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="M4iS+utp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wpx4K9bg"
 X-Original-To: netdev@vger.kernel.org
-Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3FBB1EF0A6;
-	Mon, 11 Aug 2025 22:04:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3C361F5619;
+	Mon, 11 Aug 2025 22:09:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754949889; cv=none; b=iUEDMKYcDSJhYoDCG9MOIu0955ZZbtNtNM5WK4dN2Fz5iyErAlMpHo//7Rbwk7oEDxYTOVrajOacy75QLrxvz+d+H3ej/uKpUTXcJ2IDf25ql1U3PXAvT+6VFbnvsNQ8Zypr/F0MrLWsj7YJHRs4XgoHHmspPR5GjhcMZbksWbc=
+	t=1754950143; cv=none; b=H251hQ/919A9FSVjuE9ZoW063fVqeTqAvoKKZ76GV5kBH/Gg19ND7MIL9DX0fVTlc+5LfizOaWsaMLP4G8bkIadzNtz2dqJHcfJ3g4lGpaHVR2O1/QPmF+2mhmrZpc59EuC+uAPPTz5neb6WvJ9gsstQsE1+iWG/oudk9vCZ1Os=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754949889; c=relaxed/simple;
-	bh=qxH/vUlWNOPD+oS7i4N7nf5PewbWQYYpSRYIIS0+nro=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Q9L4fXWdLC3QYwyM58X43XuPPDxQGMnlapGoUXRwSC/Y6pyzPUWXiGe2Spa+LVkbVfUK1GmeEkkq04MeNnHQp4UmwEx63JQ/w3bgR3ww651pYr0LEEYB4BG6w1ahDxmUzRUhYn/atKoe2i6gS8d2ooPQDyM527sIsNB9MYpyCkg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=M4iS+utp; arc=none smtp.client-ip=129.217.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
-Received: from simon-Latitude-5450.. (tmo-072-64.customers.d1-online.com [80.187.72.64])
-	(authenticated bits=0)
-	by unimail.uni-dortmund.de (8.18.1.10/8.18.1.10) with ESMTPSA id 57BM4dre019850
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Tue, 12 Aug 2025 00:04:40 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
-	s=unimail; t=1754949881;
-	bh=qxH/vUlWNOPD+oS7i4N7nf5PewbWQYYpSRYIIS0+nro=;
-	h=From:To:Cc:Subject:Date;
-	b=M4iS+utpvMKRprFS897/nIpqmPhimUh5UlmDeWV2cmcxkgMIQdNNfvVo/T8P2iZVv
-	 9SlwnRcaJHb2sd8dlK/EP6MGlt1kVACpzbtR92b8hBuERDTFyOAnP20ajkGlbw5IgE
-	 ah1VsoRgkIve6SIXvEH4coa+U0QLuqIxVtDjvFuw=
-From: Simon Schippers <simon.schippers@tu-dortmund.de>
-To: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Simon Schippers <simon.schippers@tu-dortmund.de>,
-        Tim Gebauer <tim.gebauer@tu-dortmund.de>
-Subject: [PATCH net v2] TUN/TAP: Improving throughput and latency by avoiding SKB drops
-Date: Tue, 12 Aug 2025 00:03:48 +0200
-Message-ID: <20250811220430.14063-1-simon.schippers@tu-dortmund.de>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1754950143; c=relaxed/simple;
+	bh=M7cUkVfwO6dwDnPkJ75gnTs0rb6wS07K0cZjufFCAdk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WEwpFleMg3iWgdN/8JjQqHXqXjsEoBTkxdWD3Znt1+2Ftr9BkR3WmhbKDvRKY4ooWrm1SLIcJOjpy99mAk6oaQMiXXuNLa47HFvTtPDa9nVZDdfn2wUAxrkig+O+a2R+erlZy2AGIsW+fjxkZlINH5Fk7fCcKethrBUbQ2riQR0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wpx4K9bg; arc=none smtp.client-ip=209.85.215.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-b4209a0d426so4850190a12.1;
+        Mon, 11 Aug 2025 15:09:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1754950141; x=1755554941; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=V2S9pg8v7o5mRJiQVZf8V1Ym4Pi/3TRmsQa27GUDL3g=;
+        b=Wpx4K9bgJ04rCtq1YE3Ltv5s0SGyELu2TeNUqrK1pflfJKd79lg6pNuelcaNy5k2pi
+         /9scqSUxoHr3PT0uo2N+qGI/hrqe+tIevMVQMCARN1vXOAWgvrVdEbahmH3TrvdmUPOj
+         xXBBFXO8j0jNKJq+p2k03vrsxElQ6RxFBPeQy4SC0Gy1CeDXkose2rpC4vtVtHzG53Vc
+         irXShyIhIK+ho2tTUT5E6Zo914VqA4N506+qZI0QCcMqAc5JblmrJ1Ti3WarZ0FPDr+6
+         zAjxzq+axEuNPA2W9kSzVamCsYUq4ace4yi+xDraUoJ65/kuqPF/oahbVgp0q7IM+8pP
+         9Snw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754950141; x=1755554941;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=V2S9pg8v7o5mRJiQVZf8V1Ym4Pi/3TRmsQa27GUDL3g=;
+        b=Y37txZawRUJfNweKxUCMMOIC0dMjg2jnlsdp7TKIljf/XOF/o6Y8gEcOK2ePEj6azL
+         hXfFc9eEs/TUwkb5yww4bCkbF60Sf6SjzeCwAgRxNCexFY5rLCKOKRsX23mwRuEQc2IH
+         j8kdbu5ZZ0XcXeT258hwQfIpmuV9zdF8bLhnz2eyvKApbhjZFkEnCatEGk3T8hFgc9PN
+         g7Q+Vj8alkaPJJ/24C9IoGyQhTh96kFQWqxXVeajg+MEMmrtw6nzENtTn86nLgf/8LUx
+         o/QadEa0LG1u6rBigmujdyU9ulOYdtZ2GeEg24Iti9bnGSwto3vrnIZngC//Qh9Jx1Z6
+         vnmw==
+X-Forwarded-Encrypted: i=1; AJvYcCUdmM1C6/OKbHlKlEePLnhLeyX07mk0QRKs0SogL6cgrfRoWfcUSnHyp010IVxbkWgU+s8R/Y1Itl3OI8sw@vger.kernel.org, AJvYcCW3Wg/GhxFEtbR+XrZya18fiETwxplx15bLxWST92GwzJWVPmx/o/dNWgf9NnFikiV2VBNJtcLEsmvS@vger.kernel.org, AJvYcCWTp0e1G5rnXYvd4iN6WRdPbL6Fy3uheDFk5J+brp2ow/l5zOsvXUKo6CzMN3XtOkKVjgMOERSP@vger.kernel.org
+X-Gm-Message-State: AOJu0YxT9filGkl7O5ScZ8h7BTHLvDpKPzp3APLaiM+EzrJ+b39gJoXn
+	7QR61ppcuaGg1e55GYIlydsIph++Wsy9rtCWF0pTGBW0sLJcIEiIrHEo
+X-Gm-Gg: ASbGncuWz7DYsQ94NqjT/mVV8FyvJXF++/L36Yp4QxtiuorgEwAb77tKc/3EJsfdyLL
+	n1EyRKtCKWL5YyaEBC3zcMAYxobow9e44u3jUrQc4fufspten/cFM6TE6qN21AArVjDIyrQwN3U
+	Psq4t1WwJkI5QyJZRTlu22DEOW1VcViGISziB3DH1HiFOkCaoTCTkGA9NdZSlXPg/9xZeTdzA1W
+	XuJOvxVYMj1C4cI0Gte2VK0aOCe/4hha4/Pkgzt/I+FWWSzFQbYhcrZzrhaVaG0qAh3L66yg2wp
+	24cyqeTmh3xKHlyjCdCWT3hQH+YuQNJT7I1xdqgF6tdaqtAm2WMXFDOwVY9+nu7niPithFW0jcR
+	dND/wapsJLpAKR/ZI94uAYAc=
+X-Google-Smtp-Source: AGHT+IGjkztYScAcNXEfSr8JOnz9DlNlrKELtIRHl6YJzC7lSocRypsK4PSlrP90iF5xHUH1+s+GWA==
+X-Received: by 2002:a17:902:e5ce:b0:235:e9fe:83c0 with SMTP id d9443c01a7336-242fc316eb5mr15774605ad.27.1754950141143;
+        Mon, 11 Aug 2025 15:09:01 -0700 (PDT)
+Received: from google.com ([2620:15c:9d:2:7933:7499:67d8:279a])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-76bd6aacc4fsm26535676b3a.118.2025.08.11.15.09.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Aug 2025 15:09:00 -0700 (PDT)
+Date: Mon, 11 Aug 2025 15:08:58 -0700
+From: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: Bartosz Golaszewski <brgl@bgdev.pl>, 
+	Linus Walleij <linus.walleij@linaro.org>, linux-gpio@vger.kernel.org, 
+	Krzysztof Kozlowski <krzk@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
+	Sumanth Gavini <sumanth.gavini@yahoo.com>, Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 18/21] nfc: s3fwrn5: convert to gpio descriptors
+Message-ID: <bkvnzaipmkiz7lkh5p35pqmdtlcwnm5j5snyc7g5umfxm3io6j@dqhetenn2zm2>
+References: <20250808151822.536879-1-arnd@kernel.org>
+ <20250808151822.536879-19-arnd@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250808151822.536879-19-arnd@kernel.org>
 
-This patch is the result of our paper with the title "The NODROP Patch:
-Hardening Secure Networking for Real-time Teleoperation by Preventing
-Packet Drops in the Linux TUN Driver" [1].
-It deals with the tun_net_xmit function which drops SKB's with the reason
-SKB_DROP_REASON_FULL_RING whenever the tx_ring (TUN queue) is full,
-resulting in reduced TCP performance and packet loss for bursty video
-streams when used over VPN's.
+Hi Arnd,
 
-The abstract reads as follows:
-"Throughput-critical teleoperation requires robust and low-latency
-communication to ensure safety and performance. Often, these kinds of
-applications are implemented in Linux-based operating systems and transmit
-over virtual private networks, which ensure encryption and ease of use by
-providing a dedicated tunneling interface (TUN) to user space
-applications. In this work, we identified a specific behavior in the Linux
-TUN driver, which results in significant performance degradation due to
-the sender stack silently dropping packets. This design issue drastically
-impacts real-time video streaming, inducing up to 29 % packet loss with
-noticeable video artifacts when the internal queue of the TUN driver is
-reduced to 25 packets to minimize latency. Furthermore, a small queue
-length also drastically reduces the throughput of TCP traffic due to many
-retransmissions. Instead, with our open-source NODROP Patch, we propose
-generating backpressure in case of burst traffic or network congestion.
-The patch effectively addresses the packet-dropping behavior, hardening
-real-time video streaming and improving TCP throughput by 36 % in high
-latency scenarios."
+On Fri, Aug 08, 2025 at 05:18:02PM +0200, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
+> 
+> There is no need for this driver to still use the legacy interfaces,
+> so convert all the legacy calls into their modern equivalents.
+> 
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>  drivers/nfc/s3fwrn5/i2c.c        | 42 +++++++++-----------------------
+>  drivers/nfc/s3fwrn5/phy_common.c | 12 ++++-----
+>  drivers/nfc/s3fwrn5/phy_common.h |  4 +--
+>  drivers/nfc/s3fwrn5/uart.c       | 30 ++++++-----------------
+>  4 files changed, 28 insertions(+), 60 deletions(-)
+> 
+> diff --git a/drivers/nfc/s3fwrn5/i2c.c b/drivers/nfc/s3fwrn5/i2c.c
+> index 110d086cfe5b..411be709b397 100644
+> --- a/drivers/nfc/s3fwrn5/i2c.c
+> +++ b/drivers/nfc/s3fwrn5/i2c.c
+> @@ -8,7 +8,7 @@
+>  
+>  #include <linux/clk.h>
+>  #include <linux/i2c.h>
+> -#include <linux/gpio.h>
+> +#include <linux/gpio/consumer.h>
+>  #include <linux/delay.h>
+>  #include <linux/of_gpio.h>
+>  #include <linux/of_irq.h>
+> @@ -149,29 +149,22 @@ static irqreturn_t s3fwrn5_i2c_irq_thread_fn(int irq, void *phy_id)
+>  static int s3fwrn5_i2c_parse_dt(struct i2c_client *client)
+>  {
+>  	struct s3fwrn5_i2c_phy *phy = i2c_get_clientdata(client);
+> -	struct device_node *np = client->dev.of_node;
+> +	struct device *dev = &client->dev;
+>  
+> -	if (!np)
+> -		return -ENODEV;
+> -
+> -	phy->common.gpio_en = of_get_named_gpio(np, "en-gpios", 0);
+> -	if (!gpio_is_valid(phy->common.gpio_en)) {
+> +	phy->common.gpio_en = devm_gpiod_get(dev, "en", GPIOD_OUT_HIGH);
+> +	if (IS_ERR(phy->common.gpio_en)) {
+>  		/* Support also deprecated property */
+> -		phy->common.gpio_en = of_get_named_gpio(np,
+> -							"s3fwrn5,en-gpios",
+> -							0);
+> -		if (!gpio_is_valid(phy->common.gpio_en))
+> -			return -ENODEV;
+> +		phy->common.gpio_en = devm_gpiod_get(dev, "s3fwrn5,en", GPIOD_OUT_HIGH);
+> +		if (IS_ERR(phy->common.gpio_en))
+> +			return PTR_ERR(phy->common.gpio_en);
+>  	}
 
-In addition to the mentioned performance and latency improvements for VPN
-applications, this patch also allows the proper usage of qdisc's. For
-example a fq_codel can not control the queuing delay when packets are
-already dropped in the TUN driver. This issue is also described in [2].
+Should be GPIOD_OUT_LOW or ASIS.
 
-The performance evaluation of the paper (see Fig. 4) showed a 4%
-performance hit for a single queue TUN with the default TUN queue size of
-500 packets. However it is important to notice that with the proposed
-patch no packet drop ever occurred even with a TUN queue size of 1 packet.
-The utilized validation pipeline is available under [3].
+>  
+> -	phy->common.gpio_fw_wake = of_get_named_gpio(np, "wake-gpios", 0);
+> -	if (!gpio_is_valid(phy->common.gpio_fw_wake)) {
+> +	phy->common.gpio_fw_wake = devm_gpiod_get(dev, "wake", GPIOD_OUT_LOW);
+> +	if (IS_ERR(phy->common.gpio_fw_wake)) {
+>  		/* Support also deprecated property */
+> -		phy->common.gpio_fw_wake = of_get_named_gpio(np,
+> -							     "s3fwrn5,fw-gpios",
+> -							     0);
+> -		if (!gpio_is_valid(phy->common.gpio_fw_wake))
+> -			return -ENODEV;
+> +		phy->common.gpio_fw_wake = devm_gpiod_get(dev, "s3fwrn5,fw", GPIOD_OUT_LOW);
+> +		if (IS_ERR(phy->common.gpio_fw_wake))
+> +			return PTR_ERR(phy->common.gpio_en);
+>  	}
+>  
+>  	return 0;
+> @@ -197,17 +190,6 @@ static int s3fwrn5_i2c_probe(struct i2c_client *client)
+>  	if (ret < 0)
+>  		return ret;
+>  
+> -	ret = devm_gpio_request_one(&phy->i2c_dev->dev, phy->common.gpio_en,
+> -				    GPIOF_OUT_INIT_HIGH, "s3fwrn5_en");
+> -	if (ret < 0)
+> -		return ret;
+> -
+> -	ret = devm_gpio_request_one(&phy->i2c_dev->dev,
+> -				    phy->common.gpio_fw_wake,
+> -				    GPIOF_OUT_INIT_LOW, "s3fwrn5_fw_wake");
+> -	if (ret < 0)
+> -		return ret;
+> -
+>  	/*
+>  	 * S3FWRN5 depends on a clock input ("XI" pin) to function properly.
+>  	 * Depending on the hardware configuration this could be an always-on
+> diff --git a/drivers/nfc/s3fwrn5/phy_common.c b/drivers/nfc/s3fwrn5/phy_common.c
+> index deb2c039f0fd..e802b4e609c8 100644
+> --- a/drivers/nfc/s3fwrn5/phy_common.c
+> +++ b/drivers/nfc/s3fwrn5/phy_common.c
+> @@ -8,7 +8,7 @@
+>   * Bongsu Jeon <bongsu.jeon@samsung.com>
+>   */
+>  
+> -#include <linux/gpio.h>
+> +#include <linux/gpio/consumer.h>
+>  #include <linux/delay.h>
+>  #include <linux/module.h>
+>  
+> @@ -19,7 +19,7 @@ void s3fwrn5_phy_set_wake(void *phy_id, bool wake)
+>  	struct phy_common *phy = phy_id;
+>  
+>  	mutex_lock(&phy->mutex);
+> -	gpio_set_value(phy->gpio_fw_wake, wake);
+> +	gpiod_set_value(phy->gpio_fw_wake, wake);
+>  	if (wake)
+>  		msleep(S3FWRN5_EN_WAIT_TIME);
+>  	mutex_unlock(&phy->mutex);
+> @@ -33,14 +33,14 @@ bool s3fwrn5_phy_power_ctrl(struct phy_common *phy, enum s3fwrn5_mode mode)
+>  
+>  	phy->mode = mode;
+>  
+> -	gpio_set_value(phy->gpio_en, 1);
+> -	gpio_set_value(phy->gpio_fw_wake, 0);
+> +	gpiod_set_value(phy->gpio_en, 1);
+> +	gpiod_set_value(phy->gpio_fw_wake, 0);
+>  	if (mode == S3FWRN5_MODE_FW)
+> -		gpio_set_value(phy->gpio_fw_wake, 1);
+> +		gpiod_set_value(phy->gpio_fw_wake, 1);
+>  
+>  	if (mode != S3FWRN5_MODE_COLD) {
+>  		msleep(S3FWRN5_EN_WAIT_TIME);
+> -		gpio_set_value(phy->gpio_en, 0);
+> +		gpiod_set_value(phy->gpio_en, 0);
+>  		msleep(S3FWRN5_EN_WAIT_TIME);
 
-As the reduction of the TUN queue to a size of down to 5 packets showed no
-further performance hit in the paper, a reduction of the default TUN queue
-size might be desirable accompanying this patch. A reduction would
-obviously reduce buffer bloat and memory requirements.
+The GPIO is describe as "active low" in DTS:
 
-Implementation details:
-- The netdev queue start/stop flow control is utilized.
-- Compatible with multi-queue by only stopping/waking the specific
-netdevice subqueue.
-- No additional locking is used.
+arch/arm64/boot/dts/exynos/exynos5433-tm2-common.dtsi
 
-In the tun_net_xmit function:
-- Stopping the subqueue is done when the tx_ring gets full after inserting
-the SKB into the tx_ring.
-- In the unlikely case when the insertion with ptr_ring_produce fails, the
-old dropping behavior is used for this SKB.
+So here you are leaving the chip disabled. You need to use logical
+polarity.
 
-In the tun_ring_recv function:
-- Waking the subqueue is done after consuming a SKB from the tx_ring when
-the tx_ring is empty. Waking the subqueue when the tx_ring has any
-available space, so when it is not full, showed crashes in our testing. We
-are open to suggestions.
-- When the tx_ring is configured to be small (for example to hold 1 SKB),
-queuing might be stopped in the tun_net_xmit function while at the same
-time, ptr_ring_consume is not able to grab a SKB. This prevents
-tun_net_xmit from being called again and causes tun_ring_recv to wait
-indefinitely for a SKB in the blocking wait queue. Therefore, the netdev
-queue is woken in the wait queue if it has stopped.
-- Because the tun_struct is required to get the tx_queue into the new txq
-pointer, the tun_struct is passed in tun_do_read aswell. This is likely
-faster then trying to get it via the tun_file tfile because it utilizes a
-rcu lock.
+Thanks.
 
-We are open to suggestions regarding the implementation :)
-Thank you for your work!
-
-[1] Link:
-https://cni.etit.tu-dortmund.de/storages/cni-etit/r/Research/Publications/2025/Gebauer_2025_VTCFall/Gebauer_VTCFall2025_AuthorsVersion.pdf
-[2] Link:
-https://unix.stackexchange.com/questions/762935/traffic-shaping-ineffective-on-tun-device
-[3] Link: https://github.com/tudo-cni/nodrop
-
-Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
-Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
-Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
----
-V1 -> V2: Removed NETDEV_TX_BUSY return case in tun_net_xmit and removed 
-unnecessary netif_tx_wake_queue in tun_ring_recv.
-
- drivers/net/tun.c | 21 +++++++++++++++++----
- 1 file changed, 17 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-index cc6c50180663..81abdd3f9aca 100644
---- a/drivers/net/tun.c
-+++ b/drivers/net/tun.c
-@@ -1060,13 +1060,16 @@ static netdev_tx_t tun_net_xmit(struct sk_buff *skb, struct net_device *dev)
- 
- 	nf_reset_ct(skb);
- 
--	if (ptr_ring_produce(&tfile->tx_ring, skb)) {
-+	queue = netdev_get_tx_queue(dev, txq);
-+	if (unlikely(ptr_ring_produce(&tfile->tx_ring, skb))) {
-+		netif_tx_stop_queue(queue);
- 		drop_reason = SKB_DROP_REASON_FULL_RING;
- 		goto drop;
- 	}
-+	if (ptr_ring_full(&tfile->tx_ring))
-+		netif_tx_stop_queue(queue);
- 
- 	/* dev->lltx requires to do our own update of trans_start */
--	queue = netdev_get_tx_queue(dev, txq);
- 	txq_trans_cond_update(queue);
- 
- 	/* Notify and wake up reader process */
-@@ -2110,9 +2113,10 @@ static ssize_t tun_put_user(struct tun_struct *tun,
- 	return total;
- }
- 
--static void *tun_ring_recv(struct tun_file *tfile, int noblock, int *err)
-+static void *tun_ring_recv(struct tun_struct *tun, struct tun_file *tfile, int noblock, int *err)
- {
- 	DECLARE_WAITQUEUE(wait, current);
-+	struct netdev_queue *txq;
- 	void *ptr = NULL;
- 	int error = 0;
- 
-@@ -2124,6 +2128,7 @@ static void *tun_ring_recv(struct tun_file *tfile, int noblock, int *err)
- 		goto out;
- 	}
- 
-+	txq = netdev_get_tx_queue(tun->dev, tfile->queue_index);
- 	add_wait_queue(&tfile->socket.wq.wait, &wait);
- 
- 	while (1) {
-@@ -2131,6 +2136,10 @@ static void *tun_ring_recv(struct tun_file *tfile, int noblock, int *err)
- 		ptr = ptr_ring_consume(&tfile->tx_ring);
- 		if (ptr)
- 			break;
-+
-+		if (unlikely(netif_tx_queue_stopped(txq)))
-+			netif_tx_wake_queue(txq);
-+
- 		if (signal_pending(current)) {
- 			error = -ERESTARTSYS;
- 			break;
-@@ -2147,6 +2156,10 @@ static void *tun_ring_recv(struct tun_file *tfile, int noblock, int *err)
- 	remove_wait_queue(&tfile->socket.wq.wait, &wait);
- 
- out:
-+	if (ptr_ring_empty(&tfile->tx_ring)) {
-+		txq = netdev_get_tx_queue(tun->dev, tfile->queue_index);
-+		netif_tx_wake_queue(txq);
-+	}
- 	*err = error;
- 	return ptr;
- }
-@@ -2165,7 +2178,7 @@ static ssize_t tun_do_read(struct tun_struct *tun, struct tun_file *tfile,
- 
- 	if (!ptr) {
- 		/* Read frames from ring */
--		ptr = tun_ring_recv(tfile, noblock, &err);
-+		ptr = tun_ring_recv(tun, tfile, noblock, &err);
- 		if (!ptr)
- 			return err;
- 	}
 -- 
-2.43.0
-
+Dmitry
 
