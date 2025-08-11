@@ -1,267 +1,203 @@
-Return-Path: <netdev+bounces-212606-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212608-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EC3DB216F5
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 23:07:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60A22B2170F
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 23:09:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1FA881A245AF
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 21:07:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 768EF680E81
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 21:08:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9F482E427B;
-	Mon, 11 Aug 2025 21:06:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDDF12E2EEE;
+	Mon, 11 Aug 2025 21:08:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=esdhannover.onmicrosoft.com header.i=@esdhannover.onmicrosoft.com header.b="aUEDuqog"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="ZqyuVnWE"
 X-Original-To: netdev@vger.kernel.org
-Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11021098.outbound.protection.outlook.com [52.101.70.98])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BCC62E3718;
-	Mon, 11 Aug 2025 21:06:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.98
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754946380; cv=fail; b=uNxXTl1YFJsJ1g+xCbsyi8era2p4l8TwD+7UxuNQc52VxKkj0qCktxErOvdFeix3ocQc3NIjpow2Ze1jzO/5UMv0f4Olf+xqNRo6Q83xZ3AvFgPxnD5+KRLk14ZXM0RbzI9V6QGqsy7ctA22Rw5LYfhQTiMz568wZ2EKzpEWR+o=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754946380; c=relaxed/simple;
-	bh=Lnt+AzbuehWYqItoiXEoLVVnU4T0ynEwM5PNItkuLFA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HQfIO0SA6AQrMvjKAYbn0ozUEE4HfZ6oQkPzMFc+8wV6OEhibHJhaWrkyn6dpHpcuNG5GB30vHRHUBQd3dk9gfiz3xsqtnFrD7w8QPqOO697BSg3ibeSmBu/NRHmFEhPLQGcZRegjYJvuVxrAZrBn4+Ner3bUmqFUCkKOxxsVe8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=esd.eu; spf=pass smtp.mailfrom=esd.eu; dkim=pass (1024-bit key) header.d=esdhannover.onmicrosoft.com header.i=@esdhannover.onmicrosoft.com header.b=aUEDuqog; arc=fail smtp.client-ip=52.101.70.98
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=esd.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=esd.eu
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=m0NjoIkScKIU+Vc5x/T2eo/oCh2c7YtJoS31d+dx4C2IN1ZBT1Lz0wYDph0gjc/k5WgThwtkQfO+mytnA9GNDN0CGm/DsOyEd2rtWey2UZBhvZ8mvlWh7yR5heQExcsLITJYqL4S65ziJAnvLFCGhWF4QNrczTBmmtXoEWImDQCaUKoQqOsiNOigpkb/gHj/IT3p26dGRPNuW/2/pgYMdr4qy/LauLh1mQb6Hy+oIXYfSaLjIppehnbFQZI22ESUCpGTwGOthT6GTcJaPNuKDc5kmZTF13hkQRgnjjIclKYht7uZR8AHYox4+Tuk6M8YUbIUttbDSj1YmqPDromJWw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vt5Id6YLdp8N4cOxMqXPHaub+VuzeAbm/DuNkdL3cBo=;
- b=HPMHLr0qxXYj5kWQwJJgm1x93khRlOOMHHrN90CqhbmLckFzF3EA+JLxFubJDeVrg75RNOagcDoDRK2dtSI49zR+AgnLH7OaAkCUvXGA4QLyEuZRSr+h+g1YMayO3kNcOsMGaBVODaP03hVIr9vvjFfF6mHECt0QQumcOdIIJB1VqOiuHOE9C0vCEz5sIWQH4aA8ECyF0VM7QXjYxAj62Hr+GkUMDLTqn7eyWrZgD/qPzdmN9jJEMTVeUydQK1rWvBuURALPDHgLnQaXf69nD657crzrwemkm0EDwrPrqeaOu6YXuwY5ll2dEOnnAJmR6StsqTKQ7e3nRZ0XitxG8Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=softfail (sender ip
- is 80.151.164.27) smtp.rcpttodomain=esd.eu smtp.mailfrom=esd.eu; dmarc=fail
- (p=none sp=none pct=100) action=none header.from=esd.eu; dkim=none (message
- not signed); arc=none (0)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27F582E2EE4
+	for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 21:08:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1754946488; cv=none; b=bkp6lypeH/FT3HPe+Amz5gS+jhWoBlbH5BzVLtmoHxspZL0Xc8dgR+8mEd6Cr31Ax9VphUp9fHmWsdPJZiFjMDOOWm4vRx2anvqQLgmzxZC/H4E01gkyxlrvOVjsh0HWsXcfnZ4chewRfrzOP45ikG8b6ONwNZOjfjuehfIesE4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1754946488; c=relaxed/simple;
+	bh=HA5GVypJ4ScykSXNFFxS5BkGihwWrZk/jfU+oeSmaIo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=vDJPXXt2w5zecNF5z6EyUNoFOygzX0t2d8IdPRLvJseF7D52Ij5gzrRdKXTOz5rLdJTK6QC0O4mANqHBo2epkW+Z/iiGf6dVNJPovpZO7HtSUvz2fPhNXVw9DIqMIbtRC3tYGb92XCU9y2my8ws7xl3pgu7VjMNiTWFTsTIKm0U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=ZqyuVnWE; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-6155e75a9acso7568142a12.0
+        for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 14:08:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=esdhannover.onmicrosoft.com; s=selector1-esdhannover-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vt5Id6YLdp8N4cOxMqXPHaub+VuzeAbm/DuNkdL3cBo=;
- b=aUEDuqoglQvM4XxI+Ko2qLHUwY+8sUEM82ibZe3h/ej61b6pfpD/+xAD8XDNxMSIB880utGcxidJWrwVorHDxCuCNZjbCz5G6PcbzuZeDBoe9QRJrA2IaQoP7XMceJ4eDZuVVVaeRdsR9hUVE+uChEUN35Rw4ukF0EBmBkOMsb8=
-Received: from PR1P264CA0201.FRAP264.PROD.OUTLOOK.COM (2603:10a6:102:34d::12)
- by GV1PR03MB10702.eurprd03.prod.outlook.com (2603:10a6:150:207::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9009.21; Mon, 11 Aug
- 2025 21:06:13 +0000
-Received: from AM3PEPF0000A791.eurprd04.prod.outlook.com
- (2603:10a6:102:34d:cafe::cb) by PR1P264CA0201.outlook.office365.com
- (2603:10a6:102:34d::12) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9009.22 via Frontend Transport; Mon,
- 11 Aug 2025 21:06:12 +0000
-X-MS-Exchange-Authentication-Results: spf=softfail (sender IP is
- 80.151.164.27) smtp.mailfrom=esd.eu; dkim=none (message not signed)
- header.d=none;dmarc=fail action=none header.from=esd.eu;
-Received-SPF: SoftFail (protection.outlook.com: domain of transitioning esd.eu
- discourages use of 80.151.164.27 as permitted sender)
-Received: from esd-s7.esd (80.151.164.27) by
- AM3PEPF0000A791.mail.protection.outlook.com (10.167.16.120) with Microsoft
- SMTP Server id 15.20.9031.11 via Frontend Transport; Mon, 11 Aug 2025
- 21:06:12 +0000
-Received: from debby.esd.local (jenkins.esd.local [10.0.0.190])
-	by esd-s7.esd (Postfix) with ESMTPS id 05BD67C16CF;
-	Mon, 11 Aug 2025 23:06:12 +0200 (CEST)
-Received: by debby.esd.local (Postfix, from userid 2044)
-	id 01B7B2EC3E2; Mon, 11 Aug 2025 23:06:11 +0200 (CEST)
-From: =?UTF-8?q?Stefan=20M=C3=A4tje?= <stefan.maetje@esd.eu>
-To: Marc Kleine-Budde <mkl@pengutronix.de>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	Frank Jungclaus <frank.jungclaus@esd.eu>,
-	linux-can@vger.kernel.org,
-	socketcan@esd.eu
-Cc: Simon Horman <horms@kernel.org>,
-	Olivier Sobrie <olivier@sobrie.be>,
-	Oliver Hartkopp <socketcan@hartkopp.net>,
-	netdev@vger.kernel.org
-Subject: [PATCH 6/6] can: esd_usb: Avoid errors triggered from USB disconnect
-Date: Mon, 11 Aug 2025 23:06:11 +0200
-Message-Id: <20250811210611.3233202-7-stefan.maetje@esd.eu>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20250811210611.3233202-1-stefan.maetje@esd.eu>
-References: <20250811210611.3233202-1-stefan.maetje@esd.eu>
+        d=broadcom.com; s=google; t=1754946485; x=1755551285; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=vIWcwn97b7lWHcLZyXbCllvFOaOg7s4x3kZrm6zU4Ic=;
+        b=ZqyuVnWEeflknBwnZMzfUYaHb/YOwJPFJ0TYc4ssEsIaF4dH/2oG99QXAVGmn1Z4qF
+         iaTRgRMT7GP+ayjV0hxNe9c4my8i1tQ2rgHApbzQ4Yc3Hkaq/yXEBNZH6ft3TPg9piD6
+         Brf5g8Fx0WT7mXceYzjLaFg3ChgqKwYShqwzc=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754946485; x=1755551285;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vIWcwn97b7lWHcLZyXbCllvFOaOg7s4x3kZrm6zU4Ic=;
+        b=UWaZmfgVwKx9cjg4iE79bMi3hB5SiwxAbGQg2a379u1D3gkPKIC/ajhFdoetEtWW1f
+         kUV/nGhT9/zhrIn0ZAdng8uve5Z8h68a2t//NEoUJouPRX4y38OwhnsN5wbvKI/wPoU0
+         8fqi9hm0QJQmkB10/vm5GSwf/QH+XFEFt0P8Z/dZe5emVsRUpqTxuAfBD95QstBJDcxt
+         IJyjG18Luktzk76CjheaOKeJKNR6xba4pLoU1+kImt4AF4w7SLliSJIXBDxn5Jfk2sdO
+         nWVae5anllGtdJr0/T8HxASSnCfqylIG2e8ibmiz1Av3jF87u+aN2ej9HbN908ha5/Uj
+         27Rw==
+X-Gm-Message-State: AOJu0YxAOWuRIlpsMtqOxA35x6zLcE0f0tblHhrx/NrWYcrahg99Cbsw
+	nyTnAb64FccMb2YT6rJTnK/Hhbb1Hh+4PtJ/Ig6+ebDHdHaPmaD9TlkATcdUC1S7G1J8kPvA42b
+	oJrFUFjstrPO4zBMB3ehevT4bsza8sskBT+CbI6Hx
+X-Gm-Gg: ASbGncuh4FyGGCpvWdOJfDT5AeM5wA25sNTeh185hcIcy3aRmKylHCWig0xl7KeswDa
+	LrSO3KiBTl0DVY5dvag2m7NrcehAweZ8HyY7UovL+be5IxY40etLpRZJqquICplf0Zk9b8BstcS
+	5OT1Un1oeqExfXcsdAextgcFlWFYioxK3ow6JsdTmw9r3jp0tMSqLxy3cGoC+sP06BFeBhZTy9h
+	a4C5/T+
+X-Google-Smtp-Source: AGHT+IGSizuJi11OTIFONuEgTUoI2/ERWdyjOb+VX6Gu2IEPYn3wuetVFveR+45ThkyXTpkQe31EcV1eLfr0Dd6O3Qg=
+X-Received: by 2002:a17:907:944d:b0:af9:4282:d38a with SMTP id
+ a640c23a62f3a-afa1dfecbc5mr84865666b.21.1754946485426; Mon, 11 Aug 2025
+ 14:08:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM3PEPF0000A791:EE_|GV1PR03MB10702:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2a10e989-087b-4307-dad9-08ddd91ae740
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|82310400026|36860700013|19092799006|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?V2lMUXNBZGoxY1ZRb205bVdkVFY4VkVBMkNoRzEyU3cwMC9ac25WRGVJUnJu?=
- =?utf-8?B?VFR0NndxdjdnZExkTTg4eUpuQTJDTFNGNlEvTmt4N213bzAzSXllcHJZVzJ3?=
- =?utf-8?B?a3VhTzYvZUluUUdRKzZWNnZzb3VxRHFOK0JESmdaclpsQ252a2t4ZGZSUkJW?=
- =?utf-8?B?VmpONmtNYVhnTW90SzJjT2dJamMxeWhVbzJ6YTgxT0Y3VWplYXJIY0lTdW5T?=
- =?utf-8?B?VHprY1AvRnBNTDFRNDI3YmJCYUdHU0N1Zi9TS1dxUjkxMlFqOHhCd3lvNSty?=
- =?utf-8?B?UldRUm11Z29LbWJXTm1hNjByMFFLVFdXamk1RVlEL1dlb1BwTWZXOEsrU29C?=
- =?utf-8?B?MVNob1NSTmZiK2FVbHFTV2FJU1RDbk83Sm9pVVhYc3djTHpvUjAyQXlYS1FJ?=
- =?utf-8?B?SlBrNlFGV2N0dm1wL01jeFd3RW5tVFNGQ0Y3MkRFT29qSUN0QVBDU2hNY3l5?=
- =?utf-8?B?VVpnZmN4dnhMTjdwQ2xyeVhPYVBnTmd2VmtHZVBKVHZFcGloeGZxRlVxcnV2?=
- =?utf-8?B?WjAzV1dYQ2gvNUtDY2RBdWpwaGhyV0dHRTFBTElzWFlEQm5zSTFrdTN1eWZQ?=
- =?utf-8?B?RnBTNDQ1UlM5ME15TUs3VGZ2SDNEcEt0Y1dmUzVvbWRCbWNwamN6ZklzOVlF?=
- =?utf-8?B?N1RKWk5EWGdXS04xUldTTDJGWjlaRS9VUmlhTzNnd0hPVkhQdU9wTGZlMGl0?=
- =?utf-8?B?VUQ5SUZwM0NSL3drWTMwV0k4QS9TYlZwcVhmRnBvcjVid0dxRHA2Y1JUY2Ni?=
- =?utf-8?B?ZVRVQXQvSkhSVU5qcmhzSm9CVlRkZG8wOGR5RUZvSVU2MDgwZU9aVnUzL1Z4?=
- =?utf-8?B?VXVmc0E2STdWbnduWWQxRnpTblZLOHFUOHFCMy93bjhudWNsR3p4c0JvdXVs?=
- =?utf-8?B?djFWcHJoemlSOU16VFBmU1BYUFVqUDZrUDJ4WTU2WGhVcnk1WHNtN3hiNXBG?=
- =?utf-8?B?RlpqUkZpdGg5Q1l4VGdLeEdLdUprZzE1MFhXcW1oVUtsb3dOOTlVZ2RsL2xM?=
- =?utf-8?B?c2tBbys4UEtmS09jckE3R2Z3dlBvT0g4ZCtaSkh0bkwvL1V1S0VTS25ZM0tC?=
- =?utf-8?B?aDExdEZuZ21hclZsVlRSM1QzckZ5dThrT01IRFdYUHlzZW5pMytMcDJCSUdt?=
- =?utf-8?B?R08vS2ZuR0JnN3o0aU95TGJ4blhpQWhLTW5aVlh2U2N4MEJxTHhES094c3pj?=
- =?utf-8?B?Q2Y4UnAwb1RpQmY0cTNHL1NkOUtUZS96a1hNQTZLZnoxVWNVeGRrL3BlOUFE?=
- =?utf-8?B?aEIxZzd4RDBJOFJSU1BRQjAyaG5vUkt2STltZFhWSDczMXFNT2VXY2RSWkdP?=
- =?utf-8?B?L09UeUQrZG5XUzJXWlpXa3QrZmVObkRGQlEyT1VaLzJoZWdGWVVZSkhwamho?=
- =?utf-8?B?d2tSQ2U3L0QrT3hzWlRpUzkvNTZqV29ST2pENjc4c0RKU2FUaEZJOVF5V2JQ?=
- =?utf-8?B?SGtuWE55SzFCSmFBK3JIdXdjVEx0ak1TSUVaeHRJNXg0aW1CeEcxcmExckRR?=
- =?utf-8?B?NFRMUmJiV0RuWlp2azJENjhuVFJYdWtaRlljK1VESmQ2di9Sd1B4V3ZabVF0?=
- =?utf-8?B?ZUg1ZGNDVDM2MXJUSExvVlRqRGJCY1RYVFMzZCtxRWhlSElMNWgxWXhMdkdy?=
- =?utf-8?B?OXljdVlRaERzUjVzQTkrcm1wbTZwN1VwUWkwUFg2bXpLRUxDQWxWOWpLMm9C?=
- =?utf-8?B?eE0vV2RTYUttWk5YQ2JUQ2RLYk9CcktxZDA0R3JaRmw1RmFKN0FjcFdORzdz?=
- =?utf-8?B?TVZZNjRPcHl3c2dEWHZhNWtlWnA0b2RzV25aODhRVkVINWFmTzhnYlpEUlRt?=
- =?utf-8?B?S2xDU2RRcW9wT2lVTjR1a3RZaDJJMFNlTVluRjF6VnlmN09KSVlCUjQ2dk9x?=
- =?utf-8?B?OGJ0SDh1emp2TDVZQ0sxUTVTTWNBeStoYW9NRUI1Z1RyWEFISEgrc2hzekMr?=
- =?utf-8?B?enRxOUdveHROdUNRQzF2UDRSeHIyZVM4Q2lSaWFmWmt6cUsrVWh2ajhnYVIr?=
- =?utf-8?B?RWNTRkVucitTQ2JmNklva1hkOFh5WTlrOTBlb0dxMVJpd1hTNk8zK2xQdmpY?=
- =?utf-8?Q?YnyIY/?=
-X-Forefront-Antispam-Report:
-	CIP:80.151.164.27;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:esd-s7.esd;PTR:p5097a41b.dip0.t-ipconnect.de;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(36860700013)(19092799006)(376014);DIR:OUT;SFP:1102;
-X-OriginatorOrg: esd.eu
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Aug 2025 21:06:12.7819
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2a10e989-087b-4307-dad9-08ddd91ae740
-X-MS-Exchange-CrossTenant-Id: 5a9c3a1d-52db-4235-b74c-9fd851db2e6b
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=5a9c3a1d-52db-4235-b74c-9fd851db2e6b;Ip=[80.151.164.27];Helo=[esd-s7.esd]
-X-MS-Exchange-CrossTenant-AuthSource:
-	AM3PEPF0000A791.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV1PR03MB10702
+References: <20250811174346.1989199-1-dw@davidwei.uk> <CACKFLimKpAtt8GDGT7k5zagQfzmPc_ggt9c0pu427=+T_FST1g@mail.gmail.com>
+ <521bf1f1-4a22-4afc-b101-ac960781b911@davidwei.uk>
+In-Reply-To: <521bf1f1-4a22-4afc-b101-ac960781b911@davidwei.uk>
+From: Michael Chan <michael.chan@broadcom.com>
+Date: Mon, 11 Aug 2025 14:07:52 -0700
+X-Gm-Features: Ac12FXzmIFGfTULPIPZfXPgHji2JylJrF3CxJvktWr9Xt5_svgWYYcgNSMpiqQg
+Message-ID: <CACKFLimab-kzux20TU4GD72GCa7PSe=JTxaeErDRe+zHke7TGQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] bnxt: fill data page pool with frags if
+ PAGE_SIZE > BNXT_RX_PAGE_SIZE
+To: David Wei <dw@davidwei.uk>
+Cc: netdev@vger.kernel.org, Pavan Chebbi <pavan.chebbi@broadcom.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000e25844063c1d5138"
 
-The USB stack calls during disconnect the esd_usb_disconnect() callback.
-esd_usb_disconnect() calls netdev_unregister() for each network which
-in turn calls the net_device_ops::ndo_stop callback esd_usb_close() if
-the net device is up.
+--000000000000e25844063c1d5138
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The esd_usb_close() callback tries to disable all CAN Ids and to reset
-the CAN controller of the device sending appropriate control messages.
+On Mon, Aug 11, 2025 at 1:19=E2=80=AFPM David Wei <dw@davidwei.uk> wrote:
+>
+> On 2025-08-11 11:08, Michael Chan wrote:
+> > On Mon, Aug 11, 2025 at 10:43=E2=80=AFAM David Wei <dw@davidwei.uk> wro=
+te:
+> >>
+> >> The data page pool always fills the HW rx ring with pages. On arm64 wi=
+th
+> >> 64K pages, this will waste _at least_ 32K of memory per entry in the r=
+x
+> >> ring.
+> >>
+> >> Fix by fragmenting the pages if PAGE_SIZE > BNXT_RX_PAGE_SIZE. This
+> >> makes the data page pool the same as the header pool.
+> >>
+> >> Tested with iperf3 with a small (64 entries) rx ring to encourage buff=
+er
+> >> circulation.
+> >
+> > This was a regression when adding devmem support.  Prior to that,
+> > __bnxt_alloc_rx_page() would handle this properly.  Should we add a
+> > Fixes tag?
+>
+> Sounds good, how about this?
+>
+> Fixes: cd1fafe7da1f ("eth: bnxt: add support rx side device memory TCP")
 
-Sending these messages in .disconnect() is moot and always fails because
-either the device is gone or the USB communication is already torn down
-by the USB stack in the course of a rmmod operation.
+The tag is correct.  Thanks.
 
-This patch moves the code that sends these control messages to a new
-function esd_usb_stop() which is approximately the counterpart of
-esd_usb_start() to make code structure less convoluted.
+--000000000000e25844063c1d5138
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-It then changes esd_usb_close() not to send the control messages at
-all if the ndo_stop() callback is executed from the USB .disconnect()
-callback. A new flag in_usb_disconnect is added to the struct esd_usb
-device structure to mark this condition which is checked by
-esd_usb_close() whether to skip the send operations in esd_usb_start().
-
-Signed-off-by: Stefan Mätje <stefan.maetje@esd.eu>
----
- drivers/net/can/usb/esd_usb.c | 34 ++++++++++++++++++++++++++--------
- 1 file changed, 26 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/net/can/usb/esd_usb.c b/drivers/net/can/usb/esd_usb.c
-index 3c348af566ec..70c0e7b96b8c 100644
---- a/drivers/net/can/usb/esd_usb.c
-+++ b/drivers/net/can/usb/esd_usb.c
-@@ -280,6 +280,7 @@ struct esd_usb {
- 	int net_count;
- 	u32 version;
- 	int rxinitdone;
-+	int in_usb_disconnect;
- 	void *rxbuf[ESD_USB_MAX_RX_URBS];
- 	dma_addr_t rxbuf_dma[ESD_USB_MAX_RX_URBS];
- };
-@@ -1032,9 +1033,9 @@ static netdev_tx_t esd_usb_start_xmit(struct sk_buff *skb,
- 	return ret;
- }
- 
--static int esd_usb_close(struct net_device *netdev)
-+/* Stop interface */
-+static int esd_usb_stop(struct esd_usb_net_priv *priv)
- {
--	struct esd_usb_net_priv *priv = netdev_priv(netdev);
- 	union esd_usb_msg *msg;
- 	int err;
- 	int i;
-@@ -1051,8 +1052,10 @@ static int esd_usb_close(struct net_device *netdev)
- 	for (i = 0; i <= ESD_USB_MAX_ID_SEGMENT; i++)
- 		msg->filter.mask[i] = 0;
- 	err = esd_usb_send_msg(priv->usb, msg);
--	if (err < 0)
--		netdev_err(netdev, "sending idadd message failed: %d\n", err);
-+	if (err < 0) {
-+		netdev_err(priv->netdev, "sending idadd message failed: %d\n", err);
-+		goto bail;
-+	}
- 
- 	/* set CAN controller to reset mode */
- 	msg->hdr.len = sizeof(struct esd_usb_set_baudrate_msg) / sizeof(u32); /* # of 32bit words */
-@@ -1062,7 +1065,23 @@ static int esd_usb_close(struct net_device *netdev)
- 	msg->setbaud.baud = cpu_to_le32(ESD_USB_NO_BAUDRATE);
- 	err = esd_usb_send_msg(priv->usb, msg);
- 	if (err < 0)
--		netdev_err(netdev, "sending setbaud message failed: %d\n", err);
-+		netdev_err(priv->netdev, "sending setbaud message failed: %d\n", err);
-+
-+bail:
-+	kfree(msg);
-+
-+	return err;
-+}
-+
-+static int esd_usb_close(struct net_device *netdev)
-+{
-+	struct esd_usb_net_priv *priv = netdev_priv(netdev);
-+	int err = 0;
-+
-+	if (!priv->usb->in_usb_disconnect) {
-+		/* It's moot to try this in usb_disconnect()! */
-+		err = esd_usb_stop(priv);
-+	}
- 
- 	priv->can.state = CAN_STATE_STOPPED;
- 
-@@ -1070,9 +1089,7 @@ static int esd_usb_close(struct net_device *netdev)
- 
- 	close_candev(netdev);
- 
--	kfree(msg);
--
--	return 0;
-+	return err;
- }
- 
- static const struct net_device_ops esd_usb_netdev_ops = {
-@@ -1434,6 +1451,7 @@ static void esd_usb_disconnect(struct usb_interface *intf)
- 	usb_set_intfdata(intf, NULL);
- 
- 	if (dev) {
-+		dev->in_usb_disconnect = 1;
- 		for (i = 0; i < dev->net_count; i++) {
- 			if (dev->nets[i]) {
- 				netdev = dev->nets[i]->netdev;
--- 
-2.34.1
-
+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
+OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
+/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
+AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
+c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
+AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
+TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
+bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
+BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
+L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
+kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
+5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
+hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
+E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJgMIIC
+XAIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
+EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
+DQYJYIZIAWUDBAIBBQCggccwLwYJKoZIhvcNAQkEMSIEICQF2UAb03RM+rmjKH0VJao5SutFTEwN
+8NgYjUn4yKUCMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDgx
+MTIxMDgwNVowXAYJKoZIhvcNAQkPMU8wTTALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQcwCwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEB
+AQUABIIBABGz87lO7L/AbPDfjyYW+MYjip6Bica65VC/7X6VJamecU3q0spRHliKiUh8bk4A84R8
+PfMnPhSHjrS36gAU9v7yGka0ukXz0gUMzhrnhU9Bg8vMRS+YjrmK25XKF1R49MJt4TaYUrzt2BMB
+YMK4ixUSWU703QZSSqvXqE6XLwLsvZwhDW9fuCxDRgGUSRQeTj3wTU6nrCoWs1XEutJjgaNAMaTx
+J3tMkQkbSlwo0a79wZpp5RQBF4mATiliyVkQZ/nnBzfY/ZzYbYiW8kwEY98hPmhzL8QYRcSoL3m7
+9NdKjkajl8hoB5GeawppKHVjMJRoN1jCQeCSf+o1mxlW6oA=
+--000000000000e25844063c1d5138--
 
