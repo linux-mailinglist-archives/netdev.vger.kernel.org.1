@@ -1,147 +1,136 @@
-Return-Path: <netdev+bounces-212455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212456-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D98F7B209B1
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 15:10:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 24171B209C5
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 15:12:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E43A6188863C
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 13:11:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B1E918A6DF9
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 13:13:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FB092DAFA3;
-	Mon, 11 Aug 2025 13:10:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BF6D2DAFBB;
+	Mon, 11 Aug 2025 13:12:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="ojjnhV8s"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NcUp2LTy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ECEA2D8363
-	for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 13:10:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C1802D8396;
+	Mon, 11 Aug 2025 13:12:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754917840; cv=none; b=suKwEHtJUZ/NRvBUrZ8se22eE/CWrqYeXmveFLTF8ggn3UyvTOy2+AwQQUzZQ4FVjQYR1BZysodBp7pxFW3mC5nRByyb+MsnBTcFLFz2AqY9Ys4SPlLGclH9s4uY8vfPMjDWDEMV3fLkVpunHUcE5xI9BU/VzbV/3GMCvZDF8ZA=
+	t=1754917966; cv=none; b=KQLIN7n+0S6TtxH1kxO9jZqGIJT9KSGVP5D7ZPZ6Os9ei2DWxf9+fY/eC1YhnTVpviBjj1Sxx1BKdLKyngdeK20cO8gQnr4S3o9WDLiM67mFjpqRD4TKY1wpzaG3IHSaZRKRRqCA4DqsDv9szQb0UOc5+H0TTAHDrH4qG0GSLKA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754917840; c=relaxed/simple;
-	bh=YdcvZYKwitUcECgcbI2UhLZ6metpTwEak9n/5y6m0SA=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AqOT7HU0VumjmdCQaM+EM6ACssesCkWsNTQS7GnDAk8drgTHw0iUCP/pQEIbi5Odpb1c3OocF2z/Bx8ZbVrxMg8etiXQayis6mSlcVg9BJX140yP2vnpqaOH+RTdX+Dm7/+fw8YBXVsIDQtASUfLWXtg4yf4fQw1yGCB4ZOhgkM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=ojjnhV8s; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2401b855980so30936635ad.1
-        for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 06:10:37 -0700 (PDT)
+	s=arc-20240116; t=1754917966; c=relaxed/simple;
+	bh=vvPCKyJYH0XXDpnBfsmDzTunKOUXZ5y1vWJq5EqeV5A=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ZBVuN+8KMdTX3K+Q56baHOwIOuB6PrpxMYiiDEHVrYiuaHxLr4Q59UZlnh7NRXRJxwDJragzkFJtOpBxNiw5+O6Q7i7NgiOn7plKIa0ZWfTqWvplCVK0e7XUcSRuNSv/TDN3oNSqdLq0UcJZNzbvS58ajPfn0x46/c6a76BiuXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NcUp2LTy; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-76bfabdbef5so3531415b3a.1;
+        Mon, 11 Aug 2025 06:12:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1754917837; x=1755522637; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:references:mime-version:in-reply-to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=YdcvZYKwitUcECgcbI2UhLZ6metpTwEak9n/5y6m0SA=;
-        b=ojjnhV8sG5RePBCOlfNn+HKKrpovehYP/8l1sr0vNYpFHhYyNj9xWMV43bJeaTo+kp
-         pGJmmwo0JTwJGp+EMoH+TiRmSHHwCWtSKYf/ADQ+n41Fq7MLbvF4puoYKzMZIfAb5Yr5
-         rfyUeS8+hBywvWWe45et8EVilsYHrox7Ct03tWZtWfpes3F5MB7MSmpvGYu3l/KMy0Lm
-         Xz5nZcHYvM5pMpkmNGOifNAmrO7N485x8Dy3qu1/BQr+p2mpzG31DunBz5mKNnrnKK8W
-         RdKVIPz8XNIoKoiGQOe1wq9OXTmtM2HvY5MHwnIuZgNfLGAMI4k+PY6m2DfBQiYd+C7+
-         Xhsg==
+        d=gmail.com; s=20230601; t=1754917963; x=1755522763; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZVIMJg5R5sZv5Lr4Rz6ju2tVpZJjLM1IsEH4KNqRx5w=;
+        b=NcUp2LTyjsn7QwXnv2ClJVdQpCG44+Szo8lwYeEZJZMGBVj8ae4b5uSMA8t1dCi6cn
+         SiqUP36alg+zGw+oJmJn3I4VKUBjNQ8RGT4bAG3XADJAcWbOWsMGwE2EqOBZggRRrXvZ
+         4JVACq/moZPEo5BadhwR973immCAawI5XUnQQiCpdhkA0uIimzi+GsPbp8APPjmqxwqX
+         snTl+HA/N2/uReYk+DIcQF/7E7/H6lQV4HnXU3QPobKobJZNowjCKIjqrBjSu7h8FBhF
+         G+/9T3Im7RFRG2esr4Mw45yBD0CCz4yOV0oZjdKPQvIeYaSS0LliILtuo7BqGdbVX9a9
+         atEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754917837; x=1755522637;
-        h=cc:to:subject:message-id:date:references:mime-version:in-reply-to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YdcvZYKwitUcECgcbI2UhLZ6metpTwEak9n/5y6m0SA=;
-        b=K4KGLmvZd6lGtdUG++efTQPxmcBxfZmOggzkMKaAyXbo9pFFQ4JTpWUH1twj1pkv6z
-         Lnns3HYzoVBZ6FFYgZKR1n/r1UZbVXD/FmHjNhb7SH8P0T8Kn/FjUHqUX1UBBgZkgvVl
-         2v41e7H32Q3YkSsVvoG2Kq65wrapWIRqFRP75ELLKJ5fu9AK4FXR+EOizpDcjHGu2qYP
-         Xc+ce5F1lA43zzHmy3kfQFQZVH0PwcfuTJgYI9w4UTSGbjPTC92rWgUaf6jGqOJHlPAz
-         dP9Vcuf4CA1x0lRZy4XWuQQXmTFl3YGQFPPDrqz7hw+hVA4k5lo/X8uzSYvb6lePbOb/
-         kLmw==
-X-Forwarded-Encrypted: i=1; AJvYcCXDRdoFCZBfW90JR9TG1BvgPFYcA4E/Jb4ccfYxq6PoyCuWJDEpPuGUxx36/Lg2L61e49IMerc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywf6hHzzy2gYcE6bNCpqcIt0Ywk3LL6Zv9TI2cWNzh4xhIBAojj
-	oLnJzrMdIQOpaDFCL7E3VJ2W5fWfC9yd4YhdgF2yTsQSRCTfvjwZzdm0TzYtFCqlz4a9xZgqO5t
-	AYTnAcUZZzNcJAL4EVxR+xgFYmeKxFl2021vahQmT7g==
-X-Gm-Gg: ASbGncsEAAs3bupE6NjhqhWXk0mmwJBmLpg+SsOIsMYjsL6AJxGj+kWGJn2kVk02bL2
-	qFE8ujC1AfP7QwCsBFeuPf7gxOcTnqThjSuDpNQd76SBpmHh8q/RiJZ2bxp+mkYB6LVVLLdIdr0
-	Tv4anF/EZUkAXt+wGLXF9cjJawt8EOMtGmSy+yjwtVlvSPec91+VTzLHbuUMmZGzBvj17kTo4FM
-	D/MAJrxspgj8poUwsv4A5fLfGTYOUCzTLjzFfE=
-X-Google-Smtp-Source: AGHT+IEgMvtsNpCEbzm+bQO3Dq6oVeggGu7qnt+f1HYUPfLnzNmxpfjIx2ohdBUK5XJ+fhQGIjFsq0lNMPvywZaOZwE=
-X-Received: by 2002:a17:903:32cb:b0:240:96a:b812 with SMTP id
- d9443c01a7336-242c203d030mr203994295ad.24.1754917837398; Mon, 11 Aug 2025
- 06:10:37 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Mon, 11 Aug 2025 06:10:31 -0700
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Mon, 11 Aug 2025 06:10:31 -0700
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-In-Reply-To: <20250808151822.536879-1-arnd@kernel.org>
+        d=1e100.net; s=20230601; t=1754917963; x=1755522763;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZVIMJg5R5sZv5Lr4Rz6ju2tVpZJjLM1IsEH4KNqRx5w=;
+        b=k4Xr0FM4r784P4HAJ+AcrSkuZzTrgWIQzAdmdwtOFud8En0Wv1So9avLPopvs4kdx8
+         bvF4GbmmFNZHaweO8KdTL8BW3TE1Hjh4x4M7wvEeEZQb63XQnf+i/G/I/N4h8WjDB4we
+         w/w2kBD2dBTQSecs6+pbjG9BWEhYIdyQqUaSBwDIHszs39yWvCnTkyD7vnGyRl16PPO8
+         dHuF+oiVkHXuIwAciwcHdBmTmhQRPpOYN72daSr1MiAdXsKTVuX5fYgX5S/zi6ikFvPX
+         RNz3LXCWlMhSfe7A1Csx6oVIXpXaQkahOwxXPBHipWxxBlxH17A8AlXH00uXHFagbO5w
+         DRnA==
+X-Forwarded-Encrypted: i=1; AJvYcCX+uKZkDoNSeC8xnqUUoE01Bh6SZ9mmXAaBujetrXW5uoDpIW7etC8L+97UFA82JViu/DaV6dE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywr+IPSgYHwWt0E2xey0ons/DFoymPk03uNN6giD02qngOAxQuA
+	mjZcC0SCXz6ruXWQoolB6vsILmyUN4kul5lKWpyUjU0YaWah6SMqOx6s
+X-Gm-Gg: ASbGncvTi+EcrZ3XPpdoO5TpPjcsftug6Mmg2jXU+8SKU4syKYrRjMuQGfbJpB05R7T
+	E7tM/mpQRNblVxl9LSrYV0DLR+7nSuzL3ndN5wqhDGeNj9E929BL431iotowd4LhEXYWyD+oCCD
+	ndXWy58RG32CbTSP53BJxOdUdZ7K+mmE6k+vGR768RWvhrToLe5FdFTl9RPGktp7GEtk2QgJf0u
+	p0SbbT7am3rUYmsHo7KP1e3tRraVuZid6xiRGXfz16qV8nnbfUfYLmk4Z/ZP2siXc7H47xpeXt1
+	E/G5tveIFmG+5GKjW4kUTyI10AN2OtvwWZSCiWINNc3PvNdwCRN1Jl8HemknfoYBoaUZQtE9y6N
+	c10qZH2BKOmUpiZH9GyilWyq9npsOCpK1NJmDet8CkMc857JWLW9p6cb/2NfeWHqPqOYJLg==
+X-Google-Smtp-Source: AGHT+IGj8RxFoSvUsZve69ZQuIYiRRenRgHRbybWFNyXSov1uJAlVeUI2OTJA8QSbj5kZ7XGKat7Og==
+X-Received: by 2002:a05:6a20:6a1c:b0:23f:fbb1:c229 with SMTP id adf61e73a8af0-24054d788a7mr17616063637.0.1754917963466;
+        Mon, 11 Aug 2025 06:12:43 -0700 (PDT)
+Received: from KERNELXING-MC1.tencent.com ([111.201.28.60])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-76c46a05464sm8227069b3a.96.2025.08.11.06.12.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Aug 2025 06:12:43 -0700 (PDT)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	bjorn@kernel.org,
+	magnus.karlsson@intel.com,
+	maciej.fijalkowski@intel.com,
+	jonathan.lemon@gmail.com,
+	sdf@fomichev.me,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	horms@kernel.org,
+	andrew+netdev@lunn.ch
+Cc: bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Jason Xing <kernelxing@tencent.com>
+Subject: [PATCH net-next 0/2] xsk: improvement performance in copy mode
+Date: Mon, 11 Aug 2025 21:12:34 +0800
+Message-Id: <20250811131236.56206-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250808151822.536879-1-arnd@kernel.org>
-Date: Mon, 11 Aug 2025 06:10:31 -0700
-X-Gm-Features: Ac12FXxi-t7kK_6HIDwsxWJsHZcp5BcOM26Y8X32Zi2av6pcVu6UuipKim4OtEQ
-Message-ID: <CAMRc=MeyW8gtG_hsLWytCpufQRmg3s5QZenxCvP3MNGmaoo2cA@mail.gmail.com>
-Subject: Re: [PATCH 00/21] gpiolib: fence off legacy interfaces
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: Arnd Bergmann <arnd@arndb.de>, Andrew Lunn <andrew@lunn.ch>, 
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>, 
-	Gregory Clement <gregory.clement@bootlin.com>, Russell King <linux@armlinux.org.uk>, 
-	Daniel Mack <daniel@zonque.org>, Haojian Zhuang <haojian.zhuang@gmail.com>, 
-	Robert Jarzmik <robert.jarzmik@free.fr>, Krzysztof Kozlowski <krzk@kernel.org>, 
-	Alim Akhtar <alim.akhtar@samsung.com>, Geert Uytterhoeven <geert@linux-m68k.org>, 
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, Yoshinori Sato <ysato@users.sourceforge.jp>, 
-	Rich Felker <dalias@libc.org>, John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Dmitry Torokhov <dmitry.torokhov@gmail.com>, Lee Jones <lee@kernel.org>, 
-	Pavel Machek <pavel@kernel.org>, Mauro Carvalho Chehab <mchehab@kernel.org>, 
-	Matti Vaittinen <mazziesaccount@gmail.com>, Florian Fainelli <florian.fainelli@broadcom.com>, 
-	Jeff Johnson <jjohnson@kernel.org>, Hans de Goede <hansg@kernel.org>, 
-	=?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jaroslav Kysela <perex@perex.cz>, 
-	Takashi Iwai <tiwai@suse.com>, Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, 
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
-	"Dr. David Alan Gilbert" <linux@treblig.org>, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, linux-samsung-soc@vger.kernel.org, 
-	linux-m68k@lists.linux-m68k.org, linux-mips@vger.kernel.org, 
-	linux-sh@vger.kernel.org, linux-input@vger.kernel.org, 
-	linux-leds@vger.kernel.org, linux-media@vger.kernel.org, 
-	patches@opensource.cirrus.com, netdev@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, ath10k@lists.infradead.org, 
-	platform-driver-x86@vger.kernel.org, linux-usb@vger.kernel.org, 
-	linux-sound@vger.kernel.org, Bartosz Golaszewski <brgl@bgdev.pl>, 
-	Linus Walleij <linus.walleij@linaro.org>, linux-gpio@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-On Fri, 8 Aug 2025 17:17:44 +0200, Arnd Bergmann <arnd@kernel.org> said:
-> From: Arnd Bergmann <arnd@arndb.de>
->
-> Commit 678bae2eaa81 ("gpiolib: make legacy interfaces optional") was
-> merged for linux-6.17, so now it is possible to use the legacy interfaces
-> conditionally and eventually have the support left out of the kernel
-> whenever it is not needed.
->
-> I created six patches to force-enable CONFIG_GPIOLIB_LEGACY on the
-> few (mostly ancient) platforms that still require this, plus a set of
-> patches to either add the corresponding Kconfig dependencies that make
-> the device drivers conditional on that symbol, or change them to no
-> longer require it.
->
-> The final patch ends up turning the Kconfig symbol off by default,
-> which of course depends on everything else getting merged first to avoid
-> build errors.
->
-> I would suggest that patches 1-20 can just get merged through the
-> respective maintainer trees independently when they are deemed ready,
-> and the final patch can wait another merge window.
->
+From: Jason Xing <kernelxing@tencent.com>
 
-Oh, not at all, I'm fine sending a second PR late into the merge window to
-get that done in a single cycle.
+Like in VM using virtio_net, there are not that many machines supporting
+advanced function like multi-buffer and zerocopy. Using xsk copy mode
+becomes a default choice to support bypass kernel feature instead of
+resorting to DPDK.
 
-Thanks for doing this, awesome work!
+Prior to this series, zerocopy mode has a better performance than copy
+mode. But now, the copy mode outperforms zc mode by 12.9%, which was
+tested on ixgbe driver by means of xdpsock.
 
-Bartosz
+The thought behind this series is to aggregate packets in a certain
+small group like GSO/GRO and then send them at one time by only grabbing
+the tx queue and disable bh once.
+
+Jason Xing (2):
+  xsk: introduce XDP_GENERIC_XMIT_BATCH setsockopt
+  xsk: support generic batch xmit in copy mode
+
+ Documentation/networking/af_xdp.rst |   9 ++
+ include/linux/netdevice.h           |   2 +
+ include/net/xdp_sock.h              |   2 +
+ include/uapi/linux/if_xdp.h         |   1 +
+ net/core/dev.c                      |  18 ++++
+ net/xdp/xsk.c                       | 135 +++++++++++++++++++++++++++-
+ tools/include/uapi/linux/if_xdp.h   |   1 +
+ 7 files changed, 165 insertions(+), 3 deletions(-)
+
+-- 
+2.41.3
+
 
