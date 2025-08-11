@@ -1,158 +1,136 @@
-Return-Path: <netdev+bounces-212487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212488-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66558B2106F
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 17:57:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1954DB21094
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 18:00:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F71A18A230D
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 15:52:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C53A3E79D2
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 15:52:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEE502E093E;
-	Mon, 11 Aug 2025 15:29:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CE591A9FA5;
+	Mon, 11 Aug 2025 15:32:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pj3D2R/V"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aABcN5Qm"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89A031F9A89
-	for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 15:29:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31AF91A9F91;
+	Mon, 11 Aug 2025 15:32:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754926199; cv=none; b=ZJoY28U/7Cp61hy5AA+YlPWDhSFHbFGqgwWP59CFmASaJmcOKAkZTLKJzpDgPdxo7W7cjF9BKOXsDtx0s21dtDoOeIM306nlJTrvQ5OqXtms8FEyTol3AOxvHGM6z5+mIxsLPk0meXNub9Tc+3zlAaovj8udeTU/0crrkDQZf4c=
+	t=1754926324; cv=none; b=s1Lx0iSdH7/XRMqqhH+sj5eIDE7RQdveH3LnN2Pc6bBEZ5EK7iFpgiGcBgOL+9XuX6p7JJzaRsGISAy4NdrvUSbY8T9Mc315NzoiUfWMOX2qfhkEsK0Vw5MX/bxA9biSe5ZNn8jMG5ERcngQnNeDddTn2S8XFjgWV7L/hELg6XM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754926199; c=relaxed/simple;
-	bh=RH7z9l5KkRjGeKgIExlrNjKa4fyoQAxpw8b/ndamz4k=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gro/D7/xVVuPwej1JrSewEDUQXZZBQFXtqxMzdJNx5DlJHG8VRF49feHxFwC6C0+WbN54UkYYULbf6d/RXllNDpuqQmsYx0HYyNhi/k7cJO3P0++BVB40K/rR2Rjfg+PpEEluO/Nox83XUbXkfWSSJtkg/POSduJgbX3mD017k4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pj3D2R/V; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CA31C4CEED;
-	Mon, 11 Aug 2025 15:29:59 +0000 (UTC)
+	s=arc-20240116; t=1754926324; c=relaxed/simple;
+	bh=6q79iZqgmRYKyPHnlMqwPzEGP8FF+iIXD11AwfalVcU=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=BOMVNeF1Y9kTxC39g8ubqz+vhugTRBgtIWj1cVvYD7aptcl3D/yHWPWecNFbBhhcF0bPgupusjCTQQatfvT8vgGfCyla8ajal5juPITKLx182V1+k0gzBAZQe+6ENeGbpQ8QBq3aqyRgiaSnwaxmsdopr0D5ldI70FEUKOSqNUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aABcN5Qm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7DDD1C4CEED;
+	Mon, 11 Aug 2025 15:32:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754926199;
-	bh=RH7z9l5KkRjGeKgIExlrNjKa4fyoQAxpw8b/ndamz4k=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Pj3D2R/Vn0NcnhqgaqNH+MhP1ySQsVm8/syY7Cd93L+aGVNSJ6YTjJ1dalyJzRUmM
-	 fxyOuyPYMBUUTux0ZEdQ5y9mv6vje/z2DjLR+fo3DtjNP1iAqXI6/cGRaDs8NiwVDj
-	 WPAqIyXDwmVV+Q3lVcExcWBZrJAX+zUg1QZg0ip+ncatU/Kv2HWBf+X4GpqEv4+/lz
-	 wAtM/69YoJgx2g6NmxvQxuBOl4uXVkHqlHLLSO0Kn5/JHhA7VU6Y2398mCQA6RGK7L
-	 wQHWCCZ8xegoSgcPfirbx6zvF5q0FR+EDrP26mKFcEoLA4oz/Z5wiDYeLrKvjSKTW6
-	 mc6GGarIBOAiw==
-Date: Mon, 11 Aug 2025 08:29:58 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: William Liu <will@willsroot.io>
-Cc: netdev@vger.kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
- pabeni@redhat.com, jiri@resnulli.us, davem@davemloft.net,
- edumazet@google.com, horms@kernel.org, savy@syst3mfailure.io,
- victor@mojatatu.com
-Subject: Re: [PATCH net v4 1/2] net/sched: Fix backlog accounting in
- qdisc_dequeue_internal
-Message-ID: <20250811082958.489df3fa@kernel.org>
-In-Reply-To: <n-GjVW0_1R1-ujkLgZIEgnaQKSsNtQ9-7UZiTmDCJsy1EutoUtiGOSahNSxpz2yANsp5olbxItT2X9apTC9btIRepMGAZZVBqWx6ueYE5O4=@willsroot.io>
-References: <20250727235602.216450-1-will@willsroot.io>
-	<20250808142746.6b76eae1@kernel.org>
-	<n-GjVW0_1R1-ujkLgZIEgnaQKSsNtQ9-7UZiTmDCJsy1EutoUtiGOSahNSxpz2yANsp5olbxItT2X9apTC9btIRepMGAZZVBqWx6ueYE5O4=@willsroot.io>
+	s=k20201202; t=1754926323;
+	bh=6q79iZqgmRYKyPHnlMqwPzEGP8FF+iIXD11AwfalVcU=;
+	h=From:Subject:Date:To:Cc:From;
+	b=aABcN5QmeJa0Pmwl9RL6gqihtSfKmm+rxMX8XRsLUt9rXTP55OGJKwPyHWndGnyEc
+	 DCx7XTUyKQFeZ3G9tyuEWX0qBwpmDwPKnvJnVPPS/X/oJc/DSakUN3SnYB7r9fd+PQ
+	 ut85ODRKfp0xlJHm9QYgAkOOFk4TC9n7ged34geRH51FAIK1TpRCWHIvwGYgEMTla3
+	 gblEoctGffVSVWPvMtU4gw8OVhrlfxm/jepuUKFeMPIrUuawCbCxbkXvLt7h9AohW0
+	 OAUFbao4LnXkU2AvSaY0z82+tOIO03JN7UxSxlyT9ijjs5BwxcjEXTsaRO1moBVA9Y
+	 6cfWjSAeVaL1A==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Subject: [PATCH net-next v7 0/7] net: airoha: Introduce NPU callbacks for
+ wlan offloading
+Date: Mon, 11 Aug 2025 17:31:35 +0200
+Message-Id: <20250811-airoha-en7581-wlan-offlaod-v7-0-58823603bb4e@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIANcMmmgC/33Oy2rDMBCF4VcJWldF90tXfY/SxdgaxaLGCnJxU
+ oLfvbKh4GLQ8szim/9JZiwJZ/J2eZKCS5pTnuqwLxfSDzBdkaZQNxFMaGYZp5BKHoDiZLXj9D7
+ CRHOMI+RAje19gBidspJU4FYwpseOf3zWPaT5O5ef/dfCt+sfK1rswimjjknGvGWsk+79C8uE4
+ 2suV7K5izhaummJask+SmGdRun4yZIHi6umJfcu6KIBQI/qZKmjZZuWqpYJHbdOeo5BnCx9sIR
+ sWrpaAbxAFl2vvD1Z5mi1u8zWBRGCN9Bza/5Z67r+Ahk49ehBAgAA
+X-Change-ID: 20250701-airoha-en7581-wlan-offlaod-67c9daff8473
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Simon Horman <horms@kernel.org>, Felix Fietkau <nbd@nbd.name>, 
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
+ netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+ Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+X-Mailer: b4 0.14.2
 
-On Sun, 10 Aug 2025 21:06:57 +0000 William Liu wrote:
-> > On Sun, 27 Jul 2025 23:56:32 +0000 William Liu wrote:
-> >   
-> > > Special care is taken for fq_codel_dequeue to account for the
-> > > qdisc_tree_reduce_backlog call in its dequeue handler. The
-> > > cstats reset is moved from the end to the beginning of
-> > > fq_codel_dequeue, so the change handler can use cstats for
-> > > proper backlog reduction accounting purposes. The drop_len and
-> > > drop_count fields are not used elsewhere so this reordering in
-> > > fq_codel_dequeue is ok.  
-> > 
-> > 
-> > Using local variables like we do in other qdiscs will not work?
-> > I think your change will break drop accounting during normal dequeue?  
-> 
-> Can you elaborate on this? 
-> 
-> I just moved the reset of two cstats fields from the dequeue handler
-> epilogue to the prologue. Those specific cstats fields are not used
-> elsewhere so they should be fine, 
+Similar to wired traffic, EN7581 SoC allows to offload traffic to/from
+the MT76 wireless NIC configuring the NPU module via the Netfilter
+flowtable. This series introduces the necessary NPU callback used by
+the MT7996 driver in order to enable the offloading.
+MT76 support has been posted as RFC in [0] in order to show how the
+APIs are consumed.
 
-That's the disconnect. AFAICT they are passed to codel_dequeue(),
-and will be used during normal dequeue, as part of normal active
-queue management under traffic..
+[0] https://lore.kernel.org/linux-wireless/cover.1753173330.git.lorenzo@kernel.org/
 
-> but we need to accumulate their
-> values during limit adjustment. Otherwise the limit adjustment loop
-> could perform erroneous accounting in the final
-> qdisc_tree_reduce_backlog because the dequeue path could have already
-> triggered qdisc_tree_reduce_backlog calls.
->
-> > > diff --git a/net/sched/sch_fq.c b/net/sched/sch_fq.c
-> > > index 902ff5470607..986e71e3362c 100644
-> > > --- a/net/sched/sch_fq.c
-> > > +++ b/net/sched/sch_fq.c
-> > > @@ -1014,10 +1014,10 @@ static int fq_change(struct Qdisc *sch, struct nlattr *opt,
-> > > struct netlink_ext_ack *extack)
-> > > {
-> > > struct fq_sched_data *q = qdisc_priv(sch);
-> > > + unsigned int prev_qlen, prev_backlog;
-> > > struct nlattr *tb[TCA_FQ_MAX + 1];
-> > > - int err, drop_count = 0;
-> > > - unsigned drop_len = 0;
-> > > u32 fq_log;
-> > > + int err;
-> > > 
-> > > err = nla_parse_nested_deprecated(tb, TCA_FQ_MAX, opt, fq_policy,
-> > > NULL);
-> > > @@ -1135,16 +1135,16 @@ static int fq_change(struct Qdisc *sch, struct nlattr *opt,
-> > > err = fq_resize(sch, fq_log);
-> > > sch_tree_lock(sch);
-> > > }
-> > > +
-> > > + prev_qlen = sch->q.qlen;
-> > > + prev_backlog = sch->qstats.backlog;
-> > > while (sch->q.qlen > sch->limit) {
-> > > struct sk_buff *skb = qdisc_dequeue_internal(sch, false);
-> > > 
-> > > - if (!skb)
-> > > - break;  
-> > 
-> > 
-> > The break conditions is removed to align the code across the qdiscs?  
-> 
-> That break is no longer needed because qdisc_internal_dequeue handles
-> all the length and backlog size adjustments. The check existed there
-> because of the qdisc_pkt_len call.
+---
+Changes in v7:
+- Rebase on top of net-next main branch
+- Link to v6: https://lore.kernel.org/r/20250727-airoha-en7581-wlan-offlaod-v6-0-6afad96ac176@kernel.org
 
-Ack, tho, theoretically the break also prevents an infinite loop.
-Change is fine, but worth calling this out in the commit message,
-I reckon.
+Changes in v6:
+- Fix wlan_mbox_data message size
+- Make NPU memory regions optional in NPU dts
+- Link to v5: https://lore.kernel.org/r/20250723-airoha-en7581-wlan-offlaod-v5-0-da92e0f8c497@kernel.org
 
-> > > - drop_len += qdisc_pkt_len(skb);
-> > > rtnl_kfree_skbs(skb, skb);
-> > > - drop_count++;
-> > > }
-> > > - qdisc_tree_reduce_backlog(sch, drop_count, drop_len);
-> > > + qdisc_tree_reduce_backlog(sch, prev_qlen - sch->q.qlen,
-> > > + prev_backlog - sch->qstats.backlog);  
-> > 
-> > 
-> > There is no real change in the math here, right?
-> > Again, you're just changing this to align across the qdiscs?  
-> 
-> Yep, asides from using a properly updated qlen and backlog from the
-> revamped qdisc_dequeue_internal.
+Changes in v5:
+- Rebase on top of net-next main branch
+- Link to v4: https://lore.kernel.org/r/20250717-airoha-en7581-wlan-offlaod-v4-0-6db178391ed2@kernel.org
 
-Personal preference, but my choice would be to follow the FQ code,
-and count the skbs as they are freed. But up to you, since we hold
-the lock supposedly the changes to backlog can only be due to our
-purging.
+Changes in v4:
+- Improve commit messages
+- Link to v3: https://lore.kernel.org/r/20250714-airoha-en7581-wlan-offlaod-v3-0-80abf6aae9e4@kernel.org
+
+Changes in v3:
+- Rename 'binary' memory region in 'firmware'
+- Do not make memory-region-names property required
+- Link to v2: https://lore.kernel.org/r/20250705-airoha-en7581-wlan-offlaod-v2-0-3cf32785e381@kernel.org
+
+Changes in v2:
+- Introduce binding for memory regions used for wlan offload
+- Rely on of_reserved_mem_region_to_resource_byname
+- Export just wlan_{send,get}_msg NPU callback for MT76
+- Improve commit messages
+- Link to v1: https://lore.kernel.org/r/20250702-airoha-en7581-wlan-offlaod-v1-0-803009700b38@kernel.org
+
+---
+Lorenzo Bianconi (7):
+      dt-bindings: net: airoha: npu: Add memory regions used for wlan offload
+      net: airoha: npu: Add NPU wlan memory initialization commands
+      net: airoha: npu: Add wlan_{send,get}_msg NPU callbacks
+      net: airoha: npu: Add wlan irq management callbacks
+      net: airoha: npu: Read NPU wlan interrupt lines from the DTS
+      net: airoha: npu: Enable core 3 for WiFi offloading
+      net: airoha: Add airoha_offload.h header
+
+ .../devicetree/bindings/net/airoha,en7581-npu.yaml |  22 +-
+ drivers/net/ethernet/airoha/airoha_npu.c           | 175 +++++++++++++-
+ drivers/net/ethernet/airoha/airoha_npu.h           |  36 ---
+ drivers/net/ethernet/airoha/airoha_ppe.c           |   2 +-
+ include/linux/soc/airoha/airoha_offload.h          | 260 +++++++++++++++++++++
+ 5 files changed, 451 insertions(+), 44 deletions(-)
+---
+base-commit: 37816488247ddddbc3de113c78c83572274b1e2e
+change-id: 20250701-airoha-en7581-wlan-offlaod-67c9daff8473
+
+Best regards,
+-- 
+Lorenzo Bianconi <lorenzo@kernel.org>
+
 
