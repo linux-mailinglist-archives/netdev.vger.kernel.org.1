@@ -1,194 +1,122 @@
-Return-Path: <netdev+bounces-212419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212424-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8F5BB20317
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 11:19:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B54FB20328
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 11:21:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D0056176980
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 09:19:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E2DC918C192F
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 09:21:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 119B72DCF70;
-	Mon, 11 Aug 2025 09:19:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41FFF2DEA98;
+	Mon, 11 Aug 2025 09:20:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IC1/WLPH"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="iu9cYTq0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1375813AD1C
-	for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 09:19:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B301D2DCC11
+	for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 09:20:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754903970; cv=none; b=X97QbTJyCdyftisj1Ec6YjldOM92EP+72SbNOa67kRqv5uL+872V3aBG+NdPMM5ZHSXf1tTX2haLyUT4Pk+deV3uCNtNuApZBiDIyasEB1hnNr38Wus6jwOFLL2P+Abu9rD/wUwIIbSUKxtdL6xkdocdodYnGxYo13/DMx32vD8=
+	t=1754904032; cv=none; b=EPcMiO7ym3o+9x+tsmN82d1pfl1DBBgjhHHG6STJjm/so8ryxpVH4j5enAzEhDcvhwHveU4SmNhBvtTp2zJTYdHxB53x3B5Xj1fvCLYqpob5pI1FxZAUUT6CsGz6KTI6z5KudkP50JQbu+4na9IpXqPCOjqK6NXgOKUt9Tm45vw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754903970; c=relaxed/simple;
-	bh=eOcXVHRq7KcT5QV7lddFhfB5s66umFv3YrBqQ/TX/uc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TKZiQbUS4+EivuUXPWV4E3aFKRtUvvrKuZGeFTNZ+lmkYVdcKqZlNca/Aw3VYkayinSU9S+f/l7ZcIkjXnVKm4tI1I0UD/yx9g9lK0MAs1hGHHFfmeYTWFDiJ4KczvQlzlPgFBkJg9GD0T9yQ+57QVHc58GBBZ4ZmKiRxtrV3Qc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IC1/WLPH; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4b07d777d5bso47638661cf.2
-        for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 02:19:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1754903966; x=1755508766; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9X3+VyeiU1OgsV7atWhvLrxkvJsIXxj9Qgw0FX6QMEE=;
-        b=IC1/WLPHof7gy7NDluHwPQCGGRp2bnxoJO4nLyeMuVaA16aD3gkdia/0IJYpGsPeOA
-         fDEUWTLRFEY4x/jukbffuRlMkGPhe8jUSuvZ1yPPjOW/OD4TF5PTjoohB8ffB9FP6O3D
-         /CJUO7Uqpl2ON+hNvU+owkyFKmK3aoCnsikY4BjlivzSsdtfdFu0w9uROLcP0c3SYJc2
-         YJRBkBMz0vykid9wn4+q8Aolv31wwmF694SG9VkAzsE+kqHtqPApSPD5fh2XufQv0oah
-         yuXzHBZNPPoD/rayCyX35a5NhVRLO5IKBfSWfiuprwJQLon+moeaW7p496duSTFbMbN6
-         qQvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754903966; x=1755508766;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9X3+VyeiU1OgsV7atWhvLrxkvJsIXxj9Qgw0FX6QMEE=;
-        b=K7fYy3kxEO19jEwChanBO9EHrYeWVrIHYm6aVHSOX9P3TuBYR5CstuzvoHb1jWBUbS
-         qiAsQm11o8NvTWI0IUwrrGxV9sY+oW5n1VJ4zKuzxvJhnK4mQoyOCymvzJ45s+oIsvD3
-         daeaBsPq667w05qzoC9oX2erhO4WFFLAmVES9fxb+vZmWoR1b2BQA5IujsXsgbI7LSAM
-         JtQ2GwJQDgokoww1P5IbyXhkEb0Tf2v6D7MSxcnOLbmN3w0kJhQsFkbLsh/W1qT9NNol
-         BCM36nPOoWzXjiOEgCEHhsyP8MqB6KqZjeQ4tVQg8rrAitxzkctKmhPJd3pLYMQ3LAvU
-         3w4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCX8+0G0PcjzMGHvny8DMvJOTprrJM19W21fj4Cm+oDvpyuqfp1eRv/V2LCbpM1NOscqroo2fJk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyK5xoXky1oCViJ33v0AaqOgvurok08IQHJauVoM8WZaEZPXrQB
-	+JH1FKj91C98XUATCFlwTXpy/LE8J/ii+m2TDc/hP4zU2bydKSWS/BwQ0FKUdXXc7cKEtl7gbEW
-	5fA/SOz58HnEEppyLjur7KLEYDT8OSUi10fqXW4A9
-X-Gm-Gg: ASbGncsqXaDkZv1wCo/Ay5pQwsT5kwK/B7gh63K4QA4gMH/zUyXdOBA6NmsFDtvig3T
-	dekyw7Ay/FRET9TU8VWImEAOYO0piOaYL4hN3IkWeQdwC0AvVRsJqqtc0XCAb9aG+pkef4MDsIP
-	YLMsbPRRBRon8Wc99zgd5yoAextCKQsg3fD+U7qKqn25G9W28dhZ5ulPe+GariQBCilRSXEA/3m
-	71bffo=
-X-Google-Smtp-Source: AGHT+IGsGqL0Tet528TAr+FeI8cqB44Iw1Yw7vkXFDKW2y66uKrMwpszv3VtSYrNMrGppCnsouzQ6A2JECoC7Hzay+s=
-X-Received: by 2002:a05:622a:548:b0:4af:203f:73e9 with SMTP id
- d75a77b69052e-4b0aecff0afmr124996791cf.3.1754903965426; Mon, 11 Aug 2025
- 02:19:25 -0700 (PDT)
+	s=arc-20240116; t=1754904032; c=relaxed/simple;
+	bh=RP0nMAbhmMqhT+b15D9nwQY8JJQKu5UmzFe58CFja60=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=quDg50mR+XGZiwu48gJjiUbvoJH6fEy/7qJE4epB9zzmY8cvKbT7e9oBiswam4mY1saiNn+9SJoYR4Z8gpNuyAu4q0nZ5qXANebWr2FtVYQ/Un5ursnpkdhS8q/r3Lj0OohRUmnry0xnSTy2UBHxk3O2auwr+hzog25eVMBHuBo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=iu9cYTq0; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by mx1.secunet.com (Postfix) with ESMTP id 46230207FC;
+	Mon, 11 Aug 2025 11:20:21 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from mx1.secunet.com ([127.0.0.1])
+ by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id dweYxDhFsg6c; Mon, 11 Aug 2025 11:20:20 +0200 (CEST)
+Received: from EXCH-01.secunet.de (unknown [10.32.0.231])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.secunet.com (Postfix) with ESMTPS id B9DE6201D3;
+	Mon, 11 Aug 2025 11:20:20 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com B9DE6201D3
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1754904020;
+	bh=AExMwnuk/C2ldQj9humzRZW0unjeaQKXjbk6GS6Yabc=;
+	h=From:To:CC:Subject:Date:From;
+	b=iu9cYTq0ezzykzproe902PGE4sDPELdvBSYG8UlIBQRxm+FnPuufCVBIpNpfqb5d8
+	 JcbE3dSIvlyB+dG+VOdqE0AJpQUomqhT7/iSK3B7gilU5fwOaZLkjUkMXaJ2ekYERr
+	 Gay+in5oDCqNJGJ1+E/WS77Px2p+C3yOe5vbL9NJB7VmD1fYlh2p99Uz7mDu8qsMHT
+	 RKbFlOALibJAPl1Uf1M86itpdbiO7sPvbIPPG4kGJ/wHMtArxQqJe1ZYVDJBmtgv1F
+	 LA7pYPOABdW/lDMKnvUKS5foPyVW5HdIQjeb92Ay+A1kMOwp5E0zP/NWJjrfvuNmhw
+	 2xuGiH9z6T5/A==
+Received: from gauss2.secunet.de (10.182.7.193) by EXCH-01.secunet.de
+ (10.32.0.171) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.1748.10; Mon, 11 Aug
+ 2025 11:20:20 +0200
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+	id EF5933183F80; Mon, 11 Aug 2025 11:20:19 +0200 (CEST)
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
+CC: Herbert Xu <herbert@gondor.apana.org.au>, Steffen Klassert
+	<steffen.klassert@secunet.com>, <netdev@vger.kernel.org>
+Subject: [PATCH 0/4] pull request (net): ipsec 2025-08-11
+Date: Mon, 11 Aug 2025 11:19:28 +0200
+Message-ID: <20250811092008.731573-1-steffen.klassert@secunet.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250811084427.178739-1-dqfext@gmail.com>
-In-Reply-To: <20250811084427.178739-1-dqfext@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 11 Aug 2025 02:19:14 -0700
-X-Gm-Features: Ac12FXyDAHXwINvs0_c2V2RB4ZbG2aFo4c_KD22t99jVdd62EqxWa-M4aOJp_VE
-Message-ID: <CANn89iLEMss3VGiJCo=XGVFBSA12bz0y01vVdmBN7WysBLtoUA@mail.gmail.com>
-Subject: Re: [PATCH net] ppp: fix race conditions in ppp_fill_forward_path
-To: Qingfang Deng <dqfext@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Pablo Neira Ayuso <pablo@netfilter.org>, Felix Fietkau <nbd@nbd.name>, linux-ppp@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
+ EXCH-01.secunet.de (10.32.0.171)
 
-On Mon, Aug 11, 2025 at 1:44=E2=80=AFAM Qingfang Deng <dqfext@gmail.com> wr=
-ote:
->
-> ppp_fill_forward_path() has two race conditions:
->
-> 1. The ppp->channels list can change between list_empty() and
->    list_first_entry(), as ppp_lock() is not held. If the only channel
->    is deleted in ppp_disconnect_channel(), list_first_entry() may
->    access an empty head or a freed entry, and trigger a panic.
->
-> 2. pch->chan can be NULL. When ppp_unregister_channel() is called,
->    pch->chan is set to NULL before pch is removed from ppp->channels.
->
-> Fix these by using a lockless RCU approach:
-> - Use list_first_or_null_rcu() to safely test and access the first list
->   entry.
-> - Convert list modifications on ppp->channels to their RCU variants and
->   add synchronize_rcu() after removal.
-> - Check for a NULL pch->chan before dereferencing it.
->
-> Fixes: f6efc675c9dd ("net: ppp: resolve forwarding path for bridge pppoe =
-devices")
-> Signed-off-by: Qingfang Deng <dqfext@gmail.com>
-> ---
->  drivers/net/ppp/ppp_generic.c | 13 +++++++++----
->  1 file changed, 9 insertions(+), 4 deletions(-)
->
-> diff --git a/drivers/net/ppp/ppp_generic.c b/drivers/net/ppp/ppp_generic.=
-c
-> index 8c98cbd4b06d..fd3ac75a56e3 100644
-> --- a/drivers/net/ppp/ppp_generic.c
-> +++ b/drivers/net/ppp/ppp_generic.c
-> @@ -33,6 +33,7 @@
->  #include <linux/ppp_channel.h>
->  #include <linux/ppp-comp.h>
->  #include <linux/skbuff.h>
-> +#include <linux/rculist.h>
->  #include <linux/rtnetlink.h>
->  #include <linux/if_arp.h>
->  #include <linux/ip.h>
-> @@ -1598,11 +1599,14 @@ static int ppp_fill_forward_path(struct net_devic=
-e_path_ctx *ctx,
->         if (ppp->flags & SC_MULTILINK)
->                 return -EOPNOTSUPP;
->
-> -       if (list_empty(&ppp->channels))
-> +       pch =3D list_first_or_null_rcu(&ppp->channels, struct channel, cl=
-ist);
+1) Fix flushing of all states in xfrm_state_fini.
+   From Sabrina Dubroca.
 
-It is unclear if rcu_read_lock() is held at this point.
+2) Fix some IPsec software offload features. These
+   got lost with some recent HW offload changes.
+   From Sabrina Dubroca.
 
-list_first_or_null_rcu() does not have a builtin __list_check_rcu()
+Please pull or let me know if there are problems.
 
+Thanks!
 
+The following changes since commit d942fe13f72bec92f6c689fbd74c5ec38228c16a:
 
-> +       if (!pch)
->                 return -ENODEV;
->
-> -       pch =3D list_first_entry(&ppp->channels, struct channel, clist);
->         chan =3D pch->chan;
+  net: ti: icssg-prueth: Fix skb handling for XDP_PASS (2025-08-05 18:03:33 -0700)
 
-chan =3D READ_ONCE(pch->chan);
+are available in the Git repository at:
 
-And add a WRITE_ONCE(pch->chan, NULL) in ppp_unregister_channel()
+  git://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec.git tags/ipsec-2025-08-11
 
-And/or add __rcu to pch->chan
+for you to fetch changes up to d8369183a01a9f06f08c5d52e2667035e66b9957:
 
-> +       if (!chan)
-> +               return -ENODEV;
-> +
->         if (!chan->ops->fill_forward_path)
->                 return -EOPNOTSUPP;
->
-> @@ -3515,7 +3519,7 @@ ppp_connect_channel(struct channel *pch, int unit)
->         hdrlen =3D pch->file.hdrlen + 2;  /* for protocol bytes */
->         if (hdrlen > ppp->dev->hard_header_len)
->                 ppp->dev->hard_header_len =3D hdrlen;
-> -       list_add_tail(&pch->clist, &ppp->channels);
-> +       list_add_tail_rcu(&pch->clist, &ppp->channels);
->         ++ppp->n_channels;
->         pch->ppp =3D ppp;
->         refcount_inc(&ppp->file.refcnt);
-> @@ -3545,10 +3549,11 @@ ppp_disconnect_channel(struct channel *pch)
->         if (ppp) {
->                 /* remove it from the ppp unit's list */
->                 ppp_lock(ppp);
-> -               list_del(&pch->clist);
-> +               list_del_rcu(&pch->clist);
->                 if (--ppp->n_channels =3D=3D 0)
->                         wake_up_interruptible(&ppp->file.rwait);
->                 ppp_unlock(ppp);
-> +               synchronize_rcu();
+  Merge branch 'xfrm: some fixes for GSO with SW crypto' (2025-08-08 10:44:23 +0200)
 
-synchronize_net() is preferred.
+----------------------------------------------------------------
+ipsec-2025-08-11
 
->                 if (refcount_dec_and_test(&ppp->file.refcnt))
->                         ppp_destroy_interface(ppp);
->                 err =3D 0;
-> --
-> 2.43.0
->
+----------------------------------------------------------------
+Sabrina Dubroca (4):
+      xfrm: flush all states in xfrm_state_fini
+      xfrm: restore GSO for SW crypto
+      xfrm: bring back device check in validate_xmit_xfrm
+      udp: also consider secpath when evaluating ipsec use for checksumming
+
+Steffen Klassert (1):
+      Merge branch 'xfrm: some fixes for GSO with SW crypto'
+
+ net/ipv4/udp_offload.c  |  2 +-
+ net/ipv6/xfrm6_tunnel.c |  2 +-
+ net/xfrm/xfrm_device.c  | 12 +++++++++---
+ net/xfrm/xfrm_state.c   |  2 +-
+ 4 files changed, 12 insertions(+), 6 deletions(-)
 
