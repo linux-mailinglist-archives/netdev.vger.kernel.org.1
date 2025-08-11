@@ -1,85 +1,80 @@
-Return-Path: <netdev+bounces-212434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212435-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D0FCB20487
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 11:54:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D2DFB20495
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 11:56:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 75F0E4E2C84
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 09:54:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 206EC1717A6
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 09:54:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C128201113;
-	Mon, 11 Aug 2025 09:53:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2F8321ADB9;
+	Mon, 11 Aug 2025 09:53:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e70RdzFX"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="fFgFNwCA"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4296D1A3BD7
-	for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 09:53:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C87A2264A3
+	for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 09:53:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754906028; cv=none; b=OW6crf1KM7Sl+2Qmvl6xUkFwJ/btAHYkAJYNwsEn5+Qzt85+/yMIu/WruhCfJtvl+a1IKpZgW7bvPo7ZQ8b1KgQmBs5/aBo76vSYqNyO1ROfs8ISyr667PdROildcg8vSbdnTvJJemxbItWL+5snclst5CuZUFZODYQziAFaQBY=
+	t=1754906034; cv=none; b=MwewcydxORcr9mmZX5NSPDZWCel4xW38yO3CsC2AS5HYhE7ZPGgzxOODmW4IHN9tRO0kqX6A1tE3UZlEEKgDyZYJ0HnW+3GhNIA+TwvWf7+2DB6oTRS5ndec+FQYc/Bfmn5Q/Pqe/WFlSINx9W033x1EpuocTzAbg1ojcWcGjnU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754906028; c=relaxed/simple;
-	bh=X+/wETXg6+t+xV51UEQmour6oMA0R+27wdMYsGkvz+c=;
+	s=arc-20240116; t=1754906034; c=relaxed/simple;
+	bh=Id6hAsBzqvvvJuLnhifWVuPprxw97gs5pfxiXKcIU18=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ChaZW+xxipgj7Z8t5cILGmgdrUZXjpFdaNADdBaQkkxHjpEBcDncrsH+2xjYwVs1IfKPQdmVsUZumWpIdDpQsKw0dnIJEQaEtM+/GaHsUpIKaWMtINb3906Rj06biPoBrazmXT/dAbUnq2yAN2DWfwKOUrSv1X+0aonRoCNVghk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e70RdzFX; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1754906025;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LHJd90lJt7pKkV7L6fdhKaIxyXCO7FJPwtx28akpSm0=;
-	b=e70RdzFXKzTZOfkPn172HQdxInLj+LSbF6NuLrYF7vq4yK7HyDOfQSfn5t2tVYUxCLoqyw
-	Foyl2YoVn6smT5ZpriZ4HyWLTOy8/kCGP+wfdFf63Ojvsuu9v1zZrPnaoooIJq/CB6aiRJ
-	O/CGlB/r/slIgrlFiYUbIT/j1MzZYw0=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-52-h2_3JwXMN_istiiiwvXd2Q-1; Mon, 11 Aug 2025 05:53:43 -0400
-X-MC-Unique: h2_3JwXMN_istiiiwvXd2Q-1
-X-Mimecast-MFC-AGG-ID: h2_3JwXMN_istiiiwvXd2Q_1754906023
-Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-707453b0307so95080336d6.3
-        for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 02:53:43 -0700 (PDT)
+	 In-Reply-To:Content-Type; b=Ifln+QM42rzIo9rfPmMU9y/jGHgfCwnUgOlW5dJWHYX8IHFlp8u7yVjAN18aSKkaMe3cxGh394Z48/iVv0WGCw1ZzEjKG+DzKg3LCJoUV+FxvR9ci/MsaE3ptEXxy8xLB+ZtoEO9dEWfMnNA8jfYMItw4NQQfMs7DHLTmt9cq6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=fFgFNwCA; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-76bdc73f363so3557561b3a.3
+        for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 02:53:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1754906032; x=1755510832; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=lWk6+fuhPROgdnZouTKBsa+OgjZO72VHnDBSFJOn8Gk=;
+        b=fFgFNwCAUInchQmzAB97HWuHq8cqzKMMcOP1FLwZCqCdrhV3I/vddcnWELCT1e2Lwu
+         Iioh4J+Ebc1X5y5Oa5rBpzWbuYYbhNZ8BhAjQZcCa3kQopMMfMcL7BxnkJGTH9t0VxrL
+         AHiqmuKy3KiR8gL4HPchGvdEfjCaF1nJm8gjYRZlxCpCe7m87ICf/K7e3wzoL0Yag//T
+         5e5iHn42mk8uI9RYUK0YpKEaVlYwLih63DgWJcYO84xeSat2ZVcXxhJtOqG0jGcoI7zq
+         gKYWQaP/csSRRShVsPv7BkULppkMBRrdH/v1pLmE6RRts7SwKV04dWTDuqHlsoTfactl
+         ggDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754906023; x=1755510823;
+        d=1e100.net; s=20230601; t=1754906032; x=1755510832;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LHJd90lJt7pKkV7L6fdhKaIxyXCO7FJPwtx28akpSm0=;
-        b=lhkjt/O5nPUfh73mVwNBbeA63R9Ad5k7rjJrcV7Y0pzFLb5Mho0r+gNidCpXbwyEyU
-         8KhCgqwa+QoJyv0TSfZEnq1wclndT7gO43HIDi83DoZZBTpJrFCKwkVE8nMpZKzNtCMr
-         KKdDnh/SPNz1pLAGzfMfjrkd2Vm/zctf6ch5+z1j5UTb4Ye50bORjVfnLgnjXgCBuGYz
-         R5R3h4PDIQmeeuZfYIuh3hNMWiwvFT5Jl8hp+YrjusjHYNEgnajdDQF3uA98Q71ua/TF
-         3AAWg6yhydNPjaggMXIqtdtEw9/6qMHNxswBUHcDJSOimI9R/vpOlAMLDZUjook2d1AU
-         CFyw==
-X-Gm-Message-State: AOJu0Yz6PjzAI2mfznKjP0tdd3cp3UylZVCksrAPqzfdQ5Z11IvfGnOa
-	tI25f/hDCopzd6PfoT87N6Et0NeVontHFB84AZBLg2uYzJJd/Q9cQwY0N60vktXaqwKPRo6x+5Y
-	fi2zYcbtOYKkTepoO2jSoVvunYjUBq8pjpVIHakaccZpFr+LyuqW8q61RGDyyMxmuzQ==
-X-Gm-Gg: ASbGncu9849d+4qmf7fakqGngL5Zfqz92FyHs9Ax5tfKQ2z0pWDvc8um2eW2H3eJwrD
-	VTcwQC95GNEsv7y4YKfw2peB1qRhpadr4pz1U9p8rAeIpLXxKyJ3Fhi2PVYie5W6IYtDUhAETp0
-	Nn64VtGdDrdc6Gb7GdlVB3HuEuYk2uZUjr3g07fq7ig9RBUAWpLiz1R72+4XZUj3uwv3zqDvtcW
-	LTynjxvdJnydkJ9W3x365mPrxjhMEVpN99lCxHOpr7GOWtMF7YwGX7+Wt6nd7AJkg0GjgDAJ8us
-	9Ogg0WkFS+PwcWj/gpeEB0dOG3tug+pFs0KxUgmYoU4=
-X-Received: by 2002:a0c:da06:0:b0:709:9b8e:da0c with SMTP id 6a1803df08f44-7099b8edbe5mr112073406d6.44.1754906023060;
-        Mon, 11 Aug 2025 02:53:43 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFhDAMiPhkWP4y81WnT8aCqUZTFa3MossLf3cLQLsxAl0+cuexXhtMxG6I+EVpY/G1M9uEsNA==
-X-Received: by 2002:a0c:da06:0:b0:709:9b8e:da0c with SMTP id 6a1803df08f44-7099b8edbe5mr112073306d6.44.1754906022634;
-        Mon, 11 Aug 2025 02:53:42 -0700 (PDT)
-Received: from [192.168.0.115] ([212.105.149.252])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-7077c9dff72sm151703916d6.15.2025.08.11.02.53.40
+        bh=lWk6+fuhPROgdnZouTKBsa+OgjZO72VHnDBSFJOn8Gk=;
+        b=VJZVSnbXpTkOqiEh8BqR/HzW/LJN6fQMbSSQUqwaNobdd84ZfNEFkc6rAgBbHXDgiI
+         NkchvkpccZIoX057rua5U2Tz0SU7z5tdO8M+jNpThjJbrwX7m82wMw158yCVW/IfJ1n5
+         f3fil3084Fxm9p03EHc7AK3FgaP12ZbSNjkH89NV0B11D+M5cD0yH9FwE9/9IUN7fo7d
+         AVGNCna8Hw5jKyquyo0dRL+w8VVZ0pGUN9M//rvJIQzPqts2PgK8X9hRfNoatjGnCL4i
+         V1nWaRyh/8U5Iy3m38UtvyPoBwqDsWfhBQ35MyEWSWHvltEMC0zR9t9R0ML/+K9s5pC6
+         RkyA==
+X-Forwarded-Encrypted: i=1; AJvYcCXjYxPh7+DyioyjcXsJX37P6i0ZhuvNODn6anDQHBYp+zWdBl7FaSfvy/l8YOQ2DEMAky/5mBc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxt/eFf6MXOBvj+ZDTnhBai1ucyeXVIvDQ5uDnKF27J19SWKGOd
+	W+Y2Ns0wSZn0bjutrTXr//cR2erfXgyDt9PK+QFsDATyTFGY0uwMyxvgF62C/bK/Pw==
+X-Gm-Gg: ASbGnctwGyPs5OxO4JSCfekpEM51+K6YjgBoDKdw69GUzKP/zU7ghjznVIeKpk0U/4o
+	XrltAWSOxO84vAQH9JYV+7WaQmXO4YjJ1+9vbgKuh4U5x8jD3RzxXgghai+yiQfxhWgzhGlkibx
+	krjC6b7rMUXQFlnY/pmfPj7vDJlaUHsLoPM5sF4A07gVVH6P4BOH3zsFGeProMpIVM3KqFwnHTB
+	qsju7pKNj5T0tgycxTKPiFk2Mj0uhUIZ+kXbZGglh+noP2cBWo11oXux9GfVrXce1NN9s1fIImX
+	RgrVKNxrTVx6bfP9Bql77ub4LTSVPSNRJzBREYGfrfnKxPAnngIhx0TFq18VXPWEJffL0eIKw6L
+	rvKR+c1AlhaWuNDN+3lFyAeyRcMB3gcXW799nZQK1MhfGk0698+lh8vbmJXT6nC+fhzul
+X-Google-Smtp-Source: AGHT+IFo7vi6HrItK7v1CufJvGlHeDnQfSmmkZbZztaZyc+WP0vxOvzwHR3Pd05E0yhcxcqlyvO5/A==
+X-Received: by 2002:a05:6a20:5493:b0:240:17d2:bff9 with SMTP id adf61e73a8af0-24055044d6amr18674326637.18.1754906032394;
+        Mon, 11 Aug 2025 02:53:52 -0700 (PDT)
+Received: from ?IPV6:2804:7f1:e2c3:a11c:ddd8:43e3:ca5c:f6ea? ([2804:7f1:e2c3:a11c:ddd8:43e3:ca5c:f6ea])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-76bccfd1d8csm26307631b3a.101.2025.08.11.02.53.48
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 Aug 2025 02:53:42 -0700 (PDT)
-Message-ID: <beada520-564a-481e-9f9d-91cd106aaee3@redhat.com>
-Date: Mon, 11 Aug 2025 11:53:38 +0200
+        Mon, 11 Aug 2025 02:53:51 -0700 (PDT)
+Message-ID: <81bd4809-b268-42a2-af34-03087f7ff329@mojatatu.com>
+Date: Mon, 11 Aug 2025 06:53:47 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,54 +82,62 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: linux-next: build warnings after merge of the net-next tree
-To: Stephen Rothwell <sfr@canb.auug.org.au>,
- David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
-Cc: Networking <netdev@vger.kernel.org>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux Next Mailing List <linux-next@vger.kernel.org>
-References: <20250711183129.2cf66d32@canb.auug.org.au>
- <20250801144222.719c6568@canb.auug.org.au>
+Subject: Re: [PATCH net] net/sched: ets: use old 'nbands' while purging unused
+ classes
+To: Davide Caratti <dcaratti@redhat.com>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang
+ <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Lion Ackermann <nnamrec@gmail.com>,
+ Petr Machata <petrm@mellanox.com>, netdev@vger.kernel.org,
+ Ivan Vecera <ivecera@redhat.com>, Li Shuang <shuali@redhat.com>
+References: <f3b9bacc73145f265c19ab80785933da5b7cbdec.1754581577.git.dcaratti@redhat.com>
+ <8d76538b-678f-4a98-9308-d7209b5ebee9@mojatatu.com>
+ <aJmge28EVB0jKOLF@dcaratti.users.ipa.redhat.com>
 Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250801144222.719c6568@canb.auug.org.au>
-Content-Type: text/plain; charset=UTF-8
+From: Victor Nogueira <victor@mojatatu.com>
+In-Reply-To: <aJmge28EVB0jKOLF@dcaratti.users.ipa.redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi,
-
-On 8/1/25 6:42 AM, Stephen Rothwell wrote:
-> On Fri, 11 Jul 2025 18:31:29 +1000 Stephen Rothwell <sfr@canb.auug.org.au> wrote:
->>
->> After merging the net-next tree, today's linux-next build (htmldocs)
->> produced these warnings:
->>
->> include/linux/virtio.h:172: warning: Excess struct member 'features' description in 'virtio_device'
->> include/linux/virtio.h:172: warning: Excess struct member 'features_array' description in 'virtio_device'
->>
->> Introduced by commit
->>
->>   e7d4c1c5a546 ("virtio: introduce extended features")
+On 8/11/25 04:49, Davide Caratti wrote:
+> On Fri, Aug 08, 2025 at 03:15:13PM -0300, Victor Nogueira wrote:
+>> On 8/7/25 12:48, Davide Caratti wrote:
 > 
-> I am still seeing those warnings.  That commit is now in Linus' tree.
+> [...]
+>   
+>>> Fixes: 103406b38c60 ("net/sched: Always pass notifications when child class becomes empty")
+>>> Fixes: c062f2a0b04d ("net/sched: sch_ets: don't remove idle classes from the round-robin list")
+>>> Fixes: dcc68b4d8084 ("net: sch_ets: Add a new Qdisc")
+>>> Reported-by: Li Shuang <shuali@redhat.com>
+>>> Closes: https://issues.redhat.com/browse/RHEL-108026
+>>> Co-developed-by: Ivan Vecera <ivecera@redhat.com>
+>>> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+>>> Signed-off-by: Davide Caratti <dcaratti@redhat.com>
+>>
+>> Can you submit a tdc test case for this bug?
+> 
+> hello Victor,
+> 
+> Thanks for looking at this!
+> 
+> At a first look: TDC is not the correct tool here, because it doesn't
+> allow changing the qdisc tree while the scapy plugin emits traffic.
 
-I'm sorry for the latency, I was off-the-grid in the past weeks.
+I see.
 
-I observed that warnings in an earlier revision of the relevant patch,
-but I thought the previous commit:
+> Maybe it's better to extend sch_ets.sh from net/forwarding instead?
+> If so, I can follow-up on net-next with a patch that adds a new
+> test-case that includes the 3-lines in [1] - while this patch can go
+> as-is in 'net' (and eventually in stable). In alternative, I can
+> investigate on TDC adding "sch_plug" to the qdisc tree in a way
+> that DWRR never deplete, and the crash would then happen with "verifyCmd".
+> 
+> WDYT?
 
-eade9f57ca72 ("scripts/kernel_doc.py: properly handle
-VIRTIO_DECLARE_FEATURES")
+That works for me as well.
 
-addressed it. At least I can't see the warnings locally while running:
-
-make V=1 C=1 htmldocs
-
-Perhaps it's sphinx version dependent? I'm using sphinx-build 7.3.7
-Could you please share the exact command line and tools version used?
-
-Thanks,
-
-Paolo
-
+cheers,
+Victor
 
