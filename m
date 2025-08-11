@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-212497-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212499-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 685D7B210B1
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 18:02:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55AF4B210BD
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 18:03:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60CC52A326A
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 15:53:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB1593AB8C8
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 15:56:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA80A2D480F;
-	Mon, 11 Aug 2025 15:33:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07A762E8881;
+	Mon, 11 Aug 2025 15:37:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ExP9PM6G"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Oiu9iENr"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B00D1296BAF;
-	Mon, 11 Aug 2025 15:33:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D13352E7F32;
+	Mon, 11 Aug 2025 15:37:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754926439; cv=none; b=t3kg4gD+8s4ecBOQrv0slFBH7f2KI5dlU7OW0cWK58i7XRRb4V7KjnrY0OdxNDwBVCJlePViuFtTfI4bDwr/fVhyS5vhZV8u/EtKdPyJQnevSU8GWiUP2lwEBobzSTSALWyTrX9yjcdmBvsI+Wc2LPrSKWaWdPetPqQTFWBQTQc=
+	t=1754926659; cv=none; b=Rd146bHHIKS8R69+K+VcHi3tVllwZO9zHedVRj+W5GfOHeMANexskVumktaWeY+v6M209NzmyfHY8RjMmKDH6x5Rt6gF33U6fVkEoLRhVMs8HEKaQ/H4OdL6Cg/JzmhjaJDd9rgSdqvPbC9Q6ctfLSU+fqeCtqM7N9120rRLhVE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754926439; c=relaxed/simple;
-	bh=eSOlRImoJ/oBZHOPhHvF814nt3A8TimrFqSk62iMgWc=;
+	s=arc-20240116; t=1754926659; c=relaxed/simple;
+	bh=xreD27Fpmb+ZqmNwEP6ViAFZpkCnuQJup+gAGGJ9mTY=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sja6aaV5Ipw62QcpyYUdiIqMvrj7/bxtER5P3631OY8W+M26xGLCnnnB2IDpbUsJyWW7CfQd2kcu72gfoR2FE9B/Vr/52zOHe/xQjmyP+NHI6UhKK4K6AOldVxfhsTyTv2eOMZ9ct6HcgOQ/zVPMzuluNl6wSWmB7R+Nog6Qsuc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ExP9PM6G; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50EF4C4CEED;
-	Mon, 11 Aug 2025 15:33:57 +0000 (UTC)
+	 MIME-Version:Content-Type; b=R1437hjQNECmsIEFcFv0NDxACpHVxAU283VwGAv5H24+4HgCRsUvXl0YQKKiJNJad7j2mpAQ+dDEwXBX/0TpwZQQ9AYipwJfqo5+tDi/XQAEgNE7/wpmydxmCCG7wP9wgk3d9Xy97fRR5Jv0nhboE/EpgSZDq2mS5hX0xkZ5IyM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Oiu9iENr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05D95C4CEED;
+	Mon, 11 Aug 2025 15:37:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754926439;
-	bh=eSOlRImoJ/oBZHOPhHvF814nt3A8TimrFqSk62iMgWc=;
+	s=k20201202; t=1754926659;
+	bh=xreD27Fpmb+ZqmNwEP6ViAFZpkCnuQJup+gAGGJ9mTY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ExP9PM6GyoBntsw8j/7UMxlugkpwGspZqQmchPNhLluIzjqBN1WDBmHIzSmm3ouHr
-	 xt7FZdmUQiRUdaIuwyxsvhnDVJ5xnM4d7XLWKY5gHCnTRj/eXYwb/NoHaeTPwRrY7m
-	 XGvzNmWq89/m77cqF2k4hsKgq3ihiytBGPWmQ8YVewP5ppZNqUxHU48cGWN+ubIHMa
-	 NN6fdRHH4bDpKuPMU4FIvUC4Mt1DcNxzC5yjlSji6B+9dySQdw4AxXnVZARzqAM25q
-	 IinlDi2VlASpX1KNBa0AJgcRtnTR1wrOBEN+ERq3Xiv6QNLqRTbXJVo8tc1UATJM1T
-	 Edex4OXyt/KbA==
-Date: Mon, 11 Aug 2025 08:33:56 -0700
+	b=Oiu9iENrS+e1XQffKABcxvqiEhWohi/qUbxG6ZtAPX1RGPlLyvFq4vT/rvK2TiuWR
+	 x1gKlljxCN5FxXuqrpdWM8tjIowrLYip4heXRaIHDOD2TMPhs+i/QxsaNd9oF3LarC
+	 jDQAMHY3dehZcZ7F1WEYwb0LsMAJ1D/htkO93jYCz1WUoFE7K1UqhkngyGsXNGiST9
+	 j7nyMLStcWg2CQBNDCYYw8ZGCyvdgYX3hrrndQkJvTu7O0cr1cgYIOx9CdtFBC9DmG
+	 +J89Eu80mTAd5ZhbnDsUkQYB1mC4GUaOb473XuKIlJzTdgTuIvg1Mjl3qifU/Pe1mL
+	 Ywy59rof8eU3w==
+Date: Mon, 11 Aug 2025 08:37:38 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Alexandra Winter <wintera@linux.ibm.com>
-Cc: "D. Wythe" <alibuda@linux.alibaba.com>, ast@kernel.org,
- daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
- pabeni@redhat.com, song@kernel.org, sdf@google.com, haoluo@google.com,
- yhs@fb.com, edumazet@google.com, john.fastabend@gmail.com,
- kpsingh@kernel.org, jolsa@kernel.org, Mahanta.Jambigi@ibm.com,
- Sidraya.Jayagond@ibm.com, wenjia@linux.ibm.com, dust.li@linux.alibaba.com,
- tonylu@linux.alibaba.com, guwen@linux.alibaba.com, bpf@vger.kernel.org,
- davem@davemloft.net, netdev@vger.kernel.org, jaka@linux.ibm.com
-Subject: Re: [PATCH bpf-next 2/5] net/smc: fix UAF on smcsk after
- smc_listen_out()
-Message-ID: <20250811083356.7911039b@kernel.org>
-In-Reply-To: <14ec76a2-e80e-44a8-a775-ebd4668959c4@linux.ibm.com>
-References: <20250731084240.86550-1-alibuda@linux.alibaba.com>
-	<20250731084240.86550-3-alibuda@linux.alibaba.com>
-	<174ccf57-6e7c-4dab-8743-33989829de01@linux.ibm.com>
-	<20250811015452.GB19346@j66a10360.sqa.eu95>
-	<14ec76a2-e80e-44a8-a775-ebd4668959c4@linux.ibm.com>
+To: "Gupta, Suraj" <Suraj.Gupta2@amd.com>
+Cc: "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
+ <davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+ "pabeni@redhat.com" <pabeni@redhat.com>, "Simek, Michal"
+ <michal.simek@amd.com>, "sean.anderson@linux.dev"
+ <sean.anderson@linux.dev>, "Pandey, Radhey Shyam"
+ <radhey.shyam.pandey@amd.com>, "horms@kernel.org" <horms@kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "Katakam, Harini" <harini.katakam@amd.com>
+Subject: Re: [PATCH net] net: xilinx: axienet: Increment Rx skb ring head
+ pointer after BD is successfully allocated in dmaengine flow
+Message-ID: <20250811083738.04bf1e31@kernel.org>
+In-Reply-To: <BL3PR12MB65712291B55DD8D535BAE667C92EA@BL3PR12MB6571.namprd12.prod.outlook.com>
+References: <20250805191958.412220-1-suraj.gupta2@amd.com>
+	<20250808120534.0414ffd0@kernel.org>
+	<BL3PR12MB65712291B55DD8D535BAE667C92EA@BL3PR12MB6571.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,30 +68,34 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 11 Aug 2025 11:24:50 +0200 Alexandra Winter wrote:
-> > Yes, it should be sent to net. But the problem is that if I don't carry
-> > this patch, the BPF CI test will always crash. Maybe I should send a
-> > copy to both net and bpf-next? Do you have any suggestions?
-> 
-> I do not have any experience with bpf-next. But typically patches
-> to 'net' are taken after one or two days, if there are no issues.
-> I'd assume they are then picked to net-next and bpf-next(?) almost instantly.
-> Then you would not need it in your bpf series anymore.
+On Sat, 9 Aug 2025 20:31:40 +0000 Gupta, Suraj wrote:
+> > The fix itself seems incomplete. Even if we correctly skip the incremen=
+t we
+> > will never try to catch up with the allocations, the ring will have few=
+er
+> > outstanding Rx skbs until reset, right? Worst case we drop all the skbs=
+ and the
+> > ring will be empty, no Rx will happen until reset.
+> > The shutdown path seems to be checking for skb =3D NULL so I guess it's=
+ correct
+> > but good to double check..
+>=20
+> I agree that Rx ring will have fewer outstanding skbs. But I think
+> that difference won't exceed one anytime as descriptors submission
+> will fail only once due to insufficient space in AXIDMA BD ring. Rest
+> of the time we already will have an extra entry in AXIDMA BD ring.
+> Also, invoking callback (where Rx skb ring hp is filled in
+> axienet)and freeing AXIDMA BD are part of same tasklet in AXIDMA
+> driver so next callback will only be called after freeing a BD. I
+> tested running stress tests (Both UPD and TCP netperf). Please let me
+> know your thoughts if I'm missing something.
 
-AFAIU the patches which land in net will make it to -next trees after
-respective PR with fixes. So
+That wasn't my reading, maybe I misinterpreted the code.
 
-
- patch -> 
-          net ->
-                 [next Thu] Linus ->
-                                      [same day] net-next
-                                      [at some point] bpf PR ->
-                                                                 Linux
-                                                                        -> bpf-next
-
-What gets applied to net should be in net-next in a week,
-and most -next trees within 2 weeks.
+=46rom what I could tell the driver tries to give one new buffer for each
+buffer completed. So it never tries to "catch up" on previously missed
+allocations. IOW say we have a queue with 16 indexes, after 16 failures
+(which may be spread out over time) the ring will be empty.
 
