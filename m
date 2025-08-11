@@ -1,98 +1,132 @@
-Return-Path: <netdev+bounces-212391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212392-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23FF1B1FD2C
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 02:03:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29501B1FD71
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 03:09:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E5A1171383
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 00:03:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2C1C3B9AC7
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 01:09:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2913442C;
-	Mon, 11 Aug 2025 00:03:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IwNhIrTS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0B011922FB;
+	Mon, 11 Aug 2025 01:09:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F21C4400;
-	Mon, 11 Aug 2025 00:03:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4DA22E401;
+	Mon, 11 Aug 2025 01:09:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754870595; cv=none; b=GG391+gTEVveP0gIivd5gS8+TF+M8JP7bPB3RcvokjeMalwszIinT9csCr9NlFiRGJcRmEJfPuOvbeKWiMQXYa0NDCqzHfJZrO5VSxjeQVKGGFK11AlxSzQkqhm61+gN+GnsLB5bMgSHNPfd7VIWi/PS8RVC2ax5H1kPbhfICWI=
+	t=1754874578; cv=none; b=nTyX1Jfp9HFmtdCI6ZOndHiAWGToH1eH4Sdp4Gi6cfZlckcFo9inO4/NX6gov5vKJGkc0cXr+P9R5H/d6UJIgmGEqplMefBjJBqiTITOe1jeNAYfDbQxXfT+/cknBw7rIlzwurVw0ZcNWQOColkQApCFzUWjzrDK5QzUqa7pY2g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754870595; c=relaxed/simple;
-	bh=X+BdXFqquj9DQr6IZy+gnd+atvFm1saLgYgTBYGsDcc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RSPldG5gKe5AkcM7Rl9q4AOcKcQBOMU5mwrwcodKm2UO3Sw9Cz8GMy2oIzOItSBmoKnZKjRoP7cB9Fv5XpX9pTG5SOxlvpXD1rv8SgD7rci3bErjzddWfcpt8vuBiZROf3oEAfzutwdk6QpPANEuJnS517e5DgUpQmEqSPJCpLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IwNhIrTS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B93CC4CEEB;
-	Mon, 11 Aug 2025 00:03:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754870594;
-	bh=X+BdXFqquj9DQr6IZy+gnd+atvFm1saLgYgTBYGsDcc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=IwNhIrTSncJxWdZ2aY0n/OpWBzLHtdeDdtqD5+L1CFL86UORnALYCcQp0lr46IJmK
-	 QfYpITQOe/3jNfCUoktAuooa3UV0HRXYiD5QT9oe/awIBZjKB1Iha+ntxvt0S8zcUv
-	 +5jNoWOfLSKqHgr9ElMOr3navaHtvZCm+yEZYLHaeETo99A2vnX3O1jN5EUlAUzfaK
-	 zS/tjGE1uUJRXVuEHgXYMIHi5GVWwHBtVLEpqEnCPb4pAPocc1MrIUHLxfK6R3PdO8
-	 Xn9tjuhyZKJCWL3ouaL1S9d4CsrXUm7B3KNegfsW7sl0SHwx/h3Plfvge1bDvhceJG
-	 9dYQaxn6JaY5w==
-Message-ID: <8358d907-0edc-4ff0-a520-9cec3c84a49a@kernel.org>
-Date: Sun, 10 Aug 2025 18:03:12 -0600
+	s=arc-20240116; t=1754874578; c=relaxed/simple;
+	bh=edK6wfe82+a1zI95IT4725tatobF5C9KlGS4WvUMtzs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KOQ1jri43BGhRkFowd0ZaSW08ZC7L1rubyEb0XfFPmOPwOB/kFGMIzGua5QrcUgDIWtf1nkKahTNXJqm39BoFsjIRNlDWdj2VPY7YeTPW9wWWBwqtNGQHsdUXpDtgu7pV4EdRLHNX9jXqq+AqTKSbTbXaHITcJPvMtQZntfjm7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-681ff7000002311f-f7-689942c2df79
+Date: Mon, 11 Aug 2025 10:09:17 +0900
+From: Byungchul Park <byungchul@sk.com>
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: linux-mm@kvack.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
+	harry.yoo@oracle.com, ast@kernel.org, daniel@iogearbox.net,
+	davem@davemloft.net, kuba@kernel.org, hawk@kernel.org,
+	john.fastabend@gmail.com, sdf@fomichev.me, saeedm@nvidia.com,
+	leon@kernel.org, tariqt@nvidia.com, mbloch@nvidia.com,
+	andrew+netdev@lunn.ch, edumazet@google.com, pabeni@redhat.com,
+	akpm@linux-foundation.org, david@redhat.com,
+	lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, vbabka@suse.cz,
+	rppt@kernel.org, surenb@google.com, mhocko@suse.com,
+	horms@kernel.org, jackmanb@google.com, hannes@cmpxchg.org,
+	ziy@nvidia.com, ilias.apalodimas@linaro.org, willy@infradead.org,
+	brauner@kernel.org, kas@kernel.org, yuzhao@google.com,
+	usamaarif642@gmail.com, baolin.wang@linux.alibaba.com,
+	almasrymina@google.com, toke@redhat.com, bpf@vger.kernel.org,
+	linux-rdma@vger.kernel.org, sfr@canb.auug.org.au
+Subject: Re: [PATCH linux-next v3] mm, page_pool: introduce a new page type
+ for page pool in page type
+Message-ID: <20250811010917.GB28363@system.software.com>
+References: <20250729110210.48313-1-byungchul@sk.com>
+ <757b3268-43ab-41bf-88fa-4730089721f3@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2] net: vrf: don't down the interface when add
- slave
-Content-Language: en-US
-To: Ido Schimmel <idosch@idosch.org>, Menglong Dong <menglong8.dong@gmail.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, sdf@fomichev.me,
- kuniyu@google.com, ahmed.zaki@intel.com, aleksander.lobakin@intel.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250807055634.113753-1-dongml2@chinatelecom.cn>
- <aJhNP_xQyENLSF6d@shredder>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <aJhNP_xQyENLSF6d@shredder>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <757b3268-43ab-41bf-88fa-4730089721f3@gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0hTcRjG+Z9zds5xOTotzX8GfViUYHSl4A1Kutr/SxEUBRrUcic3mlrT
+	vHSBaXbTZmLXLQvLMnWSMO+XSW3LS7EuRrUsnVlJstS8JN6oNkXq2/P+3pfneT68PC2vkwTz
+	mtgEURer1CpYKSPt9b+3zL7ZqF5Z7pRAbmkJC+bRZHjYWe2diisRDI995OCPtRHBkKOJBY99
+	EEH+3REacl+mM/CrdJyGb41dHJgtO8Bd0M1A/fkqGrouN7NgSJ+gwTrWx0FadSEFuWV6Dl5V
+	Zkng6vgDGqr0nRy8qc1loaPkjwS6bQYGWkxFDPy85qDBnbURGvPmwcjzHwgcpVUUjFy6zcJb
+	Yy0FFda3HFxpzWPhS7obQau9i4FrkxdYuJWahWBi1GvZlz0sgVtPO7iNS0mqy8US+49+mpQX
+	faCIq+EZRWpM7RzJsxwnZYWhJMPVShNL8UWWWAZzOPLpXT1Lmm9OMKTm8zpSUz1EEcOZPpYM
+	fGtjdgVESNerRK0mUdStCDsoVRsqJyRHW2clN9l7OT3q5zOQH4+FNdj5vYOd0e7757gMxPOM
+	sBi/NCf4MCuEYJdrjPbpAGEp9ry3eU+kPC2UcNj4IgP5FnMFNS6784XyaZkAONvTw/i03Mvf
+	nC2STPM5uMX4dYrTQih2/e6hfFm0sAA//D1Vx0/YgB1DDVNZgcIi/LiyifJlYeErjwusPdR0
+	z/n4SaGLyUaC6T9b03+2pn+2eYguRnJNbGKMUqNds1ydEqtJXh4VF2NB3pcqOD0ZWY0GX+22
+	IYFHCn9Z54ObarlEmRifEmNDmKcVAbJu9Q21XKZSppwQdXEHdMe1YrwNLeAZRZBs9UiSSi5E
+	KxPEI6J4VNTNbCneL1iP7mTLQ+K25ndcD3tdnunZdCr6UE7vnKQoZ1qtJku7Ihzr98iMpuGg
+	oDZb2d4tH5dlUmReWEXiWPPkbEf5vpz9SdZHgcau9UERhWu3UeK4s31Wt8ps1sSVslrDsfpI
+	D7ezPXq77GRE2lV7xEDkFpuzbdvwQvfBlNkF4YfriGqJUcHEq5WrQmldvPIvSa6EKU4DAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0iTcRTG+b93V4u3qfmiXWBRgZVlJB27IUH1J7p9CIoIdeiLG84pm4oG
+	habdrJndKNcMrTQvC2Oam6YSm01NyFDMmeVMTTAvZV5oahdnRH17+D3nOc/5cDhSlkf7cypN
+	oqjVKNRyRkJJDu/I2Gjbk6vcnFG4GYzlJgbKvqfA414rDcbSKgST7m4WftU5EEw0NDIwbP+G
+	4GHBNAnG1kwKpspnSPjk6GOhzHwIXEWDFNRetJDQd62JAX3mLAl17jEWzlmLCTBWpLFgz2um
+	4U1VNg23ZgpJsKT1stBeY2Sgx/SLhkGbnoJmQwkFX283kODKDgNH/jKYbhlB0FBuIWD6ah4D
+	Hbk1BDyr62DhZls+A/2ZLgRt9j4Kbs9dYuBeejaC2e/zK8dyJmm497KHDduA051OBttHvpC4
+	sqSLwM76VwSuNnxgcb45CVcUB+IsZxuJzaWXGWz+doPF79/WMrjp7iyFqz+G4mrrBIH1GWMM
+	Hv/0jjrqe1KyM1pUq5JF7abdkRKlvmqWTmhblNJoH2XT0BcuC3lxAr9VcD26wGYhjqP4NUJr
+	WaIHM/w6wel0kx7tw68Xhjtt8yMSjuRNrJD7Ogt5DG9eKVTc7yc8WsqDkDM8RHm0bJ63ny+h
+	//ClQnPuwAIn+UDB+XOI8HSRfIDw+OfCCV78LqFhon6hy5dfLbyoaiRykNTwX9rwX9rwL52P
+	yFLko9IkxylU6pAgXawyVaNKCYqKjzOj+acpOjN33Yom2/fbEM8h+WJpb+FdpYxWJOtS42xI
+	4Ei5j3RQeUcpk0YrUk+L2vgIbZJa1NlQAEfJ/aQHjouRMj5GkSjGimKCqP3rEpyXfxrSdq7C
+	jugmvzsPHk6dq4hypY9WBv+QrWjRHywb6DxyP+SzumhskHN5q84mbWskhsb7R5rrVh4zFew9
+	sSRi35WnYeNXmrbv9dKGJjrGwy17YgItGVu63N3WA6clcTPPTaHhr1KiAlpifPffmjbHXpKc
+	Gjnsq3EPrHXt3rSrMuhJumK5nNIpFcGBpFan+A1UN4MuMAMAAA==
+X-CFilter-Loop: Reflected
 
-On 8/10/25 1:41 AM, Ido Schimmel wrote:
-> On Thu, Aug 07, 2025 at 01:56:34PM +0800, Menglong Dong wrote:
->> For now, cycle_netdev() will be called to flush the neighbor cache when
->> add slave by downing and upping the slave netdev. When the slave has
->> vlan devices, the data transmission can interrupted.
+On Sun, Aug 10, 2025 at 09:21:45PM +0100, Pavel Begunkov wrote:
+> On 7/29/25 12:02, Byungchul Park wrote:
+> > Changes from v2:
+> >       1. Rebase on linux-next as of Jul 29.
+> >       2. Skip 'niov->pp = NULL' when it's allocated using __GFP_ZERO.
+> >       3. Change trivial coding style. (feedbacked by Mina)
+> >       4. Add Co-developed-by, Acked-by, and Reviewed-by properly.
+> >          Thanks to all.
+> > 
+> > Changes from v1:
+> >       1. Rebase on linux-next.
+> >       2. Initialize net_iov->pp = NULL when allocating net_iov in
+> >          net_devmem_bind_dmabuf() and io_zcrx_create_area().
+> >       3. Use ->pp for net_iov to identify if it's pp rather than
+> >          always consider net_iov as pp.
+> >       4. Add Suggested-by: David Hildenbrand <david@redhat.com>.
+> > 
+> > ---8<---
+> >  From 88bcb9907a0cef65a9c0adf35e144f9eb67e0542 Mon Sep 17 00:00:00 2001
+> > From: Byungchul Park <byungchul@sk.com>
+> > Date: Tue, 29 Jul 2025 19:49:44 +0900
+> > Subject: [PATCH linux-next v3] mm, page_pool: introduce a new page type for page pool in page type
 > 
-> OK, but can you provide more details on the production use case for
-> enslaving the real device to a VRF during runtime? Usually this kind of
-> configuration is performed before data transmission begins. I suspect
-> this is why nobody complained about this behavior despite being present
-> in the VRF driver since its initial submission almost a decade ago.
+> That will conflict with "netmem: replace __netmem_clear_lsb() with
+> netmem_to_nmdesc()", it'll need some coordination.
+
+Indeed.  It'd better work on top of "netmem: replace __netmem_clear_lsb()
+with netmem_to_nmdesc()" then.  You said you are going to take the patch.
+Please lemme know the progress so that I can track and re-work on this.
+
+	Byungchul
+
+> --
+> Pavel Begunkov
 > 
-> I'm asking because the potential for regressions from this patch seems
-> quite high to me. For example, before this patch nexthop objects using
-> the enslaved device would get flushed, but now they persist. This can
-> impact offload of nexthop objects and it's possible I'm missing more
-> potential regressions.
-> 
-
-+1
-
-Thanks for staying on top of this, Ido. I have been very distracted the
-past few months.
-
-The design choices when the VRF code was first written was either
-1) require the devices to be added to a VRF while down, or
-2) cycle the device while adding it to the VRF.
-
-I preferred 2 as the simplest choice for users, and so that is the way
-the feature went in.
 
