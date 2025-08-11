@@ -1,75 +1,77 @@
-Return-Path: <netdev+bounces-212532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212533-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99D85B2120B
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 18:33:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 590CCB211E9
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 18:28:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47D8F3A33CF
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 16:28:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7F3307A2884
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 16:27:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0F77311C23;
-	Mon, 11 Aug 2025 16:28:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6275117B50F;
+	Mon, 11 Aug 2025 16:28:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bKGvp9NK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WlRRa0AG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4176C311C02
-	for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 16:28:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98397311C24
+	for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 16:28:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754929710; cv=none; b=NCOLpTkgyCr8QWtTnRUIfNnuTqy2a5MEY8zU2JAHH95Re/zZJmK3kiNaT40Ypz3V0ZyurcREsYM7JmmoFZ3xE391j4GUiO/+LlfsP1YY3v9bDQChCtWkjV9NuTHKaVLcZwJmMy1zBUheyCXWnAlmsk31Va8n2k37KSmAwYnx7Zk=
+	t=1754929712; cv=none; b=FiO0wDoIy/a2Xsm1mqxCgeb0dOfFc2Z7Unrn4kyrOCWVRMmRg3qpn/yUhfMUuUonl/EHVzZjhH6g6L7Unw21bmfeFWbrHGOtQAFCg1wkcbkBZQ7Ng7c+FNtimoK7z29HDBq3F2IaS2efjuFzgHohr3wm+BBM6hvQ8TqA/Qq8EkU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754929710; c=relaxed/simple;
-	bh=YVbZYEKJitQTSeRIRZBEmXhgEgn20LxM//uJhpi477k=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lfnQaLyMpYNEWhgKHCC/nWvs3d8QCIDDZnWDW/tNTQdxdKIQg/hg5PsJkZI7P3O+IoLPR5YD9nuzsL5gqVHKmJdpFcts03rV9tky8Jj+SmKM3jz6frxY09l2AClpE/uWfRkJ1Hi9AvdgmOYAQxvqzkB02wwYuApkrsnCiKY22Tk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bKGvp9NK; arc=none smtp.client-ip=209.85.128.53
+	s=arc-20240116; t=1754929712; c=relaxed/simple;
+	bh=OthZYmVjAQXZSU8tdPAh/aIimrhk4lm9FU6WQYMA+WA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=au6nDP1zsrJHxw2OEkzt4yu/eX/CnAByMxGfGjUJtWoeZ+fc/sod1QHkQjo1D9tQrF7UNZwcFBioUsyftKT2HGh3+9lTppJH2ru6D3YK+AikPQaD4JHykSH0bvtXT9a4QL0TMpxI4aMTOhcFhAoJgbLPh5gT220eK/byJM9GhIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WlRRa0AG; arc=none smtp.client-ip=209.85.128.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-459e72abdd2so26948325e9.2
-        for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 09:28:28 -0700 (PDT)
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-459e1338565so42936265e9.2
+        for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 09:28:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1754929707; x=1755534507; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=5QYO33vtyNX6lrHTI/yuoeKF7fWSxGUk/Rv1icvg4M4=;
-        b=bKGvp9NKuU63KaVy8PJiw7ysF70f/5ipN7IohNll0mFrfxPSiA/xIpfSmoj+1utAXO
-         7Ry1p+FzB1XZq0+V5GTXU7PqAnGKiMwog3v/D4Ap3UpYrgOe6lfm7Lb5esjvzea8C7f+
-         pysawfxK0sqnEtcecoa3CzNr2abVPf9EifG1iQ5vU9U/zB3jb9pBOb7Snnu11H/oPfOA
-         8r74JqTj5VhSuH/afN4DUt/GJwz5Qkzb/dv0OOYYlNSCI/MQn9+bzWAM4FVcoaKqqz3F
-         14jHMcqF65Mgrk5DrCpcn+Ykaghc42unYqGAk4/fbbf+NagWL/BI8bs5IbFMRcjDNL4O
-         i85w==
+        d=gmail.com; s=20230601; t=1754929708; x=1755534508; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cj8UJ5Kho5dtyMmT2Wiw/Wf6VOq6939AtFX2Hk0IXRE=;
+        b=WlRRa0AGuaaEjlNML62juFRZK4mYT8pbx8/Xi7eEL4qxDVnCiiZsirPaRJVoNKd2Ll
+         iUcCKIls1yc2ZsN1p///Lw9KDwFzGmhgnF4p2YqH3nm6BS4ocXWx9cdnjQ5fSt9U0gSQ
+         DR0D641xhIGoumgbu3f9iooBcNGmqgf28IqayipDRGl8MEbHOuLlFgpSjrb1S707q473
+         IEM4y6sUllXunRISd4Lt0bSsxJhHnjjyOSQKn4+VBhSc5uT1lov/SJPkXn1oVPb3ASiz
+         t/MWebKjtx+R6XHUA+nbsO6G5TBI3ohoMCp9m3x/wJrZa8nfeFcF1vKKljtXiiyhw11h
+         MiCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754929707; x=1755534507;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5QYO33vtyNX6lrHTI/yuoeKF7fWSxGUk/Rv1icvg4M4=;
-        b=i1DIadNkJGBICrDcf44D+yPRIP3FTx04Y7Rww9YFz3mwTiGyEh+nEcqMJXwwLk6DkO
-         0BTyHN4xYkPyrZ+q9CjrNBpAsfZ6/3pBgQ7Uf9OdGed1qD7ihiJldpCDVraWiu5WPWs6
-         0jNMsjDJ05Ngqu1tskPiBaxI89gRVVfgGrvCQbwPryxsqGBKYiIV3aoU3RdWytWIVkUO
-         EdQ3tHiv69JF7y37ecqPiI2t1jz1v6mKpzpfw4tzvfaOyG80xD7YwxOGSiO+bPf3Q0ie
-         Fr3OsrlJSwPzmA43V/KP7d/xdlitP+oLbqE6Npbq4wmftZDo9crlOtWLPBfEz6XoIm05
-         7v0Q==
-X-Gm-Message-State: AOJu0YyVdRO241nh2QII+t9Pjmz/gVqKBDMd+oUDZ5BjZNDag+BLkEqZ
-	jp7iDBJ9g+KJ4s5ILZZhFSRJT2pO2FOXMVf38GNY2h2dEZ+SoLU22yiVtgFx7A==
-X-Gm-Gg: ASbGncvAHIm5HnGifque4NhGdOt+UZvUBYUB5RurX4O8JQB9KZ3bN0gPLYeCSICFP8Y
-	//o0Wob42G5QE8xSCiobhGuLny1ffGibm8kynbHxDb6WPx/4V229p6SylBhEarJaZkWXGdpkrEe
-	RIo/eBrSXHBRW0PQZiu1/5OJoFPi0VsHkUIb5k7NSv9xy6I+v1oUMu7TK2gyDZONcG91oZFJ69z
-	J0EO/gV2uh0qOzw89KlTnFTSnR/dqEKOU6t2li1R05ka0O/ZOsanZiF64JTNSouXVedMMR0Z+10
-	6WBomkWZMlySPUj/rmA+/R+knPaqNK3KKP7MFA0kzUJ65qSvDd4jw7g3+IxZpnwNVKKy5rfITjq
-	wavclCQ==
-X-Google-Smtp-Source: AGHT+IFha+q4uQmjExR0o8zEW12E6c3kYVn26D4UWc1nRd5p1ftZy2ByyeO5Ju1+Cz3yjZPbcjcJWQ==
-X-Received: by 2002:a05:600c:45cc:b0:456:fc1:c286 with SMTP id 5b1f17b1804b1-45a10b9bec7mr3167595e9.1.1754929707021;
-        Mon, 11 Aug 2025 09:28:27 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1754929708; x=1755534508;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cj8UJ5Kho5dtyMmT2Wiw/Wf6VOq6939AtFX2Hk0IXRE=;
+        b=xOFKyeoS4O9thKXE/ZZ2rb6ih4ySxuQxWsawz/h3X5xnXZtJEs01DO45ffnLoiwbjM
+         V6X91v5xGgtiKIAZ517qcGQipE7cd9qFknF72ZYujH3l8xH4XT7VaJLddF11DwES4fWL
+         4ayIvF4/T4M1mGQ0R5no9BSEq7Milkf2FWWxcj1++8Yu0Wx+YdDr0jood9/bq0FmLHhg
+         a+i0OOpgAKmPWrKKtUBrPBgGh+M3Dwlz8PickiaPW95tqxO9w8fWejx4fgC3Bj6ccD1X
+         Rwo3o+61CQ5QrfF3mBgsvHUkIE5SmdXaYnTZ4/4FSUoOkHCnRcnxUWIyYwBc9kZl51vs
+         cjuA==
+X-Gm-Message-State: AOJu0YwZRkWi1SP0amK/+IGWKxLQTqh3OBE/XjlOUa2XWIWWxhv9gpV1
+	U7JdnnBpIqhwoyZ8w3MSCc6lMXIQU0c/HtgRnBFTpPUAVtyFMlS27e5i4voD/A==
+X-Gm-Gg: ASbGncutnMllaVsyUTWArwYfcXWwa1IZ4WD67lm9slyTCfIvHVfHk8usHULJ/b9q7Ou
+	95cL0MF7oBYe6qpGhFIlMkCVzaJtkkoM7bM7XQFkaV5u3Pnc84ZBw6xSvrjPsj51l2U1BzHqUJV
+	mNl8JuNvDL+Ugcn1m38lA9MvXNt9pa35slMRm9EGjStoKDAoe5Hst0S28CpOSassk3iODCksojZ
+	ZwrhcTvAoeTkDRGlqnXIMj5gkN+ZYeFCF6biq6KpAo718hh64NJ29NyhH25KQe/wIjrzaLnaFB6
+	q2FGzybagaNW8nsCR8Bi79BjPQBw9W8EVxvVOsq3DsndRY1Wq4rkUJE6W4LLMlEgkQS1OJorxyb
+	b8T9jRg==
+X-Google-Smtp-Source: AGHT+IH2A8t0e+thsg4QiC+1SnAaw1gGgqeg89O3wcKaQoPj6Ehev3IIVzhyWvLCwjd/0y0XUHyzpw==
+X-Received: by 2002:a05:600c:4e91:b0:453:6ca:16b1 with SMTP id 5b1f17b1804b1-459f4f144e5mr114233465e9.26.1754929708395;
+        Mon, 11 Aug 2025 09:28:28 -0700 (PDT)
 Received: from 127.com ([2620:10d:c092:600::1:628b])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-459e58554f2sm260267515e9.12.2025.08.11.09.28.25
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-459e58554f2sm260267515e9.12.2025.08.11.09.28.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Aug 2025 09:28:26 -0700 (PDT)
+        Mon, 11 Aug 2025 09:28:27 -0700 (PDT)
 From: Pavel Begunkov <asml.silence@gmail.com>
 To: netdev@vger.kernel.org
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -83,10 +85,12 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
 	Byungchul Park <byungchul@sk.com>,
 	asml.silence@gmail.com
-Subject: [RFC net-next v1 0/6] nmdesc cleanups and optimisations
-Date: Mon, 11 Aug 2025 17:29:37 +0100
-Message-ID: <cover.1754929026.git.asml.silence@gmail.com>
+Subject: [RFC net-next v1 1/6] net: move pp_page_to_nmdesc()
+Date: Mon, 11 Aug 2025 17:29:38 +0100
+Message-ID: <a85b5aeab5f011742657a9caae22da5bcdcf91b1.1754929026.git.asml.silence@gmail.com>
 X-Mailer: git-send-email 2.49.0
+In-Reply-To: <cover.1754929026.git.asml.silence@gmail.com>
+References: <cover.1754929026.git.asml.silence@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,41 +99,67 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series uses newly introduced struct netmem_desc, which represents
-common fields b/w netmem types, for optimisations and to start
-addressing some of the netmem technical debt.
+A preparation patch moving pp_page_to_nmdesc() up in the header file and
+no other changes otherwise. It reduces cluttering from the following
+patch.
 
-First, replace __netmem_clear_lsb with netmem_to_nmdesc(). The helper
-optimises pp fields accesses, but now we can do the same but cleaner.
+Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+---
+ include/net/netmem.h | 34 +++++++++++++++++-----------------
+ 1 file changed, 17 insertions(+), 17 deletions(-)
 
-The second problem is abundance of places where the user has struct
-page / net_iov but still needs to cast it to netmem back and forth
-just to be able to use generic helpers. It's not the prettiest
-pattern and often can't be optimised. Start introducing netmem_desc
-based helpers and using them instead.
-
-There is more work we can do, but these are the patches I want to
-pull into zcrx. It's an RFC for now, I'll send it as a pull request
-without zcrx bits.
-
-Byungchul Park (1):
-  net: replace __netmem_clear_lsb() with netmem_to_nmdesc()
-
-Pavel Begunkov (5):
-  net: move pp_page_to_nmdesc()
-  net: page_pool: remove page_pool_set_dma_addr()
-  net: convert page pool dma helpers to netmem_desc
-  net: page_pool: convert refcounting helpers to nmdesc
-  io_uring/zcrx: avoid netmem casts with nmdesc
-
- include/net/netmem.h            | 75 +++++++++++++++------------------
- include/net/page_pool/helpers.h | 41 ++++++++++++++----
- io_uring/zcrx.c                 | 12 +++---
- net/core/devmem.c               |  5 ---
- net/core/netmem_priv.h          | 20 +++------
- net/core/page_pool_priv.h       | 14 +++---
- 6 files changed, 82 insertions(+), 85 deletions(-)
-
+diff --git a/include/net/netmem.h b/include/net/netmem.h
+index f7dacc9e75fd..8b639e45cfe2 100644
+--- a/include/net/netmem.h
++++ b/include/net/netmem.h
+@@ -217,6 +217,23 @@ static inline netmem_ref net_iov_to_netmem(struct net_iov *niov)
+ 	const struct page * :	(__force const netmem_ref)(p),	\
+ 	struct page * :		(__force netmem_ref)(p)))
+ 
++/* XXX: How to extract netmem_desc from page must be changed, once
++ * netmem_desc no longer overlays on page and will be allocated through
++ * slab.
++ */
++#define __pp_page_to_nmdesc(p)	(_Generic((p),				\
++	const struct page * :	(const struct netmem_desc *)(p),	\
++	struct page * :		(struct netmem_desc *)(p)))
++
++/* CAUTION: Check if the page is a pp page before calling this helper or
++ * know it's a pp page.
++ */
++#define pp_page_to_nmdesc(p)						\
++({									\
++	DEBUG_NET_WARN_ON_ONCE(!page_pool_page_is_pp(p));		\
++	__pp_page_to_nmdesc(p);						\
++})
++
+ /**
+  * virt_to_netmem - convert virtual memory pointer to a netmem reference
+  * @data: host memory pointer to convert
+@@ -285,23 +302,6 @@ static inline struct net_iov *__netmem_clear_lsb(netmem_ref netmem)
+ 	return (struct net_iov *)((__force unsigned long)netmem & ~NET_IOV);
+ }
+ 
+-/* XXX: How to extract netmem_desc from page must be changed, once
+- * netmem_desc no longer overlays on page and will be allocated through
+- * slab.
+- */
+-#define __pp_page_to_nmdesc(p)	(_Generic((p),				\
+-	const struct page * :	(const struct netmem_desc *)(p),	\
+-	struct page * :		(struct netmem_desc *)(p)))
+-
+-/* CAUTION: Check if the page is a pp page before calling this helper or
+- * know it's a pp page.
+- */
+-#define pp_page_to_nmdesc(p)						\
+-({									\
+-	DEBUG_NET_WARN_ON_ONCE(!page_pool_page_is_pp(p));		\
+-	__pp_page_to_nmdesc(p);						\
+-})
+-
+ /**
+  * __netmem_get_pp - unsafely get pointer to the &page_pool backing @netmem
+  * @netmem: netmem reference to get the pointer from
 -- 
 2.49.0
 
