@@ -1,137 +1,254 @@
-Return-Path: <netdev+bounces-212446-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212447-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16374B20775
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 13:22:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72A83B207ED
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 13:32:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3FB411893257
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 11:22:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1556B166050
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 11:31:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32B432C3745;
-	Mon, 11 Aug 2025 11:22:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AB092D3A7C;
+	Mon, 11 Aug 2025 11:28:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gOvnX+Kr"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="DosoLwUw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B02C2C327F;
-	Mon, 11 Aug 2025 11:22:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ECC42D3221;
+	Mon, 11 Aug 2025 11:28:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754911335; cv=none; b=kedBPKvg7BgtNTCmRRALuiCIf5bVblyUVSIolHq4P17w37rvR3hRgjhFlblDMaijv7wnowi7u8I+msBBRWfhja6+q+qXdYjgLj6gDb6ZIyN0ksCAsa+bIwCyOTF191jhbSOWl9Zhy8BoFFW9oyilCWn7B5RmB20BAq6HdAWH6eI=
+	t=1754911736; cv=none; b=ehqHG0CRSdNfvflLBhD2iIWU6KHyPYmXeIK51Ggn+Nyv6qbkZUuVrZaTNbhFycwKZRAS6wlDW5YQPEtf1tt8SmU4fBRNDoQkyD0iPyMSD9ZwTTi8+ezL9PfV9I7PMdOyQ34eP2v381h2lOACC2O/ey5W2TXCTCVS/2An3J+DLOg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754911335; c=relaxed/simple;
-	bh=mqTVABIauHO9LRTapJL80A3vtc4ZkZVHXgu77CE3mB4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=MdIB8HUyhm068iQ+CnRmGeps7RUXeKk2dGGr1HbdoR4mR84DrUu1HUtgBp2VgNzzQsuvHIVu+N9teZTgSMl4z2gFzsMIrjemYpvcwF0rMJNZ45jLqwm81SzauYfHiAgRJojaJXdV+7ygGB3Zh50uYdSYXcPguGczruRaQ4RK0rQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gOvnX+Kr; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-456127fa3d6so6291685e9.1;
-        Mon, 11 Aug 2025 04:22:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1754911331; x=1755516131; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=5g5hDi7jeqhhL4tmsyaBdgjOZMXvW3aL4OS/N5PPoYg=;
-        b=gOvnX+Kro/IVPaWvUB9BnB8y2CPs5ZHu9WU/gpRjZtpQu7e9gJblnnTt1xga5lL4uD
-         1q7gnsr/0pv80dpY3lJXaRlnEXXSb0cl2n/1P8U+uLyEckB9ddPuQvrh7HrPfFHowT/b
-         PqGkbhLR4008JS3lLNPYbBSTJiCZ5tzl88/FsNUxDZx5bwpAn2wvsCVa0S3QLopLYrce
-         M2kPGE/vLkreSpwesDYHO165c8ir7IdISsvuQxWoLUX0tWoWdSKkVVEr4inWv91q150i
-         4Lcq9k5dVhscbZHnkduc9FHUMO5kbwGgC1R+K2+2DkARUG+AOhTweGLqbdpr8XYxFQ3b
-         uTdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754911331; x=1755516131;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5g5hDi7jeqhhL4tmsyaBdgjOZMXvW3aL4OS/N5PPoYg=;
-        b=S0fcXn8VFjr6TARpUeB2SmMlc44A1EmGz58WiMM/GP1OOy5BXn1fPU73Ttk0Wj7c9O
-         h8SHsHVlQxqxEnixwBd5tZ739jPXRQPcgt0DZuEuUh94VOsI51YQs3bIGyOtR1X2rk/7
-         8r1vNsw8+Glmy2L40K7ur48Gjh7KhaIBY6MHkdjfwSz/XRmQudyp1/sXMFn6Y0Huy87Z
-         mFdxqDvOjcYg1cezlR8UJzVEWgdgw9RCZR8rK1dUNBamk7sBxXL2ykECKKlXCIByhvNV
-         tnYK6mtr+bLjGMIOexWtO7w6/Nr2dgbgrrcrs40HC1QaoHm3A1hRAXh0Dr5U1w5tm+A8
-         /ZuQ==
-X-Gm-Message-State: AOJu0Yz33YRiRPFY/wOhNjlygOvtp1c7kiM7KkQRUAYbTRUaOSAczzf7
-	DlThcCOgowgQlc26HEbdMXc21etH3hRdaj3cUNeTRih4i1eXrAR+Bt+CpVa4gD/Q984=
-X-Gm-Gg: ASbGncujQH+V/CvGn2awVySLBOCcVHWma+oExmwbsSFZAqzd9tZPf5fMfWznfsqOTRk
-	GGRQd/IpXp/m8Y9PXhdoXfhil4pKHC90ZVUu5TOPBJ1NauLlwaOSiiHA4y2ISAWp2d0wgaLuByI
-	zfCdWO18XrMClMK1SFTxPTscqgNDStsv+r7UaNbw1i8aBSssMOlcOBwU/SjZNI1FxbUrRL1LRxU
-	/nVJMGpCAxAgDGCP+04q8LjEjWCU0e9R+l6W+KD1Ll5qZBxqDuLTUnwSETJOUGXL5oMSTlrrKmY
-	M7wPlT7cVCPGUJUzp6Q7lcmLMiev8BWRsSToHb56N9NCt1WXN3GN89FtBv85PIsII7TxgL9rMLJ
-	7mDL00KneP+Kon1JiINu9oVukEqriF9HaIdnUeggJaeo5NgfJOBBjQjABczrc2BMudfm+7inrSg
+	s=arc-20240116; t=1754911736; c=relaxed/simple;
+	bh=fW0VvhJf4Iec8UuG9QGtVbjmK87c6Llrf5Yz4IdAv7g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ksPgNzlvmslJodsyItUYyG/RPg3h/HcH/yYWUGl4tu86u6NKKSf6a7GCgF8QYp/5lYDnMQLVXEZzUey4CIKyxZEm1YuFuMd5OUZC9STB1paKXJGLq4dkuY+jIh0yyjY56M3bYxlDfcWK/m34Vdh5KmC1cZwJ+h37aFf3oiAxTQI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=DosoLwUw; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57B53sLi002897;
+	Mon, 11 Aug 2025 11:28:45 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=fGgOD1
+	1FTbo+q5hNtNpmOJYetYgCfBeiUH3XysgW3vw=; b=DosoLwUwdp+2DjJnKDyi+I
+	ZRLpR9MZJ/MJEeG63Ug4K7+iGuAqqW8UUOWjV2q3Fev0VKO2Qe6ILpvTTQpj+B8u
+	h6rhkBMHX4wg0CjeMxAzU5Ti5QHOyDGtKYFjQyqc2oQuhjXu6tTj2C0axeEz82Ll
+	FuCrt3zglmDBPvWnxm4OTZ6K+grx9B0bS8ITGKsmHsdg4018QwPfo6dWulLhNKou
+	Jr3mSoUH+tYwAwAgjXtmCYIGFDlhTMosh/9EpJU+rJsNNk3Q2NqDXNm5b66+567p
+	b1vnLOAL1a8T9nfUdj3kpcGjkDTzbbjkfYKQOxP4vFC2/wdNHEQPnwqNZyfYUQ+Q
 	==
-X-Google-Smtp-Source: AGHT+IGH7TsHfHe4aY4SI1cXo67Gk3CyAYojTMifCQDhVfute1+x1Z+lPV6jjXMKTd2spw6sjIpuhQ==
-X-Received: by 2002:a05:600c:6095:b0:459:d449:a629 with SMTP id 5b1f17b1804b1-459fc1ec115mr32073125e9.8.1754911331131;
-        Mon, 11 Aug 2025 04:22:11 -0700 (PDT)
-Received: from pop-os.localdomain (208.77.11.37.dynamic.jazztel.es. [37.11.77.208])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-459dbba5210sm322605505e9.2.2025.08.11.04.22.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Aug 2025 04:22:10 -0700 (PDT)
-From: =?UTF-8?q?Miguel=20Garc=C3=ADa?= <miguelgarciaroman8@gmail.com>
-To: netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	willemdebruijn.kernel@gmail.com,
-	jasowang@redhat.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	skhan@linuxfoundation.org,
-	=?UTF-8?q?Miguel=20Garc=C3=ADa?= <miguelgarciaroman8@gmail.com>
-Subject: [PATCH] net: tun: replace strcpy with strscpy for ifr_name
-Date: Mon, 11 Aug 2025 13:22:07 +0200
-Message-Id: <20250811112207.97371-1-miguelgarciaroman8@gmail.com>
-X-Mailer: git-send-email 2.34.1
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48eha9w85f-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 11 Aug 2025 11:28:45 +0000 (GMT)
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 57BBRwVF025185;
+	Mon, 11 Aug 2025 11:28:44 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48eha9w85c-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 11 Aug 2025 11:28:44 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 57B7Cr04017617;
+	Mon, 11 Aug 2025 11:28:43 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 48ekc3d8qn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 11 Aug 2025 11:28:43 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 57BBSdU160096902
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 11 Aug 2025 11:28:40 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D697A2004B;
+	Mon, 11 Aug 2025 11:28:39 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 80E122004D;
+	Mon, 11 Aug 2025 11:28:39 +0000 (GMT)
+Received: from [9.152.224.240] (unknown [9.152.224.240])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 11 Aug 2025 11:28:39 +0000 (GMT)
+Message-ID: <a92a4e51-5560-48ec-93f2-6d434b1abbb9@linux.ibm.com>
+Date: Mon, 11 Aug 2025 13:28:39 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC net-next 03/17] net/smc: Remove error handling of
+ unregister_dmb()
+To: dust.li@linux.alibaba.com, David Miller <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "D. Wythe" <alibuda@linux.alibaba.com>,
+        Sidraya Jayagond <sidraya@linux.ibm.com>,
+        Wenjia Zhang
+ <wenjia@linux.ibm.com>,
+        Julian Ruess <julianr@linux.ibm.com>
+Cc: netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Thorsten Winkler <twinkler@linux.ibm.com>,
+        Simon Horman <horms@kernel.org>,
+        Mahanta Jambigi <mjambigi@linux.ibm.com>,
+        Tony Lu
+ <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
+        Halil Pasic <pasic@linux.ibm.com>, linux-rdma@vger.kernel.org
+References: <20250806154122.3413330-1-wintera@linux.ibm.com>
+ <20250806154122.3413330-4-wintera@linux.ibm.com>
+ <aJh8d2G9-veAynO1@linux.alibaba.com>
+Content-Language: en-US
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <aJh8d2G9-veAynO1@linux.alibaba.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=KPRaDEFo c=1 sm=1 tr=0 ts=6899d3ed cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10 a=VnNF1IyMAAAA:8 a=iYOzEUFcZFceXDu_1icA:9
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: fUDQHkdiQu3SJZ1wi1QjNfHyy3lMg3xf
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODExMDA3NSBTYWx0ZWRfXwjtJj0KcKSGo
+ xWp+xU8UmCgS81y5j3M7wC5BPe0tgQD0O0q8xkKyIYEyTm8TiGqGWFDF2tRzwG1KmWSfxEdIG5H
+ e55OlttM1YoaKbW7XoyRVegWoRRR0CBbufVnq7XfoisficZWNBvf1Z1OOmQ0qxiDNw0zk4uycKz
+ ThwVlaQQOvi836oDBATuq0wml/hEd+bETlr/fwGmlfxDnbT41asXJS5lGWtdIxZB7TD/uYlAgBP
+ OZOnlWkVM8L/x3d1oMQl2+bfge3SlhQ6YWighDdwZo2hvGvsvX2Q5oYF25dUKWWIewdtRzFiezE
+ JkGWZ3jR5ItQuulMJSstOr19rtSZfTBJut6yetNdeQbN1ZFuD9vOVK2syAGeSRwDRCplOZgOADO
+ EHLGZ4KwvxE2Y/MdcZ2BWdo7yFIRNxzL0FrQshM1twUBq9isWMeD6Yy2/+r7f/Uhj/STJI9r
+X-Proofpoint-GUID: a26-C3CnD40GwQNXFQ_yw-ie8QWcwsDq
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-11_02,2025-08-06_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 impostorscore=0 bulkscore=0 mlxlogscore=713 spamscore=0
+ clxscore=1015 adultscore=0 priorityscore=1501 malwarescore=0
+ lowpriorityscore=0 mlxscore=0 suspectscore=0 classifier=spam authscore=0
+ authtc=n/a authcc= route=outbound adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2507300000 definitions=main-2508110075
 
-Replace the strcpy() calls that copy the device name into ifr->ifr_name
-with strscpy() to avoid potential overflows and guarantee NUL termination.
 
-Destination is ifr->ifr_name (size IFNAMSIZ).
 
-Tested in QEMU (BusyBox rootfs):
- - Created TUN devices via TUNSETIFF helper
- - Set addresses and brought links up
- - Verified long interface names are safely truncated (IFNAMSIZ-1)
+On 10.08.25 13:03, Dust Li wrote:
+> On 2025-08-06 17:41:08, Alexandra Winter wrote:
+>> smcd_buf_free() calls smc_ism_unregister_dmb(lgr->smcd, buf_desc) and
+>> then unconditionally frees buf_desc.
+>>
+>> Remove the cleaning up of fields of buf_desc in
+>> smc_ism_unregister_dmb(), because it is not helpful.
+>>
+>> This removes the only usage of ISM_ERROR from the smc module. So move it
+>> to drivers/s390/net/ism.h.
+>>
+>> Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
+>> Reviewed-by: Mahanta Jambigi <mjambigi@linux.ibm.com>
+>> ---
+>> drivers/s390/net/ism.h |  1 +
+>> include/net/smc.h      |  2 --
+>> net/smc/smc_ism.c      | 14 +++++---------
+>> net/smc/smc_ism.h      |  3 ++-
+>> 4 files changed, 8 insertions(+), 12 deletions(-)
+>>
+>> diff --git a/drivers/s390/net/ism.h b/drivers/s390/net/ism.h
+>> index 047fa6101555..b5b03db52fce 100644
+>> --- a/drivers/s390/net/ism.h
+>> +++ b/drivers/s390/net/ism.h
+>> @@ -10,6 +10,7 @@
+>> #include <asm/pci_insn.h>
+>>
+>> #define UTIL_STR_LEN	16
+>> +#define ISM_ERROR	0xFFFF
+>>
+>> /*
+>>  * Do not use the first word of the DMB bits to ensure 8 byte aligned access.
+>> diff --git a/include/net/smc.h b/include/net/smc.h
+>> index db84e4e35080..a9c023dd1380 100644
+>> --- a/include/net/smc.h
+>> +++ b/include/net/smc.h
+>> @@ -44,8 +44,6 @@ struct smcd_dmb {
+>>
+>> #define ISM_RESERVED_VLANID	0x1FFF
+>>
+>> -#define ISM_ERROR	0xFFFF
+>> -
+>> struct smcd_dev;
+>>
+>> struct smcd_gid {
+>> diff --git a/net/smc/smc_ism.c b/net/smc/smc_ism.c
+>> index 84f98e18c7db..a94e1450d095 100644
+>> --- a/net/smc/smc_ism.c
+>> +++ b/net/smc/smc_ism.c
+>> @@ -205,13 +205,13 @@ int smc_ism_put_vlan(struct smcd_dev *smcd, unsigned short vlanid)
+>> 	return rc;
+>> }
+>>
+>> -int smc_ism_unregister_dmb(struct smcd_dev *smcd, struct smc_buf_desc *dmb_desc)
+>> +void smc_ism_unregister_dmb(struct smcd_dev *smcd,
+>> +			    struct smc_buf_desc *dmb_desc)
+>> {
+>> 	struct smcd_dmb dmb;
+>> -	int rc = 0;
+>>
+>> 	if (!dmb_desc->dma_addr)
+>> -		return rc;
+>> +		return;
+>>
+>> 	memset(&dmb, 0, sizeof(dmb));
+>> 	dmb.dmb_tok = dmb_desc->token;
+>> @@ -219,13 +219,9 @@ int smc_ism_unregister_dmb(struct smcd_dev *smcd, struct smc_buf_desc *dmb_desc)
+>> 	dmb.cpu_addr = dmb_desc->cpu_addr;
+>> 	dmb.dma_addr = dmb_desc->dma_addr;
+>> 	dmb.dmb_len = dmb_desc->len;
+>> -	rc = smcd->ops->unregister_dmb(smcd, &dmb);
+>> -	if (!rc || rc == ISM_ERROR) {
+>> -		dmb_desc->cpu_addr = NULL;
+>> -		dmb_desc->dma_addr = 0;
+>> -	}
+>> +	smcd->ops->unregister_dmb(smcd, &dmb);
+> 
+> Hmm, I think the old way of handling error here is certainly not good.
+> But completely ignoring error handling here would make bugs harder
+> to detect.
+> 
+> What about adding a WARN_ON_ONCE(rc) ?
+> 
+> Also, I think we can just remove the rc == ISM_ERROR to remove
+> the dependency of ISM_ERROR in smc.
+> 
+> Best regards,
+> Dust
+> 
 
-Signed-off-by: Miguel García <miguelgarciaroman8@gmail.com>
----
- drivers/net/tun.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+As I wrote in the commit message, I removed rc, because it is ignored by the caller anyhow today.
+If you want to I can add it back into this function and then you can think about how SMC should
+handle such an error.
 
-diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-index f8c5e2fd04df..e4c6c1118acb 100644
---- a/drivers/net/tun.c
-+++ b/drivers/net/tun.c
-@@ -2800,13 +2800,13 @@ static int tun_set_iff(struct net *net, struct file *file, struct ifreq *ifr)
- 	if (netif_running(tun->dev))
- 		netif_tx_wake_all_queues(tun->dev);
- 
--	strcpy(ifr->ifr_name, tun->dev->name);
-+	strscpy(ifr->ifr_name, tun->dev->name, IFNAMSIZ);
- 	return 0;
- }
- 
- static void tun_get_iff(struct tun_struct *tun, struct ifreq *ifr)
- {
--	strcpy(ifr->ifr_name, tun->dev->name);
-+	strscpy(ifr->ifr_name, tun->dev->name, IFNAMSIZ);
- 
- 	ifr->ifr_flags = tun_flags(tun);
- 
--- 
-2.34.1
+My thoughts on this are:
+There is not really much smc can do about a problem in unregister_dmb.
+
+I think it is Linux strategy to report and handle errors at the lowest level possible. I have some
+patches on my harddisk to improve error handling and error reporting of the ism device diver. And
+we are already discussing internally which errors should do a WARN_ON_ONCE in the ism device driver.
+
+So I don't think there is much to do in the smc layer at the moment.
+How does that sound to you?
+
+
+
+
+
+
+
 
 
