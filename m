@@ -1,126 +1,128 @@
-Return-Path: <netdev+bounces-212429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212430-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6396AB203D8
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 11:36:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A6CDB203FF
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 11:43:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 789E0188874C
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 09:36:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F75F16E7DE
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 09:43:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CBD12253A9;
-	Mon, 11 Aug 2025 09:35:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E31122425E;
+	Mon, 11 Aug 2025 09:42:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KJ/mrs4I"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wo6PFPZP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64719219A9B;
-	Mon, 11 Aug 2025 09:35:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45CDD221F09;
+	Mon, 11 Aug 2025 09:42:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754904955; cv=none; b=t/1vJ+LJApK1sYPINoxZu17BHGzFLZ+2wkCFlTLBujO3tjTEWS/ZLhGR1EUPJYHCtBqYfAOAhbnFE/lqZvy3VO6piAC/WfuQgfKD7Hcq5Eh50w5JkJ9oyyJEdFqYty5faavqM0hAofNPThF1P1l/g1VCMeLyN7HnN3Dw5QgqVvA=
+	t=1754905377; cv=none; b=mx77MWB35cVPuFaa99L3IGJpSq4TQKKPXmrbQ2J+D1zorIKMPwRLr6VpzpMJihaP9rKSC8KJgmYmCCm8Pkw0XE4H0yynnYC42xdRjqQ/sBit9v0kb9S9DxVvqmWOb8wo6WuTtrVeQmYiu5jOFW4n0hmdYlTC6sD1G6mZPSu2BdY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754904955; c=relaxed/simple;
-	bh=huCMHIOn/M8ds1Qx9wLzhAyBHeP/mVcrI5EZ4zAW0Uw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nBOUFGKolgtpZsWwwq4VhY7dk813sq16koLT0/cTQkmh87LgA12qLqR0FBhHENqdMPtQ2Saeh3RXoFM94Y2PvKF/CkuCWhbP9WNVYFIX7u5j/P0GAwKMIfxXnqgFtWt5mk4lnwrEqtpH15vcJImEM4HOuLkKCMVzNm2BNcHOVCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KJ/mrs4I; arc=none smtp.client-ip=209.85.128.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-71c0ba0bea4so11748127b3.0;
-        Mon, 11 Aug 2025 02:35:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1754904953; x=1755509753; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AcUbaj5Xh5Mro6ZUAFV3vQZF2eNOuhYUNOO/PJ+eOAY=;
-        b=KJ/mrs4ImbrSCMWDpJjNJcYES5zYkt0PUNxpTqZHZDUn5LvR6d4ky3gbarpZy8TyRs
-         kpfzb1mMJTaFJlDSMm/iaVZFGLB7Pr87PPgaKWSKSwnQIKgDYZZ2Ii/Zbmk77w7/wpJM
-         2yyBPeG7dLW7vZQhTmrdp8WTajSeBoPd0Sv8GZSMQZU8B2Aja1zK0lPk+kDHNrp9nuvp
-         QhaScGFmNVOr03r7ixRfZ/kOPqZDNK+olcLbQdeO1UR10hs3l/EiTUwdPCqr0AnvIkDJ
-         5kqrCoxbWbmBwD/drbTD0F1E+755VyUfzVFBQpVJdOEpaylqaoVvol7gzyMmAES7+BB1
-         I1kw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754904953; x=1755509753;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AcUbaj5Xh5Mro6ZUAFV3vQZF2eNOuhYUNOO/PJ+eOAY=;
-        b=lp7P31/ICcQQdKfmCNLMVxazJjJYSVnOLyoO3la63R98PMwPYBH6ZBN5wrWJIQMudV
-         R1civP6EtWjRRfg5T6avsWB/EswHQY7RwUJ0ityKfy8xImpwGnCPBWi8HNjTjFLsTRgH
-         cGdVK1BzOiWhtovcgUWnIALz8R/5JBH6TLLT3I26eAMH06tPeB6zba9fOnTIYDXX44OQ
-         mda6/sC4YxLtfujPNWLyTWYdd0bXXCA+qwZMeV6E9tSxP+hmSSpEq+LlOW4eupamC5pO
-         VRhSfbGN8Xe+c0EuyFen0Y3OKWaWR9u8QbQS2WuCAzhviyIPYME37Z5nr80us4ileOpa
-         DujA==
-X-Forwarded-Encrypted: i=1; AJvYcCUOo491VMHbFY2qQXET/KnAaY7dkjmoNGgoiWP005i4Wuf51D4CuFXeF7ObGPJyJ7RMnx31gdsHGu+39vk=@vger.kernel.org, AJvYcCWkHQyWPD0L3TIf63f1RFGkYgvmEmOW0f437IudxHZremJizpmg7eHrL9bPNiKqgQfBBfczZqMh@vger.kernel.org, AJvYcCXr8zqhtGsYJ7HxMQH/8UAC8sOgn9GflZA/JIYiE/vqDyEmYjS46/YIU9bynHk7w0uPqeqyCIoYRglb@vger.kernel.org
-X-Gm-Message-State: AOJu0YwmGyzvwWcbzJrywpYlCD1rNbizphe5hnGUO4LUnp51SWd0nFCB
-	L3McD+RJ2gIhH5E58neDBYo2SGluJ7JsIGAQWwjTbfrf/E3cstMu9vrd8YFdWk+0uLmFhY8kkrG
-	WG33+3cYx34OTi0+69Kzc2MsHddKSanQ=
-X-Gm-Gg: ASbGnctkg2jZoNPZcperh4ygfzQGll04JclxdZNeOux4dNtwwRLWQ42micastJE6eWI
-	l/KYeeg3PY+GF+xKw/X9Nme0uRimKmkH3AmxOtHk+e2n8DWnOrfs9hp71AXx9Q9lyGPlvli73Jf
-	j57FY3E26HuGaDsO9O3Wo4i3sxHuoOPXwZVSDuWzO2O8zkdw4nuzJR554aaImieW5mdSgKPDc3B
-	e4iJOLvoHifg2W1qKbjhNg=
-X-Google-Smtp-Source: AGHT+IHcU9CbsS7KpoOZsMnZH/SewN4yccvQVB45rejWKX3sHFuPcavri8YzwSNjVlWayffwB8TTghNdf3bG8CWyTi0=
-X-Received: by 2002:a05:690c:9691:b0:71a:41be:133 with SMTP id
- 00721157ae682-71bf0d3d579mr151142237b3.14.1754904953147; Mon, 11 Aug 2025
- 02:35:53 -0700 (PDT)
+	s=arc-20240116; t=1754905377; c=relaxed/simple;
+	bh=8FokdP0RSTBt/P39LgCOsTHUzPcgNeFkIbO8ny7/gHs=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=X1mh5WemhnG3HMDwraNdnZPEUhSm2c8xL0IZDtmMvkLcejQDV9NyQPOXirV1VK65SNcynWjowMwv3HqZ3Om/JW4son/Rod0XJ320WhuUkZ4S8E271lLLKnbCmgFTFLDPNaZe7HxFrcUKA4ymGhcAJc3FVIwvVEgI/341fBT7wPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wo6PFPZP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD69CC4CEED;
+	Mon, 11 Aug 2025 09:42:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754905376;
+	bh=8FokdP0RSTBt/P39LgCOsTHUzPcgNeFkIbO8ny7/gHs=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=Wo6PFPZPWIoLRqTcUjCqZWuW1JRj0D5QnDYKQJnmsoowl1vqXn6XkhgpZSmqsYQjd
+	 Z8GJTfCkX/lvVgliu7tFxxXV2qUJmPtpvJoa85qupVFFL+e+qQvcC4tqcS9Vc6rLt3
+	 8Vm14wt7qw3V3W227z0710YY4LPRfG93Qw5Yz+4nowbkKXvjLM/8jMf3aD9n3tP3HA
+	 6FSFbULISznTBUCva1JjrALegBb53z9rJnBxeZAfPFnpjJgDMfMGv5Fi0LvC/aLUjV
+	 vb88PgaoYoG162Xgd1erIBCRLnEKg07HNyv7THE8kfXtGL/Tlr+PvvXwhY321UeEn1
+	 zgDBJWQFFKx6g==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: fujita.tomonori@gmail.com, linux-kernel@vger.kernel.org,
+ daniel.almeida@collabora.com, rust-for-linux@vger.kernel.org,
+ netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+ tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com,
+ gary@garyguo.net, bjorn3_gh@protonmail.com, benno.lossin@proton.me,
+ aliceryhl@google.com, anna-maria@linutronix.de, frederic@kernel.org,
+ tglx@linutronix.de, arnd@arndb.de, jstultz@google.com, sboyd@kernel.org,
+ mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com,
+ vincent.guittot@linaro.org, dietmar.eggemann@arm.com, rostedt@goodmis.org,
+ bsegall@google.com, mgorman@suse.de, vschneid@redhat.com,
+ tgunders@redhat.com, me@kloenk.dev, david.laight.linux@gmail.com
+Subject: Re: [PATCH v11 7/8] rust: Add read_poll_timeout functions
+In-Reply-To: <20250811.105320.1421518245611388442.fujita.tomonori@gmail.com>
+References: <20250220070611.214262-1-fujita.tomonori@gmail.com>
+ <20250220070611.214262-8-fujita.tomonori@gmail.com>
+ <87y0wx9hpk.fsf@kernel.org>
+ <huGw-FNRjvsPJK5CIsoI3puxml780Rr5GbJB6xg92PGzQOCMRTwC_utxTpn8u7G1sNjqq35iWOTNANpVUuip4w==@protonmail.internalid>
+ <20250811.105320.1421518245611388442.fujita.tomonori@gmail.com>
+Date: Mon, 11 Aug 2025 11:42:46 +0200
+Message-ID: <878qjqgpnt.fsf@t14s.mail-host-address-is-not-set>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250811084427.178739-1-dqfext@gmail.com> <CANn89iLEMss3VGiJCo=XGVFBSA12bz0y01vVdmBN7WysBLtoUA@mail.gmail.com>
-In-Reply-To: <CANn89iLEMss3VGiJCo=XGVFBSA12bz0y01vVdmBN7WysBLtoUA@mail.gmail.com>
-From: Qingfang Deng <dqfext@gmail.com>
-Date: Mon, 11 Aug 2025 17:35:32 +0800
-X-Gm-Features: Ac12FXyXHPt3KWJVCq5JB8s-eJ6YpQlmaT2LGNV2OsLn2GATDz-fTxsoK-fo3Qw
-Message-ID: <CALW65jZ-uBWOkxPVMQc3Yg-KEoVRdPQYVC3+q5MiQbvpDZBKTQ@mail.gmail.com>
-Subject: Re: [PATCH net] ppp: fix race conditions in ppp_fill_forward_path
-To: Eric Dumazet <edumazet@google.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Pablo Neira Ayuso <pablo@netfilter.org>, Felix Fietkau <nbd@nbd.name>, linux-ppp@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-On Mon, Aug 11, 2025 at 5:19=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Mon, Aug 11, 2025 at 1:44=E2=80=AFAM Qingfang Deng <dqfext@gmail.com> =
-wrote:
-> It is unclear if rcu_read_lock() is held at this point.
->
-> list_first_or_null_rcu() does not have a builtin __list_check_rcu()
+"FUJITA Tomonori" <fujita.tomonori@gmail.com> writes:
 
-ndo_fill_forward_path() is called by nf_tables chains, which is inside
-an RCU critical section.
-
-> >         chan =3D pch->chan;
+> Sorry, I somehow missed this email.
 >
-> chan =3D READ_ONCE(pch->chan);
+> On Sat, 22 Mar 2025 17:02:31 +0100
+> Andreas Hindborg <a.hindborg@kernel.org> wrote:
 >
-> And add a WRITE_ONCE(pch->chan, NULL) in ppp_unregister_channel()
+>>> +/// Lower CPU power consumption or yield to a hyperthreaded twin processor.
+>>> +///
+>>> +/// It also happens to serve as a compiler barrier.
+>>> +pub fn cpu_relax() {
+>>> +    // SAFETY: FFI call.
+>>
+>> I don't think this safety comment is sufficient. There are two other
+>> similar comments further down.
 >
-> And/or add __rcu to pch->chan
-
-Should I add {READ,WRITE}_ONCE to all occurrences of pch->chan or only
-to ppp_unregister_channel?
-
+> Updated the comment.
 >
-
-> > +               synchronize_rcu();
+>>> +/// ```rust
+>>> +/// use kernel::io::poll::read_poll_timeout;
+>>> +/// use kernel::time::Delta;
+>>> +/// use kernel::sync::{SpinLock, new_spinlock};
+>>> +///
+>>> +/// let lock = KBox::pin_init(new_spinlock!(()), kernel::alloc::flags::GFP_KERNEL)?;
+>>> +/// let g = lock.lock();
+>>> +/// read_poll_timeout(|| Ok(()), |()| true, Delta::from_micros(42), Some(Delta::from_micros(42)));
+>>> +/// drop(g);
+>>> +///
+>>> +/// # Ok::<(), Error>(())
+>>> +/// ```
+>>
+>> I am guessing this example is present to test the call to `might_sleep`.
 >
-> synchronize_net() is preferred.
+> I also guess so. Boqun wrote this test, IIRC.
 >
+>> Could you document the reason for the test. As an example, this code is
+>> not really usable. `#[test]` was staged for 6.15, so perhaps move this
+>> to a unit test instead?
+>>
+>> The test throws this BUG, which is what I think is also your intention:
+>
+> might_sleep() doesn't throw BUG(), just a warning. Can the test
+> infrastructure handle such?
 
-Noted.
+As I wrote, kunit does not handle this. But I am confused about the
+bug/warn comment. The trace I pasted clearly says "BUG"?
 
-Thanks!
+I think we should just remove this test for now.
+
+
+Best regards,
+Andreas Hindborg
+
+
 
