@@ -1,461 +1,127 @@
-Return-Path: <netdev+bounces-212444-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212445-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69B5AB20741
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 13:16:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1DD1B20709
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 13:13:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 74F537A81B1
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 11:11:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E05F3B3B00
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 11:12:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3756A2BEFE9;
-	Mon, 11 Aug 2025 11:12:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CC262BE7B1;
+	Mon, 11 Aug 2025 11:12:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LSfiMCA8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eZ9Yk98l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 535212BEC53
-	for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 11:12:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6255623B627;
+	Mon, 11 Aug 2025 11:12:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754910749; cv=none; b=CAU+K8P4W+QiLjZG0s6IS1AfQHvYBQKu6UKJ5ta0LGsZ3nNnnU/O5ZNyqL7QuAqe/qk/XpBzvPVytKLGk6txgw/zf1vyqeGkFevHcqYm/9icSkFdMR+6JKXPDw4zJXYlN4igJkOBxOQ+fXKze20WX62mvWRD1INK930sy4/0DFw=
+	t=1754910774; cv=none; b=NU4/G0EdK1Oq98ZlDDw8KCFbQt4yBBEOGpil0K3GJv0b0e/uMfBghNa6pVtxxJlAnXdtkdhSpwOQPvBlDswNSF7+2cg7HKdIW0QABOKTb7OGNcKkyYDWtZYs2ahdvlDuO46ZKRqDt2mW1ec1n71VdhkYjXKhBKRGhD5IKRyNIdk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754910749; c=relaxed/simple;
-	bh=lA5wa2YFp5w2hkyXw8VgYV2nkih922u6tmgaB7m2bd4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ihxFYQ/shVT1+5IRiY4dzsyueSLseCVEJq2zejV6zS+82+mhEmfQFwPTeiGNBymEPzTdxX75NREHAC1FenjAz9/sKTIegCtVqWUNHqp6R69sAeUJ1i2gukvd0IMTs+gLY2Bxhi3+nLJKXsJ3miyqYcH4sFgwtpmrzKwmQzVEW7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LSfiMCA8; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1754910747; x=1786446747;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=lA5wa2YFp5w2hkyXw8VgYV2nkih922u6tmgaB7m2bd4=;
-  b=LSfiMCA8dymisTpIxAXQd2jTGnMzZObRQddZxEP6thfzO4Et8q9iGdNF
-   hYAZaP8zoutfJ2eZZ9P/McTxZIfZEv+Qh5IzGL5oet2lUK03m3nqMG0sc
-   poZuwu58mFZ6gORZUHUU0AsHVGE4yfuFzejN3CtDJl+eM2jvSyFAMrOZK
-   S3NNCr7d/GD5XfDtzyRd3cuMik5Zkx0rPN2CYDKaAYWTPYQQY7bW4Ou/b
-   4+jJW7DwkkYfdGbsJ45EIgyELr98RRRSn8o/+vuU8wQYAbOjaJR8HTLP2
-   Uvmd/JM2sQ20xglL0cgxf3IbDBwSB0iXxWqsI59tC884HLzHeJcZ86/Tj
-   g==;
-X-CSE-ConnectionGUID: C+L3v2+OR4uJ4WXO7KPjbQ==
-X-CSE-MsgGUID: 7Qrqk+IzQAWKrkGKW8LPDw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11518"; a="56189529"
-X-IronPort-AV: E=Sophos;i="6.17,278,1747724400"; 
-   d="scan'208";a="56189529"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2025 04:12:27 -0700
-X-CSE-ConnectionGUID: YKbtH7AmSgmJDCC5J7NhFA==
-X-CSE-MsgGUID: AZP+qAxnTtSRBi//p4AguQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,278,1747724400"; 
-   d="scan'208";a="165532761"
-Received: from amlin-019-225.igk.intel.com ([10.102.19.225])
-  by orviesa009.jf.intel.com with ESMTP; 11 Aug 2025 04:12:26 -0700
-From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-To: intel-wired-lan@lists.osuosl.org,
-	anthony.l.nguyen@intel.com,
-	aleksandr.loktionov@intel.com
-Cc: netdev@vger.kernel.org,
-	Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-Subject: [PATCH iwl-next v1 5/5] iavf: add RSS support for GTP protocol via ethtool
-Date: Mon, 11 Aug 2025 11:10:55 +0000
-Message-ID: <20250811111213.2964512-6-aleksandr.loktionov@intel.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250811111213.2964512-1-aleksandr.loktionov@intel.com>
-References: <20250811111213.2964512-1-aleksandr.loktionov@intel.com>
+	s=arc-20240116; t=1754910774; c=relaxed/simple;
+	bh=1RqIFn/aCaYbnX9ev6h5HB3n3Q7qvPW4lFjEXenhedc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=G0WN+9P0NksnbBBhrw6Mi4R+bYFKrDZb4PcuMfBmkeYbQ3NYq60j6GPBnJRbT4wmpd/WZW0FPU/48y4M7p3SjtFJnZRty5SScK49bGG20ODu2uFYImmFDyWkP9lsnZPQPcxm8qyXzWNU12TnLrxB7B/xNxbowdkRobrZkrhwzS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eZ9Yk98l; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-3b783ea502eso2923297f8f.1;
+        Mon, 11 Aug 2025 04:12:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1754910771; x=1755515571; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZpFd1p985Zt2FE0ikX1FewH4hrglpUtZfkFtt2DZdFk=;
+        b=eZ9Yk98lzgHhcUoIzx5D3e3q3v+fRkWmUdclt94xqu7RDerdaZO1qby/pmtwxZjooM
+         HmuXYDPsCSzcYV4VjQuWradpwtbzLBPdItiSbWGfJp+Kag89Dm7KTGrIodeY7pola40x
+         pWhTGoYXt46Z6hwLxjnqcWigXefKa1pugVYNHZ5JGrGg9+hrB5GMYbx9A/G2KwWFHq+H
+         ZiiP16hDacpZXdQRKT5SVML/5Fea+SNUVcTiokq3oZ3vx6U7DRhzVV30TTAZ/Jqk8bt/
+         xbBAnYhbttBpRE40yWmgm/LqdaReluiipAABl3TMzaZlCnUuFp8EPvtJGqSuYSFdYUf3
+         Oj2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754910771; x=1755515571;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZpFd1p985Zt2FE0ikX1FewH4hrglpUtZfkFtt2DZdFk=;
+        b=GqCOnJgkL8+oHQB1X83hNwIKPpNiZAyyONHSXCttmcy47+n+yxilk+dFskG/k1uwEt
+         C31lfFTXh+4mEiQBk/QaA+PfjtcQ7Z3424ftmw3JWEcMaiqAl65z2+VJOboZ5icW1Ir9
+         3QiOOfcvnWCPnxDFiHUTxLMZGRVcImPeb6ueBYDy+YRRJJ3+abuDol+eCtxTUwWQi/i9
+         9GbItvTdYYb63taC9N0jaGkg8sd7xQLHGxwuzqhWaHvaYAVEDlM7HS1ZgY98EP6FQq4x
+         jDK+yX5VSI9DCLi0lGdK63Rde1x86d/PSCBQy9NKFBiya59GGjZzBiFD0I2CNlLjv3xm
+         06Mw==
+X-Forwarded-Encrypted: i=1; AJvYcCURk2jK8NV3UTWcTZm26Ku8wACeTuCYsrXIjAezXTJyXQhHffM3ZewZyz5NOEn4eoscpkuSyViw@vger.kernel.org, AJvYcCX91HqXJUMZJwxLFUoNCY7wt56hz5pBVBTPoXYJxtX88TjHsUDVmNyUxZhcCwv89oxZaQjwlcoO7kp6cbM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxHrOKUDty61+O8PSlkxDJbuUT99TyRLNGuWHq1IpuGNuQ5bz48
+	XdGqpp7iokq8gKDwkIRVtE7aLqDfhMETnZZ+B3S9bxjV4A0TVbkPKAQt
+X-Gm-Gg: ASbGncv3OV4MCz1B5NAi/pGiCxrCB4IXjDjpKMCZi1VQmIw75uzaV1CgCtDBS4ZdUpN
+	P+R9LrcTkBIjfgawjZcPX2wkJ32EJGqZGE0QZorpewtHeDczQAknJSYVL8FzxVn9axrMBCNvlcN
+	F2QRyXUK+EEsA6jpjBEaOWe7dNFJq3/mCCEtH7O1boF7Y9joz/kGSorSuvLTeDlfcBnnZfFA7Ab
+	ODcd2JiiWSo5USHiyr2nphB13Pkt0wmy9Ep34xBJ4mSfrHRbadPi0NNXVQ01EctFpNPuXUzG3ck
+	WzmfTqJWmj9OL0OSucxYwwqdYP+1k9QEGqGM9nTKH7B48mr2h7OFMA/s0zn5C0f2KL5WtCIK242
+	UJHxUEViItud9VVwhoOAU
+X-Google-Smtp-Source: AGHT+IEgnc5QqrRg0lz9+OdndWHdvt/rKwyilSbik0M4f9+GbjXlUx7jAfvxAzW/AxvkKUcd3R5bIw==
+X-Received: by 2002:a05:6000:4308:b0:3b7:915c:5fa3 with SMTP id ffacd0b85a97d-3b900fe7e69mr12080048f8f.24.1754910770430;
+        Mon, 11 Aug 2025 04:12:50 -0700 (PDT)
+Received: from localhost ([87.254.0.133])
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-3b79c3abed3sm40116248f8f.10.2025.08.11.04.12.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Aug 2025 04:12:49 -0700 (PDT)
+From: Colin Ian King <colin.i.king@gmail.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org
+Cc: kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] net: stmmac: make variable data a u32
+Date: Mon, 11 Aug 2025 12:12:11 +0100
+Message-ID: <20250811111211.1646600-1-colin.i.king@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-Extend the iavf driver to support Receive Side Scaling (RSS)
-configuration for GTP (GPRS Tunneling Protocol) flows using ethtool.
+Make data a u32 instead of an unsigned long, this way it is
+explicitly the same width as the operations performed on it
+and the same width as a writel store, and it cleans up sign
+extention warnings when 64 bit static analysis is performed
+on the code.
 
-The implementation introduces new RSS flow segment headers and hash field
-definitions for various GTP encapsulations, including:
-
-  - GTPC
-  - GTPU (IP, Extension Header, Uplink, Downlink)
-  - TEID-based hashing
-
-The ethtool interface is updated to parse and apply these new flow types
-and hash fields, enabling fine-grained traffic distribution for GTP-based
-mobile workloads.
-
-This enhancement improves performance and scalability for virtualized
-network functions (VNFs) and user plane functions (UPFs) in 5G and LTE
-deployments.
-
-Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Reviewed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
 ---
- .../net/ethernet/intel/iavf/iavf_adv_rss.c    | 119 ++++++++++++++----
- .../net/ethernet/intel/iavf/iavf_adv_rss.h    |  31 +++++
- .../net/ethernet/intel/iavf/iavf_ethtool.c    |  89 +++++++++++++
- 3 files changed, 216 insertions(+), 23 deletions(-)
+ drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_adv_rss.c b/drivers/net/ethernet/intel/iavf/iavf_adv_rss.c
-index a9e1da3..cd61abd 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_adv_rss.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_adv_rss.c
-@@ -90,6 +90,55 @@ iavf_fill_adv_rss_sctp_hdr(struct virtchnl_proto_hdr *hdr, u64 hash_flds)
- 		VIRTCHNL_ADD_PROTO_HDR_FIELD_BIT(hdr, SCTP, DST_PORT);
- }
- 
-+/**
-+ * iavf_fill_adv_rss_gtp_hdr - Fill GTP-related RSS protocol headers
-+ * @proto_hdrs: pointer to the virtchnl protocol headers structure to populate
-+ * @packet_hdrs: bitmask of packet header types to configure
-+ * @hash_flds: RSS hash field configuration
-+ *
-+ * This function populates the virtchnl protocol header structure with
-+ * appropriate GTP-related header types based on the specified packet_hdrs.
-+ * It supports GTPC, GTPU with extension headers, and uplink/downlink PDU
-+ * types. For certain GTPU types, it also appends an IPv4 header to enable
-+ * hashing on the destination IP address.
-+ *
-+ * Return: 0 on success or -EOPNOTSUPP if the packet_hdrs value is unsupported.
-+ */
-+static int
-+iavf_fill_adv_rss_gtp_hdr(struct virtchnl_proto_hdrs *proto_hdrs,
-+			  u32 packet_hdrs, u64 hash_flds)
-+{
-+	struct virtchnl_proto_hdr *hdr;
-+
-+	hdr = &proto_hdrs->proto_hdr[proto_hdrs->count - 1];
-+
-+	switch (packet_hdrs & IAVF_ADV_RSS_FLOW_SEG_HDR_GTP) {
-+	case IAVF_ADV_RSS_FLOW_SEG_HDR_GTPC_TEID:
-+	case IAVF_ADV_RSS_FLOW_SEG_HDR_GTPC:
-+		VIRTCHNL_SET_PROTO_HDR_TYPE(hdr, GTPC);
-+		break;
-+	case IAVF_ADV_RSS_FLOW_SEG_HDR_GTPU_EH:
-+		VIRTCHNL_SET_PROTO_HDR_TYPE(hdr, GTPU_EH);
-+		break;
-+	case IAVF_ADV_RSS_FLOW_SEG_HDR_GTPU_UP:
-+		VIRTCHNL_SET_PROTO_HDR_TYPE(hdr, GTPU_EH_PDU_UP);
-+		hdr = &proto_hdrs->proto_hdr[proto_hdrs->count++];
-+		iavf_fill_adv_rss_ip4_hdr(hdr, IAVF_ADV_RSS_HASH_FLD_IPV4_DA);
-+		break;
-+	case IAVF_ADV_RSS_FLOW_SEG_HDR_GTPU_DWN:
-+		VIRTCHNL_SET_PROTO_HDR_TYPE(hdr, GTPU_EH_PDU_DWN);
-+		fallthrough;
-+	case IAVF_ADV_RSS_FLOW_SEG_HDR_GTPU_IP:
-+		hdr = &proto_hdrs->proto_hdr[proto_hdrs->count++];
-+		iavf_fill_adv_rss_ip4_hdr(hdr, IAVF_ADV_RSS_HASH_FLD_IPV4_DA);
-+		break;
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+
-+	return 0;
-+}
-+
- /**
-  * iavf_fill_adv_rss_cfg_msg - fill the RSS configuration into virtchnl message
-  * @rss_cfg: the virtchnl message to be filled with RSS configuration setting
-@@ -103,6 +152,8 @@ int
- iavf_fill_adv_rss_cfg_msg(struct virtchnl_rss_cfg *rss_cfg,
- 			  u32 packet_hdrs, u64 hash_flds, bool symm)
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c b/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
+index 4846bf49c576..467f1a05747e 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
+@@ -251,7 +251,7 @@ void dwmac_dma_flush_tx_fifo(void __iomem *ioaddr)
+ void stmmac_set_mac_addr(void __iomem *ioaddr, const u8 addr[6],
+ 			 unsigned int high, unsigned int low)
  {
-+	const u32 packet_l3_hdrs = packet_hdrs & IAVF_ADV_RSS_FLOW_SEG_HDR_L3;
-+	const u32 packet_l4_hdrs = packet_hdrs & IAVF_ADV_RSS_FLOW_SEG_HDR_L4;
- 	struct virtchnl_proto_hdrs *proto_hdrs = &rss_cfg->proto_hdrs;
- 	struct virtchnl_proto_hdr *hdr;
+-	unsigned long data;
++	u32 data;
  
-@@ -113,31 +164,41 @@ iavf_fill_adv_rss_cfg_msg(struct virtchnl_rss_cfg *rss_cfg,
- 
- 	proto_hdrs->tunnel_level = 0;	/* always outer layer */
- 
--	hdr = &proto_hdrs->proto_hdr[proto_hdrs->count++];
--	switch (packet_hdrs & IAVF_ADV_RSS_FLOW_SEG_HDR_L3) {
--	case IAVF_ADV_RSS_FLOW_SEG_HDR_IPV4:
--		iavf_fill_adv_rss_ip4_hdr(hdr, hash_flds);
--		break;
--	case IAVF_ADV_RSS_FLOW_SEG_HDR_IPV6:
--		iavf_fill_adv_rss_ip6_hdr(hdr, hash_flds);
--		break;
--	default:
--		return -EINVAL;
-+	if (packet_l3_hdrs) {
-+		hdr = &proto_hdrs->proto_hdr[proto_hdrs->count++];
-+		switch (packet_l3_hdrs) {
-+		case IAVF_ADV_RSS_FLOW_SEG_HDR_IPV4:
-+			iavf_fill_adv_rss_ip4_hdr(hdr, hash_flds);
-+			break;
-+		case IAVF_ADV_RSS_FLOW_SEG_HDR_IPV6:
-+			iavf_fill_adv_rss_ip6_hdr(hdr, hash_flds);
-+			break;
-+		default:
-+			return -EINVAL;
-+		}
- 	}
- 
--	hdr = &proto_hdrs->proto_hdr[proto_hdrs->count++];
--	switch (packet_hdrs & IAVF_ADV_RSS_FLOW_SEG_HDR_L4) {
--	case IAVF_ADV_RSS_FLOW_SEG_HDR_TCP:
--		iavf_fill_adv_rss_tcp_hdr(hdr, hash_flds);
--		break;
--	case IAVF_ADV_RSS_FLOW_SEG_HDR_UDP:
--		iavf_fill_adv_rss_udp_hdr(hdr, hash_flds);
--		break;
--	case IAVF_ADV_RSS_FLOW_SEG_HDR_SCTP:
--		iavf_fill_adv_rss_sctp_hdr(hdr, hash_flds);
--		break;
--	default:
--		return -EINVAL;
-+	if (packet_l4_hdrs) {
-+		hdr = &proto_hdrs->proto_hdr[proto_hdrs->count++];
-+		switch (packet_l4_hdrs) {
-+		case IAVF_ADV_RSS_FLOW_SEG_HDR_TCP:
-+			iavf_fill_adv_rss_tcp_hdr(hdr, hash_flds);
-+			break;
-+		case IAVF_ADV_RSS_FLOW_SEG_HDR_UDP:
-+			iavf_fill_adv_rss_udp_hdr(hdr, hash_flds);
-+			break;
-+		case IAVF_ADV_RSS_FLOW_SEG_HDR_SCTP:
-+			iavf_fill_adv_rss_sctp_hdr(hdr, hash_flds);
-+			break;
-+		default:
-+			return -EINVAL;
-+		}
-+	}
-+
-+	if (packet_hdrs & IAVF_ADV_RSS_FLOW_SEG_HDR_GTP) {
-+		hdr = &proto_hdrs->proto_hdr[proto_hdrs->count++];
-+		if (iavf_fill_adv_rss_gtp_hdr(proto_hdrs, packet_hdrs, hash_flds))
-+			return -EINVAL;
- 	}
- 
- 	return 0;
-@@ -186,6 +247,8 @@ iavf_print_adv_rss_cfg(struct iavf_adapter *adapter, struct iavf_adv_rss *rss,
- 		proto = "UDP";
- 	else if (packet_hdrs & IAVF_ADV_RSS_FLOW_SEG_HDR_SCTP)
- 		proto = "SCTP";
-+	else if (packet_hdrs & IAVF_ADV_RSS_FLOW_SEG_HDR_GTP)
-+		proto = "GTP";
- 	else
- 		return;
- 
-@@ -211,6 +274,16 @@ iavf_print_adv_rss_cfg(struct iavf_adapter *adapter, struct iavf_adv_rss *rss,
- 			 IAVF_ADV_RSS_HASH_FLD_UDP_DST_PORT |
- 			 IAVF_ADV_RSS_HASH_FLD_SCTP_DST_PORT))
- 		strcat(hash_opt, "dst port,");
-+	if (hash_flds & (IAVF_ADV_RSS_HASH_FLD_GTPC_TEID | IAVF_ADV_RSS_HASH_FLD_GTPC_TEID))
-+		strcat(hash_opt, "gtp-c,");
-+	if (hash_flds & IAVF_ADV_RSS_HASH_FLD_GTPU_IP_TEID)
-+		strcat(hash_opt, "gtp-u ip,");
-+	if (hash_flds & IAVF_ADV_RSS_HASH_FLD_GTPU_EH_TEID)
-+		strcat(hash_opt, "gtp-u ext,");
-+	if (hash_flds & IAVF_ADV_RSS_HASH_FLD_GTPU_UP_TEID)
-+		strcat(hash_opt, "gtp-u ul,");
-+	if (hash_flds & IAVF_ADV_RSS_HASH_FLD_GTPU_DWN_TEID)
-+		strcat(hash_opt, "gtp-u dl,");
- 
- 	if (!action)
- 		action = "";
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_adv_rss.h b/drivers/net/ethernet/intel/iavf/iavf_adv_rss.h
-index e31eb2a..74cc9e0 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_adv_rss.h
-+++ b/drivers/net/ethernet/intel/iavf/iavf_adv_rss.h
-@@ -22,6 +22,12 @@ enum iavf_adv_rss_flow_seg_hdr {
- 	IAVF_ADV_RSS_FLOW_SEG_HDR_TCP	= 0x00000004,
- 	IAVF_ADV_RSS_FLOW_SEG_HDR_UDP	= 0x00000008,
- 	IAVF_ADV_RSS_FLOW_SEG_HDR_SCTP	= 0x00000010,
-+	IAVF_ADV_RSS_FLOW_SEG_HDR_GTPC		= 0x00000400,
-+	IAVF_ADV_RSS_FLOW_SEG_HDR_GTPC_TEID	= 0x00000800,
-+	IAVF_ADV_RSS_FLOW_SEG_HDR_GTPU_IP	= 0x00001000,
-+	IAVF_ADV_RSS_FLOW_SEG_HDR_GTPU_EH	= 0x00002000,
-+	IAVF_ADV_RSS_FLOW_SEG_HDR_GTPU_DWN	= 0x00004000,
-+	IAVF_ADV_RSS_FLOW_SEG_HDR_GTPU_UP	= 0x00008000,
- };
- 
- #define IAVF_ADV_RSS_FLOW_SEG_HDR_L3		\
-@@ -33,6 +39,14 @@ enum iavf_adv_rss_flow_seg_hdr {
- 	 IAVF_ADV_RSS_FLOW_SEG_HDR_UDP |	\
- 	 IAVF_ADV_RSS_FLOW_SEG_HDR_SCTP)
- 
-+#define IAVF_ADV_RSS_FLOW_SEG_HDR_GTP		\
-+	(IAVF_ADV_RSS_FLOW_SEG_HDR_GTPC |	\
-+	 IAVF_ADV_RSS_FLOW_SEG_HDR_GTPC_TEID |	\
-+	 IAVF_ADV_RSS_FLOW_SEG_HDR_GTPU_IP |	\
-+	 IAVF_ADV_RSS_FLOW_SEG_HDR_GTPU_EH |	\
-+	 IAVF_ADV_RSS_FLOW_SEG_HDR_GTPU_DWN |	\
-+	 IAVF_ADV_RSS_FLOW_SEG_HDR_GTPU_UP)
-+
- enum iavf_adv_rss_flow_field {
- 	/* L3 */
- 	IAVF_ADV_RSS_FLOW_FIELD_IDX_IPV4_SA,
-@@ -46,6 +60,17 @@ enum iavf_adv_rss_flow_field {
- 	IAVF_ADV_RSS_FLOW_FIELD_IDX_UDP_DST_PORT,
- 	IAVF_ADV_RSS_FLOW_FIELD_IDX_SCTP_SRC_PORT,
- 	IAVF_ADV_RSS_FLOW_FIELD_IDX_SCTP_DST_PORT,
-+	/* GTPC_TEID */
-+	IAVF_ADV_RSS_FLOW_FIELD_IDX_GTPC_TEID,
-+	/* GTPU_IP */
-+	IAVF_ADV_RSS_FLOW_FIELD_IDX_GTPU_IP_TEID,
-+	/* GTPU_EH */
-+	IAVF_ADV_RSS_FLOW_FIELD_IDX_GTPU_EH_TEID,
-+	IAVF_ADV_RSS_FLOW_FIELD_IDX_GTPU_EH_QFI,
-+	/* GTPU_UP */
-+	IAVF_ADV_RSS_FLOW_FIELD_IDX_GTPU_UP_TEID,
-+	/* GTPU_DWN */
-+	IAVF_ADV_RSS_FLOW_FIELD_IDX_GTPU_DWN_TEID,
- 
- 	/* The total number of enums must not exceed 64 */
- 	IAVF_ADV_RSS_FLOW_FIELD_IDX_MAX
-@@ -72,6 +97,12 @@ enum iavf_adv_rss_flow_field {
- 	BIT_ULL(IAVF_ADV_RSS_FLOW_FIELD_IDX_SCTP_SRC_PORT)
- #define IAVF_ADV_RSS_HASH_FLD_SCTP_DST_PORT	\
- 	BIT_ULL(IAVF_ADV_RSS_FLOW_FIELD_IDX_SCTP_DST_PORT)
-+#define IAVF_ADV_RSS_HASH_FLD_GTPC_TEID	BIT_ULL(IAVF_ADV_RSS_FLOW_FIELD_IDX_GTPC_TEID)
-+#define IAVF_ADV_RSS_HASH_FLD_GTPU_IP_TEID BIT_ULL(IAVF_ADV_RSS_FLOW_FIELD_IDX_GTPU_IP_TEID)
-+#define IAVF_ADV_RSS_HASH_FLD_GTPU_EH_TEID BIT_ULL(IAVF_ADV_RSS_FLOW_FIELD_IDX_GTPU_EH_TEID)
-+#define IAVF_ADV_RSS_HASH_FLD_GTPU_UP_TEID BIT_ULL(IAVF_ADV_RSS_FLOW_FIELD_IDX_GTPU_UP_TEID)
-+#define IAVF_ADV_RSS_HASH_FLD_GTPU_DWN_TEID \
-+	BIT_ULL(IAVF_ADV_RSS_FLOW_FIELD_IDX_GTPU_DWN_TEID)
- 
- /* bookkeeping of advanced RSS configuration */
- struct iavf_adv_rss {
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_ethtool.c b/drivers/net/ethernet/intel/iavf/iavf_ethtool.c
-index 05d72be..a3f8ced 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_ethtool.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_ethtool.c
-@@ -1336,6 +1336,56 @@ static u32 iavf_adv_rss_parse_hdrs(const struct ethtool_rxfh_fields *cmd)
- 		hdrs |= IAVF_ADV_RSS_FLOW_SEG_HDR_SCTP |
- 			IAVF_ADV_RSS_FLOW_SEG_HDR_IPV6;
- 		break;
-+	case GTPU_V4_FLOW:
-+		hdrs |= IAVF_ADV_RSS_FLOW_SEG_HDR_GTPU_IP |
-+			IAVF_ADV_RSS_FLOW_SEG_HDR_IPV4;
-+		break;
-+	case GTPC_V4_FLOW:
-+		hdrs |= IAVF_ADV_RSS_FLOW_SEG_HDR_GTPC |
-+			IAVF_ADV_RSS_FLOW_SEG_HDR_UDP |
-+			IAVF_ADV_RSS_FLOW_SEG_HDR_IPV4;
-+		break;
-+	case GTPC_TEID_V4_FLOW:
-+		hdrs |= IAVF_ADV_RSS_FLOW_SEG_HDR_GTPC_TEID |
-+			IAVF_ADV_RSS_FLOW_SEG_HDR_UDP |
-+			IAVF_ADV_RSS_FLOW_SEG_HDR_IPV4;
-+		break;
-+	case GTPU_EH_V4_FLOW:
-+		hdrs |= IAVF_ADV_RSS_FLOW_SEG_HDR_GTPU_EH |
-+			IAVF_ADV_RSS_FLOW_SEG_HDR_IPV4;
-+		break;
-+	case GTPU_UL_V4_FLOW:
-+		hdrs |= IAVF_ADV_RSS_FLOW_SEG_HDR_GTPU_UP |
-+			IAVF_ADV_RSS_FLOW_SEG_HDR_IPV4;
-+		break;
-+	case GTPU_DL_V4_FLOW:
-+		hdrs |= IAVF_ADV_RSS_FLOW_SEG_HDR_GTPU_DWN |
-+			IAVF_ADV_RSS_FLOW_SEG_HDR_IPV4;
-+		break;
-+	case GTPU_V6_FLOW:
-+		hdrs |= IAVF_ADV_RSS_FLOW_SEG_HDR_GTPU_IP |
-+			IAVF_ADV_RSS_FLOW_SEG_HDR_IPV6;
-+		break;
-+	case GTPC_V6_FLOW:
-+		hdrs |= IAVF_ADV_RSS_FLOW_SEG_HDR_GTPC |
-+			IAVF_ADV_RSS_FLOW_SEG_HDR_IPV6;
-+		break;
-+	case GTPC_TEID_V6_FLOW:
-+		hdrs |= IAVF_ADV_RSS_FLOW_SEG_HDR_GTPC_TEID |
-+			IAVF_ADV_RSS_FLOW_SEG_HDR_IPV6;
-+		break;
-+	case GTPU_EH_V6_FLOW:
-+		hdrs |= IAVF_ADV_RSS_FLOW_SEG_HDR_GTPU_EH |
-+			IAVF_ADV_RSS_FLOW_SEG_HDR_IPV6;
-+		break;
-+	case GTPU_UL_V6_FLOW:
-+		hdrs |= IAVF_ADV_RSS_FLOW_SEG_HDR_GTPU_UP |
-+			IAVF_ADV_RSS_FLOW_SEG_HDR_IPV6;
-+		break;
-+	case GTPU_DL_V6_FLOW:
-+		hdrs |= IAVF_ADV_RSS_FLOW_SEG_HDR_GTPU_DWN |
-+			IAVF_ADV_RSS_FLOW_SEG_HDR_IPV6;
-+		break;
- 	default:
- 		break;
- 	}
-@@ -1353,6 +1403,12 @@ iavf_adv_rss_parse_hash_flds(const struct ethtool_rxfh_fields *cmd, bool symm)
- 		case TCP_V4_FLOW:
- 		case UDP_V4_FLOW:
- 		case SCTP_V4_FLOW:
-+		case GTPU_V4_FLOW:
-+		case GTPC_V4_FLOW:
-+		case GTPC_TEID_V4_FLOW:
-+		case GTPU_EH_V4_FLOW:
-+		case GTPU_UL_V4_FLOW:
-+		case GTPU_DL_V4_FLOW:
- 			if (cmd->data & RXH_IP_SRC)
- 				hfld |= IAVF_ADV_RSS_HASH_FLD_IPV4_SA;
- 			if (cmd->data & RXH_IP_DST)
-@@ -1361,6 +1417,12 @@ iavf_adv_rss_parse_hash_flds(const struct ethtool_rxfh_fields *cmd, bool symm)
- 		case TCP_V6_FLOW:
- 		case UDP_V6_FLOW:
- 		case SCTP_V6_FLOW:
-+		case GTPU_V6_FLOW:
-+		case GTPC_V6_FLOW:
-+		case GTPC_TEID_V6_FLOW:
-+		case GTPU_EH_V6_FLOW:
-+		case GTPU_UL_V6_FLOW:
-+		case GTPU_DL_V6_FLOW:
- 			if (cmd->data & RXH_IP_SRC)
- 				hfld |= IAVF_ADV_RSS_HASH_FLD_IPV6_SA;
- 			if (cmd->data & RXH_IP_DST)
-@@ -1382,6 +1444,7 @@ iavf_adv_rss_parse_hash_flds(const struct ethtool_rxfh_fields *cmd, bool symm)
- 			break;
- 		case UDP_V4_FLOW:
- 		case UDP_V6_FLOW:
-+		case GTPC_V4_FLOW:
- 			if (cmd->data & RXH_L4_B_0_1)
- 				hfld |= IAVF_ADV_RSS_HASH_FLD_UDP_SRC_PORT;
- 			if (cmd->data & RXH_L4_B_2_3)
-@@ -1398,6 +1461,32 @@ iavf_adv_rss_parse_hash_flds(const struct ethtool_rxfh_fields *cmd, bool symm)
- 			break;
- 		}
- 	}
-+	if (cmd->data & RXH_GTP_TEID) {
-+		switch (cmd->flow_type) {
-+		case GTPC_TEID_V4_FLOW:
-+		case GTPC_TEID_V6_FLOW:
-+			hfld |= IAVF_ADV_RSS_HASH_FLD_GTPC_TEID;
-+			break;
-+		case GTPU_V4_FLOW:
-+		case GTPU_V6_FLOW:
-+			hfld |= IAVF_ADV_RSS_HASH_FLD_GTPU_IP_TEID;
-+			break;
-+		case GTPU_EH_V4_FLOW:
-+		case GTPU_EH_V6_FLOW:
-+			hfld |= IAVF_ADV_RSS_HASH_FLD_GTPU_EH_TEID;
-+			break;
-+		case GTPU_UL_V4_FLOW:
-+		case GTPU_UL_V6_FLOW:
-+			hfld |= IAVF_ADV_RSS_HASH_FLD_GTPU_UP_TEID;
-+			break;
-+		case GTPU_DL_V4_FLOW:
-+		case GTPU_DL_V6_FLOW:
-+			hfld |= IAVF_ADV_RSS_HASH_FLD_GTPU_DWN_TEID;
-+			break;
-+		default:
-+			break;
-+		}
-+	}
- 
- 	return hfld;
- }
+ 	data = (addr[5] << 8) | addr[4];
+ 	/* For MAC Addr registers we have to set the Address Enable (AE)
 -- 
-2.47.1
+2.50.1
 
 
