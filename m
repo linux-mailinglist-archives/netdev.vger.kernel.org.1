@@ -1,188 +1,277 @@
-Return-Path: <netdev+bounces-212620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212621-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58B03B21799
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 23:44:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4737B217A8
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 23:49:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 75396190565F
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 21:44:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A90C62244D
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 21:49:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C74D82E338F;
-	Mon, 11 Aug 2025 21:43:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0137D2D8773;
+	Mon, 11 Aug 2025 21:49:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M8ROvVv3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J8w0cmd1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A61628505F;
-	Mon, 11 Aug 2025 21:43:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1298F21FF53;
+	Mon, 11 Aug 2025 21:49:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754948636; cv=none; b=Lyxg1dd22X7zNFfq9lglpGoeDqaUh+NVGpbDLtuRzS8ea1n1D1vYuxHoeFGEAsg5jaB78Zx01g9a4zUyb1mGVD8xyI9saMTWJa/7DJokIAq9VTVFpoXTZyLJRd6a7UZZakpBb57gDx+AXHnWzgdcSEoB/TbouZiBgv31xFuMVEI=
+	t=1754948988; cv=none; b=WM+6RF+8PwvTDLpcfkUAHVk/XCR8UfaLHPlbDb5iU3eWNsxfQZ/WTpBtnA7xkHwlTLHlpba2UwxOMjt30TTTbP8Nf5nFW5TvPlBNcKf1IoiIMMyP96Cm+Xr9mwX7DeMqlTd5h0mumz9dAZ1f18F8wSaaj3KhamLcT3Z84DE16fk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754948636; c=relaxed/simple;
-	bh=7OGQk8bopsot7CutcJAcqxqmBdgPuJE0EaLcO0LDgxU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BqTEHVk8TP08+bMO3i+8xewnFnBUSMIeSclaNa0APl1FVQGrJq+A+aFs7WoK0UtLuwgp433ky0o1ST2/NQy3WmDP2P9LIYKXsEw5ppQHo4SHZed8kJOKDFB95V5LM/RydOsXIVcBtUSavaB1pf0BeO9VSK3F8LTXBgphwK0jP7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M8ROvVv3; arc=none smtp.client-ip=209.85.216.42
+	s=arc-20240116; t=1754948988; c=relaxed/simple;
+	bh=iKAPa7ekbpFpk5BqmsoUT03OQFiQWLBw9upJTqT6Bt8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=KleHlujgb1angRaXcQt4zI1+G5ALDWTFyftQYHUyJExR6JrNPYzNKatA9r0zlxbzx24aQs8oRARaIQEE3ZnFI/ckhhQNV5/Gm2Q9yvLzumGDBnoyI8Pds8he11KDBxXUXpzJBCzeIL2ehAvGVvbh3N8PA44CfZCu/uQcHvENDrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J8w0cmd1; arc=none smtp.client-ip=209.85.221.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-31f255eb191so5003819a91.0;
-        Mon, 11 Aug 2025 14:43:54 -0700 (PDT)
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3b8d0f1fb49so2889492f8f.2;
+        Mon, 11 Aug 2025 14:49:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1754948634; x=1755553434; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=V6rK+nf0PE/yzZMOCn9QAPItrRWLBQkSNHhJvIS5DoM=;
-        b=M8ROvVv3V1ge8lyv4/8erKw1qjhL1eHf/cjCsnMmA8kdS/z8tjhxLVC4cIXjOOpVCH
-         yBwm4F/pAN5+9FSG2SsmfzVuIn/T4pafUM5jgfl/Ob+Rs0anh7GJZ5p1+qrar5LgWNgp
-         kBlyuLr5wyntsLIvQiH7P5LxU2sUPFzA+lj8FplAVw3lieDnRAFPuJHByzvZ9l97y1OL
-         QDydYwlttIb7e1xQHjw7H2Wf40ZxZH4ut3UVbFzZTIQqmvobWImd5XNk3D3r1QU5UPFj
-         85JljJ96gnCogY6Q4Np5FtNFBTcQkpIgP27Cdb53v67m7ucAGdQTiWPN3glVcbOVO+T3
-         rzOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754948634; x=1755553434;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1754948985; x=1755553785; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=V6rK+nf0PE/yzZMOCn9QAPItrRWLBQkSNHhJvIS5DoM=;
-        b=j/BbkjfZlzyQXgbWcdFhTGdXmRleupS6ogkX0ajkZRSPdp3fXgRd8J09v/RyEfdXUT
-         AS+h81clun85MhwbUMpr6KCpIW6iQC/9FYuWU+Y3/gECPrWVDYjQK3Yr81qao62jujKv
-         7qB3PLfpd8rfYZDXDtzpM+YanO4Sh9xE88ktnSswbDwJqkbFLGhWJdw80dZuyL9Smh65
-         hxjDc0QWLZaPBlffMP2mErIiIl/riJhU2oXymRWpDAzLgUmXtWdeLS356sITEyRY9yf0
-         KdUDG6jrHplXVRLRZ1tST0k1+L0fPVUUG1yNOEswSnYQ6ti2x6ROFoV2osOf43Hiz6Us
-         dcDQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUrqEiU0HfXMFlmQMM67awwpK6Acu3MPKLTTFu10b6tpQhdwQtzA+5cjzQvs/JwCIX6xIKYhqwsSS24@vger.kernel.org, AJvYcCVSs839xSisPcVVnA7HUDR5xnUh2S3+vPjzS0PA0wNU2Up9u4YyaShPI2Wp1Ng+Tnyn1V5x/5UEEmxhEdkH@vger.kernel.org, AJvYcCVyDXTvy37zVcxsdcmvEof2nKpefJMasONY16O7IKEsrfbDSvqHXXgYzCsfGeW8m/aLncns+CGr@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9m1W7PoT6OoLU6QAufEP2nRi8I4GP4s7rUjZZo3FQvcrJakmD
-	CiMraSaUUTK3hMCNLp2AebEt0Eo5SqmfoXRSzi7aRBWpJH3ggkJFQyAl
-X-Gm-Gg: ASbGncuyrmYPjmnzSa5Z2qraWG2TmZqCtl4tfNKe3/NkNayDqK43ygJzxbLLvT6l1DQ
-	ws4iROro6h2ys5uQz4QSHVuCXm+wGvCsQxU75kaFWKuA+w8yxnLYzyCSnBoPGXmBqohJtoFsUiy
-	4gJ5PZn2s3aA1lE6KmM0qXvMX58IyT7hRl2EINbYb8a12tKN7wuFIvwCotOjRl7uuyBVqHd6xWL
-	6weecq7AeT4MkVpD454+3r3+9sYRonyxMwAH3kgcrBsrepgSN8MkedliE4aWVZR/O28swdkMN3r
-	eWhUxLGIFqy91kowbvcOj/BYohhytHbaeILcSZ8nH73xe/LxUbFDFGzsvTzBry+/h+tE++HdyIP
-	FVFRd1ivfz0AIQuebP0bQXCg8yD+MK1B7eQ==
-X-Google-Smtp-Source: AGHT+IFsi78NN+fBY0LS4y+P8YMijCEFQnCo74evdIk8ObOIJFSgyoxfkygQTtZGUK1jp2bVcfARVQ==
-X-Received: by 2002:a17:90b:3842:b0:311:9c1f:8522 with SMTP id 98e67ed59e1d1-321c09fc527mr1556132a91.10.1754948634369;
-        Mon, 11 Aug 2025 14:43:54 -0700 (PDT)
-Received: from google.com ([2620:15c:9d:2:69d7:30de:b05e:915b])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3218c3c2d58sm8359383a91.16.2025.08.11.14.43.53
+        bh=ribG41vgVNpaISWAFmou7/3xELnJxrsnPd0h2YITzas=;
+        b=J8w0cmd19XOOEKepFaM0e1QDggbgSrkYldQUoEWFpJlHkv4MiLyxC31Ghqq9H1XTS6
+         1PqQrn3nDjx3GOl+HLf+2gjBeKSPxOpW8PXKFCCCmMrfaXAnler3m4zNkSKbtKdCTyl8
+         hh4t92fd/QJ0I9rUnMMkWlmk/vTSS5KjZp8UKcIr1jabtP4hTZL5MmEGOo0M06C70/0l
+         WJbl5z4+UQdY4paIuqvGgav3TTK5fXDvujWJp7+Y8pCuZniilPR2eTNM1Mgf7RZjcSx9
+         7yDYsoP4BxsvaMU/DjHOOsTwRLlcXV24iR4U6L4CpB6iQ/beAfiOZ/ntlO2qyMc3DOZ9
+         Gb5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754948985; x=1755553785;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ribG41vgVNpaISWAFmou7/3xELnJxrsnPd0h2YITzas=;
+        b=LCb9bMxa6bi1H4eQbY/yVBN7eX2u7oJp3IQuXRhWq6/isdmaZw0es/OmrIKLGoOLvX
+         /9fu3cAPfyT9so+6TjJl4JE1SEXaEHlwmfoUzjahzFuHZLXLEMqUCob1BvN3YHDp0gK3
+         kRhBdByCn1qUzb3/QiF8yXmeQwC5hGPIq2a8ABV2CjzYLliXIh3WaX/wMfQr1XIL7BSw
+         LH8Nz7U2XLCvUaH+weX4FuPnS39Dr2L+qZWjI9pMZ6dJpHODu3wpfLzUP2bx+0mu93A7
+         /uW/KWuh2kDYUXuUlJCsNGg0oILkPNxoqECTWrBT1FlCwf3oxgzqGFf8hu2KTpgiTn4E
+         vw/g==
+X-Forwarded-Encrypted: i=1; AJvYcCUtK0pv/U4nUVuV1aVAyCPJOMPrbA7dvwfdoLztjUKj+sU2AAyysbfyYsZq5vcIT8b5nn4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YysG5tTSeZJVxRVUGUwXBvLmOkKoP7F24Tac04dVfNll440g/vJ
+	GECJvbSCfAWbobA1jPBW0QIGwonHA94hq/QvL4t2DxuC7dUwV/9MH3IMYPJqvatJ
+X-Gm-Gg: ASbGncscnJL8sDPRkyae9Uhv5jG59II8mFh2gGKj6k393o27fsdTCngQoDKObh0j1tn
+	qPY3FJfe85/gijo2zJ9AeE5KP9Z5pTZ/T3END7b/EF1cjidKduXuag8Xw/5u87wqZu/k30e5+dW
+	pq2YURi1qnAg6N5hH3ka5+RDZM9j5qNBO0ehc/0GIXU1X9gOA/mzGBJcoJJlk6dhr9+nvh2uaEt
+	iso4QUzPdPiRIn9QlAlHl+BhEHUVQp+Td6My0RG+fw6xHCFCw7CYcMy5hCbAjgXQGgHOEzlwc+4
+	sthASbML9r9NDpIdQ0OMYD+qTXuOnHJq3Bpg6By/DffhQAH+Cajjql/HZIsNvIuMBlJUzq9lYE1
+	PMvGozOBjyvOxnxt1bYU=
+X-Google-Smtp-Source: AGHT+IGXdjSNy/Sgt52pQ6Y8/H+kBsoddKLvdFmKN0iXa4Qz3oV6+FlqdCmdSEAk1ydMTb4eeWohqA==
+X-Received: by 2002:a05:6000:2f86:b0:3b7:9b4d:70e9 with SMTP id ffacd0b85a97d-3b911032da9mr831757f8f.43.1754948984468;
+        Mon, 11 Aug 2025 14:49:44 -0700 (PDT)
+Received: from localhost ([2a03:2880:31ff:2::])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-459e5b84674sm290271575e9.30.2025.08.11.14.49.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Aug 2025 14:43:54 -0700 (PDT)
-Date: Mon, 11 Aug 2025 14:43:51 -0700
-From: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Arnd Bergmann <arnd@kernel.org>, Bartosz Golaszewski <brgl@bgdev.pl>, 
-	Linus Walleij <linus.walleij@linaro.org>, linux-gpio@vger.kernel.org, 
-	Krzysztof Kozlowski <krzk@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Jakub Kicinski <kuba@kernel.org>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 17/21] nfc: marvell: convert to gpio descriptors
-Message-ID: <yf5coptfembueds4ozpsphdv7vggyzfezdxv66uuqzjv3gpw62@x4s6iylxahrv>
-References: <20250808151822.536879-1-arnd@kernel.org>
- <20250808151822.536879-18-arnd@kernel.org>
- <aJcea90siAod5Apw@smile.fi.intel.com>
+        Mon, 11 Aug 2025 14:49:43 -0700 (PDT)
+From: Mohsin Bashir <mohsin.bashr@gmail.com>
+To: netdev@vger.kernel.org
+Cc: kuba@kernel.org,
+	alexanderduyck@fb.com,
+	andrew+netdev@lunn.ch,
+	ast@kernel.org,
+	bpf@vger.kernel.org,
+	corbet@lwn.net,
+	daniel@iogearbox.net,
+	davem@davemloft.net,
+	edumazet@google.com,
+	hawk@kernel.org,
+	horms@kernel.org,
+	john.fastabend@gmail.com,
+	kernel-team@meta.com,
+	mohsin.bashr@gmail.com,
+	pabeni@redhat.com,
+	sdf@fomichev.me,
+	vadim.fedorenko@linux.dev,
+	aleksander.lobakin@intel.com
+Subject: [PATCH net-next V2 3/9] eth: fbnic: Use shinfo to track frags state on Rx
+Date: Mon, 11 Aug 2025 14:49:35 -0700
+Message-ID: <20250811214935.1030938-1-mohsin.bashr@gmail.com>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20250811211338.857992-1-mohsin.bashr@gmail.com>
+References: <20250811211338.857992-1-mohsin.bashr@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aJcea90siAod5Apw@smile.fi.intel.com>
+Content-Transfer-Encoding: 8bit
 
-On Sat, Aug 09, 2025 at 01:09:47PM +0300, Andy Shevchenko wrote:
-> On Fri, Aug 08, 2025 at 05:18:01PM +0200, Arnd Bergmann wrote:
-> > From: Arnd Bergmann <arnd@arndb.de>
-> > 
-> > The only reason this driver seems to still use the legacy gpio
-> > numbers is for the module parameter that lets users pass a different
-> > reset gpio.
-> > 
-> > Since the fixed numbers are on their way out, and none of the platforms
-> > this driver is used on would have them any more, remove the module
-> > parameter and instead just use the reset information from firmware.
-> 
-> This patch is my love in the series, thanks for doing it!
-> Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-> 
-> But note some comments below.
-> 
-> ...
-> 
-> > -	if (gpio_is_valid(priv->config.reset_n_io)) {
-> > -		rc = gpio_request_one(priv->config.reset_n_io,
-> > -				      GPIOF_OUT_INIT_LOW,
-> > -				      "nfcmrvl_reset_n");
-> > -		if (rc < 0) {
-> > -			priv->config.reset_n_io = -EINVAL;
-> > -			nfc_err(dev, "failed to request reset_n io\n");
-> > -		}
-> > +	priv->reset_n_io = gpiod_get_optional(dev, "reset-n-io", GPIOD_OUT_LOW);
+Remove local fields that track frags state and instead store this
+information directly in the shinfo struct. This change is necessary
+because the current implementation can lead to inaccuracies in certain
+scenarios, such as when using XDP multi-buff support. Specifically, the
+XDP program may update nr_frags without updating the local variables,
+resulting in an inconsistent state.
 
-No, this should be "reset". gpiolib-of.c has a quirk to resolve to naked
-"reset-n-io", otherwise this will resolve to "reset-n-io-gpios" in the
-bowels of gpiolib.
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
+---
+ drivers/net/ethernet/meta/fbnic/fbnic_txrx.c | 80 ++++++--------------
+ drivers/net/ethernet/meta/fbnic/fbnic_txrx.h |  4 +-
+ 2 files changed, 26 insertions(+), 58 deletions(-)
 
-> > +	if (IS_ERR(priv->reset_n_io)) {
-> > +		nfc_err(dev, "failed to get reset_n gpio\n");
-> > +		return ERR_CAST(priv->reset_n_io);
-> >  	}
-> 
-> This also needs a call to gpiod_set_consumer_name(), IIRC the API name.
-
-It does not have to... I am not sure who pays attention to names.
-
-> 
-> ...
-> 
-> > -	if (gpio_is_valid(priv->config.reset_n_io)) {
-> > -		nfc_info(priv->dev, "reset the chip\n");
-> > -		gpio_set_value(priv->config.reset_n_io, 0);
-> > -		usleep_range(5000, 10000);
-> > -		gpio_set_value(priv->config.reset_n_io, 1);
-> > -	} else
-> > -		nfc_info(priv->dev, "no reset available on this interface\n");
-> > +	nfc_info(priv->dev, "reset the chip\n");
-> > +	gpiod_set_value(priv->reset_n_io, 0);
-> > +	usleep_range(5000, 10000);
-> 
-> Side note, this would be nice to use fsleep(), but I see that's just a
-> copy'n'paste of the original piece.
-> 
-> > +	gpiod_set_value(priv->reset_n_io, 1);
-
-Nope, this is not going to work. See
-Documentation/devicetree/bindings/net/nfc/marvell,nci.yaml, this GPIO is
-active low. We do not have any "live" DTS examples so I am not sure what
-polarity is used in the wild. So either use logical level (my
-preference) or switch to "_raw()" variant.
-
-> 
-> ...
-> 
-> >  void nfcmrvl_chip_halt(struct nfcmrvl_private *priv)
-> >  {
-> > -	if (gpio_is_valid(priv->config.reset_n_io))
-> > -		gpio_set_value(priv->config.reset_n_io, 0);
-> > +	if (priv->reset_n_io)
-> 
-> Not sure why we need this dup check.
-
-I personally feel very uneasy when dealing with optional GPIO and not
-checking if it exists or not, even though gpiod_set_value() handles
-this. I think check makes logic clearer.
-
-> 
-> > +		gpiod_set_value(priv->reset_n_io, 0);
-> >  }
-> 
-
-Thanks.
-
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
+index c80cbde50925..819234aa5bd4 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
+@@ -892,9 +892,8 @@ static void fbnic_pkt_prepare(struct fbnic_napi_vector *nv, u64 rcd,
+ 	xdp_prepare_buff(&pkt->buff, hdr_start, headroom,
+ 			 len - FBNIC_RX_PAD, true);
+ 
+-	pkt->data_truesize = 0;
+-	pkt->data_len = 0;
+-	pkt->nr_frags = 0;
++	pkt->hwtstamp = 0;
++	pkt->add_frag_failed = false;
+ }
+ 
+ static void fbnic_add_rx_frag(struct fbnic_napi_vector *nv, u64 rcd,
+@@ -905,8 +904,8 @@ static void fbnic_add_rx_frag(struct fbnic_napi_vector *nv, u64 rcd,
+ 	unsigned int pg_off = FIELD_GET(FBNIC_RCD_AL_BUFF_OFF_MASK, rcd);
+ 	unsigned int len = FIELD_GET(FBNIC_RCD_AL_BUFF_LEN_MASK, rcd);
+ 	struct page *page = fbnic_page_pool_get(&qt->sub1, pg_idx);
+-	struct skb_shared_info *shinfo;
+ 	unsigned int truesize;
++	bool added;
+ 
+ 	truesize = FIELD_GET(FBNIC_RCD_AL_PAGE_FIN, rcd) ?
+ 		   FBNIC_BD_FRAG_SIZE - pg_off : ALIGN(len, 128);
+@@ -918,34 +917,34 @@ static void fbnic_add_rx_frag(struct fbnic_napi_vector *nv, u64 rcd,
+ 	dma_sync_single_range_for_cpu(nv->dev, page_pool_get_dma_addr(page),
+ 				      pg_off, truesize, DMA_BIDIRECTIONAL);
+ 
+-	/* Add page to xdp shared info */
+-	shinfo = xdp_get_shared_info_from_buff(&pkt->buff);
+-
+-	/* We use gso_segs to store truesize */
+-	pkt->data_truesize += truesize;
+-
+-	__skb_fill_page_desc_noacc(shinfo, pkt->nr_frags++, page, pg_off, len);
+-
+-	/* Store data_len in gso_size */
+-	pkt->data_len += len;
++	added = xdp_buff_add_frag(&pkt->buff, page_to_netmem(page), pg_off, len,
++				  truesize);
++	if (unlikely(!added)) {
++		pkt->add_frag_failed = true;
++		netdev_err_once(nv->napi.dev,
++				"Failed to add fragment to xdp_buff\n");
++	}
+ }
+ 
+ static void fbnic_put_pkt_buff(struct fbnic_napi_vector *nv,
+ 			       struct fbnic_pkt_buff *pkt, int budget)
+ {
+-	struct skb_shared_info *shinfo;
+ 	struct page *page;
+-	int nr_frags;
+ 
+ 	if (!pkt->buff.data_hard_start)
+ 		return;
+ 
+-	shinfo = xdp_get_shared_info_from_buff(&pkt->buff);
+-	nr_frags = pkt->nr_frags;
++	if (xdp_buff_has_frags(&pkt->buff)) {
++		struct skb_shared_info *shinfo;
++		int nr_frags;
+ 
+-	while (nr_frags--) {
+-		page = skb_frag_page(&shinfo->frags[nr_frags]);
+-		page_pool_put_full_page(nv->page_pool, page, !!budget);
++		shinfo = xdp_get_shared_info_from_buff(&pkt->buff);
++		nr_frags = shinfo->nr_frags;
++
++		while (nr_frags--) {
++			page = skb_frag_page(&shinfo->frags[nr_frags]);
++			page_pool_put_full_page(nv->page_pool, page, !!budget);
++		}
+ 	}
+ 
+ 	page = virt_to_page(pkt->buff.data_hard_start);
+@@ -955,43 +954,12 @@ static void fbnic_put_pkt_buff(struct fbnic_napi_vector *nv,
+ static struct sk_buff *fbnic_build_skb(struct fbnic_napi_vector *nv,
+ 				       struct fbnic_pkt_buff *pkt)
+ {
+-	unsigned int nr_frags = pkt->nr_frags;
+-	struct skb_shared_info *shinfo;
+-	unsigned int truesize;
+ 	struct sk_buff *skb;
+ 
+-	truesize = xdp_data_hard_end(&pkt->buff) + FBNIC_RX_TROOM -
+-		   pkt->buff.data_hard_start;
+-
+-	/* Build frame around buffer */
+-	skb = napi_build_skb(pkt->buff.data_hard_start, truesize);
+-	if (unlikely(!skb))
++	skb = xdp_build_skb_from_buff(&pkt->buff);
++	if (!skb)
+ 		return NULL;
+ 
+-	/* Push data pointer to start of data, put tail to end of data */
+-	skb_reserve(skb, pkt->buff.data - pkt->buff.data_hard_start);
+-	__skb_put(skb, pkt->buff.data_end - pkt->buff.data);
+-
+-	/* Add tracking for metadata at the start of the frame */
+-	skb_metadata_set(skb, pkt->buff.data - pkt->buff.data_meta);
+-
+-	/* Add Rx frags */
+-	if (nr_frags) {
+-		/* Verify that shared info didn't move */
+-		shinfo = xdp_get_shared_info_from_buff(&pkt->buff);
+-		WARN_ON(skb_shinfo(skb) != shinfo);
+-
+-		skb->truesize += pkt->data_truesize;
+-		skb->data_len += pkt->data_len;
+-		shinfo->nr_frags = nr_frags;
+-		skb->len += pkt->data_len;
+-	}
+-
+-	skb_mark_for_recycle(skb);
+-
+-	/* Set MAC header specific fields */
+-	skb->protocol = eth_type_trans(skb, nv->napi.dev);
+-
+ 	/* Add timestamp if present */
+ 	if (pkt->hwtstamp)
+ 		skb_hwtstamps(skb)->hwtstamp = pkt->hwtstamp;
+@@ -1094,7 +1062,9 @@ static int fbnic_clean_rcq(struct fbnic_napi_vector *nv,
+ 			/* We currently ignore the action table index */
+ 			break;
+ 		case FBNIC_RCD_TYPE_META:
+-			if (likely(!fbnic_rcd_metadata_err(rcd)))
++			if (unlikely(pkt->add_frag_failed))
++				skb = NULL;
++			else if (likely(!fbnic_rcd_metadata_err(rcd)))
+ 				skb = fbnic_build_skb(nv, pkt);
+ 
+ 			/* Populate skb and invalidate XDP */
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
+index 2154a9aac3a7..0260d4ccb96b 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
+@@ -69,9 +69,7 @@ struct fbnic_net;
+ struct fbnic_pkt_buff {
+ 	struct xdp_buff buff;
+ 	ktime_t hwtstamp;
+-	u32 data_truesize;
+-	u16 data_len;
+-	u16 nr_frags;
++	bool add_frag_failed;
+ };
+ 
+ struct fbnic_queue_stats {
 -- 
-Dmitry
+2.47.3
+
 
