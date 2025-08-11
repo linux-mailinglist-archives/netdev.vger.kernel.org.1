@@ -1,150 +1,133 @@
-Return-Path: <netdev+bounces-212563-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212564-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40896B21392
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 19:43:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FA4EB213B5
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 19:52:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5F66D7A2F23
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 17:42:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C408E3A5A9F
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 17:52:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA62D29BDB8;
-	Mon, 11 Aug 2025 17:43:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64DF82D4809;
+	Mon, 11 Aug 2025 17:51:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="Ge8vB8I8"
+	dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b="Rv38xt7F"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f50.google.com (mail-oa1-f50.google.com [209.85.160.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-4323.protonmail.ch (mail-4323.protonmail.ch [185.70.43.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36400311C16
-	for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 17:43:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F31832C21FF
+	for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 17:51:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.23
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754934230; cv=none; b=qLQjlIsJE+brZKUpdJE+ViaZG05ypfGUNmW7C1RGkIsd4uv+NK3o73PGfPABn15NgQnMuO01IoD4/uu9b3rnjf5U8n/B6R78OTYAYoHWBLEfQ6RyDIYiPX+eALWUZZU5wWfybsDbVRurzW2T3j0XftKIjtDi7COpBUZDe1fhs3o=
+	t=1754934709; cv=none; b=BI+CNdgBITREm2Xtu2KICGR2xoaN76+1iDgwUm2IcmzVHbPDPWOtk6psuQd8/Nl3B2I7pzn/8DgIjpBnUg3jY2GQUQHmy3JxB5S5kM1juFVEssrgr0Luf2qft4NCuIs+Ye8u3XEErNTW2Lt0HJWt878eZFfbIDGjRvV1Bn8iAa4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754934230; c=relaxed/simple;
-	bh=mIAghI0wEXYqIuYQnY9zcJxlwfuD1LQxODCLs6QxX2U=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cT87jRSUYgLjvX54zsAXBBvrDsUb2V7GZlLhLGBDR8XfU/L3MIiHbwK1X3pCwkG2QAik78hPbspm9f3qBqQyRlt8qmYA36WylJaTuYjYfJ1iqRgb0Vo5cNdG3RKZXb7gwouYs7pqCou1JVq6+QKs87+p6ajgGunTO8Geb1SRjNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=Ge8vB8I8; arc=none smtp.client-ip=209.85.160.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-oa1-f50.google.com with SMTP id 586e51a60fabf-30b7448b777so2824706fac.0
-        for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 10:43:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1754934228; x=1755539028; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=O7p1iwTrm0RW00nIdc/Ry6JTYnwNgoafuVaDrbknP3U=;
-        b=Ge8vB8I8tLbeLSGOWK2Yq9oJy3CsZ/nOsuO7jU39Lw1hgP6Ln+LOATLEdkccADCzVs
-         bEWp55P2irS9Ib4McYi8oqI4s0uMMsnAhrtjLAuErthSw8ZXeT806a0eyUbIlkDcypYj
-         JIKscgK3BJp6GvHkzNxzUjW98o0zJh7BzGpJEN1UIKYGgxvmar7qQBsfsEImtgVW3IfC
-         LzuS82/bNaTWzeWH2GaFff01vr44AguByGDgaRmnfvlqp2F0rr4cydSVnV22pRwPf8bN
-         CChVB6iOtbq0sysOS0Pfbl1pADp6+ol7ZNOWrXzUrqz0MpzeVjR+n4KxIhjbHsWSzNQb
-         QxFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754934228; x=1755539028;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=O7p1iwTrm0RW00nIdc/Ry6JTYnwNgoafuVaDrbknP3U=;
-        b=p1TTKENCfRirqlsGPe2IIh5IE7X9aKUi4p24rbWv0wq6gxCEOCUCdL6oO05yBLzYsG
-         oKtdPBCArDxeXOkAHpVtp84PqgMa/zvGgwE/75VCNml7svtTO3p+VBO2poeRmjfJQ+AD
-         j7JuqX+dvAuKf/iPp5lW0ZRjqhtgIfiWC6pmuocjfePa+RGUUUIevPUfjfikefgnlwLS
-         U/qZ9cuEHNC4YFw6nCOAcyyp3711QRTd4IudIl+MJfRa/LbEdRYx1u04lyNaHj5w3+uN
-         /I4PBph7lFEkgP+35WH9WahePihsitrCWc123Du3fljtN7EqPJ7mjQJbTbqRsfq7OnOP
-         b1VA==
-X-Gm-Message-State: AOJu0Yy7beTnHp16BmuTPfBjPG+pklyAzPQRPcDo17HNQgHgcHG1Jfjb
-	JbaJlujrqjtb75VGT2AXQzaOnflGOW9KQfam3GqOpjCpbW/aVIy/S824eZzEjxi4UBKd/WC6U1K
-	VUfRQDKk=
-X-Gm-Gg: ASbGncuVXZncpd0Mb8+02nrAMAoEyd7FBVhoH9oheiQ+dOXpSxo3FSpGrblKgNK7h9f
-	UXsherwBa+XneyyE6qTjPcaE28TxqtY8rSljb3ZM9wbgTmaA36ZhvGU3klasm7ClLPSP2u63fTw
-	jL2rTDRGKpCCwtuk/AxuBPdY34wsxDX6lodUTbAgc/wV7KhRiLyTdHecSr7qrzzygHqFFbOHzoa
-	FNPPClkc2cWJzcdqnRsB11nRfk1kHIP2/tH/f60QVxTAot5R3cwfZXjdOvlyjGGUUhmduZTO3Tk
-	Xa+KHkl5I5U0xgIRyct2STil01TQbpXlU3FbW5RF1Swr8KK0PCKK7hT7hSybGUjX2Lefv3RXWwY
-	VEiph/Q==
-X-Google-Smtp-Source: AGHT+IGuDWCMDodfirubfHoQH+Bv15H4SSkRLxrz0iacBK9Q96DGHZP1v0JaBLhFVML0QDWoWW59Hw==
-X-Received: by 2002:a05:6870:6b90:b0:2bc:7e72:2110 with SMTP id 586e51a60fabf-30c94ed08c8mr300681fac.13.1754934228218;
-        Mon, 11 Aug 2025 10:43:48 -0700 (PDT)
-Received: from localhost ([2a03:2880:12ff::])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-30c3a9d071csm2445138fac.16.2025.08.11.10.43.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Aug 2025 10:43:47 -0700 (PDT)
-From: David Wei <dw@davidwei.uk>
-To: netdev@vger.kernel.org
-Cc: Michael Chan <michael.chan@broadcom.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next] bnxt: fill data page pool with frags if PAGE_SIZE > BNXT_RX_PAGE_SIZE
-Date: Mon, 11 Aug 2025 10:43:46 -0700
-Message-ID: <20250811174346.1989199-1-dw@davidwei.uk>
-X-Mailer: git-send-email 2.47.3
+	s=arc-20240116; t=1754934709; c=relaxed/simple;
+	bh=5OO/8NPYBy+U5v1clTfaibswb+7qly9G+F9e0ZZX4IE=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YLyQuOketiM+XChA5wFNkmKbH3iGbKfuMm4JvQAid7XRcPnr3lc6xOCWUJAw+DGvU5rr/xSqS/hlBjrhqgK8r0ADRCzUwy2Z9DXvrxpxQt7ZwNLUDANf3dDk4Zd36b/js9Xdnarm8UnOug0gxghKgdb08Y5NROISi9pg+XHD904=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io; spf=pass smtp.mailfrom=willsroot.io; dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b=Rv38xt7F; arc=none smtp.client-ip=185.70.43.23
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=willsroot.io
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=willsroot.io;
+	s=protonmail2; t=1754934702; x=1755193902;
+	bh=5OO/8NPYBy+U5v1clTfaibswb+7qly9G+F9e0ZZX4IE=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=Rv38xt7FHhcmna6gtZNAg4KWi+Od5nP/bBDebaInmZUGOSrbVByk6tUm5YZIhWNKc
+	 k/lq130HH7a3yPTxflZ3cMXkmPy+mJQEYnZg3QIt7aJ6S093D/MHsebfJbay12T21F
+	 trT1scwkr4efxcBveJbL19AqUowAasoBhFy9rrc5uuRC2/LdeFSnxMrRlXIZz35Rrd
+	 4EmMXUuUkI+4ogtiFpWL6ruZyxTXSvKsAVxKAPxLuXrUC2FtTWZfaUotZNXO93wfqq
+	 LVSfHknsvIoCp4ZqdPjIaUkAOoEPsdVybH0kwAPEXJst2z56I97gko1eeWJUmoAZwl
+	 VrGmNgjZvNGPg==
+Date: Mon, 11 Aug 2025 17:51:39 +0000
+To: Jakub Kicinski <kuba@kernel.org>
+From: William Liu <will@willsroot.io>
+Cc: netdev@vger.kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com, pabeni@redhat.com, jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, horms@kernel.org, savy@syst3mfailure.io, victor@mojatatu.com
+Subject: Re: [PATCH net v4 1/2] net/sched: Fix backlog accounting in qdisc_dequeue_internal
+Message-ID: <Xd_A9IO0dh4NAVigE2yIDk9ZbCEz4XRcUO1PBNl2G6kEZF6TEAeXtDR85R_P-zIMdSL17cULM_GdmijrKs84RdMewdZswMDCBu5G7oBrajY=@willsroot.io>
+In-Reply-To: <20250811102449.50e5f416@kernel.org>
+References: <20250727235602.216450-1-will@willsroot.io> <20250808142746.6b76eae1@kernel.org> <n-GjVW0_1R1-ujkLgZIEgnaQKSsNtQ9-7UZiTmDCJsy1EutoUtiGOSahNSxpz2yANsp5olbxItT2X9apTC9btIRepMGAZZVBqWx6ueYE5O4=@willsroot.io> <20250811082958.489df3fa@kernel.org> <-8f3jdd-5pxHr0GW-uu8VtTzqDKDOyJohJ-soIwzRyqJUub186VYIxqNoGOTh8Oxtu1U0CEDl5h3N1c1D1jbn7nIlXUrNo55CHK5KcT23c4=@willsroot.io> <20250811102449.50e5f416@kernel.org>
+Feedback-ID: 42723359:user:proton
+X-Pm-Message-ID: 73fb0a6d0130d680b9e6b50a5cba3a980a319943
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-The data page pool always fills the HW rx ring with pages. On arm64 with
-64K pages, this will waste _at least_ 32K of memory per entry in the rx
-ring.
+On Monday, August 11th, 2025 at 5:24 PM, Jakub Kicinski <kuba@kernel.org> w=
+rote:
 
-Fix by fragmenting the pages if PAGE_SIZE > BNXT_RX_PAGE_SIZE. This
-makes the data page pool the same as the header pool.
+>=20
+>=20
+> On Mon, 11 Aug 2025 16:52:51 +0000 William Liu wrote:
+>=20
+> > > > Can you elaborate on this?
+> > > >=20
+> > > > I just moved the reset of two cstats fields from the dequeue handle=
+r
+> > > > epilogue to the prologue. Those specific cstats fields are not used
+> > > > elsewhere so they should be fine,
+> > >=20
+> > > That's the disconnect. AFAICT they are passed to codel_dequeue(),
+> > > and will be used during normal dequeue, as part of normal active
+> > > queue management under traffic..
+> >=20
+> > Yes, that is the only place those values are used. From my
+> > understanding, codel_dequeue is only called in fq_codel_dequeue. So
+> > moving the reset from the dequeue epilogue to the dequeue prologue
+> > should be fine as the same behavior is kept - the same values should
+> > always be used by codel_dequeue.
+> >=20
+> > Is there a case I am not seeing? If so, I can just add additional
+> > fields to the fq_codel_sched_data, but wanted to avoid doing that for
+> > this one edge case.
+>=20
+>=20
+> This sort of separation of logic is very error prone in general.
+> If you're asking for a specific bug that would exist with your
+> patch - I believe that two subsequent fq_codel_change() calls,
+> first one reducing the limit, the other one not reducing (and
+> therefore never invoking dequeue) will adjust the backlog twice.
+>=20
 
-Tested with iperf3 with a small (64 entries) rx ring to encourage buffer
-circulation.
+In that case, I think the code in the limit adjustment while loop never run=
+, so the backlog reduction would only happen with arguments of 0. But yes, =
+I agree that this approach is not ideal.
 
-Signed-off-by: David Wei <dw@davidwei.uk>
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+> As I commented in the previous message - wouldn't counting the
+> packets we actually dequeue not solve this problem? smth like:
+>=20
+> pkts =3D 0;
+> bytes =3D 0;
+> while (sch->q.qlen > sch->limit ||
+>=20
+> q->memory_usage > q->memory_limit) {
+>=20
+> struct sk_buff *skb =3D qdisc_dequeue_internal(sch, false);
+>=20
+> pkts++;
+> bytes +=3D qdisc_pkt_len(skb);
+> rtnl_kfree_skbs(skb, skb);
+> }
+> qdisc_tree_reduce_backlog(sch, pkts, bytes);
+>=20
+> ? "Conceptually" we are only responsible for adjusting the backlog
+> for skbs we actually gave to kfree_skb().
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 5578ddcb465d..9d7631ce860f 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -926,15 +926,21 @@ static struct page *__bnxt_alloc_rx_page(struct bnxt *bp, dma_addr_t *mapping,
- 
- static netmem_ref __bnxt_alloc_rx_netmem(struct bnxt *bp, dma_addr_t *mapping,
- 					 struct bnxt_rx_ring_info *rxr,
-+					 unsigned int *offset,
- 					 gfp_t gfp)
- {
- 	netmem_ref netmem;
- 
--	netmem = page_pool_alloc_netmems(rxr->page_pool, gfp);
-+	if (PAGE_SIZE > BNXT_RX_PAGE_SIZE) {
-+		netmem = page_pool_alloc_frag_netmem(rxr->page_pool, offset, BNXT_RX_PAGE_SIZE, gfp);
-+	} else {
-+		netmem = page_pool_alloc_netmems(rxr->page_pool, gfp);
-+		*offset = 0;
-+	}
- 	if (!netmem)
- 		return 0;
- 
--	*mapping = page_pool_get_dma_addr_netmem(netmem);
-+	*mapping = page_pool_get_dma_addr_netmem(netmem) + *offset;
- 	return netmem;
- }
- 
-@@ -1029,7 +1035,7 @@ static int bnxt_alloc_rx_netmem(struct bnxt *bp, struct bnxt_rx_ring_info *rxr,
- 	dma_addr_t mapping;
- 	netmem_ref netmem;
- 
--	netmem = __bnxt_alloc_rx_netmem(bp, &mapping, rxr, gfp);
-+	netmem = __bnxt_alloc_rx_netmem(bp, &mapping, rxr, &offset, gfp);
- 	if (!netmem)
- 		return -ENOMEM;
- 
--- 
-2.47.3
+I think the issue here is qdisc_dequeue_internal can call the actual dequeu=
+e handler, and fq_codel_dequeue would have already made a qdisc_tree_reduce=
+_backlog call [1] when cstats.drop_count is non-zero. Wouldn't we be double=
+ counting packets and bytes for qdisc_tree_reduce_backlog after the limit a=
+djustment loop with this approach?
 
+[1] https://elixir.bootlin.com/linux/v6.16/source/net/sched/sch_fq_codel.c#=
+L320
 
