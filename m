@@ -1,156 +1,138 @@
-Return-Path: <netdev+bounces-212464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212465-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78E6CB20B72
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 16:15:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D477B20BBC
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 16:24:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7436D3AD798
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 14:12:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 931DA1896178
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 14:23:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 159A2235346;
-	Mon, 11 Aug 2025 14:10:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A94972264DE;
+	Mon, 11 Aug 2025 14:22:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="OQKabDCS"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="V/ra64HY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1563E21504E;
-	Mon, 11 Aug 2025 14:10:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 978F4231A51
+	for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 14:22:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754921455; cv=none; b=PsHEepE8hzO0YhPmIyPN5FIY4sO/2vTtJRuH6qVJIkWUGUWPWCKB3erlj1pzUbYIyMGnphtO6CcnYDy92jknnD4cwhz/PSQ3mLwSRpNrRARRgTJk+V8/ZgiuiD6YmuIhUMtLLIwYPaZcbX9kQTlfoung3Ye11YI9KrC09x90TjE=
+	t=1754922165; cv=none; b=EkgVc4VyZwHrlD1fPk9Lam8QBX5GgM22FEffz6uPCzdI46pVuL9DwV2qQ51HyP83klG2lPZmmuFwfNftNKgLr8CyLlYbIb67KaLU+n1nm0kUZvMJIwo1MHXqW4/rfaIIR3WWcepidk9Mz7Q9yesBDyORQV8H/mm+QL73bC2mlbQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754921455; c=relaxed/simple;
-	bh=GOPzfBHk73dLWo3dYx183O4CEy9BVlilrv2VHXktgCg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jpbqcCogCaDgzDiC1au2wVZXoi84JGE8mHbBGvW6IHGbn/4HZkUGSzNXk8GVgSYpK9ptC5yiNBSl9VOco3Uh3ZDJAElY6w53Eywl2W/oX4CuWDgfkQn3RVbyj78LZ/TCUKXRlJQv4b8iwSz5ffiK3wrm4F8Iz/04VqDq+a/sSKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=OQKabDCS; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57BDdQMG026314;
-	Mon, 11 Aug 2025 14:10:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=sE30Z9
-	P1ro4AVXsJ1u5vy58MJt7mO4XO9gYxxo8aZU0=; b=OQKabDCSCzzb6k9hH6/VlR
-	sMWJU6BRjr3+QrA75nMNZhoVuvTIs4IxV+8xp5M1kEIu0TKdzpb+TNcW6Wm6gdm4
-	rHPppRTpscoXz4Ut3b6NyOzzcHL3Jxb68ujkiO65AZJ3bB+KvY7C1gVG/F82DpSA
-	p6MksneVhn/yhdlrKEN3KJ0Hel5I1/pw+oqJXpykNHrU2FzU/eLUlbLLqzHw5/07
-	7zSh2FC5RutpGXGx/NV0w+6ScRV9LEGAqS6QhDmip6mUJRG8DUSXP4ZuE8PXuogC
-	ovq0qRCJs1bxpj2n0iiZcBjaHcg377AdUw7gyGTzHBHiLKUx6Q+8rzkhALLhCKDA
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48dx2cspmn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 11 Aug 2025 14:10:43 +0000 (GMT)
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 57BDjqqU014720;
-	Mon, 11 Aug 2025 14:10:43 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48dx2cspmh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 11 Aug 2025 14:10:42 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 57BC0Mc1017617;
-	Mon, 11 Aug 2025 14:10:41 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 48ekc3dttm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 11 Aug 2025 14:10:41 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 57BEAcDH23068972
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 11 Aug 2025 14:10:38 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4A46B20040;
-	Mon, 11 Aug 2025 14:10:38 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E7B2720043;
-	Mon, 11 Aug 2025 14:10:37 +0000 (GMT)
-Received: from [9.152.224.240] (unknown [9.152.224.240])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 11 Aug 2025 14:10:37 +0000 (GMT)
-Message-ID: <bfcadbfa-ba05-49a1-96d2-47cc8a4fdfe1@linux.ibm.com>
-Date: Mon, 11 Aug 2025 16:10:37 +0200
+	s=arc-20240116; t=1754922165; c=relaxed/simple;
+	bh=SqkZNS/ry9IiOFLpkF0FTQ3M6L9ZG+FwE5w/Gqse7+o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KQRViXcLLqXWaK70M+Y+BNUn5zfMCoZAaOAMUcvKOcvX5Mlllb1hmZPMcX3TNjlRIS+5GxNKBAXFz82NXNPZsz9O3pSTXVXmNL3wcxp70fB9rvEpWziKu+CiE1cGgZXGfmXtdadA02fgUbx1TQWUQQebhmJl9S/lBinSB5U279s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=V/ra64HY; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-af933e84619so69072966b.0
+        for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 07:22:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1754922162; x=1755526962; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Xpi7BNJrX5eGL/LP8Vw57x6AIlZH4fDFCd+pMNqQ6kQ=;
+        b=V/ra64HYdBGzuHM5uKw5Y1hawcEGs+Ja61RkLJld6vlk1PqcbheowTvUw6Z9/QsGrC
+         C8Rqjb76QbRzJPQ+ZatZ2kb2IRVwgbNcWKHIrzXpV/Jc1zYXxiyLTeaAYKF1Vod74vkl
+         GNWqXAhpNja/OuLmsa0GbnwwKt0NR2zFMCpzQSXUSwTL56pIQn7Dn1i7mywBA7DAXCEI
+         LbQATczS4RNEjPakAZ2ZyRWtOVWl/7/s9Pd7ouu5NZ7I63cPhFo1CUve1zNHwbApSjz6
+         ixGSIGRQv9zbxYO08lZlYLcbBkxgvxsrZH7wfEyzw6S9PsC2VvsQuKDEIRlB05gPLO0t
+         68aA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754922162; x=1755526962;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Xpi7BNJrX5eGL/LP8Vw57x6AIlZH4fDFCd+pMNqQ6kQ=;
+        b=uRy1rmUGuOeJ8ohpl7n7qsvtB0xTZWcFZxzNyfKU5sygI2ULfX6TXfgB4Q43O2Wvt0
+         lJI1P4mxcyjrI1oHMBRVm5tBdCEh9EunUoZl1x4AnR5QrIc18UDPMT4JLvUr6Ua80zdi
+         UrJMp4RdUDkiQqKI2W+tpvc8DRl/Nzov8R6vFYWY21kxXUQTB9WtdT6d0XWKWC3Ik3mU
+         eoo9TMWwfw/3NfoZAzjuYXGPzUMf7ghSfg6jZMfFNZKkbRFtVX2VfdUnMGfyxYVazNjs
+         k8yxgMbo3nY41jnL8hA9K7cGtFwNfMFfuARimp/PC6nakQ0dvdhRiO03YAsx0odzGeOM
+         C2mw==
+X-Forwarded-Encrypted: i=1; AJvYcCVWv3XzJfBdSffTcUKwLyXFdirYQr0whf9D+MxMRUEu1QCOYWA1ZsxF3lTs8c7oyn2vblf+FMM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy3lxHfO7EK4UmWIYwCo8Tege7vYVpLbWm6Iu2DnN5jUcI8N2XZ
+	v6g3pgS+il0CxWtrq0ROo5hwgLak25VeL8FpItAliviYsc+HlqqFmyILWlIKmjqnlQs=
+X-Gm-Gg: ASbGnct7ud1vqwQCfplOFpIxfyWYSp0JPARo/70PHEGSoK118UyJOAFfmxfYDncV6Cc
+	Y1tCE7VsTbmCEro+WdTt1Ijx/sczJSeUju0HiUPvm0DoSPgI0PxkM7tNZkR4m05kIMSIrxahLy4
+	QQMDXQ5hIVO+Pe7DPDuAYdFP1dBQVTBnZatD7hGYx02tPBIZLhzAdl0InArCzUkPwresMaQuDJz
+	55S7bIQfhv56MLg+FDqPDlKgf1mGFZsh9um3oBRZ2K6i4aBqa6qQjljzKaz/NwXvd0HEn+lTQsl
+	FzP+egIZpQJ+NY77ENsYlHi3IYFJPrEAoQ1eG++gxb+Gae8dW7W4KBa4uatqMaSFAhWR81d5e1Z
+	mZlI1DMI0e3xd0J/fD+YDtMP9AMPFwzqRfA==
+X-Google-Smtp-Source: AGHT+IFR6gvCZMtGPXw/3s71dGGSGEyD8ct8+jDr+WVdUbYMQgrs6yK9zDhK/26/dPwO3Vy2/0MfaQ==
+X-Received: by 2002:a17:907:c21:b0:af9:3d0a:f383 with SMTP id a640c23a62f3a-af9de9af9ccmr392714266b.6.1754922161904;
+        Mon, 11 Aug 2025 07:22:41 -0700 (PDT)
+Received: from kuoka.. ([178.197.219.123])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-af9247845edsm1964216866b.46.2025.08.11.07.22.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Aug 2025 07:22:41 -0700 (PDT)
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+To: Mark Greer <mgreer@animalcreek.com>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: [PATCH net-next] dt-bindings: nfc: ti,trf7970a: Drop 'db' suffix duplicating dtschema
+Date: Mon, 11 Aug 2025 16:22:36 +0200
+Message-ID: <20250811142235.170407-2-krzysztof.kozlowski@linaro.org>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC net-next 05/17] net/smc: Improve log message for devices w/o
- pnetid
-To: dust.li@linux.alibaba.com, David Miller <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "D. Wythe" <alibuda@linux.alibaba.com>,
-        Sidraya Jayagond <sidraya@linux.ibm.com>,
-        Wenjia Zhang
- <wenjia@linux.ibm.com>,
-        Julian Ruess <julianr@linux.ibm.com>
-Cc: netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Thorsten Winkler <twinkler@linux.ibm.com>,
-        Simon Horman <horms@kernel.org>,
-        Mahanta Jambigi <mjambigi@linux.ibm.com>,
-        Tony Lu
- <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
-        Halil Pasic <pasic@linux.ibm.com>, linux-rdma@vger.kernel.org
-References: <20250806154122.3413330-1-wintera@linux.ibm.com>
- <20250806154122.3413330-6-wintera@linux.ibm.com>
- <aJinqObGQ-OHjadu@linux.alibaba.com>
-Content-Language: en-US
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <aJinqObGQ-OHjadu@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODExMDA4OCBTYWx0ZWRfX0FTaUTY0WTBs
- PhxJ/BqdnXJpWKKVnh4BwjnaCzJggxNWhHsWoEi/1CZ6VoRRNLMBYNZZgYqGWR3vcjULV7h3eYD
- ZucPxB5GPr8o2XNTRz8OrQ4vrIBBnzBitf+Y961tmVQ6UdOaiV7qk4N0QAF1Lv3p8dgiKdKxFY5
- bjol5ITPRCQkjB/0Abuibkc2Wk8/0nVBP0QYEEYre7sMne97RNVg3lKH3EGzWfyWyj3cfG3lZOM
- SwKF44huPCuOqp5+abIV+P+DZU5UGJLFYmpOnLtytbaxdpsp93qCOdI0aVwauUjE9GwHubNgk50
- 1UfvnCanDwIzlZUIBSxmmjrKvoj5caRh10Qqpw1nskyKAfeSTqSKDVXvPQWpMbaSJGzkSvrPCsc
- GQKVtwVhR5P4apP1RX/DK2yDC2cAAmvuw1Cthw8SwlSe5CjgWvEikPzktoisVSNaRMcQDGH5
-X-Proofpoint-GUID: VdbhveRbsMKp5zBBBsego82JyDFYar9b
-X-Authority-Analysis: v=2.4 cv=C9zpyRP+ c=1 sm=1 tr=0 ts=6899f9e3 cx=c_pps
- a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
- a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10 a=YXTC0nPQFvoLocbtccsA:9
- a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: Y0SSZvxv-iYbzH3LbdyEuevGSX3JQldY
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-08-11_02,2025-08-11_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 mlxscore=0 bulkscore=0 lowpriorityscore=0 phishscore=0
- mlxlogscore=487 suspectscore=0 impostorscore=0 clxscore=1015 malwarescore=0
- spamscore=0 priorityscore=1501 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2507300000
- definitions=main-2508110088
+X-Developer-Signature: v=1; a=openpgp-sha256; l=954; i=krzysztof.kozlowski@linaro.org;
+ h=from:subject; bh=SqkZNS/ry9IiOFLpkF0FTQ3M6L9ZG+FwE5w/Gqse7+o=;
+ b=owEBbQKS/ZANAwAKAcE3ZuaGi4PXAcsmYgBomfyrs3IvzolTjRXDoIBkLiYne/iELcXk9XA+Q
+ XV6xBIVBiuJAjMEAAEKAB0WIQTd0mIoPREbIztuuKjBN2bmhouD1wUCaJn8qwAKCRDBN2bmhouD
+ 15/vD/9IjosQpIL8C9tvvtWJKszpR0UYClvFTFGiV330axZedFPmxIue81IxR2TIngDKnPViOxa
+ jJ3WhZXH4F/QPyyHWIor94UiqkJSYIwCTXkTkArT2eKKtwD+O12E0+zzbbeadGstpv3/l1T3XkX
+ A8c50TfEByOjntXwA78vAljKJhpmg11e5iNarwYs6HMrHqUO+KiWwCN/XbRKB/Cw6Qx9Txd27em
+ iw26frpEVy2aFhq+Kw6VjTu4XKOau4Rrm4XJXBHxoUGlbkYxsMM3P7GHaicM10R41kqErhUuyAP
+ 4ZGepr4KfYXJwCbNBXXjbcxNm4hlzoyK3hfpknyaAl+oi3kJL8ty/QMxUa4oWelsJyArrx1wyXI
+ T8VjPOsvVAzsX51MUySZLsufHzJqL+ZJrv2Y/SZflm32IJQLDlB1Cwz5mL2oR+YLZa10sG5oQTD
+ bRGtFuzNU0iOvSelYGhUyE+z0lflpyyskOh+4oDWGVl4LumAtoDoT+dwxh4G5fVBAXByBX8Rp/g
+ 26jbp0zw5oTHqZsbuYA1c7s5qnyyWh53Cig9fC+XtV4GRzFLh4mVZf1DhEAKKsDnoO88GjcezT4
+ ajb7kSCxPRpXd8GPhJ5xhkXrod+5ANKCEebkPl5gLUTrPrAtbz64b74blhs4VCVjWdUlCSPSR0n 803Gl7sYQobZmGw==
+X-Developer-Key: i=krzysztof.kozlowski@linaro.org; a=openpgp; fpr=9BD07E0E0C51F8D59677B7541B93437D3B41629B
+Content-Transfer-Encoding: 8bit
 
+A common property unit suffix '-db' was added to dtschema, thus
+in-kernel bindings should not reference the type.
 
+Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+---
+ Documentation/devicetree/bindings/net/nfc/ti,trf7970a.yaml | 1 -
+ 1 file changed, 1 deletion(-)
 
-On 10.08.25 16:07, Dust Li wrote:
-> This patch doesn't seem strongly related to this patchset, so it might
-> be better to send this patch separately.
-> 
-> Best regards,
-> Dust
+diff --git a/Documentation/devicetree/bindings/net/nfc/ti,trf7970a.yaml b/Documentation/devicetree/bindings/net/nfc/ti,trf7970a.yaml
+index 5f49bd9ac5e6..783a85b84893 100644
+--- a/Documentation/devicetree/bindings/net/nfc/ti,trf7970a.yaml
++++ b/Documentation/devicetree/bindings/net/nfc/ti,trf7970a.yaml
+@@ -56,7 +56,6 @@ properties:
+       Regulator for supply voltage to VIN pin
+ 
+   ti,rx-gain-reduction-db:
+-    $ref: /schemas/types.yaml#/definitions/uint32
+     description: |
+       Specify an RX gain reduction to reduce antenna sensitivity with 5dB per
+       increment, with a maximum of 15dB. Supported values: [0, 5, 10, 15].
+-- 
+2.48.1
 
-You are right, and the same is true for
-[RFC net-next 02/17] s390/ism: Log module load/unload
-
-At the moment I would like to keep them in the series, so people don't have to worry about
-applying the series with or without them, because they touch the same files.
-In case the series gets delayed, I will split them off. That's why they are in the front.
 
