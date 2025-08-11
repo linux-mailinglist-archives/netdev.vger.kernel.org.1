@@ -1,130 +1,140 @@
-Return-Path: <netdev+bounces-212433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212434-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0969BB2040A
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 11:44:13 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D0FCB20487
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 11:54:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D930B18A0359
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 09:44:30 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 75F0E4E2C84
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 09:54:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 002072DE6FF;
-	Mon, 11 Aug 2025 09:43:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C128201113;
+	Mon, 11 Aug 2025 09:53:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="qxcuOZfB";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="1iNUsZA0"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e70RdzFX"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58DD62DD5E0;
-	Mon, 11 Aug 2025 09:43:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4296D1A3BD7
+	for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 09:53:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754905411; cv=none; b=MPowzdACSroaqqRmZlJB6iWX7irLE3+V6moXKJqzup3rXEVF7vRllxbiZBUIuHSwXaza2ENKq9T0FH5jZjUTzNsgHmwrvQQYraY/yhflBxXO9LUnKs893nWFOj5/YFDXdbmUaF/gxVrao3i+JvJLNzkvOwX6y8fDys6lvi5gfMM=
+	t=1754906028; cv=none; b=OW6crf1KM7Sl+2Qmvl6xUkFwJ/btAHYkAJYNwsEn5+Qzt85+/yMIu/WruhCfJtvl+a1IKpZgW7bvPo7ZQ8b1KgQmBs5/aBo76vSYqNyO1ROfs8ISyr667PdROildcg8vSbdnTvJJemxbItWL+5snclst5CuZUFZODYQziAFaQBY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754905411; c=relaxed/simple;
-	bh=R1wk1yI3kHdZ7b3M38TExwDnKAtQ2lEAsVfqoGYAhQc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=sNKWW+8pYfPinYZ83x3BV/oSC4cQvBF6oC2MfxoVT9TTQScCSykH/XIJUquRZSmcWo+nYCgyjh98GYuKf6kiL29JG/bjQ+ERjq8PzD8biZGC2mdW548GOzURNxm0pvLOMRfDryl7vuBrgPLnwrIZo0iyt5409MUGDi1krOwx/as=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=qxcuOZfB; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=1iNUsZA0; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1754905408;
+	s=arc-20240116; t=1754906028; c=relaxed/simple;
+	bh=X+/wETXg6+t+xV51UEQmour6oMA0R+27wdMYsGkvz+c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ChaZW+xxipgj7Z8t5cILGmgdrUZXjpFdaNADdBaQkkxHjpEBcDncrsH+2xjYwVs1IfKPQdmVsUZumWpIdDpQsKw0dnIJEQaEtM+/GaHsUpIKaWMtINb3906Rj06biPoBrazmXT/dAbUnq2yAN2DWfwKOUrSv1X+0aonRoCNVghk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e70RdzFX; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1754906025;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=l7t/hJpLZL9a29LQoJFY/OvuUjqQAza1kYKvckTHXaI=;
-	b=qxcuOZfBB9DR2m4PBOhYb9x/va1gwxkXs2aGvUlhoO/bUget9N3YS5cNYM5fUmj149LAOe
-	BqFJgTjkjTsvph+FUmKBn6JXynlKxttSgpcFq5C/FWxR9kitke9mquGU1KIUn+WRdGYSZw
-	EvBpU2R6qbD/YqUSfehoRh5I5FEdAY0YOXj0ZqHgczuUdnGlEe3gtM3jFhwVrG0+ZDbyuf
-	kMBjQ49F07+eBeWHNmDM36LCMGoCdCvogqG2dTKxcEetQl2lP/eY0CaryfxygyGmGz19z8
-	gNMgXmHejf8NO5sTrZTjLsOFLPAkmleYTta4ssJZmEuTohgjwKrUEvy9c0yqSA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1754905408;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=l7t/hJpLZL9a29LQoJFY/OvuUjqQAza1kYKvckTHXaI=;
-	b=1iNUsZA0Dsv3SCLGiL2lwuq7tlUathk4gu7tAwMuTMWl4QlMFkLim3abWm3T7U7ijhFSGu
-	tCCn9DaKwKwypbDQ==
-Date: Mon, 11 Aug 2025 11:43:19 +0200
-Subject: [PATCH net-next v5 2/2] net/mlx5: Don't use %pK through
- tracepoints
+	bh=LHJd90lJt7pKkV7L6fdhKaIxyXCO7FJPwtx28akpSm0=;
+	b=e70RdzFXKzTZOfkPn172HQdxInLj+LSbF6NuLrYF7vq4yK7HyDOfQSfn5t2tVYUxCLoqyw
+	Foyl2YoVn6smT5ZpriZ4HyWLTOy8/kCGP+wfdFf63Ojvsuu9v1zZrPnaoooIJq/CB6aiRJ
+	O/CGlB/r/slIgrlFiYUbIT/j1MzZYw0=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-52-h2_3JwXMN_istiiiwvXd2Q-1; Mon, 11 Aug 2025 05:53:43 -0400
+X-MC-Unique: h2_3JwXMN_istiiiwvXd2Q-1
+X-Mimecast-MFC-AGG-ID: h2_3JwXMN_istiiiwvXd2Q_1754906023
+Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-707453b0307so95080336d6.3
+        for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 02:53:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754906023; x=1755510823;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LHJd90lJt7pKkV7L6fdhKaIxyXCO7FJPwtx28akpSm0=;
+        b=lhkjt/O5nPUfh73mVwNBbeA63R9Ad5k7rjJrcV7Y0pzFLb5Mho0r+gNidCpXbwyEyU
+         8KhCgqwa+QoJyv0TSfZEnq1wclndT7gO43HIDi83DoZZBTpJrFCKwkVE8nMpZKzNtCMr
+         KKdDnh/SPNz1pLAGzfMfjrkd2Vm/zctf6ch5+z1j5UTb4Ye50bORjVfnLgnjXgCBuGYz
+         R5R3h4PDIQmeeuZfYIuh3hNMWiwvFT5Jl8hp+YrjusjHYNEgnajdDQF3uA98Q71ua/TF
+         3AAWg6yhydNPjaggMXIqtdtEw9/6qMHNxswBUHcDJSOimI9R/vpOlAMLDZUjook2d1AU
+         CFyw==
+X-Gm-Message-State: AOJu0Yz6PjzAI2mfznKjP0tdd3cp3UylZVCksrAPqzfdQ5Z11IvfGnOa
+	tI25f/hDCopzd6PfoT87N6Et0NeVontHFB84AZBLg2uYzJJd/Q9cQwY0N60vktXaqwKPRo6x+5Y
+	fi2zYcbtOYKkTepoO2jSoVvunYjUBq8pjpVIHakaccZpFr+LyuqW8q61RGDyyMxmuzQ==
+X-Gm-Gg: ASbGncu9849d+4qmf7fakqGngL5Zfqz92FyHs9Ax5tfKQ2z0pWDvc8um2eW2H3eJwrD
+	VTcwQC95GNEsv7y4YKfw2peB1qRhpadr4pz1U9p8rAeIpLXxKyJ3Fhi2PVYie5W6IYtDUhAETp0
+	Nn64VtGdDrdc6Gb7GdlVB3HuEuYk2uZUjr3g07fq7ig9RBUAWpLiz1R72+4XZUj3uwv3zqDvtcW
+	LTynjxvdJnydkJ9W3x365mPrxjhMEVpN99lCxHOpr7GOWtMF7YwGX7+Wt6nd7AJkg0GjgDAJ8us
+	9Ogg0WkFS+PwcWj/gpeEB0dOG3tug+pFs0KxUgmYoU4=
+X-Received: by 2002:a0c:da06:0:b0:709:9b8e:da0c with SMTP id 6a1803df08f44-7099b8edbe5mr112073406d6.44.1754906023060;
+        Mon, 11 Aug 2025 02:53:43 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFhDAMiPhkWP4y81WnT8aCqUZTFa3MossLf3cLQLsxAl0+cuexXhtMxG6I+EVpY/G1M9uEsNA==
+X-Received: by 2002:a0c:da06:0:b0:709:9b8e:da0c with SMTP id 6a1803df08f44-7099b8edbe5mr112073306d6.44.1754906022634;
+        Mon, 11 Aug 2025 02:53:42 -0700 (PDT)
+Received: from [192.168.0.115] ([212.105.149.252])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-7077c9dff72sm151703916d6.15.2025.08.11.02.53.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 11 Aug 2025 02:53:42 -0700 (PDT)
+Message-ID: <beada520-564a-481e-9f9d-91cd106aaee3@redhat.com>
+Date: Mon, 11 Aug 2025 11:53:38 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20250811-restricted-pointers-net-v5-2-2e2fdc7d3f2c@linutronix.de>
-References: <20250811-restricted-pointers-net-v5-0-2e2fdc7d3f2c@linutronix.de>
-In-Reply-To: <20250811-restricted-pointers-net-v5-0-2e2fdc7d3f2c@linutronix.de>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
- Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
- Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, 
- Aleksandr Loktionov <aleksandr.loktionov@intel.com>, 
- Simon Horman <horms@kernel.org>, Paul Menzel <pmenzel@molgen.mpg.de>, 
- =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1754905404; l=1849;
- i=thomas.weissschuh@linutronix.de; s=20240209; h=from:subject:message-id;
- bh=R1wk1yI3kHdZ7b3M38TExwDnKAtQ2lEAsVfqoGYAhQc=;
- b=6UPHoiJhSPpGmb/061Ob7xHhfAakKowmdb1LmSyBYr3RLzmr3od6wG7u9hxnoYtCryrvigJDU
- lszTqbo35PzA5okI63amZ81CIHpdrMR9lUurslOXwsV4ZQPQLDW3NI+
-X-Developer-Key: i=thomas.weissschuh@linutronix.de; a=ed25519;
- pk=pfvxvpFUDJV2h2nY0FidLUml22uGLSjByFbM6aqQQws=
+User-Agent: Mozilla Thunderbird
+Subject: Re: linux-next: build warnings after merge of the net-next tree
+To: Stephen Rothwell <sfr@canb.auug.org.au>,
+ David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
+Cc: Networking <netdev@vger.kernel.org>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Linux Next Mailing List <linux-next@vger.kernel.org>
+References: <20250711183129.2cf66d32@canb.auug.org.au>
+ <20250801144222.719c6568@canb.auug.org.au>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250801144222.719c6568@canb.auug.org.au>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-In the past %pK was preferable to %p as it would not leak raw pointer
-values into the kernel log.
-Since commit ad67b74d2469 ("printk: hash addresses printed with %p")
-the regular %p has been improved to avoid this issue.
-Furthermore, restricted pointers ("%pK") were never meant to be used
-through tracepoints. They can still unintentionally leak raw pointers or
-acquire sleeping locks in atomic contexts.
+Hi,
 
-Switch to the regular pointer formatting which is safer and
-easier to reason about.
-There are still a few users of %pK left, but these use it through seq_file,
-for which its usage is safe.
+On 8/1/25 6:42 AM, Stephen Rothwell wrote:
+> On Fri, 11 Jul 2025 18:31:29 +1000 Stephen Rothwell <sfr@canb.auug.org.au> wrote:
+>>
+>> After merging the net-next tree, today's linux-next build (htmldocs)
+>> produced these warnings:
+>>
+>> include/linux/virtio.h:172: warning: Excess struct member 'features' description in 'virtio_device'
+>> include/linux/virtio.h:172: warning: Excess struct member 'features_array' description in 'virtio_device'
+>>
+>> Introduced by commit
+>>
+>>   e7d4c1c5a546 ("virtio: introduce extended features")
+> 
+> I am still seeing those warnings.  That commit is now in Linus' tree.
 
-Signed-off-by: Thomas Weißschuh <thomas.weissschuh@linutronix.de>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
----
- drivers/net/ethernet/mellanox/mlx5/core/sf/dev/diag/dev_tracepoint.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I'm sorry for the latency, I was off-the-grid in the past weeks.
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/sf/dev/diag/dev_tracepoint.h b/drivers/net/ethernet/mellanox/mlx5/core/sf/dev/diag/dev_tracepoint.h
-index 0537de86f9817dc80bd897688c539135b1ad37ac..9b0f44253f332aa602a84a1f6d7532a500dd4f55 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/sf/dev/diag/dev_tracepoint.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/sf/dev/diag/dev_tracepoint.h
-@@ -28,7 +28,7 @@ DECLARE_EVENT_CLASS(mlx5_sf_dev_template,
- 				   __entry->hw_fn_id = sfdev->fn_id;
- 				   __entry->sfnum = sfdev->sfnum;
- 		    ),
--		    TP_printk("(%s) sfdev=%pK aux_id=%d hw_id=0x%x sfnum=%u\n",
-+		    TP_printk("(%s) sfdev=%p aux_id=%d hw_id=0x%x sfnum=%u\n",
- 			      __get_str(devname), __entry->sfdev,
- 			      __entry->aux_id, __entry->hw_fn_id,
- 			      __entry->sfnum)
+I observed that warnings in an earlier revision of the relevant patch,
+but I thought the previous commit:
 
--- 
-2.50.1
+eade9f57ca72 ("scripts/kernel_doc.py: properly handle
+VIRTIO_DECLARE_FEATURES")
+
+addressed it. At least I can't see the warnings locally while running:
+
+make V=1 C=1 htmldocs
+
+Perhaps it's sphinx version dependent? I'm using sphinx-build 7.3.7
+Could you please share the exact command line and tools version used?
+
+Thanks,
+
+Paolo
 
 
