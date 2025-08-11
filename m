@@ -1,172 +1,185 @@
-Return-Path: <netdev+bounces-212595-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212596-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CA71B2165B
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 22:20:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83B8EB2165D
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 22:23:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B7DEC1882C33
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 20:20:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8DC48168176
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 20:23:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AF1A2C21C3;
-	Mon, 11 Aug 2025 20:19:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AE612D8763;
+	Mon, 11 Aug 2025 20:23:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="BNTXHQol"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IvoPT8jw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD1F7311C31
-	for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 20:19:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B6D9205E25
+	for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 20:23:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754943589; cv=none; b=ABx76gUzSUSFwWts0I3A8WnxOFnnExoKaiJkc0eXpi63AlaM7mf7Msrn3O+3vIGYW5/gfcHnqC1TDGK4dbRDC16oUiOfqRHk1Qujlx1LHKkEEiSi1GIO4pzCRafck1mn9Ma7iogpdCqATIBGZc2djNcDTgkxD/oxIa31LRcW39Y=
+	t=1754943824; cv=none; b=mlJN1NZvm3YsCsuiyHFJS7LgMSdTWKmOKgW9qyLtEyWYN+5WVcd8yRrtZIry0MbIIbLt7641u8SmcDvjt3ANTTKz8Cqh5hQ+pAOLkhVdjtvexXm9MKbL+wkkIRgIiVCbpkXXHsaWQVY4Gc74gx65kYQEvM6VZgb/Gqr2B2Gdt90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754943589; c=relaxed/simple;
-	bh=sSJ/ad4MUkAKVnAtr9sOTxm9m00jZDEE2PYBXBIh5k8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=X8DQ11+VKqVRZLjkLu6jdmNb8AeYwF6VExUT3ZnbfS73TZ91YJ+yEb9FJLxVf8A3fVGgNuQ9bQDxTx4B/H5Q/0JrS+MlA7W/bsU0LDqmfJ6XINiCWdsAXaixCb889C/CLJA7SCgar4nYHAcXCuKPSzEhWPy3YD3/fBk2mXW0sGE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=BNTXHQol; arc=none smtp.client-ip=209.85.216.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-31f3b54da19so3280279a91.1
-        for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 13:19:47 -0700 (PDT)
+	s=arc-20240116; t=1754943824; c=relaxed/simple;
+	bh=O9MMJbGuTUHIqUUcd2Fu6+WBYGu9Q/0Pl95H32aD73g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pPhB7YZtbFJsJ9wbkzOcbbv4MUD6nA+ZkR6kOWp1ubZBYmEhSqThOiRKxBm30iI6lXMo/yRCXaDzytivvzJGxm2J/qYYDPR9sMpBb/kV1+yd89px3o4b9BjaZt1VWWCs0julnL/I/3t9E4j+l1C7eOfEt0PR9b+7pztbokGpjyU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IvoPT8jw; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-458c063baeaso26478755e9.1
+        for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 13:23:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1754943587; x=1755548387; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=D959IXMVDze7oXfvJioQlNfQhE71olzO+v8yu28JKQ4=;
-        b=BNTXHQolSF0XLGe3xBdXVImSpzODnN+n+Z4HOlXobblyxYmagbl2E8fThu41WAI/Bf
-         dFshS76K06eLLhkKJ9KTax7pbO5zwOxNKRiGiDHNLtApw7rpCVH0jaBUceR2+hZQ8Sp8
-         QPBBhlYY+BHuBW6hFHgm8fRzaBSUU19etoA8bCrvo+CqzgIg5wG+dVQwEJbI0ne6peKd
-         MvVBl0RBe2VEub6iK7Mwx5AhXdWdvtoMiWKnNSbut9DgpsTuX0FpT6NNzLZuoNkk76f4
-         mYoPf/DkeB5SagOK6faDR8LE/CIVBwhovmi8JO0bES6tSHaYcuvA8X4oN99kr2tieyxj
-         4Oww==
+        d=gmail.com; s=20230601; t=1754943820; x=1755548620; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rCUuGIHDdkHPVuqug3k8Q0rvfbFDfnBqIaU13gg8CyU=;
+        b=IvoPT8jwIyf88YhHdNyaeeNFyeuCnXpOv4zN3MVb7S0uUc7hs44yWnDQYvyBnx/iwd
+         URCIHv+EeIKwex1Yhgl7GmGUCS9xxhIwvA8b5btpKItoh6muIw8KsYcm+F/e/vwgIjTo
+         cLuL0STJQjlKdBHhLs01xLMfU5/0A1dyubjB6sb7Pzg0FlVClL4VxvppX6GAogE6q0bp
+         chDe7Dt1ygFx6DD1RZ820LxjkdDe7RRiJQEbXf8L6VYaJuHdUAClTSUNZ1yOAAwvkhSi
+         o4goUU8da9muMflDzhFDhwMIs/1FrpVOeuEBDwf/CFbasQgziOUVW/ILciNznG2RJ8Yd
+         mhpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754943587; x=1755548387;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=D959IXMVDze7oXfvJioQlNfQhE71olzO+v8yu28JKQ4=;
-        b=kgscemzgnp3ygn4Quf0g7pPChRz0zONMcnx+bIjhQD718L3nHgojT6NTYNSC9w+XR1
-         k52/Cikv6Zn2OyjzLAvacOeRa01Ne9ZA4nBIQ0kb9GY6pRYbuHsvL0jkUM6c/5FHEFEu
-         8/6cIqvU5yCVjACTinfbNMmu2tIYMG0zyzzX0vDDPHbmnkGElOQTayd6DBf0Ggz9tQ0N
-         OHoqd1MzueNtGWr5H/M9+Eba5YP1o1hG3Hf3TEgNjBiosvxo2FjfblyLXPkVWAaC+pqQ
-         ru/OB2VSs7SLOqxRArMr/LMOgXU/TqZbOyTnGX1DHoP+XQo5rxh39yAJ2b0ULUiG9BPd
-         btJQ==
-X-Gm-Message-State: AOJu0Yy723mcKyMuCvQPyezmzrkPk+49cerAHmh/k83ovf6SeDIKHvGQ
-	C9RkJ9bVYx7x/QeDtLAOas+eM6lw24Oj6ba6apxPpxVnllQE1zQidIZUE8fvWTK1UfsKGr1jBsG
-	JSltVI0c=
-X-Gm-Gg: ASbGncs+Wms6ydff4gAurmYR5Mi8nxod0hUiaLzzAULXNKdhrV4uGRsHf53X2jfuSXg
-	Glwlui5ykiiKwEdK3RtcjaRcqAYdlhL7YSDEMUDKCTkQnrsrQVuA6891dnWum4v+//kD8Bp9A2/
-	522a2qPRWtlRjRpoXCZaLQvAGfbmoP7aK3V8gLStGyMpiJOVXTuSjRLnSx6uPqhkhcbm5IxE9ld
-	O1JOP8NCGhc+UnhtpI9xL45M2aoiS5zPXbKIv9TVDXybrEzinbwizjlFvrgpVFL5QXJ38EJhNko
-	jj6wEm3S9syHU4FyvZdsW9q9bxyt3FpaTWtn8ZG8oDk0syCP/Uar2J4DlvtPc1O5ZQhasPt78yC
-	dk5MNhbMe/xGP6NI5vIlSFkU2RRX4cBjWZc+FBtNeUKstCZw75gow+iZDUcTwX263Z9IDJURiQY
-	ENHpo4NxQi+dvzswCY
-X-Google-Smtp-Source: AGHT+IGfFGc5mgg8XuY69tLqibsi4SnqqKhVi2wpiVhxQSy2Xpms2KWJxcnhrQK9BEyBH01ffiaHLw==
-X-Received: by 2002:a17:90b:5205:b0:31e:326e:4d2d with SMTP id 98e67ed59e1d1-321c09de3c4mr1317230a91.5.1754943586875;
-        Mon, 11 Aug 2025 13:19:46 -0700 (PDT)
-Received: from ?IPV6:2a03:83e0:1156:1:147c:18e8:a38b:e40d? ([2620:10d:c090:500::7:1e04])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3216125b7b5sm15142990a91.20.2025.08.11.13.19.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 Aug 2025 13:19:46 -0700 (PDT)
-Message-ID: <521bf1f1-4a22-4afc-b101-ac960781b911@davidwei.uk>
-Date: Mon, 11 Aug 2025 13:19:44 -0700
+        d=1e100.net; s=20230601; t=1754943820; x=1755548620;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rCUuGIHDdkHPVuqug3k8Q0rvfbFDfnBqIaU13gg8CyU=;
+        b=ntvlGwPQ8Ynkx3eXIgnnOEl0PUyVDMad2l1YDvbStnaE4DQV3ylCYM64Fwb3GUWlVX
+         ONW6VV5oiz8b/rMzbQEhleMjcNih9Sg6cJETioxBnd7YciZyaq15738bpbjTMlb2DLtu
+         tVRS67eLU09jhBB0RO3379o3z/iHmQd0DmANK55vCz7rTM3IX2jTNNlzjcF2G+5McRow
+         ILU56Y795fWZNMioYnu3z4WamMbYOwbJmhH56rmWuhYUU0ElEh+lLlU5FygQQahQiEWk
+         pFaYDmgnE8Ajtmqm7PQpqNCpQvVc3N+cwgSU4UAxyLf/cvV42IBPwaURjxtinRhZthKZ
+         R/5w==
+X-Forwarded-Encrypted: i=1; AJvYcCXN9jAdkit5e8EPiHzcvaWMb5hbSkICDQ3xuSeqYrRwLmFKbKrQ8aatncEq1WPEUA7nvKNN1c4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxZiI+tfZHw728hODtK4O+cunro1fSrF4Qit8nxjpuG9vYVPy4n
+	UoclQf2t/Yo1/noV2tZ2E4PAWkvz+dQz+VPUoAtEyc230B0y62EETP0o
+X-Gm-Gg: ASbGncsO7+jCCLkOZaYtc6KFu+anbuJp+jR+S5EO9Mru4RZ5L11EZfHHpfPipWA8oKg
+	tJdVpvgIokpB70KswMbN4rEMNiAU4kZ0LrdRpjIDVPxgDcf4Bs7kOByEKFkAnmRx4QkbKEigL5M
+	pK6jcyFtd0axnPkVNh+8GV//AZhVlfU2kXLhwBw3Ul1Pn7g2PHOac+mrZ9u1IFy1kOAb8xUS2PA
+	00075XmW1wBwbKqAzkiukewtGddvmOTZn7A7McrkUOFPXPVr8mZspK4cTh1WjdfSxzRinghPj8f
+	EIQjPZziwSYAFT1/nSxV5YkZvMO/3K/HT1pUvNowLYBrw06SdOJnSKCkdyOFTZoSaCUQetBuiq3
+	sGJAFt3ZReP/EXqecPOlgdvrCUMVyR6hZIRcBcxL+s6wpObY2xMu6VfY=
+X-Google-Smtp-Source: AGHT+IHAVrPkTtZ260oCq+9KYJfh7SC3dODIukg2FTirbWZJzdnyJ1TDYXqT0nu9enfxCx6STe7vDQ==
+X-Received: by 2002:a05:600c:1c90:b0:456:2a9:f815 with SMTP id 5b1f17b1804b1-45a10b941ddmr9975335e9.4.1754943820202;
+        Mon, 11 Aug 2025 13:23:40 -0700 (PDT)
+Received: from eldamar.lan (c-82-192-244-13.customer.ggaweb.ch. [82.192.244.13])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b79c466838sm44068994f8f.49.2025.08.11.13.23.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Aug 2025 13:23:39 -0700 (PDT)
+Sender: Salvatore Bonaccorso <salvatore.bonaccorso@gmail.com>
+Received: by eldamar.lan (Postfix, from userid 1000)
+	id 5FB22BE2DE0; Mon, 11 Aug 2025 22:23:38 +0200 (CEST)
+Date: Mon, 11 Aug 2025 22:23:38 +0200
+From: Salvatore Bonaccorso <carnil@debian.org>
+To: Michal Kubecek <mkubecek@suse.cz>
+Cc: Michel Lind <michel@michel-slm.name>, netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: Re: [PATCH ethtool] netlink: fix print_string when the value is NULL
+Message-ID: <aJpRSuCpo37TCLZZ@eldamar.lan>
+References: <aILUS-BlVm5tubAF@maurice.local>
+ <lwicuyi63qrip45nfwhifujhgtravqojbv4sud5acdqpmn7tpi@7ghj23b3hhdx>
+ <aJhG0geDvJ4a8CpS@eldamar.lan>
+ <b6unuycjddzrl55q3gwtki2rmm2ituknbmgwpuorgten5xr65w@w4dnhvf6mkoa>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] bnxt: fill data page pool with frags if
- PAGE_SIZE > BNXT_RX_PAGE_SIZE
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: netdev@vger.kernel.org, Pavan Chebbi <pavan.chebbi@broadcom.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-References: <20250811174346.1989199-1-dw@davidwei.uk>
- <CACKFLimKpAtt8GDGT7k5zagQfzmPc_ggt9c0pu427=+T_FST1g@mail.gmail.com>
-Content-Language: en-US
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <CACKFLimKpAtt8GDGT7k5zagQfzmPc_ggt9c0pu427=+T_FST1g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b6unuycjddzrl55q3gwtki2rmm2ituknbmgwpuorgten5xr65w@w4dnhvf6mkoa>
 
-On 2025-08-11 11:08, Michael Chan wrote:
-> On Mon, Aug 11, 2025 at 10:43 AM David Wei <dw@davidwei.uk> wrote:
->>
->> The data page pool always fills the HW rx ring with pages. On arm64 with
->> 64K pages, this will waste _at least_ 32K of memory per entry in the rx
->> ring.
->>
->> Fix by fragmenting the pages if PAGE_SIZE > BNXT_RX_PAGE_SIZE. This
->> makes the data page pool the same as the header pool.
->>
->> Tested with iperf3 with a small (64 entries) rx ring to encourage buffer
->> circulation.
+Hi,
+
+On Mon, Aug 11, 2025 at 10:07:00PM +0200, Michal Kubecek wrote:
+> Dne Sun, Aug 10, 2025 at 09:14:26AM GMT, Salvatore Bonaccorso napsal:
+> > Hi Michal,
+> > 
+> > On Fri, Aug 08, 2025 at 01:05:52AM +0200, Michal Kubecek wrote:
+> > > On Thu, Jul 24, 2025 at 07:48:11PM GMT, Michel Lind wrote:
+> > > > The previous fix in commit b70c92866102 ("netlink: fix missing headers
+> > > > in text output") handles the case when value is NULL by still using
+> > > > `fprintf` but passing no value.
+> > > > 
+> > > > This fails if `-Werror=format-security` is passed to gcc, as is the
+> > > > default in distros like Fedora.
+> > > > 
+> > > > ```
+> > > > json_print.c: In function 'print_string':
+> > > > json_print.c:147:25: error: format not a string literal and no format arguments [-Werror=format-security]
+> > > >   147 |                         fprintf(stdout, fmt);
+> > > >       |
+> > > > ```
+> > > > 
+> > > > Use `fprintf(stdout, "%s", fmt)` instead, using the format string as the
+> > > > value, since in this case we know it is just a string without format
+> > > > chracters.
+> > > > 
+> > > > Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+> > > > Signed-off-by: Michel Lind <michel@michel-slm.name>
+> > > 
+> > > Applied, thank you.
+> > > 
+> > > It's a bit surprising that I didn't hit this problem as I always test
+> > > building with "-Wall -Wextra -Werror". I suppose this option is not
+> > > contained in -Wall or -Wextra.
+> > > 
+> > > Michal
+> > > 
+> > > > ---
+> > > >  json_print.c | 2 +-
+> > > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > > > 
+> > > > diff --git a/json_print.c b/json_print.c
+> > > > index e07c651..75e6cd9 100644
+> > > > --- a/json_print.c
+> > > > +++ b/json_print.c
+> > > > @@ -144,7 +144,7 @@ void print_string(enum output_type type,
+> > > >  		if (value)
+> > > >  			fprintf(stdout, fmt, value);
+> > > >  		else
+> > > > -			fprintf(stdout, fmt);
+> > > > +			fprintf(stdout, "%s", fmt);
+> > > >  	}
+> > > >  }
+> > > >  
+> > > > -- 
+> > > > 2.50.1
+> > 
+> > As b70c92866102 ("netlink: fix missing headers in text output") was
+> > backported as well for the 6.14.2 version, should that get as well a
+> > new release 6.14.3 with the fix?
 > 
-> This was a regression when adding devmem support.  Prior to that,
-> __bnxt_alloc_rx_page() would handle this properly.  Should we add a
-> Fixes tag?
-
-Sounds good, how about this?
-
-Fixes: cd1fafe7da1f ("eth: bnxt: add support rx side device memory TCP")
-
+> I could do that but it didn't seem necessary. If I understand correctly,
+> this patch does not address any runtime issue (at least not until there
+> is an actual call of print_string() with null value and fmt containing
+> a template); and the build issue only happens with a very specific
+> compiler option which is not only not default but is not included even
+> in "-Wall -Wextra" (not even in gcc15).
 > 
-> The patch looks good to me.  Thanks.
-> Reviewed-by: Michael Chan <michael.chan@broadocm.com>
+> I'm aware that the commit message says that Fedora uses that compiler
+> option in its package builds but that's something that can be addressed
+> by a distribution patch. Therefore my plan was to cherry pick the commit
+> into ethtool-6.14.y branch but not to release 6.14.3 unless something
+> more serious shows up.
 > 
->>
->> Signed-off-by: David Wei <dw@davidwei.uk>
->> ---
->>   drivers/net/ethernet/broadcom/bnxt/bnxt.c | 12 +++++++++---
->>   1 file changed, 9 insertions(+), 3 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
->> index 5578ddcb465d..9d7631ce860f 100644
->> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
->> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
->> @@ -926,15 +926,21 @@ static struct page *__bnxt_alloc_rx_page(struct bnxt *bp, dma_addr_t *mapping,
->>
->>   static netmem_ref __bnxt_alloc_rx_netmem(struct bnxt *bp, dma_addr_t *mapping,
->>                                           struct bnxt_rx_ring_info *rxr,
->> +                                        unsigned int *offset,
->>                                           gfp_t gfp)
->>   {
->>          netmem_ref netmem;
->>
->> -       netmem = page_pool_alloc_netmems(rxr->page_pool, gfp);
->> +       if (PAGE_SIZE > BNXT_RX_PAGE_SIZE) {
->> +               netmem = page_pool_alloc_frag_netmem(rxr->page_pool, offset, BNXT_RX_PAGE_SIZE, gfp);
->> +       } else {
->> +               netmem = page_pool_alloc_netmems(rxr->page_pool, gfp);
->> +               *offset = 0;
->> +       }
->>          if (!netmem)
->>                  return 0;
->>
->> -       *mapping = page_pool_get_dma_addr_netmem(netmem);
->> +       *mapping = page_pool_get_dma_addr_netmem(netmem) + *offset;
->>          return netmem;
->>   }
->>
->> @@ -1029,7 +1035,7 @@ static int bnxt_alloc_rx_netmem(struct bnxt *bp, struct bnxt_rx_ring_info *rxr,
->>          dma_addr_t mapping;
->>          netmem_ref netmem;
->>
->> -       netmem = __bnxt_alloc_rx_netmem(bp, &mapping, rxr, gfp);
->> +       netmem = __bnxt_alloc_rx_netmem(bp, &mapping, rxr, &offset, gfp);
->>          if (!netmem)
->>                  return -ENOMEM;
->>
->> --
->> 2.47.3
->>
+> But if I misunderstood the situation and 6.14.3 with this commit would
+> be really helpful, I can reconsider.
+
+No not urgent, but I hit the same issue when preparing 6.14.2 for
+Debian trixie. But I can equally just cherry-pick the commit locally
+and then drop it once 6.14.3 is released.
+
+So really no hurry about that.
+
+Regards,
+Salvatore
 
