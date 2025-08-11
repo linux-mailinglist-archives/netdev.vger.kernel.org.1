@@ -1,94 +1,101 @@
-Return-Path: <netdev+bounces-212663-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212664-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54DBDB21986
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 01:48:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E10F1B21988
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 01:51:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4CF481A21A14
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 23:48:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE7B8463078
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 23:51:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB6D722DA08;
-	Mon, 11 Aug 2025 23:48:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0302263C8E;
+	Mon, 11 Aug 2025 23:50:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="F88HrC8q"
+	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="RggXwxys"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD90E4A21
-	for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 23:48:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ADC2256C71
+	for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 23:50:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754956092; cv=none; b=ooY1Vo1CV+jPPFcCnPjVb4RxDDeXU6hNBlomBJCYIFTWeR/Nc5IZ5QWYmGMYU09yuFGIUKEjZlVKvRhKs4hFXk1Mh0gax+GN48UnLOgI4Kx5jx21bT+x07/XTT9py/WuZ3MszU5iL8ZU6K2AiblidKiJSSp0wIyHM7Sc2pMr0rA=
+	t=1754956257; cv=none; b=qqMbtkAnx0f0M1zHkNB6dkuxoQqK86Jb/Cq0JvNL+dEXKx4jKgOpwSQTP9NSEB5nua6+Mgz6JeF1bokjIPjp1UrZNLifUgyjz2KsRMdJyGr33hfKlktafZLfmAOQbZOSNJM8JAv/j5VPNRxZNa5zBFARnpFQV+TMZUe5V8DdqEA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754956092; c=relaxed/simple;
-	bh=QHdGsbsGsMTF9ct+jFXXWmU25H4aBw6ecPoHa7EZZqI=;
+	s=arc-20240116; t=1754956257; c=relaxed/simple;
+	bh=nyObxS/2Bub4mAdPZqrA0gIV7yIxbeYsYdIS5GnfdJo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kGfKvTN5eFFiiWZ22veI3i/MkePLYPFZ/6RJt/pvb6oCU5rlky9FfYj7oJhKVVKDFlZwNVjdZ2xp6urNQxWIR1hlsEFyzV9ueG/49wMjf+/uvEHQ/x8QEsJNGp0ij8+L/+1+Xs2IhgR8zaJLXJt1nQb7ZPOStu6x1otYgCIYYtA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=F88HrC8q; arc=none smtp.client-ip=209.85.215.179
+	 Content-Type:Content-Disposition:In-Reply-To; b=TRuH3aeUdi253tDrW4GRvvP7fR+IR2WFOpCXMrwBJ2BD2tOcTzHDKP6K805kJbmCkZ/WJ0yRmB4Nc8ljiq76BlIu7zbAH0+BSdzFQFHaQpSmcSPpN2EcOx/4DEB+MOMeOkIvg6OeOB9/GMHWjkQNOVlduYWVVnUJizdd6k2n7LE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=RggXwxys; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
-Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-b4255b4d8f9so3279128a12.0
-        for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 16:48:10 -0700 (PDT)
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2401b855980so35814685ad.1
+        for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 16:50:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1754956090; x=1755560890; darn=vger.kernel.org;
+        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1754956255; x=1755561055; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references
          :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=U4XRSLXmEMw0woCxwm1Fun/oPeKwzB3yukJjNW3UI7g=;
-        b=F88HrC8qUdQrxXC3tvFj9XjWPrV3p0qekcsK1I5otUb1UHxHK3AoN7Em0+ZGXxgbUz
-         36mPhdmB/m0zJivW2oGuzfyuxs9+28QdHS5tL3gr7A3Wph+rArow2Vmlh1rwaxGhnWAN
-         M60XkxpV8xjRHT9xh/g2jvYDHC/wvTEx2Y/d5rWLsAS+CHudi9L3ud3bLCD6TPsBO97W
-         RP3LF3pxP57MRbbl/Lq4aE3FpkwF7C18g51OJ5wzr3gs71zNMsr/43ioYViVmIkkhx4c
-         AKEiYUyaoB1GWf+IcbywFys3y8IZYZfdcHbj0dRSyMNXz0T2E8DrNcf6QeCwL5wU6Tfw
-         NinQ==
+        bh=/TJtTTLwYllxpu5x9aN3bNHJxvrplAr8PtWCWw4sa64=;
+        b=RggXwxysY+rFMZDmiLG6tuaqnarPA7Mw1yoTcAF75W9NmEnmnk77MEAGwIrb/kbUPq
+         mYMIB1wlELbauyuJ6+YjW6aJO3uY7EYsmmLA8rHDOeKtUXRz53hdWZ/WVnVA2bzXj0h3
+         VDgH7tFs9Q0LgoxTk7lPQ17cajj7Mzdu5e4tsZOMlGLdNYHDcGPWjyIl99fPH+jRlJZN
+         PFR64sjfXKL4gqGlwKdBIMgS5cFVGmBGdaW+kpa+4BpUOAeXgcJ5KCwEbAAD4WTcsifL
+         j6vRX3qH1OMZSBbvCj2Tx9Y7huXi4BI6g/JMrMz7P+esBjmnpLHy0iT8rMGcFA62Cjtc
+         tErQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754956090; x=1755560890;
+        d=1e100.net; s=20230601; t=1754956255; x=1755561055;
         h=in-reply-to:content-disposition:mime-version:references
          :mail-followup-to:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=U4XRSLXmEMw0woCxwm1Fun/oPeKwzB3yukJjNW3UI7g=;
-        b=PrOAWx+q9dpfI2Dh4hB6fB6NHG+7H3x9J5nV/jptcKN4+SLvEqJSD/DxU8LZN5Ilxb
-         A4rJn5ZFqkCR7FNqKCvSg9TrVtreHF7wl97Vy7Lmalm0JrbN9cdYRCb2Z+dR6h3Q8FlM
-         eHihMhwTKa01LaHngwBGaU8ar3NuW1hAnTwpDIUgv4S9nkdTtC9eG50JN3/xYjU6+VHA
-         3F0kOq7AonIo/r3pM/a8F5wk8XBJpOVdECFhmJKndn2VZYfO59bcJW+7JQUX1aBt6avp
-         mfjiGQegxTkYKlebEKKM9n8of3R1H1WjjzjNoqmP9jfG7Q6HV0bZla5UGZB+QrmI1cvB
-         3Vxg==
-X-Forwarded-Encrypted: i=1; AJvYcCVgqpzhxqA9mI8cxXRGyW7bNF+qyBqhv/Z4IKUGlRrku/GyyXJkygXRB92WQbmK/hhx7ee/N14=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy+EVsrkGgSevxl4YZCIUwfT1OZk+wsFbKdIeH+lBP+wsVjh+Dd
-	B7gdKKecOMFAYZYxz7n7jDnFUSZh7RMcxGN6rx1swjekS6hPTl7jxTK/AbtmbF2/Qo4=
-X-Gm-Gg: ASbGncua04VQp3ZE9+rcv/scoU3R91siwep7UPYonV3nRg9dJn9rMH/kBbfdmAlgPlm
-	mJXccOC3jgF1j763e5IM9v4zd/Dzm53EjBAjKEH/PqUE683+HwygltpBxvADcPn9Ubjxvt8C5aO
-	85fzJJW5lmdwfyKeSJ8PVyETnm2Okt4/3ZL/NZ+6rkasQTvWB2PAdyQuUT9thxZW3HqW4XM02+c
-	NV2a7FfubZdrRnwUzDIHSjM9zYYtvioAl5qHunv3E2orscXPxBC0o5z7tCpdcoCDXiitGRjLDUw
-	nb1PUm5aH5Upwjc24uGSFtc2iqIdPeiWl2UkdBavKOAm2cB7YphcwW/BAst7C8yqXcLFtzfUTiB
-	y66nqQ0bojAOxAkdu6KvBCYAok28rsPMUJE0MyLSwT/GvRA7f+V1ko9ZRY7DdX8n2Rmo=
-X-Google-Smtp-Source: AGHT+IG07aJWSFz0EKwHxV+0m672OZTjD+dXJRBt0J7U3ZDXaKrxKPz/mMfIbtp585GM0LtN28ugxQ==
-X-Received: by 2002:a17:903:1ae6:b0:240:981d:a4f5 with SMTP id d9443c01a7336-242fc357fc0mr20275505ad.42.1754956090207;
-        Mon, 11 Aug 2025 16:48:10 -0700 (PDT)
+        bh=/TJtTTLwYllxpu5x9aN3bNHJxvrplAr8PtWCWw4sa64=;
+        b=NUqWZC0dsQXR1IijqydzQu5pELZuvq0csaxl0NOJtn8lTBF9kHZcm7dK+eJDmRe613
+         EPPOho5eouFmTpYXzPBud5298j7G3R2MAjZQZdcdDgxOnyBlqhkW6blviLzpOoYI0Ibe
+         cbTAtHHpgjxG8nixI2UNKTg0JxYJRytD7Ccf4NXxZM0GNtrWnqXbdpu1Xh4/eAMYXw1d
+         tAvz6IE7eL49/8R3UY0IEFCUWtnTy7VGrWVtDRurjQfYuDKIHCJeDiAZIURMxOAgvIf5
+         Hmw/VuRfDxVUch/cRsp3qvS2f0oAUSn0Gptuh30IY91oGv+O/hO9kUQamY9qvJVzFabj
+         6FtQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVmayGtoGKJqRqKeuSyKuLmhTW6Nxtv9+f1BJqP8IjUfzczpx9cO2c2GzWM79bDoHKnT8RWPJA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzSpivlOJhn6RJ1CR3qYjAHwHF0ULM32gMHo27QeDCT0OKs+xSm
+	+f7VMXRqp23UF/I5kjLTDIQmhaWRiDDeliVeivFyNWc0E73xRSPslMU4S/6oqI6gIJQ=
+X-Gm-Gg: ASbGncttZgkBASClhDl2PlHBO0U9KRrX2QUUAXVFBVfYYxRYlYU3dtDMRxj7gSngl+B
+	olOF6bUgq0Idm6Q5omCnjdtUCCo+uNVASkr664t+s5tpi3hhlneDucTiJXyuP7hqBQx6UqtAYzj
+	DNlJ5msH/dW4WLkwh+IB93JbTF8748RqW5Gwl93bO6eOxErPqzQLCvCuE3VvURWOfTPKu3HAOyF
+	vPR+OQCDCXc2c5OH2nlllSYLe7e/aOqqsDGDuF2DDewYrYGsUZln/eQeQZrKdOW/lGNCEf7NkNZ
+	TV38QIOOWc7tDr+K+f5sgTMf2A5iv0HA4P8ZQGy21qvM9TUrSsDj9JeDAaKargA7m0cNpDdkFDn
+	ZlpcH7m7jvHwjuqt1NJa4e5zZaYs7tVQ3JAaWiWnfv8YyH9vqMnXEF5R4YQRpuk2JFjY=
+X-Google-Smtp-Source: AGHT+IExhl97fHMJWOi2ei7Jgh0a4kSisSp2agHJTiHAKS403k5IyWnTeUF9b0oHIPPRoej3Wih1FA==
+X-Received: by 2002:a17:903:2a86:b0:240:92cc:8fcf with SMTP id d9443c01a7336-242fc3700a3mr19346545ad.49.1754956255632;
+        Mon, 11 Aug 2025 16:50:55 -0700 (PDT)
 Received: from MacBook-Air.local (c-73-222-201-58.hsd1.ca.comcast.net. [73.222.201.58])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2423783a84bsm252085905ad.51.2025.08.11.16.48.09
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-241d1ef6a8fsm281608045ad.23.2025.08.11.16.50.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Aug 2025 16:48:09 -0700 (PDT)
-Date: Mon, 11 Aug 2025 16:48:07 -0700
+        Mon, 11 Aug 2025 16:50:55 -0700 (PDT)
+Date: Mon, 11 Aug 2025 16:50:52 -0700
 From: Joe Damato <joe@dama.to>
-To: Tianyu Xu <xtydtc@gmail.com>
-Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-	andrew+netdev@lunn.ch, kuba@kernel.org, sdf@fomichev.me,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, tianyxu@cisco.com
-Subject: Re: [PATCH] igb: Fix NULL pointer dereference in ethtool loopback
- test
-Message-ID: <aJqBN0xtMzt_cA87@MacBook-Air.local>
-Mail-Followup-To: Joe Damato <joe@dama.to>, Tianyu Xu <xtydtc@gmail.com>,
-	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-	andrew+netdev@lunn.ch, kuba@kernel.org, sdf@fomichev.me,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, tianyxu@cisco.com
-References: <20250811114153.25460-1-tianyxu@cisco.com>
+To: Thorsten Blum <thorsten.blum@linux.dev>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net/sched: Remove redundant memset(0) call in
+ reset_policy()
+Message-ID: <aJqB3A8LMcocbfRT@MacBook-Air.local>
+Mail-Followup-To: Joe Damato <joe@dama.to>,
+	Thorsten Blum <thorsten.blum@linux.dev>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+References: <20250811164039.43250-1-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,43 +104,29 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250811114153.25460-1-tianyxu@cisco.com>
+In-Reply-To: <20250811164039.43250-1-thorsten.blum@linux.dev>
 
-On Mon, Aug 11, 2025 at 07:41:53PM +0800, Tianyu Xu wrote:
-> The igb driver currently causes a NULL pointer dereference
-> when executing the ethtool loopback test. This occurs because
-> there is no associated q_vector for the test ring when it is
-> set up, as interrupts are typically not added to the test rings.
+On Mon, Aug 11, 2025 at 06:40:38PM +0200, Thorsten Blum wrote:
+> The call to nla_strscpy() already zero-pads the tail of the destination
+> buffer which makes the additional memset(0) call redundant. Remove it.
 > 
-> Since commit 5ef44b3cb43b removed the napi_id assignment in
-> __xdp_rxq_info_reg(), there is no longer a need to pass a napi_id.
-> Therefore, simply use 0 as the final parameter.
-> 
-> Signed-off-by: Tianyu Xu <tianyxu@cisco.com>
+> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
 > ---
->  drivers/net/ethernet/intel/igb/igb_main.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
+>  net/sched/act_simple.c | 1 -
+>  1 file changed, 1 deletion(-)
 > 
-> diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
-> index a9a7a94ae..453deb6d1 100644
-> --- a/drivers/net/ethernet/intel/igb/igb_main.c
-> +++ b/drivers/net/ethernet/intel/igb/igb_main.c
-> @@ -4453,8 +4453,7 @@ int igb_setup_rx_resources(struct igb_ring *rx_ring)
->  	if (xdp_rxq_info_is_reg(&rx_ring->xdp_rxq))
->  		xdp_rxq_info_unreg(&rx_ring->xdp_rxq);
->  	res = xdp_rxq_info_reg(&rx_ring->xdp_rxq, rx_ring->netdev,
-> -			       rx_ring->queue_index,
-> -			       rx_ring->q_vector->napi.napi_id);
-> +			       rx_ring->queue_index, 0);
->  	if (res < 0) {
->  		dev_err(dev, "Failed to register xdp_rxq index %u\n",
->  			rx_ring->queue_index);
-
-This LGTM but will probably need to be re-sent with a Fixes tag.
-
-See: https://www.kernel.org/doc/html/v6.16/process/maintainer-netdev.html#tl-dr
-
-If you repost, feel free to add:
+> diff --git a/net/sched/act_simple.c b/net/sched/act_simple.c
+> index f3abe0545989..8e69a919b4fe 100644
+> --- a/net/sched/act_simple.c
+> +++ b/net/sched/act_simple.c
+> @@ -72,7 +72,6 @@ static int reset_policy(struct tc_action *a, const struct nlattr *defdata,
+>  	d = to_defact(a);
+>  	spin_lock_bh(&d->tcf_lock);
+>  	goto_ch = tcf_action_set_ctrlact(a, p->action, goto_ch);
+> -	memset(d->tcfd_defdata, 0, SIMP_MAX_DATA);
+>  	nla_strscpy(d->tcfd_defdata, defdata, SIMP_MAX_DATA);
+>  	spin_unlock_bh(&d->tcf_lock);
+>  	if (goto_ch)
 
 Reviewed-by: Joe Damato <joe@dama.to>
 
