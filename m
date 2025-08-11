@@ -1,173 +1,120 @@
-Return-Path: <netdev+bounces-212417-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212418-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76C4EB2021E
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 10:44:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45EC1B20263
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 10:54:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 820BA16DC7E
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 08:44:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6017B16BA62
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 08:54:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 393A52DAFB4;
-	Mon, 11 Aug 2025 08:44:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69D062DCBF4;
+	Mon, 11 Aug 2025 08:54:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jSm9GQ7f"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="t/rtueEP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACFF326B761;
-	Mon, 11 Aug 2025 08:44:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4AB523B613
+	for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 08:54:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754901881; cv=none; b=VehdezR87kP+2RfOJ6YGHGv+pi2lApUnTSm1DunjkH3dKqVYVCpnc4j4SaQ3ca9wHWj0zxuixxjFBtw+r+BaHvQXuffstuxQspPjtgt3Uo680+Wjmg56wwkgYPw0jbkefnC+UPZlgJi3hJXWxCdDBzS/7FXrTXLYLaoBgTNRVXw=
+	t=1754902461; cv=none; b=g2wpQmGtf1Prwz3caYQ+WfUZFx+nlCHX0pcqdhoCk5QNAAQ4e6pibtFnV8N2h+YKbx9DGB2rvnaeFZH2VubC67VT6RVlOEPTDjFg5ra+4udmwMEDwPa2yjlveLPUBVpM7KhQcs6NB2YgaYMtXDy+7kpBDSGQfHZEyiDGOYYumak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754901881; c=relaxed/simple;
-	bh=T5avuU9DL3vYnH4Ztt+0TxYl6qTo7v/Dlieof70baBY=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=I7pIIzig322tL5wI7xTgv8zTEMyN77y2nykV8Faf97FBgZaAizqtEQP1CnZe70KHtXBQxdDdFCptZeiit66JWGGDICo3dIQDcbzMeiz2ydep1H6T47Mk39+AsYKN6CXuiIPd5s7JkXGmQCBF3FDAa7hNe4qfwDOLHUHrAKdb6+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jSm9GQ7f; arc=none smtp.client-ip=209.85.216.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-321a5d6d301so689145a91.3;
-        Mon, 11 Aug 2025 01:44:39 -0700 (PDT)
+	s=arc-20240116; t=1754902461; c=relaxed/simple;
+	bh=+P8bhVOwv74YoOnMiIN2tr6EOCNywG2x3gGP2baVj9s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=K6fay8I3B4BRn1R+h+sranFTjet9f4q4Gr3ei6lJiTl4Dv2Fj4f0NUeMnF+0FT34soQArXAfK3tX/6bR60eG9oR1FBlhihLnvnN9zz/y7zkGP69I99P3WntQUM2QnSTHSrf8aGQQA1f2zSomP5A48TnnegqrKKiRfkDTXMuqfpw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=t/rtueEP; arc=none smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4af12ba9800so49979091cf.0
+        for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 01:54:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1754901879; x=1755506679; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=l4xS1+WWkgaSv0c4yG6G8DZIxcOQsp2YpyFMtc/MpXw=;
-        b=jSm9GQ7f6Yd50tygeF/osDDvtY/3EG+5WFotJ08QKVPOhzYapWSWqPO/aTHP8q94jo
-         xbChlfIfAs0/ddcBpydHQG/y68pKeF+tns6WyXUdYENp63fulgF5bwtpZa7b7FRAC9U/
-         dQNEhQFBGMjPFOzl1AU9IMuEuIfsaFWXiM51BvVlp7YSGJN3tCDe7YIVCqnqYfnAVyV9
-         G8ewD0e9ECd9nYm2qdxRWFkkoZU8rPQmt5bjwF1oQ+mWJVJcNbemNWX01t39Pgagogh7
-         4YCIX7Ntkc5z4cFWqcHDGPDH3iLxbFrMnMmdCiO9OxDFwIv2techuX4jcnPZvkMAKxlw
-         s1ZA==
+        d=google.com; s=20230601; t=1754902458; x=1755507258; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ggBs91xhT5OGerz7WB6lsIzNIUixHqSJQNYCiUzD130=;
+        b=t/rtueEPdSpOr6xdOCDOVwFFeuMs7KTFDvqcr+ymi/wfDWiDRPoo0dyH5f8ltC8iQr
+         Z/zKrN62QUqjfJ1uQO9lLNLnDnTSFeEcpe8EWSEzmftsWC6DFFyfMXHAo4gjwnRQJM7g
+         XDAvvgrzUHnKtIT8gWu5Rn+LFnr2Du5HN7jdTKvGx8wIGUQ3cGl2IO/MRK7Ok+F0La+v
+         Z4+6JSmISTW9FA0IyFxHd2U5YaNY6aENWLOkgXEclwLnJhv099tYOzwTpEn5rTtDkyQv
+         XRt23bLmN2flm7/88QtRa2groxNX7DOicRFAZkqvtLpnLwYmF4iqjuXmW3yPlLDJCnZ6
+         xdAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754901879; x=1755506679;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=l4xS1+WWkgaSv0c4yG6G8DZIxcOQsp2YpyFMtc/MpXw=;
-        b=C03ZCzoVibvRlwzTPucWYTTsRhfHMI5YpHkLovnYTvY3oDXp0mR0aCBHi2Vivx7gVJ
-         snNdbBzkgwDR1wNaRRGRpRXloSKxZvgnEWTmRQeBfXOLK2OQQIIQ9gx82cjxq8Q47RLw
-         lx9p0n3gAEDwNQZ1AIVU7ocSe76u6EcJODyjWz+v6Wqlrgs+7Tv8GN2PWi08S2nh50zl
-         Yf5eJQlyutEFOv3JQEXpZCssXt5FXKNh6eMobNAwqVOHYpPhdxrDTV6WWVYmyeRd7R4T
-         8UR2UFQXHBU22auGpBuIaRWYzW/OBJfFzmdp3ub5A8t6dSIXq3DW8unMczyyLHspASin
-         9q1g==
-X-Forwarded-Encrypted: i=1; AJvYcCUIyIu+6tp/pEkjaqSZOWmj351EVL1G9gdTPXodWLsuVpanG1q6sHxaaJkvuggtSzhhG9d4OfJnB/ZO@vger.kernel.org, AJvYcCVb7hBtjdWCotTC1AImw7wFrCUcRhQbZU/c/JGDzMQ0jy00F/HvAj8A9Xx61bMV3Hotv3ByK9UE@vger.kernel.org, AJvYcCXe8OBXg0C2ToP2m2Ut4UKnQzghw8q5swvhS3p5vR1re11ZuU/tTFeUOltWqnthwJBkAEryiFyp8yHLNTQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxxOkRvAproYY8X2HqVvm/SLoqyjqPImnvNcrRZF/RCODD4z9ZN
-	NDnGaZIsJOiKlfKY9CLcS88PflftKWPY1Xt8arqL6Y2dQJBGHpwJTmuc
-X-Gm-Gg: ASbGncvoM+r4pD81gPGxdlfBLAfqsXdjn71GOOObVSjgARnCnIME4iWIeEOhRSKkhbO
-	ZkVhXNrTCSLNVC0JtxIUvRQRDfob0Zva3q5y6aCA2F5rOWDMYV6B9qbaFRJfJgTufWlygxgszER
-	hNAGUOnEU2fI/c0af3+NdViRPGs33m2e/ZgTAMbfGjAe3YwrlPg5eDfB8HSQVXCHUiUTBsQDsjR
-	E00e4huyTATiQRzl1OPr6JoYBw8K1VWuBUN/OGEOoAog00qxS/Q/HmXeaEcHXjLL5lERziz5NUf
-	pVSmIN+x91yKd+f18T0+CHLs1pr1hY5nOaLN6ZPtcHOi8WlPZF9KwsIivrKTEIeeVqqKAaEK+Ic
-	f7BgaGLzhiG89og==
-X-Google-Smtp-Source: AGHT+IEnv3ilTHdBlqrw4UTyUaEPlZWCMTpuvsvsgFCL/mRg4TuuMDaAImoGmS4qOoZnHPmlfQsmkA==
-X-Received: by 2002:a17:90b:4a82:b0:31e:4492:af48 with SMTP id 98e67ed59e1d1-32183c46051mr15891178a91.28.1754901878785;
-        Mon, 11 Aug 2025 01:44:38 -0700 (PDT)
-Received: from gmail.com ([223.166.85.91])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31f63da5719sm31087468a91.6.2025.08.11.01.44.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Aug 2025 01:44:38 -0700 (PDT)
-From: Qingfang Deng <dqfext@gmail.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Felix Fietkau <nbd@nbd.name>,
-	linux-ppp@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net] ppp: fix race conditions in ppp_fill_forward_path
-Date: Mon, 11 Aug 2025 16:44:26 +0800
-Message-ID: <20250811084427.178739-1-dqfext@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20230601; t=1754902458; x=1755507258;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ggBs91xhT5OGerz7WB6lsIzNIUixHqSJQNYCiUzD130=;
+        b=KJjVCDKNpqvm7I8vpKJ03MyfYdFBiR3vRlLLjn4DZdJc8E2rqs6WT9YTrkK7JLC/b0
+         z6RPVvmsO0c//ScDNACeeF86v3rnPxfY2gj+Dot5HkOBoZAIa0R4NnO/KdQQWwG0uSCq
+         +vZcbTt0xxNkSG7lL9wF9vt+hq02/X/XzjlmKR6D6VVN9iOk2/SmLGnNwcjqSiT+bvxl
+         6gDJivgJU71qiFAys8Q/jS207OomJg5UR27rl8VAxNQiREJlVm2OeY9QNWgvBM6Svcp5
+         vfOizX+NBolayt0oEkh0sQi4jIFI+tnIg+fNm8qF1uF/bKb8i9R2eLVwSVmxblnXIIqr
+         KcyA==
+X-Forwarded-Encrypted: i=1; AJvYcCV8eOiimEtkes77qiyRZMu5HCOVJrFXNfPj43PXvObPQYxYFMNBQOsKk6dRShmuICLQG0fazgM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwYXfZEIuJK1yYwihtkcJ1e2bO5kSZI7c5Z+wJlVsmnJIxGSCCn
+	4Ovy2fFhyDuq6GiE+3jWN/CaDdhmylYq18s6xeJDNKeKOSRjrG8fehiIQpHnMnEP2HMrJdnSoE9
+	rZ/dcZGjIvC4/dUhv3qQfmOOMVQwT+1/XzC0wnekR
+X-Gm-Gg: ASbGncsj7BtZVQFa6QduQ6D/i7ehTU6LFoCL4Fxjek+7acQCpvNEIGZOg2YPhWhQYGG
+	inazgXNBJrOTDDdj1UiQgzYWSLHsoPe0vHH+xs1WDh1JZRtYa6bayKBqo/BAC1NDF5WVL8FAvxK
+	jW5eKMyhyZN0mdB2LTO23WtIYPWELpzuWZH4sXpTvQ3jqMlngFdl3zaqn8KVqS9vAIyq1ax1duV
+	csQS+CL+AFMs5uDHA==
+X-Google-Smtp-Source: AGHT+IG89vGodbMDduFmWXYAKYKFluMW/TUv1KNzoncPyzwA4Ywx0KGrdM0+oGpLbFz8OgPt0cdJzwZZzvcsfyGaDmo=
+X-Received: by 2002:a05:622a:5587:b0:4a9:b1ca:9fe1 with SMTP id
+ d75a77b69052e-4b0aec59430mr156307251cf.12.1754902457392; Mon, 11 Aug 2025
+ 01:54:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250810072944.438574-1-rongqianfeng@vivo.com> <20250810072944.438574-2-rongqianfeng@vivo.com>
+In-Reply-To: <20250810072944.438574-2-rongqianfeng@vivo.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 11 Aug 2025 01:54:06 -0700
+X-Gm-Features: Ac12FXwqVWBo7ThXFkCkWpYauhWAWMYvv5F__fjkB3vLi2kEx3RFoeqxwYzI7ic
+Message-ID: <CANn89iKFbfNvKWa=yrPnfkTdfEo-xS-9TfE6ThgZF8MATU0Cmg@mail.gmail.com>
+Subject: Re: [PATCH 1/3] tcp: cdg: remove redundant __GFP_NOWARN
+To: Qianfeng Rong <rongqianfeng@vivo.com>
+Cc: Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	"open list:NETWORKING [TCP]" <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-ppp_fill_forward_path() has two race conditions:
+On Sun, Aug 10, 2025 at 12:30=E2=80=AFAM Qianfeng Rong <rongqianfeng@vivo.c=
+om> wrote:
+>
+> GFP_NOWAIT already includes __GFP_NOWARN, so let's remove the redundant
+> __GFP_NOWARN.
+>
+> Signed-off-by: Qianfeng Rong <rongqianfeng@vivo.com>
+> ---
+>  net/ipv4/tcp_cdg.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/net/ipv4/tcp_cdg.c b/net/ipv4/tcp_cdg.c
+> index ba4d98e510e0..fbad6c35dee9 100644
+> --- a/net/ipv4/tcp_cdg.c
+> +++ b/net/ipv4/tcp_cdg.c
+> @@ -379,7 +379,7 @@ static void tcp_cdg_init(struct sock *sk)
+>         /* We silently fall back to window =3D 1 if allocation fails. */
+>         if (window > 1)
+>                 ca->gradients =3D kcalloc(window, sizeof(ca->gradients[0]=
+),
+> -                                       GFP_NOWAIT | __GFP_NOWARN);
+> +                                       GFP_NOWAIT);
 
-1. The ppp->channels list can change between list_empty() and
-   list_first_entry(), as ppp_lock() is not held. If the only channel
-   is deleted in ppp_disconnect_channel(), list_first_entry() may
-   access an empty head or a freed entry, and trigger a panic.
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
-2. pch->chan can be NULL. When ppp_unregister_channel() is called,
-   pch->chan is set to NULL before pch is removed from ppp->channels.
-
-Fix these by using a lockless RCU approach:
-- Use list_first_or_null_rcu() to safely test and access the first list
-  entry.
-- Convert list modifications on ppp->channels to their RCU variants and
-  add synchronize_rcu() after removal.
-- Check for a NULL pch->chan before dereferencing it.
-
-Fixes: f6efc675c9dd ("net: ppp: resolve forwarding path for bridge pppoe devices")
-Signed-off-by: Qingfang Deng <dqfext@gmail.com>
----
- drivers/net/ppp/ppp_generic.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/ppp/ppp_generic.c b/drivers/net/ppp/ppp_generic.c
-index 8c98cbd4b06d..fd3ac75a56e3 100644
---- a/drivers/net/ppp/ppp_generic.c
-+++ b/drivers/net/ppp/ppp_generic.c
-@@ -33,6 +33,7 @@
- #include <linux/ppp_channel.h>
- #include <linux/ppp-comp.h>
- #include <linux/skbuff.h>
-+#include <linux/rculist.h>
- #include <linux/rtnetlink.h>
- #include <linux/if_arp.h>
- #include <linux/ip.h>
-@@ -1598,11 +1599,14 @@ static int ppp_fill_forward_path(struct net_device_path_ctx *ctx,
- 	if (ppp->flags & SC_MULTILINK)
- 		return -EOPNOTSUPP;
- 
--	if (list_empty(&ppp->channels))
-+	pch = list_first_or_null_rcu(&ppp->channels, struct channel, clist);
-+	if (!pch)
- 		return -ENODEV;
- 
--	pch = list_first_entry(&ppp->channels, struct channel, clist);
- 	chan = pch->chan;
-+	if (!chan)
-+		return -ENODEV;
-+
- 	if (!chan->ops->fill_forward_path)
- 		return -EOPNOTSUPP;
- 
-@@ -3515,7 +3519,7 @@ ppp_connect_channel(struct channel *pch, int unit)
- 	hdrlen = pch->file.hdrlen + 2;	/* for protocol bytes */
- 	if (hdrlen > ppp->dev->hard_header_len)
- 		ppp->dev->hard_header_len = hdrlen;
--	list_add_tail(&pch->clist, &ppp->channels);
-+	list_add_tail_rcu(&pch->clist, &ppp->channels);
- 	++ppp->n_channels;
- 	pch->ppp = ppp;
- 	refcount_inc(&ppp->file.refcnt);
-@@ -3545,10 +3549,11 @@ ppp_disconnect_channel(struct channel *pch)
- 	if (ppp) {
- 		/* remove it from the ppp unit's list */
- 		ppp_lock(ppp);
--		list_del(&pch->clist);
-+		list_del_rcu(&pch->clist);
- 		if (--ppp->n_channels == 0)
- 			wake_up_interruptible(&ppp->file.rwait);
- 		ppp_unlock(ppp);
-+		synchronize_rcu();
- 		if (refcount_dec_and_test(&ppp->file.refcnt))
- 			ppp_destroy_interface(ppp);
- 		err = 0;
--- 
-2.43.0
-
+It is unclear why GFP_NOWAIT was used here, while all other TCP
+allocations use GFP_ATOMIC or GFP_KERNEL.
 
