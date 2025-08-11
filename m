@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-212536-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212537-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56AF4B21214
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 18:34:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F0A1B21217
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 18:34:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B7C2D18931AB
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 16:29:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB18C1893CAB
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 16:29:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C83DE262FF1;
-	Mon, 11 Aug 2025 16:28:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 356E62264D3;
+	Mon, 11 Aug 2025 16:28:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K/vCuRUP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MfaHOcz+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01C512264D3
-	for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 16:28:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69B55311C2E
+	for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 16:28:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754929716; cv=none; b=hHe4VPr36rMun74+WkiQkZDsEjlJbwRzDI/mkhLErPLBD6Z/p6TZKxO2t1FQFQ2AHEdaNq5Wg5pFX9loyjL3r960qMKnTMfjs5r3Vtstp8vhQIw3a6nO+IjmsRt8RM7sd6+Q8usWAZXwsyFjDiNqv+GPY/WYXZovKRQVeVjmjIs=
+	t=1754929718; cv=none; b=uwU3elvQrzsgJoqgHhaFcTqixm9Q7WTo5YQ8C91mCc/0PtlGKYriABg0W6c3RuixgidNOg6SQ5MS8m4ndkTm2jZ4hUetB+tRjqhFmzRfOudf1yPRaStXYJggJVRtY14fvR0bHxGgvLP/bbZ1X4/gfcO5Zyo0DF9ckL0UEQyZQqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754929716; c=relaxed/simple;
-	bh=iPAz8leLOH0+VgCTsfqbq9xvx+kXtQloJxGaAGtjeyY=;
+	s=arc-20240116; t=1754929718; c=relaxed/simple;
+	bh=+RMn9AFiGHAhqZm1nH/+34rDg3Lr/cDqH9ZAN2mup4w=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PHzvWUf3pmE6p78x4vqKhaEvNh7Loyu4HCeRx1ftyWDiXgP31TI3uN2j6iyXvLlCtRhi1BoYAe3aWsvvESka5XoO4gpHA8rVNy0TV8L18GIKgekQDWtk4h6c5PeA65vWx4pCnDTjJybqUfo5S+ZSjx4R/HwLssXTT85Y5h7nYF0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K/vCuRUP; arc=none smtp.client-ip=209.85.128.54
+	 MIME-Version; b=U+6FeWI9capnsx8tKJmNgvmEermp/OxYk9LniwPX7m85kzQqGQBGzxIRkQyC/40giKORYDb14S93U8y3rfk7+WaKFLKaxzoGeg/EryGRtF+T/gTn7aQ8wUQ0IF7uHjfF50ErO0XnoHVebPFWS5LVq9m2yFIyGjJcAh9ZdxfVBEk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MfaHOcz+; arc=none smtp.client-ip=209.85.128.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-459eb4ae596so41948945e9.1
-        for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 09:28:34 -0700 (PDT)
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-458ba079338so35570105e9.1
+        for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 09:28:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1754929713; x=1755534513; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1754929714; x=1755534514; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=tYVqX4UpHRW7fGFfRHzuuCdSWMj9Su3Ou+2QVwzuaq4=;
-        b=K/vCuRUPM4LrGFklg+hYJzaf3mL+tGMKA6mGSyuIp4Bnqzu8VeePuRWEynywKZ+GJQ
-         2wXRV3i2PMEKwkQQYGZVbMTLZVlTsizXO7HXbv0HvIr++ZgGzl75wp4fjOAvIaQMoFfv
-         p82LBdl8zVIb841zO58sDTHXKk1G4/fb3EvlVDLgQfmSMzrcpFMN18Fc00KC0yWrXZx5
-         FausPB5PpYyzgsUzi4naeCV7DZ3YWwQzH0uR7fyLgK1dh7zczy6A1sH2mo6Ifj+Owzoi
-         BDwVwYGm4qwE6ke6Hzvr+fy8R+i8Aty2dJIEIvvWCd6WVGBhika4ib3e6kelajdmVa92
-         9gLA==
+        bh=q67DRWrXlyXlidkM6wSYNWw1um1lTrwUmrSWvXSavKc=;
+        b=MfaHOcz+hepD6HfZA5+N/mqIc9SqmwEX3p+pdZj+CFxcSqk/UfP0ZswxvQNz8/v2sD
+         fTC8T7AUMb66Yy/k2EKJmCo1mv+ZBDtejzXQpGxL0tgKNME/JT97u0LCZqZgsyM7d7Lq
+         hAOKRtGvJGFr1zfDtJnOstdINkRqULbTbLqvA1kTzJqzh5IyubkH/eqxNn7b449HX5Lb
+         OYLDsZtu2g7TC6hvSRvo0vhm5rJGzKN/HTx8MbXG5Kob32PHjryBvl+t4Z/XByJAzTPS
+         TB25zV8JT6qDdTvXI64gicNlyNgRP5ItSLXqKYvn7Yi0LEKVqarhv/M1z6j8xeiLN3Uw
+         bCyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754929713; x=1755534513;
+        d=1e100.net; s=20230601; t=1754929714; x=1755534514;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=tYVqX4UpHRW7fGFfRHzuuCdSWMj9Su3Ou+2QVwzuaq4=;
-        b=hswxfjReSFHUsSqfaLPMPqTSAyAvJ+zBV44cGOQqdaouUf8hqHCDF5QW53CItYG5xa
-         ZrLpOo2jA1UGqunuHmSv8uGEAkA2stYG9rOJ7oR3bgGgpzNWOSmak3rpqVxDxOosSrt6
-         uhoicWt1CrHiYtRbtLo2aQY9ugU7Tn3Ys/zLQGl680D0fBi6106r2wYOmNVobDl5QMlm
-         zmA0sWRhSUPbfU+kr6zDVH+DW9CuGFtKkY15FDOCw0frrP/aIoyafb2fMDXwox66cSC2
-         ErgDzfe0knTwle8+wwGCntLaN8jesmqbgX0XWy727ROoP9ZuDHtAEtqbNvwBT6I45vvI
-         TvBw==
-X-Gm-Message-State: AOJu0YzUTvZtSaJc/uRXxXpe4xcSJtDMajuHyXqDMdWOlRtcXqCHcaM4
-	wHRJg76KEDlsHATGQEhQGh4zbbThEqX6oSPtwWbfM7aP6hsmOJyk58jR2yIhww==
-X-Gm-Gg: ASbGncv59TOoHAFF807UsiVpiig160NFEZKTTUJB/IEWM2k7/BR2n0uRL7kR0Ur0NH/
-	NzwdEMhy4P16hUEpiwrXYfrGQqNFnwPYLWZgq5sOu7rbpAPaQV0/LwhSz4/z22j3drqGavs8lIw
-	dDSKqvIMeBpqe6W68Qw6lL+OTQYbuEu1DfeGE5UfJP8MfP/4fxni3nQzkfgWYH5TaTEunft7WtZ
-	CeI/eeHRZH/PTj1DOjNqgeNPiPB1TXEyMs5jmqcADf9IQGrmW3OAMY9x+PmWEFIbTglWgvKGWQH
-	9eiCmwYyfdmGbVIsKq1QYhNWFmUT1cYut0oo3YHijo3Dx9YjUXeTYFgsqBJVG4W+0Epo235SCZW
-	D7eCJm788uejnX7u5
-X-Google-Smtp-Source: AGHT+IG6g3gUFIRph6jK0rmVYToqpPuCIk7P0OLzsM1mkzhzP/1zxarj6HBweqIqIrC/CVJDovroKg==
-X-Received: by 2002:a05:600c:1e8b:b0:456:f9f:657 with SMTP id 5b1f17b1804b1-459f4faccd5mr117958615e9.27.1754929712407;
-        Mon, 11 Aug 2025 09:28:32 -0700 (PDT)
+        bh=q67DRWrXlyXlidkM6wSYNWw1um1lTrwUmrSWvXSavKc=;
+        b=q4CX39qHlOhxI5EBTqmfN7vbglPjjPCibXaRnZIkwUE1IFoCt88I3sFpj4yaUvsqM+
+         91Nl6/QF+x/V53g1E4vGS+snr8Z/K7TDG71gsbgj5Qn2tlqHAQYdrg/AngG2LthZwyLR
+         ne9Me9CJKKP3N1ObxwuzLJjePh1+nam0aXE/lY0zlg8bhWgjJ52LzSIhHvXPBDUbGRG4
+         ExWaNDjnZERc0oeaQon9VPl87h5JCuaR3AHhSEN60o7rbww6nmDfyvkt0ikr2I63sncD
+         HLXl5zyDwEn6irhcBackrJK3uG0RAmrJ9jsYsmmo6eiWQg0WfOl42YqpuFYuM4Wu3Auc
+         o03Q==
+X-Gm-Message-State: AOJu0YzGzDK91e21MyFqLlKf6vbBnbqvNKENVPi2UBpg2md2IZyAVdN5
+	e8dx2d3cRY3crIpWs0ixhy/yYoT2UaayyrMp7NOn4KQmBuhF5/hkcLHEQAGzGg==
+X-Gm-Gg: ASbGncujabTccSUJu8qAzeS2X9gF67pHjnpNBMbT5HSUpbesRqH1lGqJ63+MXnYBmYH
+	dQYXuj59fdzdqZ7hqwknmu2rlb6GaY7/8hWoAwAX9ngHznK5r5obPMgEyRf/y6RCK2bGlD6KGai
+	5IA6+seJrEy/VfEKG01TYoWe+LuuPQWLWWuqWn2kCkYsMA78NOPdKp7Aara7joKfRSJEjCHTeac
+	PI+dFIEmn5vq71lVeeLRIygZHTAl87KmTiRzPjg8mD0VWON8BgK/MYA+uksjq5KT8Uadu4WP0G/
+	ysvJ+bWW8Wgo0GdZTxD8qzIhLpuYP6JYcfn6cL3FzGvBeuD4ka5UCocQl/eNlvycKy5d4h0BX8H
+	XCj869htS+t82+3Fs
+X-Google-Smtp-Source: AGHT+IEGnMJQ5ujGhm7S83dQ5EhwrwQ4VJIj8OwaOd5xpfmBwUlRDEEA+YtbZ6ChXsi0LAi0Xop+Qg==
+X-Received: by 2002:a05:600c:4fca:b0:456:189e:223a with SMTP id 5b1f17b1804b1-45a10d92d93mr2084965e9.10.1754929713906;
+        Mon, 11 Aug 2025 09:28:33 -0700 (PDT)
 Received: from 127.com ([2620:10d:c092:600::1:628b])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-459e58554f2sm260267515e9.12.2025.08.11.09.28.31
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-459e58554f2sm260267515e9.12.2025.08.11.09.28.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Aug 2025 09:28:31 -0700 (PDT)
+        Mon, 11 Aug 2025 09:28:32 -0700 (PDT)
 From: Pavel Begunkov <asml.silence@gmail.com>
 To: netdev@vger.kernel.org
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -85,9 +85,9 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
 	Byungchul Park <byungchul@sk.com>,
 	asml.silence@gmail.com
-Subject: [RFC net-next v1 4/6] net: convert page pool dma helpers to netmem_desc
-Date: Mon, 11 Aug 2025 17:29:41 +0100
-Message-ID: <dbde32b0c68a1ac5729e1c331438131bddbf3b04.1754929026.git.asml.silence@gmail.com>
+Subject: [RFC net-next v1 5/6] net: page_pool: convert refcounting helpers to nmdesc
+Date: Mon, 11 Aug 2025 17:29:42 +0100
+Message-ID: <7be7a705b9bac445e40c35cd227a4d5486d95dc9.1754929026.git.asml.silence@gmail.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <cover.1754929026.git.asml.silence@gmail.com>
 References: <cover.1754929026.git.asml.silence@gmail.com>
@@ -99,113 +99,121 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-struct netmem_desc has a clearly defined field that keeps dma_addr. Use
-the new type in netmem and page_pool functions and get rid of a bunch of
-now unnecessary accessor helpers.
-
-While doing so, extract a helper for getting a dma address out of a
-netmem desc, which can be used to optimise paths that already know the
-underlying netmem type like memory providers.
+Use netmem descriptors for the basic buffer refcounting helpers and use
+them to implement all other variants. This way netmem type aware helpers
+can avoid intermediate netmem casting and bit masking/unmasking.
 
 Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
 ---
  include/net/netmem.h            |  5 -----
- include/net/page_pool/helpers.h | 12 ++++++++++--
- net/core/netmem_priv.h          |  6 ------
- net/core/page_pool_priv.h       |  9 +++++----
- 4 files changed, 15 insertions(+), 17 deletions(-)
+ include/net/page_pool/helpers.h | 29 ++++++++++++++++++++++-------
+ net/core/devmem.c               |  5 -----
+ 3 files changed, 22 insertions(+), 17 deletions(-)
 
 diff --git a/include/net/netmem.h b/include/net/netmem.h
-index d08797e40a7c..ca6d5d151acc 100644
+index ca6d5d151acc..7b5f1427f272 100644
 --- a/include/net/netmem.h
 +++ b/include/net/netmem.h
-@@ -389,11 +389,6 @@ static inline bool netmem_is_pfmemalloc(netmem_ref netmem)
- 	return page_is_pfmemalloc(netmem_to_page(netmem));
+@@ -324,11 +324,6 @@ static inline struct page_pool *netmem_get_pp(netmem_ref netmem)
+ 	return netmem_to_nmdesc(netmem)->pp;
  }
  
--static inline unsigned long netmem_get_dma_addr(netmem_ref netmem)
+-static inline atomic_long_t *netmem_get_pp_ref_count_ref(netmem_ref netmem)
 -{
--	return netmem_to_nmdesc(netmem)->dma_addr;
+-	return &netmem_to_nmdesc(netmem)->pp_ref_count;
 -}
 -
- void get_netmem(netmem_ref netmem);
- void put_netmem(netmem_ref netmem);
- 
+ static inline bool netmem_is_pref_nid(netmem_ref netmem, int pref_nid)
+ {
+ 	/* NUMA node preference only makes sense if we're allocating
 diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/helpers.h
-index db180626be06..a9774d582933 100644
+index a9774d582933..bc54040186d9 100644
 --- a/include/net/page_pool/helpers.h
 +++ b/include/net/page_pool/helpers.h
-@@ -425,9 +425,10 @@ static inline void page_pool_free_va(struct page_pool *pool, void *va,
- 	page_pool_put_page(pool, virt_to_head_page(va), -1, allow_direct);
+@@ -234,9 +234,14 @@ page_pool_get_dma_dir(const struct page_pool *pool)
+ 	return pool->p.dma_dir;
  }
  
--static inline dma_addr_t page_pool_get_dma_addr_netmem(netmem_ref netmem)
-+static inline dma_addr_t
-+page_pool_get_dma_addr_nmdesc(const struct netmem_desc *nmdesc)
++static inline void page_pool_fragment_nmdesc(struct netmem_desc *desc, long nr)
++{
++	atomic_long_set(&desc->pp_ref_count, nr);
++}
++
+ static inline void page_pool_fragment_netmem(netmem_ref netmem, long nr)
  {
--	dma_addr_t ret = netmem_get_dma_addr(netmem);
-+	dma_addr_t ret = nmdesc->dma_addr;
+-	atomic_long_set(netmem_get_pp_ref_count_ref(netmem), nr);
++	page_pool_fragment_nmdesc(netmem_to_nmdesc(netmem), nr);
+ }
  
- 	if (PAGE_POOL_32BIT_ARCH_WITH_64BIT_DMA)
- 		ret <<= PAGE_SHIFT;
-@@ -435,6 +436,13 @@ static inline dma_addr_t page_pool_get_dma_addr_netmem(netmem_ref netmem)
+ /**
+@@ -259,12 +264,12 @@ static inline void page_pool_fragment_netmem(netmem_ref netmem, long nr)
+  */
+ static inline void page_pool_fragment_page(struct page *page, long nr)
+ {
+-	page_pool_fragment_netmem(page_to_netmem(page), nr);
++	page_pool_fragment_nmdesc(pp_page_to_nmdesc(page), nr);
+ }
+ 
+-static inline long page_pool_unref_netmem(netmem_ref netmem, long nr)
++static inline long page_pool_unref_nmdesc(struct netmem_desc *desc, long nr)
+ {
+-	atomic_long_t *pp_ref_count = netmem_get_pp_ref_count_ref(netmem);
++	atomic_long_t *pp_ref_count = &desc->pp_ref_count;
+ 	long ret;
+ 
+ 	/* If nr == pp_ref_count then we have cleared all remaining
+@@ -307,19 +312,29 @@ static inline long page_pool_unref_netmem(netmem_ref netmem, long nr)
  	return ret;
  }
  
-+static inline dma_addr_t page_pool_get_dma_addr_netmem(netmem_ref netmem)
++static inline long page_pool_unref_netmem(netmem_ref netmem, long nr)
 +{
-+	const struct netmem_desc *desc = netmem_to_nmdesc(netmem);
-+
-+	return page_pool_get_dma_addr_nmdesc(desc);
++	return page_pool_unref_nmdesc(netmem_to_nmdesc(netmem), nr);
 +}
 +
- /**
-  * page_pool_get_dma_addr() - Retrieve the stored DMA address.
-  * @page:	page allocated from a page pool
-diff --git a/net/core/netmem_priv.h b/net/core/netmem_priv.h
-index 23175cb2bd86..070faa136305 100644
---- a/net/core/netmem_priv.h
-+++ b/net/core/netmem_priv.h
-@@ -30,12 +30,6 @@ static inline void netmem_set_pp(netmem_ref netmem, struct page_pool *pool)
- 	netmem_to_nmdesc(netmem)->pp = pool;
- }
- 
--static inline void netmem_set_dma_addr(netmem_ref netmem,
--				       unsigned long dma_addr)
--{
--	netmem_to_nmdesc(netmem)->dma_addr = dma_addr;
--}
--
- static inline unsigned long netmem_get_dma_index(netmem_ref netmem)
+ static inline long page_pool_unref_page(struct page *page, long nr)
  {
- 	unsigned long magic;
-diff --git a/net/core/page_pool_priv.h b/net/core/page_pool_priv.h
-index 6445e7da5b82..fcf70cbc3e09 100644
---- a/net/core/page_pool_priv.h
-+++ b/net/core/page_pool_priv.h
-@@ -18,17 +18,18 @@ void page_pool_unlist(struct page_pool *pool);
- static inline bool
- page_pool_set_dma_addr_netmem(netmem_ref netmem, dma_addr_t addr)
- {
-+	struct netmem_desc *desc = netmem_to_nmdesc(netmem);
+-	return page_pool_unref_netmem(page_to_netmem(page), nr);
++	return page_pool_unref_nmdesc(pp_page_to_nmdesc(page), nr);
++}
 +
- 	if (PAGE_POOL_32BIT_ARCH_WITH_64BIT_DMA) {
--		netmem_set_dma_addr(netmem, addr >> PAGE_SHIFT);
-+		desc->dma_addr = addr >> PAGE_SHIFT;
- 
- 		/* We assume page alignment to shave off bottom bits,
- 		 * if this "compression" doesn't work we need to drop.
- 		 */
--		return addr != (dma_addr_t)netmem_get_dma_addr(netmem)
--				       << PAGE_SHIFT;
-+		return addr != desc->dma_addr << PAGE_SHIFT;
- 	}
- 
--	netmem_set_dma_addr(netmem, addr);
-+	desc->dma_addr = addr;
- 	return false;
++static inline void page_pool_ref_nmdesc(struct netmem_desc *desc)
++{
++	atomic_long_inc(&desc->pp_ref_count);
  }
  
+ static inline void page_pool_ref_netmem(netmem_ref netmem)
+ {
+-	atomic_long_inc(netmem_get_pp_ref_count_ref(netmem));
++	page_pool_ref_nmdesc(netmem_to_nmdesc(netmem));
+ }
+ 
+ static inline void page_pool_ref_page(struct page *page)
+ {
+-	page_pool_ref_netmem(page_to_netmem(page));
++	page_pool_ref_nmdesc(pp_page_to_nmdesc(page));
+ }
+ 
+ static inline bool page_pool_unref_and_test(netmem_ref netmem)
+diff --git a/net/core/devmem.c b/net/core/devmem.c
+index 24c591ab38ae..e084dad11506 100644
+--- a/net/core/devmem.c
++++ b/net/core/devmem.c
+@@ -440,14 +440,9 @@ void mp_dmabuf_devmem_destroy(struct page_pool *pool)
+ 
+ bool mp_dmabuf_devmem_release_page(struct page_pool *pool, netmem_ref netmem)
+ {
+-	long refcount = atomic_long_read(netmem_get_pp_ref_count_ref(netmem));
+-
+ 	if (WARN_ON_ONCE(!netmem_is_net_iov(netmem)))
+ 		return false;
+ 
+-	if (WARN_ON_ONCE(refcount != 1))
+-		return false;
+-
+ 	page_pool_clear_pp_info(netmem);
+ 
+ 	net_devmem_free_dmabuf(netmem_to_net_iov(netmem));
 -- 
 2.49.0
 
