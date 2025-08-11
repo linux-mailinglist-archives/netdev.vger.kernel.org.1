@@ -1,226 +1,173 @@
-Return-Path: <netdev+bounces-212575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212577-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAAE5B21472
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 20:32:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2D47B214E3
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 20:51:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8196016FB09
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 18:32:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DC3B71A230AF
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 18:52:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9032C2D47F1;
-	Mon, 11 Aug 2025 18:32:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A58D72E2858;
+	Mon, 11 Aug 2025 18:51:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XBOPaasY"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="t3jXhAnm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D69526FDA3;
-	Mon, 11 Aug 2025 18:32:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5FB121C160
+	for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 18:51:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754937147; cv=none; b=XSeXoR/96N3kNcrM3YpAOo5nroe/zXk5DlJkdVW9No9ItWRQsV6rZyMnHHOBgJXVt93QPHL6+lmWkwf0kOkXDj0gdo5xyjrmFoVVWpfZwDpC7ED8vbL/eV5oyZvb0vKM0u72I128RnwdqTZE4ODGUIB/TXfOWQMi36kHZScrqa8=
+	t=1754938299; cv=none; b=UX2EKQHfi/YQ9r07cjl/2AO3LYsU/Gv/0r8EK31i3M/mfh4/PZcJnVvPtAIQNhShLtGIIYyxkJO4H1f8jS73FE2ObEBehTJYiQkrOMlHwsdV8TOisRRXoOYcqWtXlJvQuNkTXABT1L1/KbHbdWMs8QMf8yqhaloK5bnczRoDkRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754937147; c=relaxed/simple;
-	bh=TYkPnUhq0q9Pu1cc3u+bphgk0Q8Pv+aHmUvtQ2rYVsI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=mvsdPA85Rts5ze0UypZKoL8H8HoIVWr4JJqgR5p6cQOK297dkDBMEQsqSBNkSQ2qz3ieqHX5igKIvoAU6F5xmsPdBBG4UvZQbTjJgv+YFFMeONLJxQBsedjDEiclwZ24FZCab1IO1BRvWpupN30TokvK03UU41NPaJjEwlFF5v8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XBOPaasY; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-459e72abdd2so27639145e9.2;
-        Mon, 11 Aug 2025 11:32:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1754937144; x=1755541944; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=+38aHWatwJZcPjV77AnirM8d2+c+qtW/JJxgUgdCUEQ=;
-        b=XBOPaasYdTe1y/lNqX8qfeiKEKaKGXoqidiuX0eSIbNAtfysr2MGQ1bjDXriEUuidD
-         zJWXFYRiDXv9a8LPTtSuex//4SexIMfHGKvXa55f1QmZ5AEtBy3YqHyG6j7wDdZReaaj
-         XrgwuCmi2iw9dBvjVp1t6h3/qdeB0RNT0oY/A4119PYmagMlBAZuorRTn/chn64RXK+G
-         UOdTDU4T1GaTj+u08HlF/SI9BMlxSiUsCyPokjxv4rWQaVN3E0QMoKAsWrHOj4ZxX+rM
-         4UlTZJfTG+th+3aLGXwcHHdl8SzfC1H2bqdAecn4MbHfNoq1/ufGF7Gm9ad54sGzkcgk
-         JP+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754937144; x=1755541944;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+38aHWatwJZcPjV77AnirM8d2+c+qtW/JJxgUgdCUEQ=;
-        b=Y5+VcFPoBob01AkzdKJB9Rf7G4s0NgzIb68TE2ui3xMU/SjiXCLzt6tA0sUu4iugr8
-         /uOduIAd7ekTzEJMx/nKI7MQHM3aIBNwTwTMV7Y5MQ7iZ4h2ORxy8fmWjuM0LIXZFI/9
-         SqRQgP21s/wEcRvso2LAz7EkqZPp3uJecJtyoe0aSOLKilynxQjsm2gqklZqt9bmgeZi
-         X5dpydrn63k0BJGjkoVF9bUfELs/XcDVOU84RDZt437TJ7A3X8j/07oo0TJmesxiq3BL
-         u1j5fBaVOwV5H5ugJK/fMJmTSBBWS6XGdXtjGDsTZLrog/uCxPIGwdtNgGrO6CvUWbX0
-         LZMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUSC+/SwgGJI8+2Xu5mpc6MvZGUOyJKDUxvRq9q29sjP6dz8RnlLelJnzZGeyZPrDIKdqQjAfWbTS6+IQ8=@vger.kernel.org, AJvYcCWGjDMd/PskNN9l6RzDjsZifvfaQcHSRxefCjtS4YBVHtId6G++H3kwVeQQnvclGTtG4zmSpKD6W3GSQ3FquIJf@vger.kernel.org
-X-Gm-Message-State: AOJu0YxBEeXeRCwjKvPceb1kjo1sfU6M99Xq5FUWkEKeQIa5Iy7BU+GS
-	TM8YFEAx79Qsj1qy4OGTpxn0fgsuxUw9rLVrJFsXmFTx0qFYCPd7060o960bhQ3ykcg=
-X-Gm-Gg: ASbGncthrnfvPoreS3U1x+dlknRIYhRgVcYC5urr1/u4RgcX7GpmWzIBSGTeCZzrm9s
-	m3rfkEt4asxPdviTW2SftQGGl09Z40oVof+Raq6qulpwt7+Jh0bxRhWBNw3NuiwuLFapUoWhHXL
-	vpJu+W/zKtKA7/kzH4qWOWF/sZCpUuVmDNVeiFF511JHqwlGJEfek7A5n4wfUnrgNyUa9EA1g2/
-	7p4+yYTJw9LR59VEMa2sFne0CNMQuUMXfWIIM8VJQKvvnFm4nAvVlkRyTYrFnMu+SRKWDA0EYRM
-	2JRprvdW+M1qjAWieups+y/SMVf9A+s7siOZakeeNYJM+6PgfhyrzjEmnoZvC5sKvUMcCa9uYwE
-	haaSzENX4/B10NC3gVvDw81Cmhw==
-X-Google-Smtp-Source: AGHT+IFJVCSJUAri3JD7IN6+yxqqLmWwHtU+s4kqcMVKECA1wbIBdQaeUjeRuyDBqwRlx4uXjqHS5Q==
-X-Received: by 2002:a05:600c:4fd1:b0:453:5c30:a1fd with SMTP id 5b1f17b1804b1-45a10ba7d10mr7182905e9.8.1754937143283;
-        Mon, 11 Aug 2025 11:32:23 -0700 (PDT)
-Received: from [192.168.1.243] ([143.58.192.81])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b79c3c33fesm42131132f8f.29.2025.08.11.11.32.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Aug 2025 11:32:22 -0700 (PDT)
-From: Andre Carvalho <asantostc@gmail.com>
-Date: Mon, 11 Aug 2025 19:32:09 +0100
-Subject: [PATCH net-next] selftests: netconsole: Validate interface
- selection by MAC address
+	s=arc-20240116; t=1754938299; c=relaxed/simple;
+	bh=rNU0m3Xfmjc9qcIF/qKfedXJt6u4sb0p/YPvqB3pWQc=;
+	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
+	 Content-Disposition:Content-Type:Message-Id:Date; b=KG+gXhf1lenT+VlRV+DtTwSRI/sD+Oe77jEPH4jHlSTD0Zlo4ggYp6xkFD5vfz5EnPp2HuUd2zaWz2f2e7wtZqDTkADedcQAe5LQM4y9/Puq8gB3HyN073Ua4XjriQ4kd11d7TQqTRyAeAZkkofoNVkE/r/RT0yZyuzOKgTyvyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=t3jXhAnm; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
+	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=gkwU+NrtOQ3YQDNx1VQqaKHQvOV1/1YDtCRZ1UlgtcY=; b=t3jXhAnmE8Y/32k9kYlIUCcYQw
+	/J4H7928UGvMo0TZOp9WX+4qJq9X/fE9Gf/O1jTV1xLm1Mo887Zu6z3AeggpB1sIDRtzPT7IU4Xdz
+	r8WHp1o98P7Ke/XrHQD+NjEW8GSthCmZp835BpDzysFskpb+9ogqFVjiCQzFeKu3j2jLjm3DB3XQs
+	mjik3koQjcDumMQ7s2rxjYdtWGdShZuq6AO91aKHFCbgSk0ORpdZAv9N0fQjmRihjHfUkp8UIBIqk
+	TI9mhqhPZqovS4cPQX+oRDj/UnHrnr/XfHk9TMtHTSUk39pHwVtuawRiVBPIH9eeV6X8hhaIu/JcY
+	xOav21YQ==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:53150 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1ulXcG-0003aU-1M;
+	Mon, 11 Aug 2025 19:51:28 +0100
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1ulXbX-008gqZ-Bb; Mon, 11 Aug 2025 19:50:43 +0100
+In-Reply-To: <aJo7kvoub5voHOUQ@shell.armlinux.org.uk>
+References: <aJo7kvoub5voHOUQ@shell.armlinux.org.uk>
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next 1/9] net: stmmac: add suspend()/resume() platform ops
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250811-netcons-cmdline-selftest-v1-1-1f725ab020fa@gmail.com>
-X-B4-Tracking: v=1; b=H4sIACg3mmgC/x3MQQrCQAxG4auUrA1Mx2rFq4iLduavBmoqk0EKp
- Xc3dPkW39vIUARG92ajgp+YLOrRnhpK70FfYMneFEO8hFvoWVHTosbpk2dRsGGeKqzyeI6I/dC
- Nub2S82/BJOuxfpArl2ul577/AdGPdYZ0AAAA
-X-Change-ID: 20250807-netcons-cmdline-selftest-b32e27a4bd16
-To: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Andre Carvalho <asantostc@gmail.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1754937142; l=4592;
- i=asantostc@gmail.com; s=20250807; h=from:subject:message-id;
- bh=TYkPnUhq0q9Pu1cc3u+bphgk0Q8Pv+aHmUvtQ2rYVsI=;
- b=syUESDzmuOy1dox0z5Eymdea7Xg59jJCDD3zso8suc9OKxXnBEcBsZXV6rA3+s2uaFUcHafN8
- aR7o4MgmwunDLQRPerr/D65ItwWe15bSWwVI9wo3C6JrWoEk9FbIR62
-X-Developer-Key: i=asantostc@gmail.com; a=ed25519;
- pk=eWre+RwFHCxkiaQrZLsjC67mZ/pZnzSM/f7/+yFXY4Q=
+Message-Id: <E1ulXbX-008gqZ-Bb@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Mon, 11 Aug 2025 19:50:43 +0100
 
-Extend the existing netconsole cmdline selftest to also validate that
-interface selection can be performed via MAC address.
+Add suspend/resume platform operations, which, when populated, override
+the init/exit platform operations when we suspend and resume. These
+suspend()/resume() methods are called by core code, and thus are
+designed to support any struct device, not just platform devices. This
+allows them to be used by the PCI drivers we have.
 
-The test now validates that netconsole works with both interface name
-and MAC address, improving test coverage.
-
-Suggested-by: Breno Leitao <leitao@debian.org>
-Signed-off-by: Andre Carvalho <asantostc@gmail.com>
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- .../selftests/drivers/net/lib/sh/lib_netcons.sh    | 10 +++-
- .../selftests/drivers/net/netcons_cmdline.sh       | 55 +++++++++++++---------
- 2 files changed, 42 insertions(+), 23 deletions(-)
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c    |  9 +++++++++
+ .../net/ethernet/stmicro/stmmac/stmmac_platform.c    | 12 ++++++++----
+ include/linux/stmmac.h                               |  2 ++
+ 3 files changed, 19 insertions(+), 4 deletions(-)
 
-diff --git a/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh b/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh
-index b6071e80ebbb6a33283ab6cd6bcb7b925aefdb43..8e1085e896472d5c87ec8b236240878a5b2d00d2 100644
---- a/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh
-+++ b/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh
-@@ -148,12 +148,20 @@ function create_dynamic_target() {
- # Generate the command line argument for netconsole following:
- #  netconsole=[+][src-port]@[src-ip]/[<dev>],[tgt-port]@<tgt-ip>/[tgt-macaddr]
- function create_cmdline_str() {
-+	local BINDMODE=${1:-"ifname"}
-+	if [ "${BINDMODE}" == "ifname" ]
-+	then
-+		SRCDEV=${SRCIF}
-+	else
-+		SRCDEV=$(mac_get "${SRCIF}")
-+	fi
-+
- 	DSTMAC=$(ip netns exec "${NAMESPACE}" \
- 		 ip link show "${DSTIF}" | awk '/ether/ {print $2}')
- 	SRCPORT="1514"
- 	TGTPORT="6666"
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index f1abf4242cd2..2da4f7bb2899 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -7879,6 +7879,9 @@ int stmmac_suspend(struct device *dev)
+ 	if (stmmac_fpe_supported(priv))
+ 		ethtool_mmsv_stop(&priv->fpe_cfg.mmsv);
  
--	echo "netconsole=\"+${SRCPORT}@${SRCIP}/${SRCIF},${TGTPORT}@${DSTIP}/${DSTMAC}\""
-+	echo "netconsole=\"+${SRCPORT}@${SRCIP}/${SRCDEV},${TGTPORT}@${DSTIP}/${DSTMAC}\""
++	if (priv->plat->suspend)
++		return priv->plat->suspend(dev, priv->plat->bsp_priv);
++
+ 	return 0;
  }
+ EXPORT_SYMBOL_GPL(stmmac_suspend);
+@@ -7931,6 +7934,12 @@ int stmmac_resume(struct device *dev)
+ 	struct stmmac_priv *priv = netdev_priv(ndev);
+ 	int ret;
  
- # Do not append the release to the header of the message
-diff --git a/tools/testing/selftests/drivers/net/netcons_cmdline.sh b/tools/testing/selftests/drivers/net/netcons_cmdline.sh
-index ad2fb8b1c46326c69af20f2c9d68e80fa8eb894f..a15149f3a905d7287258cd17f0e806fb50604cf4 100755
---- a/tools/testing/selftests/drivers/net/netcons_cmdline.sh
-+++ b/tools/testing/selftests/drivers/net/netcons_cmdline.sh
-@@ -17,10 +17,6 @@ source "${SCRIPTDIR}"/lib/sh/lib_netcons.sh
- check_netconsole_module
++	if (priv->plat->resume) {
++		ret = priv->plat->resume(dev, priv->plat->bsp_priv);
++		if (ret)
++			return ret;
++	}
++
+ 	if (!netif_running(ndev))
+ 		return 0;
  
- modprobe netdevsim 2> /dev/null || true
--rmmod netconsole 2> /dev/null || true
--
--# The content of kmsg will be save to the following file
--OUTPUT_FILE="/tmp/${TARGET}"
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+index 030fcf1b5993..21df052eeed0 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+@@ -901,7 +901,9 @@ static int __maybe_unused stmmac_pltfr_suspend(struct device *dev)
+ 	struct platform_device *pdev = to_platform_device(dev);
  
- # Check for basic system dependency and exit if not found
- # check_for_dependencies
-@@ -30,23 +26,38 @@ echo "6 5" > /proc/sys/kernel/printk
- trap do_cleanup EXIT
- # Create one namespace and two interfaces
- set_network
--# Create the command line for netconsole, with the configuration from the
--# function above
--CMDLINE="$(create_cmdline_str)"
--
--# Load the module, with the cmdline set
--modprobe netconsole "${CMDLINE}"
--
--# Listed for netconsole port inside the namespace and destination interface
--listen_port_and_save_to "${OUTPUT_FILE}" &
--# Wait for socat to start and listen to the port.
--wait_local_port_listen "${NAMESPACE}" "${PORT}" udp
--# Send the message
--echo "${MSG}: ${TARGET}" > /dev/kmsg
--# Wait until socat saves the file to disk
--busywait "${BUSYWAIT_TIMEOUT}" test -s "${OUTPUT_FILE}"
--# Make sure the message was received in the dst part
--# and exit
--validate_msg "${OUTPUT_FILE}"
+ 	ret = stmmac_suspend(dev);
+-	stmmac_pltfr_exit(pdev, priv->plat);
 +
-+# Run the test twice, with different cmdline parameters
-+for BINDMODE in "ifname" "mac"
-+do
-+	echo "Running with bind mode: ${BINDMODE}"
-+	# Create the command line for netconsole, with the configuration from the
-+	# function above
-+	CMDLINE="$(create_cmdline_str "${BINDMODE}")"
-+
-+	# The content of kmsg will be save to the following file
-+	OUTPUT_FILE="/tmp/${TARGET}-${BINDMODE}"
-+
-+	# Unload the module, if present
-+	rmmod netconsole 2> /dev/null || true
-+	# Load the module, with the cmdline set
-+	modprobe netconsole "${CMDLINE}"
-+
-+	# Listed for netconsole port inside the namespace and destination interface
-+	listen_port_and_save_to "${OUTPUT_FILE}" &
-+	# Wait for socat to start and listen to the port.
-+	wait_local_port_listen "${NAMESPACE}" "${PORT}" udp
-+	# Send the message
-+	echo "${MSG}: ${TARGET}" > /dev/kmsg
-+	# Wait until socat saves the file to disk
-+	busywait "${BUSYWAIT_TIMEOUT}" test -s "${OUTPUT_FILE}"
-+	# Make sure the message was received in the dst part
-+	# and exit
-+	validate_msg "${OUTPUT_FILE}"
-+
-+	# kill socat in case it is still running
-+	pkill_socat
-+	echo "${BINDMODE} : Test passed" >&2
-+done
++	if (!priv->plat->suspend)
++		stmmac_pltfr_exit(pdev, priv->plat);
  
- exit "${ksft_pass}"
-
----
-base-commit: 37816488247ddddbc3de113c78c83572274b1e2e
-change-id: 20250807-netcons-cmdline-selftest-b32e27a4bd16
-
-Best regards,
+ 	return ret;
+ }
+@@ -920,9 +922,11 @@ static int __maybe_unused stmmac_pltfr_resume(struct device *dev)
+ 	struct platform_device *pdev = to_platform_device(dev);
+ 	int ret;
+ 
+-	ret = stmmac_pltfr_init(pdev, priv->plat);
+-	if (ret)
+-		return ret;
++	if (!priv->plat->resume) {
++		ret = stmmac_pltfr_init(pdev, priv->plat);
++		if (ret)
++			return ret;
++	}
+ 
+ 	return stmmac_resume(dev);
+ }
+diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+index 26ddf95d23f9..22c24dacbc65 100644
+--- a/include/linux/stmmac.h
++++ b/include/linux/stmmac.h
+@@ -248,6 +248,8 @@ struct plat_stmmacenet_data {
+ 	void (*ptp_clk_freq_config)(struct stmmac_priv *priv);
+ 	int (*init)(struct platform_device *pdev, void *priv);
+ 	void (*exit)(struct platform_device *pdev, void *priv);
++	int (*suspend)(struct device *dev, void *priv);
++	int (*resume)(struct device *dev, void *priv);
+ 	struct mac_device_info *(*setup)(void *priv);
+ 	int (*clks_config)(void *priv, bool enabled);
+ 	int (*crosststamp)(ktime_t *device, struct system_counterval_t *system,
 -- 
-Andre Carvalho <asantostc@gmail.com>
+2.30.2
 
 
