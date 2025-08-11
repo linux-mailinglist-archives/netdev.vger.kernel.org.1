@@ -1,185 +1,144 @@
-Return-Path: <netdev+bounces-212596-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212597-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83B8EB2165D
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 22:23:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A6268B21685
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 22:33:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8DC48168176
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 20:23:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B383216D304
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 20:33:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AE612D8763;
-	Mon, 11 Aug 2025 20:23:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E15F2D97B0;
+	Mon, 11 Aug 2025 20:33:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IvoPT8jw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JHeqLn32"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B6D9205E25
-	for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 20:23:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98D3029BD86;
+	Mon, 11 Aug 2025 20:33:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754943824; cv=none; b=mlJN1NZvm3YsCsuiyHFJS7LgMSdTWKmOKgW9qyLtEyWYN+5WVcd8yRrtZIry0MbIIbLt7641u8SmcDvjt3ANTTKz8Cqh5hQ+pAOLkhVdjtvexXm9MKbL+wkkIRgIiVCbpkXXHsaWQVY4Gc74gx65kYQEvM6VZgb/Gqr2B2Gdt90=
+	t=1754944426; cv=none; b=aYQ1iBrg5baA1NzTkpaCBDBcW16Hr74qpzC4rm65Z9yp0+cnAjuw/kjmYjUeHdm764RNsQaPelueA0N0mtEwOVXAHy+xjXLIS0jlL6Jr9Gnh1bxuSSykd98QSgem3/FA0l1Qv4f/gwdoRH28VcHywkKbk+AEEp60nmkDpf9bTl0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754943824; c=relaxed/simple;
-	bh=O9MMJbGuTUHIqUUcd2Fu6+WBYGu9Q/0Pl95H32aD73g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pPhB7YZtbFJsJ9wbkzOcbbv4MUD6nA+ZkR6kOWp1ubZBYmEhSqThOiRKxBm30iI6lXMo/yRCXaDzytivvzJGxm2J/qYYDPR9sMpBb/kV1+yd89px3o4b9BjaZt1VWWCs0julnL/I/3t9E4j+l1C7eOfEt0PR9b+7pztbokGpjyU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IvoPT8jw; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+	s=arc-20240116; t=1754944426; c=relaxed/simple;
+	bh=S5lcfUtp71/9il0VG77vgPWtjLtzdwdq8K2rrHgg+mM=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=uPil29RNWUftQ28JkhdCVwA2snIXZApzIpkrWTZ/WV6JhEsoUNi14KPwYIXAY43J2O8dEl8ZAu9OQXK3VrOCZuNCii7lWiKplJrNiX4MWEg7FdD/8+Y/3ZPhBDGFEyzzeHwnn3+bPVXbHBELXMTOjUhfrxbfxVqktasilvwQKgs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JHeqLn32; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-458c063baeaso26478755e9.1
-        for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 13:23:41 -0700 (PDT)
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-459ea4f40afso8698635e9.2;
+        Mon, 11 Aug 2025 13:33:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1754943820; x=1755548620; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rCUuGIHDdkHPVuqug3k8Q0rvfbFDfnBqIaU13gg8CyU=;
-        b=IvoPT8jwIyf88YhHdNyaeeNFyeuCnXpOv4zN3MVb7S0uUc7hs44yWnDQYvyBnx/iwd
-         URCIHv+EeIKwex1Yhgl7GmGUCS9xxhIwvA8b5btpKItoh6muIw8KsYcm+F/e/vwgIjTo
-         cLuL0STJQjlKdBHhLs01xLMfU5/0A1dyubjB6sb7Pzg0FlVClL4VxvppX6GAogE6q0bp
-         chDe7Dt1ygFx6DD1RZ820LxjkdDe7RRiJQEbXf8L6VYaJuHdUAClTSUNZ1yOAAwvkhSi
-         o4goUU8da9muMflDzhFDhwMIs/1FrpVOeuEBDwf/CFbasQgziOUVW/ILciNznG2RJ8Yd
-         mhpQ==
+        d=gmail.com; s=20230601; t=1754944423; x=1755549223; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4lYYrjSv6845A5J/SgoFFrJQ1Leg9B3UPlq2+hMK1TE=;
+        b=JHeqLn32x9qZGTYNUi901TEgRQbNewAcX2d7JgjoOsTNDwGZcHqkYcsXX+ZukEethk
+         8SdpjZf8WyTJ32uLWSNeftvaxQccvS7wkeb6lVq1XFwUEWNvpGmyU+2OgXa+CSD5/hMh
+         EUYg/Hp8yqVpbTX0awK0xi7qKOeVnvF55uaUL9maIjYYynPIojwUJLvongsVpociDPFn
+         uusCwgDVbbNeazSyt+uDnnLoF5sunXTgL5McE57Gf9T2Y+vAoi/+AWSumytvLtBcwwW0
+         2FCtaPY6xUgPKCiQSKrDtGcxEKZWLdkVWj3u0KQ3qNvdn9v2fv/vNYgMDWbTYTHed8tv
+         rk2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754943820; x=1755548620;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1754944423; x=1755549223;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=rCUuGIHDdkHPVuqug3k8Q0rvfbFDfnBqIaU13gg8CyU=;
-        b=ntvlGwPQ8Ynkx3eXIgnnOEl0PUyVDMad2l1YDvbStnaE4DQV3ylCYM64Fwb3GUWlVX
-         ONW6VV5oiz8b/rMzbQEhleMjcNih9Sg6cJETioxBnd7YciZyaq15738bpbjTMlb2DLtu
-         tVRS67eLU09jhBB0RO3379o3z/iHmQd0DmANK55vCz7rTM3IX2jTNNlzjcF2G+5McRow
-         ILU56Y795fWZNMioYnu3z4WamMbYOwbJmhH56rmWuhYUU0ElEh+lLlU5FygQQahQiEWk
-         pFaYDmgnE8Ajtmqm7PQpqNCpQvVc3N+cwgSU4UAxyLf/cvV42IBPwaURjxtinRhZthKZ
-         R/5w==
-X-Forwarded-Encrypted: i=1; AJvYcCXN9jAdkit5e8EPiHzcvaWMb5hbSkICDQ3xuSeqYrRwLmFKbKrQ8aatncEq1WPEUA7nvKNN1c4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxZiI+tfZHw728hODtK4O+cunro1fSrF4Qit8nxjpuG9vYVPy4n
-	UoclQf2t/Yo1/noV2tZ2E4PAWkvz+dQz+VPUoAtEyc230B0y62EETP0o
-X-Gm-Gg: ASbGncsO7+jCCLkOZaYtc6KFu+anbuJp+jR+S5EO9Mru4RZ5L11EZfHHpfPipWA8oKg
-	tJdVpvgIokpB70KswMbN4rEMNiAU4kZ0LrdRpjIDVPxgDcf4Bs7kOByEKFkAnmRx4QkbKEigL5M
-	pK6jcyFtd0axnPkVNh+8GV//AZhVlfU2kXLhwBw3Ul1Pn7g2PHOac+mrZ9u1IFy1kOAb8xUS2PA
-	00075XmW1wBwbKqAzkiukewtGddvmOTZn7A7McrkUOFPXPVr8mZspK4cTh1WjdfSxzRinghPj8f
-	EIQjPZziwSYAFT1/nSxV5YkZvMO/3K/HT1pUvNowLYBrw06SdOJnSKCkdyOFTZoSaCUQetBuiq3
-	sGJAFt3ZReP/EXqecPOlgdvrCUMVyR6hZIRcBcxL+s6wpObY2xMu6VfY=
-X-Google-Smtp-Source: AGHT+IHAVrPkTtZ260oCq+9KYJfh7SC3dODIukg2FTirbWZJzdnyJ1TDYXqT0nu9enfxCx6STe7vDQ==
-X-Received: by 2002:a05:600c:1c90:b0:456:2a9:f815 with SMTP id 5b1f17b1804b1-45a10b941ddmr9975335e9.4.1754943820202;
-        Mon, 11 Aug 2025 13:23:40 -0700 (PDT)
-Received: from eldamar.lan (c-82-192-244-13.customer.ggaweb.ch. [82.192.244.13])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b79c466838sm44068994f8f.49.2025.08.11.13.23.39
+        bh=4lYYrjSv6845A5J/SgoFFrJQ1Leg9B3UPlq2+hMK1TE=;
+        b=ofDr2p6BXC7QJjmcETrO0YoUPFyQG/LUVqEO4m4F9JlDozAqfQ15exHxqWkU734qkf
+         73uY02X7zPRKjNBvrwgKq758gbetRydh03hS3q0ycap4SfUttxuwPQZDpMnI+ffrxUfz
+         CptjMiYxb2JvudNWVTzM/40GG+rlaV61fTvkilFIIgxTKfVXaxsHHvn7Yjkap43mPsJh
+         nTj6kRXC91qWyuz33tvY3tN6XoafMMNZo6IB2Pv7U/5BX3e/cQuBNnZtfByXW96TH8xZ
+         MYyaKeawBXelZ+C6B2xu1itCuXDmHP4UB9QJPE9ODWeOqc2qvOpsTh+GlJu5ivBDnegU
+         qlFQ==
+X-Gm-Message-State: AOJu0Yzsy4ydhCPILaMCRnc93Giq7KTP2Brqs4EmkfE/9lWbs79/wWze
+	jcTIETk6YG/X7q/QJAkSg7cE4mOpvNfCHgaEMb7JanaAMgr4ZY2gD0cv8VCdzQiy7hI=
+X-Gm-Gg: ASbGncu1edkOSRHmnT0hI89gXhPLNP+UryeZdW2YH5eodgSNJs+totzlexdSoo5ZXoE
+	jYk9xy99ToyodlB5ssRELoyGq0PvymmOBGodUbBIVnHciv0LtX3Y0VrkO6RKCTBArTeA85qRqXh
+	lU9n4lLNGAkmewaxukLXO9wwSnuhv1ngHEA0GIXDiloqzQwPI0ipoYpMp5L9TNRgFEm7bWShUs4
+	2yiJdyY780jlFAP/UNuylPMT/BzJcJRApaj2rot9KfBqj9+L2shXeHhHiuV8DWnK66MECDXtGsw
+	M28gkmpRyQbdpHOQ93iIBNOnsRij9cZeYg4kTvRDJ3zG0LSoZoeL7Vvzwb76maAVVQawO/0d7zy
+	OCFspsi2FLFoMEaiHLDbTz0FjgylTP5EyHs8Wb62+Q4SETKutmjOv/mk/GsCeI7fVlfj2YLfEnA
+	==
+X-Google-Smtp-Source: AGHT+IG7Z6zeZBn211/I7M3dkItmnVEODQxBESmS2cvBBAYllidB3CYd7C+MjrADI4Pv1At5iFWIXQ==
+X-Received: by 2002:a05:6000:2f86:b0:3b8:d95b:77a6 with SMTP id ffacd0b85a97d-3b910f8f95cmr312211f8f.0.1754944422521;
+        Mon, 11 Aug 2025 13:33:42 -0700 (PDT)
+Received: from pop-os.localdomain (208.77.11.37.dynamic.jazztel.es. [37.11.77.208])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-459c58ed07fsm364995685e9.22.2025.08.11.13.33.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Aug 2025 13:23:39 -0700 (PDT)
-Sender: Salvatore Bonaccorso <salvatore.bonaccorso@gmail.com>
-Received: by eldamar.lan (Postfix, from userid 1000)
-	id 5FB22BE2DE0; Mon, 11 Aug 2025 22:23:38 +0200 (CEST)
-Date: Mon, 11 Aug 2025 22:23:38 +0200
-From: Salvatore Bonaccorso <carnil@debian.org>
-To: Michal Kubecek <mkubecek@suse.cz>
-Cc: Michel Lind <michel@michel-slm.name>, netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: Re: [PATCH ethtool] netlink: fix print_string when the value is NULL
-Message-ID: <aJpRSuCpo37TCLZZ@eldamar.lan>
-References: <aILUS-BlVm5tubAF@maurice.local>
- <lwicuyi63qrip45nfwhifujhgtravqojbv4sud5acdqpmn7tpi@7ghj23b3hhdx>
- <aJhG0geDvJ4a8CpS@eldamar.lan>
- <b6unuycjddzrl55q3gwtki2rmm2ituknbmgwpuorgten5xr65w@w4dnhvf6mkoa>
+        Mon, 11 Aug 2025 13:33:42 -0700 (PDT)
+From: =?UTF-8?q?Miguel=20Garc=C3=ADa?= <miguelgarciaroman8@gmail.com>
+To: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	willemdebruijn.kernel@gmail.com,
+	jasowang@redhat.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	skhan@linuxfoundation.org,
+	=?UTF-8?q?Miguel=20Garc=C3=ADa?= <miguelgarciaroman8@gmail.com>
+Subject: [PATCH v2] net: tun: replace strcpy with strscpy for ifr_name
+Date: Mon, 11 Aug 2025 22:33:29 +0200
+Message-Id: <20250811203329.854847-1-miguelgarciaroman8@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <6899fde3dbfd6_532b129461@willemb.c.googlers.com.notmuch>
+References: <6899fde3dbfd6_532b129461@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b6unuycjddzrl55q3gwtki2rmm2ituknbmgwpuorgten5xr65w@w4dnhvf6mkoa>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi,
+Replace the strcpy() calls that copy the device name into ifr->ifr_name
+with strscpy() to avoid potential overflows and guarantee NULL termination.
 
-On Mon, Aug 11, 2025 at 10:07:00PM +0200, Michal Kubecek wrote:
-> Dne Sun, Aug 10, 2025 at 09:14:26AM GMT, Salvatore Bonaccorso napsal:
-> > Hi Michal,
-> > 
-> > On Fri, Aug 08, 2025 at 01:05:52AM +0200, Michal Kubecek wrote:
-> > > On Thu, Jul 24, 2025 at 07:48:11PM GMT, Michel Lind wrote:
-> > > > The previous fix in commit b70c92866102 ("netlink: fix missing headers
-> > > > in text output") handles the case when value is NULL by still using
-> > > > `fprintf` but passing no value.
-> > > > 
-> > > > This fails if `-Werror=format-security` is passed to gcc, as is the
-> > > > default in distros like Fedora.
-> > > > 
-> > > > ```
-> > > > json_print.c: In function 'print_string':
-> > > > json_print.c:147:25: error: format not a string literal and no format arguments [-Werror=format-security]
-> > > >   147 |                         fprintf(stdout, fmt);
-> > > >       |
-> > > > ```
-> > > > 
-> > > > Use `fprintf(stdout, "%s", fmt)` instead, using the format string as the
-> > > > value, since in this case we know it is just a string without format
-> > > > chracters.
-> > > > 
-> > > > Reviewed-by: Jakub Kicinski <kuba@kernel.org>
-> > > > Signed-off-by: Michel Lind <michel@michel-slm.name>
-> > > 
-> > > Applied, thank you.
-> > > 
-> > > It's a bit surprising that I didn't hit this problem as I always test
-> > > building with "-Wall -Wextra -Werror". I suppose this option is not
-> > > contained in -Wall or -Wextra.
-> > > 
-> > > Michal
-> > > 
-> > > > ---
-> > > >  json_print.c | 2 +-
-> > > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > > > 
-> > > > diff --git a/json_print.c b/json_print.c
-> > > > index e07c651..75e6cd9 100644
-> > > > --- a/json_print.c
-> > > > +++ b/json_print.c
-> > > > @@ -144,7 +144,7 @@ void print_string(enum output_type type,
-> > > >  		if (value)
-> > > >  			fprintf(stdout, fmt, value);
-> > > >  		else
-> > > > -			fprintf(stdout, fmt);
-> > > > +			fprintf(stdout, "%s", fmt);
-> > > >  	}
-> > > >  }
-> > > >  
-> > > > -- 
-> > > > 2.50.1
-> > 
-> > As b70c92866102 ("netlink: fix missing headers in text output") was
-> > backported as well for the 6.14.2 version, should that get as well a
-> > new release 6.14.3 with the fix?
-> 
-> I could do that but it didn't seem necessary. If I understand correctly,
-> this patch does not address any runtime issue (at least not until there
-> is an actual call of print_string() with null value and fmt containing
-> a template); and the build issue only happens with a very specific
-> compiler option which is not only not default but is not included even
-> in "-Wall -Wextra" (not even in gcc15).
-> 
-> I'm aware that the commit message says that Fedora uses that compiler
-> option in its package builds but that's something that can be addressed
-> by a distribution patch. Therefore my plan was to cherry pick the commit
-> into ethtool-6.14.y branch but not to release 6.14.3 unless something
-> more serious shows up.
-> 
-> But if I misunderstood the situation and 6.14.3 with this commit would
-> be really helpful, I can reconsider.
+Destination is ifr->ifr_name (size IFNAMSIZ).
 
-No not urgent, but I hit the same issue when preparing 6.14.2 for
-Debian trixie. But I can equally just cherry-pick the commit locally
-and then drop it once 6.14.3 is released.
+Tested in QEMU (BusyBox rootfs):
+ - Created TUN devices via TUNSETIFF helper
+ - Set addresses and brought links up
+ - Verified long interface names are safely truncated (IFNAMSIZ-1)
 
-So really no hurry about that.
+v2:
+- Dropped third argument from strscpy(), inferred from field size.
 
-Regards,
-Salvatore
+Signed-off-by: Miguel García <miguelgarciaroman8@gmail.com>
+---
+ drivers/net/tun.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+index f8c5e2fd04df..ad33b16224e2 100644
+--- a/drivers/net/tun.c
++++ b/drivers/net/tun.c
+@@ -2800,13 +2800,13 @@ static int tun_set_iff(struct net *net, struct file *file, struct ifreq *ifr)
+ 	if (netif_running(tun->dev))
+ 		netif_tx_wake_all_queues(tun->dev);
+ 
+-	strcpy(ifr->ifr_name, tun->dev->name);
++	strscpy(ifr->ifr_name, tun->dev->name);
+ 	return 0;
+ }
+ 
+ static void tun_get_iff(struct tun_struct *tun, struct ifreq *ifr)
+ {
+-	strcpy(ifr->ifr_name, tun->dev->name);
++	strscpy(ifr->ifr_name, tun->dev->name);
+ 
+ 	ifr->ifr_flags = tun_flags(tun);
+ 
+-- 
+2.34.1
+
 
