@@ -1,176 +1,263 @@
-Return-Path: <netdev+bounces-212483-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212485-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CECCB20D40
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 17:14:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED02AB20D50
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 17:17:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B44CB428284
-	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 15:13:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 633241887A5D
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 15:17:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49A952DFA21;
-	Mon, 11 Aug 2025 15:13:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 139DB2135AD;
+	Mon, 11 Aug 2025 15:17:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="igCI/Mnk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PHXoMbBH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7D412DE1E2;
-	Mon, 11 Aug 2025 15:13:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE7A71E501C;
+	Mon, 11 Aug 2025 15:17:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754925183; cv=none; b=IkaHxRHVqR50dvv53NVrKnzq0S167YMnM51nL95CnEXrR0NzQ67UGC4RRM3k6G3eq5VP6BhrV0vjLFhTd8Tc87Y3apJO+gHUH2t8RSMXDlvOTPdEbI6bltGdV/OeVBJ5ZO9ma21rbFDjA/bFu3rezZdXKyxhtU8BV4njBfTqmBs=
+	t=1754925455; cv=none; b=RB2FyeqcUiQcOsZhxXVPAodZX3GMN4690V6K6Dye/LPxah7LkHASsFs+F+bnedtJ1R4S6E4BMRIbuirlHZfHZ+XsqylMLdfnwcE0DBhnRLvtRW6QzEysT2S1b3GpoAyflyuGwd+gQ+uu4vRFHtYzaZpvoaBox2abdqf+teHr3qk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754925183; c=relaxed/simple;
-	bh=2x7HVtWR7XNJj8/cCfSFaoGcwkvqQQJtL954QaAaJ1k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CUuLUfQAXSi9/mYzE6YXDLRrWAveUW7Qa79JIPAKPvWw13LJD3c+IaQb805vFuXuRGPahlrZWJF+weUys0ZehzPNXmlQF1Cu8wrGUoaTEMx+um1dSLGyISLeRftmVQgfyYmQxBe0hBHTT7j37CDOjHbYpsQ5196ncd+9pOBGATc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=igCI/Mnk; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57BBtavO032457;
-	Mon, 11 Aug 2025 15:12:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=1Uyhbq
-	8nZiZ6zGRxliJmGE89t2X3iKne848oZ0LVFbc=; b=igCI/MnkgI7016KigkXALs
-	vHmHgXDxuldGGrAv6zoviFzVtDvOCvh3iol8eavRwT2xSBJDJq4AToN6JPoh0Hsa
-	Yji6fsCx+YMMzhjXcnkgy1g+CA6qSlWJ+G+Q5zlZn15vejm47E3yp8hN1oM3mDCp
-	76NmCtdy3xPJ0QXFIkvG0o5lkzFMwg9/pxKhxkjVMf3/QaA3PDvKNvDuROnko9jD
-	fnPcG/1qO2jqB2eNnPwL4p+Bj2DH9KUd87xc2lnfejeNmyodHoEhiG/S8o2jFE25
-	5Vjcn+xsfFyW5sB+F9qD+AYOrYJzBHbI0wsiswsP3Ga51C5tMZrxAOp0i5EPjBUA
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48eha9x8wn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 11 Aug 2025 15:12:52 +0000 (GMT)
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 57BFCQUn014303;
-	Mon, 11 Aug 2025 15:12:51 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48eha9x8wh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 11 Aug 2025 15:12:51 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 57BDoPAw026302;
-	Mon, 11 Aug 2025 15:12:50 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 48eh20xgpv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 11 Aug 2025 15:12:50 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 57BFCkOd57278820
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 11 Aug 2025 15:12:46 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A304120043;
-	Mon, 11 Aug 2025 15:12:46 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 53A9020040;
-	Mon, 11 Aug 2025 15:12:46 +0000 (GMT)
-Received: from [9.152.224.240] (unknown [9.152.224.240])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 11 Aug 2025 15:12:46 +0000 (GMT)
-Message-ID: <37bc0a65-247f-4ac3-bb03-b1d2cdcaeccd@linux.ibm.com>
-Date: Mon, 11 Aug 2025 17:12:46 +0200
+	s=arc-20240116; t=1754925455; c=relaxed/simple;
+	bh=oThR9g2icfJGdLraqN6epyKlvrTrIwhnXHmwgyj+e4U=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=jcvC2Nx4Pf+zFTK9zrLreNnZJR1l2LqxfbJZH8O10IpzdZkiLBxrmFRWdsjOEkd01iGuTM1XgCn6UM6frQo9UwKrO3SEGekrBblJuMB5dQcnEehiPUficfXUKm5iQ0+8gSv6u1pw6ZDx+p20RFFBbFWr/xySmQEPOIjqWzYcZNc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PHXoMbBH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 660DDC4CEED;
+	Mon, 11 Aug 2025 15:17:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754925454;
+	bh=oThR9g2icfJGdLraqN6epyKlvrTrIwhnXHmwgyj+e4U=;
+	h=From:Date:Subject:To:Cc:From;
+	b=PHXoMbBHrxsj90+ujDv/fhsjbKSmZPTpIFG/oVpmVca6mzPEuzcaIa5AVbwjqxXHS
+	 aacHADV2B53n1o22TH+TQsStq8ve4TeSzawrJtR6Pn13DGTxDHf/W4pPVjk0bn6XYl
+	 JptMlAMWlNzh9dGldvwtzMSX6ia8sleg7al4DwN9NelQGW9hJULLbRS9XusvnAm6Ni
+	 H6fupFzH8wQSPjiqld4Mo9sbE4EBvpN4jR5LB0RVP1o792EmVYsm0Z1XzbVulddnaf
+	 gvA75phT6Ko+hY5i3ltOMNqFg+DP2QMF+WxiFvB7RvRCtJ+V7w03KunGVcU3wPvDv+
+	 f4GIUKLjuaf3Q==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Date: Mon, 11 Aug 2025 17:14:42 +0200
+Subject: [PATCH net-next v2] net: mediatek: wed: Introduce MT7992 WED
+ support to MT7988 SoC
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC net-next 10/17] net/dibs: Define dibs_client_ops and
- dibs_dev_ops
-To: dust.li@linux.alibaba.com, David Miller <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "D. Wythe" <alibuda@linux.alibaba.com>,
-        Sidraya Jayagond <sidraya@linux.ibm.com>,
-        Wenjia Zhang
- <wenjia@linux.ibm.com>,
-        Julian Ruess <julianr@linux.ibm.com>
-Cc: netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Thorsten Winkler <twinkler@linux.ibm.com>,
-        Simon Horman <horms@kernel.org>,
-        Mahanta Jambigi <mjambigi@linux.ibm.com>,
-        Tony Lu
- <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
-        Halil Pasic <pasic@linux.ibm.com>, linux-rdma@vger.kernel.org
-References: <20250806154122.3413330-1-wintera@linux.ibm.com>
- <20250806154122.3413330-11-wintera@linux.ibm.com>
- <aJiye8W_giWiWWpI@linux.alibaba.com>
-Content-Language: en-US
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <aJiye8W_giWiWWpI@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=KPRaDEFo c=1 sm=1 tr=0 ts=689a0874 cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10 a=_akHyxmYcdlLMKxn72UA:9
- a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: VK7To6NhxKjjNRzjLyjZH8Muconrf0bq
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODExMDA5NSBTYWx0ZWRfX156ZWzNTdgOn
- X5wQCTeXOdlEI92LvIi9b9L12my0VdeES3GX1WuDOLpnqHZnAKmg9CWkNmHaXuwOOHDiKIVlW+M
- T4C/VTtefxt/10Zjp5MGstEIP+TWHllHjE73UPsiuxsjg4PNbuTVc97et19g9RQTdFjie2vrvfa
- RiRd5ikCmDglSu77SvHSF3A0G8KXv77pHBts9r73KczixxO3EevBh/2Ut0f3PpNp3zqJT/P+9tI
- RKQZimjGWxNLsapGBtYYYlDM3lcWJo3MUYhA6Z+cNoJgMAcHi6YGJZ1Rqptc0VDzz7oOHl80z9p
- vzI5YvaYW+s3uzwjiPToqusyoy+huSaZWambWoSUgrLnU+Oj4BkoXHgu6IwM7HiYiTD+28J9xKF
- JbkGF81MwEuhW/gQLf/DLrS9iStwwVVjz6YKJz6WUZ4RFEidL4wvbzzzWO3gNbZrUCSNkVDQ
-X-Proofpoint-GUID: N_t2W-xIeopEYWF4Nean-B0xTAHJyGVN
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-08-11_03,2025-08-11_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 impostorscore=0 bulkscore=0 mlxlogscore=964 spamscore=0
- clxscore=1015 adultscore=0 priorityscore=1501 malwarescore=0
- lowpriorityscore=0 mlxscore=0 suspectscore=0 classifier=spam authscore=0
- authtc=n/a authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2507300000 definitions=main-2508110095
+Message-Id: <20250811-mt7992-wed-support-v2-1-e43024c05305@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAOEImmgC/22NQQ6CMBBFr0Jm7RjaUAuuuIdh0dABGpWSKVYN6
+ d2txKXL95L//gaB2FGAc7EBU3TB+TmDPBTQT2YeCZ3NDLKUqtSixvuqm0bikyyGx7J4XrFSJ6N
+ Kq8RQC8jDhWlwrz166TJPLqye3/tHFF/7y0n9LxcFCjTGamsq29dat1fimW5HzyN0KaUPjeEV2
+ rUAAAA=
+X-Change-ID: 20250718-mt7992-wed-support-456a50d51f81
+To: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Matthias Brugger <matthias.bgg@gmail.com>, 
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+ Ryder Lee <ryder.lee@mediatek.com>, Shayne Chen <shayne.chen@mediatek.com>, 
+ Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, linux-wireless@vger.kernel.org, 
+ Rex Lu <rex.lu@mediatek.com>
+X-Mailer: b4 0.14.2
 
+Introduce the second WDMA RX ring in WED driver for MT7988 SoC since the
+Mediatek MT7992 WiFi chipset supports two separated WDMA rings.
+Add missing MT7988 configurations to properly support WED for MT7992 in
+MT76 driver.
 
+Co-developed-by: Rex Lu <rex.lu@mediatek.com>
+Signed-off-by: Rex Lu <rex.lu@mediatek.com>
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+---
+Changes in v2:
+- Fix commit log
+- Rebase on top of net-next main branch
+- Link to v1: https://lore.kernel.org/r/20250727-mt7992-wed-support-v1-1-aad7da4dc877@kernel.org
+---
+ drivers/net/ethernet/mediatek/mtk_wed.c          | 33 +++++++++++++++++++-----
+ drivers/net/ethernet/mediatek/mtk_wed.h          |  2 +-
+ drivers/net/wireless/mediatek/mt76/mt7915/mmio.c |  6 ++---
+ drivers/net/wireless/mediatek/mt76/mt7996/mmio.c | 12 ++++-----
+ include/linux/soc/mediatek/mtk_wed.h             |  2 +-
+ 5 files changed, 38 insertions(+), 17 deletions(-)
 
-On 10.08.25 16:53, Dust Li wrote:
-> Hi Winter,
-> 
-> I feel a bit hard for me to review the code especially with so many
-> intermediate parts. I may need more time to review these.
-> 
-> Seperate such a big refine patch is hard. Maybe put the
-> small parts in the front and the final one in the last to reduce
-> the intermediate part as much as possible ? I'm not sure.
-> 
-> Best regards,
-> Dust
+diff --git a/drivers/net/ethernet/mediatek/mtk_wed.c b/drivers/net/ethernet/mediatek/mtk_wed.c
+index 0a80d8f8cff7f415a60b0cd68c0c9c07e2c88f36..3dbb113b792cf00fb4f89ab20f7e7fa72ecac260 100644
+--- a/drivers/net/ethernet/mediatek/mtk_wed.c
++++ b/drivers/net/ethernet/mediatek/mtk_wed.c
+@@ -59,7 +59,9 @@ struct mtk_wed_flow_block_priv {
+ static const struct mtk_wed_soc_data mt7622_data = {
+ 	.regmap = {
+ 		.tx_bm_tkid		= 0x088,
+-		.wpdma_rx_ring0		= 0x770,
++		.wpdma_rx_ring = {
++			0x770,
++		},
+ 		.reset_idx_tx_mask	= GENMASK(3, 0),
+ 		.reset_idx_rx_mask	= GENMASK(17, 16),
+ 	},
+@@ -70,7 +72,9 @@ static const struct mtk_wed_soc_data mt7622_data = {
+ static const struct mtk_wed_soc_data mt7986_data = {
+ 	.regmap = {
+ 		.tx_bm_tkid		= 0x0c8,
+-		.wpdma_rx_ring0		= 0x770,
++		.wpdma_rx_ring = {
++			0x770,
++		},
+ 		.reset_idx_tx_mask	= GENMASK(1, 0),
+ 		.reset_idx_rx_mask	= GENMASK(7, 6),
+ 	},
+@@ -81,7 +85,10 @@ static const struct mtk_wed_soc_data mt7986_data = {
+ static const struct mtk_wed_soc_data mt7988_data = {
+ 	.regmap = {
+ 		.tx_bm_tkid		= 0x0c8,
+-		.wpdma_rx_ring0		= 0x7d0,
++		.wpdma_rx_ring = {
++			0x7d0,
++			0x7d8,
++		},
+ 		.reset_idx_tx_mask	= GENMASK(1, 0),
+ 		.reset_idx_rx_mask	= GENMASK(7, 6),
+ 	},
+@@ -621,8 +628,8 @@ mtk_wed_amsdu_init(struct mtk_wed_device *dev)
+ 		return ret;
+ 	}
+ 
+-	/* eagle E1 PCIE1 tx ring 22 flow control issue */
+-	if (dev->wlan.id == 0x7991)
++	/* Kite and Eagle E1 PCIE1 tx ring 22 flow control issue */
++	if (dev->wlan.id == 0x7991 || dev->wlan.id == 0x7992)
+ 		wed_clr(dev, MTK_WED_AMSDU_FIFO, MTK_WED_AMSDU_IS_PRIOR0_RING);
+ 
+ 	wed_set(dev, MTK_WED_CTRL, MTK_WED_CTRL_TX_AMSDU_EN);
+@@ -1239,7 +1246,11 @@ mtk_wed_set_wpdma(struct mtk_wed_device *dev)
+ 		return;
+ 
+ 	wed_w32(dev, MTK_WED_WPDMA_RX_GLO_CFG, dev->wlan.wpdma_rx_glo);
+-	wed_w32(dev, dev->hw->soc->regmap.wpdma_rx_ring0, dev->wlan.wpdma_rx);
++	wed_w32(dev, dev->hw->soc->regmap.wpdma_rx_ring[0],
++		dev->wlan.wpdma_rx[0]);
++	if (mtk_wed_is_v3_or_greater(dev->hw))
++		wed_w32(dev, dev->hw->soc->regmap.wpdma_rx_ring[1],
++			dev->wlan.wpdma_rx[1]);
+ 
+ 	if (!dev->wlan.hw_rro)
+ 		return;
+@@ -2323,6 +2334,16 @@ mtk_wed_start(struct mtk_wed_device *dev, u32 irq_mask)
+ 		if (!dev->rx_wdma[i].desc)
+ 			mtk_wed_wdma_rx_ring_setup(dev, i, 16, false);
+ 
++	if (dev->wlan.hw_rro) {
++		for (i = 0; i < MTK_WED_RX_PAGE_QUEUES; i++) {
++			u32 addr = MTK_WED_RRO_MSDU_PG_CTRL0(i) +
++				   MTK_WED_RING_OFS_COUNT;
++
++			if (!wed_r32(dev, addr))
++				wed_w32(dev, addr, 1);
++		}
++	}
++
+ 	mtk_wed_hw_init(dev);
+ 	mtk_wed_configure_irq(dev, irq_mask);
+ 
+diff --git a/drivers/net/ethernet/mediatek/mtk_wed.h b/drivers/net/ethernet/mediatek/mtk_wed.h
+index c1f0479d7a7182919e77c40efc30ade37abfad58..b49aee9a8b65156310e4f66a17921e5320b3077c 100644
+--- a/drivers/net/ethernet/mediatek/mtk_wed.h
++++ b/drivers/net/ethernet/mediatek/mtk_wed.h
+@@ -17,7 +17,7 @@ struct mtk_wed_wo;
+ struct mtk_wed_soc_data {
+ 	struct {
+ 		u32 tx_bm_tkid;
+-		u32 wpdma_rx_ring0;
++		u32 wpdma_rx_ring[MTK_WED_RX_QUEUES];
+ 		u32 reset_idx_tx_mask;
+ 		u32 reset_idx_rx_mask;
+ 	} regmap;
+diff --git a/drivers/net/wireless/mediatek/mt76/mt7915/mmio.c b/drivers/net/wireless/mediatek/mt76/mt7915/mmio.c
+index 4a82f8e4c118061fc76459dc0e38f7ee27e25a3a..36488aa6cc20117de4f5b76b80beca149015e055 100644
+--- a/drivers/net/wireless/mediatek/mt76/mt7915/mmio.c
++++ b/drivers/net/wireless/mediatek/mt76/mt7915/mmio.c
+@@ -664,8 +664,8 @@ int mt7915_mmio_wed_init(struct mt7915_dev *dev, void *pdev_ptr,
+ 					 MT_RXQ_WED_RING_BASE;
+ 		wed->wlan.wpdma_rx_glo = pci_resource_start(pci_dev, 0) +
+ 					 MT_WPDMA_GLO_CFG;
+-		wed->wlan.wpdma_rx = pci_resource_start(pci_dev, 0) +
+-				     MT_RXQ_WED_DATA_RING_BASE;
++		wed->wlan.wpdma_rx[0] = pci_resource_start(pci_dev, 0) +
++					MT_RXQ_WED_DATA_RING_BASE;
+ 	} else {
+ 		struct platform_device *plat_dev = pdev_ptr;
+ 		struct resource *res;
+@@ -687,7 +687,7 @@ int mt7915_mmio_wed_init(struct mt7915_dev *dev, void *pdev_ptr,
+ 		wed->wlan.wpdma_tx = res->start + MT_TXQ_WED_RING_BASE;
+ 		wed->wlan.wpdma_txfree = res->start + MT_RXQ_WED_RING_BASE;
+ 		wed->wlan.wpdma_rx_glo = res->start + MT_WPDMA_GLO_CFG;
+-		wed->wlan.wpdma_rx = res->start + MT_RXQ_WED_DATA_RING_BASE;
++		wed->wlan.wpdma_rx[0] = res->start + MT_RXQ_WED_DATA_RING_BASE;
+ 	}
+ 	wed->wlan.nbuf = MT7915_HW_TOKEN_SIZE;
+ 	wed->wlan.tx_tbit[0] = is_mt7915(&dev->mt76) ? 4 : 30;
+diff --git a/drivers/net/wireless/mediatek/mt76/mt7996/mmio.c b/drivers/net/wireless/mediatek/mt76/mt7996/mmio.c
+index 30b40f4a91be81d429d11f15036167396756d2dc..fb2428a9b877899a0a6fb879aba84e1f6e7840f2 100644
+--- a/drivers/net/wireless/mediatek/mt76/mt7996/mmio.c
++++ b/drivers/net/wireless/mediatek/mt76/mt7996/mmio.c
+@@ -503,9 +503,9 @@ int mt7996_mmio_wed_init(struct mt7996_dev *dev, void *pdev_ptr,
+ 		}
+ 
+ 		wed->wlan.wpdma_rx_glo = wed->wlan.phy_base + hif1_ofs + MT_WFDMA0_GLO_CFG;
+-		wed->wlan.wpdma_rx = wed->wlan.phy_base + hif1_ofs +
+-				     MT_RXQ_RING_BASE(MT7996_RXQ_BAND0) +
+-				     MT7996_RXQ_BAND0 * MT_RING_SIZE;
++		wed->wlan.wpdma_rx[0] = wed->wlan.phy_base + hif1_ofs +
++					MT_RXQ_RING_BASE(MT7996_RXQ_BAND0) +
++					MT7996_RXQ_BAND0 * MT_RING_SIZE;
+ 
+ 		wed->wlan.id = MT7996_DEVICE_ID_2;
+ 		wed->wlan.tx_tbit[0] = ffs(MT_INT_TX_DONE_BAND2) - 1;
+@@ -518,9 +518,9 @@ int mt7996_mmio_wed_init(struct mt7996_dev *dev, void *pdev_ptr,
+ 
+ 		wed->wlan.wpdma_rx_glo = wed->wlan.phy_base + MT_WFDMA0_GLO_CFG;
+ 
+-		wed->wlan.wpdma_rx = wed->wlan.phy_base +
+-				     MT_RXQ_RING_BASE(MT7996_RXQ_BAND0) +
+-				     MT7996_RXQ_BAND0 * MT_RING_SIZE;
++		wed->wlan.wpdma_rx[0] = wed->wlan.phy_base +
++					MT_RXQ_RING_BASE(MT7996_RXQ_BAND0) +
++					MT7996_RXQ_BAND0 * MT_RING_SIZE;
+ 
+ 		wed->wlan.wpdma_rx_rro[0] = wed->wlan.phy_base +
+ 					    MT_RXQ_RING_BASE(MT7996_RXQ_RRO_BAND0) +
+diff --git a/include/linux/soc/mediatek/mtk_wed.h b/include/linux/soc/mediatek/mtk_wed.h
+index d8949a4ed0dc9d41b3364e85a21e15d258519c45..c4ff6bab176db1f51cd94ac4198df0caeb557df2 100644
+--- a/include/linux/soc/mediatek/mtk_wed.h
++++ b/include/linux/soc/mediatek/mtk_wed.h
+@@ -147,7 +147,7 @@ struct mtk_wed_device {
+ 		u32 wpdma_tx;
+ 		u32 wpdma_txfree;
+ 		u32 wpdma_rx_glo;
+-		u32 wpdma_rx;
++		u32 wpdma_rx[MTK_WED_RX_QUEUES];
+ 		u32 wpdma_rx_rro[MTK_WED_RX_QUEUES];
+ 		u32 wpdma_rx_pg;
+ 
 
-I can understand that very well. I tried hard to split up the dibs layer implementation
-into consumable pieces, while preserving the functionality of smc-d, ism and loopback at
-each intermediate step, so it is always bisectable.
+---
+base-commit: 37816488247ddddbc3de113c78c83572274b1e2e
+change-id: 20250718-mt7992-wed-support-456a50d51f81
 
-I know this patch  "[RFC net-next 10/17] net/dibs: Define dibs_client_ops and dibs_dev_ops"
-and "[RFC net-next 16/17] net/dibs: Move data path to dibs layer" are rather large, but I
-could not find a way to split them up without temporarily breaking functionality.
-If you have any ideas, please let me know.
-
-You write:
-> Maybe put the small parts in the front and the final one in the last
-I am not sure I understand, what exactly you have in mind here. Are you asking
-for even larger patches?
-
-> I may need more time to review these.
-FYI: I will be on vacation the last 2 weeks of August.
-Would you rather have an RFC v2 this week with all the changes, I made so far?
-Or would you prefer that you continue reviewing this RFC and I send a new version
-in the first week of September?
+Best regards,
+-- 
+Lorenzo Bianconi <lorenzo@kernel.org>
 
 
