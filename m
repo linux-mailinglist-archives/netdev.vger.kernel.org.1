@@ -1,224 +1,168 @@
-Return-Path: <netdev+bounces-212778-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212776-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58AE3B21E3E
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 08:26:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E6A3B21E09
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 08:14:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 08B9462617E
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 06:26:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E3CA18814F2
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 06:14:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D78652D77F7;
-	Tue, 12 Aug 2025 06:25:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB2412D239A;
+	Tue, 12 Aug 2025 06:14:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="QJsSR8+m"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="mQ8E5sVQ";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="iAFaJaNx";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="mQ8E5sVQ";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="iAFaJaNx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f225.google.com (mail-pg1-f225.google.com [209.85.215.225])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B1B32D47F6
-	for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 06:25:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.225
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F5D124DCF7
+	for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 06:14:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754979959; cv=none; b=SWLkc253Oka/ITqLpS5oxCPeqlsIYMG30bZ5juEX4ZzHvDbyT0gR35bS8giyJOHCQ/k92ur2d2E/GwJFAwPGzR6R+mDIDsXSXwlVV0wo+kfG4HIFEkX7VTjisvKOPxRK7uJPhwmaH6nIQE7jPPJK7vP6p9rafXOKhviErz2Ugik=
+	t=1754979252; cv=none; b=BjeRIvaLtsHS+TgIk9IWd3RK0hZVCwIcbenzL9DR2I4WSQvLxeksH5Zur9uDO/gPFAu1kJ54bY3E9tOhGiWhp0ZmqmzTfNLhCIvFfx2lxC8EuiLLzFNPIQ+6qdMi12WfcYZDSKb6EP6eRaLxwVowpbM1vwkkyLQFTYqQ3pG9M2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754979959; c=relaxed/simple;
-	bh=JwoVUph7JdF+eUAGcD2R4C4BHZniihsGUMw3tU+0Hjk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Acm4l6MNaeKymSwBEQ20Za5D75O0kQTbR6hsT5N99NiJQZYSqJ/nOi43ImpscfzOMn64ebBjCVoA0NDT86XTKPLWExfyfba5HY+QhIYJ6Z/5Y8iiLcckL80jUu1hC4bvP207jLW61KcSq1B2FzpIt1gRzpNLAb8TsEhM1Y5iDmY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=QJsSR8+m; arc=none smtp.client-ip=209.85.215.225
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pg1-f225.google.com with SMTP id 41be03b00d2f7-b2c4331c50eso3703756a12.3
-        for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 23:25:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754979957; x=1755584757;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:dkim-signature:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=efQ/Khh+wi0B0rIIu872y8FB8xkosRs89Ye5o6WmuwM=;
-        b=WBc4BlHfwwkRKcds6dJwCbaBk8Q5vgyJuBN6zWJB8UQjGJ+fDPRzxd7pvQX/bMHuS/
-         XbYALxSo4Hls1V+FH7sKLEXrCKCuo2v2K0nbfdL/QC6Wj4/K3hlnbrSrFCK6WNMrB3gv
-         rhSmRPoxzdVAc35Kwny4x6jweUsfFy4yEKzvjA8BiHiWU5r4CyBCp7a6O4zBCarS33bO
-         oUZ6+ck3Qw7CtX33DbFvblWLPkxePf5nBcoL9epNAQd7z49HtOKIUU6oq+0Z+4QylNQ/
-         4UIRfw6dilo/TgdlId5SAcOxdViNSEFmHp/vwbObgcrlUQStS4FatwygRftt6DeXH75d
-         hRyw==
-X-Forwarded-Encrypted: i=1; AJvYcCUFhc2gxlk0FQvGnAw3tiFMJLmXQhRG4FgdEVH53RyMC4S5jjV1bwdcR+toXpkWoTm207CXwG4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz4PJo5iiA/7X37QP2aDN1eFX5PxedIpVN5KCWzywbpC1yMXkPh
-	g8J0KgMIMDK19sPs6S8PAZtfnXQW1nk4BKA+NOmoFlZ+SftrfuXGXZ/py9vLIGccJ6J0/3gA2SP
-	y4WKZnuA1hIuhDNDXvxK4pU83M0529lCIDiHCoqDPU/DDRb1B+VSZF+nKHnrhdFPZCeDaOrKgm0
-	s0jS8/kAtsudFkWfyk2ztABCJOIWOhq3hcAVx+e12YYC7Shr+6oNoA7HMUDZa+92RwpBvBUJd1q
-	FLOKUtHefc9B0GBmA==
-X-Gm-Gg: ASbGncu24AsH5kbz2vCYpo24/r9C+IHM1CWpjTdSIQ2RAaqOmcQuBo2h79AdZS5LzJ7
-	mi0WssIh9+YYH0w1GCBlAs4zw7m8DMmb/512DBXQK8ASRmhowvZVKRhgMWeuzuYlzRuPUPiLqRM
-	yJJkXIcvGIxd7mK++tq1ubcRI7/5lIRJYGF/pBWE7zu649UebUQOGUQHW6ihq1bTKZZp2CfZqIU
-	QBL4T1Ab+W79wXgEYYZhqCOlH9oEj+e/NXukBXhkVbs/afjpp3wZUx7zoqxBEGafgEE5Y3HTN05
-	QvUAnjp+TOxQ4b3mgK1NsnCYoA0wNmOWNWovAfnsvo4DjISVKO9l2HLPIjwHnOo+5HnXf6mzVo5
-	PMNlRqeRJ3wFKh//WRGq2AFPR8+6KjStWUyq7mqy7OIiTjviwlMiOmKxspaJsLx+wnjGDFClgCP
-	R4
-X-Google-Smtp-Source: AGHT+IHzhyxFOm1JGWfSqCRnAQLxijz76Swwx4W4WYwfprei0NjstbnIfVND8szpG5wjkAJursYjxDg9KQmr
-X-Received: by 2002:a17:903:247:b0:23f:f065:f2be with SMTP id d9443c01a7336-242fc317779mr30255895ad.26.1754979957438;
-        Mon, 11 Aug 2025 23:25:57 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-0.dlp.protect.broadcom.com. [144.49.247.0])
-        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2429ce702casm9338155ad.35.2025.08.11.23.25.56
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 11 Aug 2025 23:25:57 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-242fe34add1so5125565ad.3
-        for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 23:25:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1754979956; x=1755584756; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=efQ/Khh+wi0B0rIIu872y8FB8xkosRs89Ye5o6WmuwM=;
-        b=QJsSR8+mK50HbIV2kqKWlPi/pEbTvhnCU0996GgI+pgIm/tBeZkQYG2Mp6Uf1cbOin
-         BlO5CpvOX9G/fakcXK2TwqxocxNcSrboUIWj4gV/lsSCALYzXTc15jOERQ9iS8rLvxwq
-         QL9YU5CxQVihWU2NH1p983cdnt3pQo8oO1qlo=
-X-Forwarded-Encrypted: i=1; AJvYcCXPmUA+WarctnV50hmW0k2seTrnfGmdHoJlvi8wDkKBgZannuHXMogY9DawHQ9NqUd/ahSgBVE=@vger.kernel.org
-X-Received: by 2002:a17:902:f70c:b0:240:3f39:2c73 with SMTP id d9443c01a7336-242fc0eeffamr33535245ad.0.1754979955626;
-        Mon, 11 Aug 2025 23:25:55 -0700 (PDT)
-X-Received: by 2002:a17:902:f70c:b0:240:3f39:2c73 with SMTP id d9443c01a7336-242fc0eeffamr33534825ad.0.1754979955053;
-        Mon, 11 Aug 2025 23:25:55 -0700 (PDT)
-Received: from shivania.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-241e8aa9257sm291805895ad.153.2025.08.11.23.25.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Aug 2025 23:25:54 -0700 (PDT)
-From: Shivani Agarwal <shivani.agarwal@broadcom.com>
-To: stable@vger.kernel.org,
-	gregkh@linuxfoundation.org
-Cc: bcm-kernel-feedback-list@broadcom.com,
-	linux-kernel@vger.kernel.org,
-	ajay.kaher@broadcom.com,
-	alexey.makhalov@broadcom.com,
-	tapas.kundu@broadcom.com,
-	zyjzyj2000@gmail.com,
-	jgg@ziepe.ca,
-	leon@kernel.org,
-	richardcochran@gmail.com,
-	monis@mellanox.com,
-	kamalh@mellanox.com,
-	haggaie@mellanox.com,
-	amirv@mellanox.com,
-	dledford@redhat.com,
-	linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Leon Romanovsky <leonro@nvidia.com>,
-	Jason Gunthorpe <jgg@nvidia.com>,
-	Sasha Levin <sashal@kernel.org>,
-	Shivani Agarwal <shivani.agarwal@broadcom.com>
-Subject: [PATCH v5.10] RDMA/rxe: Return CQE error if invalid lkey was supplied
-Date: Mon, 11 Aug 2025 23:12:31 -0700
-Message-Id: <20250812061231.149309-1-shivani.agarwal@broadcom.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1754979252; c=relaxed/simple;
+	bh=AuvZlfgJm/luzwRGNzGdROw++QyfF6nkWXGdj7yqjw8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RE2hBRXLmVNPvLU+q3lMTAUnxUcc45Et5gWf2VzC3DL6zQNlWZH3dQG5b0TvEbx0Ti3we0IDLLdskezTHkz93PjzsAmkvak9+/svNTceiYUtl95PcKr6VFSZV7QW4B/LxEk81rR2NBfTFk1DgybjWs4r1Gha4eqRIcCctEcL8ro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=mQ8E5sVQ; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=iAFaJaNx; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=mQ8E5sVQ; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=iAFaJaNx; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 4B5C021D1A;
+	Tue, 12 Aug 2025 06:14:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1754979248; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AuvZlfgJm/luzwRGNzGdROw++QyfF6nkWXGdj7yqjw8=;
+	b=mQ8E5sVQrpTZk52ITSsp0AYh1ikV9sgODSSGEfURYiCpd/6VO+1wX0gEj6XgaOSPHoizK3
+	qKUfQgzgCAW0+waxqWFQ0WBTwjzj3EYvlzUFAZsmeledatyRqYuDSMjGlTM+/Mi0ShCcN1
+	oQdak9/vXqi0P3dbLR3oE9XH201xOv0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1754979248;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AuvZlfgJm/luzwRGNzGdROw++QyfF6nkWXGdj7yqjw8=;
+	b=iAFaJaNxOMZe3LJg5GWNqoAZ4Cc680LvKsVVrDmlPvLPeclICKWT0J1rhfIH/U2CRvQnwP
+	LmhjQVVcv++16XDw==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1754979248; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AuvZlfgJm/luzwRGNzGdROw++QyfF6nkWXGdj7yqjw8=;
+	b=mQ8E5sVQrpTZk52ITSsp0AYh1ikV9sgODSSGEfURYiCpd/6VO+1wX0gEj6XgaOSPHoizK3
+	qKUfQgzgCAW0+waxqWFQ0WBTwjzj3EYvlzUFAZsmeledatyRqYuDSMjGlTM+/Mi0ShCcN1
+	oQdak9/vXqi0P3dbLR3oE9XH201xOv0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1754979248;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AuvZlfgJm/luzwRGNzGdROw++QyfF6nkWXGdj7yqjw8=;
+	b=iAFaJaNxOMZe3LJg5GWNqoAZ4Cc680LvKsVVrDmlPvLPeclICKWT0J1rhfIH/U2CRvQnwP
+	LmhjQVVcv++16XDw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 23E4D1351A;
+	Tue, 12 Aug 2025 06:14:08 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id B7uyB7DbmmhHRAAAD6G6ig
+	(envelope-from <mkubecek@suse.cz>); Tue, 12 Aug 2025 06:14:08 +0000
+Date: Tue, 12 Aug 2025 08:14:06 +0200
+From: Michal Kubecek <mkubecek@suse.cz>
+To: Salvatore Bonaccorso <carnil@debian.org>
+Cc: Michel Lind <michel@michel-slm.name>, netdev@vger.kernel.org, 
+	Jakub Kicinski <kuba@kernel.org>
+Subject: Re: [PATCH ethtool] netlink: fix print_string when the value is NULL
+Message-ID: <z3f7fvab4q3i6aqu23iotjoyrahqxi6aegup7dmfoeoahf6dig@pmvwehb7d4fm>
+References: <aILUS-BlVm5tubAF@maurice.local>
+ <lwicuyi63qrip45nfwhifujhgtravqojbv4sud5acdqpmn7tpi@7ghj23b3hhdx>
+ <aJhG0geDvJ4a8CpS@eldamar.lan>
+ <b6unuycjddzrl55q3gwtki2rmm2ituknbmgwpuorgten5xr65w@w4dnhvf6mkoa>
+ <aJpRSuCpo37TCLZZ@eldamar.lan>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="ibpuypyjowvmhk6s"
+Content-Disposition: inline
+In-Reply-To: <aJpRSuCpo37TCLZZ@eldamar.lan>
+X-Spam-Level: 
+X-Spamd-Result: default: False [-5.90 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	SIGNED_PGP(-2.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	NEURAL_HAM_SHORT(-0.20)[-0.999];
+	ARC_NA(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	RCPT_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo]
+X-Spam-Flag: NO
+X-Spam-Score: -5.90
 
-From: Leon Romanovsky <leonro@nvidia.com>
 
-[ Upstream commit dc07628bd2bbc1da768e265192c28ebd301f509d ]
+--ibpuypyjowvmhk6s
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-RXE is missing update of WQE status in LOCAL_WRITE failures.  This caused
-the following kernel panic if someone sent an atomic operation with an
-explicitly wrong lkey.
+Dne Mon, Aug 11, 2025 at 10:23:38PM GMT, Salvatore Bonaccorso napsal:
+> No not urgent, but I hit the same issue when preparing 6.14.2 for
+> Debian trixie. But I can equally just cherry-pick the commit locally
+> and then drop it once 6.14.3 is released.
+>=20
+> So really no hurry about that.
 
-[leonro@vm ~]$ mkt test
-test_atomic_invalid_lkey (tests.test_atomic.AtomicTest) ...
- WARNING: CPU: 5 PID: 263 at drivers/infiniband/sw/rxe/rxe_comp.c:740 rxe_completer+0x1a6d/0x2e30 [rdma_rxe]
- Modules linked in: crc32_generic rdma_rxe ip6_udp_tunnel udp_tunnel rdma_ucm rdma_cm ib_umad ib_ipoib iw_cm ib_cm mlx5_ib ib_uverbs ib_core mlx5_core ptp pps_core
- CPU: 5 PID: 263 Comm: python3 Not tainted 5.13.0-rc1+ #2936
- Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.13.0-0-gf21b5a4aeb02-prebuilt.qemu.org 04/01/2014
- RIP: 0010:rxe_completer+0x1a6d/0x2e30 [rdma_rxe]
- Code: 03 0f 8e 65 0e 00 00 3b 93 10 06 00 00 0f 84 82 0a 00 00 4c 89 ff 4c 89 44 24 38 e8 2d 74 a9 e1 4c 8b 44 24 38 e9 1c f5 ff ff <0f> 0b e9 0c e8 ff ff b8 05 00 00 00 41 bf 05 00 00 00 e9 ab e7 ff
- RSP: 0018:ffff8880158af090 EFLAGS: 00010246
- RAX: 0000000000000000 RBX: ffff888016a78000 RCX: ffffffffa0cf1652
- RDX: 1ffff9200004b442 RSI: 0000000000000004 RDI: ffffc9000025a210
- RBP: dffffc0000000000 R08: 00000000ffffffea R09: ffff88801617740b
- R10: ffffed1002c2ee81 R11: 0000000000000007 R12: ffff88800f3b63e8
- R13: ffff888016a78008 R14: ffffc9000025a180 R15: 000000000000000c
- FS:  00007f88b622a740(0000) GS:ffff88806d540000(0000) knlGS:0000000000000000
- CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
- CR2: 00007f88b5a1fa10 CR3: 000000000d848004 CR4: 0000000000370ea0
- DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
- DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
- Call Trace:
-  rxe_do_task+0x130/0x230 [rdma_rxe]
-  rxe_rcv+0xb11/0x1df0 [rdma_rxe]
-  rxe_loopback+0x157/0x1e0 [rdma_rxe]
-  rxe_responder+0x5532/0x7620 [rdma_rxe]
-  rxe_do_task+0x130/0x230 [rdma_rxe]
-  rxe_rcv+0x9c8/0x1df0 [rdma_rxe]
-  rxe_loopback+0x157/0x1e0 [rdma_rxe]
-  rxe_requester+0x1efd/0x58c0 [rdma_rxe]
-  rxe_do_task+0x130/0x230 [rdma_rxe]
-  rxe_post_send+0x998/0x1860 [rdma_rxe]
-  ib_uverbs_post_send+0xd5f/0x1220 [ib_uverbs]
-  ib_uverbs_write+0x847/0xc80 [ib_uverbs]
-  vfs_write+0x1c5/0x840
-  ksys_write+0x176/0x1d0
-  do_syscall_64+0x3f/0x80
-  entry_SYSCALL_64_after_hwframe+0x44/0xae
+OK, I'll release 6.14.3 on Friday when I'm back home and can do it from
+my desktop which will be a bit easier.
 
-Fixes: 8700e3e7c485 ("Soft RoCE driver")
-Link: https://lore.kernel.org/r/11e7b553f3a6f5371c6bb3f57c494bb52b88af99.1620711734.git.leonro@nvidia.com
-Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-Acked-by: Zhu Yanjun <zyjzyj2000@gmail.com>
-Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
-[Shivani: Modified to apply on 5.10.y]
-Signed-off-by: Shivani Agarwal <shivani.agarwal@broadcom.com>
----
- drivers/infiniband/sw/rxe/rxe_comp.c | 16 ++++++++++------
- 1 file changed, 10 insertions(+), 6 deletions(-)
+Michal
 
-diff --git a/drivers/infiniband/sw/rxe/rxe_comp.c b/drivers/infiniband/sw/rxe/rxe_comp.c
-index a54d80004342..b7645de067f3 100644
---- a/drivers/infiniband/sw/rxe/rxe_comp.c
-+++ b/drivers/infiniband/sw/rxe/rxe_comp.c
-@@ -346,13 +346,15 @@ static inline enum comp_state do_read(struct rxe_qp *qp,
- 	ret = copy_data(qp->pd, IB_ACCESS_LOCAL_WRITE,
- 			&wqe->dma, payload_addr(pkt),
- 			payload_size(pkt), to_mem_obj, NULL);
--	if (ret)
-+	if (ret) {
-+		wqe->status = IB_WC_LOC_PROT_ERR;
- 		return COMPST_ERROR;
-+	}
- 
- 	if (wqe->dma.resid == 0 && (pkt->mask & RXE_END_MASK))
- 		return COMPST_COMP_ACK;
--	else
--		return COMPST_UPDATE_COMP;
-+
-+	return COMPST_UPDATE_COMP;
- }
- 
- static inline enum comp_state do_atomic(struct rxe_qp *qp,
-@@ -366,10 +368,12 @@ static inline enum comp_state do_atomic(struct rxe_qp *qp,
- 	ret = copy_data(qp->pd, IB_ACCESS_LOCAL_WRITE,
- 			&wqe->dma, &atomic_orig,
- 			sizeof(u64), to_mem_obj, NULL);
--	if (ret)
-+	if (ret) {
-+		wqe->status = IB_WC_LOC_PROT_ERR;
- 		return COMPST_ERROR;
--	else
--		return COMPST_COMP_ACK;
-+	}
-+
-+	return COMPST_COMP_ACK;
- }
- 
- static void make_send_cqe(struct rxe_qp *qp, struct rxe_send_wqe *wqe,
--- 
-2.40.4
+--ibpuypyjowvmhk6s
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCAAdFiEEWN3j3bieVmp26mKO538sG/LRdpUFAmia26cACgkQ538sG/LR
+dpWOlwgAmS3GYLexRZLULjFbOiDlJSo72esllzSboioQVrrsLnwPhYK9YWE3NDsF
+wQ02PqCYkL0Ty6gWQQUH7YbthaSFWR8J68DpwQNi/0nPjhS0w3ZhbApBblYM0oZZ
+qjsSmluK+5OlYoOdb5KLBkjPB9ngBFXyTrNQnDjGy1NP8oec+oTJTXb1rCiNth9d
+zJKEPIeptM83MT4wX663Je8YZSTUPPvzjZahCtARR/cbAJYRVFGjdCI4uQuNTZ4j
+2hVCq2VngtcKyCZLZ+uh0n6AM6YePizBMCIW8fPQAAPePvhUQ3aAipK6SuJEONkE
+/nzU6VZc7Gu9bPKH1+GVK0i2SFkVJA==
+=hmvW
+-----END PGP SIGNATURE-----
+
+--ibpuypyjowvmhk6s--
 
