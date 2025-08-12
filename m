@@ -1,92 +1,123 @@
-Return-Path: <netdev+bounces-212840-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212841-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BD14B223A9
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 11:48:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1804B223D1
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 11:57:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A60FA504BD0
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 09:48:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4CB21507D01
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 09:56:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99D252EA168;
-	Tue, 12 Aug 2025 09:48:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 533AA2EAB72;
+	Tue, 12 Aug 2025 09:56:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DxyiJVIS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FF3F2EA161
-	for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 09:48:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24DB32E92C7
+	for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 09:56:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754992088; cv=none; b=RpZ9M0eGr/6qjoQwTTQa2hP0XDeJn04B6+0S3OaJJeUveePN+vTqN9cLnEXwRrtboo0rBfrBefXPmuaZLRBd4CQ4rpEX2f+T10r+H9GkFoG2Cca48aWqavat/0g4cut7kuZWb862SiQG3bwo8SKAuve/5JKedE6Y/E24Ownygok=
+	t=1754992569; cv=none; b=TGihHQbQlwLgeNBb8oFwM+amjeAYZVlmJFU+LiN+OqJXOKf+qibYo7zKr+JOIrDn2fJfEUZkYhAgphu78u7AeIJJv/m0OrjIXfSuBjrczgckN1hiM4pY0x8W4O0TmPdTPuFv1m+rO+0W0DDem17v7Nep6fN/NlEDEd8Zkw0CmpI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754992088; c=relaxed/simple;
-	bh=tgMF8HuU+iL/6Y55dy6ba5v8RvxSKr6oTJYUTWCzqHs=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=kIz5OBWoIEyR7ABhy4MRM855flKGMRvdFoUGEW0z0rGdvD3qkvJvJiAQ8v+63dBNKbXsj+pWpwls49O/dBn0Q+fKHleFfQBoRO72mr/momOUBHDyTsrKOY7FZSWOU2kDT4g7Eu3t/ukh8XVNi3rgbwP/RA0qU6rZGrRatv61CLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-86463467dddso534016139f.3
-        for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 02:48:06 -0700 (PDT)
+	s=arc-20240116; t=1754992569; c=relaxed/simple;
+	bh=HWb3xi23hSoBArVmr8OBU1OUlFYK/4KX8UidlJ/V7tw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TP/093E3lHpfGaYW0+LJNKYTxNQKiXoN3w75wkWu4yn5PGcLU5Ylee6MF9vZ119NCvaMT3syykov3G0K8LZZT/3LlbYwd3ncr8jDCyTmuHAd+TiKvLcuJO3tHtPvRR8ZFh868N0tFUUPdMNw0cKVx9hnDnQ+0Yf6VPxL2g2gvRs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DxyiJVIS; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1754992565;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dcroCdbDdLAJtbYY5wsUtVmzj5oZXmeQISjQCT4Dk2o=;
+	b=DxyiJVISkTztys/xfImxpy075tSj+a25iDPOt1esnn7qhq67CCpPoMKCpK3k/8insacH4c
+	3w3DsHEXh4AnCWJP+oZ6Y7FmI1TOT1XaGVYwPZ6yvFHEV4UjoW32C6z1IufhZAKK9Rsgmj
+	8u6pesqLm7E/mQsfYIyqBEzfwVkcGhY=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-463-W2SzE5SiP1OKAEquBOJs9w-1; Tue, 12 Aug 2025 05:56:03 -0400
+X-MC-Unique: W2SzE5SiP1OKAEquBOJs9w-1
+X-Mimecast-MFC-AGG-ID: W2SzE5SiP1OKAEquBOJs9w_1754992562
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-458f710f364so34898635e9.0
+        for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 02:56:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754992086; x=1755596886;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
+        d=1e100.net; s=20230601; t=1754992562; x=1755597362;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=23s4cMMxaWk/6h2mIsslFjC/yj0rjYz/dHBx5jBiKdk=;
-        b=JcADegOtDJHkmsRAGiIrgFt6mzPYN3s58KJlW4yS0cTZO8h1PbsSkE93dbm6IrDee2
-         0TemoXwnHxI3UM2gFijW7PMuOqNxEaudYxOI2IZXip4Q93qJnn9RBkSnpSnIE21RLaFT
-         d1OXU/VzPH9U2m92QOqQI906xeRN3RISbm8FwASrGk97oUr/73H9RWGenRmTouUcoUP8
-         qvj4f5tWNhHfxHH/DI07mn6qNwUue91pY0/N6mt64b3g2WJ71ATSR13NoeHYNskAoMkp
-         nDjTVLq7c4gXteuTHazXNVewYuyy8IT8WGbSXJexz/KfKyd3LPiWyXDXR+PBG4w3KFAj
-         ucHg==
-X-Forwarded-Encrypted: i=1; AJvYcCWJl0duZHMSPcYTnPz+k5LT4KioMaqsucLdXtIiBOZ53b1aeBT4oSFiIXJtbM6F2vcpO1Ck464=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzV+x74tIiqfMgC3+xPsIZu0v6Ze4L5FKk55zmKYB/b7MwIlB2a
-	GVFf1v/tRoeyWa5r2TH5WkUhuRxsdmz+f2I2HGbz5aOUiPp692bJA7LusFzfZ8YKviSkhBufgdX
-	T8Nvc+pQ3N9CpMEJfJB8sgIi1Bk1/9hP/kIQw5syjIqmwfLSmtHlpsbsffm8=
-X-Google-Smtp-Source: AGHT+IG3SLQLj7KxZZEj1GNTliTbrGRu9ikWa+/cuwM6xZfm+k+wklil9CcAWSa+9Q7XgA8ywVi7c7dtP5+lK+hEKORoB3z1DYwc
+        bh=dcroCdbDdLAJtbYY5wsUtVmzj5oZXmeQISjQCT4Dk2o=;
+        b=Fql1EPh8Z7ej6XMS4oLrTAbQztFtxw6Hm/VS/uIYDYjWiGRHSWrMdI/PBp6ebPbJlO
+         s6LcpbldVR31THUMAFM6/ARE0QjDeXF5BWvqCX7RMOx1G6pYUIojZjtmmeFZAFvIjEKO
+         5StoTUU6jhqzKPAqKmgCZzJpikcHeEdiheh2Rs/FM0jnAFnpFbV8FWWnA1QLh2vURO44
+         wqra6h6ljq7Yu2sWYzE168DXZSKmMS8hesJwtopp2Gu44I2iGSpU9bWgMfPa7qHf8e+9
+         NhoNC1Zh+imeQmYYvaS4GtAZdtltdb9J/49J4LwHwUoS9aiWiKrfoSykbO2iaMAHkue5
+         ntZg==
+X-Gm-Message-State: AOJu0YzsT2Hc4hzoYQevCHJIqsfw/sdplSdx9jadHc6E50tNBTLqycAi
+	YhRvQd4YsRFjwyU9rF2ocMjRIA//9p4O2zXlOZlEBZNZf72+Xd02Opl3C6gxRwNqPY+U3DBiPJs
+	B1GE97ETaSjsmQgCz5uQ55aPPr779LkWLaUxo6wtZqa8FxilB5b3z0/+y6A==
+X-Gm-Gg: ASbGncsmW5Ks6zYeZ7cjJWg2Mw3qm3QglY4vZGABW065732CVB+H3xKENiK2Yw0RZ36
+	Yl7fwTR2t854Hyh9XzJXPPmsIXL1o4qriqoqHUAyvWxkMjQmNs56ghWoUthbBvPS95PVyuNHFvE
+	/ne+o7eLInebay4UlfSJUh4CfgZ950VLzXw7ImuCZ+0sQZdO9WKZZ37PxCGMIT4FfE8TwR0G24V
+	zd4lYm1Vs/jjHK5x0VX5LwRipuyrVQKuRaXCxorbwlIw5lMdnJeDjGAq1zqomsC2SXVUqPZRbiM
+	Jg6uU5xBneC9woQEEzrhZlpKDlO4px/qwoARdXw8UoI=
+X-Received: by 2002:a05:600c:b99:b0:459:e20e:be2f with SMTP id 5b1f17b1804b1-45a10baf6ecmr26694045e9.14.1754992562231;
+        Tue, 12 Aug 2025 02:56:02 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IENRzAL/VjP3UDkzezzv7O+gqQzDoC3ydmDX+MYqXmh2wK5sVfHxPNITbIdTaggEZYdNUateQ==
+X-Received: by 2002:a05:600c:b99:b0:459:e20e:be2f with SMTP id 5b1f17b1804b1-45a10baf6ecmr26693745e9.14.1754992561823;
+        Tue, 12 Aug 2025 02:56:01 -0700 (PDT)
+Received: from [192.168.0.115] ([212.105.149.252])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b79c4534b3sm43629578f8f.47.2025.08.12.02.56.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 12 Aug 2025 02:56:01 -0700 (PDT)
+Message-ID: <a45afc9e-f508-4f87-9462-112f3439f110@redhat.com>
+Date: Tue, 12 Aug 2025 11:55:59 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:1546:b0:881:8979:93f4 with SMTP id
- ca18e2360f4ac-883f127fca5mr3181687939f.14.1754992085862; Tue, 12 Aug 2025
- 02:48:05 -0700 (PDT)
-Date: Tue, 12 Aug 2025 02:48:05 -0700
-In-Reply-To: <20250812052537-mutt-send-email-mst@kernel.org>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <689b0dd5.050a0220.7f033.0119.GAE@google.com>
-Subject: Re: [syzbot] [kvm?] [net?] [virt?] WARNING in virtio_transport_send_pkt_info
-From: syzbot <syzbot+b4d960daf7a3c7c2b7b1@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, eperezma@redhat.com, 
-	horms@kernel.org, jasowang@redhat.com, kuba@kernel.org, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, mst@redhat.com, netdev@vger.kernel.org, 
-	pabeni@redhat.com, sgarzare@redhat.com, stefanha@redhat.com, 
-	syzkaller-bugs@googlegroups.com, virtualization@lists.linux.dev, 
-	xuanzhuo@linux.alibaba.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2] phy: mscc: Fix timestamping for vsc8584
+To: Horatiu Vultur <horatiu.vultur@microchip.com>, andrew@lunn.ch,
+ hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, richardcochran@gmail.com,
+ viro@zeniv.linux.org.uk, atenart@kernel.org, quentin.schulz@bootlin.com,
+ olteanv@gmail.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250806054605.3230782-1-horatiu.vultur@microchip.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250806054605.3230782-1-horatiu.vultur@microchip.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello,
+On 8/6/25 7:46 AM, Horatiu Vultur wrote:
+> @@ -1567,6 +1592,7 @@ int vsc8584_ptp_probe(struct phy_device *phydev)
+>  
+>  	mutex_init(&vsc8531->phc_lock);
+>  	mutex_init(&vsc8531->ts_lock);
+> +	skb_queue_head_init(&vsc8531->rx_skbs_list);
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
+The aux work is cancelled by ptp_clock_unregister(), meaning the
+`rx_skbs_list` could be left untouched if the unreg happens while the
+work is scheduled but not running yet, casing memory leaks.
 
-Reported-by: syzbot+b4d960daf7a3c7c2b7b1@syzkaller.appspotmail.com
-Tested-by: syzbot+b4d960daf7a3c7c2b7b1@syzkaller.appspotmail.com
+It's not obvious to me where/how ptp_clock_unregister() is called, as
+AFAICS the vsc85xxx phy driver lacks the 'remove' op. In any case I
+think you need to explicitly flushing the rx_skbs_list list on removal.
 
-Tested on:
+Thanks,
 
-commit:         8ca76151 vsock/virtio: Rename virtio_vsock_skb_rx_put()
-git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
-console output: https://syzkaller.appspot.com/x/log.txt?x=15d54af0580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=84141250092a114f
-dashboard link: https://syzkaller.appspot.com/bug?extid=b4d960daf7a3c7c2b7b1
-compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+Paolo
 
-Note: no patches were applied.
-Note: testing is done by a robot and is best-effort only.
 
