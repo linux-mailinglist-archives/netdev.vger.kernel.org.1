@@ -1,101 +1,120 @@
-Return-Path: <netdev+bounces-213076-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213077-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1F33B2340B
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 20:35:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B41DB2341A
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 20:36:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A72343A7071
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 18:31:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A13C2179424
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 18:32:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BDA12EE5E8;
-	Tue, 12 Aug 2025 18:31:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AA912F4A0A;
+	Tue, 12 Aug 2025 18:32:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b="LP8EWMdQ"
+	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="ZHR/dzBb"
 X-Original-To: netdev@vger.kernel.org
-Received: from ms.lwn.net (ms.lwn.net [45.79.88.28])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FBE81EF38C;
-	Tue, 12 Aug 2025 18:31:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.79.88.28
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2CFB61FFE
+	for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 18:32:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755023473; cv=none; b=QUABkWByuk9uFOpJP4ASnzNGSlND3VIEiLK+lI+guVqzUg4D4TgMo5ifWspdqg7H47vsU4JkcDAxjoroW0at7uUmdjY5ebl4SV79X7bhit5VPYuOsfMrBAfVF1I85ctx7rVrtYdc4O6EOWqBpsja/R3S0rAzHSWLND/TD0yEFPU=
+	t=1755023533; cv=none; b=Ras8KIznf898nOr9vnn2yVGt1cuTlD1uUwr2ojOWHHLroLwZIL+INYgKumCHscFrkELvlhBCkk3qtxgaX5qN6s3klL/YCllO6ynvlI3GX0dNiSUaEDXJGVuyhOksBH7KkwGaSBN6dE13GEEQJzLaHmoGfIXGZfNa1G9prQtI/f8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755023473; c=relaxed/simple;
-	bh=VYEh2U+HozjubzC2hkNUllG0x1AMyWF47DIDyoFwjKo=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=eTu0cMPsqyDAIHVbiNm3Mmv/0fCQaJSOOKesHNQh7R2l0qMr2rS7/NEM+EuRp4W9rNcqMkTUeZkw+mrJ6Ox9jKNB/o+xJ3ObnRNFLdDMTMxqjTFT5RY6DGKtx7t3k79cSGBqmMilY+QDa389G1X/wDf1Fgwdl/KK2Wh6/EF4Ipc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net; spf=pass smtp.mailfrom=lwn.net; dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b=LP8EWMdQ; arc=none smtp.client-ip=45.79.88.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lwn.net
-DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 9338C40AD9
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
-	t=1755023464; bh=Pc+Sy5s3UxH6RxvOOBqHHymFZRkVWMaCuaEcOu5B17k=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=LP8EWMdQ19YVqACm/1vbJGHvip6CRo5BsdM0VdGFyoguvggipnqqXgExOE+Nj1UUQ
-	 8lco9QQiyrH2CgbV1W1sMs4O8nhI+aVaVxmJVVYQvuHD2US2ZEh1gG02b1wr+rZEyF
-	 uwZUPBl7/E4lCKzQnO+7tvR9MNCHU96JKbugULYrv7nBH68UxMVx3rJvFtN9isHlHO
-	 yg20a5+vR8pSzbJoiuXrjGCG5dJRaYu9M3QRgJRAPt37Czo/iNflOgNrWKszmI5V9W
-	 zo6H1uTYoSpmsFEscxPMzHud2gUa3maKtLzznnAHtf0okuZqcDrZkW7/lG8SL7dEvM
-	 xedj3Y9uurjdw==
-Received: from localhost (unknown [IPv6:2601:280:4600:2da9::1fe])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by ms.lwn.net (Postfix) with ESMTPSA id 9338C40AD9;
-	Tue, 12 Aug 2025 18:31:04 +0000 (UTC)
-From: Jonathan Corbet <corbet@lwn.net>
-To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>, Jakub Kicinski
- <kuba@kernel.org>
-Cc: EDAC Mailing List <linux-edac@vger.kernel.org>, Linux Kernel Mailing
- List <linux-kernel@vger.kernel.org>, Linux Doc Mailing List
- <linux-doc@vger.kernel.org>, linux-kernel@vger.kernel.org, Akira Yokosawa
- <akiyks@gmail.com>, "David S. Miller" <davem@davemloft.net>, Ignacio
- Encinas Rubio <ignacio@iencinas.com>, Marco Elver <elver@google.com>, Shuah
- Khan <skhan@linuxfoundation.org>, Donald Hunter <donald.hunter@gmail.com>,
- Eric Dumazet <edumazet@google.com>, Jan Stancek <jstancek@redhat.com>,
- Paolo Abeni <pabeni@redhat.com>, Ruben Wauters <rubenru09@aol.com>,
- joel@joelfernandes.org, linux-kernel-mentees@lists.linux.dev,
- lkmm@lists.linux.dev, netdev@vger.kernel.org, peterz@infradead.org,
- stern@rowland.harvard.edu, Breno Leitao <leitao@debian.org>, Randy Dunlap
- <rdunlap@infradead.org>, Simon Horman <horms@kernel.org>
-Subject: Re: [GIT PULL for v6.17-rc2] add a generic yaml parser integrated
- with Netlink specs generation
-In-Reply-To: <20250812113329.356c93c2@foz.lan>
-References: <20250812113329.356c93c2@foz.lan>
-Date: Tue, 12 Aug 2025 12:31:03 -0600
-Message-ID: <87h5ycfl3s.fsf@trenco.lwn.net>
+	s=arc-20240116; t=1755023533; c=relaxed/simple;
+	bh=i+zi1mckHFSs3/o6uZ08YJLPYCf+2Co1lbbh8aL603A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sIzKg14gbOb8phX82Ov3V/Ec+60M97TLfQzCG1inabkEFio93WZr07Sm/0x73SKg+gvwI11F1huJYfgwsk/yCIZIk/m80XdB62EyC4AFus2xEfizydMFttC5P/3EyMzkBdVx12B4aqi45pFX2uJXhFGUHI2CpBF48iiuwNvC9yc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=ZHR/dzBb; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-76bd050184bso7457326b3a.2
+        for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 11:32:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1755023531; x=1755628331; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lOzgIuE3vZOPdvH25fCuhzEe3nU6ZEctPzGHGhjilCo=;
+        b=ZHR/dzBb/pfA5F81bCrKQjQyvq9CPPVVe7qQB0KidiGXhT898wgNjOpPOEA4tgiUtN
+         YV9jVBpzfMIm/6/VgyRkAE3liwRmDqmeEl8/TjkXhYP5/FA4a5jDfQRvBFx2D/2PTW8q
+         M22wfLY0YZnsBrNkBejo3i9lwP4S/uZfvikdK5mv9fDbHFAJF+xkfJseXGD6fPujB6kq
+         e1HtcUJ5CG7wDwRLN/HAsf6e5wmiR4qMdXAESanvP8DK9WSBuqG1Pk+UdtFgW+43Klkg
+         gtkEFx0Q9jU3zUICzYPdHsHj9FFM6w5TD2vXdcgDHv6XzE5OUzef2SLxaWjDwO8WUl7M
+         TChA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755023531; x=1755628331;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lOzgIuE3vZOPdvH25fCuhzEe3nU6ZEctPzGHGhjilCo=;
+        b=gHo1+L58sW8GlYcV4uaESAVuYZQG3jylolhV1HtRgZoS9FyFj9nF9QpWAwWAoF6Awe
+         UklbOlRO736BP3EZcK85qK9M03FdjpCXF3ZDQkQntYQOFMs7IUAtAwpWrRNULnJDux1o
+         SEE5Yj5GINX6OK0LnMjNB1AQpvFArT15S0U80yMiT2wdmiCRq/au5rHZfuOFe+JUS90n
+         COtToV0RRHZI5CQTla3NnRfjU96bq6FJZRjAMNQLsFvGy78FkiI9X5ofKlPVwBdG/Ber
+         gc4S2FximJi43P+/8Utl78T53zLd2YJ8S60HI1yenD7CIT/SJHrsp0As60poYyjFMUGK
+         2FKw==
+X-Forwarded-Encrypted: i=1; AJvYcCW/WrKo+ZuNmVGprNsIUlZ7De6ZL1YVeizOAMXuJs0F3cHAfMdhryykr/qNhY1TFr+4iaALN6o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzWT7JT/2Gt5bpPkqCX/lF98MyHUD3Y0zg5rUVhWXKqiZPz+4QQ
+	qLRCGOaA+4pWZw7G9MFD7cOlfod/GUBbgyUvVKz31DeS4jD691gB6xHNRwSBPVcrEao=
+X-Gm-Gg: ASbGncsygKth65tKuAX4yYa52ksX/t5ILekyJqztCf9iMfJjhFj1TW5H8dLF4ZZ/HFV
+	3p/C3YkEEQrmLTcTjqYzATY2nMm3sJpnq42RcvtjMswSmLN5bTIWDbh3m4VzlbmV+eDZAAjd3w4
+	CoVUZtHVSZ0i3x77G+HKa5WVV8o6n6sLze+MPp7Jup14ZGVV59HRxBVARgl+sYaUo05TjpvMpsD
+	QsasSYToXaaMcxNmz14a3Q7KNhgSU7ynFsHjJhkLsuDFjLoPRbF8IK9qKxr4SgOfHkmu+9GXNZ7
+	eqAbxvt2LzRNniqoENdljzdU8Yy5la2daHAjveMEDpNcDrq+3OXiAut08qV8gZDE5TR2+p+nWXc
+	9ZD8D8F4eZVIsdp3CE7lP2Fl0FsNBNulKuF1ofy8s2XzI031lOvPU0eRtfoGGtnMaJqg3B78q
+X-Google-Smtp-Source: AGHT+IG2KrHol9nCUAM8optVcWimtea66eF9fSDyxy/8IWeLuAe1+k3ngYybgu7tvMo+ZayxFhdCUg==
+X-Received: by 2002:a05:6a00:1943:b0:76c:1c69:111c with SMTP id d2e1a72fcca58-76e20ce6422mr327789b3a.9.1755023531160;
+        Tue, 12 Aug 2025 11:32:11 -0700 (PDT)
+Received: from MacBook-Air.local (c-73-222-201-58.hsd1.ca.comcast.net. [73.222.201.58])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-76bccfcf5f7sm30033272b3a.88.2025.08.12.11.32.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Aug 2025 11:32:10 -0700 (PDT)
+Date: Tue, 12 Aug 2025 11:32:08 -0700
+From: Joe Damato <joe@dama.to>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	donald.hunter@gmail.com, michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com, willemdebruijn.kernel@gmail.com,
+	ecree.xilinx@gmail.com
+Subject: Re: [PATCH net-next v4 0/4] net: ethtool: support including Flow
+ Label in the flow hash for RSS
+Message-ID: <aJuIqMEZotLPCMLi@MacBook-Air.local>
+Mail-Followup-To: Joe Damato <joe@dama.to>,
+	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, horms@kernel.org, donald.hunter@gmail.com,
+	michael.chan@broadcom.com, pavan.chebbi@broadcom.com,
+	willemdebruijn.kernel@gmail.com, ecree.xilinx@gmail.com
+References: <20250811234212.580748-1-kuba@kernel.org>
+ <aJqNeO36UpQ5KFI-@MacBook-Air.local>
+ <20250811183805.087014a6@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250811183805.087014a6@kernel.org>
 
-Mauro Carvalho Chehab <mchehab+huawei@kernel.org> writes:
+On Mon, Aug 11, 2025 at 06:38:05PM -0700, Jakub Kicinski wrote:
+> On Mon, 11 Aug 2025 17:40:24 -0700 Joe Damato wrote:
+> > Do you think that the docs (Documentation/networking/scaling.rst) should be
+> > updated to mention this setting and the side effects of using it?
+> 
+> I like writing docs but this feels a little too complicated to describe
+> in a paragraph in scaling.rst. The rest of the content in that file is
+> relatively noob-friendly. Dunno..
 
-> Hi Jon/Jakub,
->
-> In case you both prefer to merge from a stable tag, please pull from:
->
-> 	git://git.kernel.org/pub/scm/linux/kernel/git/mchehab/linux-docs.git docs/v6.17-1
->
-> For:
->
-> - An YAML parser Sphinx plugin, integrated with Netlink YAML doc
->   parser.
-
-OK, I have done that.  I will note that it adds a warning:
-
-> Documentation/networking/netlink_spec/index.rst: WARNING: document isn't included in any toctree
-
-...it might be nice to get that straightened out.
-
-Thanks,
-
-jon
+That's fair; idk what the solution is... just seems like this is really
+interesting and useful work. It'd be unfortunate if there was no way (other
+than reading the code) for others to learn that it exists, understand what it
+does, and possibly use it. But maybe for "complicated" features reading the
+code is expected?
 
