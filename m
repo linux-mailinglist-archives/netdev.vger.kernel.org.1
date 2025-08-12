@@ -1,98 +1,103 @@
-Return-Path: <netdev+bounces-212863-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212864-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1E02B224C2
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 12:41:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C87A9B224C5
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 12:43:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D0F31B63C33
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 10:40:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 16AA41B62325
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 10:44:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95B312ECD08;
-	Tue, 12 Aug 2025 10:39:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B8b/53IB"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 417FD2E03F2;
+	Tue, 12 Aug 2025 10:43:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68F362ECD03;
-	Tue, 12 Aug 2025 10:39:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B598265284;
+	Tue, 12 Aug 2025 10:43:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754995197; cv=none; b=pJDJho1/LNmNwmTowXf7B6eHWSEC4smJlbJotcTVXh+bkM7cLoP0Y9Yb476/Lwbr2hE2tvU+KRs3d2h99OZQocD5BRbHztY6OP3TCJQaPprAfnzrytH0XX9yBmZY0pqRBbtNGdzL2xAb4lMy5POMZB3CzDGU1C4MeVNrirBmm5s=
+	t=1754995418; cv=none; b=ZFRCP8Q3K8YfipwOWL3phiDVnlnEfjX5quG7Wk27is5bljanFieWwB1N/rBaG//8P9ka6iDy9kiwcWfWfsqOitKYsXdfeB8toL9rq7qwIiXIZiJeh+Ih7iM+s14m+vO3LwbInwJwLeozngAk7ymNGKrRce5iWsD6aLhB+dqJPVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754995197; c=relaxed/simple;
-	bh=2SgQnZNyP1tlzw1lJcOt2S6ffYu7OSaBmmpCdXTJHr0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=m4Vz/4H513RPnQTnSDWuLTrC8JVBadyef1flJWbr4XBH3tF/7T/QLWyvliqW0qcQP17GvBpRCCQHvnsM8ihBDrqnQAI5bshen3pv07kYtOvAEeSA7AeLuayljesDVkUP9w5PehuKuETy5XD/S9daogBrgZsSDLvQm5U7fxfJdig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B8b/53IB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECA08C4CEF9;
-	Tue, 12 Aug 2025 10:39:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754995197;
-	bh=2SgQnZNyP1tlzw1lJcOt2S6ffYu7OSaBmmpCdXTJHr0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=B8b/53IB165Bta6tIw1wOlGBWP4Olyw4+LkPwFlQE9U7tXHJosO2MLoZ/Wb8EgLKl
-	 26HHQ7QF0K44mRfrJWc+YOqMIwVjX78XeOnELqChSPsTsusEJL2pLIQDi1v2AYaezL
-	 STQ54q+WznpcCWHWj64P1hFH4y3ofMk+uRJHY3my7pN6BtLTu2bypNAZvHPdalt2X0
-	 xBOYLFJvT05eHfwECkE5KMG2fz1+gnLbX+0U0wjFlqhmC/AJ0IEh5QtTh6LHvcLyw4
-	 a2dAC65ROAGm3oierDJuBy77w+jFn6ucy0F4sTMOB0CYMsJIDMPxEg9xrPeXWM0wrL
-	 FEJIguGZSLSTw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 51133383BF51;
-	Tue, 12 Aug 2025 10:40:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1754995418; c=relaxed/simple;
+	bh=+VIezC9DLfCKAoqJQtZWx8/Xzm16vjitVHVeUQk+gSo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dyMPXzQetZDo/bE1BAKoer8OP9GFTVSD75rSlKqsI885z3+eTb6/++56Mg0QjmPCsFPt6diFtWNK4CMb/qNQ67RHFBoEPwRtn5m918wdwzcKDe1IGmeU8tcGf9fo9qnY9idJ+W4O9WiO99bs2W8rW0aYyiOHJjMEUBYuHc3tDDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id 9D58060172; Tue, 12 Aug 2025 12:43:27 +0200 (CEST)
+Date: Tue, 12 Aug 2025 12:43:22 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	netfilter-devel@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: Re: nft_flowtable.sh selftest failures
+Message-ID: <aJsaylkoOto0UsTL@strlen.de>
+References: <766e4508-aaba-4cdc-92b4-e116e52ae13b@redhat.com>
+ <78f95723-0c65-4060-b9d6-7e69d24da2da@redhat.com>
+ <aJsH3c2LcMCJoSeB@strlen.de>
+ <f1ca1f95-c85c-48a3-beb0-78fff09a5bb2@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] net: mdiobus: release reset_gpio in
- mdiobus_unregister_device()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175499520897.2526251.3672901808475265988.git-patchwork-notify@kernel.org>
-Date: Tue, 12 Aug 2025 10:40:08 +0000
-References: <20250807135449.254254-2-csokas.bence@prolan.hu>
-In-Reply-To: <20250807135449.254254-2-csokas.bence@prolan.hu>
-To: =?utf-8?b?Q3PDs2vDoXMgQmVuY2UgPGNzb2thcy5iZW5jZUBwcm9sYW4uaHU+?=@codeaurora.org
-Cc: robh@kernel.org, geert+renesas@glider.be, davem@davemloft.net,
- sergei.shtylyov@cogentembedded.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, buday.csaba@prolan.hu, andrew@lunn.ch,
- hkallweit1@gmail.com, linux@armlinux.org.uk, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f1ca1f95-c85c-48a3-beb0-78fff09a5bb2@kernel.org>
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Thu, 7 Aug 2025 15:54:49 +0200 you wrote:
-> From: Buday Csaba <buday.csaba@prolan.hu>
+Matthieu Baerts <matttbe@kernel.org> wrote:
+> I don't know if it can help, but did you try to reproduce it on top of
+> the branch used by the CI?
 > 
-> reset_gpio is claimed in mdiobus_register_device(), but it is not
-> released in mdiobus_unregister_device(). It is instead only
-> released when the whole MDIO bus is unregistered.
-> When a device uses the reset_gpio property, it becomes impossible
-> to unregister it and register it again, because the GPIO remains
-> claimed.
-> This patch resolves that issue.
+>  https://github.com/linux-netdev/testing/tree/net-next-2025-08-12--06-00
 > 
-> [...]
+> This branch is on top of net-next, where 'net' has been merged, all
+> pending patches listed on Patchwork have been applied, plus a few
+> additional patches are there to either fix some temp issues or improve
+> the CI somehow. Maybe one of these patches caused the removal of
+> CONFIG_CRYPTO_SHA1.
 
-Here is the summary with links:
-  - [net,v2] net: mdiobus: release reset_gpio in mdiobus_unregister_device()
-    https://git.kernel.org/netdev/net/c/8ea25274ebaf
+Yes:
+    sctp: Use HMAC-SHA1 and HMAC-SHA256 library for chunk authentication
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+removes it.
 
+> I guess that's the case, because when looking at the diff [1] when the
+> issue got introduced, I see some patches [2] from Eric Biggers modifying
+> some sctp's Kconfig file. They probably cause the issue, but the fix
+> should be to add CONFIG_CRYPTO_SHA1 in the ST config as mentioned by Paolo.
 
+seems like these two are the only ones that need it. at least
+xfrm_policy.sh passes again after this change.
+
+diff --git a/tools/testing/selftests/net/config b/tools/testing/selftests/net/config
+--- a/tools/testing/selftests/net/config
++++ b/tools/testing/selftests/net/config
+@@ -115,6 +115,7 @@ CONFIG_VXLAN=m
+ CONFIG_IP_SCTP=m
+ CONFIG_NETFILTER_XT_MATCH_POLICY=m
+ CONFIG_CRYPTO_ARIA=y
++CONFIG_CRYPTO_SHA1=y
+ CONFIG_XFRM_INTERFACE=m
+ CONFIG_XFRM_USER=m
+ CONFIG_IP_NF_MATCH_RPFILTER=m
+diff --git a/tools/testing/selftests/net/netfilter/config b/tools/testing/selftests/net/netfilter/config
+--- a/tools/testing/selftests/net/netfilter/config
++++ b/tools/testing/selftests/net/netfilter/config
+@@ -98,3 +98,4 @@ CONFIG_NET_PKTGEN=m
+ CONFIG_TUN=m
+ CONFIG_INET_DIAG=m
+ CONFIG_INET_SCTP_DIAG=m
++CONFIG_CRYPTO_SHA1=y
 
