@@ -1,81 +1,74 @@
-Return-Path: <netdev+bounces-212921-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212922-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C36D0B228AF
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 15:36:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B454B228E9
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 15:43:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C9FC17B80A2
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 13:34:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6B5A680A1A
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 13:36:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C715C288510;
-	Tue, 12 Aug 2025 13:32:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10E49288C23;
+	Tue, 12 Aug 2025 13:33:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b="qFKmYuuf"
+	dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b="dv3O5gHJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from TYPPR03CU001.outbound.protection.outlook.com (mail-japaneastazon11012030.outbound.protection.outlook.com [52.101.126.30])
+Received: from TYDPR03CU002.outbound.protection.outlook.com (mail-japaneastazon11013059.outbound.protection.outlook.com [52.101.127.59])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1AEC2882C0;
-	Tue, 12 Aug 2025 13:32:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.126.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E49C283FD7;
+	Tue, 12 Aug 2025 13:32:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.127.59
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755005572; cv=fail; b=kWtihT/RSQq0eqyWZHAHYuLrQL7Ecj5w3oFFBi3REYKsTTNXJPojwuvSkMR9nvrhNEgGlEWPbkkEVI5XNFeuDrFY/q+5gf21WL/zdeTlx7BCL7FWW1WGnL3l5jglJapFjFMzvTzfppRdqSB8mSN0nGpaeo0Ftvu1ewdk5r/aLGA=
+	t=1755005580; cv=fail; b=LLq/wejp71BuaDA1nVWSBLAnlh1VQZM0P46Y9szdD2ph6UJ4u+E04GfcqQaZgcZE/8Wfjy0J37WApFkS2kObrFwZ6CD/FPlWh+C507kfd0r4h+Z1zTXXzdvQRqsDKGJ1yJVGeRKl4b5OuCia8it0ZINrl63n0kRvFhm2JoaoLOI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755005572; c=relaxed/simple;
-	bh=AD4ZvlrtCwa6f46OS451UTLlHGCvenrx6lP19+xA7wY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=KnEt0wgfCDR7gciFWjwQo7+NFhrkw/NlneOM3uSc13wMoSpkl5NwQE5MqCdsSxxxCRh9tRJznlBPUtBg+LGU7J9yI7kxwSm+fB6ZJml0YVoq3ZlELgHW3VEKVz66qOFyVA6LVM/M4g346mF8+9rlEIRZoln3/2sf0PxMaXnfTbk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com; spf=pass smtp.mailfrom=vivo.com; dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b=qFKmYuuf; arc=fail smtp.client-ip=52.101.126.30
+	s=arc-20240116; t=1755005580; c=relaxed/simple;
+	bh=0voutUQ9m1tIej1vnr901XwPpkV6SnwIcmi0WnGKBoM=;
+	h=From:To:Subject:Date:Message-Id:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=bIvc7jONlJiMIw0JV8x29n+xX9UXDe9EZoLijl0ubICSH/DXn6MIdkI1DdJktKpcXM7pHx4DK06V+4z4BbXCkm3XPkcdzQa4jqrvg4NC8HYw1h5rkOssfM/hhc29xH/WIAq3zFdYeDrccMtN+/T1iU58LPDNQy7xf/uo4Kr18EM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com; spf=pass smtp.mailfrom=vivo.com; dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b=dv3O5gHJ; arc=fail smtp.client-ip=52.101.127.59
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vivo.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=GxQcwCuATqHX+QA0JUY6qkX42QmMAcG2GzMoTii2qTQ/zIUKdG1euErx9aK7mTlzbwo/Y7dm7cP//7RTTG3WHIMBshNsbOVxzCEdXakAfTmmn7XNplZRmNSF54u4GNnzpJdaNqolBKCSbpzt7ay1gffd/ie9inq05Vfpqo5/9aXfQRxUGk4hBqMNVl4pgf4FYciO0JzqXNDw3hI4ukwnRGm9X6h7SSZgtnYTFUD8cfsb59zYar45DRu0u34PNR6uKWtVv6QoAn3zXYKjc35Zp6NEmRJA0hZhHe7NzFuT4av13DnO5AQlnqy1RptOaMqftnNhmUha1KPZU08GZMZDtg==
+ b=WN/R0ZZRdZcMfnxoTJ+DDSkkjAOG9AVR/vrdFfpge3+wPEFP7f5PsJ5okLYwXBqL1gHjDE8j+Vz/x/SmhgJ9V1YtK2l3fmPK75KnJzprXA0uzOtAF6bzRFrGEDCDRrfVudnm7seKYNUS6m5F0HmaS2B3YCTD//myGNlk4gh3YYRFo1m2X8h64GQszAMgYr5tqI+CWfLH0Q2csgzcfYcqFKq70D9ZXbJNS3pVuJ0LNdyr+hUkv2PR/OlQHOYwJK7OnRnmVzL1Yu6jMQP+NBePwIopdswQrKBKqRm3cc6Sb0jsPzMU98XjsO+YWoUJwbIC3Eu4RWvScLwgao5tJQ0T4Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zHFB0ek1pYMQn2y3OjoFkNC4sgQYw8h2xvScYQY2sHw=;
- b=XOkVNg5RJ8GtAoRMfMWHr7Yv93JoB5QXf3HF+MSMpWI4LoNC8EiSlTt3yoPj0k9seYhzRk32xAuIErJ8MNhDOdDEuOFT3lsfbk7DgA6bIjuiKe4lzHwGGvr4HGJWrpq2a5LCky/eC/F6iGh0lriDoPgzq2oY4rUH52ldy5f0mx+T1VFUgDRbWE+avP/h34LLtZTUzerqfJrJLd0ZYjw5MdBt1ltgML2KmPeZQl9g3/kfjre9Ls8b6af+j3IVA6R1nRq2G9gEBRY95jf09NjAA4n1Hm9Fddom7oWgrYPhopG01qd0tH2c2WqMkp6izZ8i0abmIv5yiuyMweqpFnLsTw==
+ bh=I9L5CesIFU86Nlct0DDjcX78VMZVohBh464QTwAiNe4=;
+ b=Hm+0k6hvF92qUShwQMRMlJuFIISQNsSCE8Y0Cwtsr243EOVjgthCYUFZykNKFRxyUDBcFUXITq02vRw3HaUMz+YhApL0LBfkMjmf3up0laJFvf6izDhvdbpgWvV25KlzFiwZofQCSTmpTSrmxNMKB0P+8fs5duETr37MTraXcwOCm/26w3BqKzGNNm/7wwkl6zE6E6MW24vFunQsMlJKJjaWOmmA42azKoKC3qHBZ653rb454awXExvQ2/LXcC0+4tSTM7mQGo2GwXtC9PMAh2caHfvOzbD0Z3S/9q7gAbustbdCcWu7GfdvTl+crPw6EYy8CYf8ZXWAzAY2AmGGlA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
  dkim=pass header.d=vivo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zHFB0ek1pYMQn2y3OjoFkNC4sgQYw8h2xvScYQY2sHw=;
- b=qFKmYuuf2zDVs0WAvMU38gp73I56sJ7S0dass2f8xTuR83TAABVLQmHZqpAHxXjJRKPr6EezAe260Vc5xSwHxPdpWs769N+5hjs+5z6FRoZJQjlifyzLXBNadXvPrLtZIVlh1h/8Jh9Sx9fLM82qtWhj6mJnQUoGClg1jGe24NuGyALssdu8F3AG8NfUuZSTpU9STpqr7ZghAC9kmRsEwexQdy5ESnf/5sQeyLOxFBKIrJ/nM3lBA8jI7dfAE/jkuL3kClZl+HVnoCkcjIrUJm6a5FFH+xtaBbFHopVUepieerruwEzLqP9i/De/BL3X62vkLfM4ZgPqZ8Buqg15XQ==
+ bh=I9L5CesIFU86Nlct0DDjcX78VMZVohBh464QTwAiNe4=;
+ b=dv3O5gHJk4HS1rJjpnAIQF2DTEX8P92bfCeM4GQv5PhmzsrEWNbBPq9sMy6sKFngJTuiWPhTczYj2QNMvGac5cKNBKAIFaGYh11AeX3PoAzGCXQDfFT296vvg2kbrSO2zabyp7zp0DjP16TidDm6/2ULEkeifbqK7v9yfe3O1SboKMdP9SFpxOVz0SoHShQQ9XBuHjaq9jCSF4wUDiJeFRUo6dHAnF5RHybW1t3KjOKFvGrRTJ1N7f2+fEAtcbcTcbFamj8sg7Z66BqGcz+0HLdV8Kto2E2/AWyHpAsNmmFDCScVx0mCQaoehiA2LMIslvr4vfwg8HkFXW77hqE84A==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=vivo.com;
 Received: from SI2PR06MB5140.apcprd06.prod.outlook.com (2603:1096:4:1af::9) by
  SEYPR06MB5040.apcprd06.prod.outlook.com (2603:1096:101:54::7) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9009.21; Tue, 12 Aug 2025 13:32:48 +0000
+ 15.20.9009.21; Tue, 12 Aug 2025 13:32:55 +0000
 Received: from SI2PR06MB5140.apcprd06.prod.outlook.com
  ([fe80::468a:88be:bec:666]) by SI2PR06MB5140.apcprd06.prod.outlook.com
  ([fe80::468a:88be:bec:666%4]) with mapi id 15.20.9009.018; Tue, 12 Aug 2025
- 13:32:48 +0000
+ 13:32:55 +0000
 From: Qianfeng Rong <rongqianfeng@vivo.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+To: Jakub Kicinski <kuba@kernel.org>,
+	Simon Horman <horms@kernel.org>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	intel-wired-lan@lists.osuosl.org (moderated list:INTEL ETHERNET DRIVERS),
+	Qianfeng Rong <rongqianfeng@vivo.com>,
+	oss-drivers@corigine.com (open list:NETRONOME ETHERNET DRIVERS),
 	netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
-	linux-kernel@vger.kernel.org (open list),
-	bpf@vger.kernel.org (open list:XDP (eXpress Data Path):Keyword:(?:\b|_)xdp(?:\b|_))
-Cc: Qianfeng Rong <rongqianfeng@vivo.com>
-Subject: [PATCH 1/5] ethtool: use vmalloc_array() to simplify code
-Date: Tue, 12 Aug 2025 21:32:14 +0800
-Message-Id: <20250812133226.258318-2-rongqianfeng@vivo.com>
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH 2/5] nfp: flower: use vmalloc_array() to simplify code
+Date: Tue, 12 Aug 2025 21:32:15 +0800
+Message-Id: <20250812133226.258318-3-rongqianfeng@vivo.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250812133226.258318-1-rongqianfeng@vivo.com>
 References: <20250812133226.258318-1-rongqianfeng@vivo.com>
@@ -92,79 +85,79 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: SI2PR06MB5140:EE_|SEYPR06MB5040:EE_
-X-MS-Office365-Filtering-Correlation-Id: 625f4224-d03f-46a2-7ff6-08ddd9a4ba74
+X-MS-Office365-Filtering-Correlation-Id: fa0feef3-ce7d-463c-e6ba-08ddd9a4bed8
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|52116014|7416014|376014|366016|1800799024|921020|38350700014;
+	BCL:0;ARA:13230040|52116014|376014|366016|1800799024|921020|38350700014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?fs1Uap9yvRwdZSXpuo9OIDjkeMH9Yewv+hGx7XDFFY4cHCy1LVzU/S8tr/Tf?=
- =?us-ascii?Q?/VVy+v86ovVm1f8kko7lxsPCuiOY929BZjdUST+5BpXF2nlzc+PEIb/1cpQQ?=
- =?us-ascii?Q?P4HARzg2nM32czBL05yM2XKh5pd7HFTZxaI7gItD3fJmW/F2fgnSrJVHth5z?=
- =?us-ascii?Q?Zm/ZkPsgwV0MWYVdKRfE1KQy8lzM5MsXuVAz0fmS7+nt2WdIjSiDTP2FGlIa?=
- =?us-ascii?Q?jgdDz01V5zUdEfNUyDt06oOpJgiUTdxKRrp/Qiu8WjvcZYqF3FauqksaorPu?=
- =?us-ascii?Q?1I0z5aAjvQgqnRAtg5KMwwJ7nH0iAmSbV5SP7LBVateaBTLn+PXPfmZ6Psph?=
- =?us-ascii?Q?uGObUUNEDA46r3KgmMcX3s5DqY7NBjy0zBqrFEVnMW92BSgVXk4qgO2gV5QQ?=
- =?us-ascii?Q?ZQ5xG2iaXkWiaG0Zd0FQhsUdMdNm4cn/Iit5jBd0KncTKY2GCTq9gSI1Z2Qp?=
- =?us-ascii?Q?hiQm4TI05Dz6xdhLVT1RBs2+JR6wUaIKNf+FykMBReyahJXAPSITtDdlWrF3?=
- =?us-ascii?Q?iY8QEQtD+i7g/zsx9rD2WjlSDVtuxXkDeEYw+jRn2ZeQ9ZW/gvQuV4yhxE63?=
- =?us-ascii?Q?SwSx1wG/FcxCZBdZ8crkbYFx5e5h1M/oMQFG5JuuOF0kNFF/OUMs+mOLlTkY?=
- =?us-ascii?Q?XwzGXjLzFufxAfNadCFZi15hU2zSvcKZN0J9DqIP6J/+so4YFoClLP24C7lk?=
- =?us-ascii?Q?EVsxEwNqOZd3sMT6CWmfSdQYhwa8dIcW1IiJS2Y2BbTgI1Jjeeg8sH4ozk6p?=
- =?us-ascii?Q?Vo8EyfbCXujnbowuifhfVmNi9kIL68tw2NGVqLelkvbNk2Ks6nSwj39X9yk2?=
- =?us-ascii?Q?gFX19h3meW3zs/IuJOWf2d76a//4BU/x2NYBabdavIAWZ+T3aYdsmBZo5p8Y?=
- =?us-ascii?Q?A8Bb5WsQv/r9C43k3cjlrXnaOTRZkqdBUdhPwssehd740dAWMcaWdNRqRLPx?=
- =?us-ascii?Q?kZdIWDec5wAFY8A+hoyQTI528IZ/heoHQrE9DmEditpa8C9+Jdf8sI1chUEQ?=
- =?us-ascii?Q?SOgYLHgt2JqPO23JA6uV3vl6Om6YPOjmuPR8sh/jfGHeRcW5R4U01sHcgo/J?=
- =?us-ascii?Q?yK2eRGoDSu+o9F8ikY/jk/cc8nt7iugxMa8qfDnX5JnvuZPeHhrj/qgCuNpK?=
- =?us-ascii?Q?fmMeOpPR3+g4qnsz4Jpiug1jgz6N7fvqPNsSA2Vsolhxa1GlVltL04vTMglH?=
- =?us-ascii?Q?aLPfJ25bDmDKRgL1d9SBi7JvP09AfiT6znPNpMdp5bwi63s9Onw5nIkAsP++?=
- =?us-ascii?Q?mu5jgh2prAP5jdxp1JztRw583QzBtB4fZD3gBvzctEOOPWefxaYnnLwZxXGN?=
- =?us-ascii?Q?j4CbIxdrwDioH3ah91gPTZzPnGY4LYS2eBKYcPmV7RVwINUET15eTaELRSle?=
- =?us-ascii?Q?QOELA+UpGAIUGj8KtMPGvW/qBzFof0ZQh6vkYdtE5sIy1nAKiLl5auJix+ww?=
- =?us-ascii?Q?GRW9zjPHN5SlH3ZAGNBzwdTVLBIt//Dx8yFL7y2k12NEpqN0vH/STfiCPkFh?=
- =?us-ascii?Q?zw0B+H1RfM8AH0c=3D?=
+	=?us-ascii?Q?dNtpMYkMo5mbMIkGJDNoqKHL0up+uQpE22TEMsrJBaNUQIxRFfaTWqg7Ocjt?=
+ =?us-ascii?Q?nQN53/creiYTXBxTIRXiCntrE6H8QtAZHWZnLtXZZWi8SmZS2MXch3RD/Y2t?=
+ =?us-ascii?Q?Bym/cD+jgeT850SWsYVr+OfPuSohW0/fNmaTYiehelNu/ttMdYtyxZhM/f1/?=
+ =?us-ascii?Q?SGXSUjPIhFqUmuEkAM62IVrbhCy/Yekn9Fz3S9hYYLIaYty/RLfKW81pJeHf?=
+ =?us-ascii?Q?GdN1w1vx4smMYASoLg9EYliHfTiAKZdEyHU9Qq9XArNHPYu5rAq+qOxGWw7J?=
+ =?us-ascii?Q?vRApcQaGdpp9ona+DDAQkiTvb6FLKt0iYGF1PV1/oaOg7xWujVERWcKzllSz?=
+ =?us-ascii?Q?p9P/IhlqjjcK9mqbovD1tvIuIs81/2qm6bmWAAhmMfCOi0Y26RgqylNJ5jva?=
+ =?us-ascii?Q?QuQAAlKt/eWWnjPaqPXLaL9BUmMtDlO9YZtmIWhAy7Kgc8bsfIeBmPqtD0Kf?=
+ =?us-ascii?Q?3Y5a5IzNWkLhMS0uBzZHOsNSL554ZSwCqs03nf8HWUvckh1lKh7hB/z/3bu4?=
+ =?us-ascii?Q?kACKuGF2g23L1DSqwgMwa2vxlAviUAejN0uU7qHRG32wSo0rExz+58vyGsqy?=
+ =?us-ascii?Q?iUbP4+YOpLgk3NGzlnpIiK7uovDiBzdxccjkCJ/JiYdzfMRFBWXY5CpmYqzp?=
+ =?us-ascii?Q?Hz9EipSwNwjnaraq5RdL6oaGa3xNxtgLfvVegQqRoTVjbVMRMEIzzCftsp8k?=
+ =?us-ascii?Q?5QorU+67IwZVlIQY7MNTUFz1b2/MjsbD81WHXKh7sBj8bLZslErsviRY1sjg?=
+ =?us-ascii?Q?6hjbf7zpTStfJCi8Ikkju/ReUjIbPuuw3Cxh3SWnVT+gekoNyqPkZIp1uo+K?=
+ =?us-ascii?Q?oUwTeTpH/o4dKYgjg8gfTLJtFhvHt50ADKS/qLV6k/lu8LFWu0iSHW0ffxyY?=
+ =?us-ascii?Q?QaqdMMLhnsTPXOm5tRx8o137EJQ3driShQvqfzxxjj31UiC0cEFoDgFhPd9H?=
+ =?us-ascii?Q?KYVq+UhasWZXIQdoCWtnoSvr/tYZX3K+xgcClHZRJBgOMiCKWphnsHWjTPvx?=
+ =?us-ascii?Q?GjVDjfldMCz18uKC3tQoiBefjWtVQwbyXoAONLFeF7PU2UDxkRowyQtjzK+i?=
+ =?us-ascii?Q?r9Fz8+cV9Pf7NMLiGflc5kaJW7uOePxAlN2hqKANxQUmJaszpOyKL+6AYyO8?=
+ =?us-ascii?Q?EOgLQxVXDXfL64r7+ldYf9JfGwaKGhacIm78l4run6oG1cy5v8fCtp3YgrMq?=
+ =?us-ascii?Q?FQO1tspfddGtZUhryZLQde3K+/doi13FYunlqLpn8MlZ4pwDEWwOMDna/dBr?=
+ =?us-ascii?Q?D84DnESrndUqq6cPjzdxAT5qa8tktO/4msLS0EftrU4zltNM7XOD/gPMw06A?=
+ =?us-ascii?Q?mIVA51dvrALJpQX/tl8w+sio7DWesGQ1j1eE8UuCXg0/Pj3Gtfu+yGNnd94Y?=
+ =?us-ascii?Q?msrm9W6nn5QjeAlWwW9wy7uhKb+NPDBoqkjQ/gDVKfG09HVygQFoWdpc0Ujq?=
+ =?us-ascii?Q?fJsbSUAU1VhZOtVPnYTYNev8fmYNX0fhFrEQayk0aAkUBdSCFIUOjKDPaxN9?=
+ =?us-ascii?Q?cjl/4qVPwRQ9cgk=3D?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SI2PR06MB5140.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(7416014)(376014)(366016)(1800799024)(921020)(38350700014);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SI2PR06MB5140.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(376014)(366016)(1800799024)(921020)(38350700014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?YhmX0Hpi79Y5dzOkLsjFGz3KO6Zagbd7gezFC9Nv5iFcm4qxM+Mj6PpO7FFK?=
- =?us-ascii?Q?DgambO3avqSYHsZP/wsKi1Wc4gGEu3sJv7kIUwxNAH9nibSbycW9jHxEesUX?=
- =?us-ascii?Q?eTlXJANYhQJ0X/B0WRS2Baql6aP6ua46stAcaAtQaqiTVfU7FW3WQW2HV+J8?=
- =?us-ascii?Q?lAo5GY/3ywx5qjH8tksPlQcp9tE0rc2qxuL2VNB+aMIe4Pq1yLqHjO58Clzr?=
- =?us-ascii?Q?kKVzvDTlv3l3yf+7W+q5PJN7dGtUC+XVsNfx4j/jINKki2fqfCUdVETgl3/D?=
- =?us-ascii?Q?dOtreZuOO2ORiMb8gXwqssMbQLXdoVqHmk688Uyt5U5oJmKyFL6FThfJW21v?=
- =?us-ascii?Q?wZAZlIZ1IDBEMEtZQVYYrP5eEokapvx+VqeIC8U1hdCWIZ6lKYnae204IELD?=
- =?us-ascii?Q?EUrVWRCV85Ch2dDRXKu22sZ8UJX4C+XskmF5/NcbQVvDphW+L5TFzlfnTGpd?=
- =?us-ascii?Q?8N6/0RinEKv3LIoV7UxA32lZsTBQXbhfMCD74g2sD4RP2T2ZvX4iUWcsOZxO?=
- =?us-ascii?Q?sJpG/g9hkNBEELNxZ4aBO0/0ygt6J5yWXS1Ul3co2LYsypgrYJLPbcTT846r?=
- =?us-ascii?Q?L/1lgjmuo34l1/UK0iHLgCri8tt0yKiyl8qVGnnc7ekGnDr/3brrIlxVXyd/?=
- =?us-ascii?Q?FHzFYfd+dWqwW2Hic4eU9i1kcO94Ar6QlqJPIaPn5GZUzGc9ru0ZBoHFDyr9?=
- =?us-ascii?Q?Rp7uM1JaDKpgofiTD7OFoWB6zbjxFiMF0bueVga0IkE+h2Ni4NWbfv0rtdbz?=
- =?us-ascii?Q?d6Z9tF92FdwOP7Dwh6r1yFpP8Dj3FjLNmSsGSCprit6opf/WCV67NY2I4s2K?=
- =?us-ascii?Q?cFqCX40o8mCSG3yskURiwoEYCHP2Dsx5DAPEdqIG793F7+xilwQOK3KRlUve?=
- =?us-ascii?Q?P6kCm+YTI0ohCsN5OFDP7HaxGJWX2G0bKysEloOY4iuYMY6nLNaRquxfBiyx?=
- =?us-ascii?Q?QGAS1pUIxoOcaCGwuQN6mDSD/ZWz5ZBHi7WYmpaRrvXQVHb4MdZi4FnJ5MXC?=
- =?us-ascii?Q?4genb9laoC+AkN89lyUwB6X610VZwNiFbOW8OkomlIs/M7g30aK+MWTC93NZ?=
- =?us-ascii?Q?jM4hT0p1Cb3B35FVclS0i2Z+0xOLvyO/MTZ9ADrwlNKCNTRcSALpRwDvQO2f?=
- =?us-ascii?Q?jS9NQA9uRaNHtfP5o/TUqk0q9gKAnBAewrgi8uJfaGCW6TylKETaL67RR0Q7?=
- =?us-ascii?Q?AAzYQDdNSvDCAFVfoQY3F7Z1VrpQ/ghKk857zgsDTcNYFWJeQCMehpNhA+Ub?=
- =?us-ascii?Q?Ckr501AW/Pr/eImt/4UqfgQ8HpxEEfAIXeZvZw7EGVaVmyW22LdwuTKuiw16?=
- =?us-ascii?Q?j0Ad2GCM7d76F7/55QS87JQi9uBng+ssl4aRF8E2pheo/7w50Rtd5YUaASB/?=
- =?us-ascii?Q?fV6XqyZcHkrgCtAZGP5e+YGsrwYGKhcmlQNEexllP3bZOTv1Z1ryhjY00fUq?=
- =?us-ascii?Q?v9JYFi+l4ryqEdD+rxzkNoJSlmYbJEz/ViMDgxUVfodDuyRmilRVyFI2uVVB?=
- =?us-ascii?Q?YlUj3+UHv0FNTX9dxTXhs6RU4xayc6kAg2vl2MLuUd5lSib9awQvw/g7u/Z9?=
- =?us-ascii?Q?nbLDcfBdQIkq6Vz4aR7mRFhmiOjKb8tt6RdxOsYI?=
+	=?us-ascii?Q?FzqeykMwwFkFo1KJ3rtEoGi4oLLyDZ3XWmA5M7WyiIzPplPepYgUKM1OQlUQ?=
+ =?us-ascii?Q?S549k1wZ6rqs3n38anCsmDWnjVCBGH7/I04I58f7aUEhulApfSJNE4960Ukg?=
+ =?us-ascii?Q?PYMDgMOWDBVztw0JWP+pL//wPxmyCMGRoVzfbozaZLCUoTtq7P/qpQC40f9H?=
+ =?us-ascii?Q?H9cELguZybXKul+K2wNBH8G1c4M6W5IIXndty+GH/99cHS3hg3kFMw9VCE+R?=
+ =?us-ascii?Q?zQAhwhBTVH/bsxUvEDiEzPHKPUSgwEX41374Wtyi/z4AbKYCv0TuZtUUVv80?=
+ =?us-ascii?Q?nx+zRTWBAEwX6n619COO3NDI0liK9JEBV0xT+7rMMZCNKM5XHnO2Dl17XDex?=
+ =?us-ascii?Q?IGltMeb86bR77MF+V3yqtdy1MU2aI+pgkastBJqN029LL5v8aR6qGCeNJIzR?=
+ =?us-ascii?Q?MCc5lNY4A4HcTQRb/PYxOYn74hAt8T/oq9WWF0EEfos+Xk3thXlmc44YO/qL?=
+ =?us-ascii?Q?G+ai47R2QrCeGWXQR4IY5wjICMegD6ZvRVyZo5uj1mPT+lFzSbYh+GeJKmBA?=
+ =?us-ascii?Q?wRvygZMHrvdK94If4gZcl5vYjbkopE4SHZpilcU6rBIV8z90c6WCE2akBGla?=
+ =?us-ascii?Q?hOtfP54kyPtOBv7JffLVOVWM/gRY0K2TVM5qsyZHXSMa+EjIwRG0VkrHu98Y?=
+ =?us-ascii?Q?2EdVxghPskCnKJcq5GmO5KytpcC7AVO2sXED7HN9c1kXvkfLOxVNJ84nGniN?=
+ =?us-ascii?Q?TQuj5OwCstuR55XMomMlu8izRZk0VyphL1KIwAEjwcLkB1fzOV7c3wSriDyv?=
+ =?us-ascii?Q?3WYYf5mfPpsnTql0rc8uXWg/zCLdo5O5mKwMkBZG1IFKFT2EwA73yKFT6cLW?=
+ =?us-ascii?Q?h1CknoVUI6InrcoQ3sL9wSdPs5/8L0bTqz+H/clbicI/ePQynCy9zf3o3Sxt?=
+ =?us-ascii?Q?ltD1pkWC5kkTuWPluv0rcyFrDmFla26KzX0PowRLjRuRr3u0d1A61V3Z3DY0?=
+ =?us-ascii?Q?CC0Qa8ItzGFh6QqPk5J2sRLZJqu3nwoRVYr95gcVGe8mRKGDA8+gloLx6QLq?=
+ =?us-ascii?Q?yHlE0wnuo3nMG4sNBYSHJWe5J+gBST+5Ul4QALsJSvn9c2Uc7l80TW1egR4U?=
+ =?us-ascii?Q?Wq2oq7Y90R6X/7hQXwNlpqn7fevsRtVDjV7PqO38vYy8Gd8oCa3mhjZ/QTQs?=
+ =?us-ascii?Q?4DoZpv6OdpwxXR6HyAWHtHg4AvvmgieuiJDB14Dc/RQxXPVXOlhI468Bhh6Q?=
+ =?us-ascii?Q?prxOxe62Vd2K6QhnfQ/4dWlxNURUamKUg3xncAt/NTiJV/w8xlWiA4VVceQo?=
+ =?us-ascii?Q?1CW0uaW7dfKL1xfLMY3Ew5VL0MvxxPI+GrwyP5UNZioJHssOX8oqbI8EPfoz?=
+ =?us-ascii?Q?GaBRR6FWeHcItMGY6sPYsTofqcX2Bprv3NrnRtrlbGSTHfIJRZECxmzPgFn7?=
+ =?us-ascii?Q?F96yspFIHMaihwFwhMTk7n5X9EYgoXEksBT6Ky2BDCtAy3sr5rmDfeDTMjuK?=
+ =?us-ascii?Q?e4Y36113iXSMPqIeGJDAUKPyaSaWpf7wZpIUMkKiDNwsOnnkA+IObj27NgNp?=
+ =?us-ascii?Q?eWWEu1li6K05EadWCvPjnpYskcntSwVk9DQbfubRDqEGTfynmtlZHOfU6eqK?=
+ =?us-ascii?Q?WmJltSNjnxYV9DwYptrKgZmPi08Lr2ZvkFkY9JUV?=
 X-OriginatorOrg: vivo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 625f4224-d03f-46a2-7ff6-08ddd9a4ba74
+X-MS-Exchange-CrossTenant-Network-Message-Id: fa0feef3-ce7d-463c-e6ba-08ddd9a4bed8
 X-MS-Exchange-CrossTenant-AuthSource: SI2PR06MB5140.apcprd06.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Aug 2025 13:32:48.4293
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Aug 2025 13:32:55.8653
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 8D6WyfSiKl/lPAaLhj5RDFSIgKAr6oChBR2SbegkYf1UWVZZ0c/aUW3T3t3XBRyUF01dO6SnXocvbY0X/mh7og==
+X-MS-Exchange-CrossTenant-UserPrincipalName: JRnESaythbbRrNiuQs2IpMo1lnO70LZraNxqqZqokVsW+KCOsAGJKyR1+FqP3vr8+3vPr7xoabHaQJV2N2ynAw==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SEYPR06MB5040
 
 Remove array_size() calls and replace vmalloc() with vmalloc_array() to
@@ -173,96 +166,24 @@ usage.
 
 Signed-off-by: Qianfeng Rong <rongqianfeng@vivo.com>
 ---
- drivers/net/ethernet/intel/fm10k/fm10k_ethtool.c | 2 +-
- drivers/net/ethernet/intel/igb/igb_ethtool.c     | 8 ++++----
- drivers/net/ethernet/intel/igc/igc_ethtool.c     | 8 ++++----
- drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c | 2 +-
- drivers/net/ethernet/intel/ixgbevf/ethtool.c     | 6 +++---
- 5 files changed, 13 insertions(+), 13 deletions(-)
+ drivers/net/ethernet/netronome/nfp/flower/metadata.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/fm10k/fm10k_ethtool.c b/drivers/net/ethernet/intel/fm10k/fm10k_ethtool.c
-index 1954a04460d1..bf2029144c1d 100644
---- a/drivers/net/ethernet/intel/fm10k/fm10k_ethtool.c
-+++ b/drivers/net/ethernet/intel/fm10k/fm10k_ethtool.c
-@@ -560,7 +560,7 @@ static int fm10k_set_ringparam(struct net_device *netdev,
+diff --git a/drivers/net/ethernet/netronome/nfp/flower/metadata.c b/drivers/net/ethernet/netronome/nfp/flower/metadata.c
+index 80e4675582bf..137e526e2584 100644
+--- a/drivers/net/ethernet/netronome/nfp/flower/metadata.c
++++ b/drivers/net/ethernet/netronome/nfp/flower/metadata.c
+@@ -564,8 +564,8 @@ int nfp_flower_metadata_init(struct nfp_app *app, u64 host_ctx_count,
  
- 	/* allocate temporary buffer to store rings in */
- 	i = max_t(int, interface->num_tx_queues, interface->num_rx_queues);
--	temp_ring = vmalloc(array_size(i, sizeof(struct fm10k_ring)));
-+	temp_ring = vmalloc_array(i, sizeof(struct fm10k_ring));
+ 	/* Init ring buffer and unallocated stats_ids. */
+ 	priv->stats_ids.free_list.buf =
+-		vmalloc(array_size(NFP_FL_STATS_ELEM_RS,
+-				   priv->stats_ring_size));
++		vmalloc_array(NFP_FL_STATS_ELEM_RS,
++			      priv->stats_ring_size);
+ 	if (!priv->stats_ids.free_list.buf)
+ 		goto err_free_last_used;
  
- 	if (!temp_ring) {
- 		err = -ENOMEM;
-diff --git a/drivers/net/ethernet/intel/igb/igb_ethtool.c b/drivers/net/ethernet/intel/igb/igb_ethtool.c
-index 92ef33459aec..51d5cb6599ed 100644
---- a/drivers/net/ethernet/intel/igb/igb_ethtool.c
-+++ b/drivers/net/ethernet/intel/igb/igb_ethtool.c
-@@ -920,11 +920,11 @@ static int igb_set_ringparam(struct net_device *netdev,
- 	}
- 
- 	if (adapter->num_tx_queues > adapter->num_rx_queues)
--		temp_ring = vmalloc(array_size(sizeof(struct igb_ring),
--					       adapter->num_tx_queues));
-+		temp_ring = vmalloc_array(adapter->num_tx_queues,
-+					  sizeof(struct igb_ring));
- 	else
--		temp_ring = vmalloc(array_size(sizeof(struct igb_ring),
--					       adapter->num_rx_queues));
-+		temp_ring = vmalloc_array(adapter->num_rx_queues,
-+					  sizeof(struct igb_ring));
- 
- 	if (!temp_ring) {
- 		err = -ENOMEM;
-diff --git a/drivers/net/ethernet/intel/igc/igc_ethtool.c b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-index ecb35b693ce5..f3e7218ba6f3 100644
---- a/drivers/net/ethernet/intel/igc/igc_ethtool.c
-+++ b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-@@ -627,11 +627,11 @@ igc_ethtool_set_ringparam(struct net_device *netdev,
- 	}
- 
- 	if (adapter->num_tx_queues > adapter->num_rx_queues)
--		temp_ring = vmalloc(array_size(sizeof(struct igc_ring),
--					       adapter->num_tx_queues));
-+		temp_ring = vmalloc_array(adapter->num_tx_queues,
-+					  sizeof(struct igc_ring));
- 	else
--		temp_ring = vmalloc(array_size(sizeof(struct igc_ring),
--					       adapter->num_rx_queues));
-+		temp_ring = vmalloc_array(adapter->num_rx_queues,
-+					  sizeof(struct igc_ring));
- 
- 	if (!temp_ring) {
- 		err = -ENOMEM;
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-index 25c3a09ad7f1..2c5d774f1ec1 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-@@ -1278,7 +1278,7 @@ static int ixgbe_set_ringparam(struct net_device *netdev,
- 	/* allocate temporary buffer to store rings in */
- 	i = max_t(int, adapter->num_tx_queues + adapter->num_xdp_queues,
- 		  adapter->num_rx_queues);
--	temp_ring = vmalloc(array_size(i, sizeof(struct ixgbe_ring)));
-+	temp_ring = vmalloc_array(i, sizeof(struct ixgbe_ring));
- 
- 	if (!temp_ring) {
- 		err = -ENOMEM;
-diff --git a/drivers/net/ethernet/intel/ixgbevf/ethtool.c b/drivers/net/ethernet/intel/ixgbevf/ethtool.c
-index 7ac53171b041..bebad564188e 100644
---- a/drivers/net/ethernet/intel/ixgbevf/ethtool.c
-+++ b/drivers/net/ethernet/intel/ixgbevf/ethtool.c
-@@ -276,9 +276,9 @@ static int ixgbevf_set_ringparam(struct net_device *netdev,
- 	}
- 
- 	if (new_tx_count != adapter->tx_ring_count) {
--		tx_ring = vmalloc(array_size(sizeof(*tx_ring),
--					     adapter->num_tx_queues +
--						adapter->num_xdp_queues));
-+		tx_ring = vmalloc_array(adapter->num_tx_queues +
-+					adapter->num_xdp_queues,
-+					sizeof(*tx_ring));
- 		if (!tx_ring) {
- 			err = -ENOMEM;
- 			goto clear_reset;
 -- 
 2.34.1
 
