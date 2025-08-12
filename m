@@ -1,228 +1,333 @@
-Return-Path: <netdev+bounces-213022-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213025-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E810B22DCD
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 18:36:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AD7EB22DFB
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 18:44:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3CDB718923C2
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 16:30:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3815E3A6E99
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 16:37:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E86472FA0EB;
-	Tue, 12 Aug 2025 16:29:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB2B52F90CD;
+	Tue, 12 Aug 2025 16:37:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="E0Ik2fSL"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="PDDayXFJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from fllvem-ot03.ext.ti.com (fllvem-ot03.ext.ti.com [198.47.19.245])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 089A92FABEF
-	for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 16:29:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.20
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755016168; cv=fail; b=Rv87M9FxkY7HFcPGSsQPOe9Vw2F6z/RJQMszG1AMEdSHIK3G836lWXQvLPs+a2dV5010nPOKau1NbnJlbdFd7iGxBKZOE8I4/QHbjAFqpYIyCVUe+lUGOjRC6CQLdNYaeEzwSkzKXS69wqbh5Q4kb1/vdnvO3qgzAPTXQ/BI/EU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755016168; c=relaxed/simple;
-	bh=LrHXXT3e56FgfMYgGa6PdZXOJ3vCWZCEoDtDVHcW3n8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=PEpKALGlVgRbjJw4xmZkZuimdSaZrY33JN91OOAXW9npQcyr+d1ubmJbeMfv5nqAlaqFwHzog8pgiiF6MuNoND488Mk8qmkhRCGaBBbqeWzduXrtSXnifuQrVtb0D0/Or+l4OVHyza856zwkw0NgQRMhSkp4Udy+Vw74HITAFts=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=E0Ik2fSL; arc=fail smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1755016167; x=1786552167;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=LrHXXT3e56FgfMYgGa6PdZXOJ3vCWZCEoDtDVHcW3n8=;
-  b=E0Ik2fSLyCV447A6KtPVbNpu28UY827s8FnrfZ2UCGpOsdpxoVFHl0/c
-   LUl6HwN89/UAGaIGauFzHNuTMMN0e+J2JkvKDdZhzIHfukoOpomuVEPW5
-   nfE8d7Wlq4pUBPQQol9mWJ7AlJjHxD7PcroekM0g0Kbfsc8FuZHldS+9R
-   NlF73O5BHRC8NvgZ/XeRh8cyATmCOo69+tvKy3m3XxG0/GLaAwlm9H7Gu
-   mGBC3yNYGL3AX5HOQqrweuOWX0PNfMr8ku0w+z7Du6DtOtPDPsDHkWzVg
-   WfGG+rF/o3DfmPOSS5VBMJS8/lfkvPntntM5pjX9Gv+da9HFkLBikPZrD
-   Q==;
-X-CSE-ConnectionGUID: XYgcUFJFSI2uHVPNl/FPKA==
-X-CSE-MsgGUID: 1fb9liO1Qx6XzGrnDAnLLg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11520"; a="57011628"
-X-IronPort-AV: E=Sophos;i="6.17,284,1747724400"; 
-   d="scan'208";a="57011628"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2025 09:29:26 -0700
-X-CSE-ConnectionGUID: jZEjLnvPSWOzcN27uq7cKQ==
-X-CSE-MsgGUID: uKdu1ENsTaehCL2ux6xvIg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,284,1747724400"; 
-   d="scan'208";a="170440958"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by orviesa003.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2025 09:29:26 -0700
-Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Tue, 12 Aug 2025 09:29:25 -0700
-Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26 via Frontend Transport; Tue, 12 Aug 2025 09:29:25 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (40.107.223.54)
- by edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Tue, 12 Aug 2025 09:29:25 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=OQ1Drctwezi9snA2eNKODi8vNd7D/7joet6yUmBoIlutgZyF7VjVq0NCPRy8hRFM4To7OFNaILjauDXI82VQKeH8V2kVsl2Tc6BZJAlxPltg10ycJZ3KSqWtD4ueMn8JZ9dxznBwshLZl0hY97zQaJi/ioShJJTTHVq8/eTLzVYRtIDl9vnVGxHsOSLQCasoHMsXf69/4IvJIJFveA6IFu9jY/hlDszm4HP0N1Zr3TVGrCcr88CfCZd9TWhbeSP/tU8ny/hPEqFA0OWt/aJyOPMFZ4CMnsUb2u1l3cJHjn9TQYYn9BVxo270sk6K/8vxOmvnInyDQNLafKSspxP8Yg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vYtkZlEJK43fN6eRwChASxkDDX5aiz/tKoUcxVrW6CU=;
- b=NPRNzNQmZJOI79M2ZIW2A4XJL4YpFwErG9iN6uuPj0kiD/V+2YRi/ZTGevHLweEXdCpVoy1E8R/yy6RTM1cvfZ8pJdln6ImtLSO4n15g1blOJRIpOjRjOE9/tVSo2PkpsGDtRfHnlkVvng+01emWRZScd/8E/cQ2+xzkUIVnwB+9RFv82zfOhVcq7LliWnI96Q3wpU8ahdB0xcQgVFFGOCoELUAca3vU1O1F0jKMkxVzorvdENO81jnt3Xuz5HYdFfb0S+S95s/NPyd9+XVKkCma6Xjig4jw8P+boh7bCfihT7a+jODI5HFjoq2UN5ByFs1IiiRf2TXnmCE1lTDx2w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DS4PPF7551E6552.namprd11.prod.outlook.com
- (2603:10b6:f:fc02::31) by DM4PR11MB6117.namprd11.prod.outlook.com
- (2603:10b6:8:b3::19) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9031.13; Tue, 12 Aug
- 2025 16:29:21 +0000
-Received: from DS4PPF7551E6552.namprd11.prod.outlook.com
- ([fe80::29e3:35cb:6d5a:4d7b]) by DS4PPF7551E6552.namprd11.prod.outlook.com
- ([fe80::29e3:35cb:6d5a:4d7b%3]) with mapi id 15.20.9031.012; Tue, 12 Aug 2025
- 16:29:21 +0000
-From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
-To: "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH 07/12] ice: split RSS stuff out of
- ice_virtchnl.c - p2
-Thread-Topic: [Intel-wired-lan] [PATCH 07/12] ice: split RSS stuff out of
- ice_virtchnl.c - p2
-Thread-Index: AQHcC59Tr77obdbM+USQ39tQGHi5YrRfNR4A
-Date: Tue, 12 Aug 2025 16:29:21 +0000
-Message-ID: <DS4PPF7551E6552C3F6DF211BC3FC5282F8E52BA@DS4PPF7551E6552.namprd11.prod.outlook.com>
-References: <20250812132910.99626-1-przemyslaw.kitszel@intel.com>
- <20250812132910.99626-8-przemyslaw.kitszel@intel.com>
-In-Reply-To: <20250812132910.99626-8-przemyslaw.kitszel@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DS4PPF7551E6552:EE_|DM4PR11MB6117:EE_
-x-ms-office365-filtering-correlation-id: 1dd68fe0-fa9f-446b-fe53-08ddd9bd6475
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7053199007|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?RdZtwxm0im1baj9Obb8CDZPXgLpm8/x7wYM63XjivccJfghpJMGt58ctBc9S?=
- =?us-ascii?Q?BMkVuPE6cQnmcLm3TrMoZF8AnKKlAHRRShwyDOhUisqXcsu2Umf9x9wVOmWt?=
- =?us-ascii?Q?xGRkr5jqBQ9arW+5Y0Y05nfim2M/MiosMc4bCxdYH3M0RGFJocgMxbP7VIa0?=
- =?us-ascii?Q?HBkwiZdA8gKV1pK6s/6yTHQcRAV4zT16WNn0COkAOGtSweKcSmgju3gg6a6j?=
- =?us-ascii?Q?Z6r3IZhMFiLPMit4Xbs1nQm9eUaHuzQPUh6VokL+11T0YHSg123puqXBeJBR?=
- =?us-ascii?Q?fCd1OpXU6Jo5Joqgd7pAJ01YsZhEXOFjJnwIzXLIW0mHfPQDpaXa4HBi9Vma?=
- =?us-ascii?Q?aQLY8eE3PY1Rzw/dDDMdGmlgX3DmSxBzyzV+n4Z9KF0AJ8De0SWlGusfcE/F?=
- =?us-ascii?Q?85mJddlFzuyzYBlfmgzeebaj1EuR486EIv/LhcVYMmIKXWBMhA9Xu5vl8dTE?=
- =?us-ascii?Q?ZaoMyjIiKU6hfy1wpHiPVj3G6NI6rbfyfHp4F1IPG1h+6v2m/TA/WuWnOh6j?=
- =?us-ascii?Q?cgOZEIJf3mCueZ/aDoAv+iAJo3Ko0z+6hs51KKbkSIURXmVISTmzGi9WXZtt?=
- =?us-ascii?Q?T+C+Y6bjxwjrDxYN2iq3fNxAyJh/lSsIu9F1Q5UWMjGX64RxqUubqW4mdwEt?=
- =?us-ascii?Q?kgsd7R2KDVsieWnwT0pGK6RPCeuZHG/lchKaLiB6j94OB3tbCsUc7Z0HWXjC?=
- =?us-ascii?Q?ESamldQs/WqSwp2W1vgQx4ALch+cKmxod7B1yR1bZT+CIcCVYivTc3vru/Th?=
- =?us-ascii?Q?57uJCO5AXWLh+msLhs4Vcwx3ALu4cfKHKsJRhv5QOprSeKqHZGzRn0TNLnSH?=
- =?us-ascii?Q?o+Y+x8ut74Clz7rOLBQUpptuSAKqGhsi8r8RQumlqfwvqB9tRDgpHHrAde/f?=
- =?us-ascii?Q?Xg8+TL6kQc2+unmcrT3u3BDl6n1L9KZauKacV6F1rY6EZXZJwVxTJBunuThz?=
- =?us-ascii?Q?57x+qewWGflcH2M/KcEAsgOuh5Se9tvPeko2PgqysMrdjrYpijWEOokGVjFY?=
- =?us-ascii?Q?U4PhUhezCmaHw0hgeWcDKCLc7F/8K469VqYRkerVH0fcAupbck3HOxDYyR8/?=
- =?us-ascii?Q?Ae6lNM9OUGN/q7YGuVVTk+z8HGuMrcKDwnRmXpf1B59vM80XwqGeXfKzuUFf?=
- =?us-ascii?Q?WbegkL57FovkNn273HK8+PlYzR4XxykvejM1uienHsDOqTxiO43nlm6OdB6k?=
- =?us-ascii?Q?5vDW0c4c5ByxUfrKSwo/orBHcXT5HvLkJkscLCh7/mnI43YY1Tk9FPKngRpn?=
- =?us-ascii?Q?l5MjwTWnjDIC7R9TaIq9eDNtq3W3V6GO4hodMah7EjjA0+7VNILNnXyOtq/b?=
- =?us-ascii?Q?m/iLWAiJnAIxO4aW4A8g3qNgmqyuliPd3oojCfhfAj6uKyyiSoIG6qGiURtN?=
- =?us-ascii?Q?A5EoX9B5xFT3LFscekZK7x9m31PsllfA7gYRHD2w7yQWjGgVmagKD0kb2DvZ?=
- =?us-ascii?Q?mf7GI9XZoyZ9J1glHT3sydaIkBQubSLsWPP6ZSuO6f1yaI9aHzdDCoTxGnjU?=
- =?us-ascii?Q?kNOVSKaOlQkdfz0=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS4PPF7551E6552.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7053199007)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?GB2J5yo3CWEGNmgXbYJJsxxE5zn34wvbtiV7ldeWbMvkKKcezlR7jzBeU09K?=
- =?us-ascii?Q?AB0uZQmmyRC6O2nYbJiqG6OHZtIzO01oT9gz0fvgOnrf33mOu3TrlsmJCVZn?=
- =?us-ascii?Q?gXtA3z/0ARvzg/rhyojIT/UaWSzGG0LFGOA/GR19rR1oY+0GodSBucnoAlVc?=
- =?us-ascii?Q?8idhUocl2yvuRLhixaXd9FIYLkHLKaa4V7T7mpKjHX9U+OsPeAOwa9QZN9D1?=
- =?us-ascii?Q?TFxdIbGYxkCyYzDsMnFn4HWl8ibDWXpW7/wPHQu2pkkFRybh3CZ+ojmAnAJf?=
- =?us-ascii?Q?mRybo403bdRW5FmYKEjB3PLDMI+jDilEPIX/nEZWEC/gX8nygK8jW1xC9O7u?=
- =?us-ascii?Q?J2kmEWNA7S66RclnU5XbasSrg3v6SDgH59Da8XrWD7vs/V6iAVunAzNhlLLU?=
- =?us-ascii?Q?RmNObZH4FajHRjwRoW7njqh5bkIyJC47N1pyjYxOEFecFSJ0CmN1Ls3hsUdZ?=
- =?us-ascii?Q?xcgB06DTuvov1PgqEYzh/cODgrS2AEBj9u2zTX7gUDTd/kgXrItoAJpBeMjH?=
- =?us-ascii?Q?/2qldYkYYGzcwXaRynRNgapdHWgoMyUzNm9GuHiheD5v1OW2ov7mp4DA+BqH?=
- =?us-ascii?Q?qArPXz2urRkN98JsGhkNQ8PPZ1YR/B1L9us6R2y5jKEt+deVqtCu19VEmEdi?=
- =?us-ascii?Q?GiEch+0FoIRXfRhQo5iRKCQQqokdcPnwIIVyu+UUKHPM68huGGkkk2jDh/cY?=
- =?us-ascii?Q?+qR53hueVjX6aN0C4f3OAoS4iSem2ByDixV6p8i7BR2YLUYaflvhtzBkyFQO?=
- =?us-ascii?Q?YCUxUFgQ3t5oBdC6oRj1bMeqAd/1ulo5ObesFSRgljvIsVSrBj++Kz18kZ6a?=
- =?us-ascii?Q?P5/r4/5ha24BIKZVvji5SAJaYYi7B0G9Duhpx+BrosPA0q6Th/aSa14B9O+B?=
- =?us-ascii?Q?dNJHwsQFIdTwk0dqnXYTmOsR61cOeGRW/WLXJBW0YgU02Ja0sqpK3v29DGTR?=
- =?us-ascii?Q?DvNsYrloVBq2kot813YSrKIAYfPkCoatDBHa7pJBirFGk7o4yuDVDPE489PL?=
- =?us-ascii?Q?QJlHrTOGNNn0A7cRfprfn7DXe5GqDoB9FgmJUE+cRVTbbxoWCUoc6ou+XUne?=
- =?us-ascii?Q?oWwFw7qog5cFogoOqaWmTPX6v3PqaTt8Pc63Sqe3J8hht5woB/Ynp3/6lABo?=
- =?us-ascii?Q?lni0FhbHf3IqXYLHZDLOSop/FSj8cJQIbttyRhQzM1MvlWk8aeM8Ge9uvZpd?=
- =?us-ascii?Q?F426DodHBEZCgJHaAor2tUbmczo55Sg68BO05SUduIUpcxuZr3YrF/yPJGFE?=
- =?us-ascii?Q?DP4HaHAb2XJrkuXxM1z4ClcWdY1if+G46MIUpZU/i7qzfc8j1aZ0oVl5j6Sz?=
- =?us-ascii?Q?5mrObNcTGvxm/GTPsjKMZdJg0+ikStjwejc0r3dY8UONgbgbmo009Zyv0HZV?=
- =?us-ascii?Q?e+H9XH41Qp21RAF/lK+BP6q264/v5w6tnxrKVyp9DEOGlTOmakabAS1EK3gy?=
- =?us-ascii?Q?60qvxzJeB1hW0ufV6pJVtjMfbN5R7x1sZBZB4+6nkqjijXMHqQAYIP8mmufk?=
- =?us-ascii?Q?KTWmYLd9Hl/zPBf49bJfEA8VRfBghfZIlrfLNcpy+ltfXmwkiJtRCnvGiTdY?=
- =?us-ascii?Q?h+XKO7+KGbGjOs1hteOrlyoomb+YdRx4yqD4iKJeVRqTTaWvjaqPOlxMuLQi?=
- =?us-ascii?Q?WQ=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64EE32F5490;
+	Tue, 12 Aug 2025 16:37:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.245
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755016652; cv=none; b=Uf0rkRy+PnWBCBHuM9HQ1m/kCUYckTBTiTw+gL7IuiNKHJy6zabImxcjMbZi8xmmQZmRjGT+8KIGhibxhZhr2bfiThIYZAXSqpvFPMjJK9NioA2Y/Ijh0dzpQ5FxtcbY+fgntielSM+0XUZjJy/4MHOQW6ViFa23IzKCG8x4WZ0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755016652; c=relaxed/simple;
+	bh=KCKNEl62rjrtMG8u1hgKULtjfvWRT+ksDKwDjpV2ePE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=S4ovOM7NCVL67UTOIK/oGAYDRWOacCLVdMkEb57mCSAr7q91NQbvc6Vq1eWEks3xQT/GxtEJeyCbAJzrkpweAP7fh7whQihPeiJs0prPps3wzDubuvoQK/eXp4doPgMpaRRPEbwh5/YRGSXm83Yx35uyiifCDUm5XZRLT/hggQI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=PDDayXFJ; arc=none smtp.client-ip=198.47.19.245
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelvem-sh01.itg.ti.com ([10.180.77.71])
+	by fllvem-ot03.ext.ti.com (8.15.2/8.15.2) with ESMTP id 57CGVEpi1447545;
+	Tue, 12 Aug 2025 11:31:14 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1755016274;
+	bh=YFLM9pfLOusy2YVMdLzf9ptsSRr3pdKzRMQf7aNOi3M=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=PDDayXFJeFvugwsuu8W3/SXdqBGeOvAgqbJl/IOnBJcnLKq8bMOp574l4TIH8rRHi
+	 TPnzd0FP2DnLEM8AP6y+oaiEzvRVl6AmeFUswvqFmNvqEFaZzKZS5xlwMv0fslKAmz
+	 A8MvM9Dy77mB89zmD/claPP7wZP79g9A962sjOzA=
+Received: from DLEE104.ent.ti.com (dlee104.ent.ti.com [157.170.170.34])
+	by lelvem-sh01.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 57CGVEBg3598831
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
+	Tue, 12 Aug 2025 11:31:14 -0500
+Received: from DLEE115.ent.ti.com (157.170.170.26) by DLEE104.ent.ti.com
+ (157.170.170.34) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Tue, 12
+ Aug 2025 11:31:13 -0500
+Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DLEE115.ent.ti.com
+ (157.170.170.26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55 via
+ Frontend Transport; Tue, 12 Aug 2025 11:31:13 -0500
+Received: from [10.249.130.61] ([10.249.130.61])
+	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 57CGUw4i639914;
+	Tue, 12 Aug 2025 11:30:59 -0500
+Message-ID: <4f8d678a-8b72-449e-9809-bed912f26e59@ti.com>
+Date: Tue, 12 Aug 2025 22:00:57 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DS4PPF7551E6552.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1dd68fe0-fa9f-446b-fe53-08ddd9bd6475
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Aug 2025 16:29:21.3531
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: CxOp+f8aYeaVEonvzfQFPaP8x2TemHwVA5c6wMwftVUO8DyUYQvgF4iE6+EEfZ58p36SDKIohDEOE5PhU13eLsNZd97Xq6qIrrcaLaLPZlM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB6117
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 3/5] net: rnpgbe: Add basic mbx ops support
+To: Dong Yibo <dong100@mucse.com>, <andrew+netdev@lunn.ch>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <horms@kernel.org>, <corbet@lwn.net>,
+        <gur.stavi@huawei.com>, <maddy@linux.ibm.com>, <mpe@ellerman.id.au>,
+        <danishanwar@ti.com>, <lee@trager.us>, <gongfan1@huawei.com>,
+        <lorenzo@kernel.org>, <geert+renesas@glider.be>,
+        <Parthiban.Veerasooran@microchip.com>, <lukas.bulwahn@redhat.com>,
+        <alexanderduyck@fb.com>, <richardcochran@gmail.com>
+CC: <netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+References: <20250812093937.882045-1-dong100@mucse.com>
+ <20250812093937.882045-4-dong100@mucse.com>
+Content-Language: en-US
+From: "Anwar, Md Danish" <a0501179@ti.com>
+In-Reply-To: <20250812093937.882045-4-dong100@mucse.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
 
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
-> Of Przemek Kitszel
-> Sent: Tuesday, August 12, 2025 3:29 PM
-> To: intel-wired-lan@lists.osuosl.org; Nguyen, Anthony L
-> <anthony.l.nguyen@intel.com>
-> Cc: netdev@vger.kernel.org; Kitszel, Przemyslaw
-> <przemyslaw.kitszel@intel.com>
-> Subject: [Intel-wired-lan] [PATCH 07/12] ice: split RSS stuff out of
-> ice_virtchnl.c - p2
->=20
-> Add copy of ice_virtchnl.c under the original name/location.
-> Now both ice_virtchnl.c and ice_virtchnl_rss.c have the same content,
-> and only the former of the two in use.
->=20
-> Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+On 8/12/2025 3:09 PM, Dong Yibo wrote:
+> Initialize basic mbx function.
+> 
+> Signed-off-by: Dong Yibo <dong100@mucse.com>
 > ---
->  drivers/net/ethernet/intel/ice/Makefile       |    2 +-
->  drivers/net/ethernet/intel/ice/ice_virtchnl.c | 3647
-> +++++++++++++++++
->  2 files changed, 3648 insertions(+), 1 deletion(-)
->  create mode 100644 drivers/net/ethernet/intel/ice/ice_virtchnl.c
->=20
+>  drivers/net/ethernet/mucse/rnpgbe/Makefile    |   3 +-
+>  drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h    |  37 ++
+>  .../net/ethernet/mucse/rnpgbe/rnpgbe_chip.c   |   5 +
+>  drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h |   2 +
+>  .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c    | 443 ++++++++++++++++++
+>  .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx.h    |  31 ++
+>  6 files changed, 520 insertions(+), 1 deletion(-)
+>  create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c
+>  create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.h
+> 
+> diff --git a/drivers/net/ethernet/mucse/rnpgbe/Makefile b/drivers/net/ethernet/mucse/rnpgbe/Makefile
+> index 42c359f459d9..5fc878ada4b1 100644
+> --- a/drivers/net/ethernet/mucse/rnpgbe/Makefile
+> +++ b/drivers/net/ethernet/mucse/rnpgbe/Makefile
+> @@ -6,4 +6,5 @@
+>  
+>  obj-$(CONFIG_MGBE) += rnpgbe.o
+>  rnpgbe-objs := rnpgbe_main.o\
+> -	       rnpgbe_chip.o
+> +	       rnpgbe_chip.o\
+> +	       rnpgbe_mbx.o
+> diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
+> index 0dd3d3cb2a4d..05830bb73d3e 100644
+> --- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
+> +++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
+> @@ -5,6 +5,7 @@
+>  #define _RNPGBE_H
+>  
+>  #include <linux/types.h>
+> +#include <linux/mutex.h>
+>  
+>  extern const struct rnpgbe_info rnpgbe_n500_info;
+>  extern const struct rnpgbe_info rnpgbe_n210_info;
+> @@ -40,7 +41,43 @@ struct mucse_mac_info {
+>  	void *back;
+>  };
+>  
+> +struct mucse_hw;
+> +
+> +struct mucse_mbx_operations {
+> +	void (*init_params)(struct mucse_hw *hw);
+> +	int (*read)(struct mucse_hw *hw, u32 *msg,
+> +		    u16 size);
+> +	int (*write)(struct mucse_hw *hw, u32 *msg,
+> +		     u16 size);
+> +	int (*read_posted)(struct mucse_hw *hw, u32 *msg,
+> +			   u16 size);
+> +	int (*write_posted)(struct mucse_hw *hw, u32 *msg,
+> +			    u16 size);
+> +	int (*check_for_msg)(struct mucse_hw *hw);
+> +	int (*check_for_ack)(struct mucse_hw *hw);
+> +	void (*configure)(struct mucse_hw *hw, int num_vec,
+> +			  bool enable);
+> +};
+> +
+> +struct mucse_mbx_stats {
+> +	u32 msgs_tx;
+> +	u32 msgs_rx;
+> +	u32 acks;
+> +	u32 reqs;
+> +	u32 rsts;
+> +};
+> +
+>  struct mucse_mbx_info {
+> +	const struct mucse_mbx_operations *ops;
+> +	struct mucse_mbx_stats stats;
+> +	u32 timeout;
+> +	u32 usec_delay;
+> +	u16 size;
+> +	u16 fw_req;
+> +	u16 fw_ack;
+> +	/* lock for only one use mbx */
+> +	struct mutex lock;
+> +	bool irq_enabled;
+>  	/* fw <--> pf mbx */
+>  	u32 fw_pf_shm_base;
+>  	u32 pf2fw_mbox_ctrl;
+> diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
+> index 20ec67c9391e..16d0a76114b5 100644
+> --- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
+> +++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
+> @@ -1,8 +1,11 @@
+>  // SPDX-License-Identifier: GPL-2.0
+>  /* Copyright(c) 2020 - 2025 Mucse Corporation. */
+>  
+> +#include <linux/string.h>
+> +
+>  #include "rnpgbe.h"
+>  #include "rnpgbe_hw.h"
+> +#include "rnpgbe_mbx.h"
+>  
+>  /**
+>   * rnpgbe_init_common - Setup common attribute
+> @@ -23,6 +26,8 @@ static void rnpgbe_init_common(struct mucse_hw *hw)
+>  
+>  	mac->mac_addr = hw->hw_addr + RNPGBE_MAC_BASE;
+>  	mac->back = hw;
+> +
+> +	hw->mbx.ops = &mucse_mbx_ops_generic;
+>  }
+>  
+>  /**
+> diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h
+> index fc57258537cf..aee037e3219d 100644
+> --- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h
+> +++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h
+> @@ -7,6 +7,8 @@
+>  #define RNPGBE_RING_BASE 0x1000
+>  #define RNPGBE_MAC_BASE 0x20000
+>  #define RNPGBE_ETH_BASE 0x10000
+> +/**************** DMA Registers ****************************/
+> +#define RNPGBE_DMA_DUMY 0x000c
+>  /**************** CHIP Resource ****************************/
+>  #define RNPGBE_MAX_QUEUES 8
+>  #endif /* _RNPGBE_HW_H */
+> diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c
+> new file mode 100644
+> index 000000000000..1195cf945ad1
+> --- /dev/null
+> +++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c
+> @@ -0,0 +1,443 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/* Copyright(c) 2022 - 2025 Mucse Corporation. */
+> +
+> +#include <linux/pci.h>
+> +#include <linux/errno.h>
+> +#include <linux/delay.h>
+> +#include <linux/iopoll.h>
+> +
+> +#include "rnpgbe.h"
+> +#include "rnpgbe_mbx.h"
+> +#include "rnpgbe_hw.h"
+> +
+> +/**
+> + * mucse_read_mbx - Reads a message from the mailbox
+> + * @hw: pointer to the HW structure
+> + * @msg: the message buffer
+> + * @size: length of buffer
+> + *
+> + * @return: 0 on success, negative on failure
+> + **/
+> +int mucse_read_mbx(struct mucse_hw *hw, u32 *msg, u16 size)
+> +{
+> +	struct mucse_mbx_info *mbx = &hw->mbx;
+> +
+> +	/* limit read size */
+> +	min(size, mbx->size);
+> +	return mbx->ops->read(hw, msg, size);
+> +}
 
-...
+What's the purpose of min() here if you are anyways passing size to read()?
 
-> --
-> 2.39.3
+The min() call needs to be assigned to size, e.g.: size = min(size,
+mbx->size);
+
+> +
+> +/**
+> + * mucse_write_mbx - Write a message to the mailbox
+> + * @hw: pointer to the HW structure
+> + * @msg: the message buffer
+> + * @size: length of buffer
+> + *
+> + * @return: 0 on success, negative on failure
+> + **/
+
+> +
+> +/**
+> + * mucse_mbx_reset - Reset mbx info, sync info from regs
+> + * @hw: pointer to the HW structure
+> + *
+> + * This function reset all mbx variables to default.
+> + **/
+> +static void mucse_mbx_reset(struct mucse_hw *hw)
+> +{
+> +	struct mucse_mbx_info *mbx = &hw->mbx;
+> +	int v;
+> +
+
+Variable 'v' should be declared as u32 to match the register read.
+
+> +	v = mbx_rd32(hw, FW2PF_COUNTER(mbx));
+> +	hw->mbx.fw_req = v & GENMASK(15, 0);
+> +	hw->mbx.fw_ack = (v >> 16) & GENMASK(15, 0);
+> +	mbx_wr32(hw, PF2FW_MBOX_CTRL(mbx), 0);
+> +	mbx_wr32(hw, FW_PF_MBOX_MASK(mbx), GENMASK(31, 16));
+> +}
+> +
+> +/**
+> + * mucse_mbx_configure_pf - Configure mbx to use nr_vec interrupt
+> + * @hw: pointer to the HW structure
+> + * @nr_vec: vector number for mbx
+> + * @enable: TRUE for enable, FALSE for disable
+> + *
+> + * This function configure mbx to use interrupt nr_vec.
+> + **/
+> +static void mucse_mbx_configure_pf(struct mucse_hw *hw, int nr_vec,
+> +				   bool enable)
+> +{
+> +	struct mucse_mbx_info *mbx = &hw->mbx;
+> +	u32 v;
+> +
+> +	if (enable) {
+> +		v = mbx_rd32(hw, FW2PF_COUNTER(mbx));
+> +		hw->mbx.fw_req = v & GENMASK(15, 0);
+> +		hw->mbx.fw_ack = (v >> 16) & GENMASK(15, 0);
+> +		mbx_wr32(hw, PF2FW_MBOX_CTRL(mbx), 0);
+> +		mbx_wr32(hw, FW2PF_MBOX_VEC(mbx), nr_vec);
+> +		mbx_wr32(hw, FW_PF_MBOX_MASK(mbx), GENMASK(31, 16));
+> +	} else {
+> +		mbx_wr32(hw, FW_PF_MBOX_MASK(mbx), 0xfffffffe);
+> +		mbx_wr32(hw, PF2FW_MBOX_CTRL(mbx), 0);
+> +		mbx_wr32(hw, RNPGBE_DMA_DUMY, 0);
+> +	}
+> +}
+> +
+> +/**
+> + * mucse_init_mbx_params_pf - Set initial values for pf mailbox
+> + * @hw: pointer to the HW structure
+> + *
+> + * Initializes the hw->mbx struct to correct values for pf mailbox
+> + */
+> +static void mucse_init_mbx_params_pf(struct mucse_hw *hw)
+> +{
+> +	struct mucse_mbx_info *mbx = &hw->mbx;
+> +
+> +	mbx->usec_delay = 100;
+> +	mbx->timeout = (4 * 1000 * 1000) / mbx->usec_delay;
+
+Use appropriate constants like USEC_PER_SEC instead of hardcoded values.
+
+> +	mbx->stats.msgs_tx = 0;
+> +	mbx->stats.msgs_rx = 0;
+
+
+-- 
+Thanks and Regards,
+Md Danish Anwar
 
 
