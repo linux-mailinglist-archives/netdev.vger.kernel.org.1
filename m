@@ -1,215 +1,336 @@
-Return-Path: <netdev+bounces-212965-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212966-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7385B22A7E
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 16:31:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E41E4B22AAC
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 16:36:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8750620E6D
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 14:21:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D33351883E7A
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 14:30:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F125C2E7BD9;
-	Tue, 12 Aug 2025 14:21:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AB062E975F;
+	Tue, 12 Aug 2025 14:30:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U9MJsFCT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OE65g0G1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3D70288CA5;
-	Tue, 12 Aug 2025 14:21:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 018132AE99;
+	Tue, 12 Aug 2025 14:30:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755008463; cv=none; b=d7RCfr4cYheZ7km1Qx7NP52MIxZ6DK4BRQIIwCFduJDMlseUYiSjAVqvk3dpEyPE2fC+tvJYxcwZTw3NJWQa2oyC6dO2LjKedD0MdcC41zfXMPH4/8/BJRKiWebOi6ipf6FWqJHUhVQBP69KlG0mZzDoKJ9FQPm4rFhBpxb8slI=
+	t=1755009011; cv=none; b=ahZz/3dwyZhasJLyIG81EXLRMjjTz0fVsqq9czAggQA1ULBzYMxzER12muPYXznqrwEuwcCsfXRu6tJGg8awoP8NmeVUd6MNTWxpcyw4plkOGGymlG+9U87vlKQEr+OKW2vWvO3pkBuaQbXTf9DAgP4NkRShgu3Ab7k4CI0V1bU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755008463; c=relaxed/simple;
-	bh=/s4QCjNiaG8i2gVPHA9BZYnfZknetpckALmAqKlClZk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rgH+CCZfk+OegDNPT6fQ0WQvHDdmYRrfRdO/Y9hlLB57mJzM2ayzWptPP9xraMe4pLoCmGQ+7RJWO/zqJCjoAobEKz7d5hsiVZO5UZJ+Cf5gX55E2BzeCYLJzCu98d8cnAbyJYCne/NvpuifIsVF50zEGcNCUeUS9GWyez/8GMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U9MJsFCT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEC8BC4CEF0;
-	Tue, 12 Aug 2025 14:21:02 +0000 (UTC)
+	s=arc-20240116; t=1755009011; c=relaxed/simple;
+	bh=jSyNlbSqb9c0dGJSJ86AGwyyjiCHp5I0JeTzYxn+p5A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Lsv4vYNdHR9hid3edRb7Y7gSCNmX/B9RiAKC2mUmPBdJi+hvM2biYbwYJigPN60MprhBGjuqxpUUR+mnfH+3nq2fa2YfM9jcOJ4I3yFbXvEYNJ+c//kvd+l+YTzws0ytxmyZoaoy0qyNshYAh5KylFXn+65cr4f3WlxmRcr5Cew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OE65g0G1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9AB4C4CEF0;
+	Tue, 12 Aug 2025 14:30:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755008463;
-	bh=/s4QCjNiaG8i2gVPHA9BZYnfZknetpckALmAqKlClZk=;
-	h=From:To:Cc:Subject:Date:From;
-	b=U9MJsFCT9wTebQmhAToepOdDQ6mGZBBP5ojKwVeGnmi4BIVTBq916sJPW8VhWZffm
-	 brP0Q4zTsosquCk88+8UMPfoG7F8qYtdn9YzjkMuS2FM4pqMFnQZg+/zufLLiAWp5S
-	 PS7bgMx4JheqAHjxcnwpH6oI+nE1neTKdFDNnDbwKYRLsWqyC6UZJdVHHPZ2EKA5v0
-	 ax5PfDaGvPzcrJ21PKrruvy7CkbE4WMGm1skJQYUw6I1vIC70EbM09KKDpEd2cejOn
-	 8qUjbmItr5u16arlzDwj909TkiTcKo08A8WxnwfkHUvagi24/ugvv3EshSWeFHg/IL
-	 iRyau49Wa39bg==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	shuah@kernel.org,
-	willemb@google.com,
-	petrm@nvidia.com,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next v2] selftests: drv-net: wait for carrier
-Date: Tue, 12 Aug 2025 07:20:54 -0700
-Message-ID: <20250812142054.750282-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.50.1
+	s=k20201202; t=1755009010;
+	bh=jSyNlbSqb9c0dGJSJ86AGwyyjiCHp5I0JeTzYxn+p5A=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=OE65g0G1gXtpCNAf4WOs+I1Q5TfgIZ6lhEs4AvhgNa5TMhoVxO16ev44P8g2NVEXb
+	 HtKq/zWCbtQdERqs2EFIYgS7k3y+K++h3NXl9kXQgr9CRwEuAY0wPRL2hoYDUuaTse
+	 GlYuLt+KBptKWCxdXE/1eS2zgOu/rsDUT4WCZqZCo3PojeXI0xJlopoNymd3VFGiAO
+	 cE2S2Ndvy4Ejk5yvl9JKam5TLrxGMoVLV4lw0JMJFqK4XRWOIIHhg8MrLwmHkgN5KP
+	 K/J+5HfHINu3kCtOdHCQhV3I1rjYnzA7U1dHKkpfOdxzybQbJIsvuaWNKUhIlDCMen
+	 UXisLrrlmu0+g==
+Message-ID: <b07b8930-e644-45a2-bef8-06f4494e7a39@kernel.org>
+Date: Tue, 12 Aug 2025 16:30:03 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/2] xsk: support generic batch xmit in copy mode
+To: Jason Xing <kerneljasonxing@gmail.com>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, bjorn@kernel.org,
+ magnus.karlsson@intel.com, maciej.fijalkowski@intel.com,
+ jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org,
+ daniel@iogearbox.net, john.fastabend@gmail.com, horms@kernel.org,
+ andrew+netdev@lunn.ch
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
+ Jason Xing <kernelxing@tencent.com>
+References: <20250811131236.56206-1-kerneljasonxing@gmail.com>
+ <20250811131236.56206-3-kerneljasonxing@gmail.com>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <20250811131236.56206-3-kerneljasonxing@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On fast machines the tests run in quick succession so even
-when tests clean up after themselves the carrier may need
-some time to come back.
 
-Specifically in NIPA when ping.py runs right after netpoll_basic.py
-the first ping command fails.
 
-Since the context manager callbacks are now common NetDrvEpEnv
-gets an ip link up call as well.
+On 11/08/2025 15.12, Jason Xing wrote:
+> From: Jason Xing <kernelxing@tencent.com>
+> 
+> Zerocopy mode has a good feature named multi buffer while copy mode has
+> to transmit skb one by one like normal flows. The latter might lose the
+> bypass power to some extent because of grabbing/releasing the same tx
+> queue lock and disabling/enabling bh and stuff on a packet basis.
+> Contending the same queue lock will bring a worse result.
+> 
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-v2:
- - add an empty __del__
-v1: https://lore.kernel.org/20250808225741.1095702-1-kuba@kernel.org
+I actually think that it is worth optimizing the non-zerocopy mode for
+AF_XDP.  My use-case was virtual net_devices like veth.
 
-CC: shuah@kernel.org
-CC: willemb@google.com
-CC: petrm@nvidia.com
-CC: linux-kselftest@vger.kernel.org
----
- .../selftests/drivers/net/lib/py/__init__.py  |  2 +-
- .../selftests/drivers/net/lib/py/env.py       | 41 +++++++++----------
- tools/testing/selftests/net/lib/py/utils.py   | 18 ++++++++
- 3 files changed, 39 insertions(+), 22 deletions(-)
 
-diff --git a/tools/testing/selftests/drivers/net/lib/py/__init__.py b/tools/testing/selftests/drivers/net/lib/py/__init__.py
-index 8711c67ad658..a07b56a75c8a 100644
---- a/tools/testing/selftests/drivers/net/lib/py/__init__.py
-+++ b/tools/testing/selftests/drivers/net/lib/py/__init__.py
-@@ -15,7 +15,7 @@ KSFT_DIR = (Path(__file__).parent / "../../../..").resolve()
-         NlError, RtnlFamily, DevlinkFamily
-     from net.lib.py import CmdExitFailure
-     from net.lib.py import bkg, cmd, bpftool, bpftrace, defer, ethtool, \
--        fd_read_timeout, ip, rand_port, tool, wait_port_listen
-+        fd_read_timeout, ip, rand_port, tool, wait_port_listen, wait_file
-     from net.lib.py import fd_read_timeout
-     from net.lib.py import KsftSkipEx, KsftFailEx, KsftXfailEx
-     from net.lib.py import ksft_disruptive, ksft_exit, ksft_pr, ksft_run, \
-diff --git a/tools/testing/selftests/drivers/net/lib/py/env.py b/tools/testing/selftests/drivers/net/lib/py/env.py
-index 1b8bd648048f..c1f3b608c6d8 100644
---- a/tools/testing/selftests/drivers/net/lib/py/env.py
-+++ b/tools/testing/selftests/drivers/net/lib/py/env.py
-@@ -4,7 +4,7 @@ import os
- import time
- from pathlib import Path
- from lib.py import KsftSkipEx, KsftXfailEx
--from lib.py import ksft_setup
-+from lib.py import ksft_setup, wait_file
- from lib.py import cmd, ethtool, ip, CmdExitFailure
- from lib.py import NetNS, NetdevSimDev
- from .remote import Remote
-@@ -25,6 +25,9 @@ from .remote import Remote
- 
-         self.env = self._load_env_file()
- 
-+        # Following attrs must be set be inheriting classes
-+        self.dev = None
-+
-     def _load_env_file(self):
-         env = os.environ.copy()
- 
-@@ -48,6 +51,22 @@ from .remote import Remote
-                 env[pair[0]] = pair[1]
-         return ksft_setup(env)
- 
-+    def __del__(self):
-+        pass
-+
-+    def __enter__(self):
-+        ip(f"link set dev {self.dev['ifname']} up")
-+        wait_file(f"/sys/class/net/{self.dev['ifname']}/carrier",
-+                  lambda x: x.strip() == "1")
-+
-+        return self
-+
-+    def __exit__(self, ex_type, ex_value, ex_tb):
-+        """
-+        __exit__ gets called at the end of a "with" block.
-+        """
-+        self.__del__()
-+
- 
- class NetDrvEnv(NetDrvEnvBase):
-     """
-@@ -72,17 +91,6 @@ from .remote import Remote
-         self.ifname = self.dev['ifname']
-         self.ifindex = self.dev['ifindex']
- 
--    def __enter__(self):
--        ip(f"link set dev {self.dev['ifname']} up")
--
--        return self
--
--    def __exit__(self, ex_type, ex_value, ex_tb):
--        """
--        __exit__ gets called at the end of a "with" block.
--        """
--        self.__del__()
--
-     def __del__(self):
-         if self._ns:
-             self._ns.remove()
-@@ -219,15 +227,6 @@ from .remote import Remote
-             raise Exception("Can't resolve remote interface name, multiple interfaces match")
-         return v6[0]["ifname"] if v6 else v4[0]["ifname"]
- 
--    def __enter__(self):
--        return self
--
--    def __exit__(self, ex_type, ex_value, ex_tb):
--        """
--        __exit__ gets called at the end of a "with" block.
--        """
--        self.__del__()
--
-     def __del__(self):
-         if self._ns:
-             self._ns.remove()
-diff --git a/tools/testing/selftests/net/lib/py/utils.py b/tools/testing/selftests/net/lib/py/utils.py
-index f395c90fb0f1..c42bffea0d87 100644
---- a/tools/testing/selftests/net/lib/py/utils.py
-+++ b/tools/testing/selftests/net/lib/py/utils.py
-@@ -249,3 +249,21 @@ global_defer_queue = []
-         if time.monotonic() > end:
-             raise Exception("Waiting for port listen timed out")
-         time.sleep(sleep)
-+
-+
-+def wait_file(fname, test_fn, sleep=0.005, deadline=5, encoding='utf-8'):
-+    """
-+    Wait for file contents on the local system to satisfy a condition.
-+    test_fn() should take one argument (file contents) and return whether
-+    condition is met.
-+    """
-+    end = time.monotonic() + deadline
-+
-+    with open(fname, "r", encoding=encoding) as fp:
-+        while True:
-+            if test_fn(fp.read()):
-+                break
-+            fp.seek(0)
-+            if time.monotonic() > end:
-+                raise TimeoutError("Wait for file contents failed", fname)
-+            time.sleep(sleep)
--- 
-2.50.1
+> This patch supports batch feature by permitting owning the queue lock to
+> send the generic_xmit_batch number of packets at one time. To further
+> achieve a better result, some codes[1] are removed on purpose from
+> xsk_direct_xmit_batch() as referred to __dev_direct_xmit().
+> 
+> [1]
+> 1. advance the device check to granularity of sendto syscall.
+> 2. remove validating packets because of its uselessness.
+> 3. remove operation of softnet_data.xmit.recursion because it's not
+>     necessary.
+> 4. remove BQL flow control. We don't need to do BQL control because it
+>     probably limit the speed. An ideal scenario is to use a standalone and
+>     clean tx queue to send packets only for xsk. Less competition shows
+>     better performance results.
+> 
+> Experiments:
+> 1) Tested on virtio_net:
+
+If you also want to test on veth, then an optimization is to increase
+dev->needed_headroom to XDP_PACKET_HEADROOM (256), as this avoids non-zc
+AF_XDP packets getting reallocated by veth driver. I never completed
+upstreaming this[1] before I left Red Hat.  (virtio_net might also benefit)
+
+  [1] 
+https://github.com/xdp-project/xdp-project/blob/main/areas/core/veth_benchmark04.org 
+
+
+(more below...)
+
+> With this patch series applied, the performance number of xdpsock[2] goes
+> up by 33%. Before, it was 767743 pps; while after it was 1021486 pps.
+> If we test with another thread competing the same queue, a 28% increase
+> (from 405466 pps to 521076 pps) can be observed.
+> 2) Tested on ixgbe:
+> The results of zerocopy and copy mode are respectively 1303277 pps and
+> 1187347 pps. After this socket option took effect, copy mode reaches
+> 1472367 which was higher than zerocopy mode impressively.
+> 
+> [2]: ./xdpsock -i eth1 -t  -S -s 64
+> 
+> It's worth mentioning batch process might bring high latency in certain
+> cases. The recommended value is 32.
+> 
+> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> ---
+>   include/linux/netdevice.h |   2 +
+>   net/core/dev.c            |  18 +++++++
+>   net/xdp/xsk.c             | 103 ++++++++++++++++++++++++++++++++++++--
+>   3 files changed, 120 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> index 5e5de4b0a433..27738894daa7 100644
+> --- a/include/linux/netdevice.h
+> +++ b/include/linux/netdevice.h
+> @@ -3352,6 +3352,8 @@ u16 dev_pick_tx_zero(struct net_device *dev, struct sk_buff *skb,
+>   
+>   int __dev_queue_xmit(struct sk_buff *skb, struct net_device *sb_dev);
+>   int __dev_direct_xmit(struct sk_buff *skb, u16 queue_id);
+> +int xsk_direct_xmit_batch(struct sk_buff **skb, struct net_device *dev,
+> +			  struct netdev_queue *txq, u32 max_batch, u32 *cur);
+>   
+>   static inline int dev_queue_xmit(struct sk_buff *skb)
+>   {
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index 68dc47d7e700..7a512bd38806 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -4742,6 +4742,24 @@ int __dev_queue_xmit(struct sk_buff *skb, struct net_device *sb_dev)
+>   }
+>   EXPORT_SYMBOL(__dev_queue_xmit);
+>   
+> +int xsk_direct_xmit_batch(struct sk_buff **skb, struct net_device *dev,
+> +			  struct netdev_queue *txq, u32 max_batch, u32 *cur)
+> +{
+> +	int ret = NETDEV_TX_BUSY;
+> +
+> +	local_bh_disable();
+> +	HARD_TX_LOCK(dev, txq, smp_processor_id());
+> +	for (; *cur < max_batch; (*cur)++) {
+> +		ret = netdev_start_xmit(skb[*cur], dev, txq, false);
+
+The last argument ('false') to netdev_start_xmit() indicate if there are
+'more' packets to be sent. This allows the NIC driver to postpone
+writing the tail-pointer/doorbell. For physical hardware this is a large
+performance gain.
+
+If index have not reached 'max_batch' then we know 'more' packets are true.
+
+   bool more = !!(*cur != max_batch);
+
+Can I ask you to do a test with netdev_start_xmit() using the 'more' 
+boolian ?
+
+
+> +		if (ret != NETDEV_TX_OK)
+> +			break;
+> +	}
+> +	HARD_TX_UNLOCK(dev, txq);
+> +	local_bh_enable();
+> +
+> +	return ret;
+> +}
+> +
+>   int __dev_direct_xmit(struct sk_buff *skb, u16 queue_id)
+>   {
+>   	struct net_device *dev = skb->dev;
+> diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+> index 7a149f4ac273..92ad82472776 100644
+> --- a/net/xdp/xsk.c
+> +++ b/net/xdp/xsk.c
+> @@ -780,9 +780,102 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+>   	return ERR_PTR(err);
+>   }
+>   
+> -static int __xsk_generic_xmit(struct sock *sk)
+> +static int __xsk_generic_xmit_batch(struct xdp_sock *xs)
+> +{
+> +	u32 max_batch = READ_ONCE(xs->generic_xmit_batch);
+> +	struct sk_buff **skb = xs->skb_batch;
+> +	struct net_device *dev = xs->dev;
+> +	struct netdev_queue *txq;
+> +	bool sent_frame = false;
+> +	struct xdp_desc desc;
+> +	u32 i = 0, j = 0;
+> +	u32 max_budget;
+> +	int err = 0;
+> +
+> +	mutex_lock(&xs->mutex);
+> +
+> +	/* Since we dropped the RCU read lock, the socket state might have changed. */
+> +	if (unlikely(!xsk_is_bound(xs))) {
+> +		err = -ENXIO;
+> +		goto out;
+> +	}
+> +
+> +	if (xs->queue_id >= dev->real_num_tx_queues)
+> +		goto out;
+> +
+> +	if (unlikely(!netif_running(dev) ||
+> +		     !netif_carrier_ok(dev)))
+> +		goto out;
+> +
+> +	max_budget = READ_ONCE(xs->max_tx_budget);
+> +	txq = netdev_get_tx_queue(dev, xs->queue_id);
+> +	do {
+> +		for (; i < max_batch && xskq_cons_peek_desc(xs->tx, &desc, xs->pool); i++) {
+> +			if (max_budget-- == 0) {
+> +				err = -EAGAIN;
+> +				break;
+> +			}
+> +			/* This is the backpressure mechanism for the Tx path.
+> +			 * Reserve space in the completion queue and only proceed
+> +			 * if there is space in it. This avoids having to implement
+> +			 * any buffering in the Tx path.
+> +			 */
+> +			err = xsk_cq_reserve_addr_locked(xs->pool, desc.addr);
+> +			if (err) {
+> +				err = -EAGAIN;
+> +				break;
+> +			}
+> +
+> +			skb[i] = xsk_build_skb(xs, &desc);
+
+There is a missed opportunity for bulk allocating the SKBs here
+(via kmem_cache_alloc_bulk).
+
+But this also requires changing the SKB alloc function used by
+xsk_build_skb(). As a seperate patch, I recommend that you change the
+sock_alloc_send_skb() to instead use build_skb (or build_skb_around).
+I expect this will be a large performance improvement on it's own.
+Can I ask you to benchmark this change before the batch xmit change?
+
+Opinions needed from other maintainers please (I might be wrong!):
+I don't think the socket level accounting done in sock_alloc_send_skb()
+is correct/relevant for AF_XDP/XSK, because the "backpressure mechanism"
+code comment above.
+
+--Jesper
+
+> +			if (IS_ERR(skb[i])) {
+> +				err = PTR_ERR(skb[i]);
+> +				break;
+> +			}
+> +
+> +			xskq_cons_release(xs->tx);
+> +
+> +			if (xp_mb_desc(&desc))
+> +				xs->skb = skb[i];
+> +		}
+> +
+> +		if (i) {
+> +			err = xsk_direct_xmit_batch(skb, dev, txq, i, &j);
+> +			if  (err == NETDEV_TX_BUSY) {
+> +				err = -EAGAIN;
+> +			} else if (err == NET_XMIT_DROP) {
+> +				j++;
+> +				err = -EBUSY;
+> +			}
+> +
+> +			sent_frame = true;
+> +			xs->skb = NULL;
+> +		}
+> +
+> +		if (err)
+> +			goto out;
+> +		i = j = 0;
+> +	} while (xskq_cons_peek_desc(xs->tx, &desc, xs->pool));
+> +
+> +	if (xskq_has_descs(xs->tx)) {
+> +		if (xs->skb)
+> +			xsk_drop_skb(xs->skb);
+> +		xskq_cons_release(xs->tx);
+> +	}
+> +
+> +out:
+> +	for (; j < i; j++) {
+> +		xskq_cons_cancel_n(xs->tx, xsk_get_num_desc(skb[j]));
+> +		xsk_consume_skb(skb[j]);
+> +	}
+> +	if (sent_frame)
+> +		__xsk_tx_release(xs);
+> +
+> +	mutex_unlock(&xs->mutex);
+> +	return err;
+> +}
+> +
+> +static int __xsk_generic_xmit(struct xdp_sock *xs)
+>   {
+> -	struct xdp_sock *xs = xdp_sk(sk);
+>   	bool sent_frame = false;
+>   	struct xdp_desc desc;
+>   	struct sk_buff *skb;
+> @@ -871,11 +964,15 @@ static int __xsk_generic_xmit(struct sock *sk)
+>   
+>   static int xsk_generic_xmit(struct sock *sk)
+>   {
+> +	struct xdp_sock *xs = xdp_sk(sk);
+>   	int ret;
+>   
+>   	/* Drop the RCU lock since the SKB path might sleep. */
+>   	rcu_read_unlock();
+> -	ret = __xsk_generic_xmit(sk);
+> +	if (READ_ONCE(xs->generic_xmit_batch))
+> +		ret = __xsk_generic_xmit_batch(xs);
+> +	else
+> +		ret = __xsk_generic_xmit(xs);
+>   	/* Reaquire RCU lock before going into common code. */
+>   	rcu_read_lock();
+>   
 
 
