@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-213113-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213114-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2ED7B23BB6
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 00:21:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2572B23BC9
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 00:23:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DDEF158243B
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 22:21:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0496B1AA7794
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 22:23:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA49425E822;
-	Tue, 12 Aug 2025 22:21:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A2552D061C;
+	Tue, 12 Aug 2025 22:23:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h8ek1SLF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WtVn9Sm1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08C1A2F0687;
-	Tue, 12 Aug 2025 22:21:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5623027604E;
+	Tue, 12 Aug 2025 22:22:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755037285; cv=none; b=eZ7+guXqP3uiFzuIgAErnQj1A3GpTFpj8yz5ZAy5eOpollUmDsV87pP+Syv1bzMPfnUw0a67AmvzOSsFrno80lSZfnoWz0TPGv9MpywKSr2wYgp0/IZFLRDt2NIG1YjrchDcP1bHRdPt/mxW3tGS01rX0zrFq5VTc36Wjb0w/8M=
+	t=1755037380; cv=none; b=VDMWZcWJZ9eO98BmBswBrdwVmz5WXMjO1jvdDQoJp15A9b8oYsPKW8DsuWtYWPcYnsCm6qGG6QZzMAKItVjTR2VDNWqL25gNdM7XeIZ5ZkCzzfowf2Wq5PiJ/J02ajSYveRM+/ck/wDbKX2jH/P/h+CkVgms8LFG6AZU53mRvAA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755037285; c=relaxed/simple;
-	bh=YqC55mj2AR86dA7/RdCYznw/7ElZag4idFv+o2F57cw=;
+	s=arc-20240116; t=1755037380; c=relaxed/simple;
+	bh=+sFQSTHIOhzJPPTHZ6mF3BRYYIb5lhP24qtZkAGLV1s=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LZ0HwGOBCLWsINVsA83anP3hBo3A29EuY2N1eaGy38ckkvklFy+XzC2jGwKBdqohcOPi9xqnhxdFVeNbvhdDYG3V6xGbrK/NF9pkUWlODweRtUlTFV25i9A0Hzc9iptS78q01FH9zRe5DoEcVYOgvE9qrhLDhPVyAuJNy3qGdso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h8ek1SLF; arc=none smtp.client-ip=209.85.221.49
+	 MIME-Version; b=otqOSj2J6Se+oiFEWwrVU+T8RIH+a5bwlcikhFAxLVxX/Eelrx3IYm5H/Y6mFGdPUH757f9oDFdhEKsIx4zY4+kAlKj6q0pMmebUJSKbybDbAj7SjtxaQ7KIjPTfC//ig9y2M0d1V0vD/cuEbVLSVEGUXxNFAWQ7QFYqIbDKVR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WtVn9Sm1; arc=none smtp.client-ip=209.85.221.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-3b7834f2e72so2893934f8f.2;
-        Tue, 12 Aug 2025 15:21:23 -0700 (PDT)
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3b78d13bf10so6032179f8f.1;
+        Tue, 12 Aug 2025 15:22:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755037282; x=1755642082; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1755037376; x=1755642176; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=vIdEO3Lv0YC4PSIjYiDP/NYDWSHMj+gKzJ0lri3ow8Y=;
-        b=h8ek1SLFEIm1rVDe/QSc0EYwgeTQ2u/yOhCht5LDFhH/pOikQKVNWeQGY+i4bv4+C0
-         fRVqC37rjo5FgMaaPoOldfzwBTZ1qnBT+xEROPVV/8QEHhBP4H+j21FJS5nt8OsRGARN
-         8s9EE5Sg7dUhSie1A7hQZz5kCL/rwgHTFvnfegrwu3NUS73pUYgoc0V/bdCTF243auts
-         IWUmZIG5PHSbpE9+PKWbrbgRg5tN4q9WnQquHd2rMCJOl7x6b4JTjCY/YFoACrt1xZ9/
-         jbYutS4p+BMl/g2RviSOJMqz2DdBdmtBAye+SBoleBgzzqVe12CF3Dxo4q6S2KVwDz0+
-         DjTw==
+        bh=WS7bmnIloASKqNj5zXPdW4P/ppO3Xb5AJCzOr3LRULg=;
+        b=WtVn9Sm1er9w2S2dhCRa/YPxh+NukpEh4fzb1d75371b+ezHkXCoG9yiMcDd1r1UOX
+         j59vCquJEQdmw7CHpjo75AhgAujBBkIGrGwdMKcwFXB2AV0WZYKJSYZBoqw08gptG9oS
+         Awjpq3/xPyW7Lc3SE/A45oGuuiJ0prQnJ1VOXncJQzZy7FJI9y6sqFwQvrpknA9JmMV3
+         aV6YNgm6XP6IQewbN7XJ0InYRYZj+0OQv7p3hNZi1Wo1fjlmaPuBH9YXN1lu7+SM1LaT
+         AobkHNPpE9tgt4K7ewmspC2c3/iyvg0IeiU5NnXCPR9EoeVDEbjedKejRcVx1aCO4X22
+         y3PA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755037282; x=1755642082;
+        d=1e100.net; s=20230601; t=1755037376; x=1755642176;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=vIdEO3Lv0YC4PSIjYiDP/NYDWSHMj+gKzJ0lri3ow8Y=;
-        b=K8viM9tw9yh5s2IqcafSuvCjvgFC09IRwfenKPOcGjCA+cP9JRXy2BfKy53hqG8OJd
-         iY2TNm2RRKCBT8vzTghkm2Ik2HoqwaWP5QstxPXldRMiEeQy4rZAZoH3r43NjlqckSWm
-         nNpYSlpSSbKP0GqpEn6t2wqUrc27PbnxNPDExMrlj7cBugOMEnvopZE3Bk3V0iwI+SAR
-         TFpYg+gMq3zNmPA3DcGKy08CEJRWnckH/t8VYnCHfa09jEWrPzVjPJKzq0TjNebMQovI
-         XeHhIPHu33OVwIm4HY9372zPNq/G93g+A0AvNSTadI4uh14uc+gDIWMuXQ2ysX9WQ0iM
-         RHkA==
-X-Forwarded-Encrypted: i=1; AJvYcCUzN0EVz2prO3BkeO8+Ow6e6um3j9I3MaqAeP08H48tmZh33epJ7TFug2nhmgijoxITAIULu36dDLUB@vger.kernel.org, AJvYcCVOeIr/pX6Vzbo2AQiAAvkfdBGUXu9tM6FnVG+3X5ubeS7LD9kgRmPFrZa4lBEmj6/9iTp/r5nlGiDyYZ10@vger.kernel.org, AJvYcCXFbUyOHPJKsILQKFQG1zbPJMYwM/pa0Ngfyl9DLpEBc2Ne9EbjXgSqePR1t89R4Z0uaHQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxYIKCjsOh3f2JPRUy4evrEzaj/ODeJr77Z507v88lhoEN0Hhnu
-	8GOcUqpqtDUT4nq7XpYZ2uDMAblm1Xzjxuj4Q0o7sAqbTRPTJNSQ05HFF+cuUTtw
-X-Gm-Gg: ASbGnctaRT7geRDm/Jy7flQGYeoifE2GDX4AOU1hV4h8uwF02G4cIUihhK5mbYPU4B+
-	6rWE/G94M7mTWge2SkTquU7HdvXaMJrafIAYhK0G/n+QTZaqShdGPr3DCL70e9YQhwi6xHaryPR
-	8EMUq6IBZSwodiWmGZf+t2hC4rzw15Esez/yfBmtmrIUxoEQR5d2Yhs7NZMIcz1H47+vNsvo1v6
-	rZwJJWE0nIBIk3qmxTQDoW2B+7vDnt/0quM4LHRQGgq0WSW3s1NBP26P6UlZ7EDR5e9nNURoqq2
-	4KWatXLZWEvSD+YWAXW403zH99mJKPFJ9WCYIsW0trvgeMk4Xj/pMnKkh/W5FaRzdZM43DKoHs9
-	YKlRYBinD7Ar5sMkopdlHkYee
-X-Google-Smtp-Source: AGHT+IHA5DUl+DA0WohBTVWkK29VWMdgV6UPb962ECdnGiG2D+fadf2fCZ9elXR3p2BKlNnxuRUpxQ==
-X-Received: by 2002:a5d:5d10:0:b0:3b9:1457:df79 with SMTP id ffacd0b85a97d-3b917d1e6b2mr402840f8f.5.1755037281893;
-        Tue, 12 Aug 2025 15:21:21 -0700 (PDT)
-Received: from localhost ([2a03:2880:31ff:1::])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45a16de6f70sm3861605e9.14.2025.08.12.15.21.20
+        bh=WS7bmnIloASKqNj5zXPdW4P/ppO3Xb5AJCzOr3LRULg=;
+        b=QOvaLXeMLleuJ2B9/8Cz1v58Z+yzwuU/XgAEQrgtHXifHECNgNjCAVSFMbylGFFApU
+         z2s8lXtVrUXdFBo2lSxoowDFPtqMTifNn9XcsSypR1S9eA+Y/pE8KR06+MkCRrS3hlk+
+         w2upGskl2GQrbZGBGTEgqnz+ZF8e+rrjWSeTfAgeRYPa0UkuCLb0RiwBDPWjyDp6CwUC
+         /NQI5EGBHAe95JFTQDucw7jX4AG+CRBBxTfUr/CsSfVyqA0fnrebcdH50+x43o8kW8IB
+         itszekPeNSVkmpR6PRgLeNNrpI7y4QDR5sC7Y65Naf5RX4GdfyURN4MBkWt4BZb3sedI
+         oFkg==
+X-Forwarded-Encrypted: i=1; AJvYcCWkgUfxcn7/DeugyhQbJ5NFHTgsrYRZsW3cg493wdwSJQxWedU4HdyyikTls1OoQHx7HuUnIsuxjjjl@vger.kernel.org, AJvYcCWt2WptgWUGy+3uD2q5e9nNHEQOyRFe+7/UE3v4Dof6vRimJEvr5desBML/LgLFp8UK8/I=@vger.kernel.org, AJvYcCXyIhBYvmO9SYnZ6JQetBtiNU1cXJDXPDQVvDoqxVvxneZX9TruQF1fEi9xtaH1SD0ZusxaoWOfognOz6iM@vger.kernel.org
+X-Gm-Message-State: AOJu0YzcOiPUusywhPMHL95Awffl6a9me7HMXAiobpVT6bEk3UdX9EjM
+	J9lHRqVsmrmoW6AWp1vMO03zMot3tx5BBiHxdx0SyEP5xmHHmvU68J3keFhDxRtQ
+X-Gm-Gg: ASbGncuv3FneQ0lZ8kENhFRt+K7QW3yLQ6O0h0jvYhg6JRlr4ZZvCOR4JTpAGfYjEd5
+	D4/6mFpPr9NP1R4iRQ/Q8t7iWUGFuZQ40yrZX3AR5D/qcKVKs+j7frZUGh7elcN2zsBC8jW+U5u
+	iBCE1RZUB0qS7wJk6JxMHHOX59KWp27xHqbYTVPLfG5kkq1Ad+f1lB9X4RjblQt6fZeEJdKuxIL
+	zHu362iMhqPYESKKbGCNamqko4ZhGZp/8+QxyiBsZDb8854kqjOosAhP55nrsv0eDcVHpnvmK05
+	Z4yvkgeqZSJiaXRwUTR0a3q/573XNk8wYqwPql+pikUP/zUSEIrKrEbSE5qbY6BrH55+1dnBqfY
+	eskyXo40eQuWJSqSvPc3h
+X-Google-Smtp-Source: AGHT+IGRW8XazU5RzfUKZN+cRS1p89FzfLhMPSsUMxnRANlZxTviQk72arFfrz8BYdCTYEyuoMn1Jg==
+X-Received: by 2002:a5d:5f56:0:b0:3b7:6828:5f78 with SMTP id ffacd0b85a97d-3b917e2da18mr371805f8f.4.1755037375963;
+        Tue, 12 Aug 2025 15:22:55 -0700 (PDT)
+Received: from localhost ([2a03:2880:31ff:70::])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45a16dffb63sm3812225e9.29.2025.08.12.15.22.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Aug 2025 15:21:21 -0700 (PDT)
+        Tue, 12 Aug 2025 15:22:55 -0700 (PDT)
 From: Mohsin Bashir <mohsin.bashr@gmail.com>
 To: netdev@vger.kernel.org
 Cc: aleksander.lobakin@intel.com,
@@ -95,9 +95,9 @@ Cc: aleksander.lobakin@intel.com,
 	pabeni@redhat.com,
 	sdf@fomichev.me,
 	vadim.fedorenko@linux.dev
-Subject: [PATCH net-next V3 7/9] eth: fbnic: Add support for XDP_TX action
-Date: Tue, 12 Aug 2025 15:21:18 -0700
-Message-ID: <20250812222118.254587-1-mohsin.bashr@gmail.com>
+Subject: [PATCH net-next V3 8/9] eth: fbnic: Collect packet statistics for XDP
+Date: Tue, 12 Aug 2025 15:22:52 -0700
+Message-ID: <20250812222252.261779-1-mohsin.bashr@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20250812220150.161848-1-mohsin.bashr@gmail.com>
 References: <20250812220150.161848-1-mohsin.bashr@gmail.com>
@@ -109,148 +109,267 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add support for XDP_TX action and cleaning the associated work.
+Add support for XDP statistics collection and reporting via rtnl_link
+and netdev_queue API.
+
+For XDP programs without frags support, fbnic requires MTU to be less
+than the HDS threshold. If an over-sized frame is received, the frame
+is dropped and recorded as rx_length_errors reported via ip stats to
+highlight that this is an error.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
 ---
- drivers/net/ethernet/meta/fbnic/fbnic_txrx.c | 85 +++++++++++++++++++-
- 1 file changed, 84 insertions(+), 1 deletion(-)
+ .../device_drivers/ethernet/meta/fbnic.rst    | 11 ++++
+ .../net/ethernet/meta/fbnic/fbnic_netdev.c    | 36 ++++++++++++-
+ drivers/net/ethernet/meta/fbnic/fbnic_txrx.c  | 51 +++++++++++++++++--
+ drivers/net/ethernet/meta/fbnic/fbnic_txrx.h  |  1 +
+ 4 files changed, 94 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-index 8c7709f707e6..3ce1762bd11d 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-@@ -19,6 +19,7 @@
- enum {
- 	FBNIC_XDP_PASS = 0,
- 	FBNIC_XDP_CONSUME,
-+	FBNIC_XDP_TX,
- 	FBNIC_XDP_LEN_ERR,
- };
+diff --git a/Documentation/networking/device_drivers/ethernet/meta/fbnic.rst b/Documentation/networking/device_drivers/ethernet/meta/fbnic.rst
+index afb8353daefd..fb6559fa4be4 100644
+--- a/Documentation/networking/device_drivers/ethernet/meta/fbnic.rst
++++ b/Documentation/networking/device_drivers/ethernet/meta/fbnic.rst
+@@ -160,3 +160,14 @@ behavior and potential performance bottlenecks.
+ 	  credit exhaustion
+         - ``pcie_ob_rd_no_np_cred``: Read requests dropped due to non-posted
+ 	  credit exhaustion
++
++XDP Length Error:
++~~~~~~~~~~~~~~~~~
++
++For XDP programs without frags support, fbnic tries to make sure that MTU fits
++into a single buffer. If an oversized frame is received and gets fragmented,
++it is dropped and the following netlink counters are updated
++
++   - ``rx-length``: number of frames dropped due to lack of fragmentation
++     support in the attached XDP program
++   - ``rx-errors``: total number of packets with errors received on the interface
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
+index fb81d1a7bc51..b8b684ad376b 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
+@@ -407,11 +407,12 @@ static void fbnic_get_stats64(struct net_device *dev,
+ 			      struct rtnl_link_stats64 *stats64)
+ {
+ 	u64 rx_bytes, rx_packets, rx_dropped = 0, rx_errors = 0;
++	u64 rx_over = 0, rx_missed = 0, rx_length = 0;
+ 	u64 tx_bytes, tx_packets, tx_dropped = 0;
+ 	struct fbnic_net *fbn = netdev_priv(dev);
+ 	struct fbnic_dev *fbd = fbn->fbd;
+ 	struct fbnic_queue_stats *stats;
+-	u64 rx_over = 0, rx_missed = 0;
++
+ 	unsigned int start, i;
  
-@@ -1020,6 +1021,80 @@ static struct sk_buff *fbnic_build_skb(struct fbnic_napi_vector *nv,
- 	return skb;
+ 	fbnic_get_hw_stats(fbd);
+@@ -489,6 +490,7 @@ static void fbnic_get_stats64(struct net_device *dev,
+ 	stats64->rx_missed_errors = rx_missed;
+ 
+ 	for (i = 0; i < fbn->num_rx_queues; i++) {
++		struct fbnic_ring *xdpr = fbn->tx[FBNIC_MAX_TXQS + i];
+ 		struct fbnic_ring *rxr = fbn->rx[i];
+ 
+ 		if (!rxr)
+@@ -500,11 +502,29 @@ static void fbnic_get_stats64(struct net_device *dev,
+ 			rx_bytes = stats->bytes;
+ 			rx_packets = stats->packets;
+ 			rx_dropped = stats->dropped;
++			rx_length = stats->rx.length_errors;
+ 		} while (u64_stats_fetch_retry(&stats->syncp, start));
+ 
+ 		stats64->rx_bytes += rx_bytes;
+ 		stats64->rx_packets += rx_packets;
+ 		stats64->rx_dropped += rx_dropped;
++		stats64->rx_errors += rx_length;
++		stats64->rx_length_errors += rx_length;
++
++		if (!xdpr)
++			continue;
++
++		stats = &xdpr->stats;
++		do {
++			start = u64_stats_fetch_begin(&stats->syncp);
++			tx_bytes = stats->bytes;
++			tx_packets = stats->packets;
++			tx_dropped = stats->dropped;
++		} while (u64_stats_fetch_retry(&stats->syncp, start));
++
++		stats64->tx_bytes += tx_bytes;
++		stats64->tx_packets += tx_packets;
++		stats64->tx_dropped += tx_dropped;
+ 	}
  }
  
-+static long fbnic_pkt_tx(struct fbnic_napi_vector *nv,
-+			 struct fbnic_pkt_buff *pkt)
-+{
-+	struct fbnic_ring *ring = &nv->qt[0].sub1;
-+	int size, offset, nsegs = 1, data_len = 0;
-+	unsigned int tail = ring->tail;
-+	struct skb_shared_info *shinfo;
-+	skb_frag_t *frag = NULL;
-+	struct page *page;
-+	dma_addr_t dma;
-+	__le64 *twd;
+@@ -603,6 +623,7 @@ static void fbnic_get_queue_stats_tx(struct net_device *dev, int idx,
+ 	struct fbnic_ring *txr = fbn->tx[idx];
+ 	struct fbnic_queue_stats *stats;
+ 	u64 stop, wake, csum, lso;
++	struct fbnic_ring *xdpr;
+ 	unsigned int start;
+ 	u64 bytes, packets;
+ 
+@@ -626,6 +647,19 @@ static void fbnic_get_queue_stats_tx(struct net_device *dev, int idx,
+ 	tx->hw_gso_wire_packets = lso;
+ 	tx->stop = stop;
+ 	tx->wake = wake;
 +
-+	if (unlikely(xdp_buff_has_frags(&pkt->buff))) {
-+		shinfo = xdp_get_shared_info_from_buff(&pkt->buff);
-+		nsegs += shinfo->nr_frags;
-+		data_len = shinfo->xdp_frags_size;
-+		frag = &shinfo->frags[0];
++	xdpr = fbn->tx[FBNIC_MAX_TXQS + idx];
++	if (xdpr) {
++		stats = &xdpr->stats;
++		do {
++			start = u64_stats_fetch_begin(&stats->syncp);
++			bytes = stats->bytes;
++			packets = stats->packets;
++		} while (u64_stats_fetch_retry(&stats->syncp, start));
++
++		tx->bytes += bytes;
++		tx->packets += packets;
 +	}
-+
-+	if (fbnic_desc_unused(ring) < nsegs)
-+		return -FBNIC_XDP_CONSUME;
-+
-+	page = virt_to_page(pkt->buff.data_hard_start);
-+	offset = offset_in_page(pkt->buff.data);
-+	dma = page_pool_get_dma_addr(page);
-+
-+	size = pkt->buff.data_end - pkt->buff.data;
-+
-+	while (nsegs--) {
-+		dma_sync_single_range_for_device(nv->dev, dma, offset, size,
-+						 DMA_BIDIRECTIONAL);
-+		dma += offset;
-+
-+		ring->tx_buf[tail] = page;
-+
-+		twd = &ring->desc[tail];
-+		*twd = cpu_to_le64(FIELD_PREP(FBNIC_TWD_ADDR_MASK, dma) |
-+				   FIELD_PREP(FBNIC_TWD_LEN_MASK, size) |
-+				   FIELD_PREP(FBNIC_TWD_TYPE_MASK,
-+					      FBNIC_TWD_TYPE_AL));
-+
-+		tail++;
-+		tail &= ring->size_mask;
-+
-+		if (!data_len)
-+			break;
-+
-+		offset = skb_frag_off(frag);
-+		page = skb_frag_page(frag);
-+		dma = page_pool_get_dma_addr(page);
-+
-+		size = skb_frag_size(frag);
-+		data_len -= size;
-+		frag++;
-+	}
-+
-+	*twd |= FBNIC_TWD_TYPE(LAST_AL);
-+
-+	ring->tail = tail;
-+
-+	return -FBNIC_XDP_TX;
-+}
-+
-+static void fbnic_pkt_commit_tail(struct fbnic_napi_vector *nv,
-+				  unsigned int pkt_tail)
-+{
-+	struct fbnic_ring *ring = &nv->qt[0].sub1;
-+
-+	/* Force DMA writes to flush before writing to tail */
-+	dma_wmb();
-+
-+	writel(pkt_tail, ring->doorbell);
-+}
-+
- static struct sk_buff *fbnic_run_xdp(struct fbnic_napi_vector *nv,
- 				     struct fbnic_pkt_buff *pkt)
+ }
+ 
+ static void fbnic_get_base_stats(struct net_device *dev,
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
+index 3ce1762bd11d..fd22e8f83962 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
+@@ -620,8 +620,8 @@ static void fbnic_clean_twq1(struct fbnic_napi_vector *nv, bool pp_allow_direct,
+ 			     struct fbnic_ring *ring, bool discard,
+ 			     unsigned int hw_head)
  {
-@@ -1040,6 +1115,8 @@ static struct sk_buff *fbnic_run_xdp(struct fbnic_napi_vector *nv,
- 	case XDP_PASS:
- xdp_pass:
- 		return fbnic_build_skb(nv, pkt);
-+	case XDP_TX:
-+		return ERR_PTR(fbnic_pkt_tx(nv, pkt));
- 	default:
- 		bpf_warn_invalid_xdp_action(nv->napi.dev, xdp_prog, act);
- 		fallthrough;
-@@ -1104,10 +1181,10 @@ static int fbnic_clean_rcq(struct fbnic_napi_vector *nv,
++	u64 total_bytes = 0, total_packets = 0;
+ 	unsigned int head = ring->head;
+-	u64 total_bytes = 0;
+ 
+ 	while (hw_head != head) {
+ 		struct page *page;
+@@ -633,6 +633,11 @@ static void fbnic_clean_twq1(struct fbnic_napi_vector *nv, bool pp_allow_direct,
+ 		twd = le64_to_cpu(ring->desc[head]);
+ 		page = ring->tx_buf[head];
+ 
++		/* TYPE_AL is 2, TYPE_LAST_AL is 3. So this trick gives
++		 * us one increment per packet, with no branches.
++		 */
++		total_packets += FIELD_GET(FBNIC_TWD_TYPE_MASK, twd) -
++				 FBNIC_TWD_TYPE_AL;
+ 		total_bytes += FIELD_GET(FBNIC_TWD_LEN_MASK, twd);
+ 
+ 		page_pool_put_page(nv->page_pool, page, -1, pp_allow_direct);
+@@ -645,6 +650,18 @@ static void fbnic_clean_twq1(struct fbnic_napi_vector *nv, bool pp_allow_direct,
+ 		return;
+ 
+ 	ring->head = head;
++
++	if (discard) {
++		u64_stats_update_begin(&ring->stats.syncp);
++		ring->stats.dropped += total_packets;
++		u64_stats_update_end(&ring->stats.syncp);
++		return;
++	}
++
++	u64_stats_update_begin(&ring->stats.syncp);
++	ring->stats.bytes += total_bytes;
++	ring->stats.packets += total_packets;
++	u64_stats_update_end(&ring->stats.syncp);
+ }
+ 
+ static void fbnic_clean_tsq(struct fbnic_napi_vector *nv,
+@@ -1040,8 +1057,12 @@ static long fbnic_pkt_tx(struct fbnic_napi_vector *nv,
+ 		frag = &shinfo->frags[0];
+ 	}
+ 
+-	if (fbnic_desc_unused(ring) < nsegs)
++	if (fbnic_desc_unused(ring) < nsegs) {
++		u64_stats_update_begin(&ring->stats.syncp);
++		ring->stats.dropped++;
++		u64_stats_update_end(&ring->stats.syncp);
+ 		return -FBNIC_XDP_CONSUME;
++	}
+ 
+ 	page = virt_to_page(pkt->buff.data_hard_start);
+ 	offset = offset_in_page(pkt->buff.data);
+@@ -1181,8 +1202,8 @@ static int fbnic_clean_rcq(struct fbnic_napi_vector *nv,
  			   struct fbnic_q_triad *qt, int budget)
  {
  	unsigned int packets = 0, bytes = 0, dropped = 0, alloc_failed = 0;
-+	s32 head0 = -1, head1 = -1, pkt_tail = -1;
- 	u64 csum_complete = 0, csum_none = 0;
++	u64 csum_complete = 0, csum_none = 0, length_errors = 0;
+ 	s32 head0 = -1, head1 = -1, pkt_tail = -1;
+-	u64 csum_complete = 0, csum_none = 0;
  	struct fbnic_ring *rcq = &qt->cmpl;
  	struct fbnic_pkt_buff *pkt;
--	s32 head0 = -1, head1 = -1;
  	__le64 *raw_rcd, done;
- 	u32 head = rcq->head;
- 
-@@ -1163,6 +1240,9 @@ static int fbnic_clean_rcq(struct fbnic_napi_vector *nv,
- 				bytes += skb->len;
- 
- 				napi_gro_receive(&nv->napi, skb);
-+			} else if (PTR_ERR(skb) == -FBNIC_XDP_TX) {
-+				pkt_tail = nv->qt[0].sub1.tail;
-+				bytes += xdp_get_buff_len(&pkt->buff);
- 			} else {
+@@ -1247,6 +1268,8 @@ static int fbnic_clean_rcq(struct fbnic_napi_vector *nv,
  				if (!skb) {
  					alloc_failed++;
-@@ -1198,6 +1278,9 @@ static int fbnic_clean_rcq(struct fbnic_napi_vector *nv,
+ 					dropped++;
++				} else if (PTR_ERR(skb) == -FBNIC_XDP_LEN_ERR) {
++					length_errors++;
+ 				} else {
+ 					dropped++;
+ 				}
+@@ -1276,6 +1299,7 @@ static int fbnic_clean_rcq(struct fbnic_napi_vector *nv,
+ 	rcq->stats.rx.alloc_failed += alloc_failed;
+ 	rcq->stats.rx.csum_complete += csum_complete;
  	rcq->stats.rx.csum_none += csum_none;
++	rcq->stats.rx.length_errors += length_errors;
  	u64_stats_update_end(&rcq->stats.syncp);
  
-+	if (pkt_tail >= 0)
-+		fbnic_pkt_commit_tail(nv, pkt_tail);
+ 	if (pkt_tail >= 0)
+@@ -1359,8 +1383,9 @@ void fbnic_aggregate_ring_rx_counters(struct fbnic_net *fbn,
+ 	fbn->rx_stats.rx.alloc_failed += stats->rx.alloc_failed;
+ 	fbn->rx_stats.rx.csum_complete += stats->rx.csum_complete;
+ 	fbn->rx_stats.rx.csum_none += stats->rx.csum_none;
++	fbn->rx_stats.rx.length_errors += stats->rx.length_errors;
+ 	/* Remember to add new stats here */
+-	BUILD_BUG_ON(sizeof(fbn->rx_stats.rx) / 8 != 3);
++	BUILD_BUG_ON(sizeof(fbn->rx_stats.rx) / 8 != 4);
+ }
+ 
+ void fbnic_aggregate_ring_tx_counters(struct fbnic_net *fbn,
+@@ -1382,6 +1407,22 @@ void fbnic_aggregate_ring_tx_counters(struct fbnic_net *fbn,
+ 	BUILD_BUG_ON(sizeof(fbn->tx_stats.twq) / 8 != 6);
+ }
+ 
++static void fbnic_aggregate_ring_xdp_counters(struct fbnic_net *fbn,
++					      struct fbnic_ring *xdpr)
++{
++	struct fbnic_queue_stats *stats = &xdpr->stats;
 +
- 	/* Unmap and free processed buffers */
- 	if (head0 >= 0)
- 		fbnic_clean_bdq(nv, budget, &qt->sub0, head0);
++	if (!(xdpr->flags & FBNIC_RING_F_STATS))
++		return;
++
++	/* Capture stats from queues before dissasociating them */
++	fbn->rx_stats.bytes += stats->bytes;
++	fbn->rx_stats.packets += stats->packets;
++	fbn->rx_stats.dropped += stats->dropped;
++	fbn->tx_stats.bytes += stats->bytes;
++	fbn->tx_stats.packets += stats->packets;
++}
++
+ static void fbnic_remove_tx_ring(struct fbnic_net *fbn,
+ 				 struct fbnic_ring *txr)
+ {
+@@ -1401,6 +1442,8 @@ static void fbnic_remove_xdp_ring(struct fbnic_net *fbn,
+ 	if (!(xdpr->flags & FBNIC_RING_F_STATS))
+ 		return;
+ 
++	fbnic_aggregate_ring_xdp_counters(fbn, xdpr);
++
+ 	/* Remove pointer to the Tx ring */
+ 	WARN_ON(fbn->tx[xdpr->q_idx] && fbn->tx[xdpr->q_idx] != xdpr);
+ 	fbn->tx[xdpr->q_idx] = NULL;
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
+index 0e92d11115a6..873440ca6a31 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
+@@ -90,6 +90,7 @@ struct fbnic_queue_stats {
+ 			u64 alloc_failed;
+ 			u64 csum_complete;
+ 			u64 csum_none;
++			u64 length_errors;
+ 		} rx;
+ 	};
+ 	u64 dropped;
 -- 
 2.47.3
 
