@@ -1,114 +1,170 @@
-Return-Path: <netdev+bounces-212831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212834-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AB52B2235E
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 11:39:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54D7EB2236F
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 11:41:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 62BF53ACFE2
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 09:38:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 88AA8188FA91
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 09:41:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 254792E92C1;
-	Tue, 12 Aug 2025 09:38:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YS+XDPyH"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7484B2E9EDC;
+	Tue, 12 Aug 2025 09:41:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbgau1.qq.com (smtpbgau1.qq.com [54.206.16.166])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A97072E88B7;
-	Tue, 12 Aug 2025 09:38:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B55F22E8E0E;
+	Tue, 12 Aug 2025 09:41:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.16.166
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754991509; cv=none; b=K4iFlCB6Z9Q3ToG5afw0WltxNQyXTeLusxcdaW9/Qrv9D7pNCpIMar05mkB7n0NPdir2k0kSzk0yXeog+akw7iX32ICn4nGUSgWg6peUGCPOc9GTxkXoWDtuB4PH+lKoDa47x/pjhwjjkzSosl2xph1s8tOxPWY/btJp8UXlEhM=
+	t=1754991667; cv=none; b=Upy2KfduTa4QlQezv238eouCj35G6RPRbYTgQMa9cgiUWzY2F2I8+7AiNgQKiUSxiqD+2KgAPhtpBQnVGEVsB8uoeF8NUapkBRlTSvW8bkOnhJ6Ekgx3F9IUjIISWSUp9oOAq3YEbwyi6hdw0yl+6mZxtEinHyR3sMBBSvGXjho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754991509; c=relaxed/simple;
-	bh=koaFm8FvB39ZLSjO9y8mETs6PzsiMdWay6NKARPb85s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KOHpuNxh/r5/nD6dTt5FyAlsHT9IhYbPjApHRKsUOdsj5FhfguuCmKlylmrOnW9KiwYabP0XilmNuc2EQBCja5zuXQBWQ5OmibFz1LEsirwTrEz1vy+yC3qmKOlupgU4Q4st40s63sn2UA9Q93G/cTQJr1qOfG3Ifrbr67puc5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YS+XDPyH; arc=none smtp.client-ip=209.85.128.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-71c42f1b4e7so7933647b3.1;
-        Tue, 12 Aug 2025 02:38:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1754991506; x=1755596306; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=koaFm8FvB39ZLSjO9y8mETs6PzsiMdWay6NKARPb85s=;
-        b=YS+XDPyHE67IS0RuVQNIcv7KefVFK9SP0ADghW3sIMvdjS2N4jLovmTeU/JAiV2ouS
-         Z0aVSo6rC/iY0d70F5taJtOlwB9cOerZU52Y3t9ncEQuovwpt0+D+GPCTs3J3vrRywVy
-         0oVyqS3/A5x9wTcNDS/2tOJWb2UF0XSjnAAzAnzunXt1kOla/iU7RUeyOZF8IMM/UJuO
-         fwpFneOdSFzd8ZM/3YEUTX0n9ptaLOTwpeyUbgj4MwG1chpYHPb4nRUgQo3beKimc03n
-         69083UA+jEvsdQRYsD9t849HUjuWTqFl37XYBNq86MkTSS9T8u597pBfojGQcszu285T
-         dfjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754991506; x=1755596306;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=koaFm8FvB39ZLSjO9y8mETs6PzsiMdWay6NKARPb85s=;
-        b=ssiGLBcFMomb7B8TtxdyY8lyUB8ubYOf20RroPN0UMh4sMg4zd2GV433gnX9EBpc6i
-         KM1wVluuGwQA+6wVv4c/6ZysWJOQuTpqGeZXsI6fYXM1eFg0Bva9vVmKnfLiHyNu3E7Q
-         CTCr2aOpAQc7G/A4Fb92gbYOFnGG7jXJMvvya9r9HbezbuFiYvzO/PzyBBOiYiL+Wv5t
-         dikJRV/iBXOxd/ooyazai37oRnhxu++f3CVRJx/v8o2QyxUEAgaT5DgOnvzmZVyLgGO6
-         18MD6h4WPflKCJLytfAFBjaqPvXGu6gVN9MeTUVSeBdvchhZK3Ixq+3DhgT+PPzK27Aw
-         UQtA==
-X-Forwarded-Encrypted: i=1; AJvYcCVodLSfrPTlhssI1QBGy5rTvZ4BHRTGFGRT/1QOOPe65Q3LEUaVh1vLqSzgu83aP5V0QfZRF2cIu9XK9sg=@vger.kernel.org, AJvYcCWMPlEs8JAPaZYBY4K9y4MzfzCZyWcnZ+aNQpLqGe50IeoV/DX83RV0G6XAYhqtkgJ8qYxn0fUIFpZ1@vger.kernel.org, AJvYcCXCCQ+hNx0LnsJECp68di8WS8+sIcqF+K3Pvb/cGHi6GUxCrkQObNcoPpJdcxCvwT+ycRpP0dK9@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw99se8hKfHsRERjvllI2nyWlsckGABxRWYyMPinoLuprsuQs+l
-	ovBujGRddkpQvcyLW0R6DcY2aL7bqfq85js4V8J3DUCFwUX3McB+zjIWUNjlX5AfCkzc1n92kpF
-	JiRDFVyP3NWtl207mAH+pZMr9vsujmDE=
-X-Gm-Gg: ASbGncv8d3sgoqGertMnLrojC5tQQ7TgJrTB2IRXGzvHqYDJ3iOgwJqNwYuofHdqPvS
-	SNCdf7F8aWKmbgStxg2XY4r4AuRVeXRgxgcN7SySxdpX1+TRs1BfcKzpNIDGPkIIaZp1SwPvaBO
-	Fch1l6TCSRIqpylPWM9xwP1H26oQWEr9Gr0U7E+jUypqYUpRlUeeVhWlEnhSOfAr4gn6qs+iH21
-	BDNAOfR3FelI9QfrtTFVqscp47AXIyXpco=
-X-Google-Smtp-Source: AGHT+IFr7lgvZZY1y9lc5TCDH28j16QxyQ1XjQ4nf1DDvgSq+pDk5VobcnsC+NpttWTdlPZ4ZOAiPz3KKhhYzaqQfyo=
-X-Received: by 2002:a05:690c:700b:b0:71c:1673:7bcf with SMTP id
- 00721157ae682-71c42a7ba20mr34696007b3.33.1754991506451; Tue, 12 Aug 2025
- 02:38:26 -0700 (PDT)
+	s=arc-20240116; t=1754991667; c=relaxed/simple;
+	bh=E30CA2OyE6yW18KhFeMGAY+johqRCBEBiBJLS6lL8x8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YJp5WjtAmkJhqwFHVpn/f4MFlBI5xOhbZVX+3dldE81eiQJdXOx/ISk+TpAG/rAnIMyoTCDMHq6ykTtc7U9bSsSNI5mKAW/C7MTkfymnZt+9lKZfB/WrIAnFYkgnQP8OycjswFU6uav3Wdyyy+j9QE75/QSDWTMhHhtzJMFMi/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=54.206.16.166
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
+X-QQ-mid: zesmtpgz7t1754991596t293a4c67
+X-QQ-Originating-IP: PnCszxP7z8c8wtX64M80yLJLhPuH0abNPFPw2j7FmGg=
+Received: from localhost.localdomain ( [203.174.112.180])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 12 Aug 2025 17:39:52 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 17493466095422222965
+EX-QQ-RecipientCnt: 23
+From: Dong Yibo <dong100@mucse.com>
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	corbet@lwn.net,
+	gur.stavi@huawei.com,
+	maddy@linux.ibm.com,
+	mpe@ellerman.id.au,
+	danishanwar@ti.com,
+	lee@trager.us,
+	gongfan1@huawei.com,
+	lorenzo@kernel.org,
+	geert+renesas@glider.be,
+	Parthiban.Veerasooran@microchip.com,
+	lukas.bulwahn@redhat.com,
+	alexanderduyck@fb.com,
+	richardcochran@gmail.com
+Cc: netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	dong100@mucse.com
+Subject: [PATCH v3 0/5] Add driver for 1Gbe network chips from MUCSE
+Date: Tue, 12 Aug 2025 17:39:32 +0800
+Message-Id: <20250812093937.882045-1-dong100@mucse.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250811084427.178739-1-dqfext@gmail.com> <CANn89iLEMss3VGiJCo=XGVFBSA12bz0y01vVdmBN7WysBLtoUA@mail.gmail.com>
- <CALW65jZ-uBWOkxPVMQc3Yg-KEoVRdPQYVC3+q5MiQbvpDZBKTQ@mail.gmail.com>
-In-Reply-To: <CALW65jZ-uBWOkxPVMQc3Yg-KEoVRdPQYVC3+q5MiQbvpDZBKTQ@mail.gmail.com>
-From: Qingfang Deng <dqfext@gmail.com>
-Date: Tue, 12 Aug 2025 17:38:02 +0800
-X-Gm-Features: Ac12FXw0Y-iPDS0UmW3suIhNsvD18mqQHDwpTsV75hK8tZWdg2KKvy21TEpnv3I
-Message-ID: <CALW65jYNMNArwzmpHhYj3fpfL0Oz2fRYsJz0JMDUnyByu-8z3w@mail.gmail.com>
-Subject: Re: [PATCH net] ppp: fix race conditions in ppp_fill_forward_path
-To: Eric Dumazet <edumazet@google.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Pablo Neira Ayuso <pablo@netfilter.org>, Felix Fietkau <nbd@nbd.name>, linux-ppp@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpgz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: MtnV5/DUURsJNAjWVY+kf5NIALCm6d6jcOTsgGxdyPByH2f7BNbZz8yS
+	li+Qlwko5IwWLXbBAtsWHp1T6NHNW/y3/kllahwn749pJbnCs+RVRawLHzcLTyWC34gGkQD
+	8aXMaKEszwd7ViAzG70wExNdB6Ofg+cbw47zNkPWdxiMSrdlSZguXtUbVdiXJ04Z0ifAkPy
+	HoM00H9xsXei/bSpP9MeQiCF6by4V+lojGc+oLZ0NnpL0vZWBoqkb4WwPL3QIPO7xypY2LE
+	Uh1iAYcYHNcx3J5TFfpKOf1o1mXiTX/rfxBlcBSpo3NzGiAyOEXlHC+F3zhKxLaIxHBMnpb
+	xooILqyeLkyWWp6ry5iPlPWU/hiJLbHjCygNwr/GYfrRlvaGj5Yy16gQIbFN8pZRQ8k55FG
+	vrf6UaD2OmjX+ACWy4KBmuMsuyA1i1xZLSn3Lan5OpTYIMYjhILF+iMYuyniElJu97oBq6k
+	dK/dHTJGb2BHw0j3UiKyITX7ljyhqfVbHDOjwEt3YLKDQyuu73md0+6BZ3wH0wpLJTPw+iQ
+	zdjn6tUX7yakD6sDFe+TkrxPvmhtCOBVD4ibb5vRMMfWbjI36RTgBGeRyHzSVDH4NZmlC5G
+	oHqMkNvN8jCr51IPiZM4wQLdKEVuSrhtT6XdRWV8/h1lZzDbRl6w3Mfx8M68xZaGbRYjpDg
+	OvdDQ2b+8SuEUW53ajgtZzt/FBmPXnjQt6TRXX1fNIBpl52j7Z3EymMeoOt3nw2bQ8ccOMl
+	K81I6KoXFcXJbfd2iB0DlhEgaoGepfOvh6/c9vAuNy7wLaaOMsbKIc8rYgC4x57Gf/L5qrY
+	qHEe3KX4spohXzJk+9ss5/HrjZ9Ur4aJHbBrbEiRxnEllSfZs0j7wAqQ4cf6owhlsm6wGR4
+	VVeXgsvpmqW1p3yJBkl8rEfWrtabG34SFOFSYDzFcTYGtHzdrvIXtKPy7uQgwfB795gEauR
+	B29HvZ026k72r1RRgGLMCSeJn5Sz9XgrC1WBPDYSV8cqnWih9l2aqwlGUPtAclLY/A7f8bg
+	lU2FNSb0iL9UbKLo6NUGLS/rbBW1Wbpk7PdHUVFJpT6sGGj51nNVR7e4bo0GoNFG8vmd/25
+	g==
+X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
+X-QQ-RECHKSPAM: 0
 
-On Mon, Aug 11, 2025 at 5:35=E2=80=AFPM Qingfang Deng <dqfext@gmail.com> wr=
-ote:
->
-> On Mon, Aug 11, 2025 at 5:19=E2=80=AFPM Eric Dumazet <edumazet@google.com=
-> wrote:
-> >
-> > On Mon, Aug 11, 2025 at 1:44=E2=80=AFAM Qingfang Deng <dqfext@gmail.com=
-> wrote:
-> > It is unclear if rcu_read_lock() is held at this point.
-> >
-> > list_first_or_null_rcu() does not have a builtin __list_check_rcu()
->
-> ndo_fill_forward_path() is called by nf_tables chains, which is inside
-> an RCU critical section.
+Hi maintainers,
 
-Update: mtk_flow_get_wdma_info() in mtk_ppe_offload.c calls
-dev_fill_forward_path() in process context without RCU, so
-ppp_fill_forward_path() can be called from two different contexts.
-Should I add rcu_read_lock() to mtk_flow_get_wdma_info() or
-ppp_fill_forward_path()?
+This patch series is v3 to introduce support for MUCSE N500/N210 1Gbps
+Ethernet controllers. I divide codes into multiple series, this is the
+first one which only register netdev without true tx/rx functions.
+
+The driver has been tested on the following platform:
+   - Kernel version: 6.16.0
+   - Intel Xeon Processor
+
+Changelog:
+v2 -> v3:
+  [patch 1/5]:
+  1. Fix rnpgbe_driver_name as static.
+  2. Fix sorted-list for index.rst Kconfig Makefile.
+  [patch 2/5]
+  1. Using common funcs to initialize common parts across multiple chips.
+  [patch 3/5]
+  1. Fix no initialised error.
+  [patch 4/5]:
+  1. Fix invalid bitfield specifier for type restricted __le32
+  
+  Some common modifications:
+  1. Remove extra parentheses for constant.
+  2. Check code-spell error and comment.
+  3. Remove no used code and define.
+  4. Use const for all ops.
+  5. Modify the code based on Brett Creeley, andrew, horms's feedbacks.
+
+links:
+v2: https://lore.kernel.org/netdev/20250721113238.18615-1-dong100@mucse.com/
+v1: https://lore.kernel.org/netdev/20250703014859.210110-1-dong100@mucse.com/
+
+Dong Yibo (5):
+  net: rnpgbe: Add build support for rnpgbe
+  net: rnpgbe: Add n500/n210 chip support
+  net: rnpgbe: Add basic mbx ops support
+  net: rnpgbe: Add basic mbx_fw support
+  net: rnpgbe: Add register_netdev
+
+ .../device_drivers/ethernet/index.rst         |   1 +
+ .../device_drivers/ethernet/mucse/rnpgbe.rst  |  21 +
+ MAINTAINERS                                   |   8 +
+ drivers/net/ethernet/Kconfig                  |   1 +
+ drivers/net/ethernet/Makefile                 |   1 +
+ drivers/net/ethernet/mucse/Kconfig            |  34 ++
+ drivers/net/ethernet/mucse/Makefile           |   7 +
+ drivers/net/ethernet/mucse/rnpgbe/Makefile    |  11 +
+ drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h    | 148 ++++++
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_chip.c   | 166 +++++++
+ drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h |  15 +
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_main.c   | 352 ++++++++++++++
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c    | 443 ++++++++++++++++++
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx.h    |  31 ++
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c | 275 +++++++++++
+ .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h | 201 ++++++++
+ 16 files changed, 1715 insertions(+)
+ create mode 100644 Documentation/networking/device_drivers/ethernet/mucse/rnpgbe.rst
+ create mode 100644 drivers/net/ethernet/mucse/Kconfig
+ create mode 100644 drivers/net/ethernet/mucse/Makefile
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/Makefile
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.c
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx.h
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c
+ create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h
+
+-- 
+2.25.1
+
 
