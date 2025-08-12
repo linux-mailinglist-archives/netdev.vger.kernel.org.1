@@ -1,42 +1,42 @@
-Return-Path: <netdev+bounces-212720-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212721-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53BEBB21A67
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 03:52:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55D0CB21A69
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 03:52:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1EC1F1A25C7F
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 01:52:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6298C1A25C02
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 01:52:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CA722D8798;
-	Tue, 12 Aug 2025 01:52:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFA5E2D3A9D;
+	Tue, 12 Aug 2025 01:52:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgeu1.qq.com (smtpbgeu1.qq.com [52.59.177.22])
+Received: from smtpbguseast1.qq.com (smtpbguseast1.qq.com [54.204.34.129])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D3FF212B05
-	for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 01:51:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.59.177.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 384902D7819
+	for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 01:52:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.129
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754963520; cv=none; b=LSfUPc5NXsmHg33mK0E4QRq7jPH6qImm1zpxH58RyLsEX95deHrFpZ+jYMLzRkjfRZBrFk+k3hFHLRgfWbGe492pais1SjbHtkGib6xGMyFsaDMSagcdAcP0ScIdo2KDx8t1gpS9msA5azOvtCfL54/Jg9evujI4gBqumN0HIcc=
+	t=1754963546; cv=none; b=Kc1xUnJCyI33HMXLZPzZ4DbH+Vu7rybXBtB6o2BnzeaFOGl6I7va/gajW3H9ZjdXtMX7KygxiZQEt04N9dFpH/T7HggToyJre8fVOBCX2MUFZTUGNZQkh4Rtz4EZfjjXQHAGymJouSmZ58htg1owQUzywgIC7+RkKXpVJIDaqvk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754963520; c=relaxed/simple;
-	bh=jnUdPUIMFKVF7SxzQjmOnhFbiuf424/+sxKqR81qgYA=;
+	s=arc-20240116; t=1754963546; c=relaxed/simple;
+	bh=kRBSFbB5Ur9//a+gzkVQ3lI3sk0J+wu1c6RJUor9YZs=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=nRJ/rrVOH2sza6fannBvJ1GrKtRj49hsfdj1efTv4gPVLXw4J8DBDpzVl9UE383A7+rMfxizFgaollzHY0BG9rV89CUF9fVnmFUl0zSDaspXwIMTHAf7qgr1DdosUFJCB/FS5CpQAIvxjhFwz2fEIPtYK/FI10fVZ2CPtIfuvvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=52.59.177.22
+	 MIME-Version; b=HOH/cVzY+9DzWs4PsqHtc/86lkE8Xjgr9rWl6n5ODZGzxi4/wtpU/Jqh1Ee9sE0wSun3m+ks3Md3Mm6u+DvL6oNWgvz+Ifmlyfb+OvHQnRSWQETZky1JUIxiJLaMeNayNEBB7ILGNb/Brd+DAPcsO/qD3e3d9htaD2gbgHG/bo0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.204.34.129
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: esmtpsz18t1754963443tf857f099
-X-QQ-Originating-IP: KHfAFLT8LDXLCOvR52wiwIj+XHkX63B+IKfFBWVmktw=
+X-QQ-mid: esmtpsz18t1754963445t4523b932
+X-QQ-Originating-IP: EX2TzBN9xUoFV0POxVfh1whKJTdh/TohhxEb0FdNRfY=
 Received: from lap-jiawenwu.trustnetic.com ( [125.120.182.53])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 12 Aug 2025 09:50:42 +0800 (CST)
+	id ; Tue, 12 Aug 2025 09:50:44 +0800 (CST)
 X-QQ-SSF: 0000000000000000000000000000000
 X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 14266096083781844644
+X-BIZMAIL-ID: 7817656972516925361
 EX-QQ-RecipientCnt: 10
 From: Jiawen Wu <jiawenwu@trustnetic.com>
 To: netdev@vger.kernel.org,
@@ -49,9 +49,9 @@ To: netdev@vger.kernel.org,
 	Jacob Keller <jacob.e.keller@intel.com>
 Cc: Mengyuan Lou <mengyuanlou@net-swift.com>,
 	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net-next v4 2/4] net: wangxun: limit tx_max_coalesced_frames_irq
-Date: Tue, 12 Aug 2025 09:50:21 +0800
-Message-Id: <20250812015023.12876-3-jiawenwu@trustnetic.com>
+Subject: [PATCH net-next v4 3/4] net: wangxun: cleanup the code in wx_set_coalesce()
+Date: Tue, 12 Aug 2025 09:50:22 +0800
+Message-Id: <20250812015023.12876-4-jiawenwu@trustnetic.com>
 X-Mailer: git-send-email 2.21.0.windows.1
 In-Reply-To: <20250812015023.12876-1-jiawenwu@trustnetic.com>
 References: <20250812015023.12876-1-jiawenwu@trustnetic.com>
@@ -64,52 +64,93 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: esmtpsz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: NSQm2ODd9qLZ1jrEdsF6Wspm6h6dJTQ5B310sqTQvpGODhx0nAqMuCth
-	rs45cq/4zpKcO9fQaifDWkBdK4vheovhQgMR77fbAcwF8FB0iFX0Kz79mI1MQtT18ri+Zez
-	9GUw4DsLW7GRghdGFrYz8DVHWoMuHBVUb82ai/joBISSJZz0zNA1CsPz4hAPVPguqhODO5J
-	C4V7uBy6MPl6Q8yt2e2Y7vblgCjVpYCx0PGxrEVdQi7KxTb9N3jRdRT2eAkq8nOOFfusSvM
-	JB+dh/FriJKyceUdwn4SqC0Df8Mnnw+LF8xxS5VCnOJ/sh0BuKCNUpoUOjsJLWzZQviqJqj
-	bxhpW+3AR7aJa6IdGJrjxCv4R5xaf+zlWnbyI90dXwPfelOEYIEVJ/PyBC86M+lP/8H8TZ9
-	crGHs8hyOZYK2gPmakNxSQW6VI2OuTpzaZBjrRao769e3jnUCdZl6Eoq1pvnceNtA7D7TjR
-	vIlihbX70CeJiz2ECO0adGFJ/VbiSAhfnEN+XyfuOuEFvr85UkCJP5t9VeUFdmzYnZKJaTM
-	P/TFT5NR+FvOhhqcycrMU1bvQ5amVltivcP/eXdczMkNN1wSk9R5Pow/B8sKoeiobyq/8pC
-	FJsPKe4YXSVqdkMYOTjoAgce98ZLZ3hRYmpzuzXezM3HETKcTd8qGCn4LNKQ6+RQ8wAqkQ1
-	JY8EeNdxx5onXsDv0o3FfG20qJ1YadXZZwBgyid7XldLvGFZayO66X/XZTNZL+YiVUZz1m5
-	Yht1FR2oPLWOEK/Hn3d6ob7LoHpdXEDPd4f9Xo3j7rrAEkML7qRM4oYPGiSdDhQxu0OVdG+
-	VKWCMPOFyqbvVNIcG0NL4cEcCzRj7T3oMOmqOjE1Mgc5S1LRXG4wiZABPq02++L5I8q6KF0
-	n2XEP/7NCAHHBksD5+7qeQxU9j1fKFVAq+ESiOTeuOC83M4J0RI2qAAXls0H/QmkpQrpjeP
-	sIMT+fuGAczsnsidIVcccB5DLZtyiUktJdPg+zyQE9zy7IJlLJe+i+9heFsSrDvhju3wtR3
-	DtA3909h/hM5p0y7J6ZQF3dI2zWgnNXiLEuvtp6Y/aHyr1RGQG
-X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
+X-QQ-XMAILINFO: Nmk4/QZkZ7Qich1GC55x3W+kyDmzZCCNgC0UfXtvCcf0hROM7yQfv1pl
+	/GJWOMt6oTdE5VwwPgtLTL/OdM7v+a6FB72zL4/TVwpBcN3ZtWBEveu+PBzS3gM4T2dS8il
+	bfVb+UmTHDTwMWJc0ty7oiOTzrxhGHSXtUTzklWoPbhf5/GoRlaLRiAyTKSLdPVFd2GR4FI
+	IgLOL8XiVFtjGr81XGDMVi3oLySAA+PAe/ZvOvB+xoCcMqEQeYFlwnoao0fpIIW3zWGMqPp
+	+3lK1nBhYf8ond8YMLb1rwzRbSs9XgHy4yg8akgkhg4h93B9eMNnaG96hO9R6peplUv8A3q
+	yCR5RJLWDbTsxLz3ElBuC9NqTQFxGjjlAWSdqOF/TmxGDFY6+Amjn2D9X9EmYf8sF7/U894
+	Rrh3EOOyqDbg34ZlFfodI9b9eoQuRqzed4+kNk6XRZR1DvoG6LLpsDEnfGluW45gHYkG5MC
+	0njifz56zDbAmoJP5Q1r1OZf5bl6W35sIUSSyRaRzwS4esXDnR3VaHkHm4CLNkwU4Dtepwz
+	wksTeeuSHEyWPQtMK1KX3CaibqfJY/XyNfQ0GA0sqFjGECbsE1f7gZapgG7vdU2T76QvuNS
+	g60PYLbR+BqTUyvM8227wwb5SLQddrirFiS6GwM3pVA4xtoQDccm7KQXwBnCz3XbsiVsTHW
+	wZWJ0ZKNS0aetpvP49P3T2DR9b/OX7Yxk7YyIapp8ofX/Iztr6SREg529N+9xoPM/6FAGRZ
+	TLVSj/NzDKl9tI3cQyeSumZhhyheKMAU9yN/Rg4kiLd8ioNeLkDmKE3NnbqRRlpF2fG0jJX
+	YuFMEReiFgtqUtiltpzHQNL/ZmKazHpfBqImg2Ja4eT1utRhVqWNaqSCYBFsjOOIW0uL7Qt
+	k6wrxIVCoXv8x2LpYTQueIbtgn7pRKtluFKI+uU1pPYtcPM0SbiBnkhhuID3JXUv/cN+/0U
+	UqrWE0Pf31i3l++Us15Hc6Z56IOOP1LrHpLcWh8VnavN7Xd1nRn2BFoxG6+7gVHHeJleNHi
+	gQCSbxKBeuXjpbC2mciDuwgSyuqyyBudvI1C8elZm/iclGBnr16mjdTptCZso=
+X-QQ-XMRINFO: NI4Ajvh11aEj8Xl/2s1/T8w=
 X-QQ-RECHKSPAM: 0
 
-Add limitation on tx_max_coalesced_frames_irq as 0 ~ 65535, because
-'wx->tx_work_limit' is declared as a member of type u16.
+Cleanup the code for the next patch to add adaptive coalesce.
 
 Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 ---
- drivers/net/ethernet/wangxun/libwx/wx_ethtool.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ .../net/ethernet/wangxun/libwx/wx_ethtool.c   | 28 ++++++-------------
+ 1 file changed, 8 insertions(+), 20 deletions(-)
 
 diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-index d9412e55b5b2..590a5901cf77 100644
+index 590a5901cf77..c7b3f5087b66 100644
 --- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
 +++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-@@ -334,8 +334,11 @@ int wx_set_coalesce(struct net_device *netdev,
- 			return -EOPNOTSUPP;
- 	}
- 
--	if (ec->tx_max_coalesced_frames_irq)
--		wx->tx_work_limit = ec->tx_max_coalesced_frames_irq;
-+	if (ec->tx_max_coalesced_frames_irq > U16_MAX  ||
-+	    !ec->tx_max_coalesced_frames_irq)
-+		return -EINVAL;
-+
-+	wx->tx_work_limit = ec->tx_max_coalesced_frames_irq;
- 
+@@ -343,13 +343,19 @@ int wx_set_coalesce(struct net_device *netdev,
  	switch (wx->mac.type) {
  	case wx_mac_sp:
+ 		max_eitr = WX_SP_MAX_EITR;
++		rx_itr_param = WX_20K_ITR;
++		tx_itr_param = WX_12K_ITR;
+ 		break;
+ 	case wx_mac_aml:
+ 	case wx_mac_aml40:
+ 		max_eitr = WX_AML_MAX_EITR;
++		rx_itr_param = WX_20K_ITR;
++		tx_itr_param = WX_12K_ITR;
+ 		break;
+ 	default:
+ 		max_eitr = WX_EM_MAX_EITR;
++		rx_itr_param = WX_7K_ITR;
++		tx_itr_param = WX_7K_ITR;
+ 		break;
+ 	}
+ 
+@@ -362,34 +368,16 @@ int wx_set_coalesce(struct net_device *netdev,
+ 	else
+ 		wx->rx_itr_setting = ec->rx_coalesce_usecs;
+ 
+-	if (wx->rx_itr_setting == 1) {
+-		if (wx->mac.type == wx_mac_em)
+-			rx_itr_param = WX_7K_ITR;
+-		else
+-			rx_itr_param = WX_20K_ITR;
+-	} else {
++	if (wx->rx_itr_setting != 1)
+ 		rx_itr_param = wx->rx_itr_setting;
+-	}
+ 
+ 	if (ec->tx_coalesce_usecs > 1)
+ 		wx->tx_itr_setting = ec->tx_coalesce_usecs << 2;
+ 	else
+ 		wx->tx_itr_setting = ec->tx_coalesce_usecs;
+ 
+-	if (wx->tx_itr_setting == 1) {
+-		switch (wx->mac.type) {
+-		case wx_mac_sp:
+-		case wx_mac_aml:
+-		case wx_mac_aml40:
+-			tx_itr_param = WX_12K_ITR;
+-			break;
+-		default:
+-			tx_itr_param = WX_7K_ITR;
+-			break;
+-		}
+-	} else {
++	if (wx->tx_itr_setting != 1)
+ 		tx_itr_param = wx->tx_itr_setting;
+-	}
+ 
+ 	/* mixed Rx/Tx */
+ 	if (wx->q_vector[0]->tx.count && wx->q_vector[0]->rx.count)
 -- 
 2.48.1
 
