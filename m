@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-212738-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212739-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62DF8B21B8B
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 05:20:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADA04B21B97
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 05:21:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66045174AE3
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 03:20:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77023188DDE0
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 03:20:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7E572D9EF3;
-	Tue, 12 Aug 2025 03:20:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEB9A2E0915;
+	Tue, 12 Aug 2025 03:20:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="halp2w/8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gkkLhG6z"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B48FB2D9ECF
-	for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 03:20:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B30442DE709;
+	Tue, 12 Aug 2025 03:20:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754968800; cv=none; b=Xd0b1YI0vd3Ld9pKSqdgM27U5JEHEt695wwlWYXVmnFGN9Nfd0Kq1DeItQgK71wj2C5Nh4FbaO3VBNSpTXoKiJ0kQACNZlxdpiQa+dhH9gJWMEEyk7MCE4emEbiuIEmzDCyXhnMPCqaLEimAtkV0t+RJZH5N3YocW9tclAW+tUw=
+	t=1754968801; cv=none; b=BgxSdQtB5zeT0ELWvVuRxyUu6V5WTM/SW+imCHl5x7Cj/ecTBxGP4aAKA+vZAinjxAskrUWVvmySi0Wk0Plv0LmYS0KhD6KfB8/fGPKVj7dW5FRNG2qoM86AgvQmdclK+9ErFSOBauah6kobywhcPgQJB5anhlExgVsEqYR5K9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754968800; c=relaxed/simple;
-	bh=6A+jeyPnXO4AX6ZcycgzjX1K4rTdQsKw738pZ+L6V6Y=;
+	s=arc-20240116; t=1754968801; c=relaxed/simple;
+	bh=QOBpupb0n5GKfRVbIXgDV1H/UMshmi+E6iE3T8GMY30=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=I4OL49KIzaBjezgrEj9vYxVcXXwnpEtDm28Ad+bc4diIN8oB5q18dSaUb6H7nJ6UEMi4Sghi3WiiMg5f3MHcFEfT/81U7xtnTBvkEdL6Jtirv69dKQA81SmKL1UK/ofQV293tyG3dVziC0xVYPfJCFuhI85P05RVJjTmNEremPE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=halp2w/8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3438C4CEED;
-	Tue, 12 Aug 2025 03:19:59 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=CZoCs9wd8tq68FQinkjRKYzOAmou3BALcLlq7liPRGRix8hL3XADc5U7KOAM0YSErhOIcf+uSzfacHcdjWjgAEjel78ZL5bCvfRjNhiBy9VTH08yruXsg5gwxa9gAgfIH7Un6nwHtcQeLD7oN4XZJ+x4A6jGAZCD0GhU4ihXkhM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gkkLhG6z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 883F4C4CEED;
+	Tue, 12 Aug 2025 03:20:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754968800;
-	bh=6A+jeyPnXO4AX6ZcycgzjX1K4rTdQsKw738pZ+L6V6Y=;
+	s=k20201202; t=1754968801;
+	bh=QOBpupb0n5GKfRVbIXgDV1H/UMshmi+E6iE3T8GMY30=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=halp2w/8T0gvAzda6uNomNpUXHnhiG6miLpGMs1Ys53r8W/N4R2ccWOxIdvct14ta
-	 Y0rY4PE9oLh6DauJzq+PB5cFu53b67nXF4KzfSKpMEjeJGCcIa4nKDSaA1Ml91drmy
-	 Y4/AUu9PgKOw9idpCrXIZZ0m0qKcuUeofMMZsgpQzCJCzMM2R3/zCqJs2PShyWcZNj
-	 L2mRj/PR8Jxf3ScUKCILXuZx97QDEWc6jBBQNi4hcFKRPDV2wPKajw1pR1pYuC3jhJ
-	 cbl7r5y3TkbA92bZjieH5TAnxn3N9qSEad/8O8D6ZNj5z/nCz72p31Dt3u9PVIOmK6
-	 Hhuv9L8A8soQw==
+	b=gkkLhG6z/R74f1c8iAmlokX3iiGdWNThJS3ULhYjQ09C0nyUoszJCGjT1ELJN+9jQ
+	 /PwhDNN2bERWt53Vd8m3n9k5v9d1wXD2j3WYHDDF/O1LaK9SuNYdqEuRlVKUB6+Jhx
+	 H50cvQLD7MLB2S2q39Dbpk6kDZje1xRyLb7dFcV086KE9sCreR+dVGqfCD8Rs9bDHj
+	 ZWGcyHFDY/qYbMJQE7vd4hSMGcOHZkolWOJxIp2ilFTmVorv+prT6ZWSMtTZ20O3+1
+	 ytlJdUOheaM41Qlqzw20vXgm7hrI9UoqFohhhzB9cMb6qDiOxQucIOOiaFgxmruSNL
+	 J3jW4wyamQULg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70B35383BF51;
-	Tue, 12 Aug 2025 03:20:13 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAD4D383BF51;
+	Tue, 12 Aug 2025 03:20:14 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,73 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] net: stmmac: rk: put the PHY clock on remove
+Subject: Re: [PATCH v2] net: usb: qmi_wwan: add Telit Cinterion FN990A w/audio
+ composition
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175496881199.1990527.5027010954317382429.git-patchwork-notify@kernel.org>
-Date: Tue, 12 Aug 2025 03:20:11 +0000
-References: <E1ukM1S-0086qo-PC@rmk-PC.armlinux.org.uk>
-In-Reply-To: <E1ukM1S-0086qo-PC@rmk-PC.armlinux.org.uk>
-To: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-Cc: andrew@lunn.ch, david.wu@rock-chips.com, hkallweit1@gmail.com,
- alexandre.torgue@foss.st.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com, mcoquelin.stm32@gmail.com,
- netdev@vger.kernel.org, pabeni@redhat.com
+ <175496881349.1990527.15993757717285261084.git-patchwork-notify@kernel.org>
+Date: Tue, 12 Aug 2025 03:20:13 +0000
+References: <20250808133108.580624-1-fabio.porcedda@gmail.com>
+In-Reply-To: <20250808133108.580624-1-fabio.porcedda@gmail.com>
+To: Fabio Porcedda <fabio.porcedda@gmail.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, bjorn@mork.no, netdev@vger.kernel.org,
+ linux-usb@vger.kernel.org, dnlplm@gmail.com, stable@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 08 Aug 2025 13:16:34 +0100 you wrote:
-> The PHY clock (bsp_priv->clk_phy) is obtained using of_clk_get(), which
-> doesn't take part in the devm release. Therefore, when a device is
-> unbound, this clock needs to be explicitly put. Fix this.
+On Fri,  8 Aug 2025 15:31:08 +0200 you wrote:
+> Add the following Telit Cinterion FN990A w/audio composition:
 > 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> ---
-> Spotted this resource leak while making other changes to dwmac-rk.
-> Would be great if the dwmac-rk maintainers can test it.
+> 0x1077: tty (diag) + adb + rmnet + audio + tty (AT/NMEA) + tty (AT) +
+> tty (AT) + tty (AT)
+> T:  Bus=01 Lev=01 Prnt=01 Port=09 Cnt=01 Dev#=  8 Spd=480 MxCh= 0
+> D:  Ver= 2.10 Cls=00(>ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
+> P:  Vendor=1bc7 ProdID=1077 Rev=05.04
+> S:  Manufacturer=Telit Wireless Solutions
+> S:  Product=FN990
+> S:  SerialNumber=67e04c35
+> C:  #Ifs=10 Cfg#= 1 Atr=e0 MxPwr=500mA
+> I:  If#= 0 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=30 Driver=option
+> E:  Ad=01(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> E:  Ad=81(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> I:  If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=42 Prot=01 Driver=(none)
+> E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> I:  If#= 2 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=50 Driver=qmi_wwan
+> E:  Ad=0f(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> E:  Ad=83(I) Atr=03(Int.) MxPS=   8 Ivl=32ms
+> E:  Ad=8e(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> I:  If#= 3 Alt= 0 #EPs= 0 Cls=01(audio) Sub=01 Prot=20 Driver=snd-usb-audio
+> I:  If#= 4 Alt= 1 #EPs= 1 Cls=01(audio) Sub=02 Prot=20 Driver=snd-usb-audio
+> E:  Ad=03(O) Atr=0d(Isoc) MxPS=  68 Ivl=1ms
+> I:  If#= 5 Alt= 1 #EPs= 1 Cls=01(audio) Sub=02 Prot=20 Driver=snd-usb-audio
+> E:  Ad=84(I) Atr=0d(Isoc) MxPS=  68 Ivl=1ms
+> I:  If#= 6 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=60 Driver=option
+> E:  Ad=04(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> E:  Ad=85(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> E:  Ad=86(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
+> I:  If#= 7 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=40 Driver=option
+> E:  Ad=05(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> E:  Ad=87(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> E:  Ad=88(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
+> I:  If#= 8 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=40 Driver=option
+> E:  Ad=06(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> E:  Ad=89(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> E:  Ad=8a(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
+> I:  If#= 9 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=40 Driver=option
+> E:  Ad=07(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> E:  Ad=8b(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> E:  Ad=8c(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] net: stmmac: rk: put the PHY clock on remove
-    https://git.kernel.org/netdev/net/c/de1e963ad064
+  - [v2] net: usb: qmi_wwan: add Telit Cinterion FN990A w/audio composition
+    https://git.kernel.org/netdev/net/c/61aaca8b89fb
 
 You are awesome, thank you!
 -- 
