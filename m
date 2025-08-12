@@ -1,148 +1,216 @@
-Return-Path: <netdev+bounces-212830-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212832-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25910B22350
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 11:36:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 785EFB22366
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 11:40:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE50017DDD0
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 09:33:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91FBA3AD8A4
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 09:39:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21F852E8DE7;
-	Tue, 12 Aug 2025 09:33:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pf7fzn4L"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E536F2E92C6;
+	Tue, 12 Aug 2025 09:39:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpbg154.qq.com (smtpbg154.qq.com [15.184.224.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFF812E7BB1;
-	Tue, 12 Aug 2025 09:33:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D18512E88B7
+	for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 09:39:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=15.184.224.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754991218; cv=none; b=pJQCDj667lCoQipV+hvU+BvG438Wy7dTY7ruuHDFE1mMByIwWqNiADVtSJRWd/WvWyA39vAVqkNMN6GLeuEaDGb6bG0UKUnF4qjKau6e7y9DhAWDUoyBsRIiclOZrgTQLiuiYH1H+ZGnoLPJHKb3wKJNI8e39F1gZrTmM8oUiAY=
+	t=1754991555; cv=none; b=WEBF5a8+kp6/zT/nlwxb4GLR2+5vO3vEjvSrHbFUnnh6VeiX2d1lJjN16v74DuyGDk/J7/Cwkfzv5+yeawj+lGbwCWHXELEWGRY2gPrFDHdmNn4aPqmMZOGwgG8at4htvuUgZpjORBt91Q/93MCkUVONnUvPPxrTur/bTL0CfHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754991218; c=relaxed/simple;
-	bh=awVECIkj//NC3B2TraxKMvGe3uB8kJQ4UisWIm+eQEc=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=ZIt/cdGj6rzmHeglkzty4Fi8htmJPaJyeO7L6pO+DD5Xm1nQ+LCirUsZ/PI2nuqi/0Nx2kTTATekkb0kIo9JuJzzXqJ5lzPToEiWDx3ujMqIz8YWiKCTECUF5uuiJu6hgXcM+sG+AdAXVaDzR7yFFhYpnhy11F/QkKDMpGrFGAs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pf7fzn4L; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A6FCC4CEF6;
-	Tue, 12 Aug 2025 09:33:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754991217;
-	bh=awVECIkj//NC3B2TraxKMvGe3uB8kJQ4UisWIm+eQEc=;
-	h=Date:From:To:Cc:Subject:From;
-	b=pf7fzn4LaH5bQkMgjAiTtoP7T8keIrINlrcT/r7eagYQZjVIg9rmj6TIq0QJO5qq/
-	 lqcF8U7lezBatG5vitwCuO09s+OVWKNcPfw5O738QqQoh0q6W1ow0OPcmC3U8DHrCT
-	 AqqyIUSYmOqd0CBPkQz/7fOSISfQIy9Y6FhP2ZyASwV2PAJiVD5FNLiwiBiJyNkrsw
-	 p2B8/sXnDkizhStV548h/jyNap1kTeeZ1C8KCzrkxYuQzP13gtbX568ZHtyNTPdhAP
-	 vnyzJdK5obpPEMR+7OzHZntbzFX/Q4TJ5QaIdSvcooAuKO4ipSZ3jGag4Ye37zBCTl
-	 iufHl20YZyiQg==
-Date: Tue, 12 Aug 2025 11:33:29 +0200
-From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-To: Jonathan Corbet <corbet@lwn.net>, Jakub Kicinski <kuba@kernel.org>
-Cc: EDAC Mailing List <linux-edac@vger.kernel.org>, Linux Kernel Mailing
- List <linux-kernel@vger.kernel.org>, Linux Doc Mailing List
- <linux-doc@vger.kernel.org>, linux-kernel@vger.kernel.org, Akira Yokosawa
- <akiyks@gmail.com>, "David S. Miller" <davem@davemloft.net>, Ignacio
- Encinas Rubio <ignacio@iencinas.com>, Marco Elver <elver@google.com>, Shuah
- Khan <skhan@linuxfoundation.org>, Donald Hunter <donald.hunter@gmail.com>,
- Eric Dumazet <edumazet@google.com>, Jan Stancek <jstancek@redhat.com>,
- Paolo Abeni <pabeni@redhat.com>, Ruben Wauters <rubenru09@aol.com>,
- joel@joelfernandes.org, linux-kernel-mentees@lists.linux.dev,
- lkmm@lists.linux.dev, netdev@vger.kernel.org, peterz@infradead.org,
- stern@rowland.harvard.edu, Breno Leitao <leitao@debian.org>, Randy Dunlap
- <rdunlap@infradead.org>, Simon Horman <horms@kernel.org>
-Subject: [GIT PULL for v6.17-rc2] add a generic yaml parser integrated with
- Netlink specs generation
-Message-ID: <20250812113329.356c93c2@foz.lan>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1754991555; c=relaxed/simple;
+	bh=8KXrIixzJItRVf4s4Bxjj7iCOo+Vc+kTkiqsKAcPOWY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rRbgEEbXsmdTJnmTc19bxIrj/Rr6LUcPdKIGUGePnTu/G5O32xoMin8QPCjtFrcCPI+i28prn6Mn+3VuI3GI2jqsQPOqSZhDBR3La3fxKt87pDtLoPjB7OBjxz/xFS6o+z3b720SffM6LBolfCPkk52i+WNoAAdthI2BUWpx3N8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=15.184.224.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid: zesmtpsz7t1754991480tf32bda96
+X-QQ-Originating-IP: olEu+ZTQQ9T+3zy5s32qZqTraug2M5sQP/jNKHBeJnk=
+Received: from w-MS-7E16.trustnetic.com ( [125.120.182.53])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 12 Aug 2025 17:37:32 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 13738346805225385979
+EX-QQ-RecipientCnt: 8
+From: Jiawen Wu <jiawenwu@trustnetic.com>
+To: netdev@vger.kernel.org,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Mengyuan Lou <mengyuanlou@net-swift.com>,
+	Jiawen Wu <jiawenwu@trustnetic.com>
+Subject: [PATCH] net: libwx: cleanup VF register macros
+Date: Tue, 12 Aug 2025 17:37:25 +0800
+Message-ID: <778899EE1D862EC2+20250812093725.58821-1-jiawenwu@trustnetic.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpsz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
+X-QQ-XMAILINFO: NbxLaS4t14pp8jyZdohfUjVaUsNfq2Eqq0mmFXe/WT+lX22a0oym8/eM
+	xHOeJJaJNrlmXHzsOIdZIXBJFcsT7UIhiCyT85eHr2XJbMgec5EoK0Mr+DqVEfsvKSqRzxI
+	Tcu5yHo96CRqZd0Cj3fF3Zg7UkU3pC8DAMRSAuOui/v74CeTF32VSzx1YYWkefYEX/U8Thl
+	NnA5o8TwDUYEiQq5Tjoy4FlWALfj2Ye4g9saNI0vpKxrESTdC1JWJxv3WNywgVUl8kj7Lex
+	etu15CuosAaLX2MrLRGBCYbzR6ijUzvKTGFkHse+4TKH7cdaRuJHF6ADaYkOjQEM2GCxE6z
+	Y0EikrM4sxrtVzUIqqrOt2HtPLZV3CPNc9I6Z0fcQC+kAJznsxigqbkD0iiYI1OhO8hOt02
+	waQl9TNaQ/mB6dNAHJmXK3nesRanI/Up+XYD9uxQ3WxGWydPRxfTS5H1K876AwtPMJUifaB
+	hxp0+O6ZSElbnFDtT1lRF35CWeCQXcOeKbzgu0XJvvmwG2as/KUoRE5C2Qcx+GAWy1KN3ed
+	qLc3Nt9MLzBmt7FO1TkRPicEy6k9lBdQMaSLVK8FM41x+99DO7gk2Ey+B4/mM9QW/hSbKyZ
+	CAJ5nOKXYHz7ZPr0hin6YtlHmpfWu3FOqivAEztsa158LG92u++Br4hKMJVCAJfSswzhS+z
+	Ut4TnedlUUpkJDzi5DPdftMIl5eDPOJszvIWUh4p/SqegNT3rs3gkZY4Kk8IHq1CStr+bKu
+	Zt3mPuc1s6oZhc4jaAcL5r6bEhIFm1/6SLwJQfWkb1WF7DkzllbDWho1SpL6A1wekolYBd8
+	MdaFI0uf8CLSsPO8wxFoWz0WA0ZOXrM0GoQA4Ha8b/mZvO+tOd4WatKkLKTHsfVNlJ/d6YS
+	p904zRWj/9PqTjdWIE4U/XiLzwq5/c3PVj7fgr0P4uEy89o2SliMI/hbFrvB7aydoANSV5L
+	+8PFoAmu0ClGMM/7DHz8V3mtwVhixQ14XFuRjSPzAaCs3WA5RZACdyBqdZ3V8sDG9Mi4T01
+	3OUAFMhRwc8fV5sAVSbKEzuAM4kLBk1ShKikoTqy+cYnzuVXJ+
+X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
+X-QQ-RECHKSPAM: 0
 
-Hi Jon/Jakub,
+Adjust the order of VF regitser macros, make it elegant.
 
-In case you both prefer to merge from a stable tag, please pull from:
-
-	git://git.kernel.org/pub/scm/linux/kernel/git/mchehab/linux-docs.git docs/v6.17-1
-
-For:
-
-- An YAML parser Sphinx plugin, integrated with Netlink YAML doc
-  parser.
-
-The patch content is identical to my v10 submission:
-
-	https://lore.kernel.org/linux-doc/cover.1753718185.git.mchehab+huawei@kernel.org/
-
-The tag was rebased on the top of v6.17-rc1 to make easier for it to be
-merged on both docs and netlink trees. 
-
-No code changes since v10.
-
-Regards,
-Mauro
-
+Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
 ---
+ drivers/net/ethernet/wangxun/libwx/wx_vf.h | 72 +++++++++++-----------
+ 1 file changed, 35 insertions(+), 37 deletions(-)
 
-The following changes since commit 8f5ae30d69d7543eee0d70083daf4de8fe15d585:
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_vf.h b/drivers/net/ethernet/wangxun/libwx/wx_vf.h
+index fec1126703e3..3f16de0fa427 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_vf.h
++++ b/drivers/net/ethernet/wangxun/libwx/wx_vf.h
+@@ -4,6 +4,7 @@
+ #ifndef _WX_VF_H_
+ #define _WX_VF_H_
+ 
++/* Control registers */
+ #define WX_VF_MAX_RING_NUMS      8
+ #define WX_VX_PF_BME             0x4B8
+ #define WX_VF_BME_ENABLE         BIT(0)
+@@ -12,16 +13,32 @@
+ #define WX_VXCTRL_RST            BIT(0)
+ 
+ #define WX_VXMRQC                0x78
++#define WX_VXMRQC_PSR_L4HDR      BIT(0)
++#define WX_VXMRQC_PSR_L3HDR      BIT(1)
++#define WX_VXMRQC_PSR_L2HDR      BIT(2)
++#define WX_VXMRQC_PSR_TUNHDR     BIT(3)
++#define WX_VXMRQC_PSR_TUNMAC     BIT(4)
++#define WX_VXMRQC_PSR_MASK       GENMASK(5, 1)
++#define WX_VXMRQC_PSR(f)         FIELD_PREP(GENMASK(5, 1), f)
++#define WX_VXMRQC_RSS_HASH(f)    FIELD_PREP(GENMASK(15, 13), f)
++#define WX_VXMRQC_RSS_MASK       GENMASK(31, 16)
++#define WX_VXMRQC_RSS(f)         FIELD_PREP(GENMASK(31, 16), f)
++#define WX_VXMRQC_RSS_ALG_IPV4_TCP   BIT(0)
++#define WX_VXMRQC_RSS_ALG_IPV4       BIT(1)
++#define WX_VXMRQC_RSS_ALG_IPV6       BIT(4)
++#define WX_VXMRQC_RSS_ALG_IPV6_TCP   BIT(5)
++#define WX_VXMRQC_RSS_EN             BIT(8)
++
++#define WX_VXRSSRK(i)            (0x80 + ((i) * 4)) /* i=[0,9] */
++#define WX_VXRETA(i)             (0xC0 + ((i) * 4)) /* i=[0,15] */
++
++/* Interrupt registers */
+ #define WX_VXICR                 0x100
+ #define WX_VXIMS                 0x108
+ #define WX_VXIMC                 0x10C
+ #define WX_VF_IRQ_CLEAR_MASK     7
+ #define WX_VF_MAX_TX_QUEUES      4
+ #define WX_VF_MAX_RX_QUEUES      4
+-#define WX_VXTXDCTL(r)           (0x3010 + (0x40 * (r)))
+-#define WX_VXRXDCTL(r)           (0x1010 + (0x40 * (r)))
+-#define WX_VXRXDCTL_ENABLE       BIT(0)
+-#define WX_VXTXDCTL_FLUSH        BIT(26)
+ 
+ #define WX_VXITR(i)              (0x200 + (4 * (i))) /* i=[0,1] */
+ #define WX_VXITR_MASK            GENMASK(8, 0)
+@@ -29,16 +46,6 @@
+ #define WX_VXIVAR_MISC           0x260
+ #define WX_VXIVAR(i)             (0x240 + (4 * (i))) /* i=[0,3] */
+ 
+-#define WX_VXRXDCTL_RSCMAX(f)    FIELD_PREP(GENMASK(24, 23), f)
+-#define WX_VXRXDCTL_BUFLEN(f)    FIELD_PREP(GENMASK(6, 1), f)
+-#define WX_VXRXDCTL_BUFSZ(f)     FIELD_PREP(GENMASK(11, 8), f)
+-#define WX_VXRXDCTL_HDRSZ(f)     FIELD_PREP(GENMASK(15, 12), f)
+-
+-#define WX_VXRXDCTL_RSCMAX_MASK  GENMASK(24, 23)
+-#define WX_VXRXDCTL_BUFLEN_MASK  GENMASK(6, 1)
+-#define WX_VXRXDCTL_BUFSZ_MASK   GENMASK(11, 8)
+-#define WX_VXRXDCTL_HDRSZ_MASK   GENMASK(15, 12)
+-
+ #define wx_conf_size(v, mwidth, uwidth) ({ \
+ 	typeof(v) _v = (v); \
+ 	(_v == 2 << (mwidth) ? 0 : _v >> (uwidth)); \
+@@ -59,44 +66,35 @@
+ #define WX_VXRDBAH(r)            (0x1004 + (0x40 * (r)))
+ #define WX_VXRDT(r)              (0x1008 + (0x40 * (r)))
+ #define WX_VXRDH(r)              (0x100C + (0x40 * (r)))
+-
++#define WX_VXRXDCTL(r)           (0x1010 + (0x40 * (r)))
++#define WX_VXRXDCTL_ENABLE       BIT(0)
++#define WX_VXRXDCTL_BUFLEN_MASK  GENMASK(6, 1)
++#define WX_VXRXDCTL_BUFLEN(f)    FIELD_PREP(GENMASK(6, 1), f)
++#define WX_VXRXDCTL_BUFSZ_MASK   GENMASK(11, 8)
++#define WX_VXRXDCTL_BUFSZ(f)     FIELD_PREP(GENMASK(11, 8), f)
++#define WX_VXRXDCTL_HDRSZ_MASK   GENMASK(15, 12)
++#define WX_VXRXDCTL_HDRSZ(f)     FIELD_PREP(GENMASK(15, 12), f)
++#define WX_VXRXDCTL_RSCMAX_MASK  GENMASK(24, 23)
++#define WX_VXRXDCTL_RSCMAX(f)    FIELD_PREP(GENMASK(24, 23), f)
+ #define WX_VXRXDCTL_RSCEN        BIT(29)
+ #define WX_VXRXDCTL_DROP         BIT(30)
+ #define WX_VXRXDCTL_VLAN         BIT(31)
+ 
++/* Transimit Path */
+ #define WX_VXTDBAL(r)            (0x3000 + (0x40 * (r)))
+ #define WX_VXTDBAH(r)            (0x3004 + (0x40 * (r)))
+ #define WX_VXTDT(r)              (0x3008 + (0x40 * (r)))
+ #define WX_VXTDH(r)              (0x300C + (0x40 * (r)))
+-
++#define WX_VXTXDCTL(r)           (0x3010 + (0x40 * (r)))
+ #define WX_VXTXDCTL_ENABLE       BIT(0)
+ #define WX_VXTXDCTL_BUFLEN(f)    FIELD_PREP(GENMASK(6, 1), f)
+ #define WX_VXTXDCTL_PTHRESH(f)   FIELD_PREP(GENMASK(11, 8), f)
+ #define WX_VXTXDCTL_WTHRESH(f)   FIELD_PREP(GENMASK(22, 16), f)
+-
+-#define WX_VXMRQC_PSR(f)         FIELD_PREP(GENMASK(5, 1), f)
+-#define WX_VXMRQC_PSR_MASK       GENMASK(5, 1)
+-#define WX_VXMRQC_PSR_L4HDR      BIT(0)
+-#define WX_VXMRQC_PSR_L3HDR      BIT(1)
+-#define WX_VXMRQC_PSR_L2HDR      BIT(2)
+-#define WX_VXMRQC_PSR_TUNHDR     BIT(3)
+-#define WX_VXMRQC_PSR_TUNMAC     BIT(4)
+-
+-#define WX_VXRSSRK(i)            (0x80 + ((i) * 4)) /* i=[0,9] */
+-#define WX_VXRETA(i)             (0xC0 + ((i) * 4)) /* i=[0,15] */
+-
+-#define WX_VXMRQC_RSS(f)         FIELD_PREP(GENMASK(31, 16), f)
+-#define WX_VXMRQC_RSS_MASK       GENMASK(31, 16)
+-#define WX_VXMRQC_RSS_ALG_IPV4_TCP   BIT(0)
+-#define WX_VXMRQC_RSS_ALG_IPV4       BIT(1)
+-#define WX_VXMRQC_RSS_ALG_IPV6       BIT(4)
+-#define WX_VXMRQC_RSS_ALG_IPV6_TCP   BIT(5)
+-#define WX_VXMRQC_RSS_EN             BIT(8)
+-#define WX_VXMRQC_RSS_HASH(f)    FIELD_PREP(GENMASK(15, 13), f)
++#define WX_VXTXDCTL_FLUSH        BIT(26)
+ 
+ #define WX_PFLINK_STATUS(g)      FIELD_GET(BIT(0), g)
+ #define WX_PFLINK_SPEED(g)       FIELD_GET(GENMASK(31, 1), g)
+-#define WX_VXSTATUS_SPEED(g)      FIELD_GET(GENMASK(4, 1), g)
++#define WX_VXSTATUS_SPEED(g)     FIELD_GET(GENMASK(4, 1), g)
+ 
+ struct wx_link_reg_fields {
+ 	u32 mac_type;
+-- 
+2.48.1
 
-  Linux 6.17-rc1 (2025-08-10 19:41:16 +0300)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/mchehab/linux-docs.git tags/docs/v6.17-1
-
-for you to fetch changes up to 47459937be8031aae6aaa17ac5f60985f7c9e1bd:
-
-  sphinx: parser_yaml.py: fix line numbers information (2025-08-12 07:47:31 +0200)
-
-----------------------------------------------------------------
-[GIT PULL for v6.17-rc2] add a generic yaml parser integrated with Netlink specs generation
-
-----------------------------------------------------------------
-Mauro Carvalho Chehab (14):
-      docs: netlink: netlink-raw.rst: use :ref: instead of :doc:
-      tools: ynl_gen_rst.py: Split library from command line tool
-      docs: netlink: index.rst: add a netlink index file
-      tools: ynl_gen_rst.py: cleanup coding style
-      docs: sphinx: add a parser for yaml files for Netlink specs
-      docs: use parser_yaml extension to handle Netlink specs
-      docs: uapi: netlink: update netlink specs link
-      tools: ynl_gen_rst.py: drop support for generating index files
-      docs: netlink: remove obsolete .gitignore from unused directory
-      MAINTAINERS: add netlink_yml_parser.py to linux-doc
-      tools: netlink_yml_parser.py: add line numbers to parsed data
-      docs: parser_yaml.py: add support for line numbers from the parser
-      docs: parser_yaml.py: fix backward compatibility with old docutils
-      sphinx: parser_yaml.py: fix line numbers information
-
- Documentation/Makefile                             |  17 -
- Documentation/conf.py                              |  20 +-
- Documentation/netlink/specs/index.rst              |  13 +
- Documentation/networking/index.rst                 |   2 +-
- Documentation/networking/netlink_spec/.gitignore   |   1 -
- Documentation/networking/netlink_spec/readme.txt   |   4 -
- Documentation/sphinx/parser_yaml.py                | 123 +++++++
- Documentation/userspace-api/netlink/index.rst      |   2 +-
- .../userspace-api/netlink/netlink-raw.rst          |   6 +-
- Documentation/userspace-api/netlink/specs.rst      |   2 +-
- MAINTAINERS                                        |   1 +
- tools/net/ynl/pyynl/lib/__init__.py                |   2 +
- tools/net/ynl/pyynl/lib/doc_generator.py           | 398 +++++++++++++++++++++
- tools/net/ynl/pyynl/ynl_gen_rst.py                 | 384 +-------------------
- 14 files changed, 565 insertions(+), 410 deletions(-)
- create mode 100644 Documentation/netlink/specs/index.rst
- delete mode 100644 Documentation/networking/netlink_spec/.gitignore
- delete mode 100644 Documentation/networking/netlink_spec/readme.txt
- create mode 100755 Documentation/sphinx/parser_yaml.py
- create mode 100644 tools/net/ynl/pyynl/lib/doc_generator.py
 
