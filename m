@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-212741-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212742-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFF0AB21B98
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 05:22:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CF34B21B99
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 05:22:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8BE3518923FF
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 03:20:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D49D18992CD
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 03:21:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2DE92E3711;
-	Tue, 12 Aug 2025 03:20:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 685CB2E4257;
+	Tue, 12 Aug 2025 03:20:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lUDYoYVF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sw9tdx3S"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB3CB2E3709;
-	Tue, 12 Aug 2025 03:20:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DE432E424B;
+	Tue, 12 Aug 2025 03:20:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754968804; cv=none; b=CaaNc3yGGFQvgwuzWD93D27PK7IcDzs5xZTbyjS1K5i8OGy6VkMUaK9C6cvy5sieHx8Xj7KbipG4Ykab3DW0pGSGEFihAbIHcbXLsoHvnXd3Pc18kJyxdY16DtYapw/TAXhnAkAKQHnIATnR5k4JnkKbayn7Dt76qfAaBDPImEA=
+	t=1754968806; cv=none; b=aY79MCa6e5b9ALBxFXu4Mbs2w0sRJ9/I1auVbk5O4uGc1st+iMIFlqjlN+mHDLKIKzmJlXY/I09R6ueDTRNzD0Ro/+tV6QV/QIaK6y9PEfHHxKzN781Vfon4BTqQHf9x0yICgTRItAJadg1T10UFeenZMVaYamtr0o6zT89ILMM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754968804; c=relaxed/simple;
-	bh=0LXvGWcDVzLjATEkBa1b2ib32lSLGtARM86lJlsk20c=;
+	s=arc-20240116; t=1754968806; c=relaxed/simple;
+	bh=HGwL2Cpxqc9hVM6X36G/L3EWkoN6i1ddB5veVLR6os4=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=qSDulfuUCd1+AsQlZQvhekrykUGyLQkC4pA6hMc1FXVTK2mPZ5B/cOkc1xLM9u0GDE2pnlgq4dUYzt8cJonl+ClORrdekE5Is6rW8Nyq1FOsDZ7jmKQjwOVIw+9M1ZFRBz9fYvKNNVv+Trn6YUhQCertJBZsPZfRTVPElTEUB1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lUDYoYVF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FBE1C4CEF5;
-	Tue, 12 Aug 2025 03:20:04 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=m1c8eBv4P+XNpobdtOPJu8Fwzeimvwv5y15uf2hKyQ6LgbGvx/I9mgrjsPQxuYsyWmyzEdUEiR+f6DB5Nh1w0VNGlDb7ZSzFBOYD7DzwO1BH27Bbeyiz//zbucgPiXiMxHmxZsF6n2WYwwtbbZO7C9InpX/uoBogQoBXi0x9EdI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sw9tdx3S; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3AC3C4CEED;
+	Tue, 12 Aug 2025 03:20:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754968804;
-	bh=0LXvGWcDVzLjATEkBa1b2ib32lSLGtARM86lJlsk20c=;
+	s=k20201202; t=1754968805;
+	bh=HGwL2Cpxqc9hVM6X36G/L3EWkoN6i1ddB5veVLR6os4=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=lUDYoYVFOKiNzvRDHMc3+0TDrHPUmU2PGYMOQY3iWMNA5ug1DG5G8lP/0TyWOQreU
-	 Du7TRPsS7g9wwhnCHUymWhEtrDBN1IRQ+qjRCWNUpVqOEMDv8XzWBSx8OSDcnGu3XA
-	 9dz2c0hGbFiijqSXcRJ8wltiAz9sIbAlheKy2nAMxHhgv8ciGCpBCUHSgnP6zp3FWS
-	 74r3A+aCdYMfU8syO9yo0tdZTFq6QyRy/+eEutK1WF+nDbHq12Q26+V7BCnGS3YIG0
-	 mnmLU/Ejna6+XztLRmziajeYN/LDDBBlE52SaR7sZ00L6dGA+Spd9yqxLng4+2ucZj
-	 q9sb4iWjBzU1w==
+	b=Sw9tdx3SEDWyYmQIZ23jyv30G6UsjonOKiwJlvYv14u2mzcuW6QtRjdv3bHQxt5Yz
+	 FcgNC8+CYXnTtCIb5n7BvHvjYZysw1LlpmUaCMYdHPlKRKwv4AOlE73x1PtNBhxuAh
+	 ArdMp7RuB2q2TMRbP/juli0bw3QsnuFKGBJHIVLnX3bmrYJArVM75N6coME2NgD7BR
+	 KWq6rMDIvtAnKqHW0XS5mrUz/Ur6HwyEXVV6OEHIm9pYXreISQyneY5D1b764VjaMp
+	 6SRVLPsLn0fqGL3Bl5G7ydZd45nJW4IGyzA/bYex+shA3eHR1ZmCHeGAKaefH3JVQA
+	 KNRbHEHVgLIcA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADB7D383BF51;
-	Tue, 12 Aug 2025 03:20:17 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C0B383BF51;
+	Tue, 12 Aug 2025 03:20:19 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,37 +52,46 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] MAINTAINERS: Mark Intel WWAN IOSM driver as orphaned
+Subject: Re: [PATCH] MAINTAINERS: Mark Intel PTP DFL ToD as orphaned
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175496881649.1990527.10833258935065520646.git-patchwork-notify@kernel.org>
-Date: Tue, 12 Aug 2025 03:20:16 +0000
-References: <20250808174505.C9FF434F@davehans-spike.ostc.intel.com>
-In-Reply-To: <20250808174505.C9FF434F@davehans-spike.ostc.intel.com>
+ <175496881774.1990527.3789561485320833609.git-patchwork-notify@kernel.org>
+Date: Tue, 12 Aug 2025 03:20:17 +0000
+References: <20250808175324.8C4B7354@davehans-spike.ostc.intel.com>
+In-Reply-To: <20250808175324.8C4B7354@davehans-spike.ostc.intel.com>
 To: Dave Hansen <dave.hansen@linux.intel.com>
 Cc: linux-kernel@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, johannes@sipsolutions.net,
- loic.poulain@oss.qualcomm.com, netdev@vger.kernel.org, pabeni@redhat.com,
- ryazanov.s.a@gmail.com
+ edumazet@google.com, kuba@kernel.org, linux-fpga@vger.kernel.org,
+ netdev@vger.kernel.org, pabeni@redhat.com, richardcochran@gmail.com,
+ tianfei.zhang@intel.com
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 08 Aug 2025 10:45:05 -0700 you wrote:
+On Fri, 08 Aug 2025 10:53:24 -0700 you wrote:
 > From: Dave Hansen <dave.hansen@linux.intel.com>
 > 
 > This maintainer's email no longer works. Remove it from MAINTAINERS.
+> Also mark the code as an Orphan.
 > 
-> I've been unable to locate a new maintainer for this at Intel. Mark
-> the driver as Orphaned.
+> Signed-off-by: Dave Hansen <dave.hansen@linux.intel.com>
+> Cc: linux-fpga@vger.kernel.org
+> Cc: netdev@vger.kernel.org
+> Cc: Richard Cochran <richardcochran@gmail.com>
+> Cc: Tianfei Zhang <tianfei.zhang@intel.com>
+> Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - MAINTAINERS: Mark Intel WWAN IOSM driver as orphaned
-    https://git.kernel.org/netdev/net/c/7573980c7049
+  - MAINTAINERS: Mark Intel PTP DFL ToD as orphaned
+    https://git.kernel.org/netdev/net/c/b56e9fb1c966
 
 You are awesome, thank you!
 -- 
