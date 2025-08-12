@@ -1,60 +1,73 @@
-Return-Path: <netdev+bounces-213091-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213092-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC6FAB23A2B
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 22:46:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F34D6B23A2F
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 22:48:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58CD1686C93
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 20:46:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 696497A9EC3
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 20:46:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9ADBE2D7382;
-	Tue, 12 Aug 2025 20:46:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04A95279DC3;
+	Tue, 12 Aug 2025 20:48:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a98G1A/I"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iXwEyuUr"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70F442D6E63;
-	Tue, 12 Aug 2025 20:46:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C763413B58B;
+	Tue, 12 Aug 2025 20:48:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755031568; cv=none; b=qrUJgljlAu0TauBrswqqKT663a9mvjwXkyGjX+BtpINartPO3UsrhhlXvL/0l+he1QvhZ0TnihW8e0PvdjLvhCoelOYkmJUfbkpELcBj9FyLaTW1/vUCBTXm3bz0ZCtnNvWCqsU9fVqnw0gn4Sjl+UesyKYwhUfE2sS8dLQE8T4=
+	t=1755031694; cv=none; b=MsNpAuz1UDiSSOG+WuqPWkLWRY+18DZ5Rp2ucmDpJOvdqTmeOJFFvkWiCI5JKKbPBdA6IE4e7gg81k5rxauzp4i1ZTk390HJ75Z8JTRX3Aa0w4PRA7IaonaXYrcz+xqdtGZvJasUnZJVxt0AD2BVvzzakogcIX3yHgVw/K7Z+As=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755031568; c=relaxed/simple;
-	bh=ywQwwRn2wVPvR+yOSHfJeDNXLEHdb3olJpBeCpKYi3Y=;
+	s=arc-20240116; t=1755031694; c=relaxed/simple;
+	bh=OlAKrjKi+FHoGWuz6d6aZG8S0aTidx2jUWsXjgxNNnY=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mTrub91kGQXAoxDEmOVevc79xkOqNSGXkO5l7Q5cz8eih3LUHpzLcyqCEJh8HUysHmvovUixM8WNXezJxzMC/WeEpPsiM+lMVhWP8Zubs9SGL6W8h49TAeq5U/R8BOBNpUdftxncg5AUlWqL3uL/9ElvJ25feBVyvttjN5aKZ74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a98G1A/I; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C5A2C4CEF1;
-	Tue, 12 Aug 2025 20:46:07 +0000 (UTC)
+	 MIME-Version:Content-Type; b=PGMsP/ngyQ07u41dJI7k/SQTLcNyCCYFS2NuSaXEtXwV9Or/D6B7MTuOaa5cVOOhqNif4n789Uspj6hAhuh4ii3D61XIA8o2kvQVA1SmaOlTfBNhH/s5xvpbtx+S71WvpfdR+qmghZx+f8QOk9sbrl/fxyUy63UeH6rizQlg318=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iXwEyuUr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1335BC4CEF0;
+	Tue, 12 Aug 2025 20:48:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755031567;
-	bh=ywQwwRn2wVPvR+yOSHfJeDNXLEHdb3olJpBeCpKYi3Y=;
+	s=k20201202; t=1755031694;
+	bh=OlAKrjKi+FHoGWuz6d6aZG8S0aTidx2jUWsXjgxNNnY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=a98G1A/I59cu4G75S5u+1h23ZaZWY5qqG4dx8Edz4Eawf9NMxi03Td3it8ZY22tTI
-	 bdnnZmOBfTOfJRw10aCt6mLXccrw4Oqp3+hg5fFo9a/kPnnrxYVPucTWUn5rTsXDKK
-	 i3cfDhIR0JRe9CA8p7F9RIiH/WuvsPv2atujIdl1vdC2Gu+UOZDnFP9mfn7nWeHThE
-	 OXsHigDT15SSYcMkTca4FhOW00KufmuntuGEhQg43Zx21CZG1z579a9zSVxttrQ4Rx
-	 fZawUFIRUdq+AYV6zexnEpaAoWNN17EVIsNvEajApk4iYIgCA7+9PtWIPtzuOcmQEU
-	 e/6JQSIZcRc1w==
-Date: Tue, 12 Aug 2025 13:46:06 -0700
+	b=iXwEyuUrq2SThIz4NtCAH+4DOZlfF58FZtwmAIjKeimhK0e9rAESTZ1Oa2zAGaZ06
+	 4uMmulzeUoAVZpC6h2+eyZ91S87qJC2+2pz/ALz/gWSaiWnGzRARp/3TCsFtJt3vy6
+	 kHnwKAuo8MmbbJDjqbJo+5c9Is2/G8VRyWjfQKD25yIBdToNhfKTCv9OhUjoXSWM4P
+	 iBE3HYzixPVVPSlatbZPsGOv5YhtMFgHxp2HLppWWPld3CXpHffEocvDf4mYqJGuBs
+	 PlCCIudpvi9U/hyWfOzWWr3i7Stw/K/AEwG9d9jmAcClRAov+pbIzajRq+T0DEAWsf
+	 G3SI13RC/Fh9w==
+Date: Tue, 12 Aug 2025 13:48:12 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Joe Damato <joe@dama.to>
-Cc: Xichao Zhao <zhao.xichao@vivo.com>, trondmy@kernel.org, anna@kernel.org,
- chuck.lever@oracle.com, jlayton@kernel.org, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, neil@brown.name,
- okorniev@redhat.com, Dai.Ngo@oracle.com, tom@talpey.com, horms@kernel.org,
- linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] sunrpc: fix "occurence"->"occurrence"
-Message-ID: <20250812134606.4f1ad614@kernel.org>
-In-Reply-To: <aJuAo3lfY9lRB-Oo@MacBook-Air.local>
-References: <20250812113359.178412-1-zhao.xichao@vivo.com>
-	<aJuAo3lfY9lRB-Oo@MacBook-Air.local>
+To: Qianfeng Rong <rongqianfeng@vivo.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jiri Slaby
+ <jirislaby@kernel.org>, Nick Kossifidis <mickflemm@gmail.com>, Luis
+ Chamberlain <mcgrof@kernel.org>, Brian Norris <briannorris@chromium.org>,
+ Francesco Dolcini <francesco@dolcini.it>, Alexei Starovoitov
+ <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard
+ Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, Johannes Berg
+ <johannes.berg@intel.com>, Sascha Hauer <s.hauer@pengutronix.de>, Kalle
+ Valo <kvalo@kernel.org>, Aditya Kumar Singh <quic_adisi@quicinc.com>,
+ Roopni Devanathan <quic_rdevanat@quicinc.com>, Dan Carpenter
+ <dan.carpenter@linaro.org>, intel-wired-lan@lists.osuosl.org (moderated
+ list:INTEL ETHERNET DRIVERS), netdev@vger.kernel.org (open list:NETWORKING
+ DRIVERS), linux-kernel@vger.kernel.org (open list),
+ oss-drivers@corigine.com (open list:NETRONOME ETHERNET DRIVERS),
+ linux-wireless@vger.kernel.org (open list:ATHEROS ATH5K WIRELESS DRIVER),
+ bpf@vger.kernel.org (open list:XDP (eXpress Data
+ Path):Keyword:(?:\b|_)xdp(?:\b|_))
+Subject: Re: [PATCH 0/5] net: use vmalloc_array() to simplify code
+Message-ID: <20250812134812.298c7d97@kernel.org>
+In-Reply-To: <20250812133226.258318-1-rongqianfeng@vivo.com>
+References: <20250812133226.258318-1-rongqianfeng@vivo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,9 +77,11 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 12 Aug 2025 10:57:55 -0700 Joe Damato wrote:
-> In the future probably a good idea to add net-next to the subject line so it
-> is clear which tree you are targeting (e.g. [PATCH net-next]).
+On Tue, 12 Aug 2025 21:32:13 +0800 Qianfeng Rong wrote:
+> Remove array_size() calls and replace vmalloc() with vmalloc_array() to
+> simplify the code and maintain consistency with existing kmalloc_array()
+> usage.
 
-net/sunrpc/ change usually go via nfs trees, FWIW
+You need to submit the first 3 as a separate series.
+They get applied to a different tree than wireless patches.
 
