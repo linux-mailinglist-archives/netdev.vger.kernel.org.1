@@ -1,249 +1,185 @@
-Return-Path: <netdev+bounces-212773-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212774-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57B28B21CC6
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 07:11:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32F4BB21DE8
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 08:06:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1329E3BDB32
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 05:11:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 711A73AF49D
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 06:03:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0270E29BDA4;
-	Tue, 12 Aug 2025 05:11:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8988B2D948C;
+	Tue, 12 Aug 2025 06:03:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="aMzbkq2c"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="Oe6iIyCx"
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 249741A9FA6
-	for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 05:11:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E193229BDBF;
+	Tue, 12 Aug 2025 06:03:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754975495; cv=none; b=lHEoh+wvJ/QnEggRQ19yX+vUz+5AaVxMXS3cwRw2dbfKHPMCm7J5KTBM+Mz8fQIbI2RQqJPnbcAvZkxZBjfv3qXzmYufsOixoe/9g7Fvz+oN02biql8qF6Oe0Ng8NDSg20sLsY5aW6ZIL3NM27j5moDuNNX47n1Rqlueqa7b4K0=
+	t=1754978609; cv=none; b=eQgngeTaucNzSYkfnzEp56A+vzLfdh+mJjxvl30wc+bu2oBP4eVVItRdypF1kD10x8EeO1sY/ZTh0ZW34GomkEQnulREVOsr6U/COmaU8x5umC5CrxRTI6a1OGinzeNdkh/XOSuM09eD6kSOk7BgRVUESVC5n+6T4RHQUAnARTQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754975495; c=relaxed/simple;
-	bh=cQ1zW4ybdFIo18h/V2wirjzwEM0K/Q2Ht+ZiShY4z1Y=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=mAK/TxqZglX5bJvyyty7bMC+fHNDrMV2IkX3GmssVgpUb58a0wwWPjWo7nuQvp9wRrKwbr9Dngm3fmXccUFFE3nWVuMKiQSEgQMJ0QZMQSXQm35X4HXjzjdGTbYOrcHAqafASAYvZViYxEQI3et58Cr5dPqY84B+UKaSbhEs4yw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=aMzbkq2c; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1754975492;
-	bh=4qmv1+yQmN3H/DORzZjRjWLSoaUojDmJgqOYjxR9fm8=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=aMzbkq2cPSdt9JEVqaEq717C/+oew8NsaWlsyGWpL84eN40y754LcoE8leG9mOgNh
-	 9TP/GzssKaRAzW6UQfkHcAZ04eb7ZM61l/9JcAnsPUFVd1jyoqF4R/SbPn+Df68/WX
-	 WMsYzwdianUKjEAEvLR2SNOifYGmCmz6tHLrnMOEUWlknvS1JTSyvkVPL7yMOUeY8G
-	 gJP5GJhYaiJQdlK08CjxQMJQlMwIkOJBDdOABkxM5nUBc6aMQiqoieHreV+uTXf1bM
-	 JNy+TXJKT0pAqd1U3n9S3EJN8F/Zi4O3YXsvZ/wLZYTVBU2zzttncSUoTo7t3XWvsY
-	 A8bsNBnCt3Ijw==
-Received: from [192.168.14.220] (unknown [159.196.94.230])
-	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id F37E26ABED;
-	Tue, 12 Aug 2025 13:11:31 +0800 (AWST)
-Message-ID: <e7cbbdbc939b7e1fe1e27981c01aca49c022cdb7.camel@codeconstruct.com.au>
-Subject: Re: [PATCH net-next 7/7] net: mctp: Add bind lookup test
-From: Matt Johnston <matt@codeconstruct.com.au>
-To: Alexandre Ghiti <alex@ghiti.fr>, Jeremy Kerr <jk@codeconstruct.com.au>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org
-Date: Tue, 12 Aug 2025 13:11:31 +0800
-In-Reply-To: <734b02a3-1941-49df-a0da-ec14310d41e4@ghiti.fr>
-References: <20250703-mctp-bind-v1-0-bb7e97c24613@codeconstruct.com.au>
-	 <20250703-mctp-bind-v1-7-bb7e97c24613@codeconstruct.com.au>
-	 <734b02a3-1941-49df-a0da-ec14310d41e4@ghiti.fr>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.3-0ubuntu1 
+	s=arc-20240116; t=1754978609; c=relaxed/simple;
+	bh=BOm7AEsgiMrW87suG/yLBgr60mr9/oXp7XxqveuKoPo=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q8PplqVAY06IWU6KgtzIhf60QsgicwGmFVH7thT1uoYeAXdWEYandRwxDbNPi2S5qVLODTDxEENtt1Hqn7XDVzP6gxrOziniDfGhkqIqG6TQ2APvLaAejkxAxf6OVy0PbfMMqP8whgcuvObBFtK+dw7cs+sLdkhT5o1CNky0OFM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=Oe6iIyCx; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57BM1jLK021525;
+	Mon, 11 Aug 2025 23:03:00 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=HZSBUEJQgQ67pMhpOI+NcoleH
+	XpTN1lryOy8bcl66uk=; b=Oe6iIyCxYAswin6m1cJihtFJJNy6XDRsq4tCvEjoa
+	YcIoAHIpefZZ6dHoc22EJipU4BAc54Z4AfG3lTzsZDuH3AiDV8Dg/9zA6TRtRttk
+	f/c/KGPikrM2Oo9w/N9WCkZ46RxlACxN5mhQNALQXJ+6fGNDk+8VH/xs+vSZj5fD
+	sYevLGu9zmyxsqtEiHZnWsgwJ0656ZXbsbIRDljzfLwei6F6ZuVxzeUplG3QXaDr
+	Roh7TAudVYY8YIbl19dMqoExFZH1bI+fUQT2j/xAAd1rqYl8rGWxV0XQxZZc/N1V
+	at20mW6NVfzU/+Qc+ZZY0HCybUfFmHJxGRFeeZZzFkfxA==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 48frxm8vxj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 11 Aug 2025 23:03:00 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Mon, 11 Aug 2025 23:03:03 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Mon, 11 Aug 2025 23:03:03 -0700
+Received: from test-OptiPlex-Tower-Plus-7010 (unknown [10.29.37.157])
+	by maili.marvell.com (Postfix) with SMTP id 0BA963F703F;
+	Mon, 11 Aug 2025 23:02:51 -0700 (PDT)
+Date: Tue, 12 Aug 2025 11:32:48 +0530
+From: Hariprasad Kelam <hkelam@marvell.com>
+To: Vishal Badole <Vishal.Badole@amd.com>
+CC: <Shyam-sundar.S-k@amd.com>, <andrew+netdev@lunn.ch>, <davem@davemloft.net>,
+        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 net-next] amd-xgbe: Configure and retrieve 'tx-usecs'
+ for Tx coalescing
+Message-ID: <aJrZCPV+QFVXoHVn@test-OptiPlex-Tower-Plus-7010>
+References: <20250812045035.3376179-1-Vishal.Badole@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20250812045035.3376179-1-Vishal.Badole@amd.com>
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODEyMDA1NCBTYWx0ZWRfX0pAskhp2mLF4 J94xMtLPcV0Giq1b9fY63fS4NNE8XopqdEo2qvxFUUHX2KiD6ScQP0fpe3r5SgvVsyt/kKy5EmN rBwhhc9b2t5uB/KXWvUGSW+aAf2dro4NyRyJ/0fN9iiPoNQn/k1C6T0uXIe4YBCHpTHVc+BGnZN
+ OpDlHg07He2MJNJ9wvPxtsUZANUn3FrCMVryPJHr5wCMXLDX2VsiqW9r59kajVHDpHhUj5dfnXT oH7WP4YwSQIUoISTKwepVj/XYvKZ7ldUHdLTSHzl9QPng9CtxdlLo3vH1fA9A6gY5tdxgklrb/7 YgAF/7Y6d73NZw8SxzQLLEcugmDPsuzzpUa8MEBuD2WrDoJTi+Kfx8jEixhfLM8L1JD+zqULlW5
+ RTXPwTHEGccUMJbxtcEIFaXalX6x5pH+LXQFC/YEGVtiRH7hrntpxLYGlPxCHE5uT+Jks6zx
+X-Authority-Analysis: v=2.4 cv=eKQTjGp1 c=1 sm=1 tr=0 ts=689ad914 cx=c_pps a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17 a=kj9zAlcOel0A:10 a=2OwXVqhp2XgA:10 a=zd2uoN0lAAAA:8 a=M5GUcnROAAAA:8 a=Wfs76xZ8JWsxpH59smMA:9 a=CjuIK1q_8ugA:10
+ a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-ORIG-GUID: KIxthRt-1FEStnkqpHuDMypIniL63jcf
+X-Proofpoint-GUID: KIxthRt-1FEStnkqpHuDMypIniL63jcf
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-12_02,2025-08-11_01,2025-03-28_01
 
-Hi Alexandre,
-
-Thanks for the report.
-
-On Mon, 2025-08-11 at 13:35 +0200, Alexandre Ghiti wrote:
-
-> I'm hitting different issues with this test.
->=20
-> With a simple riscv defconfig, I get the following warning a bit after=
-=20
-> the test succeeds:
->=20
-> [=C2=A0=C2=A0=C2=A0 5.991567] WARNING: CPU: 1 PID: 0 at net/netlink/af_ne=
-tlink.c:402=20
-> netlink_sock_destruct+0x3a/0x6a
-> [=C2=A0=C2=A0=C2=A0 5.992039] Modules linked in:
-
-I can reproduce it with the um kunit runner if I enable kasan.=C2=A0The skb=
-_pkt
-shouldn't be freed, I've submitted a fix for that.
-
-Cheers,
-Matt
-
-> [=C2=A0=C2=A0=C2=A0 5.992384] CPU: 1 UID: 0 PID: 0 Comm: swapper/1 Tainte=
-d:=20
-> G=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 N=C2=A0 6.17.0-rc1-00005-g1692753ec9e8-dirty #40 N=
-ONE
-> [=C2=A0=C2=A0=C2=A0 5.992502] Tainted: [N]=3DTEST
-> [=C2=A0=C2=A0=C2=A0 5.992521] Hardware name: riscv-virtio,qemu (DT)
-> [=C2=A0=C2=A0=C2=A0 5.992604] epc : netlink_sock_destruct+0x3a/0x6a
-> [=C2=A0=C2=A0=C2=A0 5.992643]=C2=A0 ra : netlink_sock_destruct+0x18/0x6a
-> [=C2=A0=C2=A0=C2=A0 5.992669] epc : ffffffff809bdf26 ra : ffffffff809bdf0=
-4 sp :=20
-> ff2000000000bd90
-> [=C2=A0=C2=A0=C2=A0 5.992685]=C2=A0 gp : ffffffff81a1b458 tp : ff60000080=
-2ce000 t0 :=20
-> 0000000000000040
-> [=C2=A0=C2=A0=C2=A0 5.992700]=C2=A0 t1 : 0000000000000000 t2 : 0000000080=
-150012 s0 :=20
-> ff2000000000bdb0
-> [=C2=A0=C2=A0=C2=A0 5.992715]=C2=A0 s1 : ff600000825a0800 a0 : ff60000082=
-5a08a8 a1 :=20
-> 0000000000000068
-> [=C2=A0=C2=A0=C2=A0 5.992729]=C2=A0 a2 : 0000000000000008 a3 : 0000000000=
-00000a a4 :=20
-> 0000000000000000
-> [=C2=A0=C2=A0=C2=A0 5.992743]=C2=A0 a5 : ffffffffffffce00 a6 : ffffffffff=
-ffffff a7 :=20
-> ffffffff81a20810
-> [=C2=A0=C2=A0=C2=A0 5.992757]=C2=A0 s2 : ff600000825a0800 s3 : ffffffff81=
-a7c040 s4 :=20
-> ff2000000000be60
-> [=C2=A0=C2=A0=C2=A0 5.992770]=C2=A0 s5 : 0000000000000000 s6 : 0000000000=
-00000a s7 :=20
-> 0000000000000000
-> [=C2=A0=C2=A0=C2=A0 5.992784]=C2=A0 s8 : ff600003fff1e580 s9 : 0000000000=
-000001 s10:=20
-> ffffffff81890a80
-> [=C2=A0=C2=A0=C2=A0 5.992798]=C2=A0 s11: ff600000825a0c28 t3 : 0000000000=
-000002 t4 :=20
-> 0000000000000402
-> [=C2=A0=C2=A0=C2=A0 5.992811]=C2=A0 t5 : ff60000080069168 t6 : ff60000080=
-069170
-> [=C2=A0=C2=A0=C2=A0 5.992824] status: 0000000200000120 badaddr: ffffffff8=
-09bdf26 cause:=20
-> 0000000000000003
-> [=C2=A0=C2=A0=C2=A0 5.992925] [<ffffffff809bdf26>] netlink_sock_destruct+=
-0x3a/0x6a
-> [=C2=A0=C2=A0=C2=A0 5.993015] [<ffffffff809369b8>] __sk_destruct+0x22/0x1=
-aa
-> [=C2=A0=C2=A0=C2=A0 5.993034] [<ffffffff809385b0>] sk_destruct+0x46/0x50
-> [=C2=A0=C2=A0=C2=A0 5.993049] [<ffffffff8093860a>] __sk_free+0x50/0xc6
-> [=C2=A0=C2=A0=C2=A0 5.993062] [<ffffffff809386aa>] sk_free+0x2a/0x46
-> [=C2=A0=C2=A0=C2=A0 5.993077] [<ffffffff809bdb08>] deferred_put_nlk_sk+0x=
-42/0x62
-> [=C2=A0=C2=A0=C2=A0 5.993089] [<ffffffff800a5b80>] rcu_core+0x1ba/0x5c8
-> [=C2=A0=C2=A0=C2=A0 5.993106] [<ffffffff800a5f9a>] rcu_core_si+0xc/0x14
-> [=C2=A0=C2=A0=C2=A0 5.993119] [<ffffffff8002d8de>] handle_softirqs+0x110/=
-0x2e8
-> [=C2=A0=C2=A0=C2=A0 5.993133] [<ffffffff8002dbd2>] __irq_exit_rcu+0xd0/0x=
-fa
-> [=C2=A0=C2=A0=C2=A0 5.993144] [<ffffffff8002ddbe>] irq_exit_rcu+0xc/0x14
-> [=C2=A0=C2=A0=C2=A0 5.993156] [<ffffffff80b438e0>] handle_riscv_irq+0x64/=
-0x74
-> [=C2=A0=C2=A0=C2=A0 5.993177] [<ffffffff80b4f88a>] call_on_irq_stack+0x32=
-/0x40
->=20
-> The following diff fixes it (completely unsure this is the right fix=20
-> though):
->=20
-> diff --git a/net/mctp/test/route-test.c b/net/mctp/test/route-test.c
-> index fb6b46a952cb4..03f2f76c97f75 100644
-> --- a/net/mctp/test/route-test.c
-> +++ b/net/mctp/test/route-test.c
-> @@ -1585,7 +1585,6 @@ static void mctp_test_bind_lookup(struct kunit *tes=
-t)
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->=20
->  =C2=A0cleanup:
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 kfree_skb(skb_sock);
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 kfree_skb(skb_pkt);
->=20
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* Drop all binds */
->=20
->=20
-> But then with a more consequent config attached, even with the previous=
-=20
-> fix, I'm hitting:
->=20
-> [=C2=A0 137.494285] kernel BUG at mm/slub.c:563!
-> [=C2=A0 137.494365] Kernel BUG [#2]
-> [=C2=A0 137.494388] Modules linked in:
-> [=C2=A0 137.494449] CPU: 4 UID: 0 PID: 4699 Comm: kunit_try_catch Tainted=
-:=20
-> G=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 D W=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 N=C2=A0 6.17.0-rc1+ #16 PREEMPT(voluntary)
-> [=C2=A0 137.494500] Tainted: [D]=3DDIE, [W]=3DWARN, [N]=3DTEST
-> [=C2=A0 137.494514] Hardware name: riscv-virtio,qemu (DT)
-> [=C2=A0 137.494534] epc : kmem_cache_free+0x334/0x39e
-> [=C2=A0 137.494588]=C2=A0 ra : kmem_cache_free+0x76/0x39e
-> [=C2=A0 137.494617] epc : ffffffff802e8ec4 ra : ffffffff802e8c06 sp :=20
-> ff2000000b6cbb60
-> [=C2=A0 137.494637]=C2=A0 gp : ffffffff82ac7b70 tp : ff60000087cc1f00 t0 =
-:=20
-> ff60000087ba6820
-> [=C2=A0 137.494657]=C2=A0 t1 : 0000000000000000 t2 : 0000000000000000 s0 =
-:=20
-> ff2000000b6cbbb0
-> [=C2=A0 137.494676]=C2=A0 s1 : ffffffff80c34db8 a0 : ff1c0000021ee900 a1 =
-:=20
-> ff60000087ba6680
-> [=C2=A0 137.494695]=C2=A0 a2 : ff60000087ba6680 a3 : ffffffff82e4a858 a4 =
-:=20
-> ff600003fff21d80
-> [=C2=A0 137.494715]=C2=A0 a5 : ff60000087ba67e0 a6 : 000000000002dc04 a7 =
-:=20
-> 0000000000000000
-> [=C2=A0 137.494733]=C2=A0 s2 : ff60000087ba6680 s3 : ff600000802cc900 s4 =
-:=20
-> ff1c0000021ee900
-> [=C2=A0 137.494754]=C2=A0 s5 : 0000000000000002 s6 : ff600000833d9b00 s7 =
-:=20
-> ff60000087b55a80
-> [=C2=A0 137.494772]=C2=A0 s8 : 0000000000000000 s9 : ff2000000b6cbd18 s10=
-:=20
-> ffffffff81e29a90
-> [=C2=A0 137.494791]=C2=A0 s11: 000000000000060e t3 : 0000000000000000 t4 =
-:=20
-> 0000000000000000
-> [=C2=A0 137.494810]=C2=A0 t5 : 0000000000000000 t6 : ff60000087ba6685
-> [=C2=A0 137.494826] status: 0000000200000120 badaddr: ffffffff802e8ec4 ca=
-use:=20
-> 0000000000000003
-> [=C2=A0 137.494849] [<ffffffff802e8ec4>] kmem_cache_free+0x334/0x39e
-> [=C2=A0 137.494883] [<ffffffff80c34db8>] skb_free_head+0xca/0x112
-> [=C2=A0 137.494922] [<ffffffff80c37bba>] skb_release_data+0xe2/0x112
-> [=C2=A0 137.494952] [<ffffffff80c3a202>] sk_skb_reason_drop+0x40/0x124
-> [=C2=A0 137.494984] [<ffffffff80e57afe>] mctp_test_bind_lookup+0x15e/0x3f=
-4
-> [=C2=A0 137.495019] [<ffffffff80623454>] kunit_try_run_case+0x4c/0x13e
-> [=C2=A0 137.495051] [<ffffffff80625a10>]=20
-> kunit_generic_run_threadfn_adapter+0x1a/0x34
-> [=C2=A0 137.495080] [<ffffffff80064a9c>] kthread+0xea/0x1c2
-> [=C2=A0 137.495111] [<ffffffff8001b42e>] ret_from_fork_kernel+0x10/0x162
-> [=C2=A0 137.495139] [<ffffffff80e9d192>] ret_from_fork_kernel_asm+0x16/0x=
-18
-> [=C2=A0 137.495199] Code: 80a3 00e7 5097 ffd5 80e7 9880 9002 b715 ec56 e8=
-5a=20
-> (9002) 9b61
-> [=C2=A0 137.495760] ---[ end trace 0000000000000000 ]---
->=20
-> Let me know if I can do anything to help.
->=20
-> Thanks,
->=20
-> Alex
-
+On 2025-08-12 at 10:20:35, Vishal Badole (Vishal.Badole@amd.com) wrote:
+> Ethtool has advanced with additional configurable options, but the
+> current driver does not support tx-usecs configuration.
+> 
+> Add support to configure and retrieve 'tx-usecs' using ethtool, which
+> specifies the wait time before servicing an interrupt for Tx coalescing.
+> 
+> Signed-off-by: Vishal Badole <Vishal.Badole@amd.com>
+> Acked-by: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
+> 
+> ---
+> v1 -> v2:
+>     * Replace netdev_err() with extack interface for user error reporting.
+> ---
+>  drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c | 19 +++++++++++++++++--
+>  drivers/net/ethernet/amd/xgbe/xgbe.h         |  1 +
+>  2 files changed, 18 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c b/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c
+> index 12395428ffe1..19cb1e2b7d92 100644
+> --- a/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c
+> +++ b/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c
+> @@ -450,6 +450,7 @@ static int xgbe_get_coalesce(struct net_device *netdev,
+>  	ec->rx_coalesce_usecs = pdata->rx_usecs;
+>  	ec->rx_max_coalesced_frames = pdata->rx_frames;
+>  
+> +	ec->tx_coalesce_usecs = pdata->tx_usecs;
+>  	ec->tx_max_coalesced_frames = pdata->tx_frames;
+>  
+>  	return 0;
+> @@ -463,7 +464,7 @@ static int xgbe_set_coalesce(struct net_device *netdev,
+>  	struct xgbe_prv_data *pdata = netdev_priv(netdev);
+>  	struct xgbe_hw_if *hw_if = &pdata->hw_if;
+>  	unsigned int rx_frames, rx_riwt, rx_usecs;
+> -	unsigned int tx_frames;
+> +	unsigned int tx_frames, tx_usecs;
+>  
+>  	rx_riwt = hw_if->usec_to_riwt(pdata, ec->rx_coalesce_usecs);
+>  	rx_usecs = ec->rx_coalesce_usecs;
+> @@ -485,9 +486,22 @@ static int xgbe_set_coalesce(struct net_device *netdev,
+>  		return -EINVAL;
+>  	}
+>  
+> +	tx_usecs = ec->tx_coalesce_usecs;
+>  	tx_frames = ec->tx_max_coalesced_frames;
+>  
+> +	/* Check if both tx_usecs and tx_frames are set to 0 simultaneously */
+> +	if (!tx_usecs && !tx_frames) {
+> +		NL_SET_ERR_MSG_FMT_MOD(extack,
+> +				       "tx_usecs and tx_frames must not be 0 together");
+> +		return -EINVAL;
+> +	}
+> +
+>  	/* Check the bounds of values for Tx */
+> +	if (tx_usecs > XGMAC_MAX_COAL_TX_TICK) {
+> +		NL_SET_ERR_MSG_FMT_MOD(extack, "tx-usecs is limited to %d usec",
+> +				       XGMAC_MAX_COAL_TX_TICK);
+> +		return -EINVAL;
+> +	}
+>  	if (tx_frames > pdata->tx_desc_count) {
+>  		netdev_err(netdev, "tx-frames is limited to %d frames\n",
+>  			   pdata->tx_desc_count);
+> @@ -499,6 +513,7 @@ static int xgbe_set_coalesce(struct net_device *netdev,
+>  	pdata->rx_frames = rx_frames;
+>  	hw_if->config_rx_coalesce(pdata);
+>  
+> +	pdata->tx_usecs = tx_usecs;
+>  	pdata->tx_frames = tx_frames;
+>  	hw_if->config_tx_coalesce(pdata);
+>  
+> @@ -830,7 +845,7 @@ static int xgbe_set_channels(struct net_device *netdev,
+>  }
+>  
+>  static const struct ethtool_ops xgbe_ethtool_ops = {
+> -	.supported_coalesce_params = ETHTOOL_COALESCE_RX_USECS |
+> +	.supported_coalesce_params = ETHTOOL_COALESCE_USECS |
+>  				     ETHTOOL_COALESCE_MAX_FRAMES,
+>  	.get_drvinfo = xgbe_get_drvinfo,
+>  	.get_msglevel = xgbe_get_msglevel,
+> diff --git a/drivers/net/ethernet/amd/xgbe/xgbe.h b/drivers/net/ethernet/amd/xgbe/xgbe.h
+> index 42fa4f84ff01..e330ae9ea685 100755
+> --- a/drivers/net/ethernet/amd/xgbe/xgbe.h
+> +++ b/drivers/net/ethernet/amd/xgbe/xgbe.h
+> @@ -272,6 +272,7 @@
+>  /* Default coalescing parameters */
+>  #define XGMAC_INIT_DMA_TX_USECS		1000
+>  #define XGMAC_INIT_DMA_TX_FRAMES	25
+> +#define XGMAC_MAX_COAL_TX_TICK		100000
+>  
+>  #define XGMAC_MAX_DMA_RIWT		0xff
+>  #define XGMAC_INIT_DMA_RX_USECS		30
+> -- 
+> 2.34.1
+> 
+Reviewed-by: Hariprasad Kelam <hkelam@marvell.com> 
 
