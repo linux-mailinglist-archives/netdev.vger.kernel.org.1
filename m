@@ -1,114 +1,95 @@
-Return-Path: <netdev+bounces-212918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212919-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 367BDB2283C
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 15:21:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92E41B228AD
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 15:36:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 06CC61BC0738
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 13:14:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F1FB621D9F
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 13:30:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B18DF26B2C8;
-	Tue, 12 Aug 2025 13:13:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09706280A35;
+	Tue, 12 Aug 2025 13:28:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qewqHBMR"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 555F925F796;
-	Tue, 12 Aug 2025 13:13:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1DA627F003;
+	Tue, 12 Aug 2025 13:28:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755004421; cv=none; b=lXhVPC1dlReGS/dsFLT+08enPcz/0b1i9g5t0ovhPED1S+IKabaB71H3p/IqvokoANN00mnivSASGwDD9SQ3/4Fe/yvK1k0FIMBsqqzpY+YkBT39tGRU826AnJc7P1mUnEvPv303Og+CGLK4qkwwZkRrftQCuY6u13r2SjRxqPo=
+	t=1755005307; cv=none; b=tlLYCxArBG3FUbYZVv9wtyKTmnoA818Q1KG9geE6aLZtMEWteWVlIaAxsqx2oM0855vac2mB4ccAKt0b+WU7HrQoxIAVONRZEkTSoFViaVzqPiRpsh/VHBL9pVnFCI2jHo32dkE6xdprOQVMKeJiZpH2bLyACTjWyl4afHE+xaQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755004421; c=relaxed/simple;
-	bh=rELXGmjflE8L3p+Badd/4TCPAi/HVFvdh3j8iNXmqyw=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=c7i++W7fyj2WuNc2Z2xjnubdwVuYnVebAqgAGgkUhbl2B+DMy0VEunDSzCWIlCF2Jg0gRuZ7O6gGewTCvt54iC1bh4iy56oHbsgWJYQdJnzapNKgiJivMO4iGywGLQ2CcaOwzEJWrQk2vkXMKbRjXs973fI58yGT62J6n72Ouj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.163])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4c1X1n5s7hz23jg6;
-	Tue, 12 Aug 2025 21:10:53 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 6B2DC1800B2;
-	Tue, 12 Aug 2025 21:13:32 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 12 Aug 2025 21:13:31 +0800
-Message-ID: <c0fa9fe2-7a98-4682-9ecf-aab36ec8e9ed@huawei.com>
-Date: Tue, 12 Aug 2025 21:13:30 +0800
+	s=arc-20240116; t=1755005307; c=relaxed/simple;
+	bh=zJNW1KKRSi0nQtsJy7+cTejpGxgeC51nbgUM4FI7LWs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=r6FuClfdR/gjtQYfnknjxXE41eLi06V6o+xmpiJk1aCSFRKHYFMTn9prMmY0dLFfVupMiEonFdGZfSvd9bwO71WOF07a0R4T8JTLk8CNqizddNAYjS5Y0OrNvqbXw7m0vvKCoxhocFfTyQWH0O7w/vpJrAy6MwC1uP6dP7Wwddc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qewqHBMR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7182C4CEF5;
+	Tue, 12 Aug 2025 13:28:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755005307;
+	bh=zJNW1KKRSi0nQtsJy7+cTejpGxgeC51nbgUM4FI7LWs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=qewqHBMRaY6UuO709TIpXRaKplhk8xJtLKAn8Rm6EwbPrxJYYKaDidqATf5S+3GtT
+	 7gaNpSP+srFQkWvhz8vSTTU6GKRvOQ59Gq50R9rys2AwO2o98Aa4tuhpo6Ojuf0JNi
+	 zEH8UdzkqhJ/QlHbjXhzf/AmBcvGKU2vEXY408v6v+RjE7ox7VVg7be/uSI3VzUuPI
+	 vMHdYeF3/Asc2HXbISTJxJc1UwUzquBV4XpY4BmLDRRvqvg9UWOQ3RkP0w9rz3uhCR
+	 yV9fV7XJu99CPa/z8qlpyiAg6k1cxG/fgVayz64UcKEQvoQiKtgQPvOKwSx22szvS1
+	 T1Y1Z/JdX9hDw==
+Date: Tue, 12 Aug 2025 06:28:25 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ andrew+netdev@lunn.ch, horms@kernel.org, borisp@nvidia.com,
+ john.fastabend@gmail.com, shuah@kernel.org,
+ linux-kselftest@vger.kernel.org, sd@queasysnail.net, will@willsroot.io,
+ savy@syst3mfailure.io
+Subject: Re: [PATCH net v2 1/2] tls: handle data disappearing from under the
+ TLS ULP
+Message-ID: <20250812062825.391c030c@kernel.org>
+In-Reply-To: <b3a83032-8ed4-4d5d-9df9-6dbd02acac1c@redhat.com>
+References: <20250807232907.600366-1-kuba@kernel.org>
+	<b3a83032-8ed4-4d5d-9df9-6dbd02acac1c@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, =?UTF-8?Q?Heiko_St=C3=BCbner?= <heiko@sntech.de>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>,
-	<Frank.Sae@motor-comm.com>, <hkallweit1@gmail.com>, <shenjian15@huawei.com>,
-	<liuyonglong@huawei.com>, <chenhao418@huawei.com>,
-	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
-	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 1/2] net: phy: motorcomm: Add support for PHY
- LEDs on YT8521
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-References: <20250716100041.2833168-1-shaojijie@huawei.com>
- <20250716100041.2833168-2-shaojijie@huawei.com> <7978337.lvqk35OSZv@diego>
- <aJoFvcICOXhuZ8-q@shell.armlinux.org.uk>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <aJoFvcICOXhuZ8-q@shell.armlinux.org.uk>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
- kwepemk100013.china.huawei.com (7.202.194.61)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+On Tue, 12 Aug 2025 12:45:56 +0200 Paolo Abeni wrote:
+> On 8/8/25 1:29 AM, Jakub Kicinski wrote:
+> > diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+> > index 549d1ea01a72..51c98a007dda 100644
+> > --- a/net/tls/tls_sw.c
+> > +++ b/net/tls/tls_sw.c
+> > @@ -1384,7 +1384,8 @@ tls_rx_rec_wait(struct sock *sk, struct sk_psock *psock, bool nonblock,
+> >  			return sock_intr_errno(timeo);
+> >  	}
+> >  
+> > -	tls_strp_msg_load(&ctx->strp, released);
+> > +	if (unlikely(!tls_strp_msg_load(&ctx->strp, released)))
+> > +		return tls_rx_rec_wait(sk, psock, nonblock, false);  
+> 
+> I'm probably missing something relevant, but I don't see anything
+> preventing the above recursion from going very deep and cause stack
+> overflow.
+> 
+> Perhaps something alike:
+> 
+> 		released = false;
+> 		goto <function start>
+> 
+> would be safer?
 
-on 2025/8/11 23:01, Russell King (Oracle) wrote:
-> On Thu, Aug 07, 2025 at 11:50:06AM +0200, Heiko Stübner wrote:
->>> +static int yt8521_led_hw_control_get(struct phy_device *phydev, u8 index,
->>> +				     unsigned long *rules)
->>> +{
->>> +	int val;
->>> +
->>> +	if (index >= YT8521_MAX_LEDS)
->>> +		return -EINVAL;
->>> +
->>> +	val = ytphy_read_ext(phydev, YT8521_LED0_CFG_REG + index);
->>> +	if (val < 0)
->>> +		return val;
->>> +
->>> +	if (val & YT8521_LED_TXACT_BLK_EN)
->>> +		set_bit(TRIGGER_NETDEV_TX, rules);
->>> +
->>> +	if (val & YT8521_LED_RXACT_BLK_EN)
->>> +		set_bit(TRIGGER_NETDEV_RX, rules);
->>> +
->>> +	if (val & YT8521_LED_FDX_ON_EN)
->>> +		set_bit(TRIGGER_NETDEV_FULL_DUPLEX, rules);
->>> +
->>> +	if (val & YT8521_LED_HDX_ON_EN)
->>> +		set_bit(TRIGGER_NETDEV_HALF_DUPLEX, rules);
->>> +
->>> +	if (val & YT8521_LED_GT_ON_EN)
->>> +		set_bit(TRIGGER_NETDEV_LINK_1000, rules);
->>> +
->>> +	if (val & YT8521_LED_HT_ON_EN)
->>> +		set_bit(TRIGGER_NETDEV_LINK_100, rules);
->>> +
->>> +	if (val & YT8521_LED_BT_ON_EN)
->>> +		set_bit(TRIGGER_NETDEV_LINK_10, rules);
-> Sorry, I don't have the original to hand.
->
-> Please use __set_bit() where the more expensive atomic operation that
-> set_bit() gives is not necessary.
-
-Okay, got it.
-
+It's a tail call to the same function, the compiler should do that for
+us automatically. Can we not trust the compiler to be sensible? Both
+clang and gcc get it right.
 
