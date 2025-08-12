@@ -1,223 +1,120 @@
-Return-Path: <netdev+bounces-213115-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213117-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CC51B23BDA
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 00:24:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7C0AB23C13
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 00:57:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 261221AA880A
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 22:24:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8BFB96877C1
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 22:57:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDCE32D46C4;
-	Tue, 12 Aug 2025 22:24:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 989472D0C9F;
+	Tue, 12 Aug 2025 22:57:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UsgG2lN0"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="BGPxhRb2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFB21280308;
-	Tue, 12 Aug 2025 22:24:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E53751DFCB;
+	Tue, 12 Aug 2025 22:57:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.97
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755037465; cv=none; b=FafWQNMUOkHNwyBeXjLd8tOUr8mbvTSAHi1xhr+bQkVmqAI3EhOc+7SIp+fzYm0A2CcvuTONwK0yK4nobXUTb1t7isctUlmOjJPZ+ysV7GtirP/9VDF/9DZzOdzt9sexOQNlsXyF8HMQpjw6tzcQbVZDAd/HQTs0yNEe99C5HQc=
+	t=1755039452; cv=none; b=BfobgZGaF7oCuWBixQpk9tYc6AY5IRrLltEe5yZCd5wY6j6TGzxCIbPTy8EN9OrrLEpDL5qB7vfTVdLUY+dsRlMf9uW/R+j2yiyOHKggUtGF0cybbfqlQ+2ewKUmUQ6mn9ly7Y92VkqmUfvOSQF9Z+IQ//LPRPQo9S82Jas/qyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755037465; c=relaxed/simple;
-	bh=VTu1YlP6cbBxPd8KlY7/RgMoLKQvCZlYMTO6Lr73lws=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kJ/8AtMQ1kRi/7mVZBGK3giJque5zDKQdno4k0N21paFr0WTaXk4yLMSlP1szm2li/NweLdK3UcPAp6f5fDr8kiLhKiJVCRfvdEyatFLmc98qHxXCTWB92KEweCzWnY4ErSvtYj8MxpfCINtdcCKOZIv2WvOHJlxfX1LkZ6+cq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UsgG2lN0; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-3b783ea502eso203346f8f.1;
-        Tue, 12 Aug 2025 15:24:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755037462; x=1755642262; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rtjUK0AZOjm4eF0vnry/hWr4fc/ZinEdNV9kmjIXNAY=;
-        b=UsgG2lN0/dfvuiGD/r5glWiHVrG4l89saV+mlnzWnKFzmWWfFufR+ttIQPnxpwoTuK
-         Xz4/VHGXDCCFZyoxXOcsYB36Wck3M0v2TzVxKzI87M58bJOrsPvDXPyeOWtigvfp6TPC
-         k/i5ilA+ePGDSKJBp5IlTI+TBe7n7OwSdW43/bhUaxk65sB35FhSxL5R64J0myrBFMdp
-         /ODx6S+LIoVfKqg+CuMxydF+3BvqxaxvF/Rh6oO8FuF8uMsGZqat9TbZXUciQZ+2aO5r
-         6blGBtVOavLwBOkRZhfE5gQ+4/exWFbt8EHIpPZ6VgTWGkPy0yks4wtnvR4RryW0PCxh
-         XVtA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755037462; x=1755642262;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rtjUK0AZOjm4eF0vnry/hWr4fc/ZinEdNV9kmjIXNAY=;
-        b=Jy0kVZOLv6cZgF/rd+Xje4arfcQAK1N3xFlktuQBFrlHo+khivCawW9kSMisB+eZKe
-         sGReooHIRzrftzvEsl5pJHPeijr1ZnKvEqGm7/gq1nFpAqwKmx1C5lMW+cDBvM5XSutR
-         w/UTeqs19NoSdvNhdIjnA6eGeSSL1kpYy3m6+jhXv3SceJxsEeI2SZmg8ub5AiuBeaJD
-         z/MdcSbZDmmiQLwAhia2RUQcumLXzMWvZV0mVBrGw9pAU+C/lRphYwnm+ZHDICHh6iqe
-         uR1LG/x6qwsfp807Q834F+nZ+tiaCBrvAiBLOtHqGT3VECYye3UnXsXLTe+REImts6MY
-         evwQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU26KLfefZxtdrid992cL40r7mUKF/drLukWXnbj4vXvSNeqql/R0l7VnecEZjwUGC5KWw=@vger.kernel.org, AJvYcCVBTCaX7FMNyorDmaboS17h084f8ea8YKVqjlnJJZRVYZQ7GvAtA6nz1oSgFdLCash3GiDHLQuyPf/m@vger.kernel.org, AJvYcCWI3mGJrhAHMFlAZlaS29x5jOfEMts4K+loweGnVBW9gZn5cJwfPp37Oo25gsud7CRu4biFZd315jMkkvog@vger.kernel.org
-X-Gm-Message-State: AOJu0YxE8e5Zu+HfDuK5YSHgaEhirWFNHt+39FGQjR9tuXmjPFU3gBp8
-	yX2XTnstzG3jetGIt6MUHCCDdCluiYQVVNI1tYH7jw3h6qR8WJHWm9YdKBIZM3LB
-X-Gm-Gg: ASbGncsu4O/9fpdBv2cLXQ4wM4DcddjS01qpGSD6eLEVhmVPoGfF1Kwzw3M0x6onJrL
-	ZscYl2Ej+VSA2P3CLZ+McaG4tP5eQoykP9xgKTeAsGkgmQvavgoD//V2sZ1CBoWBL8ngYWBgErn
-	6ex2HsjtwTmdzuiQ1fKAGKk4D9wYk3t1cB5U0cdzEGuup/lcM7x3A+LzdGhMKdEUn/4wdb9pnPg
-	ipk+EC0D7gQYy/EvCH8IhsCWKu0FzmC8NobtWo+BUalXaSQH/FYomO55FEeaOOIVlHReVz6EsTA
-	aMN+VcQvvYaeIu7SPQ1qtyM/L9Rsk4kqKsX+53FXC+8zkdFwEILYZxzaBdFLmaIrCgWgeuWzIv5
-	KfSCjIa6SD12uZ31sDUfKHH45jKRwv80Vf88=
-X-Google-Smtp-Source: AGHT+IHJr9x4tPHQB488BcmKjtF7JFP/uv+eKfUyu+Ss45vTGSVkFV0Ahpktarr49m9/oxGrmVivog==
-X-Received: by 2002:a05:6000:3107:b0:3b9:16e5:bd38 with SMTP id ffacd0b85a97d-3b918c4cebcmr138431f8f.4.1755037461620;
-        Tue, 12 Aug 2025 15:24:21 -0700 (PDT)
-Received: from localhost ([2a03:2880:31ff:2::])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b79c3abedesm46018339f8f.3.2025.08.12.15.24.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Aug 2025 15:24:19 -0700 (PDT)
-From: Mohsin Bashir <mohsin.bashr@gmail.com>
-To: netdev@vger.kernel.org
-Cc: aleksander.lobakin@intel.com,
-	alexanderduyck@fb.com,
-	andrew+netdev@lunn.ch,
-	ast@kernel.org,
-	bpf@vger.kernel.org,
-	corbet@lwn.net,
-	daniel@iogearbox.net,
-	davem@davemloft.net,
-	edumazet@google.com,
-	hawk@kernel.org,
-	horms@kernel.org,
-	john.fastabend@gmail.com,
-	kernel-team@meta.com,
-	kuba@kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	mohsin.bashr@gmail.com,
-	pabeni@redhat.com,
-	sdf@fomichev.me,
-	vadim.fedorenko@linux.dev
-Subject: [PATCH net-next V3 9/9] eth: fbnic: Report XDP stats via ethtool
-Date: Tue, 12 Aug 2025 15:24:17 -0700
-Message-ID: <20250812222417.268420-1-mohsin.bashr@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20250812220150.161848-1-mohsin.bashr@gmail.com>
-References: <20250812220150.161848-1-mohsin.bashr@gmail.com>
+	s=arc-20240116; t=1755039452; c=relaxed/simple;
+	bh=Jn0Scey20IWQjV8yQsVwKnL3ajtRwc+Pa/RAser3aRM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=a9xXtR00nweE8cXiOYS7xPTD0ffFxPwu+JG+pBGjI3qE2U1H1gbvKixvfRHYevDzp7Evx0ne1bt+6EnPhnV0s3wY2upMWdXtzWGwp8+wkRQXXZJ9cqG/GXOe3v6Ideo4/WuZF+Rhp/wab6FeZQlROZzTuJDuPGOdik4exhItIX4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=BGPxhRb2; arc=none smtp.client-ip=115.124.30.97
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1755039447; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=hzyGLAvYMg6i3Vhc3/4W2C3KZxciNBuhQJ30QdiHlJ0=;
+	b=BGPxhRb2O1Y2qYxuVTH/UopSDG7gWn3T8ZVgwPzFlnQGtaQAWMCZ/6bQ88xqWAudIc8x88wATofOb8LmgWYbaB7u2M7jAY5spcOZlcRUTLRCEmyayIelQPft2/d+ZXnf86OvRQPyoTXVATt6AgGbziB5wLrktjlYnpeJQTAmO2c=
+Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0WlcqLHL_1755039124 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Wed, 13 Aug 2025 06:52:05 +0800
+Date: Wed, 13 Aug 2025 06:52:04 +0800
+From: Dust Li <dust.li@linux.alibaba.com>
+To: Alexandra Winter <wintera@linux.ibm.com>,
+	David Miller <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"D. Wythe" <alibuda@linux.alibaba.com>,
+	Sidraya Jayagond <sidraya@linux.ibm.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	Julian Ruess <julianr@linux.ibm.com>
+Cc: netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Thorsten Winkler <twinkler@linux.ibm.com>,
+	Simon Horman <horms@kernel.org>,
+	Mahanta Jambigi <mjambigi@linux.ibm.com>,
+	Tony Lu <tonylu@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>, Halil Pasic <pasic@linux.ibm.com>,
+	linux-rdma@vger.kernel.org
+Subject: Re: [RFC net-next 08/17] net/dibs: Register ism as dibs device
+Message-ID: <aJvFlBISHJMe-0Jt@linux.alibaba.com>
+Reply-To: dust.li@linux.alibaba.com
+References: <20250806154122.3413330-1-wintera@linux.ibm.com>
+ <20250806154122.3413330-9-wintera@linux.ibm.com>
+ <aJiwrG-XD06gTKb3@linux.alibaba.com>
+ <2d511067-0cc6-4911-846a-ab815a0b318b@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2d511067-0cc6-4911-846a-ab815a0b318b@linux.ibm.com>
 
-Add support to collect XDP stats via ethtool API. We record
-packets and bytes sent, and packets dropped on the XDP_TX path.
+On 2025-08-11 16:27:21, Alexandra Winter wrote:
+>
+>
+>On 10.08.25 16:46, Dust Li wrote:
+>> I've been wondering whether we should completely remove the ISM concept
+>> from SMC. Including rename smc_ism.c into smc_dibs.c.
+>> 
+>> Since DIBS already serves as the replacement for ISM, having both ISM
+>> and DIBS coexist in the codebase seems a bit confusing and inconsistent.
+>> Removing ISM could help streamline the code and improve clarity.
+>> 
+>> Best regards,
+>> Dust
+>
+>I second that.
+>Like I wrote in the last commit message:
+>"[RFC net-next 17/17] net/dibs: Move event handling to dibs layer
+>...
+>SMC-D and ISM are now independent.
+>struct ism_dev can be moved to drivers/s390/net/ism.h.
+>
+>Note that in smc, the term 'ism' is still used. Future patches could
+>replace that with 'dibs' or 'smc-d' as appropriate."
+>
+>
+>I am not sure what would be the best way to do such a global replacement.
+>One big patch on top of dibs-series? That would be a lot of changes without
+>adding any functionality.
 
-ethtool -S eth0 | grep xdp | grep -v "0"
-     xdp_tx_queue_13_packets: 2
-     xdp_tx_queue_13_bytes: 16126
+I prefer this approach. Renaming without changing functionality keeps
+the patch clean and makes it easier to cherry-pick.
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
----
- .../net/ethernet/meta/fbnic/fbnic_ethtool.c   | 50 ++++++++++++++++++-
- 1 file changed, 49 insertions(+), 1 deletion(-)
+Best regards,
+Dust
 
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-index 742b557d0e56..ceb8f88ae41c 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-@@ -112,6 +112,20 @@ static const struct fbnic_stat fbnic_gstrings_hw_q_stats[] = {
- 	 FBNIC_HW_RXB_DEQUEUE_STATS_LEN * FBNIC_RXB_DEQUEUE_INDICES + \
- 	 FBNIC_HW_Q_STATS_LEN * FBNIC_MAX_QUEUES)
- 
-+#define FBNIC_QUEUE_STAT(name, stat) \
-+	FBNIC_STAT_FIELDS(fbnic_ring, name, stat)
-+
-+static const struct fbnic_stat fbnic_gstrings_xdp_stats[] = {
-+	FBNIC_QUEUE_STAT("xdp_tx_queue_%u_packets", stats.packets),
-+	FBNIC_QUEUE_STAT("xdp_tx_queue_%u_bytes", stats.bytes),
-+	FBNIC_QUEUE_STAT("xdp_tx_queue_%u_dropped", stats.dropped),
-+};
-+
-+#define FBNIC_XDP_STATS_LEN ARRAY_SIZE(fbnic_gstrings_xdp_stats)
-+
-+#define FBNIC_STATS_LEN \
-+	(FBNIC_HW_STATS_LEN + FBNIC_XDP_STATS_LEN * FBNIC_MAX_XDPQS)
-+
- static void
- fbnic_get_drvinfo(struct net_device *netdev, struct ethtool_drvinfo *drvinfo)
- {
-@@ -422,6 +436,16 @@ static void fbnic_get_rxb_dequeue_strings(u8 **data, unsigned int idx)
- 		ethtool_sprintf(data, stat->string, idx);
- }
- 
-+static void fbnic_get_xdp_queue_strings(u8 **data, unsigned int idx)
-+{
-+	const struct fbnic_stat *stat;
-+	int i;
-+
-+	stat = fbnic_gstrings_xdp_stats;
-+	for (i = 0; i < FBNIC_XDP_STATS_LEN; i++, stat++)
-+		ethtool_sprintf(data, stat->string, idx);
-+}
-+
- static void fbnic_get_strings(struct net_device *dev, u32 sset, u8 *data)
- {
- 	const struct fbnic_stat *stat;
-@@ -447,6 +471,9 @@ static void fbnic_get_strings(struct net_device *dev, u32 sset, u8 *data)
- 			for (i = 0; i < FBNIC_HW_Q_STATS_LEN; i++, stat++)
- 				ethtool_sprintf(&data, stat->string, idx);
- 		}
-+
-+		for (i = 0; i < FBNIC_MAX_XDPQS; i++)
-+			fbnic_get_xdp_queue_strings(&data, i);
- 		break;
- 	}
- }
-@@ -464,6 +491,24 @@ static void fbnic_report_hw_stats(const struct fbnic_stat *stat,
- 	}
- }
- 
-+static void fbnic_get_xdp_queue_stats(struct fbnic_ring *ring, u64 **data)
-+{
-+	const struct fbnic_stat *stat;
-+	int i;
-+
-+	if (!ring) {
-+		*data += FBNIC_XDP_STATS_LEN;
-+		return;
-+	}
-+
-+	stat = fbnic_gstrings_xdp_stats;
-+	for (i = 0; i < FBNIC_XDP_STATS_LEN; i++, stat++, (*data)++) {
-+		u8 *p = (u8 *)ring + stat->offset;
-+
-+		**data = *(u64 *)p;
-+	}
-+}
-+
- static void fbnic_get_ethtool_stats(struct net_device *dev,
- 				    struct ethtool_stats *stats, u64 *data)
- {
-@@ -511,13 +556,16 @@ static void fbnic_get_ethtool_stats(struct net_device *dev,
- 				      FBNIC_HW_Q_STATS_LEN, &data);
- 	}
- 	spin_unlock(&fbd->hw_stats_lock);
-+
-+	for (i = 0; i < FBNIC_MAX_XDPQS; i++)
-+		fbnic_get_xdp_queue_stats(fbn->tx[i + FBNIC_MAX_TXQS], &data);
- }
- 
- static int fbnic_get_sset_count(struct net_device *dev, int sset)
- {
- 	switch (sset) {
- 	case ETH_SS_STATS:
--		return FBNIC_HW_STATS_LEN;
-+		return FBNIC_STATS_LEN;
- 	default:
- 		return -EOPNOTSUPP;
- 	}
--- 
-2.47.3
-
+>Or do you have other clarity improvements in the pipeline that could be combined?
+>I would like to defer that decision to the smc maintainers. Would that be ok for you?
+>
 
