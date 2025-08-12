@@ -1,209 +1,224 @@
-Return-Path: <netdev+bounces-212775-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212778-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C275B21E04
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 08:13:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58AE3B21E3E
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 08:26:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 829FB1881493
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 06:11:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 08B9462617E
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 06:26:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 800BF2DEA60;
-	Tue, 12 Aug 2025 06:11:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D78652D77F7;
+	Tue, 12 Aug 2025 06:25:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ADSGAvcH"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="QJsSR8+m"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2064.outbound.protection.outlook.com [40.107.94.64])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f225.google.com (mail-pg1-f225.google.com [209.85.215.225])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8EE52D3A68;
-	Tue, 12 Aug 2025 06:10:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.64
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754979061; cv=fail; b=OYFB8xyuKFLlwZdo0u1fZo2vUwgRh7G5yiIBU3STKS+duQj4ETjNQ/jE2BQtvlgLF92PaQ8n6gMfX30C4ryasaeSr+siMOwRZZ38GTBLAp4gbrp/83ydna0uBM/4A6ilDwt2t//JIxmIsZ6DVZV2+ivjVJA3O9j8SNBtR16cdks=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754979061; c=relaxed/simple;
-	bh=2x3LhJb6UsD6t79T0K1So6Iu4I59DjsmxEEs9zt8Jno=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=b3ebL6XHnc/DH+BNhZ5Rbwqjda654AferpX+ErxGC1mlfUKo/VlvxDpU4JNXIgR8M16eyurVjdXAZZ7TCE+wGm9VjnkX+7hD447TmKGR1LwuOSTU0y6qtdp0eE8reoJzHdzdPOas38UJZckfwAKcsuEFT2dYL/z9OLFoUhpTMe8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ADSGAvcH; arc=fail smtp.client-ip=40.107.94.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=rKg7iDiV/wLO7qT4LQX0zB0sZYNAMwZcRP9Eo9yrLzGAHoK+U0+fpOMOArs2zZNJJOpIGeuSdfe9BfW+rrKVqxu+JjoGLvHrmPKuOF5ZRWKOfmSKs2FL86bO0t+jYPM1TRsDGQe3rS+OGD4Nyi3I5V6S7F7W+3OlJw3aEzPuuozOJIFkjBzEy0irz1UckXJe0ARtYYWU98Sc/3kW1yGWNgwgrfqFzV91z37UIhVQlNtGvOJUsF+1obtXmv2mxpE7IVmCvVlp0bsFoOsu2qJUZ3aV83w1T0/8MhFdSOSW70ldSiz3aZkonhfn1VM7MgqqHSFPBpddXLX+0JXbbIuQQQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=daL3xJSSNUI97ihwpGYot53BGNk0VaqR9Ts9jnLRi0E=;
- b=bzDZmP6NWRpliP6anJnnXKPx+Q+U8avoEgjSlEB+B1g4TDYRDviFpbV+cugicQ20+0Q1VajTLVEHz11FmcGwfOP1sqmTU+rw9W1uSuUyterHPQlurrFdTRdYKZpCNPtf0D1l3Msu9+fKwKQmdVkwlJiHT7gtPUyVLLOZnk6vlBw37n/arSnr7mwlsI9iX9CBd7DKdnMl6vGDSR82FScQ7pKm1O6HQ6EMnfxcOd8/YVScsyM9IMAwmRV0y+CuQDCbFm/j03TlwzUIubt8mZki1ExzuyVbr106HJe8dX7idirk3ot1rvt84Pj/YX31C8Ui0e4OY9cHNSb6ypYDhlXWxQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=daL3xJSSNUI97ihwpGYot53BGNk0VaqR9Ts9jnLRi0E=;
- b=ADSGAvcHZpXPAivLotheHjwHZKEhc0dheLNBthyo/Uk9tsnGzbW9rGl2HgKJLuF4yC3qte1uLX7gH1MfxI7vJhhEF1s/4UaOIo5cE16ADl1Ei4TrzcIovKywRdecAV/GDbzDDbp+Apd3qQMuUm6IX6IaCFyLPD9N9HhdyjBXmWLQ1wWetKdBj5UdosJxAPdmJ0Hl0M/5Z1z/Yc0TkX4dUel3aFDt5SmqaZkvtID1qK+CMCmQIggu9I0DX7elNkcHBfpaUJ39APEyEk0vFArX0OZTaA3zMGx7WZiINve5UbNHHqdewS5sEyF48CV03CgA5YUQv9LuZGL8j7ZsXI5S/A==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
- by DS7PR12MB6261.namprd12.prod.outlook.com (2603:10b6:8:97::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9009.21; Tue, 12 Aug
- 2025 06:10:56 +0000
-Received: from SA3PR12MB7901.namprd12.prod.outlook.com
- ([fe80::66fc:f8a2:1bfb:6de8]) by SA3PR12MB7901.namprd12.prod.outlook.com
- ([fe80::66fc:f8a2:1bfb:6de8%6]) with mapi id 15.20.9009.018; Tue, 12 Aug 2025
- 06:10:56 +0000
-Date: Tue, 12 Aug 2025 09:10:47 +0300
-From: Ido Schimmel <idosch@nvidia.com>
-To: Wang Liang <wangliang74@huawei.com>
-Cc: razor@blackwall.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	bridge@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, yuehaibing@huawei.com,
-	zhangchangzhong@huawei.com
-Subject: Re: [PATCH net v2] net: bridge: fix soft lockup in
- br_multicast_query_expired()
-Message-ID: <aJra548HB7zGcA6K@shredder>
-References: <20250812091818.542238-1-wangliang74@huawei.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250812091818.542238-1-wangliang74@huawei.com>
-X-ClientProxiedBy: TLZP290CA0009.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:9::18) To SA3PR12MB7901.namprd12.prod.outlook.com
- (2603:10b6:806:306::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B1B32D47F6
+	for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 06:25:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.225
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1754979959; cv=none; b=SWLkc253Oka/ITqLpS5oxCPeqlsIYMG30bZ5juEX4ZzHvDbyT0gR35bS8giyJOHCQ/k92ur2d2E/GwJFAwPGzR6R+mDIDsXSXwlVV0wo+kfG4HIFEkX7VTjisvKOPxRK7uJPhwmaH6nIQE7jPPJK7vP6p9rafXOKhviErz2Ugik=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1754979959; c=relaxed/simple;
+	bh=JwoVUph7JdF+eUAGcD2R4C4BHZniihsGUMw3tU+0Hjk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Acm4l6MNaeKymSwBEQ20Za5D75O0kQTbR6hsT5N99NiJQZYSqJ/nOi43ImpscfzOMn64ebBjCVoA0NDT86XTKPLWExfyfba5HY+QhIYJ6Z/5Y8iiLcckL80jUu1hC4bvP207jLW61KcSq1B2FzpIt1gRzpNLAb8TsEhM1Y5iDmY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=QJsSR8+m; arc=none smtp.client-ip=209.85.215.225
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pg1-f225.google.com with SMTP id 41be03b00d2f7-b2c4331c50eso3703756a12.3
+        for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 23:25:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754979957; x=1755584757;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:dkim-signature:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=efQ/Khh+wi0B0rIIu872y8FB8xkosRs89Ye5o6WmuwM=;
+        b=WBc4BlHfwwkRKcds6dJwCbaBk8Q5vgyJuBN6zWJB8UQjGJ+fDPRzxd7pvQX/bMHuS/
+         XbYALxSo4Hls1V+FH7sKLEXrCKCuo2v2K0nbfdL/QC6Wj4/K3hlnbrSrFCK6WNMrB3gv
+         rhSmRPoxzdVAc35Kwny4x6jweUsfFy4yEKzvjA8BiHiWU5r4CyBCp7a6O4zBCarS33bO
+         oUZ6+ck3Qw7CtX33DbFvblWLPkxePf5nBcoL9epNAQd7z49HtOKIUU6oq+0Z+4QylNQ/
+         4UIRfw6dilo/TgdlId5SAcOxdViNSEFmHp/vwbObgcrlUQStS4FatwygRftt6DeXH75d
+         hRyw==
+X-Forwarded-Encrypted: i=1; AJvYcCUFhc2gxlk0FQvGnAw3tiFMJLmXQhRG4FgdEVH53RyMC4S5jjV1bwdcR+toXpkWoTm207CXwG4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz4PJo5iiA/7X37QP2aDN1eFX5PxedIpVN5KCWzywbpC1yMXkPh
+	g8J0KgMIMDK19sPs6S8PAZtfnXQW1nk4BKA+NOmoFlZ+SftrfuXGXZ/py9vLIGccJ6J0/3gA2SP
+	y4WKZnuA1hIuhDNDXvxK4pU83M0529lCIDiHCoqDPU/DDRb1B+VSZF+nKHnrhdFPZCeDaOrKgm0
+	s0jS8/kAtsudFkWfyk2ztABCJOIWOhq3hcAVx+e12YYC7Shr+6oNoA7HMUDZa+92RwpBvBUJd1q
+	FLOKUtHefc9B0GBmA==
+X-Gm-Gg: ASbGncu24AsH5kbz2vCYpo24/r9C+IHM1CWpjTdSIQ2RAaqOmcQuBo2h79AdZS5LzJ7
+	mi0WssIh9+YYH0w1GCBlAs4zw7m8DMmb/512DBXQK8ASRmhowvZVKRhgMWeuzuYlzRuPUPiLqRM
+	yJJkXIcvGIxd7mK++tq1ubcRI7/5lIRJYGF/pBWE7zu649UebUQOGUQHW6ihq1bTKZZp2CfZqIU
+	QBL4T1Ab+W79wXgEYYZhqCOlH9oEj+e/NXukBXhkVbs/afjpp3wZUx7zoqxBEGafgEE5Y3HTN05
+	QvUAnjp+TOxQ4b3mgK1NsnCYoA0wNmOWNWovAfnsvo4DjISVKO9l2HLPIjwHnOo+5HnXf6mzVo5
+	PMNlRqeRJ3wFKh//WRGq2AFPR8+6KjStWUyq7mqy7OIiTjviwlMiOmKxspaJsLx+wnjGDFClgCP
+	R4
+X-Google-Smtp-Source: AGHT+IHzhyxFOm1JGWfSqCRnAQLxijz76Swwx4W4WYwfprei0NjstbnIfVND8szpG5wjkAJursYjxDg9KQmr
+X-Received: by 2002:a17:903:247:b0:23f:f065:f2be with SMTP id d9443c01a7336-242fc317779mr30255895ad.26.1754979957438;
+        Mon, 11 Aug 2025 23:25:57 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-0.dlp.protect.broadcom.com. [144.49.247.0])
+        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2429ce702casm9338155ad.35.2025.08.11.23.25.56
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 11 Aug 2025 23:25:57 -0700 (PDT)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-242fe34add1so5125565ad.3
+        for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 23:25:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1754979956; x=1755584756; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=efQ/Khh+wi0B0rIIu872y8FB8xkosRs89Ye5o6WmuwM=;
+        b=QJsSR8+mK50HbIV2kqKWlPi/pEbTvhnCU0996GgI+pgIm/tBeZkQYG2Mp6Uf1cbOin
+         BlO5CpvOX9G/fakcXK2TwqxocxNcSrboUIWj4gV/lsSCALYzXTc15jOERQ9iS8rLvxwq
+         QL9YU5CxQVihWU2NH1p983cdnt3pQo8oO1qlo=
+X-Forwarded-Encrypted: i=1; AJvYcCXPmUA+WarctnV50hmW0k2seTrnfGmdHoJlvi8wDkKBgZannuHXMogY9DawHQ9NqUd/ahSgBVE=@vger.kernel.org
+X-Received: by 2002:a17:902:f70c:b0:240:3f39:2c73 with SMTP id d9443c01a7336-242fc0eeffamr33535245ad.0.1754979955626;
+        Mon, 11 Aug 2025 23:25:55 -0700 (PDT)
+X-Received: by 2002:a17:902:f70c:b0:240:3f39:2c73 with SMTP id d9443c01a7336-242fc0eeffamr33534825ad.0.1754979955053;
+        Mon, 11 Aug 2025 23:25:55 -0700 (PDT)
+Received: from shivania.lvn.broadcom.net ([192.19.161.250])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-241e8aa9257sm291805895ad.153.2025.08.11.23.25.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Aug 2025 23:25:54 -0700 (PDT)
+From: Shivani Agarwal <shivani.agarwal@broadcom.com>
+To: stable@vger.kernel.org,
+	gregkh@linuxfoundation.org
+Cc: bcm-kernel-feedback-list@broadcom.com,
+	linux-kernel@vger.kernel.org,
+	ajay.kaher@broadcom.com,
+	alexey.makhalov@broadcom.com,
+	tapas.kundu@broadcom.com,
+	zyjzyj2000@gmail.com,
+	jgg@ziepe.ca,
+	leon@kernel.org,
+	richardcochran@gmail.com,
+	monis@mellanox.com,
+	kamalh@mellanox.com,
+	haggaie@mellanox.com,
+	amirv@mellanox.com,
+	dledford@redhat.com,
+	linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Leon Romanovsky <leonro@nvidia.com>,
+	Jason Gunthorpe <jgg@nvidia.com>,
+	Sasha Levin <sashal@kernel.org>,
+	Shivani Agarwal <shivani.agarwal@broadcom.com>
+Subject: [PATCH v5.10] RDMA/rxe: Return CQE error if invalid lkey was supplied
+Date: Mon, 11 Aug 2025 23:12:31 -0700
+Message-Id: <20250812061231.149309-1-shivani.agarwal@broadcom.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|DS7PR12MB6261:EE_
-X-MS-Office365-Filtering-Correlation-Id: a542b16d-0d22-4f9e-d29e-08ddd9670010
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|366016|7416014|376014|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?ylcD8Tc1jFsknhPx4aG7VO8JqYkyfUJo0d0kewTL0iBamimaegx4FiwYL2hZ?=
- =?us-ascii?Q?nudvHjMW8GKFd9aZlW9tZDdCt+O86OhTmpIi313Ps8w5RqIoBvZOGZaGiXmQ?=
- =?us-ascii?Q?w1ySQp1x6/N+43jFjZj1FSi0JS2cDnyFSkwfmSUV+p/UYVtYfhkaE8ilzFOc?=
- =?us-ascii?Q?K/WIQfv2jmC5qDqBfQZBuRbc6GUlZ4yKxiskJIBp7jFcj7t+eCVyRzW/9PwY?=
- =?us-ascii?Q?70ONNekoLSWSZhtpjFGJCBR2dUqj8QxAOBUDHTjHtzbFPbbFaFq1ZRMygbGM?=
- =?us-ascii?Q?FIsl57jk5brdIbsb9RDVqxtxbwINFlnif5y3OPobQvu/TTqJdWApH9B6MIgA?=
- =?us-ascii?Q?YqLdGJBpSL5UFUa+wWoRw1W3KO0hdKoHaxChCOPEf+fmWsOsFRiX0rw/BA//?=
- =?us-ascii?Q?Fu2vNw6CLe+WEKUSXkkFmly/IEuvDq51mmdaje7d/5eXDFdaCTaryLLmtoSO?=
- =?us-ascii?Q?rE21xb/PCWMl9oZMZ7W3HG1IODnusOqTFawQbsDgCMXm6XxhiUpjUmS41JGQ?=
- =?us-ascii?Q?wJFxo1cXW7iNDncEuKGQNRi1Y1Ns1B5R9+FGUUdeIRPx/OXy77NH0PEGqg2j?=
- =?us-ascii?Q?BYdf1ospFqQYI0HXd8lIatKQBKf3Macdl9JrlrnZ6wubPwCTxYU9Meg7LEls?=
- =?us-ascii?Q?vBUhaTwE4/TRoPjmvwa6ys00ZM2okDNp4bGwzysqdzEVLP1/vCq8X6XbsaM9?=
- =?us-ascii?Q?g+K7EnXELJFShAfcGV0TIPerJR/V3T3A20bosbBMLzOnIsXbvTt2BnDcuW9H?=
- =?us-ascii?Q?RIKf3mICbSzsXCrf6cR2Qy2joYEISv1b9zKzZnrqohzuAPajYq3R8KiLjXgt?=
- =?us-ascii?Q?ITA/Ho1MV+g18IBN1zrBC3hMUwxTvyxjU+lPHMbIPAT6BzyHx6I4VWzfsjEa?=
- =?us-ascii?Q?keqf6XrI0z5jRijtpvmG05+K9jNGpd7VQ13s+YpO72o+qHM/hd2wr+orDyVB?=
- =?us-ascii?Q?D9Z4BL0mKwH/Kh+fQXKDvP2in6f6f1hhqIFQE1zBZLimZhamDbFYo5sDZ8eB?=
- =?us-ascii?Q?g/d+q3NjwyGUuEZHmgUC5oyjLtyyP5v1UU6xTeqrWiw6Vd+Tvf2bKwKlmdWd?=
- =?us-ascii?Q?6H9fRSP0jUK9/HMscAxLnR6oq0miBZ74GqfMXmmsChkWz3b0JDGsRYeFAAot?=
- =?us-ascii?Q?N4ZuWJnGhEVM+aKBUSkEWXUZOX0fRJyJLhCNaBKUC8qoLJwDOUBJ/QUKretr?=
- =?us-ascii?Q?+ZMs6TndS9QPXVm9wFl5nGoHv1WUHqCoYalEIOEDeSPNBjSOmhklh9SQ6TEk?=
- =?us-ascii?Q?vPHMlTbfZrL1LZF/gNSBf/PRB2mNCwwanpQ56pAIJ/bGCcwhms9j3R5/JDPA?=
- =?us-ascii?Q?pvhNpiamMKinnlBGRSaYgLJ/EUgmL0qmz/MEgfR6AX15zmIFy/4WakqkbtF8?=
- =?us-ascii?Q?TEmClChOtxxE6oeKy9ori4eImZTrH1L2A1bcheypeLq2HRxA3iG/XLcZogTT?=
- =?us-ascii?Q?DWrEaMddvgo=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?SNvQ8Xm6aTzanSRNUUeF+lF/uuJsxlSi/HOOOdyZtMafEdv3J/zvVwo14yCV?=
- =?us-ascii?Q?tSWS54xfw3IWVtfC71bx6fOU4WENFhvj6W/O34i+oz78Tsikw16+r+GzMJ9C?=
- =?us-ascii?Q?4ZrkcTgEhrN4/ZspfwfkLcSSnWmcmNR4QWgrgWZxt3iFVcWAk2gUr1F4eJkZ?=
- =?us-ascii?Q?o5/RgnSTbfP18X/r2NdecpArpc6JlpfQ+rTT9iwt1FE0Sjoe0vikW3+yd0ec?=
- =?us-ascii?Q?4N8ZUQ1sI1oMUe/8nfHdlMPrraJSS1Qy1GUdq0HAwsy24ErDv7gqs62jNYd/?=
- =?us-ascii?Q?AncMztR6rHVIctTSxH+78o6rE8JpoWX+h665sqKk4GvQ2chfmhhjZLfnWfut?=
- =?us-ascii?Q?mLIEhJgS5CFqYrjJ7yWP3trZyWGoacu7uohYUpZXCdnOxLF/H42jfQlRbPXF?=
- =?us-ascii?Q?PdPUXlw9iH/WdUJIDPxYFLLm8Cy8N3RqhuhkduiJbiUrgSwRsvn07zhgcuzr?=
- =?us-ascii?Q?ihX2ziYPPWb6l+Gs1jvSSgjh2hDdmS+WWjkrIHwXWUjkET/V0hZKZ/rQSR/y?=
- =?us-ascii?Q?8hAe+c1exjtvNzv0VWXeTSX+Khhv0hXoZ2Z00ehn6OPbpY45bOgcfHV4Z6ok?=
- =?us-ascii?Q?26qXOkN3dKa6kxzIgjVGTUN50saSt60EAE718WZphyPdgLYfX6GE6viebFN6?=
- =?us-ascii?Q?Fj95eS7bEGk/6EOH1XeBM5n75RPrkVT0CFoGT2gylMcDBMm5BEdrZUkTs35G?=
- =?us-ascii?Q?aTdCrOz7oZ+78HVqCjaO9kuqCltL494rocUWrfksWv6aEon7Z4rWOabKBsny?=
- =?us-ascii?Q?lQFWSKlCCpWRd/1oXCwhLtPgVJIdty/lCI312PhI1p+xJGVj54BJTaaEhEFx?=
- =?us-ascii?Q?w+IDXuQ3dPgfwVF58leJMT7P8kUJrpaRt1XQlNs7pwhtsS4qyMbaj4wWTrlS?=
- =?us-ascii?Q?HtWSDs5d4UEC9KuTXaF2dBSVYqC+M6WGjrAkBEwdkDwbdZ76YNZyQJpTUl28?=
- =?us-ascii?Q?3wYlw38z7e4EOB1EBg8Kng2Jct+raZlmB4radnJpg5Mk9o8G19LAV1w66gQA?=
- =?us-ascii?Q?5TJivInpfTX64ySk9Dc9z2nEGe5ltluCYT/ctmb7Kx1WSr9adbsYXfTJauZa?=
- =?us-ascii?Q?th3HTJtarBVR4wHpkVOHSqZCLAICm2BFjuiA5B6PS/9C9PEmCsPeq8lvTjJk?=
- =?us-ascii?Q?0Cy2ltLJzYN5YrD7MOv8YLD+S2D3xD+cpErcaIWdnz2dVFm7Ac//MUaNp+EG?=
- =?us-ascii?Q?L9vG5tzGURA0QIiSFL397C4+ExpatpL/Qa5yHn3RAwLzsyMBh25DKArz638x?=
- =?us-ascii?Q?MTZHSw72f2CzQPvbL2xdp+b39/CIypWMMGtRzpXr9Mvy9Jf2j/OqLhxJPl82?=
- =?us-ascii?Q?tgY5j6Y6TWb29mk5B+f2r8L3xdgQrhwYiZScJByTlwayt0G1zHVhDKSEpycT?=
- =?us-ascii?Q?dhO+Sjo2qbSIYUJXi6ciZq1123UJOujLQJ1qnVSBSxenYcofGBMoRokQs26m?=
- =?us-ascii?Q?HKiE/V6kDIaVivWLhlQlkJaXupLTELU9u24J/U/3UacSmXznasrOJyspki6P?=
- =?us-ascii?Q?Of/AyGRaVhEjvwZT++6I+tOsxz8bwHxlT97AsSQPZeIGdfBY2QUw2wxIo/0Y?=
- =?us-ascii?Q?+AzDNYuRVrPdenyDlQbkeD3UjWoFH1SfCTsd335m?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a542b16d-0d22-4f9e-d29e-08ddd9670010
-X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Aug 2025 06:10:56.3792
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: UHNnsBhs5/sCitok/BVkADWqyHX6oKGC1Sdi9mvfxCmoZVRvL9VPDTaA3tH0rdyO0/V2Gh1frtqSMmF8uIJatQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6261
+Content-Transfer-Encoding: 8bit
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 
-On Tue, Aug 12, 2025 at 05:18:18PM +0800, Wang Liang wrote:
-> When set multicast_query_interval to a large value, the local variable
-> 'time' in br_multicast_send_query() may overflow. If the time is smaller
-> than jiffies, the timer will expire immediately, and then call mod_timer()
-> again, which creates a loop and may trigger the following soft lockup
-> issue.
-> 
->   watchdog: BUG: soft lockup - CPU#1 stuck for 221s! [rb_consumer:66]
->   CPU: 1 UID: 0 PID: 66 Comm: rb_consumer Not tainted 6.16.0+ #259 PREEMPT(none)
->   Call Trace:
->    <IRQ>
->    __netdev_alloc_skb+0x2e/0x3a0
->    br_ip6_multicast_alloc_query+0x212/0x1b70
->    __br_multicast_send_query+0x376/0xac0
->    br_multicast_send_query+0x299/0x510
->    br_multicast_query_expired.constprop.0+0x16d/0x1b0
->    call_timer_fn+0x3b/0x2a0
->    __run_timers+0x619/0x950
->    run_timer_softirq+0x11c/0x220
->    handle_softirqs+0x18e/0x560
->    __irq_exit_rcu+0x158/0x1a0
->    sysvec_apic_timer_interrupt+0x76/0x90
->    </IRQ>
-> 
-> This issue can be reproduced with:
->   ip link add br0 type bridge
->   echo 1 > /sys/class/net/br0/bridge/multicast_querier
->   echo 0xffffffffffffffff >
->   	/sys/class/net/br0/bridge/multicast_query_interval
->   ip link set dev br0 up
-> 
-> The multicast_startup_query_interval can also cause this issue. Similar to
-> the commit 99b40610956a("net: bridge: mcast: add and enforce query interval
-                         ^ missing space
+From: Leon Romanovsky <leonro@nvidia.com>
 
-> minimum"), add check for the query interval maximum to fix this issue.
-> 
-> Link: https://lore.kernel.org/netdev/20250806094941.1285944-1-wangliang74@huawei.com/
-> Fixes: 7e4df51eb35d ("bridge: netlink: add support for igmp's intervals")
+[ Upstream commit dc07628bd2bbc1da768e265192c28ebd301f509d ]
 
-Probably doesn't matter in practice given how old both commits are, but
-I think you should blame d902eee43f19 ("bridge: Add multicast
-count/interval sysfs entries") instead. The commit message also uses the
-sysfs path and not the netlink one.
+RXE is missing update of WQE status in LOCAL_WRITE failures.  This caused
+the following kernel panic if someone sent an atomic operation with an
+explicitly wrong lkey.
 
-> Suggested-by: Nikolay Aleksandrov <razor@blackwall.org>
-> Signed-off-by: Wang Liang <wangliang74@huawei.com>
+[leonro@vm ~]$ mkt test
+test_atomic_invalid_lkey (tests.test_atomic.AtomicTest) ...
+ WARNING: CPU: 5 PID: 263 at drivers/infiniband/sw/rxe/rxe_comp.c:740 rxe_completer+0x1a6d/0x2e30 [rdma_rxe]
+ Modules linked in: crc32_generic rdma_rxe ip6_udp_tunnel udp_tunnel rdma_ucm rdma_cm ib_umad ib_ipoib iw_cm ib_cm mlx5_ib ib_uverbs ib_core mlx5_core ptp pps_core
+ CPU: 5 PID: 263 Comm: python3 Not tainted 5.13.0-rc1+ #2936
+ Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.13.0-0-gf21b5a4aeb02-prebuilt.qemu.org 04/01/2014
+ RIP: 0010:rxe_completer+0x1a6d/0x2e30 [rdma_rxe]
+ Code: 03 0f 8e 65 0e 00 00 3b 93 10 06 00 00 0f 84 82 0a 00 00 4c 89 ff 4c 89 44 24 38 e8 2d 74 a9 e1 4c 8b 44 24 38 e9 1c f5 ff ff <0f> 0b e9 0c e8 ff ff b8 05 00 00 00 41 bf 05 00 00 00 e9 ab e7 ff
+ RSP: 0018:ffff8880158af090 EFLAGS: 00010246
+ RAX: 0000000000000000 RBX: ffff888016a78000 RCX: ffffffffa0cf1652
+ RDX: 1ffff9200004b442 RSI: 0000000000000004 RDI: ffffc9000025a210
+ RBP: dffffc0000000000 R08: 00000000ffffffea R09: ffff88801617740b
+ R10: ffffed1002c2ee81 R11: 0000000000000007 R12: ffff88800f3b63e8
+ R13: ffff888016a78008 R14: ffffc9000025a180 R15: 000000000000000c
+ FS:  00007f88b622a740(0000) GS:ffff88806d540000(0000) knlGS:0000000000000000
+ CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+ CR2: 00007f88b5a1fa10 CR3: 000000000d848004 CR4: 0000000000370ea0
+ DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+ DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+ Call Trace:
+  rxe_do_task+0x130/0x230 [rdma_rxe]
+  rxe_rcv+0xb11/0x1df0 [rdma_rxe]
+  rxe_loopback+0x157/0x1e0 [rdma_rxe]
+  rxe_responder+0x5532/0x7620 [rdma_rxe]
+  rxe_do_task+0x130/0x230 [rdma_rxe]
+  rxe_rcv+0x9c8/0x1df0 [rdma_rxe]
+  rxe_loopback+0x157/0x1e0 [rdma_rxe]
+  rxe_requester+0x1efd/0x58c0 [rdma_rxe]
+  rxe_do_task+0x130/0x230 [rdma_rxe]
+  rxe_post_send+0x998/0x1860 [rdma_rxe]
+  ib_uverbs_post_send+0xd5f/0x1220 [ib_uverbs]
+  ib_uverbs_write+0x847/0xc80 [ib_uverbs]
+  vfs_write+0x1c5/0x840
+  ksys_write+0x176/0x1d0
+  do_syscall_64+0x3f/0x80
+  entry_SYSCALL_64_after_hwframe+0x44/0xae
 
-Code looks fine to me.
+Fixes: 8700e3e7c485 ("Soft RoCE driver")
+Link: https://lore.kernel.org/r/11e7b553f3a6f5371c6bb3f57c494bb52b88af99.1620711734.git.leonro@nvidia.com
+Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+Acked-by: Zhu Yanjun <zyjzyj2000@gmail.com>
+Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+[Shivani: Modified to apply on 5.10.y]
+Signed-off-by: Shivani Agarwal <shivani.agarwal@broadcom.com>
+---
+ drivers/infiniband/sw/rxe/rxe_comp.c | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/infiniband/sw/rxe/rxe_comp.c b/drivers/infiniband/sw/rxe/rxe_comp.c
+index a54d80004342..b7645de067f3 100644
+--- a/drivers/infiniband/sw/rxe/rxe_comp.c
++++ b/drivers/infiniband/sw/rxe/rxe_comp.c
+@@ -346,13 +346,15 @@ static inline enum comp_state do_read(struct rxe_qp *qp,
+ 	ret = copy_data(qp->pd, IB_ACCESS_LOCAL_WRITE,
+ 			&wqe->dma, payload_addr(pkt),
+ 			payload_size(pkt), to_mem_obj, NULL);
+-	if (ret)
++	if (ret) {
++		wqe->status = IB_WC_LOC_PROT_ERR;
+ 		return COMPST_ERROR;
++	}
+ 
+ 	if (wqe->dma.resid == 0 && (pkt->mask & RXE_END_MASK))
+ 		return COMPST_COMP_ACK;
+-	else
+-		return COMPST_UPDATE_COMP;
++
++	return COMPST_UPDATE_COMP;
+ }
+ 
+ static inline enum comp_state do_atomic(struct rxe_qp *qp,
+@@ -366,10 +368,12 @@ static inline enum comp_state do_atomic(struct rxe_qp *qp,
+ 	ret = copy_data(qp->pd, IB_ACCESS_LOCAL_WRITE,
+ 			&wqe->dma, &atomic_orig,
+ 			sizeof(u64), to_mem_obj, NULL);
+-	if (ret)
++	if (ret) {
++		wqe->status = IB_WC_LOC_PROT_ERR;
+ 		return COMPST_ERROR;
+-	else
+-		return COMPST_COMP_ACK;
++	}
++
++	return COMPST_COMP_ACK;
+ }
+ 
+ static void make_send_cqe(struct rxe_qp *qp, struct rxe_send_wqe *wqe,
+-- 
+2.40.4
+
 
