@@ -1,71 +1,68 @@
-Return-Path: <netdev+bounces-212809-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212810-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E988B2214B
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 10:37:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 938B7B2214E
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 10:38:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A59FF169D88
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 08:32:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6DA715630C5
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 08:33:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC9A42E62D8;
-	Tue, 12 Aug 2025 08:30:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BC0F2E762F;
+	Tue, 12 Aug 2025 08:30:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="t1NnKv42";
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="ns13Rijm"
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="k9Y/WJsl";
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="kz6i6TTp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [80.241.56.152])
+Received: from mout-p-202.mailbox.org (mout-p-202.mailbox.org [80.241.56.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 011512E62C2;
-	Tue, 12 Aug 2025 08:30:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BABB02E7629;
+	Tue, 12 Aug 2025 08:30:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754987424; cv=none; b=iUkQxpX/Cx/igVbFDtLoV1bW3v5iJFj+Uc3OOqe9xENIKl0KG0ZY8K0cyfnDE0o2h7Sq4/tnFITE6plLiH46bKO4jXUCpxwb8ut5+pDOazqyDfhIdKPy18rVg+6ifq99WhrGwzknPqAg6SZb2XXHQDFB69PvaQvbQxvoUOduRgw=
+	t=1754987430; cv=none; b=KOIWKxhG1ND+18Jd/7eLCjqEYONMA1aURC5wXB/1LPYXYfeCyAVkyfW4jlR7coWttCKNOe7ArmlFlHdro5c47TemmLusxl3kpx4YH1BpoTHHs0WKHgxy5/gi+tRBft3Bh/SHA+AAXXJd7E8pmurEBWdCFf3TfvCrIIc6TKGDsI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754987424; c=relaxed/simple;
-	bh=z5KrdPaJoIcAwxg5NIX7YY9FZ0SSxid4/vfG7j8p4+o=;
+	s=arc-20240116; t=1754987430; c=relaxed/simple;
+	bh=tIffv34cZv8t/+FUsWabqju0OasZ57hNt3N2GVlWJgo=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=JHs8V8DrdUzIS3SPS+brEncZiyhTfLYCYIZL/zM1l4ImchLaCg+hCXQgxNkyRJ6ZwsaO/1bwu0l6sZPLUPmsvXn0I2J7NJ0vueE/DzJ1hGz1Mwbi11o89TF/JrquXFayQzhccQwfTzzNNXeVxljEAm2Y1QSRULyry0ZX7FHMfy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=t1NnKv42; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=ns13Rijm; arc=none smtp.client-ip=80.241.56.152
+	 MIME-Version; b=rXuuIOLP8cQFprX8aYDiyuNsNVRRuq3KdhwptzxWhNG9WgyFoCmAiUjBS+g7h5Aen4E1ui7QUGcFJi9HuHnJbsx/MAfQmpzA07Ol2r9jUidGse9XxRFbJrGU99Wlh2QAoCCuLjCPolfg7yegi+eBmpU334paD+txhZjVOqdfgb0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=k9Y/WJsl; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=kz6i6TTp; arc=none smtp.client-ip=80.241.56.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
-Received: from smtp2.mailbox.org (smtp2.mailbox.org [IPv6:2001:67c:2050:b231:465::2])
+Received: from smtp2.mailbox.org (smtp2.mailbox.org [10.196.197.2])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4c1Pp52yNJz9tyC;
-	Tue, 12 Aug 2025 10:30:21 +0200 (CEST)
+	by mout-p-202.mailbox.org (Postfix) with ESMTPS id 4c1PpB5r24z9t7J;
+	Tue, 12 Aug 2025 10:30:26 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1754987421;
+	t=1754987426;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=/HDKwhZne+MWQ6D1gAzrzcp4fIk7iWM+DbYn4d7wNqk=;
-	b=t1NnKv42T5qARIp/7N3aKRv55VqHYOhA6dJQJLuLGpTpCBDgoLl8qCJ6+9ur2ar+WIDgud
-	2utN7gM+88PiKVVs+uiyFFf6pXGYFVBY2JxCHtC81/3IhPzIC3VFAod1ji3sJQceeoPWsw
-	oHXP9oZ3kAq0EV5BOvfFtkuZgKR1hANviP8Qph8GGvto1kdoRgY3mVo9pmMNVnWXc2gyF6
-	jkZ+nXbGQqOG6LdnvnXzPHnScLzPxhux4nVly2LjT0q6dYpOlW9sH4FVOBcjR/79mnt3F8
-	hLFi2H/dfyIy4xbMeMPhZg+AUojGWSMqQsz1rM+MiHKfZDWDlK1JHFD2u++F5w==
-Authentication-Results: outgoing_mbo_mout;
-	dkim=pass header.d=mailbox.org header.s=mail20150812 header.b=ns13Rijm;
-	spf=pass (outgoing_mbo_mout: domain of lukasz.majewski@mailbox.org designates 2001:67c:2050:b231:465::2 as permitted sender) smtp.mailfrom=lukasz.majewski@mailbox.org
+	bh=I1YD7czIezP2aaNO9p/uVgWG790RJXUfVEQIPjK8GJ0=;
+	b=k9Y/WJslMYCoGj6EpN8m6HkmwKc7qW37eno6uRpfxGGtRJ11o6mV7JUgMeofSxRfRbGUpK
+	1q63gWqX658MHSaTo8ZHRZd9XkKPYmWoDc72hKn/382iOxiOj7HmWo44B1S2aBwrmo59br
+	dPR6/9PvhZ8eMeYppi/qbdvO4MnXHecqPOPlVZJpocVoSOSXlystAXReyJaoqa6lY2Bt8T
+	5lbNR/ELnJYmCPR1eBgTcEpdybBNs3+hIwDpixm6siDsC9pZ+rhZz5B6Qw8TZSj5eVEyCz
+	ZMmHazp4b3XlPHHdDIYCp4IYBw1lJjyHf8epwiNVxNrOkVwLsiN2KnvnWLtLSA==
 From: Lukasz Majewski <lukasz.majewski@mailbox.org>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1754987419;
+	t=1754987424;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=/HDKwhZne+MWQ6D1gAzrzcp4fIk7iWM+DbYn4d7wNqk=;
-	b=ns13RijmCqnAvL75e0Wr6Sgj8kbeYSHy9FePBMvQXf1Hd1CbhHg+wkFL/0GkCaMuo2FOBo
-	Mix+q2CLzV0iGuMHJItZHTVuH7MGBiU5g0Snypo0SIxsrz7YmTH7/DEyw3N/5qEY6Vq4Vf
-	3uSZalYpeOKANYhCtkWXNLJLBOQmnXojD1B1efmM3qqsK52Gt1LTa6Zt0ffJela1M1Aosh
-	TPNwiaMy94+UpKcaEEMo+uc30Sw8VqII+lRoz9aknU2kDwFIVAhxZ+5bPeCWC+5Jpc3JDQ
-	/l2cp6wIBy/0/15jcE2+1OanB7a30Z5CgB8tHtreMf8UlGcSjpfWCPLt5E16SQ==
+	bh=I1YD7czIezP2aaNO9p/uVgWG790RJXUfVEQIPjK8GJ0=;
+	b=kz6i6TTpcAo+rCl/79rvgzP+pJG+WyPYA1D8ggCqPZgCi0b4CWHghWFqcoFJm9JAXqMdUN
+	FJ3XXfJxqYzuRJVj6StTuCDOUpJye/o3ix6SR1Dg9vrD4u/ykcHdSGNGPwdFaRQEv4tpYW
+	/EEQRZ4z/66vOarxXVAOaGWE7Vofbikd5eWr8FHHOcxXflwm6T5ww+MAQUxJhTmGdTCBYo
+	/LOKxRXiDcwGPy8FD6IBCZrmEKYFthUGm/89N/FbdwJkmaEMxvD5jS0X2EpO+ufS9P9u1Z
+	633PbB4EoQ5wrDNsFFGtF4/xhYx/c5KneRBJ6IZSfiTwrpfZppnvV9CVB+rung==
 To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	davem@davemloft.net,
 	Eric Dumazet <edumazet@google.com>,
@@ -88,9 +85,9 @@ Cc: Sascha Hauer <s.hauer@pengutronix.de>,
 	Simon Horman <horms@kernel.org>,
 	Lukasz Majewski <lukasz.majewski@mailbox.org>,
 	Andrew Lunn <andrew@lunn.ch>
-Subject: [net-next RESEND v17 02/12] ARM: dts: nxp: mxs: Adjust the imx28.dtsi L2 switch description
-Date: Tue, 12 Aug 2025 10:29:29 +0200
-Message-Id: <20250812082939.541733-3-lukasz.majewski@mailbox.org>
+Subject: [net-next RESEND v17 03/12] ARM: dts: nxp: mxs: Adjust XEA board's DTS to support L2 switch
+Date: Tue, 12 Aug 2025 10:29:30 +0200
+Message-Id: <20250812082939.541733-4-lukasz.majewski@mailbox.org>
 In-Reply-To: <20250812082939.541733-1-lukasz.majewski@mailbox.org>
 References: <20250812082939.541733-1-lukasz.majewski@mailbox.org>
 Precedence: bulk
@@ -100,18 +97,10 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-MBO-RS-ID: a63c911f662d4c298c3
-X-MBO-RS-META: 4fyeuew4sc1nmbd6o3dzquieh3h183fj
-X-Rspamd-Queue-Id: 4c1Pp52yNJz9tyC
+X-MBO-RS-ID: d6d1dae3f2d574fad95
+X-MBO-RS-META: rdzm1ma5xy4wb1u49hhcr3kg9373xsan
 
-The current range of 'reg' property is too small to allow full control
-of the L2 switch on imx287.
-
-As this IP block also uses ENET-MAC blocks for its operation, the address
-range for it must be included as well.
-
-Moreover, some SoC common properties (like compatible, clocks, interrupts
-numbers) have been moved to this node.
+The description is similar to the one used with the new CPSW driver.
 
 Signed-off-by: Lukasz Majewski <lukasz.majewski@mailbox.org>
 Reviewed-by: Andrew Lunn <andrew@lunn.ch>
@@ -119,49 +108,101 @@ Reviewed-by: Stefan Wahren <wahrenst@gmx.net>
 
 ---
 Changes for v2:
-- adding extra properties (like compatible, clocks, interupts)
+- Remove properties which are common for the imx28(7) SoC
+- Use mdio properties to perform L2 switch reset (avoid using
+  deprecated properties)
 
 Changes for v3:
-- None
+- Replace IRQ_TYPE_EDGE_FALLING with IRQ_TYPE_LEVEL_LOW
+- Update comment regarding PHY interrupts s/AND/OR/g
 
 Changes for v4:
-- Rename imx287 with imx28 (as the former is not used in kernel anymore)
+- Use GPIO_ACTIVE_LOW instead of 0 in 'reset-gpios'
+- Replace port@[12] with ethernet-port@[12]
 
 Changes for v5:
-- None
+- Add proper multiline comment for IRQs description
 
-Changes for v6:
-- Add interrupt-names property
-
-Changes for v7:
-- Change switch interrupt name from 'mtipl2sw' to 'enet_switch'
-
-Changes for v8 - v17:
+Changes for v6 - v17:
 - None
 ---
- arch/arm/boot/dts/nxp/mxs/imx28.dtsi | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ arch/arm/boot/dts/nxp/mxs/imx28-xea.dts | 56 +++++++++++++++++++++++++
+ 1 file changed, 56 insertions(+)
 
-diff --git a/arch/arm/boot/dts/nxp/mxs/imx28.dtsi b/arch/arm/boot/dts/nxp/mxs/imx28.dtsi
-index bbea8b77386f..8aff2e87980e 100644
---- a/arch/arm/boot/dts/nxp/mxs/imx28.dtsi
-+++ b/arch/arm/boot/dts/nxp/mxs/imx28.dtsi
-@@ -1321,8 +1321,13 @@ mac1: ethernet@800f4000 {
- 			status = "disabled";
- 		};
+diff --git a/arch/arm/boot/dts/nxp/mxs/imx28-xea.dts b/arch/arm/boot/dts/nxp/mxs/imx28-xea.dts
+index 6c5e6856648a..69032b29d767 100644
+--- a/arch/arm/boot/dts/nxp/mxs/imx28-xea.dts
++++ b/arch/arm/boot/dts/nxp/mxs/imx28-xea.dts
+@@ -5,6 +5,7 @@
+  */
  
--		eth_switch: switch@800f8000 {
--			reg = <0x800f8000 0x8000>;
-+		eth_switch: switch@800f0000 {
-+			compatible = "nxp,imx28-mtip-switch";
-+			reg = <0x800f0000 0x20000>;
-+			interrupts = <100>, <101>, <102>;
-+			interrupt-names = "enet_switch", "enet0", "enet1";
-+			clocks = <&clks 57>, <&clks 57>, <&clks 64>, <&clks 35>;
-+			clock-names = "ipg", "ahb", "enet_out", "ptp";
- 			status = "disabled";
- 		};
- 	};
+ /dts-v1/;
++#include<dt-bindings/interrupt-controller/irq.h>
+ #include "imx28-lwe.dtsi"
+ 
+ / {
+@@ -90,6 +91,61 @@ &reg_usb_5v {
+ 	gpio = <&gpio0 2 0>;
+ };
+ 
++&eth_switch {
++	pinctrl-names = "default";
++	pinctrl-0 = <&mac0_pins_a>, <&mac1_pins_a>;
++	phy-supply = <&reg_fec_3v3>;
++	status = "okay";
++
++	ethernet-ports {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		mtip_port1: ethernet-port@1 {
++			reg = <1>;
++			label = "lan0";
++			local-mac-address = [ 00 00 00 00 00 00 ];
++			phy-mode = "rmii";
++			phy-handle = <&ethphy0>;
++		};
++
++		mtip_port2: ethernet-port@2 {
++			reg = <2>;
++			label = "lan1";
++			local-mac-address = [ 00 00 00 00 00 00 ];
++			phy-mode = "rmii";
++			phy-handle = <&ethphy1>;
++		};
++	};
++
++	mdio_sw: mdio {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		reset-gpios = <&gpio3 21 GPIO_ACTIVE_LOW>;
++		reset-delay-us = <25000>;
++		reset-post-delay-us = <10000>;
++
++		ethphy0: ethernet-phy@0 {
++			reg = <0>;
++			smsc,disable-energy-detect;
++			/*
++			 * Both PHYs (i.e. 0,1) have the same, single GPIO,
++			 * line to handle both, their interrupts (OR'ed)
++			 */
++			interrupt-parent = <&gpio4>;
++			interrupts = <13 IRQ_TYPE_LEVEL_LOW>;
++		};
++
++		ethphy1: ethernet-phy@1 {
++			reg = <1>;
++			smsc,disable-energy-detect;
++			interrupt-parent = <&gpio4>;
++			interrupts = <13 IRQ_TYPE_LEVEL_LOW>;
++		};
++	};
++};
++
+ &spi2_pins_a {
+ 	fsl,pinmux-ids = <
+ 		MX28_PAD_SSP2_SCK__SSP2_SCK
 -- 
 2.39.5
 
