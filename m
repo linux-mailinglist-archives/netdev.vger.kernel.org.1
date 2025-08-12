@@ -1,166 +1,91 @@
-Return-Path: <netdev+bounces-212959-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212960-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C984B22A54
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 16:26:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95D51B22A0A
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 16:20:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D607558267C
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 14:17:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8A6B97AAE08
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 14:17:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D031302CB3;
-	Tue, 12 Aug 2025 14:12:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB1B730AABE;
+	Tue, 12 Aug 2025 14:16:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="XqE1sexr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W4Ih3y8o"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1E8A2EA721;
-	Tue, 12 Aug 2025 14:12:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FBF830AAB7;
+	Tue, 12 Aug 2025 14:16:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755007934; cv=none; b=tXwEOP4ZbyVHtdn0CXKd3kSUpppt6ufIrl7Qo4VHGgvY5E0Q01JWpnl/appx7QuLmS7Yc9vML6qzASnl7j09Bup1c3gl5ILh8hHVFZkt2LLXy4UMWCpC4czYPD3QYJ2QC0NpiOCXFczMUftQiosutMKO40WKiuwhNM5nYkmgofs=
+	t=1755008162; cv=none; b=ArRwK8r2Q51TNyXCWps5URU9zPEiigzj+2SN5gfPekOem9MePY+ZnXKIM3x7KSxddBOl+ZMnWaV6vuPA1t7pp+MTtaDrFBCgooQ1QdAQd6WDMIFdbsSwA409TzOhIW3XySPHFvKkcWnBgPMkJkFpT4sLXyXnlDjLQQKEyTHpGYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755007934; c=relaxed/simple;
-	bh=PJRh77BlqVsEpKRGUextThdX92CPAbJt12XhrYigNZc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=jubENxFZSnwfEHkTTKcDeCc7oO+n/sEJBPntD/d3Vsax5L8++EoQJqqKuuBI3WyZFUYyayMGHAyHhyQVDflP/8T7Tr7v1J1Ua5AATuK7eXCCkhelct3Dj8LwmLvAb0Ip8DOPt7N/UWgXmbS41TwaE6VsWt2sZ4CtT0u1tB6tobY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=XqE1sexr; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57CAwi8E025631;
-	Tue, 12 Aug 2025 14:11:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	dMh9F/zW3ltk/+W9kfI6XSfIFxsE1lXA2GRM0pTwl34=; b=XqE1sexrZQEHCWtt
-	TtdEAR//dSyvEl4PGQOxxxvK8QdVyl9n//axIEN4i2CLiXMHsu/dd5/w3LJAv+fm
-	/b9XU3mj5gRSUehPmdu+IeUPOIuQ0IY2VfLXW6QDRfcNrYC/eOiRI6djphYcJap4
-	wyJla+bvl9PmKXE3kh01jIyGtcIEp6n0usBqSP/pkjLY2vG6hA5yN2H6yE+7D02Q
-	r6ZDt78UhysrN/uJaStQ86aAB1It4vRfvLCb3HBw3mW97SWSxkG7VyQwL/Ty2h6y
-	XTJw66gJXfyYdAP1/8Eh8ZdP0tOFmS9CE5EbuWcy+IjX2u3mWDMnf79yn8NYqeYV
-	TbHtsg==
-Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 48dw9srka7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 12 Aug 2025 14:11:58 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 57CEBvbn029825
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 12 Aug 2025 14:11:57 GMT
-Received: from nsssdc-sh01-lnx.ap.qualcomm.com (10.80.80.8) by
- nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.10; Tue, 12 Aug 2025 07:11:52 -0700
-From: Luo Jie <quic_luoj@quicinc.com>
-Date: Tue, 12 Aug 2025 22:10:38 +0800
-Subject: [PATCH net-next v7 14/14] MAINTAINERS: Add maintainer for Qualcomm
- PPE driver
+	s=arc-20240116; t=1755008162; c=relaxed/simple;
+	bh=rDn9n3CLVSdguZsLMCEzQfYlxMxUiaR7wgP67lAJaSY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=C+eD2VWHCbmCuIvEWT6U3IPj4VOpghHrF+N2spFL26maHXSOLPs9K56+Y9q+a85xITBz6syiPIhjX2LJO2CHaA/R+97xYcq32PQ5CVeEO7Ym+y4nr+e3ZEx3n9m1IMBW9dYsbdeF2GwP2NfL69zG9J1H/4r2iNbPJ+Rm+FPoxxg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W4Ih3y8o; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABF9EC4CEF0;
+	Tue, 12 Aug 2025 14:16:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755008162;
+	bh=rDn9n3CLVSdguZsLMCEzQfYlxMxUiaR7wgP67lAJaSY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=W4Ih3y8oXKa+XLzjZke0DghE2q8GeAlaJq2xPzU6Unly7sysAkJn85pN45mZtHLLT
+	 UX26lv5DUgWmwwuY7mfdUNmUAhLFb38lE9c1UOQ1ThNZj0UpkrN13rB3ClIDeld/+v
+	 CyttlHBtzXAR7Ij3wrXvOw6hNnfYutuJsvqY5yNmRt896ylPIc2Lzisam+UwFPQmew
+	 Dwt2/bC5di2fvDrQah+VElCziTKq1TLkbcK0NyjQtdq3RDRNeCzXpcOaJrNl0QEuUf
+	 Y5QvCeVTeKj6CKY0hllTosRLSsrWqEKprJKYUou86A9JgKYuOgB/GWfaBWtQG+uoi5
+	 GqyjQIVnTReLw==
+Date: Tue, 12 Aug 2025 07:16:00 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org,
+ willemb@google.com, petrm@nvidia.com, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net] selftests: drv-net: wait for carrier
+Message-ID: <20250812071600.6714433d@kernel.org>
+In-Reply-To: <7c011a2f-cdd8-4aed-95b9-d8edb31478a7@redhat.com>
+References: <20250808225741.1095702-1-kuba@kernel.org>
+	<7c011a2f-cdd8-4aed-95b9-d8edb31478a7@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-ID: <20250812-qcom_ipq_ppe-v7-14-789404bdbc9a@quicinc.com>
-References: <20250812-qcom_ipq_ppe-v7-0-789404bdbc9a@quicinc.com>
-In-Reply-To: <20250812-qcom_ipq_ppe-v7-0-789404bdbc9a@quicinc.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Rob Herring
-	<robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>, Lei Wei <quic_leiwei@quicinc.com>,
-        Suruchi Agarwal
-	<quic_suruchia@quicinc.com>,
-        Pavithra R <quic_pavir@quicinc.com>,
-        "Simon
- Horman" <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-        Kees Cook
-	<kees@kernel.org>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        "Philipp
- Zabel" <p.zabel@pengutronix.de>
-CC: <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-doc@vger.kernel.org>, <linux-hardening@vger.kernel.org>,
-        <quic_kkumarcs@quicinc.com>, <quic_linchen@quicinc.com>,
-        Luo Jie
-	<quic_luoj@quicinc.com>
-X-Mailer: b4 0.14.1
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1755007841; l=898;
- i=quic_luoj@quicinc.com; s=20250209; h=from:subject:message-id;
- bh=PJRh77BlqVsEpKRGUextThdX92CPAbJt12XhrYigNZc=;
- b=KfHO01pLn3Yb/4AY90A9qSPRVYZGnXYwTQ+VXn+LrPflqznhIG3aL9ZyQoA5iZTO+yVmsS8le
- W8XLgjIEP17DOO2zeyiWexoSerNoy8yybF9KsUIvKnatlpKOHJfn2hT
-X-Developer-Key: i=quic_luoj@quicinc.com; a=ed25519;
- pk=pzwy8bU5tJZ5UKGTv28n+QOuktaWuriznGmriA9Qkfc=
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Authority-Analysis: v=2.4 cv=J+Wq7BnS c=1 sm=1 tr=0 ts=689b4bae cx=c_pps
- a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
- a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10 a=COk6AnOGAAAA:8
- a=VwQbUJbxAAAA:8 a=pGLkceISAAAA:8 a=-_PooAnB-Ua2z9syxaEA:9 a=QEXdDO2ut3YA:10
- a=TjNXssC_j7lpFel5tvFf:22
-X-Proofpoint-ORIG-GUID: ifEkOtMyIBd0Sbtl52OoNEFz26zP2EOh
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODA5MDAxNSBTYWx0ZWRfX/FUod6/49Bh+
- NknTj+COarb+8/JUHSokfDXveTag+4TmETaj/qTYMhXv3S07msJQi+DNXG+hfWOg93RClk6mXOK
- 51Gzm+kI5Cqd1BgZJq19BIU6DRtZ+FoAVRAz23MSoQwdKcNkPJuiUki97d3z4CYir+BUr3XUmkw
- vLXHRto0Mwms9R8XZhe5nIkHtpDolBcAv5iZlf8o6DSPexzv3N3NjD9e8lwks4pGzLbaaqI55C7
- lcq318ZswPjtwOyRsyiEmdvkq1cgGJh/1J90XqHyt+JKwfe2rGo3Dyj+JKtQCCZaBiABAHMfi6M
- wu5N/QQaHE5l0SdLYiHmNmxz3Ocmxf9dJpOvDN0RJhrkeeUo7MirtFhugUTt9idx/S6fTxCtaSj
- YsGiubPG
-X-Proofpoint-GUID: ifEkOtMyIBd0Sbtl52OoNEFz26zP2EOh
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-08-12_07,2025-08-11_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 adultscore=0 malwarescore=0 impostorscore=0 bulkscore=0
- phishscore=0 suspectscore=0 spamscore=0 clxscore=1015 classifier=typeunknown
- authscore=0 authtc= authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2507300000 definitions=main-2508090015
 
-Add maintainer entry for PPE (Packet Process Engine) driver supported
-for Qualcomm IPQ SoCs.
+On Tue, 12 Aug 2025 13:12:47 +0200 Paolo Abeni wrote:
+> On 8/9/25 12:57 AM, Jakub Kicinski wrote:
+> > @@ -48,6 +51,19 @@ from .remote import Remote
+> >                  env[pair[0]] = pair[1]
+> >          return ksft_setup(env)
+> >  
+> > +    def __enter__(self):
+> > +        ip(f"link set dev {self.dev['ifname']} up")
+> > +        wait_file(f"/sys/class/net/{self.dev['ifname']}/carrier",
+> > +                  lambda x: x.strip() == "1")
+> > +
+> > +        return self
+> > +
+> > +    def __exit__(self, ex_type, ex_value, ex_tb):
+> > +        """
+> > +        __exit__ gets called at the end of a "with" block.
+> > +        """
+> > +        self.__del__()
+> > +  
+> 
+> pylint is doing what looks like a reasonable complain to me:
+> 
+> tools/testing/selftests/drivers/net/lib/py/env.py:65:8: E1101: Instance
+> of 'NetDrvEnvBase' has no '__del__' member (no-member)
 
-Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
----
- MAINTAINERS | 8 ++++++++
- 1 file changed, 8 insertions(+)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index bd62ad58a47f..bcab0192f39b 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -20837,6 +20837,14 @@ S:	Maintained
- F:	Documentation/devicetree/bindings/power/supply/qcom,pmi8998-charger.yaml
- F:	drivers/power/supply/qcom_smbx.c
- 
-+QUALCOMM PPE DRIVER
-+M:	Luo Jie <quic_luoj@quicinc.com>
-+L:	netdev@vger.kernel.org
-+S:	Supported
-+F:	Documentation/devicetree/bindings/net/qcom,ipq9574-ppe.yaml
-+F:	Documentation/networking/device_drivers/ethernet/qualcomm/ppe/ppe.rst
-+F:	drivers/net/ethernet/qualcomm/ppe/
-+
- QUALCOMM QSEECOM DRIVER
- M:	Maximilian Luz <luzmaximilian@gmail.com>
- L:	linux-arm-msm@vger.kernel.org
-
--- 
-2.34.1
-
+I know, it's an abstract class. The point of having an empty method is
+lost on me. But okay, let me obey the static analyzer overlord.
 
