@@ -1,149 +1,99 @@
-Return-Path: <netdev+bounces-212914-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212915-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B18CDB227ED
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 15:12:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1C20B22815
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 15:16:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 99FD51AA7B2F
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 13:05:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52C863A760B
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 13:10:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE6EB281378;
-	Tue, 12 Aug 2025 13:03:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C593276054;
+	Tue, 12 Aug 2025 13:09:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="nLVc3lJJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BzrjnWcJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4969281509;
-	Tue, 12 Aug 2025 13:03:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65E15275B1C
+	for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 13:09:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755003804; cv=none; b=Gn5O0F1VwR7+JIxi89W5JngqjtFXVlgNlx5izaqVDC9Nt6RAUkAMteHbGd2wBpLBgT2AhYz1BMJZDqbgYQaicHt0edsSBiQaU6/DrW3uxgfC/TfuJ5LwAoK6SYegSjPKWlLInysSNDhKpeQ92jaIRtxin6PM5OORp3OO+XwOeR4=
+	t=1755004199; cv=none; b=MbIpViFxoV/J+xjBtQi47u5CmbyIDoHHSMX3TbmxwuDSWuvP5/7h1gMZtL+BSsEGpcd4uSUOxs5kjr0vwNph3Gs4rFVaZkCcsZ9sFkEn2RJMKJtDpM+EUpaY3wO0fd+d5oP7tQ7pPG4byg8RU7tsdQHsYLlaQ6d3TgcvcREEnAM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755003804; c=relaxed/simple;
-	bh=O5l9GcLTZ4fkpotFf55vTIX/Omf/gELrNUq5bLR+Dm0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cRprysMHjZJw02WmfeClrOE6Ov6gyDbS/xEdoGhV14Q5rxBp/dsONdp2OB0yusFnKwYLJp76S8hrR/9i8R7jnc5fuc+3exLTjAlmS9egyO1/dinoy/UlEE1tKRJY7Q/IFbo2hWFKtKO8ioQehPZGurZl/CiO9Mg5I2JDhmdWgYU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=nLVc3lJJ; arc=none smtp.client-ip=217.70.183.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id BB0B8443BD;
-	Tue, 12 Aug 2025 13:03:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1755003799;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ha+zfhta6/gd/PsP7pwOyziLi6lhZ0AiBlnU+OeDoJo=;
-	b=nLVc3lJJx3bqaPx7a1FbQW0iW77xdWTObr9knoyD0zE58dAeaoKqLO0bzKoCAUaP6WzgqJ
-	CoLa/ubKASAyKdb1P9oS4ZbqQ1T6lxljxWGb9ict7mvAArRnPF4tEpt6LxZVMy+42cKHQI
-	rZGY32xYc3f1y3SGQcJ6ux5ABqZ9e1aYDoaaYh2AE9UeGYgUKe5zBtsA+CmgDCtSyTO9sC
-	CnZ6InPx0lBhr092mUPnp4LsRueG3uLgwy8O785/PKjXlpevmh5mUO5mIkExq1EX6tBhVd
-	9gW2lf7JIqDVndQ/QekPtmS0M/Ey9O9NaIgkj6Mfqpjxkqt9DXOg/SGb5jGkUw==
-Date: Tue, 12 Aug 2025 15:03:17 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Piotr Kubik <piotr.kubik@adtran.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v6 2/2] net: pse-pd: Add Si3474 PSE controller
- driver
-Message-ID: <20250812150317.76b51f01@kmaincent-XPS-13-7390>
-In-Reply-To: <bafdf870-dbc4-4641-b8c0-515375943acc@adtran.com>
-References: <2378ee79-db60-45fb-9077-f21e8f7571eb@adtran.com>
-	<bafdf870-dbc4-4641-b8c0-515375943acc@adtran.com>
-Organization: bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1755004199; c=relaxed/simple;
+	bh=xLzp7C+1YcyKkVLn3xJI8mxqcEqD0Hg7MrhyqrCKHe0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Cs+hTO7EjU25hMzQBCVK+uvKfY7GwrMCHzTEeA2zyFmXads9IsU1A/DeCz/kGvsWbs3rCbEYZ5jHOPJPiSgHuXyxR0tTbgYhpg6ao2aygYsQl7jOs6LbyKjiqZBVdd7g2nQ2HaRfLE1jWaM4MSh3wx03KjaWkt4q+LGUMLZDMao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BzrjnWcJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D50F4C4CEF7;
+	Tue, 12 Aug 2025 13:09:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755004198;
+	bh=xLzp7C+1YcyKkVLn3xJI8mxqcEqD0Hg7MrhyqrCKHe0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=BzrjnWcJ6UXw1zuLpw90INeHzeVxeqMOXn7xHOMj6sJx6WIUSIo2N5o3pUa1tVYtf
+	 H8O6vkaHf1trBPwri15qNwRhRcur4+0f40pxDfmQ6sBubljPU2LX1Hz6TCcpQ6Gmjw
+	 T71HQ5X8/E0QqVOy2hgu2/pIbG8N2/+KOyLkf4ealShL2nNjXQSrGellK/uYVJyxAY
+	 Dem5P/2cEi7IaSxdixQ21F0SP/1OX21qPPjC9wY83cPrFGhFvCKO0bibZB8UZYQ+ik
+	 XMMHwN81PD/Vkykfl0HthA2maKQUPgjTYVVltagh2ipoHxVgNqhUuhAmdpaFsMcBEa
+	 H34b0DVGLT4uQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33BE0383BF51;
+	Tue, 12 Aug 2025 13:10:12 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgddufeehgedtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtqhertdertdejnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgfdutdefvedtudegvefgvedtgfdvhfdtueeltefffefffffhgfetkedvfeduieeinecuffhomhgrihhnpegsohhothhlihhnrdgtohhmnecukfhppeeltddrkeelrdduieefrdduvdejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledtrdekledrudeifedruddvjedphhgvlhhopehkmhgrihhntggvnhhtqdgirffuqddufedqjeefledtpdhmrghilhhfrhhomhepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepudegpdhrtghpthhtohepphhiohhtrhdrkhhusghikhesrgguthhrrghnrdgtohhmpdhrtghpthhtohepohdrrhgvmhhpvghlsehpvghnghhuthhrohhnihigrdguvgdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvt
- hdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheprhhosghhsehkvghrnhgvlhdrohhrgh
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH 1/4] xfrm: flush all states in xfrm_state_fini
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175500421100.2610815.256378737986277211.git-patchwork-notify@kernel.org>
+Date: Tue, 12 Aug 2025 13:10:11 +0000
+References: <20250811092008.731573-2-steffen.klassert@secunet.com>
+In-Reply-To: <20250811092008.731573-2-steffen.klassert@secunet.com>
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: davem@davemloft.net, kuba@kernel.org, herbert@gondor.apana.org.au,
+ netdev@vger.kernel.org
 
-Le Tue, 12 Aug 2025 11:12:22 +0000,
-Piotr Kubik <piotr.kubik@adtran.com> a =C3=A9crit :
+Hello:
 
-> From: Piotr Kubik <piotr.kubik@adtran.com>
->=20
-> Add a driver for the Skyworks Si3474 I2C Power Sourcing Equipment
-> controller.
->=20
-> Driver supports basic features of Si3474 IC:
-> - get port status,
-> - get port power,
-> - get port voltage,
-> - enable/disable port power.
->=20
-> Only 4p configurations are supported at this moment.
->
-> Signed-off-by: Piotr Kubik <piotr.kubik@adtran.com>
+This series was applied to netdev/net.git (main)
+by Steffen Klassert <steffen.klassert@secunet.com>:
 
-...
+On Mon, 11 Aug 2025 11:19:29 +0200 you wrote:
+> From: Sabrina Dubroca <sd@queasysnail.net>
+> 
+> While reverting commit f75a2804da39 ("xfrm: destroy xfrm_state
+> synchronously on net exit path"), I incorrectly changed
+> xfrm_state_flush's "proto" argument back to IPSEC_PROTO_ANY. This
+> reverts some of the changes in commit dbb2483b2a46 ("xfrm: clean up
+> xfrm protocol checks"), and leads to some states not being removed
+> when we exit the netns.
+> 
+> [...]
 
-> +static int si3474_get_of_channels(struct si3474_priv *priv)
-> +{
-> +	struct pse_pi *pi;
-> +	u32 chan_id;
-> +	u8 pi_no;
-> +	s32 ret;
-> +
-> +	for (pi_no =3D 0; pi_no < SI3474_MAX_CHANS; pi_no++) {
-> +		pi =3D &priv->pcdev.pi[pi_no];
-> +		u8 pairset_no;
-> +
-> +		for (pairset_no =3D 0; pairset_no < 2; pairset_no++) {
-> +			if (!pi->pairset[pairset_no].np)
-> +				continue;
-> +
-> +			ret =3D
-> of_property_read_u32(pi->pairset[pairset_no].np,
-> +						   "reg", &chan_id);
-> +			if (ret) {
-> +				dev_err(&priv->client[0]->dev,
-> +					"Failed to read channel reg
-> property\n");
-> +				return ret;
-> +			}
-> +			if (chan_id > SI3474_MAX_CHANS) {
-> +				dev_err(&priv->client[0]->dev,
-> +					"Incorrect channel number: %d\n",
-> chan_id);
-> +				return -EINVAL;
-> +			}
-> +
-> +			priv->pi[pi_no].chan[pairset_no] =3D chan_id;
-> +			/* Mark as 4-pair if second pairset is present */
-> +			priv->pi[pi_no].is_4p =3D (pairset_no =3D=3D 1);
+Here is the summary with links:
+  - [1/4] xfrm: flush all states in xfrm_state_fini
+    https://git.kernel.org/netdev/net/c/42e42562c9cf
+  - [2/4] xfrm: restore GSO for SW crypto
+    https://git.kernel.org/netdev/net/c/234d1eff5d49
+  - [3/4] xfrm: bring back device check in validate_xmit_xfrm
+    https://git.kernel.org/netdev/net/c/65f079a6c446
+  - [4/4] udp: also consider secpath when evaluating ipsec use for checksumming
+    https://git.kernel.org/netdev/net/c/1118aaa3b351
 
-I think we should return and report an error if a PI is configured as a 2 p=
-airs
-PoE as long as it is not supported by the driver. This could avoid any futu=
-re
-mistakes from users.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Except from that it seems ok for me.
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
 
