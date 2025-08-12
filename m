@@ -1,94 +1,124 @@
-Return-Path: <netdev+bounces-212745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212746-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AFE0B21B96
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 05:21:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CCE6B21BC3
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 05:46:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61B19681774
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 03:21:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A81F19064F7
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 03:46:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 600A62E5B23;
-	Tue, 12 Aug 2025 03:20:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AC291DF27F;
+	Tue, 12 Aug 2025 03:46:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jJ+G3nwX"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="NbYqq15F"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F7C62E5B1D;
-	Tue, 12 Aug 2025 03:20:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A4232D9EDD;
+	Tue, 12 Aug 2025 03:46:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754968815; cv=none; b=tc0Hjm7n/yHqzcZyNiZ2WrnPs2G4Qv/9dvimGKO3Lh5dQN/xA54kLWoYphBoSrYQluwCOSRFD+GNAwYmUq+DOlxqQZh4Kj+EFFuK7bUBpL4jkVZ5ts8Rk7qdJxfpUAM0pqJSBCs1d/ILnYGXyJbdJtO+qc3QC+ZBT0KjjwMhWjA=
+	t=1754970371; cv=none; b=B1VrKQXdIYIThtOnm77gmhVvsgB/13hF0OBa0GG1okbedZag5Lp2h6mqAonFyWbppluP1TnzRI5YA9zRNt6/dR0AM4I4xmW/bpmHuiKY2PC3st9eL7CwivGSekM85AH5tMwLjzhB5z65E/4qmRDjHFskNie4aVAhhi8jBfhLR+w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754968815; c=relaxed/simple;
-	bh=/wZ5J2aHm0wr+JulREeL2jKH/HWt7HxPuCfjCYFvJ18=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=YgpmFRPNNZyuykKfZgmD0eqta9d8IlZTR9bGsWyhTP2Bk1ReqDuC7M5dv+qf+P+ResF30dhpfwdnQgS+FJgF7maJCS5kxFTp6yhzztf+cXIzaaMev3crqLLjctVw5K4WAYNs9bhV9wkS7/AlYzt3eECi0VIlNFrCZXNtRWAVo+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jJ+G3nwX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4D9AC4CEF5;
-	Tue, 12 Aug 2025 03:20:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754968813;
-	bh=/wZ5J2aHm0wr+JulREeL2jKH/HWt7HxPuCfjCYFvJ18=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=jJ+G3nwXooveQfIhJ6EdKc0pV2wa5PzX3iES0RJoDvonQbjX5L0J5dURuyHGtzSgO
-	 KdhpPhoYeYvPYO8XwMZzYJfON319GXYNUXFqNbDexmB2Qo8OMkrFfOZNaoZvSNZVbC
-	 chFditxAcqMHsEqG5fqCDHtVq0idBGhnCU2ARxm1V0MqpvaHl8FxMzPa5XyPtBCXCF
-	 9lo+1b3c5LPpGUHTExHUidcKP9TN7Ih/iQWr20MaDo1D1BXv/OttFegYONl4dgNEZL
-	 uy5kwU5dwdeRH1z8hVhxFmA+i3ZJBZqPCkpiwBNzc9MdYH5XZLVWjd+ykK/+DLv/uy
-	 nODQDTYkaNlAw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33ABA383BF51;
-	Tue, 12 Aug 2025 03:20:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1754970371; c=relaxed/simple;
+	bh=QKrhEizsg0N1zg4M61hvf6ECAUH4usaiehJgLk+LSYA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DgqciquRsZ7KpGmJZx+GH2WSBvWqp0LxxLd83fOHaow7Uez3nCwAKHcy7L7Mf6EmDVp2OIc2JYCUQkM25PhqvESkC7oCqt6U0w7p4AsggnkRcLSbiAlcnm/hJMtYP8Lr5Ah/hMByuiSb8MpK/hAz1YQnNPxn2HyysslYheMo2LE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=NbYqq15F; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=NIC/wkT8xDaIY7MD6UsDmD8NMUh6b3J8xBtXrNsXYKo=; b=NbYqq15F+k0PaYhFy5Hc5uGO1C
+	F7j6cSoP/whS4817YNAeQ66fdIUeTNQC5RhDl3Pn2Jkb/dJBC2qkppaK48DJ9uxXASz28fYUHgXWy
+	gKaqh24ZdeiIwvrmcSyoigBz47PTJ39VEZOCcGj6Fe050vKSBFjjU3uGdFI1pW5XiSuY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1ulfxA-004PNl-P9; Tue, 12 Aug 2025 05:45:36 +0200
+Date: Tue, 12 Aug 2025 05:45:36 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Vivian Wang <wangruikang@iscas.ac.cn>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Yixun Lan <dlan@gentoo.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+	Vivian Wang <uwu@dram.page>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Junhui Liu <junhui.liu@pigmoral.tech>,
+	Simon Horman <horms@kernel.org>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-riscv@lists.infradead.org, spacemit@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v5 2/5] net: spacemit: Add K1 Ethernet MAC
+Message-ID: <ac9cce0b-d29e-499b-8a86-28979cd12fb5@lunn.ch>
+References: <20250812-net-k1-emac-v5-0-dd17c4905f49@iscas.ac.cn>
+ <20250812-net-k1-emac-v5-2-dd17c4905f49@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] selftests/net: Ensure assert() triggers in
- psock_tpacket.c
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175496882574.1990527.2336308877381188320.git-patchwork-notify@kernel.org>
-Date: Tue, 12 Aug 2025 03:20:25 +0000
-References: <20250809062013.2407822-1-wakel@google.com>
-In-Reply-To: <20250809062013.2407822-1-wakel@google.com>
-To: Wake Liu <wakel@google.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, shuah@kernel.org, horms@kernel.org,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250812-net-k1-emac-v5-2-dd17c4905f49@iscas.ac.cn>
 
-Hello:
+> +static void emac_get_pause_stats(struct net_device *dev,
+> +				 struct ethtool_pause_stats *pause_stats)
+> +{
+> +	struct emac_priv *priv = netdev_priv(dev);
+> +	struct emac_hw_tx_stats *tx_stats;
+> +	struct emac_hw_rx_stats *rx_stats;
+> +
+> +	tx_stats = &priv->tx_stats;
+> +	rx_stats = &priv->rx_stats;
+> +
+> +	scoped_guard(spinlock_irqsave, &priv->stats_lock) {
+> +		emac_stats_update(priv);
+> +
+> +		pause_stats->tx_pause_frames = tx_stats->tx_pause_pkts;
+> +		pause_stats->rx_pause_frames = rx_stats->rx_pause_pkts;
+> +	}
+> +}
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+You have pause statistics, but not actual configuration of pause.
 
-On Sat,  9 Aug 2025 14:20:13 +0800 you wrote:
-> The get_next_frame() function in psock_tpacket.c was missing a return
-> statement in its default switch case, leading to a compiler warning.
-> 
-> This was caused by a `bug_on(1)` call, which is defined as an
-> `assert()`, being compiled out because NDEBUG is defined during the
-> build.
-> 
-> [...]
+> +static void emac_adjust_link(struct net_device *dev)
+> +{
+> +	struct emac_priv *priv = netdev_priv(dev);
+> +	struct phy_device *phydev = dev->phydev;
+> +	u32 ctrl;
 
-Here is the summary with links:
-  - [v2] selftests/net: Ensure assert() triggers in psock_tpacket.c
-    https://git.kernel.org/netdev/net-next/c/bc4c0a48bdad
+Normally the adjust_link callback you configure the hardware with the
+result of pause negotiation.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> +/* Called when net interface is brought up. */
+> +static int emac_open(struct net_device *ndev)
+> +{
+> +	struct emac_priv *priv = netdev_priv(ndev);
+> +	struct device *dev = &priv->pdev->dev;
+> +
+> +	int ret;
+
+Extra blank line.
 
 
+    Andrew
+
+---
+pw-bot: cr
 
