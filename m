@@ -1,122 +1,133 @@
-Return-Path: <netdev+bounces-212789-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212790-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5433B21FCD
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 09:46:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B969B21FD8
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 09:51:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 361D71893284
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 07:47:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F167D6807F5
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 07:51:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE7432D375B;
-	Tue, 12 Aug 2025 07:46:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C60872D6E62;
+	Tue, 12 Aug 2025 07:51:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WtBE8Tz0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 411391EF38C
-	for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 07:46:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 099042D781F
+	for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 07:51:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754984806; cv=none; b=U2uwoI/SOHPoLfvvbMyz8mEZQ/iUmSQVXONHPCV5xTFGeLyMTAyZdQbsNVRd9sKy7jguf6AXuRzWe53gdYRbbP+VgVqj0cQhjNzsgA8HVF2PxJ0wUjIFFF8MUveu0s/+2iN+owsYLOK40KO6sy8+mUNDkL6a8EKj54x50tu+rPg=
+	t=1754985067; cv=none; b=RUCIreEmBQcLwDg64ldHRcO+xtrNCzmgde8Bq108tEPFbwSDOLO4LKpV0UCtE6ibsDZRPKiBi6R/CnvES4tkdzcFrr1pn2zWqIT5kQmRq3xxaUJA3mnicvqkUlde9BLUhgTw95VCgL7OruFnKgfJ1N8Th9CTmVLFvSTPKCDX7FY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754984806; c=relaxed/simple;
-	bh=7veAhauFbzmeZ6VPaXhAIl+1EidQymqZFBkfOM5A+nY=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=i5TJBN7kChs+T/kgEMeOpj+HJ0QKvHc/EhFKCiDjYarWvgvr+XZpIzCHAObeoyY8EcwdkTkMUkFt1Fsvs9V1B2wzfhYEpFHEhr2TnvwO47JWSsiXRkB+Puk0jXN6PW5aBHvckLoAjT6n39Ir/dR7PuDEf0uohsaOuHUWTjqD1X0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-8841c18a4bfso147323939f.1
-        for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 00:46:44 -0700 (PDT)
+	s=arc-20240116; t=1754985067; c=relaxed/simple;
+	bh=6FcqwIFbYDR7SR+Vnwf1iscwwu1oh82gRRHzaKm0EX0=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=ci8Pru42K8pJfhJ0fYRR5Lq71GLoJOvvAAbyccVcZxLGV60fqLyDe+MlFDfRqazmwc9Z2+UA4tBSwYTppDgfy05E4rCYpG1xF9sCBwB6tfSaM7kzOwuZiiK5KWD4ylLhNhKyB+Z/jdG1IPzv1BDODtdiQVCYDa6CNeTWphWQs8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WtBE8Tz0; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1754985064;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=l0TOi3NsfzGGG2ydlG14RKfRoWrXPVBirqvc7jxpA/s=;
+	b=WtBE8Tz0bM1bOAXaJGuVSA/xKOsMR/QD0YUE67PsQKNEjfn1YUQZt+RMvuEom3NS3foSsd
+	TBaZE6kAbLoPAlLBufMUHMEChwl79ACyMfccMFAtnpmIcjv/QT8al2gcOeHxX8C3ZKWVfj
+	zuq6gJPtlQkQ2VMILQviNpUYhdhWS8E=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-304-1_WuHFydOoyFAshyXkUB-A-1; Tue, 12 Aug 2025 03:51:03 -0400
+X-MC-Unique: 1_WuHFydOoyFAshyXkUB-A-1
+X-Mimecast-MFC-AGG-ID: 1_WuHFydOoyFAshyXkUB-A_1754985063
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-7e69b0ec62cso1043100885a.3
+        for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 00:51:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754984803; x=1755589603;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Umk1YoadKdpa6fyzaimwqq35auuAfEV1rwGDtpJveWA=;
-        b=afi9oS/Zz7acjzQX0adwy+R7LfYSqkC+nJMwckxt3wEyRrrUkM4CLMUAgABpnm9DBY
-         SwctQrzKjfPKI9eYigCq2P6HRsGLkIxnokC1qXn00PrgefmvdKxmNneBLtQ6/IvaMuwq
-         QlukcScOsETDhkrZhamEmB7w8kagySEfzVgm+mHnEEW2uw1cjjkfDAGmsgKoTQaOqV40
-         wwIPcqX1Ft65IgpL9b1sd5Bpw7jCrOTL33XNFFyJGD8fpXGuRYklSjZaMcvZj/lSixbD
-         GP46R+f+GSOPpqYEHMZgIv0Iy/npp3xwLuHbYtO7GgoZigo/kLJKshz1SVV3BE2ZYo9u
-         Iuxw==
-X-Forwarded-Encrypted: i=1; AJvYcCWD+Z05M8++bgrDB+jNBAsjHmceGADh3vrY5MYzdgqn3zF8QiRohYJmeZj3x9Fch/AxdQ7YJGQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx2upa8oWoRLXHhnYy4TzelPo7SUqSbQGL6+1at/ZhO433cZZwM
-	chLzGrBzdDK8zgopK1rpaUyMY20JP2wWCSYFC9Gz/oKJVJuFZjWOuTurTnVA1/3dB21YdwXklJn
-	1WI3EAV0kuTm4X2HQZ2tgojjbW/LPVM1XOFVLKlV3FnK50N3cEnweOKejqFY=
-X-Google-Smtp-Source: AGHT+IGMO5NHQ7t/8SdMDmkMxxHOO+f+f98qggqnhfBOuHrFo4tBxoy7lI5+nUzI68F7dY4bFrEZVQmeL1OqGTmyoq+dADo+nkMr
+        d=1e100.net; s=20230601; t=1754985062; x=1755589862;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=l0TOi3NsfzGGG2ydlG14RKfRoWrXPVBirqvc7jxpA/s=;
+        b=FNqfSoOWAgjNX2jC/rkH4QuUsxtK9wuH3GhXvb1QGyucqhRUpE0QqJRgq46TUskv+G
+         udBJA0GVQJCcIvQXe2u1WC0M9w4XoM216xJ/aZTMyXnmD8SwBslPbosD3X54lO7mgfRf
+         dupNYd8BZ6APlwpPnR0y+EmFgnXzNWth49RfbEB+1ILNalvMyY+Dr6hDweo3FMQ+tNCL
+         uvHXWgVtff9qU+x98z/YbyKF/Tu6h5eNC9uhfDkLJ2pmtJFo7HEmhVavzCXTFSbOS0q3
+         ZDlszYa4rTpk+hDepBaF3QYKyr5Ql5qS4FTQpwijZ0yGiJz7Ls/x/JxUWvSAc2o47tmB
+         EK9Q==
+X-Gm-Message-State: AOJu0Yya7QPPail3Ap6ybcbCDQW53tbYpZBT+XwuHBOiFY7b23xSe7e6
+	srXEMTQjVlr7l0fUaxBCKWapk89Y5chklC7Yg6jo2rj+JKlBhRa2QTReeKEOyP4G1BsiJDG8s8F
+	lyH93ue5/rBa/lruG8NPxq+olnOXBkXK7YulL3qVBmtad7cr11YYB9EGMzTbK8FbumQ==
+X-Gm-Gg: ASbGncueNIvJPHFlLFM/TXL0N51EL0WtWmVQjnDRUsvOeXruGusN7NCgqbwYsu4boBI
+	a/SbPDbdKrIlUPHLEvt4wjPzGaob79XBkEsVkDbdZONoq2S+uQNclTLVk41QzCkiTCqIHx4xnb3
+	+g/P+JBfuUdX+fTIDtKVgW/3oF9P+4kToENGJxSXAdtIWCkD8WJFexEBgEDzqT1AcuXeWtdH+iz
+	5FgXmjAJnT58EwKpbOliWI1nrvXZ6xTSns2T+AbcAhemtrfS1BJCx1aegwbT0lvyturOr/7ctwJ
+	v/BH5q4GvBPfsfTADrqHdHGuQzGCfg+aJzd+H7u707Y=
+X-Received: by 2002:a05:620a:440b:b0:7e8:2c04:140f with SMTP id af79cd13be357-7e85880b848mr380958585a.14.1754985062597;
+        Tue, 12 Aug 2025 00:51:02 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFUbrxFfx8sd2v6OC8+o0ciYcjY42jBqu+ZlCnCG2eVlRZMAQbB0VdkiXLS9g6iS/ke0yILRQ==
+X-Received: by 2002:a05:620a:440b:b0:7e8:2c04:140f with SMTP id af79cd13be357-7e85880b848mr380957085a.14.1754985062096;
+        Tue, 12 Aug 2025 00:51:02 -0700 (PDT)
+Received: from [192.168.0.115] ([212.105.149.252])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7e83515176dsm659068485a.44.2025.08.12.00.51.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 12 Aug 2025 00:51:01 -0700 (PDT)
+Message-ID: <766e4508-aaba-4cdc-92b4-e116e52ae13b@redhat.com>
+Date: Tue, 12 Aug 2025 09:50:59 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:7187:b0:881:9412:c917 with SMTP id
- ca18e2360f4ac-8841bcc009bmr501638939f.0.1754984803514; Tue, 12 Aug 2025
- 00:46:43 -0700 (PDT)
-Date: Tue, 12 Aug 2025 00:46:43 -0700
-In-Reply-To: <20250811173116.2829786-1-kuniyu@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <689af163.050a0220.7f033.0112.GAE@google.com>
-Subject: [syzbot ci] Re: net-memcg: Decouple controlled memcg from sk->sk_prot->memory_allocated.
-From: syzbot ci <syzbot+cic0c8bc3087cfc855@syzkaller.appspotmail.com>
-To: akpm@linux-foundation.org, almasrymina@google.com, cgroups@vger.kernel.org, 
-	davem@davemloft.net, edumazet@google.com, geliang@kernel.org, 
-	hannes@cmpxchg.org, horms@kernel.org, kuba@kernel.org, kuni1840@gmail.com, 
-	kuniyu@google.com, linux-mm@kvack.org, martineau@kernel.org, 
-	matttbe@kernel.org, mhocko@kernel.org, mkoutny@suse.com, 
-	mptcp@lists.linux.dev, muchun.song@linux.dev, ncardwell@google.com, 
-	netdev@vger.kernel.org, pabeni@redhat.com, roman.gushchin@linux.dev, 
-	shakeel.butt@linux.dev, tj@kernel.org, willemb@google.com
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Pablo Neira Ayuso <pablo@netfilter.org>,
+ Jozsef Kadlecsik <kadlec@netfilter.org>, Florian Westphal <fw@strlen.de>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ netfilter-devel@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>
+From: Paolo Abeni <pabeni@redhat.com>
+Subject: nft_flowtable.sh selftest failures
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-syzbot ci has tested the following series
+Hi,
 
-[v2] net-memcg: Decouple controlled memcg from sk->sk_prot->memory_allocated.
-https://lore.kernel.org/all/20250811173116.2829786-1-kuniyu@google.com
-* [PATCH v2 net-next 01/12] mptcp: Fix up subflow's memcg when CONFIG_SOCK_CGROUP_DATA=n.
-* [PATCH v2 net-next 02/12] mptcp: Use tcp_under_memory_pressure() in mptcp_epollin_ready().
-* [PATCH v2 net-next 03/12] tcp: Simplify error path in inet_csk_accept().
-* [PATCH v2 net-next 04/12] net: Call trace_sock_exceed_buf_limit() for memcg failure with SK_MEM_RECV.
-* [PATCH v2 net-next 05/12] net: Clean up __sk_mem_raise_allocated().
-* [PATCH v2 net-next 06/12] net-memcg: Introduce mem_cgroup_from_sk().
-* [PATCH v2 net-next 07/12] net-memcg: Introduce mem_cgroup_sk_enabled().
-* [PATCH v2 net-next 08/12] net-memcg: Pass struct sock to mem_cgroup_sk_(un)?charge().
-* [PATCH v2 net-next 09/12] net-memcg: Pass struct sock to mem_cgroup_sk_under_memory_pressure().
-* [PATCH v2 net-next 10/12] net: Define sk_memcg under CONFIG_MEMCG.
-* [PATCH v2 net-next 11/12] net-memcg: Store MEMCG_SOCK_ISOLATED in sk->sk_memcg.
-* [PATCH v2 net-next 12/12] net-memcg: Decouple controlled memcg from global protocol memory accounting.
+the mentioned self test failed in the last 2 CI iterations, on both
+metal and debug build, with the following output:
 
-and found the following issue:
-kernel build error
+# PASS: flow offload for ns1/ns2 with dnat and pmtu discovery ns1 <- ns2
+# Error: Requested AUTH algorithm not found.
+# Error: Requested AUTH algorithm not found.
+# Error: Requested AUTH algorithm not found.
+# Error: Requested AUTH algorithm not found.
+# FAIL: file mismatch for ns1 -> ns2
+# -rw------- 1 root root 2097152 Aug 11 20:23 /tmp/tmp.x1oVr3mu0P
+# -rw------- 1 root root 0 Aug 11 20:23 /tmp/tmp.77gElv9oit
+# FAIL: file mismatch for ns1 <- ns2
+# -rw------- 1 root root 2097152 Aug 11 20:23 /tmp/tmp.x1oVr3mu0P
+# -rw------- 1 root root 0 Aug 11 20:23 /tmp/tmp.ogDiTh8ZXf
+# FAIL: ipsec tunnel mode for ns1/ns2
 
-Full report is available here:
-https://ci.syzbot.org/series/6fc666d9-cfec-413c-a98c-75c91ad6c07d
+see, i.e.:
+https://netdev-3.bots.linux.dev/vmksft-nf/results/249461/14-nft-flowtable-sh/
 
-***
+I don't see relevant patches landing in the relevant builds, I suspect
+the relevant kernel config knob (CONFIG_CRYPTO_SHA1 ?) was always
+missing in the ST config, pulled in by NIPA due to some CI setup tweak
+possibly changed recently (Jakub could possibly have a better idea/view
+about the latter). Could you please have a look?
 
-kernel build error
+NIPA generates the kernel config and the kernel build itself with
+something alike:
 
-tree:      net-next
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net-next.git
-base:      37816488247ddddbc3de113c78c83572274b1e2e
-arch:      amd64
-compiler:  Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
-config:    https://ci.syzbot.org/builds/a5d5d856-2809-4eee-87ca-2cd1630214ae/config
+rm -f .config
+vng --build  --config tools/testing/selftests/net/forwarding/config
 
-net/tls/tls_device.c:374:8: error: call to undeclared function 'sk_should_enter_memory_pressure'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+/P
 
-***
-
-If these findings have caused you to resend the series or submit a
-separate fix, please add the following tag to your commit message:
-Tested-by: syzbot@syzkaller.appspotmail.com
-
----
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
 
