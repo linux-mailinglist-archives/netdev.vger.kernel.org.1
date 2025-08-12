@@ -1,112 +1,136 @@
-Return-Path: <netdev+bounces-213046-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213047-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E03E3B22E84
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 19:05:13 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A763EB22E86
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 19:05:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DEBFF1A2479B
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 17:03:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C76307AF22F
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 17:03:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E78C2FAC1A;
-	Tue, 12 Aug 2025 17:03:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7189E2F8BF8;
+	Tue, 12 Aug 2025 17:05:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AGqd+B6S"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="Gm1htpT5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEEAB1E835B
-	for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 17:03:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B0082F83CE;
+	Tue, 12 Aug 2025 17:05:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755018196; cv=none; b=AKmTxoM9uvC8TwDbuCzSCpWWekf6Hf9sjV0Y9/VI1PM81FaFR2zbU+jU2swALOD4OTWYY0p8u+QsU/1w+b26H2xOGmUx8IUTdGl1K9AZSjbtHSJRdpEeOXzbAbpVQcyK8FPkbnn/BzdDNRe+S3mjxFx0PLVaxKpSxGk7IgACTHY=
+	t=1755018312; cv=none; b=NO2/8TF1ZTPpda6PSHmlTtp/dcKKVxR+UfucZqghffIXy9IX+L7QkDVKnnV8OwiIcp9RmNV2REMTSpJALLd5OQe9Z40rHOlyLclPEJmC2rTiEYtadaNPXk0Jcc5vWKpHW3nWieg/nI9/UvA0QQJgW+RLICM5rOe7u3xPT3wrZG0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755018196; c=relaxed/simple;
-	bh=OWuuTvMfPyA+107W7mBI9T0en4MRUWzU9Hz6iht/BAU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mdIPWJZeHenXOuTV8j1dQKu5/yxnTrfLfJUo0DliRWXaUm3NRUhitod/wznz/Ud3IM7CigB5kLtE/AGj5E9hc95F9Q1j6KXd2GO/AhTFOtGt3MY591GoJwY/8OydEP3wFTp910D7YhJ02Th7Dbg7iogQEOpbMe02X4PX1//rVpc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AGqd+B6S; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-55cc715d0easo425e87.0
-        for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 10:03:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755018193; x=1755622993; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lmMKlUXAZp3eKZ4PwgQ72Z7vvc5pT/7V2A2LMb9mhe0=;
-        b=AGqd+B6STjvYl/IHnh6SGv4txrr+TsUEOWo7KIlv1a1gowHO0FOHoAdz7Dh6UwmHLs
-         q+yBHQ6YRqyU8Om/mNbrAkunjCHbBGPgaebbxdkein1vIUm1EbT5O+RDs8SwZ8ekKZ6D
-         bb1OXiHGQ/M3OEzvKxEPBArEam5/xOGEolJShLuJoF4UxEcWulHlQgPx+j5XQ0ky7bzW
-         6Gi45Ua01l1MfhE5wMUa1wh5ZtcT5FawN1ChpIg2IfcCo8KsfqemgH5bX02YYJYixmGg
-         aN+g+0PRdZdYSpl8JiIltSjWeB/HNU2eaKeQtUB3TonT2GESXrA8kSiGgL7FYV2E0Yo9
-         SJWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755018193; x=1755622993;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lmMKlUXAZp3eKZ4PwgQ72Z7vvc5pT/7V2A2LMb9mhe0=;
-        b=SEo8KcuYIWU6KXuYAdouLLkdAVx8PhYAyGDM2Dudtl+xiRvy8YNvdgy0fn6V9aq+if
-         RmPj5Kxcmgod3xQts/2QtM/QWcMx1ot9pJXJhWUpqVMSusv53fQqR8Zo3sNRa0oBZGwV
-         gdOkW5bnqV6C+c0ZU4u1y5Bxy8ZFpiSW+CWE3Eg3T08nnX0OLbcI9S7lnMEqGa4PYB0m
-         vjhiYVm5YTlofsqOvob+Lp9Fi3BwNfVuNU5ro9ymWvnnHiGTnbGqLtIL+781B+Dv22ic
-         GKgCdzHXHiXjyW3+x9wM5itvwJKZLNkw93A6sNbitXElGA17dZniGF58KR/AsNjXdKDB
-         pKGw==
-X-Forwarded-Encrypted: i=1; AJvYcCV83e4kcoFrfg0aJJ60VRTv8fu2Y7XnCJuX4NDfzx1xKiMCoI8MX9dlpS3XzjnG/rm6hRJzI7E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxmAI7f6BxZGvq+qXXziyI6lxZ7ZMf9xYOXPKkENJblna1LeOjj
-	JpFCroMIntrrw27oxWQdzlyQY2YG+WC7AXv0wi8ZsUpwBe9hl7EDna0gZwGlOR48sKA73fvUeLM
-	cEpW4bfJXOPqZqj5vYTADxvknFQaCAtFPGFHygwHR
-X-Gm-Gg: ASbGnctdacXf0wJ5H2v1POpeMt6CIOHLTKRT6JtNcYoXZ2N2j/8/HWz98XEXR6/jNit
-	Qi1gmyRApAG628a6csuhyqF+L5/ZW7ayAQuHMgY0vMsUKm7eTiTXLBj9hE8UN5k83JgoLhQJVZ1
-	+y1aP8nJ94AOOjtHJkyUGjRPSSmbC6oaKKC4AsdvwRtHAJO9b5HYrwbOYWEl5zfoBuE04B0po70
-	8s0AJpLi05sbW9rw/+X446GqfqeIKgZ0lFMhj24wo99egh1
-X-Google-Smtp-Source: AGHT+IFhtF4CeSf0xkbpb20x4AxC2mCxdHvNXx3p+5yro8kmMD5Y7rhUC492jZT6952EjCndfu7lMsaPU9kKTO+1tz4=
-X-Received: by 2002:ac2:4f16:0:b0:55b:5e26:ed7b with SMTP id
- 2adb3069b0e04-55cd92926c4mr447320e87.0.1755018192643; Tue, 12 Aug 2025
- 10:03:12 -0700 (PDT)
+	s=arc-20240116; t=1755018312; c=relaxed/simple;
+	bh=NQTEZl9pZAXnSXVryxNtdsNz0W9aBjYzDb0D4HpaHIs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=nTMxz10QNE+vdAzUArHZU/iUgQyphEPndY+O1brrbs+YLopzTjC81xJRJz4nz9GJF2IqI7CAkCEZyF7TYnVPQCwr3UqtABxWoRP9ajsKzQeBq866OtOt2dx6pEQxBxZHeO6QulE/LYXpl8nzsKJD1C/O7ElMD/zrZ+jDBiq1z98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=Gm1htpT5; arc=none smtp.client-ip=117.135.210.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=60
+	GzXJ/pzzYqeT1Unc8iYznrFO7L2shobSHFgzePkIM=; b=Gm1htpT5ydBtG43C55
+	mprn8ZogaNRK/p16ppEdbHENIrAj8ZDJ4pP8896XxNHeSubJ7TIvbyTwo90Y47u1
+	zMs7eurBXKZDwx+RZalBPFWG3QktW1QNgY40GrfuXBS1l1ZRbTSNiYOyERDuf9om
+	8VuBr+/6/viFBF/1/zRLaAPI8=
+Received: from zhaoxin-MS-7E12.. (unknown [])
+	by gzga-smtp-mtada-g1-4 (Coremail) with SMTP id _____wBnKQUedJtoVOYKBA--.44003S2;
+	Wed, 13 Aug 2025 01:04:31 +0800 (CST)
+From: Xin Zhao <jackzxcui1989@163.com>
+To: willemdebruijn.kernel@gmail.com,
+	edumazet@google.com,
+	ferenc@fejes.dev
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: af_packet: Use hrtimer to do the retire operation
+Date: Wed, 13 Aug 2025 01:04:30 +0800
+Message-Id: <20250812170430.290604-1-jackzxcui1989@163.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250811231334.561137-1-kuba@kernel.org> <20250811231334.561137-5-kuba@kernel.org>
-In-Reply-To: <20250811231334.561137-5-kuba@kernel.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 12 Aug 2025 10:02:59 -0700
-X-Gm-Features: Ac12FXz9hgUmCbmNnyGlQXztiWauwAYP8otTJ0HXPRbUpIkQERsnZD1mo-yj4yE
-Message-ID: <CAHS8izMbL0Yph4JmG35svABsuB5D_GwrvZuDiHLZ-TE4pwC1KA@mail.gmail.com>
-Subject: Re: [PATCH net-next 4/5] selftests: net: terminate bkg() commands on exception
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org, 
-	sdf@fomichev.me, noren@nvidia.com, linux-kselftest@vger.kernel.org, 
-	ap420073@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wBnKQUedJtoVOYKBA--.44003S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxJF1rXrW3ZrW7Aw45urWUtwb_yoW8KF45pa
+	y5W347GwsrZF12gr4UAw48ZFyrK3WDArn8Gws3Grsayas5GFyrtayj9FZ0qFWxtF4q9F4x
+	Ar4rZr98Cwn0q3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UK-erUUUUU=
+X-CM-SenderInfo: pmdfy650fxxiqzyzqiywtou0bp/1tbioxWmCmiaBhczAwACsL
 
-On Mon, Aug 11, 2025 at 4:13=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> There is a number of:
->
->   with bkg("socat ..LISTEN..", exit_wait=3DTrue)
->
-> uses in the tests. If whatever is supposed to send the traffic
-> fails we will get stuck in the bkg(). Try to kill the process
-> in case of exception, to avoid the long wait.
->
-> A specific example where this happens is the devmem Tx tests.
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+On Mon, 2025-08-11 at 22:48 +0800, Willem wrote:
 
---=20
-Thanks,
-Mina
-Acked-by: Mina Almasry <almasrymina@google.com>
+> > @@ -603,9 +603,10 @@ static void prb_setup_retire_blk_timer(struct packet_sock *po)
+> >  	struct tpacket_kbdq_core *pkc;
+> > 
+> >  	pkc = GET_PBDQC_FROM_RB(&po->rx_ring);
+> > -	timer_setup(&pkc->retire_blk_timer, prb_retire_rx_blk_timer_expired,
+> > -		    0);
+> > -	pkc->retire_blk_timer.expires = jiffies;
+> > +	hrtimer_setup(&pkc->retire_blk_timer, prb_retire_rx_blk_timer_expired,
+> > +		      CLOCK_MONOTONIC, HRTIMER_MODE_REL_SOFT);
+> > +	if (pkc->tov_in_msecs == 0)
+> > +		pkc->tov_in_msecs = jiffies_to_msecs(1);
+
+> why is this bounds check needed now, while it was not needed when
+> converting to jiffies?
+> 
+> init_prb_bdqc will compute a retire_blk_tov if it is passed as zero,
+> by calling prb_calc_retire_blk_tmo.
+
+Dear Willem,
+
+I am very grateful for your suggestion. I will delete this bounds check in the v1
+PATCH.
+
+
+> >  static void _prb_refresh_rx_retire_blk_timer(struct tpacket_kbdq_core *pkc)
+> >  {
+> > -	mod_timer(&pkc->retire_blk_timer,
+> > -			jiffies + pkc->tov_in_jiffies);
+> > +	hrtimer_start_range_ns(&pkc->retire_blk_timer,
+> > +			       ms_to_ktime(pkc->tov_in_msecs), 0, HRTIMER_MODE_REL_SOFT);
+
+> Just hrtimer_start if leaving the slack (delta_ns) as 0.
+> 
+> More importantly, this scheduled the timer, while the caller also
+> returns HRTIMER_RESTART. Should this just call hrtimer_set_expires or
+> hrtimer_forward.
+
+I will use hrtimer_set_expires here while using hrtimer_start in 
+prb_setup_retire_blk_timer to start the timer.
+Previously I used hrtimer_forward here, then encountered 
+WARN_ON(timer->state & HRTIMER_STATE_ENQUEUED warning in the hrtimer_forward
+function. This warning occurred because the tpacket_rcv function eventually calls
+prb_open_block, which might call _prb_refresh_rx_retire_blk_timer at the same time
+prb_retire_rx_blk_timer_expired might also call _prb_refresh_rx_retire_blk_timer,
+leading to the warning.
+
+
+> >  refresh_timer:
+> >  	_prb_refresh_rx_retire_blk_timer(pkc);
+> > +	ret = HRTIMER_RESTART;
+> 
+> reinitializing a variable that was already set to the same value?
+> > 
+> >  out:
+> >  	spin_unlock(&po->sk.sk_receive_queue.lock);
+> > +	return ret;
+> 
+> just return HRTIMER_RESTART directly.
+> >  }
+
+I will modify the patch based on these suggestions and upload it later.
+
+
+Thanks
+Xin Zhao
+
 
