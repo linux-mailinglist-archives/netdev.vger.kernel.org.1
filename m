@@ -1,134 +1,277 @@
-Return-Path: <netdev+bounces-213030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213031-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7791B22E3E
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 18:51:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FB4AB22E38
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 18:51:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE7CC3AB802
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 16:44:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD0E8173C9F
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 16:46:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F152A2FABEB;
-	Tue, 12 Aug 2025 16:43:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABA282FABF6;
+	Tue, 12 Aug 2025 16:45:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="kfhWBQqZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iFBH4WQ6"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C41CC2F6571
-	for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 16:43:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755016988; cv=none; b=p5/hmbm0hknK+j/8mPsYEauy2qKnUfVyzSNo+jLB07k9/CA2onaKALXbHSYHKZsLoWd/Vlcy6x7avyPA4L0cRndrtpZnXC2/TeygWPvoqz/uWyRvi/fdLcjZIistEBFt0biN7lMWs+utgXDXVOAXNffqPuDEbrm61UiUJTcSBik=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755016988; c=relaxed/simple;
-	bh=rNklaZMueT+v27Ov69dqYSVlLrIQvetOKvOQFwh8GeE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JbsD/fTOq7rBg96VPOG3BAElTLbpODNN4Gt5YnE19+u2kkbuOKArD848zcqyv86KCxdI2FOCEq3hfWB5kUDvCMQ10Ou/9dysjM9yuT4I/2E3dZxzlXFUblleiZ5Dh7pnGDikvIvlNM/g9V/jCo6Vqxf2BSORKZbR6uwMQWFgeuY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=kfhWBQqZ; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=HaZjQbWUAKXEQCsbLdt9JaCOKOTTSoOuPgHhR/KNJDg=; b=kfhWBQqZvWMUTgbRT2unlRsmnh
-	u33Pq7UXLgrkIAcdFuBzQld1InEEqy7O674wexX12wm8xa/HobelOuhvxtZ+1KqAIG/iUW6AFH8Jj
-	0TZy0KN9ab2zLfIaPT6BVexYGan7zxdSgMCVSEetsPtGYbfR1gnfFZwAW3Wf0lZLnqoev1tMI1j4M
-	82Vb8uFvOCRZFSce2TwDBezORxCP37DWoBj2c0i3ZRw/UQb2KzXRouwv1XHnz1fi9cJu9nWWOkb+5
-	SfZ1ViwkrgasRyp92bAktxQTDwOJRS4Uld0hTJLcY6wbKIVPkjQdKLRMHen7S4xcuPrlVPYdxcrSH
-	/K5+tSzA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39140)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uls5W-0005H9-0H;
-	Tue, 12 Aug 2025 17:43:02 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uls5T-0004rV-23;
-	Tue, 12 Aug 2025 17:42:59 +0100
-Date: Tue, 12 Aug 2025 17:42:59 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Thorsten Leemhuis <regressions@leemhuis.info>
-Cc: Mathew McBride <matt@traverse.com.au>, netdev@vger.kernel.org,
-	regressions@lists.linux.dev
-Subject: Re: [REGRESSION] net: pcs-lynx: 10G SFP no longer links up
-Message-ID: <aJtvE_yDGDyAfA5s@shell.armlinux.org.uk>
-References: <Z1F1b8eh8s8T627j@shell.armlinux.org.uk>
- <E1tJ8NM-006L5J-AH@rmk-PC.armlinux.org.uk>
- <025c0ebe-5537-4fa3-b05a-8b835e5ad317@app.fastmail.com>
- <aAe94Tkf-IYjswfP@shell.armlinux.org.uk>
- <f7eac1d6-34eb-4eba-937d-c6624f9a6826@app.fastmail.com>
- <2d709754-3d4a-4803-b86f-9efa2a6bf655@app.fastmail.com>
- <6455123a-6785-4173-b145-3a1a3eb48175@leemhuis.info>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2F9E2FABEC
+	for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 16:45:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.14
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755017130; cv=fail; b=SOvgszgSz15K+zbP12kTxOh0bgHkLVUGvo1HpfZA7FSR8C7h1BmHlaaxCTKz9cxjSmuwW2j3meP9n5RS4yXy25oN7s9Xgef2VqaDZwfWjF5HXKVjLFR5CkBZasy7a8haYByAeAbQtK8EgesId7R/beYWD+X73br4FgxpeUbk5jw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755017130; c=relaxed/simple;
+	bh=+ClluA9sdA33ytcGh01qkuHyI2usjRvLNqYudyDVlIQ=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=OfApHkLkmEimQKPZmvCtSJQZ8eocdfNkJOQnjGIbpPtfLhRFZWOePTrM3R/10cTVJ3CIbTi1jfZ8sihWokxa6fUzrsnsI9wMYeH8duTf0aduBZ8Sxpc/riVhrtrdwtIN3nvYk7XLvQeF++lotZpN0TUS+bu/PRj5ZwqIKYkVt2Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iFBH4WQ6; arc=fail smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1755017129; x=1786553129;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=+ClluA9sdA33ytcGh01qkuHyI2usjRvLNqYudyDVlIQ=;
+  b=iFBH4WQ6Juv9YOUs9aqeQz/1S0U+yci0RyVROjvFsdUesmeHCXVM6Ocl
+   QVbfKw50mBDBScYYJNPBSC0PHLbeLwsPedH2knWjJqCEM69XytxQ+btUA
+   ptvNycjTkhzhNr2jVp5ql1lW/1ByDXXmwlNLyLAiSFpm6Rib4BLUVsWxk
+   Vhig8dMnLSdO1a1SIjONOBrWvLlBxyiY4CLm8dVbDReO3FAJ1zcH5zJ2e
+   CUXxJ9nLqBxZHRsMqlw3D//v64V6nzRznx29HiqAoTxCtzb+sormthN1S
+   NbMhwYb1y7QXqJ3DjviVQL9J18fA7oODFoQKRD0wQ+D5sGCoUvfr/8y9a
+   Q==;
+X-CSE-ConnectionGUID: RC1GVXQLT/mGLDBCpoZhhA==
+X-CSE-MsgGUID: 94qPlqSuQLuqQyiM5kJ2WQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11520"; a="57362573"
+X-IronPort-AV: E=Sophos;i="6.17,284,1747724400"; 
+   d="scan'208";a="57362573"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2025 09:45:28 -0700
+X-CSE-ConnectionGUID: gHFith2PRLuY8WL59aVd/w==
+X-CSE-MsgGUID: 2v1V7JwSTse76FaG+M3d7Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,284,1747724400"; 
+   d="scan'208";a="165426904"
+Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
+  by orviesa006.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2025 09:45:28 -0700
+Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26; Tue, 12 Aug 2025 09:45:27 -0700
+Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
+ FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.17 via Frontend Transport; Tue, 12 Aug 2025 09:45:27 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (40.107.92.73) by
+ edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26; Tue, 12 Aug 2025 09:45:27 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=CPr/AYPhNu3WWo8+uXuKuk3yA+/+kyyMbE1ioD36cuLPYzeegRTJKtPeCUyPuP62cwzZnJ8ge0hpvsiQBruQ5NPK50OM+HGlmfAqbFoQUN8n/5xJTR0zKGBll0PsrTUUQYczKqLWTP8geKHwgjxLS/s9GRlYwtueOHWS/YBUX8ftJwcegKWxXi63egyt9UFlSmFSYCgM+omRNbJLSrSI9jnDvBOo9cVEr52VZvCDCMZrl0OZbkSSCoOCnlGnQDi1gxEPQWgpDafJ/hAkKZDf9jNrjrf8F+s/Gib8ypYbIzrYHqw+K95PTXqlGPDz6CHKHZ2v52gx0WYJWBa+fsBIyw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fvjGVApJRZExJ6lnDWNCCITmnEptS4Xf7V1Q3thgUKE=;
+ b=VpEMjd+5g+ePCz6eDM622lRm5SDr4fHJFheiJtGDFcqgtFADrXYkluLTqh+j2SdMpJLjIjCEIwuWYybG+989FoPTsseVtsAXsN+zB5xjAq+NlCVpJxe0zQUB+A+zxE4ftIzc5GuKEDaSBStjRnNaUsfG04YAZmdVc/tFbOBvWFu7+QnzIqr6Y1e7GnDViqIVBRvJsFKPao/6aGITCTXU8CaIGP+tayYoVHHGycok+QRcIkZfRzqVDsgqo1xpRynDnznt1hUHr/Jzs1r7syrvbbMYwTrBFgPR3wk14QeOWs4GxZi31sNqgpRZZz1cf0ERA4ziK5rN9BAj204lbrPN2g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from SJ1PR11MB6297.namprd11.prod.outlook.com (2603:10b6:a03:458::8)
+ by CY8PR11MB7083.namprd11.prod.outlook.com (2603:10b6:930:51::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9009.22; Tue, 12 Aug
+ 2025 16:45:25 +0000
+Received: from SJ1PR11MB6297.namprd11.prod.outlook.com
+ ([fe80::dc50:edbf:3882:abf7]) by SJ1PR11MB6297.namprd11.prod.outlook.com
+ ([fe80::dc50:edbf:3882:abf7%5]) with mapi id 15.20.9009.017; Tue, 12 Aug 2025
+ 16:45:25 +0000
+From: "Salin, Samuel" <samuel.salin@intel.com>
+To: "Hay, Joshua A" <joshua.a.hay@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Hay, Joshua A"
+	<joshua.a.hay@intel.com>, "Chittim, Madhu" <madhu.chittim@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-net v3 1/6] idpf: add support for Tx
+ refillqs in flow scheduling mode
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-net v3 1/6] idpf: add support for
+ Tx refillqs in flow scheduling mode
+Thread-Index: AQHb/ZLdTk+gyDO/ukqU4mvmApZ5ibRfUTLg
+Date: Tue, 12 Aug 2025 16:45:25 +0000
+Message-ID: <SJ1PR11MB62978F861DC2E4B7F56E1E899B2BA@SJ1PR11MB6297.namprd11.prod.outlook.com>
+References: <20250725184223.4084821-1-joshua.a.hay@intel.com>
+ <20250725184223.4084821-2-joshua.a.hay@intel.com>
+In-Reply-To: <20250725184223.4084821-2-joshua.a.hay@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SJ1PR11MB6297:EE_|CY8PR11MB7083:EE_
+x-ms-office365-filtering-correlation-id: e9432879-bfaf-45c4-565c-08ddd9bfa2f8
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|7053199007|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?ZL55FkoyReU5946voDsbavf9E3KthZuh4E/e1gWgcqwEt9Mhhs/4IwlCDD1p?=
+ =?us-ascii?Q?I2pLtXNREfquDnuUstDy9DEJtWWcoDqJAZQoec5XqFD5yQ3+q/yhdVLdm606?=
+ =?us-ascii?Q?il5EVV7VNJvtYkaVGtp+B99YygcnvZB7vJIof0ReHYzVM1OyiHWq9O/m3oai?=
+ =?us-ascii?Q?4DqEiZPAki0OY17TAAz08GGKdNxYQbT+7uwi6g+OPmoXVIZj0COdgi72HuZ9?=
+ =?us-ascii?Q?fuAdYbeGK7bdoSqQ/atQVOyx2gJ3N29D/+IQjPgp6/i92vlop9Vcjc5qUEYE?=
+ =?us-ascii?Q?UHiSjXqkuS5XfTrasJwCEWw9qrIhvGNRQiLm+o+foJ5pNAu6uephpB5Ey7cA?=
+ =?us-ascii?Q?jFJLGiz/uxlSLGXio0l2yvjbsMNP+zy/266s1dUALG/bmlIar3BUdch/C0ce?=
+ =?us-ascii?Q?/zNyfv9nQQRVRusJSsoTGw97pOoVw6gMeS87uHRX5SUZRPs4O1G+7LZEOHZt?=
+ =?us-ascii?Q?LaG1rAS3qqGwOtsDDV/HMr0gfP/1OVfnFqzR0KQUCQx4lU6yKjIfXAJBwnle?=
+ =?us-ascii?Q?s2GM3h7uwuRHi32kALHTY2/xjdNIgg/7j2ASlwmfoS35yTw5FcAV3zUJCchR?=
+ =?us-ascii?Q?QyP2mxvOvhR7v6qMpOAx/dUdpjSKdoExCurOcfECN9lnQyasc7Q56lwS2GD1?=
+ =?us-ascii?Q?LtE8HQnqImg6gofgBVeC2h4zszlbieVwz7LUpUjGUHEcQonKt+O6ZpFIZjDr?=
+ =?us-ascii?Q?zc1MoNcZTduzZXU197Aj2/udTndw+q1le2UGJophqWWUrnu5e197V81MluV4?=
+ =?us-ascii?Q?qEP6cfvzaGnsggj6J1fvnUhMPP+Jg+zSReSozCgCT1m8O3sLPFvKwTmMRXmG?=
+ =?us-ascii?Q?j56XDRuX99RP/gNVuRILi7+6wQF6S73h68SvXSI5jKfpnB0h0AdwmtgDZOeM?=
+ =?us-ascii?Q?kGUgxV3/Z1uGykK6s9n+eBm9tt18Lad3Y9NbswQGCX6aKoPjOe4q9peJMIK0?=
+ =?us-ascii?Q?j1hYQvz5Z9wkwdQ7Gx4YlYSFIub3p9MV6BkJPXHzjQSR/uDMGhP7k+szAntz?=
+ =?us-ascii?Q?zuQQj56Uy0rHzXSTMhNx35waf0gNPu9kXP79n+hYABmFUk9XyPLus9fqN6ZA?=
+ =?us-ascii?Q?5xgnzCRPWxwuwu47rMMH63o29PO8nN8DccRJhCii3n7ZtnpKdT/cnRqFmM9R?=
+ =?us-ascii?Q?BWP6VV8mYf4HmROCs8H6Tuj+UpZlNTGBeMumc+khrSFdAmItVefa7/V+dNcb?=
+ =?us-ascii?Q?czke+Hxy49k8RYNIhjD212Vv2sHW/5Kj9aZLcp+oChh2tRqtOH7zcHZ7cbiU?=
+ =?us-ascii?Q?U/Pfj6G7T57hdHRUSFXf8PT7x25IyfB2W8+d7tYoppPMUAp4/ntuSYwFXExr?=
+ =?us-ascii?Q?H2EJyK1dXR4p8Qg1LIHWp3cTlPujKH+sxHF5gTDiapm7xd6PcfhqfmdWEi2k?=
+ =?us-ascii?Q?4cAe++Hnl1GJc3ItCVOZZenv3MonBIby08htUv7esTnE3CJZWfmx34dJV9F6?=
+ =?us-ascii?Q?QUTD0iRf4CL3bvmOwhftXgnTqx2iUDpEPp4nxFZTQBadyxO44Oc5N5QxsSdI?=
+ =?us-ascii?Q?x+wtSVz3iFnM+y4=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ1PR11MB6297.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(7053199007)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?XHRMNGjGX4/IAnR93OG3pX7aiyZufsou/8fk+eOwMeCCFrfRyrw3GDEJqGR8?=
+ =?us-ascii?Q?ZdunhJp36DSJD9ZqjorZ+4VZ8zoGkcYdWQ3w8E/nRr0B8NT4z+pHVxUzixoj?=
+ =?us-ascii?Q?348O4WbFDQDCJDgwkLwDWf4V+OYyf1NTlIxwqJ7mz2kIfoUM4HoCFZTdKExX?=
+ =?us-ascii?Q?iCc8xw8XTIHGstCdtkCgE8FwpRI2Osq+So2wwxOhpqSGwt4vEMDntGeEK5fk?=
+ =?us-ascii?Q?RWhU/h/gJwo460Un5SGdG8DBgQtT0r0lYPjpXBsMpH7YEHmLlIcNAfWAVftp?=
+ =?us-ascii?Q?PcoI+GqgMmrOpkTepBet2IjyEIDV3g8KGD5IeRCCKHh6Q4inEHQX7Ba+pafR?=
+ =?us-ascii?Q?PUaiC1+/Zo/uBWczITWEDjQxRy+rjYCCMMCqyfo6497ILc3ZOb4VGGlkVIta?=
+ =?us-ascii?Q?+mI6hgqGQXIdhC5jsdXeRRRygQkLG7KJK/Q71PD+6LbYYH5eI8N68DcBaVzl?=
+ =?us-ascii?Q?Yx70hc/rtx9s6zMgSwDJTQFo57Ucd/frauY+titXAFQQWWHFfQw/adb+C5cf?=
+ =?us-ascii?Q?6IDzhU5qmKjoTXlXuHZsD9OULD12KGpiIGXwrXmwJoJ6sUxyqNYuCcVjjcmG?=
+ =?us-ascii?Q?FwCB1njUTzLOqFzt/yU2crWjhUOSupwlEJKPgIBJDFOLKiws/pio7iPNVWx4?=
+ =?us-ascii?Q?RVunP2222gQuJeZwQh9d8zSEtB3ckNyzV3uSPpxZwazut7/fbkZWSLSOhVq1?=
+ =?us-ascii?Q?kPdLuoL9oZ5A8uX8Er6kXEJ2H7Lv2IWTSkV0TszHz/lZRm5QyQycxYgswbHN?=
+ =?us-ascii?Q?5hEAfr4YBPS6yoh1BMc4OadOZ9/vokmoblEAWe1Es9bYcI7HvI3Cl+LTtI1y?=
+ =?us-ascii?Q?RGAd1uu3POZoWOVFauIds8a0G+F/d0emyaM5TIUt1DXhh/+EPPBGlg3ZnF9u?=
+ =?us-ascii?Q?qY1xHxc376Dxq2xbIBnmek7VNAkRri0ZEmBqB9q82B1z9gZwC0vQy5olwjb1?=
+ =?us-ascii?Q?ZvMHL+gLReCR7jMC7CRifoRfa9gNeoHeBJGcg3Uv36LsDAnZEZiPKrxOKuvw?=
+ =?us-ascii?Q?mwY06EO/m1oTBE6A6kGSbGnomQgHnNTOgmsvxQqh87NBBjuczcShmMSrsjI6?=
+ =?us-ascii?Q?ZFnYXBGaLQX7z7hadd9tqOb5aefb+HHyVzhWbxlesntYAS/dM3Xjar5r5RC/?=
+ =?us-ascii?Q?PTH229MwiM8sJ27sIXrqcQu2C0Debu3H6zmGlPHDBq197Y2sDaQgOCHBKMSD?=
+ =?us-ascii?Q?jl1bG5i3NxxMgOvOf+P3VfPy8C7dl5P7Vvmfy9k203uDHss4gDUoog7/btkt?=
+ =?us-ascii?Q?Yz96Lnyx5G/2RfNTejwbUNs9aVkKhgASG3MXrE1xmtXnqKk+JO3igItno5Kd?=
+ =?us-ascii?Q?ZyW7KLvhxPStNTBo8/DlXIl7zx7+OCO8wuxyyjdEPelVxDS49n6D2g8FYVtY?=
+ =?us-ascii?Q?Z0Y/xQK2xDqOU2t3O8TN0GcIAl06o16U5kYqDtKQZsCTdlMOTxKBwpySJchM?=
+ =?us-ascii?Q?psIXZpQeqEckkG5waUPGQ5EPudJbXiMNRKWx/myWcP55t5G3k5kjF9kPeyMI?=
+ =?us-ascii?Q?ByAh5x6xONCRAxv1AmFEq+fZXBKbAoiN+omnjYtjTpYWmUMNry5u8e3Dso/D?=
+ =?us-ascii?Q?mc2XeGyyO5EFgOgM8vHDG6Tv7OAk8W9U04Pyrtzl?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6455123a-6785-4173-b145-3a1a3eb48175@leemhuis.info>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SJ1PR11MB6297.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e9432879-bfaf-45c4-565c-08ddd9bfa2f8
+X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Aug 2025 16:45:25.2573
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: BGTrTAI3Zw+4T7aX/YJ9uhQoB/W0xf6J9LBtVndFUYwcKCuFf20I/ZUr2ZVm0/lu/EMeuuLBMIdbGZ500YR6zg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB7083
+X-OriginatorOrg: intel.com
 
-On Tue, Aug 12, 2025 at 02:17:39PM +0200, Thorsten Leemhuis wrote:
-> Lo!
-> 
-> On 10.07.25 07:29, Mathew McBride wrote:
-> > Hi Russell,
-> > 
-> > On Wed, Apr 23, 2025, at 7:01 PM, Mathew McBride wrote:
-> >>
-> > [snip]
-> > 
-> > Just following up on this issue where directly connected SFP+ modules stopped linking up after the introduction of in-band capabilities.
-> > 
-> > The diff you provided below[1] resolved the issue. 
-> > Were you planning on submitting it as a patch? If not, I'd be happy to send it in.
-> 
-> I might be missing something, but from here it looks like it fall
-> through the cracks on Russell's side. This is nothing bad, this can
-> happen, especially during summer and thus vacation time. I'd thus say:
-> wait two or three days if this reminds him of the patch, otherwise go
-> ahead and submit it yourself to get the regression fixed.
 
-Yes, the reminder was sent during July when I wasn't looking at email,
-and as you can imagine, if I spend three weeks on vacation, I am _not_
-going to catch up with that pile of email - if I were, there'd be no
-point taking vacation because the mental effort would be just the same
-as having no vacation.
 
-I have been debating whether we should actually do something like this,
-especially given the issues with 2500base-X:
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
+> Joshua Hay
+> Sent: Friday, July 25, 2025 11:42 AM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: netdev@vger.kernel.org; Hay, Joshua A <joshua.a.hay@intel.com>;
+> Chittim, Madhu <madhu.chittim@intel.com>
+> Subject: [Intel-wired-lan] [PATCH iwl-net v3 1/6] idpf: add support for T=
+x
+> refillqs in flow scheduling mode
+>=20
+> In certain production environments, it is possible for completion tags to
+> collide, meaning N packets with the same completion tag are in flight at =
+the
+> same time. In this environment, any given Tx queue is effectively used to=
+ send
+> both slower traffic and higher throughput traffic simultaneously. This is=
+ the
+> result of a customer's specific configuration in the device pipeline, the=
+ details
+> of which Intel cannot provide. This configuration results in a small numb=
+er of
+> out-of-order completions, i.e., a small number of packets in flight. The =
+existing
+> guardrails in the driver only protect against a large number of packets i=
+n flight.
+> The slower flow completions are delayed which causes the out-of-order
+> completions. The fast flow will continue sending traffic and generating t=
+ags.
+> Because tags are generated on the fly, the fast flow eventually uses the =
+same
+> tag for a packet that is still in flight from the slower flow. The driver=
+ has no idea
+> which packet it should clean when it processes the completion with that t=
+ag,
+> but it will look for the packet on the buffer ring before the hash table.=
+  If the
+> slower flow packet completion is processed first, it will end up cleaning=
+ the fast
+> flow packet on the ring prematurely. This leaves the descriptor ring in a=
+ bad
+> state resulting in a crashes or Tx timeout.
+>=20
+> In summary, generating a tag when a packet is sent can lead to the same t=
+ag
+> being associated with multiple packets. This can lead to resource leaks,
+> crashes, and/or Tx timeouts.
+>=20
+> Before we can replace the tag generation, we need a new mechanism for the
+> send path to know what tag to use next. The driver will allocate and init=
+ialize a
+> refillq for each TxQ with all of the possible free tag values. During sen=
+d, the
+> driver grabs the next free tag from the refillq from next_to_clean. While
+> cleaning the packet, the clean routine posts the tag back to the refillq'=
+s
+> next_to_use to indicate that it is now free to use.
+>=20
+> This mechanism works exactly the same way as the existing Rx refill queue=
+s,
+> which post the cleaned buffer IDs back to the buffer queue to be reposted=
+ to
+> HW. Since we're using the refillqs for both Rx and Tx now, genercize some=
+ of
+> the existing refillq support.
+>=20
+> Note: the refillqs will not be used yet. This is only demonstrating how t=
+hey will
+> be used to pass free tags back to the send path.
+>=20
+> Signed-off-by: Joshua Hay <joshua.a.hay@intel.com>
+> Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
+> ---
+> v2:
+> - reorder refillq init logic to reduce indentation
+> - don't drop skb if get free bufid fails, increment busy counter
+> - add missing unlikely
+> ---
+> 2.39.2
 
--       if (!phylink_validate_pcs_inband_autoneg(pl, interface,
--                                                config.advertising)) {
--               phylink_err(pl, "autoneg setting not compatible with PCS");
--               return -EINVAL;
-+       while (!phylink_validate_pcs_inband_autoneg(pl, interface,
-+                                                   config.advertising)) {
-+               if (!test_bit(ETHTOOL_LINK_MODE_Autoneg_BIT,
-+                             config.advertising)) {
-+                       phylink_err(pl, "autoneg setting is not compatible with PCS");
-+                       return -EINVAL;
-+               }
-+
-+               __clear_bit(ETHTOOL_LINK_MODE_Autoneg_BIT, config.advertising);
-        }
-
-which turns it into something generic - but my problem with that is..
-what if the module (e.g. a GPON module immitating a fibre module)
-requires Autoneg but the PCS doesn't support Autoneg for the selected
-interface mode.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Tested-by: Samuel Salin <Samuel.salin@intel.com>
 
