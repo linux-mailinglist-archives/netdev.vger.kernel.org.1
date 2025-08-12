@@ -1,134 +1,224 @@
-Return-Path: <netdev+bounces-212916-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212917-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B469B22826
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 15:18:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A0B1B22839
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 15:20:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 273D242403B
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 13:11:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 902821B67FDA
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 13:12:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97E3426980F;
-	Tue, 12 Aug 2025 13:11:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2121E24DD13;
+	Tue, 12 Aug 2025 13:12:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KvQucUr/"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="E4oZonsI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1848924DD13;
-	Tue, 12 Aug 2025 13:11:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47605265292
+	for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 13:12:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755004267; cv=none; b=V0y/K0oIgqWr57+VRR2XDoE3e/tOweMX7Tigv9jkdc9sTrt/+VK8tEoYGDeKZAlm6gBnY0g5V8QoQQEzSmgJ8jDlNE1SLOkVnzO31lDb0ZeloQvGlsakvaMQdt0C0r37SVKt7nzB4QDKjGb8uDQpgxHKd7rkWO7izRFsjm0dxjA=
+	t=1755004354; cv=none; b=j2gTM38cMpsupXVhRpzaci/lzWKDZm9J6IMvaKLNs3SzJYdvW7yJCiisuUfnB6GwINrTWr/15K0cB0M/N0+K7/06N1babgCbMDzpxpstAN3Arc/GU85qXgeCy9yuKXyf/d7DaoVOEAeC+4h5VaGHViuLuOcayDxN7V2dsIuGGuc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755004267; c=relaxed/simple;
-	bh=jpvCdzmHJ5xj/A+c0w4r3SpkYQVGzyL63JnKHddt0Sc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=nzI53UXuIYM3VYz67h6+YMrVYc4mXl54THubrPQAV7INvC0JZjsSIHW5FpTcH5ChoBbIX2Wdv2CoXcLA0GQ/8OxYmQpf8Rlb9yqr0vM+DeYVA94PIZYHjOxm+vd4FllGKAeilIOKADyYZflIaMMe6ZYjQD0tMAjeGNp7+KHz1eY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KvQucUr/; arc=none smtp.client-ip=209.85.216.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-313bb9b2f5bso5942183a91.3;
-        Tue, 12 Aug 2025 06:11:05 -0700 (PDT)
+	s=arc-20240116; t=1755004354; c=relaxed/simple;
+	bh=Q+dL7YFTgtidPt9hAucGWE8TjdN8c70nvX6A662Fl2w=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=uT6aH2abaK5NGLJDjXSW15GL7GRzciP4Ed0eGQfjtlDkd9U+b4CStor6VUcraX4g2a6D3+R7udTNsE2jTwqvi9ZgeSIubtlYyIqTFmMo753Sk95waIyKCAnP/jLDlv7BT7vyOchej0wT8z/z7TJJnmGSAlHyvRSXXbH60J50xZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=E4oZonsI; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-61564c06e0dso8563461a12.3
+        for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 06:12:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755004265; x=1755609065; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=UxIla1HyYnxUj2HsSHmkDkdZP2KuTjodsMUdmS63XNQ=;
-        b=KvQucUr/LWDOEcpAPMCwMye2Q6eh47ke7x3uhsnl7EAYP240NqkW3zMQSGZDENc1y/
-         j94X4AkOEmRfCHexag9fF/nt3aI6Xq6WQgZqkNb3TCM8+qxBIGw+r0vruj7fzEmLz7w0
-         eEA4oLqG4DCH/sBtTTt6HmJ29vZvn+iaXW8QnqMIoS9uKru/N4iEL/28XP/xxoFHKv71
-         X6bQNNDGGlWarmiMy/VyXlvZVmq/9q8M+e22/6TA34QKwdrWqvAO/tatl70ul8cVTG8x
-         g1ta52hzO0KK01SG05V3nhhSAD3vADsWxd9ATolKG1iSVPdqsDPbZiMwcp3i4EK8OlJ/
-         LaHA==
+        d=cloudflare.com; s=google09082023; t=1755004350; x=1755609150; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=GgN8nQ/+ZBonr/SCQL/NYBCNen8CZvRuzj39S0Wnd8Y=;
+        b=E4oZonsI0MyGC2wRcNWppPN49S3t831aBOGhWZnZm9ofyX1xV93WvNJvy95UrVlazW
+         inwm27E8jfy9J/YWrKrdc1BKtwa9beTZDWn3iJNU73vbVvydNYvdBaZV0uwKp0ezcAPK
+         GtPcwQm+69YjKYJ2VVMbuPI7r98voA2dih+F06dTY8zl4cLMTOR8GbYvGq8Z/X6DiZoR
+         xGDyFXq5Ws43C5f6sJYMlHbFJZeZ3Pn/6pemyqW8cMW4vpk8zicg0arcZiZKi9Z7Z/rn
+         OchaOy2l8/HihYNCJtT7ZqQOWDdxQ+UVO+J5xytp0Dtt6fklJy02AiAnXkJQHpRSs1X9
+         wX7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755004265; x=1755609065;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UxIla1HyYnxUj2HsSHmkDkdZP2KuTjodsMUdmS63XNQ=;
-        b=J6hhzWFt1kQLoVEM3ANIyGDfIR1AmWGW5N8MDNh7ZYa5vDlQvyO4MqUiyTZpGjdYbC
-         T9mkkkz+b59MIhPXhwMCuf9JxJCBN9vUXjnR+J5oIuJ+oIoVnDqMbFBn1j9U6COrd9r9
-         +vLEfMs+OhtC4B3YD3roWbhXXtIN1kjO5C6SJnn8F8hP/eUMRbdLA0NdHPSRjzQoeSWG
-         51e4GA0dQChoiEwLnUC5UixMjl+DOvg8PR2RjBZthHIqlt+5e/O57KugsuNhKP+OstGF
-         xCdJFwde09EQ5oZo9FPHr+8aJfKJXzR8nn6uqmgFv7V16jKtl2qF0/4DpDz/VOq1eS/u
-         d0dA==
-X-Forwarded-Encrypted: i=1; AJvYcCUSiFZcxXgahw2TieO/LZTGtKuAWg0ONQmrmHRTbKbTgQCQ4qghWLgkZo8ZcSXF/AVGUWZ4+XUW@vger.kernel.org, AJvYcCX2EkRP4yZVjqMR405GaEfc2TBraoLgdOk5kbP+tEdqnuplpXuVs9VzF8PnurgKSoh1ujgYiqR8kMZrVSA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxqY70tgT99NUs3FZISvulcuxPemFRzQSQiyRSfoPw8LiwLo+Km
-	S6mFxki21V+q2vLZ81VbPNX/AcOoUg6zV+V7A2PAFuTYkrC6Dy09k3Qz3tD9ZVx1
-X-Gm-Gg: ASbGncuizgp9qk0ZANCdC1vDifZV9CYJf4/NMpqO2lVkCyzvrzvIHc1A6x1zPMNFHTO
-	A/dAYqmEbGWdvN+URMgTfjvBah/iD6Za8+XUAqDVmaiHdojgXyTHA8JOoJ4rB01rGy6ATP11zz5
-	EYak7Ei8kwx7MGDV7Clt2naP5F6WungN7ynbap38Gddl9XCvvhNic2DeA+xy8J1mrREmHZmp+He
-	zFjGrp+tIAVepgBs+rvGcW9gq4XYL+fR2LrcD+2y+GHnfoVd5Ke5iIxFKVpKgwsOysgjlx3ULD4
-	KF6nr/3Poq+xrA1+ZrE19ZfkuLFPblnBL9Ga+sgKBF5kzQb0U75xgvjDEPAHi1z2iBtXVpZlTx/
-	0YUYla8KHI+FsZJJc/x834qgLx/vyMddQRHro97RoWBlSp9exg8MdSSs=
-X-Google-Smtp-Source: AGHT+IGZho0iQ/1nCW0ztaSgx/gJSrFI5h/wMr3ThsyqUo5BdfFFaDonVE6u2aePsc3KlxqPpcFzPw==
-X-Received: by 2002:a17:90a:e294:b0:321:2407:3cef with SMTP id 98e67ed59e1d1-321c0b60856mr3040069a91.32.1755004265102;
-        Tue, 12 Aug 2025 06:11:05 -0700 (PDT)
-Received: from TIANYXU-M-J00K.cisco.com ([2001:420:588c:1300:513:ebe8:5ec0:cab3])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b4285a15c26sm13545797a12.16.2025.08.12.06.11.01
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 12 Aug 2025 06:11:04 -0700 (PDT)
-From: Tianyu Xu <xtydtc@gmail.com>
-X-Google-Original-From: Tianyu Xu <tianyxu@cisco.com>
-To: anthony.l.nguyen@intel.com
-Cc: przemyslaw.kitszel@intel.com,
-	kuba@kernel.org,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Tianyu Xu <tianyxu@cisco.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Joe Damato <joe@dama.to>
-Subject: [PATCH v2] igb: Fix NULL pointer dereference in ethtool loopback test
-Date: Tue, 12 Aug 2025 21:10:56 +0800
-Message-Id: <20250812131056.93963-1-tianyxu@cisco.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+        d=1e100.net; s=20230601; t=1755004350; x=1755609150;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GgN8nQ/+ZBonr/SCQL/NYBCNen8CZvRuzj39S0Wnd8Y=;
+        b=W70V0sVNp8TyhFl4DJB1NhZUvJWCiH4bw4Qbe8Zr8oESOfY75laRznXEo4OdOxiSVB
+         57faReyjPcdwd5IJfFrAb2p5O55Hi+AT0hU6xItMOLVnmiXEYc/mwZ0QXMaPYLU4KFSw
+         ISZlFWnJ+M2imnvyQnhN/keoO3F3fFerntTEpRQGuApc/p055+9uoMg1e+j3LotUyOV/
+         kTnoiY9bmcsKGU19j6GjhM32e43DpFNy2BEl4QQsUuDu4P89AYlsRFyUjVnhWVQNOxWo
+         02txc1X7lAwUXi5Gd7N3PO4rHCyEh3EbK85RX7gXGDe+103GKEF4u2+HUIPG723Q6cVF
+         2kPQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUX+/MjO/LSF62afyO72tQ37RJLHXTydTU1u2rHNB/kAQt/Q1ndpkoMEx1pKXu8dtXC2xMp/wM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw9rq8iIclM7OQ0cGvnTACrDxdTU1a08EgNi7Mo+9eULlFzq9gX
+	l/oKRs1QQ1xcvL8uWxxAp+HIzVhRb6IXBGVj5oFaad/REuLRDJZz7vibNQzqPS3Z+ug=
+X-Gm-Gg: ASbGncu6UUwpZ7hadtBEsDsKclBJ63sQr/1iKYZ55Hy5sloxD/xIVn87y5mKfWKaIqP
+	vRgle9WTyhEHYWjn2kdAY4Ym1rZggIbm/7vCEJVQyFU0cGzbGUaU/qXg/0C26Cr89C0QMoRlhDK
+	3vH4k7QBSExRYniETOMnPkiT5WkzhlaWVEKbN9HAOWkmMW2kao2zH3oByG4vTw2OHPKAsQCqseC
+	f6JN+iQL3BEhJKFC79ToAikTVAetaNacKVg4NP7TKdpfR3NAjmbZ7YY3iPhBmrtTWfGx7/7QLUl
+	JYuPh3c6Vv32PmR4GsjxIfrsGyrvT192vhYG1u3iBaHoQMj535R6pnuzS3wv5V+CaE+MEtavyBZ
+	Y9/gyE0zABiSLpA==
+X-Google-Smtp-Source: AGHT+IGYkWNVCxVtLaUEBzhBIySoDMQD8gWWPT0ensnCh7ERmB5oa7n6sdlG5N5YvOVg30lpB7DclA==
+X-Received: by 2002:a05:6402:454e:b0:615:6fae:d766 with SMTP id 4fb4d7f45d1cf-617e2e75a33mr11760712a12.26.1755004350478;
+        Tue, 12 Aug 2025 06:12:30 -0700 (PDT)
+Received: from cloudflare.com ([2a09:bac5:5063:2dc::49:105])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-615a911567fsm19715114a12.61.2025.08.12.06.12.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Aug 2025 06:12:29 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: Alexei Starovoitov <ast@kernel.org>,  Andrii Nakryiko
+ <andrii@kernel.org>,  Arthur Fabre <arthur@arthurfabre.com>,  Daniel
+ Borkmann <daniel@iogearbox.net>,  Eduard Zingerman <eddyz87@gmail.com>,
+  Eric Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,
+  Jesper Dangaard Brouer <hawk@kernel.org>,  Jesse Brandeburg
+ <jbrandeburg@cloudflare.com>,  Joanne Koong <joannelkoong@gmail.com>,
+  Lorenzo Bianconi <lorenzo@kernel.org>,  Toke =?utf-8?Q?H=C3=B8iland-J?=
+ =?utf-8?Q?=C3=B8rgensen?=
+ <thoiland@redhat.com>,  Yan Zhai <yan@cloudflare.com>,
+  kernel-team@cloudflare.com,  netdev@vger.kernel.org,
+  bpf@vger.kernel.org,  Stanislav Fomichev <sdf@fomichev.me>
+Subject: Re: [PATCH bpf-next v6 9/9] selftests/bpf: Cover metadata access
+ from a modified skb clone
+In-Reply-To: <e30d66a8-c4de-4d81-880d-36d996b67854@linux.dev> (Martin KaFai
+	Lau's message of "Fri, 8 Aug 2025 14:31:33 -0700")
+References: <20250804-skb-metadata-thru-dynptr-v6-0-05da400bfa4b@cloudflare.com>
+	<20250804-skb-metadata-thru-dynptr-v6-9-05da400bfa4b@cloudflare.com>
+	<7a73fb00-9433-40d7-acb7-691f32f198ff@linux.dev>
+	<87h5yi82gp.fsf@cloudflare.com>
+	<e30d66a8-c4de-4d81-880d-36d996b67854@linux.dev>
+Date: Tue, 12 Aug 2025 15:12:28 +0200
+Message-ID: <87tt2cr8eb.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-The igb driver currently causes a NULL pointer dereference when executing
-the ethtool loopback test. This occurs because there is no associated
-q_vector for the test ring when it is set up, as interrupts are typically
-not added to the test rings.
+On Fri, Aug 08, 2025 at 02:31 PM -07, Martin KaFai Lau wrote:
+> On 8/8/25 4:41 AM, Jakub Sitnicki wrote:
+>> On Thu, Aug 07, 2025 at 05:33 PM -07, Martin KaFai Lau wrote:
+>>> On 8/4/25 5:52 AM, Jakub Sitnicki wrote:
+>>>> +/* Check that skb_meta dynptr is empty */
+>>>> +SEC("tc")
+>>>> +int ing_cls_dynptr_empty(struct __sk_buff *ctx)
+>>>> +{
+>>>> +	struct bpf_dynptr data, meta;
+>>>> +	struct ethhdr *eth;
+>>>> +
+>>>> +	bpf_dynptr_from_skb(ctx, 0, &data);
+>>>> +	eth = bpf_dynptr_slice_rdwr(&data, 0, NULL, sizeof(*eth));
+>>>
+>>> If this is bpf_dynptr_slice() instead of bpf_dynptr_slice_rdwr() and...
+>>>
+>>>> +	if (!eth)
+>>>> +		goto out;
+>>>> +	/* Ignore non-test packets */
+>>>> +	if (eth->h_proto != 0)
+>>>> +		goto out;
+>>>> +	/* Packet write to trigger unclone in prologue */
+>>>> +	eth->h_proto = 42;
+>>>
+>>> ... remove this eth->h_proto write.
+>>>
+>>> Then bpf_dynptr_write() will succeed. like,
+>>>
+>>>          bpf_dynptr_from_skb(ctx, 0, &data);
+>>>          eth = bpf_dynptr_slice(&data, 0, NULL, sizeof(*eth));
+>>> 	if (!eth)
+>>>                  goto out;
+>>>
+>>> 	/* Ignore non-test packets */
+>>>          if (eth->h_proto != 0)
+>>> 		goto out;
+>>>
+>>>          bpf_dynptr_from_skb_meta(ctx, 0, &meta);
+>>>          /* Expect write to fail because skb is a clone. */
+>>>          err = bpf_dynptr_write(&meta, 0, (void *)eth, sizeof(*eth), 0);
+>>>
+>>> The bpf_dynptr_write for a skb dynptr will do the pskb_expand_head(). The
+>>> skb_meta dynptr write is only a memmove. It probably can also do
+>>> pskb_expand_head() and change it to keep the data_meta.
+>>>
+>>> Another option is to set the DYNPTR_RDONLY_BIT in bpf_dynptr_from_skb_meta() for
+>>> a clone skb. This restriction can be removed in the future.
+>> Ah, crap. Forgot that bpf_dynptr_write->bpf_skb_store_bytes calls
+>> bpf_try_make_writable(skb) behind the scenes.
+>> OK, so the head page copy for skb clone happens either in BPF prologue
+>> or lazily inside bpf_dynptr_write() call today.
+>> Best if I make it consistent for skb_meta from the start, no?
+>> Happy to take a shot at tweaking pskb_expand_head() to keep the metadata
+>> in tact, while at it.
+>
+> There is no write helper for the data_meta now. It must directly write to
+> skb->data_meta, so data_meta is a read-only for a clone now. I guess the current
+> use case is mostly for tc to read the data_meta immediately after the xdp prog
+> has added it (fwiw, it is how we tried to use it also), so it is usually not a
+> clone (?). Not even sure if it currently has a write use case considering, 1)
+> there is no bpf_"skb"_adjust_meta, and 2) the upper layer cannot use it.
+>
+> No strong opinion to either copy the metadata on a clone or set the dynptr
+> rdonly for a clone. I am ok with either way.
+>
+> A brain dump:
+> On one hand, it is hard to comment without visibility on how will it look like
+> when data_meta can be preserved in the future, e.g. what may be the overhead but
+> there is flags in bpf_dynptr_from_skb_meta and bpf_dynptr_write, so there is
+> some flexibility. On the other hand, having a copy will be less surprise on the
+> clone skb like what we have discovered in this and the earlier email thread but
+> I suspect there is actually no write use case on the skb data_meta now.
 
-Since commit 5ef44b3cb43b removed the napi_id assignment in
-__xdp_rxq_info_reg(), there is no longer a need to pass a napi_id to it.
-Therefore, simply use 0 as the last parameter.
+All makes sense.
 
-Fixes: 2c6196013f84 ("igb: Add AF_XDP zero-copy Rx support")
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Reviewed-by: Joe Damato <joe@dama.to>
-Signed-off-by: Tianyu Xu <tianyxu@cisco.com>
----
-Thanks to Aleksandr and Joe for your feedback. I have added the Fixes tag
-and formatted the lines to 75 characters based on your comments.
+To keep things simple and consistent, it would be best to have a single
+unclone (bpf_try_make_writable) point caused by a write to metadata
+through an skb clone.
 
- drivers/net/ethernet/intel/igb/igb_main.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Today, the unclone in the prologue can already be triggered by a write
+to data_meta from a dead branch. Despite being useless, since
+pskb_expand_head resets meta_len.
 
-diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
-index a9a7a94ae..453deb6d1 100644
---- a/drivers/net/ethernet/intel/igb/igb_main.c
-+++ b/drivers/net/ethernet/intel/igb/igb_main.c
-@@ -4453,8 +4453,7 @@ int igb_setup_rx_resources(struct igb_ring *rx_ring)
- 	if (xdp_rxq_info_is_reg(&rx_ring->xdp_rxq))
- 		xdp_rxq_info_unreg(&rx_ring->xdp_rxq);
- 	res = xdp_rxq_info_reg(&rx_ring->xdp_rxq, rx_ring->netdev,
--			       rx_ring->queue_index,
--			       rx_ring->q_vector->napi.napi_id);
-+			       rx_ring->queue_index, 0);
- 	if (res < 0) {
- 		dev_err(dev, "Failed to register xdp_rxq index %u\n",
- 			rx_ring->queue_index);
--- 
-2.39.5 (Apple Git-154)
+We also need the prologue unclone for bpf_dynptr_slice_rdwr created from
+an skb_meta dynptr, because creating a slice does not invalidate packet
+pointers by contract.
+
+So I'm thinking it makes sense to unclone in the prologue if we see a
+potential bpf_dynptr_write to skb_meta dynptr as well. This could be
+done by tweaking check_helper_call to set the seen_direct_write flag:
+
+static int check_helper_call(...)
+{
+        // ...
+       	switch (func_id) {
+        // ...
+	case BPF_FUNC_dynptr_write:
+	{
+                // ...
+		dynptr_type = dynptr_get_type(env, reg);
+                // ...
+		if (dynptr_type == BPF_DYNPTR_TYPE_SKB ||
+		    dynptr_type == BPF_DYNPTR_TYPE_SKB_META)
+			changes_data = true;
+		if (dynptr_type == BPF_DYNPTR_TYPE_SKB_META)
+			env->seen_direct_write = true;
+
+		break;
+	}
+        // ...
+}
+
+That would my the plan for the next iteration, if it sounds sensible.
+
+As for keeping metadata intact past a pskb_expand_head call, on second
+thought, I'd leave that for the next patch set, to keep the patch count
+within single digits.
 
 
