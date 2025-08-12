@@ -1,74 +1,107 @@
-Return-Path: <netdev+bounces-212912-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212913-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3DA5B227E9
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 15:11:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 125EAB227D9
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 15:10:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C47A51BC4F64
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 13:02:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4C403A98D6
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 13:03:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C046326FDB3;
-	Tue, 12 Aug 2025 12:59:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A77E178372;
+	Tue, 12 Aug 2025 13:02:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ZsCW8XIR"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="oKY5UMkr";
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="gXIwkCQ1"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 934AA26D4EB
-	for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 12:59:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C65B119ADA2;
+	Tue, 12 Aug 2025 13:02:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755003599; cv=none; b=aZNfFMT5onpWRWVa97WSgG6J0y8WLACFRk2xrhvgvYASZ+02mBRhmvjk6OjBnNH2flac5IztmgiXnE99DJtSV441SdvGBGdhQWKU+VZ+DFxWdF3N6nS2BImLVREe1eXwgoGhBc+3ItvGJ7L5BbJLRULilHv7v9Iz5dbA0ZXUJSs=
+	t=1755003765; cv=none; b=XPCL+JIsyMStx0WNtHemGhmDR/EchNP1Xs3OsXN8nwvziqWiZmR98k4Bsbk88ca6WbCRDak3BrTTkKx7ARriyixRlHdZsyQnD56HS4HyHncZCkjwSV8EfGuM+uZLriATjXLKSoUm/XfYvbMhkyY8xK+lRt4L2QDq5JzfvEJsJHE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755003599; c=relaxed/simple;
-	bh=mCgHARsbpZ7EY554DIC9n1x9vqvKr/9JFz03m7Kkabo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FUQ5CF531/4vKBFpd+0+vbIiQC8k/Icl2dZN2+wqQ4p+7VX7WdSN3ONUkJ3L/Ox+NP/I5JbQp3l/Z9MDA9HgXcYjPmHG2JlX/RZXF/CHLm5+IV8hPBFKIs4l6NSgSXHuSHlQSKb7/t+RfQhGfXeeRvovgJt6hTcdEWjirq18fBc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ZsCW8XIR; arc=none smtp.client-ip=95.215.58.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <a3f91ab5-d9da-4ef8-aecc-8d1264b8bf6a@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1755003595;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mCgHARsbpZ7EY554DIC9n1x9vqvKr/9JFz03m7Kkabo=;
-	b=ZsCW8XIRBW7teClXRZ+8EbhGeu4OblIhYW5uHjpFG0sbzgzj2LBa8mlJqqzfsF/4MBtQE5
-	N42DaeXIjcneIl/L4AHwKUSbEPYdkagOANGspRGyHBcKR8eqKuibO/VmcenC4T+Dgo0Y4C
-	4DszPisWbfot1vHk734PjmS5PQeGvaU=
-Date: Tue, 12 Aug 2025 13:59:42 +0100
+	s=arc-20240116; t=1755003765; c=relaxed/simple;
+	bh=hF4N0ur3iJ8jD2s2cmdeDWXctMqDSnF4apK66vD/nQ0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tLTFAOF42lkXV9YpGqb4yKXhnOwCQRogflN7s8Dk+Doj5zVkGEj4dp/+qF9HBLBCigq4qjpEk+aahSErCxLIAuvgc4proInN1exoYoIABWKCsB6PPj+n2Ux4vLJoRGOQMvQM6X5ToJN+SV40YN+kONjRIl+R10lceYGfWi4WZs8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=oKY5UMkr; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=gXIwkCQ1; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: by mail.netfilter.org (Postfix, from userid 109)
+	id 2824E606FC; Tue, 12 Aug 2025 15:02:41 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1755003761;
+	bh=evoH9a8QCOaR7pv6eWp+7tmYBWdbldvMsHMUrW2jCVI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=oKY5UMkrnyeA2SeEorRyk9mEs7SHjXbd7Tb1xNEkkRr2wXL5M6Bu99+V7PapIOFO2
+	 Z/EhzIRls6e+pbNcJuhguVFVR+shSLnNo6/w8LCCEoscDILEayBIMgt91dbv8vwirY
+	 6xtzvap503KI5lM8ClTZV6ULZydgk0sYk8valh01byQ+HopCXKrHMkYBrzY5lsjtpM
+	 3TNiTMrkb3jFYFD5RqGRtaVASyDEdMsIc0eoOmntK2zbgj3ibgh+iPshhsu2U5OINo
+	 l7U0cxKmZJQn0jWQTZyaJo6vGtfVpowRYwqdpYMdrme8OFyYCYkH8Us66re76+T3R5
+	 5nvwGQXOJB8Eg==
+X-Spam-Level: 
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with ESMTPSA id B614A606FC;
+	Tue, 12 Aug 2025 15:02:38 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1755003758;
+	bh=evoH9a8QCOaR7pv6eWp+7tmYBWdbldvMsHMUrW2jCVI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gXIwkCQ1uYAnGRGAPS+tUxNiGkuBwClHbgrCcxL6V7x5Zw7J5JuivP6EFIzT/KY7J
+	 ZQxVm0GA8FueH9ZFdZOUd5xX5irkvrihTxHpUq0AOtF+5R14Yj0GUPRPolmpVJVNks
+	 1PTmTGRtAWzcteGFmEP1bTeJKSoeQDZXja00Oqx19K42szRgWJ1I8i+U9LsfJ0CZ9d
+	 ELFB9VlcHJEnfOuiENkO4V5CHmaek8BTxWlKCzqU8cHN7lrM3kRC8dCJXzRzqdcFZu
+	 qPFG2MWKGDSHnWtxyifUtW1udgxIZ4vkeljM1iABPjxnV9eefPUjfL1in/LyyhMONH
+	 tfApuC6OLLLLg==
+Date: Tue, 12 Aug 2025 15:02:35 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Qingfang Deng <dqfext@gmail.com>
+Cc: Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Felix Fietkau <nbd@nbd.name>, linux-ppp@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] ppp: fix race conditions in ppp_fill_forward_path
+Message-ID: <aJs7az9VnJ6aUwQT@calendula>
+References: <20250811084427.178739-1-dqfext@gmail.com>
+ <CANn89iLEMss3VGiJCo=XGVFBSA12bz0y01vVdmBN7WysBLtoUA@mail.gmail.com>
+ <CALW65jZ-uBWOkxPVMQc3Yg-KEoVRdPQYVC3+q5MiQbvpDZBKTQ@mail.gmail.com>
+ <CALW65jYNMNArwzmpHhYj3fpfL0Oz2fRYsJz0JMDUnyByu-8z3w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next 2/2] devlink/port: Simplify return checks
-To: Parav Pandit <parav@nvidia.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- netdev@vger.kernel.org
-Cc: jiri@resnulli.us, Jiri Pirko <jiri@nvidia.com>
-References: <20250812035106.134529-1-parav@nvidia.com>
- <20250812035106.134529-3-parav@nvidia.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20250812035106.134529-3-parav@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CALW65jYNMNArwzmpHhYj3fpfL0Oz2fRYsJz0JMDUnyByu-8z3w@mail.gmail.com>
 
-On 12/08/2025 04:51, Parav Pandit wrote:
-> Drop always returning 0 from the helper routine and simplify
-> its callers.
+On Tue, Aug 12, 2025 at 05:38:02PM +0800, Qingfang Deng wrote:
+> On Mon, Aug 11, 2025 at 5:35 PM Qingfang Deng <dqfext@gmail.com> wrote:
+> >
+> > On Mon, Aug 11, 2025 at 5:19 PM Eric Dumazet <edumazet@google.com> wrote:
+> > >
+> > > On Mon, Aug 11, 2025 at 1:44 AM Qingfang Deng <dqfext@gmail.com> wrote:
+> > > It is unclear if rcu_read_lock() is held at this point.
+> > >
+> > > list_first_or_null_rcu() does not have a builtin __list_check_rcu()
+> >
+> > ndo_fill_forward_path() is called by nf_tables chains, which is inside
+> > an RCU critical section.
+> 
+> Update: mtk_flow_get_wdma_info() in mtk_ppe_offload.c calls
+> dev_fill_forward_path() in process context without RCU, so
+> ppp_fill_forward_path() can be called from two different contexts.
+> Should I add rcu_read_lock() to mtk_flow_get_wdma_info() or
+> ppp_fill_forward_path()?
 
-
-Oh, I see, you split it into 2 patches, but I'm not sure it's actually
-needed, because the first patch doesn't look logical on its own...
+mtk_flow_get_wdma_info() seems to be the exception at this point, so
+I'm inclined to add rcu_read_lock() to mtk_flow_get_wdma_info().
 
