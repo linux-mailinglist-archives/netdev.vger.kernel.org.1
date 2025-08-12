@@ -1,129 +1,156 @@
-Return-Path: <netdev+bounces-212824-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212402-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C685FB2229E
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 11:16:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1822FB1FEF3
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 08:04:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7469A173C1C
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 09:14:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A220189B58D
+	for <lists+netdev@lfdr.de>; Mon, 11 Aug 2025 06:04:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C0002E7F1D;
-	Tue, 12 Aug 2025 09:14:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U05wqZda"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F624278E77;
+	Mon, 11 Aug 2025 06:04:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE57A2E7BBE
-	for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 09:14:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00F5E26E158;
+	Mon, 11 Aug 2025 06:04:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754990086; cv=none; b=CcH8uY181d+2/8UvVVUB7wqYk2fkLHMf1snlS1JTXTXIbczaf8fTOP/WX6l3U1eY817TATARzs1q5j/BaSrd6EP5NuXm2MzdC4xP610kkVsYNiYiazo4HdXaa1Voc3Sx7hsfa8oyJE5e+ImU5CtiXOgRkmS+KXZlzCNO9UB9oyc=
+	t=1754892251; cv=none; b=owAefLKvDftp1Moh5zlgsSvxOnE5HLg7u1xUYh/TxvaHMA3JKdaV27LUTfjNMU5dvhSsAJ/plbvul7h15LEz20pTkCjhBAacvQOofGKFBa//qpFcqiCcv9mm3DXQvxdDFWXc986Bcr8M1sfxv9PN5bbNEZzkzX3I8TAvYA0Cywk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754990086; c=relaxed/simple;
-	bh=fbkvdHbzO5iMyqUyNMSQ2ifyYq35TUmApmNBn7z38C8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=n0mF25a3xHqB0ieGOahdMGBRaf5qa9RC83pQ71qIYvUPTkHVtOAkCbrdSM24vXBpHFmOPDCdl3g4C4iwijuk7fo3x85CPfp2gw3KmHDRw4b6Rgh48Ix3Wp9YzkzP4vKriedEsIoGaIQ+eqeuZRhEQy1A4fDVX5bGKkw52j5iHJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=U05wqZda; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1754990083;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GfnH6UdWPTLsT4NE037V+5yMnBpvuJn2hgsl4bTLdLY=;
-	b=U05wqZdaaFrxmbAMhoc4EWztNWUjs59w/KZ+Ku6rUz8TIh5pPHsW44pwu/vnCKScBJ4qko
-	uFXj7TOAsDh9Bf9iGnv91up8j/p0yTejY3r2hQlBF8SGy1CXKBTKGt6pDhqa1Y8D/2HuNE
-	+O7jG919gHynclc1RR9YD3banrM+B44=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-554-JbVaS0flOniJcKFoSy051Q-1; Tue, 12 Aug 2025 05:14:42 -0400
-X-MC-Unique: JbVaS0flOniJcKFoSy051Q-1
-X-Mimecast-MFC-AGG-ID: JbVaS0flOniJcKFoSy051Q_1754990081
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-459f53d29d2so22305055e9.1
-        for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 02:14:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754990080; x=1755594880;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GfnH6UdWPTLsT4NE037V+5yMnBpvuJn2hgsl4bTLdLY=;
-        b=ewaoIsmT3E3oa7775xWdGiMf/XcHu7ofhF++RZnOwysms5254NqC9SPyOVvt1TRFVU
-         tTu7smbFlYjROU22x/EbNhJ85Itn8NIs6hccH4dSYeoG5YPC1TVT1U4RM38TNJi1yGEk
-         at5qvJIKXRzOw+bXkcvggoN9Ksk67qvDBakNQ3VifOQ6LZCmEhYEGuhU1gV1yPFCITef
-         QCaK06S5sYQ5BZzdJUitx9S+1CdqYIiLHK7OYHbR0A3mCNCKOh+1rq+c6vg4vMwdDRnY
-         lwlueb0arf4Og4cWqHkm6SeXd2AKIcpFqSSvGU/nDFHPEI14y8JffwGkMCGoxEmtVwnC
-         e5eg==
-X-Forwarded-Encrypted: i=1; AJvYcCUhnmTlVaRug4qAZd/nSk4pmqXSreVjid6t/M3fInEmhzqSIUPEvCOcgWhFcjJTJUakaHcwVsY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxqqTxmpPpAgOQRPeZvhtiHUDHzqfrENFKrOZzlruNSQ8M9nCaJ
-	Fzk7q3fiUL7HzXZ/Ot41X2kZA3+d9JXdhnXfCzKrB2rA6ruD1g7G/c3PitZG2+VckWb09GQwo3e
-	znhj14SEf3j91YbDpWtifpfhZ9KZ5nHxMuszjZ28tbx7XNcDGf9xx9Mdlmpxon8k33w==
-X-Gm-Gg: ASbGncuvD2KS41GEhFtTUG/zDELURa30gGGk/8SLOdsV5qsQdWcEMo2rHPpnRrs1Eyw
-	Gkrc7xorMX9qKrdqX3vJem+LkXG6frZFuYSehSOxaxtfDfsMc4J7oSG/Mk/Ci7pBQDddp4dcMwo
-	48mcdNGSfjTP1eictLlNMfTPjxupxKXNnRJKldm5A/3czf2r8FR6oMWm7eXRIOdCSGvYj+uAdTy
-	Vb5iFdcevEF8UKy5oDOlJ2t06HJBQ4rwBDGLQkv4ESA7ByB05xYoS0q+2RZ6s4If5NTDWlZTez7
-	ykFy+4hl8Ln2nWiFm9/837FQOC2Qede9r4upofSbpH4=
-X-Received: by 2002:a05:600c:a46:b0:453:5a04:b60e with SMTP id 5b1f17b1804b1-45a10c0020amr20225215e9.26.1754990080407;
-        Tue, 12 Aug 2025 02:14:40 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF6aoDZQH3cS2UCnVzBBG1Izm2yKQoFjrOrA+8ZiuIJILKKDdscGnHzDMcfx14lN7+SN/qnwA==
-X-Received: by 2002:a05:600c:a46:b0:453:5a04:b60e with SMTP id 5b1f17b1804b1-45a10c0020amr20224905e9.26.1754990080025;
-        Tue, 12 Aug 2025 02:14:40 -0700 (PDT)
-Received: from [192.168.0.115] ([212.105.149.252])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b79c3ac093sm45795951f8f.9.2025.08.12.02.14.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 Aug 2025 02:14:39 -0700 (PDT)
-Message-ID: <fb08ab9f-4d15-48c4-bd2e-52077dce0b82@redhat.com>
-Date: Tue, 12 Aug 2025 11:14:38 +0200
+	s=arc-20240116; t=1754892251; c=relaxed/simple;
+	bh=ctSPiFu6RxHbHTQGoEFvUuZ95n28wDMaCdZTgvF3HZw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=q6uD/I5LzjuLmnGEKFWJfeUFGyzyaBn56EAjRIHMnc60FLmEofFFvFHD0oNf5N+tNMxkqn6+JOHe8WGtrXfAhXtVioWxwPk9cmx6LpP8zr+LwjEzL290cn7Zci76UbmazXFI6da7gzg6VUNGCvsyVzMEgC+yEQKZ1p/ChycYxTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4c0kZT4r4MztT8T;
+	Mon, 11 Aug 2025 14:02:57 +0800 (CST)
+Received: from dggpemf500016.china.huawei.com (unknown [7.185.36.197])
+	by mail.maildlp.com (Postfix) with ESMTPS id 43E2A18006C;
+	Mon, 11 Aug 2025 14:03:58 +0800 (CST)
+Received: from huawei.com (10.175.104.170) by dggpemf500016.china.huawei.com
+ (7.185.36.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Mon, 11 Aug
+ 2025 14:03:57 +0800
+From: Wang Liang <wangliang74@huawei.com>
+To: <razor@blackwall.org>, <idosch@nvidia.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<horms@kernel.org>
+CC: <bridge@lists.linux.dev>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <yuehaibing@huawei.com>,
+	<zhangchangzhong@huawei.com>, <wangliang74@huawei.com>
+Subject: [PATCH net v2] net: bridge: fix soft lockup in br_multicast_query_expired()
+Date: Tue, 12 Aug 2025 17:18:18 +0800
+Message-ID: <20250812091818.542238-1-wangliang74@huawei.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv2 net 2/3] bonding: send LACPDUs periodically in passive
- mode after receiving partner's LACPDU
-To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
-Cc: Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Nikolay Aleksandrov <razor@blackwall.org>,
- Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250805094634.40173-1-liuhangbin@gmail.com>
- <20250805094634.40173-3-liuhangbin@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250805094634.40173-3-liuhangbin@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
+ dggpemf500016.china.huawei.com (7.185.36.197)
 
-On 8/5/25 11:46 AM, Hangbin Liu wrote:
-> @@ -95,13 +95,13 @@ static int ad_marker_send(struct port *port, struct bond_marker *marker);
->  static void ad_mux_machine(struct port *port, bool *update_slave_arr);
->  static void ad_rx_machine(struct lacpdu *lacpdu, struct port *port);
->  static void ad_tx_machine(struct port *port);
-> -static void ad_periodic_machine(struct port *port, struct bond_params *bond_params);
-> +static void ad_periodic_machine(struct port *port);
->  static void ad_port_selection_logic(struct port *port, bool *update_slave_arr);
->  static void ad_agg_selection_logic(struct aggregator *aggregator,
->  				   bool *update_slave_arr);
->  static void ad_clear_agg(struct aggregator *aggregator);
->  static void ad_initialize_agg(struct aggregator *aggregator);
-> -static void ad_initialize_port(struct port *port, int lacp_fast);
-> +static void ad_initialize_port(struct port *port, struct bond_params *bond_params);
+When set multicast_query_interval to a large value, the local variable
+'time' in br_multicast_send_query() may overflow. If the time is smaller
+than jiffies, the timer will expire immediately, and then call mod_timer()
+again, which creates a loop and may trigger the following soft lockup
+issue.
 
-The `bond_params` argument should be constified.
+  watchdog: BUG: soft lockup - CPU#1 stuck for 221s! [rb_consumer:66]
+  CPU: 1 UID: 0 PID: 66 Comm: rb_consumer Not tainted 6.16.0+ #259 PREEMPT(none)
+  Call Trace:
+   <IRQ>
+   __netdev_alloc_skb+0x2e/0x3a0
+   br_ip6_multicast_alloc_query+0x212/0x1b70
+   __br_multicast_send_query+0x376/0xac0
+   br_multicast_send_query+0x299/0x510
+   br_multicast_query_expired.constprop.0+0x16d/0x1b0
+   call_timer_fn+0x3b/0x2a0
+   __run_timers+0x619/0x950
+   run_timer_softirq+0x11c/0x220
+   handle_softirqs+0x18e/0x560
+   __irq_exit_rcu+0x158/0x1a0
+   sysvec_apic_timer_interrupt+0x76/0x90
+   </IRQ>
 
-Thanks,
+This issue can be reproduced with:
+  ip link add br0 type bridge
+  echo 1 > /sys/class/net/br0/bridge/multicast_querier
+  echo 0xffffffffffffffff >
+  	/sys/class/net/br0/bridge/multicast_query_interval
+  ip link set dev br0 up
 
-Paolo
+The multicast_startup_query_interval can also cause this issue. Similar to
+the commit 99b40610956a("net: bridge: mcast: add and enforce query interval
+minimum"), add check for the query interval maximum to fix this issue.
 
+Link: https://lore.kernel.org/netdev/20250806094941.1285944-1-wangliang74@huawei.com/
+Fixes: 7e4df51eb35d ("bridge: netlink: add support for igmp's intervals")
+Suggested-by: Nikolay Aleksandrov <razor@blackwall.org>
+Signed-off-by: Wang Liang <wangliang74@huawei.com>
+---
+ net/bridge/br_multicast.c | 16 ++++++++++++++++
+ net/bridge/br_private.h   |  2 ++
+ 2 files changed, 18 insertions(+)
+
+diff --git a/net/bridge/br_multicast.c b/net/bridge/br_multicast.c
+index 1377f31b719c..8ce145938b02 100644
+--- a/net/bridge/br_multicast.c
++++ b/net/bridge/br_multicast.c
+@@ -4818,6 +4818,14 @@ void br_multicast_set_query_intvl(struct net_bridge_mcast *brmctx,
+ 		intvl_jiffies = BR_MULTICAST_QUERY_INTVL_MIN;
+ 	}
+ 
++	if (intvl_jiffies > BR_MULTICAST_QUERY_INTVL_MAX) {
++		br_info(brmctx->br,
++			"trying to set multicast query interval above maximum, setting to %lu (%ums)\n",
++			jiffies_to_clock_t(BR_MULTICAST_QUERY_INTVL_MAX),
++			jiffies_to_msecs(BR_MULTICAST_QUERY_INTVL_MAX));
++		intvl_jiffies = BR_MULTICAST_QUERY_INTVL_MAX;
++	}
++
+ 	brmctx->multicast_query_interval = intvl_jiffies;
+ }
+ 
+@@ -4834,6 +4842,14 @@ void br_multicast_set_startup_query_intvl(struct net_bridge_mcast *brmctx,
+ 		intvl_jiffies = BR_MULTICAST_STARTUP_QUERY_INTVL_MIN;
+ 	}
+ 
++	if (intvl_jiffies > BR_MULTICAST_STARTUP_QUERY_INTVL_MAX) {
++		br_info(brmctx->br,
++			"trying to set multicast startup query interval above maximum, setting to %lu (%ums)\n",
++			jiffies_to_clock_t(BR_MULTICAST_STARTUP_QUERY_INTVL_MAX),
++			jiffies_to_msecs(BR_MULTICAST_STARTUP_QUERY_INTVL_MAX));
++		intvl_jiffies = BR_MULTICAST_STARTUP_QUERY_INTVL_MAX;
++	}
++
+ 	brmctx->multicast_startup_query_interval = intvl_jiffies;
+ }
+ 
+diff --git a/net/bridge/br_private.h b/net/bridge/br_private.h
+index b159aae594c0..8de0904b9627 100644
+--- a/net/bridge/br_private.h
++++ b/net/bridge/br_private.h
+@@ -31,6 +31,8 @@
+ #define BR_MULTICAST_DEFAULT_HASH_MAX 4096
+ #define BR_MULTICAST_QUERY_INTVL_MIN msecs_to_jiffies(1000)
+ #define BR_MULTICAST_STARTUP_QUERY_INTVL_MIN BR_MULTICAST_QUERY_INTVL_MIN
++#define BR_MULTICAST_QUERY_INTVL_MAX msecs_to_jiffies(86400000) /* 24 hours */
++#define BR_MULTICAST_STARTUP_QUERY_INTVL_MAX BR_MULTICAST_QUERY_INTVL_MAX
+ 
+ #define BR_HWDOM_MAX BITS_PER_LONG
+ 
+-- 
+2.33.0
 
 
