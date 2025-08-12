@@ -1,233 +1,267 @@
-Return-Path: <netdev+bounces-212770-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212771-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88397B21C53
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 06:52:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26D26B21C73
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 06:58:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3DF403ACF40
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 04:51:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3559E1907A3F
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 04:58:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86D222D8375;
-	Tue, 12 Aug 2025 04:51:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6F812DA753;
+	Tue, 12 Aug 2025 04:57:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="fOnAaO7L"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aXedLaic"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2054.outbound.protection.outlook.com [40.107.236.54])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2045C1E47AD;
-	Tue, 12 Aug 2025 04:51:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754974274; cv=fail; b=OvdWGn8bTJOlTc5N5eGnYCKbiL1xNelvrz6EuIg7EoPrlLUDVhWK8vIoOT4od/Fh0imgg7R3bbiBa6iCX5zvQodkU0X2x8x8IleWKUeABkwiU6oRl+2EzdQhJwW2NlRUhDIbnHpD4qBEkpoObUDgrTfTfbeRlKQyQBrP02wKm/I=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754974274; c=relaxed/simple;
-	bh=YytZt8IoAzHWLPH/+HxpSFiOpY5vYNuxCqflYXscHss=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Cp8CB/LzYBX+riaBxQa1io5c2XxGpwsQ//j3KyjEgKTlnxUVyU9uWMwQ20r0JwsR+7DF1Nu3JBa6Kf6wm+Mvi2psld7teOigpBlda+uh+iOM/A0bOpQUSBtEYMGFiRKXLjcScxTemHMY99Pvgvk4736vcVFRappcuTXx1sVaQGg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=fOnAaO7L; arc=fail smtp.client-ip=40.107.236.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Go9zOU2qtwXqAY0tIddYQMD8MqnOUEHrZZ6GDQZDzrh4WbgFUiUqyTC98kVi31qqHcLcg8AAGaGvuzKNuk7vk3Y3z7hjB/ENehkuchoEZuBw5UAziZsX0BjME1pFl5UVTjr7vUlrvAf7htvtC9wpzxCgYJKusMEZ+o5GVnsYIbZQxZIptH+wDf1mAHg/q8tg7GNBEIgKDA6CJaABYsHC9xq52xhVuoUx0ztjo4IeAwelp6ta0DYnjKeqdeAzEzm86qI9O0pzYIGSJZ8RuWlcdwMVtURF+495aMTGH5v+uxnxEmKyQg5Ep3tetZ2s+9s14zHFytX9IBB/Kuowu/u17Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=GHEeQqSC4jlgMfu96eMuP+VLvYYaCRIEbt88wY9p+gQ=;
- b=kGXv405w9NwKM7SuTql7C34YQJAxnZlAVcIx7lFYeCB4vVQLJvkdlqn5rNUc6eUCsjjn3jDiDN/UFb7rplvO8P3MO/KVF4YjpILLvAcjJJsJ+FC9FpO7DVZ6Y5wSreQEZ+bzvdjLiQhBH63zPXf8KaOTVqBycLJHcwKvWDNHe5aIjFmQKfPbfMkawujrjMea2bbHyjn1hAngqQN5rVobYJnqSS5GH3LQqBLOdHIKQ6U2/DP4+NU0iLdYPfhdiS1gi0yUO68L9H1a37VAWkvmi5ndbF5sacJTw/qe4pjq+ZIdP15ap6eID+gTyYQrc98jnUN2Ou+8MjaGrLd49lNRDQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=lunn.ch smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GHEeQqSC4jlgMfu96eMuP+VLvYYaCRIEbt88wY9p+gQ=;
- b=fOnAaO7LOHvEWqC9A0daxMhhV6JZ/km9HR4bDFBAkwboLyqtMMAbfvNNib6ixoCmvpk0ooNaYR8NIlYjUY7gyBPyrBtRv493kQRmQwwjfe8knE4pi5DCtzuNIb4jNAX8DXJHS89pzVh/1B9WbhdWfpY+SJoDC3UfXatK3JNOVpQ=
-Received: from BN9PR03CA0279.namprd03.prod.outlook.com (2603:10b6:408:f5::14)
- by MN0PR12MB5979.namprd12.prod.outlook.com (2603:10b6:208:37e::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9009.21; Tue, 12 Aug
- 2025 04:51:07 +0000
-Received: from BN2PEPF000044AA.namprd04.prod.outlook.com
- (2603:10b6:408:f5:cafe::e6) by BN9PR03CA0279.outlook.office365.com
- (2603:10b6:408:f5::14) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8989.18 via Frontend Transport; Tue,
- 12 Aug 2025 04:51:07 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BN2PEPF000044AA.mail.protection.outlook.com (10.167.243.105) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.9031.11 via Frontend Transport; Tue, 12 Aug 2025 04:51:07 +0000
-Received: from airavat.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 11 Aug
- 2025 23:51:02 -0500
-From: Vishal Badole <Vishal.Badole@amd.com>
-To: <Shyam-sundar.S-k@amd.com>, <andrew+netdev@lunn.ch>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: Vishal Badole <Vishal.Badole@amd.com>
-Subject: [PATCH v2 net-next] amd-xgbe: Configure and retrieve 'tx-usecs' for Tx coalescing
-Date: Tue, 12 Aug 2025 10:20:35 +0530
-Message-ID: <20250812045035.3376179-1-Vishal.Badole@amd.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1EC52D948C;
+	Tue, 12 Aug 2025 04:57:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1754974674; cv=none; b=WJ0dZNhZigjckBv5AHyiHmO45QJHS8OYO/BZ23AXgr5w4Tv7wu4gKiCnRR6NAsnMWfdCJjjDNDPItmflldhb/ftOSiPGfvOXoJpW3so/iJ77sEJiXq+9Qsq0YB/gqsojZw2NiU9ydQNv58m0Zu8Onh3J4RG43E1MS+cEOW7HyWI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1754974674; c=relaxed/simple;
+	bh=70iXDSsLOBL8789maTo7Y86kI/oswUmM4+UtHFYgEso=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Qgg257XVtt4k/HRE4tk3Ved+fc4iyJcwcCp7GghQ6bFNHBAJG+7VJUHbIti6PTq+5Q1cRGoMv950/LKKil5VfKN58aU4NSroFaAo7FUED6athf6s4u08gTF6/qSb5PtZvWULcTK/XYvcuZkUwyhMU1RxQmnZfFz6rB7kTa6472o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aXedLaic; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 805EAC4CEF0;
+	Tue, 12 Aug 2025 04:57:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754974674;
+	bh=70iXDSsLOBL8789maTo7Y86kI/oswUmM4+UtHFYgEso=;
+	h=From:Date:Subject:To:Cc:From;
+	b=aXedLaic+LJw7p88aP0+O4vTs5o35X9KeLpUQtIbwy35JHNux0kwghicwRtkPRGi7
+	 rSjNuOJGvcoLnoE35784tjoegvzFuuNIXx6l1qopyk5jDo+3biWIe+slM2m7bbiUtb
+	 rF0DeaS6frNG5L75MkPh9HibzHcweCsA2mqZ4ISt+SXkTJbfQrUh0ZNqbsQCl4JHZ0
+	 /Ewuqy39dR9czJW/XqAXS6t8tzHNjxPIFpLTswAKuqC1ATfFKLnUBCsZtZ/w+3PJmx
+	 sNgJPhP+/8MZJ7Qy+Awcc4iaoYQprnTCpc9jIzdNUMQTDmM7PSivQQFvbeQdouZ9Gf
+	 966Uh5QzxNYMw==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Date: Tue, 12 Aug 2025 06:57:23 +0200
+Subject: [PATCH net-next v3] net: mediatek: wed: Introduce MT7992 WED
+ support to MT7988 SoC
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN2PEPF000044AA:EE_|MN0PR12MB5979:EE_
-X-MS-Office365-Filtering-Correlation-Id: 837176fc-0fa1-4625-8105-08ddd95bd9c2
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|376014|1800799024|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?TFSoz5S10UhFtIKhBBFC8LWCJ/hk3CPLyo83T9h7O7xme5OcxC1b9RB2PUBG?=
- =?us-ascii?Q?N6WaB1bbvqBhr3OhILBD4lPmfhLMrsaRxQAYalNV43WqzA5koCRbNgt9nLeh?=
- =?us-ascii?Q?LEc21AOt9kPUwzkvusA22AfMPjh6/exK9pWQR440wKQSuk96Lr55zqsKbbBh?=
- =?us-ascii?Q?XkrWXBGgaNpHhEyn5EKNr0t8/+e5a2q/zlf471nIsmxQ5v0AEuPfY/eyiLXI?=
- =?us-ascii?Q?cOtccr5IHW0z3vTpNeAs9XC42lKW/0l7vpR3H7rwRyEMI4eUG8kd77cd27C0?=
- =?us-ascii?Q?u2sB/VAxhEgDPxbO8k1T8fQXV/X/l2wFuIYZuLgZODzu+b1w2r5XNWAxiz55?=
- =?us-ascii?Q?mJZomvG9QvlN/rCHVbVTiqeMi8sVCzcd7lN1jUFTDIT6n5w92JyNHL0vMqQF?=
- =?us-ascii?Q?Og6F58pMZjzYsbnYLnriz66bD+xFzwyGAekv5iPMUtnZtK1gCZodayuufCts?=
- =?us-ascii?Q?csIhfSs+zdM3hUZvFjc6S6A82w5buDgJq1UGgAr3ljiR+jsn84FVxB10saSj?=
- =?us-ascii?Q?E+8wXwOd3rh/kfQ5W8gmjw8pUx5U9QXCXEONKExbulB0A+PJdHUlTau9DySf?=
- =?us-ascii?Q?vks4Pcv+2wbpgRBdpFuPMroUZYq9avm299Uf3Kql3lZC6W7wYn/wwAKOx2vD?=
- =?us-ascii?Q?MCDr+Ntw8c0s8q7++QZNSspKeyD4sUmrw2LyYFtOMe5GTvHnYD5Y7glehTt1?=
- =?us-ascii?Q?dndNttHYpAY/YjxAcHpWDlRWFg1t9w6710ic2NArNcRfmGWC0fo6i+SDCq7e?=
- =?us-ascii?Q?uIOXKOwLUC4mB5eeshTIQhao/jk2swvEXwz83yet86+HShP0Uy6ToX+85uxo?=
- =?us-ascii?Q?mQfdrKy3C7d8a2JZYK0CmPNesf+SrNzgef0pZvkETEQbEzairBnsqQpOGLw3?=
- =?us-ascii?Q?RKKBdGszL3iTKxDNd6DNEwTAttIuDUGWp/rwW0VAU+5AG5ygofODkfGAKcTo?=
- =?us-ascii?Q?w1/CFl+bEp8tT3Hpw/q5/F61xjlCA7NDls/RQUoReL9k7QIcTmaDkxyiD8cc?=
- =?us-ascii?Q?hmWsRwmC3Swb9L5K7gS/uAdf9NH9zzKUzCe5nESSxPNIgK4fY42BMr0Tug77?=
- =?us-ascii?Q?WUSjsZZwJJUbfZla3XgDdVHdS0v1N7yfr1Mrwzj4TxW4G+cr9XYQwS2WiJOf?=
- =?us-ascii?Q?t2yso8JsDqWPildlOavQWQELcRPBsk09h2Pe+ez6TdvUF1h/uhVUyk4p0zmV?=
- =?us-ascii?Q?XLbWTf162VVpuX+KaxEkHkmOipWPNXvXCzI1+XpP81TQOriCuHqh42+JOOgU?=
- =?us-ascii?Q?ftxBW2LAjz8mqZXFmoMHyDqiOp3PTHb/N+7/vyJOd8DBFu9O8t2GR0ydMBcg?=
- =?us-ascii?Q?sdKcPNEJUKUgFp0DGHn66/tXcoX97hsHFLzHKe/imSPQRi2ghT3JtxtBobgy?=
- =?us-ascii?Q?5Qy0DNy2bfLu81l6BshhOJQbVvOvtoSjSLM9bsvaN613d5n3B9tcGihUSW7m?=
- =?us-ascii?Q?kzSBFTcR0r1tv54XsVS4F5g2X7MLDyLDGj48uGTSAqdUfOPbfsSpg3L2ZnGC?=
- =?us-ascii?Q?/nxQjCxJA49J55zCZIMjwZfc9g870h+OaI6e?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(376014)(1800799024)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Aug 2025 04:51:07.4710
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 837176fc-0fa1-4625-8105-08ddd95bd9c2
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BN2PEPF000044AA.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5979
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250812-mt7992-wed-support-v3-1-9ada78a819a4@kernel.org>
+X-B4-Tracking: v=1; b=H4sIALLJmmgC/23N0Q6CIBTG8VdxXEfzoAh01Xu0LkiOyipxYFRzv
+ nvo2lqbl/9vO78zkYDeYiCHbCIeow3W9SmKXUbqTvctUmtSE5YznguQ9D4KpRh9oqHhMQzOj7T
+ klea54dBIIOlw8NjY14qezqk7G0bn3+uPCMv65ZjY4iJQoFobYXRpainE8Yq+x9ve+ZYsXmQ/Q
+ wJsGiwZl0JxrqrCKK7+jHmeP5mehjv5AAAA
+X-Change-ID: 20250718-mt7992-wed-support-456a50d51f81
+To: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Matthias Brugger <matthias.bgg@gmail.com>, 
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+ Ryder Lee <ryder.lee@mediatek.com>, Shayne Chen <shayne.chen@mediatek.com>, 
+ Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, linux-wireless@vger.kernel.org, 
+ Rex Lu <rex.lu@mediatek.com>
+X-Mailer: b4 0.14.2
 
-Ethtool has advanced with additional configurable options, but the
-current driver does not support tx-usecs configuration.
+Introduce the second WDMA RX ring in WED driver for MT7988 SoC since the
+Mediatek MT7992 WiFi chipset supports two separated WDMA rings.
+Add missing MT7988 configurations to properly support WED for MT7992 in
+MT76 driver.
 
-Add support to configure and retrieve 'tx-usecs' using ethtool, which
-specifies the wait time before servicing an interrupt for Tx coalescing.
-
-Signed-off-by: Vishal Badole <Vishal.Badole@amd.com>
-Acked-by: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
-
+Co-developed-by: Rex Lu <rex.lu@mediatek.com>
+Signed-off-by: Rex Lu <rex.lu@mediatek.com>
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 ---
-v1 -> v2:
-    * Replace netdev_err() with extack interface for user error reporting.
----
- drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c | 19 +++++++++++++++++--
- drivers/net/ethernet/amd/xgbe/xgbe.h         |  1 +
- 2 files changed, 18 insertions(+), 2 deletions(-)
+Changes in v3:
+- Rebase on top of net-next main branch
+- Link to v2: https://lore.kernel.org/r/20250811-mt7992-wed-support-v2-1-b3955963d959@kernel.org
 
-diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c b/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c
-index 12395428ffe1..19cb1e2b7d92 100644
---- a/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c
-+++ b/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c
-@@ -450,6 +450,7 @@ static int xgbe_get_coalesce(struct net_device *netdev,
- 	ec->rx_coalesce_usecs = pdata->rx_usecs;
- 	ec->rx_max_coalesced_frames = pdata->rx_frames;
- 
-+	ec->tx_coalesce_usecs = pdata->tx_usecs;
- 	ec->tx_max_coalesced_frames = pdata->tx_frames;
- 
- 	return 0;
-@@ -463,7 +464,7 @@ static int xgbe_set_coalesce(struct net_device *netdev,
- 	struct xgbe_prv_data *pdata = netdev_priv(netdev);
- 	struct xgbe_hw_if *hw_if = &pdata->hw_if;
- 	unsigned int rx_frames, rx_riwt, rx_usecs;
--	unsigned int tx_frames;
-+	unsigned int tx_frames, tx_usecs;
- 
- 	rx_riwt = hw_if->usec_to_riwt(pdata, ec->rx_coalesce_usecs);
- 	rx_usecs = ec->rx_coalesce_usecs;
-@@ -485,9 +486,22 @@ static int xgbe_set_coalesce(struct net_device *netdev,
- 		return -EINVAL;
+Changes in v2:
+- Fix commit log
+- Rebase on top of net-next main branch
+- Link to v1: https://lore.kernel.org/r/20250727-mt7992-wed-support-v1-1-aad7da4dc877@kernel.org
+---
+ drivers/net/ethernet/mediatek/mtk_wed.c          | 33 +++++++++++++++++++-----
+ drivers/net/ethernet/mediatek/mtk_wed.h          |  2 +-
+ drivers/net/wireless/mediatek/mt76/mt7915/mmio.c |  6 ++---
+ drivers/net/wireless/mediatek/mt76/mt7996/mmio.c | 12 ++++-----
+ include/linux/soc/mediatek/mtk_wed.h             |  2 +-
+ 5 files changed, 38 insertions(+), 17 deletions(-)
+
+diff --git a/drivers/net/ethernet/mediatek/mtk_wed.c b/drivers/net/ethernet/mediatek/mtk_wed.c
+index 0a80d8f8cff7f415a60b0cd68c0c9c07e2c88f36..3dbb113b792cf00fb4f89ab20f7e7fa72ecac260 100644
+--- a/drivers/net/ethernet/mediatek/mtk_wed.c
++++ b/drivers/net/ethernet/mediatek/mtk_wed.c
+@@ -59,7 +59,9 @@ struct mtk_wed_flow_block_priv {
+ static const struct mtk_wed_soc_data mt7622_data = {
+ 	.regmap = {
+ 		.tx_bm_tkid		= 0x088,
+-		.wpdma_rx_ring0		= 0x770,
++		.wpdma_rx_ring = {
++			0x770,
++		},
+ 		.reset_idx_tx_mask	= GENMASK(3, 0),
+ 		.reset_idx_rx_mask	= GENMASK(17, 16),
+ 	},
+@@ -70,7 +72,9 @@ static const struct mtk_wed_soc_data mt7622_data = {
+ static const struct mtk_wed_soc_data mt7986_data = {
+ 	.regmap = {
+ 		.tx_bm_tkid		= 0x0c8,
+-		.wpdma_rx_ring0		= 0x770,
++		.wpdma_rx_ring = {
++			0x770,
++		},
+ 		.reset_idx_tx_mask	= GENMASK(1, 0),
+ 		.reset_idx_rx_mask	= GENMASK(7, 6),
+ 	},
+@@ -81,7 +85,10 @@ static const struct mtk_wed_soc_data mt7986_data = {
+ static const struct mtk_wed_soc_data mt7988_data = {
+ 	.regmap = {
+ 		.tx_bm_tkid		= 0x0c8,
+-		.wpdma_rx_ring0		= 0x7d0,
++		.wpdma_rx_ring = {
++			0x7d0,
++			0x7d8,
++		},
+ 		.reset_idx_tx_mask	= GENMASK(1, 0),
+ 		.reset_idx_rx_mask	= GENMASK(7, 6),
+ 	},
+@@ -621,8 +628,8 @@ mtk_wed_amsdu_init(struct mtk_wed_device *dev)
+ 		return ret;
  	}
  
-+	tx_usecs = ec->tx_coalesce_usecs;
- 	tx_frames = ec->tx_max_coalesced_frames;
+-	/* eagle E1 PCIE1 tx ring 22 flow control issue */
+-	if (dev->wlan.id == 0x7991)
++	/* Kite and Eagle E1 PCIE1 tx ring 22 flow control issue */
++	if (dev->wlan.id == 0x7991 || dev->wlan.id == 0x7992)
+ 		wed_clr(dev, MTK_WED_AMSDU_FIFO, MTK_WED_AMSDU_IS_PRIOR0_RING);
  
-+	/* Check if both tx_usecs and tx_frames are set to 0 simultaneously */
-+	if (!tx_usecs && !tx_frames) {
-+		NL_SET_ERR_MSG_FMT_MOD(extack,
-+				       "tx_usecs and tx_frames must not be 0 together");
-+		return -EINVAL;
+ 	wed_set(dev, MTK_WED_CTRL, MTK_WED_CTRL_TX_AMSDU_EN);
+@@ -1239,7 +1246,11 @@ mtk_wed_set_wpdma(struct mtk_wed_device *dev)
+ 		return;
+ 
+ 	wed_w32(dev, MTK_WED_WPDMA_RX_GLO_CFG, dev->wlan.wpdma_rx_glo);
+-	wed_w32(dev, dev->hw->soc->regmap.wpdma_rx_ring0, dev->wlan.wpdma_rx);
++	wed_w32(dev, dev->hw->soc->regmap.wpdma_rx_ring[0],
++		dev->wlan.wpdma_rx[0]);
++	if (mtk_wed_is_v3_or_greater(dev->hw))
++		wed_w32(dev, dev->hw->soc->regmap.wpdma_rx_ring[1],
++			dev->wlan.wpdma_rx[1]);
+ 
+ 	if (!dev->wlan.hw_rro)
+ 		return;
+@@ -2323,6 +2334,16 @@ mtk_wed_start(struct mtk_wed_device *dev, u32 irq_mask)
+ 		if (!dev->rx_wdma[i].desc)
+ 			mtk_wed_wdma_rx_ring_setup(dev, i, 16, false);
+ 
++	if (dev->wlan.hw_rro) {
++		for (i = 0; i < MTK_WED_RX_PAGE_QUEUES; i++) {
++			u32 addr = MTK_WED_RRO_MSDU_PG_CTRL0(i) +
++				   MTK_WED_RING_OFS_COUNT;
++
++			if (!wed_r32(dev, addr))
++				wed_w32(dev, addr, 1);
++		}
 +	}
 +
- 	/* Check the bounds of values for Tx */
-+	if (tx_usecs > XGMAC_MAX_COAL_TX_TICK) {
-+		NL_SET_ERR_MSG_FMT_MOD(extack, "tx-usecs is limited to %d usec",
-+				       XGMAC_MAX_COAL_TX_TICK);
-+		return -EINVAL;
-+	}
- 	if (tx_frames > pdata->tx_desc_count) {
- 		netdev_err(netdev, "tx-frames is limited to %d frames\n",
- 			   pdata->tx_desc_count);
-@@ -499,6 +513,7 @@ static int xgbe_set_coalesce(struct net_device *netdev,
- 	pdata->rx_frames = rx_frames;
- 	hw_if->config_rx_coalesce(pdata);
+ 	mtk_wed_hw_init(dev);
+ 	mtk_wed_configure_irq(dev, irq_mask);
  
-+	pdata->tx_usecs = tx_usecs;
- 	pdata->tx_frames = tx_frames;
- 	hw_if->config_tx_coalesce(pdata);
+diff --git a/drivers/net/ethernet/mediatek/mtk_wed.h b/drivers/net/ethernet/mediatek/mtk_wed.h
+index c1f0479d7a7182919e77c40efc30ade37abfad58..b49aee9a8b65156310e4f66a17921e5320b3077c 100644
+--- a/drivers/net/ethernet/mediatek/mtk_wed.h
++++ b/drivers/net/ethernet/mediatek/mtk_wed.h
+@@ -17,7 +17,7 @@ struct mtk_wed_wo;
+ struct mtk_wed_soc_data {
+ 	struct {
+ 		u32 tx_bm_tkid;
+-		u32 wpdma_rx_ring0;
++		u32 wpdma_rx_ring[MTK_WED_RX_QUEUES];
+ 		u32 reset_idx_tx_mask;
+ 		u32 reset_idx_rx_mask;
+ 	} regmap;
+diff --git a/drivers/net/wireless/mediatek/mt76/mt7915/mmio.c b/drivers/net/wireless/mediatek/mt76/mt7915/mmio.c
+index 4a82f8e4c118061fc76459dc0e38f7ee27e25a3a..36488aa6cc20117de4f5b76b80beca149015e055 100644
+--- a/drivers/net/wireless/mediatek/mt76/mt7915/mmio.c
++++ b/drivers/net/wireless/mediatek/mt76/mt7915/mmio.c
+@@ -664,8 +664,8 @@ int mt7915_mmio_wed_init(struct mt7915_dev *dev, void *pdev_ptr,
+ 					 MT_RXQ_WED_RING_BASE;
+ 		wed->wlan.wpdma_rx_glo = pci_resource_start(pci_dev, 0) +
+ 					 MT_WPDMA_GLO_CFG;
+-		wed->wlan.wpdma_rx = pci_resource_start(pci_dev, 0) +
+-				     MT_RXQ_WED_DATA_RING_BASE;
++		wed->wlan.wpdma_rx[0] = pci_resource_start(pci_dev, 0) +
++					MT_RXQ_WED_DATA_RING_BASE;
+ 	} else {
+ 		struct platform_device *plat_dev = pdev_ptr;
+ 		struct resource *res;
+@@ -687,7 +687,7 @@ int mt7915_mmio_wed_init(struct mt7915_dev *dev, void *pdev_ptr,
+ 		wed->wlan.wpdma_tx = res->start + MT_TXQ_WED_RING_BASE;
+ 		wed->wlan.wpdma_txfree = res->start + MT_RXQ_WED_RING_BASE;
+ 		wed->wlan.wpdma_rx_glo = res->start + MT_WPDMA_GLO_CFG;
+-		wed->wlan.wpdma_rx = res->start + MT_RXQ_WED_DATA_RING_BASE;
++		wed->wlan.wpdma_rx[0] = res->start + MT_RXQ_WED_DATA_RING_BASE;
+ 	}
+ 	wed->wlan.nbuf = MT7915_HW_TOKEN_SIZE;
+ 	wed->wlan.tx_tbit[0] = is_mt7915(&dev->mt76) ? 4 : 30;
+diff --git a/drivers/net/wireless/mediatek/mt76/mt7996/mmio.c b/drivers/net/wireless/mediatek/mt76/mt7996/mmio.c
+index 30b40f4a91be81d429d11f15036167396756d2dc..fb2428a9b877899a0a6fb879aba84e1f6e7840f2 100644
+--- a/drivers/net/wireless/mediatek/mt76/mt7996/mmio.c
++++ b/drivers/net/wireless/mediatek/mt76/mt7996/mmio.c
+@@ -503,9 +503,9 @@ int mt7996_mmio_wed_init(struct mt7996_dev *dev, void *pdev_ptr,
+ 		}
  
-@@ -830,7 +845,7 @@ static int xgbe_set_channels(struct net_device *netdev,
- }
+ 		wed->wlan.wpdma_rx_glo = wed->wlan.phy_base + hif1_ofs + MT_WFDMA0_GLO_CFG;
+-		wed->wlan.wpdma_rx = wed->wlan.phy_base + hif1_ofs +
+-				     MT_RXQ_RING_BASE(MT7996_RXQ_BAND0) +
+-				     MT7996_RXQ_BAND0 * MT_RING_SIZE;
++		wed->wlan.wpdma_rx[0] = wed->wlan.phy_base + hif1_ofs +
++					MT_RXQ_RING_BASE(MT7996_RXQ_BAND0) +
++					MT7996_RXQ_BAND0 * MT_RING_SIZE;
  
- static const struct ethtool_ops xgbe_ethtool_ops = {
--	.supported_coalesce_params = ETHTOOL_COALESCE_RX_USECS |
-+	.supported_coalesce_params = ETHTOOL_COALESCE_USECS |
- 				     ETHTOOL_COALESCE_MAX_FRAMES,
- 	.get_drvinfo = xgbe_get_drvinfo,
- 	.get_msglevel = xgbe_get_msglevel,
-diff --git a/drivers/net/ethernet/amd/xgbe/xgbe.h b/drivers/net/ethernet/amd/xgbe/xgbe.h
-index 42fa4f84ff01..e330ae9ea685 100755
---- a/drivers/net/ethernet/amd/xgbe/xgbe.h
-+++ b/drivers/net/ethernet/amd/xgbe/xgbe.h
-@@ -272,6 +272,7 @@
- /* Default coalescing parameters */
- #define XGMAC_INIT_DMA_TX_USECS		1000
- #define XGMAC_INIT_DMA_TX_FRAMES	25
-+#define XGMAC_MAX_COAL_TX_TICK		100000
+ 		wed->wlan.id = MT7996_DEVICE_ID_2;
+ 		wed->wlan.tx_tbit[0] = ffs(MT_INT_TX_DONE_BAND2) - 1;
+@@ -518,9 +518,9 @@ int mt7996_mmio_wed_init(struct mt7996_dev *dev, void *pdev_ptr,
  
- #define XGMAC_MAX_DMA_RIWT		0xff
- #define XGMAC_INIT_DMA_RX_USECS		30
+ 		wed->wlan.wpdma_rx_glo = wed->wlan.phy_base + MT_WFDMA0_GLO_CFG;
+ 
+-		wed->wlan.wpdma_rx = wed->wlan.phy_base +
+-				     MT_RXQ_RING_BASE(MT7996_RXQ_BAND0) +
+-				     MT7996_RXQ_BAND0 * MT_RING_SIZE;
++		wed->wlan.wpdma_rx[0] = wed->wlan.phy_base +
++					MT_RXQ_RING_BASE(MT7996_RXQ_BAND0) +
++					MT7996_RXQ_BAND0 * MT_RING_SIZE;
+ 
+ 		wed->wlan.wpdma_rx_rro[0] = wed->wlan.phy_base +
+ 					    MT_RXQ_RING_BASE(MT7996_RXQ_RRO_BAND0) +
+diff --git a/include/linux/soc/mediatek/mtk_wed.h b/include/linux/soc/mediatek/mtk_wed.h
+index d8949a4ed0dc9d41b3364e85a21e15d258519c45..c4ff6bab176db1f51cd94ac4198df0caeb557df2 100644
+--- a/include/linux/soc/mediatek/mtk_wed.h
++++ b/include/linux/soc/mediatek/mtk_wed.h
+@@ -147,7 +147,7 @@ struct mtk_wed_device {
+ 		u32 wpdma_tx;
+ 		u32 wpdma_txfree;
+ 		u32 wpdma_rx_glo;
+-		u32 wpdma_rx;
++		u32 wpdma_rx[MTK_WED_RX_QUEUES];
+ 		u32 wpdma_rx_rro[MTK_WED_RX_QUEUES];
+ 		u32 wpdma_rx_pg;
+ 
+
+---
+base-commit: bc4c0a48bdad7f225740b8e750fdc1da6d85e1eb
+change-id: 20250718-mt7992-wed-support-456a50d51f81
+
+Best regards,
 -- 
-2.34.1
+Lorenzo Bianconi <lorenzo@kernel.org>
 
 
