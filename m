@@ -1,153 +1,148 @@
-Return-Path: <netdev+bounces-212672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65D78B219B5
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 02:16:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AD8CB219B2
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 02:11:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19E6A427B3F
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 00:16:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 62E09190703E
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 00:12:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED55028CF49;
-	Tue, 12 Aug 2025 00:16:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E5DC28B415;
+	Tue, 12 Aug 2025 00:11:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="HhbqM+yh"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Y/YjCsr9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CCFD287276
-	for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 00:16:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6A2A27FB31
+	for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 00:11:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754957763; cv=none; b=pUzPsqE/k9Sko307qrn890BdYeoPUCB3fHnAQY9v37wj6TZf7tVfTwPcrplVO2+PdS0ol8hCQmj7ptSpbuOGHZEqFRlXMUXTU/aWPnExYJmwMKpbH4J2e4aMj3e7n6aBDqu6mnJC4fU6BRMkK0qbq18mi3AQ9jmaizUG4gX8P0g=
+	t=1754957510; cv=none; b=k9mfTH2g6CxhC8QqwPXHWYamxaKMxec76ppZ1A2sGEUy/FP8OZaYMGj4shuqkDDG8tBRSQ0U6RoT/e3qhxImwLo4339miWNQ2zeKLsURGPlDHlLmWBig2FrZ+QAq3uYQvw3ydodIMqgpW46rPAbs3XiAULkimSM3Wjp/aGYd/Tc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754957763; c=relaxed/simple;
-	bh=lObKFFpWe1nUswWAHXSFoQmqA4gcLgheGbmRodNzuXg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HDyLehBxxUjhvQyodrYUP/yIAZYGJAcyWUkPZq8s1LH929hiaQBRNnwCrb8lVPUgIzLpOkUkx0bWtGOY0II5GhJqT3mJKOJpNxX+A0EU2LSZA4VHBk+l0rbaMl0kB9NmAwuCnn7KvnETXm9VvMJlZ+mG3UWm8Iy9ZKDChyybXso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=HhbqM+yh; arc=none smtp.client-ip=209.85.210.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-76bd2b11f80so4451918b3a.3
-        for <netdev@vger.kernel.org>; Mon, 11 Aug 2025 17:16:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1754957762; x=1755562562; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0POCdQlHDdBEpMWZLVYNWiTFkyq9Hm0ip3OGGCpoX8s=;
-        b=HhbqM+yhIllsQbh1uMrSUeUwNkZQAwS84nHefkZOZHHXS+VMvBF8QxzdBn3oAATHWL
-         v9feAO9cOOqiAwakdJ/3IP7+Lv8uiX7s0fQ+fa6FKg4aIgwUlLpV113BGBWW1Y9ge8OX
-         Tk7lbnMiZ2vXmDROLyEeZmNtkLCqEcXaTZ7VkPgrSinRzRPm/StDD/QNIErR2T51lJSw
-         9I7NCt4MzYnjmKTK51yprIIcW/Cr8FMjvMRqT1Zd/BgL3SN5iSGpjfkOeFmst6L6HDz4
-         LbW/nWuJKbbqtrgptD5ng/QDX2HolHkt4y/IbdJ4uXbSTXjLtuH32gdptYoYQwMe5BbZ
-         3qJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754957762; x=1755562562;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0POCdQlHDdBEpMWZLVYNWiTFkyq9Hm0ip3OGGCpoX8s=;
-        b=M+siGmDm8NUQ3nnUQHRrqYxqk5i24Qt+5KjaV2biX/gqujyETrcwWXKfRwaVJ8IM5A
-         8JMUvon7GwmuLkdYki6PbMNjy/L/yw4FP8HLaH54Pgj1F+XZi2dJmVJR/Jd0ucLPtFlA
-         PDmGyC+kvlqNzLM9/Q/xElBxCSErLFXm7Geao9xhNg07X0pIecvb1HBhRciJupvqcjMX
-         qLZn/a/FSHZ8uBwmMG+D6p5b5bpNXV/npFC6ITG5MBkdYvRHsMEfMlIHZ7bwUwhzJG5B
-         5UcDwKJoZpoBewc61rCw6yUoNmKlyh4pjS/W6fLDT/U0Fqw2WKU5OWKM9pwFPLIaGr//
-         ENBA==
-X-Forwarded-Encrypted: i=1; AJvYcCX8ONR9aNZnBg9k/gisAXisYlAMPZp4Rl8XaX/ke1fQxI4tziEFKNeH9hyxYsofsy4qAALf/T4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyJPFv680gTbK1CZwHsDW6ayt7TE2PuAwoeTQGZyt/PYujU+3K+
-	RolqhAcpOskpfUIXh2Gh+QdwJiuvd4dYOqEMtvTEySHnmurxiwJAQcAzySkhLCEWeFmREvQFF4X
-	GNX3jDt4=
-X-Gm-Gg: ASbGncvR4ghaycplUnxQh/e8lsRQ56z5CJ5k1G7frwvYUrnJMmIAz3QstmpBP+qjgz5
-	QaYpKj0LcH2yxoQj4AmrY4DpFsBMoaniVJUmIlIiDadqd30U5QraUMKCPyfgvHEX7vo6UKuFZ3P
-	lCf2xFVtAuxqKh9HIPlZvQlBd0lYISlNvwGWda8ahVyOzdkt6UZsxVTxs4tqyLgXjmAMOTqFvFS
-	L/YOCGo14uL8Qnq7bzC53TfPX9BA9HmNQX96jDk2IqPmuai1oRUvIUFpTj3g3pdK2bQILW8Ynqo
-	I5ieOTWXl2r+OZIZEXZPCNGI3i86ItUutabRH0rC5ccE4DZVx+XuGlncjw0SrwMPgXiWYf/zWTh
-	8gtxE+hCsbWJzQTE4crGSScUq/t3hvSssQnBKeuATCiC4MmwSO4lXKBJfgtHsChC1NrM=
-X-Google-Smtp-Source: AGHT+IEb/RCypsYKRtKPrdAz57Bt/xhCKJfsciQI+T+k7MCGB9l0n4g3gmzopXU70O5IsD9Vx0fe0w==
-X-Received: by 2002:a05:6a20:7349:b0:23d:d13d:8a6 with SMTP id adf61e73a8af0-2409a986831mr2184887637.24.1754957761704;
-        Mon, 11 Aug 2025 17:16:01 -0700 (PDT)
-Received: from MacBook-Air.local (c-73-222-201-58.hsd1.ca.comcast.net. [73.222.201.58])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-76c6f0c862fsm5509865b3a.115.2025.08.11.17.16.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Aug 2025 17:16:01 -0700 (PDT)
-Date: Mon, 11 Aug 2025 17:15:58 -0700
-From: Joe Damato <joe@dama.to>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	shuah@kernel.org, sdf@fomichev.me, almasrymina@google.com,
-	noren@nvidia.com, linux-kselftest@vger.kernel.org,
-	ap420073@gmail.com
-Subject: Re: [PATCH net-next 5/5] selftests: drv-net: devmem: flip the
- direction of Tx tests
-Message-ID: <aJqHvt0EsV6ALgiE@MacBook-Air.local>
-Mail-Followup-To: Joe Damato <joe@dama.to>,
-	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
-	andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org,
-	sdf@fomichev.me, almasrymina@google.com, noren@nvidia.com,
-	linux-kselftest@vger.kernel.org, ap420073@gmail.com
-References: <20250811231334.561137-1-kuba@kernel.org>
- <20250811231334.561137-6-kuba@kernel.org>
+	s=arc-20240116; t=1754957510; c=relaxed/simple;
+	bh=WLXAufMx4+moAqVJ6lJ70jpjz9qJ9rjFJFkOmpjLpQA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ps4r1fC/Ir+FPSJRK7qzHyuf9S4gbR3LYMtjOYh34CNCfo4GmwbvOdUsDknm8JvfpjMFFWrMislxxtac4K6HlxJ26HhxjBjxAWcoQsx4HpBnZ6ZMTXe9buW4Qpkz/KpQmL7h2zcQYnLnRhknqzJLoFrDFoUF0ArqU6V3Rka1j7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Y/YjCsr9; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1754957508; x=1786493508;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=WLXAufMx4+moAqVJ6lJ70jpjz9qJ9rjFJFkOmpjLpQA=;
+  b=Y/YjCsr9mInDVzPUVgt3ta1vUwhrkV+HauVkQVgKzzTSy7SCHk3y4nrE
+   yU+sUghZ/eh1smamPbOBpBke90tOxOyhyU3dtOQMv/IJ7zTuTOEmnq59o
+   u3WJZKaq8vw2/8WpF5Lm67PSRjF/FizLD1N0Lw+gDrACaPjeBZSikhXlS
+   IV/ygLVEg4EYidqvESJWoqmw71sDoe0IVPV/9Ruuv/Irr4WOfQ8+3FTKZ
+   X1STLq43HjAQRVTY3sD4oX2EG3dJjf/g+MJWIUQz86hBptKskxf4+JY3C
+   Dj1pSMn19rHjjHmYalE6+UMUZTGIw0unuKms8OS1qBgBTXp+VocouPMqc
+   Q==;
+X-CSE-ConnectionGUID: MXHmzk1ySECGYIs7nVu2nA==
+X-CSE-MsgGUID: zCPAiJ1tRHOXTBOU2B+r4g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11518"; a="68593828"
+X-IronPort-AV: E=Sophos;i="6.17,284,1747724400"; 
+   d="scan'208";a="68593828"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2025 17:11:48 -0700
+X-CSE-ConnectionGUID: mtx225MgRBK2vPqxHaRQWw==
+X-CSE-MsgGUID: Yk1wtHI2SG27/l1lx5wQ0A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,284,1747724400"; 
+   d="scan'208";a="166044395"
+Received: from dcskidmo-m40.jf.intel.com ([10.166.241.13])
+  by orviesa007.jf.intel.com with ESMTP; 11 Aug 2025 17:11:48 -0700
+From: Joshua Hay <joshua.a.hay@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	larysa.zaremba@intel.com,
+	Joshua Hay <joshua.a.hay@intel.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Subject: [Intel-wired-lan][PATCH iwl-net] idpf: fix UAF in RDMA core aux dev deinitialization
+Date: Mon, 11 Aug 2025 17:19:21 -0700
+Message-Id: <20250812001921.4076454-1-joshua.a.hay@intel.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250811231334.561137-6-kuba@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Aug 11, 2025 at 04:13:34PM -0700, Jakub Kicinski wrote:
-> The Device Under Test should always be the local system.
-> While the Rx test gets this right the Tx test is sending
-> from remote to local. So Tx of DMABUF memory happens on remote.
-> 
-> These tests never run in NIPA since we don't have a compatible
-> device so we haven't caught this.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
->  tools/testing/selftests/drivers/net/hw/devmem.py | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/drivers/net/hw/devmem.py b/tools/testing/selftests/drivers/net/hw/devmem.py
-> index 0a2533a3d6d6..45c2d49d55b6 100755
-> --- a/tools/testing/selftests/drivers/net/hw/devmem.py
-> +++ b/tools/testing/selftests/drivers/net/hw/devmem.py
-> @@ -42,9 +42,9 @@ from lib.py import ksft_disruptive
->      port = rand_port()
->      listen_cmd = f"socat -U - TCP{cfg.addr_ipver}-LISTEN:{port}"
->  
-> -    with bkg(listen_cmd) as socat:
-> -        wait_port_listen(port)
-> -        cmd(f"echo -e \"hello\\nworld\"| {cfg.bin_remote} -f {cfg.ifname} -s {cfg.addr} -p {port}", host=cfg.remote, shell=True)
-> +    with bkg(listen_cmd, host=cfg.remote, exit_wait=True) as socat:
-> +        wait_port_listen(port, host=cfg.remote)
-> +        cmd(f"echo -e \"hello\\nworld\"| {cfg.bin_local} -f {cfg.ifname} -s {cfg.remote_addr} -p {port}", shell=True)
->  
->      ksft_eq(socat.stdout.strip(), "hello\nworld")
->  
-> @@ -56,9 +56,9 @@ from lib.py import ksft_disruptive
->      port = rand_port()
->      listen_cmd = f"socat -U - TCP{cfg.addr_ipver}-LISTEN:{port}"
->  
-> -    with bkg(listen_cmd, exit_wait=True) as socat:
-> -        wait_port_listen(port)
-> -        cmd(f"echo -e \"hello\\nworld\"| {cfg.bin_remote} -f {cfg.ifname} -s {cfg.addr} -p {port} -z 3", host=cfg.remote, shell=True)
-> +    with bkg(listen_cmd, host=cfg.remote, exit_wait=True) as socat:
-> +        wait_port_listen(port, host=cfg.remote)
-> +        cmd(f"echo -e \"hello\\nworld\"| {cfg.bin_local} -f {cfg.ifname} -s {cfg.remote_addr} -p {port} -z 3", shell=True)
->  
->      ksft_eq(socat.stdout.strip(), "hello\nworld")
+Free the adev->id before auxiliary_device_uninit. The call to uninit
+triggers the release callback, which frees the iadev memory containing the
+adev. The previous flow results in a UAF during rmmod due to the adev->id
+access.
 
-FWIW: I don't have one of these devices to test this on, but the change seems
-reasonable to me, so:
+[264939.604077] ==================================================================
+[264939.604093] BUG: KASAN: slab-use-after-free in idpf_idc_deinit_core_aux_device+0xe4/0x100 [idpf]
+[264939.604134] Read of size 4 at addr ff1100109eb6eaf8 by task rmmod/17842
 
-Reviewed-by: Joe Damato <joe@dama.to>
+...
+
+[264939.604635] Allocated by task 17597:
+[264939.604643]  kasan_save_stack+0x20/0x40
+[264939.604654]  kasan_save_track+0x14/0x30
+[264939.604663]  __kasan_kmalloc+0x8f/0xa0
+[264939.604672]  idpf_idc_init_aux_core_dev+0x4bd/0xb60 [idpf]
+[264939.604700]  idpf_idc_init+0x55/0xd0 [idpf]
+[264939.604726]  process_one_work+0x658/0xfe0
+[264939.604742]  worker_thread+0x6e1/0xf10
+[264939.604750]  kthread+0x382/0x740
+[264939.604762]  ret_from_fork+0x23a/0x310
+[264939.604772]  ret_from_fork_asm+0x1a/0x30
+
+[264939.604785] Freed by task 17842:
+[264939.604790]  kasan_save_stack+0x20/0x40
+[264939.604799]  kasan_save_track+0x14/0x30
+[264939.604808]  kasan_save_free_info+0x3b/0x60
+[264939.604820]  __kasan_slab_free+0x37/0x50
+[264939.604830]  kfree+0xf1/0x420
+[264939.604840]  device_release+0x9c/0x210
+[264939.604850]  kobject_put+0x17c/0x4b0
+[264939.604860]  idpf_idc_deinit_core_aux_device+0x4f/0x100 [idpf]
+[264939.604886]  idpf_vc_core_deinit+0xba/0x3a0 [idpf]
+[264939.604915]  idpf_remove+0xb0/0x7c0 [idpf]
+[264939.604944]  pci_device_remove+0xab/0x1e0
+[264939.604955]  device_release_driver_internal+0x371/0x530
+[264939.604969]  driver_detach+0xbf/0x180
+[264939.604981]  bus_remove_driver+0x11b/0x2a0
+[264939.604991]  pci_unregister_driver+0x2a/0x250
+[264939.605005]  __do_sys_delete_module.constprop.0+0x2eb/0x540
+[264939.605014]  do_syscall_64+0x64/0x2c0
+[264939.605024]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+
+Fixes: f4312e6bfa2a ("idpf: implement core RDMA auxiliary dev create, init, and destroy")
+Signed-off-by: Joshua Hay <joshua.a.hay@intel.com>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+---
+ drivers/net/ethernet/intel/idpf/idpf_idc.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_idc.c b/drivers/net/ethernet/intel/idpf/idpf_idc.c
+index 4d2905103215..7e20a07e98e5 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_idc.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_idc.c
+@@ -247,10 +247,10 @@ static void idpf_unplug_aux_dev(struct auxiliary_device *adev)
+ 	if (!adev)
+ 		return;
+ 
++	ida_free(&idpf_idc_ida, adev->id);
++
+ 	auxiliary_device_delete(adev);
+ 	auxiliary_device_uninit(adev);
+-
+-	ida_free(&idpf_idc_ida, adev->id);
+ }
+ 
+ /**
+-- 
+2.39.2
+
 
