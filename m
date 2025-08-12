@@ -1,94 +1,99 @@
-Return-Path: <netdev+bounces-213055-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213056-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F613B230D3
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 19:57:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AE951B230F3
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 19:58:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ECD781896B31
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 17:55:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D7831896CD4
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 17:58:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 555C02D5C76;
-	Tue, 12 Aug 2025 17:55:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31CC12FE56A;
+	Tue, 12 Aug 2025 17:58:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="HGDXmrfS"
+	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="uDK9qv6e"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA3952F8BE7
-	for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 17:55:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDED02FAC14
+	for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 17:57:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755021328; cv=none; b=O4Xtai3uDeVlsPyozRW5TG3kk2G71eDX8MxFaxsLjn213jDw2cRj4VAdUWPtrWbPxtQ9eLDqGB00IB1J7u5U+WRL+JOQJlwvAbO0QdgC6SB452i1X4cU2hq/1z77clqCGFAvvedH2lALnyvIZWRPDJD4Ot/+Hqkh1n3b7RgZYds=
+	t=1755021481; cv=none; b=XYlf+7wd8QhJaV766NADk41SbdxHHyNhmoKVjaL+t5FRoJVAEyyAOzBNdzS96GPm5P8praD61QMXeOXtqQGhGrWsX4H2eXg4IOg6g0BlErtNHt5NgqfGz8jF69CJt8eE+NRvZ6bqquLw3THsHsRCoUuSmVVEQbTPGQQEEYUKb2w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755021328; c=relaxed/simple;
-	bh=kWTi2SgUd0nsUJ+xu5akZ/Qy88KshZVAxEcizguu4O0=;
+	s=arc-20240116; t=1755021481; c=relaxed/simple;
+	bh=hPrGuxrOLQ9ipBeDFWhoJK1vM+KGW1+i9S6rdpPe8xU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VX+0+xQF67hI/DKSgiYFE2wPuPHdbnExMUlWdDATW02dk2R2fpqLJHoyU9JZLtH7m+PH6Pst06urhOqnT3eL2AyoChqdm0vhkF9IJWtqquakpj9zVh3q2c3S/AO1U5iTB9JySZ+gGmxzcTBS9zr71AqhUlr91SjrXTk9M5/MS2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=HGDXmrfS; arc=none smtp.client-ip=209.85.214.174
+	 Content-Type:Content-Disposition:In-Reply-To; b=MhvF3Qz+uRcyd6g8OB6ygJTMS59as94pxLILIHOnjAbLC0UwFakpNYeteRyvWyTXBizF4GIwp1T3biGg524syRmPNfbmsAQJ4ue08To+gnge8rWrN1aysnRsxMvBro5SuZobKVTdt/OXBKBMu8IapJNpMHzovIwChI/ZbZyPnRo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=uDK9qv6e; arc=none smtp.client-ip=209.85.210.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-242d8dff9deso32432935ad.2
-        for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 10:55:26 -0700 (PDT)
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-76a3818eb9bso5403311b3a.3
+        for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 10:57:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1755021326; x=1755626126; darn=vger.kernel.org;
+        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1755021478; x=1755626278; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references
          :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=sFniR6OHeJpzq5CzpOsoDrSOVnI61AYAux8BFNCWE1k=;
-        b=HGDXmrfS2amW9k1mX0QArY9VENrBecOCehI6DpW/A2Zcbi+tPFWfw+qLExTQoOng7E
-         2zAVRnZn62JlE85yJOTnb73JGmdog61lE5orsIDAFGcqYzL8xeIpZ4RxGe3i6SsHweza
-         Z5RW/A7+AFXz2EmvcXi/DQsJlnVfA+X2r/OXgm0sM2nPfVvsMKD1PP2WUaPzukKcbLvz
-         /RFjqd0/OQld2tBfFRLCuxoyyGKChl2xkg818Ui1B9yqB9ihZ7Mguqznuz7RiqelsZCK
-         oGz3xQs9dDr4c+QZB6B4JG+m5cDCvYdp+T3T75WvLy0YJYas59VTARKroBebBwa02lmr
-         YjKA==
+        bh=Qc+A4jnBK4EPdKh66angrNfmE3qm0EXV6FaKJ1CugA4=;
+        b=uDK9qv6eTp2PMd3L4a8hShsQcjDB5jf48FIhmNfWH2VcfmiteLxvDDlGaLdwujL5D9
+         lHNURWLvSFtiaBpw/FL2Js9X7ifwtQQeSvS+DyF63YdqEH7EcBZmOIGjh1WXRsqfubqJ
+         g/L1LzJ0Ub5shHfn8f1IlHGjlE+ja+bc++unIogu9YN9F+4Ig9vrIOX9pN+ofxd+f3Gw
+         QIHvTWG25ZxIDouRkxvn+6YYlmhBVXT2XrQthUuT8JUhKS/oDbtCM3e0lxa2gKEoKq/7
+         SOAwT9+yY57Jqg0t3NMnCMJJn60oqoppI4DjRVwiLT62c8lhBA1A6+2Ebh3n8jvZDRXE
+         zm7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755021326; x=1755626126;
+        d=1e100.net; s=20230601; t=1755021478; x=1755626278;
         h=in-reply-to:content-disposition:mime-version:references
          :mail-followup-to:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sFniR6OHeJpzq5CzpOsoDrSOVnI61AYAux8BFNCWE1k=;
-        b=MX99esTMP77FcnQS8W12Xfj5VqsftAEZ1xvGFVkCFoser19F7voSf3xB9sS687PbpV
-         YeQzsWF1AwHCDF1WhBLIYbhGSglNarmO0sOsgLsCXXvHgtotb4CvyYalo0a9RnwG3xIY
-         kDS4vso0nNYV8pQwh72DWWgSzM+IY/XRB001o6mRZA3LYciZ8lYUNkWQSVD6M73wJO4b
-         QiRmQV5aRCtmVEG08eYoGKb61CbPPhBKvx2wIAwMjd5ql8yqElP1AbM1RT77o8xyaCjk
-         vRnK53K1B8DfFeqf/L+vAr6dMha18f2m9Sr6WIjIhViKnYesvClzw5qu2mOzP3MfYCxy
-         nJ5g==
-X-Forwarded-Encrypted: i=1; AJvYcCVlJ69u7rr1JGQc1yl5EBQyZcSDekEzP0qD9xZnzAwP0iyg/JpwwhblGXmwtsuGIBF0cNn78M4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxsidQ9woyt8qkKUDo5xO3t2hwtUAbak0puXFP+SEUvMjYiQvr/
-	5oS4VsGBhQl96IEsBrh0z8lZEV+b8R+KF4MgVOwezqw0PH0C2KclIifFj72qDtlkGfk=
-X-Gm-Gg: ASbGncuXvMIRLMUIU2d3sxxDxOB+gWCfXHX3yV+dsZkJhe0+hF+Y4KkRvWLVfRyUZaI
-	WLeTqGfN8YeE6X6/XNo5zX3KmdZgNe4GBKCyrycjD33aHS3gChyVuHJxmh2xRR+zdFPqrizcXsX
-	i8Mxm6fQmaQ4oKXlbOjVSAjubT4RrlbwPPUVPPMy7Ou3U3ipYdYAQuZVXXax6GJLBdd96zojH7s
-	BuXekk2iGivxF339c3ODRRTaj8RKpiTBcwfiLXNjZ8JkldadVWA/4+JH7DLJrvJ7/Taq23/T/a4
-	kYo/zVVRKgQFCZp/wupTCSh6zLiVw3ZR+vrCHAj9hC/l3A5TEXaVpgNt2speJFRw2EO2l6PNaX0
-	0/Zgj2j5M6eLfFoWokoeT0x35ZxvKIU5fng89IXNFDrGDjY7+veI/l4i8py9yY41GZUPFL3cz
-X-Google-Smtp-Source: AGHT+IGrcruxL8w5AP1FRZ8Qi0WJHmfwtLu4/b8EI7R/ZKX+1vBpTxr9Y6qv46OQyMfLzdTGsMzToA==
-X-Received: by 2002:a17:902:d50b:b0:235:ed01:18cd with SMTP id d9443c01a7336-2430d21d8cdmr1308655ad.44.1755021326024;
-        Tue, 12 Aug 2025 10:55:26 -0700 (PDT)
+        bh=Qc+A4jnBK4EPdKh66angrNfmE3qm0EXV6FaKJ1CugA4=;
+        b=Fd6j7dKbcNATPJxJ83Rb2BiHecRQSCDF9Xt6LhYngz3Zi22Ga+hhXXxNkFlWqg/RMe
+         7ieEiB8KTwxPcgxk6T0hbJqFzPHzdnFAXW6OZJ8Va4Bn4FeYHkGa5NhNL7GXhHHrs+oQ
+         oJxgr+aIPK/zWflvOXRXsulxlWQL6dOyKXkjPuCytT/Ie5/pluxWxKjZ6Q2SkOxKmSWO
+         LplDDwxMv2q4/dYlnBVg3TrMAjnTH7mL55ExGnPPvSbtuGcG7CAUWkvNqrxARfmupvDC
+         xcZs7TvModM9Sdg+cfP45cU7y0N3vJUljteMqIU/wuxnWDGXM48HJMngUBs3MNT7aaPs
+         7hLQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUbpVxApiZyGuddZ9ALwhAhlIJEbRq+07mKuJC56yupMV7BP1zG7eIiNYrQKnI3fa2tlC7qP4g=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyv8rO5IxrbPkEUdhkDy9CePubl5PDqEqT5LvJ334Bp/IQJ+wE5
+	ggaOIi5y/KdHB3FbcqpZQPZvwzsvRhv0ZUDRtF4ApkBf7XxQ8aYS7hUz9jaHQlLJy+A=
+X-Gm-Gg: ASbGnct3tXAm/iLgQPkzvZz+0b/d6J0NwfVZJ25XfoM1UEQMGSzZ9QWNHJFAuGPLTwY
+	qW+qGYcrjNx8zvsJG+QmHlAuaUaIwoVK3YM6SrDLV9Bv8XwZDt6ZSBwCD9g8RBM+2+erxVnQiyp
+	UlffX9p8LaUfOBKMtq4CQ+dV62rCZRC6h2S13KOc84ZaV5TbYL6rvO8Wlf8C3Y0jjByzoKgCbzy
+	13Vq7KhIJqhrlYZv8/5ufhvHhb2QhG9gjT9CFSs/IMCK2c2x50LgiXMOHJA125ndx7brZDmAycu
+	e8T/Xq0cvwBNgjdpkqchtaP4uMWNuL6AEEo2CElbTWeEP7lmvhJ0sU7ZuDhVzKQ4/kUkx8XR9Wb
+	07gAU6Q6I40qZDzH75erNdL6pKpQXNiNkWYwWmRgqsFeBjZdOgtJkKzQbm/F71l0s99ea8XS2PI
+	FjSBTqJic=
+X-Google-Smtp-Source: AGHT+IHxi2HOW8bSGkAzQGQAd8ZqXnSd+5ht/WWbBZm7UBPBn7pRtc+d0H/ulq4tQ+TrYx/lPWqfGA==
+X-Received: by 2002:a05:6a00:b55:b0:748:fe3a:49f2 with SMTP id d2e1a72fcca58-76e20f900d8mr126425b3a.21.1755021478408;
+        Tue, 12 Aug 2025 10:57:58 -0700 (PDT)
 Received: from MacBook-Air.local (c-73-222-201-58.hsd1.ca.comcast.net. [73.222.201.58])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-241e8976a1csm308425625ad.78.2025.08.12.10.55.24
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-76bccfcf523sm29950265b3a.90.2025.08.12.10.57.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Aug 2025 10:55:25 -0700 (PDT)
-Date: Tue, 12 Aug 2025 10:55:23 -0700
+        Tue, 12 Aug 2025 10:57:58 -0700 (PDT)
+Date: Tue, 12 Aug 2025 10:57:55 -0700
 From: Joe Damato <joe@dama.to>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	shuah@kernel.org, willemb@google.com, petrm@nvidia.com,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v2] selftests: drv-net: wait for carrier
-Message-ID: <aJuACzIZcknUq6C8@MacBook-Air.local>
+To: Xichao Zhao <zhao.xichao@vivo.com>
+Cc: trondmy@kernel.org, anna@kernel.org, chuck.lever@oracle.com,
+	jlayton@kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, neil@brown.name,
+	okorniev@redhat.com, Dai.Ngo@oracle.com, tom@talpey.com,
+	horms@kernel.org, linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] sunrpc: fix "occurence"->"occurrence"
+Message-ID: <aJuAo3lfY9lRB-Oo@MacBook-Air.local>
 Mail-Followup-To: Joe Damato <joe@dama.to>,
-	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
-	andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org,
-	willemb@google.com, petrm@nvidia.com,
-	linux-kselftest@vger.kernel.org
-References: <20250812142054.750282-1-kuba@kernel.org>
+	Xichao Zhao <zhao.xichao@vivo.com>, trondmy@kernel.org,
+	anna@kernel.org, chuck.lever@oracle.com, jlayton@kernel.org,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, neil@brown.name, okorniev@redhat.com,
+	Dai.Ngo@oracle.com, tom@talpey.com, horms@kernel.org,
+	linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+References: <20250812113359.178412-1-zhao.xichao@vivo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,34 +102,32 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250812142054.750282-1-kuba@kernel.org>
+In-Reply-To: <20250812113359.178412-1-zhao.xichao@vivo.com>
 
-On Tue, Aug 12, 2025 at 07:20:54AM -0700, Jakub Kicinski wrote:
-> On fast machines the tests run in quick succession so even
-> when tests clean up after themselves the carrier may need
-> some time to come back.
+On Tue, Aug 12, 2025 at 07:33:59PM +0800, Xichao Zhao wrote:
+> Trivial fix to spelling mistake in comment text.
 > 
-> Specifically in NIPA when ping.py runs right after netpoll_basic.py
-> the first ping command fails.
-> 
-> Since the context manager callbacks are now common NetDrvEpEnv
-> gets an ip link up call as well.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Xichao Zhao <zhao.xichao@vivo.com>
 > ---
-> v2:
->  - add an empty __del__
-> v1: https://lore.kernel.org/20250808225741.1095702-1-kuba@kernel.org
+>  net/sunrpc/sysfs.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> CC: shuah@kernel.org
-> CC: willemb@google.com
-> CC: petrm@nvidia.com
-> CC: linux-kselftest@vger.kernel.org
-> ---
->  .../selftests/drivers/net/lib/py/__init__.py  |  2 +-
->  .../selftests/drivers/net/lib/py/env.py       | 41 +++++++++----------
->  tools/testing/selftests/net/lib/py/utils.py   | 18 ++++++++
->  3 files changed, 39 insertions(+), 22 deletions(-)
+> diff --git a/net/sunrpc/sysfs.c b/net/sunrpc/sysfs.c
+> index 09434e1143c5..8b01b7ae2690 100644
+> --- a/net/sunrpc/sysfs.c
+> +++ b/net/sunrpc/sysfs.c
+> @@ -389,7 +389,7 @@ static ssize_t rpc_sysfs_xprt_dstaddr_store(struct kobject *kobj,
+>  	saddr = (struct sockaddr *)&xprt->addr;
+>  	port = rpc_get_port(saddr);
+>  
+> -	/* buf_len is the len until the first occurence of either
+> +	/* buf_len is the len until the first occurrence of either
+>  	 * '\n' or '\0'
+>  	 */
+>  	buf_len = strcspn(buf, "\n");
+
+In the future probably a good idea to add net-next to the subject line so it
+is clear which tree you are targeting (e.g. [PATCH net-next]).
 
 Reviewed-by: Joe Damato <joe@dama.to>
 
