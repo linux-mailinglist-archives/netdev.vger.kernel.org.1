@@ -1,184 +1,190 @@
-Return-Path: <netdev+bounces-213012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213015-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD48EB22D58
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 18:24:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EE73B22D66
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 18:26:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EEBCA1628CC
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 16:20:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 71D7A188B616
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 16:22:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54B5C2ED153;
-	Tue, 12 Aug 2025 16:20:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4B5F2F83BD;
+	Tue, 12 Aug 2025 16:21:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="YIlB4RNJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ydk08GV4"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2061.outbound.protection.outlook.com [40.107.95.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C16B12F83A7
-	for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 16:20:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.61
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755015615; cv=fail; b=lfT4eYU1eya0Xof/2aRztWS5qoO6G3JJW/VVtp5Ni4+7ldLBe0yeTA23th5YXRbiarZCuI4j2NOBEM0wc3OYwKFz7I3mwsccMwSLrYK9rtSDutgSuabR0/k6ePCPIngDuB58QyC8eXdE2Ddz2Gv4W2b5u5FkhHiJJE3qaUpU8TU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755015615; c=relaxed/simple;
-	bh=vo2g9xUb8jNa/oifbS/OOhr78eVVxKe5KMVvZgW+56c=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=qwiDNiAhPPm6MfPS3alFoFPamQniz/qlKHB1N14Q4QBmEPeDk+FjXsdK2cobVG4lXSGE+E9Ka6zY80GEt0EDq+PpV/fYy0u6DQXYqMECNyPELaDfWcNOOsMWEw4LVTG3kK5KXDiL3L7ihCtIY7a8FnbEhf9rfv6AGuyKO1KMLrk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=YIlB4RNJ; arc=fail smtp.client-ip=40.107.95.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ya/Xwz+bg5KfwpfeHGLXRkvLBszXZfwIyCmMbrt8dHPWYbjTfanf/OdR0kzPVwNJtsE+KuGWpmSx+kNQAKgFN38PoGMs2tFXGwZN8tQJu9IzApTp1+GViQsyq7BccSiNn2QIg8OrUBnElfd4XmB6qOuqEgPGuDVefbBRQ8jVAleH1F2Rl/OfTQB1+NyruCw7iVEcbuETF8VfdLoe8xtNzGoQJm9pDeDMMgktPZQp/Aos7V/SIIiuSnbp1Su5GwfZGBH9Wwa+O9NKnbDslCE1dtYmRDzhb9hZjvN89OviOH3jPHBcPhEzI3qA6qK31SE2qoSR/EoFU0ewngpbQdarog==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LowP9LSuUSWoMK1nHDEpa3UlTgaE8YqxsHvAAtUQy8E=;
- b=boJYDpRtbroOm5LYE8o/03BnnXUML1SIZf2hdod6U5+21yxgJxR4/wBG63rqPn+jD2ud7MKq5pV4mK+O2OZwX0ENFXDjXmkpwtBE7PinU2Bzj/puesNDfbABatoJ8Q5XdLOX+Ar8+SDt+KQH0awf5fahwgYJCTQjkJLejg41BMV4zkMeNxVQd/7/BX7+/su0q4qCXC43eNR3ueRiFlTYH0J9VWJMyFv/KZck3c638hGq9bMxmiEopY+hBDybhI5fFMa719he+UlSG61EAFL2XYoIX8njfqGNyTES4bGChpB29+kBSvowhZsDHgY32I+CS8vVUqNF/PFHYWJ3S2KIng==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LowP9LSuUSWoMK1nHDEpa3UlTgaE8YqxsHvAAtUQy8E=;
- b=YIlB4RNJytT/pRJWkrjPja/ARQNNc7weB9ooJUg5bsymm7sHmkA2kkGNuqd4Rf65N7xuWcc6dxRLK7UCt4QALHlVTB6WmJg+G2+np5WS5zbPfHY/dUOVf6JiH9z99pevWGQBS0bOJHDA1B9oYprweLZIvjqEQUb8ahD45AggJQ153itDDdf+VPE2pZv0xtRx02ZR6tvDn6i9BaO109IYKqtVgwg2apUqs8l1E9x0NQIGr2IvR4lfd+c7qYTaH/p3YCcJGksG6Yq6RlpGEjnjeeO7bhAsA0zP642+ZN5kCx8h6EBY96pO7VFMOD2rMg7xQTJUauK0JX+b5cTLEZghgw==
-Received: from CY8PR12MB7195.namprd12.prod.outlook.com (2603:10b6:930:59::11)
- by LV8PR12MB9207.namprd12.prod.outlook.com (2603:10b6:408:187::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9009.22; Tue, 12 Aug
- 2025 16:20:09 +0000
-Received: from CY8PR12MB7195.namprd12.prod.outlook.com
- ([fe80::e571:5f76:2b46:e0f8]) by CY8PR12MB7195.namprd12.prod.outlook.com
- ([fe80::e571:5f76:2b46:e0f8%6]) with mapi id 15.20.9009.021; Tue, 12 Aug 2025
- 16:20:08 +0000
-From: Parav Pandit <parav@nvidia.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"horms@kernel.org" <horms@kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "jiri@resnulli.us" <jiri@resnulli.us>, Jiri Pirko
-	<jiri@nvidia.com>
-Subject: RE: [PATCH net-next 1/2] devlink/port: Check attributes early and
- constify
-Thread-Topic: [PATCH net-next 1/2] devlink/port: Check attributes early and
- constify
-Thread-Index: AQHcCzyNSYRM7nVLJE6jUyFrVYNInrRfGW6AgAAZ7lA=
-Date: Tue, 12 Aug 2025 16:20:08 +0000
-Message-ID:
- <CY8PR12MB7195D5CCF640C5F85EFC199EDC2BA@CY8PR12MB7195.namprd12.prod.outlook.com>
-References: <20250812035106.134529-1-parav@nvidia.com>
-	<20250812035106.134529-2-parav@nvidia.com>
- <20250812074657.368dc780@kernel.org>
-In-Reply-To: <20250812074657.368dc780@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CY8PR12MB7195:EE_|LV8PR12MB9207:EE_
-x-ms-office365-filtering-correlation-id: 9e0ccbba-15fa-4796-a087-08ddd9bc1ad4
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?7c0jqlHHTgy1xXVtMQDUhdcFHQnf7nQ+VNQ2EcbQIF6FSehF7kf57C+dToY8?=
- =?us-ascii?Q?4CiDYm6zIjkRkKLMWZ83AT1EMwlE9+I3kV2D7WWeSdf9KqUf8PM+LCvkyjBF?=
- =?us-ascii?Q?tibsXQ6nwn0lI5mRu6b8ljgoYwfhGyHRn+CNOt0n5bEJy+l/5BrBhR4KiWvK?=
- =?us-ascii?Q?GxbwMqr1JcuRkTm/fefU7ii9ECD6Y9IgDELoVbFt4B4P1nDmKjqUpIchFMff?=
- =?us-ascii?Q?EmyTiljjm6MhuAqiz8iZP9C4BJBDuFtB57QjNcV3FJ1U4uAT3Vr/yR8pqZSD?=
- =?us-ascii?Q?cSZ7vkvofwX4lMDuA0wr7Z/mWNC0vhXZfXEPAvZxmxupjYC1V7yglPD579TC?=
- =?us-ascii?Q?05H3q/mRtOMPuUrtSe9Rx95ea1/GBntIqtruNezw78yQ8k16ahXcIOPz99Ct?=
- =?us-ascii?Q?gM02aAztwNOlKXgSafB+P7kKhdq+8L5sVHnH4Ea07yPQxOJhKhtn5wZvlQki?=
- =?us-ascii?Q?PpdEEI2vdP4JadMuFIJZFWuisGFG5VUZSwdz1ElAB5GXcVztDAcNXQxo/GN5?=
- =?us-ascii?Q?4Y1IUumTw+5uXOz27uche/KOVq8xYh4WqbOFBhBTkS5fdxUqEY1+XPJtNom/?=
- =?us-ascii?Q?7/ioapgHYf6Q99/rJnKQ16kA/gPm6eMYfuteTz0Kd0WbaRm6nA+Rscu7qTo/?=
- =?us-ascii?Q?ZoFDtUj6GP5zJ/1rs0+XP8byeNQh3LdR0lF3EjYyUT6dVe4OLZ7lv4ts6ZNf?=
- =?us-ascii?Q?1rZo5opaAhYaEiua/cYePd/Qkfeb3R6X0Oxa3Okg60Dw8HCz0vPMxRJBelvO?=
- =?us-ascii?Q?qt5KKwahk8Si1w8r3RouvIKPPNoXQ8Hnurox37PEsDiarzrn6ge4WtlI/wd/?=
- =?us-ascii?Q?eTaCifkgkUB50SGrg6rZMfrtwK2/od9siWYuk8vVerYwqc8HaH5wJCJXc1/I?=
- =?us-ascii?Q?vJt0FrnR3wYl0hJUaZ7j69dTR7mVOCbJ2kPdfoQnNs3hp91eJTQ1WygWyjMK?=
- =?us-ascii?Q?0kTcMzdncuXdMxxVa2zPerasrmepNGdaJBiLptYFtfOt9rVKEt4R0vjOFDjk?=
- =?us-ascii?Q?aLq3t6ThiPQZMIy78BexaSuCLUs8b3GiCwmTrgeIwGlVEPVz7qwfMIFhA7Gv?=
- =?us-ascii?Q?ul4s9SsyvfTicwkpXvDeyHzdmWHwwJWN2IsIsK3dY/ZZA0Uz+ZR4/iFAX5ra?=
- =?us-ascii?Q?D3JIoCLhaY7TFY0/HTbciRi5y/B7o4D7iVsXXVja3Gux0RunsvZUNK0Xc+rf?=
- =?us-ascii?Q?fkBNJiXUW6WG9bNq+6UkjoMMp7dwfXR/ahOoERrAxrJDMYCXzLe3BudW5Cdc?=
- =?us-ascii?Q?LwfFPQtF4kM5IngDPYhPhK1JdMgF3LEIa6BUwjjDUqnEk5BsAHdgu59X4zE/?=
- =?us-ascii?Q?Wi5FW5GE4l5nVc+rx2CYfW/hL4q2EOMfqAYY4YF1n6IgJnVX4rk03QVvTneg?=
- =?us-ascii?Q?2piA2+fzwvaP8QbiUFz8ZxaAWJOpOf+6bnUT+/kIZt/pooETeJn1uBuvdyfB?=
- =?us-ascii?Q?rSxw/D4lGWFzytUJMoqHPX7l5vPKZUrK/qw8azkFcjqcUl8nW3ZsHI4y8eDW?=
- =?us-ascii?Q?dDECGL3SON8Txxg=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR12MB7195.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?lw71Zq/oNhsk8AkAqQowZwxhzex95SLCb/0q+trJQMkivgjHVbNxgjW6ZwCQ?=
- =?us-ascii?Q?+F8ROa8EqmxO7+pM1xYwYK9aBoqWdHKblfStzk6uX5LT2HSM9pD5G9ztMG+6?=
- =?us-ascii?Q?Pm8cYpjn3XZeH8qnhj53MXB5Qi3Gso2L0lTD+8DMiSXs6pKBgzMe0GGONX9p?=
- =?us-ascii?Q?fRvHQtAfbqUI0YZ8qLBQTMH4XNo16jvJUJWbYTRA8gm4rAbO6Z9bqoacpnJh?=
- =?us-ascii?Q?z7wAdupldWqpvht+44TMlLB+aO/6Mnvtt8KPVBVOTwA58wgzwV8SulHWPPSi?=
- =?us-ascii?Q?D+FQY6gl69CMCHDIuiWT/QFK7QdY4HpCCQw1fegSh1e61tc1/kVh/5F8MkL9?=
- =?us-ascii?Q?iVrhlz/QNzpoUhCS20U5njiBDKuZZi46ym6sertIamMtXWtcZEyq2ze2em7U?=
- =?us-ascii?Q?qO5tR2urvMAqK6y7T286zu6pNvdy9G+1/riiflD8xc7UuhShv3E8P/HoMWDD?=
- =?us-ascii?Q?DFU92B+sVNf5f1DDk8qxswQmfsWeZuGgQxCxBPHgOmXZdf1x4w9LMCZZRbQ6?=
- =?us-ascii?Q?091tIwIRkQfMkBuezVtYz0MdTBw/gqzcDrmCUBczefRfyp4x1KFyBv1nsNKJ?=
- =?us-ascii?Q?i5DApYaCzPiFZ65JYOSMo5pP6wRmM2JcTARNEGer5W2JqPg0TL9DIedtil4E?=
- =?us-ascii?Q?+/IGXh7TZV5395sBp9Je0oBwp5CQ9SU8XATiLNj1M+QB8mWxYLEsZ16RmrD7?=
- =?us-ascii?Q?SRr5ysJcuQBcFyslt7yQyI1RDBsSGByeNt/Fz5giJWuAJMy8oKPnVVPtOTry?=
- =?us-ascii?Q?VOgEqqFcbAMq3RD79nvIxOAPtU6kHj6+UAgGnBfdEKFY8nUVI73uVSndk6vj?=
- =?us-ascii?Q?IQC/boZEH2LAWAnZkLTYnFR8d3fqeX8Knw/s2gAKXTDSqCNi5dBU5WL5uccM?=
- =?us-ascii?Q?TAHjVvhGHyMmiaR903KtY3VxTQCRN97JxvbIme6XapgLXaimMDPO6GIWjAfp?=
- =?us-ascii?Q?436R/5OVM4GX0D5oqGQq0H4t6B6iaTpenSDJTy3Otg2cLv/nDmHYVKVuuccx?=
- =?us-ascii?Q?ne26Dnpj+hXojOtSQ9QM6BWSBG/MTHsXe4lAe3SDwqaSK2Ye6B+jY5sxpnHA?=
- =?us-ascii?Q?6jT7VMEqBfqzQiQ12UGkpqADrdE9GiPOy4kzwSeA4doKeCP9LKgD6VIfWEsp?=
- =?us-ascii?Q?5jFYGITztvlqmSIGqXHn0nyEokXZgfnCfuSxD4d3zXXyMTv7DQXLF7eXQH6Q?=
- =?us-ascii?Q?fN15AdnK6MxF9WBBsqpjoh+k3kT2qBjjY+Iea4EilGeFOf7R5O6wTPAiQbto?=
- =?us-ascii?Q?FQGZP2KNZCHlvmKYoJRUer+wosK4/lUPFEFPpa3H+KZx+SMuQgZpGLoMMhaT?=
- =?us-ascii?Q?sQxHU+zjqT8dZPJr/e4gaErnAcJq369g9QO/K8Ou2HyVsj1TOu9Kp7EPJgFu?=
- =?us-ascii?Q?T88RFaK1Qv39ft3b87q7QRe7Hm1B/aU8/TjBR8DZKYqpv1LyL7IioFL2+LJ6?=
- =?us-ascii?Q?7jRTjII0yX8+vkI50Q2FZgaEwPYcfCZE8ixDbhOp31XtDPnndmqjbduHGFWA?=
- =?us-ascii?Q?1DEqQ9rKpV3qcc7CCWP7bYFMnMZg3Le+lyccONXllYveqNIgw3zBwK+uAVtY?=
- =?us-ascii?Q?RyS8r2UkoFBkOs2MmDc=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0211223D7D4
+	for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 16:21:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755015695; cv=none; b=c9FUc8M9HENCRtlLcshaGoLDGcShoMpis8KoKXAaFszGF14PAtU9NSAsITC7OoTdvjNVAHL/uU7NDpHm7uXRmSt6oMwrx45t/yEvmrNsUXIWXn6W2wIqNvsYbtRJ1KtE5rhxjvdTSl+CJUF/CNpEEjT5ygpoH1s1Mi2HmrSc5j4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755015695; c=relaxed/simple;
+	bh=+2c1sI2asU8V12zkDju8bdFDYCCHxtgOLf/bQwQhoEc=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=b/WmVKDgCfH3JQWVP/PL/n7Wvt0a83DoJLxXyLa8tTO+1GdeRlv7xaja6Tf6BtgvMLLM8kTFYwq6xxaXmmJeq7EVGqa1ikGrs997hacAEMJFRnkbMUEhNzcU9BhvCkdC11mPjvynhxttX42Pk843zAY7Sii32/QeG5rEt3qJ7nA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ydk08GV4; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-31f74a64da9so6215206a91.2
+        for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 09:21:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1755015693; x=1755620493; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=JFgrp1NHzqKg63hes8up32Hvag0Z2dcqZolmCPkVyYI=;
+        b=Ydk08GV4KxALnmg9zif7cMJgzcMrVT4pWZGaQ5KXxAIu5y+ppdlz8bHVK1rGnml20h
+         /dgYzeqE8snfOr7RsQgz4JdSLHMKVdCTDP6tBxR0pOiIF1qMk2TuCwsKIlF6EV1n2S6Y
+         CpyM6pa78WAvaOfQeH9+fB+yFTmlP9bjdu5mWCal78q0bVZur7UFalEc4C1oD/lZWvYd
+         IMRcbIgoIea3xisru+puzZiPCuFOA4DSn8qSPBHqT+wguQ5dBudMXvPIJvPj1OSRIbNy
+         1QPcqCAfnoFJPEyEB7H1xI5We0vhPN7FpHphkdE7TerFuNEVv/YkehON3n1WJhd9+YMg
+         mixA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755015693; x=1755620493;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JFgrp1NHzqKg63hes8up32Hvag0Z2dcqZolmCPkVyYI=;
+        b=wBS3Sn0qjyXtqXf6zePRfRyyDevlA0tu/aSZQBi2S65GpFkoiYxGtF6UlNKxM8L8cM
+         RPeOwnhhf+nw7BD/oKzaFgFuMT1groSP3YkmzTC6zctdoAAbXZpBaR40rDeJFraqEQqZ
+         owLfXs+TMN3hEXaH+eWnzmJc+GLa7nL8i56jTuk9wUrUYKwlNwS0jM/p0Sh6kaI/YWjG
+         2crWUdQ4Tf6iLftAnlLW/r8Gs7koV+Q0yrfvHMOt/jIcX3cAEDuz0IXccrfejRdXArKY
+         BPz3LJl0PFCCDkxaaTF0sTjYE4yTRsHB5U2+gd/tz4Y3NhrmscvuPDJzAhIryfIx6edi
+         rp7w==
+X-Forwarded-Encrypted: i=1; AJvYcCWUJ10ZTC9KsrR6p+ZSGJXd4/3GbryWhUL29vWh1U4SElAcgUEyHaVByh/vGFA3u30qAWuE4ss=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzklR3HJ8YJMQbvvU2ECASPsNzw1C3BmOur1rUobudkBP0bBvnx
+	Ey3sIWyIeNafBIUvHe56mDSY0dxemeUE5lJdeKVLDl1arl3KFJLaHMmrM2LB5DxHWx0AU5/SWTN
+	furb66w==
+X-Google-Smtp-Source: AGHT+IHcR01WgyBw3S+GjDewM87RZyznLxXypvX33G0YuvGMLmphDhbNjgHwxV9zRgKQTbaWYhbdfW47n6Q=
+X-Received: from pjzd15.prod.google.com ([2002:a17:90a:e28f:b0:312:151d:c818])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:e7c2:b0:311:df4b:4b93
+ with SMTP id 98e67ed59e1d1-321cf8a4b0dmr238520a91.7.1755015693210; Tue, 12
+ Aug 2025 09:21:33 -0700 (PDT)
+Date: Tue, 12 Aug 2025 16:21:26 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CY8PR12MB7195.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9e0ccbba-15fa-4796-a087-08ddd9bc1ad4
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Aug 2025 16:20:08.2904
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: lN9YudPw6jwWP62NdwjNtmpkAT/rDFpYsvqGrYVZ3nMJHIjP3yzoS9pyitSqWwJjo3mjpYdJcNW8Rxjd1y2faQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR12MB9207
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.rc0.205.g4a044479a3-goog
+Message-ID: <20250812162130.4129322-1-kuniyu@google.com>
+Subject: [PATCH v2 net] netdevsim: Fix wild pointer access in nsim_queue_free().
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Breno Leitao <leitao@debian.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
+	syzbot+8aa80c6232008f7b957d@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
 
+syzbot reported the splat below. [0]
 
+When nsim_queue_uninit() is called from nsim_init_netdevsim(),
+register_netdevice() has not been called, thus dev->dstats has
+not been allocated.
 
-> From: Jakub Kicinski <kuba@kernel.org>
-> Sent: 12 August 2025 08:17 PM
->=20
-> On Tue, 12 Aug 2025 06:51:05 +0300 Parav Pandit wrote:
-> >  void devlink_port_attrs_set(struct devlink_port *devlink_port,
-> > -			    struct devlink_port_attrs *devlink_port_attrs);
-> > +			    const struct devlink_port_attrs *dl_port_attrs);
->=20
-> Why not rename to attr, which is what the implementation uses?
->
-Make sense. Will change in v2.
-=20
-> >  void devlink_port_attrs_set(struct devlink_port *devlink_port,
-> > -			    struct devlink_port_attrs *attrs)
-> > +			    const struct devlink_port_attrs *attrs)
+Let's not call dev_dstats_rx_dropped_add() in such a case.
+
+[0]
+BUG: unable to handle page fault for address: ffff88809782c020
+ PF: supervisor write access in kernel mode
+ PF: error_code(0x0002) - not-present page
+PGD 1b401067 P4D 1b401067 PUD 0
+Oops: Oops: 0002 [#1] SMP KASAN NOPTI
+CPU: 3 UID: 0 PID: 8476 Comm: syz.1.251 Not tainted 6.16.0-syzkaller-06699-ge8d780dcd957 #0 PREEMPT(full)
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+RIP: 0010:local_add arch/x86/include/asm/local.h:33 [inline]
+RIP: 0010:u64_stats_add include/linux/u64_stats_sync.h:89 [inline]
+RIP: 0010:dev_dstats_rx_dropped_add include/linux/netdevice.h:3027 [inline]
+RIP: 0010:nsim_queue_free+0xba/0x120 drivers/net/netdevsim/netdev.c:714
+Code: 07 77 6c 4a 8d 3c ed 20 7e f1 8d 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 80 3c 02 00 75 46 4a 03 1c ed 20 7e f1 8d <4c> 01 63 20 be 00 02 00 00 48 8d 3d 00 00 00 00 e8 61 2f 58 fa 48
+RSP: 0018:ffffc900044af150 EFLAGS: 00010286
+RAX: dffffc0000000000 RBX: ffff88809782c000 RCX: 00000000000079c3
+RDX: 1ffffffff1be2fc7 RSI: ffffffff8c15f380 RDI: ffffffff8df17e38
+RBP: ffff88805f59d000 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000001 R11: 0000000000000001 R12: 0000000000000000
+R13: 0000000000000003 R14: ffff88806ceb3d00 R15: ffffed100dfd308e
+FS:  0000000000000000(0000) GS:ffff88809782c000(0063) knlGS:00000000f505db40
+CS:  0010 DS: 002b ES: 002b CR0: 0000000080050033
+CR2: ffff88809782c020 CR3: 000000006fc6a000 CR4: 0000000000352ef0
+Call Trace:
+ <TASK>
+ nsim_queue_uninit drivers/net/netdevsim/netdev.c:993 [inline]
+ nsim_init_netdevsim drivers/net/netdevsim/netdev.c:1049 [inline]
+ nsim_create+0xd0a/0x1260 drivers/net/netdevsim/netdev.c:1101
+ __nsim_dev_port_add+0x435/0x7d0 drivers/net/netdevsim/dev.c:1438
+ nsim_dev_port_add_all drivers/net/netdevsim/dev.c:1494 [inline]
+ nsim_dev_reload_create drivers/net/netdevsim/dev.c:1546 [inline]
+ nsim_dev_reload_up+0x5b8/0x860 drivers/net/netdevsim/dev.c:1003
+ devlink_reload+0x322/0x7c0 net/devlink/dev.c:474
+ devlink_nl_reload_doit+0xe31/0x1410 net/devlink/dev.c:584
+ genl_family_rcv_msg_doit+0x206/0x2f0 net/netlink/genetlink.c:1115
+ genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+ genl_rcv_msg+0x55c/0x800 net/netlink/genetlink.c:1210
+ netlink_rcv_skb+0x155/0x420 net/netlink/af_netlink.c:2552
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+ netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
+ netlink_unicast+0x5aa/0x870 net/netlink/af_netlink.c:1346
+ netlink_sendmsg+0x8d1/0xdd0 net/netlink/af_netlink.c:1896
+ sock_sendmsg_nosec net/socket.c:714 [inline]
+ __sock_sendmsg net/socket.c:729 [inline]
+ ____sys_sendmsg+0xa95/0xc70 net/socket.c:2614
+ ___sys_sendmsg+0x134/0x1d0 net/socket.c:2668
+ __sys_sendmsg+0x16d/0x220 net/socket.c:2700
+ do_syscall_32_irqs_on arch/x86/entry/syscall_32.c:83 [inline]
+ __do_fast_syscall_32+0x7c/0x3a0 arch/x86/entry/syscall_32.c:306
+ do_fast_syscall_32+0x32/0x80 arch/x86/entry/syscall_32.c:331
+ entry_SYSENTER_compat_after_hwframe+0x84/0x8e
+RIP: 0023:0xf708e579
+Code: b8 01 10 06 03 74 b4 01 10 07 03 74 b0 01 10 08 03 74 d8 01 00 00 00 00 00 00 00 00 00 00 00 00 00 51 52 55 89 e5 0f 34 cd 80 <5d> 5a 59 c3 90 90 90 90 8d b4 26 00 00 00 00 8d b4 26 00 00 00 00
+RSP: 002b:00000000f505d55c EFLAGS: 00000296 ORIG_RAX: 0000000000000172
+RAX: ffffffffffffffda RBX: 0000000000000007 RCX: 0000000080000080
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000296 R12: 0000000000000000
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+ </TASK>
+Modules linked in:
+CR2: ffff88809782c020
+
+Fixes: 2a68a22304f9 ("netdevsim: account dropped packet length in stats on queue free")
+Reported-by: syzbot+8aa80c6232008f7b957d@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/netdev/688bb9ca.a00a0220.26d0e1.0050.GAE@google.com/
+Suggested-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+---
+v2: Use qlen to avoid unnecessary stat change
+v1: https://lore.kernel.org/all/20250731184829.1433735-1-kuniyu@google.com/
+---
+ drivers/net/netdevsim/netdev.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
+index 39fe28af48b9..0178219f0db5 100644
+--- a/drivers/net/netdevsim/netdev.c
++++ b/drivers/net/netdevsim/netdev.c
+@@ -710,9 +710,13 @@ static struct nsim_rq *nsim_queue_alloc(void)
+ static void nsim_queue_free(struct net_device *dev, struct nsim_rq *rq)
+ {
+ 	hrtimer_cancel(&rq->napi_timer);
+-	local_bh_disable();
+-	dev_dstats_rx_dropped_add(dev, rq->skb_queue.qlen);
+-	local_bh_enable();
++
++	if (rq->skb_queue.qlen) {
++		local_bh_disable();
++		dev_dstats_rx_dropped_add(dev, rq->skb_queue.qlen);
++		local_bh_enable();
++	}
++
+ 	skb_queue_purge_reason(&rq->skb_queue, SKB_DROP_REASON_QUEUE_PURGE);
+ 	kfree(rq);
+ }
+-- 
+2.51.0.rc0.205.g4a044479a3-goog
+
 
