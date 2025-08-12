@@ -1,133 +1,175 @@
-Return-Path: <netdev+bounces-213056-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213057-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE951B230F3
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 19:58:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE9F2B23116
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 19:59:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D7831896CD4
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 17:58:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E76D6568145
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 17:59:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31CC12FE56A;
-	Tue, 12 Aug 2025 17:58:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70F182FE58D;
+	Tue, 12 Aug 2025 17:58:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="uDK9qv6e"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TT4mjuDz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDED02FAC14
-	for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 17:57:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB1AE2FE586
+	for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 17:58:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755021481; cv=none; b=XYlf+7wd8QhJaV766NADk41SbdxHHyNhmoKVjaL+t5FRoJVAEyyAOzBNdzS96GPm5P8praD61QMXeOXtqQGhGrWsX4H2eXg4IOg6g0BlErtNHt5NgqfGz8jF69CJt8eE+NRvZ6bqquLw3THsHsRCoUuSmVVEQbTPGQQEEYUKb2w=
+	t=1755021537; cv=none; b=KS+7T2vj5kIY5gZFgQXECHbHRgJGJl06NlB2ORHiYBMYzilpGiPy4tNNXclr4xEv6/TwHXvje8vp16H+1m/hWKQfe9K4FyVvBCQ7OgLf7z4jdpGpwLPs9eV+Iqi/eRglFcSmsjvfCjocXyoBVfyoZl1KOSnxoXxiodItjUnxjGc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755021481; c=relaxed/simple;
-	bh=hPrGuxrOLQ9ipBeDFWhoJK1vM+KGW1+i9S6rdpPe8xU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MhvF3Qz+uRcyd6g8OB6ygJTMS59as94pxLILIHOnjAbLC0UwFakpNYeteRyvWyTXBizF4GIwp1T3biGg524syRmPNfbmsAQJ4ue08To+gnge8rWrN1aysnRsxMvBro5SuZobKVTdt/OXBKBMu8IapJNpMHzovIwChI/ZbZyPnRo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=uDK9qv6e; arc=none smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-76a3818eb9bso5403311b3a.3
-        for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 10:57:58 -0700 (PDT)
+	s=arc-20240116; t=1755021537; c=relaxed/simple;
+	bh=BBdOvE2AriIw5xw28ETj+/eLrI0VWJQRxeJ5yHjfv94=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=PLGqRkI0WokObASV1J9E660eIRyv861qcZ7Z71+DuHdk3IQnudPIH65a0FM3/jdPrMxYcRFhSxY2lVXI3mrK4znPUpWcsgDrqv9P6aSC8NMgPTF26Jj6lCDxNdbZc+g/7VeCrLif2Yq8E4Al1FBkz+eDufx71EM7zVXQWh454mw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TT4mjuDz; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-76bb73b63d2so5951950b3a.1
+        for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 10:58:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1755021478; x=1755626278; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Qc+A4jnBK4EPdKh66angrNfmE3qm0EXV6FaKJ1CugA4=;
-        b=uDK9qv6eTp2PMd3L4a8hShsQcjDB5jf48FIhmNfWH2VcfmiteLxvDDlGaLdwujL5D9
-         lHNURWLvSFtiaBpw/FL2Js9X7ifwtQQeSvS+DyF63YdqEH7EcBZmOIGjh1WXRsqfubqJ
-         g/L1LzJ0Ub5shHfn8f1IlHGjlE+ja+bc++unIogu9YN9F+4Ig9vrIOX9pN+ofxd+f3Gw
-         QIHvTWG25ZxIDouRkxvn+6YYlmhBVXT2XrQthUuT8JUhKS/oDbtCM3e0lxa2gKEoKq/7
-         SOAwT9+yY57Jqg0t3NMnCMJJn60oqoppI4DjRVwiLT62c8lhBA1A6+2Ebh3n8jvZDRXE
-         zm7g==
+        d=google.com; s=20230601; t=1755021535; x=1755626335; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=r2V1v9VHmhBBpIoyn/8bp16McXh5rwC69+hYhu5VhtU=;
+        b=TT4mjuDzPb328wHdbUmGt/otZ3q/49m4dvhCiW5jeInpweNhEq3ajVoltTc1dei0w5
+         hZfP1NJNMpkK2+GJK49OGsbjwgiQxi8wjhBnIO5+SazZ59xYDk1TfkYHeDQSJh89GcB6
+         aJjqrbL0bzx5VEiZJvbxdDbc/zsrL2TOAntmDimR90+tDHR9JcS0/o6JoYB+I/22JgQu
+         +PFlztWPf6KkUAVPRexyM1LjUV0xHH7GigkE7eefyAgpt+Bucyq1r0RrCUWHTwlaYv9z
+         42FK5rhDgIgQu9nc0baYmvmc+1nPa3BmlniQt/wMMkEl/ryc+SCYrlpa0eNYZZcWkARn
+         hd6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755021478; x=1755626278;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Qc+A4jnBK4EPdKh66angrNfmE3qm0EXV6FaKJ1CugA4=;
-        b=Fd6j7dKbcNATPJxJ83Rb2BiHecRQSCDF9Xt6LhYngz3Zi22Ga+hhXXxNkFlWqg/RMe
-         7ieEiB8KTwxPcgxk6T0hbJqFzPHzdnFAXW6OZJ8Va4Bn4FeYHkGa5NhNL7GXhHHrs+oQ
-         oJxgr+aIPK/zWflvOXRXsulxlWQL6dOyKXkjPuCytT/Ie5/pluxWxKjZ6Q2SkOxKmSWO
-         LplDDwxMv2q4/dYlnBVg3TrMAjnTH7mL55ExGnPPvSbtuGcG7CAUWkvNqrxARfmupvDC
-         xcZs7TvModM9Sdg+cfP45cU7y0N3vJUljteMqIU/wuxnWDGXM48HJMngUBs3MNT7aaPs
-         7hLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUbpVxApiZyGuddZ9ALwhAhlIJEbRq+07mKuJC56yupMV7BP1zG7eIiNYrQKnI3fa2tlC7qP4g=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyv8rO5IxrbPkEUdhkDy9CePubl5PDqEqT5LvJ334Bp/IQJ+wE5
-	ggaOIi5y/KdHB3FbcqpZQPZvwzsvRhv0ZUDRtF4ApkBf7XxQ8aYS7hUz9jaHQlLJy+A=
-X-Gm-Gg: ASbGnct3tXAm/iLgQPkzvZz+0b/d6J0NwfVZJ25XfoM1UEQMGSzZ9QWNHJFAuGPLTwY
-	qW+qGYcrjNx8zvsJG+QmHlAuaUaIwoVK3YM6SrDLV9Bv8XwZDt6ZSBwCD9g8RBM+2+erxVnQiyp
-	UlffX9p8LaUfOBKMtq4CQ+dV62rCZRC6h2S13KOc84ZaV5TbYL6rvO8Wlf8C3Y0jjByzoKgCbzy
-	13Vq7KhIJqhrlYZv8/5ufhvHhb2QhG9gjT9CFSs/IMCK2c2x50LgiXMOHJA125ndx7brZDmAycu
-	e8T/Xq0cvwBNgjdpkqchtaP4uMWNuL6AEEo2CElbTWeEP7lmvhJ0sU7ZuDhVzKQ4/kUkx8XR9Wb
-	07gAU6Q6I40qZDzH75erNdL6pKpQXNiNkWYwWmRgqsFeBjZdOgtJkKzQbm/F71l0s99ea8XS2PI
-	FjSBTqJic=
-X-Google-Smtp-Source: AGHT+IHxi2HOW8bSGkAzQGQAd8ZqXnSd+5ht/WWbBZm7UBPBn7pRtc+d0H/ulq4tQ+TrYx/lPWqfGA==
-X-Received: by 2002:a05:6a00:b55:b0:748:fe3a:49f2 with SMTP id d2e1a72fcca58-76e20f900d8mr126425b3a.21.1755021478408;
-        Tue, 12 Aug 2025 10:57:58 -0700 (PDT)
-Received: from MacBook-Air.local (c-73-222-201-58.hsd1.ca.comcast.net. [73.222.201.58])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-76bccfcf523sm29950265b3a.90.2025.08.12.10.57.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Aug 2025 10:57:58 -0700 (PDT)
-Date: Tue, 12 Aug 2025 10:57:55 -0700
-From: Joe Damato <joe@dama.to>
-To: Xichao Zhao <zhao.xichao@vivo.com>
-Cc: trondmy@kernel.org, anna@kernel.org, chuck.lever@oracle.com,
-	jlayton@kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, neil@brown.name,
-	okorniev@redhat.com, Dai.Ngo@oracle.com, tom@talpey.com,
-	horms@kernel.org, linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] sunrpc: fix "occurence"->"occurrence"
-Message-ID: <aJuAo3lfY9lRB-Oo@MacBook-Air.local>
-Mail-Followup-To: Joe Damato <joe@dama.to>,
-	Xichao Zhao <zhao.xichao@vivo.com>, trondmy@kernel.org,
-	anna@kernel.org, chuck.lever@oracle.com, jlayton@kernel.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, neil@brown.name, okorniev@redhat.com,
-	Dai.Ngo@oracle.com, tom@talpey.com, horms@kernel.org,
-	linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-References: <20250812113359.178412-1-zhao.xichao@vivo.com>
+        d=1e100.net; s=20230601; t=1755021535; x=1755626335;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=r2V1v9VHmhBBpIoyn/8bp16McXh5rwC69+hYhu5VhtU=;
+        b=WsA5w3LlrS5h5jlYfjhpSwsT/yrWpTzKDeVTEPDF3yybCtCq8/1IzFbKTdobqApCN1
+         InSoQc4pHT1oyEaD5zoJFahhbBqVNX05ZxEWOurp7/Cl84h9JaTDEOeAiahq0Rrtj9AR
+         yL4Q1eCjDK3s+1ts96I1Uo6zXjIq49CUWgP7ezL4ZHj4dJQCZDAb/zcr2CdY/7nKt3o3
+         0X8MPmtJR3lx4vyDPEgKM6clNq/eLOY/0CY1H0Q8PHJmKlfvPBNyv8IpUhGvb1SnnTGt
+         yrHQbFO9O4A+c6pLGSGYOWZHc944JWoRxIotoQAhS2TR8Bi+slYDhvAbsHy9ecyuoW3Z
+         0yrQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVD/t8y0ewZxXD2N4sBdBS/m+IkAIKE8Lo874qT98R/JSX5gTZkeQHxuxDNY//BnDw4gQBNcLg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxXsU0DcD/yHx/EDcwYCMXWaECgfZQmRU+qQovz456HjG43MGQa
+	9kRGv4tNEiJerCa/4hJ6DGtsvyOkb7jqPvz1h4lq8lxetTZQPbBPX3plAlMW+e18Cp7wq/KowmG
+	wbwwlMA==
+X-Google-Smtp-Source: AGHT+IHpI2A58X7fiHu4X8DLCY/YyPjXlJ8KtqdQYuS0Jk77Gj/N6hjXCZ5aN91Gfz65dY+Oy92efigaL18=
+X-Received: from pfbde4.prod.google.com ([2002:a05:6a00:4684:b0:740:5196:b63a])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:939d:b0:240:1119:d70c
+ with SMTP id adf61e73a8af0-240a8bb39dcmr219488637.44.1755021534987; Tue, 12
+ Aug 2025 10:58:54 -0700 (PDT)
+Date: Tue, 12 Aug 2025 17:58:18 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250812113359.178412-1-zhao.xichao@vivo.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.rc0.205.g4a044479a3-goog
+Message-ID: <20250812175848.512446-1-kuniyu@google.com>
+Subject: [PATCH v3 net-next 00/12] net-memcg: Decouple controlled memcg from sk->sk_prot->memory_allocated.
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Neal Cardwell <ncardwell@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Willem de Bruijn <willemb@google.com>, Matthieu Baerts <matttbe@kernel.org>, 
+	Mat Martineau <martineau@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
+	Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>, 
+	Shakeel Butt <shakeel.butt@linux.dev>, Andrew Morton <akpm@linux-foundation.org>, 
+	"=?UTF-8?q?Michal=20Koutn=C3=BD?=" <mkoutny@suse.com>, Tejun Heo <tj@kernel.org>
+Cc: Simon Horman <horms@kernel.org>, Geliang Tang <geliang@kernel.org>, 
+	Muchun Song <muchun.song@linux.dev>, Mina Almasry <almasrymina@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
+	mptcp@lists.linux.dev, cgroups@vger.kernel.org, linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Aug 12, 2025 at 07:33:59PM +0800, Xichao Zhao wrote:
-> Trivial fix to spelling mistake in comment text.
-> 
-> Signed-off-by: Xichao Zhao <zhao.xichao@vivo.com>
-> ---
->  net/sunrpc/sysfs.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/sunrpc/sysfs.c b/net/sunrpc/sysfs.c
-> index 09434e1143c5..8b01b7ae2690 100644
-> --- a/net/sunrpc/sysfs.c
-> +++ b/net/sunrpc/sysfs.c
-> @@ -389,7 +389,7 @@ static ssize_t rpc_sysfs_xprt_dstaddr_store(struct kobject *kobj,
->  	saddr = (struct sockaddr *)&xprt->addr;
->  	port = rpc_get_port(saddr);
->  
-> -	/* buf_len is the len until the first occurence of either
-> +	/* buf_len is the len until the first occurrence of either
->  	 * '\n' or '\0'
->  	 */
->  	buf_len = strcspn(buf, "\n");
+Some protocols (e.g., TCP, UDP) have their own memory accounting for
+socket buffers and charge memory to global per-protocol counters such
+as /proc/net/ipv4/tcp_mem.
 
-In the future probably a good idea to add net-next to the subject line so it
-is clear which tree you are targeting (e.g. [PATCH net-next]).
+When running under a non-root cgroup, this memory is also charged to
+the memcg as sock in memory.stat.
 
-Reviewed-by: Joe Damato <joe@dama.to>
+Sockets of such protocols are still subject to the global limits,
+thus affected by a noisy neighbour outside cgroup.
+
+This makes it difficult to accurately estimate and configure appropriate
+global limits.
+
+If all workloads were guaranteed to be controlled under memcg, the issue
+can be worked around by setting tcp_mem[0~2] to UINT_MAX.
+
+However, this assumption does not always hold, and processes that belong
+to the root cgroup or opt out of memcg can consume memory up to the global
+limit, which is problematic.
+
+This series decouples memcg from the global memory accounting if its
+memory.max is not "max".  This simplifies the memcg configuration while
+keeping the global limits within a reasonable range, which is only 10% of
+the physical memory by default.
+
+Overview of the series:
+
+  patch 1 is a bug fix for MPTCP
+  patch 2 ~ 9 move sk->sk_memcg accesses to a single place
+  patch 10 moves sk_memcg under CONFIG_MEMCG
+  patch 11 stores a flag in the lowest bit of sk->sk_memcg
+  patch 12 decouples memcg from sk_prot->memory_allocated based on the flag
+
+
+Changes:
+  v3:
+    * Patch 12
+      * Fix build failrue for kTLS (include <net/proto_memory.h>)
+
+  v2: https://lore.kernel.org/netdev/20250811173116.2829786-1-kuniyu@google.com/
+    * Remove per-memcg knob
+    * Patch 11
+      * Set flag on sk_memcg based on memory.max
+    * Patch 12
+      * Add sk_should_enter_memory_pressure() and cover
+        tcp_enter_memory_pressure() calls
+      * Update examples in changelog
+
+  v1: https://lore.kernel.org/netdev/20250721203624.3807041-1-kuniyu@google.com/
+
+
+Kuniyuki Iwashima (12):
+  mptcp: Fix up subflow's memcg when CONFIG_SOCK_CGROUP_DATA=n.
+  mptcp: Use tcp_under_memory_pressure() in mptcp_epollin_ready().
+  tcp: Simplify error path in inet_csk_accept().
+  net: Call trace_sock_exceed_buf_limit() for memcg failure with
+    SK_MEM_RECV.
+  net: Clean up __sk_mem_raise_allocated().
+  net-memcg: Introduce mem_cgroup_from_sk().
+  net-memcg: Introduce mem_cgroup_sk_enabled().
+  net-memcg: Pass struct sock to mem_cgroup_sk_(un)?charge().
+  net-memcg: Pass struct sock to mem_cgroup_sk_under_memory_pressure().
+  net: Define sk_memcg under CONFIG_MEMCG.
+  net-memcg: Store MEMCG_SOCK_ISOLATED in sk->sk_memcg.
+  net-memcg: Decouple controlled memcg from global protocol memory
+    accounting.
+
+ include/linux/memcontrol.h      | 45 +++++++++-------
+ include/net/proto_memory.h      | 15 ++++--
+ include/net/sock.h              | 67 +++++++++++++++++++++++
+ include/net/tcp.h               | 10 ++--
+ mm/memcontrol.c                 | 48 +++++++++++++----
+ net/core/sock.c                 | 94 +++++++++++++++++++++------------
+ net/ipv4/inet_connection_sock.c | 35 +++++++-----
+ net/ipv4/tcp.c                  |  3 +-
+ net/ipv4/tcp_output.c           | 13 +++--
+ net/mptcp/protocol.c            |  4 +-
+ net/mptcp/protocol.h            |  4 +-
+ net/mptcp/subflow.c             | 11 ++--
+ net/tls/tls_device.c            |  4 +-
+ 13 files changed, 254 insertions(+), 99 deletions(-)
+
+-- 
+2.51.0.rc0.205.g4a044479a3-goog
+
 
