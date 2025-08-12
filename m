@@ -1,141 +1,111 @@
-Return-Path: <netdev+bounces-212751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212768-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 358B2B21C2D
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 06:36:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B44DB21C51
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 06:51:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0325F1617A4
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 04:36:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97105424F4D
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 04:48:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99FF42248A5;
-	Tue, 12 Aug 2025 04:36:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DDEE2E0410;
+	Tue, 12 Aug 2025 04:48:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="qIpGpOwL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t14BuTRS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E24E91FF7C5;
-	Tue, 12 Aug 2025 04:36:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 640D629405;
+	Tue, 12 Aug 2025 04:48:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754973366; cv=none; b=oUV17oDg/eLzLIsYYxWIScuLSiOyZgmotEyJjdxZVUli0fmNS2cBVjsfEQCTp1SYmxnEZU8XKFiLNWG20QmuZgGCrbjC+PQDJ1FLsIFHGtW1Q3PUPZ+0mFaV2767knpOfJhtHJeJKTduZnkDrmy9uyr1HBdcyW4tSKVVhplV3fc=
+	t=1754974083; cv=none; b=JSVqW1ZbdRQTWafgDkRlS4EZG9IxFBIGLRnEAcetoGvfeui0sjbELvTbZIDLS5oqYC/imQkk0cYlTtlUSHLpn/4jbVE1aoFEMMrNs/aXer8ipWGmYN3CfCQJaV5CO2cTXjqO+IfqokRO6ZdlPCnTeB2H88xF6ZHhS3ZAETuzx+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754973366; c=relaxed/simple;
-	bh=a2fFT0SML1HIj0HNz8Dgc6iVsf23KZ0DRHF/eW1eDYk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OECEAxDPWER3AY77inGuZ9dcdNFE4PS7mMTU+aE0eCaqXZpvoxJ0CNKvwM5ZwaXKsxG0zYUPpjVUF0sxHbemQd3k2k83WC14mx39I7sKErsiQqhy0c8W2pAUe+3rhitmSW+zj3eXdh68mwc8N8yH+Sump3H1dt2g7z8TSwC5R9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=qIpGpOwL; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=202503; t=1754973361;
-	bh=yB5Ml8I8HYKSrQ/QSf1O5ePzfSDfVmXd+Ij2rdSEMXA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qIpGpOwLcmJwom5dsH5tSdIA6MtAxg7UYjSZ2kH44CqnV/MZ4FqGf0Coh6jHl06qF
-	 RC3Ye0yOZKbEBGDDDrU4QNC8uU+5HS4oVs+ocX38PNh+AiBu+eoQF0X/RaV9Z+/Fov
-	 xXSn8RbDmtw0blohrJcRK1LLqprGesijuJd9AM2jNbH3NkKLSx5AvrMcRs9iG+yW3R
-	 SDzpwxvQq01AJXGQ80FAWA34Q9oYXyePi/leBSCbVNKwQCJKNGAamcZMDcNdtIcn1F
-	 cZBRe0ACTeBryMNbjdIWukRdS/YU0qIMW1c1InyuEvcFl7ee3Oy3L3noC7T/q+1Zgw
-	 CXW0rXAB/62MA==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4c1Jbh5K5Wz4wbc;
-	Tue, 12 Aug 2025 14:36:00 +1000 (AEST)
-Date: Tue, 12 Aug 2025 14:36:00 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: Re: linux-next: build warnings after merge of the net-next tree
-Message-ID: <20250812143600.387da02c@canb.auug.org.au>
-In-Reply-To: <beada520-564a-481e-9f9d-91cd106aaee3@redhat.com>
-References: <20250711183129.2cf66d32@canb.auug.org.au>
-	<20250801144222.719c6568@canb.auug.org.au>
-	<beada520-564a-481e-9f9d-91cd106aaee3@redhat.com>
+	s=arc-20240116; t=1754974083; c=relaxed/simple;
+	bh=L8L/AG5G7UAoXL1PYS/u6Nnpj1wCsKju5KEwMHdal5k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=b1jCrqFGswuNgxhdTZCwYWltO6HRnz6nY3JTB1A2/f4vlCq5IE6tv5qPgkAN4O3Jk6U/u2RA5Pe9IOe5Xk/b9YbblQLXN99svuqbNPBZ/1C1hYiKUV7c+X9EToDN6fdw7V5Ab6Ev4ZKvw9oUDclm7C4in6Sg5ZLIvHBt0StJzmg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t14BuTRS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 578E4C4CEF5;
+	Tue, 12 Aug 2025 04:48:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754974081;
+	bh=L8L/AG5G7UAoXL1PYS/u6Nnpj1wCsKju5KEwMHdal5k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=t14BuTRSKl7Vt728N9usBcoblwvlD2/EKJKXoCuYFngh0woOOWAanrRi9rKD2m7zA
+	 oggmfQDUn9MAKQ9frbyl2aUe+Ahz38AU85z9QIUvDlinAgkVgvZAdJcv3e7DTuHrXO
+	 7lwb/cMnclDw1apnuZZPNJQF5lHA/R3MiMUXaF5NUqTxm2XOdtuQ0h6tH5tK1hb3C6
+	 bRLXHjBtpqXDKMiDqVyGt2BPFRG8ErTumatjseTugpO05MpP90Q+It0EiD58FKS8L0
+	 DI84EiQMM3wkLk9uDUp8rtLxms6LjgdR7S2evdjDfO2NTOcm7lOG8IwPsLifmZGTNG
+	 S42SlpPaDbYNw==
+Date: Tue, 12 Aug 2025 06:47:57 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Ryder Lee <ryder.lee@mediatek.com>,
+	Shayne Chen <shayne.chen@mediatek.com>, netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, linux-wireless@vger.kernel.org,
+	Rex Lu <rex.lu@mediatek.com>
+Subject: Re: [PATCH net-next v2] net: mediatek: wed: Introduce MT7992 WED
+ support to MT7988 SoC
+Message-ID: <aJrHfUo5QFs-MmM7@lore-rh-laptop>
+References: <20250811-mt7992-wed-support-v2-1-e43024c05305@kernel.org>
+ <aJoK7e4aEKR96V4h@lore-rh-laptop>
+ <20250811084414.6089720d@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/F.92=Yo_jE0NJfV0MmXWkBz";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="N1vBIlflFVXeQRN6"
+Content-Disposition: inline
+In-Reply-To: <20250811084414.6089720d@kernel.org>
 
---Sig_/F.92=Yo_jE0NJfV0MmXWkBz
-Content-Type: text/plain; charset=US-ASCII
+
+--N1vBIlflFVXeQRN6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-Hi Paolo,
-
-On Mon, 11 Aug 2025 11:53:38 +0200 Paolo Abeni <pabeni@redhat.com> wrote:
->
-> On 8/1/25 6:42 AM, Stephen Rothwell wrote:
-> > On Fri, 11 Jul 2025 18:31:29 +1000 Stephen Rothwell <sfr@canb.auug.org.=
-au> wrote: =20
-> >>
-> >> After merging the net-next tree, today's linux-next build (htmldocs)
-> >> produced these warnings:
-> >>
-> >> include/linux/virtio.h:172: warning: Excess struct member 'features' d=
-escription in 'virtio_device'
-> >> include/linux/virtio.h:172: warning: Excess struct member 'features_ar=
-ray' description in 'virtio_device'
-> >>
-> >> Introduced by commit
-> >>
-> >>   e7d4c1c5a546 ("virtio: introduce extended features") =20
+> On Mon, 11 Aug 2025 17:23:25 +0200 Lorenzo Bianconi wrote:
+> > > Introduce the second WDMA RX ring in WED driver for MT7988 SoC since =
+the
+> > > Mediatek MT7992 WiFi chipset supports two separated WDMA rings.
+> > > Add missing MT7988 configurations to properly support WED for MT7992 =
+in
+> > > MT76 driver. =20
 > >=20
-> > I am still seeing those warnings.  That commit is now in Linus' tree. =
-=20
+> > I sent this email twice wrongly. Please ignore this one.
 >=20
-> I'm sorry for the latency, I was off-the-grid in the past weeks.
->=20
-> I observed that warnings in an earlier revision of the relevant patch,
-> but I thought the previous commit:
->=20
-> eade9f57ca72 ("scripts/kernel_doc.py: properly handle
-> VIRTIO_DECLARE_FEATURES")
->=20
-> addressed it. At least I can't see the warnings locally while running:
->=20
-> make V=3D1 C=3D1 htmldocs
->=20
-> Perhaps it's sphinx version dependent? I'm using sphinx-build 7.3.7
-> Could you please share the exact command line and tools version used?
+> patchwork decided to ignore the other one.
+> Are they identical?
 
-I have been using the (older) perl version because it coped with files
-being missing.  The (newer) python version (which you run) now seems
-to cope to have been enhanced, so I sill start using it instead.  It
-(as you say) does not report the above warnings, so I will ignore them
-as well.
+Yes, they are identical. I will repost v3.
 
---=20
-Cheers,
-Stephen Rothwell
+Regards,
+Lorenzo
 
---Sig_/F.92=Yo_jE0NJfV0MmXWkBz
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+--N1vBIlflFVXeQRN6
+Content-Type: application/pgp-signature; name=signature.asc
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmiaxLAACgkQAVBC80lX
-0GzPqgf7BH7uMXzImVE97hEtvZmDN1J2SwH1Y0jgUwelXX6jEkeqi6oGP/hHhJfW
-Is6ue1TyvneG+OGvqzYIGE6ozHIgW81jg6qSo2nBQ4yS7kypWXkZ9Jk4xm12lfnd
-AUrDIWV2/aw+0NiTrLZJ5RwJpz6bCj7Ogu+xpjfwfu23c9o6nxrxBtKqlY/PKHcD
-rq/ENX8HHSSCbdPg0iHDwnuga5M7oSoJUWGbCcfCxG60/xkiwPQEpe0yyKlSZJK1
-f8tp72+7kdwKCTiM4Ay4yWHfE+cBUBpTUPVcsw9lsfLP5nUiZ+AmFrShuUKE0AzW
-WKtCmTcMZOxRb1IXZqjScRn1teZSiQ==
-=I2E1
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaJrHegAKCRA6cBh0uS2t
+rAn9AP0bWrDJy2M1CQQq6ydQl8W40coUDAJ2wAj0bRJ3LjVQZQD/Skw/G0OSM9++
+iqiVRAF7bNmVxGzHSAF1T0D3HNVL1gk=
+=PIXt
 -----END PGP SIGNATURE-----
 
---Sig_/F.92=Yo_jE0NJfV0MmXWkBz--
+--N1vBIlflFVXeQRN6--
 
