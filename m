@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-212907-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212909-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8BA7B22789
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 14:57:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5899CB22799
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 15:00:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C0CE5070E9
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 12:54:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B5D13188D1EF
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 12:55:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56F4228000B;
-	Tue, 12 Aug 2025 12:52:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B3C728151C;
+	Tue, 12 Aug 2025 12:52:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="caC7RS6L"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KDMQeRiF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32A0927FD4B;
-	Tue, 12 Aug 2025 12:52:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EFD3280A4B;
+	Tue, 12 Aug 2025 12:52:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755003166; cv=none; b=Pg2/LSw0eqtA4xq4Fw8TdoiuxlwAEoqsevQcKIwMg5Yyuvv2bviykx6+BbUCORxZ+ENM3YeP+d4lYjiU6KoAlQZpXq2wsY/FwUzi4ELFJPA2GIEEmuchNQ2A8BsMWlTJUpmj1KURnkevR8hUw6JdSwsCW7GMaR0hDJpWSGHAHkE=
+	t=1755003170; cv=none; b=I4RYmdKTb9o/Ov/HJlppQCLtvu/1Pvzo7xn7Io+7mRK1sON0Xn3F5fkUvecPViPslklEjkg/0D0RsvJeIOhF4uZtM3gU2IaT3Qy8zame2nNrRWqJfHO1C/aAE6uv7mJd+0i6MiFeVtoSExcc9nC8mh0MMegZtWOngnoIZ1wqBCc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755003166; c=relaxed/simple;
-	bh=5lvuF/LKGzSpcvNCfJjlm8GefNR/bRr9nGxk/wEHGag=;
+	s=arc-20240116; t=1755003170; c=relaxed/simple;
+	bh=n4ELKnV7jIl0+1lW2DQi8lUwFMi+5+dywheFxhIobFg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=XywNb6cp47fouQEhxGadeAEPEypWotw0TxpI+GbYjstftoCcybXPi7GNu6C2p4JsRud18gWoN7F2pgPp42/X3Ev6pZ/QCPxXwKjfe9WGB8RBjDRVeoN0gb8FcLyklpascQ1uqT+Nz78dUYvMHEOKRoFymIPgEopkewQzAM/iq+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=caC7RS6L; arc=none smtp.client-ip=209.85.128.50
+	 MIME-Version; b=s8Km7k++y0L1y35OkW1IqzqQSkpkf650yQwVHfb+GHMzssRpGuwp3XsoKJAUrNUmtZH9m1RrFq25V7JYwrxS/tpTZMF12G1aCbnBbKvXTes7jePuf4Y+WojXb4R2mAYNmA7WPN0JpykVKGC3OS1k6t9GrvMX1Vtns8220Z2bDrU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KDMQeRiF; arc=none smtp.client-ip=209.85.221.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-45a0dc77a15so10901275e9.2;
-        Tue, 12 Aug 2025 05:52:44 -0700 (PDT)
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3b914a9c77dso305488f8f.2;
+        Tue, 12 Aug 2025 05:52:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755003163; x=1755607963; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1755003166; x=1755607966; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QZWoObKWxZ9g5L+SiOfuz0ooW5EC167z8BwusUyzlgE=;
-        b=caC7RS6L13LIC19IlJQPNDcWqvrPJGvR/PcK5c5NWTOPiWJ4qUWJ8rOSPHr3cvDv2a
-         pphC7M6eY1QDpVD1ssoyqJDj3yegZF/1Ae5f9KRssIN9oLsczXoSzDFBye8i5eP/fTKh
-         pVRxvWHP4AluzVTgkV2SB4qIk6zh9D6RTMccBb54TFOsRItFdVrSKuXay5sgtdzxaNg1
-         eZES/rxbIF8q4UCMSx2OavtsskKMQOiMyOv9rYZlIcfqGTqMhkGwlHgF3jRkqWezFG9X
-         y/WMP1laOF+AVkQGAVTM/zNzOcl5bozuPpKu+pgVdx+zQt7KBOSWclDkExIZo67woBaf
-         +tvQ==
+        bh=tJOro309rX4Wa3welMZVLgwK6SeC0RoTfCmmnfx70t8=;
+        b=KDMQeRiFqM3vyBPoFmQgQW8OSjYzNs4XfpZUcavjY/CWnyEnuIBjWOUo+KcRovjjKE
+         HWqSQouBHYCu59a1y8CN5QCHGSPbakiw/XsAGMb0tRQRk9hO4DWc67P6o/ccKiYdDHf4
+         Aor/RE0C4qwZgJgKhWIZyYeOogSeLC0LBH8oA1+KNz3OAnS85gW6T1BI7J4Llh1kwD9+
+         ZPf8rIZmCfXg1Ej4xL+EvwZk2nanfHyuRhBWvjoXVwE+3utenQklK+LxmspQsnWTSgSi
+         ieS1NvgwnpDFf3tdos3Z64aGlfQQ3ZdmdRAOpZdGRp++bq8aYVW/jcP6vEsfpNFJoV0o
+         19Cw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755003163; x=1755607963;
+        d=1e100.net; s=20230601; t=1755003166; x=1755607966;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=QZWoObKWxZ9g5L+SiOfuz0ooW5EC167z8BwusUyzlgE=;
-        b=pEqKmiDsSZjCCbssHjcQOtVgZuPZEIPeevyNNciB0+inEa1tx8k4DYlTXsmCdJp1KS
-         O5JIoDNpR/RnLf34iC0Ah9haML7W6WW8S3tTgVf7xWSpKP61W9LklRKiEJIhxxRM5VVB
-         fejH/oB2xzNamyvHtMiFHJPJLy915+vAUpnok3xdCw/vGamar1L1hqjtfUNyuLMtjac6
-         KZYZWZnXCcGV225TSP/jSWudEr5Wx6docZ3fiGfrFT/UFH6/aiyqsf+eKVVY19BuHpwt
-         NkvjQQ1MqPEK6SsHtYDUEJaQ/aowJvn0NE0/0FnRMO7XW+XqbjsgFHc/o12gXxKghLRz
-         wJog==
-X-Forwarded-Encrypted: i=1; AJvYcCXMFLjjMqZwS62ObKouEGtYas+H3MI5DBwc0TtunquJjVOv5aWRjC+xKTWu16KcfwAAWvIQCLxGRfMHlRk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy1rI0YOwVPCh/V6xXl2HANfT6rLuNP7XsMLtIeSrgOo/JWtujV
-	wILASujjOf0uJiFcFQxBnkIyaudeBUtTJCHtmMwHBO/H+GSl7rh+WsS9DDElBBT0MYYzxg==
-X-Gm-Gg: ASbGnctiYTXMLGzeyEAd3VwnKUwV1hvvVvCY/Pp5TI00x/FNgtgDCLYsIHU8d8DghAp
-	4iRC1WzlPh9UqwQy1Ew0gPN2x1JLPkOCVc9xrCN75EfkYbP2kXGFu7hciV9whe8XCXPP7wa99Mk
-	FBUqeaOc77AvSnvDM9q9yDyJty6B9dTilt9iYoiBYJtEzx4XhUyyPnX/IXDKoWejN0An57QnN8n
-	MfGqmm7NrRmZrAzg6oynFZvuZNQbBvdlVAothEy4q2kg3dV/9bL1II5jSZRKTL9PCfCr3QAiGGg
-	uScI4wi5VFrv1nxPIn+p9JWBfN4HuOS9z3Ja9ax5cmZvJlvaW4pdWWFBTnaLVKH98j5q4uPL1eK
-	toMNAqMHpVaWh19UefKmgr8CQ27/jBXovAg==
-X-Google-Smtp-Source: AGHT+IGG+4mLBuigpNfF6lVk6qoiHtkhfDai6x6X4Q8m2lcCoJ/gzG9WGJ0x900Lt06/+r9abUHL+g==
-X-Received: by 2002:a05:600c:1f0e:b0:458:c045:ee99 with SMTP id 5b1f17b1804b1-45a10c0f75cmr27229555e9.28.1755003162472;
-        Tue, 12 Aug 2025 05:52:42 -0700 (PDT)
+        bh=tJOro309rX4Wa3welMZVLgwK6SeC0RoTfCmmnfx70t8=;
+        b=qcI5B7MkNRAwoGW8V30DTdVf+GqJA1lZ/XrFyu0/5kbSnC4LUsBmwvWH10LwPOXAV7
+         lzHQtmrq068U9HCLVQA8PJ4dy48fUTPS7tiF8Nwi+oVqGgYmTzwNss9r/MtmTDI9Jrli
+         nvOuTssnyMaRv4MWTbyyT+njVNa7eBFXjJ0hSaEmk/SoiyissuT0asO4vXH2afU1ipFm
+         yoPo4hgpqrrZzrXKZlEry6BwBA5UF2dM2/0L6dXYWzwuBL5eKF8eQijz7oSi+KLu+BQ8
+         64WTRE8o7GuI7zbRHbWjs9y9XjFXIm7AHuXQyuZpuDu13fj/vyw8U1tzHTdk1jM7atky
+         fpyQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUIy9ciwAGg9ThjanpTA4Q5xAk1JWe8iMT3XtJnq/zsbIabavyCX3Yv43HPE1PEXRhvA08CRm46+qZBdVU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxNJQB/z9VTAurHHiZut+LYYnXVlkoO4reGOJVYC0OQ4i2RlN2M
+	+n60dSbJbBZtYHJN4RyuNDWJbW4PQRPJk4w6WyX0kuxzhnJk7vnx9cm42NLZ5s1bc+SJDg==
+X-Gm-Gg: ASbGnct/N0//1+w3f3pyLQb0xRty9/FPRJziXFnubhY9V7BiM+XfqexZvfRt+p1tP4F
+	H5RSgS3wRhkocQhYEq/G29uynAVnXmQyQpi5GIqGDo9wBk4c4aLaPNVpMeSe3/Qc1OlWg60OMOi
+	n06tPs81gN5XEyZSJEUstxwcKx6IkiFsJZRaDmWB5OFcABvw1Bne15WctHPc7l9JOiNpd4PZD3J
+	Oqngk/kWoiO3XfNBWcQAWD9U5iRe+S2z1tTh3ge1j9qnTXjeE9mgB9aN/GbsLWVx90IduQLvLto
+	cbwQgZ2LLDw78oa3g8PO0KpLR+qR1U5aYJi/58ICpevAcqoEbO7bl0xnSt0kfBNhIjrSibAFvM+
+	9gqo09BtqWVNQlDr4yxGbtWOjFC3tVeCEVIg+EA4XV71h
+X-Google-Smtp-Source: AGHT+IEpMThsR4gQcuq+tmcVaiTlHtydYrEaD+CU65Sm6QGeVCAZrsNuyv7VrWgE+icZuWwdzAxbgQ==
+X-Received: by 2002:a05:6000:18a8:b0:3a4:f66a:9d31 with SMTP id ffacd0b85a97d-3b900b2d56cmr12107268f8f.16.1755003166238;
+        Tue, 12 Aug 2025 05:52:46 -0700 (PDT)
 Received: from localhost ([45.10.155.17])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-459e5873c43sm322343075e9.22.2025.08.12.05.52.41
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b914e70596sm1106392f8f.61.2025.08.12.05.52.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Aug 2025 05:52:42 -0700 (PDT)
+        Tue, 12 Aug 2025 05:52:45 -0700 (PDT)
 From: Richard Gobert <richardbgobert@gmail.com>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -93,9 +93,9 @@ Cc: davem@davemloft.net,
 	martin.lau@kernel.org,
 	linux-kernel@vger.kernel.org,
 	Richard Gobert <richardbgobert@gmail.com>
-Subject: [PATCH net-next v5 4/5] net: geneve: enable binding geneve sockets to local addresses
-Date: Tue, 12 Aug 2025 14:51:54 +0200
-Message-Id: <20250812125155.3808-5-richardbgobert@gmail.com>
+Subject: [PATCH net-next v5 5/5] selftests/net: add vxlan localbind selftest
+Date: Tue, 12 Aug 2025 14:51:55 +0200
+Message-Id: <20250812125155.3808-6-richardbgobert@gmail.com>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250812125155.3808-1-richardbgobert@gmail.com>
 References: <20250812125155.3808-1-richardbgobert@gmail.com>
@@ -107,269 +107,340 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Allow binding geneve sockets to local addresses, similar to
-the VXLAN "local" option. Add a netlink option to configure
-the local address.
-
-Like VXLAN, Geneve sockets can be bound to non-local addresses,
-meaning they may be UP before their outgoing interfaces.
+Test to make sure the localbind netlink option works
+in VXLAN interfaces.
 
 Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
 ---
- Documentation/netlink/specs/rt-link.yaml |  8 +++
- drivers/net/geneve.c                     | 80 +++++++++++++++++++++---
- include/net/geneve.h                     |  6 ++
- include/uapi/linux/if_link.h             |  2 +
- tools/include/uapi/linux/if_link.h       |  2 +
- 5 files changed, 90 insertions(+), 8 deletions(-)
+ tools/testing/selftests/net/Makefile          |   1 +
+ .../selftests/net/test_vxlan_localbind.sh     | 306 ++++++++++++++++++
+ 2 files changed, 307 insertions(+)
+ create mode 100755 tools/testing/selftests/net/test_vxlan_localbind.sh
 
-diff --git a/Documentation/netlink/specs/rt-link.yaml b/Documentation/netlink/specs/rt-link.yaml
-index 210394c188a3..8188ca95fad6 100644
---- a/Documentation/netlink/specs/rt-link.yaml
-+++ b/Documentation/netlink/specs/rt-link.yaml
-@@ -1907,6 +1907,14 @@ attribute-sets:
-         name: port-range
-         type: binary
-         struct: ifla-geneve-port-range
-+      -
-+        name: local
-+        type: binary
-+        display-hint: ipv4
-+      -
-+        name: local6
-+        type: binary
-+        display-hint: ipv6
-   -
-     name: linkinfo-iptun-attrs
-     name-prefix: ifla-iptun-
-diff --git a/drivers/net/geneve.c b/drivers/net/geneve.c
-index 54384f9b3872..2360ca891762 100644
---- a/drivers/net/geneve.c
-+++ b/drivers/net/geneve.c
-@@ -61,6 +61,7 @@ struct geneve_config {
- 	bool			inner_proto_inherit;
- 	u16			port_min;
- 	u16			port_max;
-+	union geneve_addr	saddr;
- };
+diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
+index b31a71f2b372..9305601f4eba 100644
+--- a/tools/testing/selftests/net/Makefile
++++ b/tools/testing/selftests/net/Makefile
+@@ -117,6 +117,7 @@ TEST_GEN_FILES += tfo
+ TEST_PROGS += tfo_passive.sh
+ TEST_PROGS += broadcast_pmtu.sh
+ TEST_PROGS += ipv6_force_forwarding.sh
++TEST_PROGS += test_vxlan_localbind.sh
  
- /* Pseudo network device */
-@@ -465,7 +466,8 @@ static int geneve_udp_encap_err_lookup(struct sock *sk, struct sk_buff *skb)
- }
- 
- static struct socket *geneve_create_sock(struct net *net, bool ipv6,
--					 __be16 port, bool ipv6_rx_csum)
-+					 __be16 port, bool ipv6_rx_csum,
-+					 union geneve_addr *local_addr)
- {
- 	struct socket *sock;
- 	struct udp_port_cfg udp_conf;
-@@ -477,11 +479,20 @@ static struct socket *geneve_create_sock(struct net *net, bool ipv6,
- 		udp_conf.family = AF_INET6;
- 		udp_conf.ipv6_v6only = 1;
- 		udp_conf.use_udp6_rx_checksums = ipv6_rx_csum;
-+#if IS_ENABLED(CONFIG_IPV6)
-+		memcpy(&udp_conf.local_ip6,
-+		       &local_addr->sin6.sin6_addr,
-+		       sizeof(local_addr->sin6.sin6_addr));
-+#endif
- 	} else {
- 		udp_conf.family = AF_INET;
- 		udp_conf.local_ip.s_addr = htonl(INADDR_ANY);
-+		memcpy(&udp_conf.local_ip,
-+		       &local_addr->sin.sin_addr,
-+		       sizeof(local_addr->sin.sin_addr));
- 	}
- 
-+	udp_conf.freebind = 1;
- 	udp_conf.local_udp_port = port;
- 
- 	/* Open UDP socket */
-@@ -586,7 +597,8 @@ static int geneve_gro_complete(struct sock *sk, struct sk_buff *skb,
- 
- /* Create new listen socket if needed */
- static struct geneve_sock *geneve_socket_create(struct net *net, __be16 port,
--						bool ipv6, bool ipv6_rx_csum)
-+						bool ipv6, bool ipv6_rx_csum,
-+						union geneve_addr *local_addr)
- {
- 	struct geneve_net *gn = net_generic(net, geneve_net_id);
- 	struct geneve_sock *gs;
-@@ -598,7 +610,7 @@ static struct geneve_sock *geneve_socket_create(struct net *net, __be16 port,
- 	if (!gs)
- 		return ERR_PTR(-ENOMEM);
- 
--	sock = geneve_create_sock(net, ipv6, port, ipv6_rx_csum);
-+	sock = geneve_create_sock(net, ipv6, port, ipv6_rx_csum, local_addr);
- 	if (IS_ERR(sock)) {
- 		kfree(gs);
- 		return ERR_CAST(sock);
-@@ -657,12 +669,24 @@ static void geneve_sock_release(struct geneve_dev *geneve)
- 
- static struct geneve_sock *geneve_find_sock(struct geneve_net *gn,
- 					    sa_family_t family,
--					    __be16 dst_port)
-+					    __be16 dst_port,
-+					    union geneve_addr *saddr)
- {
- 	struct geneve_sock *gs;
- 
- 	list_for_each_entry(gs, &gn->sock_list, list) {
--		if (inet_sk(gs->sock->sk)->inet_sport == dst_port &&
-+		struct sock *sk = gs->sock->sk;
-+		struct inet_sock *inet = inet_sk(sk);
+ # YNL files, must be before "include ..lib.mk"
+ YNL_GEN_FILES := busy_poller netlink-dumps
+diff --git a/tools/testing/selftests/net/test_vxlan_localbind.sh b/tools/testing/selftests/net/test_vxlan_localbind.sh
+new file mode 100755
+index 000000000000..60b97a578c74
+--- /dev/null
++++ b/tools/testing/selftests/net/test_vxlan_localbind.sh
+@@ -0,0 +1,306 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
 +
-+		if (family == AF_INET &&
-+		    inet->inet_rcv_saddr != saddr->sin.sin_addr.s_addr)
-+			continue;
-+#if IS_ENABLED(CONFIG_IPV6)
-+		else if (ipv6_addr_cmp(&sk->sk_v6_rcv_saddr,
-+				       &saddr->sin6.sin6_addr) != 0)
-+			continue;
-+#endif
-+		if (inet->inet_sport == dst_port &&
- 		    geneve_get_sk_family(gs) == family) {
- 			return gs;
- 		}
-@@ -679,14 +703,16 @@ static int geneve_sock_add(struct geneve_dev *geneve, bool ipv6)
- 	__u8 vni[3];
- 	__u32 hash;
- 
--	gs = geneve_find_sock(gn, ipv6 ? AF_INET6 : AF_INET, geneve->cfg.info.key.tp_dst);
-+	gs = geneve_find_sock(gn, ipv6 ? AF_INET6 : AF_INET,
-+			      geneve->cfg.info.key.tp_dst, &geneve->cfg.saddr);
- 	if (gs) {
- 		gs->refcnt++;
- 		goto out;
- 	}
- 
- 	gs = geneve_socket_create(net, geneve->cfg.info.key.tp_dst, ipv6,
--				  geneve->cfg.use_udp6_rx_checksums);
-+				  geneve->cfg.use_udp6_rx_checksums,
-+				  &geneve->cfg.saddr);
- 	if (IS_ERR(gs))
- 		return PTR_ERR(gs);
- 
-@@ -1246,6 +1272,8 @@ static const struct nla_policy geneve_policy[IFLA_GENEVE_MAX + 1] = {
- 	[IFLA_GENEVE_DF]		= { .type = NLA_U8 },
- 	[IFLA_GENEVE_INNER_PROTO_INHERIT]	= { .type = NLA_FLAG },
- 	[IFLA_GENEVE_PORT_RANGE]	= NLA_POLICY_EXACT_LEN(sizeof(struct ifla_geneve_port_range)),
-+	[IFLA_GENEVE_LOCAL]	= NLA_POLICY_EXACT_LEN(sizeof_field(struct iphdr, saddr)),
-+	[IFLA_GENEVE_LOCAL6]	= NLA_POLICY_EXACT_LEN(sizeof(struct in6_addr)),
- };
- 
- static int geneve_validate(struct nlattr *tb[], struct nlattr *data[],
-@@ -1596,6 +1624,32 @@ static int geneve_nl2info(struct nlattr *tb[], struct nlattr *data[],
- 		cfg->inner_proto_inherit = true;
- 	}
- 
-+	if (data[IFLA_GENEVE_LOCAL]) {
-+		if (changelink && (ip_tunnel_info_af(info) != AF_INET)) {
-+			attrtype = IFLA_GENEVE_LOCAL;
-+			goto change_notsup;
-+		}
++# This test is for checking the VXLAN localbind option.
++#
++# It simulates two hypervisors running a VM each using four network namespaces:
++# two for the HVs, two for the VMs.
++# A small VXLAN tunnel is made between the two hypervisors to have the two vms
++# in the same virtual L2, connected through two separate subnets:
++#
++# +-------------------+                                    +-------------------+
++# |                   |                                    |                   |
++# |    vm-1 netns     |                                    |    vm-2 netns     |
++# |                   |                                    |                   |
++# |  +-------------+  |                                    |  +-------------+  |
++# |  |   veth-hv   |  |                                    |  |   veth-hv   |  |
++# |  | 10.0.0.1/24 |  |                                    |  | 10.0.0.2/24 |  |
++# |  +-------------+  |                                    |  +-------------+  |
++# |        .          |                                    |         .         |
++# +-------------------+                                    +-------------------+
++#          .                                                         .
++#          .                                                         .
++#          .                                                         .
++# +-----------------------------------+   +------------------------------------+
++# |        .                          |   |                          .         |
++# |  +----------+                     |   |                     +----------+   |
++# |  | veth-tap |                     |   |                     | veth-tap |   |
++# |  +----+-----+                     |   |                     +----+-----+   |
++# |       |                           |   |                          |         |
++# |    +--+--+                        |   |                       +--+--+      |
++# |    | br0 |                        |   |                       | br0 |      |
++# |    +--+--+                        |   |                       +--+--+      |
++# |       |                           |   |                          |         |
++# |   +---+----+  +--------+--------+ |   | +--------+--------+  +---+----+    |
++# |   | vxlan0 |..|      veth0      |.|...|.|      veth0      |..| vxlan0 |    |
++# |   +--------+  | 172.16.1.1/24   | |   | | 172.16.1.2/24   |  +--------+    |
++# |               | 172.16.2.1/24   | |   | | 172.16.2.2/24   |                |
++# |               +-----------------+ |   | +-----------------+                |
++# |                                   |   |                                    |
++# |             hv-1 netns            |   |           hv-2 netns               |
++# |                                   |   |                                    |
++# +-----------------------------------+   +------------------------------------+
++#
++# This tests the connectivity between vm-1 and vm-2 using different subnet and
++# localbind configurations.
 +
-+		cfg->saddr.sin.sin_addr.s_addr = nla_get_in_addr(data[IFLA_GENEVE_LOCAL]);
-+		cfg->saddr.sa.sa_family = AF_INET;
-+	}
++source lib.sh
++ret=0
 +
-+	if (data[IFLA_GENEVE_LOCAL6]) {
-+#if IS_ENABLED(CONFIG_IPV6)
-+		if (changelink && (ip_tunnel_info_af(info) != AF_INET6)) {
-+			attrtype = IFLA_GENEVE_LOCAL6;
-+			goto change_notsup;
-+		}
++TESTS="
++    same_subnet
++    same_subnet_localbind
++    different_subnets
++    different_subnets_localbind
++"
 +
-+		cfg->saddr.sin6.sin6_addr = nla_get_in6_addr(data[IFLA_GENEVE_LOCAL6]);
-+		cfg->saddr.sa.sa_family = AF_INET6;
-+#else
-+		NL_SET_ERR_MSG_ATTR(extack, data[IFLA_GENEVE_LOCAL6],
-+				    "IPv6 support not enabled in the kernel");
-+		return -EPFNOSUPPORT;
-+#endif
-+	}
++VERBOSE=0
++PAUSE_ON_FAIL=no
++PAUSE=no
 +
- 	return 0;
- change_notsup:
- 	NL_SET_ERR_MSG_ATTR(extack, data[attrtype],
-@@ -1782,6 +1836,7 @@ static size_t geneve_get_size(const struct net_device *dev)
- 		nla_total_size(sizeof(__u8)) + /* IFLA_GENEVE_TTL_INHERIT */
- 		nla_total_size(0) +	 /* IFLA_GENEVE_INNER_PROTO_INHERIT */
- 		nla_total_size(sizeof(struct ifla_geneve_port_range)) + /* IFLA_GENEVE_PORT_RANGE */
-+		nla_total_size(sizeof(struct in6_addr)) + /* IFLA_GENEVE_LOCAL{6} */
- 		0;
- }
- 
-@@ -1807,16 +1862,25 @@ static int geneve_fill_info(struct sk_buff *skb, const struct net_device *dev)
- 		if (nla_put_in_addr(skb, IFLA_GENEVE_REMOTE,
- 				    info->key.u.ipv4.dst))
- 			goto nla_put_failure;
++################################################################################
++# Utilities
 +
-+		if (nla_put_in_addr(skb, IFLA_GENEVE_LOCAL,
-+				    info->key.u.ipv4.src))
-+			goto nla_put_failure;
++which ping6 > /dev/null 2>&1 && ping6=$(which ping6) || ping6=$(which ping)
 +
- 		if (nla_put_u8(skb, IFLA_GENEVE_UDP_CSUM,
- 			       test_bit(IP_TUNNEL_CSUM_BIT,
- 					info->key.tun_flags)))
- 			goto nla_put_failure;
--
- #if IS_ENABLED(CONFIG_IPV6)
- 	} else if (!metadata) {
- 		if (nla_put_in6_addr(skb, IFLA_GENEVE_REMOTE6,
- 				     &info->key.u.ipv6.dst))
- 			goto nla_put_failure;
++log_test()
++{
++	local rc=$1
++	local expected=$2
++	local msg="$3"
 +
-+		if (nla_put_in6_addr(skb, IFLA_GENEVE_LOCAL6,
-+				     &info->key.u.ipv6.src))
-+			goto nla_put_failure;
++	if [ ${rc} -eq ${expected} ]; then
++		printf "TEST: %-60s  [ OK ]\n" "${msg}"
++		nsuccess=$((nsuccess+1))
++	else
++		ret=1
++		nfail=$((nfail+1))
++		printf "TEST: %-60s  [FAIL]\n" "${msg}"
++		if [ "$VERBOSE" = "1" ]; then
++			echo "    rc=$rc, expected $expected"
++		fi
 +
- 		if (nla_put_u8(skb, IFLA_GENEVE_UDP_ZERO_CSUM6_TX,
- 			       !test_bit(IP_TUNNEL_CSUM_BIT,
- 					 info->key.tun_flags)))
-diff --git a/include/net/geneve.h b/include/net/geneve.h
-index 5c96827a487e..7b12c70db11f 100644
---- a/include/net/geneve.h
-+++ b/include/net/geneve.h
-@@ -62,6 +62,12 @@ struct genevehdr {
- 	u8 options[];
- };
- 
-+union geneve_addr {
-+	struct sockaddr_in sin;
-+	struct sockaddr_in6 sin6;
-+	struct sockaddr sa;
-+};
++		if [ "${PAUSE_ON_FAIL}" = "yes" ]; then
++		echo
++			echo "hit enter to continue, 'q' to quit"
++			read a
++			[ "$a" = "q" ] && exit 1
++		fi
++	fi
 +
- static inline bool netif_is_geneve(const struct net_device *dev)
- {
- 	return dev->rtnl_link_ops &&
-diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
-index 7350129b1444..ff362d76a0d4 100644
---- a/include/uapi/linux/if_link.h
-+++ b/include/uapi/linux/if_link.h
-@@ -1442,6 +1442,8 @@ enum {
- 	IFLA_GENEVE_DF,
- 	IFLA_GENEVE_INNER_PROTO_INHERIT,
- 	IFLA_GENEVE_PORT_RANGE,
-+	IFLA_GENEVE_LOCAL,
-+	IFLA_GENEVE_LOCAL6,
- 	__IFLA_GENEVE_MAX
- };
- #define IFLA_GENEVE_MAX	(__IFLA_GENEVE_MAX - 1)
-diff --git a/tools/include/uapi/linux/if_link.h b/tools/include/uapi/linux/if_link.h
-index eee934cc2cf4..894a1aa91133 100644
---- a/tools/include/uapi/linux/if_link.h
-+++ b/tools/include/uapi/linux/if_link.h
-@@ -1438,6 +1438,8 @@ enum {
- 	IFLA_GENEVE_TTL_INHERIT,
- 	IFLA_GENEVE_DF,
- 	IFLA_GENEVE_INNER_PROTO_INHERIT,
-+	IFLA_GENEVE_LOCAL,
-+	IFLA_GENEVE_LOCAL6,
- 	__IFLA_GENEVE_MAX
- };
- #define IFLA_GENEVE_MAX	(__IFLA_GENEVE_MAX - 1)
++	if [ "${PAUSE}" = "yes" ]; then
++		echo
++		echo "hit enter to continue, 'q' to quit"
++		read a
++		[ "$a" = "q" ] && exit 1
++	fi
++
++	[ "$VERBOSE" = "1" ] && echo
++}
++
++run_cmd()
++{
++	local cmd="$1"
++	local out
++	local stderr="2>/dev/null"
++
++	if [ "$VERBOSE" = "1" ]; then
++		printf "COMMAND: $cmd\n"
++		stderr=
++	fi
++
++	out=$(eval $cmd $stderr)
++	rc=$?
++	if [ "$VERBOSE" = "1" -a -n "$out" ]; then
++		echo "    $out"
++	fi
++
++	return $rc
++}
++
++check_hv_connectivity() {
++    slowwait 5 ip netns exec $hv_1 ping -c 1 -W 1 172.16.1.2 &>/dev/null
++    slowwait 5 ip netns exec $hv_1 ping -c 1 -W 1 172.16.2.2 &>/dev/null
++
++	return $?
++}
++
++check_vm_connectivity() {
++    if [ $2 -eq 1 ]; then
++        prefix="! "
++    else
++        prefix=""
++    fi
++
++	slowwait 5 run_cmd "${prefix}ip netns exec $vm_1 ping -c 1 -W 1 10.0.0.2"
++	log_test $? 0 "VM connectivity over $1"
++}
++
++################################################################################
++# Setup
++
++setup-hv-networking() {
++    id=$1
++    local=$2
++    remote=$3
++    flags=$4
++
++    [ $id -eq 1 ] && peer=2 || peer=1
++
++    ip link set veth-hv-$id netns ${hv[$id]}
++    ip -netns ${hv[$id]} link set veth-hv-$id name veth0
++    ip -netns ${hv[$id]} link set veth0 up
++
++    ip -netns ${hv[$id]} addr add 172.16.1.$id/24 dev veth0
++    ip -netns ${hv[$id]} addr add 172.16.2.$id/24 dev veth0
++
++    ip -netns ${hv[$id]} link add br0 type bridge
++    ip -netns ${hv[$id]} link set br0 up
++
++    ip -netns ${hv[$id]} link add vxlan0 type vxlan id 10 local 172.16.$local.$id remote 172.16.$remote.$peer $flags dev veth0 dstport 4789
++    ip -netns ${hv[$id]} link set vxlan0 master br0
++    ip -netns ${hv[$id]} link set vxlan0 up
++
++    bridge -netns ${hv[$id]} fdb append 00:00:00:00:00:00 dev vxlan0 dst 172.16.$remote.$peer self permanent
++}
++
++setup-vm() {
++    id=$1
++
++    ip link add veth-tap type veth peer name veth-hv
++
++    ip link set veth-tap netns ${hv[$id]}
++    ip -netns ${hv[$id]} link set veth-tap master br0
++    ip -netns ${hv[$id]} link set veth-tap up
++
++    ip link set veth-hv address 02:1d:8d:dd:0c:6$id
++
++    ip link set veth-hv netns ${vm[$id]}
++    ip -netns ${vm[$id]} addr add 10.0.0.$id/24 dev veth-hv
++    ip -netns ${vm[$id]} link set veth-hv up
++}
++
++setup()
++{
++    setup_ns hv_1 hv_2 vm_1 vm_2
++    hv[1]=$hv_1
++    hv[2]=$hv_2
++    vm[1]=$vm_1
++    vm[2]=$vm_2
++
++    # Setup "Hypervisors" simulated with netns
++    ip link add veth-hv-1 type veth peer name veth-hv-2
++    setup-hv-networking 1 1 2 $2
++    setup-hv-networking 2 $1 1 $2
++    setup-vm 1
++    setup-vm 2
++}
++
++cleanup() {
++    ip link del veth-hv-1 2>/dev/null || true
++    ip link del veth-tap 2>/dev/null || true
++
++    cleanup_ns $hv_1 $hv_2 $vm_1 $vm_2
++}
++
++################################################################################
++# Tests
++
++same_subnet()
++{
++	setup 2 "nolocalbind"
++    check_hv_connectivity
++    check_vm_connectivity "same subnet (nolocalbind)" 0
++}
++
++same_subnet_localbind()
++{
++	setup 2 "localbind"
++    check_hv_connectivity
++    check_vm_connectivity "same subnet (localbind)" 0
++}
++
++different_subnets()
++{
++	setup 1 "nolocalbind"
++    check_hv_connectivity
++    check_vm_connectivity "different subnets (nolocalbind)" 0
++}
++
++different_subnets_localbind()
++{
++	setup 1 "localbind"
++    check_hv_connectivity
++    check_vm_connectivity "different subnets (localbind)" 1
++}
++
++################################################################################
++# Usage
++
++usage()
++{
++	cat <<EOF
++usage: ${0##*/} OPTS
++
++        -t <test>   Test(s) to run (default: all)
++                    (options: $TESTS)
++        -p          Pause on fail
++        -P          Pause after each test before cleanup
++        -v          Verbose mode (show commands and output)
++EOF
++}
++
++################################################################################
++# Main
++
++trap cleanup EXIT
++
++while getopts ":t:pPvh" opt; do
++	case $opt in
++		t) TESTS=$OPTARG ;;
++		p) PAUSE_ON_FAIL=yes;;
++		P) PAUSE=yes;;
++		v) VERBOSE=$(($VERBOSE + 1));;
++		h) usage; exit 0;;
++		*) usage; exit 1;;
++	esac
++done
++
++# Make sure we don't pause twice.
++[ "${PAUSE}" = "yes" ] && PAUSE_ON_FAIL=no
++
++if [ "$(id -u)" -ne 0 ];then
++	echo "SKIP: Need root privileges"
++	exit $ksft_skip;
++fi
++
++if [ ! -x "$(command -v ip)" ]; then
++	echo "SKIP: Could not run test without ip tool"
++	exit $ksft_skip
++fi
++
++if [ ! -x "$(command -v bridge)" ]; then
++	echo "SKIP: Could not run test without bridge tool"
++	exit $ksft_skip
++fi
++
++ip link help vxlan 2>&1 | grep -q "localbind"
++if [ $? -ne 0 ]; then
++	echo "SKIP: iproute2 ip too old, missing VXLAN localbind support"
++	exit $ksft_skip
++fi
++
++cleanup
++
++for t in $TESTS
++do
++	$t; cleanup;
++done
++
++if [ "$TESTS" != "none" ]; then
++	printf "\nTests passed: %3d\n" ${nsuccess}
++	printf "Tests failed: %3d\n"   ${nfail}
++fi
++
++exit $ret
++
 -- 
 2.36.1
 
