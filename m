@@ -1,125 +1,106 @@
-Return-Path: <netdev+bounces-213044-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213045-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2536AB22E83
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 19:05:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E851B22E7B
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 19:03:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F6B5167C45
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 17:00:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C1A96189C0DF
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 17:00:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDA612FD1A9;
-	Tue, 12 Aug 2025 17:00:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BECD2FAC03;
+	Tue, 12 Aug 2025 17:00:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b="rhfFh4Pw"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cn+Sse2v"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-10625.protonmail.ch (mail-10625.protonmail.ch [79.135.106.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08F2D2FD1A1
-	for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 17:00:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8527F2F549B
+	for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 17:00:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755018014; cv=none; b=FYqYkADxUbolKXKbbQ7LTGKoaVtAYaOAUkPD06dvWhFQcOImtwnbKfdDyQdtG+pKIDLwaXj2nb4zweABSeI7SqmwV9EhpUGz5cDuvCm/9EuwfQPXwQqw9UPWI95IJemncrQJ6Eoe3zrUf4Xanmq1JbP8l3fKU9WajhQIWExgkBo=
+	t=1755018025; cv=none; b=kffLeM7jP68F4erPxzd1wRwgQZuIMPv3LODNkQQP8TjPPl0U10ZNrovOOY/tH11xizzOd06vsK5etvYyDLgSAy3t8djXFFpozOM4CA728PMejYDTxeSH5l7knmDitNk2fMJdNiujIUXUDogDLrRFCnPHdSr/n3Y7/JS5sKu+jBk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755018014; c=relaxed/simple;
-	bh=Y/uH3UmRE0/jRDYQaaY3/CiFVzZkfvu0p5TXfmsm8vw=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FeDJhpMRASjo45h3xD4CF+cVopn4Z/hoS/TL++DE+3LRQBEq8D1nO4VBCSJ/RimHkEDBVT+SK+vm3KQr95tZwJ6cLt9HzZG6XSqhVEaX2mcB60JW3b8rjKGIGTx22E4e8lAOg4kFa1G8x80Uv4d2xXiNsi6MOFE/UAhLYogIJmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io; spf=pass smtp.mailfrom=willsroot.io; dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b=rhfFh4Pw; arc=none smtp.client-ip=79.135.106.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=willsroot.io
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=willsroot.io;
-	s=protonmail2; t=1755018003; x=1755277203;
-	bh=Y/uH3UmRE0/jRDYQaaY3/CiFVzZkfvu0p5TXfmsm8vw=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=rhfFh4Pw+qhgWc+Z+caOjSVWCiyttfKrVdc7KLc3fqg3oUy86hWhRTJGfQFOVPCRh
-	 Dx9bRpSYTHf5vAhCWxqSYa/fEcaefyRy8yHkOBYCT1NCxp9Ut5P8Bnrnn2QpqjMe2g
-	 NBENz5McVYCb/Lxqs2klStEe4NEyd2KQ6X/ANdjiUky3V1M8lZQeJr0X6Mjs4yI7HF
-	 oK3WhRoGp7ZCUCFdQ5v7iaSJyW/jzIFg8XYz7FynBC92x2P9NFIk1pk7V+56tyHaib
-	 Paj5U2rkmzZ/zldT30B3nhOkE1gF5WeDlFxWlb3rGXTpkeRhm/CwzpwbaXP2EXUU9s
-	 7tsDNbCedUPZA==
-Date: Tue, 12 Aug 2025 16:59:59 +0000
-To: Jakub Kicinski <kuba@kernel.org>
-From: William Liu <will@willsroot.io>
-Cc: netdev@vger.kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com, pabeni@redhat.com, jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, horms@kernel.org, savy@syst3mfailure.io, victor@mojatatu.com
-Subject: Re: [PATCH net v4 1/2] net/sched: Fix backlog accounting in qdisc_dequeue_internal
-Message-ID: <YycoAPI6tDiI1T8q-sQI6nAfIVk7E3AeX-6Zx9oERXXbdvHvIdO1zDqVAIAC1BUQaKnMRpAG842fAV94F7OZP7gKLcAx2ZrrEoDdQzZDt-M=@willsroot.io>
-In-Reply-To: <20250812073802.28f86ab2@kernel.org>
-References: <20250727235602.216450-1-will@willsroot.io> <20250808142746.6b76eae1@kernel.org> <n-GjVW0_1R1-ujkLgZIEgnaQKSsNtQ9-7UZiTmDCJsy1EutoUtiGOSahNSxpz2yANsp5olbxItT2X9apTC9btIRepMGAZZVBqWx6ueYE5O4=@willsroot.io> <20250811082958.489df3fa@kernel.org> <-8f3jdd-5pxHr0GW-uu8VtTzqDKDOyJohJ-soIwzRyqJUub186VYIxqNoGOTh8Oxtu1U0CEDl5h3N1c1D1jbn7nIlXUrNo55CHK5KcT23c4=@willsroot.io> <20250811102449.50e5f416@kernel.org> <Xd_A9IO0dh4NAVigE2yIDk9ZbCEz4XRcUO1PBNl2G6kEZF6TEAeXtDR85R_P-zIMdSL17cULM_GdmijrKs84RdMewdZswMDCBu5G7oBrajY=@willsroot.io> <20250811175120.7dd5b362@kernel.org> <OF2YXaY19FGNBLPjTD_cAIQim1BVjj7pzMkq8j5mXSQJr9Kd6N04zf2YkLCEpxnIz-zrljMlV0Ask-hlUDuc3rkzIKfF7MzY-jgVtyTi2Q4=@willsroot.io> <20250812073802.28f86ab2@kernel.org>
-Feedback-ID: 42723359:user:proton
-X-Pm-Message-ID: b9382dd2aaaa3e756f38ae77018a6c51c73abc1f
+	s=arc-20240116; t=1755018025; c=relaxed/simple;
+	bh=g+xnwDkX5ngCL07XyKRVEFBFnuHLjAvKsgHBvXMtb3A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dhjG+VJ1ByqYPL67/OP01J/MCbmvft9oemDgnzJdoYX2hJQJNqK2UklU5d+JGJddmuFtDs1REfnx8NPIZkVLjFmGFscqIYv2ppTu077ST+AjUNI43oSZ+YU/kCKfJJTeJdhXTYZ+JyV81R7wQoSk05eJq5i04uTZ3mGaSIbwwYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cn+Sse2v; arc=none smtp.client-ip=209.85.167.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-55cd07a28e0so577e87.0
+        for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 10:00:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1755018022; x=1755622822; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=g+xnwDkX5ngCL07XyKRVEFBFnuHLjAvKsgHBvXMtb3A=;
+        b=cn+Sse2vQYYSTXa8Uk/+ng2UExnV40XNGXOXyUHm6U6CVhqh5mjDF7JcI2v+sm5xN8
+         ZfY+vhoS+NT3r6wJsYkMTDwdb4SYS2qNrUVzbycHGxfXzqPFTBey+v9X16UHu0WTOhUf
+         Ysgfqyship5w9gJsontSXHJHLsPehRho4HUj0vnS28fC9uCUgeGgBfyA7ui4D9uidWOY
+         8+QHibXXxuSaMTSYPLXF3w/MKOuGSAFbILefc7bxUh5X+fryGgGl09eAljou0nFNi/z6
+         qrL+wIxbt4o9siXXFOJ8og0N+ufwWWf57tcsLzpgJTWpWAoTIO3y0xBAZ6r8tx4NDS8Q
+         PU9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755018022; x=1755622822;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=g+xnwDkX5ngCL07XyKRVEFBFnuHLjAvKsgHBvXMtb3A=;
+        b=Usn8utoZkBtNfVScwR3BrG77HlVIlvFzSHmfsqEFQThLkO4vnCBzs0yuKIV5nxHcZj
+         AZJkSHT2cRZshtO8FpHLLD0hdmsP6UODuYR6S+AmpUP9KpVLRc4MjC7R5dmC5nBnNvt4
+         JKAg7yMNCZbaicnJITB3DLVbk12CD83WI3SXztlgbEUTMXXZkRUXVWzC/beNKypX8SLb
+         gbpC3zo/cQDhcUALPJzKzHr1Lmv/MqAmkvaKerZkDyuvJVzAu47xzFYdOvcjZLjl/0wT
+         tfspc9QxmwUMSwpH1LQi+Ld1eBafTcX0c0RndfoOTqvI4GUuvti/1ZZqql/leoFY0JU0
+         hTgQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWvWHcA4Ws6zeFmSh9rTnYS8yBiAE0eRwgGF6C7F1RZx4yG+7rd/vdayC7wX0viwTmeBJCfc1Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyJ291iW7nRUy346WQkecI3DjPOGBk6fJmBt0NkvvxQJUkF6Xwz
+	BbvedVBMPLX1gfC0LuA72Z2TvZNRFSgaRrzUVH+QFrvtpMKsyBvLuaC0hjJU8yzwLvohfKqvecc
+	yz2uMHQ/HhEIfIMMUkMZUlKgQr2WKZiGlXzjn9CN8
+X-Gm-Gg: ASbGncsFY1ClEQea4m2U3/fWzvYo+yAmdmnaZ+bfGM73gOjWRv0zOy+GnD50HB4DBxQ
+	oilUGadUA0eaZfiWmqZOkUVPhmv/INiz4Zu2/3BH407eHR/zgHGnihVuuOa+nqq6XaPyoRlzRJr
+	zGuL1msplgyHcKjuzWf8Ke0D5RLZ3ZbkPtBlyivNwM9c5Ne5j8TijAce/VxzGGngr9zFB1fojZi
+	MHC6yGUA04ukfnwxeFQG6PY4dgJvDD2B9MOKQ==
+X-Google-Smtp-Source: AGHT+IGsm+bamhT29td+SwHGDqIrSinbu6HW1fTMkiRm3PCRaVm11QVRWbd5T45tIE+/NfYE+AaeEgGPepfjyo6/j/Q=
+X-Received: by 2002:a05:6512:33d6:b0:55b:7c73:c5f0 with SMTP id
+ 2adb3069b0e04-55cd934255emr412363e87.2.1755018021029; Tue, 12 Aug 2025
+ 10:00:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20250811231334.561137-1-kuba@kernel.org> <20250811231334.561137-4-kuba@kernel.org>
+In-Reply-To: <20250811231334.561137-4-kuba@kernel.org>
+From: Mina Almasry <almasrymina@google.com>
+Date: Tue, 12 Aug 2025 10:00:09 -0700
+X-Gm-Features: Ac12FXyDGk6XAUlBJwbNHP01ld7E2h4F-F2d8KqPQRtX-nKG5NcUnDuUe0iPPMU
+Message-ID: <CAHS8izOzh_vvGBCreeMvETO=m3Rsqf8t9ABwXsgzAQre=iO6Bg@mail.gmail.com>
+Subject: Re: [PATCH net-next 3/5] selftests: drv-net: devmem: add / correct
+ the IPv6 support
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org, 
+	sdf@fomichev.me, noren@nvidia.com, linux-kselftest@vger.kernel.org, 
+	ap420073@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tuesday, August 12th, 2025 at 2:38 PM, Jakub Kicinski <kuba@kernel.org> =
-wrote:
+On Mon, Aug 11, 2025 at 4:13=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> We need to use bracketed IPv6 addresses for socat.
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
->=20
->=20
-> On Tue, 12 Aug 2025 02:10:02 +0000 William Liu wrote:
->=20
-> > > AFAICT only if the backlog adjustment is using the prev_qlen,
-> > > prev_backlog approach, which snapshots the backlog. In that case,
-> > > yes, the "internal drops" will mess up the count.
-> >=20
-> > Yep, that's why I added the dropped_qlen and dropped_backlog
-> > variables, though that is not a very pretty solution.
-> >=20
-> > But even looking at the method you suggested (copy pasting for
-> > reference):
-> >=20
-> > pkts =3D 0;
-> > bytes =3D 0;
-> > while (sch->q.qlen > sch->limit ||
-> > q->memory_usage > q->memory_limit) {
-> > struct sk_buff *skb =3D qdisc_dequeue_internal(sch, false);
-> > pkts++;
-> > bytes +=3D qdisc_pkt_len(skb);
-> > rtnl_kfree_skbs(skb, skb);
-> > }
-> > qdisc_tree_reduce_backlog(sch, pkts, bytes);
-> >=20
-> > qdisc_dequeue_internal can trigger fq_codel_dequeue, which can
-> > trigger qdisc_tree_reduce_backlog before returning (the only qdisc
-> > out of these that does so in its dequeue handler).
-> >=20
-> > Let's say the limit only goes down by one, and packet A is at the
-> > front of the queue. qdisc_dequeue_internal takes the dequeue path,
-> > and fq_codel_dequeue triggers a qdisc_tree_reduce_backlog from that
-> > packet before returning the skb. Would this final
-> > qdisc_tree_reduce_backlog after the limit drop not double count?
->=20
->=20
-> The packets that got counted in qdisc_tree_reduce_backlog() inside
-> ->dequeue are freed immediately via
->=20
->=20
-> drop_func()
-> kfree_skb_reason(skb, SKB_DROP_REASON_QDISC_CONGESTED);
->=20
-> in the scenario you're describing ->dequeue should return NULL.
->=20
-> If that's possible, then we have another bug here :$
->=20
-> Normally backlogs get adjusted as the packet travels down the hierarchy
-> thru the parent chain. ->dequeue is part of this normal path so skbs it
->=20
-> returns are still in the parent's backlogs. qdisc_tree_reduce_backlog()
-> is only called when we need to do something to an skb outside of the
-> normal ->enqueue/->dequeue flow that iterates the hierarchy.
+Reviewed-by: Mina Almasry <almasrymina@google.com>
 
-
-Ah ok, this makes much more sense now! Thank you for explaining - I will ge=
-t a v5 in for this patch with your proposed fix soonish then.
+--=20
+Thanks,
+Mina
 
