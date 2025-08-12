@@ -1,149 +1,83 @@
-Return-Path: <netdev+bounces-212701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212702-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 743BDB21A17
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 03:23:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB3E7B21A24
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 03:26:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8BB781A2340D
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 01:24:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 305EC1A21220
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 01:26:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B4252D3EDD;
-	Tue, 12 Aug 2025 01:23:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 572FC2D8767;
+	Tue, 12 Aug 2025 01:26:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RTNYl7kb"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C44226E6FA;
-	Tue, 12 Aug 2025 01:23:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33AE92D837F
+	for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 01:26:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754961834; cv=none; b=QJ/p+yg+/TMubRhfq005dAKi5/zlq6aSvIsbpJJtbzzscK4xfezqRTtrnnNst7fLb7upwMAb29bICUOvve9tOTEEgjoDthHXq9Ukl6NhEGcO8TsXsv6utsZklI2yeuHWgaxm6zKlm1AvN/e0zHgtIhazPMR8IGEV65TG3/rb9rg=
+	t=1754961969; cv=none; b=q7+AFxs5vxyVyaQur97N8c5cUutMYvemKI2tXuzHTSj/Zyx9lETbBVcSil90D7Ye2YWEr/QWg4Q0SIuGmd2810Ivnreq7Ht4qj7WTDzDJ9wo9CZYXLVyFthG6NDFn8om8jY565UwOCm+UxBaHeKAGnBdHW6NgJIxq5bi/Aj9O/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754961834; c=relaxed/simple;
-	bh=0yONG3eZrM8wICgC9F+BkDl0wX99y6jKioS9uF9Q4FU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O0upstQPXoCozY3Pbao9IyBNVww2ob9osuIG/4JUVQ/ka7iwyR7+jPDzb8y5gNzm+1cHGkCzDXebZlsKR8EL8LsnmAJuQIPYsQQcZCIbgmd3P+qzQWhADsFi7wQNt1wCIphIFmFFj12U13maMP5awqZUamW0Dr5uInw9ErBxfKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1uldjh-000000005N3-3xYI;
-	Tue, 12 Aug 2025 01:23:34 +0000
-Date: Tue, 12 Aug 2025 02:23:28 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Arkadi Sharshevsky <arkadis@mellanox.com>,
-	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Andreas Schirm <andreas.schirm@siemens.com>,
-	Alexander Sverdlin <alexander.sverdlin@siemens.com>,
-	Lukas Stockmann <lukas.stockmann@siemens.com>,
-	John Crispin <john@phrozen.org>
-Subject: Re: [PATCH/RFC net] net: dsa: lantiq_gswip: honor dsa_db passed to
- port_fdb_{add,del}
-Message-ID: <aJqXkPHhsOXaOJ-D@pidgin.makrotopia.org>
-References: <aJfNMLNoi1VOsPrN@pidgin.makrotopia.org>
- <aJfNMLNoi1VOsPrN@pidgin.makrotopia.org>
- <20250810130637.aa5bjkmpeg4uylnu@skbuf>
- <aJixPn_7gYd1o69V@pidgin.makrotopia.org>
- <20250810163229.otapw4mhtv7e35jp@skbuf>
- <aJjO3wIbjzJYsS2o@pidgin.makrotopia.org>
- <20250810210200.6n3xguqi5ukbybm2@skbuf>
- <20250811153242.znhebimdzc2erznt@skbuf>
+	s=arc-20240116; t=1754961969; c=relaxed/simple;
+	bh=1oMyt7/aSCQ4OhYgsq1+x1H8voHRosqtt0jExsaDc9g=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jBQDS8JljD5P1rOwgzslcu7yHhK4Fr0vUyENLa2Aj7SCHZCuAK+Wx7LYny21v5X+8/5BE95h4R/FEJov3Bvj3sPWv7ilNm9pz6GOMv9Ev1Eza9Bs7I3rwSvwpj4niHzWLnj77SOn4JHh2EZoZ/llVOUWOgi9biyclFO2xJ0ao0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RTNYl7kb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 575D3C4CEF5;
+	Tue, 12 Aug 2025 01:26:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754961968;
+	bh=1oMyt7/aSCQ4OhYgsq1+x1H8voHRosqtt0jExsaDc9g=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=RTNYl7kbrsxa1rJv0nI/epG+hwAgnKN7e6c2Iz8sSyudqPX06iS+IEh8Q7NxLyOyQ
+	 eHIZYuCY4ey4srbKFlq7eu4JVLauk+4/BRVtREpgpayOJY0R/lSuNWd53H65jHN3sV
+	 zzaaJj8G1Uq4Zsuyswzh3xWeyK0qQXskJGwIMy18/atQdIaKa6e6D3xRexoLUe76CD
+	 PDg/oru4/1azudZo7woU8lYgPQbtd4mtACR5MWTHxc9zE30I8R9nVwMvlwR4v7eoj4
+	 5vwVnw7ruzNTKw6zK2ZtL9bvNU0R2+w/EE9oG4ZTFM3JRI/Nxu2NYqFU1mjg9ziJKy
+	 b+pN3g4ncO7Xg==
+Date: Mon, 11 Aug 2025 18:26:07 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Victor Nogueira <victor@mojatatu.com>
+Cc: Davide Caratti <dcaratti@redhat.com>, Jamal Hadi Salim
+ <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko
+ <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Lion Ackermann <nnamrec@gmail.com>, Petr Machata
+ <petrm@mellanox.com>, netdev@vger.kernel.org, Ivan Vecera
+ <ivecera@redhat.com>, Li Shuang <shuali@redhat.com>
+Subject: Re: [PATCH net] net/sched: ets: use old 'nbands' while purging
+ unused classes
+Message-ID: <20250811182607.222a6f98@kernel.org>
+In-Reply-To: <2ac9d393-a87b-4b55-87d6-0b76542e63c9@mojatatu.com>
+References: <f3b9bacc73145f265c19ab80785933da5b7cbdec.1754581577.git.dcaratti@redhat.com>
+	<8d76538b-678f-4a98-9308-d7209b5ebee9@mojatatu.com>
+	<aJmge28EVB0jKOLF@dcaratti.users.ipa.redhat.com>
+	<81bd4809-b268-42a2-af34-03087f7ff329@mojatatu.com>
+	<c3ffa213-ba09-47ce-9b9b-5d8a4bac9d71@mojatatu.com>
+	<aJoV1RPmh4UdNe3w@dcaratti.users.ipa.redhat.com>
+	<2ac9d393-a87b-4b55-87d6-0b76542e63c9@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250811153242.znhebimdzc2erznt@skbuf>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Aug 11, 2025 at 06:32:42PM +0300, Vladimir Oltean wrote:
-> Hi Daniel,
+On Mon, 11 Aug 2025 14:35:50 -0300 Victor Nogueira wrote:
+> > @Victor + @Jakub, can we apply this patch to 'net', so that regression is fixed ASAP, and then I post
+> > the kselftest in a separate submission for net-next?  
 > 
-> On Mon, Aug 11, 2025 at 12:02:00AM +0300, Vladimir Oltean wrote:
-> > I suggest tools/testing/selftests/net/forwarding/local_termination.sh
-> > once dsa_switch_supports_uc_filtering() returns true.
-> 
-> Since you're working with the lantiq_gswip driver which receives
-> relatively few patches...
-> 
-> I would like to submit this patch to remove the legacy behavior:
-> 
-> diff --git a/drivers/net/dsa/lantiq_gswip.c b/drivers/net/dsa/lantiq_gswip.c
-> index 6b8a5101b0e7..7e11f198ff2b 100644
-> --- a/drivers/net/dsa/lantiq_gswip.c
-> +++ b/drivers/net/dsa/lantiq_gswip.c
-> @@ -886,8 +886,6 @@ static int gswip_setup(struct dsa_switch *ds)
-> 
->  	ds->mtu_enforcement_ingress = true;
-> 
-> -	ds->configure_vlan_while_not_filtering = false;
-> -
->  	return 0;
->  }
-> 
-> however I'm sure that the driver will break, so I have more, in an
-> attempt to avoid that :)
+>  From my side, that's ok.
 
-This honourable endeavour deserves my full support :)
-
-> 
-> Would you please look at the patches I've prepared on this branch and
-> reviewing with extra info you might have / giving them a test, one by one?
-> I was only able to compile-test them. I also lack proper documentation
-> (which I'm sure you lack too), I only saw the "developer resources" from
-> Martin Blumenstingl's Github (which lack actual PCE register descriptions)
-> https://github.com/xdarklight/ltq-upstream-status
-> and the Maxlinear PRPLOS code at
-> https://github.com/maxlinear/linux/tree/UPDK_9.1.90/drivers/net/datapath/gswip/switchcore/src
-> (which I think is what you were also referencing)
-
-There is also a DSA driver for the newer standalone GSW1xx switch ICs
-which are connected to a CPU using either MDIO or SPI for management and
-2500Base-X/SGMII or RGMII/RMII for the datapath. I'm working on merging
-that with the existing lantiq_gswip driver as those newer switch ICs have
-a lot in common with the older Lantiq/Intel in-SoC switches.
-
-You can see my work-in-progress first cleaning up the reference mxl-gsw1xx
-driver and then preparing the lantiq_gswip driver for a potential merge
-with that driver here:
-
-https://github.com/dangowrt/linux/commits/mxl-gsw1xx-cleanup/
-
-The old Lantiq VRV20x turned out to be difficult to even undergo proper testing
-using tools/test/selftest/drivers/net/dsa scripts due to most boards coming with
-only 64 MiB or DDR2 RAM -- even with nothing else running and the root
-filesystem on-flash tcpdump quickly causes oom when trying to run
-local_termination.sh.
-
-In the next days I'm going to receive two boards with 256 MiB of RAM which
-I found used for little money on ebay which will allow me to at least test
-GSWIP 2.1 (xrx200) and GSWIP 2.2 (xrx330).
-I don't think any of those boards comes with an old enough xrx200 SoC to
-still contain the GSWIP 2.0 IP...
-
-> 
-> The branch over net-next is here:
-> https://github.com/vladimiroltean/linux/commits/lantiq-gswip/
-
-Nice, I'll happily take a look tomorrow and can do basic testing on my
-TL-W8970 (VRV200, but only 64 MiB of DDR2 RAM), and hopefully the full
-DSA selftest suite (or rather the part of it which covers features
-actually supported by the driver/hardware) starting with
-local_termination.sh once I receive the more resourceful boards with
-VRV200 and VRV330 in the next couple of days.
-
+Fine in principle, but is the urgency really that high?
+Feels like crashes in qdiscs with net-admin are dime a dozen,
+we can wait a day or two for a test and merge them together..
 
