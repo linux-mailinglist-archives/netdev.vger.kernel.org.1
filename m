@@ -1,151 +1,156 @@
-Return-Path: <netdev+bounces-213074-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213075-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22D29B23316
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 20:24:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D188B233E6
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 20:33:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 624D43B3FBB
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 18:20:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 75C801A207EF
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 18:29:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80F921D416C;
-	Tue, 12 Aug 2025 18:20:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 399DF2FE571;
+	Tue, 12 Aug 2025 18:29:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CbvtVuqo"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="r06eBA22"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f173.google.com (mail-oi1-f173.google.com [209.85.167.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D667282E1
-	for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 18:20:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98CC921ABD0
+	for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 18:29:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755022849; cv=none; b=AtPZXirdLsCRskRoDGPbCX54OeaVX2rBC6HQ8l/VW2D5JM/3d9I2Z7+2rc12h2Q6esNhvtwW78n+6fUWRGHgpSfbS9ehYwJIOrt2CNhZLr2o010/oHPn+tGQxGavoxxhKdQ067BZSOLbdck2B/zdDKEqPcGgyvJSbQg37h5m+hE=
+	t=1755023353; cv=none; b=TKltVRYCVqRGx2r4gyy8o4+KuIZN+cVxGtFYeFJhrs8YTHh8rvsqXyJQmEjIYSUXgHax95qC5CxqB7941uJVCuHgAu30mXrafm/jjHzGG8GXWx+lkE4ZotMQRDO3+DK06bwP63I1pvpulyHM2HD7lu9/lESWna64mgFsYvknsEc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755022849; c=relaxed/simple;
-	bh=v/nsCGs2xmu59cnfR1Tz4Wld6szL/A5pJS3oBSOfQp8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VbWBGK/q4NpRVw615M3rNOzZBtgXS4+6q5f119lz1ggqc4qNgO/AugfIKB4nxGW187HdvcKtNkM/BWF7LnLxv8N2gPs2s1bOHhGBot3oGoV4IPLbbcOaOGG3ccbFRuEZPvKhjry7kxQSk5BhTKidWNwAMsHDpD0vHgEL0n6XQ18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CbvtVuqo; arc=none smtp.client-ip=95.215.58.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <ff37dd97-dde7-48a3-9bb6-7d424f94e345@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1755022845;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=N1oQvtxW/ScS+64KV6i67Bpm+cSlP1i/7We44hEj0RE=;
-	b=CbvtVuqoUcEzfe3i81tee05aN0G26f/yHxQG3mDPFX1KzRf0a5GWVZKV79+dOLJIlxiAY4
-	kWy3mbvZzljmjmyZvFXljzYxk0f7fTJxx7vfyqOBy/p89Z60A11dNVyLZW5xYPedX1rMc3
-	B3wfk7kWzEcUqimaXx/Tmh0I6sZ/tWg=
-Date: Tue, 12 Aug 2025 11:20:35 -0700
+	s=arc-20240116; t=1755023353; c=relaxed/simple;
+	bh=9cvbpPm70mPTLnQnb8LNgteV2j+EN/EMi23cYTH5HS4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AXvb7STw5UPpzxzFKLMBvWjkgDLxX6N1zZSqSxycwP9eAK6mI7Z1bTFwXRiXTXOI7cPwcN90Rjo37Rg9dTEZLqrEW2icPude7+JsZzdQgloUzR+KdnP1TGGlf4SgSLcBRibT0VRKKXcYAplm4xGy2iQLQoepUqYrwhGVCp1Q2nI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=r06eBA22; arc=none smtp.client-ip=209.85.167.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-oi1-f173.google.com with SMTP id 5614622812f47-433f984817dso3380037b6e.0
+        for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 11:29:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1755023349; x=1755628149; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=R1zoRIoChFfpVQ/VzzUdPKbZVPd/NiA//NidJrIFR78=;
+        b=r06eBA226rL6Y0uCHoI7rfPawceRXVt9JvH6u+xObW7ulllxrw9xwhGDAvMykfue5u
+         DVN86SlWePq9oEt2i0rsNB1hyAeLOE7ePFXcjLq0XJFjK0wfzQMJUJQaq6zJnOCaoeQf
+         GMgW+YZOV+hnnfUhAYZBCyjLAd7fqxEDdUyBJhhtQv+gGcIIINg22PpN8U4LRK+Nr66I
+         hNsaKcUP1E14rgISBCzo3eJRlfW77cM64z0hth5CMfIq/KVNBRLlEOy21juLO8mj1juv
+         TwlGDoy8bzE6jMg7+hHJMLqo6itQsuGFxYXkDBBUjQQPEPZsMp5EeIEGgRGsdlndQxzx
+         6eyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755023349; x=1755628149;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=R1zoRIoChFfpVQ/VzzUdPKbZVPd/NiA//NidJrIFR78=;
+        b=Vv5GgqFnI9aXvuU+Xm0ozlbVNAjLc52JxOhX4/lcU8+P6FCptsFfq4BTHDdJY0nUCS
+         KhvmoBBX6fagS8cw8w4hLxLM8qVduSMc421jHgEo07iRcfMo8YpiIi6D/wW1Lv3dI+3Q
+         135uTDVnrz87vZC2eXUf2azdMUTCIAWJiqGrdStb2gMOMMWQPr6qTJXHvwMZCdqPW3KN
+         8Yofq/pzTqb/yHJQz7agf6XwheOmNyutMi9t4xCPuhSdqcEK/gPA2fAhDOH5jpD1qIPB
+         nV0z/LtBg0uCBsnm3Ft82UDLMBNayNR/k6j7cW6wfK+LMs0s6062RsHxffjjgeYqMe8U
+         etmA==
+X-Gm-Message-State: AOJu0YwuZtXKkiP5+Y5Fztyr+QSH7mLZLSqGYlZpo8jubqmcoq47KLfK
+	GC9BLN/v12iSVtiaG6VlQIUMEl33g/+S20GuhqB3myMznej2PV4R+dLbzaSGhI3IMsGDzYxptjN
+	MZLwT
+X-Gm-Gg: ASbGncvnwWoq+7Hkfg6jWNnovmIa081hfNwkjYzmKLuH5x+cqc+3EZFSVvoiniqyIM/
+	dibmoXeiFiNrQFFNlN8P9PwUqZIa1kTcHs7laqXHFjQaPyEzBZMBvONRnQu/9jDn2CJtE5kywJq
+	7At9/Y1ny5IAh9wN4aF4TGV6suOkBjuybqYgoEEuR533BFrGatscyRZtKTHqRq9ygOJwMac7YOO
+	s+GzrW9jwCT99bj/0EmRDtvvgq4JIhY5+UyP6xKv8rlUQCXc0gfb5ccbqENyVbfgeZ/7ERNr9Er
+	avrysoUh6Gg6FF0h0+bVD17WkooUeE3AzOWn1aX34TYLILILDzZ95wFyHeQhR7BST4f1dp0E8b9
+	Fu10B/QnY
+X-Google-Smtp-Source: AGHT+IGlttcc9W2jmEMajS0OhnGe++xuh77FZzst/YkiW1TC+nLFyH3ZZjkWQN99AwUwobFKl4DZKg==
+X-Received: by 2002:a05:6808:1992:b0:434:12a9:db06 with SMTP id 5614622812f47-435d42214c4mr268801b6e.26.1755023349627;
+        Tue, 12 Aug 2025 11:29:09 -0700 (PDT)
+Received: from localhost ([2a03:2880:12ff:1::])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-30bc9ede835sm5739938fac.32.2025.08.12.11.29.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Aug 2025 11:29:09 -0700 (PDT)
+From: David Wei <dw@davidwei.uk>
+To: netdev@vger.kernel.org
+Cc: Michael Chan <michael.chan@broadcom.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Taehee Yoo <ap420073@gmail.com>
+Subject: [PATCH net-next v2] bnxt: fill data page pool with frags if PAGE_SIZE > BNXT_RX_PAGE_SIZE
+Date: Tue, 12 Aug 2025 11:29:07 -0700
+Message-ID: <20250812182907.1540755-1-dw@davidwei.uk>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v6 9/9] selftests/bpf: Cover metadata access from
- a modified skb clone
-To: Jakub Sitnicki <jakub@cloudflare.com>
-Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Arthur Fabre <arthur@arthurfabre.com>, Daniel Borkmann
- <daniel@iogearbox.net>, Eduard Zingerman <eddyz87@gmail.com>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Jesse Brandeburg <jbrandeburg@cloudflare.com>,
- Joanne Koong <joannelkoong@gmail.com>, Lorenzo Bianconi
- <lorenzo@kernel.org>, =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?=
- <thoiland@redhat.com>, Yan Zhai <yan@cloudflare.com>,
- kernel-team@cloudflare.com, netdev@vger.kernel.org, bpf@vger.kernel.org,
- Stanislav Fomichev <sdf@fomichev.me>
-References: <20250804-skb-metadata-thru-dynptr-v6-0-05da400bfa4b@cloudflare.com>
- <20250804-skb-metadata-thru-dynptr-v6-9-05da400bfa4b@cloudflare.com>
- <7a73fb00-9433-40d7-acb7-691f32f198ff@linux.dev>
- <87h5yi82gp.fsf@cloudflare.com>
- <e30d66a8-c4de-4d81-880d-36d996b67854@linux.dev>
- <87tt2cr8eb.fsf@cloudflare.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <87tt2cr8eb.fsf@cloudflare.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-On 8/12/25 6:12 AM, Jakub Sitnicki wrote:
->> No strong opinion to either copy the metadata on a clone or set the dynptr
->> rdonly for a clone. I am ok with either way.
->>
->> A brain dump:
->> On one hand, it is hard to comment without visibility on how will it look like
->> when data_meta can be preserved in the future, e.g. what may be the overhead but
->> there is flags in bpf_dynptr_from_skb_meta and bpf_dynptr_write, so there is
->> some flexibility. On the other hand, having a copy will be less surprise on the
->> clone skb like what we have discovered in this and the earlier email thread but
->> I suspect there is actually no write use case on the skb data_meta now.
-> 
-> All makes sense.
-> 
-> To keep things simple and consistent, it would be best to have a single
-> unclone (bpf_try_make_writable) point caused by a write to metadata
-> through an skb clone.
-> 
-> Today, the unclone in the prologue can already be triggered by a write
-> to data_meta from a dead branch. Despite being useless, since
-> pskb_expand_head resets meta_len.
-> 
-> We also need the prologue unclone for bpf_dynptr_slice_rdwr created from
-> an skb_meta dynptr, because creating a slice does not invalidate packet
-> pointers by contract.
-> 
-> So I'm thinking it makes sense to unclone in the prologue if we see a
-> potential bpf_dynptr_write to skb_meta dynptr as well. This could be
-> done by tweaking check_helper_call to set the seen_direct_write flag:
-> 
-> static int check_helper_call(...)
-> {
->          // ...
->         	switch (func_id) {
->          // ...
-> 	case BPF_FUNC_dynptr_write:
-> 	{
->                  // ...
-> 		dynptr_type = dynptr_get_type(env, reg);
->                  // ...
-> 		if (dynptr_type == BPF_DYNPTR_TYPE_SKB ||
-> 		    dynptr_type == BPF_DYNPTR_TYPE_SKB_META)
-> 			changes_data = true;
+The data page pool always fills the HW rx ring with pages. On arm64 with
+64K pages, this will waste _at least_ 32K of memory per entry in the rx
+ring.
 
-This looks ok.
+Fix by fragmenting the pages if PAGE_SIZE > BNXT_RX_PAGE_SIZE. This
+makes the data page pool the same as the header pool.
 
-> 		if (dynptr_type == BPF_DYNPTR_TYPE_SKB_META)
-> 			env->seen_direct_write = true;
+Tested with iperf3 with a small (64 entries) rx ring to encourage buffer
+circulation.
 
-The "seen_direct_write = true;" addition will be gone from the verifier 
-eventually when pskb_expand_head can keep the data_meta (?). Right, there are 
-existing cases that the prologue call might be unnecessary. However, I don't 
-think it should be the reason that it can set "seen_direct_write" on top of the 
-"changes_data". I think it is confusing.
+Fixes: cd1fafe7da1f ("eth: bnxt: add support rx side device memory TCP")
+Reviewed-by: Michael Chan <michael.chan@broadcom.com>
+Signed-off-by: David Wei <dw@davidwei.uk>
+---
+v2:
+ - add Fixes tag
 
-> 
-> 		break;
-> 	}
->          // ...
-> }
-> 
-> That would my the plan for the next iteration, if it sounds sensible.
-> 
-> As for keeping metadata intact past a pskb_expand_head call, on second
-> thought, I'd leave that for the next patch set, to keep the patch count
-> within single digits.
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-If the plan is to make pskb_expand_head support the data_meta later, just set 
-the rdonly bit in the bpf_dynptr_from_skb_meta now. Then the future 
-pskb_expand_head change will be a clean change in netdev and filter.c, and no 
-need to revert the "seen_direct_write" changes from the verifier.
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index 5578ddcb465d..9d7631ce860f 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -926,15 +926,21 @@ static struct page *__bnxt_alloc_rx_page(struct bnxt *bp, dma_addr_t *mapping,
+ 
+ static netmem_ref __bnxt_alloc_rx_netmem(struct bnxt *bp, dma_addr_t *mapping,
+ 					 struct bnxt_rx_ring_info *rxr,
++					 unsigned int *offset,
+ 					 gfp_t gfp)
+ {
+ 	netmem_ref netmem;
+ 
+-	netmem = page_pool_alloc_netmems(rxr->page_pool, gfp);
++	if (PAGE_SIZE > BNXT_RX_PAGE_SIZE) {
++		netmem = page_pool_alloc_frag_netmem(rxr->page_pool, offset, BNXT_RX_PAGE_SIZE, gfp);
++	} else {
++		netmem = page_pool_alloc_netmems(rxr->page_pool, gfp);
++		*offset = 0;
++	}
+ 	if (!netmem)
+ 		return 0;
+ 
+-	*mapping = page_pool_get_dma_addr_netmem(netmem);
++	*mapping = page_pool_get_dma_addr_netmem(netmem) + *offset;
+ 	return netmem;
+ }
+ 
+@@ -1029,7 +1035,7 @@ static int bnxt_alloc_rx_netmem(struct bnxt *bp, struct bnxt_rx_ring_info *rxr,
+ 	dma_addr_t mapping;
+ 	netmem_ref netmem;
+ 
+-	netmem = __bnxt_alloc_rx_netmem(bp, &mapping, rxr, gfp);
++	netmem = __bnxt_alloc_rx_netmem(bp, &mapping, rxr, &offset, gfp);
+ 	if (!netmem)
+ 		return -ENOMEM;
+ 
+-- 
+2.47.3
+
 
