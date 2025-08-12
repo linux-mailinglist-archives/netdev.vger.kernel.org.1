@@ -1,88 +1,95 @@
-Return-Path: <netdev+bounces-212736-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212737-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51DCFB21B7D
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 05:15:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF31AB21B89
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 05:20:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AEF731904650
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 03:15:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DD3797AA396
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 03:18:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9016B2D780D;
-	Tue, 12 Aug 2025 03:15:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EBB32BEC2D;
+	Tue, 12 Aug 2025 03:19:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sp+ResZc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XjHgDzfH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63E92255222;
-	Tue, 12 Aug 2025 03:15:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05720335C7;
+	Tue, 12 Aug 2025 03:19:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754968511; cv=none; b=vDkvox4O7kGI9htBzXcFOhEsd230fPGDpwgGDRzjQBqFhte/QZP/3k9cd0XPazRERndLY87TM1jR0jeCMAuTmFSD2NKZmTLEVNbb7rIq4825VK/hTQPwbNgN/fxlr5sfzo25x6wfFHf5Kh14roU0q5/QuQOBUNjPiPtGu2hoebk=
+	t=1754968799; cv=none; b=S6aVbyhLtse57YeNmMDOrl1zSPWBJe20sQmD/tvh6gK5LplQnIUWnGfrFAM8j2kYshavFfyZsPRn7T+wND56SrUfHjh2+pB0H8GrMa/SV1xvn/YpCtrNjWr+VcsmMIXlZWhrpia1wmBmgy3WZm5iu8bOmFvkmxIveklfiwF7NS0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754968511; c=relaxed/simple;
-	bh=QAsI2ZjUhYpWwQ0cu73hU8HQPYLWFdr5Bo+h/CHBM9g=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NGa/vG/KNGPiopvjA1c8S4tQWRig4WQ7bdiCtip836X/C/JWTUwNUVc4PIAdRmVyVfPgaK2+PN0Df/yLnaKUKydF+fwMAKsQmUQiLUvaSXsb9ohN7tl11x24/ihCeL3jnq/CezYvmTVbFdbsXyuimN2qoL8kXYbQPCXL9gOTzI0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sp+ResZc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D90FC4CEED;
-	Tue, 12 Aug 2025 03:15:09 +0000 (UTC)
+	s=arc-20240116; t=1754968799; c=relaxed/simple;
+	bh=9XeyibphrUPbjRvvhkRYfsqQBB29W+NMaK2NU2KNypw=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=eogcgiuEUwhVNWR5HduXNURVFFCtuNgbXk5nogHijbkseYcgWno4NyWt7vAmmHvv/talQj8JFs3Z7qTgfDz7zB7eLG0rBTAdyZSZMg6j9ZRyMDC4qrl0O3jdau1syOaZxyk0Ita84zOzL4POUGet6fKrVVj/PHcc+HRwIvFqR4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XjHgDzfH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8CEECC4CEED;
+	Tue, 12 Aug 2025 03:19:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754968509;
-	bh=QAsI2ZjUhYpWwQ0cu73hU8HQPYLWFdr5Bo+h/CHBM9g=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=sp+ResZcDjifmh8ydmC9MytgG9sKrm7ajwIKu+r1lCOvuLOoQO3MitlZi9YN8K1tH
-	 GOeLwq40bYs21Esm9RMDHJnU9B+f+UqiT7WAY5yiR3KqDYewniKptg6d3AAmlKqHJZ
-	 Nwl8dBTcgqIhI4nhP9JnuUD5j/pzuRaO2R+dG0i5EIqiUcQ4txahcqZlTOk3z85Uoo
-	 xyU+cTNRBo3UYyMcJM9i3WgLHdCw1gKo5tKJNHfocwYfkEV4AuGOCGY4drM0A+bi0T
-	 lrQnWRj+55BlUa2xRgUVJ+Jvs+5lw7UaSrLbT6dwrWoe37X2v15wWKR++2XwVO+lz+
-	 FVluUlCEVouJg==
-Date: Mon, 11 Aug 2025 20:15:08 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: Jay Vosburgh <jv@jvosburgh.net>, netdev@vger.kernel.org, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Nikolay
- Aleksandrov <razor@blackwall.org>, Simon Horman <horms@kernel.org>, Shuah
- Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org, David Wilder <wilder@us.ibm.com>
-Subject: Re: [PATCH net] bonding: don't set oif to bond dev when getting NS
- target destination
-Message-ID: <20250811201508.508a7e3d@kernel.org>
-In-Reply-To: <aJqhRXIb3zZutO6H@fedora>
-References: <20250811140358.2024-1-liuhangbin@gmail.com>
-	<783435.1754922439@famine>
-	<20250811093328.70343754@kernel.org>
-	<aJqhRXIb3zZutO6H@fedora>
+	s=k20201202; t=1754968798;
+	bh=9XeyibphrUPbjRvvhkRYfsqQBB29W+NMaK2NU2KNypw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=XjHgDzfH+9+vbz8Bn2lPg5ixSC6PZMVEH7cpOuliVCDXrEChMFqZl2tzbfXwVHSxT
+	 JwIshgH46OyOeC5nyVWkxoy3PEWONAebxUiSX/80Lu7UOvVuc2+M3Rgzaqu+IJtHUg
+	 ZCNwwpSvGTCyjD7yQ936YLtth50niYxeDmLrPFU7dVQpbMWardh0OZtBT+vX7ytoKa
+	 EKTLXRUK8Wskf1e/QdyhnD06JlR7n0leHfstRW1nPksWVaxa5Pbr7ivf3tqcczmVMF
+	 io52bmimROmGtxGJt5caQG2RtMqqAlDqsOlvo4EJzFDtdsDQDsaGG7vWzTGte+BsfR
+	 2RdAJX8IfYiLg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAC8E383BF51;
+	Tue, 12 Aug 2025 03:20:11 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] MAINTAINERS: Remove bouncing T7XX reviewer
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175496881075.1990527.11700425109486498678.git-patchwork-notify@kernel.org>
+Date: Tue, 12 Aug 2025 03:20:10 +0000
+References: <20250808173925.FECE3782@davehans-spike.ostc.intel.com>
+In-Reply-To: <20250808173925.FECE3782@davehans-spike.ostc.intel.com>
+To: Dave Hansen <dave.hansen@linux.intel.com>
+Cc: linux-kernel@vger.kernel.org, chandrashekar.devegowda@intel.com,
+ haijun.liu@mediatek.com, netdev@vger.kernel.org,
+ ricardo.martinez@linux.intel.com
 
-On Tue, 12 Aug 2025 02:04:53 +0000 Hangbin Liu wrote:
-> On Mon, Aug 11, 2025 at 09:33:28AM -0700, Jakub Kicinski wrote:
-> > On Mon, 11 Aug 2025 07:27:19 -0700 Jay Vosburgh wrote:  
-> > > 	Generically, I'm wondering if test updates should be separate
-> > > patches from the functional changes as a general policy.  
-> > 
-> > Yes, not sure if we made it a hard requirement, but I think it's our
-> > preference. It is the reason why we don't require cover letters for
-> > submissions with 2 patches.
-> > 
-> > Hangbin, please update config for bonding tests, looks like vlans 
-> > are not enabled there today.  
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Fri, 08 Aug 2025 10:39:25 -0700 you wrote:
+> From: Dave Hansen <dave.hansen@linux.intel.com>
 > 
-> BTW, I'd like to change the bond config to modules. Because we can't unload
-> the modules with current config. It that OK for you?
+> This reviewer's email no longer works. Remove it from MAINTAINERS.
+> 
+> Signed-off-by: Dave Hansen <dave.hansen@linux.intel.com>
+> Cc: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
+> Cc: Liu Haijun <haijun.liu@mediatek.com>
+> Cc: Ricardo Martinez <ricardo.martinez@linux.intel.com>
+> Cc: netdev@vger.kernel.org
+> 
+> [...]
 
-Yes. I'm not sure if any of the bonding tests need to load the modules
-explicitly but we'll find out :) In general modules are fine for the CI.
+Here is the summary with links:
+  - MAINTAINERS: Remove bouncing T7XX reviewer
+    https://git.kernel.org/netdev/net/c/b132a3b0c228
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
