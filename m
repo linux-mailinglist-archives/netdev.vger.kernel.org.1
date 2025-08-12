@@ -1,76 +1,100 @@
-Return-Path: <netdev+bounces-212901-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212902-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41407B22723
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 14:39:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39A99B22754
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 14:50:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18BED627E4B
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 12:36:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 57F121A21F40
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 12:50:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B42F71DDC15;
-	Tue, 12 Aug 2025 12:34:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1C5F24290E;
+	Tue, 12 Aug 2025 12:49:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pkiRdiEY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rrjswFvg"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C43E119CC27
-	for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 12:34:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8602023B627;
+	Tue, 12 Aug 2025 12:49:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755002047; cv=none; b=neF5MGWI5TaBQhrZWPglH2eq2VdVAlhajW87wgkMiw0YTxLOcIKZqOAjQxE3quIGF2fn8COOtie/es4My5gpjeE0bBL1EL+Y9BIAqaDN8d7GYucRGdkmOqQqrzJp9oLXYHC1Mg237a6m5uI3KfBmeIxMlftoZ9vKjuFc8nydKPA=
+	t=1755002997; cv=none; b=izgtHVrkqJODRWLs5irbkQBJBy6xqM1Owx3PEoWm/0J4abhEKbwxxbK2komYAc0JrOCeeMAvU3jpOZIIW6gWUm7MoOyET315gNw93RBgL98MTLrcmgDVw6Fr8hZX14EYDxSsP/xi+4zFkwoY7UZOdG25EmUmPigMw9liJBMUkUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755002047; c=relaxed/simple;
-	bh=WV2SkEQ4VMzlopidLpTTX/8COLF91igRdzaI0QToov4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=njdlkErrzVjpbdLhSAHDjbMPPrNUvJHeAJe2tq/jd8Hm7DHnvp5A4Awq5frENXuJ26iYUrvrWgiUi8qMVj7x0/CMrqp8k2jglA/z/mnf9BmdG4Nj9E18i/Lj5pbF0xHbFunL9/hb42J5F1wuhZcIz3iDiAX4i4RliZ1oS60vKYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pkiRdiEY; arc=none smtp.client-ip=95.215.58.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <ee619a2d-a39d-4f48-ba18-07d4d9ef427e@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1755002030;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WV2SkEQ4VMzlopidLpTTX/8COLF91igRdzaI0QToov4=;
-	b=pkiRdiEYCqbf5ruhEHKIqqlCmZCi0D+5npJY5c+stw8l0p+KUwi0z5fpm9eb8seimKdFy/
-	M3Mxdqm28WgZRYnTTASbCDfniSuJtKsi3W4NxZeJTWgUrQEQjW+xbbwXwQr0pA4WhkNBcN
-	sDYUtJyQ/RJZG3jnIbhChvhw2Zn0C/Y=
-Date: Tue, 12 Aug 2025 13:33:40 +0100
+	s=arc-20240116; t=1755002997; c=relaxed/simple;
+	bh=Nk4whJ5SoSsOyfK2QcCuuglYmx020EoIg8mxiYrIlrY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=M/929esgBY3N9Jxm5ZgaxjQ4AYCdDI++5QYsy1sAyvYrNa6VlWVAk64LV56n4F++62CnvRABCXFvePZvRGy9n9nRRW2fwQoh6npyP/4oJD+QSIeFxZzFcl3yhCSl99dYYl4LqEJlyi18KxmP5nZnaMVAno7t4VtutsmYZuu2H1c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rrjswFvg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6041AC4CEF0;
+	Tue, 12 Aug 2025 12:49:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755002997;
+	bh=Nk4whJ5SoSsOyfK2QcCuuglYmx020EoIg8mxiYrIlrY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=rrjswFvgsiFra5U09HZUe3KGJKS8HuUMBodHQxUk4ofbzeUgkJYmGKoRJo8qKImw/
+	 FD+IRFMUJusGtDhb5O7VG8yOZzuQMW/3n6tp1XweTiYNrEGHY71pAHKJu6oE4nSZMi
+	 pfKXvW1XpEaxbdNJHWwfQLFft26xqJm3kzBpn3+7pNOf1Q+jNs2k8oBQoPp57etlbP
+	 IjgP7D/4rgTeyxc3IdMen/JnGBuylZif8fpjeE/HMDgRVkI0llWKpkXwHv27z+X9bZ
+	 F3IEbhq1hLva7+rNx/3/VCbm+iZelMp1hjw1pSol3npZ3lurlGnAd38qo2L7X0zOJC
+	 46d3NJqLGqSkw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD6E383BF51;
+	Tue, 12 Aug 2025 12:50:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH 1/6] can: esd_usb: Fix possible calls to kfree() with NULL
-To: =?UTF-8?Q?Stefan_M=C3=A4tje?= <stefan.maetje@esd.eu>,
- Marc Kleine-Budde <mkl@pengutronix.de>,
- Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
- Frank Jungclaus <frank.jungclaus@esd.eu>, linux-can@vger.kernel.org,
- socketcan@esd.eu
-Cc: Simon Horman <horms@kernel.org>, Olivier Sobrie <olivier@sobrie.be>,
- Oliver Hartkopp <socketcan@hartkopp.net>, netdev@vger.kernel.org
-References: <20250811210611.3233202-1-stefan.maetje@esd.eu>
- <20250811210611.3233202-2-stefan.maetje@esd.eu>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20250811210611.3233202-2-stefan.maetje@esd.eu>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Subject: Re: [PATCH net v2 0/3] net: prevent deadlocks and mis-configuration
+ with
+ per-NAPI threaded config
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175500300950.2603176.10461428129643934621.git-patchwork-notify@kernel.org>
+Date: Tue, 12 Aug 2025 12:50:09 +0000
+References: <20250809001205.1147153-1-kuba@kernel.org>
+In-Reply-To: <20250809001205.1147153-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ willemdebruijn.kernel@gmail.com, skhawaja@google.com, joe@dama.to,
+ sdf@fomichev.me, shuah@kernel.org, linux-kselftest@vger.kernel.org
 
-On 11/08/2025 22:06, Stefan MÃ¤tje wrote:
-> In esd_usb_start() kfree() is called with the msg variable even if the
-> allocation of *msg failed.
+Hello:
 
-But kfree() works fine with NULL pointers, have you seen any real issues
-with this code?
+This series was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Fri,  8 Aug 2025 17:12:02 -0700 you wrote:
+> Running the test added with a recent fix on a driver with persistent
+> NAPI config leads to a deadlock. The deadlock is fixed by patch 3,
+> patch 2 is I think a more fundamental problem with the way we
+> implemented the config.
+> 
+> I hope the fix makes sense, my own thinking is definitely colored
+> by my preference (IOW how the per-queue config RFC was implemented).
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v2,1/3] selftests: drv-net: don't assume device has only 2 queues
+    https://git.kernel.org/netdev/net/c/bda053d64457
+  - [net,v2,2/3] net: update NAPI threaded config even for disabled NAPIs
+    https://git.kernel.org/netdev/net/c/ccba9f6baa90
+  - [net,v2,3/3] net: prevent deadlocks when enabling NAPIs with mixed kthread config
+    https://git.kernel.org/netdev/net/c/b3fc08ab9a56
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
