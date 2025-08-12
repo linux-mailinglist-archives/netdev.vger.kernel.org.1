@@ -1,121 +1,74 @@
-Return-Path: <netdev+bounces-212911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212912-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8189AB227C0
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 15:07:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3DA5B227E9
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 15:11:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95B595678D4
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 12:59:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C47A51BC4F64
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 13:02:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0592E283CB0;
-	Tue, 12 Aug 2025 12:57:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C046326FDB3;
+	Tue, 12 Aug 2025 12:59:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mTpyTLd9"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ZsCW8XIR"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 010FE283CBF
-	for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 12:57:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 934AA26D4EB
+	for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 12:59:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755003422; cv=none; b=HPsH1rSA8ppGyesg337ed04O2iMRR3t/e1TqBV7S0y+G44KWbAoY+LDuvEx2UzLrq+urUA625fAlf5ImRb3okaZ80PIVI4SOX02X2cmDLq1p6XqK0kSv2KzyptYJnqCqxj6sGmfs1O6389MbnTo6jtRRLmYSR6CqETCI0dUitrw=
+	t=1755003599; cv=none; b=aZNfFMT5onpWRWVa97WSgG6J0y8WLACFRk2xrhvgvYASZ+02mBRhmvjk6OjBnNH2flac5IztmgiXnE99DJtSV441SdvGBGdhQWKU+VZ+DFxWdF3N6nS2BImLVREe1eXwgoGhBc+3ItvGJ7L5BbJLRULilHv7v9Iz5dbA0ZXUJSs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755003422; c=relaxed/simple;
-	bh=NmJZRF3omiQfQ6m1CN0UX/QZqQn/fJKRC6tEWJljr2U=;
+	s=arc-20240116; t=1755003599; c=relaxed/simple;
+	bh=mCgHARsbpZ7EY554DIC9n1x9vqvKr/9JFz03m7Kkabo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RQn3jIHTWIy0riqRfaWSipgcUmTHlLAqm9HqZe071iKO6FrkH5PfTB7zgs0wxazdWGMCP15yuMaDvyD46yF4FhIiWVPODbEqvlV04BtKST+CpG3+xXlPYCtHjtsIETIe35SQB/cUquMkw0wmy0ja7WgQ1BYmj46uaqGEap0LiPU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mTpyTLd9; arc=none smtp.client-ip=91.218.175.177
+	 In-Reply-To:Content-Type; b=FUQ5CF531/4vKBFpd+0+vbIiQC8k/Icl2dZN2+wqQ4p+7VX7WdSN3ONUkJ3L/Ox+NP/I5JbQp3l/Z9MDA9HgXcYjPmHG2JlX/RZXF/CHLm5+IV8hPBFKIs4l6NSgSXHuSHlQSKb7/t+RfQhGfXeeRvovgJt6hTcdEWjirq18fBc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ZsCW8XIR; arc=none smtp.client-ip=95.215.58.183
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <5bf50cb2-31c6-4391-a09e-a73fd84fe051@linux.dev>
+Message-ID: <a3f91ab5-d9da-4ef8-aecc-8d1264b8bf6a@linux.dev>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1755003418;
+	t=1755003595;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=bZsC9AivrW4iHKq1tw3pD8sQbjlniC4kKIeOMQmHCUo=;
-	b=mTpyTLd9rOqOwxBG3jDELNOMGYiKnrXsvFT8FQKPBaho1sW8KJGjEWsT+nHeumOrt/UGlj
-	ftJgLfc3FxvbluIGv3xh2BgI+C7cxl3CE6CeTDt/gB7VjH1LmKf7LdDgHgR/gVntxZIiTb
-	H201zn27yGGc4d3rkbmNeqSdvShtaHU=
-Date: Tue, 12 Aug 2025 13:56:57 +0100
+	bh=mCgHARsbpZ7EY554DIC9n1x9vqvKr/9JFz03m7Kkabo=;
+	b=ZsCW8XIRBW7teClXRZ+8EbhGeu4OblIhYW5uHjpFG0sbzgzj2LBa8mlJqqzfsF/4MBtQE5
+	N42DaeXIjcneIl/L4AHwKUSbEPYdkagOANGspRGyHBcKR8eqKuibO/VmcenC4T+Dgo0Y4C
+	4DszPisWbfot1vHk734PjmS5PQeGvaU=
+Date: Tue, 12 Aug 2025 13:59:42 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next 1/2] devlink/port: Check attributes early and
- constify
+Subject: Re: [PATCH net-next 2/2] devlink/port: Simplify return checks
 To: Parav Pandit <parav@nvidia.com>, davem@davemloft.net,
  edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
  netdev@vger.kernel.org
 Cc: jiri@resnulli.us, Jiri Pirko <jiri@nvidia.com>
 References: <20250812035106.134529-1-parav@nvidia.com>
- <20250812035106.134529-2-parav@nvidia.com>
+ <20250812035106.134529-3-parav@nvidia.com>
 Content-Language: en-US
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20250812035106.134529-2-parav@nvidia.com>
+In-Reply-To: <20250812035106.134529-3-parav@nvidia.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Migadu-Flow: FLOW_OUT
 
 On 12/08/2025 04:51, Parav Pandit wrote:
-> Constify the devlink port attributes to indicate they are read only
-> and does not depend on anything else. Therefore, validate it early
-> before setting in the devlink port.
-> 
-> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
-> Signed-off-by: Parav Pandit <parav@nvidia.com>
-> ---
->   include/net/devlink.h | 2 +-
->   net/devlink/port.c    | 4 ++--
->   2 files changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/include/net/devlink.h b/include/net/devlink.h
-> index 93640a29427c..c6f3afa92c8f 100644
-> --- a/include/net/devlink.h
-> +++ b/include/net/devlink.h
-> @@ -1739,7 +1739,7 @@ void devlink_port_type_ib_set(struct devlink_port *devlink_port,
->   			      struct ib_device *ibdev);
->   void devlink_port_type_clear(struct devlink_port *devlink_port);
->   void devlink_port_attrs_set(struct devlink_port *devlink_port,
-> -			    struct devlink_port_attrs *devlink_port_attrs);
-> +			    const struct devlink_port_attrs *dl_port_attrs);
->   void devlink_port_attrs_pci_pf_set(struct devlink_port *devlink_port, u32 controller,
->   				   u16 pf, bool external);
->   void devlink_port_attrs_pci_vf_set(struct devlink_port *devlink_port, u32 controller,
-> diff --git a/net/devlink/port.c b/net/devlink/port.c
-> index 939081a0e615..1033b9ad2af4 100644
-> --- a/net/devlink/port.c
-> +++ b/net/devlink/port.c
-> @@ -1357,17 +1357,17 @@ static int __devlink_port_attrs_set(struct devlink_port *devlink_port,
->    *	@attrs: devlink port attrs
->    */
->   void devlink_port_attrs_set(struct devlink_port *devlink_port,
-> -			    struct devlink_port_attrs *attrs)
-> +			    const struct devlink_port_attrs *attrs)
->   {
->   	int ret;
->   
->   	ASSERT_DEVLINK_PORT_NOT_REGISTERED(devlink_port);
-> +	WARN_ON(attrs->splittable && attrs->split);
->   
->   	devlink_port->attrs = *attrs;
->   	ret = __devlink_port_attrs_set(devlink_port, attrs->flavour);
->   	if (ret)
->   		return;
-> -	WARN_ON(attrs->splittable && attrs->split);
+> Drop always returning 0 from the helper routine and simplify
+> its callers.
 
-After this change there is no need for local variable and the "if" block
 
->   }
->   EXPORT_SYMBOL_GPL(devlink_port_attrs_set);
->   
-
+Oh, I see, you split it into 2 patches, but I'm not sure it's actually
+needed, because the first patch doesn't look logical on its own...
 
