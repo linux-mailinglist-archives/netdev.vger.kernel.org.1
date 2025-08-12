@@ -1,142 +1,260 @@
-Return-Path: <netdev+bounces-213119-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213120-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 359A0B23C5F
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 01:39:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94234B23C67
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 01:47:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 773561B63A02
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 23:39:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 86730178568
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 23:47:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D33F2D839E;
-	Tue, 12 Aug 2025 23:39:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40D2C1ADC93;
+	Tue, 12 Aug 2025 23:46:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hnEKyl+b"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H98XV7TD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
+Received: from mail-io1-f45.google.com (mail-io1-f45.google.com [209.85.166.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A80DF260583
-	for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 23:39:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EF7E2F069F;
+	Tue, 12 Aug 2025 23:46:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755041972; cv=none; b=UtWp9/Pk5xBrA1cjdpeNA5R470rEkBFBI4b84JCAI86zzm/wPoMQjtuUUfPSbd1N4uNqIqXznZJ61Uh1SD3xPH3Bnv4WP3fhQ1f4YWBWga3Q77eJu5GulQfU8A67hwVtOhCR3tkanKi6AmBYKLXhiU4PJfp1cQvJv73DGXqGkq4=
+	t=1755042417; cv=none; b=twspQ1ZbIqZV7MmS5A/DDQjFmT8HyLjNDIn+sZ3zPl0keB0282a3rgqJEGnldErMQmKDrT7mjp+YSkIpzoHEYLUTnqg0zsGgphYt2gDrhZyRoi/p0nvMFgDnLULRlfAEVDKk1i9+PCglH/Ak6c0rF9bwS/KOM83+tS9V+fkTusM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755041972; c=relaxed/simple;
-	bh=2u0XX36G8WUr1qtUBpFR9KxbLHQzWOunOZrdURtwG8s=;
+	s=arc-20240116; t=1755042417; c=relaxed/simple;
+	bh=yf/TpEP9k3XhdvkWxK3b3q+7QA+blq7VFiGxGxKzelY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CWOh8UB1pVUMUDjN1yIvygYXf6gFTUNngwa7C/fWGD8Zqc/md1OoQi5lE6CW59iot1vqnCZ6WLZcOS+6hamWm0E+WB5s0Ioy4majUkBJojjCu1/YMJW1w3t3j38uUqommCdpBzzfJl1U1EjXYaayJQEzWp7SiwYh3bW/7iGiSMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hnEKyl+b; arc=none smtp.client-ip=209.85.166.180
+	 To:Cc:Content-Type; b=lBcWWjkIoU1b/BJea4j48ho3kytf28Swg7QRFJq9Wtj9gDWHtKbm2Ai5L+n7h22MHtnFLPXAkJAQ/DSqHCOFc56ydvOtINrZbXQ+TIuIvH6vu/qTVIePeEM+PZPOdA5fJ+vzT4ESVSmn2QKybQt8rKUJbHNYhN+3OIwRTU1QPho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H98XV7TD; arc=none smtp.client-ip=209.85.166.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-3e55cdc7dfcso7302925ab.1
-        for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 16:39:30 -0700 (PDT)
+Received: by mail-io1-f45.google.com with SMTP id ca18e2360f4ac-8842a9b0899so1718839f.1;
+        Tue, 12 Aug 2025 16:46:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755041969; x=1755646769; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1755042414; x=1755647214; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=lDa4RY/A4zLXKrwMbGuWS/YhifwvrF5CC3sik7v3i/4=;
-        b=hnEKyl+bHG7t++H52/huPPE1fNo+qcNr+ClzlRJ0H60oEeqPyDH3tMAYqkELZMyxtE
-         aLHCFPhoGhsxoYQLZ47zk2n+KwKmIDVoyjkEA5yanor21JOwtBJa6a74oxQ/89XInE/g
-         6Qg28FTt/KTmW3HZ6kK6Dbb6o9T5PDXu1mCH85lFDhVGc4NBeAf34GKJX/rFPwxhY4xW
-         hmFUhrPGvPLT4u+VPCFZxWJLHp67S59Sxvf/LBBWtJN7GpZ434W75YvPxZiIMbeRam71
-         PCnGext0gnfSRTPqI/4XZKFKAzlyzdU+8YjBQyzklHLRrFihrLK9/aYXhs9dLMzOHWiT
-         7isA==
+        bh=X9q0yuyWp0H/yLFtjBM+2kXrqrRRzZKo9yfmECDwsl4=;
+        b=H98XV7TDEgk/CjWraZGKbMhH8aE4VkNTUuIUQZHPT3gboaxqQqyUVLz6qRmDOYzzmR
+         Xij791lNcuvBmGxOnGxUu+N9rvkWwj2wnjmc+GCSYMsMt57zuf2OvlVsrxIWlhiZf2rY
+         uyU/RqsLYUmMwNFgonDjtKC7v0LJP3DdkrfkYrZSPZg9CA26JT0Ox5FwmsiX/gZ86stR
+         JVUYUHIHgmA5CtAVyC9TJPjSKpFmWRCyWo5LjGJ9Z0dA3pZgTW1ZFF2z3TVrprInbpYw
+         2e+f1NwvMAhx40Uc9H29fGjAnJxaGGMhNJlaXK2twU0U5s1wnApjR+J1Rpm0AgAHCIyq
+         T3Qw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755041969; x=1755646769;
+        d=1e100.net; s=20230601; t=1755042414; x=1755647214;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=lDa4RY/A4zLXKrwMbGuWS/YhifwvrF5CC3sik7v3i/4=;
-        b=nj0aRjfU242r0Okc83iejNVsTIzTNHEvyNBmBnYQjfk3pOxoYE3LKl+iLsQyWx/XkA
-         Ha/SzYg4KG8dUabl5u6/KeREuBN7ofJFnHEL/cDhVfGsjf7+0gmESmfDg18+Zy9VJYOx
-         dzPWPDnEUC4EVMYgjP27g9THjp8GCVefGi98yPkW51DAlj/N81jZP/QaUAT/oiBMJOuv
-         LirRukEZVyOmL0Mymy/i4o3YUS7CGwr/7/rqdHjU/wbmaQUx1a9eVfE/Lw7dWhY3Yu4T
-         ZEycXWQQA9QZXQ8au19CIXN70qvGYWtNQ6AKqGfXo0CT7nHSW+yzhRI6XrzkrLy4vPFv
-         guBA==
-X-Forwarded-Encrypted: i=1; AJvYcCXkRjKnc3WSNU8blroj2Aq5m2uBsbs+KK+emsQpvmpyPn6zDH2o1WgY1/tQ7yq2r+WEMbtQdOA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwDguuziEeeLMIADDOwnETypzuDOrbHvdX7Viz7WOXR+fsQJowC
-	YZ4jzzN5Avb15fufIS2uBZ3Wzld5lVeefq7wYI5zSPaBck3vBtTiUie7UEB/7rDGk0nWA0eYILM
-	nqKTNYpqgk2hrFKcvhfGBNWlyeIEwprk=
-X-Gm-Gg: ASbGncuWPx/mFEYfaj4WCEMuH44GRMxCNego7aRgmOjvIRfvTDhKVSbDZiwDyHOcm86
-	6GRWLoxQZ+XZmQIpvKOeRZdwh21yFVtYCHAt2dkr2cOzy8jNKQyQyJ6nitVkQVERt8ynEVB7C+u
-	M2Wg1DRF0pN0Esn33gsQbLZdaqh7K2ZYNTAhy07rTAywIuJI3WK2XEKvEc6Esu2/1HnxUXDVeYv
-	UgniEc=
-X-Google-Smtp-Source: AGHT+IGqjRsX8X8VePGuyeTdO0SC3QZ/PbAflQYbw1LnOTFGxXJikVsAfMeWuHZVnOAd2dBjLaT4jm3d2Yl42+s386E=
-X-Received: by 2002:a05:6e02:12ca:b0:3e3:cc1b:2b5e with SMTP id
- e9e14a558f8ab-3e567486b72mr17128315ab.15.1755041969512; Tue, 12 Aug 2025
- 16:39:29 -0700 (PDT)
+        bh=X9q0yuyWp0H/yLFtjBM+2kXrqrRRzZKo9yfmECDwsl4=;
+        b=jnKzalTRqe65ycXkzLov5TcFq+TfbzoTg5St3ZBVoCYlsXANOupvlnCBI4vh+xGHbb
+         RSgzpKneug9HTHMu4ozSmWwruGuZrm8YrbOfQ48m/KXXg6nqgr/lRnbUaLNTD6PrebzK
+         EahmFhdxSU7lftW4sfmyKE0Lf90cYV6uSNBCKo7BqwqHxj/3cBppsrK3E1XbWxZxiX55
+         NYOtvaZuO4OExT0tebNXZ1gZkJ3zRQTTp/BTGGD8oj2wZw5LDZ5AYFqRyKuqLjrw6Pr3
+         KLZUDrLEPCOfDUQ+zePeiLDxFXaD1H4hheykIoL1/sgzi1UzUL5+vAoVvWhfjQQCq6+j
+         zAwg==
+X-Forwarded-Encrypted: i=1; AJvYcCUAtgSyuTzPTfD1vk4IgEXRN9wJw+5gEW8Dr1aa6KWmod79LmM//qEjR4Db9CRGcxxNuyxjGd//@vger.kernel.org, AJvYcCVmIhv/JiR9oubGEjoL8jcimF7V6mwD1Jjned+w6XYWwXWxj9u2ZiUfbkWrEo6n6py0TwM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwW3ps4T9E5yIWJIMPpp1dRBJp1HZhvmJ2w5jutouGeDHKmSNLF
+	EmWESKRPYh+HgUYJNMv8CsiddrUbOF0yy1iruntF04NcK/eRW+VYJXWfXMg5XzolN1epe48cxit
+	meG2nk5adD0YAePfI2gDpv+fA5XLN5rg=
+X-Gm-Gg: ASbGnctKVwYTUojhf+1nQJz7i+BIEyGlIQbCF56zg46SBBlz6AH63C3uNcolywCINBg
+	JkUDBz9hakog7sUO/kgzmD7Eq4dRmV5nDF8cXxPgjsBHuLETV0I9MUmnpO+22dw+K6UCEnlMPqZ
+	L195bXqLahr77XYNX0+xO++7sDlb/QkRS3fI9aIXRvVWneS1GtdZ1sQr/gJMVDm7XAlAPguRgvf
+	2LAjr4=
+X-Google-Smtp-Source: AGHT+IHjOSz2R6AUtf9Q60thDG/jVKyVKH1Q2Br1fnq3TjWbNwCgaInWW1RI8ZNsS0pOk+qoE9o+MiHXwQdBfza5dl8=
+X-Received: by 2002:a5e:990f:0:b0:87c:6851:81f1 with SMTP id
+ ca18e2360f4ac-884296924b3mr191031739f.12.1755042414428; Tue, 12 Aug 2025
+ 16:46:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250812075504.60498-1-kerneljasonxing@gmail.com> <f2ed5bd6-f3b8-4529-b9c9-28e05aae83f7@intel.com>
-In-Reply-To: <f2ed5bd6-f3b8-4529-b9c9-28e05aae83f7@intel.com>
+References: <20250811131236.56206-1-kerneljasonxing@gmail.com>
+ <20250811131236.56206-2-kerneljasonxing@gmail.com> <aJtucfMw+mXp79FV@boxer>
+In-Reply-To: <aJtucfMw+mXp79FV@boxer>
 From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 13 Aug 2025 07:38:52 +0800
-X-Gm-Features: Ac12FXyth5ETOMaNKWpIUd0SmauW4_ghf3VdfX476ya0B1enFigQFZ-hwsIPHPw
-Message-ID: <CAL+tcoBk57evHp+H+A=VcFWfuT5DfD+ywW51Tg86s6KH5OgQuQ@mail.gmail.com>
-Subject: Re: [PATCH iwl-net v2 0/3] ixgbe: xsk: a couple of changes for zerocopy
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Date: Wed, 13 Aug 2025 07:46:17 +0800
+X-Gm-Features: Ac12FXzCzY9QKvnOE6JM-U35E5tfAAPAeZyf0URf4aAEHi2UzRzlfqrN5PvNSSc
+Message-ID: <CAL+tcoA=fdiB5exzgyueBi7kxHbsCxWKbs0Y5QO4WG3P4-6Aig@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/2] xsk: introduce XDP_GENERIC_XMIT_BATCH setsockopt
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org, andrew+netdev@lunn.ch, 
-	przemyslaw.kitszel@intel.com, sdf@fomichev.me, larysa.zaremba@intel.com, 
-	maciej.fijalkowski@intel.com, intel-wired-lan@lists.osuosl.org, 
+	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com, 
+	jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org, 
+	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com, 
+	horms@kernel.org, andrew+netdev@lunn.ch, bpf@vger.kernel.org, 
 	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Aug 13, 2025 at 4:45=E2=80=AFAM Tony Nguyen <anthony.l.nguyen@intel=
-.com> wrote:
+On Wed, Aug 13, 2025 at 12:40=E2=80=AFAM Maciej Fijalkowski
+<maciej.fijalkowski@intel.com> wrote:
 >
-> On 8/12/2025 12:55 AM, Jason Xing wrote:
+> On Mon, Aug 11, 2025 at 09:12:35PM +0800, Jason Xing wrote:
+> > From: Jason Xing <kernelxing@tencent.com>
+> >
+> > This patch is to prepare for later batch xmit in generic path. Add a ne=
+w
+> > socket option to provide an alternative to achieve a higher overall
+> > throughput.
+> >
+> > skb_batch will be used to store newly allocated skb at one time in the
+> > xmit path.
 >
-> Hi Jason,
->
-> A procedural nit:
-> iwl-net is for net targeted patches and iwl-next for net-next patches; I
-> believe this should be for 'iwl-next'.
+> I don't think we need yet another setsockopt. You previously added a knob
+> for manipulating max tx budget on generic xmit and that should be enough.
+> I think that we should strive for making the batching approach a default
+> path in xsk generic xmit.
 
-Hi Tony,
-
-I see. Thanks for reminding me. I will change the subject. (This
-series is built on top of the next-queue branch as you pointed out
-before.)
+You're right, it=E2=80=98s the right direction that we should take. But I
+considered this as well before cooking the series and then gave up, my
+experiments show that in some real cases (not xdpsock) the batch
+process might increase latency. It's a side effect. At that time I
+thought many years ago the invention of GRO didn't become the default.
 
 Thanks,
 Jason
 
 >
-> Thanks,
-> Tony
->
-> > From: Jason Xing <kernelxing@tencent.com>
 > >
-> > The series mostly follows the development of i40e/ice to improve the
-> > performance for zerocopy mode in the tx path.
-> >
+> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
 > > ---
-> > V2
-> > Link: https://lore.kernel.org/intel-wired-lan/20250720091123.474-1-kern=
-eljasonxing@gmail.com/
-> > 1. remove previous 2nd and last patch.
+> >  Documentation/networking/af_xdp.rst |  9 ++++++++
+> >  include/net/xdp_sock.h              |  2 ++
+> >  include/uapi/linux/if_xdp.h         |  1 +
+> >  net/xdp/xsk.c                       | 32 +++++++++++++++++++++++++++++
+> >  tools/include/uapi/linux/if_xdp.h   |  1 +
+> >  5 files changed, 45 insertions(+)
 > >
-> > Jason Xing (3):
-> >    ixgbe: xsk: remove budget from ixgbe_clean_xdp_tx_irq
-> >    ixgbe: xsk: use ixgbe_desc_unused as the budget in ixgbe_xmit_zc
-> >    ixgbe: xsk: support batched xsk Tx interfaces to increase performanc=
-e
+> > diff --git a/Documentation/networking/af_xdp.rst b/Documentation/networ=
+king/af_xdp.rst
+> > index 50d92084a49c..1194bdfaf61e 100644
+> > --- a/Documentation/networking/af_xdp.rst
+> > +++ b/Documentation/networking/af_xdp.rst
+> > @@ -447,6 +447,15 @@ mode to allow application to tune the per-socket m=
+aximum iteration for
+> >  better throughput and less frequency of send syscall.
+> >  Allowed range is [32, xs->tx->nentries].
 > >
-> >   drivers/net/ethernet/intel/ixgbe/ixgbe_main.c |   2 +-
-> >   .../ethernet/intel/ixgbe/ixgbe_txrx_common.h  |   2 +-
-> >   drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c  | 113 ++++++++++++-----=
--
-> >   3 files changed, 76 insertions(+), 41 deletions(-)
+> > +XDP_GENERIC_XMIT_BATCH
+> > +----------------------
+> > +
+> > +It provides an option that allows application to use batch xmit in the=
+ copy
+> > +mode. Batch process minimizes the number of grabbing/releasing queue l=
+ock
+> > +without redundant actions compared to before to gain the overall perfo=
+rmance
+> > +improvement whereas it might increase the latency of per packet. The m=
+aximum
+> > +value shouldn't be larger than xs->max_tx_budget.
+> > +
+> >  XDP_STATISTICS getsockopt
+> >  -------------------------
 > >
->
+> > diff --git a/include/net/xdp_sock.h b/include/net/xdp_sock.h
+> > index ce587a225661..b5a3e37da8db 100644
+> > --- a/include/net/xdp_sock.h
+> > +++ b/include/net/xdp_sock.h
+> > @@ -61,6 +61,7 @@ struct xdp_sock {
+> >               XSK_BOUND,
+> >               XSK_UNBOUND,
+> >       } state;
+> > +     struct sk_buff **skb_batch;
+> >
+> >       struct xsk_queue *tx ____cacheline_aligned_in_smp;
+> >       struct list_head tx_list;
+> > @@ -70,6 +71,7 @@ struct xdp_sock {
+> >        * preventing other XSKs from being starved.
+> >        */
+> >       u32 tx_budget_spent;
+> > +     u32 generic_xmit_batch;
+> >
+> >       /* Statistics */
+> >       u64 rx_dropped;
+> > diff --git a/include/uapi/linux/if_xdp.h b/include/uapi/linux/if_xdp.h
+> > index 23a062781468..44cb72cd328e 100644
+> > --- a/include/uapi/linux/if_xdp.h
+> > +++ b/include/uapi/linux/if_xdp.h
+> > @@ -80,6 +80,7 @@ struct xdp_mmap_offsets {
+> >  #define XDP_STATISTICS                       7
+> >  #define XDP_OPTIONS                  8
+> >  #define XDP_MAX_TX_SKB_BUDGET                9
+> > +#define XDP_GENERIC_XMIT_BATCH               10
+> >
+> >  struct xdp_umem_reg {
+> >       __u64 addr; /* Start of packet data area */
+> > diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+> > index 9c3acecc14b1..7a149f4ac273 100644
+> > --- a/net/xdp/xsk.c
+> > +++ b/net/xdp/xsk.c
+> > @@ -1122,6 +1122,7 @@ static int xsk_release(struct socket *sock)
+> >       xskq_destroy(xs->tx);
+> >       xskq_destroy(xs->fq_tmp);
+> >       xskq_destroy(xs->cq_tmp);
+> > +     kfree(xs->skb_batch);
+> >
+> >       sock_orphan(sk);
+> >       sock->sk =3D NULL;
+> > @@ -1456,6 +1457,37 @@ static int xsk_setsockopt(struct socket *sock, i=
+nt level, int optname,
+> >               WRITE_ONCE(xs->max_tx_budget, budget);
+> >               return 0;
+> >       }
+> > +     case XDP_GENERIC_XMIT_BATCH:
+> > +     {
+> > +             unsigned int batch, batch_alloc_len;
+> > +             struct sk_buff **new;
+> > +
+> > +             if (optlen !=3D sizeof(batch))
+> > +                     return -EINVAL;
+> > +             if (copy_from_sockptr(&batch, optval, sizeof(batch)))
+> > +                     return -EFAULT;
+> > +             if (batch > xs->max_tx_budget)
+> > +                     return -EACCES;
+> > +
+> > +             mutex_lock(&xs->mutex);
+> > +             if (!batch) {
+> > +                     kfree(xs->skb_batch);
+> > +                     xs->generic_xmit_batch =3D 0;
+> > +                     goto out;
+> > +             }
+> > +             batch_alloc_len =3D sizeof(struct sk_buff *) * batch;
+> > +             new =3D kmalloc(batch_alloc_len, GFP_KERNEL);
+> > +             if (!new)
+> > +                     return -ENOMEM;
+> > +             if (xs->skb_batch)
+> > +                     kfree(xs->skb_batch);
+> > +
+> > +             xs->skb_batch =3D new;
+> > +             xs->generic_xmit_batch =3D batch;
+> > +out:
+> > +             mutex_unlock(&xs->mutex);
+> > +             return 0;
+> > +     }
+> >       default:
+> >               break;
+> >       }
+> > diff --git a/tools/include/uapi/linux/if_xdp.h b/tools/include/uapi/lin=
+ux/if_xdp.h
+> > index 23a062781468..44cb72cd328e 100644
+> > --- a/tools/include/uapi/linux/if_xdp.h
+> > +++ b/tools/include/uapi/linux/if_xdp.h
+> > @@ -80,6 +80,7 @@ struct xdp_mmap_offsets {
+> >  #define XDP_STATISTICS                       7
+> >  #define XDP_OPTIONS                  8
+> >  #define XDP_MAX_TX_SKB_BUDGET                9
+> > +#define XDP_GENERIC_XMIT_BATCH               10
+> >
+> >  struct xdp_umem_reg {
+> >       __u64 addr; /* Start of packet data area */
+> > --
+> > 2.41.3
+> >
 
