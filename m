@@ -1,130 +1,141 @@
-Return-Path: <netdev+bounces-212802-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212803-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E85F9B22085
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 10:17:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CACDAB220A7
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 10:23:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D0CC51AA13B7
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 08:17:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 331FD1AA784E
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 08:23:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C8E42D9ECF;
-	Tue, 12 Aug 2025 08:17:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5091A2E2827;
+	Tue, 12 Aug 2025 08:22:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MdsP88Kl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k1HcdkPY"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 930932DECD8
-	for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 08:17:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 890D22E2657;
+	Tue, 12 Aug 2025 08:22:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754986627; cv=none; b=bECAgw9FPnsck5GrCszeHoW0uas7rBX1aTNqmVmCWTnqfvhi7d4YwJMl9BIQ9CeCvgihIus1YKb+YoYzBqtONzcGWIreaLJvZE7RPzmHFkhg5lPjSl22QCyd9GVy1sVCNZHy0s1OLCnimHOQQ5ADPyD6NFhwNtLUAuntb3/Sw8E=
+	t=1754986972; cv=none; b=YFWyxZS7h2BSx+GfO/0xPdyhNG/o8857VdEiRG5pJjLBfx49GpQ9aplpFXnW3zf0TAVJ2wnEdvRlK9UVDZ3ZT9OsYgd+Z9fABwUJn9e9qJ0Gd9HLiJA+ZBmjOXgWOUguoLd0JFa22draV0C+wZrLNo+u6d6Tlc8x1RnN+EtzJNo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754986627; c=relaxed/simple;
-	bh=yRFc2sOlfC1VRaec8lpMMCRXQPh/gQn/3HBQl/s0F4A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ry1pRIxfXh6nlRp7LiEY5bBiKkjCXggmbHMc/XQTXMm/O1ecdlqZm8P5DofR/ZbwpwBdtxmQ1OWquzWCGfl+bDT4nFVr1DheUOwW1wigIloXR7uQmXkuvKXDvTy04y2Bod+5stAh9NDwioNtgpTNzqCJ3E8M5cCPlfzU2mDh0HI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MdsP88Kl; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1754986624;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=B+sWFNTm6ZCYaG4jfBrFltTWcj45ITlaTFvMx8eQ5+0=;
-	b=MdsP88KlmO3ypqbclnsJb4YTp6W2Q0enq2LTqMGHPm7nsJ59//s+4+3ooi9K2VF/BO8HrL
-	Qb7sLRLazmodue5HDt90vSfblPO0gmS4cMJLminvnZppylBMerOokwKhTSNwIAGkaYNzrR
-	F6F4zUuerEWF1qptzyhbFndT9jcDlY8=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-615-GqAbRIQAM2y6n4DSS_wnFw-1; Tue, 12 Aug 2025 04:17:03 -0400
-X-MC-Unique: GqAbRIQAM2y6n4DSS_wnFw-1
-X-Mimecast-MFC-AGG-ID: GqAbRIQAM2y6n4DSS_wnFw_1754986623
-Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-7073cc86450so90987106d6.2
-        for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 01:17:03 -0700 (PDT)
+	s=arc-20240116; t=1754986972; c=relaxed/simple;
+	bh=fJX20PohZpCHadUb7Zc2OniYoY/K0awKaD9ACu1c3jc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=Ug3A/8EiPWZa5GeVwUx/ztkOPmr3qX/iXgAUs2r4DTDWfXvjJ8++IsA8mTodgLE92XhbKNQqWdY21W5yK7zP4frGWgffv3S8RUN61oHpJdIRRmn2Vd5Hvc54u45SLjFICnMYBgMXMmw3bPMiVRc7Qt2vYOli64UxlIrVnNx8gnY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k1HcdkPY; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-459d55ba939so2388465e9.3;
+        Tue, 12 Aug 2025 01:22:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1754986968; x=1755591768; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=YbyGTm/Kphup1yQ5OdKhT2GE+zUDtJtHd0XwG3yDXbc=;
+        b=k1HcdkPYU6xZZHO5/JOTOkhwOb0hpYmXQUmBTkkxMHnorHfGvRaEhgaxjDW08qL52y
+         8S6hJQ9p57SADuHKQBDt1AvGRMBKmQ2vBEH/XQwZYsYmO9AlW7vZ+j7HV/OMMLd6C1h4
+         mvq4TwyD4LUOhonGdNAoKqJkMqYVKPehhIHJxgU+4OFg9PbODMbH+a1TXTQo8y/fIPnV
+         hHvZi/49LTDfcBW+5fviDvQux8QEltVYk/eQbH1DpgzL+eMJzcvJkFQ4dqoe2sKiB0dG
+         d4CuUXgZ2z/C5UTRHKnJOmUi76Eyu+0rPmE081Ie/JvedF69DunIr++tmJUfMJHMVMgt
+         tnhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754986622; x=1755591422;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=B+sWFNTm6ZCYaG4jfBrFltTWcj45ITlaTFvMx8eQ5+0=;
-        b=E+SihLf4dIjcZoNFH+77Sl5b+SbzmMbBmekvk2UxhQl9IsXnnvX0kIy2/egmHCGhPM
-         5rhj1ACmTgYORdRSSYfX6Z2ZAqHEIHQjD1k1oOLX5iJb4JLU1vefJj3VQZ9/SSMeH880
-         mq2kT/eWf5e2KCggH5lQfXyiEUEzvH1EeanwVeSvI6UpjARf2DtvlZBD+Ko9P1FNtSAt
-         JC+ySeets8vyfgOJ/ZhFo7+FaEl8fq7i38LfCLKHHPyX6eKxlLGZ61BegCnu0GmvcVlz
-         WncVZjvM/uAT3PDsQxTjjkxXD+4OXeeN3yyqCnW4urEKqHFLUFOs/+RWa/e9m+V5nXH5
-         fzqg==
-X-Gm-Message-State: AOJu0Yya2rDYHa3RcNpQLoGkhKK/3QnROCSgtRaaARTvYVRVgq2enz31
-	ds1cxG4hSctSuvLgB83DSPnCBKM+P/FknumPN495J8zTwAflh/dkZYJE2P7697wgzIthNWVN0C4
-	I8sI4svum5YWfj0TSNft8H8OgerFwz3TWbFu22GAGVGzMY3bWdnCHludrkB15B5pLpg==
-X-Gm-Gg: ASbGncsVgQRjNPN9rTD0L3AtkcA592dgVgo3cIBH0EYW2QgpCGbo55VLYbTYdspNy9Z
-	ismAilo8OGIbdJ2zbT/Sd9iVvU7EBJw4wpwJEuSyWgZUQcQE7tBHpSxUYXl8OpKur8HdrAfZgMe
-	0weaQbDYNatdOpwwc0GetLbUnpnSG46T/lzVcd+vg8ipY40E9+Bje2H5fAo58hYh8gGzl5W2qpm
-	2lRf/W9Gl/VQZJ3t2OVpoYsdNpmNJ52UaU+XxcgMrvrtjo9WVmNAXqryMocrsv5is4rFUNVUjvl
-	WUqq65UHNNyM781yw4pLomIRvNroe3PbiLhjkOFDN3Y=
-X-Received: by 2002:a05:6214:c84:b0:707:ba4:a21e with SMTP id 6a1803df08f44-7099a1d06cemr216500786d6.1.1754986622688;
-        Tue, 12 Aug 2025 01:17:02 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFJbyxt0za6gU5BC/SKoFHX+kaz9ByoX6QEm/XkTEr0Kp7Xbz+qdisalcp7XQIwZgZx/aDtsg==
-X-Received: by 2002:a05:6214:c84:b0:707:ba4:a21e with SMTP id 6a1803df08f44-7099a1d06cemr216500656d6.1.1754986622302;
-        Tue, 12 Aug 2025 01:17:02 -0700 (PDT)
-Received: from [192.168.0.115] ([212.105.149.252])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-70937821c2esm147748396d6.68.2025.08.12.01.17.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 Aug 2025 01:17:01 -0700 (PDT)
-Message-ID: <0c3291b0-ab8a-4958-b317-ffdafe61b332@redhat.com>
-Date: Tue, 12 Aug 2025 10:16:59 +0200
+        d=1e100.net; s=20230601; t=1754986968; x=1755591768;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YbyGTm/Kphup1yQ5OdKhT2GE+zUDtJtHd0XwG3yDXbc=;
+        b=DgqGcS8kj/6GTnxLuHZRYPfKJIYB0KrPDKULP4T233X6HPEnZQDysCCPSx5CfPYUkZ
+         WRi/z49gPPwJdhz+zniqv1ZcpPJBb1u3Uyp9H+ymirBNnIlH8lOIbRkAW4YSbvdukNEN
+         7zM5WwsX2FJu1KzfQW8vSerVSCIKaKGD7/N8+/CQNmTJEbxp6Ritms3DrdecfPtq98NB
+         OJbT/kih/0Ki77mso+SsLHq+iexBGpfaDGccCsaC+M7zh6xmgR8JhFtpbR1gfa2qqcp0
+         GnZA8qJRlP+C4PDzKyz46Z94HzARDGZ9tlAyPKEEcecKjMs3PGU7ZrcbjbqFQZvuLsfU
+         A/lw==
+X-Gm-Message-State: AOJu0YykqP1f8nraWTgAlYCdmkD09+W6JwxhsjauHCrQJ1miPYUjvXS/
+	FHZ9EYpqweKsuBLAHXtiGQrcrJIsSQgYrgzBu5pvZdnKeuGuSk2rg0fwyBMQD0b5eAU=
+X-Gm-Gg: ASbGncvzl45exy7FteWg5NVB6MExZ5U6cxQtq3s2JWemBUu12dW+PvJbInWoeniyxJ1
+	518aQBEKSDRLDcdkGobnwFlqM3yRY13dXbpueHDl1+XHOEiN/WbJldsi5MPgYJ+qS5prsgy/BKv
+	ZfaG+aQ7szZYkngsMSEYfqx9NGZfeBOFvzfA+3nHsDX4DcWdO6hUp4SP13RlRF+HkH16z/Ny80q
+	MO+lZQKbLZ6ygIA1PCowIz3BrbbHpsSbOpg8M+ymGGVVAb4jGrykRAW26z+jeEqxWOlCOprIsul
+	3qgO8Zqpmpp+66ocukLN08n6l8HsZW0Nb/0aL/TvzFqACVTJEQQjaF8mL0Et1s7yPRpSj7RAJSZ
+	n0oA3qkEdhOE7VsXnYIeIlkzUd5FxMzwqVckFTyG3ZqrXpLsthuAk5s9R5bbor8NoKFiJxidv2V
+	Ulb2fJwrM+
+X-Google-Smtp-Source: AGHT+IFVpnUtIAvOnPWm8jbKDKspsCrZdFXLx787xQt1P0oYsLh7XnWPIpJj+MxukmZjQbC+KPQDmQ==
+X-Received: by 2002:a05:600c:3acf:b0:458:b6b9:6df5 with SMTP id 5b1f17b1804b1-45a13f53375mr2090295e9.1.1754986968337;
+        Tue, 12 Aug 2025 01:22:48 -0700 (PDT)
+Received: from pop-os.localdomain (208.77.11.37.dynamic.jazztel.es. [37.11.77.208])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b90fdc85a4sm4142823f8f.60.2025.08.12.01.22.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Aug 2025 01:22:47 -0700 (PDT)
+From: =?UTF-8?q?Miguel=20Garc=C3=ADa?= <miguelgarciaroman8@gmail.com>
+To: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	willemdebruijn.kernel@gmail.com,
+	jasowang@redhat.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	skhan@linuxfoundation.org,
+	=?UTF-8?q?Miguel=20Garc=C3=ADa?= <miguelgarciaroman8@gmail.com>
+Subject: [PATCH net-next v2] tun: replace strcpy with strscpy for ifr_name
+Date: Tue, 12 Aug 2025 10:22:44 +0200
+Message-Id: <20250812082244.60240-1-miguelgarciaroman8@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/1] ipv6: Check AF_UNSPEC in ip6_route_multipath_add()
-To: Maksimilijan Marosevic <maksimilijan.marosevic@proton.me>,
- davem@davemloft.net, dsahern@kernel.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kernel-mentees@lists.linux.dev,
- syzbot+a259a17220263c2d73fc@syzkaller.appspotmail.com
-References: <20250804204233.1332529-1-maksimilijan.marosevic@proton.me>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250804204233.1332529-1-maksimilijan.marosevic@proton.me>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 8/4/25 10:42 PM, Maksimilijan Marosevic wrote:
-> This check was removed in commit e6f497955fb6 ("ipv6: Check GATEWAY
-> in rtm_to_fib6_multipath_config().") as part of rt6_qualify_for ecmp().
-> The author correctly recognises that rt6_qualify_for_ecmp() returns
-> false if fb_nh_gw_family is set to AF_UNSPEC, but then mistakes
-> AF_UNSPEC for AF_INET6 when reasoning that the check is unnecessary.
-> This means certain malformed entries don't get caught in
-> ip6_route_multipath_add().
-> 
-> This patch reintroduces the AF_UNSPEC check while respecting changes
-> of the initial patch.
-> 
-> Reported-by: syzbot+a259a17220263c2d73fc@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=a259a17220263c2d73fc
-> Fixes: e6f497955fb6 ("ipv6: Check GATEWAY in rtm_to_fib6_multipath_config().")
-> Signed-off-by: Maksimilijan Marosevic <maksimilijan.marosevic@proton.me>
+Replace the strcpy() calls that copy the device name into ifr->ifr_name
+with strscpy() to avoid potential overflows and guarantee NULL termination.
 
-Please resend in a 2 patches series including an additional self-test as
-asked by David.
+Destination is ifr->ifr_name (size IFNAMSIZ).
 
-Also please insert into the subj prefix the target tree ('net' in this
-case) and add Kuniyuki into the CC list.
+Tested in QEMU (BusyBox rootfs):
+ - Created TUN devices via TUNSETIFF helper
+ - Set addresses and brought links up
+ - Verified long interface names are safely truncated (IFNAMSIZ-1)
 
-Thanks,
+Signed-off-by: Miguel García <miguelgarciaroman8@gmail.com>
+---
+v2:
+  - Dropped third argument from strscpy(), inferred from field size.
+v1: https://lore.kernel.org/netdev/20250811112207.97371-1-miguelgarciaroman8@gmail.com/
 
-Paolo
+ drivers/net/tun.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+index f8c5e2fd04df..ad33b16224e2 100644
+--- a/drivers/net/tun.c
++++ b/drivers/net/tun.c
+@@ -2800,13 +2800,13 @@ static int tun_set_iff(struct net *net, struct file *file, struct ifreq *ifr)
+ 	if (netif_running(tun->dev))
+ 		netif_tx_wake_all_queues(tun->dev);
+ 
+-	strcpy(ifr->ifr_name, tun->dev->name);
++	strscpy(ifr->ifr_name, tun->dev->name);
+ 	return 0;
+ }
+ 
+ static void tun_get_iff(struct tun_struct *tun, struct ifreq *ifr)
+ {
+-	strcpy(ifr->ifr_name, tun->dev->name);
++	strscpy(ifr->ifr_name, tun->dev->name);
+ 
+ 	ifr->ifr_flags = tun_flags(tun);
+ 
+-- 
+2.34.1
 
 
