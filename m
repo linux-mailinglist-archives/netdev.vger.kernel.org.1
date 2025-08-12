@@ -1,149 +1,233 @@
-Return-Path: <netdev+bounces-212769-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-212770-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8F6DB21C4E
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 06:51:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88397B21C53
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 06:52:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2DE055008CD
-	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 04:49:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3DF403ACF40
+	for <lists+netdev@lfdr.de>; Tue, 12 Aug 2025 04:51:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CAAD2D6604;
-	Tue, 12 Aug 2025 04:48:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86D222D8375;
+	Tue, 12 Aug 2025 04:51:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DUBTAPAz"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="fOnAaO7L"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2054.outbound.protection.outlook.com [40.107.236.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D54F817A2E6;
-	Tue, 12 Aug 2025 04:48:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754974129; cv=none; b=lzzAv8ZpWMVziAqT6+feuI1voQ2sVB0huzfqhN1upP2gt+vA/5xnH07vrsZHfXFyDkV5f9MmU/YI/GgNgJeBdGTGGoPyUTZkO+TbaPLNlkdKoqVFwipIVmkVnql0ertJcdg/iWMiLNJeTY3772JqcH4bi0ycaIASFbs6+vJnb3k=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754974129; c=relaxed/simple;
-	bh=rd3l0x+u9gxrsAvt6wXIGSPCtQ9fjFS56ByUZRBtFvw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n/Rl57GkGiV8LKHKtMy4teNEzTKWzDk2QKthpGwBZqHDaBf2vQK2WjnFGB8xigEOl6ypZ0XpwojSfg7asWfjRjuufyEXgq3YN/rR410BCzKfr6BzeOrc+PCfW1WQypNmbyxxHuybJZ4Z/fTm34bse1Q8Cmdkr9bMLez8ig4nH9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DUBTAPAz; arc=none smtp.client-ip=209.85.215.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-b4245235a77so4279589a12.1;
-        Mon, 11 Aug 2025 21:48:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1754974126; x=1755578926; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ExX652zHf1GHUfqv+cm0zn7UYbTpQ3yVS+bG4tF/0so=;
-        b=DUBTAPAzrQEndWJCNwRsrk1V4laqGBT5ql3fIoizFiqQ6DITK/zMktp9gZ4XX6JnP9
-         KSbVu29DsoaglEQMi1Pq5mXbf50XOmtxg2YBYPEYAza/KQfkv2yU7Wn0WML4+gDk8YYB
-         YpWr/zRlO5eC4dghoJFml2fcJZpsAiE+0eaefpIYKgg+fNMWZIq5YI6ew8+XsBS3DR5X
-         O1b61rFFMSZAXMjK7pq74PiNrDpL4aKrtVxv1F7nBApOyhwQv1EyErf2e3ebQ0jZqpIM
-         2Pd6yB+e/1XNOoMYU6bvU1zLABj0bRef+GmbpGsybmTL9pv9h8o5RkBUm/vfHeG9/RLZ
-         4Zlw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754974126; x=1755578926;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ExX652zHf1GHUfqv+cm0zn7UYbTpQ3yVS+bG4tF/0so=;
-        b=Cl0LH8vjv/EA7S+YyB0YPZ/nwWu0sjvWm8M4PzmvhWf68I9frH8h/mvpFV86rPsc9J
-         gZ6RJK8MMPZWeoAfjcG9ouoOVS2MQomSpR1XuWbL7LJIEIfnkOrYrHuxLcESUVPxjac5
-         z96xresHbBzgaArymItIY/OGOSxCxtxxzXu28bFo2NEA1yvz9ynj01I8J5sx4Znp6N9b
-         bN3SwJ4q2adVEddyX4eIa4GxTREK0h0Vz1DE40qTcC4SKrjs7QWqWJIb/YyFsneswCPO
-         EFUtBel29b6b184OaWhFoCaR2S8UnKgKy6Sv1IDVete4Gxfmy9jLGhuFki9IAsjKf5x2
-         7PJQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU/DDQE4yOMiKzSIRXjFtkRX32nD/tB48+nc8uum3uGb4/b7GnvnlHv0kVuPo36ARl79ZiJNz1tOoK5aJ415+tg@vger.kernel.org, AJvYcCX13R5CBHxf/NG8SVXgMCNBwptbu2R1TqF/dBvybObs1urV/LtJqdfbdgXCqh4V9ZLrkVBWPww64es=@vger.kernel.org, AJvYcCX9Rkg85GcXcKTbKvzp/qQ+ypsdUlNm0Yzdnz/R5OhfUousARsmhaG4Ao5mtnegdcsN7vtRyeYfwjiopYdo@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw7U+ButA4775mrS4QK7cxxPnw+H9AYKelfQgV9E1QusyS6uCFB
-	lKhw4g3WIEONyMr2VjDwFgdbOEMp87bj+TyR3OgpEvy42z4+Ann2UB/5
-X-Gm-Gg: ASbGncvKw9J7+a4PxzxssWRlRAwR/AjUD99YICcOp93ctpTe8GRowBzGYF45ep+jSyv
-	vzdPTPbjGU8iKmLPPOro1nmTya+olqhlTxOs+9cpHekwtIFYdOfx6I7b3Br0zS1Q5Dba42+hrkZ
-	A1/FJjgSHuGalKMlqjpV8FWwmPs8eTPgG1NF9MEF+SkivitzoqrK/FFBmu+qGEgAtg5nG1285Tj
-	7RLW9d6qTQcqKJAxrBx955tIG9P2kL3pdYubDXSjCxML4cXLoIA2S5OHWWd7aA6FQM/osHHmuEq
-	OaWOI8J/wzc5PQfGgi5U3rAtF92yDkf7FxKIUMnapDOkGl59KMHjhckevYxCJBAv3Oz8gFb693T
-	202ftMQqV6D3CeDMqM9vEsQITjfxkHoQydyGRTA==
-X-Google-Smtp-Source: AGHT+IH4bampa00vZY2wn4ikjgxtDmkLgf5+sXi+LEPPRG28R7ojBu8w1mILEa76tO4L5ruhfLwAgg==
-X-Received: by 2002:a17:902:cf04:b0:240:7308:aecb with SMTP id d9443c01a7336-242c21ff8f9mr274922235ad.32.1754974126159;
-        Mon, 11 Aug 2025 21:48:46 -0700 (PDT)
-Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-243031afd94sm2644655ad.113.2025.08.11.21.48.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Aug 2025 21:48:45 -0700 (PDT)
-Date: Tue, 12 Aug 2025 04:48:34 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Nikolay Aleksandrov <razor@blackwall.org>
-Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>, Petr Machata <petrm@nvidia.com>,
-	Amit Cohen <amcohen@nvidia.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Alessandro Zanni <alessandro.zanni87@gmail.com>,
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 1/3] bonding: add support for per-port LACP
- actor priority
-Message-ID: <aJrHomEWwIn8a1Ql@fedora>
-References: <20250724081632.12921-1-liuhangbin@gmail.com>
- <20250724081632.12921-2-liuhangbin@gmail.com>
- <a1f88a9d-14b8-4547-a6c1-b880633775a5@blackwall.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2045C1E47AD;
+	Tue, 12 Aug 2025 04:51:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1754974274; cv=fail; b=OvdWGn8bTJOlTc5N5eGnYCKbiL1xNelvrz6EuIg7EoPrlLUDVhWK8vIoOT4od/Fh0imgg7R3bbiBa6iCX5zvQodkU0X2x8x8IleWKUeABkwiU6oRl+2EzdQhJwW2NlRUhDIbnHpD4qBEkpoObUDgrTfTfbeRlKQyQBrP02wKm/I=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1754974274; c=relaxed/simple;
+	bh=YytZt8IoAzHWLPH/+HxpSFiOpY5vYNuxCqflYXscHss=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Cp8CB/LzYBX+riaBxQa1io5c2XxGpwsQ//j3KyjEgKTlnxUVyU9uWMwQ20r0JwsR+7DF1Nu3JBa6Kf6wm+Mvi2psld7teOigpBlda+uh+iOM/A0bOpQUSBtEYMGFiRKXLjcScxTemHMY99Pvgvk4736vcVFRappcuTXx1sVaQGg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=fOnAaO7L; arc=fail smtp.client-ip=40.107.236.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Go9zOU2qtwXqAY0tIddYQMD8MqnOUEHrZZ6GDQZDzrh4WbgFUiUqyTC98kVi31qqHcLcg8AAGaGvuzKNuk7vk3Y3z7hjB/ENehkuchoEZuBw5UAziZsX0BjME1pFl5UVTjr7vUlrvAf7htvtC9wpzxCgYJKusMEZ+o5GVnsYIbZQxZIptH+wDf1mAHg/q8tg7GNBEIgKDA6CJaABYsHC9xq52xhVuoUx0ztjo4IeAwelp6ta0DYnjKeqdeAzEzm86qI9O0pzYIGSJZ8RuWlcdwMVtURF+495aMTGH5v+uxnxEmKyQg5Ep3tetZ2s+9s14zHFytX9IBB/Kuowu/u17Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=GHEeQqSC4jlgMfu96eMuP+VLvYYaCRIEbt88wY9p+gQ=;
+ b=kGXv405w9NwKM7SuTql7C34YQJAxnZlAVcIx7lFYeCB4vVQLJvkdlqn5rNUc6eUCsjjn3jDiDN/UFb7rplvO8P3MO/KVF4YjpILLvAcjJJsJ+FC9FpO7DVZ6Y5wSreQEZ+bzvdjLiQhBH63zPXf8KaOTVqBycLJHcwKvWDNHe5aIjFmQKfPbfMkawujrjMea2bbHyjn1hAngqQN5rVobYJnqSS5GH3LQqBLOdHIKQ6U2/DP4+NU0iLdYPfhdiS1gi0yUO68L9H1a37VAWkvmi5ndbF5sacJTw/qe4pjq+ZIdP15ap6eID+gTyYQrc98jnUN2Ou+8MjaGrLd49lNRDQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=lunn.ch smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=GHEeQqSC4jlgMfu96eMuP+VLvYYaCRIEbt88wY9p+gQ=;
+ b=fOnAaO7LOHvEWqC9A0daxMhhV6JZ/km9HR4bDFBAkwboLyqtMMAbfvNNib6ixoCmvpk0ooNaYR8NIlYjUY7gyBPyrBtRv493kQRmQwwjfe8knE4pi5DCtzuNIb4jNAX8DXJHS89pzVh/1B9WbhdWfpY+SJoDC3UfXatK3JNOVpQ=
+Received: from BN9PR03CA0279.namprd03.prod.outlook.com (2603:10b6:408:f5::14)
+ by MN0PR12MB5979.namprd12.prod.outlook.com (2603:10b6:208:37e::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9009.21; Tue, 12 Aug
+ 2025 04:51:07 +0000
+Received: from BN2PEPF000044AA.namprd04.prod.outlook.com
+ (2603:10b6:408:f5:cafe::e6) by BN9PR03CA0279.outlook.office365.com
+ (2603:10b6:408:f5::14) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8989.18 via Frontend Transport; Tue,
+ 12 Aug 2025 04:51:07 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BN2PEPF000044AA.mail.protection.outlook.com (10.167.243.105) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.9031.11 via Frontend Transport; Tue, 12 Aug 2025 04:51:07 +0000
+Received: from airavat.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 11 Aug
+ 2025 23:51:02 -0500
+From: Vishal Badole <Vishal.Badole@amd.com>
+To: <Shyam-sundar.S-k@amd.com>, <andrew+netdev@lunn.ch>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: Vishal Badole <Vishal.Badole@amd.com>
+Subject: [PATCH v2 net-next] amd-xgbe: Configure and retrieve 'tx-usecs' for Tx coalescing
+Date: Tue, 12 Aug 2025 10:20:35 +0530
+Message-ID: <20250812045035.3376179-1-Vishal.Badole@amd.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a1f88a9d-14b8-4547-a6c1-b880633775a5@blackwall.org>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN2PEPF000044AA:EE_|MN0PR12MB5979:EE_
+X-MS-Office365-Filtering-Correlation-Id: 837176fc-0fa1-4625-8105-08ddd95bd9c2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|376014|1800799024|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?TFSoz5S10UhFtIKhBBFC8LWCJ/hk3CPLyo83T9h7O7xme5OcxC1b9RB2PUBG?=
+ =?us-ascii?Q?N6WaB1bbvqBhr3OhILBD4lPmfhLMrsaRxQAYalNV43WqzA5koCRbNgt9nLeh?=
+ =?us-ascii?Q?LEc21AOt9kPUwzkvusA22AfMPjh6/exK9pWQR440wKQSuk96Lr55zqsKbbBh?=
+ =?us-ascii?Q?XkrWXBGgaNpHhEyn5EKNr0t8/+e5a2q/zlf471nIsmxQ5v0AEuPfY/eyiLXI?=
+ =?us-ascii?Q?cOtccr5IHW0z3vTpNeAs9XC42lKW/0l7vpR3H7rwRyEMI4eUG8kd77cd27C0?=
+ =?us-ascii?Q?u2sB/VAxhEgDPxbO8k1T8fQXV/X/l2wFuIYZuLgZODzu+b1w2r5XNWAxiz55?=
+ =?us-ascii?Q?mJZomvG9QvlN/rCHVbVTiqeMi8sVCzcd7lN1jUFTDIT6n5w92JyNHL0vMqQF?=
+ =?us-ascii?Q?Og6F58pMZjzYsbnYLnriz66bD+xFzwyGAekv5iPMUtnZtK1gCZodayuufCts?=
+ =?us-ascii?Q?csIhfSs+zdM3hUZvFjc6S6A82w5buDgJq1UGgAr3ljiR+jsn84FVxB10saSj?=
+ =?us-ascii?Q?E+8wXwOd3rh/kfQ5W8gmjw8pUx5U9QXCXEONKExbulB0A+PJdHUlTau9DySf?=
+ =?us-ascii?Q?vks4Pcv+2wbpgRBdpFuPMroUZYq9avm299Uf3Kql3lZC6W7wYn/wwAKOx2vD?=
+ =?us-ascii?Q?MCDr+Ntw8c0s8q7++QZNSspKeyD4sUmrw2LyYFtOMe5GTvHnYD5Y7glehTt1?=
+ =?us-ascii?Q?dndNttHYpAY/YjxAcHpWDlRWFg1t9w6710ic2NArNcRfmGWC0fo6i+SDCq7e?=
+ =?us-ascii?Q?uIOXKOwLUC4mB5eeshTIQhao/jk2swvEXwz83yet86+HShP0Uy6ToX+85uxo?=
+ =?us-ascii?Q?mQfdrKy3C7d8a2JZYK0CmPNesf+SrNzgef0pZvkETEQbEzairBnsqQpOGLw3?=
+ =?us-ascii?Q?RKKBdGszL3iTKxDNd6DNEwTAttIuDUGWp/rwW0VAU+5AG5ygofODkfGAKcTo?=
+ =?us-ascii?Q?w1/CFl+bEp8tT3Hpw/q5/F61xjlCA7NDls/RQUoReL9k7QIcTmaDkxyiD8cc?=
+ =?us-ascii?Q?hmWsRwmC3Swb9L5K7gS/uAdf9NH9zzKUzCe5nESSxPNIgK4fY42BMr0Tug77?=
+ =?us-ascii?Q?WUSjsZZwJJUbfZla3XgDdVHdS0v1N7yfr1Mrwzj4TxW4G+cr9XYQwS2WiJOf?=
+ =?us-ascii?Q?t2yso8JsDqWPildlOavQWQELcRPBsk09h2Pe+ez6TdvUF1h/uhVUyk4p0zmV?=
+ =?us-ascii?Q?XLbWTf162VVpuX+KaxEkHkmOipWPNXvXCzI1+XpP81TQOriCuHqh42+JOOgU?=
+ =?us-ascii?Q?ftxBW2LAjz8mqZXFmoMHyDqiOp3PTHb/N+7/vyJOd8DBFu9O8t2GR0ydMBcg?=
+ =?us-ascii?Q?sdKcPNEJUKUgFp0DGHn66/tXcoX97hsHFLzHKe/imSPQRi2ghT3JtxtBobgy?=
+ =?us-ascii?Q?5Qy0DNy2bfLu81l6BshhOJQbVvOvtoSjSLM9bsvaN613d5n3B9tcGihUSW7m?=
+ =?us-ascii?Q?kzSBFTcR0r1tv54XsVS4F5g2X7MLDyLDGj48uGTSAqdUfOPbfsSpg3L2ZnGC?=
+ =?us-ascii?Q?/nxQjCxJA49J55zCZIMjwZfc9g870h+OaI6e?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(376014)(1800799024)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Aug 2025 04:51:07.4710
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 837176fc-0fa1-4625-8105-08ddd95bd9c2
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN2PEPF000044AA.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5979
 
-On Fri, Jul 25, 2025 at 11:55:54AM +0300, Nikolay Aleksandrov wrote:
-> On 7/24/25 11:16, Hangbin Liu wrote:
-> > Introduce a new option ad_actor_port_prio, allowing users to set the actor
-> > port priority on a per-port basis in LACPDU.
-> > 
-> > This priority can be used in future enhancements to influence aggregator
-> > selection via ad_select policy.
-> > 
-> > Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
-> > ---
-> >  Documentation/networking/bonding.rst |  9 +++++++
-> >  drivers/net/bonding/bond_3ad.c       |  2 ++
-> >  drivers/net/bonding/bond_netlink.c   | 16 +++++++++++++
-> >  drivers/net/bonding/bond_options.c   | 35 ++++++++++++++++++++++++++++
-> >  include/net/bond_3ad.h               |  1 +
-> >  include/net/bond_options.h           |  1 +
-> >  include/uapi/linux/if_link.h         |  1 +
-> >  7 files changed, 65 insertions(+)
-> > 
-> > diff --git a/Documentation/networking/bonding.rst b/Documentation/networking/bonding.rst
-> > index a4c1291d2561..5e105e7ac8e6 100644
-> > --- a/Documentation/networking/bonding.rst
-> > +++ b/Documentation/networking/bonding.rst
-> > @@ -193,6 +193,15 @@ ad_actor_sys_prio
-> >  	This parameter has effect only in 802.3ad mode and is available through
-> >  	SysFs interface.
-> >  
-> > +ad_actor_port_prio
-> > +
-> > +	In an AD system, this specifies the port priority. The allowed range
-> > +	is 1 - 65535. If the value is not specified, it takes 255 as the
-> 
-> 
-> Leaving this as a note: it is set to 255 because actor_port_priorty is initialized to 255
->                         and port_priority is initialized to actor_port_priority at slave
->                         bind time.
+Ethtool has advanced with additional configurable options, but the
+current driver does not support tx-usecs configuration.
 
-Hi Nikolay,
+Add support to configure and retrieve 'tx-usecs' using ethtool, which
+specifies the wait time before servicing an interrupt for Tx coalescing.
 
-Is this a note for you? Or you want me add it to the doc?
+Signed-off-by: Vishal Badole <Vishal.Badole@amd.com>
+Acked-by: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
 
-Thanks
-Hangbin
+---
+v1 -> v2:
+    * Replace netdev_err() with extack interface for user error reporting.
+---
+ drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c | 19 +++++++++++++++++--
+ drivers/net/ethernet/amd/xgbe/xgbe.h         |  1 +
+ 2 files changed, 18 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c b/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c
+index 12395428ffe1..19cb1e2b7d92 100644
+--- a/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c
++++ b/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c
+@@ -450,6 +450,7 @@ static int xgbe_get_coalesce(struct net_device *netdev,
+ 	ec->rx_coalesce_usecs = pdata->rx_usecs;
+ 	ec->rx_max_coalesced_frames = pdata->rx_frames;
+ 
++	ec->tx_coalesce_usecs = pdata->tx_usecs;
+ 	ec->tx_max_coalesced_frames = pdata->tx_frames;
+ 
+ 	return 0;
+@@ -463,7 +464,7 @@ static int xgbe_set_coalesce(struct net_device *netdev,
+ 	struct xgbe_prv_data *pdata = netdev_priv(netdev);
+ 	struct xgbe_hw_if *hw_if = &pdata->hw_if;
+ 	unsigned int rx_frames, rx_riwt, rx_usecs;
+-	unsigned int tx_frames;
++	unsigned int tx_frames, tx_usecs;
+ 
+ 	rx_riwt = hw_if->usec_to_riwt(pdata, ec->rx_coalesce_usecs);
+ 	rx_usecs = ec->rx_coalesce_usecs;
+@@ -485,9 +486,22 @@ static int xgbe_set_coalesce(struct net_device *netdev,
+ 		return -EINVAL;
+ 	}
+ 
++	tx_usecs = ec->tx_coalesce_usecs;
+ 	tx_frames = ec->tx_max_coalesced_frames;
+ 
++	/* Check if both tx_usecs and tx_frames are set to 0 simultaneously */
++	if (!tx_usecs && !tx_frames) {
++		NL_SET_ERR_MSG_FMT_MOD(extack,
++				       "tx_usecs and tx_frames must not be 0 together");
++		return -EINVAL;
++	}
++
+ 	/* Check the bounds of values for Tx */
++	if (tx_usecs > XGMAC_MAX_COAL_TX_TICK) {
++		NL_SET_ERR_MSG_FMT_MOD(extack, "tx-usecs is limited to %d usec",
++				       XGMAC_MAX_COAL_TX_TICK);
++		return -EINVAL;
++	}
+ 	if (tx_frames > pdata->tx_desc_count) {
+ 		netdev_err(netdev, "tx-frames is limited to %d frames\n",
+ 			   pdata->tx_desc_count);
+@@ -499,6 +513,7 @@ static int xgbe_set_coalesce(struct net_device *netdev,
+ 	pdata->rx_frames = rx_frames;
+ 	hw_if->config_rx_coalesce(pdata);
+ 
++	pdata->tx_usecs = tx_usecs;
+ 	pdata->tx_frames = tx_frames;
+ 	hw_if->config_tx_coalesce(pdata);
+ 
+@@ -830,7 +845,7 @@ static int xgbe_set_channels(struct net_device *netdev,
+ }
+ 
+ static const struct ethtool_ops xgbe_ethtool_ops = {
+-	.supported_coalesce_params = ETHTOOL_COALESCE_RX_USECS |
++	.supported_coalesce_params = ETHTOOL_COALESCE_USECS |
+ 				     ETHTOOL_COALESCE_MAX_FRAMES,
+ 	.get_drvinfo = xgbe_get_drvinfo,
+ 	.get_msglevel = xgbe_get_msglevel,
+diff --git a/drivers/net/ethernet/amd/xgbe/xgbe.h b/drivers/net/ethernet/amd/xgbe/xgbe.h
+index 42fa4f84ff01..e330ae9ea685 100755
+--- a/drivers/net/ethernet/amd/xgbe/xgbe.h
++++ b/drivers/net/ethernet/amd/xgbe/xgbe.h
+@@ -272,6 +272,7 @@
+ /* Default coalescing parameters */
+ #define XGMAC_INIT_DMA_TX_USECS		1000
+ #define XGMAC_INIT_DMA_TX_FRAMES	25
++#define XGMAC_MAX_COAL_TX_TICK		100000
+ 
+ #define XGMAC_MAX_DMA_RIWT		0xff
+ #define XGMAC_INIT_DMA_RX_USECS		30
+-- 
+2.34.1
+
 
