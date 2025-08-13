@@ -1,219 +1,154 @@
-Return-Path: <netdev+bounces-213330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213331-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B25E0B2497B
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 14:25:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48DF3B24997
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 14:37:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 97AF91BC3B06
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 12:26:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 186D916F7D6
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 12:36:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EBD51A5BA2;
-	Wed, 13 Aug 2025 12:25:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25A99256C88;
+	Wed, 13 Aug 2025 12:36:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nn5TXXJM"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF03618A6B0
-	for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 12:25:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C95F2184540;
+	Wed, 13 Aug 2025 12:36:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755087946; cv=none; b=romhERIwird/hYwr01YznAI/yw79GoG/nxDEuJzOJ5cJwopGcACCib+B6BRNVc7Afzj2ZOMEWnsPzQPywxZUGK3s99Lpe5w4OuEbeXsGqrStjiFCjDvNQEFnTTRbPWFp4OiqXETdAj8R07mwrS4fPySBdK+HpjuiZBXtaTekGIs=
+	t=1755088576; cv=none; b=Zu98ZIa5sydRPOAxX5WV/vQQlxrwgCHKKs0emvg6iDUhFS0nkJXHEziLia73CqysLxOlOqgpq10kznEo/AGeNJScmHyqW1F0sq0NdUyLryUXaUvFDXA6360+xSgPtL785aAiofjrQQV7B7c8RNhvflpbfOGFqS+3NjGYtT9pumY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755087946; c=relaxed/simple;
-	bh=0HkpxNl44NrVp+5qb4BCrOTLkmwwz7dBkNDx3u1z8lg=;
+	s=arc-20240116; t=1755088576; c=relaxed/simple;
+	bh=mxRfZXhr447uYosUDWIrSQHTE83kDcrhJRFkwa9w6xY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mfTF2JuQN6N/LkMLMeUvbIs7KAXl4QZtX1r2yHvK5+aiHN0DWUxQp/D/WueichuMNQgDs0LongLDDdEKAk65mKQfeX5uVP09lIfBXLetaXFmRufplGcoWcx/GCRnQbd6UM94pxBf/HrHJ/CIeytF9PfgMD6UxEgDC+EAPYHwoGA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1umAXk-00048k-MG; Wed, 13 Aug 2025 14:25:24 +0200
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1umAXj-0005VI-08;
-	Wed, 13 Aug 2025 14:25:23 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1umAXi-0094sZ-30;
-	Wed, 13 Aug 2025 14:25:22 +0200
-Date: Wed, 13 Aug 2025 14:25:22 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>, Michal Kubecek <mkubecek@suse.cz>,
-	Dent Project <dentproject@linuxfoundation.org>,
-	Kyle Swenson <kyle.swenson@est.tech>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=bo7LLui8tbsDSOQ2/gB9iHYrNp2og8TjKGckRtDRhzwI4SKJnBz2f3ABmeEibvellFbToUzgU8CHb08tWRvKWYgHq1wxQ2MQGt8BuSi/w5NREsAoG0A0WOiUQNvisRNON49wQ5lr0Z2n/eEqSI6tTEO8YdIPNDCiosyg0nahEN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nn5TXXJM; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1755088574; x=1786624574;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=mxRfZXhr447uYosUDWIrSQHTE83kDcrhJRFkwa9w6xY=;
+  b=nn5TXXJMBblrNpjiyaZZjc10j7kfH7oQmILcLcpLxDc/QP4N7Sn4W7ci
+   h2oqEPqYP/RqQ/snirmdtNCokaZd0sFgYT/ZLeIDvayitxT5++wGxECp5
+   O21N574nUl3A2P9GbeIByEfo6r9zkalacjV4Eof1jekXWxxq+Q63skZia
+   gBRD0qG/aO7pZieLv7iQKMtEiOvAtOr9h1RheINSZxMnyyokL13LznkMv
+   wkKxNAFKcTI+oN2Z8oSJwrvqKljoSrtgPDBnVcRzdLCTc2aEK0bJTZBfL
+   SaOn1Ig1EHaZytyTuxc+YofiehXBzOcWuZLIF6zPuSdYOTgoPS0Ekpu3V
+   w==;
+X-CSE-ConnectionGUID: Uzk3AeV6TsOfY7Jh1PbRMw==
+X-CSE-MsgGUID: R78ZBNSXTlqmhqjFm0AW9A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11520"; a="68082075"
+X-IronPort-AV: E=Sophos;i="6.17,285,1747724400"; 
+   d="scan'208";a="68082075"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2025 05:36:04 -0700
+X-CSE-ConnectionGUID: avms1LHFQQi6Qyl4Sby/fw==
+X-CSE-MsgGUID: NDlCXyHZQtG2h9caP94TFg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,285,1747724400"; 
+   d="scan'208";a="167247521"
+Received: from smile.fi.intel.com ([10.237.72.52])
+  by fmviesa010.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2025 05:36:02 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.98.2)
+	(envelope-from <andriy.shevchenko@linux.intel.com>)
+	id 1umAhy-00000005R62-4Bwc;
+	Wed, 13 Aug 2025 15:35:59 +0300
+Date: Wed, 13 Aug 2025 15:35:58 +0300
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Cc: Arnd Bergmann <arnd@kernel.org>, Bartosz Golaszewski <brgl@bgdev.pl>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	linux-gpio@vger.kernel.org, Krzysztof Kozlowski <krzk@kernel.org>,
+	Arnd Bergmann <arnd@arndb.de>, Jakub Kicinski <kuba@kernel.org>,
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH ethtool v2 2/3] ethtool: pse-pd: Add PSE priority support
-Message-ID: <aJyEMob8kFAvD-HU@pengutronix.de>
-References: <20250813-b4-feature_poe_pw_budget-v2-0-0bef6bfcc708@bootlin.com>
- <20250813-b4-feature_poe_pw_budget-v2-2-0bef6bfcc708@bootlin.com>
+Subject: Re: [PATCH 17/21] nfc: marvell: convert to gpio descriptors
+Message-ID: <aJyGrhvViwoK2MeN@smile.fi.intel.com>
+References: <20250808151822.536879-1-arnd@kernel.org>
+ <20250808151822.536879-18-arnd@kernel.org>
+ <aJcea90siAod5Apw@smile.fi.intel.com>
+ <yf5coptfembueds4ozpsphdv7vggyzfezdxv66uuqzjv3gpw62@x4s6iylxahrv>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250813-b4-feature_poe_pw_budget-v2-2-0bef6bfcc708@bootlin.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <yf5coptfembueds4ozpsphdv7vggyzfezdxv66uuqzjv3gpw62@x4s6iylxahrv>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
+ krs, Bertel Jungin Aukio 5, 02600 Espoo
 
-Hi Kory,
+On Mon, Aug 11, 2025 at 02:43:51PM -0700, Dmitry Torokhov wrote:
+> On Sat, Aug 09, 2025 at 01:09:47PM +0300, Andy Shevchenko wrote:
+> > On Fri, Aug 08, 2025 at 05:18:01PM +0200, Arnd Bergmann wrote:
 
-Thank you for your work! Here are some review comments...
+...
 
-On Wed, Aug 13, 2025 at 10:57:51AM +0200, Kory Maincent wrote:
-> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+> > > -	if (gpio_is_valid(priv->config.reset_n_io)) {
+> > > -		rc = gpio_request_one(priv->config.reset_n_io,
+> > > -				      GPIOF_OUT_INIT_LOW,
+> > > -				      "nfcmrvl_reset_n");
+> > > -		if (rc < 0) {
+> > > -			priv->config.reset_n_io = -EINVAL;
+> > > -			nfc_err(dev, "failed to request reset_n io\n");
+> > > -		}
+> > > +	priv->reset_n_io = gpiod_get_optional(dev, "reset-n-io", GPIOD_OUT_LOW);
 > 
-> Add support for PSE (Power Sourcing Equipment) priority management:
-> - Add priority configuration parameter (prio) for port priority management
-> - Display power domain index, maximum priority, and current priority
+> No, this should be "reset". gpiolib-of.c has a quirk to resolve to naked
+> "reset-n-io", otherwise this will resolve to "reset-n-io-gpios" in the
+> bowels of gpiolib.
+
+Good point.
+
+> > > +	if (IS_ERR(priv->reset_n_io)) {
+> > > +		nfc_err(dev, "failed to get reset_n gpio\n");
+> > > +		return ERR_CAST(priv->reset_n_io);
+> > >  	}
+> > 
+> > This also needs a call to gpiod_set_consumer_name(), IIRC the API name.
 > 
-> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
-> ---
->  ethtool.8.in     | 13 +++++++++++++
->  ethtool.c        |  1 +
->  netlink/pse-pd.c | 29 +++++++++++++++++++++++++++++
->  3 files changed, 43 insertions(+)
+> It does not have to... I am not sure who pays attention to names.
+
+It goes to user space, isn't it?
+In any case it will give 1:1 transition from the look&fell perspective.
+
+...
+
+> > >  void nfcmrvl_chip_halt(struct nfcmrvl_private *priv)
+> > >  {
+> > > -	if (gpio_is_valid(priv->config.reset_n_io))
+> > > -		gpio_set_value(priv->config.reset_n_io, 0);
+> > > +	if (priv->reset_n_io)
+> > 
+> > Not sure why we need this dup check.
 > 
-> diff --git a/ethtool.8.in b/ethtool.8.in
-> index 29b8a8c..163b2b0 100644
-> --- a/ethtool.8.in
-> +++ b/ethtool.8.in
-> @@ -561,6 +561,7 @@ ethtool \- query or control network driver and hardware settings
->  .RB [ c33\-pse\-admin\-control
->  .BR enable | disable ]
->  .BN c33\-pse\-avail\-pw\-limit N
-> +.BN prio N
->  .HP
->  .B ethtool \-\-flash\-module\-firmware
->  .I devname
-> @@ -1911,6 +1912,15 @@ This attribute specifies the allowed power limit ranges in mW for
->  configuring the c33-pse-avail-pw-limit parameter. It defines the valid
->  power levels that can be assigned to the c33 PSE in compliance with the
->  c33 standard.
-> +.TP
-> +.B power-domain-index
-> +This attribute defines the index of the PSE Power Domain.
+> I personally feel very uneasy when dealing with optional GPIO and not
+> checking if it exists or not, even though gpiod_set_value() handles
+> this. I think check makes logic clearer.
 
-May be:
+I disagree with the duplicate. It doesn't make any additional clearness as I
+read it. When one reads the code the "here we set GPIO to the X state" without
+any conditional is fine as one may check later in DT schema if the GPIO is
+optional or not.
 
-Reports the index of the PSE power domain the port belongs to. Every
-port belongs to exactly one power domain. Port priorities are defined
-within that power domain.
+> > > +		gpiod_set_value(priv->reset_n_io, 0);
+> > >  }
 
-Each power domain may have its own maximum budget (e.g., 100 W per
-domain) in addition to a system-wide budget (e.g., 200 W overall).
-Domain limits are enforced first: if a single domain reaches its budget,
-only ports in that domain are affected. The system-wide budget is
-enforced across all domains; only when it is exceeded do cross-domain
-priorities apply.
 
-> +.TP
-> +.B priority-max
-> +This attribute defines the maximum priority available for the PSE.
-
-Reports the maximum configurable port priority value within the reported
-power domain. The valid range for prio is 0 to priority-max (inclusive).
-
-> +.TP
-> +.B priority
-> +This attribute defines the currently configured priority for the PSE.
-
-Reports the currently configured port priority within the reported power
-domain. Lower numeric values indicate higher priority: 0 is the highest
-priority.
-
->  .RE
->  .TP
-> @@ -1930,6 +1940,9 @@ This parameter manages c33 PSE Admin operations in accordance with the IEEE
->  This parameter manages c33 PSE Available Power Limit in mW, in accordance
->  with the IEEE 802.3-2022 33.2.4.4 Variables (pse_available_power)
->  specification.
-> +.TP
-> +.B prio \ N
-> +This parameter manages port priority.
-
-Set the port priority, scoped to the port's power domain
-as reported by power-domain-index. Lower values indicate higher
-priority; 0 is the highest. The valid range is 0 to the
-priority-max reported by --show-pse.
-
-When a single domain exceeds its budget, ports in that domain are
-powered up/down by priority (highest first for power-up; lowest shed
-first).  When the system-wide budget is exceeded, priority ordering is
-applied across domains.
-
->  .RE
->  .TP
-> diff --git a/ethtool.c b/ethtool.c
-> index 215f566..948d551 100644
-> --- a/ethtool.c
-> +++ b/ethtool.c
-> @@ -6339,6 +6339,7 @@ static const struct option args[] = {
->  		.xhelp	= "		[ podl-pse-admin-control enable|disable ]\n"
->  			  "		[ c33-pse-admin-control enable|disable ]\n"
->  			  "		[ c33-pse-avail-pw-limit N ]\n"
-> +			  "		[ prio N ]\n"
->  	},
->  	{
->  		.opts	= "--flash-module-firmware",
-> diff --git a/netlink/pse-pd.c b/netlink/pse-pd.c
-> index fd1fc4d..5bde176 100644
-> --- a/netlink/pse-pd.c
-> +++ b/netlink/pse-pd.c
-> @@ -420,6 +420,29 @@ int pse_reply_cb(const struct nlmsghdr *nlhdr, void *data)
->  		}
->  	}
->  
-> +	if (tb[ETHTOOL_A_PSE_PW_D_ID]) {
-> +		u32 val;
-> +
-> +		val = mnl_attr_get_u32(tb[ETHTOOL_A_PSE_PW_D_ID]);
-> +		print_uint(PRINT_ANY, "power-domain-index",
-> +			   "Power domain index: %u\n", val);
-> +	}
-> +
-> +	if (tb[ETHTOOL_A_PSE_PRIO_MAX]) {
-> +		u32 val;
-> +
-> +		val = mnl_attr_get_u32(tb[ETHTOOL_A_PSE_PRIO_MAX]);
-> +		print_uint(PRINT_ANY, "priority-max",
-> +			   "Max allowed priority: %u\n", val);
-> +	}
-> +
-> +	if (tb[ETHTOOL_A_PSE_PRIO]) {
-> +		u32 val;
-> +
-> +		val = mnl_attr_get_u32(tb[ETHTOOL_A_PSE_PRIO]);
-> +		print_uint(PRINT_ANY, "priority", "Priority %u\n", val);
-
-missing colon
-		print_uint(PRINT_ANY, "priority", "Priority: %u\n", val);
- 
 
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+With Best Regards,
+Andy Shevchenko
+
+
 
