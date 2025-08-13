@@ -1,106 +1,114 @@
-Return-Path: <netdev+bounces-213181-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213182-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DF07B24037
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 07:33:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 020F9B24041
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 07:35:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2241688224
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 05:33:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D54F584F78
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 05:35:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D3F329C325;
-	Wed, 13 Aug 2025 05:33:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BED92BEC2C;
+	Wed, 13 Aug 2025 05:34:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="l12r3CxW"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="UVQNBEl4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0582285047
-	for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 05:33:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C5A928C87C;
+	Wed, 13 Aug 2025 05:34:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755063228; cv=none; b=hV5SV2aELKMbIJsbiCZfvXNpFCxcCMHC0ffNKKUZ91C63d5lz08WI4CidCtKqAUQgaW/tVmfjmQKEpvpOr5qZ/sXD6bhLjH5AEpx7q8b2ZEnEW3VRR1cTN1xtnor7NGF2b8EENwN0wFXBmL0nIHuDS8rfvFF4ywDNpW5QPDdR+M=
+	t=1755063299; cv=none; b=WLY0JuXFHZ5MIoK6vxXaiKICLHPCotWeg9EnHx22+c4jpOP8HuFUGaW+ImnZSK9yerFVHvlxXzVdMkpplC2ecZJtISBo359zdGBxb7/VBi9DlDy/AXPHf2xTn9dt9jQOiw7xHa8VhX5TO7P2B1P88yt9ryuqPVCsIuwi/iBNC/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755063228; c=relaxed/simple;
-	bh=szl39VgGc6cHz9GvoA3e/6o6qymzSMMd7iMeLQXVQXo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JpJIOEfjP0VfEk915jVnDYBeGgbsuzl5rpB5Cdsohaz4UYaYntyVBThlIcWBow9j2vuM3IR7cuPRlHr9aFOWA8ynSvl/3OerQcS2t8do7Ti/SfGvTw+MK/vu11xJAbjricyFp9eQfhfTGHsiE8/x3bIKrES5HIXoG8msxs+pBg0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=l12r3CxW; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-242d8dff9deso37594185ad.2
-        for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 22:33:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755063225; x=1755668025; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=szl39VgGc6cHz9GvoA3e/6o6qymzSMMd7iMeLQXVQXo=;
-        b=l12r3CxW8jNYU/KA4zV5W8iEd7I/nRrUvF4V2wp2M4dIA1gSEhSlsyWOgFe9j5dNoT
-         nL7rsNGzdgPQHErtlLec9pcNgWhiipb4pYoSTdgF8ht2AUbGm3q+zOKeZacdIjALJA2W
-         9/ybOGm0WFbMR2up9hT7xXCM/4pEWIoXkJG960jjpcrFbpC0AyqAO6p6U3xapfNDGJ6o
-         trqfx81MRUrB3mQopRqAkyIFHGiLGVTGmEKVuXJKgr7LO1DQESB/623IphoEKlz9+T/y
-         j7oySYUXBvbQuL++gKNXevboEh+bClD2vH2JhS2IOk9prfTiQjsyNf75sYJtcTl++32Z
-         e/jg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755063225; x=1755668025;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=szl39VgGc6cHz9GvoA3e/6o6qymzSMMd7iMeLQXVQXo=;
-        b=KThK22R+VCMfpXFtg/HztdFOsxG9ix1Iq7XAbrnHEozUoJPjRmIWm4lEDwFEppY30N
-         uvWzfqELgHoEuz03j/cwWvpx9km3LP6bvMOlBOeWw4/SuZbIElYGXYxNnOSYXdX83aXe
-         sZ9fhrXQd93HaRkIM3YwdRnYZE/kfsl+bARBUnm9UvbZrxHG5raAy+A7THUdc335ov0e
-         Lu4VQRsg+1lHU8IpiwKQGAmDsdx3+4mJX4QAZJTMUJ7FROa5h87odDAA8UOrPlQAiFHJ
-         wdopLmyFfnHlGYnJOKSc2ml+O0i6RGD4WTYm5/tOb3QkADQ4z2+9H9CkfQZQQ+XA1pD1
-         Pj4A==
-X-Forwarded-Encrypted: i=1; AJvYcCWm/82sPKsG+QM/dxYhl7YLyOPTKwoMYGtfWhYx6Bh0apWkd5xxgkEznKZkk4td35mKVyVBMXE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxKK67pJXGJ2Zh7gX30d7HtvDFfjZpwcYb0eNbY6LTmxgPb/uFV
-	Fcdv1hGW36AxQXdRwEtA8aioZG+0GdMMo1PmB3sqhihoWAptkI75QME3JVAV1oDFxQGwmXuJDmA
-	9ApzWeEwtrUywyMZgBj9BlFJDN7/RThCmocl0YXLH
-X-Gm-Gg: ASbGncuMfDJoGGPnHT09hrd5XijOaKi8WtUMEz7kOalYSYBxBVtJphDmKFhOq6Nrv0n
-	0yvAoAH+1Gc5Iw2u3J7kQPVVOfNNlhQLoZu4aj9WuqrWQb6zvdQWZndiuefe2eRy/VMfDKoZO9O
-	DODd3pMYVO5uUn0tA7iU8dXYTvf7N2O8ngMc8S9PuFuKmh+GKS3JzK1013iVcca5Ii/moU23qA7
-	LaOBMeDPj1D1ibZ57nd0iCS2AKHlFx/G9hVL34G
-X-Google-Smtp-Source: AGHT+IEvhBqfIBgz0Uy2LltljSmLkoge547dd8TrEfVD4oSiAV8QynzIkXQpbdt7iwRQkewsj68bM9S2qDwCDc6MSfA=
-X-Received: by 2002:a17:903:3c2c:b0:243:597:a2f0 with SMTP id
- d9443c01a7336-2430d108278mr26839105ad.23.1755063225019; Tue, 12 Aug 2025
- 22:33:45 -0700 (PDT)
+	s=arc-20240116; t=1755063299; c=relaxed/simple;
+	bh=y2cn1F377n62GhXtZy13sRaL2HV14HmDYX5otP9AhZo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=j0sRwq+xhpnDxRQEDOvtL0zJKJe71hp9ie2HWW+ug7y/j7sjDpyF2MsuNfXPriXyuEBqHvS2K++io4TsD6HGA/sUGVTA6LvlP9OCQjiEp9hawLDQF/tAytF+ZRtGj17oQHFL8sU4L2nZxJ0yOBJI1yDw7ICQ2Mr/qYKfp+/ia5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=UVQNBEl4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FF0CC4CEEB;
+	Wed, 13 Aug 2025 05:34:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1755063299;
+	bh=y2cn1F377n62GhXtZy13sRaL2HV14HmDYX5otP9AhZo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=UVQNBEl4Mnahh/6yIBSJHL8GXVmvkVjvNEn6JoiqWownwKkR5H46Zh5/mlZsGh15Z
+	 usdr427yGZpl577ep4e1H4VltQu32GO9fB2DhfhKGdMQkpBwugAbrMu8kElmHG/fBq
+	 Ip6ZkOyTs21Iv8C4HbN+lg6jRK21Nd3bFgAhJ3eE=
+Date: Wed, 13 Aug 2025 07:34:54 +0200
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Sasha Levin <sashal@kernel.org>, intel-wired-lan@lists.osuosl.org,
+	Tony Nguyen <anthony.l.nguyen@intel.com>, netdev@vger.kernel.org,
+	Kuniyuki Iwashima <kuniyu@google.com>, stable@vger.kernel.org
+Subject: Re: [PATCH 00/12] ice: split ice_virtchnl.c git-blame friendly way
+Message-ID: <2025081319-carried-liberty-dc3e@gregkh>
+References: <20250812132910.99626-1-przemyslaw.kitszel@intel.com>
+ <20250812135714.0e1a7ee0@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250811215432.3379570-1-kuniyu@google.com> <20250811215432.3379570-2-kuniyu@google.com>
- <20250812180256.712d316b@kernel.org>
-In-Reply-To: <20250812180256.712d316b@kernel.org>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Tue, 12 Aug 2025 22:33:33 -0700
-X-Gm-Features: Ac12FXzyccBeDCNPXTyJcCxO6QF78T5PTJcX6Dl3w2G6b5GiIiaXz2LTRSx3rTw
-Message-ID: <CAAVpQUADmTFY08hm2owgb7NdJMBgzwQYE-qWN67TB6+eLC7HPg@mail.gmail.com>
-Subject: Re: [PATCH v1 net-next 1/4] selftest: af_unix: Add -Wall and
- -Wflex-array-member-not-at-end to CFLAGS.
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250812135714.0e1a7ee0@kernel.org>
 
-On Tue, Aug 12, 2025 at 6:02=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Mon, 11 Aug 2025 21:53:04 +0000 Kuniyuki Iwashima wrote:
-> > -Wall and -Wflex-array-member-not-at-end caught some warnings that
-> > will be fixed in later patches.
->
-> Makes sense to enable the warnings first when writing the patches,
-> but I think we should commit in the opposite order. Fixes fix then
-> arm the warnings. I'll reorder when applying.
+On Tue, Aug 12, 2025 at 01:57:14PM -0700, Jakub Kicinski wrote:
+> On Tue, 12 Aug 2025 15:28:58 +0200 Przemek Kitszel wrote:
+> > Summary:
+> > Split ice_virtchnl.c into two more files (+headers), in a way
+> > that git-blame works better.
+> > Then move virtchnl files into a new subdir.
+> > No logic changes.
+> > 
+> > I have developed (or discovered ;)) how to split a file in a way that
+> > both old and new are nice in terms of git-blame
+> > There were no much disscussion on [RFC], so I would like to propose
+> > to go forward with this approach.
+> > 
+> > There is more commits needed to have it nice, so it forms a git-log vs
+> > git-blame tradeoff, but (after the brief moment that this is on the top)
+> > we spend orders of magnitude more time looking at the blame output (and
+> > commit messages linked from that) - so I find it much better to see
+> > actual logic changes instead of "move xx to yy" stuff (typical for
+> > "squashed/single-commit splits").
+> > 
+> > Cherry-picks/rebases work the same with this method as with simple
+> > "squashed/single-commit" approach (literally all commits squashed into
+> > one (to have better git-log, but shitty git-blame output).
+> > 
+> > Rationale for the split itself is, as usual, "file is big and we want to
+> > extend it".
+> > 
+> > This series is available on my github (just rebased from any
+> > earlier mentions):
+> > https://github.com/pkitszel/linux/tree/virtchnl-split-Aug12
+> > (the simple git-email view flattens this series, removing two
+> > merges from the view).
+> > 
+> > 
+> > [RFC]:
+> > https://lore.kernel.org/netdev/5b94d14e-a0e7-47bd-82fc-c85171cbf26e@intel.com/T/#u
+> > 
+> > (I would really look at my fork via your preferred git interaction tool
+> > instead of looking at the patches below).
+> 
+> UI tools aside I wish you didn't cut off the diffstat from the cover
+> letter :/ It'd make it much easier to understand what you're splitting.
+> 
+> Greg, Sasha, I suspect stable will suffer the most from any file split /
+> movement. Do you have any recommendation on what should be allowed?
 
-Exactly, thank you Jakub!
+We don't care, do whatever you need to for Linus's tree, and the
+backports can work themselves out as needed.
+
+thanks,
+
+greg k-h
 
