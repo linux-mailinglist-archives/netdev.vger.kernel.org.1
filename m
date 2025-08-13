@@ -1,175 +1,160 @@
-Return-Path: <netdev+bounces-213387-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213388-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07CACB24D3B
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 17:23:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 952CDB24D4B
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 17:26:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 41DEC189E9DD
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 15:19:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 53C441A24A08
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 15:24:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03CD71FFC48;
-	Wed, 13 Aug 2025 15:19:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B25CE22F77F;
+	Wed, 13 Aug 2025 15:24:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LMqNVgUh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y4PxIGkL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 318D91FBCA7;
-	Wed, 13 Aug 2025 15:19:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00B6A1FECD8;
+	Wed, 13 Aug 2025 15:24:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755098351; cv=none; b=oujFmM3xkpYJxmZI7jApi2tGxaRYuD4rN+lVw4XhdNfmuyQNoLDoVi/fROZddwGop7mjQpzcvCGjfr7NzHCkcnYraJLyj3gbJuz9mNlV/nMsBafqc5P3Z7K/1/0dz+hAERK7EBIjC9KpSCqRqStyqjnfSNyclFgqjxIgam+kFtk=
+	t=1755098643; cv=none; b=pJwVlL47SKC2Br6Iq5b1RjcRuesKD8BkVpBo9iSngffmtGqlg3Vr1xmuLrzDHww3RXKnFfqSLdR6pR9LZVNwoWgOa9W12IGPCCZsQ5XrkLC+rOWav3USYXaw0S3DwYS1NuFtR7o9Y6dOBysljvHTZw036Cl2Wiy4aVqtdKxSetI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755098351; c=relaxed/simple;
-	bh=ttHCoJ0fS9ZoBq3faibRoEWsJ197C4OXVLM3rNqnqdA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nvt0J+yA2TqjgMyWT2rmRZrD1TYFN7hxSPUm2TR+NgExwDlkPq4Q1Jk7bfsnU7infwbh3I6A7rvXFJEl4UdtVONMSGDYtizW4lHK6GO8r0YGx6mprq7ZAhLLOlu/8m4wfuqFEFQYzUU6G87yYxGAjwDG9jEZ4MQt19oriMeC/mg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LMqNVgUh; arc=none smtp.client-ip=209.85.128.45
+	s=arc-20240116; t=1755098643; c=relaxed/simple;
+	bh=UbhBnuInugUu2cTjmEDB4YCiAKRUPYCSJOrFRfqKV7c=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=pzCDU5JeTJPLAbbWXEwKC5s2X7saCniN0VYUZtFm0IJADQEPuRxGG44Y82pVC8LJQDQ7RoIqB8kP3onSrQHuSvkSSO8VzUqfs+o/QNJ5hUHZdIPmr2mqe4IHoKM8eWaXNL1BHEqYotdXFg7ehqeURe7rx1PVHadHSQU43xLB2j8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y4PxIGkL; arc=none smtp.client-ip=209.85.221.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-459d4d7c745so61360165e9.1;
-        Wed, 13 Aug 2025 08:19:09 -0700 (PDT)
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3b78127c5d1so4486391f8f.3;
+        Wed, 13 Aug 2025 08:24:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755098348; x=1755703148; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=juZ8HOUdWY43tN3quYG7enRlIPop0IESVECKo05cC+o=;
-        b=LMqNVgUhClNRBsCfmoZOYqO7XWf3jkv3TVGjxaFTPFa2HQRMmjGLihsYLKC+3dWjhI
-         uFkUaxkLU6lxHHQ2roOSDOBw4zp3pjmNqajZBqWPGCW7ekNZeYcvKSkfmkx4qtqxl37h
-         Nu64hm1yUs7v2U4BaSVOjjELhEH9VF+mijwITKrG575iviebYkke6HSi33gz045Hnwqv
-         w1gRNeEH6jpoVgC4ovvC/D5AdZWnS7UvzaZ7kueFqnnwDxVy58BqMeUi9hc9mlNpFAJD
-         M5K7JCqRUZFc5Zcto+fO0TaIt5+Urrxss6C8/HLd8ykPVScDutRx+IJ32/ludeLgY5bg
-         guVA==
+        d=gmail.com; s=20230601; t=1755098640; x=1755703440; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Al/qX1qt84RxLjmC8/RQc6iv8G0Q8rgfIYnhnorUlSI=;
+        b=Y4PxIGkLzIt13ISWiN/QQQ3aZia6W+4aLb92UQFx5l9m5u3/qakVBGwZTI9J/k29MV
+         3NFormTuObcAfZ+sjjuRmsKrxMW5UqdYCqMMwQpnJwqjxMJR0IxB0k8ObRSNOw/PWZTQ
+         VDsLFwEubFd5FTAvW/T9BfaELV5iWUeMQu6KOxDNnYg3yrTW0XG8aRusrLA72Osv7IBs
+         fiMudsJjf/FNC1ns6MnaAF0kC+Inr4WaXK/TbOFHiIOHBP7UPnUBbHSwgve0PtDU47De
+         wF+7U+dZqZAweX5RuQP68/ri6E1SfEwtdk2RZUvIl2IInnQO4j91gI/eV+wwVfXxenSx
+         ketw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755098348; x=1755703148;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=juZ8HOUdWY43tN3quYG7enRlIPop0IESVECKo05cC+o=;
-        b=t2vDBP2TrtaMX4uHWPF7pF2CWWYuCb3OiZbOrJAl7CetmPnkOYANXgurBTjIpVHJYa
-         jL9hC/Udn97ZgYll2v3j/9R1KwNcFVoH4CbvaRJS/ohftzkcBo3FMmXHul2GF0ZPkqvZ
-         1gFFc7f7wwhVq10CbIXMIYj6nFQ2eSWbZmMpjkH2MSxTzjHTvulciP4AjGNmKIo47xtC
-         BcoO9+lN7arkuFvsWvOGU+9VoInsNEsOHJWyZl3eIhQc8VvLqmkFw41/2uLibIW+5QYT
-         9HjuOUc12DYxYAEWPIoFnhektex4Fwrs8ffIqi7IESZCC9KmkVORwKY8/j5Y/PqlWgaq
-         SUIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVJX9kty4fVqHEIlzkvG0dKuLNa8x1I0yL5+12IQjTo9wAPJuMnl4LwrTZidMqp8ov0R0CC43sg62Oeo1g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzR3N2KTKyWTzA18q3RQ6yOV6EAEeqZzzwvHK7qr0toJBd7E9wn
-	4uYR4qwPVrNCnP1ZianTx1S+GADEk/Soy26WoZhGnBnicWJvzgBZkLrM
-X-Gm-Gg: ASbGnctk9E1ccvn67LSrcOzbSt3JaNdXPmBdHLzEVUAqOyqqT/uIvUN6XGu6OJXtR9e
-	vdPhkYMZSCydOYcIA5sGHCAigJtW7rhrkmiig/v0XLlEm5xfTCcEHGmhNzlZJ4n5SWtqzW1QCKZ
-	1rVqvLAki1yRxoZCvMk3rDtOY7sT+egCLXOMFPk/enbtGqKL9fGOpDG29xrhfFKtfIlhqyw2z0G
-	NFViG5hxvKYHbf0S7DgTWyhPDjDrvAEF87mc/ZqD/kQZMpysSwaSXSTy4UzdMexDuYJ5D3yZAYy
-	JfCKcBoCv9C7FZu09s86GdeZn/164YYgw5oebyEuYZFFMai8MAu41cR19A551+QYCYKP7Ui99M0
-	Xk5J0pnmFCTAFYmgYB+Xzr2yyTCC3mrfuKyLOpvttkQvX
-X-Google-Smtp-Source: AGHT+IHHdmlCs4XmQ1940ZGsH325xC/Fhaw/95MXYkzM5EjkhUmcuNnI94nlgW6vKFQeM1E/jrYyBQ==
-X-Received: by 2002:a05:600c:3b24:b0:459:da76:d7aa with SMTP id 5b1f17b1804b1-45a165e2ec5mr25972245e9.25.1755098348280;
-        Wed, 13 Aug 2025 08:19:08 -0700 (PDT)
-Received: from localhost ([45.10.155.14])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b79c48105csm48296954f8f.64.2025.08.13.08.19.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Aug 2025 08:19:08 -0700 (PDT)
-Message-ID: <9727fba9-a238-4d0c-aa12-cb6c4cbcdea3@gmail.com>
-Date: Wed, 13 Aug 2025 17:18:57 +0200
+        d=1e100.net; s=20230601; t=1755098640; x=1755703440;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Al/qX1qt84RxLjmC8/RQc6iv8G0Q8rgfIYnhnorUlSI=;
+        b=Zth0a7z9c1Jg9KvfoJCZghH3oBCtOTRpH60xj4ZYn6Q9G3JPA35m/S0mg8ARqmKMbs
+         KLnNDHgEP4uE3LgUf9Iy4cdtBUf9e7DpbmK2102UKrB1GF+Qog562hWt+Q9+Ijqge3VD
+         ToABe3jZNiBgf++n76CaFzFgDsoE/kLYlNASWuLcPC/DnmnX57XhFhehumq6mf+85aYd
+         5BbhO38O3ib13oU2jrGdBjJOuJCp102MOkRAKSDzT9yeG/a2NiUgN4IPW+LclLMJW2Pe
+         ULRLPHPU1CZtlD9GxbiQ0PbGvhxJR9RU8urNCwJTKuWJFbt5qlm9DaHW9tL1IrFX1wwm
+         J3Qw==
+X-Forwarded-Encrypted: i=1; AJvYcCWSZ0jS0zTr/GcVxHOhrwERYnCJ332z96h7s0kqlagHQekCv/Q3EbQcyI9j2wt9PGM1D7c0rqAF0iswg5bC@vger.kernel.org, AJvYcCXir8oyNNm6PxdeQb5M13NKop/ZzgaFkhruoSFqqNUt2K/9l+6r2WcB6DeHdUULtHb0dfKVQG1WfmKx@vger.kernel.org
+X-Gm-Message-State: AOJu0YwfK7nWLgledg8yhpTMaR6+2vp+q1uTzLecxMBmGW6mxI9VH8PG
+	V49fTfwlZoD6Ce18MnOZZgbUI4Hq4CcefrEXavbfvOk6btYiOqbOOCXi
+X-Gm-Gg: ASbGncsC+LKzgWtVZxbc5TYgJGeU2h9lLD0OCtwKSwlyVlBIL+g7bx8OO4hr+wx2PSt
+	e5rkBiATF1+vhmwf7TAgu/0qVabwLmeSO+lAjg9vDKOQSdLWF0gnezqDL27OmjtQZEHTZqlQkpE
+	fhDrYkJH27XMatCWmVJUdf9hphUmm5pqYz2KWhDlrBMz0vZp9A7NSjen5lpXCEKVfbZ7732gR+y
+	IV6tuH3bs9jqDIg4/M6IwXBLHu78v3v5KjdE3j8UHtoc2n4aw6uV5Xdpv65jaY++amTkrX+3oBC
+	MTXMwVAUUTpVc9gCOSZfUhu1EB7L32cpFw0M6bNcENDZINNRHrtAiSVBsuzJYJZYU2Ifh/peGZb
+	ApCz+PPR+KUc4ZOFZWQj3Fz9fB1WbeVUxfaXTo0sFFgGAnIwJf5lWBIhK6RFWKWHgSHAAQRLRQg
+	qVbol0KCYY
+X-Google-Smtp-Source: AGHT+IGYHFONNUotKor9AwdwBpAKxhh3g61crvlGCa5AwvCNjlgzokphZFqfiS3bpgh4iCtgc9HZ1Q==
+X-Received: by 2002:a05:6000:1a8b:b0:3a5:39ee:2619 with SMTP id ffacd0b85a97d-3b917ebb5bamr2437420f8f.47.1755098640145;
+        Wed, 13 Aug 2025 08:24:00 -0700 (PDT)
+Received: from jernej-laptop.localnet (86-58-6-171.dynamic.telemach.net. [86.58.6.171])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b8ff860acbsm21721544f8f.51.2025.08.13.08.23.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Aug 2025 08:23:59 -0700 (PDT)
+From: Jernej =?UTF-8?B?xaBrcmFiZWM=?= <jernej.skrabec@gmail.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
+ Jernej Skrabec <jernej@kernel.org>, Samuel Holland <samuel@sholland.org>,
+ Chen-Yu Tsai <wens@kernel.org>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
+ linux-kernel@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH net-next v2 03/10] soc: sunxi: sram: add entry for a523
+Date: Wed, 13 Aug 2025 17:23:57 +0200
+Message-ID: <2791868.mvXUDI8C0e@jernej-laptop>
+In-Reply-To: <20250813145540.2577789-4-wens@kernel.org>
+References:
+ <20250813145540.2577789-1-wens@kernel.org>
+ <20250813145540.2577789-4-wens@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v5 3/5] net: vxlan: bind vxlan sockets to their
- local address if configured
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- donald.hunter@gmail.com, andrew+netdev@lunn.ch, dsahern@kernel.org,
- shuah@kernel.org, daniel@iogearbox.net, jacob.e.keller@intel.com,
- razor@blackwall.org, petrm@nvidia.com, menglong8.dong@gmail.com,
- martin.lau@kernel.org, linux-kernel@vger.kernel.org
-References: <20250812125155.3808-1-richardbgobert@gmail.com>
- <20250812125155.3808-4-richardbgobert@gmail.com> <aJxaYt7aPxuU9iN6@shredder>
-From: Richard Gobert <richardbgobert@gmail.com>
-In-Reply-To: <aJxaYt7aPxuU9iN6@shredder>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+
+Dne sreda, 13. avgust 2025 ob 16:55:33 Srednjeevropski poletni =C4=8Das je =
+Chen-Yu Tsai napisal(a):
+> From: Chen-Yu Tsai <wens@csie.org>
+>=20
+> The A523 has two Ethernet controllers. So in the system controller
+> address space, there are two registers for Ethernet clock delays,
+> one for each controller.
+>=20
+> Add a new entry for the A523 system controller that allows access to
+> the second register.
+>=20
+> Signed-off-by: Chen-Yu Tsai <wens@csie.org>
+
+Acked-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+
+Best regards,
+Jernej
+
+> ---
+>  drivers/soc/sunxi/sunxi_sram.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+>=20
+> diff --git a/drivers/soc/sunxi/sunxi_sram.c b/drivers/soc/sunxi/sunxi_sra=
+m.c
+> index 08e264ea0697..4f8d510b7e1e 100644
+> --- a/drivers/soc/sunxi/sunxi_sram.c
+> +++ b/drivers/soc/sunxi/sunxi_sram.c
+> @@ -320,6 +320,10 @@ static const struct sunxi_sramc_variant sun50i_h616_=
+sramc_variant =3D {
+>  	.has_ths_offset =3D true,
+>  };
+> =20
+> +static const struct sunxi_sramc_variant sun55i_a523_sramc_variant =3D {
+> +	.num_emac_clocks =3D 2,
+> +};
+> +
+>  #define SUNXI_SRAM_THS_OFFSET_REG	0x0
+>  #define SUNXI_SRAM_EMAC_CLOCK_REG	0x30
+>  #define SUNXI_SYS_LDO_CTRL_REG		0x150
+> @@ -440,6 +444,10 @@ static const struct of_device_id sunxi_sram_dt_match=
+[] =3D {
+>  		.compatible =3D "allwinner,sun50i-h616-system-control",
+>  		.data =3D &sun50i_h616_sramc_variant,
+>  	},
+> +	{
+> +		.compatible =3D "allwinner,sun55i-a523-system-control",
+> +		.data =3D &sun55i_a523_sramc_variant,
+> +	},
+>  	{ },
+>  };
+>  MODULE_DEVICE_TABLE(of, sunxi_sram_dt_match);
+>=20
 
 
 
-On 8/13/25 11:26, Ido Schimmel wrote:
-> On Tue, Aug 12, 2025 at 02:51:53PM +0200, Richard Gobert wrote:
->> Bind VXLAN sockets to the local addresses if the IFLA_VXLAN_LOCALBIND
->> option is set. This is the new default.
-> 
-> Drop the last sentence?
-> 
->>
->> Change vxlan_find_sock to search for the socket using the listening
->> address.
->>
->> This is implemented by copying the VXLAN local address to the udp_port_cfg
->> passed to udp_sock_create. The freebind option is set because VXLAN
->> interfaces may be UP before their outgoing interface is.
->>
->> This fixes multiple VXLAN selftests that fail because of that race.
-> 
-> This sentence is no longer relevant as well.
-> 
->>
->> Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
->> ---
->>  drivers/net/vxlan/vxlan_core.c | 59 ++++++++++++++++++++++++++--------
->>  1 file changed, 46 insertions(+), 13 deletions(-)
->>
->> diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
->> index 15fe9d83c724..12da9595436e 100644
->> --- a/drivers/net/vxlan/vxlan_core.c
->> +++ b/drivers/net/vxlan/vxlan_core.c
->> @@ -78,18 +78,34 @@ static inline bool vxlan_collect_metadata(struct vxlan_sock *vs)
->>  }
->>  
->>  /* Find VXLAN socket based on network namespace, address family, UDP port,
->> - * enabled unshareable flags and socket device binding (see l3mdev with
->> - * non-default VRF).
->> + * bound address, enabled unshareable flags and socket device binding
->> + * (see l3mdev with non-default VRF).
->>   */
->>  static struct vxlan_sock *vxlan_find_sock(struct net *net, sa_family_t family,
->> -					  __be16 port, u32 flags, int ifindex)
->> +					  __be16 port, u32 flags, int ifindex,
->> +					  union vxlan_addr *saddr)
->>  {
->>  	struct vxlan_sock *vs;
->>  
->>  	flags &= VXLAN_F_RCV_FLAGS;
->>  
->>  	hlist_for_each_entry_rcu(vs, vs_head(net, port), hlist) {
->> -		if (inet_sk(vs->sock->sk)->inet_sport == port &&
->> +		struct sock *sk = vs->sock->sk;
->> +		struct inet_sock *inet = inet_sk(sk);
-> 
-> https://docs.kernel.org/process/maintainer-netdev.html#local-variable-ordering-reverse-xmas-tree-rcs
-> 
->> +
->> +		if (flags & VXLAN_F_LOCALBIND) {
->> +			if (family == AF_INET &&
->> +			    inet->inet_rcv_saddr != saddr->sin.sin_addr.s_addr)
->> +				continue;
->> +#if IS_ENABLED(CONFIG_IPV6)
->> +			else if (family == AF_INET6 &&
->> +				 ipv6_addr_cmp(&sk->sk_v6_rcv_saddr,
->> +					       &saddr->sin6.sin6_addr) != 0)
->> +				continue;
->> +#endif
->> +		}
->> +
->> +		if (inet->inet_sport == port &&
->>  		    vxlan_get_sk_family(vs) == family &&
->>  		    vs->flags == flags &&
->>  		    vs->sock->sk->sk_bound_dev_if == ifindex)
 
-My bad, will fix.
 
