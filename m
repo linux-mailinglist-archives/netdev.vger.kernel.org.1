@@ -1,151 +1,77 @@
-Return-Path: <netdev+bounces-213494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213495-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0365EB25574
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 23:31:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8010B2557C
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 23:33:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B1D0F3B59CC
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 21:31:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE190189632E
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 21:32:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D52E2BF3F3;
-	Wed, 13 Aug 2025 21:31:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0E3A2D0619;
+	Wed, 13 Aug 2025 21:32:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BxQOfXCv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TDKFw9rR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E85B519E81F;
-	Wed, 13 Aug 2025 21:31:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5C762BF3F3;
+	Wed, 13 Aug 2025 21:32:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755120707; cv=none; b=d0C7UJ+WVVTYMpqp7OIJKZ0XKOm1/n5J/xvg8K2Tj3curncl5VFyLP0b9fEArnOhI7pf10AxFD5WYF8FfnSyyXZgcalJZzxTjVuQ1jtAkEjs4SWhIGk7Ewwt7Ttddq4pKMmh9VbG1cO9s7zPiKHfRIRxdMxV7c2ApyJ1JyCLDVc=
+	t=1755120727; cv=none; b=ap4nW0DNOxP5a+6oHrmiucHdZZ67HIUKL+GdLpHKXyv0pG7zzW5VJ0gkifGEfy2yoDCp1gBKTAQxS54eKgP5j+KjjQPnNw1ZAEyPtjp96p2zPNaiLpeX0o8urIqV6iu90lKtuBML77vloVVswBWj6X7WFmvcWyBUUSnQTrKKNXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755120707; c=relaxed/simple;
-	bh=XyYrWxlMAulbizJRYI5af0ztfwwasQrmniTZnZDkJNc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aolGyhXW2vxeFSB7WLpW3smc9zws9BnVBF46M0pZ6HOpzM7pIyWXqz648WEXnrVYqG4zDYwhLb0vWyWS1wSENVWzcg9+9yULeyO3iwTD1w3LcU6NRsEx7KmQa5RifzLB2KYptcxnMdGOuFkdmFy+zuxHjFqPZg9N1IsWoik1mSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BxQOfXCv; arc=none smtp.client-ip=209.85.215.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-b4716fb8e74so190411a12.0;
-        Wed, 13 Aug 2025 14:31:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755120705; x=1755725505; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zvFsXuCoCb48Cj/HqcV4mksaRsmfBU1A9zSpihdNmFA=;
-        b=BxQOfXCvuqSOZx5IG4pmKkeGHxQBNZnOpUHuK9tMGezsAp+aNKHnykjDo1cbOCx/3q
-         Ka+Kel+iF5RC4Ev6NjWwYxi/Ry93Qt9E0oiwsoMshUSECkgQcwc0mJrnGU0wHcP1kAjT
-         pSaPbl79TbnCJIBP+Z06fZLrPpre5exaOEDNlvdpPDsLCFDY2ib+DhxP/zswFV9wvyCr
-         WKAcH86tzeTFbRqZR/98PtdbpS746yVqWNVJNXxwobCNSBEFPtVWi6vAyxC0vmKjAYrU
-         OU1OpsbEmJyhInnEYAA6fPNpYzzCH0VjRFWYtKdRfNX4LCG3bejvkn/DqP80BBw5sjwN
-         X/Xw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755120705; x=1755725505;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zvFsXuCoCb48Cj/HqcV4mksaRsmfBU1A9zSpihdNmFA=;
-        b=IYnRcSYbyp38g0ahvR4Rmlzp6fu0UZc0URfmO/e6IZ163/PSHnLcBJF46+TgbV7iU9
-         LuEyerc48Em2M4wYB277jAk6qudI7c2IyKf2qlqNyrZf90yx4RoxmV0x3v9n2AuEWTe9
-         NHchXeg3zDvvie96ZshGshp0nrcKJBRll2RCEm2bg0lnnmZdfNqdTtzxScdM9Tj28+Ef
-         cJ24K9QPy4s3Hj0IaCKq6YGja94jVEuykRqFdT93Nlghw6/UpREiaHsKYmoiandZFthz
-         YfGsMLU/myCYk4gI/lOQF+kpH5xuT828rFn9Aix4nOYZWeSgsEDx+XqG+v8VqYDw67Zg
-         k9iQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWmMxF1JK8uJu8G+QlJRDKtk/zzz5tQlUN2FsvLaINvJS9CnHkhSxmB66aLp0u3cEc8ejxaVd0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyhWpJirIm3Ga7U9+YRoPFpngvAiR+/1222F0o/PUOJorbfMZML
-	Ei5LtH7+ixbrzffqpdBnAVRWe7UYpj5YswnrNIXCi1P0YkVLjKS5upU=
-X-Gm-Gg: ASbGnct5PXaK6kHAzO5fD1o8ksskfrtM54b9H1WKyjgDa3sZTlQlx/6qo4MC6YIwi6F
-	p31kdrxrt3JXlDDgvpngJZCLWbUQios76WwYQ/PMU0hBKtV2tsaoK92foE81OTgFoO/CF64vwBE
-	kItBVgwe3keoJt3Y4IYk3jhQ0nZHMTTwmH4xfskWcjiF51r0riDo9etxjNj3JWm4XLR/cMVrfVx
-	b5Dzy39gB//LfSVEfw3leXvbJevuTC38N2S4bUnzdOm5/y8mbeF+zNOs6pv0cAwodlrC+Eoegng
-	0y/L1M/xFESADfGqlKgC+xdo7pIttEV3wyjEKGoV8kpZU9EwESElS6UvM/JDoJN28eu2LCG66G8
-	ghEWPQqWAprEwMuve/sb7Nib+NTHXyks1JKVwCylffMflLgklCJLw1G1PbOE=
-X-Google-Smtp-Source: AGHT+IHtxGnCsok8hMj7qqz+Ev7qOzgroEJdjc+PVQcY6WbM2q16Isw8aqz9kjGdz0iZwGr1k4QO6A==
-X-Received: by 2002:a17:902:da92:b0:243:17a:cd48 with SMTP id d9443c01a7336-2445851f038mr10056145ad.17.1755120704880;
-        Wed, 13 Aug 2025 14:31:44 -0700 (PDT)
-Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-241d1ef66efsm333227725ad.32.2025.08.13.14.31.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Aug 2025 14:31:44 -0700 (PDT)
-Date: Wed, 13 Aug 2025 14:31:43 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
-	andrii@kernel.org, netdev@vger.kernel.org,
-	magnus.karlsson@intel.com, aleksander.lobakin@intel.com,
-	Eryk Kubanski <e.kubanski@partner.samsung.com>
-Subject: Re: [PATCH v4 bpf] xsk: fix immature cq descriptor production
-Message-ID: <aJ0EP7Dzl182WE7i@mini-arch>
-References: <20250813171210.2205259-1-maciej.fijalkowski@intel.com>
+	s=arc-20240116; t=1755120727; c=relaxed/simple;
+	bh=zAxzRiVLqsjw7sByOm1NLMZiSLothxFD7dx5ZQ0UQBM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=srGV1UlxLX71bn5dJuZPpa38tWgs6b1WhpNpunKZKOsUwbzGz/o70NWqlMyQyLhv7URsVmB8DJuqOYp5EqqFClrfyp6T2MgHu6q+T4R/I7oOAXiTXeDgrB3upYevNmm4Y+ETBUV27+js0nZVyIN1x1xkV9Vb088hpZpI6aHBLK4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TDKFw9rR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F5BDC4CEEB;
+	Wed, 13 Aug 2025 21:32:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755120727;
+	bh=zAxzRiVLqsjw7sByOm1NLMZiSLothxFD7dx5ZQ0UQBM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=TDKFw9rRlXVNuYwo+mt0yzsAgImn2acbIfF+M0Gh+QQjxHq7eV2vz6P3z4VBU5Cdc
+	 68qDKuV0KSBMEsvBSUaZPeqTBF71E5QeVca+2mBEi/wQAsyAHTMZulmm+1o4LciEGd
+	 ldIZHzJscxTa5jQGa7X0h+1WM98LADBzuPpZPfSJhm0/sbwB67JKFshKgoSqqwvyjT
+	 1UKKjwVMS0+cs5IwFJ9zFAIG6Rm8G47YIeEx+sVhVYTFaWeIBWibWonx2lAlPIQmXg
+	 lsk/W2k8L/cgGT/6P2PMO6Mwkwv5EoIKiYXQoPErnRYy8W85pHumfFJB2rl1+vX1xa
+	 iUQrynxKbLLDA==
+Date: Wed, 13 Aug 2025 14:32:05 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Yibo Dong <dong100@mucse.com>, Vadim Fedorenko
+ <vadim.fedorenko@linux.dev>, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, horms@kernel.org, corbet@lwn.net,
+ gur.stavi@huawei.com, maddy@linux.ibm.com, mpe@ellerman.id.au,
+ danishanwar@ti.com, lee@trager.us, gongfan1@huawei.com, lorenzo@kernel.org,
+ geert+renesas@glider.be, Parthiban.Veerasooran@microchip.com,
+ lukas.bulwahn@redhat.com, alexanderduyck@fb.com, richardcochran@gmail.com,
+ netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 4/5] net: rnpgbe: Add basic mbx_fw support
+Message-ID: <20250813143205.1c0bfafa@kernel.org>
+In-Reply-To: <CAMuHMdWpmt2q9tVm-3HV1h2=-7D6zEs_HnBe5gfYVgvfB=01hQ@mail.gmail.com>
+References: <20250812093937.882045-1-dong100@mucse.com>
+	<20250812093937.882045-5-dong100@mucse.com>
+	<eafb8874-a7a3-4028-a4ad-d71fc5689813@linux.dev>
+	<9A6132D78B40DAFD+20250813095214.GA979548@nic-Precision-5820-Tower>
+	<CAMuHMdWpmt2q9tVm-3HV1h2=-7D6zEs_HnBe5gfYVgvfB=01hQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250813171210.2205259-1-maciej.fijalkowski@intel.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 08/13, Maciej Fijalkowski wrote:
-> Eryk reported an issue that I have put under Closes: tag, related to
-> umem addrs being prematurely produced onto pool's completion queue.
-> Let us make the skb's destructor responsible for producing all addrs
-> that given skb used.
-> 
-> Introduce struct xsk_addrs which will carry descriptor count with array
-> of addresses taken from processed descriptors that will be carried via
-> skb_shared_info::destructor_arg. This way we can refer to it within
-> xsk_destruct_skb(). In order to mitigate the overhead that will be
-> coming from memory allocations, let us introduce kmem_cache of
-> xsk_addrs, but be smart about scalability, as assigning unique cache per
-> each socket might be expensive.
-> 
-> Store kmem_cache as percpu variables with embedded refcounting and let
-> the xsk code index it by queue id. In case when a NIC#0 already runs
-> copy mode xsk socket on queue #10 and user starts a socket on
-> <NIC#1,qid#10> tuple, the kmem_cache is reused. Keep the pointer to
-> kmem_cache in xdp_sock to avoid accessing bss in data path.
-> 
-> Commit from fixes tag introduced the buggy behavior, it was not broken
-> from day 1, but rather when xsk multi-buffer got introduced.
-> 
-> Fixes: b7f72a30e9ac ("xsk: introduce wrappers and helpers for supporting multi-buffer in Tx path")
-> Reported-by: Eryk Kubanski <e.kubanski@partner.samsung.com>
-> Closes: https://lore.kernel.org/netdev/20250530103456.53564-1-e.kubanski@partner.samsung.com/
-> Acked-by: Magnus Karlsson <magnus.karlsson@intel.com>
-> Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-> ---
-> 
-> v1:
-> https://lore.kernel.org/bpf/20250702101648.1942562-1-maciej.fijalkowski@intel.com/
-> v2:
-> https://lore.kernel.org/bpf/20250705135512.1963216-1-maciej.fijalkowski@intel.com/
-> v3:
-> https://lore.kernel.org/bpf/20250806154127.2161434-1-maciej.fijalkowski@intel.com/
-> 
-> v1->v2:
-> * store addrs in array carried via destructor_arg instead having them
->   stored in skb headroom; cleaner and less hacky approach;
-> v2->v3:
-> * use kmem_cache for xsk_addrs allocation (Stan/Olek)
-> * set err when xsk_addrs allocation fails (Dan)
-> * change xsk_addrs layout to avoid holes
-> * free xsk_addrs on error path
-> * rebase
-> v3->v4:
+On Wed, 13 Aug 2025 13:05:36 +0200 Geert Uytterhoeven wrote:
+> Or use scoped_cond_guard(mutex_intr, ...) { ... }?
 
-[..]
-
-> * have kmem_cache as percpu vars
-
-I wonder whether we're over thinking it and should just have one "global"
-kmem cache for xsk subsystem. The mm layer should, presumably,
-do all that percpu stuff already internally. Have you seen any perf
-issues with that approach?
+Hard no on that in networking.
 
