@@ -1,66 +1,65 @@
-Return-Path: <netdev+bounces-213239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213241-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F2EEB24338
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 09:52:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AD21B24348
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 09:54:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B7483AD8A1
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 07:52:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E8885612FC
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 07:53:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F5722E285E;
-	Wed, 13 Aug 2025 07:52:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9B3E2EA157;
+	Wed, 13 Aug 2025 07:52:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="nahwS0qR"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="qBWbyimW"
 X-Original-To: netdev@vger.kernel.org
-Received: from pdx-out-009.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-009.esa.us-west-2.outbound.mail-perimeter.amazon.com [35.155.198.111])
+Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F6CF2D59E3;
-	Wed, 13 Aug 2025 07:52:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.155.198.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58F1D2E9EAB;
+	Wed, 13 Aug 2025 07:52:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755071543; cv=none; b=rvJXGB701l21lkHXgVeKw837Vt5VhcLfpZSE+STGe6Jsv+cV9pL5gjomSOMrBr7j59e9BGT9CRVzxw/0sICc4+GGJl3uNNgXIjKijxVmTt88uXScTg9f5uJmmRxzIZ47B0zmj/rCNyP0oIu4bxBSKqPo3GQqJq0GrVYZS0FXI/E=
+	t=1755071565; cv=none; b=gxmH06rKZ7pvZt3T8IjyU/2lwJEnDMd2P0XvBkit6qpUCJuIS95Myc22kq4PCVhSwJ2AmclWUR+l8o1+wzwebFlrtroCZjiJddqaYntEUYlrt1tWaOtEWfUAQB7n9mrerxM0n0ijUSeDiO9x5cWwleCWhNNEz/JyR3KcKJauCqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755071543; c=relaxed/simple;
-	bh=rbpZkuoFpSp+LOSGBUuAX3MhcyopUmEUsw+gqSyBjoo=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Yfw9dlKeSwF6p38agTX7J6NhwrG8Z9ZK2NX30ZNpOnbp9jFufh3vtm0TG4tUS55wFww61LyjKp6DxQbRC8Ygz2kd+VvHspJFdx0zu1DkbIFqTRAxmTqvygO0mS37qjqbkK+K7+eMPWao3HxDOmtIxE9c+g6snFa5k1tHb/3Z5YI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=nahwS0qR; arc=none smtp.client-ip=35.155.198.111
+	s=arc-20240116; t=1755071565; c=relaxed/simple;
+	bh=KFmtBpqIS/gas15j2ubFbyJ7spXHzf2NK9I0R5ErOjY=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Nid/HFMBSPJ3ufprDfwSwO3cBBq2w7mEWt3c7nVWfttx3HRyJNkgCXndXE6YydjrOq6x5hhPXBtJ+sDzjvfxqSEIxRp5yAHKRH0x3uFNlYgq18tRh2KxnEbMz5A/EUMSzYFSDeFiw0y3OS4JU0DyA2B9rEdZMbw1glmRUL5K0rs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=qBWbyimW; arc=none smtp.client-ip=99.78.197.220
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1755071541; x=1786607541;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=9mYqUdh8+4WOrSA0/b4w7nz2P7jBkHZ0NDF86QchptE=;
-  b=nahwS0qRyX5yyT153DtUjQqxuMM3nVOw6DUj7TGXTn4xWHYV77G6AiNI
-   ecOMP8B3qTkfyHpz8sI/XmvR1MXP3Yq6vHp5gR7kg+F7LZBP7Lb3mqdAA
-   bso1nnwdVbA8KaBg7iasxsIGsnb/fMacsv2e4GR+atcEHe/nWTOq8m+Rt
-   Pkurlb5PyenKLBT4/Gy5FldHwjA6wDJdYRBdMQdsPmyOuJvTb1zhDAlDA
-   oWWZfrT6dIJ1qyiCmT9yyll5eVec/Ill1yOjOjL08cFfN7bM9AA8L9niV
-   YGjtIDjzhh14/CR3gQSSd2xNAyZXw7qgEs7KjviUy2G7Og3fMpJMAws6R
+  t=1755071564; x=1786607564;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=0tluNgAk0CYLsM7ZvS5LjeDUB61MgUfMGZZtsKFZxYc=;
+  b=qBWbyimWn3JE5LYVgkN5JfXtcmzN3IF+SVypsFSXaGLhquWWJGxvVNAt
+   OiM9tEDzweOXB3wddUg+sCRSoC6kZJGvZagfvY1jEnY6eSuvnUae1jkkh
+   dTdVRni/MjQMPaaBZo4h9XDP2pI2yfi5VxHLBgU9lltJAmGLe/mQof/bI
+   iARca+GtWkv3FGPxm8tmzZPj2lC2M5592RrC+ABVvjstY1YwOhnLCqXI6
+   zyKBKPWlxD51sudxi5n4uPsK+C+BVk3KmIt7p9jf5YmxYvB0B3QE54shs
+   mM8ygagXa3WErgvCyn/h6WJ+2d+yLJ85ByzP7Dc8VmgpaxWMOKKwB1bEs
    Q==;
-X-CSE-ConnectionGUID: OE1E8bnWRoKCaUqkm5WiKw==
-X-CSE-MsgGUID: /oe6bVl4R4qVJMGsyY5R6g==
 X-IronPort-AV: E=Sophos;i="6.17,285,1747699200"; 
-   d="scan'208";a="987739"
-Received: from ip-10-5-12-219.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.12.219])
-  by internal-pdx-out-009.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2025 07:52:17 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.7.35:41088]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.16.146:2525] with esmtp (Farcaster)
- id 7b0c3d88-72a3-4bf1-923c-d4a238488dc3; Wed, 13 Aug 2025 07:52:17 +0000 (UTC)
-X-Farcaster-Flow-ID: 7b0c3d88-72a3-4bf1-923c-d4a238488dc3
+   d="scan'208";a="224790435"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2025 07:52:42 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:13498]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.38.54:2525] with esmtp (Farcaster)
+ id 28d6fb3a-6f70-44b1-adb1-5c55fb937a18; Wed, 13 Aug 2025 07:52:42 +0000 (UTC)
+X-Farcaster-Flow-ID: 28d6fb3a-6f70-44b1-adb1-5c55fb937a18
 Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 13 Aug 2025 07:52:17 +0000
+ Wed, 13 Aug 2025 07:52:41 +0000
 Received: from b0be8375a521.amazon.com (10.37.244.11) by
  EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.17;
- Wed, 13 Aug 2025 07:52:15 +0000
+ Wed, 13 Aug 2025 07:52:39 +0000
 From: Kohei Enju <enjuk@amazon.com>
 To: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>
@@ -69,10 +68,12 @@ CC: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
  S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
  Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	<kohei.enju@gmail.com>, Kohei Enju <enjuk@amazon.com>
-Subject: [PATCH v1 iwl-next 0/2] igbvf: ethtool statistics improvements
-Date: Wed, 13 Aug 2025 16:50:49 +0900
-Message-ID: <20250813075206.70114-1-enjuk@amazon.com>
+Subject: [PATCH v1 iwl-next 1/2] igbvf: add lbtx_packets and lbtx_bytes to ethtool statistics
+Date: Wed, 13 Aug 2025 16:50:50 +0900
+Message-ID: <20250813075206.70114-2-enjuk@amazon.com>
 X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20250813075206.70114-1-enjuk@amazon.com>
+References: <20250813075206.70114-1-enjuk@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,25 +82,62 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D038UWB002.ant.amazon.com (10.13.139.185) To
+X-ClientProxiedBy: EX19D031UWA001.ant.amazon.com (10.13.139.88) To
  EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-This series contains:
-1. Add missing lbtx_packets and lbtx_bytes counters that are available
-in hardware but not exposed via ethtool
-2. Remove rx_long_byte_count counter that shows the same value as
-rx_bytes
+Currently ethtool shows lbrx_packets and lbrx_bytes (Good RX
+Packets/Octets loopback Count), but doesn't show the TX-side equivalents
+(lbtx_packets and lbtx_bytes). Add visibility of those missing
+statistics by adding them to ethtool statistics.
+
+In addition, the order of lbrx_bytes and lbrx_packets is not consistent
+with non-loopback statistics (rx_packets, rx_bytes). Therefore, align
+the order by swapping positions of lbrx_bytes and lbrx_packets.
 
 Tested on Intel Corporation I350 Gigabit Network Connection.
 
-Kohei Enju (2):
-  igbvf: add lbtx_packets and lbtx_bytes to ethtool statistics
-  igbvf: remove duplicated counter rx_long_byte_count from ethtool
-    statistics
+Before:
+  # ethtool -S ens5 | grep -E "x_(bytes|packets)"
+       rx_packets: 135
+       tx_packets: 106
+       rx_bytes: 16010
+       tx_bytes: 12451
+       lbrx_bytes: 1148
+       lbrx_packets: 12
 
- drivers/net/ethernet/intel/igbvf/ethtool.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+After:
+  # ethtool -S ens5 | grep -E "x_(bytes|packets)"
+       rx_packets: 748
+       tx_packets: 304
+       rx_bytes: 81513
+       tx_bytes: 33698
+       lbrx_packets: 97
+       lbtx_packets: 109
+       lbrx_bytes: 12090
+       lbtx_bytes: 12401
 
+Tested-by: Kohei Enju <enjuk@amazon.com>
+Signed-off-by: Kohei Enju <enjuk@amazon.com>
+---
+ drivers/net/ethernet/intel/igbvf/ethtool.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/intel/igbvf/ethtool.c b/drivers/net/ethernet/intel/igbvf/ethtool.c
+index 773895c663fd..c6defc495f13 100644
+--- a/drivers/net/ethernet/intel/igbvf/ethtool.c
++++ b/drivers/net/ethernet/intel/igbvf/ethtool.c
+@@ -30,8 +30,10 @@ static const struct igbvf_stats igbvf_gstrings_stats[] = {
+ 	{ "rx_bytes", IGBVF_STAT(stats.gorc, stats.base_gorc) },
+ 	{ "tx_bytes", IGBVF_STAT(stats.gotc, stats.base_gotc) },
+ 	{ "multicast", IGBVF_STAT(stats.mprc, stats.base_mprc) },
+-	{ "lbrx_bytes", IGBVF_STAT(stats.gorlbc, stats.base_gorlbc) },
+ 	{ "lbrx_packets", IGBVF_STAT(stats.gprlbc, stats.base_gprlbc) },
++	{ "lbtx_packets", IGBVF_STAT(stats.gptlbc, stats.base_gptlbc) },
++	{ "lbrx_bytes", IGBVF_STAT(stats.gorlbc, stats.base_gorlbc) },
++	{ "lbtx_bytes", IGBVF_STAT(stats.gotlbc, stats.base_gotlbc) },
+ 	{ "tx_restart_queue", IGBVF_STAT(restart_queue, zero_base) },
+ 	{ "tx_timeout_count", IGBVF_STAT(tx_timeout_count, zero_base) },
+ 	{ "rx_long_byte_count", IGBVF_STAT(stats.gorc, stats.base_gorc) },
 -- 
 2.48.1
 
