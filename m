@@ -1,144 +1,148 @@
-Return-Path: <netdev+bounces-213334-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213336-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B1F0B249D0
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 14:51:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C03F7B249E0
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 14:55:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 67B261AA17C3
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 12:51:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB9A717D5DA
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 12:55:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1746F27602D;
-	Wed, 13 Aug 2025 12:50:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F7E72E5B3B;
+	Wed, 13 Aug 2025 12:55:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="q/LhzmOq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eVEU1jYa"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f196.google.com (mail-yw1-f196.google.com [209.85.128.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4358315A87C
-	for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 12:50:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E62162E54D8;
+	Wed, 13 Aug 2025 12:54:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755089453; cv=none; b=ECuYn4r5d5OwoDWU0XFZWBmqaMWZLyOxAc+ZTiTflPH3bEqTh8Oo+cG3kXRB4nbBRy/3F2NV+Txb+jIACmLLswZeDv+s6NStM+UJgyaGxl1NgnqzrjvMrXhGPZMHLiQbbaTTAIqA2LNidQQMnrJ3H+NKW9oQ0HHoe+7zOj4pHio=
+	t=1755089701; cv=none; b=kHoyWAItZe141bN79V0tcEsDYkfeKB/w1X2+r6AjsPLf4+YNGDMTe3HLC5Qy7K2B7T7VJxbqt8JqKdk/YGfNRv9PS25QAoYj0QAcPTWTRn0MScz6L8+ccIUPs1MpgsEblXOCKYsC44zu9hJ2JCXwmO2qqiXIHEktt19n9C0eetE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755089453; c=relaxed/simple;
-	bh=1mEvOwuGqfTYDuFOmwLuUyhYUugJ+1L9vpE9h3V0eng=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cf0XcpfoT8z6bnIzuttqWSpgwrK2OXUz7u4TLVx57K1D4CZHeeRiu0DIX73oxu9JGpIXVnzMmbSDq1AA0eO1/cSxe7Pvv7tQCfkr5LBbxmaU9QKhmgURIchsCv954TKlVV89olBgK06aYl4exHc4gLA7efF66OEOgalLk4DLUjE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=q/LhzmOq; arc=none smtp.client-ip=91.218.175.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <354593d1-2504-407e-98fb-235fcaf61d87@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1755089448;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ON+Suyp0vdzeVZdTNkxeac41hq4WWrAXP09hCZflvbY=;
-	b=q/LhzmOqykaaTSRVE2F2sCxJbH1OwRrsg6Fq+7/6vcTBQkbqF8kOIrJ61lIHgvL/qA+q7/
-	wgAI/yICZ+7sxMuvbjo9Vuy3Koi2o497fk1NpX4Gj7jB1EuYErANawjPdlp/WN03FYEKOs
-	+cOABvN8HqJxM+BT7LPCEhAczUrKgyM=
-Date: Wed, 13 Aug 2025 13:50:34 +0100
+	s=arc-20240116; t=1755089701; c=relaxed/simple;
+	bh=UtbKvHUL/lh+x3YjI5uRS1BmHx10K5hZERwtwnnXLqA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=i+8p8gMtKuG24aZeHrL9ZhtWO8yoG7LgeB/NEBh9MJSYNwjwfoYIbZtHm2f4yE9fa3Teu5gLxGjs5WehSOYWpquEsdQU7rVQcmn9Svp92Tk38MbY4Tc8Zi6LDZRoOe0uV7Fa+DD30gzkuZ8f0mM6K0gO0yE2knOtmk1+FIQb35g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eVEU1jYa; arc=none smtp.client-ip=209.85.128.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f196.google.com with SMTP id 00721157ae682-71d3b3606d0so16896237b3.1;
+        Wed, 13 Aug 2025 05:54:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755089699; x=1755694499; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UtbKvHUL/lh+x3YjI5uRS1BmHx10K5hZERwtwnnXLqA=;
+        b=eVEU1jYat5CgCYxwt3hSyg8R2RfDwpXE3j+3aTYmJMZgOEspUs2vy7yK5Eb/mb5NQV
+         wbuVCI14SXJWZCxHkfl1qWqsmvDQuSMRBxxuY3Wg0xZPnhOIyn8rbYzqMoJrTjjFiHZ2
+         YvNtYNufIblRw7M4GrEUv+91puxoUXHgvtxsDH6pAHC/J+G33+qpMJIhMK5MFlDdRULW
+         mfs9F2EOyDoREVbBjLeXQf+FDbyy4ldl5nXhv46PHUVU5AxShjLCW/nWzdfWDZxl0rfS
+         ZDQp3teMsYq/DDLVaLGxmtppFhwkYF3hm7+pENzyqXkosJIx9/HRBHoMfxMhzPbWp1AA
+         xMHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755089699; x=1755694499;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=UtbKvHUL/lh+x3YjI5uRS1BmHx10K5hZERwtwnnXLqA=;
+        b=Bvz38bKBDtrGu5hNCmc/j1yhMstTcZDnIxoDZQz+nZcdz9OfAXBc503oE1tLGiKd73
+         sFA4Gu0kLG1FHe9auXWplTmi/xKLIc0jsaSv9P2mEgK1yjd2uePjrV3tZaBQP3DFSj9r
+         LIUaJTKksyZ4+chAYrqSXeRMy+a6C400w12i7zCzgAj9yqlk2Jv2Looo3adEB8WJ1Hag
+         Cdme5pAkL3lnq6FMM3KDChakDx/o5EA8nXGE4s6gMYS1gYmz/Qbj9pVBUW376bcgiP19
+         m+TJ5kUG8mSeIx4fLltFCdotosrBSAL6jPh6SknGtgJSZhdJvXsBOlcCiZwhzPN/bYI/
+         OeOQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVD4iSCiE6zsJU/di42PdZJbNgpQJVh9rUO7n8tkJJkUnEMSuObvaUzD6Uwdg/O/dumpLSXtLv/gsEguxCfCP5c@vger.kernel.org, AJvYcCVHEwpJheuTs/TXXrpiWWvZkE9E5pLrYcMJHoAPzIeHQGv2uZBBc075zIthmZU/IswjAx4if8Mx@vger.kernel.org, AJvYcCXbGWtizqfK4U8/J4vnRGcPIqbZVqmzXRfIy+2Yi42kzW3QpmA9TsqUBqR66sGTaWiRTsh6jBBI+jNVCCw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwuYOZBf/3gwomwJiTBrsN3dfpkDSSBsr0m8oMithTsd4PWc0qd
+	2iiOP1bVZGX3QHbRsSfIhfqsAJbR/xNLQ6ROn0M1TIOlRIC36fte2ahg+BpX0L9kfQTWd22hn/7
+	wbgj+MEQ8n6FRWpxbjd19OdXVJsKsb58=
+X-Gm-Gg: ASbGncsUAg5TvdMJd09AZo9DD04oWzgg63EFiWmTpA+QIV4rOIpdqc2pUGY2EDQeIeG
+	tSUWG7Y1kKHgL4uQew5Pbg8N30Pvo8W1ICHqGdI+siLn32RGF0F026Q2sQsv4zrD7j6jTY6tQtC
+	PqZtggLqxWaBl3ZRqxOdz7wf3+kGgPj2F0ZJKq+3acs3r0XjKTg0Z7dyCAuYpw9ZFFxxSQyqp8J
+	5BNDoc=
+X-Google-Smtp-Source: AGHT+IEj4c/eRF5bgP80NzKx8WLV6vRnZFyhb68/3YLBJKOdVzSXdaAlXeCcwAYa+QSYnZzydcnhgLjDYVha3frkjfk=
+X-Received: by 2002:a05:690c:4b8c:b0:70e:2d17:84b5 with SMTP id
+ 00721157ae682-71d4e2491dfmr38757477b3.0.1755089698869; Wed, 13 Aug 2025
+ 05:54:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v3 5/5] net: rnpgbe: Add register_netdev
-To: Yibo Dong <dong100@mucse.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, corbet@lwn.net,
- gur.stavi@huawei.com, maddy@linux.ibm.com, mpe@ellerman.id.au,
- danishanwar@ti.com, lee@trager.us, gongfan1@huawei.com, lorenzo@kernel.org,
- geert+renesas@glider.be, Parthiban.Veerasooran@microchip.com,
- lukas.bulwahn@redhat.com, alexanderduyck@fb.com, richardcochran@gmail.com,
- netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250812093937.882045-1-dong100@mucse.com>
- <20250812093937.882045-6-dong100@mucse.com>
- <e410918e-98aa-4a14-8fb4-5d9e73f7375e@linux.dev>
- <B41E833713021188+20250813090405.GC965498@nic-Precision-5820-Tower>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <B41E833713021188+20250813090405.GC965498@nic-Precision-5820-Tower>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+References: <20250802092435.288714-1-dongml2@chinatelecom.cn>
+ <20250802092435.288714-2-dongml2@chinatelecom.cn> <CAL+tcoA9Lvc4Cj9zjWVx1FzEQA=d=OnvZRDWA4nE_1GNbEDaRw@mail.gmail.com>
+ <CADxym3bD17eL0U0sQkuSZZgNtg7gmvzt0YAA+CiHf9Lw5-+awA@mail.gmail.com>
+ <CAL+tcoD80feEhPA_1L7D55UqkRuLSnZ-Kmmdab5J2v9K6uCzTA@mail.gmail.com>
+ <CADxym3Zv9+6D0hCEx1KzvW+oAQW5oEDgSHBQPyRjHodezH9O1g@mail.gmail.com> <CAL+tcoCCq8Hc3R0_75wZxHUiZrjhfS-q65XFWM69F8pcoJPdyw@mail.gmail.com>
+In-Reply-To: <CAL+tcoCCq8Hc3R0_75wZxHUiZrjhfS-q65XFWM69F8pcoJPdyw@mail.gmail.com>
+From: Menglong Dong <menglong8.dong@gmail.com>
+Date: Wed, 13 Aug 2025 20:54:48 +0800
+X-Gm-Features: Ac12FXzTK5seVQHGDbrcMI1iRSeJ-Q4x1Wbny7vI56994fdby3CWV9gaOwgaCHs
+Message-ID: <CADxym3bBVEKRNa790CchSyH-WPeXmv9tjTxtmYyJamQv357zKg@mail.gmail.com>
+Subject: Re: [PATCH net v3 1/2] net: tcp: lookup the best matched listen socket
+To: Jason Xing <kerneljasonxing@gmail.com>, kuniyu@google.com
+Cc: edumazet@google.com, ncardwell@google.com, davem@davemloft.net, 
+	dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	shuah@kernel.org, kraig@google.com, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 13/08/2025 10:04, Yibo Dong wrote:
-> On Tue, Aug 12, 2025 at 04:32:00PM +0100, Vadim Fedorenko wrote:
->> On 12/08/2025 10:39, Dong Yibo wrote:
->>> Initialize get mac from hw, register the netdev.
->>>
->>> Signed-off-by: Dong Yibo <dong100@mucse.com>
->>> ---
->>>    drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h    | 22 ++++++
->>>    .../net/ethernet/mucse/rnpgbe/rnpgbe_chip.c   | 73 ++++++++++++++++++
->>>    drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h |  1 +
->>>    .../net/ethernet/mucse/rnpgbe/rnpgbe_main.c   | 76 +++++++++++++++++++
->>>    4 files changed, 172 insertions(+)
->>>
->>> diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
->>> index 6cb14b79cbfe..644b8c85c29d 100644
->>> --- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
->>> +++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
->>> @@ -6,6 +6,7 @@
->>>    #include <linux/types.h>
->>>    #include <linux/mutex.h>
->>> +#include <linux/netdevice.h>
->>>    extern const struct rnpgbe_info rnpgbe_n500_info;
->>>    extern const struct rnpgbe_info rnpgbe_n210_info;
->>> @@ -86,6 +87,18 @@ struct mucse_mbx_info {
->>>    	u32 fw2pf_mbox_vec;
->>>    };
->>> +struct mucse_hw_operations {
->>> +	int (*init_hw)(struct mucse_hw *hw);
->>> +	int (*reset_hw)(struct mucse_hw *hw);
->>> +	void (*start_hw)(struct mucse_hw *hw);
->>> +	void (*init_rx_addrs)(struct mucse_hw *hw);
->>> +	void (*driver_status)(struct mucse_hw *hw, bool enable, int mode);
->>> +};
->>> +
->>> +enum {
->>> +	mucse_driver_insmod,
->>> +};
->>> +
->>>    struct mucse_hw {
->>>    	void *back;
->>>    	u8 pfvfnum;
->>> @@ -96,12 +109,18 @@ struct mucse_hw {
->>>    	u32 axi_mhz;
->>>    	u32 bd_uid;
->>>    	enum rnpgbe_hw_type hw_type;
->>> +	const struct mucse_hw_operations *ops;
->>>    	struct mucse_dma_info dma;
->>>    	struct mucse_eth_info eth;
->>>    	struct mucse_mac_info mac;
->>>    	struct mucse_mbx_info mbx;
->>> +	u32 flags;
->>> +#define M_FLAGS_INIT_MAC_ADDRESS BIT(0)
->>>    	u32 driver_version;
->>>    	u16 usecstocount;
->>> +	int lane;
->>> +	u8 addr[ETH_ALEN];
->>> +	u8 perm_addr[ETH_ALEN];
->>
->> why do you need both addresses if you have this info already in netdev?
->>
-> 
-> 'perm_addr' is address from firmware (fixed, can't be changed by user).
-> 'addr' is the current netdev address (It is Initialized the same with
-> 'perm_addr', but can be changed by user)
-> Maybe I should add 'addr' in the patch which support ndo_set_mac_address?
+On Sun, Aug 3, 2025 at 4:32=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.co=
+m> wrote:
+>
+> On Sun, Aug 3, 2025 at 12:00=E2=80=AFPM Menglong Dong <menglong8.dong@gma=
+il.com> wrote:
+> >
+> > On Sun, Aug 3, 2025 at 10:54=E2=80=AFAM Jason Xing <kerneljasonxing@gma=
+il.com> wrote:
+> > >
+> > > On Sun, Aug 3, 2025 at 9:59=E2=80=AFAM Menglong Dong <menglong8.dong@=
+gmail.com> wrote:
+> > > >
+> > > > On Sat, Aug 2, 2025 at 9:06=E2=80=AFPM Jason Xing <kerneljasonxing@=
+gmail.com> wrote:
+> > > > >
+[......]
+> > >
+> > > I'm trying to picture what the usage can be in the userland as you
+> > > pointed out in the MD5 case. As to the client side, it seems weird
+> > > since it cannot detect and know the priority of the other side where =
+a
+> > > few sockets listen on the same address and port.
+> >
+> > For the server side, it needs to add all the clients information
+> > with the TCP_MD5SIG option. For socket1 that binded on the
+> > eth0, it will add all the client addresses that come from eth0 to the
+> > socket1 with TCP_MD5SIG. So the server knows the clients.
+>
+> Right, but I meant the _client_ side doesn't know the details of the
+> other side, that is to say, the server side needs to keep sure the
+> client server easily connects to your preferred listener regardless of
+> what the selection algorithm looks like. In terms of what you
+> depicted, I see your point. One question is if the kernel or API
+> provides any rules and instructions to the users that on the server
+> side the sk1 must be selected in your case? Is it possible for other
+> cases where the sk2 is the preferable/ideal one? I'm not sure if it's
+> worth 'fixing' it in the kernel.
 
-But why do you need 'addr' at all? Current netdev address can be
-retrieved from netdev, why do you need to store it within driver's
-structure?
+What does sk2 represent here? I don't think that the sk2 should
+be preferable. For now, it is selected by the creating order, and
+there should not be a case that relies on the socket creation
+order......would it?
 
+So the socket should be selected by priority, and sk1, which is binded
+on eth0, has higher priority, which is awarded by the users.
+
+I noticed that the net-next is open, so we can use Kuniyuki's
+solution instead, which is better for the performance ;)
+
+Thanks!
+Menglong Dong
 
