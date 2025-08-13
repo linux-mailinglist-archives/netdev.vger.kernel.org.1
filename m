@@ -1,146 +1,161 @@
-Return-Path: <netdev+bounces-213316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213317-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1642AB24895
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 13:39:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55B0EB24899
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 13:40:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 734DD3B007B
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 11:38:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 304B3683E35
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 11:39:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3D6B2F6596;
-	Wed, 13 Aug 2025 11:38:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93B812F7453;
+	Wed, 13 Aug 2025 11:39:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="lTiqdsfR"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AD8428F4;
-	Wed, 13 Aug 2025 11:38:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 040FF74420;
+	Wed, 13 Aug 2025 11:39:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755085100; cv=none; b=jD98g1PFaZdYhuLO/QYSAzIQ4PPpqi5cGBVDV5Pph8wUg9ak37lPGxO0jpDOll9sdDL3U189sJ9iEl8We3DRARNd4uN+sVDwy0Jj3W/XRXDMU2BrJz/zKhppsPu2tLFYtnHcXWkrC7TdQgCWt9+htg+twlCiF4UX5ZCiFDDHH3g=
+	t=1755085189; cv=none; b=kpdjPlv5B/ZjBuer1aFv/aaInQQy6wWGJMHLzupCZzNFWn5plVdZJqAtCBEnVffyLAgmpbjthnpTyUnFUEVyiiS1tMDWSt3qiP4+sybzk5ZjatPUX7oBtrmJzFYmclh59bQX2wIXWNzVC7icXojI5z0keeJUfM5wm5lrhy3ZES8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755085100; c=relaxed/simple;
-	bh=twbEC2WDOua5XUTE8jPyd+Hn1+kSacYmE5jIoa1dxSQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Q8HiNWWi8SGSWVYjlK/eHaTGor2RWIcKDgxYZHCkFG++xn73/T/UX5NpMibSDX4nlYPFnlNWzcl7pF6ThDAA4zdne9TQSsYPNspUrfpLGVl/IBl1nTCQenjpMeZtuEWVO6ntURPw5NxmJCjdibrlIQoDcX9A5Tl9wht/c39bv84=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id 8BAA3605CE; Wed, 13 Aug 2025 13:38:17 +0200 (CEST)
-From: Florian Westphal <fw@strlen.de>
-To: <netdev@vger.kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	<netfilter-devel@vger.kernel.org>,
-	pablo@netfilter.org
-Subject: [PATCH net 3/3] netfilter: nf_tables: reject duplicate device on updates
-Date: Wed, 13 Aug 2025 13:36:38 +0200
-Message-ID: <20250813113800.20775-4-fw@strlen.de>
-X-Mailer: git-send-email 2.49.1
-In-Reply-To: <20250813113800.20775-1-fw@strlen.de>
-References: <20250813113800.20775-1-fw@strlen.de>
+	s=arc-20240116; t=1755085189; c=relaxed/simple;
+	bh=Zi6Z75oIMtn8beKtFputqAn8NKkyXzfJHRrfLH3JN/w=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:CC:References:
+	 In-Reply-To:Content-Type; b=FVtjUWZ9+WGlPEHEBahvRrsW2pivIK59IMwHqbKr8eKUd3ez8uaQCrfuBWZJkhIBzlgS/PiwDp5BM2GcjPFnRYbqIjVXAEVgc9TPRP4PhI+VgF5fjh3QrRffwifZXQBVEO44vZcZKY/0mjqIg8YBakGgup29/pD5wXCZ+FIwMQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=lTiqdsfR; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57DBLbgk002778;
+	Wed, 13 Aug 2025 11:39:32 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	UJq5xl9wnlbTfrwZF8n2U+4EQciaitdnUfm2jP4aBNY=; b=lTiqdsfRl1pFVuwm
+	yg/nPzzH+T/3ZpVcXGcBcKvj6W4CUgQt3GrsWAXt0o25/nzrEC/gWww87fvRxrjy
+	wkykHSme6IyOui/BEd2p6kDz3FySkuGb2mUcmj/Fl7V+mSa7i+btrZKEL8gE9oTq
+	TUJP3Jt68qZ11KxOjR52tATYHhFCBVlcTtWyqMBGnipDC+5ETpUwEcfWNFrHf8kJ
+	y1DJJi/0cSD122xtpTMXWa7jMqgN9NaHxV2vicnfJhiqDBN7vsWYBbxnZf1yHRG1
+	l9SKICOO5cULnBCgKkljTu7u22HJka8Edre01kUYg1lbSxyfo+IEDwRFyMHRE/rG
+	+JA73Q==
+Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 48dxdv3kk5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 13 Aug 2025 11:39:31 +0000 (GMT)
+Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
+	by NASANPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 57DBdUQo008472
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 13 Aug 2025 11:39:30 GMT
+Received: from [10.235.9.75] (10.80.80.8) by nasanex01b.na.qualcomm.com
+ (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.10; Wed, 13 Aug
+ 2025 04:39:25 -0700
+Message-ID: <ccb022ab-45a8-4e97-8b63-4d2921ebfadc@quicinc.com>
+Date: Wed, 13 Aug 2025 19:39:23 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+From: Luo Jie <quic_luoj@quicinc.com>
+Subject: Re: [PATCH net-next v7 03/14] net: ethernet: qualcomm: Add PPE driver
+ for IPQ9574 SoC
+To: Randy Dunlap <rdunlap@infradead.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, "Rob
+ Herring" <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        "Conor
+ Dooley" <conor+dt@kernel.org>,
+        Lei Wei <quic_leiwei@quicinc.com>,
+        "Suruchi
+ Agarwal" <quic_suruchia@quicinc.com>,
+        Pavithra R <quic_pavir@quicinc.com>, Simon Horman <horms@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>, Kees Cook
+	<kees@kernel.org>,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        "Philipp
+ Zabel" <p.zabel@pengutronix.de>
+CC: <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>, <linux-hardening@vger.kernel.org>,
+        <quic_kkumarcs@quicinc.com>, <quic_linchen@quicinc.com>
+References: <20250812-qcom_ipq_ppe-v7-0-789404bdbc9a@quicinc.com>
+ <20250812-qcom_ipq_ppe-v7-3-789404bdbc9a@quicinc.com>
+ <5ee33ac3-c23e-4da7-87bc-2a5ea6e93afe@infradead.org>
+Content-Language: en-US
+In-Reply-To: <5ee33ac3-c23e-4da7-87bc-2a5ea6e93afe@infradead.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01b.na.qualcomm.com (10.46.141.250)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Authority-Analysis: v=2.4 cv=IuYecK/g c=1 sm=1 tr=0 ts=689c7973 cx=c_pps
+ a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
+ a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10
+ a=yauDWUx4ckUadswYq4AA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: HPXd7wzleDymh-hJW_R1aw-SCfLCbgzB
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODA5MDAyNSBTYWx0ZWRfX5i13+qW4nDqh
+ usNlwPqDoA5CNuTNowKAdonAV7zadljzx9q3fqcxT+1U2TJ07AUN/7VCjWN15jv3mbCvze9A2Uz
+ QI4CwGUmrc62E2ULgQkvAOJuGB9UCEj7XUtOTo8ReP8uZjXUj7Bgn5qTfTCa+dbzSNWi5iCzo2a
+ z6VUSqtH1stODts+15mlPPTJ4kD9k1TJh9yonz9Uqhceyx9MaoD5cbPclc6gAq9ArsbZJp44udY
+ OjHGH8SMve90uCrZo52J30m8Rj3hHkOaiwQUYbLe94ZZ3e9vZS/j/J1JnOpnzk9gCVhyXBwKNmS
+ GkodGwC94senKvc1Sy2Cv6boQGsLhbMsz2WwD0EI//G8DsPU1vRzGiR8Ws+yPTJxzv2/JQWBGrm
+ nwqGpvKy
+X-Proofpoint-GUID: HPXd7wzleDymh-hJW_R1aw-SCfLCbgzB
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-08-13_01,2025-08-11_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 malwarescore=0 spamscore=0 priorityscore=1501 adultscore=0
+ clxscore=1011 phishscore=0 suspectscore=0 bulkscore=0 classifier=typeunknown
+ authscore=0 authtc= authcc= route=outbound adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2507300000 definitions=main-2508090025
 
-From: Pablo Neira Ayuso <pablo@netfilter.org>
 
-A chain/flowtable update with duplicated devices in the same batch is
-possible. Unfortunately, netdev event path only removes the first
-device that is found, leaving unregistered the hook of the duplicated
-device.
 
-Check if a duplicated device exists in the transaction batch, bail out
-with EEXIST in such case.
+On 8/13/2025 12:54 AM, Randy Dunlap wrote:
+> 
+> 
+> On 8/12/25 7:10 AM, Luo Jie wrote:
+>> diff --git a/drivers/net/ethernet/qualcomm/Kconfig b/drivers/net/ethernet/qualcomm/Kconfig
+>> index a4434eb38950..6e56b022fc2d 100644
+>> --- a/drivers/net/ethernet/qualcomm/Kconfig
+>> +++ b/drivers/net/ethernet/qualcomm/Kconfig
+>> @@ -60,6 +60,21 @@ config QCOM_EMAC
+>>   	  low power, Receive-Side Scaling (RSS), and IEEE 1588-2008
+>>   	  Precision Clock Synchronization Protocol.
+>>   
+>> +config QCOM_PPE
+>> +	tristate "Qualcomm Technologies, Inc. PPE Ethernet support"
+>> +	depends on HAS_IOMEM && OF
+>> +	depends on COMMON_CLK
+>> +	select REGMAP_MMIO
+>> +	help
+>> +	  This driver supports the Qualcomm Technologies, Inc. packet
+>> +	  process engine (PPE) available with IPQ SoC. The PPE includes
+>> +	  the ethernet MACs, Ethernet DMA (EDMA) and switch core that
+> 
+> Please use ethernet or Ethernet consistently.
 
-WARNING is hit when unregistering the hook:
+OK, I will update to use "Ethernet" consistently throughout the code.
 
- [49042.221275] WARNING: CPU: 4 PID: 8425 at net/netfilter/core.c:340 nf_hook_entry_head+0xaa/0x150
- [49042.221375] CPU: 4 UID: 0 PID: 8425 Comm: nft Tainted: G S                  6.16.0+ #170 PREEMPT(full)
- [...]
- [49042.221382] RIP: 0010:nf_hook_entry_head+0xaa/0x150
-
-Fixes: 78d9f48f7f44 ("netfilter: nf_tables: add devices to existing flowtable")
-Fixes: b9703ed44ffb ("netfilter: nf_tables: support for adding new devices to an existing netdev chain")
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
-Signed-off-by: Florian Westphal <fw@strlen.de>
----
- net/netfilter/nf_tables_api.c | 30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
-
-diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
-index 13d0ed9d1895..58c5425d61c2 100644
---- a/net/netfilter/nf_tables_api.c
-+++ b/net/netfilter/nf_tables_api.c
-@@ -2803,6 +2803,7 @@ static int nf_tables_updchain(struct nft_ctx *ctx, u8 genmask, u8 policy,
- 	struct nft_chain *chain = ctx->chain;
- 	struct nft_chain_hook hook = {};
- 	struct nft_stats __percpu *stats = NULL;
-+	struct nftables_pernet *nft_net;
- 	struct nft_hook *h, *next;
- 	struct nf_hook_ops *ops;
- 	struct nft_trans *trans;
-@@ -2845,6 +2846,20 @@ static int nf_tables_updchain(struct nft_ctx *ctx, u8 genmask, u8 policy,
- 				if (nft_hook_list_find(&basechain->hook_list, h)) {
- 					list_del(&h->list);
- 					nft_netdev_hook_free(h);
-+					continue;
-+				}
-+
-+				nft_net = nft_pernet(ctx->net);
-+				list_for_each_entry(trans, &nft_net->commit_list, list) {
-+					if (trans->msg_type != NFT_MSG_NEWCHAIN ||
-+					    trans->table != ctx->table ||
-+					    !nft_trans_chain_update(trans))
-+						continue;
-+
-+					if (nft_hook_list_find(&nft_trans_chain_hooks(trans), h)) {
-+						nft_chain_release_hook(&hook);
-+						return -EEXIST;
-+					}
- 				}
- 			}
- 		} else {
-@@ -9060,6 +9075,7 @@ static int nft_flowtable_update(struct nft_ctx *ctx, const struct nlmsghdr *nlh,
- {
- 	const struct nlattr * const *nla = ctx->nla;
- 	struct nft_flowtable_hook flowtable_hook;
-+	struct nftables_pernet *nft_net;
- 	struct nft_hook *hook, *next;
- 	struct nf_hook_ops *ops;
- 	struct nft_trans *trans;
-@@ -9076,6 +9092,20 @@ static int nft_flowtable_update(struct nft_ctx *ctx, const struct nlmsghdr *nlh,
- 		if (nft_hook_list_find(&flowtable->hook_list, hook)) {
- 			list_del(&hook->list);
- 			nft_netdev_hook_free(hook);
-+			continue;
-+		}
-+
-+		nft_net = nft_pernet(ctx->net);
-+		list_for_each_entry(trans, &nft_net->commit_list, list) {
-+			if (trans->msg_type != NFT_MSG_NEWFLOWTABLE ||
-+			    trans->table != ctx->table ||
-+			    !nft_trans_flowtable_update(trans))
-+				continue;
-+
-+			if (nft_hook_list_find(&nft_trans_flowtable_hooks(trans), hook)) {
-+				err = -EEXIST;
-+				goto err_flowtable_update_hook;
-+			}
- 		}
- 	}
- 
--- 
-2.49.1
+> 
+>> +	  supports L3 flow offload, L2 switch function, RSS and tunnel
+>> +	  offload.
+>> +
+>> +	  To compile this driver as a module, choose M here. The module
+>> +	  will be called qcom-ppe.
+>> +
 
 
