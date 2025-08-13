@@ -1,139 +1,117 @@
-Return-Path: <netdev+bounces-213268-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B67C9B244C3
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 10:55:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A7C63B244CC
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 10:58:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C6C9F1889350
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 08:55:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C4037188CA9A
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 08:58:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28DBE2ED175;
-	Wed, 13 Aug 2025 08:54:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03CFF2ED175;
+	Wed, 13 Aug 2025 08:58:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gkB0DENA"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Oc5+H8V1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay16.mail.gandi.net (relay16.mail.gandi.net [217.70.178.236])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EECFC2ECEAB;
-	Wed, 13 Aug 2025 08:54:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 794742D061E;
+	Wed, 13 Aug 2025 08:58:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.236
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755075281; cv=none; b=QL1RirvPqfetAbVKUeV+6FbK5tzwvdUYzD8/eF8zill8JdRIkvJN8fq6vi6SHzVf5wiArfaXc7MM//WC9ikc0ldesy3+15LKunXuCX4MC7DjEceWdEjfeyN7xuS3iRUPh3ZicR6T4GHU9wADSX2zHU+m7y8dwWW+2jCMkngxbmY=
+	t=1755075502; cv=none; b=FupDyBuPfnHr9aqrsHNlQ/8kwrMHJO4A6+Fhmu9hHu/dhc7qPhtrECnvQNZui42nF8MdW9wYzZyiDsomhfsphhCuDROPErk7cqHNX/vcJPE9vjRSlpff6RAjcpV1CDLpvLzm3rwxOb9c+R3ELA6K4NBVhssveEU54kvKHQzYkZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755075281; c=relaxed/simple;
-	bh=SBXBWsF/p9NKoJCWyngak/HD9GTkihC0XAEtH+NHPaU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=b/flKVz4OxtdFL+v4l1+EMB81EBp6f78pGNuO5/dEb5w4NtnMy+YoDZIjS6ttobyCFavhg7Zs0ODhQCoUpKINJN1kXwiGu3Zu732/+IQbE0YxpewxY74jBKH3dqPkXHDucsC70fcMsneK6ZVevRzYvDXfVOs1XLLRM+AO/d5nK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gkB0DENA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37C3DC4CEEB;
-	Wed, 13 Aug 2025 08:54:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755075280;
-	bh=SBXBWsF/p9NKoJCWyngak/HD9GTkihC0XAEtH+NHPaU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=gkB0DENAHiMv1bTV0uLkAOQtPelp8vcSXECcmJM1R8fLXEb+A/yNSIS0Lw5g/aNLq
-	 TScjivlOvmkh7LBv6vZuPf17tX/AEY+NwOf53y4mJZTF7N82ecPlFHRIFCkJoVpIqW
-	 Pd0PYJbXGIzPSwqVgib7ILcfUzFxfqcaEMmGH6qI1ymzYckc2KQbiebdU2wxUaOJIa
-	 r8EXvG/9cNxgcghFbKP5v8lD3OgY4KcRtXtg8dCIdQsUj/AJVQspscW02B6BvnvM1j
-	 GSsw2Gso6j90PUTrIAdD6q0ujq/FxP0XsJWpG/myCkLTddEzOzPRj8HST0bDnyoiNe
-	 KRZA8hDbrL9ZA==
-Message-ID: <3f267fa4-4266-40fa-a485-bd14012f4b61@kernel.org>
-Date: Wed, 13 Aug 2025 10:54:33 +0200
+	s=arc-20240116; t=1755075502; c=relaxed/simple;
+	bh=o9sBv3uWVhgNJc2jzb/XTDzr77JaC5G3nW4je6txHZM=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=HT5+28L6dG4jtl6th+bO9ahxpgoBEpAQrW/e7G6dWtu2DXPC2xzI58mVLOYs970UhcGNJgUL8yiY9lptC1toJ/q+WnQzIAri0yKuGEUZCrw/BrYdElkrkotmERPxjAwxWIBtIs65oDYGS28Ih9fI0DFQTG+p7L2H77GCoKRF1Ac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Oc5+H8V1; arc=none smtp.client-ip=217.70.178.236
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id E271843888;
+	Wed, 13 Aug 2025 08:58:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1755075498;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=bcnlfncs0tTOrnBAv8lWMTl1GGwu4KPhepL66SNxFiA=;
+	b=Oc5+H8V1glgn99KdP55+X/h8lTK8eD59sr/Zl8z8FdrwbYIH5oi3wvjfPdyOTBjMJzFJBC
+	6B+v7BtcZRyEtSwOqEgmNicTMr6FbsDKXEdIYD8Af8FihkUw9m8hoa1ttu4nwqz6R+Yoik
+	EepwsnlEAXxBS6L2EjO/oSLIngoVuujo7EEqpNYOXJhOj6zbwmz6McNINan7G1mkV1zSv3
+	9vDOekvx4URCcJo4s4VC5IUy9Lp+mMmM3939cEtka5Ez3/OT3Bg4Umj0TT938IIDLrHHjQ
+	/WqBX8/vfZAIUpOv+MBx7Wwu+/Wyt/4iiqg7OaapicKMBsuPLO9Mn6reNQfwdg==
+From: Kory Maincent <kory.maincent@bootlin.com>
+Subject: [PATCH ethtool v2 0/3] Add support for PSE priority feature and
+ PSE event monitoring
+Date: Wed, 13 Aug 2025 10:57:49 +0200
+Message-Id: <20250813-b4-feature_poe_pw_budget-v2-0-0bef6bfcc708@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH v3 net-next 02/12] mptcp: Use tcp_under_memory_pressure()
- in mptcp_epollin_ready().
-Content-Language: en-GB, fr-BE
-To: Kuniyuki Iwashima <kuniyu@google.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Neal Cardwell <ncardwell@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>,
- Mat Martineau <martineau@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
- Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>,
- Shakeel Butt <shakeel.butt@linux.dev>,
- Andrew Morton <akpm@linux-foundation.org>, =?UTF-8?Q?Michal_Koutn=C3=BD?=
- <mkoutny@suse.com>, Tejun Heo <tj@kernel.org>
-Cc: Simon Horman <horms@kernel.org>, Geliang Tang <geliang@kernel.org>,
- Muchun Song <muchun.song@linux.dev>, Mina Almasry <almasrymina@google.com>,
- Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org,
- mptcp@lists.linux.dev, cgroups@vger.kernel.org, linux-mm@kvack.org
-References: <20250812175848.512446-1-kuniyu@google.com>
- <20250812175848.512446-3-kuniyu@google.com>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20250812175848.512446-3-kuniyu@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAI1TnGgC/3WNwQqDMBBEf6XsuSlriNb21P8oIibZaMC6kkTbI
+ v57g/ce5vAY5s0GkYKnCPfTBoFWHz1PGeT5BGbopp6Et5lBolSFRCW0Eo66tARqZ855t3qxPSW
+ BHVFdSeVMWUKez4Gc/xzqJ1AaEvMITS4GHxOH73G5Fked7SVWEv/b10KgQG311Up9M7V7aOY0+
+ uli+AXNvu8/lJRMn8sAAAA=
+To: Oleksij Rempel <o.rempel@pengutronix.de>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Andrew Lunn <andrew@lunn.ch>, Michal Kubecek <mkubecek@suse.cz>
+Cc: Dent Project <dentproject@linuxfoundation.org>, 
+ Kyle Swenson <kyle.swenson@est.tech>, 
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Kory Maincent <kory.maincent@bootlin.com>
+X-Mailer: b4 0.15-dev-8cb71
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgddufeejjeelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhufffkfggtgfgvfevofesthekredtredtjeenucfhrhhomhepmfhorhihucforghinhgtvghnthcuoehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeduhfevudetfffgkedvhfevheeghedtleeghfffudeiffefvdehfeegieeivdekteenucffohhmrghinhepkhgvrhhnvghlrdhorhhgpdgsohhothhlihhnrdgtohhmnecukfhppeeltddrkeelrdduieefrdduvdejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledtrdekledrudeifedruddvjedphhgvlhhopegluddvjedrtddruddrudgnpdhmrghilhhfrhhomhepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepudefpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehmkhhusggvtggvkhesshhushgvrdgtiidprhgtphhtthhopehordhrvghmphgvlhesphgvn
+ hhguhhtrhhonhhigidruggvpdhrtghpthhtohepkhihlhgvrdhsfigvnhhsohhnsegvshhtrdhtvggthhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepuggvnhhtphhrohhjvggttheslhhinhhugihfohhunhgurghtihhonhdrohhrgh
 
-Hi Kuniyuki,
+From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 
-On 12/08/2025 19:58, Kuniyuki Iwashima wrote:
-> Some conditions used in mptcp_epollin_ready() are the same as
-> tcp_under_memory_pressure().
-> 
-> We will modify tcp_under_memory_pressure() in the later patch.
-> 
-> Let's use tcp_under_memory_pressure() instead.
+Add support for PSE (Power Sourcing Equipment) priority management and
+event monitoring capabilities.
 
-Good idea, thanks!
+Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+---
+Changes in v2:
+- Split the second patch in two to separate the PSE priority feature and
+  the PSE event feature support.
+- Regenerate the "update UAPI header copies" patch.
+- Link to v1: https://lore.kernel.org/r/20250620-b4-feature_poe_pw_budget-v1-0-0bdb7d2b9c8f@bootlin.com
 
-Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+---
+Kory Maincent (3):
+      update UAPI header copies
+      ethtool: pse-pd: Add PSE priority support
+      ethtool: pse-pd: Add PSE event monitoring support
 
-Cheers,
-Matt
+ ethtool.8.in                           | 13 +++++
+ ethtool.c                              |  1 +
+ netlink/monitor.c                      |  9 +++-
+ netlink/netlink.h                      |  1 +
+ netlink/pse-pd.c                       | 87 ++++++++++++++++++++++++++++++++++
+ uapi/linux/ethtool.h                   |  4 +-
+ uapi/linux/ethtool_netlink.h           |  2 -
+ uapi/linux/ethtool_netlink_generated.h | 83 ++++++++++++++++++++++++++++++++
+ uapi/linux/if_link.h                   |  2 +
+ uapi/linux/neighbour.h                 |  5 ++
+ 10 files changed, 202 insertions(+), 5 deletions(-)
+---
+base-commit: 755f5d758e7a365d13140a130a748283b67f756e
+change-id: 20241204-b4-feature_poe_pw_budget-0aee8624fc55
+
+Best regards,
 -- 
-Sponsored by the NGI0 Core fund.
+Köry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
 
