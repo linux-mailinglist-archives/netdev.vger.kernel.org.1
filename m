@@ -1,115 +1,121 @@
-Return-Path: <netdev+bounces-213417-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213418-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 145A5B24EAA
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 18:04:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29A80B24E9D
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 18:03:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D88FB9A4075
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 15:55:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F68F9A179A
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 15:56:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1994127E1A1;
-	Wed, 13 Aug 2025 15:49:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 828F224291B;
+	Wed, 13 Aug 2025 15:51:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LYUIMWMt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z/qMCFrf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CFD31F4703;
-	Wed, 13 Aug 2025 15:49:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54FDFC148;
+	Wed, 13 Aug 2025 15:51:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755100184; cv=none; b=selpaKoeYl+NKQbq7UTpzXB2o0hkxAMHOdGynsQ9QxnVsKsNtNRiYK/ifLPXfkCdZb0bRXdlOdOTbJ8HTKLHafUzwlWOomAHpF/IY7oHYPiOdsVWoXBas9GFTsOr9GkFwQA9cdzhCYJohrTcZYE9aa+kqEQx1SSWzT/7gXLL2CA=
+	t=1755100294; cv=none; b=um/aISNO80biGrDqFffwm4yfGpJZKLClJ0GyrCgBScy/3nHbXHpJL36zXMyPS+iGMiEq0GhcjQByCRVviM52ovoffRTQ6AABLs2BYx+aw1uRcZNSGHCinoIdYjX3S+OAHAXUEnM+kAchLXEzmKVAp4BD7NvX98im1IjDwO27MWY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755100184; c=relaxed/simple;
-	bh=CsYvuJxSVYzNNupPDsZKGz0kEZwDe4aG9Y9BcoWUHK0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ptW+IfW3XDx6/Nl3cchxHo01Jz2pyeQpvlic8ucYuFbF8LpjXVxC9zkaG/fcGQcQUkP3OHCF63gbA29lG/f+LniOfWx8ngGNutyoD4lja6tY96PwLYAyukn3XeSJ1s/U35vQLYiBeFmle0nRafUrEAU/doVetagyqYqhaxNhTqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LYUIMWMt; arc=none smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-3b913b7dbe3so976365f8f.1;
-        Wed, 13 Aug 2025 08:49:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755100181; x=1755704981; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=A1nl6t4UrYnJgiJX3eQ/5I9NfdeiMwCWkTmXotlRLfw=;
-        b=LYUIMWMtLeWz4HClabbij1NUjyRAAiMVU7k+ErTNBkXiDADGrA0ENiCBLCJF4Wa5DH
-         nZR6QU8h/rsWffy8ZS0zElQXLyXxb8bkdmNzGmZWpO9VBMSvtPyEZ4rbN/qjWTzCClFv
-         IiBTpvWSvvaBwPVjB84XRsu1fFcHEFX4zzXIxZA2t0pBmMj0O3Dk+awWLdPe1Zci3/DL
-         4jPlQtf/eg/9FkNo4ARvpmTP5/7GdwkiOgY3q6ZC5Zzv2QMAVlTdW8TjDaouO20+6/o4
-         v0wiU5t/2xncj8JMTDwju7Qf/qFuqV6rm13uI7guWbVr4sCt+Pufj0lVAxZgeaPWy9LX
-         kyAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755100181; x=1755704981;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=A1nl6t4UrYnJgiJX3eQ/5I9NfdeiMwCWkTmXotlRLfw=;
-        b=JYSW6+8HQGhWKruGKwypDGzQ6zLJPWbQWpqUBZ87O/AHW3LysMgQIN6USXXjKS3NsM
-         m+DIjOvQj3oA7DAAZrSvhFW/odMj+WfS2Yg0VSFXorNrV5RbTpxGVritYTZZdoo2TnRb
-         z1Z+XPGNAyxRVVQmGA+BEo7g9KRzFhcgvtPr28XJ9l5n7PbtmQNMFKonG2c58zilyB5t
-         /jggg+6RhgIqI6qPX3Y046lydrb2RBMvuf1DSqRFjvU7FmJ/6kHMCfKXbcRQSjPQPv+v
-         WNW0WxMD+xUqelbl7tQ9NEWyumbiEpmvEekLQagpxwY4YDhTbcbVE+t1tJRs664cBKBe
-         /mMA==
-X-Forwarded-Encrypted: i=1; AJvYcCWHuyea4XH0AtFm0BJNSZZjRsf0L+jp1sXHqcRAa8BWfJTWH+TkU6SWhN6Mwj/G89AAqQrTL1OlIPw2SxE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8yHLxS/viEYIHbdiyXbQ1uXFuCI9aa/rNKEGUNzp2BqMIEuBr
-	e7w6+xUPKbF63p5yLrwQbmiGw7uehOoeWLd847TMVocUrN7bC2lajMMC
-X-Gm-Gg: ASbGncu8dsyDTZOVi1gGaRO23HzZyCnmVQg//nIdRsNSRIerD5nYTvlr82+AkQgPsZL
-	JAbM5SmUEG/oRX/vjeKr1laooomFi3R15whgpojFBpQZQE5j35aimpRb4/KDOpeqFae8/THluSr
-	ZItK07PECt7tm1ag8AvReRl2E1a7fvvIAd8k5opZ2JvZObS82Hxs31jSQZbtKkNeA2+1rbLWaan
-	m6YWwocffVWwG3s1aobjGGKhYPDPnc8tYkM0zKqxzuCGICvb3P1306YrWtrM6N8rw3ybcmv8rdI
-	53ISGOjuEWYaswl9iaLFlj/ylUyuw1EWh1DxPl3Wk9nQbBoo0HkRAubbYibVmGTtXPUSz8cEBw1
-	DSvPySXOtEkWrZgJuDGnSHf5EAy9B76yxOj/pPSJsDe5S
-X-Google-Smtp-Source: AGHT+IE549XRhClWITeC14rDRnNihbIydw6bo0X/3sR1LQozFnF08n9/ldro8THKIenk544BUeHxcg==
-X-Received: by 2002:a05:6000:4006:b0:3b7:9ae0:2e5e with SMTP id ffacd0b85a97d-3b917d24bfemr3048304f8f.9.1755100180598;
-        Wed, 13 Aug 2025 08:49:40 -0700 (PDT)
-Received: from localhost ([45.10.155.14])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b79c4533f1sm48530989f8f.42.2025.08.13.08.49.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Aug 2025 08:49:40 -0700 (PDT)
-Message-ID: <1e8ba3fa-81b6-4921-a02b-1d6da756ecec@gmail.com>
-Date: Wed, 13 Aug 2025 17:49:31 +0200
+	s=arc-20240116; t=1755100294; c=relaxed/simple;
+	bh=Nned+2OXLAR4zbMBIAOqe5xsNi80BA2aVmJkwOizo/A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IKkKMNM92gvEoO3E2qzk6/2aTQEep3zJt5rTwSJ4zOgT8H+kTH8OMqRmtmm1KKMnN5+YxtKdWaGmJka/Y+lz34n6I9enah+wmuqQFi1iyi0Zhd50JobfEZpGH25WwpBV26KmSvkmBrS3x/IqzWAcxBvRcgR379t+J2ak5gtGLRA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z/qMCFrf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D53BFC4CEEB;
+	Wed, 13 Aug 2025 15:51:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755100293;
+	bh=Nned+2OXLAR4zbMBIAOqe5xsNi80BA2aVmJkwOizo/A=;
+	h=References:In-Reply-To:Reply-To:From:Date:Subject:To:Cc:From;
+	b=Z/qMCFrfEERYFA8IES6JygMml11nsuNkVSY1quWx7F+D7wF31X8MlEECLSfwkwWAn
+	 XErYabNXdin0znaccplF3O+tR9VQwLTZ7tbcFMgCaPHbmTlekDNr8uaiqJDUl51Stq
+	 py/Y0N+K8xtfU7tu3lHaGwJQw+Cl+U2m1o+SmO5zwJymG4DpqJpdeunaRdDBRELiO/
+	 hDV4EEZJuckxK5esHLkCxNzFlfvLsiAnIQjZf2qklf5/5AjrJK02kqvWogeNKO5K3R
+	 azAjg6YNxRQaeHDvwIJ3+T9GFckD7cK0J68bsFfelMdoMfSULnW259sdUXODJg7lyX
+	 MVjkXTUcS3Yag==
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-333a17be4e0so47496971fa.1;
+        Wed, 13 Aug 2025 08:51:33 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVUhtqrQDwZ+weBfrllBIOHac2fBJd5SSG8NvZr5pZiNPN1vgjR1P9l1sm+y6QfKZiE82VK0f5c@vger.kernel.org, AJvYcCW2nn5LFvMGxLSQhSxQQ/D/ECUz9pfLX7EiKjDKyR/Fj2KEdsjvu57xIwapg7QTCG8H69LKHugbR04Nhe+U@vger.kernel.org, AJvYcCXDsrbHuMsMo2S+DEOeLDqgHbB9+irc9vikE3PmRz7CasE2LA/nz/qq1Qq7k78my2TRernSQalMi5KZ@vger.kernel.org
+X-Gm-Message-State: AOJu0YwYQYG8C58lpIVng9OCR3D3ND4dqldoom3/rCuaUYoP6/D7arGT
+	k4f2gRREXYwZuFy57lUqZn1MbOP+nRPVg7Mux/egJJpvHUBG2OtsZ4MBTxdq19XxKtCh2BvfuuJ
+	g+zja4BrKtuOpBBActRNF3dg6dMtj9Do=
+X-Google-Smtp-Source: AGHT+IF/AlFvjXg9axEmXPnPSPFeb7xCGFHKQ17NbUjRATjXnSeff8Hv94XSiaaI3kXUimdVd3Yinhj/CTkIyHUENJo=
+X-Received: by 2002:a05:651c:20cf:20b0:332:6304:3076 with SMTP id
+ 38308e7fff4ca-333e9548740mr7131671fa.1.1755100292240; Wed, 13 Aug 2025
+ 08:51:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v5 5/5] selftests/net: add vxlan localbind
- selftest
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- donald.hunter@gmail.com, andrew+netdev@lunn.ch, dsahern@kernel.org,
- shuah@kernel.org, daniel@iogearbox.net, jacob.e.keller@intel.com,
- razor@blackwall.org, petrm@nvidia.com, menglong8.dong@gmail.com,
- martin.lau@kernel.org, linux-kernel@vger.kernel.org
-References: <20250812125155.3808-1-richardbgobert@gmail.com>
- <20250812125155.3808-6-richardbgobert@gmail.com> <aJx6pUrnRMnh0RAU@shredder>
-From: Richard Gobert <richardbgobert@gmail.com>
-In-Reply-To: <aJx6pUrnRMnh0RAU@shredder>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20250813145540.2577789-1-wens@kernel.org> <20250813145540.2577789-7-wens@kernel.org>
+ <aJyraGJ3JbvfGfEw@shell.armlinux.org.uk>
+In-Reply-To: <aJyraGJ3JbvfGfEw@shell.armlinux.org.uk>
+Reply-To: wens@kernel.org
+From: Chen-Yu Tsai <wens@kernel.org>
+Date: Wed, 13 Aug 2025 23:51:18 +0800
+X-Gmail-Original-Message-ID: <CAGb2v67cKrQygew2CVaq5GCGvzcpkSdU_12Gjq9KR7tFFBow0Q@mail.gmail.com>
+X-Gm-Features: Ac12FXym9NQN41ia2Vqvuf9FmKIFWMrTnliSDOIAEvwEtKHt0VT0y1bsZEx7Lbg
+Message-ID: <CAGb2v67cKrQygew2CVaq5GCGvzcpkSdU_12Gjq9KR7tFFBow0Q@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 06/10] arm64: dts: allwinner: a527: cubie-a5e:
+ Add ethernet PHY reset setting
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Jernej Skrabec <jernej@kernel.org>, Samuel Holland <samuel@sholland.org>, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	Andre Przywara <andre.przywara@arm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Ido Schimmel wrote:
-> On Tue, Aug 12, 2025 at 02:51:55PM +0200, Richard Gobert wrote:
->> Test to make sure the localbind netlink option works
->> in VXLAN interfaces.
-> 
-> Thanks for adding a test. A few clerical comments:
-> 
-> 1. Indentation is inconsistent. Please convert to 8 characters tabs.
-> 
-> 2. netdev CI started running shellcheck. I don't think you can eliminate
-> all the errors, but some can be easily fixed.
-> 
-> 3. There's a blank line at the end of the file that should be removed.
+On Wed, Aug 13, 2025 at 11:12=E2=80=AFPM Russell King (Oracle)
+<linux@armlinux.org.uk> wrote:
+>
+> On Wed, Aug 13, 2025 at 10:55:36PM +0800, Chen-Yu Tsai wrote:
+> > diff --git a/arch/arm64/boot/dts/allwinner/sun55i-a527-cubie-a5e.dts b/=
+arch/arm64/boot/dts/allwinner/sun55i-a527-cubie-a5e.dts
+> > index 70d439bc845c..d4cee2222104 100644
+> > --- a/arch/arm64/boot/dts/allwinner/sun55i-a527-cubie-a5e.dts
+> > +++ b/arch/arm64/boot/dts/allwinner/sun55i-a527-cubie-a5e.dts
+> > @@ -94,6 +94,9 @@ &mdio0 {
+> >       ext_rgmii_phy: ethernet-phy@1 {
+> >               compatible =3D "ethernet-phy-ieee802.3-c22";
+> >               reg =3D <1>;
+> > +             reset-gpios =3D <&pio 7 8 GPIO_ACTIVE_LOW>; /* PH8 */
+> > +             reset-assert-us =3D <10000>;
+> > +             reset-deassert-us =3D <150000>;
+>
+> Please verify that kexec works with this, as if the calling kernel
+> places the PHY in reset and then kexec's, and the reset remains
+> asserted, the PHY will not be detected.
 
-I'll take a look. Thanks.
+I found this to be a bit confusing to be honest.
+
+If I put the reset description in the PHY (where I think it belongs),
+then it wouldn't work if the reset isn't by default deasserted (through
+some pull-up). This would be similar to the kexec scenario.
+
+Whereas if I put the reset under the MDIO bus, then the core would
+deassert the reset before scanning the bus.
+
+It's confusing to me because the code already goes through the MDIO bus
+device tree node and *knows* that there are PHYs under it, and that the
+PHYs might have a reset. And it can even handle them _after_ the initial
+bus scan.
+
+Describing the PHY reset as a bus reset IMHO isn't correct.
+
+
+ChenYu
 
