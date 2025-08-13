@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-213390-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213391-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41F1DB24D60
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 17:30:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A215B24D65
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 17:31:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E06A3A9537
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 15:26:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1EF53BFCB0
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 15:27:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DFB52367B1;
-	Wed, 13 Aug 2025 15:26:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4DCC233712;
+	Wed, 13 Aug 2025 15:27:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OvGJYVng"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gQIqzT5R"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA0EF235341;
-	Wed, 13 Aug 2025 15:26:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DABCB2376F2;
+	Wed, 13 Aug 2025 15:27:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755098782; cv=none; b=NDGn5JUXkMjNOQObxr+4U/ghBCFOVIoUPTztMxU4hZUZ8GxMxLKdPyRgj5F5Xp5NOdESRz7ta/q68Hjp0eHfezx/GxvsgFYxsAMdpGBn+UeX3gC6OiQki8BzwDMzBt+aki5OiY9E/g5ZVzfP1un4qzZ/wUkMZ3+55yxCJgJh1kI=
+	t=1755098832; cv=none; b=oNKFBYC1J1gjJKQ8j1ShnbgkEvFEE/jT1Lpi1bXp8811dLPEXelVhCgP+X3utgk/mRbQxwlbH91T2UBtbwWghOHjlqgj5CsckeL7f/SoL/Q0PQUfJD5Zbq17bqP/d8pBSi59uXs/2TWNT6IwZ1x6gJBuEeh6nUhEGPMKs65OqKk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755098782; c=relaxed/simple;
-	bh=T9ew6vV7It536VuL2qh0FYOmync27BJ+NqE+bgI6NO4=;
+	s=arc-20240116; t=1755098832; c=relaxed/simple;
+	bh=alzjLEe2fEl8rrt5jUx+xc9uy3t9RY8ZhInQDMnJePA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bxeJDHNU9yO85QB5yrw9AHUVqQehKCsG6Eoiynr1mS6or0wlI83KpvmwZDcRVekB/E2r9/UVRHwRm1dbuQh2yS6OnkG7O7I7n2+orVSCvl5+8CigYl0ZEB+Cl5uIRzDxacVJ98fYeVycFOTzYYqeAdGO3svWbY0RGeFgGADtJCw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OvGJYVng; arc=none smtp.client-ip=209.85.128.41
+	 MIME-Version:Content-Type; b=KGefHnZhOOXQu2lMl73rgeciOxKBnOiV9h2iIPdDf/W0ct65UhkrP5nVGYrQZiwlXOQCVI5tFQBP2GtfsZhlVe7sLTxa9zuGYKuj+XYMgJ/cIU+5ykBK983UF5TraRGLYcVf5unugjzw2SP1JWejSnhoMPdoqahYTLDnX8yAzDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gQIqzT5R; arc=none smtp.client-ip=209.85.128.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-45a12b3f4b3so15303765e9.3;
-        Wed, 13 Aug 2025 08:26:19 -0700 (PDT)
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-459eb4ae596so61288455e9.1;
+        Wed, 13 Aug 2025 08:27:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755098778; x=1755703578; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1755098829; x=1755703629; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bHmzj/owjBnWQXccQqjtqoeZzUsvFVlqZRdyc+4n9B0=;
-        b=OvGJYVnghhi28Z/vyIwXXaJ73/C4tzPL3ty8ZRy8I5HKQGSj4wys9rDngh+dL5bmb+
-         g76nsoHo+QLfxxWTfJcYOTCJ9rJ//ykmd1fqY76iFaf4dQwumDdXoaao3fIld6vaWx5Q
-         W1o+3lH2+n0mo0TWVFK3ImOml9WWaoAsHn2lHFWcQwk89sGbnXCHvo3bmvcj5PkUhsHC
-         3aeTXTxnyTPkCbIXaxHQEJ93vQGEF/0uIqCvhK/8ajawy+9WxU1I+H7Mf9rLPAIroBhB
-         hRQ7ZSP80TxDUPp3BGDL8/aFZ44FaoulcdmzYa9tBu3mI7Ma9JrEFf/T5eKVFQ9psRga
-         EZWQ==
+        bh=LZIyAAVxGkCRQr9BUYAZ8nPgNM4Ndhfq5a5jE1scOa0=;
+        b=gQIqzT5R23JfKwuqlIdd/0VYLxZzcTOMtcTB1l6cq+EiZbro+Vb6/WUP96oJ5K04Ow
+         SacKeJseCjqmJqqm4INmyFxy+KN5pwa91RsQBknnks4uGSO12wd1ZJAMDW73YtksctiM
+         NRFg3uxAb4yfC8+w05LsC3xhPwR617X2o97wqg8y5Cr4y7PslIu/641R28q7DStdrLFX
+         iExJEYr5NWbjZ2W01GuSTXKRH2AZrsUN/tL+LMmkbIg8io8AENWcYQKJ/nTAz4GQI0Z7
+         ibD0gekbtb7VALg+FZx6PMbcg8R5YeTNh3k6oi8vu7NOIWgHMCSYIviZstN3iv+Gdjoq
+         X3zA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755098778; x=1755703578;
+        d=1e100.net; s=20230601; t=1755098829; x=1755703629;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=bHmzj/owjBnWQXccQqjtqoeZzUsvFVlqZRdyc+4n9B0=;
-        b=KWB3pQ3/DEgSyZ+VqaMI6JWhOju4EVqab4Wo4FXM4x2bOQ7Q7fl/8rTjcevAcZZjXQ
-         zlJtyNR3Ly6pUuN6jdPfva4I3k+3cyuXdR8YYPDlpuyX4Oej/1NGKhiID2rPCAszcxhL
-         8ElZBZ3lv1M3Jxv8zqID/9MDnbGCBaL9zX2Enmzy6PTrF++cZxDUWtrqx9yTnsXs11o9
-         Ti/prwd89SNOvJFccf9fpTtQdiMfUZD2ZzK+c14x8vXPODH4WsjZK05+8sruCHGV48ms
-         1kJBP43TbvEc17sBQlEd75zSyGFmR1P1qlO4woHxL5vESL0fCkuqSbloa3xiOvDi8Uzl
-         OH2A==
-X-Forwarded-Encrypted: i=1; AJvYcCWsXAJwWP2omI2ZTg9QguGh5YJv2CIklclVRNmkIm9zMkLBxqVoyrTZmrgq72qVL5xBoyzqoGD08R/+@vger.kernel.org, AJvYcCXwMmSXgEmPz8DA0W6GtnM2k1T7TY0CKT4sD88c1sZUcr6NIqUCVyGM7ZoNAxRyCF9Wv7XHi+DNMK4J9TYP@vger.kernel.org
-X-Gm-Message-State: AOJu0YxP39d1jCVIL/hsKWM0rIsiNcvefMuB+nrMIvhCCAeQAen3iMfd
-	brFtvSELpXfFATjSaohSDZpuxZ4HgPfUA310WEPQAHBafjdDMz9x1TPR
-X-Gm-Gg: ASbGncu3KYuU+b+FVlN3yxyMexRi3CcoR6AdV+mDBxeLRyiPnvcJyt3NevvIxVBgiIH
-	stSZVb/PhKw5U1JsxzWHiZOkasZ3+q57f1oYmQjm0xqghNg6nIbNXoSmSGuzqHE9kI2pp+n1Opl
-	4LMRfcOL+AMJsdMK+SAcLgSvdm/RwMvGasVtvf0WwsrdrRK/A2tZfLDhRpx5jU0setQ+noEl0mh
-	Ru8JSphEeXKMykio5sAIQpSzfektcy1FCcxTsx2tzSpQqbUdYszIYzqofFNTYfAP3m7HCTzyBjD
-	Uzoi18k8tfTB4WcJ0TiFWd/Mat1Pb+PUyFLBIhq+h9Qx4oQz0gxpL1+zqodcc2WoSK2vsvHIO+X
-	BpzP9e5ShGJjwfRzZoX8BrKj67BgDqzhnjhWJo07QGCQfYeyoBzdXIUUiTxzGHgYFby/urUuqN2
-	tKEbzkN1TV
-X-Google-Smtp-Source: AGHT+IHUC2ftwzSvSylSdT06ajBela8u5SU+ijYkDLGHo9/q750n74l021ps+CiYV2OdEDDglYn8Pw==
-X-Received: by 2002:a05:600c:19cf:b0:458:bfe1:4a91 with SMTP id 5b1f17b1804b1-45a166350a2mr28993085e9.20.1755098778076;
-        Wed, 13 Aug 2025 08:26:18 -0700 (PDT)
+        bh=LZIyAAVxGkCRQr9BUYAZ8nPgNM4Ndhfq5a5jE1scOa0=;
+        b=JeNOXl1yVFywlP14ZRXDJt8KcNL7Z5i15G3+METvqMNTm8vuc8QGakySjkiPc9TZYx
+         rC43QtlZB3gX5SR/Ab2xdKwbEoN0nCoyHDwwldzOB4EQBxYFB47y44K7sgZY07cweAAZ
+         cH4R0xnp2ngnxI7cpQ9Lmmm52YZmXmcVNlpfORTSwDUmDyZq1m2WiPQD2Dcp2aXHediH
+         cuTJ3FIIu/6wEMAXxvFrz5eHaT4Jk78uObYmLo7q4o1jfbSPgXIOJ6s52XP4S6AGdHGl
+         sA8w8Tfb1RfhDWM9PdIT5ADJnRFc+h6byEbHavaQaonKuPnzX1539zswtFrMkT4FDXiw
+         KISQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXIIb3ntoaUrICl9I12UWWFiSnSQ33TajWC/KqKy30ahVThkcUsKl/xwJ8wPNg0mdHlOhEpFAynLB2e1bOj@vger.kernel.org, AJvYcCXrLmXdOALN3hNM0zDzPWwAL1Q4mb3zybXLfQy1VBsuoHjwJMMRqr9ZqnRko7P3jTa5ebbvwIYoHNdC@vger.kernel.org
+X-Gm-Message-State: AOJu0YwWami05G5/dIDpw8fIrVldcIL45jxlXoKlkc2SsgeYmL//qhrY
+	xGPiuSrjh0jQ/1wfDd04kAWCICGKNI2PJp7DuxKTYPeLmxdbdnnmZJkuPnH2tw==
+X-Gm-Gg: ASbGncvq0MeENQVGZ/AjefmRPP0H3+rPhc2qUwUscdVSSqr2iztL2m4XjHoyDiHtA4Z
+	tA95f8BVNU7dtaRSpIIE5KkTlAqSWAhU79D80f93wScGeVUQ3kF9JrSy7MDlEqak7KcnFxTuqV/
+	SvyGdbfCccBU9WQix7gdYT3IqoISx/RMZZU+m8guFov93U1bkNoCAoDefG9HAi3fxkoF/qSDPac
+	sJiUYuufCHVAMrz4r59AZZwHtIYSu+dX9wvxlz5A1PS9OZ8E8he6n/Uksy3N7JsgZrcZlYQ8bdm
+	ayh9IW8NboJk1o42PNzbYaMEyGNsRlho7BIeAVYGZS0TvDKJukT7HYhsilSP9ZKSV3npGFvoyNY
+	d4ZrOpz1paVAJphhOSSEb7EXGbQTgrh1mYeMrXSmvA2cYprJhaoSRTUWblt6k/PtimSyC2j+z2W
+	xZb9k/16NM
+X-Google-Smtp-Source: AGHT+IEX4BDNa5mzqwSGmhUw6KuEqvUFZNcO+D5WjOPXTrwn2jJiUF7/1VKfEyNQ34hedf4mE52tig==
+X-Received: by 2002:a05:600c:5254:b0:459:ddad:a3bd with SMTP id 5b1f17b1804b1-45a165d4d2emr30205835e9.15.1755098829053;
+        Wed, 13 Aug 2025 08:27:09 -0700 (PDT)
 Received: from jernej-laptop.localnet (86-58-6-171.dynamic.telemach.net. [86.58.6.171])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45a1a50b99bsm6611325e9.5.2025.08.13.08.26.16
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45a1a509b9bsm6560505e9.6.2025.08.13.08.27.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Aug 2025 08:26:17 -0700 (PDT)
+        Wed, 13 Aug 2025 08:27:08 -0700 (PDT)
 From: Jernej =?UTF-8?B?xaBrcmFiZWM=?= <jernej.skrabec@gmail.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>,
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
@@ -86,14 +86,14 @@ Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
  linux-kernel@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>
 Subject:
- Re: [PATCH net-next v2 05/10] arm64: dts: allwinner: a523: Add GMAC200
- ethernet controller
-Date: Wed, 13 Aug 2025 17:26:15 +0200
-Message-ID: <5030505.31r3eYUQgx@jernej-laptop>
-In-Reply-To: <20250813145540.2577789-6-wens@kernel.org>
+ Re: [PATCH net-next v2 07/10] arm64: dts: allwinner: a527: cubie-a5e: Enable
+ second Ethernet port
+Date: Wed, 13 Aug 2025 17:27:06 +0200
+Message-ID: <2376533.ElGaqSPkdT@jernej-laptop>
+In-Reply-To: <20250813145540.2577789-8-wens@kernel.org>
 References:
  <20250813145540.2577789-1-wens@kernel.org>
- <20250813145540.2577789-6-wens@kernel.org>
+ <20250813145540.2577789-8-wens@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -103,15 +103,19 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset="utf-8"
 
-Dne sreda, 13. avgust 2025 ob 16:55:35 Srednjeevropski poletni =C4=8Das je =
+Dne sreda, 13. avgust 2025 ob 16:55:37 Srednjeevropski poletni =C4=8Das je =
 Chen-Yu Tsai napisal(a):
 > From: Chen-Yu Tsai <wens@csie.org>
 >=20
-> The A523 SoC family has a second ethernet controller, called the
-> GMAC200. It is not exposed on all the SoCs in the family.
+> On the Radxa Cubie A5E board, the second Ethernet controller, aka the
+> GMAC200, is connected to a second external Maxio MAE0621A PHY. The PHY
+> uses an external 25MHz crystal, and has the SoC's PJ16 pin connected to
+> its reset pin.
 >=20
-> Add a device node for it. All the hardware specific settings are from
-> the vendor BSP.
+> Enable the second Ethernet port. Also fix up the label for the existing
+> external PHY connected to the first Ethernet port. An enable delay for the
+> PHY supply regulator is added to make sure the PHY's internal regulators
+> are fully powered and the PHY is operational.
 >=20
 > Signed-off-by: Chen-Yu Tsai <wens@csie.org>
 
@@ -123,85 +127,86 @@ Jernej
 > ---
 >=20
 > Changes since v1:
-> - Fixed typo in tx-queues-config
+> - Switch to generic (tx|rx)-internal-delay-ps properties
+> - Add PHY regulator delay
 > ---
->  .../arm64/boot/dts/allwinner/sun55i-a523.dtsi | 55 +++++++++++++++++++
->  1 file changed, 55 insertions(+)
+>  .../dts/allwinner/sun55i-a527-cubie-a5e.dts   | 28 +++++++++++++++++--
+>  1 file changed, 26 insertions(+), 2 deletions(-)
 >=20
-> diff --git a/arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi b/arch/arm64/=
-boot/dts/allwinner/sun55i-a523.dtsi
-> index 6b6f2296bdff..449bcafbddcd 100644
-> --- a/arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi
-> +++ b/arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi
-> @@ -180,6 +180,16 @@ rgmii0_pins: rgmii0-pins {
->  				bias-disable;
+> diff --git a/arch/arm64/boot/dts/allwinner/sun55i-a527-cubie-a5e.dts b/ar=
+ch/arm64/boot/dts/allwinner/sun55i-a527-cubie-a5e.dts
+> index d4cee2222104..e96a419faf21 100644
+> --- a/arch/arm64/boot/dts/allwinner/sun55i-a527-cubie-a5e.dts
+> +++ b/arch/arm64/boot/dts/allwinner/sun55i-a527-cubie-a5e.dts
+> @@ -14,6 +14,7 @@ / {
+> =20
+>  	aliases {
+>  		ethernet0 =3D &gmac0;
+> +		ethernet1 =3D &gmac1;
+>  		serial0 =3D &uart0;
+>  	};
+> =20
+> @@ -76,7 +77,7 @@ &ehci1 {
+> =20
+>  &gmac0 {
+>  	phy-mode =3D "rgmii-id";
+> -	phy-handle =3D <&ext_rgmii_phy>;
+> +	phy-handle =3D <&ext_rgmii0_phy>;
+>  	phy-supply =3D <&reg_cldo3>;
+> =20
+>  	allwinner,tx-delay-ps =3D <300>;
+> @@ -85,13 +86,24 @@ &gmac0 {
+>  	status =3D "okay";
+>  };
+> =20
+> +&gmac1 {
+> +	phy-mode =3D "rgmii-id";
+> +	phy-handle =3D <&ext_rgmii1_phy>;
+> +	phy-supply =3D <&reg_cldo4>;
+> +
+> +	tx-internal-delay-ps =3D <300>;
+> +	rx-internal-delay-ps =3D <400>;
+> +
+> +	status =3D "okay";
+> +};
+> +
+>  &gpu {
+>  	mali-supply =3D <&reg_dcdc2>;
+>  	status =3D "okay";
+>  };
+> =20
+>  &mdio0 {
+> -	ext_rgmii_phy: ethernet-phy@1 {
+> +	ext_rgmii0_phy: ethernet-phy@1 {
+>  		compatible =3D "ethernet-phy-ieee802.3-c22";
+>  		reg =3D <1>;
+>  		reset-gpios =3D <&pio 7 8 GPIO_ACTIVE_LOW>; /* PH8 */
+> @@ -100,6 +112,16 @@ ext_rgmii_phy: ethernet-phy@1 {
+>  	};
+>  };
+> =20
+> +&mdio1 {
+> +	ext_rgmii1_phy: ethernet-phy@1 {
+> +		compatible =3D "ethernet-phy-ieee802.3-c22";
+> +		reg =3D <1>;
+> +		reset-gpios =3D <&pio 9 16 GPIO_ACTIVE_LOW>; /* PJ16 */
+> +		reset-assert-us =3D <10000>;
+> +		reset-deassert-us =3D <150000>;
+> +	};
+> +};
+> +
+>  &mmc0 {
+>  	vmmc-supply =3D <&reg_cldo3>;
+>  	cd-gpios =3D <&pio 5 6 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>; /* PF6 */
+> @@ -240,6 +262,8 @@ reg_cldo4: cldo4 {
+>  				regulator-min-microvolt =3D <3300000>;
+>  				regulator-max-microvolt =3D <3300000>;
+>  				regulator-name =3D "vcc-pj-phy";
+> +				/* enough time for the PHY to fully power on */
+> +				regulator-enable-ramp-delay =3D <150000>;
 >  			};
 > =20
-> +			rgmii1_pins: rgmii1-pins {
-> +				pins =3D "PJ0", "PJ1", "PJ2", "PJ3", "PJ4",
-> +				       "PJ5", "PJ6", "PJ7", "PJ8", "PJ9",
-> +				       "PJ11", "PJ12", "PJ13", "PJ14", "PJ15";
-> +				allwinner,pinmux =3D <5>;
-> +				function =3D "gmac1";
-> +				drive-strength =3D <40>;
-> +				bias-disable;
-> +			};
-> +
->  			uart0_pb_pins: uart0-pb-pins {
->  				pins =3D "PB9", "PB10";
->  				allwinner,pinmux =3D <2>;
-> @@ -601,6 +611,51 @@ mdio0: mdio {
->  			};
->  		};
-> =20
-> +		gmac1: ethernet@4510000 {
-> +			compatible =3D "allwinner,sun55i-a523-gmac200",
-> +				     "snps,dwmac-4.20a";
-> +			reg =3D <0x04510000 0x10000>;
-> +			clocks =3D <&ccu CLK_BUS_EMAC1>, <&ccu CLK_MBUS_EMAC1>;
-> +			clock-names =3D "stmmaceth", "mbus";
-> +			resets =3D <&ccu RST_BUS_EMAC1>;
-> +			reset-names =3D "stmmaceth";
-> +			interrupts =3D <GIC_SPI 47 IRQ_TYPE_LEVEL_HIGH>;
-> +			interrupt-names =3D "macirq";
-> +			pinctrl-names =3D "default";
-> +			pinctrl-0 =3D <&rgmii1_pins>;
-> +			power-domains =3D <&pck600 PD_VO1>;
-> +			syscon =3D <&syscon>;
-> +			snps,fixed-burst;
-> +			snps,axi-config =3D <&gmac1_stmmac_axi_setup>;
-> +			snps,mtl-rx-config =3D <&gmac1_mtl_rx_setup>;
-> +			snps,mtl-tx-config =3D <&gmac1_mtl_tx_setup>;
-> +			status =3D "disabled";
-> +
-> +			mdio1: mdio {
-> +				compatible =3D "snps,dwmac-mdio";
-> +				#address-cells =3D <1>;
-> +				#size-cells =3D <0>;
-> +			};
-> +
-> +			gmac1_mtl_rx_setup: rx-queues-config {
-> +				snps,rx-queues-to-use =3D <1>;
-> +
-> +				queue0 {};
-> +			};
-> +
-> +			gmac1_stmmac_axi_setup: stmmac-axi-config {
-> +				snps,wr_osr_lmt =3D <0xf>;
-> +				snps,rd_osr_lmt =3D <0xf>;
-> +				snps,blen =3D <256 128 64 32 16 8 4>;
-> +			};
-> +
-> +			gmac1_mtl_tx_setup: tx-queues-config {
-> +				snps,tx-queues-to-use =3D <1>;
-> +
-> +				queue0 {};
-> +			};
-> +		};
-> +
->  		ppu: power-controller@7001400 {
->  			compatible =3D "allwinner,sun55i-a523-ppu";
->  			reg =3D <0x07001400 0x400>;
+>  			reg_cpusldo: cpusldo {
 >=20
 
 
