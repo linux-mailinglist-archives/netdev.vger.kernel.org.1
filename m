@@ -1,108 +1,274 @@
-Return-Path: <netdev+bounces-213396-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213395-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E82BDB24D81
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 17:34:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6719B24D7A
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 17:34:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EFC7C1A282AB
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 15:30:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC5FD56069C
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 15:29:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D82E23C8C5;
-	Wed, 13 Aug 2025 15:29:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50CAC241122;
+	Wed, 13 Aug 2025 15:29:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rwozugh0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JEQXGTFa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88B777260D;
-	Wed, 13 Aug 2025 15:29:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2739923E34C;
+	Wed, 13 Aug 2025 15:29:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755098990; cv=none; b=fxr+wGcSBLhWk2gMpWrZIeMSCFuKZ5g10gX7+ve8sJF7j8PLBO2mKWYTCodDPWuGv/Q6DR0cPAQB/gu2BBP90+hEUXT/MM2jc4b3D2Rdn6GHxpCxyLQeUOySKH+Xo39ZB2G7L4tYY3nopCxG2JSqD+E6Xafom1vam1fjUpN+0nI=
+	t=1755098980; cv=none; b=RgHthG5BgFaQjQgUN1eAefIl2QuEGRj7nhf+t728W/7XQfQ3MrzdjvUO168LGus9nQX8RrDPxxY+GRysuvaqw3jqSjnQpg+m09hDqt7Y0HPYGnuhglnrNweUr2qbLjTWSUY9IIZMK1B7dgphbeMWCukRi9Dv3q5Dcmn81djtlcw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755098990; c=relaxed/simple;
-	bh=GsTn18GDql2jVwF/EtLnlzuCdG7Ady/F1iFVAj0vasQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IyqjEC/2OAac6deyoqOluSZ2KgDd7kljOR97YOM+omxCrB7WksawfXs4yZFKk7xeL4VFddZBND9VLDTCI2ivwdZHuNyHnpSfA0QtgxsjKFcs/FrJ3Fw83+pK8uK1jsEHt8IvTsGv0FVr3sBaRrjwEvraDSB2LGxmar8VVEb+jV8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Rwozugh0; arc=none smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-3b792b0b829so6759084f8f.3;
-        Wed, 13 Aug 2025 08:29:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755098987; x=1755703787; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1dyk6h1SXhHJg+jjJ7myywjFooeBexsFrLHNyH2/6iM=;
-        b=Rwozugh0NYQudv+Kn59IduCaN76d2uAnc2L8Lg78X/Lhf3T2ZM2JlJXrTTujxoXLCM
-         DAQ9LykY/Dbjx57JiaRVmkNCxOKq67e7ReE9Onfj1GglOb/4ovp3WZzVHigY9CO2LZc/
-         W9peRhR71LIt+rIIuckACHnXTEWeMhv0Nc+WHtO151nSWBdGTdYLx9ix3NSKvm7Qf1F6
-         IvnFraeZfYphDe4ZT2AJzN5y631s1weCZUHWXKgYGT4WzP1YCh+aAfS65SLQFAyFttwp
-         v9oMLHZLmNRO4er060HL5bXIOptLA0Q0k5+Bzp5OIIYkrVd1aLXbKO/9PdIEE88UBG7V
-         UGjA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755098987; x=1755703787;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=1dyk6h1SXhHJg+jjJ7myywjFooeBexsFrLHNyH2/6iM=;
-        b=AEEqqOLl/glqsqDtx42Jth/bTKVzxe2Tmby4ioHBJt+HHngigWGGylh9Vl/77U7ZR0
-         h2rdSn7+/ymCVNshSbtOrNQS6Iv/E00TvlcLadOwI0cXxLA0E0jpx0cz5WX4gAtaW2Gs
-         uz1lUFynblVMXlpYeLY8J7faqqufPvann4R3nV4BqLpbWGAEZph8wZJAsZqUBUixEI/M
-         wgHrenVFsmlAeNeUSAzM+LJ5efOOhZ4gP+6KHekto7wjoPk1OJgXAPDEr+M1qtf8FgJv
-         tqBHR54p7q78joy0Saxzclka3Pn/sXyVtr29SOiRIZL4I7r/vYP3E0INpcUdb5MKK9M7
-         Ygww==
-X-Forwarded-Encrypted: i=1; AJvYcCVVI2XOtRW69PO3EPyA4n+lIzpZVDyp5gDuAzEqNiurunJi8yAwEyYmv4uZ7Wo6KRStoAo+Z70otVLvi/k=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw6ITBGzKQmwlLgxuQ48of3rm8KbbwmL25xjjBXUylb/waAhE1c
-	PSrWhqqIrt/cz8a+J3D1xQEmmv+gjmwqGOHqCsWUKRkvs62KDp9c4G9H
-X-Gm-Gg: ASbGncubLMvSws++yPdNOpH/Aqk0i4qXUpq+15NvRulHI7xKuQxkrLLMKvsuGheCnvR
-	BIlrah8W8R1JEGAuIX/uqcaAqzDiGlxEe7WTrIawbysyf9sXWtoJ6p3jYLsH+MkiEGhGnffrKEA
-	Srta1gso2SC6nI1jHPAqisePavbrrVFU4Jy83rYco5P2IsrL+TwiJOUOu/gq4TT9aLgefxizcLO
-	JqMT8B4+lzLKZyGRChh9cm0pPRvwI+ox+VRL73OMI4seML4gdxOtPXTCximLD03XLvFUlcvVHES
-	xugNKxwQmdOAr2ljHB4GphJawaDABcKbpsF66/35gJVI/huj3rftRZbGQ71b/FaOIfXkKtDoCkE
-	xSQNOlAxo1TsQh076GeXXn+JNZS83P8kJBw==
-X-Google-Smtp-Source: AGHT+IFJ1rRDpXsPA9YCL8l0EWD+58Yjjmif63b5LRsrQ/1I8d8chjdc2aDkNwuW8YpU4by6LeMYJg==
-X-Received: by 2002:a05:6000:2c01:b0:3b8:d4ad:6af0 with SMTP id ffacd0b85a97d-3b917f14e1amr2584215f8f.40.1755098986682;
-        Wed, 13 Aug 2025 08:29:46 -0700 (PDT)
-Received: from localhost ([45.10.155.14])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b79c469319sm47053385f8f.54.2025.08.13.08.29.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Aug 2025 08:29:46 -0700 (PDT)
-Message-ID: <7d5f84c8-a339-4dd9-a0e2-eb6c769bda7a@gmail.com>
-Date: Wed, 13 Aug 2025 17:29:33 +0200
+	s=arc-20240116; t=1755098980; c=relaxed/simple;
+	bh=vVOCJgaHKyUCzgdtn29YJraw+cF8Ru8lcOrX2Ex+Zgs=;
+	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rEuHrmX4rtCwKfTZj6k/fK5EDe2a1G9mtvP8YApfLluoDHJQVl95bmk79B3LXGoNyb6UZLSO4jM3ckkybMsCKhhppEEnj02X+vlRL5PixAABu69GQxHlpcqB3DRaAC+b2Vi45ARjvkGOCGLTMB4kxZEJYtaadU6QqipYC9MxWGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JEQXGTFa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26D86C4CEEB;
+	Wed, 13 Aug 2025 15:29:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755098979;
+	bh=vVOCJgaHKyUCzgdtn29YJraw+cF8Ru8lcOrX2Ex+Zgs=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=JEQXGTFa2FvdpbYW2QuoWYMksA4fkGWQc/m8FiodcYA4RCw9pQCTxxf/C17bWVoIY
+	 jZByEPYcPtdzHINsJloatWhUY1tS5yoarTIOliGmAHFNkYctkxC8Rq0TSUWrFauhEf
+	 /fXDz0HhiiPhmiEtDqDfB78E0nkLLzsBwU8+wPcu0A7gRGvEAokUTVca8/lnD9V1Oh
+	 7MN4M94qRYGpHC9HzfnRS7IsiJvSVtfB7TVlEzBQsc22Yx//bj1K4o2r7ggh4EXuNY
+	 pu7+GLEoZ6Bwx6V47ueevGCHkyKMR8q3aFgr2HQL9K6zjq5NntWI+SOrVpi9chsxAA
+	 szC1nJ7qgnCUg==
+Subject: [PATCH RFC bpf-next] selftests/bpf: Extend bench for LPM trie with
+ noop and baseline
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+To: matt@readmodwrite.com, bpf@vger.kernel.org,
+ Alexei Starovoitov <ast@kernel.org>
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>, mfleming@cloudflare.com,
+ Daniel Borkmann <borkmann@iogearbox.net>, netdev@vger.kernel.org,
+ kernel-team@cloudflare.com
+Date: Wed, 13 Aug 2025 17:29:35 +0200
+Message-ID: <175509897596.2755384.18413775753563966331.stgit@firesoul>
+In-Reply-To: <20250722150152.1158205-1-matt@readmodwrite.com>
+References: <20250722150152.1158205-1-matt@readmodwrite.com>
+User-Agent: StGit/1.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v5 0/5] net: add local address bind support to
- vxlan and geneve
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- donald.hunter@gmail.com, andrew+netdev@lunn.ch, dsahern@kernel.org,
- shuah@kernel.org, daniel@iogearbox.net, jacob.e.keller@intel.com,
- razor@blackwall.org, petrm@nvidia.com, menglong8.dong@gmail.com,
- martin.lau@kernel.org, linux-kernel@vger.kernel.org
-References: <20250812125155.3808-1-richardbgobert@gmail.com>
- <aJxaDxt9T83r03J7@shredder>
-From: Richard Gobert <richardbgobert@gmail.com>
-In-Reply-To: <aJxaDxt9T83r03J7@shredder>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-Ido Schimmel wrote:
-> On Tue, Aug 12, 2025 at 02:51:50PM +0200, Richard Gobert wrote:
->> Currently, vxlan sockets are always bound to 0.0.0.0. For security, it is
->> better to bind to the specific interface on which traffic is expected.
-> 
-> s/interface/address/ ?
+This patch is extending[0] with some adjustments[1].
+ [0] https://lore.kernel.org/all/20250722150152.1158205-1-matt@readmodwrite.com/
+ [1] https://github.com/xdp-project/xdp-project/blob/main/areas/bench/patches/bench-lpm-trie-V3-adjusted.patch
 
-Sure, will change in v6.
+The 'noop' bench measures the overhead of the harness.
+Meaning the bpf_prog_test_run that calls bpf_loop with 10000
+(NR_LOOPS) iterations in the lpm_producer loop.
+
+CPU: AMD EPYC 9684X
+sudo ./bench lpm-trie-noop  --nr_entries=1 --producers=1 --affinity
+Setting up benchmark 'lpm-trie-noop'...
+Benchmark 'lpm-trie-noop' started.
+Iter   0 ( 42.501us): hits   74.567M/s ( 74.567M/prod)
+Iter   1 ( -5.155us): hits   74.630M/s ( 74.630M/prod)
+Iter   2 (  0.123us): hits   74.620M/s ( 74.620M/prod)
+Iter   3 ( -7.127us): hits   74.611M/s ( 74.611M/prod)
+Iter   4 (  7.334us): hits   74.609M/s ( 74.609M/prod)
+Iter   5 (  0.163us): hits   74.620M/s ( 74.620M/prod)
+Iter   6 (  0.213us): hits   74.610M/s ( 74.610M/prod)
+Summary: throughput   74.617 ± 0.008 M ops/s ( 74.617M ops/prod), latency   13.402 ns/op
+
+The baseline measures overhead of getting a random number
+and modulo, which can be used as a baseline comparsion
+against lpm-trie-lookup and lpm-trie-update.
+
+sudo ./bench lpm-trie-baseline  --nr_entries=1 --producers=1 --affinity
+Setting up benchmark 'lpm-trie-baseline'...
+Benchmark 'lpm-trie-baseline' started.
+Iter   0 ( 44.996us): hits   36.308M/s ( 36.308M/prod)
+Iter   1 ( -1.535us): hits   36.330M/s ( 36.330M/prod)
+Iter   2 ( -3.919us): hits   36.310M/s ( 36.310M/prod)
+Iter   3 ( -1.004us): hits   36.330M/s ( 36.330M/prod)
+Iter   4 ( -1.476us): hits   36.320M/s ( 36.320M/prod)
+Iter   5 (  0.468us): hits   36.330M/s ( 36.330M/prod)
+Iter   6 ( -0.304us): hits   36.330M/s ( 36.330M/prod)
+Summary: throughput   36.325 ± 0.008 M ops/s ( 36.325M ops/prod), latency   27.529 ns/op
+
+Thus, the overhead of bpf_get_prandom_u32() is 14.1 nanosec.
+
+Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
+---
+ tools/testing/selftests/bpf/bench.c                |    4 ++
+ .../selftests/bpf/benchs/bench_lpm_trie_map.c      |   40 +++++++++++++++++++-
+ tools/testing/selftests/bpf/progs/lpm_trie_bench.c |   31 ++++++++++++++--
+ 3 files changed, 70 insertions(+), 5 deletions(-)
+
+diff --git a/tools/testing/selftests/bpf/bench.c b/tools/testing/selftests/bpf/bench.c
+index fd15f60fd5a8..8a41aec89479 100644
+--- a/tools/testing/selftests/bpf/bench.c
++++ b/tools/testing/selftests/bpf/bench.c
+@@ -560,6 +560,8 @@ extern const struct bench bench_htab_mem;
+ extern const struct bench bench_crypto_encrypt;
+ extern const struct bench bench_crypto_decrypt;
+ extern const struct bench bench_sockmap;
++extern const struct bench bench_lpm_trie_noop;
++extern const struct bench bench_lpm_trie_baseline;
+ extern const struct bench bench_lpm_trie_lookup;
+ extern const struct bench bench_lpm_trie_update;
+ extern const struct bench bench_lpm_trie_delete;
+@@ -631,6 +633,8 @@ static const struct bench *benchs[] = {
+ 	&bench_crypto_encrypt,
+ 	&bench_crypto_decrypt,
+ 	&bench_sockmap,
++	&bench_lpm_trie_noop,
++	&bench_lpm_trie_baseline,
+ 	&bench_lpm_trie_lookup,
+ 	&bench_lpm_trie_update,
+ 	&bench_lpm_trie_delete,
+diff --git a/tools/testing/selftests/bpf/benchs/bench_lpm_trie_map.c b/tools/testing/selftests/bpf/benchs/bench_lpm_trie_map.c
+index 32a46c2402ea..4e0f12e359ba 100644
+--- a/tools/testing/selftests/bpf/benchs/bench_lpm_trie_map.c
++++ b/tools/testing/selftests/bpf/benchs/bench_lpm_trie_map.c
+@@ -87,7 +87,7 @@ static void __lpm_validate(void)
+ 	};
+ }
+ 
+-enum { OP_LOOKUP = 1, OP_UPDATE, OP_DELETE, OP_FREE };
++enum { OP_NOOP=0, OP_BASELINE, OP_LOOKUP, OP_UPDATE, OP_DELETE, OP_FREE };
+ 
+ static void lpm_delete_validate(void)
+ {
+@@ -175,6 +175,18 @@ static void lpm_setup(void)
+ 	fill_map(fd);
+ }
+ 
++static void lpm_noop_setup(void)
++{
++	__lpm_setup();
++	ctx.bench->bss->op = OP_NOOP;
++}
++
++static void lpm_baseline_setup(void)
++{
++	__lpm_setup();
++	ctx.bench->bss->op = OP_BASELINE;
++}
++
+ static void lpm_lookup_setup(void)
+ {
+ 	lpm_setup();
+@@ -208,7 +220,7 @@ static void lpm_measure(struct bench_res *res)
+ 	res->duration_ns = atomic_swap(&ctx.bench->bss->duration_ns, 0);
+ }
+ 
+-/* For LOOKUP, UPDATE, and DELETE */
++/* For NOOP, BASELINE, LOOKUP, UPDATE, and DELETE */
+ static void *lpm_producer(void *unused __always_unused)
+ {
+ 	int err;
+@@ -310,6 +322,30 @@ static void free_ops_report_final(struct bench_res res[], int res_cnt)
+ 	       latency / lat_divisor / env.producer_cnt, unit);
+ }
+ 
++/* noop bench measures harness-overhead */
++const struct bench bench_lpm_trie_noop = {
++	.name = "lpm-trie-noop",
++	.argp = &bench_lpm_trie_map_argp,
++	.validate = __lpm_validate,
++	.setup = lpm_noop_setup,
++	.producer_thread = lpm_producer,
++	.measure = lpm_measure,
++	.report_progress = ops_report_progress,
++	.report_final = ops_report_final,
++};
++
++/* baseline overhead for lookup and update */
++const struct bench bench_lpm_trie_baseline = {
++	.name = "lpm-trie-baseline",
++	.argp = &bench_lpm_trie_map_argp,
++	.validate = __lpm_validate,
++	.setup = lpm_baseline_setup,
++	.producer_thread = lpm_producer,
++	.measure = lpm_measure,
++	.report_progress = ops_report_progress,
++	.report_final = ops_report_final,
++};
++
+ const struct bench bench_lpm_trie_lookup = {
+ 	.name = "lpm-trie-lookup",
+ 	.argp = &bench_lpm_trie_map_argp,
+diff --git a/tools/testing/selftests/bpf/progs/lpm_trie_bench.c b/tools/testing/selftests/bpf/progs/lpm_trie_bench.c
+index 522e1cbef490..e4a5cecd6560 100644
+--- a/tools/testing/selftests/bpf/progs/lpm_trie_bench.c
++++ b/tools/testing/selftests/bpf/progs/lpm_trie_bench.c
+@@ -6,6 +6,7 @@
+ #include <bpf/bpf_helpers.h>
+ #include <bpf/bpf_core_read.h>
+ #include "bpf_misc.h"
++#include "bpf_atomic.h"
+ 
+ #define BPF_OBJ_NAME_LEN 16U
+ #define MAX_ENTRIES 100000000
+@@ -84,12 +85,30 @@ int BPF_PROG(trie_free_exit, struct work_struct *work)
+ 	return 0;
+ }
+ 
+-static void gen_random_key(struct trie_key *key)
++static __always_inline void gen_random_key(struct trie_key *key)
+ {
+ 	key->prefixlen = prefixlen;
+ 	key->data = bpf_get_prandom_u32() % nr_entries;
+ }
+ 
++static int noop(__u32 index, __u32 *unused)
++{
++	return 0;
++}
++
++static int baseline(__u32 index, __u32 *unused)
++{
++	struct trie_key key;
++	__s64 blackbox;
++
++	gen_random_key(&key);
++	/* Avoid compiler optimizing out the modulo */
++	barrier_var(blackbox);
++	blackbox = READ_ONCE(key.data);
++
++	return 0;
++}
++
+ static int lookup(__u32 index, __u32 *unused)
+ {
+ 	struct trie_key key;
+@@ -148,13 +167,19 @@ int BPF_PROG(run_bench)
+ 	start = bpf_ktime_get_ns();
+ 
+ 	switch (op) {
++	case 0:
++		loops = bpf_loop(NR_LOOPS, noop, NULL, 0);
++		break;
+ 	case 1:
+-		loops = bpf_loop(NR_LOOPS, lookup, NULL, 0);
++		loops = bpf_loop(NR_LOOPS, baseline, NULL, 0);
+ 		break;
+ 	case 2:
+-		loops = bpf_loop(NR_LOOPS, update, NULL, 0);
++		loops = bpf_loop(NR_LOOPS, lookup, NULL, 0);
+ 		break;
+ 	case 3:
++		loops = bpf_loop(NR_LOOPS, update, NULL, 0);
++		break;
++	case 4:
+ 		loops = bpf_loop(NR_LOOPS, delete, &need_refill, 0);
+ 		break;
+ 	default:
+
+
 
