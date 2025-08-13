@@ -1,178 +1,174 @@
-Return-Path: <netdev+bounces-213389-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213399-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15158B24D54
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 17:28:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5BFCB24DB0
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 17:41:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC0611753E9
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 15:25:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC1DB1C205EA
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 15:38:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 112EF23183C;
-	Wed, 13 Aug 2025 15:25:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26B63281509;
+	Wed, 13 Aug 2025 15:36:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WDNMMUqI"
+	dkim=pass (2048-bit key) header.d=fris.de header.i=@fris.de header.b="VMIojZs5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.fris.de (mail.fris.de [116.203.77.234])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45B8F231839;
-	Wed, 13 Aug 2025 15:25:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD331281372;
+	Wed, 13 Aug 2025 15:36:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.203.77.234
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755098712; cv=none; b=AdAw9V7kLg26BAf50DAoDSN1VH4PoaWzpIwL84PBON1j81s0/TQl4Y34JvUK/5mtfwAdpUOXeRQVZH9Eo4VE8qLkN7mcl9ZVI+8KlGNyToxxLwy9K9Q8sTcGvtLZi3L9mi6SaX5cL7jTvuV9wB/g/mLPfqYskn0zgkSIZXN9pHg=
+	t=1755099371; cv=none; b=CL7rhQflcB+31MB3T1WrN5j19DJom8WdFouhcfcrnJrGm2QdeaNEdn9wogEZJbfKBTjnOdvKImTyPYn6RleuSKuITPlvWT4QS7ZW6sCtmiIQEEkfEkKWmw3gcudQgmJRShcSPE4vQGIcZOoDljQibmMDuXdyBQdekkTNHceAi9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755098712; c=relaxed/simple;
-	bh=aSZYpogVJcVF1l/xXID+mUfdRe8mg1bAaCN9UZNml/I=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qISBmQLT/HIdTnW1AkZNOagVAHUWJ8w3R30LuZPqVlV4fDkxySaRRPcaDenx2KMOB9fnqFyGghzk2PSsKEJ1KGj6rf4uzL+M7mFzXQxv/A1dqmljl/0blQY0+l+j5gYOrltn5tdiYU7+fNTxfiaBw4A4y9PPVVBhhsBB2O2OmZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WDNMMUqI; arc=none smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-3b792b0b829so6753904f8f.3;
-        Wed, 13 Aug 2025 08:25:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755098708; x=1755703508; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vIKzP+v10goqJv8MZ6hUQxh9iZh9GLNgEJG//KT6geg=;
-        b=WDNMMUqIj72UOuM/KvB5/7uOlhvQKYtUnSqlCukpkEhGKf9f+91kA9xoTXXupsEOLq
-         iDP79d4Cj+O283jO0BGWW7IkCzEmQ4TsbNldWIlZopnHaPLBxoht0z83N4kLO23LT3BJ
-         jfpMgbqeE/5PxvKrGip8a5/3E3l+fwLMBCG/H1vrRWELh8+taSivtHABKi1XRqHBHTxL
-         wc8ZdU4Rw7P6f78aWRdIes5uP8T2ZdDV28ZYSvDSxd10vsTTqhPCOTxtO5qdmkSXVth8
-         Sz8Ao6RgEqWN28azI3TqzYUSVSdp/FgTnmK8axzttq8r5+kfrIb5RUvo49V1yDv1AGNX
-         4+TQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755098708; x=1755703508;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vIKzP+v10goqJv8MZ6hUQxh9iZh9GLNgEJG//KT6geg=;
-        b=Ajd4D6h0+xG7syHitV8rcNOQLLtEC7VUb8CRbu04In4pdZZsHd8lMKHoAWyZv+lhCa
-         6iWMOPDJE6Hw0sHdpGq2gyiaJu+NQkMhGauJK/nU6Pz9J3KbtIg9HAHeRgp11GVt//9u
-         4R+FGZJAmRLlkA/ZL2OKPGrFY+GcvUzeFHSGy5cT61cncaUDe7B3eDSKhkp4mn1FRXE/
-         7QtnktQSD0oo5leumkNI8XYJ/k4flalEAqUEwoj3T0iVZGJhk2YpENeF1+K9+smc5hjO
-         C9z/QQOI9x1eMbXGJ6LRGWyFNtdi6et+D5w1BQyc3DbtGjAviTjkdAzMcXzS47b1Qeug
-         r4gg==
-X-Forwarded-Encrypted: i=1; AJvYcCUqSTyvW1XvGQ2x4G8qXXbCO0pW6i2NUX6Uze0UHTuJNYcmTDdk/kGV+h6tzDjCDuFAyAUNBo+hvgtKCAif@vger.kernel.org, AJvYcCXzcr6tYoIenwtFZcbo+R1cY84YO0FgvWVAlpu4B3ZqJ9hnXGeaHIGshTW+qUSZMG9bJSuPTfpsrzhe@vger.kernel.org
-X-Gm-Message-State: AOJu0YzlUeBR7A15HZaB5gGMqtbE1MJiK9OkI4CnwtvewLfLBU6nAoTQ
-	/lyTE64UABsNRIG/m2fuRN/b0YUis/yPZPBhgRKre6LOMKKj0ZjFGHkErnxHwA==
-X-Gm-Gg: ASbGnctquke610gGNK9wLqJCBJTpZHGMfq2Io0U3uRLNKT8NfV4Ly0TodgmHb4NGcNw
-	DwoZMCkwlm3UcBkfwPrLTblYfc4doDJgU7sfxN0EPbYcEBBAQ4LF2cKrUYxpRMHp5nCPFI2pSSk
-	tvWLYP9hKbT6PXOUsLFWsWB2YW38aXkGpnHgbfmEXNbOFsp2EmQiBQYrP0w/kIkgjb2n9MpFz35
-	/FRKvoQ09n3JWvSzeVCf8jAQuG1af0Sb9SuYnApnAoYSaB/BFzNVJtBmTtSgPKILjHr2f4vwQfU
-	C8z8YF/QE9mMFh5mQyDRpEjULf9+9zU/9JIHBC2jSZKE0Hb15HnBSrY3ZLnZW/3lhaj+nyMNltS
-	Lt/yrGt8xYxVc1irlENc2vxuikbrCnpqG09MB9lWkocXI+XAX3x3B9vp3oPEl+QFGRBEeMySIhg
-	==
-X-Google-Smtp-Source: AGHT+IFDK6njZdaYiIYPO/ZMO6ujPoE/G41Mb7N255M2MT+1frSU31mMtoR+dOSJ53Ri0BsuUYgPGg==
-X-Received: by 2002:a05:6000:2c01:b0:3b8:d4ad:6af0 with SMTP id ffacd0b85a97d-3b917f14e1amr2572720f8f.40.1755098708425;
-        Wed, 13 Aug 2025 08:25:08 -0700 (PDT)
-Received: from jernej-laptop.localnet (86-58-6-171.dynamic.telemach.net. [86.58.6.171])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45a1abcd59bsm465535e9.3.2025.08.13.08.25.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Aug 2025 08:25:08 -0700 (PDT)
-From: Jernej =?UTF-8?B?xaBrcmFiZWM=?= <jernej.skrabec@gmail.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
- Jernej Skrabec <jernej@kernel.org>, Samuel Holland <samuel@sholland.org>,
- Chen-Yu Tsai <wens@kernel.org>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
- linux-kernel@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>
-Subject:
- Re: [PATCH net-next v2 04/10] soc: sunxi: sram: register regmap as syscon
-Date: Wed, 13 Aug 2025 17:25:05 +0200
-Message-ID: <5910992.DvuYhMxLoT@jernej-laptop>
-In-Reply-To: <20250813145540.2577789-5-wens@kernel.org>
-References:
- <20250813145540.2577789-1-wens@kernel.org>
- <20250813145540.2577789-5-wens@kernel.org>
+	s=arc-20240116; t=1755099371; c=relaxed/simple;
+	bh=0yB4yPxqFUcfgr4tTHPeG4JoznlOadq31ynbw69xH1k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gae5cELfoPlIx6dO9B9kXxbiTIQx7HuSfYL/Fq+VT0z6NOU+I1zvDnEzLwXEMhzDMNpssPIKLprFME5LvlIqWUCBi9CHOLlCPzysau1qVAv9fL1fRJ73cDR8L2G8YPK0Ll3l1X4LDIn6hKBgQmRkpbigR6crF5srY/VN68N2DLE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fris.de; spf=pass smtp.mailfrom=fris.de; dkim=pass (2048-bit key) header.d=fris.de header.i=@fris.de header.b=VMIojZs5; arc=none smtp.client-ip=116.203.77.234
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fris.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fris.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id C90D0C981B;
+	Wed, 13 Aug 2025 17:28:21 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fris.de; s=dkim;
+	t=1755098907; h=from:subject:date:message-id:to:cc:mime-version:
+	 content-transfer-encoding; bh=Lf7hoXo1qTojSQ5GerYUNJtoP2pgymrfHmOK4+PmZ7c=;
+	b=VMIojZs5JA9aS9O3gcpK+RTWtYShv47B/EX2AtYf1Ba9/0eD73cUwPpM2heUT3xcKik52j
+	o5SY/+7D/2Jtvv5W4MAYiYrCUevtgdVwKL7jhoh6Fn2yB0CiGKExFoi4vFIHWSHW+k+tlx
+	XzExX34iAkYhkvTcoP4jrFveiw6r90Sz+0c+aC3Nn6DCJbG9yR0I3RcwVkhwXLfKg8I7Jo
+	TUxmxpOfzLHKxK4bkM3Vl88R5skOQQP9tSr6tn8poV/VNHM29ildSqlZQB14B84gBxripn
+	EH8T2lwY4sis0RoVkOdbn1t8Efvq8VG6F8JDA29yYLSmkasHQ9UiaM7LRtm1nA==
+From: Frieder Schrempf <frieder@fris.de>
+To: netdev@vger.kernel.org,
+	Andrew Lunn <andrew@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-kernel@vger.kernel.org,
+	Lukasz Majewski <lukma@denx.de>,
+	Paolo Abeni <pabeni@redhat.com>,
+	UNGLinuxDriver@microchip.com,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Woojung Huh <woojung.huh@microchip.com>
+Cc: Frieder Schrempf <frieder.schrempf@kontron.de>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Jesse Van Gavere <jesseevg@gmail.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Pieter Van Trappen <pieter.van.trappen@cern.ch>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Simon Horman <horms@kernel.org>,
+	Tristram Ha <tristram.ha@microchip.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Subject: [RFC PATCH] net: dsa: microchip: Prevent overriding of HSR port forwarding
+Date: Wed, 13 Aug 2025 17:26:12 +0200
+Message-ID: <20250813152615.856532-1-frieder@fris.de>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-Dne sreda, 13. avgust 2025 ob 16:55:34 Srednjeevropski poletni =C4=8Das je =
-Chen-Yu Tsai napisal(a):
-> From: Chen-Yu Tsai <wens@csie.org>
->=20
-> If the system controller had a ethernet controller glue layer control
-> register, a limited access regmap would be registered and tied to the
-> system controller struct device for the ethernet driver to use.
->=20
-> Until now, for the ethernet driver to acquire this regmap, it had to
-> do a of_parse_phandle() + find device + dev_get_regmap() sequence.
-> Since the syscon framework allows a provider to register a custom
-> regmap for its device node, and the ethernet driver already uses
-> syscon for one platform, this provides a much more easier way to
-> pass the regmap.
->=20
-> Use of_syscon_register_regmap() to register our regmap with the
-> syscon framework so that consumers can retrieve it that way.
->=20
-> Signed-off-by: Chen-Yu Tsai <wens@csie.org>
+From: Frieder Schrempf <frieder.schrempf@kontron.de>
 
-Acked-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+The KSZ9477 supports NETIF_F_HW_HSR_FWD to forward packets between
+HSR ports. This is set up when creating the HSR interface via
+ksz9477_hsr_join() and ksz9477_cfg_port_member().
 
-Best regards,
-Jernej
+At the same time ksz_update_port_member() is called on every
+state change of a port and reconfiguring the forwarding to the
+default state which means packets get only forwarded to the CPU
+port.
 
->=20
-> ---
-> Changes since v1:
-> - Fix check on return value
-> - Expand commit message
-> ---
->  drivers/soc/sunxi/sunxi_sram.c | 6 ++++++
->  1 file changed, 6 insertions(+)
->=20
-> diff --git a/drivers/soc/sunxi/sunxi_sram.c b/drivers/soc/sunxi/sunxi_sra=
-m.c
-> index 4f8d510b7e1e..1837e1b5dce8 100644
-> --- a/drivers/soc/sunxi/sunxi_sram.c
-> +++ b/drivers/soc/sunxi/sunxi_sram.c
-> @@ -12,6 +12,7 @@
-> =20
->  #include <linux/debugfs.h>
->  #include <linux/io.h>
-> +#include <linux/mfd/syscon.h>
->  #include <linux/module.h>
->  #include <linux/of.h>
->  #include <linux/of_address.h>
-> @@ -377,6 +378,7 @@ static int __init sunxi_sram_probe(struct platform_de=
-vice *pdev)
->  	const struct sunxi_sramc_variant *variant;
->  	struct device *dev =3D &pdev->dev;
->  	struct regmap *regmap;
-> +	int ret;
-> =20
->  	sram_dev =3D &pdev->dev;
-> =20
-> @@ -394,6 +396,10 @@ static int __init sunxi_sram_probe(struct platform_d=
-evice *pdev)
->  		regmap =3D devm_regmap_init_mmio(dev, base, &sunxi_sram_regmap_config);
->  		if (IS_ERR(regmap))
->  			return PTR_ERR(regmap);
-> +
-> +		ret =3D of_syscon_register_regmap(dev->of_node, regmap);
-> +		if (ret)
-> +			return ret;
->  	}
-> =20
->  	of_platform_populate(dev->of_node, NULL, NULL, dev);
->=20
+If the ports are brought up before setting up the HSR interface
+and then the port state is not changed afterwards, everything works
+as intended:
 
+  ip link set lan1 up
+  ip link set lan2 up
+  ip link add name hsr type hsr slave1 lan1 slave2 lan2 supervision 45 version 1
+  ip addr add dev hsr 10.0.0.10/24
+  ip link set hsr up
 
+If the port state is changed after creating the HSR interface, this results
+in a non-working HSR setup:
 
+  ip link add name hsr type hsr slave1 lan1 slave2 lan2 supervision 45 version 1
+  ip addr add dev hsr 10.0.0.10/24
+  ip link set lan1 up
+  ip link set lan2 up
+  ip link set hsr up
+
+In this state, packets will not get forwarded between the HSR ports and
+communication between HSR nodes that are not direct neighbours in the
+topology fails.
+
+To avoid this, we prevent all forwarding reconfiguration requests for ports
+that are part of a HSR setup with NETIF_F_HW_HSR_FWD enabled.
+
+Fixes: 2d61298fdd7b ("net: dsa: microchip: Enable HSR offloading for KSZ9477")
+Signed-off-by: Frieder Schrempf <frieder.schrempf@kontron.de>
+---
+I'm posting this as RFC as my knowledge of the driver and the stack in
+general is very limited. Please review thoroughly and provide feedback.
+Thanks!
+---
+---
+ drivers/net/dsa/microchip/ksz_common.c | 11 +++++++++++
+ include/net/dsa.h                      | 12 ++++++++++++
+ 2 files changed, 23 insertions(+)
+
+diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+index 7c142c17b3f69..56370ecdfe4ee 100644
+--- a/drivers/net/dsa/microchip/ksz_common.c
++++ b/drivers/net/dsa/microchip/ksz_common.c
+@@ -2286,6 +2286,17 @@ static void ksz_update_port_member(struct ksz_device *dev, int port)
+ 		return;
+ 
+ 	dp = dsa_to_port(ds, port);
++
++	/*
++	 * HSR ports might use forwarding configured during setup. Prevent any
++	 * modifications as long as the port is part of a HSR setup with
++	 * NETIF_F_HW_HSR_FWD enabled.
++	 */
++	if (dev->hsr_dev && dp->user &&
++	    (dp->user->features & NETIF_F_HW_HSR_FWD) &&
++	    dsa_is_hsr_port(ds, dev->hsr_dev, port))
++		return;
++
+ 	cpu_port = BIT(dsa_upstream_port(ds, port));
+ 
+ 	for (i = 0; i < ds->num_ports; i++) {
+diff --git a/include/net/dsa.h b/include/net/dsa.h
+index 55e2d97f247eb..846a2cc2f2fc3 100644
+--- a/include/net/dsa.h
++++ b/include/net/dsa.h
+@@ -565,6 +565,18 @@ static inline bool dsa_is_user_port(struct dsa_switch *ds, int p)
+ 	return dsa_to_port(ds, p)->type == DSA_PORT_TYPE_USER;
+ }
+ 
++static inline bool dsa_is_hsr_port(struct dsa_switch *ds, struct net_device *hsr, int p)
++{
++	struct dsa_port *hsr_dp;
++
++	dsa_hsr_foreach_port(hsr_dp, ds, hsr) {
++		if (hsr_dp->index == p)
++			return true;
++	}
++
++	return false;
++}
++
+ #define dsa_tree_for_each_user_port(_dp, _dst) \
+ 	list_for_each_entry((_dp), &(_dst)->ports, list) \
+ 		if (dsa_port_is_user((_dp)))
+-- 
+2.50.1
 
 
