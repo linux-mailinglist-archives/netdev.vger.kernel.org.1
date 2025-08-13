@@ -1,237 +1,372 @@
-Return-Path: <netdev+bounces-213262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213261-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CC8EB2444C
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 10:29:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71FD8B24448
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 10:28:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 792C55827C1
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 08:27:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA6FF724353
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 08:26:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A38B2ED145;
-	Wed, 13 Aug 2025 08:27:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="E/KL4qn/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06A0D2D321B;
+	Wed, 13 Aug 2025 08:26:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02AEB2ECD3C;
-	Wed, 13 Aug 2025 08:27:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8B202D8382
+	for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 08:26:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755073641; cv=none; b=b1Voi1QTt/hI3xNJEy1Z1LWLD0jniImLhStgCwnLKG5b13XtLCcEoiggfFlOjDnJC2NFHYveKesD44XY+gMGxkEaZu60+K5AB88hOQvIt62byEcJ7Tu4vgGGfI6hAvWvFLewaLAdu7IzYGuFjNZEAdn1Znr7WFRMXwzhn+0UBm4=
+	t=1755073591; cv=none; b=cmI0nJ3ypFujaa+5vLFhG5p5fOvTabV7v6SBQIuoZyiv3RMSRNu8vVUi/nmPDpwe8QE8p4TRPzMTqopXel/tQDRdWWxloV9a6fTKy6kObTAJdKwZvh9/aYbOjbLvYR1Vl6st6mTUuOcZp66M1HFwg/TlzMbeX8gb2JUCs4hfDiU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755073641; c=relaxed/simple;
-	bh=EETb+mATWoalC/jIg1GxMzaFPbxxVYn4Baz6WzC73Pk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=BoCvVS02QRM+FyLCFVFCB7KQrKwNHkRxKmkCu4KPUUApCcT2Y/gZe0Ef//MfKCjVHagIZybVEZd/2odG7kw6MK/pOhHNXunIVQoaZ6pVaZ2I7HTTXraauDX1yNdTERrCq/QiZUD5Y0rHyfMHZhWZtu2/lFIBrTgB3DVFhnZC4Hc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=E/KL4qn/; arc=none smtp.client-ip=198.47.23.234
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllvem-sh03.itg.ti.com ([10.64.41.86])
-	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTP id 57D8QFrq1659217;
-	Wed, 13 Aug 2025 03:26:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1755073575;
-	bh=LxxC+vWL+dBv0jeH8xTa33bVZ4qWYF8YDuV31GextYQ=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=E/KL4qn/ZvseqzCjyaciE6Wvi42lnHNKpBZuHekmdtnS5MVfb7PcteyB6elY2DZ6Y
-	 X2j8RCKYqEPZKYn+lwzuDS/HWSeOgHzKz9eoDP/1ZAQ9U+39k1ttU6KWWDz5IhTF+m
-	 h64B6kZ4GqwYH3BEOIAA7XOQtCkFe+v5oiEPHzHM=
-Received: from DFLE101.ent.ti.com (dfle101.ent.ti.com [10.64.6.22])
-	by fllvem-sh03.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 57D8QFKo257229
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
-	Wed, 13 Aug 2025 03:26:15 -0500
-Received: from DFLE101.ent.ti.com (10.64.6.22) by DFLE101.ent.ti.com
- (10.64.6.22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Wed, 13
- Aug 2025 03:26:14 -0500
-Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DFLE101.ent.ti.com
- (10.64.6.22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55 via
- Frontend Transport; Wed, 13 Aug 2025 03:26:14 -0500
-Received: from [172.24.231.152] (danish-tpc.dhcp.ti.com [172.24.231.152])
-	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 57D8Q8Xc1721088;
-	Wed, 13 Aug 2025 03:26:08 -0500
-Message-ID: <94eeae65-0e4b-45ef-a9c0-6bc8d37ae789@ti.com>
-Date: Wed, 13 Aug 2025 13:56:07 +0530
+	s=arc-20240116; t=1755073591; c=relaxed/simple;
+	bh=Jyt7O8njYePsq/MWBoui+u1Z5wQNi/jDmEYIoung8cs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eYttNExGJwrM0ZFsEF0MhE7eIiR/P5EAqJT11peWISQBZbrd4vrb5cxhIfpHEKWuS4vs85ddneVDf3Oq6JiITYyCvkTaN7v4UmXjV8xjEC+NCtN+Wz+UeA240NBeX6QHMRUUHIcCdbyXSG8hTexMyIFOZED46cb7mPufdXQN4LQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1um6oO-0004aw-CB; Wed, 13 Aug 2025 10:26:20 +0200
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1um6oN-0003o7-2n;
+	Wed, 13 Aug 2025 10:26:19 +0200
+Received: from pengutronix.de (p54b152ce.dip0.t-ipconnect.de [84.177.82.206])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 78E5B4568DB;
+	Wed, 13 Aug 2025 08:26:19 +0000 (UTC)
+Date: Wed, 13 Aug 2025 10:26:17 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Stefan =?utf-8?B?TcOkdGpl?= <stefan.maetje@esd.eu>
+Cc: Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+	Frank Jungclaus <frank.jungclaus@esd.eu>, linux-can@vger.kernel.org, socketcan@esd.eu, 
+	Simon Horman <horms@kernel.org>, Olivier Sobrie <olivier@sobrie.be>, 
+	Oliver Hartkopp <socketcan@hartkopp.net>, netdev@vger.kernel.org
+Subject: Re: [PATCH 2/6] can: esd_usb: Fix not detecting version reply in
+ probe routine
+Message-ID: <20250813-just-independent-angelfish-909305-mkl@pengutronix.de>
+References: <20250811210611.3233202-1-stefan.maetje@esd.eu>
+ <20250811210611.3233202-3-stefan.maetje@esd.eu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 5/5] net: rnpgbe: Add register_netdev
-To: Dong Yibo <dong100@mucse.com>, <andrew+netdev@lunn.ch>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <horms@kernel.org>, <corbet@lwn.net>,
-        <gur.stavi@huawei.com>, <maddy@linux.ibm.com>, <mpe@ellerman.id.au>,
-        <lee@trager.us>, <gongfan1@huawei.com>, <lorenzo@kernel.org>,
-        <geert+renesas@glider.be>, <Parthiban.Veerasooran@microchip.com>,
-        <lukas.bulwahn@redhat.com>, <alexanderduyck@fb.com>,
-        <richardcochran@gmail.com>
-CC: <netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-References: <20250812093937.882045-1-dong100@mucse.com>
- <20250812093937.882045-6-dong100@mucse.com>
-Content-Language: en-US
-From: MD Danish Anwar <danishanwar@ti.com>
-In-Reply-To: <20250812093937.882045-6-dong100@mucse.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="e6icoa6tdvh3k65v"
+Content-Disposition: inline
+In-Reply-To: <20250811210611.3233202-3-stefan.maetje@esd.eu>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
 
+--e6icoa6tdvh3k65v
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH 2/6] can: esd_usb: Fix not detecting version reply in
+ probe routine
+MIME-Version: 1.0
 
-On 12/08/25 3:09 pm, Dong Yibo wrote:
-> Initialize get mac from hw, register the netdev.
-> 
-> Signed-off-by: Dong Yibo <dong100@mucse.com>
+On 11.08.2025 23:06:07, Stefan M=C3=A4tje wrote:
+> This patch fixes some problems in the esd_usb_probe routine that render
+> the CAN interface unusable.
+>=20
+> The probe routine sends a version request message to the USB device to
+> receive a version reply with the number of CAN ports and the hard-
+> & firmware versions. Then for each CAN port a CAN netdev is registered.
+>=20
+> The previous code assumed that the version reply would be received
+> immediately. But if the driver was reloaded without power cycling the
+> USB device (i. e. on a reboot) there could already be other incoming
+> messages in the USB buffers. These would be in front of the version
+> reply and need to be skipped.
+>=20
+> In the previous code these problems were present:
+> - Only one usb_bulk_msg() read was done into a buffer of
+>   sizeof(union esd_usb_msg) which is smaller than ESD_USB_RX_BUFFER_SIZE
+>   which could lead to an overflow error from the USB stack.
+> - The first bytes of the received data were taken without checking for
+>   the message type. This could lead to zero detected CAN interfaces.
+>=20
+> To mitigate these problems:
+> - Use a transfer buffer "buf" with ESD_USB_RX_BUFFER_SIZE.
+> - Added a function esd_usb_recv_version() that reads and skips incoming
+>   "esd_usb_msg" messages until a version reply message is found. This
+>   is evaluated to return the count of CAN ports and version information.
+> - The data drain loop is limited by a maximum # of bytes to read from
+>   the device based on its internal buffer sizes and a timeout
+>   ESD_USB_DRAIN_TIMEOUT_MS.
+>=20
+> This version of the patch incorporates changes recommended on the
+> linux-can list for a first version.
+>=20
+> References:
+> https://lore.kernel.org/linux-can/d7fd564775351ea8a60a6ada83a0368a99ea6b1=
+9.camel@esd.eu/#r
+>=20
+> Fixes: 80662d943075 ("can: esd_usb: Add support for esd CAN-USB/3")
+> Signed-off-by: Stefan M=C3=A4tje <stefan.maetje@esd.eu>
 > ---
->  drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h    | 22 ++++++
->  .../net/ethernet/mucse/rnpgbe/rnpgbe_chip.c   | 73 ++++++++++++++++++
->  drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h |  1 +
->  .../net/ethernet/mucse/rnpgbe/rnpgbe_main.c   | 76 +++++++++++++++++++
->  4 files changed, 172 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
-> index 6cb14b79cbfe..644b8c85c29d 100644
-> --- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
-> +++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
-> @@ -6,6 +6,7 @@
->  
->  #include <linux/types.h>
->  #include <linux/mutex.h>
-> +#include <linux/netdevice.h>
->  
->  extern const struct rnpgbe_info rnpgbe_n500_info;
->  extern const struct rnpgbe_info rnpgbe_n210_info;
-> @@ -86,6 +87,18 @@ struct mucse_mbx_info {
->  	u32 fw2pf_mbox_vec;
+>  drivers/net/can/usb/esd_usb.c | 125 ++++++++++++++++++++++++++--------
+>  1 file changed, 97 insertions(+), 28 deletions(-)
+>=20
+> diff --git a/drivers/net/can/usb/esd_usb.c b/drivers/net/can/usb/esd_usb.c
+> index 05ed664cf59d..dbdfffe3a4a0 100644
+> --- a/drivers/net/can/usb/esd_usb.c
+> +++ b/drivers/net/can/usb/esd_usb.c
+> @@ -44,6 +44,9 @@ MODULE_LICENSE("GPL v2");
+>  #define ESD_USB_CMD_TS			5 /* also used for TS_REPLY */
+>  #define ESD_USB_CMD_IDADD		6 /* also used for IDADD_REPLY */
+> =20
+> +/* esd version message name size */
+> +#define ESD_USB_FW_NAME_SZ 16
+> +
+>  /* esd CAN message flags - dlc field */
+>  #define ESD_USB_RTR	BIT(4)
+>  #define ESD_USB_NO_BRS	BIT(4)
+> @@ -95,6 +98,7 @@ MODULE_LICENSE("GPL v2");
+>  #define ESD_USB_RX_BUFFER_SIZE		1024
+>  #define ESD_USB_MAX_RX_URBS		4
+>  #define ESD_USB_MAX_TX_URBS		16 /* must be power of 2 */
+> +#define ESD_USB_DRAIN_TIMEOUT_MS	100
+> =20
+>  /* Modes for CAN-USB/3, to be used for esd_usb_3_set_baudrate_msg_x.mode=
+ */
+>  #define ESD_USB_3_BAUDRATE_MODE_DISABLE		0 /* remove from bus */
+> @@ -131,7 +135,7 @@ struct esd_usb_version_reply_msg {
+>  	u8 nets;
+>  	u8 features;
+>  	__le32 version;
+> -	u8 name[16];
+> +	u8 name[ESD_USB_FW_NAME_SZ];
+>  	__le32 rsvd;
+>  	__le32 ts;
 >  };
->  
-> +struct mucse_hw_operations {
-> +	int (*init_hw)(struct mucse_hw *hw);
-> +	int (*reset_hw)(struct mucse_hw *hw);
-> +	void (*start_hw)(struct mucse_hw *hw);
-> +	void (*init_rx_addrs)(struct mucse_hw *hw);
-> +	void (*driver_status)(struct mucse_hw *hw, bool enable, int mode);
-> +};
-
-You define functions init_hw, start_hw, and init_rx_addrs in this
-structure but they aren't implemented in this patch. Either implement
-them or remove them if not needed yet.
-
-
+> @@ -625,17 +629,91 @@ static int esd_usb_send_msg(struct esd_usb *dev, un=
+ion esd_usb_msg *msg)
+>  			    1000);
+>  }
+> =20
+> -static int esd_usb_wait_msg(struct esd_usb *dev,
+> -			    union esd_usb_msg *msg)
+> +static int esd_usb_req_version(struct esd_usb *dev, void *buf)
+>  {
+> -	int actual_length;
+> +	union esd_usb_msg *msg =3D buf;
+> =20
+> -	return usb_bulk_msg(dev->udev,
+> -			    usb_rcvbulkpipe(dev->udev, 1),
+> -			    msg,
+> -			    sizeof(*msg),
+> -			    &actual_length,
+> -			    1000);
+> +	msg->hdr.cmd =3D ESD_USB_CMD_VERSION;
+> +	msg->hdr.len =3D sizeof(struct esd_usb_version_msg) / sizeof(u32); /* #=
+ of 32bit words */
+> +	msg->version.rsvd =3D 0;
+> +	msg->version.flags =3D 0;
+> +	msg->version.drv_version =3D 0;
 > +
-> +enum {
-> +	mucse_driver_insmod,
-> +};
-> +
->  struct mucse_hw {
->  	void *back;
->  	u8 pfvfnum;
-> @@ -96,12 +109,18 @@ struct mucse_hw {
->  	u32 axi_mhz;
->  	u32 bd_uid;
->  	enum rnpgbe_hw_type hw_type;
-> +	const struct mucse_hw_operations *ops;
->  	struct mucse_dma_info dma;
->  	struct mucse_eth_info eth;
->  	struct mucse_mac_info mac;
->  	struct mucse_mbx_info mbx;
-> +	u32 flags;
-> +#define M_FLAGS_INIT_MAC_ADDRESS BIT(0)
->  	u32 driver_version;
->  	u16 usecstocount;
-> +	int lane;
-> +	u8 addr[ETH_ALEN];
-> +	u8 perm_addr[ETH_ALEN];
->  };
->  
->  struct mucse {
-> @@ -123,4 +142,7 @@ struct rnpgbe_info {
->  #define PCI_DEVICE_ID_N500_DUAL_PORT 0x8318
->  #define PCI_DEVICE_ID_N210 0x8208
->  #define PCI_DEVICE_ID_N210L 0x820a
-> +
-> +#define dma_wr32(dma, reg, val) writel((val), (dma)->dma_base_addr + (reg))
-> +#define dma_rd32(dma, reg) readl((dma)->dma_base_addr + (reg))
->  #endif /* _RNPGBE_H */
-> diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
-> index 16d0a76114b5..3eaa0257f3bb 100644
-> --- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
-> +++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
-> @@ -2,10 +2,82 @@
->  /* Copyright(c) 2020 - 2025 Mucse Corporation. */
->  
->  #include <linux/string.h>
-> +#include <linux/etherdevice.h>
->  
->  #include "rnpgbe.h"
->  #include "rnpgbe_hw.h"
->  #include "rnpgbe_mbx.h"
-> +#include "rnpgbe_mbx_fw.h"
-> +
-> +/**
-> + * rnpgbe_get_permanent_mac - Get permanent mac
-> + * @hw: hw information structure
-> + * @mac_addr: pointer to store mac
-> + *
-> + * rnpgbe_get_permanent_mac tries to get mac from hw.
-> + * It use eth_random_addr if failed.
-> + **/
-> +static void rnpgbe_get_permanent_mac(struct mucse_hw *hw,
-> +				     u8 *mac_addr)
-> +{
-> +	if (mucse_fw_get_macaddr(hw, hw->pfvfnum, mac_addr, hw->lane)) {
-> +		eth_random_addr(mac_addr);
-> +	} else {
-> +		if (!is_valid_ether_addr(mac_addr))
-> +			eth_random_addr(mac_addr);
-> +	}
-> +
-
-The function should log a warning when falling back to a random MAC
-address, especially in the second case where the hardware returned an
-invalid MAC.
-
-> +	hw->flags |= M_FLAGS_INIT_MAC_ADDRESS;
+> +	return esd_usb_send_msg(dev, msg);
 > +}
 > +
-
-> +/**
-> + * rnpgbe_xmit_frame - Send a skb to driver
-> + * @skb: skb structure to be sent
-> + * @netdev: network interface device structure
-> + *
-> + * @return: NETDEV_TX_OK or NETDEV_TX_BUSY
-> + **/
-> +static netdev_tx_t rnpgbe_xmit_frame(struct sk_buff *skb,
-> +				     struct net_device *netdev)
+> +static int esd_usb_recv_version(struct esd_usb *dev, void *rx_buf)
 > +{
-> +		dev_kfree_skb_any(skb);
-> +		return NETDEV_TX_OK;
-> +}
-
-Extra indentation on these two lines. Also, the function just drops all
-packets without any actual transmission. This should at least increment
-the drop counter statistics.
-
+> +	/* Device hardware has 2 RX buffers with ESD_USB_RX_BUFFER_SIZE, * 4 to=
+ give some slack. */
+> +	const int max_drain_bytes =3D (4 * ESD_USB_RX_BUFFER_SIZE);
+> +	unsigned long end_jiffies;
+> +	int cnt_other =3D 0;
+> +	int cnt_ts =3D 0;
+> +	int cnt_vs =3D 0;
+> +	int len_sum =3D 0;
+> +	int attempt =3D 0;
+> +	int err;
 > +
-> +static const struct net_device_ops rnpgbe_netdev_ops = {
-> +	.ndo_open = rnpgbe_open,
-> +	.ndo_stop = rnpgbe_close,
-> +	.ndo_start_xmit = rnpgbe_xmit_frame,
-> +};
+> +	end_jiffies =3D jiffies + msecs_to_jiffies(ESD_USB_DRAIN_TIMEOUT_MS);
+> +	do {
+> +		int actual_length;
+> +		int pos;
+> +
+> +		err =3D usb_bulk_msg(dev->udev,
+> +				   usb_rcvbulkpipe(dev->udev, 1),
+> +				   rx_buf,
+> +				   ESD_USB_RX_BUFFER_SIZE,
+> +				   &actual_length,
+> +				   ESD_USB_DRAIN_TIMEOUT_MS);
+> +		dev_dbg(&dev->udev->dev, "AT %d, LEN %d, ERR %d\n", attempt, actual_le=
+ngth, err);
+> +		if (err)
+> +			goto bail;
+> +
+> +		err =3D -ENOENT;
+> +		len_sum +=3D actual_length;
+> +		pos =3D 0;
+> +		while (pos < actual_length) {
 
+You have to check that the actual offset you will access later is within
+actual_length.
 
--- 
-Thanks and Regards,
-Danish
+> +			union esd_usb_msg *p_msg;
+> +
+> +			p_msg =3D (union esd_usb_msg *)(rx_buf + pos);
+> +
+> +			switch (p_msg->hdr.cmd) {
+> +			case ESD_USB_CMD_VERSION:
+> +				++cnt_vs;
+> +				dev->net_count =3D min(p_msg->version_reply.nets, ESD_USB_MAX_NETS);
+> +				dev->version =3D le32_to_cpu(p_msg->version_reply.version);
+> +				err =3D 0;
+> +				dev_dbg(&dev->udev->dev, "TS 0x%08x, V 0x%08x, N %u, F 0x%02x, %.*s\=
+n",
+> +					le32_to_cpu(p_msg->version_reply.ts),
+> +					le32_to_cpu(p_msg->version_reply.version),
+> +					p_msg->version_reply.nets,
+> +					p_msg->version_reply.features,
+> +					ESD_USB_FW_NAME_SZ, p_msg->version_reply.name);
+> +				break;
+> +			case ESD_USB_CMD_TS:
+> +				++cnt_ts;
+> +				dev_dbg(&dev->udev->dev, "TS 0x%08x\n",
+> +					le32_to_cpu(p_msg->rx.ts));
+> +				break;
+> +			default:
+> +				++cnt_other;
+> +				dev_dbg(&dev->udev->dev, "HDR %d\n", p_msg->hdr.cmd);
+> +				break;
+> +			}
+> +			pos +=3D p_msg->hdr.len * sizeof(u32); /* convert to # of bytes */
 
+Can pos overflow? hdr.len is a u8, so probably not.
+
+> +			if (pos > actual_length) {
+> +				dev_err(&dev->udev->dev, "format error\n");
+> +				err =3D -EPROTO;
+> +				goto bail;
+> +			}
+> +		}
+> +		++attempt;
+> +	} while (cnt_vs =3D=3D 0 && len_sum < max_drain_bytes && time_before(ji=
+ffies, end_jiffies));
+> +bail:
+> +	dev_dbg(&dev->udev->dev, "RC=3D%d; ATT=3D%d, TS=3D%d, VS=3D%d, O=3D%d, =
+B=3D%d\n",
+> +		err, attempt, cnt_ts, cnt_vs, cnt_other, len_sum);
+> +	return err;
+>  }
+> =20
+>  static int esd_usb_setup_rx_urbs(struct esd_usb *dev)
+> @@ -1274,7 +1352,7 @@ static int esd_usb_probe(struct usb_interface *intf,
+>  			 const struct usb_device_id *id)
+>  {
+>  	struct esd_usb *dev;
+> -	union esd_usb_msg *msg;
+> +	void *buf;
+>  	int i, err;
+> =20
+>  	dev =3D kzalloc(sizeof(*dev), GFP_KERNEL);
+> @@ -1289,34 +1367,25 @@ static int esd_usb_probe(struct usb_interface *in=
+tf,
+> =20
+>  	usb_set_intfdata(intf, dev);
+> =20
+> -	msg =3D kmalloc(sizeof(*msg), GFP_KERNEL);
+> -	if (!msg) {
+> +	buf =3D kmalloc(ESD_USB_RX_BUFFER_SIZE, GFP_KERNEL);
+> +	if (!buf) {
+>  		err =3D -ENOMEM;
+>  		goto free_dev;
+>  	}
+> =20
+>  	/* query number of CAN interfaces (nets) */
+> -	msg->hdr.cmd =3D ESD_USB_CMD_VERSION;
+> -	msg->hdr.len =3D sizeof(struct esd_usb_version_msg) / sizeof(u32); /* #=
+ of 32bit words */
+> -	msg->version.rsvd =3D 0;
+> -	msg->version.flags =3D 0;
+> -	msg->version.drv_version =3D 0;
+> -
+> -	err =3D esd_usb_send_msg(dev, msg);
+> +	err =3D esd_usb_req_version(dev, buf);
+
+I'm a bit uneasy with the passing of the buffer as an argument, but not
+its size.
+
+>  	if (err < 0) {
+>  		dev_err(&intf->dev, "sending version message failed\n");
+> -		goto free_msg;
+> +		goto free_buf;
+>  	}
+> =20
+> -	err =3D esd_usb_wait_msg(dev, msg);
+> +	err =3D esd_usb_recv_version(dev, buf);
+>  	if (err < 0) {
+>  		dev_err(&intf->dev, "no version message answer\n");
+> -		goto free_msg;
+> +		goto free_buf;
+>  	}
+> =20
+> -	dev->net_count =3D (int)msg->version_reply.nets;
+> -	dev->version =3D le32_to_cpu(msg->version_reply.version);
+> -
+>  	if (device_create_file(&intf->dev, &dev_attr_firmware))
+>  		dev_err(&intf->dev,
+>  			"Couldn't create device file for firmware\n");
+> @@ -1333,8 +1402,8 @@ static int esd_usb_probe(struct usb_interface *intf,
+>  	for (i =3D 0; i < dev->net_count; i++)
+>  		esd_usb_probe_one_net(intf, i);
+> =20
+> -free_msg:
+> -	kfree(msg);
+> +free_buf:
+> +	kfree(buf);
+>  free_dev:
+>  	if (err)
+>  		kfree(dev);
+> --=20
+> 2.34.1
+>=20
+>=20
+>=20
+
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--e6icoa6tdvh3k65v
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmicTCYACgkQDHRl3/mQ
+kZzbyQf9HAot4Tc6swFP/rldVTaGrk2axazTMaqIy6O3zAPGrUsB0XWMc4Z/qoF3
+/jq1XDuzz/QZG9L0WfOEkj2PV9/BPHqMnC/jyVEN6tHMJtxGFkqHgZHLH5fHxa3a
+pfmcZjipfu6mmIhvRzCZnScsiNA8JK6P2C2lHquCM4GYiBVt0kpYSmxrHFsNMHKH
+J23bPPmKnWSn9+TyhdDT3FMhzAE55lLp1qrwFnZ3NCP/RiDqIvSZWd8PGRklY3w7
+6/fvxpPhKv4++lmyXxoIuPTTQ413QWAfMa+3aHrpjZhzR5goaixxbaQPiAP18PyT
+pUWB68Cg2dotPX+XyUxCMz4viaXiew==
+=ukOx
+-----END PGP SIGNATURE-----
+
+--e6icoa6tdvh3k65v--
 
