@@ -1,62 +1,61 @@
-Return-Path: <netdev+bounces-213358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213366-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AAA6B24BE9
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 16:32:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06992B24C27
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 16:40:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9024D7B79AF
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 14:30:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 920823ABE9E
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 14:37:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 296A11C3F0C;
-	Wed, 13 Aug 2025 14:31:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD0822E172C;
+	Wed, 13 Aug 2025 14:34:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qh8YPewe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jU+4ck74"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB5055A79B;
-	Wed, 13 Aug 2025 14:31:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 964CC1E22E9;
+	Wed, 13 Aug 2025 14:34:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755095479; cv=none; b=W+n5I8Y+Bi/33tozas26uQ9BhxNy7O+oEr4Rg9kJe7AxVQFrwmow+Eze5OEArZTOzr4bPdlCZNKl95Cji0NGnmnN67xUchwyqN/wb7v58TXLQ9AhfhFRtPWUqcEy72MZ0DAtDhShJ1tw+yYx6Z+xPIVzShsB6lsgetVYpqC7DkQ=
+	t=1755095693; cv=none; b=Q+igYv/G+joTJV55rPiobcDwOrmFcRDZaByoXIxwKN7zSLefJJDZuhGRP0PrD2BJqvErGE41nJofv4aU22qwnSAw0Xj7y7PJbwIf/7Le0tFEDS3dwd+T/X7c0xPOmuwyYMRHu3E9MTxh1OAc8GpL8wnq+NixCTcGGQdg1PjGpLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755095479; c=relaxed/simple;
-	bh=lCnHQFYDwV26ux3XAOHXzq0Y05YyeD3LTvZGTN484T8=;
+	s=arc-20240116; t=1755095693; c=relaxed/simple;
+	bh=9KT4Ptd/LkLHSPZNthcxtGmb/B9hmXvuWaBRPjZOEg0=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=o+BQPZKV0ZentoXZK1/0QMNaZ5Lxls3kckzhot9s4zYGZFrQeDsv/9Ibu6l5HrQh8OdK+p5oI6P6y/U0V1kGgO2HNn979wuOK5TcYmm+wP8thvM4KOdwHkd65kUMdHppjiPcS3CZplOsXJUI3uy0YCvJYCQton2Fk/h7kaHeIMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qh8YPewe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D28FEC4CEEB;
-	Wed, 13 Aug 2025 14:31:17 +0000 (UTC)
+	 MIME-Version:Content-Type; b=h6yHHFnNdZk3JTKWD7ugRyxxLWUwhbem9yOsLivvQ8FU6PqfHCGcvBQeaL5Ve0/g7cZYM8jAwV/I3mJvyA0bZMxybC9bBNFwierKBw7UXN9GQ/U5ufZc00r7kKGJTBEnDoLdwYRrgnnXEKdwpzOzBIEiyzXWuIbtUKLdBLhNOJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jU+4ck74; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 830E9C4CEEB;
+	Wed, 13 Aug 2025 14:34:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755095478;
-	bh=lCnHQFYDwV26ux3XAOHXzq0Y05YyeD3LTvZGTN484T8=;
+	s=k20201202; t=1755095693;
+	bh=9KT4Ptd/LkLHSPZNthcxtGmb/B9hmXvuWaBRPjZOEg0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Qh8YPeweVmCaLwlaoK61rvcUIEcpwetldWQ0ZXblbPFcXt6FtWFoda2FTBQvpa5hO
-	 XPPjsBS09YVDDi9JJTMaAJmcWL2LtR9rh5gNa1ZOpPjALfywdxaF8rNhFpUdcAofe/
-	 2GJQKuR/q4OlR06uojNuL56k39M5gkAE7HEWi6PInnVQ0pfa7eUD9SVRu0MkSdhCPa
-	 or96RLbIoie7tvyIbY3O+IQ9l0L21Rppk4TPikEq9MsXjcOr6ya6ddgQ7QkY2kOYpm
-	 kjPaXFwnMZGxKGbqRi9mQeHuFgrvkR+sRe4pLslCqIiTrSmbbVV40IJ0k2oGZhTwvE
-	 0DuYC5XUzhZXA==
-Date: Wed, 13 Aug 2025 07:31:17 -0700
+	b=jU+4ck74Tqk3bbtZemE2sPvQ3JUQJlqTLjbz40tZM7Yf0mPlK+9GGjxHd5PG/c9Qn
+	 Fk6J5vEQLOz+3GK8HKArPmjlsK3PVlIVs/xvVOzOuPLjHytaIXkyAf7w40fLz0/0VR
+	 tgFyhlIeeROTYu/K7kDOW8W1NSx/KxEzFI5bsarZoddrur3loLvtYm7ALhSWeqYEzV
+	 NCqnfg5+7QRw41WYZQEqKt469z+ARCAhq56fVIqX7c88RRlnFzvB8e367HdnfiEG5e
+	 97MfkYhorkSxIQuuUdIh1Do0/VmIaMYGsRNmUCXG7E9vwE90FEAheC2ODLW3uJwsBl
+	 LpcejhUBjb5pQ==
+Date: Wed, 13 Aug 2025 07:34:51 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Mohsin Bashir <mohsin.bashr@gmail.com>
-Cc: netdev@vger.kernel.org, aleksander.lobakin@intel.com,
- alexanderduyck@fb.com, andrew+netdev@lunn.ch, ast@kernel.org,
- bpf@vger.kernel.org, corbet@lwn.net, daniel@iogearbox.net,
- davem@davemloft.net, edumazet@google.com, hawk@kernel.org,
- horms@kernel.org, john.fastabend@gmail.com, kernel-team@meta.com,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com,
- sdf@fomichev.me, vadim.fedorenko@linux.dev
-Subject: Re: [PATCH net-next V3 8/9] eth: fbnic: Collect packet statistics
- for XDP
-Message-ID: <20250813073117.1bca3a97@kernel.org>
-In-Reply-To: <20250812222252.261779-1-mohsin.bashr@gmail.com>
-References: <20250812220150.161848-1-mohsin.bashr@gmail.com>
-	<20250812222252.261779-1-mohsin.bashr@gmail.com>
+To: Richard Gobert <richardbgobert@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, horms@kernel.org, donald.hunter@gmail.com,
+ andrew+netdev@lunn.ch, dsahern@kernel.org, shuah@kernel.org,
+ daniel@iogearbox.net, jacob.e.keller@intel.com, razor@blackwall.org,
+ idosch@nvidia.com, petrm@nvidia.com, menglong8.dong@gmail.com,
+ martin.lau@kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v5 5/5] selftests/net: add vxlan localbind
+ selftest
+Message-ID: <20250813073451.159c5904@kernel.org>
+In-Reply-To: <20250812125155.3808-6-richardbgobert@gmail.com>
+References: <20250812125155.3808-1-richardbgobert@gmail.com>
+	<20250812125155.3808-6-richardbgobert@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,15 +65,14 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 12 Aug 2025 15:22:52 -0700 Mohsin Bashir wrote:
-> +				} else if (PTR_ERR(skb) == -FBNIC_XDP_LEN_ERR) {
-> +					length_errors++;
+On Tue, 12 Aug 2025 14:51:55 +0200 Richard Gobert wrote:
+> +ip link help vxlan 2>&1 | grep -q "localbind"
+> +if [ $? -ne 0 ]; then
+> +	echo "SKIP: iproute2 ip too old, missing VXLAN localbind support"
+> +	exit $ksft_skip
+> +fi
 
-cocci is complaining about this:
-
-...fbnic_txrx.c:1264:14-21: ERROR: PTR_ERR applied after initialization to constant on line 1250
-
-I think applying PTR_ERR/ERR_PTR to the constant may clean this up.
--- 
-pw-bot: cr
+Could you add a link to a public GH with the iproute2 patches,
+or co-post them?
+https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#co-posting-changes-to-user-space-components
 
