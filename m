@@ -1,171 +1,106 @@
-Return-Path: <netdev+bounces-213180-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213181-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9584CB24034
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 07:33:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DF07B24037
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 07:33:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 320FC623F17
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 05:33:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2241688224
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 05:33:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B00ED2BDC3E;
-	Wed, 13 Aug 2025 05:33:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D3F329C325;
+	Wed, 13 Aug 2025 05:33:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Lzlghcgv"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="l12r3CxW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E9DD242D74
-	for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 05:33:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0582285047
+	for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 05:33:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755063190; cv=none; b=Fn6QY2b7xXEBBJz07y4/6PC0ddl2ClMf7sxqhbllXZGMmiTCBqmSELNMID9tr/GeesZsDgWqPGcWAXQBiztVHhSXZsxKvRS7Eos2TA/mMLm0+2ixKrIY5CR/ceBIXt+HNjoOC27ZIv5L/v7IrYeSVLQ5hGfAcp5y+PeFmBewbAg=
+	t=1755063228; cv=none; b=hV5SV2aELKMbIJsbiCZfvXNpFCxcCMHC0ffNKKUZ91C63d5lz08WI4CidCtKqAUQgaW/tVmfjmQKEpvpOr5qZ/sXD6bhLjH5AEpx7q8b2ZEnEW3VRR1cTN1xtnor7NGF2b8EENwN0wFXBmL0nIHuDS8rfvFF4ywDNpW5QPDdR+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755063190; c=relaxed/simple;
-	bh=IHOoxSB2XGC97/Fvbsx3+kWd5jPNAgc8qjq/viGFh94=;
+	s=arc-20240116; t=1755063228; c=relaxed/simple;
+	bh=szl39VgGc6cHz9GvoA3e/6o6qymzSMMd7iMeLQXVQXo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pDWLmueuMxSajAzSkslYy9D2awBZUgIBaDgx5XtBakuEKDYuqoPW1QFrYszW7d9alqyoknf/pFKmO4kDQz0KG9UDn7PNmZ0BJbr3QxfoGzoT+D2pfN6VIiGuKFuZB8NO/YZbW8oz+qgVr/ja7H7R24dtMFHQim9a+TaQ8IFdQBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Lzlghcgv; arc=none smtp.client-ip=209.85.216.54
+	 To:Cc:Content-Type; b=JpJIOEfjP0VfEk915jVnDYBeGgbsuzl5rpB5Cdsohaz4UYaYntyVBThlIcWBow9j2vuM3IR7cuPRlHr9aFOWA8ynSvl/3OerQcS2t8do7Ti/SfGvTw+MK/vu11xJAbjricyFp9eQfhfTGHsiE8/x3bIKrES5HIXoG8msxs+pBg0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=l12r3CxW; arc=none smtp.client-ip=209.85.214.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-320dfa8cfa3so5402647a91.3
-        for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 22:33:09 -0700 (PDT)
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-242d8dff9deso37594185ad.2
+        for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 22:33:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755063188; x=1755667988; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1755063225; x=1755668025; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fd5Hzu0+89GoFhfPNDsRG3A11ZVeQEs8/UJ+qwaOXUU=;
-        b=Lzlghcgvy13Cvg7X6y7VJJe6EmT0BhYHB8QdWayuwCkeYTI6s/2qgH6to2MudMuWPP
-         HN6dJb/vXDf41oF79K993QShVCLia3EjdS9BeBVEMDbOyJDOoUEIxRHPFUDuGD8BE0b6
-         cllMxgdXuL7rVX4WeADLTvnG1S9FBG/z2cwBZxaOFonBEInwm90SUKSFQx+vEk9ACrda
-         3eELiQfr+VCvIEkL6sd0DzqMEj03cUffhF38/3cOL60HmYxre+LlPJ4K10L4e7X3IefC
-         KI50so4nd54oWe5AJK07VIRpVUARiPMPkGIjV9hdLaqowsp9livCO26hYOMobzAyVUtf
-         1mWQ==
+        bh=szl39VgGc6cHz9GvoA3e/6o6qymzSMMd7iMeLQXVQXo=;
+        b=l12r3CxW8jNYU/KA4zV5W8iEd7I/nRrUvF4V2wp2M4dIA1gSEhSlsyWOgFe9j5dNoT
+         nL7rsNGzdgPQHErtlLec9pcNgWhiipb4pYoSTdgF8ht2AUbGm3q+zOKeZacdIjALJA2W
+         9/ybOGm0WFbMR2up9hT7xXCM/4pEWIoXkJG960jjpcrFbpC0AyqAO6p6U3xapfNDGJ6o
+         trqfx81MRUrB3mQopRqAkyIFHGiLGVTGmEKVuXJKgr7LO1DQESB/623IphoEKlz9+T/y
+         j7oySYUXBvbQuL++gKNXevboEh+bClD2vH2JhS2IOk9prfTiQjsyNf75sYJtcTl++32Z
+         e/jg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755063188; x=1755667988;
+        d=1e100.net; s=20230601; t=1755063225; x=1755668025;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=fd5Hzu0+89GoFhfPNDsRG3A11ZVeQEs8/UJ+qwaOXUU=;
-        b=T0ctVznXCKC3uZOIoCL/6dDa6noqJumLZInj32V4bmVECUOELGxU5SsTE4mQduk1O5
-         o4AS6ciP7bL2Gl008lgZVc8l70j76Aw0ZMBcAj3UBo/VAEIyAgqDpSlAW5OQEIcb0j9c
-         SqaZbQb6Jf7yQ7s8+XCabGY6+2sBdZ2/wBR7EyXGJ/8WM4w+J9DsmvytePzrDw/dIvqE
-         RDp6uyI2Wb0FYB0LiZIY3/DLuhnJSugvl+KGou8rIUT5e81Rf32dHwiwzHGUcpoOSRgU
-         d4x9mTs/MTQawte8J9sY9usbNjZPhSons3d7Ef7gdjvHqIWNqxFHn1dgLdXdzsjLKxpa
-         yMnA==
-X-Forwarded-Encrypted: i=1; AJvYcCViUjhAw3DztiDifgZ+h02N0L+aHQS9tVpLeHD4UihYF+Q5xGFGKI/yYhg+VaBa8e+3pNbiDbw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzCRR5s92kNap2Atb7bPuBALKCIzfQyzlnF+lDePT+9JqPEaMgE
-	o+NMbVJQdpB678f2hwtT94LR1L9j/6rjyXRdlq7aHfIGMjJ09aarPOENpP67RQ23c0Oqe4XhvCs
-	nIJhIl+LHqPgOn9cA9DGFDaYe8rOmXALXyuMN/fb/
-X-Gm-Gg: ASbGnctrfFq5TKWy99jACq22Qzaf6LhUI52S1iRP3Emie7oLLVq9nJaj7AnQ6xE3EBX
-	LDD0NavezNygTp6bg3qNnr1wcXSDzTqxS6+uRlCMtlG+L6enD43Mb7zl92IIN2I44qloG/ZOdcY
-	Zss1+OCNLCjf2uInXEHBHqWODdrW9cP7QROXPoHE38kU0OfhSr6XLhXKwNXYxoa4T7i6zdnpsKm
-	pnE3H8yD3wQKzVBpq/HNDQVP3R662hWveI2qwAP4CU/WJiSQoo=
-X-Google-Smtp-Source: AGHT+IH3Ow5heN5Ax2cYKZiN1J5uErCtHiipF//JGUZalAKyO1nKABn3UiGzqPqVAQOS02PYRiux0Wll/uHc1/Zh/PU=
-X-Received: by 2002:a17:90b:3c08:b0:321:c567:44bf with SMTP id
- 98e67ed59e1d1-321d0eb0f49mr2505895a91.29.1755063188104; Tue, 12 Aug 2025
- 22:33:08 -0700 (PDT)
+        bh=szl39VgGc6cHz9GvoA3e/6o6qymzSMMd7iMeLQXVQXo=;
+        b=KThK22R+VCMfpXFtg/HztdFOsxG9ix1Iq7XAbrnHEozUoJPjRmIWm4lEDwFEppY30N
+         uvWzfqELgHoEuz03j/cwWvpx9km3LP6bvMOlBOeWw4/SuZbIElYGXYxNnOSYXdX83aXe
+         sZ9fhrXQd93HaRkIM3YwdRnYZE/kfsl+bARBUnm9UvbZrxHG5raAy+A7THUdc335ov0e
+         Lu4VQRsg+1lHU8IpiwKQGAmDsdx3+4mJX4QAZJTMUJ7FROa5h87odDAA8UOrPlQAiFHJ
+         wdopLmyFfnHlGYnJOKSc2ml+O0i6RGD4WTYm5/tOb3QkADQ4z2+9H9CkfQZQQ+XA1pD1
+         Pj4A==
+X-Forwarded-Encrypted: i=1; AJvYcCWm/82sPKsG+QM/dxYhl7YLyOPTKwoMYGtfWhYx6Bh0apWkd5xxgkEznKZkk4td35mKVyVBMXE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKK67pJXGJ2Zh7gX30d7HtvDFfjZpwcYb0eNbY6LTmxgPb/uFV
+	Fcdv1hGW36AxQXdRwEtA8aioZG+0GdMMo1PmB3sqhihoWAptkI75QME3JVAV1oDFxQGwmXuJDmA
+	9ApzWeEwtrUywyMZgBj9BlFJDN7/RThCmocl0YXLH
+X-Gm-Gg: ASbGncuMfDJoGGPnHT09hrd5XijOaKi8WtUMEz7kOalYSYBxBVtJphDmKFhOq6Nrv0n
+	0yvAoAH+1Gc5Iw2u3J7kQPVVOfNNlhQLoZu4aj9WuqrWQb6zvdQWZndiuefe2eRy/VMfDKoZO9O
+	DODd3pMYVO5uUn0tA7iU8dXYTvf7N2O8ngMc8S9PuFuKmh+GKS3JzK1013iVcca5Ii/moU23qA7
+	LaOBMeDPj1D1ibZ57nd0iCS2AKHlFx/G9hVL34G
+X-Google-Smtp-Source: AGHT+IEvhBqfIBgz0Uy2LltljSmLkoge547dd8TrEfVD4oSiAV8QynzIkXQpbdt7iwRQkewsj68bM9S2qDwCDc6MSfA=
+X-Received: by 2002:a17:903:3c2c:b0:243:597:a2f0 with SMTP id
+ d9443c01a7336-2430d108278mr26839105ad.23.1755063225019; Tue, 12 Aug 2025
+ 22:33:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250812175848.512446-1-kuniyu@google.com> <20250812175848.512446-13-kuniyu@google.com>
- <87ldnooue4.fsf@linux.dev>
-In-Reply-To: <87ldnooue4.fsf@linux.dev>
+References: <20250811215432.3379570-1-kuniyu@google.com> <20250811215432.3379570-2-kuniyu@google.com>
+ <20250812180256.712d316b@kernel.org>
+In-Reply-To: <20250812180256.712d316b@kernel.org>
 From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Tue, 12 Aug 2025 22:32:56 -0700
-X-Gm-Features: Ac12FXzONwUY1or--rg6Ax98ZVLm-UmE3bBgmXpdqTrH-hTrcJWYQJLYQ9n4lIg
-Message-ID: <CAAVpQUDZ_8RN_VxQWH_wipRd_Ge++YZU5SQC9535CR8W6m-JnQ@mail.gmail.com>
-Subject: Re: [PATCH v3 net-next 12/12] net-memcg: Decouple controlled memcg
- from global protocol memory accounting.
-To: Roman Gushchin <roman.gushchin@linux.dev>
+Date: Tue, 12 Aug 2025 22:33:33 -0700
+X-Gm-Features: Ac12FXzyccBeDCNPXTyJcCxO6QF78T5PTJcX6Dl3w2G6b5GiIiaXz2LTRSx3rTw
+Message-ID: <CAAVpQUADmTFY08hm2owgb7NdJMBgzwQYE-qWN67TB6+eLC7HPg@mail.gmail.com>
+Subject: Re: [PATCH v1 net-next 1/4] selftest: af_unix: Add -Wall and
+ -Wflex-array-member-not-at-end to CFLAGS.
+To: Jakub Kicinski <kuba@kernel.org>
 Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Neal Cardwell <ncardwell@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Willem de Bruijn <willemb@google.com>, Matthieu Baerts <matttbe@kernel.org>, 
-	Mat Martineau <martineau@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
-	Michal Hocko <mhocko@kernel.org>, Shakeel Butt <shakeel.butt@linux.dev>, 
-	Andrew Morton <akpm@linux-foundation.org>, =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>, 
-	Tejun Heo <tj@kernel.org>, Simon Horman <horms@kernel.org>, Geliang Tang <geliang@kernel.org>, 
-	Muchun Song <muchun.song@linux.dev>, Mina Almasry <almasrymina@google.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, mptcp@lists.linux.dev, 
-	cgroups@vger.kernel.org, linux-mm@kvack.org
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Aug 12, 2025 at 6:58=E2=80=AFPM Roman Gushchin <roman.gushchin@linu=
-x.dev> wrote:
+On Tue, Aug 12, 2025 at 6:02=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
 >
-> Kuniyuki Iwashima <kuniyu@google.com> writes:
+> On Mon, 11 Aug 2025 21:53:04 +0000 Kuniyuki Iwashima wrote:
+> > -Wall and -Wflex-array-member-not-at-end caught some warnings that
+> > will be fixed in later patches.
 >
-> > Some protocols (e.g., TCP, UDP) implement memory accounting for socket
-> > buffers and charge memory to per-protocol global counters pointed to by
-> > sk->sk_proto->memory_allocated.
-> >
-> > When running under a non-root cgroup, this memory is also charged to th=
-e
-> > memcg as "sock" in memory.stat.
-> >
-> > Even when a memcg controls memory usage, sockets of such protocols are
-> > still subject to global limits (e.g., /proc/sys/net/ipv4/tcp_mem).
-> >
-> > This makes it difficult to accurately estimate and configure appropriat=
-e
-> > global limits, especially in multi-tenant environments.
-> >
-> > If all workloads were guaranteed to be controlled under memcg, the issu=
-e
-> > could be worked around by setting tcp_mem[0~2] to UINT_MAX.
-> >
-> > In reality, this assumption does not always hold, and processes that
-> > belong to the root cgroup or opt out of memcg can consume memory up to
-> > the global limit, becoming a noisy neighbour.
-> >
-> > Let's decouple memcg from the global per-protocol memory accounting if
-> > it has a finite memory.max (!=3D "max").
->
-> I think you can't make the new behavior as the new default, simple becaus=
-e
-> it might break existing setups. Basically anyone who is using memory.max
-> will suddenly have their processes being opted out of the net memory
-> accounting. Idk how many users are actually relying on the network
-> memory accounting, but I believe way more than 0.
->
-> So I guess a net sysctl/some other knob is warranted here, with the old
-> behavior being the default.
+> Makes sense to enable the warnings first when writing the patches,
+> but I think we should commit in the opposite order. Fixes fix then
+> arm the warnings. I'll reorder when applying.
 
-I think we don't need a knob to change the behaviour because
-the affected case must have a broken assumption.
-
-There are 3 possible cases below.
-
-1) memory.max =3D=3D "max"
-
-2) memory.max !=3D "max" and tcp_mem does not suppress
-   memory allocation
-
-3) memory.max !=3D "max" and tcp_mem suppresses memory
-   allocation
-
-1) is not affected, and 2) is not affected too because decoupling
-does not change the situation.
-
-Then, for 3), this change will allow more memory than ever,
-but it's still limited by memory.max, which is configured by
-the sys admin.
-
-If this could be a problem, then the total amount of all memcg's
-memory.max should exceed the amount of system memory,
-which is unlikely if configured properly.
-
-Also, in the 3) case, TCP has quite bad performance and the
-sys admin should have raised the tcp_mem limit and moved
-to 2) like our unlimited tcp_mem setting.
-
-What do you think ?
+Exactly, thank you Jakub!
 
