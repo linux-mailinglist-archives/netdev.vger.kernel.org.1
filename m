@@ -1,157 +1,188 @@
-Return-Path: <netdev+bounces-213401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213402-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D226B24DFF
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 17:47:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 99A84B24E02
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 17:48:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 55A92582BB5
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 15:43:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 31BA45A70B8
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 15:44:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2AF8270559;
-	Wed, 13 Aug 2025 15:41:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC2472820B1;
+	Wed, 13 Aug 2025 15:42:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bnKfMmQl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PA4+KN0u"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED0011EA7DD;
-	Wed, 13 Aug 2025 15:41:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F79A27AC41;
+	Wed, 13 Aug 2025 15:41:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755099686; cv=none; b=n46Mp/BfwDsp407QbDDg/gu9PpyObLv5jTUEa9Kc1mJfNoQr85bhIH85Rcm1ybgufdUkYbWgN6e55utW+qz+HP+Y3KN15xChVkblmAL2QdceAMypJTnKuVj0sU/G1Hoh7bAMx9EJb9ERqfS3jdov+fARNmio6TvjmmiREUKvv9Q=
+	t=1755099721; cv=none; b=hHT32zQnYCkywkn99RtKRoyGAroYH4+mksYb4w4NOPeUdT2mXyGLeoLIx2OMlE7Otkbf4uV0/XLD+IeygXak827XHbcTROtW9dlwhylQFa9RFjXs7eNOUHfdjnQnkS+tgj8OI0MayOIRXVvMNinSuCRlhIeXF0U6EB1Ahfs3Cmg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755099686; c=relaxed/simple;
-	bh=5L3HUl5jWlA9jXWrXP75Y2jtyaRYJvTyplJKft2UY9c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Oy4y5LOWemA/oYtj8uYnA27fw9kIklCkzaCE3JjuTAtAxbq/r7aH74GWsup5jy3r3grCGvvX25n530UYRbG+Ih7H4DxT7csKyIG0AsNomQ30C08RvSJhh9+gO2c8TiH7PedIQxhpZ2uit4iEuySAurOwz6+albzgQIs7cg/RnLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bnKfMmQl; arc=none smtp.client-ip=209.85.221.44
+	s=arc-20240116; t=1755099721; c=relaxed/simple;
+	bh=Q+oal3i5+vNsZ6N/xmBJGOrX0PYeEyfdH+fjBKC6nuc=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=jo3/cmlo2xKBz4vzF7H3/FVI4V6O8Y6AktGMFquGVVTOu9cPvSd5uvKqJbCPQxO3gvBGvWHQvOFrJRl0ICEVVNGwAMyx2DxJ3ozGW7G6judhrjMM3MDZ2y3VGNap8viIyd3xIMM1JHU1G2cUTJQ+bbsmxLtRGLlLOWCRefeRFoc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PA4+KN0u; arc=none smtp.client-ip=209.85.222.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3b78315ff04so5700884f8f.0;
-        Wed, 13 Aug 2025 08:41:24 -0700 (PDT)
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7e6696eb47bso664829685a.3;
+        Wed, 13 Aug 2025 08:41:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755099683; x=1755704483; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=AeHikV3xnaGeBSGEAJ7yjU6cmw7l+465rsoJw5mZMcw=;
-        b=bnKfMmQl8BKF1p/wAAkGtmNsvPBmVsJiHv0UyMvcTTxfJNOAXrP1mTK6pNH8gCw/1X
-         CurVOJNbc0Ww/zZTrqc6mWjjaTRckpy2k6AZIV2emyYoVoCHKEz/Sg2v5zaRWTjpHS87
-         TAUdbKtQJI0ezz6pFGPjiNCuLjzJbqLiFpaeh6tjYtVtVugKek0ENHS2ToVlLd/6xIGH
-         elMzsdzfRQbhl+Of7a+4E5q9wos2PSBUzfRc0tw88mUNSBGXUFKEnquBIRXujB1h/0a6
-         EvAXR7GLhoWH7EMdVoJQdFltPG+d/+0laQunTJv27qCFFwYh8CAsoaw0Ky89Idn+yXa5
-         +qaw==
+        d=gmail.com; s=20230601; t=1755099719; x=1755704519; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2SMXT1ZZsjFjhUqg4asNRzg71ZxqYZ/K2SRakyEvQ4o=;
+        b=PA4+KN0uw4IUE+Y6ltYgGzZOukmCzXZ9FOHUnSAuNFs5UvmJ09xW4WgyxsI3PdB9fc
+         MeC5jiiEdHyvFkB065bd2xMiumWQXjyjU5Ts/y0C1Ihlyx+0hZoSxKyAlQ5pyEVDYxcA
+         G2JeRoSNEQyccnOa9HVfJJMGnt9KKD3cl/WnaGW1p7mROitZqzD+GYU2GyREX3ZdZ37j
+         aCpsDMoI09TCgT4DfabqvTQiVrlGwScdqkTRjRjMSYRjMSvih1nE9LOxF3r7Zqj5prLN
+         6nBMpxHbC1Wq979rfxtSSJ4O/80+k+zJZBtA/swNAEpyFdTEMUggZN2dQ/NiNpheR5/w
+         kZDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755099683; x=1755704483;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=AeHikV3xnaGeBSGEAJ7yjU6cmw7l+465rsoJw5mZMcw=;
-        b=pyKi+9UMhd7jTGAAv81wwJKZhUm5Je0PsW7sY+SUEAtXm8AmrcdsGfpY6GJDhysVGs
-         9ROEizcMOIHAqDXqlbtGjOtX4Ff8hiLNxheePUZqxf42PqoNb+duJ5tglvn5B1wPMofm
-         I9hDDqc575rUJ/yodf/sbsW9KtiNYp/7JPYJaq9czMBu6uYFSmUZPKcLbvkDRrOlXLaB
-         3rLTHwfpJxb/4srg3G4KtxyWjn2xv4bcLjWykTaWl7XOaL+ucC6Qsa0V1WWgBkATTKY+
-         Jeb674BxQ368m/n+3yGqdIhZfGwFGA4+L687Reyw+MjcmLBws/cLyqXjZEdZhPItshaa
-         hdQQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV+LvSrpt55ByhE9HVx+fFOC+HWktjfpd43eRxgFE54W8jnllTosBdiEZFcpRhf+T6Y1phAMG8LEz/BNNI=@vger.kernel.org, AJvYcCVno/X0eayw8LGDue9kgM38Qn9HhjtD7iGJCmA/PJccZeNXYAxjr94DeJdH5CFoRHtCRw7qIBoE@vger.kernel.org
-X-Gm-Message-State: AOJu0YynXPSb7H9ZPusoZFuk5b65IzcHTJ+xZHZwj2rg0sDmd2ctWCLK
-	xgS4sQ2GzNy9GDXFMEeZpfZWTri68gh9rpthIs/+z3uhMLF2x7hvMEq0
-X-Gm-Gg: ASbGnctwBHBswBfEn9IjhywXMpLmO5SKMK5VJtCWnKjUKkk2+d1mwrSd/cxXcxVCb1M
-	mfRwlw/Jy8mZQymjcERHB7c6Jk+55YpirnyPYIM+4Hje29mIyvPey3HMYKFLgc/pIlItZ84AYv6
-	I0j8gNhZhc8KsrklJsod2+XYb76VvFZsIesDzJ/C+xLN8dzkGRzVkaHIMeK4UhWJoYfftEbKIww
-	STe49t16OX2CZWxsY9zvx6Z7+EfUFktlyKjKtTr11+R7wwSgorjCoH6rQ2o8Zja94USfa+thDhQ
-	truEeQIfoQW8b5zfWxD5fPbko1ZpGuNFeJfJUKzUrHzLgIQWe0FI2t4e0KGCkShvgNg5MkOrGx5
-	cSrQpAvclxHCPgH5oYXFBhD3RFuZb+D27G2tZbnIv2lLB
-X-Google-Smtp-Source: AGHT+IFedQ8PjY1AQq6CUkCUUTRzFyA8UhME98EKLM8zsrbPu1PpzLpFXzjTCZpugRK6sb8UoFTnUw==
-X-Received: by 2002:a5d:584b:0:b0:3b9:1108:8e99 with SMTP id ffacd0b85a97d-3b917ec377dmr2990512f8f.41.1755099683074;
-        Wed, 13 Aug 2025 08:41:23 -0700 (PDT)
-Received: from localhost ([45.10.155.14])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b79c470102sm47691782f8f.53.2025.08.13.08.41.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Aug 2025 08:41:22 -0700 (PDT)
-Message-ID: <088b9c26-482d-49af-bd22-bc870aaae851@gmail.com>
-Date: Wed, 13 Aug 2025 17:41:12 +0200
+        d=1e100.net; s=20230601; t=1755099719; x=1755704519;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2SMXT1ZZsjFjhUqg4asNRzg71ZxqYZ/K2SRakyEvQ4o=;
+        b=HOFkhRs3DYGbAqdWFpExfNGpRZfy7sJsSkpBzkWS8kESiXELfdnkO0cJ4WuQy/YZg2
+         rEsXMmx1yOIGgL8gbpoGm3KFtgBeGvkgLmkjIpA8FFnF+JjU9ctppMINQEUxbmJq/zX/
+         x3YNpigPqkzZFxW+gsUIbmZ+GGzskFURVcBrlyeEJ/X6pCP6X/O36FvSDswyRlBZmFZ8
+         O2BPVXbT8dypELYpeHgbf4xpoYSf3HqkazBeQjFYo68jh8A0ubt5iZ0UqxplgWfK9WTT
+         HnjpoNMlJL2emtTJzjwmYJHSfZF3+3FskdgtfCCbbaPMdeaiY+h+ieZugb9jGrLC13wQ
+         Dtmg==
+X-Forwarded-Encrypted: i=1; AJvYcCUHmGUHgt4L3klliLbhPXgNtgoQ/MXc0FxhRFSUvDteZHjwNT1P01qR0UhGk198BcyL6eKZ36DU@vger.kernel.org, AJvYcCUT15O6xJUplH9azpUifFHZNW0Naz86gynBMu9nnX4/U95XbQnyzKQA9ScCQpm1dpFdYtUcftNM2g/wSGP5@vger.kernel.org, AJvYcCUsNOHAYcrxE9qacq3vGdAtJN6kekPnpRpu7NLGGgG/G9PpfWVvEr4KalbuOlJxFwUUifzmxBIy4CUlfg==@vger.kernel.org, AJvYcCWJCev6+8mQIfLlpeaVRERIKMDJo5zRoxLMFkL9fofy/43pUoKsE6SecSCxRs4DUVFS2J/U8/3kg9s=@vger.kernel.org, AJvYcCWO1tzomV5rSRBeXaB9lxvKHYsF/vSa0ACzQvxikehJKWopEzL+lIO6+kilCYjt+xfWpmM1zLLvbb8Y@vger.kernel.org, AJvYcCWbWad8AqRDYudRDgo1xPbg46zIxUR3426Ku/p3+YHU8EBqlmjnhbYFko5xfU+fSBaxLEqAH+IbFkhF6zusdEU=@vger.kernel.org, AJvYcCXH7xEryoyFUGUoo+2Dxaix/+myV8IF+dYpuUuZuM5zXWAi1Lg7XBV55kZWUiHr4o9938XroIxxEA62AResHfXy@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw5muInGQIMxzpn++tjKKTdB5HUq1kQFjDQvyBP9dLZM95EjO/I
+	rduM1ZXrBEZw0ilTPgQA7JtEeWTLGAZ+kzA0plhibZZylRGUPEfXsU5tz37Ph7GU9f0=
+X-Gm-Gg: ASbGncvnbTkoc2b6KcmJrL+4U188kfABUR8UkX8K7kqKJAHQC4gxQEEabfDfQ0fow7z
+	3Yl+1DdCf0q5cU9YyySR0LpSi/scTLw2qCnb8ZuC8FEeMDXBAmaFa1NZmoeHEnGBy4TXTEQjwA0
+	nsD6Ta3eSj9mv7Rsa7bsxpKfU6rmpoKz++JN3gdNvkvhJodbPNoLfBkGEM86mgoaqypaHtTHWeQ
+	67xZBDaIC6KzBHZe8eSQLQVCI5EOAamwEeUgPrGZzCW8FgJzbjx4Ipc10JQIx3tgCg3kVdF10uR
+	hCUqkwuDzYuE8l6MAJmb58nkZW9BpIKGmeFyGEho1XHXlw93tdv8M3zMCperGRCgRNgOBbtvKBk
+	0Yt8X+yO/XJMsnsWztsQdvo5PNpdp+aoXUPSJC+tR3wkd/cXMIt6F7JYAhDQEuWxNxCpvJ3ySz5
+	GSrUxbCxLvvs+8/KQKC9Glp8Lu+7S/LAazg/MTn4RSk8Vs
+X-Google-Smtp-Source: AGHT+IGHAcR23+bK3nfyte/GjkSYW2MpoD31MxNG+Ug+xwLcnQWaEswle+lh0IBDEjz7l/+uYL0/CQ==
+X-Received: by 2002:a05:620a:3707:b0:7e7:fafc:c6f with SMTP id af79cd13be357-7e86526c55bmr458130585a.22.1755099718660;
+        Wed, 13 Aug 2025 08:41:58 -0700 (PDT)
+Received: from 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa ([2600:4808:6353:5c00:d445:7694:2051:518c])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7e81bc7a1e3sm1180019685a.74.2025.08.13.08.41.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Aug 2025 08:41:58 -0700 (PDT)
+From: Tamir Duberstein <tamird@gmail.com>
+Subject: [PATCH v3 00/11] rust: use `core::ffi::CStr` method names
+Date: Wed, 13 Aug 2025 11:41:51 -0400
+Message-Id: <20250813-core-cstr-fanout-1-v3-0-545c14bc44ff@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v5 3/5] net: vxlan: bind vxlan sockets to their
- local address if configured
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: andrew+netdev@lunn.ch, daniel@iogearbox.net, davem@davemloft.net,
- donald.hunter@gmail.com, dsahern@kernel.org, edumazet@google.com,
- horms@kernel.org, idosch@nvidia.com, jacob.e.keller@intel.com,
- kuba@kernel.org, linux-kernel@vger.kernel.org, martin.lau@kernel.org,
- menglong8.dong@gmail.com, netdev@vger.kernel.org, pabeni@redhat.com,
- petrm@nvidia.com, razor@blackwall.org, shuah@kernel.org
-References: <20250812125155.3808-4-richardbgobert@gmail.com>
- <20250813070758.120210-1-kuniyu@google.com>
-From: Richard Gobert <richardbgobert@gmail.com>
-In-Reply-To: <20250813070758.120210-1-kuniyu@google.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAD+ynGgC/33NTQ7CIBQE4Ks0rMXAI/1z5T2MC0ofLYktCpRom
+ t5dWhd2YVzOJPPNTDw6g56cspk4jMYbO6YgDhlRvRw7pKZNmQCDnJWspso6pMoHR7Uc7RQopxp
+ YwXklAEogaXh3qM1zQy/XT3b4mJIdvmVvfLDutR1HvrZ/PyKnjOq2rEUjMK8knLtBmttR2YGsX
+ IQdwX8TkAjkqsmFLloQYk8sy/IG1frjZwwBAAA=
+X-Change-ID: 20250709-core-cstr-fanout-1-f20611832272
+To: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+ Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
+ Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+ Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+ Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
+ Danilo Krummrich <dakr@kernel.org>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ Dave Ertman <david.m.ertman@intel.com>, Ira Weiny <ira.weiny@intel.com>, 
+ Leon Romanovsky <leon@kernel.org>, Breno Leitao <leitao@debian.org>, 
+ "Rafael J. Wysocki" <rafael@kernel.org>, 
+ Viresh Kumar <viresh.kumar@linaro.org>, 
+ Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, 
+ Brendan Higgins <brendan.higgins@linux.dev>, 
+ David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, 
+ FUJITA Tomonori <fujita.tomonori@gmail.com>, Rob Herring <robh@kernel.org>, 
+ Saravana Kannan <saravanak@google.com>, 
+ Jocelyn Falempe <jfalempe@redhat.com>, 
+ Javier Martinez Canillas <javierm@redhat.com>, 
+ Arnd Bergmann <arnd@arndb.de>, Len Brown <lenb@kernel.org>
+Cc: dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org, 
+ rust-for-linux@vger.kernel.org, linux-pm@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
+ netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-acpi@vger.kernel.org, Tamir Duberstein <tamird@gmail.com>
+X-Mailer: b4 0.15-dev
+X-Developer-Signature: v=1; a=openssh-sha256; t=1755099715; l=2339;
+ i=tamird@gmail.com; h=from:subject:message-id;
+ bh=Q+oal3i5+vNsZ6N/xmBJGOrX0PYeEyfdH+fjBKC6nuc=;
+ b=U1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgtYz36g7iDMSkY5K7Ab51ksGX7hJgs
+ MRt+XVZTrIzMVIAAAAGcGF0YXR0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5AAAA
+ QHJf4FgT9dJFvdylW99JSkaeQhFuCXgB3JPdPc1IIelP6G6cMpAvfM0tsW3sb8wHuWy+j3deJtE
+ DH26rgkrx7QM=
+X-Developer-Key: i=tamird@gmail.com; a=openssh;
+ fpr=SHA256:264rPmnnrb+ERkS7DDS3tuwqcJss/zevJRzoylqMsbc
 
-Kuniyuki Iwashima wrote:
-> From: Richard Gobert <richardbgobert@gmail.com>
-> Date: Tue, 12 Aug 2025 14:51:53 +0200
->> diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
->> index 15fe9d83c724..12da9595436e 100644
->> --- a/drivers/net/vxlan/vxlan_core.c
->> +++ b/drivers/net/vxlan/vxlan_core.c
->> @@ -78,18 +78,34 @@ static inline bool vxlan_collect_metadata(struct vxlan_sock *vs)
->>  }
->>  
->>  /* Find VXLAN socket based on network namespace, address family, UDP port,
->> - * enabled unshareable flags and socket device binding (see l3mdev with
->> - * non-default VRF).
->> + * bound address, enabled unshareable flags and socket device binding
->> + * (see l3mdev with non-default VRF).
->>   */
->>  static struct vxlan_sock *vxlan_find_sock(struct net *net, sa_family_t family,
->> -					  __be16 port, u32 flags, int ifindex)
->> +					  __be16 port, u32 flags, int ifindex,
->> +					  union vxlan_addr *saddr)
->>  {
->>  	struct vxlan_sock *vs;
->>  
->>  	flags &= VXLAN_F_RCV_FLAGS;
-> 
-> VXLAN_F_LOCALBIND seems to be cleared ?
-> 
->>  
->>  	hlist_for_each_entry_rcu(vs, vs_head(net, port), hlist) {
->> -		if (inet_sk(vs->sock->sk)->inet_sport == port &&
->> +		struct sock *sk = vs->sock->sk;
->> +		struct inet_sock *inet = inet_sk(sk);
->> +
->> +		if (flags & VXLAN_F_LOCALBIND) {
-> 
-> Does selftest exercise this path ?
-> 
-> 
->> +			if (family == AF_INET &&
->> +			    inet->inet_rcv_saddr != saddr->sin.sin_addr.s_addr)
->> +				continue;
->> +#if IS_ENABLED(CONFIG_IPV6)
->> +			else if (family == AF_INET6 &&
->> +				 ipv6_addr_cmp(&sk->sk_v6_rcv_saddr,
->> +					       &saddr->sin6.sin6_addr) != 0)
->> +				continue;
->> +#endif
->> +		}
->> +
->> +		if (inet->inet_sport == port &&
->>  		    vxlan_get_sk_family(vs) == family &&
->>  		    vs->flags == flags &&
->>  		    vs->sock->sk->sk_bound_dev_if == ifindex)
+This is series 2b/5 of the migration to `core::ffi::CStr`[0].
+20250704-core-cstr-prepare-v1-0-a91524037783@gmail.com.
 
-Nice catch. I don't think the new selftest exercises this path, but I'm
-running the other vxlan selftests with the localbind option enabled by default
-and ensuring that they pass.
+This series depends on the prior series[0] and is intended to go through
+the rust tree to reduce the number of release cycles required to
+complete the work.
+
+Subsystem maintainers: I would appreciate your `Acked-by`s so that this
+can be taken through Miguel's tree (where the other series must go).
+
+[0] https://lore.kernel.org/all/20250704-core-cstr-prepare-v1-0-a91524037783@gmail.com/
+
+Signed-off-by: Tamir Duberstein <tamird@gmail.com>
+---
+Changes in v3:
+- Add a patch to deal with new code in acpi.
+- Drop incorrectly applied Acked-by tags from Danilo.
+- Link to v2: https://lore.kernel.org/r/20250719-core-cstr-fanout-1-v2-0-e1cb53f6d233@gmail.com
+
+Changes in v2:
+- Update patch title (was nova-core, now drm/panic).
+- Link to v1: https://lore.kernel.org/r/20250709-core-cstr-fanout-1-v1-0-fd793b3e58a2@gmail.com
+
+---
+Tamir Duberstein (11):
+      drm/panic: use `core::ffi::CStr` method names
+      rust: auxiliary: use `core::ffi::CStr` method names
+      rust: configfs: use `core::ffi::CStr` method names
+      rust: cpufreq: use `core::ffi::CStr` method names
+      rust: drm: use `core::ffi::CStr` method names
+      rust: firmware: use `core::ffi::CStr` method names
+      rust: kunit: use `core::ffi::CStr` method names
+      rust: miscdevice: use `core::ffi::CStr` method names
+      rust: net: use `core::ffi::CStr` method names
+      rust: of: use `core::ffi::CStr` method names
+      rust: acpi: use `core::ffi::CStr` method names
+
+ drivers/gpu/drm/drm_panic_qr.rs | 2 +-
+ rust/kernel/acpi.rs             | 7 ++-----
+ rust/kernel/auxiliary.rs        | 4 ++--
+ rust/kernel/configfs.rs         | 4 ++--
+ rust/kernel/cpufreq.rs          | 2 +-
+ rust/kernel/drm/device.rs       | 4 ++--
+ rust/kernel/firmware.rs         | 2 +-
+ rust/kernel/kunit.rs            | 6 +++---
+ rust/kernel/miscdevice.rs       | 2 +-
+ rust/kernel/net/phy.rs          | 2 +-
+ rust/kernel/of.rs               | 2 +-
+ samples/rust/rust_configfs.rs   | 2 +-
+ 12 files changed, 18 insertions(+), 21 deletions(-)
+---
+base-commit: 8f5ae30d69d7543eee0d70083daf4de8fe15d585
+change-id: 20250709-core-cstr-fanout-1-f20611832272
+
+Best regards,
+--  
+Tamir Duberstein <tamird@gmail.com>
+
 
