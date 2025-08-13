@@ -1,244 +1,229 @@
-Return-Path: <netdev+bounces-213480-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213481-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DD15B2537C
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 20:58:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64F61B25392
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 21:00:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AEB624E5524
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 18:58:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2CA38840F3
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 19:00:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 689A8305E34;
-	Wed, 13 Aug 2025 18:57:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70CBE309DAC;
+	Wed, 13 Aug 2025 19:00:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="jI3q1XYm"
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="eZSE3EXc"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2053.outbound.protection.outlook.com [40.107.244.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A952C305E21;
-	Wed, 13 Aug 2025 18:57:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.53
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755111462; cv=fail; b=fGCB78BLH4l/DFavSZEZBYSp6hTLhnKXbZMd/ClVw1NczBwbbqnZXE8SNRM+olKGy2wpt6C6p1of/TMk7JR/AxmSQKqFI7iodzyScKNCQ+sWSnD0Me9ev8woTBdG76GR4yOIEeWqmIhmqH1FdNy24cbKNqhgfATSDifI7ZfHzNE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755111462; c=relaxed/simple;
-	bh=nNclsje+EAqLbsYW3SihoM8DEEoQ1pE/MsVjmYP3Jlk=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=W2Kl0rFuwNtXoRGkHnSMwzvs9xWXXoWaAm/6CXcqRiirFX1c0uOlcF7zLLmfClTFfnX272sD7cUYObFmI9wq6eVwjVgPB+pGnz9jxJ7w73hzMFo3NrYCyNYI5WDys/v7WdJSV0FqvdWYtSWYVY5KukuXhQnGSr/4jTuQ6jXUah0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=jI3q1XYm; arc=fail smtp.client-ip=40.107.244.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=GviUxmdISR5kUgVxLrR6XYp1PBt6MQ423AnBncg5QHu/RKCNz52SgkCeyOJD4vo3iXhV7NxsxQI+j51ZZ0qfbXh9WZmqFKpTtW4PFihKnCMV+9AHhfRpn6WWVd9kUzXx6D2VBSWi1mGV/dVMWkNEv7KNTmESPQQrdJpvMdr41ODIQJbvcm2zomDObOOCYG2ovt8EKWqh/uOI57wcjAWP3rutE6rl/hUcJ7SyqiVi7XEcX3sxQJ5ba+5NuvvQCRfmi2me1/9anrv+84JaaU/ZMSSulBqxUS/iJ51uyREMuQ7sz7MSTROi5Sp/8nSi3DrasMh2gVyNTh0AbisbjF3kXg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Fz5e5AjMB1U0jGd82Z0MTseLOWsgSQPAfq4rg9nEafw=;
- b=jv251CkVRK9s71dx2TmFM9t+eI/Ckkyzh2KlcZVWZq2Ur28noAGBilGrka0ds20mLGsOjrbP6efuOEB4feoAIvH3Qo4XsY3y5m7AryG+o0Xcmo3+JnzaHHtizUa5Nz3re/c+wCu4sytX4LextaotZa/e2nf4vCg5UAGGQsw9eOvgj0tu1tB5gtirIW+b9Hs/quoWiwhLvnQefuqEm4OmQS5NotRbWMtijlyVhXtWBj/VyEcKfu6FBObeS4kX0QHOwej0nnzCkYZL2oTVtKDMxVsQN+qUfOrI8CfyBZLESWZLhZoPOfcfO369s0pmUCkC/V5votdS6MI/WbOxZn30lQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=marvell.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Fz5e5AjMB1U0jGd82Z0MTseLOWsgSQPAfq4rg9nEafw=;
- b=jI3q1XYmP+G2DuvJxL4Q9hy9ccqauCuw6fav5L7Amf/ugALJXFJs9V7u1oEY5mOAv9N87asb6awphhyNzIjshpmpo0VNk5hMQlhuMnege1e8UEDCIIUXts9Aimyej15U9Q2KfkwK/TWPOhe3z2ogw5bLYAIjseXL9OpSfJH9q8PzdtUZUbB9Mzn9rWkyYpY+sTsDg2Uzn/gsuVa8cQMByy0SnOfeIbbJRUg49JWFyYLxRlf+ivHlVkikfApKqe4A5bZbQJNolYMOTst/QyMR92CBJ8L97g5T0cvdz8iVvxR3yP6KsPpwPvr5bHIi+krrT+rz7kEk9BeuWxl/4dkRLg==
-Received: from SJ0PR03CA0172.namprd03.prod.outlook.com (2603:10b6:a03:338::27)
- by IA0PR12MB8424.namprd12.prod.outlook.com (2603:10b6:208:40c::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9009.21; Wed, 13 Aug
- 2025 18:57:35 +0000
-Received: from SJ5PEPF000001F4.namprd05.prod.outlook.com
- (2603:10b6:a03:338:cafe::7d) by SJ0PR03CA0172.outlook.office365.com
- (2603:10b6:a03:338::27) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9009.22 via Frontend Transport; Wed,
- 13 Aug 2025 18:57:34 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- SJ5PEPF000001F4.mail.protection.outlook.com (10.167.242.72) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9031.11 via Frontend Transport; Wed, 13 Aug 2025 18:57:34 +0000
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Wed, 13 Aug
- 2025 11:57:15 -0700
-Received: from rnnvmail203.nvidia.com (10.129.68.9) by rnnvmail202.nvidia.com
- (10.129.68.7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Wed, 13 Aug
- 2025 11:57:14 -0700
-Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.9)
- with Microsoft SMTP Server id 15.2.1544.14 via Frontend Transport; Wed, 13
- Aug 2025 11:57:06 -0700
-From: Tariq Toukan <tariqt@nvidia.com>
-To: Jiri Pirko <jiri@nvidia.com>, Jiri Pirko <jiri@resnulli.us>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
-	<davem@davemloft.net>
-CC: Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
-	Brett Creeley <brett.creeley@amd.com>, Michael Chan
-	<michael.chan@broadcom.com>, Pavan Chebbi <pavan.chebbi@broadcom.com>, "Cai
- Huoqing" <cai.huoqing@linux.dev>, Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Sunil Goutham
-	<sgoutham@marvell.com>, Linu Cherian <lcherian@marvell.com>, Geetha sowjanya
-	<gakula@marvell.com>, Jerin Jacob <jerinj@marvell.com>, hariprasad
-	<hkelam@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>, Saeed Mahameed
-	<saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Tariq Toukan
-	<tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, Ido Schimmel
-	<idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, Manish Chopra
-	<manishc@marvell.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<intel-wired-lan@lists.osuosl.org>, <linux-rdma@vger.kernel.org>, "Gal
- Pressman" <gal@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>, "Shahar
- Shitrit" <shshitrit@nvidia.com>
-Subject: [PATCH net-next V3 5/5] net/mlx5e: Set default error burst period for TX and RX reporters
-Date: Wed, 13 Aug 2025 21:55:49 +0300
-Message-ID: <1755111349-416632-6-git-send-email-tariqt@nvidia.com>
-X-Mailer: git-send-email 2.8.0
-In-Reply-To: <1755111349-416632-1-git-send-email-tariqt@nvidia.com>
-References: <1755111349-416632-1-git-send-email-tariqt@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13A203093AD
+	for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 19:00:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755111646; cv=none; b=Othe3yJM87siPOfPdMEi7eQU4Ay+8oPVEZdyYgA5jPBCrZ/Cagjv1Bc72z9L8KWVLPOJFzaJJl+0uztc1J2L9F6iqyRQvwwzu0LvYEyOaxSvLV2eexKcPDR9cAMLSIX5AOo1fsxsLwLrWF7ic/FD6kDPSyUUw92SaoPcZrEMol4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755111646; c=relaxed/simple;
+	bh=vWuweGk2fKQx2iloNpcbyqqqQCmH/osnc1DsMO0AQt4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gHiFLmzwa6mM3fyh+mLPIeGAtJqFCPH7Xgcvmt+xKwYbhP0XsckHxxqcZO77x9d0KTp+dhYsHwB32RpZy/cWehDhUEPa9i+iFBBSWD9vHZgYzyB6Bo/Xe/IjfuuXsgQLTApecMftRZz1Ygx13mLQ64naNwfU+4Us33/0hydz7WE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=eZSE3EXc; arc=none smtp.client-ip=209.85.216.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-323266b2368so187840a91.0
+        for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 12:00:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1755111641; x=1755716441; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IiJACUDbUi4ft9IyTWq32K2CcvBRH83D47gCfhyH02s=;
+        b=eZSE3EXckDVMSBJSC96M7oAuevrSxi/IKFBWDl9xVtdnaF4AhLSBipNqOb6G+T78ld
+         oSli6cKBIQx5R2HVOVY9muLoI7ECNdkg30DB5PyfkW9PWte86q+TwvrvuDnxvKFNxF3O
+         FdUaJ1tBMEZNKazoxN/iVM3S93Sr7OQIUhL162W9AoP+oniOruDP9P+0LsAM/HofUyuM
+         zpcq2kXSzs020v/wUhJBGMM15FrtCIG9As9nu2m2d7kMfg0luCWi02Zzh1pbXtb42wIz
+         f4m9kWu/5r/qjFLQtMdzrCM7usERAO/L2UM+WvfYU/lGybeibmdgMHkhHaWFECwEAvkb
+         xvrQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755111641; x=1755716441;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IiJACUDbUi4ft9IyTWq32K2CcvBRH83D47gCfhyH02s=;
+        b=sMJR79HOZdc2/YdEfu9leyedhUoN23qmEz8KLK6CkQPSgZZ3pFkSXLvYj1uIxWG0V8
+         dn123UfJAOq4P01YFlbMF6rP7PJQGeynFayofY35Paj7erwOUZCeoGu9Q1seyLlYrSW+
+         ODWd4JRgw8aFtmNZXdFvsr6rDTDzZBr6FUE67nKyBGbYGHXiFZMY82rClizGhz5OV1Xg
+         RM+HjGTBvRR2b74fkdytpcr1AJyoTezG7FYrT+l4CpjrxKCAr6XPKrJv+1iHJ61gP9kx
+         s9iXy9uYmGE+y5xVbw8ykrGGDoAvMq54vHYH4mOO7m316SD6uscBXUzsfWexMK3m8n4J
+         Tejw==
+X-Forwarded-Encrypted: i=1; AJvYcCUspztolegLuqP+vOl1ds69tFpt5xUcK75A2hCFg4y+b6qUV0/g/F2onVLX51D/42iHAQPYbcU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwPaVBQL21zFrw8tmaole0Ms8O1z1KzH8n5C/E4gLexke2RBfZY
+	Jdszkxc7J0Z7rQAAG6U2d9MyWgxqrfTaA9xCUULUyQCd9kvibhfVtu1nLDbrZ1ecWjNNYR4b5QI
+	3yUmo9mOUST/3mzZOAJFqIBQM4mQyrD2eL1cCLuSQ0sV299bYqBgofw==
+X-Gm-Gg: ASbGncvOxsOq4cxrOtZxqyrvM05+4QKT4x1j8J59ku6OJtUoi3mzWlWyCgH/Svg4Pza
+	zAGtoxDDB84BWG4ErmC6/e2TsmDIVUYf+xlZFSUXSZ/U3q64Gtwvf/orrSXpxScRyBE+V2kUpAb
+	p4+f4MFkhARhwp04+WerN9qjjcC2GOBoV6KVVJsZn2kAPnrXNXJbvIXi43TEf/JgVWjzI+xKwFg
+	/LObwBNq41i+DEHlA==
+X-Google-Smtp-Source: AGHT+IFJFrtR6xYfj9FPDNkTp+oXAAWwaahlwjf0IgIHmzy5Rxfpt0v7xQ+Oijc3sxcam4r7l+O4ItXU/CMp9Y29B8Y=
+X-Received: by 2002:a17:90b:2745:b0:30a:4874:5397 with SMTP id
+ 98e67ed59e1d1-323279dac7fmr667177a91.9.1755111641037; Wed, 13 Aug 2025
+ 12:00:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ5PEPF000001F4:EE_|IA0PR12MB8424:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8791c638-c752-41fa-4f55-08ddda9b4398
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|376014|7416014|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?Gi0CVJYp+2uR/fVtGKnkuXf3m2BMn4eCamG3HJN0iwiaGWQ8/HUZQpeC4fRY?=
- =?us-ascii?Q?8cTlwVh9okhtxfWtNJScmEbtBFPhgL54WrZlMTJ8a3Aqg0vLln1hCToh789L?=
- =?us-ascii?Q?i340f1HNgYiilxaYm7Y4bqH9GQgx3HDKL/3tFGPj9Du4D8R9LolfzLC2d5Vm?=
- =?us-ascii?Q?sb9bOVCcLZC+WxEbsug6y7/lzYfJJTcA8v1H5apaacWygf+poqBE95yrMqUA?=
- =?us-ascii?Q?oZkyEzeqTnqvadzL8Gxq5MaQo1cOu50HDTOFIz20uECCU+339ta9z5TtPIW4?=
- =?us-ascii?Q?0DgRXGh76F4WHa1FCTEH99BpCgFhL/jg9AVcuNLw5EO+YZRQI/SbpWjys0qs?=
- =?us-ascii?Q?hqQ4FR7Y3FHogdtMt6dES1YnV19oeFzbA2UtDxuWdwzBgMr4QqBdP6Gk7Z8D?=
- =?us-ascii?Q?Jj6OPX/P8NUzzyxFp1oXjMYRMTpGLrYJloO31he8kn5fW/uq+a726/JmSPdg?=
- =?us-ascii?Q?aGZduToMPuuVfIXiiz58BX/GJ8wXE3pNg3Wlc7VOyLdXZtuWNXfDFJfAi2jh?=
- =?us-ascii?Q?lvgNZBQFf8tey+EFrc536NiRPepB41U6qAgNTC1CmWX1sLmyv1LkHfHzzCfS?=
- =?us-ascii?Q?6JdMnRNnO8Q21OWiQ6N6nFnrAZp1bXr2AEuFIVy5s6aep2MPnP+3ofggcHQl?=
- =?us-ascii?Q?SpE92BZ4BQtn6sCxTVUdAAsarjYgJ7Rde+ycvrEfHiNX4kQjR+JqT5YcdodV?=
- =?us-ascii?Q?PPfzVJrHq+yvRcBHqibpFoOtJJs6Oi2JwVUW2BK7zQHLJL/ZbSz2Ke5Qb7hP?=
- =?us-ascii?Q?o0YxKEJzv+tD1V5YHNkMLMSvTYsKB09+D+6YrbVxIVDt6fe2EoQ0pTlw9Isf?=
- =?us-ascii?Q?ZNlu2muwakA4z8Aqgt69kbWofnb5il+vYjJIZ8bv5E2SHZ2zIZNQJkq/Xv88?=
- =?us-ascii?Q?FLB4V/AYRHxsR+y/L2JKPcicO4dM8WcNdJr78ROS94XdG9MO5wwcFSRW70DW?=
- =?us-ascii?Q?fVk0bgVhYGRJ5Hry+sP1dYNXg5508566s1SODFxrNWRJNcdOsAM8lDI2dX2f?=
- =?us-ascii?Q?jJpWOqYA36+eYPQB23fe9UUfe1WzkPzDAKf+YKitioqmFFLQX0o6WLrYVm6b?=
- =?us-ascii?Q?kpJJA9I7AwTOBLXv5uk5rgbf7yk7cmF+AAcI/oxvcQRHgUec0iRgD1Zi/JWS?=
- =?us-ascii?Q?GlaY5orOG/b3Hj2YoCU5guHiQxjGYWic6ZhaObC4O/0gW010VhLvSmlqblHC?=
- =?us-ascii?Q?tSZyCFiRXLi+/w1Lt+wV0g+e0UTCM7ounpRj8Cal9S6jC2AEHOPr9/3DuAV6?=
- =?us-ascii?Q?QhkrCVcQBEy8HUQQf4caHSt86U1seTh9czQ0ZRf637q2MhzvpDheCW/qxLA3?=
- =?us-ascii?Q?2rNdWXSysfDDdwNXVbSNPCAMkx5EtBapoUnxO430VtFp27Wvj4zs/YuzpFrU?=
- =?us-ascii?Q?F4MMZXoYAeJrMHOaCn17K8AuPwe2Qdr7AlmRvO533CdcicgwVm8DiSgjv48L?=
- =?us-ascii?Q?jKxzL3GwoEy8tTCx06yldO+LN3Al7lVhowxvgvThl/guAj1mpqrv2uXyDJUv?=
- =?us-ascii?Q?GTPW8WG4CYb9AWaTSdKIVPe02k3nfmpRA3xs?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(376014)(7416014)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Aug 2025 18:57:34.4962
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8791c638-c752-41fa-4f55-08ddda9b4398
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ5PEPF000001F4.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8424
+References: <20250704054824.1580222-1-kuniyu@google.com> <20250808-parent-noise-53b1edaa@mheyne-amazon>
+ <CAAVpQUAi6sQ+=S-5oYOPkuPEFk68g2zG81YOA3MYVnTSvTxcjg@mail.gmail.com>
+In-Reply-To: <CAAVpQUAi6sQ+=S-5oYOPkuPEFk68g2zG81YOA3MYVnTSvTxcjg@mail.gmail.com>
+From: Paul Moore <paul@paul-moore.com>
+Date: Wed, 13 Aug 2025 15:00:29 -0400
+X-Gm-Features: Ac12FXzbndb9SOpNyruUTrhTkhOKiI6LDHDXAwTxHjwEDVRMDiibNLg5i00kJzI
+Message-ID: <CAHC9VhRbLSJhz=5Wuyi1RE8xxXPAGcEVXMUyTevawhAFPUvUoA@mail.gmail.com>
+Subject: Re: [PATCH v1 net] netlink: Fix wraparounds of sk->sk_rmem_alloc.
+To: Kuniyuki Iwashima <kuniyu@google.com>, "Heyne, Maximilian" <mheyne@amazon.de>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	Jason Baron <jbaron@akamai.com>, "Ahmed, Aaron" <aarnahmd@amazon.com>, 
+	"Kumar, Praveen" <pravkmr@amazon.de>, Eric Paris <eparis@redhat.com>, 
+	"linux-audit@redhat.com" <linux-audit@redhat.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Shahar Shitrit <shshitrit@nvidia.com>
+On Fri, Aug 8, 2025 at 11:54=E2=80=AFAM Kuniyuki Iwashima <kuniyu@google.co=
+m> wrote:
+> On Fri, Aug 8, 2025 at 6:59=E2=80=AFAM Heyne, Maximilian <mheyne@amazon.d=
+e> wrote:
+> > On Fri, Jul 04, 2025 at 05:48:18AM +0000, Kuniyuki Iwashima wrote:
+> > > Netlink has this pattern in some places
+> > >
+> > >   if (atomic_read(&sk->sk_rmem_alloc) > sk->sk_rcvbuf)
+> > >       atomic_add(skb->truesize, &sk->sk_rmem_alloc);
+> > >
+> > > , which has the same problem fixed by commit 5a465a0da13e ("udp:
+> > > Fix multiple wraparounds of sk->sk_rmem_alloc.").
+> > >
+> > > For example, if we set INT_MAX to SO_RCVBUFFORCE, the condition
+> > > is always false as the two operands are of int.
+> > >
+> > > Then, a single socket can eat as many skb as possible until OOM
+> > > happens, and we can see multiple wraparounds of sk->sk_rmem_alloc.
+> > >
+> > > Let's fix it by using atomic_add_return() and comparing the two
+> > > variables as unsigned int.
+> > >
+> > > Before:
+> > >   [root@fedora ~]# ss -f netlink
+> > >   Recv-Q      Send-Q Local Address:Port                Peer Address:P=
+ort
+> > >   -1668710080 0               rtnl:nl_wraparound/293               *
+> > >
+> > > After:
+> > >   [root@fedora ~]# ss -f netlink
+> > >   Recv-Q     Send-Q Local Address:Port                Peer Address:Po=
+rt
+> > >   2147483072 0               rtnl:nl_wraparound/290               *
+> > >   ^
+> > >   `--- INT_MAX - 576
+> > >
+> > > Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> > > Reported-by: Jason Baron <jbaron@akamai.com>
+> > > Closes: https://lore.kernel.org/netdev/cover.1750285100.git.jbaron@ak=
+amai.com/
+> > > Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+> >
+> > Hi Kuniyuki,
+> >
+> > We're seeing soft lockups with this patch in a variety of (stable)
+> > kernel versions.
+> >
+> > I was able to reproduce it on a couple of different EC2 instances also
+> > with the latest linux kernel 6.16-rc7 using the following steps:
+> >
+> > systemctl start auditd
+> > sudo auditctl -D
+> > sudo auditctl -b 512
+> > sudo auditctl -a always,exit -F arch=3Db64 -S mmap,munmap,mprotect,brk =
+-k memory_ops
+> > sudo auditctl -e 1
+> >
+> > Then execute some programs that call some of these memory functions,
+> > such as repeated calls of "sudo auditctl -s" or logging in via SSH.
+> >
+> > These settings are set in a way to create a lot audit messages. Once th=
+e
+> > backlog (see auditctl -s) overshoots the backlog_limit, the system soft
+> > lockups:
+> >
+> > [  460.056244] watchdog: BUG: soft lockup - CPU#1 stuck for 52s! [kaudi=
+td:32]
+> > [  460.056249] Modules linked in: mousedev(E) nls_ascii(E) nls_cp437(E)=
+ sunrpc(E) vfat(E) fat(E) psmouse(E) atkbd(E) libps2(E) vivaldi_fmap(E) i80=
+42(E) serio(E) skx_edac_common(E) button(E) ena(E) ghash_clmulni_intel(E) s=
+ch_fq_codel(E) drm(E) i2c_core(E) dm_mod(E) drm_panel_orientation_quirks(E)=
+ backlight(E) fuse(E) loop(E) dax(E) configfs(E) dmi_sysfs(E) efivarfs(E)
+> > [  460.056272] CPU: 1 UID: 0 PID: 32 Comm: kauditd Tainted: G          =
+  EL      6.16.0-rc7+ #3 PREEMPT(none)
+> > [  460.056275] Tainted: [E]=3DUNSIGNED_MODULE, [L]=3DSOFTLOCKUP
+> > [  460.056276] Hardware name: Amazon EC2 t3.medium/, BIOS 1.0 10/16/201=
+7
+> > [  460.056277] RIP: 0010:_raw_spin_unlock_irqrestore+0x1b/0x30
+> > [  460.056284] Code: 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 0f 1f=
+ 44 00 00 e8 16 07 00 00 90 f7 c6 00 02 00 00 74 01 fb 65 ff 0d b5 23 b6 01=
+ <74> 05 c3 cc cc cc cc 0f 1f 44 00 00 e9 14 23 00 00 0f 1f 40 00 90
+> > [  460.056285] RSP: 0018:ffffb762c0123d70 EFLAGS: 00000246
+> > [  460.056287] RAX: 0000000000000001 RBX: ffff9b14c08eafc0 RCX: ffff9b1=
+4c3337348
+> > [  460.056288] RDX: ffff9b14c3337348 RSI: 0000000000000246 RDI: ffff9b1=
+4c3337340
+> > [  460.056289] RBP: ffff9b14c3337000 R08: ffffffff93cea880 R09: 0000000=
+000000001
+> > [  460.056290] R10: 0000000000000001 R11: 0000000000000080 R12: ffff9b1=
+4c1b72500
+> > [  460.056291] R13: ffffb762c0123de0 R14: ffff9b14c3337340 R15: ffff9b1=
+4c3337080
+> > [  460.056294] FS:  0000000000000000(0000) GS:ffff9b1563788000(0000) kn=
+lGS:0000000000000000
+> > [  460.056296] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > [  460.056297] CR2: 00007f36fd5d21b4 CR3: 000000010241a002 CR4: 0000000=
+0007706f0
+> > [  460.056298] PKRU: 55555554
+> > [  460.056299] Call Trace:
+> > [  460.056300]  <TASK>
+> > [  460.056302]  netlink_attachskb+0xb7/0x2f0
+> > [  460.056308]  ? __pfx_default_wake_function+0x10/0x10
+> > [  460.056313]  netlink_unicast+0xea/0x3b0
+> ...
+> >
+> > We've bug reports from many users, so the issue is rather wide-spread.
+> >
+> > So far I don't know why the commit is causing this issue and will keep
+> > investigating. However, when reverted (together with its 2 follow-up
+> > patches), the issue goes away and host do not lock up.
+>
+> Thanks for the report, Max!
+>
+> Does your tree have this commit ?  This is the 3rd follow-up patch.
+>
+> commit 759dfc7d04bab1b0b86113f1164dc1fec192b859
+> Author: Fedor Pchelkin <pchelkin@ispras.ru>
+> Date:   Mon Jul 28 08:06:47 2025
+>
+>     netlink: avoid infinite retry looping in netlink_unicast()
 
-System errors can sometimes cause multiple errors to be reported
-to the TX reporter at the same time. For instance, lost interrupts
-may cause several SQs to time out simultaneously. When dev_watchdog
-notifies the driver for that, it iterates over all SQs to trigger
-recovery for the timed-out ones, via TX health reporter.
-However, grace period allows only one recovery at a time, so only
-the first SQ recovers while others remain blocked. Since no further
-recoveries are allowed during the grace period, subsequent errors
-cause the reporter to enter an ERROR state, requiring manual
-intervention.
+Hopefully that resolves the problem, Maximilian?
 
-To address this, set the TX reporter's default error burst period
-to 0.5 second. This allows the reporter to detect and handle all
-timed-out SQs within this window before initiating the grace period.
+Normally the audit subsystem is reasonably robust when faced with
+significant audit loads.  An example I use for testing is to enable
+logging for *every* syscall (from the command line, don't make this
+persist via the config file!) and then shutdown the system; the system
+will obviously slow quite a bit under the absurd load, but it should
+shutdown gracefully without any lockups.
 
-To account for the possibility of a similar issue in the RX reporter,
-its default error burst period is also configured.
-
-Additionally, while here, align the TX definition prefix with the RX,
-as these are used only in EN driver.
-
-Signed-off-by: Shahar Shitrit <shshitrit@nvidia.com>
-Reviewed-by: Carolina Jubran <cjubran@nvidia.com>
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
-Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
----
- drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c | 2 ++
- drivers/net/ethernet/mellanox/mlx5/core/en/reporter_tx.c | 7 +++++--
- 2 files changed, 7 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c
-index 1b9ea72abc5a..0e861ae362bc 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c
-@@ -652,6 +652,7 @@ void mlx5e_reporter_icosq_resume_recovery(struct mlx5e_channel *c)
- }
- 
- #define MLX5E_REPORTER_RX_GRACEFUL_PERIOD 500
-+#define MLX5E_REPORTER_RX_ERROR_BURST_PERIOD 500
- 
- static const struct devlink_health_reporter_ops mlx5_rx_reporter_ops = {
- 	.name = "rx",
-@@ -659,6 +660,7 @@ static const struct devlink_health_reporter_ops mlx5_rx_reporter_ops = {
- 	.diagnose = mlx5e_rx_reporter_diagnose,
- 	.dump = mlx5e_rx_reporter_dump,
- 	.default_graceful_period = MLX5E_REPORTER_RX_GRACEFUL_PERIOD,
-+	.default_error_burst_period = MLX5E_REPORTER_RX_ERROR_BURST_PERIOD,
- };
- 
- void mlx5e_reporter_rx_create(struct mlx5e_priv *priv)
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_tx.c b/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_tx.c
-index 7a4a77f6fe6a..7813f18e7dfe 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_tx.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_tx.c
-@@ -539,14 +539,17 @@ void mlx5e_reporter_tx_ptpsq_unhealthy(struct mlx5e_ptpsq *ptpsq)
- 	mlx5e_health_report(priv, priv->tx_reporter, err_str, &err_ctx);
- }
- 
--#define MLX5_REPORTER_TX_GRACEFUL_PERIOD 500
-+#define MLX5E_REPORTER_TX_GRACEFUL_PERIOD 500
-+#define MLX5E_REPORTER_TX_ERROR_BURST_PERIOD 500
- 
- static const struct devlink_health_reporter_ops mlx5_tx_reporter_ops = {
- 		.name = "tx",
- 		.recover = mlx5e_tx_reporter_recover,
- 		.diagnose = mlx5e_tx_reporter_diagnose,
- 		.dump = mlx5e_tx_reporter_dump,
--		.default_graceful_period = MLX5_REPORTER_TX_GRACEFUL_PERIOD,
-+		.default_graceful_period = MLX5E_REPORTER_TX_GRACEFUL_PERIOD,
-+		.default_error_burst_period =
-+			MLX5E_REPORTER_TX_ERROR_BURST_PERIOD,
- };
- 
- void mlx5e_reporter_tx_create(struct mlx5e_priv *priv)
--- 
-2.31.1
-
+--=20
+paul-moore.com
 
