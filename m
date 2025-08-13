@@ -1,213 +1,177 @@
-Return-Path: <netdev+bounces-213240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213243-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD1D5B2433D
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 09:52:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A51ACB24395
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 10:02:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5C363B1BB3
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 07:52:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8952B5882E9
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 07:58:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1E602D663D;
-	Wed, 13 Aug 2025 07:52:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="IPi8sKZV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54DDA2EA17B;
+	Wed, 13 Aug 2025 07:57:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fllvem-ot03.ext.ti.com (fllvem-ot03.ext.ti.com [198.47.19.245])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97ABE27E05E;
-	Wed, 13 Aug 2025 07:52:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.245
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92EF62E36F2
+	for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 07:57:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755071560; cv=none; b=Vd5kQjthUJyfrhbLGHW3mCXps/OtqnHj3Y8+bgGF+cXJzUgwCdbQcdVODSVwsh3o4DnONNO+G3VeiNRba7RAvgRN2x7NCYsQCKxWUQiC5Oyz9LpXToZq7kB8/2fAUayNnHYosngQVXHxJNLEx13CC/XehH5E3P6Ey+ABt5MO2/Q=
+	t=1755071870; cv=none; b=muCCSerBXDpZ4daJ3QY7/+zS0O8s96arfQc1/CnXvVq5aXcSR0UcPM/ftYTvKGNwGCVL16xAazvTrRcGf/C822U7V1irvqcySdz2fcK3SwJ1Ja8k2IV8TegPa6rtzmAgCUrOJP5gpr12llHNRbHSTERrHtE1trSemhx/gekRXPE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755071560; c=relaxed/simple;
-	bh=XlFq4Sgus3oQVPGHzXvXgTDE9t8jmHYL6F+kNSEKiPQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=Mj253TP4du5Az44TCiqpcIV+fcTgUj53lgzRtDTZ5l7WgyzqW5EaTWkDSSV2z3whOMmp6DITp0Wzmuh0D3e9IyMII19dHG6pWilYdMG6tlxslZ65k4xXyCBghyqgfv+oNQGmaFLwMYDMGsVAsaE1Iluof5qYEaKe4or4tuh9YoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=IPi8sKZV; arc=none smtp.client-ip=198.47.19.245
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelvem-sh01.itg.ti.com ([10.180.77.71])
-	by fllvem-ot03.ext.ti.com (8.15.2/8.15.2) with ESMTP id 57D7pYMT1600946;
-	Wed, 13 Aug 2025 02:51:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1755071494;
-	bh=rJa4YbPLmwHtQ5vYaRplxOBKhYAcebYKOd1/PHvF9Rw=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=IPi8sKZVyBFUyA1jBcIN7qegHeqU4NgvB0m7TW8js9bv4wlWetdgTtpDMzvTU7G+X
-	 Rvv4dHysOQwh2JPhPemQJtnCFFJHqbU7z6KnB7mISjp1dc5jZcUx8CxxVck+7sKizM
-	 mi/T+sC/kQs0SKyCJlqPjaI6SuxhxrUgbH8h+oR4=
-Received: from DFLE106.ent.ti.com (dfle106.ent.ti.com [10.64.6.27])
-	by lelvem-sh01.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 57D7pYZK4090251
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
-	Wed, 13 Aug 2025 02:51:34 -0500
-Received: from DFLE105.ent.ti.com (10.64.6.26) by DFLE106.ent.ti.com
- (10.64.6.27) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Wed, 13
- Aug 2025 02:51:33 -0500
-Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DFLE105.ent.ti.com
- (10.64.6.26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55 via
- Frontend Transport; Wed, 13 Aug 2025 02:51:33 -0500
-Received: from [172.24.231.152] (danish-tpc.dhcp.ti.com [172.24.231.152])
-	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 57D7pRPs1978735;
-	Wed, 13 Aug 2025 02:51:27 -0500
-Message-ID: <d0c2fcb1-578d-443c-949f-860c94824ac9@ti.com>
-Date: Wed, 13 Aug 2025 13:21:26 +0530
+	s=arc-20240116; t=1755071870; c=relaxed/simple;
+	bh=JP3JU9DeiGsROJxfLJcR/pj+/8+ah7HYe4Sxa3Bz/AI=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=cElmRSVdyv+wUx+1ZQeBap7Kt1nGysH8xfL1zZq2ioRjCme2P1It2byRHVYv3gzAyyGvGA/3x3VFs8hfH2l8Za/7EjpAM4wBEuTtWaRFGE0XGGVE9YJUdm+DFJKQReZWCgIkVaOY6HbOtEZ93Dv6yRiS1BwXm1ELrftQRIRp7fg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-881878af906so1252111139f.0
+        for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 00:57:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755071868; x=1755676668;
+        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=j8kNKWjQfVGgObiakLKUOpl9vALlhUvsvnWSAVGV+hA=;
+        b=vay3rKRfFcL3hGV5nTmYd7omLnRIERwlEkLVeOlOzZal1cBrvmOXgrC6/97ba8BARy
+         YeukAvgKMJyCof03wAxKyKXuWV8cv47ElISmoD7tCvS8bSAMn/C8ZLdVSpKmNTlORIhu
+         JMpVtDdt91C1KCNheTfgboL3r4RmAkCWhecZ9utcx+b9/LXV60xs5MCzCeg4eltdZNUb
+         qx8Jya4zmnZKGdB5rK8XKTSkDMW5ZLOp2cqdfaNf/Ev0aD5KTekWf3mQHkQUGZEBN+h0
+         Pvyb2PYw94fBkRx86i2nCwP3zyTYNgefJkQturxb2XkwwhAC4hKTdajTGBlllSPi1pmL
+         1Gkg==
+X-Forwarded-Encrypted: i=1; AJvYcCXbb2m5pHemOHxnAMFN1xQJZJS0JTjymm7dmJ1BAMVB3ib39/Fhxgj3VpJG7pi1kng+tL7PaFs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwASqYiDgTv3PafJ/XGSQuEpOQDGtN1a96wDsTJGLqMGAxHjcwt
+	EjxBzbHpKZUWcNYqasT8upiHh+kjP4m9HpYdGxP1YzAl+9+oYx6NZAZOetrPi//oHqa+ack1Z9/
+	cXVuP/mS5LJjcDfp7gkggzHnYbYXRbzUWODEnweWaISEALl9bhGI+mgyLIk8=
+X-Google-Smtp-Source: AGHT+IEz0TPsz1KmcJLOVcoGmgl6ivHtpmt3ABdiAZsXXtlUPUoPi0TiH/VXcplKlEfNOByudgT+xTYQ7LySxAvl4q0nNONtBLXh
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 1/5] net: rnpgbe: Add build support for rnpgbe
-To: Yibo Dong <dong100@mucse.com>, "Anwar, Md Danish" <a0501179@ti.com>
-CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
-        <corbet@lwn.net>, <gur.stavi@huawei.com>, <maddy@linux.ibm.com>,
-        <mpe@ellerman.id.au>, <lee@trager.us>, <gongfan1@huawei.com>,
-        <lorenzo@kernel.org>, <geert+renesas@glider.be>,
-        <Parthiban.Veerasooran@microchip.com>, <lukas.bulwahn@redhat.com>,
-        <alexanderduyck@fb.com>, <richardcochran@gmail.com>,
-        <netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-References: <20250812093937.882045-1-dong100@mucse.com>
- <20250812093937.882045-2-dong100@mucse.com>
- <5528c38b-0405-4d3b-924a-2bed769f314d@ti.com>
- <F9D5358C994A229C+20250813064441.GB944516@nic-Precision-5820-Tower>
-Content-Language: en-US
-From: MD Danish Anwar <danishanwar@ti.com>
-In-Reply-To: <F9D5358C994A229C+20250813064441.GB944516@nic-Precision-5820-Tower>
+X-Received: by 2002:a05:6602:6c05:b0:881:82bb:94b2 with SMTP id
+ ca18e2360f4ac-884296a2e80mr445984139f.13.1755071867828; Wed, 13 Aug 2025
+ 00:57:47 -0700 (PDT)
+Date: Wed, 13 Aug 2025 00:57:47 -0700
+In-Reply-To: <20250812155245.507012-1-sdf@fomichev.me>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <689c457b.a70a0220.7865.0049.GAE@google.com>
+Subject: [syzbot ci] Re: net: Convert to skb_dst_reset and skb_dst_restore
+From: syzbot ci <syzbot+ci1b726090b21fedf1@syzkaller.appspotmail.com>
+To: abhishektamboli9@gmail.com, andrew@lunn.ch, ayush.sawal@chelsio.com, 
+	coreteam@netfilter.org, davem@davemloft.net, dsahern@kernel.org, 
+	edumazet@google.com, gregkh@linuxfoundation.org, herbert@gondor.apana.org.au, 
+	horms@kernel.org, kadlec@netfilter.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, linux-staging@lists.linux.dev, mhal@rbox.co, 
+	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, pabeni@redhat.com, 
+	pablo@netfilter.org, sdf@fomichev.me, steffen.klassert@secunet.com
+Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+
+syzbot ci has tested the following series
+
+[v1] net: Convert to skb_dst_reset and skb_dst_restore
+https://lore.kernel.org/all/20250812155245.507012-1-sdf@fomichev.me
+* [PATCH net-next 1/7] net: Add skb_dst_reset and skb_dst_restore
+* [PATCH net-next 2/7] xfrm: Switch to skb_dst_reset to clear dst_entry
+* [PATCH net-next 3/7] netfilter: Switch to skb_dst_reset to clear dst_entry
+* [PATCH net-next 4/7] net: Switch to skb_dst_reset/skb_dst_restore for ip_route_input callers
+* [PATCH net-next 5/7] staging: octeon: Convert to skb_dst_drop
+* [PATCH net-next 6/7] chtls: Convert to skb_dst_reset
+* [PATCH net-next 7/7] net: Add skb_dst_check_unset
+
+and found the following issue:
+WARNING in nf_reject_fill_skb_dst
+
+Full report is available here:
+https://ci.syzbot.org/series/dcc132bc-db4e-4a0b-a95c-9960b8a48d10
+
+***
+
+WARNING in nf_reject_fill_skb_dst
+
+tree:      net-next
+URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net-next.git
+base:      37816488247ddddbc3de113c78c83572274b1e2e
+arch:      amd64
+compiler:  Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+config:    https://ci.syzbot.org/builds/2aac43d4-6d95-49c6-8e28-28941fdb3117/config
+C repro:   https://ci.syzbot.org/findings/0af27fa7-d0b6-43d6-8965-58fbc54ca186/c_repro
+syz repro: https://ci.syzbot.org/findings/0af27fa7-d0b6-43d6-8965-58fbc54ca186/syz_repro
+
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 5901 at ./include/linux/skbuff.h:1165 skb_dst_check_unset include/linux/skbuff.h:1164 [inline]
+WARNING: CPU: 1 PID: 5901 at ./include/linux/skbuff.h:1165 skb_dst_set include/linux/skbuff.h:1210 [inline]
+WARNING: CPU: 1 PID: 5901 at ./include/linux/skbuff.h:1165 nf_reject_fill_skb_dst+0x2a4/0x330 net/ipv4/netfilter/nf_reject_ipv4.c:234
+Modules linked in:
+CPU: 1 UID: 0 PID: 5901 Comm: kworker/u8:3 Not tainted 6.16.0-syzkaller-12063-g37816488247d-dirty #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+Workqueue: ipv6_addrconf addrconf_dad_work
+RIP: 0010:skb_dst_check_unset include/linux/skbuff.h:1164 [inline]
+RIP: 0010:skb_dst_set include/linux/skbuff.h:1210 [inline]
+RIP: 0010:nf_reject_fill_skb_dst+0x2a4/0x330 net/ipv4/netfilter/nf_reject_ipv4.c:234
+Code: 8b 0d 60 b1 8b 08 48 3b 8c 24 e0 00 00 00 75 5d 48 8d 65 d8 5b 41 5c 41 5d 41 5e 41 5f 5d e9 03 8d 67 01 cc e8 cd 6c ab f7 90 <0f> 0b 90 e9 38 ff ff ff 44 89 f9 80 e1 07 fe c1 38 c1 0f 8c 2b fe
+RSP: 0018:ffffc900001e0360 EFLAGS: 00010246
+RAX: ffffffff8a143ee3 RBX: ffff888110b91200 RCX: ffff88810a3d8000
+RDX: 0000000000000100 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: ffffc900001e0490 R08: ffffffff8fa34737 R09: 1ffffffff1f468e6
+R10: dffffc0000000000 R11: fffffbfff1f468e7 R12: ffff888011c5c101
+R13: dffffc0000000001 R14: 1ffff9200003c070 R15: 0000000000000000
+FS:  0000000000000000(0000) GS:ffff8881a3c21000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000000c003cc5000 CR3: 000000010fc16000 CR4: 00000000000006f0
+Call Trace:
+ <IRQ>
+ nf_send_unreach+0x17b/0x6e0 net/ipv4/netfilter/nf_reject_ipv4.c:325
+ nft_reject_inet_eval+0x4bc/0x690 net/netfilter/nft_reject_inet.c:27
+ expr_call_ops_eval net/netfilter/nf_tables_core.c:237 [inline]
+ nft_do_chain+0x40c/0x1920 net/netfilter/nf_tables_core.c:285
+ nft_do_chain_inet+0x25d/0x340 net/netfilter/nft_chain_filter.c:161
+ nf_hook_entry_hookfn include/linux/netfilter.h:158 [inline]
+ nf_hook_slow+0xc5/0x220 net/netfilter/core.c:623
+ nf_hook include/linux/netfilter.h:273 [inline]
+ NF_HOOK+0x206/0x3a0 include/linux/netfilter.h:316
+ __netif_receive_skb_one_core net/core/dev.c:5979 [inline]
+ __netif_receive_skb+0x143/0x380 net/core/dev.c:6092
+ process_backlog+0x60e/0x14f0 net/core/dev.c:6444
+ __napi_poll+0xc7/0x360 net/core/dev.c:7489
+ napi_poll net/core/dev.c:7552 [inline]
+ net_rx_action+0x707/0xe30 net/core/dev.c:7679
+ handle_softirqs+0x286/0x870 kernel/softirq.c:579
+ do_softirq+0xec/0x180 kernel/softirq.c:480
+ </IRQ>
+ <TASK>
+ __local_bh_enable_ip+0x17d/0x1c0 kernel/softirq.c:407
+ local_bh_enable include/linux/bottom_half.h:33 [inline]
+ rcu_read_unlock_bh include/linux/rcupdate.h:910 [inline]
+ __dev_queue_xmit+0x1d79/0x3b50 net/core/dev.c:4740
+ neigh_output include/net/neighbour.h:547 [inline]
+ ip6_finish_output2+0x11fe/0x16a0 net/ipv6/ip6_output.c:141
+ NF_HOOK include/linux/netfilter.h:318 [inline]
+ ndisc_send_skb+0xb96/0x1470 net/ipv6/ndisc.c:512
+ ndisc_send_ns+0xcb/0x150 net/ipv6/ndisc.c:670
+ addrconf_dad_work+0xaae/0x14b0 net/ipv6/addrconf.c:4282
+ process_one_work kernel/workqueue.c:3236 [inline]
+ process_scheduled_works+0xae1/0x17b0 kernel/workqueue.c:3319
+ worker_thread+0x8a0/0xda0 kernel/workqueue.c:3400
+ kthread+0x711/0x8a0 kernel/kthread.c:463
+ ret_from_fork+0x3fc/0x770 arch/x86/kernel/process.c:148
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
 
 
+***
 
-On 13/08/25 12:14 pm, Yibo Dong wrote:
-> On Tue, Aug 12, 2025 at 09:48:07PM +0530, Anwar, Md Danish wrote:
->> On 8/12/2025 3:09 PM, Dong Yibo wrote:
->>> Add build options and doc for mucse.
->>> Initialize pci device access for MUCSE devices.
->>>
->>> Signed-off-by: Dong Yibo <dong100@mucse.com>
->>> ---
->>>  .../device_drivers/ethernet/index.rst         |   1 +
->>>  .../device_drivers/ethernet/mucse/rnpgbe.rst  |  21 +++
->>>  MAINTAINERS                                   |   8 +
->>>  drivers/net/ethernet/Kconfig                  |   1 +
->>>  drivers/net/ethernet/Makefile                 |   1 +
->>>  drivers/net/ethernet/mucse/Kconfig            |  34 ++++
->>>  drivers/net/ethernet/mucse/Makefile           |   7 +
->>>  drivers/net/ethernet/mucse/rnpgbe/Makefile    |   8 +
->>>  drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h    |  25 +++
->>>  .../net/ethernet/mucse/rnpgbe/rnpgbe_main.c   | 161 ++++++++++++++++++
->>>  10 files changed, 267 insertions(+)
->>>  create mode 100644 Documentation/networking/device_drivers/ethernet/mucse/rnpgbe.rst
->>>  create mode 100644 drivers/net/ethernet/mucse/Kconfig
->>>  create mode 100644 drivers/net/ethernet/mucse/Makefile
->>>  create mode 100644 drivers/net/ethernet/mucse/rnpgbe/Makefile
->>>  create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
->>>  create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c
->>
->> [ ... ]
->>
->>> + **/
->>> +static int __init rnpgbe_init_module(void)
->>> +{
->>> +	int ret;
->>> +
->>> +	ret = pci_register_driver(&rnpgbe_driver);
->>> +	if (ret)
->>> +		return ret;
->>> +
->>> +	return 0;
->>> +}
->>
->> Unnecessary code - can be simplified to just `return
->> pci_register_driver(&rnpgbe_driver);`
->>
-> 
-> Yes, but if I add some new codes which need some free after
-> pci_register_driver failed, the new patch will be like this:
-> 
-> -return pci_register_driver(&rnpgbe_driver);
-> +int ret:
-> +wq = create_singlethread_workqueue(rnpgbe_driver_name);
-> +ret = pci_register_driver(&rnpgbe_driver);
-> +if (ret) {
-> +	destroy_workqueue(wq);
-> +	return ret;
-> +}
-> +return 0;
-> 
-> Is this ok? Maybe not good to delete code for adding new feature?
-> This is what Andrew suggested not to do.
-> 
+If these findings have caused you to resend the series or submit a
+separate fix, please add the following tag to your commit message:
+Tested-by: syzbot@syzkaller.appspotmail.com
 
-In this patch series you are not modifying rnpgbe_init_module() again.
-If you define a function as something in one patch and in later patches
-you change it to something else - That is not encouraged, you should not
-remove the code that you added in previous patches.
-
-However here throughout your series you are not modifying this function.
-Now the diff that you are showing, I don't know when you plan to post
-that but as far as this series is concerned this diff is not part of the
-series.
-
-static int __init rnpgbe_init_module(void)
-{
-	int ret;
-
-	ret = pci_register_driver(&rnpgbe_driver);
-	if (ret)
-		return ret;
-
-	return 0;
-}
-
-This to me just seems unnecessary. You can just return
-pci_register_driver() now and in future whenever you add other code you
-can modify the function.
-
-It would have  made sense for you to keep it as it is if some later
-patch in your series would have modified it.
-
->>> +
->>> +module_init(rnpgbe_init_module);
->>> +
->>> +/**
->>> + * rnpgbe_exit_module - Driver remove routine
->>> + *
->>> + * rnpgbe_exit_module is called when driver is removed
->>> + **/
->>> +static void __exit rnpgbe_exit_module(void)
->>> +{
->>> +	pci_unregister_driver(&rnpgbe_driver);
->>> +}
->>> +
->>> +module_exit(rnpgbe_exit_module);
->>> +
->>> +MODULE_DEVICE_TABLE(pci, rnpgbe_pci_tbl);
->>> +MODULE_AUTHOR("Mucse Corporation, <techsupport@mucse.com>");
->>> +MODULE_DESCRIPTION("Mucse(R) 1 Gigabit PCI Express Network Driver");
->>> +MODULE_LICENSE("GPL");
->>
->> -- 
->> Thanks and Regards,
->> Md Danish Anwar
->>
->>
-> 
-> Thanks for your feedback.
-
--- 
-Thanks and Regards,
-Danish
-
+---
+This report is generated by a bot. It may contain errors.
+syzbot ci engineers can be reached at syzkaller@googlegroups.com.
 
