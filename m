@@ -1,48 +1,80 @@
-Return-Path: <netdev+bounces-213236-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213237-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCE42B2431F
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 09:49:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 889E9B24324
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 09:50:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F4A11B63DC4
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 07:49:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 770B22A08FA
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 07:49:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61A552DEA60;
-	Wed, 13 Aug 2025 07:49:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6DDF2E62C8;
+	Wed, 13 Aug 2025 07:49:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nU9JfRKf"
+	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="iWkAv5aM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 317042D4B57;
-	Wed, 13 Aug 2025 07:49:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BACC2E5B02
+	for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 07:49:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755071341; cv=none; b=d/V1cyxJlkF6a5lQZjvTgFLPfih4MEt9LHn7iRrVg/EfToR60bW7432XJ6T2T8eTfVR3dBUrxwLbj21AEuro2mdXv7SyISu4VhjIEpcegEGzBXkhqaur81gNJmCjc/Hf0xJCNw6CvVeWiRczybDOY3U/YqYIJNMXYA3sFmeFXho=
+	t=1755071354; cv=none; b=UZlBRc7kiXzcNHjvx9l3aKEiTU2Jdkm3KB8IG9VdBVAPJRc0Xv/X3svPm1u+ewsS/jlS7fm0rdEMVdLSvaqTC11csZjac53djHUl1R+sFdhHOaF+rx2XrhqpJzBq0yeSNaFDQ9NMo3dSIj5qWsF25u2jbIPAtNfHvL5OoGRxi6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755071341; c=relaxed/simple;
-	bh=fEMmMELa9QtFEDbmmYhjc1JrFmw7HuJblDULJIeCymA=;
+	s=arc-20240116; t=1755071354; c=relaxed/simple;
+	bh=21w+BvTt/gazVeuYwusahNoigrMUfHAFjc79A1kbxK4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WNPD5qb1iqHyJQvB/TsBdDYDvNCZBrvUD12wbjRUxnn162pg2gVReuXLM4hGUTnUFaqbSfa+RH0GhmL8JAqdAeJ4iJj5X0cnJCAtynUdx91E9WJnlo8y7fSbjx4jl5MrQoADpT7+uSiNgO+wnmcEZTo1WxQyZLhcmNWj8YwShC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nU9JfRKf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34852C4CEEB;
-	Wed, 13 Aug 2025 07:48:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755071340;
-	bh=fEMmMELa9QtFEDbmmYhjc1JrFmw7HuJblDULJIeCymA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=nU9JfRKfa94ggfkcOt6wRzey5l02pHi6SoBCCX+O7Od1y0eFO1T/tode7eiAFpGr2
-	 nRjJIZkaXYBaBFWt86jJcW6NTjrjq80fXS8Jvu0YxfWiRzcDbHYQ2L9J4gkKFdYyHD
-	 7tAs/OuMQwHTcvkjUTGFRjcjc5SU0/e9ulYKbnLZZLHf6aZ+Hj9cboRc5Ia7bMsbFi
-	 Nf8vbSbQ4mjp+BW5x5lubwgEiCK6Y6F+lf9YHDbAP8J7uENGsqDuraaZc5w3/rYt/O
-	 Eo7tzzs17V2I2reN0vz2uEawp0cjKBFLCcqv49zylBm3lZMdDHt3dgnFS3rfDNBxJk
-	 dYDmra7fL6Geg==
-Message-ID: <ec6fc483-d5a1-493e-954a-3525e38a6ed8@kernel.org>
-Date: Wed, 13 Aug 2025 09:48:56 +0200
+	 In-Reply-To:Content-Type; b=WkVF/xZgjPaGRk30KGkYS7tiTAZ5swB0WtARxRniB7JrBzaQQkLTOqOLR9XYPoG8iB1BJL2M2XOQy8ydWy4/ByIN0CISDKuh8N0iYeRUiN7KsRenFKfNc8YSGwSeQhm9CE1UGTO/XUWVjE2z8mTyggPwQ25UcJexAgseN14I89M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=iWkAv5aM; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-af93150f7c2so955392666b.3
+        for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 00:49:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall.org; s=google; t=1755071351; x=1755676151; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=lmFIylOVee1piWInjTQ1RjbJBz9Hanh5j6QyOwGDpxo=;
+        b=iWkAv5aM+uvQ5f0dR4pPLU0sifiO+EMNGVjxlDMVl1E2uJRmDauXI6/N9M8gPQJwc7
+         1X97sudgXpiEbcBqZHdUT3UWQbmstJhe+eMZN91n2H51Nx3eTNBzNRANBTxjkQOV0K3y
+         IfqHE06x/2XZxHQW6JVgjdV2mP4S6VjKFP3Ck5tQMemCWxTNUdQUrU9eTnWtG7cI/uqV
+         2i8wJwpkiXe8Tc7wH+B2s0Z9slbJOqvxVuRLr+ciAUHRnVevuan5QJJsn+oP8+byp9iA
+         96jwh2WV5p6yD9mRkR546ZGy2ECcmhxOjpu04UMpQuiy3MrP2/xcjzWb4ktLjxyMRaSJ
+         3j9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755071351; x=1755676151;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lmFIylOVee1piWInjTQ1RjbJBz9Hanh5j6QyOwGDpxo=;
+        b=SOqzZt30Zl9xQjtjx/PPn8OJPtPG2JfuvR4eL5Jl9fm5YI2r6qHmVDEX4pQHqYucEM
+         wrvk/Q//WsBJRzs76/ay3tstRVuuNo+pdokE9+GtD/cnoByrpRlfVve4KEbBsXytRnrk
+         jDChtTjcGMhSZvvqm4eIYleQG49tS33vg+DFKcSNkQq4fJTP8GWTX53EXJTJD7D9pZ0P
+         RP0RpSinm27BdKqKC3+l3smPvarmZOZtDlgGtP4QAOSprFk3ja+dAaeM+iNgWL0HEAYF
+         sxkZ7FU0YLIr3Y4BELRZhHdpa6BDbyCeqQR5ZoCItFpgmkXN+ExDCgG1BeYUB9f8BSId
+         6EPg==
+X-Forwarded-Encrypted: i=1; AJvYcCWqQtsMSkDWrkKw4Qp6sKHjkeBU1OYWKqk2hntlFQkkX3/qwyYwED3jZ+T8L/PtuKkA+4rPgA4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzbCdKEkF1QMt4Rxuw8UwIrE4pH6lVA/9gG0bZOMymcVrBYtodc
+	P1/W73WwgUeQAk5v+GsTjz3YsUqqmYF6wdgiglTNM87hGTSCX828F8bOZxMW+y2S2Sc=
+X-Gm-Gg: ASbGnctYyRNKFMQs20wfj+noMyUz8Bmqixy+CJ+e8Vv6Dmw/Yb5c175dIK9gTy/i6jv
+	2SvM1Kx8lVRPFsrK1w2DgjsuzUD32tUdI/mbmS7wY2ephnLwRlbYG69jlnW954TpknRG5LuSDbs
+	HmZQmTQOyerjpBKwcCcll8w/Se+P3c2mG1HYtyOYdSsT8MZUnHAsydaE+2cvK4pHo4nlAzHMQZA
+	zKkFbk6q7SZ9eznGim1KkbyLCMzP6tAyVP5tv/UNo1syBUDaMYslS6W0IH8a+TfhDOq3TiQ5IF0
+	SiesWSlnQUXi9Q8NIPbG68VBzuxXXJMvTVvbJxvjfM6Ca6wtOGNUeRbEiyGcVYL1csWXtPGi6FX
+	RyoQUcV8/gVkR/LcIhFUKDNjQKIF9
+X-Google-Smtp-Source: AGHT+IG7OQqQwH/e7BKLXt05IU5ZlDG7VA0XSSPKWCJkPKoysN9P3lttRT8vmaNa2qYFupqFnd6GGw==
+X-Received: by 2002:a17:907:9408:b0:ae3:5e2a:493 with SMTP id a640c23a62f3a-afca4ea46c4mr196943466b.49.1755071351065;
+        Wed, 13 Aug 2025 00:49:11 -0700 (PDT)
+Received: from [100.115.92.205] ([109.160.72.208])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-af91a23fd00sm2334857566b.122.2025.08.13.00.49.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 13 Aug 2025 00:49:10 -0700 (PDT)
+Message-ID: <7641f60d-2d34-4e2c-a467-07cfaba970a9@blackwall.org>
+Date: Wed, 13 Aug 2025 10:49:05 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,86 +82,68 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 17/21] nfc: marvell: convert to gpio descriptors
-To: Arnd Bergmann <arnd@kernel.org>, Bartosz Golaszewski <brgl@bgdev.pl>,
- Linus Walleij <linus.walleij@linaro.org>, linux-gpio@vger.kernel.org
-Cc: Arnd Bergmann <arnd@arndb.de>, Jakub Kicinski <kuba@kernel.org>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250808151822.536879-1-arnd@kernel.org>
- <20250808151822.536879-18-arnd@kernel.org>
-From: Krzysztof Kozlowski <krzk@kernel.org>
+Subject: Re: [PATCH net v3] net: bridge: fix soft lockup in
+ br_multicast_query_expired()
+To: Wang Liang <wangliang74@huawei.com>, idosch@nvidia.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org
+Cc: bridge@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, yuehaibing@huawei.com,
+ zhangchangzhong@huawei.com
+References: <20250813021054.1643649-1-wangliang74@huawei.com>
 Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <20250808151822.536879-18-arnd@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20250813021054.1643649-1-wangliang74@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 08/08/2025 17:18, Arnd Bergmann wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
+On 8/13/25 05:10, Wang Liang wrote:
+> When set multicast_query_interval to a large value, the local variable
+> 'time' in br_multicast_send_query() may overflow. If the time is smaller
+> than jiffies, the timer will expire immediately, and then call mod_timer()
+> again, which creates a loop and may trigger the following soft lockup
+> issue.
 > 
-> The only reason this driver seems to still use the legacy gpio
-> numbers is for the module parameter that lets users pass a different
-> reset gpio.
+>    watchdog: BUG: soft lockup - CPU#1 stuck for 221s! [rb_consumer:66]
+>    CPU: 1 UID: 0 PID: 66 Comm: rb_consumer Not tainted 6.16.0+ #259 PREEMPT(none)
+>    Call Trace:
+>     <IRQ>
+>     __netdev_alloc_skb+0x2e/0x3a0
+>     br_ip6_multicast_alloc_query+0x212/0x1b70
+>     __br_multicast_send_query+0x376/0xac0
+>     br_multicast_send_query+0x299/0x510
+>     br_multicast_query_expired.constprop.0+0x16d/0x1b0
+>     call_timer_fn+0x3b/0x2a0
+>     __run_timers+0x619/0x950
+>     run_timer_softirq+0x11c/0x220
+>     handle_softirqs+0x18e/0x560
+>     __irq_exit_rcu+0x158/0x1a0
+>     sysvec_apic_timer_interrupt+0x76/0x90
+>     </IRQ>
 > 
-> Since the fixed numbers are on their way out, and none of the platforms
-> this driver is used on would have them any more, remove the module
-> parameter and instead just use the reset information from firmware.
+> This issue can be reproduced with:
+>    ip link add br0 type bridge
+>    echo 1 > /sys/class/net/br0/bridge/multicast_querier
+>    echo 0xffffffffffffffff >
+>    	/sys/class/net/br0/bridge/multicast_query_interval
+>    ip link set dev br0 up
 > 
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> The multicast_startup_query_interval can also cause this issue. Similar to
+> the commit 99b40610956a ("net: bridge: mcast: add and enforce query
+> interval minimum"), add check for the query interval maximum to fix this
+> issue.
+> 
+> Link: https://lore.kernel.org/netdev/20250806094941.1285944-1-wangliang74@huawei.com/
+> Link: https://lore.kernel.org/netdev/20250812091818.542238-1-wangliang74@huawei.com/
+> Fixes: d902eee43f19 ("bridge: Add multicast count/interval sysfs entries")
+> Suggested-by: Nikolay Aleksandrov <razor@blackwall.org>
+> Signed-off-by: Wang Liang <wangliang74@huawei.com>
 > ---
->  drivers/nfc/nfcmrvl/main.c    | 47 +++++++++++------------------------
->  drivers/nfc/nfcmrvl/nfcmrvl.h |  5 ++--
->  drivers/nfc/nfcmrvl/uart.c    |  5 ----
->  drivers/nfc/nfcmrvl/usb.c     |  1 -
->  4 files changed, 18 insertions(+), 40 deletions(-)
+>   net/bridge/br_multicast.c | 16 ++++++++++++++++
+>   net/bridge/br_private.h   |  2 ++
+>   2 files changed, 18 insertions(+)
 > 
 
+Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-
-Best regards,
-Krzysztof
 
