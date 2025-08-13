@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-213471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213472-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5B2AB25305
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 20:27:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BECD6B25315
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 20:34:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E79971C8419E
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 18:27:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 004B2687786
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 18:34:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1C202E54D8;
-	Wed, 13 Aug 2025 18:27:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BC98292B3D;
+	Wed, 13 Aug 2025 18:34:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="KUSbWiPx"
+	dkim=pass (2048-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="eCgEzyS7"
 X-Original-To: netdev@vger.kernel.org
 Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66A6D303C99;
-	Wed, 13 Aug 2025 18:27:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A39A2303C9D;
+	Wed, 13 Aug 2025 18:33:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755109645; cv=none; b=t4d90Wmzmeki0+GgE47DVWVCTQJRk6ZeGlPVYIg6tvxDGt/w0bHLa3XJccepjyA9fNeEGx5NJ29WqLIZbXnySVyH0QMkNy2L+v8DFFZBKiOm37WRCvAKujSOAuBuY2xJ3jh2oW3KHDH5VvNHwUJcAMEAgU9Qu7cKEX/8NmBc+5Q=
+	t=1755110041; cv=none; b=Yc5OP3I7UnM8ou0Tw8EPU+itWaDVZfVd4LQsimZWdWESV4nuOaB7UWC/zTLyxYmXsYTcwTbYvyM4fncip4VbRg2tYeIvxG/NZk1LGFICp6/cv97STFdOJ7jQ42iGa4nxUm+WYGzUBINXTdg+VTZFLrRV8LVqhQKQEMD0qtT/WqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755109645; c=relaxed/simple;
-	bh=1fnCtPI9hc9mxoPa4pC7+exlHl5N905T5kmy087sg88=;
+	s=arc-20240116; t=1755110041; c=relaxed/simple;
+	bh=IoaxbL2xxkdOawW0Ymk9cFwtaLc9U6tdBeFEyNZmQzI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=COT/MazPSUc+JCKSwj963J4hX30tUwadAETZJZxRy47LQ2r5WlIZJ/qiS61zAYNrBr89ku8fzBigk6AJYUK9cmgEPL7xO6X0Qk14d7q30Qi9UfZEienpnb7pzS5C5sxMoX5n7zVx83U06AqbTX3EyePKqFA0321YL0ALmFtcusU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (2048-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=KUSbWiPx; arc=none smtp.client-ip=129.217.128.51
+	 In-Reply-To:Content-Type; b=GmfciT6B/fl10LmjKJkcto7Lb0zGCW4QxhOyDU+0KDL4PySHldNGIt6rctqNcZOI25zeebRKrSmjzU8aSRUeL/WELWlULCwp1onEwbBJkw1d6N5NPC0A2Vgv574OwWWFBfFDXgDg9/5OX01kvL4YIk8YHW2kT/yUuT4+g+7LDPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (2048-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=eCgEzyS7; arc=none smtp.client-ip=129.217.128.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
 Received: from tu-ex02.tu-dortmund.de (tu-ex02.tu-dortmund.de [129.217.131.228])
-	by unimail.uni-dortmund.de (8.18.1.10/8.18.1.10) with ESMTPS id 57DIRCGB004857
+	by unimail.uni-dortmund.de (8.18.1.10/8.18.1.10) with ESMTPS id 57DIXsHG010589
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 13 Aug 2025 20:27:12 +0200 (CEST)
+	Wed, 13 Aug 2025 20:33:54 +0200 (CEST)
 Authentication-Results: unimail.uni-dortmund.de;
-	dkim=pass (2048-bit key, unprotected) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.a=rsa-sha256 header.s=1 header.b=KUSbWiPx
+	dkim=pass (2048-bit key, unprotected) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.a=rsa-sha256 header.s=1 header.b=eCgEzyS7
 DKIM-Signature: v=1; a=rsa-sha256; d=tu-dortmund.de; s=1; c=relaxed/relaxed;
-	t=1755109632; h=from:subject:to:date:message-id;
-	bh=DkPiYN++kSWdtTfK7OsuF/wgCgpjfka4Ys6hx9JKmPw=;
-	b=KUSbWiPxEBHzBTkquJOkObCbuMUmMJi12wt8y67q/1LGnoFimtlQ+Imh7vAWAauOaB4nWW3YXla
-	4RttCq1vt1xLlAz/QzpUzVjL+nNcMT4iVqaDg4hdOP80GuDlMGZrdB6MTy6y8CdeBDo9fniT2qx5c
-	XsnmV1d3ZEAZ3nnnlOx7uQbkN3LNvQTNhB98CKCHWRYjdd3G/3e/5fRE/gMJgUTiWmdZaLXhcro39
-	yxSSJY8mWElLOwa6IJsvOJ5tFx6J0fMsiMnsh10pchnb4l5GMqTtXyNamtCTUiMqnHjzCmt+dSFoZ
-	cY2HbEX7OIciTdkVbddAtpGgmEmQASLWzwdQ==
+	t=1755110034; h=from:subject:to:date:message-id;
+	bh=IoaxbL2xxkdOawW0Ymk9cFwtaLc9U6tdBeFEyNZmQzI=;
+	b=eCgEzyS7MM/Jg2P/aJ+fVGf1VnjG8c45dAch5/m72fBm1R53h3l10WjbGjj0aI/6lSKcOZfa1sy
+	DF8d20cXGi2yTwcx3d+p6ISJmCKI2gl73kcarXEtn/xQG/RbA2cJ3ynefuY4GLGHgp1Pt4lRGD4AM
+	KaMJtrrMfKhyJxaYbooqAH8eAckfs+94QLQnm4g43YUk7+17lZoeaaGLqfAuLpdWXPqQ0FJVKQkIq
+	nqM/MRdNlfRVeczpa/UjF3piJG7YEznIDeDp0Fswjw54io9/avk3DxOlvsMOar2jV918zItpVqqsT
+	SiPrdUq2+Hzl2hFXei/wUE2Hwu0Dk1RRn8Rg==
 Received: from [IPV6:2a01:599:41d:36e2:83f0:e388:1505:7af] (129.217.131.221)
  by tu-ex02.tu-dortmund.de (2001:638:50d:2000::228) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.58; Wed, 13 Aug 2025 20:27:11 +0200
-Message-ID: <8982048b-f5dc-4fec-bc53-f7ad88fbe199@tu-dortmund.de>
-Date: Wed, 13 Aug 2025 20:27:10 +0200
+ 15.1.2507.58; Wed, 13 Aug 2025 20:33:54 +0200
+Message-ID: <4fca87fe-f56a-419d-84ba-6897ee9f48f5@tu-dortmund.de>
+Date: Wed, 13 Aug 2025 20:33:53 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,24 +60,25 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: [PATCH net v2] TUN/TAP: Improving throughput and latency by avoiding
  SKB drops
-To: Jason Wang <jasowang@redhat.com>
-CC: <willemdebruijn.kernel@gmail.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        Tim Gebauer <tim.gebauer@tu-dortmund.de>
+To: Stephen Hemminger <stephen@networkplumber.org>
+CC: <willemdebruijn.kernel@gmail.com>, <jasowang@redhat.com>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        Tim Gebauer
+	<tim.gebauer@tu-dortmund.de>
 References: <20250811220430.14063-1-simon.schippers@tu-dortmund.de>
- <CACGkMEvqYWH-dcG4ei8dERy_OXvyF3cgrzQ2_YO-imEsPoYSbQ@mail.gmail.com>
+ <20250813080128.5c024489@hermes.local>
 Content-Language: en-US
 From: Simon Schippers <simon.schippers@tu-dortmund.de>
-In-Reply-To: <CACGkMEvqYWH-dcG4ei8dERy_OXvyF3cgrzQ2_YO-imEsPoYSbQ@mail.gmail.com>
+In-Reply-To: <20250813080128.5c024489@hermes.local>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: tu-ex04.tu-dortmund.de (2001:638:50d:2000::230) To
+X-ClientProxiedBy: tu-ex03.tu-dortmund.de (2001:638:50d:2000::229) To
  tu-ex02.tu-dortmund.de (2001:638:50d:2000::228)
 
-Jason Wang wrote:
-> On Tue, Aug 12, 2025 at 6:04=E2=80=AFAM Simon Schippers
-> <simon.schippers@tu-dortmund.de> wrote:
->>
+Stephen Hemminger wrote:
+> On Tue, 12 Aug 2025 00:03:48 +0200
+> Simon Schippers <simon.schippers@tu-dortmund.de> wrote:
+>
 >> This patch is the result of our paper with the title "The NODROP Patch:
 >> Hardening Secure Networking for Real-time Teleoperation by Preventing
 >> Packet Drops in the Linux TUN Driver" [1].
@@ -170,22 +171,6 @@ a
 >> We are open to suggestions regarding the implementation :)
 >> Thank you for your work!
 >>
->
-> I would like to see some benchmark results. Not only VPN but also a
-> classical VM setup that is using vhost-net + TAP.
->
-
-I completely overlooked that in tap.c there is also a tap_do_read function.
-I would like to apologize for that and also implement the same behavior
-from the tun_ring_recv function there.
-The implementation is already done and it proved to be working but I will
-test it a bit more before submitting a v3.
-
-Regarding your proposed vhost-net + TAP setup: I need more time to
-implement such a setup. However I am wondering what kind of tests you
-would like to see exactly? TCP connections to a remote host like in our
-paper?
-
 >> [1] Link:
 >> https://cni.etit.tu-dortmund.de/storages/cni-etit/r/Research/Publication=
 s/2025/Gebauer_2025_VTCFall/Gebauer_VTCFall2025_AuthorsVersion.pdf
@@ -197,47 +182,25 @@ ive-on-tun-device
 >> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
 >> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
 >> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
->> ---
->> V1 -> V2: Removed NETDEV_TX_BUSY return case in tun_net_xmit and removed
->> unnecessary netif_tx_wake_queue in tun_ring_recv.
->>
->>  drivers/net/tun.c | 21 +++++++++++++++++----
->>  1 file changed, 17 insertions(+), 4 deletions(-)
->>
->> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
->> index cc6c50180663..81abdd3f9aca 100644
->> --- a/drivers/net/tun.c
->> +++ b/drivers/net/tun.c
->> @@ -1060,13 +1060,16 @@ static netdev_tx_t tun_net_xmit(struct sk_buff *=
-skb, struct net_device *dev)
->>
->>         nf_reset_ct(skb);
->>
->> -       if (ptr_ring_produce(&tfile->tx_ring, skb)) {
->> +       queue =3D netdev_get_tx_queue(dev, txq);
->> +       if (unlikely(ptr_ring_produce(&tfile->tx_ring, skb))) {
->> +               netif_tx_stop_queue(queue);
->>                 drop_reason =3D SKB_DROP_REASON_FULL_RING;
 >
-> This would still drop the packet. Should we detect if the ring is
-> about to be full and stop then like a virtio-net?
+> I wonder if it would be possible to implement BQL in TUN/TAP?
 >
-> Thanks
+> https://lwn.net/Articles/454390/
 >
+> BQL provides a feedback mechanism to application when queue fills.
 
-I am a bit confused. You omitted the important part of the code which
-comes right after that. There I stop the netdev queue when the tx_ring
-gets full. Therefore tun_net_xmit is not (very very unlikely) called when
-there is no space for another SKB and no SKB's are dropped. It is only
-called again after the netdev queue is activated again in the
-tun_ring_recv function.
+Thank you very much for your reply,
+I also thought about BQL before and like the idea!
 
-In virtio-net whole SKB's they basically do the same in the tx_may_stop
-function. The function is called after inserting a SKB and see if there is
-enough space for another max size SKB, which is the same statement as if
-their send_queue is full.
-Correct me if I am wrong!
-Thank you!
+However I see the following challenges in the implementation:
+- netdev_tx_sent_queue is no problem, it would just be called in
+tun_net_xmit function.
+- netdev_tx_completed_queue is challenging, because there is no completion
+routine like in a "normal" network driver. tun_ring_recv reads one SKB at
+a time and therefore I am not sure when and with what parameters to call
+the function.
+- What to do with the existing TUN queue packet limit (500 packets
+default)? Use it as an upper limit?
 
 Wichtiger Hinweis: Die Information in dieser E-Mail ist vertraulich. Sie is=
 t ausschlie=C3=9Flich f=C3=BCr den Adressaten bestimmt. Sollten Sie nicht d=
