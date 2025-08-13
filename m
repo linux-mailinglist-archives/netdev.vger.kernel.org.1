@@ -1,146 +1,154 @@
-Return-Path: <netdev+bounces-213275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213276-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E491B2450A
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 11:10:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 403ACB24541
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 11:21:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B83072224B
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 09:10:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C0B8A188C9C9
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 09:20:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F7CC27280E;
-	Wed, 13 Aug 2025 09:10:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hYJzJ6ay"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 514902EFD9F;
+	Wed, 13 Aug 2025 09:20:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CEB920E023
-	for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 09:10:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F9501EA7C6
+	for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 09:20:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755076222; cv=none; b=KqtjJaPKvPTeb7yiN4acxagaa6LlWTn7BsBDnxCFOEiMJUUrE8w3T6uhXjMwGoexYE3bcB6I9Kd+mCznbFnXYMD9EsbFf+g48BNkWKAQiLBiOWze3GUieUm2t3XTkMXaIZRf27bo9zaf4blBEhPhNGzbDdgvsNiydY/v+80riBA=
+	t=1755076834; cv=none; b=hVPJPATMS+HpEHy7Ft0zChEuZFtC6cZ9G1/A6me8VuP9RzhHlu/vPnBpwO5EJqKKeGseOgihlSw8NnSQ6oiB3tycKyCXDbFOnv+CJ/gjoCJ9nStrOdoDGM1YgubP9r4iw8GiVDg9OPflPfCAl9h09vVYWowouuu9viUJv873tm0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755076222; c=relaxed/simple;
-	bh=IsQxFe5j1TdKP3sVa1JaDTksAwgJ1BwdHBh8OlbS/KM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TngeFg+9MkuKgdPWGfrcdNuRisu9wyXIZEkgPlMzma5bny/S1iNXJxiuIwwrJx+PN3ZdkE05M6DZfMo8ECcdxgl/htDsjjwXAKXrf2U9tlMKpj4xyysaR0GkXF8MVW7xCD8pKGDQF4lHl6iHYtw/pW6PYgl6vDWkrEsagQcR7ZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hYJzJ6ay; arc=none smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-3b78127c5d1so4168357f8f.3
-        for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 02:10:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755076219; x=1755681019; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=PPjVIASm1GkOCEb3O2Hb4OqTyh7yl5zez7YxpcGCaIg=;
-        b=hYJzJ6ayolbVpZaiIIfDO1exIzxFm+CijcxkviZDiLAEfhViW5WT4qkny5gG5u5bL2
-         mIJbrlPsoFPdbWL756CLGhV3/yCV73uszghtWfBDrAqm9yCzcAA6gat1K2RKFBOqdJsl
-         nJb2iCrcfelDrc4yZFuUB0Z1qJdrvNuLFbwgGK5FZ2hwNHr/6PQsyavRbKTJKpoOKRTp
-         GPNi5LLGfD0/8i7FmWwVyOFHN3QXljC6k05H99B9gx/FkSTtkB3/ntCPTdUTneWTl66i
-         LbmPNWEFVDXXG8Ijz6n5HY2Dd9HIpKUT4ooPuNQdz9OPvLlMmUTdOqfcaxzegl0M9y7s
-         ocDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755076219; x=1755681019;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PPjVIASm1GkOCEb3O2Hb4OqTyh7yl5zez7YxpcGCaIg=;
-        b=HuPyIX9lDTKcodyZriAKRIHjGcZH849pikN+5kmgLlW4tmpeDPhsT990NqjKqMB+6J
-         8hsC+Cle6mYUx2ba++2K5TkLkMs5MaP1ZLN7xygYk695u17+AqwY3dzoRT8iDCH94UaA
-         Lg5rxNHGzbi44XzXQEX4gBms/DGB93g76EUZ7jYplk68V8gL/AADFzcXpLRa1iyknkI/
-         i2emzoFBEB+pEMIaYkTErXJYkYjzzibIFnOQRGyYsPriiMCzrw9ttGYeHNDkFMfNf+dg
-         BJBjY9zACkCxCwYoidRmhVY0Wj6qlH1IfgNPdwb37TLOL2jUrtPO+hR0g/oPTvdiw+aj
-         2P2Q==
-X-Gm-Message-State: AOJu0YzCgoBf5WsFShR0b5ySQeMo2AqMcDu2puTqOXaNPYAK7vtaNd0U
-	mTp8wwAzgJ1d5aEpdtAZe0nAW1mIbdrCw3coLhjcXUX4vxecfQMEM6to
-X-Gm-Gg: ASbGncstzU+9o9M0NBq9d6Vajc7FoHCrEFv0EgRZT+oT0DCfpRj3ett5Y7vieBgu/Ja
-	hYZyUX3FalWa/9ZhnWp1ncBW7ypT5Uli00dCDUAXLWf2FtWiqkcWccYVtptbFQJ3lAue3Mv8ZlM
-	FhBV439k0FdI5O04R5BAvWoB1gPBmfNfxmA3offZnO7Z0rpwr5TW73b/gYIB2hS9DbSif8i5Ond
-	CJrEB+h+EERRhVbeOR2Cx30x6h2VVJs62Y8OTXiNDfJELxH+T55mAg6T18OKNM5c7tsVMjGjDib
-	YLA6Js+n39hTE06etNEw6JLt94g/cHlD9/fPn5tPsiJYY8bAgEsncm1H0Tt5JQC5WFZl2Kcn+pH
-	trVnVhcWy2jljovyPs9lg8s3mxkMrmW03ToDNXp5ZBYu1pw==
-X-Google-Smtp-Source: AGHT+IF4LL+TrycB+PQuQ3Dvpsk9jiNWu/4JlbkgHBUAXQFITG20vxIXFwAGwMdPmYZP68o/NhDh2w==
-X-Received: by 2002:a5d:64e9:0:b0:3b7:907d:41c with SMTP id ffacd0b85a97d-3b917ea6117mr1843160f8f.35.1755076218703;
-        Wed, 13 Aug 2025 02:10:18 -0700 (PDT)
-Received: from ?IPV6:2620:10d:c096:325::26f? ([2620:10d:c092:600::1:f676])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b79c3abedesm47454790f8f.3.2025.08.13.02.10.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Aug 2025 02:10:18 -0700 (PDT)
-Message-ID: <35ca9ed2-8cce-4dc8-bd15-2cda0b2d2ec5@gmail.com>
-Date: Wed, 13 Aug 2025 10:11:36 +0100
+	s=arc-20240116; t=1755076834; c=relaxed/simple;
+	bh=6hQGavF1Les8XfZ1xiVJq5F8n4y1WqZcUWuyBZxgyaI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RprkUoduleDxCcQyvbIYhWWtjCtjnN6RpjTn5BBxwe40SWsIMuNt9HqTZsHecvEpydVBh2unbp2uhdxZDUliBCQYqnK6jPbTiC2wmt1wZ2RfdT0QF1AHZEywnuG9ehjixKls87JY2T2PhT2kro+6V3lViYOuScB7Np7JxjYS4N0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1um7ei-0002z1-Ag; Wed, 13 Aug 2025 11:20:24 +0200
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1um7eh-0004Ef-2V;
+	Wed, 13 Aug 2025 11:20:23 +0200
+Received: from pengutronix.de (p54b152ce.dip0.t-ipconnect.de [84.177.82.206])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 6EA2445697D;
+	Wed, 13 Aug 2025 09:20:23 +0000 (UTC)
+Date: Wed, 13 Aug 2025 11:20:22 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Stefan =?utf-8?B?TcOkdGpl?= <stefan.maetje@esd.eu>
+Cc: Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+	Frank Jungclaus <frank.jungclaus@esd.eu>, linux-can@vger.kernel.org, socketcan@esd.eu, 
+	Simon Horman <horms@kernel.org>, Olivier Sobrie <olivier@sobrie.be>, 
+	Oliver Hartkopp <socketcan@hartkopp.net>, netdev@vger.kernel.org
+Subject: Re: [PATCH 1/6] can: esd_usb: Fix possible calls to kfree() with NULL
+Message-ID: <20250813-crafty-hallowed-gaur-49ddac-mkl@pengutronix.de>
+References: <20250811210611.3233202-1-stefan.maetje@esd.eu>
+ <20250811210611.3233202-2-stefan.maetje@esd.eu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC net-next v1 5/6] net: page_pool: convert refcounting helpers
- to nmdesc
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- davem@davemloft.net, sdf@fomichev.me, dw@davidwei.uk,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Byungchul Park <byungchul@sk.com>
-References: <cover.1754929026.git.asml.silence@gmail.com>
- <7be7a705b9bac445e40c35cd227a4d5486d95dc9.1754929026.git.asml.silence@gmail.com>
- <CAHS8izOMhPLOGgxxWdQgx-FgAmbsUj=j7fEAZBRo1=Z4W=zYFg@mail.gmail.com>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <CAHS8izOMhPLOGgxxWdQgx-FgAmbsUj=j7fEAZBRo1=Z4W=zYFg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="oefxumb6xoevzno5"
+Content-Disposition: inline
+In-Reply-To: <20250811210611.3233202-2-stefan.maetje@esd.eu>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On 8/13/25 01:14, Mina Almasry wrote:
-> On Mon, Aug 11, 2025 at 9:28 AM Pavel Begunkov <asml.silence@gmail.com> wrote:
-...>> -static inline long page_pool_unref_netmem(netmem_ref netmem, long nr)
->> +static inline long page_pool_unref_nmdesc(struct netmem_desc *desc, long nr)
->>   {
->> -       atomic_long_t *pp_ref_count = netmem_get_pp_ref_count_ref(netmem);
->> +       atomic_long_t *pp_ref_count = &desc->pp_ref_count;
-> 
-> nit: I think we can also kill the pp_ref_count local var and use
-> desc->pp_ref_count directly.
 
-I stopped there to save the churn, I'd rather have it on top and outside
-of cross tree branches. But I agree in general, and there is more that
-we can do as well.
+--oefxumb6xoevzno5
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH 1/6] can: esd_usb: Fix possible calls to kfree() with NULL
+MIME-Version: 1.0
 
-...>>   static inline bool page_pool_unref_and_test(netmem_ref netmem)
->> diff --git a/net/core/devmem.c b/net/core/devmem.c
->> index 24c591ab38ae..e084dad11506 100644
->> --- a/net/core/devmem.c
->> +++ b/net/core/devmem.c
->> @@ -440,14 +440,9 @@ void mp_dmabuf_devmem_destroy(struct page_pool *pool)
->>
->>   bool mp_dmabuf_devmem_release_page(struct page_pool *pool, netmem_ref netmem)
->>   {
->> -       long refcount = atomic_long_read(netmem_get_pp_ref_count_ref(netmem));
->> -
->>          if (WARN_ON_ONCE(!netmem_is_net_iov(netmem)))
->>                  return false;
->>
->> -       if (WARN_ON_ONCE(refcount != 1))
->> -               return false;
->> -
-> 
-> Rest of the patch looks good to me, but this comes across as a
-> completely unrelated clean up/change or something? Lets keep the
-> WARN_ON_ONCE?
-I was killing netmem_get_pp_ref_count_ref(), which is why it's here.
-It checks an assumption that's guaranteed by page pools and shared
-with non-mp pools, so not like devmem needs it, and it'd not catch
-any recycling problems either. Regardless, I can leave the warning.
+On 11.08.2025 23:06:06, Stefan M=C3=A4tje wrote:
+> In esd_usb_start() kfree() is called with the msg variable even if the
+> allocation of *msg failed.
+>=20
+> Move the kfree() call to a line before the allocation error exit label
+> out: and adjust the exits for other errors to the new free_msg: label
+> just before kfree().
+>=20
+> In esd_usb_probe() add free_dev: label and skip calling kfree() if
+> allocation of *msg failed.
+>=20
+> Fixes: fae37f81fdf3 ( "net: can: esd_usb2: Do not do dma on the stack" )
+> Signed-off-by: Stefan M=C3=A4tje <stefan.maetje@esd.eu>
+> ---
+>  drivers/net/can/usb/esd_usb.c | 16 +++++++++-------
+>  1 file changed, 9 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/drivers/net/can/usb/esd_usb.c b/drivers/net/can/usb/esd_usb.c
+> index 27a3818885c2..05ed664cf59d 100644
+> --- a/drivers/net/can/usb/esd_usb.c
+> +++ b/drivers/net/can/usb/esd_usb.c
+> @@ -3,7 +3,7 @@
+>   * CAN driver for esd electronics gmbh CAN-USB/2, CAN-USB/3 and CAN-USB/=
+Micro
+>   *
+>   * Copyright (C) 2010-2012 esd electronic system design gmbh, Matthias F=
+uchs <socketcan@esd.eu>
+> - * Copyright (C) 2022-2024 esd electronics gmbh, Frank Jungclaus <frank.=
+jungclaus@esd.eu>
+> + * Copyright (C) 2022-2025 esd electronics gmbh, Frank Jungclaus <frank.=
+jungclaus@esd.eu>
+>   */
+> =20
+>  #include <linux/can.h>
+> @@ -746,21 +746,22 @@ static int esd_usb_start(struct esd_usb_net_priv *p=
+riv)
 
--- 
-Pavel Begunkov
+	msg =3D kmalloc(sizeof(*msg), GFP_KERNEL);
+	if (!msg) {
+		err =3D -ENOMEM;
+		goto out;
+	}
 
+Can you adjust the jump label for the kmalloc() fail. There's no need to
+check for -ENODEV
+
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--oefxumb6xoevzno5
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmicWNMACgkQDHRl3/mQ
+kZwh3Qf/RB9+gOBjCWvTRiM3ipbnCVbvA26FiIq6P9ShGsqQv2Q81IBm6qe0dark
+baRtztdnu5k16f6kd2p3+TdLKVZRqwi/PpCL5GalfzOvpcdVkOhsk6LOYTw4yJ36
+1CUJdOzgxq8boRiqYxZJ+TFguE8Hq7+c9zmSEzqvWmDi8VDEbw8UCkhXj5+tJG9A
+DI0Ep2PeVOuhJOUDnKxQPEqZBAdWIlLjvFverr/6BAj9eG3+mT/rlgPHDk3t+zKP
+vUTGF4big47C8L/8D1jOvMMj7ZJ8R/iJl601Xh9n4wxcVq71A54Tkxh6L2EhQ7yK
+E7OyeWQEPQcORkWwny4+yNDEljqZCg==
+=kmi1
+-----END PGP SIGNATURE-----
+
+--oefxumb6xoevzno5--
 
