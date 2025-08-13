@@ -1,126 +1,132 @@
-Return-Path: <netdev+bounces-213249-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213250-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77A3FB243D6
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 10:13:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B23C5B243DA
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 10:14:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3813568684C
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 08:13:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B43AD2A7EAE
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 08:14:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 767E42DCF42;
-	Wed, 13 Aug 2025 08:13:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iw2A4LiP"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2D9A2D8767;
+	Wed, 13 Aug 2025 08:13:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48CA02D0C6E;
-	Wed, 13 Aug 2025 08:13:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CC612EBBAB
+	for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 08:13:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755072808; cv=none; b=OZPFytRDt/B17O4VEw3Y60AaPltHJcjREFKtx+pKHnyXKwgHN+HCxYZm05xI5yuv1xyJ9GPWlopTlgxUuGSlFfEs7Bb8dmsLl08j94QWHXTf7/nvyK+k4Uo1jOeWGIJJfI/rZqNyxmRHFgAgzTLi9qmkP+1YX1W47o2hC3STRdI=
+	t=1755072814; cv=none; b=mbXJRp1b7i+sB9GF6yIlEtp8wNmO2/7SRjRJFzGclEZPi79pjcYe+RvMHn9Vnfvn/q9DVuK5qMTWfpHMORCXAxBsLivTZSAfOkzRJ6NqHntUNnCAIIvFx7IhANqZYAH33E72KhmKku1onXW/PeiKfFwzEgVb89HmZWMuNgoLmrs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755072808; c=relaxed/simple;
-	bh=olWYvgazVDAIX1fRFJ++BCO7OtcRhXqwRR+tHgLVmDU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LnOIVcbonaOQ/VUwr+q6hSU6KdYcbfU1sEg74BV6Lcriaa9pcjOzPnxzFPLFSUy6vU7Il+ErBobYRlzTXQSII37FYILr7onyn5tQnUaisJRajjPbs0+uSrlLKnMNPTGUUVqqst5w17Q4ti9qXx02l4APObpYJPuacoonUcp7IMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iw2A4LiP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 079DAC4CEF1;
+	s=arc-20240116; t=1755072814; c=relaxed/simple;
+	bh=NhKcZaeGN5x3+Z8+w2Rz40aXXLogT2mDzysg1DpqVtQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Kd3eazhsaz991RVgH70Tx7aPr0XsKO5PjxQj2bvMPwtYB6PK4ynRBW+EsTRTvDX9JoKpZr8PARlbyGXXoTuc4PxxmWvAL2VWxUc5htMgb1ItkmlP2DZ+9XFVwVQHszevA/LZ527jVRVyFdOeWkdhsakSBW0bfpzIOFLed5Fwxy4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1um6bu-00024l-5n; Wed, 13 Aug 2025 10:13:26 +0200
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1um6bt-0003lY-2n;
+	Wed, 13 Aug 2025 10:13:25 +0200
+Received: from pengutronix.de (p54b152ce.dip0.t-ipconnect.de [84.177.82.206])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 92D52456873;
 	Wed, 13 Aug 2025 08:13:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755072807;
-	bh=olWYvgazVDAIX1fRFJ++BCO7OtcRhXqwRR+tHgLVmDU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=iw2A4LiPDel9uEeKtd+y/AL9cPq6Yl2Qc8WRMZrDmmmloTA8qX04WqoFNv/WxVciV
-	 VC0EZQ4k9Qq4MMHh83vdAriDFEBHdcWw1HzhD9KHs8VIaTRL0PtBE7ZGs5FmGsWReo
-	 Mw7eKIx46YPjdfHp0K0vi/LjWrMKXTPnlpVo5GldJG1FrFTRd1j5wuTFaKksk8M1KH
-	 0yegJZPqozep47Ijt+Bsw8zBwtaiuZtKqAY3/NCJ9XPIRPypBflVRb4UG59hlm1ITZ
-	 RohzTkQCfHW0JpmPmghAxfN22OlTkolziyFoY6+FPyhBjec6IOLamZczUlqlG76Y+H
-	 BdcXcwLInFJRw==
-Message-ID: <87d7c789-0872-4d6b-9ef2-db3543f1d295@kernel.org>
-Date: Wed, 13 Aug 2025 10:13:24 +0200
+Date: Wed, 13 Aug 2025 10:13:25 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Stefan =?utf-8?B?TcOkdGpl?= <stefan.maetje@esd.eu>
+Cc: Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+	Frank Jungclaus <frank.jungclaus@esd.eu>, linux-can@vger.kernel.org, socketcan@esd.eu, 
+	Simon Horman <horms@kernel.org>, Olivier Sobrie <olivier@sobrie.be>, 
+	Oliver Hartkopp <socketcan@hartkopp.net>, netdev@vger.kernel.org
+Subject: Re: [PATCH 4/6] can: esd_usb: Add watermark handling for TX jobs
+Message-ID: <20250813-chubby-lizard-from-asgard-fb7867-mkl@pengutronix.de>
+References: <20250811210611.3233202-1-stefan.maetje@esd.eu>
+ <20250811210611.3233202-5-stefan.maetje@esd.eu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] nfc: pn533: Delete an unnecessary check
-To: Dan Carpenter <dan.carpenter@linaro.org>,
- Lars Poeschel <poeschel@lemonage.de>
-Cc: Paolo Abeni <pabeni@redhat.com>, Aleksandr Mishin <amishin@t-argos.ru>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- kernel-janitors@vger.kernel.org
-References: <aJwn2ox5g9WsD2Vx@stanley.mountain>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <aJwn2ox5g9WsD2Vx@stanley.mountain>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="mvd6jfqqmko5gpg5"
+Content-Disposition: inline
+In-Reply-To: <20250811210611.3233202-5-stefan.maetje@esd.eu>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On 13/08/2025 07:51, Dan Carpenter wrote:
-> The "rc" variable is set like this:
-> 
-> 	if (IS_ERR(resp)) {
-> 		rc = PTR_ERR(resp);
-> 
-> We know that "rc" is negative so there is no need to check.
-> 
-> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-> ---
->  drivers/nfc/pn533/pn533.c | 12 ++++--------
->  1 file changed, 4 insertions(+), 8 deletions(-)
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+--mvd6jfqqmko5gpg5
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH 4/6] can: esd_usb: Add watermark handling for TX jobs
+MIME-Version: 1.0
 
-Best regards,
-Krzysztof
+On 11.08.2025 23:06:09, Stefan M=C3=A4tje wrote:
+> The driver tried to keep as much CAN frames as possible submitted to the
+> USB device (ESD_USB_MAX_TX_URBS). This has led to occasional "No free
+> context" error messages in high load situations like with
+> "cangen -g 0 -p 10 canX".
+>=20
+> This patch now calls netif_stop_queue() already if the number of active
+> jobs reaches ESD_USB_TX_URBS_HI_WM which is < ESD_USB_MAX_TX_URBS.
+> The netif_start_queue() is called in esd_usb_tx_done_msg() only if
+> the number of active jobs is <=3D ESD_USB_TX_URBS_LO_WM.
+>=20
+> This change eliminates the occasional error messages and significantly
+> reduces the number of calls to netif_start_queue() and
+> netif_stop_queue().
+>=20
+> The watermark limits have been chosen with the CAN-USB/Micro in mind to
+> not to compromise its TX throughput. This device is running on USB 1.1
+> only with its 1ms USB polling cycle where a ESD_USB_TX_URBS_LO_WM
+> value below 9 decreases the TX throughput.
+>=20
+> Signed-off-by: Stefan M=C3=A4tje <stefan.maetje@esd.eu>
+
+Please add a Fixes tag.
+
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--mvd6jfqqmko5gpg5
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmicSSIACgkQDHRl3/mQ
+kZxbIAgAsizV5ESiPLb1GnbM5zUVlKDLgKELDgzDCQ2yB+gGx3l5WXfugjIBuYj1
+ZAoGsyZLZ33XpSAavT4Ap4pQNSn3n71XZjCPFwDks1zK2z0qtz6eBQ42jI+bZM7R
+bFXTzRcSkZ/gB/LvLw4aZbQ1LHiJm0vZSCEQS/AM8G8ALCFSO+R5+7oNxKTyksK/
+zbpaDYDvTE/0UbAx53W+8+EHjKsBzgfglF41vZLGI+teEYfJWDvbgfqJOJNO8gCm
+/EI4LlrIvnm0CEVnlYvQT9uffbfVQuEEFaG/bcVlagr7D1y5I+b7q9H+oBZSqr8Q
+CT7WVdfICapExzqxKBm+xD45Vj7k5w==
+=GfRI
+-----END PGP SIGNATURE-----
+
+--mvd6jfqqmko5gpg5--
 
