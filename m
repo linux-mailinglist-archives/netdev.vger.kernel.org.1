@@ -1,225 +1,196 @@
-Return-Path: <netdev+bounces-213177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213178-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0538FB23FE3
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 06:50:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33254B23FF4
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 06:56:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7ABB458817A
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 04:49:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2AE83BC9FB
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 04:56:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B92282BE05E;
-	Wed, 13 Aug 2025 04:46:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="UMD23GrY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 629B42882AC;
+	Wed, 13 Aug 2025 04:56:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1DCF2D12E9;
-	Wed, 13 Aug 2025 04:46:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 562202405FD
+	for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 04:56:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755060381; cv=none; b=Sa+p1CnQwSTv0+K9rNiv3kniJiqLHvfsOK5kSJKYPyQDO+ODPpA0qItmE9nicHgw/UaqQuwfhh2hQNs2H1xmcTEYXuQDahX6AUgWhuCoksHhhvSjaVzz7QC/gL6RRgGllRTcwHy/yy1YUGF+CqMTpzYZjwow4mpz3ruZ9EOOlEw=
+	t=1755060998; cv=none; b=kY9QsYc4S+O9G4qj0O42PyqVh3V3ujp6+zvPYB5qlCiuJS6hXaRE+nhvJKn7RSDQkqojYqWVSMxfILGXfk85g7vsYSFQr0u+e4icT8VWw2kT+r3wIAoiP1Scb1ldCeCzYlWDVT1mB7h5srWsxAQuQNlSY36UMYRa4aQuzitrg2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755060381; c=relaxed/simple;
-	bh=wq36rmO/H2/6uf432YYvJpZUeGI1iB9lTaIQzUTad/M=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=D6HYZwzEaxGMmF0vYPI/++WSh8Vo9y3ZffB217/Vf/kRmN5CYTebYnHqOMNoEFb5zSA52lHhy21kfzhXn49eGzwM/HT+jW8k1YBvkBVNyq6Wq75kkGnOl70xHIVLmTU0IpRSPlqflhuwkHv2DJYQnBvvR4JnPhNWdURUlhh7bxk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=UMD23GrY; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1755060374;
-	bh=wq36rmO/H2/6uf432YYvJpZUeGI1iB9lTaIQzUTad/M=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=UMD23GrYBKw70eclDrL725mIYyq56SJj1l6u8lmCGhvJdRENnmuw5ClUM7ALsFQjF
-	 T4EYa0luLMR7ABhfZE2fbeisqULKjp4+9amNUaqbvXp+Nd1agFKMD1wsTJgIERE0ls
-	 QzmG5lISGexRF/VwZjCWwcXpTknaOt+cmfKViNLWcDcmWW3+X+vr1+xstpImGsmVWd
-	 zD5tskwCT2rb+IHQtTPi/iVy7d6libpMUkmkLvZTM+9rf0X9LXWXkgxZiQaJtqzj/2
-	 xnQsKWwhCR6yMM+brNvD3EtvpWr0qUdurKL/BxyoDC/b5OUpaZsghse/yYSpMSEjjg
-	 YHRwKNRdPF/rw==
-Received: from pecola.lan (unknown [159.196.93.152])
-	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id E85BB6ABED;
-	Wed, 13 Aug 2025 12:46:12 +0800 (AWST)
-Message-ID: <42643918b686206c97076cf9fd2f02718e85b108.camel@codeconstruct.com.au>
-Subject: Re: [PATCH v24 1/1] mctp pcc: Implement MCTP over PCC Transport
-From: Jeremy Kerr <jk@codeconstruct.com.au>
-To: admiyo@os.amperecomputing.com, Matt Johnston
- <matt@codeconstruct.com.au>,  Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Sudeep Holla
-	 <sudeep.holla@arm.com>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, 
-	Huisong Li <lihuisong@huawei.com>
-Date: Wed, 13 Aug 2025 12:46:12 +0800
-In-Reply-To: <20250811153804.96850-2-admiyo@os.amperecomputing.com>
-References: <20250811153804.96850-1-admiyo@os.amperecomputing.com>
-	 <20250811153804.96850-2-admiyo@os.amperecomputing.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-User-Agent: Evolution 3.46.4-2 
+	s=arc-20240116; t=1755060998; c=relaxed/simple;
+	bh=zvk7QhRSsCVfo6Qi9CtFgv3IdPZp+Q+gyemv6Q2EhSA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QZdd0h0EdR4ky2fvc/6Eu72cc4Ui7jhuYzKG8xcEi4PPCdTt541I7joho8O6DOdxkg/Q8F/zer2lIBE6VBt3dSkSsuAHdBO8HqWCUdIKRqJt1DP8OKiHhVQX/DKZjQOcrc9sJ+POZKqdgBbiYSFKAIeFVb+I2OToApJCVt5i3Jc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.192] (ip5f5af7c8.dynamic.kabel-deutschland.de [95.90.247.200])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 4F62061E647BA;
+	Wed, 13 Aug 2025 06:55:53 +0200 (CEST)
+Message-ID: <a154eb9b-809e-4b8c-8b77-89c80d6658e1@molgen.mpg.de>
+Date: Wed, 13 Aug 2025 06:55:52 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net v2] idpf: set mac type when
+ adding and removing MAC filters
+To: Emil Tantilov <emil.s.tantilov@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, willemb@google.com, decot@google.com,
+ netdev@vger.kernel.org, joshua.a.hay@intel.com,
+ Aleksandr.Loktionov@intel.com, andrew+netdev@lunn.ch, edumazet@google.com,
+ jianliu@redhat.com, anthony.l.nguyen@intel.com,
+ przemyslaw.kitszel@intel.com, kuba@kernel.org, pabeni@redhat.com,
+ davem@davemloft.net
+References: <20250813024202.10740-1-emil.s.tantilov@intel.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20250813024202.10740-1-emil.s.tantilov@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-SGkgQWRhbSwKCkZyb20gdGhlIE1DVFAgZGV2aWNlIHNpZGUsIG1vc3RseSBsb29rcyBva2F5LCBi
-dXQgdGhlcmUgYXJlIHNvbWUgdGhpbmdzCnRoYXQgbWF5IG5lZWQgd29yayBvbiB0aGUgbWFpbGJv
-eCBpbnRlcmZhY2UuIEFzIEkgaGF2ZSBtZW50aW9uZWQKZWFybGllciwgSSdtIG5vdCBzdXBlciBm
-YW1pbGlhciB3aXRoIHRoYXQsIHNvIHNvbWUgb2YgdGhlc2UgbWF5IGJlIG1vcmUKY2xhcmlmaWNh
-dGlvbnMgb24gbXkgc2lkZSByYXRoZXIgdGhhbiBjaGFuZ2VzLi4uCgpJIHNlZSB0aGF0IHRoaXMg
-aXMgZmFpbGluZyB0byBidWlsZCBvbiBuZXQtbmV4dCwgYXMgdGhlIG1haWxib3ggY2hhbmdlcwph
-cmUgbm90IHByZXNlbnQgdGhlcmUuIFlvdSBtYXkgbmVlZCB0byBjb29yZGluYXRlIGZvciB0aGUg
-bWVyZ2UuCgo+ICsjZGVmaW5lIE1DVFBfUEFZTE9BRF9MRU5HVEjCoMKgwqDCoCAyNTYKPiArI2Rl
-ZmluZSBNQ1RQX0NNRF9MRU5HVEjCoMKgwqDCoMKgwqDCoMKgIDQKPiArI2RlZmluZSBNQ1RQX1BD
-Q19WRVJTSU9OwqDCoMKgwqDCoMKgwqAgMHgxIC8qIERTUDAyOTIgYSBzaW5nbGUgdmVyc2lvbjog
-MSAqLwoKUmVnYXJkaW5nIHRoZSBjb21tZW50OiBJIGRvbid0IHRoaW5rIERTUDAyOTIgZG9lcyBk
-ZWZpbmUgYSB2ZXJzaW9uIGZvcgp0aGUgdHJhbnNwb3J0IGRhdGEgZm9ybWF0PyBUaGVyZSdzIHRo
-ZSBEU1AwMjM2IGhlYWRlciB2ZXJzaW9uLCBidXQKdGhhdCdzIGRpc3RpbmN0IGZyb20gdGhlIHRy
-YW5zcG9ydCBpbXBsZW1lbnRhdGlvbi4gWW91IGRvbid0IHNlZW0gdG8KdXNlIHRoZXNlIHRocmVl
-IG5vdyBhbnl3YXksIHBlcmhhcHMgZHJvcC4KCkFuZCBqdXN0IGNvbmZpcm1pbmc6IHRoZSBwY2Mg
-aGVhZGVyIGZvcm1hdCBpcyBub3cgYWxsIGhvc3QtZW5kaWFuIC0gb3IKaXMgdGhhdCBhIGZpcm13
-YXJlLXNwZWNpZmllZCBlbmRpYW5uZXNzPyAod2hhdCBoYXBwZW5zIGlmIHRoZSBPUyBtYXkKYm9v
-dCBpbiBlaXRoZXIgQkUgb3IgTEU/IGlzIHRoYXQgYXQgYWxsIHBvc3NpYmxlIGZvciBhbnkgUEND
-LWNhcGFibGUKaGFyZHdhcmUsIG9yIGFyZSB3ZSBvdGhlcndpc2UgZ3VhcmFudGVlZCB0aGF0IHdl
-J3JlIHRoZSBzYW1lIGVuZGlhbm5lc3MKYXMgdGhlIGNvbnN1bWVyPykKCj4gK3N0cnVjdCBtY3Rw
-X3BjY19tYWlsYm94IHsKPiArwqDCoMKgwqDCoMKgwqB1MzIgaW5kZXg7Cj4gK8KgwqDCoMKgwqDC
-oMKgc3RydWN0IHBjY19tYm94X2NoYW4gKmNoYW47Cj4gK8KgwqDCoMKgwqDCoMKgc3RydWN0IG1i
-b3hfY2xpZW50IGNsaWVudDsKPiArwqDCoMKgwqDCoMKgwqBzdHJ1Y3Qgc2tfYnVmZl9oZWFkIHBh
-Y2tldHM7CgpJZiB5b3UncmUgZXZlciBhYmxlIHRvIHN0YXNoIGEgY29udGV4dCBwb2ludGVyIGlu
-IG1haWxib3ggcmVxdWVzdHMsIHRoYXQKd291bGQgZ2l2ZSB5b3UgYSBncmVhdCBvcHBvcnR1bml0
-eSB0byByZW1vdmUgdGhlIGNvbXBsZXhpdHkgb2YKbWFpbnRhaW5pbmcgdGhpcyBsaXN0LgoKTm8g
-Y2hhbmdlIHJlcXVpcmVkIG5vdyBuZWNlc3NhcmlseSwganVzdCBzb21ldGhpbmcgdG8gdHJhY2sg
-Zm9yIGxhdGVyCnNpbXBsaWZpY2F0aW9uLgoKPiArfTsKPiArCj4gKy8qIFRoZSBuZXRkZXYgc3Ry
-dWN0dXJlLiBPbmUgb2YgdGhlc2UgcGVyIFBDQyBhZGFwdGVyLiAqLwo+ICtzdHJ1Y3QgbWN0cF9w
-Y2NfbmRldiB7Cj4gK8KgwqDCoMKgwqDCoMKgLyogc3BpbmxvY2sgdG8gc2VyaWFsaXplIGFjY2Vz
-cyB0byBQQ0Mgb3V0Ym94IGJ1ZmZlciBhbmQgcmVnaXN0ZXJzCj4gK8KgwqDCoMKgwqDCoMKgICog
-Tm90ZSB0aGF0IHdoYXQgUENDIGNhbGxzIHJlZ2lzdGVycyBhcmUgbWVtb3J5IGxvY2F0aW9ucywg
-bm90IENQVQo+ICvCoMKgwqDCoMKgwqDCoCAqIFJlZ2lzdGVycy7CoCBUaGV5IGluY2x1ZGUgdGhl
-IGZpZWxkcyB1c2VkIHRvIHN5bmNocm9uaXplIGFjY2Vzcwo+ICvCoMKgwqDCoMKgwqDCoCAqIGJl
-dHdlZW4gdGhlIE9TIGFuZCByZW1vdGUgZW5kcG9pbnRzLgo+ICvCoMKgwqDCoMKgwqDCoCAqCj4g
-K8KgwqDCoMKgwqDCoMKgICogT25seSB0aGUgT3V0Ym94IG5lZWRzIGEgc3BpbmxvY2ssIHRvIHBy
-ZXZlbnQgbXVsdGlwbGUKPiArwqDCoMKgwqDCoMKgwqAgKiBzZW50IHBhY2tldHMgdHJpZ2dlcmlu
-ZyBtdWx0aXBsZSBhdHRlbXB0cyB0byBvdmVyIHdyaXRlCj4gK8KgwqDCoMKgwqDCoMKgICogdGhl
-IG91dGJveC7CoCBUaGUgSW5ib3ggYnVmZmVyIGlzIGNvbnRyb2xsZWQgYnkgdGhlIHJlbW90ZQo+
-ICvCoMKgwqDCoMKgwqDCoCAqIHNlcnZpY2UgYW5kIGEgc3BpbmxvY2sgd291bGQgaGF2ZSBubyBl
-ZmZlY3QuCj4gK8KgwqDCoMKgwqDCoMKgICovCj4gK8KgwqDCoMKgwqDCoMKgc3BpbmxvY2tfdCBs
-b2NrOwoKWW91IGRvbid0IHVzZSB0aGlzIGFueXdoZXJlLCBidXQgSSB0aGluayB5b3UgZG8gbmVl
-ZCBzeW5jaHJvbmlzYXRpb24Kc3RpbGwuIFNlZSBteSBjb21tZW50IG9uIHR4X2RvbmUuCgo+ICvC
-oMKgwqDCoMKgwqDCoHN0cnVjdCBuZXRfZGV2aWNlICpuZGV2Owo+ICvCoMKgwqDCoMKgwqDCoHN0
-cnVjdCBhY3BpX2RldmljZSAqYWNwaV9kZXZpY2U7Cj4gK8KgwqDCoMKgwqDCoMKgc3RydWN0IG1j
-dHBfcGNjX21haWxib3ggaW5ib3g7Cj4gK8KgwqDCoMKgwqDCoMKgc3RydWN0IG1jdHBfcGNjX21h
-aWxib3ggb3V0Ym94Owo+ICt9Owo+ICsKPiArc3RhdGljIHZvaWQgKm1jdHBfcGNjX3J4X2FsbG9j
-KHN0cnVjdCBtYm94X2NsaWVudCAqYywgaW50IHNpemUpCj4gK3sKPiArwqDCoMKgwqDCoMKgwqBz
-dHJ1Y3QgbWN0cF9wY2NfbmRldiAqbWN0cF9wY2NfbmRldiA9Cj4gK8KgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoGNvbnRhaW5lcl9vZihjLCBzdHJ1Y3QgbWN0cF9wY2NfbmRldiwgaW5ib3gu
-Y2xpZW50KTsKPiArwqDCoMKgwqDCoMKgwqBzdHJ1Y3QgbWN0cF9wY2NfbWFpbGJveCAqYm94ID0g
-Jm1jdHBfcGNjX25kZXYtPmluYm94Owo+ICvCoMKgwqDCoMKgwqDCoHN0cnVjdCBza19idWZmICpz
-a2I7Cj4gKwo+ICvCoMKgwqDCoMKgwqDCoGlmIChzaXplID4gbWN0cF9wY2NfbmRldi0+bmRldi0+
-bXR1KQo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqByZXR1cm4gTlVMTDsKPiArwqDC
-oMKgwqDCoMKgwqBza2IgPSBuZXRkZXZfYWxsb2Nfc2tiKG1jdHBfcGNjX25kZXYtPm5kZXYsIHNp
-emUpOwo+ICvCoMKgwqDCoMKgwqDCoGlmICghc2tiKQo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqByZXR1cm4gTlVMTDsKPiArwqDCoMKgwqDCoMKgwqBza2JfcHV0KHNrYiwgc2l6ZSk7
-Cj4gK8KgwqDCoMKgwqDCoMKgc2tiLT5wcm90b2NvbCA9IGh0b25zKEVUSF9QX01DVFApOwo+ICsK
-PiArwqDCoMKgwqDCoMKgwqBza2JfcXVldWVfaGVhZCgmYm94LT5wYWNrZXRzLCBza2IpOwo+ICsK
-PiArwqDCoMKgwqDCoMKgwqByZXR1cm4gc2tiLT5kYXRhOwo+ICt9Cj4gKwo+ICtzdGF0aWMgdm9p
-ZCBtY3RwX3BjY19jbGllbnRfcnhfY2FsbGJhY2soc3RydWN0IG1ib3hfY2xpZW50ICpjLCB2b2lk
-ICpidWZmZXIpCj4gK3sKPiArwqDCoMKgwqDCoMKgwqBzdHJ1Y3QgbWN0cF9wY2NfbmRldiAqbWN0
-cF9wY2NfbmRldjsKPiArwqDCoMKgwqDCoMKgwqBzdHJ1Y3QgcGNjX2hlYWRlciBwY2NfaGVhZGVy
-Owo+ICvCoMKgwqDCoMKgwqDCoHN0cnVjdCBtY3RwX3NrYl9jYiAqY2I7Cj4gK8KgwqDCoMKgwqDC
-oMKgc3RydWN0IHNrX2J1ZmYgKnNrYjsKPiArCj4gK8KgwqDCoMKgwqDCoMKgbWN0cF9wY2NfbmRl
-diA9IGNvbnRhaW5lcl9vZihjLCBzdHJ1Y3QgbWN0cF9wY2NfbmRldiwgaW5ib3guY2xpZW50KTsK
-PiArwqDCoMKgwqDCoMKgwqBpZiAoIWJ1ZmZlcikgewo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqBkZXZfZHN0YXRzX3J4X2Ryb3BwZWQobWN0cF9wY2NfbmRldi0+bmRldik7Cj4gK8Kg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHJldHVybjsKPiArwqDCoMKgwqDCoMKgwqB9Cj4g
-Kwo+ICvCoMKgwqDCoMKgwqDCoHNrYl9xdWV1ZV93YWxrKCZtY3RwX3BjY19uZGV2LT5pbmJveC5w
-YWNrZXRzLCBza2IpIHsKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgaWYgKHNrYi0+
-ZGF0YSAhPSBidWZmZXIpCj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqBjb250aW51ZTsKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgc2tiX3Vu
-bGluayhza2IsICZtY3RwX3BjY19uZGV2LT5pbmJveC5wYWNrZXRzKTsKPiArwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgZGV2X2RzdGF0c19yeF9hZGQobWN0cF9wY2NfbmRldi0+bmRldiwg
-c2tiLT5sZW4pOwo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBza2JfcmVzZXRfbWFj
-X2hlYWRlcihza2IpOwo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBza2JfcHVsbChz
-a2IsIHNpemVvZihwY2NfaGVhZGVyKSk7Cj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oHNrYl9yZXNldF9uZXR3b3JrX2hlYWRlcihza2IpOwo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqBjYiA9IF9fbWN0cF9jYihza2IpOwo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqBjYi0+aGFsZW4gPSAwOwo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBuZXRp
-Zl9yeChza2IpOwo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqByZXR1cm47Cj4gK8Kg
-wqDCoMKgwqDCoMKgfQo+ICvCoMKgwqDCoMKgwqDCoHByX3dhcm4oIlVubWF0Y2hlZCBwYWNrZXQg
-aW4gbWN0cC1wY2MgaW5ib3ggcGFja2V0IGxpc3QiKTsKCk1pbm9yOiB3b3VsZCBiZSBoZWxwZnVs
-IHRvIGluY2x1ZGUgdGhlIGRldmljZSBpbnN0YW5jZSBpbmZvIGhlcmUuClBlcmhhcHMgbmV0ZGV2
-X3dhcm4oKT8KCj4gK30KPiArCj4gK3N0YXRpYyB2b2lkIG1jdHBfcGNjX3R4X2RvbmUoc3RydWN0
-IG1ib3hfY2xpZW50ICpjLCB2b2lkICptc3NnLCBpbnQgcikKPiArewo+ICvCoMKgwqDCoMKgwqDC
-oHN0cnVjdCBtY3RwX3BjY19tYWlsYm94ICpib3g7Cj4gK8KgwqDCoMKgwqDCoMKgc3RydWN0IHNr
-X2J1ZmYgKnNrYjsKPiArCj4gK8KgwqDCoMKgwqDCoMKgYm94ID0gY29udGFpbmVyX29mKGMsIHN0
-cnVjdCBtY3RwX3BjY19tYWlsYm94LCBjbGllbnQpOwo+ICvCoMKgwqDCoMKgwqDCoHNrYl9xdWV1
-ZV93YWxrKCZib3gtPnBhY2tldHMsIHNrYikgewo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqBpZiAoc2tiLT5kYXRhID09IG1zc2cpIHsKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoHNrYl91bmxpbmsoc2tiLCAmYm94LT5wYWNrZXRzKTsKPiAr
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGRldl9jb25zdW1l
-X3NrYl9hbnkoc2tiKTsKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoGJyZWFrOwo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqB9Cj4gK8KgwqDC
-oMKgwqDCoMKgfQoKSG93IGFyZSB1cGRhdGVzIHRvIHRoaXMgcXVldWUgc3luY2hyb25pc2VkIGFn
-YWluc3QgY29uY3VycmVudCBzdGFydF94bWl0PwoKU2ltaWxhcmx5LCBmb3IgdGhlIFJYIHBhdGg6
-IHdoYXQgYWJvdXQgZHJhaW5fcGFja2V0cygpIHZzLiBSWAphbGxvYy9jb21wbGV0aW9uIC0gaXMg
-dGhlcmUgYW55IGd1YXJhbnRlZSB0aGF0IHdlIGhhdmUgcXVpZXNjZWQgdGhlIHJ4CmNoYW5uZWwg
-YmVmb3JlIG1jdHBfY2xlYW51cF9uZXRkZXYoKSBydW5zPyBJdCBzZWVtcyBsaWtlIHRoaXMgY3Vy
-cmVudGx5CmRlcGVuZHMgb24gb3JkZXJpbmcgb2YgdGhlIGRldm0gY2xlYW51cCBhY3Rpb25zLgoK
-PiArfQo+ICsKPiArc3RhdGljIG5ldGRldl90eF90IG1jdHBfcGNjX3R4KHN0cnVjdCBza19idWZm
-ICpza2IsIHN0cnVjdCBuZXRfZGV2aWNlICpuZGV2KQo+ICt7Cj4gK8KgwqDCoMKgwqDCoMKgc3Ry
-dWN0IG1jdHBfcGNjX25kZXYgKm1wbmQgPSBuZXRkZXZfcHJpdihuZGV2KTsKPiArwqDCoMKgwqDC
-oMKgwqBzdHJ1Y3QgcGNjX2hlYWRlciAqcGNjX2hlYWRlcjsKPiArwqDCoMKgwqDCoMKgwqBpbnQg
-bGVuID0gc2tiLT5sZW47Cj4gK8KgwqDCoMKgwqDCoMKgaW50IHJjOwo+ICsKPiArwqDCoMKgwqDC
-oMKgwqByYyA9IHNrYl9jb3dfaGVhZChza2IsIHNpemVvZigqcGNjX2hlYWRlcikpOwo+ICvCoMKg
-wqDCoMKgwqDCoGlmIChyYykgewo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBkZXZf
-ZHN0YXRzX3R4X2Ryb3BwZWQobmRldik7Cj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oGtmcmVlX3NrYihza2IpOwo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqByZXR1cm4g
-TkVUREVWX1RYX09LOwo+ICvCoMKgwqDCoMKgwqDCoH0KPiArCj4gK8KgwqDCoMKgwqDCoMKgcGNj
-X2hlYWRlciA9IHNrYl9wdXNoKHNrYiwgc2l6ZW9mKCpwY2NfaGVhZGVyKSk7Cj4gK8KgwqDCoMKg
-wqDCoMKgcGNjX2hlYWRlci0+c2lnbmF0dXJlID0gUENDX1NJR05BVFVSRSB8IG1wbmQtPm91dGJv
-eC5pbmRleDsKPiArwqDCoMKgwqDCoMKgwqBwY2NfaGVhZGVyLT5mbGFncyA9IFBDQ19DTURfQ09N
-UExFVElPTl9OT1RJRlk7Cj4gK8KgwqDCoMKgwqDCoMKgbWVtY3B5KCZwY2NfaGVhZGVyLT5jb21t
-YW5kLCBNQ1RQX1NJR05BVFVSRSwgTUNUUF9TSUdOQVRVUkVfTEVOR1RIKTsKPiArwqDCoMKgwqDC
-oMKgwqBwY2NfaGVhZGVyLT5sZW5ndGggPSBsZW4gKyBNQ1RQX1NJR05BVFVSRV9MRU5HVEg7Cj4g
-K8KgwqDCoMKgwqDCoMKgc2tiX3F1ZXVlX2hlYWQoJm1wbmQtPm91dGJveC5wYWNrZXRzLCBza2Ip
-Owo+ICsKPiArwqDCoMKgwqDCoMKgwqByYyA9IG1ib3hfc2VuZF9tZXNzYWdlKG1wbmQtPm91dGJv
-eC5jaGFuLT5tY2hhbiwgc2tiLT5kYXRhKTsKPiArCj4gK8KgwqDCoMKgwqDCoMKgaWYgKHJjIDwg
-MCkgewo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBza2JfdW5saW5rKHNrYiwgJm1w
-bmQtPm91dGJveC5wYWNrZXRzKTsKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgcmV0
-dXJuIE5FVERFVl9UWF9CVVNZOwo+ICvCoMKgwqDCoMKgwqDCoH0KCklzIHRoZSBsYWNrIG9mIGZs
-b3ctY29udHJvbCBoZXJlIGFuIGlzc3VlPyBJcyB0aGVyZSBhbnkgZmFjaWxpdHkgZm9yIHRoZQpt
-YWlsYm94IEFQSSB0byBnaXZlIHlvdSBhbiBpbmRpY2F0aW9uIG9mIHR4IGF2YWlsYWJpbGl0eSwg
-b3Igc2hvdWxkIHlvdSBiZQp0cmFja2luZyB0aGF0IGluIHRoZSBudW1iZXIgb2YgcGVuZGluZyBU
-WCBtZXNzYWdlcz8KCk9yLCBpbiBnZW5lcmFsOiB3aGF0IGFyZSB5b3UgZXhwZWN0YXRpb25zIG9u
-IHJldHJhbnNtaXQgZm9yIHRoaXMKTkVUREVWX1RYX0JVU1kgY2FzZT8KCgo+ICsKPiArwqDCoMKg
-wqDCoMKgwqBkZXZfZHN0YXRzX3R4X2FkZChuZGV2LCBsZW4pOwo+ICvCoMKgwqDCoMKgwqDCoHJl
-dHVybiBORVRERVZfVFhfT0s7Cj4gK30KPiArCj4gK3N0YXRpYyBjb25zdCBzdHJ1Y3QgbmV0X2Rl
-dmljZV9vcHMgbWN0cF9wY2NfbmV0ZGV2X29wcyA9IHsKPiArwqDCoMKgwqDCoMKgwqAubmRvX3N0
-YXJ0X3htaXQgPSBtY3RwX3BjY190eCwKPiArfTsKPiArCj4gK3N0YXRpYyBjb25zdCBzdHJ1Y3Qg
-bWN0cF9uZXRkZXZfb3BzIG1jdHBfbmV0ZGV2X29wcyA9IHsKPiArwqDCoMKgwqDCoMKgwqBOVUxM
-Cj4gK307CgpNaW5vcjogbWN0cF9yZWdpc3Rlcl9uZXRkZXYoKSBhbGxvd3MgcGFzc2luZyBOVUxM
-IGZvciB0aGUgb3BzIGFyZ3VtZW50LAp5b3UgZG9uJ3QgbmVlZCB0aGlzIGVtcHR5IG9wcyBzdHJ1
-Y3QuCgo+ICtzdGF0aWMgdm9pZCBkcmFpbl9wYWNrZXRzKHN0cnVjdCBza19idWZmX2hlYWQgKmxp
-c3QpCj4gK3sKPiArwqDCoMKgwqDCoMKgwqBzdHJ1Y3Qgc2tfYnVmZiAqc2tiOwo+ICsKPiArwqDC
-oMKgwqDCoMKgwqB3aGlsZSAoIXNrYl9xdWV1ZV9lbXB0eShsaXN0KSkgewo+ICvCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqBza2IgPSBza2JfZGVxdWV1ZShsaXN0KTsKPiArwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgZGV2X2NvbnN1bWVfc2tiX2FueShza2IpOwo+ICvCoMKgwqDC
-oMKgwqDCoH0KPiArfQo+ICsKPiArc3RhdGljIHZvaWQgbWN0cF9jbGVhbnVwX25ldGRldih2b2lk
-ICpkYXRhKQo+ICt7Cj4gK8KgwqDCoMKgwqDCoMKgc3RydWN0IG1jdHBfcGNjX25kZXYgKm1jdHBf
-cGNjX25kZXY7Cj4gK8KgwqDCoMKgwqDCoMKgc3RydWN0IG5ldF9kZXZpY2UgKm5kZXYgPSBkYXRh
-Owo+ICsKPiArwqDCoMKgwqDCoMKgwqBtY3RwX3BjY19uZGV2ID0gbmV0ZGV2X3ByaXYobmRldik7
-Cj4gK8KgwqDCoMKgwqDCoMKgZHJhaW5fcGFja2V0cygmbWN0cF9wY2NfbmRldi0+b3V0Ym94LnBh
-Y2tldHMpOwo+ICvCoMKgwqDCoMKgwqDCoGRyYWluX3BhY2tldHMoJm1jdHBfcGNjX25kZXYtPmlu
-Ym94LnBhY2tldHMpOwoKWW91J3JlIGRyYWluaW5nIHRoZXNlIHF1ZXVlcyBvbiBkZXZpY2UgcmVt
-b3ZhbC4gSSBzdXNwZWN0IHlvdSBtYXkgd2FudAp0byBkbyB0aGlzIG9uIG5kb19zdG9wIGluc3Rl
-YWQuCgpUaGlzIHdvdWxkIHByZXZlbnQgc3RhbGUgc2ticyBiZWluZyB0cmFuc2ZlcnJlZCBvdmVy
-IGEgY2hhbmdlIGluIG5ldHdvcmsKbmFtZXNwYWNlLCB3aGljaCBpcyBwcm9iYWJseSBhIGdvb2Qg
-dGhpbmcsIGJ1dCBtYXkgZGVwZW5kIG9uIGRldGFpbHMKb2YgdGhlIFBDQyBjaGFubmVsIGJlaGF2
-aW91ci4KCkNoZWVycywKCgpKZXJlbXkK
+Dear Emil,
 
+
+Thank you for the patch.
+
+Am 13.08.25 um 04:42 schrieb Emil Tantilov:
+> On control planes that allow changing the MAC address of the interface,
+> the driver must provide a MAC type to avoid errors such as:
+> 
+> idpf 0000:0a:00.0: Transaction failed (op 535)
+> idpf 0000:0a:00.0: Received invalid MAC filter payload (op 535) (len 0)
+> idpf 0000:0a:00.0: Transaction failed (op 536)
+> 
+> These errors occur during driver load or when changing the MAC via:
+> ip link set <iface> address <mac>
+> 
+> Add logic to set the MAC type when sending ADD/DEL (opcodes 535/536) to
+> the control plane. Since only one primary MAC is supported per vport, the
+> driver only needs to send an ADD opcode when setting it. Remove the old
+> address by calling __idpf_del_mac_filter(), which skips the message and
+> just clears the entry from the internal list.
+
+Could this be split into two patches?
+
+1.  Set the type
+2.  Improve logic
+
+> Fixes: ce1b75d0635c ("idpf: add ptypes and MAC filter support")
+> Reported-by: Jian Liu <jianliu@redhat.com>
+> Signed-off-by: Emil Tantilov <emil.s.tantilov@intel.com>
+> ---
+> Changelog:
+> v2:
+> - Make sure to clear the primary MAC from the internal list, following
+>    successful change.
+> - Update the description to include the error on 536 opcode and
+>    mention the removal of the old address.
+> 
+> v1:
+> https://lore.kernel.org/intel-wired-lan/20250806192130.3197-1-emil.s.tantilov@intel.com/
+> ---
+>   drivers/net/ethernet/intel/idpf/idpf_lib.c      |  9 ++++++---
+>   drivers/net/ethernet/intel/idpf/idpf_virtchnl.c | 11 +++++++++++
+>   2 files changed, 17 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
+> index 2c2a3e85d693..26edd2cda70b 100644
+> --- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
+> +++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
+> @@ -2345,6 +2345,7 @@ static int idpf_set_mac(struct net_device *netdev, void *p)
+>   	struct idpf_vport_config *vport_config;
+>   	struct sockaddr *addr = p;
+>   	struct idpf_vport *vport;
+> +	u8 old_addr[ETH_ALEN];
+
+old_mac_addr?
+
+>   	int err = 0;
+>   
+>   	idpf_vport_ctrl_lock(netdev);
+> @@ -2367,17 +2368,19 @@ static int idpf_set_mac(struct net_device *netdev, void *p)
+>   	if (ether_addr_equal(netdev->dev_addr, addr->sa_data))
+>   		goto unlock_mutex;
+>   
+> +	ether_addr_copy(old_addr, vport->default_mac_addr);
+> +	ether_addr_copy(vport->default_mac_addr, addr->sa_data);
+>   	vport_config = vport->adapter->vport_config[vport->idx];
+>   	err = idpf_add_mac_filter(vport, np, addr->sa_data, false);
+>   	if (err) {
+>   		__idpf_del_mac_filter(vport_config, addr->sa_data);
+> +		ether_addr_copy(vport->default_mac_addr, netdev->dev_addr);
+>   		goto unlock_mutex;
+>   	}
+>   
+> -	if (is_valid_ether_addr(vport->default_mac_addr))
+> -		idpf_del_mac_filter(vport, np, vport->default_mac_addr, false);
+> +	if (is_valid_ether_addr(old_addr))
+> +		__idpf_del_mac_filter(vport_config, old_addr);
+>   
+> -	ether_addr_copy(vport->default_mac_addr, addr->sa_data);
+>   	eth_hw_addr_set(netdev, addr->sa_data);
+>   
+>   unlock_mutex:
+> diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+> index a028c69f7fdc..e60438633cc4 100644
+> --- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+> +++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+> @@ -3765,6 +3765,15 @@ u32 idpf_get_vport_id(struct idpf_vport *vport)
+>   	return le32_to_cpu(vport_msg->vport_id);
+>   }
+>   
+> +static void idpf_set_mac_type(struct idpf_vport *vport,
+> +			      struct virtchnl2_mac_addr *mac_addr)
+> +{
+> +	if (ether_addr_equal(vport->default_mac_addr, mac_addr->addr))
+> +		mac_addr->type = VIRTCHNL2_MAC_ADDR_PRIMARY;
+> +	else
+> +		mac_addr->type = VIRTCHNL2_MAC_ADDR_EXTRA;
+
+I’d use the ternary operator. That way, it’s clear the same variable is 
+assigned a value in each branch.
+
+> +}
+> +
+>   /**
+>    * idpf_mac_filter_async_handler - Async callback for mac filters
+>    * @adapter: private data struct
+> @@ -3894,6 +3903,7 @@ int idpf_add_del_mac_filters(struct idpf_vport *vport,
+>   			    list) {
+>   		if (add && f->add) {
+>   			ether_addr_copy(mac_addr[i].addr, f->macaddr);
+> +			idpf_set_mac_type(vport, &mac_addr[i]);
+>   			i++;
+>   			f->add = false;
+>   			if (i == total_filters)
+> @@ -3901,6 +3911,7 @@ int idpf_add_del_mac_filters(struct idpf_vport *vport,
+>   		}
+>   		if (!add && f->remove) {
+>   			ether_addr_copy(mac_addr[i].addr, f->macaddr);
+> +			idpf_set_mac_type(vport, &mac_addr[i]);
+>   			i++;
+>   			f->remove = false;
+>   			if (i == total_filters)
+
+The overall diff looks good. Feel free to add:
+
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+
+
+Kind regards,
+
+Paul
 
