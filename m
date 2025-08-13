@@ -1,63 +1,71 @@
-Return-Path: <netdev+bounces-213367-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30AF2B24C5B
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 16:48:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FFE1B24C81
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 16:53:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD4CA3B39B5
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 14:48:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68D473B9C53
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 14:52:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E90992EBDC1;
-	Wed, 13 Aug 2025 14:48:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 579DE2ECD06;
+	Wed, 13 Aug 2025 14:52:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WJ+5earH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HXSRoY4F"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA6971D54D8;
-	Wed, 13 Aug 2025 14:48:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 258A1DF71;
+	Wed, 13 Aug 2025 14:52:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755096484; cv=none; b=PhcV7mqAVWQwREjC+uWU3YlzVfDhxEjNZ1BpwFC+0Lz1jmAqn7mfuGFe1puDlsdtN4Vv7h17wQxxUlzbA+1DYMi8ROAPbYHn0e5U44y5boxxRmJE9t2qJHYgLYeormAZ3/9kHaaaSV44PuwdZB38By3qoQGa/pV/7zzmbOisgkY=
+	t=1755096735; cv=none; b=kZMywdWU1sg7YfXuHAH1DeQ2jsQD6+Wgr3MJcettk1vhr0Sl+YDU3yM/50mUWlWkzQsJrrCOG6foLE9k94NMEOWrviIvyz1Bp06faBJi5Ufw38gVq51VKvnZFhtrPzQBOuipKN0vZZLUQXT/dDuTyMp4+nH+NKJDJaESzXSrgkE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755096484; c=relaxed/simple;
-	bh=Qn8agVW9Vlcdpw9sdzCP4IVz3IhuXOJzbYXLkGDbi9c=;
+	s=arc-20240116; t=1755096735; c=relaxed/simple;
+	bh=yF8iCt4IcxBj81Mp1kvQhhC5dKj1tFO3WDbfBuoASjQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UKZd+mxVh0Bv+zeRf5KVEU2QoySCmKEm65D+wM8ixagOkTbQMTuHDBrvFqniwEOSKuWoF2HzbEBKGGidjG6bjYi9vHdlx5MtWCC0JUegCPH9l6XZ04vDalDTcxzuR1BSyOWLv/VtyeY/EUXeLpvKFJMfUuCcpFJ2drfLOFLOwXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WJ+5earH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0743DC4CEF6;
-	Wed, 13 Aug 2025 14:48:03 +0000 (UTC)
+	 MIME-Version:Content-Type; b=XGnKdr8JCQpA8tRwqqVKdSbZRQdYZB2tEoRgE7e3pVIjjOyaEqSKhHi4smbMl4ISh+cdj7TlYo3m3wePb+I6HxR7sAynUM2/xV8jP6CVU1IPNLP07T6flnomYzy4mnNQEed6/n9dZ0QU0+3jhg4JZmN7EKreyyxprULuteFwwI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HXSRoY4F; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F4F7C4CEF1;
+	Wed, 13 Aug 2025 14:52:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755096484;
-	bh=Qn8agVW9Vlcdpw9sdzCP4IVz3IhuXOJzbYXLkGDbi9c=;
+	s=k20201202; t=1755096734;
+	bh=yF8iCt4IcxBj81Mp1kvQhhC5dKj1tFO3WDbfBuoASjQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WJ+5earHOqQatrSxfBJByiizZL9FAcLc+WKCq9ogrON7Wvj8KX2WLcohGJCWZa83g
-	 d15jRGcqsMGmyxjVgqkDCTM7Kjryz4pf4+qDB4qVOfjesSXDXheeZSHvl38VgKntSs
-	 0HRj0k6gbXf+CiHVL6P1+vN267NnSR2ovXNyS8A2hiz4t9UAN3p/maZJ/Lbnr1wHt9
-	 qRzvGSTsBs0VuXl6x3J5EDjZtkGyraW3dJOmBIOT8YwgyZmuIYyWeWfGF9IlS8Gjmn
-	 SblkTEKOfpRW0wgUdUH484VEiWKE8GoS7ox3HUYQxHFaNgwEN8gwYvofYsQprDCaw2
-	 M3zVOtUlw4E+w==
-Date: Wed, 13 Aug 2025 07:48:03 -0700
+	b=HXSRoY4FX97/bGSoskS9rX3kbLNHbhMECHrpExOw3SjAhO+sutt0wNIt+hXguYqFz
+	 acOrnwIq662t2uH/Pkk+7zDE8qZpdbkHmHHAOfqQwBcKJJyCXYPBsuQso8zFZkC8wc
+	 erGdkydwLPI2kjby/RJhn2Ues8nq7SX9WGDBoI3FpERRf1p1vq/7Gg6L9vYkY8r3yv
+	 /UTzDE2v+NTni4xTqnaSIoDLmtE+MWUd4MJgORxpfzwpU05jPd/97lVDP2xRhtyicu
+	 kd6cGBBqNP8JClWYuCW6Zn6N1Kg15PCa2VQb8UCi/ux4QHe6NCO7XLvlVcwo0EiNp3
+	 Pe3CylL1s7ueg==
+Date: Wed, 13 Aug 2025 07:52:12 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Roger Quadros <rogerq@kernel.org>
-Cc: Siddharth Vadapalli <s-vadapalli@ti.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Russell
- King <linux@armlinux.org.uk>, danishanwar@ti.com, srk@ti.com,
- linux-omap@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v4 8/9] net: ethernet: ti: am65-cpsw: add
- network flow classification support
-Message-ID: <20250813074803.06db304a@kernel.org>
-In-Reply-To: <d787ca03-a54e-46ae-828b-68fbd7b0b3a8@kernel.org>
-References: <20250514-am65-cpsw-rx-class-v4-0-5202d8119241@kernel.org>
-	<20250514-am65-cpsw-rx-class-v4-8-5202d8119241@kernel.org>
-	<20250516182902.5a5bfd98@kernel.org>
-	<d787ca03-a54e-46ae-828b-68fbd7b0b3a8@kernel.org>
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: Byungchul Park <byungchul@sk.com>, akpm@linux-foundation.org,
+ linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
+ harry.yoo@oracle.com, ast@kernel.org, daniel@iogearbox.net,
+ davem@davemloft.net, hawk@kernel.org, john.fastabend@gmail.com,
+ sdf@fomichev.me, saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
+ mbloch@nvidia.com, andrew+netdev@lunn.ch, edumazet@google.com,
+ pabeni@redhat.com, david@redhat.com, lorenzo.stoakes@oracle.com,
+ Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
+ surenb@google.com, mhocko@suse.com, horms@kernel.org, jackmanb@google.com,
+ hannes@cmpxchg.org, ziy@nvidia.com, ilias.apalodimas@linaro.org,
+ willy@infradead.org, brauner@kernel.org, kas@kernel.org, yuzhao@google.com,
+ usamaarif642@gmail.com, baolin.wang@linux.alibaba.com,
+ almasrymina@google.com, toke@redhat.com, bpf@vger.kernel.org,
+ linux-rdma@vger.kernel.org, sfr@canb.auug.org.au, linux-mm@kvack.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH linux-next v3] mm, page_pool: introduce a new page type
+ for page pool in page type
+Message-ID: <20250813075212.051b5178@kernel.org>
+In-Reply-To: <6bbf6ca2-0c46-43b7-82d8-b990f01ae5dd@gmail.com>
+References: <20250729110210.48313-1-byungchul@sk.com>
+	<20250813060901.GA9086@system.software.com>
+	<6bbf6ca2-0c46-43b7-82d8-b990f01ae5dd@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,29 +75,25 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 13 Aug 2025 16:49:27 +0300 Roger Quadros wrote:
-> On 17/05/2025 04:29, Jakub Kicinski wrote:
-> > On Wed, 14 May 2025 15:04:28 +0300 Roger Quadros wrote:  
-> >> The TRM doesn't mention anything about order of evaluation of the
-> >> classifier rules however it does mention in [1]
-> >> "if multiple classifier matches occur, the highest match
-> >> with thread enable bit set will be used."  
-> > 
-> > So we're not sure how to maintain the user requested ordering?  
-> 
-> Currently we are using the user/ethtool provided location as is.
-> 
-> > Am I reading this correctly? If so then ..
-> >   
-> >> +	if (fs->location == RX_CLS_LOC_ANY ||  
-> > 
-> > .. why are we rejecting LOC_ANY?   
-> 
-> Because driver doesn't have logic to decide the location and relies on ethtool to
-> decide it if user doesn't supply it.
+On Wed, 13 Aug 2025 12:18:56 +0100 Pavel Begunkov wrote:
+> It should go to net, there will be enough of conflicts otherwise.
+> mm maintainers, do you like it as a shared branch or can it just
+> go through the net tree?
 
-The location supplied by the user may have semantic significance.
-IOW locations may be interpreted as priorities.
-It's better to support LOC_ANY and add the 10 lines of code to
-allocate the id in the driver..
+Looks like this is 100% in mm, and the work is not urgent at all.
+So I'm happy for Andrew to take this, and dependent patches (if any)
+can come in the next cycle.
+
+> @@ -1379,9 +1376,11 @@ __always_inline bool free_pages_prepare(struct page *page,
+>   		mod_mthp_stat(order, MTHP_STAT_NR_ANON, -1);
+>   		folio->mapping = NULL;
+>   	}
+> -	if (unlikely(page_has_type(page)))
+> +	if (unlikely(page_has_type(page))) {
+> +		WARN_ON_ONCE(PageNet_pp(page));
+
+I guess my ask to add a comment here got ignored?
+
+>   		/* Reset the page_type (which overlays _mapcount) */
+>   		page->page_type = UINT_MAX;
 
