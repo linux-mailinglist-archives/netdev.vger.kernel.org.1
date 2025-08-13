@@ -1,63 +1,43 @@
-Return-Path: <netdev+bounces-213260-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213259-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 975D7B24439
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 10:24:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3C23B2442F
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 10:22:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB1EE724C61
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 08:21:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A30D61B68174
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 08:21:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60BCE2ED174;
-	Wed, 13 Aug 2025 08:21:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="eNx4LCbG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6388A2EA47C;
+	Wed, 13 Aug 2025 08:21:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lelvem-ot02.ext.ti.com (lelvem-ot02.ext.ti.com [198.47.23.235])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 009FB2ECEBD;
-	Wed, 13 Aug 2025 08:21:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.235
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 867322690D9;
+	Wed, 13 Aug 2025 08:21:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755073276; cv=none; b=SSKtiT6ULzZmw5tpC/bFRGBZ2Eac6jFiUr0C/ASXfkHo6s/drFlWz0Wv2DLyeC93TDaapYpPNlYkMBNUTb4P+5NcRfhdOPO9hA1tuCi0wdSwpbAMevEBOrFbqSO+V/nmII3NOn6oXxOsRlFeRp1f3DAcuz0N2j1RaEhrB9gZDHg=
+	t=1755073268; cv=none; b=NRNeXq1nZJ7nTen5q9mUU45JpJrqdGhYVTqs9T7eTLNU1rnE9mxpnXlGKMKqXAzfsRjwXJ8S0q5Pojs49cCK2a2VdwUt5faUi1gKfPg6RzUK+4MFvWC64hn5ZdRBnYTWYlfOFAg1APqS6PgEyikgX8wdyqRGsYSaX042EHWUWhI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755073276; c=relaxed/simple;
-	bh=4nJfdxzcG4OcM3o0GGc0fk6bUgEPLo11b5P1eW5MSA4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=YYsAQwffPTegs97IfU1t5PSeE2RQvIqE7yJRpqZRRWs8Msnr6pFuylxJtgLYvLWlYDRvcVyQ8pU6Ai9gHKmfZ/j+vqnH0meFPgbwid/j2C+CRMD1TFwsEPBIeRdGjN+BXTtvorIh2cxsNdYMUbSpRt9XWrRP/DLoQKQBDZUa8pk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=eNx4LCbG; arc=none smtp.client-ip=198.47.23.235
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelvem-sh01.itg.ti.com ([10.180.77.71])
-	by lelvem-ot02.ext.ti.com (8.15.2/8.15.2) with ESMTP id 57D8KGP42108025;
-	Wed, 13 Aug 2025 03:20:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1755073216;
-	bh=tFefP1/yJlaAiGAZVj+v17ptcjE2g02yG+MMbCWecvo=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=eNx4LCbGOW99HXoL9WyQlZDzPGnspHO7byjmLgCVttJyvbz9GrmJf5qDtDNk/D3gr
-	 ZRfroad0I+A2LSFijVskPrkXlzf1/v05OGCighnsKm+7gfU6vbGwjHjCzzIXEXHvh3
-	 Mq5wynYxft68hDfZfx+Tde/NkBNDlnqRnOh3xX7Q=
-Received: from DLEE105.ent.ti.com (dlee105.ent.ti.com [157.170.170.35])
-	by lelvem-sh01.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 57D8KGXd4113029
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
-	Wed, 13 Aug 2025 03:20:16 -0500
-Received: from DLEE115.ent.ti.com (157.170.170.26) by DLEE105.ent.ti.com
- (157.170.170.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Wed, 13
- Aug 2025 03:20:15 -0500
-Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DLEE115.ent.ti.com
- (157.170.170.26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55 via
- Frontend Transport; Wed, 13 Aug 2025 03:20:15 -0500
-Received: from [172.24.231.152] (danish-tpc.dhcp.ti.com [172.24.231.152])
-	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 57D8K8io2021639;
-	Wed, 13 Aug 2025 03:20:09 -0500
-Message-ID: <ab6e5c8c-6f91-4017-b68b-7fdf93980a17@ti.com>
-Date: Wed, 13 Aug 2025 13:50:08 +0530
+	s=arc-20240116; t=1755073268; c=relaxed/simple;
+	bh=y/s7wwOlYPVkyXx5nbRs5KaAJ0ZEjjOZjp/AnDFDD50=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=quRq4epl7FRYSpLXD5F82qDlCfaMkGCluF1bEWOYG6fWsiW+Dg0QYTlXwQ49T4G6qZYKtCIsOVM2hVwbEdlJ4pO9UXw4y7E5iLW3BV7x4eNggqYSQO3OFfKZFurN63cyGHngKBAx+G7BvriFI9aTG98HqyyOho6tSjX4bdWhJGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.192] (ip5f5af7c8.dynamic.kabel-deutschland.de [95.90.247.200])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id A4D2C61E647BA;
+	Wed, 13 Aug 2025 10:20:33 +0200 (CEST)
+Message-ID: <785b380c-d4ba-423c-93ed-059d0aebc6be@molgen.mpg.de>
+Date: Wed, 13 Aug 2025 10:20:33 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,104 +45,66 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 4/5] net: rnpgbe: Add basic mbx_fw support
-To: Dong Yibo <dong100@mucse.com>, <andrew+netdev@lunn.ch>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <horms@kernel.org>, <corbet@lwn.net>,
-        <gur.stavi@huawei.com>, <maddy@linux.ibm.com>, <mpe@ellerman.id.au>,
-        <lee@trager.us>, <gongfan1@huawei.com>, <lorenzo@kernel.org>,
-        <geert+renesas@glider.be>, <Parthiban.Veerasooran@microchip.com>,
-        <lukas.bulwahn@redhat.com>, <alexanderduyck@fb.com>,
-        <richardcochran@gmail.com>
-CC: <netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-References: <20250812093937.882045-1-dong100@mucse.com>
- <20250812093937.882045-5-dong100@mucse.com>
+Subject: Re: [Intel-wired-lan] [PATCH v1 iwl-next 2/2] igbvf: remove
+ duplicated counter rx_long_byte_count from ethtool statistics
+To: Kohei Enju <enjuk@amazon.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ kohei.enju@gmail.com
+References: <20250813075206.70114-1-enjuk@amazon.com>
+ <20250813075206.70114-3-enjuk@amazon.com>
 Content-Language: en-US
-From: MD Danish Anwar <danishanwar@ti.com>
-In-Reply-To: <20250812093937.882045-5-dong100@mucse.com>
-Content-Type: text/plain; charset="UTF-8"
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20250813075206.70114-3-enjuk@amazon.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+
+Dear Kohei,
 
 
+Thank you for your patch.
 
-On 12/08/25 3:09 pm, Dong Yibo wrote:
-> +/**
-> + * mucse_fw_get_capability - Get hw abilities from fw
-> + * @hw: pointer to the HW structure
-> + * @abil: pointer to the hw_abilities structure
-> + *
-> + * mucse_fw_get_capability tries to get hw abilities from
-> + * hw.
-> + *
-> + * @return: 0 on success, negative on failure
-> + **/
-> +static int mucse_fw_get_capability(struct mucse_hw *hw,
-> +				   struct hw_abilities *abil)
-> +{
-> +	struct mbx_fw_cmd_reply reply;
-> +	struct mbx_fw_cmd_req req;
-> +	int err;
-> +
-> +	memset(&req, 0, sizeof(req));
-> +	memset(&reply, 0, sizeof(reply));
-> +	build_phy_abalities_req(&req, &req);
+Am 13.08.25 um 09:50 schrieb Kohei Enju:
+> rx_long_byte_count shows the value of the GORC (Good Octets Received
+> Count) register. However, the register value is already shown as
+> rx_bytes and they always show the same value.
+> 
+> Remove rx_long_byte_count as the Intel ethernet driver e1000e did in
+> commit 0a939912cf9c ("e1000e: cleanup redundant statistics counter").
+> 
+> Tested on Intel Corporation I350 Gigabit Network Connection.
+> 
+> Tested-by: Kohei Enju <enjuk@amazon.com>
+> Signed-off-by: Kohei Enju <enjuk@amazon.com>
+> ---
+>   drivers/net/ethernet/intel/igbvf/ethtool.c | 1 -
+>   1 file changed, 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/igbvf/ethtool.c b/drivers/net/ethernet/intel/igbvf/ethtool.c
+> index c6defc495f13..9c08ebfad804 100644
+> --- a/drivers/net/ethernet/intel/igbvf/ethtool.c
+> +++ b/drivers/net/ethernet/intel/igbvf/ethtool.c
+> @@ -36,7 +36,6 @@ static const struct igbvf_stats igbvf_gstrings_stats[] = {
+>   	{ "lbtx_bytes", IGBVF_STAT(stats.gotlbc, stats.base_gotlbc) },
+>   	{ "tx_restart_queue", IGBVF_STAT(restart_queue, zero_base) },
+>   	{ "tx_timeout_count", IGBVF_STAT(tx_timeout_count, zero_base) },
+> -	{ "rx_long_byte_count", IGBVF_STAT(stats.gorc, stats.base_gorc) },
+>   	{ "rx_csum_offload_good", IGBVF_STAT(hw_csum_good, zero_base) },
+>   	{ "rx_csum_offload_errors", IGBVF_STAT(hw_csum_err, zero_base) },
+>   	{ "rx_header_split", IGBVF_STAT(rx_hdr_split, zero_base) },
 
-Typo in function name. You probably meant "build_phy_abilities_req".
-
-> +	err = mucse_fw_send_cmd_wait(hw, &req, &reply);
-> +	if (!err)
-> +		memcpy(abil, &reply.hw_abilities, sizeof(*abil));
-> +	return err;
-> +}
-> +
-> +/**
-> + * mucse_mbx_get_capability - Get hw abilities from fw
-> + * @hw: pointer to the HW structure
-> + *
-> + * mucse_mbx_get_capability tries to some capabities from
-> + * hw. Many retrys will do if it is failed.
-> + *
-
-Typo in comment: "tries to some capabities" should be "tries to get
-capabilities"
-
-> + * @return: 0 on success, negative on failure
-> + **/
-> +int mucse_mbx_get_capability(struct mucse_hw *hw)
-> +{
-> +	struct hw_abilities ability;
-> +	int try_cnt = 3;
-> +	int err;
-> +
-> +	memset(&ability, 0, sizeof(ability));
-> +	while (try_cnt--) {
-> +		err = mucse_fw_get_capability(hw, &ability);
-> +		if (err)
-> +			continue;
-> +		hw->pfvfnum = le16_to_cpu(ability.pfnum);
-> +		hw->fw_version = le32_to_cpu(ability.fw_version);
-> +		hw->axi_mhz = le32_to_cpu(ability.axi_mhz);
-> +		hw->bd_uid = le32_to_cpu(ability.bd_uid);
-> +		return 0;
-> +	}
-> +	return err;
-> +}
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
 
 
-Missing initialization of err variable before the last return, which
-could lead to undefined behavior if all attempts fail.
+Kind regards,
 
-> +
-> +/**
-> + * mbx_cookie_zalloc - Alloc a cookie structure
-> + * @priv_len: private length for this cookie
-> + *
+Paul
 
 
--- 
-Thanks and Regards,
-Danish
-
+PS: Should you resend, *redundant* instead of *duplicated* might better 
+describe the removed counter.
 
