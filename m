@@ -1,176 +1,154 @@
-Return-Path: <netdev+bounces-213266-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213267-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02DD4B244B1
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 10:50:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D3B7B244BC
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 10:54:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A5A83AB9CD
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 08:48:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 57CB47B2E7C
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 08:53:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE7482D979B;
-	Wed, 13 Aug 2025 08:48:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE6642ECEAC;
+	Wed, 13 Aug 2025 08:54:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="Up8ZMfIp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="herhqNMS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4DD82D5A13;
-	Wed, 13 Aug 2025 08:48:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B151614A0B5;
+	Wed, 13 Aug 2025 08:54:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755074910; cv=none; b=drFN7+IwC+Rkqg5rGEeAfHrHMeOWYDysv0gSuqpnpII6LDBrl+um9CZwsUNM50P44ys9tbkxBUSMAZH8OiwK/OtO7I/6nuZhsoTKk55XkFqxv8Gkfcrsgq5lO53LD/gP+PtJz9+PIzoepfUnxAXnN/2MnJMTq1C4Zh4q9YcuthU=
+	t=1755075269; cv=none; b=gvpxJVqyAYewJZSX+vl5Ghc1mrq7maUyq9iUOzZRJFnJlcWPK+ge3Pux9e4m2BvXTvFmM16vo73xmVmpJylGOUyG3idBfYnjeWxqHueWHEFFeDA9PjCAcmVkgD5hW0lhoX+vC6ssm+jfLMn3iR15aZzaVEzlmhfkpS3DLKxAL2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755074910; c=relaxed/simple;
-	bh=U7AcBY+w23HaGZoQTSyjMhvyp/uzWVzGS7MvGLs6JTk=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Yki5+yncECd0avsVn0kYFJQwjEINjUU4HZz8waY6XxlirWhfkwen10nL1GKIuEWL+RjZgKuZqDS+MumD2cOftYuhNpmU+MfNMR3D9n9Y2VDZJTgZajDWOBUrekh4Dsa8/tIBO9n8DevimUaY2AjPbvP93MhI4vsLVOAAzYvM5UU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=Up8ZMfIp; arc=none smtp.client-ip=52.95.48.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1755074909; x=1786610909;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=2/smX3GHjYtBpThREVOyuPUStG2BzCbDOiAFYJYi6Kc=;
-  b=Up8ZMfIpG3XbNaKzWnqAXyK20QrS4rqHDo/sP4+Av3b+8XScWVDC08rL
-   5idTLPLelR5pknUaMsU2OCQzv7uV3y88IBHu/q91NFP7jwEii5qkhWZXy
-   OeBiE/f6qruCsBi5VqTVBLCkV0DlDbmbdWytQH4tZRl4lDkw4ZX6T5EF4
-   7Q3f42oejXXzLxXJKfpYwUhGcm52/cOLWO7s3cbMzOUfwnkQLo0+L9M1+
-   9sebloa8+AGOURFAm3jQKSL7uZDDidRooX1GLkAZOI0WL7yJOhizEa0O1
-   C1yXQVj48by+nb/llEagPrHB60rmBATQy8mDMscK2Ugd409M0vtvC8N7A
-   g==;
-X-IronPort-AV: E=Sophos;i="6.17,285,1747699200"; 
-   d="scan'208";a="515246079"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2025 08:48:26 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.7.35:18367]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.16.146:2525] with esmtp (Farcaster)
- id dae87910-4c18-46bd-b32e-1944f016f0ca; Wed, 13 Aug 2025 08:48:24 +0000 (UTC)
-X-Farcaster-Flow-ID: dae87910-4c18-46bd-b32e-1944f016f0ca
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 13 Aug 2025 08:48:24 +0000
-Received: from b0be8375a521.amazon.com (10.37.245.11) by
- EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.17;
- Wed, 13 Aug 2025 08:48:22 +0000
-From: Kohei Enju <enjuk@amazon.com>
-To: <pmenzel@molgen.mpg.de>
-CC: <andrew+netdev@lunn.ch>, <anthony.l.nguyen@intel.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <enjuk@amazon.com>,
-	<intel-wired-lan@lists.osuosl.org>, <kohei.enju@gmail.com>,
-	<kuba@kernel.org>, <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <przemyslaw.kitszel@intel.com>
-Subject: Re: [Intel-wired-lan] [PATCH v1 iwl-next 1/2] igbvf: add lbtx_packets
- and lbtx_bytes to ethtool statistics
-Date: Wed, 13 Aug 2025 17:47:48 +0900
-Message-ID: <20250813084815.85188-1-enjuk@amazon.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <9b44df93-acec-4416-9f32-f97d0bfaaa7b@molgen.mpg.de>
-References: <9b44df93-acec-4416-9f32-f97d0bfaaa7b@molgen.mpg.de>
+	s=arc-20240116; t=1755075269; c=relaxed/simple;
+	bh=SPEB5tXelaltjOYbgqCSrRrEOItBWpxIPqLytrMKnXI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=d0w7V2A3TZufv/T1BANVZNcfiRBKoO1zpD7heh3OSPPkCq/6/gFIVnQcL7xHZZG6tFlVbNEqF182xU5QiP4wAtUZSjqOvrAAONPobFp72sGInazHxvm+i62qLRBA6Q1V8B1HGsEUOybu2nKMKLWwk5tDv5bjHGI0OryxGHfynOg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=herhqNMS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 244F6C4CEEB;
+	Wed, 13 Aug 2025 08:54:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755075269;
+	bh=SPEB5tXelaltjOYbgqCSrRrEOItBWpxIPqLytrMKnXI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=herhqNMSZD2u105m3vJP0R5NGzYg8f4wgoRgW1wtPscJKKIJ8iB4LCJ7YZVRkLPll
+	 aCCq99Y1WcMsFRfF/bEfd1fSFHveJwvnInSPrmYXF2cRC2hyInkxWN8eQxpBsmUJ5V
+	 YYqJztfk0ZrC5Nj6PYyK0wR/z1CMA+zjyQ2L+rgakOM+7mxQpupCHI862M8uAUf95o
+	 1nJMo9GRs6ivwlUcrBQSLXyiTO5gay4Ee2JPzyWsMsJY8m4R/U9q84az1GLtzRIh0K
+	 dVVBFh4NXq5IGdfu4xeKewoyKhGtZBzp+MrA515ppiDaVha4AKPsNTEq2kPm4+UDir
+	 r3hGyQdMGXGhw==
+Message-ID: <603e3360-1f8f-41bd-94fd-a4a94e4a2c34@kernel.org>
+Date: Wed, 13 Aug 2025 10:54:19 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D046UWB002.ant.amazon.com (10.13.139.181) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH v3 net-next 01/12] mptcp: Fix up subflow's memcg when
+ CONFIG_SOCK_CGROUP_DATA=n.
+Content-Language: en-GB, fr-BE
+To: Kuniyuki Iwashima <kuniyu@google.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Neal Cardwell <ncardwell@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>,
+ Mat Martineau <martineau@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
+ Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>,
+ Shakeel Butt <shakeel.butt@linux.dev>,
+ Andrew Morton <akpm@linux-foundation.org>, =?UTF-8?Q?Michal_Koutn=C3=BD?=
+ <mkoutny@suse.com>, Tejun Heo <tj@kernel.org>
+Cc: Simon Horman <horms@kernel.org>, Geliang Tang <geliang@kernel.org>,
+ Muchun Song <muchun.song@linux.dev>, Mina Almasry <almasrymina@google.com>,
+ Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org,
+ mptcp@lists.linux.dev, cgroups@vger.kernel.org, linux-mm@kvack.org
+References: <20250812175848.512446-1-kuniyu@google.com>
+ <20250812175848.512446-2-kuniyu@google.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20250812175848.512446-2-kuniyu@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, 13 Aug 2025 10:18:29 +0200, Paul Menzel wrote:=0D
-=0D
-> Dear Kohei,=0D
-> =0D
-> =0D
-> Thank you for your patch.=0D
-> =0D
-> Am 13.08.25 um 09:50 schrieb Kohei Enju:=0D
-> > Currently ethtool shows lbrx_packets and lbrx_bytes (Good RX=0D
-> > Packets/Octets loopback Count), but doesn't show the TX-side equivalent=
-s=0D
-> > (lbtx_packets and lbtx_bytes). Add visibility of those missing=0D
-> > statistics by adding them to ethtool statistics.=0D
-> > =0D
-> > In addition, the order of lbrx_bytes and lbrx_packets is not consistent=
-=0D
-> > with non-loopback statistics (rx_packets, rx_bytes). Therefore, align=0D
-> > the order by swapping positions of lbrx_bytes and lbrx_packets.=0D
-> > =0D
-> > Tested on Intel Corporation I350 Gigabit Network Connection.=0D
-> > =0D
-> > Before:=0D
-> >    # ethtool -S ens5 | grep -E "x_(bytes|packets)"=0D
-> >         rx_packets: 135=0D
-> >         tx_packets: 106=0D
-> >         rx_bytes: 16010=0D
-> >         tx_bytes: 12451=0D
-> >         lbrx_bytes: 1148=0D
-> >         lbrx_packets: 12=0D
-> > =0D
-> > After:=0D
-> >    # ethtool -S ens5 | grep -E "x_(bytes|packets)"=0D
-> >         rx_packets: 748=0D
-> >         tx_packets: 304=0D
-> >         rx_bytes: 81513=0D
-> >         tx_bytes: 33698=0D
-> >         lbrx_packets: 97=0D
-> >         lbtx_packets: 109=0D
-> >         lbrx_bytes: 12090=0D
-> >         lbtx_bytes: 12401=0D
-> > =0D
-> > Tested-by: Kohei Enju <enjuk@amazon.com>=0D
-> =0D
-> No need to resend, but I believe, you only add a Tested-by: tag, if the =
-=0D
-> person differs from the author/Signed-off-by: tag.=0D
-=0D
-Oh, I didn't know that. Thank you for the feedback.=0D
-=0D
-Since I want to resend the other patch[1] after updating as you pointed=0D
-out, I'll resend this series as v2 including this patch without the=0D
-Tested-by: tag.=0D
-=0D
-[1] https://lore.kernel.org/intel-wired-lan/20250813075206.70114-3-enjuk@am=
-azon.com/=0D
-=0D
-> > Signed-off-by: Kohei Enju <enjuk@amazon.com>=0D
-> > ---=0D
-> >   drivers/net/ethernet/intel/igbvf/ethtool.c | 4 +++-=0D
-> >   1 file changed, 3 insertions(+), 1 deletion(-)=0D
-> > =0D
-> > diff --git a/drivers/net/ethernet/intel/igbvf/ethtool.c b/drivers/net/e=
-thernet/intel/igbvf/ethtool.c=0D
-> > index 773895c663fd..c6defc495f13 100644=0D
-> > --- a/drivers/net/ethernet/intel/igbvf/ethtool.c=0D
-> > +++ b/drivers/net/ethernet/intel/igbvf/ethtool.c=0D
-> > @@ -30,8 +30,10 @@ static const struct igbvf_stats igbvf_gstrings_stats=
-[] =3D {=0D
-> >   	{ "rx_bytes", IGBVF_STAT(stats.gorc, stats.base_gorc) },=0D
-> >   	{ "tx_bytes", IGBVF_STAT(stats.gotc, stats.base_gotc) },=0D
-> >   	{ "multicast", IGBVF_STAT(stats.mprc, stats.base_mprc) },=0D
-> > -	{ "lbrx_bytes", IGBVF_STAT(stats.gorlbc, stats.base_gorlbc) },=0D
-> >   	{ "lbrx_packets", IGBVF_STAT(stats.gprlbc, stats.base_gprlbc) },=0D
-> > +	{ "lbtx_packets", IGBVF_STAT(stats.gptlbc, stats.base_gptlbc) },=0D
-> > +	{ "lbrx_bytes", IGBVF_STAT(stats.gorlbc, stats.base_gorlbc) },=0D
-> > +	{ "lbtx_bytes", IGBVF_STAT(stats.gotlbc, stats.base_gotlbc) },=0D
-> >   	{ "tx_restart_queue", IGBVF_STAT(restart_queue, zero_base) },=0D
-> >   	{ "tx_timeout_count", IGBVF_STAT(tx_timeout_count, zero_base) },=0D
-> >   	{ "rx_long_byte_count", IGBVF_STAT(stats.gorc, stats.base_gorc) },=0D
-> =0D
-> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>=0D
-> =0D
-> =0D
-> Kind regards,=0D
-> =0D
-> Paul=0D
-=0D
-Thank you for reviewing!=0D
+Hi Kuniyuki,
+
+On 12/08/2025 19:58, Kuniyuki Iwashima wrote:
+> When sk_alloc() allocates a socket, mem_cgroup_sk_alloc() sets
+> sk->sk_memcg based on the current task.
+> 
+> MPTCP subflow socket creation is triggered from userspace or
+> an in-kernel worker.
+> 
+> In the latter case, sk->sk_memcg is not what we want.  So, we fix
+> it up from the parent socket's sk->sk_memcg in mptcp_attach_cgroup().
+> 
+> Although the code is placed under #ifdef CONFIG_MEMCG, it is buried
+> under #ifdef CONFIG_SOCK_CGROUP_DATA.
+> 
+> The two configs are orthogonal.  If CONFIG_MEMCG is enabled without
+> CONFIG_SOCK_CGROUP_DATA, the subflow's memory usage is not charged
+> correctly.
+> 
+> Let's move the code out of the wrong ifdef guard.
+> 
+> Note that sk->sk_memcg is freed in sk_prot_free() and the parent
+> sk holds the refcnt of memcg->css here, so we don't need to use
+> css_tryget().
+
+Thank you for the patch!
+
+Acked-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
+
 
