@@ -1,394 +1,293 @@
-Return-Path: <netdev+bounces-213228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213231-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 361D8B242A3
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 09:27:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B132B242DE
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 09:36:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0C3457B92AD
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 07:24:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B0DD8720CD5
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 07:34:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E5342D46D4;
-	Wed, 13 Aug 2025 07:25:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 872902D59FA;
+	Wed, 13 Aug 2025 07:34:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qW/fmv2Y"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="HMh3LFOs"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 734FF2BDC26;
-	Wed, 13 Aug 2025 07:25:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6A843594E;
+	Wed, 13 Aug 2025 07:34:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755069947; cv=none; b=Pl7KAlnOW4/qFQOU0jV66uVG09pawXYvW9wI9eSFm+U9seFh762fvzIXDfoUWMeDJLxb6cV+0YGL8oit1KW/PFstR9EB6Fol7vMGXLfj9f4hppc+hTle5qiLT8ZauhWWDfmMIFW1tFMsWrc8jDtcuqC5emLI9r8cQsrMOObIEuw=
+	t=1755070480; cv=none; b=WwWSR+gycSPaQzu+EMLoqP5deE6M0tKG6g5G4YnoXPyjRGVUS/qNjhBjSqLgkURU97PNr5dGNOPHg6fDywm+LNNwNQzyzpGm4mCTapD2dJvkdJNPh8wAISFhyFpqzxgP446wNjn82431wNlwBYrldoVX8eE4NKMjSxpH4DSx1vA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755069947; c=relaxed/simple;
-	bh=MZeZzNtnVVvYXNlWyuj98fO5VUzfMayg9lNKnryMJvY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BkL52pSwzg0lD0La2p3fIK2B0pheFLUN7NaqefTSG6GjJ+NJnP9iAspAMfQCGOHZxxjIBRnzITC83PcpsREwW6JqAlyLpegce/zYmODNSNpZcSJw0Lll+W9Sz3XbKA3LQwb+xQ37FpMLnyyW1Y0kSP/pW6S0gllIl4qqRvkKX30=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qW/fmv2Y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F8C2C4CEEB;
-	Wed, 13 Aug 2025 07:25:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755069946;
-	bh=MZeZzNtnVVvYXNlWyuj98fO5VUzfMayg9lNKnryMJvY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qW/fmv2YxaSjgUId65nbUmPyUFjaUw1GwePSonM2GcIbM+KT4wviOxKz2oPDs98J6
-	 MOzapy1/kxOmw6K+OKMYK3MKLwn0c/vJ8qLhDyfHcTY4RS+T3rPGGtwTLOxYC2p/ao
-	 jg8ApAUHU6t9bp08xAK57n8IfCyFvsHrf3PNjv1dpoqqcZxqfnai6jKgdpOsnEf9m+
-	 hKPBFYmrUUu4F9Q+phRL5gYw2smbZnf7x9sa/6T2z6ARbHbjBSRpZwlU4Ks8+rA4j6
-	 cW+28vR6N2hljnebbsSIutn0DzU/XjoUet9h7fitxbUDZwevrLwrgsqZaCpr9nEoim
-	 w5NAAKtvOVe6w==
-Date: Wed, 13 Aug 2025 09:25:39 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, ast@kernel.org,
-	daniel@iogearbox.net, hawk@kernel.org, toke@redhat.com,
-	john.fastabend@gmail.com, sdf@fomichev.me,
-	michael.chan@broadcom.com, anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com, marcin.s.wojtas@gmail.com,
-	tariqt@nvidia.com, mbloch@nvidia.com, eperezma@redhat.com
-Subject: Re: [RFC] xdp: pass flags to xdp_update_skb_shared_info() directly
-Message-ID: <aJw989WySvvID5-j@lore-rh-laptop>
-References: <20250812161528.835855-1-kuba@kernel.org>
+	s=arc-20240116; t=1755070480; c=relaxed/simple;
+	bh=OJY6+omY4Q8gESjD0ydATDvH4uxYZHL/sj/tsQIBBvE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=cHUH93gFvRBAMqdcvhkV7oHeW2y3NB9BU5hfOn/V408kocr8fd94XcbqWKjF5mjghLaMSmSyNsCW+YZcnV7cD4pYBBqFzGu05bcKbJsuRq31Nl7h/SNkbElfrgrm9Djbd+0G3Mnu1hzWO9kFjZQ4o5OTqhQR4ejxlCmX7a5XXsg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=HMh3LFOs; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1755070478; x=1786606478;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=OJY6+omY4Q8gESjD0ydATDvH4uxYZHL/sj/tsQIBBvE=;
+  b=HMh3LFOsqJMZDz47/L1tz7swWlVaKwwo1mtiNH89LgryNLJGGPSHI0Fy
+   9FuYqf4KbNYlp5Cc5olpy5wumYEO1ponhH5YUoO1KCZFzUhR0IPlasJRl
+   MBCGHRdjjMwiZzFcpBuwlH2iVlMRI3fnTXWc8aO1jIX363wO0KJbtA/zZ
+   T+wMChHF/GMFfIZg7+1dVrPR/Bz96eanThOcDDB2N1fp8Twy8a97ASywK
+   0Yg+3jh1ouJJXSzLpZ4eeqOaiJ0lOoJ5RtUqioyPFYN40DHyE3paXoaYb
+   wCVgfnVoa5kpVr2h7lXNEzqrzTGOmKYacuPI3YDBk0F38YgBKYIrGWliP
+   w==;
+X-CSE-ConnectionGUID: 92Z56r3TT7eJeErfxZPskw==
+X-CSE-MsgGUID: Mt4NHuIFSZezsYLzxguyMQ==
+X-IronPort-AV: E=Sophos;i="6.17,285,1747724400"; 
+   d="scan'208";a="44597533"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 13 Aug 2025 00:34:28 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Wed, 13 Aug 2025 00:34:22 -0700
+Received: from DEN-DL-M31836.microchip.com (10.10.85.11) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
+ 15.1.2507.44 via Frontend Transport; Wed, 13 Aug 2025 00:34:18 -0700
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <richardcochran@gmail.com>, <jacob.e.keller@intel.com>,
+	<rmk+kernel@armlinux.org.uk>, <christophe.jaillet@wanadoo.fr>,
+	<rosenp@gmail.com>, <viro@zeniv.linux.org.uk>, <atenart@kernel.org>,
+	<quentin.schulz@bootlin.com>, <olteanv@gmail.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Horatiu Vultur
+	<horatiu.vultur@microchip.com>
+Subject: [PATCH net v3] phy: mscc: Fix timestamping for vsc8584
+Date: Wed, 13 Aug 2025 09:26:05 +0200
+Message-ID: <20250813072605.444794-1-horatiu.vultur@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="lTHN0rYvTReJ88u/"
-Content-Disposition: inline
-In-Reply-To: <20250812161528.835855-1-kuba@kernel.org>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
+There was a problem when we received frames and the frames were
+timestamped. The driver is configured to store the nanosecond part of
+the timestmap in the ptp reserved bits and it would take the second part
+by reading the LTC. The problem is that when reading the LTC we are in
+atomic context and to read the second part will go over mdio bus which
+might sleep, so we get an error.
+The fix consists in actually put all the frames in a queue and start the
+aux work and in that work to read the LTC and then calculate the full
+received time.
 
---lTHN0rYvTReJ88u/
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Fixes: 7d272e63e0979d ("net: phy: mscc: timestamping and PHC support")
+Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
 
-On Aug 12, Jakub Kicinski wrote:
-> xdp_update_skb_shared_info() needs to update skb state which
-> was maintained in xdp_buff / frame. Pass full flags into it,
-> instead of breaking it out bit by bit. We will need to add
-> a bit for unreadable frags (even tho XDP doesn't support
-> those the driver paths may be common), at which point almost
-> all call sites would become:
->=20
->     xdp_update_skb_shared_info(skb, num_frags,
->                                sinfo->xdp_frags_size,
->                                MY_PAGE_SIZE * num_frags,
->                                xdp_buff_is_frag_pfmemalloc(xdp),
->                                xdp_buff_is_frag_unreadable(xdp));
->=20
-> Keep a helper for accessing the flags, in case we need to
-> transform them somehow in the future (e.g. to cover up xdp_buff
-> vs xdp_frame differences).
->=20
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> Does anyone prefer the current form of the API, or can we change
-> as prosposed?
+---
+v2->v3:
+- make sure to flush the rx_skbs_list when the driver is removed
 
-I prefer the new proposed APIs if we are adding new bits there.
+v1->v2:
+- use sk_buff_head instead of a list_head and spinlock_t
+- stop allocating vsc8431_skb but put the timestamp in skb->cb
+---
+ drivers/net/phy/mscc/mscc.h      | 12 ++++++++
+ drivers/net/phy/mscc/mscc_main.c | 12 ++++++++
+ drivers/net/phy/mscc/mscc_ptp.c  | 50 ++++++++++++++++++++++++--------
+ 3 files changed, 62 insertions(+), 12 deletions(-)
 
-Regards,
-Lorenzo
+diff --git a/drivers/net/phy/mscc/mscc.h b/drivers/net/phy/mscc/mscc.h
+index 6a3d8a754eb8d..58c6d47fbe046 100644
+--- a/drivers/net/phy/mscc/mscc.h
++++ b/drivers/net/phy/mscc/mscc.h
+@@ -362,6 +362,13 @@ struct vsc85xx_hw_stat {
+ 	u16 mask;
+ };
+ 
++struct vsc8531_skb_cb {
++	u32 ns;
++};
++
++#define VSC8531_SKB_CB(skb) \
++	((struct vsc8531_skb_cb *)((skb)->cb))
++
+ struct vsc8531_private {
+ 	int rate_magic;
+ 	u16 supp_led_modes;
+@@ -410,6 +417,11 @@ struct vsc8531_private {
+ 	 */
+ 	struct mutex ts_lock;
+ 	struct mutex phc_lock;
++
++	/* list of skbs that were received and need timestamp information but it
++	 * didn't received it yet
++	 */
++	struct sk_buff_head rx_skbs_list;
+ };
+ 
+ /* Shared structure between the PHYs of the same package.
+diff --git a/drivers/net/phy/mscc/mscc_main.c b/drivers/net/phy/mscc/mscc_main.c
+index eff53e09335d4..6c8611e77a61f 100644
+--- a/drivers/net/phy/mscc/mscc_main.c
++++ b/drivers/net/phy/mscc/mscc_main.c
+@@ -2346,6 +2346,13 @@ static int vsc85xx_probe(struct phy_device *phydev)
+ 	return vsc85xx_dt_led_modes_get(phydev, default_mode);
+ }
+ 
++static void vsc85xx_remove(struct phy_device *phydev)
++{
++	struct vsc8531_private *priv = phydev->priv;
++
++	skb_queue_purge(&priv->rx_skbs_list);
++}
++
+ /* Microsemi VSC85xx PHYs */
+ static struct phy_driver vsc85xx_driver[] = {
+ {
+@@ -2600,6 +2607,7 @@ static struct phy_driver vsc85xx_driver[] = {
+ 	.config_intr    = &vsc85xx_config_intr,
+ 	.suspend	= &genphy_suspend,
+ 	.resume		= &genphy_resume,
++	.remove		= &vsc85xx_remove,
+ 	.probe		= &vsc8574_probe,
+ 	.set_wol	= &vsc85xx_wol_set,
+ 	.get_wol	= &vsc85xx_wol_get,
+@@ -2625,6 +2633,7 @@ static struct phy_driver vsc85xx_driver[] = {
+ 	.config_intr    = &vsc85xx_config_intr,
+ 	.suspend	= &genphy_suspend,
+ 	.resume		= &genphy_resume,
++	.remove		= &vsc85xx_remove,
+ 	.probe		= &vsc8574_probe,
+ 	.set_wol	= &vsc85xx_wol_set,
+ 	.get_wol	= &vsc85xx_wol_get,
+@@ -2650,6 +2659,7 @@ static struct phy_driver vsc85xx_driver[] = {
+ 	.config_intr    = &vsc85xx_config_intr,
+ 	.suspend	= &genphy_suspend,
+ 	.resume		= &genphy_resume,
++	.remove		= &vsc85xx_remove,
+ 	.probe		= &vsc8584_probe,
+ 	.get_tunable	= &vsc85xx_get_tunable,
+ 	.set_tunable	= &vsc85xx_set_tunable,
+@@ -2673,6 +2683,7 @@ static struct phy_driver vsc85xx_driver[] = {
+ 	.config_intr    = &vsc85xx_config_intr,
+ 	.suspend	= &genphy_suspend,
+ 	.resume		= &genphy_resume,
++	.remove		= &vsc85xx_remove,
+ 	.probe		= &vsc8584_probe,
+ 	.get_tunable	= &vsc85xx_get_tunable,
+ 	.set_tunable	= &vsc85xx_set_tunable,
+@@ -2696,6 +2707,7 @@ static struct phy_driver vsc85xx_driver[] = {
+ 	.config_intr    = &vsc85xx_config_intr,
+ 	.suspend	= &genphy_suspend,
+ 	.resume		= &genphy_resume,
++	.remove		= &vsc85xx_remove,
+ 	.probe		= &vsc8584_probe,
+ 	.get_tunable	= &vsc85xx_get_tunable,
+ 	.set_tunable	= &vsc85xx_set_tunable,
+diff --git a/drivers/net/phy/mscc/mscc_ptp.c b/drivers/net/phy/mscc/mscc_ptp.c
+index 275706de5847c..d368d4fd82e17 100644
+--- a/drivers/net/phy/mscc/mscc_ptp.c
++++ b/drivers/net/phy/mscc/mscc_ptp.c
+@@ -1194,9 +1194,8 @@ static bool vsc85xx_rxtstamp(struct mii_timestamper *mii_ts,
+ {
+ 	struct vsc8531_private *vsc8531 =
+ 		container_of(mii_ts, struct vsc8531_private, mii_ts);
+-	struct skb_shared_hwtstamps *shhwtstamps = NULL;
++
+ 	struct vsc85xx_ptphdr *ptphdr;
+-	struct timespec64 ts;
+ 	unsigned long ns;
+ 
+ 	if (!vsc8531->ptp->configured)
+@@ -1206,27 +1205,52 @@ static bool vsc85xx_rxtstamp(struct mii_timestamper *mii_ts,
+ 	    type == PTP_CLASS_NONE)
+ 		return false;
+ 
+-	vsc85xx_gettime(&vsc8531->ptp->caps, &ts);
+-
+ 	ptphdr = get_ptp_header_rx(skb, vsc8531->ptp->rx_filter);
+ 	if (!ptphdr)
+ 		return false;
+ 
+-	shhwtstamps = skb_hwtstamps(skb);
+-	memset(shhwtstamps, 0, sizeof(struct skb_shared_hwtstamps));
+-
+ 	ns = ntohl(ptphdr->rsrvd2);
+ 
+-	/* nsec is in reserved field */
+-	if (ts.tv_nsec < ns)
+-		ts.tv_sec--;
++	VSC8531_SKB_CB(skb)->ns = ns;
++	skb_queue_tail(&vsc8531->rx_skbs_list, skb);
+ 
+-	shhwtstamps->hwtstamp = ktime_set(ts.tv_sec, ns);
+-	netif_rx(skb);
++	ptp_schedule_worker(vsc8531->ptp->ptp_clock, 0);
+ 
+ 	return true;
+ }
+ 
++static long vsc85xx_do_aux_work(struct ptp_clock_info *info)
++{
++	struct vsc85xx_ptp *ptp = container_of(info, struct vsc85xx_ptp, caps);
++	struct skb_shared_hwtstamps *shhwtstamps = NULL;
++	struct phy_device *phydev = ptp->phydev;
++	struct vsc8531_private *priv = phydev->priv;
++	struct sk_buff_head received;
++	struct sk_buff *rx_skb;
++	struct timespec64 ts;
++	unsigned long flags;
++
++	__skb_queue_head_init(&received);
++	spin_lock_irqsave(&priv->rx_skbs_list.lock, flags);
++	skb_queue_splice_tail_init(&priv->rx_skbs_list, &received);
++	spin_unlock_irqrestore(&priv->rx_skbs_list.lock, flags);
++
++	vsc85xx_gettime(info, &ts);
++	while ((rx_skb = __skb_dequeue(&received)) != NULL) {
++		shhwtstamps = skb_hwtstamps(rx_skb);
++		memset(shhwtstamps, 0, sizeof(struct skb_shared_hwtstamps));
++
++		if (ts.tv_nsec < VSC8531_SKB_CB(rx_skb)->ns)
++			ts.tv_sec--;
++
++		shhwtstamps->hwtstamp = ktime_set(ts.tv_sec,
++						  VSC8531_SKB_CB(rx_skb)->ns);
++		netif_rx(rx_skb);
++	}
++
++	return -1;
++}
++
+ static const struct ptp_clock_info vsc85xx_clk_caps = {
+ 	.owner		= THIS_MODULE,
+ 	.name		= "VSC85xx timer",
+@@ -1240,6 +1264,7 @@ static const struct ptp_clock_info vsc85xx_clk_caps = {
+ 	.adjfine	= &vsc85xx_adjfine,
+ 	.gettime64	= &vsc85xx_gettime,
+ 	.settime64	= &vsc85xx_settime,
++	.do_aux_work	= &vsc85xx_do_aux_work,
+ };
+ 
+ static struct vsc8531_private *vsc8584_base_priv(struct phy_device *phydev)
+@@ -1567,6 +1592,7 @@ int vsc8584_ptp_probe(struct phy_device *phydev)
+ 
+ 	mutex_init(&vsc8531->phc_lock);
+ 	mutex_init(&vsc8531->ts_lock);
++	skb_queue_head_init(&vsc8531->rx_skbs_list);
+ 
+ 	/* Retrieve the shared load/save GPIO. Request it as non exclusive as
+ 	 * the same GPIO can be requested by all the PHYs of the same package.
+-- 
+2.34.1
 
->=20
-> Bonus question: while Im messing with this API could I rename
-> xdp_update_skb_shared_info()? Maybe to xdp_update_skb_state() ?
-> Not sure why the function name has "shared_info" when most of
-> what it updates is skb fields.
->=20
-> CC: ast@kernel.org
-> CC: daniel@iogearbox.net
-> CC: hawk@kernel.org
-> CC: lorenzo@kernel.org
-> CC: toke@redhat.com
-> CC: john.fastabend@gmail.com
-> CC: sdf@fomichev.me
-> CC: michael.chan@broadcom.com
-> CC: anthony.l.nguyen@intel.com
-> CC: przemyslaw.kitszel@intel.com
-> CC: marcin.s.wojtas@gmail.com
-> CC: tariqt@nvidia.com
-> CC: mbloch@nvidia.com
-> CC: eperezma@redhat.com
-> CC: bpf@vger.kernel.org
-> ---
->  include/net/xdp.h                             | 21 +++++++++----------
->  drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c |  2 +-
->  drivers/net/ethernet/intel/i40e/i40e_txrx.c   |  4 ++--
->  drivers/net/ethernet/intel/ice/ice_txrx.c     |  4 ++--
->  drivers/net/ethernet/marvell/mvneta.c         |  2 +-
->  .../net/ethernet/mellanox/mlx5/core/en_rx.c   |  7 +++----
->  drivers/net/virtio_net.c                      |  2 +-
->  net/core/xdp.c                                | 11 +++++-----
->  8 files changed, 26 insertions(+), 27 deletions(-)
->=20
-> diff --git a/include/net/xdp.h b/include/net/xdp.h
-> index b40f1f96cb11..2ff47f53ba26 100644
-> --- a/include/net/xdp.h
-> +++ b/include/net/xdp.h
-> @@ -104,17 +104,16 @@ static __always_inline void xdp_buff_clear_frags_fl=
-ag(struct xdp_buff *xdp)
->  	xdp->flags &=3D ~XDP_FLAGS_HAS_FRAGS;
->  }
-> =20
-> -static __always_inline bool
-> -xdp_buff_is_frag_pfmemalloc(const struct xdp_buff *xdp)
-> -{
-> -	return !!(xdp->flags & XDP_FLAGS_FRAGS_PF_MEMALLOC);
-> -}
-> -
->  static __always_inline void xdp_buff_set_frag_pfmemalloc(struct xdp_buff=
- *xdp)
->  {
->  	xdp->flags |=3D XDP_FLAGS_FRAGS_PF_MEMALLOC;
->  }
-> =20
-> +static __always_inline u32 xdp_buff_get_skb_flags(const struct xdp_buff =
-*xdp)
-> +{
-> +	return xdp->flags;
-> +}
-> +
->  static __always_inline void
->  xdp_init_buff(struct xdp_buff *xdp, u32 frame_sz, struct xdp_rxq_info *r=
-xq)
->  {
-> @@ -272,10 +271,10 @@ static __always_inline bool xdp_frame_has_frags(con=
-st struct xdp_frame *frame)
->  	return !!(frame->flags & XDP_FLAGS_HAS_FRAGS);
->  }
-> =20
-> -static __always_inline bool
-> -xdp_frame_is_frag_pfmemalloc(const struct xdp_frame *frame)
-> +static __always_inline u32
-> +xdp_frame_get_skb_flags(const struct xdp_frame *frame)
->  {
-> -	return !!(frame->flags & XDP_FLAGS_FRAGS_PF_MEMALLOC);
-> +	return frame->flags;
->  }
-> =20
->  #define XDP_BULK_QUEUE_SIZE	16
-> @@ -314,7 +313,7 @@ static inline void xdp_scrub_frame(struct xdp_frame *=
-frame)
->  static inline void
->  xdp_update_skb_shared_info(struct sk_buff *skb, u8 nr_frags,
->  			   unsigned int size, unsigned int truesize,
-> -			   bool pfmemalloc)
-> +			   u32 skb_flags)
->  {
->  	struct skb_shared_info *sinfo =3D skb_shinfo(skb);
-> =20
-> @@ -328,7 +327,7 @@ xdp_update_skb_shared_info(struct sk_buff *skb, u8 nr=
-_frags,
->  	skb->len +=3D size;
->  	skb->data_len +=3D size;
->  	skb->truesize +=3D truesize;
-> -	skb->pfmemalloc |=3D pfmemalloc;
-> +	skb->pfmemalloc |=3D skb_flags & XDP_FLAGS_FRAGS_PF_MEMALLOC;
->  }
-> =20
->  /* Avoids inlining WARN macro in fast-path */
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c b/drivers/net/=
-ethernet/broadcom/bnxt/bnxt_xdp.c
-> index 58d579dca3f1..b35d4a8a8dac 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-> @@ -471,6 +471,6 @@ bnxt_xdp_build_skb(struct bnxt *bp, struct sk_buff *s=
-kb, u8 num_frags,
->  	xdp_update_skb_shared_info(skb, num_frags,
->  				   sinfo->xdp_frags_size,
->  				   BNXT_RX_PAGE_SIZE * num_frags,
-> -				   xdp_buff_is_frag_pfmemalloc(xdp));
-> +				   xdp_buff_get_skb_flags(xdp));
->  	return skb;
->  }
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_txrx.c b/drivers/net/et=
-hernet/intel/i40e/i40e_txrx.c
-> index 048c33039130..9cbd614a0d57 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_txrx.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_txrx.c
-> @@ -2154,7 +2154,7 @@ static struct sk_buff *i40e_construct_skb(struct i4=
-0e_ring *rx_ring,
->  		xdp_update_skb_shared_info(skb, skinfo->nr_frags + nr_frags,
->  					   sinfo->xdp_frags_size,
->  					   nr_frags * xdp->frame_sz,
-> -					   xdp_buff_is_frag_pfmemalloc(xdp));
-> +					   xdp_buff_get_skb_flags(xdp));
-> =20
->  		/* First buffer has already been processed, so bump ntc */
->  		if (++rx_ring->next_to_clean =3D=3D rx_ring->count)
-> @@ -2209,7 +2209,7 @@ static struct sk_buff *i40e_build_skb(struct i40e_r=
-ing *rx_ring,
->  		xdp_update_skb_shared_info(skb, nr_frags,
->  					   sinfo->xdp_frags_size,
->  					   nr_frags * xdp->frame_sz,
-> -					   xdp_buff_is_frag_pfmemalloc(xdp));
-> +					   xdp_buff_get_skb_flags(xdp));
-> =20
->  		i40e_process_rx_buffs(rx_ring, I40E_XDP_PASS, xdp);
->  	} else {
-> diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethe=
-rnet/intel/ice/ice_txrx.c
-> index 29e0088ab6b2..014b321e487e 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_txrx.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
-> @@ -1038,7 +1038,7 @@ ice_build_skb(struct ice_rx_ring *rx_ring, struct x=
-dp_buff *xdp)
->  		xdp_update_skb_shared_info(skb, nr_frags,
->  					   sinfo->xdp_frags_size,
->  					   nr_frags * xdp->frame_sz,
-> -					   xdp_buff_is_frag_pfmemalloc(xdp));
-> +					   xdp_buff_get_skb_flags(xdp));
-> =20
->  	return skb;
->  }
-> @@ -1118,7 +1118,7 @@ ice_construct_skb(struct ice_rx_ring *rx_ring, stru=
-ct xdp_buff *xdp)
->  		xdp_update_skb_shared_info(skb, skinfo->nr_frags + nr_frags,
->  					   sinfo->xdp_frags_size,
->  					   nr_frags * xdp->frame_sz,
-> -					   xdp_buff_is_frag_pfmemalloc(xdp));
-> +					   xdp_buff_get_skb_flags(xdp));
->  	}
-> =20
->  	return skb;
-> diff --git a/drivers/net/ethernet/marvell/mvneta.c b/drivers/net/ethernet=
-/marvell/mvneta.c
-> index 476e73e502fe..79a6bd530619 100644
-> --- a/drivers/net/ethernet/marvell/mvneta.c
-> +++ b/drivers/net/ethernet/marvell/mvneta.c
-> @@ -2419,7 +2419,7 @@ mvneta_swbm_build_skb(struct mvneta_port *pp, struc=
-t page_pool *pool,
->  		xdp_update_skb_shared_info(skb, num_frags,
->  					   sinfo->xdp_frags_size,
->  					   num_frags * xdp->frame_sz,
-> -					   xdp_buff_is_frag_pfmemalloc(xdp));
-> +					   xdp_buff_get_skb_flags(xdp));
-> =20
->  	return skb;
->  }
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/drivers/ne=
-t/ethernet/mellanox/mlx5/core/en_rx.c
-> index b8c609d91d11..abbe24f71f6a 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-> @@ -1798,8 +1798,7 @@ mlx5e_skb_from_cqe_nonlinear(struct mlx5e_rq *rq, s=
-truct mlx5e_wqe_frag_info *wi
->  		/* sinfo->nr_frags is reset by build_skb, calculate again. */
->  		xdp_update_skb_shared_info(skb, wi - head_wi - 1,
->  					   sinfo->xdp_frags_size, truesize,
-> -					   xdp_buff_is_frag_pfmemalloc(
-> -						&mxbuf->xdp));
-> +					   xdp_buff_get_skb_flags(&mxbuf->xdp));
-> =20
->  		for (struct mlx5e_wqe_frag_info *pwi =3D head_wi + 1; pwi < wi; pwi++)
->  			pwi->frag_page->frags++;
-> @@ -2107,7 +2106,7 @@ mlx5e_skb_from_cqe_mpwrq_nonlinear(struct mlx5e_rq =
-*rq, struct mlx5e_mpw_info *w
->  			/* sinfo->nr_frags is reset by build_skb, calculate again. */
->  			xdp_update_skb_shared_info(skb, frag_page - head_page,
->  						   sinfo->xdp_frags_size, truesize,
-> -						   xdp_buff_is_frag_pfmemalloc(
-> +						   xdp_buff_get_skb_flags(
->  							&mxbuf->xdp));
-> =20
->  			pagep =3D head_page;
-> @@ -2124,7 +2123,7 @@ mlx5e_skb_from_cqe_mpwrq_nonlinear(struct mlx5e_rq =
-*rq, struct mlx5e_mpw_info *w
-> =20
->  			xdp_update_skb_shared_info(skb, sinfo->nr_frags,
->  						   sinfo->xdp_frags_size, truesize,
-> -						   xdp_buff_is_frag_pfmemalloc(
-> +						   xdp_buff_get_skb_flags(
->  							&mxbuf->xdp));
-> =20
->  			pagep =3D frag_page - sinfo->nr_frags;
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index d14e6d602273..152b0d5c2122 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -2188,7 +2188,7 @@ static struct sk_buff *build_skb_from_xdp_buff(stru=
-ct net_device *dev,
->  		xdp_update_skb_shared_info(skb, nr_frags,
->  					   sinfo->xdp_frags_size,
->  					   xdp_frags_truesz,
-> -					   xdp_buff_is_frag_pfmemalloc(xdp));
-> +					   xdp_buff_get_skb_flags(xdp));
-> =20
->  	return skb;
->  }
-> diff --git a/net/core/xdp.c b/net/core/xdp.c
-> index 491334b9b8be..789051763209 100644
-> --- a/net/core/xdp.c
-> +++ b/net/core/xdp.c
-> @@ -665,7 +665,7 @@ struct sk_buff *xdp_build_skb_from_buff(const struct =
-xdp_buff *xdp)
->  		tsize =3D sinfo->xdp_frags_truesize ? : nr_frags * xdp->frame_sz;
->  		xdp_update_skb_shared_info(skb, nr_frags,
->  					   sinfo->xdp_frags_size, tsize,
-> -					   xdp_buff_is_frag_pfmemalloc(xdp));
-> +					   xdp_buff_get_skb_flags(xdp));
->  	}
-> =20
->  	skb->protocol =3D eth_type_trans(skb, rxq->dev);
-> @@ -692,7 +692,7 @@ static noinline bool xdp_copy_frags_from_zc(struct sk=
-_buff *skb,
->  	struct skb_shared_info *sinfo =3D skb_shinfo(skb);
->  	const struct skb_shared_info *xinfo;
->  	u32 nr_frags, tsize =3D 0;
-> -	bool pfmemalloc =3D false;
-> +	u32 flags =3D 0;
-> =20
->  	xinfo =3D xdp_get_shared_info_from_buff(xdp);
->  	nr_frags =3D xinfo->nr_frags;
-> @@ -714,11 +714,12 @@ static noinline bool xdp_copy_frags_from_zc(struct =
-sk_buff *skb,
->  		__skb_fill_page_desc_noacc(sinfo, i, page, offset, len);
-> =20
->  		tsize +=3D truesize;
-> -		pfmemalloc |=3D page_is_pfmemalloc(page);
-> +		if (page_is_pfmemalloc(page))
-> +			flags |=3D XDP_FLAGS_FRAGS_PF_MEMALLOC;
->  	}
-> =20
->  	xdp_update_skb_shared_info(skb, nr_frags, xinfo->xdp_frags_size,
-> -				   tsize, pfmemalloc);
-> +				   tsize, flags);
-> =20
->  	return true;
->  }
-> @@ -826,7 +827,7 @@ struct sk_buff *__xdp_build_skb_from_frame(struct xdp=
-_frame *xdpf,
->  		xdp_update_skb_shared_info(skb, nr_frags,
->  					   sinfo->xdp_frags_size,
->  					   nr_frags * xdpf->frame_sz,
-> -					   xdp_frame_is_frag_pfmemalloc(xdpf));
-> +					   xdp_frame_get_skb_flags(xdpf));
-> =20
->  	/* Essential SKB info: protocol and skb->dev */
->  	skb->protocol =3D eth_type_trans(skb, dev);
-> --=20
-> 2.50.1
->=20
-
---lTHN0rYvTReJ88u/
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaJw97wAKCRA6cBh0uS2t
-rH7ZAQDLSW2wkMcdDjat/ywr86Jdc0+ckdIpNP592xg1Ezy9qwD8CRafO+Hl5GYt
-1EuhYbWcenakFoIAI6rAgxYwBDjEGwc=
-=2Zed
------END PGP SIGNATURE-----
-
---lTHN0rYvTReJ88u/--
 
