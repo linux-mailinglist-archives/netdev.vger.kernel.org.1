@@ -1,204 +1,248 @@
-Return-Path: <netdev+bounces-213285-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213287-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 083C6B24601
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 11:50:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F6AEB24641
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 11:57:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8B9D37AD66A
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 09:48:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20F6B3A9533
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 09:52:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 977B4212556;
-	Wed, 13 Aug 2025 09:46:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="qLcmbjrl"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46975212562;
+	Wed, 13 Aug 2025 09:50:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2058.outbound.protection.outlook.com [40.107.236.58])
+Received: from smtpbg154.qq.com (smtpbg154.qq.com [15.184.224.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DCC32FDC29
-	for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 09:46:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.58
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755078365; cv=fail; b=ocXzqCAvMRjVnPK2prKZGphFtgTlBWMUTrHkpZdA5rdUlNBU30pk91WFVTIue2XCCF3MiJLUFM/4/LuURI7DouMRTjaotbKgoEkIfDXjG0J5pbHrhH4efay4RifVqJ1ZxKaeXuEqIMaUNIOTQt0i9qQP+iVK7OapIDO96EUrUdQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755078365; c=relaxed/simple;
-	bh=vR5+S1f3jA22/eS8QeE+v5pcZYOaX0eoFQ/OlC2u8DU=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dd/NRKVbmrYr/gK1G4oTkq5f/37fF7z3QB8VmUFWgtELdvNj+WF6r5RCzZTR6Qab+2DypaahFzgzWkGIVnnQTaqHmyvmpm3a0xyaPF2eZ4YYpvfpCWEt/ZgihKM7TwljuiuFOMG7CjrnycqqAQwhnZ46kDwd2ImzoBumWSoVAXg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=qLcmbjrl; arc=fail smtp.client-ip=40.107.236.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=fFNgtrnjVqrTOXe3ZmGKgl9hR3OYjgEmo/ueeOwOQF2JtstDGcGnjoWuDAPB3u0TUBv/REYgUzyGopnEQEJ5FwxOn//5y+hmqTAWh3cIUYdlzU6cs07/ugf+b396MELigtOLLumtCHvmx9+apGv89Wzn6rMX0c1WNAhgsDooTN1i1BgXU3jskYOZW7llZ1g8MN4qn2O/lC4cDShuif3rx3Rs+DMG3VQtzICaAlcG+Buxm16z61fnUaT/oh9cc0T+J84e4ifxc/QxAIMW33MBDcgbo57KQWVdfmJP7Ml3olZ52B6Uns0afsI3Z2TKiLFN570rKBGWlsE1UhelOcY3nw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=q1wpyvibUljv1XsEvu6+cYn1UgdVExrMhtsJ3CS7a+Q=;
- b=PFvKBvaSX0Ju8MEqgBs8KGqVJeWw1te42T5JVaDWSY9AukMWIZHrlq8UIXCfG8OblMPzvWFV+Qrd8/4xUQRKrW1BDVtCsuhgWHYz3WPAh2DsBXQBoNSXHugJ9KHs7BdrZ7M/J0//NzVD8BHGPX/jb5XiMPcsOIX3OjePYWQW2FT2khxwrTRTjsVtMbOFbuhKttuWvyH9ezzyds/SBI9lHXYfWcGa7mBQmyqLgC7k13RBjnT2lf673vFCJQQCS79tsdRKSQZWvSYK4+tt+e42oB7AlPNnLceBrSQvi7JHjQHZBN7oLXvdB/d/wTyGRmdYbXe4+m9cA4UdDOIbi89yug==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=q1wpyvibUljv1XsEvu6+cYn1UgdVExrMhtsJ3CS7a+Q=;
- b=qLcmbjrlrjCT/adLdfuVWlb2AT4gqmaj+b88fznpM86618m9hIKCaP4a3XSRZ75aZmJ4fAqT8MiAiRRCq5wYWTLkqT0Hh1DwWqaUAvKGtRMKGvuSrvWU+vAPXNmDSyhb79XIN8afyrr26oCtot+yQfaTBs5JBh51xCySsfCGjJ16f1Gt7MXMHrsXzDi0i6cSB2riaEAq3vJVVIdVYdOHExFbwjBJzQcumnZKzOSMXcyuQaDihvZTyp7qesx5dqLOBxyWE2c1AcFKByMRKyaLZcgj0+J60ijjkE5yXcu3qPKiMixW/6uP2+jCB+8DJsBrduUmh3DeXB5rH92dFcwi3w==
-Received: from SJ0PR03CA0286.namprd03.prod.outlook.com (2603:10b6:a03:39e::21)
- by LV8PR12MB9081.namprd12.prod.outlook.com (2603:10b6:408:188::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9031.13; Wed, 13 Aug
- 2025 09:45:58 +0000
-Received: from SJ1PEPF000026C9.namprd04.prod.outlook.com
- (2603:10b6:a03:39e:cafe::8e) by SJ0PR03CA0286.outlook.office365.com
- (2603:10b6:a03:39e::21) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9031.15 via Frontend Transport; Wed,
- 13 Aug 2025 09:45:57 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- SJ1PEPF000026C9.mail.protection.outlook.com (10.167.244.106) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9031.11 via Frontend Transport; Wed, 13 Aug 2025 09:45:56 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Wed, 13 Aug
- 2025 02:45:37 -0700
-Received: from sw-mtx-036.mtx.nbulabs.nvidia.com (10.126.230.35) by
- rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Wed, 13 Aug 2025 02:45:36 -0700
-From: Parav Pandit <parav@nvidia.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <horms@kernel.org>, <netdev@vger.kernel.org>,
-	<vadim.fedorenko@linux.dev>
-CC: <jiri@resnulli.us>, Parav Pandit <parav@nvidia.com>, Jiri Pirko
-	<jiri@nvidia.com>
-Subject: [PATCH net-next v2 2/2] devlink/port: Check attributes early and constify
-Date: Wed, 13 Aug 2025 12:44:17 +0300
-Message-ID: <20250813094417.7269-3-parav@nvidia.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20250813094417.7269-1-parav@nvidia.com>
-References: <20250813094417.7269-1-parav@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91E9121257C;
+	Wed, 13 Aug 2025 09:50:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=15.184.224.54
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755078648; cv=none; b=jFJIzntItt/tAjclsCgy60fOhDUTvgkrZzaq01HoD4D8OQ8WCeMG2xwmD/bG2RpNJgODioSMiqIif4K+WmvAump99Ufbf/9jJGYLnMF5IwSR2Lcd2sbla02ABpcu1h0DhgTfRBnta6Rvewp8hfficg9vfCrXb2FLVs+hpAzeNZY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755078648; c=relaxed/simple;
+	bh=5NjWnfB3j0SmFDYMTbW6G/aUvyqoKnQU7ro3SxcuX84=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QZ108eZUsn/IKQDc3DjHabZD2ExRLjKve2cq4Q80h8QvR2mEds54tE2hryQ0j2y7vdFE0bKt4xKxcIoauO1SHplbf59dT2V5/9fKKxJy3FJFtxCcaIdtQMZyZoR8TxyBJRK0Aa8AVGLTwFW/KYN73eklzKex0OTHypGIoSUT7sk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=15.184.224.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
+X-QQ-mid: esmtpsz16t1755078556t50122486
+X-QQ-Originating-IP: jHUKPmaXLURVrfNnE3/1JIusEU5dtzB9sfHBB4pZc1s=
+Received: from localhost ( [203.174.112.180])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Wed, 13 Aug 2025 17:49:14 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 3286716278462949229
+Date: Wed, 13 Aug 2025 17:49:14 +0800
+From: Yibo Dong <dong100@mucse.com>
+To: MD Danish Anwar <danishanwar@ti.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	corbet@lwn.net, gur.stavi@huawei.com, maddy@linux.ibm.com,
+	mpe@ellerman.id.au, lee@trager.us, gongfan1@huawei.com,
+	lorenzo@kernel.org, geert+renesas@glider.be,
+	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
+	alexanderduyck@fb.com, richardcochran@gmail.com,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 5/5] net: rnpgbe: Add register_netdev
+Message-ID: <B301753EBB777DDB+20250813094914.GB972027@nic-Precision-5820-Tower>
+References: <20250812093937.882045-1-dong100@mucse.com>
+ <20250812093937.882045-6-dong100@mucse.com>
+ <94eeae65-0e4b-45ef-a9c0-6bc8d37ae789@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF000026C9:EE_|LV8PR12MB9081:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2d815071-85cc-4168-bbdd-08ddda4e33f5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|36860700013|1800799024|376014|13003099007;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?LkCaA31zBk8QjOj0l+w6zv4TabqjtzIDxY1bEM5k+hVYz00pittjiUTqWQ89?=
- =?us-ascii?Q?P3g39h6Lb7NAbw7hzkSd3taOt2kjZHPp1xLYE0fTODhYPzHFzFHkOrc60Ied?=
- =?us-ascii?Q?rKVuWOlDGP6WtrveBkw2xB6XvC4sEwJYjJRdTV3jwbcu+spVsSXvJ66dIZrw?=
- =?us-ascii?Q?VpvE5BCUqIM+utxzYrPnR0RJA2zINcRIA4/zFe0yn/gtLvJ+yboV5JM4fZdq?=
- =?us-ascii?Q?owM1BEEOh327I3VT/i/KTRVOI0qXgAQrS1nnpd/2rwAD7TfTIgBxm+CtfdEi?=
- =?us-ascii?Q?iexOhImGzIDk15rSLnFVURFHe7veCCWX6HkyO2hYak3HFqljHuEzoqP2pyiz?=
- =?us-ascii?Q?cUnK2ytlpkZi1nc+mm9U2B0MuCzQYK3Z2xuT2o0ZHEmxj9oMhOG8ge2t6Ncg?=
- =?us-ascii?Q?Gb9fWGvnw8xKdPi62R/4IAq0QSqVB8KPd50FMVrZs3KsZRJDEcsGo3X4rKxo?=
- =?us-ascii?Q?sKL4udH5LhJpEMYDZtTFfA1r8j1cqhAG09iVUqSb1n85iZcmZgLz82bhtwFz?=
- =?us-ascii?Q?Ngvg8Gf3RKcFjnzMNw9xEqCF7cVDEUS71+0nM5bgGx4VlmbsN5J/jlLMSJe8?=
- =?us-ascii?Q?pH0e14b4IQrZSsKTrSHPRYoOdmpSErpVNpYKS77OI6y6LOed2kRPIc70gqUh?=
- =?us-ascii?Q?1gc8rFuQTtwA02/el/UlAfjqZDFGmLhGMON0zYSTTkQWmEu3NnRmMDiItIeG?=
- =?us-ascii?Q?2fBdlrN7VByDmHx3IdkEM5K/KRUINrWypzhkiw1UKlKa3Upn7FsrreBIpr8k?=
- =?us-ascii?Q?1wFu/8UuJm31B0jRNfybgLeu19d9mMlGbIJzcJ4vyFw1epuvcg8qqfLPAZfr?=
- =?us-ascii?Q?Q38dAULa5x2P93sV4Yibvds+qv36ZnWd9Kq0UOHbI8zvW06osiHeoQyRlhVH?=
- =?us-ascii?Q?L5AaZbLYj6hQv3PO1DYEBrkla2scp8OPjGUFYX5gdhY3py36n1SoxauEOAE1?=
- =?us-ascii?Q?FpApG8sR/ddcWOvTF+TxQPN0E8UxK0OdplZLeLikrCPap37wbe258oX6/DTr?=
- =?us-ascii?Q?m35/RshCLxawwDpz5G7J00KZshPUDpM8WHTJf1OaVBBkQy+jB9qxpqNBxFMu?=
- =?us-ascii?Q?LJds0Ywiy1tWIhVkjnKfisrNQvGEXAlJQGmKlHukMbavwoYx8GSaPI/diFSW?=
- =?us-ascii?Q?M/LtGJIjHyh1MEwnV6UMxx6NvxIyAvb8cPnldwWzlNLVDDPRgS7tVQ5z819n?=
- =?us-ascii?Q?1IZxykbweSEduO8J0BAZYaUIfSMKSoUYCnT2fmeNpL/ajQymvcg5eeLgFqQo?=
- =?us-ascii?Q?LoLD2hdUcoDYnO29oNNY7BoJ6Xv6EfpUaR9snEeNL3rQOUR68AZJ/q7EaUHM?=
- =?us-ascii?Q?Mw162QbpWfUpvWdLVENpt38xH25XzeAXynjh6URVcnjYEAHEif0ghivW4p2h?=
- =?us-ascii?Q?5YtAYnoKhZ2mY2hZ9CsFWmIVEVrcFxQH5AxbBvIXD8MPaOYXOAuLmkKk2xc5?=
- =?us-ascii?Q?SwPg6csyeLxr0ziU+Bs0rdeaQxn9qNvOwE5SSOO5EzwGpsmWX9K+GqWv7j+r?=
- =?us-ascii?Q?0doOw6vywvjZ4raOqXWZIlU+guXGUbKMzSMask1PQsFjMx0uSxaR87/iZA?=
- =?us-ascii?Q?=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(1800799024)(376014)(13003099007);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Aug 2025 09:45:56.9283
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2d815071-85cc-4168-bbdd-08ddda4e33f5
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF000026C9.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR12MB9081
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <94eeae65-0e4b-45ef-a9c0-6bc8d37ae789@ti.com>
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpsz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: OQNQM5UP8StMDdmKQ4cRpMKOIhXI86KRyY6GW62byRr3PlxyTbNjhc5l
+	l/XiOGF3/9rMVo4hpO8kmd8ZY7d9/f50dVidSvlceUIheO8KHGzajutyGSAmUSIapnrsHBK
+	g8vxds4EhAqaDK6qpnEuleRGxBtelCu13dZ+ovGe4Mokq5GoZ/bbn2T966KrokwufIUudjb
+	2jbWje0DA7wMih7K6rWX3rD7sEgpaquhXbuELbX33CTxR1uW6aARNhI/q9DWrGElH+/9YWa
+	B+MO0JmbjvJbmsJBB3Cu9bKrdh+gA8cor4C1PZmqxknJ1ju0BO35cA/m3BOSttgqk9sDrYA
+	zkzcPgly7Sk37W+GNQ7ii2EGHvuVTVp+FqdNsqSIvs30spsIlOJCF66DuOQcWby7eJoJq1g
+	uJ37h39XAa1o6dKQCM1uRIn+ZwUYXo87Qqo+nEMMc4QrW3umlBWBkXO+p/4dedRUhUmpZaD
+	18l59jNFRKo8L2KgoI4PPHJKRWJ5No3ojnoJ6EvZJMa6IpPcQwmhLMxHOVDEua8keMJbzSU
+	n0YqjI4c9eFlm10Q+TuRCEx6TRCec5GF1mSHgTAXaVAdUMWAELEbg9Idbe3Z6+OVGoE7m5x
+	G5E8YBEFYcZSLxNzdMNOFv0xPKz7HvUUnUv/kxkwvFXS143D6FcgflNSexknfQ8dds/Xffu
+	4KIk1qHHoMgY4Pt8ISdMjbN7GsH9hMcMHyexeEv6xBcBCzLbOheydjSLslyaj2h2XEzPwvw
+	qCYcaWV6jXjuH26apLphuwVAAi1a9Oho1QLHsQbWCxmoxJotINUHhR9+1cdUzZx99F9kEZC
+	Pp3ZD0fHPB5LqCI/O82meRaMU8d08bnLhN0cI3dXLAXan+htKtsKIMyOeGCm6OON/NfrSXL
+	d7SoOocGZhdLvWcxQH7793GxN+K9y3ed1unjIcfL3gKcJs0AsJycItqz9CTtFycTAUFNwhH
+	I1scdWZxGQrqOZuN/uSifPwnJBx6BTXZ3ykLD9dZZLBOyBfpNotFyQSLgX64NN5d/jmUbKX
+	tUYxtS2w==
+X-QQ-XMRINFO: NS+P29fieYNw95Bth2bWPxk=
+X-QQ-RECHKSPAM: 0
 
-Constify the devlink port attributes to indicate they are read only
-and does not depend on anything else. Therefore, validate it early
-before setting in the devlink port.
+On Wed, Aug 13, 2025 at 01:56:07PM +0530, MD Danish Anwar wrote:
+> On 12/08/25 3:09 pm, Dong Yibo wrote:
+> > Initialize get mac from hw, register the netdev.
+> > 
+> > Signed-off-by: Dong Yibo <dong100@mucse.com>
+> > ---
+> >  drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h    | 22 ++++++
+> >  .../net/ethernet/mucse/rnpgbe/rnpgbe_chip.c   | 73 ++++++++++++++++++
+> >  drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h |  1 +
+> >  .../net/ethernet/mucse/rnpgbe/rnpgbe_main.c   | 76 +++++++++++++++++++
+> >  4 files changed, 172 insertions(+)
+> > 
+> > diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
+> > index 6cb14b79cbfe..644b8c85c29d 100644
+> > --- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
+> > +++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
+> > @@ -6,6 +6,7 @@
+> >  
+> >  #include <linux/types.h>
+> >  #include <linux/mutex.h>
+> > +#include <linux/netdevice.h>
+> >  
+> >  extern const struct rnpgbe_info rnpgbe_n500_info;
+> >  extern const struct rnpgbe_info rnpgbe_n210_info;
+> > @@ -86,6 +87,18 @@ struct mucse_mbx_info {
+> >  	u32 fw2pf_mbox_vec;
+> >  };
+> >  
+> > +struct mucse_hw_operations {
+> > +	int (*init_hw)(struct mucse_hw *hw);
+> > +	int (*reset_hw)(struct mucse_hw *hw);
+> > +	void (*start_hw)(struct mucse_hw *hw);
+> > +	void (*init_rx_addrs)(struct mucse_hw *hw);
+> > +	void (*driver_status)(struct mucse_hw *hw, bool enable, int mode);
+> > +};
+> 
+> You define functions init_hw, start_hw, and init_rx_addrs in this
+> structure but they aren't implemented in this patch. Either implement
+> them or remove them if not needed yet.
+> 
+> 
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
-Signed-off-by: Parav Pandit <parav@nvidia.com>
----
-changelog:
-v1->v2:
-- Addressed comments from Jakub and Vadim
-- changed patch order
-- replaced dl_port_attrs to attrs that matches implementation
-v1: https://lore.kernel.org/netdev/20250812035106.134529-1-parav@nvidia.com/T/#t
----
- include/net/devlink.h | 2 +-
- net/devlink/port.c    | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+Got it, I will remove not implemented define.
 
-diff --git a/include/net/devlink.h b/include/net/devlink.h
-index 93640a29427c..052234f0d8ce 100644
---- a/include/net/devlink.h
-+++ b/include/net/devlink.h
-@@ -1739,7 +1739,7 @@ void devlink_port_type_ib_set(struct devlink_port *devlink_port,
- 			      struct ib_device *ibdev);
- void devlink_port_type_clear(struct devlink_port *devlink_port);
- void devlink_port_attrs_set(struct devlink_port *devlink_port,
--			    struct devlink_port_attrs *devlink_port_attrs);
-+			    const struct devlink_port_attrs *attrs);
- void devlink_port_attrs_pci_pf_set(struct devlink_port *devlink_port, u32 controller,
- 				   u16 pf, bool external);
- void devlink_port_attrs_pci_vf_set(struct devlink_port *devlink_port, u32 controller,
-diff --git a/net/devlink/port.c b/net/devlink/port.c
-index 1bb5df75aa20..93f2969b9cf3 100644
---- a/net/devlink/port.c
-+++ b/net/devlink/port.c
-@@ -1356,13 +1356,13 @@ static void __devlink_port_attrs_set(struct devlink_port *devlink_port,
-  *	@attrs: devlink port attrs
-  */
- void devlink_port_attrs_set(struct devlink_port *devlink_port,
--			    struct devlink_port_attrs *attrs)
-+			    const struct devlink_port_attrs *attrs)
- {
- 	ASSERT_DEVLINK_PORT_NOT_REGISTERED(devlink_port);
-+	WARN_ON(attrs->splittable && attrs->split);
- 
- 	devlink_port->attrs = *attrs;
- 	__devlink_port_attrs_set(devlink_port, attrs->flavour);
--	WARN_ON(attrs->splittable && attrs->split);
- }
- EXPORT_SYMBOL_GPL(devlink_port_attrs_set);
- 
--- 
-2.26.2
+> > +
+> > +enum {
+> > +	mucse_driver_insmod,
+> > +};
+> > +
+> >  struct mucse_hw {
+> >  	void *back;
+> >  	u8 pfvfnum;
+> > @@ -96,12 +109,18 @@ struct mucse_hw {
+> >  	u32 axi_mhz;
+> >  	u32 bd_uid;
+> >  	enum rnpgbe_hw_type hw_type;
+> > +	const struct mucse_hw_operations *ops;
+> >  	struct mucse_dma_info dma;
+> >  	struct mucse_eth_info eth;
+> >  	struct mucse_mac_info mac;
+> >  	struct mucse_mbx_info mbx;
+> > +	u32 flags;
+> > +#define M_FLAGS_INIT_MAC_ADDRESS BIT(0)
+> >  	u32 driver_version;
+> >  	u16 usecstocount;
+> > +	int lane;
+> > +	u8 addr[ETH_ALEN];
+> > +	u8 perm_addr[ETH_ALEN];
+> >  };
+> >  
+> >  struct mucse {
+> > @@ -123,4 +142,7 @@ struct rnpgbe_info {
+> >  #define PCI_DEVICE_ID_N500_DUAL_PORT 0x8318
+> >  #define PCI_DEVICE_ID_N210 0x8208
+> >  #define PCI_DEVICE_ID_N210L 0x820a
+> > +
+> > +#define dma_wr32(dma, reg, val) writel((val), (dma)->dma_base_addr + (reg))
+> > +#define dma_rd32(dma, reg) readl((dma)->dma_base_addr + (reg))
+> >  #endif /* _RNPGBE_H */
+> > diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
+> > index 16d0a76114b5..3eaa0257f3bb 100644
+> > --- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
+> > +++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
+> > @@ -2,10 +2,82 @@
+> >  /* Copyright(c) 2020 - 2025 Mucse Corporation. */
+> >  
+> >  #include <linux/string.h>
+> > +#include <linux/etherdevice.h>
+> >  
+> >  #include "rnpgbe.h"
+> >  #include "rnpgbe_hw.h"
+> >  #include "rnpgbe_mbx.h"
+> > +#include "rnpgbe_mbx_fw.h"
+> > +
+> > +/**
+> > + * rnpgbe_get_permanent_mac - Get permanent mac
+> > + * @hw: hw information structure
+> > + * @mac_addr: pointer to store mac
+> > + *
+> > + * rnpgbe_get_permanent_mac tries to get mac from hw.
+> > + * It use eth_random_addr if failed.
+> > + **/
+> > +static void rnpgbe_get_permanent_mac(struct mucse_hw *hw,
+> > +				     u8 *mac_addr)
+> > +{
+> > +	if (mucse_fw_get_macaddr(hw, hw->pfvfnum, mac_addr, hw->lane)) {
+> > +		eth_random_addr(mac_addr);
+> > +	} else {
+> > +		if (!is_valid_ether_addr(mac_addr))
+> > +			eth_random_addr(mac_addr);
+> > +	}
+> > +
+> 
+> The function should log a warning when falling back to a random MAC
+> address, especially in the second case where the hardware returned an
+> invalid MAC.
+> 
+
+Got it, I will fix it.
+
+> > +	hw->flags |= M_FLAGS_INIT_MAC_ADDRESS;
+> > +}
+> > +
+> 
+> > +/**
+> > + * rnpgbe_xmit_frame - Send a skb to driver
+> > + * @skb: skb structure to be sent
+> > + * @netdev: network interface device structure
+> > + *
+> > + * @return: NETDEV_TX_OK or NETDEV_TX_BUSY
+> > + **/
+> > +static netdev_tx_t rnpgbe_xmit_frame(struct sk_buff *skb,
+> > +				     struct net_device *netdev)
+> > +{
+> > +		dev_kfree_skb_any(skb);
+> > +		return NETDEV_TX_OK;
+> > +}
+> 
+> Extra indentation on these two lines. Also, the function just drops all
+> packets without any actual transmission. This should at least increment
+> the drop counter statistics.
+> 
+
+Got it, I will add 'netdev->stats.tx_dropped++;' here.
+
+> > +
+> > +static const struct net_device_ops rnpgbe_netdev_ops = {
+> > +	.ndo_open = rnpgbe_open,
+> > +	.ndo_stop = rnpgbe_close,
+> > +	.ndo_start_xmit = rnpgbe_xmit_frame,
+> > +};
+> 
+> 
+> -- 
+> Thanks and Regards,
+> Danish
+> 
+> 
+
+Thanks for your feedback.
 
 
