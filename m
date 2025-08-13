@@ -1,118 +1,79 @@
-Return-Path: <netdev+bounces-213467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213468-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 047A4B252CB
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 20:09:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1757EB252D1
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 20:10:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9EA853B7DFC
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 18:09:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 885DB7ACC1C
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 18:09:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2FBA242909;
-	Wed, 13 Aug 2025 18:09:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD8C62BF00B;
+	Wed, 13 Aug 2025 18:10:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ICH683YK"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="R/8GTka/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010063.outbound.protection.outlook.com [52.101.69.63])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFB18303C81
-	for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 18:09:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 996BF29B78E;
+	Wed, 13 Aug 2025 18:10:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.63
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755108549; cv=fail; b=DcmsZJ3fxkeRUDAh7ZCNUdzAoF6zDb+jeDlbSP9wo5KDG7yNZfwTPay5VMhGAI7XpJ7ofsM77ucftrxJ/E1WZtTRSZFO5CLD7IdJx0WezdXcjee9Q0FpF4J0cvsbnhoN1P4HADViWTPVnbm19S6pN86jj5HIvO+LXUNJxCHiDMQ=
+	t=1755108646; cv=fail; b=HFlFHobnX1loPGYz+c3OeGdwvt3TfEjnEw9etuIKOpXiE1u4vTidmWQ619Av46Rut0xox4LBr0HjBVppbvdRQJDoh7vUGlrzlAw1G5xQu4bmqj9ySHxtFhwzvc5xVU53Of/tQc6EYA91vfwuTjNTb8uSPaACrnJVulv3AtiuD28=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755108549; c=relaxed/simple;
-	bh=3aKOKBPoVaFGPKVbSx/NInjoPwo2MRoykM2Xc3SDoJk=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=iUIO6ckTYSAGukHtO9goT59jBAclzTHRLMXbLnK7iA/wRvZD3jf/0LExCfHXFotpeH0exF82NMvLAGU4Lccpa7zc5soME9yV7bOPZl2/EMX6AOy4gw/7leb+jlJJXA54ytE8BAdNqM8bVW4G/Ru9CLxu8W6XukjtFQJMerdftD4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ICH683YK; arc=fail smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1755108548; x=1786644548;
-  h=date:from:to:cc:subject:message-id:references:
-   content-transfer-encoding:in-reply-to:mime-version;
-  bh=3aKOKBPoVaFGPKVbSx/NInjoPwo2MRoykM2Xc3SDoJk=;
-  b=ICH683YKzA/FxyYbd+TZRMe3g0IC6YV772yhfETS885NkdyG8H0S25EQ
-   6CXjbzOo+VywVaSHph2aMTqJZR2PjUHs81KmoCVlUMrG1bJ6rnXvqGAEU
-   SnM0HCRwkUcL9+xn7JkwlPTuW+aVWzr70CH30kLJsjuC+7jN/06D3XSna
-   BylcziXNMY4ZIYZLAWfN4ozTP+dhYNRWSVcnIx8+poyf3CVGCiKT3OlIK
-   O8gHWpGLo/ORFUoQo4PkNLds9VWHxGP16GxkYrs5cIa57hOHBVlI3ecPp
-   rVUlqbumKOYT8MBjCC2ETuX57L6Kr8fifA1O21LRx63zEEtkry+oODHt6
-   g==;
-X-CSE-ConnectionGUID: FR8T2qkSScK9BCeF8Fojbg==
-X-CSE-MsgGUID: +IVTmqjOR1q10y/HzkmgYA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11520"; a="79987408"
-X-IronPort-AV: E=Sophos;i="6.17,287,1747724400"; 
-   d="scan'208";a="79987408"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2025 11:09:07 -0700
-X-CSE-ConnectionGUID: Nr+K0iCrSLSkwbcyXodbpg==
-X-CSE-MsgGUID: E+DPzdlyQp21kEDZvnL5EA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,287,1747724400"; 
-   d="scan'208";a="166449648"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by fmviesa006.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2025 11:09:06 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Wed, 13 Aug 2025 11:09:05 -0700
-Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17 via Frontend Transport; Wed, 13 Aug 2025 11:09:05 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (40.107.92.60) by
- edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26; Wed, 13 Aug 2025 11:09:04 -0700
+	s=arc-20240116; t=1755108646; c=relaxed/simple;
+	bh=73tez0/fmurZbg0FcF0aTCKxGC7nd6zmTzINnjJtl64=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=tnq2YKIKddyqnFzXJe4EwxRKdDGZUWbYeXiUi2OwO47h9xvoWI5DotAfY2fX4KnSZhhSzbR9mf33j3J6RXYGMnpBRpI5AyxOCCOEKtwKdGYW1teTPJcC+SW9FTERFehIht3aaCJwTKQTTiETpmHOckKkqqz7A4lq2hEIQBlVzAo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=R/8GTka/; arc=fail smtp.client-ip=52.101.69.63
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=J1si12pwtFBDvCJZzws6VN1ZnysBoc8a8aXyE63hA7d+iXd1icZgj78dEGG43VICRs1jkWyuJh3p9Hwf+Gn7E/HlFVJhhlkDG824aUhU3QXkzm4hvWfR240VByKAhTPJTiYnfRRcZrMI9zsk9ME6rAHQIKkI5dXpW2rPZcNZSJEcZyHTdSiqMc2usCiyIDeCLRX1e3nBASj2E67W6J1Nenwy2b7xeoAINnz8r07zlJQPytz+AoFdDJjAQ6Nai2OMgd/jhKo3JFaM+URojemcbdqmzXeL7WzYZS0ApKz2R7vNV/sB1v+0y3/sH1Hyp5wjoYD/ruhPLw1gqvBcTIwH1g==
+ b=qKX3KzkOL5CeOdKCUKYXHzGx1w+Nciabc9ZIOQGJcIMN84Pcf93Itvu6R6sDDJJvsW+SR243FVe45hHdN/ffsUyIvxHrtAFZ+n2zYoCiArXG9tlrqRcptHJsrXhrwDaSNhjRcpuFT/rk2FSQB5uRaruGnzsN1ipWAUEjARhzuNYy8OSrbw323b4cz8BhOay1464azRMOUlRJSykM8C9zeDXbWC5D3qj9O0ppjK+q9jj02WYbYof0bbyI7sv9W3rxH2ptmFObpPEJT/DxQl3QUIUDcFsUN3Iw3wNuwHuqCQFVAM6LCebpB5bdi3YtzRK5eLhrPUge8xGy4QzhGEHdww==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=eU9nI/p284pRFRLV/pHiQDmsEA731k78vBlkmMBEsts=;
- b=k8szSloMEHhKZKVdlUsPUwL7gtBY7fqTXpHQGQ5LqiBtcKnySBxNMU8prNKQTohiigYzwi/DHp/Gu26syhy9ygpp4H0/YtIHwIwOs6UYtZ89FGlrB7lm2P62y7Ii/3uVy4C1S9519H/eJT4ynql13H4PWdEkQpByyVFe6Oge93htdNPUn3irnvjxi9OsBmrWktb8UnCB/Z1bD8SpL+kzWcDmIL2D3iTZzF/KLmTkInTnUtlB/x8/vKyZr+YTH+OGQYBXRpZQj95cQKCJbAGpL/3kyWz+IvhOhmBvltASpvJJqUX0okrHTELu3nKtwZAWqFn5mhKXtlAShoy0vVKswg==
+ bh=t42/M6xaI3hvNxRwTFHPfVaSDinWMj3w3SgWM37vd0E=;
+ b=F7JkhGeZkK8hPQkEtM+MmcMrfnx9lal9eYPOsNRmKHG8ytvFCTvpkRjMHNvLryUeL8IHPK5z5ksSSTxnxj1wOvyvSiepKJD6KCKAptuNoIwF+1OeqUDQgmc1LRlowcbtwFoan2HNjWnv8VXKHHSjvBASo8mAT9Qd0HSFmzXiaOwhwdvhFYHR/tEGF0Z9afQIezT8SqilmxzwUHTSru3t2AfxJSAgSnGGQCEaYiMMbIA5lCt9p7UhoQb/1+r8NsMdTvwV5QufUkoskPyPUprLilE+23vJS8XXR4RiyZLxra2jKl6+r/gGLbZdoYTYScMDtJAjNUCNR7UderqnnlQUYA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=t42/M6xaI3hvNxRwTFHPfVaSDinWMj3w3SgWM37vd0E=;
+ b=R/8GTka/qnvvl+cjRp7LEbBhmo+udG5VXhbaPGHNiswC1jcPpdIKVW2myEkvQ+xMpn0z3hCYAl8Dm19m0MGGP3+OYoBlkL2rY2nSNwCgq4RvTPddYQXsy4KNJCxQaYmC+5lNPKbReDimc0vlw36Kl7n3Fm+z7GC8DZ77rnGKvZ+eLdjDtZEhTVFPCV/RHXIVDzwRuj6BUJKX1VugOaY6qr/n3GfS9P6St4EXI8rymDX49QIz1trfQlnwlNp9iirvKufKlTXCRO7gjB2temEpu/VnkVJguEcRkNMc2BeBrgqbyRtHkFGIyvAstuRU7PqQPEB1eaA94N3Rn92elu0cVw==
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
- DS0PR11MB7309.namprd11.prod.outlook.com (2603:10b6:8:13e::17) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9031.15; Wed, 13 Aug 2025 18:09:02 +0000
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::d19:56fe:5841:77ca]) by DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::d19:56fe:5841:77ca%4]) with mapi id 15.20.9031.012; Wed, 13 Aug 2025
- 18:09:02 +0000
-Date: Wed, 13 Aug 2025 20:08:42 +0200
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-To: Jason Xing <kerneljasonxing@gmail.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <horms@kernel.org>, <andrew+netdev@lunn.ch>,
-	<anthony.l.nguyen@intel.com>, <przemyslaw.kitszel@intel.com>,
-	<sdf@fomichev.me>, <larysa.zaremba@intel.com>,
-	<intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>, Jason Xing
-	<kernelxing@tencent.com>
-Subject: Re: [PATCH iwl-net v2 3/3] ixgbe: xsk: support batched xsk Tx
- interfaces to increase performance
-Message-ID: <aJzUqg5m3sKPWDe0@boxer>
-References: <20250812075504.60498-1-kerneljasonxing@gmail.com>
- <20250812075504.60498-4-kerneljasonxing@gmail.com>
- <aJtg0gsR6paO22eQ@boxer>
- <CAL+tcoAGq1DhjF42qYH_yVPf9PqmMknn79WF2SncXFJmP0fDhg@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from PA4PR04MB7790.eurprd04.prod.outlook.com (2603:10a6:102:cc::8)
+ by DUZPR04MB9918.eurprd04.prod.outlook.com (2603:10a6:10:4db::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9031.15; Wed, 13 Aug
+ 2025 18:10:39 +0000
+Received: from PA4PR04MB7790.eurprd04.prod.outlook.com
+ ([fe80::6861:40f7:98b3:c2bc]) by PA4PR04MB7790.eurprd04.prod.outlook.com
+ ([fe80::6861:40f7:98b3:c2bc%4]) with mapi id 15.20.9031.014; Wed, 13 Aug 2025
+ 18:10:39 +0000
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: netdev@vger.kernel.org
+Cc: Linus Walleij <linus.walleij@linaro.org>,
+	=?UTF-8?q?Alvin=20=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+	Andrew Lunn <andrew@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] net: dsa: realtek: remove unnecessary file, dentry, inode declarations
+Date: Wed, 13 Aug 2025 21:10:23 +0300
+Message-ID: <20250813181023.808528-1-vladimir.oltean@nxp.com>
+X-Mailer: git-send-email 2.43.0
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAL+tcoAGq1DhjF42qYH_yVPf9PqmMknn79WF2SncXFJmP0fDhg@mail.gmail.com>
-X-ClientProxiedBy: DB7PR05CA0069.eurprd05.prod.outlook.com
- (2603:10a6:10:2e::46) To DM4PR11MB6117.namprd11.prod.outlook.com
- (2603:10b6:8:b3::19)
+Content-Type: text/plain
+X-ClientProxiedBy: VI1PR09CA0151.eurprd09.prod.outlook.com
+ (2603:10a6:803:12c::35) To PA4PR04MB7790.eurprd04.prod.outlook.com
+ (2603:10a6:102:cc::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -120,344 +81,106 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|DS0PR11MB7309:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0828aa1d-4446-4b21-40e2-08ddda947bb4
+X-MS-TrafficTypeDiagnostic: PA4PR04MB7790:EE_|DUZPR04MB9918:EE_
+X-MS-Office365-Filtering-Correlation-Id: dd057537-1c7f-4808-cc6d-08ddda94b57e
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?R24yejdkV0V6U0JRZEZMY2lGeVRIS295dFJ6bjhtUDFQTkUwdjNGdmFDNkg0?=
- =?utf-8?B?L1NKeEtqK3ZCKyt2RmcxajNRMzJGbkdJOTNlSzlQSlYzNDk4SjBuZGZ4Y3VX?=
- =?utf-8?B?emcrOVhwR1pZUDR3Q05LK0ZHV2l0Zk9qa3J3Z0lyWjRYaU1jbzFkeFJzMmYw?=
- =?utf-8?B?bXM3bU8vbkMzVktrQS9ucjR4OTZGcEQ5OXdUa1R0OHhHaUJscFE1TW9VeGtF?=
- =?utf-8?B?NnhMZFRSakxQaG1iVnBjWURQMXoycy96RVI2NzlYNEdVOVNyM2xjcDFlMWxY?=
- =?utf-8?B?c0I1N1YyaFpYVmliSWJwU2NSUnRGWkVtZ0VUaWtIZWp4MGtjd3c3Nk1pQzV4?=
- =?utf-8?B?RUZ1Q0hMdDByMm42TjJmU3NNR1BWU3l0OEZYSjBSN1FaRzNoWEZqSWlUM09J?=
- =?utf-8?B?cy9VYVdmNndqdmptUHgwdHNNTGhEYTNCR0ZGVm9pOWZ1WjdoRkh5ME04K1ly?=
- =?utf-8?B?Tmc2YXRWcGRsU014cWREQ1NwSFAvODRQS2d1YjhOaFNtOEtpQkRZcEwrUWM0?=
- =?utf-8?B?MmV2N21XYUlrZkRTUUxrbWN4WXZRN0UxVCsrSHZ6bkJpaTMvUWJ1SDJ5TmFW?=
- =?utf-8?B?YzNQQVljUHdqcjJiRFBUYU5RNFhBK2NabGsvc2RlY0I1WDRELzV4WUlSeHlX?=
- =?utf-8?B?eHR6eXRyc3RvZGNMUWN0azFYYlI5M3o1VENwSmx0STJUMXB4SStiUXd0b1Mz?=
- =?utf-8?B?U1hHWHlDb01yRHN2V0RxUmFlUm9xcTEyVFQzM3hxMkFhTTdIQndxT01SSVdl?=
- =?utf-8?B?UEUxNk1rbUFDRDI3N0VJY05NRHRjbEppblhNbGt3VXp6TEh6VDlxWE16a2k0?=
- =?utf-8?B?dnovMXFvblFob0VtdWhHQy9wVkE3UmRFN3hPdnJQZ2VnMFhiWkRqeTAwaUli?=
- =?utf-8?B?WnRxNkprM1dKdFFWN3RLOGFLeGUwN25xV0xRVDZEdjdPbWxVMDVpL0o4bWhJ?=
- =?utf-8?B?cEJXa1llWDdRY0I2T2JZaTNqR3hMaFVaVGxPcllCeHVSRzNCL25vanpxU2d5?=
- =?utf-8?B?bzNWZ1YzZVByajdJcE9QOCtDaEgvN0cvSzJ0REVRL254SVFCdXA5RDBnL2xs?=
- =?utf-8?B?OUFvTG5qSlp5eUZTOWo5amdtQVIzdExSd3dRSzJFWjNVcXk2S05GMitVL2tK?=
- =?utf-8?B?ZkU3MmlUQjNQcUtsSytFWHNFQXRvZXVyVUVYMnUrN2JRSUhaRUhZRnlsM3Y4?=
- =?utf-8?B?TU1rM3Q2VlVZRVFJRGdxM3pTUUxPLzMwZ3Rmdm12V2wrcWw0MkdUZms3M0xZ?=
- =?utf-8?B?YnczTmZrZTJSOERTcFB4Zk5OaVFvUVE2SDNWTjA2S24rUVYyc3g1M1B4MWxM?=
- =?utf-8?B?T1M1bjlOWWdQcXowVVVsbDdad3Q4NStjbXdSWmc3ZXkzM1VwT3RFUExnYXYv?=
- =?utf-8?B?QUNsaEtNMExBdE0xWnl5QkxVeWU4VGlSVDNSSmVGR2ZrNHgrTmRlYW5WTEF1?=
- =?utf-8?B?WVF2cy96RUkvNXBQZEdYeXowVWZoRUdVR3c2cUNPSzJkcktqSGRBaXJZNFox?=
- =?utf-8?B?c1ZUbHNLbVFVUEtmRUFoUFFqZjlCaDdSeXdMWWJ6UzRjU1N2RThtMmpScFFZ?=
- =?utf-8?B?NTlOblZmREhnOG1uQmt4cnZCd2xnNHVXVDQ2N1NsU3Juc01rL0ZiczZSTDF3?=
- =?utf-8?B?cjR5MjBoaFFwampZVWtBZ0c2a0M4QU10SG1HR2VuZWhhZ0NSbFpPQ2x2eWU5?=
- =?utf-8?B?c0s0eU92bC9obVJETnBHODl1clduMHErZWVnRU5qM2swOXNpN2VkT1pua1dp?=
- =?utf-8?B?QmtlMG1UcExqVFdudlJLMlA4RkxYRDRoWUI1T0htZFhpQm5nVzlYOHNhOGtQ?=
- =?utf-8?B?d1ZNVnpKaHFORVlvNzJ6RjR4SU9ZbWRXZFZvTVBIT05LS0tNR0pIYmRzeC9v?=
- =?utf-8?B?SWxKWUlyT1o4RXdCRzI0blJFcUpsMlV5Uks1VE5uVW9SaTVSdkVSRW5SRk5K?=
- =?utf-8?Q?az4r/yCsUoc=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|10070799003|1800799024|52116014|376014|19092799006;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?TgjEy0+5x08UCytAwEDuAxaDFR8pXmmMtcsKGi/XYXw4hnvEoVH/2zhDoYMl?=
+ =?us-ascii?Q?hN41GpzMKYmA442WlziNLykGi7lf/q+z0fuIflgssCVKaTQEERLORLL9Erng?=
+ =?us-ascii?Q?XoR86TvOmgxeTGWPBdVffbG7VF2tytwE59tQ6ZA94PPz5nhe01eL2wyWD2KT?=
+ =?us-ascii?Q?Ozoy+XDf7uSbD/JHnDC5SR10iJtP6eBMf4XTrhlVs+Nspe0aSjT4QxD5ulPZ?=
+ =?us-ascii?Q?IIkSz0dp9zayJjJzjBqil44vLqTKo3IP2xUAjmHq/IpCKtuyqHS0uoy4/Zm2?=
+ =?us-ascii?Q?r7dDf15FhDF/NCNtjiQ+UlAwubdBZ8fNjlKGHfQvhu5XP+RWN612r9PwGGED?=
+ =?us-ascii?Q?E90LcBZgvyMSlEPvBPPlUQSBenCW2kb4isGnqr5limFUCnnblROs16iEFVq/?=
+ =?us-ascii?Q?zQ902/hDsHm4sGNFzlg2shivJ14CTHOcHpg2s84R9nFyTeHt/k8DylFDg7mW?=
+ =?us-ascii?Q?Udj/8P93phzN2YmnfHzaYiLY3prDxaAi/WZFODaAszrZvtCyqhyNpN7tdKH8?=
+ =?us-ascii?Q?mauXm0UNjTTwRNXW5vDQsPwyjt96QOCHT7PKkipNLW/Fv3Q7YpQruekFdxsH?=
+ =?us-ascii?Q?KOslrdx5R42s8ZoXRxP/WAqhz6xz1JWDuztR8CZ+/QcAOup2jXEwbqZD0qWB?=
+ =?us-ascii?Q?WsJGYeZMYDhAwuuq/nfuCJfYHuzC82d1VY0iywVWvI9VTcCdxGQTem1lcJW2?=
+ =?us-ascii?Q?VZKpoGRkecLdelhu8yR3+gm91mJRkaSd1Mj+ys9tmJBk9IVG4vNSHnlGEhSr?=
+ =?us-ascii?Q?A2fqJWq4mxJMoiiclP7hA0GcHFTN6Mxo26PFKJXfsmAJvRP/GCw+wb38f4QH?=
+ =?us-ascii?Q?QqsEx7UZdsnoe0FsS5g2idCXlwEeCRE2/Zs7a+JBTPJNKCb07W6VtwPOvLE/?=
+ =?us-ascii?Q?mGx9KP887DSCSM81G3zdxESn50+tqmXaR2K3skZGulGFzN8m539hnxmwWxJ8?=
+ =?us-ascii?Q?x6hguoM9OQJNXrrV1XeR932ZDmcW0nCPPy8WFBwYqo7VeWpSPV4qzTqWNiRD?=
+ =?us-ascii?Q?0gM8alt64LcJneWtSqHhVEcw6ovoP2We4JNX4gbKTSEy8CoMVeZZz0ZJ9jRz?=
+ =?us-ascii?Q?t23ZrPMqU2iWRT2ewE/fnIrDVn8TxOQwFU+PXwcxOmLm6sXCrKysSdav492x?=
+ =?us-ascii?Q?u7U1BrCC+Q2sBBw29qvHD6OV0G+/dIqRPT5G0XRjMvKTxMBIwMA0Of3zBt0r?=
+ =?us-ascii?Q?7hwL3RCff+7QA+Tw9IxNXzcF4XoY8Z5tKQ3h3RML5ZIkoyomG/wDKtINCtof?=
+ =?us-ascii?Q?tTbkSxNt4dyS85M5zmsXNCeG6T3F2RwSFE75pjw8GdIRbx2B0IQp/PBw49Fc?=
+ =?us-ascii?Q?CZ2VcXSRbh01fPVhlOeA/HX8HffOls/FYZaDfXZXjjwPAfZqyoU71EV8f0pd?=
+ =?us-ascii?Q?EIvQ5FrlQcvqonWMp9+OuCg0pXOL6SYcW26s/TgVPziu+nw1QA=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PA4PR04MB7790.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(10070799003)(1800799024)(52116014)(376014)(19092799006);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?aHNrQVdOYzd5VXB6cXlvN2VJR2MxVW93cWZISTY4bE9vVlMyRlB0bUQ5Uklu?=
- =?utf-8?B?VEQrR1pJOFhoanlURG9zQ0ZHRm5tZ3dBQWF3emcwbGk3dnZxeDJwU3p5NWJG?=
- =?utf-8?B?ZzFOamVGbzIzRnE1bDhDbzh4SzU1YXF2VDlvVkwwR0pHQVVVcjFVMk5sT052?=
- =?utf-8?B?SXUvL2pYdnBubThZUDNaMU8vM0VoVjk3QzAybmMvMU1UQVhudzhGOXptUk9V?=
- =?utf-8?B?T1BTUkl3Ujd4MWU5L0FULzZPQ2M0RndRKzBMTXJTN2JFVXZVaXlkV2kwQzBF?=
- =?utf-8?B?c3FwOE5wamcyYU9WNzF4SVV6QzVJWjFHVWk4NDFYd2tVQmhJcllCdmlSdXU5?=
- =?utf-8?B?aWZ6OVpHcHlOWnZkb1dmZzE3SmlGMWFhNkx0ZU8yVXdrc0dBSkFzTUlrbTBS?=
- =?utf-8?B?RlBPbHJURWk3VFA5YUhvTzNoNWN1bFNNR2JlOEpReFgreVRRcWZWWU94MVpI?=
- =?utf-8?B?UVE0azdIQ3BnZHM3UENKdGgvL0Q5VVljdkgwVnpUbUlZRDBxNCtkU0owUG44?=
- =?utf-8?B?QkxlMEdQbkxGcjlDRnJwTDI0c3RuTmhMVnI2S21yMk5PS2VOdjJXMDBaVEJR?=
- =?utf-8?B?NEtTenBaZkRSNHFTTnNIaU1ucmkzVG5IWXBLb3hqTW1MRkljVEtyVXR5MVlT?=
- =?utf-8?B?bGQ2bzFvQWhwOUNsVWxqOE5mZ1VKQno0Qlhxd2lBZVlmT3lkVGhGdlpvdGIy?=
- =?utf-8?B?aVVEbTVXWTZJVDd0L0h3ajdzSUY3MmZNTkxKdDZFczN5dyszcFl4NmdVU0VM?=
- =?utf-8?B?TWsrVEVsTms3NTI0RFZlQXVkM0ZyRnlCYklxb2YvMk9WSXBBakp2amJPS094?=
- =?utf-8?B?cXZLTDhLMGxmUlp4OVFmU0dYaWlrQXZBUGpBY0p2M2t2YzJoMklhbE92dVh5?=
- =?utf-8?B?VHpobTZtSEJEcnBaWkxHUmxXd0g3NzNOV0YwMEFqekhnUVVFWjJZSW51c0tU?=
- =?utf-8?B?ZWR1amZ5dCsyVXliTitNWWVFekp1RWpFcDVmSHZDZ0tFR1lJS0xyZ2xJTExF?=
- =?utf-8?B?SEJ5d253azZ1VWxTRDNuQkd2MnZKMUFoYThjdFF5MStjTjc5ckhySC9SalQ5?=
- =?utf-8?B?dGJPbHA4blZoM2l2UjBQZ1lHSGRBVzhRQU91b3E1THFsS0JvWlJIQ3o4Y0VH?=
- =?utf-8?B?cFRIa2tLWFdRQWhxSTZ6eWdYcElTSmhxMHIyT0w3anMrbUFiczhFR2diUkZK?=
- =?utf-8?B?ZmJpY1pXMkFVbFZmbmY3cUtPcWd0bXVXWEE5OEtYeDVEc2luSTBBaHlWTWls?=
- =?utf-8?B?RzFrZlVxTEtxVEpBM1Q0VjlxbUZSMWlueURFclhZNExpWGJBYm5rSUwzLzh6?=
- =?utf-8?B?VkYyZHpTRmFhaEhQb1k3WWNkNmhIcGRDWEIxU3U1dTQrMXRXNFJxNHErVE1S?=
- =?utf-8?B?WGtqU3NPQUxKR3VEeWxjdFJ5MmZUTlNCeWhZM3BoSE9GWFgxVkF0N2llekti?=
- =?utf-8?B?dDVQR2p2NElYZWtpQzdEN2hPZ0pDazlDRWdXUzhSaktsRC9EcEZ1dGk5dWYw?=
- =?utf-8?B?WmMxYjhhdFhDVHlrMzdaRDNEZDFMYmlRSU1JQUk2RExnUjFSNnFyTnpndXkr?=
- =?utf-8?B?OGd4eXlKN2lYcmp0RmE5eU01Y1FHc1A5UjR3ODYyczYyMUJRMXBBNTA0bUdL?=
- =?utf-8?B?dlIwZS82ZGZFQWxXbmlSdnNVd0h0NndyeThWN0RvWmFiOHJZUTg0cnhVWWMy?=
- =?utf-8?B?NFcvNVFCNkFMOUhpMDJwb1N6UFFmQkplc3NBd3hEMnZPYTZTUllralVuWDJ3?=
- =?utf-8?B?YzRMeGVFelI0d05zeEJLUHdtSTNvR0tsS3pTcWRFZGd3Z2tUV2JoL2RFU09R?=
- =?utf-8?B?eTIwTU5lbWpqSFRWNUVxQmJQeHlrK3pLZGRlOHNhTG5neFBLNnVwU3RQWE9Q?=
- =?utf-8?B?YXFVYzZRZ25zZlF6RkFQNm5JeTN6K0owdHByZ0YrVHhNcGpTS1ovNjNrOXpM?=
- =?utf-8?B?VlgyRWx1N1dHWG95bGhOdE55amdreGVld29HcFgvblVDcC9hTGVVWERKa0Qw?=
- =?utf-8?B?RFprS0F4YXliWVJ3bUh4dC9lY0Rac1dHcUdqRFNueXpSVVBDNDRCT0ZrSHpp?=
- =?utf-8?B?MEFsL0o3UkFwMEwyZmRxRTZsOE80MC9iUGZzeDJvWElGc1ZPaVAzQ0NGTm5Z?=
- =?utf-8?B?ZTRkeFl6Mk5ERkxtVFVWN0JTTGhubGRxb3p3R2VPbnhOUS8wU2hXUDc3ZURa?=
- =?utf-8?B?bkE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0828aa1d-4446-4b21-40e2-08ddda947bb4
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?B+PJO1/tJZvXU2pcP35Lnbk6qaQbAeeisw7dAqyr7ydBhe3yDrg5e3q6YUIb?=
+ =?us-ascii?Q?yO58kho1l91dNmsssnVpUe7JOffXJj3zITF7EbDXVTk3Cg5dzxEk32g3caJZ?=
+ =?us-ascii?Q?bCmKIQILNCFLe8G3GIJfsVsXy8Jdbmq32bgdp2l9Ou+gmgL0+rlSR8He5lu2?=
+ =?us-ascii?Q?ZpOfWsjgyMxyoyiSYZD2YFTJEcIxGETxr38knjKyZ2k/V5uwN1faBNNj2OK9?=
+ =?us-ascii?Q?vxU2mqS3N02hC6oVJBZjXhCS3Fgbb2T/nVwHgLpSvN84QIW7lSX4dqjtFG2H?=
+ =?us-ascii?Q?a+Z49ZSTiHlVmcLNRJOt9bGEA4zOLTuzh626rh2Doohvj/B9SGKPClwqiTKo?=
+ =?us-ascii?Q?r9Vy36KuD9ApO66bZIxhJgyMohDLT/qZ5u9NfngbqBsQ/pzw5ZHX5jNrj1oU?=
+ =?us-ascii?Q?L3wEftkSpY8vH7qpnwP6qpmaTBL9mr/fWt4da4sG/Gb0DZ18mIx7Yc8yeDQY?=
+ =?us-ascii?Q?UnJbyeWYjSP7Rp8MGPSAcJsdqiGps1iQiI8tsH0FW06O/xnfc6lAKZ5lWXAG?=
+ =?us-ascii?Q?+kCs7WfWZ7GdR8ecK7EZAZK0nxrDoaAhcZ6I/2CzkOP/Tu8khKrxX0XMLweo?=
+ =?us-ascii?Q?OU9JchvZF/BWLxUfTJAm9T4Wn+oMum5kM6sQIrE6FInatv33IdSz7HqIdQ+A?=
+ =?us-ascii?Q?WDULEXQ2uvdze2mvaw07SGu+og6v1NxFdwJ1Er9crVrw8EscOuwT7BETk3qR?=
+ =?us-ascii?Q?eQ0MDnrxUcZMfao2WuNdgkM+Nd4u1QEmEHuxaPXSpKFCARs+lKnT4KOVgcNS?=
+ =?us-ascii?Q?/ddLFh6Jo/s22qlhhNLdAvcZj9CTD7c2pSwNXabt/iXxp5KKHVU0YpE8hzWg?=
+ =?us-ascii?Q?yj3Usn9pCkAVwpivuLhU95CJK+tjdNxTUUj/gRmWnMTr4KQQcXoAsTUxeQIt?=
+ =?us-ascii?Q?EoJ95z9l4HlE/47PxnXYqzsDWba6JKjCotGNA7sCCeCndKu01o5i4xwJiRfB?=
+ =?us-ascii?Q?laHAA1kz8xtdUszobfv1S35j0vgjdgi/bXd1AoMeAu8KBiz0/L5a20GwCUrw?=
+ =?us-ascii?Q?J7nyO89nuETXmcCrlG7f7VBa73d5nAfRehFQVTykfXlOz3Boys5BaREmQwVH?=
+ =?us-ascii?Q?TH86nrrwGiSpSCjRIg81ya/DphQqwFKUYXjY+YPIfd2fq8aoPHr9h0I8QxQP?=
+ =?us-ascii?Q?Ap6xOtVX48kcrFHzZkxw8Pbb94w25na4qHh1Uk18/6ltIl7IObyGSlTfXQok?=
+ =?us-ascii?Q?6vg/rfVTI4p8K820JjLDn+EydY486rUazaqavUs/p8MbD2tuTbtNcXW/To8F?=
+ =?us-ascii?Q?SKH25trbAFdesBdfNZNgg20QtI6ipHVHNCuNwRs9cVo0S4gW1D7y7VNP2/3g?=
+ =?us-ascii?Q?aJL1sohEnZDHHv2VMh7+tJdHpTWylPmrlpFLBIKfAGbCu8eQpiSf3lh/v2wi?=
+ =?us-ascii?Q?wKQthAemNUml8lDfatrFqnkzo1Au3MmN7YH1MbVzyiC1bXh2q9TqbAXjQV7R?=
+ =?us-ascii?Q?XRB7tay7+3ghpeYobfxKybN4fbzXeMiPTHGNFPtiTndJ51xT1JlrCeqf8s8Z?=
+ =?us-ascii?Q?oAbubpbeo7YT3DLJpMp9GOHRPQkZ3SUMKkLF9Gb07qwndJR01z27JaxL/8Ev?=
+ =?us-ascii?Q?vHwoz4jbOSRd4Sujp+JrqIvLvgh8F4nbMuHNoNRTNX2N8WYUGBvo4maQm4ME?=
+ =?us-ascii?Q?TbohS+Emx8v5DFwdrmW+nc3nNLfR9OQpT0RmJhK9RwYhNVPLpoxZ460BVx2b?=
+ =?us-ascii?Q?cHXreQ=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: dd057537-1c7f-4808-cc6d-08ddda94b57e
+X-MS-Exchange-CrossTenant-AuthSource: PA4PR04MB7790.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Aug 2025 18:09:02.3998
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Aug 2025 18:10:39.6152
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: mGEjC8YvyotngWGktxp/ypsoPIkodpyNvSzhpYabOmDZRzznAhrapNkkKIQPh5C0PjAB1+LO0YwRgyqrWvOCV6Ud/B01K0CMol3OjYQUos8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7309
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-UserPrincipalName: f/CdjkuokKeFT7Gn/uAJUWvrLbJJns8IqDD4sYoDR/GFQh9u6ixhNx3CQMYf7J78o8NT9GreCFu0BgV4h9H7wg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DUZPR04MB9918
 
-On Wed, Aug 13, 2025 at 08:34:52AM +0800, Jason Xing wrote:
-> Hi Maciej,
-> 
-> On Tue, Aug 12, 2025 at 11:42 PM Maciej Fijalkowski
-> <maciej.fijalkowski@intel.com> wrote:
-> >
-> > On Tue, Aug 12, 2025 at 03:55:04PM +0800, Jason Xing wrote:
-> > > From: Jason Xing <kernelxing@tencent.com>
-> > >
-> >
-> > Hi Jason,
-> >
-> > patches should be targetted at iwl-next as these are improvements, not
-> > fixes.
-> 
-> Oh, right.
-> 
-> >
-> > > Like what i40e driver initially did in commit 3106c580fb7cf
-> > > ("i40e: Use batched xsk Tx interfaces to increase performance"), use
-> > > the batched xsk feature to transmit packets.
-> > >
-> > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > > ---
-> > > In this version, I still choose use the current implementation. Last
-> > > time at the first glance, I agreed 'i' is useless but it is not.
-> > > https://lore.kernel.org/intel-wired-lan/CAL+tcoADu-ZZewsZzGDaL7NugxFTWO_Q+7WsLHs3Mx-XHjJnyg@mail.gmail.com/
-> >
-> > dare to share the performance improvement (if any, in the current form)?
-> 
-> I tested the whole series, sorry, no actual improvement could be seen
-> through xdpsock. Not even with the first series. :(
+These are present since commit d8652956cf37 ("net: dsa: realtek-smi: Add
+Realtek SMI driver") and never needed. Apparently the driver was not
+cleaned up sufficiently for submission.
 
-So if i were you i would hesitate with posting it :P in the past batching
-approaches always yielded performance gain.
+Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+---
+ drivers/net/dsa/realtek/realtek.h | 3 ---
+ 1 file changed, 3 deletions(-)
 
-> 
-> >
-> > also you have not mentioned in v1->v2 that you dropped the setting of
-> > xdp_zc_max_segs, which is a step in a correct path.
-> 
-> Oops, I blindly dropped the last patch without carefully checking it.
-> Thanks for showing me.
-> 
-> I set it as four for ixgbe. I'm not that sure if there is any theory
-> behind setting this value?
+diff --git a/drivers/net/dsa/realtek/realtek.h b/drivers/net/dsa/realtek/realtek.h
+index 7f652b245b2e..580a7c55d1e8 100644
+--- a/drivers/net/dsa/realtek/realtek.h
++++ b/drivers/net/dsa/realtek/realtek.h
+@@ -19,9 +19,6 @@
+ 
+ struct phylink_mac_ops;
+ struct realtek_ops;
+-struct dentry;
+-struct inode;
+-struct file;
+ 
+ struct rtl8366_mib_counter {
+ 	unsigned int	base;
+-- 
+2.43.0
 
-you're confusing two different things. xdp_zc_max_segs is related to
-multi-buffer support in xsk zc whereas you're referring to loop unrolling
-counter.
-
-> 
-> >
-> > > ---
-> > >  drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c | 106 +++++++++++++------
-> > >  1 file changed, 72 insertions(+), 34 deletions(-)
-> > >
-> > > diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
-> > > index f3d3f5c1cdc7..9fe2c4bf8bc5 100644
-> > > --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
-> > > +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
-> > > @@ -2,12 +2,15 @@
-> > >  /* Copyright(c) 2018 Intel Corporation. */
-> > >
-> > >  #include <linux/bpf_trace.h>
-> > > +#include <linux/unroll.h>
-> > >  #include <net/xdp_sock_drv.h>
-> > >  #include <net/xdp.h>
-> > >
-> > >  #include "ixgbe.h"
-> > >  #include "ixgbe_txrx_common.h"
-> > >
-> > > +#define PKTS_PER_BATCH 4
-> > > +
-> > >  struct xsk_buff_pool *ixgbe_xsk_pool(struct ixgbe_adapter *adapter,
-> > >                                    struct ixgbe_ring *ring)
-> > >  {
-> > > @@ -388,58 +391,93 @@ void ixgbe_xsk_clean_rx_ring(struct ixgbe_ring *rx_ring)
-> > >       }
-> > >  }
-> > >
-> > > -static bool ixgbe_xmit_zc(struct ixgbe_ring *xdp_ring, unsigned int budget)
-> > > +static void ixgbe_set_rs_bit(struct ixgbe_ring *xdp_ring)
-> > > +{
-> > > +     u16 ntu = xdp_ring->next_to_use ? xdp_ring->next_to_use - 1 : xdp_ring->count - 1;
-> > > +     union ixgbe_adv_tx_desc *tx_desc;
-> > > +
-> > > +     tx_desc = IXGBE_TX_DESC(xdp_ring, ntu);
-> > > +     tx_desc->read.cmd_type_len |= cpu_to_le32(IXGBE_TXD_CMD_RS);
-> >
-> > you have not addressed the descriptor cleaning path which makes this
-> > change rather pointless or even the driver behavior is broken.
-> 
-> Are you referring to 'while (ntc != ntu) {}' in
-> ixgbe_clean_xdp_tx_irq()? But I see no difference between that part
-> and the similar part 'for (i = 0; i < completed_frames; i++) {}' in
-> i40e_clean_xdp_tx_irq()
-
-	if (likely(!tx_ring->xdp_tx_active)) {
-		xsk_frames = completed_frames;
-		goto skip;
-	}
-> 
-> >
-> > point of such change is to limit the interrupts raised by HW once it is
-> > done with sending the descriptor. you still walk the descs one-by-one in
-> > ixgbe_clean_xdp_tx_irq().
-> 
-> Sorry, I must be missing something important. In my view only at the
-> end of ixgbe_xmit_zc(), ixgbe always kicks the hardware through
-> ixgbe_xdp_ring_update_tail() before/after this series.
-> 
-> As to 'one-by-one', I see i40e also handles like that in 'for (i = 0;
-> i < completed_frames; i++)' in i40e_clean_xdp_tx_irq(). Ice does this
-> in ice_clean_xdp_irq_zc()?
-
-i40e does not look up DD bit from descriptor. plus this loop you refer to
-is taken only when (see above) xdp_tx_active is not 0 (meaning that there
-have been some XDP_TX action on queue and we have to clean the buffer in a
-different way).
-
-in general i would advise to look at ice as i40e writes back the tx ring
-head which is used in cleaning logic. ice does not have this feature,
-neither does ixgbe.
-
-> 
-> Could you shed some light on this? Thanks in advance!
-> 
-> Thanks,
-> Jason
-> 
-> >
-> > > +}
-> > > +
-> > > +static void ixgbe_xmit_pkt(struct ixgbe_ring *xdp_ring, struct xdp_desc *desc,
-> > > +                        int i)
-> > > +
-> > >  {
-> > >       struct xsk_buff_pool *pool = xdp_ring->xsk_pool;
-> > >       union ixgbe_adv_tx_desc *tx_desc = NULL;
-> > >       struct ixgbe_tx_buffer *tx_bi;
-> > > -     struct xdp_desc desc;
-> > >       dma_addr_t dma;
-> > >       u32 cmd_type;
-> > >
-> > > -     if (!budget)
-> > > -             return true;
-> > > +     dma = xsk_buff_raw_get_dma(pool, desc[i].addr);
-> > > +     xsk_buff_raw_dma_sync_for_device(pool, dma, desc[i].len);
-> > >
-> > > -     while (likely(budget)) {
-> > > -             if (!netif_carrier_ok(xdp_ring->netdev))
-> > > -                     break;
-> > > +     tx_bi = &xdp_ring->tx_buffer_info[xdp_ring->next_to_use];
-> > > +     tx_bi->bytecount = desc[i].len;
-> > > +     tx_bi->xdpf = NULL;
-> > > +     tx_bi->gso_segs = 1;
-> > >
-> > > -             if (!xsk_tx_peek_desc(pool, &desc))
-> > > -                     break;
-> > > +     tx_desc = IXGBE_TX_DESC(xdp_ring, xdp_ring->next_to_use);
-> > > +     tx_desc->read.buffer_addr = cpu_to_le64(dma);
-> > >
-> > > -             dma = xsk_buff_raw_get_dma(pool, desc.addr);
-> > > -             xsk_buff_raw_dma_sync_for_device(pool, dma, desc.len);
-> > > +     cmd_type = IXGBE_ADVTXD_DTYP_DATA |
-> > > +                IXGBE_ADVTXD_DCMD_DEXT |
-> > > +                IXGBE_ADVTXD_DCMD_IFCS;
-> > > +     cmd_type |= desc[i].len | IXGBE_TXD_CMD_EOP;
-> > > +     tx_desc->read.cmd_type_len = cpu_to_le32(cmd_type);
-> > > +     tx_desc->read.olinfo_status =
-> > > +             cpu_to_le32(desc[i].len << IXGBE_ADVTXD_PAYLEN_SHIFT);
-> > >
-> > > -             tx_bi = &xdp_ring->tx_buffer_info[xdp_ring->next_to_use];
-> > > -             tx_bi->bytecount = desc.len;
-> > > -             tx_bi->xdpf = NULL;
-> > > -             tx_bi->gso_segs = 1;
-> > > +     xdp_ring->next_to_use++;
-> > > +}
-> > >
-> > > -             tx_desc = IXGBE_TX_DESC(xdp_ring, xdp_ring->next_to_use);
-> > > -             tx_desc->read.buffer_addr = cpu_to_le64(dma);
-> > > +static void ixgbe_xmit_pkt_batch(struct ixgbe_ring *xdp_ring, struct xdp_desc *desc)
-> > > +{
-> > > +     u32 i;
-> > >
-> > > -             /* put descriptor type bits */
-> > > -             cmd_type = IXGBE_ADVTXD_DTYP_DATA |
-> > > -                        IXGBE_ADVTXD_DCMD_DEXT |
-> > > -                        IXGBE_ADVTXD_DCMD_IFCS;
-> > > -             cmd_type |= desc.len | IXGBE_TXD_CMD;
-> > > -             tx_desc->read.cmd_type_len = cpu_to_le32(cmd_type);
-> > > -             tx_desc->read.olinfo_status =
-> > > -                     cpu_to_le32(desc.len << IXGBE_ADVTXD_PAYLEN_SHIFT);
-> > > +     unrolled_count(PKTS_PER_BATCH)
-> > > +     for (i = 0; i < PKTS_PER_BATCH; i++)
-> > > +             ixgbe_xmit_pkt(xdp_ring, desc, i);
-> > > +}
-> > >
-> > > -             xdp_ring->next_to_use++;
-> > > -             if (xdp_ring->next_to_use == xdp_ring->count)
-> > > -                     xdp_ring->next_to_use = 0;
-> > > +static void ixgbe_fill_tx_hw_ring(struct ixgbe_ring *xdp_ring,
-> > > +                               struct xdp_desc *descs, u32 nb_pkts)
-> > > +{
-> > > +     u32 batched, leftover, i;
-> > > +
-> > > +     batched = nb_pkts & ~(PKTS_PER_BATCH - 1);
-> > > +     leftover = nb_pkts & (PKTS_PER_BATCH - 1);
-> > > +     for (i = 0; i < batched; i += PKTS_PER_BATCH)
-> > > +             ixgbe_xmit_pkt_batch(xdp_ring, &descs[i]);
-> > > +     for (i = batched; i < batched + leftover; i++)
-> > > +             ixgbe_xmit_pkt(xdp_ring, &descs[i], 0);
-> > > +}
-> > >
-> > > -             budget--;
-> > > -     }
-> > > +static bool ixgbe_xmit_zc(struct ixgbe_ring *xdp_ring, unsigned int budget)
-> > > +{
-> > > +     struct xdp_desc *descs = xdp_ring->xsk_pool->tx_descs;
-> > > +     u32 nb_pkts, nb_processed = 0;
-> > >
-> > > -     if (tx_desc) {
-> > > -             ixgbe_xdp_ring_update_tail(xdp_ring);
-> > > -             xsk_tx_release(pool);
-> > > +     if (!netif_carrier_ok(xdp_ring->netdev))
-> > > +             return true;
-> > > +
-> > > +     nb_pkts = xsk_tx_peek_release_desc_batch(xdp_ring->xsk_pool, budget);
-> > > +     if (!nb_pkts)
-> > > +             return true;
-> > > +
-> > > +     if (xdp_ring->next_to_use + nb_pkts >= xdp_ring->count) {
-> > > +             nb_processed = xdp_ring->count - xdp_ring->next_to_use;
-> > > +             ixgbe_fill_tx_hw_ring(xdp_ring, descs, nb_processed);
-> > > +             xdp_ring->next_to_use = 0;
-> > >       }
-> > >
-> > > -     return !!budget;
-> > > +     ixgbe_fill_tx_hw_ring(xdp_ring, &descs[nb_processed], nb_pkts - nb_processed);
-> > > +
-> > > +     ixgbe_set_rs_bit(xdp_ring);
-> > > +     ixgbe_xdp_ring_update_tail(xdp_ring);
-> > > +
-> > > +     return nb_pkts < budget;
-> > >  }
-> > >
-> > >  static void ixgbe_clean_xdp_tx_buffer(struct ixgbe_ring *tx_ring,
-> > > --
-> > > 2.41.3
-> > >
 
