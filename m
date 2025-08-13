@@ -1,61 +1,63 @@
-Return-Path: <netdev+bounces-213366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213367-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06992B24C27
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 16:40:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30AF2B24C5B
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 16:48:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 920823ABE9E
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 14:37:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD4CA3B39B5
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 14:48:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD0822E172C;
-	Wed, 13 Aug 2025 14:34:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E90992EBDC1;
+	Wed, 13 Aug 2025 14:48:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jU+4ck74"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WJ+5earH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 964CC1E22E9;
-	Wed, 13 Aug 2025 14:34:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA6971D54D8;
+	Wed, 13 Aug 2025 14:48:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755095693; cv=none; b=Q+igYv/G+joTJV55rPiobcDwOrmFcRDZaByoXIxwKN7zSLefJJDZuhGRP0PrD2BJqvErGE41nJofv4aU22qwnSAw0Xj7y7PJbwIf/7Le0tFEDS3dwd+T/X7c0xPOmuwyYMRHu3E9MTxh1OAc8GpL8wnq+NixCTcGGQdg1PjGpLU=
+	t=1755096484; cv=none; b=PhcV7mqAVWQwREjC+uWU3YlzVfDhxEjNZ1BpwFC+0Lz1jmAqn7mfuGFe1puDlsdtN4Vv7h17wQxxUlzbA+1DYMi8ROAPbYHn0e5U44y5boxxRmJE9t2qJHYgLYeormAZ3/9kHaaaSV44PuwdZB38By3qoQGa/pV/7zzmbOisgkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755095693; c=relaxed/simple;
-	bh=9KT4Ptd/LkLHSPZNthcxtGmb/B9hmXvuWaBRPjZOEg0=;
+	s=arc-20240116; t=1755096484; c=relaxed/simple;
+	bh=Qn8agVW9Vlcdpw9sdzCP4IVz3IhuXOJzbYXLkGDbi9c=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=h6yHHFnNdZk3JTKWD7ugRyxxLWUwhbem9yOsLivvQ8FU6PqfHCGcvBQeaL5Ve0/g7cZYM8jAwV/I3mJvyA0bZMxybC9bBNFwierKBw7UXN9GQ/U5ufZc00r7kKGJTBEnDoLdwYRrgnnXEKdwpzOzBIEiyzXWuIbtUKLdBLhNOJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jU+4ck74; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 830E9C4CEEB;
-	Wed, 13 Aug 2025 14:34:52 +0000 (UTC)
+	 MIME-Version:Content-Type; b=UKZd+mxVh0Bv+zeRf5KVEU2QoySCmKEm65D+wM8ixagOkTbQMTuHDBrvFqniwEOSKuWoF2HzbEBKGGidjG6bjYi9vHdlx5MtWCC0JUegCPH9l6XZ04vDalDTcxzuR1BSyOWLv/VtyeY/EUXeLpvKFJMfUuCcpFJ2drfLOFLOwXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WJ+5earH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0743DC4CEF6;
+	Wed, 13 Aug 2025 14:48:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755095693;
-	bh=9KT4Ptd/LkLHSPZNthcxtGmb/B9hmXvuWaBRPjZOEg0=;
+	s=k20201202; t=1755096484;
+	bh=Qn8agVW9Vlcdpw9sdzCP4IVz3IhuXOJzbYXLkGDbi9c=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jU+4ck74Tqk3bbtZemE2sPvQ3JUQJlqTLjbz40tZM7Yf0mPlK+9GGjxHd5PG/c9Qn
-	 Fk6J5vEQLOz+3GK8HKArPmjlsK3PVlIVs/xvVOzOuPLjHytaIXkyAf7w40fLz0/0VR
-	 tgFyhlIeeROTYu/K7kDOW8W1NSx/KxEzFI5bsarZoddrur3loLvtYm7ALhSWeqYEzV
-	 NCqnfg5+7QRw41WYZQEqKt469z+ARCAhq56fVIqX7c88RRlnFzvB8e367HdnfiEG5e
-	 97MfkYhorkSxIQuuUdIh1Do0/VmIaMYGsRNmUCXG7E9vwE90FEAheC2ODLW3uJwsBl
-	 LpcejhUBjb5pQ==
-Date: Wed, 13 Aug 2025 07:34:51 -0700
+	b=WJ+5earHOqQatrSxfBJByiizZL9FAcLc+WKCq9ogrON7Wvj8KX2WLcohGJCWZa83g
+	 d15jRGcqsMGmyxjVgqkDCTM7Kjryz4pf4+qDB4qVOfjesSXDXheeZSHvl38VgKntSs
+	 0HRj0k6gbXf+CiHVL6P1+vN267NnSR2ovXNyS8A2hiz4t9UAN3p/maZJ/Lbnr1wHt9
+	 qRzvGSTsBs0VuXl6x3J5EDjZtkGyraW3dJOmBIOT8YwgyZmuIYyWeWfGF9IlS8Gjmn
+	 SblkTEKOfpRW0wgUdUH484VEiWKE8GoS7ox3HUYQxHFaNgwEN8gwYvofYsQprDCaw2
+	 M3zVOtUlw4E+w==
+Date: Wed, 13 Aug 2025 07:48:03 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Richard Gobert <richardbgobert@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, horms@kernel.org, donald.hunter@gmail.com,
- andrew+netdev@lunn.ch, dsahern@kernel.org, shuah@kernel.org,
- daniel@iogearbox.net, jacob.e.keller@intel.com, razor@blackwall.org,
- idosch@nvidia.com, petrm@nvidia.com, menglong8.dong@gmail.com,
- martin.lau@kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v5 5/5] selftests/net: add vxlan localbind
- selftest
-Message-ID: <20250813073451.159c5904@kernel.org>
-In-Reply-To: <20250812125155.3808-6-richardbgobert@gmail.com>
-References: <20250812125155.3808-1-richardbgobert@gmail.com>
-	<20250812125155.3808-6-richardbgobert@gmail.com>
+To: Roger Quadros <rogerq@kernel.org>
+Cc: Siddharth Vadapalli <s-vadapalli@ti.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Russell
+ King <linux@armlinux.org.uk>, danishanwar@ti.com, srk@ti.com,
+ linux-omap@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v4 8/9] net: ethernet: ti: am65-cpsw: add
+ network flow classification support
+Message-ID: <20250813074803.06db304a@kernel.org>
+In-Reply-To: <d787ca03-a54e-46ae-828b-68fbd7b0b3a8@kernel.org>
+References: <20250514-am65-cpsw-rx-class-v4-0-5202d8119241@kernel.org>
+	<20250514-am65-cpsw-rx-class-v4-8-5202d8119241@kernel.org>
+	<20250516182902.5a5bfd98@kernel.org>
+	<d787ca03-a54e-46ae-828b-68fbd7b0b3a8@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,14 +67,29 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 12 Aug 2025 14:51:55 +0200 Richard Gobert wrote:
-> +ip link help vxlan 2>&1 | grep -q "localbind"
-> +if [ $? -ne 0 ]; then
-> +	echo "SKIP: iproute2 ip too old, missing VXLAN localbind support"
-> +	exit $ksft_skip
-> +fi
+On Wed, 13 Aug 2025 16:49:27 +0300 Roger Quadros wrote:
+> On 17/05/2025 04:29, Jakub Kicinski wrote:
+> > On Wed, 14 May 2025 15:04:28 +0300 Roger Quadros wrote:  
+> >> The TRM doesn't mention anything about order of evaluation of the
+> >> classifier rules however it does mention in [1]
+> >> "if multiple classifier matches occur, the highest match
+> >> with thread enable bit set will be used."  
+> > 
+> > So we're not sure how to maintain the user requested ordering?  
+> 
+> Currently we are using the user/ethtool provided location as is.
+> 
+> > Am I reading this correctly? If so then ..
+> >   
+> >> +	if (fs->location == RX_CLS_LOC_ANY ||  
+> > 
+> > .. why are we rejecting LOC_ANY?   
+> 
+> Because driver doesn't have logic to decide the location and relies on ethtool to
+> decide it if user doesn't supply it.
 
-Could you add a link to a public GH with the iproute2 patches,
-or co-post them?
-https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#co-posting-changes-to-user-space-components
+The location supplied by the user may have semantic significance.
+IOW locations may be interpreted as priorities.
+It's better to support LOC_ANY and add the 10 lines of code to
+allocate the id in the driver..
 
