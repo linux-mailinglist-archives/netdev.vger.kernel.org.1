@@ -1,513 +1,160 @@
-Return-Path: <netdev+bounces-213332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213333-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC89BB249AE
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 14:44:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C05D7B249B5
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 14:44:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 41E2B7AEAD6
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 12:42:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4FE9A564415
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 12:44:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7CE92E11AE;
-	Wed, 13 Aug 2025 12:44:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MEPW4mhv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10A762E172F;
+	Wed, 13 Aug 2025 12:44:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81D3C2D6401
-	for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 12:44:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 447D92E11CB
+	for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 12:44:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755089052; cv=none; b=b+h8QxROavxw3ZQEgU75N6x1Ng3a18EWSpJCZvrZMtfMdvRHWBgQIuckQcDrOuvlvbDePgEBiOACs5ZbGpOqxc12LXtnuKKam7+R0olfhQVb0NREdRQfyBk4WHyk5kml7g/1SNVl7a0/69RxYYf3DEiBFTntH9VxnjPXwJ0CDh8=
+	t=1755089079; cv=none; b=VMswQim0cWFht7QxByme2/NGz6GEAnxYYUW6Yi3zITYjNlJP5WwZJnYJanHjThB48GU2ZDvLH4H9TI2gfonjW8w+903GRX/0UwJ7sRPBIj10d2iC7T6bfFAnerxyEXqUlhVOWNq5txxJD/ioRY5QVUzjK5nIy72Zj8zHzZHIdho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755089052; c=relaxed/simple;
-	bh=OQ9wDXAUkHJft+ZmwiIr5a/xqK19PnDlqBPLH5O0T3M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gF+VlxwNslJzoBVI7XrxlK8lBLjnLSWYCy1+14zjOOzYUulx2GZalHvfxNGD0ncQK0bcnoN1gkcPM0Os2I73goJHj3kbjVXHIGM3J6nRslCGeEqwvi1yBJAy1fVz0tNa3F0CdVgPwShPvZ+nVb9XVCv/DQjLpHWO2CmTQCjsvto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MEPW4mhv; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1755089049;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SaZ60ktydNak/kEhmaAG3tvsj+JZQVwyqYrBS19jQgY=;
-	b=MEPW4mhvuMHpBBe1ufdQ248uR0JE6ZXkR9mlMAbloJC+R25rFIqtBwM4ybaJLUT0WxVoGy
-	VGTwk9Feg2znIbfLqsibnv5rmGs9qWfLvMVLaDM430Ts7fasY5UaroWEEFdBHCbrapw42a
-	vuyYekCIgJXJe2xki1TPjaY9umfb1Zk=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-36-cC0pAQdPPFKveY2cPj_fkQ-1; Wed,
- 13 Aug 2025 08:44:06 -0400
-X-MC-Unique: cC0pAQdPPFKveY2cPj_fkQ-1
-X-Mimecast-MFC-AGG-ID: cC0pAQdPPFKveY2cPj_fkQ_1755089044
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E4CAA180035F;
-	Wed, 13 Aug 2025 12:44:03 +0000 (UTC)
-Received: from [10.45.224.146] (unknown [10.45.224.146])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5DF55195608F;
-	Wed, 13 Aug 2025 12:43:59 +0000 (UTC)
-Message-ID: <bad448ab-15dc-46de-983c-56fa6dfb758f@redhat.com>
-Date: Wed, 13 Aug 2025 14:43:57 +0200
+	s=arc-20240116; t=1755089079; c=relaxed/simple;
+	bh=jR6dXCBHCycpp6tXXaFEalzyWUvL8750GHQGErf0GcY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Dt/cM07B4yKsmFpsYwMuTaMPMnRpz+rcvTOitm2OqgdywxExB9CvOZ/C7rVYnZZ7U9Y4IPVYMkRTrWJr07hJdz6r90pb2OVVTlbzBORScFDE9J/30EhsOVUhR0S8HOsmMtCwSHIV1tCnERdPV5IOW9q9hUfLqRHUVsKnMgFRnAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1umAqC-00066E-Ae; Wed, 13 Aug 2025 14:44:28 +0200
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1umAqB-0005ki-1i;
+	Wed, 13 Aug 2025 14:44:27 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1umAqB-00954v-1L;
+	Wed, 13 Aug 2025 14:44:27 +0200
+Date: Wed, 13 Aug 2025 14:44:27 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew@lunn.ch>, Michal Kubecek <mkubecek@suse.cz>,
+	Dent Project <dentproject@linuxfoundation.org>,
+	Kyle Swenson <kyle.swenson@est.tech>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH ethtool v2 3/3] ethtool: pse-pd: Add PSE event monitoring
+ support
+Message-ID: <aJyIqz4T1MWuI-p9@pengutronix.de>
+References: <20250813-b4-feature_poe_pw_budget-v2-0-0bef6bfcc708@bootlin.com>
+ <20250813-b4-feature_poe_pw_budget-v2-3-0bef6bfcc708@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 3/5] dpll: zl3073x: Add firmware loading
- functionality
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- Prathosh Satish <Prathosh.Satish@microchip.com>, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, Michal Schmidt <mschmidt@redhat.com>,
- Petr Oros <poros@redhat.com>
-References: <20250811144009.2408337-1-ivecera@redhat.com>
- <20250811144009.2408337-4-ivecera@redhat.com>
- <17492545-4a71-4809-ad19-f7e54139415e@intel.com>
-Content-Language: en-US
-From: Ivan Vecera <ivecera@redhat.com>
-In-Reply-To: <17492545-4a71-4809-ad19-f7e54139415e@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250813-b4-feature_poe_pw_budget-v2-3-0bef6bfcc708@bootlin.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
+On Wed, Aug 13, 2025 at 10:57:52AM +0200, Kory Maincent wrote:
+> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+.... 
+> diff --git a/netlink/pse-pd.c b/netlink/pse-pd.c
+> index 5bde176..3fb0616 100644
+> --- a/netlink/pse-pd.c
+> +++ b/netlink/pse-pd.c
+> @@ -475,6 +475,64 @@ int nl_gpse(struct cmd_context *ctx)
+>  	return ret;
+>  }
+>  
+> +static const char *pse_events_name(u64 val)
+> +{
+> +	switch (val) {
+> +	case ETHTOOL_PSE_EVENT_OVER_CURRENT:
+> +		return "over-current";
+> +	case ETHTOOL_PSE_EVENT_OVER_TEMP:
+> +		return "over-temperature";
+> +	case ETHTOOL_C33_PSE_EVENT_DETECTION:
+> +		return "detection";
+> +	case ETHTOOL_C33_PSE_EVENT_CLASSIFICATION:
+> +		return "classification";
+> +	case ETHTOOL_C33_PSE_EVENT_DISCONNECTION:
+> +		return "disconnection";
+> +	case ETHTOOL_PSE_EVENT_OVER_BUDGET:
+> +		return "over-budget";
+> +	case ETHTOOL_PSE_EVENT_SW_PW_CONTROL_ERROR:
+> +		return "software power control error";
+> +	default:
+> +		return "unknown";
+> +	}
+> +}
+> +
+> +int pse_ntf_cb(const struct nlmsghdr *nlhdr, void *data)
+> +{
+> +	const struct nlattr *tb[ETHTOOL_A_PSE_MAX + 1] = {};
 
+s/ETHTOOL_A_PSE_MAX/ETHTOOL_A_PSE_NTF_MAX ?
 
-On 12. 08. 25 1:11 dop., Przemek Kitszel wrote:
-> On 8/11/25 16:40, Ivan Vecera wrote:
->> Add functionality for loading firmware files provided by the vendor
->> to be flashed into the device's internal flash memory. The firmware
->> consists of several components, such as the firmware executable itself,
->> chip-specific customizations, and configuration files.
->>
->> The firmware file contains at least a flash utility, which is executed
->> on the device side, and one or more flashable components. Each component
->> has its own specific properties, such as the address where it should be
->> loaded during flashing, one or more destination flash pages, and
->> the flashing method that should be used.
->>
->> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
->> ---
->> v2:
->> * added additional includes
->> * removed empty line
->> * '*(dst+len)' -> '*(dst + len)'
->> * 'Santity' -> 'Sanity'
->> * fixed smatch warning about uninitialized 'rc'
->> ---
->>   drivers/dpll/zl3073x/Makefile |   2 +-
->>   drivers/dpll/zl3073x/fw.c     | 498 ++++++++++++++++++++++++++++++++++
->>   drivers/dpll/zl3073x/fw.h     |  52 ++++
->>   3 files changed, 551 insertions(+), 1 deletion(-)
->>   create mode 100644 drivers/dpll/zl3073x/fw.c
->>   create mode 100644 drivers/dpll/zl3073x/fw.h
->>
-> 
-> overview:
-> I don't like zl3073x_fw_readline() and it's usage - sscanf will do IMO
-> 
-> please find other feedback inline
-> 
->> +/* Sanity check */
->> +static_assert(ARRAY_SIZE(component_info) == ZL_FW_NUM_COMPONENTS);
->> +
->> +/**
->> + * zl3073x_fw_readline - Read next line from firmware
->> + * @dst: destination buffer
->> + * @dst_sz: destination buffer size
->> + * @psrc: source buffer
->> + * @psrc_sz: source buffer size
->> + *
->> + * The function read next line from the firmware buffer specified by 
->> @psrc
->> + * and @psrc_sz and stores it into buffer specified by @dst and @dst_sz.
->> + * The pointer @psrc and remaining bytes in @psrc_sz are updated 
->> accordingly.
->> + *
->> + * Return: number of characters read on success, -EINVAL on error
->> + */
->> +static ssize_t
->> +zl3073x_fw_readline(char *dst, size_t dst_sz, const char **psrc,
->> +            size_t *psrc_sz)
->> +{
->> +    const char *ptr = *psrc;
->> +    size_t len;
->> +
->> +    /* Skip any existing new-lines at the beginning */
->> +    ptr = memchr_inv(*psrc, '\n', *psrc_sz);
->> +    if (ptr) {
->> +        *psrc_sz -= ptr - *psrc;
->> +        *psrc = ptr;
->> +    }
->> +
->> +    /* Now look for the next new-line in the source */
->> +    ptr = memscan((void *)*psrc, '\n', *psrc_sz);
->> +    len = ptr - *psrc;
->> +
->> +    /* Return error if the source line is too long for destination */
->> +    if (len >= dst_sz)
->> +        return -EINVAL;
->> +
->> +    /* Copy the line from source and append NUL char  */
->> +    memcpy(dst, *psrc, len);
->> +    *(dst + len) = '\0';
->> +
->> +    *psrc = ptr;
->> +    *psrc_sz -= len;
->> +
->> +    /* Return number of read chars */
->> +    return len;
->> +}
->> +
->> +/**
->> + * zl3073x_fw_component_alloc - Alloc structure to hold firmware 
->> component
->> + * @size: size of buffer to store data
->> + *
->> + * Return: pointer to allocated component structure or NULL on error.
->> + */
->> +static struct zl3073x_fw_component *
->> +zl3073x_fw_component_alloc(size_t size)
->> +{
->> +    struct zl3073x_fw_component *comp;
->> +
->> +    comp = kzalloc(sizeof(*comp), GFP_KERNEL);
->> +    if (!comp)
->> +        return NULL;
->> +
->> +    comp->size = size;
->> +    comp->data = kzalloc(size, GFP_KERNEL);
->> +    if (!comp->data) {
->> +        kfree(comp);
->> +        return NULL;
->> +    }
->> +
->> +    return comp;
->> +}
->> +
->> +/**
->> + * zl3073x_fw_component_free - Free allocated component structure
->> + * @comp: pointer to allocated component
->> + */
->> +static void
->> +zl3073x_fw_component_free(struct zl3073x_fw_component *comp)
->> +{
->> +    if (comp)
->> +        kfree(comp->data);
->> +
->> +    kfree(comp);
->> +}
->> +
->> +/**
->> + * zl3073x_fw_component_id_get - Get ID for firmware component name
->> + * @name: input firmware component name
->> + *
->> + * Return:
->> + * - ZL3073X_FW_COMPONENT_* ID for known component name
->> + * - ZL3073X_FW_COMPONENT_INVALID if the given name is unknown
->> + */
->> +static enum zl3073x_fw_component_id
->> +zl3073x_fw_component_id_get(const char *name)
->> +{
->> +    enum zl3073x_fw_component_id id;
->> +
->> +    for (id = ZL_FW_COMPONENT_UTIL; id < ZL_FW_NUM_COMPONENTS; id++)
-> 
-> I would type the start as "id = 0"
-> (as you did in other functions, eg zl3073x_fw_free())
+> +	struct nl_context *nlctx = data;
+> +	DECLARE_ATTR_TB_INFO(tb);
+> +	u64 val;
+> +	int ret, i;
+> +
+> +	ret = mnl_attr_parse(nlhdr, GENL_HDRLEN, attr_cb, &tb_info);
+> +	if (ret < 0)
+> +		return MNL_CB_OK;
+> +
+> +	if (!tb[ETHTOOL_A_PSE_NTF_EVENTS])
+> +		return MNL_CB_OK;
+> +
+> +	nlctx->devname = get_dev_name(tb[ETHTOOL_A_PSE_HEADER]);
 
-Will change.
+s/ETHTOOL_A_PSE_HEADER/ETHTOOL_A_PSE_NTF_HEADER ?
 
->> +        if (!strcasecmp(name, component_info[id].name))
->> +            return id;
->> +
->> +    return ZL_FW_COMPONENT_INVALID;
->> +}
->> +
->> +/**
->> + * zl3073x_fw_component_load - Load component from firmware source
->> + * @zldev: zl3073x device structure
->> + * @pcomp: pointer to loaded component
->> + * @psrc: data pointer to load component from
->> + * @psize: remaining bytes in buffer
->> + * @extack: netlink extack pointer to report errors
->> + *
->> + * The function allocates single firmware component and loads the 
->> data from
->> + * the buffer specified by @psrc and @psize. Pointer to allocated 
->> component
->> + * is stored in output @pcomp. Source data pointer @psrc and 
->> remaining bytes
->> + * @psize are updated accordingly.
->> + *
->> + * Return: 0 on success, <0 on error
-> 
-> document return of 1
+> +	if (!dev_ok(nlctx))
+> +		return MNL_CB_OK;
+> +
+> +	open_json_object(NULL);
+> +	print_string(PRINT_ANY, "ifname", "PSE event for %s:\n",
+> +		     nlctx->devname);
+> +	open_json_array("events", "Events:");
+> +	val = attr_get_uint(tb[ETHTOOL_A_PSE_NTF_EVENTS]);
 
-Will fix.
+we have here uint but val is u64, is it as expected?
 
->> + */
->> +static ssize_t
->> +zl3073x_fw_component_load(struct zl3073x_dev *zldev,
->> +              struct zl3073x_fw_component **pcomp,
->> +              const char **psrc, size_t *psize,
->> +              struct netlink_ext_ack *extack)
->> +{
->> +    const struct zl3073x_fw_component_info *info;
->> +    struct zl3073x_fw_component *comp = NULL;
->> +    struct device *dev = zldev->dev;
->> +    enum zl3073x_fw_component_id id;
->> +    ssize_t len, count;
->> +    u32 comp_size;
->> +    char line[32];
->> +    int rc;
->> +
->> +    /* Fetch image name from input */
->> +    len = zl3073x_fw_readline(line, sizeof(line), psrc, psize);
->> +    if (len < 0) {
->> +        rc = len;
->> +        goto err_unexpected;
->> +    } else if (!len) {
->> +        /* No more data */
->> +        return 0;
->> +    }
->> +
->> +    dev_dbg(dev, "Firmware component '%s' found\n", line);
->> +
->> +    id = zl3073x_fw_component_id_get(line);
->> +    if (id == ZL_FW_COMPONENT_INVALID) {
->> +        ZL3073X_FW_ERR_MSG(zldev, extack, "[%s] unknown component type",
->> +                   line);
->> +        return -EINVAL;
->> +    }
->> +
->> +    info = &component_info[id];
->> +
->> +    /* Fetch image size from input */
->> +    len = zl3073x_fw_readline(line, sizeof(line), psrc, psize);
->> +    if (len < 0) {
->> +        rc = len;
->> +        goto err_unexpected;
->> +    } else if (!len) {
->> +        ZL3073X_FW_ERR_MSG(zldev, extack, "[%s] missing size",
->> +                   info->name);
->> +        return -ENODATA;
->> +    }
->> +
->> +    rc = kstrtou32(line, 10, &comp_size);
->> +    if (rc) {
->> +        ZL3073X_FW_ERR_MSG(zldev, extack,
->> +                   "[%s] invalid size value '%s'", info->name,
->> +                   line);
->> +        return rc;
->> +    }
-> 
-> why not sscanf()? it would greatly simplify the above, and likely you
-> could entriely remove zl3073x_fw_readline() too
+> +	for (i = 0; 1 << i <= ETHTOOL_PSE_EVENT_SW_PW_CONTROL_ERROR; i++)
+> +		if (val & 1 << i)
+> +			print_string(PRINT_ANY, NULL, " %s",
+> +				     pse_events_name(val & 1 << i));
 
-I cannot use sscanf here because the input buffer is passed by devlink
-as 'struct firmware' buffer and this buffer is not null-terminated.
-In this case the driver would have to make a copy of the input buffer
-and place null char at the end. The firmware can have up to 256kB and
-IMO it is better to process original firmware buffer instead of extra
-copy.
-
->> +
->> +    comp_size *= sizeof(u32); /* convert num of dwords to bytes */
->> +
->> +    /* Check image size validity */
->> +    if (comp_size > component_info[id].max_size) {
->> +        ZL3073X_FW_ERR_MSG(zldev, extack,
->> +                   "[%s] component is too big (%u bytes)\n",
->> +                   info->name, comp_size);
->> +        return -EINVAL;
->> +    }
->> +
->> +    dev_dbg(dev, "Indicated component image size: %u bytes\n", 
->> comp_size);
->> +
->> +    /* Alloc component */
->> +    comp = zl3073x_fw_component_alloc(comp_size);
->> +    if (!comp) {
->> +        ZL3073X_FW_ERR_MSG(zldev, extack, "failed to alloc memory");
->> +        return -ENOMEM;
->> +    }
->> +    comp->id = id;
->> +
->> +    /* Load component data from firmware source */
->> +    for (count = 0; count < comp_size; count += 4) {
->> +        len = zl3073x_fw_readline(line, sizeof(line), psrc, psize);
->> +        if (len < 0) {
->> +            rc = len;
->> +            goto err_unexpected;
->> +        } else if (!len) {
->> +            ZL3073X_FW_ERR_MSG(zldev, extack, "[%s] missing data",
->> +                       info->name);
->> +            rc = -ENODATA;
->> +            goto err;
->> +        }
->> +
->> +        rc = kstrtou32(line, 16, comp->data + count);
->> +        if (rc) {
->> +            ZL3073X_FW_ERR_MSG(zldev, extack,
->> +                       "[%s] invalid data: '%s'",
->> +                       info->name, line);
->> +            goto err;
->> +        }
->> +    }
->> +
->> +    *pcomp = comp;
->> +
->> +    return 1;> +
->> +err_unexpected:
->> +    ZL3073X_FW_ERR_MSG(zldev, extack, "unexpected input");
->> +err:
->> +    zl3073x_fw_component_free(comp);
->> +
->> +    return rc;
->> +}
->> +
->> +/**
->> + * zl3073x_fw_free - Free allocated firmware
->> + * @fw: firmware pointer
->> + *
->> + * The function frees existing firmware allocated by @zl3073x_fw_load.
->> + */
->> +void zl3073x_fw_free(struct zl3073x_fw *fw)
->> +{
->> +    size_t i;
->> +
->> +    if (!fw)
->> +        return;
->> +
->> +    for (i = 0; i < ZL_FW_NUM_COMPONENTS; i++)
->> +        zl3073x_fw_component_free(fw->component[i]);
->> +
->> +    kfree(fw);
->> +}
->> +
->> +/**
->> + * zl3073x_fw_load - Load all components from source
->> + * @zldev: zl3073x device structure
->> + * @data: source buffer pointer
->> + * @size: size of source buffer
->> + * @extack: netlink extack pointer to report errors
->> + *
->> + * The functions allocate firmware structure and loads all components 
->> from
->> + * the given buffer specified by @data and @size.
->> + *
->> + * Return: pointer to firmware on success, error pointer on error
->> + */
->> +struct zl3073x_fw *zl3073x_fw_load(struct zl3073x_dev *zldev, const 
->> char *data,
->> +                   size_t size, struct netlink_ext_ack *extack)
->> +{
->> +    struct zl3073x_fw_component *comp;
->> +    enum zl3073x_fw_component_id id;
->> +    struct zl3073x_fw *fw;
->> +    ssize_t rc;
->> +
->> +    /* Allocate firmware structure */
->> +    fw = kzalloc(sizeof(*fw), GFP_KERNEL);
->> +    if (!fw)
->> +        return ERR_PTR(-ENOMEM);
->> +
->> +    do {
->> +        /* Load single component */
->> +        rc = zl3073x_fw_component_load(zldev, &comp, &data, &size,
->> +                           extack);
->> +        if (rc <= 0)
->> +            /* Everything was read or error occurred */
->> +            break;
->> +
->> +        id = comp->id;
->> +
->> +        /* Report error if the given component is present twice
->> +         * or more.
->> +         */
->> +        if (fw->component[id]) {
->> +            ZL3073X_FW_ERR_MSG(zldev, extack,
->> +                       "duplicate component '%s' detected",
->> +                       component_info[id].name);
->> +            zl3073x_fw_component_free(comp);
->> +            rc = -EINVAL;
->> +            break;
->> +        }
->> +
->> +        fw->component[id] = comp;
->> +    } while (1);
-> 
-> s/1/true/
-
-Will fix.
-
->> +
->> +    if (rc) {
->> +        /* Free allocated firmware in case of error */
->> +        zl3073x_fw_free(fw);
-> 
-> I found no call to it on success.
-
-The caller will deallocate it using zl3073x_fw_free()
-
-> 
->> +        return ERR_PTR(rc);
->> +    }
->> +
->> +    return fw;
->> +}
-> 
-> 
->> +++ b/drivers/dpll/zl3073x/fw.h
->> @@ -0,0 +1,52 @@
->> +/* SPDX-License-Identifier: GPL-2.0-only */
->> +
->> +#ifndef _ZL3073X_FW_H
->> +#define _ZL3073X_FW_H
->> +
->> +/*
->> + * enum zl3073x_fw_component_id - Identifiers for possible flash 
->> components
->> + */
->> +enum zl3073x_fw_component_id {
->> +    ZL_FW_COMPONENT_INVALID = -1,
->> +    ZL_FW_COMPONENT_UTIL = 0,
->> +    ZL_FW_COMPONENT_FW1,
->> +    ZL_FW_COMPONENT_FW2,
->> +    ZL_FW_COMPONENT_FW3,
->> +    ZL_FW_COMPONENT_CFG0,
->> +    ZL_FW_COMPONENT_CFG1,
->> +    ZL_FW_COMPONENT_CFG2,
->> +    ZL_FW_COMPONENT_CFG3,
->> +    ZL_FW_COMPONENT_CFG4,
->> +    ZL_FW_COMPONENT_CFG5,
->> +    ZL_FW_COMPONENT_CFG6,
->> +    ZL_FW_NUM_COMPONENTS,
-> 
-> no comma after enum that will be last forever (guard/size/max/num/cnt)
-
-Will fix.
-
->> +};
-> 
-
-Thanks,
-Ivan
-
+Hm, may be it is better to not limit to ETHTOOL_PSE_EVENT_SW_PW_CONTROL_ERROR
+and report unknow numeric value. It will keep even old ethtool at least
+partially usable.
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
