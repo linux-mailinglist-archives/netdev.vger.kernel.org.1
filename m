@@ -1,275 +1,207 @@
-Return-Path: <netdev+bounces-213206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213207-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD248B241D5
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 08:46:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8C62B241DB
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 08:49:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6EC07622F12
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 06:45:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6B3D162D06
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 06:49:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0A632D3A71;
-	Wed, 13 Aug 2025 06:45:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEED02D0C87;
+	Wed, 13 Aug 2025 06:49:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b="J3A5Pumv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f78.google.com (mail-io1-f78.google.com [209.85.166.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from SEYPR02CU001.outbound.protection.outlook.com (mail-koreacentralazon11013027.outbound.protection.outlook.com [40.107.44.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE7A42C2AB2
-	for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 06:45:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.78
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755067535; cv=none; b=rIYH05kLofNRi/fefdGBHwhvHXjbAHQa8ucniMll5pn3oCSWuz3WRM9zAxRkxi+b4OS0Px1D1PYtuImvgFUBQXvnZ8Lmqi12mT6340poIX88rgDqWzw4k6F0F7qIjzZbYWUxKzm+anLM73/HpktyfNLZb/X3DjEWxRxaKiWUMVA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755067535; c=relaxed/simple;
-	bh=huLVWDRNke8xg5Kjvlx5WsSzQGvnQrsipQTdrsMCIwc=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=IuXo4ivgwt9/XYxqtvbvEDtjuiitiiX628XKXhmwVS3yLuzntnfofGZZO5oWG6FqqmzEKDF9QjAXKj8FndgYbwrXwf3L1RSu9nXzgqBXVgidX1H4/+5T7O8L1BSdiQVcbX0YNvhAPonf4olfmp3Sd3oLF/X6SV+elytAeUcFE7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f78.google.com with SMTP id ca18e2360f4ac-88177a20e0fso1276638739f.0
-        for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 23:45:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755067533; x=1755672333;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1SZwkHD3CyNnXHRjhcNe6yr2ggQojGsRPamjq0xLWlU=;
-        b=DUDCOOuybIXSPKDRZ1nJj2Tm1Ws6d4gz1ioHBoBYzLf0eM01e+7XyEWcXQ8+pxAHSh
-         hi5ayQSaFqy1kGwQ3/zudvOxLBBAAQB4USbqMCsYNQFckserlxkdF8mr96Vgm9H+6jau
-         4mGnqdssxYTUJIXvCvq/YCVqnoio7cm7tCjEqEMlz2Oh9L4v5S7+5D/o4LtmY7NM0FnW
-         Bq708R+yFoBNWjMF6UFlrHTPkZyUYUUwdHdFXkPDOoqbLCl86OAhdwGWTyenafKPin2v
-         hpZHG2vObNm8MZIRywsrGgWVRbWnPOmG8LA0R2rCuyElvOKwWVMB25wDhGAPhPEgpnxx
-         lMfw==
-X-Forwarded-Encrypted: i=1; AJvYcCWqr/ctGhTzDwl8llLu0E+CHaVS3AYzc1HMXDjRq6+RmMEyL3ylWQWBI172S2XZvZcPb3hNzqU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxoT2pg8V4/bFM9xpLNNSTVxO0FIsci/S9k05s8haixML2OM45A
-	U0jKpSYIE6QpxViX/CcRBz0FrJtpaILnqaMczIrC54MXQPIlvF1/Z07fVXUPHLc9qyGsxJvs8TM
-	7UbXyu3WAwEay11wk6F5eaqs705C1MU2YFzAycDji+tMfqhZhmKy6C6OnzcY=
-X-Google-Smtp-Source: AGHT+IEHWcspNnFTr4GWBjfpAB9Iv4IRNOQOrPha43esbjqDXv4Z/MlF90qA+Jc1oB5yER+ksLvLVEE1N0odNjFf5ZZm0Rafph73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 254D88462;
+	Wed, 13 Aug 2025 06:49:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.44.27
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755067776; cv=fail; b=CP2yK3qtzcFHGDw9KDb5Xyg9T1YKyIXEh1nFvauOd5u0xemUIBMAdbI/4OZftnTO8buWZqw7178noBr37USHVZuNlK7rSO/uuBXD1ivUYwOOXAVgEOBD7U67nGnQHokBUPRgdEqTkbmexde5mi8fc7uDqkTMJlNjUC4l4rHNGVo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755067776; c=relaxed/simple;
+	bh=H3MJ7apaBhoYi4kWuVh2G8qckyOa/bX01FUUiR2Fluw=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Ih+xs9uaH/cZ8zvc4ybjIISlgyuTtl/iL5sTf5TnwVqmnfY8udTBtCvxis1lOcshY2pJMHnIWs9Rad+FxyG4vo8LMf9q+IaacJpsORr9yL9FBE6QMhRSvlZCn8q4+wf1A7lE4O1BOctuQFeowyAd+qWsdNvMDhI9PNMHnIKYVdk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com; spf=pass smtp.mailfrom=vivo.com; dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b=J3A5Pumv; arc=fail smtp.client-ip=40.107.44.27
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vivo.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ot/re4OS5mn6N3blz/T/mQWQpfVGshWfBxTFlhOy4d1LSPBEcEzxreUuVegsCYURQ17Kz5mG+eZs56+0Y4fMJOtlBGuD8bhMlBjaSpL3m1ouOqTz4UJCEF3IsIjHMUj6bEF/UkynpgbjQIX/SpdeScH/sbPO9A+M5YP8ecFAaKaxMfj43+vCDph2X/tL26ApJUVVBIeyJ3mXeHiGUFrUO6eccnqREor9uiaRgZq59FhFkn2RnSAjmeQdZK4LTzfblc3MSMSe6foz2qk2gc6p+XecWszU/tOIVaDID1SHaVW0WRj8cmqTmRrFeuyUvGoJMRdcpS8l9ZOcwSwj36aeQQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=H3MJ7apaBhoYi4kWuVh2G8qckyOa/bX01FUUiR2Fluw=;
+ b=gT2/Optm1ufC6tBt2uR6qx0kWzrz+KZDi+ubqUEz3NBKIrUga+wW0QMpCoAcITPysRugvbNJ5EYTqJ3GqJ6rAm4+eyl+IJK2Y/S+6d4L/TmDFXgksgV5AmhAbpxQ+7gwHeJsGuZw+iN0B6u2L2J52V7S+oFUsggQHF2TRU60Nnhuny8Dtfxzq83pW2C9LFbueOwzpiQMi2FnwU2bCeJVLtZObOXzq6rubU51ukPqbjVRBAnGc0PVlj2V7rXorPamKlY6SSZdy2hxvlMhdTJbPS8xMCkLC+9pXRu9jP//i24amC7lv6Vu78HNaN6z3Scl3ORsG162Z/V20rjk2oTHWw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
+ dkim=pass header.d=vivo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=H3MJ7apaBhoYi4kWuVh2G8qckyOa/bX01FUUiR2Fluw=;
+ b=J3A5PumvzThSlDkfYEnDnnijxem87pUKn5hqCWRxBWrcdcT/8it9uqSeH7RnP4ottam9MpT6X9BsEioUrw5v6jLQ5VGh5NmDlWhE9dCBuoYACP1QEaFbmhBYpKcGJvJRdnfRo+EELM37amPYGgUoZS4YU9CPXR5Tuw5bYhOOK3JBlZW2byI0MEKugayVYtqYiTL2T3LYv/AdyCag/8i1e487eTBOpDv22+daXZnLMWy2EC28aNdOn8TjGHvj/ZYU31VNQZQZGYmnlAdLFRzs2LsvFoUByFxoqlyIsQqohfbMo7V9R7feSI27Cpad8VmwoLQIJBahOJlnJS6wSyLhLw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=vivo.com;
+Received: from SI2PR06MB5140.apcprd06.prod.outlook.com (2603:1096:4:1af::9) by
+ TYUPR06MB6080.apcprd06.prod.outlook.com (2603:1096:400:344::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9009.21; Wed, 13 Aug 2025 06:49:29 +0000
+Received: from SI2PR06MB5140.apcprd06.prod.outlook.com
+ ([fe80::468a:88be:bec:666]) by SI2PR06MB5140.apcprd06.prod.outlook.com
+ ([fe80::468a:88be:bec:666%4]) with mapi id 15.20.9009.018; Wed, 13 Aug 2025
+ 06:49:29 +0000
+Message-ID: <98c6c93e-e370-4fd9-b47e-19ba4182e5cf@vivo.com>
+Date: Wed, 13 Aug 2025 14:49:22 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/5] net: use vmalloc_array() to simplify code
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Jiri Slaby <jirislaby@kernel.org>, Nick Kossifidis <mickflemm@gmail.com>,
+ Luis Chamberlain <mcgrof@kernel.org>, Brian Norris
+ <briannorris@chromium.org>, Francesco Dolcini <francesco@dolcini.it>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, Johannes Berg
+ <johannes.berg@intel.com>, Sascha Hauer <s.hauer@pengutronix.de>,
+ Kalle Valo <kvalo@kernel.org>, Aditya Kumar Singh <quic_adisi@quicinc.com>,
+ Roopni Devanathan <quic_rdevanat@quicinc.com>,
+ Dan Carpenter <dan.carpenter@linaro.org>,
+ "moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
+ "open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
+ open list <linux-kernel@vger.kernel.org>,
+ "open list:NETRONOME ETHERNET DRIVERS" <oss-drivers@corigine.com>,
+ "open list:ATHEROS ATH5K WIRELESS DRIVER" <linux-wireless@vger.kernel.org>,
+ "open list:XDP (eXpress Data Path):Keyword:(?:b|_)xdp(?:b|_)"
+ <bpf@vger.kernel.org>
+References: <20250812133226.258318-1-rongqianfeng@vivo.com>
+ <20250812134812.298c7d97@kernel.org>
+From: Qianfeng Rong <rongqianfeng@vivo.com>
+In-Reply-To: <20250812134812.298c7d97@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SG2PR01CA0187.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:189::12) To SI2PR06MB5140.apcprd06.prod.outlook.com
+ (2603:1096:4:1af::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a6b:6201:0:b0:884:1cc9:9b9b with SMTP id
- ca18e2360f4ac-884296a5492mr322440139f.13.1755067532844; Tue, 12 Aug 2025
- 23:45:32 -0700 (PDT)
-Date: Tue, 12 Aug 2025 23:45:32 -0700
-In-Reply-To: <000000000000750a0205f62abbf1@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <689c348c.050a0220.7f033.0141.GAE@google.com>
-Subject: Re: [syzbot] [net?] INFO: task hung in del_device_store
-From: syzbot <syzbot+6d10ecc8a97cc10639f9@syzkaller.appspotmail.com>
-To: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	hdanton@sina.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-
-syzbot has found a reproducer for the following issue on:
-
-HEAD commit:    8f5ae30d69d7 Linux 6.17-rc1
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
-console output: https://syzkaller.appspot.com/x/log.txt?x=15704da2580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=8c5ac3d8b8abfcb
-dashboard link: https://syzkaller.appspot.com/bug?extid=6d10ecc8a97cc10639f9
-compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
-userspace arch: arm64
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12702af0580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15816842580000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/18a2e4bd0c4a/disk-8f5ae30d.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/3b5395881b25/vmlinux-8f5ae30d.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/e875f4e3b7ff/Image-8f5ae30d.gz.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+6d10ecc8a97cc10639f9@syzkaller.appspotmail.com
-
-INFO: task syz-executor:6692 blocked for more than 144 seconds.
-      Not tainted 6.17.0-rc1-syzkaller-g8f5ae30d69d7 #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor    state:D stack:0     pid:6692  tgid:6692  ppid:1      task_flags:0x400140 flags:0x00000001
-Call trace:
- __switch_to+0x418/0x87c arch/arm64/kernel/process.c:741 (T)
- context_switch kernel/sched/core.c:5357 [inline]
- __schedule+0x13b0/0x2864 kernel/sched/core.c:6961
- __schedule_loop kernel/sched/core.c:7043 [inline]
- schedule+0xb4/0x230 kernel/sched/core.c:7058
- schedule_preempt_disabled+0x18/0x2c kernel/sched/core.c:7115
- __mutex_lock_common+0xca0/0x24ac kernel/locking/mutex.c:676
- __mutex_lock kernel/locking/mutex.c:760 [inline]
- mutex_lock_nested+0x2c/0x38 kernel/locking/mutex.c:812
- del_device_store+0xd4/0x31c drivers/net/netdevsim/bus.c:234
- bus_attr_store+0x80/0xa4 drivers/base/bus.c:172
- sysfs_kf_write+0x1a8/0x23c fs/sysfs/file.c:145
- kernfs_fop_write_iter+0x314/0x488 fs/kernfs/file.c:334
- new_sync_write fs/read_write.c:593 [inline]
- vfs_write+0x540/0xa3c fs/read_write.c:686
- ksys_write+0x120/0x210 fs/read_write.c:738
- __do_sys_write fs/read_write.c:749 [inline]
- __se_sys_write fs/read_write.c:746 [inline]
- __arm64_sys_write+0x7c/0x90 fs/read_write.c:746
- __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
- invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:49
- el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:132
- do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:151
- el0_svc+0x58/0x180 arch/arm64/kernel/entry-common.c:879
- el0t_64_sync_handler+0x84/0x12c arch/arm64/kernel/entry-common.c:898
- el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:596
-INFO: task syz-executor:6698 blocked for more than 144 seconds.
-      Not tainted 6.17.0-rc1-syzkaller-g8f5ae30d69d7 #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor    state:D stack:0     pid:6698  tgid:6698  ppid:6696   task_flags:0x400140 flags:0x00800000
-Call trace:
- __switch_to+0x418/0x87c arch/arm64/kernel/process.c:741 (T)
- context_switch kernel/sched/core.c:5357 [inline]
- __schedule+0x13b0/0x2864 kernel/sched/core.c:6961
- __schedule_loop kernel/sched/core.c:7043 [inline]
- schedule+0xb4/0x230 kernel/sched/core.c:7058
- schedule_preempt_disabled+0x18/0x2c kernel/sched/core.c:7115
- __mutex_lock_common+0xca0/0x24ac kernel/locking/mutex.c:676
- __mutex_lock kernel/locking/mutex.c:760 [inline]
- mutex_lock_nested+0x2c/0x38 kernel/locking/mutex.c:812
- device_lock include/linux/device.h:911 [inline]
- device_del+0xa4/0x808 drivers/base/core.c:3840
- device_unregister+0x2c/0xcc drivers/base/core.c:3919
- nsim_bus_dev_del drivers/net/netdevsim/bus.c:483 [inline]
- del_device_store+0x27c/0x31c drivers/net/netdevsim/bus.c:244
- bus_attr_store+0x80/0xa4 drivers/base/bus.c:172
- sysfs_kf_write+0x1a8/0x23c fs/sysfs/file.c:145
- kernfs_fop_write_iter+0x314/0x488 fs/kernfs/file.c:334
- new_sync_write fs/read_write.c:593 [inline]
- vfs_write+0x540/0xa3c fs/read_write.c:686
- ksys_write+0x120/0x210 fs/read_write.c:738
- __do_sys_write fs/read_write.c:749 [inline]
- __se_sys_write fs/read_write.c:746 [inline]
- __arm64_sys_write+0x7c/0x90 fs/read_write.c:746
- __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
- invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:49
- el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:132
- do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:151
- el0_svc+0x58/0x180 arch/arm64/kernel/entry-common.c:879
- el0t_64_sync_handler+0x84/0x12c arch/arm64/kernel/entry-common.c:898
- el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:596
-INFO: task syz-executor:6701 blocked for more than 144 seconds.
-      Not tainted 6.17.0-rc1-syzkaller-g8f5ae30d69d7 #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor    state:D stack:0     pid:6701  tgid:6701  ppid:6699   task_flags:0x400140 flags:0x00800000
-Call trace:
- __switch_to+0x418/0x87c arch/arm64/kernel/process.c:741 (T)
- context_switch kernel/sched/core.c:5357 [inline]
- __schedule+0x13b0/0x2864 kernel/sched/core.c:6961
- __schedule_loop kernel/sched/core.c:7043 [inline]
- schedule+0xb4/0x230 kernel/sched/core.c:7058
- schedule_preempt_disabled+0x18/0x2c kernel/sched/core.c:7115
- __mutex_lock_common+0xca0/0x24ac kernel/locking/mutex.c:676
- __mutex_lock kernel/locking/mutex.c:760 [inline]
- mutex_lock_nested+0x2c/0x38 kernel/locking/mutex.c:812
- del_device_store+0xd4/0x31c drivers/net/netdevsim/bus.c:234
- bus_attr_store+0x80/0xa4 drivers/base/bus.c:172
- sysfs_kf_write+0x1a8/0x23c fs/sysfs/file.c:145
- kernfs_fop_write_iter+0x314/0x488 fs/kernfs/file.c:334
- new_sync_write fs/read_write.c:593 [inline]
- vfs_write+0x540/0xa3c fs/read_write.c:686
- ksys_write+0x120/0x210 fs/read_write.c:738
- __do_sys_write fs/read_write.c:749 [inline]
- __se_sys_write fs/read_write.c:746 [inline]
- __arm64_sys_write+0x7c/0x90 fs/read_write.c:746
- __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
- invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:49
- el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:132
- do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:151
- el0_svc+0x58/0x180 arch/arm64/kernel/entry-common.c:879
- el0t_64_sync_handler+0x84/0x12c arch/arm64/kernel/entry-common.c:898
- el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:596
-INFO: task syz-executor:6706 blocked for more than 144 seconds.
-      Not tainted 6.17.0-rc1-syzkaller-g8f5ae30d69d7 #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor    state:D stack:0     pid:6706  tgid:6706  ppid:6705   task_flags:0x400140 flags:0x00800000
-Call trace:
- __switch_to+0x418/0x87c arch/arm64/kernel/process.c:741 (T)
- context_switch kernel/sched/core.c:5357 [inline]
- __schedule+0x13b0/0x2864 kernel/sched/core.c:6961
- __schedule_loop kernel/sched/core.c:7043 [inline]
- schedule+0xb4/0x230 kernel/sched/core.c:7058
- schedule_preempt_disabled+0x18/0x2c kernel/sched/core.c:7115
- __mutex_lock_common+0xca0/0x24ac kernel/locking/mutex.c:676
- __mutex_lock kernel/locking/mutex.c:760 [inline]
- mutex_lock_nested+0x2c/0x38 kernel/locking/mutex.c:812
- del_device_store+0xd4/0x31c drivers/net/netdevsim/bus.c:234
- bus_attr_store+0x80/0xa4 drivers/base/bus.c:172
- sysfs_kf_write+0x1a8/0x23c fs/sysfs/file.c:145
- kernfs_fop_write_iter+0x314/0x488 fs/kernfs/file.c:334
- new_sync_write fs/read_write.c:593 [inline]
- vfs_write+0x540/0xa3c fs/read_write.c:686
- ksys_write+0x120/0x210 fs/read_write.c:738
- __do_sys_write fs/read_write.c:749 [inline]
- __se_sys_write fs/read_write.c:746 [inline]
- __arm64_sys_write+0x7c/0x90 fs/read_write.c:746
- __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
- invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:49
- el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:132
- do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:151
- el0_svc+0x58/0x180 arch/arm64/kernel/entry-common.c:879
- el0t_64_sync_handler+0x84/0x12c arch/arm64/kernel/entry-common.c:898
- el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:596
-
-Showing all locks held in the system:
-1 lock held by khungtaskd/32:
- #0: ffff80008f9a9060 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire+0x4/0x48 include/linux/rcupdate.h:330
-3 locks held by kworker/u8:2/41:
-3 locks held by pr/ttyAMA-1/43:
-2 locks held by kworker/u8:5/1987:
-7 locks held by kworker/u8:7/2184:
-5 locks held by kworker/u8:8/2656:
-5 locks held by kworker/u8:9/4759:
-1 lock held by klogd/6155:
-3 locks held by udevd/6166:
-1 lock held by dhcpcd/6220:
-3 locks held by dhcpcd/6221:
-2 locks held by getty/6308:
- #0: ffff0000d73b90a0 (&tty->ldisc_sem){++++}-{0:0}, at: ldsem_down_read+0x3c/0x4c drivers/tty/tty_ldsem.c:340
- #1: ffff80009bbbb2f0 (&ldata->atomic_read_lock){+.+.}-{4:4}, at: n_tty_read+0x34c/0xfa4 drivers/tty/n_tty.c:2222
-4 locks held by syz-executor/6692:
- #0: ffff0000d802a428 (sb_writers#6){.+.+}-{0:0}, at: file_start_write include/linux/fs.h:3107 [inline]
- #0: ffff0000d802a428 (sb_writers#6){.+.+}-{0:0}, at: vfs_write+0x24c/0xa3c fs/read_write.c:682
- #1: ffff0000dc4fb888 (&of->mutex){+.+.}-{4:4}, at: kernfs_fop_write_iter+0x1b4/0x488 fs/kernfs/file.c:325
- #2: ffff0000c6c77e18 (kn->active#55){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x1d0/0x488 fs/kernfs/file.c:326
- #3: ffff800091a98908 (nsim_bus_dev_list_lock){+.+.}-{4:4}, at: del_device_store+0xd4/0x31c drivers/net/netdevsim/bus.c:234
-5 locks held by kworker/0:4/6694:
-5 locks held by syz-executor/6698:
- #0: ffff0000d802a428 (sb_writers#6){.+.+}-{0:0}, at: file_start_write include/linux/fs.h:3107 [inline]
- #0: ffff0000d802a428 (sb_writers#6){.+.+}-{0:0}, at: vfs_write+0x24c/0xa3c fs/read_write.c:682
- #1: ffff0000d9789088 (&of->mutex){+.+.}-{4:4}, at: kernfs_fop_write_iter+0x1b4/0x488 fs/kernfs/file.c:325
- #2: ffff0000c6c77e18 (kn->active#55){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x1d0/0x488 fs/kernfs/file.c:326
- #3: ffff800091a98908 (nsim_bus_dev_list_lock){+.+.}-{4:4}, at: del_device_store+0xd4/0x31c drivers/net/netdevsim/bus.c:234
- #4: ffff0000de8af0e8 (&dev->mutex){....}-{4:4}, at: device_lock include/linux/device.h:911 [inline]
- #4: ffff0000de8af0e8 (&dev->mutex){....}-{4:4}, at: device_del+0xa4/0x808 drivers/base/core.c:3840
-4 locks held by syz-executor/6701:
- #0: ffff0000d802a428 (sb_writers#6){.+.+}-{0:0}, at: file_start_write include/linux/fs.h:3107 [inline]
- #0: ffff0000d802a428 (sb_writers#6){.+.+}-{0:0}, at: vfs_write+0x24c/0xa3c fs/read_write.c:682
- #1: ffff0000c6553088 (&of->mutex){+.+.}-{4:4}, at: kernfs_fop_write_iter+0x1b4/0x488 fs/kernfs/file.c:325
- #2: ffff0000c6c77e18 (kn->active#55){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x1d0/0x488 fs/kernfs/file.c:326
- #3: ffff800091a98908 (nsim_bus_dev_list_lock){+.+.}-{4:4}, at: del_device_store+0xd4/0x31c drivers/net/netdevsim/bus.c:234
-4 locks held by syz-executor/6706:
- #0: ffff0000d802a428 (sb_writers#6){.+.+}-{0:0}, at: file_start_write include/linux/fs.h:3107 [inline]
- #0: ffff0000d802a428 (sb_writers#6){.+.+}-{0:0}, at: vfs_write+0x24c/0xa3c fs/read_write.c:682
- #1: ffff0000d7a2c488 (&of->mutex){+.+.}-{4:4}, at: kernfs_fop_write_iter+0x1b4/0x488 fs/kernfs/file.c:325
- #2: ffff0000c6c77e18 (kn->active#55){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x1d0/0x488 fs/kernfs/file.c:326
- #3: ffff800091a98908 (nsim_bus_dev_list_lock){+.+.}-{4:4}, at: del_device_store+0xd4/0x31c drivers/net/netdevsim/bus.c:234
-3 locks held by syz-executor/6770:
-3 locks held by kworker/u8:12/6772:
-2 locks held by syz-executor/6776:
-
-=============================================
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SI2PR06MB5140:EE_|TYUPR06MB6080:EE_
+X-MS-Office365-Filtering-Correlation-Id: e505c040-1f3b-4ca8-60ff-08ddda358d2f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?Qm5MeUJ6ZEhaTjJVZnRrWC8rZSsvTFpIMitXZG4xWTdWdkpBeWZneXhDZWpm?=
+ =?utf-8?B?cHoxMmg1ancyNXRlNmlZM0tLcEd1RVlKVTQ0c0JUUjhjSTJHNkxmcU12czkr?=
+ =?utf-8?B?WXhPaE9mVHhBNGZzYUgzcmZZczAvSkdnTytqSnpyUWRXeVpZVENtRXJhTUpX?=
+ =?utf-8?B?b0lqaW5oWU1YY05zWGovakd2cVY1NWVZd0NyaS9GRUcvdUhqVzFxYWlsVVlN?=
+ =?utf-8?B?ZFl1NzJMN0UwaDN0czlUYXBnZ296TTJmM2J4MXVSZ1ZicnJ3RXlNY3ZEU3Rt?=
+ =?utf-8?B?Nk9tSnQwMU5TcGdkai9sdjMwUHhzN1ViUVZkaVlEbnkyTTBHbm1FQVFVdFRv?=
+ =?utf-8?B?dzJHcW5nWHhyZXdWVEhPS2gxZ3hET3ZORkV5Q0FNOFdtVk9yeWFuOFJ5QmpP?=
+ =?utf-8?B?RTJ6Z2JWbGtwRklIbitvY0ZSMzNIT3pvQ0U3UEZDOElqNlVkQXkra1RyYkwz?=
+ =?utf-8?B?NHBIOU9tRmhjRlFPZ3pnb2paMm5UMHZ0L1VDb0tuQXZ5d1NSZi9NR3BEOXNM?=
+ =?utf-8?B?R0tDU1RMamljV3hrb1RXRGM1TEFjQk5VekpDTGhlNG1qc2pQQXhaa0RwNDI2?=
+ =?utf-8?B?c3o1SHVzekhYYThXckw5czhvdm5HU05iTWg0Q29kOStBcDV2dkpQOEVNNlph?=
+ =?utf-8?B?SVFlUjMxeksydURyT1pOUXFEcE1HMXFITVhNZ3RTNmhYaGt6YXJ2R3M5ZzZu?=
+ =?utf-8?B?c2lkM3FwUlRMOVpJd0w4TlZYSHRmNWZnajVSZHQ1TmduZXdUaWl6SW5qNmNt?=
+ =?utf-8?B?ak1qUWgrUkJZNG1PVFFHT2ZjeW5XRnFiSGFnLzJza1NSVTNOekpRSnVlTkJ2?=
+ =?utf-8?B?dnVZbHBjUjduamdUOGY2TWo5Vjg3a0xHT1k0MXRHM2Myc25MNGVBVWZ0SU9S?=
+ =?utf-8?B?MlEybXpUYkpIaStWa0NBcVdJc1ZzWXFVa0F5L29kVER3c2l5WitjWkNqcE9Z?=
+ =?utf-8?B?bWlKNHNaZ1JUVGJiZitad2ErVng0bGZpZlBNeld2aFR5dEVvVWY1OWkwbGRz?=
+ =?utf-8?B?K3ZHcGFsajJKemtkY1k3RFhDZjNXa3Fmand2OHFJYmVwZnlDS0F0UURqSTBZ?=
+ =?utf-8?B?OVpSSXRHRVphNTljZzZQdVJmMDRZZnh6b1pWK1U1ajdPVDYyclN2VVZxZXZX?=
+ =?utf-8?B?UC9rU0pmaXRwRHB0aEt3Wlo3UDBROU90RWg0U1hPWCthOGtwZE9ZS3hPakk5?=
+ =?utf-8?B?a0NzV3hTcVgwU1NIRjlTR096UjVIYytmcUQwTllCMmxDTk9KRC9xYU13MHAx?=
+ =?utf-8?B?dStPNXFFd1ErZDFYWk1BN0FkZzUwYWZpa3Bwb3MvME9uVkcvMHc1eGdWZEI3?=
+ =?utf-8?B?cVBvR0p0ZlNEMDFVSld1Wm1EMUt1b2llcFJtNFpiOVV4bDZ2VDY5U3JBalF3?=
+ =?utf-8?B?dVp2WDhKalNMUjBQOEpDT1NnM0RJWW5hVFBONUZVRXQ5RWx4MXB6N1FsbEpa?=
+ =?utf-8?B?MlhNOWFsQkh3OHR6NmQ0TW95OGJEVFA1ZFczRWx1NFdPb0hBV3o5UVRuQ2oz?=
+ =?utf-8?B?Q1E0QWE1ZXJPaC9XSG5RL2tHRHpVM0JuT3UxR29TdFo4S1ZleEZRUUY5VENF?=
+ =?utf-8?B?YVUrRVJQZU9idU5wNGFEb2NTSXNkVmcvRGtTNjBNU2JLcTBqOXRRa2hNNEEx?=
+ =?utf-8?B?R1lBc1cyOXFZMkdFcDJmSzdMdVVnYXZYanhocnRxMy81SmZFUFZIYmU1SWJM?=
+ =?utf-8?B?VkVldncraGptT3U2Z3ZWS1ZZc3V4dkNNYWFZMFN5b0dvMVRxQnNxc1htSjlm?=
+ =?utf-8?B?Q1V4REorU1JZZm0zUDV3ckVRSTBHMHB4d1NqdW4xQmpYck9FY01sZ2lST085?=
+ =?utf-8?B?VXByZXQzdGtTZHh6M1ZFTm5kRHlBZGZ1cU5UaCtjZ01NUmRzajkzOGNyQnQ3?=
+ =?utf-8?B?b1NLQmh6eEtaWnF0eDR0WDQwY2c0WDZyNFBVUy9zUXZXVHc9PQ==?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SI2PR06MB5140.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?cjkxNWhJTVdjNldITUZKdmJZMXpMSit2QWdSTEpLREVtVllDMHRKSjZnTExC?=
+ =?utf-8?B?OVBmNE81NW51R3hyWTRNQm1TNmlDQVA2UnorOS8xSEsrRzFjdWJPN2FQL1A0?=
+ =?utf-8?B?SVZmc2lwOFBZTlhEdm1CTkhNSk10akdneXo1Q0FWWDdRdE5VWHliTEVXNW1K?=
+ =?utf-8?B?MWNVTXloSkVGekRGblV5OVhTOWlubnVaL1NRK1pUbGxiK2R5REhpV3NsUFZ1?=
+ =?utf-8?B?WW5Na3Z1OGxONnlUaDBkMG5tVUllSTNaVFkzTjZjNGZUb29uNlZDSitPaEhx?=
+ =?utf-8?B?L01oeUNGZURZWjhMMW1VUUpaYjhFMlM5RXZuTUoyaEQ3eXhpNmRoMkorVWpI?=
+ =?utf-8?B?R29rR0JjK2F1UGRtOE82SVl6eTlrU2lnRzYwK2dRTUF4ekNoWnJpS3lQWkNu?=
+ =?utf-8?B?WWRWYzhDb1o1ZHNtZ0cwUldBc0d0R1VVdGl3dmp2V1FFWUVpRmlveTlrbXM5?=
+ =?utf-8?B?dlh2akNWUUdIeDhRRythK2t1Rk16aVo4Z21TaE9QM0JqYkJLSC9JazhLenlu?=
+ =?utf-8?B?OEI0aUFrUGsyemdYQlp3Ti9LWWp2bkw2Q1VWOWRGMTllQk93VXdmWWhmQ0lX?=
+ =?utf-8?B?UVhPZUpIWGhaSGlsVVVid1FKVGxoampQeVZOc2RuZXJsN0NGVXkvVlVta0kw?=
+ =?utf-8?B?N2JtV0paSFlyZ1k5WXNjcGZXZmhVM0JDeEZJcFkrWnNYM0g4eC9rVVRPMDBk?=
+ =?utf-8?B?ZGp2NkFnSkQyNFhGWDk2NU9UalhRL21TUzlMaXNKM25SY21RTlhKTDNDdGxN?=
+ =?utf-8?B?RngvWDhCNUIzdjhCRlViRW44dnFIRllLenlHdkJJY2V0WVJzQ3pabGJsbU9U?=
+ =?utf-8?B?WDE0MzlzK0JibzlSUmJZV1lpaEt6R2JqZ3RBaHJVZ2Z4R1NTYTNVVkJPUmxS?=
+ =?utf-8?B?YnNkZGtCS1VzUWxXM2pETHNyNlU4eTN5QWdIaFBuNlZoeDY1WElyRVdoVHRo?=
+ =?utf-8?B?Z3J1L3E2RmFDUVBUT1RRRk1rZDZpT1p2ZU85dXN5dFlqVWRmWFBCY0Q3eWM3?=
+ =?utf-8?B?T3VOQm1ROTNEd0N3QVd3Mlg5NFJkZ0xzRlJLaEZYWnVVS2duRFFYRDBsRW9w?=
+ =?utf-8?B?Uk9mNVRodS9mZDB1aHN6RGdERWFBWTcxbHZHeGxQbk1rQjdEMVdKS2c3VC9W?=
+ =?utf-8?B?V3cwZHpHZGltU0JLZ243bUo2d2dKZFJUN2dVdWszeGZQYVZEeDFHRE95UnJB?=
+ =?utf-8?B?VkFnZWlFOFlPQ1ZZNmRjNVZMZ09vZUJMMVhJZlZKM1UrWFhBbXowS3Arbm95?=
+ =?utf-8?B?dWRwWUpPZnI2UzJGdEcrL1JZMEdUQTZNempLNExZdFBPUGZLOERLVkNJajhq?=
+ =?utf-8?B?encrUFNMWGFvdGltSjQzQzZtMVluYVRGZS8zT2JZM0l3Zk92Mk5lS1VYeEl3?=
+ =?utf-8?B?Q2pZL2l5MjNRMFJuVko5eFRGMytYVjViaUgzanFyMURIMFhBRG00Um02Tlhi?=
+ =?utf-8?B?SzBSYjVuSUFvc0sxdnlOUkh4MjdhMG85NDFqUDlicUc5U2hTVis1Ym80ZkVL?=
+ =?utf-8?B?T3dTdWl2NFNWWVVzYjFka3NsTlozVTFENmMvRDkrbUJhMHE1b0h0R29FSkp2?=
+ =?utf-8?B?MkI5VGZ4SnFhNGtHLzN3eGZsZ3JZdjN2Zmo4QU1pMDk3NFdXcTFkSmI5am1m?=
+ =?utf-8?B?bGp0MGhNT1Q3UnBTWlAvZ20wY0dxYzB6UGhzZVFia1U1WkdjbjJsVGtQaFBO?=
+ =?utf-8?B?WkFKS3RmWWJMRzc4YXM3Q1V0K3Y0b1JmdXdkVTQyTmZFM3NoMVlhUGVNWDdu?=
+ =?utf-8?B?NjFwYThrWi95b2l6dVFTeHZmcXozT2FnS2J1NDU5ZlZoNnU1V2owekNaZDJh?=
+ =?utf-8?B?cVV0RnA4QTR6UDVlL1ZKdU1NNzNQNzBiWi92UTZDbkhROFB4a290TFRZTmdn?=
+ =?utf-8?B?bEFpZXJ0UWFPS0NIclBNb3pJL0pZeUl1STZkeVF4b0NOREN6RUhCRGdNOWhT?=
+ =?utf-8?B?YXc2aTFjbWhuamprTTFWRWhFWUZnUmlrZ2VzR2ZPNVQ5OWVWOFdVNmJWVkI1?=
+ =?utf-8?B?TmhhblQ1R3dHcmdETUlOZHJxbHBnbFhjNk1uSTd2Vmp0YlBlT1d0blFHM1RD?=
+ =?utf-8?B?L3JBQ1FIaTMrQ0JKZlRIK0tmL2IvZGs2Y3Nrd1VlaGdacitOMksxbUFWejBR?=
+ =?utf-8?Q?AYpjhY6g8AOGStSeLjbin59xw?=
+X-OriginatorOrg: vivo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e505c040-1f3b-4ca8-60ff-08ddda358d2f
+X-MS-Exchange-CrossTenant-AuthSource: SI2PR06MB5140.apcprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Aug 2025 06:49:29.5600
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: lwlxHwYLrN1TyY+GhlQizc9qnxrn0tqRBdxvWFfhdA1lfhYzZMgZ5IKGB6gX8yiYjcbI7SlKUK23mRVCdfB7UQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYUPR06MB6080
 
 
+在 2025/8/13 4:48, Jakub Kicinski 写道:
+> On Tue, 12 Aug 2025 21:32:13 +0800 Qianfeng Rong wrote:
+>> Remove array_size() calls and replace vmalloc() with vmalloc_array() to
+>> simplify the code and maintain consistency with existing kmalloc_array()
+>> usage.
+> You need to submit the first 3 as a separate series.
+> They get applied to a different tree than wireless patches.
 
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+Ok，Will do in the next version.
+
+Best regards,
+Qianfeng
+
 
