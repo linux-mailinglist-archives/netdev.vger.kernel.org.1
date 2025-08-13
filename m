@@ -1,110 +1,92 @@
-Return-Path: <netdev+bounces-213127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213128-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD55BB23D00
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 02:16:55 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73C9EB23D06
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 02:20:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7AFE43B9906
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 00:16:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E03E27A8859
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 00:18:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E5F81362;
-	Wed, 13 Aug 2025 00:16:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F9651E89C;
+	Wed, 13 Aug 2025 00:19:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zOZWMji6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NfqqxIEL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4200128EB
-	for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 00:16:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 491C51362;
+	Wed, 13 Aug 2025 00:19:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755044212; cv=none; b=i0j5GQNRxzU0aZC6suODXPVG8O6Hi1tfZ3Tl4v2PLbpj51EoM4d+fv+S1zMStmd/P+LIVrhUaYZQIDdTCuy9+L4lcTbLCzOlJ0Nd2DhyJPrUirCkGAYob4zUYebbuA3+OeuudYxuaFNsZq9Kmvl/gWwZvGPoHzPCT9oiCCms+Bk=
+	t=1755044394; cv=none; b=h31DJwL5cWoKB5qV5MFNuPnUdOEGzVwvdEw/o9FrLnlR2y8ubmCjABG5Zr7rb1dyAD+JT7BPgR5lrdU2etRAPgQG/EFgpakzyOMaF6qLB7taCUiOcoP2n/jPehTKXlqQQwGQEg2LHmfhjt6KGtuF9xqFpBjpiJjeDjd02NCgKHQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755044212; c=relaxed/simple;
-	bh=XzuKIs7vtDLlqgGoJcceSI7gyg399jNW6VySbtdmOoM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fRVLSyjwvgq9T7bNVpBKbvzq7w3ARFZPXkfvq0ONCtZ08gRMftAiJ9Dx10J28ih+jAQPi+8HchqJDKR/IZyhEb1D6Ze1NhPWa1BpxPc3ZI96LKITf9nsH6vjTX/Vh/RLoITwHBuyMxZSKjPtpGB23M6BxfC5w//APTPLrCGe8Vc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zOZWMji6; arc=none smtp.client-ip=209.85.167.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-55cd07a28e0so4485e87.0
-        for <netdev@vger.kernel.org>; Tue, 12 Aug 2025 17:16:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755044199; x=1755648999; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XzuKIs7vtDLlqgGoJcceSI7gyg399jNW6VySbtdmOoM=;
-        b=zOZWMji6bwzyeJRKtoicldgyUoRmqysVaw3OezGEIDGTB2YBN5u3Goa80ee9hbO5/J
-         A/w34nEcX4YiXNMPTK+KERcA+o0MXsbtRfjgEUGXLv+rOqw5FSwk+Vw4yASyXBNwE4tn
-         CPM6u/4wm18DnzC9wAuyzoUWZf4o4EgVg6O2vNintmGQfpziCVjQGAzwhIPdYEj64WuU
-         QhEA2yqMOCpd2EtbbaryjIZNilnOm1DAf0b6bh1n2DF3sADUuLTMx1t9IhtJPkWQlfZW
-         vRHe8lidW6LSrnFbizlJWyHxe4LaHkqMW1CqVmxC+mJ/YyhijXCfdvLsW5eMQg+r3LHr
-         UP/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755044199; x=1755648999;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XzuKIs7vtDLlqgGoJcceSI7gyg399jNW6VySbtdmOoM=;
-        b=FCnGGItSBX5hvDAEzzyPbafyDMJPu1HFqonoSclnDFOeLKjskOq6+wa4tFM02XqOmd
-         h21+g4Ci6IVb6BcA2xrRRXxWY2uB8N6NEzVaWef0Vc+RxLy8IHLPGK2mMs90P9lGDunx
-         m+M+adsn8YNeP+qsQm8J7/8f5n3zVsju/JFNGnCvTmxvIdh4w6naNorTB8WaYXgGru2t
-         /StWChKhQ6BC9bwgse9hDXjDQcA53lXh5wlxM5b0U9y/C33iBWgi3EpTSiLVhWw4MeGW
-         /IXpePtHIx2Jg7aYXcaXqOfW763e9p5pvkqMO0k0C1MSeiuSwLRRT3TxNycuDcby80+q
-         7lCQ==
-X-Gm-Message-State: AOJu0Yx0LgWn9Afz1i1psm+i5P7X7To17z6dJgRDwaQYsSBXDZlPUv/b
-	JIPYHZnruKBqriJ2gFrbReYQSpLJjfZk/2FJ7Y1E/cASFMQaKvZEJXgOWUGOHgQJEAh7x0dWIIn
-	VJaO1R5nOgFBFF9vQrBo0NVPmpFpHjuDd46Sdj7g1
-X-Gm-Gg: ASbGncvU1Hj5qw891/7MK+JF9jH3gWsUCPi34x5fGlT1FLXuMAGS1kr1Mf01gVUBGco
-	mrOLK7ISizVEFQpNFrR7TxRTgLg3PWcK4xyq0l06OW+kB2WUYNjD81f45sm4+51bgX1fgmfPALz
-	WjNtu0P409GGV8uHjjSmHfoFtmg81seF8TNXeDhyqXUIAzLgWEKreKdl7Qyerj3w3+OOSXupWS2
-	BxPCxDP4DJ5kFvKx0N6vHh8Oy4HPnH/h5vc7InnosvPjmTfeB3dtz1azw==
-X-Google-Smtp-Source: AGHT+IEsyTTVlhlKsCj6swerrcVvgcVF2/OaPW5994PaxI8uYTZ/ECzk7CKgqTc0G0pWT4Irg+n/a5BQhxjoC9jm/oU=
-X-Received: by 2002:a19:6402:0:b0:557:eadb:253d with SMTP id
- 2adb3069b0e04-55ce1245024mr71030e87.1.1755044199133; Tue, 12 Aug 2025
- 17:16:39 -0700 (PDT)
+	s=arc-20240116; t=1755044394; c=relaxed/simple;
+	bh=GbretOhKfd8D5jVY2EFHVl4zAH+L8m3u3zpnQYIopOU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=rVkHm/+m8jnIlbWvvEFHo7BUKwDyy7UwyPRFBIaC1gM5/NmnG8pxya9bisOpAXQAOoo+buPOxCLrP8vF+fIm7VwKhp25aI3q3x5jiISZ+Qd3EO0pjD1jKooz5wYAR7hveF48ovkyUxEuH6Gmfo65waxApJqiitRmpL3pL3sM2hw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NfqqxIEL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D541BC4CEF0;
+	Wed, 13 Aug 2025 00:19:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755044393;
+	bh=GbretOhKfd8D5jVY2EFHVl4zAH+L8m3u3zpnQYIopOU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=NfqqxIELN+LuVtWzKo4P5pusqp1kRvkoyAgunybwhaBnfnQb3lku13DEAgKgsV9Wl
+	 gKF5aMFsZnwbOGJ9qlCLlvSNvIGagKOMAcdxvD2GKoVIkgGpHe6xkQPABVMcfpn0dz
+	 zbU+AatInK0yaHUPXddKTdG0j5XnkV7iwT0W2+5CttBTmeQXDuG60+OYhd8hQva6Mv
+	 xplDgEyIrLS9sAML6KWA1P30h34pFMQvdOBM6Q6O1qNiK1T23aGfHQjmNegRR+dZR9
+	 DwRIMDSs6EzN9GG3oYU9qbEzycjmRUo19h9jeRxK5HYaB5UcPorfpz8KCSLcFsJGgg
+	 /gQyddhU86qlw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EADE339D0C2E;
+	Wed, 13 Aug 2025 00:20:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1754929026.git.asml.silence@gmail.com> <7468b556ab5f9ac79f00a530464590e65f65e712.1754929026.git.asml.silence@gmail.com>
-In-Reply-To: <7468b556ab5f9ac79f00a530464590e65f65e712.1754929026.git.asml.silence@gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 12 Aug 2025 17:16:25 -0700
-X-Gm-Features: Ac12FXwEwAxOGTmnm95I_XOvW4Xv5QEa78nu8fTGwTSEnfKe_rxax5ekYCP0mvM
-Message-ID: <CAHS8izMD2nnmBWbMp3zRuNwWjiphdwu7NFpVCvmcy0SkBLFG7Q@mail.gmail.com>
-Subject: Re: [RFC net-next v1 6/6] io_uring/zcrx: avoid netmem casts with nmdesc
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, davem@davemloft.net, 
-	sdf@fomichev.me, dw@davidwei.uk, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Byungchul Park <byungchul@sk.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net/sched: Remove redundant memset(0) call in
+ reset_policy()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175504440575.2899548.5063021999695695145.git-patchwork-notify@kernel.org>
+Date: Wed, 13 Aug 2025 00:20:05 +0000
+References: <20250811164039.43250-1-thorsten.blum@linux.dev>
+In-Reply-To: <20250811164039.43250-1-thorsten.blum@linux.dev>
+To: Thorsten Blum <thorsten.blum@linux.dev>
+Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Mon, Aug 11, 2025 at 9:28=E2=80=AFAM Pavel Begunkov <asml.silence@gmail.=
-com> wrote:
->
-> There is a bunch of hot path places where zcrx casts a net_iov to a
-> netmem just to pass it to a generic helper, which will immediately
-> remove NET_IOV from it. It's messy, and compilers can't completely
-> optimise it. Use newly introduced netmem_desc based helpers to avoid the
-> overhead.
->
-> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+Hello:
 
-Great cleanup actually. I didn't realize how much of a pain the casts were.
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Reviewed-by: Mina Almasry <almasrymina@google.com>
+On Mon, 11 Aug 2025 18:40:38 +0200 you wrote:
+> The call to nla_strscpy() already zero-pads the tail of the destination
+> buffer which makes the additional memset(0) call redundant. Remove it.
+> 
+> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+> ---
+>  net/sched/act_simple.c | 1 -
+>  1 file changed, 1 deletion(-)
 
---=20
-Thanks,
-Mina
+Here is the summary with links:
+  - [net-next] net/sched: Remove redundant memset(0) call in reset_policy()
+    https://git.kernel.org/netdev/net-next/c/b3ba7d929ce1
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
