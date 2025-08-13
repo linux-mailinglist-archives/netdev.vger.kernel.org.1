@@ -1,120 +1,134 @@
-Return-Path: <netdev+bounces-213502-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213438-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24B65B255EF
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 23:51:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BCBAB24FE6
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 18:37:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 345D57A61A9
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 21:50:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 11D5E166B73
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 16:30:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1D882BDC2B;
-	Wed, 13 Aug 2025 21:51:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69D11288C37;
+	Wed, 13 Aug 2025 16:29:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jTog7zuQ"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="CQO1HDkB"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 949623009CB;
-	Wed, 13 Aug 2025 21:51:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3AA0286D62
+	for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 16:29:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755121888; cv=none; b=tBh40erLEnh+Ce+aPoaFRWPXSswDegTDmjRbtD1jm5ElWmqXQSTwuGv+YS3bRRSg8usn8txiE9dErmB09ABkGqOwrI0/0C16PAuTULvgiV/0dToB3B5SbzWwMVI+6WHptDIidyiyhyxq9XhQPgPR+oGKMFgIB9pyp0ZTBOZoC0k=
+	t=1755102565; cv=none; b=cgbzuGDiiP+gTYZ+3shpzGuKLJll3PiarENXB9mr4W3I0NFC7JRfjBoEa02e8riGh2URm75gIO7R2xoNVDLRMACIDcPUSkH7YuJgWgTmmFqaB3u03ZpOqNUExR6lr6CN7A8j7WT464GMXUkNROr+yMEZRR6SlMK8njtXCkywjc4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755121888; c=relaxed/simple;
-	bh=5F8EEBGF7NpuTGwYMI/wUerdlii1addjaF7AtasrlmU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gNkRXM+R1zBszaIA5hX6VWjnBuHu3b6ctXxza+rOq6FAM32j2ilEEcnx7f/viLg4vu6lVh3/jab49OCRPsWjujNNxyHZmHdUKAsxeyV8jlK4BtQuomzCRmpGDEwlIgww83hIV5oWdU6D72bWyZYVcCTEaKhqj4nCNfpMEGoKt0M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jTog7zuQ; arc=none smtp.client-ip=91.218.175.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <b25635ec-0ab3-4c90-9fb9-b9c5c1748590@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1755121883;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5X2T2a5oAnnfM7V6t2lvvrUsAnEiflVCEAk8ZEzo21I=;
-	b=jTog7zuQpeAsBN+gkS45v6q/fnhpuX1etNGl0fb0VzrQQvw3dsyrsEje1rKHM1dITrHFMb
-	MSPEB50SRgAmtVMUd2+gicAEvgCIZqkiVm6xtDA3SW0gIDFxj/PZMiaGk5x9ZObV2JrzLq
-	wSR6d/7ZiV4NyhIgAYj+VC/Di+ZaAGQ=
-Date: Wed, 13 Aug 2025 22:51:18 +0100
+	s=arc-20240116; t=1755102565; c=relaxed/simple;
+	bh=bYaQ7xlrKxCuwQtNn2omZ7BjgvDcPYjR2TMWck0VGQM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Fk6QukbjkaIXTZJ+RmH+5mfoT3x6A2Dk0KYPoPMil8l3gVplI46WnkcPPjJDFFFIzyrUvrH0PjU6O2JlEja3zAobLhnaHl/S8Rj42che3vubBj8B9MCRyiSfyEqqN20iObDQ2ptN7ajTTYthUI6T6ekKW2adf0rggAHqDRLA7u8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=CQO1HDkB; arc=none smtp.client-ip=209.85.215.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-b1fd59851baso4674543a12.0
+        for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 09:29:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1755102563; x=1755707363; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=LhDh0bK+gQwaFqeot2nkbIRJyYLX52+XKHM1mxR51Ak=;
+        b=CQO1HDkBKZSsuTtj99voFysofUPnuHmD2TgOKkdW++4ySpL8r940YD2/Ryqi9HhTrU
+         rqP6svTg2EWjK4gOnYtb6STrxP60RO+GMsRmuZzLFrPrQHvePSfShOSyEtvhFwfRqclW
+         0Kq1oOjzgu4DI5b63cyHmHOd5Vg6gZSDwIWaI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755102563; x=1755707363;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LhDh0bK+gQwaFqeot2nkbIRJyYLX52+XKHM1mxR51Ak=;
+        b=ENtUjIThKQCRz2GDbkkjAz68b5/OjHB8NpWYdHIxum+7uY2rIhtfziwWjW9SP/gJAU
+         kS7hBvRBYke0OPJqdxWBFqNb4r+IQTnnPBX0WxcRzUWzMT5k+SeECfWZy4ewsUcyPpU2
+         QdTUjIKymOxTq9oj9+gcyrCjvB4ifueS9YAVo1ECaYwtcYbISI3/WNSg2UkalTYDssC8
+         O+ojYKlXbfQ92vHaMx0w74kPUJT/ipNcT2h0ugDx4V/pDLdvRq6o9MV8/UCwkAydpIHG
+         bjsSKkaa2VHQI2KR+oW4DngWaCjViUOe+TCMktaHw8Blkx2wGumLSc8hfc0v6nvDL0kS
+         h/Dw==
+X-Gm-Message-State: AOJu0Yy14Djz0WGdyHWceVip9/HrhKhl3jgcESfZn7+BQqmlo7koZRLf
+	349WsGNs2u/82nWvTEc+DcYwHHGsPNflARYwl5M1IISIxBlmqQGjdqsmRoKBKPEHgA==
+X-Gm-Gg: ASbGnct2aMdS6swZZpAO9Knj77djFvRPIaNVkTVbgMQVifW65CQTLpxq/i1r1NCZGH/
+	eM0E0JA7oK31/l7B723EUPp59tsvl+aEGraybn881UFROK15IHz9bO4iAJfj77NPebVwLA3c+ZK
+	jMJXa8gE9Sj0TjZhtUHwAcBwmiZ7QCH4Ba9c5b7g68utqsf6Mr0GH5Gdo9gXiDqmsUYu+5M5kNX
+	BJV2uGayo88eDcfBefaS5C+hS5kW1Q/vvacW3F9PYTmnQdXJlrN8HdCP2vGZLMqZCiVoEJsJmwA
+	2TPG+/qRZE6r9zj5MKAg+EXIOqKyg3Y7AMhXvS7GQu4H/8tEoARVpb9Hdc2EFsIDWk6xBE7mmq/
+	/NegZa9nJ+uIPAzWFzwi+MH+KCq2yeZgnSxVznOmxcCz5sg2L0OM/hkRu3/T4viWiGzjqeDxoUf
+	xLJnGzYsD9CgN+2yZlBEukdEe56g==
+X-Google-Smtp-Source: AGHT+IHaS6kzgD2z3CPm/bEpl6Q8l6D7g2epnpf64XF+XoK4p8+KLJvuUjbFUmkBdlSH0iEurBAjzQ==
+X-Received: by 2002:a17:903:2f85:b0:240:4d5b:29b4 with SMTP id d9443c01a7336-2430cf2af9fmr57123965ad.0.1755102563267;
+        Wed, 13 Aug 2025 09:29:23 -0700 (PDT)
+Received: from hyd-csg-thor2-h1-server2.dhcp.broadcom.net ([192.19.203.250])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-241d1f0f7bfsm329311915ad.41.2025.08.13.09.29.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Aug 2025 09:29:22 -0700 (PDT)
+From: Bhargava Marreddy <bhargava.marreddy@broadcom.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com,
+	vsrama-krishna.nemani@broadcom.com,
+	Bhargava Marreddy <bhargava.marreddy@broadcom.com>
+Subject: [net-next 0/9] Add more functionality to BNGE
+Date: Wed, 13 Aug 2025 21:55:54 +0000
+Message-ID: <20250813215603.76526-1-bhargava.marreddy@broadcom.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net v2] phy: mscc: Fix timestamping for vsc8584
-To: Horatiu Vultur <horatiu.vultur@microchip.com>, andrew@lunn.ch,
- hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- richardcochran@gmail.com, viro@zeniv.linux.org.uk, atenart@kernel.org,
- quentin.schulz@bootlin.com, olteanv@gmail.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250806054605.3230782-1-horatiu.vultur@microchip.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20250806054605.3230782-1-horatiu.vultur@microchip.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-On 06/08/2025 06:46, Horatiu Vultur wrote:
-> There was a problem when we received frames and the frames were
-> timestamped. The driver is configured to store the nanosecond part of
-> the timestmap in the ptp reserved bits and it would take the second part
-> by reading the LTC. The problem is that when reading the LTC we are in
-> atomic context and to read the second part will go over mdio bus which
-> might sleep, so we get an error.
-> The fix consists in actually put all the frames in a queue and start the
-> aux work and in that work to read the LTC and then calculate the full
-> received time.
+Hi,
 
-The expectation here is that aux worker will kick in immediately and the
-processing will happen within 1 second of the first stamped skb in the
-list. Why cannot you keep cached value of PHC, which is updated roughly 
-every 500ms and use it to extend timestamp? Your aux worker will be much 
-simpler, and packet processing will be faster...
+This patch series adds the infrastructure to make the netdevice
+functional. It allocates data structures for core resources,
+followed by their initialisation and registration with the firmware.
+The core resources include the RX, TX, AGG, CMPL, and NQ rings,
+as well as the VNIC. RX/TX functionality will be introduced in the
+next patch series to keep this one at a reviewable size.
 
-> 
-> Fixes: 7d272e63e0979d ("net: phy: mscc: timestamping and PHC support")
-> Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
-> 
-> ---
-> v1->v2:
-> - use sk_buff_head instead of a list_head and spinlock_t
-> - stop allocating vsc8431_skb but put the timestamp in skb->cb
-> ---
->   drivers/net/phy/mscc/mscc.h     | 12 ++++++++
->   drivers/net/phy/mscc/mscc_ptp.c | 50 +++++++++++++++++++++++++--------
->   2 files changed, 50 insertions(+), 12 deletions(-)
-> 
+Thanks,
 
+Bhargava Marreddy (9):
+  bng_en: Add initial support for RX and TX rings
+  bng_en: Add initial support for CP and NQ rings
+  bng_en: Introduce VNIC
+  bng_en: Initialise core resources
+  bng_en: Allocate packet buffers
+  bng_en: Allocate stat contexts
+  bng_en: Register rings with the firmware
+  bng_en: Register default VNIC
+  bng_en: Configure default VNIC
 
-[...]
+ drivers/net/ethernet/broadcom/Kconfig         |    1 +
+ drivers/net/ethernet/broadcom/bnge/bnge.h     |    7 +
+ .../net/ethernet/broadcom/bnge/bnge_core.c    |   16 +
+ .../ethernet/broadcom/bnge/bnge_hwrm_lib.c    |  483 ++++
+ .../ethernet/broadcom/bnge/bnge_hwrm_lib.h    |   23 +
+ .../net/ethernet/broadcom/bnge/bnge_netdev.c  | 2175 +++++++++++++++++
+ .../net/ethernet/broadcom/bnge/bnge_netdev.h  |  290 ++-
+ .../net/ethernet/broadcom/bnge/bnge_resc.c    |    4 +-
+ .../net/ethernet/broadcom/bnge/bnge_resc.h    |    1 +
+ .../net/ethernet/broadcom/bnge/bnge_rmem.c    |   58 +
+ .../net/ethernet/broadcom/bnge/bnge_rmem.h    |   22 +
+ 11 files changed, 3076 insertions(+), 4 deletions(-)
 
->   /* Shared structure between the PHYs of the same package.
-> diff --git a/drivers/net/phy/mscc/mscc_ptp.c b/drivers/net/phy/mscc/mscc_ptp.c
-> index 275706de5847c..d368d4fd82e17 100644
-> --- a/drivers/net/phy/mscc/mscc_ptp.c
-> +++ b/drivers/net/phy/mscc/mscc_ptp.c
-> @@ -1194,9 +1194,8 @@ static bool vsc85xx_rxtstamp(struct mii_timestamper *mii_ts,
->   {
->   	struct vsc8531_private *vsc8531 =
->   		container_of(mii_ts, struct vsc8531_private, mii_ts);
-> -	struct skb_shared_hwtstamps *shhwtstamps = NULL;
-> +
->   	struct vsc85xx_ptphdr *ptphdr;
+-- 
+2.47.3
 
-No empty line needed.
-
-> -	struct timespec64 ts;
->   	unsigned long ns;
->   
 
