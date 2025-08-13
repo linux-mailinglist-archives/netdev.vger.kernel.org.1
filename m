@@ -1,120 +1,98 @@
-Return-Path: <netdev+bounces-213167-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213168-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A97F9B23EAD
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 05:00:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BD7BB23EB3
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 05:01:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3284A7A6FFE
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 02:58:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE60E3B8707
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 03:01:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28CF2270575;
-	Wed, 13 Aug 2025 03:00:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFE8628936D;
+	Wed, 13 Aug 2025 03:01:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Q5mzUiH5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BTUIlxYu"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C72D23ABA8
-	for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 03:00:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F775289358;
+	Wed, 13 Aug 2025 03:01:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755054004; cv=none; b=FFaVtXnNaFBP44gIvEK3p3YtBDxpC74P+4MoTk1yKg9ljOZsMPL1PKRbLqWOaBPxAGoi/ib5RcYK1Yjt1uhUuEVpvJKf6VgWHr7jAI13a9ioAptO02RrEvtqyrrhRKDXfc2tmy+Rk98/3xziqDlfG4l80NosIiA7yekAQ90c7IM=
+	t=1755054070; cv=none; b=Xpph6Fo98C0eGJgJ2D05pYkq1nHqRrKk8c+0VNvbCw4mP+gGPtmmSy76NcjZwKym/jt6RzVK2eUcqzrhJGIEgkm45gF98DueSjN6geukAIHlSIbdyVuHqEBxO/xa8s3gebn72NDtHz6Ov0guW40HJz7+D41416DPbOg4NNHvRO8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755054004; c=relaxed/simple;
-	bh=GAm+m12xkj6fi5E6D9g63VmarVSsObFEfuuMY3gDfOQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=P61vmznYEqE1MSV7bF0/UksE+wbrsHKG+EfNXqNIhYwrW9veR8LGv+cgPndprRVX1GGKYJ6Xo+/qhwspbaZmzR8scXrkmNbAfsvIuQAttA4ZQWkhgnwtBxNFQCgpCjMNv8FnP5e90+lJ/MpCZ+dDL94pDZQR46+N8YZgf4SEYV0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Q5mzUiH5; arc=none smtp.client-ip=91.218.175.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <86294c15-523e-4ef5-a67c-d4068607da3f@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1755053998;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DrGTejR5G+x+9kTrw/iTa9/3Utlef5BmFPK6HnId7es=;
-	b=Q5mzUiH5g2vkSeNl9fnx5PjjhHplW+Skulk+CpJryMEuClwhItjHWNCpeGoLvrk2jXh1SB
-	kSVSpM/Nks39GmrqbaCzcSe1y8I3w/X5RC0kIRE9Jyh6ZK726uPXwHT7cwzPjxXDRkE7yN
-	dWyVhbyju2MzfKFmTC6Ot0XQMJWzn98=
-Date: Tue, 12 Aug 2025 19:59:49 -0700
+	s=arc-20240116; t=1755054070; c=relaxed/simple;
+	bh=g0KpjcXJtz6ln6aB1UZjeZO3yaHEGjn1lQ/ZaIiksKs=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=kDsHzzM6bYdPP2upR1Fl/9y+bH9V6G/CVW2d/346chKGOavMyD7mZCU4Rc+Uzj+XiDljOX3+ZrZBaB8R2Y+I29inRhlJ46r62NJjLmjzTwjNeN/l5c9rvPbtx+23KgF0I3hRYYoHmM6MWh+Itcj2uhcUXVf2swKKY8t71XRhZAE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BTUIlxYu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1856CC4CEF0;
+	Wed, 13 Aug 2025 03:01:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755054070;
+	bh=g0KpjcXJtz6ln6aB1UZjeZO3yaHEGjn1lQ/ZaIiksKs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=BTUIlxYukHrooJMuNxY3oHtv7yWgFbyucbWVSpM7tD4nCvHIE7IecJ0/dmsEyth4u
+	 y35A6Koi6ysIneymHY3Bbhud6KgWpKR9/2WIKyagzLx4BykzQ02EylZMuQr5K87sSf
+	 JPovpa9Ai4flpIjMPhyu/qU92PK7eyX9jTJSGaXW3iPzlUd+Y3y9JY3uL8Duiv6vZp
+	 RN9DtqdKNQVhTnSRHfyaxt0k/q69qPLt4q6SGCrwIFp49OlqWFfrapPxHBvSvtUlCs
+	 S5loBIzVZw5hxUophIqs3HYJTdR9tFBCwWcGLP/Z4iEoXdo23aKRTZBBOsMw/WFGuJ
+	 gDTVRv0LDs+8w==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33ABD39D0C2E;
+	Wed, 13 Aug 2025 03:01:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next V2 0/7] xdp: Allow BPF to set RX hints for
- XDP_REDIRECTed packets
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, Lorenzo Bianconi <lorenzo@kernel.org>,
- Stanislav Fomichev <stfomichev@gmail.com>, bpf@vger.kernel.org,
- netdev@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <borkmann@iogearbox.net>,
- Eric Dumazet <eric.dumazet@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, sdf@fomichev.me,
- kernel-team@cloudflare.com, arthur@arthurfabre.com, jakub@cloudflare.com,
- Jesse Brandeburg <jbrandeburg@cloudflare.com>,
- Andrew Rzeznik <arzeznik@cloudflare.com>
-References: <b1873a92-747d-4f32-91f8-126779947e42@kernel.org>
- <aGvcb53APFXR8eJb@mini-arch> <aG427EcHHn9yxaDv@lore-desk>
- <aHE2F1FJlYc37eIz@mini-arch> <aHeKYZY7l2i1xwel@lore-desk>
- <20250716142015.0b309c71@kernel.org>
- <fbb026f9-54cf-49ba-b0dc-0df0f54c6961@kernel.org>
- <20250717182534.4f305f8a@kernel.org>
- <ebc18aba-d832-4eb6-b626-4ca3a2f27fe2@kernel.org>
- <20250721181344.24d47fa3@kernel.org> <aIdWjTCM1nOjiWfC@lore-desk>
- <20250728092956.24a7d09b@kernel.org>
- <b23ed0e2-05cf-454b-bf7a-a637c9bb48e8@kernel.org>
- <4eaf6d02-6b4e-4713-a8f8-6b00a031d255@linux.dev>
- <21f4ee22-84f0-4d5e-8630-9a889ca11e31@kernel.org>
- <20250801133803.7570a6fd@kernel.org>
- <de68b1d7-86cd-4280-af6a-13f0751228c4@kernel.org>
- <baa409d6-e571-4380-b046-5ea54c0e613d@linux.dev>
- <20a3558f-43c5-46a2-8395-c6d966ea5caf@kernel.org>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20a3558f-43c5-46a2-8395-c6d966ea5caf@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Subject: Re: [PATCH net v2 1/2] tls: handle data disappearing from under the
+ TLS
+ ULP
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175505408200.2923440.4502312522998846490.git-patchwork-notify@kernel.org>
+Date: Wed, 13 Aug 2025 03:01:22 +0000
+References: <20250807232907.600366-1-kuba@kernel.org>
+In-Reply-To: <20250807232907.600366-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ borisp@nvidia.com, john.fastabend@gmail.com, shuah@kernel.org,
+ linux-kselftest@vger.kernel.org, sd@queasysnail.net, will@willsroot.io,
+ savy@syst3mfailure.io
 
-On 8/7/25 12:07 PM, Jesper Dangaard Brouer wrote:
-> Yan and I have previously[1] (Oct 2024) explored adding a common
-> callback to XDP drivers, which have access to both the xdp_buff and SKB
-> in the function call. (Ignore the GRO disable bit, focus on callback)
-> 
-> We named the functions: xdp_buff_fixup_skb_offloading() and
->   xdp_frame_fixup_skb_offloading()
-> We implemented the driver changes for [bnxt], [mlx5], [ice] and [veth].
-> 
-> What do you think of the idea of adding a BPF-hook, at this callback,
-> which have access to both the XDP and SKB pointer.
-> That would allow us to implement your idea, right?
-> 
-> [1] https://lore.kernel.org/all/cover.1718919473.git.yan@cloudflare.com/#r
-> 
-> [bnxt] https://lore.kernel.org/all/ 
-> f804c22ca168ec3aedb0ee754bfbee71764eb894.1718919473.git.yan@cloudflare.com/
-> 
-> [mlx5] https://lore.kernel.org/ 
-> all/17595a278ee72964b83c0bd0b502152aa025f600.1718919473.git.yan@cloudflare.com/
-> 
-> [ice] https://lore.kernel.org/all/ 
-> a9eba425bfd3bfac7e7be38fe86ad5dbff3ae01f.1718919473.git.yan@cloudflare.com/
-> 
-> [veth] https://lore.kernel.org/all/ 
-> b7c75daecca9c4e36ef79af683d288653a9b5b82.1718919473.git.yan@cloudflare.com/
+Hello:
 
-It should not need a new BPF-hook to consume info produced by an earlier xdp 
-prog. Instead, the same and existing xdp prog can call a kfunc to directly 
-create the skb and update the skb fields. The kfunc could be driver specific, 
-like the current .xmo_rx_xxx.
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Thu,  7 Aug 2025 16:29:06 -0700 you wrote:
+> TLS expects that it owns the receive queue of the TCP socket.
+> This cannot be guaranteed in case the reader of the TCP socket
+> entered before the TLS ULP was installed, or uses some non-standard
+> read API (eg. zerocopy ones). Replace the WARN_ON() and a buggy
+> early exit (which leaves anchor pointing to a freed skb) with real
+> error handling. Wipe the parsing state and tell the reader to retry.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v2,1/2] tls: handle data disappearing from under the TLS ULP
+    https://git.kernel.org/netdev/net/c/6db015fc4b5d
+  - [net,v2,2/2] selftests: tls: test TCP stealing data from under the TLS socket
+    https://git.kernel.org/netdev/net/c/d7e82594a45c
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
