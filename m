@@ -1,126 +1,169 @@
-Return-Path: <netdev+bounces-213384-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213385-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74A83B24D02
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 17:16:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2507B24D1A
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 17:18:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A3335A6F09
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 15:11:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 147E63A3E98
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 15:12:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 451D02F83DA;
-	Wed, 13 Aug 2025 15:11:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5B942F83B4;
+	Wed, 13 Aug 2025 15:11:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YFDX/a+d"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="L6UQnLWY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E4692F83CE;
-	Wed, 13 Aug 2025 15:11:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CCEB2E54C3;
+	Wed, 13 Aug 2025 15:11:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755097862; cv=none; b=eHFcwqpJMyX70oS25PkA+FM7pFxLdCBYx6yH0XnS5EDsxEUbtMQc40iRzDVQTTyQgzIWDDxTJUkZ8bifMAtBkl9mlNVOWbIbL2F9932zE5TP9sim5de4R3ABVZSVYAXRR+y40F+DQzSmbx3skAqWY0Z/RILgrqmDhQU17fIZHPs=
+	t=1755097901; cv=none; b=hPwNnqX9FpZAnDhQGvRrFVFhhkQjj6jzjII4ND59hcU+T+pftr0bnkENYlAqqq8wSDjLgyUGuwgDePtceuwQrsk9IHsydZgJdiDCxCo4HBgMkjcF8trrSH+QEUtKr/kcTbxoLP59ed5nNIADMUNQTH33A9VSyXG72VHaAFYJ1mw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755097862; c=relaxed/simple;
-	bh=T6PzKvaBAl0sHZEaG3KoN6oMA14iGxTj6iDN3n4qYLA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UZwMBbnWxqt6DwK+MSGtqknjXHihX+RFAe7gUHsQHygOHevhjB8hWWT9RqPT5KtWrOjbw1RydmafyS7LGnW7GmXDSS1zwyJrr5FrYl9y97VUehxGlDS18azzAB9XsfW9PEVmawFyssA/921D3K7+0oL3uu+iqiEjcerUvGVM+cY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YFDX/a+d; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-459ebb6bbdfso42215695e9.0;
-        Wed, 13 Aug 2025 08:11:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755097859; x=1755702659; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=MtkdMyfCRuB76+xm3xhp5E1FXNlPLjI/VnBHA/rmI6o=;
-        b=YFDX/a+dfPy3Xoadz4AIHt7GGo44b15R0Q2TGKE19IYXnrY6gXfWxqS+l6nCeyId8h
-         y9QDMW1wxPX2FNcvSw+ajoJEYfs452ufhHYpLRqclH5K5NR9ZQZEyfbCNYB8ZEItX4u2
-         ZBcBt1h81E21uB2u0wsX4qEj4G2xjINmd/T3wIjNX4tFWgnp7IfZaRZZQqXlMCpePqp6
-         vK2PjgqBOedQ6RVQ77ZNt0EuHZUsJvKC0B33LHnIHiUxmJjJBbq/yNJ1/eDCglsfR3f6
-         XfWSDCH13qlrPKnnn+Js4hN2yfrpzQF1MUgLJ91XMvlFEkH3tGpE47YEvqZwGDcq+9kR
-         zCCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755097859; x=1755702659;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=MtkdMyfCRuB76+xm3xhp5E1FXNlPLjI/VnBHA/rmI6o=;
-        b=mFbPCJ4thnhEOn+ehCoa0qhCAvc2SOSJ4ROKulYkCMviaiHuEBkRTSyKnDErb5ZZFj
-         /3be9Nejn4YGH3z8lWBEwEPeXFY2idJXWrmaxI/EBCMyB4o8CZtzng7NcNZ8O92aIG73
-         PagBYyRivNYpbtKHVquDAe/hz0IW5xyT/kIm4Yug3YDLn29vs6fvNf0LV2QJgIgHcxVF
-         fjlq9PlboSF0eF9KHyToZH6RPe5yg2YZA4bDxB6ASc+TcCjJxFLMh1JQuKPI1d7XHJ0P
-         qlLbmUh2UBoEiX6wYHFuJXOUA7Y51+FRUQFpaBXh7Uk3Cq/SW+MGaaEu0vYes12cf7ry
-         FyKw==
-X-Forwarded-Encrypted: i=1; AJvYcCUd5aasDZTngKoB9WSr4w8OCLnmc6QQgdMDQM5dIjFbr/hb3wUcTAQqaQrKUKt0YOCUy6bWkqbjV9E4jcQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxLj5FJFZAmw4xz8iNbY8oKHXkkBSTvjhZNP+Fot5aeCv6rwwJL
-	21zA1nsRiLUKeDNAN2MHKV6XwzRn0eUNQ7etICevINEwEcv+bDW4566b
-X-Gm-Gg: ASbGncu8Owc0A9fnrvtjYev0DbGkBlWw7o1oKtKBPH8T5OTl1pnwjGv7DpIpIfofsx4
-	5OgINtgQ/jw9gyCKd9py5CGq8KhpWAvUYeMhANomz5DO5dKwWqvEFMJFb6xML7XRVfp4aiPrwun
-	Jmz/A5BB6/rK/KKDDOdRVHsI+IUm3ytynJep5UAqgekFxU2xFE2ECj6tzecqcT1CFp1Y9RL5ltX
-	dDQ70Txa4I9RijsNNphAyFvJ9PIOSA+SKsuX9aerSMJFTwRIUsqKWb3F+yYL/G6w7SM9oPOeYRa
-	20fA+p/73xYc5fwDuU4Y2EHaAm67bTBLGsLS7YsKrviMDEY4A0L25GRIe8ubUHoiOiUzf82UbJX
-	8u9rZoCykvfBigFJRUJoU+YHaLtdaQoG10g==
-X-Google-Smtp-Source: AGHT+IFu8pB0HNWtETpfIY/dDfhQOFqj/eMkPZiy+OnD3O/j4DscXl3QcbkORKE4i+tlfHJU7dx+zw==
-X-Received: by 2002:a05:600c:1d1b:b0:43c:ec4c:25b4 with SMTP id 5b1f17b1804b1-45a165afbd0mr38146465e9.10.1755097858519;
-        Wed, 13 Aug 2025 08:10:58 -0700 (PDT)
-Received: from localhost ([45.10.155.14])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45a1a590187sm5343425e9.25.2025.08.13.08.10.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Aug 2025 08:10:58 -0700 (PDT)
-Message-ID: <d6e37117-4409-4ca5-ace6-7af1c9fc0cd9@gmail.com>
-Date: Wed, 13 Aug 2025 17:10:47 +0200
+	s=arc-20240116; t=1755097901; c=relaxed/simple;
+	bh=2yskElXrJjNSFbolXxtSWkQFTJIr/Kri1xcUA4o5Qzw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y2xFYX9a/nrxCeNwi5eC31PAEpcjGnNrzOjFn/4TtgLwoH839U/tAZYX3yj9VQS/YEzUGtlLZPZ7dK6/Hm7APmdEScf+dffns2vHGetDe12CEJnBQKVbtHUueDTNHG6MILTH9bRX1/TLoh0dwl33fZ+f9yrecvywY4YnmDmKuts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=L6UQnLWY; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=LMlJoJUN3z4TOoymhV2DtpiX1kn0KKwfF8qPS2pcmHU=; b=L6UQnLWYrMlrHVT3n8xXDG3ugN
+	clQ5In+uwWVsNFgc44r3T6JBSoeithf5pdO5bYJGi1SNHXSa859qL48xo4P+WGC8oTKTZ+S1cKZsx
+	R0s06h2ClWJrEkADXDVw+O2g2EWybz1HUf/XWR0qkCz4qX1VsC0OJw6rYh1bZqibWYazJDjG+7yYu
+	WUm0nDmFWiDSLyB8XwL7NoKWhfKQ9yCfF9H9BFhfQDjb3A3kwqrChLNB6gvVDaTmQeVqzk4B1VoG/
+	WVnrLBoGPUthcPiu19DKeUP9pZZmkJr71epoNgBMUw/1Rax1GMKOjyp5W5wnNFG/Kj5vZkAaJeMs5
+	z2SpHfyA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35072)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1umD8L-0006tD-0T;
+	Wed, 13 Aug 2025 16:11:21 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1umD8C-0005rA-2x;
+	Wed, 13 Aug 2025 16:11:12 +0100
+Date: Wed, 13 Aug 2025 16:11:12 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Chen-Yu Tsai <wens@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
+	Jernej Skrabec <jernej@kernel.org>,
+	Samuel Holland <samuel@sholland.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org,
+	Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH net-next v2 02/10] net: stmmac: Add support for Allwinner
+ A523 GMAC200
+Message-ID: <aJyrECCOPTZP81Sx@shell.armlinux.org.uk>
+References: <20250813145540.2577789-1-wens@kernel.org>
+ <20250813145540.2577789-3-wens@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v5 1/5] net: udp: add freebind option to
- udp_sock_create
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- donald.hunter@gmail.com, andrew+netdev@lunn.ch, dsahern@kernel.org,
- shuah@kernel.org, daniel@iogearbox.net, jacob.e.keller@intel.com,
- razor@blackwall.org, petrm@nvidia.com, menglong8.dong@gmail.com,
- martin.lau@kernel.org, linux-kernel@vger.kernel.org
-References: <20250812125155.3808-1-richardbgobert@gmail.com>
- <20250812125155.3808-2-richardbgobert@gmail.com> <aJxaIeUT8wWZRw22@shredder>
-From: Richard Gobert <richardbgobert@gmail.com>
-In-Reply-To: <aJxaIeUT8wWZRw22@shredder>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250813145540.2577789-3-wens@kernel.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Ido Schimmel wrote:
-> On Tue, Aug 12, 2025 at 02:51:51PM +0200, Richard Gobert wrote:
->> udp_sock_create creates a UDP socket and binds it according to
->> udp_port_cfg.
->>
->> Add a freebind option to udp_port_cfg that allows a socket to be bound
->> as though IP_FREEBIND is set.
->>
->> This change is required for binding vxlan sockets to their local address
->> when the outgoing interface is down.
-> 
-> It's not necessarily the outgoing interface, but rather the interface to
-> which the address is assigned.
-> 
-> Anyway, I'm not sure this change is actually necessary. It was only
-> added in v4 because back then the default behavior was changed to bind
-> the VXLAN socket to the local address and existing selftests do not
-> necessarily configure the address before putting the VXLAN device up.
-> 
-> Given that in this version binding the VXLAN socket to the local address
-> is opt-in, it seems legitimate to prevent user space from putting the
-> VXLAN device up if the new option is enabled and the local address is
-> not present. It can also be documented in the man page so that users are
-> not surprised.
+Hi,
 
-Sounds good, will change in v6.
+A few comments on this...
+
+On Wed, Aug 13, 2025 at 10:55:32PM +0800, Chen-Yu Tsai wrote:
+> +#include "stmmac.h"
+> +#include "stmmac_platform.h"
+> +
+> +#define SYSCON_REG		0x34
+> +
+> +/* RMII specific bits */
+> +#define SYSCON_RMII_EN		BIT(13) /* 1: enable RMII (overrides EPIT) */
+> +/* Generic system control EMAC_CLK bits */
+> +#define SYSCON_ETXDC_MASK		GENMASK(12, 10)
+> +#define SYSCON_ERXDC_MASK		GENMASK(9, 5)
+> +/* EMAC PHY Interface Type */
+> +#define SYSCON_EPIT			BIT(2) /* 1: RGMII, 0: MII */
+> +#define SYSCON_ETCS_MASK		GENMASK(1, 0)
+> +#define SYSCON_ETCS_MII		0x0
+> +#define SYSCON_ETCS_EXT_GMII	0x1
+> +#define SYSCON_ETCS_INT_GMII	0x2
+> +
+> +#define MASK_TO_VAL(mask)   ((mask) >> (__builtin_ffsll(mask) - 1))
+
+Is FIELD_GET() not sufficient?
+
+> +
+> +static int sun55i_gmac200_set_syscon(struct device *dev,
+> +				     struct plat_stmmacenet_data *plat)
+> +{
+> +	struct device_node *node = dev->of_node;
+> +	struct regmap *regmap;
+> +	u32 val, reg = 0;
+> +	int ret;
+> +
+> +	regmap = syscon_regmap_lookup_by_phandle(node, "syscon");
+> +	if (IS_ERR(regmap))
+> +		return dev_err_probe(dev, PTR_ERR(regmap), "Unable to map syscon\n");
+> +
+> +	if (!of_property_read_u32(node, "tx-internal-delay-ps", &val)) {
+> +		if (val % 100)
+> +			return dev_err_probe(dev, -EINVAL,
+> +					     "tx-delay must be a multiple of 100\n");
+
+	"tx-delay must be a multiple of 100ps\n"
+
+would be a bit better.
+
+> +		val /= 100;
+> +		dev_dbg(dev, "set tx-delay to %x\n", val);
+> +		if (val > MASK_TO_VAL(SYSCON_ETXDC_MASK))
+> +			return dev_err_probe(dev, -EINVAL,
+> +					     "Invalid TX clock delay: %d\n",
+> +					     val);
+
+		if (!FIELD_FIT(SYSCON_ETXDC_MASK, val))
+			return dev_err_probe(dev, -EINVAL,
+					    "TX clock delay exceeds maximum (%d00ps > %d00ps)\n",
+					    val, FIELD_MAX(SYSCON_ETXDC_MASK));
+
+> +
+> +		reg |= FIELD_PREP(SYSCON_ETXDC_MASK, val);
+> +	}
+> +
+> +	if (!of_property_read_u32(node, "rx-internal-delay-ps", &val)) {
+> +		if (val % 100)
+> +			return dev_err_probe(dev, -EINVAL,
+> +					     "rx-delay must be a multiple of 100\n");
+> +		val /= 100;
+> +		dev_dbg(dev, "set rx-delay to %x\n", val);
+> +		if (val > MASK_TO_VAL(SYSCON_ERXDC_MASK))
+> +			return dev_err_probe(dev, -EINVAL,
+> +					     "Invalid RX clock delay: %d\n",
+> +					     val);
+
+all the same points in this block.
+
+Thanks.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
