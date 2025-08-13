@@ -1,360 +1,193 @@
-Return-Path: <netdev+bounces-213491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213492-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 087BAB254B1
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 22:48:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB8A0B254BE
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 22:54:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 424841C24D1C
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 20:49:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D65B61BC257A
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 20:54:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A553229BD97;
-	Wed, 13 Aug 2025 20:48:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 159A22D6408;
+	Wed, 13 Aug 2025 20:54:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VgXkCY+4"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PoBWnEIx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 360F02FD7A2;
-	Wed, 13 Aug 2025 20:48:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEED72FD7A2;
+	Wed, 13 Aug 2025 20:54:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755118128; cv=none; b=scT/NKCXHwAosc3Awf9n5MJnlQoH5hxbx52Xbf6UyPxhtTLCOp8GO7HOBbKv2cgMesbkkrrb4VmPGvfyU6jBOq47P9GX3dykMQugEwu2tJyx1V29jT1D+oITOGVFXKBgBm1B/KQxAva0m0OKYxJ4as7HVE/gbU1TZGAiKSdjyI8=
+	t=1755118461; cv=none; b=Ux17mD9CGnsV5pQXU6NL+LzwE1n97555PrPi+ncoPbcRvFO3BLjR5b7afHRBupu8AlzVdzNcpVIDePIy0ZTD2gIBbrUmNwhGQVanViLeC2Ne6fkyygetrodzPZlF0Tn7wT/PQ60IB12w5ydrLQzAhJovywSqLUrkHbbNY/puMRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755118128; c=relaxed/simple;
-	bh=PgXPt7HUxceyhvTpIsrdpg+x5ZSykD0yX1KPHBbs9g4=;
+	s=arc-20240116; t=1755118461; c=relaxed/simple;
+	bh=9DH8u6qIUtGbxO9LA7iEGvsWUvMMlo8SaH3exJ2B8QU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ldZV6I0R7lwA0Rlcq/COkil1RV7mh542pTsx8xRDLZ5fKTVaI8DjnfdNGOgRSU1SiBky4u3i8rQkMEPdmX/Ydb6R9QlFEdf+cxivQpFD8ZPQV3IcEqTc3fE3JANxzYJ6ux/2Vig7XKqXK7WVKdEaq/zke1r+6q++7Yo8zLhbjGc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VgXkCY+4; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1755118126; x=1786654126;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=PgXPt7HUxceyhvTpIsrdpg+x5ZSykD0yX1KPHBbs9g4=;
-  b=VgXkCY+4OfJ65kNcV75dtoiEiUP6dKXpArbppBMvpUTVj59/LNz4wd8h
-   bRYQtlQTsRTUO6E5tisRiB2B364gKQPRGSH3NCv8pE1HdvXGhOXgkYA8Z
-   bUfEaBnnQX3SHy+XPq7E7Sm3QgoZQ3/6+o06k0VGDTmu4mG56cw08FMYt
-   +GSvh8c2gfoZEhYiSz8UjiZ8o3g5igkWEDraLBnFucl53fsPGPkNXb3Yi
-   np5toHzs+17r5tJSu6F5wEKKzVpVYXzDPFm6gGirlZqLZ97RiLZ7b779z
-   rnUradX3Gou+KXZ8xd7fxQSTjLdZeyVXAuogNo5G1bebDMJTzg8AksgTL
-   Q==;
-X-CSE-ConnectionGUID: T5KeyP69RlST6ShQbVIGPg==
-X-CSE-MsgGUID: h+L3bCD8RLyC7RdRyb4WWw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11520"; a="57576834"
-X-IronPort-AV: E=Sophos;i="6.17,287,1747724400"; 
-   d="scan'208";a="57576834"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2025 13:48:45 -0700
-X-CSE-ConnectionGUID: F4+C6lErRNup9+xFGLOGxg==
-X-CSE-MsgGUID: WEyceoqrRzWLZdAUxD+cPA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,287,1747724400"; 
-   d="scan'208";a="203748409"
-Received: from lkp-server02.sh.intel.com (HELO 4ea60e6ab079) ([10.239.97.151])
-  by orviesa001.jf.intel.com with ESMTP; 13 Aug 2025 13:48:42 -0700
-Received: from kbuild by 4ea60e6ab079 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1umINk-000AIy-1n;
-	Wed, 13 Aug 2025 20:47:53 +0000
-Date: Thu, 14 Aug 2025 04:46:00 +0800
-From: kernel test robot <lkp@intel.com>
-To: Maciej =?utf-8?Q?=C5=BBenczykowski?= <maze@google.com>,
-	Maciej =?utf-8?Q?=C5=BBenczykowski?= <zenczykowski@gmail.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>
-Cc: oe-kbuild-all@lists.linux.dev,
-	Linux Network Development Mailing List <netdev@vger.kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	BPF Mailing List <bpf@vger.kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>
-Subject: Re: [PATCH bpf-next] bpf: hashtab - allow
- BPF_MAP_LOOKUP{,_AND_DELETE}_BATCH with NULL keys/values.
-Message-ID: <202508140435.GA2XXxaK-lkp@intel.com>
-References: <20250813073955.1775315-1-maze@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Dj4Ebu4gPIgAHjp67PU1TkPVRWvLBws+zuhBFnusxs4SodDKiLhszqsh2Uk1kgkNGZQr7yr5K5tePjtSFKZucCWYnu5PnYethN6KJi/W11IT0wD0dP3qwVuotulW+EenqRt+B7XFH7yh6MtQg8HXGnK3mmSSP6Mgo9j1TGkN6pg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PoBWnEIx; arc=none smtp.client-ip=91.218.175.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Wed, 13 Aug 2025 13:53:58 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1755118445;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BnHjAcE2afHw2ZH4ahTMmzFeMhbV05T1AU89RXbzZLs=;
+	b=PoBWnEIxIcfMYl/tlSSwqrpgpdkIgUnt+/l5CiIfW4q7tMLS63s9dpu3LCinuWGdf2pZLI
+	PFouMpIDd+OtRzFJ0DZjD6mxEhmzKK6mUYtO0jIMBKS2DPJrYVw2hs6FmH7tH0tstH4dSA
+	7GSmRfkdmXKgTvsCjyX68rxPSWqhU08=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Shakeel Butt <shakeel.butt@linux.dev>
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Neal Cardwell <ncardwell@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Willem de Bruijn <willemb@google.com>, Matthieu Baerts <matttbe@kernel.org>, 
+	Mat Martineau <martineau@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
+	Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>, 
+	Andrew Morton <akpm@linux-foundation.org>, Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, 
+	Tejun Heo <tj@kernel.org>, Simon Horman <horms@kernel.org>, 
+	Geliang Tang <geliang@kernel.org>, Muchun Song <muchun.song@linux.dev>, 
+	Mina Almasry <almasrymina@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
+	mptcp@lists.linux.dev, cgroups@vger.kernel.org, linux-mm@kvack.org, bpf@vger.kernel.org
+Subject: Re: [PATCH v3 net-next 12/12] net-memcg: Decouple controlled memcg
+ from global protocol memory accounting.
+Message-ID: <oafk5om7v5vtxjmo5rtwy6ullprfaf6mk2lh4km7alj3dtainn@jql2rih5es4n>
+References: <20250812175848.512446-1-kuniyu@google.com>
+ <20250812175848.512446-13-kuniyu@google.com>
+ <w6klr435a4rygmnifuujg6x4k77ch7cwoq6dspmyknqt24cpjz@bbz4wzmxjsfk>
+ <CAAVpQUCU=VJxA6NKx+O1_zwzzZOxUEsG9mY+SNK+bzb=dj9s5w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250813073955.1775315-1-maze@google.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAAVpQUCU=VJxA6NKx+O1_zwzzZOxUEsG9mY+SNK+bzb=dj9s5w@mail.gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-Hi Maciej,
+On Wed, Aug 13, 2025 at 11:19:31AM -0700, Kuniyuki Iwashima wrote:
+> On Wed, Aug 13, 2025 at 12:11 AM Shakeel Butt <shakeel.butt@linux.dev> wrote:
+> >
+> > On Tue, Aug 12, 2025 at 05:58:30PM +0000, Kuniyuki Iwashima wrote:
+> > > Some protocols (e.g., TCP, UDP) implement memory accounting for socket
+> > > buffers and charge memory to per-protocol global counters pointed to by
+> > > sk->sk_proto->memory_allocated.
+> > >
+> > > When running under a non-root cgroup, this memory is also charged to the
+> > > memcg as "sock" in memory.stat.
+> > >
+> > > Even when a memcg controls memory usage, sockets of such protocols are
+> > > still subject to global limits (e.g., /proc/sys/net/ipv4/tcp_mem).
+> > >
+> > > This makes it difficult to accurately estimate and configure appropriate
+> > > global limits, especially in multi-tenant environments.
+> > >
+> > > If all workloads were guaranteed to be controlled under memcg, the issue
+> > > could be worked around by setting tcp_mem[0~2] to UINT_MAX.
+> > >
+> > > In reality, this assumption does not always hold, and processes that
+> > > belong to the root cgroup or opt out of memcg can consume memory up to
+> > > the global limit, becoming a noisy neighbour.
+> >
+> > Processes running in root memcg (I am not sure what does 'opt out of
+> > memcg means')
+> 
+> Sorry, I should've clarified memory.max==max (and same
+> up to all ancestors as you pointed out below) as opt-out,
+> where memcg works but has no effect.
+> 
+> 
+> > means admin has intentionally allowed scenarios where
+> 
+> Not really intentionally, but rather reluctantly because the admin
+> cannot guarantee memory.max solely without tcp_mem=UINT_MAX.
+> We should not disregard the cause that the two mem accounting are
+> coupled now.
+> 
+> 
+> > noisy neighbour situation can happen, so I am not really following your
+> > argument here.
+> 
+> So basically here I meant with tcp_mem=UINT_MAX any process
+> can be noisy neighbour unnecessarily.
 
-kernel test robot noticed the following build warnings:
+Only if there are processes in cgroups with unlimited memory limits.
 
-[auto build test WARNING on bpf-next/master]
+I think you are still missing the point. So, let me be very clear:
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Maciej-enczykowski/bpf-hashtab-allow-BPF_MAP_LOOKUP-_AND_DELETE-_BATCH-with-NULL-keys-values/20250813-154227
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
-patch link:    https://lore.kernel.org/r/20250813073955.1775315-1-maze%40google.com
-patch subject: [PATCH bpf-next] bpf: hashtab - allow BPF_MAP_LOOKUP{,_AND_DELETE}_BATCH with NULL keys/values.
-config: csky-randconfig-001-20250814 (https://download.01.org/0day-ci/archive/20250814/202508140435.GA2XXxaK-lkp@intel.com/config)
-compiler: csky-linux-gcc (GCC) 15.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250814/202508140435.GA2XXxaK-lkp@intel.com/reproduce)
+Please stop using the "processes in cgroup with memory.max==max can be
+source of isolation issues" argument. Having unlimited limit means you
+don't want isolation. More importantly you don't really need this
+argument for your work. It is clear (to me at least) that we want global
+TCP memory accounting to be decoupled from memcg accounting. Using the
+flawed argument is just making your series controversial.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202508140435.GA2XXxaK-lkp@intel.com/
+[...]
+> > Why not start with just two global options (maybe start with boot
+> > parameter)?
+> >
+> > Option 1: Existing behavior where memcg and global TCP accounting are
+> > coupled.
+> >
+> > Option 2: Completely decouple memcg and global TCP accounting i.e. use
+> > mem_cgroup_sockets_enabled to either do global TCP accounting or memcg
+> > accounting.
+> >
+> > Keep the option 1 default.
+> >
+> > I assume you want third option where a mix of these options can happen
+> > i.e. some sockets are only accounted to a memcg and some are accounted
+> > to both memcg and global TCP.
+> 
+> Yes because usually not all memcg have memory.max configured
+> and we do not want to allow unlimited TCP memory for them.
+> 
+> Option 2 works for processes in the root cgroup but doesn't for
+> processes in non-root cgroup with memory.max == max.
+> 
+> A good example is system processes managed by systemd where
+> we do not want to specify memory.max but want a global seatbelt.
+> 
+> Note this is how it works _now_, and we want to _preserve_ the case.
+> Does this make sense  ? > why decouple only for some
+> 
 
-All warnings (new ones prefixed by >>):
+I hope I am very clear to stop using the memory.max == max argument.
 
-   kernel/bpf/hashtab.c: In function '__htab_map_lookup_and_delete_batch':
->> kernel/bpf/hashtab.c:1875:34: warning: suggest parentheses around '&&' within '||' [-Wparentheses]
-    1875 |         if (bucket_cnt && (ukeys && copy_to_user(ukeys + total * key_size, keys,
-         |                            ~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    1876 |             key_size * bucket_cnt) ||
-         |             ~~~~~~~~~~~~~~~~~~~~~~
+> 
+> > I would recommend to make that a followup
+> > patch series. Keep this series simple and non-controversial.
+> 
+> I can separate the series, but I'd like to make sure the
+> Option 2 is a must for you or Meta configured memory.max
+> for all cgroups ?  I didn't think it's likely but if there's a real
+> use case, I'm happy to add a boot param.
+> 
+> The only diff would be boot param addition and the condition
+> change in patch 11 so simplicity won't change.
 
+I am not sure if option 2 will be used by Meta or someone else, so no
+objection from me to not pursue it. However I don't want some possibly
+userspace policy to opt-in in one or the other accounting mechanism in
+the kernel.
 
-vim +1875 kernel/bpf/hashtab.c
+What I think is the right approach is to have BPF struct ops based
+approach with possible callback 'is this socket under pressure' or maybe
+'is this socket isolated' and then you can do whatever you want in those
+callbacks. In this way your can follow the same approach of caching the
+result in kernel (lower bits of sk->sk_memcg).
 
-  1675	
-  1676	static int
-  1677	__htab_map_lookup_and_delete_batch(struct bpf_map *map,
-  1678					   const union bpf_attr *attr,
-  1679					   union bpf_attr __user *uattr,
-  1680					   bool do_delete, bool is_lru_map,
-  1681					   bool is_percpu)
-  1682	{
-  1683		struct bpf_htab *htab = container_of(map, struct bpf_htab, map);
-  1684		void *keys = NULL, *values = NULL, *value, *dst_key, *dst_val;
-  1685		void __user *uvalues = u64_to_user_ptr(attr->batch.values);
-  1686		void __user *ukeys = u64_to_user_ptr(attr->batch.keys);
-  1687		void __user *ubatch = u64_to_user_ptr(attr->batch.in_batch);
-  1688		u32 batch, max_count, size, bucket_size, map_id;
-  1689		u32 bucket_cnt, total, key_size, value_size;
-  1690		struct htab_elem *node_to_free = NULL;
-  1691		u64 elem_map_flags, map_flags;
-  1692		struct hlist_nulls_head *head;
-  1693		struct hlist_nulls_node *n;
-  1694		unsigned long flags = 0;
-  1695		bool locked = false;
-  1696		struct htab_elem *l;
-  1697		struct bucket *b;
-  1698		int ret = 0;
-  1699	
-  1700		elem_map_flags = attr->batch.elem_flags;
-  1701		if ((elem_map_flags & ~BPF_F_LOCK) ||
-  1702		    ((elem_map_flags & BPF_F_LOCK) && !btf_record_has_field(map->record, BPF_SPIN_LOCK)))
-  1703			return -EINVAL;
-  1704	
-  1705		map_flags = attr->batch.flags;
-  1706		if (map_flags)
-  1707			return -EINVAL;
-  1708	
-  1709		max_count = attr->batch.count;
-  1710		if (!max_count)
-  1711			return 0;
-  1712	
-  1713		if (put_user(0, &uattr->batch.count))
-  1714			return -EFAULT;
-  1715	
-  1716		batch = 0;
-  1717		if (ubatch && copy_from_user(&batch, ubatch, sizeof(batch)))
-  1718			return -EFAULT;
-  1719	
-  1720		if (batch >= htab->n_buckets)
-  1721			return -ENOENT;
-  1722	
-  1723		key_size = htab->map.key_size;
-  1724		value_size = htab->map.value_size;
-  1725		size = round_up(value_size, 8);
-  1726		if (is_percpu)
-  1727			value_size = size * num_possible_cpus();
-  1728		total = 0;
-  1729		/* while experimenting with hash tables with sizes ranging from 10 to
-  1730		 * 1000, it was observed that a bucket can have up to 5 entries.
-  1731		 */
-  1732		bucket_size = 5;
-  1733	
-  1734	alloc:
-  1735		/* We cannot do copy_from_user or copy_to_user inside
-  1736		 * the rcu_read_lock. Allocate enough space here.
-  1737		 */
-  1738		keys = kvmalloc_array(key_size, bucket_size, GFP_USER | __GFP_NOWARN);
-  1739		values = kvmalloc_array(value_size, bucket_size, GFP_USER | __GFP_NOWARN);
-  1740		if (!keys || !values) {
-  1741			ret = -ENOMEM;
-  1742			goto after_loop;
-  1743		}
-  1744	
-  1745	again:
-  1746		bpf_disable_instrumentation();
-  1747		rcu_read_lock();
-  1748	again_nocopy:
-  1749		dst_key = keys;
-  1750		dst_val = values;
-  1751		b = &htab->buckets[batch];
-  1752		head = &b->head;
-  1753		/* do not grab the lock unless need it (bucket_cnt > 0). */
-  1754		if (locked) {
-  1755			ret = htab_lock_bucket(b, &flags);
-  1756			if (ret) {
-  1757				rcu_read_unlock();
-  1758				bpf_enable_instrumentation();
-  1759				goto after_loop;
-  1760			}
-  1761		}
-  1762	
-  1763		bucket_cnt = 0;
-  1764		hlist_nulls_for_each_entry_rcu(l, n, head, hash_node)
-  1765			bucket_cnt++;
-  1766	
-  1767		if (bucket_cnt && !locked) {
-  1768			locked = true;
-  1769			goto again_nocopy;
-  1770		}
-  1771	
-  1772		if (bucket_cnt > (max_count - total)) {
-  1773			if (total == 0)
-  1774				ret = -ENOSPC;
-  1775			/* Note that since bucket_cnt > 0 here, it is implicit
-  1776			 * that the locked was grabbed, so release it.
-  1777			 */
-  1778			htab_unlock_bucket(b, flags);
-  1779			rcu_read_unlock();
-  1780			bpf_enable_instrumentation();
-  1781			goto after_loop;
-  1782		}
-  1783	
-  1784		if (bucket_cnt > bucket_size) {
-  1785			bucket_size = bucket_cnt;
-  1786			/* Note that since bucket_cnt > 0 here, it is implicit
-  1787			 * that the locked was grabbed, so release it.
-  1788			 */
-  1789			htab_unlock_bucket(b, flags);
-  1790			rcu_read_unlock();
-  1791			bpf_enable_instrumentation();
-  1792			kvfree(keys);
-  1793			kvfree(values);
-  1794			goto alloc;
-  1795		}
-  1796	
-  1797		/* Next block is only safe to run if you have grabbed the lock */
-  1798		if (!locked)
-  1799			goto next_batch;
-  1800	
-  1801		hlist_nulls_for_each_entry_safe(l, n, head, hash_node) {
-  1802			memcpy(dst_key, l->key, key_size);
-  1803	
-  1804			if (is_percpu) {
-  1805				int off = 0, cpu;
-  1806				void __percpu *pptr;
-  1807	
-  1808				pptr = htab_elem_get_ptr(l, map->key_size);
-  1809				for_each_possible_cpu(cpu) {
-  1810					copy_map_value_long(&htab->map, dst_val + off, per_cpu_ptr(pptr, cpu));
-  1811					check_and_init_map_value(&htab->map, dst_val + off);
-  1812					off += size;
-  1813				}
-  1814			} else {
-  1815				value = htab_elem_value(l, key_size);
-  1816				if (is_fd_htab(htab)) {
-  1817					struct bpf_map **inner_map = value;
-  1818	
-  1819					 /* Actual value is the id of the inner map */
-  1820					map_id = map->ops->map_fd_sys_lookup_elem(*inner_map);
-  1821					value = &map_id;
-  1822				}
-  1823	
-  1824				if (elem_map_flags & BPF_F_LOCK)
-  1825					copy_map_value_locked(map, dst_val, value,
-  1826							      true);
-  1827				else
-  1828					copy_map_value(map, dst_val, value);
-  1829				/* Zeroing special fields in the temp buffer */
-  1830				check_and_init_map_value(map, dst_val);
-  1831			}
-  1832			if (do_delete) {
-  1833				hlist_nulls_del_rcu(&l->hash_node);
-  1834	
-  1835				/* bpf_lru_push_free() will acquire lru_lock, which
-  1836				 * may cause deadlock. See comments in function
-  1837				 * prealloc_lru_pop(). Let us do bpf_lru_push_free()
-  1838				 * after releasing the bucket lock.
-  1839				 *
-  1840				 * For htab of maps, htab_put_fd_value() in
-  1841				 * free_htab_elem() may acquire a spinlock with bucket
-  1842				 * lock being held and it violates the lock rule, so
-  1843				 * invoke free_htab_elem() after unlock as well.
-  1844				 */
-  1845				l->batch_flink = node_to_free;
-  1846				node_to_free = l;
-  1847			}
-  1848			dst_key += key_size;
-  1849			dst_val += value_size;
-  1850		}
-  1851	
-  1852		htab_unlock_bucket(b, flags);
-  1853		locked = false;
-  1854	
-  1855		while (node_to_free) {
-  1856			l = node_to_free;
-  1857			node_to_free = node_to_free->batch_flink;
-  1858			if (is_lru_map)
-  1859				htab_lru_push_free(htab, l);
-  1860			else
-  1861				free_htab_elem(htab, l);
-  1862		}
-  1863	
-  1864	next_batch:
-  1865		/* If we are not copying data, we can go to next bucket and avoid
-  1866		 * unlocking the rcu.
-  1867		 */
-  1868		if (!bucket_cnt && (batch + 1 < htab->n_buckets)) {
-  1869			batch++;
-  1870			goto again_nocopy;
-  1871		}
-  1872	
-  1873		rcu_read_unlock();
-  1874		bpf_enable_instrumentation();
-> 1875		if (bucket_cnt && (ukeys && copy_to_user(ukeys + total * key_size, keys,
-  1876		    key_size * bucket_cnt) ||
-  1877		    uvalues && copy_to_user(uvalues + total * value_size, values,
-  1878		    value_size * bucket_cnt))) {
-  1879			ret = -EFAULT;
-  1880			goto after_loop;
-  1881		}
-  1882	
-  1883		total += bucket_cnt;
-  1884		batch++;
-  1885		if (batch >= htab->n_buckets) {
-  1886			ret = -ENOENT;
-  1887			goto after_loop;
-  1888		}
-  1889		goto again;
-  1890	
-  1891	after_loop:
-  1892		if (ret == -EFAULT)
-  1893			goto out;
-  1894	
-  1895		/* copy # of entries and next batch */
-  1896		ubatch = u64_to_user_ptr(attr->batch.out_batch);
-  1897		if (copy_to_user(ubatch, &batch, sizeof(batch)) ||
-  1898		    put_user(total, &uattr->batch.count))
-  1899			ret = -EFAULT;
-  1900	
-  1901	out:
-  1902		kvfree(keys);
-  1903		kvfree(values);
-  1904		return ret;
-  1905	}
-  1906	
+I am CCing bpf list to get some suggestions or concerns on this
+approach.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
