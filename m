@@ -1,132 +1,155 @@
-Return-Path: <netdev+bounces-213487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213488-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 007CFB2546B
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 22:12:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 66579B2547A
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 22:23:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 76B7956782F
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 20:12:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E1C71162855
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 20:21:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B70B2FD7CE;
-	Wed, 13 Aug 2025 20:12:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49D0C27FD5A;
+	Wed, 13 Aug 2025 20:21:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=cmpxchg-org.20230601.gappssmtp.com header.i=@cmpxchg-org.20230601.gappssmtp.com header.b="cGcHfJ/P"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06C632FD7B9;
-	Wed, 13 Aug 2025 20:12:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2677E3D994
+	for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 20:21:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755115925; cv=none; b=C5GjDD4/Pq/KOcrV+wPeKDvyX/iAC0mIiSdUBD0pvuB6sKvvaWIW5IPAIvSh/Ej8GiKd9sQV7Xj32DQbLXzhsq1im7Jtz9AYn+ssNYj2Pm7ilvs6JFJf+xxqVTEaeNQ8vrEa8Vk/NrgSx8KRVFffG6JrOCc9hB35oAI2Idv6kXU=
+	t=1755116511; cv=none; b=Yt/cwDN5DMjgofvNrd1Jbym/UVKp4E8fRSIQ8bvVB5s//IqFe3ZHrC3y0pfdmx1iXQj1REssPjXgFAx2J5JgmLxIzolOrjNEcEbTOeEPVXprN+yHBZqCECiRs9p0Qq8UfFgbmxezN3tDpOBWM7dkZ/FnTM80n4Hi4nPuPX2dq6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755115925; c=relaxed/simple;
-	bh=Juf1ZTnx/FB2vFj4STFZmefBih8aOZWA68hdzIY4NFA=;
+	s=arc-20240116; t=1755116511; c=relaxed/simple;
+	bh=spEw6iTr/TlKdoJ9qRoclMR04HEh7O0DeIyHVYrMPS4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JB5AJSzkOAuoNNWpWM6/mxFcqW4DWDAa05IPPI8B6A+k1q8f82MTGOPHrGPwH8WFxwza2Z62Q8i5PUMxFqiBseCBszGY1Y8l290CpEWaGDltftg5jdoJ+1caSUCrMFD06smVfCPrFhl6E8oj2NHZ8BLE+XYFtbilzDyOaUK8Lgs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4096C4CEEF;
-	Wed, 13 Aug 2025 20:11:53 +0000 (UTC)
-Date: Wed, 13 Aug 2025 21:11:51 +0100
-From: Mark Brown <broonie@debian.org>
-To: Tamir Duberstein <tamird@gmail.com>
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>,
-	Viresh Kumar <viresh.kumar@linaro.org>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Alex Gaynor <alex.gaynor@gmail.com>,
-	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
-	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
-	Benno Lossin <lossin@kernel.org>,
-	Andreas Hindborg <a.hindborg@kernel.org>,
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	FUJITA Tomonori <fujita.tomonori@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=Hgy9Wd8kHymPxGdfFnMbtoB+pCa7cjw4PdpjJoCERZSZwd0s2AX+CBfk+iN8lVpR4xgOVqRl8FAhxhfX6FIqEuR20mtLaoEdFHykRIdGhlHzWb/sFm9wc0WutDryUor8YChvSq4wtAjVuopLtyJwUpKe/pMXYmiEE6DiKdskVrQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cmpxchg.org; spf=pass smtp.mailfrom=cmpxchg.org; dkim=pass (2048-bit key) header.d=cmpxchg-org.20230601.gappssmtp.com header.i=@cmpxchg-org.20230601.gappssmtp.com header.b=cGcHfJ/P; arc=none smtp.client-ip=209.85.222.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cmpxchg.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cmpxchg.org
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7e870316b79so24887585a.0
+        for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 13:21:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cmpxchg-org.20230601.gappssmtp.com; s=20230601; t=1755116508; x=1755721308; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=H30kUHUoAp0mgFKEUbjujIS0Xnkk94c0v9Jq8jaPeYc=;
+        b=cGcHfJ/PUOTvizvE2euT/CsdSMMwDgvI7BPZL6k0tNNR4edHZ/JxwXEXE9IyR/AGTo
+         4k4gR1M8LFn1RvVZQDbuwcpqwsubgC7d8hpF+qU9b6EKUhBq3Au7/9hBy+8P5jdX+yxF
+         G01EguLPdrNeSKIfy5CUhAIPKRo71gPD665H/ORJ/wV4tZPf171z5d7TGPljXHcutguE
+         3NDtpn3cimXkgIeQ/vxS6uqx6XoP7x4gNoeA8jwkmHrphJ+i/bwiKCyJQZe4zUNJHXoi
+         +SlN+Ha7YDd/d0E5cAuvMr9wcixsySfdV0Tj8RJO5VEQ/CaliJwkhGDSY/nxKq3zQgyH
+         c0eA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755116508; x=1755721308;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=H30kUHUoAp0mgFKEUbjujIS0Xnkk94c0v9Jq8jaPeYc=;
+        b=nuyOm0tlVHmbAibPlix+7vGXioPrCVlAx8oHz0gR8uAPqqwX7oPgzrFm31sRKo+wvU
+         EzpC9GBYpUr6l2fjv1B8wvG1fAzhTmETLw7iOP7KSIpi75W6EfBPODN0J6xbfIXo6qw8
+         1QvtQxxUUaRBgfeOIHUOSeYrPFXMPOMVVhhIORyASzA2Z5MpAMBTZEHanZSy5YJDdzDC
+         MaPv/ycVyNuH6PeiCfwc8RHbxK9CqtANv9iuqdvBUptsCnpXLeNQEt0CLWGezk7KDyZi
+         ksZSFsQmldEHSlSFYBkHu57vOc2+ps539N4WSvKiqo6FEYS+WAUUYo6Lygnc89UutgHH
+         We7w==
+X-Forwarded-Encrypted: i=1; AJvYcCWahTmpZh7ofQwz4LpNLPq/UBlpadeZHt6ke57E+vVCbYQai9bruU2ooGvRg4KDhzLSP/Irpj4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw5GX93Y3AEPZb56LfCbpzfeVm88LI66i4yZBW57VX6cQuJtIrJ
+	IOMfsbzypDXOrC96cGMM39Fps50uTo3kra+iAm4MQkGerQlZWSPWKnll7AXRF2EXjLQ=
+X-Gm-Gg: ASbGncuKwS6KU4YQsBXRD9p21ZvGkhezcWGZPl/mzPgYGSCojae2uybEtq8pABscQso
+	A7NqBcZ6OXpYeHi0zbYsJS8QNOnVq9fvRcD3R8EHQtI59hADg2w3hHfJahRgzvvPB5t28JTiOgy
+	L56wIqy//XnQ9LLzEevyCC2ZyfCRNuaLDR/DkMGlTk/64+qZ0OYepjANeygexk17/cJ3Oxo68jk
+	9sPUwHQa01VV26WnFC+p6GjnukxVi//G+52StdpOhfZY1LSYzN8T1KBShf+OQ9QUAzzkpefVy7k
+	MN36hFoiAi960K1pRkrKk0y4H9Q1WvcVyKhPKrwxXxQqq4oPLKos0hNARNP4aaV4XhXpVxiZq6S
+	tVskJcvhZClw23WYWgK4qpw==
+X-Google-Smtp-Source: AGHT+IHL4RX8mGUQFHn3xTKxG6noHoTer9v5afSRdyTGpU+E2ho9o1DxodPcyvf3+YYPPRrSEMF5JQ==
+X-Received: by 2002:a05:620a:3bd2:b0:7e3:28f3:8a5 with SMTP id af79cd13be357-7e87045d632mr87942885a.28.1755116507799;
+        Wed, 13 Aug 2025 13:21:47 -0700 (PDT)
+Received: from localhost ([2603:7000:c01:2716:929a:4aff:fe16:c778])
+        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-7e8079cfcc9sm1486333285a.29.2025.08.13.13.21.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Aug 2025 13:21:46 -0700 (PDT)
+Date: Wed, 13 Aug 2025 16:21:42 -0400
+From: Johannes Weiner <hannes@cmpxchg.org>
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, Breno Leitao <leitao@debian.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Russ Weight <russ.weight@linux.dev>,
-	Dave Ertman <david.m.ertman@intel.com>,
-	Ira Weiny <ira.weiny@intel.com>, Leon Romanovsky <leon@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Brendan Higgins <brendan.higgins@linux.dev>,
-	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Alexandre Courbot <acourbot@nvidia.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	Liam Girdwood <lgirdwood@gmail.com>, linux-pm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org,
-	nouveau@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-	netdev@vger.kernel.org, linux-clk@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	kunit-dev@googlegroups.com, linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH v2 00/19] rust: replace `kernel::c_str!` with C-Strings
-Message-ID: <34d384af-6123-4602-bde0-85ca3d14fe09@sirena.org.uk>
-References: <20250813-core-cstr-cstrings-v2-0-00be80fc541b@gmail.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Neal Cardwell <ncardwell@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Matthieu Baerts <matttbe@kernel.org>,
+	Mat Martineau <martineau@kernel.org>,
+	Michal Hocko <mhocko@kernel.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+	Tejun Heo <tj@kernel.org>, Simon Horman <horms@kernel.org>,
+	Geliang Tang <geliang@kernel.org>,
+	Muchun Song <muchun.song@linux.dev>,
+	Mina Almasry <almasrymina@google.com>,
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org,
+	mptcp@lists.linux.dev, cgroups@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH v3 net-next 12/12] net-memcg: Decouple controlled memcg
+ from global protocol memory accounting.
+Message-ID: <20250813202142.GB115258@cmpxchg.org>
+References: <20250812175848.512446-1-kuniyu@google.com>
+ <20250812175848.512446-13-kuniyu@google.com>
+ <20250813130009.GA114408@cmpxchg.org>
+ <CAAVpQUB-xnx_29Hw-_Z4EbtJKkJT1_BCfXcQM7OpCO09goF+ew@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="6FVk2V0LrGBjdKpm"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250813-core-cstr-cstrings-v2-0-00be80fc541b@gmail.com>
-X-Cookie: Turn the other cheek.
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAAVpQUB-xnx_29Hw-_Z4EbtJKkJT1_BCfXcQM7OpCO09goF+ew@mail.gmail.com>
 
+On Wed, Aug 13, 2025 at 11:43:15AM -0700, Kuniyuki Iwashima wrote:
+> On Wed, Aug 13, 2025 at 6:00 AM Johannes Weiner <hannes@cmpxchg.org> wrote:
+> This change stop double-charging by opting out of _the
+> networking layer one_ because it interferes with memcg
+> and complicates configuration of memory.max and the
+> global networking limit.
 
---6FVk2V0LrGBjdKpm
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+No, we do want the global limits as a backstop - even if every single
+cgroup in the system has its own memory limit.
 
-On Wed, Aug 13, 2025 at 11:59:10AM -0400, Tamir Duberstein wrote:
-> This series depends on step 3[0] which depends on steps 2a[1] and 2b[2]
-> which both depend on step 1[3].
->=20
-> This series also has a minor merge conflict with a small change[4] that
-> was taken through driver-core-testing. This series is marked as
-> depending on that change; as such it contains the post-conflict patch.
->=20
-> Subsystem maintainers: I would appreciate your `Acked-by`s so that this
-> can be taken through Miguel's tree (where the previous series must go).
+Sure, from a fairness POV, we want socket buffers accounted towards
+the containers' memory footprint and subject to their limits.
 
-Something seems to have gone wrong with your posting, both my mail
-server and the mail archives stop at patch 15.  If it were just rate
-limiting or greylisting I'd have expected things to have sorted
-themselves out by now for one or the other.
+But that doesn't imply that we can let the cgroup limit be the only
+thing curbing an explosion in socket buffers.
 
---6FVk2V0LrGBjdKpm
-Content-Type: application/pgp-signature; name="signature.asc"
+This isn't about fairness, but about host stability.
 
------BEGIN PGP SIGNATURE-----
+The MM can easily get rid of file cache and heap pages, but it has
+limited to no control over the socket buffer lifetime. If you split a
+1TB host into 8 containers limited to ~128G, that doesn't mean you
+want to allow up to 1TB of memory in socket buffers. That could make
+low memory situations unrecoverable.
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmic8YYACgkQJNaLcl1U
-h9Cumwf/YkCiNa2FUFyl0xap34GT0uNu8Xh2QH5gQa+2jI19lL8u1OybvUdzWI8N
-dryQmdo4BgnkEFiIeCiAWIUh8fHachIQqfAZfj8yJRexfSk3R0S/Nrg8CfGa9myh
-jkwom0F4sUSvZpsacG1c/oCya64UwN/bCgC+Yw2fivCPjjw/vz1JE5gtarpJEQly
-EJBbiexaSe0XYdtZ3cIT4wm0YElZqekk8U953MglLhWOOLXzt59bkslAam/8fori
-si1u/uVgWv1vyziB8dYHRa26Gsgy9OkgjCD0P64YWkoAV/uSnxsEo5wtWBx2ys1n
-pZ4kmgo8dh16iRQ7pqHeV2g3wE9HiQ==
-=xgNk
------END PGP SIGNATURE-----
+> > Maybe their socket buffers is the only thing that happens
+> > to matter to *you*, but this is in no way a generic, universal,
+> > upstreamable solution. Knob or auto-detection is not the issue.
+> >
+> > Nacked-by: Johannes Weiner <hannes@cmpxchg.org>
+> 
+> Please let me know if this nack still applies with the
+> explanation above.
 
---6FVk2V0LrGBjdKpm--
+Yes, for one I think it's an unacceptable behavioral change of the
+sysctl semantics.
+
+But my wider point is that I think you're trying to fix something that
+is a direct result of a flawed approach to containerization, and it
+would make much more sense to address that instead.
 
