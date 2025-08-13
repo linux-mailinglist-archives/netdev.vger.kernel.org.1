@@ -1,125 +1,151 @@
-Return-Path: <netdev+bounces-213224-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213225-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56127B24253
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 09:14:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76DEBB24266
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 09:17:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5D493A9ED6
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 07:12:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C49741894540
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 07:16:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A55E32D191E;
-	Wed, 13 Aug 2025 07:11:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2938F2D46D4;
+	Wed, 13 Aug 2025 07:15:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="gG4+WM5I"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ObG88ZVD"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C473D265CB3
-	for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 07:11:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E59AC27280E;
+	Wed, 13 Aug 2025 07:15:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755069111; cv=none; b=Am5ik9GOSJEWDY//c0xsJs63IlSu8kAk4D+cF9DzCWBfiFr0QqsvpyCNnPGb9DFi+2z4VXERIEG8ZYoyM7/X2lCdmFQS3wHVz+nXenRkox/oMAz/i2BSl2MyMJ+kf0qV+Lkr9plAWrHR62w5i2+a8ppFXdl0cvLyOmDYT6UMnzQ=
+	t=1755069334; cv=none; b=fvLuQPgmoFgFmI3qOhT56cLQc/7ntLLA+CJnqe6kuhKmWPBcAhk7MbCnhQ8OT2FDF/+Pj/SvO3f0iUcqKIwlnJvH7j13QifE6WEy0o+7RpdMjKGvP9ClR8XIIBvzFOjsHsP09vzTyNss5D1VWh7ubaJ0uAMaoiVz10MwqsMIpHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755069111; c=relaxed/simple;
-	bh=j5cndD/Yt7hg4UEX0fFeQVI5gpYpcjUZXvJ2XEBYzHQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jJr+SdGAVj7NXprCjsZ0iQzcC/JerBsIIXG6cCJc9HUwnm5yR8FfppWZ3NiNL0CrKg71//v0UscfGwjLiWIqGVEfUblofZK5+kQZgy5pX98YatlZviszGku17vhAOi24iAfZRoUayrIctQ6R+mowOFiY8BhWszatikv3w90/Euw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=gG4+WM5I; arc=none smtp.client-ip=95.215.58.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 13 Aug 2025 00:11:26 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1755069097;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wZFsYJiyB1fvxRtIFfJFidT6INioyMRvmFKceuBeMbE=;
-	b=gG4+WM5IZTev5FDHmnVkWiRF1CQo6nK2IILnadjEoI9rVXYIWj5lqRHGRPWSTwTu/MyN1z
-	pTwxSpKzCwmyNqhJ3fP1/velQ2CJGQd8gNXMYsF7mK5SHPjDHm8PvczlF7tQireXlSgce/
-	ApBgrQ6UG9VPQre3jLqz44suXJwDq8M=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Shakeel Butt <shakeel.butt@linux.dev>
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Willem de Bruijn <willemb@google.com>, Matthieu Baerts <matttbe@kernel.org>, 
-	Mat Martineau <martineau@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
-	Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>, 
-	Andrew Morton <akpm@linux-foundation.org>, Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, 
-	Tejun Heo <tj@kernel.org>, Simon Horman <horms@kernel.org>, 
-	Geliang Tang <geliang@kernel.org>, Muchun Song <muchun.song@linux.dev>, 
-	Mina Almasry <almasrymina@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
-	mptcp@lists.linux.dev, cgroups@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH v3 net-next 12/12] net-memcg: Decouple controlled memcg
- from global protocol memory accounting.
-Message-ID: <w6klr435a4rygmnifuujg6x4k77ch7cwoq6dspmyknqt24cpjz@bbz4wzmxjsfk>
-References: <20250812175848.512446-1-kuniyu@google.com>
- <20250812175848.512446-13-kuniyu@google.com>
+	s=arc-20240116; t=1755069334; c=relaxed/simple;
+	bh=elyY9ghlBiJMOHD++SOe+6pqUXWxKIEdZXVjZCLz+sc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qHu/Levu4quoERuEXk/jWai6XKqYMkAV7yeFjFhoyRRaPqz5EKpPXna0s+t8V+hcnAC75d29vSXDN4GDm3pPWtzoHYVMqSTOv4n9vaXD771SSgMsuxmGICz/7g6cfAZLyY2L+qR1H5OGi1uSbIP2ESUpdq84qNo4TcdYu02YuXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ObG88ZVD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 810C2C4CEEB;
+	Wed, 13 Aug 2025 07:15:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755069333;
+	bh=elyY9ghlBiJMOHD++SOe+6pqUXWxKIEdZXVjZCLz+sc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ObG88ZVDFDiK9kpiT80O1dSFdLPYvljQKn8GyW5wJLAoWXWw7pJBdD0fmtj+ztTLb
+	 Wi9kk2jSZrUqu1RL/XNzZz6Hq66IvZCRR88T9e3MAnGGFjMA81TTSM4E3j2PuwlDKP
+	 +DsEmTZAm1SrJ1Vz5EFQE4LnsDfl5b2O4p950k+wC2nkDlHceN7t0BpAvni/ibKceI
+	 qhAO5zw0/X68BAR1rpHvXd6yk7FaARgdRtjvwYXdai/udbcEAn9t7WE3EWG7rsvoxX
+	 Rko2uqfd2Nl+qc6KC9tp611a9g+OIPDRQfVwPm2eSd59eJo1w7V3ioC0XL3HdyGhV5
+	 vbp8yNlAlEDLQ==
+Date: Wed, 13 Aug 2025 09:15:26 +0200
+From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+To: Akira Yokosawa <akiyks@gmail.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, Jakub Kicinski <kuba@kernel.org>, EDAC
+ Mailing List <linux-edac@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Doc Mailing List
+ <linux-doc@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Ignacio Encinas Rubio <ignacio@iencinas.com>, Marco Elver
+ <elver@google.com>, Shuah Khan <skhan@linuxfoundation.org>, Donald Hunter
+ <donald.hunter@gmail.com>, Eric Dumazet <edumazet@google.com>, Jan Stancek
+ <jstancek@redhat.com>, Paolo Abeni <pabeni@redhat.com>, Ruben Wauters
+ <rubenru09@aol.com>, linux-kernel-mentees@lists.linux.dev,
+ netdev@vger.kernel.org, Breno Leitao <leitao@debian.org>, Randy Dunlap
+ <rdunlap@infradead.org>, Simon Horman <horms@kernel.org>
+Subject: Re: [GIT PULL for v6.17-rc2] add a generic yaml parser integrated
+ with Netlink specs generation
+Message-ID: <20250813091526.3cf39352@foz.lan>
+In-Reply-To: <9c4a655e-095b-45fe-b35d-c3f0ae6a9237@gmail.com>
+References: <20250812113329.356c93c2@foz.lan>
+	<87h5ycfl3s.fsf@trenco.lwn.net>
+	<9c4a655e-095b-45fe-b35d-c3f0ae6a9237@gmail.com>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250812175848.512446-13-kuniyu@google.com>
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Aug 12, 2025 at 05:58:30PM +0000, Kuniyuki Iwashima wrote:
-> Some protocols (e.g., TCP, UDP) implement memory accounting for socket
-> buffers and charge memory to per-protocol global counters pointed to by
-> sk->sk_proto->memory_allocated.
+On Wed, 13 Aug 2025 11:49:50 +0900
+Akira Yokosawa <akiyks@gmail.com> wrote:
+
+> [-CC: LKMM folks and list; this has nothing to do with the memory model]
 > 
-> When running under a non-root cgroup, this memory is also charged to the
-> memcg as "sock" in memory.stat.
+> Hi Jon,
 > 
-> Even when a memcg controls memory usage, sockets of such protocols are
-> still subject to global limits (e.g., /proc/sys/net/ipv4/tcp_mem).
+> On Tue, 12 Aug 2025 12:31:03 -0600, Jonathan Corbet wrote:
+> > Mauro Carvalho Chehab <mchehab+huawei@kernel.org> writes:
+> >   
+> >> Hi Jon/Jakub,
+> >>
+> >> In case you both prefer to merge from a stable tag, please pull from:
+> >>
+> >> 	git://git.kernel.org/pub/scm/linux/kernel/git/mchehab/linux-docs.git docs/v6.17-1
+> >>
+> >> For:
+> >>
+> >> - An YAML parser Sphinx plugin, integrated with Netlink YAML doc
+> >>   parser.  
+> > 
+> > OK, I have done that.  I will note that it adds a warning:
+> >   
+> >> Documentation/networking/netlink_spec/index.rst: WARNING: document isn't included in any toctree  
+> > 
+> > ...it might be nice to get that straightened out.  
 > 
-> This makes it difficult to accurately estimate and configure appropriate
-> global limits, especially in multi-tenant environments.
+> After the merge, "git status" complains:
 > 
-> If all workloads were guaranteed to be controlled under memcg, the issue
-> could be worked around by setting tcp_mem[0~2] to UINT_MAX.
+>     Untracked files:
+>       (use "git add <file>..." to include in what will be committed)
+> 	Documentation/networking/netlink_spec/
 > 
-> In reality, this assumption does not always hold, and processes that
-> belong to the root cgroup or opt out of memcg can consume memory up to
-> the global limit, becoming a noisy neighbour.
-
-Processes running in root memcg (I am not sure what does 'opt out of
-memcg means') means admin has intentionally allowed scenarios where
-noisy neighbour situation can happen, so I am not really following your
-argument here.
-
+> So, I don't think there is anything you can do in the Git repo side ...
 > 
-> Let's decouple memcg from the global per-protocol memory accounting if
-> it has a finite memory.max (!= "max").
+> We need to remember to "rm -rf" the directory after crossing this merge
+> point.
+> 
+> In theory, such "rm -rf" could be added somewhere in Documentation/Makefile,
+> but that would not work well with write-protected shared kernel repos.
 
-Why decouple only for some? (Also if you really want to check memcg
-limits, you need to check limits for all ancestors and not just the
-given memcg).
+And this is actually what started this patch series: the original
+approach of auto-generating and writing files under
+Documentation/networking/netlink_spec/ is problematic: a patch
+that renamed some files caused the past version of the generated
+files to generate warnings.
 
-Why not start with just two global options (maybe start with boot
-parameter)?
+So, yeah, with the old approach one needs to manually clean up
+Documentation/networking/netlink_spec/ if this was not the first
+time doc were built on a git clone instance.
 
-Option 1: Existing behavior where memcg and global TCP accounting are
-coupled.
+Btw, before my patch series, there was the cleandocs target
+was:
 
-Option 2: Completely decouple memcg and global TCP accounting i.e. use
-mem_cgroup_sockets_enabled to either do global TCP accounting or memcg
-accounting.
+	YNL_INDEX:=$(srctree)/Documentation/networking/netlink_spec/index.rst
+	YNL_RST_DIR:=$(srctree)/Documentation/networking/netlink_spec
+	YNL_YAML_DIR:=$(srctree)/Documentation/netlink/specs
+	YNL_RST_FILES_TMP := $(patsubst %.yaml,%.rst,$(wildcard $(YNL_YAML_DIR)/*.yaml))
+	YNL_RST_FILES := $(patsubst $(YNL_YAML_DIR)%,$(YNL_RST_DIR)%, $(YNL_RST_FILES_TMP))
 
-Keep the option 1 default.
+	cleandocs:
+		$(Q)rm -f $(YNL_INDEX) $(YNL_RST_FILES)
+		$(Q)rm -rf $(BUILDDIR)
+		$(Q)$(MAKE) BUILDDIR=$(abspath $(BUILDDIR)) $(build)=Documentation/userspace-api/media clean
 
-I assume you want third option where a mix of these options can happen
-i.e. some sockets are only accounted to a memcg and some are accounted
-to both memcg and global TCP. I would recommend to make that a followup
-patch series. Keep this series simple and non-controversial.
+It means that, with the old approach, the safe way to apply
+patches that touch YAML Netlink (YNL) is to do:
 
+	make cleandocs			# remove old auto-generated patches from /Documentation/networking/netlink_spec
+	<apply new series>
+	make htmldocs
+
+to ensure that the previous auto-generated files were removed.
+
+Thanks,
+Mauro
 
