@@ -1,164 +1,166 @@
-Return-Path: <netdev+bounces-213473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213474-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77389B2532F
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 20:43:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70371B25358
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 20:53:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 673965A5CBC
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 18:43:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9CA3D1C84925
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 18:54:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACA512E8DE6;
-	Wed, 13 Aug 2025 18:43:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 811212FF145;
+	Wed, 13 Aug 2025 18:53:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X0O8sbup"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="G6hlxSL2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com [209.85.167.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B4C123D7FA
-	for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 18:43:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBCE784E07
+	for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 18:53:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755110609; cv=none; b=vB/hA5CEdC2oR0pTEUSL8mifnam7qHGnhoSROXu5k+OK9Ws5hwXBJN9sWvJd0EGvdRZYRpa1x7nwvawyf7Dy6JiaacRIsR4NFYl4IypiEj2exb0XT/9MRZb7cv+4inaRnWZjxYZABUBPicw2wm7L+DK+x7TRKuAH83ZvZgZV7RE=
+	t=1755111233; cv=none; b=DOMMOzhbdlggy+Gm/zGvoBWHeFhIXKA1OeiyfhopNU6KgRRGWdndGHOkpZ5oPWyepWLh8m4NuIGWW0a2OMjdREvx7kThPiFkCmg4L3e36dYvqcxD0ufVr8d6rG1wyG40JTWWZMnqhPbvGM1MFoq337XQ5jwxp0OzSyGTtK32xIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755110609; c=relaxed/simple;
-	bh=peKhyYh5erOKsru1vnv61mgnhKM9DzH+xoHN6mevgvY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OSWRWxIiJlfO0Ax6LsUFDLYsLBd0P8ELu8KWdb0UEn+UZ1fiOHbmTcBF2GhqXyPiNUosOIaSyAZUHX2/LMphTSdTBp7VAz8Mlga0wBeCUe1KT2C7eHY5pSakjuPkiCK6dquTKRcWaL7uOB8YmhO/Rg3kyOCHM8KUXDRWCAWaSb0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=X0O8sbup; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2445806df50so652755ad.1
-        for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 11:43:27 -0700 (PDT)
+	s=arc-20240116; t=1755111233; c=relaxed/simple;
+	bh=uAIoi3oE2JAfmyQClW7OLg6ZQbAytpR40I4ZrK0A/Ss=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DrLG2xlA22hI/WlhoxsCalxhwT4MTARJGhnMYrAt0WsQrq2rO6nrW6NOkeX5p325pqEAon1r/vpQto5Lc+DcOcMQnWebI3JlAWdEnClblv3U5wu01WXUjWpsX+SLtwmPSUCgzp8ohjL2Y9B4zbYsWkoYMc1fqk8fmAF8glr6Q2Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=G6hlxSL2; arc=none smtp.client-ip=209.85.167.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-oi1-f170.google.com with SMTP id 5614622812f47-435de7d6d05so119257b6e.2
+        for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 11:53:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755110607; x=1755715407; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=a9BzIik8ItZsQbt/3YanXJu26q0lEOJnE+a73ddJFdE=;
-        b=X0O8sbupOxY7pG6JHsl2uQa9oQUxyZnIwb8Xrofhd4g3Id/XEE4sjE3ucT0xDr3je7
-         d8Hh/CTfUELFF9jO2Qyfak/i4AuBuXMK9Sqq4LJVitYnoW0EbpGbnL9+fFPBcjUk4kCa
-         TgHegg5pjYQDjKcZwv6UE/CDyssHj9wfHAXezpT+ek2zY2Fnvca4I3XlN4AsBMlg4OQz
-         OtXwT2GmxRWw99Lho1qbMdbWejgPvsvu6SSDMNAjncSTYo1TPQ1rbwxVprNeMFD0y8E7
-         8fhwFgNROxFDHHbvYB+e5TDwODUzHv2IYRG2nACd13vi0PSOsBBqXJHCucTBBtcoIqdJ
-         TqLg==
+        d=cloudflare.com; s=google09082023; t=1755111231; x=1755716031; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8TqjUBMBvz3ge0UrPwf2mXPDOUtrqy+wU9/W1Le4cwc=;
+        b=G6hlxSL2o7oP+USDyuTE1+DfucCYUV/oR/xRPvpSuryts1PEjeBdXWypG9hllHxrxN
+         szFvxMauu1JjuCctWPWR+w71Xgt5T4xGEZPoAPrbdjUCbiVoOfRjREiSC40eAGaa7IqN
+         PUrZSESwTAOW4OSOFOnYL9DWOc1NAfZFg3wXIgfHk71zXrrZWF/xm8VFZN1jjj3guRhu
+         w1ymHQfzBWI7ye+kZUOYlKGKyZBV+B3oqmRyhZgW3t5Zb25UgtkhsFiYhOu7/cwf2P8d
+         yjlRwIGfEWZ67T+PmKlPOVGYL3OZlqe/LqgOdT6mUxH3eDE+Qyyg9XxlaSqLifqVzTjv
+         tkCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755110607; x=1755715407;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=a9BzIik8ItZsQbt/3YanXJu26q0lEOJnE+a73ddJFdE=;
-        b=ahcUIYZb9toPtLmM3zESX3qJxgNzDTEj0Oq1cxxgwDItr8qZiFcwPkTKInZjrYKDbZ
-         U7zy6msuWlfjbJPEirlx63FcKQJdsfpMlRO+Zf2KCmnl8jjg8SlAVtqXTGoorW5R7Vri
-         YuqtdlLlqb4D8HFwJXEHhRmVDTumCx4e4nVt/4+M0nxbd9Hs2WGbWvrVQm5Wqn8cwCtx
-         46Bl4ga3PZfSawjS2ItzMNn9sebOzMyVzS2/8gEzGinY8CUXG0+xCjnbbhcW3YtJyCjn
-         b6ihJXuaoX219f83AhcLpw7yWfKCRdTTvC9nBLf+Jjr74zT3PXRjby9QMTgizOrZjMWA
-         FzOw==
-X-Forwarded-Encrypted: i=1; AJvYcCWIBVy9JhS1hxYfgbCVfvv7JfsHBOZsVHqvSYX4mdTgPWGV0v716VdnUmtklX4etnCvT8JQhMg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzUEMVtYglArPRKc49XpaTvc1YDiE21TIZ5Bui4pzf84zXUkE+h
-	pda7LpPtjFgYcsPYVF7O1OtDDpxygmctcTUOh8v9v871HFe6RdmYGK/9tQnGyvYz9QXF57fYgk9
-	abtIZ6u1WrQOZ6btjg30GEK2vClNX5NpLY4yNWJW/
-X-Gm-Gg: ASbGncsEWQ7yHMV7yrmtka5VzDe0fEyRNfVC1Y0IXvHFhlRdTWFMQ2+1KRGKTXpjH4J
-	Qf83/LuLZk3qp3cS4hxiDEbd4Tugdkx5Y+BnC7GmEPIZI08lVM6bzdb2EhY3nrUxt4xxTIxBOQn
-	YVd7Wvj/KwWLaKiJEQNgsrRLmnZzTO3ZL0VR7/gKxi6RganXrDOE3slwdkXg0z4BHLdBRjK5i4I
-	8351mVlNqf+yd7mfcAC06pdKFm7YFYq73VjYLrU
-X-Google-Smtp-Source: AGHT+IE+OAJLh0cA0JpKkD0/B+CsZDY5rBp0+LgetnTu3qP/aHmx8+dnnAhaX3xyY/0hlQtXLDaeU8b5ZnPRaXFlw7U=
-X-Received: by 2002:a17:903:22d2:b0:240:3915:99ba with SMTP id
- d9443c01a7336-244584af6a2mr1990405ad.5.1755110607235; Wed, 13 Aug 2025
- 11:43:27 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1755111231; x=1755716031;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8TqjUBMBvz3ge0UrPwf2mXPDOUtrqy+wU9/W1Le4cwc=;
+        b=UYp/F+85hUZD6I13HgWyjfgY/28saCe2qGkOcNqXQU5qQ0GhI/Kh7br+EOlpK4yHj0
+         jmctMoQsG5u/daKhI8fiREDjbtDDI99XhAbpW1jEmvDUImBdo9U2ZF3TkYjjozr9AilF
+         IJirULBaf0CPV6ukgeLjeAIvRCAryQ6hcpebje2e/LthEb0IH0IYOu9PcoCHGPRchfa6
+         XAe8j+Di9EIBsvTczNQ/OQNWfxlHTPkbpZ+nBJZyShhZ30+POlLUpGCNUpWOyDMHfwdB
+         xKe4MGkXVzAFsoZq/sG7lUyEK/xvNDmPhQPfcbS+fSuh1v3SKKfGwbO/TMKIH5Qoj6h7
+         St+g==
+X-Forwarded-Encrypted: i=1; AJvYcCUkPTLsBX+Vhi/Lr1M1dHMDCo36vqf1O3LXXYjUPjLyrvqIK86ZEquOtsRGiVOqVaaSmvi4hY8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzaS4m2tklte2K6ZGMF8gp2i3hiNIpv4dtlpm5dH8nv7VFp+OeU
+	L6DsFHBx/b45LE966JHoVDBiCd3WnK9jXZpAuYNYWZTltBWBwvHcYqDeRgzJXMdjU04=
+X-Gm-Gg: ASbGncvddnyW3cpf/iW0t91F+snU6WBT6oJ5OqhHL7KToKxHKPnpRI3taHEo4ySqg4m
+	AmXrxIwpldF8c2TBvKj754mxOMBb/dM81Sp6vswbT1Ftmt91AQmzSgDrArIPmDkFgHjVBdA2prK
+	E5Vy+mgP4AmpaEN5xZnB4yWyPolJBnkelCzdIXpZhfPomeBUgUYCaCXlD0jwOk8b2npMPK3lyvL
+	sKOpRdQUBzvcnJv9bACfl3BT/+Hn4fUnmiOtKUiaeAhZd1jmF2nxguh2Ici0RdYAd6lAlHv4xyq
+	HVp6UltJrijfhS4TQH1xb3P9Vvcm4hFBspf0/tP+R4GNh0a8eOI0XMisCHsXEY/+H5l1p5tLlgq
+	eX4S0
+X-Google-Smtp-Source: AGHT+IH+cxAc1P0YpSjpT5GkMD6yTAL+x39p48U9fLHRa1UvuKJNiSxTcXqK8YDOSg3Bw6mNwWToXw==
+X-Received: by 2002:a05:6808:f03:b0:40a:526e:5e7a with SMTP id 5614622812f47-435df7c035bmr175396b6e.23.1755111230876;
+        Wed, 13 Aug 2025 11:53:50 -0700 (PDT)
+Received: from 861G6M3 ([2a09:bac1:76a0:540::f:384])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-435ce85684csm777268b6e.18.2025.08.13.11.53.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Aug 2025 11:53:50 -0700 (PDT)
+Date: Wed, 13 Aug 2025 13:53:48 -0500
+From: Chris Arges <carges@cloudflare.com>
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: Jesse Brandeburg <jbrandeburg@cloudflare.com>, netdev@vger.kernel.org,
+	bpf@vger.kernel.org, kernel-team <kernel-team@cloudflare.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>, tariqt@nvidia.com,
+	saeedm@nvidia.com, Leon Romanovsky <leon@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Andrew Rzeznik <arzeznik@cloudflare.com>,
+	Yan Zhai <yan@cloudflare.com>
+Subject: Re: [BUG] mlx5_core memory management issue
+Message-ID: <aJzfPFCTlc35b2Bp@861G6M3>
+References: <CAFzkdvi4BTXb5zrjpwae2dF5--d2qwVDCKDCFnGyeV40S_6o3Q@mail.gmail.com>
+ <dhqeshvesjhyxeimyh6nttlkrrhoxwpmjpn65tesani3tmne5v@msusvzdhuuin>
+ <aIEuZy6fUj_4wtQ6@861G6M3>
+ <jlvrzm6q7dnai6nf5v3ifhtwqlnvvrdg5driqomnl5q4lzfxmk@tmwaadjob5yd>
+ <aJTYNG1AroAnvV31@861G6M3>
+ <hlsks2646fmhbnhxwuihheri2z4ymldtqlca6fob7rmvzncpat@gljjmlorugzw>
+ <aqti6c3imnaffenkgnnw5tnmjwrzw7g7pwbt47bvbgar2c4rbv@af4mch7msf3w>
+ <9b27d605-9211-43c9-aa49-62bbf87f7574@cloudflare.com>
+ <72vpwjc4tosqt2djhyatkycofi2hlktulevzlszmhb6w3mlo46@63sxu3or7suc>
+ <aJuxY9oTtxSn4qZP@861G6M3>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250812175848.512446-1-kuniyu@google.com> <20250812175848.512446-13-kuniyu@google.com>
- <20250813130009.GA114408@cmpxchg.org>
-In-Reply-To: <20250813130009.GA114408@cmpxchg.org>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Wed, 13 Aug 2025 11:43:15 -0700
-X-Gm-Features: Ac12FXzkQNJfJzM_zFO5RI8--6tu5_zAqIX6wf49jOuR7WukQGz1HzzF1Da6JMs
-Message-ID: <CAAVpQUB-xnx_29Hw-_Z4EbtJKkJT1_BCfXcQM7OpCO09goF+ew@mail.gmail.com>
-Subject: Re: [PATCH v3 net-next 12/12] net-memcg: Decouple controlled memcg
- from global protocol memory accounting.
-To: Johannes Weiner <hannes@cmpxchg.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Neal Cardwell <ncardwell@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Willem de Bruijn <willemb@google.com>, Matthieu Baerts <matttbe@kernel.org>, 
-	Mat Martineau <martineau@kernel.org>, Michal Hocko <mhocko@kernel.org>, 
-	Roman Gushchin <roman.gushchin@linux.dev>, Shakeel Butt <shakeel.butt@linux.dev>, 
-	Andrew Morton <akpm@linux-foundation.org>, =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>, 
-	Tejun Heo <tj@kernel.org>, Simon Horman <horms@kernel.org>, Geliang Tang <geliang@kernel.org>, 
-	Muchun Song <muchun.song@linux.dev>, Mina Almasry <almasrymina@google.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, mptcp@lists.linux.dev, 
-	cgroups@vger.kernel.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aJuxY9oTtxSn4qZP@861G6M3>
 
-On Wed, Aug 13, 2025 at 6:00=E2=80=AFAM Johannes Weiner <hannes@cmpxchg.org=
-> wrote:
->
-> On Tue, Aug 12, 2025 at 05:58:30PM +0000, Kuniyuki Iwashima wrote:
-> > If all workloads were guaranteed to be controlled under memcg, the issu=
-e
-> > could be worked around by setting tcp_mem[0~2] to UINT_MAX.
+On 2025-08-12 16:25:58, Chris Arges wrote:
+> On 2025-08-12 20:19:30, Dragos Tatulea wrote:
+> > On Tue, Aug 12, 2025 at 11:55:39AM -0700, Jesse Brandeburg wrote:
+> > > On 8/12/25 8:44 AM, 'Dragos Tatulea' via kernel-team wrote:
+> > > 
+> > > > diff --git a/kernel/bpf/devmap.c b/kernel/bpf/devmap.c
+> > > > index 482d284a1553..484216c7454d 100644
+> > > > --- a/kernel/bpf/devmap.c
+> > > > +++ b/kernel/bpf/devmap.c
+> > > > @@ -408,8 +408,10 @@ static void bq_xmit_all(struct xdp_dev_bulk_queue *bq, u32 flags)
+> > > >          /* If not all frames have been transmitted, it is our
+> > > >           * responsibility to free them
+> > > >           */
+> > > > +       xdp_set_return_frame_no_direct();
+> > > >          for (i = sent; unlikely(i < to_send); i++)
+> > > >                  xdp_return_frame_rx_napi(bq->q[i]);
+> > > > +       xdp_clear_return_frame_no_direct();
+> > > 
+> > > Why can't this instead just be xdp_return_frame(bq->q[i]); with no
+> > > "no_direct" fussing?
+> > > 
+> > > Wouldn't this be the safest way for this function to call frame completion?
+> > > It seems like presuming the calling context is napi is wrong?
+> > >
+> > It would be better indeed. Thanks for removing my horse glasses!
+> > 
+> > Once Chris verifies that this works for him I can prepare a fix patch.
 > >
-> > In reality, this assumption does not always hold, and processes that
-> > belong to the root cgroup or opt out of memcg can consume memory up to
-> > the global limit, becoming a noisy neighbour.
->
-> As per the last thread, this is not a supported usecase. Opting out of
-> memcg coverage for individual cgroups is a self-inflicted problem and
-> misconfiguration. There is *no* memory isolation *at all* on such
-> containers.
+> Working on that now, I'm testing a kernel with the following change:
+> 
+> ---
+> 
+> diff --git a/kernel/bpf/devmap.c b/kernel/bpf/devmap.c
+> index 3aa002a47..ef86d9e06 100644
+> --- a/kernel/bpf/devmap.c
+> +++ b/kernel/bpf/devmap.c
+> @@ -409,7 +409,7 @@ static void bq_xmit_all(struct xdp_dev_bulk_queue *bq, u32 flags)
+>          * responsibility to free them
+>          */
+>         for (i = sent; unlikely(i < to_send); i++)
+> -               xdp_return_frame_rx_napi(bq->q[i]);
+> +               xdp_return_frame(bq->q[i]);
+>  
+>  out:
+>         bq->count = 0;
 
-I think the commit message needs to be improved, but could
-you read throughout the patch again ?  I think you have the
-same misunderstanding that Shakeel had and corrected here.
-https://lore.kernel.org/netdev/jmbszz4m7xkw7fzolpusjesbreaczmr4i64kynbs3zco=
-ehrkpj@lwso5soc4dh3/
+This patch resolves the issue I was seeing and I am no longer able to
+reproduce the issue. I tested for about 2 hours, when the reproducer usually
+takes about 1-2 minutes.
 
----8<---
-Initially, I thought the series introduced multiple modes, including an
-option to exclude network memory from memcg accounting. However, if I
-understand correctly, that is not the case=E2=80=94the opt-out applies only=
- to
-the global TCP/UDP accounting. That=E2=80=99s a relief, and I apologize for=
- the
-misunderstanding.
----8<---
+--chris
 
-This patch does NOT change how memcg is applied to sockets
-but changes how _another_ memory accounting in the networking
-layer is applied to sockets.
-
-Currently, memcg AND the other mem accounting are applied
-to socket buffers.
-
-With/without this patch, memcg is _always_ applied to socket
-buffers.
-
-Also, there is _no_ behavioural change for _uncontrolled
-containers_ that have been subject to the two memory
-accounting.  This behaviour hasn't been changed since
-you added memcg support for the networking stack in
-e805605c72102, and we want to _preserve_ this behaviour.
-
-This change stop double-charging by opting out of _the
-networking layer one_ because it interferes with memcg
-and complicates configuration of memory.max and the
-global networking limit.
-
-
-> Maybe their socket buffers is the only thing that happens
-> to matter to *you*, but this is in no way a generic, universal,
-> upstreamable solution. Knob or auto-detection is not the issue.
->
-> Nacked-by: Johannes Weiner <hannes@cmpxchg.org>
-
-Please let me know if this nack still applies with the
-explanation above.
 
