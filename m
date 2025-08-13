@@ -1,180 +1,165 @@
-Return-Path: <netdev+bounces-213451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213452-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F032B2503A
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 18:54:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95FB5B2505D
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 18:59:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2F4D81AA6846
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 16:53:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4941488397D
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 16:55:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E43F128A71D;
-	Wed, 13 Aug 2025 16:52:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0EE023D7D9;
+	Wed, 13 Aug 2025 16:55:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="iXNi7r2k"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bzvHx2ls"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE794246BC1;
-	Wed, 13 Aug 2025 16:52:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.3
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23B9C280CD3
+	for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 16:55:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755103968; cv=none; b=TVR4ba10Wv5DDskItyn1Qn7C9RFVWJxXnNhP77GLVjqLIQqBxWzqYuidQKJ1+7w9Z4wWEYKmrdLQGcEBf6OKuzVwVeiN9aCVZ2lSB6npXc6Gr81se8uxaJ+5AK6jIoRB2wUpRQ3HOK2MSu4iKrHICbADmWLWOHE+csJgDso2aSA=
+	t=1755104134; cv=none; b=u7ej4qVPu7XQln2Ql1tzeoWnjGhiHm3HuA6mkF1JmlUjoBAY3/RyNZ5JpFHNW5xkYGo4+MLuM6EJEOZG6qlC1IdR3e/DNPBMW0KDSU0Foq70pbxvXyPjmjnTtuF/vz9fsrXZCUFyFH+8KE4Ydk2HtUTs6toB9OtxBa/s8TIedBM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755103968; c=relaxed/simple;
-	bh=9QCc3j7Nu7J1rYdLuLDu6Gu2I3KvelaAd4J5+ojVcH8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qUJaJEg1+AqdYR3K0zfNW0kn+vKfOyqe9OeL6C1iCLPjoqGRNsse83o7ccQM7LHrAapntr9SPdV5RphPiSdGIchjEMu5mdATC+QlLhLJU8jnZtN48IJ59hkb63pWW8ygG977t7E932YefzdeyyyHWnvF5MqhgeS+sNNg5YrHzsQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=iXNi7r2k; arc=none smtp.client-ip=220.197.31.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=6d
-	ZW97DLwK3hq4Qvj+4tZMAjOl8ZsoVPuweEcUtDLR8=; b=iXNi7r2kHIUX+TZkAC
-	yTdlUXN8I7ZVG9uZKthyOK9g2AsL/+GOCg3aFWltubkzMVmrELSl7/phTWaiQapN
-	flRvTw4EYZy0ru0iku7HR+cITB/ToPW9QoybaZe+jJY0Go8V4fNSfjAUYAlz6nuj
-	yXjh8A6qNqbTTjzkPi9GBLCVg=
-Received: from zhaoxin-MS-7E12.. (unknown [])
-	by gzga-smtp-mtada-g1-1 (Coremail) with SMTP id _____wD3f9Czwpxooy_tBA--.18339S2;
-	Thu, 14 Aug 2025 00:52:04 +0800 (CST)
-From: Xin Zhao <jackzxcui1989@163.com>
-To: willemdebruijn.kernel@gmail.com,
-	edumazet@google.com,
-	ferenc@fejes.dev
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Xin Zhao <jackzxcui1989@163.com>
-Subject: [PATCH v1] net: af_packet: Use hrtimer to do the retire operation
-Date: Thu, 14 Aug 2025 00:52:01 +0800
-Message-Id: <20250813165201.1492779-1-jackzxcui1989@163.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1755104134; c=relaxed/simple;
+	bh=R78X1eugxynKC0lTYo4txkS1kInPjqxZU1IWXlVlUfg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=k8rr+ywEN6Da3gURg+gsTnlpIFv4HnZSo+0nT6XN0CaTgx2tgbYxxJ7nVL5wGkt9aZfjsSvRbkGBW7bzeSw7aQOURebXgQvV+tb7nx7d59MuNhmGDXIWYmeeVYBLFiYX5Ejp81nQpW7G0Pi4xkz97/6Mf5g0KA03rzBD/1v5N6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bzvHx2ls; arc=none smtp.client-ip=209.85.167.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-55cd07a28e0so416e87.0
+        for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 09:55:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1755104131; x=1755708931; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ts9gasw9dkYPDd99xp0aER506LHY63IZ37c/vRLflJE=;
+        b=bzvHx2lsOaW1kTsmtYyHVGY9v7MF5vhDfClMg4UCbH+L96XRxrHNwDxo8iy5Qgz4oC
+         cEtO3TgoNuzIcQgs1DPCpmVpXeBR/zyO0IAdxjmEq9JhUfewEvCcWdQGp0/N4svllFl5
+         OcO4igSq6ekqy6Ih3H2yIySBKLV/o47+qi/qVWJUyS6lCCa2CHA6mt6e97K62A9JqAOf
+         iuDgntFwCsW378xjskri34bjhV79QTk503ZHrteXi+mIQUScPqL5+ARvRrNuna3qNDmz
+         UW/raVbYfnetQtJvWRPiMaGxqTDFFuVJSfnoJfozjEHoEzkZhd9InZ9QxUtk4I9G0wCO
+         FUhg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755104131; x=1755708931;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Ts9gasw9dkYPDd99xp0aER506LHY63IZ37c/vRLflJE=;
+        b=NVuRFgghi+5TiJFOjiBYDEhMvjOhDMXfL1wYt+TvvwNcFd0xYmMGt4b8LSJyEZ7Op4
+         znTjL6/Wep3zt+kIBqpqvHELik2y1CmUugJHBrENkG/NUBYirufEh36XrQYDFkEk2YiH
+         waUHGY+qL/5pnWfFhq+OLchYt89V1jBLgOPoZEhr9PMJnZ9Yj2SqmDBNGZL4IpDfczVP
+         SbU0S2VytmmH/VaNPIDH6GR0XYr40QzRw0toe0hFtRpI15t8Img7p0Un+pxcqfuK98rj
+         5FLXCJLOwmz9U2ENamu+86HkDiIaHSwZtW9CuF7YWpprLDHPgICy6Lm+L8us6JkX56nP
+         oybA==
+X-Gm-Message-State: AOJu0YzgonkX8AwEepv4uUjKdKJ5C2TA+6l5ETUd+PWGqtEQND9VW8Sp
+	+BvCBp27NuQ988GB8yaYxRMf8O/vngIpW0jruLXnReEqeC5R7P47jW8aGJ9GmuDBIJfJ6BI+PRo
+	Yptqtvl9HsfcyMAtBSeCUKTprKxY9yJLbdp/zSUS+
+X-Gm-Gg: ASbGncvkMlDdmVdEvsqwpfsMNJbcw56GFsqBM+lPr+x9lNS+l62WZZSlPBRiUUsxZAX
+	4Xpve8jIciv9zp+lnpM233TDHgd5Me/+qxzL9WdsN4nsycNuGXTMk7Z8SKrnpUMljhZcy/4VNCb
+	HS7yQdiB3r5DtRHvFHOO2eUuuHzXOL2KFB0NpxzPvUDsTZ8uotdkjuy7eZQg3zY6UShtQuU8vNQ
+	YfdfdKSJSrdrEQTLH9+c6CJA4KmWnx2A+QTXQ==
+X-Google-Smtp-Source: AGHT+IH905ve9bM5Fx+wWK8lUVKvEPKcxVkA5zHi8MtUl1d/b8Cj6+pxan403EijeU57px3CAWtaNhxVqdsIouq9Rxs=
+X-Received: by 2002:ac2:494c:0:b0:557:e3bc:4950 with SMTP id
+ 2adb3069b0e04-55ce126a661mr250202e87.7.1755104131003; Wed, 13 Aug 2025
+ 09:55:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD3f9Czwpxooy_tBA--.18339S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxXw1rAr1kWF4UJF1DXw47Arb_yoWrtF4fpa
-	y5W34xGw47Za1agw48Xrs7ZFyYgw1DAry7G393Xwsay3Z3try5ta1j9Fyq9FWftFZFkw43
-	Ar4ktFs8Cw1kXrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pEy8BnUUUUU=
-X-CM-SenderInfo: pmdfy650fxxiqzyzqiywtou0bp/1tbiRwqoCmicsxzwmwAAsf
+References: <cover.1754929026.git.asml.silence@gmail.com> <7be7a705b9bac445e40c35cd227a4d5486d95dc9.1754929026.git.asml.silence@gmail.com>
+ <CAHS8izOMhPLOGgxxWdQgx-FgAmbsUj=j7fEAZBRo1=Z4W=zYFg@mail.gmail.com> <35ca9ed2-8cce-4dc8-bd15-2cda0b2d2ec5@gmail.com>
+In-Reply-To: <35ca9ed2-8cce-4dc8-bd15-2cda0b2d2ec5@gmail.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Wed, 13 Aug 2025 09:55:18 -0700
+X-Gm-Features: Ac12FXzeFEzFZET_muTXpJX1QrWWbv6tKTmR_Oiy3eFKe2tDH4mwKzPdlN-WpRE
+Message-ID: <CAHS8izMfqgzA75Wo9fkeLkHdCa512vqr+5iQ0u1zHKZX9uGoNQ@mail.gmail.com>
+Subject: Re: [RFC net-next v1 5/6] net: page_pool: convert refcounting helpers
+ to nmdesc
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, davem@davemloft.net, 
+	sdf@fomichev.me, dw@davidwei.uk, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Byungchul Park <byungchul@sk.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-In a system with high real-time requirements, the timeout mechanism of
-ordinary timers with jiffies granularity is insufficient to meet the
-demands for real-time performance. Meanwhile, the optimization of CPU
-usage with af_packet is quite significant. Use hrtimer instead of timer
-to help compensate for the shortcomings in real-time performance.
-In HZ=100 or HZ=250 system, the update of TP_STATUS_USER is not real-time
-enough, with fluctuations reaching over 8ms (on a system with HZ=250).
-This is unacceptable in some high real-time systems that require timely
-processing of network packets. By replacing it with hrtimer, if a timeout
-of 2ms is set, the update of TP_STATUS_USER can be stabilized to within
-3 ms.
+On Wed, Aug 13, 2025 at 2:10=E2=80=AFAM Pavel Begunkov <asml.silence@gmail.=
+com> wrote:
+>
+> On 8/13/25 01:14, Mina Almasry wrote:
+> > On Mon, Aug 11, 2025 at 9:28=E2=80=AFAM Pavel Begunkov <asml.silence@gm=
+ail.com> wrote:
+> ...>> -static inline long page_pool_unref_netmem(netmem_ref netmem, long =
+nr)
+> >> +static inline long page_pool_unref_nmdesc(struct netmem_desc *desc, l=
+ong nr)
+> >>   {
+> >> -       atomic_long_t *pp_ref_count =3D netmem_get_pp_ref_count_ref(ne=
+tmem);
+> >> +       atomic_long_t *pp_ref_count =3D &desc->pp_ref_count;
+> >
+> > nit: I think we can also kill the pp_ref_count local var and use
+> > desc->pp_ref_count directly.
+>
+> I stopped there to save the churn, I'd rather have it on top and outside
+> of cross tree branches. But I agree in general, and there is more that
+> we can do as well.
+>
+> ...>>   static inline bool page_pool_unref_and_test(netmem_ref netmem)
+> >> diff --git a/net/core/devmem.c b/net/core/devmem.c
+> >> index 24c591ab38ae..e084dad11506 100644
+> >> --- a/net/core/devmem.c
+> >> +++ b/net/core/devmem.c
+> >> @@ -440,14 +440,9 @@ void mp_dmabuf_devmem_destroy(struct page_pool *p=
+ool)
+> >>
+> >>   bool mp_dmabuf_devmem_release_page(struct page_pool *pool, netmem_re=
+f netmem)
+> >>   {
+> >> -       long refcount =3D atomic_long_read(netmem_get_pp_ref_count_ref=
+(netmem));
+> >> -
+> >>          if (WARN_ON_ONCE(!netmem_is_net_iov(netmem)))
+> >>                  return false;
+> >>
+> >> -       if (WARN_ON_ONCE(refcount !=3D 1))
+> >> -               return false;
+> >> -
+> >
+> > Rest of the patch looks good to me, but this comes across as a
+> > completely unrelated clean up/change or something? Lets keep the
+> > WARN_ON_ONCE?
+> I was killing netmem_get_pp_ref_count_ref(), which is why it's here.
+> It checks an assumption that's guaranteed by page pools and shared
+> with non-mp pools, so not like devmem needs it, and it'd not catch
+> any recycling problems either. Regardless, I can leave the warning.
+>
 
-Signed-off-by: Xin Zhao <jackzxcui1989@163.com>
----
- net/packet/af_packet.c | 20 +++++++++++---------
- net/packet/internal.h  |  4 ++--
- 2 files changed, 13 insertions(+), 11 deletions(-)
+Ack. I also agree the WARN_ON_ONCE is not necessary, even the one
+above it for the net_iov check is not necessary.
 
-diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
-index bc438d0d9..636b72bf6 100644
---- a/net/packet/af_packet.c
-+++ b/net/packet/af_packet.c
-@@ -203,7 +203,7 @@ static void prb_retire_current_block(struct tpacket_kbdq_core *,
- static int prb_queue_frozen(struct tpacket_kbdq_core *);
- static void prb_open_block(struct tpacket_kbdq_core *,
- 		struct tpacket_block_desc *);
--static void prb_retire_rx_blk_timer_expired(struct timer_list *);
-+static enum hrtimer_restart prb_retire_rx_blk_timer_expired(struct hrtimer *);
- static void _prb_refresh_rx_retire_blk_timer(struct tpacket_kbdq_core *);
- static void prb_fill_rxhash(struct tpacket_kbdq_core *, struct tpacket3_hdr *);
- static void prb_clear_rxhash(struct tpacket_kbdq_core *,
-@@ -581,7 +581,7 @@ static __be16 vlan_get_protocol_dgram(const struct sk_buff *skb)
- 
- static void prb_del_retire_blk_timer(struct tpacket_kbdq_core *pkc)
- {
--	timer_delete_sync(&pkc->retire_blk_timer);
-+	hrtimer_cancel(&pkc->retire_blk_timer);
- }
- 
- static void prb_shutdown_retire_blk_timer(struct packet_sock *po,
-@@ -603,9 +603,10 @@ static void prb_setup_retire_blk_timer(struct packet_sock *po)
- 	struct tpacket_kbdq_core *pkc;
- 
- 	pkc = GET_PBDQC_FROM_RB(&po->rx_ring);
--	timer_setup(&pkc->retire_blk_timer, prb_retire_rx_blk_timer_expired,
--		    0);
--	pkc->retire_blk_timer.expires = jiffies;
-+	hrtimer_setup(&pkc->retire_blk_timer, prb_retire_rx_blk_timer_expired,
-+		      CLOCK_MONOTONIC, HRTIMER_MODE_REL_SOFT);
-+	hrtimer_start(&pkc->retire_blk_timer, ms_to_ktime(pkc->tov_in_msecs),
-+		      HRTIMER_MODE_REL_SOFT);
- }
- 
- static int prb_calc_retire_blk_tmo(struct packet_sock *po,
-@@ -676,7 +677,7 @@ static void init_prb_bdqc(struct packet_sock *po,
- 	else
- 		p1->retire_blk_tov = prb_calc_retire_blk_tmo(po,
- 						req_u->req3.tp_block_size);
--	p1->tov_in_jiffies = msecs_to_jiffies(p1->retire_blk_tov);
-+	p1->tov_in_msecs = p1->retire_blk_tov;
- 	p1->blk_sizeof_priv = req_u->req3.tp_sizeof_priv;
- 	rwlock_init(&p1->blk_fill_in_prog_lock);
- 
-@@ -691,8 +692,8 @@ static void init_prb_bdqc(struct packet_sock *po,
-  */
- static void _prb_refresh_rx_retire_blk_timer(struct tpacket_kbdq_core *pkc)
- {
--	mod_timer(&pkc->retire_blk_timer,
--			jiffies + pkc->tov_in_jiffies);
-+	hrtimer_set_expires(&pkc->retire_blk_timer,
-+			    ktime_add(ktime_get(), ms_to_ktime(pkc->tov_in_msecs)));
- 	pkc->last_kactive_blk_num = pkc->kactive_blk_num;
- }
- 
-@@ -719,7 +720,7 @@ static void _prb_refresh_rx_retire_blk_timer(struct tpacket_kbdq_core *pkc)
-  * prb_calc_retire_blk_tmo() calculates the tmo.
-  *
-  */
--static void prb_retire_rx_blk_timer_expired(struct timer_list *t)
-+static enum hrtimer_restart prb_retire_rx_blk_timer_expired(struct hrtimer *t)
- {
- 	struct packet_sock *po =
- 		timer_container_of(po, t, rx_ring.prb_bdqc.retire_blk_timer);
-@@ -790,6 +791,7 @@ static void prb_retire_rx_blk_timer_expired(struct timer_list *t)
- 
- out:
- 	spin_unlock(&po->sk.sk_receive_queue.lock);
-+	return HRTIMER_RESTART;
- }
- 
- static void prb_flush_block(struct tpacket_kbdq_core *pkc1,
-diff --git a/net/packet/internal.h b/net/packet/internal.h
-index 1e743d031..41df245e3 100644
---- a/net/packet/internal.h
-+++ b/net/packet/internal.h
-@@ -47,10 +47,10 @@ struct tpacket_kbdq_core {
- 
- 	unsigned short  retire_blk_tov;
- 	unsigned short  version;
--	unsigned long	tov_in_jiffies;
-+	unsigned long	tov_in_msecs;
- 
- 	/* timer to retire an outstanding block */
--	struct timer_list retire_blk_timer;
-+	struct hrtimer retire_blk_timer;
- };
- 
- struct pgv {
--- 
-2.34.1
+But since devmem was the first memory provider I'm paranoid that I got
+something wrong in the general memory provider infra or in the devmem
+implementation specifically; I think some paranoid WARN_ON_ONCEs are
+justified, maybe. I'd rather debug the warning firing rather than a
+very subtle refcounting issue or provider mixup or something at a
+later point. I'm still surprised there aren't many bug reports about
+any memory providers. They probably aren't used much in production
+yet.
 
+I think after 2025 or 2026 LTS it's probably time to clean up these
+unnecessary WARN_ONs, but until then, let's keep them in if you don't
+mind.
+
+--=20
+Thanks,
+Mina
 
