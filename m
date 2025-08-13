@@ -1,248 +1,182 @@
-Return-Path: <netdev+bounces-213287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213286-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F6AEB24641
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 11:57:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12715B24649
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 11:58:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20F6B3A9533
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8958A1B60982
 	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 09:52:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46975212562;
-	Wed, 13 Aug 2025 09:50:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8032212565;
+	Wed, 13 Aug 2025 09:50:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b="TAyC9li1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg154.qq.com (smtpbg154.qq.com [15.184.224.54])
+Received: from SEYPR02CU001.outbound.protection.outlook.com (mail-koreacentralazon11013013.outbound.protection.outlook.com [40.107.44.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91E9121257C;
-	Wed, 13 Aug 2025 09:50:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=15.184.224.54
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755078648; cv=none; b=jFJIzntItt/tAjclsCgy60fOhDUTvgkrZzaq01HoD4D8OQ8WCeMG2xwmD/bG2RpNJgODioSMiqIif4K+WmvAump99Ufbf/9jJGYLnMF5IwSR2Lcd2sbla02ABpcu1h0DhgTfRBnta6Rvewp8hfficg9vfCrXb2FLVs+hpAzeNZY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755078648; c=relaxed/simple;
-	bh=5NjWnfB3j0SmFDYMTbW6G/aUvyqoKnQU7ro3SxcuX84=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QZ108eZUsn/IKQDc3DjHabZD2ExRLjKve2cq4Q80h8QvR2mEds54tE2hryQ0j2y7vdFE0bKt4xKxcIoauO1SHplbf59dT2V5/9fKKxJy3FJFtxCcaIdtQMZyZoR8TxyBJRK0Aa8AVGLTwFW/KYN73eklzKex0OTHypGIoSUT7sk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=15.184.224.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
-X-QQ-mid: esmtpsz16t1755078556t50122486
-X-QQ-Originating-IP: jHUKPmaXLURVrfNnE3/1JIusEU5dtzB9sfHBB4pZc1s=
-Received: from localhost ( [203.174.112.180])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 13 Aug 2025 17:49:14 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 3286716278462949229
-Date: Wed, 13 Aug 2025 17:49:14 +0800
-From: Yibo Dong <dong100@mucse.com>
-To: MD Danish Anwar <danishanwar@ti.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	corbet@lwn.net, gur.stavi@huawei.com, maddy@linux.ibm.com,
-	mpe@ellerman.id.au, lee@trager.us, gongfan1@huawei.com,
-	lorenzo@kernel.org, geert+renesas@glider.be,
-	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
-	alexanderduyck@fb.com, richardcochran@gmail.com,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 5/5] net: rnpgbe: Add register_netdev
-Message-ID: <B301753EBB777DDB+20250813094914.GB972027@nic-Precision-5820-Tower>
-References: <20250812093937.882045-1-dong100@mucse.com>
- <20250812093937.882045-6-dong100@mucse.com>
- <94eeae65-0e4b-45ef-a9c0-6bc8d37ae789@ti.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6A0E212562;
+	Wed, 13 Aug 2025 09:50:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.44.13
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755078638; cv=fail; b=JKpz2r4VgIDZp9e2SXPGgmtQMidm6DOiUf9qenZiWv8oiIkcMC/IW9R6CiO8CT0pVyiJcHXXUrxhZAvmZPU514dR+rqtFVn+5r7mEfJRIh7rfvo4wD9KUgXMgQ3gHW5NAQ5DlwxFmh3NhWwaWvBoiNd4YIRqYNpbGNBZHaBfrWI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755078638; c=relaxed/simple;
+	bh=hCkOOGFAC+c9MKXbik8CjTzpjOvb3miTeuzm8dDHy9c=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=LIcRdccqj7kxR61NvLUETSFZd4oQvDpdmqWeXbq4E9y8nWRW1ky6k7Cj59J3B6LbDFvvE+u7OMxsunKXaFQFO0JMueMoB472YkY1+EvlVSchg5qpj6R6TvCn7L4YMe8G72UvlE3OLvSztWCdFNiZQcDLd2TWhJu2vb2xraZghmw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com; spf=pass smtp.mailfrom=vivo.com; dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b=TAyC9li1; arc=fail smtp.client-ip=40.107.44.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vivo.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=dJcLikOtndidVIBn2i49/foxNPUjGsQdf3+UbzRMFfi7Qfk6WoHyPd5DdvzAXO8HTrhxd95E0nF8Kshr3F3mzMweTiYMCxPvfViMuv8nJ2u635TLS6r43I2b3t3ExlMEVp1sD9oVk9WhRn1Ly6/ur2IpHS0n0JJQwa0EKdWTl+0Zmthi11wBcPcWFQSmbRxXbpPhZ+VOTyQ8w11SeLWJqzcLd/pn22kK6ORld3E6JYoLGhJ3HA04HC4T6vDc4jQFwULqGhs0jYahM3lA8JNevda3X+ovBIT3fWDk7OPF3eUx7ZVPd3PpCcWMGhFrH+wuEKtlI43o05WZ+KMvwDBsPA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=SvmLUWVjZDS/9QGfjAjsS6gLNbYh+Q4L6ASgTHSGEA8=;
+ b=kKldv4WTMp+toj+dxBe+Tia/nevzhmaruT6C6XeK/oSR/ugyayq5s864nOJsE1hyFucgW0QMJB3wNexfP34xzVFIijoAIrLnKMapt9zZ1IY0wRLf0DxZXgAZ44+bW3Xnl7bClnGD5XJ6wmTZn+eFX5N0NjoPLbB9Rki4Md5KrjukssVOVjHrnCRSArFQpjVBXpWwcI6fGG9k0hd14tGfm1tFucbJrnwesCcOgra5Oo7X2HqXTbSS5OuZV64t41pV/dx8c9OguXcYr5Fwjl2t9T1LWC2+PaT55aKU8DZAbEpKJGAaKNpGNC9GA10v+1vjia7alim7bWShoE+r6zDfMQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
+ dkim=pass header.d=vivo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SvmLUWVjZDS/9QGfjAjsS6gLNbYh+Q4L6ASgTHSGEA8=;
+ b=TAyC9li1wbaizxbjZ6PTkabvqC/ueVcaXZxCgbNxPCmcta+/g5dF1qFgXE57YLBZRCrLZ67PlIGMIkhn9VL8w/JsLfVRZCaP+HH14tx/JHpFAuGMmqoGDWUSSZx1k9ZX8Ph8FXBNuURR66aN23lQRDxmex9NJd5NgEKMwohBNIMOwTB/QjzLLKjlfvtqo4zej4DKHbyC/XjuosMyYXOHukoE17+pFEOvpsmFdEHGvK5i/a0ZWYC3vhYscEj1EyTxNkzYqm04uoCZF65sPaY0s/j9ZjtP3r1CKplv462om2KNk9IPHSgYAIl6zEXkSl2xnxBWKWTrPLHGgKggnLdqzQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=vivo.com;
+Received: from SEZPR06MB5576.apcprd06.prod.outlook.com (2603:1096:101:c9::14)
+ by SEZPR06MB6927.apcprd06.prod.outlook.com (2603:1096:101:1ed::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9009.21; Wed, 13 Aug
+ 2025 09:50:34 +0000
+Received: from SEZPR06MB5576.apcprd06.prod.outlook.com
+ ([fe80::5c0a:2748:6a72:99b6]) by SEZPR06MB5576.apcprd06.prod.outlook.com
+ ([fe80::5c0a:2748:6a72:99b6%5]) with mapi id 15.20.9031.014; Wed, 13 Aug 2025
+ 09:50:34 +0000
+From: Liao Yuanhong <liaoyuanhong@vivo.com>
+To: Richard Cochran <richardcochran@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org (open list:PTP HARDWARE CLOCK SUPPORT),
+	linux-kernel@vger.kernel.org (open list)
+Cc: Liao Yuanhong <liaoyuanhong@vivo.com>
+Subject: [PATCH] ptp: ptp_clockmatrix: Remove redundant semicolons
+Date: Wed, 13 Aug 2025 17:50:24 +0800
+Message-Id: <20250813095024.559085-1-liaoyuanhong@vivo.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: TYCP286CA0312.JPNP286.PROD.OUTLOOK.COM
+ (2603:1096:400:38b::19) To SEZPR06MB5576.apcprd06.prod.outlook.com
+ (2603:1096:101:c9::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <94eeae65-0e4b-45ef-a9c0-6bc8d37ae789@ti.com>
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpsz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: OQNQM5UP8StMDdmKQ4cRpMKOIhXI86KRyY6GW62byRr3PlxyTbNjhc5l
-	l/XiOGF3/9rMVo4hpO8kmd8ZY7d9/f50dVidSvlceUIheO8KHGzajutyGSAmUSIapnrsHBK
-	g8vxds4EhAqaDK6qpnEuleRGxBtelCu13dZ+ovGe4Mokq5GoZ/bbn2T966KrokwufIUudjb
-	2jbWje0DA7wMih7K6rWX3rD7sEgpaquhXbuELbX33CTxR1uW6aARNhI/q9DWrGElH+/9YWa
-	B+MO0JmbjvJbmsJBB3Cu9bKrdh+gA8cor4C1PZmqxknJ1ju0BO35cA/m3BOSttgqk9sDrYA
-	zkzcPgly7Sk37W+GNQ7ii2EGHvuVTVp+FqdNsqSIvs30spsIlOJCF66DuOQcWby7eJoJq1g
-	uJ37h39XAa1o6dKQCM1uRIn+ZwUYXo87Qqo+nEMMc4QrW3umlBWBkXO+p/4dedRUhUmpZaD
-	18l59jNFRKo8L2KgoI4PPHJKRWJ5No3ojnoJ6EvZJMa6IpPcQwmhLMxHOVDEua8keMJbzSU
-	n0YqjI4c9eFlm10Q+TuRCEx6TRCec5GF1mSHgTAXaVAdUMWAELEbg9Idbe3Z6+OVGoE7m5x
-	G5E8YBEFYcZSLxNzdMNOFv0xPKz7HvUUnUv/kxkwvFXS143D6FcgflNSexknfQ8dds/Xffu
-	4KIk1qHHoMgY4Pt8ISdMjbN7GsH9hMcMHyexeEv6xBcBCzLbOheydjSLslyaj2h2XEzPwvw
-	qCYcaWV6jXjuH26apLphuwVAAi1a9Oho1QLHsQbWCxmoxJotINUHhR9+1cdUzZx99F9kEZC
-	Pp3ZD0fHPB5LqCI/O82meRaMU8d08bnLhN0cI3dXLAXan+htKtsKIMyOeGCm6OON/NfrSXL
-	d7SoOocGZhdLvWcxQH7793GxN+K9y3ed1unjIcfL3gKcJs0AsJycItqz9CTtFycTAUFNwhH
-	I1scdWZxGQrqOZuN/uSifPwnJBx6BTXZ3ykLD9dZZLBOyBfpNotFyQSLgX64NN5d/jmUbKX
-	tUYxtS2w==
-X-QQ-XMRINFO: NS+P29fieYNw95Bth2bWPxk=
-X-QQ-RECHKSPAM: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SEZPR06MB5576:EE_|SEZPR06MB6927:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6b015569-c83e-4ae4-bc1d-08ddda4ed8fb
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|376014|52116014|1800799024|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?XdBvrQEl/A9+yb6hOSR1K1MByNfe394BXctt8C1Ph1IxATHBlBXWGqq58RvT?=
+ =?us-ascii?Q?Bzyxcwx25V3vv7PSHfpM+J8wKEw7gglFBL+w1yUGeoYi6XG7b0kM3VFb/RRT?=
+ =?us-ascii?Q?CAmRvRBskviNqLNhh+fLTv5Bjd81LcdQioI9017YWH8Ub9tj5fCMN5kR1jUV?=
+ =?us-ascii?Q?/A32KncXwugm1f0agsqV5QavV6ufUb4rMFABmn1IW2ZkJ/50YDLkSGOTXz2R?=
+ =?us-ascii?Q?m+72ZIWxb9yTspXYWqcwOf2QEuGYJl+lHtlUkW8ZG7A+7F5en9z/BmYdpevA?=
+ =?us-ascii?Q?yb4+JHzcldzZbLgotF18n8FL0Z95tNVvnbBoD/XWEVtzCfeDNsdR5morb1m9?=
+ =?us-ascii?Q?SFKvYtoCcDQOHAjhRw/dz2QpYSBY+EHlrHgIDyajRXdsmO4iBgHQZE7X7cH0?=
+ =?us-ascii?Q?tmIBJRTz9WPsnODKUJYQ8mC+/ACq1ZX33W+/Wr899bAHu1KYR/30C1SO/pyp?=
+ =?us-ascii?Q?J648QAT/VZ4309Ne+QbSg0Fyru3cBi+gC3jjoUDymZTxbtzIV5H4oSqsW33f?=
+ =?us-ascii?Q?xN2AgfahIU9c1XkYocOCaZpwtndiIUecS8OxEwXDvmooZy6s4OGb1LZwVImT?=
+ =?us-ascii?Q?GEsHYKtupGJwa5f8Q5p1Domw7ydOKrd/X+77B0XXEgNeI7DOuTvXuFaHX3cD?=
+ =?us-ascii?Q?z8TDTdxxBtiYUq/1559jZbIWL+mL3UpJeNTKfw04O+/nSlx/CJcVQ+v10o4w?=
+ =?us-ascii?Q?l5LWtMjrKDdR/yuQ+M5OfmYpsyuUTiYdZPwI78iMH1ANnujBAbBkxFLi+1Xo?=
+ =?us-ascii?Q?8uvFhQtuDgu/8bfmT4tdIBxroLdwcYCnhYVFHCldHdAEftXlb75E+aspPLcP?=
+ =?us-ascii?Q?7/Mmr8Eux2IdjASdKLNOjycu6ylRROmitKrssj6xc5qX06lT0L9xlx9IXQxR?=
+ =?us-ascii?Q?p+kaIj5gc4GnhOM5lRNcWuavcKthrNiNTowRmitLSyqESM+b6Qa74U8sGizG?=
+ =?us-ascii?Q?Nft6VfU+DDDKHY58tXhB7jntdsAIoZinqfXnkY18k/F1qmQ9AkCECScXu7yS?=
+ =?us-ascii?Q?COz/v3415TsHuey8Jc2EQV9MOSDFjZXde5hVvgI9cBv9Y6wb+madgZ/mPdXP?=
+ =?us-ascii?Q?U/bd/SbiGiUDvRFyivgXkwuCPowH6IPh1UwCoLg85V6wznzn1QH3PWB0oDWj?=
+ =?us-ascii?Q?9MJ1ts/oYZBeOkb5LI3Rqh5y8fMEioEdDZqLNASuDCBL7pIRDWkaI7qoan75?=
+ =?us-ascii?Q?ref1LF84LEabNLxLSaqqZIG1x7VVAReY3oU0kIVgrTDEUEiIXOEI5R9neXvl?=
+ =?us-ascii?Q?+2Rq+MtEYwjwr585qkJBeP0P1ZuiO2zpTlE6zu5cEeV9w4mVfld0pUoSDCeq?=
+ =?us-ascii?Q?x8FMnJI/u5yRsHwgmReRmTG2NlRio+ipod0uOReUCtCptvDMhRzePkuYF0Jd?=
+ =?us-ascii?Q?E6hA1NV7OryVFxBCuy83C283E5wcXDIqKM86l9n3qzBwt9Xrz0tRfzn3Ceae?=
+ =?us-ascii?Q?vdoyXp5b3Lh2j26Ep3gG98Ze1eys7apJYmTQCIILSqV5Ib4URSSNYQ=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SEZPR06MB5576.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(52116014)(1800799024)(38350700014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?8sBV3+Geeh/oMShN/Oj46wdAu/iKzikJGRYVELfFMO8AAVS7jR8tsyUmPkuK?=
+ =?us-ascii?Q?S1t0/F/WBmASStBFudC7PUy6U7U24zf0b+xepAB2xmYrawBIZx3qCC7eM+0/?=
+ =?us-ascii?Q?e1t240D9cy+SA4HftsV0SnnJ/swPCSSUDoy5yqXdFU29SBF2D8+Oxq3fCgef?=
+ =?us-ascii?Q?wIbtIToeofF6s2bdCf1KIIz6aFlnUowTuYjHbll5w8N7kcWprGqcKT0ykEwP?=
+ =?us-ascii?Q?YldsybNnCfp7YySCLJDLo+lZY1Fcdo6BNv+FVO0vPvTB0NXK/O0gtiRiMLUy?=
+ =?us-ascii?Q?J9Eo+XgIjp28kehZo4E01WKOTq1NkcCDdVlQ57hdN9bngZljTQa/XbazMaCR?=
+ =?us-ascii?Q?PKBjuLqktGJzcPlkyzjy9TxUSgPi8KhpWZWihkD61PbyughfxKnVOxo5WEIX?=
+ =?us-ascii?Q?TmwgwF5rh3NQnc9i6gib+eVsAIPr8yjchA3W7dSwenJdpAnShS6hO9ZIYssE?=
+ =?us-ascii?Q?CSXyfqTVxLeTXfNMGZwNdZ03RQZylddp3NH71UxuXyTLHDNwv0cJCbKy403d?=
+ =?us-ascii?Q?Q63XNtWa2hWbXrAj9iH1FOepCDr7Dta4m/lkuTGIB3aXN7wv/+k7YnxbyUeD?=
+ =?us-ascii?Q?Y4CDbRigDzQlxQYY9P5es2kqjBBw0vTool5jixcCsu8PujMdxj3NBm/kfLSv?=
+ =?us-ascii?Q?9vHKPkU13vpA5fg4l57ehLMl+OUQL6BypZkgA5pMMTVAr598Im6IqGLmrIsn?=
+ =?us-ascii?Q?KRSu/e6OGq6g3IdzEBBGNF26K1qzNro6u/oP6AAbDyuCClXt0c4HMpje7Swe?=
+ =?us-ascii?Q?AwnspiquBtmmMxkhanxUa5Uvd4NnoEvQCA8eOE0+YXEAlqIRv2s2GuTisLTe?=
+ =?us-ascii?Q?1lt3/wo4X2/3d9kPWYFVzs7CJjzEpGvD8LbYaYg6IZDghux0dRo656Foy1Fm?=
+ =?us-ascii?Q?4Vlny0OFrLMtZ+idUQ0dLjDoW0cdo/vCsV4zn5ehr7mdqX6Aja2eJ4DpErm2?=
+ =?us-ascii?Q?ojaoyrMs3asPoh4WMyGsl+lSaVlTYDlJeqfnKdx1snnVF3qSEes2pfGJn1YD?=
+ =?us-ascii?Q?SuNben76+WPxfPJnt2zi27ZjW437RmU0TQKakoblZscVsGmNSRQs6PU38+M2?=
+ =?us-ascii?Q?/qBBW1Y98KxdNKPsV3JPtSSvDlcfopAd7wc8LWyWkWhVYLg5EPlKWk6eGQZz?=
+ =?us-ascii?Q?s3OYFebQH4FhSol9+BFsrnK543PAotk3QGVljtNA5kfdZkb9gkSZDQRA+HEv?=
+ =?us-ascii?Q?Gld3D3bbMtjpb54SSU9825BvMtvSFTBByCl8umCDtfAu1Rv5jt+IibrsDEls?=
+ =?us-ascii?Q?m6BSnK+8YahPj73TZDgTvxPvUbCBzusQ9MWU/XrmQqBuG6+bJWAztS1TcIVL?=
+ =?us-ascii?Q?bSEzv4PKvSKXg8US7PrKhIqUCg7LJgm//qxWk9w+496A6hHmCjXutftzAtyR?=
+ =?us-ascii?Q?d9Uw/3X/OtHMiCes/dBV33RCB9fNRyivOEdnI8nPMJDd/3oyrtdFOmIj4KhV?=
+ =?us-ascii?Q?gZlY/baxvtO118zA3xOMQHSLAvHoxp2zWLWFrtBmS5OmX1ldqHktLZFXvPUp?=
+ =?us-ascii?Q?+5k35+2iEwFmV7SQ5YMCnRhMDGtih0q9dh7qzivTLDH4qgbUd41DyCHKLWbP?=
+ =?us-ascii?Q?gm1l/VE8MVcbIRYaK1BPJY3UZq4MCGSrcURlvCvE?=
+X-OriginatorOrg: vivo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6b015569-c83e-4ae4-bc1d-08ddda4ed8fb
+X-MS-Exchange-CrossTenant-AuthSource: SEZPR06MB5576.apcprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Aug 2025 09:50:34.0161
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 5HyWvqkdxL1yeUW2druzIXVazso7NZO11J94lq/Qf+fIV3yHYdhdGmofBwpR4UfaVLf2AojeZSVVKcXDPjgOPA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SEZPR06MB6927
 
-On Wed, Aug 13, 2025 at 01:56:07PM +0530, MD Danish Anwar wrote:
-> On 12/08/25 3:09 pm, Dong Yibo wrote:
-> > Initialize get mac from hw, register the netdev.
-> > 
-> > Signed-off-by: Dong Yibo <dong100@mucse.com>
-> > ---
-> >  drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h    | 22 ++++++
-> >  .../net/ethernet/mucse/rnpgbe/rnpgbe_chip.c   | 73 ++++++++++++++++++
-> >  drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h |  1 +
-> >  .../net/ethernet/mucse/rnpgbe/rnpgbe_main.c   | 76 +++++++++++++++++++
-> >  4 files changed, 172 insertions(+)
-> > 
-> > diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
-> > index 6cb14b79cbfe..644b8c85c29d 100644
-> > --- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
-> > +++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
-> > @@ -6,6 +6,7 @@
-> >  
-> >  #include <linux/types.h>
-> >  #include <linux/mutex.h>
-> > +#include <linux/netdevice.h>
-> >  
-> >  extern const struct rnpgbe_info rnpgbe_n500_info;
-> >  extern const struct rnpgbe_info rnpgbe_n210_info;
-> > @@ -86,6 +87,18 @@ struct mucse_mbx_info {
-> >  	u32 fw2pf_mbox_vec;
-> >  };
-> >  
-> > +struct mucse_hw_operations {
-> > +	int (*init_hw)(struct mucse_hw *hw);
-> > +	int (*reset_hw)(struct mucse_hw *hw);
-> > +	void (*start_hw)(struct mucse_hw *hw);
-> > +	void (*init_rx_addrs)(struct mucse_hw *hw);
-> > +	void (*driver_status)(struct mucse_hw *hw, bool enable, int mode);
-> > +};
-> 
-> You define functions init_hw, start_hw, and init_rx_addrs in this
-> structure but they aren't implemented in this patch. Either implement
-> them or remove them if not needed yet.
-> 
-> 
+Remove unnecessary semicolons.
 
-Got it, I will remove not implemented define.
+Signed-off-by: Liao Yuanhong <liaoyuanhong@vivo.com>
+---
+ drivers/ptp/ptp_clockmatrix.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> > +
-> > +enum {
-> > +	mucse_driver_insmod,
-> > +};
-> > +
-> >  struct mucse_hw {
-> >  	void *back;
-> >  	u8 pfvfnum;
-> > @@ -96,12 +109,18 @@ struct mucse_hw {
-> >  	u32 axi_mhz;
-> >  	u32 bd_uid;
-> >  	enum rnpgbe_hw_type hw_type;
-> > +	const struct mucse_hw_operations *ops;
-> >  	struct mucse_dma_info dma;
-> >  	struct mucse_eth_info eth;
-> >  	struct mucse_mac_info mac;
-> >  	struct mucse_mbx_info mbx;
-> > +	u32 flags;
-> > +#define M_FLAGS_INIT_MAC_ADDRESS BIT(0)
-> >  	u32 driver_version;
-> >  	u16 usecstocount;
-> > +	int lane;
-> > +	u8 addr[ETH_ALEN];
-> > +	u8 perm_addr[ETH_ALEN];
-> >  };
-> >  
-> >  struct mucse {
-> > @@ -123,4 +142,7 @@ struct rnpgbe_info {
-> >  #define PCI_DEVICE_ID_N500_DUAL_PORT 0x8318
-> >  #define PCI_DEVICE_ID_N210 0x8208
-> >  #define PCI_DEVICE_ID_N210L 0x820a
-> > +
-> > +#define dma_wr32(dma, reg, val) writel((val), (dma)->dma_base_addr + (reg))
-> > +#define dma_rd32(dma, reg) readl((dma)->dma_base_addr + (reg))
-> >  #endif /* _RNPGBE_H */
-> > diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
-> > index 16d0a76114b5..3eaa0257f3bb 100644
-> > --- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
-> > +++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
-> > @@ -2,10 +2,82 @@
-> >  /* Copyright(c) 2020 - 2025 Mucse Corporation. */
-> >  
-> >  #include <linux/string.h>
-> > +#include <linux/etherdevice.h>
-> >  
-> >  #include "rnpgbe.h"
-> >  #include "rnpgbe_hw.h"
-> >  #include "rnpgbe_mbx.h"
-> > +#include "rnpgbe_mbx_fw.h"
-> > +
-> > +/**
-> > + * rnpgbe_get_permanent_mac - Get permanent mac
-> > + * @hw: hw information structure
-> > + * @mac_addr: pointer to store mac
-> > + *
-> > + * rnpgbe_get_permanent_mac tries to get mac from hw.
-> > + * It use eth_random_addr if failed.
-> > + **/
-> > +static void rnpgbe_get_permanent_mac(struct mucse_hw *hw,
-> > +				     u8 *mac_addr)
-> > +{
-> > +	if (mucse_fw_get_macaddr(hw, hw->pfvfnum, mac_addr, hw->lane)) {
-> > +		eth_random_addr(mac_addr);
-> > +	} else {
-> > +		if (!is_valid_ether_addr(mac_addr))
-> > +			eth_random_addr(mac_addr);
-> > +	}
-> > +
-> 
-> The function should log a warning when falling back to a random MAC
-> address, especially in the second case where the hardware returned an
-> invalid MAC.
-> 
-
-Got it, I will fix it.
-
-> > +	hw->flags |= M_FLAGS_INIT_MAC_ADDRESS;
-> > +}
-> > +
-> 
-> > +/**
-> > + * rnpgbe_xmit_frame - Send a skb to driver
-> > + * @skb: skb structure to be sent
-> > + * @netdev: network interface device structure
-> > + *
-> > + * @return: NETDEV_TX_OK or NETDEV_TX_BUSY
-> > + **/
-> > +static netdev_tx_t rnpgbe_xmit_frame(struct sk_buff *skb,
-> > +				     struct net_device *netdev)
-> > +{
-> > +		dev_kfree_skb_any(skb);
-> > +		return NETDEV_TX_OK;
-> > +}
-> 
-> Extra indentation on these two lines. Also, the function just drops all
-> packets without any actual transmission. This should at least increment
-> the drop counter statistics.
-> 
-
-Got it, I will add 'netdev->stats.tx_dropped++;' here.
-
-> > +
-> > +static const struct net_device_ops rnpgbe_netdev_ops = {
-> > +	.ndo_open = rnpgbe_open,
-> > +	.ndo_stop = rnpgbe_close,
-> > +	.ndo_start_xmit = rnpgbe_xmit_frame,
-> > +};
-> 
-> 
-> -- 
-> Thanks and Regards,
-> Danish
-> 
-> 
-
-Thanks for your feedback.
+diff --git a/drivers/ptp/ptp_clockmatrix.c b/drivers/ptp/ptp_clockmatrix.c
+index b8d4df8c6da2..59cd6bbb33f3 100644
+--- a/drivers/ptp/ptp_clockmatrix.c
++++ b/drivers/ptp/ptp_clockmatrix.c
+@@ -1161,7 +1161,7 @@ static int set_pll_output_mask(struct idtcm *idtcm, u16 addr, u8 val)
+ 		SET_U16_MSB(idtcm->channel[3].output_mask, val);
+ 		break;
+ 	default:
+-		err = -EFAULT; /* Bad address */;
++		err = -EFAULT; /* Bad address */
+ 		break;
+ 	}
+ 
+-- 
+2.34.1
 
 
