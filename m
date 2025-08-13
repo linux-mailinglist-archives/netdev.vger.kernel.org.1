@@ -1,164 +1,176 @@
-Return-Path: <netdev+bounces-213264-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213265-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 236ABB24486
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 10:42:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79365B24490
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 10:43:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 253D6721E7E
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 08:41:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B0F60175EBC
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 08:43:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC79B2EE61B;
-	Wed, 13 Aug 2025 08:41:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6B9C2F0662;
+	Wed, 13 Aug 2025 08:43:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IoM70vIo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TKXWQNUy"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35DED2D94B0
-	for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 08:41:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE83A2EFDB5;
+	Wed, 13 Aug 2025 08:43:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755074478; cv=none; b=YEQ1dqowUHidJvKiKczI3m/ffDyr72z3cnNto+Sw+QeQccsiQadCYw5L971T/WpxN6qviJni8FA8ltAyBMualblYYeYVR7NtvJMew63tZ5dq0G5R8GkJDSPQtKnHWo09s4lqIgWcLWEWklhZ6aywS3PLGZzzCsPkyxUbe7Us8Bc=
+	t=1755074607; cv=none; b=R8Kie8Uz3VVVfu4wjc9Kq8yU8UFHew8G4efSe8nl5zG5n4uDTy0zIJ1JXSujDJMaWyZY1abOrQZcMUkme5mrLVX/YDnKQUGcaztcUEQAz8eWMJUL2keAnkklXtjyeyGmeNw0lfPJ6b7uca3zpPJt8m70trKuaRUhSexiT/1m9vE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755074478; c=relaxed/simple;
-	bh=tPuksD77buzY7YWi9EBculS4rVEQBAdYHafEc74xhBA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V1EHP49OvYB7b9Z8kMJh4vFxdmKlf2UcRzqxhVO1aMq7gZKSBwbLtof3ZMNy/CpoTYb9NpQqFMQI4RxklLdGOVOth3bsALfnFkvywWWacGTtaLA92TefZt0C26ku8/gnvaTByE71khv9OsBlnY09amJDmfzX+720WIiRQQDHBDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IoM70vIo; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1755074476;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=76YJFkH9eIhBYjG5GaaJcP9B1ox/l/WKOLKsUlz9rUw=;
-	b=IoM70vIoIA0WG1EdZbTiMQ0U4V+1909tSy1OpO1jwGx5t8R+/d1jylMILVtcNr4nj+8pb4
-	ONHj5BYRF3f04J+iX7zO1nwhhcECeSnDEJjAPhgEGZOGLXf3GZ1zN0HHmCDwoumydMcnZy
-	EZdoCzFRppyAe5bGCWone25YoKdQgLc=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-441-Sipyb4tkPN211No2s3zyvg-1; Wed, 13 Aug 2025 04:41:14 -0400
-X-MC-Unique: Sipyb4tkPN211No2s3zyvg-1
-X-Mimecast-MFC-AGG-ID: Sipyb4tkPN211No2s3zyvg_1755074473
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-458f710f364so41836965e9.0
-        for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 01:41:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755074473; x=1755679273;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=76YJFkH9eIhBYjG5GaaJcP9B1ox/l/WKOLKsUlz9rUw=;
-        b=pYZNoHSfFUm3sznVzxMmtwrrSVNIMWBSEA45Dh/em61B6cn79LGT5I15yOoKvNW/sG
-         MO01wQKYzlqOdsD5Nz1fdvzVpXteC4A75fpxAFUL7q2gnjosui0pjzqOwXsJueQsZGV6
-         MkL0vbGrBDybxjWKNWUgXeGVJNOo2K8Sk8FIDrm7SzMixq8BFh7PrlazPD3WXQjSDLZb
-         zAQjGCxLkrjb4Z1fCoaAGEapJ9lb2679kaD5peYZfsbywjwJtVC/xKjUxeOkWLYgysEc
-         YfFGGz7fMS1QT4SrTjIme+tz4o3N02dUYVLRM5Y6vinK+mdmNXNh41/md8ZDbneLN6fD
-         HBfQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX1yW4eq/ofAZRp6M/7vWRc4j55DB8uKMpIuEVAb18pWXodSpuLe8yz2sDrZVD7zZgmqTBUc9U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwpKLGmkNGG289WJMwFwGWzElvXokFuxzQ1+I8m/MBoClGjMOUG
-	tcWX+miq1PpPCVnGlCi3TJbzV6cprEuvrbbz8nY6FI9ZB02n62+51zLvTO9NWxmS5U5Zcdy7mFp
-	D4Ct4xCaD4LotOJ5QJQ5uhYdTALDrlXgR0xmdXs1ec4kES883SHhTCSsFgw==
-X-Gm-Gg: ASbGncuE0GoSo+CnkG4uc7EVLpP65tFzlo2Zmm0UYEiwRhVfNwwY+2eKG6QlBQfCOKU
-	IoLhiV6UHDHMo5dGNGknWklUFRUyjk7FnmAm+6H2zU60oMmRnpzSYyBetTdHsihJSSpz+JI45nj
-	OZZRxdy+E3+HXuZBYydgXyEjMjNyS1KRgLVzPX6DQQoLgEoRECZ43lU6aRgk5e50CHEY7gbGiwG
-	dBDExKylLhcI/2EMM5gdawW22si71wEvIo0ek2TmtECOtUB3xGPkelmfXC8c/mLdC30pZdFuoJG
-	luiQGMrW3Vgzve42Cc0KbqPI9MYbH2ha
-X-Received: by 2002:a05:600c:3106:b0:458:6733:fb5c with SMTP id 5b1f17b1804b1-45a1664bdb7mr15732945e9.28.1755074473344;
-        Wed, 13 Aug 2025 01:41:13 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHAoH7imNQ2C+/iwNJvGO5T7E2kVVUhVdyltcXD3iFW1FubZdXr/O++cAjLCc7t/dYIu5pcLQ==
-X-Received: by 2002:a05:600c:3106:b0:458:6733:fb5c with SMTP id 5b1f17b1804b1-45a1664bdb7mr15732735e9.28.1755074472965;
-        Wed, 13 Aug 2025 01:41:12 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc0:1515:7300:62e6:253a:2a96:5e3])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45a16ddb9fbsm19841985e9.9.2025.08.13.01.41.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Aug 2025 01:41:12 -0700 (PDT)
-Date: Wed, 13 Aug 2025 04:41:09 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Will Deacon <will@kernel.org>
-Cc: linux-kernel@vger.kernel.org, Keir Fraser <keirf@google.com>,
-	Steven Moreland <smoreland@google.com>,
-	Frederick Mayle <fmayle@google.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	netdev@vger.kernel.org, virtualization@lists.linux.dev
-Subject: Re: [PATCH v4 9/9] vsock/virtio: Allocate nonlinear SKBs for
- handling large transmit buffers
-Message-ID: <20250812112226-mutt-send-email-mst@kernel.org>
-References: <20250717090116.11987-1-will@kernel.org>
- <20250717090116.11987-10-will@kernel.org>
+	s=arc-20240116; t=1755074607; c=relaxed/simple;
+	bh=w8gAexE8HUB0CV05DNC00MXF4b6kSy0iHfD/95EwwEs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XwxlsMpkmmO4viPid75PVomstN/lGBUxrIyPT0o6zjc/bQX93GrwonvRi35SatX8cu3ZvaJ7BtOzVzTVWoL3W2B/zzgU6wR+8D8LlhE6Y1rKXGs7+TZbD2EVX/POMNqXmc6GCCZy4PmobEdPvuzcXyTcyiqyxLVakHxw54i1xxE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TKXWQNUy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83AFBC4CEEB;
+	Wed, 13 Aug 2025 08:43:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755074607;
+	bh=w8gAexE8HUB0CV05DNC00MXF4b6kSy0iHfD/95EwwEs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=TKXWQNUy4Nypry+jJm861Bpp76KsJzsLO9J9bSFS4/omiS8os+tGxStcEoQKhSYo7
+	 SimvbVRavtza6ljVDbU3iLqiaIccfNI9CVadnMY7ECd1yJXligH21wLfmjGg8oLRsb
+	 oOiK5Iql9fH8qq/e30fMnWYPzEw7mAIEM2Qnzt6hG1nxv3CjxQ1rgerXjOYHUc3aA8
+	 gycMF7RXmfeDRzvd28g7XZ80jHaFEWfpVdYQUBElcKnTZAu3ZMQJIZjaWgjdVhJDw8
+	 kkydB4g/3ZluY4yRB8qXC0pN29MxtASl4Y4N7/CpZ3709d4UF6hA6pD5+eutteREKe
+	 iO9DIpODpVrBQ==
+Message-ID: <2ba29c9f-a44f-4be6-bd3a-eb9cdb34ac8a@kernel.org>
+Date: Wed, 13 Aug 2025 10:43:21 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250717090116.11987-10-will@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC] xdp: pass flags to xdp_update_skb_shared_info() directly
+To: Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, ast@kernel.org,
+ daniel@iogearbox.net, lorenzo@kernel.org, toke@redhat.com,
+ john.fastabend@gmail.com, sdf@fomichev.me, michael.chan@broadcom.com,
+ anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+ marcin.s.wojtas@gmail.com, tariqt@nvidia.com, mbloch@nvidia.com,
+ eperezma@redhat.com
+References: <20250812161528.835855-1-kuba@kernel.org>
+ <46470d2b-4828-48ad-a94e-9d874de1b2fc@intel.com>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <46470d2b-4828-48ad-a94e-9d874de1b2fc@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jul 17, 2025 at 10:01:16AM +0100, Will Deacon wrote:
-> When transmitting a vsock packet, virtio_transport_send_pkt_info() calls
-> virtio_transport_alloc_linear_skb() to allocate and fill SKBs with the
-> transmit data. Unfortunately, these are always linear allocations and
-> can therefore result in significant pressure on kmalloc() considering
-> that the maximum packet size (VIRTIO_VSOCK_MAX_PKT_BUF_SIZE +
-> VIRTIO_VSOCK_SKB_HEADROOM) is a little over 64KiB, resulting in a 128KiB
-> allocation for each packet.
+
+
+
+On 12/08/2025 18.48, Alexander Lobakin wrote:
+> From: Jakub Kicinski <kuba@kernel.org>
+> Date: Tue, 12 Aug 2025 09:15:28 -0700
 > 
-> Rework the vsock SKB allocation so that, for sizes with page order
-> greater than PAGE_ALLOC_COSTLY_ORDER, a nonlinear SKB is allocated
-> instead with the packet header in the SKB and the transmit data in the
-> fragments. Note that this affects both the vhost and virtio transports.
+>> xdp_update_skb_shared_info() needs to update skb state which
+>> was maintained in xdp_buff / frame. Pass full flags into it,
+>> instead of breaking it out bit by bit. We will need to add
+>> a bit for unreadable frags (even tho XDP doesn't support
+>> those the driver paths may be common), at which point almost
+>> all call sites would become:
+>>
+>>      xdp_update_skb_shared_info(skb, num_frags,
+>>                                 sinfo->xdp_frags_size,
+>>                                 MY_PAGE_SIZE * num_frags,
+>>                                 xdp_buff_is_frag_pfmemalloc(xdp),
+>>                                 xdp_buff_is_frag_unreadable(xdp));
 > 
-> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-> Signed-off-by: Will Deacon <will@kernel.org>
-
-
-
-So this caused a regression, see syzbot report:
-
-https://lore.kernel.org/all/689a3d92.050a0220.7f033.00ff.GAE@google.com
-
-
-I'm inclined to revert unless we have a fix quickly.
-
-
-> ---
->  net/vmw_vsock/virtio_transport_common.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
+> Yeah I think this doesn't make sense, it just doesn't scale. We can make
+> more flags in future and adding a new argument for each is not a good
+> idea, even if more drivers would switch to generic
+> xdp_build_skb_from_buff().
 > 
-> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-> index c9eb7f7ac00d..fe92e5fa95b4 100644
-> --- a/net/vmw_vsock/virtio_transport_common.c
-> +++ b/net/vmw_vsock/virtio_transport_common.c
-> @@ -109,7 +109,8 @@ static int virtio_transport_fill_skb(struct sk_buff *skb,
->  		return __zerocopy_sg_from_iter(info->msg, NULL, skb,
->  					       &info->msg->msg_iter, len, NULL);
->  
-> -	return memcpy_from_msg(skb_put(skb, len), info->msg, len);
-> +	virtio_vsock_skb_put(skb, len);
-> +	return skb_copy_datagram_from_iter(skb, 0, &info->msg->msg_iter, len);
->  }
->  
->  static void virtio_transport_init_hdr(struct sk_buff *skb,
-> @@ -261,7 +262,7 @@ static struct sk_buff *virtio_transport_alloc_skb(struct virtio_vsock_pkt_info *
->  	if (!zcopy)
->  		skb_len += payload_len;
->  
-> -	skb = virtio_vsock_alloc_linear_skb(skb_len, GFP_KERNEL);
-> +	skb = virtio_vsock_alloc_skb(skb_len, GFP_KERNEL);
->  	if (!skb)
->  		return NULL;
->  
-> -- 
-> 2.50.0.727.gbf7dc18ff4-goog
 
+I agree. And good reminder that some driver have already switched to the
+generic xdp_build_skb_from_buff().
+
+>>
+>> Keep a helper for accessing the flags, in case we need to
+>> transform them somehow in the future (e.g. to cover up xdp_buff
+>> vs xdp_frame differences).
+>>
+>> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+>> ---
+>> Does anyone prefer the current form of the API, or can we change
+>> as prosposed?
+>>
+
+I like the proposed change.
+The only thing that confuses me was that the u32 flags is named
+"skb_flags" and not "xdp_flags".
+
+@@ -314,7 +313,7 @@
+  static inline void
+  xdp_update_skb_shared_info(struct sk_buff *skb, u8 nr_frags,
+  			   unsigned int size, unsigned int truesize,
+-			   bool pfmemalloc)
++			   u32 skb_flags)
+
+
+>> Bonus question: while Im messing with this API could I rename
+>> xdp_update_skb_shared_info()? Maybe to xdp_update_skb_state() ?
+>> Not sure why the function name has "shared_info" when most of
+>> what it updates is skb fields.
+> 
+> I can only suspect that the author decided to name it this way due to
+> that it's only used when xdp_buff has frags (and frags are in shinfo).
+> But I agree it's not the best choice. xdp_update_skb_state() sounds fine
+> to me, but given that it's all about frags, maybe something like
+> xdp_update_skb_frags_info/state() or so?
+> 
+
+Yes, function is only used when skb_shared_info have already been touched.
+
+Performance wise it can be expensive to touch the cache-line for
+skb_shared_info, so the code carefully checks xdp_buff_has_frags() (flag
+XDP_FLAGS_HAS_FRAGS) before deref of skb_shared_info memory area.
+
+Calling it xdp_update_skb_state() seems misleading. As Olek says, this
+is about updating the "skb_frags".  The original intent is that
+xdp_buff/xdp_frame is using same skb_shared_info area as SKB, and when
+transitioning to a "full" SKB then we need to do some adjustments.
+(Looking at function code, it is of-cause confusing that it doesn't
+touch sinfo->frags[] array, but that is because we don't need to, as
+non-linear XDP and SKB have same layout.).
+
+--Jesper
+
+>>
+>> CC: ast@kernel.org
+>> CC: daniel@iogearbox.net
+>> CC: hawk@kernel.org
+>> CC: lorenzo@kernel.org
+>> CC: toke@redhat.com
+>> CC: john.fastabend@gmail.com
+>> CC: sdf@fomichev.me
+>> CC: michael.chan@broadcom.com
+>> CC: anthony.l.nguyen@intel.com
+>> CC: przemyslaw.kitszel@intel.com
+>> CC: marcin.s.wojtas@gmail.com
+>> CC: tariqt@nvidia.com
+>> CC: mbloch@nvidia.com
+>> CC: eperezma@redhat.com
+>> CC: bpf@vger.kernel.org
+>> ---
+>>   include/net/xdp.h                             | 21 +++++++++----------
+>>   drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c |  2 +-
+>>   drivers/net/ethernet/intel/i40e/i40e_txrx.c   |  4 ++--
+>>   drivers/net/ethernet/intel/ice/ice_txrx.c     |  4 ++--
+>>   drivers/net/ethernet/marvell/mvneta.c         |  2 +-
+>>   .../net/ethernet/mellanox/mlx5/core/en_rx.c   |  7 +++----
+>>   drivers/net/virtio_net.c                      |  2 +-
+>>   net/core/xdp.c                                | 11 +++++-----
+>>   8 files changed, 26 insertions(+), 27 deletions(-)
 
