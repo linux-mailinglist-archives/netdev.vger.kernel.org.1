@@ -1,127 +1,164 @@
-Return-Path: <netdev+bounces-213263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213264-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA425B24462
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 10:34:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 236ABB24486
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 10:42:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DBCFF1887CE3
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 08:33:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 253D6721E7E
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 08:41:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C3082EBBAB;
-	Wed, 13 Aug 2025 08:33:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC79B2EE61B;
+	Wed, 13 Aug 2025 08:41:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OhfGZGXi"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IoM70vIo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD9352D12EF
-	for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 08:33:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35DED2D94B0
+	for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 08:41:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755074010; cv=none; b=d7akFgnSrSEN1GmtUEYRvWY5zIrfFRQXB3C0ZPNSO8Ck1Wi7pkjZVLMa5yl8I9yffpJmM8ZQjq3ZcQDe9iWVuf4NK4yV40A05iQkNagkRRDTbvkHkf6lkqC8IS+Fn/o6fNrlotEAU1OQCSP70TmHnpvA8PxOji5pPigiIhWeIjY=
+	t=1755074478; cv=none; b=YEQ1dqowUHidJvKiKczI3m/ffDyr72z3cnNto+Sw+QeQccsiQadCYw5L971T/WpxN6qviJni8FA8ltAyBMualblYYeYVR7NtvJMew63tZ5dq0G5R8GkJDSPQtKnHWo09s4lqIgWcLWEWklhZ6aywS3PLGZzzCsPkyxUbe7Us8Bc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755074010; c=relaxed/simple;
-	bh=8MWYyc4pWgdl1S73eQOvCrejLOkGKZuvFgUyb1SGy4Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XYig/PxWttQF8ZfE7CI8MM77A8KZ5MmVEHhwz4oXwWzGKW6E24DMD2SMfArrJC6ZZ+rC7O3eFiIqBq6R8lCNs7a1Kaj59tJ7qVBBiXBYh+579pKtP/+iVjV2NxSPBGzkJqV7F+twVu5nDX4a2uD22f7JjFGUz83NeWGMTrKYMpQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OhfGZGXi; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3b79bd3b1f7so3069359f8f.1
-        for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 01:33:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755074007; x=1755678807; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=teOvt0wiOgB9B6wfD73/ElQ4Xk6YJNybYKKNeoSe/qU=;
-        b=OhfGZGXibluqOjesmL8Qt3eti9tic4Z3ELJatjDD5oKEtK2J9MZg+UCdehJ0C+2QUR
-         ZNlXnuD4gXWKO3V/f8jlz0wMnxmpp+1AijxjWHaGBXWtPMudM4qNep983z/qBMYMMwC3
-         Rf90NKaAqeR/z6LSj3mOnCOxLcqy58qg+fyEQj7rumJYyud/H38JjUP2MV8GLE6u5t3l
-         F7l+EZOBZH3/aRtm3m/sGdDXwjAikOKBVqYxUTplv/H5HH0ekdU9sa+c5KFbHMwNT732
-         fHPRiW029dxRG0TE20/qGKhFFXe5JPEhXGcTkqrwmIWvseNwDmdqu2GwVBVbw3EhAWZa
-         bRKA==
+	s=arc-20240116; t=1755074478; c=relaxed/simple;
+	bh=tPuksD77buzY7YWi9EBculS4rVEQBAdYHafEc74xhBA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=V1EHP49OvYB7b9Z8kMJh4vFxdmKlf2UcRzqxhVO1aMq7gZKSBwbLtof3ZMNy/CpoTYb9NpQqFMQI4RxklLdGOVOth3bsALfnFkvywWWacGTtaLA92TefZt0C26ku8/gnvaTByE71khv9OsBlnY09amJDmfzX+720WIiRQQDHBDo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IoM70vIo; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1755074476;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=76YJFkH9eIhBYjG5GaaJcP9B1ox/l/WKOLKsUlz9rUw=;
+	b=IoM70vIoIA0WG1EdZbTiMQ0U4V+1909tSy1OpO1jwGx5t8R+/d1jylMILVtcNr4nj+8pb4
+	ONHj5BYRF3f04J+iX7zO1nwhhcECeSnDEJjAPhgEGZOGLXf3GZ1zN0HHmCDwoumydMcnZy
+	EZdoCzFRppyAe5bGCWone25YoKdQgLc=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-441-Sipyb4tkPN211No2s3zyvg-1; Wed, 13 Aug 2025 04:41:14 -0400
+X-MC-Unique: Sipyb4tkPN211No2s3zyvg-1
+X-Mimecast-MFC-AGG-ID: Sipyb4tkPN211No2s3zyvg_1755074473
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-458f710f364so41836965e9.0
+        for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 01:41:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755074007; x=1755678807;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=teOvt0wiOgB9B6wfD73/ElQ4Xk6YJNybYKKNeoSe/qU=;
-        b=aD01f6HdNFgsKXyZ3HEfKg9Nvbv1UDOzfqD38GPFKjZtGilcFmqhcqKfBOuiMhzA9L
-         ZSvOI31gOTvTv6apbaNDcSnyubA2k4sqJgMhxJDvihcM2uptW1oOsk9Hil+m7cqn7EGK
-         Bg3xp74N8UeQTAX/5CGeqwnrGEHLYoXC36suqxfcYwPY2PVkYclPrIUzpC/pxTAG3y+A
-         dgl2v3wguu+h4mc7gC9aCZd6toNQHftKlgNGREwffpzcns3Zne6QHaQZpT8s6jC/39FD
-         PTUCt0SQdQzU7RALY6a8FtbVvdgsqXEUfvZAS0C7CQAqRz0yZ6ZapQf5AMOdIiUjrk7G
-         z4BQ==
-X-Gm-Message-State: AOJu0YyVpqOL9hEKXm29svV+omkhRifnUraoV5+RoIPPM137B3WheXUu
-	KpGzaE5eFGd9ffSe+pn9yh2J2ghnFsRUy/I76Il7IWliIGDgqu7y5P+F
-X-Gm-Gg: ASbGncvcJQBZuByeAhMCbHDes2bDZDO3c29aLcm3i/4M1EgCpskvpT5YVjEHq6w8Rtt
-	c8LI1nRc0FdAzxN4L/eifZTsD7wG2eEFzhRe6yJOIKHMpDoM/xKtFMc4xw2qV8fKIwxTEJ6i8ve
-	kf65PWPtz+ZuvQRzj7bO/UFUFGfPvaiTyLxLqfOpnd/0G0tRRsz+KP2lDXtt4T5nHYqKoTOA9OM
-	rUOk3vTKXEETZlMLYo8Cw/hGe/lhWTGUgYgZr59D+E0jjqO/1UYtUcXua+gfPUGgK1wNBLpdxDo
-	luyAEtBsDNVnJAqzqY7pJj1DuT2sSLsl7jiliXV7o9hV/CKkAzHO8iNm2cUpGomHutA6F1Neu5F
-	6o4sDNBARy4TzgnHasFWHKaVSctdacRYD6LI=
-X-Google-Smtp-Source: AGHT+IFK9N1ikTwcigdfwqInixCnoOmmdPAPIpB4AxnF/o1BP4cLxhB09qmQ7VQe6AMoeH2J1qy4iA==
-X-Received: by 2002:a05:6000:1882:b0:3b8:d4ad:6ae8 with SMTP id ffacd0b85a97d-3b917eb7bbbmr1336251f8f.50.1755074006755;
-        Wed, 13 Aug 2025 01:33:26 -0700 (PDT)
-Received: from ?IPV6:2620:10d:c096:325::26f? ([2620:10d:c092:600::1:f676])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b79c453ab0sm47241119f8f.44.2025.08.13.01.33.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Aug 2025 01:33:26 -0700 (PDT)
-Message-ID: <fad270c7-5f7f-4739-b40e-4460f96fb9af@gmail.com>
-Date: Wed, 13 Aug 2025 09:34:45 +0100
+        d=1e100.net; s=20230601; t=1755074473; x=1755679273;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=76YJFkH9eIhBYjG5GaaJcP9B1ox/l/WKOLKsUlz9rUw=;
+        b=pYZNoHSfFUm3sznVzxMmtwrrSVNIMWBSEA45Dh/em61B6cn79LGT5I15yOoKvNW/sG
+         MO01wQKYzlqOdsD5Nz1fdvzVpXteC4A75fpxAFUL7q2gnjosui0pjzqOwXsJueQsZGV6
+         MkL0vbGrBDybxjWKNWUgXeGVJNOo2K8Sk8FIDrm7SzMixq8BFh7PrlazPD3WXQjSDLZb
+         zAQjGCxLkrjb4Z1fCoaAGEapJ9lb2679kaD5peYZfsbywjwJtVC/xKjUxeOkWLYgysEc
+         YfFGGz7fMS1QT4SrTjIme+tz4o3N02dUYVLRM5Y6vinK+mdmNXNh41/md8ZDbneLN6fD
+         HBfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX1yW4eq/ofAZRp6M/7vWRc4j55DB8uKMpIuEVAb18pWXodSpuLe8yz2sDrZVD7zZgmqTBUc9U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwpKLGmkNGG289WJMwFwGWzElvXokFuxzQ1+I8m/MBoClGjMOUG
+	tcWX+miq1PpPCVnGlCi3TJbzV6cprEuvrbbz8nY6FI9ZB02n62+51zLvTO9NWxmS5U5Zcdy7mFp
+	D4Ct4xCaD4LotOJ5QJQ5uhYdTALDrlXgR0xmdXs1ec4kES883SHhTCSsFgw==
+X-Gm-Gg: ASbGncuE0GoSo+CnkG4uc7EVLpP65tFzlo2Zmm0UYEiwRhVfNwwY+2eKG6QlBQfCOKU
+	IoLhiV6UHDHMo5dGNGknWklUFRUyjk7FnmAm+6H2zU60oMmRnpzSYyBetTdHsihJSSpz+JI45nj
+	OZZRxdy+E3+HXuZBYydgXyEjMjNyS1KRgLVzPX6DQQoLgEoRECZ43lU6aRgk5e50CHEY7gbGiwG
+	dBDExKylLhcI/2EMM5gdawW22si71wEvIo0ek2TmtECOtUB3xGPkelmfXC8c/mLdC30pZdFuoJG
+	luiQGMrW3Vgzve42Cc0KbqPI9MYbH2ha
+X-Received: by 2002:a05:600c:3106:b0:458:6733:fb5c with SMTP id 5b1f17b1804b1-45a1664bdb7mr15732945e9.28.1755074473344;
+        Wed, 13 Aug 2025 01:41:13 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHAoH7imNQ2C+/iwNJvGO5T7E2kVVUhVdyltcXD3iFW1FubZdXr/O++cAjLCc7t/dYIu5pcLQ==
+X-Received: by 2002:a05:600c:3106:b0:458:6733:fb5c with SMTP id 5b1f17b1804b1-45a1664bdb7mr15732735e9.28.1755074472965;
+        Wed, 13 Aug 2025 01:41:12 -0700 (PDT)
+Received: from redhat.com ([2a0d:6fc0:1515:7300:62e6:253a:2a96:5e3])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45a16ddb9fbsm19841985e9.9.2025.08.13.01.41.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Aug 2025 01:41:12 -0700 (PDT)
+Date: Wed, 13 Aug 2025 04:41:09 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Will Deacon <will@kernel.org>
+Cc: linux-kernel@vger.kernel.org, Keir Fraser <keirf@google.com>,
+	Steven Moreland <smoreland@google.com>,
+	Frederick Mayle <fmayle@google.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	netdev@vger.kernel.org, virtualization@lists.linux.dev
+Subject: Re: [PATCH v4 9/9] vsock/virtio: Allocate nonlinear SKBs for
+ handling large transmit buffers
+Message-ID: <20250812112226-mutt-send-email-mst@kernel.org>
+References: <20250717090116.11987-1-will@kernel.org>
+ <20250717090116.11987-10-will@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC net-next v1 4/6] net: convert page pool dma helpers to
- netmem_desc
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- davem@davemloft.net, sdf@fomichev.me, dw@davidwei.uk,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Byungchul Park <byungchul@sk.com>
-References: <cover.1754929026.git.asml.silence@gmail.com>
- <dbde32b0c68a1ac5729e1c331438131bddbf3b04.1754929026.git.asml.silence@gmail.com>
- <CAHS8izNXjGhg2ntH_9rjH8OfbZr8VaU97w6j4uYqK9kkQE+n5g@mail.gmail.com>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <CAHS8izNXjGhg2ntH_9rjH8OfbZr8VaU97w6j4uYqK9kkQE+n5g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250717090116.11987-10-will@kernel.org>
 
-On 8/13/25 01:05, Mina Almasry wrote:
-...>> diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/helpers.h
->> index db180626be06..a9774d582933 100644
->> --- a/include/net/page_pool/helpers.h
->> +++ b/include/net/page_pool/helpers.h
-...>> +static inline dma_addr_t page_pool_get_dma_addr_netmem(netmem_ref netmem)
->> +{
->> +       const struct netmem_desc *desc = netmem_to_nmdesc(netmem);
->> +
->> +       return page_pool_get_dma_addr_nmdesc(desc);
->> +}
->> +
+On Thu, Jul 17, 2025 at 10:01:16AM +0100, Will Deacon wrote:
+> When transmitting a vsock packet, virtio_transport_send_pkt_info() calls
+> virtio_transport_alloc_linear_skb() to allocate and fill SKBs with the
+> transmit data. Unfortunately, these are always linear allocations and
+> can therefore result in significant pressure on kmalloc() considering
+> that the maximum packet size (VIRTIO_VSOCK_MAX_PKT_BUF_SIZE +
+> VIRTIO_VSOCK_SKB_HEADROOM) is a little over 64KiB, resulting in a 128KiB
+> allocation for each packet.
 > 
-> nit: this wrapper feels very unnecessary. The _nmdesc variant has only
-> one call site from page_pool_get_dma_addr_netmem. I'd really prefer we
-> don't have the _nmdesc variant.
+> Rework the vsock SKB allocation so that, for sizes with page order
+> greater than PAGE_ALLOC_COSTLY_ORDER, a nonlinear SKB is allocated
+> instead with the packet header in the SKB and the transmit data in the
+> fragments. Note that this affects both the vhost and virtio transports.
+> 
+> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+> Signed-off-by: Will Deacon <will@kernel.org>
 
-It's reused for zcrx in Patch 6. If I want a cast there optimised,
-it's either that, or some new get_dma_niov helper, which would still
-need to be expressed through sth like page_pool_get_dma_addr_nmdesc()
-to avoid duplication.
 
--- 
-Pavel Begunkov
+
+So this caused a regression, see syzbot report:
+
+https://lore.kernel.org/all/689a3d92.050a0220.7f033.00ff.GAE@google.com
+
+
+I'm inclined to revert unless we have a fix quickly.
+
+
+> ---
+>  net/vmw_vsock/virtio_transport_common.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> index c9eb7f7ac00d..fe92e5fa95b4 100644
+> --- a/net/vmw_vsock/virtio_transport_common.c
+> +++ b/net/vmw_vsock/virtio_transport_common.c
+> @@ -109,7 +109,8 @@ static int virtio_transport_fill_skb(struct sk_buff *skb,
+>  		return __zerocopy_sg_from_iter(info->msg, NULL, skb,
+>  					       &info->msg->msg_iter, len, NULL);
+>  
+> -	return memcpy_from_msg(skb_put(skb, len), info->msg, len);
+> +	virtio_vsock_skb_put(skb, len);
+> +	return skb_copy_datagram_from_iter(skb, 0, &info->msg->msg_iter, len);
+>  }
+>  
+>  static void virtio_transport_init_hdr(struct sk_buff *skb,
+> @@ -261,7 +262,7 @@ static struct sk_buff *virtio_transport_alloc_skb(struct virtio_vsock_pkt_info *
+>  	if (!zcopy)
+>  		skb_len += payload_len;
+>  
+> -	skb = virtio_vsock_alloc_linear_skb(skb_len, GFP_KERNEL);
+> +	skb = virtio_vsock_alloc_skb(skb_len, GFP_KERNEL);
+>  	if (!skb)
+>  		return NULL;
+>  
+> -- 
+> 2.50.0.727.gbf7dc18ff4-goog
 
 
