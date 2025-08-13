@@ -1,74 +1,77 @@
-Return-Path: <netdev+bounces-213295-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213297-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BEC0B24761
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 12:35:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25F85B2479A
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 12:46:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58E4D720BBF
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 10:34:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8259685600
+	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 10:46:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B376F2F6574;
-	Wed, 13 Aug 2025 10:34:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2137B280308;
+	Wed, 13 Aug 2025 10:45:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="kyBOcDDu"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CynXljvm"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 203582F49F3;
-	Wed, 13 Aug 2025 10:34:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A16F619D880
+	for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 10:45:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755081256; cv=none; b=p6vDlcnF5f6XxwEyn4L1txykGXo4FkjK86RGf6Q5FIXmfs5+VjoHuX3ggkcmVzEs1eggZ6JYPV42vUAxwQiButEM9J3olFXHjwH6iY0mUyXuJxW8DNgmnEan8NC1gi2lTylSgjC2kXk78mjJ2+zwumTdsEkNtz1W7H3miSfrMyI=
+	t=1755081959; cv=none; b=PMixTXmT6Fr2CPYN+3uU11MRVpf44V1nsb9JkS9YDX0GrkDutXROJEr2oxrBaaTDyhVtk8oZP4Zs6mvdYtiIHT0j9s40OEja/VAbpdtSxmQelA9cOxusZjdD5DOlP6yrP94PgXgnfpZhk57+0bSVzIbEmYaPibdvBPFbSfSpVug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755081256; c=relaxed/simple;
-	bh=4M4WTr7aDG7m7x4izcfAcsDMik6L9YC6njBc54p0N+c=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cHbxmMQgPDVAolJJgkx5FI6vEV8jcOEgR7hohciUVUyjeBS/2WHl1b2wLKTcJQOnQha56EGtFTyIZo7hAoXvItsm7/ULvRiYD3J/iW7Yl0QHqIarNGdqgr3On3uPkS5mpaCw7/xpAQzQaq5gMTEGarUj2/XkQRI+evmpbJqKk5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=kyBOcDDu; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+	s=arc-20240116; t=1755081959; c=relaxed/simple;
+	bh=yLT7BDKccKmh7IL+6jcK22ShpJb0eR0hxsC+U/6WvuM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pmYve4+DH+eZjQ++c3C2ZrEvuOkoSaT9cImG4dcv4QT1yBaJzdPO8p7V3wOENEWDStfm4mJW1MhoxJYcU/xetInf0d76AjUZgjtVkL2rdFIrTxHiBpq/gLymN6dMORcRbniPaT9ax76+NB2Oo9D4OpACFMaD7MeBn8ao1wARD84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CynXljvm; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1755081255; x=1786617255;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=4M4WTr7aDG7m7x4izcfAcsDMik6L9YC6njBc54p0N+c=;
-  b=kyBOcDDufpfOiQ5JTdz4/fkb3JwioI5bxRE3Q3D1G0j9fxVEnVPcSm+D
-   dxyLrAshgfoKUGNohVK2CmSbvpYTjQFPQsDxA93Tb41UmVlXlP/Q5I872
-   zCEryMh2NXUDW2VnadsC9JjKPQspnI9+IbNWJM5AfAKH3m8/zfvS4NKa0
-   3kx1sUegh1h29CYlPvsKxqO8x1sIZHZKRzA8FLmdT2io0IHo5HUSXladd
-   KkwkbNTRfC6E1JeKQ/i79Ovqz+bwrfGsu8q3EOTkHClhUVIaRA0cWM7R8
-   M8p224FNgHfi1z9u5zujP7njz0yIpP0zqYkYQxXWIDPr4mpMU/fCsA6Uw
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1755081957; x=1786617957;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=yLT7BDKccKmh7IL+6jcK22ShpJb0eR0hxsC+U/6WvuM=;
+  b=CynXljvmAgrvNyzNPyiwwzkc9IZ7fkOWt63vEh2pXAKcLAE62ZPEr/Rm
+   88XJnDbW5E+WIDPi20qVuPA3A43grFhdPA26ePEDQCAs4xJ90IhEIPG2J
+   DTcPgShnvisMRIqbHbrpPvo4qPiI5pvDRxdp/9ZL+4vRPR4rsD/QK3PBD
+   Lbi0fGohRewaYuN7nbpy77U+yKZvq0SlS2LQt5kX5buzHtxCXfXx3KvaO
+   +JxQtESY6bMY1EyLKdUtHOyjhjKpkt1UNarHT5Nw40muYaGVtH6+mZ24W
+   V6pvniHyc8ujAn6TKvaf88bh5Fzu8p8/Zf+N5t9NNcTrKMG86yuR60Kzg
    g==;
-X-CSE-ConnectionGUID: 7pl1KfoDRtWRHbFbwqg1xg==
-X-CSE-MsgGUID: IP/Mkq3KR1yKKoEIgpPfjw==
+X-CSE-ConnectionGUID: qFVe01twSJmtdlJevX4Gdw==
+X-CSE-MsgGUID: xR1rG1+7QEeBIsWwEVp3aA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11520"; a="44949612"
 X-IronPort-AV: E=Sophos;i="6.17,285,1747724400"; 
-   d="scan'208";a="276535070"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 13 Aug 2025 03:34:13 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Wed, 13 Aug 2025 03:34:10 -0700
-Received: from che-ll-i17164.microchip.com (10.10.85.11) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
- 15.1.2507.44 via Frontend Transport; Wed, 13 Aug 2025 03:34:07 -0700
-From: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
-To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "Parthiban
- Veerasooran" <parthiban.veerasooran@microchip.com>
-Subject: [PATCH net 2/2] microchip: lan865x: fix missing configuration for Rev.B0/B1 as per AN1760
-Date: Wed, 13 Aug 2025 16:03:55 +0530
-Message-ID: <20250813103355.70838-3-parthiban.veerasooran@microchip.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250813103355.70838-1-parthiban.veerasooran@microchip.com>
-References: <20250813103355.70838-1-parthiban.veerasooran@microchip.com>
+   d="scan'208";a="44949612"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2025 03:45:57 -0700
+X-CSE-ConnectionGUID: 3aXtKSgsT0WGWVuzmmfQyw==
+X-CSE-MsgGUID: Yyh+KhR7Ruq3j0zfOyONpQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,285,1747724400"; 
+   d="scan'208";a="166066902"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by orviesa009.jf.intel.com with ESMTP; 13 Aug 2025 03:45:55 -0700
+Received: from pkitszel-desk.tendawifi.com (unknown [10.245.245.219])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 9472F28781;
+	Wed, 13 Aug 2025 11:45:53 +0100 (IST)
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+To: intel-wired-lan@lists.osuosl.org,
+	Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: netdev@vger.kernel.org,
+	Greg KH <gregkh@linuxfoundation.org>,
+	jeremiah.kyle@intel.com,
+	leszek.pepiak@intel.com,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: [PATCH iwl-net 0/8] i40e: virtchnl improvements
+Date: Wed, 13 Aug 2025 12:45:10 +0200
+Message-ID: <20250813104552.61027-1-przemyslaw.kitszel@intel.com>
+X-Mailer: git-send-email 2.50.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,60 +79,28 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
 
-Fix missing configuration required for LAN865x silicon revisions B0 and B1,
-as documented in Microchip Application Note AN1760 (Revision F, June 2024).
+Improvements hardening PF-VF communication for i40e driver.
+This patchset targets several issues that can cause undefined behavior
+or be exploited in some other way.
 
-According to the guidance in the application note, register 0x10077 must be
-programmed with the value 0x0028 to ensure correct operation on Rev.B0/B1
-devices. Without this fixup, the device may not function correctly or may
-fail to initialize.
+Lukasz Czapnik (8):
+  i40e: add validation for ring_len param
+  i40e: fix idx validation in i40e_validate_queue_map
+  i40e: fix idx validation in config queues msg
+  i40e: fix input validation logic for action_meta
+  i40e: fix validation of VF state in get resources
+  i40e: add max boundary check for VF filters
+  i40e: add mask to apply valid bits for itr_idx
+  i40e: improve VF MAC filters accounting
 
-Reference:
-https://www.microchip.com/en-us/application-notes/an1760
+ drivers/net/ethernet/intel/i40e/i40e.h        |   3 +-
+ .../ethernet/intel/i40e/i40e_virtchnl_pf.h    |   3 +-
+ drivers/net/ethernet/intel/i40e/i40e_main.c   |  26 ++++-
+ .../ethernet/intel/i40e/i40e_virtchnl_pf.c    | 110 ++++++++++--------
+ 4 files changed, 90 insertions(+), 52 deletions(-)
 
-Fixes: 5cd2340cb6a3 ("microchip: lan865x: add driver support for Microchip's LAN865X MAC-PHY")
-Signed-off-by: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
----
- drivers/net/ethernet/microchip/lan865x/lan865x.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
-
-diff --git a/drivers/net/ethernet/microchip/lan865x/lan865x.c b/drivers/net/ethernet/microchip/lan865x/lan865x.c
-index d03f5a8de58d..a55ca485062f 100644
---- a/drivers/net/ethernet/microchip/lan865x/lan865x.c
-+++ b/drivers/net/ethernet/microchip/lan865x/lan865x.c
-@@ -32,6 +32,14 @@
- /* MAC Specific Addr 1 Top Reg */
- #define LAN865X_REG_MAC_H_SADDR1	0x00010023
- 
-+/* LAN865x Rev.B0/B1 configuration parameters from AN1760
-+ * As per the Configuration Application Note AN1760 published in the below link,
-+ * https://www.microchip.com/en-us/application-notes/an1760
-+ * Revision F (DS60001760G - June 2024)
-+ */
-+#define LAN865X_REG_FIXUP		0x00010077
-+#define LAN865X_FIXUP_VALUE		0x0028
-+
- struct lan865x_priv {
- 	struct work_struct multicast_work;
- 	struct net_device *netdev;
-@@ -346,6 +354,14 @@ static int lan865x_probe(struct spi_device *spi)
- 		goto free_netdev;
- 	}
- 
-+	/* LAN8650/1 configuration fixup from AN1760 */
-+	ret = oa_tc6_write_register(priv->tc6, LAN865X_REG_FIXUP,
-+				    LAN865X_FIXUP_VALUE);
-+	if (ret) {
-+		dev_err(&spi->dev, "Failed to configure fixup: %d\n", ret);
-+		goto oa_tc6_exit;
-+	}
-+
- 	/* As per the point s3 in the below errata, SPI receive Ethernet frame
- 	 * transfer may halt when starting the next frame in the same data block
- 	 * (chunk) as the end of a previous frame. The RFA field should be
 -- 
-2.34.1
+2.50.0
 
 
