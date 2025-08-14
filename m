@@ -1,96 +1,50 @@
-Return-Path: <netdev+bounces-213547-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213548-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE539B258F4
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 03:26:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1D76B2590F
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 03:31:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA8B5887669
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 01:26:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06B3B724928
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 01:30:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5A7A19D071;
-	Thu, 14 Aug 2025 01:26:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AE9F19D081;
+	Thu, 14 Aug 2025 01:30:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dWSYS9Sa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DJj3AErv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1628015B0EC;
-	Thu, 14 Aug 2025 01:26:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5AD219CCEC;
+	Thu, 14 Aug 2025 01:29:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755134782; cv=none; b=DaYDGA5HLg+IqpnrzXvQsL8S+LA3myNioerPSzm5Cxl2yD8LHQXeiwLB+8YOdeEiziajcC3/68FVDnLn19IzeItaGA9ybdutIz6Edy5pSYYs1uXNyInXRbCRSsUb01981lV6f2F/hbuZ/0n6To/o9ya2y4p2HA19WxltCoRet00=
+	t=1755134999; cv=none; b=e+AtS77CSvt6lIC7Xb7/ttHpKySG1Yd5kLHL6tcdigdnLoazaGpHlFLT/U03/cH7EZ2jpMyDi0Yl7OxNmidshFgVxc4O/Vtj4r09EWmtQ6nKkPU2k/E/TwUR6qR2WCix4I3FUjgtEYni04ZcUfICpVOI419GqLas6e1/pYLQS1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755134782; c=relaxed/simple;
-	bh=AaTOIjKM/HhANfXPn7WY/y8dURyKGAwym4+LGmYUpW8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AovxRg0n5J2ZsV1IgyPW83snwUTa4mUedJPoVN3+JeYil6yRis9bK+nX+Wb1zUjVhtUlLS5OkxwZ99OglacZxQA8luFVOe7/HWnoJSXbpIsmGOAVnhe+0S5MHpE58jp7VD/k39mtWHBNT24pUmf3VaLQWzneWNdRJ57ZMgbriRs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dWSYS9Sa; arc=none smtp.client-ip=209.85.210.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-76e2e8bb2e5so746854b3a.1;
-        Wed, 13 Aug 2025 18:26:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755134780; x=1755739580; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QxHg1aswGQ9X8RPJVWs7DtEqnRdVWNWal6g+jkC+HfE=;
-        b=dWSYS9Sa9dHqL2e0VIB390wFLvHCbw3NUJBw6qzUSaDCEu5eFNDqIVwxJFr/uy9YvD
-         Pmsj+AWxqHkJt+FJsezywtOA8a4eOX6zJfW+N2Mms1Fkpn2DBlJ8hdmVoESBd5JxQTo6
-         SjKVvuK84uK6ymFTjeG7+BWKTQ/8sYP+vXEJd64lzMXjr2b+r4zcZv1ppxT4DRg0xpWH
-         gizWRnKN5nIWQmK377YSZs2EJEb3TbtRpdE7zYbbJQ83inZCDftCkTBGwskNVzbj5mmm
-         NKkjFZtsBkrdti85/6QfEM6clYtSXMFgJ7QZO73Gro7vFqh2h2/i7m5zTCa4plnQH93R
-         Q1RQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755134780; x=1755739580;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QxHg1aswGQ9X8RPJVWs7DtEqnRdVWNWal6g+jkC+HfE=;
-        b=S2L/WS1+dwFV4/zWViUAMKvyjHglTCcTNvkCkRoyTUmvbkLolAagOLsdJ0cQkXsZf6
-         kuwMp3OFIw15hSvwI1EXcXHwXjh1rMb22vuc9ICYZU86Nbn6JbezZeh1UPvoVIErPsOU
-         kQukv+vtLF/aMjr3PQvU/0JIrvJKREn8xnFlkvFlDEI4s06B2qzLCJ7Y28IGkO67WT5z
-         7ahofVeN/QFYdsUt8WEDlE62R5Oc3rdV7iEYtXxGVAU1/vrvlrpA/u1DQkksaEHOYCoD
-         mQ6NpZ05k52fXMS0Ezd5eDKjJkKTACc5co15MkiaD5wJhTniBPqanOrJmVsTZpMmzlB9
-         NcWA==
-X-Forwarded-Encrypted: i=1; AJvYcCUOASg+gaVN74xqdhQS/6cL9xlUBfDND2Dm3FCRE2OXOb0rjoLVPQ7LKLO4qYR9lmAEIPvWvux5@vger.kernel.org, AJvYcCWgUS/G95Q4o4I3Bm7gCYibuRsCMc5cIbBZukzzhqtp+NPLyH+t+ipJwN6wIXcMazf4vxSBNwURJpAo@vger.kernel.org, AJvYcCXjw9VijoqWoD8BBgZrJI0vT6rDBfAXKeFG/SsrE9XW05fRKPtS92QLgWdk4PJXPPt/Wvx7F0T2FE4Yi1E=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx4xWwe2+jZp/+cfLWI3g6Ks3C7RFDGRxWvBpoMjvqD0Q7bpqNX
-	S4uXvUJWfU1DIFkb99+WHBK3Am8GdZFUWRrgI5K0XYqivlIH922nrfED
-X-Gm-Gg: ASbGnctDaSwTi7jZAMu8ym9ixtzu65hh/jHI5l6YNM83Niw82L0kM6ci4EvEVaxchnC
-	3g4ZKMW1DsTJ3XCu9rYnbP0m8OHmZ0Rp79Mf+yzQxZdnoOJrJzNHT/ZFf4SMUTTrY10EkPNX/Rm
-	oDOg2Ptey1Tcvgb5QFzSG2dZUO2ziaaGsLQE3XIEEQFNNvPKm3vN+BThpmFVTBTFBsRaZkjbi20
-	9OB0YBqmjxMzfHv5UnJD3LSqWaX2tm/6XirgvfuSymgvCiA4pLu3nD5iTrqntBZDCEkWm/K37/j
-	ARsJ1RKY+TaEhir8H1q3t0513yN0fUFj2iUB2Ar16SJ4ptGRaWAZSfzDp81q6WLr6QDCmYgcf4R
-	wNlQYDnDx+UEk
-X-Google-Smtp-Source: AGHT+IHNcdpCGXHvkqSCZsXpc7Usbxwm5MeQy6A4wV71bhBTfpofgrjkMiXew9+JZ8GNjW8Pbs2/aA==
-X-Received: by 2002:a05:6a20:734f:b0:239:1c1e:3edf with SMTP id adf61e73a8af0-240bd2b4021mr1643767637.40.1755134780338;
-        Wed, 13 Aug 2025 18:26:20 -0700 (PDT)
-Received: from gmail.com ([223.166.85.89])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b424ca987desm23395786a12.40.2025.08.13.18.26.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Aug 2025 18:26:20 -0700 (PDT)
-From: Qingfang Deng <dqfext@gmail.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Felix Fietkau <nbd@nbd.name>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	linux-ppp@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Kuniyuki Iwashima <kuniyu@google.com>
-Subject: [PATCH net v3 2/2] ppp: fix race conditions in ppp_fill_forward_path
-Date: Thu, 14 Aug 2025 09:25:58 +0800
-Message-ID: <20250814012559.3705-2-dqfext@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250814012559.3705-1-dqfext@gmail.com>
-References: <20250814012559.3705-1-dqfext@gmail.com>
+	s=arc-20240116; t=1755134999; c=relaxed/simple;
+	bh=J55Fs/Cz9AW+uhrMa+7Gfgx6XLg0a+dnMKDxhbeQISc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Gdes+X63UBk0+K63jLhh3A8xdJBhx0J601h/T5/k6rT4QEW+rPu02HTa17K77H4Y20XJHec+L7aMC2tqFYZbNQSfx1MxYLHpul7nGQWiJmD4hmnUl2IPK3WYsio758Gvn+mpbFBqlcihu4nxHp9SD/E9CX3FK6NHayVaC1JeDo8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DJj3AErv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65DEDC4CEEB;
+	Thu, 14 Aug 2025 01:29:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755134998;
+	bh=J55Fs/Cz9AW+uhrMa+7Gfgx6XLg0a+dnMKDxhbeQISc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=DJj3AErv1Y+Akl6loCWCYIuwCwIaQaA29YvuxizxIGbhpn1zbKuGDNVS691MlB7S0
+	 VJU0h8368YPLBSMm8F2siER/f3YQKgepBO5Cp4LZsU6ZL3iynU8MjqbUMLq9ajqSuM
+	 oEmk+x0pi6nN0kMac00LhJA0KSqZxovzDJzOTy1qjfyv4fS+Zo5j6ex+61SEdUx/hE
+	 xkT03+yfzbyN4Lg3vhXW6yReDESys/snU/yMC9iQn6hO7xDRbYReWvRTERmdxqWVCW
+	 APFylYXDss+aGb6AOxHVC8yGFAEkAmc15UBqsNYs3PO4CWn0V7Ty1hdrBeG7Ex7BAv
+	 eSGz6KQGUI4WQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33AFD39D0C38;
+	Thu, 14 Aug 2025 01:30:11 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,98 +52,49 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2 0/2] ets: use old 'nbands' while purging unused
+ classes
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175513501000.3846704.9094584005828460007.git-patchwork-notify@kernel.org>
+Date: Thu, 14 Aug 2025 01:30:10 +0000
+References: <cover.1755016081.git.dcaratti@redhat.com>
+In-Reply-To: <cover.1755016081.git.dcaratti@redhat.com>
+To: Davide Caratti <dcaratti@redhat.com>
+Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org, nnamrec@gmail.com, petrm@nvidia.com,
+ netdev@vger.kernel.org, ivecera@redhat.com, shuali@redhat.com,
+ stable@vger.kernel.org
 
-ppp_fill_forward_path() has two race conditions:
+Hello:
 
-1. The ppp->channels list can change between list_empty() and
-   list_first_entry(), as ppp_lock() is not held. If the only channel
-   is deleted in ppp_disconnect_channel(), list_first_entry() may
-   access an empty head or a freed entry, and trigger a panic.
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-2. pch->chan can be NULL. When ppp_unregister_channel() is called,
-   pch->chan is set to NULL before pch is removed from ppp->channels.
+On Tue, 12 Aug 2025 18:40:28 +0200 you wrote:
+> - patch 1/2 fixes a NULL dereference in the control path of sch_ets qdisc
+> - patch 2/2 extends kselftests to verify effectiveness of the above fix
+> 
+> Changes since v1:
+>  - added a kselftest (thanks Victor)
+> 
+> Davide Caratti (2):
+>   net/sched: ets: use old 'nbands' while purging unused classes
+>   selftests: net/forwarding: test purge of active DWRR classes
+> 
+> [...]
 
-Fix these by using a lockless RCU approach:
-- Use list_first_or_null_rcu() to safely test and access the first list
-  entry.
-- Convert list modifications on ppp->channels to their RCU variants and
-  add synchronize_net() after removal.
-- Check for a NULL pch->chan before dereferencing it.
+Here is the summary with links:
+  - [net,v2,1/2] net/sched: ets: use old 'nbands' while purging unused classes
+    https://git.kernel.org/netdev/net/c/87c6efc5ce9c
+  - [net,v2,2/2] selftests: net/forwarding: test purge of active DWRR classes
+    https://git.kernel.org/netdev/net/c/774a2ae6617b
 
-Fixes: f6efc675c9dd ("net: ppp: resolve forwarding path for bridge pppoe devices")
-Signed-off-by: Qingfang Deng <dqfext@gmail.com>
----
-v3:
- Reorder the patch to be after the mtk_ppe patch.
-v2:
- Use synchronize_net() instead of synchronize_rcu().
- Use READ_ONCE() to access pch->chan, and WRITE_ONCE() to set it to NULL.
-
- drivers/net/ppp/ppp_generic.c | 17 +++++++++++------
- 1 file changed, 11 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/net/ppp/ppp_generic.c b/drivers/net/ppp/ppp_generic.c
-index 8c98cbd4b06d..824c8dc4120b 100644
---- a/drivers/net/ppp/ppp_generic.c
-+++ b/drivers/net/ppp/ppp_generic.c
-@@ -33,6 +33,7 @@
- #include <linux/ppp_channel.h>
- #include <linux/ppp-comp.h>
- #include <linux/skbuff.h>
-+#include <linux/rculist.h>
- #include <linux/rtnetlink.h>
- #include <linux/if_arp.h>
- #include <linux/ip.h>
-@@ -1598,11 +1599,14 @@ static int ppp_fill_forward_path(struct net_device_path_ctx *ctx,
- 	if (ppp->flags & SC_MULTILINK)
- 		return -EOPNOTSUPP;
- 
--	if (list_empty(&ppp->channels))
-+	pch = list_first_or_null_rcu(&ppp->channels, struct channel, clist);
-+	if (!pch)
-+		return -ENODEV;
-+
-+	chan = READ_ONCE(pch->chan);
-+	if (!chan)
- 		return -ENODEV;
- 
--	pch = list_first_entry(&ppp->channels, struct channel, clist);
--	chan = pch->chan;
- 	if (!chan->ops->fill_forward_path)
- 		return -EOPNOTSUPP;
- 
-@@ -2994,7 +2998,7 @@ ppp_unregister_channel(struct ppp_channel *chan)
- 	 */
- 	down_write(&pch->chan_sem);
- 	spin_lock_bh(&pch->downl);
--	pch->chan = NULL;
-+	WRITE_ONCE(pch->chan, NULL);
- 	spin_unlock_bh(&pch->downl);
- 	up_write(&pch->chan_sem);
- 	ppp_disconnect_channel(pch);
-@@ -3515,7 +3519,7 @@ ppp_connect_channel(struct channel *pch, int unit)
- 	hdrlen = pch->file.hdrlen + 2;	/* for protocol bytes */
- 	if (hdrlen > ppp->dev->hard_header_len)
- 		ppp->dev->hard_header_len = hdrlen;
--	list_add_tail(&pch->clist, &ppp->channels);
-+	list_add_tail_rcu(&pch->clist, &ppp->channels);
- 	++ppp->n_channels;
- 	pch->ppp = ppp;
- 	refcount_inc(&ppp->file.refcnt);
-@@ -3545,10 +3549,11 @@ ppp_disconnect_channel(struct channel *pch)
- 	if (ppp) {
- 		/* remove it from the ppp unit's list */
- 		ppp_lock(ppp);
--		list_del(&pch->clist);
-+		list_del_rcu(&pch->clist);
- 		if (--ppp->n_channels == 0)
- 			wake_up_interruptible(&ppp->file.rwait);
- 		ppp_unlock(ppp);
-+		synchronize_net();
- 		if (refcount_dec_and_test(&ppp->file.refcnt))
- 			ppp_destroy_interface(ppp);
- 		err = 0;
+You are awesome, thank you!
 -- 
-2.43.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
