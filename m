@@ -1,106 +1,110 @@
-Return-Path: <netdev+bounces-213540-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213541-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED30BB2589A
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 02:56:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD44EB258A6
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 02:59:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E3D921891EE4
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 00:55:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 94A969A1DC1
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 00:57:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C3E22AD13;
-	Thu, 14 Aug 2025 00:54:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FF2113E898;
+	Thu, 14 Aug 2025 00:57:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="j6HQjTqi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jHgwLrac"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A52F2FF671
-	for <netdev@vger.kernel.org>; Thu, 14 Aug 2025 00:54:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DE5D29A2;
+	Thu, 14 Aug 2025 00:57:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755132897; cv=none; b=tGYIkNFmfwhUG+2v6OzWoojzKMKaC8IDg+eeXwyag9Wqi0wvD/RPPcWUWqPOrR8SDx02HkkLQMjqa2J4eFDVIoJTbHXXvCHakbYFpWAmGDc+2JSxxlvoGUP2xI7CxYcWZyhyqF4ZO1Ic8ygs2Sh7HQxlZRjAzZIH8W835Iud1v8=
+	t=1755133062; cv=none; b=NxITwBxXdjHJZgIAyjGTCFbmcYHRlo3qpH0dGmmR4z9/MU2qSt+dQCP+nBbqT9A+sv2fH8sLqqn4Yp9vkuI00J6AmOS9leWwmbu608aVnDh4BVYZSEP5CxL9LBfZc8gt0/YIdtjPNst5ZmWxYE4OE6fkZcMCKorvFzWwS3oXDEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755132897; c=relaxed/simple;
-	bh=JydQgnfv1smbfa7kiZsNg0dRzfJLvvk2h3GZdX1R0Ow=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XUQK4zXk+FJTjtQR48lPHKK5+wyO7kE6oRMyA3Et/B4JJRG8g4EGSMCJ9CP4zzgYeTIeNLeI8x4kZnmzUQ5F5RWM+np74EH18sg6wjapIwR9+kF6cGy/OuKRDZcXyDdQs4SqY2HmOXP/tnV4VuPjHnzQ++Vs0V/IkW4x79aM5aQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=j6HQjTqi; arc=none smtp.client-ip=91.218.175.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <e6c8fa06-c76c-49e7-a027-0a7b610f1e9c@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1755132890;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WdHhV4i8i+lWGHS2gl9FLlu2TgUgJbbs4bD/Zxld7c4=;
-	b=j6HQjTqifsSO2Uppl1+E8juWlz85WB6Puvvo38zR0af1UA37Dw9SimZLmZuB9dm1eOcmBg
-	ClajNZt92ETnf/J4hcXbQq43iGyGJsz35Oj+8z3oHgpyWVoPyIp+xlvpV5UK78DWgLMmi1
-	7Au6epSZeq1y5zb1TVkFgVNw6Q6r0ZU=
-Date: Wed, 13 Aug 2025 17:54:43 -0700
+	s=arc-20240116; t=1755133062; c=relaxed/simple;
+	bh=+IMn7C7Sq7bYpHjCzCPlaS5XdaZQiDEZ1iugmJAtHog=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=J0PiAewlnW9yyaofWhQT6PzZ/H2+yzOyTKmQ/mTycmyS8aTaJVn+SKlusfvoYQCcvD6GJyjRDNJgX4C0dDKy4JSu0DbtUH+Ya2WRfmqssFq38kaLL/pq5vWU2o+G/5jH3Dwc+DGiqu6EEwcTUCkNNThOeg/G5UIOXRTPLaECDF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jHgwLrac; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22FA7C4CEEB;
+	Thu, 14 Aug 2025 00:57:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755133061;
+	bh=+IMn7C7Sq7bYpHjCzCPlaS5XdaZQiDEZ1iugmJAtHog=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=jHgwLracLj2YbX6WDRy0A4VQVgtQT1qXrNFyJAt+GbhZB7mGmr3RiSjOojOjW5vO/
+	 oaL/zI8FfYZxdtJ1czykMF0XWbQGVzf5Vhzqi6s6UYgpA/JYxpbeBCTmni72XF37HT
+	 Bl09K7vU7fMF1vARG3t6qdh+a9pYA5A20d7/nYB4Ac2eszh/WuBKj4mlN2W4t4Qna1
+	 ABVfNLomGg1snZPFGrVZKychbQzfjXUvhJxvZRLk8ADWTRlTJM/EGlOJ2hku0RXVsR
+	 UB37HG7X9+YwYVjQOIGuwsRJ/zhJKYGDS9ndJOt6tthi8FWRQ01/9Mcr/Xa8OSNxNw
+	 nPZPna1zGI/BA==
+Date: Wed, 13 Aug 2025 17:57:40 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Stanislav Fomichev <sdf@fomichev.me>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, ayush.sawal@chelsio.com, andrew+netdev@lunn.ch,
+ gregkh@linuxfoundation.org, horms@kernel.org, dsahern@kernel.org,
+ pablo@netfilter.org, kadlec@netfilter.org, steffen.klassert@secunet.com,
+ mhal@rbox.co, abhishektamboli9@gmail.com, linux-kernel@vger.kernel.org,
+ linux-staging@lists.linux.dev, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, herbert@gondor.apana.org.au
+Subject: Re: [PATCH net-next 1/7] net: Add skb_dst_reset and skb_dst_restore
+Message-ID: <20250813175740.4c24e747@kernel.org>
+In-Reply-To: <20250812155245.507012-2-sdf@fomichev.me>
+References: <20250812155245.507012-1-sdf@fomichev.me>
+	<20250812155245.507012-2-sdf@fomichev.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v3 net-next 12/12] net-memcg: Decouple controlled memcg
- from global protocol memory accounting.
-To: Shakeel Butt <shakeel.butt@linux.dev>,
- Kuniyuki Iwashima <kuniyu@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Neal Cardwell <ncardwell@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Willem de Bruijn <willemb@google.com>, Matthieu Baerts <matttbe@kernel.org>,
- Mat Martineau <martineau@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
- Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>,
- Andrew Morton <akpm@linux-foundation.org>, =?UTF-8?Q?Michal_Koutn=C3=BD?=
- <mkoutny@suse.com>, Tejun Heo <tj@kernel.org>,
- Simon Horman <horms@kernel.org>, Geliang Tang <geliang@kernel.org>,
- Muchun Song <muchun.song@linux.dev>, Mina Almasry <almasrymina@google.com>,
- Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org,
- mptcp@lists.linux.dev, cgroups@vger.kernel.org, linux-mm@kvack.org,
- bpf@vger.kernel.org
-References: <20250812175848.512446-1-kuniyu@google.com>
- <20250812175848.512446-13-kuniyu@google.com>
- <w6klr435a4rygmnifuujg6x4k77ch7cwoq6dspmyknqt24cpjz@bbz4wzmxjsfk>
- <CAAVpQUCU=VJxA6NKx+O1_zwzzZOxUEsG9mY+SNK+bzb=dj9s5w@mail.gmail.com>
- <oafk5om7v5vtxjmo5rtwy6ullprfaf6mk2lh4km7alj3dtainn@jql2rih5es4n>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <oafk5om7v5vtxjmo5rtwy6ullprfaf6mk2lh4km7alj3dtainn@jql2rih5es4n>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 8/13/25 1:53 PM, Shakeel Butt wrote:
-> What I think is the right approach is to have BPF struct ops based
-> approach with possible callback 'is this socket under pressure' or maybe
-> 'is this socket isolated' and then you can do whatever you want in those
-> callbacks. In this way your can follow the same approach of caching the
-> result in kernel (lower bits of sk->sk_memcg).
-> 
-> I am CCing bpf list to get some suggestions or concerns on this
-> approach.
+On Tue, 12 Aug 2025 08:52:39 -0700 Stanislav Fomichev wrote:
+> +/**
+> + * skb_dst_reset() - return current dst_entry value and clear it
+> + * @skb: buffer
+> + *
+> + * Resets skb dst_entry without adjusting its reference count. Useful in
+> + * cases where dst_entry needs to be temporarily reset and restored.
+> + * Note that the returned value cannot be used directly because it
+> + * might contain SKB_DST_NOREF bit.
+> + *
+> + * When in doubt, prefer skb_dst_drop() over skb_dst_reset() to correctly
+> + * handle dst_entry reference counting.
 
-I have quickly looked at the set. In patch 11, it sets a bit in sk->sk_memcg.
+thoughts on prefixing these two new helpers with __ to hint that
+they are low level and best avoided?
 
-On the bpf side, there are already cgroup bpf progs that can do bpf_setsockopt 
-on a sk, so the same can be done here. The bpf_setsockopt does not have to set 
-option/knob that is only available in the uapi in case we don't want to expose 
-this to the user space.
+> + *
+> + * Returns: original skb dst_entry.
+> + */
+> +static inline unsigned long skb_dst_reset(struct sk_buff *skb)
+> +{
+> +	unsigned long refdst = skb->_skb_refdst;
+> +
+> +	skb->_skb_refdst = 0;
+> +	return refdst;
+> +}
+> +
+> +/**
+> + * skb_dst_restore() - restore skb dst_entry saved via skb_dst_reset
 
-The cgroup bpf prog (BPF_CGROUP_INET_SOCK_CREATE) can already be run when a 
-"inet" sock is created. This hook (i.e. attach_type) does not have access to 
-bpf_setsockopt but should be easy to add.
+saved -> removed ?
+Also I think for better kdoc linking it's good to add () after function
+names
 
-For more comprehensive mem charge policy that needs new bpf hook, that probably 
-will need struct_ops instead of another cgroup attach_type but that will be 
-implementation details.
+> + * @skb: buffer
+
+kdoc missing for refdst
+
+> + */
+> +static inline void skb_dst_restore(struct sk_buff *skb, unsigned long refdst)
+> +{
+> +	skb->_skb_refdst = refdst;
 
