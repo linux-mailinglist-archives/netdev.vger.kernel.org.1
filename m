@@ -1,155 +1,113 @@
-Return-Path: <netdev+bounces-213695-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213696-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74523B26569
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 14:32:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8801B2659F
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 14:43:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E3A81B6018D
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 12:30:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD1E01CC1A51
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 12:43:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81DB22FC89C;
-	Thu, 14 Aug 2025 12:30:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="E4H0oF1v"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F27A2FE05B;
+	Thu, 14 Aug 2025 12:42:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ABE12D0C80
-	for <netdev@vger.kernel.org>; Thu, 14 Aug 2025 12:30:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 922CF25C706
+	for <netdev@vger.kernel.org>; Thu, 14 Aug 2025 12:42:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755174628; cv=none; b=OB9t+59deLIyoFiabxvtfUecOpNFY7oEu5sdU9GJ3h/0AewJuFwku1MvIr1KZFHi4cYVoCyP311wh2OlbyLRSu4ruDYvcyllgX8qgO8en28TpDTCHHxqjlXg/ESCxGxHSJZLUx5tpe9AuNWsR2wYV/6djJRTRCwi3aM7MzevZTg=
+	t=1755175348; cv=none; b=jQcD8CCK4wxuHIOLWQLy9TWGBgb9vQfJ6MAkqTkS1AgLR0UHr8TYykjoWlNiwd2P8g4NseV6c2IDzE8EPi2QxDpRfhHE4wowwy4/RNiZ1bJ6dIHwPrgPdXj95UQFeSOdOUyCgpKtcn/BWYo0msTiYRa0RT09yXA3AP/giuDabos=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755174628; c=relaxed/simple;
-	bh=1PE9vqqyAAJHt2b4anvd33upg87s7/sb4TrxyKMVNKg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sK2e8xOfQZKWoIML5zCCPZ2XLyEMi2e5FztzSPQN5ZbhRC0x7RjeB7A1QQDmpR12ats1RBeVpLarAtr9VqeYTk3vyFJ2/HLGL6AlSsle61Ou82iGlKWayLhUWLDqqIKariDazZ3NNTxTti6TOTc18YQnpgHCXfnKT3HQQ2Hcp0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=E4H0oF1v; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-3b9e41101d4so468520f8f.2
-        for <netdev@vger.kernel.org>; Thu, 14 Aug 2025 05:30:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1755174625; x=1755779425; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fJ1w1vX016HZnhf51EVaJqwNMCPhdOvsodT4l6hbFIE=;
-        b=E4H0oF1v9HyUEv/PaapQmZXv2Qj8FbNSP2dSaO73BcECErZ+qjpyThCT5uyiNriH3H
-         VYwQ6gBxjru8L9YTVAOlfkD4AuJxv6UCCSYHWe1yyAZAwZIJ4dvSuVEjliiXp3rOGwuq
-         LHAkyT5gbIgYe5dxMM2m3hWjam7zAJVboHAMc+2mqKAkjSw7w+4n9CwS/M36ugrW5K+d
-         FJwKjSg7UAJZtvjohWd3QyiQt7fRaq2Ry7UOCNIaWEZOjN2VQBFBokWKZYgFAZGkgkm4
-         MY7uL9KR0ngEgs1OnYXlAG4cRY6EaQ6SsSMPp10yc/kpDGg69I7Anjadgg6YmIgdSCQX
-         yxdg==
+	s=arc-20240116; t=1755175348; c=relaxed/simple;
+	bh=+jEP63/fwVi2lrN9xFrebDIsSXfRw9oRl5BYut7hPDE=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=GwOyNU3hi6HziplVhCrAfv9wkeZC2VCPYCSfmah25fFw/OTacjJXDZY+6hFdnWNzTMaXMf04qE75Ox7bdRrY+YRZTAMFYsVikaHRBY34uowzypqATqR1USljwXo3tKIVlwWGzz+TW9LtV0LjN44+MEEjvaS6LYh1Zzz2Iiq4jFg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-88432d8ddb1so106174639f.1
+        for <netdev@vger.kernel.org>; Thu, 14 Aug 2025 05:42:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755174625; x=1755779425;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fJ1w1vX016HZnhf51EVaJqwNMCPhdOvsodT4l6hbFIE=;
-        b=EGg4wGYQAEOgx03MV58tCTUp5mMCHh2Ma/HlYtCjL0B8Gqjc+06Eho436r1pu26lm0
-         m8p3AeOm4+2vpUoFWRg5xZ7p1Kkk8T54+pTjyEuGWUUt6retQTd10wgbqx6dBucpHsCm
-         g1KlZ60o6BR6Y8nlTYojPGsbvuX9KIqBVRP9zJmueiZrGOLcj++/nl3UQuJFPtn4FKrV
-         PkbDgrtPFu+rOaD0oW2rInksrvQqvB7VrUkRwq5Cdk5k8HqoZGwUcXKd4L9/8qbZm5HU
-         5lnqnhZnV8TO1LntHXN8ACLMbcNhtmCQdGDMs4z+UQHecmJL5uup8a5vu6Azeu00z0Un
-         JxtA==
-X-Forwarded-Encrypted: i=1; AJvYcCVcwLjpCTGpX4KebKN9Ew4mmYFSbA7swXtNAdeac6Ljo1yio9m/XUhBCU/4JsDQbVbmyR8BIeM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxRTEBTBrtxhsxDfCtSLPaWvEDjvGXZ+khLa0rt4hHvlpybWS9/
-	sa0iURxe3G77fW5r9RQWuqvItGl1EOsSrabf0zQUjM5gMzP4j428/jebxTwJqjkGYoc=
-X-Gm-Gg: ASbGnctmpRXAQHsWSgm1OF9cYCglyCCce8rqIfGPQ2b8LAjrcinAm5lykUZuPugsy5I
-	r8hEBHngVLakE/fCqet+lVhUqHQMDOQYbZ7XOOx8/QarYYMXCfpDMtXEKEokLI41ipMAkDe4GAf
-	POOKVZnatRjK7ky4F0HLeMq443cE1jAavLmR1AIJdy6pIVTaC599YCcdD48m/4MSXA69LNcTknc
-	tfo75bDFwgMI+T3w+hXNKmFXNB4mY2eu2N6/4NstxJ+mTW6GUjM5XEfhvqtuFF/0ocB50fBZvRb
-	ZhWDLax0WPNrfIQLMCKzlFDdr/POkB1IBi7I8Mezaj7d0CLv0zGsIEUubffMrl+0CvdTYsQ2mJB
-	xvxmsHRtxY6wQ32n0mnGxhhFjudHIi2KXDlwxa5PIjQ==
-X-Google-Smtp-Source: AGHT+IEcamlanLgHj4e3UiHXnuoZFx6EM5i/6/BHJ22GOTsUGejY8ezIfKRRmd/gWCi23iogf+4+lg==
-X-Received: by 2002:a05:6000:3111:b0:3b7:974d:5359 with SMTP id ffacd0b85a97d-3b9fc359a99mr2276811f8f.32.1755174624685;
-        Thu, 14 Aug 2025 05:30:24 -0700 (PDT)
-Received: from blackdock.suse.cz (nat2.prg.suse.com. [195.250.132.146])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-241d1f0fb4asm348329055ad.60.2025.08.14.05.30.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Aug 2025 05:30:23 -0700 (PDT)
-Date: Thu, 14 Aug 2025 14:30:05 +0200
-From: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Willem de Bruijn <willemb@google.com>, Matthieu Baerts <matttbe@kernel.org>, 
-	Mat Martineau <martineau@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
-	Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>, 
-	Shakeel Butt <shakeel.butt@linux.dev>, Andrew Morton <akpm@linux-foundation.org>, 
-	Tejun Heo <tj@kernel.org>, Simon Horman <horms@kernel.org>, 
-	Geliang Tang <geliang@kernel.org>, Muchun Song <muchun.song@linux.dev>, 
-	Mina Almasry <almasrymina@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
-	mptcp@lists.linux.dev, cgroups@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH v3 net-next 01/12] mptcp: Fix up subflow's memcg when
- CONFIG_SOCK_CGROUP_DATA=n.
-Message-ID: <ukfrq6ybrbb2yds5duyj2ms6i7xgssjsywzgknxctfgkpzupor@tjxbuiil5ptt>
-References: <20250812175848.512446-1-kuniyu@google.com>
- <20250812175848.512446-2-kuniyu@google.com>
+        d=1e100.net; s=20230601; t=1755175345; x=1755780145;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=uiRRu9OJFyKeenKqerh2f8im3zeM5epxTzM5uWVDxL4=;
+        b=Dp7aeHE96SdEGPEx1TLchewJT7PBJU4An8o4+/ilkR0YvVsEGSxbjtdkavmzLtgJrc
+         Ld4vXJa8aTUeAV3KD6xajqbTzCQtH0jm5MbHw1kbURY8KYHMCslLSg459USiJwPwrkZm
+         73FjEOPdsR+z5/2QFgsfCmxHSR9X5JNNLNlmwzTXWIVq1uy1KPoDFehXGcthrAcoihps
+         D5yfGgajbmbgcW1uCy2NCiogAPTljpBHwPF8yBwJoSPwVobbWnSJTSFJwqLZqdqyGoDT
+         h3qO5/AO+naYtEJALax+kVe3Qk4iWg1o2GWW7GF0PdMHu4a5TJ3VDcSzmCOZvZjCUF/2
+         n+dw==
+X-Forwarded-Encrypted: i=1; AJvYcCVBHhsXFpeKHLIdpY9sd7Jx+OZ0+g+tmyQLzSxJMLfrMLx7XMXBMpeLTigg6Yig33+b74rtqTQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yylt3M2h5/5+e8OKezjHHBaD3zUHX4S07IJa3fUkWkW3zlYkrVY
+	JbO7V44BFZKfQFrjd+zFo7gJA1vruMHzxjsVrb3pg9l2BfDDr+YEPIhp5U+xz3CLlb5EsTqAtPm
+	xt4MlRdnUWTS/tTpeUxjV0bjyPNLdXzDhPmsE7dtYg+9A6zm2jgUFkUEyqmw=
+X-Google-Smtp-Source: AGHT+IFLTLOk5lm5M0xQ8qibNIbknOd85LTrLoRWuJLHUBvMopNJUjY/dVy1Po/t4iRcG8rrKtakJVdxO8EiiuwNg4DgXPd/z9jn
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="xhbunld2ijovocqb"
-Content-Disposition: inline
-In-Reply-To: <20250812175848.512446-2-kuniyu@google.com>
+X-Received: by 2002:a05:6602:1550:b0:879:66fe:8d1e with SMTP id
+ ca18e2360f4ac-8843386e0e9mr579219239f.8.1755175345671; Thu, 14 Aug 2025
+ 05:42:25 -0700 (PDT)
+Date: Thu, 14 Aug 2025 05:42:25 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <689dd9b1.050a0220.17479b.0008.GAE@google.com>
+Subject: [syzbot] Monthly net report (Aug 2025)
+From: syzbot <syzbot+list60930c84dcf19143ccdb@syzkaller.appspotmail.com>
+To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
+Hello net maintainers/developers,
 
---xhbunld2ijovocqb
-Content-Type: text/plain; protected-headers=v1; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH v3 net-next 01/12] mptcp: Fix up subflow's memcg when
- CONFIG_SOCK_CGROUP_DATA=n.
-MIME-Version: 1.0
+This is a 31-day syzbot report for the net subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/net
 
-Hello.
+During the period, 5 new issues were detected and 6 were fixed.
+In total, 128 issues are still open and 1604 have already been fixed.
 
-On Tue, Aug 12, 2025 at 05:58:19PM +0000, Kuniyuki Iwashima <kuniyu@google.=
-com> wrote:
-> When sk_alloc() allocates a socket, mem_cgroup_sk_alloc() sets
-> sk->sk_memcg based on the current task.
->=20
-> MPTCP subflow socket creation is triggered from userspace or
-> an in-kernel worker.
+Some of the still happening issues:
 
-I somewhat remembered
-d752a4986532c ("net: memcg: late association of sock to memcg")
+Ref  Crashes Repro Title
+<1>  370101  Yes   unregister_netdevice: waiting for DEV to become free (8)
+                   https://syzkaller.appspot.com/bug?extid=881d65229ca4f9ae8c84
+<2>  13108   Yes   BUG: workqueue lockup (5)
+                   https://syzkaller.appspot.com/bug?extid=f0b66b520b54883d4b9d
+<3>  10021   Yes   KASAN: slab-use-after-free Read in __ethtool_get_link_ksettings
+                   https://syzkaller.appspot.com/bug?extid=5fe14f2ff4ccbace9a26
+<4>  7473    Yes   KMSAN: uninit-value in eth_type_trans (2)
+                   https://syzkaller.appspot.com/bug?extid=0901d0cc75c3d716a3a3
+<5>  3275    Yes   INFO: task hung in linkwatch_event (4)
+                   https://syzkaller.appspot.com/bug?extid=2ba2d70f288cf61174e4
+<6>  2639    Yes   WARNING in rcu_check_gp_start_stall
+                   https://syzkaller.appspot.com/bug?extid=111bc509cd9740d7e4aa
+<7>  1846    Yes   INFO: task hung in del_device_store
+                   https://syzkaller.appspot.com/bug?extid=6d10ecc8a97cc10639f9
+<8>  1684    Yes   KMSAN: uninit-value in bpf_prog_run_generic_xdp
+                   https://syzkaller.appspot.com/bug?extid=0e6ddb1ef80986bdfe64
+<9>  1506    Yes   INFO: task hung in addrconf_dad_work (5)
+                   https://syzkaller.appspot.com/bug?extid=82ccd564344eeaa5427d
+<10> 1034    Yes   possible deadlock in __dev_queue_xmit (3)
+                   https://syzkaller.appspot.com/bug?extid=3b165dac15094065651e
 
-but IIUC this MPTCP codepath, the socket would never be visible to
-userspace nor manipulated from a proper process context, so there is no
-option to defer the association in similar fashion, correct?
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-Then, I wonder whether this isn't a scenario for
-	o =3D set_active_memcg(sk->sk_memcg);
-	newsk =3D  sk_alloc();
-	...
-	set_active_memcg(o);
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
 
-i.e. utilize the existing remote charging infra instead of introducing
-specific mem_cgroup_sk_inherit() helper.
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
 
-Regards,
-Michal
-
---xhbunld2ijovocqb
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQRCE24Fn/AcRjnLivR+PQLnlNv4CAUCaJ3WwQAKCRB+PQLnlNv4
-CAoVAQCrDITNqluusq0b12YFFhfY1gKK4Q8uAHs/KsISm9RelwD+JxaqxOrcmstY
-zyqaWiykc0r7xJAjUUU3so6cKm+/lQg=
-=6bNw
------END PGP SIGNATURE-----
-
---xhbunld2ijovocqb--
+You may send multiple commands in a single email message.
 
