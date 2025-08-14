@@ -1,64 +1,57 @@
-Return-Path: <netdev+bounces-213520-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213521-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF0E8B257BE
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 01:49:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D57EEB25803
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 02:03:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 52D5B1C82CE6
-	for <lists+netdev@lfdr.de>; Wed, 13 Aug 2025 23:49:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A768D5869FC
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 00:01:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58EA4301471;
-	Wed, 13 Aug 2025 23:48:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 185BB2FC891;
+	Thu, 14 Aug 2025 00:00:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Oa6iEQeo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WuaOCCfF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21A2D2BD5B0;
-	Wed, 13 Aug 2025 23:48:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF4772F60BD;
+	Thu, 14 Aug 2025 00:00:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755128929; cv=none; b=Xj3yfabvwUuD9cLLLEtyurNdMapuUtpR7msqQH+/c7wGcx9/RFHcriSuiwpahRw2OE9i8An4N25IROpipcSGMgMcHrwrlANPF/74puSf+9dx5A20EfGqS3Ay8Lfc67c1CN0wbW3O6X74rGQCqOnK09ifAuboqWuPmnjR27GIC98=
+	t=1755129614; cv=none; b=kV3ma/9L7nY7kjx3vizE8ms+uYjOb1vjMfwrbdkd8EABfIVbg1FnpmNSWZIcMpZ8QMyNBMJhS6JympVpjRquKenllYwREw/RyslBhBjaV0BexqsAL/gQIwuIZ5qHRZKhWkHV60h6upAN3PmQB2cU8PYDoS1jnp1z+D0TYZD0SyY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755128929; c=relaxed/simple;
-	bh=eS3xL90Y3tS+K19RMUEzHgxObEqUmzm3La4nnxzcm8c=;
+	s=arc-20240116; t=1755129614; c=relaxed/simple;
+	bh=bn7IKQjMLN4JXVpZcb+CROTKitiJI2sWExFMMP7aG4s=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OIyuJ3jcQs206ynbi6IVnoFjwLHpvnYJNvMPfvhvgLLI1EPeSsO3BeuqglTA4sT+JoToesl8dV3Il5qg1O5GmMrYu2qhE1txbC9wOYAHllPZjRFmw3sS79Rq39YYWc/LleZTpy7qxvvChCXB3xN+BfYW706aS5zb9yfteoUMJdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Oa6iEQeo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7433C4CEEB;
-	Wed, 13 Aug 2025 23:48:47 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Po5uVhqtlCozVWEVlF5VUp5eSzjCtGJXI6s4gnlyoOsU39sCuLQCRjHElt+RCsHmK/zjcDYjuAenyNfvPABUSVt0mG993xO9fuKAMkEQx2AE/RINuxcan1GQwvU7n0KNQ/0gplR6WoIYO3netuZ/tp0nSiLIT+8Nae4AKnfsdow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WuaOCCfF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C868C4CEEB;
+	Thu, 14 Aug 2025 00:00:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755128928;
-	bh=eS3xL90Y3tS+K19RMUEzHgxObEqUmzm3La4nnxzcm8c=;
+	s=k20201202; t=1755129613;
+	bh=bn7IKQjMLN4JXVpZcb+CROTKitiJI2sWExFMMP7aG4s=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Oa6iEQeodc92Y6V40cf92rpkiCb2j717T4lLJaGT2jz8XDaqm2ME3dHvfP6QIuNvJ
-	 B5tFZHSsodpWrEWiY4V9OHSN2xSOARFMyTIzfarrknVwGE18ff47LlzzXGFAFFwWnD
-	 B1FabfTrq/XcCIgcLPjvlQ3CEOowucksU53BrknlwV3od3SX1KtN7Y8+U1EduRRUW9
-	 mbNquYKrcIhHQDHjs7zq58bz+CkR0mDPdmiDXar7KJG+M7VO4xZYasq1MHRC05Et0c
-	 h2fyNvCtmu1O4sX3c5nhQKSxW9jUpc7xyfs2WPj8LVuYhTz1uHzDC1t9ijMDVY0CTs
-	 qjfl/sKe6ZTKw==
-Date: Wed, 13 Aug 2025 16:48:47 -0700
+	b=WuaOCCfFjQEKcpAQtI730rOQaisFWV5KdyNEXx040DnkSyyK9f/xH30znzqyYbMBg
+	 ludRIbf/tzutH/dEDWwWUSUy5UuOB/uehd4715JrAYNhKJxw1asCSrrM1DIsICRFhb
+	 LJw4IlOQSKlQ8u2BlNplbus2Iz6yb5vix0wcww3EzUjyBcVVLIinMttsaDBZpm0a2t
+	 nrhtrhAEpBQWDKhFdqOJs+PG3Vfw9uP3jR+lvxUpWBBG/MP2oI5Wy2DCxv9fXNGOFO
+	 JVbelYxdkDAL8LpzQZNXtWQqrUagiOPmt+srHWnkl0+3zFeging5IH+NPlNWZMOzcL
+	 rWY32p0+qeZnA==
+Date: Wed, 13 Aug 2025 17:00:12 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Dipayaan Roy <dipayanroy@linux.microsoft.com>
-Cc: horms@kernel.org, kys@microsoft.com, haiyangz@microsoft.com,
- wei.liu@kernel.org, decui@microsoft.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- longli@microsoft.com, kotaranov@microsoft.com, ast@kernel.org,
- daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
- sdf@fomichev.me, lorenzo@kernel.org, michal.kubiak@intel.com,
- ernis@linux.microsoft.com, shradhagupta@linux.microsoft.com,
- shirazsaleem@microsoft.com, rosenp@gmail.com, netdev@vger.kernel.org,
- linux-hyperv@vger.kernel.org, linux-rdma@vger.kernel.org,
- bpf@vger.kernel.org, linux-kernel@vger.kernel.org, dipayanroy@microsoft.com
-Subject: Re: [PATCH net-next v4] net: mana: Use page pool fragments for RX
- buffers instead of full pages to improve memory efficiency.
-Message-ID: <20250813164847.62ade421@kernel.org>
-In-Reply-To: <20250811222919.GA25951@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <20250811222919.GA25951@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+To: Vishal Badole <Vishal.Badole@amd.com>
+Cc: <Shyam-sundar.S-k@amd.com>, <andrew+netdev@lunn.ch>,
+ <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+ <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 net-next] amd-xgbe: Configure and retrieve 'tx-usecs'
+ for Tx coalescing
+Message-ID: <20250813170012.7436b6e6@kernel.org>
+In-Reply-To: <20250812045035.3376179-1-Vishal.Badole@amd.com>
+References: <20250812045035.3376179-1-Vishal.Badole@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,33 +61,40 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 11 Aug 2025 15:29:19 -0700 Dipayaan Roy wrote:
-> -	if (apc->port_is_up)
-> +	if (apc->port_is_up) {
-> +		/* Re-create rxq's after xdp prog was loaded or unloaded.
-> +		 * Ex: re create rxq's to switch from full pages to smaller
-> +		 * size page fragments when xdp prog is unloaded and
-> +		 * vice-versa.
-> +		 */
+On Tue, 12 Aug 2025 10:20:35 +0530 Vishal Badole wrote:
+> Ethtool has advanced with additional configurable options, but the
+> current driver does not support tx-usecs configuration.
+
+Not sure what you mean by this, perhaps:
+
+  current driver does not even support tx-usecs configuration.
+
+? tx-usecs is a very old tunable.
+
+> Add support to configure and retrieve 'tx-usecs' using ethtool, which
+> specifies the wait time before servicing an interrupt for Tx coalescing.
+> 
+
+> +	/* Check if both tx_usecs and tx_frames are set to 0 simultaneously */
+> +	if (!tx_usecs && !tx_frames) {
+> +		NL_SET_ERR_MSG_FMT_MOD(extack,
+> +				       "tx_usecs and tx_frames must not be 0 together");
+> +		return -EINVAL;
+> +	}
 > +
-> +		/* Pre-allocate buffers to prevent failure in mana_attach */
-> +		err = mana_pre_alloc_rxbufs(apc, ndev->mtu, apc->num_queues);
-> +		if (err) {
-> +			NL_SET_ERR_MSG_MOD
-> +			    (extack,
-> +			    "XDP: Insufficient memory for tx/rx re-config");
+>  	/* Check the bounds of values for Tx */
+> +	if (tx_usecs > XGMAC_MAX_COAL_TX_TICK) {
+> +		NL_SET_ERR_MSG_FMT_MOD(extack, "tx-usecs is limited to %d usec",
+> +				       XGMAC_MAX_COAL_TX_TICK);
+> +		return -EINVAL;
+> +	}
 
-This weird line breaking is not necessary, checkpatch understands that
-string can go over line limit:
-
-			NL_SET_ERR_MSG_MOD(extack,
-					   "XDP: Insufficient memory for tx/rx re-config");
-
-> +			return err;
-
-I think you already replaced the bpf program at this point? 
-So the allocation should happen earlier. On failure changes
-to the driver state should be undone.
+Normal configuration granularity for this parameter is in 10s of usecs.
+You seem to be using a timer, so I think you should either round the
+value up / down to what the jiffy resolution will give you or
+reject configuration that's not expressible in jiffies (not a multiple
+of jiffies_to_usecs(1)). Otherwise users may waste time turning this
+knob by 100usec which will have zero effect.
 -- 
 pw-bot: cr
 
