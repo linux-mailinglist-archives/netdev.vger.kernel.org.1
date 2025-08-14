@@ -1,126 +1,141 @@
-Return-Path: <netdev+bounces-213670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E53DBB262DC
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 12:35:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A494BB26322
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 12:47:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A7C47188CD47
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 10:33:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C4FB5E243C
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 10:43:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3DE52F39D5;
-	Thu, 14 Aug 2025 10:32:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1CAD2F83B9;
+	Thu, 14 Aug 2025 10:43:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a2Qo/JnH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YFZEZUNT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A1A62F39A0;
-	Thu, 14 Aug 2025 10:32:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 740992F39D5;
+	Thu, 14 Aug 2025 10:43:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755167568; cv=none; b=L7PrcjFeltAtiI+o9VOzCOmI66caRevVc2H8Hc6iJXO6NUIO7XPXpcKxkHHgNt+uvwukE7EN6h/ef5yyGaj/Oy3CT1jws/iDx7VQRi1+TO4k7GFWpVaQ1DKFvfz964giQCW7hGi0yoLb+wPrrIPUk7Cda3+OSY7VTbA7+wUNQJg=
+	t=1755168198; cv=none; b=LjuuDj5Y4hb9rY2JDgZFbfbi4ddb1gyOp18Iugfsfmq/A0bU5hwAf2RS1JXt2ISEveLtX3xsIReVmGxUrozFNzqfi8lX5Ir8/oPBUSvUvpP7M0Md3Tnj5nlyzQMqxDRylQNIdIHRijyUDU+ncsHTTSrhlfF5B8c+kvPe8jP27yA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755167568; c=relaxed/simple;
-	bh=CYzbKVOF/TPdEmZ8s/gMlGCZBSnCGBFSN85mnNON29o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jRX6X6jzZZgAhPaau5dEYQ2y/Yyi2kqFcGwu9rd2VM0VF/iy/pbZ1aIGBSIuSuoUXp+VKaONVBJkTFfGPbsAEY/MvtnX6Uu0R89Y0N3RDAuvJ5WAMrTt6xHyyh89n/nRL2R3bfS5SObXQwywhuKF7UkFyg6uWTVi6ItfZvOw/Jk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a2Qo/JnH; arc=none smtp.client-ip=209.85.160.171
+	s=arc-20240116; t=1755168198; c=relaxed/simple;
+	bh=ByaxPKIOOsSpAmqsDB0Mq3lT1GdJT7b79vpjsbOysw4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=O53WghFBUODwcFiZDALvWxZx+WeohGPI40E3miNfF8Vwjwo0NHMTmnnGgs0mctb0EEgjDwCMKpM2Z98XmRgFSevXQKL2FU7q9hZDBCaIT8FkP28VmO0BZYW9QW4d3GTBwVJhUT4o9u18fQKkubwbJHV1MeNbjH0BsJqjRsDL4mQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YFZEZUNT; arc=none smtp.client-ip=209.85.215.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4b109bedc38so150231cf.2;
-        Thu, 14 Aug 2025 03:32:46 -0700 (PDT)
+Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-b47173a7e50so589241a12.1;
+        Thu, 14 Aug 2025 03:43:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755167565; x=1755772365; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Uidag5GH3rbfp6RvsevZJFZiGLSa9EyuN+ZmrX0Ohk0=;
-        b=a2Qo/JnHFNH/HV2PqscLXujDOgzNWzNA+xghTMSzmc8xSFL9dozAsok3LsTQGGCpt+
-         ZMUIqNQj2zsqXzs8bm1Edr7bKW3LGsy6G2dhgIydUqIbjpGhj2VbvvT8UU5jM6PMKs/W
-         PZgmwpVYfzbCLfYUh+JhyAor9G7VwAubY3UzIK0Rfh5Zs5ZqNOJRJB8jbBjLQ5tuyzOW
-         kz/UjFCLFN5XAAo95AGgOQYF2bqn3axF3dBhYvJOw8plwqzhUh1xkCs3ho8KzoitHEiZ
-         FYXi3NBZLon68PbaThYRETcwZ5VaP9QmLXh0EQJjyvTvUVlf1DxLEq9J/nV1LsMDeB3C
-         GUDA==
+        d=gmail.com; s=20230601; t=1755168195; x=1755772995; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=NQQrI7equ/7Apuzl/jQOdd++HWjACeEFbFrTaZ0NeVc=;
+        b=YFZEZUNTIrOnbb2x1lGE1MIb4iu9/eriu8nXIugf8mT3CP8vPVW99vkQBpnCxY0c2z
+         9CllxRBviPb0kSv4TMzBXycltb4Aqj5Scr0a563VOHpNqAGbaEBJ9bWFs+v3Iljpn0T0
+         ZX/NATbHBIeheerB99gnNzxcGxp5xPVRDk+QynRXW3ff+hUXUxTFpF7Wx6Jd1qKu7t5+
+         nCWZ0rCeCfJih1geRl1sc9gPCJaazgCcoYkIC84x+9y47uzVcL9Avc1SV+GvsX4xJH0L
+         5rzdMAnumaKNRFa5XfveTvhzkz+k5deNwT/rCQAg3t39yLAwc3sIJssoIcMGDYRq0evq
+         /7Lw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755167565; x=1755772365;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Uidag5GH3rbfp6RvsevZJFZiGLSa9EyuN+ZmrX0Ohk0=;
-        b=pjQiP+tiOfVFnOJJlgE0yiu6M/PXi7C/gbeLWzGHZ0sMpMbvI/+SqLjmjIFlajMnWH
-         pfKA4EK+EM1EHPY1XTqTL7Ux7sAxVo4DGKg8noJZxjAGL/B6d9sU+TfYbaPXT2JJkKdC
-         mApMCKmpRNS600an2ZEpfm7it+jES6CpRpSvPYJkxaopr83PLxylFGWZnNAp15vs3BXm
-         +dH7pe65amBQfAMKsYzHUxOxB3UmLp0td1Lr3G7VcRaCGB9B5vUopAj3EtJLgAzZm180
-         7x+VAGKleRASqEMNjrZFEHwAg7GGjFom46QvRyIaPsODd3ewDf73PmOXO2gGpcik+OE2
-         SU3Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWeRWfsNBeqGtxVKYRoAvbhwwCz/gwql5kzrkE9vN5aI+K35+OE2GFGDrFOrkxfONtrCywV5s4fLsZ0+ZY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzg4cbbT3Pba+j0b8w6lu4axG3qfVP1uvrppfIF9TKysxGF2YS1
-	48Oul4QH5SvlJQB2B9sYprDsK28XUTmU/T70z/43JBl+P+AUfEnPaqJLl5Fjw6rZsYABByIb5sj
-	v+bjhIsAJ5ahH9cmuaOckHikb4TZxYNA=
-X-Gm-Gg: ASbGnctLKUAPE7v3kQm3EJpZPH/gkPPYy41j7AJi2OJWcrUGKoaSrK3mpCvx+tHVLn5
-	Pwjy1MAGpX7JQUwCNwpDeLjE57TAAZRLG5KGhMgnOKYd+VowYDoT8HzkwPhXFy1bGZ5K3QCN2ko
-	bVnwDvtdzOhkGDLHfVkjggH5XfoG72e2nXdEojrJiTIYl/R3nGTfrnflFBSw54Z6QrgLsMxTkM+
-	bvkyA==
-X-Google-Smtp-Source: AGHT+IFu31MRahXeNRGXB5OCH9nzb1U/olRrBgEEv0rdSL8Stn8Hl/kczWWsDd0HZkH7R447MArgv+9zbTEYHlkXCT4=
-X-Received: by 2002:ac8:5885:0:b0:4ab:6b8c:1a41 with SMTP id
- d75a77b69052e-4b10aa84523mr16219091cf.7.1755167565307; Thu, 14 Aug 2025
- 03:32:45 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1755168195; x=1755772995;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NQQrI7equ/7Apuzl/jQOdd++HWjACeEFbFrTaZ0NeVc=;
+        b=M7IleBZvuh2tqORiVxq9oE9pOB8MfdGQkn2dHGgNIN422phJI6SnL9Jlp99aLn5KA7
+         7YN/YB1RNULGvMXG2MKdA/XN1fGhnDp0q0g60ox0odd2IAdVNy4pkM10aZJJk3c6/vFQ
+         7oupG8ERf110KW04UYnjmJfZTl78risqxtZAtk+ppQ2GUadXcwfrBOaU6m6UkZryOXVY
+         yuqMixYtPGHUZQgi1dXD8aHXWModShxE2mnT3JiW3qAWPM7aeO3kUjSEAg9pgponMNMF
+         /BJoiVy2kMvga5fiL28/LJXQECkJGQNvOQEAj8fgEGLIMRWPf+38xi0GrOnaswIMhWi7
+         malA==
+X-Forwarded-Encrypted: i=1; AJvYcCUMbcIt53UbOU/PSZscYb7a2LMSxhOf8fGWHHAjbnIuZ/QssAauF2vRBWzvypOk5JEgeRCuKnHlzSvv6QMH7nyK@vger.kernel.org, AJvYcCWh2bp8tYko/WUyYDK/SBfVvxZhThL+u3GJQ0xvPeUI+ewzRZO4PsXRQIR+VqQDEnXi/UUzjWRGRvo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyuMH3SYSHuHa5QM3Y7TY93sqS/mnLoJt4YpTdTpbU48bCwg49I
+	HpwkyT2haP7BaH3f+a1lJ/vGDxa4AJuyOqtiVHxlmJWCRpqGPJeZz+iBmbdvLVma
+X-Gm-Gg: ASbGnct3cwS6EmIojqaZ6014Jz4etgxWRo6eDg9XOIcs4D2bnwaXl87TcCjE2mXwFX7
+	1oHBKY+A6vGyyv4XLAgZhPN3rtRFZ65vryiHNNK9uayqWtLZH0qHrQDma5NPkmkgmSfDNuYA4Fo
+	LNWZh3qoEF5MGXimVhjdG4jQWET6CgbQLhPDWjjkvMa5KAEsxd7yVRlumjmXM5A7O6XT75jBTWn
+	AzdnOnzZE33LpPyz+d4NqFR+jRQsfRSBVz4jnkW7uHPpPrUU3x+H33HUuq+bZbF2KnxxslLpsrT
+	O/a36bYhQ9DOHaYiaPdJ+2V6pymVEv+yLnslSoOzykm0AJ6csf2XUJ7I6dIgzV5u67iyG3g5mbV
+	JIgPVOmB84g4nobRHWXjHpBDrDjjPo9clN8GcBwIWrw==
+X-Google-Smtp-Source: AGHT+IFrxnbMnFTrneqJzK3CsUad1WU6U11pJTdSkCfwczVAOD+xvDSRYuVuFDDf9/y+3vylk9r3EQ==
+X-Received: by 2002:a17:902:ce12:b0:243:e3:a505 with SMTP id d9443c01a7336-244586f2595mr32018195ad.57.1755168195448;
+        Thu, 14 Aug 2025 03:43:15 -0700 (PDT)
+Received: from fedora.redhat.com ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-241e8976a1csm351796225ad.78.2025.08.14.03.43.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Aug 2025 03:43:14 -0700 (PDT)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Jay Vosburgh <jv@jvosburgh.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Simon Horman <horms@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Petr Machata <petrm@nvidia.com>,
+	Amit Cohen <amcohen@nvidia.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Stephen Hemminger <stephen@networkplumber.org>,
+	David Ahern <dsahern@gmail.com>,
+	linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: [PATCHv2 net-next 0/3] bonding: support aggregator selection based on port priority
+Date: Thu, 14 Aug 2025 10:42:53 +0000
+Message-ID: <20250814104256.18372-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250812082244.60240-1-miguelgarciaroman8@gmail.com> <175513140725.3830230.6064788817690151758.git-patchwork-notify@kernel.org>
-In-Reply-To: <175513140725.3830230.6064788817690151758.git-patchwork-notify@kernel.org>
-From: =?UTF-8?B?TWlndWVsIEdhcmPDrWEgUm9tw6Fu?= <miguelgarciaroman8@gmail.com>
-Date: Thu, 14 Aug 2025 12:32:34 +0200
-X-Gm-Features: Ac12FXySgBOEXQm53QMc0vwZNeEvULA1MusZ7LbWpESUt9ICaStDDiAZ1RsJJy8
-Message-ID: <CABKbRoJDogS-uzy-vott1LHxEPB3tVU4SrBwaagmrhreXxuX9A@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] tun: replace strcpy with strscpy for ifr_name
-To: patchwork-bot+netdevbpf@kernel.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	willemdebruijn.kernel@gmail.com, jasowang@redhat.com, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	skhan@linuxfoundation.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-El jue, 14 ago 2025 a las 2:29, <patchwork-bot+netdevbpf@kernel.org> escrib=
-i=C3=B3:
->
-> Hello:
->
-> This patch was applied to netdev/net-next.git (main)
-> by Jakub Kicinski <kuba@kernel.org>:
-Perfect, thanks!
->
-> On Tue, 12 Aug 2025 10:22:44 +0200 you wrote:
-> > Replace the strcpy() calls that copy the device name into ifr->ifr_name
-> > with strscpy() to avoid potential overflows and guarantee NULL terminat=
-ion.
-> >
-> > Destination is ifr->ifr_name (size IFNAMSIZ).
-> >
-> > Tested in QEMU (BusyBox rootfs):
-> >  - Created TUN devices via TUNSETIFF helper
-> >  - Set addresses and brought links up
-> >  - Verified long interface names are safely truncated (IFNAMSIZ-1)
-> >
-> > [...]
->
-> Here is the summary with links:
->   - [net-next,v2] tun: replace strcpy with strscpy for ifr_name
->     https://git.kernel.org/netdev/net-next/c/a57384110dc6
->
-> You are awesome, thank you!
-> --
-> Deet-doot-dot, I am a bot.
-> https://korg.docs.kernel.org/patchwork/pwbot.html
->
->
+This patchset introduces a new per-port bonding option: `ad_actor_port_prio`.
+
+It allows users to configure the actor's port priority, which can then be used
+by the bonding driver for aggregator selection based on port priority.
+
+This provides finer control over LACP aggregator choice, especially in setups
+with multiple eligible aggregators over 2 switches.
+
+v2:
+a) set default bond option value for port priority (Nikolay Aleksandrov)
+b) fix __agg_ports_priority coding style (Nikolay Aleksandrov)
+c) fix shellcheck warns
+
+Hangbin Liu (3):
+  bonding: add support for per-port LACP actor priority
+  bonding: support aggregator selection based on port priority
+  selftests: bonding: add test for LACP actor port priority
+
+ Documentation/networking/bonding.rst          | 18 +++-
+ drivers/net/bonding/bond_3ad.c                | 29 ++++++
+ drivers/net/bonding/bond_netlink.c            | 16 ++++
+ drivers/net/bonding/bond_options.c            | 37 ++++++++
+ include/net/bond_3ad.h                        |  2 +
+ include/net/bond_options.h                    |  1 +
+ include/uapi/linux/if_link.h                  |  1 +
+ .../selftests/drivers/net/bonding/Makefile    |  3 +-
+ .../drivers/net/bonding/bond_lacp_prio.sh     | 93 +++++++++++++++++++
+ tools/testing/selftests/net/forwarding/lib.sh | 24 -----
+ tools/testing/selftests/net/lib.sh            | 24 +++++
+ 11 files changed, 222 insertions(+), 26 deletions(-)
+ create mode 100755 tools/testing/selftests/drivers/net/bonding/bond_lacp_prio.sh
+
+-- 
+2.50.1
+
 
