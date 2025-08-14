@@ -1,250 +1,269 @@
-Return-Path: <netdev+bounces-213567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213568-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2C4DB25AD0
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 07:34:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD3A6B25ADA
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 07:39:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D6AC1C23314
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 05:34:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F1DD81C246C0
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 05:39:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A0CA221F17;
-	Thu, 14 Aug 2025 05:33:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2A8322129B;
+	Thu, 14 Aug 2025 05:39:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NcaGQ5Zh"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="ft3Q95U6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2055.outbound.protection.outlook.com [40.107.220.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8F0C224AE0;
-	Thu, 14 Aug 2025 05:33:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755149638; cv=none; b=f4ARoQ3w3vKI3w1hkw1SezhJ7gwrg3LYMFtfT5l9TlCTOefLqiBRlkrKpJM/9vSDZETemn/PECK65YmvfGxlVruLBX0OEv4WTnFYy9X6kLQLp9IsjknWwp40IPuG+6B6P2TvGBiTMwZVUGHW5bFi7GbO9Ues+pifMT/VETYVosQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755149638; c=relaxed/simple;
-	bh=GeJjP+TUdBl5BD2eSSgzz9493+BZmCw5J9EpNaxM8JY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l3iJ6OR1NyzPrxO18RasISG5O/BrOKFICJVZVfv/fUwvA/kV5fscnV7i68GwdXmJURF3kJXm+Cu4rbgsf/wellQZKh+0zvGoi1suz4ju/K0JWQeFHB+3EhnElUkxh82cWDtLOW+EIYRp0HvPOMaqGVHyFPgRZMbClWAbnbVWe3U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NcaGQ5Zh; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1755149637; x=1786685637;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=GeJjP+TUdBl5BD2eSSgzz9493+BZmCw5J9EpNaxM8JY=;
-  b=NcaGQ5ZhdDDCJbEl8Wwxy/93rAYtX36VfxYDantFIhRDOJCfp9qnpVSu
-   KZFgt+mAHzafUHj+4pyN8Psrz1dqMnnSSHQxS1ZInPMPcZdAQDpPnnWeT
-   A/wcgsR41SbVQRjJancD6MAtsPz2fjfyBcaGdvszJvQUp5v35CTwJTOl7
-   uQLdYqdfBRQy4GjP7BtiSsb5Xppq0Z5+OzenSeAlM55p+YD/b4ONYzN5k
-   Vl5PScBpLW5zpYd8Q2pZbqPUoYObKik33LF0sRWUOSd0yXjVcbs+Z115c
-   tZeqSbVT9KH9M/+NpKBPLAL6NlR6TQwvSjX1sBqVZ+vhYB45DuhBKhzM7
-   g==;
-X-CSE-ConnectionGUID: gRRIj8JQRkWYPqJL/mXl1g==
-X-CSE-MsgGUID: G2XQkYG2Rr63buW+wD6H9g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11520"; a="61078954"
-X-IronPort-AV: E=Sophos;i="6.17,287,1747724400"; 
-   d="scan'208";a="61078954"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2025 22:33:57 -0700
-X-CSE-ConnectionGUID: NQyopVXkR423CP/IURkjuw==
-X-CSE-MsgGUID: lvTFe7rCRYGho+E+V6N9bQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,287,1747724400"; 
-   d="scan'208";a="166657209"
-Received: from lkp-server02.sh.intel.com (HELO 4ea60e6ab079) ([10.239.97.151])
-  by orviesa007.jf.intel.com with ESMTP; 13 Aug 2025 22:33:52 -0700
-Received: from kbuild by 4ea60e6ab079 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1umQaz-000Ac4-2X;
-	Thu, 14 Aug 2025 05:33:49 +0000
-Date: Thu, 14 Aug 2025 13:32:49 +0800
-From: kernel test robot <lkp@intel.com>
-To: Bhargava Marreddy <bhargava.marreddy@broadcom.com>, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	andrew+netdev@lunn.ch, horms@kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, michael.chan@broadcom.com,
-	pavan.chebbi@broadcom.com, vsrama-krishna.nemani@broadcom.com,
-	Bhargava Marreddy <bhargava.marreddy@broadcom.com>,
-	Vikas Gupta <vikas.gupta@broadcom.com>,
-	Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
-Subject: Re: [net-next 1/9] bng_en: Add initial support for RX and TX rings
-Message-ID: <202508141306.LMpg4Jkx-lkp@intel.com>
-References: <20250813215603.76526-2-bhargava.marreddy@broadcom.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12B6A1E3DFE;
+	Thu, 14 Aug 2025 05:39:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.55
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755149962; cv=fail; b=fcAasvHVB7f/yXoOm5Dz4xK7BOscECd3UXRkBE7gV+EEqc6K71WbTG7n9KaReiVP+hwl9Vv8mQRoejc3Z2y/9TKPH3Inea/zb5xpTgqvrkbYQqT3dDE1Uf+u90Z8PPx6YkPd8KqmRFRvztjLMJXpLrcvpSrKjQ4h9HEtf+ntqSw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755149962; c=relaxed/simple;
+	bh=SlnmTGalpi8ZMoUVwefy9ottM4wshRYugRQMAWNT+V4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=dWMB3bKzu/Vv4ZBNL9sMeFqjihJzU/xMKQyOoLb9y/4+v8kReHZxEf5Rf5xAhPouYcJdHzTAKb1kiyppe7MbjF2UGrPmZfS+/MAtd3cci+JmMJzGoX0qCl8x8SJU5BEhf1uraapnKdxpdwVOeyMz1UC5tqftjdr1qyyDvkHnp6E=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=ft3Q95U6; arc=fail smtp.client-ip=40.107.220.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=YW6IPB3Hf2fQp4b8iWtbzK84nuNDR9jPqEp3H3B0U1JNzWMjwzR1JkzRPHrrRmY1txVeuRmcwrZkdHm2PlQ6ZKQ98OCqhDYkzImwaPTvE+8QO3MXAhnOgRG3wSD4syDmKISnTG30WFkIc63tl5AE1ixw5Scz2opo0XPrMaO1QKfJxe4ubynpyhUGMyTUzRhKxShsI4C5kHqBKIVBEuLT9l9HE3dyZ9+MuowzYbK7L/aMXPM8EOXf09v6kGhcOy/v29nvfHljVMTKQDO+5HvAKBlV5Ubaa1848w/0/bKSbP7NvoXuObsN7w2FTzgcH66YDeCORQDKrO5b2gV03Ad/lQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=u26LbOFiv2e1piQu6/WctApVofAunxQ1aH0H7JaD0wc=;
+ b=ICjkSiQ//HoFQisuVF6gEZxq6F33FjQAVx6EG6YnNzTzTwKIcCAqzAIYrXfQkSIFdQBwxhhLw5qmFH8eMLxlVPky+DiCpdCIfRXvbGdtTRypUia7T7FHNpduJNAPsFpVYvOmAEJP6mORWpIGVQX9xEQE83JSHrXOpf5XNM4dZqwTM7nX7tVMrI291JRf53ZKRGMOIlZPlKvLk61eh47kAFN/JBycQKmCwKJHsbxWuiI4iTfJF3WIIx7WwzAIG83oZaxz1NKXC7GQZFG2Eg4HwPtT3DWVqY0HZUGMTYZ3XhLuP81PQdt6xbmpESpy0r5eAl7Xesiga+SaqMWsiFvmMw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=davemloft.net smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=u26LbOFiv2e1piQu6/WctApVofAunxQ1aH0H7JaD0wc=;
+ b=ft3Q95U6KqDH3FLdafRfzUbsb5NiHEmCb90AyG88p5+FOiPXReQMelhX0OSJtVGXaKgN4k5115ihr8UPeaR2n1XJmTsxB6519tmoFU/gURZgATXwMTo+38dZ6C1zJpjMHO10NwY1QFlGpfl5gw0XQskjhqdxEm+c2f/jdm9OxFc=
+Received: from DM6PR04CA0024.namprd04.prod.outlook.com (2603:10b6:5:334::29)
+ by DM3PR12MB9352.namprd12.prod.outlook.com (2603:10b6:0:4a::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9031.14; Thu, 14 Aug
+ 2025 05:39:16 +0000
+Received: from DS3PEPF0000C37A.namprd04.prod.outlook.com
+ (2603:10b6:5:334:cafe::f7) by DM6PR04CA0024.outlook.office365.com
+ (2603:10b6:5:334::29) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9031.16 via Frontend Transport; Thu,
+ 14 Aug 2025 05:39:16 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ DS3PEPF0000C37A.mail.protection.outlook.com (10.167.23.4) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.9031.11 via Frontend Transport; Thu, 14 Aug 2025 05:39:15 +0000
+Received: from satlexmb08.amd.com (10.181.42.217) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 14 Aug
+ 2025 00:39:15 -0500
+Received: from SATLEXMB04.amd.com (10.181.40.145) by satlexmb08.amd.com
+ (10.181.42.217) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.1748.10; Wed, 13 Aug
+ 2025 22:39:14 -0700
+Received: from xhdabhijitg41x.xilinx.com (10.180.168.240) by
+ SATLEXMB04.amd.com (10.181.40.145) with Microsoft SMTP Server id 15.1.2507.39
+ via Frontend Transport; Thu, 14 Aug 2025 00:39:11 -0500
+From: Abhijit Gangurde <abhijit.gangurde@amd.com>
+To: <brett.creeley@amd.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <corbet@lwn.net>, <jgg@ziepe.ca>,
+	<leon@kernel.org>, <andrew+netdev@lunn.ch>
+CC: <sln@onemain.com>, <allen.hubbe@amd.com>, <nikhil.agarwal@amd.com>,
+	<linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Abhijit Gangurde
+	<abhijit.gangurde@amd.com>
+Subject: [PATCH v5 00/14] Introduce AMD Pensando RDMA driver
+Date: Thu, 14 Aug 2025 11:08:46 +0530
+Message-ID: <20250814053900.1452408-1-abhijit.gangurde@amd.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250813215603.76526-2-bhargava.marreddy@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS3PEPF0000C37A:EE_|DM3PR12MB9352:EE_
+X-MS-Office365-Filtering-Correlation-Id: e822cefb-4383-4fca-77ca-08dddaf4e832
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|82310400026|36860700013|1800799024|7416014|13003099007;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?YkdUZjVEWmVKa1RBVDVyWTJQMTJzb2g2cU41QXNSTWxGN2tvYTZRVTV2VFI0?=
+ =?utf-8?B?WnM1U3ZYUHVwMXd4aTlDVnJyc3VoUVdkZk1oWDhXZGVrbm5rUWZ2ekhDUXhE?=
+ =?utf-8?B?MytyTXdtS2JaOHNtZUR6aTh0dnBCVVBid25zQVNXMzhKdWluTEYxOWFnekRC?=
+ =?utf-8?B?cFJockt4Sm1KQ0J0KzlqV0VkZW01eDhkZDYwY0E5MjBweUJHQVdmM294cVBY?=
+ =?utf-8?B?VHJYN01kNlNUanVnSGQ2S1JwUUJLL20wSVRjamVIMS9lNlJTMElCY0JQSEE0?=
+ =?utf-8?B?QXJBNDZCM2tBbFVjbW5vYWxOdGl5SkFSdFV3dytlVDZaNDB0UGtIWW9yeldj?=
+ =?utf-8?B?dDdPUk1IcTYrRVB0RXpOaDJYbU1VZlJUWjJzWGdjU2hiY2RvYktlY0xvTFdE?=
+ =?utf-8?B?ZFFWOCtOS040Z1cvaGZoSDZlTVpWNWY2eVdlZFdBV0NXQzNEdWVFMmFTZkNZ?=
+ =?utf-8?B?SlYxQjJ2SjM4ZE50eTZWbTd1N0RPeFVtNzFZRERzSkk5bVFibHJWUXcwYnRQ?=
+ =?utf-8?B?dFRKaWJmVmk5a3kzNFJua1kwSEgwUmNMSGtkZjJzdW5tK21RL0hHdVljVElY?=
+ =?utf-8?B?TEdlZWg3T0ZuL1p3cGlVMGE2dkJnY3VKUFJLczhhTmZJUHlJUUcwdGRpQ0JU?=
+ =?utf-8?B?dmdWTWdyZVdMQmRwTWxiZzB4RXpFeWVRYUI0MU9HaGticlBYcnVVRnE1bGIw?=
+ =?utf-8?B?V055OEo1bmFZQWttLzNIdXRRVjlRZVJHR0paUGNpbVo4dWpCZDhMeHpXeXJ4?=
+ =?utf-8?B?eFUwSy9JUkRlOFp2eDBwY3BvVEFteDdjTUJhNGY1ekcyR1ArdjhxMVNtT0lq?=
+ =?utf-8?B?UlRpRFRHNlI4Y3kveWU5YWR3Q29LREVGd2V4WVFadzJpZzdqWnRQME9qYk9j?=
+ =?utf-8?B?dWQwa0cyZzgxYUU1OW9YSHFGVlZ5NERJYVZ1NzBmejNpMmN0UktIWkdVREdG?=
+ =?utf-8?B?WjEwbDdpUUVmTkRUREZmSzBPZEh0aTI3QUltbldXQXNudzdHRDN5UW0vVnhS?=
+ =?utf-8?B?Vk1vSzlJUmUrNWVGZjBCaXNYYUpUanV3K1U2WkoxUXprV1dEZmFWb283UE1H?=
+ =?utf-8?B?UU5SSVJ3NGJFUkZ3VVE3TDNKWnN2S3o5NHJtSndUSHZwWEpDZ3NrdGFWOStp?=
+ =?utf-8?B?MlV3WHo5ZHcwVi9sSVJaVjc2enQ5OEtrcFUvS1R5Ymhwb3hNK2o3elVseGRz?=
+ =?utf-8?B?NzA3K3N1V1VtcmYwTFJKSm1YVkZwWllTSDVhUjBwaG4yUlhYYW1kcjVkUlUx?=
+ =?utf-8?B?TEo2eTBpMnYzOFp6b0M2b3RPU0J0V0JaZzN4TEk4Mmh2ZTdSaDZiQ2lmWk52?=
+ =?utf-8?B?MmEwMjBlRUIyS2xHVTZLSXAzYjVYeUdqcFVQN0RURE4rZHFEMkl5OGRFTlBs?=
+ =?utf-8?B?R3JzUjhMT2R3aFZqMmIzSzdvUzNLNFFhR2dFZzZwc056dTNYd1pYc0RGS3cy?=
+ =?utf-8?B?TFhzWHZqZjFiNTNPdkJiTmw0TDF5bGR2bkR4bm9SbDBjVFIyZlNvaFp0MFhz?=
+ =?utf-8?B?Q0gvY2VYbGlqUzJWWTR6N0dXQWhoMVMvZTYySjJhVEh2SE9CdnlsYS9hSmp1?=
+ =?utf-8?B?eTExeVNxZEQ0SmluN3NYQmU3c2xOSVNhLyt2a1JNVzNkSGJRQkI2K1ZkRlM0?=
+ =?utf-8?B?SFlnUTNvSGpaMXdkdk1ydmE2V0dKNFd6WlQ5R1V6Y2VWcGdHV0R3azJ1Z0hr?=
+ =?utf-8?B?c1BkdDZWVVg2OXB5Z1JvMTFWc1JnbGRhWjBEdTE5ZnJXYmI1TmlOK3pyeFE0?=
+ =?utf-8?B?eWY1YUg5a1krWFpaKzdzYVo0YWE1SkYxYndHOVVtZ2RjQXd0dG95Q25XSTBC?=
+ =?utf-8?B?V3Q2ZUwxYzdoVFBuVjhwWmV3Q05YVnM0NTlCbExVYXdUYzlYVE5yZ3lzb2pB?=
+ =?utf-8?B?M2lVL1VCeDhXRThTRjNNTDlxREFSTVlzZVV6NDVWbDBMVGtrNEltKys5Vkw0?=
+ =?utf-8?B?ZDhTNHZjTXU1ckVlZEJ1QTlyd2dYWDYwb1lHNlBQRG96MnBkTmdMN1oxd1VU?=
+ =?utf-8?B?aWRlcGQzTGhKVlpCR2JheDFnQnFhNnpLcXJjd1JiQkdyb2VUbWdGYUFDVlpQ?=
+ =?utf-8?B?YWFRNTE2OE53eHlrWnZDU0huK1J5OUNtM2oyUT09?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(82310400026)(36860700013)(1800799024)(7416014)(13003099007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Aug 2025 05:39:15.8165
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: e822cefb-4383-4fca-77ca-08dddaf4e832
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS3PEPF0000C37A.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PR12MB9352
 
-Hi Bhargava,
+This patchset introduces an RDMA driver for the AMD Pensando adapter.
+An AMD Pensando Ethernet device with RDMA capabilities extends its
+functionality through an auxiliary device.
 
-kernel test robot noticed the following build warnings:
+The first 6 patches of the series modify the ionic Ethernet driver
+to support the RDMA driver. The ionic RDMA driver implementation is
+split into the remaining 8 patches.
 
-[auto build test WARNING on net-next/main]
+The user-mode of the driver is being reviewed at:
+https://github.com/linux-rdma/rdma-core/pull/1620
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Bhargava-Marreddy/bng_en-Add-initial-support-for-RX-and-TX-rings/20250814-004339
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250813215603.76526-2-bhargava.marreddy%40broadcom.com
-patch subject: [net-next 1/9] bng_en: Add initial support for RX and TX rings
-config: loongarch-randconfig-r073-20250814 (https://download.01.org/0day-ci/archive/20250814/202508141306.LMpg4Jkx-lkp@intel.com/config)
-compiler: clang version 22.0.0git (https://github.com/llvm/llvm-project 3769ce013be2879bf0b329c14a16f5cb766f26ce)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250814/202508141306.LMpg4Jkx-lkp@intel.com/reproduce)
+v4->v5
+  - Updated documentation
+  - Fixed error path in aux device creation
+v3->v4
+  - Used xa lock instead of rcu lock for qp and cq access
+  - Removed empty labels
+  - Improved comments
+  - Removed unwanted warning and error prints.
+v2->v3
+  - Used IDA for resource id allocation
+  - Fixed lockdep warning
+  - Removed rw locks around xarrays
+  - Used rdma_user_mmap_* APIs for mappings
+  - Removed uverbs_cmd_mask
+  - Registered main ib ops at once
+  - Fixed sparse checks
+  - Fixed make htmldocs error
+v1->v2
+  - Removed netdev references from ionic RDMA driver
+  - Moved to ionic_lif* instead of void* to convey information between
+    aux devices and drivers
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202508141306.LMpg4Jkx-lkp@intel.com/
+Abhijit Gangurde (14):
+  net: ionic: Create an auxiliary device for rdma driver
+  net: ionic: Update LIF identity with additional RDMA capabilities
+  net: ionic: Export the APIs from net driver to support device commands
+  net: ionic: Provide RDMA reset support for the RDMA driver
+  net: ionic: Provide interrupt allocation support for the RDMA driver
+  net: ionic: Provide doorbell and CMB region information
+  RDMA: Add IONIC to rdma_driver_id definition
+  RDMA/ionic: Register auxiliary module for ionic ethernet adapter
+  RDMA/ionic: Create device queues to support admin operations
+  RDMA/ionic: Register device ops for control path
+  RDMA/ionic: Register device ops for datapath
+  RDMA/ionic: Register device ops for miscellaneous functionality
+  RDMA/ionic: Implement device stats ops
+  RDMA/ionic: Add Makefile/Kconfig to kernel build environment
 
-All warnings (new ones prefixed by >>):
+ .../device_drivers/ethernet/index.rst         |    1 +
+ .../ethernet/pensando/ionic.rst               |   10 +
+ .../ethernet/pensando/ionic_rdma.rst          |   52 +
+ MAINTAINERS                                   |    9 +
+ drivers/infiniband/Kconfig                    |    1 +
+ drivers/infiniband/hw/Makefile                |    1 +
+ drivers/infiniband/hw/ionic/Kconfig           |   15 +
+ drivers/infiniband/hw/ionic/Makefile          |    9 +
+ drivers/infiniband/hw/ionic/ionic_admin.c     | 1228 ++++++++
+ .../infiniband/hw/ionic/ionic_controlpath.c   | 2679 +++++++++++++++++
+ drivers/infiniband/hw/ionic/ionic_datapath.c  | 1392 +++++++++
+ drivers/infiniband/hw/ionic/ionic_fw.h        | 1029 +++++++
+ drivers/infiniband/hw/ionic/ionic_hw_stats.c  |  484 +++
+ drivers/infiniband/hw/ionic/ionic_ibdev.c     |  452 +++
+ drivers/infiniband/hw/ionic/ionic_ibdev.h     |  517 ++++
+ drivers/infiniband/hw/ionic/ionic_lif_cfg.c   |  111 +
+ drivers/infiniband/hw/ionic/ionic_lif_cfg.h   |   66 +
+ drivers/infiniband/hw/ionic/ionic_pgtbl.c     |  143 +
+ drivers/infiniband/hw/ionic/ionic_queue.c     |   52 +
+ drivers/infiniband/hw/ionic/ionic_queue.h     |  234 ++
+ drivers/infiniband/hw/ionic/ionic_res.h       |  154 +
+ drivers/net/ethernet/pensando/Kconfig         |    1 +
+ drivers/net/ethernet/pensando/ionic/Makefile  |    2 +-
+ drivers/net/ethernet/pensando/ionic/ionic.h   |    7 -
+ .../net/ethernet/pensando/ionic/ionic_api.h   |  131 +
+ .../net/ethernet/pensando/ionic/ionic_aux.c   |  102 +
+ .../net/ethernet/pensando/ionic/ionic_aux.h   |   10 +
+ .../ethernet/pensando/ionic/ionic_bus_pci.c   |    7 +
+ .../net/ethernet/pensando/ionic/ionic_dev.c   |  270 +-
+ .../net/ethernet/pensando/ionic/ionic_dev.h   |   28 +-
+ .../net/ethernet/pensando/ionic/ionic_if.h    |  118 +-
+ .../net/ethernet/pensando/ionic/ionic_lif.c   |   47 +-
+ .../net/ethernet/pensando/ionic/ionic_lif.h   |    3 +
+ .../net/ethernet/pensando/ionic/ionic_main.c  |    4 +-
+ include/uapi/rdma/ib_user_ioctl_verbs.h       |    1 +
+ include/uapi/rdma/ionic-abi.h                 |  115 +
+ 36 files changed, 9421 insertions(+), 64 deletions(-)
+ create mode 100644 Documentation/networking/device_drivers/ethernet/pensando/ionic_rdma.rst
+ create mode 100644 drivers/infiniband/hw/ionic/Kconfig
+ create mode 100644 drivers/infiniband/hw/ionic/Makefile
+ create mode 100644 drivers/infiniband/hw/ionic/ionic_admin.c
+ create mode 100644 drivers/infiniband/hw/ionic/ionic_controlpath.c
+ create mode 100644 drivers/infiniband/hw/ionic/ionic_datapath.c
+ create mode 100644 drivers/infiniband/hw/ionic/ionic_fw.h
+ create mode 100644 drivers/infiniband/hw/ionic/ionic_hw_stats.c
+ create mode 100644 drivers/infiniband/hw/ionic/ionic_ibdev.c
+ create mode 100644 drivers/infiniband/hw/ionic/ionic_ibdev.h
+ create mode 100644 drivers/infiniband/hw/ionic/ionic_lif_cfg.c
+ create mode 100644 drivers/infiniband/hw/ionic/ionic_lif_cfg.h
+ create mode 100644 drivers/infiniband/hw/ionic/ionic_pgtbl.c
+ create mode 100644 drivers/infiniband/hw/ionic/ionic_queue.c
+ create mode 100644 drivers/infiniband/hw/ionic/ionic_queue.h
+ create mode 100644 drivers/infiniband/hw/ionic/ionic_res.h
+ create mode 100644 drivers/net/ethernet/pensando/ionic/ionic_api.h
+ create mode 100644 drivers/net/ethernet/pensando/ionic/ionic_aux.c
+ create mode 100644 drivers/net/ethernet/pensando/ionic/ionic_aux.h
+ create mode 100644 include/uapi/rdma/ionic-abi.h
 
->> drivers/net/ethernet/broadcom/bnge/bnge_netdev.c:276:6: warning: variable 'rc' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
-     276 |         if (!bn->tx_ring_map)
-         |             ^~~~~~~~~~~~~~~~
-   drivers/net/ethernet/broadcom/bnge/bnge_netdev.c:315:9: note: uninitialized use occurs here
-     315 |         return rc;
-         |                ^~
-   drivers/net/ethernet/broadcom/bnge/bnge_netdev.c:276:2: note: remove the 'if' if its condition is always false
-     276 |         if (!bn->tx_ring_map)
-         |         ^~~~~~~~~~~~~~~~~~~~~
-     277 |                 goto err_free_core;
-         |                 ~~~~~~~~~~~~~~~~~~
-   drivers/net/ethernet/broadcom/bnge/bnge_netdev.c:270:6: warning: variable 'rc' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
-     270 |         if (!bn->tx_ring)
-         |             ^~~~~~~~~~~~
-   drivers/net/ethernet/broadcom/bnge/bnge_netdev.c:315:9: note: uninitialized use occurs here
-     315 |         return rc;
-         |                ^~
-   drivers/net/ethernet/broadcom/bnge/bnge_netdev.c:270:2: note: remove the 'if' if its condition is always false
-     270 |         if (!bn->tx_ring)
-         |         ^~~~~~~~~~~~~~~~~
-     271 |                 goto err_free_core;
-         |                 ~~~~~~~~~~~~~~~~~~
-   drivers/net/ethernet/broadcom/bnge/bnge_netdev.c:253:6: warning: variable 'rc' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
-     253 |         if (!bn->rx_ring)
-         |             ^~~~~~~~~~~~
-   drivers/net/ethernet/broadcom/bnge/bnge_netdev.c:315:9: note: uninitialized use occurs here
-     315 |         return rc;
-         |                ^~
-   drivers/net/ethernet/broadcom/bnge/bnge_netdev.c:253:2: note: remove the 'if' if its condition is always false
-     253 |         if (!bn->rx_ring)
-         |         ^~~~~~~~~~~~~~~~~
-     254 |                 goto err_free_core;
-         |                 ~~~~~~~~~~~~~~~~~~
-   drivers/net/ethernet/broadcom/bnge/bnge_netdev.c:228:14: note: initialize the variable 'rc' to silence this warning
-     228 |         int i, j, rc, size, arr_size;
-         |                     ^
-         |                      = 0
-   3 warnings generated.
 
-
-vim +276 drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
-
-   224	
-   225	static int bnge_alloc_core(struct bnge_net *bn)
-   226	{
-   227		struct bnge_dev *bd = bn->bd;
-   228		int i, j, rc, size, arr_size;
-   229		void *bnapi;
-   230	
-   231		arr_size = L1_CACHE_ALIGN(sizeof(struct bnge_napi *) *
-   232				bd->nq_nr_rings);
-   233		size = L1_CACHE_ALIGN(sizeof(struct bnge_napi));
-   234		bnapi = kzalloc(arr_size + size * bd->nq_nr_rings, GFP_KERNEL);
-   235		if (!bnapi)
-   236			return -ENOMEM;
-   237	
-   238		bn->bnapi = bnapi;
-   239		bnapi += arr_size;
-   240		for (i = 0; i < bd->nq_nr_rings; i++, bnapi += size) {
-   241			struct bnge_nq_ring_info *nqr;
-   242	
-   243			bn->bnapi[i] = bnapi;
-   244			bn->bnapi[i]->index = i;
-   245			bn->bnapi[i]->bn = bn;
-   246			nqr = &bn->bnapi[i]->nq_ring;
-   247			nqr->ring_struct.ring_mem.flags = BNGE_RMEM_RING_PTE_FLAG;
-   248		}
-   249	
-   250		bn->rx_ring = kcalloc(bd->rx_nr_rings,
-   251				      sizeof(struct bnge_rx_ring_info),
-   252				      GFP_KERNEL);
-   253		if (!bn->rx_ring)
-   254			goto err_free_core;
-   255	
-   256		for (i = 0; i < bd->rx_nr_rings; i++) {
-   257			struct bnge_rx_ring_info *rxr = &bn->rx_ring[i];
-   258	
-   259			rxr->rx_ring_struct.ring_mem.flags =
-   260				BNGE_RMEM_RING_PTE_FLAG;
-   261			rxr->rx_agg_ring_struct.ring_mem.flags =
-   262				BNGE_RMEM_RING_PTE_FLAG;
-   263			rxr->bnapi = bn->bnapi[i];
-   264			bn->bnapi[i]->rx_ring = &bn->rx_ring[i];
-   265		}
-   266	
-   267		bn->tx_ring = kcalloc(bd->tx_nr_rings,
-   268				      sizeof(struct bnge_tx_ring_info),
-   269				      GFP_KERNEL);
-   270		if (!bn->tx_ring)
-   271			goto err_free_core;
-   272	
-   273		bn->tx_ring_map = kcalloc(bd->tx_nr_rings, sizeof(u16),
-   274					  GFP_KERNEL);
-   275	
- > 276		if (!bn->tx_ring_map)
-   277			goto err_free_core;
-   278	
-   279		if (bd->flags & BNGE_EN_SHARED_CHNL)
-   280			j = 0;
-   281		else
-   282			j = bd->rx_nr_rings;
-   283	
-   284		for (i = 0; i < bd->tx_nr_rings; i++) {
-   285			struct bnge_tx_ring_info *txr = &bn->tx_ring[i];
-   286			struct bnge_napi *bnapi2;
-   287			int k;
-   288	
-   289			txr->tx_ring_struct.ring_mem.flags = BNGE_RMEM_RING_PTE_FLAG;
-   290			bn->tx_ring_map[i] = i;
-   291			k = j + BNGE_RING_TO_TC_OFF(bd, i);
-   292	
-   293			bnapi2 = bn->bnapi[k];
-   294			txr->txq_index = i;
-   295			txr->tx_napi_idx =
-   296				BNGE_RING_TO_TC(bd, txr->txq_index);
-   297			bnapi2->tx_ring[txr->tx_napi_idx] = txr;
-   298			txr->bnapi = bnapi2;
-   299		}
-   300	
-   301		bnge_init_ring_struct(bn);
-   302	
-   303		rc = bnge_alloc_rx_rings(bn);
-   304		if (rc)
-   305			goto err_free_core;
-   306	
-   307		rc = bnge_alloc_tx_rings(bn);
-   308		if (rc)
-   309			goto err_free_core;
-   310	
-   311		return 0;
-   312	
-   313	err_free_core:
-   314		bnge_free_core(bn);
-   315		return rc;
-   316	}
-   317	
-
+base-commit: 8f5ae30d69d7543eee0d70083daf4de8fe15d585
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.43.0
+
 
