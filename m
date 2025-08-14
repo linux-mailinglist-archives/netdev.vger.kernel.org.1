@@ -1,145 +1,115 @@
-Return-Path: <netdev+bounces-213587-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213588-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98B40B25BC8
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 08:29:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7ACC4B25BD6
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 08:33:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E90D7217EE
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 06:29:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 886615C4F07
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 06:33:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C0D4242D66;
-	Thu, 14 Aug 2025 06:29:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23D5C24E00F;
+	Thu, 14 Aug 2025 06:33:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FDE450276;
-	Thu, 14 Aug 2025 06:29:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DDD024DFE6
+	for <netdev@vger.kernel.org>; Thu, 14 Aug 2025 06:33:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755152976; cv=none; b=Rg2p6shg0OuWs4HqsDMc5jw2HW95NN5bQTLsgQKf5PX95/tnxYioKGMoHsr5Rx5ZGcLBsxdXHHbLjROdrHIFeO1nS8lL1buLTyyOJcQn5pGBuvAM61aTL2k/I7NHYgNmnnvov6p1TGGcGv1vBHrrgc/xXyg2AYOL/LyrtjLrQH4=
+	t=1755153198; cv=none; b=mhxKkPemvjaML5/s2J/ANQPL4ggywCSGVkpJtTuVkqGyPVzedbNujqjWP1SdtHsBTpD8yu8+zTXVBX81xtalz0WqGMehhdtCfMtwC777JrB/hYxnkPIDn3t1H4X8X1KytVKRBoJcwc6jLXLGNEOlOKVwq41RTahacDm+LjznhcI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755152976; c=relaxed/simple;
-	bh=mHrZ3pJ8EWpvZlPK0OvhbaUzb9eALq4tdkF+Y/M64hI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MauylEOL8zeAM8anm0m2y+6I2hB5oyenw3YHrIdzGicUHE551Lj5VHrRPJLPDmC/0YJEJ2nIcBsbPItXYrhGtap979WSaAAYtO9BpMSaFgDi0OOV3h2QcQuIukEPSRCIeIyMJrMng15A04Qoggq0KmPofwXVv9mAxM5DKL2drcY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.192] (ip5f5af7f5.dynamic.kabel-deutschland.de [95.90.247.245])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id E494561E647BA;
-	Thu, 14 Aug 2025 08:28:42 +0200 (CEST)
-Message-ID: <2ec36cd7-7378-4e44-894a-93008348a96a@molgen.mpg.de>
-Date: Thu, 14 Aug 2025 08:28:42 +0200
+	s=arc-20240116; t=1755153198; c=relaxed/simple;
+	bh=W6uwyd6/PMbtteJTRZv4x7ii8cMYoDvuLniZfcqPkmM=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=lKrrOJwPTLK75UXHLgrnt+nmPwUoBoQackXl6hxaZ8V9pnkttI2mh0ozDBaMp1VUpKd4aj36mevdoHVSVt03fhU5W3Vkf+bEFvT7+KrDSoadNqzYJenfBvPlogosHKu18001mIHylDxBd35b6fpRK4L2QF51c/b7BzY8qEwy0M0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 8ab2b63c78d811f0b29709d653e92f7d-20250814
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.45,REQID:bc2ca6bb-2064-4b67-9941-30a270da3272,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:6493067,CLOUDID:b0d66b71d2d5ac8ad07e0029767130c1,BulkI
+	D:nil,BulkQuantity:0,Recheck:0,SF:81|82|102,TC:nil,Content:0|50,EDM:-3,IP:
+	nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,L
+	ES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-UUID: 8ab2b63c78d811f0b29709d653e92f7d-20250814
+Received: from node4.com.cn [(10.44.16.170)] by mailgw.kylinos.cn
+	(envelope-from <heminhong@kylinos.cn>)
+	(Generic MTA)
+	with ESMTP id 1948565323; Thu, 14 Aug 2025 14:33:08 +0800
+Received: from node4.com.cn (localhost [127.0.0.1])
+	by node4.com.cn (NSMail) with SMTP id 08E4716004283;
+	Thu, 14 Aug 2025 14:33:08 +0800 (CST)
+X-ns-mid: postfix-689D8323-767312578
+Received: from localhost.localdomain (unknown [10.42.12.141])
+	by node4.com.cn (NSMail) with ESMTPA id 0D27D16001A01;
+	Thu, 14 Aug 2025 06:33:06 +0000 (UTC)
+From: heminhong <heminhong@kylinos.cn>
+To: idosch@idosch.org
+Cc: dsahern@kernel.org,
+	edumazet@google.com,
+	heminhong@kylinos.cn,
+	kuba@kernel.org,
+	kuniyu@google.com,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com
+Subject: [PATCH net v3] ipv6: sr: validate HMAC algorithm ID in seg6_hmac_info_add
+Date: Thu, 14 Aug 2025 14:33:02 +0800
+Message-Id: <20250814063302.112132-1-heminhong@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <aJx9DPI8dbRUtfGA@shredder>
+References: <aJx9DPI8dbRUtfGA@shredder>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH 1/5] ethtool: use vmalloc_array() to
- simplify code
-To: Qianfeng Rong <rongqianfeng@vivo.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, intel-wired-lan@lists.osuosl.org,
- netdev@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
- bpf@vger.kernel.org
-References: <20250812133226.258318-1-rongqianfeng@vivo.com>
- <20250812133226.258318-2-rongqianfeng@vivo.com>
- <af057e48-f428-4c34-8991-99959edbabd2@molgen.mpg.de>
- <abc66ec5-85a4-47e1-9759-2f60ab111971@vivo.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <abc66ec5-85a4-47e1-9759-2f60ab111971@vivo.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
 
-Dear Quianfeng,
+From: Minhong He <heminhong@kylinos.cn>
 
+The seg6_genl_sethmac() directly uses the algorithm ID provided by the
+userspace without verifying whether it is an HMAC algorithm supported
+by the system.
+If an unsupported HMAC algorithm ID is configured, packets using SRv6 HMA=
+C
+will be dropped during encapsulation or decapsulation.
+To keep the HMAC algorithm logic in seg6_hmac.c and perform the check
+in seg6_hmac_info_add().
 
-Thank you very much for your reply.
+Fixes: 4f4853dc1c9c ("ipv6: sr: implement API to control SR HMAC structur=
+e")
+Signed-off-by: Minhong He <heminhong@kylinos.cn>
+---
+ net/ipv6/seg6_hmac.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Am 14.08.25 um 06:05 schrieb Qianfeng Rong:
-> 
-> 在 2025/8/13 0:34, Paul Menzel 写道:
+diff --git a/net/ipv6/seg6_hmac.c b/net/ipv6/seg6_hmac.c
+index f78ecb6ad838..d77b52523b6a 100644
+--- a/net/ipv6/seg6_hmac.c
++++ b/net/ipv6/seg6_hmac.c
+@@ -304,6 +304,9 @@ int seg6_hmac_info_add(struct net *net, u32 key, stru=
+ct seg6_hmac_info *hinfo)
+ 	struct seg6_pernet_data *sdata =3D seg6_pernet(net);
+ 	int err;
+=20
++	if (!__hmac_get_algo(hinfo->alg_id))
++		return -EINVAL;
++
+ 	err =3D rhashtable_lookup_insert_fast(&sdata->hmac_infos, &hinfo->node,
+ 					    rht_params);
+=20
+--=20
+2.25.1
 
-[…]
-
->> Am 12.08.25 um 15:32 schrieb Qianfeng Rong:
->>> Remove array_size() calls and replace vmalloc() with vmalloc_array() to
->>> simplify the code and maintain consistency with existing kmalloc_array()
->>> usage.
->>
->> You could build it without and with your patch and look if the assembler
->> code changes.
-> 
-> Very good point, the following experiment was done:
-> //before apply patch:
-> objdump -dSl --prefix-addresses fm10k_ethtool.o > original.dis
-> 
-> //after apply patch:
-> objdump -dSl --prefix-addresses fm10k_ethtool.o > patched.dis
-> 
-> diff -u original.dis patched.dis | diffstat
-> patched.dis | 1578 ... 1 file changed, 785 insertions(+), 793 deletions(-)
-> 
-> From the above results, we can see that the assembly instructions are
-> reduced after applying the patch.
-> 
-> 
-> #define array_size(a, b)    size_mul(a, b)
-> 
-> static inline size_t __must_check size_mul(size_t factor1, size_t factor2)
-> {
->      size_t bytes;
-> 
->      if (check_mul_overflow(factor1, factor2, &bytes))
->          return SIZE_MAX;
-> 
->      return bytes;
-> }
-> 
-> void *__vmalloc_array_noprof(size_t n, size_t size, gfp_t flags)
-> {
->      size_t bytes;
-> 
->      if (unlikely(check_mul_overflow(n, size, &bytes)))
->          return NULL;
->      return __vmalloc_noprof(bytes, flags);
-> }
-> 
-> And from the code, array_size() will return SIZE_MAX after detecting
-> overflow.  SIZE_MAX is passed to vmalloc for available memory
-> verification before exiting and returning NULL. vmalloc_array()
-> will directly return NULL after detecting overflow.
-
-Awesome! Thank you for digging that up. Maybe something to add to the 
-commit message. Maybe something like:
-
-`vmalloc_array()` is also optimized better, resulting in less 
-instructions being used, which can be verified with:
-
-objdump -dSl --prefix-addresses <changed module>.o
-
->> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-
-
-Kind regards,
-
-Paul
 
