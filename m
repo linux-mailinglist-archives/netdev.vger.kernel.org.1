@@ -1,82 +1,82 @@
-Return-Path: <netdev+bounces-213659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213660-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 115C6B261C7
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 12:05:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4BAEB261BC
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 12:04:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45A139E7C0C
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 10:00:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6CA1E5C3A68
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 10:00:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4988D2F99B7;
-	Thu, 14 Aug 2025 09:59:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B36D2FA0F6;
+	Thu, 14 Aug 2025 09:59:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="GR28qlTW"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="EV7O6pET"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 922F92F9989
-	for <netdev@vger.kernel.org>; Thu, 14 Aug 2025 09:59:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74A122F99BE
+	for <netdev@vger.kernel.org>; Thu, 14 Aug 2025 09:59:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755165597; cv=none; b=Xz3cs2/aPGc6aSGQ6dZc4AoP6PTWPwinLk7D4bYVWTap62M0G3DiGj5WBur9pSxWLxW2lMIt8cQt7zsT61e7RdyBts1HNsrxNF43197v+nnCjAAc68TPspdnQ0gKoSKASDNXYcP94fYJ66SuKsQ1VCC03sJkIKdmz/IT2X6CjB0=
+	t=1755165599; cv=none; b=azvx1W8YsHm6TMQX1I4rDlFpSKZc9KK0AvrtHQroVuriZhN4kYz3GgsbnWTBEATel2kBygwA9Qesg1U7y/uFjs//7iI6IaFQgRuHwNtvvDdiFccLHT9rmPHUacXjIkxzms8JoeIaKepeCt6g6FE8KG/pz76/9LP2pkTOoRBLRLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755165597; c=relaxed/simple;
-	bh=6lefPy4pLLhuIjRSarK/JZllaot0EAvW9lX25Tym5zs=;
+	s=arc-20240116; t=1755165599; c=relaxed/simple;
+	bh=rOgEaue3k1efCvteS9x+AYID405oKjOeQI0S/MAOO/4=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=oZrw/iOgXcyH+YF9vk5aAcnPSYLOkUp/7ocXEP3ydZRoL9U8Wp0YiLNjfazqpnOotpGDFvZ1C3OHxWYJ+mqj8aEJvzzyCib+3poCIkVRiG6cJwocQO6JmdZPxJPdWxVNNNnqHQyo9ffoWsp0aa6f0imxsQdlt3xbskzHX4Ecrqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=GR28qlTW; arc=none smtp.client-ip=209.85.208.46
+	 In-Reply-To:To:Cc; b=lQki27zu1NMVUrTHBNBXOtqN1Lgeq+GHF7GZvfzdX9uZcTu4CFCwvFFDY0EOeXpgKmwQyzDIjnYCfEldPwmVZRB58Wp8UeHTvwMQAFx24oPqvUv7zyzgrZNoVYkUq+7blgnaEjHldbceEWTBjSbEJsOJaON1P5XG0ixIlXPIieQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=EV7O6pET; arc=none smtp.client-ip=209.85.218.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-6188b7532f3so1215732a12.2
-        for <netdev@vger.kernel.org>; Thu, 14 Aug 2025 02:59:55 -0700 (PDT)
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-afcb72d51dcso115287366b.0
+        for <netdev@vger.kernel.org>; Thu, 14 Aug 2025 02:59:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1755165594; x=1755770394; darn=vger.kernel.org;
+        d=cloudflare.com; s=google09082023; t=1755165596; x=1755770396; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=i/WU4t3bXNXHytiZBMYllM2g5xtPpYjdz0N6ykqxU6s=;
-        b=GR28qlTWhHA/enY/Y+C9fgx6a3cXDfuSBouZwVg7jXVvq3DUbQXrDiteSTOSW6tLGN
-         /KrPQ6fdB9A9FgXOVyMwq9Xq/k30QwBwSadLxuuTnmghzfJbLIufSnDhjuJFt65XWX1K
-         HJcEOVm5sHmNUcd2kTYOaIBMLOoAIEUY6bJWkdVgEz7Chbl+0s8k1jcAHBH1hbnDK1ep
-         gXXEio+HlfzBKEDq+5IhYOOV+V0MxIn6IuTTnw8Iq3RSuD72FuDbezfJfi3J7v6g308E
-         tp6lSlGWFuVoszG94+GN4fvUzLAMcT/3nfXLcor0lBfWlgtrE+lhNAE6K4V9Xy5bi58v
-         AU7A==
+        bh=r0fIqnzU78JFEGt4tPHYQLQeFtpWNKhdVMlxMCo22pY=;
+        b=EV7O6pET9va1qj/gg2AZATwD/u2IB9w6wGHGJVNpqsHg3/a3fEgzfhwhbdufWjegs+
+         zdTKPD5fqW6mAvImb0FJH1TbbuGa/zXCJb/xz+MxmF+DH4WdOBEuFiD3jfbYf3QrUuhu
+         RBOvemu4sLR5HOh/Hx3iWiCykUmv9/BCzXQN5yg7VuCk84HGpBDAwo5ki4FTFcjIJIEn
+         VLDD3YNUvqha5IK9KyVgIxwjWCvgUGXoRMHzIRvXBylfIVLV1EdFwCoQmufCzn0+LqYr
+         mUG3y9tkynSuejfSqOpXO77lb5xsooly0wGMLiZP+X0OLCClj8WpWO++MU9Rz72ej1c7
+         qLeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755165594; x=1755770394;
+        d=1e100.net; s=20230601; t=1755165596; x=1755770396;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=i/WU4t3bXNXHytiZBMYllM2g5xtPpYjdz0N6ykqxU6s=;
-        b=owrYhSFCpvijWeil6lPbBdrCuon55lFTb1oSZp6JYv0eOBeH//9/7lAtO6STMuh1Zj
-         DVnU5EbjYf2V0Mf/Jwpnau2eCCt71us3+bjeRfRUWpjbaIQiLCkjiT1s4fAmdxT+uRgV
-         2NB4gcL75/414eSr9aYAfvMTnBfCLTrtINbtgMLCWMXH7WcTeRsez9HwrDKogu+NGY3e
-         BXyDGHuGQTKd0BMGjs3R6lWXh+AZD+J1W0Xzos2qtO7CspYZApNgTlt5F6+/MLg6SaEo
-         8e14puP4zZnaZUPYrxg9rrblen6KClC5DhW/mXVD4nUDtvBeF8yFGLqwCAP8WT18ak0V
-         by5A==
-X-Forwarded-Encrypted: i=1; AJvYcCUt3buCXppCSieepoQ+X+H+/alhZmM9FPrqqWI6WjtPNdQMEKqehydV57JUz0Af1BRn7B3PfdE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwXYKUSHw402bINmkr+uy6H1RSWaigos8IcZ8v9K3BRRJp8aMqq
-	ObO3msbpbjxozX+30PPOFcel5Gugh6sgwjgGQ5syFjv6tTPKWAnLNTUsIW6iAnFM0Hw=
-X-Gm-Gg: ASbGnctc1RwXvb4D3AP/ZJ55ohdjYKQE2UUTHkMf0+onQDNKEuDzryO5NZto9k2fHkF
-	yr8G0lqNCa6q/o4w+eh4j1eWXbQ0nl+MXH7aXe+FFOeu0Nf0j3sAUdA7EDp8AsXe3/+B1t50sTQ
-	hgkPQLmcJYpyVC5+mc3I0/SncrGc+pl5JRsW4lXRd6pERP7lrMnl5fUiTmP+/3WddEL4D0gbRk6
-	PKoL3Qp22uN7K5vNB76sFAFqKEZheHqgHTak/BXq3gTcUX/mCfbru4ALed4WAVbi/VO+a3W8VqV
-	lqA5P0xWGKjObRcMZDzg7VAJtSJiXa2s5SGsrHrywhSt4REAkA0kxx2luMkgA5UH6pD6BjoChvT
-	X+4+xXxo+qTitRh/Xgu1X
-X-Google-Smtp-Source: AGHT+IH36/n02R/i4TJC+1iQOV+OciBplBbdWZlg3xnNgH2EIEvmqL02LRuqsZ6bR1XQDtsMC5nW+A==
-X-Received: by 2002:a05:6402:354c:b0:615:cb9c:d5a2 with SMTP id 4fb4d7f45d1cf-6188c1fb55dmr2080133a12.18.1755165593455;
-        Thu, 14 Aug 2025 02:59:53 -0700 (PDT)
+        bh=r0fIqnzU78JFEGt4tPHYQLQeFtpWNKhdVMlxMCo22pY=;
+        b=h1Dmq5u161ZrJdQYSC+FU3ifRWyAAp/TpPPf/GXm85TynJR64RHTiCBA3Z306WaM0I
+         aZbn5+ji1FR4vjlsJ2888TCZrHzOhEhViiB1hhXJ8F3lRXBRiR5anDQzeqitoKoUSHIK
+         VPA0KPLF9moUAiATI3OA+KQHm94eq8r3K0QF3baBn+zp15p8kt7nsoPaoQTbRXEG6ZSg
+         2NJywZnbsPYgCZ+4l8VyuG1K6DehZ8Q/vqt4wVwWcKfrlV8UG2IArx5uM7Vrtl29Srzy
+         RWkDvvNPXrdoUeOExRCo+x2L0jA7Z5Qj01xUC/S8cGoUGdPgnnWw4jMBpIWGtXF3gaDg
+         J0nQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV8bj8dTuFASxOLaG7sO3Y1cRKNWpl2SFl3WyMX47hnJj4TI+f2vi8ZIOc/8kF137Gwh2BtIqM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxD6OGT90LwgNyYmQ9fnGd6vEfUZZ+bbxzggvPOaE9yQr/jgeWf
+	FDpx13z7V5mlO7UnI4ZqdM558uhpDhkDy8Jj5KP5EGVJUH6HslvwIb/LdCGB0juEtEQ=
+X-Gm-Gg: ASbGncvADwAkxTfUe8or1E7y9hcKmIOqRxOuiX4dqvVxbD8b/zU+gvZ98tvqgkvD+59
+	e/1GrTcAX1SGVEZDhcwNVybSAASyIPhSFUGgSJbWerqFNLevowR/GZrumCrHHEJRZyszpeYhcgj
+	JONNU2fJMT5/ih68/zxae3xCeo+MGTePHAca+XgjvgODQcEsL4othDKCkvKSNW8llAtw0JVFNDW
+	N+8Ba675wfn2yS646Ru+bZ94nAYbYhLYy/KViBpwXUROkY6c817Rq/qjQexWvca7iDc+K+g/h0W
+	tbYDlwcvfImdSgP6/6b2GRxarORFzW6GpO9wIOveRT99gZ1OetEKeBn8DgTvytdhChg8Nw8yD8Y
+	+SVq+kQv5ePJY+pnq97SH
+X-Google-Smtp-Source: AGHT+IG8XNjJJ8axUv1kHemYqxYmKs6jEIi80bYTWtmES0etyEbXzIxgH5Vavr+Q88+uoIMG0YYGnA==
+X-Received: by 2002:a17:907:7202:b0:ae4:107f:dba2 with SMTP id a640c23a62f3a-afcb981f243mr246458066b.13.1755165595497;
+        Thu, 14 Aug 2025 02:59:55 -0700 (PDT)
 Received: from cloudflare.com ([2a09:bac5:5063:2432::39b:f6])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-61850794509sm4631499a12.31.2025.08.14.02.59.52
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-af91a0a3792sm2548731466b.50.2025.08.14.02.59.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Aug 2025 02:59:52 -0700 (PDT)
+        Thu, 14 Aug 2025 02:59:54 -0700 (PDT)
 From: Jakub Sitnicki <jakub@cloudflare.com>
-Date: Thu, 14 Aug 2025 11:59:30 +0200
-Subject: [PATCH bpf-next v7 4/9] selftests/bpf: Pass just bpf_map to
- xdp_context_test helper
+Date: Thu, 14 Aug 2025 11:59:31 +0200
+Subject: [PATCH bpf-next v7 5/9] selftests/bpf: Parametrize
+ test_xdp_context_tuntap
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,7 +85,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250814-skb-metadata-thru-dynptr-v7-4-8a39e636e0fb@cloudflare.com>
+Message-Id: <20250814-skb-metadata-thru-dynptr-v7-5-8a39e636e0fb@cloudflare.com>
 References: <20250814-skb-metadata-thru-dynptr-v7-0-8a39e636e0fb@cloudflare.com>
 In-Reply-To: <20250814-skb-metadata-thru-dynptr-v7-0-8a39e636e0fb@cloudflare.com>
 To: bpf@vger.kernel.org
@@ -103,57 +103,90 @@ Cc: Alexei Starovoitov <ast@kernel.org>,
  netdev@vger.kernel.org, Stanislav Fomichev <sdf@fomichev.me>
 X-Mailer: b4 0.15-dev-07fe9
 
-Prepare for parametrizing the xdp_context tests. The assert_test_result
-helper doesn't need the whole skeleton. Pass just what it needs.
+We want to add more test cases to cover different ways to access the
+metadata area. Prepare for it. Pull up the skeleton management.
 
 Acked-by: Eduard Zingerman <eddyz87@gmail.com>
 Reviewed-by: Jesse Brandeburg <jbrandeburg@cloudflare.com>
 Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
 ---
- tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+ .../bpf/prog_tests/xdp_context_test_run.c          | 31 +++++++++++++++-------
+ 1 file changed, 21 insertions(+), 10 deletions(-)
 
 diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c b/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c
-index b9d9f0a502ce..0134651d94ab 100644
+index 0134651d94ab..6c66e27e5bc7 100644
 --- a/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c
 +++ b/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c
-@@ -156,15 +156,14 @@ static int send_test_packet(int ifindex)
- 	return -1;
+@@ -256,12 +256,13 @@ void test_xdp_context_veth(void)
+ 	netns_free(tx_ns);
  }
  
--static void assert_test_result(struct test_xdp_meta *skel)
-+static void assert_test_result(const struct bpf_map *result_map)
+-void test_xdp_context_tuntap(void)
++static void test_tuntap(struct bpf_program *xdp_prog,
++			struct bpf_program *tc_prog,
++			struct bpf_map *result_map)
  {
- 	int err;
- 	__u32 map_key = 0;
- 	__u8 map_value[TEST_PAYLOAD_LEN];
+ 	LIBBPF_OPTS(bpf_tc_hook, tc_hook, .attach_point = BPF_TC_INGRESS);
+ 	LIBBPF_OPTS(bpf_tc_opts, tc_opts, .handle = 1, .priority = 1);
+ 	struct netns_obj *ns = NULL;
+-	struct test_xdp_meta *skel = NULL;
+ 	__u8 packet[sizeof(struct ethhdr) + TEST_PAYLOAD_LEN];
+ 	int tap_fd = -1;
+ 	int tap_ifindex;
+@@ -277,10 +278,6 @@ void test_xdp_context_tuntap(void)
  
--	err = bpf_map__lookup_elem(skel->maps.test_result, &map_key,
--				   sizeof(map_key), &map_value,
--				   TEST_PAYLOAD_LEN, BPF_ANY);
-+	err = bpf_map__lookup_elem(result_map, &map_key, sizeof(map_key),
-+				   &map_value, TEST_PAYLOAD_LEN, BPF_ANY);
- 	if (!ASSERT_OK(err, "lookup test_result"))
- 		return;
+ 	SYS(close, "ip link set dev " TAP_NAME " up");
  
-@@ -248,7 +247,7 @@ void test_xdp_context_veth(void)
- 	if (!ASSERT_OK(ret, "send_test_packet"))
+-	skel = test_xdp_meta__open_and_load();
+-	if (!ASSERT_OK_PTR(skel, "open and load skeleton"))
+-		goto close;
+-
+ 	tap_ifindex = if_nametoindex(TAP_NAME);
+ 	if (!ASSERT_GE(tap_ifindex, 0, "if_nametoindex"))
+ 		goto close;
+@@ -290,12 +287,12 @@ void test_xdp_context_tuntap(void)
+ 	if (!ASSERT_OK(ret, "bpf_tc_hook_create"))
  		goto close;
  
--	assert_test_result(skel);
-+	assert_test_result(skel->maps.test_result);
+-	tc_opts.prog_fd = bpf_program__fd(skel->progs.ing_cls);
++	tc_opts.prog_fd = bpf_program__fd(tc_prog);
+ 	ret = bpf_tc_attach(&tc_hook, &tc_opts);
+ 	if (!ASSERT_OK(ret, "bpf_tc_attach"))
+ 		goto close;
  
- close:
- 	close_netns(nstoken);
-@@ -313,7 +312,7 @@ void test_xdp_context_tuntap(void)
+-	ret = bpf_xdp_attach(tap_ifindex, bpf_program__fd(skel->progs.ing_xdp),
++	ret = bpf_xdp_attach(tap_ifindex, bpf_program__fd(xdp_prog),
+ 			     0, NULL);
+ 	if (!ASSERT_GE(ret, 0, "bpf_xdp_attach"))
+ 		goto close;
+@@ -312,11 +309,25 @@ void test_xdp_context_tuntap(void)
  	if (!ASSERT_EQ(ret, sizeof(packet), "write packet"))
  		goto close;
  
--	assert_test_result(skel);
-+	assert_test_result(skel->maps.test_result);
+-	assert_test_result(skel->maps.test_result);
++	assert_test_result(result_map);
  
  close:
  	if (tap_fd >= 0)
+ 		close(tap_fd);
+-	test_xdp_meta__destroy(skel);
+ 	netns_free(ns);
+ }
++
++void test_xdp_context_tuntap(void)
++{
++	struct test_xdp_meta *skel = NULL;
++
++	skel = test_xdp_meta__open_and_load();
++	if (!ASSERT_OK_PTR(skel, "open and load skeleton"))
++		return;
++
++	if (test__start_subtest("data_meta"))
++		test_tuntap(skel->progs.ing_xdp, skel->progs.ing_cls,
++			    skel->maps.test_result);
++
++	test_xdp_meta__destroy(skel);
++}
 
 -- 
 2.43.0
