@@ -1,114 +1,79 @@
-Return-Path: <netdev+bounces-213799-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213800-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1B1EB26B95
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 17:54:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E080AB26B9F
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 17:55:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 162C41CE4AB2
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 15:49:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D788E188566A
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 15:50:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F1AF24502D;
-	Thu, 14 Aug 2025 15:48:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C5E723ABBD;
+	Thu, 14 Aug 2025 15:49:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="L+p+sqRm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JcmV2y0g"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a2-smtp.messagingengine.com (fout-a2-smtp.messagingengine.com [103.168.172.145])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A42BD23ABBD
-	for <netdev@vger.kernel.org>; Thu, 14 Aug 2025 15:48:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.145
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42373233710;
+	Thu, 14 Aug 2025 15:49:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755186520; cv=none; b=qVRWQWeUdjeCgRgSzJEJ2pbj/IdOYYgYkpHFlvn6GfputfQQxP8Lp4OOjhByBpv2r9N2Z1tuKi9k9z8eNU3nJpTR1oAPf/aiC04880Ua+W+3oTLUojrwPOvPuniaws2N/OM+qYi8pPweD9ROTOwYO0qVxIT7YnXVXqVVsuw+D5o=
+	t=1755186579; cv=none; b=r0OUwZI6gNaFot1YWZzGsbcFdyN7HOCIdXo/mixZSE9Bv3zSS+vc2nE7ta9nLb413XPUd2PL0uXLgUtJfXbG+Pvwwi9hQbj9w6NlvyUavTVnkulYLIeGxaGjMkW9WOi8Iddn2BQ1pXhYsK5Ls4BfDsaNMVXjFGLKgGK2Dv/KJwc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755186520; c=relaxed/simple;
-	bh=sPE4/19E6dXsRQeRp7B3nlioy5W3BoQ/f9E4wp+e88I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uxwnKYP2nP8QqPX47m3+1ob2RT7YcLMxN2MEiHyzajhh9IsJjq5ETvG2B0NgKLkSqjxLlq2Pd4caSIr4m/K+AR63PnCaovHaNov4OPerRd6fkKW09wxabz2JdKH3cNkUmUhR7q74Xf77OrAI8rXRpxEtRt41/Sub9Qg5CsqVdT0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=L+p+sqRm; arc=none smtp.client-ip=103.168.172.145
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from phl-compute-07.internal (phl-compute-07.internal [10.202.2.47])
-	by mailfout.phl.internal (Postfix) with ESMTP id 956C2EC0180;
-	Thu, 14 Aug 2025 11:48:37 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-07.internal (MEProxy); Thu, 14 Aug 2025 11:48:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1755186517; x=1755272917; bh=HWedBERlR+YAiHi12Wg0cESfgmpAGV7emp5
-	s/9aFc5k=; b=L+p+sqRmWJGJAKUlB+s5YdknriA5o2sLx8DZp1i1tbvLjiPZpUQ
-	ZKhO2OblmbKKJo6nOq53rKg5AeQqrsrVYeHHLUTaWdGHnGVuqpyCEeZkh1sw+QqM
-	EGSJCcTIDtJZ1RCOb5T0YNuPwG6qVhPWG5Jxq1T6ayJPcIBRCzYGToC49/5BCVn9
-	S4xe48PiOh1CCSOl4/BW0XiBVObc3mZbQlGSIvNdt/DfsZJ0+VkZ2rUgKge4O2Kp
-	CsbaHAuJBU3mazq1SfFV3jsDhFf4BOwlS+yEmmGpib7t2iDBJdNUqkaNY4ynESF1
-	aaZB2qe40hD9h7vDh1Dmez9NTH+nQ+LSGSQ==
-X-ME-Sender: <xms:VAWeaCnE8gQNNVZLLkX6KX4wD4P8fMz9wDMGdzlBdxZ2PT2qkfilOw>
-    <xme:VAWeaHY3qobzE0CIeifdAA3T4OIdYiXcIUXbPXZh4bN8vRv5UbFT1q00kFHfQkIBx
-    nGjqex4tMloIRI>
-X-ME-Received: <xmr:VAWeaHEPxUfLP48sHLgGHvEOWl8m3A26H9hdeaoUCQDbnh_CMh5fIylPG2oaJsHXsDT4xwA5iKbiDGTCfzxorrQWl5TFmg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgddugedugeekucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucenucfjughrpeffhffvvefukfhfgggtuggjsehttdertd
-    dttddvnecuhfhrohhmpefkughoucfutghhihhmmhgvlhcuoehiughoshgthhesihguohhs
-    tghhrdhorhhgqeenucggtffrrghtthgvrhhnpedvudefveekheeugeeftddvveefgfduie
-    efudeifefgleekheegleegjeejgeeghfenucevlhhushhtvghrufhiiigvpedtnecurfgr
-    rhgrmhepmhgrihhlfhhrohhmpehiughoshgthhesihguohhstghhrdhorhhgpdhnsggprh
-    gtphhtthhopeejpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehhvghmihhnhhho
-    nhhgsehkhihlihhnohhsrdgtnhdprhgtphhtthhopegushgrhhgvrhhnsehkvghrnhgvlh
-    drohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghp
-    thhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkuhhnihihuhesgh
-    hoohhglhgvrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghl
-    rdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomh
-X-ME-Proxy: <xmx:VAWeaILtpxyMizftAP1kuDQFjhR97o9q4XbExMg3bwhztlPE24dxJg>
-    <xmx:VAWeaCNMCBXHqFtnkumvi8GhSoEmJ40zvb00F1fzc3I6haOnFiKs6A>
-    <xmx:VAWeaIk4DmcyHJ5a9z7KJSG0hTn_1EkUsE1rkx-t7HLjVWDuKXAnVw>
-    <xmx:VAWeaG4jjiIghzbD2dlJynUzeiUEg-EpYG2lNH_IQGSOr8PurGNHjQ>
-    <xmx:VQWeaGWZI4EE6EPRd27BHtUpMyLSM2axRWgH9P3lvzQAMSmIkz0NLc7x>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 14 Aug 2025 11:48:36 -0400 (EDT)
-Date: Thu, 14 Aug 2025 18:48:33 +0300
-From: Ido Schimmel <idosch@idosch.org>
-To: heminhong <heminhong@kylinos.cn>
-Cc: dsahern@kernel.org, edumazet@google.com, kuba@kernel.org,
-	kuniyu@google.com, netdev@vger.kernel.org, pabeni@redhat.com
-Subject: Re: [PATCH net v3] ipv6: sr: validate HMAC algorithm ID in
- seg6_hmac_info_add
-Message-ID: <aJ4FUauS-3Ymarop@shredder>
-References: <aJx9DPI8dbRUtfGA@shredder>
- <20250814063302.112132-1-heminhong@kylinos.cn>
+	s=arc-20240116; t=1755186579; c=relaxed/simple;
+	bh=LAOaboagujh2OPRaVCOoohhX/P7NWG2HXLah0MOtewQ=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=otOXgODThn5KHPeP1b20Je7c5fvuS6EnYC6uQIwb6FvuAfl899C7dMMBkOOCBzj3kHJwDKvPGkSYm+90qlpQBkDewb3YWGg6wdTWluCAtI2k1H0/9c6iJk8NhfjpwkzSJWm90XRkZGdHpmkoJ8ONKCWAT0glX1rKKUl61VJAndU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JcmV2y0g; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E11BC4CEED;
+	Thu, 14 Aug 2025 15:49:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755186579;
+	bh=LAOaboagujh2OPRaVCOoohhX/P7NWG2HXLah0MOtewQ=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=JcmV2y0gUSk5FuKbZ1FSg+UO3ttxHrfYEYTyrIrTrnUSFV+H2587E/ciuXQpPH3ZH
+	 IRESZjPZcHQ61QqDXpxzZ5/7xhINkIBl/fbuV+gxH79wCziCr77fw92GN6pELBz4w3
+	 TjU5Mexo08J1M6Eh5Josktr+AZy3JdmkEFnVTyKlrNeynHigT07UWjMvu+nGwmphcS
+	 jrC/H66zZmyg2dzmEeC6K5P0RrA3sVqWIDtnLfwkHvunZKnYPx/m+88LAAPdwsbz18
+	 oMhPItHxLl0y+UgETg6yoQSMclh44B/YtsaIZRQeTbDubE+IPVA1oHiS4duroBEjQI
+	 4h6xuLq5mVj3Q==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE8639D0C3B;
+	Thu, 14 Aug 2025 15:49:51 +0000 (UTC)
+Subject: Re: [GIT PULL] Networking for v6.17-rc2
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20250814112101.35891-1-pabeni@redhat.com>
+References: <20250814112101.35891-1-pabeni@redhat.com>
+X-PR-Tracked-List-Id: <netdev.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20250814112101.35891-1-pabeni@redhat.com>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.17-rc2
+X-PR-Tracked-Commit-Id: 4faff70959d51078f9ee8372f8cff0d7045e4114
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 63467137ecc0ff6f804d53903ad87a2f0397a18b
+Message-Id: <175518659027.350189.1346984299494340924.pr-tracker-bot@kernel.org>
+Date: Thu, 14 Aug 2025 15:49:50 +0000
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250814063302.112132-1-heminhong@kylinos.cn>
 
-On Thu, Aug 14, 2025 at 02:33:02PM +0800, heminhong wrote:
-> From: Minhong He <heminhong@kylinos.cn>
-> 
-> The seg6_genl_sethmac() directly uses the algorithm ID provided by the
-> userspace without verifying whether it is an HMAC algorithm supported
-> by the system.
-> If an unsupported HMAC algorithm ID is configured, packets using SRv6 HMAC
-> will be dropped during encapsulation or decapsulation.
-> To keep the HMAC algorithm logic in seg6_hmac.c and perform the check
-> in seg6_hmac_info_add().
+The pull request you sent on Thu, 14 Aug 2025 13:21:01 +0200:
 
-The "To" doesn't seem necessary in the last sentence?
+> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.17-rc2
 
-> 
-> Fixes: 4f4853dc1c9c ("ipv6: sr: implement API to control SR HMAC structure")
-> Signed-off-by: Minhong He <heminhong@kylinos.cn>
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/63467137ecc0ff6f804d53903ad87a2f0397a18b
 
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
