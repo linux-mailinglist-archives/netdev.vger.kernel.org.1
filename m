@@ -1,543 +1,134 @@
-Return-Path: <netdev+bounces-213763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213756-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C0A5B268AD
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 16:10:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EBF3B26885
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 16:06:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 716643A7A00
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 14:00:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 14DC35E7A34
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 13:58:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5F17306D55;
-	Thu, 14 Aug 2025 13:58:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0D803002DA;
+	Thu, 14 Aug 2025 13:58:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="CWxKYeJN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VYJRLnvQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2AEC302744;
-	Thu, 14 Aug 2025 13:58:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39D072FB987
+	for <netdev@vger.kernel.org>; Thu, 14 Aug 2025 13:58:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755179935; cv=none; b=NXMLlh+qeVfs/+oSbL0VfGPBJdD81/nVf+5mE1Cevz5Sgl2Dr1jyBXcoVyD2o2VsWO1LSm1ogAzSUz2QK9RE8cyq0o+aqSnJ8+w1ORrPTP9rGa1XCCBNplQxXVSG9QhspBr8ngTp/N1fSQZsdhfm71wyoLRRJ+FO65Nq1T+3dY8=
+	t=1755179909; cv=none; b=oDa5q7kjt1lOogL63zL9UT+5NkJogQSlNEI6L/UQ2qWkxs/Q/NP6rslYZhoxE9I/MGfKXmPQ8SmcwwRVhiruPCi6wtSPP9KOxZOQnaoWsG4lPlTvIKyS9B9M+rvoaAUziDms6BFSdOMj0hAx0cGkRS8kDqJ6pLkGtH79UHNnPb8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755179935; c=relaxed/simple;
-	bh=jJ6eAoS4S9qMqv0Q+KveUP/4ha7/0g4ywvSE1j78Wkw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=awVIgYPSX/BeHDwiZ/2jfK56yJnF8VGuzhUy9bSvWWpLqttU4lbTDlohBlum65jBBckZTfgudaCr4g2tJ4Zy6BzkTbJceXuivgX5l0ocxznZNVYRe5cCT0w4TOqkunYS299gJ2agufzVh3/HIk/GS8jJamIS0zhA+dG2Pwpx6dk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=CWxKYeJN; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 1AE364440F;
-	Thu, 14 Aug 2025 13:58:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1755179924;
+	s=arc-20240116; t=1755179909; c=relaxed/simple;
+	bh=Sj05B51cgUZ0avxrLKp2IoXo48UYNcdTKdECpYc91ZE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qJexF8jdMCnmod8Mrbibg7wFLk/oShboZbaCGOhBQ7H8mAuJ5YkxMLyRf0d9Cfr6OJKll6xLylJafs7BfNVH7VKEVtcFVFarMBUx2zeRaeIAiISxa/ZvPXtF+5ogaMuQClYFF0MKi75dCzRd1ojz6rkkKaOIeWAvf9AydFMZqk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VYJRLnvQ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1755179907;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=w/yqSwRvXqVvYfzjZo7nUqBHSWqW6ckF9rNnJTRjDn0=;
-	b=CWxKYeJNLCX1CgzzSXxoDtkq49niLL8KndOsNfCE5PAA/147S+PVLyDrq3492jLVBWvwvj
-	M5Wj/kNfA+FO9hu5Na5Grs1WBlTsmm61MtZmFE9/AydRMpPadmm6BqHZEVBM1ppo3m3H5U
-	fimahpS6mCgU46PswEUEgnSAtPSYasNloE6z5OEf7X2erYkFrR67sN9DKZOHuDqBoI0X+t
-	N1x9BPdXP4XjG4zFzKtceBuy4JlSl68OPMayoozsReLhJyP4L0SEXXc9bbOg7Gvmz82xdl
-	Xc1ovK9HeB2Hh4KnAW8th/MnDsqQqAYyXDya+ReK8XVCEyQM4qapOQpLKVq64Q==
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: davem@davemloft.net
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	thomas.petazzoni@bootlin.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
-	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	=?UTF-8?q?Nicol=C3=B2=20Veronese?= <nicveronese@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	mwojtas@chromium.org,
-	Antoine Tenart <atenart@kernel.org>,
-	devicetree@vger.kernel.org,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-Subject: [PATCH net-next v11 03/16] net: ethtool: Introduce ETHTOOL_LINK_MEDIUM_* values
-Date: Thu, 14 Aug 2025 15:58:18 +0200
-Message-ID: <20250814135832.174911-4-maxime.chevallier@bootlin.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250814135832.174911-1-maxime.chevallier@bootlin.com>
-References: <20250814135832.174911-1-maxime.chevallier@bootlin.com>
+	bh=BVBR8FmgN4jHo2BlS19vumM6w1Y3dIr/gXLy3u4Ko18=;
+	b=VYJRLnvQrYMKSxhXhTAjf3jcQd7whfjxQ1j5RiGn0ehqqgs5iMj8mOmcCVnuL+1L3zH4kM
+	NLvB3pmTmIASvh46W/zKx2YDGgmZQiFTz7YL/noiE6N7V7xAYqqEoScmc2i91u+aFESc0E
+	zGgKksP85vQMuDUDn49gbhh+fQwyly0=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-399-NNkhmXEUNlOsCiLyGTSyXA-1; Thu, 14 Aug 2025 09:58:23 -0400
+X-MC-Unique: NNkhmXEUNlOsCiLyGTSyXA-1
+X-Mimecast-MFC-AGG-ID: NNkhmXEUNlOsCiLyGTSyXA_1755179903
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3b9edf80ddcso374706f8f.3
+        for <netdev@vger.kernel.org>; Thu, 14 Aug 2025 06:58:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755179903; x=1755784703;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BVBR8FmgN4jHo2BlS19vumM6w1Y3dIr/gXLy3u4Ko18=;
+        b=kk1lWdCVhwhYp2iqOvIXXDLvq7GfV0rQHuk3DTD6TlRaYiQ7ZkqbEqPvHBP44FjMww
+         E0Z0O5uVVuB2nOY1lyMgtmOHvXNZ2npbFdVStnZWuhn+Wnk5mBFOjk4Xjsj1fTFvPbH1
+         c5mLcOJ4wcxb8clE4cSU6RqpqWvKVz2FP73Gh6evFdns1nkl/Nf1/pAaiQNEOnEFZi1/
+         1RtjH95nsWnOvdyt5VSBmP0OGjwo0y91ZP6i7p53pUyXjxmj85K7Nskbb1a6KgkRnXpI
+         Ki+C6XxWafWZP5gYKz45y8cMnl3mrZc2YJVG3gmy4mQKisCIxg2HqQ3sWy5edqgnZxmF
+         hxoA==
+X-Forwarded-Encrypted: i=1; AJvYcCVm3XfXbFp5L57fX/k3xaPzRoboUUCHK8r1uWhcOnJOT62IH26OKUX7KRpDSVgAuo8nS8Bj80Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxNgNEt70O8dPalZW+XE1YB6lncu9MAJr2kHztUs1HxcPzgXbyV
+	n8IP5ri86v0Wp99R7IqG9KISFjun1aPcvA1Tr9kp3mvlJk9YLkEPuocBwMC160fcevu9Tu9/5uw
+	gokHJbGO3J3t/4k8hSJfbaLVyRS75/vs4SKLGDAR30yeaHGq/zoHqH2tD2w==
+X-Gm-Gg: ASbGncsMTpeSV2dWNy0mYbOh/orIAYsTW+YQOeyjIN4qRdu+DYaTMDa0eCnEwIpbqI/
+	PIBmQydsvEg3kni2bYvLo8MpAl2PcUQfnQgJCiK0nzuCtZgMPhyy1vwfC30xYL7kw8uxG6L1VDX
+	44XmeCHrJZ2HzZOSUlRDnjmunPjNNuj3mpYNXifyi8Nz8VCVE+sFTOIe3H/fo80yef2+bvR08RT
+	awbd0RCvIrCtDiiSCjnholM/xXbuMlY2+Ti7gLgp1bm0bWQod5HBCLH4FqqNSnzOjcUBMRRwdZ0
+	1sxnJ8Dyu3iR6CHFF+UL1mKKzI7zsRPf9EDNtYO8QGXpQLbxfbUR3fA6sY2uUTwHS0Q0O9RmvB7
+	ZqRzLlA6NR/U=
+X-Received: by 2002:a05:6000:40c9:b0:3b7:944d:e5e6 with SMTP id ffacd0b85a97d-3b9edf34a71mr2743322f8f.36.1755179902783;
+        Thu, 14 Aug 2025 06:58:22 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFXoEiflGNe3WmWcBowH2Gju0nBRddk8NqdmmOXtp4zIxXK7+h/vjKfq1VxVQ4Ii/mi9MO/WQ==
+X-Received: by 2002:a05:6000:40c9:b0:3b7:944d:e5e6 with SMTP id ffacd0b85a97d-3b9edf34a71mr2743285f8f.36.1755179902408;
+        Thu, 14 Aug 2025 06:58:22 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b8f8b1bc81sm28997994f8f.69.2025.08.14.06.58.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 Aug 2025 06:58:21 -0700 (PDT)
+Message-ID: <a6635ce0-a27f-4a3b-845a-7c25f8b58452@redhat.com>
+Date: Thu, 14 Aug 2025 15:58:19 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgddugeduvdeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvfevufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepveegtdffleffleevueellefgjeefvedvjefhheegfefgffdvfeetgeevudetffdtnecukfhppedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjedphhgvlhhopehfvgguohhrrgdrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepfedupdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrk
- hgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqrghrmhdqmhhsmhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehthhhomhgrshdrphgvthgriiiiohhnihessghoohhtlhhinhdrtghomhdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhg
-X-GND-Sasl: maxime.chevallier@bootlin.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v6 09/19] net: psp: update the TCP MSS to reflect
+ PSP packet overhead
+To: Daniel Zahka <daniel.zahka@gmail.com>,
+ Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>, Boris Pismenny <borisp@nvidia.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn
+ <willemb@google.com>, David Ahern <dsahern@kernel.org>,
+ Neal Cardwell <ncardwell@google.com>, Patrisious Haddad
+ <phaddad@nvidia.com>, Raed Salem <raeds@nvidia.com>,
+ Jianbo Liu <jianbol@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>,
+ Rahul Rameshbabu <rrameshbabu@nvidia.com>,
+ Stanislav Fomichev <sdf@fomichev.me>,
+ =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Kiran Kella <kiran.kella@broadcom.com>,
+ Jacob Keller <jacob.e.keller@intel.com>, netdev@vger.kernel.org
+References: <20250812003009.2455540-1-daniel.zahka@gmail.com>
+ <20250812003009.2455540-10-daniel.zahka@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250812003009.2455540-10-daniel.zahka@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-In an effort to have a better representation of Ethernet ports,
-introduce enumeration values representing the various ethernet Mediums.
+On 8/12/25 2:29 AM, Daniel Zahka wrote:
+> @@ -236,6 +237,10 @@ int psp_sock_assoc_set_tx(struct sock *sk, struct psp_dev *psd,
+>  	tcp_write_collapse_fence(sk);
+>  	pas->upgrade_seq = tcp_sk(sk)->rcv_nxt;
+>  
+> +	icsk = inet_csk(sk);
+> +	icsk->icsk_ext_hdr_len += psp_sk_overhead(sk);
 
-This is part of the 802.3 naming convention, for example :
+I'm likely lost, but AFAICS the user-space can successfully call
+multiple times psp_sock_assoc_set_tx() on the same socket, increasing
+icsk->icsk_ext_hdr_len in an unbounded way.
 
-1000 Base T 4
- |    |   | |
- |    |   | \_ lanes (4)
- |    |   \___ Medium (T == Twisted Copper Pairs)
- |    \_______ Baseband transmission
- \____________ Speed
-
- Other example :
-
-10000 Base K X 4
-           | | \_ lanes (4)
-           | \___ encoding (BaseX is 8b/10b while BaseR is 66b/64b)
-           \_____ Medium (K is backplane ethernet)
-
-In the case of representing a physical port, only the medium and number
-of lanes should be relevant. One exception would be 1000BaseX, which is
-currently also used as a medium in what appears to be any of
-1000BaseSX, 1000BaseCX and 1000BaseLX. This was reflected in the mediums
-associated with the 1000BaseX linkmode.
-
-These mediums are set in the net/ethtool/common.c lookup table that
-maintains a list of all linkmodes with their number of lanes, medium,
-encoding, speed and duplex.
-
-One notable exception to this is 100M BaseT Ethernet. 100BaseTX is a
-2-lanes protocol but it will also work on 4-lanes cables, so the lookup
-table contains 2 sets of lane numbers, indicating the min number of lanes
-for a protocol to work and the "nominal" number of lanes as well.
-
-Another set of exceptions are linkmodes such 100000baseLR4_ER4, where
-the same link mode seems to represent 100GBaseLR4 and 100GBaseER4. The
-macro __DEFINE_LINK_MODE_PARAMS_MEDIUMS is here used to populate the
-.mediums bitfield with all appropriate mediums.
-
-Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
-Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
----
- drivers/net/phy/phy_caps.c   |   8 ++
- include/linux/ethtool.h      |  18 ++-
- include/uapi/linux/ethtool.h |  20 +++
- net/ethtool/common.c         | 265 +++++++++++++++++++++--------------
- 4 files changed, 199 insertions(+), 112 deletions(-)
-
-diff --git a/drivers/net/phy/phy_caps.c b/drivers/net/phy/phy_caps.c
-index 2cc9ee97e867..990c36ccd9e7 100644
---- a/drivers/net/phy/phy_caps.c
-+++ b/drivers/net/phy/phy_caps.c
-@@ -78,6 +78,14 @@ int phy_caps_init(void)
- 	/* Fill the caps array from net/ethtool/common.c */
- 	for (i = 0; i < __ETHTOOL_LINK_MODE_MASK_NBITS; i++) {
- 		linkmode = &link_mode_params[i];
-+
-+		/* Sanity check the linkmodes array for number of lanes */
-+		if (linkmode->lanes < linkmode->min_lanes) {
-+			pr_err("Lanes count must not be under min_lanes for linkmode %d\n",
-+			       i);
-+			return -EINVAL;
-+		}
-+
- 		capa = speed_duplex_to_capa(linkmode->speed, linkmode->duplex);
- 
- 		if (capa < 0) {
-diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
-index de5bd76a400c..a0696cb840f7 100644
---- a/include/linux/ethtool.h
-+++ b/include/linux/ethtool.h
-@@ -216,13 +216,25 @@ static inline u8 *ethtool_rxfh_context_key(struct ethtool_rxfh_context *ctx)
- void ethtool_rxfh_context_lost(struct net_device *dev, u32 context_id);
- 
- struct link_mode_info {
--	int                             speed;
--	u8                              lanes;
--	u8                              duplex;
-+	int	speed;
-+	u8	min_lanes;
-+	u8	lanes;
-+	u8	duplex;
-+	u16	mediums;
- };
- 
- extern const struct link_mode_info link_mode_params[];
- 
-+extern const char ethtool_link_medium_names[][ETH_GSTRING_LEN];
-+
-+static inline const char *phy_mediums(enum ethtool_link_medium medium)
-+{
-+	if (medium >= __ETHTOOL_LINK_MEDIUM_LAST)
-+		return "unknown";
-+
-+	return ethtool_link_medium_names[medium];
-+}
-+
- /* declare a link mode bitmap */
- #define __ETHTOOL_DECLARE_LINK_MODE_MASK(name)		\
- 	DECLARE_BITMAP(name, __ETHTOOL_LINK_MODE_MASK_NBITS)
-diff --git a/include/uapi/linux/ethtool.h b/include/uapi/linux/ethtool.h
-index 8bd5ea5469d9..6ed235053aed 100644
---- a/include/uapi/linux/ethtool.h
-+++ b/include/uapi/linux/ethtool.h
-@@ -2587,4 +2587,24 @@ enum phy_upstream {
- 	PHY_UPSTREAM_PHY,
- };
- 
-+enum ethtool_link_medium {
-+	ETHTOOL_LINK_MEDIUM_BASET = 0,
-+	ETHTOOL_LINK_MEDIUM_BASEK,
-+	ETHTOOL_LINK_MEDIUM_BASES,
-+	ETHTOOL_LINK_MEDIUM_BASEC,
-+	ETHTOOL_LINK_MEDIUM_BASEL,
-+	ETHTOOL_LINK_MEDIUM_BASED,
-+	ETHTOOL_LINK_MEDIUM_BASEE,
-+	ETHTOOL_LINK_MEDIUM_BASEF,
-+	ETHTOOL_LINK_MEDIUM_BASEV,
-+	ETHTOOL_LINK_MEDIUM_BASEMLD,
-+	ETHTOOL_LINK_MEDIUM_NONE,
-+
-+	__ETHTOOL_LINK_MEDIUM_LAST,
-+};
-+
-+#define ETHTOOL_MEDIUM_FIBER_BITS (BIT(ETHTOOL_LINK_MEDIUM_BASES) | \
-+				   BIT(ETHTOOL_LINK_MEDIUM_BASEL) | \
-+				   BIT(ETHTOOL_LINK_MEDIUM_BASEF))
-+
- #endif /* _UAPI_LINUX_ETHTOOL_H */
-diff --git a/net/ethtool/common.c b/net/ethtool/common.c
-index 57290fdb7193..163b76629b27 100644
---- a/net/ethtool/common.c
-+++ b/net/ethtool/common.c
-@@ -281,12 +281,32 @@ static_assert(ARRAY_SIZE(link_mode_names) == __ETHTOOL_LINK_MODE_MASK_NBITS);
- #define __LINK_MODE_LANES_DR8_2		8
- #define __LINK_MODE_LANES_T1BRR		1
- 
--#define __DEFINE_LINK_MODE_PARAMS(_speed, _type, _duplex)	\
-+#define __DEFINE_LINK_MODE_PARAMS_LANES(_speed, _type, _min_lanes, _lanes, _duplex, _medium) \
- 	[ETHTOOL_LINK_MODE(_speed, _type, _duplex)] = {		\
- 		.speed  = SPEED_ ## _speed, \
-+		.min_lanes  = _min_lanes, \
-+		.lanes  = _lanes, \
-+		.duplex	= __DUPLEX_ ## _duplex, \
-+		.mediums = BIT(ETHTOOL_LINK_MEDIUM_BASE ## _medium) \
-+	}
-+
-+#define __DEFINE_LINK_MODE_PARAMS(_speed, _type, _duplex, _medium)	\
-+	[ETHTOOL_LINK_MODE(_speed, _type, _duplex)] = {		\
-+		.speed  = SPEED_ ## _speed, \
-+		.min_lanes  = __LINK_MODE_LANES_ ## _type, \
-+		.lanes  = __LINK_MODE_LANES_ ## _type, \
-+		.duplex	= __DUPLEX_ ## _duplex, \
-+		.mediums = BIT(ETHTOOL_LINK_MEDIUM_BASE ## _medium) \
-+	}
-+#define __DEFINE_LINK_MODE_PARAMS_MEDIUMS(_speed, _type, _duplex, _mediums)	\
-+	[ETHTOOL_LINK_MODE(_speed, _type, _duplex)] = {		\
-+		.speed  = SPEED_ ## _speed, \
-+		.min_lanes  = __LINK_MODE_LANES_ ## _type, \
- 		.lanes  = __LINK_MODE_LANES_ ## _type, \
--		.duplex	= __DUPLEX_ ## _duplex \
-+		.duplex	= __DUPLEX_ ## _duplex, \
-+		.mediums = (_mediums) \
- 	}
-+#define __MED(_medium)	(BIT(ETHTOOL_LINK_MEDIUM_BASE ## _medium))
- #define __DUPLEX_Half DUPLEX_HALF
- #define __DUPLEX_Full DUPLEX_FULL
- #define __DEFINE_SPECIAL_MODE_PARAMS(_mode) \
-@@ -294,138 +314,165 @@ static_assert(ARRAY_SIZE(link_mode_names) == __ETHTOOL_LINK_MODE_MASK_NBITS);
- 		.speed	= SPEED_UNKNOWN, \
- 		.lanes	= 0, \
- 		.duplex	= DUPLEX_UNKNOWN, \
-+		.mediums = BIT(ETHTOOL_LINK_MEDIUM_NONE), \
- 	}
- 
- const struct link_mode_info link_mode_params[] = {
--	__DEFINE_LINK_MODE_PARAMS(10, T, Half),
--	__DEFINE_LINK_MODE_PARAMS(10, T, Full),
--	__DEFINE_LINK_MODE_PARAMS(100, T, Half),
--	__DEFINE_LINK_MODE_PARAMS(100, T, Full),
--	__DEFINE_LINK_MODE_PARAMS(1000, T, Half),
--	__DEFINE_LINK_MODE_PARAMS(1000, T, Full),
-+	__DEFINE_LINK_MODE_PARAMS_LANES(10, T, 2, 4, Half, T),
-+	__DEFINE_LINK_MODE_PARAMS_LANES(10, T, 2, 4, Full, T),
-+	__DEFINE_LINK_MODE_PARAMS_LANES(100, T, 2, 4, Half, T),
-+	__DEFINE_LINK_MODE_PARAMS_LANES(100, T, 2, 4, Full, T),
-+	__DEFINE_LINK_MODE_PARAMS(1000, T, Half, T),
-+	__DEFINE_LINK_MODE_PARAMS(1000, T, Full, T),
- 	__DEFINE_SPECIAL_MODE_PARAMS(Autoneg),
- 	__DEFINE_SPECIAL_MODE_PARAMS(TP),
- 	__DEFINE_SPECIAL_MODE_PARAMS(AUI),
- 	__DEFINE_SPECIAL_MODE_PARAMS(MII),
- 	__DEFINE_SPECIAL_MODE_PARAMS(FIBRE),
- 	__DEFINE_SPECIAL_MODE_PARAMS(BNC),
--	__DEFINE_LINK_MODE_PARAMS(10000, T, Full),
-+	__DEFINE_LINK_MODE_PARAMS(10000, T, Full, T),
- 	__DEFINE_SPECIAL_MODE_PARAMS(Pause),
- 	__DEFINE_SPECIAL_MODE_PARAMS(Asym_Pause),
--	__DEFINE_LINK_MODE_PARAMS(2500, X, Full),
-+	__DEFINE_LINK_MODE_PARAMS_MEDIUMS(2500, X, Full,
-+					  __MED(C) | __MED(S) | __MED(L)),
- 	__DEFINE_SPECIAL_MODE_PARAMS(Backplane),
--	__DEFINE_LINK_MODE_PARAMS(1000, KX, Full),
--	__DEFINE_LINK_MODE_PARAMS(10000, KX4, Full),
--	__DEFINE_LINK_MODE_PARAMS(10000, KR, Full),
-+	__DEFINE_LINK_MODE_PARAMS(1000, KX, Full, K),
-+	__DEFINE_LINK_MODE_PARAMS(10000, KX4, Full, K),
-+	__DEFINE_LINK_MODE_PARAMS(10000, KR, Full, K),
- 	[ETHTOOL_LINK_MODE_10000baseR_FEC_BIT] = {
- 		.speed	= SPEED_10000,
- 		.lanes	= 1,
- 		.duplex = DUPLEX_FULL,
- 	},
--	__DEFINE_LINK_MODE_PARAMS(20000, MLD2, Full),
--	__DEFINE_LINK_MODE_PARAMS(20000, KR2, Full),
--	__DEFINE_LINK_MODE_PARAMS(40000, KR4, Full),
--	__DEFINE_LINK_MODE_PARAMS(40000, CR4, Full),
--	__DEFINE_LINK_MODE_PARAMS(40000, SR4, Full),
--	__DEFINE_LINK_MODE_PARAMS(40000, LR4, Full),
--	__DEFINE_LINK_MODE_PARAMS(56000, KR4, Full),
--	__DEFINE_LINK_MODE_PARAMS(56000, CR4, Full),
--	__DEFINE_LINK_MODE_PARAMS(56000, SR4, Full),
--	__DEFINE_LINK_MODE_PARAMS(56000, LR4, Full),
--	__DEFINE_LINK_MODE_PARAMS(25000, CR, Full),
--	__DEFINE_LINK_MODE_PARAMS(25000, KR, Full),
--	__DEFINE_LINK_MODE_PARAMS(25000, SR, Full),
--	__DEFINE_LINK_MODE_PARAMS(50000, CR2, Full),
--	__DEFINE_LINK_MODE_PARAMS(50000, KR2, Full),
--	__DEFINE_LINK_MODE_PARAMS(100000, KR4, Full),
--	__DEFINE_LINK_MODE_PARAMS(100000, SR4, Full),
--	__DEFINE_LINK_MODE_PARAMS(100000, CR4, Full),
--	__DEFINE_LINK_MODE_PARAMS(100000, LR4_ER4, Full),
--	__DEFINE_LINK_MODE_PARAMS(50000, SR2, Full),
--	__DEFINE_LINK_MODE_PARAMS(1000, X, Full),
--	__DEFINE_LINK_MODE_PARAMS(10000, CR, Full),
--	__DEFINE_LINK_MODE_PARAMS(10000, SR, Full),
--	__DEFINE_LINK_MODE_PARAMS(10000, LR, Full),
--	__DEFINE_LINK_MODE_PARAMS(10000, LRM, Full),
--	__DEFINE_LINK_MODE_PARAMS(10000, ER, Full),
--	__DEFINE_LINK_MODE_PARAMS(2500, T, Full),
--	__DEFINE_LINK_MODE_PARAMS(5000, T, Full),
-+	__DEFINE_LINK_MODE_PARAMS(20000, MLD2, Full, MLD),
-+	__DEFINE_LINK_MODE_PARAMS(20000, KR2, Full, K),
-+	__DEFINE_LINK_MODE_PARAMS(40000, KR4, Full, K),
-+	__DEFINE_LINK_MODE_PARAMS(40000, CR4, Full, C),
-+	__DEFINE_LINK_MODE_PARAMS(40000, SR4, Full, S),
-+	__DEFINE_LINK_MODE_PARAMS(40000, LR4, Full, L),
-+	__DEFINE_LINK_MODE_PARAMS(56000, KR4, Full, K),
-+	__DEFINE_LINK_MODE_PARAMS(56000, CR4, Full, C),
-+	__DEFINE_LINK_MODE_PARAMS(56000, SR4, Full, S),
-+	__DEFINE_LINK_MODE_PARAMS(56000, LR4, Full, L),
-+	__DEFINE_LINK_MODE_PARAMS(25000, CR, Full, C),
-+	__DEFINE_LINK_MODE_PARAMS(25000, KR, Full, K),
-+	__DEFINE_LINK_MODE_PARAMS(25000, SR, Full, S),
-+	__DEFINE_LINK_MODE_PARAMS(50000, CR2, Full, C),
-+	__DEFINE_LINK_MODE_PARAMS(50000, KR2, Full, K),
-+	__DEFINE_LINK_MODE_PARAMS(100000, KR4, Full, K),
-+	__DEFINE_LINK_MODE_PARAMS(100000, SR4, Full, S),
-+	__DEFINE_LINK_MODE_PARAMS(100000, CR4, Full, C),
-+	__DEFINE_LINK_MODE_PARAMS_MEDIUMS(100000, LR4_ER4, Full,
-+					  __MED(L) | __MED(E)),
-+	__DEFINE_LINK_MODE_PARAMS(50000, SR2, Full, S),
-+	__DEFINE_LINK_MODE_PARAMS_MEDIUMS(1000, X, Full,
-+					  __MED(C) | __MED(S) | __MED(L)),
-+	__DEFINE_LINK_MODE_PARAMS(10000, CR, Full, C),
-+	__DEFINE_LINK_MODE_PARAMS(10000, SR, Full, S),
-+	__DEFINE_LINK_MODE_PARAMS(10000, LR, Full, L),
-+	__DEFINE_LINK_MODE_PARAMS(10000, LRM, Full, L),
-+	__DEFINE_LINK_MODE_PARAMS(10000, ER, Full, E),
-+	__DEFINE_LINK_MODE_PARAMS(2500, T, Full, T),
-+	__DEFINE_LINK_MODE_PARAMS(5000, T, Full, T),
- 	__DEFINE_SPECIAL_MODE_PARAMS(FEC_NONE),
- 	__DEFINE_SPECIAL_MODE_PARAMS(FEC_RS),
- 	__DEFINE_SPECIAL_MODE_PARAMS(FEC_BASER),
--	__DEFINE_LINK_MODE_PARAMS(50000, KR, Full),
--	__DEFINE_LINK_MODE_PARAMS(50000, SR, Full),
--	__DEFINE_LINK_MODE_PARAMS(50000, CR, Full),
--	__DEFINE_LINK_MODE_PARAMS(50000, LR_ER_FR, Full),
--	__DEFINE_LINK_MODE_PARAMS(50000, DR, Full),
--	__DEFINE_LINK_MODE_PARAMS(100000, KR2, Full),
--	__DEFINE_LINK_MODE_PARAMS(100000, SR2, Full),
--	__DEFINE_LINK_MODE_PARAMS(100000, CR2, Full),
--	__DEFINE_LINK_MODE_PARAMS(100000, LR2_ER2_FR2, Full),
--	__DEFINE_LINK_MODE_PARAMS(100000, DR2, Full),
--	__DEFINE_LINK_MODE_PARAMS(200000, KR4, Full),
--	__DEFINE_LINK_MODE_PARAMS(200000, SR4, Full),
--	__DEFINE_LINK_MODE_PARAMS(200000, LR4_ER4_FR4, Full),
--	__DEFINE_LINK_MODE_PARAMS(200000, DR4, Full),
--	__DEFINE_LINK_MODE_PARAMS(200000, CR4, Full),
--	__DEFINE_LINK_MODE_PARAMS(100, T1, Full),
--	__DEFINE_LINK_MODE_PARAMS(1000, T1, Full),
--	__DEFINE_LINK_MODE_PARAMS(400000, KR8, Full),
--	__DEFINE_LINK_MODE_PARAMS(400000, SR8, Full),
--	__DEFINE_LINK_MODE_PARAMS(400000, LR8_ER8_FR8, Full),
--	__DEFINE_LINK_MODE_PARAMS(400000, DR8, Full),
--	__DEFINE_LINK_MODE_PARAMS(400000, CR8, Full),
-+	__DEFINE_LINK_MODE_PARAMS(50000, KR, Full, K),
-+	__DEFINE_LINK_MODE_PARAMS(50000, SR, Full, S),
-+	__DEFINE_LINK_MODE_PARAMS(50000, CR, Full, C),
-+	__DEFINE_LINK_MODE_PARAMS_MEDIUMS(50000, LR_ER_FR, Full,
-+					  __MED(L) | __MED(E) | __MED(F)),
-+	__DEFINE_LINK_MODE_PARAMS(50000, DR, Full, D),
-+	__DEFINE_LINK_MODE_PARAMS(100000, KR2, Full, K),
-+	__DEFINE_LINK_MODE_PARAMS(100000, SR2, Full, S),
-+	__DEFINE_LINK_MODE_PARAMS(100000, CR2, Full, C),
-+	__DEFINE_LINK_MODE_PARAMS_MEDIUMS(100000, LR2_ER2_FR2, Full,
-+					  __MED(L) | __MED(E) | __MED(F)),
-+	__DEFINE_LINK_MODE_PARAMS(100000, DR2, Full, D),
-+	__DEFINE_LINK_MODE_PARAMS(200000, KR4, Full, K),
-+	__DEFINE_LINK_MODE_PARAMS(200000, SR4, Full, S),
-+	__DEFINE_LINK_MODE_PARAMS_MEDIUMS(200000, LR4_ER4_FR4, Full,
-+					  __MED(L) | __MED(E) | __MED(F)),
-+	__DEFINE_LINK_MODE_PARAMS(200000, DR4, Full, D),
-+	__DEFINE_LINK_MODE_PARAMS(200000, CR4, Full, C),
-+	__DEFINE_LINK_MODE_PARAMS(100, T1, Full, T),
-+	__DEFINE_LINK_MODE_PARAMS(1000, T1, Full, T),
-+	__DEFINE_LINK_MODE_PARAMS(400000, KR8, Full, K),
-+	__DEFINE_LINK_MODE_PARAMS(400000, SR8, Full, S),
-+	__DEFINE_LINK_MODE_PARAMS_MEDIUMS(400000, LR8_ER8_FR8, Full,
-+					  __MED(L) | __MED(E) | __MED(F)),
-+	__DEFINE_LINK_MODE_PARAMS(400000, DR8, Full, D),
-+	__DEFINE_LINK_MODE_PARAMS(400000, CR8, Full, C),
- 	__DEFINE_SPECIAL_MODE_PARAMS(FEC_LLRS),
--	__DEFINE_LINK_MODE_PARAMS(100000, KR, Full),
--	__DEFINE_LINK_MODE_PARAMS(100000, SR, Full),
--	__DEFINE_LINK_MODE_PARAMS(100000, LR_ER_FR, Full),
--	__DEFINE_LINK_MODE_PARAMS(100000, DR, Full),
--	__DEFINE_LINK_MODE_PARAMS(100000, CR, Full),
--	__DEFINE_LINK_MODE_PARAMS(200000, KR2, Full),
--	__DEFINE_LINK_MODE_PARAMS(200000, SR2, Full),
--	__DEFINE_LINK_MODE_PARAMS(200000, LR2_ER2_FR2, Full),
--	__DEFINE_LINK_MODE_PARAMS(200000, DR2, Full),
--	__DEFINE_LINK_MODE_PARAMS(200000, CR2, Full),
--	__DEFINE_LINK_MODE_PARAMS(400000, KR4, Full),
--	__DEFINE_LINK_MODE_PARAMS(400000, SR4, Full),
--	__DEFINE_LINK_MODE_PARAMS(400000, LR4_ER4_FR4, Full),
--	__DEFINE_LINK_MODE_PARAMS(400000, DR4, Full),
--	__DEFINE_LINK_MODE_PARAMS(400000, CR4, Full),
--	__DEFINE_LINK_MODE_PARAMS(100, FX, Half),
--	__DEFINE_LINK_MODE_PARAMS(100, FX, Full),
--	__DEFINE_LINK_MODE_PARAMS(10, T1L, Full),
--	__DEFINE_LINK_MODE_PARAMS(800000, CR8, Full),
--	__DEFINE_LINK_MODE_PARAMS(800000, KR8, Full),
--	__DEFINE_LINK_MODE_PARAMS(800000, DR8, Full),
--	__DEFINE_LINK_MODE_PARAMS(800000, DR8_2, Full),
--	__DEFINE_LINK_MODE_PARAMS(800000, SR8, Full),
--	__DEFINE_LINK_MODE_PARAMS(800000, VR8, Full),
--	__DEFINE_LINK_MODE_PARAMS(10, T1S, Full),
--	__DEFINE_LINK_MODE_PARAMS(10, T1S, Half),
--	__DEFINE_LINK_MODE_PARAMS(10, T1S_P2MP, Half),
--	__DEFINE_LINK_MODE_PARAMS(10, T1BRR, Full),
--	__DEFINE_LINK_MODE_PARAMS(200000, CR, Full),
--	__DEFINE_LINK_MODE_PARAMS(200000, KR, Full),
--	__DEFINE_LINK_MODE_PARAMS(200000, DR, Full),
--	__DEFINE_LINK_MODE_PARAMS(200000, DR_2, Full),
--	__DEFINE_LINK_MODE_PARAMS(200000, SR, Full),
--	__DEFINE_LINK_MODE_PARAMS(200000, VR, Full),
--	__DEFINE_LINK_MODE_PARAMS(400000, CR2, Full),
--	__DEFINE_LINK_MODE_PARAMS(400000, KR2, Full),
--	__DEFINE_LINK_MODE_PARAMS(400000, DR2, Full),
--	__DEFINE_LINK_MODE_PARAMS(400000, DR2_2, Full),
--	__DEFINE_LINK_MODE_PARAMS(400000, SR2, Full),
--	__DEFINE_LINK_MODE_PARAMS(400000, VR2, Full),
--	__DEFINE_LINK_MODE_PARAMS(800000, CR4, Full),
--	__DEFINE_LINK_MODE_PARAMS(800000, KR4, Full),
--	__DEFINE_LINK_MODE_PARAMS(800000, DR4, Full),
--	__DEFINE_LINK_MODE_PARAMS(800000, DR4_2, Full),
--	__DEFINE_LINK_MODE_PARAMS(800000, SR4, Full),
--	__DEFINE_LINK_MODE_PARAMS(800000, VR4, Full),
-+	__DEFINE_LINK_MODE_PARAMS(100000, KR, Full, K),
-+	__DEFINE_LINK_MODE_PARAMS(100000, SR, Full, S),
-+	__DEFINE_LINK_MODE_PARAMS_MEDIUMS(100000, LR_ER_FR, Full,
-+					  __MED(L) | __MED(E) | __MED(F)),
-+	__DEFINE_LINK_MODE_PARAMS(100000, DR, Full, D),
-+	__DEFINE_LINK_MODE_PARAMS(100000, CR, Full, C),
-+	__DEFINE_LINK_MODE_PARAMS(200000, KR2, Full, K),
-+	__DEFINE_LINK_MODE_PARAMS(200000, SR2, Full, S),
-+	__DEFINE_LINK_MODE_PARAMS_MEDIUMS(200000, LR2_ER2_FR2, Full,
-+					  __MED(L) | __MED(E) | __MED(F)),
-+	__DEFINE_LINK_MODE_PARAMS(200000, DR2, Full, D),
-+	__DEFINE_LINK_MODE_PARAMS(200000, CR2, Full, C),
-+	__DEFINE_LINK_MODE_PARAMS(400000, KR4, Full, K),
-+	__DEFINE_LINK_MODE_PARAMS(400000, SR4, Full, S),
-+	__DEFINE_LINK_MODE_PARAMS_MEDIUMS(400000, LR4_ER4_FR4, Full,
-+					  __MED(L) | __MED(E) | __MED(F)),
-+	__DEFINE_LINK_MODE_PARAMS(400000, DR4, Full, D),
-+	__DEFINE_LINK_MODE_PARAMS(400000, CR4, Full, C),
-+	__DEFINE_LINK_MODE_PARAMS(100, FX, Half, F),
-+	__DEFINE_LINK_MODE_PARAMS(100, FX, Full, F),
-+	__DEFINE_LINK_MODE_PARAMS(10, T1L, Full, T),
-+	__DEFINE_LINK_MODE_PARAMS(800000, CR8, Full, C),
-+	__DEFINE_LINK_MODE_PARAMS(800000, KR8, Full, K),
-+	__DEFINE_LINK_MODE_PARAMS(800000, DR8, Full, D),
-+	__DEFINE_LINK_MODE_PARAMS(800000, DR8_2, Full, D),
-+	__DEFINE_LINK_MODE_PARAMS(800000, SR8, Full, S),
-+	__DEFINE_LINK_MODE_PARAMS(800000, VR8, Full, V),
-+	__DEFINE_LINK_MODE_PARAMS(10, T1S, Full, T),
-+	__DEFINE_LINK_MODE_PARAMS(10, T1S, Half, T),
-+	__DEFINE_LINK_MODE_PARAMS(10, T1S_P2MP, Half, T),
-+	__DEFINE_LINK_MODE_PARAMS(10, T1BRR, Full, T),
-+	__DEFINE_LINK_MODE_PARAMS(200000, CR, Full, C),
-+	__DEFINE_LINK_MODE_PARAMS(200000, KR, Full, K),
-+	__DEFINE_LINK_MODE_PARAMS(200000, DR, Full, D),
-+	__DEFINE_LINK_MODE_PARAMS(200000, DR_2, Full, D),
-+	__DEFINE_LINK_MODE_PARAMS(200000, SR, Full, S),
-+	__DEFINE_LINK_MODE_PARAMS(200000, VR, Full, V),
-+	__DEFINE_LINK_MODE_PARAMS(400000, CR2, Full, C),
-+	__DEFINE_LINK_MODE_PARAMS(400000, KR2, Full, K),
-+	__DEFINE_LINK_MODE_PARAMS(400000, DR2, Full, D),
-+	__DEFINE_LINK_MODE_PARAMS(400000, DR2_2, Full, D),
-+	__DEFINE_LINK_MODE_PARAMS(400000, SR2, Full, S),
-+	__DEFINE_LINK_MODE_PARAMS(400000, VR2, Full, V),
-+	__DEFINE_LINK_MODE_PARAMS(800000, CR4, Full, C),
-+	__DEFINE_LINK_MODE_PARAMS(800000, KR4, Full, K),
-+	__DEFINE_LINK_MODE_PARAMS(800000, DR4, Full, D),
-+	__DEFINE_LINK_MODE_PARAMS(800000, DR4_2, Full, D),
-+	__DEFINE_LINK_MODE_PARAMS(800000, SR4, Full, S),
-+	__DEFINE_LINK_MODE_PARAMS(800000, VR4, Full, V),
- };
- static_assert(ARRAY_SIZE(link_mode_params) == __ETHTOOL_LINK_MODE_MASK_NBITS);
- EXPORT_SYMBOL_GPL(link_mode_params);
- 
-+const char ethtool_link_medium_names[][ETH_GSTRING_LEN] = {
-+	[ETHTOOL_LINK_MEDIUM_BASET] = "BaseT",
-+	[ETHTOOL_LINK_MEDIUM_BASEK] = "BaseK",
-+	[ETHTOOL_LINK_MEDIUM_BASES] = "BaseS",
-+	[ETHTOOL_LINK_MEDIUM_BASEC] = "BaseC",
-+	[ETHTOOL_LINK_MEDIUM_BASEL] = "BaseL",
-+	[ETHTOOL_LINK_MEDIUM_BASED] = "BaseD",
-+	[ETHTOOL_LINK_MEDIUM_BASEE] = "BaseE",
-+	[ETHTOOL_LINK_MEDIUM_BASEF] = "BaseF",
-+	[ETHTOOL_LINK_MEDIUM_BASEV] = "BaseV",
-+	[ETHTOOL_LINK_MEDIUM_BASEMLD] = "BaseMLD",
-+	[ETHTOOL_LINK_MEDIUM_NONE] = "None",
-+};
-+static_assert(ARRAY_SIZE(ethtool_link_medium_names) == __ETHTOOL_LINK_MEDIUM_LAST);
-+EXPORT_SYMBOL_GPL(ethtool_link_medium_names);
-+
- const char netif_msg_class_names[][ETH_GSTRING_LEN] = {
- 	[NETIF_MSG_DRV_BIT]		= "drv",
- 	[NETIF_MSG_PROBE_BIT]		= "probe",
--- 
-2.49.0
+/P
 
 
