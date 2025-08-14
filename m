@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-213740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213742-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BE88B26756
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 15:31:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE488B26791
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 15:37:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E1448B654E1
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 13:29:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7850681C6A
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 13:31:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 611713093B7;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1E9C3093D6;
 	Thu, 14 Aug 2025 13:27:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KEdqg1Yd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kfyWV+U6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D89B3090EB;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69FAA3090EE;
 	Thu, 14 Aug 2025 13:27:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755178061; cv=none; b=OmMOlpOHVowSPWpZC4AX1GMnD87PTdelflhtiYxZMRTllFWfRr10Bv/bL3aZp5Gy5XA74GlKcp5RhEEChX/HhGBGaoVBC9BUCewzoJdN4KhQRdzhfQR0GdqW6d1/lzffBTBbV0IJhQl1PCmezWUbezLIj6rrYxNec573Mbwmf1g=
+	t=1755178061; cv=none; b=Lo5OFNnC5d/dOiaHiVrAXkqdYm584tkVPsePFXi4G5ML6x4Br1CUoDgsZEHtT87b54I3Npvqt+q8zxIWWmYvHtL3NMF6x3pUNxY/ndbkIzCEGsB8hdQx1xHexO7RERMEGF67P7RSbiQoPdWlxsLuGmh4rxN7IebsjT3OGznOvQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1755178061; c=relaxed/simple;
-	bh=b6lC4ZSVXYJBSXWp8PVJkxW58MFM6DlbxSmvqDbSojc=;
+	bh=SjmIx/7UYqo0E3Lk3QlSBDqsTZwOnTbDmEwieZU3ytk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lnCqWd7Kc8iQlif6VTT67wo+JoK2x/y9jALzzPvdm1hP8fC2xUoSoUw+xKPUnC0FMyH5OkkfH6k6uot3rujLQoBATl6r3T93y8sWD1yx8gWPvyO/MHsKIfZatkuYNJZsIXwzz4jU5xxsTHPpbhKIZ2+cZA/63Vzbn5qYsixykIE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KEdqg1Yd; arc=none smtp.client-ip=209.85.222.178
+	 MIME-Version; b=oHancxTIbCrgk7kocaoyVFoyCO+MDfD1SsPrviRLLugaDMifvBqgvbFXEy1fKWVc0bSeNoqGO/oykuSFqp1G3Yv7bNngdXUtzFWWG9BpnEy2mZSdr3cxhRE8nwnMVCkDWLR15N+dOLbC/LUXLEHC+DCY+jJYNZWHYurRgESmpEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kfyWV+U6; arc=none smtp.client-ip=209.85.160.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7e87055e1b6so123653685a.1;
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-4b109c59dc9so12709521cf.3;
         Thu, 14 Aug 2025 06:27:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20230601; t=1755178058; x=1755782858; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=29A7/5VAiM4GENNkvHC0nxXXa/DMb3GN/z+XG3NOojE=;
-        b=KEdqg1YdXScoGZCH3vK5ONjIOoZCxvAzgIDArAuB76FYhkr3z8sydcXxo7TvyPmMjm
-         jEuvH340HURkI2C1vrIxSC1GinCM23YXluyrQWOYsi7/j64Qk+oLRGsbWlJQkZuAvx1g
-         4Mjbhjhd5vpz6dualzXGOu7CehBdB2R3fT7PIv5cK1HD44aTbSioBMXinK+B3yASVdfi
-         nJ+DpLCq5ctF4DO+52Rg0tN8eI2PUAikbDmVGXK7DGDOoV2H4cmuPRnrzQl5+J623W1L
-         Vp7DIGtSf/jQTjM8ihvgp6QBwpkvr3TS3lVYW7/HrtroUJXCVmvxestkqOGYHy4QOIKU
-         PIZg==
+        bh=4DSJYyfSqFn8j16S+PLjAxzeMGdVIa+W/VtNYnJwCE4=;
+        b=kfyWV+U6m09kQ/yykx7q6CHteBUcHqosAUdna3VF1XoGDsm2XIKs7FC1v6R7sywiUe
+         b5QtwijE3Cki2nd6ygkUuJEo7cZKvrCCI4I/HdbqBArneh0POe+LJ8HGfu/PorRjhuIU
+         3KGCbfCGwXpPYGQ60WPFY7xfHPiE64rvi/P6ToSd/BX44Hrbg2pzANUrULLw5+BYk8PB
+         jdrs4G1yjwQkjapfqHWm9wgnA8zB9rBNoIhlM5zAa95YD5jjTh7vXKM7Q7mtxRQw1r0j
+         BX0CdQlrBA3q6+yb/epOe7QVxZ0iHhW8ZBrpqVHsflX5qksqb+9TqJ2YPMdkY+bSv2xa
+         PaZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1755178058; x=1755782858;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=29A7/5VAiM4GENNkvHC0nxXXa/DMb3GN/z+XG3NOojE=;
-        b=d3mFKtzRLZcvz4y7uYfxRvN9UspcFYHwO1SF9+ghN4hlxaasZVhAz2qImO5Slceqok
-         7p9cG1YzigqBIR1+Ivk7vtlWgt5c6oDtK8vl0R6GinXF4OgOZRSpV141dd4LY49gZWPA
-         4dbN7eUhCn/wYXaZpBhlkqer91EP3LQtsYswlIDGpYHE8grRFCsOteedMsqu/c0qsiHW
-         9DcPe2pgkCKgnWPSHAdFdRwEzAG7X2QnQekORPU9suv4YpU1yB5laIFDwW9+6lUFA6cG
-         8g0483PgSrtTZAz7sDJOrEtMBLMMl+0m4Hatd+2a2yATUHr16sEwK3WqKwwbTlcognjx
-         XXAw==
-X-Forwarded-Encrypted: i=1; AJvYcCXUPnxNHKk1AN8tfOWqHC3DX2BnVtdPMFhbSQ+ugQdQ+/L/e3LlxM2PYi1Hz4VbE2mEjlROijU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyMMLcGxUyyYmzOaEAORqBrk4jD9Lk0K9loBC5EgFD3BtfwKdkc
-	BpqbbXCQhxc8xkbyd7x9Mfl8lpt4173zS/9Drej8UO0g2Gmq/RwdQfIotrZBCQ==
-X-Gm-Gg: ASbGnct0uHeVK134hc7Gv7a24+GYsx4pehbYcXglWqUtUeNjZa5anycmvynlxJRQqRj
-	9WcMmt9ERzl5jbg2BEvNqVv3cXuMp4QFqZGbAgcNxPWvqDWxm0acv2qPDgSqgoQwBW+bNdeEJHY
-	qnKN7iZi58kJ8tNGqf9NdGj2YTdKl57KyAwA8TcpxFinyIRyBgMOdSePw/agolOQ/0atdm74Env
-	NWJMTbwY8aVZfs3Xg3YDlMEA7Eu7jxrAV7mlu8O81DSOeLIoTTaxwuXALdY6sfZOkvUFLLurwnx
-	W7J6eROARKVLFYtimcSoKmJO4saH/bnSKfp7a1rim/EPh/4EwzROFpDV/mbVmAkjSsmFYhV1Mjd
-	mFb+TD44QRE3Cb5qQ86UgXb4nu3MBU2/Ti6VHai/WdnhwCSOKTaMxyDR6vw2Ev796G0sKH9FI1D
-	AodL2Jjbz/VezZLeYUpV+ZEZkAtQ==
-X-Google-Smtp-Source: AGHT+IHq9MNLDGGUsMzyQheCVcx8ogSK9KhDhseDZrMGhouTj/aVyB+i8uoNhUwj7l36T5T1vanTuw==
-X-Received: by 2002:a05:620a:2954:b0:7e8:5bb:b398 with SMTP id af79cd13be357-7e870290994mr443410185a.9.1755178057575;
-        Thu, 14 Aug 2025 06:27:37 -0700 (PDT)
+        bh=4DSJYyfSqFn8j16S+PLjAxzeMGdVIa+W/VtNYnJwCE4=;
+        b=P064eeAaWQi0rRYb/ayvUgfiMylC9jVz4rJua5PIRtw+EatxBst7f5ueA8rEw2TyWz
+         ShsDvUHrTZcVJiKp1nKdLeE+Ah+HKYI89JHEEeZ4YaTx2qlkn+N7n3TEWpeGclPPQoYu
+         V630Y6qXDvgKK7HKP2mRiggvd6fIXR4uPFeU3/sNZK5UbIIoQoKdoeNfHUABi4NjXaAx
+         vRc1kDe25Zpay60TGv9KFn4jLEiDOGhYCVZKzm787hUCo/eAX4IwxR4SOAvp+ItLs9dZ
+         z4hlFvvUOU2bXtIVd/IH/3/FYgzErEYWI4ta6w5EBvEDZ8xXC2E5jy+ACTA+0TOxgsqH
+         FQQg==
+X-Forwarded-Encrypted: i=1; AJvYcCWkL7lHAIlpX2ARz8InKGB9wph/dEEapHCzjzcoj8VycwsEouHzA4IqZ5GsPqC7JvAQkYaLWD8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxIIdmJlYVJt0gM27wjwBd42qotYu+LeO745I8Ph4xVb693TeQG
+	kiDBtCHD1HruYJ/1qnyzAJ0+YGQsDhjzajbtyqYZBtxZIpCIb+/UFX5ZClmaFA==
+X-Gm-Gg: ASbGncsn0vlGO9bxoeS/jNLv3+GgnudkhzCEncpvjOyyz411rAK7xE2Gi/rEH37QBx+
+	+BtIOOKpraEPz+9eSn5QQZWbiZ0mts5/ic3PpTJyM3IMlE1QzJh22hxbcmS2HnXvha0KnGq0yMj
+	orEEA9XaD/ri6hciegfCt6/x0X6ZULdEtZ5+v6v0e9DVDqAnj9+iy8xV9L9+Wb+7JnvpZFlrdUj
+	qXZUcgwvDcWTsbjZg7wHZ5vYxKBnjePTdNpq12QaTnhN+4YMeBd0f77iWGqsnbipNI/VoFBX1i4
+	sKvn8l94r/LtEmn/9atcus7QyHK4aw3Pa9oWahJPjG/qEHtYu0w4xVkjwUP6bKOLsWTLXuppSxK
+	RusdMfCJng8LhpD6mHnb594sqdxVewRqqp397jlUfZX2i5I7IU2twNKtOW+oMcZ+LsOuuWymtkc
+	7MmCWFfGzE8cqaW1kLzxlTE7C8dQ==
+X-Google-Smtp-Source: AGHT+IElvq+1fRLAvqBKzj+c7hUGYldxhC5067lL7e8OyQip6/a1K3ccj+aT/R3BHfgmd+MbcnHdqQ==
+X-Received: by 2002:a05:622a:2d5:b0:4af:3b7:7011 with SMTP id d75a77b69052e-4b10aa6b7a0mr42504171cf.35.1755178058251;
+        Thu, 14 Aug 2025 06:27:38 -0700 (PDT)
 Received: from fedora.. (ec2-52-70-167-183.compute-1.amazonaws.com. [52.70.167.183])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4b0733088e1sm153587391cf.61.2025.08.14.06.27.36
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4b0733088e1sm153587391cf.61.2025.08.14.06.27.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Aug 2025 06:27:36 -0700 (PDT)
+        Thu, 14 Aug 2025 06:27:37 -0700 (PDT)
 From: Stephen Smalley <stephen.smalley.work@gmail.com>
 To: selinux@vger.kernel.org
 Cc: paul@paul-moore.com,
@@ -81,9 +81,9 @@ Cc: paul@paul-moore.com,
 	netdev@vger.kernel.org,
 	horms@kernel.org,
 	Stephen Smalley <stephen.smalley.work@gmail.com>
-Subject: [PATCH v7 35/42] selinux: annotate selinuxfs permission checks
-Date: Thu, 14 Aug 2025 09:26:26 -0400
-Message-ID: <20250814132637.1659-36-stephen.smalley.work@gmail.com>
+Subject: [PATCH v7 36/42] selinux: annotate process transition permission checks
+Date: Thu, 14 Aug 2025 09:26:27 -0400
+Message-ID: <20250814132637.1659-37-stephen.smalley.work@gmail.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250814132637.1659-1-stephen.smalley.work@gmail.com>
 References: <20250814132637.1659-1-stephen.smalley.work@gmail.com>
@@ -95,201 +95,134 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Annotate the selinuxfs permission checks with comments
-explaining why we only check permissions against the
-current SELinux namespace (because these operations only
-read or modify the state of the current SELinux namespace).
-If we were instead to check permissions against ancestor
-namespaces, we would need to be allowed by the ancestor
-policies to perform the same operation in those namespaces,
-which would be undesirable.
+Annotate all process transition-related permission checks that are only
+performed against the current SELinux namespace and not ancestors with
+comments. These checks are only applied against the current namespace
+because the process SID only changes in the current namespace; the SID
+in ancestor namespaces remains unchanged.
 
 Signed-off-by: Stephen Smalley <stephen.smalley.work@gmail.com>
 ---
- security/selinux/selinuxfs.c | 65 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 65 insertions(+)
+ security/selinux/hooks.c | 46 ++++++++++++++++++++++++++++++++++------
+ 1 file changed, 40 insertions(+), 6 deletions(-)
 
-diff --git a/security/selinux/selinuxfs.c b/security/selinux/selinuxfs.c
-index be78b71b7fcd..b1ce3a98a241 100644
---- a/security/selinux/selinuxfs.c
-+++ b/security/selinux/selinuxfs.c
-@@ -175,6 +175,10 @@ static ssize_t sel_write_enforce(struct file *file, const char __user *buf,
+diff --git a/security/selinux/hooks.c b/security/selinux/hooks.c
+index 8a32f5655980..e35b3fb16bb8 100644
+--- a/security/selinux/hooks.c
++++ b/security/selinux/hooks.c
+@@ -2395,19 +2395,23 @@ static int selinux_bprm_creds_for_exec(struct linux_binprm *bprm)
+ 		if (rc)
+ 			return rc;
+ 	} else {
++		/* Check permissions for the transition. */
+ 		/*
+ 		 * Only check against the current SELinux namespace
+ 		 * because only the SID in the current namespace
+ 		 * is changed by a transition.
+ 		 */
+-
+-		/* Check permissions for the transition. */
+ 		rc = avc_has_perm(current_selinux_state,
+ 				  old_tsec->sid, new_tsec->sid,
+ 				  SECCLASS_PROCESS, PROCESS__TRANSITION, &ad);
+ 		if (rc)
+ 			return rc;
  
- 	old_value = enforcing_enabled(state);
- 	if (new_value != old_value) {
 +		/*
-+		 * Only check against the current namespace because
-+		 * this operation only affects it and no others.
++		 * Only check against the current SELinux namespace
++		 * because only the SID in the current namespace
++		 * is changed by a transition.
 +		 */
- 		length = avc_has_perm(current_selinux_state,
- 				      current_sid(), SECINITSID_SECURITY,
- 				      SECCLASS_SECURITY, SECURITY__SETENFORCE,
-@@ -362,6 +366,10 @@ static ssize_t sel_write_unshare(struct file *file, const char __user *buf,
- 	if (*ppos != 0)
- 		return -EINVAL;
+ 		rc = avc_has_perm(current_selinux_state,
+ 				  new_tsec->sid, isec->sid,
+ 				  SECCLASS_FILE, FILE__ENTRYPOINT, &ad);
+@@ -2416,6 +2420,11 @@ static int selinux_bprm_creds_for_exec(struct linux_binprm *bprm)
  
+ 		/* Check for shared state */
+ 		if (bprm->unsafe & LSM_UNSAFE_SHARE) {
++			/*
++			 * Only check against the current SELinux namespace
++			 * because only the SID in the current namespace
++			 * is changed by a transition.
++			 */
+ 			rc = avc_has_perm(current_selinux_state,
+ 					  old_tsec->sid, new_tsec->sid,
+ 					  SECCLASS_PROCESS, PROCESS__SHARE,
+@@ -2429,6 +2438,12 @@ static int selinux_bprm_creds_for_exec(struct linux_binprm *bprm)
+ 		if (bprm->unsafe & LSM_UNSAFE_PTRACE) {
+ 			u32 ptsid = ptrace_parent_sid();
+ 			if (ptsid != 0) {
++				/*
++				 * Only check against the current SELinux
++				 * namespace because only the SID in the
++				 * current namespace is changed by a
++				 * transition.
++				 */
+ 				rc = avc_has_perm(current_selinux_state,
+ 						  ptsid, new_tsec->sid,
+ 						  SECCLASS_PROCESS,
+@@ -2444,6 +2459,11 @@ static int selinux_bprm_creds_for_exec(struct linux_binprm *bprm)
+ 		/* Enable secure mode for SIDs transitions unless
+ 		   the noatsecure permission is granted between
+ 		   the two SIDs, i.e. ahp returns 0. */
++		/*
++		 * Only check against the current SELinux namespace
++		 * because only the SID in the current namespace
++		 * is changed by a transition.
++		 */
+ 		rc = avc_has_perm(current_selinux_state,
+ 				  old_tsec->sid, new_tsec->sid,
+ 				  SECCLASS_PROCESS, PROCESS__NOATSECURE,
+@@ -2550,8 +2570,10 @@ static void selinux_bprm_committing_creds(const struct linux_binprm *bprm)
+ 	 * higher than the default soft limit for cases where the default is
+ 	 * lower than the hard limit, e.g. RLIMIT_CORE or RLIMIT_STACK.
+ 	 */
+-	/* Only check against the current namespace because the SID
+-	 * does not change in the parent.
 +	/*
-+	 * Only check against the current namespace because
-+	 * this operation only affects it and no others.
-+	 */
- 	rc = avc_has_perm(current_selinux_state, current_sid(),
- 			  SECINITSID_SECURITY, SECCLASS_SECURITY,
- 			  SECURITY__UNSHARE, NULL);
-@@ -592,6 +600,10 @@ static int sel_open_policy(struct inode *inode, struct file *filp)
- 
- 	mutex_lock(&fsi->state->policy_mutex);
- 
-+	/*
-+	 * Only check against the current namespace because
-+	 * this operation only affects it and no others.
-+	 */
++	 * Only check against the current SELinux namespace
++	 * because only the SID in the current namespace
++	 * is changed by a transition.
+ 	 */
  	rc = avc_has_perm(current_selinux_state,
- 			  current_sid(), SECINITSID_SECURITY,
- 			  SECCLASS_SECURITY, SECURITY__READ_POLICY, NULL);
-@@ -654,6 +666,10 @@ static ssize_t sel_read_policy(struct file *filp, char __user *buf,
- 	struct policy_load_memory *plm = filp->private_data;
- 	int ret;
- 
+ 			  new_tsec->osid, new_tsec->sid, SECCLASS_PROCESS,
+@@ -2593,8 +2615,10 @@ static void selinux_bprm_committed_creds(const struct linux_binprm *bprm)
+ 	 * This must occur _after_ the task SID has been updated so that any
+ 	 * kill done after the flush will be checked against the new SID.
+ 	 */
+-	/* Only check against the current namespace because the SID
+-	 * does not change in the parent.
 +	/*
-+	 * Only check against the current namespace because
-+	 * this operation only affects it and no others.
-+	 */
- 	ret = avc_has_perm(current_selinux_state,
- 			   current_sid(), SECINITSID_SECURITY,
- 			   SECCLASS_SECURITY, SECURITY__READ_POLICY, NULL);
-@@ -811,6 +827,11 @@ static ssize_t sel_write_load(struct file *file, const char __user *buf,
- 		return -EPERM;
- 
- 	mutex_lock(&fsi->state->policy_mutex);
-+
-+	/*
-+	 * Only check against the current namespace because
-+	 * this operation only affects it and no others.
-+	 */
- 	length = avc_has_perm(current_selinux_state,
- 			      current_sid(), SECINITSID_SECURITY,
- 			      SECCLASS_SECURITY, SECURITY__LOAD_POLICY, NULL);
-@@ -866,6 +887,10 @@ static ssize_t sel_write_context(struct file *file, char *buf, size_t size)
- 	u32 sid, len;
- 	ssize_t length;
- 
-+	/*
-+	 * Only check against the current namespace because
-+	 * this operation only affects it and no others.
-+	 */
- 	length = avc_has_perm(current_selinux_state,
- 			      current_sid(), SECINITSID_SECURITY,
- 			      SECCLASS_SECURITY, SECURITY__CHECK_CONTEXT, NULL);
-@@ -917,6 +942,10 @@ static ssize_t sel_write_checkreqprot(struct file *file, const char __user *buf,
- 	if (fsi->state != current_selinux_state)
- 		return -EPERM;
- 
-+	/*
-+	 * Only check against the current namespace because
-+	 * this operation only affects it and no others.
-+	 */
- 	length = avc_has_perm(current_selinux_state,
- 			      current_sid(), SECINITSID_SECURITY,
- 			      SECCLASS_SECURITY, SECURITY__SETCHECKREQPROT,
-@@ -976,6 +1005,10 @@ static ssize_t sel_write_validatetrans(struct file *file,
- 	if (state != current_selinux_state)
- 		return -EPERM;
- 
-+	/*
-+	 * Only check against the current namespace because
-+	 * this operation only affects it and no others.
-+	 */
++	 * Only check against the current SELinux namespace
++	 * because only the SID in the current namespace
++	 * is changed by a transition.
+ 	 */
  	rc = avc_has_perm(current_selinux_state,
- 			  current_sid(), SECINITSID_SECURITY,
- 			  SECCLASS_SECURITY, SECURITY__VALIDATE_TRANS, NULL);
-@@ -1109,6 +1142,10 @@ static ssize_t sel_write_access(struct file *file, char *buf, size_t size)
- 	struct av_decision avd;
- 	ssize_t length;
+ 			  osid, sid, SECCLASS_PROCESS, PROCESS__SIGINH, NULL);
+@@ -6812,6 +6836,11 @@ static int selinux_lsm_setattr(u64 attr, void *value, size_t size)
+ 		}
  
-+	/*
-+	 * Only check against the current namespace because
-+	 * this operation only affects it and no others.
-+	 */
- 	length = avc_has_perm(current_selinux_state,
- 			      current_sid(), SECINITSID_SECURITY,
- 			      SECCLASS_SECURITY, SECURITY__COMPUTE_AV, NULL);
-@@ -1163,6 +1200,10 @@ static ssize_t sel_write_create(struct file *file, char *buf, size_t size)
- 	u32 len;
- 	int nargs;
- 
-+	/*
-+	 * Only check against the current namespace because
-+	 * this operation only affects it and no others.
-+	 */
- 	length = avc_has_perm(current_selinux_state,
- 			      current_sid(), SECINITSID_SECURITY,
- 			      SECCLASS_SECURITY, SECURITY__COMPUTE_CREATE,
-@@ -1265,6 +1306,10 @@ static ssize_t sel_write_relabel(struct file *file, char *buf, size_t size)
- 	char *newcon = NULL;
- 	u32 len;
- 
-+	/*
-+	 * Only check against the current namespace because
-+	 * this operation only affects it and no others.
-+	 */
- 	length = avc_has_perm(current_selinux_state,
- 			      current_sid(), SECINITSID_SECURITY,
- 			      SECCLASS_SECURITY, SECURITY__COMPUTE_RELABEL,
-@@ -1331,6 +1376,10 @@ static ssize_t sel_write_user(struct file *file, char *buf, size_t size)
- 		" userspace.\n", current->comm, current->pid);
- 	ssleep(5);
- 
-+	/*
-+	 * Only check against the current namespace because
-+	 * this operation only affects it and no others.
-+	 */
- 	length = avc_has_perm(current_selinux_state,
- 			      current_sid(), SECINITSID_SECURITY,
- 			      SECCLASS_SECURITY, SECURITY__COMPUTE_USER,
-@@ -1396,6 +1445,10 @@ static ssize_t sel_write_member(struct file *file, char *buf, size_t size)
- 	char *newcon = NULL;
- 	u32 len;
- 
-+	/*
-+	 * Only check against the current namespace because
-+	 * this operation only affects it and no others.
-+	 */
- 	length = avc_has_perm(current_selinux_state,
- 			      current_sid(), SECINITSID_SECURITY,
- 			      SECCLASS_SECURITY, SECURITY__COMPUTE_MEMBER,
-@@ -1527,6 +1580,10 @@ static ssize_t sel_write_bool(struct file *filep, const char __user *buf,
- 
- 	mutex_lock(&fsi->state->policy_mutex);
- 
-+	/*
-+	 * Only check against the current namespace because
-+	 * this operation only affects it and no others.
-+	 */
- 	length = avc_has_perm(current_selinux_state,
- 			      current_sid(), SECINITSID_SECURITY,
- 			      SECCLASS_SECURITY, SECURITY__SETBOOL,
-@@ -1586,6 +1643,10 @@ static ssize_t sel_commit_bools_write(struct file *filep,
- 
- 	mutex_lock(&fsi->state->policy_mutex);
- 
-+	/*
-+	 * Only check against the current namespace because
-+	 * this operation only affects it and no others.
-+	 */
- 	length = avc_has_perm(current_selinux_state,
- 			      current_sid(), SECINITSID_SECURITY,
- 			      SECCLASS_SECURITY, SECURITY__SETBOOL,
-@@ -1707,6 +1768,10 @@ static ssize_t sel_write_avc_cache_threshold(struct file *file,
- 	if (state != current_selinux_state)
- 		return -EPERM;
- 
-+	/*
-+	 * Only check against the current namespace because
-+	 * this operation only affects it and no others.
-+	 */
- 	ret = avc_has_perm(current_selinux_state,
- 			   current_sid(), SECINITSID_SECURITY,
- 			   SECCLASS_SECURITY, SECURITY__SETSECPARAM,
+ 		/* Check permissions for the transition. */
++		/*
++		 * Only check against the current SELinux namespace
++		 * because only the SID in the current namespace
++		 * is changed by a transition.
++		 */
+ 		error = avc_has_perm(current_selinux_state,
+ 				     tsec->sid, sid, SECCLASS_PROCESS,
+ 				     PROCESS__DYNTRANSITION, NULL);
+@@ -6822,6 +6851,11 @@ static int selinux_lsm_setattr(u64 attr, void *value, size_t size)
+ 		   Otherwise, leave SID unchanged and fail. */
+ 		ptsid = ptrace_parent_sid();
+ 		if (ptsid != 0) {
++			/*
++			 * Only check against the current SELinux namespace
++			 * because only the SID in the current namespace
++			 * is changed by a transition.
++			 */
+ 			error = avc_has_perm(current_selinux_state,
+ 					     ptsid, sid, SECCLASS_PROCESS,
+ 					     PROCESS__PTRACE, NULL);
 -- 
 2.50.1
 
