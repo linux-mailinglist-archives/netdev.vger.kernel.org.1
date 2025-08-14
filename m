@@ -1,163 +1,172 @@
-Return-Path: <netdev+bounces-213847-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213848-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FBC7B270EA
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 23:38:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F7D7B27101
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 23:44:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 864F51CE0C11
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 21:38:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4347D3B67BC
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 21:44:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9ADB279DAA;
-	Thu, 14 Aug 2025 21:37:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D108279DA8;
+	Thu, 14 Aug 2025 21:44:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P4zJQZk8"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="t1Lffbdo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41B112798E1;
-	Thu, 14 Aug 2025 21:37:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72FBA14A60F
+	for <netdev@vger.kernel.org>; Thu, 14 Aug 2025 21:44:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755207467; cv=none; b=g7RGojUFrcVoWySjVJcKcGVU5XmKE0xqW3sOqtkoiOM88JNwIhbf+W0k418qFr3cRtFRjk9arQCXqcd/ld53V0XYvF7dvQPaX56+hJvK7R95SBkmiKqQl8XbMJkRPjZCo+27E3K2E/9R6tkAIykmoT/iT7kqEFsxy7X1bCyeE08=
+	t=1755207877; cv=none; b=FG1+JOtSdCtJBHi9OFyo7RAXsY9O1T8dOiZjoLf3wy+fpMCRyyxOjK6oF3828zZBNl2W1kMJbcFEjXWPTscd8RzagqcmZqPOwNkky8z2FQ7pmhR/+StaYounvDnec2qstktsBMt2JYsUI6A+nGSYRe7Cl1yp5R4TXKwvxvVu1RA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755207467; c=relaxed/simple;
-	bh=o02N445rRoeQTRrB+aNxGiyHOWW2iVqXtaa4iVa67qw=;
+	s=arc-20240116; t=1755207877; c=relaxed/simple;
+	bh=DUPr5MQoUxFFoqkAGNzRO/DGWT8OKJ2LYBfoUBU+Xww=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FyN4RMxDLQjXBIFa5jJeeZ2MeU0srWNJDtphS6//NdnL5lD//2e7UOt+UlUhqHhQMyHBF1FKt8jqdMWeiECfIE36IvxY9bcOP8Wz22sBaTIuvUsJM1fs03hB/GfYCg35Dt57mhiixui0Kq9JhAiwZCyl+OYNGVmtzwXibGfMkyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P4zJQZk8; arc=none smtp.client-ip=209.85.216.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-32326e20aadso1870102a91.2;
-        Thu, 14 Aug 2025 14:37:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755207465; x=1755812265; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vYw3GsEP5T/zhqlLRwEN+W3JUIy6Z3umGKTorlB7Ks8=;
-        b=P4zJQZk85oKvHdLmVna08+y1ZE2JLha163oV5ffL7U3AfWYW7g4okQIP3Wr/BlLjah
-         T/Kl/GTuYoyqP+x7NLXLMdRaTnXv12kUfmcRyxc7EF3CR9YyEEC2/bLKSQ8ikOsr9J4V
-         g3piz6vrPnqk/cPOuRWMnmsZlyK7kdZZidlrpsl6PDKRMPEKfT9xg1Px4hAAfriBI1ws
-         OChm3IiXGczb+aeRcvvugZOLjNsNZAMOPpkaoP9uQcCjisdBdPkg43RZz2r1V3hXXrK1
-         AhbYiiSC9CGokuQQ/BVEQvEGdNmw9vGjUvrRzlFG9BBrBCwyLcJsUdTMmwE0NBUVltMX
-         4neQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755207465; x=1755812265;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vYw3GsEP5T/zhqlLRwEN+W3JUIy6Z3umGKTorlB7Ks8=;
-        b=V57WO6lB1/0OXZYxgeBrMZWfPKgscWvjNRsbccqyfX7ggEwNls+QswsY+qz368nXAG
-         nJr6yqR/AzsG6WP0Tf7tB1t9sK00L35SRmT18E/9+JrXtXhpOvlDLOBBSLma1bBzDZnc
-         Izkmqf7ZSGJhYuGWEphtPH6RIx/CGkehJMot5Uz9cGazCClKrJeJWLBPv2XfS+mtlF5D
-         tzUN0HMMlHPELSBlGglkPzLz5FRPjAEbZJyMQt4hA2ER89WMfPot+7VzpuTwwcEzyZJY
-         jfHms8vu71d3lQAdIQEIFyKT0XaS076y+XHJ5QUcvCtTpTuYWf7PDqp5ibTPHbo5Rw32
-         E2Gg==
-X-Forwarded-Encrypted: i=1; AJvYcCWCs0S5fjxcNMwnsz9RuEUOR3DfVrNBbReoYXe7RZgLnOh3A/say37HVKUsc5YAe125pd9i7EF2@vger.kernel.org, AJvYcCWEyCnBg88oT/CB3yB+zQX/7MBtvnX75gJiDRDDy+1iWvaTImbScSUXqMLmYjKkbU0xKLUWVjwcGAEGWf8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyxiRycwmF/mPODy8mRh1kezzJt5/ZHu8PtMX0Be3UUMSXrZlUE
-	KBGQF0AvwHri42aIiZC6syW8Tkw32P4KfGczz56HahC0I7UrVTTwW1om
-X-Gm-Gg: ASbGncu2prS5js8k1AaFypFWcnZwgUvOM82r/QFCUHE1MMdB8FU2j4evmQ21UCUT7Oe
-	jInMcolJPbelTsSnBbZ9EWFam2mxEcV0xKEQvyQllCHy4J3nLmkpK81iz7hkCXFdZ1/T8Wcovjc
-	hb5FKkXs9HFPGUxaenqmEzVPgHVlP67Ooe0xrkPNW0W6szW6uKDOmVqte9zopz76XXxEtB53UuX
-	oca7W/vdUs4/NckqW5I5C1xDhnEeMTPTkluuDlz9UpfvvdIuEkrBGBfDhSjEhRq0HEHnYbHkxyD
-	ATpRwf7DPpFxwqgj2jBzhdP9KTru7NTSeT0E3xgtng9y2nNBBQU4CjdnGT09FLpTeskTjQyXQiB
-	WAnZOYkYYjRq8O5/AxKPsZA==
-X-Google-Smtp-Source: AGHT+IFCbK4yM42Aj+5kTYh4/wqb1OFptHIo/GuiobZceKUu7nSQyGKoXcCLUpNsT+zfbVZbDEr6zQ==
-X-Received: by 2002:a17:90b:1b47:b0:323:28cc:7706 with SMTP id 98e67ed59e1d1-32328cc78e4mr6874379a91.2.1755207465330;
-        Thu, 14 Aug 2025 14:37:45 -0700 (PDT)
-Received: from localhost ([216.228.127.131])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-32330db1784sm2830169a91.0.2025.08.14.14.37.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Aug 2025 14:37:44 -0700 (PDT)
-Date: Thu, 14 Aug 2025 17:37:42 -0400
-From: Yury Norov <yury.norov@gmail.com>
-To: Ilya Maximets <i.maximets@ovn.org>
-Cc: Aaron Conole <aconole@redhat.com>, Eelco Chaudron <echaudro@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	dev@openvswitch.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: openvswitch: Use for_each_cpu_from() where
- appropriate
-Message-ID: <aJ5XJmDa-Ltpdmn3@yury>
-References: <20250814195838.388693-1-yury.norov@gmail.com>
- <c5b583a8-65da-4adb-8cf1-73bf679c0593@ovn.org>
- <aJ5Pl1i0RczgaHyI@yury>
- <2dc70249-7de2-4178-9184-2d50cc0dffe9@ovn.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ODgATRDmDGoDBtfgOIPHGQIEx3oTg56RdlJ19BD+jYQ7EKY4MsanTd8GkJ+ZqYKRCOYgUoyu/AvOLXm31aSbfx5u3wf7pEgZs+o3GYcLjUzwnj7cXatVBvwM9iG553Nzi2zNgcH66BqLeM/wjEgRFTZ6Sm/Ein8pcLsJAgR9lGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=t1Lffbdo; arc=none smtp.client-ip=95.215.58.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Thu, 14 Aug 2025 14:44:12 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1755207863;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=19ByPHkfjF5Lwww0ZNwzVRVwJ3xsKPEqJn5AnAvA/3U=;
+	b=t1Lffbdo8V4eR10ikc1QCrxW10AzvrgCdPZA5YBsQ6+OleiyAIQA4YUzCr+08bP8URWDg8
+	I3WGm7qBbMemh6lNZgLU3P0L13FkBioWFv+J8o7EcD+mc9jCxyJL+fK14ZPQz1+kwyZCWI
+	y3C6iL3Q61oALehShym+eszZC21gE8E=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Shakeel Butt <shakeel.butt@linux.dev>
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Neal Cardwell <ncardwell@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Willem de Bruijn <willemb@google.com>, Matthieu Baerts <matttbe@kernel.org>, 
+	Mat Martineau <martineau@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
+	Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>, 
+	Andrew Morton <akpm@linux-foundation.org>, Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, 
+	Tejun Heo <tj@kernel.org>, Simon Horman <horms@kernel.org>, 
+	Geliang Tang <geliang@kernel.org>, Muchun Song <muchun.song@linux.dev>, 
+	Mina Almasry <almasrymina@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
+	mptcp@lists.linux.dev, cgroups@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH v4 net-next 01/10] mptcp: Fix up subflow's memcg when
+ CONFIG_SOCK_CGROUP_DATA=n.
+Message-ID: <cs5uvm72eyzqljcxtmienkmmth54pqqjmlyya5vf3twncbp7u5@jfnktl43r5se>
+References: <20250814200912.1040628-1-kuniyu@google.com>
+ <20250814200912.1040628-2-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <2dc70249-7de2-4178-9184-2d50cc0dffe9@ovn.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250814200912.1040628-2-kuniyu@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Aug 14, 2025 at 11:21:02PM +0200, Ilya Maximets wrote:
-> On 8/14/25 11:05 PM, Yury Norov wrote:
-> > On Thu, Aug 14, 2025 at 10:49:30PM +0200, Ilya Maximets wrote:
-> >> On 8/14/25 9:58 PM, Yury Norov wrote:
-> >>> From: Yury Norov (NVIDIA) <yury.norov@gmail.com>
-> >>>
-> >>> Openvswitch opencodes for_each_cpu_from(). Fix it and drop some
-> >>> housekeeping code.
-> >>>
-> >>> Signed-off-by: Yury Norov (NVIDIA) <yury.norov@gmail.com>
-> >>> ---
-> >>>  net/openvswitch/flow.c       | 14 ++++++--------
-> >>>  net/openvswitch/flow_table.c |  8 ++++----
-> >>>  2 files changed, 10 insertions(+), 12 deletions(-)
-> >>>
-> >>> diff --git a/net/openvswitch/flow.c b/net/openvswitch/flow.c
-> >>> index b80bd3a90773..b464ab120731 100644
-> >>> --- a/net/openvswitch/flow.c
-> >>> +++ b/net/openvswitch/flow.c
-> >>> @@ -129,15 +129,14 @@ void ovs_flow_stats_get(const struct sw_flow *flow,
-> >>>  			struct ovs_flow_stats *ovs_stats,
-> >>>  			unsigned long *used, __be16 *tcp_flags)
-> >>>  {
-> >>> -	int cpu;
-> >>> +	/* CPU 0 is always considered */
-> >>> +	unsigned int cpu = 1;
-> >>
-> >> Hmm.  I'm a bit confused here.  Where is CPU 0 considered if we start
-> >> iteration from 1?
-> > 
-> > I didn't touch this part of the original comment, as you see, and I'm
-> > not a domain expert, so don't know what does this wording mean.
-> > 
-> > Most likely 'always considered' means that CPU0 is not accounted in this
-> > statistics.
-> >   
-> >>>  	*used = 0;
-> >>>  	*tcp_flags = 0;
-> >>>  	memset(ovs_stats, 0, sizeof(*ovs_stats));
-> >>>  
-> >>> -	/* We open code this to make sure cpu 0 is always considered */
-> >>> -	for (cpu = 0; cpu < nr_cpu_ids;
-> >>> -	     cpu = cpumask_next(cpu, flow->cpu_used_mask)) {
-> >>> +	for_each_cpu_from(cpu, flow->cpu_used_mask) {
-> >>
-> >> And why it needs to be a for_each_cpu_from() and not just for_each_cpu() ?
-> > 
-> > The original code explicitly ignores CPU0.
+On Thu, Aug 14, 2025 at 08:08:33PM +0000, Kuniyuki Iwashima wrote:
+> When sk_alloc() allocates a socket, mem_cgroup_sk_alloc() sets
+> sk->sk_memcg based on the current task.
 > 
-> No, it's not.  The loop explicitly starts from zero.  And the comments
-> are saying that the loop is open-coded specifically to always have zero
-> in the iteration.
+> MPTCP subflow socket creation is triggered from userspace or
+> an in-kernel worker.
+> 
+> In the latter case, sk->sk_memcg is not what we want.  So, we fix
+> it up from the parent socket's sk->sk_memcg in mptcp_attach_cgroup().
+> 
+> Although the code is placed under #ifdef CONFIG_MEMCG, it is buried
+> under #ifdef CONFIG_SOCK_CGROUP_DATA.
+> 
+> The two configs are orthogonal.  If CONFIG_MEMCG is enabled without
+> CONFIG_SOCK_CGROUP_DATA, the subflow's memory usage is not charged
+> correctly.
+> 
+> Let's wrap sock_create_kern() for subflow with set_active_memcg()
+> using the parent sk->sk_memcg.
+> 
+> Fixes: 3764b0c5651e3 ("mptcp: attach subflow socket to parent cgroup")
+> Suggested-by: Michal Koutný <mkoutny@suse.com>
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+> ---
+>  mm/memcontrol.c     |  5 ++++-
+>  net/mptcp/subflow.c | 11 +++--------
+>  2 files changed, 7 insertions(+), 9 deletions(-)
+> 
+> diff --git a/mm/memcontrol.c b/mm/memcontrol.c
+> index 8dd7fbed5a94..450862e7fd7a 100644
+> --- a/mm/memcontrol.c
+> +++ b/mm/memcontrol.c
+> @@ -5006,8 +5006,11 @@ void mem_cgroup_sk_alloc(struct sock *sk)
+>  	if (!in_task())
+>  		return;
+>  
+> +	memcg = current->active_memcg;
+> +
 
-OK, I see now. That indentation has fooled me. So the comment means
-that CPU0 is included even if flow->cpu_used_mask has it cleared. And
-to avoid opencoding, we need to do like:
-        
-        for_each_cpu_or(cpu, flow->cpu_used_mask, cpumask_of(0))
+Use active_memcg() instead of current->active_memcg and do before the
+!in_task() check.
 
-I'll send v2 shortly.
+Basically something like following:
 
-Thanks for pointing to this, eagle eye :).
+	memcg = active_memcg();
+	/* Do not associate the sock with unrelated interrupted task's memcg. */
+	if (!in_task() && !memcg)
+		return;
+
+>  	rcu_read_lock();
+> -	memcg = mem_cgroup_from_task(current);
+> +	if (likely(!memcg))
+> +		memcg = mem_cgroup_from_task(current);
+>  	if (mem_cgroup_is_root(memcg))
+>  		goto out;
+>  	if (!cgroup_subsys_on_dfl(memory_cgrp_subsys) && !memcg1_tcpmem_active(memcg))
+> diff --git a/net/mptcp/subflow.c b/net/mptcp/subflow.c
+> index 3f1b62a9fe88..a4809054ea6c 100644
+> --- a/net/mptcp/subflow.c
+> +++ b/net/mptcp/subflow.c
+> @@ -1717,14 +1717,6 @@ static void mptcp_attach_cgroup(struct sock *parent, struct sock *child)
+>  	/* only the additional subflows created by kworkers have to be modified */
+>  	if (cgroup_id(sock_cgroup_ptr(parent_skcd)) !=
+>  	    cgroup_id(sock_cgroup_ptr(child_skcd))) {
+> -#ifdef CONFIG_MEMCG
+> -		struct mem_cgroup *memcg = parent->sk_memcg;
+> -
+> -		mem_cgroup_sk_free(child);
+> -		if (memcg && css_tryget(&memcg->css))
+> -			child->sk_memcg = memcg;
+> -#endif /* CONFIG_MEMCG */
+> -
+>  		cgroup_sk_free(child_skcd);
+>  		*child_skcd = *parent_skcd;
+>  		cgroup_sk_clone(child_skcd);
+> @@ -1757,6 +1749,7 @@ int mptcp_subflow_create_socket(struct sock *sk, unsigned short family,
+>  {
+>  	struct mptcp_subflow_context *subflow;
+>  	struct net *net = sock_net(sk);
+> +	struct mem_cgroup *memcg;
+>  	struct socket *sf;
+>  	int err;
+>  
+> @@ -1766,7 +1759,9 @@ int mptcp_subflow_create_socket(struct sock *sk, unsigned short family,
+>  	if (unlikely(!sk->sk_socket))
+>  		return -EINVAL;
+>  
+> +	memcg = set_active_memcg(sk->sk_memcg);
+>  	err = sock_create_kern(net, family, SOCK_STREAM, IPPROTO_TCP, &sf);
+> +	set_active_memcg(memcg);
+>  	if (err)
+>  		return err;
+>  
+> -- 
+> 2.51.0.rc1.163.g2494970778-goog
+> 
 
