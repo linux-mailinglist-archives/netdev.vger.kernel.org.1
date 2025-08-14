@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-213776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213777-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FF71B26935
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 16:27:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4CE5B268F5
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 16:18:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B6BBA604FD4
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 14:09:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E6AA1CE2ABF
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 14:10:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A65EF21A42F;
-	Thu, 14 Aug 2025 14:03:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54A53220F5C;
+	Thu, 14 Aug 2025 14:03:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H9+UfYhe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B7d8HrzL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D598121B184;
-	Thu, 14 Aug 2025 14:03:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85FD821D3C5;
+	Thu, 14 Aug 2025 14:03:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755180214; cv=none; b=kpfMBkjpxVOpCMzwy56AfobjgxaHUc11MDN7Q+gq2WcwLKTPePIktUlkpnX10hjmwUAV9owbEw4B7MtiDxv8NFp4GqZH8xnFQEw/InQofZRuzLgljnYov5KtBuSji+mhtJVg/VL0GG6cVgfRCPVyzBSNgytmEUvE0W3QzPwjfmM=
+	t=1755180220; cv=none; b=gmTbH2qaSkHBcoYmtgezPltAcdsRfV+2sDgJM/f9zI8KCXyfU3rCF9XSRELqiuJ1AbzSV+7HjALXjzx5MPGNShOJHTx/PSilOJEDLmnIU2N+3sGRZ6Q9eYPU7THtagnvXzwktocm4xf8iqnBGE2B1OWUh2yHtriifWf8/FB5E/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755180214; c=relaxed/simple;
-	bh=kOHukOQ3cceJovBOgC2BME7cXTZifKxXU27NEWj1FsE=;
+	s=arc-20240116; t=1755180220; c=relaxed/simple;
+	bh=P+9HgUpbubR24QEwTBNnkun+LVmOIGHZmzlAEkjm5pE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qYNddYT/ox+bBPY6ABAwqEe4dt+aOyoi2mmsJGbag96603H/SPL6T2/QsRUttBmB5pSz/VM91WuxjOF1JAtx7l08A2Q6aOXTXg+6ya58vs9qouC9+ObooUYYvStxr/7e04cSwTjiVfxj8lQbKtMkHidma50zecfJ0I65f5oaYvY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H9+UfYhe; arc=none smtp.client-ip=209.85.221.52
+	 MIME-Version; b=OeIcrYn4BOpazA6wEIaKVhajZbtn2H2CCCF5ln8BkkvVB5vWnNkjZvU1QtUDFVaQAa1O+BHh+uu44LwsyZ6P61fN1+nvIbPFAPsRITuZcpJaOAG4LRzOGwrj2yaI5Uz1Mn1MDiryKDOzVtyLJafHIKia3ySDyFBoVRV3CA5YNME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B7d8HrzL; arc=none smtp.client-ip=209.85.128.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-3b916fda762so988080f8f.0;
-        Thu, 14 Aug 2025 07:03:32 -0700 (PDT)
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-45a1b0b2d21so4915465e9.2;
+        Thu, 14 Aug 2025 07:03:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755180211; x=1755785011; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1755180217; x=1755785017; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=PLxnqIyefbhGWLAW2tSxC8TLmMmgpMfhOXMAxYGHn80=;
-        b=H9+UfYhewQdVvULHEB3UrgY+Qc9BsOvAMKxjjFkRKvHPZWxYn2hGwz2ItBo7CW90Dw
-         PDA3u25YKnSRf8mtj0BKxl3SapZ3VNqjRwyoR7aQbHynvINY0e6JBedcPS7i1mSbezVK
-         dq49Z4SvfhbCbL0/S/b5BI8/EIJTf1G8YeiU64vqnCdpDGbfJhKFyApmpGtYTktcqTB+
-         LPYEIoa2T6cmIpOl0xJHLVDAuOLQ1KoMnsjyp1qtqfnRRykcqyUw9X2Rk8hXsAdKRAS6
-         VxS1bT46uqkzRpDEy76Qit+MtdTQZ3zKg8YTFoekSX7GazO3I996IsvJukoSBzUEmSiU
-         sXGw==
+        bh=XxXSu6aBR4j/2h9Jk21q3XAtSOVHdikpb6rC+rmqJY4=;
+        b=B7d8HrzLlhGipVdK9+ebfxM4U05TGx1bJ+SJNjelXFARPYWDzgPzFdLsbtVKkiY7nf
+         I3RHIUT1G9tuMPxgQ061jWCpeFzJF54JHnMjuWQvIICJdaJch/L3sVEZi32sWh8oxeoH
+         jgI4Aca1qyZ+4rUOnB3uqixD0blB0OLTLr0HwepcCqe0X/CJi2+9zHXyEsQ2/HzRldoB
+         VzI5pxf5mEYNPpYuK2+TVks++pLwjVLM4nnyERnk50aChiweK5iLQaHhinRaWY63PQZS
+         lqoM+pQcDJvo5l/IvIjtCOe5UJocy2p1wGxKNe1GuC4uUzPS1+/3vtO4Grqid5x/1Sko
+         WTHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755180211; x=1755785011;
+        d=1e100.net; s=20230601; t=1755180217; x=1755785017;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=PLxnqIyefbhGWLAW2tSxC8TLmMmgpMfhOXMAxYGHn80=;
-        b=YR0uaNBaEZDf44pIe0Kk3artdiboKF7CJSoBYUohuLtAE8JzehuETjJJZmT3I5tZpb
-         Z8UqVVuG5/fPspWKGj9wj0zSb0GWZxENaVLd0ySGU34xNb2bMNhkdH8fMRpi0dmgFVJA
-         mlvCQNCsAHBKYExLTu0rokB1REpCmNTSp5nsKtXhpSwTBLFd1D3e3j7odT/JlXW8HFS/
-         Zqi+LjiobHb93iGKYezfrJ4bMjnnSTA6C87MLDl1SLEI2qH1YRZdpApq6BWlHEw6BQmb
-         iJ4bA4LmWd+NR4RFvLMGlR1sDGHjqHIK8V5G1wwFQauAYafZUjJzra2R84OAIyFQ2HJ/
-         F8Ew==
-X-Forwarded-Encrypted: i=1; AJvYcCVj6qWZ1js8p8qVnpWynlVPQMXc/neAzR7EUBYOSD1M6tg0CaQc/Be+2gsP8xMUkWUOgafHbB2dRlgn2RE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzjbJ+uBleYg82pRb4VC1fwh/JbR72cKb94ZtxCPTBENr3U21a1
-	2KUR3anDG+VXr1ZqYHDKDW0mMBwPwnYX2y8Atd9SLvrPKRRdqveJKtc3Vv2Edg==
-X-Gm-Gg: ASbGncsDv5NXUlgi6Db1Xeu5s3Zu+2VX5i7zACTZJl47J/7pFE9RNAA1ctnDmRgGndR
-	6nrDeRUUmlKShcgYJAo6JceKBOKmG7IrgcObmt/riLIOkXO9nJQ33D000cQeOatoNAk74zpXHWU
-	eP44pIXfJHz3rCIwMdJrqWNAEsXFBjVuYKJNqR+rYkCTFr7EGhigQKpJ8AGiShkIEgKDeu8oBzH
-	z2zxB85RXjlhHoWLxjW4S6PLmY8ovjG8vbwdVYinWIylYo/0i0KvTYYQjWJIY1/8y8PGNuCSt0g
-	s/drAH+SSWM4f94EVINcizpFyPRcMGfRtJmEVDBoYWEFQzKxW3TiXLWRMVyTSKmIbUov1GSX1AS
-	RFvJ0FWTAPBpOy4KbUbUo7Ye9rOrNtDM=
-X-Google-Smtp-Source: AGHT+IEQqnxg3Y1E0Mfyh2Xt357oFkFI+IHK226NowFV2XYynnUjGHyKopSG04Mkl82E8GKhZLSvGA==
-X-Received: by 2002:a05:6000:22c6:b0:3b8:d740:a16a with SMTP id ffacd0b85a97d-3ba508ec53emr2531131f8f.16.1755180210867;
-        Thu, 14 Aug 2025 07:03:30 -0700 (PDT)
+        bh=XxXSu6aBR4j/2h9Jk21q3XAtSOVHdikpb6rC+rmqJY4=;
+        b=jZlFgpobeMadOlBGMVyJjf4XOZq7w3mXS67kee6ZRDUNKE0twMd7GSIBfq42o2KD1e
+         /4n6S0MTY6mUsQA7hCUIfscjid+28vC+H46uDazlhMJSZ3KDTUw8Jp7oKf0y1qyeZyP8
+         y4+5xUkOxP0nMAZsAV9bjMNl9K7pkvyAzeHQzve856njdc4wikPf+fg9yyUfmcrNCfso
+         eXByi+9+vc3Qv+29b4NoAgc3CLCqZ+JzQ7M2xNzckayCSks4vcuV/VzPLflb6c//6XcH
+         43l1GjyLeeUMy7ul08EYNMpGOrZ+lVJTd86tHDZRyxYpLzE3NpaUEAtwgJ3qlx0pC9IK
+         Wv4w==
+X-Forwarded-Encrypted: i=1; AJvYcCWYH2ckpUGa0nuhUJYkmO8SCL+s7NxCLQOVLJ9KNlsF41DLCki9ygMfFx+HKtYjLe8iH6MJ6QGAfTvVdnw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzkhnS+Vc2a6oWvByEeA3/dXyVwyy5XJR6KdrSwFxBnFa1qU2ns
+	YOAp4JIPQHgw21hImnJUrsHr9k41zOET4GPxuco3Cx7jyqKRMK5N5TUug1IIQQ==
+X-Gm-Gg: ASbGncuRWUdTMrV8UN6mEAt85GKbL7oFEKd5wiv2yj4aaIMFexwYoqjdOpb8bxDr3kJ
+	lsjye63GM0StUp96LKf+eAXJjeq+0mbHLZRIxAd5vprU7Xh7VU5G7qmGL164JkWl4/GlO9MSvs4
+	SZg1pakeoM95UXqrmq1UdSN9FiDCaRLa/2CiCicZtNp70oxOGeS7qbBntZCi6CJy2k8tnoszzt7
+	xNZJg/S2nqAN04V+N4kJ9t8SgY89sPWgyilPgwGA5v6cqAlDp6Szzu4Bb961EyCw5CALpzQohmj
+	sEyJflxGjgzd70AkIEWxUAYcJ8rQdaGlQftMHGBppNRsh7UL07Vmutesfvof82aUAf5dWkmhFiV
+	qtuBdztZan1NgJOXxuJxb
+X-Google-Smtp-Source: AGHT+IEbb8zJmcQIRTw/3UL8iG8DmYayAWcPbjO65U5u2ao7Rjm9/MmIJW4SB2jaSmO7AhonQAQnsQ==
+X-Received: by 2002:a05:600c:4ece:b0:455:f187:6203 with SMTP id 5b1f17b1804b1-45a1b654a11mr26145295e9.27.1755180216603;
+        Thu, 14 Aug 2025 07:03:36 -0700 (PDT)
 Received: from oscar-xps.. ([79.127.164.93])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45a1c6c2e95sm22483085e9.6.2025.08.14.07.03.25
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45a1c6c2e95sm22483085e9.6.2025.08.14.07.03.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Aug 2025 07:03:30 -0700 (PDT)
+        Thu, 14 Aug 2025 07:03:36 -0700 (PDT)
 From: Oscar Maes <oscmaes92@gmail.com>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -84,9 +84,9 @@ Cc: davem@davemloft.net,
 	shuah@kernel.org,
 	linux-kernel@vger.kernel.org,
 	Oscar Maes <oscmaes92@gmail.com>
-Subject: [PATCH net-next v2 1/2] net: ipv4: allow directed broadcast routes to use dst hint
-Date: Thu, 14 Aug 2025 16:03:08 +0200
-Message-Id: <20250814140309.3742-2-oscmaes92@gmail.com>
+Subject: [PATCH net-next v2 2/2] selftests: net: add test for dst hint mechanism with directed broadcast addresses
+Date: Thu, 14 Aug 2025 16:03:09 +0200
+Message-Id: <20250814140309.3742-3-oscmaes92@gmail.com>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250814140309.3742-1-oscmaes92@gmail.com>
 References: <20250814140309.3742-1-oscmaes92@gmail.com>
@@ -98,65 +98,86 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Currently, ip_extract_route_hint uses RTN_BROADCAST to decide
-whether to use the route dst hint mechanism.
+Add a test for ensuring that the dst hint mechanism is used for
+directed broadcast addresses.
 
-This check is too strict, as it prevents directed broadcast
-routes from using the hint, resulting in poor performance
-during bursts of directed broadcast traffic.
+This test relies on mausezahn for sending directed broadcast packets.
+Additionally, a high GRO flush timeout is set to ensure that packets
+will be received as lists.
 
-Fix this in ip_extract_route_hint and modify ip_route_use_hint
-to preserve the intended behaviour.
+The test determines if the hint mechanism was used by checking
+the in_brd statistic using lnstat.
 
 Signed-off-by: Oscar Maes <oscmaes92@gmail.com>
 ---
- net/ipv4/ip_input.c | 11 +++++++----
- net/ipv4/route.c    |  2 +-
- 2 files changed, 8 insertions(+), 5 deletions(-)
+ tools/testing/selftests/net/route_hint.sh | 58 +++++++++++++++++++++++
+ 1 file changed, 58 insertions(+)
+ create mode 100755 tools/testing/selftests/net/route_hint.sh
 
-diff --git a/net/ipv4/ip_input.c b/net/ipv4/ip_input.c
-index fc323994b1fa..57bf6e23b342 100644
---- a/net/ipv4/ip_input.c
-+++ b/net/ipv4/ip_input.c
-@@ -587,9 +587,13 @@ static void ip_sublist_rcv_finish(struct list_head *head)
- }
- 
- static struct sk_buff *ip_extract_route_hint(const struct net *net,
--					     struct sk_buff *skb, int rt_type)
-+					     struct sk_buff *skb)
- {
--	if (fib4_has_custom_rules(net) || rt_type == RTN_BROADCAST ||
-+	const struct iphdr *iph = ip_hdr(skb);
+diff --git a/tools/testing/selftests/net/route_hint.sh b/tools/testing/selftests/net/route_hint.sh
+new file mode 100755
+index 000000000000..fab08d8b742d
+--- /dev/null
++++ b/tools/testing/selftests/net/route_hint.sh
+@@ -0,0 +1,58 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
 +
-+	if (fib4_has_custom_rules(net) ||
-+	    ipv4_is_lbcast(iph->daddr) ||
-+	    (iph->daddr == 0 && iph->saddr == 0) ||
- 	    IPCB(skb)->flags & IPSKB_MULTIPATH)
- 		return NULL;
- 
-@@ -618,8 +622,7 @@ static void ip_list_rcv_finish(struct net *net, struct list_head *head)
- 
- 		dst = skb_dst(skb);
- 		if (curr_dst != dst) {
--			hint = ip_extract_route_hint(net, skb,
--						     dst_rtable(dst)->rt_type);
-+			hint = ip_extract_route_hint(net, skb);
- 
- 			/* dispatch old sublist */
- 			if (!list_empty(&sublist))
-diff --git a/net/ipv4/route.c b/net/ipv4/route.c
-index f639a2ae881a..1f212b2ce4c6 100644
---- a/net/ipv4/route.c
-+++ b/net/ipv4/route.c
-@@ -2210,7 +2210,7 @@ ip_route_use_hint(struct sk_buff *skb, __be32 daddr, __be32 saddr,
- 		goto martian_source;
- 	}
- 
--	if (rt->rt_type != RTN_LOCAL)
-+	if (!(rt->rt_flags & RTCF_LOCAL))
- 		goto skip_validate_source;
- 
- 	reason = fib_validate_source_reason(skb, saddr, daddr, dscp, 0, dev,
++# This test ensures directed broadcast routes use dst hint mechanism
++
++CLIENT_NS=$(mktemp -u client-XXXXXXXX)
++CLIENT_IP4="192.168.0.1"
++
++SERVER_NS=$(mktemp -u server-XXXXXXXX)
++SERVER_IP4="192.168.0.2"
++
++BROADCAST_ADDRESS="192.168.0.255"
++
++setup() {
++	ip netns add "${CLIENT_NS}"
++	ip netns add "${SERVER_NS}"
++
++	ip -net "${SERVER_NS}" link add link1 type veth peer name link0 netns "${CLIENT_NS}"
++
++	ip -net "${CLIENT_NS}" link set link0 up
++	ip -net "${CLIENT_NS}" addr add "${CLIENT_IP4}/24" dev link0
++
++	ip -net "${SERVER_NS}" link set link1 up
++	ip -net "${SERVER_NS}" addr add "${SERVER_IP4}/24" dev link1
++
++	ip netns exec "${CLIENT_NS}" ethtool -K link0 tcp-segmentation-offload off
++	ip netns exec "${SERVER_NS}" sh -c "echo 500000000 > /sys/class/net/link1/gro_flush_timeout"
++	ip netns exec "${SERVER_NS}" sh -c "echo 1 > /sys/class/net/link1/napi_defer_hard_irqs"
++	ip netns exec "${SERVER_NS}" ethtool -K link1 generic-receive-offload on
++}
++
++cleanup() {
++	ip -net "${SERVER_NS}" link del link1
++	ip netns del "${CLIENT_NS}"
++	ip netns del "${SERVER_NS}"
++}
++
++directed_bcast_hint_test()
++{
++	echo "Testing for directed broadcast route hint"
++
++	orig_in_brd=$(ip netns exec "${SERVER_NS}" lnstat -k in_brd -s0 -i1 -c1 | tr -d ' |')
++	ip netns exec "${CLIENT_NS}" mausezahn link0 -a own -b bcast -A "${CLIENT_IP4}" \
++		-B "${BROADCAST_ADDRESS}" -c1 -t tcp "sp=1-100,dp=1234,s=1,a=0" -p 5 -q
++	sleep 1
++	new_in_brd=$(ip netns exec "${SERVER_NS}" lnstat -k in_brd -s0 -i1 -c1 | tr -d ' |')
++
++	res=$(echo "${new_in_brd} - ${orig_in_brd}" | bc)
++
++	[ "${res}" -lt 100 ]
++}
++
++trap cleanup EXIT
++
++setup
++
++directed_bcast_hint_test
++exit $?
 -- 
 2.39.5
 
