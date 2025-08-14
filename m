@@ -1,82 +1,81 @@
-Return-Path: <netdev+bounces-213787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213789-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23113B26A25
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 16:55:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69013B26A4A
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 17:00:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3119A189EEB5
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 14:50:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C0CDAA2A07
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 14:51:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3318D21B9CD;
-	Thu, 14 Aug 2025 14:49:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77127205ABA;
+	Thu, 14 Aug 2025 14:50:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="qVWwE5mO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Uw5i2eLp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53085218AA3;
-	Thu, 14 Aug 2025 14:49:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE0041F8AC8
+	for <netdev@vger.kernel.org>; Thu, 14 Aug 2025 14:50:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755182975; cv=none; b=OeHVqjF7NErakVrhAUtH5W0TF7T/Qc7tMo8aTc7Q7JHR2Wl56h05BNYphogRHDiUcY3MVVxCRFtH3loduoIwbLGewTxdXwuS6cb20a4UwnYbLhVcNx7SlO72FOH7XY1WSoKJoDmlZRHW7HW6tkTqmB9W0B14mEPMyKMyRFMfdjE=
+	t=1755183026; cv=none; b=Ubw1hHC3APJb4xKD5TJh1//npnJGWuzPim8+bXa/KfD19yMikPl7bTloPzVR3WJciJMU1jGUbd4Uyy3mjSnkJ9S8rzpV/oprNowRqS2UyXvTCCGL4JvwzXyyHT7af7avuWQQgiuQFYsoSeX8XiYI8CG9ZZgCklyOEaogmKeEE0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755182975; c=relaxed/simple;
-	bh=5OQaVcwy8qq0BWPBq0Xv9tdlEf3SSr+Vlbc+VNiKzhc=;
+	s=arc-20240116; t=1755183026; c=relaxed/simple;
+	bh=eVQgdWittB1A1eRdvrgYGjzFM/V7ftpJLsC2BFnyyTE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=us6+TfATr49LHl+YNVVpDwWo5Q/CG/anz14ps+eq2otycCmpbFDlWzlWF6ICSXCXvkgPuh4/IRUQBF8qZkmoWv5FRxjrxVkIbFOK2J+E/d5oFszNoFn2eylfLf4z0wn5a7gY3FlLoUvWuz1BuGZ8EPap/vrwES56n0pfkQNonBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=qVWwE5mO; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 57EEVUkH029945;
-	Thu, 14 Aug 2025 14:49:24 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=gdTcb/
-	3GX9TLmprI5fhVBXai54xRUdMwJgxbtUu3+cQ=; b=qVWwE5mO10SIM7OFwN2Nj0
-	P8KR6gzeQvXbFaDrTz90ZvHgQ5xw+a5uvaL1PkmIi92XtXlw+HDEfg2DAh+4HhU4
-	iM0Yuc4meMQ/YWYV2o1LtSipK6+i2JXAvWD7l5JuTgbDKWfhf9RRV30zrfEbS80g
-	Q10pCoX8nQiBE1ib3Z7GTqNLYyk552rnNDOSE5uUHJmIILtUvymJqy61SjT0o9Xj
-	R3wXgt3Tz5AqDskcmGmlle1PJTwPHMNUvc2WTvE44pzfGGEue/uXJc40Y+1uLkfy
-	DgugMb9SUZxiQDDRUloyMfzxRpBzk1ZGCBzeMPNwTcHoJxH+Ms09aQqF0LuLnLMw
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48dvrpafqv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 14 Aug 2025 14:49:23 +0000 (GMT)
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 57EEgxkY024384;
-	Thu, 14 Aug 2025 14:49:23 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 48dvrpafqq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 14 Aug 2025 14:49:23 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 57ECMCb3010832;
-	Thu, 14 Aug 2025 14:49:22 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 48egnuvumj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 14 Aug 2025 14:49:22 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 57EEnIDg58458472
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 14 Aug 2025 14:49:18 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C84FB20049;
-	Thu, 14 Aug 2025 14:49:18 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6363220040;
-	Thu, 14 Aug 2025 14:49:18 +0000 (GMT)
-Received: from [9.152.224.240] (unknown [9.152.224.240])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 14 Aug 2025 14:49:18 +0000 (GMT)
-Message-ID: <ed4750cf-fcd7-40b3-be7c-84838cf8fd63@linux.ibm.com>
-Date: Thu, 14 Aug 2025 16:49:18 +0200
+	 In-Reply-To:Content-Type; b=ZrCdsYbvt1BwGu1UL+kQbw8HEG+gMiV++L/ptlozldWPvIYlT3kAo/HovvvA+L8BaeNjBTQFsvysgGo/AHug1j6eT12e/JvmreqxWNcPJW0tuZWGRav3e0IqXZjgjEf8l9JeLUl6npUweYsH/bjmPhY4xbZ6fkbo+oAQULzjbdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Uw5i2eLp; arc=none smtp.client-ip=209.85.160.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4b109bcceb9so10346311cf.2
+        for <netdev@vger.kernel.org>; Thu, 14 Aug 2025 07:50:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755183024; x=1755787824; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CEPflc75uW9weWnSJOxL+wqyI+gsL7Ya3HCYLtQBm2M=;
+        b=Uw5i2eLpAdnL1ahYKaayq5joL3kPVCvBMYYGA8Wh2wGqgweKllXBZVJJEkvftIGBCU
+         ObSUhcpXzDEr6USCKd8eD13gp1RTGxt9ZRrJ6POujguFz2x9hev81wDpHleUAQuLwUnf
+         EuTAzIPvxV0i6nQmcmt4Zp87pSKxgF1jwywXHtSVTJ+u2ez/waDK8f7QI6jwDZ78qr1C
+         TKQyWtfkAiZLdCTiIviEeFwHopyTO1NpTr3TH441s8OrMYBRDCwyMEnoYiQDsBYzqZT8
+         JJncIhpWru5VVLaGXX245H20MybfaqZzXLP4VG78TZ++B4Et75NznUe0VTwA5bMqd210
+         nDtw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755183024; x=1755787824;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CEPflc75uW9weWnSJOxL+wqyI+gsL7Ya3HCYLtQBm2M=;
+        b=X0LqBQOAKgZe0q0hJDC8Lho8eqhYG1GcThywGUlm/6G4l8x3fyC4MhEWLUnwMSKrvh
+         3BRYT09Sz7aj2qfuOC2jFuv2TkndpLqMeexRgA5SB0jLCpDFtX1kvd2zuiZa8mseq+J2
+         h4MT2jUzi+plJEs3WMmR5wUVylLe32AZxFkrUctcqU2f+vFSjVLLxmHs/VJ5nktENrlQ
+         eP3O6BkK/EEBvAdVPk09zTPn5ChLwRKzLAGLLrSC+6saGQ9kfWKENh66EENTnJ4iQ+VH
+         3CDVM+AJjoULBprTmmmIKu1Q/vk1KlPYuqWBf5wcneTpY62R5xEecP6YkyWd11IVy4+Z
+         fchw==
+X-Forwarded-Encrypted: i=1; AJvYcCWHWJ8xAiyBhMefBXY4abF0AMF/oeD52xqFrHRe1w3NOmF8gsI690fDQgelhu86kjHnmUUyhBg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxBQ63/iTCEra0UFB3I5Lu3v9xUoZnjOiqEnRhO7exCu+ZB7lj8
+	Z8qmJRRSFJNrLRk+CwqC9vTByal1lDbMbKm3DNmLS7oISpUtM7egvKqF
+X-Gm-Gg: ASbGncuEa3zH5H/T4lh/BqqCvhd/L8U/yw1Xa1My3hwlEoctr+l9FOUcaZBi4dEwsa9
+	m6PVXmmbDQ5h8rzSHaYVof+4aFxY8vgDrZz3Mi3EWx2l9J23ZjxZaR8+2+zlV2QoAnR64rXdPJF
+	KrpMVXwC7Mm3P88O//A52cu9sOvnuBTCQB2kMvGwfGhIKxX2/oilpmqXbRTk7hqwxebuFd4CL3E
+	/F88X+NrwXKYsUGy2dLOp89dunR3eUtSLoD7aHBdukwX32SOrMQdMEKV22tq7EQITdXqARI4ixg
+	X7eg1ws0RKm5cCrRC3KB0tcvZ1EyAv8efFTw/hE1oy5S9cr2sMlvtuMYqHVBJBsWkwV/mpmlHS3
+	NQ1zDP/LDK84vi1cOTzwWKnshgQ1mUWAbqRzH1nv5T2hoJOU8hO8t51tkjhPjcatjTxBJu8G64b
+	1x
+X-Google-Smtp-Source: AGHT+IFRgsrLloXlVJhDbtD5vBQiv1HIZsinKsr1dLeyeKpzbfv/re44ywiAuviqkQV+7Tt9aEn5qA==
+X-Received: by 2002:ac8:7c56:0:b0:4b0:6a0d:bbdc with SMTP id d75a77b69052e-4b10aabcb1amr37173851cf.15.1755183023553;
+        Thu, 14 Aug 2025 07:50:23 -0700 (PDT)
+Received: from ?IPV6:2600:4040:95d2:7b00:8471:c736:47af:a8b7? ([2600:4040:95d2:7b00:8471:c736:47af:a8b7])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4b067e71186sm162116021cf.17.2025.08.14.07.50.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 Aug 2025 07:50:22 -0700 (PDT)
+Message-ID: <d78db534-b472-47c4-829d-83384b537ea2@gmail.com>
+Date: Thu, 14 Aug 2025 10:50:21 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,111 +83,55 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC net-next 15/17] net/dibs: Move query_remote_gid() to
- dibs_dev_ops
-To: Julian Ruess <julianr@linux.ibm.com>, David Miller <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "D. Wythe" <alibuda@linux.alibaba.com>,
-        Dust Li <dust.li@linux.alibaba.com>,
-        Sidraya Jayagond <sidraya@linux.ibm.com>,
-        Wenjia Zhang <wenjia@linux.ibm.com>
-Cc: netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Thorsten Winkler <twinkler@linux.ibm.com>,
-        Simon Horman <horms@kernel.org>,
-        Mahanta Jambigi <mjambigi@linux.ibm.com>,
-        Tony Lu
- <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
-        Halil Pasic <pasic@linux.ibm.com>, linux-rdma@vger.kernel.org
-References: <20250806154122.3413330-1-wintera@linux.ibm.com>
- <20250806154122.3413330-16-wintera@linux.ibm.com>
- <DBZHV2Z3T4M5.1G8HW0HFP8GLO@linux.ibm.com>
+Subject: Re: [PATCH net-next v6 09/19] net: psp: update the TCP MSS to reflect
+ PSP packet overhead
+To: Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
+ Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>, Boris Pismenny <borisp@nvidia.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn
+ <willemb@google.com>, David Ahern <dsahern@kernel.org>,
+ Neal Cardwell <ncardwell@google.com>, Patrisious Haddad
+ <phaddad@nvidia.com>, Raed Salem <raeds@nvidia.com>,
+ Jianbo Liu <jianbol@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>,
+ Rahul Rameshbabu <rrameshbabu@nvidia.com>,
+ Stanislav Fomichev <sdf@fomichev.me>,
+ =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Kiran Kella <kiran.kella@broadcom.com>,
+ Jacob Keller <jacob.e.keller@intel.com>, netdev@vger.kernel.org
+References: <20250812003009.2455540-1-daniel.zahka@gmail.com>
+ <20250812003009.2455540-10-daniel.zahka@gmail.com>
+ <a6635ce0-a27f-4a3b-845a-7c25f8b58452@redhat.com>
 Content-Language: en-US
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <DBZHV2Z3T4M5.1G8HW0HFP8GLO@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODEyMDIxOSBTYWx0ZWRfXyyjYnhW/NHex
- l9zGpqZLgTksdvwvq4wSMgyqwFy6FTNogr75P9uTR330BYqDSGt6nbbzk+UlWgsVtC00x144v+L
- EErWQvIorlsr8StR9sXPexo1EWtfVsi1o05BNzBcSoYV8i8mlepwbaIiuuDvz6RiEH5+oTiPDBS
- mLIAKKKPQpwiD8OhBFwvDDLUEnJUViPUlMTyrAvpOQVMf8XLCUUPYAZJ/m2PIj3hcLvWIH3R2Ux
- OnNCgfkQuPG9xAGRteG3gy/1LcsYd5QQZw/bvJpuJFIBuclxZPcxRmL9PZ0GZpbPWggG8zBk/Gj
- QNSYh6f+PSNWYgSgTfC2kQwM5zByWNFEo9Y783L7kB7q0OngA27Ne96crYOofh2sPJCqEIug2Xh
- Pb8lBEsz
-X-Authority-Analysis: v=2.4 cv=GrpC+l1C c=1 sm=1 tr=0 ts=689df773 cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
- a=IkcTkHD0fZMA:10 a=2OwXVqhp2XgA:10 a=VnNF1IyMAAAA:8 a=-a8VnQ1ltUyKSbjGXZUA:9
- a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: t2ZMvLahaUXAs7GJ8CCnFcrO3p-HmseG
-X-Proofpoint-ORIG-GUID: aCCuv498CXKYH4gF3BiOPTB3Dx4WO2RG
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-08-13_02,2025-08-14_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 adultscore=0 spamscore=0 impostorscore=0 suspectscore=0
- phishscore=0 bulkscore=0 priorityscore=1501 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2507300000 definitions=main-2508120219
+From: Daniel Zahka <daniel.zahka@gmail.com>
+In-Reply-To: <a6635ce0-a27f-4a3b-845a-7c25f8b58452@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
 
 
-On 11.08.25 11:34, Julian Ruess wrote:
-> On Wed Aug 6, 2025 at 5:41 PM CEST, Alexandra Winter wrote:
->> Provide the dibs_dev_ops->query_remote_gid() in ism and dibs_loopback
->> dibs_devices. And call it in smc dibs_client.
->>
->> Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
->> Reviewed-by: Julian Ruess <julianr@linux.ibm.com>
->> ---
->>  drivers/s390/net/ism_drv.c | 41 +++++++++++++++++---------------------
->>  include/linux/dibs.h       | 14 +++++++++++++
->>  include/net/smc.h          |  2 --
->>  net/dibs/dibs_loopback.c   | 10 ++++++++++
->>  net/smc/smc_ism.c          |  8 ++++++--
->>  net/smc/smc_loopback.c     | 13 ------------
->>  6 files changed, 48 insertions(+), 40 deletions(-)
->>
-> 
-> -- snip --
-> 
->> diff --git a/include/linux/dibs.h b/include/linux/dibs.h
->> index 10be10ae4660..d940411aa179 100644
->> --- a/include/linux/dibs.h
->> +++ b/include/linux/dibs.h
->> @@ -133,6 +133,20 @@ struct dibs_dev_ops {
->>  	 * Return: 2 byte dibs fabric id
->>  	 */
->>  	u16 (*get_fabric_id)(struct dibs_dev *dev);
->> +	/**
->> +	 * query_remote_gid()
->> +	 * @dev: local dibs device
->> +	 * @rgid: gid of remote dibs device
->> +	 * @vid_valid: if zero, vid will be ignored;
->> +	 *	       deprecated, ignored if device does not support vlan
->> +	 * @vid: VLAN id; deprecated, ignored if device does not support vlan
->> +	 *
->> +	 * Query whether a remote dibs device is reachable via this local device
->> +	 * and this vlan id.
->> +	 * Return: 0 if remote gid is reachable.
->> +	 */
->> +	int (*query_remote_gid)(struct dibs_dev *dev, uuid_t *rgid,
->> +				u32 vid_valid, u32 vid);
-> 
-> Shouldn't this be 'const uuid_t *rgid'?
-> 
-> -- snip --
-> 
-> Thanks,
-> Julian
+On 8/14/25 9:58 AM, Paolo Abeni wrote:
+> On 8/12/25 2:29 AM, Daniel Zahka wrote:
+>> @@ -236,6 +237,10 @@ int psp_sock_assoc_set_tx(struct sock *sk, struct psp_dev *psd,
+>>   	tcp_write_collapse_fence(sk);
+>>   	pas->upgrade_seq = tcp_sk(sk)->rcv_nxt;
+>>   
+>> +	icsk = inet_csk(sk);
+>> +	icsk->icsk_ext_hdr_len += psp_sk_overhead(sk);
+> I'm likely lost, but AFAICS the user-space can successfully call
+> multiple times psp_sock_assoc_set_tx() on the same socket, increasing
+> icsk->icsk_ext_hdr_len in an unbounded way.
 
+If it were possible to execute the code you have highlighted more than 
+once per socket, that would be a bug. This should not be possible 
+because of the preceding checks in the function i.e.
 
-Good point. Same for the 'uuid_t *' in signal_event() in
-[RFC net-next 17/17] net/dibs: Move event handling to dibs layer
-Changed in next version.
+     if (pas->tx.spi) {
+         NL_SET_ERR_MSG(extack, "Tx key already set");
+         err = -EBUSY;
+         goto exit_unlock;
+     }
 
