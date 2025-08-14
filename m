@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-213599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213600-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97147B25C7D
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 09:03:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C47DB25C99
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 09:05:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B911BB60DE0
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 07:00:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BF2B51C26C8D
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 07:04:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76D6C263C8E;
-	Thu, 14 Aug 2025 07:01:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0B2B25EF9C;
+	Thu, 14 Aug 2025 07:04:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CfJJmDQE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cOlEDaW5"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4897825A659;
-	Thu, 14 Aug 2025 07:01:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B553325A326;
+	Thu, 14 Aug 2025 07:04:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755154900; cv=none; b=keOxihBa3gG1pmaV9vgm92DH80sUw4u84+fvpnrtiGquVpS4ZMED2dvj1CTC+ejjJg5OBCkp3B54vos5sDzd4apggPeKwEssjylodgQCz6k4LLTgdl0x3Q+LORPxD/sohCfJRTREsFsT9FVdq44jWk3ZpvSvVdmGckxoUkVRqf4=
+	t=1755155052; cv=none; b=qVaOdipGv9V4BWAN0FCQg8A+6nDna5chfEeA9BI9BoH6uG5o7/9zK8bXwUfw29fg0diSJlQfCIajiFvRngoPAhym6Pfet5yaPU9ny/XqeqBbmMmCSKez4AdIQ7uWGMExJ6YzRg07jiuurDqP7tTrxVbHqKDkgRUAnbrQj7eT0TE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755154900; c=relaxed/simple;
-	bh=G4m2WmUA6j5mbRNXvyqVELr7P6kumC3Wt2zPvFeuSVI=;
+	s=arc-20240116; t=1755155052; c=relaxed/simple;
+	bh=7pJ0Fl261mW06QcqNKqe/+yuvQAesZpRiKlzp/hYupk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FsKrZEsajFaN6vqFe+YDFm4WaBkWB0goXfWHI5SrU12SZROq1BGC+DC4lJc4BEQ7yPPC+LrhxTa/pAJz6ZXNy35tJXzWfWkdvgkLylrWbDZyumwiCZwGDZg27p8ifE/VY7VyEbdbw9a2+CtsoibAY/bJjwId7MkmhFzh0CYLC8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CfJJmDQE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 766F6C4CEEF;
-	Thu, 14 Aug 2025 07:01:36 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=Jvp6WGAr32t5Kc8yXYPe0H98KJ2NJzhPxhUzQzgD9MvpLef5LKtDRKL5NAuip1EfWYHtEnZWKiTgEn9lbCpsD3biq6bmoLnRgXTZTpoyEZrcIAk8MEdXCAWgqAKfDsBsB9aSp2dOjeh0Qyfx+9ifkO7ZUKSMuQDuKM2UrRUeWuk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cOlEDaW5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFBB6C4CEEF;
+	Thu, 14 Aug 2025 07:04:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755154899;
-	bh=G4m2WmUA6j5mbRNXvyqVELr7P6kumC3Wt2zPvFeuSVI=;
+	s=k20201202; t=1755155052;
+	bh=7pJ0Fl261mW06QcqNKqe/+yuvQAesZpRiKlzp/hYupk=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=CfJJmDQElgFs9Ogl780UH6NOP70i1oxXgzwiGTwP08poyZzyRvQbDVF0RC5gM7Ho8
-	 P7go/JXHips9oRUILR6WuZzgiG9/lY85C9KNjSz4bSrAH1CjgU0isi1Cy38aLrjETy
-	 /ZRCF5C7zo/aEMXe/tO+MFax7dHKLic9EKixSQ94plath7XxyUpvv4LJanqYIGjT7n
-	 3L75w8zOrcDsrMYmu5/hgTohHmkt7EAaVUlbjTaZITW8/jfv9gP1AK1Rl0SGxdIKuv
-	 5uW2Qrup29CGGs6xESThum6XaFbv5NNphOZlrnvUnAX2BwhryeyMf+m54tBBFvhejv
-	 yuyjKtOsY9sow==
-Message-ID: <94d10725-e69f-4a08-954a-db66b384b2f1@kernel.org>
-Date: Thu, 14 Aug 2025 09:01:34 +0200
+	b=cOlEDaW5ECeXrzN6DPKXy+8yDJuFotlq5GGenZw4h+YwpzB27POapMjDf3zI2vNjr
+	 7NGamYhZSAESN4SQsIT14gGugSgp+qc5VyanSZjUgRXYx0EiQ5hlNzuM82YktHn1SC
+	 meXT1qphP5QpMiGzFMoBZHOkw6J7eCAHNu3buCi2dNwSVn4dR25j1/jqFCj5ZEzSzE
+	 BcbDoXXDkkfc3RYyRXcaUemNEndurNv9zZQrDzBFkaHHZPSJXDXNMTj/W9zW3U4vu1
+	 6OWOvaUk7zcckhKDF/u2VgIFRSlRKylp3gRiHycSNwAJK1zKdQlfobKZYwwDHXyE76
+	 DBbgISTw3I/0w==
+Message-ID: <ef95652d-eafd-45e1-9603-16c4edcb8e9e@kernel.org>
+Date: Thu, 14 Aug 2025 09:04:06 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,8 +50,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC net-next 0/3] net: dsa: yt921x: Add support for Motorcomm
- YT921x
+Subject: Re: [RFC net-next 1/3] dt-bindings: net: dsa: yt921x: Add Motorcomm
+ YT921x switch support
 To: David Yang <mmyangfl@gmail.com>, netdev@vger.kernel.org
 Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
@@ -61,6 +61,7 @@ Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
  Russell King <linux@armlinux.org.uk>, devicetree@vger.kernel.org,
  linux-kernel@vger.kernel.org
 References: <20250814065032.3766988-1-mmyangfl@gmail.com>
+ <20250814065032.3766988-2-mmyangfl@gmail.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -106,35 +107,114 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
  zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
  XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <20250814065032.3766988-1-mmyangfl@gmail.com>
+In-Reply-To: <20250814065032.3766988-2-mmyangfl@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 14/08/2025 08:50, David Yang wrote:
-> Motorcomm YT921x is a series of ethernet switches developed by Shanghai
-> Motorcomm Electronic Technology, including:
+> The Motorcomm YT921x series is a family of Ethernet switches with up to
+> 8 internal GbE PHYs and up to 2 GMACs.
 > 
->   - YT9215S / YT9215RB / YT9215SC: 5 GbE phys
->   - YT9213NB / YT9214NB: 2 GbE phys
->   - YT9218N / YT9218MB: 8 GbE phys
+> Signed-off-by: David Yang <mmyangfl@gmail.com>
+> ---
+>  .../bindings/net/dsa/motorcomm,yt921x.yaml    | 121 ++++++++++++++++++
+>  1 file changed, 121 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/dsa/motorcomm,yt921x.yaml
 > 
-> and up to 2 serdes interfaces.
-> 
-> This patch adds basic support for a working DSA switch.
-> 
-> previous rfc: https://lore.kernel.org/all/20250808173808.273774-1-mmyangfl@gmail.com/
+> diff --git a/Documentation/devicetree/bindings/net/dsa/motorcomm,yt921x.yaml b/Documentation/devicetree/bindings/net/dsa/motorcomm,yt921x.yaml
+> new file mode 100644
+> index 000000000000..2f0e4532e73e
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/dsa/motorcomm,yt921x.yaml
+> @@ -0,0 +1,121 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/dsa/motorcomm,yt921x.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Motorcomm YT921x Ethernet switch family
+> +
+> +maintainers:
+> +  - David Yang <mmyangfl@gmail.com>
+> +
+> +description: |
+> +  The Motorcomm YT921x series is a family of Ethernet switches with up to 8
+> +  internal GbE PHYs and up to 2 GMACs, including YT9213NB, YT9214NB, YT9215RB,
+> +  YT9215S, YT9215SC, YT9218N, YT9218MB.
+> +
+> +  For now, only YT9215 is supported.
 
+Please describe complete hardware. Drivers are not relevant here and
+binding cannot support anything, thus this feels like comment about drivers.
 
-So that's a v2? Please version your patches correctly, e.g. use b4 or
-git format-patch -vX, and add changelog in cover letter or under '---'
-of individual patches describing changes from previous version.
+> +
+> +properties:
+> +  compatible:
+> +    const: motorcomm,yt9215
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  reset-gpios:
+> +    description: Optional gpio specifier for a reset line
 
->   - fix coding style
->   - add dt binding
->   - add support for fdb, vlan and bridge
+Drop comment, 100% redundant.
 
+> +    maxItems: 1
+> +
+> +  motorcomm,switch-id:
+> +    description: |
+> +      When managed via mdio, hard-configured switch id to distinguish between
+> +      multiple devices.
 
-Please also explain why this is RFC, why this is not ready for review.
+IDs are not allowed.
+
+> +    enum: [0, 1, 2, 3]
+> +    default: 0
+> +
+> +  mdio:
+> +    $ref: /schemas/net/mdio.yaml#
+> +    unevaluatedProperties: false
+> +    description: MDIO bus for the internal GbE PHYs.
+> +
+> +  mdio-external:
+> +    $ref: /schemas/net/mdio.yaml#
+> +    unevaluatedProperties: false
+> +    description: External MDIO bus.
+> +
+> +    properties:
+> +      compatible:
+> +        const: motorcomm,yt921x-mdio-external
+
+Incomplete compatible... but also not needed in the first place.
+
+> +
+> +    required:
+> +      - compatible
+> +
+> +allOf:
+> +  - $ref: dsa.yaml#/$defs/ethernet-ports
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +
+> +unevaluatedProperties: false
+> +
+> +examples:
+> +  - |
+> +    mdio {
+> +        #address-cells = <1>;
+> +        #size-cells = <0>;
+> +
+> +        switch@1d {
+> +            compatible = "motorcomm,yt9215";
+> +            reg = <0x1d>;
+> +
+
+Incomplete example. Where are all other properties?
+
 
 
 Best regards,
