@@ -1,162 +1,151 @@
-Return-Path: <netdev+bounces-213590-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213592-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FCDEB25BFE
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 08:41:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F8BCB25C20
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 08:47:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8AC9E68026C
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 06:41:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 29E6F188C865
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 06:48:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81522253B71;
-	Thu, 14 Aug 2025 06:41:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D0A3257440;
+	Thu, 14 Aug 2025 06:47:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IgDPikPp"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RhV213J4"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE85225393A
-	for <netdev@vger.kernel.org>; Thu, 14 Aug 2025 06:41:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0B8A253B47;
+	Thu, 14 Aug 2025 06:47:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755153706; cv=none; b=Uq2t9OrIoU66IqcbUVdnWXiiVdTb6dYc0CNY9Rc2owNejlR1sIkArIMDtV9JObg6HGyLqH9YTqq1i8eDKT2lEPVOUTx9c9iWn3In8GPePtlV2ZnqDlbjbxpxOG+vo4APLz9lZKm0xO+wWz0T6YZ6L4q1lBrTZigzLmQ32AuAE2w=
+	t=1755154055; cv=none; b=SYGlLT/HRIWC0JBjOQMneZhF8OAx2Q8svZN3EP+7nPGH0JIv/k3cnw8D415CAPmXAK7VN5dswri55vd7FiZ9FARxxiktcPKiG3lX0vzz41jeuOlqyk3uyz8++zBhE61H4nY3IVqZAXJxnxXoi2zzXWzgNLRsw8Fas89shae1YlM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755153706; c=relaxed/simple;
-	bh=GCbPMefnp9LdOOPenXhGV0oJ7QE490/uj4sFARHm2Qo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mYt39kJZCLdEuBZqPEEJ0s+9qGyEwhxLhJc1/Tvke0GZPu/liMIgMyCOQduNSRw55ZzHpdjE3D5Kfxhz4JTKpEmqWM1edLlBJj88tRhg/QoxhrAeXNyi4ZINzZCoLLfE1UHgj4LY+Nq7KltcR3elPiWA7T8QVFXtY+l8gbnTPeg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IgDPikPp; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1755153703;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=S9gfDC3XT5JH5+UXZeFk4ANri2tI0Wf8QHIFMwTkbME=;
-	b=IgDPikPpiRiy1kHDuQpPKStVkJIQUTuZ7XbK8lD7y08wsWCARvK49+MQ9YZP+62mOIvXRV
-	5xTiQCRQLhXsLaM8h2sJL+neUNv2l/+CC29M3gLqo90EKv5exmPyPPhfkCwMyCRHagc/lX
-	62QxhqLcTo4V3u10qfeTEujG4XKcocY=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-138-uHH_UuiwOdGCjeCprOFdvA-1; Thu, 14 Aug 2025 02:41:42 -0400
-X-MC-Unique: uHH_UuiwOdGCjeCprOFdvA-1
-X-Mimecast-MFC-AGG-ID: uHH_UuiwOdGCjeCprOFdvA_1755153701
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3b9e4166a7bso315688f8f.2
-        for <netdev@vger.kernel.org>; Wed, 13 Aug 2025 23:41:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755153701; x=1755758501;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=S9gfDC3XT5JH5+UXZeFk4ANri2tI0Wf8QHIFMwTkbME=;
-        b=PcGi+MJn/b2/m27gqm7hnY1x4a49A3gcvcy965UUenxTaTpH6Ri1gFWL49zzSvCeXf
-         YhACN7a4dyzZEsLAseSWUPpkMLsJSB183Jl7rpo33NEOcUxkwHxsx/77gN5N+JdI4BLb
-         YNomxeasH2WMLtkBQoQ3i+UQbqNwlb0cHISq4b0rn7xNJpmAbKPxfx56nwZ4hDGV3oEo
-         IPa0683jyRqkeNYY4/wcZlwiocHT/mq7r3O5gUn2frgwn6TyNCnWz1mWYyvmO2XPVIC2
-         yKTZqVY0c/ry7M00PbcvP6I8w5++7qcXFHa41ESZUhe0osZntQQjV8NK/OIoqik1Svrq
-         L1KA==
-X-Forwarded-Encrypted: i=1; AJvYcCVjR6D+55OHaaMnOcDojpWn8OktARF5C9AkiAmG6Fdm2Ba9ny7usFb5uDgNEphVvj6tLM/LP60=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwtpO1dJCAuC81HbnYaC3LI/mKTqLLDwtpOzrGJiY1NT2XfLekm
-	Z1/CdN2s6ndt5F5X9WmtL3J8zqMzqk0Splo3xvf6rSI3/GX0GV+DHdW9hPHrnWgoNPn0KnQQkOs
-	e85qrbQST1Eb/PhvLkZFzjdAUwqhylsWCvSJg2eAJDIcQ0YLqFiEsBQGH7Q==
-X-Gm-Gg: ASbGncs7HM77Fr8Ww2AKlAQup42VW6q+q0kSNfSpTHZBNfInCT0W4/OtH7cAsPRoqqj
-	4v2WRCRW+4AcQITSvEhUNnqEAQa5/MsZZMNOhtOfNHRdlb90uAqACprcUQhjN/WP25uS7ThpnxK
-	N9KFJbHjpClwuqleRT0EnKt/RJu4b7SScb7AN71VmVVmEnD31FlGDRgy7AjkJUKGRkTzcFVYVRD
-	MVa0xZ2op7VfBjp2Jg+jmO27zu1owuT3TpdNiSY/59YDPcuNT6Ms5/TVHYD4QxTDg1mkhvlOlYJ
-	M3y4Pri9Zif8FvOwDI9nxpSH9j6thOv6nC6qeijx+WDUUpOreNZZprJ2znditvcrk3dgxKfkORf
-	8STo=
-X-Received: by 2002:a05:6000:40c7:b0:3b7:8a49:eed0 with SMTP id ffacd0b85a97d-3b9f1a13965mr1378478f8f.22.1755153701051;
-        Wed, 13 Aug 2025 23:41:41 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFpLaxNWs2oFsAZSrN9kqR+39ayEAZmpXcMUMLGDC+7HLlsr/ah//p96eCfa0Qd8T4sw00vYQ==
-X-Received: by 2002:a05:6000:40c7:b0:3b7:8a49:eed0 with SMTP id ffacd0b85a97d-3b9f1a13965mr1378416f8f.22.1755153700568;
-        Wed, 13 Aug 2025 23:41:40 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:c:37e0:8998:e0cf:68cc:1b62? ([2a01:e0a:c:37e0:8998:e0cf:68cc:1b62])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45a1c6bc932sm9252735e9.3.2025.08.13.23.41.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Aug 2025 23:41:39 -0700 (PDT)
-Message-ID: <0f3a72c0-f52f-4ccc-acd8-861824fb762d@redhat.com>
-Date: Thu, 14 Aug 2025 08:41:36 +0200
+	s=arc-20240116; t=1755154055; c=relaxed/simple;
+	bh=XvPc8HzjswWuTYiAMjYzuffOvKnIpKNewoQ0Hd37OCs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qY0C6hgglWBrVKzwhOcPXQH2JpcBEL8roNX1amqCH4Ueeh0iD8uieh4TUSDlrquiK3VmMO4mQD++iOQIG6I2cvIsbCeKDK/lwvCzMCmetxI2xfmEB1kPeP0uFKhRhl+CRdl11lircFSijuCRT20KdPs4RtOCQjF4Jdm5zgGDTXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RhV213J4; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1755154054; x=1786690054;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=XvPc8HzjswWuTYiAMjYzuffOvKnIpKNewoQ0Hd37OCs=;
+  b=RhV213J4v/TEtAsd0KYTUFLx9ZvBaQIjzy1SAElEHm3bGQKDBJHadwmZ
+   jDoOURWssOoY4EcDjAJVJPgdEsxEE/TH9kKwlPThVALWaiPzFm66DrxTs
+   Zr6K6JXOc3+SjoMQlaL8Q2PMbjYxV8L940Twt+e4XGw+w4FbhfSlA3+Qg
+   0HpkX9GMr5VRWEpkCojDj1QSNRyFrVgkmyk1S/jDlNg6i+5ubK0ZVsRHo
+   oHSjoplAaslTnplhLkGSpeCI9ehnOQjcIsVvhDJtD/Uym8wNYVc+QotjQ
+   GgYtTaeC/TkMrJy34vw3DV79Ek8FYtx/EsPNltMR4hvrR7zxqvMU/H4p8
+   w==;
+X-CSE-ConnectionGUID: K6w0fXObQMyB1nTPLjCyNQ==
+X-CSE-MsgGUID: FhufOdhJR1WJINuZRa1v1g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11520"; a="57330007"
+X-IronPort-AV: E=Sophos;i="6.17,287,1747724400"; 
+   d="scan'208";a="57330007"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2025 23:47:33 -0700
+X-CSE-ConnectionGUID: JeJVqeKeSaKpD0s+Gaz0qg==
+X-CSE-MsgGUID: kVEGrLsDRaK7PJjZKb9Veg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,287,1747724400"; 
+   d="scan'208";a="197539847"
+Received: from lkp-server02.sh.intel.com (HELO 4ea60e6ab079) ([10.239.97.151])
+  by fmviesa001.fm.intel.com with ESMTP; 13 Aug 2025 23:47:28 -0700
+Received: from kbuild by 4ea60e6ab079 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1umRkE-000AfM-0t;
+	Thu, 14 Aug 2025 06:47:26 +0000
+Date: Thu, 14 Aug 2025 14:47:16 +0800
+From: kernel test robot <lkp@intel.com>
+To: Bhargava Marreddy <bhargava.marreddy@broadcom.com>, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, horms@kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com, vsrama-krishna.nemani@broadcom.com,
+	Bhargava Marreddy <bhargava.marreddy@broadcom.com>,
+	Vikas Gupta <vikas.gupta@broadcom.com>,
+	Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
+Subject: Re: [net-next 7/9] bng_en: Register rings with the firmware
+Message-ID: <202508141404.DrfpnTy0-lkp@intel.com>
+References: <20250813215603.76526-8-bhargava.marreddy@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 01/11] drm/panic: use `core::ffi::CStr` method names
-To: Tamir Duberstein <tamird@gmail.com>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
- David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
- Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>,
- Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
- =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
- Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>,
- Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
- Danilo Krummrich <dakr@kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Dave Ertman <david.m.ertman@intel.com>, Ira Weiny <ira.weiny@intel.com>,
- Leon Romanovsky <leon@kernel.org>, Breno Leitao <leitao@debian.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>,
- Viresh Kumar <viresh.kumar@linaro.org>, Luis Chamberlain
- <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>,
- Brendan Higgins <brendan.higgins@linux.dev>, David Gow
- <davidgow@google.com>, Rae Moar <rmoar@google.com>,
- FUJITA Tomonori <fujita.tomonori@gmail.com>, Rob Herring <robh@kernel.org>,
- Saravana Kannan <saravanak@google.com>,
- Javier Martinez Canillas <javierm@redhat.com>, Arnd Bergmann
- <arnd@arndb.de>, Len Brown <lenb@kernel.org>
-Cc: dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
- rust-for-linux@vger.kernel.org, linux-pm@vger.kernel.org,
- linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-acpi@vger.kernel.org
-References: <20250813-core-cstr-fanout-1-v3-0-545c14bc44ff@gmail.com>
- <20250813-core-cstr-fanout-1-v3-1-545c14bc44ff@gmail.com>
-Content-Language: en-US, fr
-From: Jocelyn Falempe <jfalempe@redhat.com>
-In-Reply-To: <20250813-core-cstr-fanout-1-v3-1-545c14bc44ff@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250813215603.76526-8-bhargava.marreddy@broadcom.com>
 
-On 13/08/2025 17:41, Tamir Duberstein wrote:
-> Prepare for `core::ffi::CStr` taking the place of `kernel::str::CStr` by
-> avoid methods that only exist on the latter.
+Hi Bhargava,
 
-Thanks, it looks good to me.
+kernel test robot noticed the following build warnings:
 
-Acked-by: Jocelyn Falempe <jfalempe@redhat.com>
+[auto build test WARNING on net-next/main]
 
-> 
-> Link: https://github.com/Rust-for-Linux/linux/issues/1075
-> Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Reviewed-by: Alice Ryhl <aliceryhl@google.com>
-> Reviewed-by: Benno Lossin <lossin@kernel.org>
-> Acked-by: Danilo Krummrich <dakr@kernel.org>
-> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
-> ---
->   drivers/gpu/drm/drm_panic_qr.rs | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/gpu/drm/drm_panic_qr.rs b/drivers/gpu/drm/drm_panic_qr.rs
-> index 09a9b452e8b7..10bc5bb16992 100644
-> --- a/drivers/gpu/drm/drm_panic_qr.rs
-> +++ b/drivers/gpu/drm/drm_panic_qr.rs
-> @@ -948,7 +948,7 @@ fn draw_all(&mut self, data: impl Iterator<Item = u8>) {
->           // nul-terminated string.
->           let url_cstr: &CStr = unsafe { CStr::from_char_ptr(url) };
->           let segments = &[
-> -            &Segment::Binary(url_cstr.as_bytes()),
-> +            &Segment::Binary(url_cstr.to_bytes()),
->               &Segment::Numeric(&data_slice[0..data_len]),
->           ];
->           match EncodedMsg::new(segments, tmp_slice) {
-> 
+url:    https://github.com/intel-lab-lkp/linux/commits/Bhargava-Marreddy/bng_en-Add-initial-support-for-RX-and-TX-rings/20250814-004339
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20250813215603.76526-8-bhargava.marreddy%40broadcom.com
+patch subject: [net-next 7/9] bng_en: Register rings with the firmware
+config: loongarch-randconfig-r073-20250814 (https://download.01.org/0day-ci/archive/20250814/202508141404.DrfpnTy0-lkp@intel.com/config)
+compiler: clang version 22.0.0git (https://github.com/llvm/llvm-project 3769ce013be2879bf0b329c14a16f5cb766f26ce)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250814/202508141404.DrfpnTy0-lkp@intel.com/reproduce)
 
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202508141404.DrfpnTy0-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c:768:32: warning: variable 'resp' set but not used [-Wunused-but-set-variable]
+     768 |         struct hwrm_ring_free_output *resp;
+         |                                       ^
+   1 warning generated.
+
+
+vim +/resp +768 drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c
+
+   763	
+   764	int hwrm_ring_free_send_msg(struct bnge_net *bn,
+   765				    struct bnge_ring_struct *ring,
+   766				    u32 ring_type, int cmpl_ring_id)
+   767	{
+ > 768		struct hwrm_ring_free_output *resp;
+   769		struct hwrm_ring_free_input *req;
+   770		struct bnge_dev *bd = bn->bd;
+   771		int rc;
+   772	
+   773		rc = bnge_hwrm_req_init(bd, req, HWRM_RING_FREE);
+   774		if (rc)
+   775			goto exit;
+   776	
+   777		req->cmpl_ring = cpu_to_le16(cmpl_ring_id);
+   778		req->ring_type = ring_type;
+   779		req->ring_id = cpu_to_le16(ring->fw_ring_id);
+   780	
+   781		resp = bnge_hwrm_req_hold(bd, req);
+   782		rc = bnge_hwrm_req_send(bd, req);
+   783		bnge_hwrm_req_drop(bd, req);
+   784	exit:
+   785		if (rc) {
+   786			netdev_err(bd->netdev, "hwrm_ring_free type %d failed. rc:%d\n", ring_type, rc);
+   787			return -EIO;
+   788		}
+   789		return 0;
+   790	}
+   791	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
