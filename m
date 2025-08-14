@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-213548-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213549-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1D76B2590F
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 03:31:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E61DEB2590A
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 03:30:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06B3B724928
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 01:30:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD3A05A269B
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 01:30:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AE9F19D081;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5293B1A23A4;
 	Thu, 14 Aug 2025 01:30:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DJj3AErv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T3kzgqw4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5AD219CCEC;
-	Thu, 14 Aug 2025 01:29:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2608413EFE3;
+	Thu, 14 Aug 2025 01:29:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755134999; cv=none; b=e+AtS77CSvt6lIC7Xb7/ttHpKySG1Yd5kLHL6tcdigdnLoazaGpHlFLT/U03/cH7EZ2jpMyDi0Yl7OxNmidshFgVxc4O/Vtj4r09EWmtQ6nKkPU2k/E/TwUR6qR2WCix4I3FUjgtEYni04ZcUfICpVOI419GqLas6e1/pYLQS1E=
+	t=1755135000; cv=none; b=S2zPcjeFWtPCUwkKpF79h9pRHPdIbKce9KiHX3h+HmBHZN3cUzdw6V+FScZk82T1fd2EE8/mXUpU2sjatTlzmPxUiuQvlsv+lRu6sILDNSZxHfNr4sPOGuAHo952fc3DeaZ/2pIKpY/t6AFWaxOLS16tQBdxrMXSqTcj9QVTaLo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755134999; c=relaxed/simple;
-	bh=J55Fs/Cz9AW+uhrMa+7Gfgx6XLg0a+dnMKDxhbeQISc=;
+	s=arc-20240116; t=1755135000; c=relaxed/simple;
+	bh=/lNNI6dV6jBIz3njLt7onXJXt/W2po1EbFHESeeLYYM=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Gdes+X63UBk0+K63jLhh3A8xdJBhx0J601h/T5/k6rT4QEW+rPu02HTa17K77H4Y20XJHec+L7aMC2tqFYZbNQSfx1MxYLHpul7nGQWiJmD4hmnUl2IPK3WYsio758Gvn+mpbFBqlcihu4nxHp9SD/E9CX3FK6NHayVaC1JeDo8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DJj3AErv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65DEDC4CEEB;
-	Thu, 14 Aug 2025 01:29:58 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=WijVdasj8DIaM+bUFXhm1qZbEiAl7AG6ef8nFbP2rmUQkOqQsINPgcssPULZTR9b+kph8LE4in/4QUeuZZ0UErM64QjS/q8sfKRLgKV2iTEpBPEvkOJlpcjSitjD0TBuQbHl+AzYXchMtzvjxi/ah4jClmXw3uWL9DykeqFKM7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T3kzgqw4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A76CFC4CEF7;
+	Thu, 14 Aug 2025 01:29:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755134998;
-	bh=J55Fs/Cz9AW+uhrMa+7Gfgx6XLg0a+dnMKDxhbeQISc=;
+	s=k20201202; t=1755134999;
+	bh=/lNNI6dV6jBIz3njLt7onXJXt/W2po1EbFHESeeLYYM=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=DJj3AErv1Y+Akl6loCWCYIuwCwIaQaA29YvuxizxIGbhpn1zbKuGDNVS691MlB7S0
-	 VJU0h8368YPLBSMm8F2siER/f3YQKgepBO5Cp4LZsU6ZL3iynU8MjqbUMLq9ajqSuM
-	 oEmk+x0pi6nN0kMac00LhJA0KSqZxovzDJzOTy1qjfyv4fS+Zo5j6ex+61SEdUx/hE
-	 xkT03+yfzbyN4Lg3vhXW6yReDESys/snU/yMC9iQn6hO7xDRbYReWvRTERmdxqWVCW
-	 APFylYXDss+aGb6AOxHVC8yGFAEkAmc15UBqsNYs3PO4CWn0V7Ty1hdrBeG7Ex7BAv
-	 eSGz6KQGUI4WQ==
+	b=T3kzgqw4XJyD/ga89g3u77FtDe7VhnBb8a8d8lRQr9XrhyTkUIFqj57D4Jsqx08fW
+	 CbKFHbePr+Xi99rJAr4P2YVBwNImC9VRIUkEh0mLrMlFtfkyK7V69Kg5erKZHajlSk
+	 uNgiq5WHwUfejKmcwJsvjgtc5snL2X3wz8mnqwQos0kppGvHA173L/OS0x9+4SmC6B
+	 su8YyT4zUyeQBri/rzVj/g7CG2NH44SpW/K8k97ZE9JLmtUgG0rGOrfh7KfI6sWGjz
+	 JVLCtdt4T3uS0n1FaeZSnMFu9FdrXzcqu/rTeFsfG88Ux5MifJi/zLQwZOVNd0oRcN
+	 PVXBis9KH73uQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33AFD39D0C38;
-	Thu, 14 Aug 2025 01:30:11 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70BF939D0C38;
+	Thu, 14 Aug 2025 01:30:12 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,44 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2 0/2] ets: use old 'nbands' while purging unused
- classes
+Subject: Re: [PATCH net v2] net: kcm: Fix race condition in kcm_unattach()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175513501000.3846704.9094584005828460007.git-patchwork-notify@kernel.org>
-Date: Thu, 14 Aug 2025 01:30:10 +0000
-References: <cover.1755016081.git.dcaratti@redhat.com>
-In-Reply-To: <cover.1755016081.git.dcaratti@redhat.com>
-To: Davide Caratti <dcaratti@redhat.com>
-Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, nnamrec@gmail.com, petrm@nvidia.com,
- netdev@vger.kernel.org, ivecera@redhat.com, shuali@redhat.com,
- stable@vger.kernel.org
+ <175513501124.3846704.13838201534984026862.git-patchwork-notify@kernel.org>
+Date: Thu, 14 Aug 2025 01:30:11 +0000
+References: <20250812191810.27777-1-sven@stegemann.de>
+In-Reply-To: <20250812191810.27777-1-sven@stegemann.de>
+To: Sven Stegemann <sven@stegemann.de>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ syzbot+e62c9db591c30e174662@syzkaller.appspotmail.com,
+ syzbot+d199b52665b6c3069b94@syzkaller.appspotmail.com,
+ syzbot+be6b1fdfeae512726b4e@syzkaller.appspotmail.com
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 12 Aug 2025 18:40:28 +0200 you wrote:
-> - patch 1/2 fixes a NULL dereference in the control path of sch_ets qdisc
-> - patch 2/2 extends kselftests to verify effectiveness of the above fix
+On Tue, 12 Aug 2025 21:18:03 +0200 you wrote:
+> syzbot found a race condition when kcm_unattach(psock)
+> and kcm_release(kcm) are executed at the same time.
 > 
-> Changes since v1:
->  - added a kselftest (thanks Victor)
+> kcm_unattach() is missing a check of the flag
+> kcm->tx_stopped before calling queue_work().
 > 
-> Davide Caratti (2):
->   net/sched: ets: use old 'nbands' while purging unused classes
->   selftests: net/forwarding: test purge of active DWRR classes
+> If the kcm has a reserved psock, kcm_unattach() might get executed
+> between cancel_work_sync() and unreserve_psock() in kcm_release(),
+> requeuing kcm->tx_work right before kcm gets freed in kcm_done().
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2,1/2] net/sched: ets: use old 'nbands' while purging unused classes
-    https://git.kernel.org/netdev/net/c/87c6efc5ce9c
-  - [net,v2,2/2] selftests: net/forwarding: test purge of active DWRR classes
-    https://git.kernel.org/netdev/net/c/774a2ae6617b
+  - [net,v2] net: kcm: Fix race condition in kcm_unattach()
+    https://git.kernel.org/netdev/net/c/52565a935213
 
 You are awesome, thank you!
 -- 
