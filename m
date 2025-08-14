@@ -1,208 +1,155 @@
-Return-Path: <netdev+bounces-213694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213695-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F37C9B26531
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 14:16:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74523B26569
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 14:32:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DB9687BE35C
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 12:14:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E3A81B6018D
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 12:30:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1914D2FDC2A;
-	Thu, 14 Aug 2025 12:15:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81DB22FC89C;
+	Thu, 14 Aug 2025 12:30:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="dbLo7fO4"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="E4H0oF1v"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllvem-ot03.ext.ti.com (fllvem-ot03.ext.ti.com [198.47.19.245])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E82E62E7BBC;
-	Thu, 14 Aug 2025 12:15:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.245
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ABE12D0C80
+	for <netdev@vger.kernel.org>; Thu, 14 Aug 2025 12:30:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755173750; cv=none; b=PbAqpkYvyb5/n5zUlGcU2itNuqvJrW4Z2P3Bz7f2St0YDPsUqP4r7YliH9e0f011TFclhHBBzQ/PYWWvY3lR0YLa/L4zjkuMzUUlZqUoCTW6mle+BlHdWI1NT9wDGabCYXtWpqu6xr6G4ypUfUbtI8x8LKS6dlDtxDCgyJthnFI=
+	t=1755174628; cv=none; b=OB9t+59deLIyoFiabxvtfUecOpNFY7oEu5sdU9GJ3h/0AewJuFwku1MvIr1KZFHi4cYVoCyP311wh2OlbyLRSu4ruDYvcyllgX8qgO8en28TpDTCHHxqjlXg/ESCxGxHSJZLUx5tpe9AuNWsR2wYV/6djJRTRCwi3aM7MzevZTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755173750; c=relaxed/simple;
-	bh=zsj/r4+qg+RibQeEvHxn2GkGt2ubYJ+iN86QAKdU1/0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=kDMjliO0nVgdoTneZuAKnt4S3wHTyVTU7MIFBcZXIuPpeHe3DMKhK7muCmV3gZgM5cpkjs+H+XbVhg9hnpoPsrVYWz4x+5zlZBnEfZg3auYGGxhz/UVrITSAxEZNTy5U5iGaTEuvQ2zyD5gZ9NDfBiOzdwiJ6CvWX4xeiL/YSRs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=dbLo7fO4; arc=none smtp.client-ip=198.47.19.245
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllvem-sh04.itg.ti.com ([10.64.41.54])
-	by fllvem-ot03.ext.ti.com (8.15.2/8.15.2) with ESMTP id 57ECExwS1875851;
-	Thu, 14 Aug 2025 07:14:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1755173699;
-	bh=3bkB4ImlGUHuqngaDsC8bS0n8FZ4dBNcDo4Y1EMKjpE=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=dbLo7fO40YX7UWvYJmhodrSTTzlEIOLeOw35d4UR+YPJE1fj4ourbiGEy1rYfkDPC
-	 UWPGYNHmbEf1ZZzLDEw6H4MdUY3YKILbftMREbHBMams0wqz4AeHDrxD+57kPfR0x1
-	 7b56lgQBaD/wXECzbSoPTgKGr8Yy8WhDHq5TzZPQ=
-Received: from DFLE105.ent.ti.com (dfle105.ent.ti.com [10.64.6.26])
-	by fllvem-sh04.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 57ECEx9L1821238
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
-	Thu, 14 Aug 2025 07:14:59 -0500
-Received: from DFLE106.ent.ti.com (10.64.6.27) by DFLE105.ent.ti.com
- (10.64.6.26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Thu, 14
- Aug 2025 07:14:58 -0500
-Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DFLE106.ent.ti.com
- (10.64.6.27) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55 via
- Frontend Transport; Thu, 14 Aug 2025 07:14:58 -0500
-Received: from [172.24.231.152] (danish-tpc.dhcp.ti.com [172.24.231.152])
-	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 57ECEqac3583824;
-	Thu, 14 Aug 2025 07:14:52 -0500
-Message-ID: <dd6ece66-ae4b-424a-aa09-872ac15e1549@ti.com>
-Date: Thu, 14 Aug 2025 17:44:51 +0530
+	s=arc-20240116; t=1755174628; c=relaxed/simple;
+	bh=1PE9vqqyAAJHt2b4anvd33upg87s7/sb4TrxyKMVNKg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sK2e8xOfQZKWoIML5zCCPZ2XLyEMi2e5FztzSPQN5ZbhRC0x7RjeB7A1QQDmpR12ats1RBeVpLarAtr9VqeYTk3vyFJ2/HLGL6AlSsle61Ou82iGlKWayLhUWLDqqIKariDazZ3NNTxTti6TOTc18YQnpgHCXfnKT3HQQ2Hcp0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=E4H0oF1v; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-3b9e41101d4so468520f8f.2
+        for <netdev@vger.kernel.org>; Thu, 14 Aug 2025 05:30:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1755174625; x=1755779425; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=fJ1w1vX016HZnhf51EVaJqwNMCPhdOvsodT4l6hbFIE=;
+        b=E4H0oF1v9HyUEv/PaapQmZXv2Qj8FbNSP2dSaO73BcECErZ+qjpyThCT5uyiNriH3H
+         VYwQ6gBxjru8L9YTVAOlfkD4AuJxv6UCCSYHWe1yyAZAwZIJ4dvSuVEjliiXp3rOGwuq
+         LHAkyT5gbIgYe5dxMM2m3hWjam7zAJVboHAMc+2mqKAkjSw7w+4n9CwS/M36ugrW5K+d
+         FJwKjSg7UAJZtvjohWd3QyiQt7fRaq2Ry7UOCNIaWEZOjN2VQBFBokWKZYgFAZGkgkm4
+         MY7uL9KR0ngEgs1OnYXlAG4cRY6EaQ6SsSMPp10yc/kpDGg69I7Anjadgg6YmIgdSCQX
+         yxdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755174625; x=1755779425;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fJ1w1vX016HZnhf51EVaJqwNMCPhdOvsodT4l6hbFIE=;
+        b=EGg4wGYQAEOgx03MV58tCTUp5mMCHh2Ma/HlYtCjL0B8Gqjc+06Eho436r1pu26lm0
+         m8p3AeOm4+2vpUoFWRg5xZ7p1Kkk8T54+pTjyEuGWUUt6retQTd10wgbqx6dBucpHsCm
+         g1KlZ60o6BR6Y8nlTYojPGsbvuX9KIqBVRP9zJmueiZrGOLcj++/nl3UQuJFPtn4FKrV
+         PkbDgrtPFu+rOaD0oW2rInksrvQqvB7VrUkRwq5Cdk5k8HqoZGwUcXKd4L9/8qbZm5HU
+         5lnqnhZnV8TO1LntHXN8ACLMbcNhtmCQdGDMs4z+UQHecmJL5uup8a5vu6Azeu00z0Un
+         JxtA==
+X-Forwarded-Encrypted: i=1; AJvYcCVcwLjpCTGpX4KebKN9Ew4mmYFSbA7swXtNAdeac6Ljo1yio9m/XUhBCU/4JsDQbVbmyR8BIeM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxRTEBTBrtxhsxDfCtSLPaWvEDjvGXZ+khLa0rt4hHvlpybWS9/
+	sa0iURxe3G77fW5r9RQWuqvItGl1EOsSrabf0zQUjM5gMzP4j428/jebxTwJqjkGYoc=
+X-Gm-Gg: ASbGnctmpRXAQHsWSgm1OF9cYCglyCCce8rqIfGPQ2b8LAjrcinAm5lykUZuPugsy5I
+	r8hEBHngVLakE/fCqet+lVhUqHQMDOQYbZ7XOOx8/QarYYMXCfpDMtXEKEokLI41ipMAkDe4GAf
+	POOKVZnatRjK7ky4F0HLeMq443cE1jAavLmR1AIJdy6pIVTaC599YCcdD48m/4MSXA69LNcTknc
+	tfo75bDFwgMI+T3w+hXNKmFXNB4mY2eu2N6/4NstxJ+mTW6GUjM5XEfhvqtuFF/0ocB50fBZvRb
+	ZhWDLax0WPNrfIQLMCKzlFDdr/POkB1IBi7I8Mezaj7d0CLv0zGsIEUubffMrl+0CvdTYsQ2mJB
+	xvxmsHRtxY6wQ32n0mnGxhhFjudHIi2KXDlwxa5PIjQ==
+X-Google-Smtp-Source: AGHT+IEcamlanLgHj4e3UiHXnuoZFx6EM5i/6/BHJ22GOTsUGejY8ezIfKRRmd/gWCi23iogf+4+lg==
+X-Received: by 2002:a05:6000:3111:b0:3b7:974d:5359 with SMTP id ffacd0b85a97d-3b9fc359a99mr2276811f8f.32.1755174624685;
+        Thu, 14 Aug 2025 05:30:24 -0700 (PDT)
+Received: from blackdock.suse.cz (nat2.prg.suse.com. [195.250.132.146])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-241d1f0fb4asm348329055ad.60.2025.08.14.05.30.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Aug 2025 05:30:23 -0700 (PDT)
+Date: Thu, 14 Aug 2025 14:30:05 +0200
+From: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Neal Cardwell <ncardwell@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Willem de Bruijn <willemb@google.com>, Matthieu Baerts <matttbe@kernel.org>, 
+	Mat Martineau <martineau@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
+	Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>, 
+	Shakeel Butt <shakeel.butt@linux.dev>, Andrew Morton <akpm@linux-foundation.org>, 
+	Tejun Heo <tj@kernel.org>, Simon Horman <horms@kernel.org>, 
+	Geliang Tang <geliang@kernel.org>, Muchun Song <muchun.song@linux.dev>, 
+	Mina Almasry <almasrymina@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
+	mptcp@lists.linux.dev, cgroups@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH v3 net-next 01/12] mptcp: Fix up subflow's memcg when
+ CONFIG_SOCK_CGROUP_DATA=n.
+Message-ID: <ukfrq6ybrbb2yds5duyj2ms6i7xgssjsywzgknxctfgkpzupor@tjxbuiil5ptt>
+References: <20250812175848.512446-1-kuniyu@google.com>
+ <20250812175848.512446-2-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 5/5] net: rnpgbe: Add register_netdev
-To: Dong Yibo <dong100@mucse.com>, <andrew+netdev@lunn.ch>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <horms@kernel.org>, <corbet@lwn.net>,
-        <gur.stavi@huawei.com>, <maddy@linux.ibm.com>, <mpe@ellerman.id.au>,
-        <lee@trager.us>, <gongfan1@huawei.com>, <lorenzo@kernel.org>,
-        <geert+renesas@glider.be>, <Parthiban.Veerasooran@microchip.com>,
-        <lukas.bulwahn@redhat.com>, <alexanderduyck@fb.com>,
-        <richardcochran@gmail.com>
-CC: <netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-References: <20250814073855.1060601-1-dong100@mucse.com>
- <20250814073855.1060601-6-dong100@mucse.com>
-Content-Language: en-US
-From: MD Danish Anwar <danishanwar@ti.com>
-In-Reply-To: <20250814073855.1060601-6-dong100@mucse.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="xhbunld2ijovocqb"
+Content-Disposition: inline
+In-Reply-To: <20250812175848.512446-2-kuniyu@google.com>
 
 
+--xhbunld2ijovocqb
+Content-Type: text/plain; protected-headers=v1; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v3 net-next 01/12] mptcp: Fix up subflow's memcg when
+ CONFIG_SOCK_CGROUP_DATA=n.
+MIME-Version: 1.0
 
-On 14/08/25 1:08 pm, Dong Yibo wrote:
-> Initialize get mac from hw, register the netdev.
-> 
-> Signed-off-by: Dong Yibo <dong100@mucse.com>
-> ---
->  drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h    | 18 +++++
->  .../net/ethernet/mucse/rnpgbe/rnpgbe_chip.c   | 73 ++++++++++++++++++
->  drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h |  1 +
->  .../net/ethernet/mucse/rnpgbe/rnpgbe_main.c   | 75 +++++++++++++++++++
->  4 files changed, 167 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
-> index 7ab1cbb432f6..7e51a8871b71 100644
-> --- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
-> +++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
-> @@ -6,6 +6,7 @@
->  
->  #include <linux/types.h>
->  #include <linux/mutex.h>
-> +#include <linux/netdevice.h>
->  
->  extern const struct rnpgbe_info rnpgbe_n500_info;
->  extern const struct rnpgbe_info rnpgbe_n210_info;
-> @@ -82,6 +83,15 @@ struct mucse_mbx_info {
->  	u32 fw2pf_mbox_vec;
->  };
->  
-> +struct mucse_hw_operations {
-> +	int (*reset_hw)(struct mucse_hw *hw);
-> +	void (*driver_status)(struct mucse_hw *hw, bool enable, int mode);
-> +};
-> +
-> +enum {
-> +	mucse_driver_insmod,
-> +};
-> +
->  struct mucse_hw {
->  	u8 pfvfnum;
->  	void __iomem *hw_addr;
-> @@ -91,12 +101,17 @@ struct mucse_hw {
->  	u32 axi_mhz;
->  	u32 bd_uid;
->  	enum rnpgbe_hw_type hw_type;
-> +	const struct mucse_hw_operations *ops;
->  	struct mucse_dma_info dma;
->  	struct mucse_eth_info eth;
->  	struct mucse_mac_info mac;
->  	struct mucse_mbx_info mbx;
-> +	u32 flags;
-> +#define M_FLAGS_INIT_MAC_ADDRESS BIT(0)
->  	u32 driver_version;
->  	u16 usecstocount;
-> +	int lane;
-> +	u8 perm_addr[ETH_ALEN];
->  };
->  
->  struct mucse {
-> @@ -117,4 +132,7 @@ struct rnpgbe_info {
->  #define PCI_DEVICE_ID_N500_DUAL_PORT 0x8318
->  #define PCI_DEVICE_ID_N210 0x8208
->  #define PCI_DEVICE_ID_N210L 0x820a
-> +
-> +#define dma_wr32(dma, reg, val) writel((val), (dma)->dma_base_addr + (reg))
-> +#define dma_rd32(dma, reg) readl((dma)->dma_base_addr + (reg))
+Hello.
 
-These macros could collide with other definitions. Consider prefixing
-them with the driver name (rnpgbe_dma_wr32).
+On Tue, Aug 12, 2025 at 05:58:19PM +0000, Kuniyuki Iwashima <kuniyu@google.=
+com> wrote:
+> When sk_alloc() allocates a socket, mem_cgroup_sk_alloc() sets
+> sk->sk_memcg based on the current task.
+>=20
+> MPTCP subflow socket creation is triggered from userspace or
+> an in-kernel worker.
 
-I don't see these macros getting used anywhere in this series. They
-should be introduced when they are used.
+I somewhat remembered
+d752a4986532c ("net: memcg: late association of sock to memcg")
 
->  #endif /* _RNPGBE_H */
-> diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
-> index e0c6f47efd4c..aba44b31eae3 100644
-> --- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
-> +++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
-> @@ -1,11 +1,83 @@
->  // SPDX-License-Identifier: GPL-2.0
->  /* Copyright(c) 2020 - 2025 Mucse Corporation. */
->  
-> +#include <linux/pci.h>
->  #include <linux/string.h>
-> +#include <linux/etherdevice.h>
->  
->  #include "rnpgbe.h"
->  #include "rnpgbe_hw.h"
->  #include "rnpgbe_mbx.h"
-> +#include "rnpgbe_mbx_fw.h"
+but IIUC this MPTCP codepath, the socket would never be visible to
+userspace nor manipulated from a proper process context, so there is no
+option to defer the association in similar fashion, correct?
 
-> +/**
-> + * rnpgbe_xmit_frame - Send a skb to driver
-> + * @skb: skb structure to be sent
-> + * @netdev: network interface device structure
-> + *
-> + * @return: NETDEV_TX_OK or NETDEV_TX_BUSY
-> + **/
-> +static netdev_tx_t rnpgbe_xmit_frame(struct sk_buff *skb,
-> +				     struct net_device *netdev)
-> +{
-> +		dev_kfree_skb_any(skb);
-> +		netdev->stats.tx_dropped++;
-> +		return NETDEV_TX_OK;
-> +}
+Then, I wonder whether this isn't a scenario for
+	o =3D set_active_memcg(sk->sk_memcg);
+	newsk =3D  sk_alloc();
+	...
+	set_active_memcg(o);
 
-You didn't fix this extra indentation. This was present in v3 as well
+i.e. utilize the existing remote charging infra instead of introducing
+specific mem_cgroup_sk_inherit() helper.
 
-https://lore.kernel.org/all/94eeae65-0e4b-45ef-a9c0-6bc8d37ae789@ti.com/#:~:text=skb)%3B%0A%3E%20%2B%09%09return%20NETDEV_TX_OK%3B%0A%3E%20%2B-,%7D,-Extra%20indentation%20on
+Regards,
+Michal
 
-> +
-> +static const struct net_device_ops rnpgbe_netdev_ops = {
-> +	.ndo_open = rnpgbe_open,
-> +	.ndo_stop = rnpgbe_close,
+--xhbunld2ijovocqb
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
 
--- 
-Thanks and Regards,
-Danish
+iHUEABYKAB0WIQRCE24Fn/AcRjnLivR+PQLnlNv4CAUCaJ3WwQAKCRB+PQLnlNv4
+CAoVAQCrDITNqluusq0b12YFFhfY1gKK4Q8uAHs/KsISm9RelwD+JxaqxOrcmstY
+zyqaWiykc0r7xJAjUUU3so6cKm+/lQg=
+=6bNw
+-----END PGP SIGNATURE-----
 
+--xhbunld2ijovocqb--
 
