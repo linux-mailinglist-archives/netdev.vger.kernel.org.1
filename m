@@ -1,81 +1,48 @@
-Return-Path: <netdev+bounces-213801-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213802-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC6E8B26BB4
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 18:00:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46E13B26BE0
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 18:06:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AEAEFAA56F5
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 15:53:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 84BBE604A37
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 15:58:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88A44204096;
-	Thu, 14 Aug 2025 15:53:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B9BD21B9CF;
+	Thu, 14 Aug 2025 15:58:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HKAhOxpm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JdZYZAPh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECA7C199924
-	for <netdev@vger.kernel.org>; Thu, 14 Aug 2025 15:53:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 237F11C5486;
+	Thu, 14 Aug 2025 15:58:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755186806; cv=none; b=XJRhBRb3Fo0MLbPNNVduQF5Bssr3XPqdkr/yyEY7A+VnQTr0EnOxkuuC1LtDhHyhmozri94lD3VjlUEV3wscEfPEWiFJeAukODXAZjqMvo0s0X63ck2XdfhnRtjY/GszGlvM+GMditxWPK/5kk3z9vbZIJ+MN7rfJeVjldSVFXA=
+	t=1755187108; cv=none; b=PYSAIoRwn3JqDioEKtq27Gq5qQF/7pyxljwnRn/nSiOytGRX+/d0PD05IAOdSwfqj1yNsNDa0+fhfn76Gq3I3NGgX27xi52IfvFBBFBWmys1+I4e1hW8vK2+B23fAoYw3eApwwmlzuhH7H3sUDpaJI3VxFoOKqPSsIuaDwG6a6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755186806; c=relaxed/simple;
-	bh=chNbYMXqIf5sbUwTNQRed47YL3+n/DL74eP1uksvpZY=;
+	s=arc-20240116; t=1755187108; c=relaxed/simple;
+	bh=Y5BCUY/vfZOJE/H9WaGMwKhbW4Km+J9Jr+jMcFeKmaY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=h5ZRdqV/qaHJCvO6hwU+cA+oA0Zx/xxED2YnWYDOrYXEAY8nYMicA8iBB5QOuddknHE4cexLMGufeP37Rj91RoNYLrqllHfTz4CiQCTk8mATnj4PrRxZ3da+g/Y9fttEvh2jLu1FKwxPrqx4To0TMq3yS+eOqF7Jiviv+T4/ZAE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HKAhOxpm; arc=none smtp.client-ip=209.85.219.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-70a88db0bd8so10768536d6.0
-        for <netdev@vger.kernel.org>; Thu, 14 Aug 2025 08:53:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755186804; x=1755791604; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jU0FKL9k+yo0fLGUfr+yjxIwwRipTVVmHHTwNHnqUb8=;
-        b=HKAhOxpmJNR2GIPHuTHTAX3/7cLjU4f2mpOzlTEWYtOG7RbKOh6EdB+CfeFsHJwQr+
-         OydVtFDGNSUdgAeE16VS/a9IdDbf5mGEHFe01UsHqv548PI3ohALzTCkjgI35gzJMjoF
-         ME5iavcYSh6pkQS2dLRnWBi6XR+fqpchA9TfH1rT4rafshCbZHF6IW8UkTFIYAcYDKj2
-         diYq1ye80QenGhlfyhjoH84FI+A/dZtWynZ95FA9SrGyt+HYMGU57FZ18WNz7JG5aYdU
-         caiQ/L20MqKcsUfy1kS6YOPiylGnRf5wtT6eV5L7V73CWnnV3oBhNF3FlKFqL7xpqHy1
-         yMiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755186804; x=1755791604;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jU0FKL9k+yo0fLGUfr+yjxIwwRipTVVmHHTwNHnqUb8=;
-        b=nNJ5aGQoxfbtdhxEG4iUB6Kzx5l0aX5CB0OLaF+lQXBygviMaFZ3bti7pqgHP8kPdk
-         Gd62oo4eJ5PbT8g/0QIeslQ5pXFNpBxVXu+Z4Z4AsDW3N1mQlyDLXR7oGr5JrWRI5YPI
-         8qofR7Mzc5+NQKxiuMwoM+NiihG38FuiyRs6idIc86vSAlVt67KE7pwiraqn5GMPfq7E
-         /km+DeO0EYD7EERD6omBJt+Ia/FMDLbFRRD32lxjIJxxTiI94g6Zm2RS6Yttf0vg6e1/
-         kTZjBks8woGc+hYnHylNAr5gBTPc5RTHRFvGYhbTQkWBjOx/8w7Z5FKIPQlljaZ5G+tE
-         pjPg==
-X-Forwarded-Encrypted: i=1; AJvYcCVdKQjtLiFDykyTZl62tC2nEcsnpuaYcHZ/iTmtMdMi/f0uelqfpmzjhzzl9iE2jAeTBx7hnVY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwoxqiNWkZAXdkbTziVFQkzWireIdXa1m2jcL03FxBhNlUKV942
-	DIe5ywsoxM4uU1gSnxibIDOiUKF46Uaz1n6RBnndvwtJr0M4riPIBXCt
-X-Gm-Gg: ASbGncvQ5GqhHdhczVJLlsjtjWTuj2OBHRm4VuqttsnfCp6W274mCepLe4dR+rJqOh+
-	WqbqEAntQ0d/c/lro/AyFyYgAzdraI3dPfOzlNObfHhg4xP5jQvOYYSMmqmmzAAeM4SYdbk6oXz
-	ZQl9HJ7Ua/StR4xxEq2JRaF0KsrlXONLklZQjWj5JvjGZIYXLM9cj1coqxdeq8oApdMWS/fEzsG
-	QTmOSRAxxIJbgVUNWX+W4peVOopToFZcnNgJMP4MQ5MWq3QkHF/8X4qdQn/q1Qc9Zkifjr+qghh
-	TqirUA+W95rmBd1WI4ljyHZM3hN3yWOrXmBldqhifpZbcMA22vHKFg0GQw6QwjODETp29m4b/sC
-	w0bE7+1FOBMH9aEy0Cqg+FXk+HTSj1qNYvAF7SdENeVKbOS26TUpGojcfgInfN2UR8FupIxXS2m
-	n/
-X-Google-Smtp-Source: AGHT+IGA0rSBML2rLnKnQ0Dn0LLB44udsvkK/ncc0LXhRz3ABHANdxXtVb/N5E8P5T0a/3IPqCIttA==
-X-Received: by 2002:a05:6214:1bcc:b0:707:4c29:c53b with SMTP id 6a1803df08f44-70af5f4106bmr52082396d6.51.1755186803781;
-        Thu, 14 Aug 2025 08:53:23 -0700 (PDT)
-Received: from ?IPV6:2600:4040:95d2:7b00:8471:c736:47af:a8b7? ([2600:4040:95d2:7b00:8471:c736:47af:a8b7])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-70ae6cc98e4sm14820476d6.21.2025.08.14.08.53.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Aug 2025 08:53:23 -0700 (PDT)
-Message-ID: <32b6cce4-6751-486a-b853-5604a48572e3@gmail.com>
-Date: Thu, 14 Aug 2025 11:53:21 -0400
+	 In-Reply-To:Content-Type; b=b5o4CndmYqe9G12fF1YVUZZVxpljlUh5trTLBY+Bvh+simREeRnry9sy3bZoMSHmMh1tA5utuUHPTaLZR9jEgotj56aCxKUs7IcW/soOz/0EK4qbyCWoHyFjmK//60URAiqKdllLC/K7sfxKd6jGTwJf5I4vXpVOYS0uN1Nx/f4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JdZYZAPh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5767FC4CEED;
+	Thu, 14 Aug 2025 15:58:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755187107;
+	bh=Y5BCUY/vfZOJE/H9WaGMwKhbW4Km+J9Jr+jMcFeKmaY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=JdZYZAPh1M8qq680u8pfMCh5XH71WAVCRZ5tr47DrGsgnX+sCL7rpO3cXA+JLS4PS
+	 aMLWMXXec9SD0dWMHoIkigo7Ji3poUJI4PRQH2MUFjtqxtwHOvOitDWPWb8QgUbP+B
+	 U5UDCDJIgCLrJVi/uv+aud+k1HG1p4IpJCnhYi4EO3XKAW+zpR56aQe5Zlg5QgQ/X6
+	 JQ8yDH7P1qcVqXzm8DjtuR2AQ+4E9t03AOyEZ+LYL4LXYoFJp4GRWFpsMFtsNjTQQ9
+	 DAc/8H+RN2ASV+dzOeoZWIO+9hRa4wqiYO+hX3hChT6VRHL5v14POkIxBMJkPjkTpL
+	 oLvCjly3fnS7g==
+Message-ID: <8d165026-1477-46cb-94d4-a01e1da40833@kernel.org>
+Date: Thu, 14 Aug 2025 17:58:21 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,67 +50,175 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 10/19] psp: track generations of device key
-To: Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
- Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- Tariq Toukan <tariqt@nvidia.com>, Boris Pismenny <borisp@nvidia.com>,
- Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn
- <willemb@google.com>, David Ahern <dsahern@kernel.org>,
- Neal Cardwell <ncardwell@google.com>, Patrisious Haddad
- <phaddad@nvidia.com>, Raed Salem <raeds@nvidia.com>,
- Jianbo Liu <jianbol@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>,
- Rahul Rameshbabu <rrameshbabu@nvidia.com>,
- Stanislav Fomichev <sdf@fomichev.me>,
- =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
- Alexander Lobakin <aleksander.lobakin@intel.com>,
- Kiran Kella <kiran.kella@broadcom.com>,
- Jacob Keller <jacob.e.keller@intel.com>, netdev@vger.kernel.org
-References: <20250812003009.2455540-1-daniel.zahka@gmail.com>
- <20250812003009.2455540-11-daniel.zahka@gmail.com>
- <324f1785-80a8-4178-937a-c3d6a47e6d79@redhat.com>
+Subject: Re: [BUG] mlx5_core memory management issue
+To: Dragos Tatulea <dtatulea@nvidia.com>, Chris Arges
+ <carges@cloudflare.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: Jesse Brandeburg <jbrandeburg@cloudflare.com>, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, kernel-team <kernel-team@cloudflare.com>,
+ tariqt@nvidia.com, saeedm@nvidia.com, Leon Romanovsky <leon@kernel.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ John Fastabend <john.fastabend@gmail.com>, Simon Horman <horms@kernel.org>,
+ Andrew Rzeznik <arzeznik@cloudflare.com>, Yan Zhai <yan@cloudflare.com>,
+ Kumar Kartikeya Dwivedi <memxor@gmail.com>
+References: <aJTYNG1AroAnvV31@861G6M3>
+ <hlsks2646fmhbnhxwuihheri2z4ymldtqlca6fob7rmvzncpat@gljjmlorugzw>
+ <aqti6c3imnaffenkgnnw5tnmjwrzw7g7pwbt47bvbgar2c4rbv@af4mch7msf3w>
+ <9b27d605-9211-43c9-aa49-62bbf87f7574@cloudflare.com>
+ <72vpwjc4tosqt2djhyatkycofi2hlktulevzlszmhb6w3mlo46@63sxu3or7suc>
+ <aJuxY9oTtxSn4qZP@861G6M3> <aJzfPFCTlc35b2Bp@861G6M3>
+ <5hinwlan55y6fl6ocilg7iccatuu5ftiyruf7wwfi44w5b4gpa@ainmdlgjtm5g>
+ <4zkm7dmkxhfhf3cm7eniim26z6nbp3zsm4qttapg3xbvkrqhro@cvjnbr624m5h>
+ <e60404e2-4782-409f-8596-ae21ce7272c4@kernel.org>
+ <tyioy6vj2os2lnlirqxdbiwdaquoxd64lf3j3quqmyz6qvryft@xrfztbgfk7td>
 Content-Language: en-US
-From: Daniel Zahka <daniel.zahka@gmail.com>
-In-Reply-To: <324f1785-80a8-4178-937a-c3d6a47e6d79@redhat.com>
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <tyioy6vj2os2lnlirqxdbiwdaquoxd64lf3j3quqmyz6qvryft@xrfztbgfk7td>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 
 
-On 8/14/25 10:07 AM, Paolo Abeni wrote:
-> On 8/12/25 2:29 AM, Daniel Zahka wrote:
->> +void psp_assocs_key_rotated(struct psp_dev *psd)
->> +{
->> +	struct psp_assoc *pas, *next;
->> +
->> +	/* Mark the stale associations as invalid, they will no longer
->> +	 * be able to Rx any traffic.
->> +	 */
->> +	list_for_each_entry_safe(pas, next, &psd->prev_assocs, assocs_list)
->> +		pas->generation |= ~PSP_GEN_VALID_MASK;
->> +	list_splice_init(&psd->prev_assocs, &psd->stale_assocs);
->> +	list_splice_init(&psd->active_assocs, &psd->prev_assocs);
-> AFAICS the prev_assocs size is unbounded, and keep increasing at each
-> key rotation, am I correct?
+On 14/08/2025 16.42, Dragos Tatulea wrote:
+> On Thu, Aug 14, 2025 at 01:26:37PM +0200, Jesper Dangaard Brouer wrote:
+>>
+>>
+>> On 13/08/2025 22.24, Dragos Tatulea wrote:
+>>> On Wed, Aug 13, 2025 at 07:26:49PM +0000, Dragos Tatulea wrote:
+>>>> On Wed, Aug 13, 2025 at 01:53:48PM -0500, Chris Arges wrote:
+>>>>> On 2025-08-12 16:25:58, Chris Arges wrote:
+>>>>>> On 2025-08-12 20:19:30, Dragos Tatulea wrote:
+>>>>>>> On Tue, Aug 12, 2025 at 11:55:39AM -0700, Jesse Brandeburg wrote:
+>>>>>>>> On 8/12/25 8:44 AM, 'Dragos Tatulea' via kernel-team wrote:
+>>>>>>>>
+>>>>>>>>> diff --git a/kernel/bpf/devmap.c b/kernel/bpf/devmap.c
+>>>>>>>>> index 482d284a1553..484216c7454d 100644
+>>>>>>>>> --- a/kernel/bpf/devmap.c
+>>>>>>>>> +++ b/kernel/bpf/devmap.c
+>>>>>>>>> @@ -408,8 +408,10 @@ static void bq_xmit_all(struct xdp_dev_bulk_queue *bq, u32 flags)
+>>>>>>>>>            /* If not all frames have been transmitted, it is our
+>>>>>>>>>             * responsibility to free them
+>>>>>>>>>             */
+>>>>>>>>> +       xdp_set_return_frame_no_direct();
+>>>>>>>>>            for (i = sent; unlikely(i < to_send); i++)
+>>>>>>>>>                    xdp_return_frame_rx_napi(bq->q[i]);
+>>>>>>>>> +       xdp_clear_return_frame_no_direct();
+>>>>>>>>
+>>>>>>>> Why can't this instead just be xdp_return_frame(bq->q[i]); with no
+>>>>>>>> "no_direct" fussing?
+>>>>>>>>
+>>>>>>>> Wouldn't this be the safest way for this function to call frame completion?
+>>>>>>>> It seems like presuming the calling context is napi is wrong?
+>>>>>>>>
+>>>>>>> It would be better indeed. Thanks for removing my horse glasses!
+>>>>>>>
+>>>>>>> Once Chris verifies that this works for him I can prepare a fix patch.
+>>>>>>>
+>>>>>> Working on that now, I'm testing a kernel with the following change:
+>>>>>>
+>>>>>> ---
+>>>>>>
+>>>>>> diff --git a/kernel/bpf/devmap.c b/kernel/bpf/devmap.c
+>>>>>> index 3aa002a47..ef86d9e06 100644
+>>>>>> --- a/kernel/bpf/devmap.c
+>>>>>> +++ b/kernel/bpf/devmap.c
+>>>>>> @@ -409,7 +409,7 @@ static void bq_xmit_all(struct xdp_dev_bulk_queue *bq, u32 flags)
+>>>>>>            * responsibility to free them
+>>>>>>            */
+>>>>>>           for (i = sent; unlikely(i < to_send); i++)
+>>>>>> -               xdp_return_frame_rx_napi(bq->q[i]);
+>>>>>> +               xdp_return_frame(bq->q[i]);
+>>>>>>    out:
+>>>>>>           bq->count = 0;
+>>>>>
+>>>>> This patch resolves the issue I was seeing and I am no longer able to
+>>>>> reproduce the issue. I tested for about 2 hours, when the reproducer usually
+>>>>> takes about 1-2 minutes.
+>>>>>
+>>>> Thanks! Will send a patch tomorrow and also add you in the Tested-by tag.
+>>>>
+>>
+>> Looking at code ... there are more cases we need to deal with.
+>> If simply replacing xdp_return_frame_rx_napi() with xdp_return_frame.
+>>
+>> The normal way to fix this is to use the helpers:
+>>   - xdp_set_return_frame_no_direct();
+>>   - xdp_clear_return_frame_no_direct()
+>>
+>> Because __xdp_return() code[1] via xdp_return_frame_no_direct() will
+>> disable those napi_direct requests.
+>>
+>>   [1] https://elixir.bootlin.com/linux/v6.16/source/net/core/xdp.c#L439
+>>
+>> Something doesn't add-up, because the remote CPUMAP bpf-prog that redirects
+>> to veth is running in cpu_map_bpf_prog_run_xdp()[2] and that function
+>> already uses the xdp_set_return_frame_no_direct() helper.
+>>
+>>   [2] https://elixir.bootlin.com/linux/v6.16/source/kernel/bpf/cpumap.c#L189
+>>
+>> I see the bug now... attached a patch with the fix.
+>> The scope for the "no_direct" forgot to wrap the xdp_do_flush() call.
+>>
+>> Looks like bug was introduced in 11941f8a8536 ("bpf: cpumap: Implement
+>> generic cpumap") v5.15.
+>>
+> Nice! Thanks for looking at this! Will you send the patch separately?
+> 
 
-psp_assoc objects are added to the active list during psp_assoc_create() 
-in the rx-assoc netlink op, and then removed from whichever of the three 
-lists it happens to be on during psp_assoc_free(), which is called when 
-its refcount goes to 0. So basically, a key rotation will shift the 
-psp_assoc's associated with the device around in terms of bookkeeping, 
-but the total length of these three lists combined is determined only by 
-the number of sockets in the system that have entered the rx-assoc 
-state, and have yet to be closed. For now, there can only ever be one 
-assoc per socket.
+Yes, I will send the patch as an official patch.
 
-> In case of extreme long uptime (sometime
-> happens :) or if the user-space goes wild, that could potentially
-> consume unbound amount of memory. Could memory accounting or some hard
-> limit make sense here?
+I want to give both of you credit, so I'm considering adding these tags
+to the patch description (WDYT):
 
-I suppose a hard limit could make sense if adding one assoc per socket 
-could be abused, but that is a different issue than if there is some way 
-to use the uapi to create a psp_assoc leak.
+Found-by: Dragos Tatulea <dtatulea@nvidia.com>
+Reported-by: Chris Arges <carges@cloudflare.com>
+
+
+>>>> As follow up work it would be good to have a way to catch this family of
+>>>> issues. Something in the lines of the patch below.
+>>>>
+>>
+>> Yes, please, we want something that can catch these kind of hard to find
+>> bugs.
+>>
+> Will send a patch when I find some time.
+>
+
+Great! :-)
+
+>>>> Thanks,
+>>>> Dragos
+>>>>
+>>>> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+>>>> index f1373756cd0f..0c498fbd8df6 100644
+>>>> --- a/net/core/page_pool.c
+>>>> +++ b/net/core/page_pool.c
+>>>> @@ -794,6 +794,10 @@ __page_pool_put_page(struct page_pool *pool, netmem_ref netmem,
+>>>>    {
+>>>>           lockdep_assert_no_hardirq();
+>>>> +#ifdef CONFIG_PAGE_POOL_CACHEDEBUG
+>>>> +       WARN(page_pool_napi_local(pool), "Page pool cache access from non-direct napi context");
+>>> I meant to negate the condition here.
+>>>
+>>
+>> The XDP code have evolved since the xdp_set_return_frame_no_direct()
+>> calls were added.  Now page_pool keeps track of pp->napi and
+>> pool-> cpuid.  Maybe the __xdp_return [1] checks should be updated?
+>> (and maybe it allows us to remove the no_direct helpers).
+>>
+> So you mean to drop the napi_direct flag in __xdp_return and let
+> page_pool_put_unrefed_netmem() decide if direct should be used by
+> page_pool_napi_local()?
+
+Yes, something like that, but I would like Kuba/Jakub's input, as IIRC
+he introduced the page_pool->cpuid and page_pool->napi.
+
+There are some corner-cases we need to consider if they are valid.  If
+cpumap get redirected to the *same* CPU as "previous" NAPI instance,
+which then makes page_pool->cpuid match, is it then still valid to do
+"direct" return(?).
+
+--Jesper
 
