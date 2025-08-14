@@ -1,69 +1,64 @@
-Return-Path: <netdev+bounces-213857-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213859-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 613B5B271F7
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 00:46:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF523B272AD
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 00:55:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CFF8BAA0CB0
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 22:44:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD8C65E4510
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 22:55:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 728B9295510;
-	Thu, 14 Aug 2025 22:40:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66C2A27D784;
+	Thu, 14 Aug 2025 22:55:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kfgMWQ2E"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="2Rmmwu7X"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EEE828136F;
-	Thu, 14 Aug 2025 22:40:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7201327A906
+	for <netdev@vger.kernel.org>; Thu, 14 Aug 2025 22:55:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755211256; cv=none; b=idxuMeiIT3PvQJPXfmEaWBkH+WYEKKTomTqtEdAithcVQ7JySodXYGYA6ASM0lfVSBKGnU+pF/Dp2XTGKavqFUhnULmOQtDXT+z0yywmNrp5mXacKiXQwdgmuuu/UVXs14VDKBXjsMIP8QA3VJQEt72Rgcf8uRVMWkp7dTH7xvU=
+	t=1755212125; cv=none; b=qX9U8aYStOfRG1qpl8OrLFkMcRH9QyN9imcIuqFhlxj3ErBZV+i/nrXkogADDvtwsLy/dgBj0wXgrtn5K02Upl21S1VCy7+W9mjXaFGtwANAkChnk2etdhHl91Bz4yVf/867V9zqFx14Bou5vdNogIWMmVk+yt5aAPEL8++ubyM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755211256; c=relaxed/simple;
-	bh=8G9CxDqP1jybeUHRO2NOjhgGn1Kh5z/Nj845EVD600s=;
+	s=arc-20240116; t=1755212125; c=relaxed/simple;
+	bh=GisTV7ehkAa9jgteQLA7zEpNHE68tAPBqqW6bx7ZhZM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SyvNcZ0qrHPKso7ASh7ZsxPofjOLhEELuYF9CXOLcU1KHJjZnY/5bqncQUq7P5tTihPeuCID1wrxWkqnqI498UUozu1ZUxZVFEeZj+q9BJrioUoVDy+uRW5AwmLk68bf2tGsbd/DLyF5dBuqs1B8HCTRjLtYDIRb1Ylx4KiX7A8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kfgMWQ2E; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92AEAC4CEED;
-	Thu, 14 Aug 2025 22:40:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755211255;
-	bh=8G9CxDqP1jybeUHRO2NOjhgGn1Kh5z/Nj845EVD600s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kfgMWQ2EU4SUB4CFGqVaqHLutotWkmyR/hY/lxAoi1q1I4JYIiR4vGGKpV7Ycbb/U
-	 UU9tWmKc13L0/JNm8aMl6S6pNAcOTYyP8nNSaJzwmu0EqKRtdUTG6NZzF2AbKT48V/
-	 kHdrzy1sKYAKAmiAnn97R/fiogAM2P11An+NfxfVkrPlxw42pwgcrvE/RTT6zMfUkh
-	 ZtNc0snNGTztGfC+EvC3ZF4sy96Ig04+AmMjdef2GHAz97gD89caRB5MU7VRwPrmwJ
-	 4I7BdX8OA2imiriWQ+YviVhYxHlDMUaWKbPC2VS/xx68rfo6RRKWTesCXiTXdlz/x/
-	 QKTn+aWvXIuAQ==
-Date: Thu, 14 Aug 2025 17:40:54 -0500
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Luo Jie <quic_luoj@quicinc.com>
-Cc: linux-doc@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-arm-msm@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Pavithra R <quic_pavir@quicinc.com>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Kees Cook <kees@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
-	Lei Wei <quic_leiwei@quicinc.com>, Paolo Abeni <pabeni@redhat.com>,
-	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
-	linux-hardening@vger.kernel.org,
-	Suruchi Agarwal <quic_suruchia@quicinc.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, quic_kkumarcs@quicinc.com,
-	quic_linchen@quicinc.com, Philipp Zabel <p.zabel@pengutronix.de>,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next v7 01/14] dt-bindings: net: Add PPE for Qualcomm
- IPQ9574 SoC
-Message-ID: <175521125408.4049104.2810229443778226424.robh@kernel.org>
-References: <20250812-qcom_ipq_ppe-v7-0-789404bdbc9a@quicinc.com>
- <20250812-qcom_ipq_ppe-v7-1-789404bdbc9a@quicinc.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=SebxaXJmjirZqv6r3JYF1D2awAvxAX4iWz9L8vhF/NOkWfyW5mUW9IovE/0VOdVxoSmfF62BImuS97KUF/0EabpSmISbsZ/eiGFwgGcYFhuidlbDzwgGPb4l/yC29Ujp39vs6dIfXaBrhD2+BhEv7GPMTJlK//zl5q3HdsM7eU4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=2Rmmwu7X; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=WC5NbM10I9h+hCAYNWMRushta1NSR5tCIeyjdNAIyGU=; b=2Rmmwu7XflouKZToA6cATzWyQn
+	DPdMME9yMaTiC0LP3GLCEbTCOEHGuYGyQiGI7TyhTBiNRIOyGjbzOtsOUpPmYYXqqqBDUyo+Mdmds
+	26UuM5aeKZDw3qmqJ4u9/D3MVWwgEBtEbfmkpX0VI4AwkUW1na0HfH8RuBqBOluiAVNY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1umgqq-004kwQ-Qf; Fri, 15 Aug 2025 00:55:16 +0200
+Date: Fri, 15 Aug 2025 00:55:16 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Frieder Schrempf <frieder.schrempf@kontron.de>
+Cc: Woojung.Huh@microchip.com, kuba@kernel.org, lukma@denx.de,
+	netdev@vger.kernel.org, Tristram.Ha@microchip.com
+Subject: Re: KSZ9477 HSR Offloading
+Message-ID: <0501b135-8a25-4461-ad3c-9f322cdccb38@lunn.ch>
+References: <42a2f96f-34cd-4d95-99d5-3b4c4af226af@kontron.de>
+ <BL0PR11MB2913C7E1AE86A3A0EB12D0D7E7EE2@BL0PR11MB2913.namprd11.prod.outlook.com>
+ <1400a748-0de7-4093-a549-f07617e6ac51@kontron.de>
+ <BL0PR11MB29130BB177996C437F792106E7E92@BL0PR11MB2913.namprd11.prod.outlook.com>
+ <20250203103113.27e3060a@wsk>
+ <1edbe1e4-9491-4344-828d-4c3b73954e8a@kontron.de>
+ <BL0PR11MB2913B949D05B9BB73108A5FFE7F52@BL0PR11MB2913.namprd11.prod.outlook.com>
+ <20250203150418.7f244827@kernel.org>
+ <BL0PR11MB2913ECAA6F0C97E342F7DE22E7F42@BL0PR11MB2913.namprd11.prod.outlook.com>
+ <8e761c31-728c-4ff7-925a-5e16a9ef1310@kontron.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,33 +67,78 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250812-qcom_ipq_ppe-v7-1-789404bdbc9a@quicinc.com>
+In-Reply-To: <8e761c31-728c-4ff7-925a-5e16a9ef1310@kontron.de>
 
+On Wed, Aug 13, 2025 at 03:43:14PM +0200, Frieder Schrempf wrote:
+> Am 04.02.25 um 15:55 schrieb Woojung.Huh@microchip.com:
+> > Hi Jakub,
+> > 
+> >> -----Original Message-----
+> >> From: Jakub Kicinski <kuba@kernel.org>
+> >> Sent: Monday, February 3, 2025 6:04 PM
+> >> To: Woojung Huh - C21699 <Woojung.Huh@microchip.com>
+> >> Cc: frieder.schrempf@kontron.de; lukma@denx.de; andrew@lunn.ch;
+> >> netdev@vger.kernel.org; Tristram Ha - C24268 <Tristram.Ha@microchip.com>
+> >> Subject: Re: KSZ9477 HSR Offloading
+> >>
+> >> EXTERNAL EMAIL: Do not click links or open attachments unless you know the
+> >> content is safe
+> >>
+> >> On Mon, 3 Feb 2025 14:58:12 +0000 Woojung.Huh@microchip.com wrote:
+> >>> Hi Lukasz & Frieder,
+> >>>
+> >>> Oops! My bad. I confused that Lukasz was filed a case originally. Monday
+> >> brain-freeze. :(
+> >>>
+> >>> Yes, it is not a public link and per-user case. So, only Frieder can see
+> >> it.
+> >>> It may be able for you when Frieder adds you as a team. (Not tested
+> >> personally though)
+> >>
+> >> Woojung Huh, please make sure the mailing list is informed about
+> >> the outcomes. Taking discussion off list to a closed ticketing
+> >> system is against community rules. See below, thanks.
+> >>
+> >> Quoting documentation:
+> >>
+> >>   Open development
+> >>   ----------------
+> >>
+> >>   Discussions about user reported issues, and development of new code
+> >>   should be conducted in a manner typical for the larger subsystem.
+> >>   It is common for development within a single company to be conducted
+> >>   behind closed doors. However, development and discussions initiated
+> >>   by community members must not be redirected from public to closed forums
+> >>   or to private email conversations. Reasonable exceptions to this guidance
+> >>   include discussions about security related issues.
+> >>
+> >> See: https://www.kernel.org/doc/html/next/maintainer/feature-and-driver-maintainers.html#open-development
+> > 
+> > Learn new thing today. Didn't know this. Definitely I will share it
+> > when this work is done. My intention was for easier work for request than
+> The HW forwarding between HSR ports is configured in ksz9477_hsr_join()
+> at the time of creating the HSR interface by calling
+> ksz9477_cfg_port_member().
+> 
+> In my case I enabled the ports **after** that which caused the
+> forwarding to be disabled again as ksz9477_cfg_port_member() gets called
+> with the default configuration.
+> 
+> If I reorder my commands everything seems to work fine even with
+> NETIF_F_HW_HSR_FWD enabled.
+> 
+> I wonder if the kernel should handle this case and prevent the
+> forwarding configuration to be disabled if HSR is configured? I'll have
+> a look if I can come up with a patch for this.
 
-On Tue, 12 Aug 2025 22:10:25 +0800, Luo Jie wrote:
-> The PPE (packet process engine) hardware block is available in Qualcomm
-> IPQ chipsets that support PPE architecture, such as IPQ9574. The PPE in
-> the IPQ9574 SoC includes six ethernet ports (6 GMAC and 6 XGMAC), which
-> are used to connect with external PHY devices by PCS. It includes an L2
-> switch function for bridging packets among the 6 ethernet ports and the
-> CPU port. The CPU port enables packet transfer between the ethernet ports
-> and the ARM cores in the SoC, using the ethernet DMA.
-> 
-> The PPE also includes packet processing offload capabilities for various
-> networking functions such as route and bridge flows, VLANs, different
-> tunnel protocols and VPN.
-> 
-> The PPE switch is modeled according to the ethernet switch schema, with
-> additional properties defined for the switch node for interrupts, clocks,
-> resets, interconnects and Ethernet DMA. The switch port node is extended
-> with additional properties for clocks and resets.
-> 
-> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
-> ---
->  .../devicetree/bindings/net/qcom,ipq9574-ppe.yaml  | 533 +++++++++++++++++++++
->  1 file changed, 533 insertions(+)
-> 
+If you don't offload it, but do it in software, does the order matter?
 
-Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+As a user, i should not need to care if offload is used or not. It
+should be transparent. Which means any order that works with pure
+software should also work with offloading. At least, it should not
+break. If it fails to offload, and uses software, that is fine. Not
+optimal, but O.K.
+
+	Andrew
 
 
