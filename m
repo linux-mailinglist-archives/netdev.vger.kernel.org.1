@@ -1,176 +1,156 @@
-Return-Path: <netdev+bounces-213827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213828-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BE44B26FE9
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 21:59:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9602DB26FF1
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 22:09:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 81854A07975
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 19:58:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E09121B668D8
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 20:09:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2F4C248F41;
-	Thu, 14 Aug 2025 19:58:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18325246BB0;
+	Thu, 14 Aug 2025 20:09:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iYr78f7F"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BEF6FVjQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F2F42472B7;
-	Thu, 14 Aug 2025 19:58:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B7FE245003
+	for <netdev@vger.kernel.org>; Thu, 14 Aug 2025 20:09:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755201524; cv=none; b=rjgEN4mgycWyOMAwO3IFyHS2+mx31fp6g/+Bsx6Cbf5ahcQKD3xwZZckfUIpC0soonUJjOy/E8WOny2UJMZWVQSx5WAvfEdrwYDac5wO+SKUfMWlCcTWfiPbYVBxICHLmoykwKAV0x7Cu5Rq1nbx5m212f+Yb/3yKQh9UgzGvHs=
+	t=1755202157; cv=none; b=Vr5gD8VTc1jcRYx/73J81lLIFwwP9y/5nxJWEKMuKFgsSWMYiLanBffcllNmv+gR0AmhydKYkHBNNh3cs5Bk615FN3zSZVQ8ta2yYD8sT3e10WyB25GOfC4ORWOif143+6Cjkn/OyZxYM9l54Olm2Vgzix/qTvwFQKgi5vQx6oA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755201524; c=relaxed/simple;
-	bh=nrlkrGOj9FqTVo2wmyTaurACgaNJ4dRf1Fq6fsT64vA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Z5EnhXUPb/1XT3fHrdIyEhRsSAxZj2Ne4qHybek4+PsktT30Maqc8OED/lBffRWfGpYTrV9tfOglWTmG5U20H6019VWORqDEgwWkiMxrTCcwFSKBzI22QmHxfvTUnEr47RqeVrUrLqIn5FendKSbcALsJ6Q7DEJ5st8A/es4S1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iYr78f7F; arc=none smtp.client-ip=209.85.210.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-76e2eb09041so1297539b3a.3;
-        Thu, 14 Aug 2025 12:58:43 -0700 (PDT)
+	s=arc-20240116; t=1755202157; c=relaxed/simple;
+	bh=XRFloEn6WUdoHP1BiKO+9NyjAYqAlyAeTcjtp3BnPEo=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=cbxKnLBWnfF7FCTXP/kZT+eq05UmtbH6Q3FbZaPWWmFcckaiK5s3tJbhmVy2h2FEZpktfSYxDMGoV9qdhhf/ODzRdauQajgTSqJCevhJQJpPtwQyhiSeQ51Md0PsmDrtjN2XQAAAER/z+XSZYv6/bDlR9+tPqlKmDvWtyVGSP9s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BEF6FVjQ; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-32326e017eeso1389550a91.3
+        for <netdev@vger.kernel.org>; Thu, 14 Aug 2025 13:09:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755201522; x=1755806322; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=TTV/lDDZEqi/BsEhizG8Om94UxJelIedyE+K0f5Dktw=;
-        b=iYr78f7FOjxjM88H6FT0tmNT+wetghXtw8cSGZNUFPbrjp46BSlCDMYG/6Q+naOWk1
-         HnsDRTGgLTXJ+iCr+lBxAPnpXobd7NS8LgND0hrLMXjY1mM5KK6Kdk/KtLrszEuYYy+T
-         y0QJ/LIskX/4jj0G4rKf9LX/M16y9d2TTyODf+DQjijGR+kEpZNcFmtHsQ6RN01+pCnJ
-         2hKzCyDYsFAYQdbEHC6F3IGot8LzH+rcpQk4VEarkw2M70qQVCjKY/uRkdICv8ug3Xul
-         qaSrqf0dDFiHOl9p4Bw1m6+FaypXJ2wIzbU0P7c6Uj7DfEwCfEbI6yRu+zxzYRVEO1Gq
-         Mggw==
+        d=google.com; s=20230601; t=1755202155; x=1755806955; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=HPx3oS3D/U5/Z6SJp4+G98+eGPb8Zkxs9lelPKWCUiM=;
+        b=BEF6FVjQ5q3g8Hpy6Q1fRXr09C9QWVgrtsxNqz8z1Oxt5DYyS5MwrcFzoFzwW4IGSL
+         bJOySiAyGUx1bugTib8pP5/yO0YHdjCivJUwXyIy8QWbAaBxoHmFWVKtLxCfCK7nxgNR
+         e8Ozkp7io4/oYz3bxr9Ou1wEq3Joxq6fgVakSqzTvDbF8q6+StttXV2xiJyPP7MEcQOw
+         xpEehmIlvt0Y2tY8CuQWVr2wVndbPUWEZRcIbu/06oU9ygEL1/toP471aiK3YLi6j9fs
+         gWBvHahfEmdlIlJr2ye44eSuMSA3Gf1YnxpmtHYTscw1QzLHafgrlL5EpXtlc9dLsLit
+         pYog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755201522; x=1755806322;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TTV/lDDZEqi/BsEhizG8Om94UxJelIedyE+K0f5Dktw=;
-        b=l4knTqrri0r2nRk5WGet1+VGgmIBC1144VO/XciWDKakvw1nxFSp9KkWcKFNEs+LjD
-         pjIEXTPy7c/Jo2dNodGrnTTKomOC7fu6/2mKuXZ/kKGW7U+pddzMoAvHB9TN/HFV+Ysw
-         qLhE57euVo7d4k8aIn2pUK+EFo7HALRKAl9bRcqwclOJcE8SpkBSq9dCbXgfM43k8Yaw
-         TWNa+ZS6Ao1v88GymLBpIB1Xx58i/AHFtTjWOh27eWI29srv/HEv+IqU7KfCEA+7hC13
-         MIpVv1FlwOgYfnREfU4DJkWjb0UGrGJ+kdmq7zfhHOFTgHryQQDdGaWxYih3pXeURTGd
-         wsbw==
-X-Forwarded-Encrypted: i=1; AJvYcCWhlXd8ZnMpHqBFSUwNQH18NXHU8/GkOrX/HY6azuV2GaT2TZJbvhI/jH9z7fIIywfK5yQdz2UE@vger.kernel.org, AJvYcCXninItpOig7uYWIakG45GZgGBfRb+ymqUYkZJkXEySC1UXMFqAZyDJbf6qA+ossR5KU+ebKtZz1/NF/Rs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx2i2x/BKpLiAu1Fhpw/3az8qvz/85g8dh4KimxiDxf8MTUn6CW
-	G2kkIqkyo6MKKmTFQoSM4jTGGxiiBYbmaReW33TGIWP8PRnagIF0B+PU
-X-Gm-Gg: ASbGnct4QZA/ndCEcBdFPi4FmLnWu2Cy90tshvafXf0Le6eEn1/M7MCd3wtAXuIsOxi
-	PKFDbcKN2UPXPOA+wE1QD6llh3T0sbaSgF6AwaBhPM9i9zEjOkQmieHulhVJt2Wc2V0nE/EcVZ3
-	ODs+TrgE3jUU0OlBWqQo5jyE5ER+DwFdOFmr6ULf3X1tDSI6IVrr3TWH5k4O2TZs698pRz1vXyN
-	KDs4KDtBAtjhhmxmesv04faU720odeKm5vFVKSV3S7AXeJN4ZXeyB2baCFFJ/c6wLWOpsRR30Hr
-	TDwTQqsT3Hx7XyMI4CjNt9fQvADJ9EsdZpYKpC3D7TmWTf9GjwfNerUP+YROMrL+zJ9Wf+CZUe6
-	Y+isupIWBu8+blJmVXExXumH+LecRIj76
-X-Google-Smtp-Source: AGHT+IGfqAEK4l5/msrW/qNfWimt6bHO8cTnrAWKRlRK83XrpYBg6McxN2mX0rKbCM7Sw+3yfa29kg==
-X-Received: by 2002:a05:6a00:3e1b:b0:76b:c882:e0a with SMTP id d2e1a72fcca58-76e31eb9d76mr4896477b3a.5.1755201522541;
-        Thu, 14 Aug 2025 12:58:42 -0700 (PDT)
-Received: from localhost ([216.228.127.131])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-76e2037acf2sm5380761b3a.112.2025.08.14.12.58.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Aug 2025 12:58:41 -0700 (PDT)
-From: Yury Norov <yury.norov@gmail.com>
-To: Aaron Conole <aconole@redhat.com>,
-	Eelco Chaudron <echaudro@redhat.com>,
-	Ilya Maximets <i.maximets@ovn.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	dev@openvswitch.org,
-	linux-kernel@vger.kernel.org
-Cc: Yury Norov <yury.norov@gmail.com>
-Subject: [PATCH] net: openvswitch: Use for_each_cpu_from() where appropriate
-Date: Thu, 14 Aug 2025 15:58:37 -0400
-Message-ID: <20250814195838.388693-1-yury.norov@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20230601; t=1755202155; x=1755806955;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=HPx3oS3D/U5/Z6SJp4+G98+eGPb8Zkxs9lelPKWCUiM=;
+        b=GxamX4QHobnTIhVEdGSKY4uqg4jIW6zJ+5GMIoam1gdXNaVFFtN+HEq9+UNNtGJrfr
+         Qgx6CZrNbwQvcIGr60nh+YB1TuQYBTy83SnxCvNh+L2G1M7u5B7h/iP6xffdP0PjI2f9
+         dLMxefW67Vdj1jnPmNrj9qJrmwDf7x8iqR8B4HU2YTkZZRynuENuJl/56YkuTgL8X+h5
+         NOalfZRYwlVOWe5fVXuDJkf80RSTyf7BrxVnkk7dM4pjk7oPaceeqcZJrTG9/H/nqHV/
+         guC5d6+SqfX6XQ4N+JC7YJxzJMKrI2v9ErRXqhmapy2VwLVaBRCHb9qnV9CcmsoYcFbD
+         nMbQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWIS5SfZW8iv7nKuzUxaG6T587MjkeP/cLBShnrgpcwc4F4tN67tDqWXmkh3vD8cflivpc64nw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxa9u6MkBb2i+SSZJZf3ytAnlncqOGcDNwm8jugwzeEP40nmIP0
+	Nho5CjKxzJY9heej5huAUXsxe/o+RAGm6ys5J9d36c351OTKekfCAuPvsqKeDlIVUTP/CbcIUQb
+	64JVTjQ==
+X-Google-Smtp-Source: AGHT+IHoeO4kZujSsChFOwaTNJ8uA4UdHGwa9a1sAiH+eAKhd1r6y1himci0q94O8Kz1fkx16/6OM5R2r0A=
+X-Received: from pjbsy14.prod.google.com ([2002:a17:90b:2d0e:b0:31e:c1fb:dbb2])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:48c2:b0:31f:6d6b:b453
+ with SMTP id 98e67ed59e1d1-3232b7b76damr5551630a91.30.1755202154816; Thu, 14
+ Aug 2025 13:09:14 -0700 (PDT)
+Date: Thu, 14 Aug 2025 20:08:32 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.rc1.163.g2494970778-goog
+Message-ID: <20250814200912.1040628-1-kuniyu@google.com>
+Subject: [PATCH v4 net-next 00/10] net-memcg: Gather memcg code under CONFIG_MEMCG.
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Neal Cardwell <ncardwell@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Willem de Bruijn <willemb@google.com>, Matthieu Baerts <matttbe@kernel.org>, 
+	Mat Martineau <martineau@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
+	Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>, 
+	Shakeel Butt <shakeel.butt@linux.dev>, Andrew Morton <akpm@linux-foundation.org>, 
+	"=?UTF-8?q?Michal=20Koutn=C3=BD?=" <mkoutny@suse.com>, Tejun Heo <tj@kernel.org>
+Cc: Simon Horman <horms@kernel.org>, Geliang Tang <geliang@kernel.org>, 
+	Muchun Song <muchun.song@linux.dev>, Mina Almasry <almasrymina@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
+	mptcp@lists.linux.dev, cgroups@vger.kernel.org, linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
 
-From: Yury Norov (NVIDIA) <yury.norov@gmail.com>
+This series converts most sk->sk_memcg access to helper functions
+under CONFIG_MEMCG and finally defines sk_memcg under CONFIG_MEMCG.
 
-Openvswitch opencodes for_each_cpu_from(). Fix it and drop some
-housekeeping code.
+This is v4 of the series linked below but without core changes
+that decoupled memcg and global socket memory accounting.
 
-Signed-off-by: Yury Norov (NVIDIA) <yury.norov@gmail.com>
----
- net/openvswitch/flow.c       | 14 ++++++--------
- net/openvswitch/flow_table.c |  8 ++++----
- 2 files changed, 10 insertions(+), 12 deletions(-)
+I will defer the changes to a follow-up series that will use BPF
+to store a flag in sk->sk_memcg.
 
-diff --git a/net/openvswitch/flow.c b/net/openvswitch/flow.c
-index b80bd3a90773..b464ab120731 100644
---- a/net/openvswitch/flow.c
-+++ b/net/openvswitch/flow.c
-@@ -129,15 +129,14 @@ void ovs_flow_stats_get(const struct sw_flow *flow,
- 			struct ovs_flow_stats *ovs_stats,
- 			unsigned long *used, __be16 *tcp_flags)
- {
--	int cpu;
-+	/* CPU 0 is always considered */
-+	unsigned int cpu = 1;
- 
- 	*used = 0;
- 	*tcp_flags = 0;
- 	memset(ovs_stats, 0, sizeof(*ovs_stats));
- 
--	/* We open code this to make sure cpu 0 is always considered */
--	for (cpu = 0; cpu < nr_cpu_ids;
--	     cpu = cpumask_next(cpu, flow->cpu_used_mask)) {
-+	for_each_cpu_from(cpu, flow->cpu_used_mask) {
- 		struct sw_flow_stats *stats = rcu_dereference_ovsl(flow->stats[cpu]);
- 
- 		if (stats) {
-@@ -158,11 +157,10 @@ void ovs_flow_stats_get(const struct sw_flow *flow,
- /* Called with ovs_mutex. */
- void ovs_flow_stats_clear(struct sw_flow *flow)
- {
--	int cpu;
-+	/* CPU 0 is always considered */
-+	unsigned int cpu = 1;
- 
--	/* We open code this to make sure cpu 0 is always considered */
--	for (cpu = 0; cpu < nr_cpu_ids;
--	     cpu = cpumask_next(cpu, flow->cpu_used_mask)) {
-+	for_each_cpu_from(cpu, flow->cpu_used_mask) {
- 		struct sw_flow_stats *stats = ovsl_dereference(flow->stats[cpu]);
- 
- 		if (stats) {
-diff --git a/net/openvswitch/flow_table.c b/net/openvswitch/flow_table.c
-index d108ae0bd0ee..0a97ea08457a 100644
---- a/net/openvswitch/flow_table.c
-+++ b/net/openvswitch/flow_table.c
-@@ -107,16 +107,16 @@ int ovs_flow_tbl_count(const struct flow_table *table)
- 
- static void flow_free(struct sw_flow *flow)
- {
--	int cpu;
-+	/* CPU 0 is always considered */
-+	unsigned int cpu = 1;
- 
- 	if (ovs_identifier_is_key(&flow->id))
- 		kfree(flow->id.unmasked_key);
- 	if (flow->sf_acts)
- 		ovs_nla_free_flow_actions((struct sw_flow_actions __force *)
- 					  flow->sf_acts);
--	/* We open code this to make sure cpu 0 is always considered */
--	for (cpu = 0; cpu < nr_cpu_ids;
--	     cpu = cpumask_next(cpu, flow->cpu_used_mask)) {
-+
-+	for_each_cpu_from(cpu, flow->cpu_used_mask) {
- 		if (flow->stats[cpu])
- 			kmem_cache_free(flow_stats_cache,
- 					(struct sw_flow_stats __force *)flow->stats[cpu]);
+
+Overview of the series:
+
+  patch 1 is a bug fix for MPTCP
+  patch 2 ~ 9 move sk->sk_memcg accesses to a single place
+  patch 10 moves sk_memcg under CONFIG_MEMCG
+
+
+Changes:
+  v4:
+    * Patch 1
+      * Use set_active_memcg()
+
+  v3: https://lore.kernel.org/netdev/20250812175848.512446-1-kuniyu@google.com/
+    * Patch 12
+      * Fix build failrue for kTLS (include <net/proto_memory.h>)
+
+  v2: https://lore.kernel.org/netdev/20250811173116.2829786-1-kuniyu@google.com/
+    * Remove per-memcg knob
+    * Patch 11
+      * Set flag on sk_memcg based on memory.max
+    * Patch 12
+      * Add sk_should_enter_memory_pressure() and cover
+        tcp_enter_memory_pressure() calls
+      * Update examples in changelog
+
+  v1: https://lore.kernel.org/netdev/20250721203624.3807041-1-kuniyu@google.com/
+
+
+Kuniyuki Iwashima (10):
+  mptcp: Fix up subflow's memcg when CONFIG_SOCK_CGROUP_DATA=n.
+  mptcp: Use tcp_under_memory_pressure() in mptcp_epollin_ready().
+  tcp: Simplify error path in inet_csk_accept().
+  net: Call trace_sock_exceed_buf_limit() for memcg failure with
+    SK_MEM_RECV.
+  net: Clean up __sk_mem_raise_allocated().
+  net-memcg: Introduce mem_cgroup_from_sk().
+  net-memcg: Introduce mem_cgroup_sk_enabled().
+  net-memcg: Pass struct sock to mem_cgroup_sk_(un)?charge().
+  net-memcg: Pass struct sock to mem_cgroup_sk_under_memory_pressure().
+  net: Define sk_memcg under CONFIG_MEMCG.
+
+ include/linux/memcontrol.h      | 39 ++++++++++++++--------------
+ include/net/proto_memory.h      |  4 +--
+ include/net/sock.h              | 46 +++++++++++++++++++++++++++++++++
+ include/net/tcp.h               |  4 +--
+ mm/memcontrol.c                 | 29 ++++++++++++++-------
+ net/core/sock.c                 | 38 ++++++++++++++-------------
+ net/ipv4/inet_connection_sock.c | 19 +++++++-------
+ net/ipv4/tcp_output.c           |  5 ++--
+ net/mptcp/protocol.h            |  4 +--
+ net/mptcp/subflow.c             | 11 +++-----
+ 10 files changed, 124 insertions(+), 75 deletions(-)
+
 -- 
-2.43.0
+2.51.0.rc1.163.g2494970778-goog
 
 
