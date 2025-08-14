@@ -1,88 +1,139 @@
-Return-Path: <netdev+bounces-213585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213586-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D43FB25B85
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 08:04:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84283B25BC3
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 08:27:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E5AB6562292
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 06:04:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 458CF3AFA21
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 06:27:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF9C7238C08;
-	Thu, 14 Aug 2025 06:04:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 973B9242D65;
+	Thu, 14 Aug 2025 06:27:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="pB4o/+if"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nG0ijTwW"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99FBF22AE65;
-	Thu, 14 Aug 2025 06:04:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0539F241679;
+	Thu, 14 Aug 2025 06:27:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755151442; cv=none; b=ZWtIM1R56fYMDVL9Aqi3auIYnqeruqMfz7s3Yl9WlikWk8F5KuuAhN8Ipzv95a585u0uZcP09neyMZb+mizYaDAI2xRG93IduNEvyaFEK1m90hVUcFtmqCc81mCVNLS2z/GipmowMjB+O2b1xg2BX8P3uK6a6ZDoVMDk2tFnC6Q=
+	t=1755152840; cv=none; b=rdlpG3f2NiujerHEheK3fH9g2JaO6SdTPSlbngwz4/+saX02JcxN6bD+jTjb2gdwfms/EFDEkw7P1ot8rN94YbsSTzeFl8Yyqv9vkPUH79LLlbul76agiixUqdbJcVnl3WNfkLCHsvG+dy/ZAQX4XOgoBot6rBdUqq+6JxgdrEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755151442; c=relaxed/simple;
-	bh=60Ftf0DARQkpjZvRX6ryo7HU42ZASmSF5OfaZKP+h2s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Npz9o8MWUrSfm8dqW6Fb4am81MRaDBGQc7bhheFQYq7nEUqqWMUSDPU2a6gdfQjWwfzEF/PX8K8Xf3HHpyr0VIuyOWet+JTs6yiPVJ119s2mnw83Xv3V3tNqgaIz/P5wcc+efzkHIdBWySBcu+eCaqkwGAbRsWw6WDpVlq80MO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=pB4o/+if; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=XJNzi2C0gN4PJ/y69bDjrKc7lnX+PbRVUIRwlssDM1Y=; b=pB4o/+ifLt4CQSmrt6q+08RTAr
-	ejT+P8jGFWUx7m5P6z0hEsi3bQJyjseBuzQpDOaGzHEt1YDMVM5itInNIiIYyDH7/zoCJzB+WDUyG
-	jbQXy6TNlsnsFxYHHE2+PJRmrZcufoM9W7Tbdzs6PLEVd3FFotVEemWmp5yhN4NuqqHm8QBUYLYyJ
-	/RVfimbe6boAsH25+SiIEbz31ETPtkqy5UPE2Vtc4v8KJHGn1st/v4TIREXuwtW//QXvVa2OrC3zX
-	xAu+eix3QcsySbZfJMjRTZWwKiapNeVkJkasqwDawaC0ct9b/U3FehFzKH3mYdHg8WJcENCFpUa2T
-	bwKZL/cA==;
-Received: from [50.53.25.54] (helo=[192.168.254.17])
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1umR4A-0000000Ftj7-3zIX;
-	Thu, 14 Aug 2025 06:03:58 +0000
-Message-ID: <095d545c-d3cf-4029-9b57-639e27a7fed5@infradead.org>
-Date: Wed, 13 Aug 2025 23:03:57 -0700
+	s=arc-20240116; t=1755152840; c=relaxed/simple;
+	bh=7C2qXLNIBZ6eia/1W6IjTf5fHo1xJNSXNElLkOznFdA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LdGlSJ8qS6XvDMc0kCcM3SoxKSWWT6TCuoettU8jL0KjS5OdiRyt56/5WbgDg/rPZfiZz2gjEp1xDW3nFSj46k+bDGyomMRZ667rdZiMgbXqNAPgHWsUUVJ3dQf6hDs94RdcpAWQXOJ+SfXYgfJXvfI06PMw4rUt+oR+hMetQ3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nG0ijTwW; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1755152838; x=1786688838;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=7C2qXLNIBZ6eia/1W6IjTf5fHo1xJNSXNElLkOznFdA=;
+  b=nG0ijTwWIozueZP9L1dLEdEj6bSsUmpJeKZFXe5pnhzdx3Y5LffuETXP
+   o+MNrQjodDPSurM3Yh02el26tQ2Ia6wyqh/pdJW4q0S9mvwvR5N5Ifz+v
+   onTd+EJ1TdMkXt7NS57S0zk/g5eSINU7Syn8B5gf0nyajPeJWgYoz2AH0
+   tEyYIQ2sCSBjDsQuQg/f2IMkuF+QBYV7JXyT7yZJuD0HUV7j9/tWZi5RF
+   QjZUI4TyCjAZIbGfLHWarbXECJOaqAWp3MB7vUwhbIcVtddcjkSbWo6mn
+   Y+/2TP16LfISZhZg6JpWoB2H2Bv9xXQ1x6TYDMbFAkZ2+quzpMs88lG5x
+   A==;
+X-CSE-ConnectionGUID: E4/ikvMLSnGU8JBc3+sdjw==
+X-CSE-MsgGUID: E11o1Kc+TuerEgkGhSKd+g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11520"; a="57327894"
+X-IronPort-AV: E=Sophos;i="6.17,287,1747724400"; 
+   d="scan'208";a="57327894"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2025 23:27:11 -0700
+X-CSE-ConnectionGUID: Zk7z/qHCTD2YF91fhOt6KQ==
+X-CSE-MsgGUID: 17rxyqDiSZSzZwKelRmI3w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,287,1747724400"; 
+   d="scan'208";a="197536124"
+Received: from lkp-server02.sh.intel.com (HELO 4ea60e6ab079) ([10.239.97.151])
+  by fmviesa001.fm.intel.com with ESMTP; 13 Aug 2025 23:27:08 -0700
+Received: from kbuild by 4ea60e6ab079 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1umRQY-000AeS-0E;
+	Thu, 14 Aug 2025 06:27:06 +0000
+Date: Thu, 14 Aug 2025 14:26:26 +0800
+From: kernel test robot <lkp@intel.com>
+To: Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] netfilter: nft_payload: Use csum_replace4()
+ instead of opencoding
+Message-ID: <202508141336.K6vIBjy1-lkp@intel.com>
+References: <e98467a942d65d2dc45dcf8ff809b43d4a3769eb.1754992552.git.christophe.leroy@csgroup.eu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 14/14] RDMA/ionic: Add Makefile/Kconfig to kernel build
- environment
-To: Abhijit Gangurde <abhijit.gangurde@amd.com>, brett.creeley@amd.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, corbet@lwn.net, jgg@ziepe.ca, leon@kernel.org,
- andrew+netdev@lunn.ch
-Cc: sln@onemain.com, allen.hubbe@amd.com, nikhil.agarwal@amd.com,
- linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250814053900.1452408-1-abhijit.gangurde@amd.com>
- <20250814053900.1452408-15-abhijit.gangurde@amd.com>
-Content-Language: en-US
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20250814053900.1452408-15-abhijit.gangurde@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e98467a942d65d2dc45dcf8ff809b43d4a3769eb.1754992552.git.christophe.leroy@csgroup.eu>
 
+Hi Christophe,
 
+kernel test robot noticed the following build warnings:
 
-On 8/13/25 10:39 PM, Abhijit Gangurde wrote:
-> +Support
-> +=======
-> +
-> +For general Linux rdma support, please use the rdma mailing
-> +list, which is monitored by AMD Pensando personnel::
+[auto build test WARNING on net-next/main]
 
-s/rdma/RDMA/ 2 times.
+url:    https://github.com/intel-lab-lkp/linux/commits/Christophe-Leroy/netfilter-nft_payload-Use-csum_replace4-instead-of-opencoding/20250812-183440
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/e98467a942d65d2dc45dcf8ff809b43d4a3769eb.1754992552.git.christophe.leroy%40csgroup.eu
+patch subject: [PATCH net-next] netfilter: nft_payload: Use csum_replace4() instead of opencoding
+config: x86_64-randconfig-122-20250814 (https://download.01.org/0day-ci/archive/20250814/202508141336.K6vIBjy1-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250814/202508141336.K6vIBjy1-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202508141336.K6vIBjy1-lkp@intel.com/
+
+sparse warnings: (new ones prefixed by >>)
+>> net/netfilter/nft_payload.c:687:28: sparse: sparse: incorrect type in argument 2 (different base types) @@     expected restricted __be32 [usertype] from @@     got restricted __wsum [usertype] fsum @@
+   net/netfilter/nft_payload.c:687:28: sparse:     expected restricted __be32 [usertype] from
+   net/netfilter/nft_payload.c:687:28: sparse:     got restricted __wsum [usertype] fsum
+>> net/netfilter/nft_payload.c:687:34: sparse: sparse: incorrect type in argument 3 (different base types) @@     expected restricted __be32 [usertype] to @@     got restricted __wsum [usertype] tsum @@
+   net/netfilter/nft_payload.c:687:34: sparse:     expected restricted __be32 [usertype] to
+   net/netfilter/nft_payload.c:687:34: sparse:     got restricted __wsum [usertype] tsum
+>> net/netfilter/nft_payload.c:687:28: sparse: sparse: incorrect type in argument 2 (different base types) @@     expected restricted __be32 [usertype] from @@     got restricted __wsum [usertype] fsum @@
+   net/netfilter/nft_payload.c:687:28: sparse:     expected restricted __be32 [usertype] from
+   net/netfilter/nft_payload.c:687:28: sparse:     got restricted __wsum [usertype] fsum
+>> net/netfilter/nft_payload.c:687:34: sparse: sparse: incorrect type in argument 3 (different base types) @@     expected restricted __be32 [usertype] to @@     got restricted __wsum [usertype] tsum @@
+   net/netfilter/nft_payload.c:687:34: sparse:     expected restricted __be32 [usertype] to
+   net/netfilter/nft_payload.c:687:34: sparse:     got restricted __wsum [usertype] tsum
+
+vim +687 net/netfilter/nft_payload.c
+
+   684	
+   685	static inline void nft_csum_replace(__sum16 *sum, __wsum fsum, __wsum tsum)
+   686	{
+ > 687		csum_replace4(sum, fsum, tsum);
+   688		if (*sum == 0)
+   689			*sum = CSUM_MANGLED_0;
+   690	}
+   691	
 
 -- 
-~Randy
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
