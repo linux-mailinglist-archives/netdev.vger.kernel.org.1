@@ -1,144 +1,131 @@
-Return-Path: <netdev+bounces-213819-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213821-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53EA0B26EAD
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 20:16:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D638B26ECB
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 20:25:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA42E170AC2
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 18:16:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 34F55188EBB9
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 18:25:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 554EC136347;
-	Thu, 14 Aug 2025 18:16:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BA9A213E7A;
+	Thu, 14 Aug 2025 18:24:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PXRMjfUx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OAcms378"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5B0F8834;
-	Thu, 14 Aug 2025 18:16:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35C59319855;
+	Thu, 14 Aug 2025 18:24:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755195365; cv=none; b=cm9SxSzeUvsaciamhLweAInBg0fnSZqIl8EJHALhxMKHHAkaKFJxr9S96eVeAnjki8CWn11FoR00Lx1FKelw3Av1dK9b445FMWyagsULNBXTrR3LMa3+nPZHKrLjCLcJufjpC4vTNWFtR5jqrctokTzPYK/XeOKpUZ3gigeKpfk=
+	t=1755195884; cv=none; b=fmUmH+/1z7G6cCb40952VAym3rXR5jhxbjeRqJO1KXKNMdrggr9JP5LXvv16e/+7MBXDGdKo8C1qJPLkMGweF3tfDTRCXnHnp5kFmw315K3Yjb8aoGo/937e1N0OcrHqg9svh31MMgoOlTdrpC4nyCzA9dlAd17XwpjYG+4w3hg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755195365; c=relaxed/simple;
-	bh=lfR5m4C6qpeGF7BqklRhmXMKFJ//+lAnAnq/PFTEm3A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gAMmOXjVL3AR/ZtjFcaWEA/iahQgS0rNFVS6jB5MeVWIWIbvjdEvkj+GR9Pmogi0khzL7lc7Xp9Qxonye7QK/XXJhdtuhOVFJ/IITFSXR6h7qIg/TGXi6prDTLsqMdtPd6QzjcY46I5hdDJCNAnwCwKZQk8KV1ayaM7cyuP4uag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PXRMjfUx; arc=none smtp.client-ip=209.85.128.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-71d6059f490so11387687b3.3;
-        Thu, 14 Aug 2025 11:16:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755195362; x=1755800162; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=G+n4/FeNOVvGWacFWXQIqguWy7zGbFv1DUiyZxjURns=;
-        b=PXRMjfUxyW1eH5BBggU5NkT+3a06M3vzq4Y4kYYPIO/vm8+5zNxn5DajbE68leq9PE
-         XuM6k0cbqxE81MFFKPoRiAdX6b8f24dgh9bEUsYHMn4Cv82zFQEmqqag/HUCx7v3/zrw
-         IQlIUuHbPElK4CNxR1A8l0VfNB93a9+f9i9+miQ6z61jfMyvBMVTzqdAgyCSpUTmoX6z
-         DkP80oPSOgFle4/GppWtJc0uEdATSLZgQf2IX0V3nXmqUisTVHiJd4IFqd6oVW56guM9
-         4FHBTErUiG+EF3z5cOSeXMnSmMLtK42i5NYRZEBt6yaGo61ag4Cu8Ua4Vqjm0U68rnUJ
-         uq6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755195362; x=1755800162;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=G+n4/FeNOVvGWacFWXQIqguWy7zGbFv1DUiyZxjURns=;
-        b=RwBD2QSgmot99pibcIlIz02m3BgCj7I4awjLjaxgbXYh7GdRVq7HtNytBtY8sPi4vD
-         s9amiGGflDuhf5UO/etkM6UhJK7AlKidzJsNqdKBgnmy5q0AEIIbwgpaM8GOSvq8sqpR
-         gYUsWmGb9sI3zjC65ux6YFFWHH96HxKoTyV2G627VRoPV8Po33uhjNQcNCvdXHMMwqFT
-         nZn6QnzLhob9+liKxoHWKQi7NnfNCUEp4/BjOUGsh9A3UtFdH0NbVl18X+FbLobL28Cv
-         xFDm7CNrCt6FpM6ACOAC1r2KZ9rKl12aGCewqbFM9Kx3iJlPVBoyvF0mxqR/1YURa6+j
-         L7YA==
-X-Forwarded-Encrypted: i=1; AJvYcCU1i4jH6Cw4SlLSWcKjOWy09aQYf4NdNB99rujy7AQegYUtNQJ0SjqcHSY+rQanMfElIFnTVvuJ@vger.kernel.org, AJvYcCVskjFs6Oy5v2Ia+dceKpcNaWy7ekJVvI/hbdPjGHZ/aDHhMiWrm1YuxtL2qTnWYU4LFWrZREWJ0Hdh2PQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw5Kj8xNht6fbbgKgfG+j+MVdMN3bfnoj8JrCVgeEHUSoIQYV2z
-	2P1Syy+5Kt1BqwrokkKLwkJOLPRmO5u3o+K0dCXlF2CqfQRqZP2gw3+FnPdumJfETu7P050ew99
-	ieEjwd8IfqzqMqUnK0o2DnHob37EOpaw=
-X-Gm-Gg: ASbGncszDTJxmQed7zBhMhM8AZ3hz6NjiPS0+gmJbzHSchAJIkBl6oSMRzqYf3j/sZA
-	kqRpJMQVBceJWl9apjTbJypDREuy3q7O1tOQ85WWwDV5Am+orDWQX+QYEdPl8fBzF6F97OxElU3
-	NrEDjZlK2EyBZtekDZwKLhIpalQeCATH9AIk8lmDvsx867QJI8JBEWo7RxnZIy3nmazPQtQS37y
-	wV0pDh912h7ZlWf33GLZV7eg9d/wEJ4GKE=
-X-Google-Smtp-Source: AGHT+IGfpA6WLqLoMafirvagHvFBKAIxZpGtck1OYWE5+xJQUQ5A40uzUgqaBVYQ02HSxIUhyuJwK/zBp85IPpmZZE4=
-X-Received: by 2002:a05:690c:6103:b0:70c:c013:f26 with SMTP id
- 00721157ae682-71d635b3ab1mr53754757b3.33.1755195362372; Thu, 14 Aug 2025
- 11:16:02 -0700 (PDT)
+	s=arc-20240116; t=1755195884; c=relaxed/simple;
+	bh=cmrj8KeLzigsMCLdXBz/YsgLbulEKsMvd1PG5n4Iz1g=;
+	h=Subject:From:To:Cc:Date:Message-ID:MIME-Version:Content-Type; b=d6nOThGB7RhXpKnC3HLpNj0NL2uvwxW5BaY4J5BW3xpn4YJHRLrYiefe8J3Q0vRms2ASVDbDedozuVwqVzQzWYWVuvkEABsmyBeI+4YQMrrycriIULjRQtV2Mi4nnBcTOwKvF99i/XYj234CPa/VsSbTlUbwwIeI2ekaHCIVXXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OAcms378; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0141CC4CEED;
+	Thu, 14 Aug 2025 18:24:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755195883;
+	bh=cmrj8KeLzigsMCLdXBz/YsgLbulEKsMvd1PG5n4Iz1g=;
+	h=Subject:From:To:Cc:Date:From;
+	b=OAcms378TgtnSyNlFAHryczzmx+PD71h7QQOG8aH5f2p7zLJfPszR5/qfdIG9Kd/4
+	 byN1VYjCAU0QchJ9lo1ruW05fGNKCa8+Y4Oh/wjxBjJ9rrhWDBWX5GWr30huwNSx7R
+	 GWk9RhacLnQ9TDv7D25r0VvCf0iRzZ368E7SsxRGIpZurv3swtq8+tMoUP4C/qcxtc
+	 mX+0Az9zc+6PMCVhYVEH7qZBQn+Gs+XznXEYyyN/rcbO0P5XLjh6nvuUx0VYe3wXNp
+	 HG7Z6CB6SSK8J5t9m1/jSTMPc3FFwG4jks0Caxlj338EBXMCZf8FpytDxCsAnCjYoj
+	 KcXxmz36eyPvg==
+Subject: [PATCH bpf] cpumap: disable page_pool direct xdp_return need larger
+ scope
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+To: bpf@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, dtatulea@nvidia.com
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>,
+ Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <borkmann@iogearbox.net>, netdev@vger.kernel.org,
+ Eric Dumazet <eric.dumazet@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ tariqt@nvidia.com, tariqt@nvidia.com, memxor@gmail.com,
+ john.fastabend@gmail.com, kernel-team@cloudflare.com, yan@cloudflare.com,
+ jbrandeburg@cloudflare.com, carges@cloudflare.com, arzeznik@cloudflare.com
+Date: Thu, 14 Aug 2025 20:24:37 +0200
+Message-ID: <175519587755.3008742.1088294435150406835.stgit@firesoul>
+User-Agent: StGit/1.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250814172300.57458-1-zhtfdev@gmail.com>
-In-Reply-To: <20250814172300.57458-1-zhtfdev@gmail.com>
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Date: Thu, 14 Aug 2025 20:15:25 +0200
-X-Gm-Features: Ac12FXx_XcXnWKz9GdNfc372MhOuX6-i0nxWtxdWnyxqLeh1JDk-xBvVwPU7e-Y
-Message-ID: <CAF=yD-KTwwWMwTMtLBkwWORB26Ty64o8pw1QxBefDmkHi6rL0g@mail.gmail.com>
-Subject: Re: [PATCH] net: tun: fix strscpy call with missing size argument
-To: Zhang Tengfei <zhtfdev@gmail.com>
-Cc: =?UTF-8?Q?Miguel_Garc=C3=ADa?= <miguelgarciaroman8@gmail.com>, 
-	ason Wang <jasowang@redhat.com>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	linux-kernel@vger.kernel.org, Network Development <netdev@vger.kernel.org>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 
-On Thu, Aug 14, 2025 at 7:23=E2=80=AFPM Zhang Tengfei <zhtfdev@gmail.com> w=
-rote:
->
-> The tun_set_iff() and tun_get_iff() functions call strscpy()
-> with only two arguments, omitting the destination buffer size.
->
-> This patch corrects these calls by providing the required size
-> argument using the IFNAMSIZ macro. This ensures the code adheres
-> to the function's documented contract and improves its overall
-> robustness and clarity.
->
-> Fixes: a57384110dc6 ("tun: replace strcpy with strscpy for ifr_name")
-> Signed-off-by: Zhang Tengfei <zhtfdev@gmail.com>
+When running an XDP bpf_prog on the remote CPU in cpumap code
+then we must disable the direct return optimization that
+xdp_return can perform for mem_type page_pool.  This optimization
+assumes code is still executing under RX-NAPI of the original
+receiving CPU, which isn't true on this remote CPU.
 
-The two argument choice is intentional. In that case the length is
-taken from the struct field sizes, which is more robust than an
-explicit argument.
+The cpumap code already disabled this via helpers
+xdp_set_return_frame_no_direct() and xdp_clear_return_frame_no_direct(),
+but the scope didn't include xdp_do_flush().
 
-https://lore.kernel.org/netdev/6899fde3dbfd6_532b129461@willemb.c.googlers.=
-com.notmuch/
+When doing XDP_REDIRECT towards e.g devmap this causes the
+function bq_xmit_all() to run with direct return optimization
+enabled. This can lead to hard to find bugs.  The issue
+only happens when bq_xmit_all() cannot ndo_xdp_xmit all
+frames and them frees them via xdp_return_frame_rx_napi().
+
+Fix by expanding scope to include xdp_do_flush().
+
+Fixes: 11941f8a8536 ("bpf: cpumap: Implement generic cpumap")
+Found-by: Dragos Tatulea <dtatulea@nvidia.com>
+Reported-by: Chris Arges <carges@cloudflare.com>
+Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
+---
+ kernel/bpf/cpumap.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/kernel/bpf/cpumap.c b/kernel/bpf/cpumap.c
+index b2b7b8ec2c2a..c46360b27871 100644
+--- a/kernel/bpf/cpumap.c
++++ b/kernel/bpf/cpumap.c
+@@ -186,7 +186,6 @@ static int cpu_map_bpf_prog_run_xdp(struct bpf_cpu_map_entry *rcpu,
+ 	struct xdp_buff xdp;
+ 	int i, nframes = 0;
+ 
+-	xdp_set_return_frame_no_direct();
+ 	xdp.rxq = &rxq;
+ 
+ 	for (i = 0; i < n; i++) {
+@@ -231,7 +230,6 @@ static int cpu_map_bpf_prog_run_xdp(struct bpf_cpu_map_entry *rcpu,
+ 		}
+ 	}
+ 
+-	xdp_clear_return_frame_no_direct();
+ 	stats->pass += nframes;
+ 
+ 	return nframes;
+@@ -255,6 +253,7 @@ static void cpu_map_bpf_prog_run(struct bpf_cpu_map_entry *rcpu, void **frames,
+ 
+ 	rcu_read_lock();
+ 	bpf_net_ctx = bpf_net_ctx_set(&__bpf_net_ctx);
++	xdp_set_return_frame_no_direct();
+ 
+ 	ret->xdp_n = cpu_map_bpf_prog_run_xdp(rcpu, frames, ret->xdp_n, stats);
+ 	if (unlikely(ret->skb_n))
+@@ -264,6 +263,7 @@ static void cpu_map_bpf_prog_run(struct bpf_cpu_map_entry *rcpu, void **frames,
+ 	if (stats->redirect)
+ 		xdp_do_flush();
+ 
++	xdp_clear_return_frame_no_direct();
+ 	bpf_net_ctx_clear(bpf_net_ctx);
+ 	rcu_read_unlock();
+ 
 
 
-> ---
->  drivers/net/tun.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-> index 86a9e927d0ff..88c440c99542 100644
-> --- a/drivers/net/tun.c
-> +++ b/drivers/net/tun.c
-> @@ -2823,13 +2823,13 @@ static int tun_set_iff(struct net *net, struct fi=
-le *file, struct ifreq *ifr)
->         if (netif_running(tun->dev))
->                 netif_tx_wake_all_queues(tun->dev);
->
-> -       strscpy(ifr->ifr_name, tun->dev->name);
-> +       strscpy(ifr->ifr_name, tun->dev->name, IFNAMSIZ);
->         return 0;
->  }
->
->  static void tun_get_iff(struct tun_struct *tun, struct ifreq *ifr)
->  {
-> -       strscpy(ifr->ifr_name, tun->dev->name);
-> +       strscpy(ifr->ifr_name, tun->dev->name, IFNAMSIZ);
->
->         ifr->ifr_flags =3D tun_flags(tun);
->
-> --
-> 2.47.3
->
 
