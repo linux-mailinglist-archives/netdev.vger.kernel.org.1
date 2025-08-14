@@ -1,120 +1,128 @@
-Return-Path: <netdev+bounces-213855-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213856-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90EA1B2719A
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 00:28:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3410DB271A7
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 00:34:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78AB756700A
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 22:27:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2CF641716D5
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 22:34:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7856B27FB28;
-	Thu, 14 Aug 2025 22:27:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A051D27FD48;
+	Thu, 14 Aug 2025 22:34:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q0Q7jH13"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kPRDvgWK"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 507C81C9DE5;
-	Thu, 14 Aug 2025 22:27:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D2B923D7E2;
+	Thu, 14 Aug 2025 22:34:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755210429; cv=none; b=uf5IuRFvxThI/ED3MI1WeMWX8psLTpiWUiNKtDNLiSlfB0CtYBebhpRZHUHQQY1NkuJX90JQgfCe3lWcEweETqbw7MZ+W58B3QBQ8bHEcckx/+uqOCS/wnUppWI2QNk7Wv0REctYPHrB5zu2PSi1Q9649+PpIDIeQj6QQ0DOdlo=
+	t=1755210868; cv=none; b=GnbV7zRfth74tNcHhR9qbqpbQ+Pesi7o7rVrY17gICWdRVssYctAJAZQAGRpKg5TB48bjh1kmzchhocrHuJGK9ywxqUsDO42sEQ21vu8QxQf9lt0r9JAwzlhmFHKx6XJL2hMNpnp9pXiKs7V6k69T8lbn391ybuGcrCwWSzZmNA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755210429; c=relaxed/simple;
-	bh=ihJiNbq3crEvohcQ6It1P3dL4Tr9QQCo2wRY/rSYaeQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IvwN4yv9wCCbIdpXFgDZnJBn1ifL8qYgOhNrPXZ4Ht6pGahp1hIoBIuaYjz8lFZRRNk1rrrTV0PMUoFdQMlKgrYKFX4+FBJsVtNbn6yt0JxhnKeRUL3LkUgB0FMVU1dI7A3x+wN7fAurAk6H/GDq0ZsfKhkCT5lOHTUAoOLBV80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q0Q7jH13; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FE42C4CEED;
-	Thu, 14 Aug 2025 22:27:08 +0000 (UTC)
+	s=arc-20240116; t=1755210868; c=relaxed/simple;
+	bh=r5sVScVg8A+4RvvS2qufgrLSgNQ4hfZIM+ozBjWCA/Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZlwDhkEIUeiifkjpzuYJGv1TTtKhBlnTrHKctlGIPyuCjtoqVu6MMWiaaFQRckjrkT+v4gzIyL8BgxbTPt+xrP7omAXjwKw0apq3oPfHyxl6HPdko2O9MD23rXfH++JdGn/TizpWN+0+r276/YPlrm+kjgQ1ksLPfqUZDeh7mXE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kPRDvgWK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1E2BC4CEED;
+	Thu, 14 Aug 2025 22:34:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755210428;
-	bh=ihJiNbq3crEvohcQ6It1P3dL4Tr9QQCo2wRY/rSYaeQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Q0Q7jH135MxbppYhKzub1ljudwF5pZ3mhYyRD712Xp/VREwHyd/Vj0ErUDLXb6St4
-	 gT20k6vFcAb0Brh8OhmhHj/wWFOs5nZiDr0tgJEf8UjxJ7HopK6yq5FsBFpzA1nYDH
-	 rCnCu4tMXWIePnjmjjV7LIT8vKFQTkArmRs8XWNhd0uAu73L6t6XAXCVDoCf7XCcrD
-	 g7h7WdqMH688SddqlgQ0tfToJFSrtnedDRx/d2qas9ZydvySW2Y7uX+nd53yYoqhoP
-	 jj54TuJkL6acXRriEMLWXAVVH3q53v57+j83IZ+CbqPLW6mBPO1Xwpw3Xd4eP6lgFW
-	 XstVjn8uGaTYA==
-Date: Thu, 14 Aug 2025 15:27:07 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Stanislav Fomichev <sdf@fomichev.me>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, donald.hunter@gmail.com, horms@kernel.org,
- jstancek@redhat.com, jacob.e.keller@intel.com, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] tools: ynl: make ynl.c more c++ friendly
-Message-ID: <20250814152707.6d16c342@kernel.org>
-In-Reply-To: <20250814164413.1258893-1-sdf@fomichev.me>
-References: <20250814164413.1258893-1-sdf@fomichev.me>
+	s=k20201202; t=1755210867;
+	bh=r5sVScVg8A+4RvvS2qufgrLSgNQ4hfZIM+ozBjWCA/Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=kPRDvgWKPpmzN7VJ2NuXCIhNUk20jsFdncWyMVJdPSCtDm2Mdpuqbyu2KbYY4Ctou
+	 kQffSmYPoX7edg9+ZK2Ls6HIS1AGhO6N+RJ0jew1OVOCBGbC+YDl1DahkKC9bZcfTJ
+	 jrCz2yko6n+qQfbrEhqNM+yUNY57d52ic1AIALYx3poUO30Dryfgw4kTknvlwQfTAN
+	 FHei49OlsWYktOT61tiSUY850UnjADhShH2EkJTh2vMB+ur0yieyhTd/HErDvRTNjv
+	 TSkq1CCv1Rbo8WmCfZBi0xkZ4hMdoBk3psBqOxtZ2yNb4n+w0fWTZCtCQIRfLkDpnX
+	 YF842IRv9Va1g==
+Date: Thu, 14 Aug 2025 17:34:26 -0500
+From: Rob Herring <robh@kernel.org>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
+	Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
+	Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
+	Conor Dooley <conor+dt@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+Subject: Re: [PATCH net-next v11 06/16] dt-bindings: net: dp83822: Deprecate
+ ti,fiber-mode
+Message-ID: <20250814223426.GA4036754-robh@kernel.org>
+References: <20250814135832.174911-1-maxime.chevallier@bootlin.com>
+ <20250814135832.174911-7-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250814135832.174911-7-maxime.chevallier@bootlin.com>
 
-On Thu, 14 Aug 2025 09:44:13 -0700 Stanislav Fomichev wrote:
-> Compiling ynl.c in a C++ code base requires invoking C compiler and
-> using extern "C" for the headers. To make it easier, we can add
-> small changes to the ynl.c file to make it palatable to the native
-> C++ compiler. The changes are:
-> - avoid using void* pointer arithmetic, use char* instead
-> - avoid implicit void* type casts, add c-style explicit casts
-> - avoid implicit int->enum type casts, add c-style explicit casts
-> - avoid anonymous structs (for type casts)
-> - namespacify cpp version, this should let us compile both ynl.c
->   as c and ynl.c as cpp in the same binary (YNL_CPP can be used
->   to enable/disable namespacing)
+On Thu, Aug 14, 2025 at 03:58:21PM +0200, Maxime Chevallier wrote:
+> The newly added ethernet-connector binding allows describing an Ethernet
+> connector with greater precision, and in a more generic manner, than
+> ti,fiber-mode. Deprecate this property.
 > 
-> Also add test_cpp rule to make sure ynl.c won't break C++ in the future.
-
-As I mentioned in person, ynl-cpp is a separate thing, and you'd all
-benefit from making it more C++ than going the other way and massaging
-YNL C.
-
-With that said, commenting below on the few that I think would be okay.
-
-> @@ -224,7 +228,7 @@ static inline void *ynl_attr_data_end(const struct nlattr *attr)
+> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> ---
+>  .../devicetree/bindings/net/ti,dp83822.yaml    | 18 ++++++++++++++++++
+>  1 file changed, 18 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/ti,dp83822.yaml b/Documentation/devicetree/bindings/net/ti,dp83822.yaml
+> index 28a0bddb9af9..c1fd6f0a8ce5 100644
+> --- a/Documentation/devicetree/bindings/net/ti,dp83822.yaml
+> +++ b/Documentation/devicetree/bindings/net/ti,dp83822.yaml
+> @@ -47,6 +47,9 @@ properties:
+>         is disabled.
+>         In fiber mode, auto-negotiation is disabled and the PHY can only work in
+>         100base-fx (full and half duplex) modes.
+> +       This property is deprecated, for details please refer to
+> +       Documentation/devicetree/bindings/net/ethernet-connector.yaml
+> +    deprecated: true
 >  
->  #define ynl_attr_for_each_payload(start, len, attr)			\
->  	for ((attr) = ynl_attr_first(start, len, 0); attr;		\
-> -	     (attr) = ynl_attr_next(start + len, attr))
-> +	     (attr) = ynl_attr_next((char *)start + len, attr))
+>    rx-internal-delay-ps:
+>      description: |
+> @@ -143,5 +146,20 @@ examples:
+>          mac-termination-ohms = <43>;
+>        };
+>      };
+> +  - |
+> +    mdio1 {
+> +      #address-cells = <1>;
+> +      #size-cells = <0>;
+> +      fiberphy0: ethernet-phy@0 {
+> +        reg = <0>;
+> +        mdi {
+> +          connector-0 {
+> +            lanes = <1>;
+> +            media = "BaseF";
+> +          };
 
-okay
+If you respin, just add this to the existing example.
 
-> @@ -149,7 +153,7 @@ ynl_err_walk(struct ynl_sock *ys, void *start, void *end, unsigned int off,
->  		return n;
->  	}
->  
-> -	data_len = end - start;
-> +	data_len = (char *)end - (char *)start;
-
-can we make the arguments char * instead of the casts?
-
->  static void ynl_err_reset(struct ynl_sock *ys)
->  {
-> -	ys->err.code = 0;
-> +	ys->err.code = YNL_ERROR_NONE;
-
-sure
-
-> @@ -56,6 +60,11 @@ struct ynl_family {
->  	unsigned int ntf_info_size;
->  };
->  
-> +struct ynl_sock_mcast {
-
-struct ynl_mcast_grp
-
-> +	unsigned int id;
-> +	char name[GENL_NAMSIZ];
-> +};
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
 
