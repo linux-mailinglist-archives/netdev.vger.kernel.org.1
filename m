@@ -1,101 +1,134 @@
-Return-Path: <netdev+bounces-213620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213621-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40090B25E73
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 10:10:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4773DB25E7B
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 10:13:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4389017CA45
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 08:10:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D8FC517B4B3
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 08:11:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE7D42E7181;
-	Thu, 14 Aug 2025 08:10:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14DF72E717D;
+	Thu, 14 Aug 2025 08:11:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DLbJ0NC1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b1OvAMrc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6F3827587D;
-	Thu, 14 Aug 2025 08:10:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E206B22D78F;
+	Thu, 14 Aug 2025 08:11:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755159040; cv=none; b=jJStjg3CQoB6VRd5bYjK8QCOTCqxyRaKUasbvLD8GrHPoRjfzrmQdKfwZpJ7D8B0RCZXTd1t1P3VnXmU6NXv1M4JKBN5cYs237/WHEGYAKsoNRysPYCJS8XmfybdDyECY6JBL9v9sGUUSTQ1ogSCcjft8Q960WDoFDTW4OUYpPw=
+	t=1755159103; cv=none; b=RcJ2N5nsOmEkc2aVP7dxVGS9eI8bGJc5aUHnsZ8QPlV1vgIe7qXcHkr48XV8/xruPyrspw2PvSZdJagEsmEnTDikidcyF8I8Qldd86+zkFmYXla0EsGIktE5C3C8q5SrFlUh1mHw9QdDOFDYGyg6OepTnyimmyxYRR8JGnjXwM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755159040; c=relaxed/simple;
-	bh=8PGdpqI11ac8Y8fSWkUX0aKnppBjPfTLxK1xdjlz6cE=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=PtEhGhFRSOTxnEqm7Iw+VTGJAl/s2l//MyjB190sPlDAMHS3ZvQdETwlYsCdXKPua1bPmE1RTTOGtRFQaDUXjXMIxslxEgL5z79wF+3QR70LNp6f21x80Mn1umGoKqbWT0Gx5qW/G1HalFm7cr1FO7jY4ZPM0didQIlUC3S2O10=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DLbJ0NC1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2747C4CEF4;
-	Thu, 14 Aug 2025 08:10:32 +0000 (UTC)
+	s=arc-20240116; t=1755159103; c=relaxed/simple;
+	bh=/nwd1vSYgyNJx0ptVJqmjDnn54Z2UmVCME9EuIdCn7k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=k/Ep2PRSyV92HrE71EJ6KOx+N7Oip0gZma5scGeaE8nzI3VPQONgr/B37yBUe4OKkqN9I2zhHCGRu1m0ZRpPVuL9/7BQ9ibmZgU1QVDaIydTdJtDO9eQJMJYZCe4x1N1eQPtz0UfW0NZU8XAP4oQXJw9MarWgalZCtRej25WjSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b1OvAMrc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50843C4CEEF;
+	Thu, 14 Aug 2025 08:11:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755159040;
-	bh=8PGdpqI11ac8Y8fSWkUX0aKnppBjPfTLxK1xdjlz6cE=;
-	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
-	b=DLbJ0NC153asI54kpXF/bKi1f5qTjJYsdUrlcRx7KzPAUp3hOB3VlFXB2QW7nMuiK
-	 tNAuNlLZzXMh5kyDx4qeuZA+eFTi9ZHbFPq7QZ4nIOLtndciGqwzCJN/rXowebYeng
-	 h7yTuboG83nXDd+Buqo5VVartYvky3YZ+6YMqRrsaYBUGjjRudUE6LutBc93y9fZAG
-	 VflSSnl1UZlFjNfQWsNH8ltDGKwlrLSo3XQeaAvYbjQMoaq9r9jWSxc41YktvdTf8C
-	 qqZ3E+bbhcSlbLc0C0YRYrSk15I0J2lvCVoRPuhIQwY1gjU0+JBx5AVe9d72U5QYeA
-	 FRGRzpivjT7zg==
+	s=k20201202; t=1755159101;
+	bh=/nwd1vSYgyNJx0ptVJqmjDnn54Z2UmVCME9EuIdCn7k=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=b1OvAMrcC1lq1iNLaygGi5yimNb6OChZenTmMCZCgggivJWGcbDZIfyXhGsL5z+wf
+	 cpu8ClVNwUFnNxYJmJfVjHWyhrzU9LVGoW0ualz2hgYPvB6n5KHg4dd7s3ADsyYRJH
+	 5zNOTdqKWYDfFLc3Ra6lPb9dPNSKgDEb6h6Y5CCL4eUYDLTj9WF86XrMf/V2Pqt0ZT
+	 84njqmDOwdMa5mo9I59VlhDso1K4ByhDIxg3SC3XOlpFHuLAkS1aGK6A1l56CzFKP5
+	 Y2Aj/fN2aF6FPHm+WxIRZ2DjXD+gNQ3q6nFqTy9YUUluwD8qoZ8lVpY4p83AMev14m
+	 0reXZEhZGhZ+g==
+Message-ID: <902cf005-7731-4a20-9cb1-287318ab8a9a@kernel.org>
+Date: Thu, 14 Aug 2025 10:11:35 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Thu, 14 Aug 2025 10:10:31 +0200
-Message-Id: <DC1ZY7PYGCK6.2LDYPXE3XSUMK@kernel.org>
-Cc: <dri-devel@lists.freedesktop.org>, <linux-kernel@vger.kernel.org>,
- <rust-for-linux@vger.kernel.org>, <linux-pm@vger.kernel.org>,
- <linux-kselftest@vger.kernel.org>, <kunit-dev@googlegroups.com>,
- <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
- <linux-acpi@vger.kernel.org>
-Subject: Re: [PATCH v3 11/11] rust: acpi: use `core::ffi::CStr` method names
-From: "Benno Lossin" <lossin@kernel.org>
-To: "Tamir Duberstein" <tamird@gmail.com>, "Maarten Lankhorst"
- <maarten.lankhorst@linux.intel.com>, "Maxime Ripard" <mripard@kernel.org>,
- "Thomas Zimmermann" <tzimmermann@suse.de>, "David Airlie"
- <airlied@gmail.com>, "Simona Vetter" <simona@ffwll.ch>, "Miguel Ojeda"
- <ojeda@kernel.org>, "Alex Gaynor" <alex.gaynor@gmail.com>, "Boqun Feng"
- <boqun.feng@gmail.com>, "Gary Guo" <gary@garyguo.net>,
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, "Andreas
- Hindborg" <a.hindborg@kernel.org>, "Alice Ryhl" <aliceryhl@google.com>,
- "Trevor Gross" <tmgross@umich.edu>, "Danilo Krummrich" <dakr@kernel.org>,
- "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>, "Dave Ertman"
- <david.m.ertman@intel.com>, "Ira Weiny" <ira.weiny@intel.com>, "Leon
- Romanovsky" <leon@kernel.org>, "Breno Leitao" <leitao@debian.org>, "Rafael
- J. Wysocki" <rafael@kernel.org>, "Viresh Kumar" <viresh.kumar@linaro.org>,
- "Luis Chamberlain" <mcgrof@kernel.org>, "Russ Weight"
- <russ.weight@linux.dev>, "Brendan Higgins" <brendan.higgins@linux.dev>,
- "David Gow" <davidgow@google.com>, "Rae Moar" <rmoar@google.com>, "FUJITA
- Tomonori" <fujita.tomonori@gmail.com>, "Rob Herring" <robh@kernel.org>,
- "Saravana Kannan" <saravanak@google.com>, "Jocelyn Falempe"
- <jfalempe@redhat.com>, "Javier Martinez Canillas" <javierm@redhat.com>,
- "Arnd Bergmann" <arnd@arndb.de>, "Len Brown" <lenb@kernel.org>
-X-Mailer: aerc 0.20.1
-References: <20250813-core-cstr-fanout-1-v3-0-545c14bc44ff@gmail.com>
- <20250813-core-cstr-fanout-1-v3-11-545c14bc44ff@gmail.com>
-In-Reply-To: <20250813-core-cstr-fanout-1-v3-11-545c14bc44ff@gmail.com>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC] xdp: pass flags to xdp_update_skb_shared_info() directly
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
+ lorenzo@kernel.org, toke@redhat.com, john.fastabend@gmail.com,
+ sdf@fomichev.me, michael.chan@broadcom.com, anthony.l.nguyen@intel.com,
+ przemyslaw.kitszel@intel.com, marcin.s.wojtas@gmail.com, tariqt@nvidia.com,
+ mbloch@nvidia.com, eperezma@redhat.com
+References: <20250812161528.835855-1-kuba@kernel.org>
+ <46470d2b-4828-48ad-a94e-9d874de1b2fc@intel.com>
+ <2ba29c9f-a44f-4be6-bd3a-eb9cdb34ac8a@kernel.org>
+ <20250813144439.71a09e9a@kernel.org>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <20250813144439.71a09e9a@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed Aug 13, 2025 at 5:42 PM CEST, Tamir Duberstein wrote:
-> Prepare for `core::ffi::CStr` taking the place of `kernel::str::CStr` by
-> avoid methods that only exist on the latter.
->
-> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
 
-Reviewed-by: Benno Lossin <lossin@kernel.org>
 
----
-Cheers,
-Benno
+On 13/08/2025 23.44, Jakub Kicinski wrote:
+> On Wed, 13 Aug 2025 10:43:21 +0200 Jesper Dangaard Brouer wrote:
+>>>> Does anyone prefer the current form of the API, or can we change
+>>>> as prosposed?
+>>
+>> I like the proposed change.
+>> The only thing that confuses me was that the u32 flags is named
+>> "skb_flags" and not "xdp_flags".
+>>
+>> @@ -314,7 +313,7 @@
+>>    static inline void
+>>    xdp_update_skb_shared_info(struct sk_buff *skb, u8 nr_frags,
+>>    			   unsigned int size, unsigned int truesize,
+>> -			   bool pfmemalloc)
+>> +			   u32 skb_flags)
+> 
+> It was matching the helper names: xdp_buff_get_skb_flags()
+> 
+> If we rename it to xdp_flags here do you want me to keep
+> the helpers (xdp_buff_get_flags()?) or access buf->flags
+> directly in the caller?
+> 
+> The idea was that the helper could filter / transform
+> the flags to whatever the update function takes. And the skb_
+> in the helper name was matching the skb_ of the arg.
+> 
 
-> ---
->  rust/kernel/acpi.rs | 7 ++-----
->  1 file changed, 2 insertions(+), 5 deletions(-)
+It makes sense to have a helper, as you argue.
+
+>>>> Bonus question: while Im messing with this API could I rename
+>>>> xdp_update_skb_shared_info()? Maybe to xdp_update_skb_state() ?
+>>>> Not sure why the function name has "shared_info" when most of
+>>>> what it updates is skb fields.
+>>>
+>>> I can only suspect that the author decided to name it this way due to
+>>> that it's only used when xdp_buff has frags (and frags are in shinfo).
+>>> But I agree it's not the best choice. xdp_update_skb_state() sounds fine
+>>> to me, but given that it's all about frags, maybe something like
+>>> xdp_update_skb_frags_info/state() or so?
+>>
+>> Yes, function is only used when skb_shared_info have already been touched.
+>>
+>> Performance wise it can be expensive to touch the cache-line for
+>> skb_shared_info, so the code carefully checks xdp_buff_has_frags() (flag
+>> XDP_FLAGS_HAS_FRAGS) before deref of skb_shared_info memory area.
+>>
+>> Calling it xdp_update_skb_state() seems misleading. As Olek says, this
+>> is about updating the "skb_frags".  The original intent is that
+>> xdp_buff/xdp_frame is using same skb_shared_info area as SKB, and when
+>> transitioning to a "full" SKB then we need to do some adjustments.
+>> (Looking at function code, it is of-cause confusing that it doesn't
+>> touch sinfo->frags[] array, but that is because we don't need to, as
+>> non-linear XDP and SKB have same layout.).
+> 
+> Let's go with xdp_update_skb_frags_info(), then.
+
+Fine with me. It was Olek's naming suggestions (and I liked both).
+
+Thanks
+--Jesper
+
 
