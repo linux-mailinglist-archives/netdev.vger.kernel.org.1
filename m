@@ -1,335 +1,244 @@
-Return-Path: <netdev+bounces-213679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213680-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5B3CB2641F
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 13:22:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BDF7B26432
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 13:26:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 872553AF9D4
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 11:21:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB8E29E70AF
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 11:26:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 437CB2F39D9;
-	Thu, 14 Aug 2025 11:21:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C4942EBBB8;
+	Thu, 14 Aug 2025 11:26:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BsqKCXk0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SYXXtvz2"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B20E2EFDAC
-	for <netdev@vger.kernel.org>; Thu, 14 Aug 2025 11:21:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61E9675809;
+	Thu, 14 Aug 2025 11:26:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755170510; cv=none; b=HvLvvxyz6eXb79verXosIN+ad0QiLQwC65aP2LVON9kD7zq6GhuxI0UA2/XWIOGyu3hyWdTg1r7ked1aRCUSOL5mGeXWMuBc0OlF1/d4GveV/suELMqyMsGybeemseQ4c9xb883hyjpvUt/K4v+k35LD+kt4ymqNxsH8FltEdOg=
+	t=1755170804; cv=none; b=mr6LsmgCY80joIrQwaahptYGD3/BraypNdVtM4Km3rnPWNm62j1sU4N5W47u3SoGnxVCRbJJOjiO3Ls5Pn0NCV540xqjq26j1eaME2II79bK7HfoCakMQOmUJNBbJs56SJdWicrJIC3rSJnDwjDvcnWgjfkXLigQdXbdHmsbZ2U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755170510; c=relaxed/simple;
-	bh=n+c54q/JIitz3ZcglzykxPKObG0OyoAyZeiO108zw6s=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=LlFU31TR/qN0QFsyzqcUGKxdlAa636qnJCNlbp2LoXINJyfDNZ9jy6tQZZEu/KnHMZ1iHIqPQqm19A4w55D/ZiDRj53zTj1Ic3htFLZ4sNWmCB6Tpkok0egKOJw1ZkDVpHmerlvRcf7/YKag30Miui9LMEFdnOzBSh6utezOrtU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BsqKCXk0; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1755170507;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=zfaxiYyd5Dr5mQ5lKs2Zw3QQyzDjjlKEaB38MzjfWHM=;
-	b=BsqKCXk0TxKab5ql3cNqAvotjvy5AHVKdg5gSEFYYsL7i/gusNoc7VfNNs0JiGaCOgjj9B
-	TIePcysbR+m/QcQvK35jxmxWCyraQnJlAb05tCiBuSn159Lo9VvNgr2f8WkWnh1/3R55gI
-	dbASr1LsXNikejPL8oJ9ASfeN3uZnxM=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-441-hfjVm0_QMDWueHjvpwrIvA-1; Thu,
- 14 Aug 2025 07:21:43 -0400
-X-MC-Unique: hfjVm0_QMDWueHjvpwrIvA-1
-X-Mimecast-MFC-AGG-ID: hfjVm0_QMDWueHjvpwrIvA_1755170502
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 90CFA1955BD9;
-	Thu, 14 Aug 2025 11:21:42 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.44.32.79])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 87B4D18003FC;
-	Thu, 14 Aug 2025 11:21:40 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: torvalds@linux-foundation.org
-Cc: kuba@kernel.org,
-	davem@davemloft.net,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [GIT PULL] Networking for v6.17-rc2
-Date: Thu, 14 Aug 2025 13:21:01 +0200
-Message-ID: <20250814112101.35891-1-pabeni@redhat.com>
+	s=arc-20240116; t=1755170804; c=relaxed/simple;
+	bh=30DXgkTYYD6RYCecMC8sYcMnUiHiVam0osnwdwk5nJA=;
+	h=Content-Type:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To; b=GEaQSMg2XcStKB1+qOEVzDP/xGA79EbWeYoTU0zKTwiDsniAHXBmZDpjPlIsxYJ/aRnZiW7vA371oe9uiX2GO6vPuieVPRV6tdmQkK7imxEpuJdSiKsEbYGtFSnyDTmURquQNe7XcTuFMOO+D3UoUdWDQ+/5mpcE6T48vwfaHIk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SYXXtvz2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85060C4CEED;
+	Thu, 14 Aug 2025 11:26:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755170803;
+	bh=30DXgkTYYD6RYCecMC8sYcMnUiHiVam0osnwdwk5nJA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=SYXXtvz2m1bwfOsPB1EL46Mn1yVdrXeh+7FI7l3nBC+wBNZTCtYoInI2P9nE/CudD
+	 OQ5FyedlGQGBRf1DsBuJLlDDRo8JOmK+U9i4ImKGeER/30aDbfhu8DxlZACWrQus7U
+	 hjAY706BayX2bx99MwHQKxjVfefiYjyAoBzovPWrxUGH6r/ik+o4+l/TvSTQT83LjV
+	 iGc1n72OXw4NMwxqcOMh4qBvFaKR4O0rdOr5T0Aa9tDcMx7tlNi6B38Hsofin5ktxJ
+	 +PVuUAo0u632+jQjPg/pvvl9zsR2HUOZXtwZU5qXcCs/3yWgbKOskVQZHA+6KTqwLY
+	 8kjgdqzQNxJhw==
+Content-Type: multipart/mixed; boundary="------------lF30PlGn2iU8UK0ul3hEviSE"
+Message-ID: <e60404e2-4782-409f-8596-ae21ce7272c4@kernel.org>
+Date: Thu, 14 Aug 2025 13:26:37 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+User-Agent: Mozilla Thunderbird
+Subject: Re: [BUG] mlx5_core memory management issue
+To: Dragos Tatulea <dtatulea@nvidia.com>, Chris Arges <carges@cloudflare.com>
+Cc: Jesse Brandeburg <jbrandeburg@cloudflare.com>, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, kernel-team <kernel-team@cloudflare.com>,
+ tariqt@nvidia.com, saeedm@nvidia.com, Leon Romanovsky <leon@kernel.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ John Fastabend <john.fastabend@gmail.com>, Simon Horman <horms@kernel.org>,
+ Andrew Rzeznik <arzeznik@cloudflare.com>, Yan Zhai <yan@cloudflare.com>,
+ Kumar Kartikeya Dwivedi <memxor@gmail.com>
+References: <aIEuZy6fUj_4wtQ6@861G6M3>
+ <jlvrzm6q7dnai6nf5v3ifhtwqlnvvrdg5driqomnl5q4lzfxmk@tmwaadjob5yd>
+ <aJTYNG1AroAnvV31@861G6M3>
+ <hlsks2646fmhbnhxwuihheri2z4ymldtqlca6fob7rmvzncpat@gljjmlorugzw>
+ <aqti6c3imnaffenkgnnw5tnmjwrzw7g7pwbt47bvbgar2c4rbv@af4mch7msf3w>
+ <9b27d605-9211-43c9-aa49-62bbf87f7574@cloudflare.com>
+ <72vpwjc4tosqt2djhyatkycofi2hlktulevzlszmhb6w3mlo46@63sxu3or7suc>
+ <aJuxY9oTtxSn4qZP@861G6M3> <aJzfPFCTlc35b2Bp@861G6M3>
+ <5hinwlan55y6fl6ocilg7iccatuu5ftiyruf7wwfi44w5b4gpa@ainmdlgjtm5g>
+ <4zkm7dmkxhfhf3cm7eniim26z6nbp3zsm4qttapg3xbvkrqhro@cvjnbr624m5h>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <4zkm7dmkxhfhf3cm7eniim26z6nbp3zsm4qttapg3xbvkrqhro@cvjnbr624m5h>
 
-Hi Linus!
+This is a multi-part message in MIME format.
+--------------lF30PlGn2iU8UK0ul3hEviSE
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The following changes since commit 37816488247ddddbc3de113c78c83572274b1e2e:
 
-  Merge tag 'net-6.17-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2025-08-08 07:03:25 +0300)
 
-are available in the Git repository at:
+On 13/08/2025 22.24, Dragos Tatulea wrote:
+> On Wed, Aug 13, 2025 at 07:26:49PM +0000, Dragos Tatulea wrote:
+>> On Wed, Aug 13, 2025 at 01:53:48PM -0500, Chris Arges wrote:
+>>> On 2025-08-12 16:25:58, Chris Arges wrote:
+>>>> On 2025-08-12 20:19:30, Dragos Tatulea wrote:
+>>>>> On Tue, Aug 12, 2025 at 11:55:39AM -0700, Jesse Brandeburg wrote:
+>>>>>> On 8/12/25 8:44 AM, 'Dragos Tatulea' via kernel-team wrote:
+>>>>>>
+>>>>>>> diff --git a/kernel/bpf/devmap.c b/kernel/bpf/devmap.c
+>>>>>>> index 482d284a1553..484216c7454d 100644
+>>>>>>> --- a/kernel/bpf/devmap.c
+>>>>>>> +++ b/kernel/bpf/devmap.c
+>>>>>>> @@ -408,8 +408,10 @@ static void bq_xmit_all(struct xdp_dev_bulk_queue *bq, u32 flags)
+>>>>>>>           /* If not all frames have been transmitted, it is our
+>>>>>>>            * responsibility to free them
+>>>>>>>            */
+>>>>>>> +       xdp_set_return_frame_no_direct();
+>>>>>>>           for (i = sent; unlikely(i < to_send); i++)
+>>>>>>>                   xdp_return_frame_rx_napi(bq->q[i]);
+>>>>>>> +       xdp_clear_return_frame_no_direct();
+>>>>>>
+>>>>>> Why can't this instead just be xdp_return_frame(bq->q[i]); with no
+>>>>>> "no_direct" fussing?
+>>>>>>
+>>>>>> Wouldn't this be the safest way for this function to call frame completion?
+>>>>>> It seems like presuming the calling context is napi is wrong?
+>>>>>>
+>>>>> It would be better indeed. Thanks for removing my horse glasses!
+>>>>>
+>>>>> Once Chris verifies that this works for him I can prepare a fix patch.
+>>>>>
+>>>> Working on that now, I'm testing a kernel with the following change:
+>>>>
+>>>> ---
+>>>>
+>>>> diff --git a/kernel/bpf/devmap.c b/kernel/bpf/devmap.c
+>>>> index 3aa002a47..ef86d9e06 100644
+>>>> --- a/kernel/bpf/devmap.c
+>>>> +++ b/kernel/bpf/devmap.c
+>>>> @@ -409,7 +409,7 @@ static void bq_xmit_all(struct xdp_dev_bulk_queue *bq, u32 flags)
+>>>>           * responsibility to free them
+>>>>           */
+>>>>          for (i = sent; unlikely(i < to_send); i++)
+>>>> -               xdp_return_frame_rx_napi(bq->q[i]);
+>>>> +               xdp_return_frame(bq->q[i]);
+>>>>   
+>>>>   out:
+>>>>          bq->count = 0;
+>>>
+>>> This patch resolves the issue I was seeing and I am no longer able to
+>>> reproduce the issue. I tested for about 2 hours, when the reproducer usually
+>>> takes about 1-2 minutes.
+>>>
+>> Thanks! Will send a patch tomorrow and also add you in the Tested-by tag.
+>>
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.17-rc2
+Looking at code ... there are more cases we need to deal with.
+If simply replacing xdp_return_frame_rx_napi() with xdp_return_frame.
 
-for you to fetch changes up to 4faff70959d51078f9ee8372f8cff0d7045e4114:
+The normal way to fix this is to use the helpers:
+  - xdp_set_return_frame_no_direct();
+  - xdp_clear_return_frame_no_direct()
 
-  net: usb: asix_devices: add phy_mask for ax88772 mdio bus (2025-08-14 10:09:28 +0200)
+Because __xdp_return() code[1] via xdp_return_frame_no_direct() will
+disable those napi_direct requests.
 
-----------------------------------------------------------------
-Including fixes from Netfilter and IPsec.
+  [1] https://elixir.bootlin.com/linux/v6.16/source/net/core/xdp.c#L439
 
-Current release - regressions:
+Something doesn't add-up, because the remote CPUMAP bpf-prog that 
+redirects to veth is running in cpu_map_bpf_prog_run_xdp()[2] and that 
+function already uses the xdp_set_return_frame_no_direct() helper.
 
-  - netfilter: nft_set_pipapo:
-    - don't return bogus extension pointer
-    - fix null deref for empty set
+  [2] https://elixir.bootlin.com/linux/v6.16/source/kernel/bpf/cpumap.c#L189
 
-Current release - new code bugs:
+I see the bug now... attached a patch with the fix.
+The scope for the "no_direct" forgot to wrap the xdp_do_flush() call.
 
-  - core: prevent deadlocks when enabling NAPIs with mixed kthread config
+Looks like bug was introduced in 11941f8a8536 ("bpf: cpumap: Implement 
+generic cpumap") v5.15.
 
-  - eth: netdevsim: Fix wild pointer access in nsim_queue_free().
+>> As follow up work it would be good to have a way to catch this family of
+>> issues. Something in the lines of the patch below.
+>>
 
-Previous releases - regressions:
+Yes, please, we want something that can catch these kind of hard to find 
+bugs.
 
-  - page_pool: allow enabling recycling late, fix false positive warning
+>> Thanks,
+>> Dragos
+>>
+>> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+>> index f1373756cd0f..0c498fbd8df6 100644
+>> --- a/net/core/page_pool.c
+>> +++ b/net/core/page_pool.c
+>> @@ -794,6 +794,10 @@ __page_pool_put_page(struct page_pool *pool, netmem_ref netmem,
+>>   {
+>>          lockdep_assert_no_hardirq();
+>>   
+>> +#ifdef CONFIG_PAGE_POOL_CACHEDEBUG
+>> +       WARN(page_pool_napi_local(pool), "Page pool cache access from non-direct napi context");
+> I meant to negate the condition here.
+> 
 
-  - sched: ets: use old 'nbands' while purging unused classes
+The XDP code have evolved since the xdp_set_return_frame_no_direct()
+calls were added.  Now page_pool keeps track of pp->napi and
+pool-> cpuid.  Maybe the __xdp_return [1] checks should be updated?
+(and maybe it allows us to remove the no_direct helpers).
 
-  - xfrm:
-    - restore GSO for SW crypto
-    - bring back device check in validate_xmit_xfrm
+--Jesper
 
-  - tls: handle data disappearing from under the TLS ULP
+--------------lF30PlGn2iU8UK0ul3hEviSE
+Content-Type: text/x-patch; charset=UTF-8;
+ name="01-cpumap-disable-pp-direct.patch"
+Content-Disposition: attachment; filename="01-cpumap-disable-pp-direct.patch"
+Content-Transfer-Encoding: base64
 
-  - ptp: prevent possible ABBA deadlock in ptp_clock_freerun()
+Y3B1bWFwOiBkaXNhYmxlIHBhZ2VfcG9vbCBkaXJlY3QgeGRwX3JldHVybiBuZWVkIGxhcmdl
+ciBzY29wZQoKRnJvbTogSmVzcGVyIERhbmdhYXJkIEJyb3VlciA8aGF3a0BrZXJuZWwub3Jn
+PgoKV2hlbiBydW5uaW5nIGFuIFhEUCBicGZfcHJvZyBvbiB0aGUgcmVtb3RlIENQVSBpbiBj
+cHVtYXAgY29kZQp0aGVuIHdlIG11c3QgZGlzYWJsZSB0aGUgZGlyZWN0IHJldHVybiBvcHRp
+bWl6YXRpb24gdGhhdAp4ZHBfcmV0dXJuIGNhbiBwZXJmb3JtIGZvciBtZW1fdHlwZSBwYWdl
+X3Bvb2wuICBUaGlzIG9wdGltaXphdGlvbgphc3N1bWVzIGNvZGUgaXMgc3RpbGwgZXhlY3V0
+aW5nIHVuZGVyIFJYLU5BUEkgb2YgdGhlIG9yaWdpbmFsCnJlY2VpdmluZyBDUFUsIHdoaWNo
+IGlzbid0IHRydWUgb24gdGhpcyByZW1vdGUgQ1BVLgoKVGhlIGNwdW1hcCBjb2RlIGFscmVh
+ZHkgZGlzYWJsZWQgdGhpcyB2aWEgaGVscGVycwp4ZHBfc2V0X3JldHVybl9mcmFtZV9ub19k
+aXJlY3QoKSBhbmQgeGRwX2NsZWFyX3JldHVybl9mcmFtZV9ub19kaXJlY3QoKSwKYnV0IHRo
+ZSBzY29wZSBkaWRuJ3QgaW5jbHVkZSB4ZHBfZG9fZmx1c2goKS4KCldoZW4gZG9pbmcgWERQ
+X1JFRElSRUNUIHRvd2FyZHMgZS5nIGRldm1hcCB0aGlzIGNhdXNlcyB0aGUKZnVuY3Rpb24g
+YnFfeG1pdF9hbGwoKSB0byBydW4gd2l0aCBkaXJlY3QgcmV0dXJuIG9wdGltaXphdGlvbgpl
+bmFibGVkLiBUaGlzIGNhbiBsZWFkIHRvIGhhcmQgdG8gZmluZCBidWdzLgoKRml4IGJ5IGV4
+cGFuZGluZyBzY29wZSB0byBpbmNsdWRlIHhkcF9kb19mbHVzaCgpLgoKRml4ZXM6IDExOTQx
+ZjhhODUzNiAoImJwZjogY3B1bWFwOiBJbXBsZW1lbnQgZ2VuZXJpYyBjcHVtYXAiKQpTaWdu
+ZWQtb2ZmLWJ5OiBKZXNwZXIgRGFuZ2FhcmQgQnJvdWVyIDxoYXdrQGtlcm5lbC5vcmc+Ci0t
+LQoga2VybmVsL2JwZi9jcHVtYXAuYyB8ICAgIDQgKystLQogMSBmaWxlIGNoYW5nZWQsIDIg
+aW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9rZXJuZWwvYnBm
+L2NwdW1hcC5jIGIva2VybmVsL2JwZi9jcHVtYXAuYwppbmRleCBiMmI3YjhlYzJjMmEuLmM0
+NjM2MGIyNzg3MSAxMDA2NDQKLS0tIGEva2VybmVsL2JwZi9jcHVtYXAuYworKysgYi9rZXJu
+ZWwvYnBmL2NwdW1hcC5jCkBAIC0xODYsNyArMTg2LDYgQEAgc3RhdGljIGludCBjcHVfbWFw
+X2JwZl9wcm9nX3J1bl94ZHAoc3RydWN0IGJwZl9jcHVfbWFwX2VudHJ5ICpyY3B1LAogCXN0
+cnVjdCB4ZHBfYnVmZiB4ZHA7CiAJaW50IGksIG5mcmFtZXMgPSAwOwogCi0JeGRwX3NldF9y
+ZXR1cm5fZnJhbWVfbm9fZGlyZWN0KCk7CiAJeGRwLnJ4cSA9ICZyeHE7CiAKIAlmb3IgKGkg
+PSAwOyBpIDwgbjsgaSsrKSB7CkBAIC0yMzEsNyArMjMwLDYgQEAgc3RhdGljIGludCBjcHVf
+bWFwX2JwZl9wcm9nX3J1bl94ZHAoc3RydWN0IGJwZl9jcHVfbWFwX2VudHJ5ICpyY3B1LAog
+CQl9CiAJfQogCi0JeGRwX2NsZWFyX3JldHVybl9mcmFtZV9ub19kaXJlY3QoKTsKIAlzdGF0
+cy0+cGFzcyArPSBuZnJhbWVzOwogCiAJcmV0dXJuIG5mcmFtZXM7CkBAIC0yNTUsNiArMjUz
+LDcgQEAgc3RhdGljIHZvaWQgY3B1X21hcF9icGZfcHJvZ19ydW4oc3RydWN0IGJwZl9jcHVf
+bWFwX2VudHJ5ICpyY3B1LCB2b2lkICoqZnJhbWVzLAogCiAJcmN1X3JlYWRfbG9jaygpOwog
+CWJwZl9uZXRfY3R4ID0gYnBmX25ldF9jdHhfc2V0KCZfX2JwZl9uZXRfY3R4KTsKKwl4ZHBf
+c2V0X3JldHVybl9mcmFtZV9ub19kaXJlY3QoKTsKIAogCXJldC0+eGRwX24gPSBjcHVfbWFw
+X2JwZl9wcm9nX3J1bl94ZHAocmNwdSwgZnJhbWVzLCByZXQtPnhkcF9uLCBzdGF0cyk7CiAJ
+aWYgKHVubGlrZWx5KHJldC0+c2tiX24pKQpAQCAtMjY0LDYgKzI2Myw3IEBAIHN0YXRpYyB2
+b2lkIGNwdV9tYXBfYnBmX3Byb2dfcnVuKHN0cnVjdCBicGZfY3B1X21hcF9lbnRyeSAqcmNw
+dSwgdm9pZCAqKmZyYW1lcywKIAlpZiAoc3RhdHMtPnJlZGlyZWN0KQogCQl4ZHBfZG9fZmx1
+c2goKTsKIAorCXhkcF9jbGVhcl9yZXR1cm5fZnJhbWVfbm9fZGlyZWN0KCk7CiAJYnBmX25l
+dF9jdHhfY2xlYXIoYnBmX25ldF9jdHgpOwogCXJjdV9yZWFkX3VubG9jaygpOwogCg==
 
-  - eth: bnxt: fill data page pool with frags if PAGE_SIZE > BNXT_RX_PAGE_SIZE
-
-  - eth: hv_netvsc: fix panic during namespace deletion with VF
-
-Previous releases - always broken:
-
-  - netfilter: fix refcount leak on table dump
-
-  - vsock: do not allow binding to VMADDR_PORT_ANY
-
-  - sctp: linearize cloned gso packets in sctp_rcv
-
-  - eth: hibmcge: fix the division by zero issue
-
-  - eth: microchip: fix KSZ8863 reset problem
-
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-
-----------------------------------------------------------------
-Alok Tiwari (1):
-      net: ti: icss-iep: Fix incorrect type for return value in extts_enable()
-
-Arnd Bergmann (1):
-      netfilter: add back NETFILTER_XTABLES dependencies
-
-Buday Csaba (1):
-      net: mdiobus: release reset_gpio in mdiobus_unregister_device()
-
-Budimir Markovic (1):
-      vsock: Do not allow binding to VMADDR_PORT_ANY
-
-Clark Wang (1):
-      net: phy: nxp-c45-tja11xx: fix the PHY ID mismatch issue when using C45
-
-Dan Carpenter (1):
-      netfilter: conntrack: clean up returns in nf_conntrack_log_invalid_sysctl()
-
-Dave Hansen (3):
-      MAINTAINERS: Mark Intel WWAN IOSM driver as orphaned
-      MAINTAINERS: Mark Intel PTP DFL ToD as orphaned
-      MAINTAINERS: Remove bouncing T7XX reviewer
-
-David Wei (1):
-      bnxt: fill data page pool with frags if PAGE_SIZE > BNXT_RX_PAGE_SIZE
-
-Davide Caratti (2):
-      net/sched: ets: use old 'nbands' while purging unused classes
-      selftests: net/forwarding: test purge of active DWRR classes
-
-Fabio Porcedda (1):
-      net: usb: qmi_wwan: add Telit Cinterion FN990A w/audio composition
-
-Florian Westphal (5):
-      MAINTAINERS: resurrect my netfilter maintainer entry
-      netfilter: ctnetlink: fix refcount leak on table dump
-      netfilter: ctnetlink: remove refcounting in expectation dumpers
-      netfilter: nft_set_pipapo: don't return bogus extension pointer
-      netfilter: nft_set_pipapo: fix null deref for empty set
-
-Frederic Weisbecker (1):
-      ipvs: Fix estimator kthreads preferred affinity
-
-Haiyang Zhang (1):
-      hv_netvsc: Fix panic during namespace deletion with VF
-
-Jakub Kicinski (11):
-      Merge tag 'nf-25-08-07' of git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
-      Merge branch 'there-are-some-bugfix-for-hibmcge-ethernet-driver'
-      net: page_pool: allow enabling recycling late, fix false positive warning
-      selftests: drv-net: don't assume device has only 2 queues
-      net: update NAPI threaded config even for disabled NAPIs
-      net: prevent deadlocks when enabling NAPIs with mixed kthread config
-      tls: handle data disappearing from under the TLS ULP
-      selftests: tls: test TCP stealing data from under the TLS socket
-      Merge tag 'nf-25-08-13' of https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
-      Merge branch '10GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue
-      Merge branch 'ets-use-old-nbands-while-purging-unused-classes'
-
-Jedrzej Jagielski (2):
-      devlink: let driver opt out of automatic phys_port_name generation
-      ixgbe: prevent from unwanted interface name changes
-
-Jeff Layton (1):
-      ref_tracker: use %p instead of %px in debugfs dentry name
-
-Jeongjun Park (1):
-      ptp: prevent possible ABBA deadlock in ptp_clock_freerun()
-
-Jijie Shao (3):
-      net: hibmcge: fix rtnl deadlock issue
-      net: hibmcge: fix the division by zero issue
-      net: hibmcge: fix the np_link_fail error reporting issue
-
-Jordan Rife (1):
-      docs: Fix name for net.ipv4.udp_child_hash_entries
-
-Kuniyuki Iwashima (1):
-      netdevsim: Fix wild pointer access in nsim_queue_free().
-
-MD Danish Anwar (1):
-      net: ti: icssg-prueth: Fix emac link speed handling
-
-Matt Johnston (1):
-      net: mctp: Fix bad kfree_skb in bind lookup test
-
-Pablo Neira Ayuso (2):
-      netfilter: nft_socket: remove WARN_ON_ONCE with huge level value
-      netfilter: nf_tables: reject duplicate device on updates
-
-Paolo Abeni (3):
-      Merge branch 'fix-broken-link-with-th1520-gmac-when-linkspeed-changes'
-      Merge branch 'net-prevent-deadlocks-and-mis-configuration-with-per-napi-threaded-config'
-      Merge tag 'ipsec-2025-08-11' of git://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec
-
-Russell King (Oracle) (2):
-      net: stmmac: rk: put the PHY clock on remove
-      net: stmmac: dwc-qos: fix clk prepare/enable leak on probe failure
-
-Sabrina Dubroca (4):
-      xfrm: flush all states in xfrm_state_fini
-      xfrm: restore GSO for SW crypto
-      xfrm: bring back device check in validate_xmit_xfrm
-      udp: also consider secpath when evaluating ipsec use for checksumming
-
-Stanislav Fomichev (2):
-      net: lapbether: ignore ops-locked netdevs
-      hamradio: ignore ops-locked netdevs
-
-Steffen Klassert (1):
-      Merge branch 'xfrm: some fixes for GSO with SW crypto'
-
-Sven Stegemann (1):
-      net: kcm: Fix race condition in kcm_unattach()
-
-Tristram Ha (1):
-      net: dsa: microchip: Fix KSZ8863 reset problem
-
-Xin Long (1):
-      sctp: linearize cloned gso packets in sctp_rcv
-
-Xu Yang (1):
-      net: usb: asix_devices: add phy_mask for ax88772 mdio bus
-
-Yao Zi (3):
-      dt-bindings: net: thead,th1520-gmac: Describe APB interface clock
-      net: stmmac: thead: Get and enable APB clock on initialization
-      riscv: dts: thead: Add APB clocks for TH1520 GMACs
-
- .../devicetree/bindings/net/thead,th1520-gmac.yaml |  6 +-
- Documentation/networking/ip-sysctl.rst             |  2 +-
- MAINTAINERS                                        |  8 +--
- arch/riscv/boot/dts/thead/th1520.dtsi              | 10 ++--
- drivers/net/dsa/microchip/ksz8.c                   | 20 ++++---
- drivers/net/dsa/microchip/ksz_common.c             |  1 +
- drivers/net/ethernet/broadcom/bnxt/bnxt.c          | 21 +++++--
- drivers/net/ethernet/hisilicon/hibmcge/hbg_err.c   | 14 ++---
- drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c    | 15 ++++-
- drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.h  |  7 ++-
- drivers/net/ethernet/intel/ixgbe/devlink/devlink.c |  1 +
- .../ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c    | 13 +----
- drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c     |  6 +-
- drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c  | 14 +++++
- drivers/net/ethernet/ti/icssg/icss_iep.c           |  3 +-
- drivers/net/ethernet/ti/icssg/icssg_prueth.c       |  6 ++
- drivers/net/hamradio/bpqether.c                    |  2 +-
- drivers/net/hyperv/hyperv_net.h                    |  3 +
- drivers/net/hyperv/netvsc_drv.c                    | 29 +++++++++-
- drivers/net/netdevsim/netdev.c                     | 10 +++-
- drivers/net/phy/mdio_bus.c                         |  1 +
- drivers/net/phy/mdio_bus_provider.c                |  3 -
- drivers/net/phy/nxp-c45-tja11xx.c                  | 23 ++++----
- drivers/net/usb/asix_devices.c                     |  1 +
- drivers/net/usb/qmi_wwan.c                         |  1 +
- drivers/net/wan/lapbether.c                        |  2 +-
- drivers/ptp/ptp_private.h                          |  5 ++
- drivers/ptp/ptp_vclock.c                           |  7 +++
- include/linux/netdevice.h                          |  5 +-
- include/net/devlink.h                              |  6 +-
- include/net/ip_vs.h                                | 13 +++++
- include/net/kcm.h                                  |  1 -
- include/net/page_pool/types.h                      |  2 +
- kernel/kthread.c                                   |  1 +
- lib/ref_tracker.c                                  |  2 +-
- net/bridge/netfilter/Kconfig                       |  1 +
- net/core/dev.c                                     | 12 +++-
- net/core/dev.h                                     |  8 +++
- net/core/page_pool.c                               | 29 ++++++++++
- net/devlink/port.c                                 |  2 +-
- net/ipv4/netfilter/Kconfig                         |  3 +
- net/ipv4/udp_offload.c                             |  2 +-
- net/ipv6/netfilter/Kconfig                         |  1 +
- net/ipv6/xfrm6_tunnel.c                            |  2 +-
- net/kcm/kcmsock.c                                  | 10 +---
- net/mctp/test/route-test.c                         |  1 -
- net/netfilter/ipvs/ip_vs_est.c                     |  3 +-
- net/netfilter/nf_conntrack_netlink.c               | 65 ++++++++++------------
- net/netfilter/nf_conntrack_standalone.c            |  6 +-
- net/netfilter/nf_tables_api.c                      | 30 ++++++++++
- net/netfilter/nft_set_pipapo.c                     |  5 +-
- net/netfilter/nft_set_pipapo_avx2.c                | 12 ++--
- net/netfilter/nft_socket.c                         |  2 +-
- net/sched/sch_ets.c                                | 11 ++--
- net/sctp/input.c                                   |  2 +-
- net/tls/tls.h                                      |  2 +-
- net/tls/tls_strp.c                                 | 11 +++-
- net/tls/tls_sw.c                                   |  3 +-
- net/vmw_vsock/af_vsock.c                           |  3 +-
- net/xfrm/xfrm_device.c                             | 12 +++-
- net/xfrm/xfrm_state.c                              |  2 +-
- .../testing/selftests/drivers/net/napi_threaded.py | 10 ++--
- tools/testing/selftests/net/forwarding/sch_ets.sh  |  1 +
- .../selftests/net/forwarding/sch_ets_tests.sh      |  8 +++
- tools/testing/selftests/net/tls.c                  | 63 +++++++++++++++++++++
- 65 files changed, 429 insertions(+), 157 deletions(-)
-
+--------------lF30PlGn2iU8UK0ul3hEviSE--
 
