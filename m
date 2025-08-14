@@ -1,126 +1,234 @@
-Return-Path: <netdev+bounces-213646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213648-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD196B26156
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 11:46:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A133DB2615D
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 11:48:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C746A26741
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 09:41:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 495046250E9
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 09:42:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ECAF2EACE7;
-	Thu, 14 Aug 2025 09:39:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a4OwP0Fj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D5922E7F18;
+	Thu, 14 Aug 2025 09:42:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f77.google.com (mail-io1-f77.google.com [209.85.166.77])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F5502E8E1A
-	for <netdev@vger.kernel.org>; Thu, 14 Aug 2025 09:39:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD15E2C0F62
+	for <netdev@vger.kernel.org>; Thu, 14 Aug 2025 09:42:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.77
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755164392; cv=none; b=fLWFjCL/8zoMuOxyUVdp0sjYmRh+s63cwMnanNDOIRBCvfUVVSa6cRHN+U/6sxi/P/HP4pUQe/jCQ98d2y8SI0RYPlkniwJEp/wmzIu/iVR14Ln2QeBth5rfvJoSl9y1PpzCAAHDT/RBqyvY5sIq/AJwhJqzOt5+8KbmcbLSJ0Y=
+	t=1755164555; cv=none; b=JdBEO51rH68MJ4phOPsNffn9x/e8pYiK2+gF0ppjs9kUvLcZyArcNpdL0lMXT7FOZtcC7QDQyLJgg1XdXliwM4gwQdG24sAkhTC049UNzAwXAcK3CLCFuI8s9+KiCno0VJikl2l4KKafuH2z9avZbH/aEDC7qW+MxHy8GO9gZ10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755164392; c=relaxed/simple;
-	bh=FRRUfXI/ueu8DUzYG3Pmy8P6iL6jtRJqIvtumIS4VDE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TOBqu7WPF6yyf5B6di8A68OSrmIoLFuRec86WBwrDC3SDqvROo3o01SUoUJiR6UACVn6mKwxOzMm9cLFAn+7ZlGCe7bQ6EUfpAMSkt2izamz4Q4wf5BueeWzfKSBHx57I+K3xWbi54thvNARuX/pmnnJkfRrebeTUm4emf6+t5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=a4OwP0Fj; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1755164389;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FRRUfXI/ueu8DUzYG3Pmy8P6iL6jtRJqIvtumIS4VDE=;
-	b=a4OwP0Fjmo6wlmj+XnXav7zChPvSHxDVHjZ8X8c/C0x8ljiqBt/bBLwb4PRuW4Zcf9WdEw
-	oJJx/VUw9EaJeVPD8WEECKqyjOGGjuiSwUzNdxq8yjnQ87/z38SArvxVdnhMGb5DpnrlYi
-	Ii3VpSIro1ecWJ7qbEt6sjAGhGHp1Js=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-250-e1MOtI-SNIyPSv6PVdeSng-1; Thu, 14 Aug 2025 05:39:45 -0400
-X-MC-Unique: e1MOtI-SNIyPSv6PVdeSng-1
-X-Mimecast-MFC-AGG-ID: e1MOtI-SNIyPSv6PVdeSng_1755164385
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-7e8705feefaso201125885a.2
-        for <netdev@vger.kernel.org>; Thu, 14 Aug 2025 02:39:45 -0700 (PDT)
+	s=arc-20240116; t=1755164555; c=relaxed/simple;
+	bh=HK7wjbZ2TBaPM33in7VSgcP3FCSqEX29s6jE++uMvLo=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=j74I65So/+RgJ1gIjVV09A2RCQMujZdW2JsWGxdAI0fIsQO7wMcuKgV9+qUV/K09R5802oa8aj0+4zk3ZKjVi8y0dXS4eTEqgZ+OtN/eBgIXh240fhKXuhjgBZeqMioREKzVLYEjWMTXlP5hLD/ZxSHBDSLosNMCXhh7oMWJ6Xo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f77.google.com with SMTP id ca18e2360f4ac-88432d88f64so196983839f.1
+        for <netdev@vger.kernel.org>; Thu, 14 Aug 2025 02:42:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755164385; x=1755769185;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FRRUfXI/ueu8DUzYG3Pmy8P6iL6jtRJqIvtumIS4VDE=;
-        b=BbLuBeEN4F+PsvrGuIsmpfmTKjI6Uuq8oiMKJcKNPVH5aa/bYgsRSIc2jXjm3/XEQy
-         91LUoPc4hOX9PmrUJL9gl/rUa0IAk6dj3Z0pObQbXFWnfeP2iyo4apSe1n+r7qgn/RlA
-         1YfhNEnT2giUfC+pEHsA78qR7160oRFxymjrBkCwdxYHhkB5aBUHOt8Ysl/FaG4opfT3
-         NO011hfG9gcK2t1lnt99lIvixG7E5f2TzUFcN9YuuBadGyfXaeKhVb1/jNELBl/9qHQK
-         HQCLI1BnniL2Nppuj/Cp7IANbWCGazW7lYd7hvppnRpOJeX+RK3lQ1e0vXYFgqFf4RBa
-         WpkQ==
-X-Gm-Message-State: AOJu0YzNKCr5CySAhn1rVaS8JuNTDNaK3F71X7Rrcn7REjfaTmbnM8Wb
-	b5EVEuvIbF0OkH8XlItDFLOwjqJ5sODDQvGFCM4zwse8btbwfhdXJAEYR3IsksdQgB/rjUTGX5C
-	ZhI9R32TRcaz4gjpZCVeI5TMAZ7fQJlH07JdoAdm5+EvjJevRSP5X8P0+sWXHkZfoNw==
-X-Gm-Gg: ASbGncssRYvfYt8a1QJZoOzRBuNmL6FibPRCnfUwAwti/b3ssA4zHOy/Owqyn7kf22Z
-	jbPwaIh7FDkdhz++c/0AEc4FEDyG+vVG17B1SMRf8mjbqtpaiM4UvDyBYXp2z42QHWF5awtMiZD
-	kFECw52rhzm77boobqlZj2/2KKPk+nn+ip2TI7CdBLkXIZFfRewBbGKxFSF7GKfXIj42vwahf/2
-	oS484Eswprd1o8hqTvm7dP6WI2jjG7BXFl14iHAPvK+9hEqE2hJe+78haZseORbXtF0pQML0YtX
-	Hnsrr3A80Cpu0Rn4aQpKVgKx9tu7zwkWD/bhSS0g6oIUNJJAOBQK3zNsinr8lGahERKei+Kt7T5
-	dWkFBVpfDceg=
-X-Received: by 2002:a05:620a:569:b0:7e8:3e5d:7c93 with SMTP id af79cd13be357-7e8705fcabbmr241868985a.61.1755164385055;
-        Thu, 14 Aug 2025 02:39:45 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGZ7LR39BHceCda8+X8nSy1OtO1P6Oe3f4RnMMm1ycBMpkj2Qt420T+bKui8QDQ085w3FuURQ==
-X-Received: by 2002:a05:620a:569:b0:7e8:3e5d:7c93 with SMTP id af79cd13be357-7e8705fcabbmr241866385a.61.1755164384644;
-        Thu, 14 Aug 2025 02:39:44 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7e82aa29328sm1151256185a.33.2025.08.14.02.39.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Aug 2025 02:39:43 -0700 (PDT)
-Message-ID: <0277b2b5-b3f4-41da-8c18-e6131f908fd3@redhat.com>
-Date: Thu, 14 Aug 2025 11:39:41 +0200
+        d=1e100.net; s=20230601; t=1755164553; x=1755769353;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7Bje1TugN+kD58hq4oWKLa5Ok4zlZyJ9oM5ehqRuTuw=;
+        b=c+cLwJRCThWSfUNDmNCLV0+xLpscnqvfBXz9/R9mQELve3rmFg2z8SAmL11fFncD3s
+         /jdWNqfQWfvzeA0qLgke903Kem8+YRrnnXPSZGqUXuM0ICowmMoVLbcKmsq7oC68ilab
+         S9aHH98XPdH+PMhySqpLsjJ57ud55NLfqlkwYb15fNSLqYjXmxq8jQ7eVlu+qeXZuEJ+
+         WjO2kvFPTZRjtAcQ6IrGUGkWZw9Tq8asN1DS3EsHc5nkOiVrFTWobpQSAt6u3c+5MJV/
+         rA8EE8j7tt0ji0qzsjgyNo7tdTUisV16zYvJyO/gyVwj5rbddUAXDwm5GHOh9gdJ0Zmb
+         GQ8Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXhz1nSGxLakl9c3Wi3Ssj7jiPhmE5dHtgiuWZL8b3IC35UV1dam8lE9p8yP81bDjDV4ACVSXE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxTYr2SPRxNvU6/TXWpA0GjMlarHUIkN24+GLYUwe9cc54Z0a0l
+	6vuNzmsAfN9o4n0MAhY6v/4QlCdmzYNnCkoV/NLWaVpp6LrldEd/OSSgnQfcAI7zKvl5dnXzagx
+	cpurlG0i6jnmn5AspCLqPR+sdEJv8e0AZQYojeWIrA/fQnEG2rSViLQln2IA=
+X-Google-Smtp-Source: AGHT+IHaibs0qJyxxHhtqEgf2/Jjup2rZR0i2DUjwlTbduXOK6RtGuKfDvdMmsf9LakZ0xjbjjMr1I4I5Lm4ETYvW3i1Oh3xpyxO
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 1/4] net: ethtool: support including Flow
- Label in the flow hash for RSS
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, andrew+netdev@lunn.ch,
- horms@kernel.org, donald.hunter@gmail.com, michael.chan@broadcom.com,
- pavan.chebbi@broadcom.com, willemdebruijn.kernel@gmail.com,
- ecree.xilinx@gmail.com, andrew@lunn.ch
-References: <20250811234212.580748-1-kuba@kernel.org>
- <20250811234212.580748-2-kuba@kernel.org>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250811234212.580748-2-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6602:1304:b0:881:6d77:6d81 with SMTP id
+ ca18e2360f4ac-88433851730mr358291439f.8.1755164552899; Thu, 14 Aug 2025
+ 02:42:32 -0700 (PDT)
+Date: Thu, 14 Aug 2025 02:42:32 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <689daf88.050a0220.2d37a5.0001.GAE@google.com>
+Subject: [syzbot] [libertas?] INFO: task hung in lbs_remove_card
+From: syzbot <syzbot+c99d17aa44dbdba16ad2@syzkaller.appspotmail.com>
+To: libertas-dev@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 8/12/25 1:42 AM, Jakub Kicinski wrote:
-> It is expected that the hash communicated to the host
-> may change if the Flow Label changes. This may be surprising
-> to some host software, but I don't expect the devices
-> can compute two Toeplitz hashes, one with the Flow Label
-> for queue selection and one without for the rx hash
-> communicated to the host. Besides, changing the hash
-> may potentially help to change the path thru host queues.
-> User can disable NETIF_F_RXHASH if they require a stable
-> flow hash.
+Hello,
 
-FWIW, my understanding is that the S/W computed RX hash includes by
-default the flow label, as skb_get_hash()/__skb_get_hash_net() dissect
-with FLOW_DISSECTOR_F_STOP_AT_FLOW_LABEL and the latter force the
-flowlabel inclusion when available.
+syzbot found the following issue on:
 
-AFAICS enabling RXH_IP6_FL will make the H/W and S/W hashing consistent.
+HEAD commit:    2b38afce25c4 Merge tag 'turbostat-2025.09.09' of git://git..
+git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb.git usb-testing
+console output: https://syzkaller.appspot.com/x/log.txt?x=142f4af0580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=fc65f9fdda222232
+dashboard link: https://syzkaller.appspot.com/bug?extid=c99d17aa44dbdba16ad2
+compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
 
-/P
+Unfortunately, I don't have any reproducer for this issue yet.
 
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/03c1659365fe/disk-2b38afce.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/c24a7ba0c087/vmlinux-2b38afce.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/ae60f96c7e73/bzImage-2b38afce.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+c99d17aa44dbdba16ad2@syzkaller.appspotmail.com
+
+INFO: task kworker/1:5:10878 blocked for more than 143 seconds.
+      Not tainted 6.16.0-syzkaller-12288-g2b38afce25c4 #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:kworker/1:5     state:D
+ stack:21576 pid:10878 tgid:10878 ppid:2      task_flags:0x4288060 flags:0x00004000
+Workqueue: events request_firmware_work_func
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5357 [inline]
+ __schedule+0x12fc/0x3b90 kernel/sched/core.c:6961
+ __schedule_loop kernel/sched/core.c:7043 [inline]
+ schedule+0xe7/0x3a0 kernel/sched/core.c:7058
+ lbs_wait_for_firmware_load+0x11e/0x1e0 drivers/net/wireless/marvell/libertas/firmware.c:116
+ lbs_remove_card+0x84/0x390 drivers/net/wireless/marvell/libertas/main.c:913
+ if_usb_disconnect+0xaf/0x2e0 drivers/net/wireless/marvell/libertas/if_usb.c:316
+ usb_unbind_interface+0x1dd/0x9e0 drivers/usb/core/driver.c:458
+ device_remove drivers/base/dd.c:571 [inline]
+ device_remove+0x125/0x170 drivers/base/dd.c:563
+ __device_release_driver drivers/base/dd.c:1274 [inline]
+ device_release_driver_internal+0x44b/0x620 drivers/base/dd.c:1297
+ usb_driver_release_interface drivers/usb/core/driver.c:640 [inline]
+ usb_forced_unbind_intf+0x144/0x220 drivers/usb/core/driver.c:1133
+ usb_reset_device+0x439/0xa90 drivers/usb/core/hub.c:6403
+ if_usb_reset_device.isra.0+0x215/0x280 drivers/net/wireless/marvell/libertas/if_usb.c:400
+ if_usb_prog_firmware+0x63c/0x10c0 drivers/net/wireless/marvell/libertas/if_usb.c:877
+ lbs_fw_loaded drivers/net/wireless/marvell/libertas/firmware.c:23 [inline]
+ helper_firmware_cb drivers/net/wireless/marvell/libertas/firmware.c:80 [inline]
+ helper_firmware_cb+0x1f8/0x2e0 drivers/net/wireless/marvell/libertas/firmware.c:64
+ request_firmware_work_func+0x139/0x250 drivers/base/firmware_loader/main.c:1161
+ process_one_work+0x9cf/0x1b70 kernel/workqueue.c:3236
+ process_scheduled_works kernel/workqueue.c:3319 [inline]
+ worker_thread+0x6c8/0xf10 kernel/workqueue.c:3400
+ kthread+0x3c5/0x780 kernel/kthread.c:463
+ ret_from_fork+0x5b6/0x6c0 arch/x86/kernel/process.c:148
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+
+Showing all locks held in the system:
+1 lock held by khungtaskd/30:
+ #0: ffffffff892c7320 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
+ #0: ffffffff892c7320 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
+ #0: ffffffff892c7320 (rcu_read_lock){....}-{1:3}, at: debug_show_all_locks+0x36/0x1c0 kernel/locking/lockdep.c:6775
+2 locks held by getty/2908:
+ #0: ffff8881123fe0a0 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_ref_wait+0x24/0x80 drivers/tty/tty_ldisc.c:243
+ #1: ffffc900000432f0 (&ldata->atomic_read_lock){+.+.}-{4:4}, at: n_tty_read+0x41b/0x14f0 drivers/tty/n_tty.c:2222
+4 locks held by udevd/5192:
+3 locks held by kworker/0:4/5233:
+3 locks held by kworker/1:5/10878:
+ #0: ffff888100080d48 ((wq_completion)events){+.+.}-{0:0}, at: process_one_work+0x12a2/0x1b70 kernel/workqueue.c:3211
+ #1: ffffc90016497d10 ((work_completion)(&fw_work->work)){+.+.}-{0:0}, at: process_one_work+0x929/0x1b70 kernel/workqueue.c:3212
+ #2: ffff88814573d160 (&dev->mutex){....}-{4:4}, at: device_lock include/linux/device.h:911 [inline]
+ #2: ffff88814573d160 (&dev->mutex){....}-{4:4}, at: __device_driver_lock drivers/base/dd.c:1096 [inline]
+ #2: ffff88814573d160 (&dev->mutex){....}-{4:4}, at: device_release_driver_internal+0xa4/0x620 drivers/base/dd.c:1294
+3 locks held by kworker/1:8/12237:
+3 locks held by kworker/0:1/14373:
+5 locks held by kworker/0:8/19369:
+ #0: ffff888106eaf548 ((wq_completion)usb_hub_wq){+.+.}-{0:0}, at: process_one_work+0x12a2/0x1b70 kernel/workqueue.c:3211
+ #1: ffffc90013447d10 ((work_completion)(&hub->events)){+.+.}-{0:0}, at: process_one_work+0x929/0x1b70 kernel/workqueue.c:3212
+ #2: ffff88810b752198 (&dev->mutex){....}-{4:4}, at: device_lock include/linux/device.h:911 [inline]
+ #2: ffff88810b752198 (&dev->mutex){....}-{4:4}, at: hub_event+0x1be/0x5060 drivers/usb/core/hub.c:5898
+ #3: ffff88811d13c198 (&dev->mutex){....}-{4:4}, at: device_lock include/linux/device.h:911 [inline]
+ #3: ffff88811d13c198 (&dev->mutex){....}-{4:4}, at: usb_disconnect+0x10a/0x9c0 drivers/usb/core/hub.c:2335
+ #4: ffff88814573d160 (&dev->mutex){....}-{4:4}, at: device_lock include/linux/device.h:911 [inline]
+ #4: ffff88814573d160 (&dev->mutex){....}-{4:4}, at: device_del+0xa0/0x9f0 drivers/base/core.c:3840
+2 locks held by kworker/u8:0/21113:
+ #0: ffff888100089148 ((wq_completion)events_unbound){+.+.}-{0:0}, at: process_one_work+0x12a2/0x1b70 kernel/workqueue.c:3211
+ #1: ffffc90012d3fd10 ((reaper_work).work){+.+.}-{0:0}, at: process_one_work+0x929/0x1b70 kernel/workqueue.c:3212
+4 locks held by kworker/1:7/23200:
+
+=============================================
+
+NMI backtrace for cpu 0
+CPU: 0 UID: 0 PID: 30 Comm: khungtaskd Not tainted 6.16.0-syzkaller-12288-g2b38afce25c4 #0 PREEMPT(voluntary) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
+ nmi_cpu_backtrace+0x27b/0x390 lib/nmi_backtrace.c:113
+ nmi_trigger_cpumask_backtrace+0x29c/0x300 lib/nmi_backtrace.c:62
+ trigger_all_cpu_backtrace include/linux/nmi.h:160 [inline]
+ check_hung_uninterruptible_tasks kernel/hung_task.c:328 [inline]
+ watchdog+0xf0e/0x1260 kernel/hung_task.c:491
+ kthread+0x3c5/0x780 kernel/kthread.c:463
+ ret_from_fork+0x5b6/0x6c0 arch/x86/kernel/process.c:148
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+Sending NMI from CPU 0 to CPUs 1:
+NMI backtrace for cpu 1
+CPU: 1 UID: 0 PID: 5219 Comm: kworker/1:4 Not tainted 6.16.0-syzkaller-12288-g2b38afce25c4 #0 PREEMPT(voluntary) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
+Workqueue: events legacy_dvb_usb_read_remote_control
+RIP: 0010:io_serial_out+0x8f/0xb0 drivers/tty/serial/8250/8250_port.c:407
+Code: 48 8d 7d 40 44 89 e1 48 b8 00 00 00 00 00 fc ff df 48 89 fa d3 e3 48 c1 ea 03 80 3c 02 00 75 1c 66 03 5d 40 44 89 e8 89 da ee <5b> 5d 41 5c 41 5d e9 06 6b 66 04 e8 41 85 02 ff eb a0 e8 ca 85 02
+RSP: 0018:ffffc9000233f700 EFLAGS: 00000006
+RAX: 0000000000000000 RBX: 00000000000003f9 RCX: 0000000000000000
+RDX: 00000000000003f9 RSI: ffffffff82d9a765 RDI: ffffffff93b7f160
+RBP: ffffffff93b7f120 R08: 0000000000000001 R09: 000000000000001f
+R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
+R13: 0000000000000000 R14: ffffffff93b7f120 R15: ffffffff93b7f3e0
+FS:  0000000000000000(0000) GS:ffff888268ffc000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00005555908fc4a8 CR3: 000000014b144000 CR4: 00000000003506f0
+Call Trace:
+ <TASK>
+ serial_out drivers/tty/serial/8250/8250.h:142 [inline]
+ serial8250_clear_IER+0x9b/0xc0 drivers/tty/serial/8250/8250_port.c:713
+ serial8250_console_write+0x255/0x1890 drivers/tty/serial/8250/8250_port.c:3361
+ console_emit_next_record kernel/printk/printk.c:3138 [inline]
+ console_flush_all+0x7fe/0xc60 kernel/printk/printk.c:3226
+ __console_flush_and_unlock kernel/printk/printk.c:3285 [inline]
+ console_unlock+0xd8/0x210 kernel/printk/printk.c:3325
+ vprintk_emit+0x418/0x6d0 kernel/printk/printk.c:2450
+ _printk+0xc7/0x100 kernel/printk/printk.c:2475
+ legacy_dvb_usb_read_remote_control+0x40b/0x4f0 drivers/media/usb/dvb-usb/dvb-usb-remote.c:124
+ process_one_work+0x9cf/0x1b70 kernel/workqueue.c:3236
+ process_scheduled_works kernel/workqueue.c:3319 [inline]
+ worker_thread+0x6c8/0xf10 kernel/workqueue.c:3400
+ kthread+0x3c5/0x780 kernel/kthread.c:463
+ ret_from_fork+0x5b6/0x6c0 arch/x86/kernel/process.c:148
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
