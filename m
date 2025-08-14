@@ -1,89 +1,154 @@
-Return-Path: <netdev+bounces-213543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213544-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDDB8B258BD
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 03:03:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B648B258C5
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 03:12:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3AB58175CB8
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 01:03:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 461B5584CF1
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 01:11:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 559B172605;
-	Thu, 14 Aug 2025 01:03:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2BAD165F13;
+	Thu, 14 Aug 2025 01:11:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q8/iOo2v"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="WwNUwWBr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25EDD2FF66A;
-	Thu, 14 Aug 2025 01:03:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F92D23B0;
+	Thu, 14 Aug 2025 01:11:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755133400; cv=none; b=X1pY5Q8sX6mRLwWLefg7LxV9SKKkzPS6jHw7YKbb7ebR0sLPHekewLNDJrgDv1ng++/1Lf4olN5AbBvfFDcUArrsYZMcrILJ5shDvrFioOOCWoRf16SXGvYk+eBL/CqyV4VHrdMerYasdU1dI/n2Wui24bZ4Yre33/IQWTP+htY=
+	t=1755133894; cv=none; b=aufsGPEzvLQroLlihJ21qMbnLt2it5l575tkSmhE4b7RY6N/mCkVUB8KoAC7ua4guF5F5frJxo/V0Fm/Mg85wGzr2+1stdaBz9gyH1JuT1FSqR45x/1dXHF1EoO+03RSgw3PZ5dcIGRENssd8tX0tj3Pz/0PO7NrhyiZcRjSpTY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755133400; c=relaxed/simple;
-	bh=a9cPTPnhk0B0MV87JUqmN62I77LB1AsQD8P49IZxTR0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Q/0uMwsMq9yD8YNKt8+psyHygyNkE9Ue/qdDjrC3+xOH/MbvTGMVqokvLi0ImlL3WTIhGXIBqn1BUPftCxxKKiar0w63J/BqmWWn/WavkoDXmNMKLNDFf3shcYK93O4cNDJq3pQf8TWYWPGh6AJVQ9ruEiNcsI/WqE4m+Bw8r2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q8/iOo2v; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 081C5C4CEEB;
-	Thu, 14 Aug 2025 01:03:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755133399;
-	bh=a9cPTPnhk0B0MV87JUqmN62I77LB1AsQD8P49IZxTR0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Q8/iOo2vkUI95kSX1lTlNIW+ts6FuOTThX7PWqgAwutXn3igOgWbCMwgfpbJhZ0ww
-	 x9BU+gBEFcL+8523fkc/LUfo712nw8uIVL2D3Pl7gKaO96A0r9/TZKPVWuWH1cP77x
-	 dACXvkJ1HMAJqEKQmr+zcp2UoK/Zi52LY5Q7yXmqvgunCu+TzJS8nf+qNz4JEv8QWg
-	 Lf6WwMk3W6HaMGZmFEH2x1LLMSuLel3ZdRxcgzPrYuquOneksZkgMjY3oO1GAvAX62
-	 mJpEWJlW0aiNmz7011j4uceFf2g83k9DCcq2vPIYXjczk6FnJpa2TKsS6SaxFqUD2M
-	 1/HQqNPoildqg==
-Date: Wed, 13 Aug 2025 18:03:18 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Stanislav Fomichev <sdf@fomichev.me>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, ayush.sawal@chelsio.com, andrew+netdev@lunn.ch,
- gregkh@linuxfoundation.org, horms@kernel.org, dsahern@kernel.org,
- pablo@netfilter.org, kadlec@netfilter.org, steffen.klassert@secunet.com,
- mhal@rbox.co, abhishektamboli9@gmail.com, linux-kernel@vger.kernel.org,
- linux-staging@lists.linux.dev, netfilter-devel@vger.kernel.org,
- coreteam@netfilter.org, herbert@gondor.apana.org.au
-Subject: Re: [PATCH net-next 1/7] net: Add skb_dst_reset and skb_dst_restore
-Message-ID: <20250813180313.284432a8@kicinski-fedora-PF5CM1Y0>
-In-Reply-To: <20250813175740.4c24e747@kernel.org>
-References: <20250812155245.507012-1-sdf@fomichev.me>
-	<20250812155245.507012-2-sdf@fomichev.me>
-	<20250813175740.4c24e747@kernel.org>
+	s=arc-20240116; t=1755133894; c=relaxed/simple;
+	bh=XJIig21WqK4b4EcBXflRF2hKoC3oV/jWqdwFWSgYtLY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=T7YsK7q/J15ZegcERd4PbMQj5As6x6jycluXCJZsF8Ar+baNNF7mv6fED9bXVeBRfPFiH4OmkGG3U6x90NnAQm+fP/sxdLw1DpZ2bvIDgNG4WZoi76aTRygAXSdcBgo+z19FFbpNl6g+Qrc1K62aHbTtLkciuBvKFttDGrLHINc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=WwNUwWBr; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1204)
+	id 902422015E5E; Wed, 13 Aug 2025 18:11:32 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 902422015E5E
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1755133892;
+	bh=LPV047bXOThMstCe4e8lAmvOoRt4u5HfZm/JlOTqLoA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=WwNUwWBrWNB0B7vHZXCOOXkTTMZUOr/Yd4JX2nARAru4D+FgsfQTxuQVqlRhSJaq6
+	 vX3AGd8ENZVjl9ZsBXI0W435pGpFGIvl4fEJHXbSH+vR5BrcIXHKAWVS/x2aLjIb/k
+	 3z/tAUDJQdupkiyAdoJW7MEZKGlDATyZxVn/9AzE=
+Date: Wed, 13 Aug 2025 18:11:32 -0700
+From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: horms@kernel.org, kys@microsoft.com, haiyangz@microsoft.com,
+	wei.liu@kernel.org, decui@microsoft.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	longli@microsoft.com, kotaranov@microsoft.com, ast@kernel.org,
+	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
+	sdf@fomichev.me, lorenzo@kernel.org, michal.kubiak@intel.com,
+	ernis@linux.microsoft.com, shradhagupta@linux.microsoft.com,
+	shirazsaleem@microsoft.com, rosenp@gmail.com,
+	netdev@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org, dipayanroy@microsoft.com
+Subject: Re: [PATCH net-next v4] net: mana: Use page pool fragments for RX
+ buffers instead of full pages to improve memory efficiency.
+Message-ID: <20250814011132.GA30001@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <20250811222919.GA25951@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <20250813164847.62ade421@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250813164847.62ade421@kernel.org>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-On Wed, 13 Aug 2025 17:57:40 -0700 Jakub Kicinski wrote:
-> On Tue, 12 Aug 2025 08:52:39 -0700 Stanislav Fomichev wrote:
-> > +/**
-> > + * skb_dst_reset() - return current dst_entry value and clear it
-> > + * @skb: buffer
-> > + *
-> > + * Resets skb dst_entry without adjusting its reference count. Useful in
-> > + * cases where dst_entry needs to be temporarily reset and restored.
-> > + * Note that the returned value cannot be used directly because it
-> > + * might contain SKB_DST_NOREF bit.
-> > + *
-> > + * When in doubt, prefer skb_dst_drop() over skb_dst_reset() to correctly
-> > + * handle dst_entry reference counting.  
+Hi Jakub,
+
+Thank you for the review comments,
+
+On Wed, Aug 13, 2025 at 04:48:47PM -0700, Jakub Kicinski wrote:
+> On Mon, 11 Aug 2025 15:29:19 -0700 Dipayaan Roy wrote:
+> > -	if (apc->port_is_up)
+> > +	if (apc->port_is_up) {
+> > +		/* Re-create rxq's after xdp prog was loaded or unloaded.
+> > +		 * Ex: re create rxq's to switch from full pages to smaller
+> > +		 * size page fragments when xdp prog is unloaded and
+> > +		 * vice-versa.
+> > +		 */
+> > +
+> > +		/* Pre-allocate buffers to prevent failure in mana_attach */
+> > +		err = mana_pre_alloc_rxbufs(apc, ndev->mtu, apc->num_queues);
+> > +		if (err) {
+> > +			NL_SET_ERR_MSG_MOD
+> > +			    (extack,
+> > +			    "XDP: Insufficient memory for tx/rx re-config");
 > 
-> thoughts on prefixing these two new helpers with __ to hint that
-> they are low level and best avoided?
+> This weird line breaking is not necessary, checkpatch understands that
+> string can go over line limit:
+> 
+> 			NL_SET_ERR_MSG_MOD(extack,
+> 					   "XDP: Insufficient memory for tx/rx re-config");
+> 
+Ok, I willl rectify this in v5.
 
-Looking at the uses -- maybe skb_dstref_steal() or skb_steal_dstref()
-would be a better name? We have skb_steal_sock() (et.al.) already,
-same semantics.
+> > +			return err;
+> 
+> I think you already replaced the bpf program at this point? 
+> So the allocation should happen earlier. On failure changes
+> to the driver state should be undone.
+The bpf prog gets completely replaced in mana_chn_setxdp,
+I suggest these changes below to address your point on alloc failure
+and will work on a v5:
+
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_bpf.c
+b/drivers/net/ethernet/microsoft/mana/mana_bpf.c
+index e616f4239294..0000c1dd7aa2 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_bpf.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_bpf.c
+@@ -196,9 +196,6 @@ static int mana_xdp_set(struct net_device *ndev,
+struct bpf_prog *prog,
+         */
+        apc->bpf_prog = prog;
+ 
+-       if (old_prog)
+-               bpf_prog_put(old_prog);
+-
+        if (apc->port_is_up) {
+                /* Re-create rxq's after xdp prog was loaded or
+ * unloaded.
+                 * Ex: re create rxq's to switch from full pages to
+                 * smaller
+@@ -237,6 +234,9 @@ static int mana_xdp_set(struct net_device *ndev,
+struct bpf_prog *prog,
+                mana_pre_dealloc_rxbufs(apc);
+        }
+ 
++       if (old_prog)
++               bpf_prog_put(old_prog);
++
+        if (prog)
+                ndev->max_mtu = MANA_XDP_MTU_MAX;
+        else
+@@ -245,6 +245,7 @@ static int mana_xdp_set(struct net_device *ndev,
+struct bpf_prog *prog,
+        return 0;
+ 
+ err_dealloc_rxbuffs:
++       apc->bpf_prog = old_prog;
+        mana_pre_dealloc_rxbufs(apc);
+        return err;
+ }
+
+> -- 
+> pw-bot: cr
+
+Thanks
+Dipayaan Roy
 
