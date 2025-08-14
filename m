@@ -1,160 +1,127 @@
-Return-Path: <netdev+bounces-213795-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213796-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3831AB26B8C
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 17:52:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81AC3B26B79
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 17:50:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3049A5881E8
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 15:44:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33C92685CFA
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 15:45:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8F0F221FB6;
-	Thu, 14 Aug 2025 15:44:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65FA923A995;
+	Thu, 14 Aug 2025 15:45:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kjttK/Rm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c1dV5XCn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2B4415E8B;
-	Thu, 14 Aug 2025 15:44:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9C21238C24;
+	Thu, 14 Aug 2025 15:45:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755186245; cv=none; b=pd/ab2sWsDzXP6oUi4PD5yh8zzbQkdCd7e4FwhfokD8cnpE1DFHhoXuc92PGeRgWSQrmlq5Em2AUhJvZza4yUUDZK1hY3iqH9N7InECjnXHLwEw/iIWyNGjxhTE2givOuDY/F0syPAGkx8etaQM9ffBJmLH6U50ocfaZpN8M5w0=
+	t=1755186346; cv=none; b=eP6OaH79tHtOVm2izzZalaNpdYis5MVjQKuMSpVR1PG7Z7sQAHsFOKNry5dGIdK5HLKQhT5mr4pvRLOrrS5A8EzvxXj8Id0gsngQmN7xeT6mxZROz/ew22s/1KZ7cOrcz22E4oEM6dilTG80ODePk8fBz6AbR8UG8VTCo3dt1AI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755186245; c=relaxed/simple;
-	bh=t3MqfObdMhB/eNrcducvkgj1vjIjX96P5SMnnDq3ogc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fprnJQTFqbPne0mRiq8Gsio/Jnb88DiS9h1Cr/8mFibIBtGFQkUrdiLtNYp0ViHq0qmY/smmynwRavJ8HmPSvSNHDDMRSmFqVVBOyaqfI2C+/BXBRmJdrT53EbRdDEr+6GV6XCUxF1h8zlF2Tch0SFX5W0gpdxCrfqPoCQ5XJso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kjttK/Rm; arc=none smtp.client-ip=209.85.221.42
+	s=arc-20240116; t=1755186346; c=relaxed/simple;
+	bh=8PhsoonV74hS11HznyhtwwEr2mmvi6egb8cha1qlM7g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Cq5rCdRVj8YLdlLC3Y0reWYrUDl0N2j6yTktWQ9AECRugozhxPfHYWkQ9v9JA6NqEDh4qJd+E8NElf4a5BiFuXfzvSpZZrjg/CT4PwgmnLLBO1Bk6SLYWWHQd6tEl3h1zSXqku3PkgOggmdsuXR57PaVvmLMRyxYJIbkMA3eKwM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c1dV5XCn; arc=none smtp.client-ip=209.85.214.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-3b9df0bffc3so640669f8f.1;
-        Thu, 14 Aug 2025 08:44:03 -0700 (PDT)
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-24457f3edd4so8268185ad.0;
+        Thu, 14 Aug 2025 08:45:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755186242; x=1755791042; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/eT6EXaXfAgPUtCDoo+js557olCIIOh9kVJvS1JST3g=;
-        b=kjttK/Rm+M4al45/rjFmEl/wS7VkhKUlnYJug9F6xG72uvXrbHl6MfmeekRg+W5X+3
-         V2I2izBwE9TAWrvoNJ4zYSNDGye/sqG/o0C5sMx5jajz6a7nVaRPxe8ur2JG4ZNZOF9G
-         AFZDacG6evB3SPa54aeOQC8zR4nhqeh2ZrcwsKiY8Q+8wt8kVoo/t5y1371NRBo1xt9v
-         Wy+yAgTszrgF1oX6k322YBOPiSlH4r25/z0jOWlMvNy3Q4Pty9TMPY5dhEp3DEBX6moM
-         50oRG4y09oUyi7ErO8NzO9OC/+50yOr1J3V+oT+BEj2YkkFmfD2le1iRSx7RHzrGyUhj
-         MRHg==
+        d=gmail.com; s=20230601; t=1755186344; x=1755791144; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=2zPOjzgJ6ei3R7tSEzyHsuGUiKphrQk/wfZ7YvshtY8=;
+        b=c1dV5XCnDh30/E8wEBRo8f9hEiH50egncSDSnxO8rwaesO1hn2CLNTYIdKl9Uz14jC
+         4Hk0uhEqO683jfjfp8yie0+9hxvD/EDkadUn3lSflEk1zD4Rh6Pu/C4W6w9Bq2LYFjE6
+         2NUkQtVlWISsaBT+sRxnj2P8hpJk640NbJiLVgKEqXsJxP6qhjba0AnKFcnomszoXhp3
+         gp3xrn7EzOutHu1xVfBitdQ//wFNIoiFcizGliznNKrckcZ1LM0+eN9dkOLpt2nlfFdU
+         bvsDJ52Bk/z+7KcAO95nvlPamLc0B9bcaX35m67FG8M6OvzsZBbZptOfFUM5Wceav8Gn
+         v73w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755186242; x=1755791042;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/eT6EXaXfAgPUtCDoo+js557olCIIOh9kVJvS1JST3g=;
-        b=wHIJj4MIUc4LOIeVf338zsl9a/B72G356RIkn/ANM9OnBe8BIOHFH6HV3ne1LRlsGA
-         6hJV0Kf/zs10Nb7NG6bGkKZ+IDneITtBZv/x/PZmUEMSq3W+VJrLVKorYG7kHy/piTF2
-         ub8pHj1Zcr3MI1EsENr0+ULatZWlc2nBn6Za1SFFiIVCMBGwmiAVvMKiJcuHZnhLmrv2
-         Azxb1N+0umZ+VJnBoOvVWDEj9lkgltVEPgYyOmwPMreXtl+yQIu75LSlHrqKJ0m+RGlO
-         Kf7YtAh/e4GmN0d39kv6cXH740Rjw/xJlCSyVGqOpEj0d0wy4OhUWgeqjYeKHhRR+ViU
-         20bw==
-X-Forwarded-Encrypted: i=1; AJvYcCUzF4fC4jKMDePp6ibyUC2PP/faLK8lSbLLi4cA6WfsJAZHcl9ua5HirOGkjqyV5hg0rxZDjBs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzYyA25/D5aN7RmnugMJthfvLAcW82A4tH195rAmG+j5hT/FE4d
-	i0ioatQH8ZLUzo8ncSSYLSWhXl/aN0bzYn1NAbAk7Q/tnTcLcA32E5ag
-X-Gm-Gg: ASbGncs8Ko4uIdlPF1OYQeWdrFYBdW7XvqaK8X7L9M0QOXAiIpizpanRLulPJMpNli/
-	NMoiTskre04p+rcFrP5Sn/VzAOL9R0Qofn9fYM4AN3qGQCZXTd88OmpdWaTXZFxOSa8XRHIqUtL
-	8CuYNAC+JXcjs+oIKEtuxBXdZsABEpF0Vd63IIAj9UeMTSBf+pPFiODXpWi+A7biIwPzGrfYjFh
-	EII8+4nTmcjM0VcJHiXihWzfYLqdg2Dh4t7tLZhtLRRm+hj1Y2Cp3+X1niRHgRzusoOC/46SNG2
-	w01AMoPexjejPH+aQ0QQSFg9tErT4IDOtwsmKYhY+SViyOfqux12aXnlaigaHc647NH5E5KPQuE
-	2zo8j2usT9lniwvYATU+bnPseFKg1Y2miFLcu3h5aybf7VQ==
-X-Google-Smtp-Source: AGHT+IEUyPPY/ilyCvI0pwfT8QaROBfvAnjlt5odJQI/7Ysk04frv8GmG9vqxGJ2NZBMPkYNXsa7Qw==
-X-Received: by 2002:a05:6000:1445:b0:3b8:d0bb:7554 with SMTP id ffacd0b85a97d-3b9e4158a5bmr3254886f8f.7.1755186242191;
-        Thu, 14 Aug 2025 08:44:02 -0700 (PDT)
-Received: from ?IPV6:2620:10d:c096:325::26f? ([2620:10d:c092:600::1:64dc])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3ba50f369ecsm2612704f8f.48.2025.08.14.08.44.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Aug 2025 08:44:01 -0700 (PDT)
-Message-ID: <001d822f-2f78-4ba5-b29f-23ec1813d3d4@gmail.com>
-Date: Thu, 14 Aug 2025 16:45:19 +0100
+        d=1e100.net; s=20230601; t=1755186344; x=1755791144;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2zPOjzgJ6ei3R7tSEzyHsuGUiKphrQk/wfZ7YvshtY8=;
+        b=Syo1vL64T/biIFn5AAk4F3o56Hs7N0i09DqWhSim8pKc+qr9yaFsSj2ky1neXnrR17
+         o9iBYn22A7i2YJf4rCzPJkUMj31TRz8jhu4XGfFhEvunEpo3rBgKZFo+I7hH4lTZNOhA
+         YcO7wjteosYP/W6tX4Vic4KcmtXcdli+MaoCS+/JmJ30L1D025/rUMSn4uGEUPeH7dgc
+         vK4a0Xnatfl2yOuK1S+1nvHF2bVI2ehqk2JeSYujWOwZhY39TipNOmoI3lJlCofbKA6k
+         Fwh5XLfavKTzS7+WrNIK/QLFOMod9En/ToOerg5H+KSRRYvRL91W61wpR9WW07cDynkA
+         Es3w==
+X-Forwarded-Encrypted: i=1; AJvYcCVSoSuMJnvm0ioy/U4uray8Dh0K0n9yMuFgsD6th3rfyqex5TJrQfkfsaCuKAE4oYi9HLGYTaLG7HwBJ/Q=@vger.kernel.org, AJvYcCXZjSc8P8SjcfNr64vR9sFad/6SlH55q/SsL8eGl1q+l4CXzCFtRM3YujclO/fWaqC/VpRA/OCSgJ8Xg+8iqcAN@vger.kernel.org, AJvYcCXn9UlTdh7wWA8AJ5LaJjxL63EqIKfHFstX2i3Sbz70jjmCP1pvtNXm2HmK3Q+wqov6M+iH/F6t@vger.kernel.org
+X-Gm-Message-State: AOJu0YyT5BgJDzkFH5uW59w8GmekjO04UZSW4SDXFu+qFf2qofxxHCrs
+	n8M/Or7D+BkFIe1QyB0aREEJi7vw9NMdDxaxMAANcTwE4hJm/cZdaiY=
+X-Gm-Gg: ASbGncvMOYHlqIWlAybIqJD95S9HPhxLqmnprNLhr2u1mDfp0bkjntdqdVlj/mY7Ecj
+	sik3Xarhdduk9Kc1Qnt7dzclzysUQA71679GBoM5x5NhnQOLZnnGDazDF8frVIKOWQWiftdGxso
+	9FdabIlA02ZnAldIU9ZvjiZ/XZ+We4DzVpdLWQo7iiovkQUy/4kk4Fxn6JkXo9MB0nzeT5ZwUad
+	PS7tVqXHILlw9PcGt9XKje6qGl117T36lJxeag0LDaLKiu7YH7R+YZTLHzr+8GRPgfibvz5looL
+	jUmHvIhOR82h08EFb6ILfKVjyFD9+hrYOyH4lLJFI0bsJN009IaocFE+FZvX7uMRFI5gxJ/x7sc
+	SyodRKs3miAE4ydItx2URwcRbi94wAlZtaH4o8Y2I2KIGGl/AYFIYkZ6GC6go1tWujTVXpw==
+X-Google-Smtp-Source: AGHT+IGlxL2vO5rbswwUa03fBzurJOLXDC3ZMd0abz8+oqyFcg/bSZ3VQpRRuzxa9ZBIROVNKsj8mQ==
+X-Received: by 2002:a17:902:f602:b0:242:b315:ddaf with SMTP id d9443c01a7336-244589fe5e0mr49988975ad.7.1755186344057;
+        Thu, 14 Aug 2025 08:45:44 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-241d1f1ebc1sm353014885ad.67.2025.08.14.08.45.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Aug 2025 08:45:43 -0700 (PDT)
+Date: Thu, 14 Aug 2025 08:45:43 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	ayush.sawal@chelsio.com, andrew+netdev@lunn.ch,
+	gregkh@linuxfoundation.org, horms@kernel.org, dsahern@kernel.org,
+	pablo@netfilter.org, kadlec@netfilter.org,
+	steffen.klassert@secunet.com, mhal@rbox.co,
+	abhishektamboli9@gmail.com, linux-kernel@vger.kernel.org,
+	linux-staging@lists.linux.dev, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, herbert@gondor.apana.org.au
+Subject: Re: [PATCH net-next 1/7] net: Add skb_dst_reset and skb_dst_restore
+Message-ID: <aJ4Ep13RwUSdJZfb@mini-arch>
+References: <20250812155245.507012-1-sdf@fomichev.me>
+ <20250812155245.507012-2-sdf@fomichev.me>
+ <20250813175740.4c24e747@kernel.org>
+ <20250813180313.284432a8@kicinski-fedora-PF5CM1Y0>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: netconsole: HARDIRQ-safe -> HARDIRQ-unsafe lock order warning
-To: Breno Leitao <leitao@debian.org>, Mike Galbraith <efault@gmx.de>,
- paulmck@kernel.org, kuba@kernel.org
-Cc: LKML <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org,
- boqun.feng@gmail.com
-References: <fb38cfe5153fd67f540e6e8aff814c60b7129480.camel@gmx.de>
- <oth5t27z6acp7qxut7u45ekyil7djirg2ny3bnsvnzeqasavxb@nhwdxahvcosh>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <oth5t27z6acp7qxut7u45ekyil7djirg2ny3bnsvnzeqasavxb@nhwdxahvcosh>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250813180313.284432a8@kicinski-fedora-PF5CM1Y0>
 
-On 8/14/25 11:16, Breno Leitao wrote:
-> Hello Mike,
+On 08/13, Jakub Kicinski wrote:
+> On Wed, 13 Aug 2025 17:57:40 -0700 Jakub Kicinski wrote:
+> > On Tue, 12 Aug 2025 08:52:39 -0700 Stanislav Fomichev wrote:
+> > > +/**
+> > > + * skb_dst_reset() - return current dst_entry value and clear it
+> > > + * @skb: buffer
+> > > + *
+> > > + * Resets skb dst_entry without adjusting its reference count. Useful in
+> > > + * cases where dst_entry needs to be temporarily reset and restored.
+> > > + * Note that the returned value cannot be used directly because it
+> > > + * might contain SKB_DST_NOREF bit.
+> > > + *
+> > > + * When in doubt, prefer skb_dst_drop() over skb_dst_reset() to correctly
+> > > + * handle dst_entry reference counting.  
+> > 
+> > thoughts on prefixing these two new helpers with __ to hint that
+> > they are low level and best avoided?
 > 
-> On Wed, Aug 13, 2025 at 06:14:36AM +0200, Mike Galbraith wrote:
->> [  107.984942] Chain exists of:
->>                   console_owner --> target_list_lock --> &fq->lock
->>
->> [  107.984947]  Possible interrupt unsafe locking scenario:
->>
->> [  107.984948]        CPU0                    CPU1
->> [  107.984949]        ----                    ----
->> [  107.984950]   lock(&fq->lock);
->> [  107.984952]                                local_irq_disable();
->> [  107.984952]                                lock(console_owner);
->> [  107.984954]                                lock(target_list_lock);
-> 
-> Thanks for the report. I _think_ I understand the problem, it should be
-> easier to see it while thinking about a single CPU:
-> 
->   1) lock(&fq->lock); 			// This is not hard irq safe log
->   2) IRQ					// IRQ hits the while the lock is held
->   2.1) printk() 				// WARNs and printk can in fact happen during IRQs
->   2.2) netconsole subsystem 		/// target_list_lock is not important and can be ignored
->   2.2) netpoll 				// net poll will call the network subsystem to send the packet
->   2.3) lock(&fq->lock);			// Try to get the lock while the lock was already held
->   3) Dead lock!
-> 
-> Given fq->lock is not IRQ safe, then this is a possible deadlock.
-> 
-> In fact, I would say that FQ is not the only lock that might get into
-> this deadlock.
-> 
-> Possible solutions that come to my mind:
-> 
-> 1) make those lock (fq->lock and TX locks) IRQ safe
+> Looking at the uses -- maybe skb_dstref_steal() or skb_steal_dstref()
+> would be a better name? We have skb_steal_sock() (et.al.) already,
+> same semantics.
 
-And I'm pretty sure the list is not exhaustive.
-
->   * cons: This has network performance penalties, and very intrusive.
-> 2) Making printk from IRQs deferred. Calling `printk_deferred_enter` at
->     IRQs handlers ?!
-
-It'd only help if the deferred printk doesn't need the
-console_lock / doesn't disable irqs.
-
->   * Cons: This will add latency to printk() inside IRQs.
-> 3) Create a deferred mechanism inside netconsole, that would buffer and
->     defer the TX of the packet to outside of the IRQs.
->     a) Basically on netconsole, check if it is being invoke inside an
->     IRQ, then buffer the message and it it at Softirq/task context.
->   * Cons: this would use extra memory for printks() inside IRQs and also
->     latency (netconsole only).
-
-That should work, we basically need to pull xmit out of the
-console_lock protected section, and deferring is not a bad option
-
-> Let me add some other developers who might have other opinions and help
-> to decide what is the best approach.
-
--- 
-Pavel Begunkov
-
+Sure, will rename and address the rest of your feedback. Thanks for
+the review!
 
