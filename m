@@ -1,59 +1,57 @@
-Return-Path: <netdev+bounces-213754-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213755-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EF82B26865
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 16:03:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22826B2687E
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 16:05:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 696A55E65F3
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 13:56:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8977D681E31
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 13:58:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9894D3019A3;
-	Thu, 14 Aug 2025 13:56:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 743BD3002D8;
+	Thu, 14 Aug 2025 13:57:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="a1S3lmav"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2A843002DB;
-	Thu, 14 Aug 2025 13:56:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.22.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48EB22FCBF1;
+	Thu, 14 Aug 2025 13:57:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755179777; cv=none; b=KvblzUYFX/qZPUAeMpWz4I6wI/nbltdVo136OFagnqypUM85wb4mbq7ErHnBfnsL8kfNW06GSRIQDmbEQJBwfmgz9w97ifGMrJRanndEkeDv2OKZ8GMJ4g379yBzKDWgk/drfuBDFRUwKSPJNpKc741r1UBoOxOfe5Xv/Fc1RjA=
+	t=1755179879; cv=none; b=uA2iLeqi1j1dHwUPoVQ8A9hlmsWm0pDz29o0qUpmntv3+RgUhXehtMGRtLx9eG8WuxjmhxAgLhDV9gXB8x7k64HDqlJ6wymG5dvGo5nrQE8zDHLr+ZBV60pdvfwpu8E/qD30Lkmv+PKwqPuXRPhgkBxT5z24nW+1CD5AJ6TITbA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755179777; c=relaxed/simple;
-	bh=FY5sbNBK7qZlnMcmmL7hNtLU1I+7sRKJWqEJAf4IRlo=;
+	s=arc-20240116; t=1755179879; c=relaxed/simple;
+	bh=00L8Plgo1muOZEE6yX/bScl7169HxigOb92OdTXvj6A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GglJZeI2UEK3aLJ5770UdZAqGBg8GAzVrShhIpiRAoeThNUosG314XPvurwWasa86s7VUP/ZxbKPfR1Xqxqgrak5czfZsWuEEu8pNn6I8sCgjN/Ge/BL8kWe7qbJBm99twNi9GufInFzXjVUMuom9o1c1vLwkdWDip7McysVnM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=54.207.22.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
-X-QQ-mid: zesmtpsz9t1755179680t7764a06f
-X-QQ-Originating-IP: kAirI4c1dFDqOa0MCUTbPS30JYAfzpXeBXjviMMwVKo=
-Received: from localhost ( [203.174.112.180])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Thu, 14 Aug 2025 21:54:38 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 2664948985724009700
-Date: Thu, 14 Aug 2025 21:54:37 +0800
-From: Yibo Dong <dong100@mucse.com>
-To: MD Danish Anwar <danishanwar@ti.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	corbet@lwn.net, gur.stavi@huawei.com, maddy@linux.ibm.com,
-	mpe@ellerman.id.au, lee@trager.us, gongfan1@huawei.com,
-	lorenzo@kernel.org, geert+renesas@glider.be,
-	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
-	alexanderduyck@fb.com, richardcochran@gmail.com,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 4/5] net: rnpgbe: Add basic mbx_fw support
-Message-ID: <3866866DBCE66734+20250814135437.GB1094497@nic-Precision-5820-Tower>
-References: <20250814073855.1060601-1-dong100@mucse.com>
- <20250814073855.1060601-5-dong100@mucse.com>
- <c69d6a87-3d9f-49dc-836e-f33508c62c1a@ti.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=E6XUKk20mP730bi1OnMzMmGXTJX6a7OXpYA6/4+4iJ14WGEj24FinjcV75I4ooE2/sDyTESvrDum0Av4RripQi0LVJ/POJvJIWyk4rUs4T9Egb3kWDJrYLf/a1tRs6V5PILCtAnwo8MokXptIQF4zn9sRz98Z3msK2b+RVy+O6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=a1S3lmav; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 196A2C4CEED;
+	Thu, 14 Aug 2025 13:57:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1755179878;
+	bh=00L8Plgo1muOZEE6yX/bScl7169HxigOb92OdTXvj6A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=a1S3lmavTCmHq0GuVZEGqSDcHNBd1421699LqSu1KFIhCZ74Wi7CiX1c8+vYB5s4t
+	 NRxg7Kjxc9//LG6eKfDzCB4nmwT9bsRVyX9pvf3Y2XvkxAXC3YM8msbKJ7lx5W/GZR
+	 fDt20911pdG30fQfPQ79NtdZNSf8jlTbzFLkd6SU=
+Date: Thu, 14 Aug 2025 15:57:55 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Julian Taylor <julian.taylor@1und1.de>
+Cc: patchwork-bot+netdevbpf@kernel.org, Fedor Pchelkin <pchelkin@ispras.ru>,
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	kuniyu@google.com, edumazet@google.com, horms@kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	lvc-project@linuxtesting.org, stable@vger.kernel.org
+Subject: Re: [PATCH net] netlink: avoid infinite retry looping in
+ netlink_unicast()
+Message-ID: <2025081422-monetize-ferocity-fe28@gregkh>
+References: <20250728080727.255138-1-pchelkin@ispras.ru>
+ <175392900576.2584771.4406793154439387342.git-patchwork-notify@kernel.org>
+ <9fa0c0ea-9c5d-4039-856f-222486283a3c@1und1.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,79 +60,49 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c69d6a87-3d9f-49dc-836e-f33508c62c1a@ti.com>
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpsz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: M18A+sp1qNHzq4pS8N4zhVqEyqkwpR7zx0f9witggg/dsBSbKWlYGfF+
-	KSC3lTws0MRn5ALXJj3gWlUBde/tPG8qQZIuw9kYIoRZfRZFFtLRp+junxyMZti2Y0gpduW
-	YJvddH7f3qf9BSTA5DlQbk7u4lQOr81HEloppjsHkh4IY0H4N0j1iGLdtiSFmC7Tiep5KtS
-	x5HCbA5ul6dHGomY8MnWW0mF4TEIetJeX+JpNx70Y69THDIlK+LDPGsT0snlthmprBriTCX
-	gLjd5NXoy++aH4VXnniVSMjqSTcpE+GTDgXx0Y9ClnxggdliMF1Zhm+TaIcpY3n4mZuGgke
-	r91IrVzsmG1cXNYDJOMnxFI+mgoaYnzgBVsSAkE2WC2yOOf23Vf564Ju7WfUROmfH3lmIbz
-	oxhyuUqnz0GkXDFo3xuiIYkJKLbPQnu/D8kuNE8OM5R+bIXCZ8TjPer9yIOS6SKuFgxyAHN
-	JWDBSBQg/O4lTgpE7zDkYTG3vbd8ihzhTF4zhVTWiwrc2ANPUClZogOFwW85B2YORNc/nUX
-	Tw3t5IqeEZDNTAxEqPPZLp6isxWQck0MbYfrXVg9Ng1Rlp2nr8nkkOO+L8voZ/E8B1HDF3j
-	BmD8X7NhUAyPd14ehGsElAF88EpUCfIfTt0y1KAtwsfTlx0vXFuKxkzz90tRRqyby/VPZ2E
-	Madd51B/uDQTEwJ0O+IOE8eKQQfg6BpPytaA+hIbG1fonPhJPRqn3ZfmwH46QPy/letg+QU
-	B9Cmw0mRbrZrgSIqOirE2lanKLFbdwrR0DcelfVeZJvc/jFnTMquoosSt4s0h5RPUKhNlND
-	gMbW1ojh9bKBSXBy4wHnI+HJGcVoe3bFhvVJe7AzRckIGs9m8y9pXE6w2WE5c/qS0bh7UcD
-	2ajtooU3vBi8EoJZmYDSQ2sSvbaNl6YvVqOACdx4qk4boRWpiSdNMMI4uH/szhcvORE71/G
-	q2goKo/jxgMfHnfjGbEYM2rbw2Mku9KbuAwxBYgVx8bFIv0rFKBY//hgPQNwAeHnulXuGFd
-	rHcFCNrbtfvTuuPIpuut2ALHBsU8M=
-X-QQ-XMRINFO: Nq+8W0+stu50PRdwbJxPCL0=
-X-QQ-RECHKSPAM: 0
+In-Reply-To: <9fa0c0ea-9c5d-4039-856f-222486283a3c@1und1.de>
 
-On Thu, Aug 14, 2025 at 05:40:14PM +0530, MD Danish Anwar wrote:
-> On 14/08/25 1:08 pm, Dong Yibo wrote:
-> > Initialize basic mbx_fw ops, such as get_capability, reset phy
-> > and so on.
+On Thu, Aug 14, 2025 at 02:51:27PM +0200, Julian Taylor wrote:
+> 
+> On 31.07.25 04:30, patchwork-bot+netdevbpf@kernel.org wrote:
+> > Hello:
 > > 
-> > Signed-off-by: Dong Yibo <dong100@mucse.com>
-> > ---
-> >  drivers/net/ethernet/mucse/rnpgbe/Makefile    |   3 +-
-> >  drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h    |   4 +
-> >  .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c | 264 ++++++++++++++++++
-> >  .../net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h | 201 +++++++++++++
-> >  4 files changed, 471 insertions(+), 1 deletion(-)
-> >  create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c
-> >  create mode 100644 drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.h
+> > This patch was applied to netdev/net.git (main)
+> > by Jakub Kicinski <kuba@kernel.org>:
 > > 
+> > On Mon, 28 Jul 2025 11:06:47 +0300 you wrote:
+> > > netlink_attachskb() checks for the socket's read memory allocation
+> > > constraints. Firstly, it has:
+> > > 
+> > >    rmem < READ_ONCE(sk->sk_rcvbuf)
+> > > 
+> > > to check if the just increased rmem value fits into the socket's receive
+> > > buffer. If not, it proceeds and tries to wait for the memory under:
+> > > 
+> > > [...]
+> > 
+> > Here is the summary with links:
+> >    - [net] netlink: avoid infinite retry looping in netlink_unicast()
+> >      https://git.kernel.org/netdev/net/c/759dfc7d04ba
+> > 
+> > You are awesome, thank you!
 > 
-> > +
-> > +/**
-> > + * mbx_cookie_zalloc - Alloc a cookie structure
-> > + * @priv_len: private length for this cookie
-> > + *
-> > + * @return: cookie structure on success
-> > + **/
-> > +static struct mbx_req_cookie *mbx_cookie_zalloc(int priv_len)
-> > +{
-> > +	struct mbx_req_cookie *cookie;
-> > +
-> > +	cookie = kzalloc(struct_size(cookie, priv, priv_len), GFP_KERNEL);
-> > +	if (cookie) {
-> > +		cookie->timeout_jiffes = 30 * HZ;
-> 
-> Typo: should be "timeout_jiffies" instead of "timeout_jiffes"
-> 
+> hello,
+> as far as I can tell this patch has not made it to the 6.1 stable tree yet in the 6.1.148 review yet:
+> https://www.spinics.net/lists/stable/msg866199.html
 
-Got it, I will fix it.
+Please use lore.kernel.org links.
 
-> > +		cookie->magic = COOKIE_MAGIC;
-> > +		cookie->priv_len = priv_len;
-> > +	}
-> > +	return cookie;
-> > +}
-> > +
-> > +/**
+> As this seems to be causing issues in distributions releasing 6.1.147 can this still be added to the next possible stable release?
+> See following issues in relation to loading audit rules which seems to trigger the fixed bug:
+> https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1111017
+> https://github.com/amazonlinux/amazon-linux-2023/issues/988
 > 
-> 
-> -- 
-> Thanks and Regards,
-> Danish
-> 
-> 
+> I have tested this patch solves the problem in the Debian bookworm using 6.1.x
 
-Thanks for you feedback.
+What is the git commit id of this patch in Linus's tree?
 
+thanks,
+
+greg k-h
 
