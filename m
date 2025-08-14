@@ -1,76 +1,81 @@
-Return-Path: <netdev+bounces-213654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213655-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D700B261B1
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 12:02:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B020B261BD
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 12:04:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 32A38583780
-	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 09:59:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6702B9E67A0
+	for <lists+netdev@lfdr.de>; Thu, 14 Aug 2025 09:59:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F24C32F7443;
-	Thu, 14 Aug 2025 09:59:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFCD82F7445;
+	Thu, 14 Aug 2025 09:59:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="wROdkiKb"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="O66COCqx"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79DAB2741CD;
-	Thu, 14 Aug 2025 09:59:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6CF52F60C0
+	for <netdev@vger.kernel.org>; Thu, 14 Aug 2025 09:59:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755165566; cv=none; b=e7EU5/vSHoKSoew4aOGsBWCadLMaNIOmox01SvjUcQbQX2e/9o08Mw0ajiHelKCg8tiTa8eKq+veznQpJaQmTeAwZtOzx2NVCk8Lz5cc02RPMVnyu8aI7tp8FjVVwdnFjZPIHNjTpchXcEYoPd1mr3Sbw1WYPEPzwdCl47KCl+c=
+	t=1755165589; cv=none; b=PBi1d6ZnPX8ey9TBnn3Fmap8cq94xcL9dLKrUMChsI5Vv9NX5i1qomzfBqp7WSbYjLe4hZLM7ify6erzJn1p0GiugWROLWwzMzhzv7jgyGjcNMmdJ54+eS4J1a+1gxqoh7YVR9qNSTUpDuRqbdfCfskEHD3xpedAIFUZCf48f/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755165566; c=relaxed/simple;
-	bh=xeT0dGXRv1bptAHCQGFx8vyfq1VIKHXEDhIsjHpAn+I=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GkedqjzUXXsOqd1mXzvT8P6oJRsjDt4udDG5KhYaoCCJMFMG9pRVh0/kgra/HadVNnTud0z0BvhYLG3BbQ/5BxJTmPX4wCgKXa0G+HjJoXwKPlUJd2xWRbx2yN0M7ujbm3mNvlrK/voNgbngVoIx6JRzns1v2gs6Jb/pJEdFGC8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=wROdkiKb; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1755165565; x=1786701565;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=xeT0dGXRv1bptAHCQGFx8vyfq1VIKHXEDhIsjHpAn+I=;
-  b=wROdkiKbFds4g0pFbu+7j4WaCY77KxRSuTrkw4D/9FTBjWANY4dUxGBL
-   fZYBWebf46e7u9ww0V2cXukPdwQ1M6eY5IEpL6adFvZFI8bruZn904+FL
-   eYaZ/E0jfJkDoyfoHVO1qJX4cGli98M/6W5sXr6WmvkuAeJk+QSoEIEja
-   rwbt0PcFP8H9kq/qBocyex7sPATriFL8/StaYmYvho4oM2deU686sY/Vv
-   2TZnPL9R0VDX70ZckdbvF3ZLr1TLnC7wzVPESqGp1UJRPI/kAA5fHT9c1
-   YEpV3FEJN6bTv8QqTm9GswHku9ogF2ttbD2s82u1gR+0fcoa2i9pDKDRY
-   w==;
-X-CSE-ConnectionGUID: F9m7b+GcTjmxrNK+m1cJwg==
-X-CSE-MsgGUID: P7PiFCzbRsa/fECHcHxhpg==
-X-IronPort-AV: E=Sophos;i="6.17,287,1747724400"; 
-   d="scan'208";a="50711981"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 14 Aug 2025 02:59:24 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Thu, 14 Aug 2025 02:58:43 -0700
-Received: from localhost (10.10.85.11) by chn-vm-ex01.mchp-main.com
- (10.10.85.143) with Microsoft SMTP Server id 15.1.2507.44 via Frontend
- Transport; Thu, 14 Aug 2025 02:58:43 -0700
-Date: Thu, 14 Aug 2025 11:55:26 +0200
-From: Horatiu Vultur <horatiu.vultur@microchip.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-CC: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<richardcochran@gmail.com>, <o.rempel@pengutronix.de>,
-	<alok.a.tiwari@oracle.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v4 4/4] net: phy: micrel: Add support for lan8842
-Message-ID: <20250814095526.v3ft2d55piohvhby@DEN-DL-M31836.microchip.com>
-References: <20250814082624.696952-1-horatiu.vultur@microchip.com>
- <20250814082624.696952-5-horatiu.vultur@microchip.com>
- <aJ2qd9SkUPg5tmYL@shell.armlinux.org.uk>
+	s=arc-20240116; t=1755165589; c=relaxed/simple;
+	bh=9HOgiH5pJkJhAvZ0/FLD1f5y7V2iwD/GAx0voBqi0Gk=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=dvBJFa6zASb+8/S2LHEEz+IPcPuNMhdHk1BRTZPma5BItu3B6sX0J1QIbM88RbVO2n2pFbByLMchUBdUGyRm85L5naZ1Dv3NlOyjRbGMQlCFBD4QZVaZJJ9gRyCv7Xm+NFnQC3ypsSRMiLgI+RCXAZaTRWQkPkfiH0FMnrWZel4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=O66COCqx; arc=none smtp.client-ip=209.85.218.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-afcb73621fcso109766766b.0
+        for <netdev@vger.kernel.org>; Thu, 14 Aug 2025 02:59:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1755165586; x=1755770386; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=314PM31sHN6MajJUuSWcL1nsLquUAPC0wj8JGYel1qs=;
+        b=O66COCqxd+cd0URc2VG0aLVnwaR4FsAaaRrLVqKFrLrMtSwZNTxrdzUaCTNSz4e7My
+         l4u7fFXCgOyUbFKOPK7yP9HoQ0zSTtDbIPcRsfjB2bnSdFazHNl+2wCVUMS/cfmtGHzM
+         XI/ZOp9Q8V8fv1lBMtHcwBXMHmBf6wAh7J+3HfH4W06bNiYiwust/kYT+IrVUd2i9o3G
+         cqBNloLVrtTeRzPgrLIPyMp38gjINd8fMoewlOMM+YOCyp7E7PX4dbSKeVLpLLal6rYn
+         1eVJIvrW0SwlQk2jedvklFrQe3H1wzKzrXr6TmiSb/lojAWAdjGHHbHp7XnwGlxrCyCu
+         namA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755165586; x=1755770386;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=314PM31sHN6MajJUuSWcL1nsLquUAPC0wj8JGYel1qs=;
+        b=LCNvWG0dCuaWWiiup07tnOZX69Jtgg4IuPatwSjIiCWWyq9gEdDT1xRiksaMwo66FG
+         ItWtogSYO7X2dRXK42cpedSvDpi+lrjxUQhrKG0UmbQxfHebmeNSDwHhCpCTjToxw1QQ
+         nRH05VpJlEePYDBWQPtupnL8DfQdsKREQ0Xt6smyYyzaxDu0TfRBDWElCKSvFcqaDl/g
+         zzC7TPjM3e9u83zz4/PZBY30tH8IhQVjFtG+qv3xuEOwh+2VCBeK01qHLxtgXT2xP+rl
+         hsMHp6w7roJ0DfQDLUNaXw9BkMDQ+0A8wzMuvCV3QaKvpdacfpdPvUx6KdhpL/ZdVHaX
+         IVHA==
+X-Forwarded-Encrypted: i=1; AJvYcCUfB7/W1yjn8u9urD8bED23oiyHAMRowZmDs62FSP+WGeLJVK7i8zIfVKXqO2vJkRnqrzNBbXc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YygCWmKRaJNT6L3FCfBgUPoSx4HIuSKk8wFBNySeF6M/DqTZAFn
+	fM/JcMXUCgJhOvexkoR0/42Ln4IkDftZPlWBqvlFPnxYEh9Kfxkk1pB1T1ATxdxB/iE=
+X-Gm-Gg: ASbGncsCTFQT3i3kW7x8DUlMdC43kUjeJRaEewHVYK60r/X7yq84Rxq23muIfY8QpKq
+	BRTid9AU2YgCfHt1boZnT1Q/cROZ8DI0wi0DdSQVz4+uHIV1ud6XmzdfYxPc/wy07ZEHberJnrM
+	8HqnfZdp0o/GBVnea2vu9RWE9qGBSO3BNxAsInSbeoHVtwJ5mmCqOlzU7ylJxpFn7PfkkKGuVoQ
+	3jbSenUZwAnOWHGLeCmVxSv6uptrQPQI7LhF4TT+UKC5hrMLkH8AGoetqFkY4oLjZqNssvMa8sb
+	mAMIMypcmF70y6Kn4TEjAzTJY7nR29hwz0UYSIJZMOTxLSUn2knFVl3nCz6mbWXDq2rsdI7/VLo
+	i6IN/EAhjR9uacSg=
+X-Google-Smtp-Source: AGHT+IGdn1vvDgYPNUFhekmmnQ/ODCJomKknq6Rm95dARAxYil2XYqWpJeB+Jj7JvAQRmu44hnb3JQ==
+X-Received: by 2002:a17:907:1c8b:b0:af9:36b3:d695 with SMTP id a640c23a62f3a-afcb99d797emr240490766b.43.1755165585810;
+        Thu, 14 Aug 2025 02:59:45 -0700 (PDT)
+Received: from cloudflare.com ([2a09:bac5:5063:2432::39b:f6])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-af91a21c050sm2559151966b.104.2025.08.14.02.59.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Aug 2025 02:59:45 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+Subject: [PATCH bpf-next v7 0/9] Add a dynptr type for skb metadata for TC
+ BPF
+Date: Thu, 14 Aug 2025 11:59:26 +0200
+Message-Id: <20250814-skb-metadata-thru-dynptr-v7-0-8a39e636e0fb@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,81 +83,196 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-In-Reply-To: <aJ2qd9SkUPg5tmYL@shell.armlinux.org.uk>
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAH6znWgC/33QTU7DMBAF4KtUXmPkv7EDK+6BWNieMY1ok8hxo
+ 1ZV7o4Ji0YiZPk0mm+e5s5Gyi2N7PVwZ5mmdmz7rgb3dGDx6LtP4i3WzJRQIKy0fPwK/EzFoy+
+ el2O+cLx1Q8ncBA/ORY0CDKvrQ6bUXhf6nYUh8Y6uhX3UybEdS59vy81JLvNfXov/+UlywZN06
+ KW2CrB5i6f+gunkMz3H/rzIk3pobq/spKoGCRphjCOJaVPTK03JHU1XjV5UIABtpDObmllrekc
+ zVfMiEZomRNRuU4OVpve6wc/fhEo2gG0ajJuafWj1JTuarZoA9EaIkLwJf7R5nr8BnThBoVUCA
+ AA=
+X-Change-ID: 20250616-skb-metadata-thru-dynptr-4ba577c3d054
+To: bpf@vger.kernel.org
+Cc: Alexei Starovoitov <ast@kernel.org>, 
+ Andrii Nakryiko <andrii@kernel.org>, Arthur Fabre <arthur@arthurfabre.com>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ Eduard Zingerman <eddyz87@gmail.com>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+ Jesse Brandeburg <jbrandeburg@cloudflare.com>, 
+ Joanne Koong <joannelkoong@gmail.com>, 
+ Lorenzo Bianconi <lorenzo@kernel.org>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <thoiland@redhat.com>, 
+ Yan Zhai <yan@cloudflare.com>, kernel-team@cloudflare.com, 
+ netdev@vger.kernel.org, Stanislav Fomichev <sdf@fomichev.me>
+X-Mailer: b4 0.15-dev-07fe9
 
-The 08/14/2025 10:20, Russell King (Oracle) wrote:
+TL;DR
+-----
 
-Hi Russell,
+This is the first step in an effort which aims to enable skb metadata
+access for all BPF programs which operate on an skb context.
 
-> On Thu, Aug 14, 2025 at 10:26:24AM +0200, Horatiu Vultur wrote:
-> > +static int lan8842_config_init(struct phy_device *phydev)
-> > +{
-> > +     int ret;
-> > +
-> > +     /* Reset the PHY */
-> > +     ret = lanphy_modify_page_reg(phydev, LAN8814_PAGE_COMMON_REGS,
-> > +                                  LAN8814_QSGMII_SOFT_RESET,
-> > +                                  LAN8814_QSGMII_SOFT_RESET_BIT,
-> > +                                  LAN8814_QSGMII_SOFT_RESET_BIT);
-> > +     if (ret < 0)
-> > +             return ret;
-> > +
-> > +     /* Disable ANEG with QSGMII PCS Host side
-> > +      * It has the same address as lan8814
-> > +      */
-> > +     ret = lanphy_modify_page_reg(phydev, LAN8814_PAGE_PORT_REGS,
-> > +                                  LAN8814_QSGMII_PCS1G_ANEG_CONFIG,
-> > +                                  LAN8814_QSGMII_PCS1G_ANEG_CONFIG_ANEG_ENA,
-> > +                                  0);
-> > +     if (ret < 0)
-> > +             return ret;
-> 
-> Could you explain exactly what effect this has please?
+By skb metadata we mean the custom metadata area which can be allocated
+from an XDP program with the bpf_xdp_adjust_meta helper [1]. Network stack
+code accesses it using the skb_metadata_* helpers.
 
-The effect of this and the next write is to disable the auto-negotiation
-between the PHY and the MAC.
+Changelog
+---------
+Changes in v7:
+- Make dynptr read-only for cloned skbs for now. (Martin)
+- Extend tests for skb clones to cover writes to metadata.
+- Drop Jesse's review stamp for patch 2 due to an update.
+- Link to v6: https://lore.kernel.org/r/20250804-skb-metadata-thru-dynptr-v6-0-05da400bfa4b@cloudflare.com
 
-> 
-> > +
-> > +     /* Disable also the SGMII_AUTO_ANEG_ENA, this will determine what is the
-> > +      * PHY autoneg with the other end and then will update the host side
-> > +      */
-> > +     ret = lanphy_write_page_reg(phydev, LAN8814_PAGE_COMMON_REGS,
-> > +                                 LAN8842_SGMII_AUTO_ANEG_ENA, 0);
-> > +     if (ret < 0)
-> > +             return ret;
-> 
-> Also please explain this a bit more.
+Changes in v6:
+- Enable CONFIG_NET_ACT_MIRRED for bpf selftests to fix CI failure
+- Switch from u32 to matchall classifier, which bpf selftests already use
+- Link to v5: https://lore.kernel.org/r/20250731-skb-metadata-thru-dynptr-v5-0-f02f6b5688dc@cloudflare.com
 
-This write disables the PHY to update the host side advertise abilities
-with what it autonegotiate on the link side. I will need to double check
-but I think this is not needed if the autonegotiation on the host side
-is already disabled.
+Changes in v5:
+- Invalidate skb payload and metadata slices on write to metadata. (Martin)
+- Drop redundant bounds check in bpf_skb_meta_*(). (Martin)
+- Check for unexpected flags in __bpf_dynptr_write(). (Martin)
+- Fold bpf_skb_meta_{load,store}_bytes() into callers.
+- Add a test for metadata access when an skb clone has been modified.
+- Drop Eduard's Ack for patch 3. Patch updated.
+- Keep Eduard's Ack for patches 4-8.
+- Add Jesse's stamp from an internal review.
+- Link to v4: https://lore.kernel.org/r/20250723-skb-metadata-thru-dynptr-v4-0-a0fed48bcd37@cloudflare.com
 
-> 
-> If this changes whether host-side "negotiation" is used, then please
-> consider implementing the two phy driver inbnad operations as well.
+Changes in v4:
+- Kill bpf_dynptr_from_skb_meta_rdonly. Not needed for now. (Marin)
+- Add a test to cover passing OOB offsets to dynptr ops. (Eduard)
+- Factor out bounds checks from bpf_dynptr_{read,write,slice}. (Eduard)
+- Squash patches:
+      bpf: Enable read access to skb metadata with bpf_dynptr_read
+      bpf: Enable write access to skb metadata with bpf_dynptr_write
+      bpf: Enable read-write access to skb metadata with dynptr slice
+- Kept Eduard's Acks for v3 on unchanged patches.
+- Link to v3: https://lore.kernel.org/r/20250721-skb-metadata-thru-dynptr-v3-0-e92be5534174@cloudflare.com
 
-Yes, I will implement the functions: config_inband and inband_caps.
+Changes in v3:
+- Add a kfunc set for skb metadata access. Limited to TC BPF. (Martin)
+- Drop patches related to skb metadata access outside of TC BPF:
+      net: Clear skb metadata on handover from device to protocol
+      selftests/bpf: Cover lack of access to skb metadata at ip layer
+      selftests/bpf: Count successful bpf program runs
+- Link to v2: https://lore.kernel.org/r/20250716-skb-metadata-thru-dynptr-v2-0-5f580447e1df@cloudflare.com
 
-> 
-> > +static u64 lan8842_get_stat(struct phy_device *phydev, int count, int *regs)
-> > +{
-> > +     int val;
-> i> +    u64 ret = 0;
-> 
-> Please remember... reverse Christmas tree for variable declarations.
+Changes in v2:
+- Switch to a dedicated dynptr type for skb metadata (Andrii)
+- Add verifier test coverage since we now touch its code
+- Add missing test coverage for bpf_dynptr_adjust and access at an offset
+- Link to v1: https://lore.kernel.org/r/20250630-skb-metadata-thru-dynptr-v1-0-f17da13625d8@cloudflare.com
 
-Argh.. goot catch!
+Overview
+--------
 
-> 
-> Thanks.
-> 
-> --
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Today, the skb metadata is accessible only by the BPF TC ingress programs
+through the __sk_buff->data_meta pointer. We propose a three step plan to
+make skb metadata available to all other BPF programs which operate on skb
+objects:
 
--- 
-/Horatiu
+ 1) Add a dynptr type for skb metadata (this patch set)
+
+    This is a preparatory step, but it also stands on its own. Here we
+    enable access to the skb metadata through a bpf_dynptr, the same way we
+    can already access the skb payload today.
+
+    As the next step (2), we want to relocate the metadata as skb travels
+    through the network stack in order to persist it. That will require a
+    safe way to access the metadata area irrespective of its location.
+
+    This is where the dynptr [2] comes into play. It solves exactly that
+    problem. A dynptr to skb metadata can be backed by a memory area that
+    resides in a different location depending on the code path.
+
+ 2) Persist skb metadata past the TC hook (future)
+
+    Having the metadata in front of the packet headers as the skb travels
+    through the network stack is problematic - see the discussion of
+    alternative approaches below. Hence, we plan to relocate it as
+    necessary past the TC hook.
+
+    Where to relocate it? We don't know yet. There are a couple of
+    options: (i) move it to the top of skb headroom, or (ii) allocate
+    dedicated memory for it.  They are not mutually exclusive. The right
+    solution might be a mix.
+
+    When to relocate it? That is also an open question. It could be done
+    during device to protocol handover or lazily when headers get pushed or
+    headroom gets resized.
+
+ 3) skb dynptr for sockops, sk_lookup, etc. (future)
+
+    There are BPF program types don't operate on __sk_buff context, but
+    either have, or could have, access to the skb itself. As a final touch,
+    we want to provide a way to create an skb metadata dynptr for these
+    program types.
+
+TIMTOWDI
+--------
+
+Alternative approaches which we considered:
+
+* Keep the metadata always in front of skb->data
+
+We think it is a bad idea for two reasons, outlined below. Nevertheless we
+are open to it, if necessary.
+
+ 1) Performance concerns
+
+    It would require the network stack to move the metadata on each header
+    pull/push - see skb_reorder_vlan_header() [3] for an example. While
+    doable, there is an expected performance overhead.
+
+ 2) Potential for bugs
+
+    In addition to updating skb_push/pull and pskp_expand_head, we would
+    need to audit any code paths which operate on skb->data pointer
+    directly without going through the helpers. This creates a "known
+    unknown" risk.
+
+* Design a new custom metadata area from scratch
+
+We have tried that in Arthur's patch set [4]. One of the outcomes of the
+discussion there was that we don't want to have two places to store custom
+metadata. Hence the change of approach to make the existing custom metadata
+area work.
+
+-jkbs
+
+[1] https://docs.ebpf.io/linux/helper-function/bpf_xdp_adjust_meta/
+[2] https://docs.ebpf.io/linux/concepts/dynptrs/
+[3] https://elixir.bootlin.com/linux/v6.16-rc6/source/net/core/skbuff.c#L6211
+[4] https://lore.kernel.org/all/20250422-afabre-traits-010-rfc2-v2-0-92bcc6b146c9@arthurfabre.com/
+
+Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
+---
+Jakub Sitnicki (9):
+      bpf: Add dynptr type for skb metadata
+      bpf: Enable read/write access to skb metadata through a dynptr
+      selftests/bpf: Cover verifier checks for skb_meta dynptr type
+      selftests/bpf: Pass just bpf_map to xdp_context_test helper
+      selftests/bpf: Parametrize test_xdp_context_tuntap
+      selftests/bpf: Cover read access to skb metadata via dynptr
+      selftests/bpf: Cover write access to skb metadata via dynptr
+      selftests/bpf: Cover read/write to skb metadata at an offset
+      selftests/bpf: Cover metadata access from a modified skb clone
+
+ include/linux/bpf.h                                |   7 +-
+ include/linux/filter.h                             |   6 +
+ kernel/bpf/helpers.c                               |  11 +
+ kernel/bpf/log.c                                   |   2 +
+ kernel/bpf/verifier.c                              |  15 +-
+ net/core/filter.c                                  |  57 +++
+ tools/testing/selftests/bpf/bpf_kfuncs.h           |   3 +
+ tools/testing/selftests/bpf/config                 |   1 +
+ tools/testing/selftests/bpf/prog_tests/dynptr.c    |   2 +
+ .../bpf/prog_tests/xdp_context_test_run.c          | 218 +++++++++--
+ tools/testing/selftests/bpf/progs/dynptr_fail.c    | 258 +++++++++++++
+ tools/testing/selftests/bpf/progs/dynptr_success.c |  55 +++
+ tools/testing/selftests/bpf/progs/test_xdp_meta.c  | 419 +++++++++++++++++++++
+ 13 files changed, 1027 insertions(+), 27 deletions(-)
+
 
