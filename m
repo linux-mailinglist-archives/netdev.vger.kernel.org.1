@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-213970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213971-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D3DBB278AC
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 07:56:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4311FB278C7
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 08:05:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 640E616ED86
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 05:56:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7EA361CE7A18
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 06:05:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4059221CC62;
-	Fri, 15 Aug 2025 05:56:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C229288C81;
+	Fri, 15 Aug 2025 06:05:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mdAE6JbU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kllvPuZw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 143DF2192F9;
-	Fri, 15 Aug 2025 05:56:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06D0925334B;
+	Fri, 15 Aug 2025 06:05:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755237366; cv=none; b=PZkGyyksgeXTNVVsc2DX4XX2snZLSIYtRw457uUsvgHcdnwDNRThXdxvHn/4+8QjH4ihKXf9mxYHL5qYAn24QWhVy4wptHVC9UO4D2B8xEAW0cm8inDD36H/3agkb0t+x3yU2r/Eenvt1eMTNdzVyfEdyxc16m60WeTWyM+r2iQ=
+	t=1755237920; cv=none; b=qxpy9I10Q+C/2GfN+vtnSBCeCO8chzY5ARb2Rly6O4QSZIjwoHlE8Xd6VjFljEi+XlI52r/VQROarH3luiEnbRmS1M2GDAeYIgHbowYfr7JCoS2DjkZjnr1Y7+qaeAeEkg3ZCKETyB9NFQN3YQlELzhwl9V9SZDi3eyh7nAkRnM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755237366; c=relaxed/simple;
-	bh=bfKrrkTfyrpACOTNr5WVmWTWKBqGGumeVY6yYEwqPq4=;
+	s=arc-20240116; t=1755237920; c=relaxed/simple;
+	bh=yTQcmNIN/VvgA8Q36hNqkRMmGQohgKcXOjpdoM0mOL4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HFNKZ/eez7aHIC/d4cY5LuuEe3brgV2mbYNczCzY1Sel/Q2WUfCoI2IFHxSx8ijzL9FmFdmVxpQgmWJsMr1j7feJFRcs/PnV2KoaDnHmaiWoAdXL1OB+hd3uM3oScbdNK7AomZJPxnD/NyzavpsRnW92vh1e6OsNbSs9XEc6RHc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mdAE6JbU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56AB9C4CEEB;
-	Fri, 15 Aug 2025 05:56:01 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=qGmEa+wJWwZ5YuneWTonleKXvRawfZz9iqaa/jC0d/7YgWelPnrQ6d4oV4W6DxyLW3/ztZPNxOQBxni02lVoRexQbGduR2EbJaltTHumRHyEdZSyPTGQT5+Zv0R+KdU1/CM4JOlasTDrwJ0lAQR9wvpPL88e38g1Ud8BZPNLs9g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kllvPuZw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4483AC4CEF4;
+	Fri, 15 Aug 2025 06:05:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755237365;
-	bh=bfKrrkTfyrpACOTNr5WVmWTWKBqGGumeVY6yYEwqPq4=;
+	s=k20201202; t=1755237919;
+	bh=yTQcmNIN/VvgA8Q36hNqkRMmGQohgKcXOjpdoM0mOL4=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=mdAE6JbUY7lLx9LHAyTfYwbSAkRe0rPYMOe/xDJyb2RTNZhxbE2qjanljm8/cuS0P
-	 WkDPpk7+uxT5BXifCcQ5f/zOa2xB1Dvm34tU9reas/eYMub1GKu/ZqBNejOVe6Z5EU
-	 zCabyP+4P+Pc3ZsNUwmV0kk38FLk+K+EvaN1sUCzwLZj+mOHAkfPuX+kukSje7v/XY
-	 hSjo9GNL6Z/ejQ6LuFE4NEtTCqLWsHce2cxaQu74z51keathXC2+5MsaXpduIfs1yX
-	 iq9aSNjFVWZHZq98ifEe8vl6BRqTWCapEmboxcUvLSFLZqu9gOXzlEB/8uaNa1ttQ1
-	 atZWPnctRd5uA==
-Message-ID: <e3cfdd98-6c51-479d-8d99-857316dcd64b@kernel.org>
-Date: Fri, 15 Aug 2025 07:55:59 +0200
+	b=kllvPuZw0FL1+4uxxDTXdseXW4cN4rayzjyy7AeypGp3egpPAZ/pBM7v1Tx3IVgic
+	 XLk1ayha77yqniWw+KZOpqTk8OxMV0+MkWNTgZtbtbZ+8sa+RhH4k/bR4zRM65RWu1
+	 QSFJcR+tunt76s9KBrKrZx90WFa/opDmJttR0y1K5HXlklW1/xnVezZ/O7D8lE3DXm
+	 S5/0yg53xvOtz7meKTiredPA5eodn93y2o1Rj+EjCyS4RRgbZPfTxESDPb0reYawhY
+	 sKLTVnjXE2ulNWc+VtrX91S1zMUyo+In7OKOPV+MtgzkMFUTbcl3KD9nsMkWfgNcKg
+	 Y2D2Ba27YScJg==
+Message-ID: <cf531bbd-dc07-4c13-9dbb-774c8dfca70c@kernel.org>
+Date: Fri, 15 Aug 2025 08:05:12 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,16 +50,21 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net/nfc: Fix A-B/B-A deadlock between
- nfc_unregister_device and rfkill_fop_write
-To: Yunseong Kim <ysk@kzalloc.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Taehee Yoo <ap420073@gmail.com>,
- Byungchul Park <byungchul@sk.com>, max.byungchul.park@gmail.com,
- yeoreum.yun@arm.com, ppbuk5246@gmail.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250814173142.632749-2-ysk@kzalloc.com>
+Subject: Re: [PATCH v3 net-next 01/15] dt-bindings: ptp: add NETC Timer PTP
+ clock
+To: Frank Li <Frank.li@nxp.com>
+Cc: Wei Fang <wei.fang@nxp.com>, robh@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, richardcochran@gmail.com, claudiu.manoil@nxp.com,
+ vladimir.oltean@nxp.com, xiaoning.wang@nxp.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, vadim.fedorenko@linux.dev, shawnguo@kernel.org,
+ s.hauer@pengutronix.de, festevam@gmail.com, fushi.peng@nxp.com,
+ devicetree@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, imx@lists.linux.dev, kernel@pengutronix.de
+References: <20250812094634.489901-1-wei.fang@nxp.com>
+ <20250812094634.489901-2-wei.fang@nxp.com>
+ <20250814-hospitable-hyrax-of-health-21eef3@kuoka>
+ <aJ4v4D71OAaV3ZXy@lizhi-Precision-Tower-5810>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -105,50 +110,143 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
  zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
  XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <20250814173142.632749-2-ysk@kzalloc.com>
+In-Reply-To: <aJ4v4D71OAaV3ZXy@lizhi-Precision-Tower-5810>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 14/08/2025 19:31, Yunseong Kim wrote:
-> A potential deadlock due to A-B/B-A deadlock exists between the NFC core
-> and the RFKill subsystem, involving the NFC device lock and the
-> rfkill_global_mutex.
+On 14/08/2025 20:50, Frank Li wrote:
+> On Thu, Aug 14, 2025 at 10:25:14AM +0200, Krzysztof Kozlowski wrote:
+>> On Tue, Aug 12, 2025 at 05:46:20PM +0800, Wei Fang wrote:
+>>> NXP NETC (Ethernet Controller) is a multi-function PCIe Root Complex
+>>> Integrated Endpoint (RCiEP), the Timer is one of its functions which
+>>> provides current time with nanosecond resolution, precise periodic
+>>> pulse, pulse on timeout (alarm), and time capture on external pulse
+>>> support. And also supports time synchronization as required for IEEE
+>>> 1588 and IEEE 802.1AS-2020. So add device tree binding doc for the
+>>> PTP clock based on NETC Timer.
+>>>
+>>> Signed-off-by: Wei Fang <wei.fang@nxp.com>
+>>>
+>>> ---
+>>> v2 changes:
+>>> 1. Refine the subject and the commit message
+>>> 2. Remove "nxp,pps-channel"
+>>> 3. Add description to "clocks" and "clock-names"
+>>> v3 changes:
+>>> 1. Remove the "system" clock from clock-names
+>>> ---
+>>>  .../devicetree/bindings/ptp/nxp,ptp-netc.yaml | 63 +++++++++++++++++++
+>>>  1 file changed, 63 insertions(+)
+>>>  create mode 100644 Documentation/devicetree/bindings/ptp/nxp,ptp-netc.yaml
+>>>
+>>> diff --git a/Documentation/devicetree/bindings/ptp/nxp,ptp-netc.yaml b/Documentation/devicetree/bindings/ptp/nxp,ptp-netc.yaml
+>>> new file mode 100644
+>>> index 000000000000..60fb2513fd76
+>>> --- /dev/null
+>>> +++ b/Documentation/devicetree/bindings/ptp/nxp,ptp-netc.yaml
+>>> @@ -0,0 +1,63 @@
+>>> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+>>> +%YAML 1.2
+>>> +---
+>>> +$id: http://devicetree.org/schemas/ptp/nxp,ptp-netc.yaml#
+>>> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+>>> +
+>>> +title: NXP NETC V4 Timer PTP clock
+>>> +
+>>> +description:
+>>> +  NETC V4 Timer provides current time with nanosecond resolution, precise
+>>> +  periodic pulse, pulse on timeout (alarm), and time capture on external
+>>> +  pulse support. And it supports time synchronization as required for
+>>> +  IEEE 1588 and IEEE 802.1AS-2020.
+>>> +
+>>> +maintainers:
+>>> +  - Wei Fang <wei.fang@nxp.com>
+>>> +  - Clark Wang <xiaoning.wang@nxp.com>
+>>> +
+>>> +properties:
+>>> +  compatible:
+>>> +    enum:
+>>> +      - pci1131,ee02
+>>> +
+>>> +  reg:
+>>> +    maxItems: 1
+>>> +
+>>> +  clocks:
+>>> +    maxItems: 1
+>>> +    description:
+>>> +      The reference clock of NETC Timer, if not present, indicates that
+>>> +      the system clock of NETC IP is selected as the reference clock.
+>>> +
+>>> +  clock-names:
+>>> +    description:
+>>> +      The "ccm_timer" means the reference clock comes from CCM of SoC.
+>>> +      The "ext_1588" means the reference clock comes from external IO
+>>> +      pins.
+>>> +    enum:
+>>> +      - ccm_timer
+>>
+>> You should name here how the input pin is called, not the source. Pin is
+>> "ref"?
+>>
+>>> +      - ext_1588
+>>
+>> This should be just "ext"? We probably talked about this, but this feels
+>> like you describe one input in different ways.
+>>
+>> You will get the same questions in the future, if commit msg does not
+>> reflect previous talks.
+>>
+>>> +
+>>> +required:
+>>> +  - compatible
+>>> +  - reg
+>>> +
+>>> +allOf:
+>>> +  - $ref: /schemas/pci/pci-device.yaml
+>>> +
+>>> +unevaluatedProperties: false
+>>> +
+>>> +examples:
+>>> +  - |
+>>> +    pcie {
+>>> +        #address-cells = <3>;
+>>> +        #size-cells = <2>;
+>>> +
+>>> +        ethernet@18,0 {
+>>
+>> That's rather timer or ptp-timer or your binding is incorrect. Please
+>> describe COMPLETE device in your binding.
 > 
-> This issue is particularly visible on PREEMPT_RT kernels, which can
-> report the following warning:
-
-Why are not you crediting syzbot and its report?
-
-there is clear INSTRUCTION in that email from Syzbot.
-
+> Krzysztof:
 > 
-> | rtmutex deadlock detected
-> | WARNING: CPU: 0 PID: 22729 at kernel/locking/rtmutex.c:1674 rt_mutex_handle_deadlock+0x68/0xec kernel/locking/rtmutex.c:-1
-> | Modules linked in:
-> | CPU: 0 UID: 0 PID: 22729 Comm: syz.7.2187 Kdump: loaded Not tainted 6.17.0-rc1-00001-g1149a5db27c8-dirty #55 PREEMPT_RT
-> | Hardware name: QEMU KVM Virtual Machine, BIOS 2025.02-8ubuntu1 06/11/2025
-> | pstate: 63400005 (nZCv daif +PAN -UAO +TCO +DIT -SSBS BTYPE=--)
-> | pc : rt_mutex_handle_deadlock+0x68/0xec kernel/locking/rtmutex.c:-1
-> | lr : rt_mutex_handle_deadlock+0x40/0xec kernel/locking/rtmutex.c:1674
-> | sp : ffff8000967c7720
-> | x29: ffff8000967c7720 x28: 1fffe0001946d182 x27: dfff800000000000
-> | x26: 0000000000000001 x25: 0000000000000003 x24: 1fffe0001946d00b
-> | x23: 1fffe0001946d182 x22: ffff80008aec8940 x21: dfff800000000000
-> | x20: ffff0000ca368058 x19: ffff0000ca368c10 x18: ffff80008af6b6e0
-> | x17: 1fffe000590b8088 x16: ffff80008046cc08 x15: 0000000000000001
-> | x14: 1fffe000590ba990 x13: 0000000000000000 x12: 0000000000000000
-> | x11: ffff6000590ba991 x10: 0000000000000002 x9 : 0fe446e029bcfe00
-> | x8 : 0000000000000000 x7 : 0000000000000000 x6 : 000000000000003f
-> | x5 : 0000000000000001 x4 : 0000000000001000 x3 : ffff800080503efc
-> | x2 : 0000000000000001 x1 : 0000000000000001 x0 : 0000000000000001
+> 	I have question about "COMPLETE" here. For some MFD/syscon, I know
+> need descript all children nodes to make MFD/syscon complete.
+> 
+> 	But here it is PCIe device.
+> 
+> pcie_4ca00000: pcie@4ca00000 {
+> 	compatible = "pci-host-ecam-generic";
+> 	...
+> 
+> 	enetc_port0: ethernet@0,0 {
+>         	compatible = "fsl,imx95-enetc", "...";
+> 		...
+> 
+> 	ptp-timer@18,0 {
+> 		compatible = "pci1131,ee02";
+> 	}
+> };
+> 
+> 	parent "pci-host-ecam-generic" is common pci binding, each children
+> is indepentant part.
+> 
+> 	I am not sure how to decript COMPLETE device for PCI devices.
 
-This all is irrelevant, really. Trim the log.
+I don't know what is missing here, but naming it ethernet suggested
+there are other functions not being described in the binding.
 
-> | Call trace:
-> |  rt_mutex_handle_deadlock+0x68/0xec kernel/locking/rtmutex.c:-1 (P)
-> |  __rt_mutex_slowlock+0x1cc/0x480 kernel/locking/rtmutex.c:1734
-> |  __rt_mutex_slowlock_locked kernel/locking/rtmutex.c:1760 [inline]
-> |  rt_mutex_slowlock+0x140/0x21c kernel/locking/rtmutex.c:1800
+
+
 Best regards,
 Krzysztof
 
