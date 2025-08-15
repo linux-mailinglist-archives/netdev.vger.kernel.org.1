@@ -1,62 +1,73 @@
-Return-Path: <netdev+bounces-213919-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213920-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 132D9B274CB
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 03:37:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7E09B27553
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 04:07:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B29203BAB4B
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 01:37:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B6D3189EA61
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 02:02:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65A9D2561B6;
-	Fri, 15 Aug 2025 01:37:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAB3E2D372F;
+	Fri, 15 Aug 2025 01:56:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="K+izhJXm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
+Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D45059475;
-	Fri, 15 Aug 2025 01:37:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.92.39.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3188D292B4B;
+	Fri, 15 Aug 2025 01:56:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755221831; cv=none; b=dayBGlvyZ0Ul8PkpHTHWpzv8lujUlmOogwiGXoJROjH0NMerd/VvG7bxyf3iBnrMFuw9IdSt9y8dcbJffH99Kkwhai69K9P6OyQm27Bozvti7u6QM0gp6hAnO7M1/xZCxJIgdjbtPlTmGELxzZnjDT5kmrmCkRxAKvn2Q/VYbHI=
+	t=1755222975; cv=none; b=BjePhBrh5YWcLncRxSpsqx+2vz6XxcFRTW33wMqiRpsjuTgGAG7yBMiAXS079A5Q1I7ue2ajKoojenL9s4hvvIsoR/OV8V1jg1gKlXDeuBJ1in33cDJFmw2N2Z0y3Ml3L3sOYWSWtaaj1xSQEkSAzSs8NDx04Xkm81wWsq0vLM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755221831; c=relaxed/simple;
-	bh=W49tmC8pMPCmtFcn3qEiXKG1KBDWgCmX4g9K7vu18jQ=;
+	s=arc-20240116; t=1755222975; c=relaxed/simple;
+	bh=+nBM0hG2RnI2dnOPGBNUDFaGBpn2PLbz2yh8BzKLn0Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CXHnVtr2x66xRXniUM44WG9xWEr8E2Fbny/7Ueu/cg9qlTbt9kmfjdd9g9KpqfV1vrB3nqGZnrfNRrDDa9TasmXAjK8NRZygYIbt3+33SAEubpg5J0kQ3AbZf6WO1VF2l5CpVPcApqbjsgr7zQcxb9MbTEmMjEm567xCzFffhhw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=54.92.39.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
-X-QQ-mid: zesmtpgz8t1755221820tf5699c30
-X-QQ-Originating-IP: tlNQ7+NHEjaXcRky/Tvj9nySe0eW04M+BZV9Y0tdcD4=
-Received: from localhost ( [203.174.112.180])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Fri, 15 Aug 2025 09:36:58 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 9320296151560598808
-Date: Fri, 15 Aug 2025 09:36:58 +0800
-From: Yibo Dong <dong100@mucse.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, corbet@lwn.net,
-	gur.stavi@huawei.com, maddy@linux.ibm.com, mpe@ellerman.id.au,
-	danishanwar@ti.com, lee@trager.us, gongfan1@huawei.com,
-	lorenzo@kernel.org, geert+renesas@glider.be,
-	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
-	alexanderduyck@fb.com, richardcochran@gmail.com,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 4/5] net: rnpgbe: Add basic mbx_fw support
-Message-ID: <AC9522804BA5F115+20250815013658.GB1129045@nic-Precision-5820-Tower>
-References: <20250812093937.882045-1-dong100@mucse.com>
- <20250812093937.882045-5-dong100@mucse.com>
- <eafb8874-a7a3-4028-a4ad-d71fc5689813@linux.dev>
- <9A6132D78B40DAFD+20250813095214.GA979548@nic-Precision-5820-Tower>
- <9af5710c-e465-4e21-8705-4698e544c649@lunn.ch>
+	 Content-Type:Content-Disposition:In-Reply-To; b=H/CUP01dCtLUPUsGv4Njj/5hmXcYaCB12ZrJaSvCWP9ERNe7dkLrdbNovbJg8BeFQ2/74EdsvsPK+kuDrczfJMPpFwC+bzqPION17SD2SigclRxaPF6TSGNJPtj0oNXu88GIxzFewku/bXzBjkgY6SBlEiGlhgwbLt9VsyXnCDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=K+izhJXm; arc=none smtp.client-ip=115.124.30.118
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1755222964; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=iGiVqtfZRbEkrw+mdhN+VrYas9P5Pc4amtyTrXuf5OU=;
+	b=K+izhJXmvQV/G1cAADnCUxO+Kt6XmPaX6YfrnGT5fXIcJ56z8phephToDpbU21d+fnzOu9n1bBNol9DUYkPiwXFQNDbVHdmSCwMwGGdHDh1n5mzRKU+dFgyP6JsEw75Lqt9x3Pr0/R/T0e68s5xlJKPuP8Dan/93Pm1kNaurxCQ=
+Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0Wlmn22a_1755222962 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Fri, 15 Aug 2025 09:56:03 +0800
+Date: Fri, 15 Aug 2025 09:56:02 +0800
+From: Dust Li <dust.li@linux.alibaba.com>
+To: Alexandra Winter <wintera@linux.ibm.com>,
+	David Miller <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"D. Wythe" <alibuda@linux.alibaba.com>,
+	Sidraya Jayagond <sidraya@linux.ibm.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	Julian Ruess <julianr@linux.ibm.com>
+Cc: netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Thorsten Winkler <twinkler@linux.ibm.com>,
+	Simon Horman <horms@kernel.org>,
+	Mahanta Jambigi <mjambigi@linux.ibm.com>,
+	Tony Lu <tonylu@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>, Halil Pasic <pasic@linux.ibm.com>,
+	linux-rdma@vger.kernel.org
+Subject: Re: [RFC net-next 11/17] net/dibs: Move struct device to dibs_dev
+Message-ID: <aJ6TsutbywkTLWxO@linux.alibaba.com>
+Reply-To: dust.li@linux.alibaba.com
+References: <20250806154122.3413330-1-wintera@linux.ibm.com>
+ <20250806154122.3413330-12-wintera@linux.ibm.com>
+ <369a292c-c8c5-4002-a116-f9e1b4a436ba@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,79 +76,227 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <9af5710c-e465-4e21-8705-4698e544c649@lunn.ch>
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpgz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: Mf2c2cXG8XEiQMetGMQwjHFRz3d1mTlEqgChonH+LMVTfGtqcMKhYJqA
-	RfFeG5nC/kUqDkIIFcRU+8FBjJqqNUowxQ4x6nJMS+GKncHBLlyD6eVVQkkQIkK0GxU9Vqp
-	YUB+lADqqGLInqT8xu/8RODmrJN/kIe0DJz6ASzz9hcLd99u1S7WQNIQBXAdPCvmykt3wRK
-	F4dmqDbfzK8Sj+L+l94DowLlBnpocPKZM7Jd4wTbO3r3q+XMAafy2zifucHMZ9MV3rkSrQn
-	KQ3MzLujzXI/U47WlN6nPU6GCekCAMvWdRGzDD4KQrIjzYkJQr07zd2ZlFBzcLx4mWI2D2X
-	cW6EfY4JK2mSu8K10lUmFC4epMgiMMS3ASTTP7oLpRY1QqKI6l5kG9TyRQps3bMg90NA9AY
-	68XBA7ug2snJmHe5IOdawqXS0tKd6HLmLIPtspcEBEtyuXit0OKwTRMck9kiAiHnE2gvgOq
-	Lty+g5RlcIuA2p+bBD6X2HS6RKWTfTi6Q6jMZTW+tqQaxEZSKlKueFb8W8tQJjtiLCSpC25
-	fxzoC2BKxOzPWSL/lSl1HpjvBkVlqk6YtBEqGFTRjRXq80Pa36Z/LhMKEtjUIhvAKES+wmR
-	AXzQddM43v0rYROWfaFGFayBecNQHSaz5xGvCuK/tQvwDKp1/hIncGsqFoRNH8vVBjV5seA
-	wEllzqwKmq5k1erp6atEnb8QCX5+ijzT2kUzBhYerRhLQFTmN03ptyDKuCXnrUCGIZlPw7H
-	ZRN/oelfe7yEUok7zS9/zXusqf8aaEgwTqxNmt6JQ0iaTM5lrpvMVtccbvjr4slqBqHIp9o
-	Q3WB+4zEiG7fPETQNcrShZqEcxZt5XM3C00LSz57qWQ5+zEcp2jWzbEJruXsdTtQ1fXFRWe
-	yccW0KRdJwpTTGAtmuSslwU6a9XxFOrnuQOx+yjzATYTqR3nCl5nhKkOtJMr8X9wX/PbIXw
-	viDJ+gdphOr7epFFNI4l/qUbGc2GouJJUXIOOctK9r8S9dA5R/GG622FQ/Q1Yv0HmTE3Gmf
-	sSTYqNJ83DEgw5vj6t
-X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
-X-QQ-RECHKSPAM: 0
+In-Reply-To: <369a292c-c8c5-4002-a116-f9e1b4a436ba@linux.ibm.com>
 
-On Fri, Aug 15, 2025 at 02:04:57AM +0200, Andrew Lunn wrote:
-> > If it is more cleaner bellow?
-> > 
-> > static int mucse_fw_send_cmd_wait(struct mucse_hw *hw,
-> >                                   struct mbx_fw_cmd_req *req,
-> >                                   struct mbx_fw_cmd_reply *reply)
-> > {
-> >         int len = le16_to_cpu(req->datalen) + MBX_REQ_HDR_LEN;
-> >         int retry_cnt = 3;
-> >         int err;
-> > 
-> >         err = mutex_lock_interruptible(&hw->mbx.lock);
-> >         if (err)
-> >                 return err;
-> >         err = hw->mbx.ops->write_posted(hw, (u32 *)req,
-> >                                         L_WD(len));
-> >         if (err)
-> >                 goto quit;
-> >         do {
-> >                 err = hw->mbx.ops->read_posted(hw, (u32 *)reply,
-> >                                                L_WD(sizeof(*reply)));
-> >                 if (err)
-> >                         goto quit;
-> >         } while (--retry_cnt >= 0 && reply->opcode != req->opcode);
-> > 
-> >         mutex_unlock(&hw->mbx.lock);
-> >         if (retry_cnt < 0)
-> >                 return -ETIMEDOUT;
-> >         if (reply->error_code)
-> >                 return -EIO;
-> >         return 0;
-> > quit:
-> >         mutex_unlock(&hw->mbx.lock);
-> >         return err;
-> > }
-> 
-> You might want a read a few other drivers in mailine. Look at the
-> naming. I doubt you will find many using "quit" for a label. "out" or
-> "unlock" is more popular.
-> 
-> When it comes to locks, it is better to have one lock statement and
-> one unlock statement. It then becomes easy to see all paths lead to
-> the unlock.
-> 
-> 	Andrew
-> 
+On 2025-08-14 10:51:27, Alexandra Winter wrote:
+>
+>
+>On 06.08.25 17:41, Alexandra Winter wrote:
+>[...]
+>> 
+>> Replace smcd->ops->get_dev(smcd) by dibs_get_dev().
+>> 
+>
+>Looking at the resulting code, I don't really like this concept of a *_get_dev() function,
+>that does not call get_device().
+>I plan to replace that by using dibs->dev directly in the next version.
 
-Got it, I will change label 'quit' to 'out'.
-And I will try to keep 'one lock statement and one unlock statement'
-principle in mind.
+May I ask why? Because of the function name ? If so, maybe we can change the name.
 
-Thanks for your feedback.
+While I don't have a strong preference either way, I personally favor
+hiding the members of the dibs_dev structure from the upper layer. In my
+opinion, it would be better to avoid direct access to dibs members from
+upper layers and instead provide dedicated interface functions.
 
+For example, I even think we should not expose dibs->ops->xxx directly
+to the SMC layer. Encapsulating such details would improve modularity
+and maintainability. Just like what IB subsystem has done before :)
+
+For example:
+# git grep dibs net/smc
+[...]
+net/smc/smc_ism.c:      return dibs->ops->query_remote_gid(dibs, &ism_rgid, vlan_id ? 1 : 0,
+net/smc/smc_ism.c:      return smcd->dibs->ops->get_fabric_id(smcd->dibs);
+net/smc/smc_ism.c:      if (!smcd->dibs->ops->add_vlan_id)
+net/smc/smc_ism.c:      if (smcd->dibs->ops->add_vlan_id(smcd->dibs, vlanid)) {
+net/smc/smc_ism.c:      if (!smcd->dibs->ops->del_vlan_id)
+net/smc/smc_ism.c:      if (smcd->dibs->ops->del_vlan_id(smcd->dibs, vlanid))
+[...]
+
+Best regards,
+Dust
+
+>
+>
+>See below for the code pieces I am referring to:
+>
+>
+>> diff --git a/drivers/s390/net/ism_drv.c b/drivers/s390/net/ism_drv.c
+>> index 84a6e9ae2e64..0ddfd47a3a7c 100644
+>> --- a/drivers/s390/net/ism_drv.c
+>> +++ b/drivers/s390/net/ism_drv.c
+>[...]
+>> @@ -697,16 +684,14 @@ static int ism_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>>  	ism_dev_exit(ism);
+>>  err_dibs:
+>>  	/* pairs with dibs_dev_alloc() */
+>> -	kfree(dibs);
+>> +	put_device(dibs_get_dev(dibs));
+>[...]
+>> @@ -719,13 +704,12 @@ static void ism_remove(struct pci_dev *pdev)
+>>  	dibs_dev_del(dibs);
+>>  	ism_dev_exit(ism);
+>>  	/* pairs with dibs_dev_alloc() */
+>> -	kfree(dibs);
+>> +	put_device(dibs_get_dev(dibs));
+>>  
+>>  	pci_release_mem_regions(pdev);
+>[...]
+>> @@ -871,13 +855,6 @@ static void smcd_get_local_gid(struct smcd_dev *smcd,
+>>  	smcd_gid->gid_ext = 0;
+>>  }
+>>  
+>> -static inline struct device *smcd_get_dev(struct smcd_dev *dev)
+>> -{
+>> -	struct ism_dev *ism = dev->priv;
+>> -
+>> -	return &ism->dev;
+>> -}
+>> -
+>>  static const struct smcd_ops ism_smcd_ops = {
+>>  	.query_remote_gid = smcd_query_rgid,
+>>  	.register_dmb = smcd_register_dmb,
+>> @@ -890,7 +867,6 @@ static const struct smcd_ops ism_smcd_ops = {
+>>  	.move_data = smcd_move,
+>>  	.supports_v2 = smcd_supports_v2,
+>>  	.get_local_gid = smcd_get_local_gid,
+>> -	.get_dev = smcd_get_dev,
+>>  };
+>>  
+>>  const struct smcd_ops *ism_get_smcd_ops(void)
+>> diff --git a/include/linux/dibs.h b/include/linux/dibs.h
+>> index 805ab33271b5..4459b9369dc0 100644
+>> --- a/include/linux/dibs.h
+>> +++ b/include/linux/dibs.h
+>[...]
+>> @@ -158,6 +159,21 @@ static inline void *dibs_get_priv(struct dibs_dev *dev,
+>>  
+>>  /* ------- End of client-only functions ----------- */
+>>  
+>> +/* Functions to be called by dibs clients and dibs device drivers:
+>> + */
+>> +/**
+>> + * dibs_get_dev()
+>> + * @dev: dibs device
+>> + * @token: dmb token of the remote dmb
+>> + *
+>> + * TODO: provide get and put functions
+>> + * Return: struct device* to be used for device refcounting
+>> + */
+>> +static inline struct device *dibs_get_dev(struct dibs_dev *dibs)
+>> +{
+>> +	return &dibs->dev;
+>> +}
+>> +
+>[...]
+>> diff --git a/include/net/smc.h b/include/net/smc.h
+>> index e271891b85e6..05faac83371e 100644
+>> --- a/include/net/smc.h
+>> +++ b/include/net/smc.h
+>> @@ -63,7 +63,6 @@ struct smcd_ops {
+>>  			 unsigned int size);
+>>  	int (*supports_v2)(void);
+>>  	void (*get_local_gid)(struct smcd_dev *dev, struct smcd_gid *gid);
+>> -	struct device* (*get_dev)(struct smcd_dev *dev);
+>>  
+>>  	/* optional operations */
+>>  	int (*add_vlan_id)(struct smcd_dev *dev, u64 vlan_id);
+>[...]
+>
+>>  
+>> diff --git a/net/smc/smc_core.c b/net/smc/smc_core.c
+>> index 67f9e0b83ebc..71c410dc3658 100644
+>> --- a/net/smc/smc_core.c
+>> +++ b/net/smc/smc_core.c
+>> @@ -924,7 +924,7 @@ static int smc_lgr_create(struct smc_sock *smc, struct smc_init_info *ini)
+>>  	if (ini->is_smcd) {
+>>  		/* SMC-D specific settings */
+>>  		smcd = ini->ism_dev[ini->ism_selected];
+>> -		get_device(smcd->ops->get_dev(smcd));
+>> +		get_device(dibs_get_dev(smcd->dibs));
+>>  		lgr->peer_gid.gid =
+>>  			ini->ism_peer_gid[ini->ism_selected].gid;
+>>  		lgr->peer_gid.gid_ext =
+>> @@ -1474,7 +1474,7 @@ static void smc_lgr_free(struct smc_link_group *lgr)
+>>  	destroy_workqueue(lgr->tx_wq);
+>>  	if (lgr->is_smcd) {
+>>  		smc_ism_put_vlan(lgr->smcd, lgr->vlan_id);
+>> -		put_device(lgr->smcd->ops->get_dev(lgr->smcd));
+>> +		put_device(dibs_get_dev(lgr->smcd->dibs));
+>>  	}
+>>  	smc_lgr_put(lgr); /* theoretically last lgr_put */
+>>  }
+>[...]
+>> diff --git a/net/smc/smc_loopback.c b/net/smc/smc_loopback.c
+>> index 37d8366419f7..262d0d0df4d0 100644
+>> --- a/net/smc/smc_loopback.c
+>> +++ b/net/smc/smc_loopback.c
+>> @@ -23,7 +23,6 @@
+>>  #define SMC_LO_SUPPORT_NOCOPY	0x1
+>>  #define SMC_DMA_ADDR_INVALID	(~(dma_addr_t)0)
+>>  
+>> -static const char smc_lo_dev_name[] = "loopback-ism";
+>>  static struct smc_lo_dev *lo_dev;
+>>  
+>>  static void smc_lo_generate_ids(struct smc_lo_dev *ldev)
+>> @@ -255,11 +254,6 @@ static void smc_lo_get_local_gid(struct smcd_dev *smcd,
+>>  	smcd_gid->gid_ext = ldev->local_gid.gid_ext;
+>>  }
+>>  
+>> -static struct device *smc_lo_get_dev(struct smcd_dev *smcd)
+>> -{
+>> -	return &((struct smc_lo_dev *)smcd->priv)->dev;
+>> -}
+>> -
+>>  static const struct smcd_ops lo_ops = {
+>>  	.query_remote_gid = smc_lo_query_rgid,
+>>  	.register_dmb = smc_lo_register_dmb,
+>> @@ -274,7 +268,6 @@ static const struct smcd_ops lo_ops = {
+>>  	.signal_event		= NULL,
+>>  	.move_data = smc_lo_move_data,
+>>  	.get_local_gid = smc_lo_get_local_gid,
+>> -	.get_dev = smc_lo_get_dev,
+>>  };
+>>  
+>[...]
+>> diff --git a/net/smc/smc_pnet.c b/net/smc/smc_pnet.c
+>> index 76ad29e31d60..bbdd875731f2 100644
+>> --- a/net/smc/smc_pnet.c
+>> +++ b/net/smc/smc_pnet.c
+>> @@ -169,7 +169,7 @@ static int smc_pnet_remove_by_pnetid(struct net *net, char *pnet_name)
+>>  			pr_warn_ratelimited("smc: smcd device %s "
+>>  					    "erased user defined pnetid "
+>>  					    "%.16s\n",
+>> -					    dev_name(smcd->ops->get_dev(smcd)),
+>> +					    dev_name(dibs_get_dev(smcd->dibs)),
+>>  					    smcd->pnetid);
+>>  			memset(smcd->pnetid, 0, SMC_MAX_PNETID_LEN);
+>>  			smcd->pnetid_by_user = false;
+>> @@ -332,7 +332,7 @@ static struct smcd_dev *smc_pnet_find_smcd(char *smcd_name)
+>>  
+>>  	mutex_lock(&smcd_dev_list.mutex);
+>>  	list_for_each_entry(smcd_dev, &smcd_dev_list.list, list) {
+>> -		if (!strncmp(dev_name(smcd_dev->ops->get_dev(smcd_dev)),
+>> +		if (!strncmp(dev_name(dibs_get_dev(smcd_dev->dibs)),
+>>  			     smcd_name, IB_DEVICE_NAME_MAX - 1))
+>>  			goto out;
+>>  	}
+>> @@ -431,7 +431,7 @@ static int smc_pnet_add_ib(struct smc_pnettable *pnettable, char *ib_name,
+>>  	if (smcd) {
+>>  		smcddev_applied = smc_pnet_apply_smcd(smcd, pnet_name);
+>>  		if (smcddev_applied) {
+>> -			dev = smcd->ops->get_dev(smcd);
+>> +			dev = dibs_get_dev(smcd->dibs);
+>>  			pr_warn_ratelimited("smc: smcd device %s "
+>>  					    "applied user defined pnetid "
+>>  					    "%.16s\n", dev_name(dev),
+>> @@ -1192,7 +1192,7 @@ int smc_pnetid_by_table_ib(struct smc_ib_device *smcibdev, u8 ib_port)
+>>   */
+>>  int smc_pnetid_by_table_smcd(struct smcd_dev *smcddev)
+>>  {
+>> -	const char *ib_name = dev_name(smcddev->ops->get_dev(smcddev));
+>> +	const char *ib_name = dev_name(dibs_get_dev(smcddev->dibs));
+>>  	struct smc_pnettable *pnettable;
+>>  	struct smc_pnetentry *tmp_pe;
+>>  	struct smc_net *sn;
 
