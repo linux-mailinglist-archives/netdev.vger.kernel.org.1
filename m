@@ -1,242 +1,177 @@
-Return-Path: <netdev+bounces-214001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214002-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7ECB6B27ACD
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 10:20:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F106B27ADB
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 10:24:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A1CE1C8790B
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 08:21:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9DBA11C87999
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 08:24:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FA4723FC66;
-	Fri, 15 Aug 2025 08:20:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.de header.i=markus.stockhausen@gmx.de header.b="jvOZxmi7"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2C361FAC4D;
+	Fri, 15 Aug 2025 08:24:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2957F1FC0F0
-	for <netdev@vger.kernel.org>; Fri, 15 Aug 2025 08:20:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1030CDF71;
+	Fri, 15 Aug 2025 08:24:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755246047; cv=none; b=IyNsCZat2YLHnOrLpAJLnK9YOw/VbnU48PN7sPNZSUMRFI2NqWh1C0Rb4Vf8h/xNI0MMfpsS6BFDijVjnr65VzygDfVohdhS2KGyQBBwyUjeGcd4cU0iJRmjLL01RuV88GAK3oaVfdhzAIOSTo50YBAilone3pvsx0tkwTh/pPg=
+	t=1755246242; cv=none; b=CiZH52GobooZO4z43SR1ZZkvdidDvqtn5LH/ZpzhkNz4YXacSswoGwTwBC6Rwn1UUk4RqORuVsYaNE5hPajavYDxKFIus5z6by0QAvxSmp6S8YfzFmVuWBIM73dD664pR9xoKqIFOegwevM15Fd1P4PtX1iLdVaJf04WdGtiuhE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755246047; c=relaxed/simple;
-	bh=YsWETRXwLsrLOcXH3DupIuLZELW/r8FKv5zPHazyH8c=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iW/VHVjLv0H0b1QsHvpwyDXA0HkaiMLaL/ss83Y4fvpVhqyJQwMZwQ1+R6bJcQYqrrjor0S1PnZ/XS6guDfB5RG7PaK98QsUx0VoPpKS1voIXWdIMiGKztRP69AicI7a+sE+CAdgpft5j0+lr/XLF0j7AbmdZrQAqJeCXyF2jFM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=markus.stockhausen@gmx.de header.b=jvOZxmi7; arc=none smtp.client-ip=212.227.15.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
-	s=s31663417; t=1755246023; x=1755850823;
-	i=markus.stockhausen@gmx.de;
-	bh=X/jNrm/FtNa5FOo/g0ES5OBhaB+p+tOlDySfSRZVF3U=;
-	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-ID:
-	 MIME-Version:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=jvOZxmi7VlRYASq44oYmAwdAhlW3JTc/qtb1ciI7KViHoZ5CIpfSDtRwkAoPRExp
-	 Uf2PkcCBggFVlOM/pf5TyzcEx9T/nColhKt9fhhL+koP84UjGwFejw7K9pwBmY4Te
-	 ORxZjZLClK1KGACGloxePCHMKYYJ+O9MYmmH09SlFWgBQgUm/Hi7eMjr3cZ+68Yhy
-	 +2gvR1pa32RXed5gwInLD9xMaMrsH/0u1a1/gm4GRD4TqytnGfGxL8pvypokz8hSG
-	 NsDI2atdLY34bAfATAqtgIipkfvPSDhTHNUC8Xl04USEukk7P9P5tn3MpaPO1HkxE
-	 SMOPMozjJklfgLduyA==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from openwrt ([94.31.70.55]) by mail.gmx.net (mrgmx005
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1Mel3n-1uCfNC1NHJ-00bk90; Fri, 15
- Aug 2025 10:20:23 +0200
-From: Markus Stockhausen <markus.stockhausen@gmx.de>
-To: andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	michael@fossekall.de,
-	daniel@makrotopia.org,
-	netdev@vger.kernel.org,
-	jan@3e8.eu
-Cc: Markus Stockhausen <markus.stockhausen@gmx.de>
-Subject: [PATCH net-next] net: phy: realtek: enable serdes option mode for RTL8226-CG
-Date: Fri, 15 Aug 2025 04:20:09 -0400
-Message-ID: <20250815082009.3678865-1-markus.stockhausen@gmx.de>
-X-Mailer: git-send-email 2.47.0
+	s=arc-20240116; t=1755246242; c=relaxed/simple;
+	bh=ER2ukscimwht73kLfrM+khgx7sIqkTSSbc7PrTo4M84=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TbdQLtonhWvpmYJ6oM5Ie8JL9mHWWKvcOvE+euxB/65nk9gkABtvvCLXarokDaeH8N0TmRR6xvmsoL5Bmw8r1tZ4EwCo8SJ2Je7QGEHGdz5FaIzWRdAM3A01zspD3eludfkZkR522xDKLDO667cQa4/a0qd8l5Sn35C89S/LtIk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kzalloc.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.215.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kzalloc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-b4717593371so151245a12.3;
+        Fri, 15 Aug 2025 01:24:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755246240; x=1755851040;
+        h=content-transfer-encoding:in-reply-to:organization:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qnUmDGFjkvK6EGBJSNFaT5dG2DK3adFiwRq2/pRAI/Q=;
+        b=C3It6XfZtidcdhG/iF35hXCg/OHkqgcUOUt3fcWvsept36y766Xqsskj9zTK62E+RF
+         i9aWLViVAqV5Y/BYAKeOCu2fD0VTqy7Ws5uIQVgwV3djWIo41Il2ZFYUE2OsfNCgimlF
+         k7beWuy7vEQ/vXEG9tfmTWFGUZ9H0+Zdfi+Dfuwz4umaUICI1cRst1pp52H2QzDDBXzZ
+         EX5DH75TIA6TgrGc1UW7T7rjfW8C+ii42JofiFbqTnIrcSlef4Xwx1SUCvr0bRWyEcFy
+         6BsbtyqYbJH0SRHpRZSbGNROIdMW615nSzETNeJ11g1y+UrGE0bpo6xyOkCD4TFNCyM8
+         /mKg==
+X-Forwarded-Encrypted: i=1; AJvYcCVdiDf2H+xebXabSv68V07SvZ13rU8Ra52wb6W4phSsOcMB47NdZ+Hs0biDvvETmborIF9cl19qRZYdQcg=@vger.kernel.org, AJvYcCWAzBXVkLw6BnNcvFZlkNgU55DwOd61r1oJSmCpzGFJ8hByU9TDFBf41OnKoZeU2DdtmDSchd9q@vger.kernel.org
+X-Gm-Message-State: AOJu0YxMFIpWeXpnQQTOnAYiiXzoGdOoRuhwfOPiW7Aad/pY0F4TZpA/
+	Lh8q171ihkB58DvIzgax4TMtAq36lsMaNiD66aROq/x0bXK/QVtnWt1o
+X-Gm-Gg: ASbGncs7zpXNPnOuuVlPjaaqYvjEWG3RQIa/tpT0d3md/Cw1MsduvrnICFKFk+DpgCn
+	UiZj2M+zOhEpKZvywTSv0lZ/1zzv/xbIlAt+hZCojbiZlOFCeuE881rPE4x3EG4FomKh/hW2lRD
+	BFO2o0LdJBv1C3TZC5zzF9kcNdbuLrPtRkkdOurk8MJBqLkG/ydt/2xiXxXMDHEfAxai+aFP3Ic
+	K/z0Jeuba4luKAHoAad4ohYm5xdcOkLMxcgzkdgSFCTEmZr8x4jshx80HE814s2s0F9dal8aGZu
+	SBo15Rnmn1L357OlzP47G5ojtLHi1AhsYN2+gMA+F6JM5VXiicGd+zcQtnV2IkpbUud6gsYlK4q
+	UipImutlFy/5/lXIUooRAZuewq5KH8U+RZ18Uq9ttnSg=
+X-Google-Smtp-Source: AGHT+IHWD+Bnk4L4dHnIDVIbG+ye0U5qD7F8KoEHkzFkyW+DMqlCF7IQBAkML14BDtGWdpU+Jz8cug==
+X-Received: by 2002:a17:903:1a70:b0:240:11be:4dbe with SMTP id d9443c01a7336-2446d95b26cmr8476295ad.8.1755246240203;
+        Fri, 15 Aug 2025 01:24:00 -0700 (PDT)
+Received: from [192.168.50.136] ([118.32.98.101])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2446cae0278sm9064575ad.43.2025.08.15.01.23.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 15 Aug 2025 01:23:59 -0700 (PDT)
+Message-ID: <b8dc1074-725f-4048-9af5-6b62bd2150a3@kzalloc.com>
+Date: Fri, 15 Aug 2025 17:23:53 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:sgQUxqOINK0bCYit/fmEnVJmungM3cW4fupOLmMYXn0PSgulyAE
- vVzafkbY2coaX2BjnCdCWnHxWmftA/WtlX/G9fd6bnvmd/ZpC5Y1yFIPYBaND5LSGIKLIZL
- E3wTt5N5nLNxStz+fjSGdcSKkjZnA6FtDPs/kQrN+VjT1hEXQI8n2n4IikLMd3pJb3OGHT2
- V9ISh4h1qmfF6r+g0a3ew==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:smCO/PTn6ok=;NSTCYTCxAlMrVSLz5+OqucL69gf
- 4Ost5dTeovjTajFsfhsfYMiouy1OeVk1y0tXIMJTMi30obV6rIma/GFkH1o32W2DpUGzlsawy
- 2YbyiRASuE5JYc5LDHUuZxVqQZPJiw3fwEp6I7iABbda/97qLozk9hICfl7Zf3jZW1nzzSmMs
- ZTKV1GyI5HnRsrWUrfqBbuBEwvL8r4zMPYvuD/ZSHAmcS4Mfs404t2tJcYy4c+dfsyETj9KTs
- nLoclniDmiATZMTsNNwfj0JCnqs/+S8ApcmvGsm+UzOQOcyjwZhi4YqCzi67wgLmnFUYR0xp3
- PJlBUJ+IANQlC1zxLsxAdinTj5vZcCA2V0j/MwyjhvHaK7S7l/jTpbNIiETfwhHGKq5lWYvn+
- SycbegCLXalxF9147QA/2uiSiZM4yt1pIC6JHkBkfjf1QcccVwh2fInBLSsugct8gMmnmUZm7
- treNrnOupRB5mL2Fb40/dtAOo2Ku+vNE/ezITuKlycDMKfeIvXYoeSVSaziq6ZFFKE4iGk29E
- peP0xWHqkEc8qmOVtHA7Nxsyxo1e1fbfQIZ5zslySExdA7hubChYIO/7fiZKiEQxd8Ah1gjne
- RrtsKp807z6SuSXi8ZouebiLOof6Ixm/bUYRg3MGe7QyOHDojBpzYc5fF0KRwqbN2yLV+LlLW
- 36yAbHYmIki47unAh6m7AahJAs9qID6kX+G4IDUkhAmzCztK8fj/CUfFVcW1upfz4175Z8yCu
- DjJp0FxzKV4guK6HS51TEE7s+dvsl5FaLQ6c5nTf8dNvh1GQb85Fkr4jEbiR9765b9CPuMLkq
- A3qSv8VYguOkpjRIfndMrHSGNe8nNQykTZODf37/bMw81UtQOhECSER7eoztlNOPRdItezqaY
- 5oPpOqpzS/Ohh9fRKKvJJVEGeZzx5BE1nlYuwdiB7qtyFZ5aK1WyyETm8kcKM1m5ql4zg35Hy
- EFOos2pIZVnEiow8tL4CSURunB1VN52VK6MHB2Qn+7YKTGvkwW+Ps0raG/lsJ5ck3zTo2rW5f
- DUelrHcPyEGDLTe1dqcgn6300JvOI0cHnIlU9NTtLXvh6rdhYrrV1sAyprtWMcAEz5+RWZfun
- m+JcNZo/hujrD9xDcD1sV81mscWx66D2q1/jCM7IZ+6n+rlgHAdHU2XMUkzlnVMwA/wMaD0aS
- ZFH/EiBICS4q5CKTY16VhJq+Ole6+p/FSvFowrThKxLq3hGkRYhG8CkutDAm9t+cHCXMVokbB
- /4y/j8QlEmRiRoyYvb/mqVj0b6+DegfW/uRRTKDbZn50EmMYLlmTbgdL7YiaUqIktR7RWlfcF
- KKk97WI585BpW3Z3Y4gwWYwSNxv55r5Y9Q4KQtPTk6bRGh1kGPc4aFHjDEotQLBKHus81BEu6
- DLqlb/7xcQhO3d6JtNWIU58pRp57pxV0e7q6jc5z3YDv88ntLVzq+OjtP/x1Q0Uu+dqantKRZ
- fCdGj0a3cJnUydwyMxwYpiJtW1B6bZh6DqU9F09JQy4NnZ6KTHaKFagsz81vDzBgA1q4nFckx
- pGb45zbQmothEz6I0uWlWHz5TzIkblu+dU+O88VR87xVQJVqzcT52qq4HQO9hN40Mqqbzziub
- 6RmIaMrdlgOSAkMEObg5asWlWRDcxqfzba9cAamhId8yzPj5kuZvBDkjciHLQpeC871roMN1R
- o4/08a9AO5JMrsF1ZSqCunPh9zo6VB086KOfDycTRxcq1Sfv1bIa/3OPiTRyDrpm7D9vWhZ0T
- xxBY+1VosXg/80QOlx0CeXSnMZVO4NNvN3zybx0gqFgIM7iARpeAtwCfOmiN0aiQjmIRA/tly
- ug6gpIpQf233iSvH8GplBLNhyXKHm7uRRScADsZ3Nr42lLJ4Ma8ERxQWzfjp42sgQWROQ6BBt
- N2ditJ6kP2yUymFanKrPpyUzZAfrGVEaJvScYxqvOve/Ea8VqKIHVNkJOoAbeh8yRIQv5TtuW
- r6BQ1LZcCr7IvqWAedFOAGdk+QxtrScRdrAvI/7Scu3k+1HsLhZkDtf08tfWPj1k+KXxkMApM
- 1ZAvL3tXksPvnJ6Nldeq8Xl7GajfQmChzackueQggzGkYu9xbSnWX1He4x0TsO3pGPFMSKWmA
- O+N2sXlNMCDs6JTTc2ZtkR7N0c1BvaYTv3ZwSx1N3DHFkMrlR5UZxA715Y/Mgj7xwHoOf+DSF
- Up3EUxI3cbp10CWj2PEzkvRqDPpv1do6QrE/q9KifCHA9j3ZPaQlMFmTLVI3XDuAn2MFJe//y
- a3px2KHkSp/X7PUsxB8Wf+NhVn84x1TofjBGXS6KQDIR9ucorIkwqi9Jw0GopMUmae3k25rk7
- hAbAmLJEVyqiGt+Ki9j2EUHRvRQZCFoUsYbDa8vgU5Xxn9En10dDADoik2OEFffElYCSPq2CX
- t2ERHJ6JeretBS493E+/LGQIxZFK2y3ObvZnswMAdC/4ONaf6HZ/+F1oMYRl2YA+vR6oHJwcy
- I5lvbGDCyAo+CF2xVYpudSnsUpck0mBrOFFqEh6sKkMgZgvRyKQKEQDakLlOw+t1CCVDq0hXZ
- 98CAuCY6sv2/BAZESC8mlSpIndlyn/KHYIOgpFd1xgiQz8T3zRXj+6IJsk07V+OyPONuGq9UX
- 6if0R9EjXLaH35fiZyYpk+gAWxMED1ZI9kM3I1MTsvyZQMaiG5zU7qP0Oce32alqt1NJP8NsL
- urAWOeNiXoUraI0lwxoucGTYepat2OwdKk73grlA8j1qJcPIoNP9Cz35LDNWEebpzLel2Z4DB
- uN8mcqysbqzN3XT+gBiQDgLVSmYBNIXBcI14IZlO/y2Z1K/GLtYgnlXEsIBQohaI7gB02pUvQ
- MMeEPbkplCDXHQXcMvlNWodCEdIOSjKLoUoEUBY/U8KhFfI0v0iuFAPCDZJXz/yKSQ0ghUwIx
- V7toG9mE8RqVhVJYmLSTXqMFTisBAXaP74w0NsamsttDPy6HgVCMx/EXx55DDY+Y+uajt5LeI
- T2BkaHk/Ih+ML27jzW0PwbIJUKSfqZvg5W7gNC2d+U7o2eDjo3edQiTUAl7sBStHqnhEWsL/A
- JWq+F736shXqJ+nW/spz7+6w4GCiqI4jlQ9Ji/8+ac1atOJC8CQh0QAqZcl/+2ygzHwB8+JF0
- pjuewJCAFLOy6BtwfJgyr0n7R6GVFoGzVaWu8VFxzyu3mELN/cRhh8jDly76QiGtIsxRVCkJT
- bUGZniWl0heq0yts+sETEesZC73eC/o2xE7T4RBfx3+4YkH6d3h/byfnPE9fBauCsM4BiAxsl
- bEkXhh+3poGQ1ZC4YAt2I6CdCEL5L1FARtHo5PJMyx4QO/poTIsmEioV7yjvMjQ9caPoHem2x
- B6X3IYfOO06cDBAn7KQZ73cIkUbygveP8WsvVLjIb6MY5nMBYmyFJ5nHwpAsjqGiFTkXb+SNu
- z6fB2YhVRp0WwicTCivzbDp/gWX8UOkMn5LWAN3aTsHSZ8KhYHAFF9miY+jR+jVOnffcHvRDj
- 5pJndA7J37bbLkNKL/1kNx3URsMiVrU8h+5dr43MQAF8vxO8ePmxX2ZoiUXQklKEfTVxpvmKq
- fybDGRLhNpthPGNif0oPJH6r0KFIDPEodxKhMulv+TRIUgKRKmvkcY94CzMGHZ5PTF1glitA3
- go6nR/T6SJ292RoM6T4+kpNigir7G/r5Qj0iMK9Rb8odY9izTL5cpFkNn/uOquhzwcs0aMmEI
- fWl9iib9LBisjx7Yt3wzGjYl4xLTypIOHzbjKTFPZvK8/FnB9h567CkaH0AFU1bxBw2X1FIE4
- fbrM2QipSbL1XNmFdbMHFkk/9AdNKSWIlDImTiRANN+q1mXpgqkGSMJfURyNXNBKWx4bABYtg
- vFF4xhifTN/oOI9rJfmOfdrJTx+P/ZiG1A7l4m6hGddKh/x/4JTLqQ5b3lRs782miMyzIbbGN
- Y8khqeUCwP5JVhWSPXLgOEoNybyTi0LqHSHd5gN7EJ1kMoMgccsbkc76bRIgaSjCIEQNQmio4
- U0zyQvh7k1FWDYWDRW7p+YsjmFrg4wkOwYr8sHVJqynnF2Bqxmtq4gZVGTEdgnGS9NAM0tMEG
- ZzwYKPj/pMQx0QRM0fRF+Rr2Ky0ps5gdPv7ReBvGqqSIXZiTnjAU4WSPZF6gQPzOEuw5IFN7l
- Df4xvGrWAeuNg6YqCRx38d3I4q2OimFoep4hSao3/GNQIPLXZopQe0G1NBqb4FD1q6UPcPFkx
- bNFcc5be7kJDXnQvlj25EZP0ObEhRlPfUnK57PPVkgIy9Oq6ANQaiBPty1OGduoblHhm0OlMH
- sd3dSLFaWvx9LP1NZYJyodx5naE2dGPDAs3ZdM0FwmaI1vE4Hx7+rSv4/sPc6WyPH7csFPgRi
- 2ARJtwe0D/uIfzH8IKwuvxEh0zpAI4zp2v2Lv3vwL+Q4VtizaoNyVj+wZoED0vLQ9KtlgQG2b
- luR9kiSKlt64Nsm8MWK8+kfSgkmYlQSB/+75+S0qQL6bPNhcCW0ZWZ8nQGAjWnSYUMFT0FRiy
- nMNaQtT5eD/gZ52m9m/B+AWx4XzngnlFUEYRh7i+LgOj+2klSmsvYrKSat91XsOye7mZ4UcgE
- gzQZVC9udsJ3z4Avrvc43i2ZBfgwy+f94fHuz3flsXxG9770ZrLb7rzOomj2uuJty2kZgGPIf
- tNe+XUnA3mwA2HJAGYbkQqCcbiScZgBahCeqv+2rg1l2SLORlLncP8MwJ4bzDcyPrtUlOsFgU
- 1vyjUVlkowougjaqkL8ZiMsliSnP
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net/nfc: Fix A-B/B-A deadlock between
+ nfc_unregister_device and rfkill_fop_write
+To: Krzysztof Kozlowski <krzk@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Taehee Yoo <ap420073@gmail.com>,
+ Byungchul Park <byungchul@sk.com>, max.byungchul.park@gmail.com,
+ yeoreum.yun@arm.com, ppbuk5246@gmail.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, syzkaller@googlegroups.com
+References: <20250814173142.632749-2-ysk@kzalloc.com>
+ <e3cfdd98-6c51-479d-8d99-857316dcd64b@kernel.org>
+Content-Language: en-US
+From: Yunseong Kim <ysk@kzalloc.com>
+Organization: kzalloc
+In-Reply-To: <e3cfdd98-6c51-479d-8d99-857316dcd64b@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-The RTL8226-CG can make use of the serdes option mode feature to
-dynamically switch between SGMII and 2500base-X. From what is
-known the setup sequence is much simpler with no magic values.
+Hi Krzysztof,
 
-Convert the exiting config_init() into a helper that configures
-the PHY depending on generation 1 or 2. Call the helper from two
-separated new config_init() functions.
+Thank you for your review.
 
-Finally convert the phy_driver specs of the RTL8226-CG to make
-use of the new configuration and switch over to the extended
-read_status() function to dynamically change the interface
-according to the serdes mode.
+On 8/15/25 2:55 PM, Krzysztof Kozlowski wrote:
+> On 14/08/2025 19:31, Yunseong Kim wrote:
+>> A potential deadlock due to A-B/B-A deadlock exists between the NFC core
+>> and the RFKill subsystem, involving the NFC device lock and the
+>> rfkill_global_mutex.
+>>
+>> This issue is particularly visible on PREEMPT_RT kernels, which can
+>> report the following warning:
+> 
+> Why are not you crediting syzbot and its report?
+> 
+> there is clear INSTRUCTION in that email from Syzbot.
 
-Remark! The logic could be simpler if the serdes mode could be
-set before all other generation 2 magic values. Due to missing
-RTL8221B test hardware the mmd command order was kept.
+I wanted to clarify that this report did not originate from syzbot.
 
-Tested on Zyxel XGS1210-12.
+I found this issue by building and running syzkaller locally on my own
+Arm64 RADXA Orion6 board.
 
-Signed-off-by: Markus Stockhausen <markus.stockhausen@gmx.de>
-=2D--
- drivers/net/phy/realtek/realtek_main.c | 26 ++++++++++++++++++++------
- 1 file changed, 20 insertions(+), 6 deletions(-)
+This is reproduction series on my local syzkaller.
 
-diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/real=
-tek/realtek_main.c
-index a7541899e327..acc44de54270 100644
-=2D-- a/drivers/net/phy/realtek/realtek_main.c
-+++ b/drivers/net/phy/realtek/realtek_main.c
-@@ -1038,7 +1038,7 @@ static int rtl822x_probe(struct phy_device *phydev)
- 	return 0;
- }
-=20
--static int rtl822xb_config_init(struct phy_device *phydev)
-+static int rtl822x_set_serdes_option_mode(struct phy_device *phydev, bool=
- gen1)
- {
- 	bool has_2500, has_sgmii;
- 	u16 mode;
-@@ -1073,15 +1073,18 @@ static int rtl822xb_config_init(struct phy_device =
-*phydev)
- 	/* the following sequence with magic numbers sets up the SerDes
- 	 * option mode
- 	 */
--	ret =3D phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x75f3, 0);
--	if (ret < 0)
--		return ret;
-+
-+	if (!gen1) {
-+		ret =3D phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x75f3, 0);
-+		if (ret < 0)
-+			return ret;
-+	}
-=20
- 	ret =3D phy_modify_mmd_changed(phydev, MDIO_MMD_VEND1,
- 				     RTL822X_VND1_SERDES_OPTION,
- 				     RTL822X_VND1_SERDES_OPTION_MODE_MASK,
- 				     mode);
--	if (ret < 0)
-+	if (gen1 || ret < 0)
- 		return ret;
-=20
- 	ret =3D phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x6a04, 0x0503);
-@@ -1095,6 +1098,16 @@ static int rtl822xb_config_init(struct phy_device *=
-phydev)
- 	return phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x6f11, 0x8020);
- }
-=20
-+static int rtl822x_config_init(struct phy_device *phydev)
-+{
-+	return rtl822x_set_serdes_option_mode(phydev, true);
-+}
-+
-+static int rtl822xb_config_init(struct phy_device *phydev)
-+{
-+	return rtl822x_set_serdes_option_mode(phydev, false);
-+}
-+
- static int rtl822xb_get_rate_matching(struct phy_device *phydev,
- 				      phy_interface_t iface)
- {
-@@ -1693,7 +1706,8 @@ static struct phy_driver realtek_drvs[] =3D {
- 		.soft_reset     =3D rtl822x_c45_soft_reset,
- 		.get_features   =3D rtl822x_c45_get_features,
- 		.config_aneg    =3D rtl822x_c45_config_aneg,
--		.read_status    =3D rtl822x_c45_read_status,
-+		.config_init    =3D rtl822x_config_init,
-+		.read_status    =3D rtl822xb_c45_read_status,
- 		.suspend        =3D genphy_c45_pma_suspend,
- 		.resume         =3D rtlgen_c45_resume,
- 	}, {
-=2D-=20
-2.47.0
+WARNING in __rt_mutex_slowlock
 
+#	Log	Report	Time	Tag
+7	log	report	2025/08/14 20:01	
+6	log	report	2025/08/14 05:55	
+5	log	report	2025/08/14 02:31	
+4	log	report	2025/08/12 09:38	
+3	log	report	2025/07/30 07:09	
+2	log	report	2025/07/27 23:29	
+1	log	report	2025/07/26 04:18	
+0	log	report	2025/07/26 04:17
+
+The reason this is coming from syzbot recently is that I worked with Sebastian,
+the RT maintainer, to fix KCOV to be PREEMPT_RT-aware. This was merged recently:
+Link: https://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb.git/commit/?h=usb-linus&id=9528d32873b38281ae105f2f5799e79ae9d086c2
+
+So, syszbot now report it:
+https://syzkaller.appspot.com/bug?extid=535bbe83dfc3ae8d4be3
+
+>> | rtmutex deadlock detected
+>> | WARNING: CPU: 0 PID: 22729 at kernel/locking/rtmutex.c:1674 rt_mutex_handle_deadlock+0x68/0xec kernel/locking/rtmutex.c:-1
+>> | Modules linked in:
+>> | CPU: 0 UID: 0 PID: 22729 Comm: syz.7.2187 Kdump: loaded Not tainted 6.17.0-rc1-00001-g1149a5db27c8-dirty #55 PREEMPT_RT
+>> | Hardware name: QEMU KVM Virtual Machine, BIOS 2025.02-8ubuntu1 06/11/2025
+
+As you might notice from the logs (e.g., "BIOS 2025.02-8ubuntu1"),
+the environment is Ubuntu image on my machine, which, syzbot does not use.
+
+>> | pstate: 63400005 (nZCv daif +PAN -UAO +TCO +DIT -SSBS BTYPE=--)
+>> | pc : rt_mutex_handle_deadlock+0x68/0xec kernel/locking/rtmutex.c:-1
+>> | lr : rt_mutex_handle_deadlock+0x40/0xec kernel/locking/rtmutex.c:1674
+>> | sp : ffff8000967c7720
+>> | x29: ffff8000967c7720 x28: 1fffe0001946d182 x27: dfff800000000000
+>> | x26: 0000000000000001 x25: 0000000000000003 x24: 1fffe0001946d00b
+>> | x23: 1fffe0001946d182 x22: ffff80008aec8940 x21: dfff800000000000
+>> | x20: ffff0000ca368058 x19: ffff0000ca368c10 x18: ffff80008af6b6e0
+>> | x17: 1fffe000590b8088 x16: ffff80008046cc08 x15: 0000000000000001
+>> | x14: 1fffe000590ba990 x13: 0000000000000000 x12: 0000000000000000
+>> | x11: ffff6000590ba991 x10: 0000000000000002 x9 : 0fe446e029bcfe00
+>> | x8 : 0000000000000000 x7 : 0000000000000000 x6 : 000000000000003f
+>> | x5 : 0000000000000001 x4 : 0000000000001000 x3 : ffff800080503efc
+>> | x2 : 0000000000000001 x1 : 0000000000000001 x0 : 0000000000000001
+> 
+> This all is irrelevant, really. Trim the log.
+
+My apologies if the formatting and the log length were not appropriate. I
+will trim the log significantly and review the subsystem's git history to
+ensure the commit message format aligns with the expected style for
+the next version.
+
+>> | Call trace:
+>> |  rt_mutex_handle_deadlock+0x68/0xec kernel/locking/rtmutex.c:-1 (P)
+>> |  __rt_mutex_slowlock+0x1cc/0x480 kernel/locking/rtmutex.c:1734
+>> |  __rt_mutex_slowlock_locked kernel/locking/rtmutex.c:1760 [inline]
+>> |  rt_mutex_slowlock+0x140/0x21c kernel/locking/rtmutex.c:1800
+> Best regards,
+> Krzysztof
+
+I’ve added the syzkaller mailing list to Cc.
+
+Thank you!
+
+Yunseong Kim
 
