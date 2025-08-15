@@ -1,113 +1,74 @@
-Return-Path: <netdev+bounces-214086-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214085-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57E63B2831B
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 17:42:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CD11B28305
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 17:36:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C4491C86A39
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 15:42:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 195DFAE8500
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 15:36:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E04B0306D58;
-	Fri, 15 Aug 2025 15:41:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33E31302CB7;
+	Fri, 15 Aug 2025 15:35:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uIPcYaWT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EdjEynv8"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 194EA306D51
-	for <netdev@vger.kernel.org>; Fri, 15 Aug 2025 15:41:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 098A230277B;
+	Fri, 15 Aug 2025 15:35:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755272511; cv=none; b=o3BEzpR7fEd6Kc+W5BaKi/wIlfPH3WdumNdeayY7Ff+EwUdpv7YHf8I+TQumnjByxoHyK1yQTVuJg2FM9Ej8QY7TmZ5QRcmBcK2FjOtiKjoNtliuH72C8+Vscv6f5hVLJt8UfB8tdAnti48EIs0yY9Yd4UiSlk9+E4RyqSdbfhU=
+	t=1755272157; cv=none; b=CI1715yQUtwH4nKwuiE4HVRh6wb7YtLv8L1JjXRdKdt9eAr1OGtwqMQpzABmiriIuPNznisVLlYzZ9XbLR+mhDWYpGp3s+Ty15A+nuUNDC+vz+EtRRY/C0yQgYgXQG+jPW+5TPFSaMvEZIRTwvgDSYtw9ZTr+ZDElia1XtKXyZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755272511; c=relaxed/simple;
-	bh=kWIeKW/3+LZqeCGlBxC1tJztJxOj/OGJgM+qI//Vx9I=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=c3jLHdimmnSlz6p/1OL1M15xfRS6W0BlBUeOyiFnYWS1h4+LS4GavGqPyWegZ8mha+G3oU4f/yvBXRh2pFuyTfzdoDd5pp/5zV4/9gHxRh2RhcvciUJHUyaJSgVp+aj5sV4zh/jPp01P9jz4qhk3To3yPuKiEykz7UixSbQ8TqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uIPcYaWT; arc=none smtp.client-ip=95.215.58.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1755272498;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=XoTQC/MqUTM2TQEXO9Dy4N6Bkcqbv/50Gl4TO7GZo+k=;
-	b=uIPcYaWTHp3Ue8B4JNxoYifSJQXbTMFYo9VBbbhuUTSstk5ZvuJdzCAtUuFfOurlsrUn3c
-	+K51SfEV+p6egayGXTyYZc6XuCNDDCg7z2eA4M3TrXfYExajEDUOl/nPNByW2irNW20+Ks
-	+xwwM/CUWKRjRbiQ5cAqOTW74MUjhDc=
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Peter Seiderer <ps.report@gmx.net>,
-	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-Cc: Thorsten Blum <thorsten.blum@linux.dev>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2] net: pktgen: Use min()/min_t() to improve pktgen_finalize_skb()
-Date: Fri, 15 Aug 2025 17:33:33 +0200
-Message-ID: <20250815153334.295431-3-thorsten.blum@linux.dev>
+	s=arc-20240116; t=1755272157; c=relaxed/simple;
+	bh=FlF2US4rsEJYg2ZBuZxi12UiGfIbY4thhuVo0jjaL/Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CuT+7yTR+hnLrXJlyoavlCAUMUsBWAuPFTYwKzDEIphDSktTD3NmrzTixMq7KtUGAM36Bji77wE31itX1/rhdX49CjSIRO0hgHytBZOiKH8/bTNW/H6CM0hQ74wgvTrXnk6L1eMWX/8fZy22uuXMF4e7rJtD3PXtv44LcqOV5jc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EdjEynv8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64719C4CEF4;
+	Fri, 15 Aug 2025 15:35:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755272156;
+	bh=FlF2US4rsEJYg2ZBuZxi12UiGfIbY4thhuVo0jjaL/Q=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=EdjEynv8LLvUi9xFftCeCIkzln4bNUIOGp3TTOFiYRL6gBrRvfZjsTRpW4pTb+TNJ
+	 xkT28sCnCGpxUfP930MJUZqnH7t+ZVQkVl5McU+i1Gzjp2scwlmF7sHDeg/eqnbs5t
+	 aJ1A6K9utjphZ0xZlhccmmEo7k0t7CAjPUSJfDz9wR2BqD+LyiZuWi6pI8j9tG/JdL
+	 i+DHOVc44yz+U5Olu0DY+UIhAvheD1SHErjPpM7NyTijUBiNtvhIKr15w9qm32q11/
+	 kUQdhVg8scX8hM3vUM2tsA9SCsxeDiF4qV8lA5r0wjX7IA4OB2EAF8MK2IU8nkIlvP
+	 REG8Zby0aXvXg==
+Date: Fri, 15 Aug 2025 08:35:55 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Simon Schippers <simon.schippers@tu-dortmund.de>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Stephen Hemminger
+ <stephen@networkplumber.org>, <jasowang@redhat.com>,
+ <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Tim Gebauer
+ <tim.gebauer@tu-dortmund.de>
+Subject: Re: [PATCH net v2] TUN/TAP: Improving throughput and latency by
+ avoiding SKB drops
+Message-ID: <20250815083555.0bc82c09@kernel.org>
+In-Reply-To: <f16b67e6-8279-4e52-82ca-f2ea68753f70@tu-dortmund.de>
+References: <20250811220430.14063-1-simon.schippers@tu-dortmund.de>
+	<20250813080128.5c024489@hermes.local>
+	<4fca87fe-f56a-419d-84ba-6897ee9f48f5@tu-dortmund.de>
+	<689dfc02cf665_18aa6c29427@willemb.c.googlers.com.notmuch>
+	<f16b67e6-8279-4e52-82ca-f2ea68753f70@tu-dortmund.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Use min() and min_t() to improve pktgen_finalize_skb() and avoid
-calculating 'datalen / frags' twice.
+On Thu, 14 Aug 2025 18:23:56 +0200 Simon Schippers wrote:
+> Important note: The information included in this e-mail is confidential. 
 
-Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
----
-Changes in v2:
-- Use min_t(int,,) to prevent a signedness error
-- Link to v1: https://lore.kernel.org/lkml/20250814172242.231633-2-thorsten.blum@linux.dev/
----
- net/core/pktgen.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
-
-diff --git a/net/core/pktgen.c b/net/core/pktgen.c
-index 0ebe5461d4d9..d41b03fd1f63 100644
---- a/net/core/pktgen.c
-+++ b/net/core/pktgen.c
-@@ -114,6 +114,7 @@
- 
- #include <linux/sys.h>
- #include <linux/types.h>
-+#include <linux/minmax.h>
- #include <linux/module.h>
- #include <linux/moduleparam.h>
- #include <linux/kernel.h>
-@@ -2841,8 +2842,7 @@ static void pktgen_finalize_skb(struct pktgen_dev *pkt_dev, struct sk_buff *skb,
- 		}
- 
- 		i = 0;
--		frag_len = (datalen/frags) < PAGE_SIZE ?
--			   (datalen/frags) : PAGE_SIZE;
-+		frag_len = min_t(int, datalen / frags, PAGE_SIZE);
- 		while (datalen > 0) {
- 			if (unlikely(!pkt_dev->page)) {
- 				int node = numa_node_id();
-@@ -2859,8 +2859,7 @@ static void pktgen_finalize_skb(struct pktgen_dev *pkt_dev, struct sk_buff *skb,
- 			if (i == (frags - 1))
- 				skb_frag_fill_page_desc(&skb_shinfo(skb)->frags[i],
- 							pkt_dev->page, 0,
--							(datalen < PAGE_SIZE ?
--							 datalen : PAGE_SIZE));
-+							min(datalen, PAGE_SIZE));
- 			else
- 				skb_frag_fill_page_desc(&skb_shinfo(skb)->frags[i],
- 							pkt_dev->page, 0, frag_len);
--- 
-2.50.1
-
+You really need to try to get rid of this footer if you want to talk
+to an open source community.
 
