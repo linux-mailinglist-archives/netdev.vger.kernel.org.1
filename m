@@ -1,142 +1,138 @@
-Return-Path: <netdev+bounces-214178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214179-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A41DB286DD
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 22:04:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2937B286FB
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 22:14:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A770E1CC487A
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 20:04:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 51E7216E818
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 20:14:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E0F629B8C7;
-	Fri, 15 Aug 2025 20:04:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB85829B8C7;
+	Fri, 15 Aug 2025 20:14:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IJb3AlOk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ArIU8Aly"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAE2426F44D;
-	Fri, 15 Aug 2025 20:04:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE4D81A9F9D;
+	Fri, 15 Aug 2025 20:14:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755288248; cv=none; b=MT83VmRL7YJxNT53B//zls0RTev9YM+oSdUDMjHUFBE4sVQmIahjNZgoSq2yv602dYWnRYcZGr5fHwoICFf/qfA1AkYAA8F5qoIOb4dPbdgCKQ+zKrmyk6DO5BNsZ4HYhXLjkuvKih63pKum5B9YatAPgqCuxen7Fa9dQ2glcnc=
+	t=1755288851; cv=none; b=PLzb6hvXGCfkMU23OtZiozmcPbkYjHWh6l6wlAC+1YZvbcMouRvt4BHAV3p+gFexM3Y5EFAsKWqP6XwAo0/IAo1gBkm++7vJePGnQFu9wCIC2ASzIpXd5sq5f+bz0EqvE5Xz48NjbTr/WK69dc6DJLZj2aunl5YTvgPgaRXMx18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755288248; c=relaxed/simple;
-	bh=KdoNFM0JyALmDBeXeK9bjvyngTHO5qk2sJ3MRHhIr5Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e2KGvfEMNCBSwPhrQCwwdNKXDJ2LXzrjXSd/0il+YdWce6JrxYc4xM8tWNUlFL8IGUIwk+mPxPOV+tKEVXmR0ZRChBI2KRtpwberGPuAvR+I5D8X7m5Ha624454FaATMNvUdHqNlz6Uc+46G47GWrHi4+JufSFoea6/H3uVv+UQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IJb3AlOk; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1755288247; x=1786824247;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=KdoNFM0JyALmDBeXeK9bjvyngTHO5qk2sJ3MRHhIr5Y=;
-  b=IJb3AlOkwuwTKo2lScWfnVce0Lqy6O0lB2Cr+LTB74a86UVpLM27/C0o
-   stH6XifF8Ezm2BreCe5VF4z0pP3h4vBbScP6QOrDb+YW4Ykg0zd0TwhGV
-   IkP6ZbdkdTPWS6IAyqlO4RGSXGqvnGXCoa+FKn2xyjaNl+8F6pQeYdwjM
-   Xay4SXTjdriMdwl+/wRIQzO3wbYSf3vz8qd3BcY4Az0D8vYP4FHrlW5nS
-   b6pa/7O4EHkWW6l1TuIA31mS0oel9Xois5NynKc+XXdhZCwKY8I+2sD8A
-   Cotzu+2FIjnBLRL2A6uwTreYJV4XOstgxTZZlYVmTAGfnWxZ33ob3M6fP
-   g==;
-X-CSE-ConnectionGUID: 4lWAmQuqTHK/B2aGtTZcaA==
-X-CSE-MsgGUID: lthB33xtSbyt5pYTu4gsiw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11523"; a="57716990"
-X-IronPort-AV: E=Sophos;i="6.17,293,1747724400"; 
-   d="scan'208";a="57716990"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Aug 2025 13:04:06 -0700
-X-CSE-ConnectionGUID: p62lv+19RGmetwWyYZhq1A==
-X-CSE-MsgGUID: ipz8qSBhSIme0DYb3mWaXQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,293,1747724400"; 
-   d="scan'208";a="167048938"
-Received: from lkp-server02.sh.intel.com (HELO 4ea60e6ab079) ([10.239.97.151])
-  by orviesa007.jf.intel.com with ESMTP; 15 Aug 2025 13:04:02 -0700
-Received: from kbuild by 4ea60e6ab079 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1un0eZ-000CIy-2g;
-	Fri, 15 Aug 2025 20:03:57 +0000
-Date: Sat, 16 Aug 2025 04:03:19 +0800
-From: kernel test robot <lkp@intel.com>
-To: alistair23@gmail.com, chuck.lever@oracle.com, hare@kernel.org,
-	kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-nfs@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, kbusch@kernel.org,
-	axboe@kernel.dk, hch@lst.de, sagi@grimberg.me, kch@nvidia.com,
-	alistair23@gmail.com, Alistair Francis <alistair.francis@wdc.com>
-Subject: Re: [PATCH 2/8] net/handshake: Make handshake_req_cancel public
-Message-ID: <202508160354.iNoLUr4h-lkp@intel.com>
-References: <20250815050210.1518439-3-alistair.francis@wdc.com>
+	s=arc-20240116; t=1755288851; c=relaxed/simple;
+	bh=OVuyTG5nhwMFG0/VcvCQJLlP8ZSEufOwxgfWizbedKs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GLDVhtLXsL+vset3x5EczSaNc+v/JGCALtBleQOkcB9wxq08DrZWQN/1BP9uF4Zdg33ptnZdx5csj9enCd2IlJq/HfLLBFTtnuyjBssAVdD2sWE9RSSnQbPlq5FuiPuZtKHjEAKok3n7G2OJZK0yBkIyAci85HA7JX873qum/Zw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ArIU8Aly; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-afcb78d5dcbso330894966b.1;
+        Fri, 15 Aug 2025 13:14:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755288848; x=1755893648; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=COhSb7HrWWdD2eumi5rQzVn0swC6LORO2wNxh+3c4p4=;
+        b=ArIU8AlyDKsx8zmTMmcNkjD5PvCxGF8qwz1bgHh38OfiEO1BYbsQ3Xm6UOa6r52s4E
+         WVJR7DhsPPVA8S0NTaoCwTdYCI1050rsB4iUwuXSZyfPD84kdqKm7rOkaK0l50+i+VYc
+         x3J9wo1+fGBw/OkWRR3L8ciUHci/jj6mZTcjVtwA/yIMqAtXvYf4WvIuXnezAIgi3Tre
+         wbwJQXQmCXc41Um4cW5KrU4q42UK6qTHV+g+7fAG7T3fmGaPA04d3nH/Ye3vI2kZuqSv
+         yR9vFHamNvY7Ksi91AJLF0Dnbji1JVdiMsM+wdxRiFp50jWV99ODFjqG01OdHPOMdgEE
+         +IOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755288848; x=1755893648;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=COhSb7HrWWdD2eumi5rQzVn0swC6LORO2wNxh+3c4p4=;
+        b=vkGVMRPbEr82nnCjhju88peGK22XEHjJR7FxPhClWE2hkZ0dY+u0BZZcw2B94KOJXx
+         ERTmHyACHD5XhKPC70iAdVGHJ9UN0MU+Bvys6MML4q1fTHYoVWt0WKWojHd8Bkp583Z+
+         L0fzazN85L/W4scJK9XgU2v35VD5JzsG2Wb8zTAbv2q/kDBGfh/7fUYj7ogifkG1ERka
+         en0hBFfT88hfuPeeyF1tDTYHH1aHPfgGnobzoCjCo+SK19wPSyg9zZrQIe2SEDpbrCjO
+         +FHpUkoQpWLC2HDU7vukf23EOls1t25VKuBp40wdXMnRkMNl3ZdCcMi1LOaT7FNEGc9S
+         Qc1Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWBFLVonyk8IF8D8uTrGV/KZqRJYzo4sueRxvKJ4pBNF61pXYogxhDkFO1FvJOPfH5oDo4hspVe@vger.kernel.org, AJvYcCWsKx7mb0xbFylgT5y7G5LFNSK4dFGhJo8h7i4nVFi+ZjhwT7BJRVlWV/VsZKPkAwl77vu55Z+xtxX01YE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzZ8dKAyp0WXBlEgkupuL1D+ZRO4Vax1A/o4uHNlbIFj4OknDd3
+	INu4GoLDndLpUtzxAH+nKkUnV26i2ra1hgvNIqzjbFolsp5ttswmsWeK
+X-Gm-Gg: ASbGncvpUvh2Lf2KmjC5O/uB6scTWLULhJScK83dEIY5xKmhdEbNHPqT+15P9r6Ra9U
+	tLGXuQ36PyyET7EjAQZU9/7iJhu5V/P/10JQFe0F7CfYrkSrChIjetfxuSFHc6B3yEFWk3JQ6pL
+	6eXH4QhRyifp/0dqEVzDTH7EpOEdsvfpWnBo/7qlf2ERazX6WiwQxTPGVKdj36ndqZ99ePBMblD
+	poDwEn4w5FQJ9dK/KxHNHMzi1RRkpZwUBMJ6ZrQp1HnNwf7kGx7uIrWxwRNYKAE+rRCo95EnXWJ
+	zL3xGQzCwRB6ESv2c68vmPgXro4CH/awa3H4706GLG9sCqKIcChtUzpc2QZuFetcBQZQMAqe48U
+	mN+p1KG+hWLjIBP8VlN8zcLtGcl/+teqA
+X-Google-Smtp-Source: AGHT+IGhaqijyQFoFzM8w64aYLTtJpGY+cHcW4Cpo+Dh+QYVANebZy8fOXOSzUZWqeSyiZ4t4U8Z5g==
+X-Received: by 2002:a17:907:60d6:b0:ae3:4f99:a5aa with SMTP id a640c23a62f3a-afcdc206232mr313713966b.4.1755288847938;
+        Fri, 15 Aug 2025 13:14:07 -0700 (PDT)
+Received: from [192.168.8.100] ([148.252.132.122])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-afcdcfcb2d1sm207666766b.62.2025.08.15.13.14.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 15 Aug 2025 13:14:07 -0700 (PDT)
+Message-ID: <ac041a47-98b1-4fac-86d7-487421b939e9@gmail.com>
+Date: Fri, 15 Aug 2025 21:15:24 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250815050210.1518439-3-alistair.francis@wdc.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC v2 00/24] Per queue configs and large rx buffer support for
+ zcrx
+To: Dragos Tatulea <dtatulea@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
+ netdev@vger.kernel.org
+Cc: Eric Dumazet <edumazet@google.com>, Willem de Bruijn
+ <willemb@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ andrew+netdev@lunn.ch, horms@kernel.org, davem@davemloft.net,
+ sdf@fomichev.me, almasrymina@google.com, dw@davidwei.uk,
+ michael.chan@broadcom.com, ap420073@gmail.com, linux-kernel@vger.kernel.org
+References: <cover.1754657711.git.asml.silence@gmail.com>
+ <ul2vfq7upoqwoyop7mhznjmsjau7e4ei2t643gx7t7egoez3vn@lhnf5h2dpeb5>
+ <dbd3784b-2704-4628-9e48-43b17b4980b1@gmail.com>
+ <rekaw6n6fsfkh46tbkyms47wjf7cdllwsihpsvp46bcrhxsxp4@ytymllzp72u6>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <rekaw6n6fsfkh46tbkyms47wjf7cdllwsihpsvp46bcrhxsxp4@ytymllzp72u6>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi,
+On 8/15/25 17:44, Dragos Tatulea wrote:
+> On Thu, Aug 14, 2025 at 11:46:35AM +0100, Pavel Begunkov wrote:
+...>> "-A1" here is for using huge pages, so don't forget to configure
+>> /proc/sys/vm/nr_hugepages.
+>>
+>> # client
+>> examples/send-zerocopy -6 tcp -D <ip addr> -p <port>
+>>                         -t <runtime secs>
+>>                         -l -b1 -n1 -z1 -d -s<send size>
+>>
+> Thanks a lot for the branch and the instructions Pavel! I am playing
+> with them now and seeing some preliminary good results. Will post
+> them once we share the patches.
 
-kernel test robot noticed the following build warnings:
+Sounds good
 
-[auto build test WARNING on trondmy-nfs/linux-next]
-[also build test WARNING on net/main net-next/main linus/master linux-nvme/for-next v6.17-rc1 next-20250815]
-[cannot apply to horms-ipvs/master]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+>> I had to play with the client a bit for it to keep up with
+>> the server. "-l" enables huge pages, and had to bump up the
+>> send size. You can also add -v to both for a basic payload
+>> verification.
+>>
+> I see what you mean. I also had to make the rx memory larger once
 
-url:    https://github.com/intel-lab-lkp/linux/commits/alistair23-gmail-com/net-handshake-Store-the-key-serial-number-on-completion/20250815-130804
-base:   git://git.linux-nfs.org/projects/trondmy/linux-nfs.git linux-next
-patch link:    https://lore.kernel.org/r/20250815050210.1518439-3-alistair.francis%40wdc.com
-patch subject: [PATCH 2/8] net/handshake: Make handshake_req_cancel public
-config: arm-mps2_defconfig (https://download.01.org/0day-ci/archive/20250816/202508160354.iNoLUr4h-lkp@intel.com/config)
-compiler: clang version 22.0.0git (https://github.com/llvm/llvm-project 93d24b6b7b148c47a2fa228a4ef31524fa1d9f3f)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250816/202508160354.iNoLUr4h-lkp@intel.com/reproduce)
+Forgot to mention that the tool doesn't consider CPU affinities,
+so I had to configure task and irq affinities by hand.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202508160354.iNoLUr4h-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> net/handshake/request.c:312:6: warning: no previous prototype for function 'handshake_req_cancel' [-Wmissing-prototypes]
-     312 | bool handshake_req_cancel(struct sock *sk)
-         |      ^
-   net/handshake/request.c:312:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
-     312 | bool handshake_req_cancel(struct sock *sk)
-         | ^
-         | static 
-   1 warning generated.
-
-
-vim +/handshake_req_cancel +312 net/handshake/request.c
-
-3b3009ea8abb71 Chuck Lever 2023-04-17  300  
-3b3009ea8abb71 Chuck Lever 2023-04-17  301  /**
-3b3009ea8abb71 Chuck Lever 2023-04-17  302   * handshake_req_cancel - Cancel an in-progress handshake
-3b3009ea8abb71 Chuck Lever 2023-04-17  303   * @sk: socket on which there is an ongoing handshake
-3b3009ea8abb71 Chuck Lever 2023-04-17  304   *
-3b3009ea8abb71 Chuck Lever 2023-04-17  305   * Request cancellation races with request completion. To determine
-3b3009ea8abb71 Chuck Lever 2023-04-17  306   * who won, callers examine the return value from this function.
-3b3009ea8abb71 Chuck Lever 2023-04-17  307   *
-3b3009ea8abb71 Chuck Lever 2023-04-17  308   * Return values:
-3b3009ea8abb71 Chuck Lever 2023-04-17  309   *   %true - Uncompleted handshake request was canceled
-3b3009ea8abb71 Chuck Lever 2023-04-17  310   *   %false - Handshake request already completed or not found
-3b3009ea8abb71 Chuck Lever 2023-04-17  311   */
-3b3009ea8abb71 Chuck Lever 2023-04-17 @312  bool handshake_req_cancel(struct sock *sk)
+> rx-buf-len >= 32K. Otherwise the traffic was hanging after a second or
+> so. This is probably related to the currently known issue where if a
+> page_pool is too small due to incorrect sizing of the buffer, mlx5 hangs
+> on first refill. That still needs fixing.
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Pavel Begunkov
+
 
