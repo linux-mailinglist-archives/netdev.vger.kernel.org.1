@@ -1,197 +1,83 @@
-Return-Path: <netdev+bounces-214218-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214219-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F3D6B288AB
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 01:15:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B3F9B288AC
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 01:15:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EBDCEAA246D
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 23:15:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F33DE5C038E
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 23:15:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCB2B2D1929;
-	Fri, 15 Aug 2025 23:15:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98B812D028F;
+	Fri, 15 Aug 2025 23:15:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dtnhH5xv"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="vlDwZpHx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B269C24111D;
-	Fri, 15 Aug 2025 23:15:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCE4726B77B
+	for <netdev@vger.kernel.org>; Fri, 15 Aug 2025 23:15:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755299719; cv=none; b=u1RQkTmJwKRJwYB8dft26AX+6TYmN9Ym0KdyfT14azxZTvB3rKWgtf3XmZQ1XAshBKa6phM1zI85n0h9m0UvZXd5PGi8wkRwERuJlDXBOBkGE4LDaK9s09wO2Fzwq0XYy39VfUKuUR3xCFcDHichvXjmFtiqNby+hzKUonjE3U8=
+	t=1755299734; cv=none; b=eS6LlXJB1ZHENNRvFFk6l2GmV8yqsN7FClp210/K/Op1jeFUrmqq10goiw+If+/hezQ5jODnIqIvuNgLI/AhnS7+TbIg9qpt91pUTomskFEiQG3K/6oKVDZ8plktkg3LDiHkrhT15nnyQdnVzU3PGKtNytS9qz4Fb5OPrRZgyCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755299719; c=relaxed/simple;
-	bh=hPX8Rw2XYN37yKZbsN7yXqiMNoy09Tv+WYuJAcD6nII=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CGpZxAFCemCxlf1hUWKc4NmCFWwIA5PENlyQzYFpuAEflRn2xYnzAkcQFWqUubJvqknplmzmDQK89FkXbHiegjEfbZCjes7qjFoA1KI3kq/LhEkvWjWV8iUtj2Z4gMBq1gNNnyoxufE6J1nphdsydqWfwnX4Xm/3e6GYWMWAkAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dtnhH5xv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE2EAC4CEEB;
-	Fri, 15 Aug 2025 23:15:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755299718;
-	bh=hPX8Rw2XYN37yKZbsN7yXqiMNoy09Tv+WYuJAcD6nII=;
-	h=From:To:Cc:Subject:Date:From;
-	b=dtnhH5xvHX8H8IodstPBQ08aVqaAqh0yShDzWQQlxZ9Wlsnqi3c5gP9A3tTIcUnQH
-	 8MEAI51T62zjfK4gRiuMtJ60Qw7Dgk+OfPD4ZT+NJ2dsjMray8SB1NbCyiX1432OzX
-	 Ayjx+yQ3I3ScKnYKbV9zHwy7uFWfD9FuFzE3Vf81OAmtrrmbUUthdBKzaSxueOdJRp
-	 /HGZb1+JqpdTcEkCsyXu1FK4w8DrKc5XsWdEru49qluaIL61w5wDTqL7D66MFCFqxZ
-	 QwGYjVtEoICijnEALToEcKRl0Gu4D1OcqPtSd/l7majGYCLeCFY7Gv7IbWldk5r8N0
-	 Pu4wj8aWkAEDA==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	shuah@kernel.org,
-	almasrymina@google.com,
-	sdf@fomichev.me,
-	joe@dama.to,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next] selftests: drv-net: ncdevmem: make configure_channels() support combined channels
-Date: Fri, 15 Aug 2025 16:15:13 -0700
-Message-ID: <20250815231513.381652-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1755299734; c=relaxed/simple;
+	bh=EVbCdF80LblIZxZvOuIseOifIl6jqmOAoPSgrYZhD+Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CdKYVDdseAyOXiUNMe75DzVKKXmIw6WtsoF0SX3Eb85eSmsr4bV8yAfbZZ5T0QKQXlzOGDW9gucbZ+idkZUlwG8UnTt5tb4j5VCbK0WiUEmkIp9wuGCR1PYvADatq66KEo4aFZAXkrfYpiXNgBiZUqGRwTOaSpTS+1W7lUDRitM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=vlDwZpHx; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=iHRCT/2zIklqVKvAzFFnIX5IPGUnVVxm0k+0MF0HW1c=; b=vlDwZpHxWdT4k2wlZ5CarV3BQc
+	IJVV2Ghki1kWZLGrviAsrSJ77Ek/14U8o4uYFoOZMrDDKfTcKWCkajgEiJNb/6OXrov9GAh+Scg60
+	MjGWWv6fbGQQHDaBDYrN0msac29a9nE8EcsGAGCh+Fu9BnsvHkvu1ttWokyczZhq25Cw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1un3dt-004s2n-8S; Sat, 16 Aug 2025 01:15:25 +0200
+Date: Sat, 16 Aug 2025 01:15:25 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 3/4] net: dsa: ks8995: Delete sysfs register
+ access
+Message-ID: <d109e10e-6f61-40ca-8269-648aba33f8bd@lunn.ch>
+References: <20250813-ks8995-to-dsa-v1-0-75c359ede3a5@linaro.org>
+ <20250813-ks8995-to-dsa-v1-3-75c359ede3a5@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250813-ks8995-to-dsa-v1-3-75c359ede3a5@linaro.org>
 
-ncdevmem tests that the kernel correctly rejects attempts
-to deactivate queues with MPs bound.
+On Wed, Aug 13, 2025 at 11:43:05PM +0200, Linus Walleij wrote:
+> There is some sysfs file to read and write registers randomly
+> in the ks8995 driver.
 
-Make the configure_channels() test support combined channels.
-Currently it tries to set the queue counts to rx N tx N-1,
-which only makes sense for devices which have IRQs per ring
-type. Most modern devices used combined IRQs/channels with
-both Rx and Tx queues. Since the math is total Rx == combined+Rx
-setting Rx when combined is non-zero will be increasing the total
-queue count, not decreasing as the test intends.
+I _think_ there is some userspace code to drive the switch. Its not
+what we want, but since nobody has been interested in this device, we
+have not touched it. Technically, this is an ABI change, put i suspect
+nobody will care.
 
-Note that the test would previously also try to set the Tx
-ring count to Rx - 1, for some reason. Which would be 0
-if the device has only 2 queues configured.
+> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 
-With this change (device with 2 queues):
-  setting channel count rx:1 tx:1
-  YNL set channels: Kernel error: 'requested channel counts are too low for existing memory provider setting (2)'
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: shuah@kernel.org
-CC: almasrymina@google.com
-CC: sdf@fomichev.me
-CC: joe@dama.to
-CC: linux-kselftest@vger.kernel.org
----
- .../selftests/drivers/net/hw/ncdevmem.c       | 78 ++++++++++++++++++-
- 1 file changed, 76 insertions(+), 2 deletions(-)
-
-diff --git a/tools/testing/selftests/drivers/net/hw/ncdevmem.c b/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-index be937542b4c0..71961a7688e6 100644
---- a/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-+++ b/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-@@ -356,7 +356,81 @@ static int configure_rss(void)
- 
- static int configure_channels(unsigned int rx, unsigned int tx)
- {
--	return run_command("ethtool -L %s rx %u tx %u", ifname, rx, tx);
-+	struct ethtool_channels_get_req *gchan;
-+	struct ethtool_channels_set_req *schan;
-+	struct ethtool_channels_get_rsp *chan;
-+	struct ynl_error yerr;
-+	struct ynl_sock *ys;
-+	int ret;
-+
-+	fprintf(stderr, "setting channel count rx:%u tx:%u\n", rx, tx);
-+
-+	ys = ynl_sock_create(&ynl_ethtool_family, &yerr);
-+	if (!ys) {
-+		fprintf(stderr, "YNL: %s\n", yerr.msg);
-+		return -1;
-+	}
-+
-+	gchan = ethtool_channels_get_req_alloc();
-+	if (!gchan) {
-+		ret = -1;
-+		goto exit_close_sock;
-+	}
-+
-+	ethtool_channels_get_req_set_header_dev_index(gchan, ifindex);
-+	chan = ethtool_channels_get(ys, gchan);
-+	ethtool_channels_get_req_free(gchan);
-+	if (!chan) {
-+		fprintf(stderr, "YNL get channels: %s\n", ys->err.msg);
-+		ret = -1;
-+		goto exit_close_sock;
-+	}
-+
-+	schan =	ethtool_channels_set_req_alloc();
-+	if (!schan) {
-+		ret = -1;
-+		goto exit_free_chan;
-+	}
-+
-+	ethtool_channels_set_req_set_header_dev_index(schan, ifindex);
-+
-+	if (chan->_present.combined_count) {
-+		if (chan->_present.rx_count || chan->_present.tx_count) {
-+			ethtool_channels_set_req_set_rx_count(schan, 0);
-+			ethtool_channels_set_req_set_tx_count(schan, 0);
-+		}
-+
-+		if (rx == tx) {
-+			ethtool_channels_set_req_set_combined_count(schan, rx);
-+		} else if (rx > tx) {
-+			ethtool_channels_set_req_set_combined_count(schan, tx);
-+			ethtool_channels_set_req_set_rx_count(schan, rx - tx);
-+		} else {
-+			ethtool_channels_set_req_set_combined_count(schan, rx);
-+			ethtool_channels_set_req_set_tx_count(schan, tx - rx);
-+		}
-+
-+		ret = ethtool_channels_set(ys, schan);
-+		if (ret)
-+			fprintf(stderr, "YNL set channels: %s\n", ys->err.msg);
-+	} else if (chan->_present.rx_count) {
-+		ethtool_channels_set_req_set_rx_count(schan, rx);
-+		ethtool_channels_set_req_set_tx_count(schan, tx);
-+
-+		ret = ethtool_channels_set(ys, schan);
-+		if (ret)
-+			fprintf(stderr, "YNL set channels: %s\n", ys->err.msg);
-+	} else {
-+		fprintf(stderr, "Error: device has neither combined nor rx channels\n");
-+		ret = -1;
-+	}
-+	ethtool_channels_set_req_free(schan);
-+exit_free_chan:
-+	ethtool_channels_get_rsp_free(chan);
-+exit_close_sock:
-+	ynl_sock_destroy(ys);
-+
-+	return ret;
- }
- 
- static int configure_flow_steering(struct sockaddr_in6 *server_sin)
-@@ -752,7 +826,7 @@ void run_devmem_tests(void)
- 		error(1, 0, "Failed to bind\n");
- 
- 	/* Deactivating a bound queue should not be legal */
--	if (!configure_channels(num_queues, num_queues - 1))
-+	if (!configure_channels(num_queues, num_queues))
- 		error(1, 0, "Deactivating a bound queue should be illegal.\n");
- 
- 	/* Closing the netlink socket does an implicit unbind */
--- 
-2.50.1
-
+    Andrew
 
