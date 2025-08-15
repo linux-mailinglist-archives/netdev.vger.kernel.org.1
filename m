@@ -1,173 +1,108 @@
-Return-Path: <netdev+bounces-214149-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214150-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5B29B285D3
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 20:32:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 224EFB285E4
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 20:38:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 286E41CC8118
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 18:30:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 916D91CE4A29
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 18:38:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 271681DE8A3;
-	Fri, 15 Aug 2025 18:30:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DCC621421D;
+	Fri, 15 Aug 2025 18:38:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fris.de header.i=@fris.de header.b="bTH84N8W"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GhEjmdbF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.fris.de (mail.fris.de [116.203.77.234])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82EC131771D;
-	Fri, 15 Aug 2025 18:30:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.203.77.234
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA16A31771D;
+	Fri, 15 Aug 2025 18:38:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755282635; cv=none; b=Pu4WVRJ2+5Bz03HCiui6/g3pKF+TfPPszWl4bJrshiPUrNZ0uXVEpzokbVmfZY3hjSlSAge6FDqM0qwfvORtq6Cy6Hqe8/O6MaHvlCNQYlTvm14nS0/gTF3wFPr/N3K7sMrTMtfuPCBM7WRJEhe/qP3oOn4zrOytoQvegDVXYp4=
+	t=1755283096; cv=none; b=SVJftEEHnec3luLo+gXRdPGvDsAf4uiuAkPgvjh53rEcAD0zgWq47Qzwqr8O5mGaBRU9Gnp7bSW95PQPgwQYmjfWBQxbRzUXSvG86g8DyiZlwqOuMdoRuH1Vj8WwYbnNquARbNKfwsg6Mxtdr4a6NBtCMMKMDiaKA/8RN5tHd3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755282635; c=relaxed/simple;
-	bh=QVPAKAEDY5Ajw6vI4+xPvTyy6Pi156iwUX91UxHQKiY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IkJCiayfqZH0fsjODtcByAhPRrZvLQeAQXOsjyB7POvg+tjz34QqcH3zE3Hnjr/5jp8yXitLJKy5yufh7bw0eB8dl6U6A7l7LqR+m7tLPiBRSO+m4HKEiwpUn+wDTdYKwYV/CGLCw6w6bl2K9AynbXf3UfwFjNecjU/h+dxB/HU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fris.de; spf=pass smtp.mailfrom=fris.de; dkim=pass (2048-bit key) header.d=fris.de header.i=@fris.de header.b=bTH84N8W; arc=none smtp.client-ip=116.203.77.234
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fris.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fris.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 1B99EC986D;
-	Fri, 15 Aug 2025 20:30:14 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fris.de; s=dkim;
-	t=1755282622; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references:autocrypt;
-	bh=i1lM1c2T06TGk0j3EQmUfchgEN5b1nCTvTTZHPiR7MI=;
-	b=bTH84N8W2L0LLMwMKnxQHa4i3HFrLehG8HejeImbQSCq44bHy25E0TCKFSfAgjfSOCIVkt
-	Y1ZX4gaBXPXMZbstz96ULAPSSXlkN4gtRmwDtn50CKE7AZpKtMczimbVWz+kBHrynzbczw
-	tppMiMAaBuYlRX9ssaCoAQx53gNufaTK2JFgKwk9OnPXZmRMAn60flHdXrtvW6VRexGEcP
-	Mxye7HbiniSLyHW6NqnuOPQC055Z53h95HbPDuAGhziKMVOs6l0ryPkMJrjqG+POT/nuPP
-	I0iBBb5nCOpTqX/SLa04UBhM91m+2od9T4VzT47hveQ9TTfVkjpTxQR+nnlgGg==
-Message-ID: <27ccf5c4-db66-491c-aa7c-29b83ebfca3a@fris.de>
-Date: Fri, 15 Aug 2025 20:30:13 +0200
+	s=arc-20240116; t=1755283096; c=relaxed/simple;
+	bh=Fq+JsG/X8ICLODlEHQqKZ5Wu3dHnMuRLkTFb7+Cn2cc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GNHmLREyxjp2Huf/aH8uZMaZProxB5t35E1lmnbUaLbEI5KixbGiPsuh04l/XiW1P03trlFKZ4RFiYhhUDwq7KL9zd6L7m2v3WiPDdRYWwG37Ctyuk2Ru+sLJd6g2lOdtO7HUlJ3UhIhNjmYWyvZoeJQLx7OjK+3MIkmuKKw17k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GhEjmdbF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C23CC4CEEB;
+	Fri, 15 Aug 2025 18:38:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755283095;
+	bh=Fq+JsG/X8ICLODlEHQqKZ5Wu3dHnMuRLkTFb7+Cn2cc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=GhEjmdbF6Zd106+cxr7uY5xJes0Qf5HxZKekIArM2tF0mGkF0ZZ0VHJStCm0VMFBM
+	 PaSZ6a4e+9+xu9JP3PiDbEAPb6pjwC6Na/+HOF/I1mHHyiX25hE34hqKO1nlmQ1fIH
+	 U/jffc74kYo9ZrYSa3Gi79Bi36F2roWokgPy25bK9K8pcL7cA9it3XTiixjuX1PbOn
+	 uvfReK9hlqa2ubLWt/h21Em181/f7UY6eSeERigpzgzbDe3nSu8CAqdP8FwMtffupt
+	 p4bIw6gWkAqQ8pFSxzs8p4uYsaK7egKqQMNiujGCl/bJPyhwxAIm++FrG3/Zt+/r0Q
+	 aPWxuLnp1nnhQ==
+Date: Fri, 15 Aug 2025 11:38:14 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Wen Gu <guwen@linux.alibaba.com>
+Cc: richardcochran@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, xuanzhuo@linux.alibaba.com,
+ dust.li@linux.alibaba.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, David
+ Woodhouse <dwmw2@infradead.org>
+Subject: Re: [PATCH net-next v4] ptp: add Alibaba CIPU PTP clock driver
+Message-ID: <20250815113814.5e135318@kernel.org>
+In-Reply-To: <20250812115321.9179-1-guwen@linux.alibaba.com>
+References: <20250812115321.9179-1-guwen@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH] net: dsa: microchip: Prevent overriding of HSR port
- forwarding
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- linux-kernel@vger.kernel.org, Lukasz Majewski <lukma@denx.de>,
- Paolo Abeni <pabeni@redhat.com>, UNGLinuxDriver@microchip.com,
- Vladimir Oltean <olteanv@gmail.com>, Woojung Huh
- <woojung.huh@microchip.com>, Frieder Schrempf <frieder.schrempf@kontron.de>,
- Florian Fainelli <florian.fainelli@broadcom.com>,
- Jesse Van Gavere <jesseevg@gmail.com>,
- Oleksij Rempel <o.rempel@pengutronix.de>,
- Pieter Van Trappen <pieter.van.trappen@cern.ch>,
- "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- Simon Horman <horms@kernel.org>, Tristram Ha <tristram.ha@microchip.com>,
- Vadim Fedorenko <vadim.fedorenko@linux.dev>
-References: <20250813152615.856532-1-frieder@fris.de>
- <d7b430cf-7b28-49af-91f9-6b0da0f81c6a@lunn.ch>
-Content-Language: en-GB, de-DE
-From: Frieder Schrempf <frieder@fris.de>
-Autocrypt: addr=frieder@fris.de; keydata=
- xsDNBFz75hwBDAC6vQIx3yi+PXpz+mznSZHLQFXVVxYIoP3HyY+3Pakr9yHM0dBEfRWq5m2E
- bKitCxoxIHSFZATSYyg1qPKJxt/3jyo1XlLrls9ilyw2svLj6w6cUq/pd8gvz0Nc+7XrhIB5
- ZLxaC90l2poY5jF9JjlMFUxx2MYcYrdW9ylEs/Fnqlw6gqaSIpIW9r5RdtjQKiciFn3ppRVK
- kmYinNCklzW1TSV6Y9jscVxxiVMjfd1F2Vl7zuW4hTGAWjinn5yzadCYD8+tLIQmXq0iLEC9
- 6LKaioVm1dOUHdaLQwPlQ8YQtSIYaOUPmYZdlHgoL3oHlHwXvjV0k5rQ3B5buVvhvdvOe6Xv
- gUzkzgYmxOLvHe7L7ZZyF8W0se2SmL5CuYhTrYKpHF4LbmDXo56lxDLLT4zGuMCHwb4YWdsL
- eEZgvYuS4TUF0bubutDzBdtfE5gA9PD57Eb96kujlge0atLNTp0/TGda1N76ckxpY7XXnIdt
- XqOOYLItVQlpT64HcCMNI+UAEQEAAc0iRnJpZWRlciBTY2hyZW1wZiA8ZnJpZWRlckBmcmlz
- LmRlPsLBDgQTAQgAOAIbAwULCQgHAgYVCgkICwIEFgIDAQIeAQIXgBYhBIPFrzPE/HCclyPS
- l+fdUfRfgzgCBQJivwBWAAoJEOfdUfRfgzgCvdkMAIz8rr91Qsx7ZWaWHeRHrQU9QdOeDtsP
- gEh3NfpE7whc/hprO6imvObvqFj7eS/1eEaedy319BsLQM4yn0QGg6s3qB5Qj+w6M2DV48e7
- zFyuyQOpEC360FBl5LfZftYG3cs130bcFTU7M3Xh5VPzWeL2+gkz+3ZvvOWyEETk4PgXFbVX
- CW5vRSiGKvrbF8dUkPRForSP4Vrp81OEYKWwkuN2r/3w0t9EgbkppF71eOmvFJkUcJ6Rlbvz
- lA30w9hgMoErM+8Nq6l3Geb5JqlPDvlfXS0IGZzMxsWxmZCmZGz9rqptJEDyolMWgwKIIjIO
- m5BJy6GUym5edhuMnBVYywhcPvcJ15NpEEeMUx6fpI0wiM0Up3n9XoWs3rlCJl+dWVg3ZExC
- whgNKEFpSY5wkIN2hg3wQv4ODQ/vEXLIfNVDU4TVPW2iacKuGjRuIPjw7mUgZ9nw4We9Rlyg
- yfYY4kYbw7Kux/3x1CNiBdKhPZGP0dbPkBWcaJoQs1QQA5zxj87AzQRc++YcAQwAy841e7Ug
- yQCupaKqmAJFK3HKue5sGYVbUDsUQqev1KM+dckgvz2J7GeaDlOzLwJV4nhp9RT1pFwMiMiD
- XL9Em/jGVB+GIXv8OVSwMZZAvKONrGPXMWwnxazpxthURodn3zDJ6E4TZlFTXFC+DXlsAhmN
- 4sdeNtxNvNCG02asYj2+5/JMnf2sKUUWKqOENp96/7SZ7MgHpNUDPAcmd/8bCW8tZYcWngtK
- aKPTd1OVnim7QuZ2rC5qveR3W5QAvtbssx1gkjJuNiPpC77g7L5ufG78X4J2heH3VyEW1igk
- vZPIIbgnWM6B6MecexwQMgcIp2MMDqHR7GX2fCpExjZYbwyoZBv6dH2exsNGqzbD4gRHISMh
- hK1bZC51tKtM8D4iPVQ/oc6KlCPes6cwPq1Y7hAAL0WkpcBYLqy7+hFxvrOo85gufY45PrWS
- J0qHUZKVF1i6maquJMQ2AMH6zpgZKb1PW0qrdGRwr2kAsa79a1YJhqP0630MHNmPUFS6t9IT
- ABEBAAHCwPYEGAEKACACGwwWIQSDxa8zxPxwnJcj0pfn3VH0X4M4AgUCYr8ApAAKCRDn3VH0
- X4M4AjTuC/40zVeU1JZTfXDSCQrNbOLrh7ufbHbD37pD8oKQldOAAIsL6ZTTeOU/1CYNCf+v
- aLp3+SKT0S1M7a+bt9hebc8czzdvZPp3xY+81k8IMeMEgKQxXWVsYEyi85N6I6bgbohSK6Kd
- hHMKrKpS95HAB99q2KU91p89L2T6rybQKtJluqJnwbTBcd3dnDpWpgu4fMWRHg/8KOumdIWu
- kdoJYDSqi/pi49eFH8W+3nHHIHfPDXQHKO6eRrlQu/DAScCnVbuJGM1Bh9ptLnoMfgmN13de
- MyXYuOiuXOaMOnjaEBOgeqDj6DccnRl65lz/Y73UV/E45QpsjECyNjvoaQgfpNjdPqijl53j
- +VW/A4ThGQkJSLU7rQjB2k246YsiczWI+QoWhMXTTcQPZLN/IaKEpYRSSI4b8JbPto3fgBxw
- ayRVuMbKenFO2mEPnvs4nPXf24ulq+05DfsHrm5Un4uCW8LFg1OnC5G9kMsy4TbvcR8FXc68
- BnPajIeNAvjJFMw88/I=
-In-Reply-To: <d7b430cf-7b28-49af-91f9-6b0da0f81c6a@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
 
-Am 15.08.25 um 00:59 schrieb Andrew Lunn:
-> On Wed, Aug 13, 2025 at 05:26:12PM +0200, Frieder Schrempf wrote:
->> From: Frieder Schrempf <frieder.schrempf@kontron.de>
->>
->> The KSZ9477 supports NETIF_F_HW_HSR_FWD to forward packets between
->> HSR ports. This is set up when creating the HSR interface via
->> ksz9477_hsr_join() and ksz9477_cfg_port_member().
->>
->> At the same time ksz_update_port_member() is called on every
->> state change of a port and reconfiguring the forwarding to the
->> default state which means packets get only forwarded to the CPU
->> port.
->>
->> If the ports are brought up before setting up the HSR interface
->> and then the port state is not changed afterwards, everything works
->> as intended:
->>
->>    ip link set lan1 up
->>    ip link set lan2 up
->>    ip link add name hsr type hsr slave1 lan1 slave2 lan2 supervision 45 version 1
->>    ip addr add dev hsr 10.0.0.10/24
->>    ip link set hsr up
->>
->> If the port state is changed after creating the HSR interface, this results
->> in a non-working HSR setup:
->>
->>    ip link add name hsr type hsr slave1 lan1 slave2 lan2 supervision 45 version 1
->>    ip addr add dev hsr 10.0.0.10/24
->>    ip link set lan1 up
->>    ip link set lan2 up
->>    ip link set hsr up
-> 
-> So, restating what i said in a different thread, what happens if only
-> software was used? No hardware offload.
+On Tue, 12 Aug 2025 19:53:21 +0800 Wen Gu wrote:
+> This adds a driver for Alibaba CIPU PTP clock. The CIPU, an underlying
+> infrastructure of Alibaba Cloud, synchronizes time with reference clocks
+> continuously and provides PTP clocks for VMs and bare metals in cloud.
 
-Sorry, I don't understand what you are aiming at.
+> +static struct attribute *ptp_cipu_attrs[] = {
+> +	&dev_attr_reg_dev_feat.attr,
+> +	&dev_attr_reg_gst_feat.attr,
+> +	&dev_attr_reg_drv_ver.attr,
+> +	&dev_attr_reg_env_ver.attr,
+> +	&dev_attr_reg_dev_stat.attr,
+> +	&dev_attr_reg_sync_stat.attr,
+> +	&dev_attr_reg_tm_prec_ns.attr,
+> +	&dev_attr_reg_epo_base_yr.attr,
+> +	&dev_attr_reg_leap_sec.attr,
+> +	&dev_attr_reg_max_lat_ns.attr,
+> +	&dev_attr_reg_mt_tout_us.attr,
+> +	&dev_attr_reg_thresh_us.attr,
+> +
+> +	&dev_attr_ptp_gettm.attr,
+> +	&dev_attr_ptp_gettm_inval_err.attr,
+> +	&dev_attr_ptp_gettm_tout_err.attr,
+> +	&dev_attr_ptp_gettm_excd_thresh.attr,
+> +
+> +	&dev_attr_dev_clk_abn.attr,
+> +	&dev_attr_dev_clk_abn_rec.attr,
+> +	&dev_attr_dev_maint.attr,
+> +	&dev_attr_dev_maint_rec.attr,
+> +	&dev_attr_dev_maint_tout.attr,
+> +	&dev_attr_dev_busy.attr,
+> +	&dev_attr_dev_busy_rec.attr,
+> +	&dev_attr_dev_err.attr,
+> +	&dev_attr_dev_err_rec.attr,
 
-Yes, this issue is related to hardware offloading. As far as I know 
-there is no option (for the user) to force HSR into SW-only mode. The 
-KSZ9477 driver uses hardware offloading up to the capabilities of the HW 
-by default.
+This driver is lacking documentation. You need to describe how the user
+is expected to interact with the device and document all these sysfs
+attributes.
 
-Yes, if I disable the offloading by modifying the driver code as already 
-described in the other thread, the issue can be fixed at the cost of 
-loosing the HW acceleration. In this case the driver consistently 
-configures the HSR ports to forward any packets to the CPU which then 
-forwards them as needed.
-
-With the driver code as-is, there are two conflicting values used for 
-the register that configures the forwarding. One is set during the HSR 
-setup and makes sure that HSR ports forward packets among each other 
-(and not only to the CPU), the other is set while changing the link 
-state of the HSR ports and causes the forwarding to only happen between 
-each port and the CPU, therefore effectively disabling the HW offloading 
-while the driver still assumes it is enabled.
-
-This is obviously a problem that should be fixed in the driver as 
-changing the link state of the ports *after* setup of the HSR is a 
-completely valid operation that shouldn't break things like it currently 
-does.
+Maybe it's just me, but in general I really wish someone stepped up
+and created a separate subsystem for all these cloud / vm clocks.
+They have nothing to do with PTP. In my mind PTP clocks are simple HW
+tickers on which we build all the time related stuff. While this driver
+reports the base year for the epoch and leap second status via sysfs.
 
