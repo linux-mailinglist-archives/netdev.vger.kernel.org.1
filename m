@@ -1,131 +1,112 @@
-Return-Path: <netdev+bounces-214212-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214213-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 228B5B28860
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 00:39:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 168ECB28866
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 00:41:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC01DAE4B61
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 22:39:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 640201C883B7
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 22:41:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDAE4242D87;
-	Fri, 15 Aug 2025 22:38:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76C49246766;
+	Fri, 15 Aug 2025 22:41:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="27VAkc/2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PtN+LK2e"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0553B13FEE;
-	Fri, 15 Aug 2025 22:38:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D690317715;
+	Fri, 15 Aug 2025 22:41:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755297538; cv=none; b=QSbuawqsB3xsKO2pks0o5yrLFMqtHMfkup5buopmDPp5OaBJskYw7Qdy3Hg48u4XUVNqe7Dh3YTGAJKvb+36rmcCQxtqmz4G3aMWgQHuoHZ05wZBglhrHdvD+QZmYUcp2fVpz+cjc6Ac1Hl8rkAsLhIT5V/aB8R/F2GpQpRrEXo=
+	t=1755297668; cv=none; b=NEIZ9shjww+zt1nW7xT8eR/rnR4+GCh4qPeIkn9uFhC+hAmu+wrbv4G5Mmhnnn/ycwJxYHJH40fpjZ9U5IBLDWkl1gMS76j3ISQKZK+IX68S7Fnqci1Z15oqmXljZJNXpS9kJskvAb8eSFfIM6OqFNoHQY/FQrzn+vApqyPjShw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755297538; c=relaxed/simple;
-	bh=SU5U9JA8BpJrLDqB6qFZ5x7j2WQF/0eO5Lpaikl8yFE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tBtO8V4G3I3c0pc9Qbv8zTyvgbc0PhLleLuelVTHYgbjniwfqrY6XD/kw217WHewZAjKdUnPU7l+G+ZJCnvWMqIDNFCx0iBdHU/m08vLebyduuFE3XL3if7UqnRULBpxJUlYM5ji8oA22O6Y4gUd3x4cMwHOCsGm3+73za/nzVk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=27VAkc/2; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=vH9M3gIPfPvhVLyqEXopQg5B5Azi5msqEGmfM/vCccc=; b=27VAkc/2u764qpgBbHqTK5WWRS
-	XL1zcYEU4nMVBCkjVnQcp0a8RyrdamOfE7gbIzdL3kmkiMkjPJASJU3Oteh5NoQ54QjnWmBhpu78g
-	jacLrAJBrgdEMIPfJWLSsHK7TwDTrB90jEvvG6mZ0ciwN/T7GcJl2YeM6u2TVCzIj86E=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1un34H-004rtV-M4; Sat, 16 Aug 2025 00:38:37 +0200
-Date: Sat, 16 Aug 2025 00:38:37 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Artur Rojek <contact@artur-rojek.eu>
-Cc: Rob Landley <rob@landley.net>, Jeff Dionne <jeff@coresemi.io>,
-	John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/3] net: j2: Introduce J-Core EMAC
-Message-ID: <fc6ed96e-2bab-4f2f-9479-32a895b9b1b2@lunn.ch>
-References: <20250815194806.1202589-1-contact@artur-rojek.eu>
- <20250815194806.1202589-4-contact@artur-rojek.eu>
- <973c6f96-6020-43e0-a7cf-9c129611da13@lunn.ch>
- <b1a9b50471d80d51691dfbe1c0dbe6fb@artur-rojek.eu>
- <02ce17e8f00955bab53194a366b9a542@artur-rojek.eu>
+	s=arc-20240116; t=1755297668; c=relaxed/simple;
+	bh=uFKEJJOjRDhjSKoXQ6Fe8Zn8RG1bPOxAlF+QEogDX4o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hkbD4dSayMgiDcwF9WavZe90akfi/1QRYsbv4B02Befu5yb+SUVOX9GNs9hZSBGQiWuvvhgvqHEMp0EOEgiXXFtDo6xtFG027GLjJpTYSRux1iC3SMA73aDdj3s552I8Bk6hb4qft/0Y6Ma41nBJ87GN4/qmMVKgky4eA0QLcEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PtN+LK2e; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24505C4CEEB;
+	Fri, 15 Aug 2025 22:41:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755297667;
+	bh=uFKEJJOjRDhjSKoXQ6Fe8Zn8RG1bPOxAlF+QEogDX4o=;
+	h=From:To:Cc:Subject:Date:From;
+	b=PtN+LK2ev2AUcW+NwEZzv6yD3zPVUpPAS4wwhfpKAP37ldhvxzAg2Tg9A/RlBfOUp
+	 5wyB6mfEyUbP8o18TV39lRP1LLMmaxg9H9CvSKvuQ7gj2jH7xAiPGLziyLmq35syWa
+	 zBWhjJcgyyNoS1emzBqqYR+jshYWZ26VeJqECPpcQ935JJCjgsfyeQIIfJWUbCVHMI
+	 9E+P2fgcBpkYT9D8kSVDI0a3iOQk04eJfO5zqpM1OSjOjVVrDtb+9qFg4Yuhw5gwCM
+	 gVqnetbMHs98bjs2HEsCUtxYBUn2a7sl+Z1qxlJw2q+KqsITo2PTOnojDsxJba9cE9
+	 Rz9ttSskS8c1g==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	shuah@kernel.org,
+	willemb@google.com,
+	daniel.zahka@gmail.com,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net-next] selftests: drv-net: tso: increase the retransmit threshold
+Date: Fri, 15 Aug 2025 15:41:00 -0700
+Message-ID: <20250815224100.363438-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <02ce17e8f00955bab53194a366b9a542@artur-rojek.eu>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Aug 15, 2025 at 11:14:08PM +0200, Artur Rojek wrote:
-> On 2025-08-15 22:52, Artur Rojek wrote:
-> > On 2025-08-15 22:16, Andrew Lunn wrote:
-> > 
-> > Hi Andrew,
-> > thanks for the review!
-> > 
-> > > > +static irqreturn_t jcore_emac_irq(int irq, void *data)
-> > > > +{
-> > > > +	struct jcore_emac *priv = data;
-> > > > +	struct net_device *ndev = priv->ndev;
-> > > > +	struct sk_buff *skb;
-> > > > +	struct {
-> > > > +		int packets;
-> > > > +		int bytes;
-> > > > +		int dropped;
-> > > > +		int crc_errors;
-> > > > +	} stats = {};
-> > > > +	unsigned int status, pkt_len, i;
-> > > 
-> > > netdev uses 'reverse christmas tree' for local variables. They should
-> > > be sorted longest to shortest. This sometimes means you need to move
-> > > assignments into the body of the function, in this case, ndev.
-> 
-> Should I move the struct stats members into stand alone variables as
-> well? Or is below sorting acceptable with regards to stats vs skb:
+We see quite a few flakes during the TSO test against virtualized
+devices in NIPA. There's often 10-30 retransmissions during the
+test. Sometimes as many as 100. Set the retransmission threshold
+at 1/4th of the wire frame target.
 
-I would pull the structure definition out of the function. Then just
-create one instance of the structure on the stack.
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: shuah@kernel.org
+CC: willemb@google.com
+CC: daniel.zahka@gmail.com
+CC: linux-kselftest@vger.kernel.org
+---
+ tools/testing/selftests/drivers/net/hw/tso.py | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-> > > What support is there for MDIO? Normally the MAC driver would not be
-> > > setting the carrier status, phylink or phylib would do that.
-> > 
-> > From what I can tell, none. This is a very simple FPGA RTL
-> > implementation of a MAC, and looking at the VHDL, I don't see any MDIO
-> > registers.
-> 
-> > Moreover, the MDIO pin on the PHY IC on my dev board also
-> > appears unconnected.
-> 
-> I spoke too soon on that one. It appears to be connected through a trace
-> that goes under the IC. Nevertheless, I don't think MDIO support is in
-> the IP core design.
+diff --git a/tools/testing/selftests/drivers/net/hw/tso.py b/tools/testing/selftests/drivers/net/hw/tso.py
+index c13dd5efa27a..0998e68ebaf0 100755
+--- a/tools/testing/selftests/drivers/net/hw/tso.py
++++ b/tools/testing/selftests/drivers/net/hw/tso.py
+@@ -60,16 +60,17 @@ from lib.py import bkg, cmd, defer, ethtool, ip, rand_port, wait_port_listen
+         sock_wait_drain(sock)
+         qstat_new = cfg.netnl.qstats_get({"ifindex": cfg.ifindex}, dump=True)[0]
+ 
+-        # No math behind the 10 here, but try to catch cases where
+-        # TCP falls back to non-LSO.
+-        ksft_lt(tcp_sock_get_retrans(sock), 10)
+-        sock.close()
+-
+         # Check that at least 90% of the data was sent as LSO packets.
+         # System noise may cause false negatives. Also header overheads
+         # will add up to 5% of extra packes... The check is best effort.
+         total_lso_wire  = len(buf) * 0.90 // cfg.dev["mtu"]
+         total_lso_super = len(buf) * 0.90 // cfg.dev["tso_max_size"]
++
++        # Make sure we have order of magnitude more LSO packets than
++        # retransmits, in case TCP retransmitted all the LSO packets.
++        ksft_lt(tcp_sock_get_retrans(sock), total_lso_wire / 4)
++        sock.close()
++
+         if should_lso:
+             if cfg.have_stat_super_count:
+                 ksft_ge(qstat_new['tx-hw-gso-packets'] -
+-- 
+2.50.1
 
-MDIO is actually two pins. MDC and MDIO.
-
-It might be there is a second IP core which implements MDIO. There is
-no reason it needs to be tightly integrated into the MAC. But it does
-make the MAC driver slightly more complex. You then need a Linux MDIO
-bus driver for it, and the DT for the MAC would include a phy-handle
-property pointing to the PHY on the MDIO bus.
-
-Is there an Ethernet PHY on your board?
-
-	Andrew
 
