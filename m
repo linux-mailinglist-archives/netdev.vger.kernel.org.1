@@ -1,170 +1,171 @@
-Return-Path: <netdev+bounces-213881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1D96B27355
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 02:06:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFAF7B2735A
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 02:11:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 569D2685E4A
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 00:06:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 830A65E67D5
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 00:11:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB4851FB3;
-	Fri, 15 Aug 2025 00:06:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E63391114;
+	Fri, 15 Aug 2025 00:11:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TKL/aaLq"
+	dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b="pZVdPsq0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp153-162.sina.com.cn (smtp153-162.sina.com.cn [61.135.153.162])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B7DD184E
-	for <netdev@vger.kernel.org>; Fri, 15 Aug 2025 00:06:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4977819A
+	for <netdev@vger.kernel.org>; Fri, 15 Aug 2025 00:11:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=61.135.153.162
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755216371; cv=none; b=JAvn1zCXy6+lDfiPYsJJt6s0NjTisBLT6TWgJhK4ExGDNbRWn/kiFPI51zH6um/tKZo2ryaaC2cmTOEKd85cskvSvx9FVXJ7MmbIMrhw192WKVRsanTP/elejP/usLRWi/UHb/cKDBltO5FwvCfhwkuj6NWUMy8SBg1IfvVOxr8=
+	t=1755216711; cv=none; b=M3DwHx46AdgeVqXZJPxTTaahgeABinCZVnycADB14NNFbD2jb9Wtxrwlzv/AHIzJrKK/y66ARZ8YZTmaZFz7OQNLnyiRbHwyJY2MVo+c5VPVaXVYfvgVc+zQy9wx/+WDGxD5j8maIMXa6p47o1qxLiDORc4atHxGS3/xfKMKcfE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755216371; c=relaxed/simple;
-	bh=tOOWispR6Ea6ciZ3YMCAEhq3ARekCONZh3ZONXZA0hc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Nk5ex2/1Hh5g816OK7E1jMdGISbO++6CkvwCCx2iZwm4Sw6FMXm2WqiH/ZNSR+3H6cc4SXm+dG0KlyzKlGn1cODD0gi+4WlOEzn8t4QJ9Dndz9Uooq6Qu9PdTnWK1PA6VsZ/No4rHnJIFGKPfUIKJulS0Xcxr8gADYpLCLj+8FA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TKL/aaLq; arc=none smtp.client-ip=209.85.215.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-b4717553041so1173724a12.3
-        for <netdev@vger.kernel.org>; Thu, 14 Aug 2025 17:06:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755216368; x=1755821168; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=C3g7azcGA34tDaaYjObSrLKH+WoZLGsOWxePbsNLSk8=;
-        b=TKL/aaLqf8MbDQZkl37c1wQDFshng1E744minxa1ATSZWWttYtbrMO+vHZEfORz2j2
-         jhCDAT0WJY8p65E31Upv1sjNFnW2BBLpQDhmT8vJEXvLunvmf0XpuJPtnSouEyDtkj6t
-         1jpXoRO6BVs9YPDiXoldhigLt0ulqirpAzVGGblYV/fDBaXLjPoDpWh77rylbPEBe6nn
-         +7xblQRtqC225LjlI6p/MizKZ78eEI+vlII1rMf9/VKUgtGwScI355UB2HiPFl436AyP
-         dxtNR/8DGuKppJ1cTr+11oCrybMWKUXb6S+bHiIbDF+fb24OrhQJxwlRwZYNYvH1yTCS
-         1slQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755216368; x=1755821168;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=C3g7azcGA34tDaaYjObSrLKH+WoZLGsOWxePbsNLSk8=;
-        b=MoakGABgkhRrTIaegaHWmgfZGDkeBR8JODE4xNKVM8JCDOpY/alSI7w3tMrq7EPkr0
-         B3EIu2TBtPPv0KkOK7r8F8ARMf2kpzDO8tahhlN4SIde0O6/8JXfB9XA8fDOT4NllpOc
-         m0HKjqXjDG63rqEV8M5WNhZ0yJpodcwAATvDrfVC3KtoM+N1ju+YBSENkfSQH0E7m8jP
-         SXGjsyG9eB1Vp1XmDmw4yKws3c+hUlrtQCtNQdDW6Kj1dTS8fA2idBJqYx9DJCy51JjC
-         ZTH+mcuEUbsKzh7qygPcvBu68LdJyhLgfFMVydp+PHptIOlf1IlbOLaJVeBbQptK43gs
-         /Zqw==
-X-Forwarded-Encrypted: i=1; AJvYcCXU+vbSKuAF409fYgwao7leodldiRd0+3+BkF93jF90tuj1PHMPkgh2CfR1ZNEnR8J9uqt+G6E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQe+T1wKPYZkbh/BHQO/bheJYhmFW7bGJqkMCMRVQnEsZkV/da
-	fdGNEgRUpncFJsKp6B9zYeSLOkND7wT8zK2COj8ZeyUdDe0dzYHBuEhXdfxnSxKuRO4yhp9QUj7
-	PFY2CPx0vobMstVdyesZq/Qjz6MdU05HJFhuZ4p+p
-X-Gm-Gg: ASbGncscE1WDpxQHA5qfpJW/TZhZMnOyNMJPE45qkxx9if7Z6K6YCS+jn79lq+BxAu0
-	ENBOOgcktu4NjqrhrxAJAbYw2jICo4dWw4u/04NQRFrXW7ORPzKptF/8nexWM8t5FShqLlUkR9r
-	rWkmc5W7zp1TJqzJlDMY6/SPsdA2RLLvhQIebKSNfk1RHI4blS156buk1LkIXtTogNV3rXJRg8e
-	uJZ7Mc3MST+a0pWIH3lHiMqOITQGcnbO9qka0qTUGCt96OuIXu9cA4L
-X-Google-Smtp-Source: AGHT+IEFX5W+lUoDE7ZvmQhutvrW9vD5G/rFOFnR+zH+RlJzruuwGalQl9EbNrgSF6pYF7LAALbUj/uy+KXE1fNSEc8=
-X-Received: by 2002:a17:902:dac1:b0:234:d778:13fa with SMTP id
- d9443c01a7336-2446d866269mr1258465ad.26.1755216368013; Thu, 14 Aug 2025
- 17:06:08 -0700 (PDT)
+	s=arc-20240116; t=1755216711; c=relaxed/simple;
+	bh=M7/awrwFW0+lfKMbyVgOnxo2z+jj8zWoxElZ250hLBY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=tAVGy1TqtT+B/csxWgIaAGUqmNGbmry1UeyGFFXV1Rop2kcj/UcJ8Lh5SqzR4U2qEl6BYAM2LxUIOiUz7N/WpXxHPQFYXSPGL1ApfBALpQs+fYW2efhwVkxf0TRcvdfd2pbHbgptVJypPlBvVT/6/VBl0ulrhuV6Sp83Y6AX6bs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b=pZVdPsq0; arc=none smtp.client-ip=61.135.153.162
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1755216702;
+	bh=fDqRyFA+mjlN2QT1Fq9xh052KYDrnE6/QdvHVjXFdsg=;
+	h=From:Subject:Date:Message-ID;
+	b=pZVdPsq0JjuECx/fF6Zs8hIQD+MTMQqrPRz+aPEkdyv6vlTcVEqkyYGS22BuimpTt
+	 0606RgcmUp09MHXiWFWLn7ScqQW88+LYqhTAq8BWPs4gesVvwcEu3USUPrl+S4rX+x
+	 CJFcZpCkOu6hpi9cekShs5w0wcYaqNccqBDjJttI=
+X-SMAIL-HELO: localhost.localdomain
+Received: from unknown (HELO localhost.localdomain)([114.249.58.236])
+	by sina.com (10.54.253.31) with ESMTP
+	id 689E7B3300004D9A; Fri, 15 Aug 2025 08:11:34 +0800 (CST)
+X-Sender: hdanton@sina.com
+X-Auth-ID: hdanton@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=hdanton@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=hdanton@sina.com
+X-SMAIL-MID: 1152966816373
+X-SMAIL-UIID: B585CA0F583C4A35B1986E2EFF5354D0-20250815-081134-1
+From: Hillf Danton <hdanton@sina.com>
+To: syzbot <syzbot+535bbe83dfc3ae8d4be3@syzkaller.appspotmail.com>
+Cc: edumazet@google.com,
+	linux-kernel@vger.kernel.org,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+	netdev@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [nfc?] [net?] WARNING in nfc_rfkill_set_block
+Date: Fri, 15 Aug 2025 08:11:21 +0800
+Message-ID: <20250815001123.4558-1-hdanton@sina.com>
+In-Reply-To: <689e6bba.050a0220.e29e5.0003.GAE@google.com>
+References: 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250814200912.1040628-1-kuniyu@google.com> <20250814200912.1040628-2-kuniyu@google.com>
- <cs5uvm72eyzqljcxtmienkmmth54pqqjmlyya5vf3twncbp7u5@jfnktl43r5se>
- <CAAVpQUDyy9f7=LNZc2ka2RiOhR3_eOhEb+Nih37HnF0_cdrJqA@mail.gmail.com> <r3czpatkdegf7aoo3ezvrvzuqkixsb557okybueig4fcuknku3@jkgzexpt7dnq>
-In-Reply-To: <r3czpatkdegf7aoo3ezvrvzuqkixsb557okybueig4fcuknku3@jkgzexpt7dnq>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Thu, 14 Aug 2025 17:05:56 -0700
-X-Gm-Features: Ac12FXwONNleDf8vaBVKCNkrBAioUhawdr6ixCRQttfFCFdFsOrwwMIEvBAgFfE
-Message-ID: <CAAVpQUAx9SyA96b_UYofbhM2TPgAGSqq_=-g6ERqmbCZP04-PA@mail.gmail.com>
-Subject: Re: [PATCH v4 net-next 01/10] mptcp: Fix up subflow's memcg when CONFIG_SOCK_CGROUP_DATA=n.
-To: Shakeel Butt <shakeel.butt@linux.dev>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Neal Cardwell <ncardwell@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Willem de Bruijn <willemb@google.com>, Matthieu Baerts <matttbe@kernel.org>, 
-	Mat Martineau <martineau@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
-	Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>, 
-	Andrew Morton <akpm@linux-foundation.org>, =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>, 
-	Tejun Heo <tj@kernel.org>, Simon Horman <horms@kernel.org>, Geliang Tang <geliang@kernel.org>, 
-	Muchun Song <muchun.song@linux.dev>, Mina Almasry <almasrymina@google.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, mptcp@lists.linux.dev, 
-	cgroups@vger.kernel.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Aug 14, 2025 at 4:46=E2=80=AFPM Shakeel Butt <shakeel.butt@linux.de=
-v> wrote:
->
-> On Thu, Aug 14, 2025 at 04:27:31PM -0700, Kuniyuki Iwashima wrote:
-> > On Thu, Aug 14, 2025 at 2:44=E2=80=AFPM Shakeel Butt <shakeel.butt@linu=
-x.dev> wrote:
-> > >
-> > > On Thu, Aug 14, 2025 at 08:08:33PM +0000, Kuniyuki Iwashima wrote:
-> > > > When sk_alloc() allocates a socket, mem_cgroup_sk_alloc() sets
-> > > > sk->sk_memcg based on the current task.
-> > > >
-> > > > MPTCP subflow socket creation is triggered from userspace or
-> > > > an in-kernel worker.
-> > > >
-> > > > In the latter case, sk->sk_memcg is not what we want.  So, we fix
-> > > > it up from the parent socket's sk->sk_memcg in mptcp_attach_cgroup(=
-).
-> > > >
-> > > > Although the code is placed under #ifdef CONFIG_MEMCG, it is buried
-> > > > under #ifdef CONFIG_SOCK_CGROUP_DATA.
-> > > >
-> > > > The two configs are orthogonal.  If CONFIG_MEMCG is enabled without
-> > > > CONFIG_SOCK_CGROUP_DATA, the subflow's memory usage is not charged
-> > > > correctly.
-> > > >
-> > > > Let's wrap sock_create_kern() for subflow with set_active_memcg()
-> > > > using the parent sk->sk_memcg.
-> > > >
-> > > > Fixes: 3764b0c5651e3 ("mptcp: attach subflow socket to parent cgrou=
-p")
-> > > > Suggested-by: Michal Koutn=C3=BD <mkoutny@suse.com>
-> > > > Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
-> > > > ---
-> > > >  mm/memcontrol.c     |  5 ++++-
-> > > >  net/mptcp/subflow.c | 11 +++--------
-> > > >  2 files changed, 7 insertions(+), 9 deletions(-)
-> > > >
-> > > > diff --git a/mm/memcontrol.c b/mm/memcontrol.c
-> > > > index 8dd7fbed5a94..450862e7fd7a 100644
-> > > > --- a/mm/memcontrol.c
-> > > > +++ b/mm/memcontrol.c
-> > > > @@ -5006,8 +5006,11 @@ void mem_cgroup_sk_alloc(struct sock *sk)
-> > > >       if (!in_task())
-> > > >               return;
-> > > >
-> > > > +     memcg =3D current->active_memcg;
-> > > > +
-> > >
-> > > Use active_memcg() instead of current->active_memcg and do before the
-> > > !in_task() check.
-> >
-> > Why not reuse the !in_task() check here ?
-> > We never use int_active_memcg for socket and also
-> > know int_active_memcg is always NULL here.
-> >
->
-> If we are making mem_cgroup_sk_alloc() work with set_active_memcg()
-> infra then make it work for both in_task() and !in_task() contexts.
+On Thu, 14 Aug 2025 16:05:30 -0700
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    8f5ae30d69d7 Linux 6.17-rc1
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=16c80af0580000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=13f39c6a0380a209
+> dashboard link: https://syzkaller.appspot.com/bug?extid=535bbe83dfc3ae8d4be3
+> compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+> 
+> Unfortunately, I don't have any reproducer for this issue yet.
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/46150b6d2447/disk-8f5ae30d.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/1c604b2b2258/vmlinux-8f5ae30d.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/9c542f0972de/bzImage-8f5ae30d.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+535bbe83dfc3ae8d4be3@syzkaller.appspotmail.com
+> 
+> ------------[ cut here ]------------
+> rtmutex deadlock detected
 
-Considering e876ecc67db80, then I think we should add
-set_active_memcg_in_task() and active_memcg_in_task().
+Even given the lockdep_set_novalidate_class() in device_initialize(),
+rtmutex can detect deadlock (the ABBA one [1]?), weird.
 
-or at least we need WARN_ON() if we want to place active_memcg()
-before the in_task() check, but this looks ugly.
+[1] Subject: [PATCH] net/nfc: Fix A-B/B-A deadlock between nfc_unregister_device and rfkill_fop_write
+https://lore.kernel.org/lkml/20250814173142.632749-2-ysk@kzalloc.com/
 
-        memcg =3D active_memcg();
-        if (!in_task() && !memcg)
-                return;
-        DEBUG_NET_WARN_ON_ONCE(!in_task() && memcg))
+> WARNING: CPU: 1 PID: 9725 at kernel/locking/rtmutex.c:1674 rt_mutex_handle_deadlock+0x28/0xb0 kernel/locking/rtmutex.c:1674
+> Modules linked in:
+> CPU: 1 UID: 0 PID: 9725 Comm: syz.8.874 Tainted: G        W           6.17.0-rc1-syzkaller #0 PREEMPT_{RT,(full)} 
+> Tainted: [W]=WARN
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
+> RIP: 0010:rt_mutex_handle_deadlock+0x28/0xb0 kernel/locking/rtmutex.c:1674
+> Code: 90 90 41 57 41 56 41 55 41 54 53 83 ff dd 0f 85 8c 00 00 00 48 89 f7 e8 c6 2c 01 00 90 48 c7 c7 a0 08 0b 8b e8 79 08 8b f6 90 <0f> 0b 90 90 4c 8d 3d 00 00 00 00 65 48 8b 1c 25 08 b0 f5 91 4c 8d
+> RSP: 0018:ffffc900043a7950 EFLAGS: 00010246
+> RAX: 89021558f1df5a00 RBX: ffffc900043a79e0 RCX: ffff888025bb3b80
+> RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+> RBP: ffffc900043a7b00 R08: 0000000000000000 R09: 0000000000000000
+> R10: dffffc0000000000 R11: ffffed1017124863 R12: 1ffff92000874f38
+> R13: ffffffff8af82119 R14: ffff888036e55098 R15: dffffc0000000000
+> FS:  00007fec70d5e6c0(0000) GS:ffff8881269c5000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007fce013b0000 CR3: 000000003ebbc000 CR4: 00000000003526f0
+> Call Trace:
+>  <TASK>
+>  __rt_mutex_slowlock kernel/locking/rtmutex.c:1734 [inline]
+>  __rt_mutex_slowlock_locked kernel/locking/rtmutex.c:1760 [inline]
+>  rt_mutex_slowlock+0x692/0x6e0 kernel/locking/rtmutex.c:1800
+>  __rt_mutex_lock kernel/locking/rtmutex.c:1815 [inline]
+>  __mutex_lock_common kernel/locking/rtmutex_api.c:536 [inline]
+>  mutex_lock_nested+0x16a/0x1d0 kernel/locking/rtmutex_api.c:547
+>  device_lock include/linux/device.h:911 [inline]
+>  nfc_dev_down net/nfc/core.c:143 [inline]
+>  nfc_rfkill_set_block+0x50/0x2e0 net/nfc/core.c:179
+>  rfkill_set_block+0x1e5/0x450 net/rfkill/core.c:346
+>  rfkill_fop_write+0x44e/0x580 net/rfkill/core.c:1301
+>  vfs_write+0x287/0xb40 fs/read_write.c:684
+>  ksys_write+0x14b/0x260 fs/read_write.c:738
+>  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+>  do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> RIP: 0033:0x7fec72afebe9
+> Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+> RSP: 002b:00007fec70d5e038 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+> RAX: ffffffffffffffda RBX: 00007fec72d25fa0 RCX: 00007fec72afebe9
+> RDX: 0000000000000008 RSI: 0000200000000080 RDI: 0000000000000003
+> RBP: 00007fec72b81e19 R08: 0000000000000000 R09: 0000000000000000
+> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+> R13: 00007fec72d26038 R14: 00007fec72d25fa0 R15: 00007ffe1f71d718
+>  </TASK>
+> 
+> 
+> ---
+> This report is generated by a bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for more information about syzbot.
+> syzbot engineers can be reached at syzkaller@googlegroups.com.
+> 
+> syzbot will keep track of this issue. See:
+> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+> 
+> If the report is already addressed, let syzbot know by replying with:
+> #syz fix: exact-commit-title
+> 
+> If you want to overwrite report's subsystems, reply with:
+> #syz set subsystems: new-subsystem
+> (See the list of subsystem names on the web dashboard)
+> 
+> If the report is a duplicate of another one, reply with:
+> #syz dup: exact-subject-of-another-report
+> 
+> If you want to undo deduplication, reply with:
+> #syz undup
+> 
 
