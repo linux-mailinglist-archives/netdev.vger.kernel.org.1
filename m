@@ -1,220 +1,263 @@
-Return-Path: <netdev+bounces-214020-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214021-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9BC5B27D5F
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 11:42:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCBE2B27DC5
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 12:03:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1C3462330C
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 09:38:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 686EE16B65C
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 10:01:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 252362FAC01;
-	Fri, 15 Aug 2025 09:38:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD7552FE594;
+	Fri, 15 Aug 2025 10:00:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="EqoY+K4y"
+	dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b="XhJkIMfe"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2082.outbound.protection.outlook.com [40.107.220.82])
+Received: from fra-out-007.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-007.esa.eu-central-1.outbound.mail-perimeter.amazon.com [3.75.33.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 567292FA0DC;
-	Fri, 15 Aug 2025 09:38:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.82
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755250711; cv=fail; b=UIp5HrxOPJphj2KDGallO75WRAla1yMowJs1+Dp9EkBtnk9CkKLYxyDdUfgj1ioKkLErEPI9kTN+sefR78afQ065ICwEfd/Z/YrYhY2psO77O/OLUvFYMt83YAu+oTRetf5uqE/7lBoVN1oj7cWv1+vmEEuHmS6MqhNGHFNVH60=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755250711; c=relaxed/simple;
-	bh=yk9rdKaYnyngNUxjDxox+FXxmtO7H5Mdg8TlhFwWOYE=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=A3XXWkX+x8COTqM71I1NzA7rLB7hdYamt5GutRuhLRkCbeWReDSgbYYBvdVmNEbHehkTk7Ctk2SjcSF7fXhQLNo9D75neS6JRl9S2UTOra/0WGEn/5YHZr7uwT22/6aedtKL91keTCjyIo4hXK3rqFdWqLwRf+ggYMQFdXGPuvM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=EqoY+K4y; arc=fail smtp.client-ip=40.107.220.82
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=xdLvc12bpCBBPkfCNFwSX27HFjONMWdKfYyFnjS+9WcTsD8NQKYtZVAt3ZjiGeL57KPJA3YVLUzbiXxGd//95LnTsYgVwe5kpGkmu53Xg+tMw1FSwePC4b2VH2FDf3ehjIcYtyz/2SYJ6x0uSKossuxmlOakQqJn77wE06rBI3fqkW5J/B/euNHTBl2ewUlKCEeVy+WeU979n46W8wzkVkpMvqQuoll8BJ9lfVoMXviTtUiafVFZPLXGS0psYt845dUl+mGllv0JJg7abOErhQA+zMNz6FcisXqISU0td3Egzqm0dsZLTZ7gMHausPUPJ2JMrmv1aSPmxk/pYtVC0Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zeXghW7N6MNcAadLUwULsCxyK6DOHjf8SfNv4HOVHhg=;
- b=wvEBGTHA2fOD94UR5KNlrJ3sL5LF7uMp33CNEdDVWfjEsCuuOOnUmgI3aEPZ61pIuXYG2WQEZxxIfqRYIVrW6JwlGya34eddtvAeb/d743YSEswyGXXzB6l3kwaIgcBSYeGEFg83pu3JpdNGqdkQxBKFMtihwYxX3kB5ORGhbiuMsbrIa/nBuflh+0VkOiqfcnBeUuLVRPSo3s92nmyp7H84a1okUP8F5ng7es2YZYYr1b6GuXJ0eru6iyJ+cNVswD4/QWFvlTqNIxI9kt7kBfFANB84HUi3haf8AWrUPVM76I+0mqsQH9+20IJXBIOhZtvqBDGanuSwMg14oPQioQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zeXghW7N6MNcAadLUwULsCxyK6DOHjf8SfNv4HOVHhg=;
- b=EqoY+K4yCtaCeH/Hkx0Cxm77pepPRptfPJPL5pRuSZlaEAYgezTYCHH8cJ7Ko9VzBY1oy1DOafKxZT6CCqq3s8RKkB0WNE9beA1Yygr4im3bKQzMH7bRua9oH/vzusRCHzgQ+ydE5Ofs19wGORrWhWbqLaxKJytAFsAaH78vKhQ=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from CH3PR12MB7523.namprd12.prod.outlook.com (2603:10b6:610:148::13)
- by BN5PR12MB9461.namprd12.prod.outlook.com (2603:10b6:408:2a8::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9031.15; Fri, 15 Aug
- 2025 09:38:26 +0000
-Received: from CH3PR12MB7523.namprd12.prod.outlook.com
- ([fe80::f722:9f71:3c1a:f216]) by CH3PR12MB7523.namprd12.prod.outlook.com
- ([fe80::f722:9f71:3c1a:f216%6]) with mapi id 15.20.9031.014; Fri, 15 Aug 2025
- 09:38:26 +0000
-Message-ID: <595d754a-c8c2-4ef0-bdbd-3ff25330224a@amd.com>
-Date: Fri, 15 Aug 2025 15:08:20 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net-next] amd-xgbe: Configure and retrieve 'tx-usecs'
- for Tx coalescing
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Shyam-sundar.S-k@amd.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250812045035.3376179-1-Vishal.Badole@amd.com>
- <20250813170012.7436b6e6@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37F38227E82;
+	Fri, 15 Aug 2025 10:00:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.75.33.185
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755252043; cv=none; b=TEbC3bL2Hqkit4t6CYZWCF42kTY7NV63ki/RvWv7J2Kwt6PC8EZGt0BvzDqKxf0oSiNd8NUI1BBqI78Lj0hmecyyJ+4Sv8XMsqxbw+LSDEAd2Jebj+Aeo8UWeNdghmIr5w/r5E5/tEThv7E9KDuvo7XUja8AaYz4NOCNPAa6rio=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755252043; c=relaxed/simple;
+	bh=E7DJ0BR0UZJPAuQOHg0Es65htcrgoYS7wpkzPlJ/oVw=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=D2ebknFx1EbbRHtFbbWUtzgWHDLrWCTb7D7z44cUM65XvNQyfuyZqiK9PuR11GlVzoyWQ2F83U3mb0mOiZVn9bzaCd449oG3ZAs2e8Kz9AAFIrYhfjEdMb2Eq2hurIvYsEJTbxoehwy55f54VoIkGo5gXg/cvNGW2nfQgMsp42c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b=XhJkIMfe; arc=none smtp.client-ip=3.75.33.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazoncorp2;
+  t=1755252041; x=1786788041;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:mime-version:
+   content-transfer-encoding;
+  bh=SuDBHRL149zCixfFVAUqzYmtxiiXpLidwnvIdl1+bRc=;
+  b=XhJkIMfeLpkVVA4dbks7Rc3TdMytO03GOepuqCvsi39ObssvnSRJMTsC
+   ii4gDd64Kkae0yVApEhKoTfwPs9FOCp8tOFK2yCW7sJAFtsgU/pc8cEQs
+   zC2G4mnXCQzWWH/NhTclswYZuL/wQDV5FlrDhV2wykfvYuYiqhYcCmJlm
+   4pjN2JEbrNkGkG+QV95mTcx5s2HCVbt+35oJLLZWDPtRuJElS1836eTE4
+   eD2Fpx1aTKv7aGYdhiN1QVQV8feNHwcnpcGeSKWBBDda328oPuOKFEwY9
+   UM8oBdy3MtOpJRmuvgmKOcTajqiAZSVWE2Lk8WWYmnvKXbJtopcBwlLAS
+   w==;
+X-CSE-ConnectionGUID: JLRRJEMIQxey4tQ49EYQlw==
+X-CSE-MsgGUID: qG4Nim78RnWv/efvnRtIpA==
+X-IronPort-AV: E=Sophos;i="6.17,290,1747699200"; 
+   d="scan'208";a="816125"
+Received: from ip-10-6-11-83.eu-central-1.compute.internal (HELO smtpout.naws.eu-west-1.prod.farcaster.email.amazon.dev) ([10.6.11.83])
+  by internal-fra-out-007.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Aug 2025 10:00:30 +0000
+Received: from EX19MTAEUA002.ant.amazon.com [10.0.10.100:4368]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.30.48:2525] with esmtp (Farcaster)
+ id ebacf326-514f-4d1e-ada7-f9005e4c17be; Fri, 15 Aug 2025 10:00:30 +0000 (UTC)
+X-Farcaster-Flow-ID: ebacf326-514f-4d1e-ada7-f9005e4c17be
+Received: from EX19D008EUC004.ant.amazon.com (10.252.51.148) by
+ EX19MTAEUA002.ant.amazon.com (10.252.50.126) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Fri, 15 Aug 2025 10:00:29 +0000
+Received: from EX19D008EUC001.ant.amazon.com (10.252.51.165) by
+ EX19D008EUC004.ant.amazon.com (10.252.51.148) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Fri, 15 Aug 2025 10:00:29 +0000
+Received: from EX19D008EUC001.ant.amazon.com ([fe80::9611:c62b:a7ba:aee1]) by
+ EX19D008EUC001.ant.amazon.com ([fe80::9611:c62b:a7ba:aee1%3]) with mapi id
+ 15.02.1544.014; Fri, 15 Aug 2025 10:00:29 +0000
+From: "Heyne, Maximilian" <mheyne@amazon.de>
+To: Paul Moore <paul@paul-moore.com>
+CC: Kuniyuki Iwashima <kuniyu@google.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Jason Baron
+	<jbaron@akamai.com>, "Ahmed, Aaron" <aarnahmd@amazon.com>, "Kumar, Praveen"
+	<pravkmr@amazon.de>, Eric Paris <eparis@redhat.com>, "linux-audit@redhat.com"
+	<linux-audit@redhat.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v1 net] netlink: Fix wraparounds of sk->sk_rmem_alloc.
+Thread-Topic: [PATCH v1 net] netlink: Fix wraparounds of sk->sk_rmem_alloc.
+Thread-Index: AQHcDctu6YADZPH6Mkm2ogmhibpggQ==
+Date: Fri, 15 Aug 2025 10:00:29 +0000
+Message-ID: <20250815-herons-fair-c5f3b931@mheyne-amazon>
+References: <20250704054824.1580222-1-kuniyu@google.com>
+ <20250808-parent-noise-53b1edaa@mheyne-amazon>
+ <CAAVpQUAi6sQ+=S-5oYOPkuPEFk68g2zG81YOA3MYVnTSvTxcjg@mail.gmail.com>
+ <CAHC9VhRbLSJhz=5Wuyi1RE8xxXPAGcEVXMUyTevawhAFPUvUoA@mail.gmail.com>
+In-Reply-To: <CAHC9VhRbLSJhz=5Wuyi1RE8xxXPAGcEVXMUyTevawhAFPUvUoA@mail.gmail.com>
+Accept-Language: en-US
 Content-Language: en-US
-From: "Badole, Vishal" <vishal.badole@amd.com>
-In-Reply-To: <20250813170012.7436b6e6@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: BMXPR01CA0075.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:b00:54::15) To CH3PR12MB7523.namprd12.prod.outlook.com
- (2603:10b6:610:148::13)
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <8D16B22460FF444DACC87C3C48542B14@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB7523:EE_|BN5PR12MB9461:EE_
-X-MS-Office365-Filtering-Correlation-Id: e45a0d59-e17e-43bf-e40a-08dddbdf7be6
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?L3BnSEozYUJiK2lQT3NvQUsrZWRuZkFoL0RlNndURnowSEtKSXlKTDZxa0Z5?=
- =?utf-8?B?S29SSldCRzNSeXBlM1lYb3h5cVE2SW9OR2JPNmh3MW1zeGRUR25KVWN2Ykpa?=
- =?utf-8?B?QXR0eXg3YndJK2VnaXI3S1VTUzc5TU01WXdpaGl4T2lXaGhFRU5HaSt2YmY4?=
- =?utf-8?B?M2VBa1AyUytHSXdSODcrNUNMdDR3RVliYjlHOHFYRWtIR3dlMHRxSE5mMThm?=
- =?utf-8?B?TXdyaG9oYmhjMi84ZlkzTW9VYXNYZ09RbEh1elhMZ2VkSXRBaVF1YWl3NHJV?=
- =?utf-8?B?SmxUdTIxamhPYU1zbjZuM1VEWTRBV0RrLy81K005Nm12QkZianJudlRWMjB0?=
- =?utf-8?B?d3ZJRFNKelk0enIxcG1pT00wRTBFbDZFVmM4MUJZc0lGZUJNU1VMY0R3Nk9k?=
- =?utf-8?B?WmpaVWVlKytmYVNxQS9BaExNMEJxM3h6VDFQYmZOQ05KQWRoNGVnOC84Yllp?=
- =?utf-8?B?ZXE5T0JFWEI0U3dPV1VreWVSVFhXOXM5RElEeXo0M2c4eVg5QlplejZtdFhK?=
- =?utf-8?B?NUVhMG95OWxDbi81eHBvM01BaWZBTW9BSTE3WmdEU1hQWnJmRytPdkJXbnJ5?=
- =?utf-8?B?SG8raWd1c2xrQVF6U2Z6Rnh4YjhBaEV3S2JZV0wwOFkybDJBTGdEejhOOXBY?=
- =?utf-8?B?VUZ0cW9WNWEwWk1ma2FLbUEwNGYzT3o4bUdiUVJ0bW91aTJuNUpCdlkxdzBU?=
- =?utf-8?B?TExzdFM3N2RiOGJyK2R1Q2VvUW9pbTl3Q2tHRjB6Vm1Id3F5cW4xR2daQWhy?=
- =?utf-8?B?WmNYbHdubWZQdFc3MklhYVZvYWNyTExuUkdsV084ak5QNWZhZk92QlJXL21m?=
- =?utf-8?B?Qktra2VRcFlVSG5hcUFMRjBDR2JRNTdIdVRzcjdXUnQvWUMvOVdVM0pWYzdQ?=
- =?utf-8?B?Wjh0TWx1Y0g1OCtjVmh0ODU3d3NGVU9WRzNYZ0VCc3Z3RG5kekhDWHRpdDBs?=
- =?utf-8?B?aWIzS1hXTDVnMXcvRFBhb3pTSUNjWmZHbTZOSDJRdFdlS2pPQlpsL2Vta09E?=
- =?utf-8?B?a1puc1NmcGcrN0JRUGJOdmR5WWdTYk9pWmppNmkyNk1oZ1dpcnVwUnpITjJv?=
- =?utf-8?B?aEtOWWpSQzgxYnZ4S2x1c1RQZmVTVkhNSjdoWHQ5K2x0TTkvcDcxMjl6SW9s?=
- =?utf-8?B?OUM3dWpUR1hIK0NRYW1BcHdOUHdMdTZleDZOVUsrYUpTUDlDcWluT3ZyVGFW?=
- =?utf-8?B?LzhUT3p4VXFJV3VuTHB1c21rUTJnQWc2Zm9UWk1OOHU0NVRDbmhDV1RydjRp?=
- =?utf-8?B?VnBTekhLbjlHa0kyeGJIVEpPMHdqTFZDVjBXbmZyazRiMVdMUy9TN3YrdEMy?=
- =?utf-8?B?TDlicW9kNlBiSzdONXE5NUR5UmhYTWNXQXNzUGoySGlJQThlWlowNTZtZHo3?=
- =?utf-8?B?dVV4anRqK2ZuOEVSK3Y4NkVoRzNPdlJBRjBpN1RxcURrRkRrRExaYUFwZnhu?=
- =?utf-8?B?YTRjZ3ZBK0NzcVd0WGF0Wm4xd2VidmRUNTFleDAzL0R0VjZNTmt1YnRDZXRF?=
- =?utf-8?B?eGtUODF6YjF0VFppMkZNZXJ3UHVsb3FSV3NOMFJZRXpnWTVVSTlrTmR0aGpz?=
- =?utf-8?B?aDdaU2JCQ282bGJjdldqSlZJT2hRdmovZXVmdXljam9DcmhUVUZZcjI0RTRX?=
- =?utf-8?B?QmNkVnJ1OVB4REtwQ0ErdUJrSWxxeHNHL0xOTk9hNmF6RWdKM3JGeHlONVZN?=
- =?utf-8?B?MmYxNXVqUXdmSkR3UnVlaUNQVFBtT1FoVUtVYlgyNVZZTWdaTTBKczYwVVNi?=
- =?utf-8?B?Mm92Z2tCdmF4NHpaSXMzdGpvVVdEUFlabmhBclEzU3FvSU5iMVRvSjZuMFhC?=
- =?utf-8?B?a2hDWjlVdWsrOWFzV3JqY1JOOFBLSjJ2T2RCUVNxYzdJWC9CZ2JOUWdYMVFY?=
- =?utf-8?B?d0FLS0I3ekdhcUhIMjVNazc0c3lXZHE0Uk5teExqWnhhRGc9PQ==?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7523.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?cEVsQVhJVWJYcXhUUVI2c3V4cU9aLzRrZitNUEkrL0JTdTBXS1JVTmg3RVRh?=
- =?utf-8?B?OXYrWGx4Nms0UDMxK3B6dS9SeDlRSU40c2FvSEJ6bVBIeldERzdsQ0xLdlFB?=
- =?utf-8?B?MTNpcVdCcjJ5cnNzR2Z2ZFpHQ2J5cS9jWm0zc1g4V2JLM3F5N3M2NkZhNUxH?=
- =?utf-8?B?cUNIa1VSdk0xQVdSSTVmb1NCU0RpL3pJR3VrYTc1TlNEQVU0a1Nnc1p0Mmds?=
- =?utf-8?B?VGxUejBCSDlrRkEwVFRPcmhJYnNCQVBUaFBBL3BWK2dhVmNURWJ2dkRNQ3Er?=
- =?utf-8?B?SUNFRXZTUW5pQmhEZ1hrdWRyTnZPbkE5aGVNVkJSZFNoUEh5YVRiVHlybG9h?=
- =?utf-8?B?RWNzMENueXlBeFZBbHljUnFlek8wMEx6cHFCdzNBZG90RmQ4Wmx6c3R2Rk96?=
- =?utf-8?B?dGRQK2dOOXNZbUxTeHFEQUlIYmpqMjNad2JjZ3NraGZDYVYvdm5YVzdMSStu?=
- =?utf-8?B?U2ozSGpiNVR0V0Z0c2R6MDM5S1BLdVgxVGZCVXFsRUIrbkYyU2xqUWlTbE1W?=
- =?utf-8?B?WGlrSXNGQU5FMXlRY1A4VEtFWXRuaHkrcGVxV3pKaHlVcm1UcjBnNW04OEJZ?=
- =?utf-8?B?cWxYUU5PSkp2Sno5VkVwK0VBNm93bzdMQmVuUEFPWFFHNjVtbGZJdHZOcHhO?=
- =?utf-8?B?TGN6M1g3RkJnOXZLQUtwQUw4WFJRSnpqbG9NOWxKVWFUNWhWU09IVnB5aFVz?=
- =?utf-8?B?NDRnbTJjMGt3RVNaNnpUSjRFQndBTTJWa090RDNaV1pTUmxoNWtJWG5XNm1w?=
- =?utf-8?B?ZHRlMlJNVy9rMWFhMHpPWW0wdlJhaVV6QzlsczFXWER0NWFlSnVWZjl3aVVz?=
- =?utf-8?B?WVFEa1VzakRTdjNTazFyZGtxdVNqQ25aQkN2alNWbGZTMnIvVlhjSFk0R3lq?=
- =?utf-8?B?WkNmd2lOSTlPMTRVcjhsQW1pMjBPMlliZTlTZ1AyQm5MWTA4UURkRks5THFX?=
- =?utf-8?B?VXV6VXByeXFhY0FzRU9WTU1DZXM1NnVKU1Blb2hxek91THVnZHh6YWlGbDdU?=
- =?utf-8?B?V0x2S3djRHJOdE5ic3NZVEcrWVRWencxYWJhdGhlQlUyNEM0b0FSa0lMTTAy?=
- =?utf-8?B?TmNYeGxKQzhZTGhJeUFZSzVhLzN6NWIvMWx4ZVVQNnVTM1VpbktqUnNxTDZy?=
- =?utf-8?B?cWNZR0liQ1dwb1N1TWg1bDZsempneXF1MUJJekhwQVlBL0FYeWN4RE5KRnZm?=
- =?utf-8?B?ckh0SURHN2U1bnlRd0ZvTG1uNk14UDRxZWE4R3M5VTI2dDJGRjQvZkxoZ2xD?=
- =?utf-8?B?bUdWbHZ1dDk3V1pZdlJZVUhQdWY4MDhESkl5RFg0TTU4NnBEZUs5Uit0K3ZW?=
- =?utf-8?B?UnYzMm5CbnRPakpMaVlVdUdFWi9iME9MUjROTXE4bkV2bE1aV1VPbXdXdWJs?=
- =?utf-8?B?dTEwZll4b0REL05STm5LYzZIUzRkbWJyeVIxTldEUjVqbklaOTJnVWZuMzNC?=
- =?utf-8?B?MEx2WGE1SnBLcVhIejlraG5EQUd6U2NibUVyRlhmL2dqMFB5RnV6VW5XM2hj?=
- =?utf-8?B?NUdkSVNicnBqMytHR1F1MzZGMmYvbHlaREZ5OWpBYzNaZWpLQlRHekFhaWRJ?=
- =?utf-8?B?bTE2THVUMERRWWl4OXpkZk1TdklONGFSZStZUTdFZ1ZtaFU3QWtXWlNuZ01O?=
- =?utf-8?B?MHNiVVNReTRTS1RXbEZibXBRazVERFUyMmdTdkxyZWRtai9UYXVTQ2dqSEt1?=
- =?utf-8?B?RGZxUWRtdW9jcGVCS0J3TkdBVUx4USthRVgraDFCVUpWb29VY3I4Qk94YVZV?=
- =?utf-8?B?WTF6a29JRmhoenFvellYWUpPRDBnbk9kZVZBRmduZjRJZitkZmNVa2dtb1o1?=
- =?utf-8?B?VG9EQ1diaU1OMitHaGFJN003dTMxR2lxbE1aOTFxVjlER0VXMXFFQk1QMUVQ?=
- =?utf-8?B?bnlsOCtrSGY1cHZ6RnpSd01OdG9jZ1JiTW9FRTFzRk1vY3VSbEY5VnBLaW5K?=
- =?utf-8?B?UUJodFRGdUR0TGJmL01QKzdvYUVtdU5pSE1QTnRrNTZWeEVVVDJJZTJmTUZ4?=
- =?utf-8?B?bDhpT2tvbmRsNmUxcjVZTmJicWx5Nm5vWVp5M3VyL2puaVh5dmNlenM1U3Ju?=
- =?utf-8?B?eUlYd2RObUtQRGUyNThCOUd5ckRSMWJVcGR4LzFVZmNHSkRHMG5uYXdzK1pr?=
- =?utf-8?Q?EWdcmySkHcAvlbUmzCh4UOlwc?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e45a0d59-e17e-43bf-e40a-08dddbdf7be6
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7523.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Aug 2025 09:38:26.3199
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Elfz1ZNH86jIGz67cSqMYsm+B4giRG2WnfrFd4kgExd2xk0XjmC+0d0MDbjMzLmjvyYiH0N6wW2enw+4e/MacA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN5PR12MB9461
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Aug 13, 2025 at 03:00:29PM -0400, Paul Moore wrote:
+> On Fri, Aug 8, 2025 at 11:54???AM Kuniyuki Iwashima <kuniyu@google.com> w=
+rote:
+> > On Fri, Aug 8, 2025 at 6:59???AM Heyne, Maximilian <mheyne@amazon.de> w=
+rote:
+> > > On Fri, Jul 04, 2025 at 05:48:18AM +0000, Kuniyuki Iwashima wrote:
+> > > > Netlink has this pattern in some places
+> > > >
+> > > >   if (atomic_read(&sk->sk_rmem_alloc) > sk->sk_rcvbuf)
+> > > >       atomic_add(skb->truesize, &sk->sk_rmem_alloc);
+> > > >
+> > > > , which has the same problem fixed by commit 5a465a0da13e ("udp:
+> > > > Fix multiple wraparounds of sk->sk_rmem_alloc.").
+> > > >
+> > > > For example, if we set INT_MAX to SO_RCVBUFFORCE, the condition
+> > > > is always false as the two operands are of int.
+> > > >
+> > > > Then, a single socket can eat as many skb as possible until OOM
+> > > > happens, and we can see multiple wraparounds of sk->sk_rmem_alloc.
+> > > >
+> > > > Let's fix it by using atomic_add_return() and comparing the two
+> > > > variables as unsigned int.
+> > > >
+> > > > Before:
+> > > >   [root@fedora ~]# ss -f netlink
+> > > >   Recv-Q      Send-Q Local Address:Port                Peer Address=
+:Port
+> > > >   -1668710080 0               rtnl:nl_wraparound/293               *
+> > > >
+> > > > After:
+> > > >   [root@fedora ~]# ss -f netlink
+> > > >   Recv-Q     Send-Q Local Address:Port                Peer Address:=
+Port
+> > > >   2147483072 0               rtnl:nl_wraparound/290               *
+> > > >   ^
+> > > >   `--- INT_MAX - 576
+> > > >
+> > > > Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> > > > Reported-by: Jason Baron <jbaron@akamai.com>
+> > > > Closes: https://lore.kernel.org/netdev/cover.1750285100.git.jbaron@=
+akamai.com/
+> > > > Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+> > >
+> > > Hi Kuniyuki,
+> > >
+> > > We're seeing soft lockups with this patch in a variety of (stable)
+> > > kernel versions.
+> > >
+> > > I was able to reproduce it on a couple of different EC2 instances also
+> > > with the latest linux kernel 6.16-rc7 using the following steps:
+> > >
+> > > systemctl start auditd
+> > > sudo auditctl -D
+> > > sudo auditctl -b 512
+> > > sudo auditctl -a always,exit -F arch=3Db64 -S mmap,munmap,mprotect,br=
+k -k memory_ops
+> > > sudo auditctl -e 1
+> > >
+> > > Then execute some programs that call some of these memory functions,
+> > > such as repeated calls of "sudo auditctl -s" or logging in via SSH.
+> > >
+> > > These settings are set in a way to create a lot audit messages. Once =
+the
+> > > backlog (see auditctl -s) overshoots the backlog_limit, the system so=
+ft
+> > > lockups:
+> > >
+> > > [  460.056244] watchdog: BUG: soft lockup - CPU#1 stuck for 52s! [kau=
+ditd:32]
+> > > [  460.056249] Modules linked in: mousedev(E) nls_ascii(E) nls_cp437(=
+E) sunrpc(E) vfat(E) fat(E) psmouse(E) atkbd(E) libps2(E) vivaldi_fmap(E) i=
+8042(E) serio(E) skx_edac_common(E) button(E) ena(E) ghash_clmulni_intel(E)=
+ sch_fq_codel(E) drm(E) i2c_core(E) dm_mod(E) drm_panel_orientation_quirks(=
+E) backlight(E) fuse(E) loop(E) dax(E) configfs(E) dmi_sysfs(E) efivarfs(E)
+> > > [  460.056272] CPU: 1 UID: 0 PID: 32 Comm: kauditd Tainted: G        =
+    EL      6.16.0-rc7+ #3 PREEMPT(none)
+> > > [  460.056275] Tainted: [E]=3DUNSIGNED_MODULE, [L]=3DSOFTLOCKUP
+> > > [  460.056276] Hardware name: Amazon EC2 t3.medium/, BIOS 1.0 10/16/2=
+017
+> > > [  460.056277] RIP: 0010:_raw_spin_unlock_irqrestore+0x1b/0x30
+> > > [  460.056284] Code: 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 0f =
+1f 44 00 00 e8 16 07 00 00 90 f7 c6 00 02 00 00 74 01 fb 65 ff 0d b5 23 b6 =
+01 <74> 05 c3 cc cc cc cc 0f 1f 44 00 00 e9 14 23 00 00 0f 1f 40 00 90
+> > > [  460.056285] RSP: 0018:ffffb762c0123d70 EFLAGS: 00000246
+> > > [  460.056287] RAX: 0000000000000001 RBX: ffff9b14c08eafc0 RCX: ffff9=
+b14c3337348
+> > > [  460.056288] RDX: ffff9b14c3337348 RSI: 0000000000000246 RDI: ffff9=
+b14c3337340
+> > > [  460.056289] RBP: ffff9b14c3337000 R08: ffffffff93cea880 R09: 00000=
+00000000001
+> > > [  460.056290] R10: 0000000000000001 R11: 0000000000000080 R12: ffff9=
+b14c1b72500
+> > > [  460.056291] R13: ffffb762c0123de0 R14: ffff9b14c3337340 R15: ffff9=
+b14c3337080
+> > > [  460.056294] FS:  0000000000000000(0000) GS:ffff9b1563788000(0000) =
+knlGS:0000000000000000
+> > > [  460.056296] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > > [  460.056297] CR2: 00007f36fd5d21b4 CR3: 000000010241a002 CR4: 00000=
+000007706f0
+> > > [  460.056298] PKRU: 55555554
+> > > [  460.056299] Call Trace:
+> > > [  460.056300]  <TASK>
+> > > [  460.056302]  netlink_attachskb+0xb7/0x2f0
+> > > [  460.056308]  ? __pfx_default_wake_function+0x10/0x10
+> > > [  460.056313]  netlink_unicast+0xea/0x3b0
+> > ...
+> > >
+> > > We've bug reports from many users, so the issue is rather wide-spread.
+> > >
+> > > So far I don't know why the commit is causing this issue and will keep
+> > > investigating. However, when reverted (together with its 2 follow-up
+> > > patches), the issue goes away and host do not lock up.
+> >
+> > Thanks for the report, Max!
+> >
+> > Does your tree have this commit ?  This is the 3rd follow-up patch.
+> >
+> > commit 759dfc7d04bab1b0b86113f1164dc1fec192b859
+> > Author: Fedor Pchelkin <pchelkin@ispras.ru>
+> > Date:   Mon Jul 28 08:06:47 2025
+> >
+> >     netlink: avoid infinite retry looping in netlink_unicast()
+> =
+
+
+Hi Paul,
+
+> Hopefully that resolves the problem, Maximilian?
+
+sorry for the late reply. Just tested the commit yesterday and I can
+confirm that this fixes our issues.
+
+> Normally the audit subsystem is reasonably robust when faced with
+> significant audit loads.  An example I use for testing is to enable
+> logging for *every* syscall (from the command line, don't make this
+> persist via the config file!) and then shutdown the system; the system
+> will obviously slow quite a bit under the absurd load, but it should
+> shutdown gracefully without any lockups.
+> =
+
+
+Thank you for suggesting this. Will add something like this to our
+internal testing. Do you know whether there is already some stress test
+that covers the audit subsystem or would have any selftest found this
+issue?
+
+Regards,
+Maximilian
 
 
 
-On 8/14/2025 5:30 AM, Jakub Kicinski wrote:
-> On Tue, 12 Aug 2025 10:20:35 +0530 Vishal Badole wrote:
->> Ethtool has advanced with additional configurable options, but the
->> current driver does not support tx-usecs configuration.
-> 
-> Not sure what you mean by this, perhaps:
-> 
->    current driver does not even support tx-usecs configuration.
-> 
-> ? tx-usecs is a very old tunable.
-> 
->> Add support to configure and retrieve 'tx-usecs' using ethtool, which
->> specifies the wait time before servicing an interrupt for Tx coalescing.
->>
-Thanks for pointing that out. My intent was to highlight that while 
-ethtool has gained more advanced and configurable options over time, the 
-driver in its current form does not have support for tx-usecs 
-configuration using Ethool.
-I’ll reword the sentence to make this clearer in next patch version.>
->> +	/* Check if both tx_usecs and tx_frames are set to 0 simultaneously */
->> +	if (!tx_usecs && !tx_frames) {
->> +		NL_SET_ERR_MSG_FMT_MOD(extack,
->> +				       "tx_usecs and tx_frames must not be 0 together");
->> +		return -EINVAL;
->> +	}
->> +
->>   	/* Check the bounds of values for Tx */
->> +	if (tx_usecs > XGMAC_MAX_COAL_TX_TICK) {
->> +		NL_SET_ERR_MSG_FMT_MOD(extack, "tx-usecs is limited to %d usec",
->> +				       XGMAC_MAX_COAL_TX_TICK);
->> +		return -EINVAL;
->> +	}
-> 
-> Normal configuration granularity for this parameter is in 10s of usecs.
-> You seem to be using a timer, so I think you should either round the
-> value up / down to what the jiffy resolution will give you or
-> reject configuration that's not expressible in jiffies (not a multiple
-> of jiffies_to_usecs(1)). Otherwise users may waste time turning this
-> knob by 100usec which will have zero effect.
+Amazon Web Services Development Center Germany GmbH
+Tamara-Danz-Str. 13
+10243 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
+Sitz: Berlin
+Ust-ID: DE 365 538 597
 
-Good point — the hardware uses a timer, so sub-jiffy resolution won’t 
-have any real effect. I’ll update the code in next patch version to 
-round the tx-usecs value to the nearest multiple.
 
