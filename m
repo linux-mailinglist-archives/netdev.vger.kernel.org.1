@@ -1,110 +1,88 @@
-Return-Path: <netdev+bounces-214146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214147-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60B8CB285AE
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 20:18:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 520FEB285B6
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 20:19:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C5C121B67049
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 18:18:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A8903B601EB
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 18:17:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDCF31FDA89;
-	Fri, 15 Aug 2025 18:18:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 918FE2F9C5B;
+	Fri, 15 Aug 2025 18:18:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="XeDhmJ4y"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uSiRkUW/"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46B1531770A;
-	Fri, 15 Aug 2025 18:17:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D96B218EB1
+	for <netdev@vger.kernel.org>; Fri, 15 Aug 2025 18:18:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755281880; cv=none; b=RvzE2AVEpK+Pr8rgWHAiIa9dxyxn+JS9AtCcvRO9tuRDzuKKvluLtbtxgOIw8G6jQFW1ita0uBViksbSht4HNkhTi+M/ONGcbsK9fZUgoz2o0ubgeuXWaBsEs+5V+5b5eOI/1ZTP0sI4nU0Z8oBXIy/VIcOXLTFeo6ZfM6ITQHo=
+	t=1755281936; cv=none; b=peKCfB6RCqKPELFomYEzrMhxIZwfZpxFBATrSFVIXWNu7qqMJ250pmfWjUH7QZWTKtj1mUyR4k51QdaeLfla+6xWINdJMJSDbE03Qhv3ixmCEAvCRhx5/BGobpYyKycnKT/+pbNY8UW10A2Gg3iGqug+bKPuZ4i77rWEf7u0xOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755281880; c=relaxed/simple;
-	bh=6WA1AzM68wUn5rKZorqUBe/a24Hl7xLvSiCclzH9bes=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DJrZiUZe+UHPer/zvQKkh8mheUCGoD9AmVCHNFRXq7uVTNBMJpgVOX+PfqLCaGL68Y8q5BjY5EfFMSRkpzM5HPBjP6bZycvv3TTxXEv33+5b4pfLHrB+vzhPfzix3WfI9XihC8i+AWW8GfFRXN68ZXk3nAKlPAki60zEwwDxafc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=XeDhmJ4y; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=x991MXHST0EKiSJEKhetd564OkHnAL8jVf76/MDrS0c=; b=XeDhmJ4y9KKDkVdDuflrq5rn09
-	L5mL6HhGn0XktAYU7n3gE40QDLQ2HzzS51Uyk61sD2QFliAjVGRBjC2aHH5+x+mbqWGvu9fWqUilP
-	PFN6P/BWLU60i0PyUv3v+2ex0B4ftLx92Ab83vIpqI3OPteQ4f3sG9XgovWaSO/8S3G4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1umyzl-004qln-V5; Fri, 15 Aug 2025 20:17:41 +0200
-Date: Fri, 15 Aug 2025 20:17:41 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jacky Chou <jacky_chou@aspeedtech.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Joel Stanley <joel@jms.id.au>,
-	Andrew Jeffery <andrew@codeconstruct.com.au>,
-	Simon Horman <horms@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@baylibre.com>,
-	Po-Yu Chuang <ratbert@faraday-tech.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-aspeed@lists.ozlabs.org,
-	taoren@meta.com, bmc-sw2@aspeedtech.com
-Subject: Re: [net-next v2 3/4] ARM: dts: aspeed: ast2600evb: Add delay
- setting for MAC
-Message-ID: <0f0383dd-a55b-48e6-824c-798c2a9e173e@lunn.ch>
-References: <20250813063301.338851-1-jacky_chou@aspeedtech.com>
- <20250813063301.338851-4-jacky_chou@aspeedtech.com>
+	s=arc-20240116; t=1755281936; c=relaxed/simple;
+	bh=ujkalNO0fo39nSMHUUcBvgj5Nx1Sb2W1Thd/WbcLpZI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lzuyPxEtgR2ZSGJj+eTXSQb5Cq3DCaPXT30/JqHdzb7BhWj+5wjldUlyWYznq6TBlNmz7fthYFckwzb2iGapbzYuK29+tzYHhl7hK+7xjmL7vqX0oHwmStynWMq+K9m1EdY+9qsBsHqwDK+a6dJdLj1Q+Hgv9UMc/lH1jUIZQ4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uSiRkUW/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99AFAC4CEF5;
+	Fri, 15 Aug 2025 18:18:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755281935;
+	bh=ujkalNO0fo39nSMHUUcBvgj5Nx1Sb2W1Thd/WbcLpZI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=uSiRkUW/jvZoNxzdsUEjP6VB92gKfU9NJ+KtvFFXwvFfhVIQBiuxHvgpCK0de2LtT
+	 494+Sx+NNSTlPOuop35WO9LkQv4hQaG4ikkGORyfstM6Y15BeUTgUczDgl5/V91nCg
+	 uSNqQj00/upBYricEpAnPnmOgppGd3rai6/1h1NsSlfUavIXPr6KGyy35/hTmCUVge
+	 An+vx9qJ5FxEUyKBCjHrIAfftW8qBY+jipQm9BKUtF8OitInBbbuGl4JCzmQRrDRN1
+	 J4rMr4lIKWXLGTv5fc5UMD42BNHhBQ4kbGjofL976Wez16IySBrw5+SRoBMn7r2n4M
+	 W0/X1RUK6GNlw==
+Date: Fri, 15 Aug 2025 11:18:54 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jacob Keller
+ <jacob.e.keller@intel.com>, Mengyuan Lou <mengyuanlou@net-swift.com>
+Subject: Re: [PATCH net-next v4 4/4] net: wangxun: support to use adaptive
+ RX/TX coalescing
+Message-ID: <20250815111854.170fea68@kernel.org>
+In-Reply-To: <20250812015023.12876-5-jiawenwu@trustnetic.com>
+References: <20250812015023.12876-1-jiawenwu@trustnetic.com>
+	<20250812015023.12876-5-jiawenwu@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250813063301.338851-4-jacky_chou@aspeedtech.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> @@ -149,6 +155,9 @@ &mac2 {
+On Tue, 12 Aug 2025 09:50:23 +0800 Jiawen Wu wrote:
+> @@ -878,6 +909,8 @@ static int wx_poll(struct napi_struct *napi, int budget)
 >  
->  	pinctrl-names = "default";
->  	pinctrl-0 = <&pinctrl_rgmii3_default>;
-> +
-> +	rx-internal-delay-ps = <2000>;
-> +	tx-internal-delay-ps = <2000>;
->  };
->  
->  &mac3 {
-> @@ -159,6 +168,9 @@ &mac3 {
->  
->  	pinctrl-names = "default";
->  	pinctrl-0 = <&pinctrl_rgmii4_default>;
-> +
-> +	rx-internal-delay-ps = <2000>;
-> +	tx-internal-delay-ps = <2000>;
->  };
+>  	/* all work done, exit the polling mode */
+>  	if (likely(napi_complete_done(napi, work_done))) {
+> +		if (wx->adaptive_itr)
+> +			wx_update_dim_sample(q_vector);
 
-Documentation/devicetree/bindings/net/ethernet-controller.yaml
+this is racy, napi is considered released after napi_complete_done()
+returns. So napi_disable() can succeed right after that point...
 
-# Sometimes there is a need to fine tune the delays. Often the MAC or
-# PHY can perform this fine tuning. In the MAC node, the Device Tree
-# properties 'rx-internal-delay-ps' and 'tx-internal-delay-ps' should
-# be used to indicate fine tuning performed by the MAC. The values
-# expected here are small. A value of 2000ps, i.e 2ns, and a phy-mode
-# of 'rgmii' will not be accepted by Reviewers.
+> @@ -1611,6 +1708,8 @@ void wx_napi_disable_all(struct wx *wx)
+>  	for (q_idx = 0; q_idx < wx->num_q_vectors; q_idx++) {
+>  		q_vector = wx->q_vector[q_idx];
+>  		napi_disable(&q_vector->napi);
+> +		cancel_work_sync(&q_vector->rx.dim.work);
+> +		cancel_work_sync(&q_vector->tx.dim.work);
 
-    Andrew
-
----
+so you may end up with the DIM work scheduled after the device is
+stopped.
+-- 
 pw-bot: cr
 
