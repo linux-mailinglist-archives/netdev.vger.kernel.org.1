@@ -1,237 +1,242 @@
-Return-Path: <netdev+bounces-213999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214001-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD98AB27AB9
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 10:17:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7ECB6B27ACD
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 10:20:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E251E7A4DA2
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 08:15:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A1CE1C8790B
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 08:21:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 938181C8632;
-	Fri, 15 Aug 2025 08:17:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FA4723FC66;
+	Fri, 15 Aug 2025 08:20:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="XsILf4Fg";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="ZzYLnIyM"
+	dkim=pass (2048-bit key) header.d=gmx.de header.i=markus.stockhausen@gmx.de header.b="jvOZxmi7"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB84322083
-	for <netdev@vger.kernel.org>; Fri, 15 Aug 2025 08:17:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2957F1FC0F0
+	for <netdev@vger.kernel.org>; Fri, 15 Aug 2025 08:20:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755245843; cv=none; b=cFjtWhtaecOr91XBzDzJLwCy9HpYwusOqJF+uX4alLFt1826P1Zccu8YxdfLlUZTfijifM5eHG6wXa02rQVx2ZT5dRzpxygixahYlCHC3/KyL8Zpnjie6ilmTsu/PnvMPYtG3y3Vh2HPze8b4K0Ri6IkvTKZUVrTJo/tirPiC7U=
+	t=1755246047; cv=none; b=IyNsCZat2YLHnOrLpAJLnK9YOw/VbnU48PN7sPNZSUMRFI2NqWh1C0Rb4Vf8h/xNI0MMfpsS6BFDijVjnr65VzygDfVohdhS2KGyQBBwyUjeGcd4cU0iJRmjLL01RuV88GAK3oaVfdhzAIOSTo50YBAilone3pvsx0tkwTh/pPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755245843; c=relaxed/simple;
-	bh=xbISTRKz0EJnMTmLIwLf7tT4jbcCgjF818w/ZymAGU4=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=ZOtF7n+VQLTaooc4JMX5Twh4c1D8V07sZybCygSzXr4fCgEqHrH2zvEh3jgWP1lm+hIPt92gBvgpmBdedSnhhUk5vpA9lfCIh6ml68PX/8BG5GfKUtR0Y4IAM5DXLNNg/H4lB5EQr7Mzja40jfoHMr7pqFZRzRdOiTMS0REB2b8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=XsILf4Fg; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=ZzYLnIyM; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1755245839;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PWHiph4fIINuELdt0a+NGv5gE0TDFyitr5/9rdKwdFI=;
-	b=XsILf4Fgh7LpXgpzykCRN5AbgVC960WZEPgrktFrApvVr81hKqSebQ+ILc9eUyPK2i+bSm
-	OFiL7HTUTDZGjy8TFSvk6pg/AFcD/k77Io39iwuBwh2MMkRCppqBtpbpTKIiRUfL5SHJIK
-	x61Z1s8oZKn9PDv7y6+CQBew1LbO4Hu/5Vz1CxDGj5yfvZ2aNOTvbqdW8GZxMMGSgW9sbB
-	y9JPsytamsRuX2RQSHepdeQhWvzkVI5G0VzILaykUPjR+rTLkhrkvNsB21L5TIrpICk212
-	eQu6oIpOqCGvOyA8IvJXRCQLf+jRPqC51m32jCoKAm/CVVBhi8fyN24dP05Mng==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1755245839;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PWHiph4fIINuELdt0a+NGv5gE0TDFyitr5/9rdKwdFI=;
-	b=ZzYLnIyM5Mcz8s14MZmo4oDKz7Dj/ZA7J9FwJqBgpiA2IbVMrCAWt+OL4VbzSk+xU9PwVX
-	Dr2FEgM2GAnYK+Bw==
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, Vinicius
- Costa Gomes <vinicius.gomes@intel.com>, Sebastian Andrzej Siewior
- <bigeasy@linutronix.de>, intel-wired-lan@lists.osuosl.org,
- netdev@vger.kernel.org
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next] igb: Retrieve Tx timestamp
- directly from interrupt
-In-Reply-To: <a1e9e37e-63da-4f1c-8ac3-36e1fde2ec0a@molgen.mpg.de>
-References: <20250815-igb_irq_ts-v1-1-8c6fc0353422@linutronix.de>
- <a1e9e37e-63da-4f1c-8ac3-36e1fde2ec0a@molgen.mpg.de>
-Date: Fri, 15 Aug 2025 10:17:17 +0200
-Message-ID: <87y0rlm22a.fsf@jax.kurt.home>
+	s=arc-20240116; t=1755246047; c=relaxed/simple;
+	bh=YsWETRXwLsrLOcXH3DupIuLZELW/r8FKv5zPHazyH8c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iW/VHVjLv0H0b1QsHvpwyDXA0HkaiMLaL/ss83Y4fvpVhqyJQwMZwQ1+R6bJcQYqrrjor0S1PnZ/XS6guDfB5RG7PaK98QsUx0VoPpKS1voIXWdIMiGKztRP69AicI7a+sE+CAdgpft5j0+lr/XLF0j7AbmdZrQAqJeCXyF2jFM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=markus.stockhausen@gmx.de header.b=jvOZxmi7; arc=none smtp.client-ip=212.227.15.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
+	s=s31663417; t=1755246023; x=1755850823;
+	i=markus.stockhausen@gmx.de;
+	bh=X/jNrm/FtNa5FOo/g0ES5OBhaB+p+tOlDySfSRZVF3U=;
+	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-ID:
+	 MIME-Version:Content-Transfer-Encoding:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=jvOZxmi7VlRYASq44oYmAwdAhlW3JTc/qtb1ciI7KViHoZ5CIpfSDtRwkAoPRExp
+	 Uf2PkcCBggFVlOM/pf5TyzcEx9T/nColhKt9fhhL+koP84UjGwFejw7K9pwBmY4Te
+	 ORxZjZLClK1KGACGloxePCHMKYYJ+O9MYmmH09SlFWgBQgUm/Hi7eMjr3cZ+68Yhy
+	 +2gvR1pa32RXed5gwInLD9xMaMrsH/0u1a1/gm4GRD4TqytnGfGxL8pvypokz8hSG
+	 NsDI2atdLY34bAfATAqtgIipkfvPSDhTHNUC8Xl04USEukk7P9P5tn3MpaPO1HkxE
+	 SMOPMozjJklfgLduyA==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from openwrt ([94.31.70.55]) by mail.gmx.net (mrgmx005
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1Mel3n-1uCfNC1NHJ-00bk90; Fri, 15
+ Aug 2025 10:20:23 +0200
+From: Markus Stockhausen <markus.stockhausen@gmx.de>
+To: andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	michael@fossekall.de,
+	daniel@makrotopia.org,
+	netdev@vger.kernel.org,
+	jan@3e8.eu
+Cc: Markus Stockhausen <markus.stockhausen@gmx.de>
+Subject: [PATCH net-next] net: phy: realtek: enable serdes option mode for RTL8226-CG
+Date: Fri, 15 Aug 2025 04:20:09 -0400
+Message-ID: <20250815082009.3678865-1-markus.stockhausen@gmx.de>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
-
---=-=-=
-Content-Type: text/plain
 Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:sgQUxqOINK0bCYit/fmEnVJmungM3cW4fupOLmMYXn0PSgulyAE
+ vVzafkbY2coaX2BjnCdCWnHxWmftA/WtlX/G9fd6bnvmd/ZpC5Y1yFIPYBaND5LSGIKLIZL
+ E3wTt5N5nLNxStz+fjSGdcSKkjZnA6FtDPs/kQrN+VjT1hEXQI8n2n4IikLMd3pJb3OGHT2
+ V9ISh4h1qmfF6r+g0a3ew==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:smCO/PTn6ok=;NSTCYTCxAlMrVSLz5+OqucL69gf
+ 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
+ 1vyjUVlkowougjaqkL8ZiMsliSnP
 
-Hi Paul,
+The RTL8226-CG can make use of the serdes option mode feature to
+dynamically switch between SGMII and 2500base-X. From what is
+known the setup sequence is much simpler with no magic values.
 
-On Fri Aug 15 2025, Paul Menzel wrote:
-> Dear Kurt,
->
->
-> Thank you for your patch.
->
-> Am 15.08.25 um 08:50 schrieb Kurt Kanzenbach:
->> Retrieve Tx timestamp directly from interrupt handler.
->>=20
->> The current implementation uses schedule_work() which is executed by the
->> system work queue to retrieve Tx timestamps. This increases latency and =
-can
->> lead to timeouts in case of heavy system load.
->>=20
->> Therefore, fetch the timestamp directly from the interrupt handler.
->>=20
->> The work queue code stays for the Intel 82576. Tested on Intel i210.
->
-> Excuse my ignorance, I do not understand the first sentence in the last=20
-> line. Is it because the driver support different models? Why not change=20
-> it for Intel 82576 too?
+Convert the exiting config_init() into a helper that configures
+the PHY depending on generation 1 or 2. Call the helper from two
+separated new config_init() functions.
 
-Yes, the driver supports lots of different NIC(s). AFAICS Intel 82576 is
-the only one which does not use time sync interrupts. Probably it does
-not have this feature. Therefore, the 82576 needs to schedule a work
-queue item.
+Finally convert the phy_driver specs of the RTL8226-CG to make
+use of the new configuration and switch over to the extended
+read_status() function to dynamically change the interface
+according to the serdes mode.
 
->
-> Do you have a reproducer for the issue, so others can test.
+Remark! The logic could be simpler if the serdes mode could be
+set before all other generation 2 magic values. Due to missing
+RTL8221B test hardware the mmd command order was kept.
 
-Yeah, I do have a reproducer:
+Tested on Zyxel XGS1210-12.
 
- - Run ptp4l with 40ms tx timeout (--tx_timestamp_timeout)
- - Run periodic RT tasks (e.g. with SCHED_FIFO 1) with run time of
-   50-100ms per CPU core
+Signed-off-by: Markus Stockhausen <markus.stockhausen@gmx.de>
+=2D--
+ drivers/net/phy/realtek/realtek_main.c | 26 ++++++++++++++++++++------
+ 1 file changed, 20 insertions(+), 6 deletions(-)
 
-This leads to sporadic error messages from ptp4l such as "increasing
-tx_timestamp_timeout or increasing kworker priority may correct this
-issue, but a driver bug likely causes it"
+diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/real=
+tek/realtek_main.c
+index a7541899e327..acc44de54270 100644
+=2D-- a/drivers/net/phy/realtek/realtek_main.c
++++ b/drivers/net/phy/realtek/realtek_main.c
+@@ -1038,7 +1038,7 @@ static int rtl822x_probe(struct phy_device *phydev)
+ 	return 0;
+ }
+=20
+-static int rtl822xb_config_init(struct phy_device *phydev)
++static int rtl822x_set_serdes_option_mode(struct phy_device *phydev, bool=
+ gen1)
+ {
+ 	bool has_2500, has_sgmii;
+ 	u16 mode;
+@@ -1073,15 +1073,18 @@ static int rtl822xb_config_init(struct phy_device =
+*phydev)
+ 	/* the following sequence with magic numbers sets up the SerDes
+ 	 * option mode
+ 	 */
+-	ret =3D phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x75f3, 0);
+-	if (ret < 0)
+-		return ret;
++
++	if (!gen1) {
++		ret =3D phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x75f3, 0);
++		if (ret < 0)
++			return ret;
++	}
+=20
+ 	ret =3D phy_modify_mmd_changed(phydev, MDIO_MMD_VEND1,
+ 				     RTL822X_VND1_SERDES_OPTION,
+ 				     RTL822X_VND1_SERDES_OPTION_MODE_MASK,
+ 				     mode);
+-	if (ret < 0)
++	if (gen1 || ret < 0)
+ 		return ret;
+=20
+ 	ret =3D phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x6a04, 0x0503);
+@@ -1095,6 +1098,16 @@ static int rtl822xb_config_init(struct phy_device *=
+phydev)
+ 	return phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x6f11, 0x8020);
+ }
+=20
++static int rtl822x_config_init(struct phy_device *phydev)
++{
++	return rtl822x_set_serdes_option_mode(phydev, true);
++}
++
++static int rtl822xb_config_init(struct phy_device *phydev)
++{
++	return rtl822x_set_serdes_option_mode(phydev, false);
++}
++
+ static int rtl822xb_get_rate_matching(struct phy_device *phydev,
+ 				      phy_interface_t iface)
+ {
+@@ -1693,7 +1706,8 @@ static struct phy_driver realtek_drvs[] =3D {
+ 		.soft_reset     =3D rtl822x_c45_soft_reset,
+ 		.get_features   =3D rtl822x_c45_get_features,
+ 		.config_aneg    =3D rtl822x_c45_config_aneg,
+-		.read_status    =3D rtl822x_c45_read_status,
++		.config_init    =3D rtl822x_config_init,
++		.read_status    =3D rtl822xb_c45_read_status,
+ 		.suspend        =3D genphy_c45_pma_suspend,
+ 		.resume         =3D rtlgen_c45_resume,
+ 	}, {
+=2D-=20
+2.47.0
 
-However, increasing the kworker priority is not an option, simply
-because this kworker is doing non-related PTP work items as well.
-
-As the time sync interrupt already signals that the Tx timestamp is
-available, there's no need to schedule a work item in this case. I might
-have missed something though. But my testing looked good. The warn_on
-never triggered.
-
->
->> Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
->> ---
->>   drivers/net/ethernet/intel/igb/igb.h      |  1 +
->>   drivers/net/ethernet/intel/igb/igb_main.c |  2 +-
->>   drivers/net/ethernet/intel/igb/igb_ptp.c  | 22 ++++++++++++++++++++++
->>   3 files changed, 24 insertions(+), 1 deletion(-)
->>=20
->> diff --git a/drivers/net/ethernet/intel/igb/igb.h b/drivers/net/ethernet=
-/intel/igb/igb.h
->> index c3f4f7cd264e9b2ff70f03b580f95b15b528028c..102ca32e8979fa3203fc2ea3=
-6eac456f1943cfca 100644
->> --- a/drivers/net/ethernet/intel/igb/igb.h
->> +++ b/drivers/net/ethernet/intel/igb/igb.h
->> @@ -776,6 +776,7 @@ int igb_ptp_hwtstamp_get(struct net_device *netdev,
->>   int igb_ptp_hwtstamp_set(struct net_device *netdev,
->>   			 struct kernel_hwtstamp_config *config,
->>   			 struct netlink_ext_ack *extack);
->> +void igb_ptp_tx_tstamp_event(struct igb_adapter *adapter);
->>   void igb_set_flag_queue_pairs(struct igb_adapter *, const u32);
->>   unsigned int igb_get_max_rss_queues(struct igb_adapter *);
->>   #ifdef CONFIG_IGB_HWMON
->> diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/eth=
-ernet/intel/igb/igb_main.c
->> index a9a7a94ae61e93aa737b0103e00580e73601d62b..8ab6e52cb839bbb698007a74=
-462798faaaab0071 100644
->> --- a/drivers/net/ethernet/intel/igb/igb_main.c
->> +++ b/drivers/net/ethernet/intel/igb/igb_main.c
->> @@ -7080,7 +7080,7 @@ static void igb_tsync_interrupt(struct igb_adapter=
- *adapter)
->>=20=20=20
->>   	if (tsicr & E1000_TSICR_TXTS) {
->>   		/* retrieve hardware timestamp */
->> -		schedule_work(&adapter->ptp_tx_work);
->> +		igb_ptp_tx_tstamp_event(adapter);
->>   	}
->>=20=20=20
->>   	if (tsicr & TSINTR_TT0)
->> diff --git a/drivers/net/ethernet/intel/igb/igb_ptp.c b/drivers/net/ethe=
-rnet/intel/igb/igb_ptp.c
->> index a7876882aeaf2b2a7fb9ec6ff5c83d8a1b06008a..20ecafecc60557353f8cc5ab=
-505030246687c8e4 100644
->> --- a/drivers/net/ethernet/intel/igb/igb_ptp.c
->> +++ b/drivers/net/ethernet/intel/igb/igb_ptp.c
->> @@ -796,6 +796,28 @@ static int igb_ptp_verify_pin(struct ptp_clock_info=
- *ptp, unsigned int pin,
->>   	return 0;
->>   }
->>=20=20=20
->> +/**
->> + * igb_ptp_tx_tstamp_event
->> + * @adapter: pointer to igb adapter
->> + *
->> + * This function checks the TSYNCTXCTL valid bit and stores the Tx hard=
-ware
->> + * timestamp at the current skb.
->> + **/
->> +void igb_ptp_tx_tstamp_event(struct igb_adapter *adapter)
->> +{
->> +	struct e1000_hw *hw =3D &adapter->hw;
->> +	u32 tsynctxctl;
->> +
->> +	if (!adapter->ptp_tx_skb)
->> +		return;
->> +
->> +	tsynctxctl =3D rd32(E1000_TSYNCTXCTL);
->> +	if (WARN_ON_ONCE(!(tsynctxctl & E1000_TSYNCTXCTL_VALID)))
->> +		return;
->> +
->> +	igb_ptp_tx_hwtstamp(adapter);
->> +}
->> +
->>   /**
->>    * igb_ptp_tx_work
->>    * @work: pointer to work struct
->
-> The diff looks fine.
->
-> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-
-Thanks!
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmie7Q0THGt1cnRAbGlu
-dXRyb25peC5kZQAKCRDBk9HyqkZzgvyEEACfDBSYsAYL9qu5zwmSqcAZklz43qTv
-1VOPuLIIhUBBC+qgP5gXs6aWBrRrvP/fZ7hB3PAL6oPNV+j+/kNkxFJGPF4nWm/z
-Po28nN6LYbhMMl8c0yKbqfljubPPpHP48Nda6cH6OSUtma1//+BWeYiNRQVuP7Hy
-1zUVge5m1NHepOATleB1ZOELkgQZbtMUC7mKHyvk9HAuS356axxQPRJzO9WHXaV4
-nMjTNv0WYeaGlw2JRuiom/7uYsZG/YEUj6NBdUmHL0QVlOTJ5QkEsfAnbOE9yWvo
-ns5kmc63mxHD+DjorfqnbyprGGBhX+/xo+cbpxTVpwgW3si/rJMRnQyh+j3ZNgzE
-hLjdPx2inSf94LVTgdQPs1cu5hnjN/M+fHfjRbkhHoehl9rtic69EXc1tHVtb1xD
-WAZ5a3+4i09acbTvQNn/Lk40SyNCP3Abz8s1RTvh8zoT1WdtDblkGC1Sn5uYyYpw
-0AJ64ZzCdqN0IpO2ge+QejMV5J99ZbILU2tWS7LVU/tkY6pbL9fT9BhXRmwpoT49
-SUUHXb6poC/3fMkkPB1eiwXwkJ/IP/kse4yBVAHpQCvPB+s/aUoPOkiXM03OdIFG
-1xJjViTY0CbVsz+NCLaDKR1Pn7hUmw+n+GCC8aU2XQwElwxU32UlQUKGFdN82HwO
-bpD0+vrX7Plp/w==
-=7AIh
------END PGP SIGNATURE-----
---=-=-=--
 
