@@ -1,92 +1,105 @@
-Return-Path: <netdev+bounces-214024-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214022-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8D73B27E00
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 12:11:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D3BDB27E0C
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 12:14:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C6EBA4E26D3
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 10:11:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5BA0D626A93
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 10:09:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C1EB2FE577;
-	Fri, 15 Aug 2025 10:11:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D3432FB99A;
+	Fri, 15 Aug 2025 10:09:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eT8QeuIm"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A8252FE075;
-	Fri, 15 Aug 2025 10:11:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE580279DAA;
+	Fri, 15 Aug 2025 10:09:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755252697; cv=none; b=tsONmVE8+LiFNrWjVgcGXWrxDlTTmgDLmFdkZ8oqhPcONLuWQeO2HhjS73JHfaoIy0hpykyYNJF6ScUlor+gFNtuUnmKXhm5RPPqzgp+bfHJmpXfW+UNh0YOctmC3UzsZ4oJE6iwe3S9F2ElCqgBBx5NQgm8gk9jGrfwFg7u7ug=
+	t=1755252571; cv=none; b=MH/ww9XU4je3c52mHnM8nAKD5/lEnLJ1SbFfVPX9YQV3MtwNOSfmq5iDXIJKScm2JL+jcjNnZ4IB31tDuSMrzuW4ni36LtCbmfx6B3/8yfCI6KvkaWwN2Gc91Z7giPUgG6YwDP/0efm1DBmAIOqLqrNxnSDd+dyU10RP/y8k58Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755252697; c=relaxed/simple;
-	bh=RfED2PCOz+YUn4/E3zPIkHvesjtY22YQB1eAiG0o3+8=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sTvVRfGjVUE530MD7/jeOEp2vi/Duk/3HDm3Bd/CJlodZhSKpKLo0Oo4h14F8Bd1OqW+HzezwVibelakmniaEYE+dUc6IS2qlKp4D+fGLZ2wBH7ZTS1HMPnjGeCp+tYxUP36Whv0MYzaQkOnpNMbofnH4YXQs3aashAebBWlwg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4c3HvQ4zB5zvWxS;
-	Fri, 15 Aug 2025 18:11:30 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 3C453180B54;
-	Fri, 15 Aug 2025 18:11:32 +0800 (CST)
-Received: from localhost.localdomain (10.90.31.46) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 15 Aug 2025 18:11:31 +0800
-From: Jijie Shao <shaojijie@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>
-CC: <shenjian15@huawei.com>, <liuyonglong@huawei.com>,
-	<chenhao418@huawei.com>, <jonathan.cameron@huawei.com>,
-	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <shaojijie@huawei.com>
-Subject: [PATCH net-next 2/2] net: hns3: change the function return type from int to bool
-Date: Fri, 15 Aug 2025 18:04:14 +0800
-Message-ID: <20250815100414.949752-3-shaojijie@huawei.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20250815100414.949752-1-shaojijie@huawei.com>
-References: <20250815100414.949752-1-shaojijie@huawei.com>
+	s=arc-20240116; t=1755252571; c=relaxed/simple;
+	bh=4F6G06c4lwRmjRxDA3kCpdM0Fpzl2wgfCSFO8ncYib4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N+t4SwBJZkd2wzUCfSzXnIVglBco151MXU1TiUxAXjmwg7Jc2X7rUZJ3SJzu6B5KO7PqJB9ISIMOE7TLiK+N42IK7yLtFBuZZ1k6sXe64JHK3fzdebrxNibrFIfLKMOuQzg71dkJSL92q5Ru0EQzqIjix+dE9TeDkiS83zzToq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eT8QeuIm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84E8AC4CEF5;
+	Fri, 15 Aug 2025 10:09:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755252570;
+	bh=4F6G06c4lwRmjRxDA3kCpdM0Fpzl2wgfCSFO8ncYib4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=eT8QeuImN6Mc0M1N8IPUm86ATESY2jDh0jxkLdPIjuGK8mAZmv5TpZTtKrziii0BK
+	 iD4JcFBmZ+82M6OZlZj7XpbT8ro/alnxe9WxMgx1GTGwV3Caeh7PSIIDZoDzahXIju
+	 eEGaJN277PxU+EIbTJzqPAA9qTxytkAviEc/bXpbkO0Mlv/m83XUnyuROb21Jrgf3m
+	 /wOVlwFzaFELgaexErcumbgtSSmbyVbRoVeV26Z+7j29CHtlOLa2qkJnGJ3wU0a4RJ
+	 PbCIsd1AupDwoRKhwl2PvHb2CH0jKsuXlTR8yE5DXNfq3uFPDWqGBfIWM0IWQ0lOhl
+	 OWc75fokBhfDg==
+Date: Fri, 15 Aug 2025 11:09:24 +0100
+From: Will Deacon <will@kernel.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: syzbot <syzbot+b4d960daf7a3c7c2b7b1@syzkaller.appspotmail.com>,
+	davem@davemloft.net, edumazet@google.com, eperezma@redhat.com,
+	horms@kernel.org, jasowang@redhat.com, kuba@kernel.org,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, pabeni@redhat.com, sgarzare@redhat.com,
+	stefanha@redhat.com, syzkaller-bugs@googlegroups.com,
+	virtualization@lists.linux.dev, xuanzhuo@linux.alibaba.com
+Subject: Re: [syzbot] [kvm?] [net?] [virt?] WARNING in
+ virtio_transport_send_pkt_info
+Message-ID: <aJ8HVCbE-fIoS1U4@willie-the-truck>
+References: <20250812052645-mutt-send-email-mst@kernel.org>
+ <689b1156.050a0220.7f033.011c.GAE@google.com>
+ <20250812061425-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
- kwepemk100013.china.huawei.com (7.202.194.61)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250812061425-mutt-send-email-mst@kernel.org>
 
-hclge_only_alloc_priv_buff() only return true or false,
-So, change the function return type from integer to boolean.
+On Tue, Aug 12, 2025 at 06:15:46AM -0400, Michael S. Tsirkin wrote:
+> On Tue, Aug 12, 2025 at 03:03:02AM -0700, syzbot wrote:
+> > Hello,
+> > 
+> > syzbot has tested the proposed patch but the reproducer is still triggering an issue:
+> > WARNING in virtio_transport_send_pkt_info
+> 
+> OK so the issue triggers on
+> commit 6693731487a8145a9b039bc983d77edc47693855
+> Author: Will Deacon <will@kernel.org>
+> Date:   Thu Jul 17 10:01:16 2025 +0100
+> 
+>     vsock/virtio: Allocate nonlinear SKBs for handling large transmit buffers
+>     
+> 
+> but does not trigger on:
+> 
+> commit 8ca76151d2c8219edea82f1925a2a25907ff6a9d
+> Author: Will Deacon <will@kernel.org>
+> Date:   Thu Jul 17 10:01:15 2025 +0100
+> 
+>     vsock/virtio: Rename virtio_vsock_skb_rx_put()
+>     
+> 
+> 
+> Will, I suspect your patch merely uncovers a latent bug
+> in zero copy handling elsewhere.
+> Want to take a look?
 
-Signed-off-by: Jijie Shao <shaojijie@huawei.com>
----
- drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Sorry for the delay, I was debugging something else!
 
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-index f209a05e2033..f5457ae0b64f 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-@@ -2182,8 +2182,8 @@ static bool hclge_drop_pfc_buf_till_fit(struct hclge_dev *hdev,
- 	return hclge_is_rx_buf_ok(hdev, buf_alloc, rx_all);
- }
- 
--static int hclge_only_alloc_priv_buff(struct hclge_dev *hdev,
--				      struct hclge_pkt_buf_alloc *buf_alloc)
-+static bool hclge_only_alloc_priv_buff(struct hclge_dev *hdev,
-+				       struct hclge_pkt_buf_alloc *buf_alloc)
- {
- #define COMPENSATE_BUFFER	0x3C00
- #define COMPENSATE_HALF_MPS_NUM	5
--- 
-2.33.0
+I see Hillf already tried some stuff in the other thread, but I can take
+a look as well.
 
+Will
 
