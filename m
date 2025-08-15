@@ -1,136 +1,125 @@
-Return-Path: <netdev+bounces-214206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214207-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEE37B28787
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 23:14:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E094B287A5
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 23:20:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B4729567F4A
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 21:14:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67E48AE70B1
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 21:20:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F079C23FC41;
-	Fri, 15 Aug 2025 21:14:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EA402405FD;
+	Fri, 15 Aug 2025 21:19:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UzGRMhKx"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 599DC218AAA;
-	Fri, 15 Aug 2025 21:14:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D245424CEE8;
+	Fri, 15 Aug 2025 21:19:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755292462; cv=none; b=qefwn90CgCCu/9roct5hVsSCbHkJXNYHiLzyWlGBtPcEXRTrY8OquOkFPz220YkQDOkOVWG8Yow3bAK+FCAC9uMxcHh/2FLEXypP9q9FUjII0FBFnqScp48yMCYsHVHrlKNRh2nsf6whdbuaEMETt2AWn2xOe4YVXBNSyMmij5c=
+	t=1755292781; cv=none; b=ix1uyhqZYLYCTP6XF6N1F/YtPQQ+iH80o4uqsRtnDdFiUf0gFryPSETnrTGGni7Dm6xb4/jj+y/pFNUoW42Vx30INtjYJ3txKytsThvv50u1cROoxFEiCbpA4zMIlB8SWGP9sZZJ0fAFYsrRZ4jNrjuMgCpCNGDJCDkcxz/DU3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755292462; c=relaxed/simple;
-	bh=9p9okCGYvGPHo8sJcrzTn4FAmsxYbsgLB6jhERDRiP0=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=B+DF0oCQjTFGNd3sByqqZZ5egQyOLncqMSL0stCW7wU1XZ8ZjZKSH78WPIkF7xGARWxQSkrliXiDBMy0lYEg0joPQUj5ZClzZ1c0S8MkyN4QD9am12YuWUFTVcy4h/jrPpd+T1vNgHnP29CgNtPqc2gkCH+c73+rt+dJUprLFJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=artur-rojek.eu; spf=pass smtp.mailfrom=artur-rojek.eu; arc=none smtp.client-ip=217.70.183.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=artur-rojek.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=artur-rojek.eu
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 16AF041DE2;
-	Fri, 15 Aug 2025 21:14:08 +0000 (UTC)
+	s=arc-20240116; t=1755292781; c=relaxed/simple;
+	bh=osbK+NidJ6fe9BioPokX7wWLeoCjqwmjjqkkfv/cr6s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=I05RJ6FbUtr4ncDVzww+8sKD+iyRAHdK7dAan75bmO8wncyJV1WFENAUQzZcnvFMt0m6YR/zNptOAR66xw9PggwXxnCnLZA45wCIKTvXlhch0CdhYwJwfg2msAbWNIpkiyiFUocxXxIJ2HZHjW/NDy7W69zE8jZd5ayXQDBJQVk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UzGRMhKx; arc=none smtp.client-ip=209.85.166.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-3e56ff1c11eso11265775ab.0;
+        Fri, 15 Aug 2025 14:19:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755292779; x=1755897579; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ny0iGd628JnEoEUo6u++DHd3GYH7/1jKqFMyZSSKKPc=;
+        b=UzGRMhKxojv3b5q3Emv1MivXRBfAjVE++PN1qbwqFITL+ck4fjMG9BaKnhlpzE8LDH
+         xd/G0NKXya+tcjaA3gAWEuC3SXv9h9mKqU6JYBZeurptyavyt0+jND2chlTCVaiVuqtH
+         ZI/20D/uoOud6lc8XdNUoCBX5Me51+7xAIm+Np3TqbFPINHjDDErMvsajDq0JKroVluM
+         svSWO9dIDvinyABc1pwn5hAjzEJv/NYbT5lBn/3jMm+i+h2msglxAzBO2WgsY9b+Y7kO
+         SZR4zZXDqPk/LbsjNuRC+3vhbJ63vLF/RRi8PbTvqdwo0oqpmPerZSNK4MbBxsquPbDH
+         aB4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755292779; x=1755897579;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Ny0iGd628JnEoEUo6u++DHd3GYH7/1jKqFMyZSSKKPc=;
+        b=ptL6CfaXONXFk+8+GVvUcxvdCQz+AkhqFUFQdv41qk6w+60NRfpkCnqmZPW/ijXtez
+         VX6c7r4Z9BELntFzndrpRsCbX5pG46Xab772TBkpXgFIrU64RZL1v9E889E56JpsN3Zu
+         +Wi4RXuL0R2CR6V1gbtaqHNS/ySC1X8lUUoMqBfEGoeKb1LoOiuxrqRq7n0o2dEKlnVP
+         Z5W1nfucR4bdRLUh3pAH31dml87meJK2cd0n65lHFyc/6W5ipc20aVNOjzHKphYHjbSp
+         0mOYLNbmJGTwr7v6M2YMUpqyFcgKRS3G/oGre63lczhfOBBqjPevgn9sIR1QgvZtXwQw
+         l6iA==
+X-Forwarded-Encrypted: i=1; AJvYcCV9wOrUl+zNdb0dxPKZc2Jvc8ARNLyQx4Vr/AHIISCmjjIuSQYuebQqcjS3NdCOKyNNfGdzdWfA@vger.kernel.org, AJvYcCXiPayvtIDloT6LWbXdKD488dDUxfzO9gsQ2gQxtHlJKOl7dii5fMoenqY2CZp7stlv+El3EnMN51eO9+s=@vger.kernel.org, AJvYcCXlw6/Wm52q0zuQUaPsKZADfLAlthZFlkvAC8wgrvkgqOI86kgT4le/5c0Uffce+Db8MDZR204H6kYGDQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwSKy2PJNE7zQq9C6MxaZanak8re5vQ6FiAP2bucm/lrxULwEBo
+	siU7aCFXqIDUStzLAkvr/4MZF+mp/4o+ARTcUNVDU4IPq/q6d3xLvMWnJKF471kPFGdulSM7cbu
+	zu/4vh2bqHGoSQN8m4YB/4rKIo7ckk20=
+X-Gm-Gg: ASbGnctpt7lXCShTbr51k8nrdgLDddDa9CNjbRiyduxNjtHeRV5iKJpce3Y7DxNAOdY
+	VQohIJp/WbTZBiOe2vOEyCJ8ULluk7dXflgm8GUpEntUZEGvr3JymkQOyl/Txvyfxg7BOcIE2Un
+	ZmhJSzkJJy6P7og1Jh5e1rtoR1Bvrp0HWhB+u7YjizIPImP4CIy+QhAPRWAd4EaCEZ0UQ/qLY9f
+	BHe0n4wxw==
+X-Google-Smtp-Source: AGHT+IGruZJHHuJSkXvvI6zO6adNO8v8W9hQb7SEGVm12I3hK2yf7/Y5uG5kgOh+lP5pWJzAArxz4LjA22ows3yY7qQ=
+X-Received: by 2002:a05:6e02:1d89:b0:3e5:7e24:3edc with SMTP id
+ e9e14a558f8ab-3e58391e0e7mr11494335ab.20.1755292778797; Fri, 15 Aug 2025
+ 14:19:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Fri, 15 Aug 2025 23:14:08 +0200
-From: Artur Rojek <contact@artur-rojek.eu>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Rob Landley <rob@landley.net>, Jeff Dionne <jeff@coresemi.io>, John Paul
- Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, Geert Uytterhoeven
- <geert+renesas@glider.be>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S .
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
- <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/3] net: j2: Introduce J-Core EMAC
-In-Reply-To: <b1a9b50471d80d51691dfbe1c0dbe6fb@artur-rojek.eu>
-References: <20250815194806.1202589-1-contact@artur-rojek.eu>
- <20250815194806.1202589-4-contact@artur-rojek.eu>
- <973c6f96-6020-43e0-a7cf-9c129611da13@lunn.ch>
- <b1a9b50471d80d51691dfbe1c0dbe6fb@artur-rojek.eu>
-Message-ID: <02ce17e8f00955bab53194a366b9a542@artur-rojek.eu>
-X-Sender: contact@artur-rojek.eu
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgddugeehtdduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeggfffhvfevufgjfhfkgigtgfesthejjhdttddtvdenucfhrhhomheptehrthhurhcutfhojhgvkhcuoegtohhnthgrtghtsegrrhhtuhhrqdhrohhjvghkrdgvuheqnecuggftrfgrthhtvghrnheptdejuedtgefgtdfhgfdugefgffffteetteffuddtgfefheekgedvtdekvddvtdeknecukfhppedutddrvddttddrvddtuddrudelnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepuddtrddvtddtrddvtddurdduledphhgvlhhopeifvggsmhgrihhlrdhgrghnughirdhnvghtpdhmrghilhhfrhhomheptghonhhtrggtthesrghrthhurhdqrhhojhgvkhdrvghupdhnsggprhgtphhtthhopeduiedprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehrohgssehlrghnughlvgihrdhnvghtpdhrtghpthhtohepjhgvfhhfsegtohhrvghsvghmihdrihhopdhrtghpthhtohepghhlrghusghithiisehphhihshhikhdrfhhuqdgsvghrlhhinhdruggvpdhrtghpthhtohepghgvvghrthdorhgvnhgvshgrshesghhlihguvghrrdgsvgdprhgtphhtthhopegrnhgurhgvf
- idonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhm
-X-GND-Sasl: contact@artur-rojek.eu
+References: <20250813040121.90609-1-ebiggers@kernel.org> <20250813040121.90609-4-ebiggers@kernel.org>
+ <20250815120910.1b65fbd6@kernel.org>
+In-Reply-To: <20250815120910.1b65fbd6@kernel.org>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Fri, 15 Aug 2025 17:19:27 -0400
+X-Gm-Features: Ac12FXyoMC7HdRcTuJ9sH2SzT9qwOkx9-bIalnhQ98MqcLgjuBG1ae3gG0w45Qg
+Message-ID: <CADvbK_csEoZhA9vnGnYbfV90omFqZ6dX+V3eVmWP7qCOqWDAKw@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 3/3] sctp: Convert cookie authentication to
+ use HMAC-SHA256
+To: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Eric Biggers <ebiggers@kernel.org>, linux-sctp@vger.kernel.org, netdev@vger.kernel.org, 
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2025-08-15 22:52, Artur Rojek wrote:
-> On 2025-08-15 22:16, Andrew Lunn wrote:
-> 
-> Hi Andrew,
-> thanks for the review!
-> 
->>> +static irqreturn_t jcore_emac_irq(int irq, void *data)
->>> +{
->>> +	struct jcore_emac *priv = data;
->>> +	struct net_device *ndev = priv->ndev;
->>> +	struct sk_buff *skb;
->>> +	struct {
->>> +		int packets;
->>> +		int bytes;
->>> +		int dropped;
->>> +		int crc_errors;
->>> +	} stats = {};
->>> +	unsigned int status, pkt_len, i;
->> 
->> netdev uses 'reverse christmas tree' for local variables. They should
->> be sorted longest to shortest. This sometimes means you need to move
->> assignments into the body of the function, in this case, ndev.
+On Fri, Aug 15, 2025 at 3:09=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Tue, 12 Aug 2025 21:01:21 -0700 Eric Biggers wrote:
+> > +     if (net->sctp.cookie_auth_enable)
+> > +             tbl.data =3D (char *)"sha256";
+> > +     else
+> > +             tbl.data =3D (char *)"none";
+> > +     tbl.maxlen =3D strlen(tbl.data);
+> > +     return proc_dostring(&tbl, 0, buffer, lenp, ppos);
+>
+> I wonder if someone out there expects to read back what they wrote,
+> but let us find out.
+I feel it's a bit weird to have:
 
-Should I move the struct stats members into stand alone variables as
-well? Or is below sorting acceptable with regards to stats vs skb:
+# sysctl net.sctp.cookie_hmac_alg=3D"md5"
+net.sctp.cookie_hmac_alg =3D md5
+# sysctl net.sctp.cookie_hmac_alg
+net.sctp.cookie_hmac_alg =3D sha256
 
-> 	unsigned int status, pkt_len, i;
-> 	struct jcore_emac *priv = data;
-> 	struct net_device *ndev;
-> 	struct {
-> 		int crc_errors;
-> 		int dropped;
-> 		int packets;
-> 		int bytes;
-> 	} stats = {};
-> 	struct sk_buff *skb;
+This patch deprecates md5 and sha1 use there.
+So generally, for situations like this, should we also issue a
+warning, or just fail it?
 
->> 
->>> +	jcore_emac_read_hw_addr(priv, mac);
->>> +	if (is_zero_ether_addr(mac)) {
->> 
->> It would be more normal to use !is_valid_ether_addr()
->> 
->> What support is there for MDIO? Normally the MAC driver would not be
->> setting the carrier status, phylink or phylib would do that.
-> 
-> From what I can tell, none. This is a very simple FPGA RTL
-> implementation of a MAC, and looking at the VHDL, I don't see any MDIO
-> registers.
+Paolo, what do you think?
 
-> Moreover, the MDIO pin on the PHY IC on my dev board also
-> appears unconnected.
-
-I spoke too soon on that one. It appears to be connected through a trace
-that goes under the IC. Nevertheless, I don't think MDIO support is in
-the IP core design.
-
-> Perhaps Rob L. or Jeff can shine more light on this
-> design wise.
-> 
-> Cheers,
-> Artur
-> 
->> 
->>     Andrew
->> 
->> ---
->> pw-bot: cr
+>
+> It'd be great to get an ack / review from SCTP maintainers, otherwise
+> we'll apply by Monday..
+Other than that, LGTM.
+Sorry for the late reply, I was running some SCTP-auth related tests
+against the patchset.
 
