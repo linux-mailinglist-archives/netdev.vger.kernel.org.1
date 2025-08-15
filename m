@@ -1,85 +1,77 @@
-Return-Path: <netdev+bounces-214075-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214076-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABD57B2818D
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 16:22:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF846B28267
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 16:49:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 197B2B67E0B
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 14:21:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 622AD188DDF8
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 14:48:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C17321CA03;
-	Fri, 15 Aug 2025 14:22:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B3C4277CA2;
+	Fri, 15 Aug 2025 14:47:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L8BvgBSl"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J0+wZ4aQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f50.google.com (mail-ua1-f50.google.com [209.85.222.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAEBB19004E;
-	Fri, 15 Aug 2025 14:22:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6886D230BFD
+	for <netdev@vger.kernel.org>; Fri, 15 Aug 2025 14:47:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755267760; cv=none; b=luiH/ZfsLcMfBhGPBecuHRu9u/1GWBopG/0kZyxULtfBR3nr4AsBll3MChaAPYJAA+5W12Vsr4EKWaRlMieRk/+WbH0foL17/W7llyQCryBqNyZgWRDJBFPI0dbcBOh2mMtEUK6mx8Hir+431xEH7wWFYN8yjrdDbwRu3RmTFY8=
+	t=1755269274; cv=none; b=LRrDBDUpgEPKsXIJ0/f+EJFJTv+F2w3pSZxQb9PfWsPLWk37U9s11SIslJCqUrVVG44Hj4Eta84AUKwvPV7bmzd8HwwJ2qEeBH6CTtmyFdVFtwAUY6EZu/SF6QONN7vENj1vbZuaODVF8sztt3jMJGuseainYrPFtmI4A60X2Yw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755267760; c=relaxed/simple;
-	bh=/yuTindczvZO6IK8MDkvQMTzde9WhqB/nwMt9fTd7xM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=W3s8F273DKn39lIAZtSSc+GCP7QPSnaUc9J37a6Ep7a6pfdU6+//exppp4Tiobe4pidnDG/IoxBpEuAArN1CkjHfMxLKslYpqn7/jp81Lx9bMyhgoB6wcmWudVXfC9gzftYJM6K3chuq1c0Q2CIkjBZXqAVklHatE4ELxvE/yTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L8BvgBSl; arc=none smtp.client-ip=209.85.222.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f50.google.com with SMTP id a1e0cc1a2514c-89018e9f902so1328310241.0;
-        Fri, 15 Aug 2025 07:22:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755267757; x=1755872557; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=1W2rd45Y6JwnYaD/KMs/HtNhPMne7Z8EDXrfiJDESX8=;
-        b=L8BvgBSlOzA6l2iA08za3LlXk/PpK0FPz55xyDbNLR+oj+1mz9PszqCK+YWhBVlxWW
-         Uwb74SYzA+hTbcWGykCTfGDn2vNnY/onB2v+wbV/fzuVQsFV7reIWMZ8nPsC7jBImST0
-         ZWHcBa3MmvsitD7E/mybdmbj+589UiU1J6MMaBRYxRI41DC5+qoAVTSzPUkXUjvj1kc2
-         YJ8S1qmnp2t2/awkurdLAgl5Qxz5lMAmpveOgckYkOMCi+HJMKYSkzK5if6qIdw5mGqw
-         /rt6Dv6Jb71YxMeL5JreB+qj9wTyhYB3S8TIqaSBSuFh0fGra8RsZIJpBqO/WIkmnhZq
-         2Dcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755267757; x=1755872557;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1W2rd45Y6JwnYaD/KMs/HtNhPMne7Z8EDXrfiJDESX8=;
-        b=HLOX5LeQV1mVDBorJkOqx9aqEQTIagK6TenRjIwfEGXOABJxoeF1kJsFjsbWUBJyd6
-         5MMG+4TWCh1jciVkSB5xTDqAbxxlq4nUkqGKYLMFjCHA8F/xjTlEZPoZag0ITiWcbv+b
-         6SvXm/rx6fdwzBP05GCkoKdc0AATtVGguYsB4k5KSvn0Z39nTbaT6v51Ugln2iEm2frv
-         q9OL97UezyFJD+USZf1RfB/SVfu+jbQTtPgMal8hD0bqwsO2orW8UR66C6AFzKKeMIlh
-         ZE4ukxxcStnaIYXcQfH65869HX5PL0Y4Nde7uJ5rxKZRE9LKDKMeT0b4kMREHxQWssFf
-         l0Zw==
-X-Forwarded-Encrypted: i=1; AJvYcCUcbrEr8KquUU+jWAJuWgf/UNUN+44LDhQ1Jy89aJ6fxFTNFSpNRn35aG8QxqcO7ZW9KGG4Zhg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YydlH40DQryjNXEfFLX6TWt9rRl257RVBCyXMLNBzygcFcarx8/
-	zajTHHseMTnpcbYRfxVqT0NSlAIFeg4If0hqX/gKWTOwhVXSc4bIuyc7
-X-Gm-Gg: ASbGnct9D4PV+h171bLRXWV2wELdTm8ogaD1P3sG0AfT0z1C3m/k09ALLgWQLUpdjti
-	Dt16G0r/v1Fj56kanR9AtyD2ZrHltRLqdqGkdKNi6DDCKttKMJuqfKVy/jSIO7ZABr9aP7DXzmk
-	ZV1RzuenU2QzmmposKeQ+EaNA+ZCKgnY/SEhbkI2LPgsAe+ecH0znYHrD/Zo/GRT7UPv/K0+dsj
-	LdmdWer1rVyb45f4NY3yaSfrQPSqF5laIpKdfggcPoezPBW9phsViL35E0cAlhe2CRfbb6lDcm/
-	yxlmgBo3rEvy8smz184p6GyI/XfOE3eDwzfZaMmNBGyesrjfIjxBWZYf/8BHKEaiyf15PupmrdU
-	z5r5vJKrxC0LwSja3E6XumeEmJ5frKtHcO7MgsdM+VBQE0HfZcgpFi3Q1XtXnNNG/
-X-Google-Smtp-Source: AGHT+IHtWubLXSAiK4EN/MbSf4lt4FXUyiTBANdMSebRPjpqETXSK08B17Da/YPP9ieUOPO4QbeLPA==
-X-Received: by 2002:a05:6102:38ca:b0:4e7:7787:1b9a with SMTP id ada2fe7eead31-5126cb4dcafmr802994137.17.1755267757452;
-        Fri, 15 Aug 2025 07:22:37 -0700 (PDT)
-Received: from lvondent-mobl5 (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-890278edaa5sm257540241.18.2025.08.15.07.22.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Aug 2025 07:22:36 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [GIT PULL] bluetooth 2025-08-15
-Date: Fri, 15 Aug 2025 10:22:29 -0400
-Message-ID: <20250815142229.253052-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1755269274; c=relaxed/simple;
+	bh=LwC42usex+8ylvFt4aTbq/GyJFYNsHX5kH2ui/VE6nY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ri0EdpZEv2jxYx1E5FHFa+ncCJM8W/OCSr4SqORrbqDiBApefAbh5Gz3/bGTIllDb5mHZUQGpCXLDfdF/zdleIzKEPEVA1rrHxe07/WE5SkF2xCnCTYhJEuVX+2Z41RQPMQA7DwI3r0dlEK6oZckql/DvUd3n/nAo6UNBuvensI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=J0+wZ4aQ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1755269271;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=sg1fwPS7sBPbcXc/VRMT8Ax3SswWQxZY6NUgMTsaTNw=;
+	b=J0+wZ4aQQi0GZlKb+sNzVZKbrFbog0sehsY/j84ssvOZ9C273wlI+UWJ11XkxTpblPYgwL
+	YrCuZiuhEMhDMhismgLw/Kp6VqElEeqnzD7DKU0iOBTNkyZtqcaHK9TSxOitJW95MJrIJe
+	NJDcSlFs2Sk99BTI5piiFjVB9dZyA5s=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-550-LDJkOuj_Ms-GMEMsX_2qtA-1; Fri,
+ 15 Aug 2025 10:47:45 -0400
+X-MC-Unique: LDJkOuj_Ms-GMEMsX_2qtA-1
+X-Mimecast-MFC-AGG-ID: LDJkOuj_Ms-GMEMsX_2qtA_1755269264
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 271CD18011D2;
+	Fri, 15 Aug 2025 14:47:42 +0000 (UTC)
+Received: from p16v.redhat.com (unknown [10.45.224.184])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 79F5930001A6;
+	Fri, 15 Aug 2025 14:47:37 +0000 (UTC)
+From: Ivan Vecera <ivecera@redhat.com>
+To: netdev@vger.kernel.org
+Cc: mschmidt@redhat.com,
+	poros@redhat.com,
+	Andrew Lunn <andrew@lunn.ch>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Prathosh Satish <Prathosh.Satish@microchip.com>,
+	devicetree@vger.kernel.org (open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [RFC PATCH net-next] dt-bindings: dpll: Add per-channel Ethernet reference property
+Date: Fri, 15 Aug 2025 16:47:35 +0200
+Message-ID: <20250815144736.1438060-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,70 +79,158 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-The following changes since commit 065c31f2c6915b38f45b1c817b31f41f62eaa774:
+In case of SyncE scenario a DPLL channels generates a clean frequency
+synchronous Ethernet clock (SyncE) and feeds it into the NIC transmit
+path. The DPLL channel can be locked either to the recovered clock
+from the NIC's PHY (Loop timing scenario) or to some external signal
+source (e.g. GNSS) (Externally timed scenario).
 
-  rtase: Fix Rx descriptor CRC error bit definition (2025-08-14 17:53:12 -0700)
+The example shows both situations. NIC1 recovers the input SyncE signal
+that is used as an input reference for DPLL channel 1. The channel locks
+to this signal, filters jitter/wander and provides holdover. On output
+the channel feeds a stable, phase-aligned clock back into the NIC1.
+In the 2nd case the DPLL channel 2 locks to a master clock from GNSS and
+feeds a clean SyncE signal into the NIC2.
 
-are available in the Git repository at:
+		   +-----------+
+		+--|   NIC 1   |<-+
+		|  +-----------+  |
+		|                 |
+		| RxCLK     TxCLK |
+		|                 |
+		|  +-----------+  |
+		+->| channel 1 |--+
++------+	   |-- DPLL ---|
+| GNSS |---------->| channel 2 |--+
++------+  RefCLK   +-----------+  |
+				  |
+			    TxCLK |
+				  |
+		   +-----------+  |
+		   |   NIC 2   |<-+
+		   +-----------+
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2025-08-15
+In the situations above the DPLL channels should be registered into
+the DPLL sub-system with the same Clock Identity as PHCs present
+in the NICs (for the example above DPLL channel 1 uses the same
+Clock ID as NIC1's PHC and the channel 2 as NIC2's PHC).
 
-for you to fetch changes up to 9d4b01a0bf8d2163ae129c9c537cb0753ad5a2aa:
+Because a NIC PHC's Clock ID is derived from the NIC's MAC address,
+add a per-channel property 'ethernet-handle' that specifies a reference
+to a node representing an Ethernet device that uses this channel
+to synchronize its hardware clock. Additionally convert existing
+'dpll-types' list property to 'dpll-type' per-channel property.
 
-  Bluetooth: hci_core: Fix not accounting for BIS/CIS/PA links separately (2025-08-15 10:13:41 -0400)
+Suggested-by: Andrew Lunn <andrew@lunn.ch>
+Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+---
+ .../devicetree/bindings/dpll/dpll-device.yaml | 40 ++++++++++++++++---
+ .../bindings/dpll/microchip,zl30731.yaml      | 29 +++++++++++++-
+ 2 files changed, 62 insertions(+), 7 deletions(-)
 
-----------------------------------------------------------------
-bluetooth pull request for net:
+diff --git a/Documentation/devicetree/bindings/dpll/dpll-device.yaml b/Documentation/devicetree/bindings/dpll/dpll-device.yaml
+index fb8d7a9a3693f..798c5484657cf 100644
+--- a/Documentation/devicetree/bindings/dpll/dpll-device.yaml
++++ b/Documentation/devicetree/bindings/dpll/dpll-device.yaml
+@@ -27,11 +27,41 @@ properties:
+   "#size-cells":
+     const: 0
+ 
+-  dpll-types:
+-    description: List of DPLL channel types, one per DPLL instance.
+-    $ref: /schemas/types.yaml#/definitions/non-unique-string-array
+-    items:
+-      enum: [pps, eec]
++  channels:
++    type: object
++    description: DPLL channels
++    unevaluatedProperties: false
++
++    properties:
++      "#address-cells":
++        const: 1
++      "#size-cells":
++        const: 0
++
++    patternProperties:
++      "^channel@[0-9a-f]+$":
++        type: object
++        description: DPLL channel
++        unevaluatedProperties: false
++
++        properties:
++          reg:
++            description: Hardware index of the DPLL channel
++            maxItems: 1
++
++          dpll-type:
++            description: DPLL channel type
++            $ref: /schemas/types.yaml#/definitions/string
++            enum: [pps, eec]
++
++          ethernet-handle:
++            description:
++              Specifies a reference to a node representing an Ethernet device
++              that uses this channel to synchronize its hardware clock.
++            $ref: /schemas/types.yaml#/definitions/phandle
++
++        required:
++          - reg
+ 
+   input-pins:
+     type: object
+diff --git a/Documentation/devicetree/bindings/dpll/microchip,zl30731.yaml b/Documentation/devicetree/bindings/dpll/microchip,zl30731.yaml
+index 17747f754b845..bc6d6cc1dd47f 100644
+--- a/Documentation/devicetree/bindings/dpll/microchip,zl30731.yaml
++++ b/Documentation/devicetree/bindings/dpll/microchip,zl30731.yaml
+@@ -44,9 +44,26 @@ examples:
+       #size-cells = <0>;
+ 
+       dpll@70 {
++        #address-cells = <0>;
++        #size-cells = <0>;
+         compatible = "microchip,zl30732";
+         reg = <0x70>;
+-        dpll-types = "pps", "eec";
++
++        channels {
++          #address-cells = <1>;
++          #size-cells = <0>;
++
++          channel@0 {
++            reg = <0>;
++            dpll-type = "pps";
++          };
++
++          channel@1 {
++            reg = <1>;
++            dpll-type = "eec";
++            ethernet-handle = <&ethernet0>;
++          };
++        };
+ 
+         input-pins {
+           #address-cells = <1>;
+@@ -84,7 +101,15 @@ examples:
+         reg = <0x70>;
+         spi-max-frequency = <12500000>;
+ 
+-        dpll-types = "pps";
++        channels {
++          #address-cells = <1>;
++          #size-cells = <0>;
++
++          channel@0 {
++            reg = <0>;
++            dpll-type = "pps";
++          };
++        };
+ 
+         input-pins {
+           #address-cells = <1>;
+-- 
+2.49.1
 
- - hci_conn: Fix running bis_cleanup for hci_conn->type PA_LINK
- - hci_conn: Fix not cleaning up Broadcaster/Broadcast Source
- - hci_core: Fix using {cis,bis}_capable for current settings
- - hci_core: Fix using ll_privacy_capable for current settings
- - hci_core: Fix not accounting for BIS/CIS/PA links separately
- - hci_conn: do return error from hci_enhanced_setup_sync()
- - hci_event: fix MTU for BN == 0 in CIS Established
- - hci_sync: Fix scan state after PA Sync has been established
- - hci_sync: Avoid adding default advertising on startup
- - hci_sync: Prevent unintended PA sync when SID is 0xFF
- - ISO: Fix getname not returning broadcast fields
- - btmtk: Fix wait_on_bit_timeout interruption during shutdown
- - btnxpuart: Uses threaded IRQ for host wakeup handling
-
-----------------------------------------------------------------
-Jiande Lu (1):
-      Bluetooth: btmtk: Fix wait_on_bit_timeout interruption during shutdown
-
-Luiz Augusto von Dentz (7):
-      Bluetooth: hci_sync: Fix scan state after PA Sync has been established
-      Bluetooth: ISO: Fix getname not returning broadcast fields
-      Bluetooth: hci_conn: Fix running bis_cleanup for hci_conn->type PA_LINK
-      Bluetooth: hci_conn: Fix not cleaning up Broadcaster/Broadcast Source
-      Bluetooth: hci_core: Fix using {cis,bis}_capable for current settings
-      Bluetooth: hci_core: Fix using ll_privacy_capable for current settings
-      Bluetooth: hci_core: Fix not accounting for BIS/CIS/PA links separately
-
-Neeraj Sanjay Kale (1):
-      Bluetooth: btnxpuart: Uses threaded IRQ for host wakeup handling
-
-Pauli Virtanen (1):
-      Bluetooth: hci_event: fix MTU for BN == 0 in CIS Established
-
-Sergey Shtylyov (1):
-      Bluetooth: hci_conn: do return error from hci_enhanced_setup_sync()
-
-Yang Li (2):
-      Bluetooth: hci_sync: Avoid adding default advertising on startup
-      Bluetooth: hci_sync: Prevent unintended PA sync when SID is 0xFF
-
- drivers/bluetooth/btmtk.c         |  7 +------
- drivers/bluetooth/btnxpuart.c     |  8 +++----
- include/net/bluetooth/bluetooth.h |  4 ++--
- include/net/bluetooth/hci_core.h  | 44 +++++++++++++++++++++++++++++++++------
- net/bluetooth/hci_conn.c          | 17 ++++++++++++---
- net/bluetooth/hci_event.c         | 15 ++++++++-----
- net/bluetooth/hci_sync.c          | 25 ++++++++++++++--------
- net/bluetooth/iso.c               | 16 +++++++-------
- net/bluetooth/mgmt.c              | 12 +++++------
- 9 files changed, 99 insertions(+), 49 deletions(-)
 
