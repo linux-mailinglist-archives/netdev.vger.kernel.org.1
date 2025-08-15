@@ -1,150 +1,154 @@
-Return-Path: <netdev+bounces-214032-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214033-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBABEB27E9F
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 12:47:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28A8CB27EB1
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 12:51:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 58B47622E1C
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 10:45:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E165178D73
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 10:48:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E97423002B4;
-	Fri, 15 Aug 2025 10:44:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D17C2FFDF6;
+	Fri, 15 Aug 2025 10:48:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gOw47Lzu"
+	dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b="W9iw0BPn"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from layka.disroot.org (layka.disroot.org [178.21.23.139])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E4EC2FF163
-	for <netdev@vger.kernel.org>; Fri, 15 Aug 2025 10:44:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D59311DF24F;
+	Fri, 15 Aug 2025 10:48:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.21.23.139
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755254697; cv=none; b=W8AvXA4UppKZe5vy2oM2nRtySGbCb0n5TfYJnk1spgGowvWkjjdxQgR7ovy4LdZ9Z+wjZalFHjXJ/IpbaPtZnZyt0c6mqxGQ77qPJFhH1non4JrnhwdvtWTGEPKWgvU7mlZgqcZr0ytfrzWavnqeeneGkKK6LrUa/d/C70wVFbY=
+	t=1755254913; cv=none; b=ReswvTSLFtfRtb2Nkrnu38W4/HnMnW4mh8Ekpb5JsR/XwwQVtDgkof7J0cpexTr0/gcwtMdIW4AFCcw+OiCOnsAbuILUMy/oD2ZQdH+JHoECxkNpBIu4ERhP14A63VnoAuZSSFQCQ1+Fx2G04wjXpzwBUR/LHrhZNwHIgGwrxQI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755254697; c=relaxed/simple;
-	bh=WjR/rbwNJc0Qp2k2aQAdE2Gr22tCrag3f7ATcKE39Uc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ueFpxfB6nu5BNENIzo7Q0MtvLZp44H+Sc1Iw+csW+qOnFRvcAcPCYQxTztDS5iIUB5wXMwFxzJqV734Yg1LGk+bx4PeZTdAxuYlVnzVqbRP+Hxd00dDlTcimG94qaokryALrvY2DkMV9FA7QcqUPvnThaFUD9nS7FMyjxO1u0+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gOw47Lzu; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1755254695;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=V5GOAcmmdxLGbEbM9B2YGjZnwu9h8dtTUkFqo/i0QYA=;
-	b=gOw47LzufTf2haNuRfCk3P2bFSCjFRwzn7jAz4gGMkyIa89yz9OATtcCTpqVFWsxS+pDeD
-	DFeKk+TF0rOa7707G6Bqbsw2Pxp+1yTx3LwdZOrrxINTnBkYo+f9K4bQ0iYvJqAVSskPnp
-	nPNEnk/Y1HY9bP3aT+4tk3i0ALBSmIs=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-120-xTYhGIAzPIOZTEhcMI6SLQ-1; Fri, 15 Aug 2025 06:44:54 -0400
-X-MC-Unique: xTYhGIAzPIOZTEhcMI6SLQ-1
-X-Mimecast-MFC-AGG-ID: xTYhGIAzPIOZTEhcMI6SLQ_1755254693
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3b9e41037e6so847668f8f.1
-        for <netdev@vger.kernel.org>; Fri, 15 Aug 2025 03:44:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755254692; x=1755859492;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=V5GOAcmmdxLGbEbM9B2YGjZnwu9h8dtTUkFqo/i0QYA=;
-        b=PvqZT5f8ItL1Ft+ZPeDq6zf3Yku/KbUEiEoQJBN66YtL/s6eeEeFF4RV8aeo8/c4k8
-         XWcz0gxqWHWs6/5RIcVOtwV+5w8uT+8IFtmxHFUBPsbZdEMhMe4qfm5uZpPIataz6JFo
-         lgx/97elbIqmZommSYfI2Oj9RR9YHJZSDLzvxtaVM3VqfnghfB/5FdveeoVWMFCq5AY1
-         YWiNDTOK6qiEV+dim0+Nygh7sHC9ERC/6zn5wLGCh1PycCdliRW6TkZVty/RTRlefu8R
-         ZeNA2WKNZOy/BpgIya3lbHNmMPsPIV+GzUnQgloHgi3EVhTVfLvWAXPydZXzmWUCeKza
-         no9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUXrc2ScdYKKetDoRZpyl64gXZKKiJnrpzX2AtlmSOfDe5aeyOGywtQzb2DrjD9FEmIV9wpplM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxfRigIUUrJtU7xoPIiMTY5KgWwNlvy8qf0+V+VyWFVejqDxPR2
-	xRHcsT7LDQp7lkiUO9NQYDrFjUNutArIzNAxJIfL3tXqMoGWQINHzl68eDFFdwzeayJ7MCg1mwS
-	aLlpvbbV5nXskEdziD5/CdwajF6H7CUO1Gr3Nkd6tC9tb5bX/EPmY0bjwBw==
-X-Gm-Gg: ASbGncsvEKE/xwB9jJFgWfV/4wSoVoRJDLUlJRevIx82WNdEXgWtceAQOsXhYVhQ9SQ
-	GpJVtiRPjkpyQKtRs3EZMqLDn1hjYiHcbwcZABzxDl0YmB6DaHa6cCKSUeqOVEyGMMswpLupymr
-	mTjJo2+abdT3u41FrcTAwsWOuxVxaZBrXwABh9OKlZ3wRO2OTNWTmDLRSpEY3N8aPLQoexNsBaB
-	7T9ZzkXmw8Hd0nED0Gyfjn0WhJr/QxX4OPUAGWbTATcdDf1yeeZN0GbA2fnvWQLz0kEaPDxSOaR
-	4jFV1F4Z34wFMd5MjfvZCG2UvJNXmd/UFvI=
-X-Received: by 2002:a05:6000:1a8d:b0:3b7:9d83:50ef with SMTP id ffacd0b85a97d-3bb694af396mr1111609f8f.55.1755254691697;
-        Fri, 15 Aug 2025 03:44:51 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFjxJ9VfnonVDFqga9qmU4sokEZCEtKZYfi4E6SPLLakFaeJSs6iOf6aXLBGPZEAaqLwiSlKQ==
-X-Received: by 2002:a05:6000:1a8d:b0:3b7:9d83:50ef with SMTP id ffacd0b85a97d-3bb694af396mr1111588f8f.55.1755254691299;
-        Fri, 15 Aug 2025 03:44:51 -0700 (PDT)
-Received: from redhat.com ([2a06:c701:73cf:b700:6c5c:d9e7:553f:9f71])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3bb676c9936sm1456218f8f.38.2025.08.15.03.44.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Aug 2025 03:44:50 -0700 (PDT)
-Date: Fri, 15 Aug 2025 06:44:47 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Will Deacon <will@kernel.org>
-Cc: syzbot <syzbot+b4d960daf7a3c7c2b7b1@syzkaller.appspotmail.com>,
-	davem@davemloft.net, edumazet@google.com, eperezma@redhat.com,
-	horms@kernel.org, jasowang@redhat.com, kuba@kernel.org,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, pabeni@redhat.com, sgarzare@redhat.com,
-	stefanha@redhat.com, syzkaller-bugs@googlegroups.com,
-	virtualization@lists.linux.dev, xuanzhuo@linux.alibaba.com
-Subject: Re: [syzbot] [kvm?] [net?] [virt?] WARNING in
- virtio_transport_send_pkt_info
-Message-ID: <20250815063140-mutt-send-email-mst@kernel.org>
-References: <20250812052645-mutt-send-email-mst@kernel.org>
- <689b1156.050a0220.7f033.011c.GAE@google.com>
- <20250812061425-mutt-send-email-mst@kernel.org>
- <aJ8HVCbE-fIoS1U4@willie-the-truck>
+	s=arc-20240116; t=1755254913; c=relaxed/simple;
+	bh=G1edQCNuacWPxWwIea/30FqFc+UX9B4+0teA0JgdIRo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qc4Pi1tmWMSEUHTiuoC76xcE1ARIXT0NWoZetAxKot9Mmt5fFMJJwWsuOuQhEnyE8l3ge+ajwd+AT1ljskWkCNCcWyse802AvKi40wf3pXk5es3xIRE2PUMPnI+jxYzW39IQCrvpAdRCJyauqDwZCE2acznIKf+jJGNsb9d47Pc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org; spf=pass smtp.mailfrom=disroot.org; dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b=W9iw0BPn; arc=none smtp.client-ip=178.21.23.139
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=disroot.org
+Received: from mail01.disroot.lan (localhost [127.0.0.1])
+	by disroot.org (Postfix) with ESMTP id 86D5324E0A;
+	Fri, 15 Aug 2025 12:48:22 +0200 (CEST)
+X-Virus-Scanned: SPAM Filter at disroot.org
+Received: from layka.disroot.org ([127.0.0.1])
+ by localhost (disroot.org [127.0.0.1]) (amavis, port 10024) with ESMTP
+ id SyKGABv6NFZd; Fri, 15 Aug 2025 12:48:20 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=disroot.org; s=mail;
+	t=1755254900; bh=G1edQCNuacWPxWwIea/30FqFc+UX9B4+0teA0JgdIRo=;
+	h=From:To:Cc:Subject:Date;
+	b=W9iw0BPno5o8NOL0V8LNhfHfl5armoo9r66RuZGE4y1ImOyqLtIWM8qUsuZBEhfe5
+	 kixnIHsrNfajaya+gpOmsjxV67sxur+BoRiSVgPAhvGK4Ty0uOFPVeRpAFkQzN2abu
+	 3fdiKjMX71Ra+umb9W/m7oP726h2ETceZJ6HRvyT04YA90jHq84enWsb5J1oJlOf8i
+	 8dDFPFPiczTUBsVnbBMK2kp+Y+B1BhdwBfhJOwX3sxdUbf5QDzSA89kXgz2p/6O8Bw
+	 2IDdB2X5r2DVaXua8wo3EsUEeqmrUYx2arxq6yvPuf+/FcrQ9gu0qqj1WyVnd8Kqf2
+	 zGOLsmCDMgotw==
+From: Yao Zi <ziyao@disroot.org>
+To: Drew Fustini <fustini@kernel.org>,
+	Guo Ren <guoren@kernel.org>,
+	Fu Wei <wefu@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Emil Renner Berthing <emil.renner.berthing@canonical.com>,
+	Jisheng Zhang <jszhang@kernel.org>
+Cc: nux-riscv@lists.infradead.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Han Gao <rabenda.cn@gmail.com>,
+	Han Gao <gaohan@iscas.ac.cn>,
+	Yao Zi <ziyao@disroot.org>
+Subject: [PATCH net v3] net: stmmac: thead: Enable TX clock before MAC initialization
+Date: Fri, 15 Aug 2025 10:48:03 +0000
+Message-ID: <20250815104803.55294-1-ziyao@disroot.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aJ8HVCbE-fIoS1U4@willie-the-truck>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Aug 15, 2025 at 11:09:24AM +0100, Will Deacon wrote:
-> On Tue, Aug 12, 2025 at 06:15:46AM -0400, Michael S. Tsirkin wrote:
-> > On Tue, Aug 12, 2025 at 03:03:02AM -0700, syzbot wrote:
-> > > Hello,
-> > > 
-> > > syzbot has tested the proposed patch but the reproducer is still triggering an issue:
-> > > WARNING in virtio_transport_send_pkt_info
-> > 
-> > OK so the issue triggers on
-> > commit 6693731487a8145a9b039bc983d77edc47693855
-> > Author: Will Deacon <will@kernel.org>
-> > Date:   Thu Jul 17 10:01:16 2025 +0100
-> > 
-> >     vsock/virtio: Allocate nonlinear SKBs for handling large transmit buffers
-> >     
-> > 
-> > but does not trigger on:
-> > 
-> > commit 8ca76151d2c8219edea82f1925a2a25907ff6a9d
-> > Author: Will Deacon <will@kernel.org>
-> > Date:   Thu Jul 17 10:01:15 2025 +0100
-> > 
-> >     vsock/virtio: Rename virtio_vsock_skb_rx_put()
-> >     
-> > 
-> > 
-> > Will, I suspect your patch merely uncovers a latent bug
-> > in zero copy handling elsewhere.
-> > Want to take a look?
-> 
-> Sorry for the delay, I was debugging something else!
-> 
-> I see Hillf already tried some stuff in the other thread, but I can take
-> a look as well.
-> 
-> Will
+The clk_tx_i clock must be supplied to the MAC for successful
+initialization. On TH1520 SoC, the clock is provided by an internal
+divider configured through GMAC_PLLCLK_DIV register when using RGMII
+interface. However, currently we don't setup the divider before
+initialization of the MAC, resulting in DMA reset failures if the
+bootloader/firmware doesn't enable the divider,
 
-I will be frank I don't understand how that patch makes sense though.
+[    7.839601] thead-dwmac ffe7060000.ethernet eth0: Register MEM_TYPE_PAGE_POOL RxQ-0
+[    7.938338] thead-dwmac ffe7060000.ethernet eth0: PHY [stmmac-0:02] driver [RTL8211F Gigabit Ethernet] (irq=POLL)
+[    8.160746] thead-dwmac ffe7060000.ethernet eth0: Failed to reset the dma
+[    8.170118] thead-dwmac ffe7060000.ethernet eth0: stmmac_hw_setup: DMA engine initialization failed
+[    8.179384] thead-dwmac ffe7060000.ethernet eth0: __stmmac_open: Hw setup failed
 
+Let's simply write GMAC_PLLCLK_DIV_EN to GMAC_PLLCLK_DIV to enable the
+divider before MAC initialization. Note that for reconfiguring the
+divisor, the divider must be disabled first and re-enabled later to make
+sure the new divisor take effect.
+
+The exact clock rate doesn't affect MAC's initialization according to my
+test. It's set to the speed required by RGMII when the linkspeed is
+1Gbps and could be reclocked later after link is up if necessary.
+
+Fixes: 33a1a01e3afa ("net: stmmac: Add glue layer for T-HEAD TH1520 SoC")
+Signed-off-by: Yao Zi <ziyao@disroot.org>
+---
+
+Note that the DMA reset failures cannot be reproduced with the vendor
+U-Boot, which always enables the divider, regardless whether the port is
+used[1].
+
+[1]: https://github.com/revyos/thead-u-boot/blob/93ff49d9f5bbe7942f727ab93311346173506d27/board/thead/light-c910/light.c#L581-L582
+
+Changed from v2
+- Explain the special process for changing divider's rate in commit
+  message
+- Fix the typo where ';' is mistyped as ','
+- Link to v2: https://lore.kernel.org/all/20250808103447.63146-2-ziyao@disroot.org/
+Changed from v1
+- Initialize the divisor to a well-known value (producing the clock rate
+  required by RGMII link at 1Gbps)
+- Write zero to GMAC_PLLCLK_DIV before writing the configuration, as
+  required by the TRM
+- Link to v1: https://lore.kernel.org/netdev/20250801094507.54011-1-ziyao@disroot.org/
+
+ drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c
+index f2946bea0bc2..6c6c49e4b66f 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c
+@@ -152,7 +152,7 @@ static int thead_set_clk_tx_rate(void *bsp_priv, struct clk *clk_tx_i,
+ static int thead_dwmac_enable_clk(struct plat_stmmacenet_data *plat)
+ {
+ 	struct thead_dwmac *dwmac = plat->bsp_priv;
+-	u32 reg;
++	u32 reg, div;
+ 
+ 	switch (plat->mac_interface) {
+ 	case PHY_INTERFACE_MODE_MII:
+@@ -164,6 +164,13 @@ static int thead_dwmac_enable_clk(struct plat_stmmacenet_data *plat)
+ 	case PHY_INTERFACE_MODE_RGMII_RXID:
+ 	case PHY_INTERFACE_MODE_RGMII_TXID:
+ 		/* use pll */
++		div = clk_get_rate(plat->stmmac_clk) / rgmii_clock(SPEED_1000);
++		reg = FIELD_PREP(GMAC_PLLCLK_DIV_EN, 1) |
++		      FIELD_PREP(GMAC_PLLCLK_DIV_NUM, div);
++
++		writel(0, dwmac->apb_base + GMAC_PLLCLK_DIV);
++		writel(reg, dwmac->apb_base + GMAC_PLLCLK_DIV);
++
+ 		writel(GMAC_GTXCLK_SEL_PLL, dwmac->apb_base + GMAC_GTXCLK_SEL);
+ 		reg = GMAC_TX_CLK_EN | GMAC_TX_CLK_N_EN | GMAC_TX_CLK_OUT_EN |
+ 		      GMAC_RX_CLK_EN | GMAC_RX_CLK_N_EN;
 -- 
-MST
+2.50.1
 
 
