@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-213893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213894-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73125B2743C
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 02:50:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16C88B27447
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 02:52:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B2A05C78A9
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 00:50:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 16C46189CE4D
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 00:50:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A2DC13957E;
-	Fri, 15 Aug 2025 00:49:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6813560DCF;
+	Fri, 15 Aug 2025 00:50:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ttth/RDT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kilzjN4z"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62D8C131E49;
-	Fri, 15 Aug 2025 00:49:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43D513595B
+	for <netdev@vger.kernel.org>; Fri, 15 Aug 2025 00:50:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755218997; cv=none; b=tpogaOwi5JGoH73MsdV8Nnp+xC7YbnUZ9VbYr1o+LienfuCZH2LUl7hdrYEHPi7jHidozs42/wqhbNfUEz82z0kj8GNr9mI0pTdW2hNLqG7qHCb/5qpJtVTX9GnLs8HL59Aoax5SNC3I61VxE1itjlzXOzNbOfQ9btC5KJtyW6E=
+	t=1755219013; cv=none; b=TTi36POcaCWR1gInVy/Ix2uAtn9aAy22cRTl4AasCsQSxKldnx1ViX7Gv809Hw4SeuYzNEO2YSeTyVpTBbPZn9opTRllNe9M/yuUZHNbzqpoKI4zkIzxtguGD9e5DYHgVfyGpsGNkL7Y+2q8f1b+9VL7MIxbtlTS4BOi/4rSDFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755218997; c=relaxed/simple;
-	bh=eBjfGJFAIB9PNSuG226jlmZoI98zEZdasUPmN3XCETk=;
+	s=arc-20240116; t=1755219013; c=relaxed/simple;
+	bh=g5sfBB+8wm+QzrL4fd0Fu1o9NJK9Iqu6DIyVGvdZLZQ=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Gqn9DTcPv1B3oarRZMO+HmQKES9M1kEOPzkfSw3KLxPPVumQ8fG8k7rDT8gSUIexTk1M+jysY7POB+nvAzD1KQK7hCung04eQDv2yaToS99eBLwlHJPoFJyXny9a7rp3A43iJNId8RNPIW0hKyq0SS9O0D90RQEfJXOV3ssfueE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ttth/RDT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B1F1C4CEED;
-	Fri, 15 Aug 2025 00:49:57 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=H91LWG/V3blYtdUgh+BO2/QzN/GW1iyOfHzzw4m950THYl8mGhOmHLYH+2w/CkUAqQzrg7xTq4pl6CKoIX9XbE3EJvDLgnCXkYF3MPKHLkbBdpTPJVl4gbPVv7pd66NhxIVtlSgKFbqwzfvFqu9fTtMzUFhUz5UeyZlpIWQKyxg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kilzjN4z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B20AAC4CEED;
+	Fri, 15 Aug 2025 00:50:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755218997;
-	bh=eBjfGJFAIB9PNSuG226jlmZoI98zEZdasUPmN3XCETk=;
+	s=k20201202; t=1755219012;
+	bh=g5sfBB+8wm+QzrL4fd0Fu1o9NJK9Iqu6DIyVGvdZLZQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ttth/RDTtdSmxz2nATU/O9UwTv9OrskOMAnAvixmPgts/tgloNF0ZJjkPfwX+9M/6
-	 DcopTv5J4Pn9CnOWr1qKO6YMgbDoBK20V4A+C5mcTJYfrKn+3IrPBfHyRG0ClnHA+t
-	 WbcHNpjlFJZmC9eviHGZmW/G7N20ZSI/2p4xMwnLmkmQi0GRyuOHvVe/ixoQhpXXii
-	 gMbz7/Qh++9s1kTHTNt2HnPD7gBo90HJb4m6VqVciJcoG8MvHXLYiCYRojQGpafzWI
-	 G6UUS0va9Tct7vP7srXgW2iyQ9xrjAROa+WZE3VwdgXfvaZchXUtPGMMrKg07BfOER
-	 Ur6/Ww7CIaQtQ==
+	b=kilzjN4zEVqTe9tQjptp/LHY7GB0SKVZCzYbYC29Xxpxj/BlPQbA+OBUuER4MFf7H
+	 XUjFZIt/Qw24yMaDPYfpKkVD1FgPFZe4MfxrgJZM2WK9Qi3m/vW/+H7i4YeekYsDQw
+	 8c9szoyiKLQb01XAl0EhGqF/0RGxN2ryMF9CHHk+A2h4viaxaMEwe584WBpDd03cOa
+	 RpF9q0/qg9KMllnuedPOpZQNp1VnvIzsklyntiiCRkQ8jFG+qLg0nujW3tcTALdDNP
+	 y/n91dXnTT8XQpwn8lafyqBJwIPpmnt7UBQ9VD3tCJgaJXbNoVHsVLuo7ChGwWV8np
+	 lTpw74damNlvA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id A518E39D0C3E;
-	Fri, 15 Aug 2025 00:50:09 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B4B39D0C3E;
+	Fri, 15 Aug 2025 00:50:25 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,41 +52,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net V2] net: xilinx: axienet: Fix RX skb ring management
- in
- DMAengine mode
+Subject: Re: [PATCH net-next 0/2] bridge: Redirect to backup port when port is
+ administratively down
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175521900824.500228.10283078380078516780.git-patchwork-notify@kernel.org>
-Date: Fri, 15 Aug 2025 00:50:08 +0000
-References: <20250813135559.1555652-1-suraj.gupta2@amd.com>
-In-Reply-To: <20250813135559.1555652-1-suraj.gupta2@amd.com>
-To: Suraj Gupta <suraj.gupta2@amd.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, michal.simek@amd.com,
- sean.anderson@linux.dev, radhey.shyam.pandey@amd.com, horms@kernel.org,
- netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, harini.katakam@amd.com
+ <175521902398.500228.4413563447477304609.git-patchwork-notify@kernel.org>
+Date: Fri, 15 Aug 2025 00:50:23 +0000
+References: <20250812080213.325298-1-idosch@nvidia.com>
+In-Reply-To: <20250812080213.325298-1-idosch@nvidia.com>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, bridge@lists.linux-foundation.org,
+ davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
+ razor@blackwall.org, petrm@nvidia.com, horms@kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 13 Aug 2025 19:25:59 +0530 you wrote:
-> Submit multiple descriptors in axienet_rx_cb() to fill Rx skb ring. This
-> ensures the ring "catches up" on previously missed allocations.
+On Tue, 12 Aug 2025 11:02:11 +0300 you wrote:
+> Patch #1 amends the bridge to redirect to the backup port when the
+> primary port is administratively down and not only when it does not have
+> a carrier. See the commit message for more details.
 > 
-> Increment Rx skb ring head pointer after BD is successfully allocated.
-> Previously, head pointer was incremented before verifying if descriptor is
-> successfully allocated and has valid entries, which could lead to ring
-> state inconsistency if descriptor setup failed.
+> Patch #2 extends the bridge backup port selftest to cover this case.
+> 
+> Ido Schimmel (2):
+>   bridge: Redirect to backup port when port is administratively down
+>   selftests: net: Test bridge backup port when port is administratively
+>     down
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,V2] net: xilinx: axienet: Fix RX skb ring management in DMAengine mode
-    https://git.kernel.org/netdev/net/c/fd980bf6e9cd
+  - [net-next,1/2] bridge: Redirect to backup port when port is administratively down
+    https://git.kernel.org/netdev/net-next/c/3d05b24429e1
+  - [net-next,2/2] selftests: net: Test bridge backup port when port is administratively down
+    https://git.kernel.org/netdev/net-next/c/51ca1e67f416
 
 You are awesome, thank you!
 -- 
