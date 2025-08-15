@@ -1,257 +1,122 @@
-Return-Path: <netdev+bounces-214094-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214095-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7026B28417
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 18:45:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A09F9B2841D
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 18:46:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E214B586351
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 16:42:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 72D025C09B2
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 16:42:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD2C630EF6B;
-	Fri, 15 Aug 2025 16:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 740CF30E827;
+	Fri, 15 Aug 2025 16:42:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PCe0WvJb"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="jk8kTtoj";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="agMEzjxM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9510130E82B;
-	Fri, 15 Aug 2025 16:40:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD24230E0E0
+	for <netdev@vger.kernel.org>; Fri, 15 Aug 2025 16:42:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755276028; cv=none; b=ddruB/Z5qYHHCrJ69WCgIYgRtqkLKtsIgjKgU1ByEpZneYMX8/TEO9xY9YniJ3teRe/gK6Di26n/LhKeEbZUMH6b3G8cPhcfoOwgY5+lLSGsjlTdl3fMvspeKF85V/0IDvv4tBJrNkdMwpNLG8ZYOuevFKWv4y19PogJ3oDDmgU=
+	t=1755276122; cv=none; b=hA/r65P1MFECkULvZYHHWCuvcaD0Y6691gDgL90z0LyLSnFuoFS3MtjXBB/qxl+jCrU4PJ4G7yetINDjVQUMaEVCPmTjYZeSx37VTQWLL4YpaeEE2FoDqdBS/jQ8Nhy5NuPJq+daYCWU2m7JyX/xuzrjB7qfSRrBG8OpCv1bCCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755276028; c=relaxed/simple;
-	bh=5LziujzWacnCbqw+g7qqICqrZy1EOWsUKZ+Tw1dxDmM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IKL/OTfGq2HNnNRpuIMsKUwQdiWWyrkabPcsmJllYQ4ChFZD6ODKTE/SCTGfBM1P0FgYhVencTwlzSywWTvtGtj8x8Y1eTw58WfW7IiT/ze6V2SBUgTaCHQGotln01115KOhOhWhX0wnzmbdvE/5lAyfvurN6nSV4SWpEmFD120=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PCe0WvJb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 130B3C4CEEB;
-	Fri, 15 Aug 2025 16:40:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755276028;
-	bh=5LziujzWacnCbqw+g7qqICqrZy1EOWsUKZ+Tw1dxDmM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=PCe0WvJb8et0r8SjJyXoN4uyqGs2I6eiLOETRhARpLHTgSdoHTY5Qea8Osqs5pMh8
-	 i0onemCa+6U22PCjVsctU+K17q2QJjza/oWeer93/GQOkb7yRG2XlI55Y7IgZhHBeo
-	 iHm+dm48ZmkzXmYAx8dJiOoWkQ6Sag3oBtdZLbp0ReGldo5eUaD1lRLKpHz1RvpxL6
-	 grtJ3F5E5F0lpyKo9z1Lk3q+/l0TK8BVfVeWfyNfvPYCXTtX18+6vaBrRTU0nCh1uE
-	 yu4khpHsNFsYZX/CE+hyn/5eIauBe6vJ1fKP6BlrRq5SSFab0htt9Go3UInDKmE8Ai
-	 Jo5jG+fDmPl3Q==
-Message-ID: <d34bf5f5-9626-442d-bdd2-b3ada51d556e@kernel.org>
-Date: Fri, 15 Aug 2025 18:40:21 +0200
+	s=arc-20240116; t=1755276122; c=relaxed/simple;
+	bh=nv09JT8j/RPlJ2lIWFIf6rNe2bfQWVNSFRmAOOXAF2I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qZSMMMp7pMHmt2Dl0TpPb6xMkrN+RhjZZZM0Vl+Xa0YCY3oamm4puVul3Yp7lpjcTe+qj26WUSer2JRBF3DPA8BMEksClqUYTKvcA3EuSkXjcT80JDNk8ZG2/3Pmf+SbWL5FZdi1miECZncKSrYrj9CXJKbOd+shSxpjHztzZ30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=jk8kTtoj; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=agMEzjxM; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Fri, 15 Aug 2025 18:41:57 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1755276118;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SuO9hWRB2tZu87vohsl77fbUrl0oo/RQH6y79VVI59I=;
+	b=jk8kTtoj0lR4im/1aitRimBk1HHrBhiokfmlw1OPnl/4eDcnsnBTFRZmlvh4fJwr6IRII7
+	KbDzL1xoEaL3GT/qx5AX/4tsR522CyvqoHsoqYEVrdlxLW6f+1EzSlMddA4CEaJFg7/XMU
+	HG/UiDx3R5gI9I0O1ZuHhrHLqXI+KBzlJBMB41DtGC6n7yanfbpo55f4CMkh26p+h/Z1in
+	O433iMSjtJYlMdvrEXBxiSlYphug8d/yfFbiy/SfRPN6ni+ZU4pTN555RBX/GSntO6DaQw
+	oHQOR/brruiWxpaALt9md0yOTCtSq1+7WCHTFJTRZY6WgTfp2QYrrEalvhZlhg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1755276118;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SuO9hWRB2tZu87vohsl77fbUrl0oo/RQH6y79VVI59I=;
+	b=agMEzjxMF9CFD7nDwflH12aIGhmn+a7w+1cz2P9BbvK8f5GiYKADO4oVIfCABvQc4aVw1r
+	pfsv5CRPSY/tYpAQ==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: Kurt Kanzenbach <kurt@linutronix.de>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next] igb: Retrieve Tx timestamp
+ directly from interrupt
+Message-ID: <20250815164157.jIKm3gdS@linutronix.de>
+References: <20250815-igb_irq_ts-v1-1-8c6fc0353422@linutronix.de>
+ <a1e9e37e-63da-4f1c-8ac3-36e1fde2ec0a@molgen.mpg.de>
+ <87y0rlm22a.fsf@jax.kurt.home>
+ <ad66d19c-be7b-4df3-8e4c-d57a08782df4@molgen.mpg.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/2] xsk: support generic batch xmit in copy mode
-To: Jason Xing <kerneljasonxing@gmail.com>,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com,
- jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org,
- daniel@iogearbox.net, john.fastabend@gmail.com, horms@kernel.org,
- andrew+netdev@lunn.ch, bpf@vger.kernel.org, netdev@vger.kernel.org,
- Jason Xing <kernelxing@tencent.com>
-References: <20250811131236.56206-1-kerneljasonxing@gmail.com>
- <20250811131236.56206-3-kerneljasonxing@gmail.com>
- <b07b8930-e644-45a2-bef8-06f4494e7a39@kernel.org> <aJt+kBqXT/RgLGvR@boxer>
- <CAL+tcoBrT7WnPP9c+fhRxYyqyf0dZsMAP9=ghvcWRc2rTsF3Ag@mail.gmail.com>
- <CAL+tcoAst1xs=xCLykUoj1=Vj-0LtVyK-qrcDyoy4mQrHgW1kg@mail.gmail.com>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <CAL+tcoAst1xs=xCLykUoj1=Vj-0LtVyK-qrcDyoy4mQrHgW1kg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <ad66d19c-be7b-4df3-8e4c-d57a08782df4@molgen.mpg.de>
 
-
-
-On 13/08/2025 15.06, Jason Xing wrote:
-> On Wed, Aug 13, 2025 at 9:02 AM Jason Xing <kerneljasonxing@gmail.com> wrote:
->>
->> On Wed, Aug 13, 2025 at 1:49 AM Maciej Fijalkowski
->> <maciej.fijalkowski@intel.com> wrote:
->>>
->>> On Tue, Aug 12, 2025 at 04:30:03PM +0200, Jesper Dangaard Brouer wrote:
->>>>
->>>>
->>>> On 11/08/2025 15.12, Jason Xing wrote:
->>>>> From: Jason Xing <kernelxing@tencent.com>
->>>>>
->>>>> Zerocopy mode has a good feature named multi buffer while copy mode has
->>>>> to transmit skb one by one like normal flows. The latter might lose the
->>>>> bypass power to some extent because of grabbing/releasing the same tx
->>>>> queue lock and disabling/enabling bh and stuff on a packet basis.
->>>>> Contending the same queue lock will bring a worse result.
->>>>>
->>>>
->>>> I actually think that it is worth optimizing the non-zerocopy mode for
->>>> AF_XDP.  My use-case was virtual net_devices like veth.
->>>>
->>>>
->>>>> This patch supports batch feature by permitting owning the queue lock to
->>>>> send the generic_xmit_batch number of packets at one time. To further
->>>>> achieve a better result, some codes[1] are removed on purpose from
->>>>> xsk_direct_xmit_batch() as referred to __dev_direct_xmit().
->>>>>
->>>>> [1]
->>>>> 1. advance the device check to granularity of sendto syscall.
->>>>> 2. remove validating packets because of its uselessness.
->>>>> 3. remove operation of softnet_data.xmit.recursion because it's not
->>>>>      necessary.
->>>>> 4. remove BQL flow control. We don't need to do BQL control because it
->>>>>      probably limit the speed. An ideal scenario is to use a standalone and
->>>>>      clean tx queue to send packets only for xsk. Less competition shows
->>>>>      better performance results.
->>>>>
->>>>> Experiments:
->>>>> 1) Tested on virtio_net:
->>>>
->>>> If you also want to test on veth, then an optimization is to increase
->>>> dev->needed_headroom to XDP_PACKET_HEADROOM (256), as this avoids non-zc
->>>> AF_XDP packets getting reallocated by veth driver. I never completed
->>>> upstreaming this[1] before I left Red Hat.  (virtio_net might also benefit)
->>>>
->>>>   [1] https://github.com/xdp-project/xdp-project/blob/main/areas/core/veth_benchmark04.org
->>>>
->>>>
->>>> (more below...)
->>>>
->>>>> With this patch series applied, the performance number of xdpsock[2] goes
->>>>> up by 33%. Before, it was 767743 pps; while after it was 1021486 pps.
->>>>> If we test with another thread competing the same queue, a 28% increase
->>>>> (from 405466 pps to 521076 pps) can be observed.
->>>>> 2) Tested on ixgbe:
->>>>> The results of zerocopy and copy mode are respectively 1303277 pps and
->>>>> 1187347 pps. After this socket option took effect, copy mode reaches
->>>>> 1472367 which was higher than zerocopy mode impressively.
->>>>>
->>>>> [2]: ./xdpsock -i eth1 -t  -S -s 64
->>>>>
->>>>> It's worth mentioning batch process might bring high latency in certain
->>>>> cases. The recommended value is 32.
->>>
->>> Given the issue I spotted on your ixgbe batching patch, the comparison
->>> against zc performance is probably not reliable.
->>
->> I have to clarify the thing: zc performance was tested without that
->> series applied. That means without that series, the number is 1303277
->> pps. What I used is './xdpsock -i enp2s0f0np0 -t -q 11  -z -s 64'.
+On 2025-08-15 14:54:16 [+0200], Paul Menzel wrote:
+> > > Do you have a reproducer for the issue, so others can test.
+> > 
+> > Yeah, I do have a reproducer:
+> > 
+> >   - Run ptp4l with 40ms tx timeout (--tx_timestamp_timeout)
+> >   - Run periodic RT tasks (e.g. with SCHED_FIFO 1) with run time of
+> >     50-100ms per CPU core
+> > 
+> > This leads to sporadic error messages from ptp4l such as "increasing
+> > tx_timestamp_timeout or increasing kworker priority may correct this
+> > issue, but a driver bug likely causes it"
+> > 
+> > However, increasing the kworker priority is not an option, simply
+> > because this kworker is doing non-related PTP work items as well.
+> > 
+> > As the time sync interrupt already signals that the Tx timestamp is
+> > available, there's no need to schedule a work item in this case. I might
+> > have missed something though. But my testing looked good. The warn_on
+> > never triggered.
 > 
+> Great. Maybe add that too, as, at least for me, realtime stuff is something
+> I do not do, so pointers would help me.
 
-My i40e device is running at 40Gbit/s.
-I see significantly higher packet per sec (pps) that you are reporting:
+If you ask for an explicit reproducer that you would have to have task
+that does
+	struct sched_param param = { .sched_priority = 1 };
+	sched_setscheduler(0, SCHED_FIFO, &param);
 
-$ sudo ./xdpsock -i i40e2 --txonly -q 2 -z -s 64
+and let it run for to exceed the ptp4l timeout. But in general it does
+not require a real time task to trigger the problem. A busy CPU with a
+lot of pending worker will do the trick, too. You just need "enough" CPU
+work so the scheduler puts other tasks on the CPU before the kworker,
+which retrieves the timestamp, is scheduled.
 
-  sock0@i40e2:2 txonly xdp-drv
-                    pps            pkts           1.00
-rx                 0              0
-tx                 21,546,859     21,552,896
+> Paul
 
-
-The "copy" mode (-c/--copy) looks like this:
-
-$ sudo ./xdpsock -i i40e2 --txonly -q 2 --copy -s 64
-
-  sock0@i40e2:2 txonly xdp-drv
-                    pps            pkts           1.00
-rx                 0              0
-tx                 2,135,424      2,136,192
-
-
-The skb-mode (-S, --xdp-skb) looks like this:
-
-$ sudo ./xdpsock -i i40e2 --txonly -q 2 --xdp-skb -s 64
-
-  sock0@i40e2:2 txonly xdp-skb
-                    pps            pkts           1.00
-rx                 0              0
-tx                 2,187,992      2,188,800
-
-
-The HUGE performance gap to "xdp-drv" zero-copy mode, tells me that
-there is a huge potential for improving the performance for the copy
-mode, both "native" xdp-drv and xdp-skb, cases.
-Thus, the work your are doing here is important.
-
-
-> ------
-> @Maciej Fijalkowski
-> Interesting thing is that copy mode is way worse than zerocopy if the
-> nic is _i40e_.
-> 
-> With ixgbe, even copy mode reaches nearly 50-60% of the full speed
-> (which is only 1Gb/sec) while either zc or batch version copy mode
-> reaches 70%.
-> With i40e, copy mode only reaches nearly 9% while zc mode 70%. i40e
-> has a much faster speed (10Gb/sec) comparatively.
-> 
-> Here are some summaries (budget 32, batch 32):
->                 copy       batch         zc
-> i40e       1,777,859   2,102,579   14,880,643
-> ixgbe      1,187,347   1,472,367    1,303,277
-> 
-(added thousands separators to make above readable)
-
-Those number only make sense if
-  i40e runs at link speed 10Git/s and
-  ixgbe runs at link speed 1Gbit/s
-
-
-> For i40e, here are numbers around the batch copy mode (budget is 128):
-> no batch       batch 64
-> 1825027      2228328.
-> Side note: 2228328 seems to be the max limit in copy mode with this
-> series applied after testing with different settings.
-> 
-> It turns out that testing on i40e is definitely needed because the
-> xdpsock test hits the bottleneck on ixgbe.
-> 
-> -----
-> @Jesper Dangaard Brouer
-> In terms of the 'more' boolean as Jesper said, related drivers might
-> need changes like this because in the 'for' loop of the batch process
-> in xsk_direct_xmit_batch(), drivers may fail to send and then break
-> the 'for' loop, which leads to no chance to kick the hardware.
-
-If sending with 'more' indicator and driver fail to send, then it is the
-responsibility of the driver to update the tail-ptr/doorbell.
-Example for ixgbe driver:
-  https://elixir.bootlin.com/linux/v6.16/source/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c#L8879-L8880
-
-> Or we
-> can keep trying to send in xsk_direct_xmit_batch() instead of breaking
-> immediately even if the driver becomes busy right now.
-> 
-> As to ixgbe, the performance doesn't improve as I analyzed (because it
-> already reaches 70% of full speed).
-> 
-
-If ixgbe runs at 1Gbit/s then remember Ethernet wire-speed is 1.488
-Mpps. Thus, you are much closer than 70% to wire-speed.
-
-
-> As to i40e, only adding 'more' logic, the number goes from 2102579 to
-> 2585224 with the 32 batch and 32 budget settings. The number goes from
-> 2200013 to 2697313 with the  batch and 64 budget settings. See! 22+%
-> improvement!
-
-That is a very big performance gain IMHO. Shows that avoiding the tail-
-ptr/doorbell between each packet have a huge benefit.
-
-> As to virtio_net, no obvious change here probably because the hardirq
-> logic doesn't have a huge effect.
-> 
-
-Perhaps virtio_net doesn't implement the SKB 'more' feature?
-
---Jesper
-
+Sebastian
 
