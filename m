@@ -1,89 +1,141 @@
-Return-Path: <netdev+bounces-213922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213923-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B997B27563
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 04:09:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5664BB2753D
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 04:05:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F6563AED9E
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 02:04:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 573817B1F92
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 02:03:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD05F29A31A;
-	Fri, 15 Aug 2025 01:59:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14C67292917;
+	Fri, 15 Aug 2025 02:01:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ZFQcYZYN"
+	dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b="UPw4PWwR"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 329652777F9;
-	Fri, 15 Aug 2025 01:59:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+Received: from submarine.notk.org (submarine.notk.org [62.210.214.84])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B776628A1F9;
+	Fri, 15 Aug 2025 02:01:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.210.214.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755223168; cv=none; b=hQe2JssQHPGZETYQqqLTZaGhdEJvkeh1x//pAzr0/DA4JI1Uj6KQKrFIK0WEXxVbnrd61iM7wP+MTS5qaQLbYwgpOv7uJRXrEUICChPzEjsG51nKxeOu7cLVEwreqxZcRhWcHGqoEdFYnCKfrg0x5h8T9zYA92AJUs06v9KkNk0=
+	t=1755223283; cv=none; b=ZH1euObdae+lsf7STLwl9XCGyR45gOCRTGbk4ooudBUedUWyRs21vz+K6kpnB6oi9gl9VWSTfgNViqftWzsRHd2j2rUXBcU9kBKOs5ddAmnI5R5l9jFYbcrHzMbxoSjzSxgHMPs2O5fRVaxiUbPOUe/2EK2UEM0cSg7de2/T+bE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755223168; c=relaxed/simple;
-	bh=zSUUbOPSNIlO8oema4/AtenrMEjWQHo4i6YgosHvNn0=;
+	s=arc-20240116; t=1755223283; c=relaxed/simple;
+	bh=jdxcyUe5l4oRk+B3RKLN5jSCzycW/bTs8X0cLOYpjNE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aMo0urc4Y2OG5itaqdjrhw5GXr2v0cn1I+28CRpimjC3Pu+91YoSqv/STXnyWfAMPmlaFdhR7evqlr38/uaBAwMQob7kT7QIQFtnUBv0JzfSOZP/BqDKjso4kvoSbVEAHdEipTOghnVcyHc6wbIKDdhusfTsQfXU6UkJSsu+Cqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ZFQcYZYN; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=6UITZGCNKVQJuHjpAdvmMBezdHWOXUFmkpWZz90DmNg=; b=ZFQcYZYNoD8pmeYzItpfpqXp+q
-	ufxxGqXVrWNxYI1GFUJ968wi+ZKXsaHYmAPjQaqjnc7Uzp84flMpnhOEyImn7Q82dfdKwdngwFkX0
-	BQmg56at8A/M6YxJBuJEjdikuvGUJ4JeXk4TE+Vrkvl3sqjob4SD/OMkO4Zs3tRPUhM8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1umjiQ-004m6Z-JY; Fri, 15 Aug 2025 03:58:46 +0200
-Date: Fri, 15 Aug 2025 03:58:46 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Dong Yibo <dong100@mucse.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	corbet@lwn.net, gur.stavi@huawei.com, maddy@linux.ibm.com,
-	mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
-	gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
-	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
-	alexanderduyck@fb.com, richardcochran@gmail.com,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 1/5] net: rnpgbe: Add build support for rnpgbe
-Message-ID: <00e2690c-3b26-46c3-9b27-1c1a73964326@lunn.ch>
-References: <20250814073855.1060601-1-dong100@mucse.com>
- <20250814073855.1060601-2-dong100@mucse.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=c4OztlhS/b0cA87V7NkKiVDjMlp2Nxdd9TWR+qvJZvEepzLnPzli5+/NB2Kxy5BJGeI558LzwsANfTaU1sDIcukKlkcNsfD7IC8sctG0OQeEYAwZ94BL2rWGHdioeEJZbpAziS3vnMWxHohAPoKeCe+KuGtDvXYG1sGMN24zL/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org; spf=pass smtp.mailfrom=codewreck.org; dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b=UPw4PWwR; arc=none smtp.client-ip=62.210.214.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codewreck.org
+Received: from gaia.codewreck.org (localhost [127.0.0.1])
+	by submarine.notk.org (Postfix) with ESMTPS id 4EF1A14C2D3;
+	Fri, 15 Aug 2025 04:01:17 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org;
+	s=2; t=1755223279;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3to1JoTI7YxcKW36ucsrZ8J9JD5dqSy+UMJOKOKBxv0=;
+	b=UPw4PWwRqxf1H5wm6Xxz+bk+TNXbRFnTYziuff+8i7C6OO8Se8RC09eI8Fcum+oBQS9poC
+	b1Zoo0jfmSbXHuT8QZfYyItZad4X2x2SJEP2AyxwceCrfT0puraxxFHTdihNOAiuZIWika
+	nkpROOMoLZMoWnLxAuyzug8AotDS8bUzWWCnMYaO7Os7sjgSgTvJqci7KJfKUFXI2o7I/o
+	HiFDGcNMqo1c+f/cQNpTAtz91AHQIuefT07IyHLbCDN+RvdDuWnkmw+e9bnhXikd1BDVos
+	qCNiWlLkUAvs72tRqhAaogpJj2VqOiPG8mKpRUvOf1Ko9YUdsrEoqV/4IAmbnA==
+Received: from localhost (gaia.codewreck.org [local])
+	by gaia.codewreck.org (OpenSMTPD) with ESMTPA id 831f3cb7;
+	Fri, 15 Aug 2025 02:01:15 +0000 (UTC)
+Date: Fri, 15 Aug 2025 11:01:00 +0900
+From: Dominique Martinet <asmadeus@codewreck.org>
+To: Nalivayko Sergey <Sergey.Nalivayko@kaspersky.com>
+Cc: v9fs-developer@lists.sourceforge.net, netdev@vger.kernel.org,
+	Eric Van Hensbergen <ericvh@gmail.com>,
+	Wang Hai <wanghai38@huawei.com>,
+	Latchesar Ionkov <lucho@ionkov.net>, lvc-project@linuxtesting.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] net: 9p: fix double req put in p9_fd_cancelled
+Message-ID: <aJ6U3DQn876wGS4C@codewreck.org>
+References: <20250715154815.3501030-1-Sergey.Nalivayko@kaspersky.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250814073855.1060601-2-dong100@mucse.com>
+In-Reply-To: <20250715154815.3501030-1-Sergey.Nalivayko@kaspersky.com>
 
-> +static void rnpgbe_shutdown(struct pci_dev *pdev)
-> +{
-> +	bool wake;
-> +
-> +	rnpgbe_dev_shutdown(pdev, &wake);
-> +
-> +	if (system_state == SYSTEM_POWER_OFF) {
-> +		pci_wake_from_d3(pdev, wake);
-> +		pci_set_power_state(pdev, PCI_D3hot);
-> +	}
+Nalivayko Sergey wrote on Tue, Jul 15, 2025 at 06:48:15PM +0300:
+> This happens because of a race condition between:
+> 
+> - The 9p client sending an invalid flush request and later cleaning it up;
+> - The 9p client in p9_read_work() canceled all pending requests.
+> 
+>       Thread 1                              Thread 2
+>     ...
+>     p9_client_create()
+>     ...
+>     p9_fd_create()
+>     ...
+>     p9_conn_create()
+>     ...
+>     // start Thread 2
+>     INIT_WORK(&m->rq, p9_read_work);
+>                                         p9_read_work()
+>     ...
+>     p9_client_rpc()
+>     ...
+>                                         ...
+>                                         p9_conn_cancel()
+>                                         ...
+>                                         spin_lock(&m->req_lock);
+>     ...
+>     p9_fd_cancelled()
+>     ...
+>                                         ...
+>                                         spin_unlock(&m->req_lock);
+>                                         // status rewrite
+>                                         p9_client_cb(m->client, req, REQ_STATUS_ERROR)
+>                                         // first remove
+>                                         list_del(&req->req_list);
+>                                         ...
+> 
+>     spin_lock(&m->req_lock)
+>     ...
+>     // second remove
+>     list_del(&req->req_list);
+>     spin_unlock(&m->req_lock)
+>   ...
+> 
+> Commit 74d6a5d56629 ("9p/trans_fd: Fix concurrency del of req_list in
+> p9_fd_cancelled/p9_read_work") fixes a concurrency issue in the 9p filesystem
+> client where the req_list could be deleted simultaneously by both
+> p9_read_work and p9_fd_cancelled functions, but for the case where req->status
+> equals REQ_STATUS_RCVD.
 
-I don't think you need this test of system state until you have added
-WoL support.
+Sorry for the delay,
+Thanks for the investigation, this makes sense and deserves fixing.
 
-    Andrew
+> Add an explicit check for REQ_STATUS_ERROR in p9_fd_cancelled before
+> processing the request. Skip processing if the request is already in the error
+> state, as it has been removed and its resources cleaned up.
 
----
-pw-bot: cr
+Looking at the other status, it's quite unlikely but if other thread
+would make it FLSHD we should also skip these -- and I don't think it's
+possible as far as the logic goes but if it's not sent yet we would have
+nothing to flush either, so it's probably better to invert the check,
+and make it `if (req != SENT) return` ?
+
+client.c already checks `READ_ONCE(oldreq->status) == REQ_STATUS_SENT`
+before calling cancelled but that's without lock, so basically we're
+checking nothing raced since that check, and it's not limited to RCVD
+and ERROR.
+
+If you can send a v2 with that I'll pick it up.
+
+Thanks,
+-- 
+Dominique Martinet | Asmadeus
 
