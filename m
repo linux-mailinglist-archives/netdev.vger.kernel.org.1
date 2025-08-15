@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-213896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64530B2743F
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 02:50:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13DE8B27440
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 02:50:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 817F55E0F5E
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 00:50:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C4C625E1472
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 00:50:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06B5E1624DF;
-	Fri, 15 Aug 2025 00:50:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AD0B19343B;
+	Fri, 15 Aug 2025 00:50:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sRUoj0OO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e98ZKKB0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D547A13957E;
-	Fri, 15 Aug 2025 00:50:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E73511922FA;
+	Fri, 15 Aug 2025 00:50:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755219015; cv=none; b=kldl5lvPeB4zeLAa4st8bSQgn37c4ggZnfTdEhpuVfhDGXXXBllV/NA224OdO1m1KkkkwpobGKdsF6YhBFvunYQ2dCfdw/KidYEtghV6I+xfcYBP3YWyqaahNouwUZcgNrbLcDvu7+9IKsKIQ78Q0AArjRsZmmP5xO7YEj5mlj4=
+	t=1755219018; cv=none; b=obi7E46+n9/esmbqUbn6Q751vWhm8sFTe7NITEy2oclbyWrPbl/zVsNyhm1aaHHBSPPIWwsj11lSVv6pm+fFC6LYbsX2mpqPHenXPvxwYChToviJR1jkpOeXaJNFd1APjGLpoiBijqHEZSb9okm+ZPYUYfN1kfbc8Yiq5+X4Qmo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755219015; c=relaxed/simple;
-	bh=Ir0LlXy5gpHEXiw2yKFnGGk3vvtK8APW1bJBk2QSfmM=;
+	s=arc-20240116; t=1755219018; c=relaxed/simple;
+	bh=NaNqaP3C3jdeRHtc6S2034lmWD1zWpANl8x9Tuqx6HA=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=kGWkfXFA4/W/JFFV0rW+fz1gam8O/QQG+EtRQcKFpWpwn/yAH7q7J2HxzilB0k7EZnbRQIB4HL58/oJ0rTt9FMZ+9t1sSfff/Um3GECoCh0PuPOk94TocGoZaYiazJbvPeLWHE5oguUc773KZA8Qa5Bc4VEqsqxAJEWiuISjV7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sRUoj0OO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B45CBC4CEF5;
-	Fri, 15 Aug 2025 00:50:15 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=fd5TKFsic2/OLhUxz7ACz34k1ckdrPBBmOB4lmLNSqqqtPbgkeBE9clQbiKPHgUgG/M0eCQbwYFHpUbNLhow34NSVwRcQkHeDZKX2bZR6EsdMx5QgaCAKLcmZA+mFC6TpVR6/lUSpNBHdwhTRl8Xfbg+4rTBYoSqHhUEvNAgxRM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e98ZKKB0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EC5EC4CEED;
+	Fri, 15 Aug 2025 00:50:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755219015;
-	bh=Ir0LlXy5gpHEXiw2yKFnGGk3vvtK8APW1bJBk2QSfmM=;
+	s=k20201202; t=1755219017;
+	bh=NaNqaP3C3jdeRHtc6S2034lmWD1zWpANl8x9Tuqx6HA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=sRUoj0OOItiwiGQKbh/swSLZg7mYgdcvbbW2A37H9wAbVU1qpSJ9vL9zgFKrBXhn7
-	 pHnoVA/YINqOE8+hgZNm+d9we0SYZKoFHK1O5Hhhsdz1Mf8AvSBv/bvANI5CLVZcxl
-	 5PkYeskFLIZJQcuWCkmFIriUtnY+ABdAAW0UTarigJ6tjUVPRpn5zeNSzPJVvPKrNR
-	 EyGDUhBOCed11P0F5wtiwIWWVFsvahzVZn9huaMQnfUdmGpWcOJwBQO7UXSsKSdhmU
-	 CO0EOCxCXCu+1fK6gCXC4HuYuWH39xKkvU5llfuHln7M4FjCCiKOMGxD9pyVHDIpbM
-	 Kn2e1sora0Fdg==
+	b=e98ZKKB0pXjmcaEYzAIscFu58rUG6Y8lvpgKOwqjqPYkN3A0TF+n9CxD8he/DlRo8
+	 76XzSpyJNg/nEfKN+E0yuf0NvCRkHHbCSqk86R1etMhyc5xr6WyfJVh41XqP6M3BPy
+	 9ZlWj0aFP2CQFljhkztrne8/qaLqxvyVdR5C7aTPJ7ktJXFKIrJqbsI31V2RL1PoXN
+	 5+e1b37KdBIR2VjgXDPyOXiFfv58H59TIadTeGMqXHTb7zjtmkTj3Kf09AHfnH0Fxb
+	 jjYm7MgVEk9oQuJmoMhIyaF/CaUojWjd+dvQkQ8NGzXP+F3cjgQg6GGD2xTxVOy6Vc
+	 nO/m3V75bnWiQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C5739D0C3E;
-	Fri, 15 Aug 2025 00:50:28 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF7D39D0C3E;
+	Fri, 15 Aug 2025 00:50:29 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,36 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] selftests: drv-net: wait for carrier
+Subject: Re: [PATCH net-next] net: dsa: realtek: remove unnecessary file,
+ dentry,
+ inode declarations
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175521902674.500228.5816047536590617644.git-patchwork-notify@kernel.org>
-Date: Fri, 15 Aug 2025 00:50:26 +0000
-References: <20250812142054.750282-1-kuba@kernel.org>
-In-Reply-To: <20250812142054.750282-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org,
- willemb@google.com, petrm@nvidia.com, linux-kselftest@vger.kernel.org
+ <175521902841.500228.2139598366894065654.git-patchwork-notify@kernel.org>
+Date: Fri, 15 Aug 2025 00:50:28 +0000
+References: <20250813181023.808528-1-vladimir.oltean@nxp.com>
+In-Reply-To: <20250813181023.808528-1-vladimir.oltean@nxp.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, linus.walleij@linaro.org, alsi@bang-olufsen.dk,
+ andrew@lunn.ch, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 12 Aug 2025 07:20:54 -0700 you wrote:
-> On fast machines the tests run in quick succession so even
-> when tests clean up after themselves the carrier may need
-> some time to come back.
+On Wed, 13 Aug 2025 21:10:23 +0300 you wrote:
+> These are present since commit d8652956cf37 ("net: dsa: realtek-smi: Add
+> Realtek SMI driver") and never needed. Apparently the driver was not
+> cleaned up sufficiently for submission.
 > 
-> Specifically in NIPA when ping.py runs right after netpoll_basic.py
-> the first ping command fails.
-> 
-> [...]
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> ---
+>  drivers/net/dsa/realtek/realtek.h | 3 ---
+>  1 file changed, 3 deletions(-)
 
 Here is the summary with links:
-  - [net-next,v2] selftests: drv-net: wait for carrier
-    https://git.kernel.org/netdev/net-next/c/f09fc24dd9a5
+  - [net-next] net: dsa: realtek: remove unnecessary file, dentry, inode declarations
+    https://git.kernel.org/netdev/net-next/c/20e1b75b38fd
 
 You are awesome, thank you!
 -- 
