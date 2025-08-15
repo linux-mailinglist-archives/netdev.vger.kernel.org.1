@@ -1,93 +1,159 @@
-Return-Path: <netdev+bounces-214176-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214177-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F26A1B286B0
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 21:50:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BADC5B286D0
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 22:01:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B403DB6633F
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 19:49:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74BFBAA83DC
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 20:01:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B876E2C21D7;
-	Fri, 15 Aug 2025 19:50:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26A6123D7E3;
+	Fri, 15 Aug 2025 20:01:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ng2wUKvI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XTaDgpa+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 911462C1798;
-	Fri, 15 Aug 2025 19:50:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EF3950276;
+	Fri, 15 Aug 2025 20:01:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755287407; cv=none; b=Xp3er1W73oz02E6R9i1fOZvhHceFN4sjj8Jd7tJkuWImQ7Hp21WN1wgYbGOapvzHEXBIkbm7VmyWcELIXnmijXWnZc4OgCZ/snChilnTxi72YnO7AzIgZVKqoPry5FYfLPP98iVLA/eWEvbldLHTTAjAJfNQwjCRqlOc0OB4E+U=
+	t=1755288075; cv=none; b=dTCXQiVCOAe2mLtfHV3w0OQrN7V9HAWYY7XXEwDwlHhV11bdhcSp4A6ENYjYMVJ8ZYXnrMpsUQAFncpdYBtyrpMAG9YiYGhyDqR9NsfoMvH4fG6fwKLiXM81vqwqLkFn8S2y+uouwS6G8mbnMxUv6zBnXGzew1vtYyN5tCKHhWc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755287407; c=relaxed/simple;
-	bh=ad2i4iurqGuCF+I3o7cRV8IpdB69BXentAymQHoUIOY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=P4WhQRwM3u3shxS3oi+Ap/bTJypIlAF50ZIoTE/o7dFfi/H5deV5V3pf4ZFO8x3hX8YJAW89P3dKWpE2uy+e4uJv8YD8J/B5THtIfFInl8w9uC7kdmOqtGfJi+Li0+O3nSbGg1VcvvFjIiwI7cAOSebUqc3Pk29pZ7GooOg+0AI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ng2wUKvI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71F74C4CEF1;
-	Fri, 15 Aug 2025 19:50:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755287407;
-	bh=ad2i4iurqGuCF+I3o7cRV8IpdB69BXentAymQHoUIOY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ng2wUKvIL+HuBeKqztsX/as6ihcv05EUSkv+oqobFzjUcOgaGvYUlNE495/tKcaUe
-	 azF/TtoV0twiJtdcqwcpf3+0RjuLtuPhd+MLLbQzD6n5XWqvVUUtQO36IXb4V6a1BI
-	 R8tAszM8x59bwu3HHnqifDyOq+Jgpc+atXFvgb/kCh4pSXS7pcL7503vNtTdLpiNCf
-	 qY6xIycUNKH+PdzDrHZMDB+DD9F6WKHlY6nMhpbNnSIp1Bpp0PlLKWMljAXqvigUjl
-	 bJdEN9csWMY6gGOTo6HxU9r3hs0p9ZeC0iTqVrWVrNcNx7Z45GVfLW29iJZeQxkmi+
-	 xjWFHw2CdJwSw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE02D39D0C3D;
-	Fri, 15 Aug 2025 19:50:19 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1755288075; c=relaxed/simple;
+	bh=6+LmKr2YP0pGP/eJQZgqSIGXevYjsw5ECpIPORp7Bl0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=vEvJXoMmfR9h7IgM/ktEWdbbBcSV0hZFmIzTGtHWpx71wESBWx1aSccJcDvFXw0NAuEt4tYK2ZalOXHczeD92ugutyRmZXLP23p4roLHVYoccodrRR4zbHU0z9Zc2smNTZGbn9eydvYwLUimZKMARWFYWaGrpHF045KYJd0wguk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XTaDgpa+; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-afcb78c77ebso370940366b.1;
+        Fri, 15 Aug 2025 13:01:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755288072; x=1755892872; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=QJ3m6kWmuzmZpkxa5qzINXaMzNRW1w5l7/WQfkLOFVU=;
+        b=XTaDgpa+j32c50YtD5D+44YuWKMRfRWXv/oU00VTL6/9fZqZ9RVMiT7WJz5aUbb6LB
+         0JmLwTny3NfjXhSZ4ZwNAMGtRRvcz4TzcYXIs7R1nOJUpX5ZdIlNyqDXgcoHphOhFulM
+         3GJspJGM2JFBrgkauZBLuL/4TxZtE1rUR6KLkgY1XMBBJb8v02eI+ozHdYH0jft6HLL2
+         nt5aCc7S8AUW9CpHiT/+UeuFGj1Xs/INaHAPVwUvlaiq/vLG4jSkhUx31ghV//dEJWwZ
+         ixIPu1SMW5o/MGNRX+Q2xB+86GLGlqPSqIlV3bRDMxxUVirM3NcqhwmHoEQQZudt0c3i
+         sUzg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755288072; x=1755892872;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QJ3m6kWmuzmZpkxa5qzINXaMzNRW1w5l7/WQfkLOFVU=;
+        b=h3l6cipSVnI/sZeFI1BtKwm27geEVotKn4pNzbZH0xiicDDE7xx53X2TPUC6pLVcN3
+         c9SfZUvZVZkyPvKj/RODWeCeEFlsjZo52p0NIjONYRsAs7tVduJpc1W5XA1su9KhBigE
+         1L42fnwaKbghJgV386iCVYM9MX9kTMpIWP60ld2ffKyYjT+7Vx9HP23V0rTgSlKDiSeX
+         YMapiMaYT50qNwhY3O+G3O4w+llgoLXdFlE3mO2pXAMYJooH3HbqyM7ADLXEFJwRwXJn
+         UgQ2SKThOOXoBAmK/F1b20dm9jeaLkYLz4O62bOSlvBScEbtBLW3jTE/OJ5AC3fV/LD0
+         W7nQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUgVA3Pww6cim2K8HWgXcVeagTUBmDw+O5DjEMhFTJOgye3VFLq4nFHtVxdZ/MovyD+dbLnXRDr@vger.kernel.org, AJvYcCUwBJOZzpgl5YdmlcXN1iVlLcbiZda/0nE3F9w7mrO3z/t2XcupuOmjHCHL1Bfyk/yrO9HzsNEUS23Rkjk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzLGnmsAZoRPi6gg/9I1rz5d0D50KARNvEXnIwm69sjLuk3YR06
+	rlMKBGXNRhRPkzbRncEPf0Rlw5mKzxdezv0+UTqYsCdLMFvXTS36Wikv
+X-Gm-Gg: ASbGnctdvmBKpigzsiS4DaaNlMl01HZ+mhHffF23WfeUnz206cHvbRN4VpK+azSB0Hr
+	wmn8FtoChyGYxV5myLxIBPZw7msOtJ6N3fYzHmkMkgWhOf6SugFrdWTfMRnj3fkYzMVFUwgwJ48
+	zf3xJPmSL7rDuidDmPR3kcNIdErrmfhxZNWPB6PiNmWJud2PCIthXFQ2igIcRnfObVu+E/A6PhK
+	U/LBOCcDtVA1mB5hwStXCJJ2ZMT6xzUBQrDX9FAyV+BNUFiFPO/WI6aPYUEhmBi8zmXDZToRmPg
+	5ukh6U/UGfVBD5cZa5Rq/h7VFjR4MJC85IfIGEqv40674V/jnMZqMkBr4c2Zwo76GLczNOMqCjT
+	OQFuA5ewnuCg0wKLvnpjWRvPNkLdxOTqq
+X-Google-Smtp-Source: AGHT+IGPPPKhW/xav02lZiADLlNsDo5PyvNUJXqYDQ74MG+hoLNbCFM4yKLAOmjs9ElOXbXs5nuHdg==
+X-Received: by 2002:a17:907:9446:b0:ae4:a17:e6d2 with SMTP id a640c23a62f3a-afcdc22768amr269948766b.24.1755288070831;
+        Fri, 15 Aug 2025 13:01:10 -0700 (PDT)
+Received: from [192.168.8.100] ([148.252.132.122])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-afcdd010e7dsm207430166b.89.2025.08.15.13.01.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 15 Aug 2025 13:01:10 -0700 (PDT)
+Message-ID: <3dd73125-7f9b-405c-b5cd-0ab172014d00@gmail.com>
+Date: Fri, 15 Aug 2025 21:02:27 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: Space: Replace memset(0) + strscpy() with
- strscpy_pad()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175528741824.1253623.4919609679119905065.git-patchwork-notify@kernel.org>
-Date: Fri, 15 Aug 2025 19:50:18 +0000
-References: <20250814180514.251000-2-thorsten.blum@linux.dev>
-In-Reply-To: <20250814180514.251000-2-thorsten.blum@linux.dev>
-To: Thorsten Blum <thorsten.blum@linux.dev>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: netconsole: HARDIRQ-safe -> HARDIRQ-unsafe lock order warning
+To: Breno Leitao <leitao@debian.org>, Jakub Kicinski <kuba@kernel.org>
+Cc: Johannes Berg <johannes@sipsolutions.net>, Mike Galbraith
+ <efault@gmx.de>, paulmck@kernel.org, LKML <linux-kernel@vger.kernel.org>,
+ netdev@vger.kernel.org, boqun.feng@gmail.com
+References: <fb38cfe5153fd67f540e6e8aff814c60b7129480.camel@gmx.de>
+ <oth5t27z6acp7qxut7u45ekyil7djirg2ny3bnsvnzeqasavxb@nhwdxahvcosh>
+ <20250814172326.18cf2d72@kernel.org>
+ <3d20ce1b-7a9b-4545-a4a9-23822b675e0c@gmail.com>
+ <20250815094217.1cce7116@kernel.org>
+ <isnqkmh36mnzm5ic5ipymltzljkxx3oxapez5asp24tivwtar2@4mx56cvxtrnh>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <isnqkmh36mnzm5ic5ipymltzljkxx3oxapez5asp24tivwtar2@4mx56cvxtrnh>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 14 Aug 2025 20:05:14 +0200 you wrote:
-> Replace memset(0) followed by strscpy() with strscpy_pad() to improve
-> netdev_boot_setup_add(). This avoids zeroing the memory before copying
-> the string and ensures the destination buffer is only written to once,
-> simplifying the code and improving efficiency.
+On 8/15/25 18:29, Breno Leitao wrote:
+> On Fri, Aug 15, 2025 at 09:42:17AM -0700, Jakub Kicinski wrote:
+>> On Fri, 15 Aug 2025 11:44:45 +0100 Pavel Begunkov wrote:
+>>> On 8/15/25 01:23, Jakub Kicinski wrote:
+>>
+>> I suspect disabling netconsole over WiFi may be the most sensible way out.
 > 
-> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+> I believe we might be facing a similar issue with virtio-net.
+> Specifically, any network adapter where TX is not safe to use in IRQ
+> context encounters this problem.
 > 
-> [...]
+> If we want to keep netconsole enabled on all TX paths, a possible
+> solution is to defer the transmission work when netconsole is called
+> inside an IRQ.
+> 
+> The idea is that netconsole first checks if it is running in an IRQ
+> context using in_irq(). If so, it queues the skb without transmitting it
+> immediately and schedules deferred work to handle the transmission
+> later.
+> 
+> A rough implementation could be:
+> 
+> static void send_udp(struct netconsole_target *nt, const char *msg, int len) {
+> 
+> 	/* get the SKB that is already populated, with all the headers
+> 	 * and ready to be sent
+> 	 */
+> 	struct sk_buff = netpoll_get_skb(&nt->np, msg, len);
+> 
+> 	if (in_irq()) {
 
-Here is the summary with links:
-  - [net-next] net: Space: Replace memset(0) + strscpy() with strscpy_pad()
-    https://git.kernel.org/netdev/net-next/c/815957293639
+It's not just irq handlers but any context that has irqs disabled, and
+since it's nested under irq-safe console_owner it'd need to always be
+deferred or somehow moved out of the console_owner critical section.
+Maybe there is printk lock trickery I don't understand, however.
 
-You are awesome, thank you!
+> 		skb_queue_tail(&np->delayed_queue, skb);
+> 		schedule_delayed_work(flush_delayed_queue, 0);
+> 		return;
+> 	}
+> 
+> 	return __netpoll_send_skb(struct netpoll *np, struct sk_buff *skb)
+> }
+> 
+> This approach does not require additional memory or extra data copying,
+> since copying from the printk buffer to the skb must be performed
+> regardless.
+> 
+> The main drawback is a slight delay for messages sent from within an IRQ
+> context, though I believe such cases are infrequent.
+> 
+> We could potentially also perform the flush from softirq context, which
+> would help reduce this latency further.
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Pavel Begunkov
 
 
