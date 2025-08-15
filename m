@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-214225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214226-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FA7FB288C7
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 01:32:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38A70B288CD
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 01:33:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D44CAC3E48
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 23:32:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B0CEC1898EB6
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 23:33:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C382C26E6FF;
-	Fri, 15 Aug 2025 23:31:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AFB72820B6;
+	Fri, 15 Aug 2025 23:33:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vUalADxH"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="VqNZM3WV"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D427B1E8332
-	for <netdev@vger.kernel.org>; Fri, 15 Aug 2025 23:31:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0EC523D7F4
+	for <netdev@vger.kernel.org>; Fri, 15 Aug 2025 23:33:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755300715; cv=none; b=a7llBgmpr6B7aCsqVasZWWH5kamUKJE8Fycj2hC7hX3uhILW44myft+C5V1fVMZzCDDUzb3uK5zSH1liv9nTRpzYvD3fceR4XT2XqnXC7rBdqIPkDv2PkywaRsnhoEBFbOyMGC/Fas6ucya2BcyBU1s0dN/TQDyeuE0quaoBrew=
+	t=1755300783; cv=none; b=NCiU2499rUDxBpECQydsX6lJCNXeEt/juhLbuPkYFLvxroW9m23W6ztvb3t8B8AYR1aRD6aEzKgXjW8paNYw22n4/qRnTz+zxWy1nj9eyZ4VMqIoVY+lUwTF3K2tP/7xpj3zKqNXRlqwuIa+9UKFX1pvU6PzjivimMPv8NdT9I8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755300715; c=relaxed/simple;
-	bh=IjyK+DpeelkhKjQ4pKnvMKVGUp3feARBxTF26AxXLAY=;
+	s=arc-20240116; t=1755300783; c=relaxed/simple;
+	bh=H0tadr0xTM+W0GzQmg1abUwYMljwYrKCXvZb3D/4XeM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Hw5LNSoea/bMSVTAt1blgw53anNcEmFQUtE90x4nq4qoZB+0jFmvJ7V3BIUamhTWqzLE8sK5+O5jIjw39D9Z+37YvrQBje3VCHxDW1RIdDtcw0izJv7m0et2BvhrPICzf79EKgqb+9mWoKNpmlP9N4IjCBloTpPSX/TmjcUZ/VE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vUalADxH; arc=none smtp.client-ip=95.215.58.176
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z8MzuWFZdOeJFuURCJ3E4nphV95SQ7VkfGEUzTu02V8pPHW6SXDcbvORGQGezhzQIHrUV5te9L+BCb/uCFZxB3wbQwPmDNHvPjTf7s6HEF6OLXXQy3+Nv3P+YpaL4kLq9quZfOxRyrQVDKdkM2kLcZ4rdLm0I1hyGzO5zSE1kYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=VqNZM3WV; arc=none smtp.client-ip=91.218.175.189
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Fri, 15 Aug 2025 16:31:27 -0700
+Date: Fri, 15 Aug 2025 16:32:42 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1755300701;
+	t=1755300769;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=8mWAMiGacIPdo/U9tWrZ4G95PCsJeEqc6aHk78b6x74=;
-	b=vUalADxHq4n5TJyKV8RytL6pshWYqmbgSJ52T0tz2UYUci8EEBIB85xnniIlNi5ddQLAR7
-	ucGIjd839HqjVorE6RTr1GxfMme8r59DDlekkpWP/EcvAs2oI7tWmFQdBFW5MpBXbUHFK4
-	+Rh2quaCh0LQ46ltOhdBynDEnItymNI=
+	bh=rXLIjULjHIbwG6bxUtOeWzsAAQ+xy0b4gmrNOnGTqG4=;
+	b=VqNZM3WVNHiEwegbdEeOrBiwjv+u9KHv1mwrE2FQPW3BrRaLz3tbXZPdXM33SVSh44czJi
+	UaD2eXhYLBJRfn2PbG+xXhnRrI5UT8RtcxsBjT+d2ZEUkl/7n3YD8wkxvW3lEbs0dxeJIg
+	10j7dSS/lFi6xMyINEXBJfa4uB79F70=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Shakeel Butt <shakeel.butt@linux.dev>
 To: Kuniyuki Iwashima <kuniyu@google.com>
@@ -55,11 +55,11 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Geliang Tang <geliang@kernel.org>, Muchun Song <muchun.song@linux.dev>, 
 	Mina Almasry <almasrymina@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
 	mptcp@lists.linux.dev, cgroups@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH v5 net-next 01/10] mptcp: Fix up subflow's memcg when
- CONFIG_SOCK_CGROUP_DATA=n.
-Message-ID: <3x5m5rvbvtnta6lqyyx6k3uew4zhg5nxt2wmadkpi5t6tlsko6@peltw6axwvkg>
+Subject: Re: [PATCH v5 net-next 02/10] mptcp: Use tcp_under_memory_pressure()
+ in mptcp_epollin_ready().
+Message-ID: <j4npjivymessz7rnlc7xvec77k7634b4ldfrd2to5zpcgofci4@5adfxbs3hcl3>
 References: <20250815201712.1745332-1-kuniyu@google.com>
- <20250815201712.1745332-2-kuniyu@google.com>
+ <20250815201712.1745332-3-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,36 +68,21 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250815201712.1745332-2-kuniyu@google.com>
+In-Reply-To: <20250815201712.1745332-3-kuniyu@google.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Fri, Aug 15, 2025 at 08:16:09PM +0000, Kuniyuki Iwashima wrote:
-> When sk_alloc() allocates a socket, mem_cgroup_sk_alloc() sets
-> sk->sk_memcg based on the current task.
+On Fri, Aug 15, 2025 at 08:16:10PM +0000, Kuniyuki Iwashima wrote:
+> Some conditions used in mptcp_epollin_ready() are the same as
+> tcp_under_memory_pressure().
 > 
-> MPTCP subflow socket creation is triggered from userspace or
-> an in-kernel worker.
+> We will modify tcp_under_memory_pressure() in the later patch.
 > 
-> In the latter case, sk->sk_memcg is not what we want.  So, we fix
-> it up from the parent socket's sk->sk_memcg in mptcp_attach_cgroup().
+> Let's use tcp_under_memory_pressure() instead.
 > 
-> Although the code is placed under #ifdef CONFIG_MEMCG, it is buried
-> under #ifdef CONFIG_SOCK_CGROUP_DATA.
-> 
-> The two configs are orthogonal.  If CONFIG_MEMCG is enabled without
-> CONFIG_SOCK_CGROUP_DATA, the subflow's memory usage is not charged
-> correctly.
-> 
-> Let's move the code out of the wrong ifdef guard.
-> 
-> Note that sk->sk_memcg is freed in sk_prot_free() and the parent
-> sk holds the refcnt of memcg->css here, so we don't need to use
-> css_tryget().
-> 
-> Fixes: 3764b0c5651e3 ("mptcp: attach subflow socket to parent cgroup")
 > Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 > Reviewed-by: Eric Dumazet <edumazet@google.com>
-> Acked-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+> Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
-Acked-by: Shakeel Butt <shakeel.butt@linux.dev>
+Reviewed-by: Shakeel Butt <shakeel.butt@linux.dev>
+ 
 
