@@ -1,135 +1,140 @@
-Return-Path: <netdev+bounces-214027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214028-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F39AB27E18
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 12:17:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F73EB27E1B
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 12:19:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 105CE4E25C2
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 10:17:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 220237B29DA
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 10:17:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A11F52253AE;
-	Fri, 15 Aug 2025 10:17:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD53C279DC4;
+	Fri, 15 Aug 2025 10:18:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mjuuhm0v"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="QxMvlQ3f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f177.google.com (mail-vk1-f177.google.com [209.85.221.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2841517332C;
-	Fri, 15 Aug 2025 10:17:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E14851946A0
+	for <netdev@vger.kernel.org>; Fri, 15 Aug 2025 10:18:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755253054; cv=none; b=A2ehOWC6hRj7tnq1n8vi90a1z6Q+5LQ1ScLjb/PPVJEKeVTcTmX1/Ua7mvaBpoWi2+qDTQrVJ1reAQrSKlA3RkXs2b4gwr/MmoeuZ4aUlI3yX3Macs+lb3dLcMs3qv84qMNyFU3b4EzaVLDiE4RJGlPdTRpRUtjamT4NlywqqZ8=
+	t=1755253131; cv=none; b=K8QjmFxFd1YFOstI8qdPPQKErtLVemzfYCcCLsdOlOCr59S4hyGgJDQlRszCGxUssWL+jv7dUDCHkcDzzDCIg29xFBRf0oihdziYujU5eGCTScAbJ07Mo1Uv0CVweRtKTwrZH1btTFj/Lt+UO5PIAABhrHgvHln54+JqktYpK3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755253054; c=relaxed/simple;
-	bh=S0/8BdOSERg5uWRWITzQDVfY6sYuws7ILxyquavqsqY=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=S4FTGAgfRQo37CqbOAVD5NFOVHzYitkM7/0+vl7DzRB1YuybmxW6WD1qsGKv9fd4ZHWgCXi2pAVYeRL5ohAIV4E51O0uVR1bp485NRnJoNc/7N/XsGGzH8LhZ42t2GUbSf7Zd1flbajR66+1fkqqPdZvnFAYFulzpeBMFB7pyc4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mjuuhm0v; arc=none smtp.client-ip=209.85.221.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f177.google.com with SMTP id 71dfb90a1353d-53b171ca696so773478e0c.0;
-        Fri, 15 Aug 2025 03:17:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755253052; x=1755857852; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0CUXXCmt6pULCqRNiIVnXu6Ku5PVFCvCyuITqaGMBy4=;
-        b=mjuuhm0v+l5zYEIY9Kvf7nA3RsI0OIUDOVX8I6h1GsMffMamH+H5iNIfrwRqXKEIzB
-         P34Ods+/biQzxDCuRiJzf7/GqnJ2QKzY+uCamzOUDSVL0FT0ewiH1qDpdf6HMvcx58fb
-         Fx7/jyHn6pdLQm35r9N79g/tXan+TPAcDRAuIGu7hggqgtbn+kQ8sR9kYOeBuY4HQE2X
-         /qkdYlB7BqpN+4fhxAreg38igNYTvHdML3FvpRAX0BVi6tLRTYJUODl1ob+oF3x1rvsA
-         1A9bYi323ME4fiWtwtg/8H62vy85wzZuZV9KKPRPRrUJBBMBWjquAgEX7QZpRCmX7oKA
-         O3Dw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755253052; x=1755857852;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=0CUXXCmt6pULCqRNiIVnXu6Ku5PVFCvCyuITqaGMBy4=;
-        b=EnLbdaH0D3Qcg1HOkDPpHNYflOOxms3OzWkMYOaUSuzQGVmynfr8fCHUMpulWB7755
-         E3hdtCHc9wP29HAU74dBjXKtDwp3h/7N0xAActfG2orc4M7Ube3ISm1b5gFBLeKQjyU2
-         YOIIDwsKoFmX4AtAauwMBrxfrYiDeqFntC4DOQyX0ejkpcrvduE3BeBq/QpwP2WSYwc2
-         7YLasdOUfTAUG1UnpPFSDgcaa3HaSXuOm+VXC7KS7oBnPqgzFTz26Tc/01ruSaqMh9f9
-         tVoQJdOdPWQpM0eM/VznN5GRSDq18E2yEVbQWiFOsoR6ax1QIq36a8illgvYnDjlXOCl
-         aJOg==
-X-Forwarded-Encrypted: i=1; AJvYcCVHSLMrLyBLZIHfYcMuORnCN95V4UeKhSUBzAxOI9rmT9PsZJ2SCok2uezBc4chB8K4NjbaqWvkFPLkWyI=@vger.kernel.org, AJvYcCVeAbjoHoSKz7k1N9wXWmfx/v2thTnfpberKYCVtN+nfaZRut8CfdOkw+l5G0KjlTRbUppv6KHk@vger.kernel.org
-X-Gm-Message-State: AOJu0YzmJoneVfJHkGuvlQ0IWmKj6oJu8mF+5ykU7sTpK1c31cKy9Th+
-	0c/+wMxAsaxlxwgyUDRJJjb2CsZudt545i3xn+jK2BJg98tCe/qU2tJe
-X-Gm-Gg: ASbGncsE2BisGjcsyovW2Q1h4harWhWjCTu+97XzHKEgNuWCgar3wn+UHA+s9+J2g71
-	YZgdG5vcvfdFricKp7K3WWdbAzyHa6oShWDlyoEdB6m9JGg/JBWixyI05Ox0lfR1JdYPeAqZNof
-	QXyGcixjAIg15WKmXuJOAMRe9bcRjcUJyM7VgOAKe6oi2yhS8Z0+bugX+FKONLIa2cBHUTN/iXm
-	ge/Z4KyHzMxjkkphP/mmrRS/JJkBcgLUIP1tBn8d5cPUmoI9Z5QXbenCbFvrv/lYPYDr/Nv3QaH
-	xSng591zhFtPowZLA0OP7xTII4YPphQ3eg7AUFU+JeZrDqBHFzy+8wD7LXwaCBHpWdQaPkscdWD
-	Icq/hUgFi4XUpDKp1fzCbpaqoiwXy2S1jQ6AqypeZAbJV8/IlrTAYnCQRagFsOzKqEWNCNg==
-X-Google-Smtp-Source: AGHT+IG2gbli32klA78F/iI5imumJb5ahyh3dTccWNTgh97CCTa++9QvatbKuYqFDCy+k1Ttc3iHIw==
-X-Received: by 2002:a05:6122:31a0:b0:530:6bcb:c97f with SMTP id 71dfb90a1353d-53b2b892f93mr290049e0c.8.1755253052025;
-        Fri, 15 Aug 2025 03:17:32 -0700 (PDT)
-Received: from gmail.com (128.5.86.34.bc.googleusercontent.com. [34.86.5.128])
-        by smtp.gmail.com with UTF8SMTPSA id 71dfb90a1353d-53b2bed94b1sm152335e0c.17.2025.08.15.03.17.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Aug 2025 03:17:31 -0700 (PDT)
-Date: Fri, 15 Aug 2025 06:17:30 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Richard Gobert <richardbgobert@gmail.com>, 
- netdev@vger.kernel.org
-Cc: davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- horms@kernel.org, 
- corbet@lwn.net, 
- shenjian15@huawei.com, 
- salil.mehta@huawei.com, 
- shaojijie@huawei.com, 
- andrew+netdev@lunn.ch, 
- saeedm@nvidia.com, 
- tariqt@nvidia.com, 
- mbloch@nvidia.com, 
- leon@kernel.org, 
- ecree.xilinx@gmail.com, 
- dsahern@kernel.org, 
- ncardwell@google.com, 
- kuniyu@google.com, 
- shuah@kernel.org, 
- sdf@fomichev.me, 
- ahmed.zaki@intel.com, 
- aleksander.lobakin@intel.com, 
- linux-kernel@vger.kernel.org, 
- linux-net-drivers@amd.com, 
- Richard Gobert <richardbgobert@gmail.com>
-Message-ID: <willemdebruijn.kernel.2d92c3db94507@gmail.com>
-In-Reply-To: <20250814114030.7683-2-richardbgobert@gmail.com>
-References: <20250814114030.7683-1-richardbgobert@gmail.com>
- <20250814114030.7683-2-richardbgobert@gmail.com>
-Subject: Re: [PATCH net-next 1/5] net: gro: remove is_ipv6 from napi_gro_cb
+	s=arc-20240116; t=1755253131; c=relaxed/simple;
+	bh=t89BDj+s6NTWdxfwmklWhPUBlzAY0DHwSTUE9wUWjIU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=l0SUZUBKqRUAkpPXPekI+HPBkDwP+ihWH4j+u/ysAYeCX0ZDJ3CWZKPpJmkK6Rkh2vv9dC8hLXGcFMufYWevtPkliYkdi36a0ECBBmJgxOJxeW3h1s3JYBUHd3dzV4mvwo8JqlSsckG6mzxTRexR4DOmiiPCSYjRqKvnQMppGeE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=QxMvlQ3f; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=JZjx72MweuPnKMGhIqN2pESLyuEeXWe50emThtaqpd0=; b=QxMvlQ3fp6CRI9uFk5eQpYp4Et
+	bEXhNVljLSvkaQXihAcsNd9+ChASTss69+qJOasWd94AlUSBmErnH5mvVZuzuteQP9boNgk5g5/5v
+	19AIxoInU2tZEMEkGoPBH0jWtE3lKwqow3lPxjn3k403QKoNuVrNiPptsMIisfR1OVc6PsxmH06SH
+	EOhuFunqQhf1AsUb1+/Y9VQejo3QfyrrqiyqOuaxNFjNi/79u+NKgw0S3m//GWIc6nwRsfmEuPrlJ
+	4QAfmXtYTsbpM49YgoKGxO8syj9PUZYKj+9qMv9HYucii6qotC2N6BYeJGrBV7T96WVl8PGj0mhVw
+	oe3Mr5ng==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:40324)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1umrWA-0000ws-2s;
+	Fri, 15 Aug 2025 11:18:38 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1umrW7-0007k7-37;
+	Fri, 15 Aug 2025 11:18:35 +0100
+Date: Fri, 15 Aug 2025 11:18:35 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Thorsten Leemhuis <regressions@leemhuis.info>
+Cc: Mathew McBride <matt@traverse.com.au>, netdev@vger.kernel.org,
+	regressions@lists.linux.dev
+Subject: Re: [REGRESSION] net: pcs-lynx: 10G SFP no longer links up
+Message-ID: <aJ8JezoKkgKLoRCR@shell.armlinux.org.uk>
+References: <Z1F1b8eh8s8T627j@shell.armlinux.org.uk>
+ <E1tJ8NM-006L5J-AH@rmk-PC.armlinux.org.uk>
+ <025c0ebe-5537-4fa3-b05a-8b835e5ad317@app.fastmail.com>
+ <aAe94Tkf-IYjswfP@shell.armlinux.org.uk>
+ <f7eac1d6-34eb-4eba-937d-c6624f9a6826@app.fastmail.com>
+ <2d709754-3d4a-4803-b86f-9efa2a6bf655@app.fastmail.com>
+ <6455123a-6785-4173-b145-3a1a3eb48175@leemhuis.info>
+ <aJtvE_yDGDyAfA5s@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aJtvE_yDGDyAfA5s@shell.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Richard Gobert wrote:
-> Remove is_ipv6 from napi_gro_cb and use sk->sk_family instead.
-> This frees up space for another ip_fixedid bit that will be added
-> in the next commit.
+On Tue, Aug 12, 2025 at 05:42:59PM +0100, Russell King (Oracle) wrote:
+> On Tue, Aug 12, 2025 at 02:17:39PM +0200, Thorsten Leemhuis wrote:
+> > Lo!
+> > 
+> > On 10.07.25 07:29, Mathew McBride wrote:
+> > > Hi Russell,
+> > > 
+> > > On Wed, Apr 23, 2025, at 7:01 PM, Mathew McBride wrote:
+> > >>
+> > > [snip]
+> > > 
+> > > Just following up on this issue where directly connected SFP+ modules stopped linking up after the introduction of in-band capabilities.
+> > > 
+> > > The diff you provided below[1] resolved the issue. 
+> > > Were you planning on submitting it as a patch? If not, I'd be happy to send it in.
+> > 
+> > I might be missing something, but from here it looks like it fall
+> > through the cracks on Russell's side. This is nothing bad, this can
+> > happen, especially during summer and thus vacation time. I'd thus say:
+> > wait two or three days if this reminds him of the patch, otherwise go
+> > ahead and submit it yourself to get the regression fixed.
 > 
-> udp_sock_create always creates either a AP_INET or a AF_INET6 socket,
-> so using sk->sk_family is reliable.
+> Yes, the reminder was sent during July when I wasn't looking at email,
+> and as you can imagine, if I spend three weeks on vacation, I am _not_
+> going to catch up with that pile of email - if I were, there'd be no
+> point taking vacation because the mental effort would be just the same
+> as having no vacation.
+> 
+> I have been debating whether we should actually do something like this,
+> especially given the issues with 2500base-X:
+> 
+> -       if (!phylink_validate_pcs_inband_autoneg(pl, interface,
+> -                                                config.advertising)) {
+> -               phylink_err(pl, "autoneg setting not compatible with PCS");
+> -               return -EINVAL;
+> +       while (!phylink_validate_pcs_inband_autoneg(pl, interface,
+> +                                                   config.advertising)) {
+> +               if (!test_bit(ETHTOOL_LINK_MODE_Autoneg_BIT,
+> +                             config.advertising)) {
+> +                       phylink_err(pl, "autoneg setting is not compatible with PCS");
+> +                       return -EINVAL;
+> +               }
+> +
+> +               __clear_bit(ETHTOOL_LINK_MODE_Autoneg_BIT, config.advertising);
+>         }
+> 
+> which turns it into something generic - but my problem with that is..
+> what if the module (e.g. a GPON module immitating a fibre module)
+> requires Autoneg but the PCS doesn't support Autoneg for the selected
+> interface mode.
 
-In general, IPv6 socket can accept IPv4 packets. See also
-cfg->ipv6_v6only in udp_sock_create6.
+Please note that I'm waiting for a response from those who have the
+problem... and this thread is again getting buried, so likely I'll
+forget about it soon.
 
-Not sure about fou, but are we sure that such AF_INET6 sockets
-cannot receive flows with !is_ipv6.
- 
-> Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
