@@ -1,102 +1,165 @@
-Return-Path: <netdev+bounces-213959-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213960-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7D41B277E3
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 06:51:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1772B277F2
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 07:02:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E52205E22D9
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 04:51:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A6CBB5E776B
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 05:02:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB76221517C;
-	Fri, 15 Aug 2025 04:51:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EA54224B0E;
+	Fri, 15 Aug 2025 05:02:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b="HTLgno2y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PTp7wtoo"
 X-Original-To: netdev@vger.kernel.org
-Received: from submarine.notk.org (submarine.notk.org [62.210.214.84])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00D0D10942;
-	Fri, 15 Aug 2025 04:51:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.210.214.84
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8D0F374C4;
+	Fri, 15 Aug 2025 05:02:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755233481; cv=none; b=BMwJ/6AD9ID7euWcdfWq1KyWsxyLqh4wZqmWY+SL8VC7wJ53et4/PG1n1lWanEIEqxVnDpTEXfnMboSW5A+M6TT8NwviiT8UYBVgMi6wPeTbsCpbwELpq+uFb5bCxpqnPzYnbUDtakihlsJ5zFxCIXJdxrfBNaPbRggSBui1NoE=
+	t=1755234142; cv=none; b=G9wz0i9l9ir+gjSiUtuuvCNzydP4hmVX41PlgaTbfVD1FQ1R4TeyYd8ctnjbvE5TYRGfEIYj3LbJYS2V+/03LbQMqGfSU4xCUNSgXQ1Y7BPwabxRvL4q565NoAKdPjSKQsyGd9qSc3gkpn3YbMDylujk5p+00ZyMKC+rEhz0JwY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755233481; c=relaxed/simple;
-	bh=+UHYjqlJl2fb1gjhQSzprr6FAHW4wm7uqqAjUMY6fKo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RucTVstJCkJ0FpaasVqyDZ+SGAE1gRGfyz+HSiMjnMOLfVnLvPsRwIH9+zYoXX0MZxsba2UTD5Tuf/R+VKSBc4ulwE+VaEzseVYn/agb3hpQBUdLXtNWrrQKj4JKr2KuJvJJ800d8hUnmiNFK5UJ3nassaiRGvXYcunDckB9YiQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org; spf=pass smtp.mailfrom=codewreck.org; dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b=HTLgno2y; arc=none smtp.client-ip=62.210.214.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codewreck.org
-Received: from gaia.codewreck.org (localhost [127.0.0.1])
-	by submarine.notk.org (Postfix) with ESMTPS id 58D9D14C2D3;
-	Fri, 15 Aug 2025 06:51:14 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org;
-	s=2; t=1755233476;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8uxBniPwyaO+yNFnnHEfGjdgeq+9rf4sD2sPCvixeD8=;
-	b=HTLgno2y3nd+UN7LonYAuK4aFtjsMowRW84yZrbBavcnUHzgBmY4wQj4k4FoaLWhRZ9Wdi
-	CR3kJYCAXWCccz8haAyzQYzVs44GGGqAkxAEDjM35BknSOOxJFdXPVqWQspt2yXEQnNtly
-	XKSd3S5HPlMGTrBI5TU6wa5CTS/g1ATMY4FqLmGjhqUR2hUZ8Knx5iElg2SqsShxb2tYeS
-	mmZj6I9WZ/il9u7zdM48Wb5yRsJn8gJTwCaqaFJ/XqoQNhYsyd1laLzOKszRgfnX59Q8Fh
-	WeHxIcjsEO4AKiO98s09q8i3XHf1BKM0E9RqdDwQy/OagRuuW0DaEaINmtLKxg==
-Received: from localhost (gaia.codewreck.org [local])
-	by gaia.codewreck.org (OpenSMTPD) with ESMTPA id e3824f1a;
-	Fri, 15 Aug 2025 04:51:12 +0000 (UTC)
-Date: Fri, 15 Aug 2025 13:50:57 +0900
-From: Dominique Martinet <asmadeus@codewreck.org>
-To: Nalivayko Sergey <Sergey.Nalivayko@kaspersky.com>
-Cc: v9fs-developer@lists.sourceforge.net, netdev@vger.kernel.org,
-	Eric Van Hensbergen <ericvh@gmail.com>,
-	Wang Hai <wanghai38@huawei.com>,
-	Latchesar Ionkov <lucho@ionkov.net>, lvc-project@linuxtesting.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH] net: 9p: fix double req put in p9_fd_cancelled
-Message-ID: <aJ68sV1kH2CQ8eYr@codewreck.org>
-References: <20250715154815.3501030-1-Sergey.Nalivayko@kaspersky.com>
- <aJ6U3DQn876wGS4C@codewreck.org>
+	s=arc-20240116; t=1755234142; c=relaxed/simple;
+	bh=4aoISFqoZW3xIWfmCOYas+QHZ7GQjQ+ceAIQLkxwDZg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CV+VcVIzgC/XVPEEvy3Ji+dMOB/FqUT278YRQOtgy3I6XDJw2ydKMX8R6+QHR7AIiPkn5/xvCS3XlF66TcReJZP4e2emjnD1ONYrAeUfPRt/TSKRsW6ytjHgVwFWv9o2BVARdI77Uuslf5Lr06kxBzCX+qMtHwPYg0ZAF7/egQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PTp7wtoo; arc=none smtp.client-ip=209.85.216.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-32326793a85so1502012a91.1;
+        Thu, 14 Aug 2025 22:02:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755234140; x=1755838940; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=HvJ9vjlQgWj0JGVdSmCK4V4OH1FNmLUxKe8JArbwI44=;
+        b=PTp7wtoo24622jPyRmbLk+NyKrV9mx7f5+XG3+2wMR1DqVEGnMjZB1i0MZYSGEFH8n
+         7q0nU6LoEBlSNij2PfXSVsEpQnF8Mknu59Ym0o6jkW4Uo6xRQ7FfC1oN597Qv36bH6O2
+         xgiS59Y0KRbkAlWsZLReitOf/4oI5w4Nv2xtLqwBcuGdZtfNmWMouM8VifCW08JkjUHR
+         OBqvoIxQ2XoW63+03UCVrRykwkV2I+82JqVZSL4ibJC+pnm4katf26FNfTGw+e8pwWQH
+         7BbTBzPFvd8AjzVuGqTPqB6IOtFo6YU+Wk9VOfof4eIzMeGi89/9W0i7VQASeq8w1M+F
+         le1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755234140; x=1755838940;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HvJ9vjlQgWj0JGVdSmCK4V4OH1FNmLUxKe8JArbwI44=;
+        b=qSLBmB/0BhD5RAL72BIXcK4f/wYr7xrO3Iwn0Ja2n3hPKnIr4wyex03M4oiJmwAecN
+         YlR+rJOMMpOgFYq1pNNpU9NK3BSVTVV5gqgj7OFUHmfpvQVzf0bUcoHJyDfWiILDHYk0
+         r8TERz8BK9qMY9h68uI/fLBq68nMzcI46PwUI755PdiPGQl4btrvDmbFgrMm40wcI+Pe
+         OB2QpKXARqeJ61OOvnLFs6BvEqDMybmZANL9ETUc4Lyv0ZDdX5T95UPGXAWiJTamHhDZ
+         CDc9N4LyrjhgLm5qQ3CAK9KeJw7l75n5szkthvZJDUr95+Gvkijk/8ZfFKd/ncJMJ95I
+         abkg==
+X-Forwarded-Encrypted: i=1; AJvYcCV2SVTdRQVG19FGgRi+DS3xdybjeGEPYsUoz+VDsXLIvzmdlEBBOHvYpDsPYTtA9lZ0xk/jMYgmUOnjPDVd@vger.kernel.org, AJvYcCWq9+j1e2+VGxvzX0baAqc0aUcKR4zXhSyQrfbnYJKq/QJ8Anssoez9wZQTCzW3+Lb5hli+n7bMTp5e@vger.kernel.org, AJvYcCXp+Icc+Z7TQslMknr9Z6Kt8XQEhFIQ3xFYdwEsQI5ZQuTPc7gchJmRPS0ZMqYrZynje69wzhsRTok=@vger.kernel.org, AJvYcCXzM4GmwkdzwtIxyOO87CsFysTzfVoZmUzTVZ9nAxSEljl0CIAbrMo2iOUt4Zf0xLZIV1GCumdT@vger.kernel.org
+X-Gm-Message-State: AOJu0YzTgRYlIna7iM8IS4mlyTWkkQjLW+MXNZAFbuyntqJhbCMWkrKQ
+	Br8PaKj9D4VbBKiRrPNzH62FsulHOiHjfPdU91S8tcGc5izGgwIvxFGr
+X-Gm-Gg: ASbGncsV9kkFHtvm2hfPx142dgBP+TJxXKlyZM1ZkkVKFyFzYU0jpiEo7R3akd8RAnX
+	XbMBSJpAbTu8lGpdCKGFCfo+RHJrTJxk46jzSsBCf/1xcTLuRYsNx+sfvbhPKe97bYtzlvMpkO9
+	p7cv3TQnHGLw9aY7ztXhkl3lR12ceiEXhZG1LzL6Wxg5e69iNO6vQJvxXrslMvWJKACDgitU2Vw
+	XAXN7C47AH584A3SXcFt7s/xJmIc7rbW192zezd8AJK7tAfYkU1UWWXVyNXattMrfJZo+03j0g4
+	7ZYIpeib7ympgQ/6etDPgLydKpVhhEJ9iDtP6iVuMvnvlCt0H23xb6S9fPu5WxjPpTGerZNRES9
+	q420lhB7CDksw4WU3g6X3xqoCakcdHDJB4/grj6kwtDB0LwrBLknBvuXd00FjsN63Bf70fPJ19w
+	osJiLX/Wuk+zeu2uEccGiUO7dLS89pB7lCBzC7Uw==
+X-Google-Smtp-Source: AGHT+IFc/j6gSSFssjIPr1g+lc0GaAJwz273eKQ4JRPcXd+8ZTYMotiRajoz1cIteit3jJWFjwumvg==
+X-Received: by 2002:a17:903:41c3:b0:242:e0f1:f4bf with SMTP id d9443c01a7336-2446d720275mr11691175ad.18.1755234139897;
+        Thu, 14 Aug 2025 22:02:19 -0700 (PDT)
+Received: from toolbx.alistair23.me (2403-580b-97e8-0-82ce-f179-8a79-69f4.ip6.aussiebb.net. [2403:580b:97e8:0:82ce:f179:8a79:69f4])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2446d53c6e1sm5128645ad.115.2025.08.14.22.02.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Aug 2025 22:02:19 -0700 (PDT)
+From: alistair23@gmail.com
+X-Google-Original-From: alistair.francis@wdc.com
+To: chuck.lever@oracle.com,
+	hare@kernel.org,
+	kernel-tls-handshake@lists.linux.dev,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-nfs@vger.kernel.org
+Cc: kbusch@kernel.org,
+	axboe@kernel.dk,
+	hch@lst.de,
+	sagi@grimberg.me,
+	kch@nvidia.com,
+	alistair23@gmail.com,
+	Alistair Francis <alistair.francis@wdc.com>
+Subject: [PATCH 0/8] nvme-tcp: Support receiving KeyUpdate requests
+Date: Fri, 15 Aug 2025 15:02:02 +1000
+Message-ID: <20250815050210.1518439-1-alistair.francis@wdc.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <aJ6U3DQn876wGS4C@codewreck.org>
+Content-Transfer-Encoding: 8bit
 
-Dominique Martinet wrote on Fri, Aug 15, 2025 at 11:01:00AM +0900:
-> > Add an explicit check for REQ_STATUS_ERROR in p9_fd_cancelled before
-> > processing the request. Skip processing if the request is already in the error
-> > state, as it has been removed and its resources cleaned up.
-> 
-> Looking at the other status, it's quite unlikely but if other thread
-> would make it FLSHD we should also skip these -- and I don't think it's
-> possible as far as the logic goes but if it's not sent yet we would have
-> nothing to flush either, so it's probably better to invert the check,
-> and make it `if (req != SENT) return` ?
-> 
-> client.c already checks `READ_ONCE(oldreq->status) == REQ_STATUS_SENT`
-> before calling cancelled but that's without lock, so basically we're
-> checking nothing raced since that check, and it's not limited to RCVD
-> and ERROR.
-> 
-> If you can send a v2 with that I'll pick it up.
+From: Alistair Francis <alistair.francis@wdc.com>
 
-Actually it's just as fast if I do it myself, if you have time please
-check this makes sense:
-https://github.com/martinetd/linux/commit/afdaa9f9ea451a935e9b7645fc7ffd93d58cdfed
+The TLS 1.3 specification allows the TLS client or server to send a
+KeyUpdate. This is generally used when the sequence is about to
+overflow or after a certain amount of bytes have been encrypted.
 
-This is a fix but I don't believe it's urgent (can only happen with a
-bogus server, and while in theory we should aim to be robust to an
-adversary server I don't believe 9p is anywhere near that point), so
-I'll push it along with other fixes next cycle as I missed the 5.17
-train
+The TLS spec doesn't mandate the conditions though, so a KeyUpdate
+can be sent by the TLS client or server at any time. This includes
+when running NVMe-OF over a TLS 1.3 connection.
 
-Thanks,
+As such Linux should be able to handle a KeyUpdate event, as the
+other NVMe side could initiate a KeyUpdate.
+
+Upcoming WD NVMe-TCP hardware controllers implement TLS support
+and send KeyUpdate requests.
+
+This series builds on top of the existing TLS EKEYEXPIRED work,
+which already detects a KeyUpdate request. We can now pass that
+information up to the NVMe layer (target and host) and then pass
+it up to userspace.
+
+Userspace (ktls-utils) will need to save the connection state
+in the keyring during the initial handshake. The kernel then
+provides the key serial back to userspace when handling a
+KeyUpdate. Userspace can use this to restore the connection
+information and then update the keys, this final process
+is similar to the initial handshake.
+
+Link: https://datatracker.ietf.org/doc/html/rfc8446#section-4.6.3
+
+Alistair Francis (8):
+  net/handshake: Store the key serial number on completion
+  net/handshake: Make handshake_req_cancel public
+  net/handshake: Expose handshake_sk_destruct_req publically
+  tls: Allow callers to clear errors
+  net/handshake: Support KeyUpdate message types
+  nvme-tcp: Support KeyUpdate
+  net/handshake: Support decoding the HandshakeType
+  nvmet-tcp: Support KeyUpdate
+
+ Documentation/netlink/specs/handshake.yaml | 19 +++++-
+ Documentation/networking/tls-handshake.rst |  4 +-
+ drivers/nvme/host/tcp.c                    | 78 ++++++++++++++++++++--
+ drivers/nvme/target/tcp.c                  | 71 ++++++++++++++++++--
+ include/net/handshake.h                    | 18 ++++-
+ include/net/tls.h                          |  6 ++
+ include/net/tls_prot.h                     | 17 +++++
+ include/uapi/linux/handshake.h             | 14 ++++
+ net/handshake/alert.c                      | 26 ++++++++
+ net/handshake/genl.c                       |  5 +-
+ net/handshake/handshake-test.c             |  1 +
+ net/handshake/handshake.h                  |  1 -
+ net/handshake/request.c                    | 17 +++++
+ net/handshake/tlshd.c                      | 46 +++++++++++--
+ net/sunrpc/svcsock.c                       |  3 +-
+ net/sunrpc/xprtsock.c                      |  3 +-
+ 16 files changed, 300 insertions(+), 29 deletions(-)
+
 -- 
-Dominique Martinet | Asmadeus
+2.50.1
+
 
