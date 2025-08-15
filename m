@@ -1,87 +1,56 @@
-Return-Path: <netdev+bounces-214105-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214106-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC3ABB284B0
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 19:09:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98685B284B2
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 19:10:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4AE7A1CC3B56
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 17:09:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CAE2817B7CA
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 17:09:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 029A4304BB7;
-	Fri, 15 Aug 2025 17:09:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33B91304BC7;
+	Fri, 15 Aug 2025 17:09:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="P1UTvyhO"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="j1H1DZO6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 637A0304BA0
-	for <netdev@vger.kernel.org>; Fri, 15 Aug 2025 17:09:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1B05304BA8;
+	Fri, 15 Aug 2025 17:09:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755277744; cv=none; b=nxju+eO3zG7NfxQupJlXxKnwSuPWTB6ZPcErBDgekoyah1pXRq+3dYGhqeRWLZnqY+LVknVJHIr3t5qI7dMLoK++QPGoqaM266Zi1x8zFrw1E3ow1n6YWPPVVCNhJoAsmbao4df3cPlOpFv8uIBdO0WC/5Kw0kkAITnLu/kNdFg=
+	t=1755277747; cv=none; b=JEu/tUfxbmpJRGeqSFhYx+O5b+w5yFoXrzNhKTSRu/trTkZ9w+0hV0oMwZ7HFBInIdGpM/qQMJ+8lRwz3ivO4Mt5YbDx3fQWap8rajDthIRRRZxkuwK1qqAPkIR10LtgMdN1CoxlJ9czEKwV4IzGKGRMab6+7WkHim0xIx1xUmA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755277744; c=relaxed/simple;
-	bh=QfHu6tLXuJd+/WBauDhvCbTwtQ3bApCc3J/DQz1ip5A=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZyWWzfTqyr7HBi/79ev5bSHsLNmyF4qKxbojx3s5bhgaxTO0TALvTtu5eOmL+pnkplJNpWORiX6h84W9zyyTaqDzMui3YI7xOmlfTu4hhMrF2rhTTsgA7TLDhe4BxXPC6EZBBKguxuO6vEDnBlt56bO24pP40fAiqjhnqFuR+xg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=P1UTvyhO; arc=none smtp.client-ip=209.85.219.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-70a88db0416so21009766d6.0
-        for <netdev@vger.kernel.org>; Fri, 15 Aug 2025 10:09:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1755277742; x=1755882542; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=LMrtEazDsbydoQH8MWp4czd/N5VoXBjQsVIKAzhRZv0=;
-        b=P1UTvyhOWfB90FYUCsNvdr2W686ELNuVaiUs9Qtbw+8pBH/U0eT32xp5wlonu5Q9Z2
-         7hdQTRdlYAn5HNJtiwdwwBukgbmGJHNVa0X5i3tsDK+94eoxdPOV76DEZIuwPA2RqtoJ
-         dVJh/6PYmzc2wxvSSA25y6NFXBCcKGc2k/H7c=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755277742; x=1755882542;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=LMrtEazDsbydoQH8MWp4czd/N5VoXBjQsVIKAzhRZv0=;
-        b=ojHxAJH6r95CURC2HvA4TuPaa8br5CYo+SaRFXRwP3yQDYboeLsL1VybJ235Ir1f3C
-         BWZyiTHCPMkSLEXWQ5que+H3kQef/FsXtk2hJ8Be75ZL+8IfZW5TUVXu0GuYZWFngREE
-         jIoamY71ognLFKzpzgAynWKLrcYCwac2ry+LG5zcNinapu0YYXY8Kep9qzFmsAAGwK5l
-         HslhAcwlBMtDRVDYTt+HeFSE9Vq8nKOZk8XhEy87T2zXLKpsRQIWMgzMvbLafhMLgUk4
-         bpZ8+UwDuo+E5i3gPUcVPeglKX/jnjr6YtH76oIxzVIhYVHFF7J6ydSfXfBDB29QV/r1
-         5uQw==
-X-Gm-Message-State: AOJu0YyjFXviua9ofHeX2NB4eacw4CjrCWORP5HYYR93A1EHxe7XKdRx
-	TFGT0KeJwFWESUSsbouR5WD3dgj+0bWSU/wbDmJW+LPx/WW4U4sNEeoSo4yNvp3xUQ==
-X-Gm-Gg: ASbGnctc3qQ4L24h+FlwuxePTaJJhI8RBHOcqezGgXeVfVXU1tnJPv0L0wZ952r404i
-	+oaXLsqv1CZ6Z56PlCufthu+BhDXZ+9ZV7bc0OGB0jPlZnpQevmYPkpLuYC+9w+B02XGHukjHrp
-	WJqMZoHJaPKTthWgauIDlW7wRJ5cvZCHJssC3ZesNa5u7RL4eHyVDEITwpz6ztHeSOJhfQ5qh75
-	S6nzWQuSZ/pA10yoyVQyiTYetSbb+VAh/TWKnBk3WW/6mghoo0tqjSOidkvmLGFiBA/0PMtwZ2T
-	JZd55JNoU0RTLSsbWpFoPX7FEi4ztHKIvfJGJH1qqAHT7U7SP+s3G7JNlBLDpjmVNHEwQGwIwMq
-	GiXxaPYk57iPQOU+aR7nXMQ5H0hoEsG3AtKuEeuUW/RVG5RgkhwNTMHgna2ZXlS7dJpV5HzVQrc
-	gcQQ==
-X-Google-Smtp-Source: AGHT+IGuywqulvjWjCVtEh43+8ZYgrbIlqh01GFBCrQltfE7N5bVM31U/YknzhBLEvd1MFsi5O6l6w==
-X-Received: by 2002:a05:6214:21a2:b0:707:bba:40d4 with SMTP id 6a1803df08f44-70ba7aa5a49mr31765606d6.11.1755277741923;
-        Fri, 15 Aug 2025 10:09:01 -0700 (PDT)
-Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-70ba902f221sm10725436d6.12.2025.08.15.10.09.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Aug 2025 10:09:01 -0700 (PDT)
-From: Michael Chan <michael.chan@broadcom.com>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
+	s=arc-20240116; t=1755277747; c=relaxed/simple;
+	bh=boEF1KxrJYXx9rWPa1UaosMdgC0AncPnn9B8wz5UXW0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pCalZpzIwFpDZnIraupQ7OMSEC/57+ae4AanLhyhyzNCC2nQLz0yvdnq5O+NzuXqCNF3dgZL889+NGU33Nsedgq47+ASOF3kZSJC2Q+dd/p3qIcKtViFZ9YfHvjwnHs2GGOmx9A1VQTMJJ4Y9r9dRdyQOMhwnUFbBshMKBQr0aI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=j1H1DZO6; arc=none smtp.client-ip=220.197.31.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=pJ
+	xDQfZ/ZCiKpMxGpv2ngGkeJfJGVY+hTDotS3/x6oE=; b=j1H1DZO67ev5AjQ4/p
+	Vcmifd+/n0nwt92vPmL5JcSEt92DcZenkfikaZlL/5W9/a5YV7ZJYddUT/YCYFGu
+	dC5H74efgXJtsfn99dEKm/+RPcb5N8iYv+ra6/G1F1bdcisUqBWgYgnBNfa+JL0O
+	ulz6ECZl4JdtL2fHhbfg78bfo=
+Received: from zhaoxin-MS-7E12.. (unknown [])
+	by gzsmtp5 (Coremail) with SMTP id QCgvCgB3LYSJaZ9o8aVLAQ--.49724S2;
+	Sat, 16 Aug 2025 01:08:26 +0800 (CST)
+From: Xin Zhao <jackzxcui1989@163.com>
+To: willemdebruijn.kernel@gmail.com,
 	edumazet@google.com,
+	ferenc@fejes.dev
+Cc: davem@davemloft.net,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	pavan.chebbi@broadcom.com,
-	andrew.gospodarek@broadcom.com,
-	sdf@fomichev.me
-Subject: [PATCH net] bnxt_en: Fix lockdep warning during rmmod
-Date: Fri, 15 Aug 2025 10:08:23 -0700
-Message-ID: <20250815170823.4062508-1-michael.chan@broadcom.com>
-X-Mailer: git-send-email 2.45.2
+	horms@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] net: af_packet: Use hrtimer to do the retire operation
+Date: Sat, 16 Aug 2025 01:08:25 +0800
+Message-Id: <20250815170825.3585310-1-jackzxcui1989@163.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,62 +58,127 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:QCgvCgB3LYSJaZ9o8aVLAQ--.49724S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxZw4fCr1ruryUuFWkCF4Uurg_yoWrKw1DpF
+	W5tF9rGwn7XF4jga1xZr4kZFyruw4DAr98Grs3W343A3sxJryrta929FZ0qFWfGF4qkrsF
+	vF4xZrZ8Aw1DJrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UK-erUUUUU=
+X-CM-SenderInfo: pmdfy650fxxiqzyzqiywtou0bp/1tbiRw6qCmifZlAxoAAAs5
 
-The commit under the Fixes tag added a netdev_assert_locked() in
-bnxt_free_ntp_fltrs().  The lock should be held during normal run-time
-but the assert will be triggered (see below) during bnxt_remove_one()
-which should not need the lock.  The netdev is already unregistered by
-then.  Fix it by only calling netdev_assert_locked() if the netdev is
-registered.
+On Fri, 2025-08-15 at 18:12 +0800, Willem wrote:
 
-WARNING: CPU: 5 PID: 2241 at ./include/net/netdev_lock.h:17 bnxt_free_ntp_fltrs+0xf8/0x100 [bnxt_en]
-Modules linked in: rpcrdma rdma_cm iw_cm ib_cm configfs ib_core bnxt_en(-) bridge stp llc x86_pkg_temp_thermal xfs tg3 [last unloaded: bnxt_re]
-CPU: 5 UID: 0 PID: 2241 Comm: rmmod Tainted: G S      W           6.16.0 #2 PREEMPT(voluntary)
-Tainted: [S]=CPU_OUT_OF_SPEC, [W]=WARN
-Hardware name: Dell Inc. PowerEdge R730/072T6D, BIOS 2.4.3 01/17/2017
-RIP: 0010:bnxt_free_ntp_fltrs+0xf8/0x100 [bnxt_en]
-Code: 41 5c 41 5d 41 5e 41 5f c3 cc cc cc cc 48 8b 47 60 be ff ff ff ff 48 8d b8 28 0c 00 00 e8 d0 cf 41 c3 85 c0 0f 85 2e ff ff ff <0f> 0b e9 27 ff ff ff 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90
-RSP: 0018:ffffa92082387da0 EFLAGS: 00010246
-RAX: 0000000000000000 RBX: ffff9e5b593d8000 RCX: 0000000000000001
-RDX: 0000000000000001 RSI: ffffffff83dc9a70 RDI: ffffffff83e1a1cf
-RBP: ffff9e5b593d8c80 R08: 0000000000000000 R09: ffffffff8373a2b3
-R10: 000000008100009f R11: 0000000000000001 R12: 0000000000000001
-R13: ffffffffc01c4478 R14: dead000000000122 R15: dead000000000100
-FS:  00007f3a8a52c740(0000) GS:ffff9e631ad1c000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055bb289419c8 CR3: 000000011274e001 CR4: 00000000003706f0
-Call Trace:
- <TASK>
- bnxt_remove_one+0x57/0x180 [bnxt_en]
- pci_device_remove+0x39/0xc0
- device_release_driver_internal+0xa5/0x130
- driver_detach+0x42/0x90
- bus_remove_driver+0x61/0xc0
- pci_unregister_driver+0x38/0x90
- bnxt_exit+0xc/0x7d0 [bnxt_en]
+> Signed-off-by: Xin Zhao <jackzxcui1989@163.com>
 
-Fixes: 004b5008016a ("eth: bnxt: remove most dependencies on RTNL")
-Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Signed-off-by: Michael Chan <michael.chan@broadcom.com>
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+> Please clearly label PATCH net-next and include a changelog and link
+> to previous versions.
+> 
+> See also other recently sent patches and
+> https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+> https://docs.kernel.org/process/submitting-patches.html
+> 
+> > ---
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 2800a90fba1f..a208c2a73cd6 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -5332,7 +5332,8 @@ static void bnxt_free_ntp_fltrs(struct bnxt *bp, bool all)
- {
- 	int i;
- 
--	netdev_assert_locked(bp->dev);
-+	if (bp->dev->reg_state == NETREG_REGISTERED)
-+		netdev_assert_locked(bp->dev);
- 
- 	/* Under netdev instance lock and all our NAPIs have been disabled.
- 	 * It's safe to delete the hash table.
--- 
-2.30.1
+Dear Willem,
+
+I will add the details in PATCH v3.
+
+
+> > -	p1->tov_in_jiffies = msecs_to_jiffies(p1->retire_blk_tov);
+> 
+> Since the hrtimer API takes ktime, and there is no other user for
+> retire_blk_tov, remove that too and instead have interval_ktime.
+> 
+> >  	p1->blk_sizeof_priv = req_u->req3.tp_sizeof_priv;
+
+We cannot simply remove the retire_blk_tov field, because in net/packet/diag.c 
+retire_blk_tov is being used in function pdiag_put_ring. Since there are still
+people using it, I personally prefer not to remove this variable for now. If
+you think it is still necessary, I can remove it later and adjust the logic in
+diag.c accordingly, using ktime_to_ms to convert the ktime_t format value back
+to the u32 type needed in the pdiag_put_ring function.
+
+
+> > +	hrtimer_set_expires(&pkc->retire_blk_timer,
+> > +			    ktime_add(ktime_get(), ms_to_ktime(pkc->retire_blk_tov)));
+> 
+> More common for HRTIMER_RESTART timers is hrtimer_forward_now.
+> 
+> >  	pkc->last_kactive_blk_num = pkc->kactive_blk_num;
+
+As I mentioned in my previous response, we cannot use hrtimer_forward_now here
+because the function _prb_refresh_rx_retire_blk_timer can be called not only
+when the retire timer expires, but also when the kernel logic for receiving
+network packets detects that a network packet has filled up a block and calls
+prb_open_block to use the next block. This can lead to a WARN_ON being triggered
+in hrtimer_forward_now when it checks if the timer has already been enqueued
+(WARN_ON(timer->state & HRTIMER_STATE_ENQUEUED)).
+I encountered this issue when I initially used hrtimer_forward_now. This is the
+reason why the existing logic for the regular timer uses mod_timer instead of
+add_timer, as mod_timer is designed to handle such scenarios. A relevant comment
+in the mod_timer implementation states:
+ * Note that if there are multiple unserialized concurrent users of the
+ * same timer, then mod_timer() is the only safe way to modify the timeout,
+ * since add_timer() cannot modify an already running timer.
+
+
+> > +static enum hrtimer_restart prb_retire_rx_blk_timer_expired(struct hrtimer *t)
+> >  {
+> >  	struct packet_sock *po =
+> >  		timer_container_of(po, t, rx_ring.prb_bdqc.retire_blk_timer);
+> > @@ -790,6 +790,7 @@ static void prb_retire_rx_blk_timer_expired(struct timer_list *t)
+> > 
+> >  out:
+> >  	spin_unlock(&po->sk.sk_receive_queue.lock);
+> > +	return HRTIMER_RESTART;
+> 
+> This always restart the timer. But that is not the current behavior.
+> Per prb_retire_rx_blk_timer_expired:
+> 
+>    * 1) We refresh the timer only when we open a block.
+> 
+> Look at the five different paths that can reach label out.
+> 
+> In particular, if the block is retired in this timer, and no new block
+> is available to be opened, no timer should be armed.
+> 
+> >  }
+
+I have sorted out the logic in this area; please take a look and see if it's correct.
+
+We are discussing the conditions under which we should return HRTIMER_NORESTART. We only
+need to focus on the three 'goto out' statements in this function (because if it don't
+call 'goto out', it will definitely not skip the 'refresh_timer:' label, and if it don't
+skip the refresh_timer label, it will definitely execute the _prb_refresh_rx_retire_blk_timer
+function, which expects to return HRTIMER_RESTART):
+Case 1:
+  if (unlikely(pkc->delete_blk_timer))
+    goto out;
+  This case indicates that the hrtimer has already been stopped. In this situation, it 
+  should return HRTIMER_NORESTART, and I will make this change in PATCH v3.
+Case 2:
+  if (!prb_dispatch_next_block(pkc, po))
+    goto refresh_timer;
+  else
+    goto out;
+  In this case, the execution will only reach the out label if prb_dispatch_next_block
+  returns a non-zero value. If prb_dispatch_next_block returns a non-zero value, it must
+  have executed prb_open_block, which in turn will call _prb_refresh_rx_retire_blk_timer
+  to set the new timeout for the retire timer. Therefore, in this scenario, the hrtimer
+  should return HRTIMER_RESTART.
+Case 3:
+  } else {
+     ...
+     prb_open_block(pkc, pbd);
+     goto out;
+  }
+  This goto out clearly follows a call to prb_open_block, and as mentioned in the case 2,
+  it will set a new timeout and expects the hrtimer to restart.
+Based on the analysis above, I only need to modify the situation described in case 1 in
+PATCH v3 to return HRTIMER_NORESTART. If there are any inaccuracies, please provide
+further guidance.
+
+
+Thanks
+Xin Zhao
 
 
