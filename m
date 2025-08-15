@@ -1,143 +1,149 @@
-Return-Path: <netdev+bounces-214209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214210-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 263C8B287F7
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 23:49:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFE8FB287F9
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 23:50:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF09A3BE8A6
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 21:49:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C64995680B0
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 21:50:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD736220686;
-	Fri, 15 Aug 2025 21:49:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A515D220686;
+	Fri, 15 Aug 2025 21:50:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="faNrEmUt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KeHz71c0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D9381B87C0;
-	Fri, 15 Aug 2025 21:49:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77B6C1A2C06;
+	Fri, 15 Aug 2025 21:50:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755294555; cv=none; b=svBiI53W/N+gnG8O0mFcY6H61jBXTULEaLdbgVRYvd5bG9zrE+ZfJapiGTm2e9pyBsbhD7mXoNjam6TRyuXa8SflEYXyM+vEPX2HTj1FLnRTNOKC2IHx349K2Jok4U8GQga5aQf4p1tcn/9wVzE+vVBkaxR7xNeDnz+QuCTQgLo=
+	t=1755294611; cv=none; b=EulcGICJ+J0tSsQit6etRxkw+5IziJkdFJC8jpkxLPBIPgI0EScf7EwDflGCHBo7CjAwGsyYWNDsXgqrlk3uhC2f7GlI+DapDRaPBJ/J34rJt6OHW1EiviIrzjtGhMlhZGp9nJhIk9CESds88u0AW3eICE8U8FKbSJ27sczPoao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755294555; c=relaxed/simple;
-	bh=7/DESvwD3138OtQA65/DUWMV7oCqWuC7zjK3tOXv16k=;
+	s=arc-20240116; t=1755294611; c=relaxed/simple;
+	bh=MxgkB66MUbddmAZhB9tANtPcCjoYOpNJFxoJqvb8KsE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nkWifaw6K+sqA4+w+D0IqjNJZKyYu5OGqQTOM6x3Pbp+UR2m3Hs7f8yLDmOStW3mgMcC89tDT0rVnR4H8X3U5SNcQrdTYq0JXGUzaWc/vnHhRm/gTAapC172nwp4Bo5QhXKfHfT9KwL2lT/3fH/Z4NI/0FL/kCyhvh4+oTwjk4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=faNrEmUt; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1755294554; x=1786830554;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=7/DESvwD3138OtQA65/DUWMV7oCqWuC7zjK3tOXv16k=;
-  b=faNrEmUtnTP59Ltdp3yGuxOYVUXFSGDrqMi3T0kA4Uv0ECBjL5VBlMil
-   NtT8CWPDJb8oX061NxG4NcmyTL8Nhj9SGSDyFxaOp3DLzkhIPtaTf4mwn
-   1599mXqS7MRcHkLNkwxETN9r77/nLoLdEsNivInhPucC5uwoBLCJnSpJR
-   UtgxRoJr3T65MwhI6OtENfn0+X6SP2KwrNZNjnUJkt6z7SmA5lr7JRGQm
-   TkLtO++28xHfDncK6tfvwxSDDCRTcA7wclpdz8afE6xa+HJG6K5JWzO/D
-   CCZQdCYlIbqeb9JNQkvi4V9kUVI4DLfT8IIhF0a5DmOwWMj01IQeTiaRy
-   A==;
-X-CSE-ConnectionGUID: CmdGQ7m8Rn2zdjq1mo/BqQ==
-X-CSE-MsgGUID: hg5IUbAGSY+CRdjoe7nLbg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11523"; a="68220427"
-X-IronPort-AV: E=Sophos;i="6.17,293,1747724400"; 
-   d="scan'208";a="68220427"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Aug 2025 14:49:13 -0700
-X-CSE-ConnectionGUID: QnRETjyrRLavnrXXHKJkKg==
-X-CSE-MsgGUID: p65L7qcuScGyVUlLkIq0Mg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,293,1747724400"; 
-   d="scan'208";a="166321491"
-Received: from lkp-server02.sh.intel.com (HELO 4ea60e6ab079) ([10.239.97.151])
-  by orviesa010.jf.intel.com with ESMTP; 15 Aug 2025 14:49:10 -0700
-Received: from kbuild by 4ea60e6ab079 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1un2IM-000CNc-0o;
-	Fri, 15 Aug 2025 21:49:06 +0000
-Date: Sat, 16 Aug 2025 05:48:51 +0800
-From: kernel test robot <lkp@intel.com>
-To: alistair23@gmail.com, chuck.lever@oracle.com, hare@kernel.org,
-	kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-nfs@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, kbusch@kernel.org,
-	axboe@kernel.dk, hch@lst.de, sagi@grimberg.me, kch@nvidia.com,
-	alistair23@gmail.com, Alistair Francis <alistair.francis@wdc.com>
-Subject: Re: [PATCH 3/8] net/handshake: Expose handshake_sk_destruct_req
- publically
-Message-ID: <202508160510.XOTeniWX-lkp@intel.com>
-References: <20250815050210.1518439-4-alistair.francis@wdc.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=m1kZd3rToTugm2SOTu1RKibyGlBzUGu7dVF4HfmPlyf48l/m286CRjNxXzbmWEsF3NtMfuW7JLRVMW6mZyWUYIB99kgbhapYkBNgXROlMhsi/thtNaRpidvQv1tm/NtOSFUvEf6HXOfer9xjis4fIXcBT3TPWWFMo0WdiaCfzuE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KeHz71c0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B18AFC4CEEB;
+	Fri, 15 Aug 2025 21:50:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755294611;
+	bh=MxgkB66MUbddmAZhB9tANtPcCjoYOpNJFxoJqvb8KsE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KeHz71c04cPgRHQfuu1aVBXIztU6bwzm+Fa5dQOddp6To4PPHyLtWG+WM5x98+6Zl
+	 XmOOHpbwNUnmKA2RxbVUksz+SOTTScrVmOO7HIRW3FJKTEVbLmDgXy2Jp1hj4+2kdV
+	 A1e6GEGhpEJrj49QQ5JktJBdynPGP4mx+1IzhSGwSfwkzOJAVF/HE5kdJFi2w7MdCG
+	 9he5n1i5sjgYH+M/914r6PTlHrT1nlwn47K28j3aNbn75Ec2Z6vu/EFqXh0ZOgXpMq
+	 fiPXyASFqZ1wCcHyG6jGBbgmVXOXn/3QNh72wHl84PfV3lFAbqEoUVedt57kjzLSK8
+	 ne4IrwkUqdpXg==
+Date: Fri, 15 Aug 2025 14:50:09 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Xin Long <lucien.xin@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-sctp@vger.kernel.org, netdev@vger.kernel.org,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	linux-crypto@vger.kernel.org
+Subject: Re: [PATCH net-next v2 3/3] sctp: Convert cookie authentication to
+ use HMAC-SHA256
+Message-ID: <20250815215009.GA2041@quark>
+References: <20250813040121.90609-1-ebiggers@kernel.org>
+ <20250813040121.90609-4-ebiggers@kernel.org>
+ <20250815120910.1b65fbd6@kernel.org>
+ <CADvbK_csEoZhA9vnGnYbfV90omFqZ6dX+V3eVmWP7qCOqWDAKw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250815050210.1518439-4-alistair.francis@wdc.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADvbK_csEoZhA9vnGnYbfV90omFqZ6dX+V3eVmWP7qCOqWDAKw@mail.gmail.com>
 
-Hi,
+On Fri, Aug 15, 2025 at 05:19:27PM -0400, Xin Long wrote:
+> On Fri, Aug 15, 2025 at 3:09 PM Jakub Kicinski <kuba@kernel.org> wrote:
+> >
+> > On Tue, 12 Aug 2025 21:01:21 -0700 Eric Biggers wrote:
+> > > +     if (net->sctp.cookie_auth_enable)
+> > > +             tbl.data = (char *)"sha256";
+> > > +     else
+> > > +             tbl.data = (char *)"none";
+> > > +     tbl.maxlen = strlen(tbl.data);
+> > > +     return proc_dostring(&tbl, 0, buffer, lenp, ppos);
+> >
+> > I wonder if someone out there expects to read back what they wrote,
+> > but let us find out.
+> I feel it's a bit weird to have:
+> 
+> # sysctl net.sctp.cookie_hmac_alg="md5"
+> net.sctp.cookie_hmac_alg = md5
+> # sysctl net.sctp.cookie_hmac_alg
+> net.sctp.cookie_hmac_alg = sha256
+> 
+> This patch deprecates md5 and sha1 use there.
+> So generally, for situations like this, should we also issue a
+> warning, or just fail it?
+> 
+> Paolo, what do you think?
+> 
+> >
+> > It'd be great to get an ack / review from SCTP maintainers, otherwise
+> > we'll apply by Monday..
+> Other than that, LGTM.
+> Sorry for the late reply, I was running some SCTP-auth related tests
+> against the patchset.
 
-kernel test robot noticed the following build warnings:
+Ideally we'd just fail the write and remove the last mentions of md5 and
+sha1 from the code.  But I'm concerned there could be a case where
+userspace is enabling cookie authentication by setting
+cookie_hmac_alg=md5 or cookie_hmac_alg=sha1, and by just failing the
+write the system would end up with cookie authentication not enabled.
 
-[auto build test WARNING on trondmy-nfs/linux-next]
-[also build test WARNING on net/main net-next/main linus/master linux-nvme/for-next v6.17-rc1 next-20250815]
-[cannot apply to horms-ipvs/master]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+It would have been nice if this sysctl had just been a boolean toggle.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/alistair23-gmail-com/net-handshake-Store-the-key-serial-number-on-completion/20250815-130804
-base:   git://git.linux-nfs.org/projects/trondmy/linux-nfs.git linux-next
-patch link:    https://lore.kernel.org/r/20250815050210.1518439-4-alistair.francis%40wdc.com
-patch subject: [PATCH 3/8] net/handshake: Expose handshake_sk_destruct_req publically
-config: arm-mps2_defconfig (https://download.01.org/0day-ci/archive/20250816/202508160510.XOTeniWX-lkp@intel.com/config)
-compiler: clang version 22.0.0git (https://github.com/llvm/llvm-project 93d24b6b7b148c47a2fa228a4ef31524fa1d9f3f)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250816/202508160510.XOTeniWX-lkp@intel.com/reproduce)
+A deprecation warning might be a good idea.  How about the following on
+top of this patch:
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202508160510.XOTeniWX-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   net/handshake/request.c:312:6: warning: no previous prototype for function 'handshake_req_cancel' [-Wmissing-prototypes]
-     312 | bool handshake_req_cancel(struct sock *sk)
-         |      ^
-   net/handshake/request.c:312:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
-     312 | bool handshake_req_cancel(struct sock *sk)
-         | ^
-         | static 
->> net/handshake/request.c:349:6: warning: no previous prototype for function 'handshake_sk_destruct_req' [-Wmissing-prototypes]
-     349 | void handshake_sk_destruct_req(struct sock *sk)
-         |      ^
-   net/handshake/request.c:349:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
-     349 | void handshake_sk_destruct_req(struct sock *sk)
-         | ^
-         | static 
-   2 warnings generated.
-
-
-vim +/handshake_sk_destruct_req +349 net/handshake/request.c
-
-   344	
-   345	/**
-   346	 * handshake_sk_destruct_req - destroy an existing request
-   347	 * @sk: socket on which there is an existing request
-   348	 */
- > 349	void handshake_sk_destruct_req(struct sock *sk)
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+diff --git a/net/sctp/sysctl.c b/net/sctp/sysctl.c
+index 19acc57c3ed97..72af4a843ae52 100644
+--- a/net/sctp/sysctl.c
++++ b/net/sctp/sysctl.c
+@@ -399,20 +399,28 @@ static int proc_sctp_do_hmac_alg(const struct ctl_table *ctl, int write,
+ 		tbl.data = tmp;
+ 		tbl.maxlen = sizeof(tmp) - 1;
+ 		ret = proc_dostring(&tbl, 1, buffer, lenp, ppos);
+ 		if (ret)
+ 			return ret;
+-		if (!strcmp(tmp, "sha256") ||
+-		    /* for backwards compatibility */
+-		    !strcmp(tmp, "md5") || !strcmp(tmp, "sha1")) {
++		if (!strcmp(tmp, "sha256")) {
+ 			net->sctp.cookie_auth_enable = 1;
+ 			return 0;
+ 		}
+ 		if (!strcmp(tmp, "none")) {
+ 			net->sctp.cookie_auth_enable = 0;
+ 			return 0;
+ 		}
++		/*
++		 * Accept md5 and sha1 for backwards compatibility, but treat
++		 * them simply as requests to enable cookie authentication.
++		 */
++		if (!strcmp(tmp, "md5") || !strcmp(tmp, "sha1")) {
++			pr_warn_once("net.sctp.cookie_hmac_alg=%s is deprecated. Use net.sctp.cookie_hmac_alg=sha256\n",
++				     tmp);
++			net->sctp.cookie_auth_enable = 1;
++			return 0;
++		}
+ 		return -EINVAL;
+ 	}
+ 	if (net->sctp.cookie_auth_enable)
+ 		tbl.data = (char *)"sha256";
+ 	else
 
