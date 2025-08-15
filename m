@@ -1,161 +1,126 @@
-Return-Path: <netdev+bounces-214042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214043-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC42FB27F30
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 13:32:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CA9CB27F37
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 13:33:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A16F3621788
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 11:32:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BD38AB64CEB
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 11:31:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F1B028725E;
-	Fri, 15 Aug 2025 11:32:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D864927FB3E;
+	Fri, 15 Aug 2025 11:32:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="APAZaaJ5"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="VVhPY4iK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3E00283130;
-	Fri, 15 Aug 2025 11:32:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CCA52857CC
+	for <netdev@vger.kernel.org>; Fri, 15 Aug 2025 11:32:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755257549; cv=none; b=n8NPl551thMZVjucVBu6R14RnFHPbL3l3isIWCKk4j04FYRR9HuMt+8VVJdTHsQAZOodXrPWYhpw6Ga6umrituIRrNrGetXQzuTRNqXdYOyFnRePBSXyzNtMSmuCtvEphRWgcu/UnDEmMojOmTCMjR/RqEdAP/PGSJ5eeZbKe0U=
+	t=1755257563; cv=none; b=dqjwo3vwbNHmRx7/wfP/UMlwIIjF7hIcYPmeis6WDxtFp7xI+YFvwftT6oKfSFQRD+FmrCtigzx8z+HX0Ic08eoH5aLhuc/KKGOVI0sWbOJruUptK6MJ16o4oPWyM8a+PEP9OVDMCz5Or93vZTvHEv/6FkTBbv4UlROftrQICfI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755257549; c=relaxed/simple;
-	bh=2h1fMYeROE4yIGF+CgZnPkm/+lHpvohrDgo1Bzz9TFk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F5+BX8TAwNMnQbcR8bADa8niY9ZNsoNgHUq74WNpLDq/vmNU/YikeiwRUFQX3APE4OMnJhtu02EOwkijYJIgf2Vp39FtQ4jWcRGZc1eV5b6RoyWzCrK7w/dcsDTo+PzT8J3Tv2zXeMrG/i1TxTzUI9bOVcEzL0/6bZsML/Yzg+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=APAZaaJ5; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1755257547; x=1786793547;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=2h1fMYeROE4yIGF+CgZnPkm/+lHpvohrDgo1Bzz9TFk=;
-  b=APAZaaJ54WL/7bnb1qKWPOyrS30rC+jRveFvtjo79aNd8VrhuXrqMcFw
-   z25NMmjhThoSb5QkNNYvHe9MoDvv2jAI4zLLEVIqKjeyjq0K+Ir6deY2g
-   8idOwb1pgr6eashRxmOTH9vpu+X1F6YxdFAhMPuCBvl7YtSrMQYYctQYm
-   rusV1gi4Jy1cgRVyaAvBXiIhXbU/UzyUcX1KqH4QQn0OQQwOPxyJJszaC
-   dn/Fgieno9lNdEfUxcMIW7/CANCnfJceBbkWiaaI1UPv2hp9zNc/CkaBX
-   2rPDUj/8l2KMwZkPUjGVN3Ohbcz943QmVAfJ6kMsfoausaXD3yNbblJVn
-   w==;
-X-CSE-ConnectionGUID: aGDD8SLMSeevbnCxzywxMw==
-X-CSE-MsgGUID: 14UdNFFjSXKKKyAG1dtxCw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11522"; a="61211987"
-X-IronPort-AV: E=Sophos;i="6.17,290,1747724400"; 
-   d="scan'208";a="61211987"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Aug 2025 04:32:27 -0700
-X-CSE-ConnectionGUID: pufAPPvqSiyqv3iaBbtgAg==
-X-CSE-MsgGUID: ZdipE9jNR6KpldVQlQvDdw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,290,1747724400"; 
-   d="scan'208";a="197990603"
-Received: from lkp-server02.sh.intel.com (HELO 4ea60e6ab079) ([10.239.97.151])
-  by orviesa002.jf.intel.com with ESMTP; 15 Aug 2025 04:32:24 -0700
-Received: from kbuild by 4ea60e6ab079 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1umsfU-000Buu-2l;
-	Fri, 15 Aug 2025 11:32:20 +0000
-Date: Fri, 15 Aug 2025 19:31:37 +0800
-From: kernel test robot <lkp@intel.com>
-To: Thorsten Blum <thorsten.blum@linux.dev>,
+	s=arc-20240116; t=1755257563; c=relaxed/simple;
+	bh=mOZu74yAR37nkzjZEGGeiWXde6MsR8NJwh8fhBZwyM8=;
+	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
+	 Content-Disposition:Content-Type:Message-Id:Date; b=K4vC13sCdWVpUbMD1KTrWrqw64PhbsTSvvXg+mmR1A1QfV6TmWDWOdrQOAmqmCjmB2YZvXGiu2NNBsiZA4ZXREGNIkbmsJuNbb4YY9Qmtay0L3LMuDM3upHz8+9amfYP2dbaM2lPXEXsBg1tGVOpvxB9pjs0C95xQw+bdd9OtpE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=VVhPY4iK; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
+	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=9PDEQQVstFPjRei/ldFIp0/nQrs7re/PB3W4I/9pPKE=; b=VVhPY4iK2GzN2+0hSxy3pLbO9t
+	T3iD57j6s50is6c+bB+cgdhEb5LhPrf+gWbT//f07oaHYplyB7ki8TB/RRGWx2xDqEjSTKAsnwG6Y
+	g2PhmJAdt5W2T8UYMDptpi3Kz+dET9atTzjrLLQC932UvlaenhP/RexFMxi9cn1YRZEPaezOdm6p4
+	7lxJLlcgRGIjl66uX2+2MiVrL4+ElSJJqlPtd6tNGFqLOVNm9NC8264qdsiVOGJjzSZGjY9l++8ya
+	14Q/RYy95YI0KPajAsAohU9wEnr8hUrE+5vsZzzzLYL+qFAq+Yh4NTK7Y93HiZ8S2SbRKv8umJS3u
+	Aj+zq4kQ==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:60688 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1umsfi-00011I-39;
+	Fri, 15 Aug 2025 12:32:35 +0100
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1umsf0-008vKK-A3; Fri, 15 Aug 2025 12:31:50 +0100
+In-Reply-To: <aJ8avIp8DBAckgMc@shell.armlinux.org.uk>
+References: <aJ8avIp8DBAckgMc@shell.armlinux.org.uk>
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Peter Seiderer <ps.report@gmx.net>,
-	Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Thorsten Blum <thorsten.blum@linux.dev>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: pktgen: Use min() to simplify
- pktgen_finalize_skb()
-Message-ID: <202508151939.AA9PxPv1-lkp@intel.com>
-References: <20250814172242.231633-2-thorsten.blum@linux.dev>
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next 1/7] net: stmmac: remove unnecessary checks in
+ ethtool eee ops
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250814172242.231633-2-thorsten.blum@linux.dev>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1umsf0-008vKK-A3@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Fri, 15 Aug 2025 12:31:50 +0100
 
-Hi Thorsten,
+Phylink will check whether the MAC supports the LPI methods in
+struct phylink_mac_ops, and return -EOPNOTSUPP if the LPI capabilities
+are not provided. stmmac doesn't provide LPI capabilities if
+priv->dma_cap.eee is not set.
 
-kernel test robot noticed the following build errors:
+Therefore, checking the state of priv->dma_cap.eee in the ethtool ops
+and returning -EOPNOTSUPP is redundant - let phylink handle this.
 
-[auto build test ERROR on net-next/main]
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c | 6 ------
+ 1 file changed, 6 deletions(-)
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Thorsten-Blum/net-pktgen-Use-min-to-simplify-pktgen_finalize_skb/20250815-012951
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250814172242.231633-2-thorsten.blum%40linux.dev
-patch subject: [PATCH net-next] net: pktgen: Use min() to simplify pktgen_finalize_skb()
-config: arc-randconfig-002-20250815 (https://download.01.org/0day-ci/archive/20250815/202508151939.AA9PxPv1-lkp@intel.com/config)
-compiler: arc-linux-gcc (GCC) 9.5.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250815/202508151939.AA9PxPv1-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202508151939.AA9PxPv1-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   In file included from <command-line>:
-   net/core/pktgen.c: In function 'pktgen_finalize_skb':
->> include/linux/compiler_types.h:572:38: error: call to '__compiletime_assert_853' declared with attribute error: min(datalen / frags, ((1UL) << 12)) signedness error
-     572 |  _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-         |                                      ^
-   include/linux/compiler_types.h:553:4: note: in definition of macro '__compiletime_assert'
-     553 |    prefix ## suffix();    \
-         |    ^~~~~~
-   include/linux/compiler_types.h:572:2: note: in expansion of macro '_compiletime_assert'
-     572 |  _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-         |  ^~~~~~~~~~~~~~~~~~~
-   include/linux/build_bug.h:39:37: note: in expansion of macro 'compiletime_assert'
-      39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
-         |                                     ^~~~~~~~~~~~~~~~~~
-   include/linux/minmax.h:93:2: note: in expansion of macro 'BUILD_BUG_ON_MSG'
-      93 |  BUILD_BUG_ON_MSG(!__types_ok(ux, uy),  \
-         |  ^~~~~~~~~~~~~~~~
-   include/linux/minmax.h:98:2: note: in expansion of macro '__careful_cmp_once'
-      98 |  __careful_cmp_once(op, x, y, __UNIQUE_ID(x_), __UNIQUE_ID(y_))
-         |  ^~~~~~~~~~~~~~~~~~
-   include/linux/minmax.h:105:19: note: in expansion of macro '__careful_cmp'
-     105 | #define min(x, y) __careful_cmp(min, x, y)
-         |                   ^~~~~~~~~~~~~
-   net/core/pktgen.c:2845:14: note: in expansion of macro 'min'
-    2845 |   frag_len = min(datalen / frags, PAGE_SIZE);
-         |              ^~~
-
-
-vim +/__compiletime_assert_853 +572 include/linux/compiler_types.h
-
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  558  
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  559  #define _compiletime_assert(condition, msg, prefix, suffix) \
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  560  	__compiletime_assert(condition, msg, prefix, suffix)
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  561  
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  562  /**
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  563   * compiletime_assert - break build and emit msg if condition is false
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  564   * @condition: a compile-time constant condition to check
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  565   * @msg:       a message to emit if condition is false
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  566   *
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  567   * In tradition of POSIX assert, this macro will break the build if the
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  568   * supplied condition is *false*, emitting the supplied error message if the
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  569   * compiler has support to do so.
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  570   */
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  571  #define compiletime_assert(condition, msg) \
-eb5c2d4b45e3d2 Will Deacon 2020-07-21 @572  	_compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  573  
-
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+index 77758a7299b4..dda7ba1f524d 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+@@ -852,9 +852,6 @@ static int stmmac_ethtool_op_get_eee(struct net_device *dev,
+ {
+ 	struct stmmac_priv *priv = netdev_priv(dev);
+ 
+-	if (!priv->dma_cap.eee)
+-		return -EOPNOTSUPP;
+-
+ 	return phylink_ethtool_get_eee(priv->phylink, edata);
+ }
+ 
+@@ -863,9 +860,6 @@ static int stmmac_ethtool_op_set_eee(struct net_device *dev,
+ {
+ 	struct stmmac_priv *priv = netdev_priv(dev);
+ 
+-	if (!priv->dma_cap.eee)
+-		return -EOPNOTSUPP;
+-
+ 	return phylink_ethtool_set_eee(priv->phylink, edata);
+ }
+ 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.30.2
+
 
