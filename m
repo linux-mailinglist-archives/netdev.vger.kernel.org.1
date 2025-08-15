@@ -1,52 +1,53 @@
-Return-Path: <netdev+bounces-214100-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214101-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B819B2847D
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 18:59:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DF03B2847E
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 18:59:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D57E561F41
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F04FF5625EE
 	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 16:55:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AC4C25782A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AD0425782D;
 	Fri, 15 Aug 2025 16:55:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d+DXsfzw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D6EZQOYO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22D6219DF4F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22DE81F582A;
 	Fri, 15 Aug 2025 16:55:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755276926; cv=none; b=iA67O3QRmCNImAUIlfb+fGIWMjimaqnTA8/EhS/pOcZ8a3i8y9/qSSZMJaQ7SPlPqUpR64hntAaGmeGG/dRyFgx3fxKuBS8gAJ9lRmzPLXTGcqpLt20lor5no0IFNiCb45hwoEOzZ1mGZEI4KTRZbnEItmXHZ+/IyORKjgBFzBI=
+	t=1755276926; cv=none; b=h0RMSnmhE2FsKzVhZqlNGqtxbdoIM6HjaHPbdXHhpNlOZriWa2fN6RkXVEbAYdCIUqw2XZfanMqPK8wLrTc72T+mAUuj2tOkmhL0amsgpCeDyj78hB7wsJHcyUufzcHgtcFAkjSkAM4dDVbC75BO1uxOuROSEqCYeKBWWpI7Ga8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1755276926; c=relaxed/simple;
-	bh=zl87QclcDa3DKTevz342RWsdUkmKZ3kWOu2bPgZotaQ=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=NwD2KdCqH3u6XWHSUZLofbR9KKd2iyu5ezCTeRUpSG5AIStwJzgN6dUsf/yAOastkZKnUy7fh0+EHufQL0PedcvdIPRCLhTbMAQYMk8kPj10k7fsUqRY2g0K1FioOWVgjNMxLC2c1+MSjor5OvTYlkzQ1lAnwFTt3E655MEfAPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d+DXsfzw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id BF2B4C4CEF1;
+	bh=inws8rGfKLYVfokZMZsnBzF7qQWjCw/1Z/VQ/H87srg=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=CpiU5QZkyjGL2Bn6Hz5QyOcBqpRigYKjP5GqkOrkjhfBkgDWMTZALm4LbqFZv4YrAfk0WawKQ3yX7ldS5LRKZmJrnQCb9zTY9SU48ULCcllykkeYFsGpihg73OH+8M80CoEY+RpxtvwF96kEDtgFAixwwdn17dvFmr56HpyKTuQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D6EZQOYO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id CB57DC4CEF5;
 	Fri, 15 Aug 2025 16:55:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1755276925;
-	bh=zl87QclcDa3DKTevz342RWsdUkmKZ3kWOu2bPgZotaQ=;
-	h=From:Subject:Date:To:Cc:Reply-To:From;
-	b=d+DXsfzwZz/1607mPnylsjSqtFkdljLyHXb1M+0KtScK3u3fJozABnYjf/4A3v1dF
-	 /KPUafe1k1W61UwDtCQfnE5wiGCr3A+l9Ybnr+dqfTSmwFfmCV2e5xFUe7Lm73HaRu
-	 TyWnrpEwdjBWkoRwatOzNR9m7qSTFV3YdiXTQ65CX8wDPk62E5/jdutbvOEGzM/MAz
-	 vugEwC/22T+7oWvoqexFFvFGQajpA6+vMs+2ArxZ8aJxn7SkYj8wmIxoTNwIg6YdRN
-	 hNkXmV+a4CNEuBjX0sB14Rfyd9B+dTcVWcrcUwghHkYuLhZS++QczJ3H30abbYPhKi
-	 GG/a29Q1cf4NQ==
+	bh=inws8rGfKLYVfokZMZsnBzF7qQWjCw/1Z/VQ/H87srg=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
+	b=D6EZQOYOAUAeF305N1gV7XWP8PF60SeQAOjLMO1wlTgas6veveIMLTz2fnidz4Oud
+	 MBlT+tUJBdT2vTIoqV7HNodxVm56PUe6uX4yrHIgZ0N9Nz+XJxoUgztaIG9Zqjyzfp
+	 FTaX3rEtIAcmi+r3E0BWxyri9Kr7Nke5dLq6on1qne25HkZ4DjjXw3HYTfuulfG1Qf
+	 h1F1nKc7xxYp/slEvjKOo1513TSPOxA4UK9Fyb8dRDqvgN/fEXfbjq1Bb+OFXQyl8n
+	 JvuJPqVf84UATwehLRVjdeeeix5KdgoczSsPe0THCCw4Oqmnoc3845oP1d85TXiv1b
+	 ++Pk/8wWvYmcw==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B349CCA0EE6;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2C56CA0ED1;
 	Fri, 15 Aug 2025 16:55:25 +0000 (UTC)
 From: Rohan G Thomas via B4 Relay <devnull+rohan.g.thomas.altera.com@kernel.org>
-Subject: [PATCH net-next v2 0/3] net: stmmac: xgmac: Minor fixes
-Date: Sat, 16 Aug 2025 00:55:22 +0800
-Message-Id: <20250816-xgmac-minor-fixes-v2-0-699552cf8a7f@altera.com>
+Date: Sat, 16 Aug 2025 00:55:23 +0800
+Subject: [PATCH net-next v2 1/3] net: stmmac: xgmac: Do not enable RX FIFO
+ Overflow interrupts
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,11 +56,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAHpmn2gC/32NQQqDMBBFryKz7pRkatF25T2KixBHHahJSYKki
- HdvyAG6fDze/wdEDsIRns0BgXeJ4l0BujRgV+MWRpkKAym6q063mJfNWNzE+YCzZI7YKuq7mUh
- PlqF0n8BVlOwFjhM6zgnGYlaJyYdvPdt19X92d40K7a1VDzJ9bzoazDtxMFfrNxjP8/wBtwHLZ
- 70AAAA=
-X-Change-ID: 20250714-xgmac-minor-fixes-40287f221dce
+Message-Id: <20250816-xgmac-minor-fixes-v2-1-699552cf8a7f@altera.com>
+References: <20250816-xgmac-minor-fixes-v2-0-699552cf8a7f@altera.com>
+In-Reply-To: <20250816-xgmac-minor-fixes-v2-0-699552cf8a7f@altera.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
@@ -74,11 +73,11 @@ Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
  Rohan G Thomas <rohan.g.thomas@altera.com>, 
  Matthew Gerlach <matthew.gerlach@altera.com>, Andrew Lunn <andrew@lunn.ch>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1755276924; l=1234;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1755276924; l=1566;
  i=rohan.g.thomas@altera.com; s=20250815; h=from:subject:message-id;
- bh=zl87QclcDa3DKTevz342RWsdUkmKZ3kWOu2bPgZotaQ=;
- b=e07IJKlqLpRHehRFXDj41qKkESxMxzz5NMzfNCTXpgPDuowY+O4sUC/gPBXEZ9NWseGEfNinm
- rkO9woTy9UxBhgwURhP+g6fPGdtebSJAlvhGr6DwzbJJ1lwj9/FqhuN
+ bh=E0GCiOkgubMN2NevEVBVfzpHtZM3l1Fx7YIgaGSXhBE=;
+ b=OAU0E3PwMrRPvcg/pVQaA9iV5Ql2eiNQoRq+NwfecsLEHn+IbcprNx58bAx8/1GqsKDlnfZ81
+ uRjhsjDGB0fA/n07LCtDi99v7dWkmYGkYG6I80P8piIOVSRWcgMpRt7
 X-Developer-Key: i=rohan.g.thomas@altera.com; a=ed25519;
  pk=5yZXkXswhfUILKAQwoIn7m6uSblwgV5oppxqde4g4TY=
 X-Endpoint-Received: by B4 Relay for rohan.g.thomas@altera.com/20250815
@@ -86,38 +85,45 @@ X-Endpoint-Received: by B4 Relay for rohan.g.thomas@altera.com/20250815
 X-Original-From: Rohan G Thomas <rohan.g.thomas@altera.com>
 Reply-To: rohan.g.thomas@altera.com
 
-This patch series includes following minor fixes for stmmac
-dwxgmac driver:
+From: Rohan G Thomas <rohan.g.thomas@altera.com>
 
-    1. Disable Rx FIFO overflow interrupt for dwxgmac
-    2. Correct supported speed modes for dwxgmac
-    3. Check for coe-unsupported flag before setting CIC bit of
-       Tx Desc3 in the AF_XDP flow
+Enabling RX FIFO Overflow interrupts is counterproductive
+and causes an interrupt storm when RX FIFO overflows.
+Disabling this interrupt has no side effect and eliminates
+interrupt storms when the RX FIFO overflows.
 
+Commit 8a7cb245cf28 ("net: stmmac: Do not enable RX FIFO
+overflow interrupts") disables RX FIFO overflow interrupts
+for DWMAC4 IP and removes the corresponding handling of
+this interrupt. This patch is doing the same thing for
+XGMAC IP.
+
+Fixes: 2142754f8b9c ("net: stmmac: Add MAC related callbacks for XGMAC2")
 Signed-off-by: Rohan G Thomas <rohan.g.thomas@altera.com>
+Reviewed-by: Matthew Gerlach <matthew.gerlach@altera.com>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 ---
-Changes in v2:
-- Added Fixes: tags to relevant commits.
-- Added a check for synopsys version to enable 10Mbps, 100Mbps support.
-- Link to v1: https://lore.kernel.org/r/20250714-xgmac-minor-fixes-v1-0-c34092a88a72@altera.com
+ drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
----
-Rohan G Thomas (3):
-      net: stmmac: xgmac: Do not enable RX FIFO Overflow interrupts
-      net: stmmac: xgmac: Correct supported speed modes
-      net: stmmac: Set CIC bit only for TX queues with COE
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
+index 5dcc95bc0ad28b756accf9670c5fa00aa94fcfe3..7201a38842651a865493fce0cefe757d6ae9bafa 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
+@@ -203,10 +203,6 @@ static void dwxgmac2_dma_rx_mode(struct stmmac_priv *priv, void __iomem *ioaddr,
+ 	}
+ 
+ 	writel(value, ioaddr + XGMAC_MTL_RXQ_OPMODE(channel));
+-
+-	/* Enable MTL RX overflow */
+-	value = readl(ioaddr + XGMAC_MTL_QINTEN(channel));
+-	writel(value | XGMAC_RXOIE, ioaddr + XGMAC_MTL_QINTEN(channel));
+ }
+ 
+ static void dwxgmac2_dma_tx_mode(struct stmmac_priv *priv, void __iomem *ioaddr,
 
- drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c | 13 +++++++++++--
- drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c  |  9 +++++----
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c   |  6 ++++--
- 3 files changed, 20 insertions(+), 8 deletions(-)
----
-base-commit: 88250d40ed59d2b3c2dff788e9065caa7eb4dba0
-change-id: 20250714-xgmac-minor-fixes-40287f221dce
-
-Best regards,
 -- 
-Rohan G Thomas <rohan.g.thomas@altera.com>
+2.32.0
 
 
 
