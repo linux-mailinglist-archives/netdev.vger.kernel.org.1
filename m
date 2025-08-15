@@ -1,122 +1,97 @@
-Return-Path: <netdev+bounces-214095-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214096-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A09F9B2841D
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 18:46:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33D0AB2842D
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 18:47:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 72D025C09B2
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 16:42:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C18B81B62638
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 16:43:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 740CF30E827;
-	Fri, 15 Aug 2025 16:42:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 096CF30F805;
+	Fri, 15 Aug 2025 16:42:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="jk8kTtoj";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="agMEzjxM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VzNG3Efl"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD24230E0E0
-	for <netdev@vger.kernel.org>; Fri, 15 Aug 2025 16:42:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D492D30EF69;
+	Fri, 15 Aug 2025 16:42:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755276122; cv=none; b=hA/r65P1MFECkULvZYHHWCuvcaD0Y6691gDgL90z0LyLSnFuoFS3MtjXBB/qxl+jCrU4PJ4G7yetINDjVQUMaEVCPmTjYZeSx37VTQWLL4YpaeEE2FoDqdBS/jQ8Nhy5NuPJq+daYCWU2m7JyX/xuzrjB7qfSRrBG8OpCv1bCCs=
+	t=1755276138; cv=none; b=qVupQk88FT584R8t9zZkBEVv6Mt1hnQpo5imSjVJ6Eit/7cVsN0zfmsjSgO9ODZCSGO9u/QDs2Nl7cahF+s156ur/7lZuwSC2nwxRhFIVggLS/CYm5ggu8WWzmuKw8KmVxwGp5ep3+WagSC4FRWgeAY11YS7QIurwzE8C85Ku5w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755276122; c=relaxed/simple;
-	bh=nv09JT8j/RPlJ2lIWFIf6rNe2bfQWVNSFRmAOOXAF2I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qZSMMMp7pMHmt2Dl0TpPb6xMkrN+RhjZZZM0Vl+Xa0YCY3oamm4puVul3Yp7lpjcTe+qj26WUSer2JRBF3DPA8BMEksClqUYTKvcA3EuSkXjcT80JDNk8ZG2/3Pmf+SbWL5FZdi1miECZncKSrYrj9CXJKbOd+shSxpjHztzZ30=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=jk8kTtoj; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=agMEzjxM; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Fri, 15 Aug 2025 18:41:57 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1755276118;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SuO9hWRB2tZu87vohsl77fbUrl0oo/RQH6y79VVI59I=;
-	b=jk8kTtoj0lR4im/1aitRimBk1HHrBhiokfmlw1OPnl/4eDcnsnBTFRZmlvh4fJwr6IRII7
-	KbDzL1xoEaL3GT/qx5AX/4tsR522CyvqoHsoqYEVrdlxLW6f+1EzSlMddA4CEaJFg7/XMU
-	HG/UiDx3R5gI9I0O1ZuHhrHLqXI+KBzlJBMB41DtGC6n7yanfbpo55f4CMkh26p+h/Z1in
-	O433iMSjtJYlMdvrEXBxiSlYphug8d/yfFbiy/SfRPN6ni+ZU4pTN555RBX/GSntO6DaQw
-	oHQOR/brruiWxpaALt9md0yOTCtSq1+7WCHTFJTRZY6WgTfp2QYrrEalvhZlhg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1755276118;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SuO9hWRB2tZu87vohsl77fbUrl0oo/RQH6y79VVI59I=;
-	b=agMEzjxMF9CFD7nDwflH12aIGhmn+a7w+1cz2P9BbvK8f5GiYKADO4oVIfCABvQc4aVw1r
-	pfsv5CRPSY/tYpAQ==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: Kurt Kanzenbach <kurt@linutronix.de>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next] igb: Retrieve Tx timestamp
- directly from interrupt
-Message-ID: <20250815164157.jIKm3gdS@linutronix.de>
-References: <20250815-igb_irq_ts-v1-1-8c6fc0353422@linutronix.de>
- <a1e9e37e-63da-4f1c-8ac3-36e1fde2ec0a@molgen.mpg.de>
- <87y0rlm22a.fsf@jax.kurt.home>
- <ad66d19c-be7b-4df3-8e4c-d57a08782df4@molgen.mpg.de>
+	s=arc-20240116; t=1755276138; c=relaxed/simple;
+	bh=fFth/dz/MaNpJqkuv1JoCoVaICV+R6UfG3yK1b1QAHA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dt7p3Or0UbZ/P73T8Mugydg7tD3+bn0dcVKY3+6+Ae3ayKU7apG1XqbdzuDmIUjLjp5C1XF5lwIv7Yl8Ul6CAF2em+quNZC9sljYW5jRHH+hf6XLZVLf7uBnB+49crVRUr/zPnh4g8B7LOGU7r3dzHtHlrRU61mCFC6l+NC3eiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VzNG3Efl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68FD9C4CEEB;
+	Fri, 15 Aug 2025 16:42:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755276138;
+	bh=fFth/dz/MaNpJqkuv1JoCoVaICV+R6UfG3yK1b1QAHA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=VzNG3EflMcW2o9zwQ7oJFDSUEp/gVswaz1p8izpCC9cdOgEuaSgQayPE1w1GhedT0
+	 z+DyL27MN8mmNm8qP5ayhN4HVFHJDk+t+nn5ljXJg5KukzuDBpbRE6OUD3tUIE5SST
+	 r14DZ0P8Q+r5jiRuxAyizW/ePGZX5hhSrRaUpYzI2TB/IGzs+Ikr0l4JGCxtOYfwaN
+	 YUNAqpU6ZdoEdWeB7BnFKCIRziE0F2PA/9DlijOMbeRVPRmrSvKAYdIGYU82A2Bg8q
+	 6EyGcv+tqn/QvvDNECg/3T9DLi/gLUWdvisTmnQbu0BfpcUZRQA2vW9Fn6fMlP94eG
+	 g4+gB0C0m1uPg==
+Date: Fri, 15 Aug 2025 09:42:17 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Pavel Begunkov <asml.silence@gmail.com>, Johannes Berg
+ <johannes@sipsolutions.net>
+Cc: Breno Leitao <leitao@debian.org>, Mike Galbraith <efault@gmx.de>,
+ paulmck@kernel.org, LKML <linux-kernel@vger.kernel.org>,
+ netdev@vger.kernel.org, boqun.feng@gmail.com
+Subject: Re: netconsole: HARDIRQ-safe -> HARDIRQ-unsafe lock order warning
+Message-ID: <20250815094217.1cce7116@kernel.org>
+In-Reply-To: <3d20ce1b-7a9b-4545-a4a9-23822b675e0c@gmail.com>
+References: <fb38cfe5153fd67f540e6e8aff814c60b7129480.camel@gmx.de>
+	<oth5t27z6acp7qxut7u45ekyil7djirg2ny3bnsvnzeqasavxb@nhwdxahvcosh>
+	<20250814172326.18cf2d72@kernel.org>
+	<3d20ce1b-7a9b-4545-a4a9-23822b675e0c@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ad66d19c-be7b-4df3-8e4c-d57a08782df4@molgen.mpg.de>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 2025-08-15 14:54:16 [+0200], Paul Menzel wrote:
-> > > Do you have a reproducer for the issue, so others can test.
-> > 
-> > Yeah, I do have a reproducer:
-> > 
-> >   - Run ptp4l with 40ms tx timeout (--tx_timestamp_timeout)
-> >   - Run periodic RT tasks (e.g. with SCHED_FIFO 1) with run time of
-> >     50-100ms per CPU core
-> > 
-> > This leads to sporadic error messages from ptp4l such as "increasing
-> > tx_timestamp_timeout or increasing kworker priority may correct this
-> > issue, but a driver bug likely causes it"
-> > 
-> > However, increasing the kworker priority is not an option, simply
-> > because this kworker is doing non-related PTP work items as well.
-> > 
-> > As the time sync interrupt already signals that the Tx timestamp is
-> > available, there's no need to schedule a work item in this case. I might
-> > have missed something though. But my testing looked good. The warn_on
-> > never triggered.
+On Fri, 15 Aug 2025 11:44:45 +0100 Pavel Begunkov wrote:
+> On 8/15/25 01:23, Jakub Kicinski wrote:
+> > On Thu, 14 Aug 2025 03:16:11 -0700 Breno Leitao wrote:  
+> >>   2.2) netpoll 				// net poll will call the network subsystem to send the packet
+> >>   2.3) lock(&fq->lock);			// Try to get the lock while the lock was already held  
 > 
-> Great. Maybe add that too, as, at least for me, realtime stuff is something
-> I do not do, so pointers would help me.
+> The report for reference:
+> 
+> https://lore.kernel.org/all/fb38cfe5153fd67f540e6e8aff814c60b7129480.camel@gmx.de/> 
+> > Where does netpoll take fq->lock ?  
+> 
+> the dependencies between the lock to be acquired
+> [  107.985514]  and HARDIRQ-irq-unsafe lock:
+> [  107.985531] -> (&fq->lock){+.-.}-{3:3} {
+> ...
+> [  107.988053]  ... acquired at:
+> [  107.988054]    check_prev_add+0xfb/0xca0
+> [  107.988058]    validate_chain+0x48c/0x530
+> [  107.988061]    __lock_acquire+0x550/0xbc0
+> [  107.988064]    lock_acquire.part.0+0xa1/0x210
+> [  107.988068]    _raw_spin_lock_bh+0x38/0x50
+> [  107.988070]    ieee80211_queue_skb+0xfd/0x350 [mac80211]
+> [  107.988198]    __ieee80211_xmit_fast+0x202/0x360 [mac80211]
+> [  107.988314]    ieee80211_xmit_fast+0xfb/0x1f0 [mac80211]
+> [  107.988424]    __ieee80211_subif_start_xmit+0x14e/0x3d0 [mac80211]
+> [  107.988530]    ieee80211_subif_start_xmit+0x46/0x230 [mac80211]
 
-If you ask for an explicit reproducer that you would have to have task
-that does
-	struct sched_param param = { .sched_priority = 1 };
-	sched_setscheduler(0, SCHED_FIFO, &param);
-
-and let it run for to exceed the ptp4l timeout. But in general it does
-not require a real time task to trigger the problem. A busy CPU with a
-lot of pending worker will do the trick, too. You just need "enough" CPU
-work so the scheduler puts other tasks on the CPU before the kworker,
-which retrieves the timestamp, is scheduled.
-
-> Paul
-
-Sebastian
+Ah, that's WiFi's stack queuing. Dunno whether we expect netpoll to 
+work over WiFi. I suspect disabling netconsole over WiFi may be the 
+most sensible way out. Johannes, do you expect mac80211 Tx to be IRQ-safe?
 
