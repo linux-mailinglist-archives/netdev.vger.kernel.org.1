@@ -1,119 +1,94 @@
-Return-Path: <netdev+bounces-214136-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8286EB28583
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 20:07:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FDCAB28590
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 20:09:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7DA243B3E65
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 18:07:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11DF23BA0B0
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 18:09:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 635B1224B0E;
-	Fri, 15 Aug 2025 18:07:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BC7C30DEA4;
+	Fri, 15 Aug 2025 18:09:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="W4L5Sohf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S60jODD6"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86178317702;
-	Fri, 15 Aug 2025 18:07:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11267309DAB;
+	Fri, 15 Aug 2025 18:09:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755281239; cv=none; b=j7eKhvxHT4Om1oGO1THFPaEidP1fsahPPZAD+v/sNazQ2BRyQ6Eb8G9Jze1G5LMgc2ZOkflsrR4YqrM4HQd7km0jqA0j4/vOGrAZjJo433nSzT7sq7CCAYRbh+KVlLdMVJQ5XGtm/cit5VxlxURidUgGxvcNs58XC3mm8mRzQ2I=
+	t=1755281342; cv=none; b=B1yvu7EO9Chq/OpGDNQKj1WrovSDwCtgCkaNaPS6KbrfyPmALVqBSTO7CYxsOCgUOG9RQneyVkc+tjyQ16rUsOivWO5aCUQ0IARAtlhkzGErqwD8E+ZWfZeCI/A54zLTD2vcu1XB4axHAlOEpkxuCCz3WmZKTFSYIVASvvEP6uM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755281239; c=relaxed/simple;
-	bh=6LkPZMv9k8hDlzCNKVs3sIwoyDtLrZJkQI0c17gRlOw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Wq+M9rE7a/0iICb0YfA+FkxqeEbTbZjmhMc2WLXWmxmKVxRJK1V+Yq3ogOSQCBR8IuCYWoYenYPrUccdjJuYBGjwr43L/JC3pZ0Ai82uhlObJFKnw2qxtInBlaF4KRJ556QC2wQKpZv/pKHkjkRH1LkoUvTMsD1qIwl+Hzx41Mc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=W4L5Sohf; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=YgvvVuDKqui7txj7cJZLGV7Pe1wl+IwQEbSo3OxI38Y=; b=W4L5SohfsikhicM2fMhMYVU5ez
-	7GHAzt8DwRE0JLzrV2MptVHRAfjIKqFdGNGxRchaK/KTSWivn5Lgyjbde+CxjI24zzPF382VEhuAW
-	gtccE+EVzyqGn5NSLCy0JtxRYj24P64KzKawzX3gdV7ycR2IKsGCbhQza79dQG3D04iA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1umyp1-004qd8-3h; Fri, 15 Aug 2025 20:06:35 +0200
-Date: Fri, 15 Aug 2025 20:06:35 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Yibo Dong <dong100@mucse.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	corbet@lwn.net, gur.stavi@huawei.com, maddy@linux.ibm.com,
-	mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
-	gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
-	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
-	alexanderduyck@fb.com, richardcochran@gmail.com,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 5/5] net: rnpgbe: Add register_netdev
-Message-ID: <b669db06-83f8-447c-8081-7ef6ae9d2aba@lunn.ch>
-References: <20250814073855.1060601-1-dong100@mucse.com>
- <20250814073855.1060601-6-dong100@mucse.com>
- <099a6006-02e4-44f0-ae47-7de14cc58a12@lunn.ch>
- <CFAA902406A8215F+20250815064441.GB1148411@nic-Precision-5820-Tower>
+	s=arc-20240116; t=1755281342; c=relaxed/simple;
+	bh=19brnsyyIp2ph9JbH6r7iqDFUZXwBNSUtnngklw5n6g=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sDYH0XmS6dwn3sSF+4dYXYy1nf7yTOPSTYjFMHP3jM8JSJeilMj6X2zV3REtTXDh8XoU/3a/Grv31A0DCaZ/qb1jkpnnYTArsI/mOPGqUIsbDW6Ya1hbsc8pNAhp7th4iVTuZzK1/JP0uJdlXf8EIrqJNMcoWcAtptxEbpHxXaU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S60jODD6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E79AC4CEF5;
+	Fri, 15 Aug 2025 18:09:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755281341;
+	bh=19brnsyyIp2ph9JbH6r7iqDFUZXwBNSUtnngklw5n6g=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=S60jODD61ed3m6ByVsl+MR8QbRZKIVfOeqq8DilJzWDV6I3KqSnlntv4IIbsnqGXz
+	 tHVlV2ynSErS2aY1pbiKCwOELGvq461gdtnLaDJiBAWGHNZRgP896oJ3AwLlmMZFAv
+	 ob4bojVv05YsoyaE+VqiqLLB5n1hH3pAfCUrvNAJghu2QKBfdcmRTupW+6LGeefGap
+	 +IONgtaP5WX3+nTXXsT+KvvRXVloVLZKOQx00dTmxsICH6/cj3poHsWehbK9IU94hZ
+	 FCUcYmkLeT+qe5GKZrFYvAdiia/GfPC/IV/4mbBLAkcEGFIuKObc08DGCy6y6P3LVc
+	 mEuRjdnlaHqXA==
+Date: Fri, 15 Aug 2025 11:09:00 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Mihai Moldovan <ionic@ionic.de>
+Cc: linux-arm-msm@vger.kernel.org, Manivannan Sadhasivam <mani@kernel.org>,
+ Denis Kenzior <denkenz@gmail.com>, Eric Dumazet <edumazet@google.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Willem de Bruijn <willemb@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Simon Horman <horms@kernel.org>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v5 01/11] net: qrtr: ns: validate msglen before ctrl_pkt
+ use
+Message-ID: <20250815110900.2da8f3c5@kernel.org>
+In-Reply-To: <161d8d203f17fde87ac7dd2c9c24be6d1f35a3c1.1754962436.git.ionic@ionic.de>
+References: <cover.1754962436.git.ionic@ionic.de>
+	<161d8d203f17fde87ac7dd2c9c24be6d1f35a3c1.1754962436.git.ionic@ionic.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CFAA902406A8215F+20250815064441.GB1148411@nic-Precision-5820-Tower>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> > > +static int rnpgbe_reset_hw_ops(struct mucse_hw *hw)
-> > > +{
-> > > +	struct mucse_dma_info *dma = &hw->dma;
-> > > +	int err;
-> > > +
-> > > +	dma_wr32(dma, RNPGBE_DMA_AXI_EN, 0);
-> > > +	err = mucse_mbx_fw_reset_phy(hw);
-> > > +	if (err)
-> > > +		return err;
-> > > +	/* Store the permanent mac address */
-> > > +	if (!(hw->flags & M_FLAGS_INIT_MAC_ADDRESS))
-> > 
-> > What do this hw->flags add to the driver? Why is it here?
-> > 
+On Tue, 12 Aug 2025 03:35:27 +0200 Mihai Moldovan wrote:
+> The qrtr_ctrl_pkt structure is currently accessed without checking
+> if the received payload is large enough to hold the structure's fields.
+> Add a check to ensure the payload length is sufficient.
 > 
-> It is used to init 'permanent addr' only once.
-> rnpgbe_reset_hw_ops maybe called when netdev down or hw hang, no need
-> try to get 'permanent addr' more times.
+> Signed-off-by: Denis Kenzior <denkenz@gmail.com>
+> Reviewed-by: Marcel Holtmann <marcel@holtmann.org>
+> Reviewed-by: Andy Gross <agross@kernel.org>
+> Signed-off-by: Mihai Moldovan <ionic@ionic.de>
+> Fixes: 0c2204a4ad71 ("net: qrtr: Migrate nameservice to kernel from userspace")
 
-It normally costs ~0 to ask the firmware something. So it is generally
-simpler to just ask it. If the firmware is dead, you should not really
-care, the RPC should timeout, ETIMEDOUT will get returned to user
-space, and likely everything else will fail anyway.
- 
-> > >  static void rnpgbe_rm_adapter(struct pci_dev *pdev)
-> > >  {
-> > >  	struct mucse *mucse = pci_get_drvdata(pdev);
-> > > +	struct mucse_hw *hw = &mucse->hw;
-> > >  	struct net_device *netdev;
-> > >  
-> > >  	if (!mucse)
-> > >  		return;
-> > >  	netdev = mucse->netdev;
-> > > +	if (netdev->reg_state == NETREG_REGISTERED)
-> > > +		unregister_netdev(netdev);
-> > 
-> > Is that possible?
-> > 
-> 
-> Maybe probe failed before register_netdev? Then rmmod the driver.
+If this is a fix it has to go to net, then once it reaches Linus's tree
+the dependent patches should be reposted for net-next.
 
-Functions like this come in pairs. There is some sort of setup
-function, and a corresponding teardown function. probe/remove,
-open/close. In Linux, if the first fails, the second is never called.
+> diff --git a/net/qrtr/ns.c b/net/qrtr/ns.c
+> index 3de9350cbf30..2bcfe539dc3e 100644
+> --- a/net/qrtr/ns.c
+> +++ b/net/qrtr/ns.c
+> @@ -619,6 +619,9 @@ static void qrtr_ns_worker(struct work_struct *work)
+>  			break;
+>  		}
+>  
+> +		if ((size_t)msglen < sizeof(*pkt))
+> +			break;
 
-	Andrew
+why not continue?
 
