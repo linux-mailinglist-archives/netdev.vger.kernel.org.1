@@ -1,56 +1,61 @@
-Return-Path: <netdev+bounces-214108-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214109-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06C97B284C7
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 19:14:12 +0200 (CEST)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC49FB284D1
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 19:16:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8672AC6162
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 17:13:01 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 647214E5D4D
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 17:16:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF55E30FF0E;
-	Fri, 15 Aug 2025 17:12:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA91B2F9C39;
+	Fri, 15 Aug 2025 17:16:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gClLHy7b"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M2IryycX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A4AB30FF0C
-	for <netdev@vger.kernel.org>; Fri, 15 Aug 2025 17:12:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1AEE2F9C24;
+	Fri, 15 Aug 2025 17:16:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755277979; cv=none; b=tUsc2H5pZg3aL9vF5XaPOaZ0HufB6hHU7Q/pSoWMKC5e6ose+7ENmffg5bkT2ZbaHtjCzM9deWHnFs6Mjo1bgga7JuKv+nRxqgUSTClAzwz2Gk+D7Tc9FiHIoxTN++j+ZjPm8O4JsoxOr8xl2qahnE0D/JGSJq7fJGltDXzHU5k=
+	t=1755278188; cv=none; b=Y5FSxGTUiZpqIKqyFnvBJ4hx0ulmD/HbUy5DYp5wfAi3dtganyi0/DXNjcX9yLfCqBGsmpBKzHM4+uqe3iOXXsds8R+6wE5YCeO2dgXzeAGSzduiafdg2XbGO9GIz2PjHKxg+N3ohR5TCVB4NrNKY77GfPitm2LcnwQqf7pnB9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755277979; c=relaxed/simple;
-	bh=eHDv5Vmq+l8bLS8wfLXZBcj/cD9Byz9OqCLZk2xn0fE=;
+	s=arc-20240116; t=1755278188; c=relaxed/simple;
+	bh=vUSlgNbostwDHn7HetcT1k1vd03/2QSR/Hejw5tNUz8=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=D+Z2wTSgbQOWPfb3U6VENEDRcUQxPiuwsLSfMHkhhRzS2SZqDkrfoIL3aM7LGTZw7Q98dyHBStzYMzWeMc9mQQc0RE2DznfF/t7NspxhPbUa7ye6yNVj74tyguRa7xeLbW8sFy6T1rt749D9RW/kdwFb/X8zp7xW6LE/ivlpD6k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gClLHy7b; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35B68C4CEEB;
-	Fri, 15 Aug 2025 17:12:59 +0000 (UTC)
+	 MIME-Version:Content-Type; b=BYhT7HvygJV0u02jD8I6lQ2v7jBg3nMC/HcFv1GxAzoph9U8leQ326OTaOM6cK6OyZz4zQHjZM3Xm4AJZLtFCNRGRIjnyDCs+qVGiskdjTtU3UJL8+K4y1g853xbajWnWOyx6Y6MBuzQACVynyeL+ay7N88A3u9mvp1jAKk+iSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M2IryycX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE4D2C4CEEB;
+	Fri, 15 Aug 2025 17:16:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755277979;
-	bh=eHDv5Vmq+l8bLS8wfLXZBcj/cD9Byz9OqCLZk2xn0fE=;
+	s=k20201202; t=1755278188;
+	bh=vUSlgNbostwDHn7HetcT1k1vd03/2QSR/Hejw5tNUz8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gClLHy7bslGKQAwscbEb2yHkl97+sNTovRSvohsjEP8vU4Q001f7zA7qpkzci4ZWr
-	 CNWTd/uu1kjZ+k39DBxCTsyXikSPLEfCGG8oa3nRmThEjGDD1kq9mTLaaoHgf7S6bY
-	 czb6g8LfJvZNLJ9cEdArM7cbzbdqRM2fwY8ItXzwU9jKrUil2T6/esl+F4vCH+ZAvT
-	 dyXTO+t8O8g0zc9OcSQe/pqwXIV+/Hxh4UnyHiTpB2CujasuAnVcNO9R4ukQqPjRVk
-	 /0R+K1Bme/oNXXoXfYECL7D6j2NTANNRPXH3cWOLGZB1bxi/8L6LXCYFNzvPca3EK4
-	 RXr+EzS+ROgXw==
-Date: Fri, 15 Aug 2025 10:12:58 -0700
+	b=M2IryycXkmA/OqUaHz2j7xUV83YCDH4tDaM8iHMdrkGYlj/28iHyS9Svgq6Ho1Cx6
+	 ANcsPXPP7ciOZo47Qp1QLrbdBCbOSlbvp/GF2cmtst4e/Y5LUjzyB1G49DC8bkXrwj
+	 YsZ2b2PnpwrUw94qXlKHpL4wv+s+gjmBQSQEcb6EThto1PXvDq5whpBQPOY8OyuDW0
+	 o+2iOyt01ir2AXmbFlkt9UT41UZbWjgTPG3cVAHctx3bKQaayiGmehHI3tMCTbIN2w
+	 RJvTtlP1spSIRKenJwGtplnh5Yq9lk+qyqKCABdak5lxQDh5IoYnyGD+cBic1onoeq
+	 dViKS/ov7YLFw==
+Date: Fri, 15 Aug 2025 10:16:27 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, pavan.chebbi@broadcom.com,
- andrew.gospodarek@broadcom.com, sdf@fomichev.me
-Subject: Re: [PATCH net] bnxt_en: Fix lockdep warning during rmmod
-Message-ID: <20250815101258.37cb17b1@kernel.org>
-In-Reply-To: <20250815170823.4062508-1-michael.chan@broadcom.com>
-References: <20250815170823.4062508-1-michael.chan@broadcom.com>
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: <almasrymina@google.com>, <asml.silence@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, <cratiu@nvidia.com>,
+ <tariqt@nvidia.com>, <parav@nvidia.com>, Christoph Hellwig
+ <hch@infradead.org>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC net-next v3 1/7] queue_api: add support for fetching per
+ queue DMA dev
+Message-ID: <20250815101627.3c0bc59d@kernel.org>
+In-Reply-To: <20250815110401.2254214-3-dtatulea@nvidia.com>
+References: <20250815110401.2254214-2-dtatulea@nvidia.com>
+	<20250815110401.2254214-3-dtatulea@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,23 +65,20 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 15 Aug 2025 10:08:23 -0700 Michael Chan wrote:
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> index 2800a90fba1f..a208c2a73cd6 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> @@ -5332,7 +5332,8 @@ static void bnxt_free_ntp_fltrs(struct bnxt *bp, bool all)
->  {
->  	int i;
->  
-> -	netdev_assert_locked(bp->dev);
-> +	if (bp->dev->reg_state == NETREG_REGISTERED)
-> +		netdev_assert_locked(bp->dev);
->  
->  	/* Under netdev instance lock and all our NAPIs have been disabled.
->  	 * It's safe to delete the hash table.
+On Fri, 15 Aug 2025 14:03:42 +0300 Dragos Tatulea wrote:
+> +static inline struct device *
+> +netdev_queue_get_dma_dev(struct net_device *dev, int idx)
+> +{
+> +	const struct netdev_queue_mgmt_ops *queue_ops = dev->queue_mgmt_ops;
+> +	struct device *dma_dev;
+> +
+> +	if (queue_ops && queue_ops->ndo_queue_get_dma_dev)
+> +		dma_dev = queue_ops->ndo_queue_get_dma_dev(dev, idx);
+> +	else
+> +		dma_dev = dev->dev.parent;
+> +
+> +	return dma_dev && dma_dev->dma_mask ? dma_dev : NULL;
+> +}
 
-netdev_assert_locked_or_invisible()
--- 
-pw-bot: cr
+This really does not have to live in the header file.
 
