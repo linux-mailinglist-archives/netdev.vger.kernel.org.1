@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-214174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214175-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F9D1B286AB
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 21:50:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C98A5B286B2
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 21:51:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A30AA1886EA2
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 19:50:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9FE0B0636B
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 19:50:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16D4D29A9E6;
-	Fri, 15 Aug 2025 19:50:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 363712C0F77;
+	Fri, 15 Aug 2025 19:50:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qSlnMD7L"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q+qhkSiE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E13A426A088;
-	Fri, 15 Aug 2025 19:50:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FEFA2C0F66
+	for <netdev@vger.kernel.org>; Fri, 15 Aug 2025 19:50:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755287405; cv=none; b=Ua1yD1rI+McZrZn4glSoDUnq96WxCNMvkdvXFgofbacuGUgsXzFOKrFVX+4SccQD+awNjscFq3UW4q/mHE+/rG6fz5lm19rC1OogUwPiEFKj1XBKV0+vx3x3kb9aZ6T5TOYtHVkM+lG7Ye9LlaM/RouHfqgha9v4Ci1k1Bjh960=
+	t=1755287406; cv=none; b=SY1u/KdEn697iBBjg6qtemR6GQUYZ+4ew1xAE1A+eFPFOHIhg5KWe+5oA3rtLUt9xm4BzbBmeHfTKjlq7pGKU6C9aJTx8yJfCeVhEPYRdg3OOA3WH430nQcX1/tnxr2KmFd/8r1cwE41A69Z11c9C2OBPUKdRhJm/qxM9UWISfE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755287405; c=relaxed/simple;
-	bh=e0jzt6J6vmxwqhPeZoIbQfaTuNCk0nUAqB7/DUg091Y=;
+	s=arc-20240116; t=1755287406; c=relaxed/simple;
+	bh=xkCxhK9vFWYqwc4geX9ekP7gMh3dl2bc19LP3doowWA=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Hw/eWwiX6+faRF95hG3ogsYvrTvEXj6/I8l1GM1zlO+/rkCN++DRp84s9vNN7XuYGie0pphUmJdf/3QUUfMo8EpA5qN9tuZmTDtIq0HUWHUsgFbqCa7pf0uZbj5bgDrOnSiU0gUE1F5bh7BHygDED7gutA1PBZ/2FrKeXqou8mE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qSlnMD7L; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B833C4CEEB;
-	Fri, 15 Aug 2025 19:50:04 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=f2+LIuTrBm0/bGDggykYKPJYp6P3DirFud75+Zber5PtNt389UimMbEOxM5TdTU8I+HTqRfQATxffJfHHWjxZixuhC+aYIZ5F5cwblwE8fBYiuwyIFIAn+bJFeRufR2MqUh9WWq+hIX1B1WaYOepflEQn5zPRkLXp8UaFnX2qJQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q+qhkSiE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4435C4CEEB;
+	Fri, 15 Aug 2025 19:50:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755287404;
-	bh=e0jzt6J6vmxwqhPeZoIbQfaTuNCk0nUAqB7/DUg091Y=;
+	s=k20201202; t=1755287405;
+	bh=xkCxhK9vFWYqwc4geX9ekP7gMh3dl2bc19LP3doowWA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=qSlnMD7LbBHk6yGRSwlk7YKRQE3A+0DYlMenzLYOTDUpDSnM8TCA4nYlCM35RI5mG
-	 HrON2mQjW0T4njfTnwWArSg312Dk5gntPcCNxVM5eejYy3dG+3ewdn9pbqUzgVdaUz
-	 w94Ex8glVt5tDtwPH2pkP8sJ/6q9OBJf3jsaqaaKGbA7zSOICW8uinybnK08mL8nQd
-	 bazqcCL2WkUJheymxFZVBA7O0LIGr+nibj+PDttFZZAfr2EuIUq85XEnbAQaWFkzxw
-	 3MvX8HQKggFNyE0yXaX5gEOmpcY+16Jxys1YWG3Xu1kMfV07ZO9rs2bsGjNuh/3F7Y
-	 GXu4Y9Ol1TbMg==
+	b=Q+qhkSiEhO1TqkUSX2NRNHRx6cywWXTVZpmvdf9Eh23KHp15BGI8Y7Slvop0SZ6In
+	 Jr9tUA2QqeABzo06xtImzX92oVDenSDKgJFPrKorMC9mdKIs8gchZpoaYZNTrdRoPZ
+	 2aGgOWHixdP6xg3Omk2A9QEVQtOHWHQw0rh2akGbQ41n31XCB9geKER8mHE40I7Nc+
+	 GXsmDXE9Kerghu9o87GJ/IllbM5RPAe3UNRGtg7h3PyyAyfrMRzapbcdMBKpPfbw85
+	 SQ0R6euQi7CLYOeuk+l2cuN9mUWrj+8HSsQ0FBmP7XlEZKn/DwKUE2MNavZRqiD3UC
+	 t60FmXRZn9xIQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADF4D39D0C3D;
-	Fri, 15 Aug 2025 19:50:16 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E5B39D0C3D;
+	Fri, 15 Aug 2025 19:50:18 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,42 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/2] net/mlx5: Support disabling host PFs
+Subject: Re: [PATCH v2 net-next] net: phy: fixed: remove usage of a faux
+ device
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175528741548.1253623.12610948985665011253.git-patchwork-notify@kernel.org>
-Date: Fri, 15 Aug 2025 19:50:15 +0000
-References: <1755112796-467444-1-git-send-email-tariqt@nvidia.com>
-In-Reply-To: <1755112796-467444-1-git-send-email-tariqt@nvidia.com>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, saeedm@nvidia.com,
- leon@kernel.org, mbloch@nvidia.com, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, gal@nvidia.com,
- dtatulea@nvidia.com, danielj@nvidia.com, witu@nvidia.com
+ <175528741674.1253623.1950644109913722977.git-patchwork-notify@kernel.org>
+Date: Fri, 15 Aug 2025 19:50:16 +0000
+References: <e9426bb9-f228-4b99-bc09-a80a958b5a93@gmail.com>
+In-Reply-To: <e9426bb9-f228-4b99-bc09-a80a958b5a93@gmail.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: andrew@lunn.ch, andrew+netdev@lunn.ch, linux@armlinux.org.uk,
+ kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net, edumazet@google.com,
+ netdev@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 13 Aug 2025 22:19:54 +0300 you wrote:
-> Hi,
+On Wed, 13 Aug 2025 21:18:03 +0200 you wrote:
+> A struct mii_bus doesn't need a parent, so we can simplify the code and
+> remove using a faux device. Only difference is the following in sysfs
+> under /sys/class/mdio_bus:
 > 
-> This small series by Daniel adds support for disabling host PFs.
-> If device is capable and configured, the driver won't access vports of
-> disabled host functions.
-> 
-> Regards,
-> Tariq
+> old: fixed-0 -> '../../devices/faux/Fixed MDIO bus/mdio_bus/fixed-0'
+> new: fixed-0 -> ../../devices/virtual/mdio_bus/fixed-0
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,1/2] net/mlx5: Query to see if host PF is disabled
-    https://git.kernel.org/netdev/net-next/c/9e84de72aef9
-  - [net-next,2/2] net/mlx5: Support disabling host PFs
-    https://git.kernel.org/netdev/net-next/c/520369ef43a8
+  - [v2,net-next] net: phy: fixed: remove usage of a faux device
+    https://git.kernel.org/netdev/net-next/c/d0f110773d77
 
 You are awesome, thank you!
 -- 
