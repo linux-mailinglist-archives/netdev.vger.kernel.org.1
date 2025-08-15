@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-213914-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213915-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B8F7B274BB
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 03:30:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1FAAB274B7
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 03:30:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DADF91CE0FD0
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 01:30:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C0C8AA0B07
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 01:30:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A196D1448E0;
-	Fri, 15 Aug 2025 01:29:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C232C19D8A8;
+	Fri, 15 Aug 2025 01:29:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UVRzB6Xw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JE7eXqo4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CFAA81ACA
-	for <netdev@vger.kernel.org>; Fri, 15 Aug 2025 01:29:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97EA31990A7;
+	Fri, 15 Aug 2025 01:29:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755221397; cv=none; b=jKHkpvMoBGk1UIHwXX1FfcL7X2wmMh0sNYKJGmSMebiRuQV60++DOYd5QqOEfkZ99s1mTKGrwXIDEtCXxCTghp4dKtbkBPNUHb6M8NaswtdHEwFWGSkuxazna4PS7YvArKzNTBLGskzRz9uYaxdOmnRST/N8aHiXogRV1ILmRJ4=
+	t=1755221398; cv=none; b=uJKeCcvoK3XLlptnaCqfcsxj8FyT8MNzNmb8KeHme6hv4sDTbN2UDQgVogPXOY8hZ6eNUS6QOBY8K5KTdF2I3wkNXiuO3xLW3nZbQjMU4ic34QCDTif1tMxkXGnd0jmce2LGSGx9nsMovUzcgrHLzrTzTZ2+du9BFSp/pqr3YNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755221397; c=relaxed/simple;
-	bh=4im6gS12rESCM9ktaUtVLtDJbxkkUSYNbw+Wep9wRdg=;
+	s=arc-20240116; t=1755221398; c=relaxed/simple;
+	bh=lZQ9QRRVgo42yFVW5XyEOLzKK8kOJQGa4ftxluS2M2k=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=iI/iq067vFlip4vXtI8Me9k7uMRQMZG0SICv5XrkeT0pCxKGKJsDLrjKI1CMS0CyOkGTDOmL/Rz4SURdVS3c0MKaAJzQ17NVJfelB0nHkvfSrJkqxzK2GHykPy6et+xUqIcVLM8kmdQejGmrUW5tveew7ElUrBw/9SzgqTzTQf8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UVRzB6Xw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0A49C4CEED;
-	Fri, 15 Aug 2025 01:29:56 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=Ro8bMQpSe+P50hF4xjdaPI1vfpmz1/hqT8l/AM3F8mICuglAtSn09sBOsYUtZ7uMXbXyyE0mJQcTPwv96n8VjPfCDnyH4UY3s6B40E7vzFBjtmkppdADMnoCiDkPlcNGnDj+N/FCEXwYkgKjjeWKnkMbbq/RQw+xd6UPVTwOf7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JE7eXqo4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 711C6C4CEED;
+	Fri, 15 Aug 2025 01:29:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755221397;
-	bh=4im6gS12rESCM9ktaUtVLtDJbxkkUSYNbw+Wep9wRdg=;
+	s=k20201202; t=1755221398;
+	bh=lZQ9QRRVgo42yFVW5XyEOLzKK8kOJQGa4ftxluS2M2k=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=UVRzB6XwLyu/iY4Z0HL2hInRvi5X71KPBF6EElaKk4sIiHpRackpkJ/iW0w+GTMu+
-	 r/qi+GFw8AtCpIQsW3nFpjGkUPOLHaV2t0Em+ZhRg7vjbYR72cW2vzH8eSlkRi9dxA
-	 Me72MZmmv8o8yFTxX9DjGb/yulhE1TWQ+19PHmZJ4dFuoROoO2LP53GFagtLAFtcv+
-	 G2vpO420MKW9cd357Z+z6LevVnJhj3baCpVZCGTLIIhpNS9MoxM5A0s4OsXn1U2/py
-	 eschEA7rt5x5xmZp/4U8NUN8RIjQJX35UVvFS8ijbp46O1zqvx+sKKhXLZqjYvs7Nv
-	 iJiffYmEa74Ug==
+	b=JE7eXqo4l2LuDKz72HqAjSk3I5Z6uQbuKZMb3EXkrZDLfE2JYt+fdRhQyi/rZXlnv
+	 4W1uUYy6RwsOTjoHxI4/UbmT4OXAvo3uONem28U6cHsrf40DNE57M4QjcFERry9Evq
+	 2fQ1QHpbcrtdZE01bOqUeLSYcoED40ZokZNzVXOzQnofuJYvzO/QQw+LdCDi0ZuQ9s
+	 S03V+s0p1ODKfOAIXPCPRovbsX5wBvRvan2Op7/+SOE1UfA4Dyc64CiUDzBrzmQRA/
+	 vHUOk77xqcDUHene9Vkfu3Kpzw2ogo+wQKJPCv5zlxjsCro+d6W3bk6QsSUPmPunzY
+	 8zaOtlIMDJWEQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70BBE39D0C3E;
-	Fri, 15 Aug 2025 01:30:09 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAEA039D0C3E;
+	Fri, 15 Aug 2025 01:30:10 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,46 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v5 1/2] net/sched: Fix backlog accounting in
- qdisc_dequeue_internal
+Subject: Re: [PATCH net] rtase: Fix Rx descriptor CRC error bit definition
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175522140825.510661.16232160646168789853.git-patchwork-notify@kernel.org>
-Date: Fri, 15 Aug 2025 01:30:08 +0000
-References: <20250812235725.45243-1-will@willsroot.io>
-In-Reply-To: <20250812235725.45243-1-will@willsroot.io>
-To: William Liu <will@willsroot.io>
-Cc: netdev@vger.kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
- pabeni@redhat.com, kuba@kernel.org, jiri@resnulli.us, davem@davemloft.net,
- edumazet@google.com, horms@kernel.org, savy@syst3mfailure.io,
- victor@mojatatu.com
+ <175522140949.510661.17207824271959160883.git-patchwork-notify@kernel.org>
+Date: Fri, 15 Aug 2025 01:30:09 +0000
+References: <20250813071631.7566-1-justinlai0215@realtek.com>
+In-Reply-To: <20250813071631.7566-1-justinlai0215@realtek.com>
+To: Justin Lai <justinlai0215@realtek.com>
+Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, horms@kernel.org, pkshih@realtek.com,
+ larry.chiu@realtek.com
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 12 Aug 2025 23:57:57 +0000 you wrote:
-> This issue applies for the following qdiscs: hhf, fq, fq_codel, and
-> fq_pie, and occurs in their change handlers when adjusting to the new
-> limit. The problem is the following in the values passed to the
-> subsequent qdisc_tree_reduce_backlog call given a tbf parent:
+On Wed, 13 Aug 2025 15:16:31 +0800 you wrote:
+> The CRC error bit is located at bit 17 in the Rx descriptor, but the
+> driver was incorrectly using bit 16. Fix it.
 > 
->    When the tbf parent runs out of tokens, skbs of these qdiscs will
->    be placed in gso_skb. Their peek handlers are qdisc_peek_dequeued,
->    which accounts for both qlen and backlog. However, in the case of
->    qdisc_dequeue_internal, ONLY qlen is accounted for when pulling
->    from gso_skb. This means that these qdiscs are missing a
->    qdisc_qstats_backlog_dec when dropping packets to satisfy the
->    new limit in their change handlers.
-> 
-> [...]
+> Fixes: a36e9f5cfe9e ("rtase: Add support for a pci table in this module")
+> Signed-off-by: Justin Lai <justinlai0215@realtek.com>
+> ---
+>  drivers/net/ethernet/realtek/rtase/rtase.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Here is the summary with links:
-  - [net,v5,1/2] net/sched: Fix backlog accounting in qdisc_dequeue_internal
-    https://git.kernel.org/netdev/net/c/52bf272636bd
-  - [net,v5,2/2] selftests/tc-testing: Check backlog stats in gso_skb case
-    https://git.kernel.org/netdev/net/c/8c06cbdcbaea
+  - [net] rtase: Fix Rx descriptor CRC error bit definition
+    https://git.kernel.org/netdev/net/c/065c31f2c691
 
 You are awesome, thank you!
 -- 
