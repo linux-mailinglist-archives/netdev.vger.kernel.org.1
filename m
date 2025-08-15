@@ -1,112 +1,111 @@
-Return-Path: <netdev+bounces-214213-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214214-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 168ECB28866
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 00:41:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id ED55AB28899
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 00:59:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 640201C883B7
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 22:41:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 68FC71C80F3D
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 22:59:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76C49246766;
-	Fri, 15 Aug 2025 22:41:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 227112882AF;
+	Fri, 15 Aug 2025 22:59:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PtN+LK2e"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ZpjMUgrf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D690317715;
-	Fri, 15 Aug 2025 22:41:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45EB226D4D7
+	for <netdev@vger.kernel.org>; Fri, 15 Aug 2025 22:59:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755297668; cv=none; b=NEIZ9shjww+zt1nW7xT8eR/rnR4+GCh4qPeIkn9uFhC+hAmu+wrbv4G5Mmhnnn/ycwJxYHJH40fpjZ9U5IBLDWkl1gMS76j3ISQKZK+IX68S7Fnqci1Z15oqmXljZJNXpS9kJskvAb8eSFfIM6OqFNoHQY/FQrzn+vApqyPjShw=
+	t=1755298768; cv=none; b=MJnSohLdTZnjcRHDjENS0h8bIN/OPGApw80qwnAtlcims4B+YaBgoISSLxnWDr6/kQtqHV6WSGDA/4TqzUHgOGdlbUv58hnlzErD/Rn0C1LzKGVBU1WXMiy1kO2HJQAg40ZPTTWcRI18JWTIFz7TWeac494v4iXaBVGx9SMlr5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755297668; c=relaxed/simple;
-	bh=uFKEJJOjRDhjSKoXQ6Fe8Zn8RG1bPOxAlF+QEogDX4o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hkbD4dSayMgiDcwF9WavZe90akfi/1QRYsbv4B02Befu5yb+SUVOX9GNs9hZSBGQiWuvvhgvqHEMp0EOEgiXXFtDo6xtFG027GLjJpTYSRux1iC3SMA73aDdj3s552I8Bk6hb4qft/0Y6Ma41nBJ87GN4/qmMVKgky4eA0QLcEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PtN+LK2e; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24505C4CEEB;
-	Fri, 15 Aug 2025 22:41:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755297667;
-	bh=uFKEJJOjRDhjSKoXQ6Fe8Zn8RG1bPOxAlF+QEogDX4o=;
-	h=From:To:Cc:Subject:Date:From;
-	b=PtN+LK2ev2AUcW+NwEZzv6yD3zPVUpPAS4wwhfpKAP37ldhvxzAg2Tg9A/RlBfOUp
-	 5wyB6mfEyUbP8o18TV39lRP1LLMmaxg9H9CvSKvuQ7gj2jH7xAiPGLziyLmq35syWa
-	 zBWhjJcgyyNoS1emzBqqYR+jshYWZ26VeJqECPpcQ935JJCjgsfyeQIIfJWUbCVHMI
-	 9E+P2fgcBpkYT9D8kSVDI0a3iOQk04eJfO5zqpM1OSjOjVVrDtb+9qFg4Yuhw5gwCM
-	 gVqnetbMHs98bjs2HEsCUtxYBUn2a7sl+Z1qxlJw2q+KqsITo2PTOnojDsxJba9cE9
-	 Rz9ttSskS8c1g==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	shuah@kernel.org,
-	willemb@google.com,
-	daniel.zahka@gmail.com,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next] selftests: drv-net: tso: increase the retransmit threshold
-Date: Fri, 15 Aug 2025 15:41:00 -0700
-Message-ID: <20250815224100.363438-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1755298768; c=relaxed/simple;
+	bh=Px+abMeJWBYaaGly0Lg4KDaJId0lPsVCot2eh2Lz3Uc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uUrrJWXPql5e5aGfZd6m+7xr5M1RT75RRXlsC8YwhQLuVsltvZc4Lzucy0uJUk67cpX7dXHYNaFAFL0R5gYT3uZhWx2hOu0BhKL5r4epqYuRLVrZ8u30vrSivQkWuVy6Y76moRR6HskqNXg0rq1QnZz1BS0CQgwk11qvkX+MjcI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ZpjMUgrf; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Jrb0snTQcYUXj15IkTvl9h05o72r0b0mnuGaZvDHwPU=; b=ZpjMUgrfF6DU/+a1TC+dIjMjkc
+	Cb7XYpaykDFEaCabynMG51ma8RW1FIj+ODDfTC5JlTc5jcLTR/WdQDRbzHD6ZrDU1G7q1rsQcSpB1
+	l0lSfqC5LK+XRWLI1h73pELrFZFtG88jTpkJ7dRnlehcAq1WDOQ/dGAEyuNVZp/RlT4k=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1un3OF-004rxh-0B; Sat, 16 Aug 2025 00:59:15 +0200
+Date: Sat, 16 Aug 2025 00:59:14 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Daniel Braunwarth <daniel.braunwarth@kuka.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jon Hunter <jonathanh@nvidia.com>,
+	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	Thierry Reding <treding@nvidia.com>
+Subject: Re: [PATCH net-next] net: phy: realtek: fix RTL8211F wake-on-lan
+ support
+Message-ID: <fa319ca7-d8a6-4a6a-9d10-997594a51420@lunn.ch>
+References: <E1um8Ld-008jxD-Mc@rmk-PC.armlinux.org.uk>
+ <aJx-5qV7qHxk2Uxe@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aJx-5qV7qHxk2Uxe@shell.armlinux.org.uk>
 
-We see quite a few flakes during the TSO test against virtualized
-devices in NIPA. There's often 10-30 retransmissions during the
-test. Sometimes as many as 100. Set the retransmission threshold
-at 1/4th of the wire frame target.
+On Wed, Aug 13, 2025 at 01:02:46PM +0100, Russell King (Oracle) wrote:
+> On Wed, Aug 13, 2025 at 11:04:45AM +0100, Russell King (Oracle) wrote:
+> > +	/* Mark this PHY as wakeup capable and register the interrupt as a
+> > +	 * wakeup IRQ if the PHY is marked as a wakeup source in firmware,
+> > +	 * and the interrupt is valid.
+> > +	 */
+> > +	if (device_property_read_bool(dev, "wakeup-source") &&
+> > +	    phy_interrupt_is_valid(phydev)) {
+> > +		device_set_wakeup_capable(dev, true);
+> > +		devm_pm_set_wake_irq(dev, phydev->irq);
+> > +	}
+> 
+> I'm wondering whether this should just check for the "wakeup-source"
+> property, which would allow for PMEB mode, and if we don't have a valid
+> interrupt, we set the INTB/PMEB pin to PMEB mode here. In other words:
+> 
+> 	if (device_property_read_bool(dev, "wakeup-source")) {
+> 		device_set_wakeup_capable(dev, true);
+> 		if (phy_interrupt_is_valid(phydev)) {
+> 			devm_pm_set_wake_irq(dev, phydev->irq);
+> 		} else {
+> 			ret = phy_modify_paged(phydev, RTL8211F_INTBCR_PAGE,
+> 					       RTL8211F_INTBCR,
+> 					       RTL8211F_INTBCR_INTB_PMEB,
+> 					       RTL8211F_INTBCR_INTB_PMEB);
+> 		}
+> 	}
+> 
+> this would support example 3 in the wakeup-source document, where the
+> PHY is connected to an interrupt-less power management controller.
+> 
+> Any thoughts?
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: shuah@kernel.org
-CC: willemb@google.com
-CC: daniel.zahka@gmail.com
-CC: linux-kselftest@vger.kernel.org
----
- tools/testing/selftests/drivers/net/hw/tso.py | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+I guess you have no way to actually test it?
 
-diff --git a/tools/testing/selftests/drivers/net/hw/tso.py b/tools/testing/selftests/drivers/net/hw/tso.py
-index c13dd5efa27a..0998e68ebaf0 100755
---- a/tools/testing/selftests/drivers/net/hw/tso.py
-+++ b/tools/testing/selftests/drivers/net/hw/tso.py
-@@ -60,16 +60,17 @@ from lib.py import bkg, cmd, defer, ethtool, ip, rand_port, wait_port_listen
-         sock_wait_drain(sock)
-         qstat_new = cfg.netnl.qstats_get({"ifindex": cfg.ifindex}, dump=True)[0]
- 
--        # No math behind the 10 here, but try to catch cases where
--        # TCP falls back to non-LSO.
--        ksft_lt(tcp_sock_get_retrans(sock), 10)
--        sock.close()
--
-         # Check that at least 90% of the data was sent as LSO packets.
-         # System noise may cause false negatives. Also header overheads
-         # will add up to 5% of extra packes... The check is best effort.
-         total_lso_wire  = len(buf) * 0.90 // cfg.dev["mtu"]
-         total_lso_super = len(buf) * 0.90 // cfg.dev["tso_max_size"]
-+
-+        # Make sure we have order of magnitude more LSO packets than
-+        # retransmits, in case TCP retransmitted all the LSO packets.
-+        ksft_lt(tcp_sock_get_retrans(sock), total_lso_wire / 4)
-+        sock.close()
-+
-         if should_lso:
-             if cfg.have_stat_super_count:
-                 ksft_ge(qstat_new['tx-hw-gso-packets'] -
--- 
-2.50.1
+I would probably not support it now. When somebody actually needs it,
+this email exists, it points out how to do it.
 
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+
+    Andrew
 
