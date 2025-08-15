@@ -1,68 +1,102 @@
-Return-Path: <netdev+bounces-213882-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213883-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFAF7B2735A
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 02:11:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F986B273A9
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 02:21:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 830A65E67D5
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 00:11:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06E063A773B
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 00:19:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E63391114;
-	Fri, 15 Aug 2025 00:11:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDA0333985;
+	Fri, 15 Aug 2025 00:18:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b="pZVdPsq0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WFexyq4o"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp153-162.sina.com.cn (smtp153-162.sina.com.cn [61.135.153.162])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4977819A
-	for <netdev@vger.kernel.org>; Fri, 15 Aug 2025 00:11:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=61.135.153.162
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2A4AAD2C;
+	Fri, 15 Aug 2025 00:18:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755216711; cv=none; b=M3DwHx46AdgeVqXZJPxTTaahgeABinCZVnycADB14NNFbD2jb9Wtxrwlzv/AHIzJrKK/y66ARZ8YZTmaZFz7OQNLnyiRbHwyJY2MVo+c5VPVaXVYfvgVc+zQy9wx/+WDGxD5j8maIMXa6p47o1qxLiDORc4atHxGS3/xfKMKcfE=
+	t=1755217126; cv=none; b=oJj7v5bgOeIySRkOdTlzXjrIraBOIaucFYF0qs3PDxvlyy/YYN1yc3fyPgmhZ+xVw7aIHp/9oMzR23kSZpoeDr86dydg2DZ3u4DMWukr+Z9kTj/A4w9MtmVQILgGF8IDS7B8DtTuttsKNtN68auqLwVNK+zVp8BtU9zIYNmALC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755216711; c=relaxed/simple;
-	bh=M7/awrwFW0+lfKMbyVgOnxo2z+jj8zWoxElZ250hLBY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tAVGy1TqtT+B/csxWgIaAGUqmNGbmry1UeyGFFXV1Rop2kcj/UcJ8Lh5SqzR4U2qEl6BYAM2LxUIOiUz7N/WpXxHPQFYXSPGL1ApfBALpQs+fYW2efhwVkxf0TRcvdfd2pbHbgptVJypPlBvVT/6/VBl0ulrhuV6Sp83Y6AX6bs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b=pZVdPsq0; arc=none smtp.client-ip=61.135.153.162
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1755216702;
-	bh=fDqRyFA+mjlN2QT1Fq9xh052KYDrnE6/QdvHVjXFdsg=;
-	h=From:Subject:Date:Message-ID;
-	b=pZVdPsq0JjuECx/fF6Zs8hIQD+MTMQqrPRz+aPEkdyv6vlTcVEqkyYGS22BuimpTt
-	 0606RgcmUp09MHXiWFWLn7ScqQW88+LYqhTAq8BWPs4gesVvwcEu3USUPrl+S4rX+x
-	 CJFcZpCkOu6hpi9cekShs5w0wcYaqNccqBDjJttI=
-X-SMAIL-HELO: localhost.localdomain
-Received: from unknown (HELO localhost.localdomain)([114.249.58.236])
-	by sina.com (10.54.253.31) with ESMTP
-	id 689E7B3300004D9A; Fri, 15 Aug 2025 08:11:34 +0800 (CST)
-X-Sender: hdanton@sina.com
-X-Auth-ID: hdanton@sina.com
-Authentication-Results: sina.com;
-	 spf=none smtp.mailfrom=hdanton@sina.com;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=hdanton@sina.com
-X-SMAIL-MID: 1152966816373
-X-SMAIL-UIID: B585CA0F583C4A35B1986E2EFF5354D0-20250815-081134-1
-From: Hillf Danton <hdanton@sina.com>
-To: syzbot <syzbot+535bbe83dfc3ae8d4be3@syzkaller.appspotmail.com>
-Cc: edumazet@google.com,
+	s=arc-20240116; t=1755217126; c=relaxed/simple;
+	bh=YSHQ0nHVRPFsB93Dabwiu8ozEATJ/8Mr0PnXcpCB98s=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=uvkhhDFAQda5cdgEGqIp8WaFNkgFhLATKhSFTQ86XwTd56a7vRJIo5/oAkjsPvgwwmXtdoQDrsDHalqTKQ733TewL8JzgVwDzahCiPivB0YX74qiDSHfmwSGml3Y40XwFTxvJjTAU3oWJd4knCZlV74jgYN8jIDopH2ocHRm0K4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WFexyq4o; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2445806c2ddso12760205ad.1;
+        Thu, 14 Aug 2025 17:18:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755217124; x=1755821924; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VHJYqmfxyB1ZtjnaSlG3/Xthq2PX+hi9aHfPk8z27kw=;
+        b=WFexyq4oXTNdVCrZZiWbVQWICwor/oZkoM5a+veKqbKqwurJx7uhZ1lYL7puFPtM97
+         T9rvtKBJAsYbiHPn63d3J5+bbBiw3JOkp2I5WjT65ulmhzGK7EPEuPIluAK96iDejfhv
+         V2zPkZOtGQJTbHBBVMZWjBWl4Pwh2CJmtMfswCXNMjjAr13b7E8NqO6PpeUZkbigKcoU
+         KCx41nRvW9HWFqPnSbMqwTM+3kzZD/gCo404E1fvkLfi33sR6GkzSP8tpcwhRB/jGulr
+         CrQI7Hy6dkYHh94XLaJXUeZxntwpyC4mGACMvVe2w2BJWsbrQngtjjNb2jxDouVocTW6
+         N1kA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755217124; x=1755821924;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VHJYqmfxyB1ZtjnaSlG3/Xthq2PX+hi9aHfPk8z27kw=;
+        b=fv/h0ZocVsAzylqVdIiVCJm7Njf9CO019WUyVyf9YCGzUOtnpykH48Aav8HJdBlE6f
+         t4SSn8CLHdNrgjKfBd51EKcfDT6DAu/jdBHPx8sEpynKgwiScaJlojXyVFBuWFj8RyFZ
+         Xg/ZrJkZtOcYpLGVoEDpvvJ/CEOcc7E8F3SsfMx2ypHzgX7ayK/QB6ZXqptCCoiVBoYt
+         KudqcbL3QKThCHiEJN6vAl1sHVrP9/eSLeIrBdLQRc0QGzGiaNKj49fBSOwA5ACbFZ7x
+         Uki4GpRVrst+npYdau/uS34yFRg/I05X0iMwLrRcnAfaVKNYLBOzFwJarsJ3nZptbLEg
+         Kz5w==
+X-Forwarded-Encrypted: i=1; AJvYcCUgsoaZJDIKYGuq2Q0DHSy5umr7lfOGavRJnrK4/oJjDZ7yjktXO7NcY6rhIYsjGOiSHwQvW42d@vger.kernel.org, AJvYcCV4waBbTfD4Kkdkk1wnxhUSzyamXEVXdNwXaBz8niylaEdA1hyX3tPda6NrdXoXPReb4pfHbUjP/tMEt30=@vger.kernel.org, AJvYcCXLZjodCsSgcUl8tE8iPs1zu3sq8ChXlADdwlsC9A+Cbed9JXOF+UMfQJzc/fQXBVAWkdnDsxtNUrc0AmBbLb3w@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx7/w21cXwyEVBgu190U6EzyxA9H1Z/4kYLIzhuN13gmeGj9bNW
+	LLv3CqJoEzQg21bP+qLPQdoNNPEm/vN2vejvp+i8IZatxaJu0CtjrVq35nSHUjk/2aY=
+X-Gm-Gg: ASbGncu7B24+ECxypbG1xrmTpi2ibcWRBw3zgypmr3tllKzAmXxAUwJ9KS9aRUwYFFT
+	F44g6BfJ0Rw3WKTbb3FhR+2BP57aPdzgcSC1fjI3xgz9zerEvKCHtmT0p8F1SLkyeNIkFxGoklR
+	5CFu2oQnUdfTp94GnB4v/a/dGPxSVJuToiAadL7vs2vyv/fokyR+NR10Um1eHprpNUl4JA7XU4n
+	KB1tDlAfnWPhXZ2XyrZBtVV25aNPTRCr6SZLZExYDxzjlXLO/BWo+Ujzo43lAMN3TR8g6XMjg9I
+	AeXb11/kPnwlDBOBj6kt8ucmr05XIXq87X5EbXBUb7MTAfjaw5UaUG/jKUFd/hubthmsn6EEY62
+	dtmFvQ7WvT99kd6t2ipeqSw7Hvw64yx2i7ms/k2ty3Q==
+X-Google-Smtp-Source: AGHT+IFxzhdphiJBS2G/UPMPzKz6foyjIJZMPLW6JxLo23pShrslemm4KTOWFETkoXre0puhmLRAcQ==
+X-Received: by 2002:a17:902:c947:b0:240:aa0:1584 with SMTP id d9443c01a7336-2446d8db8f0mr2125065ad.38.1755217123642;
+        Thu, 14 Aug 2025 17:18:43 -0700 (PDT)
+Received: from soham-laptop.. ([103.182.158.111])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2446d5a451esm700745ad.165.2025.08.14.17.18.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Aug 2025 17:18:43 -0700 (PDT)
+From: Soham Metha <sohammetha01@gmail.com>
+To: linux-kselftest@vger.kernel.org
+Cc: shuah@kernel.org,
+	skhan@linuxfoundation.org,
+	linux-kernel-mentees@lists.linuxfoundation.org,
 	linux-kernel@vger.kernel.org,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-	netdev@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [nfc?] [net?] WARNING in nfc_rfkill_set_block
-Date: Fri, 15 Aug 2025 08:11:21 +0800
-Message-ID: <20250815001123.4558-1-hdanton@sina.com>
-In-Reply-To: <689e6bba.050a0220.e29e5.0003.GAE@google.com>
-References: 
+	Soham Metha <sohammetha01@gmail.com>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org
+Subject: [PATCH 2/6] setftests: net: netfilter: fix spelling mistakes in output
+Date: Fri, 15 Aug 2025 05:47:59 +0530
+Message-Id: <20250815001803.112924-1-sohammetha01@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20250815000859.112169-1-sohammetha01@gmail.com>
+References: <20250815000859.112169-1-sohammetha01@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,101 +105,105 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-On Thu, 14 Aug 2025 16:05:30 -0700
-> Hello,
-> 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    8f5ae30d69d7 Linux 6.17-rc1
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=16c80af0580000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=13f39c6a0380a209
-> dashboard link: https://syzkaller.appspot.com/bug?extid=535bbe83dfc3ae8d4be3
-> compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
-> 
-> Unfortunately, I don't have any reproducer for this issue yet.
-> 
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/46150b6d2447/disk-8f5ae30d.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/1c604b2b2258/vmlinux-8f5ae30d.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/9c542f0972de/bzImage-8f5ae30d.xz
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+535bbe83dfc3ae8d4be3@syzkaller.appspotmail.com
-> 
-> ------------[ cut here ]------------
-> rtmutex deadlock detected
+found/fixed following typos
 
-Even given the lockdep_set_novalidate_class() in device_initialize(),
-rtmutex can detect deadlock (the ABBA one [1]?), weird.
+- add add -> add
+- cannnot -> cannot
+- fowarded -> forwarded
 
-[1] Subject: [PATCH] net/nfc: Fix A-B/B-A deadlock between nfc_unregister_device and rfkill_fop_write
-https://lore.kernel.org/lkml/20250814173142.632749-2-ysk@kzalloc.com/
+in `tools/testing/selftests/net/netfilter/nft_nat.sh`
 
-> WARNING: CPU: 1 PID: 9725 at kernel/locking/rtmutex.c:1674 rt_mutex_handle_deadlock+0x28/0xb0 kernel/locking/rtmutex.c:1674
-> Modules linked in:
-> CPU: 1 UID: 0 PID: 9725 Comm: syz.8.874 Tainted: G        W           6.17.0-rc1-syzkaller #0 PREEMPT_{RT,(full)} 
-> Tainted: [W]=WARN
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
-> RIP: 0010:rt_mutex_handle_deadlock+0x28/0xb0 kernel/locking/rtmutex.c:1674
-> Code: 90 90 41 57 41 56 41 55 41 54 53 83 ff dd 0f 85 8c 00 00 00 48 89 f7 e8 c6 2c 01 00 90 48 c7 c7 a0 08 0b 8b e8 79 08 8b f6 90 <0f> 0b 90 90 4c 8d 3d 00 00 00 00 65 48 8b 1c 25 08 b0 f5 91 4c 8d
-> RSP: 0018:ffffc900043a7950 EFLAGS: 00010246
-> RAX: 89021558f1df5a00 RBX: ffffc900043a79e0 RCX: ffff888025bb3b80
-> RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-> RBP: ffffc900043a7b00 R08: 0000000000000000 R09: 0000000000000000
-> R10: dffffc0000000000 R11: ffffed1017124863 R12: 1ffff92000874f38
-> R13: ffffffff8af82119 R14: ffff888036e55098 R15: dffffc0000000000
-> FS:  00007fec70d5e6c0(0000) GS:ffff8881269c5000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00007fce013b0000 CR3: 000000003ebbc000 CR4: 00000000003526f0
-> Call Trace:
->  <TASK>
->  __rt_mutex_slowlock kernel/locking/rtmutex.c:1734 [inline]
->  __rt_mutex_slowlock_locked kernel/locking/rtmutex.c:1760 [inline]
->  rt_mutex_slowlock+0x692/0x6e0 kernel/locking/rtmutex.c:1800
->  __rt_mutex_lock kernel/locking/rtmutex.c:1815 [inline]
->  __mutex_lock_common kernel/locking/rtmutex_api.c:536 [inline]
->  mutex_lock_nested+0x16a/0x1d0 kernel/locking/rtmutex_api.c:547
->  device_lock include/linux/device.h:911 [inline]
->  nfc_dev_down net/nfc/core.c:143 [inline]
->  nfc_rfkill_set_block+0x50/0x2e0 net/nfc/core.c:179
->  rfkill_set_block+0x1e5/0x450 net/rfkill/core.c:346
->  rfkill_fop_write+0x44e/0x580 net/rfkill/core.c:1301
->  vfs_write+0x287/0xb40 fs/read_write.c:684
->  ksys_write+0x14b/0x260 fs/read_write.c:738
->  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
->  do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> RIP: 0033:0x7fec72afebe9
-> Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-> RSP: 002b:00007fec70d5e038 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-> RAX: ffffffffffffffda RBX: 00007fec72d25fa0 RCX: 00007fec72afebe9
-> RDX: 0000000000000008 RSI: 0000200000000080 RDI: 0000000000000003
-> RBP: 00007fec72b81e19 R08: 0000000000000000 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-> R13: 00007fec72d26038 R14: 00007fec72d25fa0 R15: 00007ffe1f71d718
->  </TASK>
-> 
-> 
-> ---
-> This report is generated by a bot. It may contain errors.
-> See https://goo.gl/tpsmEJ for more information about syzbot.
-> syzbot engineers can be reached at syzkaller@googlegroups.com.
-> 
-> syzbot will keep track of this issue. See:
-> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-> 
-> If the report is already addressed, let syzbot know by replying with:
-> #syz fix: exact-commit-title
-> 
-> If you want to overwrite report's subsystems, reply with:
-> #syz set subsystems: new-subsystem
-> (See the list of subsystem names on the web dashboard)
-> 
-> If the report is a duplicate of another one, reply with:
-> #syz dup: exact-subject-of-another-report
-> 
-> If you want to undo deduplication, reply with:
-> #syz undup
-> 
+Signed-off-by: Soham Metha <sohammetha01@gmail.com>
+---
+ .../testing/selftests/net/netfilter/nft_nat.sh | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/tools/testing/selftests/net/netfilter/nft_nat.sh b/tools/testing/selftests/net/netfilter/nft_nat.sh
+index a954754b99b3..44a8fdf5c19c 100755
+--- a/tools/testing/selftests/net/netfilter/nft_nat.sh
++++ b/tools/testing/selftests/net/netfilter/nft_nat.sh
+@@ -164,7 +164,7 @@ table $family nat {
+ }
+ EOF
+ 	if [ $? -ne 0 ]; then
+-		echo "SKIP: Could not add add $family dnat hook"
++		echo "SKIP: Could not add $family dnat hook"
+ 		return $ksft_skip
+ 	fi
+ 
+@@ -239,7 +239,7 @@ EOF
+ 			test_inet_nat=false
+ 			return $ksft_skip
+ 		fi
+-		echo "SKIP: Could not add add $family dnat hook"
++		echo "SKIP: Could not add $family dnat hook"
+ 		return $ksft_skip
+ 	fi
+ 
+@@ -418,7 +418,7 @@ table $family nat {
+ }
+ EOF
+ 	if [ $? -ne 0 ]; then
+-		echo "SKIP: Could not add add $family masquerade hook"
++		echo "SKIP: Could not add $family masquerade hook"
+ 		return $ksft_skip
+ 	fi
+ 
+@@ -509,7 +509,7 @@ table $family nat {
+ }
+ EOF
+ 	if [ $? -ne 0 ]; then
+-		echo "SKIP: Could not add add $family masquerade hook"
++		echo "SKIP: Could not add $family masquerade hook"
+ 		return $ksft_skip
+ 	fi
+ 
+@@ -569,7 +569,7 @@ test_redirect6()
+ 	ip netns exec "$ns0" sysctl net.ipv6.conf.all.forwarding=1 > /dev/null
+ 
+ 	if ! ip netns exec "$ns2" ping -q -c 1 dead:1::99 > /dev/null;then
+-		echo "ERROR: cannnot ping $ns1 from $ns2 via ipv6"
++		echo "ERROR: cannot ping $ns1 from $ns2 via ipv6"
+ 		lret=1
+ 	fi
+ 
+@@ -598,7 +598,7 @@ table $family nat {
+ }
+ EOF
+ 	if [ $? -ne 0 ]; then
+-		echo "SKIP: Could not add add $family redirect hook"
++		echo "SKIP: Could not add $family redirect hook"
+ 		return $ksft_skip
+ 	fi
+ 
+@@ -673,7 +673,7 @@ table $family nat {
+ }
+ EOF
+ 	if [ $? -ne 0 ]; then
+-		echo "SKIP: Could not add add $family redirect hook"
++		echo "SKIP: Could not add $family redirect hook"
+ 		return $ksft_skip
+ 	fi
+ 
+@@ -844,7 +844,7 @@ table $family nat {
+ }
+ EOF
+ 	if [ $? -ne 0 ]; then
+-		echo "SKIP: Could not add add $family masquerade hook"
++		echo "SKIP: Could not add $family masquerade hook"
+ 		return $ksft_skip
+ 	fi
+ 
+@@ -859,7 +859,7 @@ EOF
+ 	# from router:service bypass connection tracking.
+ 	test_port_shadow_notrack "$family"
+ 
+-	# test nat based mitigation: fowarded packets coming from service port
++	# test nat based mitigation: forwarded packets coming from service port
+ 	# are masqueraded with random highport.
+ 	test_port_shadow_pat "$family"
+ 
+-- 
+2.34.1
+
 
