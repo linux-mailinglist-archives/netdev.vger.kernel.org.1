@@ -1,113 +1,147 @@
-Return-Path: <netdev+bounces-214080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214081-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE940B28299
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 17:06:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C987EB282B1
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 17:09:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF9011889E1B
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 15:05:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42A41AE5512
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 15:08:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8E721FBEBE;
-	Fri, 15 Aug 2025 15:05:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94DD7289810;
+	Fri, 15 Aug 2025 15:08:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kNV2qv0M"
+	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="C1RVc9on"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4176119D081
-	for <netdev@vger.kernel.org>; Fri, 15 Aug 2025 15:05:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5933289807
+	for <netdev@vger.kernel.org>; Fri, 15 Aug 2025 15:08:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755270330; cv=none; b=XrN7XGErkT6l596sT0mDtZzwPk9s5Ppr4fw5R9oEK+MYWGFurhDgIH8aktrOaKKJ6/P7P++z3Csl1cCG1Wyq5oFP/jEgAhMQ5AMicUmETIx7GuLx+mDTBT1N9ReCJlBvbMa/MuEQs588rP4/ji5SLNpQRh4WKpTif56nHTmIsiI=
+	t=1755270518; cv=none; b=sSYWAR09gYrI93DLPnI5VpVX7VcjzLeKw16752QCf7wR8n43q3y5sqxxp2r+bEzAdnVd+enPD/J2Z4lsuFHzOcpB+LDZ1A6JrvLjlu+HrnFPrZWZSZDx45SuJVn0jOrBekp60TH5SxYQiTJZIABX7hs1/olcU31VWidPT1NpIW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755270330; c=relaxed/simple;
-	bh=dKLbDrUReBNfvypVob7Qf4D22jVDFl4udMb8HhtJLTE=;
-	h=From:Content-Type:Mime-Version:Subject:Message-Id:Date:To; b=IWRgdW9RU45cNEZB2ZIwcREMNMjO24doadWVFE4e1OG2FYyirDJGaENMpwj5c173jAkSB1vODU8pXOQwIA/AJ7gxaJ4Yu9wywEEsdcthCusgshhxnXhRkt517Hw5DjbDt/Io3vdbZl0PRvzutJbF0bSf0zrLxToP7cRe5y/LBks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kNV2qv0M; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-24458263458so17802155ad.3
-        for <netdev@vger.kernel.org>; Fri, 15 Aug 2025 08:05:29 -0700 (PDT)
+	s=arc-20240116; t=1755270518; c=relaxed/simple;
+	bh=wxXY4tEGwganMnpiKU8Ayd+L73yT/MpiUpiLzweyTx0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=g87E15sydkVfPuqvdbghntGTcn6fII6daNqW8YEcXk3Lpp1gj7zw5JFIvxEWaOBYtQkuSlH9IymAWoqwtNmfn97XlXOrC0SJd3vfIYqJyJvBVcdZdb/OfFBo0YXxm8gnS6hsHpAHMXJlxz+ecLZCx6DJm1INDDHdYopryKuS02A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=C1RVc9on; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-618896b3ff9so4283134a12.1
+        for <netdev@vger.kernel.org>; Fri, 15 Aug 2025 08:08:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755270328; x=1755875128; darn=vger.kernel.org;
-        h=to:date:message-id:subject:mime-version:content-transfer-encoding
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=dKLbDrUReBNfvypVob7Qf4D22jVDFl4udMb8HhtJLTE=;
-        b=kNV2qv0M0JcMsJoPC0+NRMxuU2WYWwTJ9xAqPmweXCc9vUV9LgfmlrvtmUKc2VfbHy
-         uRLqlgm1mFG2irtwvivDioqg+2D/kDfjVNc8sNe+YbWVsxwHfrqtXKwWmhc/aL+NfK8J
-         gT6PzMvIXOo5tAss7Zlf6ggYlQ2fTKGVW2poeusNjiQrN5Q1tZbjdUT3+RYeB1y40RQM
-         +M7mfRhyZMkxqYKqN0gG6dTGIN9kPeyc2OLcXmeQom/OznxdQ9bag3ssfglB8QuqJb8B
-         KkQEGcFw9ZloHgYV2mw5M6PgyUeztI26g5sBG4nS3UMAL71NbPbzaJ0/ePNEwSzFct+F
-         wnSg==
+        d=blackwall.org; s=google; t=1755270514; x=1755875314; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=DvYymIzLnJigupjUPWkbrLGydSeNzR7fRIJx+eQRmEI=;
+        b=C1RVc9onz/M86sN91Ek7JRoEF86dRLnQdhY0FShJL5A9YAlHQ2ClSsbsvxzmosqedL
+         kAEfrg81xKdPsfwcgf6XXePHbdulXFyTM583GPWP1mtlrFzYQohhm80NXZE9vKKUbikf
+         gO//ln37Tbu9sigNmftbwrX8AOea2gHz7XlB5Je9gRJLoo0a8uyUHsmCsjhWLh+kXtw4
+         UnH7HxAuy0oZ7I/ggSwU/Qu/N3IY3uaLl0H4H3W/SsWvNm4zBmSDybu3XORN7j2bgmnO
+         Avtj8e1Wal6qB/4kNpX49EhJw4RZ2WnlQRaCKuDXvkbTBGH8RFy/N1I4DaVgv4wHUNd9
+         tteA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755270328; x=1755875128;
-        h=to:date:message-id:subject:mime-version:content-transfer-encoding
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dKLbDrUReBNfvypVob7Qf4D22jVDFl4udMb8HhtJLTE=;
-        b=TEqrE/R03Qo9r7vQlGogo+BlM4+s+URfI95r/qPwq+xPMv5ki+bCGuIjZeQNGCNtrH
-         FEG+VBNVrRuuRTW9USdSPDOuIT8sePIOC1qQQ8fqMGPU3w45KXH2SnK0vh+N3JB67BQc
-         o+dIH8Gd9uvbaOpiZ58frVLIfRld4ZisPpKmhG+sJXF8+DGigcQtwesq7o4goisYZ0NM
-         zO0wpU5eHLHyeQcG5Pxe5bjYOiwKOoTCO3ObT7HjxHKaz5eVU2N2gk9SSCggWVmAckgD
-         9ko7FMIcF4C0S2+rW0IWv/mPwx6S21tYR4S9vqYDR9JLBHgwU+U01jkJvpOyNVxjLdhx
-         pCHg==
-X-Gm-Message-State: AOJu0YyKo37StfY/ZCqwuzyLIkM+nKBvP4/ETziwKaXjVp8Gqi9bZufL
-	C7AO46XxCx9CeKg+b1Dwa2kmjThla0GB3Mv3nNAHwMSXLmuIY6/x0FTQsr54/TWo
-X-Gm-Gg: ASbGncuJsfZNpTupPMKk7BFMY++AZT0RtYOHkzLUW868UTnQ4R14j0ZC00bD7DVCSGL
-	1z4ZaHCzPaNOclZFaqlG3CU9ew1oTruGCdhYBWvb3x1Ez8Reg2afnJP5P7sAZYp/yQgvDCTQkFN
-	jwwozjXaazIAy0oz15gvfwqa/H10l0SiEcq+mca15sA9AQHuiLzlrk5IGC2zBsuPi4wiZCXSXEH
-	L/4nYMYDd6FvzKVdmHHXLFgnDehbFrqJrIHqk8LZLO57VJrL7LvLp8kaPqO4Pu4e36ecOuR4mKM
-	/Eq8KE1KVG113IQUiahgrdZR4kMk3GebesYPbL+I8vKctLMhu/T+kOkYGJMc7WlxMUTy/uDhbfb
-	VS2+ccrtxz/NEMSfOjyqoJsmg4li+UFMyIFRxVV7o5bjXGtLJ
-X-Google-Smtp-Source: AGHT+IHzhp1U6GqElUExJVw6sRkTd0dRoS3PDvcVyzc0GyPecRJ/88YyQ93/IMnn4N5MvbkPj9lBeA==
-X-Received: by 2002:a17:903:1252:b0:242:2cad:2f8 with SMTP id d9443c01a7336-2446d748d74mr42033515ad.22.1755270328132;
-        Fri, 15 Aug 2025 08:05:28 -0700 (PDT)
-Received: from smtpclient.apple ([177.189.100.201])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2446ca9d99csm16252735ad.24.2025.08.15.08.05.26
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 15 Aug 2025 08:05:27 -0700 (PDT)
-From: Guilherme Novaes Lima <acc.guilhermenl@gmail.com>
-Content-Type: text/plain;
-	charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+        d=1e100.net; s=20230601; t=1755270514; x=1755875314;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DvYymIzLnJigupjUPWkbrLGydSeNzR7fRIJx+eQRmEI=;
+        b=vA5H+UGXxyVB41J6+VrBxgjT4yhPVaKPh2AdhfGptYFTXCfTCFfGJmrdOGdB4sDwX2
+         hi8ToOa9jlAu2nRLd8upgYI+4HNznTftwe0FqxPxDfx+My5nn/RpTVKBZM8LYpPBBqNm
+         ys+oBdRlWt3JHLgSwzeDHUrQMNyjJrm5h/C0dLoNDEUnA8ZwQQXNgb02ymUI9cSvNQ5i
+         iNEiLiYl7XC3Ypp1L04oGrJyDSsH6p9eFro7Nito/pVpwNm+Ue32K45Hb/KZIRLMnjPC
+         2G35E3BuJWAajHTGh6fRlgRW1eebg11M0BOuxeAvt8xfxR39vTOrDLAZTeUASJwTdifd
+         2oTA==
+X-Forwarded-Encrypted: i=1; AJvYcCXocVs7PJM1v7rABQ5igujNvw4D7rR49yR5F+HjiAbAjWEqqJoL9ERJOJcNJGyVzZTA0PhN/p0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx9NYxRF+f2qrCU9edB4tOlybSYWm3qvWSp7Ql84VixhclocKu2
+	EVUE4P+HcvzSv0ymhnr5vSuC7AOYklxZD6GoZ1oipotCFmM+fT7wdMl5JkVGMgyxAoM=
+X-Gm-Gg: ASbGnct+TtdDrZTwRO4E62BnKAZQSmtH3zgkgqnYN9RTf2+2rHh6oZo7CkgvilZ0uZO
+	E5DDvl2QpZWUKij9NNIk16zGrjRSQTNQUJzlMzUs1I+heqV2qaHbr8lZistrPG8sLVuxjIT228o
+	IDcRJZkmY9g1PHfAGC1BhX2+D74jEAOtUooibCZKFrixWLgdEyNbmJa1B+tfuvB50EDZU5CcID6
+	ssqeRzxvpCbodiXiOPwiK8r8r0Kmj687l9d88EtdgXyJKFuwiLNFkyJjjoC6PZQ8r/7XmiMlU6Q
+	kPA30QVSdjhWfGq/8wfZpA91H9s9w9ImaDuoZxN0rY+WO3BAkOg0rnmcjf0yeJtGN9bgxCt93UD
+	RQgMNz65LLBAwniDxY+gKLMK+nTJ5Ni1IKzeVBKE=
+X-Google-Smtp-Source: AGHT+IGg3ipRv25chD0V0TpD5T6M8dl0rPLRTtfh63vVqHF23z3Qpb+K6dK+mPlUqX6NaiNGb1oPjA==
+X-Received: by 2002:a05:6402:2188:b0:618:780f:e89d with SMTP id 4fb4d7f45d1cf-6189199fa41mr6105149a12.3.1755270513688;
+        Fri, 15 Aug 2025 08:08:33 -0700 (PDT)
+Received: from [100.115.92.205] ([149.62.209.203])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-618b01ae5casm1791561a12.36.2025.08.15.08.08.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 15 Aug 2025 08:08:33 -0700 (PDT)
+Message-ID: <9680221e-e702-41b6-8401-9e940e2f3290@blackwall.org>
+Date: Fri, 15 Aug 2025 18:08:31 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.600.51.1.1\))
-Subject: Seeking guidance on Rust porting for network driver as a learning
- project 
-Message-Id: <355E9163-9274-49C3-98AB-7354B9C091B7@gmail.com>
-Date: Fri, 15 Aug 2025 12:05:14 -0300
-To: netdev@vger.kernel.org
-X-Mailer: Apple Mail (2.3826.600.51.1.1)
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: bridge: remove unused argument of
+ br_multicast_query_expired()
+To: Wang Liang <wangliang74@huawei.com>, idosch@nvidia.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org
+Cc: bridge@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, yuehaibing@huawei.com,
+ zhangchangzhong@huawei.com
+References: <20250814042355.1720755-1-wangliang74@huawei.com>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20250814042355.1720755-1-wangliang74@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello everyone,
+On 8/14/25 07:23, Wang Liang wrote:
+> Since commit 67b746f94ff3 ("net: bridge: mcast: make sure querier
+> port/address updates are consistent"), the argument 'querier' is unused,
+> just get rid of it.
+> 
+> Signed-off-by: Wang Liang <wangliang74@huawei.com>
+> ---
+>   net/bridge/br_multicast.c | 9 +++------
+>   1 file changed, 3 insertions(+), 6 deletions(-)
+> 
+> diff --git a/net/bridge/br_multicast.c b/net/bridge/br_multicast.c
+> index 1377f31b719c..4dc62d01e2d3 100644
+> --- a/net/bridge/br_multicast.c
+> +++ b/net/bridge/br_multicast.c
+> @@ -4049,8 +4049,7 @@ int br_multicast_rcv(struct net_bridge_mcast **brmctx,
+>   }
+>   
+>   static void br_multicast_query_expired(struct net_bridge_mcast *brmctx,
+> -				       struct bridge_mcast_own_query *query,
+> -				       struct bridge_mcast_querier *querier)
+> +				       struct bridge_mcast_own_query *query)
+>   {
+>   	spin_lock(&brmctx->br->multicast_lock);
+>   	if (br_multicast_ctx_vlan_disabled(brmctx))
+> @@ -4069,8 +4068,7 @@ static void br_ip4_multicast_query_expired(struct timer_list *t)
+>   	struct net_bridge_mcast *brmctx = timer_container_of(brmctx, t,
+>   							     ip4_own_query.timer);
+>   
+> -	br_multicast_query_expired(brmctx, &brmctx->ip4_own_query,
+> -				   &brmctx->ip4_querier);
+> +	br_multicast_query_expired(brmctx, &brmctx->ip4_own_query);
+>   }
+>   
+>   #if IS_ENABLED(CONFIG_IPV6)
+> @@ -4079,8 +4077,7 @@ static void br_ip6_multicast_query_expired(struct timer_list *t)
+>   	struct net_bridge_mcast *brmctx = timer_container_of(brmctx, t,
+>   							     ip6_own_query.timer);
+>   
+> -	br_multicast_query_expired(brmctx, &brmctx->ip6_own_query,
+> -				   &brmctx->ip6_querier);
+> +	br_multicast_query_expired(brmctx, &brmctx->ip6_own_query);
+>   }
+>   #endif
+>   
 
-I=E2=80=99m a computer science student working on a graduation project =
-focused on learning more about the Linux kernel and Rust. I understand =
-that the kernel maintainers have been cautious about integrating Rust, =
-and my intention is not to push for any immediate changes, but rather to =
-explore Rust porting as a learning exercise.
+Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
 
-Specifically, I=E2=80=99m interested in working with a network driver to =
-get hands-on experience. My goal is to comply fully with the =
-community=E2=80=99s expectations and guidelines, and to better =
-understand the technical and cultural aspects before considering any =
-real contributions in the future.
-
-If there are any maintainers or experienced folks willing to offer =
-guidance or suggest a suitable driver for this kind of project, I=E2=80=99=
-d be very grateful. I=E2=80=99m not asking anyone to do the work, just =
-hoping to learn and engage respectfully with the community.
-
-Thanks for your time and any advice you can share.
-
-Best regards,
-Guilherme Lima=
 
