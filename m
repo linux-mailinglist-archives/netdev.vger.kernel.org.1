@@ -1,99 +1,102 @@
-Return-Path: <netdev+bounces-213958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-213959-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01E2EB277E1
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 06:50:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7D41B277E3
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 06:51:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6181F1CC5BB7
-	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 04:50:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E52205E22D9
+	for <lists+netdev@lfdr.de>; Fri, 15 Aug 2025 04:51:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 089E21A0BF1;
-	Fri, 15 Aug 2025 04:49:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB76221517C;
+	Fri, 15 Aug 2025 04:51:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tsvXZVaf"
+	dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b="HTLgno2y"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D19C0946A;
-	Fri, 15 Aug 2025 04:49:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from submarine.notk.org (submarine.notk.org [62.210.214.84])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00D0D10942;
+	Fri, 15 Aug 2025 04:51:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.210.214.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755233395; cv=none; b=nesk285GKt33BopHnsqlVYxQCvX0gSjtSGUCCzpQ4Q1E5aqihpo43eD3OBPhOf4WzSFnuxfZPjEyyxnA/fNNap9q9Ymj3QbQ170dy8VtYfxMF6jyqafmsPMhc+7MebS9VpJLaEVnORDUFbJ++JRg9ZncsnanEl2W70jTg5sDbD0=
+	t=1755233481; cv=none; b=BMwJ/6AD9ID7euWcdfWq1KyWsxyLqh4wZqmWY+SL8VC7wJ53et4/PG1n1lWanEIEqxVnDpTEXfnMboSW5A+M6TT8NwviiT8UYBVgMi6wPeTbsCpbwELpq+uFb5bCxpqnPzYnbUDtakihlsJ5zFxCIXJdxrfBNaPbRggSBui1NoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755233395; c=relaxed/simple;
-	bh=C3q/y8MMaQ+0ZqOlJGv+UqBGHlP4qCoeDojB9hW3wg4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=f4lCnguxRJRzVH3awDTdKnv77jC7zDpb7UtHNTw04jX3WFpDESNEujb+uxKPgSEQMoCjaj8jZ3iMgbGr4Gz04oRiW5Zc1y04jr/NqfCqv/l5vd8/An1CMvFRDmzuFRm+klct2XaGrNVUdXC6BQk6ziMe3B3Jev/btixcYXrORsQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tsvXZVaf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48BB6C4CEEB;
-	Fri, 15 Aug 2025 04:49:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755233395;
-	bh=C3q/y8MMaQ+0ZqOlJGv+UqBGHlP4qCoeDojB9hW3wg4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=tsvXZVafto2wLwi1df8rYO8+Yxe5hu0rWL33WJMtBqEOYZRidqdeTNc04L2vaSBy9
-	 B2xgXvk/CnozqkiKeHfbdmHVCb8rzSY1Gg7obhyZmCoU37UnH8QBUQhonRM90Ctx+b
-	 aluvbx7dRwu9Z6Trz4EjjZZr2PCftOS88VojH74s5gpMt+pZZqyUh/zvLWWE38hdne
-	 YwFHD5Ou6ulPLipRG95woj/cOIYufnn8VV/1qAdW9jk6Ad2xGx1rupESexIbmkBY1z
-	 spJmOtgnStNCHiychMU2jGxctR2UWKnfWwj7SfyPFpS/jOdailVQWzOMO09ptClAjq
-	 CzoMAzG5npBZg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADC8C39D0C3B;
-	Fri, 15 Aug 2025 04:50:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1755233481; c=relaxed/simple;
+	bh=+UHYjqlJl2fb1gjhQSzprr6FAHW4wm7uqqAjUMY6fKo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RucTVstJCkJ0FpaasVqyDZ+SGAE1gRGfyz+HSiMjnMOLfVnLvPsRwIH9+zYoXX0MZxsba2UTD5Tuf/R+VKSBc4ulwE+VaEzseVYn/agb3hpQBUdLXtNWrrQKj4JKr2KuJvJJ800d8hUnmiNFK5UJ3nassaiRGvXYcunDckB9YiQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org; spf=pass smtp.mailfrom=codewreck.org; dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b=HTLgno2y; arc=none smtp.client-ip=62.210.214.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codewreck.org
+Received: from gaia.codewreck.org (localhost [127.0.0.1])
+	by submarine.notk.org (Postfix) with ESMTPS id 58D9D14C2D3;
+	Fri, 15 Aug 2025 06:51:14 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org;
+	s=2; t=1755233476;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8uxBniPwyaO+yNFnnHEfGjdgeq+9rf4sD2sPCvixeD8=;
+	b=HTLgno2y3nd+UN7LonYAuK4aFtjsMowRW84yZrbBavcnUHzgBmY4wQj4k4FoaLWhRZ9Wdi
+	CR3kJYCAXWCccz8haAyzQYzVs44GGGqAkxAEDjM35BknSOOxJFdXPVqWQspt2yXEQnNtly
+	XKSd3S5HPlMGTrBI5TU6wa5CTS/g1ATMY4FqLmGjhqUR2hUZ8Knx5iElg2SqsShxb2tYeS
+	mmZj6I9WZ/il9u7zdM48Wb5yRsJn8gJTwCaqaFJ/XqoQNhYsyd1laLzOKszRgfnX59Q8Fh
+	WeHxIcjsEO4AKiO98s09q8i3XHf1BKM0E9RqdDwQy/OagRuuW0DaEaINmtLKxg==
+Received: from localhost (gaia.codewreck.org [local])
+	by gaia.codewreck.org (OpenSMTPD) with ESMTPA id e3824f1a;
+	Fri, 15 Aug 2025 04:51:12 +0000 (UTC)
+Date: Fri, 15 Aug 2025 13:50:57 +0900
+From: Dominique Martinet <asmadeus@codewreck.org>
+To: Nalivayko Sergey <Sergey.Nalivayko@kaspersky.com>
+Cc: v9fs-developer@lists.sourceforge.net, netdev@vger.kernel.org,
+	Eric Van Hensbergen <ericvh@gmail.com>,
+	Wang Hai <wanghai38@huawei.com>,
+	Latchesar Ionkov <lucho@ionkov.net>, lvc-project@linuxtesting.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] net: 9p: fix double req put in p9_fd_cancelled
+Message-ID: <aJ68sV1kH2CQ8eYr@codewreck.org>
+References: <20250715154815.3501030-1-Sergey.Nalivayko@kaspersky.com>
+ <aJ6U3DQn876wGS4C@codewreck.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf] cpumap: disable page_pool direct xdp_return need
- larger
- scope
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175523340651.927837.5280126542856100609.git-patchwork-notify@kernel.org>
-Date: Fri, 15 Aug 2025 04:50:06 +0000
-References: <175519587755.3008742.1088294435150406835.stgit@firesoul>
-In-Reply-To: <175519587755.3008742.1088294435150406835.stgit@firesoul>
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: bpf@vger.kernel.org, kuba@kernel.org, dtatulea@nvidia.com, ast@kernel.org,
- borkmann@iogearbox.net, netdev@vger.kernel.org, eric.dumazet@gmail.com,
- davem@davemloft.net, pabeni@redhat.com, tariqt@nvidia.com, memxor@gmail.com,
- john.fastabend@gmail.com, kernel-team@cloudflare.com, yan@cloudflare.com,
- jbrandeburg@cloudflare.com, carges@cloudflare.com, arzeznik@cloudflare.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <aJ6U3DQn876wGS4C@codewreck.org>
 
-Hello:
-
-This patch was applied to bpf/bpf.git (master)
-by Martin KaFai Lau <martin.lau@kernel.org>:
-
-On Thu, 14 Aug 2025 20:24:37 +0200 you wrote:
-> When running an XDP bpf_prog on the remote CPU in cpumap code
-> then we must disable the direct return optimization that
-> xdp_return can perform for mem_type page_pool.  This optimization
-> assumes code is still executing under RX-NAPI of the original
-> receiving CPU, which isn't true on this remote CPU.
+Dominique Martinet wrote on Fri, Aug 15, 2025 at 11:01:00AM +0900:
+> > Add an explicit check for REQ_STATUS_ERROR in p9_fd_cancelled before
+> > processing the request. Skip processing if the request is already in the error
+> > state, as it has been removed and its resources cleaned up.
 > 
-> The cpumap code already disabled this via helpers
-> xdp_set_return_frame_no_direct() and xdp_clear_return_frame_no_direct(),
-> but the scope didn't include xdp_do_flush().
+> Looking at the other status, it's quite unlikely but if other thread
+> would make it FLSHD we should also skip these -- and I don't think it's
+> possible as far as the logic goes but if it's not sent yet we would have
+> nothing to flush either, so it's probably better to invert the check,
+> and make it `if (req != SENT) return` ?
 > 
-> [...]
+> client.c already checks `READ_ONCE(oldreq->status) == REQ_STATUS_SENT`
+> before calling cancelled but that's without lock, so basically we're
+> checking nothing raced since that check, and it's not limited to RCVD
+> and ERROR.
+> 
+> If you can send a v2 with that I'll pick it up.
 
-Here is the summary with links:
-  - [bpf] cpumap: disable page_pool direct xdp_return need larger scope
-    https://git.kernel.org/bpf/bpf/c/7572a47ebcdf
+Actually it's just as fast if I do it myself, if you have time please
+check this makes sense:
+https://github.com/martinetd/linux/commit/afdaa9f9ea451a935e9b7645fc7ffd93d58cdfed
 
-You are awesome, thank you!
+This is a fix but I don't believe it's urgent (can only happen with a
+bogus server, and while in theory we should aim to be robust to an
+adversary server I don't believe 9p is anywhere near that point), so
+I'll push it along with other fixes next cycle as I missed the 5.17
+train
+
+Thanks,
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Dominique Martinet | Asmadeus
 
