@@ -1,132 +1,125 @@
-Return-Path: <netdev+bounces-214255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214256-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CACAB28A44
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 05:20:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A546B28A5F
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 05:53:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5057C583612
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 03:20:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E728A25964
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 03:53:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D8C418DF9D;
-	Sat, 16 Aug 2025 03:20:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41F261D88A4;
+	Sat, 16 Aug 2025 03:53:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l0CKPJTS"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="B+LtpeGw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7941F374D1
-	for <netdev@vger.kernel.org>; Sat, 16 Aug 2025 03:20:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B983155333;
+	Sat, 16 Aug 2025 03:53:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755314431; cv=none; b=qxgYfA08R28VPNpcS5zvN0+no/X8LCaPx89xVqQI8FKqk8zvDcieBzpab3K+Ah9dziiP3jnkR7fyhxs8NF2AnvkWiNYWJAyNeXs67Y38++b9mHOGtX5Ff3BjscT483SaNOxj/pinIdddcN3uhekaVttLO/cmbrV7Ng7dJFy8aDY=
+	t=1755316422; cv=none; b=Sk71SjzWjpQrDa+iQfXCRlTEj9uIWJJf9dUEaVgWYD+EFLIqnToqHHRSDsan5a3CQoBxl4SnPwa4tgk92VfibA0RRds7mFvwjKJ+4XFFaRMeSKYIwVhXtuM9VE+JgDjoIXLuZIafe/oecCr1q8omXfXSF1hP6HiEG6i6lptpmo8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755314431; c=relaxed/simple;
-	bh=a2JSw+DHVe3QfCBuggx7+YZaLQTcPVI6HXtIH8oetNA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=q0pv9+Oef83jPg+W716AIks9KsFRwQMFYd8xBAeYCIAqt/ltzv893loByJvD+EqY1rrczC/N7sEgH2qYYR/oKXvWHHhl/QhQbOzKUhdmqFoRytuTfbo//WhDa+ow9fgFLRxIa3Km5NRe+uouJXQvXYsjfQmOthzSogG0Nwzt8ss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l0CKPJTS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA33CC4CEEB;
-	Sat, 16 Aug 2025 03:20:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755314431;
-	bh=a2JSw+DHVe3QfCBuggx7+YZaLQTcPVI6HXtIH8oetNA=;
-	h=From:To:Cc:Subject:Date:From;
-	b=l0CKPJTSFYj+Dg58ZcBtg7Wbreofhwn5oK9GTytn/hnFmWSc+SQUV1UOfX0qJs3Hn
-	 0qpYqcOn7mgQ8217j24W4zGzgG4UJ9J/+RwDPxq4HDVdAeNG1W9zXJTGxPtRCYml/L
-	 zTvzNf32bRklYBYMgeO7FJu668hZ89+Co89KM3iiUKf1mHfTQlwgAAhKPC6WwIGmw1
-	 ZcZydvdNDvetwSX10noE1594RBQeOtsh5NoSX6Hc3WBMlSHDaQeN7j2NQEB2Z4Rvdn
-	 xYgQFxYgnI5fcALuLa4IQJnEFGAusoW3ndlYeS8nuksTm0fRo47CXm24YWb+jFEbyr
-	 MXxeXDg5s/xgQ==
-From: Eric Biggers <ebiggers@kernel.org>
-To: netdev@vger.kernel.org,
-	David Ahern <dsahern@gmail.com>,
-	Stephen Hemminger <stephen@networkplumber.org>
-Cc: Andrea Mayer <andrea.mayer@uniroma2.it>,
-	David Lebrun <dlebrun@google.com>,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH iproute2-next v2] man8: ip-sr: Document that passphrase must be high-entropy
-Date: Fri, 15 Aug 2025 20:18:46 -0700
-Message-ID: <20250816031846.483658-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1755316422; c=relaxed/simple;
+	bh=sFof9ZJ265IZSD36dpzx06sjikw+apqRmtPD496v4Lk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XgWERR84V+7rcQqU2lTDLM//8LbAx449GLRgZYxogs/x3gTCYLlwN8FXuYBqWmYoANxOPC2Y3GLoarTA1VkL5+rBf9rYrXLF3ciHaFBe/8auo1zyH0C5IA9gJ+7gTlTlZnfyw++y6oUKT4Z9AGFiHkQXXwYlrCnqoyGRUFLZ0iw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=B+LtpeGw; arc=none smtp.client-ip=115.124.30.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1755316407; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=JIZlq6Vx8PLQbzVJbIEl4PG97O7jQ5b2q+B6qeAr2Jc=;
+	b=B+LtpeGwLF4PR5rKOMpfnaZlRBABz/F1h1aZl2UF2FT7VaG89zUQnZyQqkWXOrTcAHeV6MYKFHXdtDPxdP3z4KrmMw1zPCWxW3DbcaHZhc1K+lno1V8Hi7itnsviN7y7yUKWajoTRupPnXO/RgmiBvJadxTUpMvU5ng/BXEWTow=
+Received: from 30.221.32.119(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0WlqVtem_1755316338 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Sat, 16 Aug 2025 11:53:27 +0800
+Message-ID: <2a98165b-a353-405d-83e0-ffbca1d41340@linux.alibaba.com>
+Date: Sat, 16 Aug 2025 11:52:18 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4] ptp: add Alibaba CIPU PTP clock driver
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: richardcochran@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, xuanzhuo@linux.alibaba.com,
+ dust.li@linux.alibaba.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+ David Woodhouse <dwmw2@infradead.org>
+References: <20250812115321.9179-1-guwen@linux.alibaba.com>
+ <20250815113814.5e135318@kernel.org>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <20250815113814.5e135318@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-'ip sr hmac set' takes a newline-terminated "passphrase", but it fails
-to stretch it.  The "passphrase" actually gets used directly as the key.
-This makes it difficult to use securely.
 
-I recommend deprecating this command and replacing it with a command
-that either stretches the passphrase or explicitly takes a key instead
-of a passphrase.  But for now, let's at least document this pitfall.
 
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
+On 2025/8/16 02:38, Jakub Kicinski wrote:
+> On Tue, 12 Aug 2025 19:53:21 +0800 Wen Gu wrote:
+>> This adds a driver for Alibaba CIPU PTP clock. The CIPU, an underlying
+>> infrastructure of Alibaba Cloud, synchronizes time with reference clocks
+>> continuously and provides PTP clocks for VMs and bare metals in cloud.
+> 
+>> +static struct attribute *ptp_cipu_attrs[] = {
+>> +	&dev_attr_reg_dev_feat.attr,
+>> +	&dev_attr_reg_gst_feat.attr,
+>> +	&dev_attr_reg_drv_ver.attr,
+>> +	&dev_attr_reg_env_ver.attr,
+>> +	&dev_attr_reg_dev_stat.attr,
+>> +	&dev_attr_reg_sync_stat.attr,
+>> +	&dev_attr_reg_tm_prec_ns.attr,
+>> +	&dev_attr_reg_epo_base_yr.attr,
+>> +	&dev_attr_reg_leap_sec.attr,
+>> +	&dev_attr_reg_max_lat_ns.attr,
+>> +	&dev_attr_reg_mt_tout_us.attr,
+>> +	&dev_attr_reg_thresh_us.attr,
+>> +
+>> +	&dev_attr_ptp_gettm.attr,
+>> +	&dev_attr_ptp_gettm_inval_err.attr,
+>> +	&dev_attr_ptp_gettm_tout_err.attr,
+>> +	&dev_attr_ptp_gettm_excd_thresh.attr,
+>> +
+>> +	&dev_attr_dev_clk_abn.attr,
+>> +	&dev_attr_dev_clk_abn_rec.attr,
+>> +	&dev_attr_dev_maint.attr,
+>> +	&dev_attr_dev_maint_rec.attr,
+>> +	&dev_attr_dev_maint_tout.attr,
+>> +	&dev_attr_dev_busy.attr,
+>> +	&dev_attr_dev_busy_rec.attr,
+>> +	&dev_attr_dev_err.attr,
+>> +	&dev_attr_dev_err_rec.attr,
+> 
+> This driver is lacking documentation. You need to describe how the user
+> is expected to interact with the device and document all these sysfs
+> attributes.
+> 
 
-v2: use better example command for key generation
+OK. I will add the description.
 
- man/man8/ip-sr.8 | 20 ++++++++++++++++----
- 1 file changed, 16 insertions(+), 4 deletions(-)
+Would you prefer me to create a related .rst file under Documentation/
+(perhaps in a new Documentation/clock/ptp/ directory?), or add the
+description comments directly in this driver source?
 
-diff --git a/man/man8/ip-sr.8 b/man/man8/ip-sr.8
-index 6be1cc54..cd8c5d18 100644
---- a/man/man8/ip-sr.8
-+++ b/man/man8/ip-sr.8
-@@ -1,6 +1,6 @@
--.TH IP\-SR 8 "14 Apr 2017" "iproute2" "Linux"
-+.TH IP\-SR 8 "15 Aug 2025" "iproute2" "Linux"
- .SH "NAME"
- ip-sr \- IPv6 Segment Routing management
- .SH SYNOPSIS
- .sp
- .ad l
-@@ -32,13 +32,21 @@ internal parameters.
- .PP
- Those parameters include the mapping between an HMAC key ID and its associated
- hashing algorithm and secret, and the IPv6 address to use as source for encapsulated
- packets.
- .PP
--The \fBip sr hmac set\fR command prompts for a passphrase that will be used as the
--HMAC secret for the corresponding key ID. A blank passphrase removes the mapping.
--The currently supported algorithms for \fIALGO\fR are \fBsha1\fR and \fBsha256\fR.
-+The \fBip sr hmac set\fR command prompts for a newline-terminated "passphrase"
-+that will be used as the HMAC secret for the corresponding key ID. This
-+"passphrase" is \fInot\fR stretched, and it is used directly as the HMAC key.
-+Therefore it \fImust\fR have enough entropy to be used as a key. For example, a
-+correct use would be to use a passphrase that was generated using
-+\fBhead\~-c\~32\~/dev/urandom\~|\~base64\~-w\~0\fR.
-+.PP
-+A blank "passphrase" removes the mapping.
-+.PP
-+The currently supported algorithms for \fIALGO\fR are \fBsha1\fR and
-+\fBsha256\fR.
- .PP
- If the tunnel source is set to the address :: (which is the default), then an address
- of the egress interface will be selected. As this operation may hinder performances,
- it is recommended to set a non-default address.
- 
-@@ -52,7 +60,11 @@ it is recommended to set a non-default address.
- .nf
- # ip sr tunsrc set 2001:db8::1
- .SH SEE ALSO
- .br
- .BR ip-route (8)
-+
-+.SH BUGS
-+\fBip sr hmac set\fR does not stretch the passphrase.
-+
- .SH AUTHOR
- David Lebrun <david.lebrun@uclouvain.be>
+> Maybe it's just me, but in general I really wish someone stepped up
+> and created a separate subsystem for all these cloud / vm clocks.
+> They have nothing to do with PTP. In my mind PTP clocks are simple HW
+> tickers on which we build all the time related stuff. While this driver
+> reports the base year for the epoch and leap second status via sysfs.
 
-base-commit: 0ad8fef322365b7bafd052f416fc972bea49d362
--- 
-2.50.1
+These sysfs are intended to provide diagnostics and informations.
+For users, interacting with this PTP clock works the same way as with other
+PTP clock, through the exposed chardev. The 1588 protocol related work has
+been done by the cloud infra so the driver only reads some registers.
 
+Thanks.
 
