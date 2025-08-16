@@ -1,330 +1,166 @@
-Return-Path: <netdev+bounces-214230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214231-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CE34B28901
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 02:03:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 103F7B2891E
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 02:13:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B74AE189D535
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 00:04:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7AEB71C256E2
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 00:10:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8116138B;
-	Sat, 16 Aug 2025 00:03:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19152AD24;
+	Sat, 16 Aug 2025 00:09:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FsrBEdKi"
+	dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b="hTPbelH1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp153-165.sina.com.cn (smtp153-165.sina.com.cn [61.135.153.165])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACA473208;
-	Sat, 16 Aug 2025 00:03:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB0FA27470
+	for <netdev@vger.kernel.org>; Sat, 16 Aug 2025 00:09:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=61.135.153.165
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755302620; cv=none; b=nnXNMJCgKQi8Y4vrfW2v9+ndZf6l+75fgtFteyNEKX0H1h1L0GQlJJFTobJ1iQyv6+1DlU+da9WYwDmv4IVxQJAJVRIcnNQWmVv8a9IVgBGLS6g5d3JRncCeZ2upo2qWl/xnq5fXf1sJ6IUWJfzt4FWUDYb7U3e1tRUUnu9nSls=
+	t=1755302961; cv=none; b=G/4zb4zLSggSEWyw84z2E5+5cMpuEMOdlOuEzOFNsp7grA21q+ATYL7TFEkmELcDLsO0M3D6/PHKScVsfm5YTeARvc3pky157cTOI4xDMJiAUHVl7ZexjdEsbsFEn/53v6LTeFvO7uQDT+oMF7DdEdETECT3MrzcJPTAgVAREfQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755302620; c=relaxed/simple;
-	bh=6XncJXKXHXIOKvYZZECDIMij/FvpiGfYxLAnoc/pj8U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GpjUeIMXUUHq/ZRwkgkaWeBzH2LjnBgfEmTMnfS7GU4b6wq5vvIT94Z+o4uOua9u4ZRFYK4ZPuTr1TeTHa3GMrz+qNkUa95/tnXwKR1KE+aAY0v3Red/cX1PlwOXSR+42M1BVWe7XhK70geiKySXg2uFvulpuOtAIZiYTS7uD80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FsrBEdKi; arc=none smtp.client-ip=209.85.166.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-3e584a51a3fso580915ab.2;
-        Fri, 15 Aug 2025 17:03:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755302617; x=1755907417; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Kc8sqh2x1VrQ8A0LrTywTYFGnzuhVgf0glcrmNBYGR8=;
-        b=FsrBEdKib6FSzOF5X6Kdbpe7o8x0LhKtyA5nxnRJefh7PANSBjEYP7ZrhkZC00mf5Q
-         PwmEUZ8LnhoraczwkjGghdcb+/AcebH9E7L4tgyA9PuRjmCJqjklYVAi94O5RIWGTuGz
-         rsivut/jyr1+bbWKM+Hutgv9ovMTPKDXF4Q8YBS77BrT3cBmKDMMAV7OP/5kgn7egH3v
-         nf69ZTQ7tx6tFOQ4JKXhH80Oy+DcWkUC1RBfgAOekksFDiO3zPqcRxNrgO8dAZPSOyBQ
-         5WM7svueIfbzQYYgmke0yVycj8oY3osjAG1OJlwZ/MZ+rA0IWHPsjNRbSFB1bkn/pSKm
-         D9Ng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755302617; x=1755907417;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Kc8sqh2x1VrQ8A0LrTywTYFGnzuhVgf0glcrmNBYGR8=;
-        b=BTj3M95J3CR8gTSFI4igMrnCsF1Kby/jlqKrGuUb+sHtK9/WnuHqxiDfNBieRiBmKS
-         vNQLBVvYHhMSO0lmgY/6jyG9Aa82WU2O0csuIeHPwtLXk3sBR2Erci88/IjVQAHREZ3/
-         2yHD0rVo3HbAc2Q7aZ2eu7MMNBZQiaNjQgfwPvIxyTqusHjGN13MGivSeCdDWpHaS0na
-         UOuHQ1K6aO7JhIJRRFrifUIt+30VifzYUI3Z6QDtTjhnLslbf/7y4nkHHT6z/mems6jV
-         jaJ6Ca4Q8PauHEofobwXyZCjNpHcCL1k1RA9LkXaFv2TaK3FFL4g8zS4SYoANmHXRqr2
-         GpVA==
-X-Forwarded-Encrypted: i=1; AJvYcCUFJw5UMYlOQk7evCRtH34a8phr2KLRJcu6+0xWbUaz5s7QgBuvHee5iOJQkIq4x5CMKQGAyzwP@vger.kernel.org, AJvYcCVkpS0opVFRqebCHWHSLcsqstrY7y20OwbTsYvIN+wVIfG6Hc7LrwueTR/Kdg0Z2Op2CQI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9yJ+uVclx9kzDu7zwYjESQz5N8w4T+48aUpZkmrItEpMG/k4A
-	CyPm94HoPS+8cXHcqB+X/Ys4uQ195r8swfjYMys/jlEIsfUJocbbbJvSy2egflkYD41VEam4nYK
-	bTqu8azzRsncZh8OwZKRv0/dBZYMTbBQ=
-X-Gm-Gg: ASbGncstrTWX/NcTz9LZpediQTC7d5XmRnLBqDLA26Akc2i1v23IJbVarUQR6dUXH1W
-	9RI7VY75vkm2IjRyK7NqsDA3uHLby1bWl6VGT0YPn1wwj5kVlJjqLQZGZVrzC8nBZfYsVI+QRsn
-	tfaqGz1lLpu3tdJsM+7QFYjGfgP3oX3P1ribweOkZkGgrLQGShWwYcGtG+10J2XDGTJbOOpnzZn
-	nuLpQ==
-X-Google-Smtp-Source: AGHT+IEFgJakZyYeFdOphnfoDM6tWy8x5/ZWyjwSq3E4IIK1yiT+CFpMgxx3z0LTTy4+0uxN/VryqIG4oYSodCngBjg=
-X-Received: by 2002:a05:6e02:1c08:b0:3e5:67a6:d418 with SMTP id
- e9e14a558f8ab-3e57e83d558mr86203435ab.3.1755302617407; Fri, 15 Aug 2025
- 17:03:37 -0700 (PDT)
+	s=arc-20240116; t=1755302961; c=relaxed/simple;
+	bh=F0CG0VqNgeqX8oh+TQB3QzFWHslyU8JjBLjUk9bCwbg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ZNUzwvUVchsRvYqQnmi1pJXeQ2QdoRjIhbXl1cjyzQHhzmW8mLXymxqv2mli/0Zy8w51X/QKBgF7SmJcgscH+pxyUGoaHAaS2Q1E1LEDhXzQmZXVCJGXjHGUVE93dMs4Dgbry8CANjtB/1a5Vxnr3aWpiu09XT8ne4qXs6pIWcE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b=hTPbelH1; arc=none smtp.client-ip=61.135.153.165
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1755302954;
+	bh=bdkGAoWrdbVzcqO40aR6fwo0x6+ClWirQe96L5A0gRY=;
+	h=From:Subject:Date:Message-ID;
+	b=hTPbelH1QT85XvnrxTDL73FkhA+Gc8zuHWOxLl3zKtSykLOWs/GWrir0WIll77y56
+	 LW/MhTDJDNo543xhO2HlkWD0HaDLQFo4xQ63RP7Zo7uK9RpEZPbURDhuzkgrwsATlx
+	 J5vieWYQ+Zb1+a+ZXcJAcNZwwTFyWyg+jsu6F4Is=
+X-SMAIL-HELO: localhost.localdomain
+Received: from unknown (HELO localhost.localdomain)([114.249.58.236])
+	by sina.com (10.54.253.32) with ESMTP
+	id 689FCC2400004CB2; Sat, 16 Aug 2025 08:09:10 +0800 (CST)
+X-Sender: hdanton@sina.com
+X-Auth-ID: hdanton@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=hdanton@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=hdanton@sina.com
+X-SMAIL-MID: 6044754456638
+X-SMAIL-UIID: 66DD780839E84197B5EAAF0360550DC7-20250816-080910-1
+From: Hillf Danton <hdanton@sina.com>
+To: Will Deacon <will@kernel.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+	syzbot <syzbot+b4d960daf7a3c7c2b7b1@syzkaller.appspotmail.com>,
+	jasowang@redhat.com,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	stefanha@redhat.com,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [kvm?] [net?] [virt?] WARNING in virtio_transport_send_pkt_info
+Date: Sat, 16 Aug 2025 08:08:56 +0800
+Message-ID: <20250816000900.4653-1-hdanton@sina.com>
+In-Reply-To: <aJ9WsFovkgZM3z09@willie-the-truck>
+References: <20250812052645-mutt-send-email-mst@kernel.org> <689b1156.050a0220.7f033.011c.GAE@google.com> <20250812061425-mutt-send-email-mst@kernel.org> <aJ8HVCbE-fIoS1U4@willie-the-truck> <20250815063140-mutt-send-email-mst@kernel.org> <aJ8heyq4-RtJAPyI@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250811131236.56206-1-kerneljasonxing@gmail.com>
- <20250811131236.56206-3-kerneljasonxing@gmail.com> <b07b8930-e644-45a2-bef8-06f4494e7a39@kernel.org>
- <aJt+kBqXT/RgLGvR@boxer> <CAL+tcoBrT7WnPP9c+fhRxYyqyf0dZsMAP9=ghvcWRc2rTsF3Ag@mail.gmail.com>
- <CAL+tcoAst1xs=xCLykUoj1=Vj-0LtVyK-qrcDyoy4mQrHgW1kg@mail.gmail.com> <d34bf5f5-9626-442d-bdd2-b3ada51d556e@kernel.org>
-In-Reply-To: <d34bf5f5-9626-442d-bdd2-b3ada51d556e@kernel.org>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Sat, 16 Aug 2025 08:03:01 +0800
-X-Gm-Features: Ac12FXzHr-7YE3J955vos4taAN8VW1TV88KmECh1L813GQLlrASC0m62RmtWDyc
-Message-ID: <CAL+tcoAesfv_SmkQCpijVRM0YRAg9ujYuX4gL1UD3QnjWhD0dw@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/2] xsk: support generic batch xmit in copy mode
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, bjorn@kernel.org, 
-	magnus.karlsson@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me, 
-	ast@kernel.org, daniel@iogearbox.net, john.fastabend@gmail.com, 
-	horms@kernel.org, andrew+netdev@lunn.ch, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Sat, Aug 16, 2025 at 12:40=E2=80=AFAM Jesper Dangaard Brouer <hawk@kerne=
-l.org> wrote:
+On Fri, 15 Aug 2025 16:48:00 +0100 Will Deacon wrote:
+>On Fri, Aug 15, 2025 at 01:00:59PM +0100, Will Deacon wrote:
+>> On Fri, Aug 15, 2025 at 06:44:47AM -0400, Michael S. Tsirkin wrote:
+>> > On Fri, Aug 15, 2025 at 11:09:24AM +0100, Will Deacon wrote:
+>> > > On Tue, Aug 12, 2025 at 06:15:46AM -0400, Michael S. Tsirkin wrote:
+>> > > > On Tue, Aug 12, 2025 at 03:03:02AM -0700, syzbot wrote:
+>> > > > > Hello,
+>> > > > > 
+>> > > > > syzbot has tested the proposed patch but the reproducer is still triggering an issue:
+>> > > > > WARNING in virtio_transport_send_pkt_info
+>> > > > 
+>> > > > OK so the issue triggers on
+>> > > > commit 6693731487a8145a9b039bc983d77edc47693855
+>> > > > Author: Will Deacon <will@kernel.org>
+>> > > > Date:   Thu Jul 17 10:01:16 2025 +0100
+>> > > > 
+>> > > >     vsock/virtio: Allocate nonlinear SKBs for handling large transmit buffers
+>> > > >     
+>> > > > 
+>> > > > but does not trigger on:
+>> > > > 
+>> > > > commit 8ca76151d2c8219edea82f1925a2a25907ff6a9d
+>> > > > Author: Will Deacon <will@kernel.org>
+>> > > > Date:   Thu Jul 17 10:01:15 2025 +0100
+>> > > > 
+>> > > >     vsock/virtio: Rename virtio_vsock_skb_rx_put()
+>> > > >     
+>> > > > 
+>> > > > 
+>> > > > Will, I suspect your patch merely uncovers a latent bug
+>> > > > in zero copy handling elsewhere.
+>> 
+>> I'm still looking at this, but I'm not sure zero-copy is the right place
+>> to focus on.
+>> 
+>> The bisected patch 6693731487a8 ("vsock/virtio: Allocate nonlinear SKBs
+>> for handling large transmit buffers") only has two hunks. The first is
+>> for the non-zcopy case and the latter is a no-op for zcopy, as
+>> skb_len == VIRTIO_VSOCK_SKB_HEADROOM and so we end up with a linear SKB
+>> regardless.
 >
+>It's looking like this is caused by moving from memcpy_from_msg() to
+>skb_copy_datagram_from_iter(), which is necessary to handle non-linear
+>SKBs correctly.
 >
+>In the case of failure (i.e. faulting on the source and returning
+>-EFAULT), memcpy_from_msg() rewinds the message iterator whereas
+>skb_copy_datagram_from_iter() does not. If we have previously managed to
+>transmit some of the packet, then I think
+>virtio_transport_send_pkt_info() can end up returning a positive "bytes
+>written" error code and the caller will call it again. If we've advanced
+>the message iterator, then this can end up with the reported warning if
+>we run out of input data.
 >
-> On 13/08/2025 15.06, Jason Xing wrote:
-> > On Wed, Aug 13, 2025 at 9:02=E2=80=AFAM Jason Xing <kerneljasonxing@gma=
-il.com> wrote:
-> >>
-> >> On Wed, Aug 13, 2025 at 1:49=E2=80=AFAM Maciej Fijalkowski
-> >> <maciej.fijalkowski@intel.com> wrote:
-> >>>
-> >>> On Tue, Aug 12, 2025 at 04:30:03PM +0200, Jesper Dangaard Brouer wrot=
-e:
-> >>>>
-> >>>>
-> >>>> On 11/08/2025 15.12, Jason Xing wrote:
-> >>>>> From: Jason Xing <kernelxing@tencent.com>
-> >>>>>
-> >>>>> Zerocopy mode has a good feature named multi buffer while copy mode=
- has
-> >>>>> to transmit skb one by one like normal flows. The latter might lose=
- the
-> >>>>> bypass power to some extent because of grabbing/releasing the same =
-tx
-> >>>>> queue lock and disabling/enabling bh and stuff on a packet basis.
-> >>>>> Contending the same queue lock will bring a worse result.
-> >>>>>
-> >>>>
-> >>>> I actually think that it is worth optimizing the non-zerocopy mode f=
-or
-> >>>> AF_XDP.  My use-case was virtual net_devices like veth.
-> >>>>
-> >>>>
-> >>>>> This patch supports batch feature by permitting owning the queue lo=
-ck to
-> >>>>> send the generic_xmit_batch number of packets at one time. To furth=
-er
-> >>>>> achieve a better result, some codes[1] are removed on purpose from
-> >>>>> xsk_direct_xmit_batch() as referred to __dev_direct_xmit().
-> >>>>>
-> >>>>> [1]
-> >>>>> 1. advance the device check to granularity of sendto syscall.
-> >>>>> 2. remove validating packets because of its uselessness.
-> >>>>> 3. remove operation of softnet_data.xmit.recursion because it's not
-> >>>>>      necessary.
-> >>>>> 4. remove BQL flow control. We don't need to do BQL control because=
- it
-> >>>>>      probably limit the speed. An ideal scenario is to use a standa=
-lone and
-> >>>>>      clean tx queue to send packets only for xsk. Less competition =
-shows
-> >>>>>      better performance results.
-> >>>>>
-> >>>>> Experiments:
-> >>>>> 1) Tested on virtio_net:
-> >>>>
-> >>>> If you also want to test on veth, then an optimization is to increas=
-e
-> >>>> dev->needed_headroom to XDP_PACKET_HEADROOM (256), as this avoids no=
-n-zc
-> >>>> AF_XDP packets getting reallocated by veth driver. I never completed
-> >>>> upstreaming this[1] before I left Red Hat.  (virtio_net might also b=
-enefit)
-> >>>>
-> >>>>   [1] https://github.com/xdp-project/xdp-project/blob/main/areas/cor=
-e/veth_benchmark04.org
-> >>>>
-> >>>>
-> >>>> (more below...)
-> >>>>
-> >>>>> With this patch series applied, the performance number of xdpsock[2=
-] goes
-> >>>>> up by 33%. Before, it was 767743 pps; while after it was 1021486 pp=
-s.
-> >>>>> If we test with another thread competing the same queue, a 28% incr=
-ease
-> >>>>> (from 405466 pps to 521076 pps) can be observed.
-> >>>>> 2) Tested on ixgbe:
-> >>>>> The results of zerocopy and copy mode are respectively 1303277 pps =
-and
-> >>>>> 1187347 pps. After this socket option took effect, copy mode reache=
-s
-> >>>>> 1472367 which was higher than zerocopy mode impressively.
-> >>>>>
-> >>>>> [2]: ./xdpsock -i eth1 -t  -S -s 64
-> >>>>>
-> >>>>> It's worth mentioning batch process might bring high latency in cer=
-tain
-> >>>>> cases. The recommended value is 32.
-> >>>
-> >>> Given the issue I spotted on your ixgbe batching patch, the compariso=
-n
-> >>> against zc performance is probably not reliable.
-> >>
-> >> I have to clarify the thing: zc performance was tested without that
-> >> series applied. That means without that series, the number is 1303277
-> >> pps. What I used is './xdpsock -i enp2s0f0np0 -t -q 11  -z -s 64'.
-> >
+>As a hack (see below), I tried rewinding the iterator in the error path
+>of skb_copy_datagram_from_iter() but I'm not sure whether other callers
+>would be happy with that. If not, then we could save/restore the
+>iterator state in virtio_transport_fill_skb() if the copy fails. Or we
+>could add a variant of skb_copy_datagram_from_iter(), say
+>skb_copy_datagram_from_iter_full(), which has the rewind behaviour.
 >
-> My i40e device is running at 40Gbit/s.
-> I see significantly higher packet per sec (pps) that you are reporting:
+>What do you think?
 >
-> $ sudo ./xdpsock -i i40e2 --txonly -q 2 -z -s 64
+>Will
 >
->   sock0@i40e2:2 txonly xdp-drv
->                     pps            pkts           1.00
-> rx                 0              0
-> tx                 21,546,859     21,552,896
->
->
-> The "copy" mode (-c/--copy) looks like this:
->
-> $ sudo ./xdpsock -i i40e2 --txonly -q 2 --copy -s 64
->
->   sock0@i40e2:2 txonly xdp-drv
->                     pps            pkts           1.00
-> rx                 0              0
-> tx                 2,135,424      2,136,192
->
->
-> The skb-mode (-S, --xdp-skb) looks like this:
->
-> $ sudo ./xdpsock -i i40e2 --txonly -q 2 --xdp-skb -s 64
->
->   sock0@i40e2:2 txonly xdp-skb
->                     pps            pkts           1.00
-> rx                 0              0
-> tx                 2,187,992      2,188,800
->
->
-> The HUGE performance gap to "xdp-drv" zero-copy mode, tells me that
-> there is a huge potential for improving the performance for the copy
-> mode, both "native" xdp-drv and xdp-skb, cases.
-> Thus, the work your are doing here is important.
+>--->8
 
-Great! Thanks for your affirmation.
+#syz test
 
->
->
-> > ------
-> > @Maciej Fijalkowski
-> > Interesting thing is that copy mode is way worse than zerocopy if the
-> > nic is _i40e_.
-> >
-> > With ixgbe, even copy mode reaches nearly 50-60% of the full speed
-> > (which is only 1Gb/sec) while either zc or batch version copy mode
-> > reaches 70%.
-> > With i40e, copy mode only reaches nearly 9% while zc mode 70%. i40e
-> > has a much faster speed (10Gb/sec) comparatively.
-> >
-> > Here are some summaries (budget 32, batch 32):
-> >                 copy       batch         zc
-> > i40e       1,777,859   2,102,579   14,880,643
-> > ixgbe      1,187,347   1,472,367    1,303,277
-> >
-> (added thousands separators to make above readable)
->
-> Those number only make sense if
->   i40e runs at link speed 10Git/s and
->   ixgbe runs at link speed 1Gbit/s
->
->
-> > For i40e, here are numbers around the batch copy mode (budget is 128):
-> > no batch       batch 64
-> > 1825027      2228328.
-> > Side note: 2228328 seems to be the max limit in copy mode with this
-> > series applied after testing with different settings.
-> >
-> > It turns out that testing on i40e is definitely needed because the
-> > xdpsock test hits the bottleneck on ixgbe.
-> >
-> > -----
-> > @Jesper Dangaard Brouer
-> > In terms of the 'more' boolean as Jesper said, related drivers might
-> > need changes like this because in the 'for' loop of the batch process
-> > in xsk_direct_xmit_batch(), drivers may fail to send and then break
-> > the 'for' loop, which leads to no chance to kick the hardware.
->
-> If sending with 'more' indicator and driver fail to send, then it is the
-> responsibility of the driver to update the tail-ptr/doorbell.
-> Example for ixgbe driver:
->   https://elixir.bootlin.com/linux/v6.16/source/drivers/net/ethernet/inte=
-l/ixgbe/ixgbe_main.c#L8879-L8880
-
-Thanks for sharing this. I'm learning :)
-
->
-> > Or we
-> > can keep trying to send in xsk_direct_xmit_batch() instead of breaking
-> > immediately even if the driver becomes busy right now.
-> >
-> > As to ixgbe, the performance doesn't improve as I analyzed (because it
-> > already reaches 70% of full speed).
-> >
->
-> If ixgbe runs at 1Gbit/s then remember Ethernet wire-speed is 1.488
-> Mpps. Thus, you are much closer than 70% to wire-speed.
-
-Right. 70% probably is the maximum number that xdpsock can reach.
-
->
->
-> > As to i40e, only adding 'more' logic, the number goes from 2102579 to
-> > 2585224 with the 32 batch and 32 budget settings. The number goes from
-> > 2200013 to 2697313 with the  batch and 64 budget settings. See! 22+%
-> > improvement!
->
-> That is a very big performance gain IMHO. Shows that avoiding the tail-
-> ptr/doorbell between each packet have a huge benefit.
-
-That's right, and I will include it into the series as you suggested. Thank=
-s!
-
->
-> > As to virtio_net, no obvious change here probably because the hardirq
-> > logic doesn't have a huge effect.
-> >
->
-> Perhaps virtio_net doesn't implement the SKB 'more' feature?
-
-Oh, let me investigate it more deeply.
-
-BTW, I'm not sure if you missed the previous last email, what do you
-think of socket level accounting after reading that reply?
-
-Thanks,
-Jason
-
->
-> --Jesper
->
+diff --git a/net/core/datagram.c b/net/core/datagram.c
+index 94cc4705e91d..62e44ab136b7 100644
+--- a/net/core/datagram.c
++++ b/net/core/datagram.c
+@@ -551,7 +551,7 @@ int skb_copy_datagram_from_iter(struct sk_buff *skb, int offset,
+ 				 int len)
+ {
+ 	int start = skb_headlen(skb);
+-	int i, copy = start - offset;
++	int i, copy = start - offset, start_off = offset;
+ 	struct sk_buff *frag_iter;
+ 
+ 	/* Copy header. */
+@@ -614,6 +614,7 @@ int skb_copy_datagram_from_iter(struct sk_buff *skb, int offset,
+ 		return 0;
+ 
+ fault:
++	iov_iter_revert(from, offset - start_off);
+ 	return -EFAULT;
+ }
+ EXPORT_SYMBOL(skb_copy_datagram_from_iter);
+--
 
