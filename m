@@ -1,166 +1,93 @@
-Return-Path: <netdev+bounces-214231-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214232-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 103F7B2891E
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 02:13:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 33BA1B28929
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 02:18:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7AEB71C256E2
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 00:10:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A63251CC0C17
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 00:19:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19152AD24;
-	Sat, 16 Aug 2025 00:09:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF9771FC3;
+	Sat, 16 Aug 2025 00:18:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b="hTPbelH1"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="MjkUJ0rH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp153-165.sina.com.cn (smtp153-165.sina.com.cn [61.135.153.165])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB0FA27470
-	for <netdev@vger.kernel.org>; Sat, 16 Aug 2025 00:09:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=61.135.153.165
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3992010957;
+	Sat, 16 Aug 2025 00:18:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755302961; cv=none; b=G/4zb4zLSggSEWyw84z2E5+5cMpuEMOdlOuEzOFNsp7grA21q+ATYL7TFEkmELcDLsO0M3D6/PHKScVsfm5YTeARvc3pky157cTOI4xDMJiAUHVl7ZexjdEsbsFEn/53v6LTeFvO7uQDT+oMF7DdEdETECT3MrzcJPTAgVAREfQ=
+	t=1755303516; cv=none; b=tyX/UeOMbyZ2IjAWRqqjpZ2jvJ4ty77NQ+1okIZ42upr1LGI6ckfQlknync78x8+wHBc1QxIwRUlLXRks2/+OoKAe0eyRSrqsJh2BfkBPxzrRIk0S8iRcDZagBRAuMDE1S+U2Vi2QSZpEo6Jh2JrKhFN2xUfX+ebMQSrPvUTWUs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755302961; c=relaxed/simple;
-	bh=F0CG0VqNgeqX8oh+TQB3QzFWHslyU8JjBLjUk9bCwbg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZNUzwvUVchsRvYqQnmi1pJXeQ2QdoRjIhbXl1cjyzQHhzmW8mLXymxqv2mli/0Zy8w51X/QKBgF7SmJcgscH+pxyUGoaHAaS2Q1E1LEDhXzQmZXVCJGXjHGUVE93dMs4Dgbry8CANjtB/1a5Vxnr3aWpiu09XT8ne4qXs6pIWcE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b=hTPbelH1; arc=none smtp.client-ip=61.135.153.165
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1755302954;
-	bh=bdkGAoWrdbVzcqO40aR6fwo0x6+ClWirQe96L5A0gRY=;
-	h=From:Subject:Date:Message-ID;
-	b=hTPbelH1QT85XvnrxTDL73FkhA+Gc8zuHWOxLl3zKtSykLOWs/GWrir0WIll77y56
-	 LW/MhTDJDNo543xhO2HlkWD0HaDLQFo4xQ63RP7Zo7uK9RpEZPbURDhuzkgrwsATlx
-	 J5vieWYQ+Zb1+a+ZXcJAcNZwwTFyWyg+jsu6F4Is=
-X-SMAIL-HELO: localhost.localdomain
-Received: from unknown (HELO localhost.localdomain)([114.249.58.236])
-	by sina.com (10.54.253.32) with ESMTP
-	id 689FCC2400004CB2; Sat, 16 Aug 2025 08:09:10 +0800 (CST)
-X-Sender: hdanton@sina.com
-X-Auth-ID: hdanton@sina.com
-Authentication-Results: sina.com;
-	 spf=none smtp.mailfrom=hdanton@sina.com;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=hdanton@sina.com
-X-SMAIL-MID: 6044754456638
-X-SMAIL-UIID: 66DD780839E84197B5EAAF0360550DC7-20250816-080910-1
-From: Hillf Danton <hdanton@sina.com>
-To: Will Deacon <will@kernel.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
-	syzbot <syzbot+b4d960daf7a3c7c2b7b1@syzkaller.appspotmail.com>,
-	jasowang@redhat.com,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	stefanha@redhat.com,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [kvm?] [net?] [virt?] WARNING in virtio_transport_send_pkt_info
-Date: Sat, 16 Aug 2025 08:08:56 +0800
-Message-ID: <20250816000900.4653-1-hdanton@sina.com>
-In-Reply-To: <aJ9WsFovkgZM3z09@willie-the-truck>
-References: <20250812052645-mutt-send-email-mst@kernel.org> <689b1156.050a0220.7f033.011c.GAE@google.com> <20250812061425-mutt-send-email-mst@kernel.org> <aJ8HVCbE-fIoS1U4@willie-the-truck> <20250815063140-mutt-send-email-mst@kernel.org> <aJ8heyq4-RtJAPyI@willie-the-truck>
+	s=arc-20240116; t=1755303516; c=relaxed/simple;
+	bh=5egSqttg+zhq6JKFgoxyFAWXu1lGsjRBE1PauwRUfEo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=u2NcnnGIBDj0NyqUhQyaAvFEO7OXsKHiY1ePzpHQ60pCyoiBIylXeQkqrZSePMDpemEBy89KliKRzvZvhf1P/fLRlr7qhOm3mDewFRWeboxZ+ZcPjGCs7IdttWiZ94vPY4He1MvbfdCqjetOxr38yAFSZh7y01ejzus+ySlEGXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=MjkUJ0rH; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=ko1+mkIT7bYw/SCpq1gobXQboTLe77dTl2YpjhZDnOs=; b=MjkUJ0rHyoIO3POmly8MKNLxXJ
+	QukjgnljN238hKfTozbtCWOkWH1TbCHqkwGF93WO2rTZEp6j4wuBiM+1VotuN11KwomVIRtIAWj3i
+	I16/wXcHg91xSLB0Xd0EQQfESYZ8kjsMIM0LsBh1UOlwc/3YEZjRLYYx6c1FIgfIHcUI=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1un4co-004sJx-5R; Sat, 16 Aug 2025 02:18:22 +0200
+Date: Sat, 16 Aug 2025 02:18:22 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Artur Rojek <contact@artur-rojek.eu>
+Cc: Rob Landley <rob@landley.net>, Jeff Dionne <jeff@coresemi.io>,
+	John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 3/3] net: j2: Introduce J-Core EMAC
+Message-ID: <ee607928-1845-47aa-90a1-6511decda49d@lunn.ch>
+References: <20250815194806.1202589-1-contact@artur-rojek.eu>
+ <20250815194806.1202589-4-contact@artur-rojek.eu>
+ <973c6f96-6020-43e0-a7cf-9c129611da13@lunn.ch>
+ <b1a9b50471d80d51691dfbe1c0dbe6fb@artur-rojek.eu>
+ <02ce17e8f00955bab53194a366b9a542@artur-rojek.eu>
+ <fc6ed96e-2bab-4f2f-9479-32a895b9b1b2@lunn.ch>
+ <7a4154eef1cd243e30953d3423e97ab1@artur-rojek.eu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7a4154eef1cd243e30953d3423e97ab1@artur-rojek.eu>
 
-On Fri, 15 Aug 2025 16:48:00 +0100 Will Deacon wrote:
->On Fri, Aug 15, 2025 at 01:00:59PM +0100, Will Deacon wrote:
->> On Fri, Aug 15, 2025 at 06:44:47AM -0400, Michael S. Tsirkin wrote:
->> > On Fri, Aug 15, 2025 at 11:09:24AM +0100, Will Deacon wrote:
->> > > On Tue, Aug 12, 2025 at 06:15:46AM -0400, Michael S. Tsirkin wrote:
->> > > > On Tue, Aug 12, 2025 at 03:03:02AM -0700, syzbot wrote:
->> > > > > Hello,
->> > > > > 
->> > > > > syzbot has tested the proposed patch but the reproducer is still triggering an issue:
->> > > > > WARNING in virtio_transport_send_pkt_info
->> > > > 
->> > > > OK so the issue triggers on
->> > > > commit 6693731487a8145a9b039bc983d77edc47693855
->> > > > Author: Will Deacon <will@kernel.org>
->> > > > Date:   Thu Jul 17 10:01:16 2025 +0100
->> > > > 
->> > > >     vsock/virtio: Allocate nonlinear SKBs for handling large transmit buffers
->> > > >     
->> > > > 
->> > > > but does not trigger on:
->> > > > 
->> > > > commit 8ca76151d2c8219edea82f1925a2a25907ff6a9d
->> > > > Author: Will Deacon <will@kernel.org>
->> > > > Date:   Thu Jul 17 10:01:15 2025 +0100
->> > > > 
->> > > >     vsock/virtio: Rename virtio_vsock_skb_rx_put()
->> > > >     
->> > > > 
->> > > > 
->> > > > Will, I suspect your patch merely uncovers a latent bug
->> > > > in zero copy handling elsewhere.
->> 
->> I'm still looking at this, but I'm not sure zero-copy is the right place
->> to focus on.
->> 
->> The bisected patch 6693731487a8 ("vsock/virtio: Allocate nonlinear SKBs
->> for handling large transmit buffers") only has two hunks. The first is
->> for the non-zcopy case and the latter is a no-op for zcopy, as
->> skb_len == VIRTIO_VSOCK_SKB_HEADROOM and so we end up with a linear SKB
->> regardless.
->
->It's looking like this is caused by moving from memcpy_from_msg() to
->skb_copy_datagram_from_iter(), which is necessary to handle non-linear
->SKBs correctly.
->
->In the case of failure (i.e. faulting on the source and returning
->-EFAULT), memcpy_from_msg() rewinds the message iterator whereas
->skb_copy_datagram_from_iter() does not. If we have previously managed to
->transmit some of the packet, then I think
->virtio_transport_send_pkt_info() can end up returning a positive "bytes
->written" error code and the caller will call it again. If we've advanced
->the message iterator, then this can end up with the reported warning if
->we run out of input data.
->
->As a hack (see below), I tried rewinding the iterator in the error path
->of skb_copy_datagram_from_iter() but I'm not sure whether other callers
->would be happy with that. If not, then we could save/restore the
->iterator state in virtio_transport_fill_skb() if the copy fails. Or we
->could add a variant of skb_copy_datagram_from_iter(), say
->skb_copy_datagram_from_iter_full(), which has the rewind behaviour.
->
->What do you think?
->
->Will
->
->--->8
+> Yes, it's an IC+ IP101ALF 10/100 Ethernet PHY [1]. It does have both MDC
+> and MDIO pins connected, however I suspect that nothing really
+> configures it, and it simply runs on default register values (which
+> allow for valid operation in 100Mb/s mode, it seems). I doubt there is
+> another IP core to handle MDIO, as this SoC design is optimized for
+> minimal utilization of FPGA blocks. Does it make sense to you that a MAC
+> could run without any access to an MDIO bus?
 
-#syz test
+It can work like that. You will likely have problems if the link ever
+negotiates 10Mbps or 100Mbps half duplex. You generally need to change
+something in the MAC to support different speeds and duplex. Without
+being able to talk to the PHY over MDIO you have no idea what it has
+negotiated with the link peer.
 
-diff --git a/net/core/datagram.c b/net/core/datagram.c
-index 94cc4705e91d..62e44ab136b7 100644
---- a/net/core/datagram.c
-+++ b/net/core/datagram.c
-@@ -551,7 +551,7 @@ int skb_copy_datagram_from_iter(struct sk_buff *skb, int offset,
- 				 int len)
- {
- 	int start = skb_headlen(skb);
--	int i, copy = start - offset;
-+	int i, copy = start - offset, start_off = offset;
- 	struct sk_buff *frag_iter;
- 
- 	/* Copy header. */
-@@ -614,6 +614,7 @@ int skb_copy_datagram_from_iter(struct sk_buff *skb, int offset,
- 		return 0;
- 
- fault:
-+	iov_iter_revert(from, offset - start_off);
- 	return -EFAULT;
- }
- EXPORT_SYMBOL(skb_copy_datagram_from_iter);
---
+	Andrew
 
