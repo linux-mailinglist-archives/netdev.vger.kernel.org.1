@@ -1,130 +1,205 @@
-Return-Path: <netdev+bounces-214297-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214298-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85CF1B28C8E
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 11:41:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AAA06B28CEC
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 12:34:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0CAD67B04FA
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 09:39:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 36AF77BDF8E
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 10:33:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96F7426CE29;
-	Sat, 16 Aug 2025 09:40:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F079B28C851;
+	Sat, 16 Aug 2025 10:34:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AQ58s/P5"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aMyeqhKZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A616257831;
-	Sat, 16 Aug 2025 09:40:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 370EE1F4C9F
+	for <netdev@vger.kernel.org>; Sat, 16 Aug 2025 10:34:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755337253; cv=none; b=QqPUvCPM2urU/GriJewtF0pdRl/m3iEERGnQQ6AS41pXGi6F88czg9BTkaEH6xYlrW0LXIKNyNayrjU4rd0UmQ/AoKT1t3PMul6DwOQqGBUh2SNpYNQsN+5BhlUgCnbgB/ZEGUrGb5XXfmiFfmH7mDOM7pQ3SdDqyP5r9qTX9Cs=
+	t=1755340479; cv=none; b=T/ZRXLk5OHN3BipO1tZK7D/trKrHlFe60C2OR3SPhrPIFoJnAy+MjSMWqKuvneIvdgipTft429QtXGG4O4JcwjMfkaRRWnX9SPO5pDedeYXI87aqJY7MhEcrBd6mEHVex22vhEc5dkK0T7U2LMa7BhHdzDi5zSfoG4HFwfiDnVE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755337253; c=relaxed/simple;
-	bh=l/oDk0oKxxbQRqAvrMfls1DCnuSFlvkTrGTMP3IQcus=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UHQpm5NhCoxr3Z6jDAeRQhmdqknIogllAawD9Ce7Y4t8QLuOQDPXeTzEatWz07dKYCMNh+30D9HheozWJn3icVvSwb28KM/3JlF81urSQ6nkI0EJKC439lAd9Ui0MxArgcMWHzW13w7wfjlu4r0C89/GZqb1WVXp8g3kkKjekDM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AQ58s/P5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B621C4CEF5;
-	Sat, 16 Aug 2025 09:40:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755337252;
-	bh=l/oDk0oKxxbQRqAvrMfls1DCnuSFlvkTrGTMP3IQcus=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=AQ58s/P5DY7ez8Y0MciSCXEp8MHktUbGwkxlacUJ+5UkvMe4H+rGW+CsMW2xa+Q+d
-	 KbSKNZvaHBo74KUNjlA7C1AWt2wMSahEHGWeKDTInYHtMJu6b5MA6WftAUpNKb0L2e
-	 9AOkXSZIKslUhMD7oqF9ScLd17vD60rPPDfXulLsR0kmiNhmoLMJXPhCSgwxD+LGvg
-	 XhlyzLKbJHkDLjRD6xHCaau+bCltc2uyInOAAqrVvzh+MwQpvB+CjsainjnGcgUZzW
-	 xM8M+QR4lbxZMkARxGo/0EKIe91xFi44FzH0k4D/tNiXRvK95vhVozbg/YxDWSvaOb
-	 CJ5sw/V/S5ziA==
-Message-ID: <54521b53-4106-4328-973a-78d7bb30bbb8@kernel.org>
-Date: Sat, 16 Aug 2025 11:40:47 +0200
+	s=arc-20240116; t=1755340479; c=relaxed/simple;
+	bh=t9nsA9xxppfh4GuaSr2En7HWIUYMTE5nS0V7EiLZoKE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=O0tT7BneFbehU1j9SM7wQ0zCiIFZkxoWT8kqIJFgUoXAKRzMgsRc0CVBVU64XuDe0XICwzxgQjxuL1Zw+mmD2pfMEvrT+nWh2i/az+WeunRT8GrN53IVuxcVoLeY+ICPHngeU/TWk5puhXCKuzM2ouVtDQtdVXlrIOOw3uvvb+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aMyeqhKZ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1755340477;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TbxBMAjshEeD1LlV1sadxP05g9sf1GmiKcl0uerjKR0=;
+	b=aMyeqhKZiZNZLPd9u4pCo4NZE5UGbLtyztvqGmaFKab8sRiYSbiji+o4LZgR7+6wD8gHC6
+	t/Xax3HczqyOT9bqbLJOXJq0Wr4bQdx7EGZyuRqz95uwPRrkGyQzHHQK2QMuTbgvdE7VQc
+	Xu2IM4Tf5JpXM9BgtykhmwWilEiq760=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-339-pX_9tJydMM2NlkxhUT6YfQ-1; Sat, 16 Aug 2025 06:34:35 -0400
+X-MC-Unique: pX_9tJydMM2NlkxhUT6YfQ-1
+X-Mimecast-MFC-AGG-ID: pX_9tJydMM2NlkxhUT6YfQ_1755340474
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3b9e4146902so1523282f8f.2
+        for <netdev@vger.kernel.org>; Sat, 16 Aug 2025 03:34:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755340474; x=1755945274;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TbxBMAjshEeD1LlV1sadxP05g9sf1GmiKcl0uerjKR0=;
+        b=DMPYv/Idz6eXzBW6ECqXmz4FG2exx23YqcoQdXIf84J/K1WAVtbl6ht/kQNFdbplbq
+         oeSXXnAVIDXdBeaNMQMZ7ytKOaveK04ASnR+VETaRA3vhC/gwjFnztWrtEURr2TsdWwJ
+         NR3VzWN+nVPSmqWHfMf7X1f6p2RCKlkV6OE6whey13ttpUQJ2dhu41xTbMNYQJPvzDoG
+         yyGIN/3baKTpwxA9mtaY5vWp4A5Qm0UxT0Lj5WjhSCotuqaX7iCy3UyXfdafsuDNd/36
+         aFhZYqyxudU4p7eI4xz0Hh/R3TLaOjyhVK4hjNQBxdTF58oWp+eck2evIxlkHypFECWa
+         e3cw==
+X-Forwarded-Encrypted: i=1; AJvYcCUH3xA+PPXo9J0IbXGjJwnSgIBrMItqdxt2Rt+hrPyUfqgOwq0NYfiXkdYltqt8iPgmeWyOBFs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxDVJnz8LLQFfU5xnSxo1tbt1Uat2QZc9z+8Nqp6NEDOgNR/eJX
+	PCtPC4k5FUKYtvA0iDxh39umdIo8zCFfRM8sbXvNx8HBqDp7Sa3JbMKMcb4DmVq9MjTCvFiFhMe
+	2HIZqZiIj3f3K+xxgftHvtki0FgqGoVV3ehtj4GBrxRzD2u+TEqLW2GoyGQ==
+X-Gm-Gg: ASbGncvtFoFQ0sK7bxYrb2TX8m8ZH32lw8b5vYmrEjsmOMbi+BgDI3kuqJ3z7Yi/r6t
+	9pTDuNpIsix5kH23BxGEEvDjRlyjKxxz0InRFTpn/q4vZxt4DVBt9hQrZAJyCEWwBpeYy4ebbQq
+	gW0lBDvRhrRUsOPBS2uJMrs7QmXIYgwOqILKL1jcCSfdYV3EAIfPo0R1/nn3F9uuIFS6Fzyst+o
+	5mc6hz9VOtGMN/KU8Ae4Kpq/t5cXoXL84sK4hRJEKn2j+XSShOwztI+dOCdbGOkNEkL4SUzLYuu
+	4BjorCuon6yM64VJdK/4A6VQ+WExP9aVzNE=
+X-Received: by 2002:a05:6000:24c4:b0:3b7:644f:9ca7 with SMTP id ffacd0b85a97d-3bc694261a0mr1550450f8f.25.1755340473677;
+        Sat, 16 Aug 2025 03:34:33 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHvMJVoF0MSZh9zb0Y1qco87mCLOaf2fgKACdvLYKV1i5IJWFVtigfJ0ROFghywjQv+IIbDVg==
+X-Received: by 2002:a05:6000:24c4:b0:3b7:644f:9ca7 with SMTP id ffacd0b85a97d-3bc694261a0mr1550435f8f.25.1755340473295;
+        Sat, 16 Aug 2025 03:34:33 -0700 (PDT)
+Received: from redhat.com ([2a06:c701:73cf:b700:6c5c:d9e7:553f:9f71])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3bb64d307cfsm5175627f8f.18.2025.08.16.03.34.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 16 Aug 2025 03:34:32 -0700 (PDT)
+Date: Sat, 16 Aug 2025 06:34:29 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Will Deacon <will@kernel.org>
+Cc: syzbot <syzbot+b4d960daf7a3c7c2b7b1@syzkaller.appspotmail.com>,
+	davem@davemloft.net, edumazet@google.com, eperezma@redhat.com,
+	horms@kernel.org, jasowang@redhat.com, kuba@kernel.org,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, pabeni@redhat.com, sgarzare@redhat.com,
+	stefanha@redhat.com, syzkaller-bugs@googlegroups.com,
+	virtualization@lists.linux.dev, xuanzhuo@linux.alibaba.com
+Subject: Re: [syzbot] [kvm?] [net?] [virt?] WARNING in
+ virtio_transport_send_pkt_info
+Message-ID: <20250816063301-mutt-send-email-mst@kernel.org>
+References: <20250812052645-mutt-send-email-mst@kernel.org>
+ <689b1156.050a0220.7f033.011c.GAE@google.com>
+ <20250812061425-mutt-send-email-mst@kernel.org>
+ <aJ8HVCbE-fIoS1U4@willie-the-truck>
+ <20250815063140-mutt-send-email-mst@kernel.org>
+ <aJ8heyq4-RtJAPyI@willie-the-truck>
+ <aJ9WsFovkgZM3z09@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/3] dt-bindings: vendor-prefixes: Document J-Core
-To: Artur Rojek <contact@artur-rojek.eu>, Rob Landley <rob@landley.net>,
- Jeff Dionne <jeff@coresemi.io>,
- John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
- Geert Uytterhoeven <geert+renesas@glider.be>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, Geert Uytterhoeven <geert@linux-m68k.org>
-References: <20250815194806.1202589-1-contact@artur-rojek.eu>
- <20250815194806.1202589-2-contact@artur-rojek.eu>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <20250815194806.1202589-2-contact@artur-rojek.eu>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aJ9WsFovkgZM3z09@willie-the-truck>
 
-On 15/08/2025 21:48, Artur Rojek wrote:
-> J-Core is a clean-room open source processor and SoC design using the
-> SuperH instruction set.
+On Fri, Aug 15, 2025 at 04:48:00PM +0100, Will Deacon wrote:
+> On Fri, Aug 15, 2025 at 01:00:59PM +0100, Will Deacon wrote:
+> > On Fri, Aug 15, 2025 at 06:44:47AM -0400, Michael S. Tsirkin wrote:
+> > > On Fri, Aug 15, 2025 at 11:09:24AM +0100, Will Deacon wrote:
+> > > > On Tue, Aug 12, 2025 at 06:15:46AM -0400, Michael S. Tsirkin wrote:
+> > > > > On Tue, Aug 12, 2025 at 03:03:02AM -0700, syzbot wrote:
+> > > > > > Hello,
+> > > > > > 
+> > > > > > syzbot has tested the proposed patch but the reproducer is still triggering an issue:
+> > > > > > WARNING in virtio_transport_send_pkt_info
+> > > > > 
+> > > > > OK so the issue triggers on
+> > > > > commit 6693731487a8145a9b039bc983d77edc47693855
+> > > > > Author: Will Deacon <will@kernel.org>
+> > > > > Date:   Thu Jul 17 10:01:16 2025 +0100
+> > > > > 
+> > > > >     vsock/virtio: Allocate nonlinear SKBs for handling large transmit buffers
+> > > > >     
+> > > > > 
+> > > > > but does not trigger on:
+> > > > > 
+> > > > > commit 8ca76151d2c8219edea82f1925a2a25907ff6a9d
+> > > > > Author: Will Deacon <will@kernel.org>
+> > > > > Date:   Thu Jul 17 10:01:15 2025 +0100
+> > > > > 
+> > > > >     vsock/virtio: Rename virtio_vsock_skb_rx_put()
+> > > > >     
+> > > > > 
+> > > > > 
+> > > > > Will, I suspect your patch merely uncovers a latent bug
+> > > > > in zero copy handling elsewhere.
+> > 
+> > I'm still looking at this, but I'm not sure zero-copy is the right place
+> > to focus on.
+> > 
+> > The bisected patch 6693731487a8 ("vsock/virtio: Allocate nonlinear SKBs
+> > for handling large transmit buffers") only has two hunks. The first is
+> > for the non-zcopy case and the latter is a no-op for zcopy, as
+> > skb_len == VIRTIO_VSOCK_SKB_HEADROOM and so we end up with a linear SKB
+> > regardless.
 > 
-> The 'jcore' prefix is in use by IP cores originating from this design.
+> It's looking like this is caused by moving from memcpy_from_msg() to
+> skb_copy_datagram_from_iter(), which is necessary to handle non-linear
+> SKBs correctly.
 > 
-> Link: https://j-core.org
-> Reviewed-by: Geert Uytterhoeven <geert@linux-m68k.org>
-> Signed-off-by: Artur Rojek <contact@artur-rojek.eu>
+> In the case of failure (i.e. faulting on the source and returning
+> -EFAULT), memcpy_from_msg() rewinds the message iterator whereas
+> skb_copy_datagram_from_iter() does not. If we have previously managed to
+> transmit some of the packet, then I think
+> virtio_transport_send_pkt_info() can end up returning a positive "bytes
+> written" error code and the caller will call it again. If we've advanced
+> the message iterator, then this can end up with the reported warning if
+> we run out of input data.
+> 
+> As a hack (see below), I tried rewinding the iterator in the error path
+> of skb_copy_datagram_from_iter() but I'm not sure whether other callers
+> would be happy with that. If not, then we could save/restore the
+> iterator state in virtio_transport_fill_skb() if the copy fails. Or we
+> could add a variant of skb_copy_datagram_from_iter(), say
+> skb_copy_datagram_from_iter_full(), which has the rewind behaviour.
+> 
+> What do you think?
+> 
+> Will
 
-Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+It is, at least, self-contained. I don't much like hacking around
+it in virtio_transport_fill_skb. If your patch isn't acceptable,
+skb_copy_datagram_from_iter_full seem like a better approach, I think.
 
-Best regards,
-Krzysztof
+
+> --->8
+> 
+> diff --git a/net/core/datagram.c b/net/core/datagram.c
+> index 94cc4705e91d..62e44ab136b7 100644
+> --- a/net/core/datagram.c
+> +++ b/net/core/datagram.c
+> @@ -551,7 +551,7 @@ int skb_copy_datagram_from_iter(struct sk_buff *skb, int offset,
+>  				 int len)
+>  {
+>  	int start = skb_headlen(skb);
+> -	int i, copy = start - offset;
+> +	int i, copy = start - offset, start_off = offset;
+>  	struct sk_buff *frag_iter;
+>  
+>  	/* Copy header. */
+> @@ -614,6 +614,7 @@ int skb_copy_datagram_from_iter(struct sk_buff *skb, int offset,
+>  		return 0;
+>  
+>  fault:
+> +	iov_iter_revert(from, offset - start_off);
+>  	return -EFAULT;
+>  }
+>  EXPORT_SYMBOL(skb_copy_datagram_from_iter);
+
 
