@@ -1,97 +1,117 @@
-Return-Path: <netdev+bounces-214352-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214354-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6940B290E6
-	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 01:06:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE9A8B290E9
+	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 01:13:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C26617AD7DD
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 23:05:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC394580DA8
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 23:13:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF6C423ABBD;
-	Sat, 16 Aug 2025 23:06:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C115A23E35B;
+	Sat, 16 Aug 2025 23:13:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RcuVuj8i"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kZHHm6Rh"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B42583176E2;
-	Sat, 16 Aug 2025 23:06:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B3DD1B423C
+	for <netdev@vger.kernel.org>; Sat, 16 Aug 2025 23:13:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755385588; cv=none; b=auDSBdytVUtzVim1+Ics43tY5MpYuIN0a/kW1i2iIX4ZeMYvMIv7wVy3JB/DdcjBhJZqSdGQKImjWV+UMd3Me3U/88QhHmziogX5qvnRUMi51SYjYxAkAux64+X/idL2BDBQ0Gc5d/BHdfU3YJrDlbhss2MkOLZeS0iioEch1JY=
+	t=1755385988; cv=none; b=SqlNHDVGlORWFRmCmty8XI6iDgJNRIXFC+jMVIVWE3XBbwf2Ru9tbqmAgqOTu5m/LE+0Y3Luq8TketG3N+fhCDTtLcoBhBzq/5wif3OLIgo/A2EBBeFQtbcKeHb8UPKASwzPgXZjp+elhy16J+IU1Oylcmw9TUTipquq2TrL6eQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755385588; c=relaxed/simple;
-	bh=iSKnB2zZ894IV2ruSrlFuVSXiPxFFjRzOOZWUxvj+Qs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Irt9mSMeGd8jE2ixQuRvKdri3yFWSCGXJCCjsn1N/7MnNRb2cOT2cjAQ0GbZNul2I5mJSDjgetrMetcA+J3zolbtTjT3AeGy41/r6+MhpPhddYsRb4eaOB4IeY91UoRTFD4+idkx1DFTV6eO6uhSH8Imry6c+rLyMoCSHHzzecE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RcuVuj8i; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10163C4CEEF;
-	Sat, 16 Aug 2025 23:06:28 +0000 (UTC)
+	s=arc-20240116; t=1755385988; c=relaxed/simple;
+	bh=6oq/r2Duv8TUJtLlhHnfA58qlBeaNbRXlhksPZnzC4w=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=oMBImnKifX/6/ssJ4vTGjMlMGZXQtgPl5QO5t3LwamgY7n3w9ohojbfNFlBMpN8R5gKcGZUzf2m1RwTggxXnaoAf4EJyMis8OyPxwmE0ZMqEXkb1DGrMA/vtU602tMZbto8xG9mgyMrKLIe8oYm+vGgg6Xr+aSzHoERs5B4koj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kZHHm6Rh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 28B3EC4CEEF;
+	Sat, 16 Aug 2025 23:13:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755385588;
-	bh=iSKnB2zZ894IV2ruSrlFuVSXiPxFFjRzOOZWUxvj+Qs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RcuVuj8iWC1LOVXruzh1iTw7J1+fVWyGVSFT1uUB+DSeSQ6JtyOLcaot6P/ntJkDS
-	 /J3a7ja+Ak4l8PFb3vWIr9UvjcZWLFJjXiIakqp0pXoK9Qx/VuC73hFS7mMHzz+rrX
-	 O+rzlI/6N5f8Kf1MgKUAdmSPOI/Mfe1ARUdbpHUmb0FCo9Qfij/LTfST0v2knlSgJy
-	 KH8IAYi51toR3PCMqW3lJEkejPvcVNqcbJjXiBumiruuTC/ZQpRubDfP7WKnBO2XuW
-	 Q6tWgIt3BrN2ebi/O4FHgZxfTlB92sa7y9vIwgCjGwMiohke7q3vWjVCOs856iGI3p
-	 EC0IEhEpvRabg==
-Date: Sat, 16 Aug 2025 16:06:26 -0700
-From: Drew Fustini <fustini@kernel.org>
-To: Yao Zi <ziyao@disroot.org>
-Cc: Guo Ren <guoren@kernel.org>, Fu Wei <wefu@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Emil Renner Berthing <emil.renner.berthing@canonical.com>,
-	Jisheng Zhang <jszhang@kernel.org>, nux-riscv@lists.infradead.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Han Gao <rabenda.cn@gmail.com>, Han Gao <gaohan@iscas.ac.cn>
-Subject: Re: [PATCH net v3] net: stmmac: thead: Enable TX clock before MAC
- initialization
-Message-ID: <aKEO8gFxUhid/QOX@x1>
-References: <20250815104803.55294-1-ziyao@disroot.org>
+	s=k20201202; t=1755385988;
+	bh=6oq/r2Duv8TUJtLlhHnfA58qlBeaNbRXlhksPZnzC4w=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=kZHHm6Rh0BTLRdE1/ceX89Myb2nD4VINMCI87nThv3wXS7/RaY4dJrvLJXDlZRRiN
+	 QnAlRD3HdCScql9XsgB5qUCfUJNhxk9C9WxI6LJllXYodqUbQUscwcvs4Hm1IioZgk
+	 spEXN0XeXSmndUsZ+sa5mtFmSBSKrqb6+Ui/djAdhlV2HG61DQlFE1I7RyJrEgGo57
+	 qLidM9EmqgWlDdDoZHfooh7Rgf4PD5q8xQi+xpbp/Hb8RvLy3pguDou3pS1HSO2PwL
+	 Dv3zcT6OfKeAar13MWr/sEAW9DaLu3lmNUfg08q+EIxSywUGeOfJIkCBkaWtPCoq+E
+	 BUzcyTvDTkFdw==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15DBACA0EE4;
+	Sat, 16 Aug 2025 23:13:08 +0000 (UTC)
+From: Christoph Paasch via B4 Relay <devnull+cpaasch.openai.com@kernel.org>
+Subject: [PATCH net-next v2 0/2] net: Speedup some nexthop handling when
+ having A LOT of nexthops
+Date: Sat, 16 Aug 2025 16:12:47 -0700
+Message-Id: <20250816-nexthop_dump-v2-0-491da3462118@openai.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250815104803.55294-1-ziyao@disroot.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAG8QoWgC/22NywrDIBREfyXcdS3RvKCr/kcIJeq1uYuoqA0pw
+ X+vuO5yODNnLogYCCM8mgsCHhTJ2RLErQG1rfaNjHTJIFoxtJPomcUzbc6/9Gf3zIyqE/0kpNI
+ GysQHNHRW3QwWU23DUshGMbnwrT8Hr/y/8uCMs1H2nTFGD3JVT+fRrnRXbocl5/wDZKxDo7MAA
+ AA=
+X-Change-ID: 20250724-nexthop_dump-f6c32472bcdf
+To: David Ahern <dsahern@kernel.org>, 
+ Nikolay Aleksandrov <razor@blackwall.org>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@idosch.org>
+Cc: netdev@vger.kernel.org, Christoph Paasch <cpaasch@openai.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1755385987; l=1201;
+ i=cpaasch@openai.com; s=20250712; h=from:subject:message-id;
+ bh=6oq/r2Duv8TUJtLlhHnfA58qlBeaNbRXlhksPZnzC4w=;
+ b=g8diLrmD17CmCr2q08HjVmvpTapBE/z+gcgdw+hgV8J2E7Qjp2+DGqmWfEYkPjfbBy/k8R1KR
+ ScpZCndKkbBC2pnFdEARxR/9uBbYVXZwnxsK9cZbhDX0AOAOU1Fr/7C
+X-Developer-Key: i=cpaasch@openai.com; a=ed25519;
+ pk=1HRHZlVUZPziMZvsAQFvP7n5+uEosTDAjXmNXykdxdg=
+X-Endpoint-Received: by B4 Relay for cpaasch@openai.com/20250712 with
+ auth_id=459
+X-Original-From: Christoph Paasch <cpaasch@openai.com>
+Reply-To: cpaasch@openai.com
 
-On Fri, Aug 15, 2025 at 10:48:03AM +0000, Yao Zi wrote:
-> The clk_tx_i clock must be supplied to the MAC for successful
-> initialization. On TH1520 SoC, the clock is provided by an internal
-> divider configured through GMAC_PLLCLK_DIV register when using RGMII
-> interface. However, currently we don't setup the divider before
-> initialization of the MAC, resulting in DMA reset failures if the
-> bootloader/firmware doesn't enable the divider,
-> 
-> [    7.839601] thead-dwmac ffe7060000.ethernet eth0: Register MEM_TYPE_PAGE_POOL RxQ-0
-> [    7.938338] thead-dwmac ffe7060000.ethernet eth0: PHY [stmmac-0:02] driver [RTL8211F Gigabit Ethernet] (irq=POLL)
-> [    8.160746] thead-dwmac ffe7060000.ethernet eth0: Failed to reset the dma
-> [    8.170118] thead-dwmac ffe7060000.ethernet eth0: stmmac_hw_setup: DMA engine initialization failed
-> [    8.179384] thead-dwmac ffe7060000.ethernet eth0: __stmmac_open: Hw setup failed
-> 
-> Let's simply write GMAC_PLLCLK_DIV_EN to GMAC_PLLCLK_DIV to enable the
-> divider before MAC initialization. Note that for reconfiguring the
-> divisor, the divider must be disabled first and re-enabled later to make
-> sure the new divisor take effect.
-> 
-> The exact clock rate doesn't affect MAC's initialization according to my
-> test. It's set to the speed required by RGMII when the linkspeed is
-> 1Gbps and could be reclocked later after link is up if necessary.
-> 
-> Fixes: 33a1a01e3afa ("net: stmmac: Add glue layer for T-HEAD TH1520 SoC")
-> Signed-off-by: Yao Zi <ziyao@disroot.org>
+Configuring a very large number of nexthops is fairly possible within a
+reasonable time-frame. But, certain netlink commands can become
+extremely slow.
 
-Reviewed-by: Drew Fustini <fustini@kernel.org>
+This series addresses some of these, namely dumping and removing
+nexthops.
+
+Signed-off-by: Christoph Paasch <cpaasch@openai.com>
+---
+Changes in v2:
+- Added another improvement to the series "net: When removing nexthops,
+  don't call synchronize_net if it is not necessary"
+- Fixed typos, made comments within 80-character limit and unified
+  comment-style. (Ido Schimmel)
+- Removed if (nh->id < s_idx) in the for-loop as it is no more needed.
+  (Ido Schimmel)
+- Link to v1: https://lore.kernel.org/r/20250724-nexthop_dump-v1-1-6b43fffd5bac@openai.com
+
+---
+Christoph Paasch (2):
+      net: Make nexthop-dumps scale linearly with the number of nexthops
+      net: When removing nexthops, don't call synchronize_net if it is not necessary
+
+ net/ipv4/nexthop.c | 42 +++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 39 insertions(+), 3 deletions(-)
+---
+base-commit: bab3ce404553de56242d7b09ad7ea5b70441ea41
+change-id: 20250724-nexthop_dump-f6c32472bcdf
+
+Best regards,
+-- 
+Christoph Paasch <cpaasch@openai.com>
+
+
 
