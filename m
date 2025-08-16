@@ -1,195 +1,159 @@
-Return-Path: <netdev+bounces-214273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214275-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACD52B28B61
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 09:27:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47AC4B28B6A
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 09:29:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE65B1C246A1
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 07:27:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8794A17832B
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 07:28:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20C292264B6;
-	Sat, 16 Aug 2025 07:27:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="fQ0sK/hx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2CB822A4D5;
+	Sat, 16 Aug 2025 07:28:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1127521E098
-	for <netdev@vger.kernel.org>; Sat, 16 Aug 2025 07:27:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A7CD227EAA
+	for <netdev@vger.kernel.org>; Sat, 16 Aug 2025 07:28:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755329241; cv=none; b=J448va+Bdtu8axnGlD0Rx+PwhU64X4mxe93FHPTISGUzx2bcSxc3xNwtjtiDNjHk/GUIXc1qjWxpn+sqhMO+rHf22DBX3ybPx9WWqIxPlJBlaFrbDrcONMoviAri7FPMAJgBOVngDWKDSZjsnASe32t4Eq9goddYvu0NCgJnaV8=
+	t=1755329315; cv=none; b=liS5641aNpJiWo/rJGQkvwxj6Dz7ftb8da8JKHnHPnnPxO63q2IKca3llnWm5eTpJ9xQ6wYbKO6KErfFF6QwvUUyLjv5aquZWxm/I3oi7Z4yBbc49zqXQsZK/Eyf8QVPG5LYB6xEnav4qSkxq1c8vj3SJW9mpAt1MxCSIPhA0xw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755329241; c=relaxed/simple;
-	bh=6t+pWXtNvn3PngcOHMQ0az8IKzQqpXpauzoUr3nAI3k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EB4pzdo/ArQFA3SYCrgP4SWhaZXHgXeedZG3uGzYE3XjZdKmhq4siMuXRO0hHmgb87flmbHi04UcUVUKKd4vZNxr/TDVmyJd5gVrrPiLV6JAqr5E8vsyA6S61M8HIQ4nu0Ojby5R/GR2+nkaXMeCjP71pvFUwbjqGXoQ1VjeVn8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=fQ0sK/hx; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-afcb73621fcso317832966b.0
-        for <netdev@vger.kernel.org>; Sat, 16 Aug 2025 00:27:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1755329236; x=1755934036; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=FpiVReBk4pxi7WdSyaid9+sMC8akMMwfHAVHbbVirOA=;
-        b=fQ0sK/hxNVwmGst+oxWhkC/dXmt6K/rFa859hVG8g47Zycx0qEC1R8nZoswGF1Hwz/
-         jn8e1pBPnzIWD16izOjpOy8eDVvdmvgiqgdD6zO66cEEQXLIOB+dzgCHJqI77/x/V75D
-         WKqU6wqV+lQyzGbECZ8Uhg/vnz9NrKkaewXIqO+tBpW8ZZGoEsCv0iPO3T/8pEQV232M
-         heAao2AHf4HeKbyIX2OkWQu68voSvoA+7BIi32p6WS4MPJN9EbyIif7ki0VS44SWf7aN
-         f1KLlGL3dXdVrT4eeuz3VdyY5ilo9N+DxPHx6Z1hB0Id6BRM5inOTUKXh3A3RaUFpcOy
-         lPJA==
+	s=arc-20240116; t=1755329315; c=relaxed/simple;
+	bh=JrB5cSg+IpZYdHhFkUFjjmDDAEPGVnUgwy59mGK2wy0=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=KIaR3byRddb0giPbrxcn8rkG+J9gQL04Rus0DM3gpgsbZ7RRUhIPdEisWDhBjvDJKCumjqxKttK07IjnbI/8Pnl/SnDxKzaa62rmrh7twWoxIvcvDy0mn2tixTeqWJDvz+/RDxHLLdgbqWb42IjsjRIHCAelpWJo6zXNnCJWG40=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3e6649d783bso1007715ab.3
+        for <netdev@vger.kernel.org>; Sat, 16 Aug 2025 00:28:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755329236; x=1755934036;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FpiVReBk4pxi7WdSyaid9+sMC8akMMwfHAVHbbVirOA=;
-        b=rO9XzX/lwvC7EdAEdYBiU7IZXMQksmMeiSoKNVQpFwoJomIzZNpQekJtvvqRkxu90y
-         774uSywUZoUXQZib6hWylYRjKPgwaaJZKGsSblDqAiDQ//4TCUNHAJeMUTOlrh9hHxLm
-         BwgaQH4ae99lvZhb5St6JYcKqDLu2rRz58GGaQXp7be6m3GZaNbSw8WVQXIhWtk8AubS
-         50vbm39xPym0tPY5WhR79bZmaXI68BFRCvLJAGlJKaX/MdhIHfana7SMSGUaBim5NmkA
-         TytECqvbtEn2O9LruYOggprJ+wcKY8zWZDBeF3d92rTES7ta6/aGlQcD5qszyPi/bTGT
-         yCpQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVHFJJs1jg6s+grR9XoT/6mnNJpzlF4whYVOw8dNuK6mBaQ2Q/bB5FvmF+frlgdW6Kpd7ljflA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw0vsDDLrJNbytDfiLOB8N/OCmwrUJ/okkSSfM0PWnAyY9Sj8NF
-	0Xu0ylE3a6GCvW9YpSGp7u+g2qURggxbxebdIsPCEjMG26vBvyOcUw0HtQwfag0iww==
-X-Gm-Gg: ASbGncuo5U0qU2fHvhM5E7P1/gaNz2bw6x+y+OTAeO6bGZQKk1ah8IbmW6Z4ouTt9+4
-	INFeY/quVG79E81je0oIzmnfjohYnbOQX2Yl7+OgBP2Yt8AtUZTQiUra4/MCMt0nUtAsgTW/60I
-	HnWx6/bDXcK/acz/fsvC1wYM9dOE96RmLzr04ZPHJrMXbjdqOhZzsR4qz+jt6c4lFn411BONelQ
-	d5yFZJ0hgjg2K/u9JnfLvNKkfhOmcqQllWMyiGFBugJ0ZeN7MAVdeCHt+vwB+dgzQHPnMBCJWiu
-	S6yhJ3Y4CzcS7WwVl1JYqBO+XYfq4HFy5HfI4DkHArS4ScMrBwYhz8d53VbKL57heCH70iM78bU
-	yNktzxuULW0U=
-X-Google-Smtp-Source: AGHT+IFg7imxaFEagNP0U5Ayia7U3tygLpXsVf6xKmyOpZitxVfNDophojGzUA2/MzddJEvPpEzhfA==
-X-Received: by 2002:a17:906:6a0f:b0:ae8:4776:fbb1 with SMTP id a640c23a62f3a-afcdc03d360mr411785966b.11.1755329236202;
-        Sat, 16 Aug 2025 00:27:16 -0700 (PDT)
-Received: from localhost ([2a07:de40:b240:0:2ad6:ed42:2ad6:ed42])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-afcdcea179esm312796166b.57.2025.08.16.00.27.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 16 Aug 2025 00:27:15 -0700 (PDT)
-Date: Sat, 16 Aug 2025 07:27:14 +0000
-From: Wei Gao <wegao@suse.com>
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: kernel test robot <oliver.sang@intel.com>,
-	Menglong Dong <menglong8.dong@gmail.com>, kraig@google.com,
-	lkp@intel.com, netdev@vger.kernel.org, dsahern@kernel.org,
-	linux-kernel@vger.kernel.org, rcu@vger.kernel.org,
-	edumazet@google.com, horms@kernel.org, oe-lkp@lists.linux.dev,
-	kuba@kernel.org, pabeni@redhat.com, ncardwell@google.com,
-	davem@davemloft.net, ltp@lists.linux.it,
-	Menglong Dong <dongml2@chinatelecom.cn>
-Subject: Re: [LTP] [PATCH net v2] net: ip: order the reuseport socket in
- __inet_hash
-Message-ID: <aKAy0nu2p6X9sKUw@localhost>
-References: <20250801090949.129941-1-dongml2@chinatelecom.cn>
- <202508110750.a66a4225-lkp@intel.com>
- <aJ_qbZDvDJwVoZGA@localhost>
- <CAAVpQUCEGiRjoobf69Jd5M9vnZyi0N6crNUgSBpDTGNfrap1cA@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1755329313; x=1755934113;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9h/w0PHHXlYPVWDRA7UJ7b2X9Ic0+ZisyHghCWLnk+U=;
+        b=rrib52MXL1or3uXeIExt2f+7KDcnck9ZaBs3a7EUUmYFoUyRbe9UGf+mZruSG7XVwY
+         wC8iPymZz+1R1k8T8pQmV3qjiKwizB6CmmEWnWUj008Yt9oQAUse0KtnBU0n5UNpN9Or
+         w5HsJ4XfCpSnglQD43XEaJ7fp3GhMu/K23QwhQ9fvdGNICegfXZjGf4lb9LiyNZLBEAt
+         I3bBE9p6y31QOit1bPLWIY6keydGfTKchN/xQNihic8Ye0Pctqbm7M35k27bgftqjUBy
+         xIqE0TWcvkDvkYTt+L5HKBBLOmXGg2NSiGwuPzpUUwDsi8rYjS0XSxEBkiu+DLMoZW5H
+         XViw==
+X-Forwarded-Encrypted: i=1; AJvYcCWsUJc/dfbafkjXOEsHRF2l/niauSR1hkSt6gmRze2+Ha+xBwICjEEK2IVnCCEJ2/CzvBCpXwU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxLSr9LLlMa9aLJL+OfipuJcv5du/B/zaOKkwQlFlrcjFpGDW8H
+	Bv9yM+DG7bIqzsUqgCnZFtWqbtRdKZUIRGKT2u2BqC8G8eR0duBG+rXc4+tu9hceVLlfkD+ktka
+	is/TuhXO4+BaK9BJJzCeYud1PzslnGpX/sntZORLQnDohdD7RvPkNa6VHYTA=
+X-Google-Smtp-Source: AGHT+IGGVfZ/cSBX7xevD4EgqL66lj5U0cKpIgKn0q98EKvNleK+tpRh4KatIlNYl/ohq+ZWEzOAbW1baqpHZgQKNE51iQy+TW/Q
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAAVpQUCEGiRjoobf69Jd5M9vnZyi0N6crNUgSBpDTGNfrap1cA@mail.gmail.com>
+X-Received: by 2002:a05:6e02:1889:b0:3e5:6313:4562 with SMTP id
+ e9e14a558f8ab-3e57e8a7d35mr83025195ab.14.1755329313307; Sat, 16 Aug 2025
+ 00:28:33 -0700 (PDT)
+Date: Sat, 16 Aug 2025 00:28:33 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68a03321.050a0220.e29e5.0040.GAE@google.com>
+Subject: [syzbot] [wireless?] WARNING: ODEBUG bug in bss_free
+From: syzbot <syzbot+266cecacfaabc2ca17d0@syzkaller.appspotmail.com>
+To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Aug 15, 2025 at 07:35:10PM -0700, Kuniyuki Iwashima wrote:
-> On Fri, Aug 15, 2025 at 7:18 PM Wei Gao <wegao@suse.com> wrote:
-> >
-> > On Mon, Aug 11, 2025 at 01:27:12PM +0800, kernel test robot wrote:
-> > >
-> > >
-> > > Hello,
-> > >
-> > > kernel test robot noticed "BUG:KASAN:slab-use-after-free_in__inet_hash" on:
-> > >
-> > > commit: 859ca60b71ef223e210d3d003a225d9ca70879fd ("[PATCH net v2] net: ip: order the reuseport socket in __inet_hash")
-> > > url: https://github.com/intel-lab-lkp/linux/commits/Menglong-Dong/net-ip-order-the-reuseport-socket-in-__inet_hash/20250801-171131
-> > > base: https://git.kernel.org/cgit/linux/kernel/git/davem/net.git 01051012887329ea78eaca19b1d2eac4c9f601b5
-> > > patch link: https://lore.kernel.org/all/20250801090949.129941-1-dongml2@chinatelecom.cn/
-> > > patch subject: [PATCH net v2] net: ip: order the reuseport socket in __inet_hash
-> > >
-> > > in testcase: ltp
-> > > version: ltp-x86_64-6505f9e29-1_20250802
-> > > with following parameters:
-> > >
-> > >       disk: 1HDD
-> > >       fs: ext4
-> > >       test: fs_perms_simple
-> > >
-> > >
-> > >
-> > > config: x86_64-rhel-9.4-ltp
-> > > compiler: gcc-12
-> > > test machine: 4 threads 1 sockets Intel(R) Core(TM) i3-3220 CPU @ 3.30GHz (Ivy Bridge) with 8G memory
-> > >
-> > > (please refer to attached dmesg/kmsg for entire log/backtrace)
-> > >
-> > >
-> > >
-> > > If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> > > the same patch/commit), kindly add following tags
-> > > | Reported-by: kernel test robot <oliver.sang@intel.com>
-> > > | Closes: https://lore.kernel.org/oe-lkp/202508110750.a66a4225-lkp@intel.com
-> > >
-> > >
-> > > kern :err : [  128.186735] BUG: KASAN: slab-use-after-free in __inet_hash (net/ipv4/inet_hashtables.c:749 net/ipv4/inet_hashtables.c:800)
-> >
-> > This kasan error not related with LTP case, i guess it triggered by network
-> > related process such as bind etc. I try to give following patch to fix
-> > kasan error, correct me if any mistake, thanks.
-> 
-> Note that the report was for the patch in the mailing list
-> and the patch was not applied to net-next.git nor net.git.
-Thanks for note. 
-Since this email sent to LTP group so i got this. Since
-i'm interested in this 'kasan' problem, so trying to fix it.
-> 
-> 
-> >
-> > From: Wei Gao <wegao@suse.com>
-> > Date: Sat, 16 Aug 2025 09:32:56 +0800
-> > Subject: [PATCH v1] net: Fix BUG:KASAN:slab-use-after-free_in__inet_hash
-> >
-> > Reported-by: kernel test robot <oliver.sang@intel.com>
-> > Closes: https://lore.kernel.org/oe-lkp/202508110750.a66a4225-lkp@intel.com
-> > Signed-off-by: Wei Gao <wegao@suse.com>
-> > ---
-> >  include/linux/rculist_nulls.h | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/include/linux/rculist_nulls.h b/include/linux/rculist_nulls.h
-> > index da500f4ae142..5def9009c507 100644
-> > --- a/include/linux/rculist_nulls.h
-> > +++ b/include/linux/rculist_nulls.h
-> > @@ -57,7 +57,7 @@ static inline void hlist_nulls_del_init_rcu(struct hlist_nulls_node *n)
-> >   * @node: element of the list.
-> >   */
-> >  #define hlist_nulls_pprev_rcu(node) \
-> > -       (*((struct hlist_nulls_node __rcu __force **)&(node)->pprev))
-> > +       (*((struct hlist_nulls_node __rcu __force **)(node)->pprev))
-> >
-> >  /**
-> >   * hlist_nulls_del_rcu - deletes entry from hash list without re-initialization
-> > @@ -175,7 +175,7 @@ static inline void hlist_nulls_add_before_rcu(struct hlist_nulls_node *n,
-> >  {
-> >         WRITE_ONCE(n->pprev, next->pprev);
-> >         n->next = next;
-> > -       rcu_assign_pointer(hlist_nulls_pprev_rcu(n), n);
-> > +       rcu_assign_pointer(hlist_nulls_pprev_rcu(next), n);
-> >         WRITE_ONCE(next->pprev, &n->next);
-> >  }
-> >
-> > --
-> > 2.43.0
-> >
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    8f5ae30d69d7 Linux 6.17-rc1
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=12be85a2580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=412ee2f8b704a5e6
+dashboard link: https://syzkaller.appspot.com/bug?extid=266cecacfaabc2ca17d0
+compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+userspace arch: i386
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/005a27f2fde5/disk-8f5ae30d.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/eedc3e5b0288/vmlinux-8f5ae30d.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/400079450339/bzImage-8f5ae30d.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+266cecacfaabc2ca17d0@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+ODEBUG: activate active (active state 1) object: ffff888057456e00 object type: rcu_head hint: 0x0
+WARNING: CPU: 0 PID: 11283 at lib/debugobjects.c:615 debug_print_object+0x16b/0x1e0 lib/debugobjects.c:612
+Modules linked in:
+CPU: 0 UID: 0 PID: 11283 Comm: kworker/u8:13 Not tainted 6.17.0-rc1-syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
+Workqueue: netns cleanup_net
+RIP: 0010:debug_print_object+0x16b/0x1e0 lib/debugobjects.c:612
+Code: 4c 89 ff e8 57 19 53 fd 4d 8b 0f 48 c7 c7 a0 3c e3 8b 48 8b 34 24 4c 89 ea 89 e9 4d 89 f0 41 54 e8 8a 4a b3 fc 48 83 c4 08 90 <0f> 0b 90 90 ff 05 c7 af d3 0a 48 83 c4 08 5b 41 5c 41 5d 41 5e 41
+RSP: 0018:ffffc9000b7674f8 EFLAGS: 00010282
+RAX: 109ab45e96de0500 RBX: dffffc0000000000 RCX: ffff88806a35bc00
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000002
+RBP: 0000000000000001 R08: 0000000000000003 R09: 0000000000000004
+R10: dffffc0000000000 R11: fffffbfff1bfa1ec R12: 0000000000000000
+R13: ffffffff8be33e20 R14: ffff888057456e00 R15: ffffffff8b8bd3c0
+FS:  0000000000000000(0000) GS:ffff888125c1c000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000080186000 CR3: 0000000078eae000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 00000000e08e800c DR6: 00000000ffff0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ debug_object_activate+0x26a/0x420 lib/debugobjects.c:842
+ debug_rcu_head_queue kernel/rcu/rcu.h:236 [inline]
+ kvfree_call_rcu+0x4f/0x410 mm/slab_common.c:1953
+ bss_free+0xb9/0x250 net/wireless/scan.c:89
+ bss_ref_put net/wireless/scan.c:143 [inline]
+ cfg80211_put_bss+0x1e2/0x230 net/wireless/scan.c:3353
+ cfg80211_dev_free+0x257/0x2d0 net/wireless/core.c:1226
+ device_release+0x99/0x1c0 drivers/base/core.c:-1
+ kobject_cleanup lib/kobject.c:689 [inline]
+ kobject_release lib/kobject.c:720 [inline]
+ kref_put include/linux/kref.h:65 [inline]
+ kobject_put+0x22b/0x480 lib/kobject.c:737
+ mac80211_hwsim_del_radio+0x2de/0x460 drivers/net/wireless/virtual/mac80211_hwsim.c:5677
+ hwsim_exit_net+0x584/0x640 drivers/net/wireless/virtual/mac80211_hwsim.c:6554
+ ops_exit_list net/core/net_namespace.c:198 [inline]
+ ops_undo_list+0x497/0x990 net/core/net_namespace.c:251
+ cleanup_net+0x4c5/0x800 net/core/net_namespace.c:682
+ process_one_work kernel/workqueue.c:3236 [inline]
+ process_scheduled_works+0xade/0x17b0 kernel/workqueue.c:3319
+ worker_thread+0x8a0/0xda0 kernel/workqueue.c:3400
+ kthread+0x70e/0x8a0 kernel/kthread.c:463
+ ret_from_fork+0x3f9/0x770 arch/x86/kernel/process.c:148
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
