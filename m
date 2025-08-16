@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-214296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214297-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6C67B28C8B
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 11:40:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85CF1B28C8E
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 11:41:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B1E807A8191
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 09:39:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0CAD67B04FA
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 09:39:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FCFB26C3A4;
-	Sat, 16 Aug 2025 09:40:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96F7426CE29;
+	Sat, 16 Aug 2025 09:40:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J7YkPL+e"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AQ58s/P5"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 646D3257831;
-	Sat, 16 Aug 2025 09:40:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A616257831;
+	Sat, 16 Aug 2025 09:40:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755337244; cv=none; b=U8Fbq5o7QMe129XTk3w+YDe1uFLDS0PlYq5kbf3VNtw/m75wNvLsw9kIWRZxaNV6545+c7ZhfqvCVqb6XYSvkB+kYxEM/ppSd3vmd2mEmRueh2LumtGSqLNBuMVT9Y2ckWOrCtRaiehYZROJxHzF3143rH0ExOrCXVKVV5c6aCY=
+	t=1755337253; cv=none; b=QqPUvCPM2urU/GriJewtF0pdRl/m3iEERGnQQ6AS41pXGi6F88czg9BTkaEH6xYlrW0LXIKNyNayrjU4rd0UmQ/AoKT1t3PMul6DwOQqGBUh2SNpYNQsN+5BhlUgCnbgB/ZEGUrGb5XXfmiFfmH7mDOM7pQ3SdDqyP5r9qTX9Cs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755337244; c=relaxed/simple;
-	bh=D3g4jWwGtvZ7o19bjhqBPgm4csrgDjOoUZM9+vHRBjI=;
+	s=arc-20240116; t=1755337253; c=relaxed/simple;
+	bh=l/oDk0oKxxbQRqAvrMfls1DCnuSFlvkTrGTMP3IQcus=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RUDaarMIEuhSzbTKvzl72SA3JarTbF9WqIh1qgR1I+R3CqYko8jnklFgmPn03PwCjHrR2ReEFCWJw6ydwqdev5CT5Nh6c0FwS2CQLYa6N2ydD7UnTK8CuG/fVlSLRQDWWbZ3Us58soYZBivFBbI/xl9uqdqu+TN1EISpjn50HOY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J7YkPL+e; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49CF3C4CEEF;
-	Sat, 16 Aug 2025 09:40:40 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=UHQpm5NhCoxr3Z6jDAeRQhmdqknIogllAawD9Ce7Y4t8QLuOQDPXeTzEatWz07dKYCMNh+30D9HheozWJn3icVvSwb28KM/3JlF81urSQ6nkI0EJKC439lAd9Ui0MxArgcMWHzW13w7wfjlu4r0C89/GZqb1WVXp8g3kkKjekDM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AQ58s/P5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B621C4CEF5;
+	Sat, 16 Aug 2025 09:40:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755337244;
-	bh=D3g4jWwGtvZ7o19bjhqBPgm4csrgDjOoUZM9+vHRBjI=;
+	s=k20201202; t=1755337252;
+	bh=l/oDk0oKxxbQRqAvrMfls1DCnuSFlvkTrGTMP3IQcus=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=J7YkPL+egRSh6WKtKAp4CEB5wFwl8iatm/4g03HskfXqOF3nDF2hzp1UAbyUeGeH7
-	 rHxF0/ACVzL6NW9YAIDAeWUngzB09bneVsbJu+Tqz89Fg5JQj8bpk3odpN3csHGWtF
-	 CvUGJTLNrG7VVLvlcK1UEQVKxlLeI8gDulf89D7faXLuZbSd1ze15Mv6IiHjCB16KL
-	 6n47tl2fo5wx/5OuxMiTvDsa/iQ1v0DrkUj0ARmwlMa87IkeVoEA66RdZTRlJIIOrN
-	 /ZJCMUr67TL5pxSps0WFnozKcEIKDEz0sZi3qGL9LEePeyGnosVAR3yuIcQMLXgoIt
-	 k9yIK2F+Vs+qg==
-Message-ID: <f9903242-beec-4506-af20-2f8fc94d53cc@kernel.org>
-Date: Sat, 16 Aug 2025 11:40:38 +0200
+	b=AQ58s/P5DY7ez8Y0MciSCXEp8MHktUbGwkxlacUJ+5UkvMe4H+rGW+CsMW2xa+Q+d
+	 KbSKNZvaHBo74KUNjlA7C1AWt2wMSahEHGWeKDTInYHtMJu6b5MA6WftAUpNKb0L2e
+	 9AOkXSZIKslUhMD7oqF9ScLd17vD60rPPDfXulLsR0kmiNhmoLMJXPhCSgwxD+LGvg
+	 XhlyzLKbJHkDLjRD6xHCaau+bCltc2uyInOAAqrVvzh+MwQpvB+CjsainjnGcgUZzW
+	 xM8M+QR4lbxZMkARxGo/0EKIe91xFi44FzH0k4D/tNiXRvK95vhVozbg/YxDWSvaOb
+	 CJ5sw/V/S5ziA==
+Message-ID: <54521b53-4106-4328-973a-78d7bb30bbb8@kernel.org>
+Date: Sat, 16 Aug 2025 11:40:47 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -51,20 +51,19 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH 1/3] dt-bindings: vendor-prefixes: Document J-Core
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Artur Rojek <contact@artur-rojek.eu>, Rob Landley <rob@landley.net>,
+To: Artur Rojek <contact@artur-rojek.eu>, Rob Landley <rob@landley.net>,
  Jeff Dionne <jeff@coresemi.io>,
  John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
+ Geert Uytterhoeven <geert+renesas@glider.be>,
  Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
  <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
  Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+ Conor Dooley <conor+dt@kernel.org>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Geert Uytterhoeven <geert@linux-m68k.org>
 References: <20250815194806.1202589-1-contact@artur-rojek.eu>
  <20250815194806.1202589-2-contact@artur-rojek.eu>
- <68a6d0a7-b245-456d-9c7e-60fbf08c4b32@kernel.org>
- <CAMuHMdVj8r_voaXqVdt07fRT5mdJJ4B2NFiK9=XhtYDCuRgz1g@mail.gmail.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -110,30 +109,21 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
  zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
  XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <CAMuHMdVj8r_voaXqVdt07fRT5mdJJ4B2NFiK9=XhtYDCuRgz1g@mail.gmail.com>
+In-Reply-To: <20250815194806.1202589-2-contact@artur-rojek.eu>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 16/08/2025 10:22, Geert Uytterhoeven wrote:
-> Hi Krzysztof,
+On 15/08/2025 21:48, Artur Rojek wrote:
+> J-Core is a clean-room open source processor and SoC design using the
+> SuperH instruction set.
 > 
-> On Sat, 16 Aug 2025 at 10:18, Krzysztof Kozlowski <krzk@kernel.org> wrote:
->> On 15/08/2025 21:48, Artur Rojek wrote:
->>> J-Core is a clean-room open source processor and SoC design using the
->>> SuperH instruction set.
->>>
->>> The 'jcore' prefix is in use by IP cores originating from this design.
->>>
->>> Link: https://j-core.org
->>> Reviewed-by: Geert Uytterhoeven <geert@linux-m68k.org>
->>
->> How is it possible if this is v1? If this is not v1, where is changelog
->> and why isn't it marked as vx?
+> The 'jcore' prefix is in use by IP cores originating from this design.
 > 
-> The patch series had several iterations (v0, v-1, v-2 ;-), with a limited
-> audience.
+> Link: https://j-core.org
+> Reviewed-by: Geert Uytterhoeven <geert@linux-m68k.org>
+> Signed-off-by: Artur Rojek <contact@artur-rojek.eu>
 
-Thanks, would be nice to see it reflected somewhere.
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
 Best regards,
 Krzysztof
