@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-214309-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214310-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D45EB28EC9
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 17:12:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2C2DB28F1D
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 17:25:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 90EEC7A22F5
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 15:10:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 62B6F1CC4D93
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 15:24:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C0812F0691;
-	Sat, 16 Aug 2025 15:11:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 113152F39DF;
+	Sat, 16 Aug 2025 15:20:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="L2zMQX5H"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="auYojMp6"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CCEA2F39D5;
-	Sat, 16 Aug 2025 15:11:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C7B81DE3A7;
+	Sat, 16 Aug 2025 15:20:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755357113; cv=none; b=Pf5nnfJ49PnwZdiJ8BrjAfUsl9V29cmcEHsZljat0Bncs4Vd4VUr/m0pAxqy2fEAdkv7Rr6jtn2Fh9rvF59P25L8us5ELJkm3ei+4xqsWVYYyr5+mQZIxS/yM7sP5c/NY5r/PfRPkNgpM7EzLBpcQu8va+ti0kYv7vCIRULD+k4=
+	t=1755357658; cv=none; b=GGr3nOdxjm+zNriuxzJiEokfFun5tSxtmvWX+7Snfy1AsgxqRwvmpdcPQwZ0/J1Xx8FRuB/ZREmbquxi5ybS//hCGx2Anq90cWB4Ptj/LWHwbFwTqybHbHH/jlG2oHZkERjSFo+TgORqZk5ijHOJW89j+7T1DWptG/krEo4E2Xo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755357113; c=relaxed/simple;
-	bh=UMEFa52la42hMqyKMzdR+q0aEPSEABoj+9c5UKaSSvw=;
+	s=arc-20240116; t=1755357658; c=relaxed/simple;
+	bh=RBIyDtnznFHzqlQIF1q+gcJw4wQW/dS5qTzOPwt1XYI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Asr2Os8HnYgtbbAIz9ScsMN9AU3SowTY1xpuz9ij9tLld6hLPnSiK7Kjl6ewqz/JBhMan+FzFvr+14Vq/Rx26n+hU8vOC2ZuyjfJYyIHG9KwvF85axwkYrCT5X8aTdeYMMY6pmNLatKZajt79Pb52DMU/J1sAjzYM+WSS1o6mD0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=L2zMQX5H; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=aFP1qday64ohXzQy6w37jT0MJKOMvPuaCn/TNeDmBcbmrknv6FC6wTdeYMWDa+m0k9LDmdywvb2oOLW3iKj0UMMG2RTQQHiYKnpwI0hKD/zomWRwvSuzxO+BxfSyfhvQNdnDXDVaUrgDjs23Dei4CUqRq7pqqAW2KOmgkIdEGcs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=auYojMp6; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=3NAUUTiJZHuAR2izt+xT21rv8ZMns6fw9BsTVEElK6M=; b=L2zMQX5Hww/NOqp+oDguP1MWAu
-	1ExUD0+VsfUvL6v/2KlyqgL8gCrSmpJwMTv3YOQwJNOIw+3X/vP1XY6QaNoKbf/xZuZj4gL711y5D
-	bCwVW1B/FiRf5PchvAzW8u/Z7jA9aGPLCCxu4tNwhS2U3KQAv6y9HMANgJzwLm3tseIY=;
+	bh=shQDX71uKhVljkmiU89xwZumPoU80TwEyr56tSmwUfU=; b=auYojMp6+dMcsrLevaeyCizdDk
+	LONQLs50qaqdKV1kqcFcSEI8r271ye35AfBxJbl2ZqX01I0SI9BgrHwDtmBliNRSaVmzlhnqLxR45
+	Q5U5E0MnKlAxC+43FyIVsAgn96ECQk6ximiPQiQ0BHzk8MAjSPDKRhGEET39l+Kq8WfQ=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1unIZJ-004uXK-LF; Sat, 16 Aug 2025 17:11:41 +0200
-Date: Sat, 16 Aug 2025 17:11:41 +0200
+	id 1unIi5-004uZe-6l; Sat, 16 Aug 2025 17:20:45 +0200
+Date: Sat, 16 Aug 2025 17:20:45 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: David Yang <mmyangfl@gmail.com>
 Cc: netdev@vger.kernel.org, Vladimir Oltean <olteanv@gmail.com>,
@@ -54,11 +54,10 @@ Cc: netdev@vger.kernel.org, Vladimir Oltean <olteanv@gmail.com>,
 	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
 	Russell King <linux@armlinux.org.uk>, devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [net-next v3 1/3] dt-bindings: net: dsa: yt921x: Add Motorcomm
- YT921x switch support
-Message-ID: <9b44c768-8362-4b1d-931a-6df91106018b@lunn.ch>
+Subject: Re: [net-next v3 0/3] net: dsa: yt921x: Add support for Motorcomm
+ YT921x
+Message-ID: <1ceb8a8f-140a-4b54-be2a-df9ac2c219b6@lunn.ch>
 References: <20250816052323.360788-1-mmyangfl@gmail.com>
- <20250816052323.360788-2-mmyangfl@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,39 +66,36 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250816052323.360788-2-mmyangfl@gmail.com>
+In-Reply-To: <20250816052323.360788-1-mmyangfl@gmail.com>
 
-> +  motorcomm,switch-id:
-> +    $ref: /schemas/types.yaml#/definitions/uint32
-> +    description: |
-> +      When managed via MDIO, a hard-configured switch ID to form MDIO reg addrs,
-> +      to distinguish between multiple devices beside phyaddr.
-> +    enum: [0, 1, 2, 3]
-> +    default: 0
-> +    maxItems: 1
+On Sat, Aug 16, 2025 at 01:23:18PM +0800, David Yang wrote:
+> Motorcomm YT921x is a series of ethernet switches developed by Shanghai
+> Motorcomm Electronic Technology, including:
+> 
+>   - YT9215S / YT9215RB / YT9215SC: 5 GbE phys
+>   - YT9213NB / YT9214NB: 2 GbE phys
+>   - YT9218N / YT9218MB: 8 GbE phys
+> 
+> and up to 2 serdes interfaces.
+> 
+> This patch adds basic support for a working DSA switch.
+> 
+> v2: https://lore.kernel.org/r/20250814065032.3766988-1-mmyangfl@gmail.com
+>   - fix words in dt binding
+>   - add support for lag and mst
 
-So how is this different to reg? Why cannot it be derived from reg?
-Please give us all the details of what this actually does. Or point us
-to a chapter in the datasheet.
+Please don't add new features between revisions. Reviewers spend time
+reviewing the code. They assume just the issues raised will be
+address, and the rest of the code remains unchanged. It then means
+they just need to check the issues raised have been addressed. By
+adding new features, they back to the beginning, having to review all
+the code again, because you potentially added new issues.
 
-> +                /* if external phy is connected to a MAC */
-> +                port@9 {
-> +                    reg = <9>;
-> +                    label = "wan";
-> +                    phy-mode = "rgmii";
-> +                    phy-handle = <&phy1>;
-> +
-> +                    fixed-link {
-> +                        speed = <1000>;
-> +                        full-duplex;
-> +                        pause;
-> +                    };
+LAG and MST should of been implemented as patches on top of the basic
+driver. They can then be reviewed as small increments.
 
-If there is an external PHY, why have a fixed link?
+Please put yourself in our position. How would you review this code?
+That would make it easy for you to review it?
 
-
-    Andrew
-
----
-pw-bot: cr
+	Andrew
 
