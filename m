@@ -1,201 +1,261 @@
-Return-Path: <netdev+bounces-214286-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214291-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E068AB28C2B
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 11:05:56 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7165CB28C4E
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 11:15:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 907303A91A2
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 09:05:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 752A17A3AB4
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 09:14:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EEBF23A9AD;
-	Sat, 16 Aug 2025 09:05:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 310251AA1D9;
+	Sat, 16 Aug 2025 09:15:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="XlKX/sAB"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="hcJ+AWgX";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="G5pkbQQx"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2056.outbound.protection.outlook.com [40.107.96.56])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7E1A2222C3;
-	Sat, 16 Aug 2025 09:05:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.96.56
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755335153; cv=fail; b=BprHWCO3PbkP/H+WZ8tdxSmDTCEPd2xgyJ6OBxvMfgBoh4CY05R1wVWTjzIxDEqwC2kDKplRRt5ydJc/1GEXQoWxlw2f99TjEX4WnY1BX7CgkIhTgH75MsfbPxnruI1T9zeJQEbdbvHREmwmY2AfB2wGncFk++R3cD0cxgj19tE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755335153; c=relaxed/simple;
-	bh=eEZ9ePdxq0r8mqoaDoV//umMueGGdQOrApspCPpGh94=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=m3joVIuw6wXEdLOVQ+zma3e20EClr53Mx9RAJdrbQmzEhItnmGQqs99fJX1X7ERfEDEgw3oQlwMziBhJbQmnTHP/9cqHG5Zy0d1iKmJy94jOuEtWs5e+3Sp+jSurI6xhO5Gw643KCjBX9fQrOezlRXk9zcbhSkdG40PIeA+l5Y4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=XlKX/sAB; arc=fail smtp.client-ip=40.107.96.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=bj8gfxqS2wcivFR3ABEn4NtVmIC87PfypJLZngeLNfwG0FPUnu3IABUFUVyEGg0sI7nHZXnGD5PoPcaxEK87TLnblGdr7Wl+Mir+OSnZi9YAjoHhLzQgFLb3ToPw46rdOtRwrw0OF6ytMfxoZWuO8SdohIzSxwCBGlIH83qcaGCRuHWJZ9Lj3J1NkllCdxVsrPqczKBQhI8EbeuSjG5Za8hSFlUBatY75WJLQ2xzjgt9Z/RQwBtQckpV/emiYPSvJ9tDuRy5Aqyu7TqNUeM6DnWu6iStmcuRfTGWZ7wm1/gTxl6TPTErQLJEVA+ZcgfSqDJs0Q9kiruXaJShtCJ8dg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+gNVnKruWf3FokzT5SCTIOuJE+wUkom6xI0sUrQy4AM=;
- b=s+02gLExt1hLvuU21i1WOW9sB/ioIUde+/257htsYvdESKYUEHBJU0rkR7ONluxoPnpOJQO3GH0mJ+h8i6iGqZQZ45RJUe2LYXdTyjBpHxbcxZBUkrCidNizS+7Ly84eKO4NC3YTcQXWwJbsaYifcBM1vAZ2Rti+1a0EfNBxHug5q5Mjg0P+bwNEp7CWYYOUVMY2Roe5flOHJsP4CnjBj85YhBatjXRKRm5GgG+JUmmrb1xbYr/JCbkw3AML/4ZGrPfy/Hj4BLG6KLCdT1FgFR+d0rAOIKl8xpUB5Ug96zSpRtK+bywyd1fClGyIZ3sw3e7TzXu02+ryQe0DBYdDww==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+gNVnKruWf3FokzT5SCTIOuJE+wUkom6xI0sUrQy4AM=;
- b=XlKX/sABxnQ1Kh7b8NVN4fhkmOYdJI7Rk5AGoKB8uMeKL2UHm6jTQprWgE/7gSgGDcJvqWw4Mc/UErPPOV8OJ7W0hvr1a77a0AHlJ70Jo5ZibMzz14nkoS747eB7PELHXxobwkcPmubqBsT8RV46pVjJ03c5dLmrxoVDGijmE95CSb3ZlR5faxmMx6zo1NUCwD5ncaVLxFd76sWZ5Nq8XYdbd6nSN4l2jYw4yC7f+Jc1s6/BguSzKVlnmrP0BvnRIlg2oBJ3hzaexA8npxypT9E7XLfU2mqqUo9xSzBmKMCs2CKp73/uf8McbZRScWtG0NEMl3pi2ZaKjheZnJhcYA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from IA1PR12MB9031.namprd12.prod.outlook.com (2603:10b6:208:3f9::19)
- by SA3PR12MB9178.namprd12.prod.outlook.com (2603:10b6:806:396::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9031.18; Sat, 16 Aug
- 2025 09:05:48 +0000
-Received: from IA1PR12MB9031.namprd12.prod.outlook.com
- ([fe80::1fb7:5076:77b5:559c]) by IA1PR12MB9031.namprd12.prod.outlook.com
- ([fe80::1fb7:5076:77b5:559c%6]) with mapi id 15.20.9031.014; Sat, 16 Aug 2025
- 09:05:48 +0000
-Date: Sat, 16 Aug 2025 09:05:40 +0000
-From: Dragos Tatulea <dtatulea@nvidia.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: almasrymina@google.com, asml.silence@gmail.com, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, cratiu@nvidia.com, 
-	tariqt@nvidia.com, parav@nvidia.com, Christoph Hellwig <hch@infradead.org>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC net-next v3 7/7] net: devmem: allow binding on rx queues
- with same MA devices
-Message-ID: <n6sgvidgswqc456fo7tizxsqeq5vjwiqnef3mfr5fgifcnkdcp@3ntalkm56cr7>
-References: <20250815110401.2254214-2-dtatulea@nvidia.com>
- <20250815110401.2254214-9-dtatulea@nvidia.com>
- <20250815102433.740eb2a6@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250815102433.740eb2a6@kernel.org>
-X-ClientProxiedBy: TL2P290CA0005.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:2::15) To IA1PR12MB9031.namprd12.prod.outlook.com
- (2603:10b6:208:3f9::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7150242058
+	for <netdev@vger.kernel.org>; Sat, 16 Aug 2025 09:15:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755335748; cv=none; b=Hvy7lrAYZTX87zvQtWoxOKD2MTJZp6jMHtrL2rj5vntlXw4ruQY6wkq5ddOGySiPBTsxAiw5g8Pk0VTXgug1yw3g8025pF0zyRAfB+qoTLfWapaopN0S0GXbwqQuZ8jaPFcND9x3iGoNtySaxbFu1MN16H4vsLSmdW0H+Zg4VLo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755335748; c=relaxed/simple;
+	bh=WB86T57mNPxYebdb9k7A3Fmn2lok2/L5wiLVZWeTfBU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=TohoPunupiDoQjLe1vPJD0GAiw1UX/E6wPGVk1gscK91hcMJ95dKn31BNnSL+OCIOSwicMtgQEhyaRZ3LZeq9Etyh9jR5bGa42iCEDm/60IKXPXgeERXPayHcIQJmcubMMnTfzPdVNjP04equ3lCQDesJHLM2LysEW6iUN9Rdi8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=hcJ+AWgX; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=G5pkbQQx; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Kurt Kanzenbach <kurt@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1755335211;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kMHrh6mAPmSb1QDQuu4HaGSvTsFmDjKNWVPs+LpPVeE=;
+	b=hcJ+AWgXVXrtPN3wy4nCta2qvgdQBnAgH9ffph98nZoYmFvjgnrzqta2d9OTse51djQy7Q
+	adtwmnRpILXogilclHkwI3wUcuzHsnA9H4p322OAv2caDmcWVaLZ2YkyqdeJnemD9rLvTs
+	D3QpcqT6ZhhPBDch5PjY+GIpjUI/IbPH8LS6l0ZWAJ/Hf539rngngcEtOhZCtpLpm7soep
+	siQqO3vvOFBGQ1FmYweBm1+ZosGxUowv9EsHgP31uLFavOXbBvTgvIGlklxN3nMd9XgRQm
+	UNXm6oAvri3inEkaR8QpND97CH+ZhE7nsocDPRCQjNRzvrNunxFQa4adP5Ty0w==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1755335211;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kMHrh6mAPmSb1QDQuu4HaGSvTsFmDjKNWVPs+LpPVeE=;
+	b=G5pkbQQx0dWM3bVUVFgYTen9C36xDp2+1QtbR6NZkIGSR4N3HSWzk94Qq7gyHov1u4Vf+V
+	CFCgnfviQ5Sv97Bg==
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Paul Menzel
+ <pmenzel@molgen.mpg.de>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, Vinicius
+ Costa Gomes <vinicius.gomes@intel.com>, Sebastian Andrzej Siewior
+ <bigeasy@linutronix.de>, intel-wired-lan@lists.osuosl.org,
+ netdev@vger.kernel.org
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next] igb: Retrieve Tx timestamp
+ directly from interrupt
+In-Reply-To: <1f42eff0-b6a5-44cb-996e-655c325591be@linux.dev>
+References: <20250815-igb_irq_ts-v1-1-8c6fc0353422@linutronix.de>
+ <a1e9e37e-63da-4f1c-8ac3-36e1fde2ec0a@molgen.mpg.de>
+ <87y0rlm22a.fsf@jax.kurt.home>
+ <1f42eff0-b6a5-44cb-996e-655c325591be@linux.dev>
+Date: Sat, 16 Aug 2025 11:06:49 +0200
+Message-ID: <87bjofoct2.fsf@jax.kurt.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: IA1PR12MB9031:EE_|SA3PR12MB9178:EE_
-X-MS-Office365-Filtering-Correlation-Id: ecf6dea2-ec10-4ee1-354a-08dddca4178d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?M2h3VEVqTEFZNEFSMXJTaTRuZzVRVExaeXJNMjZRY1g3ZFZDY2xDcVRWMHhO?=
- =?utf-8?B?MDR4UjU0ZHlKM2ZNSkUwSVFxN09Ia1FGTzltNTdCWlhob2tvTGNVUko0VUtq?=
- =?utf-8?B?c3VvQ0NTWXArZnhXdE1TR2J2TmFPU1Q5MXN5T25xcnVHR0wvQjZ3L0tRNlh1?=
- =?utf-8?B?c0Z3RW5velZXalFlT2tiVUFlU0tCZzU1Z1QzeXBQNjlXTDRZbXZWUXJWajA0?=
- =?utf-8?B?YUlabkV6MldMaGRnampPNFdZdHRUanFQekovWTVCQ0E4VWZoS1F1Q21tQTNN?=
- =?utf-8?B?WnhRQm9rZnprZTNLbnpZYUVOeENOUlEzRkt5eDFKdUt4bTlJTEI2UlczOXlw?=
- =?utf-8?B?Mk5qSjMraVJvUXlOcE5sUXJpOWdYRXErMklmQkhHaXl2d3hLL2Z1cTduOUYz?=
- =?utf-8?B?TTVjOGNoSUJFeUFxWm5EZkxISGJGc3FEbkhzemdLbjl0RTlTTFVwdFhrd1R3?=
- =?utf-8?B?bEZmWjdDVExpUVZBODFjc3ZHNXhadnhtbDlaTWxIYkVXamoxZUdnanR3Sk1q?=
- =?utf-8?B?bDY5Q0FvOWdwbmpIV0JvdlBWcDBPN3BmOEgvSE1rUzhydUxWN1haTHYwSzF6?=
- =?utf-8?B?V2RCNkZQU2tPMC9zc2hxQWp2enVkREFYSlVWTXFYVDZpZHZSZDBGYkRUVmZ0?=
- =?utf-8?B?WE1KemZPZDcwKzVXR1E1b3VHeERjc051UWV3ZFVDcWJ1MVl3UW5rN1dQV2ov?=
- =?utf-8?B?NGtPazNsQTVSNmoxRHZqMVZyb2VNbWc5T2ZwK2RPQzRFR2V6UWZ5ODVxMTY1?=
- =?utf-8?B?dUNaQ0NNVzFmVUVVTk1sQkZmVU5xT3lreDBsc0p3alFEMVFhaHp3bkhXeDVT?=
- =?utf-8?B?UHZ3Ry9Xd1Vqd0tscTkzMzlVZGhVVURRUS9LWjJuMUR3dDVBL0V1V0g4RTlj?=
- =?utf-8?B?QU5tNFdqaVphaWs4cXhZcmNUMDV0b0Zya2U5T3kvRlc1TkU2cnRUWFY1TXNE?=
- =?utf-8?B?L1duQUp1Y2FidTF1bTFhWjlUVVNDQnJpZ1laNVJtV05odk9rSXcyUlZtemYr?=
- =?utf-8?B?ZnlpZjE1RS9FR2NYdlI1N0xFamFGVFJQdmxyR1FMSXJFMEI4REhUaU00Ym8y?=
- =?utf-8?B?UFhoUWUvK3p5SWhsVWxmT2VycnBkaTYvcUxpL3hwSTlXWFNzZ0dqaWtsOW1N?=
- =?utf-8?B?WmJ1TnFrRHVBYTBxUDErU2h3bEo0VkUxTmNmc0c5cVNzV3pUaW1oN2VtdGhl?=
- =?utf-8?B?QU9KMkZxUmNMN3RyVHIwK2RwQTdING04MmltMXRKNEFQdnFEbkZmSVZSeG8w?=
- =?utf-8?B?bWJNdXE5Y3lFQzZPdnBqdkwxWWU1bTZCTldOZHBDcDBaMEVENmFtYnFPSTR5?=
- =?utf-8?B?RHVtaUw3QWpLd3ZlS3V2ZGRaY2tyV2w3dCtHRDE4dDNPd0YyOEM4MTRqblVp?=
- =?utf-8?B?L1JlSzR1K1Q0SjJqaERWVTUxTFFFc3daMU1jK3JOUjZvRjFiZDNhZEpRV0J3?=
- =?utf-8?B?Vmwzb1c3Zy9YYnBseEFRbXNzZFZFSCtOSDJwSFFvR1VHbEhLc3NicjM2VVRk?=
- =?utf-8?B?NS9HakU5azlxVHg2bDBjRVpVT2VuWG1EdlRic1ZMaFl4Z2pTNFI4RU5SN3F5?=
- =?utf-8?B?dEFWUnFQNVowOFVaVWd2VEorMVg0Rk4zdVZFZXI2N0E3a1BScHY2Wmx3andB?=
- =?utf-8?B?VkUvcnFyVHR3OEVqUEtFcG16aWpUVHhyS3J6YUxZa01uYll1QTRHZE5rWjVn?=
- =?utf-8?B?VmFkNHdwZVVNNXhFYXkrTmc4b3ZEcWs1azdtblZoUzZQUElJMTRQMlhrejh0?=
- =?utf-8?B?ZkxuZno1d2xXVHh2U2hTRUw5MG5XOE9BakJ6QUFlSURmWXR6dTg1MFBHMGdI?=
- =?utf-8?B?TE1rcUdGRDdtTFgrSSs2UktHcXp4amxLNU1VakxBbnJJS1Zmak9GdXNUYmIz?=
- =?utf-8?B?K2lEU2d1NmZCNDh4dHU0UFBsNjBVL3JhT3hhUno5L1FLRlE9PQ==?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR12MB9031.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?T3JVUTFvT0NJWkxJSUVmNGlSVUFUY2x1dHdWVExQRnlNNWFDZ2lvRnc3Qmky?=
- =?utf-8?B?eEpqOFBYdk5Wbmlqald2MXRnU0k0N0t5cUw5dVpZZmdEOHFSZm10b2xaaDc0?=
- =?utf-8?B?Ty9YdVhyeURCRlI0K0UzdER2THJ6VHdGTWRsMTd0WnhXZHIxUzdaVGdyNXNj?=
- =?utf-8?B?dVFsa1ZlTUljZ2g5RHRPeW9lKzJCSm5NK2g2MkMzUTdRQTFRQ3VIYVF3RVRy?=
- =?utf-8?B?US9oUnlxRGFGMWk4ZkFxV2dJbEl2SnZTQXlUeWFFYnMzVk51TXlGK1BSZmtk?=
- =?utf-8?B?ZVBOTTZpYWxGUEJNeTIvbUNFVFM2QkpxT2pxYUwyelVNRHR0Y0NpSG5OaVE1?=
- =?utf-8?B?M1g2SWduRU9NVmRUaTZCRHh3ZEZGQlJkQUpndXE4QmpubitEQjVMVHM2dnQ4?=
- =?utf-8?B?MmkycVNDV2kwNFBLRG1mcVRKMDlJQjMxOTU2U2s3akdGR3pSKzlaRThoelRP?=
- =?utf-8?B?OFJndjluYnhHVjVURkdoR0dLcVd1U2dJVThWT0Z4dVJyNFlPOUJJS0xGUEZQ?=
- =?utf-8?B?WVNPVTlKVm1rWDRuaTloOGlDRUtQM0ZOdURtbjYycjFZQnpsVCtGdmdabm5m?=
- =?utf-8?B?Zk9seWpIY2hicG1FaVQ0RU4rclJ0blJkVjdhTGZyazNFc3NKdHFCWWR1Mk0y?=
- =?utf-8?B?VkRhM3dlbGhHajk5TGhnbXByYjkrMWRSUldmRyt5bWxwTUtSVkM0V3ljRDF4?=
- =?utf-8?B?K1gxNy9nZkFSTEpvM28xV0NFKzlUOVFpa240cEtydTQxaVM5d3JPdjY5KzA3?=
- =?utf-8?B?N0ZOQnUvcGVmanpKZFFyMEwyUU93d1haMTZsWFVSVnRranBBQWQ5MnNreit2?=
- =?utf-8?B?U3FWaGs0RDRLdUE4ZytkazhMc0JEcUduRmNaSWlUNWpUcVdYdHFhYXFSU1o1?=
- =?utf-8?B?Q0xqVjFSVHVhSGdrN3N6Mi9nUTZWbGhGMW9NVmNKVXVDclpPUVpGREc3d1dS?=
- =?utf-8?B?eCtaeWxhUHJUc2xZdFJGalpqOWxuZmRVTG4vN0hEV0JQUkZJTmxrd1hpQ3hO?=
- =?utf-8?B?T2s2dEcwZ3lmTlZCd1Z6cnBBblU4RWhRbzRwckxyaVZROWc2YXRGZ0U3TXhu?=
- =?utf-8?B?NE5JQ3JJWm41SEVId0k1NFI2NDN0Z0xkZ3hTcVNDWDUraVh6SWdxUThtRm1R?=
- =?utf-8?B?WlR4VVdZdlZSZ3pudG5hMHlvOStHT0E4Z2tXdVZkZS9vRG9Jd2QyTzZwajFr?=
- =?utf-8?B?a1IyWDFvOEFVbmo5d3MzWENRTEw2K0dud21IR1FsRmtzY1AzT0ZrTnovODN6?=
- =?utf-8?B?MHhDSFZPcDF4OFZ1eC90ZFdSaUNuM25jMCs0cU4zdHJ2T0h0UVBDM0J4c2U2?=
- =?utf-8?B?VTZ1TVhnM0JGSyt5ZjFsaHFWN0hNM2ExUkpKM3dmOUxVZWJKdmZuZUtvQks1?=
- =?utf-8?B?RGtDTW1pSHljRjNtTEZ5YUt3cEI1UjFzRldENFV6N1FUdVhlMzVuUk10bWNn?=
- =?utf-8?B?NDlxVTJwNWlLYmJDcXpGTytKZGtVQjJjMThpZzBvUC9sTmhRM3hGYWhoNjBB?=
- =?utf-8?B?aENvUWpJVDdsRS8yVWJJNlRpaDl0TmJNd0NkMm84UXorYXRFckVZS3hmNFNx?=
- =?utf-8?B?R3dEdWt3b0hUVmQ5M3pKTG5NVUdvaW1OSXlBajJZM1lsWXNEMHh4TjJZN1RL?=
- =?utf-8?B?bFRmSTV6R1VCTys1WURLOFdHUnF0MUlqYlFFK1cxVTcvRGFrWkpFTit0WVgr?=
- =?utf-8?B?NGxBWHBwbWdhRVJWcG9FcUJtVk9Sb0FjRXB3UmI4b1BnZmdFUzZNek9EV0tI?=
- =?utf-8?B?cFVMaGQ4SllPWk9zdi96WjhJcXl3bTB6SWlzOXVsOGY3Rk8yWFBTeEFreHFv?=
- =?utf-8?B?Mk5YamRPTlB4TXZweGJXRDFaSDhlM2FRUVpUMHB0dEgwdVpoMmZLTUNnejk3?=
- =?utf-8?B?TUVaSnhhK1BJWXhNOWRKTEROemdYUUNWY0RmN05nMlJMTVRnYTRCNnpiTFh3?=
- =?utf-8?B?NVhxa1dmcmx6UXlXOEl6U3JWeFlqclpoNWxGakRlNFd6WjU1T0RvSURvdUU3?=
- =?utf-8?B?YzFCc3FwdHZlaWFxV2taQzdiVnZDTVJXbTlENzJvMTdVL2pQWjhva2YyQnRX?=
- =?utf-8?B?N2VPRFhaRjBFclBMcWROc2VwNEhIQmFhMDN0dkkxc0lDcHJGUnhzRUtVVDJa?=
- =?utf-8?Q?km7C/XGgkwyIYfezgilnqlEPL?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ecf6dea2-ec10-4ee1-354a-08dddca4178d
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR12MB9031.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Aug 2025 09:05:48.5707
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 4hxCBvtCU3t/CPS9+IVT1UHQEp61sTCBlptx6YKLHq1QPQHdkIE452Z3LvYqk5MJ6KoufehnxYo7BqrLxYQJsw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB9178
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
 
-On Fri, Aug 15, 2025 at 10:24:33AM -0700, Jakub Kicinski wrote:
-> On Fri, 15 Aug 2025 14:03:48 +0300 Dragos Tatulea wrote:
-> > +		rxq_dma_dev = netdev_queue_get_dma_dev(netdev, rxq_idx);
-> > +		/* Multi-PF netdev queues can belong to different DMA devoces.
-Just saw the "devoces" typo. Will fix this too.
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-> > +		 * Block this case.
-> > +		 */
-> > +		if (rxq_dma_dev && dma_dev && rxq_dma_dev != dma_dev) {
-> 
-> Why rxq_dma_dev ? 🤔️
-> Don't we want to error out if the first queue gave us a DMA dev but the
-> second gave us a NULL ?
+On Fri Aug 15 2025, Vadim Fedorenko wrote:
+> On 15/08/2025 09:17, Kurt Kanzenbach wrote:
+>> Hi Paul,
+>>=20
+>> On Fri Aug 15 2025, Paul Menzel wrote:
+>>> Dear Kurt,
+>>>
+>>>
+>>> Thank you for your patch.
+>>>
+>>> Am 15.08.25 um 08:50 schrieb Kurt Kanzenbach:
+>>>> Retrieve Tx timestamp directly from interrupt handler.
+>>>>
+>>>> The current implementation uses schedule_work() which is executed by t=
+he
+>>>> system work queue to retrieve Tx timestamps. This increases latency an=
+d can
+>>>> lead to timeouts in case of heavy system load.
+>>>>
+>>>> Therefore, fetch the timestamp directly from the interrupt handler.
+>>>>
+>>>> The work queue code stays for the Intel 82576. Tested on Intel i210.
+>>>
+>>> Excuse my ignorance, I do not understand the first sentence in the last
+>>> line. Is it because the driver support different models? Why not change
+>>> it for Intel 82576 too?
+>>=20
+>> Yes, the driver supports lots of different NIC(s). AFAICS Intel 82576 is
+>> the only one which does not use time sync interrupts. Probably it does
+>> not have this feature. Therefore, the 82576 needs to schedule a work
+>> queue item.
+>>=20
+>>>
+>>> Do you have a reproducer for the issue, so others can test.
+>>=20
+>> Yeah, I do have a reproducer:
+>>=20
+>>   - Run ptp4l with 40ms tx timeout (--tx_timestamp_timeout)
+>>   - Run periodic RT tasks (e.g. with SCHED_FIFO 1) with run time of
+>>     50-100ms per CPU core
+>>=20
+>> This leads to sporadic error messages from ptp4l such as "increasing
+>> tx_timestamp_timeout or increasing kworker priority may correct this
+>> issue, but a driver bug likely causes it"
+>>=20
+>> However, increasing the kworker priority is not an option, simply
+>> because this kworker is doing non-related PTP work items as well.
 >
-Hmm, yes... I didn't take this case into account. Will fix.
+> Well, in this case, as it pointed out for other drivers, the best
+> practice would be to use a dedicated PTP worker which does only PTP
+> related tasks and can have higher priority.
+>
+> The inline retrieving of timestamp, of course, the best option, but for
+> 82576 could you please consider using @do_aux_work in ptp_caps and do
+> proper ptp_schedule_worker()?
 
-> > +			NL_SET_ERR_MSG(extack, "Can't bind to queues from different dma devices");
-> 
-> _FMT the conflicting queue IDs into this?
-Sure. Will print the last dma_dev index and the current rxq_dma_dev index.
+Sure, using the PTP aux worker is always the better than using the
+system work queue. I ordered a 82576 for testing. But, that conversion
+will be another patch.
 
-Thanks,
-Dragos
+>
+>>=20
+>> As the time sync interrupt already signals that the Tx timestamp is
+>> available, there's no need to schedule a work item in this case. I might
+>> have missed something though. But my testing looked good. The warn_on
+>> never triggered.
+>>=20
+>>>
+>>>> Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
+>>>> ---
+>>>>    drivers/net/ethernet/intel/igb/igb.h      |  1 +
+>>>>    drivers/net/ethernet/intel/igb/igb_main.c |  2 +-
+>>>>    drivers/net/ethernet/intel/igb/igb_ptp.c  | 22 ++++++++++++++++++++=
+++
+>>>>    3 files changed, 24 insertions(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/drivers/net/ethernet/intel/igb/igb.h b/drivers/net/ethern=
+et/intel/igb/igb.h
+>>>> index c3f4f7cd264e9b2ff70f03b580f95b15b528028c..102ca32e8979fa3203fc2e=
+a36eac456f1943cfca 100644
+>>>> --- a/drivers/net/ethernet/intel/igb/igb.h
+>>>> +++ b/drivers/net/ethernet/intel/igb/igb.h
+>>>> @@ -776,6 +776,7 @@ int igb_ptp_hwtstamp_get(struct net_device *netdev,
+>>>>    int igb_ptp_hwtstamp_set(struct net_device *netdev,
+>>>>    			 struct kernel_hwtstamp_config *config,
+>>>>    			 struct netlink_ext_ack *extack);
+>>>> +void igb_ptp_tx_tstamp_event(struct igb_adapter *adapter);
+>>>>    void igb_set_flag_queue_pairs(struct igb_adapter *, const u32);
+>>>>    unsigned int igb_get_max_rss_queues(struct igb_adapter *);
+>>>>    #ifdef CONFIG_IGB_HWMON
+>>>> diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/e=
+thernet/intel/igb/igb_main.c
+>>>> index a9a7a94ae61e93aa737b0103e00580e73601d62b..8ab6e52cb839bbb698007a=
+74462798faaaab0071 100644
+>>>> --- a/drivers/net/ethernet/intel/igb/igb_main.c
+>>>> +++ b/drivers/net/ethernet/intel/igb/igb_main.c
+>>>> @@ -7080,7 +7080,7 @@ static void igb_tsync_interrupt(struct igb_adapt=
+er *adapter)
+>>>>=20=20=20=20
+>>>>    	if (tsicr & E1000_TSICR_TXTS) {
+>>>>    		/* retrieve hardware timestamp */
+>>>> -		schedule_work(&adapter->ptp_tx_work);
+>>>> +		igb_ptp_tx_tstamp_event(adapter);
+>>>>    	}
+>>>>=20=20=20=20
+>>>>    	if (tsicr & TSINTR_TT0)
+>>>> diff --git a/drivers/net/ethernet/intel/igb/igb_ptp.c b/drivers/net/et=
+hernet/intel/igb/igb_ptp.c
+>>>> index a7876882aeaf2b2a7fb9ec6ff5c83d8a1b06008a..20ecafecc60557353f8cc5=
+ab505030246687c8e4 100644
+>>>> --- a/drivers/net/ethernet/intel/igb/igb_ptp.c
+>>>> +++ b/drivers/net/ethernet/intel/igb/igb_ptp.c
+>>>> @@ -796,6 +796,28 @@ static int igb_ptp_verify_pin(struct ptp_clock_in=
+fo *ptp, unsigned int pin,
+>>>>    	return 0;
+>>>>    }
+>>>>=20=20=20=20
+>>>> +/**
+>>>> + * igb_ptp_tx_tstamp_event
+>>>> + * @adapter: pointer to igb adapter
+>>>> + *
+>>>> + * This function checks the TSYNCTXCTL valid bit and stores the Tx ha=
+rdware
+>>>> + * timestamp at the current skb.
+>>>> + **/
+>>>> +void igb_ptp_tx_tstamp_event(struct igb_adapter *adapter)
+>>>> +{
+>>>> +	struct e1000_hw *hw =3D &adapter->hw;
+>>>> +	u32 tsynctxctl;
+>>>> +
+>>>> +	if (!adapter->ptp_tx_skb)
+>>>> +		return;
+>>>> +
+>>>> +	tsynctxctl =3D rd32(E1000_TSYNCTXCTL);
+>>>> +	if (WARN_ON_ONCE(!(tsynctxctl & E1000_TSYNCTXCTL_VALID)))
+>>>> +		return;
+>>>> +
+>>>> +	igb_ptp_tx_hwtstamp(adapter);
+>>>> +}
+>>>> +
+>>>>    /**
+>>>>     * igb_ptp_tx_work
+>>>>     * @work: pointer to work struct
+>>>
+>>> The diff looks fine.
+>>>
+>>> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+>
+> Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+
+Thanks!
+Kurt
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmigSikTHGt1cnRAbGlu
+dXRyb25peC5kZQAKCRDBk9HyqkZzgtwqEACrkPVsqfeGqszsv4seaGMy8MnS3Rfj
+FWa1rws6GMNjRAh5c4q31ScZonmUO1aCrdR2LPIVaSOpi3Lazd8dB4vOiScCikK2
+3TwL172hDFWyKdGKujz5ekPiQRmD5odgb+q5RhKzfeYRKjLOJLtcxDh4LREGlpOb
+k5iSdXC7Ib5eJRQGrk1YOSK7ZHO0EkEQhxb17MMKWZCJ3kAhPIDx3SD7+T1cD8ne
+9X9OSMiIUVeE6rFCY3TdSvmDxnWmCLf5xI/sbAtUNQ29+zyrhmXgGS3JiDc4ybnF
+0qzHMBCmlNT9WLvFCfC1rLXZFwWjEnbmK+JM5SMAFkL3c+rbyjmG21phs5uz7rsj
+BFW++mxosAx7DUS7N5WzKg3ecqkbI2M6VmyIriwvSRPEZ23/iIW2HWiiUY+fpF+M
+9a/gFUa5FFII700xrQ5Wp6azMrJ3doR6AKOp6BYReUKtQLCaAre/GecXEQxyoeI+
+CntDN/3wCQJGRQSIl3C2y/5Ym7tE7A+JDMBm4buLbOpNiXh9xv1+p4f3f+ZazSK1
+W8yL/Odaq29AU7Nj+ikKDm7oxXJa1Xr41kTJfunL/Xoh0PmC+kCw+46QYpOJMQYI
+4dh+o+CsOMi4jWGk3JVEDMQRJSJLd2+bGwBjpoQM+NVWV1hbZ3HwTrTKFJCrLp4A
+3yJGuXAPPWaV/w==
+=3TtW
+-----END PGP SIGNATURE-----
+--=-=-=--
 
