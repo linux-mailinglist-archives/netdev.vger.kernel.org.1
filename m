@@ -1,131 +1,140 @@
-Return-Path: <netdev+bounces-214266-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214268-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7CF1B28B36
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 08:55:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C28DEB28B40
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 09:03:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A1E73BB698
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 06:55:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18B273BFBD6
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 07:03:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 161DB2010EE;
-	Sat, 16 Aug 2025 06:55:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BCC421FF51;
+	Sat, 16 Aug 2025 07:03:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nQ4i5lbX"
+	dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b="B90Bbbv3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mxout4.routing.net (mxout4.routing.net [134.0.28.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 697AB3176F0
-	for <netdev@vger.kernel.org>; Sat, 16 Aug 2025 06:55:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAF8E21B918;
+	Sat, 16 Aug 2025 07:03:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.0.28.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755327306; cv=none; b=Bg8fASCAZ1VSNtCCuqUDiwArTj1R4STBZHL+eWsMVBTf7gQ68Bp0uJrezSi3znw3TzvNcadgNumHNYkA2Y0znNoR815+RE+YgTmuRfOiabhMnVUvxkiMLZ5j1PnFM++2LHG9pZSu2XWOJosq8SxAinJiezwJO8cYlfuAxZwymP4=
+	t=1755327794; cv=none; b=fdqxyH8Fv13JzKCvP8IeFBKEQc1QGsixRVwlalzRRRgsZgToVAKom7CN4lqkZCKkMcJ3f2sesGfcGxHX9Ov6DEoa1g+XKWEzH+fX6//TKelmIG6VCfM03FujZbGwV129ph0AZoGjGbWE/hz/La8nOZIr6EEvX6ASJSRncwaExHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755327306; c=relaxed/simple;
-	bh=/F+VLR4k/VQa/W7G7e4mK7Tt/KybN6dnMhzKfl7uavc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HUb1IdGXCxkW1o1lcdEfGKpPAyWuiNPADBbnF9XhFOpKHSa0W+esFe63pkE8Po6MkS46GpX0eE60xV9hqWiZDrGcASkdzBcb98fjGNN2eo8wnhiKqBx5tSlV+5GMzUPZhhA4H3uKtjUC096V2hWl9UfbFfTRoCoBJOuhBv0cWuM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nQ4i5lbX; arc=none smtp.client-ip=209.85.215.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-b472f0106feso868756a12.2
-        for <netdev@vger.kernel.org>; Fri, 15 Aug 2025 23:55:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755327303; x=1755932103; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+roC/3kZ2N7w+PMio3Mw9lCc2kYfnFQheZWp08VP6Fo=;
-        b=nQ4i5lbXMmRhAE/G2LrZfqn0rWfNWFQbVj30LZGZYq+XfEL4HzK7vv1OIsg/3a+5AX
-         XfGCoZZoEdQlM4tc60K7RcZuH/Fmun2ZM+CCJ2ivk74Dz3qj9ObtborntzZFT95EWFPj
-         XGTv5VPc9jO1uY7pVu87TsNX+kclGPCPM2IIPslZzr6YaCr4yuDCsU4iL0hf0o1GOk83
-         pNoSlD4ozfdxVPf+JJ50bwiW9UY7ZNlLsKdGFoMDuylVDq621BRiP1GVePnGmESwVNFU
-         ruqVwQV18XhJ/RelzoMzEiZj67Y+wCnLB1gz5g4CAQ8xyFSDglAxEhYIMLzNhF72ZH/k
-         f5GQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755327303; x=1755932103;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+roC/3kZ2N7w+PMio3Mw9lCc2kYfnFQheZWp08VP6Fo=;
-        b=UKdhUce3E2eC4JjXAbZRJuhl2Qw6tPjMWxj2PZ9pQmtmsVj1GG6Ja4g0mvp5x+aNsK
-         KwaO1zPdGVXpIYsctYbLMA0UnR10Zbf2DoUpzIjnvFtsEkpgsHR3J5PTFm5Csdnmchrl
-         pYVf2GR/+MiUn+NtURzRbQ/XjUyAenXdE7LkmVrrujHKMCTxKFdrcYi8J0rO6q0VS3gZ
-         gkAP3uKd0WbzsFAsh3A/o8Z8gjlrGuvkPEl+eX56r5LYwAKuPbz2+rzDcrJEd6/OOHjL
-         lf5SY5JaZVLIeiUiTRnqHO2eeLNe7vBEseTKuxMXjmpVcpYD4FCiRJdbWQuzqqALmV92
-         fEPg==
-X-Forwarded-Encrypted: i=1; AJvYcCWavRtqRYCtvi4M7idZr/5WlDdfrhg7tL+3Fe7XgcepJH36ChA0yoWa9G+GcVoql95JWDEfmTo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyAIm/Yq7lEsrjDzJ7Z4yud9gaNiikGUP+b2YYjSLuNd2wa1kdM
-	97uyc4FBhxbksm3EunwYh7AoNW7SdsLldj1BkaicvRuAB14DENEvfrR69X+qrhjZgkr9dvKVlX6
-	S4wEONWSo3b0mcm+ZsPuKAapOBBvn2pQ1n84CP/12
-X-Gm-Gg: ASbGnct/dyUQ/zjU7gdZVokczvU6X365ySGeF+r6b0F0pw8zagKgKA3MM11pc0drpRU
-	LY84PBprzz0VLcVhoPRESdJAB3iZewPOFX+v0W9ZPStJSV6BagTOpxbZb60cq3oQr10hiTAJnfi
-	CjkxBYwv6AIbat5XCrPvC2HFVZoKIJ3jTj0SOWSjYEselIbUdeZreRppX8GTJAng9ZNU/kyxOwP
-	w7r1VgEy1BorkQSf+ItRIHQIyRNG/PvcmtA4cCpotavqkammaEWXR6RyQ==
-X-Google-Smtp-Source: AGHT+IEMSA24bd0diS0sQYr20cbIkI0J4iGYKyH2mU0FJoJ7HQA4OvKP0Qg3cveqUerOQhUmDDsmSsfyd608LPwwrjg=
-X-Received: by 2002:a17:902:f54f:b0:23f:cd6e:8d0f with SMTP id
- d9443c01a7336-2446d71ab4bmr70555295ad.13.1755327302534; Fri, 15 Aug 2025
- 23:55:02 -0700 (PDT)
+	s=arc-20240116; t=1755327794; c=relaxed/simple;
+	bh=OnJuy7emtHk4hQBUmYOKm/D2zPW1BmNtYcmtvPGdvAY=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=DWoNrbRBQlNg5ebANu3tgwP7PlhUhjzkXvXEldwK+pXV1bX5CWwbXqF3pV4Jit3Fwmf9ajnQbnzcIMsZVJOc24eDqhN57/tbgCvhiJaoR46zMyJ9oPJAM9XYN4b/r7rjPc8TqDEU00R+hvE50oSyHLzJY0muJrGAL5oqqHYo5y0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de; spf=pass smtp.mailfrom=fw-web.de; dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b=B90Bbbv3; arc=none smtp.client-ip=134.0.28.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fw-web.de
+Received: from mxbox2.masterlogin.de (unknown [192.168.10.89])
+	by mxout4.routing.net (Postfix) with ESMTP id 87FCD10078F;
+	Sat, 16 Aug 2025 06:55:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailerdienst.de;
+	s=20200217; t=1755327352;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cOdNjKyebw/s0rYRUwH2anrLdBAU4WTiR9sWOyp0RzU=;
+	b=B90Bbbv3kORkuslteF8M9lfemmr/Ar1i0t3y1qMPZ3aNWD5GMw4AF99Zmf/twP1Z2Xvzxh
+	VHoMItSyNhLXYNk6eJP2k+iwn8QLsnvEmMzpau4i7qAkKW02XnkQBDIX7WsMeXFCbyVHbA
+	JGT7zABH+1AdtypI/z6yjto4yaFzkLc=
+Received: from [IPv6:::1] (unknown [IPv6:2a01:599:a34:a3b8:9076:e76e:6930:1412])
+	by mxbox2.masterlogin.de (Postfix) with ESMTPSA id 156781002C7;
+	Sat, 16 Aug 2025 06:55:51 +0000 (UTC)
+Date: Sat, 16 Aug 2025 08:55:51 +0200
+From: Frank Wunderlich <linux@fw-web.de>
+To: patchwork-bot+netdevbpf@kernel.org
+CC: myungjoo.ham@samsung.com, kyungmin.park@samsung.com, cw00.choi@samsung.com,
+ djakov@kernel.org, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+ andrew@lunn.ch, olteanv@gmail.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, matthias.bgg@gmail.com,
+ angelogioacchino.delregno@collabora.com, johnson.wang@mediatek.com,
+ arinc.unal@arinc9.com, Landen.Chao@mediatek.com, dqfext@gmail.com,
+ sean.wang@mediatek.com, daniel@makrotopia.org, lorenzo@kernel.org,
+ nbd@nbd.name, frank-w@public-files.de, linux-pm@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH v9 00/13] further mt7988 devicetree work
+User-Agent: K-9 Mail for Android
+In-Reply-To: <175218542224.1682269.17523198222056896163.git-patchwork-notify@kernel.org>
+References: <20250709111147.11843-1-linux@fw-web.de> <175218542224.1682269.17523198222056896163.git-patchwork-notify@kernel.org>
+Message-ID: <8A21C091-0C26-4E9F-9B9E-E28A01F71369@fw-web.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <aJ4FUauS-3Ymarop@shredder> <20250815063845.85426-1-heminhong@kylinos.cn>
-In-Reply-To: <20250815063845.85426-1-heminhong@kylinos.cn>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Fri, 15 Aug 2025 23:54:50 -0700
-X-Gm-Features: Ac12FXwZyGYXEIwMUpsUzF4a8Iww5pU6O2PEKL5Oev7G9TdqLt1QMJCq7MTRFsg
-Message-ID: <CAAVpQUACaRY3gW1W1rBEFkYJxeJfVpL=BfuSv_99D7cqr-G6nQ@mail.gmail.com>
-Subject: Re: [PATCH net v4] ipv6: sr: validate HMAC algorithm ID in seg6_hmac_info_add
-To: Minhong He <heminhong@kylinos.cn>
-Cc: idosch@idosch.org, dsahern@kernel.org, edumazet@google.com, 
-	kuba@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: quoted-printable
+X-Mail-ID: d7d08745-eee0-42d0-ad9e-cba520e4f9d1
 
-On Thu, Aug 14, 2025 at 11:39=E2=80=AFPM Minhong He <heminhong@kylinos.cn> =
-wrote:
+Am 11=2E Juli 2025 00:10:22 MESZ schrieb patchwork-bot+netdevbpf@kernel=2Eo=
+rg:
+>Hello:
 >
-> The seg6_genl_sethmac() directly uses the algorithm ID provided by the
-> userspace without verifying whether it is an HMAC algorithm supported
-> by the system.
-> If an unsupported HMAC algorithm ID is configured, packets using SRv6 HMA=
-C
-> will be dropped during encapsulation or decapsulation.
+>This series was applied to netdev/net-next=2Egit (main)
+>by Jakub Kicinski <kuba@kernel=2Eorg>:
 >
-> Fixes: 4f4853dc1c9c ("ipv6: sr: implement API to control SR HMAC structur=
-e")
-> Signed-off-by: Minhong He <heminhong@kylinos.cn>
+>On Wed,  9 Jul 2025 13:09:36 +0200 you wrote:
+>> From: Frank Wunderlich <frank-w@public-files=2Ede>
+>>=20
+>> This series continues mt7988 devicetree work
+>>=20
+>> - Extend cpu frequency scaling with CCI
+>> - GPIO leds
+>> - Basic network-support (ethernet controller + builtin switch + SFP Cag=
+es)
+>>=20
+>> [=2E=2E=2E]
+>
+>Here is the summary with links:
+>  - [v9,01/13] dt-bindings: net: mediatek,net: update mac subnode pattern=
+ for mt7988
+>    https://git=2Ekernel=2Eorg/netdev/net-next/c/29712b437339
+>  - [v9,02/13] dt-bindings: net: mediatek,net: allow up to 8 IRQs
+>    https://git=2Ekernel=2Eorg/netdev/net-next/c/356dea0baf4c
+>  - [v9,03/13] dt-bindings: net: mediatek,net: allow irq names
+>    https://git=2Ekernel=2Eorg/netdev/net-next/c/23ac2a71bdbd
+>  - [v9,04/13] dt-bindings: net: mediatek,net: add sram property
+>    https://git=2Ekernel=2Eorg/netdev/net-next/c/c4582a31efd9
+>  - [v9,05/13] dt-bindings: net: dsa: mediatek,mt7530: add dsa-port defin=
+ition for mt7988
+>    https://git=2Ekernel=2Eorg/netdev/net-next/c/588cb646ce70
+>  - [v9,06/13] dt-bindings: net: dsa: mediatek,mt7530: add internal mdio =
+bus
+>    https://git=2Ekernel=2Eorg/netdev/net-next/c/66a44adf4c3d
+>  - [v9,07/13] arm64: dts: mediatek: mt7986: add sram node
+>    (no matching commit)
+>  - [v9,08/13] arm64: dts: mediatek: mt7986: add interrupts for RSS and i=
+nterrupt names
+>    (no matching commit)
+>  - [v9,09/13] arm64: dts: mediatek: mt7988: add basic ethernet-nodes
+>    (no matching commit)
+>  - [v9,10/13] arm64: dts: mediatek: mt7988: add switch node
+>    (no matching commit)
+>  - [v9,11/13] arm64: dts: mediatek: mt7988a-bpi-r4: add aliases for ethe=
+rnet
+>    (no matching commit)
+>  - [v9,12/13] arm64: dts: mediatek: mt7988a-bpi-r4: add sfp cages and li=
+nk to gmac
+>    (no matching commit)
+>  - [v9,13/13] arm64: dts: mediatek: mt7988a-bpi-r4: configure switch phy=
+s and leds
+>    (no matching commit)
+>
+>You are awesome, thank you!
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+Hi
 
-
-> ---
->  net/ipv6/seg6_hmac.c | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/net/ipv6/seg6_hmac.c b/net/ipv6/seg6_hmac.c
-> index f78ecb6ad838..d77b52523b6a 100644
-> --- a/net/ipv6/seg6_hmac.c
-> +++ b/net/ipv6/seg6_hmac.c
-> @@ -304,6 +304,9 @@ int seg6_hmac_info_add(struct net *net, u32 key, stru=
-ct seg6_hmac_info *hinfo)
->         struct seg6_pernet_data *sdata =3D seg6_pernet(net);
->         int err;
->
-> +       if (!__hmac_get_algo(hinfo->alg_id))
-> +               return -EINVAL;
-> +
->         err =3D rhashtable_lookup_insert_fast(&sdata->hmac_infos, &hinfo-=
->node,
->                                             rht_params);
->
-> --
-> 2.25.1
->
+Any comments on the missing DTS parts or can they applied too?
+regards Frank
 
