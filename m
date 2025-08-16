@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-214336-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214337-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00CC1B2905F
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 21:54:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2942BB29066
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 21:55:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 55B161C88D9D
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 19:54:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66EB6AE6F9A
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 19:54:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6DFA21A424;
-	Sat, 16 Aug 2025 19:53:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 836DD21CC68;
+	Sat, 16 Aug 2025 19:53:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1624F214A6A;
-	Sat, 16 Aug 2025 19:53:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8AB7219A67;
+	Sat, 16 Aug 2025 19:53:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755374016; cv=none; b=ABR6AK/3DS9+HCOfAs3cc3NGp7t3I2KI8my6OXjAHWo9GDVBXDVQnKfar+GR+eXw1s/cwjVDBVC7pcp/gz6HxbnZ01iUdjh0LBJalYWwiPRXhU5RZASOo7nL/oT9zmczcX1Bs9yDyH81PE6K+vzaDGeyiFRHbyPKfuHIeyXfRgQ=
+	t=1755374028; cv=none; b=BPwVMnu0OWaZKnl/+YdqcNdA/4dkcanPLo/tXLWxtzcrnhSiUvyQmfk2qJX2zsWFJMBpnKqnTC7eVhboInLd+D+T8zqcST7547vWf4IJOT9bu2FTOZRVR9WgMG+ud5h7Aqdi9qa14K8G42pp/XjDn1olB+ArhXGC3Sv9B6WWwZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755374016; c=relaxed/simple;
-	bh=ziy6OiCFCrRlJWmMRuOFaXhlVv8fM2wEoWyrPJ0RJyk=;
+	s=arc-20240116; t=1755374028; c=relaxed/simple;
+	bh=R4e5sikzTcaj2bOC3rEAHKFYHm1TMGn0ZlrzOik0ZKA=;
 	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=mhRRb8R1OfUIqLpQ0uA8wQBEAeNR64aH4PV/flnFVCuaMcz4k6MqlO2PuAluKL/3MNhGrH6ffN+C6eLaBwfKc5YrxzqY9X7VZMFVjpawYJJ62fCqoCnAquEyjGVoIfElhkxZs2yimTpBgKIoc/0cNj0KkrYabjd5zeloCWD44+U=
+	 Content-Disposition; b=MZGmfcM87Y68xt5F3dljKVOCQ3v2i4q4AsVgEWhfgfkabmsXNJYzJZ/B3prxk4OvE1XTjyTNkAhH7acEq1mUtPxiQVcDGNDNZUIhQ1xXrcuIgFr3dI9DU1awI1h9u4r+2WZ1em9mvy/Zo8WanxPK+htgKR6wsgsl4oijaWDzTII=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -33,9 +33,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.98.2)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1unMy0-0000000070t-3Fwd;
-	Sat, 16 Aug 2025 19:53:28 +0000
-Date: Sat, 16 Aug 2025 20:53:25 +0100
+	id 1unMyD-0000000071k-0hdh;
+	Sat, 16 Aug 2025 19:53:41 +0000
+Date: Sat, 16 Aug 2025 20:53:37 +0100
 From: Daniel Golle <daniel@makrotopia.org>
 To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -57,9 +57,9 @@ Cc: Andreas Schirm <andreas.schirm@siemens.com>,
 	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
 	"Livia M. Rosu" <lrosu@maxlinear.com>,
 	John Crispin <john@phrozen.org>
-Subject: [PATCH RFC net-next 11/23] net: dsa: lantiq_gswip: support Energy
- Efficient Ethernet
-Message-ID: <aKDhtft7buA7iqli@pidgin.makrotopia.org>
+Subject: [PATCH RFC net-next 12/23] net: dsa: lantiq_gswip: support 4k VLANs
+ on API 2.2 or later
+Message-ID: <aKDhwYPptuC94u-f@pidgin.makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,115 +69,200 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-Introduce support for Energy Efficient Ethernet (EEE) on switch API 2.3
-or later.
+Dynamically allocate vlans array depending on the switch API version.
+Versions less than 2.2 support 64 VLANs, versions 2.2 or later support
+4096 VLANs.
 
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 ---
- drivers/net/dsa/lantiq_gswip.c | 57 +++++++++++++++++++++++++++++++---
- drivers/net/dsa/lantiq_gswip.h |  7 +++++
- 2 files changed, 60 insertions(+), 4 deletions(-)
+ drivers/net/dsa/lantiq_gswip.c | 73 +++++++++++++++++++++++-----------
+ drivers/net/dsa/lantiq_gswip.h |  4 +-
+ 2 files changed, 52 insertions(+), 25 deletions(-)
 
 diff --git a/drivers/net/dsa/lantiq_gswip.c b/drivers/net/dsa/lantiq_gswip.c
-index fde31c5bd8ae..cc8a65c173c9 100644
+index cc8a65c173c9..5a5e85b1b32f 100644
 --- a/drivers/net/dsa/lantiq_gswip.c
 +++ b/drivers/net/dsa/lantiq_gswip.c
-@@ -1625,10 +1625,57 @@ static int gswip_get_sset_count(struct dsa_switch *ds, int port, int sset)
- 	return ARRAY_SIZE(gswip_rmon_cnt);
+@@ -657,6 +657,11 @@ static int gswip_setup(struct dsa_switch *ds)
+ 	gswip_switch_mask(priv, 0, GSWIP_BM_QUEUE_GCTRL_GL_MOD,
+ 			  GSWIP_BM_QUEUE_GCTRL);
+ 
++	if (GSWIP_VERSION_GE(priv, GSWIP_VERSION_2_2))
++		/* Enable VLANMD 2.2 for 4k VLANs entries */
++		gswip_switch_mask(priv, 0, GSWIP_PCE_GCTRL_1_VLANMD,
++				  GSWIP_PCE_GCTRL_1);
++
+ 	/* VLAN aware Switching */
+ 	gswip_switch_mask(priv, 0, GSWIP_PCE_GCTRL_0_VLAN, GSWIP_PCE_GCTRL_0);
+ 
+@@ -700,8 +705,8 @@ static int gswip_vlan_active_create(struct gswip_priv *priv,
+ 	int i;
+ 
+ 	/* Look for a free slot */
+-	for (i = max_ports; i < ARRAY_SIZE(priv->vlans); i++) {
+-		if (!priv->vlans[i].bridge) {
++	for (i = max_ports; i < priv->num_vlans; i++) {
++		if (!(*priv->vlans)[i].bridge) {
+ 			idx = i;
+ 			break;
+ 		}
+@@ -725,9 +730,9 @@ static int gswip_vlan_active_create(struct gswip_priv *priv,
+ 		return err;
+ 	}
+ 
+-	priv->vlans[idx].bridge = bridge;
+-	priv->vlans[idx].vid = vid;
+-	priv->vlans[idx].fid = fid;
++	(*priv->vlans)[idx].bridge = bridge;
++	(*priv->vlans)[idx].vid = vid;
++	(*priv->vlans)[idx].fid = fid;
+ 
+ 	return idx;
+ }
+@@ -743,7 +748,7 @@ static int gswip_vlan_active_remove(struct gswip_priv *priv, int idx)
+ 	err = gswip_pce_table_entry_write(priv, &vlan_active);
+ 	if (err)
+ 		dev_err(priv->dev, "failed to delete active VLAN: %d\n", err);
+-	priv->vlans[idx].bridge = NULL;
++	(*priv->vlans)[idx].bridge = NULL;
+ 
+ 	return err;
+ }
+@@ -759,8 +764,8 @@ static int gswip_vlan_add_unaware(struct gswip_priv *priv,
+ 	int err;
+ 
+ 	/* Check if there is already a page for this bridge */
+-	for (i = max_ports; i < ARRAY_SIZE(priv->vlans); i++) {
+-		if (priv->vlans[i].bridge == bridge) {
++	for (i = max_ports; i < priv->num_vlans; i++) {
++		if ((*priv->vlans)[i].bridge == bridge) {
+ 			idx = i;
+ 			break;
+ 		}
+@@ -822,12 +827,12 @@ static int gswip_vlan_add_aware(struct gswip_priv *priv,
+ 	int err;
+ 
+ 	/* Check if there is already a page for this bridge */
+-	for (i = max_ports; i < ARRAY_SIZE(priv->vlans); i++) {
+-		if (priv->vlans[i].bridge == bridge) {
+-			if (fid != -1 && fid != priv->vlans[i].fid)
++	for (i = max_ports; i < priv->num_vlans; i++) {
++		if ((*priv->vlans)[i].bridge == bridge) {
++			if (fid != -1 && fid != (*priv->vlans)[i].fid)
+ 				dev_err(priv->dev, "one bridge with multiple flow ids\n");
+-			fid = priv->vlans[i].fid;
+-			if (priv->vlans[i].vid == vid) {
++			fid = (*priv->vlans)[i].fid;
++			if ((*priv->vlans)[i].vid == vid) {
+ 				idx = i;
+ 				break;
+ 			}
+@@ -894,9 +899,9 @@ static int gswip_vlan_remove(struct gswip_priv *priv,
+ 	int err;
+ 
+ 	/* Check if there is already a page for this bridge */
+-	for (i = max_ports; i < ARRAY_SIZE(priv->vlans); i++) {
+-		if (priv->vlans[i].bridge == bridge &&
+-		    (!vlan_aware || priv->vlans[i].vid == vid)) {
++	for (i = max_ports; i < priv->num_vlans; i++) {
++		if ((*priv->vlans)[i].bridge == bridge &&
++		    (!vlan_aware || (*priv->vlans)[i].vid == vid)) {
+ 			idx = i;
+ 			break;
+ 		}
+@@ -993,9 +998,9 @@ static int gswip_port_vlan_prepare(struct dsa_switch *ds, int port,
+ 		return -EOPNOTSUPP;
+ 
+ 	/* Check if there is already a page for this VLAN */
+-	for (i = max_ports; i < ARRAY_SIZE(priv->vlans); i++) {
+-		if (priv->vlans[i].bridge == bridge &&
+-		    priv->vlans[i].vid == vlan->vid) {
++	for (i = max_ports; i < priv->num_vlans; i++) {
++		if ((*priv->vlans)[i].bridge == bridge &&
++		    (*priv->vlans)[i].vid == vlan->vid) {
+ 			idx = i;
+ 			break;
+ 		}
+@@ -1007,8 +1012,8 @@ static int gswip_port_vlan_prepare(struct dsa_switch *ds, int port,
+ 	 */
+ 	if (idx == -1) {
+ 		/* Look for a free slot */
+-		for (; pos < ARRAY_SIZE(priv->vlans); pos++) {
+-			if (!priv->vlans[pos].bridge) {
++		for (; pos < priv->num_vlans; pos++) {
++			if (!(*priv->vlans)[pos].bridge) {
+ 				idx = pos;
+ 				pos++;
+ 				break;
+@@ -1149,9 +1154,9 @@ static int gswip_port_fdb(struct dsa_switch *ds, int port,
+ 
+ 	switch (db.type) {
+ 	case DSA_DB_BRIDGE:
+-		for (i = 0; i < ARRAY_SIZE(priv->vlans); i++) {
+-			if (priv->vlans[i].bridge == db.bridge.dev) {
+-				fid = priv->vlans[i].fid;
++		for (i = 0; i < priv->num_vlans; i++) {
++			if ((*priv->vlans)[i].bridge == db.bridge.dev) {
++				fid = (*priv->vlans)[i].fid;
+ 				break;
+ 			}
+ 		}
+@@ -1948,6 +1953,22 @@ static int gswip_validate_cpu_port(struct dsa_switch *ds)
+ 	return 0;
  }
  
--static const struct phylink_mac_ops gswip_phylink_mac_ops = {
--	.mac_config	= gswip_phylink_mac_config,
--	.mac_link_down	= gswip_phylink_mac_link_down,
--	.mac_link_up	= gswip_phylink_mac_link_up,
-+static int gswip_set_mac_eee(struct dsa_switch *ds, int port,
-+			     struct ethtool_keee *e)
++static int gswip_allocate_vlans(struct gswip_priv *priv)
 +{
-+	if (e->tx_lpi_timer > 0x7f)
-+		return -EINVAL;
++	if (GSWIP_VERSION_GE(priv, GSWIP_VERSION_2_2))
++		priv->num_vlans = 4096;
++	else
++		priv->num_vlans = 64;
++
++	priv->vlans = devm_kcalloc(priv->dev, priv->num_vlans,
++				   sizeof((*priv->vlans)[0]), GFP_KERNEL);
++	if (!priv->vlans)
++		return dev_err_probe(priv->dev, -ENOMEM,
++				     "VLAN allocation failed\n");
 +
 +	return 0;
 +}
 +
-+static void gswip_phylink_mac_disable_tx_lpi(struct phylink_config *config)
-+{
-+	struct dsa_port *dp = dsa_phylink_to_port(config);
-+	struct gswip_priv *priv = dp->ds->priv;
-+
-+	gswip_switch_mask(priv, GSWIP_MAC_CTRL_4_LPIEN, 0,
-+			  GSWIP_MAC_CTRL_4p(dp->index));
-+}
-+
-+static int gswip_phylink_mac_enable_tx_lpi(struct phylink_config *config,
-+					    u32 timer, bool tx_clock_stop)
-+{
-+	struct dsa_port *dp = dsa_phylink_to_port(config);
-+	struct gswip_priv *priv = dp->ds->priv;
-+
-+	gswip_switch_mask(priv, GSWIP_MAC_CTRL_4_LPIEN |
-+				GSWIP_MAC_CTRL_4_GWAIT_MASK |
-+				GSWIP_MAC_CTRL_4_WAIT_MASK,
-+			  GSWIP_MAC_CTRL_4_LPIEN |
-+			  GSWIP_MAC_CTRL_4_GWAIT(timer) |
-+			  GSWIP_MAC_CTRL_4_WAIT(timer),
-+			  GSWIP_MAC_CTRL_4p(dp->index));
-+
-+	return 0;
-+}
-+
-+static bool gswip_support_eee(struct dsa_switch *ds, int port)
-+{
-+	struct gswip_priv *priv = ds->priv;
-+
-+	if (GSWIP_VERSION_GE(priv, GSWIP_VERSION_2_3))
-+		return true;
-+
-+	return false;
-+}
-+
-+const struct phylink_mac_ops gswip_phylink_mac_ops = {
-+	.mac_config		= gswip_phylink_mac_config,
-+	.mac_link_down		= gswip_phylink_mac_link_down,
-+	.mac_link_up		= gswip_phylink_mac_link_up,
-+	.mac_disable_tx_lpi	= gswip_phylink_mac_disable_tx_lpi,
-+	.mac_enable_tx_lpi	= gswip_phylink_mac_enable_tx_lpi,
- };
+ static int gswip_probe(struct platform_device *pdev)
+ {
+ 	struct device_node *np, *gphy_fw_np;
+@@ -2024,6 +2045,10 @@ static int gswip_probe(struct platform_device *pdev)
+ 		goto gphy_fw_remove;
+ 	}
  
- static const struct dsa_switch_ops gswip_switch_ops = {
-@@ -1652,6 +1699,8 @@ static const struct dsa_switch_ops gswip_switch_ops = {
- 	.get_strings		= gswip_get_strings,
- 	.get_ethtool_stats	= gswip_get_ethtool_stats,
- 	.get_sset_count		= gswip_get_sset_count,
-+	.set_mac_eee		= gswip_set_mac_eee,
-+	.support_eee		= gswip_support_eee,
- };
- 
- static const struct xway_gphy_match_data xrx200a1x_gphy_data = {
++	err = gswip_allocate_vlans(priv);
++	if (err)
++		goto gphy_fw_remove;
++
+ 	err = dsa_register_switch(priv->ds);
+ 	if (err) {
+ 		dev_err_probe(dev, err, "dsa switch registration failed\n");
 diff --git a/drivers/net/dsa/lantiq_gswip.h b/drivers/net/dsa/lantiq_gswip.h
-index b565ebebbc46..5c21618ca6f0 100644
+index 5c21618ca6f0..00a786d374b1 100644
 --- a/drivers/net/dsa/lantiq_gswip.h
 +++ b/drivers/net/dsa/lantiq_gswip.h
-@@ -2,6 +2,7 @@
- #ifndef __LANTIQ_GSWIP_H
- #define __LANTIQ_GSWIP_H
- 
-+#include <linux/bitfield.h>
- #include <linux/clk.h>
- #include <linux/mutex.h>
- #include <linux/platform_device.h>
-@@ -183,6 +184,12 @@
- #define GSWIP_MAC_CTRL_2p(p)		(0x905 + ((p) * 0xC))
- #define GSWIP_MAC_CTRL_2_LCHKL		BIT(2) /* Frame Length Check Long Enable */
- #define GSWIP_MAC_CTRL_2_MLEN		BIT(3) /* Maximum Untagged Frame Lnegth */
-+#define GSWIP_MAC_CTRL_4p(p)		(0x907 + ((p) * 0xC))
-+#define  GSWIP_MAC_CTRL_4_LPIEN		BIT(7) /* LPI Mode Enable */
-+#define  GSWIP_MAC_CTRL_4_GWAIT_MASK	GENMASK(14, 8) /* LPI Wait Time 1G */
-+#define  GSWIP_MAC_CTRL_4_GWAIT(t)	u16_encode_bits((t), GSWIP_MAC_CTRL_4_GWAIT_MASK)
-+#define  GSWIP_MAC_CTRL_4_WAIT_MASK	GENMASK(6, 0) /* LPI Wait Time 100M */
-+#define  GSWIP_MAC_CTRL_4_WAIT(t)	u16_encode_bits((t), GSWIP_MAC_CTRL_4_WAIT_MASK)
- 
- /* Ethernet Switch Fetch DMA Port Control Register */
- #define GSWIP_FDMA_PCTRLp(p)		(0xA80 + ((p) * 0x6))
+@@ -142,6 +142,7 @@
+ #define GSWIP_PCE_GCTRL_1		0x457
+ #define  GSWIP_PCE_GCTRL_1_MAC_GLOCK	BIT(2)	/* MAC Address table lock */
+ #define  GSWIP_PCE_GCTRL_1_MAC_GLOCK_MOD	BIT(3) /* Mac address table lock forwarding mode */
++#define  GSWIP_PCE_GCTRL_1_VLANMD	BIT(9)	/* VLAN MODE */
+ #define GSWIP_PCE_PCTRL_0p(p)		(0x480 + ((p) * 0xA))
+ #define  GSWIP_PCE_PCTRL_0_TVM		BIT(5)	/* Transparent VLAN mode */
+ #define  GSWIP_PCE_PCTRL_0_VREP		BIT(6)	/* VLAN Replace Mode */
+@@ -269,7 +270,8 @@ struct gswip_priv {
+ 	struct dsa_switch *ds;
+ 	struct device *dev;
+ 	struct regmap *rcu_regmap;
+-	struct gswip_vlan vlans[64];
++	struct gswip_vlan (*vlans)[];
++	unsigned int num_vlans;
+ 	int num_gphy_fw;
+ 	struct gswip_gphy_fw *gphy_fw;
+ 	u32 port_vlan_filter;
 -- 
 2.50.1
 
