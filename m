@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-214325-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214326-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 502FFB2904A
+	by mail.lfdr.de (Postfix) with ESMTPS id F0F1BB2904B
 	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 21:51:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F0E48171784
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 19:51:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09CE51741F9
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 19:51:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7C58212575;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7CCF212577;
 	Sat, 16 Aug 2025 19:51:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA11621018A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACEED207A0B;
 	Sat, 16 Aug 2025 19:51:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755373869; cv=none; b=qjWeHclGRoy642PD126m06l4O91f5kKxA/3tqnHMeSOFSnRWabzsnEiyFP4Wkpzvo9Qq1v60KErFgrDJNRP5GTSd8bxRb2HaxafZnGRYyrkHaRHEekyfGT6w1dPdXPWRDN0liUtHkC0qZhPRv0cmmzVCZpDSTJm2HTv9kPynAhQ=
+	t=1755373869; cv=none; b=liWwSn2iosw/BsNQngHQ1gtucfn8DmBx18hIM1zG6d6R052EueWFEFnYRPk3/Si08KF1Bu6gP1SwNsMBIoDUEi9/TaWZhC79M5YbMmtfdkzNRQ2cgrYcDW4KQzWTRoeBobZssK8SUXjvtLXtSSh5pjIT/8AgaLUQrkkdC5/cqRY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1755373869; c=relaxed/simple;
-	bh=RBbQrtRwehhemxLdMv5fjf08owk+Wvkmgcq4c5VJSAg=;
+	bh=j56q4vHgG+bh4xmCJrmoMvgyYabA1VSV5N5+8z89ay4=;
 	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=XXxC54eV137NflDyNbeqEjY6ZVHxhvQPPfhaInAGzmynscaSZo7pN3LI/sL2DgDl0Asq/Jt9Yz3UXlEhzJ7JYZzq7Wh/aWr+BJNU0TmRzebT2Xr7zau/NDXQtV8nIw7n9JrWiVOmhMR9u0bu4pKmIsrfQV3q613cL8BVzQ1VkWw=
+	 Content-Disposition; b=EHdnhYCKvBBYQw5CEe3AHlfPvdKHo/hVeSzlsKY3WAm3kg+kvHHqTI52MKm6sVijREMQm0JFpsp+HFSIBZtlMgKGYsvTuQRWz4ii1m/8wZMaUe/dfu4D/6StzszgqqewrKkiwYrHoXCTvJAyqEUClxPaMr/ViNf1lKJrbXUdC4Q=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -33,9 +33,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.98.2)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1unMvQ-000000006vj-3naq;
-	Sat, 16 Aug 2025 19:50:49 +0000
-Date: Sat, 16 Aug 2025 20:50:44 +0100
+	id 1unMvd-000000006vx-2lJD;
+	Sat, 16 Aug 2025 19:51:01 +0000
+Date: Sat, 16 Aug 2025 20:50:57 +0100
 From: Daniel Golle <daniel@makrotopia.org>
 To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -57,9 +57,9 @@ Cc: Andreas Schirm <andreas.schirm@siemens.com>,
 	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
 	"Livia M. Rosu" <lrosu@maxlinear.com>,
 	John Crispin <john@phrozen.org>
-Subject: [PATCH RFC net-next 00/23] net: dsa: lantiq_gswip: Add support for
- MaxLinear GSW1xx switch family
-Message-ID: <aKDhFCNwjDDwRKsI@pidgin.makrotopia.org>
+Subject: [PATCH RFC net-next 01/23] net: dsa: lantiq_gswip: honor dsa_db
+ passed to port_fdb_{add,del}
+Message-ID: <aKDhIQb36SayIjy6@pidgin.makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,90 +69,140 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-This patch series extends the existing lantiq_gswip DSA driver to support
-the MaxLinear GSW1xx family of dedicated Ethernet switch ICs. These switches
-are based on the same IP as the Lantiq/Intel GSWIP found in VR9 and xRX
-MIPS router SoCs, but are connected via MDIO instead of memory-mapped I/O.
+Commit c9eb3e0f8701 ("net: dsa: Add support for learning FDB through
+notification") added a dev_close() call "to indicate inconsistent
+situation" when we could not delete an FDB entry from the port. In case
+of the lantiq_gswip driver this is problematic on standalone ports for
+which all calls to either .port_fdb_add() or .port_fdb_del() would just
+always return -EINVAL as adding or removing FDB entries is currently
+only supported for ports which are a member of a bridge.
 
-The series includes several improvements and refactoring to prepare for the
-new hardware support.
+As since commit c26933639b54 ("net: dsa: request drivers to perform FDB
+isolation") the dsa_db is passed to the .port_fdb_add() or
+.port_fdb_del() calls we can use that to set the FID accordingly,
+similar to how it was for bridge ports, and to FID 0 for standalone
+ports. In order for FID 0 to work at all we also need to set bit 1 in
+val[1], so always set it.
 
-The GSW1xx family includes several variants:
-- GSW120: 4 ports, 2 PHYs, RGMII & SGMII/2500Base-X
-- GSW125: 4 ports, 2 PHYs, RGMII & SGMII/2500Base-X, industrial temperature
-- GSW140: 6 ports, 4 PHYs, RGMII & SGMII/2500Base-X  
-- GSW141: 6 ports, 4 PHYs, RGMII & SGMII
-- GSW145: 6 ports, 4 PHYs, RGMII & SGMII/2500Base-X, industrial temperature
+This solution was found in a downstream driver provided by MaxLinear
+(which is the current owner of the former Lantiq switch IP) under
+GPL-2.0. Import the implementation and the copyright headers from that
+driver.
 
-Key features implemented:
-- MDIO-based register access using regmap
-- Support for SGMII/1000Base-X/2500Base-X SerDes interfaces
-- Configurable MII delays via device tree properties
-- Energy Efficient Ethernet (EEE) support
-- 4096 VLAN support on newer API versions
-- Assisted learning on CPU port
+Fixes: c9eb3e0f8701 ("net: dsa: Add support for learning FDB through notification")
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+---
+ drivers/net/dsa/lantiq_gswip.c | 55 ++++++++++++++++++++--------------
+ 1 file changed, 33 insertions(+), 22 deletions(-)
 
-This is submitted as RFC to gather feedback on the approach, particularly
-regarding the prefered order of things, ie. should I first introduce all
-features (some are already supported on GRX3xx), then split into MDIO and
-common parts, then add new hardware like I did now, or rather first split
-into MDIO and common parts, then add new hardware support and then new
-features would follow (maybe even in follow series)?
-
-Basic testing has be carried out on the GSW145 reference board, confirming
-everything works as fine as it does on older Lantiq GSWIP hardware.
-Brief testing also showed that nothing breaks on Lantiq VR9 (VRX208),
-testing on slightly newer Intel GRX330 hardware is going to follow.
-
-As Vladimir Oltean is working on a series of patches improving lantiq_gswip
-the first patch of this series is likely to be replaced by his work and can
-be ignored for now. I've included it anyway for completeness as that is also
-what I have been testing.
-
-Daniel Golle (23):
-  net: dsa: lantiq_gswip: honor dsa_db passed to port_fdb_{add,del}
-  net: dsa: lantiq_gswip: deduplicate dsa_switch_ops
-  net: dsa: lantiq_gswip: prepare for more CPU port options
-  net: dsa: lantiq_gswip: move definitions to header
-  net: dsa: lantiq_gswip: introduce bitmaps for port types
-  net: dsa: lantiq_gswip: load model-specific microcode
-  net: dsa: lantiq_gswip: make DSA tag protocol model-specific
-  net: dsa: lantiq_gswip: store switch API version in priv
-  net: dsa: lantiq_gswip: add support for SWAPI version 2.3
-  net: dsa: lantiq_gswip: support enable/disable learning
-  net: dsa: lantiq_gswip: support Energy Efficient Ethernet
-  net: dsa: lantiq_gswip: support 4k VLANs on API 2.2 or later
-  net: dsa: lantiq_gswip: support model-specific mac_select_pcs()
-  net: dsa: lantiq_gswip: support GSW1xx offset of MII register
-  net: dsa: lantiq_gswip: allow adjusting MII delays
-  net: dsa: lantiq_gswip: support standard MDIO node name
-  net: dsa: lantiq_gswip: move MDIO bus registration to .setup()
-  net: dsa: lantiq_gswip: convert to use regmap
-  net: dsa: lantiq_gswip: split into common and MMIO parts
-  net: dsa: lantiq_gswip: add registers specific for MaxLinear GSW1xx
-  net: dsa: add tagging driver for MaxLinear GSW1xx switch family
-  net: dsa: add driver for MaxLinear GSW1xx switch family
-  net: dsa: lantiq_gswip: ignore SerDes modes in phylink_mac_config()
-
- drivers/net/dsa/Kconfig               |   17 +
- drivers/net/dsa/Makefile              |    2 +
- drivers/net/dsa/lantiq_gswip.c        | 1933 ++-----------------------
- drivers/net/dsa/lantiq_gswip.h        |  408 ++++++
- drivers/net/dsa/lantiq_gswip_common.c | 1778 +++++++++++++++++++++++
- drivers/net/dsa/lantiq_pce.h          |    9 +-
- drivers/net/dsa/mxl-gsw1xx.c          |  710 +++++++++
- drivers/net/dsa/mxl-gsw1xx_pce.h      |  160 ++
- include/net/dsa.h                     |    2 +
- net/dsa/Kconfig                       |    8 +
- net/dsa/Makefile                      |    1 +
- net/dsa/tag_mxl-gsw1xx.c              |  141 ++
- 12 files changed, 3331 insertions(+), 1838 deletions(-)
- create mode 100644 drivers/net/dsa/lantiq_gswip.h
- create mode 100644 drivers/net/dsa/lantiq_gswip_common.c
- create mode 100644 drivers/net/dsa/mxl-gsw1xx.c
- create mode 100644 drivers/net/dsa/mxl-gsw1xx_pce.h
- create mode 100644 net/dsa/tag_mxl-gsw1xx.c
-
+diff --git a/drivers/net/dsa/lantiq_gswip.c b/drivers/net/dsa/lantiq_gswip.c
+index 6eb3140d4044..fed86b2d78fc 100644
+--- a/drivers/net/dsa/lantiq_gswip.c
++++ b/drivers/net/dsa/lantiq_gswip.c
+@@ -2,9 +2,11 @@
+ /*
+  * Lantiq / Intel GSWIP switch driver for VRX200, xRX300 and xRX330 SoCs
+  *
+- * Copyright (C) 2010 Lantiq Deutschland
+- * Copyright (C) 2012 Avinash Jayaraman <ajayaraman@maxlinear.com>, Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>, Juraj Povazanec <jpovazanec@maxlinear.com>, "Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>, "Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>, "Livia M. Rosu" <lrosu@maxlinear.com>, John Crispin <john@phrozen.org>
++ * Copyright (C) 2023 - 2024 MaxLinear Inc.
++ * Copyright (C) 2022 Snap One, LLC.  All rights reserved.
+  * Copyright (C) 2017 - 2019 Hauke Mehrtens <hauke@hauke-m.de>
++ * Copyright (C) 2012 Avinash Jayaraman <ajayaraman@maxlinear.com>, Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>, Juraj Povazanec <jpovazanec@maxlinear.com>, "Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>, "Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>, "Livia M. Rosu" <lrosu@maxlinear.com>, John Crispin <john@phrozen.org>
++ * Copyright (C) 2010 Lantiq Deutschland
+  *
+  * The VLAN and bridge model the GSWIP hardware uses does not directly
+  * matches the model DSA uses.
+@@ -239,6 +241,7 @@
+ #define  GSWIP_TABLE_MAC_BRIDGE_KEY3_FID	GENMASK(5, 0)	/* Filtering identifier */
+ #define  GSWIP_TABLE_MAC_BRIDGE_VAL0_PORT	GENMASK(7, 4)	/* Port on learned entries */
+ #define  GSWIP_TABLE_MAC_BRIDGE_VAL1_STATIC	BIT(0)		/* Static, non-aging entry */
++#define  GSWIP_TABLE_MAC_BRIDGE_VAL1_VALID	BIT(1)		/* Valid bit */
+ 
+ #define XRX200_GPHY_FW_ALIGN	(16 * 1024)
+ 
+@@ -1349,30 +1352,37 @@ static void gswip_port_stp_state_set(struct dsa_switch *ds, int port, u8 state)
+ }
+ 
+ static int gswip_port_fdb(struct dsa_switch *ds, int port,
+-			  const unsigned char *addr, u16 vid, bool add)
++			  const unsigned char *addr, u16 vid, struct dsa_db db,
++			  bool add)
+ {
+-	struct net_device *bridge = dsa_port_bridge_dev_get(dsa_to_port(ds, port));
+ 	struct gswip_priv *priv = ds->priv;
+ 	struct gswip_pce_table_entry mac_bridge = {0,};
+-	unsigned int max_ports = priv->hw_info->max_ports;
+ 	int fid = -1;
+-	int i;
+ 	int err;
++	int i;
+ 
+-	if (!bridge)
+-		return -EINVAL;
+-
+-	for (i = max_ports; i < ARRAY_SIZE(priv->vlans); i++) {
+-		if (priv->vlans[i].bridge == bridge) {
+-			fid = priv->vlans[i].fid;
+-			break;
++	switch (db.type) {
++	case DSA_DB_BRIDGE:
++		for (i = 0; i < ARRAY_SIZE(priv->vlans); i++) {
++			if (priv->vlans[i].bridge == db.bridge.dev) {
++				fid = priv->vlans[i].fid;
++				break;
++			}
+ 		}
+-	}
+-
+-	if (fid == -1) {
+-		dev_err(priv->dev, "no FID found for bridge %s\n",
+-			bridge->name);
+-		return -EINVAL;
++		if (fid == -1) {
++			dev_err(priv->dev, "Port %d not part of a bridge\n", port);
++			return -EINVAL;
++		}
++		break;
++	case DSA_DB_PORT:
++		if (dsa_is_cpu_port(ds, port) &&
++			dsa_fdb_present_in_other_db(ds, port, addr, vid, db))
++			return 0;
++		/* FID of a standalone / single port bridge */
++		fid = 0;
++		break;
++	default:
++		return -EOPNOTSUPP;
+ 	}
+ 
+ 	mac_bridge.table = GSWIP_TABLE_MAC_BRIDGE;
+@@ -1382,7 +1392,8 @@ static int gswip_port_fdb(struct dsa_switch *ds, int port,
+ 	mac_bridge.key[2] = addr[1] | (addr[0] << 8);
+ 	mac_bridge.key[3] = FIELD_PREP(GSWIP_TABLE_MAC_BRIDGE_KEY3_FID, fid);
+ 	mac_bridge.val[0] = add ? BIT(port) : 0; /* port map */
+-	mac_bridge.val[1] = GSWIP_TABLE_MAC_BRIDGE_VAL1_STATIC;
++	mac_bridge.val[1] = add ? (GSWIP_TABLE_MAC_BRIDGE_VAL1_STATIC |
++				   GSWIP_TABLE_MAC_BRIDGE_VAL1_VALID) : 0;
+ 	mac_bridge.valid = add;
+ 
+ 	err = gswip_pce_table_entry_write(priv, &mac_bridge);
+@@ -1396,14 +1407,14 @@ static int gswip_port_fdb_add(struct dsa_switch *ds, int port,
+ 			      const unsigned char *addr, u16 vid,
+ 			      struct dsa_db db)
+ {
+-	return gswip_port_fdb(ds, port, addr, vid, true);
++	return gswip_port_fdb(ds, port, addr, vid, db, true);
+ }
+ 
+ static int gswip_port_fdb_del(struct dsa_switch *ds, int port,
+ 			      const unsigned char *addr, u16 vid,
+ 			      struct dsa_db db)
+ {
+-	return gswip_port_fdb(ds, port, addr, vid, false);
++	return gswip_port_fdb(ds, port, addr, vid, db, false);
+ }
+ 
+ static int gswip_port_fdb_dump(struct dsa_switch *ds, int port,
 -- 
 2.50.1
 
