@@ -1,75 +1,123 @@
-Return-Path: <netdev+bounces-214313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31B2DB28F37
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 17:38:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 023A1B28F3A
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 17:39:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 01E1E5C2593
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 15:38:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6999AE69A1
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 15:39:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CC291547CC;
-	Sat, 16 Aug 2025 15:38:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0CD01A2390;
+	Sat, 16 Aug 2025 15:39:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="FpEz8krS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QIP7IQGF"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C8CC6FC5;
-	Sat, 16 Aug 2025 15:37:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95EAC19006B;
+	Sat, 16 Aug 2025 15:39:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755358680; cv=none; b=UClRsmV3fHG3nL6aPxrqnFHR4lTjKFVm8qA32CqH2tDTXsk5R/vOmxnc75ek4ewkYXQSv5fKGPax/GwXSuP98upZElPmhzyUMHHXexKFaeonjH0MJm2IGXdqCpQretb4oZXPFtNB7HIltQ/oZfuNe2Ye057t12NW1kOLjJBuq2M=
+	t=1755358744; cv=none; b=N7Jf4bpVHGvnAh+eahfN87F9sIu5TEZWC4yIveR5GJu9YVRefcDVYlTVfKPXiS7YnHsHzuSBhx2PPUNwPXPwzT3/WbhnzBGFyjFBbgyNJwzThekXE+VXhIt0HVACANABnjlQUoIITS+X2bWZ4Z068EZlzY3Xuzl8rG860cCQ8rw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755358680; c=relaxed/simple;
-	bh=fmUjxBqT/YQptLLFUCnuBtOiMVGfqLNL5OiA/bV5gvI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Qnuz1b2SHqpYGVAkNBKuzogtLpfowx44DzcRA4ODLQMoNajVXRc8k7VchvCieV8EiIEPlEUbZ3DikvDtcHjQIJ98Xaed9dq2PBwXMjdxDjemyYWnpXSbfMmXpVdlRvDe+77T/yZqubwD1eHJZu2w8Rl79RJzu5ltu4p8sjw/ytk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=FpEz8krS; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=RvC+UC/AdOwrm3IlIaz82Z8Ib6je8cnny1YfptPh3y4=; b=FpEz8krSo3XZrKdIGIf9Cniw4q
-	qq/+8JbM3iURszASaV3B5xrxulu5ttSDVG/SaE1HoUJt06qh0dQsm0DuIbjzoYxzNcZ1+0orKY8br
-	FzIbN+DUdioUXbgrzCLm9AQuwfJz6MRLCC4U/nWLmu9de/UmBxWX6nSkyrKURmmpDYJM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1unIyX-004ufj-4Z; Sat, 16 Aug 2025 17:37:45 +0200
-Date: Sat, 16 Aug 2025 17:37:45 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Wen Gu <guwen@linux.alibaba.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, richardcochran@gmail.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, xuanzhuo@linux.alibaba.com,
-	dust.li@linux.alibaba.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-	David Woodhouse <dwmw2@infradead.org>
-Subject: Re: [PATCH net-next v4] ptp: add Alibaba CIPU PTP clock driver
-Message-ID: <729dee1e-3c8c-40c5-b705-01691e3d85d7@lunn.ch>
-References: <20250812115321.9179-1-guwen@linux.alibaba.com>
- <20250815113814.5e135318@kernel.org>
- <2a98165b-a353-405d-83e0-ffbca1d41340@linux.alibaba.com>
+	s=arc-20240116; t=1755358744; c=relaxed/simple;
+	bh=o+rHkyCjmB4hkyP7M3HLqZNJrf+AJVoFYhkrqijhjZg=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=CYPf3UQHt6Hu166XFmITdeT3/ZNYa5EnALz0fVSr+SCyfiumbwDDqtR8vbaiqNj/DXLSIDolcQn/Ap8CzQYf8+VsxivbOG2bRuIbujFIUGh1n3D2O08oKSmjTLQeqAbQxELeyZJfR1kCu8rjWPcGOUghfCYt+7U4fiPcCG0iROQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QIP7IQGF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 36932C4CEEF;
+	Sat, 16 Aug 2025 15:39:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755358744;
+	bh=o+rHkyCjmB4hkyP7M3HLqZNJrf+AJVoFYhkrqijhjZg=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=QIP7IQGF2hmBnfEh2M61I2ssKMLsuh66UT1q1iAnLHW11ZwEe8HUcto5Vz8p+MaL3
+	 tpTnY5yx17q6x3grmNF4r52al8bf6mp611i+AdGGYMuRxyanb+M2tS/ornqxJOINin
+	 565YjTcnwDNvsPuZ1UXAaMEnVTNnx02K90htm1OJ3Wsz46HsgzUIaPrNHY4nTwU4bQ
+	 t44mnwMc0mbf4p3XreMKM1holZ82XzpGHz4mY0j2caj6ckSgkt20siFwYGBOMA8RMI
+	 dEBgv/ZoT8botwMXgMtxjx4ZF72XghO2VNam7R+0xN8T63ixhm6pZFDIHDk0oA1uUz
+	 X6izhWfvraHiQ==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22CECCA0EE9;
+	Sat, 16 Aug 2025 15:39:04 +0000 (UTC)
+From: Christoph Paasch via B4 Relay <devnull+cpaasch.openai.com@kernel.org>
+Subject: [PATCH net-next v2 0/2] net/mlx5: Avoid payload in skb's linear
+ part for better GRO-processing
+Date: Sat, 16 Aug 2025 08:39:02 -0700
+Message-Id: <20250816-cpaasch-pf-927-netmlx5-avoid-copying-the-payload-to-the-malloced-area-v2-0-b11b30bc2d10@openai.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2a98165b-a353-405d-83e0-ffbca1d41340@linux.alibaba.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIABamoGgC/62OQYrDMAxFr1K0rkrixk3b1dxj6ELYaiNILGObk
+ BBy95owR5jl48H/b4PMSTjD87RB4lmyaKhgzidwA4UPo/jKYBpjm7416CJRdgPGNz5Mj4HLNC4
+ WaVbx6DSuEj5YBsZI66jkseiBE42jOvZIiQlv1nSPtu+spRvUr5j4LcvR8Qt1s+4uBV7VDJKLp
+ vUInNvD/7Vc/6llbrFBdsT+7sy96/hHIweSi9MJXvu+fwGiyscgJQEAAA==
+X-Change-ID: 20250712-cpaasch-pf-927-netmlx5-avoid-copying-the-payload-to-the-malloced-area-6524917455a6
+To: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
+ Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Alexander Lobakin <aleksander.lobakin@intel.com>, 
+ Gal Pressman <gal@nvidia.com>
+Cc: linux-rdma@vger.kernel.org, netdev@vger.kernel.org, 
+ Christoph Paasch <cpaasch@openai.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1755358743; l=1531;
+ i=cpaasch@openai.com; s=20250712; h=from:subject:message-id;
+ bh=o+rHkyCjmB4hkyP7M3HLqZNJrf+AJVoFYhkrqijhjZg=;
+ b=l+5SKjfiweJsliNW8BZ12uhSvZ3HCGFk0I44HeHLd7jk2KjiqBT2AVdISiC4cm3l8R0KQFZGD
+ m8zotkOOwA+DIhQHVSicGgyv/ql/sM4st0Ck+gYjidoBBKPkOB+V3r2
+X-Developer-Key: i=cpaasch@openai.com; a=ed25519;
+ pk=1HRHZlVUZPziMZvsAQFvP7n5+uEosTDAjXmNXykdxdg=
+X-Endpoint-Received: by B4 Relay for cpaasch@openai.com/20250712 with
+ auth_id=459
+X-Original-From: Christoph Paasch <cpaasch@openai.com>
+Reply-To: cpaasch@openai.com
 
-> These sysfs are intended to provide diagnostics and informations.
+When LRO is enabled on the MLX, mlx5e_skb_from_cqe_mpwrq_nonlinear
+copies parts of the payload to the linear part of the skb.
 
-Maybe they should be in debugfs if they are just diagnostics? You then
-don't need to document them, because they are not ABI.
+This triggers suboptimal processing in GRO, causing slow throughput,...
 
-	Andrew
+This patch series addresses this by copying a lower-bound estimate of
+the protocol headers - trying to avoid the payload part. This results in
+a significant throughput improvement (detailled results in the specific
+patch).
+
+Signed-off-by: Christoph Paasch <cpaasch@openai.com>
+---
+Changes in v2:
+- Refine commit-message with more info and testing data
+- Make mlx5e_cqe_get_min_hdr_len() return MLX5E_RX_MAX_HEAD when l3_type
+  is neither IPv4 nor IPv6. Same for the l4_type. That way behavior is
+  unchanged for other traffic types.
+- Rename mlx5e_cqe_get_min_hdr_len to mlx5e_cqe_estimate_hdr_len
+- Link to v1: https://lore.kernel.org/r/20250713-cpaasch-pf-927-netmlx5-avoid-copying-the-payload-to-the-malloced-area-v1-0-ecaed8c2844e@openai.com
+
+---
+Christoph Paasch (2):
+      net/mlx5: Bring back get_cqe_l3_hdr_type
+      net/mlx5: Avoid copying payload to the skb's linear part
+
+ drivers/net/ethernet/mellanox/mlx5/core/en_rx.c | 37 ++++++++++++++++++++++++-
+ include/linux/mlx5/device.h                     | 12 +++++++-
+ 2 files changed, 47 insertions(+), 2 deletions(-)
+---
+base-commit: bab3ce404553de56242d7b09ad7ea5b70441ea41
+change-id: 20250712-cpaasch-pf-927-netmlx5-avoid-copying-the-payload-to-the-malloced-area-6524917455a6
+
+Best regards,
+-- 
+Christoph Paasch <cpaasch@openai.com>
+
+
 
