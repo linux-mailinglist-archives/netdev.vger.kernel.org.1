@@ -1,89 +1,84 @@
-Return-Path: <netdev+bounces-214234-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214235-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7076B28941
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 02:30:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81E35B28945
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 02:30:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C91935C14B6
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 00:30:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0367E1D02220
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 00:31:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CDD52F84F;
-	Sat, 16 Aug 2025 00:30:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 623611FC3;
+	Sat, 16 Aug 2025 00:30:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="f4zmHIVd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC4D4171CD
-	for <netdev@vger.kernel.org>; Sat, 16 Aug 2025 00:30:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7286D405F7
+	for <netdev@vger.kernel.org>; Sat, 16 Aug 2025 00:30:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755304206; cv=none; b=Sd+9Vmh8NRxR+UTmIQD5yqAxgPquNE8/PQYGNXeB8Os52qs2b2OkZBEDC4XvPwvTj8GtAmrNCvkpPrCyay81/tFji35DxLxekHZgiLNVrmugiQUyiCsKhZ3TuE61cocNsyz1JoVmW0Lv8TD7x/rwWuZlHXC0yr5LGZKDc8mad0E=
+	t=1755304246; cv=none; b=hWmSf6/sVSEUs8g7+nuVHBKgWhl4uMf8zhRlaZMF2vYcIFnkdx40go87Bweespegs9eQHMIeM8Vrk+EE8rPSi1PRW8ZsCj34exPEOI3LLrcvibNTsFRoWQ6ttkJFtlM8dIGUtGNBa2S/UG4Gcf+yrTVktdeZ+IH+Q0fxgt5CKw4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755304206; c=relaxed/simple;
-	bh=VWUiUzQK86HWSwGuF8xInFChZoi2gS7Rymc5YjbW5Jc=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=egT9xh43RK4rZxikT0LxWKT08vTgaT8gSTJIt0K2jbh++4VcJ5rdYJvpszohAa2UTQReBWgi7PjJ6B1iQjOLyF1LzbiPu8VHPTv76QTxyFzDQGorfkTbuq5rIMVT2PYmafodrC04Q24Kzdah2VNP+sYb0TyjmUTafR6C4KHbJY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-88432d9ae89so247186539f.1
-        for <netdev@vger.kernel.org>; Fri, 15 Aug 2025 17:30:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755304204; x=1755909004;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=COIfik/RujH0ZCMLEJoppWLOYa7oLNPGVJSWQTRhpbY=;
-        b=b43w8SDVHM13lqoNoGFH7sMPrZ+9wQk3Vjv8QlaAV9Q5+bN0OOqN8/Es4efo+E/jiV
-         NpzdKIX+gEcw7zgg4pu1Mb7CD6TakLYZUVCIGYu2LMJZZFLEge9Fsh6kSxIn2R2KK+8X
-         0Hk5db9dcuLL47Iyn3hbu/Yeaq5qVQNkJC1zDcelA5heqeGYzPq1xjNf2Zp9T3Ss2lOs
-         nj1Wk1QagIsbIX2fyDXOmzvWVqOG5UjtpnbGb1k0KAy2Xqvx/ME9Q7TDnfkOEJJpr95Y
-         O4TW4SlxxfbTyMoVli4clNQxKDxC39OJapPNpWCG5Wqo/+7IgiPJN2UxN7+YA9pdZI1s
-         ozPw==
-X-Forwarded-Encrypted: i=1; AJvYcCUntAjf5i6pCV42GwpWvi9yLck0/cIUt/2jM4EN8WKE/s/8FKU6xh+8KX7GiGIVn80iCEeRFqc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzQ2Tw39yxcKaKxgEYsjM6NHO4u/Bdo6bwYntBqT1aEGbCjzJt9
-	tDQX6aclaKprKV8s/4ocUzXK9WF0Gf5dnei8DrKT03A8yIZETUXgdEX9i/3Oi/P/oSb/YpbBHPC
-	ntBrmCuTnRZq+ukIBLmoB3N6j/uBr8Q5o3jKSz7RJZpGBu6zjUiNk5FSkOXA=
-X-Google-Smtp-Source: AGHT+IGCPgu5VDqf/or0rvRi+5fvi5mHaUDTFi6g/UotAx5ZrpDq+WzqXhoiqrBWQWgr6NUqvygidm0bU9AuzJFp9eJfOYIlACQY
+	s=arc-20240116; t=1755304246; c=relaxed/simple;
+	bh=I193qQEop4Fz59XNPdGmQG7l6yuKt5tQqXnd76+tNWU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=B16DZmwzl5NgZpY0NPXRsOPIrqeh2Ue0ofXxADS0xH2hZ71gQWms/V3Od39i1Q4dJonSNanXDpRu+NNp5ji6skmo8Mxv7TZiEUDtp50Rg9/TNl4KYiZtJynmg3qLdsgjcFm8RQjMT2JPrj5sI+RBtiT8iFgflMyuKroZZ5KLnG0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=f4zmHIVd; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=BBEQJXduKyAUWITPYyruO7rQEKgNnkD1VpUmf9eyfWI=; b=f4
+	zmHIVdznHIAPre5l7256QDjgSRz+FoBYyX5E5qc3QR0Uwj11QSArxrz+Vr4YiLJH/7SSO4GHKSVKn
+	UYtwOXgL5PMUDQvr3Y4kdXeSjcPWizGNuoduPlw6V7QWu9I0dua9vM2txmKcQItJXxrUFimIz1KT9
+	GomVSebUXuNrR3U=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1un4ok-004sPb-7h; Sat, 16 Aug 2025 02:30:42 +0200
+Date: Sat, 16 Aug 2025 02:30:42 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Guilherme Novaes Lima <acc.guilhermenl@gmail.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: Seeking guidance on Rust porting for network driver as a
+ learning project
+Message-ID: <e219a202-0e02-4802-bba4-da8d15624113@lunn.ch>
+References: <CE8FAE9A-CC93-4C91-AC07-B6C43B073CDA@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1c08:b0:3e5:4869:fdbe with SMTP id
- e9e14a558f8ab-3e57e82cfb9mr73498675ab.8.1755304203940; Fri, 15 Aug 2025
- 17:30:03 -0700 (PDT)
-Date: Fri, 15 Aug 2025 17:30:03 -0700
-In-Reply-To: <20250816000900.4653-1-hdanton@sina.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <689fd10b.050a0220.e29e5.002c.GAE@google.com>
-Subject: Re: [syzbot] [kvm?] [net?] [virt?] WARNING in virtio_transport_send_pkt_info
-From: syzbot <syzbot+b4d960daf7a3c7c2b7b1@syzkaller.appspotmail.com>
-To: hdanton@sina.com, jasowang@redhat.com, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, mst@redhat.com, netdev@vger.kernel.org, 
-	stefanha@redhat.com, syzkaller-bugs@googlegroups.com, will@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CE8FAE9A-CC93-4C91-AC07-B6C43B073CDA@gmail.com>
 
-Hello,
+On Fri, Aug 15, 2025 at 08:27:53PM -0300, Guilherme Novaes Lima wrote:
+> Hi Andrew,
+> 
+> > Another idea might be an Ethernet switch which is not supported by DSA
+> > at the moment.
+> 
+> Thank you for your reply. The ideal would be to do something simple, the actual implementation of the driver would be the secondary focus of the research. What I originally intended to do was to port over r8169, I didn’t have switches in mind. Do you think that would be too hard? Sorry for my inexperience, I’m a complete noob when it comes to kernel / driver development, so I thank you again for your patience and generosity.
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
+Any code you produce for the r8169 will not be merged. We don't want
+reimplementations of existing drivers. r8169 is widely used, and
+currently Rust only supports a subset of architectures. It makes no
+sense to have a minimal Rust driver for a few architectures and a full
+featured driver for all architectures. This is why i suggested writing
+a driver for something which currently does not have a driver. If
+Linux currently does not support some hardware, we don't care too much
+that a Rust driver works for a subset of architectures. Its better
+than nothing.
 
-Reported-by: syzbot+b4d960daf7a3c7c2b7b1@syzkaller.appspotmail.com
-Tested-by: syzbot+b4d960daf7a3c7c2b7b1@syzkaller.appspotmail.com
-
-Tested on:
-
-commit:         dfd4b508 Merge tag 'drm-fixes-2025-08-16' of https://g..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=130453a2580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=3f81850843b877ed
-dashboard link: https://syzkaller.appspot.com/bug?extid=b4d960daf7a3c7c2b7b1
-compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=125373a2580000
-
-Note: testing is done by a robot and is best-effort only.
+	Andrew
 
