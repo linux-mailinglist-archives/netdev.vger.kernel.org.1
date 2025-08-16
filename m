@@ -1,113 +1,101 @@
-Return-Path: <netdev+bounces-214267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214269-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A62EB28B3D
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 09:02:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 696BBB28B4B
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 09:10:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1AE4E587E10
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 07:02:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DBCAB1BC552D
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 07:10:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D8CC1F0E2E;
-	Sat, 16 Aug 2025 07:02:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jDkukHFD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 066FE221FDE;
+	Sat, 16 Aug 2025 07:10:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout1.hostsharing.net (mailout1.hostsharing.net [83.223.95.204])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38EE345009
-	for <netdev@vger.kernel.org>; Sat, 16 Aug 2025 07:02:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 007D9221FD4
+	for <netdev@vger.kernel.org>; Sat, 16 Aug 2025 07:10:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.95.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755327751; cv=none; b=Y46ZYBlVB9ReY62ZajvvMJuSbi/3PqtGXEPJi5qbHkjvn/OxQkrDw3Hbmq1r/hoyhQA0sV6XIufg3EmVwVa3h6Qb8HrQN6xSjKhc2+qYQuAUHljGVLWF5EKuAMO0/1Oe84634k0O/OBDjI2ghXXNUcjTd9BMJsgSB/mGCY2Y4Fo=
+	t=1755328216; cv=none; b=U3jg9QBRDvtytFCJtZucc/goiU/FwoXeV92fTaG970Y5GBTxXQiC6uYn3hJqX7syUiWQEBmIiCKIxFMcAsgBOrU4iXpM6ct+b6og5qylfDc4+z+c5qeQU0KOFgPjudZjaqyFBP4AM5h+jF9L+A4wUQcj0Y2gSxqDku1aXmxX1hw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755327751; c=relaxed/simple;
-	bh=9zr4cVGmfq2TFRGx9uS4sZPGfY9cmGBmyoCZkN8MSKM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=SAuWHFtYiqsewU+oJMEUFWwH7xiJpz4+ZZh+R4TABGaHrM0U3VoLxcgMeL1TpYNFAOvBhz/HbrvUQjCG5ivQAHxMZm1+OLNKFtBlyFZMLfRVgAtbdRqr22fJDFVoutkkR9+uUdEXHMSvMtx++ULK6IsyR0xqcsE7I1YB0PlKc50=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jDkukHFD; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-76e2e9a98b4so2342841b3a.1
-        for <netdev@vger.kernel.org>; Sat, 16 Aug 2025 00:02:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1755327749; x=1755932549; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OZ4KPO3OTfBU5odD4L+dZ2HyAYRZd4rJ9ysQS4sj4H0=;
-        b=jDkukHFDOIwJ877g6da4GwZQ8GxSWq0SKLw6nOajk+DR1B5PMawh5TSIznyn7nBzEp
-         /V3vEZs8vw5BXtk16ICd84hT2C+mb26sa/43jiWtFqsrP4Wb7M4RqCd0bOx2zwPdgqyh
-         eGDqjXt38g0NpJqQiXs8wbcNbrW6gYZcM5DnixnAV5wv+2SN71LDrUfVI0czOxBWDVh6
-         93BHmtCyvdQseUt5At9BHEPH83q0552Gz8y/+zahFjbSe5kO4vIJgEkPLv+ZG40Ep5BD
-         7dnKjzq/sU7nr9i93SzDH6CK46IbRyoZmuf/KODmH19YH2fEGV2L59DtbO3j3NUbVddS
-         61EQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755327749; x=1755932549;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OZ4KPO3OTfBU5odD4L+dZ2HyAYRZd4rJ9ysQS4sj4H0=;
-        b=JUqz09kFqYP9CxDPMNiEy/t0zy78AWb2ORwprerAe+g59MxnXaTwPjkcHZeHJJHID+
-         pTovCKoROCGguaCiMy5AXw2Y4rJNU7Cj4DS1MAs/yzvfcnoCW9IwMTxzjQKIEu9ZKCNl
-         ukMDXNuqIvzexTrBV6HfQOPz/pfEVPjKhzznDeoN8cc/1DvEpVld+SQn4zXsmbpPOqVA
-         cPySAzNhdZHbCNGtsGrzuvtvaQByADrFfEjOuWColVEKgjXaze6uB1SEI2yBAONBGNgB
-         ZDBT5EUODKECUnKyhycv3vKAhn2o2gugeJaYHH8kjVMvxnxm2fITnXetPUzauHz0bGIc
-         Y74Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUyc5sDZlatFGhVONjjjVdNJPm9BohNKHvo4jRYQO2ArjXGoc5rtM3q6iPCSx1lnmbIOrWJ6bM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyVHCJwdi7fBnvwfwlszV94K7wSp/ZYuh7RDSDnbCVWHeoDIcBi
-	21vtHc/vUx/57sK9AIpVbrpU6HN8GqjZcMqKbpZKV7jwNn/Pvdtbkedxt/airWTnzTl48JtcwZT
-	dkwJqNA==
-X-Google-Smtp-Source: AGHT+IFVet8FRBdtWSJfveWRjqspytrXfyjOqMTPNLkn9G8QEMfVM2GfQ61byXK0lJ4a2jF4jPoWDawuGBY=
-X-Received: from pfiv6.prod.google.com ([2002:aa7:99c6:0:b0:769:dd99:e6e4])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:aa7:8e8e:0:b0:76b:f7da:2704
- with SMTP id d2e1a72fcca58-76e324c93c4mr9566064b3a.11.1755327749346; Sat, 16
- Aug 2025 00:02:29 -0700 (PDT)
-Date: Sat, 16 Aug 2025 07:01:28 +0000
-In-Reply-To: <20250816031136.482400-3-ebiggers@kernel.org>
+	s=arc-20240116; t=1755328216; c=relaxed/simple;
+	bh=Ti3uxkQIv+XAWK9w1jvxxiCG5nGR1f9lx28s1CQLzmw=;
+	h=Message-ID:From:Date:Subject:To:Cc; b=Vp2GgtzsOVoEl2xMcZtPtKTsTEegUNMuP41PMSj2+Ugq32sKyY5b+QapgX1iT9O/fC5JpEOz+lasq8qOHVJj9DMDtaz4+xGs7kOGvVZmVlxQX4jpCrkU/oqUUReNpIAIBL0EiogghKr2C59SGRG6IgbetOK8+2j2eUhE+5FcHro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=pass smtp.mailfrom=wunner.de; arc=none smtp.client-ip=83.223.95.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wunner.de
+Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
+	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
+	by mailout1.hostsharing.net (Postfix) with UTF8SMTPS id 9FF5E1A793;
+	Sat, 16 Aug 2025 09:10:03 +0200 (CEST)
+Received: from localhost (unknown [89.246.108.87])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by h08.hostsharing.net (Postfix) with UTF8SMTPSA id 55A5C600D2F4;
+	Sat, 16 Aug 2025 09:10:03 +0200 (CEST)
+X-Mailbox-Line: From 22e7b32bfe524219eb7ff1e5c6b4d91763b79eef Mon Sep 17 00:00:00 2001
+Message-ID: <cover.1755327132.git.lukas@wunner.de>
+From: Lukas Wunner <lukas@wunner.de>
+Date: Sat, 16 Aug 2025 09:10:00 +0200
+Subject: [PATCH 0/3] ice/i40e: pci_enable_device() fixes
+To: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250816031136.482400-3-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.51.0.rc1.163.g2494970778-goog
-Message-ID: <20250816070227.1904762-1-kuniyu@google.com>
-Subject: Re: [PATCH net-next 2/3] ipv6: sr: Use HMAC-SHA1 and HMAC-SHA256
- library functions
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: ebiggers@kernel.org
-Cc: andrea.mayer@uniroma2.it, dlebrun@google.com, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
 
-From: Eric Biggers <ebiggers@kernel.org>
-Date: Fri, 15 Aug 2025 20:11:35 -0700
-> @@ -106,79 +95,17 @@ static struct sr6_tlv_hmac *seg6_get_tlv_hmac(struct ipv6_sr_hdr *srh)
->  		return NULL;
->  
->  	return tlv;
->  }
->  
-> -static struct seg6_hmac_algo *__hmac_get_algo(u8 alg_id)
-> -{
-> -	struct seg6_hmac_algo *algo;
-> -	int i, alg_count;
-> -
-> -	alg_count = ARRAY_SIZE(hmac_algos);
-> -	for (i = 0; i < alg_count; i++) {
-> -		algo = &hmac_algos[i];
-> -		if (algo->alg_id == alg_id)
-> -			return algo;
-> -	}
-> -
-> -	return NULL;
-> -}
+The ice and i40e drivers perform surplus calls to pci_enable_device()
+on resume and on error recovery.  This results in the Memory Space Enable
+bit in the PCI Command register not being cleared on driver unbind.
 
-This chunk will cause build failure when net.git is merged
-to net-next due to the patch below.  You may want to respin
-the series after this lands to net-next.
+Not a catastrophic issue, so although these commits contain Fixes tags,
+I recommend applying through next-queue.git to let them bake in linux-next
+for a couple of weeks.
 
-https://lore.kernel.org/netdev/20250815063845.85426-1-heminhong@kylinos.cn/
+I have neither an ice nor i40e card available, so this is compile-tested
+only.  I'm hoping Intel validation can test it.
+
+Suggested test procedure:
+
+- Unbind the driver through sysfs without having suspended the card:
+  echo D:B:D.F | sudo tee /sys/bus/pci/drivers/ice/unbind
+  (replace D:B:D.F with the device address, e.g. 0000:07:00.0)
+
+- Verify with lspci that it says "Mem-" in the "Control:" register:
+  lspci -vv -s D:B:D.F
+
+- Rebind the driver:
+  echo D:B:D.F | sudo tee /sys/bus/pci/drivers/ice/bind
+
+- Suspend the card, resume the card, unbind the driver, re-run lspci.
+  Expected result without this series "Mem+", with this series "Mem-".
+
+For error recovery, the procedure is the same but instead of suspending
+and resuming the card, an error needs to be injected.  See the section
+on "Software error injection" in Documentation/PCI/pcieaer-howto.rst.
+
+Thanks!
+
+Lukas Wunner (3):
+  ice: Fix enable_cnt imbalance on resume
+  ice: Fix enable_cnt imbalance on PCIe error recovery
+  i40e: Fix enable_cnt imbalance on PCIe error recovery
+
+ drivers/net/ethernet/intel/i40e/i40e_main.c | 29 ++++++----------
+ drivers/net/ethernet/intel/ice/ice_main.c   | 38 ++++++---------------
+ 2 files changed, 21 insertions(+), 46 deletions(-)
+
+-- 
+2.47.2
+
 
