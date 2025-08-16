@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-214346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214347-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9178DB29073
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 21:57:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99C27B2907B
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 21:59:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AC3917BC385
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 19:55:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 558735C4AA9
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 19:57:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C780B22A4E1;
-	Sat, 16 Aug 2025 19:57:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC1BB2620F5;
+	Sat, 16 Aug 2025 19:57:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11B0F21FF5D;
-	Sat, 16 Aug 2025 19:57:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF3E3224B0E;
+	Sat, 16 Aug 2025 19:57:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755374225; cv=none; b=J+87vx8md/STj0RSgJUeufuIN49sJgxFmo7YzPUkGkCnZbjTyiQqhTIU1KMMCVSRdH1WUQ2uDUVctd3KuQftGuKRkvuHgTF6xuNqMpYc6k5dciKqVoVOX0VNcj9Ww0ReGHIb9qJ7PLV4cTI9hT7rEZnO6Eod+BHZsSg63zfZKmY=
+	t=1755374239; cv=none; b=qvpTyaz/6tGNU7MdEtP4n/kkijSIV48FmploKJ6wFlgTc50gtNrtSDCuZFdlo7JmJIZKPdf/vU+Fml2A4HuZJK70QgGPScKjFuU1PRf0YqE+pD6EGGjy/DpYPkzHahfHOqlCS8js9Bg0Lr5w/tvzqXxp2jGemc/bGmK5BBxs/GE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755374225; c=relaxed/simple;
-	bh=80qSlyIEwMOpRahsm7kdAlGxnMZLncJ5x2I9+Q2J6po=;
+	s=arc-20240116; t=1755374239; c=relaxed/simple;
+	bh=lq5ToUOlYY4bJpVjIK59WSfn5QGqXBdQbt8Ir330Vng=;
 	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=oMoFQcQh6wVB7reaPcKt+5OsFPP8hm7DPesje57dewlcnO+HgnaSDUC0SOiOvR5Y87hIZ1bid+4Bf5E6tiUQGgCvWiabpJadPrCnpWIB78IjWwJrZ22MD5Orz8p01p2Q/JDcBSlpmvvOZRhulNZPeA4MTuYUbfVaYF12QLnURwY=
+	 Content-Disposition; b=SyW0TIn7QVj2zk97aIM43i3u/RgPu7iu1XEee5CV68qswrG6lJ3mFzxPQaKJDlj6T9P0S3jwFcYj/El1rjs1oxcuGPgq/3VjwpGx+ghSB2JnZRjLNkjH2Z1rXwr5rl9lwgGR79/LtA6VNWyXXqQurcILlAiBSj5AmFzFzvRyyfo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -33,9 +33,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.98.2)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1unN1N-0000000078g-0EXc;
-	Sat, 16 Aug 2025 19:56:57 +0000
-Date: Sat, 16 Aug 2025 20:56:53 +0100
+	id 1unN1Y-0000000079U-2bO3;
+	Sat, 16 Aug 2025 19:57:08 +0000
+Date: Sat, 16 Aug 2025 20:57:05 +0100
 From: Daniel Golle <daniel@makrotopia.org>
 To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -57,9 +57,9 @@ Cc: Andreas Schirm <andreas.schirm@siemens.com>,
 	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
 	"Livia M. Rosu" <lrosu@maxlinear.com>,
 	John Crispin <john@phrozen.org>
-Subject: [PATCH RFC net-next 21/23] net: dsa: add tagging driver for
- MaxLinear GSW1xx switch family
-Message-ID: <aKDihWrDtVpm0TfV@pidgin.makrotopia.org>
+Subject: [PATCH RFC net-next 22/23] net: dsa: add driver for MaxLinear GSW1xx
+ switch family
+Message-ID: <aKDikYiU-88zC6RF@pidgin.makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,222 +69,946 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-Add support for a new DSA tagging protocol driver for the MaxLinear
-GSW1xx switch family. The GSW1xx switches use a proprietary 8-byte
-special tag inserted between the source MAC address and the EtherType
-field to indicate the source and destination ports for frames
-traversing the CPU port.
+Add driver for the MaxLinear GSW1xx family of Ethernet switch ICs which
+are based on the same IP as the Lantiq/Intel GSWIP found in the Lantiq VR9
+and Intel GRX MIPS router SoCs. The main difference is that instead of
+using memory-mapped I/O to communicate with the host CPU these ICs are
+connected via MDIO (or SPI, which isn't supported by this driver).
+Implement the regmap API to access the switch registers over MDIO to allow
+reusing lantiq_gswip_common for all core functionality.
 
-Implement the tag handling logic to insert the special tag on transmit
-and parse it on receive.
+The GSW1xx also comes with a SerDes port capable of 1000Base-X, SGMII and
+2500Base-X, which can either be used to connect an external PHY or SFP
+cage, or as the CPU port. Support for the SerDes interface is implemented
+in this driver using the phylink_pcs interface.
 
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 ---
- include/net/dsa.h        |   2 +
- net/dsa/Kconfig          |   8 +++
- net/dsa/Makefile         |   1 +
- net/dsa/tag_mxl-gsw1xx.c | 141 +++++++++++++++++++++++++++++++++++++++
- 4 files changed, 152 insertions(+)
- create mode 100644 net/dsa/tag_mxl-gsw1xx.c
+ drivers/net/dsa/Kconfig          |  12 +
+ drivers/net/dsa/Makefile         |   1 +
+ drivers/net/dsa/mxl-gsw1xx.c     | 710 +++++++++++++++++++++++++++++++
+ drivers/net/dsa/mxl-gsw1xx_pce.h | 160 +++++++
+ 4 files changed, 883 insertions(+)
+ create mode 100644 drivers/net/dsa/mxl-gsw1xx.c
+ create mode 100644 drivers/net/dsa/mxl-gsw1xx_pce.h
 
-diff --git a/include/net/dsa.h b/include/net/dsa.h
-index d73ea0880066..8c7bad3fdfc2 100644
---- a/include/net/dsa.h
-+++ b/include/net/dsa.h
-@@ -55,6 +55,7 @@ struct tc_action;
- #define DSA_TAG_PROTO_LAN937X_VALUE		27
- #define DSA_TAG_PROTO_VSC73XX_8021Q_VALUE	28
- #define DSA_TAG_PROTO_BRCM_LEGACY_FCS_VALUE	29
-+#define DSA_TAG_PROTO_MXL_GSW1XX_VALUE		30
+diff --git a/drivers/net/dsa/Kconfig b/drivers/net/dsa/Kconfig
+index 95275f7bc701..f4e412f9540e 100644
+--- a/drivers/net/dsa/Kconfig
++++ b/drivers/net/dsa/Kconfig
+@@ -39,6 +39,18 @@ config NET_DSA_LANTIQ_GSWIP
+ 	  This enables support for the Lantiq / Intel GSWIP 2.1 found in
+ 	  the xrx200 / VR9 SoC.
  
- enum dsa_tag_protocol {
- 	DSA_TAG_PROTO_NONE		= DSA_TAG_PROTO_NONE_VALUE,
-@@ -87,6 +88,7 @@ enum dsa_tag_protocol {
- 	DSA_TAG_PROTO_RZN1_A5PSW	= DSA_TAG_PROTO_RZN1_A5PSW_VALUE,
- 	DSA_TAG_PROTO_LAN937X		= DSA_TAG_PROTO_LAN937X_VALUE,
- 	DSA_TAG_PROTO_VSC73XX_8021Q	= DSA_TAG_PROTO_VSC73XX_8021Q_VALUE,
-+	DSA_TAG_PROTO_MXL_GSW1XX	= DSA_TAG_PROTO_MXL_GSW1XX_VALUE,
- };
- 
- struct dsa_switch;
-diff --git a/net/dsa/Kconfig b/net/dsa/Kconfig
-index 869cbe57162f..e7d826b47cb3 100644
---- a/net/dsa/Kconfig
-+++ b/net/dsa/Kconfig
-@@ -98,6 +98,14 @@ config NET_DSA_TAG_EDSA
- 	  Say Y or M if you want to enable support for tagging frames for the
- 	  Marvell switches which use EtherType DSA headers.
- 
-+config NET_DSA_TAG_MXL_GSW1XX
-+	tristate "Tag driver for MaxLinear GSW1xx switches"
++config NET_DSA_MXL_GSW1XX
++	tristate "MaxLinear GSW1xx Ethernet switch support"
++	select NET_DSA_TAG_MXL_GSW1XX
++	select NET_DSA_LANTIQ_COMMON
 +	help
-+	  The GSW1xx family of switches supports an 8-byte special tag which
-+	  can be used on the CPU port of the switch.
-+	  Say Y or M if you want to enable support for tagging frames for
-+	  MaxLinear GSW1xx switches.
++	  This enables support for the MaxLinear GSW1xx family of 1GE switches
++	    GSW120 4 port, 2 PHYs, RGMII & SGMII/2500Base-X
++	    GSW125 4 port, 2 PHYs, RGMII & SGMII/2500Base-X, industrial temperature
++	    GSW140 6 port, 4 PHYs, RGMII & SGMII/2500Base-X
++	    GSW141 6 port, 4 PHYs, RGMII & SGMII
++	    GSW145 6 port, 4 PHYs, RGMII & SGMII/2500Base-X, industrial temperature
 +
- config NET_DSA_TAG_MTK
- 	tristate "Tag driver for Mediatek switches"
- 	help
-diff --git a/net/dsa/Makefile b/net/dsa/Makefile
-index 555c07cfeb71..3a73fbeee684 100644
---- a/net/dsa/Makefile
-+++ b/net/dsa/Makefile
-@@ -27,6 +27,7 @@ obj-$(CONFIG_NET_DSA_TAG_GSWIP) += tag_gswip.o
- obj-$(CONFIG_NET_DSA_TAG_HELLCREEK) += tag_hellcreek.o
- obj-$(CONFIG_NET_DSA_TAG_KSZ) += tag_ksz.o
- obj-$(CONFIG_NET_DSA_TAG_LAN9303) += tag_lan9303.o
-+obj-$(CONFIG_NET_DSA_TAG_MXL_GSW1XX) += tag_mxl-gsw1xx.o
- obj-$(CONFIG_NET_DSA_TAG_MTK) += tag_mtk.o
- obj-$(CONFIG_NET_DSA_TAG_NONE) += tag_none.o
- obj-$(CONFIG_NET_DSA_TAG_OCELOT) += tag_ocelot.o
-diff --git a/net/dsa/tag_mxl-gsw1xx.c b/net/dsa/tag_mxl-gsw1xx.c
+ config NET_DSA_MT7530
+ 	tristate "MediaTek MT7530 and MT7531 Ethernet switch support"
+ 	select NET_DSA_TAG_MTK
+diff --git a/drivers/net/dsa/Makefile b/drivers/net/dsa/Makefile
+index ac54bf870cd6..2c26e91c7c73 100644
+--- a/drivers/net/dsa/Makefile
++++ b/drivers/net/dsa/Makefile
+@@ -7,6 +7,7 @@ obj-$(CONFIG_FIXED_PHY)		+= dsa_loop_bdinfo.o
+ endif
+ obj-$(CONFIG_NET_DSA_LANTIQ_GSWIP) += lantiq_gswip.o
+ obj-$(CONFIG_NET_DSA_LANTIQ_COMMON) += lantiq_gswip_common.o
++obj-$(CONFIG_NET_DSA_MXL_GSW1XX) += mxl-gsw1xx.o
+ obj-$(CONFIG_NET_DSA_MT7530)	+= mt7530.o
+ obj-$(CONFIG_NET_DSA_MT7530_MDIO) += mt7530-mdio.o
+ obj-$(CONFIG_NET_DSA_MT7530_MMIO) += mt7530-mmio.o
+diff --git a/drivers/net/dsa/mxl-gsw1xx.c b/drivers/net/dsa/mxl-gsw1xx.c
 new file mode 100644
-index 000000000000..7095496db7b6
+index 000000000000..719218cc92ce
 --- /dev/null
-+++ b/net/dsa/tag_mxl-gsw1xx.c
-@@ -0,0 +1,141 @@
-+// SPDX-License-Identifier: GPL-2.0+
++++ b/drivers/net/dsa/mxl-gsw1xx.c
+@@ -0,0 +1,710 @@
++// SPDX-License-Identifier: GPL-2.0
 +/*
-+ * DSA driver Special Tag support for MaxLinear GSW1xx switch chips
++ * DSA Driver for MaxLinear GSW1xx switch devices
 + *
 + * Copyright (C) 2025 Daniel Golle <daniel@makrotopia.org>
 + * Copyright (C) 2023 - 2024 MaxLinear Inc.
++ * Copyright (C) 2022 Snap One, LLC.  All rights reserved.
++ * Copyright (C) 2017 - 2019 Hauke Mehrtens <hauke@hauke-m.de>
++ * Copyright (C) 2012 Avinash Jayaraman <ajayaraman@maxlinear.com>, Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>, Juraj Povazanec <jpovazanec@maxlinear.com>, "Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>, "Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>, "Livia M. Rosu" <lrosu@maxlinear.com>, John Crispin <john@phrozen.org>
++ * Copyright (C) 2010 Lantiq Deutschland
 + */
 +
-+#include <linux/bitops.h>
-+#include <linux/etherdevice.h>
-+#include <linux/skbuff.h>
++#include <linux/bits.h>
++#include <linux/delay.h>
++#include <linux/module.h>
++#include <linux/of_device.h>
++#include <linux/of_mdio.h>
++#include <linux/regmap.h>
 +#include <net/dsa.h>
 +
-+#include "tag.h"
++#include "lantiq_gswip.h"
++#include "mxl-gsw1xx_pce.h"
 +
-+/* To define the outgoing port and to discover the incoming port a special
-+ * tag is used by the GSW1xx.
-+ *
-+ *       Dest MAC       Src MAC    special TAG        EtherType
-+ * ...| 1 2 3 4 5 6 | 1 2 3 4 5 6 | 1 2 3 4 5 6 7 8 | 1 2 |...
-+ *                                |<--------------->|
-+ */
-+
-+#define GSW1XX_TAG_NAME		"gsw1xx"
-+
-+/* special tag in TX path header */
-+#define GSW1XX_TX_HEADER_LEN	8
-+
-+/* Byte 0 = Ethertype byte 1 -> 0x88 */
-+/* Byte 1 = Ethertype byte 2 -> 0xC3*/
-+
-+/* Byte 2 */
-+#define GSW1XX_TX_PORT_MAP_EN		BIT(7)
-+#define GSW1XX_TX_CLASS_EN		BIT(6)
-+#define GSW1XX_TX_TIME_STAMP_EN		BIT(5)
-+#define GSW1XX_TX_LRN_DIS		BIT(4)
-+#define GSW1XX_TX_CLASS_SHIFT		0
-+#define GSW1XX_TX_CLASS_MASK		GENMASK(3, 0)
-+
-+/* Byte 3 */
-+#define GSW1XX_TX_PORT_MAP_LOW_SHIFT	0
-+#define GSW1XX_TX_PORT_MAP_LOW_MASK	GENMASK(7, 0)
-+
-+/* Byte 4 */
-+#define GSW1XX_TX_PORT_MAP_HIGH_SHIFT	0
-+#define GSW1XX_TX_PORT_MAP_HIGH_MASK	GENMASK(7, 0)
-+
-+#define GSW1XX_RX_HEADER_LEN		8
-+
-+/* special tag in RX path header */
-+/* Byte 4 */
-+#define GSW1XX_RX_PORT_MAP_LOW_SHIFT	0
-+#define GSW1XX_RX_PORT_MAP_LOW_MASK	GENMASK(7, 0)
-+
-+/* Byte 5 */
-+#define GSW1XX_RX_PORT_MAP_HIGH_SHIFT	0
-+#define GSW1XX_RX_PORT_MAP_HIGH_MASK	GENMASK(7, 0)
-+
-+static struct sk_buff *gsw1xx_tag_xmit(struct sk_buff *skb,
-+				       struct net_device *dev)
-+{
-+	struct dsa_port *dp = dsa_user_to_port(dev);
-+	u8 *gsw1xx_tag;
-+
-+	if (!skb)
-+		return skb;
-+
-+	/* provide additional space 'GSW1XX_TX_HEADER_LEN' bytes */
-+	skb_push(skb, GSW1XX_TX_HEADER_LEN);
-+
-+	/* add space between MAC address and Ethertype */
-+	memmove(skb->data, skb->data + GSW1XX_TX_HEADER_LEN, 2 * ETH_ALEN);
-+
-+	/* special tag ingress */
-+	gsw1xx_tag = skb->data + 2 * ETH_ALEN;
-+	gsw1xx_tag[0] = 0x88;
-+	gsw1xx_tag[1] = 0xc3;
-+	gsw1xx_tag[2] = GSW1XX_TX_PORT_MAP_EN | GSW1XX_TX_LRN_DIS;
-+	gsw1xx_tag[3] = BIT(dp->index + GSW1XX_TX_PORT_MAP_LOW_SHIFT) & GSW1XX_TX_PORT_MAP_LOW_MASK;
-+	gsw1xx_tag[4] = 0;
-+	gsw1xx_tag[5] = 0;
-+	gsw1xx_tag[6] = 0;
-+	gsw1xx_tag[7] = 0;
-+
-+	return skb;
-+}
-+
-+static struct sk_buff *gsw1xx_tag_rcv(struct sk_buff *skb,
-+				      struct net_device *dev)
-+{
-+	int port;
-+	u8 *gsw1xx_tag;
-+
-+	if (unlikely(!pskb_may_pull(skb, GSW1XX_RX_HEADER_LEN))) {
-+		dev_warn_ratelimited(&dev->dev, "Dropping packet, cannot pull SKB\n");
-+		return NULL;
-+	}
-+
-+	gsw1xx_tag = skb->data - 2;
-+
-+	if (gsw1xx_tag[0] != 0x88 && gsw1xx_tag[1] != 0xc3) {
-+		dev_warn_ratelimited(&dev->dev, "Dropping packet due to invalid special tag\n");
-+		dev_warn_ratelimited(&dev->dev,
-+				     "Tag: 0x%x, 0x%x, 0x%x, 0x%x, 0x%x, 0x%x, 0x%x, 0x%x\n",
-+				     gsw1xx_tag[0], gsw1xx_tag[1], gsw1xx_tag[2], gsw1xx_tag[3],
-+				     gsw1xx_tag[4], gsw1xx_tag[5], gsw1xx_tag[6], gsw1xx_tag[7]);
-+		return NULL;
-+	}
-+
-+	/* Get source port information */
-+	port = (gsw1xx_tag[2] & GSW1XX_RX_PORT_MAP_LOW_MASK) >> GSW1XX_RX_PORT_MAP_LOW_SHIFT;
-+	skb->dev = dsa_conduit_find_user(dev, 0, port);
-+	if (!skb->dev) {
-+		dev_warn_ratelimited(&dev->dev, "Dropping packet due to invalid source port\n");
-+		dev_warn_ratelimited(&dev->dev,
-+				     "Tag: 0x%x, 0x%x, 0x%x, 0x%x, 0x%x, 0x%x, 0x%x, 0x%x\n",
-+				     gsw1xx_tag[0], gsw1xx_tag[1], gsw1xx_tag[2], gsw1xx_tag[3],
-+				     gsw1xx_tag[4], gsw1xx_tag[5], gsw1xx_tag[6], gsw1xx_tag[7]);
-+		return NULL;
-+	}
-+
-+	/* remove the GSW1xx special tag between MAC addresses and the current ethertype field. */
-+	skb_pull_rcsum(skb, GSW1XX_RX_HEADER_LEN);
-+	memmove(skb->data - ETH_HLEN, skb->data - (ETH_HLEN + GSW1XX_RX_HEADER_LEN), 2 * ETH_ALEN);
-+
-+	return skb;
-+}
-+
-+static const struct dsa_device_ops gsw1xx_netdev_ops = {
-+	.name = GSW1XX_TAG_NAME,
-+	.proto	= DSA_TAG_PROTO_MXL_GSW1XX,
-+	.xmit = gsw1xx_tag_xmit,
-+	.rcv = gsw1xx_tag_rcv,
-+	.needed_headroom = GSW1XX_RX_HEADER_LEN,
++struct gsw1xx_priv {
++	struct gswip_priv	gswip;
++	struct mdio_device	*mdio_dev;
++	int			smdio_badr;
++	struct regmap_config	regmap_config[7];
++	int			regmap_config_count;
++	struct			regmap *sgmii;
++	struct			regmap *gpio;
++	struct			regmap *clk;
++	struct			regmap *shell;
++	struct			phylink_pcs sgmii_pcs;
 +};
 +
-+MODULE_DESCRIPTION("DSA tag driver for MaxLinear GSW1xx 8 byte protocol");
-+MODULE_LICENSE("GPL");
-+MODULE_ALIAS_DSA_TAG_DRIVER(DSA_TAG_PROTO_MXL_GSW1XX, GSW1XX_TAG_NAME);
++static int gsw1xx_config_smdio_badr(struct gsw1xx_priv *priv,
++				    unsigned int reg)
++{
++	struct mii_bus *bus = priv->mdio_dev->bus;
++	int sw_addr = priv->mdio_dev->addr;
++	int smdio_badr = priv->smdio_badr;
++	int res;
 +
-+module_dsa_tag_driver(gsw1xx_netdev_ops);
++	if (smdio_badr == GSW1XX_SMDIO_BADR_UNKNOWN ||
++	    reg - smdio_badr >= GSW1XX_SMDIO_BADR ||
++	    smdio_badr > reg) {
++		/* Configure the Switch Base Address */
++		smdio_badr = reg & ~GENMASK(3, 0);
++		res = __mdiobus_write(bus, sw_addr, GSW1XX_SMDIO_BADR, smdio_badr);
++		if (res < 0) {
++			dev_err(&priv->mdio_dev->dev,
++				"%s: Error %d, configuring switch base\n",
++				__func__, res);
++			return res;
++		}
++		priv->smdio_badr = smdio_badr;
++	}
++
++	return smdio_badr;
++}
++
++static int gsw1xx_regmap_read(void *context, unsigned int reg,
++			      unsigned int *val)
++{
++	struct gsw1xx_priv *priv = context;
++	struct mii_bus *bus = priv->mdio_dev->bus;
++	int sw_addr = priv->mdio_dev->addr;
++	int smdio_badr;
++	int res;
++
++	smdio_badr = gsw1xx_config_smdio_badr(priv, reg);
++	if (smdio_badr < 0)
++		return smdio_badr;
++
++	res = __mdiobus_read(bus, sw_addr, reg - smdio_badr);
++	if (res < 0) {
++		dev_err(&priv->mdio_dev->dev, "%s: Error %d reading 0x%x\n",
++			__func__, res, reg);
++		return res;
++	}
++
++	*val = res;
++
++	return 0;
++}
++
++static int gsw1xx_regmap_write(void *context, unsigned int reg,
++			       unsigned int val)
++{
++	struct gsw1xx_priv *priv = context;
++	struct mii_bus *bus = priv->mdio_dev->bus;
++	int sw_addr = priv->mdio_dev->addr;
++	int smdio_badr;
++	int res;
++
++	smdio_badr = gsw1xx_config_smdio_badr(priv, reg);
++	if (smdio_badr < 0)
++		return smdio_badr;
++
++	res = __mdiobus_write(bus, sw_addr, reg - smdio_badr, val);
++	if (res < 0)
++		dev_err(&priv->mdio_dev->dev,
++			"%s: Error %d, writing 0x%x:0x%x\n", __func__, res, reg,
++			val);
++
++	return res;
++}
++
++static const struct regmap_bus gsw1xx_regmap_bus = {
++	.reg_write = gsw1xx_regmap_write,
++	.reg_read = gsw1xx_regmap_read,
++};
++
++static void gsw1xx_mdio_regmap_lock(void *mdio_lock)
++{
++	mutex_lock_nested(mdio_lock, MDIO_MUTEX_NESTED);
++}
++
++static void gsw1xx_mdio_regmap_unlock(void *mdio_lock)
++{
++	mutex_unlock(mdio_lock);
++}
++
++static int gsw1xx_sgmii_phy_xaui_write(struct gsw1xx_priv *priv, u16 addr,
++				       u16 data)
++{
++	int ret, val;
++
++	ret = regmap_write(priv->sgmii, GSW1XX_SGMII_PHY_D, data);
++	if (ret < 0)
++		return ret;
++
++	ret = regmap_write(priv->sgmii, GSW1XX_SGMII_PHY_A, addr);
++	if (ret < 0)
++		return ret;
++
++	ret = regmap_write(priv->sgmii, GSW1XX_SGMII_PHY_C,
++			   GSW1XX_SGMII_PHY_WRITE |
++			   GSW1XX_SGMII_PHY_RESET_N);
++	if (ret < 0)
++		return ret;
++
++	return regmap_read_poll_timeout(priv->sgmii, GSW1XX_SGMII_PHY_C,
++					val, val & GSW1XX_SGMII_PHY_STATUS,
++					1000, 100000);
++}
++
++static struct gsw1xx_priv *sgmii_pcs_to_gsw1xx(struct phylink_pcs *pcs)
++{
++	return container_of(pcs, struct gsw1xx_priv, sgmii_pcs);
++}
++
++static int gsw1xx_sgmii_pcs_config(struct phylink_pcs *pcs,
++				   unsigned int neg_mode,
++				   phy_interface_t interface,
++				   const unsigned long *advertising,
++				   bool permit_pause_to_mac)
++{
++	struct gsw1xx_priv *priv = sgmii_pcs_to_gsw1xx(pcs);
++	bool sgmii_mac_mode = dsa_is_user_port(priv->gswip.ds, GSW1XX_SGMII_PORT);
++	u16 txaneg, anegctl, val, nco_ctrl;
++	int ret;
++
++	/* Assert and deassert SGMII shell reset */
++	ret = regmap_set_bits(priv->shell, GSW1XX_SHELL_RST_REQ,
++			      GSW1XX_RST_REQ_SGMII_SHELL);
++	if (ret < 0)
++		return ret;
++
++	ret = regmap_clear_bits(priv->shell, GSW1XX_SHELL_RST_REQ,
++				GSW1XX_RST_REQ_SGMII_SHELL);
++	if (ret < 0)
++		return ret;
++
++	/* Hardware Bringup FSM Enable  */
++	ret = regmap_write(priv->sgmii, GSW1XX_SGMII_PHY_HWBU_CTRL,
++			   GSW1XX_SGMII_PHY_HWBU_CTRL_EN_HWBU_FSM |
++			   GSW1XX_SGMII_PHY_HWBU_CTRL_HW_FSM_EN);
++	if (ret < 0)
++		return ret;
++
++	/* Configure SGMII PHY Receiver */
++	val = FIELD_PREP(GSW1XX_SGMII_PHY_RX0_CFG2_EQ,
++			 GSW1XX_SGMII_PHY_RX0_CFG2_EQ_DEF) |
++	      GSW1XX_SGMII_PHY_RX0_CFG2_LOS_EN |
++	      GSW1XX_SGMII_PHY_RX0_CFG2_TERM_EN |
++	      FIELD_PREP(GSW1XX_SGMII_PHY_RX0_CFG2_FILT_CNT,
++			 GSW1XX_SGMII_PHY_RX0_CFG2_FILT_CNT_DEF);
++
++	// if (!priv->dts.sgmii_rx_invert)
++		val |= GSW1XX_SGMII_PHY_RX0_CFG2_INVERT;
++
++	ret = regmap_write(priv->sgmii, GSW1XX_SGMII_PHY_RX0_CFG2, val);
++	if (ret < 0)
++		return ret;
++
++	/* Reset and Release TBI */
++	val = GSW1XX_SGMII_TBI_TBICTL_INITTBI | GSW1XX_SGMII_TBI_TBICTL_ENTBI |
++	      GSW1XX_SGMII_TBI_TBICTL_CRSTRR | GSW1XX_SGMII_TBI_TBICTL_CRSOFF;
++	ret = regmap_write(priv->sgmii, GSW1XX_SGMII_TBI_TBICTL, val);
++	if (ret < 0)
++		return ret;
++	val &= ~GSW1XX_SGMII_TBI_TBICTL_INITTBI;
++	ret = regmap_write(priv->sgmii, GSW1XX_SGMII_TBI_TBICTL, val);
++	if (ret < 0)
++		return ret;
++
++	/* Release Tx Data Buffers */
++	ret = regmap_set_bits(priv->sgmii, GSW1XX_SGMII_PCS_TXB_CTL,
++			      GSW1XX_SGMII_PCS_TXB_CTL_INIT_TX_TXB);
++	if (ret < 0)
++		return ret;
++	ret = regmap_clear_bits(priv->sgmii, GSW1XX_SGMII_PCS_TXB_CTL,
++				GSW1XX_SGMII_PCS_TXB_CTL_INIT_TX_TXB);
++	if (ret < 0)
++		return ret;
++
++	/* Release Rx Data Buffers */
++	ret = regmap_set_bits(priv->sgmii, GSW1XX_SGMII_PCS_RXB_CTL,
++			      GSW1XX_SGMII_PCS_RXB_CTL_INIT_RX_RXB);
++	if (ret < 0)
++		return ret;
++	ret = regmap_clear_bits(priv->sgmii, GSW1XX_SGMII_PCS_RXB_CTL,
++				GSW1XX_SGMII_PCS_RXB_CTL_INIT_RX_RXB);
++	if (ret < 0)
++		return ret;
++
++	anegctl = GSW1XX_SGMII_TBI_ANEGCTL_OVRANEG;
++	if (neg_mode != PHYLINK_PCS_NEG_INBAND_ENABLED)
++		anegctl |= GSW1XX_SGMII_TBI_ANEGCTL_OVRABL;
++
++	switch (phylink_get_link_timer_ns(interface)) {
++	case 10000:
++		anegctl |= FIELD_PREP(GSW1XX_SGMII_TBI_ANEGCTL_LT,
++				      GSW1XX_SGMII_TBI_ANEGCTL_LT_10US);
++		break;
++	case 1600000:
++		anegctl |= FIELD_PREP(GSW1XX_SGMII_TBI_ANEGCTL_LT,
++				      GSW1XX_SGMII_TBI_ANEGCTL_LT_1_6MS);
++		break;
++	case 5000000:
++		anegctl |= FIELD_PREP(GSW1XX_SGMII_TBI_ANEGCTL_LT,
++				      GSW1XX_SGMII_TBI_ANEGCTL_LT_5MS);
++		break;
++	case 10000000:
++		anegctl |= FIELD_PREP(GSW1XX_SGMII_TBI_ANEGCTL_LT,
++				      GSW1XX_SGMII_TBI_ANEGCTL_LT_10MS);
++		break;
++	default:
++		return -EINVAL;
++	}
++
++	if (interface == PHY_INTERFACE_MODE_SGMII) {
++		txaneg = ADVERTISE_SGMII;
++		if (sgmii_mac_mode) {
++			txaneg |= BIT(14); /* MAC should always send BIT 14 */
++			anegctl |= FIELD_PREP(GSW1XX_SGMII_TBI_ANEGCTL_ANMODE,
++					      GSW1XX_SGMII_TBI_ANEGCTL_ANMODE_SGMII_MAC);
++		} else {
++			txaneg |= LPA_SGMII_1000FULL;
++			anegctl |= FIELD_PREP(GSW1XX_SGMII_TBI_ANEGCTL_ANMODE,
++					      GSW1XX_SGMII_TBI_ANEGCTL_ANMODE_SGMII_PHY);
++		}
++
++		if (neg_mode & PHYLINK_PCS_NEG_INBAND)
++			anegctl |= GSW1XX_SGMII_TBI_ANEGCTL_ANEGEN;
++	} else if (interface == PHY_INTERFACE_MODE_1000BASEX ||
++		   interface == PHY_INTERFACE_MODE_2500BASEX) {
++		txaneg = BIT(5) | BIT(7);
++		anegctl |= FIELD_PREP(GSW1XX_SGMII_TBI_ANEGCTL_ANMODE,
++				      GSW1XX_SGMII_TBI_ANEGCTL_ANMODE_1000BASEX);
++	} else {
++		dev_err(priv->gswip.dev, "%s: SGMII wrong interface mode %s\n",
++			__func__, phy_modes(interface));
++		return -EINVAL;
++	}
++
++	ret = regmap_write(priv->sgmii, GSW1XX_SGMII_TBI_TXANEGH,
++			   FIELD_GET(GENMASK(15, 8), txaneg));
++	if (ret < 0)
++		return ret;
++	ret = regmap_write(priv->sgmii, GSW1XX_SGMII_TBI_TXANEGL,
++			   FIELD_GET(GENMASK(7, 0), txaneg));
++	if (ret < 0)
++		return ret;
++	ret = regmap_write(priv->sgmii, GSW1XX_SGMII_TBI_ANEGCTL, anegctl);
++	if (ret < 0)
++		return ret;
++
++	/* setup SerDes clock speed */
++	if (interface == PHY_INTERFACE_MODE_2500BASEX)
++		nco_ctrl = GSW1XX_SGMII_2G5 | GSW1XX_SGMII_2G5_NCO2;
++	else
++		nco_ctrl = GSW1XX_SGMII_1G | GSW1XX_SGMII_1G_NCO1;
++
++	ret = regmap_update_bits(priv->clk, GSW1XX_CLK_NCO_CTRL,
++				 GSW1XX_SGMII_HSP_MASK | GSW1XX_SGMII_SEL,
++				 nco_ctrl);
++	if (ret)
++		return ret;
++
++	ret = gsw1xx_sgmii_phy_xaui_write(priv, 0x30, 0x80);
++	if (ret)
++		return ret;
++
++	return 0;
++}
++
++static void gsw1xx_sgmii_pcs_link_up(struct phylink_pcs *pcs,
++				     unsigned int neg_mode,
++				     phy_interface_t interface, int speed,
++				     int duplex)
++{
++	struct gsw1xx_priv *priv = sgmii_pcs_to_gsw1xx(pcs);
++	u16 lpstat;
++
++	/* When in-band AN is enabled hardware will set lpstat */
++	if (neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED)
++		return;
++
++	/* Force speed and duplex settings */
++	if (interface == PHY_INTERFACE_MODE_SGMII) {
++		if (speed == SPEED_10)
++			lpstat = FIELD_PREP(GSW1XX_SGMII_TBI_LPSTAT_SPEED,
++					    GSW1XX_SGMII_TBI_LPSTAT_SPEED_10);
++		else if (speed == SPEED_100)
++			lpstat = FIELD_PREP(GSW1XX_SGMII_TBI_LPSTAT_SPEED,
++					    GSW1XX_SGMII_TBI_LPSTAT_SPEED_100);
++		else
++			lpstat = FIELD_PREP(GSW1XX_SGMII_TBI_LPSTAT_SPEED,
++					    GSW1XX_SGMII_TBI_LPSTAT_SPEED_1000);
++	} else {
++		lpstat = FIELD_PREP(GSW1XX_SGMII_TBI_LPSTAT_SPEED,
++				    GSW1XX_SGMII_TBI_LPSTAT_SPEED_NOSGMII);
++	}
++
++	if (duplex == DUPLEX_FULL)
++		lpstat |= GSW1XX_SGMII_TBI_LPSTAT_DUPLEX;
++
++	regmap_write(priv->sgmii, GSW1XX_SGMII_TBI_LPSTAT, lpstat);
++}
++
++static void gsw1xx_sgmii_pcs_get_state(struct phylink_pcs *pcs,
++				       unsigned int neg_mode,
++				       struct phylink_link_state *state)
++{
++	struct gsw1xx_priv *priv = sgmii_pcs_to_gsw1xx(pcs);
++	int ret;
++	u32 val;
++
++	ret = regmap_read(priv->sgmii, GSW1XX_SGMII_TBI_TBISTAT, &val);
++	if (ret < 0)
++		return;
++
++	state->link = !!(val & GSW1XX_SGMII_TBI_TBISTAT_LINK);
++	state->an_complete = !!(val & GSW1XX_SGMII_TBI_TBISTAT_AN_COMPLETE);
++
++	ret = regmap_read(priv->sgmii, GSW1XX_SGMII_TBI_LPSTAT, &val);
++	if (ret < 0)
++		return;
++
++	state->duplex = (val & GSW1XX_SGMII_TBI_LPSTAT_DUPLEX) ?
++			 DUPLEX_FULL : DUPLEX_HALF;
++	if (val & GSW1XX_SGMII_TBI_LPSTAT_PAUSE_RX)
++		state->pause |= MLO_PAUSE_RX;
++
++	if (val & GSW1XX_SGMII_TBI_LPSTAT_PAUSE_TX)
++		state->pause |= MLO_PAUSE_TX;
++
++	switch (FIELD_GET(GSW1XX_SGMII_TBI_LPSTAT_SPEED, val)) {
++	case GSW1XX_SGMII_TBI_LPSTAT_SPEED_10:
++		state->speed = SPEED_10;
++		break;
++	case GSW1XX_SGMII_TBI_LPSTAT_SPEED_100:
++		state->speed = SPEED_100;
++		break;
++	case GSW1XX_SGMII_TBI_LPSTAT_SPEED_1000:
++		state->speed = SPEED_1000;
++		break;
++	case GSW1XX_SGMII_TBI_LPSTAT_SPEED_NOSGMII:
++		if (state->interface == PHY_INTERFACE_MODE_1000BASEX)
++			state->speed = SPEED_1000;
++		else if (state->interface == PHY_INTERFACE_MODE_2500BASEX)
++			state->speed = SPEED_2500;
++		else
++			state->speed = SPEED_UNKNOWN;
++		break;
++	}
++}
++
++static void gsw1xx_sgmii_pcs_an_restart(struct phylink_pcs *pcs)
++{
++	struct gsw1xx_priv *priv = sgmii_pcs_to_gsw1xx(pcs);
++
++	regmap_set_bits(priv->sgmii, GSW1XX_SGMII_TBI_ANEGCTL,
++			GSW1XX_SGMII_TBI_ANEGCTL_RANEG);
++}
++
++static const struct phylink_pcs_ops gsw1xx_sgmii_pcs_ops = {
++	.pcs_get_state = gsw1xx_sgmii_pcs_get_state,
++	.pcs_config = gsw1xx_sgmii_pcs_config,
++	.pcs_an_restart = gsw1xx_sgmii_pcs_an_restart,
++	.pcs_link_up = gsw1xx_sgmii_pcs_link_up,
++};
++
++static void gsw1xx_phylink_get_caps(struct dsa_switch *ds, int port,
++				    struct phylink_config *config)
++{
++	struct gswip_priv *priv = ds->priv;
++
++	config->mac_capabilities = MAC_ASYM_PAUSE | MAC_SYM_PAUSE |
++		MAC_10 | MAC_100 | MAC_1000;
++
++	switch (port) {
++	case 0:
++	case 1:
++	case 2:
++	case 3:
++		__set_bit(PHY_INTERFACE_MODE_INTERNAL,
++			  config->supported_interfaces);
++		break;
++	case 4: /* port 4: SGMII */
++		__set_bit(PHY_INTERFACE_MODE_SGMII,
++			  config->supported_interfaces);
++		__set_bit(PHY_INTERFACE_MODE_1000BASEX,
++			  config->supported_interfaces);
++		if (priv->hw_info->supports_2500m) {
++			__set_bit(PHY_INTERFACE_MODE_2500BASEX,
++				  config->supported_interfaces);
++			config->mac_capabilities |= MAC_2500FD;
++		}
++		break;
++	case 5: /* port 5: RGMII or RMII */
++		__set_bit(PHY_INTERFACE_MODE_RMII,
++			  config->supported_interfaces);
++		phy_interface_set_rgmii(config->supported_interfaces);
++		break;
++	}
++}
++
++static struct phylink_pcs *gsw1xx_phylink_mac_select_pcs(struct phylink_config *config,
++							 phy_interface_t interface)
++{
++	struct dsa_port *dp = dsa_phylink_to_port(config);
++	struct gswip_priv *gswip_priv = dp->ds->priv;
++	struct gsw1xx_priv *gsw1xx_priv = container_of(gswip_priv,
++						       struct gsw1xx_priv,
++						       gswip);
++
++	switch (dp->index) {
++	case GSW1XX_SGMII_PORT:
++		return &gsw1xx_priv->sgmii_pcs;
++	default:
++		return NULL;
++	}
++}
++
++static struct regmap *gsw1xx_regmap_init(struct gsw1xx_priv *priv,
++					 const char *name,
++					 unsigned int reg_base,
++					 unsigned int max_register)
++{
++	int count = priv->regmap_config_count++;
++	struct regmap_config *config;
++
++	if (WARN_ON(count >= ARRAY_SIZE(priv->regmap_config)))
++		return NULL;
++
++	config = &priv->regmap_config[count];
++	config->name = name;
++	config->reg_bits = 16;
++	config->val_bits = 16;
++	config->reg_base = reg_base;
++	config->max_register = max_register;
++	config->lock = gsw1xx_mdio_regmap_lock;
++	config->unlock = gsw1xx_mdio_regmap_unlock;
++	config->lock_arg = &priv->mdio_dev->bus->mdio_lock;
++
++	return devm_regmap_init(&priv->mdio_dev->dev, &gsw1xx_regmap_bus,
++				priv, config);
++}
++
++static int gsw1xx_probe(struct mdio_device *mdiodev)
++{
++	struct device *dev = &mdiodev->dev;
++	struct gsw1xx_priv *priv;
++	struct dsa_switch *ds;
++	int ret;
++
++	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
++	if (!priv)
++		return -ENOMEM;
++
++	priv->mdio_dev = mdiodev;
++	priv->smdio_badr = GSW1XX_SMDIO_BADR_UNKNOWN;
++
++	priv->gswip.dev = dev;
++	priv->gswip.hw_info = of_device_get_match_data(dev);
++	if (!priv->gswip.hw_info)
++		return -EINVAL;
++
++	mutex_init(&priv->gswip.pce_table_lock);
++
++	priv->gswip.gswip = gsw1xx_regmap_init(priv, "switch",
++					       GSW1XX_SWITCH_BASE, 0xfff);
++	if (IS_ERR(priv->gswip.gswip))
++		return PTR_ERR(priv->gswip.gswip);
++
++	priv->gswip.mdio = gsw1xx_regmap_init(priv, "mdio", GSW1XX_MMDIO_BASE,
++					      0xff);
++	if (IS_ERR(priv->gswip.mdio))
++		return PTR_ERR(priv->gswip.mdio);
++
++	priv->gswip.mii = gsw1xx_regmap_init(priv, "mii", GSW1XX_RGMII_BASE,
++					     0xff);
++	if (IS_ERR(priv->gswip.mii))
++		return PTR_ERR(priv->gswip.mii);
++
++	priv->sgmii = gsw1xx_regmap_init(priv, "sgmii", GSW1XX_SGMII_BASE,
++					 0xfff);
++	if (IS_ERR(priv->sgmii))
++		return PTR_ERR(priv->sgmii);
++
++	priv->gpio = gsw1xx_regmap_init(priv, "gpio", GSW1XX_GPIO_BASE,
++					0xff);
++	if (IS_ERR(priv->gpio))
++		return PTR_ERR(priv->gpio);
++
++	priv->clk = gsw1xx_regmap_init(priv, "clk", GSW1XX_CLK_BASE, 0xff);
++	if (IS_ERR(priv->clk))
++		return PTR_ERR(priv->clk);
++
++	priv->shell = gsw1xx_regmap_init(priv, "shell", GSW1XX_SHELL_BASE,
++					 0xff);
++	if (IS_ERR(priv->shell))
++		return PTR_ERR(priv->shell);
++
++	priv->sgmii_pcs.ops = &gsw1xx_sgmii_pcs_ops;
++	priv->sgmii_pcs.poll = 1;
++	__set_bit(PHY_INTERFACE_MODE_SGMII,
++		  priv->sgmii_pcs.supported_interfaces);
++	__set_bit(PHY_INTERFACE_MODE_1000BASEX,
++		  priv->sgmii_pcs.supported_interfaces);
++	if (priv->gswip.hw_info->supports_2500m)
++		__set_bit(PHY_INTERFACE_MODE_2500BASEX,
++			  priv->sgmii_pcs.supported_interfaces);
++
++	ret = regmap_read(priv->gswip.gswip, GSWIP_VERSION, &priv->gswip.version);
++	if (ret < 0)
++		return ret;
++
++	ds = devm_kzalloc(dev, sizeof(*ds), GFP_KERNEL);
++	if (!ds)
++		return -ENOMEM;
++
++	priv->gswip.ds = ds;
++
++	ret = gswip_allocate_vlans(&priv->gswip);
++	if (ret)
++		return ret;
++
++	ds->dev = dev;
++	ds->num_ports = GSW1XX_PORTS;
++	ds->priv = &priv->gswip;
++	ds->ops = &gswip_switch_ops;
++	ds->phylink_mac_ops = &gswip_phylink_mac_ops;
++	ds->fdb_isolation = true;
++
++	/* configure GPIO pin-mux for MMDIO in case of external PHY connected to
++	 * SGMII or RGMII as slave interface
++	 */
++	regmap_set_bits(priv->gpio, GPIO_ALTSEL0, 3);
++	regmap_set_bits(priv->gpio, GPIO_ALTSEL1, 3);
++
++	dev_set_drvdata(dev, ds);
++
++	ret = dsa_register_switch(ds);
++	if (ret) {
++		if (ret != -EPROBE_DEFER)
++			dev_err(dev, "%s: Error %d register DSA switch\n",
++				__func__, ret);
++		return ret;
++	}
++
++	ret = gswip_validate_cpu_port(ds);
++	if (ret)
++		goto disable_switch;
++
++	dev_info(dev, "probed GSWIP version %lx mod %lx\n",
++		 (priv->gswip.version & GSWIP_VERSION_REV_MASK) >> GSWIP_VERSION_REV_SHIFT,
++		 (priv->gswip.version & GSWIP_VERSION_MOD_MASK) >> GSWIP_VERSION_MOD_SHIFT);
++
++	return 0;
++
++disable_switch:
++	gswip_disable_switch(&priv->gswip);
++	dsa_unregister_switch(ds);
++
++	return ret;
++}
++
++static void gsw1xx_remove(struct mdio_device *mdiodev)
++{
++	struct dsa_switch *ds = dev_get_drvdata(&mdiodev->dev);
++	struct gswip_priv *priv;
++
++	if (!ds)
++		return;
++
++	priv = ds->priv;
++	if (!priv)
++		return;
++
++	gswip_disable_switch(priv);
++
++	dsa_unregister_switch(ds);
++}
++
++static void gsw1xx_shutdown(struct mdio_device *mdiodev)
++{
++	struct dsa_switch *ds = dev_get_drvdata(&mdiodev->dev);
++	struct gswip_priv *priv;
++
++	dev_set_drvdata(&mdiodev->dev, NULL);
++
++	if (!ds)
++		return;
++
++	priv = ds->priv;
++	if (!priv)
++		return;
++
++	gswip_disable_switch(priv);
++}
++
++static const struct gswip_hw_info gsw12x_data = {
++	.max_ports		= GSW1XX_PORTS,
++	.allowed_cpu_ports	= BIT(GSW1XX_MII_PORT) | BIT(GSW1XX_SGMII_PORT),
++	.phy_ports		= BIT(0) | BIT(1),
++	.mii_ports		= BIT(GSW1XX_MII_PORT),
++	.mii_port_reg_offset	= -GSW1XX_MII_PORT,
++	.sgmii_ports		= BIT(GSW1XX_SGMII_PORT),
++	.mac_select_pcs		= gsw1xx_phylink_mac_select_pcs,
++	.phylink_get_caps	= &gsw1xx_phylink_get_caps,
++	.supports_2500m		= true,
++	.pce_microcode		= &gsw1xx_pce_microcode,
++	.pce_microcode_size	= ARRAY_SIZE(gsw1xx_pce_microcode),
++	.tag_protocol		= DSA_TAG_PROTO_MXL_GSW1XX,
++};
++
++static const struct gswip_hw_info gsw140_data = {
++	.max_ports		= GSW1XX_PORTS,
++	.allowed_cpu_ports	= BIT(GSW1XX_MII_PORT) | BIT(GSW1XX_SGMII_PORT),
++	.phy_ports		= BIT(0) | BIT(1) | BIT(2) | BIT(3),
++	.mii_ports		= BIT(GSW1XX_MII_PORT),
++	.mii_port_reg_offset	= -GSW1XX_MII_PORT,
++	.sgmii_ports		= BIT(GSW1XX_SGMII_PORT),
++	.mac_select_pcs		= gsw1xx_phylink_mac_select_pcs,
++	.phylink_get_caps	= &gsw1xx_phylink_get_caps,
++	.supports_2500m		= true,
++	.pce_microcode		= &gsw1xx_pce_microcode,
++	.pce_microcode_size	= ARRAY_SIZE(gsw1xx_pce_microcode),
++	.tag_protocol		= DSA_TAG_PROTO_MXL_GSW1XX,
++};
++
++static const struct gswip_hw_info gsw141_data = {
++	.max_ports		= GSW1XX_PORTS,
++	.allowed_cpu_ports	= BIT(GSW1XX_MII_PORT) | BIT(GSW1XX_SGMII_PORT),
++	.phy_ports		= BIT(0) | BIT(1) | BIT(2) | BIT(3),
++	.mii_ports		= BIT(GSW1XX_MII_PORT),
++	.mii_port_reg_offset	= -GSW1XX_MII_PORT,
++	.sgmii_ports		= BIT(GSW1XX_SGMII_PORT),
++	.mac_select_pcs		= gsw1xx_phylink_mac_select_pcs,
++	.phylink_get_caps	= gsw1xx_phylink_get_caps,
++	.pce_microcode		= &gsw1xx_pce_microcode,
++	.pce_microcode_size	= ARRAY_SIZE(gsw1xx_pce_microcode),
++	.tag_protocol		= DSA_TAG_PROTO_MXL_GSW1XX,
++};
++
++/*
++ * GSW125 is the industrial temperature version of GSW120.
++ * GSW145 is the industrial temperature version of GSW140.
++ */
++static const struct of_device_id gsw1xx_of_match[] = {
++	{ .compatible = "maxlinear,gsw120", .data = &gsw12x_data },
++	{ .compatible = "maxlinear,gsw125", .data = &gsw12x_data },
++	{ .compatible = "maxlinear,gsw140", .data = &gsw140_data },
++	{ .compatible = "maxlinear,gsw141", .data = &gsw141_data },
++	{ .compatible = "maxlinear,gsw145", .data = &gsw140_data },
++	{ /* sentinel */ },
++};
++
++MODULE_DEVICE_TABLE(of, gsw1xx_of_match);
++
++static struct mdio_driver gsw1xx_driver = {
++	.probe		= gsw1xx_probe,
++	.remove		= gsw1xx_remove,
++	.shutdown	= gsw1xx_shutdown,
++	.mdiodrv.driver	= {
++		.name = "mxl-gsw1xx",
++		.of_match_table = gsw1xx_of_match,
++	},
++};
++
++mdio_module_driver(gsw1xx_driver);
++
++MODULE_DESCRIPTION("Driver for MaxLinear GSW1xx ethernet switch");
++MODULE_LICENSE("GPL");
++MODULE_ALIAS("platform:mxl-gsw1xx");
+diff --git a/drivers/net/dsa/mxl-gsw1xx_pce.h b/drivers/net/dsa/mxl-gsw1xx_pce.h
+new file mode 100644
+index 000000000000..d2cbad83faec
+--- /dev/null
++++ b/drivers/net/dsa/mxl-gsw1xx_pce.h
+@@ -0,0 +1,160 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * PCE microcode code update for driver for MaxLinear GSW1xx switch chips
++ *
++ * Copyright (C) 2023 - 2024 MaxLinear Inc.
++ * Copyright (C) 2022 Snap One, LLC.  All rights reserved.
++ * Copyright (C) 2017 - 2019 Hauke Mehrtens <hauke@hauke-m.de>
++ * Copyright (C) 2012 Avinash Jayaraman <ajayaraman@maxlinear.com>, Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>, Juraj Povazanec <jpovazanec@maxlinear.com>, "Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>, "Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>, "Livia M. Rosu" <lrosu@maxlinear.com>, John Crispin <john@phrozen.org>
++ * Copyright (C) 2010 Lantiq Deutschland
++ */
++
++/**************************************************************************/
++/*      DEFINES:                                                          */
++/**************************************************************************/
++
++#include "lantiq_gswip.h"
++
++#define INSTR 0
++#define IPV6 1
++#define LENACCU 2
++
++/* GSWIP_2.X */
++enum {
++	GOUT_MAC0 = 0,
++	GOUT_MAC1,
++	GOUT_MAC2,
++	GOUT_MAC3,
++	GOUT_MAC4,
++	GOUT_MAC5,
++	GOUT_ETHTYP,
++	GOUT_VTAG0,
++	GOUT_VTAG1,
++	GOUT_ITAG0,
++	GOUT_ITAG1,	/* 10 */
++	GOUT_ITAG2,
++	GOUT_ITAG3,
++	GOUT_IP0,
++	GOUT_IP1,
++	GOUT_IP2,
++	GOUT_IP3,
++	GOUT_SIP0,
++	GOUT_SIP1,
++	GOUT_SIP2,
++	GOUT_SIP3,	/* 20 */
++	GOUT_SIP4,
++	GOUT_SIP5,
++	GOUT_SIP6,
++	GOUT_SIP7,
++	GOUT_DIP0,
++	GOUT_DIP1,
++	GOUT_DIP2,
++	GOUT_DIP3,
++	GOUT_DIP4,
++	GOUT_DIP5,	/* 30 */
++	GOUT_DIP6,
++	GOUT_DIP7,
++	GOUT_SESID,
++	GOUT_PROT,
++	GOUT_APP0,
++	GOUT_APP1,
++	GOUT_IGMP0,
++	GOUT_IGMP1,
++	GOUT_STAG0 = 61,
++	GOUT_STAG1 = 62,
++	GOUT_NONE = 63,
++};
++
++/* parser's microcode flag type */
++enum {
++	GFLAG_ITAG = 0,
++	GFLAG_VLAN,
++	GFLAG_SNAP,
++	GFLAG_PPPOE,
++	GFLAG_IPV6,
++	GFLAG_IPV6FL,
++	GFLAG_IPV4,
++	GFLAG_IGMP,
++	GFLAG_TU,
++	GFLAG_HOP,
++	GFLAG_NN1,	/* 10 */
++	GFLAG_NN2,
++	GFLAG_END,
++	GFLAG_NO,	/* 13 */
++	GFLAG_SVLAN,	/* 14 */
++};
++
++#define PCE_MC_M(val, msk, ns, out, len, type, flags, ipv4_len) \
++	{ (val), (msk), ((ns) << 10 | (out) << 4 | (len) >> 1),\
++	 ((len) & 1) << 15 | (type) << 13 | (flags) << 9 | (ipv4_len) << 8 }
++
++static const struct gswip_pce_microcode gsw1xx_pce_microcode[] = {
++	/*-----------------------------------------------------------------*/
++	/**   value    mask   ns  out_fields   L  type   flags   ipv4_len **/
++	/*-----------------------------------------------------------------*/
++	/* V22_2X (IPv6 issue fixed) */
++	PCE_MC_M(0x88c3, 0xFFFF, 1,  GOUT_ITAG0,  4, INSTR,   GFLAG_ITAG,  0),
++	PCE_MC_M(0x8100, 0xFFFF, 4,  GOUT_STAG0,  2, INSTR,   GFLAG_SVLAN, 0),
++	PCE_MC_M(0x88A8, 0xFFFF, 4,  GOUT_STAG0,  2, INSTR,   GFLAG_SVLAN, 0),
++	PCE_MC_M(0x9100, 0xFFFF, 4,  GOUT_STAG0,  2, INSTR,   GFLAG_SVLAN, 0),
++	PCE_MC_M(0x8100, 0xFFFF, 5,  GOUT_VTAG0,  2, INSTR,   GFLAG_VLAN,  0),
++	PCE_MC_M(0x88A8, 0xFFFF, 6,  GOUT_VTAG0,  2, INSTR,   GFLAG_VLAN,  0),
++	PCE_MC_M(0x9100, 0xFFFF, 4,  GOUT_VTAG0,  2, INSTR,   GFLAG_VLAN,  0),
++	PCE_MC_M(0x8864, 0xFFFF, 20, GOUT_ETHTYP, 1, INSTR,   GFLAG_NO,    0),
++	PCE_MC_M(0x0800, 0xFFFF, 24, GOUT_ETHTYP, 1, INSTR,   GFLAG_NO,    0),
++	PCE_MC_M(0x86DD, 0xFFFF, 25, GOUT_ETHTYP, 1, INSTR,   GFLAG_NO,    0),
++	PCE_MC_M(0x8863, 0xFFFF, 19, GOUT_ETHTYP, 1, INSTR,   GFLAG_NO,    0),
++	PCE_MC_M(0x0000, 0xF800, 13, GOUT_NONE,   0, INSTR,   GFLAG_NO,    0),
++	PCE_MC_M(0x0000, 0x0000, 44, GOUT_ETHTYP, 1, INSTR,   GFLAG_NO,    0),
++	PCE_MC_M(0x0600, 0x0600, 44, GOUT_ETHTYP, 1, INSTR,   GFLAG_NO,    0),
++	PCE_MC_M(0x0000, 0x0000, 15, GOUT_NONE,   1, INSTR,   GFLAG_NO,    0),
++	PCE_MC_M(0xAAAA, 0xFFFF, 17, GOUT_NONE,   1, INSTR,   GFLAG_NO,    0),
++	PCE_MC_M(0x0000, 0x0000, 45, GOUT_NONE,   0, INSTR,   GFLAG_NO,    0),
++	PCE_MC_M(0x0300, 0xFF00, 45, GOUT_NONE,   0, INSTR,   GFLAG_SNAP,  0),
++	PCE_MC_M(0x0000, 0x0000, 45, GOUT_NONE,   0, INSTR,   GFLAG_NO,    0),
++	PCE_MC_M(0x0000, 0x0000, 45, GOUT_DIP7,   3, INSTR,   GFLAG_NO,    0),
++	PCE_MC_M(0x0000, 0x0000, 21, GOUT_DIP7,   3, INSTR,   GFLAG_PPPOE, 0),
++	PCE_MC_M(0x0021, 0xFFFF, 24, GOUT_NONE,   1, INSTR,   GFLAG_NO,    0),
++	PCE_MC_M(0x0057, 0xFFFF, 25, GOUT_NONE,   1, INSTR,   GFLAG_NO,    0),
++	PCE_MC_M(0x0000, 0x0000, 44, GOUT_NONE,   0, INSTR,   GFLAG_NO,    0),
++	PCE_MC_M(0x4000, 0xF000, 27, GOUT_IP0,    4, INSTR,   GFLAG_IPV4,  1),
++	PCE_MC_M(0x6000, 0xF000, 30, GOUT_IP0,    3, INSTR,   GFLAG_IPV6,  0),
++	PCE_MC_M(0x0000, 0x0000, 45, GOUT_NONE,   0, INSTR,   GFLAG_NO,    0),
++	PCE_MC_M(0x0000, 0x0000, 28, GOUT_IP3,    2, INSTR,   GFLAG_NO,    0),
++	PCE_MC_M(0x0000, 0x0000, 29, GOUT_SIP0,   4, INSTR,   GFLAG_NO,    0),
++	PCE_MC_M(0x0000, 0x0000, 44, GOUT_NONE,   0, LENACCU, GFLAG_NO,    0),
++	PCE_MC_M(0x1100, 0xFF00, 43, GOUT_PROT,   1, INSTR,   GFLAG_NO,    0),
++	PCE_MC_M(0x0600, 0xFF00, 43, GOUT_PROT,   1, INSTR,   GFLAG_NO,    0),
++	PCE_MC_M(0x0000, 0xFF00, 36, GOUT_IP3,   17, INSTR,   GFLAG_HOP,   0),
++	PCE_MC_M(0x2B00, 0xFF00, 36, GOUT_IP3,   17, INSTR,   GFLAG_NN1,   0),
++	PCE_MC_M(0x3C00, 0xFF00, 36, GOUT_IP3,   17, INSTR,   GFLAG_NN2,   0),
++	PCE_MC_M(0x0000, 0x0000, 43, GOUT_PROT,   1, INSTR,   GFLAG_NO,    0),
++	PCE_MC_M(0x0000, 0x00F0, 38, GOUT_NONE,   0, INSTR,   GFLAG_NO,    0),
++	PCE_MC_M(0x0000, 0x0000, 44, GOUT_NONE,   0, INSTR,   GFLAG_NO,    0),
++	PCE_MC_M(0x0000, 0xFF00, 36, GOUT_NONE,   0, IPV6,    GFLAG_HOP,   0),
++	PCE_MC_M(0x2B00, 0xFF00, 36, GOUT_NONE,   0, IPV6,    GFLAG_NN1,   0),
++	PCE_MC_M(0x3C00, 0xFF00, 36, GOUT_NONE,   0, IPV6,    GFLAG_NN2,   0),
++	PCE_MC_M(0x0000, 0x00FC, 44, GOUT_PROT,   0, IPV6,    GFLAG_NO,    0),
++	PCE_MC_M(0x0000, 0x0000, 44, GOUT_NONE,   0, IPV6,    GFLAG_NO,    0),
++	PCE_MC_M(0x0000, 0x0000, 44, GOUT_SIP0,  16, INSTR,   GFLAG_NO,    0),
++	PCE_MC_M(0x0000, 0x0000, 45, GOUT_APP0,   4, INSTR,   GFLAG_IGMP,  0),
++	PCE_MC_M(0x0000, 0x0000, 45, GOUT_NONE,   0, INSTR,   GFLAG_END,   0),
++	PCE_MC_M(0x0000, 0x0000, 45, GOUT_NONE,   0, INSTR,   GFLAG_END,   0),
++	PCE_MC_M(0x0000, 0x0000, 45, GOUT_NONE,   0, INSTR,   GFLAG_END,   0),
++	PCE_MC_M(0x0000, 0x0000, 45, GOUT_NONE,   0, INSTR,   GFLAG_END,   0),
++	PCE_MC_M(0x0000, 0x0000, 45, GOUT_NONE,   0, INSTR,   GFLAG_END,   0),
++	PCE_MC_M(0x0000, 0x0000, 45, GOUT_NONE,   0, INSTR,   GFLAG_END,   0),
++	PCE_MC_M(0x0000, 0x0000, 45, GOUT_NONE,   0, INSTR,   GFLAG_END,   0),
++	PCE_MC_M(0x0000, 0x0000, 45, GOUT_NONE,   0, INSTR,   GFLAG_END,   0),
++	PCE_MC_M(0x0000, 0x0000, 45, GOUT_NONE,   0, INSTR,   GFLAG_END,   0),
++	PCE_MC_M(0x0000, 0x0000, 45, GOUT_NONE,   0, INSTR,   GFLAG_END,   0),
++	PCE_MC_M(0x0000, 0x0000, 45, GOUT_NONE,   0, INSTR,   GFLAG_END,   0),
++	PCE_MC_M(0x0000, 0x0000, 45, GOUT_NONE,   0, INSTR,   GFLAG_END,   0),
++	PCE_MC_M(0x0000, 0x0000, 45, GOUT_NONE,   0, INSTR,   GFLAG_END,   0),
++	PCE_MC_M(0x0000, 0x0000, 45, GOUT_NONE,   0, INSTR,   GFLAG_END,   0),
++	PCE_MC_M(0x0000, 0x0000, 45, GOUT_NONE,   0, INSTR,   GFLAG_END,   0),
++	PCE_MC_M(0x0000, 0x0000, 45, GOUT_NONE,   0, INSTR,   GFLAG_END,   0),
++	PCE_MC_M(0x0000, 0x0000, 45, GOUT_NONE,   0, INSTR,   GFLAG_END,   0),
++	PCE_MC_M(0x0000, 0x0000, 45, GOUT_NONE,   0, INSTR,   GFLAG_END,   0),
++	PCE_MC_M(0x0000, 0x0000, 45, GOUT_NONE,   0, INSTR,   GFLAG_END,   0),
++};
 -- 
 2.50.1
 
