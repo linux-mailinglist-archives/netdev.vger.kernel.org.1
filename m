@@ -1,125 +1,198 @@
-Return-Path: <netdev+bounces-214256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214257-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A546B28A5F
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 05:53:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DD66CB28A81
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 06:16:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E728A25964
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 03:53:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 99323AC19E6
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 04:16:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41F261D88A4;
-	Sat, 16 Aug 2025 03:53:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1615F5BAF0;
+	Sat, 16 Aug 2025 04:16:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="B+LtpeGw"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="UUh3rOWL"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
+Received: from pdx-out-002.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-002.esa.us-west-2.outbound.mail-perimeter.amazon.com [44.246.1.125])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B983155333;
-	Sat, 16 Aug 2025 03:53:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D4434A33
+	for <netdev@vger.kernel.org>; Sat, 16 Aug 2025 04:16:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.246.1.125
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755316422; cv=none; b=Sk71SjzWjpQrDa+iQfXCRlTEj9uIWJJf9dUEaVgWYD+EFLIqnToqHHRSDsan5a3CQoBxl4SnPwa4tgk92VfibA0RRds7mFvwjKJ+4XFFaRMeSKYIwVhXtuM9VE+JgDjoIXLuZIafe/oecCr1q8omXfXSF1hP6HiEG6i6lptpmo8=
+	t=1755317774; cv=none; b=gZG6R/IBg2aHrYSmUYYcMw7eKBgujG+Of0aCrcnMCjFN0Uf4vt+QblGNl4YMhNatC6IXPLlWHW5KGF1P6Sn4bQUM7TVbOJVdDGs7HykmvCaH7Ny6s+30ggaQic3Tp+Rjko5czKVfLOnNAyhkdwwDekBloA2xS2fj/auJoqUuewk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755316422; c=relaxed/simple;
-	bh=sFof9ZJ265IZSD36dpzx06sjikw+apqRmtPD496v4Lk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XgWERR84V+7rcQqU2lTDLM//8LbAx449GLRgZYxogs/x3gTCYLlwN8FXuYBqWmYoANxOPC2Y3GLoarTA1VkL5+rBf9rYrXLF3ciHaFBe/8auo1zyH0C5IA9gJ+7gTlTlZnfyw++y6oUKT4Z9AGFiHkQXXwYlrCnqoyGRUFLZ0iw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=B+LtpeGw; arc=none smtp.client-ip=115.124.30.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1755316407; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=JIZlq6Vx8PLQbzVJbIEl4PG97O7jQ5b2q+B6qeAr2Jc=;
-	b=B+LtpeGwLF4PR5rKOMpfnaZlRBABz/F1h1aZl2UF2FT7VaG89zUQnZyQqkWXOrTcAHeV6MYKFHXdtDPxdP3z4KrmMw1zPCWxW3DbcaHZhc1K+lno1V8Hi7itnsviN7y7yUKWajoTRupPnXO/RgmiBvJadxTUpMvU5ng/BXEWTow=
-Received: from 30.221.32.119(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0WlqVtem_1755316338 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Sat, 16 Aug 2025 11:53:27 +0800
-Message-ID: <2a98165b-a353-405d-83e0-ffbca1d41340@linux.alibaba.com>
-Date: Sat, 16 Aug 2025 11:52:18 +0800
+	s=arc-20240116; t=1755317774; c=relaxed/simple;
+	bh=4pl7HhioxdvaFIegkDUeOmLYPbeUzrx5Kk8on7OU6Go=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=K7/gFusnCqTK2tOvUIi8y2HpPcP6gr4M7oXIYe2pRuHTbZ3zfBwz5XpYrPGGq6Bt5fy1j045ksiY/22qOQG7QpCWDNuEEU2Et8mmfe8dR5dQdp2xDhYQ0mXzcNBRxl7qc61SUw1jYfThfHbl92Fjd4B2z0s/93XR0YdTnktT9XQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=UUh3rOWL; arc=none smtp.client-ip=44.246.1.125
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1755317772; x=1786853772;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=grQ8MznX0ax9VmAPZJL5cknDcX/BG/AnrXvD+2GWl80=;
+  b=UUh3rOWLB+yE8f9EpogEoqmUQrnAk/BtcrRo0LYtnQwqyO8YLdq5hjG2
+   JUAgYo+QLp+FEMIP1hD0H11EXj70msSgJ+lazCK7oIUDgMipR7qfmAdHc
+   yHn6u2W2ekbwsxbQEMvzuIty+F0am5/wPSYcoUJO1vOZYOW6BH5CJgHMJ
+   j+tyGve1jq8mrz5aqvutKk3ewzkqlq8SZe8aZ1TZlxrf+ZtvHokaMTyML
+   5qdAICLStw2jU4RTMCl+waZD8To8tWoGZCN19VYdyB2/x8Jh8zVyVTRpM
+   ZxmGkKFFvUvDntJvyjy/EhSL5akfm+w23VrtL2fChxiTBIXpNlFuVNZMS
+   A==;
+X-CSE-ConnectionGUID: zVwOjIXKRri8HnBOwpJqWQ==
+X-CSE-MsgGUID: 8XG63X9vSWOTCSVAYklqYA==
+X-IronPort-AV: E=Sophos;i="6.16,202,1744070400"; 
+   d="scan'208";a="1244802"
+Received: from ip-10-5-9-48.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.9.48])
+  by internal-pdx-out-002.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Aug 2025 04:16:09 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:6564]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.45.64:2525] with esmtp (Farcaster)
+ id 33b31170-08d4-4ec5-90ee-1f3758c28f5d; Sat, 16 Aug 2025 04:16:09 +0000 (UTC)
+X-Farcaster-Flow-ID: 33b31170-08d4-4ec5-90ee-1f3758c28f5d
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Sat, 16 Aug 2025 04:16:09 +0000
+Received: from b0be8375a521.amazon.com (10.37.244.14) by
+ EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.17;
+ Sat, 16 Aug 2025 04:16:06 +0000
+From: Kohei Enju <enjuk@amazon.com>
+To: <pmenzel@molgen.mpg.de>
+CC: <alexanderduyck@fb.com>, <andrew+netdev@lunn.ch>,
+	<anthony.l.nguyen@intel.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<enjuk@amazon.com>, <intel-wired-lan@lists.osuosl.org>,
+	<kohei.enju@gmail.com>, <kuba@kernel.org>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <przemyslaw.kitszel@intel.com>
+Subject: Re: [Intel-wired-lan] [PATCH v1 iwl-net] igb: fix link test skipping
+ when interface is admin down
+Date: Sat, 16 Aug 2025 13:15:28 +0900
+Message-ID: <20250816041557.71794-2-enjuk@amazon.com>
+X-Mailer: git-send-email 2.48.1
+In-Reply-To: <01054bc5-74b6-4472-b7b6-78febaaf575f@molgen.mpg.de>
+References: <01054bc5-74b6-4472-b7b6-78febaaf575f@molgen.mpg.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4] ptp: add Alibaba CIPU PTP clock driver
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: richardcochran@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, xuanzhuo@linux.alibaba.com,
- dust.li@linux.alibaba.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
- David Woodhouse <dwmw2@infradead.org>
-References: <20250812115321.9179-1-guwen@linux.alibaba.com>
- <20250815113814.5e135318@kernel.org>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <20250815113814.5e135318@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D037UWB003.ant.amazon.com (10.13.138.115) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-
-
-On 2025/8/16 02:38, Jakub Kicinski wrote:
-> On Tue, 12 Aug 2025 19:53:21 +0800 Wen Gu wrote:
->> This adds a driver for Alibaba CIPU PTP clock. The CIPU, an underlying
->> infrastructure of Alibaba Cloud, synchronizes time with reference clocks
->> continuously and provides PTP clocks for VMs and bare metals in cloud.
-> 
->> +static struct attribute *ptp_cipu_attrs[] = {
->> +	&dev_attr_reg_dev_feat.attr,
->> +	&dev_attr_reg_gst_feat.attr,
->> +	&dev_attr_reg_drv_ver.attr,
->> +	&dev_attr_reg_env_ver.attr,
->> +	&dev_attr_reg_dev_stat.attr,
->> +	&dev_attr_reg_sync_stat.attr,
->> +	&dev_attr_reg_tm_prec_ns.attr,
->> +	&dev_attr_reg_epo_base_yr.attr,
->> +	&dev_attr_reg_leap_sec.attr,
->> +	&dev_attr_reg_max_lat_ns.attr,
->> +	&dev_attr_reg_mt_tout_us.attr,
->> +	&dev_attr_reg_thresh_us.attr,
->> +
->> +	&dev_attr_ptp_gettm.attr,
->> +	&dev_attr_ptp_gettm_inval_err.attr,
->> +	&dev_attr_ptp_gettm_tout_err.attr,
->> +	&dev_attr_ptp_gettm_excd_thresh.attr,
->> +
->> +	&dev_attr_dev_clk_abn.attr,
->> +	&dev_attr_dev_clk_abn_rec.attr,
->> +	&dev_attr_dev_maint.attr,
->> +	&dev_attr_dev_maint_rec.attr,
->> +	&dev_attr_dev_maint_tout.attr,
->> +	&dev_attr_dev_busy.attr,
->> +	&dev_attr_dev_busy_rec.attr,
->> +	&dev_attr_dev_err.attr,
->> +	&dev_attr_dev_err_rec.attr,
-> 
-> This driver is lacking documentation. You need to describe how the user
-> is expected to interact with the device and document all these sysfs
-> attributes.
-> 
-
-OK. I will add the description.
-
-Would you prefer me to create a related .rst file under Documentation/
-(perhaps in a new Documentation/clock/ptp/ directory?), or add the
-description comments directly in this driver source?
-
-> Maybe it's just me, but in general I really wish someone stepped up
-> and created a separate subsystem for all these cloud / vm clocks.
-> They have nothing to do with PTP. In my mind PTP clocks are simple HW
-> tickers on which we build all the time related stuff. While this driver
-> reports the base year for the epoch and leap second status via sysfs.
-
-These sysfs are intended to provide diagnostics and informations.
-For users, interacting with this PTP clock works the same way as with other
-PTP clock, through the exposed chardev. The 1588 protocol related work has
-been done by the cloud infra so the driver only reads some registers.
-
-Thanks.
+On Fri, 15 Aug 2025 09:41:28 +0200, Paul Menzel wrote:=0D
+=0D
+>[Correct Alexander=E2=80=99s email address]=0D
+=0D
+Thank you for the correction.=0D
+I'll use the correct address going forward.=0D
+=0D
+>=0D
+>Am 15.08.25 um 09:38 schrieb Paul Menzel:=0D
+>> Dear Kohei,=0D
+>> =0D
+>> =0D
+>> Thank you very much for your patch.=0D
+>> =0D
+>> Am 15.08.25 um 08:26 schrieb Kohei Enju:=0D
+>>> The igb driver incorrectly skips the link test when the network=0D
+>>> interface is admin down (if_running =3D=3D false), causing the test to=
+=0D
+>>> always report PASS regardless of the actual physical link state.=0D
+>>>=0D
+>>> This behavior is inconsistent with other drivers (e.g. i40e, ice, ixgbe=
+,=0D
+>>> etc.) which correctly test the physical link state regardless of admin=
+=0D
+>>> state.=0D
+>> =0D
+>> I=E2=80=99d collapse the above two sentences into one paragraph and add =
+an empty =0D
+>> line here to visually separate the paragraph below.=0D
+=0D
+Yes, that makes sense. I'll do that.=0D
+=0D
+>> =0D
+>>> Remove the if_running check to ensure link test always reflects the=0D
+>>> physical link state.=0D
+>> =0D
+>> Please add how to verify your change, that means the command to run.=0D
+=0D
+Sure, I tested the change using the ip and ethtool commands, with the=0D
+physical link down. =0D
+Should I include the following test steps in the commit message?=0D
+=0D
+Before:=0D
+  $ sudo ip link set dev enp7s0f0 down=0D
+  =0D
+  $ ip --json link show enp7s0f0 | jq -c ".[].flags"=0D
+  ["BROADCAST","MULTICAST"]=0D
+  =0D
+  $ sudo ethtool --test enp7s0f0 online=0D
+  The test result is PASS=0D
+  The test extra info:=0D
+  Register test  (offline)         0=0D
+  Eeprom test    (offline)         0=0D
+  Interrupt test (offline)         0=0D
+  Loopback test  (offline)         0=0D
+  Link test   (on/offline)         0 # <- Not expected=0D
+=0D
+After:=0D
+  $ sudo ip link set dev enp7s0f0 down=0D
+  =0D
+  $ ip --json link show enp7s0f0 | jq -c ".[].flags"=0D
+  ["BROADCAST","MULTICAST"]=0D
+  =0D
+  $ sudo ethtool --test enp7s0f0 online=0D
+  The test result is FAIL=0D
+  The test extra info:=0D
+  Register test  (offline)         0=0D
+  Eeprom test    (offline)         0=0D
+  Interrupt test (offline)         0=0D
+  Loopback test  (offline)         0=0D
+  Link test   (on/offline)         1 # <- Expected=0D
+=0D
+>> =0D
+>>> Fixes: 8d420a1b3ea6 ("igb: correct link test not being run when link is=
+ down")=0D
+>>> Signed-off-by: Kohei Enju <enjuk@amazon.com>=0D
+>>> ---=0D
+>>>   drivers/net/ethernet/intel/igb/igb_ethtool.c | 5 +----=0D
+>>>   1 file changed, 1 insertion(+), 4 deletions(-)=0D
+>>>=0D
+>>> diff --git a/drivers/net/ethernet/intel/igb/igb_ethtool.c b/drivers/ =0D
+>>> net/ethernet/intel/igb/igb_ethtool.c=0D
+>>> index ca6ccbc13954..6412c84e2d17 100644=0D
+>>> --- a/drivers/net/ethernet/intel/igb/igb_ethtool.c=0D
+>>> +++ b/drivers/net/ethernet/intel/igb/igb_ethtool.c=0D
+>>> @@ -2081,11 +2081,8 @@ static void igb_diag_test(struct net_device =0D
+>>> *netdev,=0D
+>>>       } else {=0D
+>>>           dev_info(&adapter->pdev->dev, "online testing starting\n");=0D
+>>> -        /* PHY is powered down when interface is down */=0D
+>>> -        if (if_running && igb_link_test(adapter, &data[TEST_LINK]))=0D
+>>> +        if (igb_link_test(adapter, &data[TEST_LINK]))=0D
+>>>               eth_test->flags |=3D ETH_TEST_FL_FAILED;=0D
+>>> -        else=0D
+>>> -            data[TEST_LINK] =3D 0;=0D
+>>>           /* Online tests aren't run; pass by default */=0D
+>>>           data[TEST_REG] =3D 0;=0D
+>> =0D
+>> Regardless of my style comments above:=0D
+>> =0D
+>> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>=0D
+>> =0D
+>> =0D
+>> Kind regards,=0D
+>> =0D
+>> Paul=0D
+=0D
+Thank you for the review, Paul.=0D
 
