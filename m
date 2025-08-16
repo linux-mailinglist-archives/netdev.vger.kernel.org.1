@@ -1,153 +1,153 @@
-Return-Path: <netdev+bounces-214323-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214324-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A030BB2901D
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 20:40:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BD9E9B29022
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 20:45:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D9541B639E9
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 18:40:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B91A189F0C5
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 18:46:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 816C91FDE14;
-	Sat, 16 Aug 2025 18:40:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50B961DF256;
+	Sat, 16 Aug 2025 18:45:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="QX85cYjh"
+	dkim=pass (2048-bit key) header.d=free.fr header.i=@free.fr header.b="LC78k60W"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp4-g21.free.fr (smtp4-g21.free.fr [212.27.42.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEA701FECA1
-	for <netdev@vger.kernel.org>; Sat, 16 Aug 2025 18:40:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD1551C2DB2;
+	Sat, 16 Aug 2025 18:45:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.27.42.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755369622; cv=none; b=q1qFM4FawHBKzELmwcMSHYSUOpX/jTPhxFgTGOSLq691/IupO84aQHPjuopBeORc8rk6qGGdMk3INM9mCfLZGxtzSsgeR6DpVDserHuUXRa7fg+jnL0dOBcXpzIhAZzms+KrKORG0qiL5W5oVwtzcTULMROoBcbm8hLLSSrWPdw=
+	t=1755369953; cv=none; b=e94UCbyxE9HtHWPM/UpyiBHukguMtZ5yqy2UQSqvVomKNwtDDYjncs6qIqGWsoVT9nVk7lwcvsCAbIs/zhB/wUpLd3FmaRCLt278DwAJa8dU5DsHzvvxAn+GcI1f11xQJwqcCUOmBxaKrqOl3CbfjfwKYgBx5KSDEmsi67ExRps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755369622; c=relaxed/simple;
-	bh=z08Jr7P8hu2oefHrkDq/WIQ//YpY6UYZlwy1aevr608=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=H7X6ma0SEkZ5LmEyPT3HR4YiqxLEFBHdjUNcgweGxvdMFXFeeZcJEE+es5wJ3tzx1Rmnv/68sBhoP7mcOxUDDuv+NaQJm4tpzvBGu2XgIPsHMxqFwhpupjctwpRC+Av0izPtejIIbsvhxCnQ9x8FFzgn+hDAHSn7o30VTSmXckQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=QX85cYjh; arc=none smtp.client-ip=209.85.219.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-70a927d4aaaso25549276d6.1
-        for <netdev@vger.kernel.org>; Sat, 16 Aug 2025 11:40:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1755369620; x=1755974420; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Mbcwx98lB/QEoiQ9FRWT/djaHQYjYPeHTVxWkrP/sRE=;
-        b=QX85cYjhl+iYQl2U/+YdM5Y4rOlfxxIAyCHZVlKUsgP1Mnk0Wtx21Gmyey/k0bqHkB
-         FR0FnGy5ThK121GOZFVZaGVimLK3dNN6HELXcJEg1ci/ddXUfElSpQzlyUYs5phUBZCk
-         o9PRQUZ5MeXeM9zohrcABQ38fno02xVzrbDh8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755369620; x=1755974420;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Mbcwx98lB/QEoiQ9FRWT/djaHQYjYPeHTVxWkrP/sRE=;
-        b=HoNUAFM8XwvCYPhSQVam2/R2+VBRdQWjAxS6fzqneBpG9y4zu4I5ySKeZzZ8YwLlDm
-         B5Ozv6VcLrv0ganGEXsaDrtSVUzmISDx/aKNkV/Damrr6x29PVhh/XdCQoQBEYahTaar
-         RCEP8o6gZLdOoVXSUHAKo/RXRE/Tv4QqLXsMxh0Oj/jzeRuWoaIp+iIlC6e6//Le+866
-         /2yZPWF/opLevtxD0C1f15L3aimAMKwY7Hltyedp2HWaM/yBDGGlmFxiZ5SMupAehwiu
-         zDKm8QUYJMsRNtPWyIMAo8u8/wCdhvTyjx7kcsZXNWn4g1LMs+XdiP8X/LD2wiK+s22T
-         y+Hw==
-X-Gm-Message-State: AOJu0YxUJ8hNDSGLAfrduq9GeF5CfN2MDK5z0tO7/MbTGSta8kLvK5jv
-	jKRMYHgoEh6j6Rg4RvVquS/Y9kSkXhYvf77qH1SSflv5zmwWEK5FtAXS049ra0q1mw==
-X-Gm-Gg: ASbGncsCtfYYjCWEekDXb6RP0pEURS5F+V8FtOUYSyw6t+bmYa7MQIC4gKqQuc7QsZZ
-	hl+Ky3YVKczvHovGWzWWel4ZNzSFsRrBzSIZaXoS5kRm1zKgRVtkyihi39DPJqAQbWRNkxrmQKa
-	ArPR32BVjTnGw1SqgpfdpvHySFG+GOQ4ksnRy95oBa4Fe5HHWJuuVsixN3/mi4XsN6DfyJxb8aU
-	BOHD+B37c34aE2Aj2VxiBs/N11YxFW9G1Hh3DFBGmk6RXrX5gwgr1b8JxKIP1EI+p0/cKj64+/q
-	I/PuC2WGqIWPhVbMOs7iovS3iRPJkHKsSWOESyYo/beKKgsQoXViw0e+OF+UShn53B/qD79QBEW
-	1KkaiHD/NPXfXfUiNHOMeYyOIoFpAAoXQSd/PUXW6VL9ssZ4K/AXCjeuwaVhMlG1gtlIuuuNXiA
-	==
-X-Google-Smtp-Source: AGHT+IG3llcDftK3ZYrLazYpPnWCXyxAj7AuxN3wfesQ1EzqkLMlLzJ1Fb9qRIJ0kepc+WywtgqhRg==
-X-Received: by 2002:a05:6214:2304:b0:707:3829:d491 with SMTP id 6a1803df08f44-70ba7847556mr83929346d6.0.1755369619647;
-        Sat, 16 Aug 2025 11:40:19 -0700 (PDT)
-Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-70ba9301703sm26552936d6.49.2025.08.16.11.40.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 16 Aug 2025 11:40:19 -0700 (PDT)
-From: Michael Chan <michael.chan@broadcom.com>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	pavan.chebbi@broadcom.com,
-	andrew.gospodarek@broadcom.com,
-	sdf@fomichev.me
-Subject: [PATCH net v2] bnxt_en: Fix lockdep warning during rmmod
-Date: Sat, 16 Aug 2025 11:38:50 -0700
-Message-ID: <20250816183850.4125033-1-michael.chan@broadcom.com>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1755369953; c=relaxed/simple;
+	bh=8aYSOySoEz7FCu7GTPtcv6KZfxK2OsnYq3gGWh5IHSA=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:References:
+	 In-Reply-To:Content-Type; b=anHEA2VZHzNe7yWCddHCQMhP+RtelWuQE4y+bT0vkUUQ7KeZiH2ypxP+WE15Lqxh8cYiViUv/8zaIPTm+78YibcBfROg+1MadIlYZTb/xRo4auD6ePPzNxvePaHr5Ffp64SkFf0DTxmdYkMKOVM2gsL9IlmB5/jPvFI2cXdUStk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=free.fr; spf=pass smtp.mailfrom=free.fr; dkim=pass (2048-bit key) header.d=free.fr header.i=@free.fr header.b=LC78k60W; arc=none smtp.client-ip=212.27.42.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=free.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=free.fr
+Received: from [44.168.19.11] (unknown [86.195.82.193])
+	(Authenticated sender: bernard.pidoux@free.fr)
+	by smtp4-g21.free.fr (Postfix) with ESMTPSA id E7E6219F5BA;
+	Sat, 16 Aug 2025 20:45:46 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=free.fr;
+	s=smtp-20201208; t=1755369949;
+	bh=8aYSOySoEz7FCu7GTPtcv6KZfxK2OsnYq3gGWh5IHSA=;
+	h=Date:Subject:From:To:Reply-To:References:In-Reply-To:From;
+	b=LC78k60W+P0RXRlTG3oMP72KzlfV2ZaVwqumlh85/3xm8Ty245jBPMhp3TCKJruO9
+	 rHrC+6s2iiVlWa6nS13XRX7K+DfabpZXXIGnLIMeXVVSB1vda3CPRmxccU9n8Ga1gD
+	 b4+B9ahbFhmbU53q/fwsk5fW7BuhFLDLr6odDGR2/qxmxeYN2Xnr54Bu072jSrJke+
+	 82b2+InFztAtfD5cdL2l5uWfaqem0eqvb2B+YBM0obAe9FJ5Ay5TFJuHo071OdiP24
+	 BMsjp+kDES5sljky8mgetFxVOeX1aSxUtWo6nBQUVjwgPfJnxfUXcXfHda135MIRp1
+	 EtZQp4yoxlW5Q==
+Message-ID: <e92e23a7-1503-454f-a7a2-cedab6e55fe2@free.fr>
+Date: Sat, 16 Aug 2025 20:45:46 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [ROSE] [AX25] 6.15.10 long term stable kernel oops
+From: Bernard Pidoux <bernard.pidoux@free.fr>
+To: David Ranch <dranch@trinnet.net>, linux-hams@vger.kernel.org,
+ netdev <netdev@vger.kernel.org>
+Reply-To: Bernard Pidoux <bernard.pidoux@free.fr>
+References: <11c5701d-4bf9-4661-ad8a-06690bbe1c1c@free.fr>
+ <fff0b3eb-ea42-4475-970d-30622dc25dca@free.fr>
+Content-Language: en-US
+In-Reply-To: <fff0b3eb-ea42-4475-970d-30622dc25dca@free.fr>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-The commit under the Fixes tag added a netdev_assert_locked() in
-bnxt_free_ntp_fltrs().  The lock should be held during normal run-time
-but the assert will be triggered (see below) during bnxt_remove_one()
-which should not need the lock.  The netdev is already unregistered by
-then.  Fix it by calling netdev_assert_locked_or_invisible() which will
-not assert if the netdev is unregistered.
+David,
 
-WARNING: CPU: 5 PID: 2241 at ./include/net/netdev_lock.h:17 bnxt_free_ntp_fltrs+0xf8/0x100 [bnxt_en]
-Modules linked in: rpcrdma rdma_cm iw_cm ib_cm configfs ib_core bnxt_en(-) bridge stp llc x86_pkg_temp_thermal xfs tg3 [last unloaded: bnxt_re]
-CPU: 5 UID: 0 PID: 2241 Comm: rmmod Tainted: G S      W           6.16.0 #2 PREEMPT(voluntary)
-Tainted: [S]=CPU_OUT_OF_SPEC, [W]=WARN
-Hardware name: Dell Inc. PowerEdge R730/072T6D, BIOS 2.4.3 01/17/2017
-RIP: 0010:bnxt_free_ntp_fltrs+0xf8/0x100 [bnxt_en]
-Code: 41 5c 41 5d 41 5e 41 5f c3 cc cc cc cc 48 8b 47 60 be ff ff ff ff 48 8d b8 28 0c 00 00 e8 d0 cf 41 c3 85 c0 0f 85 2e ff ff ff <0f> 0b e9 27 ff ff ff 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90
-RSP: 0018:ffffa92082387da0 EFLAGS: 00010246
-RAX: 0000000000000000 RBX: ffff9e5b593d8000 RCX: 0000000000000001
-RDX: 0000000000000001 RSI: ffffffff83dc9a70 RDI: ffffffff83e1a1cf
-RBP: ffff9e5b593d8c80 R08: 0000000000000000 R09: ffffffff8373a2b3
-R10: 000000008100009f R11: 0000000000000001 R12: 0000000000000001
-R13: ffffffffc01c4478 R14: dead000000000122 R15: dead000000000100
-FS:  00007f3a8a52c740(0000) GS:ffff9e631ad1c000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055bb289419c8 CR3: 000000011274e001 CR4: 00000000003706f0
-Call Trace:
- <TASK>
- bnxt_remove_one+0x57/0x180 [bnxt_en]
- pci_device_remove+0x39/0xc0
- device_release_driver_internal+0xa5/0x130
- driver_detach+0x42/0x90
- bus_remove_driver+0x61/0xc0
- pci_unregister_driver+0x38/0x90
- bnxt_exit+0xc/0x7d0 [bnxt_en]
+For some reason my messages are not accepted by vger.kernel.org despite 
+I configured thunderbird not to send html.
 
-Fixes: 004b5008016a ("eth: bnxt: remove most dependencies on RTNL")
-Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Signed-off-by: Michael Chan <michael.chan@broadcom.com>
----
-v2: Use netdev_assert_locked_or_invisible()
+I just compiled and loaded kernel 6.15.1.
 
-v1: https://lore.kernel.org/netdev/20250815170823.4062508-1-michael.chan@broadcom.com/
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Up to now FPAC 4.1.4 is running fine and performing connexions with 
+neighbour ROSE nodes.
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 2800a90fba1f..207a8bb36ae5 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -5332,7 +5332,7 @@ static void bnxt_free_ntp_fltrs(struct bnxt *bp, bool all)
- {
- 	int i;
- 
--	netdev_assert_locked(bp->dev);
-+	netdev_assert_locked_or_invisible(bp->dev);
- 
- 	/* Under netdev instance lock and all our NAPIs have been disabled.
- 	 * It's safe to delete the hash table.
--- 
-2.30.1
+I will let it run a while before starting to apply progressively the 
+AX25 and ROSE patches committed in kernels 15.2 to 15.10
+
+I will start with ax25 ones and see what happens.
+
+73 de Bernard f6bvp / ai7bg
+
+
+
+Le 16/08/2025 à 19:49, Bernard Pidoux a écrit :
+> Hi David,
+> 
+> Actually Ubuntu stops responding without any message. No more response 
+> from keyboard or mouse. Only switch power !
+> 
+> I am working on activating kernel messages on oops.
+> 
+> The bug is already present in 6.15.10 so there is no reason to look at a 
+> more recent version.
+> 
+> I will report any progress if I find something interesting.
+> 
+> This is quite a challenge for me as I did not perform this kind of 
+> kernel investigations since nearly a decade...and I am not getting younger !
+> 
+> 73 de Bernard, f6bvp / ai7bg
+> 
+> 
+> Le 16/08/2025 à 19:32, David Ranch a écrit :
+>>
+>> Hey Bernard,
+>>
+>> Thanks for posting this issue.  Can you copy/paste in the Oops you're 
+>> seeing?  I did see a recent ROSE issue on 6.16.0-rc6-next-20250718- 
+>> syzkaller and I wonder if that could have created this issue:
+>>
+>> https://groups.google.com/g/syzkaller-bugs/c/0TmBbcJ2PKE
+>>
+>> Btw, I would say that posting this to netdev@vger.kernel.org would 
+>> probably be more important than this Debian list since this is most 
+>> likely a kernel issue and not a distro issue per se.
+>>
+>> --David
+>> KI6ZHD
+>>
+>>
+>> On 08/16/2025 10:02 AM, Bernard Pidoux wrote:
+>>> Hi,
+>>>
+>>> I am continuously working on AX25 ROSE/FPAC node since decades, 
+>>> running a number of RaspBerry Pi (Raspi OS 64bit) plus Ubuntu LTS on 
+>>> a mini PC.
+>>>
+>>> Stable FPAC version 4.1.4 is performing packet switch quite well 
+>>> although some improvements are underway.
+>>>
+>>> FPAC runs flawlessly with kernel 6.14.11.
+>>>
+>>> However, trying FPAC under stable kernel 6.15.10 experienced a frozen 
+>>> system when issuing some commands like connect request.
+>>>
+>>> Investigations seem to show that ax25 connect is fine and that the 
+>>> bug is probably in ROSE module .
+>>>
+>>> I am presently trying to find the faulty bug that triggers the kernel 
+>>> oops by compiling and installing previous kernel versions starting 
+>>> with 6.15.1.
+>>>
+>>> 73s de Bernard, f6bvp / ai7bg
+>>>
+>>> http://f6bvp.org
+>>>
+>>
 
 
