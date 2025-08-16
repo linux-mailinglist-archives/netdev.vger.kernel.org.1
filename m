@@ -1,187 +1,121 @@
-Return-Path: <netdev+bounces-214280-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214281-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4453B28BD0
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 10:20:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A79DBB28BD6
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 10:22:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD7A61BC4092
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 08:20:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 361535C2EE9
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 08:22:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7083230BDB;
-	Sat, 16 Aug 2025 08:20:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q47tzq7H"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9072623534D;
+	Sat, 16 Aug 2025 08:22:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f44.google.com (mail-vs1-f44.google.com [209.85.217.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB6222222C3;
-	Sat, 16 Aug 2025 08:20:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D3EE1B425C;
+	Sat, 16 Aug 2025 08:22:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755332404; cv=none; b=QZbR08NNuUIcGp14AIr9/Uii+DtSlMXlRyjnWVaXxKDzSsqJTkfs9/nln3AKBPoX94yKKs1lVmgmOeBysvA+IypyU+ou+nrcy+TmsuqhveXMuiXySfRQjpP8UzgyX3dnLrYy6Dtt3oyPzmkCKIOICqArS0rO/gWpdjUajNc0SBU=
+	t=1755332547; cv=none; b=aP9orEgZJCc79YOBtgAptoRV2mVLca+VuKCKkXkk9ch3/ugYdTn44RUEbNIZAg9oad6fFiZPWZIghUbY4/kQ2MKS0ej8yFq5/eKjwuqBQn5A1y8WrkDn3JDnn4GIBIF7Imgh54SfxFt1+/9MS37o83zbpQvBgnP2wfOE/q0/gJQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755332404; c=relaxed/simple;
-	bh=nqXpO0Afu7Q9LYqv1ain41BiwjcqwFhwWW0Yb2kHhsk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iVjYwfK3l8Syj9WyoJykLpj+HQzueQXI2KgAt3O8QSUYwIN9BJXFUVbvo8mUKZFCis2gEVl+mJ890GQ7aD5R6fnRK0lURcAont/Hwwu/wIRqDY01+zxbXk3XTB7kwfrevpP4AsNh5H/UZpgXxpTmuoU5Y29fckoi5k0D7TbXVbw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q47tzq7H; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D50BEC4CEEF;
-	Sat, 16 Aug 2025 08:20:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755332404;
-	bh=nqXpO0Afu7Q9LYqv1ain41BiwjcqwFhwWW0Yb2kHhsk=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=q47tzq7HCnzXYBHYx8oI6yFEgpedpccT4AIHNKPM1WPW4/m7G2c7A7DQxwLynJzGO
-	 ozIU/3V+jEaITefNxI5iHFHTvCzfX1rbIK4eHUCJDkf81Kju2Cad7tIGGw1RU1GSiE
-	 wfD+wS2m+uhlPKkRWjYxmuu1UuwQzUtUn+gQ5aFyKHuuDTpMNIbOrAXX6Z2LqfBSVC
-	 Lqf41zowoUT/kRdmMLZEdesQCxrk9M3mSe1jfWuM8MQgdrM8NcVsNm+7Vr9OASZhQJ
-	 7pBCoLDuQPriFnUrnFJ07LHsQjhEksu/GltlWk+f98Uk/HQ1wA36CxPpyIy1LAdBX4
-	 CUYEbefRfUIhQ==
-Message-ID: <aa6bdc05-81b0-49a2-9d0d-8302fa66bf35@kernel.org>
-Date: Sat, 16 Aug 2025 10:19:58 +0200
+	s=arc-20240116; t=1755332547; c=relaxed/simple;
+	bh=TM6bp1xwXZfHaRbosSDin92Zfgbdz9bNeieDgzOrvh8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nRyry5mKhXlF1FoLS/qQCyyYHLwGXCQ4y0aFJJbJX4AaW5jQOmo58ET/ISdfTf321yKJTlMa0dlvUuOMPcoR6NexoM0G5hniOt9lOdWBckDrjWn3IfUJYIQZJByCGGdmsj0Lj+YY4ukuDtbr8dbkss+QkgvXC0lKpSjzW6hPuvs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.217.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vs1-f44.google.com with SMTP id ada2fe7eead31-50f8af33918so879133137.2;
+        Sat, 16 Aug 2025 01:22:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755332544; x=1755937344;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QsBaPqarhgIk8XEByqeqWZqmjqN39o7TFwQ5D893CU4=;
+        b=gnemNf14isM9LVcn8WppExA4uryTHftJkfK9r6TWsbuuAclLmYLL/7d3VCFojgXBlU
+         9D8uDmupUVBKxgVkw4+LqPRSxPCKVhIxHGRyrcj1vhDNvnXh7DHSl7PTM/i8p9y1HSn9
+         eE5S8h0YcnXZY40mnhjf8nz5fVZF7Lck2Ofe7Z84HbmU5Ab/20akSX7AXT7XP4VjC9MI
+         1qwdGr8AZWRdOi3Si0HD06hlzTvBcOdafBn+Tts3DYkZGOxmEQtKwLMpJSQ26q5Fmp4P
+         bpnCmyvGRL6grToIj6ujivjJdH2sDaJSPoiMSf+jINXH9Ea6elkagRUbm8isBsSD1pQ6
+         d/QA==
+X-Forwarded-Encrypted: i=1; AJvYcCVhYCypsAHWCDzaAKPSBz7YoihXhXWbHMjKBc6pu7JaDMGfSlwKhbayIjU9+f8gKKYKNXbopCoORy/HLiX4@vger.kernel.org, AJvYcCVu4y95KnDdV7Jy8Ic/iw7mZRQ6KgwafL6ZZuZkM8dLfx3L8yda0eABfDOSkRA37vFoXbn4HvL9JE5z@vger.kernel.org, AJvYcCWfwTy+KRnt1fEyxia6v8sLt2qR50wUdpjax30UOxzVDUp5b3yktu56ZuQ3NABIqL/q8J9/QC/3@vger.kernel.org
+X-Gm-Message-State: AOJu0YyPDVyzrIwrJjxLgdYcTZ2rbCu+4A1gGJo8+HpfOys3CLrAZvmN
+	9oyaSiyyKDCEJVKB4OHgo4Biq8sTEuPo+LSUFzCOpJsU48++isLaf1U4iFPjKq2t
+X-Gm-Gg: ASbGnctEsteqwMGoJg6PDR3irNv2QgVFxGgfnrQ55j0t5fOnOYZlDBsJctSUqDDu49u
+	WHj+e4lsgEaDFZ+hboZxR0YziWLg6mGEnfRDnAJI+mR5/o954SIAfdkw/KBfYdYvYsEcHmIByIn
+	38CFwVwCH7kxkF+V/PVmkbz2amLpEWmVSeaOoD8SiszemP0GC7H4XG5pR2LnZ6AqSeVNSu1JpoU
+	8+cVGtjNU15LDnAWa+aRdSWcZMMdOeCe8VEsRjAKifelJ+0lZ1/lZKcyp2XUizAED1zUIXRIvqw
+	77ZBpHp7N7fnU0ggnrVCwS+e4k2zfnc+IXt8fLMlXGN8ULNrVhId6CcopiyLzrmeYpncZcdv2jk
+	H2F9qqLKqalO/zLE5R4OthnLqYoHl2OViljw8ojGbdNI7eHGRFRFWurLTIGUGV1Q87vewniM=
+X-Google-Smtp-Source: AGHT+IHaiz4raVNdjFjtWOmC/235muh4ZiCovtf/P7sFWMPAzbeZPF5WSq55MTEMfmu5da2JFILUiQ==
+X-Received: by 2002:a05:6102:809e:b0:50a:530f:baad with SMTP id ada2fe7eead31-5126cd388cdmr2197830137.13.1755332544010;
+        Sat, 16 Aug 2025 01:22:24 -0700 (PDT)
+Received: from mail-vs1-f42.google.com (mail-vs1-f42.google.com. [209.85.217.42])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-890278ec6c1sm686132241.19.2025.08.16.01.22.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 16 Aug 2025 01:22:23 -0700 (PDT)
+Received: by mail-vs1-f42.google.com with SMTP id ada2fe7eead31-50f88ee8ac3so752125137.1;
+        Sat, 16 Aug 2025 01:22:23 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCV02lJTsfL5dhznAvGOvkHT9P2Pvv+a7Q85/7OLsT6WZ5AzrbFk5QHpIi5erwkxm17A7hQodaZY@vger.kernel.org, AJvYcCW2ueq9AXojGKYDRN4W5lNV/h5M6dSUVNUr0IKP64DvvshXzx5A+P8BYXZB8dq0m2cNSIGedSczs0WZeU9+@vger.kernel.org, AJvYcCXiFrRyKuxsqjQaoFd7o1WsPYr4LGAU/BZVdta12FB2BvB8SL357dWY999j536tPVOtvTNQlWxbe5wb@vger.kernel.org
+X-Received: by 2002:a05:6102:a52:b0:4e9:8f71:bd6e with SMTP id
+ ada2fe7eead31-51267ec340dmr1989710137.0.1755332543532; Sat, 16 Aug 2025
+ 01:22:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/3] dt-bindings: net: Add support for J-Core EMAC
-To: Artur Rojek <contact@artur-rojek.eu>, Rob Landley <rob@landley.net>,
- Jeff Dionne <jeff@coresemi.io>,
- John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
- Geert Uytterhoeven <geert+renesas@glider.be>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org
 References: <20250815194806.1202589-1-contact@artur-rojek.eu>
- <20250815194806.1202589-3-contact@artur-rojek.eu>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <20250815194806.1202589-3-contact@artur-rojek.eu>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+ <20250815194806.1202589-2-contact@artur-rojek.eu> <68a6d0a7-b245-456d-9c7e-60fbf08c4b32@kernel.org>
+In-Reply-To: <68a6d0a7-b245-456d-9c7e-60fbf08c4b32@kernel.org>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Sat, 16 Aug 2025 10:22:12 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdVj8r_voaXqVdt07fRT5mdJJ4B2NFiK9=XhtYDCuRgz1g@mail.gmail.com>
+X-Gm-Features: Ac12FXxA8TNUHbRbvipWZzi2vHsQ_uunk7HR-ZBiE8OpiAEHJPsa-wMKtKNt0Yw
+Message-ID: <CAMuHMdVj8r_voaXqVdt07fRT5mdJJ4B2NFiK9=XhtYDCuRgz1g@mail.gmail.com>
+Subject: Re: [PATCH 1/3] dt-bindings: vendor-prefixes: Document J-Core
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Artur Rojek <contact@artur-rojek.eu>, Rob Landley <rob@landley.net>, 
+	Jeff Dionne <jeff@coresemi.io>, John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On 15/08/2025 21:48, Artur Rojek wrote:
-> Add a documentation file to describe the Device Tree bindings for the
-> Ethernet Media Access Controller found in the J-Core family of SoCs.
-> 
-> Signed-off-by: Artur Rojek <contact@artur-rojek.eu>
-> ---
->  .../devicetree/bindings/net/jcore,emac.yaml   | 42 +++++++++++++++++++
->  1 file changed, 42 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/jcore,emac.yaml
-> 
-> diff --git a/Documentation/devicetree/bindings/net/jcore,emac.yaml b/Documentation/devicetree/bindings/net/jcore,emac.yaml
-> new file mode 100644
-> index 000000000000..a4384f7ed83d
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/jcore,emac.yaml
-> @@ -0,0 +1,42 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/jcore,emac.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: J-Core Ethernet Media Access Controller
-> +
-> +description: |
-> +  This node provides properties for configuring the Ethernet MAC found
-> +  in the J-Core family of SoCs.
-> +
-> +maintainers:
-> +  - Artur Rojek <contact@artur-rojek.eu>
-> +
-> +properties:
-> +  compatible:
-> +    const: jcore,emac
+Hi Krzysztof,
 
-You need SoC-based compatibles. And then also rename the file to match it.
+On Sat, 16 Aug 2025 at 10:18, Krzysztof Kozlowski <krzk@kernel.org> wrote:
+> On 15/08/2025 21:48, Artur Rojek wrote:
+> > J-Core is a clean-room open source processor and SoC design using the
+> > SuperH instruction set.
+> >
+> > The 'jcore' prefix is in use by IP cores originating from this design.
+> >
+> > Link: https://j-core.org
+> > Reviewed-by: Geert Uytterhoeven <geert@linux-m68k.org>
+>
+> How is it possible if this is v1? If this is not v1, where is changelog
+> and why isn't it marked as vx?
 
-> +
-> +  reg:
-> +    maxItems: 1
-> +
-> +  interrupts:
-> +    maxItems: 1
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +  - interrupts
-> +
-> +allOf:
-> +  - $ref: ethernet-controller.yaml#
-> +
-> +additionalProperties: false
+The patch series had several iterations (v0, v-1, v-2 ;-), with a limited
+audience.
 
-unevaluatedProperties instead
+Gr{oetje,eeting}s,
 
-> +
-> +examples:
-> +  - |
-> +    ethernet@10000 {
-> +      compatible = "jcore,emac";
-> +      reg = <0x10000 0x2000>;
-> +      interrupts = <0x11>;
+                        Geert
 
-That's not hex...
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
-> +    };
-
-
-Best regards,
-Krzysztof
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
 
