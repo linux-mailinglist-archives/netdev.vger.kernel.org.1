@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-214260-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214261-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82A90B28AAA
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 07:27:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 428EEB28AAB
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 07:27:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F333A1C8727A
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 05:27:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 079FE1C853EE
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 05:27:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79EDB1EBA07;
-	Sat, 16 Aug 2025 05:26:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20D191E5B94;
+	Sat, 16 Aug 2025 05:26:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GBoR76S0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lk3WXPXA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0AD71862A;
-	Sat, 16 Aug 2025 05:26:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A6351B4247;
+	Sat, 16 Aug 2025 05:26:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755321994; cv=none; b=imeIQEEx4Wg2FNRnFqKmwVHx+US7zuqZMPIEttWflfQA8YrzY+tChE74PYwv10yqhTDRDgUvgBYGMcmR0ZrFCH8fYaAj5o/7YVjHhLy+ye0KptkEmfW1pOfAIZMxf9hMsDzdOVue5kbbZmXiWO9HWQpz14SQ8w54lVzFse14ZYk=
+	t=1755321999; cv=none; b=bkYJuslp4Y5Z4zlHQhSgGBoM/RsJ+V1k0zYF4VPbwVDzhzx6DhSlU54MjGNca0F2S/5lrqXAx3phnARd1tYmNua724OPMvtFSe7hPhPBPODZolbThgx5im47LmgEGN9SD/vnhf7/yL7ZhFOhXF54Ot0561ozy/cYTZv2iGxcacY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755321994; c=relaxed/simple;
-	bh=YmP1CgpjY8vKQ9vOA7ok6UFf9+xXv+41pI4u+6ESdPk=;
+	s=arc-20240116; t=1755321999; c=relaxed/simple;
+	bh=asjeJEmSFmPFeJWGhFBItWYtDo4mBTsBYEvqyGx58yI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gSMRxQn3QFrkW9Yva1vflaxpmGii5flO/WQJn/QRemKrRQP96O7JYFk4Ih2z00rM39xgvRuTp+JahL14t4xoop+Okszuw/8Z0m6k/ueJNwSO11NS2beYDDaj3ZrjucLHuq4fgfChG6EgbV1zPWwkWaPzaCNfdlYOYz9vTpwwpec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GBoR76S0; arc=none smtp.client-ip=209.85.214.170
+	 MIME-Version; b=gqepMD2CHbWH6Sh7/piEZ45bQLPJ0C9ArxYFsWF4+N6Azc8FK3TqUDJJawgzSBSuBIzvjkzadleKKj4Q3eZ2mh4on3gnAYd84Mjvu88Sxs+Sk90+6PPtByAnb30ZVKMJItqgDkkvz4Q6tSb2jMpSf9yrT+E1WA5kjY1wOsfcT1g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lk3WXPXA; arc=none smtp.client-ip=209.85.215.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-24458194d83so17992185ad.2;
-        Fri, 15 Aug 2025 22:26:31 -0700 (PDT)
+Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-b47174edb2bso1879633a12.3;
+        Fri, 15 Aug 2025 22:26:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755321991; x=1755926791; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1755321995; x=1755926795; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DI2xUDwUxegvJuyoRtpkKubePNbnN/R+Y255PFNpvK4=;
-        b=GBoR76S0P06VUfMEjnhI/XSImsw2jr4RYPaYkQLOYT5YBhcNGOqSTBMpqwMxvrG8yo
-         xz8Zrsb3PTEee21LQhunPY3gzmWd+ikjknDGH80ZzgHLWq1GOXhzCErmu+V4RfzzasAi
-         yozM+CZxf9tQd7yhm6MoCyvzcrv9FftWy/uqp15BjQCWUWNBT2heXAHfwgUAO8PY3V+P
-         JPlUQvj8g/ilTesJbN+7wyQbNDZo13s0PkUD1I48gcllQt/exQ93vILC5cshvpWjUT6w
-         I/FdDLBljgcJqZXRuewaVv7co6NWijYQDAws5V/TmXTPRjMO66B11l4IWt/7IC6leGHu
-         i85Q==
+        bh=XV/FwDB61VKoH8QLTemjH8B6ozFRPeO6trFlTaP5glQ=;
+        b=lk3WXPXAoPfrBMogMU8928yIOxxET9jOlai6q2rrMbN3/WA0YlHfIIFIYne58RgTzH
+         pwYKxJGq44FQOJDqZCHKt3J6k+4iV8zoL5yObyTr2HF4u5rn4TCKGXGvFXboXRRIDRwA
+         sgSvqsaq2mY3LN4KTDtmz4okZJbQirrFSkT0voJYwYu0tNfQJlIYwwvzRz+GWQyq2stb
+         j3KKX0RPt5OLU0rOQVKqn466GZN0s9wJmz0RJSyoJxr2Y/HoYlN9NmtSC9P6QuZfxqfM
+         ns+SUos2RUqySAjZ5thmGh9YbMpipedeCHP5bWRMC401oGn+N135GKqZZbC60Rb4fAq4
+         KY/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755321991; x=1755926791;
+        d=1e100.net; s=20230601; t=1755321995; x=1755926795;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=DI2xUDwUxegvJuyoRtpkKubePNbnN/R+Y255PFNpvK4=;
-        b=SqlJBkcZpG7pZa+88dvc6oEOfkVSpWsPiXpYPVM+x5RLm8ROqkx/BZP0bugWvV0wMI
-         6gNg8pl1w8Ylk72Kv4R0O2FfMlJ2unH6mygUcNbcr2f8KkEQvjop5Xu+soKsjg2x/1ux
-         iri4IWqpVGIMx2WLcJfNoyC/CL4sa1FJyQ3VGqpRQmJ8YvYor+yzR6oyxjoGjYcRF/Jp
-         3zKjo9mmc6lseIcjzTlS7RFBYdc6cvfIhikRPhKW+fZILKg/RrGcadZeO9+jMwwQuxvq
-         0ZqvLSDe8Xozb/CosKi7WfJgjUbCoKQ3PKjyngcRDBtrIqXoxpMoPxMz7TvFh0PYkUDr
-         N0OA==
-X-Forwarded-Encrypted: i=1; AJvYcCUXwXIBoBlWle4p2SKvXzI9DcGl2WyxHkU/dmSoC9SBMpI/SH3uzoQ/zp4bX9n99Y3RlWNgZUl2Z/PMVx2/@vger.kernel.org, AJvYcCV7aKNSyx6yZ9eqSJq9j89eVUrcEEJ+dFk38RDQkqP8gaN6jUs6Z4D8NYHu5faUi8m9VP2WWltX1Tml@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyo/fBW40htu7ioyRgy2vCQVFmd4OSVIp6jXnYFI+bUyLZNl4Od
-	qcPsPv2a8bVBUxC9r7ZXFYail4rpD9bTmVAJtC/AEsXqt70JsGAli5+DChjNesNvNhw/Pg==
-X-Gm-Gg: ASbGncv/Sp+7/IIAwLDo4d5QXuL48wdHTsi2qYlDyFHwbSShgoAwDWRbtzYBA9GD5qK
-	8AwGOJc/0EZvHER7DNNFwDiNBiOz3kWn8xNFIStpr0y3roZH2oah1PeV9hdc/r7BvNaTzbrcRFi
-	LShmE6VkR0bdsA++3eR7o6gjnKF5BqH1NHPqAuJnDaN7aIBIuKNO1I+0Qo79nl0pq+Toxc3E0Wq
-	Ib9FYijqXdDQMzdjBCSFemNdQQejSNJtZS6alFDImyjcC4XVKmqbGIIUDeqqLHSHB7Kx7w5NsQU
-	l6V/ZysGh0lzaBkpS6Ml0ngO03XDBMETTLTon1MAFFTrq00RVNy7DgcSaseAe4hKVNUVlgho28r
-	WCTdkfgRdholsGXleCZ2rvy7aKMuB3A==
-X-Google-Smtp-Source: AGHT+IGv0P8MVsBSKWftikcoj46n/co5VH4B8+R2CmQZ+FMrx/HHbWwmNtV9EnWx9MEWwLA/kAvPJQ==
-X-Received: by 2002:a17:902:fc4c:b0:234:914b:3841 with SMTP id d9443c01a7336-2446d91628amr81058265ad.39.1755321990829;
-        Fri, 15 Aug 2025 22:26:30 -0700 (PDT)
+        bh=XV/FwDB61VKoH8QLTemjH8B6ozFRPeO6trFlTaP5glQ=;
+        b=DM7QIdSOI3JY5dzyRolbuz1oYey7SxfqPVhUgKcPh3ijdNqcK9dLfDRuAmOW2JfgSc
+         cdxuxbpdcWqpEP6i9gTxg+q65fNDg7aaP/HiT74+eKuI7yLxq086d4bvtrXG2tVSgFz+
+         n9b0W1uX+YJoYXzBcCSMYnfN6T9CVvpQVcVH4WSbaztBccZ3mojxIxo+l7H95liWFxmd
+         mprsKwqRNdM/G7nVKMVq573Lc8NCKFN7Gtw59s1yELAd3xmX7xHlJprCqgQfw+Op8hXE
+         Ey6WUlweNsU8giPmPWJm99AemzpBOFKnaDBITtGEO1q3SUzRTsd4bQ46T4zqOJUZ2WKa
+         IAnQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUrplXyFhvTRU/Q8fMQk7Z5ziXH4xfINu1jxNfOnUJS/9FU3PuQitDkyyoAZsNAoVn3ADlIuDl3K7fcze2y@vger.kernel.org, AJvYcCW0IUwxEZZkl9YkXsSHsD8DxrqcS5BDjoKWI1VpW0zB6dr6uosYjad+Wxp50JDA06Utbj3/DNf7QffO@vger.kernel.org
+X-Gm-Message-State: AOJu0YxkTcz/sePmrwCh7VCmROAfv64Iaz7iXcqraeo8aZoI7VGSmQcD
+	3+fRrKVVHcbYpFXSr6S/oVe2Pc9me0OfI1haIdLgYyzPGVrbZw/huqCHzPJDsVJXPBW82w==
+X-Gm-Gg: ASbGncvISMUdHmPcfia1eXswxZuJ2Nj4Nc9OXWXHb5I9Sdv0mM2wR6h2MoVUMuWAJ+c
+	yh+w+kd4aTtq/UStA53104NkxujxfE3nXNfOQXJ9mxTlo903fkjmy8ujA8L2OtOVTFRkC6MYehR
+	kTHDxDYt7NQZps75zKUchGo+/qlwJCr3AIEIbO00XgX4qnBZ8y2JDl+JB08A4LAZELM45bAhBFn
+	wCVhJca9lj3NTJXXnUfLfCGcZ9RkLHZC9c9tI4n4C6kS4WjP8yNzfcqxlanJ2CNkdexkzB9RE8V
+	q6LRT+oIGvY1Ye5lzgcOfE8s+y3lHA/r/7qVINg5RpD2BXXjLEXRffGyt1rTIoOVtdo4AMJIL0G
+	NF9vP+xUDT4m2jhinDn3QS9jf0MLDZg==
+X-Google-Smtp-Source: AGHT+IFfCJUel77VQrGH8QEkZMQyMxkneI/O2fIdH25jORJVjyoHuYaQ+s0j0gcoV2Erus6Ka4rpfQ==
+X-Received: by 2002:a17:903:2d0:b0:226:38ff:1d6a with SMTP id d9443c01a7336-2446d6e4c8fmr73645175ad.7.1755321995352;
+        Fri, 15 Aug 2025 22:26:35 -0700 (PDT)
 Received: from d.home.yangfl.dn42 ([89.208.250.155])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2446ca9d016sm27225805ad.35.2025.08.15.22.26.26
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2446ca9d016sm27225805ad.35.2025.08.15.22.26.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Aug 2025 22:26:30 -0700 (PDT)
+        Fri, 15 Aug 2025 22:26:34 -0700 (PDT)
 From: David Yang <mmyangfl@gmail.com>
 To: netdev@vger.kernel.org
 Cc: David Yang <mmyangfl@gmail.com>,
@@ -89,9 +89,9 @@ Cc: David Yang <mmyangfl@gmail.com>,
 	Russell King <linux@armlinux.org.uk>,
 	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [net-next v3 1/3] dt-bindings: net: dsa: yt921x: Add Motorcomm YT921x switch support
-Date: Sat, 16 Aug 2025 13:23:19 +0800
-Message-ID: <20250816052323.360788-2-mmyangfl@gmail.com>
+Subject: [net-next v3 2/3] net: dsa: tag_yt921x: add support for Motorcomm YT921x tags
+Date: Sat, 16 Aug 2025 13:23:20 +0800
+Message-ID: <20250816052323.360788-3-mmyangfl@gmail.com>
 X-Mailer: git-send-email 2.47.2
 In-Reply-To: <20250816052323.360788-1-mmyangfl@gmail.com>
 References: <20250816052323.360788-1-mmyangfl@gmail.com>
@@ -103,187 +103,197 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The Motorcomm YT921x series is a family of Ethernet switches with up to
-8 internal GbE PHYs and up to 2 GMACs.
+Add support for Motorcomm YT921x tags, which includes a proper
+configurable ethertype field (default to 0x9988).
 
 Signed-off-by: David Yang <mmyangfl@gmail.com>
 ---
- .../bindings/net/dsa/motorcomm,yt921x.yaml    | 166 ++++++++++++++++++
- 1 file changed, 166 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/net/dsa/motorcomm,yt921x.yaml
+ include/net/dsa.h    |   2 +
+ net/dsa/Kconfig      |   6 +++
+ net/dsa/Makefile     |   1 +
+ net/dsa/tag_yt921x.c | 126 +++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 135 insertions(+)
+ create mode 100644 net/dsa/tag_yt921x.c
 
-diff --git a/Documentation/devicetree/bindings/net/dsa/motorcomm,yt921x.yaml b/Documentation/devicetree/bindings/net/dsa/motorcomm,yt921x.yaml
+diff --git a/include/net/dsa.h b/include/net/dsa.h
+index d73ea0880066..67762fdaf3c7 100644
+--- a/include/net/dsa.h
++++ b/include/net/dsa.h
+@@ -55,6 +55,7 @@ struct tc_action;
+ #define DSA_TAG_PROTO_LAN937X_VALUE		27
+ #define DSA_TAG_PROTO_VSC73XX_8021Q_VALUE	28
+ #define DSA_TAG_PROTO_BRCM_LEGACY_FCS_VALUE	29
++#define DSA_TAG_PROTO_YT921X_VALUE		30
+ 
+ enum dsa_tag_protocol {
+ 	DSA_TAG_PROTO_NONE		= DSA_TAG_PROTO_NONE_VALUE,
+@@ -87,6 +88,7 @@ enum dsa_tag_protocol {
+ 	DSA_TAG_PROTO_RZN1_A5PSW	= DSA_TAG_PROTO_RZN1_A5PSW_VALUE,
+ 	DSA_TAG_PROTO_LAN937X		= DSA_TAG_PROTO_LAN937X_VALUE,
+ 	DSA_TAG_PROTO_VSC73XX_8021Q	= DSA_TAG_PROTO_VSC73XX_8021Q_VALUE,
++	DSA_TAG_PROTO_YT921X		= DSA_TAG_PROTO_YT921X_VALUE,
+ };
+ 
+ struct dsa_switch;
+diff --git a/net/dsa/Kconfig b/net/dsa/Kconfig
+index 869cbe57162f..6b94028b1fcc 100644
+--- a/net/dsa/Kconfig
++++ b/net/dsa/Kconfig
+@@ -190,4 +190,10 @@ config NET_DSA_TAG_XRS700X
+ 	  Say Y or M if you want to enable support for tagging frames for
+ 	  Arrow SpeedChips XRS700x switches that use a single byte tag trailer.
+ 
++config NET_DSA_TAG_YT921X
++	tristate "Tag driver for Motorcomm YT921x switches"
++	help
++	  Say Y or M if you want to enable support for tagging frames for
++	  Motorcomm YT921x switches.
++
+ endif
+diff --git a/net/dsa/Makefile b/net/dsa/Makefile
+index 555c07cfeb71..4b011a1d5c87 100644
+--- a/net/dsa/Makefile
++++ b/net/dsa/Makefile
+@@ -39,6 +39,7 @@ obj-$(CONFIG_NET_DSA_TAG_SJA1105) += tag_sja1105.o
+ obj-$(CONFIG_NET_DSA_TAG_TRAILER) += tag_trailer.o
+ obj-$(CONFIG_NET_DSA_TAG_VSC73XX_8021Q) += tag_vsc73xx_8021q.o
+ obj-$(CONFIG_NET_DSA_TAG_XRS700X) += tag_xrs700x.o
++obj-$(CONFIG_NET_DSA_TAG_YT921X) += tag_yt921x.o
+ 
+ # for tracing framework to find trace.h
+ CFLAGS_trace.o := -I$(src)
+diff --git a/net/dsa/tag_yt921x.c b/net/dsa/tag_yt921x.c
 new file mode 100644
-index 000000000000..d93fa24e0943
+index 000000000000..5b842948dfe3
 --- /dev/null
-+++ b/Documentation/devicetree/bindings/net/dsa/motorcomm,yt921x.yaml
-@@ -0,0 +1,166 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/dsa/motorcomm,yt921x.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
++++ b/net/dsa/tag_yt921x.c
+@@ -0,0 +1,126 @@
++// SPDX-License-Identifier: GPL-2.0+
++/*
++ * Motorcomm YT921x Switch Extend CPU Port
++ *
++ * Copyright (c) 2025 David Yang <mmyangfl@gmail.com>
++ *
++ * +----+----+-------+-----+----+---------
++ * | DA | SA | TagET | Tag | ET | Payload ...
++ * +----+----+-------+-----+----+---------
++ *   6    6      2      6    2       N
++ *
++ * Tag Ethertype: CPU_TAG_TPID_TPIDf (default: 0x9988)
++ * Tag:
++ *   2: Service VLAN Tag
++ *   2: Rx Port
++ *     15b: Rx Port Valid
++ *     14b-11b: Rx Port
++ *     10b-0b: Unknown value 0x80
++ *   2: Tx Port(s)
++ *     15b: Tx Port(s) Valid
++ *     10b-0b: Tx Port(s) Mask
++ */
 +
-+title: Motorcomm YT921x Ethernet switch family
++#include <linux/etherdevice.h>
++#include <linux/list.h>
++#include <linux/slab.h>
 +
-+maintainers:
-+  - David Yang <mmyangfl@gmail.com>
++#include "tag.h"
 +
-+description: |
-+  The Motorcomm YT921x series is a family of Ethernet switches with up to 8
-+  internal GbE PHYs and up to 2 GMACs, including:
++#define YT921X_NAME	"yt921x"
 +
-+    - YT9215S / YT9215RB / YT9215SC: 5 GbE PHYs (Port 0-4) + 2 GMACs (Port 8-9)
-+    - YT9213NB: 2 GbE PHYs (Port 1/3) + 1 GMAC (Port 9)
-+    - YT9214NB: 2 GbE PHYs (Port 1/3) + 2 GMACs (Port 8-9)
-+    - YT9218N: 8 GbE PHYs (Port 0-7)
-+    - YT9218MB: 8 GbE PHYs (Port 0-7) + 2 GMACs (Port 8-9)
++#define YT921X_TAG_LEN	8
 +
-+  Any port can be used as the CPU port.
++#define ETH_P_YT921X	0x9988
 +
-+properties:
-+  compatible:
-+    const: motorcomm,yt9215
++#define YT921X_TAG_PORT_EN		BIT(15)
++#define YT921X_TAG_RX_PORT_M		GENMASK(14, 11)
++#define YT921X_TAG_RX_CMD_M		GENMASK(10, 0)
++#define  YT921X_TAG_RX_CMD(x)			FIELD_PREP(YT921X_TAG_RX_CMD_M, (x))
++#define   YT921X_TAG_RX_CMD_UNK_NORMAL			0x80
++#define YT921X_TAG_TX_PORTS_M		GENMASK(10, 0)
++#define  YT921X_TAG_TX_PORTn(port)		BIT(port)
 +
-+  reg:
-+    maxItems: 1
++static struct sk_buff *
++yt921x_tag_xmit(struct sk_buff *skb, struct net_device *netdev)
++{
++	struct dsa_port *dp = dsa_user_to_port(netdev);
++	unsigned int port = dp->index;
++	struct dsa_port *partner;
++	__be16 *tag;
++	u16 tx;
 +
-+  reset-gpios:
-+    maxItems: 1
++	skb_push(skb, YT921X_TAG_LEN);
++	dsa_alloc_etype_header(skb, YT921X_TAG_LEN);
 +
-+  motorcomm,switch-id:
-+    $ref: /schemas/types.yaml#/definitions/uint32
-+    description: |
-+      When managed via MDIO, a hard-configured switch ID to form MDIO reg addrs,
-+      to distinguish between multiple devices beside phyaddr.
-+    enum: [0, 1, 2, 3]
-+    default: 0
-+    maxItems: 1
++	tag = dsa_etype_header_pos_tx(skb);
 +
-+  mdio:
-+    $ref: /schemas/net/mdio.yaml#
-+    unevaluatedProperties: false
-+    description: |
-+      Internal MDIO bus for the internal GbE PHYs. PHYs 0-7 are used for Port
-+      0-7 respectively.
++	/* Might use yt921x_priv::tag_eth_p, but... */
++	tag[0] = htons(ETH_P_YT921X);
++	/* Service VLAN tag not used */
++	tag[1] = 0;
++	tag[2] = 0;
++	tx = YT921X_TAG_PORT_EN | YT921X_TAG_TX_PORTn(port);
++	if (dp->hsr_dev)
++		dsa_hsr_foreach_port(partner, dp->ds, dp->hsr_dev)
++			tx |= YT921X_TAG_TX_PORTn(partner->index);
++	tag[3] = htons(tx);
 +
-+  mdio-external:
-+    $ref: /schemas/net/mdio.yaml#
-+    unevaluatedProperties: false
-+    description: |
-+      External MDIO bus to access external components. External PHYs for GMACs
-+      (Port 8-9) are expected to be connected to the external MDIO bus in
-+      vendor's reference design, but that is not a hard limitation from the
-+      chip.
++	/* Now tell the conduit network device about the desired output queue
++	 * as well
++	 */
++	skb_set_queue_mapping(skb, port);
 +
-+allOf:
-+  - $ref: dsa.yaml#/$defs/ethernet-ports
++	return skb;
++}
 +
-+required:
-+  - compatible
-+  - reg
++static struct sk_buff *
++yt921x_tag_rcv(struct sk_buff *skb, struct net_device *netdev)
++{
++	unsigned int port;
++	__be16 *tag;
++	u16 rx;
 +
-+unevaluatedProperties: false
++	if (unlikely(!pskb_may_pull(skb, YT921X_TAG_LEN)))
++		return NULL;
 +
-+examples:
-+  - |
-+    #include <dt-bindings/gpio/gpio.h>
++	tag = (__be16 *)skb->data;
 +
-+    mdio {
-+        #address-cells = <1>;
-+        #size-cells = <0>;
++	/* Locate which port this is coming from */
++	rx = ntohs(tag[1]);
++	if (unlikely((rx & YT921X_TAG_PORT_EN) == 0)) {
++		netdev_err(netdev, "Unexpected rx tag 0x%04x\n", rx);
++		return NULL;
++	}
 +
-+        switch@1d {
-+            compatible = "motorcomm,yt9215";
-+            /* default 0x1d, alternate 0x0 */
-+            reg = <0x1d>;
-+            motorcomm,switch-id = <0>;
-+            reset-gpios = <&tlmm 39 GPIO_ACTIVE_LOW>;
++	port = FIELD_GET(YT921X_TAG_RX_PORT_M, rx);
++	skb->dev = dsa_conduit_find_user(netdev, 0, port);
++	if (unlikely(!skb->dev)) {
++		dev_warn_ratelimited(&netdev->dev,
++				     "Cannot locate rx port %u\n", port);
++		return NULL;
++	}
 +
-+            mdio {
-+                #address-cells = <1>;
-+                #size-cells = <0>;
++	/* Remove YT921x tag and update checksum */
++	skb_pull_rcsum(skb, YT921X_TAG_LEN);
 +
-+                sw_phy0: phy@0 {
-+                    reg = <0x0>;
-+                };
-+            };
++	dsa_default_offload_fwd_mark(skb);
 +
-+            mdio-external {
-+                #address-cells = <1>;
-+                #size-cells = <0>;
++	dsa_strip_etype_header(skb, YT921X_TAG_LEN);
 +
-+                phy1: phy@b {
-+                    reg = <0xb>;
-+                };
-+            };
++	return skb;
++}
 +
-+            ports {
-+                #address-cells = <1>;
-+                #size-cells = <0>;
++static const struct dsa_device_ops yt921x_netdev_ops = {
++	.name	= YT921X_NAME,
++	.proto	= DSA_TAG_PROTO_YT921X,
++	.xmit	= yt921x_tag_xmit,
++	.rcv	= yt921x_tag_rcv,
++	.needed_headroom = YT921X_TAG_LEN,
++};
 +
-+                /* phy-handle is optional for internal PHYs */
-+                port@0 {
-+                    reg = <0>;
-+                    label = "lan1";
-+                    phy-mode = "internal";
-+                    phy-handle = <&sw_phy0>;
-+                };
++MODULE_DESCRIPTION("DSA tag driver for Motorcomm YT921x switches");
++MODULE_LICENSE("GPL");
++MODULE_ALIAS_DSA_TAG_DRIVER(DSA_TAG_PROTO_YT921X, YT921X_NAME);
 +
-+                port@1 {
-+                    reg = <1>;
-+                    label = "lan2";
-+                    phy-mode = "internal";
-+                };
-+
-+                port@2 {
-+                    reg = <2>;
-+                    label = "lan3";
-+                    phy-mode = "internal";
-+                };
-+
-+                port@3 {
-+                    reg = <3>;
-+                    label = "lan4";
-+                    phy-mode = "internal";
-+                };
-+
-+                port@4 {
-+                    reg = <4>;
-+                    label = "lan5";
-+                    phy-mode = "internal";
-+                };
-+
-+                /* CPU port */
-+                port@8 {
-+                    reg = <8>;
-+                    phy-mode = "sgmii";
-+                    ethernet = <&eth0>;
-+
-+                    fixed-link {
-+                        speed = <1000>;
-+                        full-duplex;
-+                        pause;
-+                        asym-pause;
-+                    };
-+                };
-+
-+                /* if external phy is connected to a MAC */
-+                port@9 {
-+                    reg = <9>;
-+                    label = "wan";
-+                    phy-mode = "rgmii";
-+                    phy-handle = <&phy1>;
-+
-+                    fixed-link {
-+                        speed = <1000>;
-+                        full-duplex;
-+                        pause;
-+                    };
-+                };
-+            };
-+        };
-+    };
++module_dsa_tag_driver(yt921x_netdev_ops);
 -- 
 2.47.2
 
