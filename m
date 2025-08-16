@@ -1,177 +1,167 @@
-Return-Path: <netdev+bounces-214301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214302-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08583B28D68
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 13:25:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F686B28D8D
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 14:06:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B59DB3BA932
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 11:25:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F415C7B8534
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 12:05:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65EB22D0C6B;
-	Sat, 16 Aug 2025 11:25:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="n71hZWok"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED511248F4E;
+	Sat, 16 Aug 2025 12:06:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3C1B2C3768;
-	Sat, 16 Aug 2025 11:25:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31C8222083;
+	Sat, 16 Aug 2025 12:06:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755343544; cv=none; b=RGxYOQK+WDYdClodj+zlK/lQ16mCHOEZYQfQ53mTQP+UB4WqZrFjCjA1ijK+loQ/h1t5WI6jZcr0uJioQtwcB+1EkuK2+SLz0+QP3aw57Rfg/IjYxjWbMFDaD+dShp4wR0ADcZjez22NOJZRHJu6rGzZ5gqMF9cm5leYRy9YGI8=
+	t=1755346000; cv=none; b=puihdnTHhupvp9HOb+LUnb/qhjGgamGwdTirBEm57yP7+iYUo6ctXAJJOEBmNywkha/v12vMze91IO4cJyZEpaEaEX1OTQUqKOWsJnAdCEVeobSIkLFjj7HP+FsFi39BCoagNBq25e1soglYSXHdXArhx3EzoJG+dth5ADjHMJg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755343544; c=relaxed/simple;
-	bh=yXFNrlTsuKcIiCEG5HOLk1E5J3QOdw3cZCTv8+Nq19Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lymf+8swtYgb1MQ/awKjckKqmxpsrbAqBmBImqGNQSM8Ss1evvOcw8DXIKgvL1i65vX1D2049+yYP1sO8UD2uodCBlzi9ComXoPZSiVY2DcUE9DVGo/7lS+GdqnTrQvL8lsk374Yu9b5G6wUupXHzUQnQXf0BpmoOrCCvWLh2kM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=n71hZWok; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1755343543; x=1786879543;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=yXFNrlTsuKcIiCEG5HOLk1E5J3QOdw3cZCTv8+Nq19Q=;
-  b=n71hZWokabrRDjOBI42sW1w7fjcwElw+LzgHU0HWoginULo6m9Vv5+uS
-   VyzB02IQqdsOytedHFHSh40WxiqMEcV+DKosm6IhunAJh/9KEGIVcu0B5
-   3Zcqq/SJdf0Usyo0xZGOPOpLX1DDprsi+gQARMq4Tgel+hOcBbjJOa5IP
-   +P/8s/RALDzHzxdN5m2A9XMsV8uaNUmxnusVFn9MFU4ACzsDhl6dK21dc
-   /xRbKU/yK/NKlXqY1P71MA66hBC9XFjVMy98tMEDk6gyi6yWuEvo/C8Ol
-   USGE1rcUl1OCcIWd14L+2avMlBLLJkWEMFJuPosfcDMWlXbKN43Aj/H1g
-   A==;
-X-CSE-ConnectionGUID: p07IyuLnRySbStjIjLqRLQ==
-X-CSE-MsgGUID: guZ+JZrCTZeGG9OOly6HqQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11523"; a="57713463"
-X-IronPort-AV: E=Sophos;i="6.17,293,1747724400"; 
-   d="scan'208";a="57713463"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Aug 2025 04:25:42 -0700
-X-CSE-ConnectionGUID: uGNPv/P0SAOZCDHGzi1O3w==
-X-CSE-MsgGUID: Tv9x7wr8Td6dRbiYNGSuGw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,293,1747724400"; 
-   d="scan'208";a="190913937"
-Received: from lkp-server02.sh.intel.com (HELO 4ea60e6ab079) ([10.239.97.151])
-  by fmviesa002.fm.intel.com with ESMTP; 16 Aug 2025 04:25:38 -0700
-Received: from kbuild by 4ea60e6ab079 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1unF2T-000CqO-0F;
-	Sat, 16 Aug 2025 11:25:34 +0000
-Date: Sat, 16 Aug 2025 19:24:43 +0800
-From: kernel test robot <lkp@intel.com>
-To: Artur Rojek <contact@artur-rojek.eu>, Rob Landley <rob@landley.net>,
-	Jeff Dionne <jeff@coresemi.io>,
-	John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Artur Rojek <contact@artur-rojek.eu>
-Subject: Re: [PATCH 3/3] net: j2: Introduce J-Core EMAC
-Message-ID: <202508161930.ergOga3z-lkp@intel.com>
-References: <20250815194806.1202589-4-contact@artur-rojek.eu>
+	s=arc-20240116; t=1755346000; c=relaxed/simple;
+	bh=pxKL/i5KZ3St1r+nCO3dem3IEbdpNgPCz0cfdIjoFtE=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=pkbrB3ScMYXHK+mKhIPeqI3n4rBNpc8bkuCSJJsMQRLEgf4twJkVe894s8bGrosQ6zPECvA2wLzBWGtF8UITsoEWwTTbT6ew2dP4yscZjxbSNv7DrzslCoX5JJryh8+6fMhGhdRoQWs42MYqagG24wA2L2ctvxMk2fCozp3W5Yk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=artur-rojek.eu; spf=pass smtp.mailfrom=artur-rojek.eu; arc=none smtp.client-ip=217.70.183.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=artur-rojek.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=artur-rojek.eu
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 42CE343203;
+	Sat, 16 Aug 2025 12:06:34 +0000 (UTC)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250815194806.1202589-4-contact@artur-rojek.eu>
+Date: Sat, 16 Aug 2025 14:06:34 +0200
+From: Artur Rojek <contact@artur-rojek.eu>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Rob Landley <rob@landley.net>, Jeff Dionne <jeff@coresemi.io>, John Paul
+ Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, Geert Uytterhoeven
+ <geert+renesas@glider.be>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S .
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/3] dt-bindings: net: Add support for J-Core EMAC
+In-Reply-To: <aa6bdc05-81b0-49a2-9d0d-8302fa66bf35@kernel.org>
+References: <20250815194806.1202589-1-contact@artur-rojek.eu>
+ <20250815194806.1202589-3-contact@artur-rojek.eu>
+ <aa6bdc05-81b0-49a2-9d0d-8302fa66bf35@kernel.org>
+Message-ID: <cab483ef08e15d999f83e0fbabdc4fdf@artur-rojek.eu>
+X-Sender: contact@artur-rojek.eu
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgddugeeikeduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeggfffhvfevufgjfhfkgigtgfesthejjhdttddtvdenucfhrhhomheptehrthhurhcutfhojhgvkhcuoegtohhnthgrtghtsegrrhhtuhhrqdhrohhjvghkrdgvuheqnecuggftrfgrthhtvghrnheptdeugfelveeuvedtfffhledttddthefhuedufffguedtveehieeukeejgfejgefhnecuffhomhgrihhnpeguvghvihgtvghtrhgvvgdrohhrghdpghhithhhuhgsuhhsvghrtghonhhtvghnthdrtghomhenucfkphepuddtrddvtddtrddvtddurdduleenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedutddrvddttddrvddtuddrudelpdhhvghlohepfigvsghmrghilhdrghgrnhguihdrnhgvthdpmhgrihhlfhhrohhmpegtohhnthgrtghtsegrrhhtuhhrqdhrohhjvghkrdgvuhdpnhgspghrtghpthhtohepudeipdhrtghpthhtohepkhhriihksehkvghrnhgvlhdrohhrghdprhgtphhtthhopehrohgssehlrghnughlvgihrdhnvghtpdhrtghpthhtohepjhgvfhhfsegtohhrvghsvghmihdrihhopdhrtghpthhtohepghhlrghusghithiisehphhihshhikhdrfhhuqdgsvghrlhhinhdru
+ ggvpdhrtghpthhtohepghgvvghrthdorhgvnhgvshgrshesghhlihguvghrrdgsvgdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhm
+X-GND-Sasl: contact@artur-rojek.eu
 
-Hi Artur,
+On 2025-08-16 10:19, Krzysztof Kozlowski wrote:
+> On 15/08/2025 21:48, Artur Rojek wrote:
+>> Add a documentation file to describe the Device Tree bindings for the
+>> Ethernet Media Access Controller found in the J-Core family of SoCs.
+>> 
+>> Signed-off-by: Artur Rojek <contact@artur-rojek.eu>
+>> ---
+>>  .../devicetree/bindings/net/jcore,emac.yaml   | 42 
+>> +++++++++++++++++++
+>>  1 file changed, 42 insertions(+)
+>>  create mode 100644 
+>> Documentation/devicetree/bindings/net/jcore,emac.yaml
+>> 
+>> diff --git a/Documentation/devicetree/bindings/net/jcore,emac.yaml 
+>> b/Documentation/devicetree/bindings/net/jcore,emac.yaml
+>> new file mode 100644
+>> index 000000000000..a4384f7ed83d
+>> --- /dev/null
+>> +++ b/Documentation/devicetree/bindings/net/jcore,emac.yaml
+>> @@ -0,0 +1,42 @@
+>> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+>> +%YAML 1.2
+>> +---
+>> +$id: http://devicetree.org/schemas/net/jcore,emac.yaml#
+>> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+>> +
+>> +title: J-Core Ethernet Media Access Controller
+>> +
+>> +description: |
+>> +  This node provides properties for configuring the Ethernet MAC 
+>> found
+>> +  in the J-Core family of SoCs.
+>> +
+>> +maintainers:
+>> +  - Artur Rojek <contact@artur-rojek.eu>
+>> +
+>> +properties:
+>> +  compatible:
+>> +    const: jcore,emac
+> 
+> You need SoC-based compatibles. And then also rename the file to match 
+> it.
 
-kernel test robot noticed the following build warnings:
+Given how the top-most compatible of the bindings [1] of the board I am
+using has "jcore,j2-soc", this driver should probably go with
+"jcore,j2-emac".
 
-[auto build test WARNING on robh/for-next]
-[also build test WARNING on linus/master v6.17-rc1 next-20250815]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+But as this is an FPGA design, I don't know how widespread the use is
+across other jcore derived SoCs (if any?).
+I will wait for Jeff (who's design this is) to clarify on that.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Artur-Rojek/dt-bindings-vendor-prefixes-Document-J-Core/20250816-042354
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/robh/linux.git for-next
-patch link:    https://lore.kernel.org/r/20250815194806.1202589-4-contact%40artur-rojek.eu
-patch subject: [PATCH 3/3] net: j2: Introduce J-Core EMAC
-config: hexagon-allmodconfig (https://download.01.org/0day-ci/archive/20250816/202508161930.ergOga3z-lkp@intel.com/config)
-compiler: clang version 17.0.6 (https://github.com/llvm/llvm-project 6009708b4367171ccdbf4b5905cb6a803753fe18)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250816/202508161930.ergOga3z-lkp@intel.com/reproduce)
+PS. Too bad we already have other IP cores following the old pattern:
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202508161930.ergOga3z-lkp@intel.com/
+> $ grep -r "compatible = \"jcore," bindings/ | grep -v "emac"
+> bindings/timer/jcore,pit.yaml:        compatible = "jcore,pit";
+> bindings/spi/jcore,spi.txt:	compatible = "jcore,spi2";
+> bindings/interrupt-controller/jcore,aic.yaml:        compatible = 
+> "jcore,aic2";
 
-All warnings (new ones prefixed by >>):
+Cheers,
+Artur
 
->> drivers/net/ethernet/jcore_emac.c:231:2: warning: label at end of compound statement is a C2x extension [-Wc2x-extensions]
-     231 |         }
-         |         ^
-   1 warning generated.
+[1] 
+https://raw.githubusercontent.com/j-core/jcore-soc/refs/heads/master/targets/boards/turtle_1v1/board.dts
 
-
-vim +231 drivers/net/ethernet/jcore_emac.c
-
-   192	
-   193	static void jcore_emac_set_rx_mode(struct net_device *ndev)
-   194	{
-   195		struct jcore_emac *priv = netdev_priv(ndev);
-   196		struct netdev_hw_addr *ha;
-   197		unsigned int reg, i, idx = 0, set_mask = 0, clear_mask = 0, addr = 0;
-   198	
-   199		if (ndev->flags & IFF_PROMISC)
-   200			set_mask |= JCORE_EMAC_PROMISC;
-   201		else
-   202			clear_mask |= JCORE_EMAC_PROMISC;
-   203	
-   204		if (ndev->flags & IFF_ALLMULTI)
-   205			set_mask |= JCORE_EMAC_MCAST;
-   206		else
-   207			clear_mask |= JCORE_EMAC_MCAST;
-   208	
-   209		regmap_update_bits(priv->map, JCORE_EMAC_CONTROL, set_mask | clear_mask,
-   210				   set_mask);
-   211	
-   212		if (!(ndev->flags & IFF_MULTICAST))
-   213			return;
-   214	
-   215		netdev_for_each_mc_addr(ha, ndev) {
-   216			/* Only the first 3 octets are used in a hardware mcast mask. */
-   217			memcpy(&addr, ha->addr, 3);
-   218	
-   219			for (i = 0; i < idx; i++) {
-   220				regmap_read(priv->map, JCORE_EMAC_MCAST_MASK(i), &reg);
-   221				if (reg == addr)
-   222					goto next_ha;
-   223			}
-   224	
-   225			regmap_write(priv->map, JCORE_EMAC_MCAST_MASK(idx), addr);
-   226			if (++idx >= JCORE_EMAC_MCAST_ADDRS) {
-   227				netdev_warn(ndev, "Multicast list limit reached\n");
-   228				break;
-   229			}
-   230	next_ha:
- > 231		}
-   232	
-   233		/* Clear the remaining mask entries. */
-   234		for (i = idx; i < JCORE_EMAC_MCAST_ADDRS; i++)
-   235			regmap_write(priv->map, JCORE_EMAC_MCAST_MASK(i), 0);
-   236	}
-   237	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+> 
+>> +
+>> +  reg:
+>> +    maxItems: 1
+>> +
+>> +  interrupts:
+>> +    maxItems: 1
+>> +
+>> +required:
+>> +  - compatible
+>> +  - reg
+>> +  - interrupts
+>> +
+>> +allOf:
+>> +  - $ref: ethernet-controller.yaml#
+>> +
+>> +additionalProperties: false
+> 
+> unevaluatedProperties instead
+> 
+>> +
+>> +examples:
+>> +  - |
+>> +    ethernet@10000 {
+>> +      compatible = "jcore,emac";
+>> +      reg = <0x10000 0x2000>;
+>> +      interrupts = <0x11>;
+> 
+> That's not hex...
+> 
+>> +    };
+> 
+> 
+> Best regards,
+> Krzysztof
 
