@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-214279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214280-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1355BB28BCB
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 10:18:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4453B28BD0
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 10:20:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 95ADF1CE4014
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 08:19:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD7A61BC4092
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 08:20:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3FD321FF55;
-	Sat, 16 Aug 2025 08:18:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7083230BDB;
+	Sat, 16 Aug 2025 08:20:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UsISCm1E"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q47tzq7H"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78126DF71;
-	Sat, 16 Aug 2025 08:18:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB6222222C3;
+	Sat, 16 Aug 2025 08:20:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755332327; cv=none; b=TVbFtTdwcsrvs0Fs1HPMoBGgd4DRFpYyVsLnWessLpYsebRf4x7LifXK40w2TLa7mrGNx6yfCsI58QesbIti9vvA4cFyBDFBFD/tsKTSEwH8e6sIBjKBpg0/MhYuQCJTRaRuVwwbqHGti7FpYB9EhBOswPXtbiLjj0UURdMsTFc=
+	t=1755332404; cv=none; b=QZbR08NNuUIcGp14AIr9/Uii+DtSlMXlRyjnWVaXxKDzSsqJTkfs9/nln3AKBPoX94yKKs1lVmgmOeBysvA+IypyU+ou+nrcy+TmsuqhveXMuiXySfRQjpP8UzgyX3dnLrYy6Dtt3oyPzmkCKIOICqArS0rO/gWpdjUajNc0SBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755332327; c=relaxed/simple;
-	bh=DEM0POzVnPEdsPxmECbIkyXJrVTL/Ba/F2IEe0XGDQY=;
+	s=arc-20240116; t=1755332404; c=relaxed/simple;
+	bh=nqXpO0Afu7Q9LYqv1ain41BiwjcqwFhwWW0Yb2kHhsk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gRvuLnj8LbP3ZlkCqr/ehEgRtaI20NBE3PeWyh/GrR8UWPiRfVaJjRGQsmCkJYEC8Km0CgrX6xu6+i06R68NYNIMiAw+BSdXSFiCxy9yOlopd0xyx4QZOIiGfqkat3VifrvhUOQF7HCkR8DwQVHgadJzRjFaxE6N3YRyjeEwvSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UsISCm1E; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53881C4CEEF;
-	Sat, 16 Aug 2025 08:18:43 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=iVjYwfK3l8Syj9WyoJykLpj+HQzueQXI2KgAt3O8QSUYwIN9BJXFUVbvo8mUKZFCis2gEVl+mJ890GQ7aD5R6fnRK0lURcAont/Hwwu/wIRqDY01+zxbXk3XTB7kwfrevpP4AsNh5H/UZpgXxpTmuoU5Y29fckoi5k0D7TbXVbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q47tzq7H; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D50BEC4CEEF;
+	Sat, 16 Aug 2025 08:20:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755332327;
-	bh=DEM0POzVnPEdsPxmECbIkyXJrVTL/Ba/F2IEe0XGDQY=;
+	s=k20201202; t=1755332404;
+	bh=nqXpO0Afu7Q9LYqv1ain41BiwjcqwFhwWW0Yb2kHhsk=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=UsISCm1ED6yxRXm2/diqklxVdJT+xiYS3TBnMK/VhqzAFEflFeo/pfAGZalCk0Aot
-	 SLZbrBugRw4lZFsmNvuZN1/fMm3RSRzvCPRuDbDDYogp1rXos37/Ur4MMNcCpBEHRg
-	 AQ//zBBDuUkhOL4OUxHQ+jyQXiCwIvWCGsphpII5n+O6GfYMMqdgGChrA5sTFg1Am1
-	 hUTOIYm09gczL9iCcDIJ6wmfHykedPNfCbLHzRfeKz9jlO/ysAt7GyM/RvAJ7oskAT
-	 5puuMKSgKUTsWZ0jbhtnUTBakp/6XONMK8t4xmP46p60Hr7alk/yQ+GF9mWWzCT0Hf
-	 4Lf5TejKtOhng==
-Message-ID: <68a6d0a7-b245-456d-9c7e-60fbf08c4b32@kernel.org>
-Date: Sat, 16 Aug 2025 10:18:41 +0200
+	b=q47tzq7HCnzXYBHYx8oI6yFEgpedpccT4AIHNKPM1WPW4/m7G2c7A7DQxwLynJzGO
+	 ozIU/3V+jEaITefNxI5iHFHTvCzfX1rbIK4eHUCJDkf81Kju2Cad7tIGGw1RU1GSiE
+	 wfD+wS2m+uhlPKkRWjYxmuu1UuwQzUtUn+gQ5aFyKHuuDTpMNIbOrAXX6Z2LqfBSVC
+	 Lqf41zowoUT/kRdmMLZEdesQCxrk9M3mSe1jfWuM8MQgdrM8NcVsNm+7Vr9OASZhQJ
+	 7pBCoLDuQPriFnUrnFJ07LHsQjhEksu/GltlWk+f98Uk/HQ1wA36CxPpyIy1LAdBX4
+	 CUYEbefRfUIhQ==
+Message-ID: <aa6bdc05-81b0-49a2-9d0d-8302fa66bf35@kernel.org>
+Date: Sat, 16 Aug 2025 10:19:58 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,7 +50,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/3] dt-bindings: vendor-prefixes: Document J-Core
+Subject: Re: [PATCH 2/3] dt-bindings: net: Add support for J-Core EMAC
 To: Artur Rojek <contact@artur-rojek.eu>, Rob Landley <rob@landley.net>,
  Jeff Dionne <jeff@coresemi.io>,
  John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
@@ -61,9 +61,9 @@ To: Artur Rojek <contact@artur-rojek.eu>, Rob Landley <rob@landley.net>,
  Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
  Conor Dooley <conor+dt@kernel.org>
 Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, Geert Uytterhoeven <geert@linux-m68k.org>
+ linux-kernel@vger.kernel.org
 References: <20250815194806.1202589-1-contact@artur-rojek.eu>
- <20250815194806.1202589-2-contact@artur-rojek.eu>
+ <20250815194806.1202589-3-contact@artur-rojek.eu>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -109,26 +109,79 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
  zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
  XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <20250815194806.1202589-2-contact@artur-rojek.eu>
+In-Reply-To: <20250815194806.1202589-3-contact@artur-rojek.eu>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 15/08/2025 21:48, Artur Rojek wrote:
-> J-Core is a clean-room open source processor and SoC design using the
-> SuperH instruction set.
+> Add a documentation file to describe the Device Tree bindings for the
+> Ethernet Media Access Controller found in the J-Core family of SoCs.
 > 
-> The 'jcore' prefix is in use by IP cores originating from this design.
-> 
-> Link: https://j-core.org
-> Reviewed-by: Geert Uytterhoeven <geert@linux-m68k.org>
-
-How is it possible if this is v1? If this is not v1, where is changelog
-and why isn't it marked as vx?
-
 > Signed-off-by: Artur Rojek <contact@artur-rojek.eu>
 > ---
->  Documentation/devicetree/bindings/vendor-prefixes.yaml | 2 ++
->  1 file changed, 2 insertions(+)
+>  .../devicetree/bindings/net/jcore,emac.yaml   | 42 +++++++++++++++++++
+>  1 file changed, 42 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/jcore,emac.yaml
+> 
+> diff --git a/Documentation/devicetree/bindings/net/jcore,emac.yaml b/Documentation/devicetree/bindings/net/jcore,emac.yaml
+> new file mode 100644
+> index 000000000000..a4384f7ed83d
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/jcore,emac.yaml
+> @@ -0,0 +1,42 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/jcore,emac.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: J-Core Ethernet Media Access Controller
+> +
+> +description: |
+> +  This node provides properties for configuring the Ethernet MAC found
+> +  in the J-Core family of SoCs.
+> +
+> +maintainers:
+> +  - Artur Rojek <contact@artur-rojek.eu>
+> +
+> +properties:
+> +  compatible:
+> +    const: jcore,emac
+
+You need SoC-based compatibles. And then also rename the file to match it.
+
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  interrupts:
+> +    maxItems: 1
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +  - interrupts
+> +
+> +allOf:
+> +  - $ref: ethernet-controller.yaml#
+> +
+> +additionalProperties: false
+
+unevaluatedProperties instead
+
+> +
+> +examples:
+> +  - |
+> +    ethernet@10000 {
+> +      compatible = "jcore,emac";
+> +      reg = <0x10000 0x2000>;
+> +      interrupts = <0x11>;
+
+That's not hex...
+
+> +    };
+
+
 Best regards,
 Krzysztof
 
