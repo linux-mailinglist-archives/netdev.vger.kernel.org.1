@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-214312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214313-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1118AB28F25
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 17:29:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31B2DB28F37
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 17:38:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F347517B4FD
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 15:29:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 01E1E5C2593
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 15:38:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5410C2F60D4;
-	Sat, 16 Aug 2025 15:29:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CC291547CC;
+	Sat, 16 Aug 2025 15:38:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="yoluvoiw"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="FpEz8krS"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB28B2ECEBD;
-	Sat, 16 Aug 2025 15:29:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C8CC6FC5;
+	Sat, 16 Aug 2025 15:37:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755358161; cv=none; b=fRQ9ZppKSApO4GU1r5vD1fHtvLpOmaqNsVO8kdRqIb1ex73ALuCulkMGXO5UTR2ZjsNXE6gXlCO4A7gRrI8abY9E0ra3tKB/JLPTN+g21mlACENZzZLF5AlhDoSU83dwA6Mhh+fm7xfszbsCCBJge/X7Xd/4OTwhu0C73W7FnSE=
+	t=1755358680; cv=none; b=UClRsmV3fHG3nL6aPxrqnFHR4lTjKFVm8qA32CqH2tDTXsk5R/vOmxnc75ek4ewkYXQSv5fKGPax/GwXSuP98upZElPmhzyUMHHXexKFaeonjH0MJm2IGXdqCpQretb4oZXPFtNB7HIltQ/oZfuNe2Ye057t12NW1kOLjJBuq2M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755358161; c=relaxed/simple;
-	bh=AN3ech0LTfGbrCPbaUNpgbJ2BzWQEov4mSdREN5/rkU=;
+	s=arc-20240116; t=1755358680; c=relaxed/simple;
+	bh=fmUjxBqT/YQptLLFUCnuBtOiMVGfqLNL5OiA/bV5gvI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fBgrhImxUECWtftcmkXogZ3PplXAXwa+Z5NZwEmjIT0B+Zr5gXebPcbH/HrJg0lKWH2e/x18jkmTdHkt3A/xKeakp/fha5T9OjaW8FDnxZeTuq/Gbm9dAn5xnlQ/lNTi5WLcaehYByahkJy3mbrJMIB+v9Yhcgi3O4JjW2b3SVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=yoluvoiw; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=Qnuz1b2SHqpYGVAkNBKuzogtLpfowx44DzcRA4ODLQMoNajVXRc8k7VchvCieV8EiIEPlEUbZ3DikvDtcHjQIJ98Xaed9dq2PBwXMjdxDjemyYWnpXSbfMmXpVdlRvDe+77T/yZqubwD1eHJZu2w8Rl79RJzu5ltu4p8sjw/ytk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=FpEz8krS; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,29 +36,26 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=i5t69DMowoXeK1OBYzzEg7YkLA6qxp/aS77f2fkx2KQ=; b=yoluvoiwmakFg4E9fgAOkcCD+r
-	/l0zeMb89WmbiNZ1XC3sveiTVQhKsuH9gwBXpYVsxbwgKxH6aDLGzJIQC6VNBR+LkbC2wIXDBq1my
-	T1WKmdThP9pfeyTDYqcj9zIASWDR74bOJ0XEhbg/qbQgCP0ONK0EIAlEGUxAsyFmL3Mg=;
+	bh=RvC+UC/AdOwrm3IlIaz82Z8Ib6je8cnny1YfptPh3y4=; b=FpEz8krSo3XZrKdIGIf9Cniw4q
+	qq/+8JbM3iURszASaV3B5xrxulu5ttSDVG/SaE1HoUJt06qh0dQsm0DuIbjzoYxzNcZ1+0orKY8br
+	FzIbN+DUdioUXbgrzCLm9AQuwfJz6MRLCC4U/nWLmu9de/UmBxWX6nSkyrKURmmpDYJM=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1unIqD-004uct-7Z; Sat, 16 Aug 2025 17:29:09 +0200
-Date: Sat, 16 Aug 2025 17:29:09 +0200
+	id 1unIyX-004ufj-4Z; Sat, 16 Aug 2025 17:37:45 +0200
+Date: Sat, 16 Aug 2025 17:37:45 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: David Yang <mmyangfl@gmail.com>
-Cc: netdev@vger.kernel.org, Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
-	Russell King <linux@armlinux.org.uk>, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [net-next v3 3/3] net: dsa: yt921x: Add support for Motorcomm
- YT921x
-Message-ID: <f4b9a113-51f8-4c5f-9aef-05abf33c4dd9@lunn.ch>
-References: <20250816052323.360788-1-mmyangfl@gmail.com>
- <20250816052323.360788-4-mmyangfl@gmail.com>
+To: Wen Gu <guwen@linux.alibaba.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, richardcochran@gmail.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, xuanzhuo@linux.alibaba.com,
+	dust.li@linux.alibaba.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+	David Woodhouse <dwmw2@infradead.org>
+Subject: Re: [PATCH net-next v4] ptp: add Alibaba CIPU PTP clock driver
+Message-ID: <729dee1e-3c8c-40c5-b705-01691e3d85d7@lunn.ch>
+References: <20250812115321.9179-1-guwen@linux.alibaba.com>
+ <20250815113814.5e135318@kernel.org>
+ <2a98165b-a353-405d-83e0-ffbca1d41340@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,11 +64,12 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250816052323.360788-4-mmyangfl@gmail.com>
+In-Reply-To: <2a98165b-a353-405d-83e0-ffbca1d41340@linux.alibaba.com>
 
-> +#define u64_from_u32(hi, lo) (((u64)(hi) << 32) | (lo))
+> These sysfs are intended to provide diagnostics and informations.
 
-https://lore.kernel.org/lkml/CAHk-=wjLCqUUWd8DzG+xsOn-yVL0Q=O35U9D6j6=2DUWX52ghQ@mail.gmail.com/
+Maybe they should be in debugfs if they are just diagnostics? You then
+don't need to document them, because they are not ABI.
 
 	Andrew
 
