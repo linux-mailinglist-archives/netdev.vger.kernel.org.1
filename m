@@ -1,198 +1,142 @@
-Return-Path: <netdev+bounces-214257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214259-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD66CB28A81
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 06:16:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B88AB28AA5
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 07:26:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 99323AC19E6
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 04:16:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C81421C84DE2
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 05:26:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1615F5BAF0;
-	Sat, 16 Aug 2025 04:16:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A57D31DF261;
+	Sat, 16 Aug 2025 05:26:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="UUh3rOWL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IL3XInNl"
 X-Original-To: netdev@vger.kernel.org
-Received: from pdx-out-002.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-002.esa.us-west-2.outbound.mail-perimeter.amazon.com [44.246.1.125])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D4434A33
-	for <netdev@vger.kernel.org>; Sat, 16 Aug 2025 04:16:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.246.1.125
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 314DF1862A;
+	Sat, 16 Aug 2025 05:26:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755317774; cv=none; b=gZG6R/IBg2aHrYSmUYYcMw7eKBgujG+Of0aCrcnMCjFN0Uf4vt+QblGNl4YMhNatC6IXPLlWHW5KGF1P6Sn4bQUM7TVbOJVdDGs7HykmvCaH7Ny6s+30ggaQic3Tp+Rjko5czKVfLOnNAyhkdwwDekBloA2xS2fj/auJoqUuewk=
+	t=1755321988; cv=none; b=og3pq9Ax6uX+I9+4KYqnaaMrJd93ziBFXzoAwM3KSXJIUiBCekWZbL1CFu3qQqd3G/uSSrSYzEpRFydPduYBI6/XQYknB3Aytmo/wy4pdlMRoqns7zQ5/emL5b0d+IN/xeW9FJH9Gwqbh8WaLqfJ05ylppDLd1HIAwSeYBoTdWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755317774; c=relaxed/simple;
-	bh=4pl7HhioxdvaFIegkDUeOmLYPbeUzrx5Kk8on7OU6Go=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=K7/gFusnCqTK2tOvUIi8y2HpPcP6gr4M7oXIYe2pRuHTbZ3zfBwz5XpYrPGGq6Bt5fy1j045ksiY/22qOQG7QpCWDNuEEU2Et8mmfe8dR5dQdp2xDhYQ0mXzcNBRxl7qc61SUw1jYfThfHbl92Fjd4B2z0s/93XR0YdTnktT9XQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=UUh3rOWL; arc=none smtp.client-ip=44.246.1.125
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1755321988; c=relaxed/simple;
+	bh=nVjqhG9sbPi0wuuSS6+4rvv16FUq7s90IVK1VJVy9Wc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oi3oBi1yRWj98ND4L27oDJp3Zjwijz4JVu0xkcbuygvm9MO1vkUyfSOorLzNlL8QszmdavaNqr5TyI+MU4sHJF14MBQGtGuWhEOOzMvEMQ23hLOzlbKXOltpxI75QNIJyLj4YW/usoMvbbmKR7/k1pJgwQLnzmqijXhG8IntE+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IL3XInNl; arc=none smtp.client-ip=209.85.215.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-b47174c3817so1910269a12.2;
+        Fri, 15 Aug 2025 22:26:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1755317772; x=1786853772;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=grQ8MznX0ax9VmAPZJL5cknDcX/BG/AnrXvD+2GWl80=;
-  b=UUh3rOWLB+yE8f9EpogEoqmUQrnAk/BtcrRo0LYtnQwqyO8YLdq5hjG2
-   JUAgYo+QLp+FEMIP1hD0H11EXj70msSgJ+lazCK7oIUDgMipR7qfmAdHc
-   yHn6u2W2ekbwsxbQEMvzuIty+F0am5/wPSYcoUJO1vOZYOW6BH5CJgHMJ
-   j+tyGve1jq8mrz5aqvutKk3ewzkqlq8SZe8aZ1TZlxrf+ZtvHokaMTyML
-   5qdAICLStw2jU4RTMCl+waZD8To8tWoGZCN19VYdyB2/x8Jh8zVyVTRpM
-   ZxmGkKFFvUvDntJvyjy/EhSL5akfm+w23VrtL2fChxiTBIXpNlFuVNZMS
-   A==;
-X-CSE-ConnectionGUID: zVwOjIXKRri8HnBOwpJqWQ==
-X-CSE-MsgGUID: 8XG63X9vSWOTCSVAYklqYA==
-X-IronPort-AV: E=Sophos;i="6.16,202,1744070400"; 
-   d="scan'208";a="1244802"
-Received: from ip-10-5-9-48.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.9.48])
-  by internal-pdx-out-002.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Aug 2025 04:16:09 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:6564]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.45.64:2525] with esmtp (Farcaster)
- id 33b31170-08d4-4ec5-90ee-1f3758c28f5d; Sat, 16 Aug 2025 04:16:09 +0000 (UTC)
-X-Farcaster-Flow-ID: 33b31170-08d4-4ec5-90ee-1f3758c28f5d
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Sat, 16 Aug 2025 04:16:09 +0000
-Received: from b0be8375a521.amazon.com (10.37.244.14) by
- EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.17;
- Sat, 16 Aug 2025 04:16:06 +0000
-From: Kohei Enju <enjuk@amazon.com>
-To: <pmenzel@molgen.mpg.de>
-CC: <alexanderduyck@fb.com>, <andrew+netdev@lunn.ch>,
-	<anthony.l.nguyen@intel.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<enjuk@amazon.com>, <intel-wired-lan@lists.osuosl.org>,
-	<kohei.enju@gmail.com>, <kuba@kernel.org>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <przemyslaw.kitszel@intel.com>
-Subject: Re: [Intel-wired-lan] [PATCH v1 iwl-net] igb: fix link test skipping
- when interface is admin down
-Date: Sat, 16 Aug 2025 13:15:28 +0900
-Message-ID: <20250816041557.71794-2-enjuk@amazon.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <01054bc5-74b6-4472-b7b6-78febaaf575f@molgen.mpg.de>
-References: <01054bc5-74b6-4472-b7b6-78febaaf575f@molgen.mpg.de>
+        d=gmail.com; s=20230601; t=1755321986; x=1755926786; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=rfYWh65R6C5URO0NO9DTk8nFnnyazeHWWO/jHTbMAPo=;
+        b=IL3XInNl8wepyuIQaawz7FIQn29IrodX3/X6UVP6R/80pcJcBWBHFV8enB7FwY17j2
+         wdtEtgyjasTMQTOiuVHo5F6rW5edTe7zYHK+FyVoIWXhqJDg7F2teyrcqO55BBfY5IFO
+         RG6FD6bHz8MRcm6DsPfWp47y9pl3qcn+1C6E/4eqIQ0zZ/KD1pXQbrgRsJcoAKBo5wTk
+         RgpIcHvZiU1LXteoVMR5VY4BkwXC2uGVq8SxsmgspfgFaBkgm+pKmZ8ERZENFQ7ALYum
+         m9TVzrGR1iGnvivASN9t9lGNpQQFg9sJgwIY6wZ3i4z1xJGjfoTq48Z4OuNT/sUAnXNS
+         jOpw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755321986; x=1755926786;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rfYWh65R6C5URO0NO9DTk8nFnnyazeHWWO/jHTbMAPo=;
+        b=o14T3HLLvIk2gKNy9uANFGYsfM6aVnm6kOQ76Kl4MxT+qqCHpGVJk5sge6y81GOcPI
+         5zXDExMX0uq3wb+pKVHsPNkNnDwXswO+8Gj8nLczAEhsVCyRNPe9M7OA0tCV0IwIfIBy
+         X/R2wjwn49t0cXHjsjab7oIczoWVjlHoEd8G/vKMBFfiwiQZaj2qxg9nrOQuDRI55nv2
+         mtbPMP/rgNPzidgNsVEoPgFZGxMNvtynw6k0XMCLlOoNIuXtNZPqn5iOLKX5CW2126B3
+         t1b46h3RPCMvx+gGGRBzHtZ3JgUbp9uTUVpx6/pRTeRa06U4XbPnivt7/4J/8mZL7EiU
+         I3Yw==
+X-Forwarded-Encrypted: i=1; AJvYcCVAMn+CfXbimu+QrdSEXrO2zx/5/Igil367hzpOsgzJrbY4qZAvbFBNEulW2Wm4ClirYbQa08W4vk1u@vger.kernel.org, AJvYcCXD3Yd39T8Pcr18snEDwWW5jgHa6mkGZJd6VdvuqriOBanaHvPsZLWjLDGP5tDeQIPPqBNoYyb5j6xk1EwC@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy05APa2MCluLGAQm8hy+x+VXaj4B3hBa4/R3GFCkVaCe4Zb2Oe
+	KgWb2KAUcOgZp8pbmtHIczZkXbazCN1XiA8imbhocdnKvUOTX3AzrtESjvqEsfR1kZBU2g==
+X-Gm-Gg: ASbGnctWlZ3li0HBklAHDB6Kg6eioWfJngo7DKkgGtoXTtssrlYyBlWNVJWwjPC5p8T
+	HtmCIajXeKs/OjKcEJYJWBhHLwN2LANnU0BLfFo6IZZEovi93NUO2VCxWp+0N1dhXXqkGmwR6Ot
+	Q6bSVXgoiaL1vuOAbw6GpFjz7eH2WhPxaYqoJga/meV1SW0bENJAZWheqfMecSSsnsPCPnZBlIx
+	GhK/DeUQmgR1AlzwV6kYL6Gw89pLdWd+6Nm9uGE/AGO6lli+JJfw0XwsobmxvMHYA6ZZA+6pcsv
+	8r4Uy9fgX4O9Pm9irkdvAufXpH4oqHBfoguhp8R+ALHoLhuuhFbQNEeUntBn1FYSwfJcHtsmADz
+	xi8xdGJhTy477Pqwan4Bae0S47DnUiQ==
+X-Google-Smtp-Source: AGHT+IGeDOSO0voCJeRuqzmLYix6G+3EdF64VR5GERchsW16sjMcRRjfTUF7mFkmG9sK9raG14dzBQ==
+X-Received: by 2002:a17:903:b07:b0:23d:fa76:5c3b with SMTP id d9443c01a7336-2446d745130mr71210345ad.22.1755321986160;
+        Fri, 15 Aug 2025 22:26:26 -0700 (PDT)
+Received: from d.home.yangfl.dn42 ([89.208.250.155])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2446ca9d016sm27225805ad.35.2025.08.15.22.26.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Aug 2025 22:26:25 -0700 (PDT)
+From: David Yang <mmyangfl@gmail.com>
+To: netdev@vger.kernel.org
+Cc: David Yang <mmyangfl@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [net-next v3 0/3] net: dsa: yt921x: Add support for Motorcomm YT921x
+Date: Sat, 16 Aug 2025 13:23:18 +0800
+Message-ID: <20250816052323.360788-1-mmyangfl@gmail.com>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D037UWB003.ant.amazon.com (10.13.138.115) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
+Content-Transfer-Encoding: 8bit
 
-On Fri, 15 Aug 2025 09:41:28 +0200, Paul Menzel wrote:=0D
-=0D
->[Correct Alexander=E2=80=99s email address]=0D
-=0D
-Thank you for the correction.=0D
-I'll use the correct address going forward.=0D
-=0D
->=0D
->Am 15.08.25 um 09:38 schrieb Paul Menzel:=0D
->> Dear Kohei,=0D
->> =0D
->> =0D
->> Thank you very much for your patch.=0D
->> =0D
->> Am 15.08.25 um 08:26 schrieb Kohei Enju:=0D
->>> The igb driver incorrectly skips the link test when the network=0D
->>> interface is admin down (if_running =3D=3D false), causing the test to=
-=0D
->>> always report PASS regardless of the actual physical link state.=0D
->>>=0D
->>> This behavior is inconsistent with other drivers (e.g. i40e, ice, ixgbe=
-,=0D
->>> etc.) which correctly test the physical link state regardless of admin=
-=0D
->>> state.=0D
->> =0D
->> I=E2=80=99d collapse the above two sentences into one paragraph and add =
-an empty =0D
->> line here to visually separate the paragraph below.=0D
-=0D
-Yes, that makes sense. I'll do that.=0D
-=0D
->> =0D
->>> Remove the if_running check to ensure link test always reflects the=0D
->>> physical link state.=0D
->> =0D
->> Please add how to verify your change, that means the command to run.=0D
-=0D
-Sure, I tested the change using the ip and ethtool commands, with the=0D
-physical link down. =0D
-Should I include the following test steps in the commit message?=0D
-=0D
-Before:=0D
-  $ sudo ip link set dev enp7s0f0 down=0D
-  =0D
-  $ ip --json link show enp7s0f0 | jq -c ".[].flags"=0D
-  ["BROADCAST","MULTICAST"]=0D
-  =0D
-  $ sudo ethtool --test enp7s0f0 online=0D
-  The test result is PASS=0D
-  The test extra info:=0D
-  Register test  (offline)         0=0D
-  Eeprom test    (offline)         0=0D
-  Interrupt test (offline)         0=0D
-  Loopback test  (offline)         0=0D
-  Link test   (on/offline)         0 # <- Not expected=0D
-=0D
-After:=0D
-  $ sudo ip link set dev enp7s0f0 down=0D
-  =0D
-  $ ip --json link show enp7s0f0 | jq -c ".[].flags"=0D
-  ["BROADCAST","MULTICAST"]=0D
-  =0D
-  $ sudo ethtool --test enp7s0f0 online=0D
-  The test result is FAIL=0D
-  The test extra info:=0D
-  Register test  (offline)         0=0D
-  Eeprom test    (offline)         0=0D
-  Interrupt test (offline)         0=0D
-  Loopback test  (offline)         0=0D
-  Link test   (on/offline)         1 # <- Expected=0D
-=0D
->> =0D
->>> Fixes: 8d420a1b3ea6 ("igb: correct link test not being run when link is=
- down")=0D
->>> Signed-off-by: Kohei Enju <enjuk@amazon.com>=0D
->>> ---=0D
->>>   drivers/net/ethernet/intel/igb/igb_ethtool.c | 5 +----=0D
->>>   1 file changed, 1 insertion(+), 4 deletions(-)=0D
->>>=0D
->>> diff --git a/drivers/net/ethernet/intel/igb/igb_ethtool.c b/drivers/ =0D
->>> net/ethernet/intel/igb/igb_ethtool.c=0D
->>> index ca6ccbc13954..6412c84e2d17 100644=0D
->>> --- a/drivers/net/ethernet/intel/igb/igb_ethtool.c=0D
->>> +++ b/drivers/net/ethernet/intel/igb/igb_ethtool.c=0D
->>> @@ -2081,11 +2081,8 @@ static void igb_diag_test(struct net_device =0D
->>> *netdev,=0D
->>>       } else {=0D
->>>           dev_info(&adapter->pdev->dev, "online testing starting\n");=0D
->>> -        /* PHY is powered down when interface is down */=0D
->>> -        if (if_running && igb_link_test(adapter, &data[TEST_LINK]))=0D
->>> +        if (igb_link_test(adapter, &data[TEST_LINK]))=0D
->>>               eth_test->flags |=3D ETH_TEST_FL_FAILED;=0D
->>> -        else=0D
->>> -            data[TEST_LINK] =3D 0;=0D
->>>           /* Online tests aren't run; pass by default */=0D
->>>           data[TEST_REG] =3D 0;=0D
->> =0D
->> Regardless of my style comments above:=0D
->> =0D
->> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>=0D
->> =0D
->> =0D
->> Kind regards,=0D
->> =0D
->> Paul=0D
-=0D
-Thank you for the review, Paul.=0D
+Motorcomm YT921x is a series of ethernet switches developed by Shanghai
+Motorcomm Electronic Technology, including:
+
+  - YT9215S / YT9215RB / YT9215SC: 5 GbE phys
+  - YT9213NB / YT9214NB: 2 GbE phys
+  - YT9218N / YT9218MB: 8 GbE phys
+
+and up to 2 serdes interfaces.
+
+This patch adds basic support for a working DSA switch.
+
+v2: https://lore.kernel.org/r/20250814065032.3766988-1-mmyangfl@gmail.com
+  - fix words in dt binding
+  - add support for lag and mst
+v1: https://lore.kernel.org/r/20250808173808.273774-1-mmyangfl@gmail.com
+  - fix coding style
+  - add dt binding
+  - add support for fdb, vlan and bridge
+
+David Yang (3):
+  dt-bindings: net: dsa: yt921x: Add Motorcomm YT921x switch support
+  net: dsa: tag_yt921x: add support for Motorcomm YT921x tags
+  net: dsa: yt921x: Add support for Motorcomm YT921x
+
+ .../bindings/net/dsa/motorcomm,yt921x.yaml    |  166 +
+ drivers/net/dsa/Kconfig                       |    7 +
+ drivers/net/dsa/Makefile                      |    1 +
+ drivers/net/dsa/yt921x.c                      | 3960 +++++++++++++++++
+ include/net/dsa.h                             |    2 +
+ net/dsa/Kconfig                               |    6 +
+ net/dsa/Makefile                              |    1 +
+ net/dsa/tag_yt921x.c                          |  126 +
+ 8 files changed, 4269 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/dsa/motorcomm,yt921x.yaml
+ create mode 100644 drivers/net/dsa/yt921x.c
+ create mode 100644 net/dsa/tag_yt921x.c
+
+-- 
+2.47.2
+
 
