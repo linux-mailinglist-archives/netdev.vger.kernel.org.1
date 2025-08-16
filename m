@@ -1,135 +1,105 @@
-Return-Path: <netdev+bounces-214272-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0550B28B4F
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 09:14:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AE240B28B65
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 09:27:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 885C67AA01E
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 07:13:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 273BAB60A69
+	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 07:26:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 168C42222C7;
-	Sat, 16 Aug 2025 07:14:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3257226D0D;
+	Sat, 16 Aug 2025 07:27:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dh0DiUJm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout2.hostsharing.net (mailout2.hostsharing.net [83.223.78.233])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60D6F1FDA92
-	for <netdev@vger.kernel.org>; Sat, 16 Aug 2025 07:14:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.78.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DC05226CFD
+	for <netdev@vger.kernel.org>; Sat, 16 Aug 2025 07:27:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755328493; cv=none; b=DPmv+6+k6eMgVkURN89YspgYrlpmm/Ft77D4gJTRYjdo7pK/Ua4TW1z5gG7S1dymDVL+HTKsOZKGfT9jmi9LDp+HJjNrvkEN0HK7j/6c0mttgnB+QeUQddwSJKycw+xkOnXbIES99HdHVJHsSgnkOaAFtqfwmDxnTE82tG2nOVY=
+	t=1755329265; cv=none; b=Wux0UgE6NGI4hdjZ66RrpmWReOIy8m8GyUWvHEQuoktUWQPRhVj7t9rdzXIBOx4vXzINRedoAbJZEn66UzPUj3HWs+WOq5Qy3AI28cr0bK/w2opxiE4r/vWdpSYEMFCMohpmKmmkLooxK80rTdjzetqub47XwNeL8dUobtFAuSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755328493; c=relaxed/simple;
-	bh=oeQ2OTjlrtVj/v9a3psGJMI/IhXiWsjVQTr6UMcOYzY=;
-	h=Message-ID:In-Reply-To:References:From:Date:Subject:To:Cc; b=V3wkvHnCIWaRuVvTM59964hRG5u8jVN/FzK03XTECOAAPVAFXrIFlT1UXrE8j/XPHOnEr5YvG1/8YwDtZLhNEpLaZxcrlHW5dAb+sO+HGS1UB5/FvgcpY487ucBCDzeLmp9v8YCIogGwNwY5b93kPn0CmdGBnXWeEnL59ODgqTE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=pass smtp.mailfrom=wunner.de; arc=none smtp.client-ip=83.223.78.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wunner.de
-Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
-	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by mailout2.hostsharing.net (Postfix) with UTF8SMTPS id D075C2C25B80;
-	Sat, 16 Aug 2025 09:14:41 +0200 (CEST)
-Received: from localhost (unknown [89.246.108.87])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by h08.hostsharing.net (Postfix) with UTF8SMTPSA id 9D91F600D2F4;
-	Sat, 16 Aug 2025 09:14:41 +0200 (CEST)
-X-Mailbox-Line: From 22e7b32bfe524219eb7ff1e5c6b4d91763b79eef Mon Sep 17 00:00:00 2001
-Message-ID: <22e7b32bfe524219eb7ff1e5c6b4d91763b79eef.1755327132.git.lukas@wunner.de>
-In-Reply-To: <cover.1755327132.git.lukas@wunner.de>
-References: <cover.1755327132.git.lukas@wunner.de>
-From: Lukas Wunner <lukas@wunner.de>
-Date: Sat, 16 Aug 2025 09:10:03 +0200
-Subject: [PATCH 3/3] i40e: Fix enable_cnt imbalance on PCIe error recovery
-To: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+	s=arc-20240116; t=1755329265; c=relaxed/simple;
+	bh=5lgLmDZGzWV60KtO5256JLeMb6iSts3NhD470bV9oQc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dRKnOmpZGZuieD9fNNPa4pz2D4VmqPqHFUe5ZPPW6uDQ8z4qkJGlsZUTed72QFq9FGW3PW3BjI/pUKbc0Unt95W5k/nZvg4pGPOUbZ5nRKlYRpteNTCGnXtLsJNr6NClTehJqnop7c8fv7R7JJntfhVFBhOFZuEQjrWWLpVxotI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dh0DiUJm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF517C4CEF0;
+	Sat, 16 Aug 2025 07:27:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755329265;
+	bh=5lgLmDZGzWV60KtO5256JLeMb6iSts3NhD470bV9oQc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Dh0DiUJmD3B4rk7xQuOebbPfuTCfPIjB7rqh1dA8qYDzAJ2S/m7EJdFXNjkNWJRda
+	 65nQyENzKLV16SUW2eQ9vGrOvTamLSs/K+6dN+dKfdnsPG+YeuTczwW1um3q4Ksb6N
+	 V72hn3dW5LP6HuWz2Gilq89vHCMZ6E8yF2Nf7T/6Gwp4kPVKNQ//5/KjlCHZRY60B6
+	 s6BNm5oBD6rt/jXGAYh4Gbfjgdwg3Ekv/hS8ScwN5+7slDXzFmLrgJNr8pQfrLd10w
+	 gZm0Cx0gAbttYEHS8gTwSlvMuoG58bhXu3iXaYeIGi/l8MXln60sF7KfEoxz406X9A
+	 RfrAilYyFNJJQ==
+Date: Sat, 16 Aug 2025 00:26:39 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: andrea.mayer@uniroma2.it, dlebrun@google.com, netdev@vger.kernel.org,
+	Minhong He <heminhong@kylinos.cn>
+Subject: Re: [PATCH net-next 2/3] ipv6: sr: Use HMAC-SHA1 and HMAC-SHA256
+ library functions
+Message-ID: <20250816072639.GA291962@sol>
+References: <20250816031136.482400-3-ebiggers@kernel.org>
+ <20250816070227.1904762-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250816070227.1904762-1-kuniyu@google.com>
 
-After a PCIe Uncorrectable Error has been reported by an i40e adapter
-and has been recovered through a Secondary Bus Reset, its driver calls
-pci_enable_device() without having called pci_disable_device().
+On Sat, Aug 16, 2025 at 07:01:28AM +0000, Kuniyuki Iwashima wrote:
+> From: Eric Biggers <ebiggers@kernel.org>
+> Date: Fri, 15 Aug 2025 20:11:35 -0700
+> > @@ -106,79 +95,17 @@ static struct sr6_tlv_hmac *seg6_get_tlv_hmac(struct ipv6_sr_hdr *srh)
+> >  		return NULL;
+> >  
+> >  	return tlv;
+> >  }
+> >  
+> > -static struct seg6_hmac_algo *__hmac_get_algo(u8 alg_id)
+> > -{
+> > -	struct seg6_hmac_algo *algo;
+> > -	int i, alg_count;
+> > -
+> > -	alg_count = ARRAY_SIZE(hmac_algos);
+> > -	for (i = 0; i < alg_count; i++) {
+> > -		algo = &hmac_algos[i];
+> > -		if (algo->alg_id == alg_id)
+> > -			return algo;
+> > -	}
+> > -
+> > -	return NULL;
+> > -}
+> 
+> This chunk will cause build failure when net.git is merged
+> to net-next due to the patch below.  You may want to respin
+> the series after this lands to net-next.
+> 
+> https://lore.kernel.org/netdev/20250815063845.85426-1-heminhong@kylinos.cn/
 
-This leads to an imbalance of the enable_cnt tracked by the PCI core:
-Every time error recovery occurs, the enable_cnt keeps growing.  If it
-occurs at least once and the driver is then unbound, the device isn't
-disabled since the enable_cnt hasn't reached zero (and never again will).
+Thanks for pointing that out.  I hadn't seen that patch.  Patch 3 in my
+series actually fixes the exact same problem, though in my patch it's
+more of a side effect of preparing the HMAC key rather than the main
+point of the patch.  If that patch lands first, I'll rebase my series.
 
-The call to pci_enable_device() has almost no effect because the
-enable_cnt was already incremented in i40e_probe() through the call to
-pci_enable_device_mem().  The subsequent pci_enable_device() thus bails
-out after invoking pci_update_current_state().
+We do need to decide whether the algorithm ID validation and key
+preparation should be done in seg6_hmac_info_add() as in that patch, or
+in seg6_genl_sethmac() as in my patch.  seg6_hmac_info_add() is fine I
+guess, but let me know if you have a preference.
 
-Remove pci_enable_device().  In lieu of pci_update_current_state(), set
-the power state to D0 because that's the power state after a Secondary
-Bus Reset (PCIe r7.0 sec 5.3.1.1).
-
-The intended purpose of pci_enable_device() may have been to set the
-Memory Space Enable bit in the Command register again after reset, but
-that is already achieved by the subsequent call to pci_restore_state().
-
-Fixes: 41c445ff0f48 ("i40e: main driver core")
-Signed-off-by: Lukas Wunner <lukas@wunner.de>
-Cc: stable@vger.kernel.org  # v3.12+
----
- drivers/net/ethernet/intel/i40e/i40e_main.c | 29 +++++++--------------
- 1 file changed, 10 insertions(+), 19 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index 9d6d892602fa..7e87234fde67 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -16439,29 +16439,20 @@ static pci_ers_result_t i40e_pci_error_detected(struct pci_dev *pdev,
- static pci_ers_result_t i40e_pci_error_slot_reset(struct pci_dev *pdev)
- {
- 	struct i40e_pf *pf = pci_get_drvdata(pdev);
--	pci_ers_result_t result;
- 	u32 reg;
- 
- 	dev_dbg(&pdev->dev, "%s\n", __func__);
--	/* enable I/O and memory of the device  */
--	if (pci_enable_device(pdev)) {
--		dev_info(&pdev->dev,
--			 "Cannot re-enable PCI device after reset.\n");
--		result = PCI_ERS_RESULT_DISCONNECT;
--	} else {
--		pci_set_master(pdev);
--		pci_restore_state(pdev);
--		pci_save_state(pdev);
--		pci_wake_from_d3(pdev, false);
--
--		reg = rd32(&pf->hw, I40E_GLGEN_RTRIG);
--		if (reg == 0)
--			result = PCI_ERS_RESULT_RECOVERED;
--		else
--			result = PCI_ERS_RESULT_DISCONNECT;
--	}
-+	pdev->current_state = PCI_D0;
-+	pci_set_master(pdev);
-+	pci_restore_state(pdev);
-+	pci_save_state(pdev);
-+	pci_wake_from_d3(pdev, false);
- 
--	return result;
-+	reg = rd32(&pf->hw, I40E_GLGEN_RTRIG);
-+	if (reg == 0)
-+		return PCI_ERS_RESULT_RECOVERED;
-+	else
-+		return PCI_ERS_RESULT_DISCONNECT;
- }
- 
- /**
--- 
-2.47.2
-
+- Eric
 
