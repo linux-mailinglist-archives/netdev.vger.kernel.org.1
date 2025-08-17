@@ -1,95 +1,107 @@
-Return-Path: <netdev+bounces-214383-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 322E4B29399
-	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 16:49:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BB59B29397
+	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 16:49:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B52133B87C8
-	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 14:48:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D39A3AF79B
+	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 14:47:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA6942AD00;
-	Sun, 17 Aug 2025 14:48:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1FAC29CE6;
+	Sun, 17 Aug 2025 14:47:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="LaL3aKri"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="vNZkMSOJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3497F1114;
-	Sun, 17 Aug 2025 14:48:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.2
+Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E19081114;
+	Sun, 17 Aug 2025 14:47:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755442091; cv=none; b=mTak7NgHBATGQEpBj9Qi5pskX2bDlFO25PnL8nVQlEFIf02hWw/1ZhBWrtrQstcIG3WegWNZK7wRqDJohPowv1C84d6YWYXY4yuqxubGbdK1VEAVWOvy1gUr8GHryAXbRopGLo0W1XNP+aUT0J407bv9VxCEj1ELbcxndROV8Us=
+	t=1755442070; cv=none; b=B6nao+nE9NI156++rRHwGWjJCHWNbh+a4e6tHhlX/ikoZbvcYz2fPAb152DeG6O+Lo+BUyK0yBVQ+9CRpWrvzilQSk+YCYDGBBynfSIDZixRADg4M71ZbwHDC3kw/UM6TP9K6tHTbUuCRE06lfGVJjWprDcYSYOxsX7VSh0bIDA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755442091; c=relaxed/simple;
-	bh=QnrFYLFxC489JtiUIGnXfu7Ko851gVF5JuO/DK2Mgh0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=U8B4ppwcSiqH9hZfiVX1Jjb5egqNRS9yaa+CGlhfWdbEps5zEL9DmTHh5GL5Hax3y236K/UPAZsG3+JPuwEeIRAQViBxyPFdvk5XElzmEvkrUD4BWhqVLQnseU+bGa1Pki+JHV9TII9Dgya0k4jhScblTMzRJ5gRR38ZLNg7nz0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=LaL3aKri; arc=none smtp.client-ip=220.197.31.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=HH
-	yS6OUYKPjh1c54sIKQnhRGQUzMfOCmTqIpdFYyv9Q=; b=LaL3aKriSWDpQ075sw
-	CJ87RRTGL0DoSAnMib7XibfFocXAr7BU3hDVyI5lJRBCmdiOpLBt9EZBhnH47L45
-	8IEasAvLyHC/z1MAdj8+VQJDrWzp2aBq/jAFlsZ+jSUmdQ39t/U+v1LeU5NMIX4O
-	zqXmHjDxs3zl6eQMB88A3lDe0=
-Received: from zhaoxin-MS-7E12.. (unknown [])
-	by gzga-smtp-mtada-g1-3 (Coremail) with SMTP id _____wA3nI9t66Folth8Cg--.4857S2;
-	Sun, 17 Aug 2025 22:47:10 +0800 (CST)
-From: Xin Zhao <jackzxcui1989@163.com>
-To: willemdebruijn.kernel@gmail.com,
-	edumazet@google.com,
-	ferenc@fejes.dev
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3] net: af_packet: Use hrtimer to do the retire operation
-Date: Sun, 17 Aug 2025 22:47:09 +0800
-Message-Id: <20250817144709.3599024-1-jackzxcui1989@163.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1755442070; c=relaxed/simple;
+	bh=yXARakI6k03ymGQSbr4dSPhBT/iQlvYnjX8gdJUZ974=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JyUZ8YuFL6YSw+RO3gSwBkOSahIrI4ku8RCS0SiOa1bUC+KRqukc2ONk1+UkQ8loQwTcUmxOmXAnJ6s5xMa6L8PagoeuDUgRXSPp6uMUbOWHm8x8fhwdsmDd4xztFNUPeEoE2FK9YLmz8LHA5bxHsmn2VATlqcJDTNF+1el7N54=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=vNZkMSOJ; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by mx1.secunet.com (Postfix) with ESMTP id D612620606;
+	Sun, 17 Aug 2025 16:47:39 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from mx1.secunet.com ([127.0.0.1])
+ by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id cKvTaERl5Ngu; Sun, 17 Aug 2025 16:47:39 +0200 (CEST)
+Received: from EXCH-01.secunet.de (unknown [10.32.0.231])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.secunet.com (Postfix) with ESMTPS id E4A122050A;
+	Sun, 17 Aug 2025 16:47:38 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com E4A122050A
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1755442058;
+	bh=9ZP7Ld49nJmdiuSlDqBAd2NVgX/RMSwa8yk9QwTGslY=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=vNZkMSOJGKLDsy49gGXtnEW6RPfia9sMRy0aepDBUSGLsMSSxpIRZ3ouetDDnupDy
+	 YGwUovdPAx5a0mq7/Vvo3trWHca0BweV14G3/ZGdtyjVugrLDGO91wJVQVQIHEnpjh
+	 mEOrNjK/2YOBECgHOSXSH+O1eyzyd3owmss9b4lyuDEwMs81AFGTGdjN+lopKNfChL
+	 qG+rP3eXv1SBv3dEFGcqNvm7Im+Bzebb2XBSSVrgrwwKB2pBWyfQm5OU0GKds4BZcQ
+	 qPTg+nMoScqjZ+IyxTZ1zyFFFX9D8XKNPybXjTFC4zwwWMqpwV2CQ2f+tP1q+AGnRs
+	 wfBxGI9H24gPQ==
+Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.1748.10; Sun, 17 Aug
+ 2025 16:47:38 +0200
+Received: (nullmailer pid 2608436 invoked by uid 1000);
+	Sun, 17 Aug 2025 14:47:37 -0000
+Date: Sun, 17 Aug 2025 16:47:37 +0200
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Charalampos Mitrodimas <charmitro@posteo.net>
+CC: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller"
+	<davem@davemloft.net>, David Ahern <dsahern@kernel.org>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<syzbot+01b0667934cdceb4451c@syzkaller.appspotmail.com>
+Subject: Re: [PATCH ipsec-next v3] net: ipv6: fix field-spanning memcpy
+ warning in AH output
+Message-ID: <aKHriXFxwGlTHwnq@secunet.com>
+References: <20250812-ah6-buffer-overflow-v3-1-446d4340c86f@posteo.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wA3nI9t66Folth8Cg--.4857S2
-X-Coremail-Antispam: 1Uf129KBjvdXoW7XF17Ww1xKFyUGFWxurWruFg_yoWfAFg_C3
-	4qvF1xGwn8JayrKa1akFs8Xryagw4qkay5G3yrt3sFg3s8XFW7Grs3WryfCFyxCa17Kr9x
-	GF4DJ3y7AwnrWjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IUbyEEUUUUUU==
-X-CM-SenderInfo: pmdfy650fxxiqzyzqiywtou0bp/1tbibg+sCmih3ircJQAAsD
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20250812-ah6-buffer-overflow-v3-1-446d4340c86f@posteo.net>
+X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
+ EXCH-01.secunet.de (10.32.0.171)
 
-On Sun, 2025-08-17 at 21:28 +0800, Willem wrote:
-
-> Here we cannot use hrtimer_add_expires for the same reason you gave in
-> the second version of the patch:
+On Tue, Aug 12, 2025 at 03:51:25PM +0000, Charalampos Mitrodimas wrote:
+> Fix field-spanning memcpy warnings in ah6_output() and
+> ah6_output_done() where extension headers are copied to/from IPv6
+> address fields, triggering fortify-string warnings about writes beyond
+> the 16-byte address fields.
 > 
-> > Additionally, I think we cannot avoid using ktime_get, as the retire
-> > timeout for each block is not fixed. When there are a lot of network packets,
-> > a block can retire quickly, and if we do not re-fetch the time, the timeout
-> > duration may be set incorrectly.
+>   memcpy: detected field-spanning write (size 40) of single field "&top_iph->saddr" at net/ipv6/ah6.c:439 (size 16)
+>   WARNING: CPU: 0 PID: 8838 at net/ipv6/ah6.c:439 ah6_output+0xe7e/0x14e0 net/ipv6/ah6.c:439
 > 
-> Is that right?
+> The warnings are false positives as the extension headers are
+> intentionally placed after the IPv6 header in memory. Fix by properly
+> copying addresses and extension headers separately, and introduce
+> helper functions to avoid code duplication.
 > 
-> Otherwise patch LGTM.
+> Reported-by: syzbot+01b0667934cdceb4451c@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=01b0667934cdceb4451c
+> Signed-off-by: Charalampos Mitrodimas <charmitro@posteo.net>
 
-
-I'll think about whether there's a better way to implement the logic.
-
-Additionally, regarding the previous email where you mentioned replacing retire_blk_tov
-with the interval_ktime field, do we still need to make that change?
-I noticed you didn't respond to my latest patch that replaces retire_blk_tov with
-interval_ktime, and I'm wondering if we should make that change.
-So we remain the retire_blk_tov field?
-
-
-Thanks
-Xin Zhao
-
+Applied, thanks a lot!
 
