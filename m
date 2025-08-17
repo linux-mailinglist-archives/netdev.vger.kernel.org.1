@@ -1,473 +1,165 @@
-Return-Path: <netdev+bounces-214380-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214381-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A9A9B29382
-	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 16:32:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25FC7B2938F
+	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 16:42:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 32E131B26A24
-	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 14:32:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EEAC53B1BBA
+	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 14:42:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C97AA2E6131;
-	Sun, 17 Aug 2025 14:31:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 918BF2F9C34;
+	Sun, 17 Aug 2025 14:42:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BTr/44sk"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B987029ACE8;
-	Sun, 17 Aug 2025 14:31:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3A412F9C27;
+	Sun, 17 Aug 2025 14:42:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755441111; cv=none; b=I2UE1G8/dHcm3c29vvo960kNsbytWdf0OMAl6c/S7VBcCwSj+Up5UlQDcoCsNxSa2ZBjoTHFI3KxG7Wc0W/aY5mJ72/7KYWprgVfNSI1nEIXyUP9LyGQUq24IcC7sXBIISJMKNhBsWX0Zn/gKIxCvKh54zu/Eq1AwulGsOMKrF4=
+	t=1755441730; cv=none; b=Hx1aid4lRoaQVwPzKehC8wayM/oM9GOYPTGJt+Rf5r1RGn6u5HDW4QSWwCyuHfaFd+Mfr6hOr8GqnfXK4KAkMu74Ka/fqktoHefcfClRO+9cfPP/JnXkdpppx/IwCBgH+UurItA1GiSe8I2RekF3NsD88N8g1kGFu/EPEmliyQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755441111; c=relaxed/simple;
-	bh=D7MWsOGhXy+J+ksnYzluL7+4XhCdBph1E8/pqw3eyGY=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=p9iSqVID9vTSdl2wM0RRSPu2lwTE0vQjOz3QGHKvOqbXecXK4foUpKY85qperf7OzGPRmMO5S5qO2aN+CtFI56W0ZHxnFQTkMtfX2NYbVfePTvotoo1NnUZ8Ebpf1XszdIKNDjN1kO36aw4gsAFMCGZ03zDejwIRmvYSzzG9rV4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1uneQD-0000000010z-3jmF;
-	Sun, 17 Aug 2025 14:31:45 +0000
-Date: Sun, 17 Aug 2025 15:31:43 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Xu Liang <lxu@maxlinear.com>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2 3/3] net: phy: mxl-86110: add basic support for
- MxL86111 PHY
-Message-ID: <aKHnz1e3nBxWvgFd@pidgin.makrotopia.org>
+	s=arc-20240116; t=1755441730; c=relaxed/simple;
+	bh=VCAAoYXrZeEeZvYFDo8gpSf5FRlsHN77VicwqCg7lnk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fC4Ccl3MtMWp4HtMhnVMLk6YeWivlEV+jlc4XzpW5YJ6gBS/ADl7G3xp9e/06nkhtsXEQQSQ49VFk4mGqdHlyJ4MEBBBi0Z33BX/o8B+RZ2MgMyZhjjl+RJJPw3iy5HyHu63CDj/Wu3zYfZPtufPcAtj9dyLCHZlQ029fdgrC5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BTr/44sk; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3b9dc5c2f0eso2314486f8f.1;
+        Sun, 17 Aug 2025 07:42:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755441727; x=1756046527; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JCK0McWcOTuTtwFlnRSx3Lqz/jXdIqFs+uzK4OV710Y=;
+        b=BTr/44skjPhAdxbal7NahWzkVbEdpaUbOUWJ3nUwro/PceJUEoDatGH33kJZJ9najw
+         1JwCcToQdjFPN2RMPrOBxkI3Fb8WhZDjCPhSIWOoCYfBdZXRtOzPpycHPJUyY7PLfIxF
+         7Vz/ht7mMzHCmKQHC6ryqTLJWpqbjo3Kor3UR5iD0VRQYJTFxgHP0tp56WdyO1K7kAZi
+         tBHeYUya2iSuUX7Qx+rsgK2fLfOcW+ZpD+owkMRX4RpttdGsOEO2TNGmZMJou7iRAzQB
+         oNH9l0HAtUe7/7cYXnws003ymvJLK6gZwW0RRq0+vXSuIs4YPdLc/GPuuCKy74OCAJJt
+         GMeQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755441727; x=1756046527;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JCK0McWcOTuTtwFlnRSx3Lqz/jXdIqFs+uzK4OV710Y=;
+        b=bfpNgkScJJ58I5k63HRSjj1rwpvhV2zVTbs3FwPsaeywSYRZR/A3EIPlQEqnnVKi+K
+         ne/YFAMnnCb2LNvCXbUbhhhvqyIfHJFM8sli1/JAskrmexYWCff8QKoRpDYGcyUoA0c/
+         pdzqYk8Q9VMEGg8MXwheWVmWkomR9OwCYxziPQ1Y8CiJqYlMRbcpVzKG6/jGxBk7d/cR
+         Y2wEkAUac+qUcoQJXnS77OyW5bkTJ7b57An7uq7zouAJW95knxkEG3NyXk21AmzrgWsW
+         2DXCmZWzJ0UT66E0tRHZptBXg7dAZMd+3F3umIdhH9ln1TZpBye9scmq8S+y/FJqNfXR
+         z+Ag==
+X-Forwarded-Encrypted: i=1; AJvYcCVeEEL0gZybcwWqSWiTlZFF9evqm8jnTSYblDwh4ybjTqxMwdClV/g/WZwdZXbb40D24teri02S@vger.kernel.org, AJvYcCXtd9yfTG80Z1FVQ4jOKMUhOXqbVCqcglub4+gYcoNO5HZ5swixVBktayJMgv6TULoqnFeSdH/C6XB6LHI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxE7SRJomPEFyRZQMK++AzuSaMMduaDpCtiWNuXIOsdEcCCeqDu
+	isN0NkmYvknYC2LWy7vs3wLEf3KTVRwr8YQCZRsAeMrMq5a+46U7HPfV
+X-Gm-Gg: ASbGncv4jXzbxoUiToO89aaIB/1iWU/HfsWOp4xdeYVog1aNVisOH24a43JQ2JViZOP
+	Zdf5wIRUda054fhwzcSEzQrDMOfqk6CfVeypoedR8vhBHjYfpwcTU0KWbPKb7GApGFGMDKNuqS+
+	uTQgypG7aZjX19xoQH5FWjRC6QfYAmnLUC9cBOslpdrsq3D0R+4WYfsRQaLh81t+pcpjrWLRfC7
+	gA62QrAF3mLPY9zQvZgSK+4WcYuP823qxWAM7rbZ2k5hj0ExpFLn/zwQwqca9ss50yveKj49rA4
+	F34RHZ497BVluH0jHtV3NrP9jL+ybgKxzqbUa1VRq2nTIaBIQtw+wSGv+3AAceV5dmr4HJRIhuB
+	amPERpZFQzPZ8yke9xoYwhRdlC9Ip3YO0q5rvfx9U5airHSqNqWWG9BGAZ5Xg
+X-Google-Smtp-Source: AGHT+IFlIuH2NAhG3N61PeoqIDbW0IWOe4t4kn17RiKQqs35q6xh7BpQ/VMASePWLc6529FKkvONyg==
+X-Received: by 2002:a5d:5d11:0:b0:3b8:fa8c:f1ac with SMTP id ffacd0b85a97d-3bc68b89fb3mr4773670f8f.24.1755441726833;
+        Sun, 17 Aug 2025 07:42:06 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45a22328b5fsm93743445e9.20.2025.08.17.07.42.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 17 Aug 2025 07:42:06 -0700 (PDT)
+Date: Sun, 17 Aug 2025 15:42:05 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: Xichao Zhao <zhao.xichao@vivo.com>
+Cc: ecree.xilinx@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-net-drivers@amd.com,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] sfc: replace min/max nesting with clamp()
+Message-ID: <20250817154205.6044124e@pumpkin>
+In-Reply-To: <20250812065026.620115-1-zhao.xichao@vivo.com>
+References: <20250812065026.620115-1-zhao.xichao@vivo.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Add basic support for the MxL86111 PHY which in addition to the features
-of the MxL86110 also comes with an SGMII interface.
-Setup the interface mode and take care of in-band-an.
+On Tue, 12 Aug 2025 14:50:26 +0800
+Xichao Zhao <zhao.xichao@vivo.com> wrote:
 
-Currently only RGMII-to-UTP and SGMII-to-UTP modes are supported while the
-PHY would also support RGMII-to-1000Base-X, including automatic selection
-of the Fiber or UTP link depending on the presence of a link partner.
+> The clamp() macro explicitly expresses the intent of constraining
+> a value within bounds.Therefore, replacing min(max(a, b), c) with
+> clamp(val, lo, hi) can improve code readability.
 
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
----
-v2:
- - move fixing indentation to separate patch
- - acutally use reg_page variable
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202508161615.Zd1agg0S-lkp@intel.com/
+I think you can do a better job of the line wraps?
+The first and third won't exceed 80 cols split onto two lines.
+They might be 86 on one line - plausibly ok (but I like 80 and they are splittable).
 
- drivers/net/phy/mxl-86110.c | 321 ++++++++++++++++++++++++++++++++++--
- 1 file changed, 309 insertions(+), 12 deletions(-)
+	David
 
-diff --git a/drivers/net/phy/mxl-86110.c b/drivers/net/phy/mxl-86110.c
-index 47e2fe81842d..6007a26e8303 100644
---- a/drivers/net/phy/mxl-86110.c
-+++ b/drivers/net/phy/mxl-86110.c
-@@ -15,6 +15,7 @@
- 
- /* PHY ID */
- #define PHY_ID_MXL86110		0xc1335580
-+#define PHY_ID_MXL86111		0xc1335588
- 
- /* required to access extended registers */
- #define MXL86110_EXTD_REG_ADDR_OFFSET			0x1E
-@@ -22,7 +23,15 @@
- #define PHY_IRQ_ENABLE_REG				0x12
- #define PHY_IRQ_ENABLE_REG_WOL				BIT(6)
- 
--/* SyncE Configuration Register - COM_EXT SYNCE_CFG */
-+/* different pages for EXTD access for MXL86111 */
-+/* SerDes/PHY Control Access Register - COM_EXT_SMI_SDS_PHY */
-+#define MXL86111_EXT_SMI_SDS_PHY_REG			0xA000
-+#define MXL86111_EXT_SMI_SDS_PHYSPACE_MASK		BIT(1)
-+#define MXL86111_EXT_SMI_SDS_PHYFIBER_SPACE		(0x1 << 1)
-+#define MXL86111_EXT_SMI_SDS_PHYUTP_SPACE		(0x0 << 1)
-+#define MXL86111_EXT_SMI_SDS_PHY_AUTO			0xff
-+
-+/* SyncE Configuration Register - COM_EXT_SYNCE_CFG */
- #define MXL86110_EXT_SYNCE_CFG_REG			0xA012
- #define MXL86110_EXT_SYNCE_CFG_CLK_FRE_SEL		BIT(4)
- #define MXL86110_EXT_SYNCE_CFG_EN_SYNC_E_DURING_LNKDN	BIT(5)
-@@ -117,9 +126,67 @@
- 
- /* Chip Configuration Register - COM_EXT_CHIP_CFG */
- #define MXL86110_EXT_CHIP_CFG_REG			0xA001
-+#define MXL86111_EXT_CHIP_CFG_MODE_SEL_MASK		GENMASK(2, 0)
-+#define MXL86111_EXT_CHIP_CFG_MODE_UTP_TO_RGMII		0
-+#define MXL86111_EXT_CHIP_CFG_MODE_FIBER_TO_RGMII	1
-+#define MXL86111_EXT_CHIP_CFG_MODE_UTP_FIBER_TO_RGMII	2
-+#define MXL86111_EXT_CHIP_CFG_MODE_UTP_TO_SGMII		3
-+#define MXL86111_EXT_CHIP_CFG_MODE_SGPHY_TO_RGMAC	4
-+#define MXL86111_EXT_CHIP_CFG_MODE_SGMAC_TO_RGPHY	5
-+#define MXL86111_EXT_CHIP_CFG_MODE_UTP_TO_FIBER_AUTO	6
-+#define MXL86111_EXT_CHIP_CFG_MODE_UTP_TO_FIBER_FORCE	7
-+
-+#define MXL86111_EXT_CHIP_CFG_CLDO_MASK			GENMASK(5, 4)
-+#define MXL86111_EXT_CHIP_CFG_CLDO_3V3			0
-+#define MXL86111_EXT_CHIP_CFG_CLDO_2V5			1
-+#define MXL86111_EXT_CHIP_CFG_CLDO_1V8_2		2
-+#define MXL86111_EXT_CHIP_CFG_CLDO_1V8_3		3
-+#define MXL86111_EXT_CHIP_CFG_CLDO_SHIFT		4
-+#define MXL86111_EXT_CHIP_CFG_ELDO			BIT(6)
- #define MXL86110_EXT_CHIP_CFG_RXDLY_ENABLE		BIT(8)
- #define MXL86110_EXT_CHIP_CFG_SW_RST_N_MODE		BIT(15)
- 
-+/* Specific Status Register - PHY_STAT */
-+#define MXL86111_PHY_STAT_REG				0x11
-+#define MXL86111_PHY_STAT_SPEED_MASK			GENMASK(15, 14)
-+#define MXL86111_PHY_STAT_SPEED_OFFSET			14
-+#define MXL86111_PHY_STAT_SPEED_10M			0x0
-+#define MXL86111_PHY_STAT_SPEED_100M			0x1
-+#define MXL86111_PHY_STAT_SPEED_1000M			0x2
-+#define MXL86111_PHY_STAT_DPX_OFFSET			13
-+#define MXL86111_PHY_STAT_DPX				BIT(13)
-+#define MXL86111_PHY_STAT_LSRT				BIT(10)
-+
-+/* 3 phy reg page modes,auto mode combines utp and fiber mode*/
-+#define MXL86111_MODE_FIBER				0x1
-+#define MXL86111_MODE_UTP				0x2
-+#define MXL86111_MODE_AUTO				0x3
-+
-+/* FIBER Auto-Negotiation link partner ability - SDS_AN_LPA */
-+#define MXL86111_SDS_AN_LPA_PAUSE			(0x3 << 7)
-+#define MXL86111_SDS_AN_LPA_ASYM_PAUSE			(0x2 << 7)
-+
-+/* Miscellaneous Control Register - COM_EXT _MISC_CFG */
-+#define MXL86111_EXT_MISC_CONFIG_REG			0xa006
-+#define MXL86111_EXT_MISC_CONFIG_FIB_SPEED_SEL		BIT(0)
-+#define MXL86111_EXT_MISC_CONFIG_FIB_SPEED_SEL_1000BX	(0x1 << 0)
-+#define MXL86111_EXT_MISC_CONFIG_FIB_SPEED_SEL_100BX	(0x0 << 0)
-+
-+/* Phy fiber Link timer cfg2 Register - EXT_SDS_LINK_TIMER_CFG2 */
-+#define MXL86111_EXT_SDS_LINK_TIMER_CFG2_REG		0xA5
-+#define MXL86111_EXT_SDS_LINK_TIMER_CFG2_EN_AUTOSEN	BIT(15)
-+
-+/* default values of PHY register, required for Dual Media mode */
-+#define MII_BMSR_DEFAULT_VAL		0x7949
-+#define MII_ESTATUS_DEFAULT_VAL		0x2000
-+
-+/* Timeout in ms for PHY SW reset check in STD_CTRL/SDS_CTRL */
-+#define BMCR_RESET_TIMEOUT		500
-+
-+/* PL P1 requires optimized RGMII timing for 1.8V RGMII voltage
-+ */
-+#define MXL86111_PL_P1				0x500
-+
- /**
-  * __mxl86110_write_extended_reg() - write to a PHY's extended register
-  * @phydev: pointer to the PHY device structure
-@@ -586,22 +653,15 @@ static int mxl86110_enable_led_activity_blink(struct phy_device *phydev)
- }
- 
- /**
-- * mxl86110_config_init() - initialize the PHY
-+ * mxl86110_config_rgmii_delay() - configure RGMII delays
-  * @phydev: pointer to the phy_device
-  *
-  * Return: 0 or negative errno code
-  */
--static int mxl86110_config_init(struct phy_device *phydev)
-+static int mxl86110_config_rgmii_delay(struct phy_device *phydev)
- {
--	u16 val = 0;
- 	int ret;
--
--	phy_lock_mdio_bus(phydev);
--
--	/* configure syncE / clk output */
--	ret = mxl86110_synce_clk_cfg(phydev);
--	if (ret < 0)
--		goto out;
-+	u16 val;
- 
- 	switch (phydev->interface) {
- 	case PHY_INTERFACE_MODE_RGMII:
-@@ -643,6 +703,31 @@ static int mxl86110_config_init(struct phy_device *phydev)
- 	if (ret < 0)
- 		goto out;
- 
-+out:
-+	return ret;
-+}
-+
-+/**
-+ * mxl86110_config_init() - initialize the MXL86110 PHY
-+ * @phydev: pointer to the phy_device
-+ *
-+ * Return: 0 or negative errno code
-+ */
-+static int mxl86110_config_init(struct phy_device *phydev)
-+{
-+	int ret;
-+
-+	phy_lock_mdio_bus(phydev);
-+
-+	/* configure syncE / clk output */
-+	ret = mxl86110_synce_clk_cfg(phydev);
-+	if (ret < 0)
-+		goto out;
-+
-+	ret = mxl86110_config_rgmii_delay(phydev);
-+	if (ret < 0)
-+		goto out;
-+
- 	ret = mxl86110_enable_led_activity_blink(phydev);
- 	if (ret < 0)
- 		goto out;
-@@ -654,6 +739,201 @@ static int mxl86110_config_init(struct phy_device *phydev)
- 	return ret;
- }
- 
-+/**
-+ * mxl86111_probe() - validate bootstrap chip config and set UTP page
-+ * @phydev: pointer to the phy_device
-+ *
-+ * returns 0 or negative errno code
-+ */
-+static int mxl86111_probe(struct phy_device *phydev)
-+{
-+	int chip_config;
-+	u16 reg_page;
-+	int ret;
-+
-+	chip_config = mxl86110_read_extended_reg(phydev, MXL86110_EXT_CHIP_CFG_REG);
-+	if (chip_config < 0)
-+		return chip_config;
-+
-+	switch (chip_config & MXL86111_EXT_CHIP_CFG_MODE_SEL_MASK) {
-+	case MXL86111_EXT_CHIP_CFG_MODE_UTP_TO_SGMII:
-+	case MXL86111_EXT_CHIP_CFG_MODE_UTP_TO_RGMII:
-+		phydev->port = PORT_TP;
-+		reg_page = MXL86111_EXT_SMI_SDS_PHYUTP_SPACE;
-+		break;
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+
-+	ret = mxl86110_write_extended_reg(phydev,
-+					  MXL86111_EXT_SMI_SDS_PHY_REG,
-+					  reg_page);
-+	if (ret < 0)
-+		return ret;
-+
-+	return 0;
-+}
-+
-+/**
-+ * mxl86111_config_init() - initialize the MXL86111 PHY
-+ * @phydev: pointer to the phy_device
-+ *
-+ * returns 0 or negative errno code
-+ */
-+static int mxl86111_config_init(struct phy_device *phydev)
-+{
-+	int ret;
-+
-+	phy_lock_mdio_bus(phydev);
-+
-+	/* configure syncE / clk output */
-+	ret = mxl86110_synce_clk_cfg(phydev);
-+	if (ret < 0)
-+		goto out;
-+
-+	switch (phydev->interface) {
-+	case PHY_INTERFACE_MODE_100BASEX:
-+		ret = __mxl86110_modify_extended_reg(phydev,
-+						     MXL86111_EXT_MISC_CONFIG_REG,
-+						     MXL86111_EXT_MISC_CONFIG_FIB_SPEED_SEL,
-+						     MXL86111_EXT_MISC_CONFIG_FIB_SPEED_SEL_100BX);
-+		if (ret < 0)
-+			goto out;
-+		break;
-+	case PHY_INTERFACE_MODE_1000BASEX:
-+	case PHY_INTERFACE_MODE_SGMII:
-+		ret = __mxl86110_modify_extended_reg(phydev,
-+						     MXL86111_EXT_MISC_CONFIG_REG,
-+						     MXL86111_EXT_MISC_CONFIG_FIB_SPEED_SEL,
-+						     MXL86111_EXT_MISC_CONFIG_FIB_SPEED_SEL_1000BX);
-+		if (ret < 0)
-+			goto out;
-+		break;
-+	default:
-+		/* RGMII modes */
-+		ret = mxl86110_config_rgmii_delay(phydev);
-+		if (ret < 0)
-+			goto out;
-+		ret = __mxl86110_modify_extended_reg(phydev, MXL86110_EXT_RGMII_CFG1_REG,
-+						     MXL86110_EXT_RGMII_CFG1_FULL_MASK, ret);
-+
-+		/* PL P1 requires optimized RGMII timing for 1.8V RGMII voltage
-+		 */
-+		ret = __mxl86110_read_extended_reg(phydev, 0xf);
-+		if (ret < 0)
-+			goto out;
-+
-+		if (ret == MXL86111_PL_P1) {
-+			ret = __mxl86110_read_extended_reg(phydev, MXL86110_EXT_CHIP_CFG_REG);
-+			if (ret < 0)
-+				goto out;
-+
-+			/* check if LDO is in 1.8V mode */
-+			switch (FIELD_GET(MXL86111_EXT_CHIP_CFG_CLDO_MASK, ret)) {
-+			case MXL86111_EXT_CHIP_CFG_CLDO_1V8_3:
-+			case MXL86111_EXT_CHIP_CFG_CLDO_1V8_2:
-+				ret = __mxl86110_write_extended_reg(phydev, 0xa010, 0xabff);
-+				if (ret < 0)
-+					goto out;
-+				break;
-+			default:
-+				break;
-+			}
-+		}
-+		break;
-+	}
-+
-+	ret = mxl86110_enable_led_activity_blink(phydev);
-+	if (ret < 0)
-+		goto out;
-+
-+	ret = mxl86110_broadcast_cfg(phydev);
-+out:
-+	phy_unlock_mdio_bus(phydev);
-+
-+	return ret;
-+}
-+
-+/**
-+ * mxl86111_read_page() - read reg page
-+ * @phydev: pointer to the phy_device
-+ *
-+ * returns current reg space of mxl86111 or negative errno code
-+ */
-+static int mxl86111_read_page(struct phy_device *phydev)
-+{
-+	int page;
-+
-+	page = __mxl86110_read_extended_reg(phydev, MXL86111_EXT_SMI_SDS_PHY_REG);
-+	if (page < 0)
-+		return page;
-+
-+	return page & MXL86111_EXT_SMI_SDS_PHYSPACE_MASK;
-+};
-+
-+/**
-+ * mxl86111_write_page() - Set reg page
-+ * @phydev: pointer to the phy_device
-+ * @page: The reg page to set
-+ *
-+ * returns 0 or negative errno code
-+ */
-+static int mxl86111_write_page(struct phy_device *phydev, int page)
-+{
-+	return __mxl86110_modify_extended_reg(phydev, MXL86111_EXT_SMI_SDS_PHY_REG,
-+					      MXL86111_EXT_SMI_SDS_PHYSPACE_MASK, page);
-+};
-+
-+static int mxl86111_config_inband(struct phy_device *phydev, unsigned int modes)
-+{
-+	int ret;
-+
-+	ret = phy_modify_paged(phydev, MXL86111_EXT_SMI_SDS_PHYFIBER_SPACE,
-+			       MII_BMCR, BMCR_ANENABLE,
-+			       (modes == LINK_INBAND_DISABLE) ? 0 : BMCR_ANENABLE);
-+	if (ret < 0)
-+		goto out;
-+
-+	phy_lock_mdio_bus(phydev);
-+
-+	ret = __mxl86110_modify_extended_reg(phydev, MXL86111_EXT_SDS_LINK_TIMER_CFG2_REG,
-+					     MXL86111_EXT_SDS_LINK_TIMER_CFG2_EN_AUTOSEN,
-+					     (modes == LINK_INBAND_DISABLE) ? 0 :
-+					     MXL86111_EXT_SDS_LINK_TIMER_CFG2_EN_AUTOSEN);
-+	if (ret < 0)
-+		goto out;
-+
-+	ret = __mxl86110_modify_extended_reg(phydev, MXL86110_EXT_CHIP_CFG_REG,
-+					     MXL86110_EXT_CHIP_CFG_SW_RST_N_MODE, 0);
-+	if (ret < 0)
-+		goto out;
-+
-+	/* For fiber forced mode, power down/up to re-aneg */
-+	if (modes != LINK_INBAND_DISABLE) {
-+		__phy_modify(phydev, MII_BMCR, 0, BMCR_PDOWN);
-+		usleep_range(1000, 1050);
-+		__phy_modify(phydev, MII_BMCR, BMCR_PDOWN, 0);
-+	}
-+
-+out:
-+	phy_unlock_mdio_bus(phydev);
-+
-+	return ret;
-+}
-+
-+static unsigned int mxl86111_inband_caps(struct phy_device *phydev,
-+					 phy_interface_t interface)
-+{
-+	switch (interface) {
-+	case PHY_INTERFACE_MODE_100BASEX:
-+	case PHY_INTERFACE_MODE_1000BASEX:
-+	case PHY_INTERFACE_MODE_SGMII:
-+		return LINK_INBAND_DISABLE | LINK_INBAND_ENABLE;
-+	default:
-+		return 0;
-+	}
-+}
-+
- static struct phy_driver mxl_phy_drvs[] = {
- 	{
- 		PHY_ID_MATCH_EXACT(PHY_ID_MXL86110),
-@@ -666,17 +946,34 @@ static struct phy_driver mxl_phy_drvs[] = {
- 		.led_hw_control_get	= mxl86110_led_hw_control_get,
- 		.led_hw_control_set	= mxl86110_led_hw_control_set,
- 	},
-+	{
-+		PHY_ID_MATCH_EXACT(PHY_ID_MXL86111),
-+		.name			= "MXL86111 Gigabit Ethernet",
-+		.probe			= mxl86111_probe,
-+		.config_init		= mxl86111_config_init,
-+		.get_wol		= mxl86110_get_wol,
-+		.set_wol		= mxl86110_set_wol,
-+		.inband_caps		= mxl86111_inband_caps,
-+		.config_inband		= mxl86111_config_inband,
-+		.read_page		= mxl86111_read_page,
-+		.write_page		= mxl86111_write_page,
-+		.led_brightness_set	= mxl86110_led_brightness_set,
-+		.led_hw_is_supported	= mxl86110_led_hw_is_supported,
-+		.led_hw_control_get	= mxl86110_led_hw_control_get,
-+		.led_hw_control_set	= mxl86110_led_hw_control_set,
-+	},
- };
- 
- module_phy_driver(mxl_phy_drvs);
- 
- static const struct mdio_device_id __maybe_unused mxl_tbl[] = {
- 	{ PHY_ID_MATCH_EXACT(PHY_ID_MXL86110) },
-+	{ PHY_ID_MATCH_EXACT(PHY_ID_MXL86111) },
- 	{  }
- };
- 
- MODULE_DEVICE_TABLE(mdio, mxl_tbl);
- 
--MODULE_DESCRIPTION("MaxLinear MXL86110 PHY driver");
-+MODULE_DESCRIPTION("MaxLinear MXL86110/MXL86111 PHY driver");
- MODULE_AUTHOR("Stefano Radaelli");
- MODULE_LICENSE("GPL");
--- 
-2.50.1
+> 
+> Signed-off-by: Xichao Zhao <zhao.xichao@vivo.com>
+> ---
+>  drivers/net/ethernet/sfc/efx_channels.c       | 4 ++--
+>  drivers/net/ethernet/sfc/falcon/efx.c         | 5 ++---
+>  drivers/net/ethernet/sfc/siena/efx_channels.c | 4 ++--
+>  3 files changed, 6 insertions(+), 7 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/sfc/efx_channels.c b/drivers/net/ethernet/sfc/efx_channels.c
+> index 06b4f52713ef..0f66324ed351 100644
+> --- a/drivers/net/ethernet/sfc/efx_channels.c
+> +++ b/drivers/net/ethernet/sfc/efx_channels.c
+> @@ -216,8 +216,8 @@ static int efx_allocate_msix_channels(struct efx_nic *efx,
+>  
+>  	if (efx_separate_tx_channels) {
+>  		efx->n_tx_channels =
+> -			min(max(n_channels / 2, 1U),
+> -			    efx->max_tx_channels);
+> +			clamp(n_channels / 2, 1U,
+> +			      efx->max_tx_channels);
+>  		efx->tx_channel_offset =
+>  			n_channels - efx->n_tx_channels;
+>  		efx->n_rx_channels =
+> diff --git a/drivers/net/ethernet/sfc/falcon/efx.c b/drivers/net/ethernet/sfc/falcon/efx.c
+> index b07f7e4e2877..d19fbf8732ff 100644
+> --- a/drivers/net/ethernet/sfc/falcon/efx.c
+> +++ b/drivers/net/ethernet/sfc/falcon/efx.c
+> @@ -1394,9 +1394,8 @@ static int ef4_probe_interrupts(struct ef4_nic *efx)
+>  			if (n_channels > extra_channels)
+>  				n_channels -= extra_channels;
+>  			if (ef4_separate_tx_channels) {
+> -				efx->n_tx_channels = min(max(n_channels / 2,
+> -							     1U),
+> -							 efx->max_tx_channels);
+> +				efx->n_tx_channels = clamp(n_channels / 2, 1U,
+> +							   efx->max_tx_channels);
+>  				efx->n_rx_channels = max(n_channels -
+>  							 efx->n_tx_channels,
+>  							 1U);
+> diff --git a/drivers/net/ethernet/sfc/siena/efx_channels.c b/drivers/net/ethernet/sfc/siena/efx_channels.c
+> index d120b3c83ac0..703419866d18 100644
+> --- a/drivers/net/ethernet/sfc/siena/efx_channels.c
+> +++ b/drivers/net/ethernet/sfc/siena/efx_channels.c
+> @@ -217,8 +217,8 @@ static int efx_allocate_msix_channels(struct efx_nic *efx,
+>  
+>  	if (efx_siena_separate_tx_channels) {
+>  		efx->n_tx_channels =
+> -			min(max(n_channels / 2, 1U),
+> -			    efx->max_tx_channels);
+> +			clamp(n_channels / 2, 1U,
+> +			      efx->max_tx_channels);
+>  		efx->tx_channel_offset =
+>  			n_channels - efx->n_tx_channels;
+>  		efx->n_rx_channels =
+
 
