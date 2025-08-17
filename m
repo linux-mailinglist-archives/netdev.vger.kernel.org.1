@@ -1,133 +1,146 @@
-Return-Path: <netdev+bounces-214403-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214404-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 196F3B29433
-	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 18:38:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65AA9B2944B
+	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 18:52:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 147E62003E5
-	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 16:38:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C53BD1B24885
+	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 16:53:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FD052FF15E;
-	Sun, 17 Aug 2025 16:38:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N7ishbzr"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92D5C2FF15E;
+	Sun, 17 Aug 2025 16:52:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-io1-f79.google.com (mail-io1-f79.google.com [209.85.166.79])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01AC2285075;
-	Sun, 17 Aug 2025 16:38:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6799221FC4
+	for <netdev@vger.kernel.org>; Sun, 17 Aug 2025 16:52:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.79
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755448724; cv=none; b=TSacDFe2Ku90QWwwJt2ITqLTR0fmkDIqH3M19Tv73HWr7Rh0qSMilSuoQOZA32FWlwZt0IKe+A6qWrsRbl4qbr64sY6xhFXjkpFRF+cSag69yK7gUIF4QqijezJDUWTU79DZdHHSu796UuBLvZWv4kDZr6NEAusl+2eLm95bJzY=
+	t=1755449555; cv=none; b=RsXM1lpaJvTf9EP/wRfZ3fvXUiIQLTCuglg+NK3E/yymTN3e10gVySodkRyeKLH9Gol8DlwowSu72XwNDjQBp7fv8nv+TerDknGAMNTIcEkzc0ItNryJmaoSNoVETRIe+bgmPhOQcJ0WQrujZu8cn0McqNkrz6VwjQ+/gL2ghKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755448724; c=relaxed/simple;
-	bh=8R2fcFGpSJdmy6QSJXEPyqstFl05JrSadN5kH4ubPtM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=jBKOpZgO17su/HXvVxVGhThXD7Op7/Q6d53dEGTw5HKLuVbx1DWCIhMTGxSyUyi1aWIQO748GUctwgxh/MWn2pMQWi4G5eobLv9UWYslcsBUsEKC4YQf2UgG23XJcpZg00nUk82BXFXDe+jV14JHaAm3D1jWJ8IGOae1gqWnuaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N7ishbzr; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-244580591b0so23581385ad.1;
-        Sun, 17 Aug 2025 09:38:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755448722; x=1756053522; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MIT6uNUMzYTnbCPCMHsRis4gVzR0ZZCKNYfvnWn+bgk=;
-        b=N7ishbzrnrMt/Rfb1zN9teAA1dJTveeQ8XoFz49LBoltTwfGNir0+nChm2KOz2ZlEV
-         GdFUgg6yxGDc5o8p1MdFV9kCJsO+sRB1KfXuTHKKY6KOcGPdPqtrwH8IaNzW5DRDuhwt
-         gBdPo7E4Uu2YZTfaYspNBAtHNfx1m2y8gYnYze8nZTd2dRV4hKXTQnV5rmP12dLq9tOm
-         M7RbQWKbblh7HLEYrDKP31knPiTMwXCg9N8FxQ+yAWjCUInxN3ym2wDBKSJ77fuSbqbX
-         T//2Xl0CvbdNtfCRFnrgxO2yOZaddDib7mL20PlsmowBu9wjA2f7dN92h3c63orDf2dV
-         SCbQ==
+	s=arc-20240116; t=1755449555; c=relaxed/simple;
+	bh=La33uNruziC6aK5yC+OZwi/CjaShNe4+LeE5OKVRtsM=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=YosJxFa0ZB1iDXDaugYX7PlHXjKREG6OCG6StUZMmmssOEg9PweyZf6ZryNGjRWvq8rYtZA/ByxIW5dXg/7JS2fZ1afAAPYIYwVAQZ2Sjq2P9156v6hmqNfu5vk7craOnMhHYNIrNNxRzP5RgPrkBR8/JxULGF49NJyHEPhO3JM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f79.google.com with SMTP id ca18e2360f4ac-88432dc61d9so931736039f.1
+        for <netdev@vger.kernel.org>; Sun, 17 Aug 2025 09:52:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755448722; x=1756053522;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MIT6uNUMzYTnbCPCMHsRis4gVzR0ZZCKNYfvnWn+bgk=;
-        b=WJ69+G1UAC3UurHeZVuY3AMiL/ajriZCaORR15CjzCKmnXmpVcaHOD8SHVUOkFL7Jq
-         dVGOxcrakqW2bT2wYnWK6VjE0IgnhhRUTlPImR6jwjvTlFLUzP890uFKiNRPfiA+Z6RE
-         vbE8R+sFtDGS5fupVFK8XpfzgwuA7C3MtNdqxS/5wVFUm/STdA9rWmWjzbJkb22FgmpI
-         4knxDzRmf+I7CTeky3X4WFZdB5jfV48AEOZCY0tL/of3Oau5F6JWoRzMVmmwq6klBdjW
-         5hMK82cmdR4M/66iCygShdzjNICI1XA8724tkut9HNmvBCvx3jpK/pmzaJI4NeJxshD0
-         Naqw==
-X-Forwarded-Encrypted: i=1; AJvYcCUY0qTvxIJacrTrE3cQn+TnNGnc2aJsZ0cNc93o0bjKEFKS/tXasVRaqVnI5ka/W+2iCqM8ItiR@vger.kernel.org, AJvYcCXbtWWkCxdr2BlLNHMLipDW7pa0F0MsZPZcB5cxoecXQJrV+RuL/qFqDYiSzGOqlHzf7xdlnvOkrtD3Yg==@vger.kernel.org, AJvYcCXh6s9AnwzoExpsWbNV8T9iD2gT9MeUnT4SFpnJFW3f51Hv+wgLgcmhOAUU3Cg0mdXVMG2q1Hi1AzWbYMQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzqgzcoC48LbddJ+dQQGBzywB/OLTvCAVAQbJpw/yr3i/12doFU
-	RFoOAxTzh3MpDoNIQ1ho7ywitWNT30peQ/vUoQXhd5VB5oEwyHpnKV8l
-X-Gm-Gg: ASbGncvIYXKNmvO3FROIYF5UZaA3o1F3XYRF9bouEJ+jDaXqDaJCHXaR2YhJOJ4YbY+
-	Wq9fZdcg5xM0/U20uaSBeNtUmek9vIN/c5Rg4qXb78BPyLK6FbwKUZd/8czu6fGm/SYEvTcizIK
-	Bb7exIVFWXtkBWTGtX/qgOTreyTVR/3smmOrlAJyNPyoH1DijdBAcq4ZpH+KUiR/JQlZOk2qwDw
-	DoOL7fHdNC9vrJoEOLbUWGngqbfO2LmS7EtJxYfAPAOZEvtQwX2FhyRrOqiO41EB7jTuJpEAkpH
-	xjxRY3qF70rGRKFkUR+E5c0EVnUd77Nn/Hds8WRNwCKCwPpx4C3txDrR466m6EV01R/jEz2ji1I
-	1tPv4I3+pI5nU7Q6+Sz/0Y576IYeTFTMmLhba1XAByNf2kQ==
-X-Google-Smtp-Source: AGHT+IEkSGa1drps5XlLVHbgDwqS0fGTBd+3pDBDTaNi1J6dZB00Iu5x8mb8bByRJd5ZnaAPNHfgXQ==
-X-Received: by 2002:a17:902:cccb:b0:243:80d:c513 with SMTP id d9443c01a7336-2446d6e444dmr128946865ad.4.1755448722181;
-        Sun, 17 Aug 2025 09:38:42 -0700 (PDT)
-Received: from localhost.localdomain ([120.235.172.134])
-        by smtp.googlemail.com with ESMTPSA id 41be03b00d2f7-b472d735e83sm6279040a12.33.2025.08.17.09.38.37
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sun, 17 Aug 2025 09:38:41 -0700 (PDT)
-From: Miaoqian Lin <linmq006@gmail.com>
-To: Tariq Toukan <tariqt@nvidia.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: linmq006@gmail.com
-Subject: [PATCH v2] eth: mlx4: Fix IS_ERR() vs NULL check bug in mlx4_en_create_rx_ring
-Date: Mon, 18 Aug 2025 00:38:30 +0800
-Message-Id: <20250817163830.10819-1-linmq006@gmail.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20250805025057.3659898-1-linmq006@gmail.com>
-References: <20250805025057.3659898-1-linmq006@gmail.com>
+        d=1e100.net; s=20230601; t=1755449553; x=1756054353;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SMyjkT6Y8eXPsn2bZrda8Pw4BLi3+j8GhORmxcjlJ2s=;
+        b=aNS+JGU4vn3VzMMYb+/L/xhbt3/6RcQcd2HL+p1XdTcQCL/VTU0piD9DLbeOyZg8Ei
+         7ouixd+qw/a+KxESlCaH+BmUvGvVqjWIwtZr606ayUqOqTJPkYy2MSoSW2pD07v0y6bP
+         MYjY+C013J2kUqfLf+RByXBHYy2j2sYEPe6PzPYKB02C9DKsNH99OFwqLsO45cDVgLrd
+         Yp7UyHYwHd9VBbx3T9c+rrlpWZrS2FA3Pidb+5Tgjcrm/Px3PD+wM6v7eZgMSXZvhTzQ
+         I49aICCQBIAwdaUNiTyyWk06w4ri8tijU+LbfOG7/wECu0P5RhXDVgTIoUgDl0EexbSB
+         oVtQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXX7A7SsoJTA2l8IZohxI5uSBI/nEcWIErXNAE1eFWLRfQBxbiHLsbho7LbAaSHe2FxCwoxypg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwBNELzD0kMHYPockD1oVypVWvgYAHjC9i+35WIINCLKu/bNRq6
+	6sInEe1gE0a9mgB8GCZCnc8CPGVDklWgicM9ShTAdWNKKrwk2YpjQMHXx07rXprx8ndtR7BesUi
+	j83gcIi/huOiY5uvyPzITMocw7zXaMl4vBNuSuEEKeYYdEdVCP3axIunAqTM=
+X-Google-Smtp-Source: AGHT+IER8rHkZb7o5CdFfjUuJKJFKzWg2Lr3WChYbhL47cIydC0zpBc3Cvdtsg86Gu7E4tkZUCkNR+ogQpn0f3GIRRMd4U/vDfEI
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:156a:b0:3e3:fe5e:9b96 with SMTP id
+ e9e14a558f8ab-3e57e8a6872mr165247005ab.11.1755449553002; Sun, 17 Aug 2025
+ 09:52:33 -0700 (PDT)
+Date: Sun, 17 Aug 2025 09:52:32 -0700
+In-Reply-To: <689ff631.050a0220.e29e5.0035.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68a208d0.050a0220.e29e5.006e.GAE@google.com>
+Subject: Re: [syzbot] [usb?] UBSAN: shift-out-of-bounds in ax88772_bind
+From: syzbot <syzbot+20537064367a0f98d597@syzkaller.appspotmail.com>
+To: andrew+netdev@lunn.ch, andrew@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-usb@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Replace NULL check with IS_ERR() check after calling page_pool_create()
-since this function returns error pointers (ERR_PTR).
-Using NULL check could lead to invalid pointer dereference.
+syzbot has found a reproducer for the following issue on:
 
-Fixes: 8533b14b3d65 ("eth: mlx4: create a page pool for Rx")
-Signed-off-by: Miaoqian Lin <linmq006@gmail.com>
+HEAD commit:    99bade344cfa Merge tag 'rust-fixes-6.17' of git://git.kern..
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=13ea1234580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=ce98061fb8ee27bc
+dashboard link: https://syzkaller.appspot.com/bug?extid=20537064367a0f98d597
+compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=126d13a2580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1754faf0580000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/e140d0491611/disk-99bade34.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/f581d5a99c83/vmlinux-99bade34.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/feceb1caceef/bzImage-99bade34.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+20537064367a0f98d597@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+UBSAN: shift-out-of-bounds in drivers/net/usb/asix_devices.c:679:27
+shift exponent 208 is too large for 64-bit type 'unsigned long'
+CPU: 0 UID: 0 PID: 10 Comm: kworker/0:1 Not tainted 6.17.0-rc1-syzkaller-00214-g99bade344cfa #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
+Workqueue: usb_hub_wq hub_event
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
+ ubsan_epilogue+0xa/0x40 lib/ubsan.c:233
+ __ubsan_handle_shift_out_of_bounds+0x386/0x410 lib/ubsan.c:494
+ ax88772_init_mdio drivers/net/usb/asix_devices.c:679 [inline]
+ ax88772_bind+0xdcf/0xfa0 drivers/net/usb/asix_devices.c:910
+ usbnet_probe+0xa96/0x2870 drivers/net/usb/usbnet.c:1781
+ usb_probe_interface+0x668/0xc30 drivers/usb/core/driver.c:396
+ call_driver_probe drivers/base/dd.c:-1 [inline]
+ really_probe+0x26a/0x9e0 drivers/base/dd.c:659
+ __driver_probe_device+0x18c/0x2f0 drivers/base/dd.c:801
+ driver_probe_device+0x4f/0x430 drivers/base/dd.c:831
+ __device_attach_driver+0x2ce/0x530 drivers/base/dd.c:959
+ bus_for_each_drv+0x251/0x2e0 drivers/base/bus.c:462
+ __device_attach+0x2b8/0x400 drivers/base/dd.c:1031
+ bus_probe_device+0x185/0x260 drivers/base/bus.c:537
+ device_add+0x7b6/0xb50 drivers/base/core.c:3689
+ usb_set_configuration+0x1a87/0x20e0 drivers/usb/core/message.c:2210
+ usb_generic_driver_probe+0x8d/0x150 drivers/usb/core/generic.c:250
+ usb_probe_device+0x1c1/0x390 drivers/usb/core/driver.c:291
+ call_driver_probe drivers/base/dd.c:-1 [inline]
+ really_probe+0x26a/0x9e0 drivers/base/dd.c:659
+ __driver_probe_device+0x18c/0x2f0 drivers/base/dd.c:801
+ driver_probe_device+0x4f/0x430 drivers/base/dd.c:831
+ __device_attach_driver+0x2ce/0x530 drivers/base/dd.c:959
+ bus_for_each_drv+0x251/0x2e0 drivers/base/bus.c:462
+ __device_attach+0x2b8/0x400 drivers/base/dd.c:1031
+ bus_probe_device+0x185/0x260 drivers/base/bus.c:537
+ device_add+0x7b6/0xb50 drivers/base/core.c:3689
+ usb_new_device+0xa39/0x16f0 drivers/usb/core/hub.c:2694
+ hub_port_connect drivers/usb/core/hub.c:5566 [inline]
+ hub_port_connect_change drivers/usb/core/hub.c:5706 [inline]
+ port_event drivers/usb/core/hub.c:5870 [inline]
+ hub_event+0x2958/0x4a20 drivers/usb/core/hub.c:5952
+ process_one_work kernel/workqueue.c:3236 [inline]
+ process_scheduled_works+0xade/0x17b0 kernel/workqueue.c:3319
+ worker_thread+0x8a0/0xda0 kernel/workqueue.c:3400
+ kthread+0x70e/0x8a0 kernel/kthread.c:463
+ ret_from_fork+0x3f9/0x770 arch/x86/kernel/process.c:148
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+---[ end trace ]---
+
+
 ---
-Changes in v2:
-use err = PTR_ERR(ring->pp);
-v1 link: https://lore.kernel.org/all/20250805025057.3659898-1-linmq006@gmail.com
----
- drivers/net/ethernet/mellanox/mlx4/en_rx.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx4/en_rx.c b/drivers/net/ethernet/mellanox/mlx4/en_rx.c
-index 92a16ddb7d86..13666d50b90f 100644
---- a/drivers/net/ethernet/mellanox/mlx4/en_rx.c
-+++ b/drivers/net/ethernet/mellanox/mlx4/en_rx.c
-@@ -267,8 +267,10 @@ int mlx4_en_create_rx_ring(struct mlx4_en_priv *priv,
-    pp.dma_dir = priv->dma_dir;
- 
-    ring->pp = page_pool_create(&pp);
--   if (!ring->pp)
-+   if (IS_ERR(ring->pp)) {
-+       err = PTR_ERR(ring->pp);
-        goto err_ring;
-+   }
- 
-    if (xdp_rxq_info_reg(&ring->xdp_rxq, priv->dev, queue_index, 0) < 0)
-        goto err_pp;
--- 
-2.25.1
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
