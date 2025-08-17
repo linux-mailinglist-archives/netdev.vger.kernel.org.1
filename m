@@ -1,73 +1,68 @@
-Return-Path: <netdev+bounces-214410-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214411-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E59AB294E0
-	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 21:39:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38D98B294EE
+	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 22:17:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B17FF4E4DEB
-	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 19:39:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CEC1E189ACEF
+	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 20:17:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA6F91FF603;
-	Sun, 17 Aug 2025 19:39:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="WpvtdpdD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BEBB21FF41;
+	Sun, 17 Aug 2025 20:17:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 061DA12B73;
-	Sun, 17 Aug 2025 19:39:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40B1E212B3D;
+	Sun, 17 Aug 2025 20:17:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755459592; cv=none; b=clIKjUa0gNhF8UNoWXiuWnoxCsICMFC7liUAHEEEDPuqEFzvsnKs1ZdAI+x2eKQ9Okw04nPibGY+BLYYZq80XMLzDlU+Y0bdHE1ZLg+aKDHawx8cHxscVYPA/8OQrXahS+6e/HIv5G+ZWur+sj75haQsEi3dJ4By+1JOXGRTFX8=
+	t=1755461834; cv=none; b=oI5R2wSgmenYwrb49nj63GPu1DElv9QFPVyoM7W59WINSdmCi1BcDclwG1TB9LDY1PJRp9LBY2O7OXUmnzoR+o53pEHYCeLADbWZP6fcbG4dyc9pJvGW05bbyakLFJC+ZEaf3GQHRq68JCaUZPvFkFqonU7xmE6anmQDphvExF0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755459592; c=relaxed/simple;
-	bh=fm9MC9w71x2V6wUYh0NhquPACQ+eHjamPHK0Jmda5po=;
+	s=arc-20240116; t=1755461834; c=relaxed/simple;
+	bh=D7myZiWNhx3MHjJJPqnTlE2VCH8CxxYU/ukBho1zS0g=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qPVzbwEakLu2/fhAShGm+vDQiNn4vk78ozlZq/pmqkocnoamtwwFRlB1pVGeTqbOpmpKpSvn/RlHjO/9y7u61U7v9KZzfCD/iW5+w7HZSiGSbTaorDk/8fBN45th8JeggyAMDu9La7UNNuramrgWNl1lNRzQFa05lOihRN0IRIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=WpvtdpdD; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=QO7IaYTt/6d2MUg1fvfXtUP6TpN6Oc9uIKuq9biZ7vo=; b=WpvtdpdDNDKoBlSSHEkaJM8Dlr
-	YGhuW3iHT5E92MLMSSfcqS518WRFZvYdLHUl5HgGcxiA2A0njMq7fdgBEh4MCfCiIsvruIdk+uM3+
-	DhvtMOTL9VxvAXs5XJI7lmh+Qxl/bfVPKl/xd+Wm7d/IfomQYJiKnRvccLK1ADgAPrvA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1unjE8-004z45-E5; Sun, 17 Aug 2025 21:39:36 +0200
-Date: Sun, 17 Aug 2025 21:39:36 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Rob Landley <rob@landley.net>
-Cc: Artur Rojek <contact@artur-rojek.eu>, Jeff Dionne <jeff@coresemi.io>,
-	John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=imc9QqWbRLBLLYXhqe7xbHoGbhHpNaVBhTlit/VaZOQ7NKi3kBH6Xr7ahp86k59E5iDGAu5lRhIfZdTrUKD/jVXRcsvBWQumk28/S7jJLWhSqoXGq0FzcluKpiiTid8sSadHmbpIX0DuBzPoVc1sXQM1xXaGghhV03ltekSNdJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1unjoA-000000001uE-33Rs;
+	Sun, 17 Aug 2025 20:16:50 +0000
+Date: Sun, 17 Aug 2025 21:16:45 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/3] net: j2: Introduce J-Core EMAC
-Message-ID: <bc31f53a-ba85-4580-add3-a287dca06661@lunn.ch>
-References: <20250815194806.1202589-4-contact@artur-rojek.eu>
- <973c6f96-6020-43e0-a7cf-9c129611da13@lunn.ch>
- <b1a9b50471d80d51691dfbe1c0dbe6fb@artur-rojek.eu>
- <02ce17e8f00955bab53194a366b9a542@artur-rojek.eu>
- <fc6ed96e-2bab-4f2f-9479-32a895b9b1b2@lunn.ch>
- <7a4154eef1cd243e30953d3423e97ab1@artur-rojek.eu>
- <ee607928-1845-47aa-90a1-6511decda49d@lunn.ch>
- <9eab7a4ff3a72117a1a832b87425130f@artur-rojek.eu>
- <52aef275-0907-4510-b95c-b2b01738ce0b@lunn.ch>
- <d4f291e3-9d4f-4724-91de-742f9ace5b86@landley.net>
+	Hauke Mehrtens <hauke@hauke-m.de>, Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Arkadi Sharshevsky <arkadis@mellanox.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Andreas Schirm <andreas.schirm@siemens.com>,
+	Lukas Stockmann <lukas.stockmann@siemens.com>,
+	Alexander Sverdlin <alexander.sverdlin@siemens.com>,
+	Peter Christen <peter.christen@siemens.com>,
+	Avinash Jayaraman <ajayaraman@maxlinear.com>,
+	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
+	Juraj Povazanec <jpovazanec@maxlinear.com>,
+	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
+	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
+	"Livia M. Rosu" <lrosu@maxlinear.com>,
+	John Crispin <john@phrozen.org>
+Subject: Re: [PATCH RFC net-next 09/23] net: dsa: lantiq_gswip: add support
+ for SWAPI version 2.3
+Message-ID: <aKI4rbGX8f03thgn@pidgin.makrotopia.org>
+References: <aKDhigwyg2v5mtIG@pidgin.makrotopia.org>
+ <712e82b5-62fc-423a-a356-8cc74fc22e3d@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,39 +71,61 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d4f291e3-9d4f-4724-91de-742f9ace5b86@landley.net>
+In-Reply-To: <712e82b5-62fc-423a-a356-8cc74fc22e3d@lunn.ch>
 
-> My vague recollection is this SOC only implemented full duplex 100baseT
-> because they didn't have any hardware lying around that _couldn't_ talk to
-> that.
+On Sun, Aug 17, 2025 at 05:36:13PM +0200, Andrew Lunn wrote:
+> On Sat, Aug 16, 2025 at 08:52:42PM +0100, Daniel Golle wrote:
+> > Add definition for switch API version 2.3 and a macro to make comparing
+> > the version more conveniant.
+> > 
+> > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> > ---
+> >  drivers/net/dsa/lantiq_gswip.h | 3 +++
+> >  1 file changed, 3 insertions(+)
+> > 
+> > diff --git a/drivers/net/dsa/lantiq_gswip.h b/drivers/net/dsa/lantiq_gswip.h
+> > index 433b65b047dd..fd0c01edb914 100644
+> > --- a/drivers/net/dsa/lantiq_gswip.h
+> > +++ b/drivers/net/dsa/lantiq_gswip.h
+> > @@ -7,6 +7,7 @@
+> >  #include <linux/platform_device.h>
+> >  #include <linux/regmap.h>
+> >  #include <linux/reset.h>
+> > +#include <linux/swab.h>
+> >  #include <net/dsa.h>
+> >  
+> >  /* GSWIP MDIO Registers */
+> > @@ -93,6 +94,8 @@
+> >  #define   GSWIP_VERSION_2_1		0x021
+> >  #define   GSWIP_VERSION_2_2		0x122
+> >  #define   GSWIP_VERSION_2_2_ETC		0x022
+> > +#define   GSWIP_VERSION_2_3		0x023
+> > +#define GSWIP_VERSION_GE(priv, ver)	(swab16(priv->version) >= swab16(ver))
+> 
+> Don't this depend on the endiannes of the CPU?
+> 
+> It seems like it would be better to make your new version member cpu
+> endian, and when writing to it, do le16_to_cpu().
 
-It is pretty unusual to find hardware, now a days, which only does
-10Mbp. So it is a somewhat theoretical use case. And as you say,
-100Mbps is plenty fast for lots of applications.
+Yes, that does make sense.
 
-What we need to think about is the path forwards, how MDIO and PHY
-support can be added later, without breaking DT backwards
-compatibility.
+> 
+> Also, if i remember correctly, you made version a u32. Should it
+> really be a u16?
 
-What you would normally do if there is no access to the PHY is use
-fixed-link. It emulates a PHY, one that is always up and at a fixed
-speed. See fixed-link in
-Documentation/devicetree/bindings/net/ethernet-controller.yaml
+True, it should probably be u16. It would complicate things a bit though
+as the (existing, currently supported) MMIO switches built-into the Lantiq
+SoCs use 32-bit memory operations to access the 16-bit switch registers,
+where the upper 16-bit are always all zero... Hence I got to use
+.val_bits = 32 to not end up with bus errors, and also .reg_shift = -2
+is needed as each 16-bit register address needs to be multiplied by 4 (ie.
+addr =<< 2, which is what .reg_shift = -2 is doing).
+So up to now, eg. when passed as a function paramter in existing code paths,
+the version has been a u32 type. When using a different type for the version
+stored in the priv struct, that would create quite a bit of confusion imho:
 
-That allows the MAC driver to use the phylib API. The MAC does not
-hard coded the carrier up, phylib tells the MAC link is up, and phylib
-manages the carrier.
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/net/dsa/lantiq_gswip.c?h=v6.16#n2018
 
-What this means is, if sometime in the future MDIO is added, and
-phylib gets access to the PHY, there are no MAC driver changes. Old DT
-blobs, using fixed-link still work, and new DT blobs with MDIO, a PHY
-node, and a phy-handle have working PHY.
-
-If you don't do this now, adding support later will be messy, if you
-don't want to break backwards compatibility with old DT blobs.
-
-	Andrew
-
-
+Let me know what you think.
 
 
