@@ -1,94 +1,122 @@
-Return-Path: <netdev+bounces-214361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214362-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE325B291D4
-	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 08:18:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32FD0B29228
+	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 10:12:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C6344445B1
-	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 06:18:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 10B8217155D
+	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 08:12:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CBA01EFF8B;
-	Sun, 17 Aug 2025 06:18:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DD991A704B;
+	Sun, 17 Aug 2025 08:12:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vNgK/nBu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B64491DE89A
-	for <netdev@vger.kernel.org>; Sun, 17 Aug 2025 06:18:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FD82A945;
+	Sun, 17 Aug 2025 08:12:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755411487; cv=none; b=ksmSy9u/CctcOAM5APqQYw3mX8xuE+lwdoWz1b2/gBEXPtqEASuqd62cqFOKTBD0b5E94Q+fIyqfMeta3QGuK8NMK+5uKlpkFRct6diiTZl+pl5C7Eff8xiKduTTHS3IYcWfJGRZb9r+RhNRL/a5/kusNxy/HXgXiyFmynJKevc=
+	t=1755418365; cv=none; b=Al2xzlgZKCrElepr9BjzUc5hll8t6mqGch6wKaXKrIZJcKCX6NNmsKMbAbzUgO/5hKSVkyDIQ9Sa2k06D0jkgEAfM3s5Gn+LMrvsOwUZ0+5SfxFIqZKK7o+J/f3TZ2qsXxCkziC3MOQu0nCUfYDwSkylOwbDx1xjdQJsozXz35w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755411487; c=relaxed/simple;
-	bh=x6SRgnib0G7M2g+ot+TWQJ8h3Z9ID7PuY1Ye6vQiO7A=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=lCcdbWbVICL1Y54sVfcK/40iIkCh9gXfldKFYH4OC6vfQVeDe+DC6yLAZJJ24698pK/bgsEauJnN/MD6o8mxZoEpQ3Fcpos0mR1aptIw8PW/wyDyGbaopdSjoTTktCk71NOaL6aRqShFynMQyCCsaIe5vyoYtDavOGGbFMQSkf0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-88432e5aa43so373755039f.3
-        for <netdev@vger.kernel.org>; Sat, 16 Aug 2025 23:18:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755411485; x=1756016285;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JdO8zLjvXGnLAKqt2Wo9ucoKrtcFQMjL+W6shvTRwsE=;
-        b=Zgw7v8JjrzuYdga45z4aJYnTJ7NwJtKyqYs8HqqWbsBGJQ94EG0z7zY8OgWCj9UyTr
-         6fAmesYO0EeQwS+3hWZAuXmfAHFE6sofkTqgNvFKhu5GZZjrtGBpshRM8ZSf3tvBCXYJ
-         e12iXs21YEvUShY7w5iLuqT97vTzE4PrxZar9tjbvHtkL52BFTl6jImIXMD7F3AWIsVp
-         4bAzUN2fir2wIHjOqTSlJ4PdU4tkqthT+KDvDhZuag97n0jmb2h1xzhsdGfH5c2uhpiI
-         iu6rJmMgRvR7xsnylzFuB8QdOyth8b7ZNfp50tS8tDbDYKEnAISc6OI8vWZ0NZd5Puwj
-         MCsQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU3Oy0JWnupY3/AQLanT1jabJi9Jos5ETL+PBQN7RLlGclm776ODBvJO+weQ+vOAEnev9I86NM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxB01QBMDEhdfqlo7KnSCSCLL4iR3JoukURfeX7F6LVMzUv/BTa
-	oyNbpm9m95rUwbc6Pu3vRji8He4gpjTpgG0DPEotQVlx40Xpm+OegcwpFKYCZuDSaZmmZ/nJZEA
-	X627d+YhQv8MllHxu+zosBYOr9T34an+ZOMRXUSe9vKsSGJ0pfwxWoTe9+eE=
-X-Google-Smtp-Source: AGHT+IHZFzSwDxf2TRTZM6Le8S0sSkvLrk9hGAeEtwb8V3MPhnIYewVlR7ckO5uIS7XAC1CPsuDIjUd08C4UFZSkM+VjvxP9yYWX
+	s=arc-20240116; t=1755418365; c=relaxed/simple;
+	bh=3ogXhEmizaAUsLyP8gBBwxZlw+Leo/hHTvDxWG9rwN0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pJDw0TMkJ2HAffrZCniS1i7HVqoe0Yob1obbbZv6mQk7ZMHvhDaWvfiramZhtkCoSYF++YUs10s2zNInFFWKrr6qVYYQ/k58OJFeTW5EHN/s6QNbYAaRUPkw7knhKPPe5L3pg7oNx9Y9hudt1TAYKf2DKOagpoMSpOTYTOPP+jY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vNgK/nBu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48D2FC4CEEB;
+	Sun, 17 Aug 2025 08:12:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755418364;
+	bh=3ogXhEmizaAUsLyP8gBBwxZlw+Leo/hHTvDxWG9rwN0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=vNgK/nBu66g+/TEivXA24x2CkykDm0dh7UOUYnX5w+yIZwCLF33tTXWxHEy0+KBpX
+	 eGafPFmqTueJaLcbr3vPIZsqLmijJzCuKb8g2HOD5LffSxuDMHVg23gwlhbc4+ecVu
+	 TZ7sFN8x2mfprl+3knY19VihVZhk1eJBPonBKJ23tyaRdGo7k2OJ1X3rEHfFVjWsyq
+	 T9OiN2aGwYg4uMwReqM+iNyQNZTz5m4q60619Ws9fePfU3s4OE58sOJ4XevH+Mj9lW
+	 mpK7pPTq/0MMvh1+tcBkG2hgAiHLQ8c8dUVLPpo5m717LAnjJi/wgMtsl1j6Wcg7n6
+	 XtLYJZZQUesqg==
+Message-ID: <18290017-fd9b-499c-be34-55b49efad95a@kernel.org>
+Date: Sun, 17 Aug 2025 10:12:41 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:16ce:b0:3e5:7e02:a06d with SMTP id
- e9e14a558f8ab-3e57e84b6c4mr127240065ab.4.1755411484903; Sat, 16 Aug 2025
- 23:18:04 -0700 (PDT)
-Date: Sat, 16 Aug 2025 23:18:04 -0700
-In-Reply-To: <689ff66d.050a0220.e29e5.0036.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68a1741c.050a0220.e29e5.005d.GAE@google.com>
-Subject: Re: [syzbot] [ntfs3?] kernel panic: stack is corrupted in debug_object_active_state
-From: syzbot <syzbot+56728135217003dc6f7d@syzkaller.appspotmail.com>
-To: almaz.alexandrovich@paragon-software.com, davem@davemloft.net, 
-	johan.hedberg@gmail.com, kuba@kernel.org, linma@zju.edu.cn, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org, 
-	ntfs3@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] nfc: s3fwrn5: Use SHA-1 library instead of
+ crypto_shash
+To: Eric Biggers <ebiggers@kernel.org>, netdev@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250815022329.28672-1-ebiggers@kernel.org>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <20250815022329.28672-1-ebiggers@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-syzbot has bisected this issue to:
+On 15/08/2025 04:23, Eric Biggers wrote:
+> Now that a SHA-1 library API is available, use it instead of
+> crypto_shash.  This is simpler and faster.
+> 
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+> ---
+>  drivers/nfc/s3fwrn5/Kconfig    |  3 +--
+>  drivers/nfc/s3fwrn5/firmware.c | 17 +----------------
+>  2 files changed, 2 insertions(+), 18 deletions(-)
+> 
 
-commit e305509e678b3a4af2b3cfd410f409f7cdaabb52
-Author: Lin Ma <linma@zju.edu.cn>
-Date:   Sun May 30 13:37:43 2021 +0000
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-    Bluetooth: use correct lock to prevent UAF of hdev object
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=10c6e234580000
-start commit:   ee94b00c1a64 Merge tag 'block-6.17-20250815' of git://git...
-git tree:       upstream
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=12c6e234580000
-console output: https://syzkaller.appspot.com/x/log.txt?x=14c6e234580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=98e114f4eb77e551
-dashboard link: https://syzkaller.appspot.com/bug?extid=56728135217003dc6f7d
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=118d2234580000
-
-Reported-by: syzbot+56728135217003dc6f7d@syzkaller.appspotmail.com
-Fixes: e305509e678b ("Bluetooth: use correct lock to prevent UAF of hdev object")
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+Best regards,
+Krzysztof
 
