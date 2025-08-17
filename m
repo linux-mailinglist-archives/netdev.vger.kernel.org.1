@@ -1,54 +1,58 @@
-Return-Path: <netdev+bounces-214406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214407-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90D7BB2948C
-	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 19:24:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0791DB2948D
+	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 19:25:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 275161B26897
-	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 17:24:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE3C42A31A8
+	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 17:25:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16F2F1F4717;
-	Sun, 17 Aug 2025 17:24:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6159829B8F8;
+	Sun, 17 Aug 2025 17:25:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b="Qv8kjU/F"
+	dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b="omJc9ktR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-4323.protonmail.ch (mail-4323.protonmail.ch [185.70.43.23])
+Received: from mail-10625.protonmail.ch (mail-10625.protonmail.ch [79.135.106.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF0F2221FC4
-	for <netdev@vger.kernel.org>; Sun, 17 Aug 2025 17:24:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.23
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DD471ADC83
+	for <netdev@vger.kernel.org>; Sun, 17 Aug 2025 17:25:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755451473; cv=none; b=n7cJ1UfbN9sDcNloB5xqKb5QkeqE60bbtnJWdlfNXP+vSLb4L5ICL9pDj7kE6jKKjM8T5IRohlMsOCANrEaQxenTjYcEPhmPRJyHQaBMZ0V+XX+nrGik9gsy0eHkwtgL6J6DjGmslLKvddTAPKUPfmHs4hNklBkNsU3A4/jiHoU=
+	t=1755451503; cv=none; b=Cgx/smVqCqoB1b9PSMS7WKmjEm2q7g525vogwzmBDTlxuvbyx+tlt9Mbxfwy5BnNrVwkvYtpMOIqC/BIKcusfphU9VJtoUzLrw7Z36vU7WaUGbRkVi+ehrgFo0T/IcdBzIVNX/+/ZXWeu6Q+vcswKWXtMNKkahTGTck9co7QIHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755451473; c=relaxed/simple;
-	bh=omIc8mNAk/gq3H73GvtGc57UDOYkV2lBSUrucDfQtjQ=;
-	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=J70/bdr3qNKLkgd0ZcAhPqm2vk/uHQ2Ur4EPkfG9sd2qJsnhk25JGkQE+v48jnx9vWYKw7inBD76ylYFAAehDX6IwqlFW5BM1hX81Z8KvrPeK3dry5O3ptfvbcAApM53JbKBhuSy5kSiPDOoYrUe8wWdfIKRVITcscQKSvnN8I8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io; spf=pass smtp.mailfrom=willsroot.io; dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b=Qv8kjU/F; arc=none smtp.client-ip=185.70.43.23
+	s=arc-20240116; t=1755451503; c=relaxed/simple;
+	bh=otQxlRbfs12Tm6jQHCJ7Bi/vAt44Lp4Olg/SN3JtIVY=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=n3lzYelQtQY86d3BMoXuPD5/DlQ7okA1w0+gUk31ukXMgFOWVczWs91i8rlF6nPw1CkHEGfr/S/OMTgI7TJBAecKvJ6oa1RxJRNwd6lz4YC/PkMrO8BSQ5WVHVRVeHQmgPg4NBpQmmAy/Q/LxuAqJSUWMHJW5tMvxzvOLmaV4Qo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io; spf=pass smtp.mailfrom=willsroot.io; dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b=omJc9ktR; arc=none smtp.client-ip=79.135.106.25
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=willsroot.io
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=willsroot.io;
-	s=protonmail2; t=1755451461; x=1755710661;
-	bh=WlfDB9f9hx9/p9nnw0AggcvHEZASiW/W23imChJvDRs=;
-	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=Qv8kjU/FeEZiLiubE8LWpXEQuBjMIZ/UxMDCLm7TbEwKblW9Yx77zmZvl9731xXyS
-	 A8FqtBzB7yaxwEHTCgFgg4mVN3kEUN9/dECRtbsdPli6EZETqrVhnWfknJ7zrLk+5x
-	 7ruIw0o29BvwB8YWZwuhLokbznKVALEnxf9pjtmIIqf6ib9OEujT3aWrLWRdObBQ5B
-	 AeOYW8bkxlONmIxUWrS/ezlW8PGjjq78OBvUme6MRdPl2Gg5blhPFPV9SxRrcwOa09
-	 rSfJ/LKSsh6c821EzmjDWwy4ueKQIDDxonKUhKbQdHJy5cWS/VKc24z+h4AD1VMg4M
-	 +nwPRHFJwHzYw==
-Date: Sun, 17 Aug 2025 17:24:17 +0000
+	s=protonmail2; t=1755451492; x=1755710692;
+	bh=8jFOE2i1llqvjqv+5WETuyLKZL1V2XOXfWrfYTuNnqI=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=omJc9ktRivDvxvx4fcZNwLbZqEe4SS7+PhbTjMdIVj7skCUfsWMj2+esByK6k18M7
+	 WUSyuRMZ16rM0RwYI/Q7IK1mSm+gYTSgLfjqiPMvZg/Jo+PPWvMsaEnvOrd4h4I3VM
+	 pQlk4g4M/OsZXaqpJkFI5iJa9A4SNh2y+Q8g/KGCrrH1fhZ4JAcD+6MUlLTyseX6Sk
+	 3PdkwDSHgyC0DbFqBHfWp6jVeLUTN/mDfPz5dbPGWeKxnzPm4vF3kkPBR3ez/iABl2
+	 qXilw/I3V4umcRdIZliCch7K9FP1rm1F0RKGH6Nw6jISDMzR6HIYznFs4gDaXI9PGA
+	 a0AQpfde/9dKg==
+Date: Sun, 17 Aug 2025 17:24:46 +0000
 To: netdev@vger.kernel.org
 From: William Liu <will@willsroot.io>
 Cc: toke@toke.dk, jhs@mojatatu.com, xiyou.wangcong@gmail.com, pabeni@redhat.com, kuba@kernel.org, savy@syst3mfailure.io, jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, horms@kernel.org, cake@lists.bufferbloat.net, William Liu <will@willsroot.io>
-Subject: [PATCH net 1/2] net/sched: Make cake_enqueue return NET_XMIT_CN when past buffer_limit
-Message-ID: <20250817172344.449992-1-will@willsroot.io>
+Subject: [PATCH net 2/2] net/sched: Remove unnecessary WARNING condition for empty child qdisc in htb_activate
+Message-ID: <20250817172420.450039-1-will@willsroot.io>
+In-Reply-To: <20250817172344.449992-1-will@willsroot.io>
+References: <20250817172344.449992-1-will@willsroot.io>
 Feedback-ID: 42723359:user:proton
-X-Pm-Message-ID: 8da73108157485efe91066723bbc5a3e3ac39643
+X-Pm-Message-ID: 5653a5754ac815c5a552cac0032c4cb9fa18b13f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,49 +62,30 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-The following setup can trigger a WARNING in htb_activate due to
-the condition: !cl->leaf.q->q.qlen
+The WARN_ON trigger based on !cl->leaf.q->q.qlen is unnecessary in
+htb_activate. htb_dequeue_tree already accounts for that scenario.
 
-tc qdisc del dev lo root
-tc qdisc add dev lo root handle 1: htb default 1
-tc class add dev lo parent 1: classid 1:1 \
-       htb rate 64bit
-tc qdisc add dev lo parent 1:1 handle f: \
-       cake memlimit 1b
-ping -I lo -f -c1 -s64 -W0.001 127.0.0.1
-
-This is because the low memlimit leads to a low buffer_limit, which
-causes packet dropping. However, cake_enqueue still returns
-NET_XMIT_SUCCESS, causing htb_enqueue to call htb_activate with an
-empty child qdisc.
-
-I do not believe return value of NET_XMIT_CN is necessary for packet
-drops in the case of ack filtering, as that is meant to optimize
-performance, not to signal congestion.
-
-Fixes: 046f6fd5daef ("sched: Add Common Applications Kept Enhanced (cake) q=
-disc")
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
 Signed-off-by: William Liu <will@willsroot.io>
 Reviewed-by: Savino Dicanosa <savy@syst3mfailure.io>
 ---
- net/sched/sch_cake.c | 3 +++
- 1 file changed, 3 insertions(+)
+ net/sched/sch_htb.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/sched/sch_cake.c b/net/sched/sch_cake.c
-index dbcfb948c867..40814449f17a 100644
---- a/net/sched/sch_cake.c
-+++ b/net/sched/sch_cake.c
-@@ -1934,6 +1934,9 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Q=
-disc *sch,
- =09=09=09cake_drop(sch, to_free);
- =09=09}
- =09=09b->drop_overlimit +=3D dropped;
-+
-+=09=09if (dropped)
-+=09=09=09return NET_XMIT_CN;
- =09}
- =09return NET_XMIT_SUCCESS;
- }
+diff --git a/net/sched/sch_htb.c b/net/sched/sch_htb.c
+index c968ea763774..b5e40c51655a 100644
+--- a/net/sched/sch_htb.c
++++ b/net/sched/sch_htb.c
+@@ -592,7 +592,7 @@ htb_change_class_mode(struct htb_sched *q, struct htb_c=
+lass *cl, s64 *diff)
+  */
+ static inline void htb_activate(struct htb_sched *q, struct htb_class *cl)
+ {
+-=09WARN_ON(cl->level || !cl->leaf.q || !cl->leaf.q->q.qlen);
++=09WARN_ON(cl->level || !cl->leaf.q);
+=20
+ =09if (!cl->prio_activity) {
+ =09=09cl->prio_activity =3D 1 << cl->prio;
 --=20
 2.43.0
 
