@@ -1,93 +1,132 @@
-Return-Path: <netdev+bounces-214385-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214386-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 941CAB293AE
-	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 16:58:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E340BB293B3
+	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 17:02:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 729B6205B28
-	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 14:58:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7663206A3E
+	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 15:02:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 266471C84BD;
-	Sun, 17 Aug 2025 14:57:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A9E282899;
+	Sun, 17 Aug 2025 15:02:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="O9gOwle/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EB4IwwrV"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1516D290F;
-	Sun, 17 Aug 2025 14:57:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E4BD29B0;
+	Sun, 17 Aug 2025 15:02:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755442679; cv=none; b=Nr5pDttDF7K0FZx32YsF4YWR7mLuKk9N7EZ4rcodN3R4B6KrkBXRbekybA4EpHEj8TuaAE03Ef74NiIj45V/SmCvfAPWT9cmZw4bqJY17UFC15kOhqQeqz8h1jgMCGJchLSW6EGoU3nQpMFFFAwTrb/XdjIh4GHIoIebRB+Nr9s=
+	t=1755442925; cv=none; b=KwDzG2Lxa7sF/PWMUbqFWP01yFOUN9H8ERlyggS5DmzcwbIVM8FQC544puvQeBxwMLoAirPpI28aZAw6emPWeyaobTvpwvUX47BnGq2AcKIIsAS0iRIU0mDhJ44andYOQuB1L9umpsF0t7E/NjoxwQhUbczwq0r7B8EGGmftYxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755442679; c=relaxed/simple;
-	bh=fAvFlJJqYOWnNyPSnXRIgCcz2MA0GUGCioFGwWtR8f0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PfWbsm41C8NFNxTfmxDaemDJ2vIiHgVjgbfb1z9d3uWwl30jg8DCleF9FMmpPIASqj95u7Vx41o7GuqE1RqGaSdBWCSCT2kQEOX2YdjefBl8WavZvnQJWUdWGkabyR/EwkOJAueeZEKXqYv6xMrTM7Lz6K/YziI6S6WO6blvflk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=O9gOwle/; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=/s3HWwswGJVbhetzqyV9rkWjvELllA0/5aDo3OGOunY=; b=O9gOwle/E/dlKqhO3XqolD3KJw
-	E3ResiTjiiSb8PrsTBWunk70onEyeRzuw315IoztouabqAUBdtpUFJ+eINW1w8VX4GOKVPRrj5z6A
-	0k0KfoZI6wtqNwLEsbIR6KNnggVkFwV3vtqaugERsbjT2lRt6M5f7E/Wb9183PSxAo64=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1unep3-004y9j-Jd; Sun, 17 Aug 2025 16:57:25 +0200
-Date: Sun, 17 Aug 2025 16:57:25 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Hauke Mehrtens <hauke@hauke-m.de>, Simon Horman <horms@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Arkadi Sharshevsky <arkadis@mellanox.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Andreas Schirm <andreas.schirm@siemens.com>,
-	Lukas Stockmann <lukas.stockmann@siemens.com>,
-	Alexander Sverdlin <alexander.sverdlin@siemens.com>,
-	Peter Christen <peter.christen@siemens.com>,
-	Avinash Jayaraman <ajayaraman@maxlinear.com>,
-	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
-	Juraj Povazanec <jpovazanec@maxlinear.com>,
-	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	"Livia M. Rosu" <lrosu@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: Re: [PATCH RFC net-next 02/23] net: dsa: lantiq_gswip: deduplicate
- dsa_switch_ops
-Message-ID: <6b110e80-85b9-4a5e-96b9-282ba75b24d1@lunn.ch>
-References: <aKDhMZgsq9UblP4j@pidgin.makrotopia.org>
+	s=arc-20240116; t=1755442925; c=relaxed/simple;
+	bh=qagc0OpqwUzPrnoUD6f6TtA3Bomgc1rdbnKs4XOQJ38=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PJwNiylVdv9sI8DTFIVVxNueT1VmwV548K2jc2C6ZtULeKmwvLiAhJv6A3wAVQSVTWhj3Kax0GnI7EkPw84uBl6Q+QIo00G1ahJz5876SKTnrLGaVIq+zblj5C8X9uNu53BkDQuFKLkqAu2tRYmcnP9gmm3mKYqbMi15Cl6ex9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EB4IwwrV; arc=none smtp.client-ip=209.85.221.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-3b9e7437908so3487451f8f.3;
+        Sun, 17 Aug 2025 08:02:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755442922; x=1756047722; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=X0+wXNypPm/jjYIXszVkPMU2fiSMirBXbYuD96ca0Vk=;
+        b=EB4IwwrVg7996PlDuJ+IqODbP9TsZ7a+BmHlDGfvMskYbcxsN43MCXSALysZP0lPBL
+         5yosYVkyjyraaN+KLWxYXwQNLR0tcmjJVRchCKTC12lCgVMzvTDrZ1EtklWtQKLudC4A
+         aw9bS2YEfQSTN+VM63wVDbHtEqZUBlnOnkKY1PYXVIyGgnTq8bFW/O58Nds8/VN7oC17
+         bsGCUEipZv/waVUuV4XpfU2CCEOOPOxrYeX8AWTS85/kuCsoYE6sAD7+kQx35Oj+x0dy
+         kiT/awhBlA+uLHLaNsUkrxDqkSv9O9j52qLds2yl6B1g1cWFjlHx7q8bAFNF82mP8ux4
+         QrBg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755442922; x=1756047722;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=X0+wXNypPm/jjYIXszVkPMU2fiSMirBXbYuD96ca0Vk=;
+        b=C17FRHNK1t9S5trdBfrThqRiYccAHhoiXaMdYxGXxfyna/JPdUw8x77er2H4RoBnAf
+         bqgSaa+kXXiZLko4FfNG/j2mYL61B4UcGBIHJz6rEcq24GpxSzKnsyctnDK3Yt+bOXAn
+         mSypXHCT5Qv7/Qg1YuAOkr9iHk9zJwgaejJpbEmJ19RwdSBQICOvuZZ+uuxg7GbTvK7y
+         G1/MpYNGe+XBw7RtzfCSQ29RmvVJuzYclmzU32ERCf9mmEZy3r29naF1gUcwIk5q/2AY
+         CTLvTrFuqXaO1l0RlPqdpAmDE1HYH3KoUxqBGc7uvuEdmxlt4Ty0fKog9HvMpyyJW0sU
+         0DIA==
+X-Forwarded-Encrypted: i=1; AJvYcCW1ULIe2Dl4RDwKD4rpRVxd76KylT1WX7kXWQgWgtLYh5y6IXutN8hjVw8yIVPSQ+T1nxzSa6T9qt4=@vger.kernel.org, AJvYcCXe1w67o458TkERNm8/7hiEtGNP59zIpFnl/UrVNG1UXLneuj50gK0K+jyMUf1KepBKQtTrMtYA@vger.kernel.org
+X-Gm-Message-State: AOJu0YzNQeQiBMCe4bMej0IMM1kR5UscCxxUS4CzsyRjoW/XFdkNVeX9
+	envht8CYmhzZ0A3mwhK2SYRG9dtpPvQW4aEPC7v4a4ljp4dBd/3lyYiI
+X-Gm-Gg: ASbGncsPo+0ah2CmI0zRgWvQN+HYr651N+4y1N6g2+eKJpk8CZJZb7gcgJuudd/nNj3
+	/Ngv2gh55xKQ1I8qm9x5GkQ9aA+T2YEff6pYTs+F1C9BzReg3m5rnh359s8D4AD/iY09l7HwdgL
+	gtGKSfWsKlPU0mMsHZHiMaBppqeM0WYigBrWROCaU/ElEYVQw+7dfXiwFI0DHwc1YkdY0dTnwCM
+	YyQ7CnRmoVpHXmle7UpUoce0DHYmXjVoUx3O2HleiMdt9xENr/14bJbyAbYZQzPC/NkyBOZs4NX
+	j0ffirebejd42Vm8Ww5a8N71kOMZaOn1VE0EzBgvSgBV8c5OCm4opBZnXpbUMeSL/GpbYinTd6i
+	adNO+gmpoAL4yhvKXskMllDdvnl8IyywzgKE7jQORTZ1d1I5jl14XJJAVZr6i
+X-Google-Smtp-Source: AGHT+IEQ5vGNjDKw/FMeH2tWklD/UbfDoFhOhBQHtlgDzf47wYWeVe/EdLz8oKAljKkaIjI2FC0Vvw==
+X-Received: by 2002:a05:6000:4382:b0:3b7:859d:d62b with SMTP id ffacd0b85a97d-3bc6800f468mr4114300f8f.8.1755442921458;
+        Sun, 17 Aug 2025 08:02:01 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3bb6863d9a4sm9555204f8f.61.2025.08.17.08.02.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 17 Aug 2025 08:02:01 -0700 (PDT)
+Date: Sun, 17 Aug 2025 16:02:00 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: Stefan =?UTF-8?B?TcOkdGpl?= <stefan.maetje@esd.eu>
+Cc: "vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>,
+ "linux-can@vger.kernel.org" <linux-can@vger.kernel.org>,
+ "mkl@pengutronix.de" <mkl@pengutronix.de>, Frank Jungclaus
+ <frank.jungclaus@esd.eu>, "mailhol.vincent@wanadoo.fr"
+ <mailhol.vincent@wanadoo.fr>, socketcan <socketcan@esd.eu>,
+ "horms@kernel.org" <horms@kernel.org>, "socketcan@hartkopp.net"
+ <socketcan@hartkopp.net>, "olivier@sobrie.be" <olivier@sobrie.be>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH 1/6] can: esd_usb: Fix possible calls to kfree() with
+ NULL
+Message-ID: <20250817160200.76467a18@pumpkin>
+In-Reply-To: <9e30abd4fe42b56158debde0caf71ebac89cc8cb.camel@esd.eu>
+References: <20250811210611.3233202-1-stefan.maetje@esd.eu>
+	<20250811210611.3233202-2-stefan.maetje@esd.eu>
+	<ee619a2d-a39d-4f48-ba18-07d4d9ef427e@linux.dev>
+	<9e30abd4fe42b56158debde0caf71ebac89cc8cb.camel@esd.eu>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aKDhMZgsq9UblP4j@pidgin.makrotopia.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, Aug 16, 2025 at 08:51:13PM +0100, Daniel Golle wrote:
-> The two instances of struct dsa_switch_ops differ only by their
-> .phylink_get_caps op. Instead of having two instances of dsa_switch_ops,
-> rather just have a pointer to the phylink_get_caps function in
-> struct gswip_hw_info.
-> 
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+On Fri, 15 Aug 2025 14:57:44 +0000
+Stefan M=C3=A4tje <stefan.maetje@esd.eu> wrote:
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> Am Dienstag, dem 12.08.2025 um 13:33 +0100 schrieb Vadim Fedorenko:
+> > On 11/08/2025 22:06, Stefan M=C3=83=C2=A4tje wrote: =20
+> > > In esd_usb_start() kfree() is called with the msg variable even if the
+> > > allocation of *msg failed. =20
+> >=20
+> > But kfree() works fine with NULL pointers, have you seen any real issues
+> > with this code? =20
+>=20
+> Hello Vadim,
+>=20
+> I've not seen real problems with this code. And when I posted the patch I
+> knew that kfree() can cope with NULL pointers. But in any case calling a
+> *free() function with a NULL pointer sends shivers over my spine and I
+> want to avoid to stumble over this again and again.
 
-    Andrew
+The only time it is worth the check in the caller is the case where it
+is normal for the pointer to be NULL.
+
+But for an error exit it is safer to have one exit path that tidies everyth=
+ing
+up rather than lots of them where there is the opportunity to exit via the
+wrong one.
+
+	David
 
