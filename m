@@ -1,166 +1,120 @@
-Return-Path: <netdev+bounces-214355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214356-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB8D5B290EA
-	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 01:13:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBE4AB29108
+	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 02:32:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BC3397B0028
-	for <lists+netdev@lfdr.de>; Sat, 16 Aug 2025 23:11:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B688F3B5EA1
+	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 00:32:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4F3923F40F;
-	Sat, 16 Aug 2025 23:13:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C3443594A;
+	Sun, 17 Aug 2025 00:32:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X3P1QIBy"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="fUQxl/hn"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B034D215175
-	for <netdev@vger.kernel.org>; Sat, 16 Aug 2025 23:13:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2293D13FEE;
+	Sun, 17 Aug 2025 00:32:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755385988; cv=none; b=omOvgV/UXO3JHPU+MgIE6VYtLpRNWPPJmiOXNUC4/OL6Z/jVEz/bfCUc7kN0enQYUE5KJh8qerigtle5DQa8zpIZWsUaToJ3F4APbHL0Wi4cljvcn0t7U7/0FEvlv56Qqk1iNqZrfKyKC0qoYm//oZWRfW78HX42Cp1vVRP4sRI=
+	t=1755390733; cv=none; b=iz42sb+vRiD9qySbFTqtFdSQKlAkZLU4m5zimr3XX/Jgzfo8DQ+5+lduhovyg9uOATjAz914kzZjvfka7RkHS7Aqq8AmVpbx1zChdckfzzA/3NS8s50ZDOru2RDyee/ri1hEgqCxruwQN5jaU6DQq1i+JdQ7QYTxUAGKCSUTkEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755385988; c=relaxed/simple;
-	bh=Rl3t65V3dFEsQ1RYW/qCkHJ2p9s2rpLl9Z7RXkazzNg=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=PkoTg1L4bknLJN0OTR7vvDiI29zbTkh8BhSD4wecfz9BZAO+eetU2btsRqerFPGB5ctOTfVRBBao+r9Wo/mniEVbRbLD2sCfXhCMQyttugF5wWHbpcbHGpEaUjr/6S9G2sbk7X5IkYKTLVH1Oex95hahEXfadE0BYsVuURwcZ0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X3P1QIBy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4154BC4CEF6;
-	Sat, 16 Aug 2025 23:13:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755385988;
-	bh=Rl3t65V3dFEsQ1RYW/qCkHJ2p9s2rpLl9Z7RXkazzNg=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=X3P1QIByY0hkhtbabt2iUdVvanO4wEpjj8EeD4x18B9UCBVDyBt6q2HbJrkYUopBq
-	 MiCD38jnm+dQXoWQC7jrt1tYUqvyQv0dzwf1dHgUvz5MmbzK2W8sgnhcn9zD8JOA+w
-	 EknR0Hb5FIcc+n5mmN0SWjP1B0yI7HbQS4FpVMg9Fsex0BzolBzN9dy7E4CDYsB5wt
-	 rVXuhDJ5dZOdtf78fcfr/RIhoYlY3lCDvXRBPrQqvgYq2byBYOGuEkNrudyZqKUGpt
-	 5bXtAKfBeHQqaE96dHlzJesdYrvcwWvPeNxgwgi4tPqwOX/gupBX4EJMcZqEQdqmum
-	 6Vn47/GjH9cLg==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31724CA0EE6;
-	Sat, 16 Aug 2025 23:13:08 +0000 (UTC)
-From: Christoph Paasch via B4 Relay <devnull+cpaasch.openai.com@kernel.org>
-Date: Sat, 16 Aug 2025 16:12:49 -0700
-Subject: [PATCH net-next v2 2/2] net: When removing nexthops, don't call
- synchronize_net if it is not necessary
+	s=arc-20240116; t=1755390733; c=relaxed/simple;
+	bh=SYSf3xnc7zAMoFCLHwjiYQSb+HCoNuTd/lwQn8+geW0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RBI1i1ndT68OJTuh21Mb4D2y0Qm3kcXoQ+Q/z48F50jr7hauUoP7La6bX8NRyNx+TVUUtjxfKQ1gGSCQtt6H7Ozn94cXIR9YeWJ8X90dGj/8CRy7OU+VxNUFieiSvtyurL8Nf7P+RjtpknHoe0ufxM5DCfprB5rYNsUruycqDyY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=fUQxl/hn; arc=none smtp.client-ip=220.197.31.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=Gy
+	S0BF4N7kb4dNNguU2QXnvUxcXRJcFEexZ/e1tAMcw=; b=fUQxl/hnspEEivhZtF
+	JL0QJAxPnyP9luJrKPdSmTdsxODomk3uHUOVex7eEcFOSm+B9W3l8inamESdlrUU
+	dLQdeX7uzM4oGZBLMlgmFgxtkAR2dmni+in11hR42akVQD5AhlDIqz4S0cfn/mpZ
+	uT37D1WtW3+IFs2wPrdYaTCHk=
+Received: from MS-CMFLBWVCLQRG.localdomain (unknown [])
+	by gzga-smtp-mtada-g1-1 (Coremail) with SMTP id _____wBHEDl3IqFo9GLXBw--.16921S2;
+	Sun, 17 Aug 2025 08:29:53 +0800 (CST)
+From: luoguangfei <15388634752@163.com>
+To: nicolas.ferre@microchip.com,
+	claudiu.beznea@tuxon.dev
+Cc: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux@armlinux.org.uk,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	15388634752@163.com
+Subject: [PATCH] net: macb: fix unregister_netdev call order in macb_remove()
+Date: Sun, 17 Aug 2025 08:29:39 +0800
+Message-ID: <20250817002939.3296-1-15388634752@163.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250816-nexthop_dump-v2-2-491da3462118@openai.com>
-References: <20250816-nexthop_dump-v2-0-491da3462118@openai.com>
-In-Reply-To: <20250816-nexthop_dump-v2-0-491da3462118@openai.com>
-To: David Ahern <dsahern@kernel.org>, 
- Nikolay Aleksandrov <razor@blackwall.org>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@idosch.org>
-Cc: netdev@vger.kernel.org, Christoph Paasch <cpaasch@openai.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1755385987; l=2230;
- i=cpaasch@openai.com; s=20250712; h=from:subject:message-id;
- bh=pWb6FXe0Ufgtfgh7z1wN5oRm8vc3NP0L20N8nbaldKw=;
- b=JDaQ3c73msDslVitWgfYMnSIdzVaUTZ4eHgoaMk1GrIM8kEr3DmL1cTQ9s4IMhMCY6sBopZ8B
- fXFz4BsFtrpCxPY5dm99gHwt3XSwY5yBecaZKvykJGPd+iQ8seJzmno
-X-Developer-Key: i=cpaasch@openai.com; a=ed25519;
- pk=1HRHZlVUZPziMZvsAQFvP7n5+uEosTDAjXmNXykdxdg=
-X-Endpoint-Received: by B4 Relay for cpaasch@openai.com/20250712 with
- auth_id=459
-X-Original-From: Christoph Paasch <cpaasch@openai.com>
-Reply-To: cpaasch@openai.com
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wBHEDl3IqFo9GLXBw--.16921S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7tw1fXrW3WFyrur47AFWUArb_yoW8Ww48pw
+	43GFyfWryIqrsFyws7Xa1UJFy5Ga47t348Wa4xu393Z39IkryqyrWjkFy8uFy5GrZrAFWa
+	yr15AasxAa1kAaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pid-BtUUUUU=
+X-CM-SenderInfo: jprvjmqywtklivs6il2tof0z/
 
-From: Christoph Paasch <cpaasch@openai.com>
+When removing a macb device, the driver calls phy_exit() before
+unregister_netdev(). This leads to a WARN from kernfs:
 
-When removing a nexthop, commit
-90f33bffa382 ("nexthops: don't modify published nexthop groups") added a
-call to synchronize_rcu() (later changed to _net()) to make sure
-everyone sees the new nexthop-group before the rtnl-lock is released.
+  ------------[ cut here ]------------
+  kernfs: can not remove 'attached_dev', no directory
+  WARNING: CPU: 1 PID: 27146 at fs/kernfs/dir.c:1683
+  Call trace:
+    kernfs_remove_by_name_ns+0xd8/0xf0
+    sysfs_remove_link+0x24/0x58
+    phy_detach+0x5c/0x168
+    phy_disconnect+0x4c/0x70
+    phylink_disconnect_phy+0x6c/0xc0 [phylink]
+    macb_close+0x6c/0x170 [macb]
+    ...
+    macb_remove+0x60/0x168 [macb]
+    platform_remove+0x5c/0x80
+    ...
 
-When one wants to delete a large number of groups and nexthops, it is
-fastest to first flush the groups (ip nexthop flush groups) and then
-flush the nexthops themselves (ip -6 nexthop flush). As that way the
-groups don't need to be rebalanced.
+The warning happens because the PHY is being exited while the netdev
+is still registered. The correct order is to unregister the netdev
+before shutting down the PHY and cleaning up the MDIO bus.
 
-However, `ip -6 nexthop flush` will still take a long time if there is
-a very large number of nexthops because of the call to
-synchronize_net(). Now, if there are no more groups, there is no point
-in calling synchronize_net(). So, let's skip that entirely by checking
-if nh->grp_list is empty.
+Fix this by moving unregister_netdev() ahead of phy_exit() in
+macb_remove().
 
-This gives us a nice speedup:
-
-BEFORE:
-=======
-
-$ time sudo ip -6 nexthop flush
-Dump was interrupted and may be inconsistent.
-Flushed 2097152 nexthops
-
-real	1m45.345s
-user	0m0.001s
-sys	0m0.005s
-
-$ time sudo ip -6 nexthop flush
-Dump was interrupted and may be inconsistent.
-Flushed 4194304 nexthops
-
-real	3m10.430s
-user	0m0.002s
-sys	0m0.004s
-
-AFTER:
-======
-
-$ time sudo ip -6 nexthop flush
-Dump was interrupted and may be inconsistent.
-Flushed 2097152 nexthops
-
-real	0m17.545s
-user	0m0.003s
-sys	0m0.003s
-
-$ time sudo ip -6 nexthop flush
-Dump was interrupted and may be inconsistent.
-Flushed 4194304 nexthops
-
-real	0m35.823s
-user	0m0.002s
-sys	0m0.004s
-
-Signed-off-by: Christoph Paasch <cpaasch@openai.com>
+Signed-off-by: luoguangfei <15388634752@163.com>
 ---
- net/ipv4/nexthop.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ drivers/net/ethernet/cadence/macb_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/ipv4/nexthop.c b/net/ipv4/nexthop.c
-index 509004bfd08ec43de44c7ce4a540c983d0e70201..0a20625f5ffb471052d92b48802076b8295dd703 100644
---- a/net/ipv4/nexthop.c
-+++ b/net/ipv4/nexthop.c
-@@ -2087,6 +2087,12 @@ static void remove_nexthop_from_groups(struct net *net, struct nexthop *nh,
- {
- 	struct nh_grp_entry *nhge, *tmp;
+diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+index ce55a1f59..7bbb674d5 100644
+--- a/drivers/net/ethernet/cadence/macb_main.c
++++ b/drivers/net/ethernet/cadence/macb_main.c
+@@ -5407,11 +5407,11 @@ static void macb_remove(struct platform_device *pdev)
  
-+	/* If there is nothing to do, let's avoid the costly call to
-+	 * synchronize_net()
-+	 */
-+	if (list_empty(&nh->grp_list))
-+		return;
-+
- 	list_for_each_entry_safe(nhge, tmp, &nh->grp_list, nh_list)
- 		remove_nh_grp_entry(net, nhge, nlinfo);
+ 	if (dev) {
+ 		bp = netdev_priv(dev);
++		unregister_netdev(dev);
+ 		phy_exit(bp->sgmii_phy);
+ 		mdiobus_unregister(bp->mii_bus);
+ 		mdiobus_free(bp->mii_bus);
  
-
+-		unregister_netdev(dev);
+ 		cancel_work_sync(&bp->hresp_err_bh_work);
+ 		pm_runtime_disable(&pdev->dev);
+ 		pm_runtime_dont_use_autosuspend(&pdev->dev);
 -- 
-2.50.1
-
+2.43.0
 
 
