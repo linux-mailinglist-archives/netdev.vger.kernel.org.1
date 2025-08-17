@@ -1,146 +1,108 @@
-Return-Path: <netdev+bounces-214405-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214406-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADAA6B2944F
-	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 18:58:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 90D7BB2948C
+	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 19:24:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 391851966597
-	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 16:58:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 275161B26897
+	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 17:24:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 394F82FD1AD;
-	Sun, 17 Aug 2025 16:58:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16F2F1F4717;
+	Sun, 17 Aug 2025 17:24:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="cL1YHVp2"
+	dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b="Qv8kjU/F"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a5-smtp.messagingengine.com (fhigh-a5-smtp.messagingengine.com [103.168.172.156])
+Received: from mail-4323.protonmail.ch (mail-4323.protonmail.ch [185.70.43.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DE56245006
-	for <netdev@vger.kernel.org>; Sun, 17 Aug 2025 16:58:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF0F2221FC4
+	for <netdev@vger.kernel.org>; Sun, 17 Aug 2025 17:24:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.23
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755449888; cv=none; b=cNWohOudt3IgPeExY2iBOXQI9HVgGpeiogZW9yY6k+ecoXbaBJsW3QumzZpWAYrB16ySKdeXTUcZsyyb5XF/2lopanhOLiB1fJXjZS58k2NyYyzJUqSSamJi7BdpR8JzyYgJRYTkH9a7hnsYjckFuzNeBH5QEUXf2WmduGy9Oa4=
+	t=1755451473; cv=none; b=n7cJ1UfbN9sDcNloB5xqKb5QkeqE60bbtnJWdlfNXP+vSLb4L5ICL9pDj7kE6jKKjM8T5IRohlMsOCANrEaQxenTjYcEPhmPRJyHQaBMZ0V+XX+nrGik9gsy0eHkwtgL6J6DjGmslLKvddTAPKUPfmHs4hNklBkNsU3A4/jiHoU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755449888; c=relaxed/simple;
-	bh=dZZs/Hlm7qFOTJeTJJnuNBkTXUeFU5g7unhg89fcJdU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=r6XIRkaA8tjXHLavFYQY2A2/o+CVc1iR6CWNZMZAHUPmm38dnZCo8t1vnHhQanHjBEwNcXdLyPwykawXAgLt5ejviVoJk2kHujWbNZaTntYEXMkwllVe+QOuTCbRNRYMkFiZOER/K1XsbTbqQPmTFVxzW8sNq2GySUopjTJE6eY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=cL1YHVp2; arc=none smtp.client-ip=103.168.172.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 675141400045;
-	Sun, 17 Aug 2025 12:58:05 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-04.internal (MEProxy); Sun, 17 Aug 2025 12:58:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1755449885; x=1755536285; bh=LTFB6H4XgQdjW1q59gBpOXXnyiu7mjy6UGO
-	DZG+CLO8=; b=cL1YHVp2vFrToUs7vssTVGBbWo/CmvQ4UqBvTfcouoI1Rf1bzOT
-	xO8DSd7cet5n3rSKumjky8tb+rDYHMpEmJ9Fetu+R1w5DsSNpEGdQHL4A/+oYMqk
-	d4PZOsYmo3w2x+t19qQi4Rn34Zr17LrNsTMojIEKzwNWhzjVVcBDuYfLTtCq68n1
-	sEWNupTC4qp9Co8q0woqA91vj7Ozq01ilNRhKudL7vUKKy6a5YMNS0WHB5YTse0d
-	3LqtTCP+C+uP+/oMhsxAz4Lm48AP/xWesqVdsjS+S+eY5/8D6Sr06Tyzxt2JStOo
-	2GwTBXJr36tsr05LuhIFMinKWXcF0fbplAA==
-X-ME-Sender: <xms:GwqiaK3qqQJdLZ1eEV5vuEisbvhyFXj79OusnKOmIh0Zw0fS5-UBVw>
-    <xme:GwqiaFi0b3EU1ZrOx7jglkLgKpBVABMK6PCs-smExbxoc6EQa2cEsy3zAFmlq0F55
-    UPGYRhVksOOBtQ>
-X-ME-Received: <xmr:GwqiaDVJpB2idY5QLyL5UF22tuInDgtPWT0DBL5Tu4lr0JSIngGOSIpKfnCv0eot3fFAylzhIF08nsKINZ-0nw97L5K8qg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdduhedtvdejucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepkfguohcuufgt
-    hhhimhhmvghluceoihguohhstghhsehiughoshgthhdrohhrgheqnecuggftrfgrthhtvg
-    hrnhephefhtdejvdeiffefudduvdffgeetieeigeeugfduffdvffdtfeehieejtdfhjeek
-    necuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpedtne
-    curfgrrhgrmhepmhgrihhlfhhrohhmpehiughoshgthhesihguohhstghhrdhorhhgpdhn
-    sggprhgtphhtthhopeeipdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegvsghigh
-    hgvghrsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhunhhihihusehgohhoghhl
-    vgdrtghomhdprhgtphhtthhopegrnhgurhgvrgdrmhgrhigvrhesuhhnihhrohhmrgdvrd
-    hithdprhgtphhtthhopegulhgvsghruhhnsehgohhoghhlvgdrtghomhdprhgtphhtthho
-    pehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehhvghmih
-    hnhhhonhhgsehkhihlihhnohhsrdgtnh
-X-ME-Proxy: <xmx:GwqiaMWYChKC67NowULMKdjuB_o0A6ZOREypu9OZuppA18QriaaAyA>
-    <xmx:GwqiaLgokG7hn__AxfX6TaAuUYwZ0r4FYiEZx7pFj2UfPU-bJm25aQ>
-    <xmx:GwqiaPYcn7_Xg5-urWuTbJk9G3SPdHNUh8lhBzVGUx4iR18sAAUzSw>
-    <xmx:GwqiaApdWpBm2pu1SDEiYsgyraFg57oGQqKwnfjbwaOtDgWH7_XW4Q>
-    <xmx:HQqiaDm_qzxB7IzS9jUPuNhopxZy1veOV_vJ5XuyQEi3Ewj-FRHpLb_D>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
- 17 Aug 2025 12:58:03 -0400 (EDT)
-Date: Sun, 17 Aug 2025 19:58:00 +0300
-From: Ido Schimmel <idosch@idosch.org>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Kuniyuki Iwashima <kuniyu@google.com>, andrea.mayer@uniroma2.it,
-	dlebrun@google.com, netdev@vger.kernel.org,
-	Minhong He <heminhong@kylinos.cn>
-Subject: Re: [PATCH net-next 2/3] ipv6: sr: Use HMAC-SHA1 and HMAC-SHA256
- library functions
-Message-ID: <aKIKGI72EklLRfwO@shredder>
-References: <20250816031136.482400-3-ebiggers@kernel.org>
- <20250816070227.1904762-1-kuniyu@google.com>
- <20250816072639.GA291962@sol>
+	s=arc-20240116; t=1755451473; c=relaxed/simple;
+	bh=omIc8mNAk/gq3H73GvtGc57UDOYkV2lBSUrucDfQtjQ=;
+	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=J70/bdr3qNKLkgd0ZcAhPqm2vk/uHQ2Ur4EPkfG9sd2qJsnhk25JGkQE+v48jnx9vWYKw7inBD76ylYFAAehDX6IwqlFW5BM1hX81Z8KvrPeK3dry5O3ptfvbcAApM53JbKBhuSy5kSiPDOoYrUe8wWdfIKRVITcscQKSvnN8I8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io; spf=pass smtp.mailfrom=willsroot.io; dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b=Qv8kjU/F; arc=none smtp.client-ip=185.70.43.23
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=willsroot.io
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=willsroot.io;
+	s=protonmail2; t=1755451461; x=1755710661;
+	bh=WlfDB9f9hx9/p9nnw0AggcvHEZASiW/W23imChJvDRs=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=Qv8kjU/FeEZiLiubE8LWpXEQuBjMIZ/UxMDCLm7TbEwKblW9Yx77zmZvl9731xXyS
+	 A8FqtBzB7yaxwEHTCgFgg4mVN3kEUN9/dECRtbsdPli6EZETqrVhnWfknJ7zrLk+5x
+	 7ruIw0o29BvwB8YWZwuhLokbznKVALEnxf9pjtmIIqf6ib9OEujT3aWrLWRdObBQ5B
+	 AeOYW8bkxlONmIxUWrS/ezlW8PGjjq78OBvUme6MRdPl2Gg5blhPFPV9SxRrcwOa09
+	 rSfJ/LKSsh6c821EzmjDWwy4ueKQIDDxonKUhKbQdHJy5cWS/VKc24z+h4AD1VMg4M
+	 +nwPRHFJwHzYw==
+Date: Sun, 17 Aug 2025 17:24:17 +0000
+To: netdev@vger.kernel.org
+From: William Liu <will@willsroot.io>
+Cc: toke@toke.dk, jhs@mojatatu.com, xiyou.wangcong@gmail.com, pabeni@redhat.com, kuba@kernel.org, savy@syst3mfailure.io, jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, horms@kernel.org, cake@lists.bufferbloat.net, William Liu <will@willsroot.io>
+Subject: [PATCH net 1/2] net/sched: Make cake_enqueue return NET_XMIT_CN when past buffer_limit
+Message-ID: <20250817172344.449992-1-will@willsroot.io>
+Feedback-ID: 42723359:user:proton
+X-Pm-Message-ID: 8da73108157485efe91066723bbc5a3e3ac39643
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250816072639.GA291962@sol>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, Aug 16, 2025 at 12:26:39AM -0700, Eric Biggers wrote:
-> On Sat, Aug 16, 2025 at 07:01:28AM +0000, Kuniyuki Iwashima wrote:
-> > From: Eric Biggers <ebiggers@kernel.org>
-> > Date: Fri, 15 Aug 2025 20:11:35 -0700
-> > > @@ -106,79 +95,17 @@ static struct sr6_tlv_hmac *seg6_get_tlv_hmac(struct ipv6_sr_hdr *srh)
-> > >  		return NULL;
-> > >  
-> > >  	return tlv;
-> > >  }
-> > >  
-> > > -static struct seg6_hmac_algo *__hmac_get_algo(u8 alg_id)
-> > > -{
-> > > -	struct seg6_hmac_algo *algo;
-> > > -	int i, alg_count;
-> > > -
-> > > -	alg_count = ARRAY_SIZE(hmac_algos);
-> > > -	for (i = 0; i < alg_count; i++) {
-> > > -		algo = &hmac_algos[i];
-> > > -		if (algo->alg_id == alg_id)
-> > > -			return algo;
-> > > -	}
-> > > -
-> > > -	return NULL;
-> > > -}
-> > 
-> > This chunk will cause build failure when net.git is merged
-> > to net-next due to the patch below.  You may want to respin
-> > the series after this lands to net-next.
-> > 
-> > https://lore.kernel.org/netdev/20250815063845.85426-1-heminhong@kylinos.cn/
-> 
-> Thanks for pointing that out.  I hadn't seen that patch.  Patch 3 in my
-> series actually fixes the exact same problem, though in my patch it's
-> more of a side effect of preparing the HMAC key rather than the main
-> point of the patch.  If that patch lands first, I'll rebase my series.
-> 
-> We do need to decide whether the algorithm ID validation and key
-> preparation should be done in seg6_hmac_info_add() as in that patch, or
-> in seg6_genl_sethmac() as in my patch.  seg6_hmac_info_add() is fine I
-> guess, but let me know if you have a preference.
+The following setup can trigger a WARNING in htb_activate due to
+the condition: !cl->leaf.q->q.qlen
 
-FWIW, I think that as you have it now is fine given the other parameters
-are also validated in seg6_genl_sethmac(). Exposing __hmac_get_algo()
-seemed wrong to me so I suggested either moving the check to
-seg6_hmac_info_add() or exposing something like 'bool
-seg6_hmac_algo_is_valid(u8 alg_id)' which internally calls
-__hmac_get_algo().
+tc qdisc del dev lo root
+tc qdisc add dev lo root handle 1: htb default 1
+tc class add dev lo parent 1: classid 1:1 \
+       htb rate 64bit
+tc qdisc add dev lo parent 1:1 handle f: \
+       cake memlimit 1b
+ping -I lo -f -c1 -s64 -W0.001 127.0.0.1
+
+This is because the low memlimit leads to a low buffer_limit, which
+causes packet dropping. However, cake_enqueue still returns
+NET_XMIT_SUCCESS, causing htb_enqueue to call htb_activate with an
+empty child qdisc.
+
+I do not believe return value of NET_XMIT_CN is necessary for packet
+drops in the case of ack filtering, as that is meant to optimize
+performance, not to signal congestion.
+
+Fixes: 046f6fd5daef ("sched: Add Common Applications Kept Enhanced (cake) q=
+disc")
+Signed-off-by: William Liu <will@willsroot.io>
+Reviewed-by: Savino Dicanosa <savy@syst3mfailure.io>
+---
+ net/sched/sch_cake.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/net/sched/sch_cake.c b/net/sched/sch_cake.c
+index dbcfb948c867..40814449f17a 100644
+--- a/net/sched/sch_cake.c
++++ b/net/sched/sch_cake.c
+@@ -1934,6 +1934,9 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Q=
+disc *sch,
+ =09=09=09cake_drop(sch, to_free);
+ =09=09}
+ =09=09b->drop_overlimit +=3D dropped;
++
++=09=09if (dropped)
++=09=09=09return NET_XMIT_CN;
+ =09}
+ =09return NET_XMIT_SUCCESS;
+ }
+--=20
+2.43.0
+
+
 
