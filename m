@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-214392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214393-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BDDAB293DD
-	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 17:31:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A532BB293E5
+	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 17:36:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 125A016E855
-	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 15:31:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9B71E7B249F
+	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 15:35:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAC9C1A3160;
-	Sun, 17 Aug 2025 15:31:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA17822A4E1;
+	Sun, 17 Aug 2025 15:36:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="5Bz1QDu5"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="MXMb2L+1"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42D3212B73;
-	Sun, 17 Aug 2025 15:31:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27E231E1A05;
+	Sun, 17 Aug 2025 15:36:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755444669; cv=none; b=m3w6FFiV/oX1xYEUY4u4AP4yt/ryp7S/877wehsFv2RaGRs1jTAiUQJm4fJvGBytZ+08QAqAxbI7+aGQBWDTesLye8kKIeZoHJ72wOck/P/64SZHlRK6Tvye1IqMMFKN5Qn6EtNRbItorxBQJFC3mRrT566ZuYt64nInJtI+Yr4=
+	t=1755444994; cv=none; b=Xtt2xg1Hov+HjJXb0sh/HCIQg3A8K7diXfKTBtdWWIkOx5y6vIQRIRx1GWE1b2+BeLHHLsX7XVt1Tl9Gvc133NCAIWZBVyv/YrO5BYNXlvGsez6++q8apulFlG/1UPm6GZMUNtVeuP1j5A8z5AB9mCoJRp+dymuscqV2A5SoMNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755444669; c=relaxed/simple;
-	bh=PQ+CFIhp1yiLUGGpNqB/wxFxiJR6D2Rdik6+NX9WSPE=;
+	s=arc-20240116; t=1755444994; c=relaxed/simple;
+	bh=EJFLB8vlxaD2J0q/5EuxQV/CklJYT944X91IRyIAV5M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ctIsvZiQ9IiBN9HXAXKQn2y10ih2rFAhUifl1zpUIVrKwNea79+SBshDlstOZ0MStBqU8xrJn05jNDiCIFHizmEpyJ9XAhnOuva+flbpeF8/fukMeUIaNfXEb7nj4pJs3eFzJvFbkFN7HAtSnPuGmKMOi6askefT+pTkD9FA6ZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=5Bz1QDu5; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=WlY8rkMCROkbt+jxtaWTpQU9CeS9eWVDfOldnKZcQSk+Mr4r+dCBr5deTlmLsB56lCMhG+w+9eBoRcpPzpv56crC6y3lPSscv6Hc0tFJxhDSz45UGVlgvSm6zZf4GQMdl5kAwP6pX/Y6uHk+9OBnwluWfzDSZIRgFIrz07B2rfI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=MXMb2L+1; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=TkFJZU4VtS+tHD4zwXLDlbea3GBzl9UC0DlBrPXczD8=; b=5Bz1QDu5nC/ErdwxZ7aKzlb8AT
-	lYQSzRxGQ32xBSBzJceK9VMmp4nroK9VVFUuA7uP0YuAiaChaw8AMl6EsugsdLrawRxnoBvA/XKxQ
-	eEw7DFdDRwGHkLaIvUmTb48K8Tg58QlHSblt4GssHzNEDoAt2FBc1ejvNzfBohHsy+jc=;
+	bh=a3dU9bOsBGQWEGsligX1eCujGn6cFI0IDVQajv49Yzg=; b=MXMb2L+1jOEzEvTBuomQ1QVrKk
+	1ncJsTUL0HJ7f7BhG7rT9ESGdBicu7Ydeyp6BVYwFd497HQkrvT5EXM7Eumty8kTvImWm6pMJ4b8Z
+	F4ue5yk4DBAax2J7JT5Cp+RE6FgzTD3fxl48EPKUrt9uLRAjXEZnvWMaKDefQU1Fw6t0=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1unfLO-004yOT-RU; Sun, 17 Aug 2025 17:30:50 +0200
-Date: Sun, 17 Aug 2025 17:30:50 +0200
+	id 1unfQb-004yQP-Qg; Sun, 17 Aug 2025 17:36:13 +0200
+Date: Sun, 17 Aug 2025 17:36:13 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Daniel Golle <daniel@makrotopia.org>
 Cc: Vladimir Oltean <olteanv@gmail.com>,
@@ -65,10 +65,10 @@ Cc: Vladimir Oltean <olteanv@gmail.com>,
 	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
 	"Livia M. Rosu" <lrosu@maxlinear.com>,
 	John Crispin <john@phrozen.org>
-Subject: Re: [PATCH RFC net-next 08/23] net: dsa: lantiq_gswip: store switch
- API version in priv
-Message-ID: <2e433a22-723c-4217-b682-35839015873f@lunn.ch>
-References: <aKDhfn-92oPzDcYY@pidgin.makrotopia.org>
+Subject: Re: [PATCH RFC net-next 09/23] net: dsa: lantiq_gswip: add support
+ for SWAPI version 2.3
+Message-ID: <712e82b5-62fc-423a-a356-8cc74fc22e3d@lunn.ch>
+References: <aKDhigwyg2v5mtIG@pidgin.makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,15 +77,43 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aKDhfn-92oPzDcYY@pidgin.makrotopia.org>
+In-Reply-To: <aKDhigwyg2v5mtIG@pidgin.makrotopia.org>
 
-On Sat, Aug 16, 2025 at 08:52:30PM +0100, Daniel Golle wrote:
-> Store the switch API version in struct gswip_priv to prepare supporting
-> newer features such as 4096 VLANs and per-port configurable learning.
+On Sat, Aug 16, 2025 at 08:52:42PM +0100, Daniel Golle wrote:
+> Add definition for switch API version 2.3 and a macro to make comparing
+> the version more conveniant.
 > 
 > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> ---
+>  drivers/net/dsa/lantiq_gswip.h | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/drivers/net/dsa/lantiq_gswip.h b/drivers/net/dsa/lantiq_gswip.h
+> index 433b65b047dd..fd0c01edb914 100644
+> --- a/drivers/net/dsa/lantiq_gswip.h
+> +++ b/drivers/net/dsa/lantiq_gswip.h
+> @@ -7,6 +7,7 @@
+>  #include <linux/platform_device.h>
+>  #include <linux/regmap.h>
+>  #include <linux/reset.h>
+> +#include <linux/swab.h>
+>  #include <net/dsa.h>
+>  
+>  /* GSWIP MDIO Registers */
+> @@ -93,6 +94,8 @@
+>  #define   GSWIP_VERSION_2_1		0x021
+>  #define   GSWIP_VERSION_2_2		0x122
+>  #define   GSWIP_VERSION_2_2_ETC		0x022
+> +#define   GSWIP_VERSION_2_3		0x023
+> +#define GSWIP_VERSION_GE(priv, ver)	(swab16(priv->version) >= swab16(ver))
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Don't this depend on the endiannes of the CPU?
 
-    Andrew
+It seems like it would be better to make your new version member cpu
+endian, and when writing to it, do le16_to_cpu().
+
+Also, if i remember correctly, you made version a u32. Should it
+really be a u16?
+
+	Andrew
 
