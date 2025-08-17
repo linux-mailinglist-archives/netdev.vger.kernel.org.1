@@ -1,232 +1,163 @@
-Return-Path: <netdev+bounces-214366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214367-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A083B29264
-	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 11:16:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1180B29278
+	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 11:40:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B47924831C2
-	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 09:16:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 862DB487018
+	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 09:40:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D95C209F2E;
-	Sun, 17 Aug 2025 09:16:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61183221F26;
+	Sun, 17 Aug 2025 09:40:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b="ngIq4PgX"
+	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="F+g5/sZY"
 X-Original-To: netdev@vger.kernel.org
-Received: from SEYPR02CU001.outbound.protection.outlook.com (mail-koreacentralazon11013000.outbound.protection.outlook.com [40.107.44.0])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BF1C1D61BB;
-	Sun, 17 Aug 2025 09:16:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.44.0
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755422176; cv=fail; b=QrzsyxGXFQ8a5BY58i/syfxeaEY8x3B7/vUfrHNvXHKVWUDyRMh/8qgjF8PphU4dg20mt/Li6e98aiknqlXj2h8HLayO06VSDMGAv99CAL/rr0B/HBwW1idHa0s/qNeTD45rww4EbxXq/TS2pJ4865LORAOwkQWlX/23xQKmkRo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755422176; c=relaxed/simple;
-	bh=17fno8oLqAicFgXdQIHYc7SXPIO6ewx6cncYXbZ/krQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=KtYk2qHY9UWjJT06QnCkr22B4oQlYwxDYHBYGSOOFPWGw8Ug5G2f3xO4WY6QGFsMInZFdl8C64icsayXiu7BMnXe3UluDDdvG/ZGNJq4epuJ2zeW/f7rq9GeJC33miNh6gxe0WmoSimWKjMHAvqMdTCBgumi3Qrmf8MV9/e8LsE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com; spf=pass smtp.mailfrom=vivo.com; dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b=ngIq4PgX; arc=fail smtp.client-ip=40.107.44.0
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vivo.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=MYGE0iX3Xp2gQBfPNXFrczj/4nvG+JDFGn/SDXpbqfewjeV7AolCw86hIFpCAshMrYffbPq14yltytjro6W6qKOOEGlZPvy1QqR1J1JN5VdmAn7NpV3COQWS2DpTeGCvdHZHWBYum7ZURxM8nQkfrIGncs0FyFiv71tet99wLTriu7PHtu44WLWsmzjEePnu+42VOQPltJVxIY90jkCDpgXFWjnydH693c4JeQzmJY6hoDP13v27RQLQcDph8MrEiOxQOapiN3JCtFD3h1IEpHztAO8s3Ynr2XMOY8XXVWwgVi9HSUT4e3xRHLISghO38KIag0qnIVx19ZO7zk89KQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bcl4I29pvNAWU8ZCIzNLzWnheirigLyRhXab0USs52o=;
- b=e+jPJtR9E0gQ9ShwyRtSFWx4iaZF1MIHgczIuB+60ZjJ3MQsmqdvhyH/Zx9Yl+oLZK6XIm3IzTd5YyhvrTD1H33J36IFAy4mTTXjvPmzlgIgK31B2r6zhMVyF5I8w6QLD72VtMufPcp2YSC0Jnjo+mo/aEq8skVRP2FdYjyvO5EdJglow8iQIO3k3LaFSAgwdoX3aURzdgv1Mq98I3ru5XkBow0ZA7ac5EhngCKPGaq4k858qqMXCWvmCQuhy/p0vFGhKt/0M5xBw3ivFATgYr8m3YmlTsdjaIuglGvbltc/2Gl3om0xpqv3AHKna9DrRB2fugpr7juWPLCMZN6l4Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
- dkim=pass header.d=vivo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bcl4I29pvNAWU8ZCIzNLzWnheirigLyRhXab0USs52o=;
- b=ngIq4PgX124y7o+9hQd2AVqRjsitBGfeceOhgXb9uhWkvj/bhhVdyWR9T0FjKxGsRtbntBNqHs46rqh045lWcLpBcUQF8tZFqKDE7Sg8JnkSOkJwmLGZOp9JmZr4Idu+VpHxO7dtiLfp5iL20C9F+E7kFYldemJgYVUWVPdNnDazoRo2ZmVqNeT1YXzCX6x8mDN5mSknWEa172sXhROK81gxjgF3ZDLfCsp/eoidwGJsQjtUZwYAHVCc7uZmRpjXa5XRU5ccE+s6OTaiLSn2z7q8FwDGW92RW1oFgO4kxXRWuYAIJSfGHMFUBpKj6UcnUWsfHmVU/AaX6RFzYWbfhA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=vivo.com;
-Received: from SI2PR06MB5140.apcprd06.prod.outlook.com (2603:1096:4:1af::9) by
- TYZPR06MB6190.apcprd06.prod.outlook.com (2603:1096:400:33f::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9031.19; Sun, 17 Aug
- 2025 09:16:11 +0000
-Received: from SI2PR06MB5140.apcprd06.prod.outlook.com
- ([fe80::468a:88be:bec:666]) by SI2PR06MB5140.apcprd06.prod.outlook.com
- ([fe80::468a:88be:bec:666%5]) with mapi id 15.20.9031.021; Sun, 17 Aug 2025
- 09:16:11 +0000
-From: Qianfeng Rong <rongqianfeng@vivo.com>
-To: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Ido Schimmel <idosch@nvidia.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	bridge@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Qianfeng Rong <rongqianfeng@vivo.com>
-Subject: [PATCH] netfilter: ebtables: Use vmalloc_array() to improve code
-Date: Sun, 17 Aug 2025 17:15:56 +0800
-Message-Id: <20250817091556.80912-1-rongqianfeng@vivo.com>
-X-Mailer: git-send-email 2.34.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: TYCPR01CA0049.jpnprd01.prod.outlook.com
- (2603:1096:405:2::13) To SI2PR06MB5140.apcprd06.prod.outlook.com
- (2603:1096:4:1af::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7BE11DF74F
+	for <netdev@vger.kernel.org>; Sun, 17 Aug 2025 09:40:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755423614; cv=none; b=dHJTN+a0UGcZB588XaJeaM0rypL+fg9S/aVOji6/1EiuzgHRGmLDd93zXXlxe2bYNcle2sF1n0GQz55G4+KLI1IZTzHm63mY7xBmbOYVB4YGFK+bK3uBvF/e0NcWuuP7LOEp1FdU2bzvaIUW8R/YhoRPoywms7R9RmFY9mhfFik=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755423614; c=relaxed/simple;
+	bh=Y4b1Wey0Bzm9RnN7kiOzeEuSRoMo8KgO6GcwS5m6utw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Bh0GcEWVtortwCH4J5W2cc5B6t5qYWrj3Yuzbc5dFmUkMTsiRHjQ6g3xcbmZt9SX9dGqTUVoPKiVhJVpj0uJUyb/T6DDh/iG9QzrsOT9FXj6aK7aBXHHIRRV7osFlaYdcZRzTR6NrRKUJ+P7LbDUikui1d1HOf0p+FIk8Y1423o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=F+g5/sZY; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-afcb731ca8eso536140766b.0
+        for <netdev@vger.kernel.org>; Sun, 17 Aug 2025 02:40:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall.org; s=google; t=1755423611; x=1756028411; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Qm4RPaa0FhsIq5Gi6bADCpXN7OJ5u1r+9fgBroRfJm8=;
+        b=F+g5/sZYU+qjFVW0JAja9naKFcPUaxs22UPXqIuFR9yM7505RJjmzYp+Q/hNYtT9EQ
+         zWMuEK7Rx+JQIZcfzoW44iYMQVxJ9T9722OBLSmPXG4nMy6R1KzVVm4C6GuorFugKs5L
+         KlSziuNzgQ6berSsRR8o0KyFbKqghi6XkK618wqe3JTuAY5itwAb0Qwkqx4AvYxBzoHF
+         Yr/Dsp2rKlaRJ4Bo9IzAfsAVMzE8obWoXBf+t85s6O45YcBpZGdasJa7D0B2QYcmmfyh
+         KdnK18NbPXNA9PAus+pDRL8fb6ruDgjNpyk513h3VgQorWxqQRbbHcdsrfXwcXZtXW0m
+         BYWQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755423611; x=1756028411;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Qm4RPaa0FhsIq5Gi6bADCpXN7OJ5u1r+9fgBroRfJm8=;
+        b=wkD45uT9NUnrdNUT4nq/CO002KxZfbz0KaZ8LozzG34kK4aRniQP3hyJhMs/iUENwo
+         93/viQKB5JCg2iPXYg2Rx6DzFLddwNha/kkY+WM8iTghp1tdxcetYKbYn7x446btKYSy
+         ceLo76RlOw4EhmeIDBAiGfkJhG0Rh/T9vhAK3/LIKpbqPnD5yZYPF9MQ0DBQiilHraNa
+         AAC9xrG0qU/JIAN2lmJ3ok/cVaPYWYIN1uZyNkVeCyOA+2bjdg3EJg8PB0x6w9N1xpkP
+         eKrv1eoHuWTa79v2O00U3oPDTFB4xE1+ixNEmVVyQcE+44blBA92L45G7L6AnDYMvcas
+         Ia0w==
+X-Gm-Message-State: AOJu0YzvQITVoajrPKeeeNspzMOP+9RQMAO7ewrdMv0lGIlDX/qaIdsF
+	XBlHZf3ohOPtHdTq/DKRnUcW6/hnN73HSSnm7iSmn1vAHiDcWvPoQcqvgXMAAh7CDBk=
+X-Gm-Gg: ASbGnctM6ZQNb1mDV5JY25TjCZrrSoeY7G/nxIxCQ8r3rIikJVEgUqGSyZdImQelNSI
+	SkmvV5IWLbp4OQlzcR5SnKOHd2CV9uXSvsFtHchR2k/Dm8Kq4/e5FjG0wH/BarcxKScew2Qt2BI
+	qaqXUF7tw4El5hQTutmHJtXOs0NPGh7A+22JZEGGX8Cr3KhchTlqdyWnfOREw76PMmhNg3vFpDm
+	Y5OlZIHfNll2GBTUWJMSP2cpwbfdsmrNMkidsd+qcOY2s/G/OoLzjMEGbeCTwlOUZQoHFxFnzZy
+	1cKioCVicqUkVRKLc+udeJ2c1yZjk4SgWEgMCJolTO5cWOU3nnMLqsGQp1vGW33PqptBQC3AiYM
+	96Oux77PiObwKrnV14L4+LrCiP8S/lNfKBoTrYqCkV5Et4Rp9SPxWbA==
+X-Google-Smtp-Source: AGHT+IGHLSmc20FUaq+pXnAxbhs85W77k0jJB8aw5RuDsIYFk+rfXk653aRmqm4W7siVHq5W0hJO1A==
+X-Received: by 2002:a17:907:9628:b0:ae3:6d27:5246 with SMTP id a640c23a62f3a-afcdc3ab857mr701920266b.48.1755423610813;
+        Sun, 17 Aug 2025 02:40:10 -0700 (PDT)
+Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-afcdce53eccsm565094566b.19.2025.08.17.02.40.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 17 Aug 2025 02:40:10 -0700 (PDT)
+Message-ID: <bf2686f5-21a5-4654-9825-c883a626baad@blackwall.org>
+Date: Sun, 17 Aug 2025 12:40:08 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SI2PR06MB5140:EE_|TYZPR06MB6190:EE_
-X-MS-Office365-Filtering-Correlation-Id: d53097ed-81e1-467c-df9d-08dddd6eb4f2
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|1800799024|52116014|366016|38350700014|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?vm8ixvK5Y0JasGnVKV+tevF7kZSTPWdZKKnjftxLBEBiydCdX0//Na1SS3U/?=
- =?us-ascii?Q?GKIKLbf3UVDDxu/2A/35IfLh7NCAHqE6+ZGWkwsyxo5fOZfVbaXLoM4g1q+s?=
- =?us-ascii?Q?ZpxiNZ7OMBX18rfLBW0RK3RSUfQqS+XR+PakTYCnGT4RhttnHmSpWi4UnSVW?=
- =?us-ascii?Q?z5Kaz28sQfspK86Jqdn7nQ4nXo2dBHN6albu9jCsJHfHWaw2WtPGdNEj3Chi?=
- =?us-ascii?Q?DOoCtjJxYYOIGsoQNXmUnz/Hh6rt8wO+WNqfz7inQBa2HxPQWcmVH2JGbKl5?=
- =?us-ascii?Q?1hi80aQqxH3RxzujZR+blvwAdivvwIbzsKwyik/n+d4G/IhrenSAXW702aiJ?=
- =?us-ascii?Q?z5vJXDcB+nruHdVGSDLU6oqPIUz3OTTEbHHk2478Y4OxeMNZkAb9dZIbd4ZO?=
- =?us-ascii?Q?LeEgRfNvK/kFCVh4RsylDDmixs8OnU20qFfDOI+2qvoof4WHewhTKjqo8R7x?=
- =?us-ascii?Q?2Qw0JmGNqdp4Nn9sPaBfbwvfqoe/FEyXNFsIDVJMmXdZBfFBvREJHCQKV5ds?=
- =?us-ascii?Q?Ic3N5sJOjBM4WOhAvcuXVg+SRfOGfKxJxMrN15Dhh0kinhKZZLMbqtnTBVno?=
- =?us-ascii?Q?AxKpQ6yfDcBam+tktyafrnVcDxSa4w3vd/XSXXl9UZ2bnepcuWIyVXKx5eIM?=
- =?us-ascii?Q?BOTMyntenVYZnT6Wvi9OAYbIVoNm79MyTtCVx7VhzaaxNF6Mp2V/cWUEX2Ik?=
- =?us-ascii?Q?9OLomMMTFVBmzeDEGhv9cMY1ubYl01Cwe9pg/xA1AvMfTSGYTi6VNRkOHiXA?=
- =?us-ascii?Q?GENp/RKGMOtwpbsKy6JjZyOhMwCoXUs2x5wcJTSPT5b79sbxgZpjbCM0+KiU?=
- =?us-ascii?Q?dShODIScz+h1yJU1s8wBO/5mwAmMVMa8ACLj7Z+GYIkA2ORImzrv+5PTnsSl?=
- =?us-ascii?Q?hTge0GdGNYA/JVmFb3sPFQPLSLQAnFRI+0ovhcoR1s41WC+CKkYf6cW8O9nH?=
- =?us-ascii?Q?oZEVbuTBAVL7f9FX+sbxfUr2UVzRQJCSvk0sADwFEirz/pM7ElLChSfVfsBP?=
- =?us-ascii?Q?uqL3h+e68rjcNjLYvD/LXcPlcQ2fC1gw/o4NAzHzgg9WeVBQDKZxsShYsbUi?=
- =?us-ascii?Q?p/ED7r+8rWP2EtTB3U/OQO5HKzQH9rmokCAr1bo59qPYyDMFJHOf6+Z2huSP?=
- =?us-ascii?Q?ESYiUJjjlhD5jBFYMPIVpVGhH+kCiw4dd6Q7BS1GPqOpFZHI6K4J09VX1PuU?=
- =?us-ascii?Q?iBcHOa76ZUORqTLGBpFDPKAcK8TMdSRlfhsvP8BgdGLSWU7u6duocCPLdqiX?=
- =?us-ascii?Q?88JbKOUBqeRFL9svmho0JMrcDN9gG5p7u7k7gV78s4WPr2IUN9DoT7U8e7nw?=
- =?us-ascii?Q?ViUh287wiB1rklJc6pIpYZrM5+SxMWhSuIfOXrC+g4F26tJ04NWm7XzCvmhK?=
- =?us-ascii?Q?jFVYkEiJv7/0ozXdSAOROmiUjRyYFBLL7rbljbYB5dsr1rGmZEta34fCzkoo?=
- =?us-ascii?Q?86NQXZAde1M4H6NIsNVlN6pROynpdBs2?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SI2PR06MB5140.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(52116014)(366016)(38350700014)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?cre1FJCJAMbKO2kmNnVBMsT9fJMTcjFOw8edA5kWurm8xROMx9+8P4kQPicn?=
- =?us-ascii?Q?aaWn5CbYYohKtMxwAbbl90xLmaZZ3SB2CwthfEqbkQ9C1lkcpL+15DWGd9T+?=
- =?us-ascii?Q?OQM6WHfGDns+/RQZpevYajTCsksNnIcQ5EP+c0lodzcrD1Eokw9ySA15N902?=
- =?us-ascii?Q?JJ9j6jdTfVjbsxstr/kBh3vejgGN/2542nDY3apJqCt2OBJ2i+A1i5vcaKJm?=
- =?us-ascii?Q?JrWFSEwjnMm3/ohU+7pORsm5Ox78mfVUMB1tD4WP4+VdUJj92+nLejyBMcOH?=
- =?us-ascii?Q?bivwojrTt1oAqWxLgwWDR2FEc8ZJvxlJng5iUe/OHtSfZlZRNHzwLuWFTIVe?=
- =?us-ascii?Q?twFcOleGHgUTz6xMp3sVMDe1QQC0tzHaIbwV/dJq7eA63McaomSjqukeCFnH?=
- =?us-ascii?Q?43TzvelctW8MCLU2uyrv14qnOV1uMtLADMUNEFHOkdpRNEDy0bH4K2FTJHVJ?=
- =?us-ascii?Q?3frNb3eXytzK9Z7I/gq/2BpOwbTM4NkfkzrcAePNgzOdORjZkacSp2s40IhR?=
- =?us-ascii?Q?B5tXMKxmlR75JFbEGKfCtY1uCOj+F7eG3wpD07cvVb2v6zfVjZrki8WTBvtB?=
- =?us-ascii?Q?IDC33EviG7Peycy7E41gMAs7EHzUNjkEK0uLJB87TCQRRUROZC7oPphHmtui?=
- =?us-ascii?Q?4Z1GZKKqxpraRaYneJqnGOI7/XmawK+/DVna0aDrLA0zzQ4TP+SM/1XVuVFU?=
- =?us-ascii?Q?r97CxM2Po/U/Ela5bbTbJRe6ZVwrR51/qPfsZBL/aCf5340Yaa2hTHt2PPi2?=
- =?us-ascii?Q?fanFH5tHASLy7ltq5KanuNCIScRsm59XK+8pNXDcfleLDiepQLDMhJM23Psv?=
- =?us-ascii?Q?OQvPnDPUUsA1omohqneoQDaJJEscnpbb/bR59BIJFT1p/shx6YHwqST1e/lS?=
- =?us-ascii?Q?r+Zw06mE37aCcX86YmDMB6cdBrpg2HeLcpJC0C6BKXP65k6CuESuRvCbyVJw?=
- =?us-ascii?Q?BClr5DePmsT5FxvHGntu7EhhIF3WEpe/rgjbjtfofmRo7d31IRAn3gN3M2b/?=
- =?us-ascii?Q?GZaMzI8fNBjFw4AZNwdyEluG9rouv9tetF9c5aZqdlMLtxz4H9OePnrw9ay5?=
- =?us-ascii?Q?L+/xDbXLmzB2Cw8Pvxy3P+gVbICS8poeoiyv+aAaeyQriCBN1Mm/2+LqITOR?=
- =?us-ascii?Q?FoJHfCmzfXkZ0jDjrIe6DkveOlNRsSLZez9TmFxGBQa0Fao3aTRIpS6f+/HS?=
- =?us-ascii?Q?85rJelNQPUEaZIDLIbNpy0irA9Nav0Io7Op2dnE/kuAiJYoZ5m40Mvj/vJ23?=
- =?us-ascii?Q?veprCpoH9Ehow4WPsl3zxLMUjrh6Cs5UkSBHKfgtEJEBaZJcRR2xntJhtMI9?=
- =?us-ascii?Q?YMADPdSfdBAcV6F6gxBZt7QPLYnMxly9kOUVC3oo+6hWVGlPusosTKi/JkrY?=
- =?us-ascii?Q?JYqRY8moXQ7bL0RzD+t489NckzicgS7dWbbFsNeakXeFdKeva8pF8bxwa/nP?=
- =?us-ascii?Q?9Qh+zGOG5bnl/5H/NITR/6KtlE90gs5W6dDqz37euDixghOdpktH1eLXMp+K?=
- =?us-ascii?Q?e1sq9ucHni4N4zyykDmxTdFrG/j4r6a08bo+u5rhAGGkhsEYadH47jzSg34u?=
- =?us-ascii?Q?YFeR8kHXOpydGGqVAGGWSiei72owsqcVZfnq8d+s?=
-X-OriginatorOrg: vivo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d53097ed-81e1-467c-df9d-08dddd6eb4f2
-X-MS-Exchange-CrossTenant-AuthSource: SI2PR06MB5140.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Aug 2025 09:16:11.0476
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ThNfP0iFN7ySfwNMpzeMhPl4N/DKDAg5XMVle9QR+eVVzy8c76WYLyk701Kh3sdrBLpT52REeLVvDYkqYl06IQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYZPR06MB6190
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 1/2] net: Make nexthop-dumps scale linearly
+ with the number of nexthops
+To: cpaasch@openai.com, David Ahern <dsahern@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@idosch.org>
+Cc: netdev@vger.kernel.org
+References: <20250816-nexthop_dump-v2-0-491da3462118@openai.com>
+ <20250816-nexthop_dump-v2-1-491da3462118@openai.com>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20250816-nexthop_dump-v2-1-491da3462118@openai.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Remove array_size() calls and replace vmalloc() with vmalloc_array() to
-simplify the code.  vmalloc_array() is also optimized better, uses fewer
-instructions, and handles overflow more concisely[1].
+On 8/17/25 02:12, Christoph Paasch via B4 Relay wrote:
+> From: Christoph Paasch <cpaasch@openai.com>
+> 
+> When we have a (very) large number of nexthops, they do not fit within a
+> single message. rtm_dump_walk_nexthops() thus will be called repeatedly
+> and ctx->idx is used to avoid dumping the same nexthops again.
+> 
+> The approach in which we avoid dumping the same nexthops is by basically
+> walking the entire nexthop rb-tree from the left-most node until we find
+> a node whose id is >= s_idx. That does not scale well.
+> 
+> Instead of this inefficient approach, rather go directly through the
+> tree to the nexthop that should be dumped (the one whose nh_id >=
+> s_idx). This allows us to find the relevant node in O(log(n)).
+> 
+> We have quite a nice improvement with this:
+> 
+> Before:
+> =======
+> 
+> --> ~1M nexthops:
+> $ time ~/libnl/src/nl-nh-list | wc -l
+> 1050624
+> 
+> real	0m21.080s
+> user	0m0.666s
+> sys	0m20.384s
+> 
+> --> ~2M nexthops:
+> $ time ~/libnl/src/nl-nh-list | wc -l
+> 2101248
+> 
+> real	1m51.649s
+> user	0m1.540s
+> sys	1m49.908s
+> 
+> After:
+> ======
+> 
+> --> ~1M nexthops:
+> $ time ~/libnl/src/nl-nh-list | wc -l
+> 1050624
+> 
+> real	0m1.157s
+> user	0m0.926s
+> sys	0m0.259s
+> 
+> --> ~2M nexthops:
+> $ time ~/libnl/src/nl-nh-list | wc -l
+> 2101248
+> 
+> real	0m2.763s
+> user	0m2.042s
+> sys	0m0.776s
+> 
+> Signed-off-by: Christoph Paasch <cpaasch@openai.com>
+> ---
+>  net/ipv4/nexthop.c | 36 +++++++++++++++++++++++++++++++++---
+>  1 file changed, 33 insertions(+), 3 deletions(-)
+> 
 
-[1]: https://lore.kernel.org/lkml/abc66ec5-85a4-47e1-9759-2f60ab111971@vivo.com/
-Signed-off-by: Qianfeng Rong <rongqianfeng@vivo.com>
----
- net/bridge/netfilter/ebtables.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
-
-diff --git a/net/bridge/netfilter/ebtables.c b/net/bridge/netfilter/ebtables.c
-index 3e67d4aff419..5697e3949a36 100644
---- a/net/bridge/netfilter/ebtables.c
-+++ b/net/bridge/netfilter/ebtables.c
-@@ -920,8 +920,8 @@ static int translate_table(struct net *net, const char *name,
- 		 * if an error occurs
- 		 */
- 		newinfo->chainstack =
--			vmalloc(array_size(nr_cpu_ids,
--					   sizeof(*(newinfo->chainstack))));
-+			vmalloc_array(nr_cpu_ids,
-+				      sizeof(*(newinfo->chainstack)));
- 		if (!newinfo->chainstack)
- 			return -ENOMEM;
- 		for_each_possible_cpu(i) {
-@@ -938,7 +938,7 @@ static int translate_table(struct net *net, const char *name,
- 			}
- 		}
- 
--		cl_s = vmalloc(array_size(udc_cnt, sizeof(*cl_s)));
-+		cl_s = vmalloc_array(udc_cnt, sizeof(*cl_s));
- 		if (!cl_s)
- 			return -ENOMEM;
- 		i = 0; /* the i'th udc */
-@@ -1018,8 +1018,8 @@ static int do_replace_finish(struct net *net, struct ebt_replace *repl,
- 	 * the check on the size is done later, when we have the lock
- 	 */
- 	if (repl->num_counters) {
--		unsigned long size = repl->num_counters * sizeof(*counterstmp);
--		counterstmp = vmalloc(size);
-+		counterstmp = vmalloc_array(repl->num_counters,
-+					    sizeof(*counterstmp));
- 		if (!counterstmp)
- 			return -ENOMEM;
- 	}
-@@ -1386,7 +1386,7 @@ static int do_update_counters(struct net *net, const char *name,
- 	if (num_counters == 0)
- 		return -EINVAL;
- 
--	tmp = vmalloc(array_size(num_counters, sizeof(*tmp)));
-+	tmp = vmalloc_array(num_counters, sizeof(*tmp));
- 	if (!tmp)
- 		return -ENOMEM;
- 
-@@ -1526,7 +1526,7 @@ static int copy_counters_to_user(struct ebt_table *t,
- 	if (num_counters != nentries)
- 		return -EINVAL;
- 
--	counterstmp = vmalloc(array_size(nentries, sizeof(*counterstmp)));
-+	counterstmp = vmalloc_array(nentries, sizeof(*counterstmp));
- 	if (!counterstmp)
- 		return -ENOMEM;
- 
--- 
-2.34.1
+Very nice,
+Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
 
 
