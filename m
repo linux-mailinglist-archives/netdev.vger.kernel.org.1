@@ -1,164 +1,174 @@
-Return-Path: <netdev+bounces-214359-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214360-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A72FEB29187
-	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 06:30:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2250CB291AB
+	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 07:46:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A070448460A
-	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 04:30:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E5C52A1D18
+	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 05:46:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F25CD1E5205;
-	Sun, 17 Aug 2025 04:29:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D827A13E02D;
+	Sun, 17 Aug 2025 05:45:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=coresemi-io.20230601.gappssmtp.com header.i=@coresemi-io.20230601.gappssmtp.com header.b="bu+CI9fu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iOtbclsR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A3E81D8A10
-	for <netdev@vger.kernel.org>; Sun, 17 Aug 2025 04:29:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE306881E;
+	Sun, 17 Aug 2025 05:45:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755404999; cv=none; b=T9f64zh4eXCKzmWzQE5TzcREeZiutOzza8ESuO38dN833RVGi69ODCL4epkgqiOnFVbUm68E5/AnFTIaO7wybx/HFZYxkvZgvtnLm0yIbwI/5ijXjr30KcZyEGwkXAhxBmdVhTmX9gM2QOBPw/l8tFA1g1mywsFc0qu9FEKLEoM=
+	t=1755409556; cv=none; b=OE+pWb1hbPED4vhgVbXXqaqfSiGGzT9NlY/Hx3om2urmVuD/LmIFxHK13o+qUX64+SlT5jlY/yuWwlSuJ/38n1EiX0s2ouJ9FW2fCRumWA3g+E+HoKWeMw13ZK65VylCLD7AlxX7zR5udSu0UyH7a92EdkhexErwHD5vG1yLrKc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755404999; c=relaxed/simple;
-	bh=dJsoDn9ejss6xZxq1+PO6yZOjAfrmBEGOzoE1pFfCOY=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=mkVsuseiJeVQLVirtOsmRWHfZh8xr59EBRBApHuHbF+cZCBrUmd7AJtiXH1eJHK58DZwULH/fTY05EC3OsyLFIhKYs5tiyx4Yoh4LfQNzwARtie/sMIlue8sGqx6Sg8s7znbLykwq6KjSXGHQHe12gUkwxLUUb2QlX6hcQ7Pa/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=coresemi.io; spf=none smtp.mailfrom=coresemi.io; dkim=pass (2048-bit key) header.d=coresemi-io.20230601.gappssmtp.com header.i=@coresemi-io.20230601.gappssmtp.com header.b=bu+CI9fu; arc=none smtp.client-ip=209.85.210.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=coresemi.io
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=coresemi.io
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-76e2eb6d07bso2775099b3a.3
-        for <netdev@vger.kernel.org>; Sat, 16 Aug 2025 21:29:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=coresemi-io.20230601.gappssmtp.com; s=20230601; t=1755404998; x=1756009798; darn=vger.kernel.org;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=D7tOnFcQoia7OLIfjY0GXgnbZUBsSDQdwxwR729Y/e8=;
-        b=bu+CI9fuicYGql7eXCSSIHIhAnefx+/szl65SWoI3A/eRgLojNwzGAZnNuNp4KfYeb
-         5nsFX2jTA79wYBcpGrBDT9J4z1pVvTPc8V6RBUNFd4U6DDlQq/jPWfosMEcQqx/6UNd/
-         uO+O9RP6NIRdJRgHEQas79AvX4WjG0Z8wLxoz9joWS+k7x/RFwRkRWvsj5GaD50rrIcS
-         b9+tRO688Ch3A1WZlazCSTxWdJvysUbusuZfNfWGkK1PL4hZKqPInIUY6rTn4IxKcEdq
-         5U0nr0Gl3lOvb36HYFw7wqdyX5oLf73jVvDWMvlu2rKpUxZq44IpmOJVA9K/oS9NpLgV
-         /HlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755404998; x=1756009798;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=D7tOnFcQoia7OLIfjY0GXgnbZUBsSDQdwxwR729Y/e8=;
-        b=GZq/qXh8Iozt4pfz0dyUbG2DVyF9VgLF8Wf9BYGTRHjS+LkfDCaq/zdJJmEJ7IxWx2
-         Yos7DNKTvCGvh4sLNuRNri+lsyehV08Mqh61jJ4Tc/gGOFyeOorWXPwTnFqy7xmFtDX0
-         r6jFHq5Pnj0FId++atk7ec9c9W9PRrg6I2mwQwalRNoLZAzCafbQ21Sq4X2vk8oVHiOT
-         HKwAzR2OQm2bBObPQrHMFIaoDAOPU7z2oj5vBmCop2LlG/7Z3ltOLzjFNANqCmBslzrD
-         VIivKATCDzBZPF875/fJQHSnt266f6xOinCfnWJXVvHG0LBLwnxRglq0fRfymOid+AVf
-         jjhg==
-X-Forwarded-Encrypted: i=1; AJvYcCUnDpv9lGL0t2GuKB05aqABVKzA6e/qZxNnp/gdBJTh+BSsJDKlE9jpQcDT1h5o7yMkpZcaj/o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzB2I0CkaKtojvaojfiThnhLpI5keDeBk6nUOkijjqUmdB/toOu
-	uxw47uX8yy4mu+wffJ9YHp1sNzOGBFe4d11d1gEuJhn6BLz1CZ5RHah07WgCVQDZZeU=
-X-Gm-Gg: ASbGncsK0fdOYD2RMfgGu35rnJx3Q16wnD3qCbZw+ThqBPz3/WkofYtQ+nV9uEf6aDp
-	uVMvXTeZa/Khgy1SUwhSJOw71aiaTZj9I++JgCYuN6AP0aNzW9Yl78xu509V15niAYjCEvaPZH9
-	TfPn08iaZEmBtlG9YXnu0iTjkHrTZA5Z7IP7yLo0Fo5DenPdfSCn7Yqq0uZbcNV3D9RJCx+rMrG
-	vsfFheHvVhjcgL3o9x46ti8CxJnwSEBKUhEvTMZEDo8BydvZPRM4rZoT9/5iMtTYoML3xtvqZuM
-	2BiO0dRKpMnfocuKqerB9o1b5nlleB2FnBBS1txmSIRHBU8gH6MOMdgpLIaySDyquUlTkGG8Y4w
-	ioMELgNE66UeB3TdEZa5BqYtF/oinsfMQzWPCtRTGguPkc+6DAKvRn668oH28TCwQ+w==
-X-Google-Smtp-Source: AGHT+IGTkulwbSKlMNKTgkK2+N/a2tNWqVdcaDc/+0IBx3cEbIkK7JZwpjqo8gKvMk5mXlc40TvNCw==
-X-Received: by 2002:a05:6a20:9143:b0:23f:f7ae:6e24 with SMTP id adf61e73a8af0-240e6311cc0mr6485220637.29.1755404997708;
-        Sat, 16 Aug 2025 21:29:57 -0700 (PDT)
-Received: from smtpclient.apple (p121132.f.east.v6connect.net. [221.113.121.132])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b472d73a0a7sm5134883a12.28.2025.08.16.21.29.53
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 16 Aug 2025 21:29:57 -0700 (PDT)
-Content-Type: text/plain;
-	charset=utf-8
+	s=arc-20240116; t=1755409556; c=relaxed/simple;
+	bh=ttZ6jtkkRczJ0axAm9jZ0bwV4tHP2+ZyMJp+BLvzgMU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jZ6p5UxeVh01bw6YziY6z57pLdLZBmQFce71qSRfp9HBg75fmggTpJuSTEKh2iNpVu3Si45idMWok0jhlnVXL5VegJtrzg9z+bTjB4/E/4y/vf/aUdvYR8WROsQ/t1mxVnMR/inNy1GUXSi6d6tK+0gAj+LID8gUPtUCowpWZPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iOtbclsR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6DBBC4CEEB;
+	Sun, 17 Aug 2025 05:45:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755409556;
+	bh=ttZ6jtkkRczJ0axAm9jZ0bwV4tHP2+ZyMJp+BLvzgMU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=iOtbclsR3JH/yiCq9pAi1a+x0lWzJk7D8Y/T2R50hJ1WKoaktUJLiayU7r1jOOBz4
+	 xiCxAu03lmMI7AqhXPQ2zxutlhl+gr8bnJ+Tl/QaMjLTYDmmI1fxUMqHOWyvmDvfqg
+	 WFd8D/GnMNU8d9AylcbDhI0m1Q7DlJ+pMXNbMKDYT1nrkhoa/6LkahAv2K7cMLpy25
+	 bb/SgExzEAiQJhY7SYGKbQe8NKNicgEqmpKuJ60067SPm5/8eoZSqVhQUjTmFJuzi0
+	 8oNvHtWFClLH+tvF6Rn5Puxg/ihB+Z3lq0b0SX0yNfp2WDqHc9Jd5TH19mbPDR52rm
+	 46K8D0IxjNFXA==
+Message-ID: <7b6ff2bf-c2f3-411d-ab4a-a907d8edbc57@kernel.org>
+Date: Sun, 17 Aug 2025 07:45:51 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81\))
-Subject: Re: [PATCH 3/3] net: j2: Introduce J-Core EMAC
-From: "D. Jeff Dionne" <jeff@coresemi.io>
-In-Reply-To: <9eab7a4ff3a72117a1a832b87425130f@artur-rojek.eu>
-Date: Sun, 17 Aug 2025 13:29:42 +0900
-Cc: Andrew Lunn <andrew@lunn.ch>,
- Rob Landley <rob@landley.net>,
- John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
- Geert Uytterhoeven <geert+renesas@glider.be>,
- Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>,
- netdev@vger.kernel.org,
- devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- "D. Jeff Dionne" <jeff@coresemi.io>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <DC855B2C-37F3-4565-8B6F-B122F7E16E25@coresemi.io>
-References: <20250815194806.1202589-1-contact@artur-rojek.eu>
- <20250815194806.1202589-4-contact@artur-rojek.eu>
- <973c6f96-6020-43e0-a7cf-9c129611da13@lunn.ch>
- <b1a9b50471d80d51691dfbe1c0dbe6fb@artur-rojek.eu>
- <02ce17e8f00955bab53194a366b9a542@artur-rojek.eu>
- <fc6ed96e-2bab-4f2f-9479-32a895b9b1b2@lunn.ch>
- <7a4154eef1cd243e30953d3423e97ab1@artur-rojek.eu>
- <ee607928-1845-47aa-90a1-6511decda49d@lunn.ch>
- <9eab7a4ff3a72117a1a832b87425130f@artur-rojek.eu>
-To: Artur Rojek <contact@artur-rojek.eu>
-X-Mailer: Apple Mail (2.3826.700.81)
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net/nfc: Fix A-B/B-A deadlock between
+ nfc_unregister_device and rfkill_fop_write
+To: Yunseong Kim <ysk@kzalloc.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Taehee Yoo <ap420073@gmail.com>,
+ Byungchul Park <byungchul@sk.com>, max.byungchul.park@gmail.com,
+ yeoreum.yun@arm.com, ppbuk5246@gmail.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, syzkaller@googlegroups.com
+References: <20250814173142.632749-2-ysk@kzalloc.com>
+ <e3cfdd98-6c51-479d-8d99-857316dcd64b@kernel.org>
+ <b8dc1074-725f-4048-9af5-6b62bd2150a3@kzalloc.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
+ cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
+ JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
+ gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
+ J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
+ NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
+ BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
+ vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
+ Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
+ TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzSVLcnp5c3p0b2Yg
+ S296bG93c2tpIDxrcnprQGtlcm5lbC5vcmc+wsGVBBMBCgA/AhsDBgsJCAcDAgYVCAIJCgsE
+ FgIDAQIeAQIXgBYhBJvQfg4MUfjVlne3VBuTQ307QWKbBQJoF1BKBQkWlnSaAAoJEBuTQ307
+ QWKbHukP/3t4tRp/bvDnxJfmNdNVn0gv9ep3L39IntPalBFwRKytqeQkzAju0whYWg+R/rwp
+ +r2I1Fzwt7+PTjsnMFlh1AZxGDmP5MFkzVsMnfX1lGiXhYSOMP97XL6R1QSXxaWOpGNCDaUl
+ ajorB0lJDcC0q3xAdwzRConxYVhlgmTrRiD8oLlSCD5baEAt5Zw17UTNDnDGmZQKR0fqLpWy
+ 786Lm5OScb7DjEgcA2PRm17st4UQ1kF0rQHokVaotxRM74PPDB8bCsunlghJl1DRK9s1aSuN
+ hL1Pv9VD8b4dFNvCo7b4hfAANPU67W40AaaGZ3UAfmw+1MYyo4QuAZGKzaP2ukbdCD/DYnqi
+ tJy88XqWtyb4UQWKNoQqGKzlYXdKsldYqrLHGoMvj1UN9XcRtXHST/IaLn72o7j7/h/Ac5EL
+ 8lSUVIG4TYn59NyxxAXa07Wi6zjVL1U11fTnFmE29ALYQEXKBI3KUO1A3p4sQWzU7uRmbuxn
+ naUmm8RbpMcOfa9JjlXCLmQ5IP7Rr5tYZUCkZz08LIfF8UMXwH7OOEX87Y++EkAB+pzKZNNd
+ hwoXulTAgjSy+OiaLtuCys9VdXLZ3Zy314azaCU3BoWgaMV0eAW/+gprWMXQM1lrlzvwlD/k
+ whyy9wGf0AEPpLssLVt9VVxNjo6BIkt6d1pMg6mHsUEVzsFNBFVDXDQBEADNkrQYSREUL4D3
+ Gws46JEoZ9HEQOKtkrwjrzlw/tCmqVzERRPvz2Xg8n7+HRCrgqnodIYoUh5WsU84N03KlLue
+ MNsWLJBvBaubYN4JuJIdRr4dS4oyF1/fQAQPHh8Thpiz0SAZFx6iWKB7Qrz3OrGCjTPcW6ei
+ OMheesVS5hxietSmlin+SilmIAPZHx7n242u6kdHOh+/SyLImKn/dh9RzatVpUKbv34eP1wA
+ GldWsRxbf3WP9pFNObSzI/Bo3kA89Xx2rO2roC+Gq4LeHvo7ptzcLcrqaHUAcZ3CgFG88CnA
+ 6z6lBZn0WyewEcPOPdcUB2Q7D/NiUY+HDiV99rAYPJztjeTrBSTnHeSBPb+qn5ZZGQwIdUW9
+ YegxWKvXXHTwB5eMzo/RB6vffwqcnHDoe0q7VgzRRZJwpi6aMIXLfeWZ5Wrwaw2zldFuO4Dt
+ 91pFzBSOIpeMtfgb/Pfe/a1WJ/GgaIRIBE+NUqckM+3zJHGmVPqJP/h2Iwv6nw8U+7Yyl6gU
+ BLHFTg2hYnLFJI4Xjg+AX1hHFVKmvl3VBHIsBv0oDcsQWXqY+NaFahT0lRPjYtrTa1v3tem/
+ JoFzZ4B0p27K+qQCF2R96hVvuEyjzBmdq2esyE6zIqftdo4MOJho8uctOiWbwNNq2U9pPWmu
+ 4vXVFBYIGmpyNPYzRm0QPwARAQABwsF8BBgBCgAmAhsMFiEEm9B+DgxR+NWWd7dUG5NDfTtB
+ YpsFAmgXUF8FCRaWWyoACgkQG5NDfTtBYptO0w//dlXJs5/42hAXKsk+PDg3wyEFb4NpyA1v
+ qmx7SfAzk9Hf6lWwU1O6AbqNMbh6PjEwadKUk1m04S7EjdQLsj/MBSgoQtCT3MDmWUUtHZd5
+ RYIPnPq3WVB47GtuO6/u375tsxhtf7vt95QSYJwCB+ZUgo4T+FV4hquZ4AsRkbgavtIzQisg
+ Dgv76tnEv3YHV8Jn9mi/Bu0FURF+5kpdMfgo1sq6RXNQ//TVf8yFgRtTUdXxW/qHjlYURrm2
+ H4kutobVEIxiyu6m05q3e9eZB/TaMMNVORx+1kM3j7f0rwtEYUFzY1ygQfpcMDPl7pRYoJjB
+ dSsm0ZuzDaCwaxg2t8hqQJBzJCezTOIkjHUsWAK+tEbU4Z4SnNpCyM3fBqsgYdJxjyC/tWVT
+ AQ18NRLtPw7tK1rdcwCl0GFQHwSwk5pDpz1NH40e6lU+NcXSeiqkDDRkHlftKPV/dV+lQXiu
+ jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
+ zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
+ XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
+In-Reply-To: <b8dc1074-725f-4048-9af5-6b62bd2150a3@kzalloc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Aug 16, 2025, at 22:40, Artur Rojek <contact@artur-rojek.eu> wrote:
+On 15/08/2025 10:23, Yunseong Kim wrote:
+> Hi Krzysztof,
+> 
+> Thank you for your review.
+> 
+> On 8/15/25 2:55 PM, Krzysztof Kozlowski wrote:
+>> On 14/08/2025 19:31, Yunseong Kim wrote:
+>>> A potential deadlock due to A-B/B-A deadlock exists between the NFC core
+>>> and the RFKill subsystem, involving the NFC device lock and the
+>>> rfkill_global_mutex.
+>>>
+>>> This issue is particularly visible on PREEMPT_RT kernels, which can
+>>> report the following warning:
+>>
+>> Why are not you crediting syzbot and its report?
+>>
+>> there is clear INSTRUCTION in that email from Syzbot.
+> 
+> I wanted to clarify that this report did not originate from syzbot.
+> 
+> I found this issue by building and running syzkaller locally on my own
+> Arm64 RADXA Orion6 board.
+> 
+> This is reproduction series on my local syzkaller.
+> 
+> WARNING in __rt_mutex_slowlock
+> 
+> #	Log	Report	Time	Tag
+> 7	log	report	2025/08/14 20:01	
+> 6	log	report	2025/08/14 05:55	
+> 5	log	report	2025/08/14 02:31	
+> 4	log	report	2025/08/12 09:38	
+> 3	log	report	2025/07/30 07:09	
+> 2	log	report	2025/07/27 23:29	
+> 1	log	report	2025/07/26 04:18	
+> 0	log	report	2025/07/26 04:17
+> 
+> The reason this is coming from syzbot recently is that I worked with Sebastian,
+> the RT maintainer, to fix KCOV to be PREEMPT_RT-aware. This was merged recently:
+> Link: https://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb.git/commit/?h=usb-linus&id=9528d32873b38281ae105f2f5799e79ae9d086c2
+> 
+> So, syszbot now report it:
+> https://syzkaller.appspot.com/bug?extid=535bbe83dfc3ae8d4be3
 
-The MDIO isn=E2=80=99t implemented yet.  There is a pin driver for it, =
-but it relies on
-pin strapping the Phy.  Probably because all the designs that SoC base =
-is in
-(IIRC 10 or so customer and prototype designs, plus Turtle and a few=20
-derivatives), the SoC was designed in conjunction with board.  A bit =
-lazy.
 
-But they all have the MDIO connected, so we should add it (it=E2=80=99s =
-very simple).
+Syzbot reported it before you pasted patch, so it should also receive
+the reported-by credit, even if you discovered it separately.
 
-Cheers,
-J.
+> 
+>>> | rtmutex deadlock detected
+>>> | WARNING: CPU: 0 PID: 22729 at kernel/locking/rtmutex.c:1674 rt_mutex_handle_deadlock+0x68/0xec kernel/locking/rtmutex.c:-1
+>>> | Modules linked in:
+>>> | CPU: 0 UID: 0 PID: 22729 Comm: syz.7.2187 Kdump: loaded Not tainted 6.17.0-rc1-00001-g1149a5db27c8-dirty #55 PREEMPT_RT
+>>> | Hardware name: QEMU KVM Virtual Machine, BIOS 2025.02-8ubuntu1 06/11/2025
+> 
 
-> On 2025-08-16 02:18, Andrew Lunn wrote:
->>> Yes, it's an IC+ IP101ALF 10/100 Ethernet PHY [1]. It does have both =
-MDC
->>> and MDIO pins connected, however I suspect that nothing really
->>> configures it, and it simply runs on default register values (which
->>> allow for valid operation in 100Mb/s mode, it seems). I doubt there =
-is
->>> another IP core to handle MDIO, as this SoC design is optimized for
->>> minimal utilization of FPGA blocks. Does it make sense to you that a =
-MAC
->>> could run without any access to an MDIO bus?
->> It can work like that. You will likely have problems if the link ever
->> negotiates 10Mbps or 100Mbps half duplex. You generally need to =
-change
->> something in the MAC to support different speeds and duplex. Without
->> being able to talk to the PHY over MDIO you have no idea what it has
->> negotiated with the link peer.
->=20
-> Thanks for the explanation. I just confirmed that there is no activity
-> on the MDIO bus from board power on, up to the jcore_emac driver start
-> (and past it), so most likely this SoC design does not provide any
-> management interface between MAC and PHY. I guess once/if MDIO is
-> implemented, we can distinguish between IP core revision compatibles,
-> and properly switch between netif_carrier_*()/phylink logic.
->=20
-> Cheers,
-> Artur
->=20
->> Andrew
 
+
+Best regards,
+Krzysztof
 
