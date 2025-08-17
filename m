@@ -1,102 +1,93 @@
-Return-Path: <netdev+bounces-214384-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214385-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67A2CB2939A
-	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 16:50:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 941CAB293AE
+	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 16:58:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E3D2E3BF723
-	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 14:48:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 729B6205B28
+	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 14:58:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0CA3770FE;
-	Sun, 17 Aug 2025 14:48:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 266471C84BD;
+	Sun, 17 Aug 2025 14:57:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="Gg8/gm0E"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="O9gOwle/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B66D38F80;
-	Sun, 17 Aug 2025 14:48:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1516D290F;
+	Sun, 17 Aug 2025 14:57:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755442107; cv=none; b=tyRtf8kumpXrrO2eQZB7UP/zj5/ThtBX8SHSQux1wi09FOvmRVGeCy2XTfWte7elRam4UGA9Q7GD4MvqVq7NRWCd64X1uHv+PEBhLBeJ2aY4Byzgbs8bHIKwu3S9vhN3kBz9Bmlvz5hBUaIxya1IYODWlFRw8ywy7EORwxO5D4I=
+	t=1755442679; cv=none; b=Nr5pDttDF7K0FZx32YsF4YWR7mLuKk9N7EZ4rcodN3R4B6KrkBXRbekybA4EpHEj8TuaAE03Ef74NiIj45V/SmCvfAPWT9cmZw4bqJY17UFC15kOhqQeqz8h1jgMCGJchLSW6EGoU3nQpMFFFAwTrb/XdjIh4GHIoIebRB+Nr9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755442107; c=relaxed/simple;
-	bh=LZR3aB3y+tiOZpoXlCy/7P5bNxuZ3k8TzEL9EaxB2UA=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=agWxVlNjDnQVbDhhjSKHWe7xxOYtH1IfxpeDRpL/zR8kpyUUAcuT6AOFCJkHlVfLboGSztZN16MKeGI0SS3wYdQfsGhazYRm4FDqQrBuJVTvWI+AaXH3J9WlPY0kpMIl+gpcoe/H40iCFYWSgvvxB+cLCNB4YDMHypWLwparK1g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=Gg8/gm0E; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 6F39420606;
-	Sun, 17 Aug 2025 16:48:24 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id sWzYaDuY1Gkf; Sun, 17 Aug 2025 16:48:24 +0200 (CEST)
-Received: from EXCH-01.secunet.de (unknown [10.32.0.231])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id E7D062050A;
-	Sun, 17 Aug 2025 16:48:23 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com E7D062050A
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1755442103;
-	bh=6DYfHVIyP3OXUwscPjwu3WrtIU5hORiCvkuUvwAeDAc=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=Gg8/gm0E85BYCPC4m8JZOILx4Ss+6iuuLjAYBn88p8l76pYZBoND3h923frilNo4H
-	 KMO2eEOvtsDNT0vaqyqFHk1yJiUSXHhuXkJAoE730owcdbHzJkXK9Cdf0XiHhj2yKm
-	 RZXyWc60+V3aaNBuabeT46M8rb+s2jyiy8YMq13T4hhFNL0lBA0o4M6qt74oTO/xIc
-	 6YNMAQOjLzAS1bO4W115961ptVxVYTkisriMkQbmc9JkKYyCfc2y/VTO6NUGYCqLdx
-	 6xG9TTA2klYhUqafo6rW9OuD/TvwEMkBm5f1w4dX5AFPgwUa+dfeJ2BX7qfV1qNlDw
-	 WPsmLnGl2ZrCg==
-Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.1748.10; Sun, 17 Aug
- 2025 16:48:23 +0200
-Received: (nullmailer pid 2609053 invoked by uid 1000);
-	Sun, 17 Aug 2025 14:48:22 -0000
-Date: Sun, 17 Aug 2025 16:48:22 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Miguel =?iso-8859-1?Q?Garc=EDa?= <miguelgarciaroman8@gmail.com>
-CC: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<horms@kernel.org>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<skhan@linuxfoundation.org>
-Subject: Re: [PATCH net-next] xfrm: xfrm_user: use strscpy() for alg_name
-Message-ID: <aKHrttHa0W1RfZjB@secunet.com>
-References: <20250814193217.819835-1-miguelgarciaroman8@gmail.com>
+	s=arc-20240116; t=1755442679; c=relaxed/simple;
+	bh=fAvFlJJqYOWnNyPSnXRIgCcz2MA0GUGCioFGwWtR8f0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PfWbsm41C8NFNxTfmxDaemDJ2vIiHgVjgbfb1z9d3uWwl30jg8DCleF9FMmpPIASqj95u7Vx41o7GuqE1RqGaSdBWCSCT2kQEOX2YdjefBl8WavZvnQJWUdWGkabyR/EwkOJAueeZEKXqYv6xMrTM7Lz6K/YziI6S6WO6blvflk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=O9gOwle/; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=/s3HWwswGJVbhetzqyV9rkWjvELllA0/5aDo3OGOunY=; b=O9gOwle/E/dlKqhO3XqolD3KJw
+	E3ResiTjiiSb8PrsTBWunk70onEyeRzuw315IoztouabqAUBdtpUFJ+eINW1w8VX4GOKVPRrj5z6A
+	0k0KfoZI6wtqNwLEsbIR6KNnggVkFwV3vtqaugERsbjT2lRt6M5f7E/Wb9183PSxAo64=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1unep3-004y9j-Jd; Sun, 17 Aug 2025 16:57:25 +0200
+Date: Sun, 17 Aug 2025 16:57:25 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Hauke Mehrtens <hauke@hauke-m.de>, Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Arkadi Sharshevsky <arkadis@mellanox.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Andreas Schirm <andreas.schirm@siemens.com>,
+	Lukas Stockmann <lukas.stockmann@siemens.com>,
+	Alexander Sverdlin <alexander.sverdlin@siemens.com>,
+	Peter Christen <peter.christen@siemens.com>,
+	Avinash Jayaraman <ajayaraman@maxlinear.com>,
+	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
+	Juraj Povazanec <jpovazanec@maxlinear.com>,
+	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
+	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
+	"Livia M. Rosu" <lrosu@maxlinear.com>,
+	John Crispin <john@phrozen.org>
+Subject: Re: [PATCH RFC net-next 02/23] net: dsa: lantiq_gswip: deduplicate
+ dsa_switch_ops
+Message-ID: <6b110e80-85b9-4a5e-96b9-282ba75b24d1@lunn.ch>
+References: <aKDhMZgsq9UblP4j@pidgin.makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250814193217.819835-1-miguelgarciaroman8@gmail.com>
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
- EXCH-01.secunet.de (10.32.0.171)
+In-Reply-To: <aKDhMZgsq9UblP4j@pidgin.makrotopia.org>
 
-On Thu, Aug 14, 2025 at 09:32:17PM +0200, Miguel García wrote:
-> Replace the strcpy() calls that copy the canonical algorithm name into
-> alg_name with strscpy() to avoid potential overflows and guarantee NULL
-> termination.
+On Sat, Aug 16, 2025 at 08:51:13PM +0100, Daniel Golle wrote:
+> The two instances of struct dsa_switch_ops differ only by their
+> .phylink_get_caps op. Instead of having two instances of dsa_switch_ops,
+> rather just have a pointer to the phylink_get_caps function in
+> struct gswip_hw_info.
 > 
-> Destination is alg_name in xfrm_algo/xfrm_algo_auth/xfrm_algo_aead
-> (size CRYPTO_MAX_ALG_NAME).
-> 
-> Tested in QEMU (BusyBox/Alpine rootfs):
->  - Added ESP AEAD (rfc4106(gcm(aes))) and classic ESP (sha256 + cbc(aes))
->  - Verified canonical names via ip -d xfrm state
->  - Checked IPComp negative (unknown algo) and deflate path
-> 
-> Signed-off-by: Miguel García <miguelgarciaroman8@gmail.com>
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 
-Patch applied, thanks!
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+
+    Andrew
 
