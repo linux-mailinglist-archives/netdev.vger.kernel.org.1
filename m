@@ -1,163 +1,118 @@
-Return-Path: <netdev+bounces-214421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214422-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FDE3B29525
-	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 23:17:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE064B29551
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 00:07:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6FE8717C997
-	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 21:16:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C2CF4178369
+	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 22:07:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DBC91DE89B;
-	Sun, 17 Aug 2025 21:16:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 133FD2185BC;
+	Sun, 17 Aug 2025 22:07:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DjiW7zD4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f77.google.com (mail-io1-f77.google.com [209.85.166.77])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A49871C862E
-	for <netdev@vger.kernel.org>; Sun, 17 Aug 2025 21:16:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.77
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 142E041C63;
+	Sun, 17 Aug 2025 22:07:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755465392; cv=none; b=IWsDviqCljJDJwTBX8TGdZUuybjf1ElaJehqbXBEhNIXryURKKjpMtlc9EIx4BddiPWpv+mpihzbx5jPj2sFVLEzADQc3pbGIJGZUm6PLqDqp2NtUPXnD/lUPs7XDQLRzskYcf8Qkr1feq5lfuYkmZZAOvPQOfXHDLWqv8P9QuY=
+	t=1755468427; cv=none; b=cehex5230ST7ZsCHz8VnAYbrhcalT9nuTu7lWr06dS7sKHPpRWpH8lBQULrdQqBQPEHZCUHGPuBA5yCZlOfgfyGcROZnM5nBSBn9vQIKT5wa3JATTmnUhlBtergBNzcJhDALbO+7CoHPha7t9Dhu7J58mpVlxBB5/O685rWvABA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755465392; c=relaxed/simple;
-	bh=cELf/5hBA7ty2DgyXFWFsQALXI6RcXSejzmDa9bZDS4=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=KNxSOzLdMUi3OZND7TE03lcegQrxHD7R4rzEj3jgSYzMVoeMhr+bMY4IhnE68Fp6S51D8nA7VQPVg/MuRdk2KcrXF5EBIXUYySFBRW42AtgXoDA9vweyLlmApwKWbruyQ62T3MpbtRl6fcPXWWW3ThueH1CJ070kfa9EUtXMXXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f77.google.com with SMTP id ca18e2360f4ac-88432e1c782so449221539f.2
-        for <netdev@vger.kernel.org>; Sun, 17 Aug 2025 14:16:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755465390; x=1756070190;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9xOFL93V9ybpTTQzlx6ceA1J0+rEZ162D18Jclq7jEg=;
-        b=DjIoK3x1attMdJHa4U9tspCvzvfQ/Mzo2QFKGtWYtviShrghe3OyHSKFNgbhWymLHJ
-         U6UD3dBAyk8nhvnJQy74hynWluJ1N3mzCPqttgapgBpo7FNZJtRgAkvGtoPPn+++W3VH
-         s7dTir4pp3Td5Q1uR1GpyAxazbPF8CziyynmOp2DzmEJtI5VjNCAAF7H2jA+DcKPfrj3
-         tIquirX6JlqacwKH0FINtotmIJlBmyvhLM3lIdpCkzwZJTp2LPhGrYMA2X1aValAFswl
-         GVL+IPLpLlu8+ssCLOO5+0z64iRx0Av+knJtvqGv0ehiOzfoMsmzgEWvzb5yCMuszuvZ
-         GLBA==
-X-Forwarded-Encrypted: i=1; AJvYcCUhQZAXkIcT1QO7M89HBQUMb/atmIsLwmz6ojnK3sxk4RrEf+KxC9Hd6OdfsEkc8lg0vhwgdcY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyWxIYA4T344rze9wzqS9aUfADS50RlQhDdwcHj0VXwl8j7EZfO
-	rnv4+2IZYbPiDINVqx6nKQtZhAjFdajV98bnmsEImCaOyP6U3IhhVfEUP70Ds8843B6KlddcovT
-	mBqkf1gEIgBuSDZGQ1Tdb68X/QAFXlhirNN5eaC46nGhXc9lnH3NqpeFBU2k=
-X-Google-Smtp-Source: AGHT+IHUgIuGZ+mDB66y6V5ZCmackd0V6NXkrgXQ9lX0LiJJCZZTnfZRx5rCfFfCq17djZrCFyamEyqBJlpZd9B+mF/ZD+O1xtmk
+	s=arc-20240116; t=1755468427; c=relaxed/simple;
+	bh=zpUl0zheLy5NDYN7VEg3PlKRz2DeeuHjGTiWDGX1+1Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qrN2/0US9qfQmBvXkNjgqJO2BWPG7V4fUbY2Usyz8N+F5V65D0gvSjtnMkModxcLKEhuf8vtPEpzgOJ4nMjTwiMxpb8WotNwhQbXZ45w38nkEQWJnDrzQXjVxKt/RPyZZ1V8JcsVAVHD6UFLRsh9UH9qpeF3ZZL1sN3CG3lSi4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DjiW7zD4; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1755468424; x=1787004424;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=zpUl0zheLy5NDYN7VEg3PlKRz2DeeuHjGTiWDGX1+1Y=;
+  b=DjiW7zD4bUgdzuyx6xh4+YOzyeBJFJEwt2EunIbcXmPneFPiDtZmQLg3
+   cGVyP85Cvte4OEyq72ugvlhZnGiI9h2GQPP/BDhBXwPY4Frro04NlMvja
+   1qUFZHjuO6zDU+MW+X7cXwtSolin+RGrZrNbAE30bpQeBlt3KmIurWWrU
+   tgwHo+DQ/RIl4YTsmzozyAODIoaYDZKrNCwXsY0BBAeDDUdvw4fF6T3iC
+   Fp/YtELVTgCYgzAUm5tewTlknDQWju4LGbX60mc5U5S5KE0kS3kexVNFd
+   9laa0t7RBQLBgOsnilVrE91inAViNoyipaX9/npzFKqs2NF0Fh3Qilcbo
+   Q==;
+X-CSE-ConnectionGUID: yDq1T02MRt6mrUkoSoOl+w==
+X-CSE-MsgGUID: /kxdx3R4Tf+mMXezluhbxw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11524"; a="57799119"
+X-IronPort-AV: E=Sophos;i="6.17,293,1747724400"; 
+   d="scan'208";a="57799119"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Aug 2025 15:07:04 -0700
+X-CSE-ConnectionGUID: GlhdEQL6SreESSRdpR4x8w==
+X-CSE-MsgGUID: Gl7609VGQE62K4AD3Sdybw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.17,293,1747724400"; 
+   d="scan'208";a="191126910"
+Received: from lkp-server02.sh.intel.com (HELO 4ea60e6ab079) ([10.239.97.151])
+  by fmviesa002.fm.intel.com with ESMTP; 17 Aug 2025 15:07:01 -0700
+Received: from kbuild by 4ea60e6ab079 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1unlVY-000Dk3-37;
+	Sun, 17 Aug 2025 22:06:24 +0000
+Date: Mon, 18 Aug 2025 06:05:28 +0800
+From: kernel test robot <lkp@intel.com>
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, bpf@vger.kernel.org,
+	ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	magnus.karlsson@intel.com, stfomichev@gmail.com,
+	aleksander.lobakin@intel.com,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Eryk Kubanski <e.kubanski@partner.samsung.com>
+Subject: Re: [PATCH v4 bpf] xsk: fix immature cq descriptor production
+Message-ID: <202508180712.ZeSSNfkM-lkp@intel.com>
+References: <20250813171210.2205259-1-maciej.fijalkowski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:6d86:b0:883:f01a:5d55 with SMTP id
- ca18e2360f4ac-8843e3b9d76mr1687416939f.5.1755465389864; Sun, 17 Aug 2025
- 14:16:29 -0700 (PDT)
-Date: Sun, 17 Aug 2025 14:16:29 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68a246ad.050a0220.e29e5.0077.GAE@google.com>
-Subject: [syzbot] [wireless?] WARNING in ieee80211_tx_skb_tid
-From: syzbot <syzbot+8bd4574e8c52c48c2595@syzkaller.appspotmail.com>
-To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250813171210.2205259-1-maciej.fijalkowski@intel.com>
 
-Hello,
+Hi Maciej,
 
-syzbot found the following issue on:
+kernel test robot noticed the following build warnings:
 
-HEAD commit:    91325f31afc1 Merge tag 'mm-hotfixes-stable-2025-08-12-20-5..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=11fecda2580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=412ee2f8b704a5e6
-dashboard link: https://syzkaller.appspot.com/bug?extid=8bd4574e8c52c48c2595
-compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+[auto build test WARNING on bpf/master]
 
-Unfortunately, I don't have any reproducer for this issue yet.
+url:    https://github.com/intel-lab-lkp/linux/commits/Maciej-Fijalkowski/xsk-fix-immature-cq-descriptor-production/20250814-012129
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git master
+patch link:    https://lore.kernel.org/r/20250813171210.2205259-1-maciej.fijalkowski%40intel.com
+patch subject: [PATCH v4 bpf] xsk: fix immature cq descriptor production
+config: x86_64-randconfig-121-20250817 (https://download.01.org/0day-ci/archive/20250818/202508180712.ZeSSNfkM-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250818/202508180712.ZeSSNfkM-lkp@intel.com/reproduce)
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/8c83f4baf60f/disk-91325f31.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/be959267627a/vmlinux-91325f31.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/68dffaf16c63/bzImage-91325f31.xz
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202508180712.ZeSSNfkM-lkp@intel.com/
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+8bd4574e8c52c48c2595@syzkaller.appspotmail.com
+sparse warnings: (new ones prefixed by >>)
+>> net/xdp/xsk.c:49:1: sparse: sparse: symbol '__pcpu_scope_system_xsk_generic_cache' was not declared. Should it be static?
 
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 11866 at net/mac80211/tx.c:6202 ieee80211_tx_skb_tid+0x380/0x420 net/mac80211/tx.c:6202
-Modules linked in:
-CPU: 0 UID: 0 PID: 11866 Comm: syz.1.2132 Not tainted 6.17.0-rc1-syzkaller-00029-g91325f31afc1 #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
-RIP: 0010:ieee80211_tx_skb_tid+0x380/0x420 net/mac80211/tx.c:6202
-Code: 9e a4 f6 e9 b1 fe ff ff e8 ed c3 c6 f6 90 0f 0b 90 e9 1f fe ff ff e8 df c3 c6 f6 90 0f 0b 90 e9 2a fe ff ff e8 d1 c3 c6 f6 90 <0f> 0b 90 e8 58 e2 fd ff 31 ff 48 8b 34 24 ba 02 00 00 00 48 83 c4
-RSP: 0018:ffffc9000b697478 EFLAGS: 00010287
-RAX: ffffffff8af8e7df RBX: ffffffff8af8e48f RCX: 0000000000080000
-RDX: ffffc9000b7d9000 RSI: 000000000000298a RDI: 000000000000298b
-RBP: 00000000ffffffff R08: 0000000000000000 R09: ffffffff8af8e48f
-R10: dffffc0000000000 R11: ffffed100ebe1146 R12: ffff888054e94d80
-R13: 0000000000000000 R14: 0000000000000001 R15: dffffc0000000000
-FS:  00007f5035e4d6c0(0000) GS:ffff888125c1c000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f53e6e5ed58 CR3: 000000007d2fc000 CR4: 00000000003526f0
-Call Trace:
- <TASK>
- ieee80211_tx_skb net/mac80211/ieee80211_i.h:2409 [inline]
- mesh_plink_frame_tx+0x734/0xc10 net/mac80211/mesh_plink.c:354
- mesh_plink_deactivate+0x18e/0x2f0 net/mac80211/mesh_plink.c:410
- mesh_sta_cleanup+0x42/0x150 net/mac80211/mesh.c:171
- __cleanup_single_sta net/mac80211/sta_info.c:167 [inline]
- cleanup_single_sta+0x40f/0x660 net/mac80211/sta_info.c:192
- __sta_info_flush+0x5e4/0x710 net/mac80211/sta_info.c:1683
- sta_info_flush net/mac80211/sta_info.h:970 [inline]
- ieee80211_do_stop+0x399/0x1fb0 net/mac80211/iface.c:509
- ieee80211_stop+0x1b1/0x240 net/mac80211/iface.c:814
- __dev_close_many+0x361/0x6f0 net/core/dev.c:1755
- __dev_close net/core/dev.c:1767 [inline]
- __dev_change_flags+0x2c7/0x6d0 net/core/dev.c:9530
- netif_change_flags+0x88/0x1a0 net/core/dev.c:9595
- dev_change_flags+0x130/0x260 net/core/dev_api.c:68
- dev_ioctl+0x7b4/0x1150 net/core/dev_ioctl.c:824
- sock_do_ioctl+0x22c/0x300 net/socket.c:1252
- sock_ioctl+0x576/0x790 net/socket.c:1359
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:598 [inline]
- __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:584
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f5034f8ebe9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f5035e4d038 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007f50351b5fa0 RCX: 00007f5034f8ebe9
-RDX: 0000200000000000 RSI: 0000000000008914 RDI: 0000000000000004
-RBP: 00007f5035011e19 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f50351b6038 R14: 00007f50351b5fa0 R15: 00007f50352dfa28
- </TASK>
+vim +/__pcpu_scope_system_xsk_generic_cache +49 net/xdp/xsk.c
 
+    48	
+  > 49	DEFINE_PER_CPU(struct xsk_generic_cache, system_xsk_generic_cache);
+    50	
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
