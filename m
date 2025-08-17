@@ -1,42 +1,42 @@
-Return-Path: <netdev+bounces-214356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBE4AB29108
-	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 02:32:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EF531B2910B
+	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 02:40:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B688F3B5EA1
-	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 00:32:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A787C4E806F
+	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 00:40:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C3443594A;
-	Sun, 17 Aug 2025 00:32:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44C567082F;
+	Sun, 17 Aug 2025 00:40:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="fUQxl/hn"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="U6K9Jt/O"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2293D13FEE;
-	Sun, 17 Aug 2025 00:32:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90E22B665;
+	Sun, 17 Aug 2025 00:40:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755390733; cv=none; b=iz42sb+vRiD9qySbFTqtFdSQKlAkZLU4m5zimr3XX/Jgzfo8DQ+5+lduhovyg9uOATjAz914kzZjvfka7RkHS7Aqq8AmVpbx1zChdckfzzA/3NS8s50ZDOru2RDyee/ri1hEgqCxruwQN5jaU6DQq1i+JdQ7QYTxUAGKCSUTkEw=
+	t=1755391228; cv=none; b=fce6SAZ/BR2TM7OQXcwxJrioMB47WVzUilOYldQhHxfQ1tvXyDm8AYZRydaEpsPmQfhT3CKAc3Qb/JPg0WbBwW1IjkVarXP3ZBZmYsecQdTaX0Fa3P9jixXdNcIe5ZrR45RhDMyWWWrol4ZMqkBu3beJgRMgSnuo79idc5LDvWo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755390733; c=relaxed/simple;
+	s=arc-20240116; t=1755391228; c=relaxed/simple;
 	bh=SYSf3xnc7zAMoFCLHwjiYQSb+HCoNuTd/lwQn8+geW0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RBI1i1ndT68OJTuh21Mb4D2y0Qm3kcXoQ+Q/z48F50jr7hauUoP7La6bX8NRyNx+TVUUtjxfKQ1gGSCQtt6H7Ozn94cXIR9YeWJ8X90dGj/8CRy7OU+VxNUFieiSvtyurL8Nf7P+RjtpknHoe0ufxM5DCfprB5rYNsUruycqDyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=fUQxl/hn; arc=none smtp.client-ip=220.197.31.5
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=p8zHek3GYcxB4U/iHyHcjs3FeZ42Q6oxWUOGO+iIydRSruGr0X9CkIWTvVLJB6+pUexwyeIaP7iOZMabmZO9pw46TmPi9jLs1/Ax5gxpQkOLWd85V05l0ipvDw8CrOPafUt9yqmxs+pP+5Lk46pZHl09AHSscGZ5E0Iy+aZ+39Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=U6K9Jt/O; arc=none smtp.client-ip=117.135.210.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
 	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=Gy
-	S0BF4N7kb4dNNguU2QXnvUxcXRJcFEexZ/e1tAMcw=; b=fUQxl/hnspEEivhZtF
-	JL0QJAxPnyP9luJrKPdSmTdsxODomk3uHUOVex7eEcFOSm+B9W3l8inamESdlrUU
-	dLQdeX7uzM4oGZBLMlgmFgxtkAR2dmni+in11hR42akVQD5AhlDIqz4S0cfn/mpZ
-	uT37D1WtW3+IFs2wPrdYaTCHk=
+	S0BF4N7kb4dNNguU2QXnvUxcXRJcFEexZ/e1tAMcw=; b=U6K9Jt/OTvq+gtX4Yd
+	MZIzZGMJKG/+TL7hZmpSqF/xBl7821QUn2tMiYnwZTTpkJZ6RmZemMT5NYYq6jfO
+	WsuLM9cHczoLzGTDMvwzRgbcYo+aawoo7ZX/n6ayD8OGRYfnZKG5dazWkYZo3mhO
+	rYCDRsHymN4pFS68ddjqMIl9k=
 Received: from MS-CMFLBWVCLQRG.localdomain (unknown [])
-	by gzga-smtp-mtada-g1-1 (Coremail) with SMTP id _____wBHEDl3IqFo9GLXBw--.16921S2;
-	Sun, 17 Aug 2025 08:29:53 +0800 (CST)
+	by gzga-smtp-mtada-g1-0 (Coremail) with SMTP id _____wD3Xzi+JKFoenr+CQ--.51539S2;
+	Sun, 17 Aug 2025 08:39:35 +0800 (CST)
 From: luoguangfei <15388634752@163.com>
 To: nicolas.ferre@microchip.com,
 	claudiu.beznea@tuxon.dev
@@ -50,8 +50,8 @@ Cc: andrew+netdev@lunn.ch,
 	linux-kernel@vger.kernel.org,
 	15388634752@163.com
 Subject: [PATCH] net: macb: fix unregister_netdev call order in macb_remove()
-Date: Sun, 17 Aug 2025 08:29:39 +0800
-Message-ID: <20250817002939.3296-1-15388634752@163.com>
+Date: Sun, 17 Aug 2025 08:39:25 +0800
+Message-ID: <20250817003925.3362-1-15388634752@163.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -60,12 +60,12 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wBHEDl3IqFo9GLXBw--.16921S2
+X-CM-TRANSID:_____wD3Xzi+JKFoenr+CQ--.51539S2
 X-Coremail-Antispam: 1Uf129KBjvJXoW7tw1fXrW3WFyrur47AFWUArb_yoW8Ww48pw
 	43GFyfWryIqrsFyws7Xa1UJFy5Ga47t348Wa4xu393Z39IkryqyrWjkFy8uFy5GrZrAFWa
 	yr15AasxAa1kAaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pid-BtUUUUU=
-X-CM-SenderInfo: jprvjmqywtklivs6il2tof0z/
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0piJKsUUUUUU=
+X-CM-SenderInfo: jprvjmqywtklivs6il2tof0z/1tbiEBWsn2ihHnZTpgAAsi
 
 When removing a macb device, the driver calls phy_exit() before
 unregister_netdev(). This leads to a WARN from kernfs:
