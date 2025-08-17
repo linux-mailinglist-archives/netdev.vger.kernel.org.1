@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-214367-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1180B29278
-	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 11:40:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69459B2927A
+	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 11:41:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 862DB487018
-	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 09:40:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B83B18830D6
+	for <lists+netdev@lfdr.de>; Sun, 17 Aug 2025 09:41:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61183221F26;
-	Sun, 17 Aug 2025 09:40:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DADA217F27;
+	Sun, 17 Aug 2025 09:41:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="F+g5/sZY"
+	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="fI+NdiQg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7BE11DF74F
-	for <netdev@vger.kernel.org>; Sun, 17 Aug 2025 09:40:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEE1A1ADC83
+	for <netdev@vger.kernel.org>; Sun, 17 Aug 2025 09:41:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755423614; cv=none; b=dHJTN+a0UGcZB588XaJeaM0rypL+fg9S/aVOji6/1EiuzgHRGmLDd93zXXlxe2bYNcle2sF1n0GQz55G4+KLI1IZTzHm63mY7xBmbOYVB4YGFK+bK3uBvF/e0NcWuuP7LOEp1FdU2bzvaIUW8R/YhoRPoywms7R9RmFY9mhfFik=
+	t=1755423665; cv=none; b=aod13fNYT3XUhHhNlLOYr/t0ACAlzvi6dMQdV2E7x47TpNZn7WDi551JLlzD6jccsttET655yMaKiq3bL/+ig0mS99B/jEeUN6fHyY4gyYYIwghUkru8qnTzHJoplBaakgwyB1Xfm1C8H1F27hzuprn08jHQ97kbuxAHCcWr2GE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755423614; c=relaxed/simple;
-	bh=Y4b1Wey0Bzm9RnN7kiOzeEuSRoMo8KgO6GcwS5m6utw=;
+	s=arc-20240116; t=1755423665; c=relaxed/simple;
+	bh=5LD6tUnMBRUDDeNUW9C5hnH7FHJKH/LSZdjG7fi1KM0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Bh0GcEWVtortwCH4J5W2cc5B6t5qYWrj3Yuzbc5dFmUkMTsiRHjQ6g3xcbmZt9SX9dGqTUVoPKiVhJVpj0uJUyb/T6DDh/iG9QzrsOT9FXj6aK7aBXHHIRRV7osFlaYdcZRzTR6NrRKUJ+P7LbDUikui1d1HOf0p+FIk8Y1423o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=F+g5/sZY; arc=none smtp.client-ip=209.85.218.54
+	 In-Reply-To:Content-Type; b=SEBO6QZ5Z+k2rMxSc6JYHhv5Plr3Kp2r4Di7mfLXHkm0f6MK06xWEArdXcFRqy3HKZ0/mm4GBuHhIMbodoPAPrWCPPt30c+OhpDmAynoHwhsJo9B+QIMKYynsINLI90wf/G7urxhpDQwfpBy9E3p8wbAbim08Ja3Nu+eiaajefY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=fI+NdiQg; arc=none smtp.client-ip=209.85.208.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-afcb731ca8eso536140766b.0
-        for <netdev@vger.kernel.org>; Sun, 17 Aug 2025 02:40:12 -0700 (PDT)
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-6197efa570eso2218009a12.1
+        for <netdev@vger.kernel.org>; Sun, 17 Aug 2025 02:41:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall.org; s=google; t=1755423611; x=1756028411; darn=vger.kernel.org;
+        d=blackwall.org; s=google; t=1755423660; x=1756028460; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=Qm4RPaa0FhsIq5Gi6bADCpXN7OJ5u1r+9fgBroRfJm8=;
-        b=F+g5/sZYU+qjFVW0JAja9naKFcPUaxs22UPXqIuFR9yM7505RJjmzYp+Q/hNYtT9EQ
-         zWMuEK7Rx+JQIZcfzoW44iYMQVxJ9T9722OBLSmPXG4nMy6R1KzVVm4C6GuorFugKs5L
-         KlSziuNzgQ6berSsRR8o0KyFbKqghi6XkK618wqe3JTuAY5itwAb0Qwkqx4AvYxBzoHF
-         Yr/Dsp2rKlaRJ4Bo9IzAfsAVMzE8obWoXBf+t85s6O45YcBpZGdasJa7D0B2QYcmmfyh
-         KdnK18NbPXNA9PAus+pDRL8fb6ruDgjNpyk513h3VgQorWxqQRbbHcdsrfXwcXZtXW0m
-         BYWQ==
+        bh=ktajYdOBczI/qieVqSlgWHXhRm0v28BeXhu0c44yne4=;
+        b=fI+NdiQgP+M96TFrlWM+INqBgfbLhLNfvah2AiGEpp0IRIMS52E+TBKc1Ff+sYvMFr
+         CQMYmRP/Qct9LjIjE68tHx1/kfignYs5wCLKsPLismQ7Z1ACysXxdTLmKI3lQDLiahLa
+         FpHH7t5Qx6viyIk6/0A+BZrmmfg+eHmhikG39EdFIZRNzjuKmIlGeIM2QLKEC9786sBl
+         vumal3A0hIbX7g3ktoInY0u9bAHHf5ooGbsNlVWSCMzsmIgyqVNrzJ1cPWByoF3VLVxG
+         4uSrpSZk3FhyQE6CZrnZsOo8NIH3gs9wkI85BwlMHKOr2XsAU1boJa/5dPpppfdj8tCz
+         pe1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755423611; x=1756028411;
+        d=1e100.net; s=20230601; t=1755423660; x=1756028460;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Qm4RPaa0FhsIq5Gi6bADCpXN7OJ5u1r+9fgBroRfJm8=;
-        b=wkD45uT9NUnrdNUT4nq/CO002KxZfbz0KaZ8LozzG34kK4aRniQP3hyJhMs/iUENwo
-         93/viQKB5JCg2iPXYg2Rx6DzFLddwNha/kkY+WM8iTghp1tdxcetYKbYn7x446btKYSy
-         ceLo76RlOw4EhmeIDBAiGfkJhG0Rh/T9vhAK3/LIKpbqPnD5yZYPF9MQ0DBQiilHraNa
-         AAC9xrG0qU/JIAN2lmJ3ok/cVaPYWYIN1uZyNkVeCyOA+2bjdg3EJg8PB0x6w9N1xpkP
-         eKrv1eoHuWTa79v2O00U3oPDTFB4xE1+ixNEmVVyQcE+44blBA92L45G7L6AnDYMvcas
-         Ia0w==
-X-Gm-Message-State: AOJu0YzvQITVoajrPKeeeNspzMOP+9RQMAO7ewrdMv0lGIlDX/qaIdsF
-	XBlHZf3ohOPtHdTq/DKRnUcW6/hnN73HSSnm7iSmn1vAHiDcWvPoQcqvgXMAAh7CDBk=
-X-Gm-Gg: ASbGnctM6ZQNb1mDV5JY25TjCZrrSoeY7G/nxIxCQ8r3rIikJVEgUqGSyZdImQelNSI
-	SkmvV5IWLbp4OQlzcR5SnKOHd2CV9uXSvsFtHchR2k/Dm8Kq4/e5FjG0wH/BarcxKScew2Qt2BI
-	qaqXUF7tw4El5hQTutmHJtXOs0NPGh7A+22JZEGGX8Cr3KhchTlqdyWnfOREw76PMmhNg3vFpDm
-	Y5OlZIHfNll2GBTUWJMSP2cpwbfdsmrNMkidsd+qcOY2s/G/OoLzjMEGbeCTwlOUZQoHFxFnzZy
-	1cKioCVicqUkVRKLc+udeJ2c1yZjk4SgWEgMCJolTO5cWOU3nnMLqsGQp1vGW33PqptBQC3AiYM
-	96Oux77PiObwKrnV14L4+LrCiP8S/lNfKBoTrYqCkV5Et4Rp9SPxWbA==
-X-Google-Smtp-Source: AGHT+IGHLSmc20FUaq+pXnAxbhs85W77k0jJB8aw5RuDsIYFk+rfXk653aRmqm4W7siVHq5W0hJO1A==
-X-Received: by 2002:a17:907:9628:b0:ae3:6d27:5246 with SMTP id a640c23a62f3a-afcdc3ab857mr701920266b.48.1755423610813;
-        Sun, 17 Aug 2025 02:40:10 -0700 (PDT)
+        bh=ktajYdOBczI/qieVqSlgWHXhRm0v28BeXhu0c44yne4=;
+        b=gzebRzNLAKABLAgYg+9FQDUV9uBmYMYm5ruoTpy7GUYllpknJPgaFUsmXx0Oci05Tp
+         B/5OD5MeEnZoKD/NxyN0cgeBIsPtG+cCW+OVof03OIkxlTE2KJokdLwDY0nSBKwUyz4+
+         u06vCIVYKQzK6aCWae2GfqkAwIxdMs1Aw8JHQeA5cXpQNAZXDGDIVCfEKbaZ6Uh0PN0i
+         5aTfjJ2bCvQVW01SVG/8BJEDUFX2icWE2XMRBn6e1qnulpCTJqiclIAq6ljQaqiGcvYv
+         JTL0+Hax8S9SDFi76ZYjHGvt3NHtFfFtBCnrx61YrBg+2p2fSkR1A8pBvUjW1lNIGzZR
+         WD/A==
+X-Gm-Message-State: AOJu0Yyzx9jul5eTCywpVO1g2p9icx+MR+Rq8jcxGKWNKirr5rmvu220
+	p6VUDk6TLWkKgo82K+h5bHxeY7A7TlT+EfQ7GN5SN553WGevAqBT2wG3lpM/SdNPyNk=
+X-Gm-Gg: ASbGncvJhsDjY0qlveZgh72cNq//SFG3JWidt+3yEjGdvEl7YTYzRaJ9x0NPQXt5Oo9
+	7MBM/5Sj4Vr3alck3WTafkBV6EA4sbusT6nMAw1luYY9VqLIwsPaqbicjTP38vtja02BRriKG0o
+	BfN1FC/15swru75FZUZXcuXcQ8t5hmR9gnlaYj2YplfU/jHwSiSoV8UZxPqzfaohkgOGM20LjEk
+	a/tLbl0ascMQDB/3ZVqNaAj8eC+zz4n74h5JsfSv4gAuS2T+5pslYrT66JmT9YVFKqCc2PiiM+j
+	qSoZ0x7KtF8CgGO4aZojrzOh+hKZIZm6rbNiCxkWwiA5Iu2re15hBoTYidaqoEtjIN7dCkHBiwQ
+	k4ZXXv/W5XJbGyTG/c+7bgmpk6vSZihHrCGu9Py5Oaesfk738VcRjnPXRYKN8xJnR
+X-Google-Smtp-Source: AGHT+IGDfd+DflTFOf4pxYo1ISMzYojm2miQU4pB3dGwtoEKDR6RREMCYWE4LnZ/QE554k2KX+f1Ag==
+X-Received: by 2002:a05:6402:278f:b0:618:afa:70b1 with SMTP id 4fb4d7f45d1cf-619bf1e5ac5mr3823091a12.20.1755423659761;
+        Sun, 17 Aug 2025 02:40:59 -0700 (PDT)
 Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-afcdce53eccsm565094566b.19.2025.08.17.02.40.09
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-618b01ae57dsm4815371a12.29.2025.08.17.02.40.58
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 17 Aug 2025 02:40:10 -0700 (PDT)
-Message-ID: <bf2686f5-21a5-4654-9825-c883a626baad@blackwall.org>
-Date: Sun, 17 Aug 2025 12:40:08 +0300
+        Sun, 17 Aug 2025 02:40:59 -0700 (PDT)
+Message-ID: <5cb17491-d6a8-468b-b260-1b941a7f42e5@blackwall.org>
+Date: Sun, 17 Aug 2025 12:40:58 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,83 +81,104 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 1/2] net: Make nexthop-dumps scale linearly
- with the number of nexthops
+Subject: Re: [PATCH net-next v2 2/2] net: When removing nexthops, don't call
+ synchronize_net if it is not necessary
 To: cpaasch@openai.com, David Ahern <dsahern@kernel.org>,
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
  Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@idosch.org>
 Cc: netdev@vger.kernel.org
 References: <20250816-nexthop_dump-v2-0-491da3462118@openai.com>
- <20250816-nexthop_dump-v2-1-491da3462118@openai.com>
+ <20250816-nexthop_dump-v2-2-491da3462118@openai.com>
 Content-Language: en-US
 From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20250816-nexthop_dump-v2-1-491da3462118@openai.com>
+In-Reply-To: <20250816-nexthop_dump-v2-2-491da3462118@openai.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 8/17/25 02:12, Christoph Paasch via B4 Relay wrote:
 > From: Christoph Paasch <cpaasch@openai.com>
 > 
-> When we have a (very) large number of nexthops, they do not fit within a
-> single message. rtm_dump_walk_nexthops() thus will be called repeatedly
-> and ctx->idx is used to avoid dumping the same nexthops again.
+> When removing a nexthop, commit
+> 90f33bffa382 ("nexthops: don't modify published nexthop groups") added a
+> call to synchronize_rcu() (later changed to _net()) to make sure
+> everyone sees the new nexthop-group before the rtnl-lock is released.
 > 
-> The approach in which we avoid dumping the same nexthops is by basically
-> walking the entire nexthop rb-tree from the left-most node until we find
-> a node whose id is >= s_idx. That does not scale well.
+> When one wants to delete a large number of groups and nexthops, it is
+> fastest to first flush the groups (ip nexthop flush groups) and then
+> flush the nexthops themselves (ip -6 nexthop flush). As that way the
+> groups don't need to be rebalanced.
 > 
-> Instead of this inefficient approach, rather go directly through the
-> tree to the nexthop that should be dumped (the one whose nh_id >=
-> s_idx). This allows us to find the relevant node in O(log(n)).
+> However, `ip -6 nexthop flush` will still take a long time if there is
+> a very large number of nexthops because of the call to
+> synchronize_net(). Now, if there are no more groups, there is no point
+> in calling synchronize_net(). So, let's skip that entirely by checking
+> if nh->grp_list is empty.
 > 
-> We have quite a nice improvement with this:
+> This gives us a nice speedup:
 > 
-> Before:
+> BEFORE:
 > =======
 > 
-> --> ~1M nexthops:
-> $ time ~/libnl/src/nl-nh-list | wc -l
-> 1050624
+> $ time sudo ip -6 nexthop flush
+> Dump was interrupted and may be inconsistent.
+> Flushed 2097152 nexthops
 > 
-> real	0m21.080s
-> user	0m0.666s
-> sys	0m20.384s
+> real	1m45.345s
+> user	0m0.001s
+> sys	0m0.005s
 > 
-> --> ~2M nexthops:
-> $ time ~/libnl/src/nl-nh-list | wc -l
-> 2101248
+> $ time sudo ip -6 nexthop flush
+> Dump was interrupted and may be inconsistent.
+> Flushed 4194304 nexthops
 > 
-> real	1m51.649s
-> user	0m1.540s
-> sys	1m49.908s
+> real	3m10.430s
+> user	0m0.002s
+> sys	0m0.004s
 > 
-> After:
+> AFTER:
 > ======
 > 
-> --> ~1M nexthops:
-> $ time ~/libnl/src/nl-nh-list | wc -l
-> 1050624
+> $ time sudo ip -6 nexthop flush
+> Dump was interrupted and may be inconsistent.
+> Flushed 2097152 nexthops
 > 
-> real	0m1.157s
-> user	0m0.926s
-> sys	0m0.259s
+> real	0m17.545s
+> user	0m0.003s
+> sys	0m0.003s
 > 
-> --> ~2M nexthops:
-> $ time ~/libnl/src/nl-nh-list | wc -l
-> 2101248
+> $ time sudo ip -6 nexthop flush
+> Dump was interrupted and may be inconsistent.
+> Flushed 4194304 nexthops
 > 
-> real	0m2.763s
-> user	0m2.042s
-> sys	0m0.776s
+> real	0m35.823s
+> user	0m0.002s
+> sys	0m0.004s
 > 
 > Signed-off-by: Christoph Paasch <cpaasch@openai.com>
 > ---
->  net/ipv4/nexthop.c | 36 +++++++++++++++++++++++++++++++++---
->  1 file changed, 33 insertions(+), 3 deletions(-)
+>  net/ipv4/nexthop.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/net/ipv4/nexthop.c b/net/ipv4/nexthop.c
+> index 509004bfd08ec43de44c7ce4a540c983d0e70201..0a20625f5ffb471052d92b48802076b8295dd703 100644
+> --- a/net/ipv4/nexthop.c
+> +++ b/net/ipv4/nexthop.c
+> @@ -2087,6 +2087,12 @@ static void remove_nexthop_from_groups(struct net *net, struct nexthop *nh,
+>  {
+>  	struct nh_grp_entry *nhge, *tmp;
+>  
+> +	/* If there is nothing to do, let's avoid the costly call to
+> +	 * synchronize_net()
+> +	 */
+> +	if (list_empty(&nh->grp_list))
+> +		return;
+> +
+>  	list_for_each_entry_safe(nhge, tmp, &nh->grp_list, nh_list)
+>  		remove_nh_grp_entry(net, nhge, nlinfo);
+>  
 > 
 
-Very nice,
 Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
 
 
