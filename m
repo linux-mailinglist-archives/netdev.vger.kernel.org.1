@@ -1,208 +1,189 @@
-Return-Path: <netdev+bounces-214557-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214558-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEE61B2A2E9
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 15:04:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36EF2B2A413
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 15:16:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C53187B24A9
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 13:02:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED9B06211E0
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 13:10:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BAF731E0F0;
-	Mon, 18 Aug 2025 13:03:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F67131E10E;
+	Mon, 18 Aug 2025 13:10:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="C6YX7csN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f80.google.com (mail-io1-f80.google.com [209.85.166.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from server.couthit.com (server.couthit.com [162.240.164.96])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D25031B138
-	for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 13:03:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E898430F7F8;
+	Mon, 18 Aug 2025 13:10:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.164.96
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755522216; cv=none; b=k7DNywh7g3htXttJhayIFHNIDSVyZQ1Pmz440Pk680ZyucELP/9vaCcqw/sSZFsnygWjjV6HFX+g+QznUMWd863FmNd/HYkXVdsdohR8qGfYvnW0wp1ciIQoHvAVFgUsNGwDcTzyJ+v9icI2+U7qCzOS4nnuMvnsi/G7DDxLx7A=
+	t=1755522632; cv=none; b=VHk3t6SjewtdPfywEppL40hZqUaZwrR+7BTdWcOxqO929zvOoy0n5ObnXsN79pgUJJnBUuCiLyGUVPD0mvXKtAGufhtNJM/5rcVev8Gc+QLjoZBXX1Nk7cK9UX7YjuiVAMLUdTRBJ4P1AFAkv3/XJHQzn+15F/ttkNQqjPC0kr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755522216; c=relaxed/simple;
-	bh=VWQDe+tdPUG9+IU46gdoK6WXGm8lfqys7RG0ouhkjNk=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=A6253JbPibKTQRQnFLYH+X8S47FUu6GP+DDA2A8lH2yx6/RLJpi8fgHcNug3cViNSmE8kk1uIOiobnlyCMZCCu1l7Hms3dyRbyx+4Tp9adOYgAa3rXncbYxydSCCKFlDCzdq49k1TDNvsKNFPiBasIGXdtwrvMFaDtAV1nJ6RE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f80.google.com with SMTP id ca18e2360f4ac-884454c97dbso216811939f.1
-        for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 06:03:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755522213; x=1756127013;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=J6D/MLSyEOvx+mf01Y+3hlSzu1UvpzFqY9eDSOwkeYQ=;
-        b=nw1PfSUfAU93ZuUNIXSLe+MPdoqfs8xeTaE0yrdw3tP0jiG8rqh3BLoYSruJ3iDwtA
-         Bz8d30w/chPoedB6sCiAuhWRYTQF8oPww3tIHHsNDO7dTJIzRBAoCMREyagWGmx6XXeb
-         iLZ/UUxf00ZAJ+xjYTfUE3Lvzz/eOgzDtYwbl4QmPhZzlwZROnUeH7SEqCzLYpeV0WDE
-         +2VoYDMoiGITFzccagpszkrgV8dsQWl6A3eaSSMYqx5UD9Yp2Meuesmq/Asta3CwxHYV
-         uCu/TDljtK06gaPCym2CidwH7lVHlyYQvjKc1KGH/0sTENWu91qVtUyUFaKClPYlCDqD
-         hiwA==
-X-Forwarded-Encrypted: i=1; AJvYcCXV4RkCsgLajw3l8Dcrk8W84Sc/wevSMs+hBPW59O6BGXSjEhrAGGuFIDDsxpiWLUPbaAA8jmw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyqZMQRZ8ChHG6DMtzP/+FniM/iEUpkzStm73cIWBFBssy2nfQx
-	e85NcM5KbQl2RwEdex51K8CxdZ2jSyX6EeZT67wyHB/nNv8Elf9ns4gnDU1BlAf4u1NkITCygwW
-	eC99Bf0U7fKxI96qdolBdMFQbYyJkyx73TnY2NO9JpxztDeQEgrqYTh0YABQ=
-X-Google-Smtp-Source: AGHT+IGjcDaJWe46xzthBaKdKkQgFfnYtUt9n3274K0vkPhMdTkgnX2cWwcPvLSiwFEJ/BcNafUkJRyQBJL0w96L+uBEZP5YpK8M
+	s=arc-20240116; t=1755522632; c=relaxed/simple;
+	bh=aznMTAoxRo5LgtSTK4lQ4btu5gj1FbPbhNWVnEuY9hU=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=O0VfUFKifGl7Os84UBsGUBbFcegFIYYrzN7ZpbCgrhpScOc8aAK0ZoC/lcN3Yn8ebhoh8GFXogS2D6E07MeIf7bM4kAjvctz/GIDFGBF08ysvwQ3jPubfJ2sS+yRMF0Z2ZjkpcMldNQkqj88TmXdgrjw3UoMb+NGem5eeIk6YMs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=C6YX7csN; arc=none smtp.client-ip=162.240.164.96
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
+	; s=default; h=Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:
+	References:In-Reply-To:Message-ID:Cc:To:From:Date:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=au0sTz/mm51+Sa4SRsMXgzQ5QH8WFCLiHSCeaH4jd3Y=; b=C6YX7csNdrLRHWSgSvP1mSzkpT
+	UJi4OaAf6/9RVP7vxZOs0dUgljVQrkiR2XtkmqX8uzP3OzTt6YNZTZA1TwrZ0sTJbOA1qs8rkxltG
+	F5l+bi9JhRl5Q9F4rgzkW9pG76GmCEaCg4JQuULtpLfwYqbPQjTjpyqpc0y8z2JlJmZCGGeun1RgN
+	GuosDbCfIpQagSF4TEvMm7EMku1SB2O8+UiJxbxK37BF8yF9sYmrbyJ4/ZWhWcPp3wtRLdWIUx7eB
+	Kv4JxXfIRKw3IOifi9jboHfDpNbM5FHMvfD/R7tVH7ogcOWK9eOc2Z5gCpTdixRtIBbkRjqrGiABS
+	EZk1/Mlg==;
+Received: from [122.175.9.182] (port=51937 helo=zimbra.couthit.local)
+	by server.couthit.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.1)
+	(envelope-from <parvathi@couthit.com>)
+	id 1unzcl-0000000EI4Q-3NDO;
+	Mon, 18 Aug 2025 09:10:08 -0400
+Received: from zimbra.couthit.local (localhost [127.0.0.1])
+	by zimbra.couthit.local (Postfix) with ESMTPS id 5A75317816C0;
+	Mon, 18 Aug 2025 18:39:38 +0530 (IST)
+Received: from localhost (localhost [127.0.0.1])
+	by zimbra.couthit.local (Postfix) with ESMTP id 345C21781E41;
+	Mon, 18 Aug 2025 18:39:38 +0530 (IST)
+Received: from zimbra.couthit.local ([127.0.0.1])
+	by localhost (zimbra.couthit.local [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id QVAtmhKDmHst; Mon, 18 Aug 2025 18:39:38 +0530 (IST)
+Received: from zimbra.couthit.local (zimbra.couthit.local [10.10.10.103])
+	by zimbra.couthit.local (Postfix) with ESMTP id CF63D17816C0;
+	Mon, 18 Aug 2025 18:39:37 +0530 (IST)
+Date: Mon, 18 Aug 2025 18:39:37 +0530 (IST)
+From: Parvathi Pudi <parvathi@couthit.com>
+To: kuba <kuba@kernel.org>
+Cc: parvathi <parvathi@couthit.com>, danishanwar <danishanwar@ti.com>, 
+	rogerq <rogerq@kernel.org>, andrew+netdev <andrew+netdev@lunn.ch>, 
+	davem <davem@davemloft.net>, edumazet <edumazet@google.com>, 
+	pabeni <pabeni@redhat.com>, robh <robh@kernel.org>, 
+	krzk+dt <krzk+dt@kernel.org>, conor+dt <conor+dt@kernel.org>, 
+	ssantosh <ssantosh@kernel.org>, 
+	richardcochran <richardcochran@gmail.com>, 
+	m-malladi <m-malladi@ti.com>, s hauer <s.hauer@pengutronix.de>, 
+	afd <afd@ti.com>, jacob e keller <jacob.e.keller@intel.com>, 
+	horms <horms@kernel.org>, johan@kernel.org, 
+	m-karicheri2 <m-karicheri2@ti.com>, s-anna <s-anna@ti.com>, 
+	glaroque <glaroque@baylibre.com>, 
+	saikrishnag <saikrishnag@marvell.com>, 
+	kory maincent <kory.maincent@bootlin.com>, 
+	diogo ivo <diogo.ivo@siemens.com>, 
+	javier carrasco cruz <javier.carrasco.cruz@gmail.com>, 
+	basharath <basharath@couthit.com>, 
+	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, 
+	netdev <netdev@vger.kernel.org>, 
+	devicetree <devicetree@vger.kernel.org>, 
+	linux-kernel <linux-kernel@vger.kernel.org>, 
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+	ALOK TIWARI <alok.a.tiwari@oracle.com>, 
+	Bastien Curutchet <bastien.curutchet@bootlin.com>, 
+	pratheesh <pratheesh@ti.com>, Prajith Jayarajan <prajith@ti.com>, 
+	Vignesh Raghavendra <vigneshr@ti.com>, praneeth <praneeth@ti.com>, 
+	srk <srk@ti.com>, rogerq <rogerq@ti.com>, 
+	krishna <krishna@couthit.com>, pmohan <pmohan@couthit.com>, 
+	mohan <mohan@couthit.com>
+Message-ID: <1969814282.190581.1755522577590.JavaMail.zimbra@couthit.local>
+In-Reply-To: <20250815115956.0f36ae06@kernel.org>
+References: <20250812110723.4116929-1-parvathi@couthit.com> <20250812133534.4119053-5-parvathi@couthit.com> <20250815115956.0f36ae06@kernel.org>
+Subject: Re: [PATCH net-next v13 4/5] net: ti: prueth: Adds link detection,
+ RX and TX support.
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:12ea:b0:3e5:5466:1aa2 with SMTP id
- e9e14a558f8ab-3e57e7fd2b0mr214245375ab.10.1755522212847; Mon, 18 Aug 2025
- 06:03:32 -0700 (PDT)
-Date: Mon, 18 Aug 2025 06:03:32 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68a324a4.050a0220.e29e5.00a8.GAE@google.com>
-Subject: [syzbot] [bpf?] INFO: rcu detected stall in task_work_add
-From: syzbot <syzbot+f2cf09711ff194bc2c22@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, eddyz87@gmail.com, haoluo@google.com, 
-	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org, 
-	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
-	sdf@fomichev.me, song@kernel.org, syzkaller-bugs@googlegroups.com, 
-	yonghong.song@linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Mailer: Zimbra 8.8.15_GA_3968 (ZimbraWebClient - GC138 (Mac)/8.8.15_GA_3968)
+Thread-Topic: prueth: Adds link detection, RX and TX support.
+Thread-Index: xgy3E4VeZd17NU5MI/nMZAk8d4Qe8Q==
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - server.couthit.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - couthit.com
+X-Get-Message-Sender-Via: server.couthit.com: authenticated_id: smtp@couthit.com
+X-Authenticated-Sender: server.couthit.com: smtp@couthit.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 
-Hello,
+Hi,
 
-syzbot found the following issue on:
+> On Tue, 12 Aug 2025 19:04:19 +0530 Parvathi Pudi wrote:
+>> +static irqreturn_t icssm_emac_rx_packets(struct prueth_emac *emac, int quota)
+> 
+> Please stick to calling the budget budget rather than synonym terms
+> like "quota". Makes it harder to review the code.
+> 
 
-HEAD commit:    3b5ca25ecfa8 Merge branch 'net-don-t-use-pk-through-printk..
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=104365a2580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=2ae1da3a7f4a6ba4
-dashboard link: https://syzkaller.appspot.com/bug?extid=f2cf09711ff194bc2c22
-compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=140b0da2580000
+We will address this in the next version.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/3a41dee6422d/disk-3b5ca25e.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/37991dc02c89/vmlinux-3b5ca25e.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/48eac1c2fff5/bzImage-3b5ca25e.xz
+>> +	/* search host queues for packets */
+>> +	for (i = start_queue; i <= end_queue; i++) {
+>> +		queue_desc = emac->rx_queue_descs + i;
+>> +		rxqueue = &queue_infos[PRUETH_PORT_HOST][i];
+> 
+> budget can be 0, in which case the driver is not supposed to process
+> Rx, just Tx (if the NAPI instance is used to serve completions).
+> 
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+f2cf09711ff194bc2c22@syzkaller.appspotmail.com
+We will add the following check to handle the case when NAPI
+calls with a zero budget.
 
-rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
-rcu: 	Tasks blocked on level-0 rcu_node (CPUs 0-1): P6488/1:b..l
-rcu: 	(detected by 1, t=10502 jiffies, g=19581, q=865 ncpus=2)
-task:syz.6.33        state:R  running task     stack:25096 pid:6488  tgid:6488  ppid:6264   task_flags:0x400040 flags:0x00004006
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5357 [inline]
- __schedule+0x1798/0x4cc0 kernel/sched/core.c:6961
- preempt_schedule_irq+0xb5/0x150 kernel/sched/core.c:7288
- irqentry_exit+0x6f/0x90 kernel/entry/common.c:197
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
-RIP: 0010:lock_acquire+0x175/0x360 kernel/locking/lockdep.c:5872
-Code: 00 00 00 00 9c 8f 44 24 30 f7 44 24 30 00 02 00 00 0f 85 cd 00 00 00 f7 44 24 08 00 02 00 00 74 01 fb 65 48 8b 05 eb 93 02 11 <48> 3b 44 24 58 0f 85 f2 00 00 00 48 83 c4 60 5b 41 5c 41 5d 41 5e
-RSP: 0018:ffffc900047776f0 EFLAGS: 00000206
-RAX: c2093f235efbe900 RBX: 0000000000000000 RCX: c2093f235efbe900
-RDX: 0000000000000001 RSI: ffffffff8dba39e3 RDI: ffffffff8be32680
-RBP: ffffffff81cea1f6 R08: 0000000000000000 R09: ffffffff81cea1f6
-R10: ffffc90004777878 R11: ffffffff81ac3890 R12: 0000000000000002
-R13: ffffffff8e139ee0 R14: 0000000000000000 R15: 0000000000000246
- rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
- rcu_read_lock include/linux/rcupdate.h:841 [inline]
- is_bpf_text_address+0x47/0x2b0 kernel/bpf/core.c:776
- kernel_text_address+0xa5/0xe0 kernel/extable.c:125
- __kernel_text_address+0xd/0x40 kernel/extable.c:79
- unwind_get_return_address+0x4d/0x90 arch/x86/kernel/unwind_orc.c:369
- arch_stack_walk+0xfc/0x150 arch/x86/kernel/stacktrace.c:26
- stack_trace_save+0x9c/0xe0 kernel/stacktrace.c:122
- kasan_save_stack+0x3e/0x60 mm/kasan/common.c:47
- kasan_record_aux_stack+0xbd/0xd0 mm/kasan/generic.c:548
- task_work_add+0xb1/0x420 kernel/task_work.c:65
- __fput_deferred+0x154/0x390 fs/file_table.c:529
- fput_close+0x119/0x200 fs/file_table.c:585
- filp_close+0x27/0x40 fs/open.c:1561
- __range_close fs/file.c:767 [inline]
- __do_sys_close_range fs/file.c:826 [inline]
- __se_sys_close_range+0x359/0x650 fs/file.c:790
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fed93f8ebe9
-RSP: 002b:00007ffcb5611318 EFLAGS: 00000246 ORIG_RAX: 00000000000001b4
-RAX: ffffffffffffffda RBX: 00007fed941b7da0 RCX: 00007fed93f8ebe9
-RDX: 0000000000000000 RSI: 000000000000001e RDI: 0000000000000003
-RBP: 00007fed941b7da0 R08: 0000000000000000 R09: 00000006b561160f
-R10: 00007fed941b7cb0 R11: 0000000000000246 R12: 0000000000057219
-R13: 00007fed941b6090 R14: ffffffffffffffff R15: 0000000000000003
- </TASK>
-rcu: rcu_preempt kthread starved for 1596 jiffies! g19581 f0x0 RCU_GP_WAIT_FQS(5) ->state=0x0 ->cpu=1
-rcu: 	Unless rcu_preempt kthread gets sufficient CPU time, OOM is now expected behavior.
-rcu: RCU grace-period kthread stack dump:
-task:rcu_preempt     state:R  running task     stack:27160 pid:16    tgid:16    ppid:2      task_flags:0x208040 flags:0x00004000
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5357 [inline]
- __schedule+0x1798/0x4cc0 kernel/sched/core.c:6961
- __schedule_loop kernel/sched/core.c:7043 [inline]
- schedule+0x165/0x360 kernel/sched/core.c:7058
- schedule_timeout+0x12b/0x270 kernel/time/sleep_timeout.c:99
- rcu_gp_fqs_loop+0x301/0x1540 kernel/rcu/tree.c:2083
- rcu_gp_kthread+0x99/0x390 kernel/rcu/tree.c:2285
- kthread+0x70e/0x8a0 kernel/kthread.c:463
- ret_from_fork+0x3fc/0x770 arch/x86/kernel/process.c:148
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-rcu: Stack dump where RCU GP kthread last ran:
-CPU: 1 UID: 0 PID: 6401 Comm: napi/wg0-0 Not tainted 6.16.0-syzkaller-12122-g3b5ca25ecfa8 #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/12/2025
-RIP: 0010:finish_task_switch+0x26b/0x950 kernel/sched/core.c:5225
-Code: 0f 84 3c 01 00 00 48 85 db 0f 85 63 01 00 00 0f 1f 44 00 00 4c 8b 75 d0 4c 89 e7 e8 cf 37 ea 09 e8 5a 3f 36 00 fb 4c 8b 65 c0 <49> 8d bc 24 18 16 00 00 48 89 f8 48 c1 e8 03 42 0f b6 04 28 84 c0
-RSP: 0018:ffffc9000458fa78 EFLAGS: 00000286
-RAX: e330458c080e4500 RBX: 0000000000000000 RCX: e330458c080e4500
-RDX: 0000000000000000 RSI: ffffffff8d9b49fa RDI: ffffffff8be32680
-RBP: ffffc9000458fad0 R08: ffffffff8fa34737 R09: 1ffffffff1f468e6
-R10: dffffc0000000000 R11: fffffbfff1f468e7 R12: ffff8880252d0000
-R13: dffffc0000000000 R14: ffff8880256a3c00 R15: ffff8880b873ab58
-FS:  0000000000000000(0000) GS:ffff888125d21000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055ea52750000 CR3: 0000000077f62000 CR4: 00000000003526f0
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5360 [inline]
- __schedule+0x17a0/0x4cc0 kernel/sched/core.c:6961
- __schedule_loop kernel/sched/core.c:7043 [inline]
- schedule+0x165/0x360 kernel/sched/core.c:7058
- napi_thread_wait net/core/dev.c:7583 [inline]
- napi_threaded_poll+0xfa/0x2b0 net/core/dev.c:7634
- kthread+0x70e/0x8a0 kernel/kthread.c:463
- ret_from_fork+0x3fc/0x770 arch/x86/kernel/process.c:148
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
+@@ -766,6 +766,10 @@ static irqreturn_t icssm_emac_rx_packets(struct prueth_emac *emac, int budget)
+        start_queue = emac->rx_queue_start;
+        end_queue = emac->rx_queue_end;
+ 
++       /* skip Rx if budget is 0 */
++       if (!budget)
++               return 0;
++
+        /* search host queues for packets */
+        for (i = start_queue; i <= end_queue; i++) {
+                queue_desc = emac->rx_queue_descs + i;
+
+We will address this in the next version.
+
+>> +	num_rx_packets = icssm_emac_rx_packets(emac, budget);
+>> +	if (num_rx_packets < budget) {
+>> +		napi_complete_done(napi, num_rx_packets);
+> 
+> don't ignore the return value of napi_complete_done()
+> --
+
+We will update the code to check the return value of napi_complete_done()
+as shown below.
+
+@@ -840,10 +844,9 @@ static int icssm_emac_napi_poll(struct napi_struct *napi, int budget)
+        int num_rx_packets;
+ 
+        num_rx_packets = icssm_emac_rx_packets(emac, budget);
+-       if (num_rx_packets < budget) {
+-               napi_complete_done(napi, num_rx_packets);
++
++       if (num_rx_packets < budget && napi_complete_done(napi, num_rx_packets))
+                enable_irq(emac->rx_irq);
+-       }
+ 
+        return num_rx_packets;
+ }
+
+We will address this in the next version.
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Thanks and Regards,
+Parvathi.
 
