@@ -1,139 +1,130 @@
-Return-Path: <netdev+bounces-214640-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214641-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 079EAB2AB5A
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 16:46:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 708EBB2AB44
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 16:45:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E7111BC4B93
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 14:32:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F5F91B6441C
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 14:38:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B97F033EAEA;
-	Mon, 18 Aug 2025 14:23:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15619246789;
+	Mon, 18 Aug 2025 14:31:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="z13bQ4w7"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="Zo8Dlfhy"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EC3B33EAE7;
-	Mon, 18 Aug 2025 14:23:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDC2E288AD;
+	Mon, 18 Aug 2025 14:31:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755526990; cv=none; b=kV/ErK/1vtcmbzLSDIT69vqd32eTvCZNHXrGF/7m6Q3DCCRzKc1I6YQo1eGduSBpCmYpJGrk4h+9OKiprywqnsoVRMSsCVN2vDQqB/I/n6NPNV7NAqY5mMnCqZGQTUpk1+H+bR1EgsYMjpbJ/EfmQ7DFRf7tzdQjg6g3j7KhayQ=
+	t=1755527505; cv=none; b=nLekqGI8jjhTO6qfyLUrU9KC/NqyUz0m1EEQmX+d9K5CYud4zcSWHgT2n/PYYSTrZNUi5xD8KQuYQEQS+I8RS3+4JmJVNLfmAeokBZGHaQAM6FyJFltWwsWBidXRLyVJ3rP+F6IlQvLVMsN1ieQrQ9BnNa+t+BC5Cimjz5LkLus=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755526990; c=relaxed/simple;
-	bh=xV+yCcq6GkEFZSuRsObv889GnJMU74ErMAVX1xzOIic=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y9baNvPMk9c9AK4KFMYjJMOVpYndAcc7qCfW++9ZJQus2mPAbASCDOobCWzf5Puw8p7YgEoz+McYF5oJObbJDAc4SZaSh0Nlc2c63GFY/oy//Ck1s8IuEi140tgHPzAsr2qTxGPTpQce24vPqv7kR7pKieZvGcnErULWO+pbk2I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=z13bQ4w7; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1755526989; x=1787062989;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=xV+yCcq6GkEFZSuRsObv889GnJMU74ErMAVX1xzOIic=;
-  b=z13bQ4w7q9WqN4B8P46291iMs0EEDyN4VHnXH5IxSJTdJzsmFN7snSpj
-   crQVA9ldspdxGlsYhqN8GrlxvNkpFpx3dhiJMtJVg6xkt04zK8YlDhrga
-   RE4L+tBETptKO5W7Rw5qmm2/SXiWphI1bmsY9T0niwXI3jz9/ky4pzJcU
-   JcXAV6esuz5lYvdV/nWGDtCEW6ZWHd1G1MXAQnaWRbX//uKZWbU4Ten1j
-   6X8NtyGpDzSssNDNqG/hOQqcFCi06Y0NE9qfpDCN/IQv0VgFhzxD2x0qr
-   bFxvv/lB7sk297HAu4n11NfcwVQKA7pZFFGwC2cIA2PD78if/7kKx2BpY
-   w==;
-X-CSE-ConnectionGUID: Om7kd4uvQdGD8bWCpE/DyA==
-X-CSE-MsgGUID: YLJTI/MuTwOU11OaMQsH8g==
-X-IronPort-AV: E=Sophos;i="6.17,293,1747724400"; 
-   d="scan'208";a="50869351"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 18 Aug 2025 07:23:07 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Mon, 18 Aug 2025 07:22:47 -0700
-Received: from localhost (10.10.85.11) by chn-vm-ex02.mchp-main.com
- (10.10.85.144) with Microsoft SMTP Server id 15.1.2507.44 via Frontend
- Transport; Mon, 18 Aug 2025 07:22:47 -0700
-Date: Mon, 18 Aug 2025 16:19:25 +0200
-From: Horatiu Vultur <horatiu.vultur@microchip.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-CC: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <richardcochran@gmail.com>,
-	<rmk+kernel@armlinux.org.uk>, <rosenp@gmail.com>,
-	<christophe.jaillet@wanadoo.fr>, <viro@zeniv.linux.org.uk>,
-	<quentin.schulz@bootlin.com>, <atenart@kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net v4] phy: mscc: Fix timestamping for vsc8584
-Message-ID: <20250818141925.l7rvjns26gda3bp7@DEN-DL-M31836.microchip.com>
-References: <20250818081029.1300780-1-horatiu.vultur@microchip.com>
- <20250818132141.ezxmflzzg6kj5t7k@skbuf>
- <20250818135658.exs5mrtuio7rm3bf@DEN-DL-M31836.microchip.com>
- <20250818141306.qlytyq3cjryhqkas@skbuf>
+	s=arc-20240116; t=1755527505; c=relaxed/simple;
+	bh=LZyhNlWErTZfaiOwGWM9+qW3vd841xJv3O1uNo7STb0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Gs7S88Z/TvPuGvF5mXAyos1rcpjbxt3UUjKZhDHeVdNzW/ykvRh7IBk0KBcfq6v9jVho8km1kHd4l6P3NOwogOZwil+/NXlEDyP2cJ1qYgZm7FR2AzFOnryLdi99886fcBw4TIPvY4SXM5jN9uAy0ufbDbn2+CbnkIDoXsY0Toc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=Zo8Dlfhy; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=Q0bC70KYbU70l1V9oWMxOUx91cfUilkZ3/uHXkaudow=; b=Zo8DlfhyeU1M7rWB1dZYh02JUR
+	l+yG3/PgxODMGyvWZUmstpfJwh8hhvIlv/bE4Ej34Sr3UYWGuPL5GCppXT99JxuduwqGMAyUOu+Yf
+	AGDb3pL8NsajaSJYV8NwwYgivA47QIA0mUmkF8KJAtu02CCylL7Pfc1qEYEVGE6hTdrzXyjQ3R5Xp
+	3PQTTPAHwUB26ge5jTo1d8TIp9i9V7zyf78JgEzaNR8DOTsh7xunlKmuNkK3/nxJsYmLtTwZFdnH+
+	nmW5RJBZK4bvbyF48XYhxWlmFKj7fvO94ZDfzSs0ylcryK/v00tXybk/e8omEhWENrzKwslyoWG0n
+	UyQD/qk8rpNsRmyK9aHSWKSTQCrzCJrL7qr9QEZKzN9Tw/A4UO69uV46+SjDKm8oBkWfpffVyrXys
+	iY9TsgQo8PpBOwaAq1A17drwvYsttKoKd497fnf9FT8XxtSiQ51m6o02XdCaYgsUfOxxtsGynpYUm
+	TZuPejZFufphslfoJAy0a6UO;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1uo0tW-003TUE-2Z;
+	Mon, 18 Aug 2025 14:31:30 +0000
+Message-ID: <5d5ac074-1790-410e-acf9-0e559cb7eacb@samba.org>
+Date: Mon, 18 Aug 2025 16:31:29 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-In-Reply-To: <20250818141306.qlytyq3cjryhqkas@skbuf>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 01/15] net: define IPPROTO_QUIC and SOL_QUIC
+ constants
+To: Xin Long <lucien.xin@gmail.com>, network dev <netdev@vger.kernel.org>
+Cc: davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>,
+ Pengtao He <hepengtao@xiaomi.com>, linux-cifs@vger.kernel.org,
+ Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>,
+ Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>,
+ kernel-tls-handshake@lists.linux.dev, Chuck Lever <chuck.lever@oracle.com>,
+ Jeff Layton <jlayton@kernel.org>, Benjamin Coddington <bcodding@redhat.com>,
+ Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>,
+ Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>,
+ Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe"
+ <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>,
+ illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>,
+ Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+ Daniel Stenberg <daniel@haxx.se>,
+ Andy Gospodarek <andrew.gospodarek@broadcom.com>
+References: <cover.1755525878.git.lucien.xin@gmail.com>
+ <50eb7a8c7f567f0a87b6e11d2ad835cdbb9546b4.1755525878.git.lucien.xin@gmail.com>
+Content-Language: en-US
+From: Stefan Metzmacher <metze@samba.org>
+In-Reply-To: <50eb7a8c7f567f0a87b6e11d2ad835cdbb9546b4.1755525878.git.lucien.xin@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The 08/18/2025 17:13, Vladimir Oltean wrote:
-> 
-> On Mon, Aug 18, 2025 at 03:56:58PM +0200, Horatiu Vultur wrote:
-> > The 08/18/2025 16:21, Vladimir Oltean wrote:
-> >
-> > Hi Vladimir,
-> >
-> > >
-> > > On Mon, Aug 18, 2025 at 10:10:29AM +0200, Horatiu Vultur wrote:
-> > > > diff --git a/drivers/net/phy/mscc/mscc_main.c b/drivers/net/phy/mscc/mscc_main.c
-> > > > index 37e3e931a8e53..800da302ae632 100644
-> > > > --- a/drivers/net/phy/mscc/mscc_main.c
-> > > > +++ b/drivers/net/phy/mscc/mscc_main.c
-> > > > @@ -2368,6 +2368,13 @@ static int vsc85xx_probe(struct phy_device *phydev)
-> > > >       return vsc85xx_dt_led_modes_get(phydev, default_mode);
-> > > >  }
-> > > >
-> > > > +static void vsc85xx_remove(struct phy_device *phydev)
-> > > > +{
-> > > > +     struct vsc8531_private *priv = phydev->priv;
-> > > > +
-> > > > +     skb_queue_purge(&priv->rx_skbs_list);
-> > > > +}
-> > >
-> > > Have you tested this patch with an unbind/bind cycle? Haven't you found
-> > > that a call to ptp_clock_unregister() is also missing?
-> >
-> > I haven't tested unbind/bind cycle. As I said also to Paolo[1], I will need
-> > to look in this issue with missing ptp_clock_unregister(). But I want to
-> > do that in a separate patch after getting this accepted.
-> >
-> > [1] https://lkml.org/lkml/2025/8/13/345
-> >
-> > --
-> > /Horatiu
-> 
-> Ok, is there anything preventing you from looking into that issue as well?
+Hi,
 
-Nothing prevents me for looking at this issue. I just need to alocate
-some time for this.
+> diff --git a/include/linux/socket.h b/include/linux/socket.h
+> index 3b262487ec06..a7c05b064583 100644
+> --- a/include/linux/socket.h
+> +++ b/include/linux/socket.h
+> @@ -386,6 +386,7 @@ struct ucred {
+>   #define SOL_MCTP	285
+>   #define SOL_SMC		286
+>   #define SOL_VSOCK	287
+> +#define SOL_QUIC	288
+>   
+>   /* IPX options */
+>   #define IPX_TYPE	1
+> diff --git a/include/uapi/linux/in.h b/include/uapi/linux/in.h
+> index ced0fc3c3aa5..34becd90d3a6 100644
+> --- a/include/uapi/linux/in.h
+> +++ b/include/uapi/linux/in.h
+> @@ -85,6 +85,8 @@ enum {
+>   #define IPPROTO_RAW		IPPROTO_RAW
+>     IPPROTO_SMC = 256,		/* Shared Memory Communications		*/
+>   #define IPPROTO_SMC		IPPROTO_SMC
+> +  IPPROTO_QUIC = 261,		/* A UDP-Based Multiplexed and Secure Transport	*/
+> +#define IPPROTO_QUIC		IPPROTO_QUIC
+>     IPPROTO_MPTCP = 262,		/* Multipath TCP connection		*/
+>   #define IPPROTO_MPTCP		IPPROTO_MPTCP
+>     IPPROTO_MAX
 
-> The two problems are introduced by the same commit, and fixes will be
-> backported to all the same stable kernels. I don't exactly understand
-> why you'd add some code to the PHY's remove() method, but not enough in
-> order for it to work.
+Can these constants be accepted, soon?
 
-Yes, I understand that but the fix for ptp_clock_unregister will fix a
-different issue that this patch is trying to fix. That is the reason why
-I prefer not to add that fix now, just to make things more clear.
+Samba 4.23.0 to be released early September will ship userspace code to
+use them. It would be good to have them correct when kernel's start to
+support this...
 
--- 
-/Horatiu
+It would also mean less risk for conflicting projects with the need for such numbers.
+
+I think it's useful to use a value lower than IPPROTO_MAX, because it means
+the kernel module can also be build against older kernels as out of tree module
+and still it would be transparent for userspace consumers like samba.
+There are hardcoded checks for IPPROTO_MAX in inet_create, inet6_create, inet_diag_register
+and the value of IPPROTO_MAX is 263 starting with commit
+d25a92ccae6bed02327b63d138e12e7806830f78 in 6.11.
+
+Thanks!
+metze
 
