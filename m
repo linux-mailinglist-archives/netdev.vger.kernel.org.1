@@ -1,160 +1,134 @@
-Return-Path: <netdev+bounces-214485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214486-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19ECAB29D99
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 11:24:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B26A2B29DA0
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 11:24:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 351DC2A316D
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 09:21:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C59C42A3D9C
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 09:22:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C33730DEB0;
-	Mon, 18 Aug 2025 09:21:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8853530DEB1;
+	Mon, 18 Aug 2025 09:22:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JyQYtfoY"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f180.google.com (mail-vk1-f180.google.com [209.85.221.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8926C2C3246
-	for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 09:21:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDCC83074AE;
+	Mon, 18 Aug 2025 09:22:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755508881; cv=none; b=loOVHCLEGfIq7XrVJxFDCDxbOJ6Nb5ANsN60DZL3uYcVHf+j5rJF14xT2j4bM4GcekDx4CruoN5UG1YZ9lQW9n1enhYwRtpamVnkhTtlbZ/J6ipmaUqGcGbZcRI8rucZdEdo8/7ENPbN5reGImAepCmitHLnSH6YiynAk8f9BBg=
+	t=1755508923; cv=none; b=pkbwIeVebR0kAMjkplDmYb7zN8N2DUA4TwH8ufHL0vOQorg8TsSVj+Vz2ffPiYZogpYE1bri1qYNAHVGz+Q3/qXdX3DU1ASiV9XoZYhvY8+Oq+jEWDZLIkjb7+ZvQ8hUAl0Qwo3HG9FLUHfNVFsKxKxzcxJSR4Q9YIZURRl+e7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755508881; c=relaxed/simple;
-	bh=02EAHmb0JV+wP0FR+YB9py05X+SwMTPsln/83688kh8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PYjG40nmHf5BwESJRfTE78ic1OkSkgicVB0jnDLtitg0SwjLDqDVh/uBlXWhpFVgPdTYO9XRGcyw6wfEOKQ8TKfHpNtpLMQTkIP6U6Iawjj7vuXISGhvlaoM9FEktTTJySRRpve1FizJ6eUjQnFIB2XN4h2xE81RvGnzL32hxrU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1unw2x-0005q1-Sd; Mon, 18 Aug 2025 11:20:55 +0200
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1unw2w-000sUD-13;
-	Mon, 18 Aug 2025 11:20:54 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1unw2w-001hUG-0d;
-	Mon, 18 Aug 2025 11:20:54 +0200
-Date: Mon, 18 Aug 2025 11:20:54 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Nishanth Menon <nm@ti.com>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com, linux-doc@vger.kernel.org,
-	Michal Kubecek <mkubecek@suse.cz>, Roan van Dijk <roan@protonic.nl>
-Subject: Re: [PATCH net-next v2 5/5] net: phy: dp83td510: add MSE interface
- support for 10BASE-T1L
-Message-ID: <aKLwdrqn-_9KqMaA@pengutronix.de>
-References: <20250815063509.743796-1-o.rempel@pengutronix.de>
- <20250815063509.743796-6-o.rempel@pengutronix.de>
- <1df-68a2e100-1-20bf1840@149731379>
+	s=arc-20240116; t=1755508923; c=relaxed/simple;
+	bh=35ExYHNkSOFl+vIDqv8fU+bcX6NCYN9Sw9qjqiUvNJw=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=JTo5MJ+iYVwos5KOP7yAuwdOzONg9ZEJuuWdRpT6cUDntViDpV6Ga0LO/dh1yQgTKYjm98YZsU0rEHOL7ZWU6NtibokbFClgGA5UHM0UvqaqH+xV0hk/hT/tC5s7P/oH9W8VR2w2jutdI/dvA9ijpRIAgwzZhXKmVt1DolcuNsA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JyQYtfoY; arc=none smtp.client-ip=209.85.221.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f180.google.com with SMTP id 71dfb90a1353d-53b09878addso3597821e0c.0;
+        Mon, 18 Aug 2025 02:22:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755508921; x=1756113721; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4i8EHdDnh/5DdxWcY1M48VGjMphp0rLN8Gdmw8dmd2w=;
+        b=JyQYtfoY8Y8LIhE8XGuiIg/fwhfVf3GF/cmN2OWx2rkHIV0ixiCRTNPv37UU1rIUUn
+         YfN5NlW59TbrNalpmm930LKBoQ3iKipP4uX4SvK4yGHPtuM+A3gHu4DUr5SY0jLNQqZM
+         1Ypuf/Mf14yJHf5orNhqb1jWLK7qur4gPz7J+6fwQ3/qi7nZpsciEqizthyvlU9eHE10
+         vrRqqI/HOfimJnW+atWRo3gzR9GVZ6kuQ9K/oDSi1rqgyqNG1s5vAZ1y/AG0EeD1aloY
+         mkkWjbjC4rsTtdB3zZkEYK0Ke/6hfDosDVMSidv/gZ43+TFkFTZOde/ilveph245wx0x
+         cQYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755508921; x=1756113721;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=4i8EHdDnh/5DdxWcY1M48VGjMphp0rLN8Gdmw8dmd2w=;
+        b=GdE19m95hI0WGWLfVBk9DuyYUHpFECegZfoibxCtaxT6D2/K0K4gGT7UDM8TJtLUsw
+         xojoXTSeSEhWlZ46BZ8Y/1XOGAyagE4HGSLPeb39zHGToE/D9rcUkXNYsQP3dqBPMtyZ
+         PMPffuBLjRCwp0T/drPOSZVIoKGRwRleayS3v82aUzTjCbasp+jHrieLPmpL/JNpcGiU
+         NtbNLcuXYdksWi1+GBolwzzceW+mXmqUcaXtgwkeY3CFO6n4bmwUZAI39VWu3MQTE2gj
+         PRAqDHDTLXuI39fmDV0PxarE7KH+9SSCUrkOkKN0DuWtzbnFaeF3MdkWDvxJ1DOVMKd8
+         VFCA==
+X-Forwarded-Encrypted: i=1; AJvYcCUilDfzEsxtx/f344EJoXlCek8fqRWoxxzCM6gkMCqgNgJ0ASHCgB3ZlidwhJguiih3O13omH1v@vger.kernel.org, AJvYcCUw9hNxyBLlyY8C0cJKRazu6TwdwAuGguT1WAo3qEdxjcuHeH5BWweCFhdC4brk8A8MADFhwKdXhgmE+jY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyafrQPGvkuM5Mc25o7cVbJxVHX+zUuJV9hMAB/Oo5tthnVOP2/
+	df1bFrFaaNhS6ruTjiCFU9y0xvFvCzhfm8oRJWf9kaf2H+tewK1kHxQy
+X-Gm-Gg: ASbGncsi6ft3W+SVH0OvR4hjubWeoHwklWiPt1efu6z8mC97ubuJUbLJZjJbcw5ln4U
+	eXhoYX5YpARDZKnQsvGn77Z5hC9OI5QgwwV57w9lrdXWnDzwbPokkGb/6l8BwfB9vjkLUi4a/Hk
+	kocOFfSaBbIt6seppVEj0/AroU2Dss5DyJdrdX3bCvkJP0tkADSJZQRnuKC+567xOke86pvejyl
+	gNDvtlys41+SXevorx0uUg1645juWVwKO9I+KenEhC70sR7pvEolY+AUcjMDTyJzj5xp2w4G1oC
+	IkqDW687XU6FXXqETJFrJkkuV8pLOrHliXeeYUoC8zNPVNCTqZ5+s+3UGAg0w9LKYIVffCcsUFi
+	Qtr3Vn4xqFvUb7prr+QXc/ywCaPQarFmyKgFwWj9dvYSJfObsOiNd/95xk7DA2anCDKYr/g==
+X-Google-Smtp-Source: AGHT+IH8FYwREhyqacv9UB0VgYQu7743NkG4uUNESFFnzPKV4gB3XG5F0ca/b2TSYW5gJp37+nmmXQ==
+X-Received: by 2002:a05:6122:e6b:b0:53a:dcb4:79be with SMTP id 71dfb90a1353d-53b19d86818mr4321378e0c.4.1755508920640;
+        Mon, 18 Aug 2025 02:22:00 -0700 (PDT)
+Received: from gmail.com (128.5.86.34.bc.googleusercontent.com. [34.86.5.128])
+        by smtp.gmail.com with UTF8SMTPSA id 71dfb90a1353d-53b2bf26276sm1884859e0c.32.2025.08.18.02.21.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Aug 2025 02:21:59 -0700 (PDT)
+Date: Mon, 18 Aug 2025 05:21:59 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Xin Zhao <jackzxcui1989@163.com>, 
+ willemdebruijn.kernel@gmail.com, 
+ edumazet@google.com, 
+ ferenc@fejes.dev
+Cc: davem@davemloft.net, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ horms@kernel.org, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org
+Message-ID: <willemdebruijn.kernel.45acd8edbab1@gmail.com>
+In-Reply-To: <20250818071334.240913-1-jackzxcui1989@163.com>
+References: <20250818071334.240913-1-jackzxcui1989@163.com>
+Subject: Re: [PATCH net-next v3] net: af_packet: Use hrtimer to do the retire
+ operation
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1df-68a2e100-1-20bf1840@149731379>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Hi Maxime,
-
-On Mon, Aug 18, 2025 at 10:15:56AM +0200, Maxime Chevallier wrote:
-> Hi Oleksij,
+Xin Zhao wrote:
+> On Sun, 2025-08-17 at 21:28 +0800, Willem wrote:
 > 
-> On Friday, August 15, 2025 08:35 CEST, Oleksij Rempel <o.rempel@pengutronix.de> wrote:
-> 
-> > Implement get_mse_config() and get_mse_snapshot() for the DP83TD510E
-> > to expose its Mean Square Error (MSE) register via the new PHY MSE
-> > UAPI.
+> > Here we cannot use hrtimer_add_expires for the same reason you gave in
+> > the second version of the patch:
 > > 
-> > The DP83TD510E does not document any peak MSE values; it only exposes
-> > a single average MSE register used internally to derive SQI. This
-> > implementation therefore advertises only PHY_MSE_CAP_AVG, along with
-> > LINK and channel-A selectors. Scaling is fixed to 0xFFFF, and the
-> > refresh interval/number of symbols are estimated from 10BASE-T1L
-> > symbol rate (7.5 MBd) and typical diagnostic intervals (~1 ms).
+> > > Additionally, I think we cannot avoid using ktime_get, as the retire
+> > > timeout for each block is not fixed. When there are a lot of network packets,
+> > > a block can retire quickly, and if we do not re-fetch the time, the timeout
+> > > duration may be set incorrectly.
 > > 
-> > For 10BASE-T1L deployments, SQI is a reliable indicator of link
-> > modulation quality once the link is established, but it does not
-> > indicate whether autonegotiation pulses will be correctly received
-> > in marginal conditions. MSE provides a direct measurement of slicer
-> > error rate that can be used to evaluate if autonegotiation is likely
-> > to succeed under a given cable length and condition. In practice,
-> > testing such scenarios often requires forcing a fixed-link setup to
-> > isolate MSE behaviour from the autonegotiation process.
+> > Is that right?
 > > 
-> > Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> > Otherwise patch LGTM.
 > 
-> [...]
 > 
-> > +static int dp83td510_get_mse_snapshot(struct phy_device *phydev, u32 channel,
-> > +				      struct phy_mse_snapshot *snapshot)
-> > +{
-> > +	int ret;
-> > +
-> > +	if (channel != PHY_MSE_CHANNEL_LINK &&
-> > +	    channel != PHY_MSE_CHANNEL_A)
-> > +		return -EOPNOTSUPP;
+> Dear Willem,
 > 
-> The doc in patch 1 says :
-> 
->   > + * Link-wide mode:
->   > + *  - Some PHYs only expose a link-wide aggregate MSE, or cannot map their
->   > + *    measurement to a specific channel/pair (e.g. 100BASE-TX when MDI/MDI-X
->   > + *    resolution is unknown). In that case, callers must use the LINK selector.
-> 
-> The way I understand that is that PHYs will report either channel-specific values or
-> link-wide values. Is that correct or are both valid ? In BaseT1 this is the same thing,
-> but maybe for consistency, we should report either channel values or link-wide values ?
+> While reviewing the code, I suddenly realized that previously I used 
+> hrtimer_set_expires instead of hrtimer_forward_now to resolve the situation when
+> handling the retire timer timeout while run into prb_open_block simultaneously.
+> However, since there is now a distinction with the bool start variable in PATCH v4,
+> it seems that we no longer need to use hrtimer_set_expires and can directly use
+> hrtimer_forward_now instead. Therefore, I plan to make this change immediately and
+> resend PATCH v4. Please take a look at it then.
 
-for 100Base-T1 the LINK and channel-A selectors are effectively the
-same, since the PHY only has a single channel. In this case both are
-valid, and the driver will return the same answer for either request.
+Having a conversation in one thread that is not concluded yet and
+already starting another thread makes back and forth communication
+a bit difficult.
 
-I decided to expose both for consistency:
-- on one side, the driver already reports pair_A information for the
-  cable test, so it makes sense to allow channel-A here as well;
-- on the other side, if a caller such as a generic link-status/health
-  request asks for LINK, we can also provide that without special
-  casing.
-
-So the driver just answers what it can. For this PHY, LINK and
-channel-A map to the same hardware register, and all other selectors
-return -EOPNOTSUPP.
-
-Best regards,
-Oleksij
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+I'll take a look, but just send a v5 after 24 hrs.
 
