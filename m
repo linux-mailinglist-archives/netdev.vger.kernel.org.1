@@ -1,71 +1,74 @@
-Return-Path: <netdev+bounces-214447-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214448-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EA89B2994F
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 08:05:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 066E2B2995B
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 08:07:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE80D3BBEC7
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 06:05:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DCE123A7D79
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 06:07:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48E4726FA5E;
-	Mon, 18 Aug 2025 06:05:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B99152701CC;
+	Mon, 18 Aug 2025 06:07:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="sNgfHIAY"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="EfZ7x04B"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A27A417A300;
-	Mon, 18 Aug 2025 06:05:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32E0E26FA70;
+	Mon, 18 Aug 2025 06:07:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755497131; cv=none; b=cm+1ciJd3SxnYEivQ/41OIJRNqIaawSRSRj/KH+qbVKkESGG5dBMpCFC5nIXMjBfOJmRnHZ4KCDQdS9JyVJciz55ZviQa42tqx1YD6KYYLV7bn/Bf76YbZ2FId1Bn//9bJgAg5be6AkI3bNRcoMHTMO+2sQCdE+b079ne/T3gQI=
+	t=1755497224; cv=none; b=QWTPzfttRG8rHmJUVJf8cqiuWxqD0/gTWc5WA66dcJhQn4q19c8po7Oj7MnAIT++uFMr8O3e3fGyoHqKkN0csBDqgBR+esrvCmTw8Z3VuIjKOyhg5PuhX41+SlpHAfALWyfN0hko54MkAYnKdFfZ7ab0Kz2oHPG/t+6R5p6qVu8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755497131; c=relaxed/simple;
-	bh=b4y+xOJAyeQJFHpsb9bHaRAMa5KHZrCIkkWSVJFpknI=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=HPwcYiRQOYblHv3189cIXy5jLzUWAA7dsZNkj3Z1PrQoeFpIsd2wDmEkIYARm1VxGpxwYltNTp+zFODf91mAnw+DZ9gnEUTiFd+lSSsAtt0pguXhi4+CDfLeX0roxYLIyuGorXFA0406UQo2+94yaIbN7bsi9kKm30YbUllvf5w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=sNgfHIAY; arc=none smtp.client-ip=68.232.154.123
+	s=arc-20240116; t=1755497224; c=relaxed/simple;
+	bh=RdQTeqQB8uoTlU13DhVu51bey3H2cntBXfP/WY0N2a4=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=oNabO1jkyJ6HewPmtGt25gA90QWf6kcsDvTQsNgShqB5BHXe0hzo8BZmo4MeS7kKFaxnyuO/JDpjysT970FWR9RdoFSzURbeEjxFQ4vAzeS9TUKZK/jJv3G1R5BJntGZVnotTxVln5u+aJivvYiujjwoqmkS8FYEUfGMXW9upbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=EfZ7x04B; arc=none smtp.client-ip=68.232.153.233
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1755497129; x=1787033129;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=b4y+xOJAyeQJFHpsb9bHaRAMa5KHZrCIkkWSVJFpknI=;
-  b=sNgfHIAY29D2qflws8C4h6UvD6yOfqT+FAm9tmby7+IXHotrwIVEV5+0
-   4FCMMocsZ414W052yOnBvQJXmk3w4q+4/piaS7/WAAJx2Rnwb3X40yu9N
-   P9T/eF3pS4UQGzdQwL4f0WPbhOqLQAuW7oyQYOw4SzJNPTvSm53+mlAKf
-   XbriZ2AWU4rDCYv+4JTUMdYHgXHbD/R6dqWuwTi4SaNKwIGa5sHpkdsD3
-   MFllSbpn93T/LfQl2biBdrxXpfkXM1K9mDjg4kGY5pxNUTzZp8lYyN5dG
-   jA3W+6Xde0U6oygzss3D5nURO+Pr2W74pzfYQfe5Bt+xZ/5xFwlUT451S
-   Q==;
-X-CSE-ConnectionGUID: wiCCt1P6SCqaq7ADjJVoNA==
-X-CSE-MsgGUID: yqvyF2tXSE2Y0lMIiA2/8g==
+  t=1755497223; x=1787033223;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=RdQTeqQB8uoTlU13DhVu51bey3H2cntBXfP/WY0N2a4=;
+  b=EfZ7x04BsxIFhU3thdj+ZbgBzKI+FmrKVK27k/bfoXr27o8dhCoyOEJw
+   uIhPGI+o9lpnSyUv9qQbk01U3/vwxUwVEMkxS+g3zny8bniH5pVZLYfiI
+   Xh5vQ1vpJRVsVew0W+AeEeEN3QwnVrIcMu8et1vMlQ3vALI6+xfI+eK2V
+   NU55WSogTiNlFCegy84/EORejWpbWIdlIVT105oim02cVfv3BKRLro1Yv
+   fPHFcUZZtZAzWlrwUnwkH93OQWjVSIkmDoXiof1PwegL72c5ZKW8DTs4b
+   iENIycBp5diBN5O6nMuwEgoSS+j5MyCglPN3JKlAMC+zaeZrzQqZocFU2
+   w==;
+X-CSE-ConnectionGUID: jhrJsGctQCiiFoS1UDzbFg==
+X-CSE-MsgGUID: sSwgepzARQ6+4qdZL0QTJg==
 X-IronPort-AV: E=Sophos;i="6.17,293,1747724400"; 
-   d="scan'208";a="44766265"
+   d="scan'208";a="50850432"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 17 Aug 2025 23:05:22 -0700
+  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 17 Aug 2025 23:05:54 -0700
 Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
  chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Sun, 17 Aug 2025 23:05:20 -0700
+ 15.1.2507.44; Sun, 17 Aug 2025 23:05:23 -0700
 Received: from che-ll-i17164.microchip.com (10.10.85.11) by
  chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
- 15.1.2507.44 via Frontend Transport; Sun, 17 Aug 2025 23:05:17 -0700
+ 15.1.2507.44 via Frontend Transport; Sun, 17 Aug 2025 23:05:20 -0700
 From: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
 To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
 	<kuba@kernel.org>, <pabeni@redhat.com>
 CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "Parthiban
  Veerasooran" <parthiban.veerasooran@microchip.com>
-Subject: [PATCH net v2 0/2] Fixes on the Microchip's LAN865x driver
-Date: Mon, 18 Aug 2025 11:35:12 +0530
-Message-ID: <20250818060514.52795-1-parthiban.veerasooran@microchip.com>
+Subject: [PATCH net v2 1/2] microchip: lan865x: fix missing netif_start_queue() call on device open
+Date: Mon, 18 Aug 2025 11:35:13 +0530
+Message-ID: <20250818060514.52795-2-parthiban.veerasooran@microchip.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20250818060514.52795-1-parthiban.veerasooran@microchip.com>
+References: <20250818060514.52795-1-parthiban.veerasooran@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,43 +78,34 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 
-This patch series includes two bug fixes for the LAN865x Ethernet MAC-PHY
-driver:
+This fixes an issue where the transmit queue is started implicitly only
+the very first time the device is registered. When the device is taken
+down and brought back up again (using `ip` or `ifconfig`), the transmit
+queue is not restarted, causing packet transmission to hang.
 
-1. Fix missing transmit queue restart on device reopen
-   This patch addresses an issue where the transmit queue is not restarted
-   when the network interface is brought back up after being taken down
-   (e.g., via ip or ifconfig). As a result, packet transmission hangs
-   after the first down/up cycle. The fix ensures netif_start_queue() is
-   explicitly called in lan865x_net_open() to properly restart the queue
-   on every reopen.
+Adding an explicit call to netif_start_queue() in lan865x_net_open()
+ensures the transmit queue is properly started every time the device
+is reopened.
 
-2. Fix missing configuration in the Microchip LAN865x driver for silicon
-   revisions B0 and B1, as documented in Microchip Application Note AN1760
-   (Rev F, June 2024). These revisions require the MAC to be configured for
-   timestamping at the end of the Start of Frame Delimiter (SFD) and the
-   Timer Increment register to be set to 40 ns, corresponding to a 25 MHz
-   internal clock.
+Fixes: 5cd2340cb6a3 ("microchip: lan865x: add driver support for Microchip's LAN865X MAC-PHY")
+Signed-off-by: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
+---
+ drivers/net/ethernet/microchip/lan865x/lan865x.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Both patches address issues introduced with the initial driver support and
-are marked with the appropriate Fixes: tag.
-
-v2:
-- Updated the register name details with proper names instead of using
-  generic "fixup" labels
-- Revised the cover letter description of the second patch to reflect the
-  latest changes.
-
-Parthiban Veerasooran (2):
-  microchip: lan865x: fix missing netif_start_queue() call on device
-    open
-  microchip: lan865x: fix missing Timer Increment config for Rev.B0/B1
-
- .../net/ethernet/microchip/lan865x/lan865x.c  | 21 +++++++++++++++++++
- 1 file changed, 21 insertions(+)
-
-
-base-commit: bab3ce404553de56242d7b09ad7ea5b70441ea41
+diff --git a/drivers/net/ethernet/microchip/lan865x/lan865x.c b/drivers/net/ethernet/microchip/lan865x/lan865x.c
+index dd436bdff0f8..d03f5a8de58d 100644
+--- a/drivers/net/ethernet/microchip/lan865x/lan865x.c
++++ b/drivers/net/ethernet/microchip/lan865x/lan865x.c
+@@ -311,6 +311,8 @@ static int lan865x_net_open(struct net_device *netdev)
+ 
+ 	phy_start(netdev->phydev);
+ 
++	netif_start_queue(netdev);
++
+ 	return 0;
+ }
+ 
 -- 
 2.34.1
 
