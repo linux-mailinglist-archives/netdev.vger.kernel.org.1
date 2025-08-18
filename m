@@ -1,151 +1,132 @@
-Return-Path: <netdev+bounces-214433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214434-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E3C0B29608
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 03:15:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DFE8B2960E
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 03:20:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DC600189C688
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 01:15:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D0141893EF8
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 01:20:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B2F322A817;
-	Mon, 18 Aug 2025 01:15:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE4DF1E9B2D;
+	Mon, 18 Aug 2025 01:19:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="r5bieQaQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg154.qq.com (smtpbg154.qq.com [15.184.224.54])
+Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E3B92236FC
-	for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 01:14:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=15.184.224.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6305C3176EE
+	for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 01:19:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755479702; cv=none; b=g1u6dmUyxJH6ZfcOGHYCXcG+x3D6Lu+WwhFG/q7Xyu4qyeqG9QafNGdUpIuZIB3uYX/zPRfm5ctV/m63P/ur521TIqFMj7L1DEOlrlsaGI4Ey8I2R+w4UwA22r2POHu9WPvgdfV2Zb+8McnzsvcvPJe4w/0FLDxFVwwLdidLn1g=
+	t=1755479994; cv=none; b=Mn7MhACx43t09o5SUomdtwZa4uFb3g3N0kHerERH7ijN8ZbHAEgZ9KNTWxKX/gjpDiHK+vDII+Jb8V7EJbklA2qS2WGpauec6mCxUahxkMILRlSg41pj8kXMujzsrwpzLrjw57137q6ecPVMynHrjqhgK6VuYmxjGaHsyIBhGKo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755479702; c=relaxed/simple;
-	bh=re+a3hWvgegvjpaptPnpkLKcIKZ7lfEQo+cdRQVOra0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cU2YTs7zendHgTUXO4n32LW74N1YxZGB0XpLUlR3NwDk4gfgFcItEVLWyiAatuJrNcFye0V2P1rVKncKzRUeZc1WNvonOJmUJH7HlpdvUqp23VZGKyjLaBmlxntJrrcFiDCqygZEvQ2p3LdPGx/3KaEF+ruyHFXKgKJu5CLGQgg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=15.184.224.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
-X-QQ-mid: zesmtpgz8t1755479679t304d19fa
-X-QQ-Originating-IP: U+HouEQjyiYAmzyTLPl5BSeqSP+HEtl38Pp5dE5JTBQ=
-Received: from localhost ( [203.174.112.180])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 18 Aug 2025 09:14:37 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 10326870123005562293
-Date: Mon, 18 Aug 2025 09:14:37 +0800
-From: Yibo Dong <dong100@mucse.com>
-To: Andrew Lunn <andrew@lunn.ch>
+	s=arc-20240116; t=1755479994; c=relaxed/simple;
+	bh=iMJ1oHRbauEj3lcgwQet8BFInJoPoG6llDJNmYuo08M=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:MIME-Version:
+	 Content-Type:References; b=rIn5rlF11GGqtmvoL3XhYer314NKc5Cbn9GMEBXE7OcvJpNSnqOTJ0uXRY0Xqaf0caQxgu/z3I7CC5sVYAQ65KpFGv/gNgIsvD4gmDNwbVoZGw0mxpTdXRX7y8Prft58/7LreD0NZHiGjSrKeSRvslV9EQVe19Qh2K5sQpBKJus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=r5bieQaQ; arc=none smtp.client-ip=203.254.224.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
+	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20250818011943epoutp03ac7140103b8e9ba18d67568418477142~ct756ri3F0859708597epoutp03H
+	for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 01:19:43 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20250818011943epoutp03ac7140103b8e9ba18d67568418477142~ct756ri3F0859708597epoutp03H
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1755479983;
+	bh=oNTFgx0f6ht5S3wLJmJIF+ULm2VzvhkkVhPoqV1VuFU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=r5bieQaQDK+udQuQ/GAQ5N52e5rs0LXmxAZRW3grU3xxgxroejR7nBhMq5bp/FOrj
+	 91R/485IL4Owz8xUHaVPhvN4g7tBjbtDuKpcIXwQKmy1poKuoZ6rmO5LWbnYiLUfzT
+	 WvwHanvYLOYWlpf70NMDpbvYko7DCy6deLZS3XgA=
+Received: from epsnrtp03.localdomain (unknown [182.195.42.155]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTPS id
+	20250818011942epcas5p2aaaec9298cbcd1112fd218a1ae73ec32~ct75Ip0qr0869608696epcas5p2p;
+	Mon, 18 Aug 2025 01:19:42 +0000 (GMT)
+Received: from epcas5p1.samsung.com (unknown [182.195.38.87]) by
+	epsnrtp03.localdomain (Postfix) with ESMTP id 4c4vyP46yvz3hhT3; Mon, 18 Aug
+	2025 01:19:41 +0000 (GMT)
+Received: from epsmtip1.samsung.com (unknown [182.195.34.30]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+	20250818011515epcas5p21295745d0e831fd988706877d598f913~ct3--8YNT1315413154epcas5p2j;
+	Mon, 18 Aug 2025 01:15:15 +0000 (GMT)
+Received: from asg29.. (unknown [109.105.129.29]) by epsmtip1.samsung.com
+	(KnoxPortal) with ESMTPA id
+	20250818011513epsmtip12d2ab6910a9fefba463c4b8f998f0853~ct3_D_ADu1149011490epsmtip1x;
+	Mon, 18 Aug 2025 01:15:12 +0000 (GMT)
+From: Junnan Wu <junnan01.wu@samsung.com>
+To: kuba@kernel.org
 Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	corbet@lwn.net, gur.stavi@huawei.com, maddy@linux.ibm.com,
-	mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
-	gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
-	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
-	alexanderduyck@fb.com, richardcochran@gmail.com,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 2/5] net: rnpgbe: Add n500/n210 chip support
-Message-ID: <154C964FB97A8BAE+20250818011437.GA1370135@nic-Precision-5820-Tower>
-References: <20250814073855.1060601-1-dong100@mucse.com>
- <20250814073855.1060601-3-dong100@mucse.com>
- <a0553f1d-46dd-470c-aabf-163442449e19@lunn.ch>
- <F74E98A5E4BF5DA4+20250815023836.GB1137415@nic-Precision-5820-Tower>
- <63af9ff7-0008-4795-a78b-9bed84d75ae0@lunn.ch>
- <67844B7C9238FBFB+20250815072103.GC1148411@nic-Precision-5820-Tower>
- <ade28286-33b9-421c-9f3f-da7963a69d4e@lunn.ch>
+	eperezma@redhat.com, jasowang@redhat.com, junnan01.wu@samsung.com,
+	lei19.wang@samsung.com, linux-kernel@vger.kernel.org, mst@redhat.com,
+	netdev@vger.kernel.org, pabeni@redhat.com, q1.huang@samsung.com,
+	virtualization@lists.linux.dev, xuanzhuo@linux.alibaba.com,
+	ying123.xu@samsung.com
+Subject: Re: [PATCH net] virtio_net: adjust the execution order of function
+ `virtnet_close` during freeze
+Date: Mon, 18 Aug 2025 09:15:22 +0800
+Message-Id: <20250818011522.1334212-1-junnan01.wu@samsung.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20250815085503.3034e391@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ade28286-33b9-421c-9f3f-da7963a69d4e@lunn.ch>
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpgz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: MFyAKqap4x//RpEpeccJuhJyZkL+ocQhhcx219bVkF0Fg27hMfFyJJy9
-	qWqrRIwUm2enhnj04cduuf/IYz15YK9RK7RqksUM1PgSGCLRgrDvRivd0kIAcixnU4uJeZ6
-	VRL//WotM0cT685i6fjscKf97wgtuJJpGHINfC2OSiYse3knAfwqKMoyniBLz9vlop8up3w
-	7YTBmqCHyxlrENw+z+UkUxnq9PubDZcU8vXcKlmOZc97oOyXlMD68l2NnohtFTmZ0hXbf5B
-	xYCQCo1bMjj0ajmpxzcuX4XJq58lPQWs4bIRM6X5luYYZ4lKNC224UNv55BAF3E0Jw35YuB
-	7UeypyKOOhNd/pLiRoyIhyRO6dck06gQTdeq2s1QImwF/5938AEl8Wu/9nWloBqnAUF/NSE
-	MDmkgTmcV+qHepXa2vtd1ecu1e4cI2JP5V2d9qRed7ZdAMFXK98VttgSmylRs4mloRMPTHW
-	jCroF/eaDeoy9tXVdwS+Lja3r0XT6Zkjkl9hRDY5IVMu/slu4HWMGElz3uCY2XHwKfzlmo+
-	spdWYgiZfe+QIpQsIKfSc20ObTHFZTBHxsq6TV4FyEjzO6TCZzwBjvkU2kunDoaqn/I7C1U
-	ol5f8TW6GSQRRCp6QC3KJdvu0OIAbcuQfFoVcjtjFqw9CrPiPW/PIs1k/bYNvjAhePeXpoQ
-	lUHhfaxNzXMibBm/s2y+huFcV9jLpPE+5b25tUN1CirPd37e7uXlRJrQJCgUG7YO5k70n/j
-	e3OJtjF4bdlrhtxaIPhMi5Q9eHBn6bLgo7MKOsVmktKFsUltJH79ClGAZwI8B1AXb7kGLWS
-	iy/qMRXeCgjbeT5NcyaB/r69vI8JIrwyFo6CMLQGf7Tnc+W0HcMBhQR30q4/aUrX8uHINhC
-	ERtNKUqp9R9Y4YiR2YD7g319iiR+r6MxHpohq7+zqoE+X9TwrqyRDUZ1beS0XJ3mtxsktAC
-	FQtCKo7dLJ38cRq+vuJre18kUuCMTffz3Yl8kgm0APrOJl+MPPjEa3lg4sIyBtfuF6d/d6C
-	GZQioSGr16v1IZSg6uODGjRonvG9CVmZVpTvfVRt7TTA+erAzLnOKhVnISvgkO2+/uIH8w/
-	A==
-X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
-X-QQ-RECHKSPAM: 0
+Content-Transfer-Encoding: 8bit
+X-CMS-MailID: 20250818011515epcas5p21295745d0e831fd988706877d598f913
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+cpgsPolicy: CPGSC10-505,Y
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20250818011515epcas5p21295745d0e831fd988706877d598f913
+References: <20250815085503.3034e391@kernel.org>
+	<CGME20250818011515epcas5p21295745d0e831fd988706877d598f913@epcas5p2.samsung.com>
 
-On Fri, Aug 15, 2025 at 03:36:10PM +0200, Andrew Lunn wrote:
-> On Fri, Aug 15, 2025 at 03:21:03PM +0800, Yibo Dong wrote:
-> > On Fri, Aug 15, 2025 at 05:56:30AM +0200, Andrew Lunn wrote:
-> > > > It means driver version 0.2.4.16.
+On Fri, 15 Aug 2025 08:55:03 -0700 Jakub Kicinski wrote
+> On Fri, 15 Aug 2025 14:06:15 +0800 Junnan Wu wrote:
+> > On Fri, 15 Aug 2025 13:38:21 +0800 Jason Wang <jasowang@redhat.com> wrote
+> > > On Fri, Aug 15, 2025 at 10:24 AM Junnan Wu <junnan01.wu@samsung.com> wrote:  
+> > > > Sorry, I basically mean that the tx napi which caused by
+> > > > userspace will not be scheduled during suspend, others can not be
+> > > > guaranteed, such as unfinished packets already in tx vq etc.
+> > > >
+> > > > But after this patch, once `virtnet_close` completes,
+> > > > both tx and rq napi will be disabled which guarantee their napi
+> > > > will not be scheduled in future. And the tx state will be set to
+> > > > "__QUEUE_STATE_DRV_XOFF" correctly in `netif_device_detach`.  
 > > > 
-> > > And what does that mean?
-> > > 
-> > > > I used it in 'mucse_mbx_ifinsmod'(patch4, I will move this to that patch),
-> > > > to echo 'driver version' to FW. FW reply different command for different driver.
-> > > 
-> > > There only is one driver. This driver.
-> > > 
-> > > This all sounds backwards around. Normally the driver asks the
-> > > firmware what version it is. From that, it knows what operations the
-> > > firmware supports, and hence what it can offer to user space.
-> > > 
-> > > So what is your long terms plan? How do you keep backwards
-> > > compatibility between the driver and the firmware?
-> > > 
-> > > 	Andrew
-> > > 
+> > > Ok, so the commit mentioned by fix tag is incorrect.  
 > > 
-> > To the driver, it is the only driver. It get the fw version and do
-> > interactive with fw, this is ok.
-> > But to the fw, I think it is not interactive with only 'this driver'?
-> > Chips has been provided to various customers with different driver
-> > version......
+> > Yes, you are right. The commit of this fix tag is the first commit I
+> > found which add function `virtnet_poll_cleantx`. Actually, we are not
+> > sure whether this issue appears after this commit.
+> > 
+> > In our side, this issue is found by chance in version 5.15.
+> > 
+> > It's hard to find the key commit which cause this issue
+> > for reason that the reproduction of this scenario is too complex.
 > 
-> They theoretically exist, but mainline does not care about them. 
-> 
-> > More specific, our FW can report link state with 2 version:
-> > a: without pause status (to driver < 0.2.1.0)
-> > b: with pause status (driver >= 0.2.1.0)
-> 
-> But mainline does not care about this. It should ask the firmware, do
-> you support pause? If yes, report it, if not EOPNOTSUP. You want to be
-> able to run any version of mainline on any version of the
-> firmware. This means the ABI between the driver and the firmware is
-> fixed. You can extend the ABI, but you cannot make fundamental
-> changes, like adding new fields in the middle of messages. With care,
-> you can add new fields to the end of an existing messages, but you
-> need to do it such that you don't break older versions of the driver
-> which don't expect it.
-> 
-> Please look at other drivers. This is how they all do this. I don't
-> know of any driver which reports its version to the firmware and
-> expects the firmware to change its ABI.
-> 
-> So maybe you should just fill this version with 0xffffffff so the
-> firmware enables everything, and that is the ABI you use. Does the
-> firmware have an RPC to get its version? You can then use that for
-> future extensions to the ABI. Same as all other drivers.
-> 
-> 	Andrew
-> 
+> I think the problem needs to be more clearly understood, and then it
+> will be easier to find the fixes tag. At the face of it the patch
+> makes it look like close() doesn't reliably stop the device, which
+> is highly odd.
 
-Ok, I will fill 0xffffffff in mucse_mbx_ifinsmod to echo firmware.
+Yes, you are right. It is really strange that `close()` acts like that, because current order has worked for long time.
+But panic call stack in our env shows that the function `virtnet_close` and `netif_device_detach`
+should have a correct execution order.
+And it needs more time to find the fixes tag. I wonder that is it must have fixes tag to merge?
 
-Thanks for your feedback.
+By the way, you mentioned that "the problem need to be more clearly understood",
+did you mean the descriptions and sequences in commit message are not easy to understand?
+Do you have some suggestions about this?
+
+Thanks!
+
 
