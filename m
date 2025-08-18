@@ -1,67 +1,60 @@
-Return-Path: <netdev+bounces-214657-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214658-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38816B2ACCF
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 17:33:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1B5EB2ACD7
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 17:35:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2744818A7234
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 15:30:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDC645E64FA
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 15:32:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91C0725B1C7;
-	Mon, 18 Aug 2025 15:30:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 599D925C711;
+	Mon, 18 Aug 2025 15:31:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TUiYRhv3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cWgCzQZs"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60DD2258CC1;
-	Mon, 18 Aug 2025 15:30:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F54325BF13;
+	Mon, 18 Aug 2025 15:31:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755531008; cv=none; b=Rpua9NDOpv4AZUXiqNcTio1/r2eXACde2beEqrBftffFDaqQW/j/QQ03zdoBnnDXAZ6PdOIaXNXohaXX5UILRtyYhyYyLfdvqV2qcDuqWYrAwrCCKLCq9DLi46dv4zgJuehxvAqtGgjcglbZ9K04E2zGj8WE5M6GYmDUpGJ/AyA=
+	t=1755531112; cv=none; b=aV8E1imxO/bNxZaEgEQcQFVK6RkyYJe0Pm62pupPpbdSUakP4HQzGBOOXoEFx8RAMLIQIm2ZaSlPNE1/jkcS4GwrRbZmZ5ulCarF4DwVnEx+6BQYJ36jJxqo8lkoH/DLmQcmcR8Zrm/zbPr7t9+7af9FGxQ0y6+6LkJi31tqkzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755531008; c=relaxed/simple;
-	bh=0dpJixL1oHRcv/3jNzfC2XXZ+aqq6CYkmZdArMOuDoY=;
+	s=arc-20240116; t=1755531112; c=relaxed/simple;
+	bh=BwedT9hx5Lfn+vXgok0i3S4q6cuqvNa1FVkqAbi1paU=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IGB+5R0Ra//hl6B4rSKB9afnbDw6LuK24+mXXLwxJjz9/5TQ/mw4pHNyENAYEjunI8VPp6mAXliIbe9goNBv+gLXw1/6lXp520Ohj7lQ9ffE2ve4OleRbRA4yZbYRhdppHSRXdw8QzkUN5ZfLD7QzQK8X/Z5iTnKpLTmvQuN3Gc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TUiYRhv3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5706C113D0;
-	Mon, 18 Aug 2025 15:30:06 +0000 (UTC)
+	 MIME-Version:Content-Type; b=uKkTxsJSOiSDEcIA0uhnc91vOl0ilk4K/HOfcuMxihjTKtvtwdlM7ZZ5anXcJPVDmdUeIdJpO8eVqjTVYiHXZhGz8O2Sogndta+mHGfsoXEf+8yJYjk0hjPUhiMhxPhi5CPWMqBZiW6nwC+N5fHr7GjdU9O6i783VvQgEts4L6g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cWgCzQZs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62CD7C4CEF1;
+	Mon, 18 Aug 2025 15:31:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755531007;
-	bh=0dpJixL1oHRcv/3jNzfC2XXZ+aqq6CYkmZdArMOuDoY=;
+	s=k20201202; t=1755531111;
+	bh=BwedT9hx5Lfn+vXgok0i3S4q6cuqvNa1FVkqAbi1paU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=TUiYRhv3OxN9v2yoois/MTIq1RAg66QbGVeqXLXRna6GBPLoitAfU5+gXIHywbugf
-	 X00aRZagGj9JZAY1UHWYYLwyOEvGPaEDCXSjxOUFCZGppHCl7aMFZJAad4zXTPM60L
-	 xbWShtgAz0mK/6jJ3KdipPypAdeKan6efrcwQQmg4X3T3kv6Gt3/SvT8MuB4eQxdo8
-	 QDfRYPP2/DNbE2/jpeCouKXiUG2VlioTTVLH2uiay+gJXqJd4ket+v10VHMyy+J8wv
-	 wZkV/l6S+UjE0cCmmxpqSVeeggjFJpsG041Sc40Piu+wxpBaoLWkX54tO2/f/Tmwqt
-	 ONoyPbr4UUJXg==
-Date: Mon, 18 Aug 2025 08:30:06 -0700
+	b=cWgCzQZsehTYp3XVWorx3iO1H1nmaDZehzYmhM4gR3AjIIB56KjqUzAuaI6S659s/
+	 npO+ouOSCRDirrszGc04a0S3+TpO7DpgcPbBAe8rygdL0Fj2/RaDMeQ/vD0hSDU/DO
+	 sWTUS+/KVasnWpvR+tw2CbhSroVsjA/9NizNxiUG5o26Iz5LiEF5nA+2pJ56WRJtgs
+	 bvGBAP8s+lfySqLGdbvpDWhxDuFl0mak0jiodQK3kP5uNb2U1UdMkY1NvEJTTZo/Gv
+	 VPLWqngwfk+WHWTyW/9xGJKMajr1XZtOiEWIHOnnFbHYHwNC59+wD7OxcG5d6g+ZwV
+	 9ih0dp97HBl4A==
+Date: Mon, 18 Aug 2025 08:31:50 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Frank Wunderlich <linux@fw-web.de>
-Cc: patchwork-bot+netdevbpf@kernel.org, myungjoo.ham@samsung.com,
- kyungmin.park@samsung.com, cw00.choi@samsung.com, djakov@kernel.org,
- robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, andrew@lunn.ch,
- olteanv@gmail.com, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, matthias.bgg@gmail.com,
- angelogioacchino.delregno@collabora.com, johnson.wang@mediatek.com,
- arinc.unal@arinc9.com, Landen.Chao@mediatek.com, dqfext@gmail.com,
- sean.wang@mediatek.com, daniel@makrotopia.org, lorenzo@kernel.org,
- nbd@nbd.name, frank-w@public-files.de, linux-pm@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH v9 00/13] further mt7988 devicetree work
-Message-ID: <20250818083006.0f277b5b@kernel.org>
-In-Reply-To: <8A21C091-0C26-4E9F-9B9E-E28A01F71369@fw-web.de>
-References: <20250709111147.11843-1-linux@fw-web.de>
-	<175218542224.1682269.17523198222056896163.git-patchwork-notify@kernel.org>
-	<8A21C091-0C26-4E9F-9B9E-E28A01F71369@fw-web.de>
+To: Miaoqian Lin <linmq006@gmail.com>
+Cc: Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] eth: mlx4: Fix IS_ERR() vs NULL check bug in
+ mlx4_en_create_rx_ring
+Message-ID: <20250818083150.6a1c05f5@kernel.org>
+In-Reply-To: <20250817163830.10819-1-linmq006@gmail.com>
+References: <20250805025057.3659898-1-linmq006@gmail.com>
+	<20250817163830.10819-1-linmq006@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,9 +64,15 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sat, 16 Aug 2025 08:55:51 +0200 Frank Wunderlich wrote:
-> Any comments on the missing DTS parts or can they applied too?
+On Mon, 18 Aug 2025 00:38:30 +0800 Miaoqian Lin wrote:
+> Replace NULL check with IS_ERR() check after calling page_pool_create()
+> since this function returns error pointers (ERR_PTR).
+> Using NULL check could lead to invalid pointer dereference.
 
-You should probably put the maintainers you're addressing this question
-to in the To: header of the email.
+The v2 patch is white-space corrupted. The v1 was fine, so maybe try to
+send it the way you send the v1?
+Please do *not* try to send the new version of the patch in reply to
+the thread of v1. The link to v1 you put in the changelog is enough.
+-- 
+pw-bot: cr
 
