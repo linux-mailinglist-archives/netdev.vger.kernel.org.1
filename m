@@ -1,146 +1,123 @@
-Return-Path: <netdev+bounces-214729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214730-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E455BB2B171
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 21:20:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C2AAB2B18E
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 21:27:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3110218846C6
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 19:20:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 361A25E84A8
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 19:26:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D31B270553;
-	Mon, 18 Aug 2025 19:20:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07B8E25485F;
+	Mon, 18 Aug 2025 19:26:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="SDkGGXoh";
-	dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="vUO5nwf5"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="goN7U/QS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.uniroma2.it (smtp.uniroma2.it [160.80.4.42])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 738391DDA14;
-	Mon, 18 Aug 2025 19:20:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.80.4.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1135FE555;
+	Mon, 18 Aug 2025 19:26:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755544809; cv=none; b=MbA0UBXrDbVAoEasrO9UvCR9bIoYH7P6FQwr13L0Bb4ym/kxMOmKAElbO7n6axFYBcMNkAkI3mat2lsQnb135kRA4Trwt20GP8BzmmnHYTTaHIskN7m06zZy/6h8QzHG7JDdbX5RHnZy2kzPxS4bcmTpBpSHI3rfqKmXjsJ8qFA=
+	t=1755545178; cv=none; b=AGS37eX4DFP/nl4trb6z+ZqCT0jjXfBr5FKBFPdarKWJJcRZamsh+JEd/6FXLqw/GqEab07sH9sRZOVYyhVAsBtJwIBwQxDHao+DRF+hHRsB1KDDk40lPxTTV7HwcfJb81qZQzArc1wkOPrGvUIsnQd+VZ1dUJ3q1N/im5qepc8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755544809; c=relaxed/simple;
-	bh=Wza6qtvZhTFrsjhfzsFGqK4N3FfU9M1gdnS7kNEhwZI=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=u+YvgZNb+bg9fZTna76fyve2n/XmLDagqHATs8PvTsXbzSJkWGuAHONK4dv7t4MIFM+g8i0PcMXlbCJiu6dew4QIMUCGWw1ekxOhHK0X3veVqEeL3JHF7zfafhiqcr/OxhA8aCaHMWbQPDHYOtGHzyA92uZUqhS5fShIB+nxBz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it; spf=pass smtp.mailfrom=uniroma2.it; dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=SDkGGXoh; dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=vUO5nwf5; arc=none smtp.client-ip=160.80.4.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniroma2.it
-Received: from smtpauth-2019-1.uniroma2.it (smtpauth.uniroma2.it [160.80.5.46])
-	by smtp-2015.uniroma2.it (8.14.4/8.14.4/Debian-8) with ESMTP id 57IJGC2e003941;
-	Mon, 18 Aug 2025 21:16:17 +0200
-Received: from lubuntu-18.04 (unknown [160.80.103.126])
-	by smtpauth-2019-1.uniroma2.it (Postfix) with ESMTPSA id 800BF120537;
-	Mon, 18 Aug 2025 21:16:07 +0200 (CEST)
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=uniroma2.it;
-	s=ed201904; t=1755544567; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pdX4L3NmB2YU0Xr//TXuddy8lAr+NTspye2ibC+fj3o=;
-	b=SDkGGXoh28iXoHQ6mSz9HlZasWoXW8YZJMZieYprVE52A1fsb0jpX0658NbzUDnaN1L/Xb
-	/Dh4TFAPv7IiDyBA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniroma2.it; s=rsa201904;
-	t=1755544567; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pdX4L3NmB2YU0Xr//TXuddy8lAr+NTspye2ibC+fj3o=;
-	b=vUO5nwf5L5rmgxp/B2En7sHsGZTLV5/yiwSHCfVI1Hzgenz2puhEkvC0VEXA6sw1akBNHI
-	o8VuxnH8RHY3katDlVOs1kW4vE6H+Y7hP1huK0bE4RwMqfG8gdO6FRgM3AgcgRzss+BYHX
-	ewJTb5lP+LxyxlRm1/xqdSUlOLXvYOWVD3BR6L1loS2Wz/kNjlmuCsAYSWIxn/QHUwyb0Q
-	kR8ueb/5xCVRK+M3rP3mOn2VYFRfhpNs1+d+zHVtuDBhir/gB8Ukv8J8hxRoEFqJiR7mn0
-	JJSl2z3DWN8xgwNRHKtUgmifyvMVRlH5Sk+qGNOgpvIMkZTEjI5R/OcYbM9R+w==
-Date: Mon, 18 Aug 2025 21:16:07 +0200
-From: Andrea Mayer <andrea.mayer@uniroma2.it>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: netdev@vger.kernel.org, David Lebrun <dlebrun@google.com>,
-        stable@vger.kernel.org, stefano.salsano@uniroma2.it,
-        Paolo Lungaroni
- <paolo.lungaroni@uniroma2.it>,
-        Andrea Mayer <andrea.mayer@uniroma2.it>
-Subject: Re: [PATCH net-next 1/3] ipv6: sr: Fix MAC comparison to be
- constant-time
-Message-Id: <20250818211607.c8eb87fbac2f81774022b54b@uniroma2.it>
-In-Reply-To: <20250816031136.482400-2-ebiggers@kernel.org>
-References: <20250816031136.482400-1-ebiggers@kernel.org>
-	<20250816031136.482400-2-ebiggers@kernel.org>
-X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1755545178; c=relaxed/simple;
+	bh=69W23qFghf8b0DLplTxLuxTLlICbMFs0XcgmXglH2hc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N3pAkkLvum+SA7HoMZH2L92nyN8RU5xD5fbVAHUSZGM2DcHt0dHod3i2uMy43wz80HLxSQ3Orui4nVy2J91xZxxEYkryHVlT4llhL8JOTvPNDfT26bWCgIUdo8nnrlkU1WUWv5SXaXnbbhfTuxXQcHGMjkgZd0eCD7coxjUdUI0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=goN7U/QS; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Kd+IXbkrMS5qiS+Sd0sXzW37rFNI73FRN7pVjSKY668=; b=goN7U/QS6bPVXFS85mifHaha++
+	mt627KyDXT7bQ2rbldEKEwyKL+Ibd3XZWKVfwmUKRPWs3t+Vc1yCjqDWYl17Ix4BhYydjKdaEZURC
+	XHvfokBXFoV5bhY0UTdkJlpesXobGS0EwLeQ/oyzLRnnH7xpjYU/6iMO6iUKYenZO9bRO6C/IWgA1
+	XYISo4fsVze3vSN3CN5MvoopPNbxehtEildTjTg1dncrsgZTrIfNJI7qUfpN5o+MhsQCFJ0Ho0T9t
+	CzW+rD19rT5+KsztxLUvx/66g58mMe3/Q5KbH6nxNwBpzLPjihysdilfP3aOMmW+4kbsMhxj0YpYA
+	dY/3SAaA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38234)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uo5Uf-00028K-1Q;
+	Mon, 18 Aug 2025 20:26:10 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uo5Ub-0002hA-1M;
+	Mon, 18 Aug 2025 20:26:05 +0100
+Date: Mon, 18 Aug 2025 20:26:05 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: "Paul E. McKenney" <paulmck@kernel.org>
+Cc: linux-kernel@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH RFC] net: stmmac: Make DWMAC_ROCKCHIP and DWMAC_STM32
+ depend on PM_SLEEP
+Message-ID: <aKN-Tdfvc3_hD2p7@shell.armlinux.org.uk>
+References: <7ee6a142-1ed9-4874-83b7-128031e41874@paulmck-laptop>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: clamav-milter 0.100.0 at smtp-2015
-X-Virus-Status: Clean
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7ee6a142-1ed9-4874-83b7-128031e41874@paulmck-laptop>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Fri, 15 Aug 2025 20:11:34 -0700
-Eric Biggers <ebiggers@kernel.org> wrote:
-
-> To prevent timing attacks, MACs need to be compared in constant time.
-> Use the appropriate helper function for this.
+On Mon, Aug 18, 2025 at 12:11:09PM -0700, Paul E. McKenney wrote:
+> Hello!
 > 
-> Fixes: bf355b8d2c30 ("ipv6: sr: add core files for SR HMAC support")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> ---
->  net/ipv6/seg6_hmac.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+> This might be more of a bug report than a patch, but here goes...
 > 
-
-Hi Eric,
-
-Thanks for the fix!
-
-I believe it would be best to submit this fix separately from the current patch
-set. Since this addresses a bug rather than an enhancement or cleanup, sending
-it individually with the 'net' tag will help facilitate applying this patch to
-the net tree.
-
-Ciao,
-Andrea
-
-> diff --git a/net/ipv6/seg6_hmac.c b/net/ipv6/seg6_hmac.c
-> index f78ecb6ad8383..5dae892bbc73b 100644
-> --- a/net/ipv6/seg6_hmac.c
-> +++ b/net/ipv6/seg6_hmac.c
-> @@ -33,10 +33,11 @@
->  #include <net/ip6_route.h>
->  #include <net/addrconf.h>
->  #include <net/xfrm.h>
->  
->  #include <crypto/hash.h>
-> +#include <crypto/utils.h>
->  #include <net/seg6.h>
->  #include <net/genetlink.h>
->  #include <net/seg6_hmac.h>
->  #include <linux/random.h>
->  
-> @@ -278,11 +279,11 @@ bool seg6_hmac_validate_skb(struct sk_buff *skb)
->  		return false;
->  
->  	if (seg6_hmac_compute(hinfo, srh, &ipv6_hdr(skb)->saddr, hmac_output))
->  		return false;
->  
-> -	if (memcmp(hmac_output, tlv->hmac, SEG6_HMAC_FIELD_LEN) != 0)
-> +	if (crypto_memneq(hmac_output, tlv->hmac, SEG6_HMAC_FIELD_LEN))
->  		return false;
->  
->  	return true;
->  }
->  EXPORT_SYMBOL(seg6_hmac_validate_skb);
-> -- 
-> 2.50.1
+> Running rcuscale or refscale performance tests on datacenter ARM systems
+> gives the following build errors with CONFIG_HIBERNATION=n:
 > 
+> ERROR: modpost: "stmmac_simple_pm_ops" [drivers/net/ethernet/stmicro/stmmac/dwmac-rk.ko] undefined!
+> ERROR: modpost: "stmmac_simple_pm_ops" [drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.ko] undefined!
+
+The kernel build bot caught this, and I asked questions of Rafael last
+week and have been waiting for a response that still hasn't come.
+
+However, there was some discussion over the weekend (argh) on IRC from
+rdd and arnd, but I didn't have time over a weekend (shocking, I know,
+we're supposed to work 24x7 on the kernel, rather than preparing to
+travel to a different location for medical stuff) to really participate
+in that discussion.
+
+Nevertheless, I do have a patch with my preferred solution - but whether
+that solution is what other people prefer seems to be a subject of
+disagreement according to that which happened on IRC. This affects every
+driver that I converted to use stmmac_simple_pm_ops, which is more than
+you're patching.
+
+I've been missing around with medical stuff today, which means I also
+haven't had time today to do anything further.
+
+It's a known problem, but (1) there's been no participation from the
+kernel community to help address it and (2) over the last few days I've
+been busy myself doing stuff related to medical stuff.
+
+Yea, it's shocking, but it's also real life outside of the realms of
+kernel hacking.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
