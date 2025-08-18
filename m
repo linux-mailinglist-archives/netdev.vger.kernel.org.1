@@ -1,197 +1,112 @@
-Return-Path: <netdev+bounces-214496-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214505-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0923B29E58
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 11:49:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8379B29EEB
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 12:19:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83C684E58F8
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 09:48:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C5B9D207D24
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 10:19:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55D2E286897;
-	Mon, 18 Aug 2025 09:48:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F03172701C3;
+	Mon, 18 Aug 2025 10:19:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=toke.dk header.i=@toke.dk header.b="oHmj8Jkx"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+Received: from mail.toke.dk (mail.toke.dk [45.145.95.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21FD819D08F;
-	Mon, 18 Aug 2025 09:48:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF7442236F2
+	for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 10:19:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.145.95.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755510515; cv=none; b=Vh4kzzxZnxCu5MEaczpqr9PEMr6OrFbr+s6clIgkdC6mltC/VChLErA0wpHeRQnl2uCOUSJlQOWwQSskX0M6xQgDoi84cVPGU6Q2RLhmopWV25GD8D+PPg4ViVT1WwxdvyUAiRDGFQkk55GtQLOub7SXQc6COiBdMCuU7kNrdsg=
+	t=1755512372; cv=none; b=tUStPStSGqmlGIGeoqVBdIzViyZRMA2byD0AbtMmbdZ8gfsTCqhnluXrYvOQIUfzIQjiBG1yn0LcgDO63lop8rHriVHOxZTyY3WmequvUzvuM1OcxJemu8GCmFM0nwp7Pk9AP01PudOKkIO/XBK+KGSh2LyL+rrA3VMajljFuf0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755510515; c=relaxed/simple;
-	bh=2cebde2kfuXyzBvXebgHT65nyp1L5Usz3QUTVaXigEg=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=qRtUoAmKMMOY9QDRjoqBeNsB0B9fbEYr9rwl1Ecz1mAt/OwZd663hukfR1mIikuD3jJBBPr515gHOOkq3MA4TMDxeutSn+2lSKgxTibF3/pqCVM3zB+a1RkeylKGB1F9tMTk9gusqw4+L+vDOXNKhc7/4lY120PgOzzH0UmMO90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.163])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4c57Gh3LqYz3TqZL;
-	Mon, 18 Aug 2025 17:49:32 +0800 (CST)
-Received: from dggpemf500002.china.huawei.com (unknown [7.185.36.57])
-	by mail.maildlp.com (Postfix) with ESMTPS id 80585180042;
-	Mon, 18 Aug 2025 17:48:27 +0800 (CST)
-Received: from huawei.com (10.50.159.234) by dggpemf500002.china.huawei.com
- (7.185.36.57) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Mon, 18 Aug
- 2025 17:48:26 +0800
-From: Yue Haibing <yuehaibing@huawei.com>
-To: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<yuehaibing@huawei.com>
-Subject: [PATCH RESEND net-next] ipv6: mcast: Add ip6_mc_find_idev() helper
-Date: Mon, 18 Aug 2025 18:10:51 +0800
-Message-ID: <20250818101051.892443-1-yuehaibing@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1755512372; c=relaxed/simple;
+	bh=f30jZL5cYWfUn1vWNWyTFBHLrGVCX1FnWqrPVRvaIe8=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=RHnhZwHrrB77dryevouNFm1HEzgDhR1T5/lsYd9kxpYCmWLQAIANxR7XLjukG2eg+IZLekVG8kZbNfQ+awfVt22Zwd26wxOaL/zBzQAnIOrFn8tH6K7w3xPcQDiAbn47OTkQKWJiVpYUXjhsShoesrotJ74ukqpUMfwlFN0xt8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=toke.dk; spf=pass smtp.mailfrom=toke.dk; dkim=pass (2048-bit key) header.d=toke.dk header.i=@toke.dk header.b=oHmj8Jkx; arc=none smtp.client-ip=45.145.95.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=toke.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=toke.dk
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=toke.dk; s=20161023;
+	t=1755512356; bh=f30jZL5cYWfUn1vWNWyTFBHLrGVCX1FnWqrPVRvaIe8=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=oHmj8Jkx7+QX4TFX9u+mNGH9lll/6ZJxEolXYC/ijdyXwxR2C+5597fmAdVFwYCOr
+	 ZfA26R7i466ABzXTkI3LTnGLsXgC8alK9BqPbZFRabZgbNT+mKOerox65QxXMvhLl6
+	 /918zRCr9t734sZaaOjGSMl8CNum1iAwoNAVmesHtQ11E8l6OgPKV/zKdAXh5Oy+f9
+	 JX3t/4YLPo8rwNl6JDiXuSctqZG0/DhdqntT5As4Wylw37nNOY9MbL3z8g01IQ9VeF
+	 UzEmZhCPJXXFGbbmeVga7OphjBIKJ+/CgBmTBXgZcxaK1ror7Y6QcMtY7Q0Vp+2fY/
+	 DIDodlQTvZMtQ==
+To: William Liu <will@willsroot.io>, netdev@vger.kernel.org
+Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, pabeni@redhat.com,
+ kuba@kernel.org, savy@syst3mfailure.io, jiri@resnulli.us,
+ davem@davemloft.net, edumazet@google.com, horms@kernel.org,
+ cake@lists.bufferbloat.net, William Liu <will@willsroot.io>
+Subject: Re: [PATCH net 1/2] net/sched: Make cake_enqueue return NET_XMIT_CN
+ when past buffer_limit
+In-Reply-To: <20250817172344.449992-1-will@willsroot.io>
+References: <20250817172344.449992-1-will@willsroot.io>
+Date: Mon, 18 Aug 2025 12:19:16 +0200
+X-Clacks-Overhead: GNU Terry Pratchett
+Message-ID: <87a53xj5jv.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
- dggpemf500002.china.huawei.com (7.185.36.57)
 
-__ipv6_sock_mc_join() has the same code as ip6_mc_find_dev() to find dev,
-extract this into ip6_mc_find_dev() and add ip6_mc_find_idev() to reduce
-code duplication and improve readability.
+William Liu <will@willsroot.io> writes:
 
-Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
----
- net/ipv6/mcast.c | 76 ++++++++++++++++++++++--------------------------
- 1 file changed, 35 insertions(+), 41 deletions(-)
+> The following setup can trigger a WARNING in htb_activate due to
+> the condition: !cl->leaf.q->q.qlen
+>
+> tc qdisc del dev lo root
+> tc qdisc add dev lo root handle 1: htb default 1
+> tc class add dev lo parent 1: classid 1:1 \
+>        htb rate 64bit
+> tc qdisc add dev lo parent 1:1 handle f: \
+>        cake memlimit 1b
+> ping -I lo -f -c1 -s64 -W0.001 127.0.0.1
+>
+> This is because the low memlimit leads to a low buffer_limit, which
+> causes packet dropping. However, cake_enqueue still returns
+> NET_XMIT_SUCCESS, causing htb_enqueue to call htb_activate with an
+> empty child qdisc.
+>
+> I do not believe return value of NET_XMIT_CN is necessary for packet
+> drops in the case of ack filtering, as that is meant to optimize
+> performance, not to signal congestion.
+>
+> Fixes: 046f6fd5daef ("sched: Add Common Applications Kept Enhanced (cake) qdisc")
+> Signed-off-by: William Liu <will@willsroot.io>
+> Reviewed-by: Savino Dicanosa <savy@syst3mfailure.io>
+> ---
+>  net/sched/sch_cake.c | 3 +++
+>  1 file changed, 3 i
+> nsertions(+)
+>
+> diff --git a/net/sched/sch_cake.c b/net/sched/sch_cake.c
+> index dbcfb948c867..40814449f17a 100644
+> --- a/net/sched/sch_cake.c
+> +++ b/net/sched/sch_cake.c
+> @@ -1934,6 +1934,9 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+>  			cake_drop(sch, to_free);
+>  		}
+>  		b->drop_overlimit += dropped;
+> +
+> +		if (dropped)
+> +			return NET_XMIT_CN;
 
-diff --git a/net/ipv6/mcast.c b/net/ipv6/mcast.c
-index 36ca27496b3c..75430ad55c3d 100644
---- a/net/ipv6/mcast.c
-+++ b/net/ipv6/mcast.c
-@@ -169,6 +169,29 @@ static int unsolicited_report_interval(struct inet6_dev *idev)
- 	return iv > 0 ? iv : 1;
- }
- 
-+static struct net_device *ip6_mc_find_dev(struct net *net,
-+					  const struct in6_addr *group,
-+					  int ifindex)
-+{
-+	struct net_device *dev = NULL;
-+	struct rt6_info *rt;
-+
-+	if (ifindex == 0) {
-+		rcu_read_lock();
-+		rt = rt6_lookup(net, group, NULL, 0, NULL, 0);
-+		if (rt) {
-+			dev = dst_dev(&rt->dst);
-+			dev_hold(dev);
-+			ip6_rt_put(rt);
-+		}
-+		rcu_read_unlock();
-+	} else {
-+		dev = dev_get_by_index(net, ifindex);
-+	}
-+
-+	return dev;
-+}
-+
- /*
-  *	socket join on multicast group
-  */
-@@ -191,28 +214,13 @@ static int __ipv6_sock_mc_join(struct sock *sk, int ifindex,
- 	}
- 
- 	mc_lst = sock_kmalloc(sk, sizeof(struct ipv6_mc_socklist), GFP_KERNEL);
--
- 	if (!mc_lst)
- 		return -ENOMEM;
- 
- 	mc_lst->next = NULL;
- 	mc_lst->addr = *addr;
- 
--	if (ifindex == 0) {
--		struct rt6_info *rt;
--
--		rcu_read_lock();
--		rt = rt6_lookup(net, addr, NULL, 0, NULL, 0);
--		if (rt) {
--			dev = dst_dev(&rt->dst);
--			dev_hold(dev);
--			ip6_rt_put(rt);
--		}
--		rcu_read_unlock();
--	} else {
--		dev = dev_get_by_index(net, ifindex);
--	}
--
-+	dev = ip6_mc_find_dev(net, addr, ifindex);
- 	if (!dev) {
- 		sock_kfree_s(sk, mc_lst, sizeof(*mc_lst));
- 		return -ENODEV;
-@@ -302,32 +310,18 @@ int ipv6_sock_mc_drop(struct sock *sk, int ifindex, const struct in6_addr *addr)
- }
- EXPORT_SYMBOL(ipv6_sock_mc_drop);
- 
--static struct inet6_dev *ip6_mc_find_dev(struct net *net,
--					 const struct in6_addr *group,
--					 int ifindex)
-+static struct inet6_dev *ip6_mc_find_idev(struct net *net,
-+					  const struct in6_addr *group,
-+					  int ifindex)
- {
--	struct net_device *dev = NULL;
--	struct inet6_dev *idev;
--
--	if (ifindex == 0) {
--		struct rt6_info *rt;
-+	struct inet6_dev *idev = NULL;
-+	struct net_device *dev;
- 
--		rcu_read_lock();
--		rt = rt6_lookup(net, group, NULL, 0, NULL, 0);
--		if (rt) {
--			dev = dst_dev(&rt->dst);
--			dev_hold(dev);
--			ip6_rt_put(rt);
--		}
--		rcu_read_unlock();
--	} else {
--		dev = dev_get_by_index(net, ifindex);
-+	dev = ip6_mc_find_dev(net, group, ifindex);
-+	if (dev) {
-+		idev = in6_dev_get(dev);
-+		dev_put(dev);
- 	}
--	if (!dev)
--		return NULL;
--
--	idev = in6_dev_get(dev);
--	dev_put(dev);
- 
- 	return idev;
- }
-@@ -374,7 +368,7 @@ int ip6_mc_source(int add, int omode, struct sock *sk,
- 	if (!ipv6_addr_is_multicast(group))
- 		return -EINVAL;
- 
--	idev = ip6_mc_find_dev(net, group, pgsr->gsr_interface);
-+	idev = ip6_mc_find_idev(net, group, pgsr->gsr_interface);
- 	if (!idev)
- 		return -ENODEV;
- 
-@@ -509,7 +503,7 @@ int ip6_mc_msfilter(struct sock *sk, struct group_filter *gsf,
- 	    gsf->gf_fmode != MCAST_EXCLUDE)
- 		return -EINVAL;
- 
--	idev = ip6_mc_find_dev(net, group, gsf->gf_interface);
-+	idev = ip6_mc_find_idev(net, group, gsf->gf_interface);
- 	if (!idev)
- 		return -ENODEV;
- 
--- 
-2.34.1
+cake_drop() may drop from a different flow, so we can't unconditionally
+return NET_XMIT_CN. We'll have to check the return code of cake_drop()
+and only return NET_XMIT_CN if it's the same flow we just enqueued a
+packet to (which is also what fq_codel does, BTW).
 
+-Toke
 
