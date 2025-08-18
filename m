@@ -1,149 +1,166 @@
-Return-Path: <netdev+bounces-214510-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214511-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B57FFB29F6E
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 12:47:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BEA5B29FAD
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 12:54:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 50E221960549
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 10:47:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AECCB18A7D02
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 10:54:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61A7A29B205;
-	Mon, 18 Aug 2025 10:46:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1D5530FF1C;
+	Mon, 18 Aug 2025 10:53:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="bCoaOhbQ"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Tj/Bm0j2"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46E2B258EE7
-	for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 10:46:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6FE430100E;
+	Mon, 18 Aug 2025 10:53:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755514010; cv=none; b=V/mejWOxwgwmNKkK547Asg0OVvKgqfu+qGUeBdwSP2mCHC/DInjbJ85MkIPdaoYiOaro4+IinwwRIOJTRAqawHUH9t6I55eKOQ0Lo4wyfbQPb0x7af+rD0XAtM365n8ttk2ptCPa52c6eDbe6o7nARqqRpvt9rmTT13X25gQzd8=
+	t=1755514436; cv=none; b=u0Ag04Zl8H+WGqN1EznOb1/YZFtf3Q7i17cbeswqwMbOQI1DfsEqDTd7OYHFBSGkS/aTASSIk3ICzQDrydRF7b7nR+vsH+mOwWwBf8bU5xs0CwPMzxuLqlzubraDgFwF830gplFAIUuAj/+pjC66kOIYLJ97bYBnC1Oo3M2hcNM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755514010; c=relaxed/simple;
-	bh=3BxcpB0fi1YyTJ0Sn+csxHq2U6qGPZ8M/XQnMsJOnG8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Uc8YjSVeuQUHNyb4GvahjYSbcaro2uUNwKQ79lN+Vi1QyPIM4pSYzRoeiUe01LbHm9+oqKQZR93tOMsq+o1AYRHw0ZDjXqaFqbMygLKMtOMi7nHx21LwQhqfqDlm78xAl/B7cHJ3bepHyZimhTUro9is5K7feC2eSnfXS4g1sWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=bCoaOhbQ; arc=none smtp.client-ip=91.218.175.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <aab9c257-fe34-46ac-b8b6-ffce99344491@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1755514004;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lRWSb7LVYHNyrrMMHfGdXwwpX38Oa6kjy03ZEqG9OvA=;
-	b=bCoaOhbQS3fwYIiNtrVwtORpLlvRaiwTPYaLQjwN/O9ySIYIiwsIc0C5m/nOxjN6Y97o1M
-	U5tGKFWXhoO4XwDd9B1QytteVbkMtQpCb0j6sYsNNo6Rz+soxvSg95tr8L+hKwLnx/zKOd
-	w8LjKgm17VE68GpvUm1rHGAYJvqCeU4=
-Date: Mon, 18 Aug 2025 11:46:39 +0100
+	s=arc-20240116; t=1755514436; c=relaxed/simple;
+	bh=bdkGFGntJn6b9/DexCBKcDKT9nz79mQibMj1XFOZbAI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VGnSIcWusYB7agiqeRG1GmcUeE3GYtv7Cg4IlQ923yP28LTwvEij7+XvLCykNs+6OV4nrt346b7V9JGZ2vtY70QNWEXtye5npxbbg+WMTRBVUmcezqFyaSE8rCnfnNnffCKSzRw2RY6mnD+ZaoTPXhLw1jCCJfxJzhw5DOlB00g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Tj/Bm0j2; arc=none smtp.client-ip=115.124.30.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1755514424; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=UC+BNZzpQ+2R/7vUVL670jKwVT1hX1AhqBX1uis4yPM=;
+	b=Tj/Bm0j27okO4rsi+mbgGvlrgwicdRTNTF/uIGXmKv0ArGiJOkb0XWoGVxfywZrPPtZlac6pQHsC6h8FwElRGkkBtVU39vhQTSwlZGF7o42CEFjVgT+jm9wGkMgZNChGARmk8uwCKrbLnCLPnV7q4PtAGeszYVNY/eQrY57BIkc=
+Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0Wm-j9fQ_1755514423 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Mon, 18 Aug 2025 18:53:43 +0800
+Date: Mon, 18 Aug 2025 18:53:43 +0800
+From: Dust Li <dust.li@linux.alibaba.com>
+To: "D. Wythe" <alibuda@linux.alibaba.com>, Mahanta.Jambigi@ibm.com,
+	Sidraya.Jayagond@ibm.com, wenjia@linux.ibm.com,
+	wintera@linux.ibm.com, tonylu@linux.alibaba.com,
+	guwen@linux.alibaba.com
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+	linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
+	pabeni@redhat.com, edumazet@google.com, jaka@linux.ibm.com
+Subject: Re: [PATCH net] net/smc: fix UAF on smcsk after smc_listen_out()
+Message-ID: <aKMGNyMUUwq7ufT7@linux.alibaba.com>
+Reply-To: dust.li@linux.alibaba.com
+References: <20250818054618.41615-1-alibuda@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] ptp: ocp: Fix PCI delay estimation
-To: Antoine Gagniere <antoine@gagniere.dev>, jonathan.lemon@gmail.com
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>
-References: <20250817222933.21102-1-antoine.ref@gagniere.dev>
- <20250817222933.21102-1-antoine@gagniere.dev>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20250817222933.21102-1-antoine@gagniere.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250818054618.41615-1-alibuda@linux.alibaba.com>
 
-On 17/08/2025 23:29, Antoine Gagniere wrote:
-> Since linux 6.12, a sign error causes the initial value of ts_window_adjust, (used in gettimex64) to be impossibly high, causing consumers like chrony to reject readings from PTP_SYS_OFFSET_EXTENDED.
-> 
-> This patch fixes ts_window_adjust's inital value and the sign-ness of various format flags
-> 
-> Context
-> -------
-> 
-> The value stored in the read-write attribute ts_window_adjust is a number of nanoseconds subtracted to the post_ts timestamp of the reading in gettimex64, used notably in the ioctl PTP_SYS_OFFSET_EXTENDED, to compensate for PCI delay.
-> Its initial value is set by estimating PCI delay.
-> 
-> Bug
-> ---
-> 
-> The PCI delay estimation starts with the value U64_MAX and makes 3 measurements, taking the minimum value.
-> However because the delay was stored in a s64, U64_MAX was interpreted as -1, which compared as smaller than any positive values measured.
-> Then, that delay is divided by ~10 and placed in ts_window_adjust, which is a u32.
-> So ts_window_adjust ends up with (u32)(((s64)U64_MAX >> 5) * 3) inside, which is 4294967293
-> 
-> Symptom
-> -------
-> 
-> The consequence was that the post_ts of gettimex64, returned by PTP_SYS_OFFSET_EXTENDED, was substracted 4.29 seconds.
-> As a consequence chrony rejected all readings from the PHC
-> 
-> Difficulty to diagnose
-> ----------------------
-> 
-> Using cat to read the attribute value showed -3 because the format flags %d was used instead of %u, resulting in a re-interpret cast.
-> 
-> Fixes
-> -----
-> 
-> 1. Using U32_MAX as initial value for PCI delays: no one is expecting an ioread to take more than 4 s
->     This will correctly compare as bigger that actual PCI delay measurements.
-> 2. Fixing the sign of various format flags
-> 
-> Signed-off-by: Antoine Gagniere <antoine@gagniere.dev>
-> ---
->   drivers/ptp/ptp_ocp.c | 32 +++++++++++++++++---------------
->   1 file changed, 17 insertions(+), 15 deletions(-)
-> 
-> diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
-> index b651087f426f..153827722a63 100644
-> --- a/drivers/ptp/ptp_ocp.c
-> +++ b/drivers/ptp/ptp_ocp.c
-> @@ -1558,7 +1558,8 @@ ptp_ocp_watchdog(struct timer_list *t)
->   static void
->   ptp_ocp_estimate_pci_timing(struct ptp_ocp *bp)
->   {
-> -	ktime_t start, end, delay = U64_MAX;
-> +	ktime_t start, end;
-> +	s64 delay_ns = U32_MAX; /* 4.29 seconds is high enough */
->   	u32 ctrl;
->   	int i;
->   
-> @@ -1568,15 +1569,16 @@ ptp_ocp_estimate_pci_timing(struct ptp_ocp *bp)
->   
->   		iowrite32(ctrl, &bp->reg->ctrl);
->   
-> -		start = ktime_get_raw_ns();
-> +		start = ktime_get_raw();
->   
->   		ctrl = ioread32(&bp->reg->ctrl);
->   
-> -		end = ktime_get_raw_ns();
-> +		end = ktime_get_raw();
->   
-> -		delay = min(delay, end - start);
-> +		delay_ns = min(delay_ns, ktime_to_ns(end - start));
->   	}
-> -	bp->ts_window_adjust = (delay >> 5) * 3;
-> +	delay_ns = max(0, delay_ns);
+On 2025-08-18 13:46:18, D. Wythe wrote:
+>BPF CI testing report a UAF issue:
+>
+>  [   16.446633] BUG: kernel NULL pointer dereference, address: 000000000000003  0
+>  [   16.447134] #PF: supervisor read access in kernel mod  e
+>  [   16.447516] #PF: error_code(0x0000) - not-present pag  e
+>  [   16.447878] PGD 0 P4D   0
+>  [   16.448063] Oops: Oops: 0000 [#1] PREEMPT SMP NOPT  I
+>  [   16.448409] CPU: 0 UID: 0 PID: 9 Comm: kworker/0:1 Tainted: G           OE      6.13.0-rc3-g89e8a75fda73-dirty #4  2
+>  [   16.449124] Tainted: [O]=OOT_MODULE, [E]=UNSIGNED_MODUL  E
+>  [   16.449502] Hardware name: QEMU Ubuntu 24.04 PC (i440FX + PIIX, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/201  4
+>  [   16.450201] Workqueue: smc_hs_wq smc_listen_wor  k
+>  [   16.450531] RIP: 0010:smc_listen_work+0xc02/0x159  0
+>  [   16.452158] RSP: 0018:ffffb5ab40053d98 EFLAGS: 0001024  6
+>  [   16.452526] RAX: 0000000000000001 RBX: 0000000000000002 RCX: 000000000000030  0
+>  [   16.452994] RDX: 0000000000000280 RSI: 00003513840053f0 RDI: 000000000000000  0
+>  [   16.453492] RBP: ffffa097808e3800 R08: ffffa09782dba1e0 R09: 000000000000000  5
+>  [   16.453987] R10: 0000000000000000 R11: 0000000000000000 R12: ffffa0978274640  0
+>  [   16.454497] R13: 0000000000000000 R14: 0000000000000000 R15: ffffa09782d4092  0
+>  [   16.454996] FS:  0000000000000000(0000) GS:ffffa097bbc00000(0000) knlGS:000000000000000  0
+>  [   16.455557] CS:  0010 DS: 0000 ES: 0000 CR0: 000000008005003  3
+>  [   16.455961] CR2: 0000000000000030 CR3: 0000000102788004 CR4: 0000000000770ef  0
+>  [   16.456459] PKRU: 5555555  4
+>  [   16.456654] Call Trace  :
+>  [   16.456832]  <TASK  >
+>  [   16.456989]  ? __die+0x23/0x7  0
+>  [   16.457215]  ? page_fault_oops+0x180/0x4c  0
+>  [   16.457508]  ? __lock_acquire+0x3e6/0x249  0
+>  [   16.457801]  ? exc_page_fault+0x68/0x20  0
+>  [   16.458080]  ? asm_exc_page_fault+0x26/0x3  0
+>  [   16.458389]  ? smc_listen_work+0xc02/0x159  0
+>  [   16.458689]  ? smc_listen_work+0xc02/0x159  0
+>  [   16.458987]  ? lock_is_held_type+0x8f/0x10  0
+>  [   16.459284]  process_one_work+0x1ea/0x6d  0
+>  [   16.459570]  worker_thread+0x1c3/0x38  0
+>  [   16.459839]  ? __pfx_worker_thread+0x10/0x1  0
+>  [   16.460144]  kthread+0xe0/0x11  0
+>  [   16.460372]  ? __pfx_kthread+0x10/0x1  0
+>  [   16.460640]  ret_from_fork+0x31/0x5  0
+>  [   16.460896]  ? __pfx_kthread+0x10/0x1  0
+>  [   16.461166]  ret_from_fork_asm+0x1a/0x3  0
+>  [   16.461453]  </TASK  >
+>  [   16.461616] Modules linked in: bpf_testmod(OE) [last unloaded: bpf_testmod(OE)  ]
+>  [   16.462134] CR2: 000000000000003  0
+>  [   16.462380] ---[ end trace 0000000000000000 ]---
+>  [   16.462710] RIP: 0010:smc_listen_work+0xc02/0x1590
+>
+>The direct cause of this issue is that after smc_listen_out_connected(),
+>newclcsock->sk may be NULL since it will releases the smcsk. Therefore,
+>if the application closes the socket immediately after accept,
+>newclcsock->sk can be NULL. A possible execution order could be as
+>follows:
+>
+>smc_listen_work                                 | userspace
+>-----------------------------------------------------------------
+>lock_sock(sk)                                   |
+>smc_listen_out_connected()                      |
+>| \- smc_listen_out                             |
+>|    | \- release_sock                          |
+>     | |- sk->sk_data_ready()                   |
+>                                                | fd = accept();
+>                                                | close(fd);
+>                                                |  \- socket->sk = NULL;
+>/* newclcsock->sk is NULL now */
+>SMC_STAT_SERV_SUCC_INC(sock_net(newclcsock->sk))
+>
+>Since smc_listen_out_connected() will not fail, simply swapping the order
+>of the code can easily fix this issue.
+>
+>Fixes: 3b2dec2603d5 ("net/smc: restructure client and server code in af_smc")
+>Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+>Reviewed-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
+>Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
 
-I don't believe we can get a negative value from
-ktime_to_ns(end - start), and that means that delay_ns will always be
-positive and there is no need for the last max().
+Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
 
-Apart from that the patch LGTM,
-Thanks
+Best regards,
+Dust
 
-> +	bp->ts_window_adjust = (delay_ns >> 5) * 3;
->   }
->   
+>---
+> net/smc/af_smc.c | 3 ++-
+> 1 file changed, 2 insertions(+), 1 deletion(-)
+>
+>diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+>index 9311c38f7abe..e0e48f24cd61 100644
+>--- a/net/smc/af_smc.c
+>+++ b/net/smc/af_smc.c
+>@@ -2568,8 +2568,9 @@ static void smc_listen_work(struct work_struct *work)
+> 			goto out_decl;
+> 	}
+> 
+>-	smc_listen_out_connected(new_smc);
+> 	SMC_STAT_SERV_SUCC_INC(sock_net(newclcsock->sk), ini);
+>+	/* smc_listen_out() will release smcsk */
+>+	smc_listen_out_connected(new_smc);
+> 	goto out_free;
+> 
+> out_unlock:
+>-- 
+>2.45.0
+>
 
