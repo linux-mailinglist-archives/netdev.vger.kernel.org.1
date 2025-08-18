@@ -1,495 +1,121 @@
-Return-Path: <netdev+bounces-214790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214791-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF2E7B2B425
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 00:38:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79AD7B2B4C4
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 01:28:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 36FFA189AA13
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 22:38:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5366F16E8C2
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 23:28:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55C5D25CC70;
-	Mon, 18 Aug 2025 22:38:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF0752264B0;
+	Mon, 18 Aug 2025 23:28:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MD/Fr8y5"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="A9EOX86d"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 236CF1D514E
-	for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 22:38:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.19
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755556693; cv=fail; b=OpA3Rf0DGMgODu4+2E50WzWbTfihruVZBKVX6D/crPKo/o2nWwhIKg44aCVmvOIc/FC5vzpQ4aoQhm/ds2OGC0loFrZMmhIaaknouB+Qlm2ojO2ANrzdNctZFSqk/IAgLIZh2NldQNTU6LzWqMgxTOVxWLjW6OXg0Xno2G7Wco8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755556693; c=relaxed/simple;
-	bh=7nebk25gs7Tfd0WkOQqYC8CkFOuEhzFGp56TlScMpL0=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Gvgkjg9T3A3MoGYmuZqyJqHM4TFOi6OrJdRFCvUyLQxvhniBGmr8K5Wqjuq27wNC5MsYvtvfRTQkY4h3E08rffjWASYtz0J45EXNMug0VllHJIx+bzm1feWmxQTKpL956wIAgmEz1J9CtLGCpssgloifK7uG6joCBOJzS4J0YiM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MD/Fr8y5; arc=fail smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1755556691; x=1787092691;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:mime-version;
-  bh=7nebk25gs7Tfd0WkOQqYC8CkFOuEhzFGp56TlScMpL0=;
-  b=MD/Fr8y56BCY9g429VNAqG103vKCXypvvf100PpaSOAc/w9jWYddlcpH
-   +3qqrFf0Xtto6dbzQm6P8zvrAvuJwuVNwuRYf24DsQM9dj/pavJNR3CYp
-   9XCR0a4RNmwuf+LX2l4RGZaMoYNVNiysNqDfFjMyEJXAu9wp76Rq+hs4Q
-   Agw9Worgm74DoNjCNqBX2+1Xnb+SqLzaWqCpvvRX77h93uNU4p7mQ7N2V
-   F+kwcFXEhFFAuQDL01o2Vgc0wNYi15eO9xQERPWbBWcVcbdm+iOrpK7Sc
-   MCPthBv0nLSsmhnfECCVMawPochwKnD/lSHdkPt/C1YsdKPA5DoIcccQS
-   Q==;
-X-CSE-ConnectionGUID: s7P3qgfwSeK5QHV77BDVfA==
-X-CSE-MsgGUID: L2mb0cyXTbe5aio0D+hDNg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11526"; a="56818881"
-X-IronPort-AV: E=Sophos;i="6.17,300,1747724400"; 
-   d="asc'?scan'208";a="56818881"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2025 15:38:10 -0700
-X-CSE-ConnectionGUID: Ro6IbzCAQwWjOsLx3YRPgw==
-X-CSE-MsgGUID: xVYaY96gQ4628r2jyvApUQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.17,300,1747724400"; 
-   d="asc'?scan'208";a="168052194"
-Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
-  by fmviesa008.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2025 15:38:09 -0700
-Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
- fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Mon, 18 Aug 2025 15:38:09 -0700
-Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
- FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17 via Frontend Transport; Mon, 18 Aug 2025 15:38:09 -0700
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (40.107.100.46)
- by edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17; Mon, 18 Aug 2025 15:38:08 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=LiuiO+L6Uql+Qw65XgwAW/xaaa/KWg/7POyIaygJKGKAIYFCrqE/dZ7DZPgi67LgIrTYH+4Hvj5kjolWgfmWtTsx9pBLW+jmaZ0tFF5QnKhhv7pa8UV9QBufHCzrcT1zZX51/hceI8bUNZj39HMbQGdHdrgb4Ap42EgMVtaOpkNFKWjLIbqjh8TL/jQyQov1qJxBSl2MIJ6rbLBCznpjlBd/LsNBKhiEc/9thh9DTsrWnUoYFYT8KlX6SJsyOEmHhqzQLu+DhT/cbbPTj6fcxmp/ul+9nGYP0DDTVZc7dJhFhUd62kHFtJjej3p+HBFEeX+KpL1uoJE4KcdrdjDugg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=U4gzGIjOjy0JLS0O6mtG7vzVGFVsZgLSsueoXHwlej0=;
- b=EWaR6JpKNdv+jWVSFyHRAgSRLQKylGEPgqS0j4PI74jDwzDOoqIcdfr4ttLaRG3NMZ2wMLgek/r42RNhuLN0id7TqnCmnj9zqVcXdVG01P2iEjhT3V+Te00jCwVkMrjLSUGcCYfHKXZ64BOAA5Jm9cSCMAyMKzSivk4qukYgVZzOhmcJ8kicz3gebO8CdUa2KF6QSC0UYLT4I/QAqrRM8K7OpKK0wuc2rtnpjEVmMl5srmg3dqK2MmcqaBW0pbHTjKAIjzbyms0KJz43Cd2qTkppNtZqCyhx1xnGdBWDsQzZ6Ew17cSqgJ/UiUinc1YjqqdCPI+u4u2gr/2yqdm5+w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by PH7PR11MB8503.namprd11.prod.outlook.com (2603:10b6:510:30d::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9031.24; Mon, 18 Aug
- 2025 22:38:06 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::81f7:c6c0:ca43:11c3]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::81f7:c6c0:ca43:11c3%5]) with mapi id 15.20.9031.023; Mon, 18 Aug 2025
- 22:38:06 +0000
-Message-ID: <474498f1-5ad3-41ef-aca4-16830ad208ac@intel.com>
-Date: Mon, 18 Aug 2025 15:38:04 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-net 1/2] ice: fix double-call to ice_deinit_hw()
- during probe failure
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>, Anthony Nguyen
-	<anthony.l.nguyen@intel.com>
-CC: <vgrinber@redhat.com>, <netdev@vger.kernel.org>, Aleksandr Loktionov
-	<aleksandr.loktionov@intel.com>, Intel Wired LAN
-	<intel-wired-lan@lists.osuosl.org>, Simon Horman <horms@kernel.org>, "Marcin
- Szycik" <marcin.szycik@linux.intel.com>
-References: <20250717-jk-ddp-safe-mode-issue-v1-0-e113b2baed79@intel.com>
- <20250717-jk-ddp-safe-mode-issue-v1-1-e113b2baed79@intel.com>
- <7f767a82-b70e-4520-a9cd-360949961373@intel.com>
-Content-Language: en-US
-From: Jacob Keller <jacob.e.keller@intel.com>
-Autocrypt: addr=jacob.e.keller@intel.com; keydata=
- xjMEaFx9ShYJKwYBBAHaRw8BAQdAE+TQsi9s60VNWijGeBIKU6hsXLwMt/JY9ni1wnsVd7nN
- J0phY29iIEtlbGxlciA8amFjb2IuZS5rZWxsZXJAaW50ZWwuY29tPsKTBBMWCgA7FiEEIEBU
- qdczkFYq7EMeapZdPm8PKOgFAmhcfUoCGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AA
- CgkQapZdPm8PKOiZAAEA4UV0uM2PhFAw+tlK81gP+fgRqBVYlhmMyroXadv0lH4BAIf4jLxI
- UPEL4+zzp4ekaw8IyFz+mRMUBaS2l+cpoBUBzjgEaFx9ShIKKwYBBAGXVQEFAQEHQF386lYe
- MPZBiQHGXwjbBWS5OMBems5rgajcBMKc4W4aAwEIB8J4BBgWCgAgFiEEIEBUqdczkFYq7EMe
- apZdPm8PKOgFAmhcfUoCGwwACgkQapZdPm8PKOjbUQD+MsPBANqBUiNt+7w0dC73R6UcQzbg
- cFx4Yvms6cJjeD4BAKf193xbq7W3T7r9BdfTw6HRFYDiHXgkyoc/2Q4/T+8H
-In-Reply-To: <7f767a82-b70e-4520-a9cd-360949961373@intel.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="------------LUTRftresaCpLYo0yKkSRKvk"
-X-ClientProxiedBy: MW4P222CA0013.NAMP222.PROD.OUTLOOK.COM
- (2603:10b6:303:114::18) To CO1PR11MB5089.namprd11.prod.outlook.com
- (2603:10b6:303:9b::16)
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.4])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29E631F1932;
+	Mon, 18 Aug 2025 23:28:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.4
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755559694; cv=none; b=g1G0KQ7w7NOgoqmjhnengNzSvtT3ffy1LTKw0oWmYnqmPkuyfDSdAXf3ZlkI5ocBM5ZWNUq1fzZr2QFAnsal+Bs62D4wVm/KpeOQ3qOuQGB1F6DAktinSob7vaLIQZLIhiK8wZpFdWZhFqNIhmaWsikARSnrvGeNDk90Cv3x0fE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755559694; c=relaxed/simple;
+	bh=qWU5jKZb9in6UgtT2b/F4r0PzCZrNnHxBos+Lj7LMD0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=J30M2NYL9WZXY8bMzm+UYSZxoUHoCIaoIR8ohAv/k5BzbxDhlXB6E4ddWopGDUNjJLc7k3dCukjEF7XzmbfN2ausXe1V/1HdOhz8M9IBA9yZ2Mc9DFWfhlDcWb3vziSdfuHfbXQQ0RCYh08lVhftVmKEFDFmr+TxOIKNHqptNBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=A9EOX86d; arc=none smtp.client-ip=220.197.31.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=/i
+	z/xnD8uPClOoozqxGllgCqbDdwjuuBB3H3lArHsUo=; b=A9EOX86dEh9/qHSGTK
+	FPdXgxdqwMrWjI+dBsrPaPpBUF3U2SHBhNc06zt3K81EwjkGzvn6Z5llQqcm1qsC
+	Ekq6i2/eVqP+uyhZglyY3ZWoeeceDf1nVS1n5k8+rFiycl+DIj0FLopJ+TN+Qp1Q
+	8YhCTV2eyFbukL1DyIZeFnuFI=
+Received: from MS-CMFLBWVCLQRG.localdomain (unknown [])
+	by gzga-smtp-mtada-g1-2 (Coremail) with SMTP id _____wDnt2hstqNotTBVCw--.32213S2;
+	Tue, 19 Aug 2025 07:25:44 +0800 (CST)
+From: luoguangfei <15388634752@163.com>
+To: nicolas.ferre@microchip.com,
+	claudiu.beznea@tuxon.dev
+Cc: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux@armlinux.org.uk,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	15388634752@163.com
+Subject: [PATCH] net: macb: fix unregister_netdev call order in macb_remove() [v2]
+Date: Tue, 19 Aug 2025 07:25:27 +0800
+Message-ID: <20250818232527.1316-1-15388634752@163.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|PH7PR11MB8503:EE_
-X-MS-Office365-Filtering-Correlation-Id: a0bef81c-6d45-4855-4e51-08dddea7e64f
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?cTFKd2s3VmV6b2twZjVkRVFaSVNadFN2b0pCUHRZZTdXczRrVGZFUlhpTkRp?=
- =?utf-8?B?UEp3KzgrWVpFMnkyQThZUEZYSjl1RFBLd0pOWTM5dUl3SDU1WlpLU24yVzY3?=
- =?utf-8?B?N3BFbk4wcGJzdXRZbm9ydEtEQ2hDRzZaYTVNWTV3Tk5uSVVuMHZGd0ZUSENW?=
- =?utf-8?B?OW9sNGI3SnhzckdLcmsraEtOdHNlb3hrRjhWV2gyRUxQeHV6alV6Zi9tNUJE?=
- =?utf-8?B?enE1ZkVSMFJqL1IzOG9uMHpZSzU5RUM0VTVteko5V2NzQ1QyVFpubk55WnBC?=
- =?utf-8?B?N1BKNlI3OUlSQzlEVmdiaVVJR1R6SXlFSnc2MjM0NitnVEN1M3MvdXhTQ2VW?=
- =?utf-8?B?aHBQajFlWnQ5SVRlQ01adWdBdmRlK25xd3hjZ2xDMDB2VTJQY3FpWE5vclpq?=
- =?utf-8?B?RHhuamx2czhmTHNmTjM5NHBtTWZ0cDNCM3hQN2RpbEJISVlXT3A2b3lBUEsv?=
- =?utf-8?B?QS9yUFF5aktKZWM1ZGo5dUJORGpWNWVuSGhvMFY3VEF1NmhUVkgrV0VDMThG?=
- =?utf-8?B?UVRCOC9sT0hJc2t5T2JlM1psZXVRSjVjNk1ZeU90dE5PaXZhRHVwd0hHNUZW?=
- =?utf-8?B?YkVDMjBrbzhHeGlubm90NUNacVByck1vSW1EUGJCTmhBVmF4WVpqM3JCMUZI?=
- =?utf-8?B?aVpEdEZlT1I5K1NwYUtWWCtVWEZxaitJTkdVOWtBOXpCZndvbDY2enRURlQw?=
- =?utf-8?B?Uk9tM256L1lJa0hGZWJFbmorNWhOYlZJTUhMRzZuODRINDlDSC94dTNnemRF?=
- =?utf-8?B?VXZOM3dRQklRT2R6bjNPdTRZQ1pYc0pBSTBJKzBRdEY0ZERLMVB1ZlVhNytE?=
- =?utf-8?B?b1dLeDZyU2ljcWdJZmxvdFRiZGJtaEVsZk9WV1U3SzJva2dBOERyeTE5NmVv?=
- =?utf-8?B?MW9pMlByOFdObm5FYisyU0wzOG1ZZkdGZkhGYUZLdzFtdWZtbXU5ak16d3FY?=
- =?utf-8?B?ZjNIYU11b1lwMU9BVWFSc3krSDBxZlgzQ250eWdUNWFwbURnRk1wakVqQjFp?=
- =?utf-8?B?MGE2MmphRyt3MkFvbFpNUndZOGpNeTVTWXliSkx0d3dZbzh2ZlpWcDk3V3BY?=
- =?utf-8?B?QXRkUUgzUFBoZStCYi9ZUzgvQVIzNzBtQmVPVVNQeXFuelpFaG5JSHY2ajVQ?=
- =?utf-8?B?LzAxaUVOV2JGKy9ocWVHajM0RWUrajNGdjc0TS9KK2pIY1VnYmpPUVhHeGk2?=
- =?utf-8?B?cjR0YmQxSGdOYi9jOE80cWN3N29CTm1kUlZjd2F2UWR2cERZNTRWV1BJSFh4?=
- =?utf-8?B?VGFrSmZQSWpJTGJ2U2JwbitHR25zU0hmMDhpSGJCMWo4bGlWZXBZOUQ1VTVQ?=
- =?utf-8?B?UHR4cG81ZGdwOVpBK0I4ZjRYYTFkNUF3Zk1lZWZSUVQ1MEFBakFwRnpTTjFI?=
- =?utf-8?B?anNiTmVBbVZHeTd3Z3ZRUXg0VWw4bElWQmIyRndkeTcvQkp2dGlYMkhxd2xu?=
- =?utf-8?B?R0RPNzFmcHZNMHE0QXBZUVlxKzErRXNzcEZKdW9hczhTYnBaamlpTWNsb3Jj?=
- =?utf-8?B?UHpPc1pWa0ZQNU4rc01DT0ZPZFZnRVhOR3VEWldFMGhTaU9YNk5MZXJlaCtk?=
- =?utf-8?B?NlgvdkZIalBrc1NxdDVKNlNNYW5HNS83UnJjMHBvUzBHOTN1UHZGVmhFZ0Ns?=
- =?utf-8?B?WWdrakhrQ0dQdjlabDFhRmREcDl5aS9uVFdJY1J6RGNJV2dvSURaWmVHa0ht?=
- =?utf-8?B?M3lvb3NINEE2eWJSMS9SQVcwUjdzRFFHKzIzUXRiRHVpaWtpNmpwSURoNEh3?=
- =?utf-8?B?SEZaY3k0azluY0xYYjN4VytyU0ZlQWorS3llb3VnRWF1bHh2M2ExTGQ4K21Y?=
- =?utf-8?B?dmhoSEgzRGdLTHM4a3hIOVQ3bXVUZDRqelBsRlVXS1pTUm1JRklIZEQ0eVBU?=
- =?utf-8?B?c0tsTWk5MTBnbmwzMVhTWEs1aHNhVUVPRndyOGpjUmpOR3Y4WGYxTExjMGNz?=
- =?utf-8?Q?YA2gTKfn/NM=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?OFFuTkVSREE1aDZzbFBzK1dvZEduaWRZVmVsdVFSVlpuYlF2TzBTQTRzVjJR?=
- =?utf-8?B?WEQvc1E0bS9XbjNhV0lINm9ESEQyWlJKRWVUMldqNjJTS1Zpc28zcGlvbnQx?=
- =?utf-8?B?cHJpNVJwTk9uQWhKeDVQdWhKRW02QTlFYXVabUhaVTk5ZjA2L3RnK2YyZmFV?=
- =?utf-8?B?eDRNS0tGTXJjVGNtZVl6RkhCVk0rMFVSZ3lhZWRaZVJhczJINXVuK1Vob2dS?=
- =?utf-8?B?di9IMUo0VTJJc2VVVGhmQ1MxTHhxQmczTlgvN1J5THk4aElLcFR1N1hUT0Rm?=
- =?utf-8?B?bnJvcE9NOHltN1BKWHJuUWVjcG5OYk5KRkVLWW1DQWJBQnZiZjdzU3E1UTZz?=
- =?utf-8?B?WE1PL1JZZFBKMHp0ZHVOWldZNjV2aHlQeWFhNlErYzkza3JJcWcrZnhDZWc1?=
- =?utf-8?B?aThBMm01cGRVYWxwZ2grTldJSWdmQ1dTVWhWYjlSemxIRm9KeUtMUVd3anN6?=
- =?utf-8?B?UllEVFpCOHRSQmdYUmNGRTNnODFiY21nclV2OW91ZlFkUkhaelZlNkdEcFhS?=
- =?utf-8?B?UGxqZ3VRYTRZMjFXK3pCTk9FZFhsK2orRDlINzNDNUFhZ0dpbXZhcHU1RG5P?=
- =?utf-8?B?OHhEbkcxUU9QbTM3UktYL25xVlEyZitaTGszMFlraHZDTGRXZlFaUGJXWTZi?=
- =?utf-8?B?MjA1QkZPdzRNYU5LdXpneXVyWXFzUThTazBjb2sxbXNZRVVvdlZ3MWJuNmJO?=
- =?utf-8?B?WmtKVmdVbEs1YUlMK3BkbmYxM0tRNWpXaGpobjBKZmZUQkdTblA2ZVd5SFRY?=
- =?utf-8?B?UXQ4S0NuRUxHS1dPTHFvcTNrdHJmUmF6TmE5S21LeUVOOEduTTE1ZTZqVXM5?=
- =?utf-8?B?Ky9LOHNlTEQ2MjVqUWZWOTdaVkoyZjI0Zjk0MHlsTi9KSzRRN01MclhsVGdR?=
- =?utf-8?B?ZzhvNStVMERGaExQbkE4bDdPTXlxTExCRk84N0x3NnpBSElkcGNyY0VlYVRk?=
- =?utf-8?B?ZjhCUUEzZmM2djNJZTh1V3V2ZElpVncyb1BUS3dhRHlNeHBCVnhNdHhkWmky?=
- =?utf-8?B?MWczeXVnQ2l6aW51S0lhd0k5c3RrbGczOFBhVVl2aC9pVGNIelJRYjVvZSts?=
- =?utf-8?B?a1NpYi91QnhHaEZhR3kxY0VEM1g1OW04MFlBa1BGYy84dzZRbUhwam43R1Uz?=
- =?utf-8?B?ZzFDZzRRcmV5STZlVlFxQ0RiSUkwMHJ2ZUlEUmlvU1RaTlQ2NEhiNkR5RUp2?=
- =?utf-8?B?NmpSWXl4bERucVh6U0hJQWZ2ZEdiTEl6MW1iNzc5NWlMcStva0R6d1pXQ3hD?=
- =?utf-8?B?WGJYaHQySVhkMVJiMGhaUVVBcExzRTNwUEIxbzdCRVUvaHZNcDJXQ1o3TkIw?=
- =?utf-8?B?ZnVDYklNaW4xY1RQWG54U2ZONVhIeHNkck9zc09ZSFNtekFzRDhBWVg4aDh5?=
- =?utf-8?B?Z09LdFVWa3dNTjZXL256NklFV3NOamRTM1VBV1JXNVliL2J2VjQvQ3NNbkVh?=
- =?utf-8?B?MlNBTlhjdUJBS1Z6UDdodWl3K0Z2K2E5OFhhUElrSWNZK2tGOVcveTBEanc0?=
- =?utf-8?B?TFJKTHloOUxLN3BacU1CbHVVcEVqSk94SFQvQ2ExenBCczhSTHZiMnBNRXBr?=
- =?utf-8?B?Qk1ITDYzMU9aZnZESkliZDllQTMzbm5vU1JySUpuQ0VIaUpOYW5WSlVraFU5?=
- =?utf-8?B?cHZiVzJxSHh2K2VrMjZCL3FXTkwzbk04Zi9TYTF1ZmtLK3R3cllsNDBhdXVR?=
- =?utf-8?B?by9WV3JBeTkwUzBzMlBxR3ZsaGRnQ1UrdjEydTgzUmZLNkJLUEI5WXdkR2RN?=
- =?utf-8?B?YitoYnpxb0VlNVZrYXFUdGsyNURDWG9SRW53VGF2YVkwckpjelVWeFQyMjFp?=
- =?utf-8?B?U1JBcHpDSmZrbEI0eFFObTdGM1VIVVF5ZVNqK2U2VzZRWFMrZis4Vk9CK3hE?=
- =?utf-8?B?K0dXY2hReHF0QWpuK3I1ZTNXU2FPTjRaT1E0TjlJRG1zV0Z6SHdzRlpQb3VR?=
- =?utf-8?B?N0JDMUJDTENPNkxLbGZ1ZVMzVEtXL0s1LzFSc2JJM2x2ekRwWS9La1daVVR2?=
- =?utf-8?B?bGRBSnRWdlRINmcveU9TaGttVDVKeUowcHYxNWMzeVNSMFhEaDZyeGdKY09p?=
- =?utf-8?B?Ui9iajk4K1Y2VGJiVXkvaWhJZ0R6UG9JVlRHalhMbFh3YUFvNGJRWlVHWExy?=
- =?utf-8?B?WmtCcU5udVhRak5GclEwQS9MaDgvZmJhZ1NFVG82NmVWRjg4WTF3eC9Cdm9Q?=
- =?utf-8?B?RkE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: a0bef81c-6d45-4855-4e51-08dddea7e64f
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Aug 2025 22:38:06.2972
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ehYqVcczzuFvPF+LpENhpFvYTY3JMx2lO00JpCCR5zEjJBuUJ+VcrJNnUxSwponU+J2xDMmv5LhQR6CeCFNvkDopGnCrV1QiQc1VlKllDfM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB8503
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wDnt2hstqNotTBVCw--.32213S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7tw1fXrW3WFyrur47AFWUArb_yoW8AF43pw
+	43CFyfWryIqr4qvws7Xa1UJFy5Ca47t348Wa4xurZ3Z392kw1qyFW0kFy8u345GFZrAFWa
+	yr1Yya9xAa1kCaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0piBWlDUUUUU=
+X-CM-SenderInfo: jprvjmqywtklivs6il2tof0z/xtbBMRKtn2ijpe73zgAAso
 
---------------LUTRftresaCpLYo0yKkSRKvk
-Content-Type: multipart/mixed; boundary="------------EGJt6KHZSArp85dyQxgTBVki";
- protected-headers="v1"
-From: Jacob Keller <jacob.e.keller@intel.com>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Anthony Nguyen <anthony.l.nguyen@intel.com>
-Cc: vgrinber@redhat.com, netdev@vger.kernel.org,
- Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
- Intel Wired LAN <intel-wired-lan@lists.osuosl.org>,
- Simon Horman <horms@kernel.org>,
- Marcin Szycik <marcin.szycik@linux.intel.com>
-Message-ID: <474498f1-5ad3-41ef-aca4-16830ad208ac@intel.com>
-Subject: Re: [PATCH iwl-net 1/2] ice: fix double-call to ice_deinit_hw()
- during probe failure
-References: <20250717-jk-ddp-safe-mode-issue-v1-0-e113b2baed79@intel.com>
- <20250717-jk-ddp-safe-mode-issue-v1-1-e113b2baed79@intel.com>
- <7f767a82-b70e-4520-a9cd-360949961373@intel.com>
-In-Reply-To: <7f767a82-b70e-4520-a9cd-360949961373@intel.com>
+When removing a macb device, the driver calls phy_exit() before
+unregister_netdev(). This leads to a WARN from kernfs:
 
---------------EGJt6KHZSArp85dyQxgTBVki
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+  ------------[ cut here ]------------
+  kernfs: can not remove 'attached_dev', no directory
+  WARNING: CPU: 1 PID: 27146 at fs/kernfs/dir.c:1683
+  Call trace:
+    kernfs_remove_by_name_ns+0xd8/0xf0
+    sysfs_remove_link+0x24/0x58
+    phy_detach+0x5c/0x168
+    phy_disconnect+0x4c/0x70
+    phylink_disconnect_phy+0x6c/0xc0 [phylink]
+    macb_close+0x6c/0x170 [macb]
+    ...
+    macb_remove+0x60/0x168 [macb]
+    platform_remove+0x5c/0x80
+    ...
 
+The warning happens because the PHY is being exited while the netdev
+is still registered. The correct order is to unregister the netdev
+before shutting down the PHY and cleaning up the MDIO bus.
 
+Fix this by moving unregister_netdev() ahead of phy_exit() in
+macb_remove().
 
-On 8/18/2025 3:27 AM, Przemek Kitszel wrote:
-> On 7/17/25 18:57, Jacob Keller wrote:
->> The following (and similar) KFENCE bugs have recently been found occur=
-ring
->> during certain error flows of the ice_probe() function:
->>
->> kernel: =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->> kernel: BUG: KFENCE: use-after-free read in ice_cleanup_fltr_mgmt_stru=
-ct+0x1d
->> kernel: Use-after-free read at 0x00000000e72fe5ed (in kfence-#223):
->> kernel:  ice_cleanup_fltr_mgmt_struct+0x1d/0x200 [ice]
->> kernel:  ice_deinit_hw+0x1e/0x60 [ice]
->> kernel:  ice_probe+0x245/0x2e0 [ice]
->> kernel:
->> kernel: kfence-#223: <..snip..>
->> kernel: allocated by task 7553 on cpu 0 at 2243.527621s (198.108303s a=
-go):
->> kernel:  devm_kmalloc+0x57/0x120
->> kernel:  ice_init_hw+0x491/0x8e0 [ice]
->> kernel:  ice_probe+0x203/0x2e0 [ice]
->> kernel:
->> kernel: freed by task 7553 on cpu 0 at 2441.509158s (0.175707s ago):
->> kernel:  ice_deinit_hw+0x1e/0x60 [ice]
->> kernel:  ice_init+0x1ad/0x570 [ice]
->> kernel:  ice_probe+0x22b/0x2e0 [ice]
->> kernel:
->> kernel: =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->>
->> These occur as the result of a double-call to ice_deinit_hw(). This do=
-uble
->> call happens if ice_init() fails at any point after calling
->> ice_init_dev().
->>
->> Upon errors, ice_init() calls ice_deinit_dev(), which is supposed to b=
-e the
->> inverse of ice_init_dev(). However, currently ice_init_dev() does not =
-call
->> ice_init_hw(). Instead, ice_init_hw() is called by ice_probe(). Thus,
->> ice_probe() itself calls ice_deinit_hw() as part of its error cleanup
->> logic.
->>
->> This results in two calls to ice_deinit_hw() which results in straight=
+Fixes: 8b73fa3ae02b ("net: macb: Added ZynqMP-specific initialization")
+Signed-off-by: luoguangfei <15388634752@163.com>
+---
+ drivers/net/ethernet/cadence/macb_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
->> forward use-after-free violations due to double calling kfree and othe=
-r
->> cleanup functions.
->>
->> To avoid this double call, move the call to ice_init_hw() into
->> ice_init_dev(), and remove the now logically unnecessary cleanup from
->> ice_probe(). This is simpler than the alternative of moving ice_deinit=
-_hw()
->> *out* of ice_deinit_dev().
->=20
-> [1]
->=20
->>
->> Moving the calls to ice_deinit_hw() requires validating all cleanup pa=
-ths,
->> and changing significantly more code. Moving the calls of ice_init_hw(=
-)
->> requires only validating that the new placement is still prior to all =
-HW
->> structure accesses.
->>
->> For ice_probe(), this now delays ice_init_hw() from before
->> ice_adapter_get() to just after it. This is safe, as ice_adapter_get()=
- does
->> not rely on the HW structure.
->=20
-> I introduced the order change by
-> commit fb59a520bbb1 ("ice: ice_probe: init ice_adapter after HW init").=
+diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+index ce55a1f59..7bbb674d5 100644
+--- a/drivers/net/ethernet/cadence/macb_main.c
++++ b/drivers/net/ethernet/cadence/macb_main.c
+@@ -5407,11 +5407,11 @@ static void macb_remove(struct platform_device *pdev)
+ 
+ 	if (dev) {
+ 		bp = netdev_priv(dev);
++		unregister_netdev(dev);
+ 		phy_exit(bp->sgmii_phy);
+ 		mdiobus_unregister(bp->mii_bus);
+ 		mdiobus_free(bp->mii_bus);
+ 
+-		unregister_netdev(dev);
+ 		cancel_work_sync(&bp->hresp_err_bh_work);
+ 		pm_runtime_disable(&pdev->dev);
+ 		pm_runtime_dont_use_autosuspend(&pdev->dev);
+-- 
+2.43.0
 
-> You are right that current driver does not yet utilizes that, but it
-> will in the future.
->=20
-
-If you have a better fix, I'm all for it. The current driver code is
-buggy at least in the error handling phase.
-
->>
->> For ice_devlink_reinit_up(), the ice_init_hw() is now called after
->> ice_set_min_max_msix(). This is also safe as that function does not ac=
-cess
->> the HW structure either.
->>
->> This flow makes more logical sense, as ice_init_dev() is mirrored by
->> ice_deinit_dev(), so it reasonably should be the caller of ice_init_hw=
-().
->> It also reduces one extra call to ice_init_hw() since both ice_probe()=
- and
->> ice_devlink_reinit_up() call ice_init_dev().
->>
->> This resolves the double-free and avoids memory corruption and other
->> invalid memory accesses in the event of a failed probe.
->>
->> Fixes: 5b246e533d01 ("ice: split probe into smaller functions")
->=20
-> The blame should be on me here. But instead of fixing current bug in
-> a way that I would need to invert later, it would be better to fix w/o
-> order change. (If unwilling to wait, simple revert would be also better=
-)
->=20
-> I would like to do [1] above, either by my or Jake hands (will sync).
->=20
-
-I hadn't noticed your change when looking through history. I am fine
-with either a revert, or dropping this fix from the DDP fix and
-submitting that separately. This issue only occurs if probe fails at
-certain points and cleanup logic is triggered. That should be rare.
-
-Alternatively I'm fine with reverting the change if we want to get this
-potential issue fixed now.
-
->> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
->> ---
->>   drivers/net/ethernet/intel/ice/devlink/devlink.c | 10 +---------
->>   drivers/net/ethernet/intel/ice/ice_main.c        | 24 +++++++++++---=
-----------
->>   2 files changed, 12 insertions(+), 22 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink.c b/driver=
-s/net/ethernet/intel/ice/devlink/devlink.c
->> index 4af60e2f37df..ef49da0590b3 100644
->> --- a/drivers/net/ethernet/intel/ice/devlink/devlink.c
->> +++ b/drivers/net/ethernet/intel/ice/devlink/devlink.c
->> @@ -1233,18 +1233,12 @@ static int ice_devlink_reinit_up(struct ice_pf=
- *pf)
->>   	struct ice_vsi *vsi =3D ice_get_main_vsi(pf);
->>   	int err;
->>  =20
->> -	err =3D ice_init_hw(&pf->hw);
->> -	if (err) {
->> -		dev_err(ice_pf_to_dev(pf), "ice_init_hw failed: %d\n", err);
->> -		return err;
->> -	}
->> -
->>   	/* load MSI-X values */
->>   	ice_set_min_max_msix(pf);
->>  =20
->>   	err =3D ice_init_dev(pf);
->>   	if (err)
->> -		goto unroll_hw_init;
->> +		return err;
->>  =20
->>   	vsi->flags =3D ICE_VSI_FLAG_INIT;
->>  =20
->> @@ -1267,8 +1261,6 @@ static int ice_devlink_reinit_up(struct ice_pf *=
-pf)
->>   	rtnl_unlock();
->>   err_vsi_cfg:
->>   	ice_deinit_dev(pf);
->> -unroll_hw_init:
->> -	ice_deinit_hw(&pf->hw);
->>   	return err;
->>   }
->>  =20
->> diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/e=
-thernet/intel/ice/ice_main.c
->> index 0a11b4281092..c44bb8153ad0 100644
->> --- a/drivers/net/ethernet/intel/ice/ice_main.c
->> +++ b/drivers/net/ethernet/intel/ice/ice_main.c
->> @@ -4739,6 +4739,12 @@ int ice_init_dev(struct ice_pf *pf)
->>   	struct ice_hw *hw =3D &pf->hw;
->>   	int err;
->>  =20
->> +	err =3D ice_init_hw(hw);
->> +	if (err) {
->> +		dev_err(dev, "ice_init_hw failed: %d\n", err);
->> +		return err;
->> +	}
->> +
->>   	ice_init_feature_support(pf);
->>  =20
->>   	err =3D ice_init_ddp_config(hw, pf);
->> @@ -4759,7 +4765,7 @@ int ice_init_dev(struct ice_pf *pf)
->>   	err =3D ice_init_pf(pf);
->>   	if (err) {
->>   		dev_err(dev, "ice_init_pf failed: %d\n", err);
->> -		return err;
->> +		goto unroll_hw_init;
->>   	}
->>  =20
->>   	pf->hw.udp_tunnel_nic.set_port =3D ice_udp_tunnel_set_port;
->> @@ -4803,6 +4809,8 @@ int ice_init_dev(struct ice_pf *pf)
->>   	ice_clear_interrupt_scheme(pf);
->>   unroll_pf_init:
->>   	ice_deinit_pf(pf);
->> +unroll_hw_init:
->> +	ice_deinit_hw(hw);
->>   	return err;
->>   }
->>  =20
->> @@ -5330,17 +5338,9 @@ ice_probe(struct pci_dev *pdev, const struct pc=
-i_device_id __always_unused *ent)
->>   	if (ice_is_recovery_mode(hw))
->>   		return ice_probe_recovery_mode(pf);
->>  =20
->> -	err =3D ice_init_hw(hw);
->> -	if (err) {
->> -		dev_err(dev, "ice_init_hw failed: %d\n", err);
->> -		return err;
->> -	}
->> -
->>   	adapter =3D ice_adapter_get(pdev);
->> -	if (IS_ERR(adapter)) {
->> -		err =3D PTR_ERR(adapter);
->> -		goto unroll_hw_init;
->> -	}
->> +	if (IS_ERR(adapter))
->> +		return PTR_ERR(adapter);
->>   	pf->adapter =3D adapter;
->>  =20
->>   	err =3D ice_init(pf);
->> @@ -5366,8 +5366,6 @@ ice_probe(struct pci_dev *pdev, const struct pci=
-_device_id __always_unused *ent)
->>   	ice_deinit(pf);
->>   unroll_adapter:
->>   	ice_adapter_put(pdev);
->> -unroll_hw_init:
->> -	ice_deinit_hw(hw);
->>   	return err;
->>   }
->>  =20
->>
->=20
-
-
---------------EGJt6KHZSArp85dyQxgTBVki--
-
---------------LUTRftresaCpLYo0yKkSRKvk
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-wnsEABYIACMWIQQgQFSp1zOQVirsQx5qll0+bw8o6AUCaKOrTAUDAAAAAAAKCRBqll0+bw8o6KFu
-AQDbJKWkOqEd7dwOph4KBn9CU+xCuss65R3Gu59XilK6ogD+IXO1Zb/fSLwd9pUp8AZdTvJywH0Z
-4+MqrxPwCriCEwg=
-=AhV1
------END PGP SIGNATURE-----
-
---------------LUTRftresaCpLYo0yKkSRKvk--
 
