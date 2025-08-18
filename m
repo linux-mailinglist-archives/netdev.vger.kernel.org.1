@@ -1,425 +1,294 @@
-Return-Path: <netdev+bounces-214543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214538-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF426B2A124
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 14:10:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 309F0B2A100
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 14:01:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 64E6D1899267
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 12:01:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C40DF162D99
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 11:58:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3CE827B35B;
-	Mon, 18 Aug 2025 12:00:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9765261B92;
+	Mon, 18 Aug 2025 11:58:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="AEKb/r/W"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HD6p8c5F"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2055.outbound.protection.outlook.com [40.107.93.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B77BA261B80;
-	Mon, 18 Aug 2025 12:00:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.55
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755518405; cv=fail; b=chRaYpbrdANkn8+QPyGa/HCHviMNc0K75LL2RTU1+DMSUg+IalWX0qu8kk9bRNPmse4+Otexrb1E2dWiejrcMsZBKQapZ4fHKcSgpVUaDW32haFddl19PqJHpYHRuOZMDF65PNnJRqP/jXEhoublpFsdk8Ebex8jC3nKjXJ+B8A=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755518405; c=relaxed/simple;
-	bh=x3h0hLOdt8BbcYkM8AX+D7qKzT6cDkLF2eHnp5qkTks=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=WsOTsRmfyMzyGvn/jo2vx4iN0Ypxehe5JCorbSxkOmAyO5FuO4AzyBETAtRk4kxrxNeJNDSGraNvCb8uwMb4i8pHNKiJyQQhDkhs/JcmnXoxrkilrgqRHXt5wlvo5cWnYLXvtYa8uxaGElsCJon9fCElYqluDXMaVg640yDUwNI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=AEKb/r/W; arc=fail smtp.client-ip=40.107.93.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=RB5sLUmytiBBO+EdAR7LhNcbUnKqJQnWG6Ut+ssktZUh/MKWE6RjWxQsclOkUL+nIipxZyHQ8prPr6Pn2nhucZKqXJyetng+JUM6G13tIzhKRRr4f0sELRh0ULXlEXecwAiJonHaA+jqz7H//TKsFQ2hAGFJgjEwW3xV43t74Z7kjfO/Lppl0mQ/XG6cbWC6ePe28P/e4yCwTRElDg+R8rx6Hyt+ngEVS9RX+wwf1svytA5SuTG4B+ll6nS7DbtWaVD+DkbEmAaRBNAna5AmqWHxx1GQ/L2uK+k4W1sqjLdIsBc/Z1besIQZ68zrNVKUqf+7cM5yo3YpmqdvbGjlGA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5GmlGOxV0y0ajPkQJPvBV4zt0bKLLVVHgjJRdAMdJ30=;
- b=Jp2/Q6LTJl/OO3EqGiEMXx/EAdOCVnKmAcjY80eQfgDkUnFu0gPY4KsJ6RaJRQ3mBk+UkX62aUayTjquqacqoFJnvDZHGGOPSi1Y/yBX1dTWuf/uza8lCCiNeNs6El+DMCWM8Z9SbkZJPWGqF3QDnaDnFyQKj/K3Op4Es8tF7S/7Pk8Gr3JgJ02eaFpuLZL2O5EJjAjIZ2bBDnm35qqyUksD51rf/bvujITfi4SUXV719GbCUYQLQSo2FliId1jyWZdhLdP+f3sYzLZ+kxsZw3eY1XATc2R+a4W6iZu70gIlGg9F6hiBahF19zixmAqHJJTSvCzR8dll1/hvlTll7Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5GmlGOxV0y0ajPkQJPvBV4zt0bKLLVVHgjJRdAMdJ30=;
- b=AEKb/r/WdGUmQ/uQq58UxA5gU4RovqAwXrMepT9HS8UAHj00tUJiOIDa2aReU2zIlq0badLQlnskxBRUS+I6nk0ORJ/yPgcq/mHsQilEW5WWUqpEaQ/Hkmn8DcOW6ZB/xyi6SGJlV82Q20/L1L28dSB+52MRBZhEnikLJin6tsk=
-Received: from BN9PR03CA0868.namprd03.prod.outlook.com (2603:10b6:408:13d::33)
- by SJ0PR12MB6760.namprd12.prod.outlook.com (2603:10b6:a03:44c::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9031.24; Mon, 18 Aug
- 2025 11:59:58 +0000
-Received: from BL02EPF00029927.namprd02.prod.outlook.com
- (2603:10b6:408:13d:cafe::1d) by BN9PR03CA0868.outlook.office365.com
- (2603:10b6:408:13d::33) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9031.20 via Frontend Transport; Mon,
- 18 Aug 2025 11:59:57 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BL02EPF00029927.mail.protection.outlook.com (10.167.249.52) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.9052.8 via Frontend Transport; Mon, 18 Aug 2025 11:59:57 +0000
-Received: from airavat.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 18 Aug
- 2025 06:59:54 -0500
-From: Raju Rangoju <Raju.Rangoju@amd.com>
-To: <netdev@vger.kernel.org>
-CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <richardcochran@gmail.com>,
-	<linux-kernel@vger.kernel.org>, <Shyam-sundar.S-k@amd.com>, Raju Rangoju
-	<Raju.Rangoju@amd.com>
-Subject: [PATCH net-next] amd-xgbe: Add PPS periodic output support
-Date: Mon, 18 Aug 2025 17:28:01 +0530
-Message-ID: <20250818115801.2518912-1-Raju.Rangoju@amd.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7EC823C38C;
+	Mon, 18 Aug 2025 11:58:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755518287; cv=none; b=ZfgQpBwg5rO6Fhd4FbJyzIUW5KblT5GmBVs9XQdymjRVADCHSxefeQcdkroAs+Mv3fE9hc0gJaxuFbUh7MZgGei2FFSx1Et1EYGrGcaI0zK4UgKdczsFEolNDDa2ihL4kCXJQ+GQCoXPOAnm2aUfFX/QbyO0mc2GpCg4gGj+f2I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755518287; c=relaxed/simple;
+	bh=0auSW5vJxopsycxV9N9Pw6iyytMEwDeZ+ZGHBA8xtEk=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=Z8DqYYDRqp0v0iPGGjQuZfNYgQo2ZAhpf1n10OS+qnYQyyQfN7dCxYmuAr4DLhF09rR1HbyQNpCnugSO/41RgMW7I1U156IXkXPRZQv7TznnAeZYA+PtyVEaaE4+11Py3WQkEcXXsRF74EGsAvVlZyZCuJdF3JLIgZpg4Pqpf+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HD6p8c5F; arc=none smtp.client-ip=209.85.222.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-7e87061d120so410378285a.2;
+        Mon, 18 Aug 2025 04:58:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755518285; x=1756123085; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DySjixOZmDG1zxGPAN3vyCflQ83OteviIDFUIh593Mk=;
+        b=HD6p8c5F//mtPSMc7Mbv+BJW43S4JLqQUkMrnQUduwGr0Tg/dyblZEAC/5nEASuqTg
+         A7Ly7xby2B/GEuEvkpAs9KKlHrHYsELLVUjKOTCvpiDrRl8xtZHnYFGpxdvqVBYWPSeE
+         XE4mKQ/k+FhBc4P/RB8Q9TC10kktIIzULsK8pkY4i0iEAV+YH/o3JWtBRnE3Uee1ytQx
+         s7kTJcY1nor+YyigdXB02wWRWtxVupMqabSrjPSJ/6R6GoFHXXi4fkPsIVTBCfXNEwYh
+         zOl4a2xlaVBa07/CfxYJX3weGYEgEWznpcMymsNsS15tcEIfQdSQOEwl2N+o0C8EsDy0
+         Ft7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755518285; x=1756123085;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=DySjixOZmDG1zxGPAN3vyCflQ83OteviIDFUIh593Mk=;
+        b=uwPvbBlG2c1qkuzWm1f6CPOxgcVoj+1GCrOCg/oK2bz+x/P9FaEa+DxZINxsXEpoxA
+         AUt+71Paovf9kL1h97lFM42caarC6gdd7n5ON3DboOy/hRyh7KKs92+yV0OpJkxPmUuO
+         9dRIiCNl8QUHBwqTdJnyKzopsC94XVF3EznXApS8i9yD38hOuG6Z535wqNHk0pgLnL/C
+         Kd/268UY5QwLDzBb0gQNOmzcSYrX52VGTLBJjwZWDtRxSa1FZFZAfEBUZxaEItxGrVgv
+         NGUXy1e5R35UGbVKrZl9gpL5SqDYjH/bdJuRebOPtAJZ8bhSM72o+5tuh7Z44w3lQg7Y
+         hVSw==
+X-Forwarded-Encrypted: i=1; AJvYcCUvRSXTcptWPKqs/q2iDHItOU5BKdj5J1KqVQq9kZYLfUHonnJc3mwuDFSleVslI9wLAK67qQkwV5ATuU0=@vger.kernel.org, AJvYcCVno4sm+YlViQ0vSpe1q8rXWekx6s7h/aPBg/6/mb99NgIuX2Aun16FjgqBiIljM47fL5cZcZwb@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw00VVZowLw9xHHtUk7YbYgsO513spNLakDGWwZ2t1BBwtl4uOy
+	tndtOCLHUQw2IG6Cfi5IoGzEYsm8sJRUR640qYY5B2zzNwSVcFTXAnAY
+X-Gm-Gg: ASbGncvMCmCtwqk1ZyxLVkwzEZra90oPu+FVkGeShZGY8btlTw8X48ygBuDlTfyxzTb
+	I5M6zYL9X/xfymgeX78mrtIaavYbjGqhcosDzVuD+RTNvrhACJ1R6nkIb/3NZL8XMXIFfq8+YFP
+	ITZ12FHrwictmAY+53kcyLWRWGb7MXsYNj3dY2xIwEO2PVzhoLzFIcfk6nMMysCIfr7sYN7wKEW
+	UmbWFiZ4YYipZHYrmBk0CgyAI1a7fXUENtEKV5zucRvaEGkBd0GeOsYIqVJIGcx3NQShmdZRm75
+	rHgL1LL1+lm9Ju9xbPIe9XQdq8hWeMdfikbx1DzusTgAmcvSml2fwbXbQE+HGp0BRxEO+V4ZwIk
+	/XXBak+XBqkImF1mq+wrqyqK96cObXWKyl6UUKA+B7FFc6xvV6bondpVjKA67MKRd1NKcnQ==
+X-Google-Smtp-Source: AGHT+IGGhOp8B+kplNRoYjGullJk6WNyVuzVI3ZyHvZN2lgnZPmkwC7OyobQlqFtgTG89CJLk+LZeg==
+X-Received: by 2002:a05:620a:2844:b0:7e8:4014:dbf2 with SMTP id af79cd13be357-7e87e0c744dmr1402704085a.56.1755518284702;
+        Mon, 18 Aug 2025 04:58:04 -0700 (PDT)
+Received: from gmail.com (128.5.86.34.bc.googleusercontent.com. [34.86.5.128])
+        by smtp.gmail.com with UTF8SMTPSA id 6a1803df08f44-70ba902f4edsm51413646d6.14.2025.08.18.04.58.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Aug 2025 04:58:03 -0700 (PDT)
+Date: Mon, 18 Aug 2025 07:58:03 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Richard Gobert <richardbgobert@gmail.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ netdev@vger.kernel.org
+Cc: davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ horms@kernel.org, 
+ alexander.duyck@gmail.com, 
+ corbet@lwn.net, 
+ shenjian15@huawei.com, 
+ salil.mehta@huawei.com, 
+ shaojijie@huawei.com, 
+ andrew+netdev@lunn.ch, 
+ saeedm@nvidia.com, 
+ tariqt@nvidia.com, 
+ mbloch@nvidia.com, 
+ leon@kernel.org, 
+ ecree.xilinx@gmail.com, 
+ dsahern@kernel.org, 
+ ncardwell@google.com, 
+ kuniyu@google.com, 
+ shuah@kernel.org, 
+ sdf@fomichev.me, 
+ ahmed.zaki@intel.com, 
+ aleksander.lobakin@intel.com, 
+ linux-kernel@vger.kernel.org, 
+ linux-net-drivers@amd.com
+Message-ID: <willemdebruijn.kernel.ee1a9b43eb45@gmail.com>
+In-Reply-To: <9be872a7-1523-48ef-86a4-dad899fc0a03@gmail.com>
+References: <20250814114030.7683-1-richardbgobert@gmail.com>
+ <20250814114030.7683-4-richardbgobert@gmail.com>
+ <willemdebruijn.kernel.26e28ce8a7fe@gmail.com>
+ <willemdebruijn.kernel.2963bd70f4104@gmail.com>
+ <9be872a7-1523-48ef-86a4-dad899fc0a03@gmail.com>
+Subject: Re: [PATCH net-next 3/5] net: gso: restore ids of outer ip headers
+ correctly
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL02EPF00029927:EE_|SJ0PR12MB6760:EE_
-X-MS-Office365-Filtering-Correlation-Id: cc425fa1-16db-4aae-b6a0-08ddde4ec095
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|82310400026|36860700013|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?OiowHKhAIU6IHZphE+WwV9s1a30QDLI16NewW91qFJb/9XEgyKQzN571xrEs?=
- =?us-ascii?Q?vCe0AYIAkMERc5/HT5JyBcCpLTbBuAUMAQKao2k4umi+IAhHhz/bGrmZ9x/3?=
- =?us-ascii?Q?75NKsvxUr/EX4QgCRJchyAKhbcGgTPcgf2BmCIfTzyMVABIvV6tnP+Hcogoq?=
- =?us-ascii?Q?yQKZlMJsVlfvb8bpSO8XgDU1o1jAbxBYSShXf6bfbEnqDAJxLBy4O4YqPHe5?=
- =?us-ascii?Q?SgF1jgDIpGAfqqZneUjB5KFdY7194qUqDW2kuj+NXZ0Lj4nk9aFqrD4qsmCf?=
- =?us-ascii?Q?cmHtsFU6FKmUvA1QDDHLvWYlMmzd57R3BRtT6TSbiBGdJuWxbU2NSYmQAKCo?=
- =?us-ascii?Q?e60l70cmBVREBstq1sFblsd8taYeGqyhyQJulWDrDKnAWVvnqmE8yjvXtDzW?=
- =?us-ascii?Q?AtptzmpP9y6beMBSQgg+6CredsE4YtZowatp1HyxBmRhG/wEUDsAO841TABa?=
- =?us-ascii?Q?YIcP9F8Kca2REAJZGyBh5R/kIlFH3XzI4qdF3ii79d3FioyfW4NmdNUBsi0f?=
- =?us-ascii?Q?RblC3plXGms/UbZ1F0Cs8+WKlaa3qsL+gnDUYhRWVVrTzEjn5DM/T8b1SKCj?=
- =?us-ascii?Q?+ulTmFm+R6muJPqt/RQxCzcaw645Ms2RD9iJK1g9Lqo87bpSnHOeIBIil4qY?=
- =?us-ascii?Q?CN0QGjKnK8uHPaagf8wiGCCKIdGfa+gExJro8tOfLnpMEgIhiLNa9ZV6qAez?=
- =?us-ascii?Q?uzPd121Rwb7fXhj6Q3/F6BTHQBvQ6MD7tpXDjwE6YxuCc6qZqVvFCGswdwZX?=
- =?us-ascii?Q?Fge4UFcZQdNG6ZpHpTZBjqBdaD7G844InwB3in0QVXCNh9lNn9V6GBzzYU6f?=
- =?us-ascii?Q?y4gjnTqTJ6GyNg3hgt+HF1Ro3YptHoVZM2jajN8tojf8ID7PgPe8FZrM3P9h?=
- =?us-ascii?Q?MB1ejzrz/SLK+DRCyOgmgYUx53QCFDj4mOc6w1s3mPy8dgkABFl8udCWsyrX?=
- =?us-ascii?Q?CdEb5HS2WDekvEx6zg36Gm2NuPOa5/l3oBoBl12l9NQ+TY385n5Kt1jEHaZU?=
- =?us-ascii?Q?LrJObmMHuQdxYjqMsl8pWsPqc2x8GJDB0/li8Ie50OCBlOV5D94x49zuUFoh?=
- =?us-ascii?Q?8sHdMuBFrrBC9UR+Y7DVQaaJceofLMqlh5qxVsDOOZiqsypNyx3IntPUe4B3?=
- =?us-ascii?Q?/yj1TzGOzrzECKA9PCPR7kjnGo3UoWWSFuCE43/Kx9DJup5cdgNtnD+PniGh?=
- =?us-ascii?Q?5yALDfPdOStfAl5bh/+W6ZGpUTOkgQVWQxfiS4BW2PE0QoJAwMhhRM6lXg0m?=
- =?us-ascii?Q?fgy9Kna7TI8Atr7Ap+sNMvwHFe6kVfR5OfGa+Tzd+6qolio4dBNN4lb1dcym?=
- =?us-ascii?Q?IDPmiYmUo8D2cg3dZ15IiOfhK1SDbtotqAD6B/DJWH3tF2QZjxYDMYn7Hs39?=
- =?us-ascii?Q?HfEEIJy+VOv6wQRtcNEkTS/+6nZl0tA26JqQEWmW1MSKl9xwfcq43TgPU89A?=
- =?us-ascii?Q?oomWYC7uXp6Jq5Dbz1/CtSSRc93W5Kst7tqWCVyIwqKsk7SEb8a3GnW0d2PX?=
- =?us-ascii?Q?18NR3sgpe3fw8Tfw61zJJF6NJbCKb8cXdGHt?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(36860700013)(376014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Aug 2025 11:59:57.5898
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: cc425fa1-16db-4aae-b6a0-08ddde4ec095
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BL02EPF00029927.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB6760
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Add support for hardware PPS (Pulse Per Second) output to the
-AMD XGBE driver. The implementation enables flexible periodic
-output mode, exposing it via the PTP per_out interface.
+Richard Gobert wrote:
+> Willem de Bruijn wrote:
+> > Willem de Bruijn wrote:
+> >> Richard Gobert wrote:
+> >>> Currently, NETIF_F_TSO_MANGLEID indicates that the inner-most ID can
+> >>> be mangled. Outer IDs can always be mangled.
+> >>>
+> >>> Make GSO preserve outer IDs by default, with NETIF_F_TSO_MANGLEID allowing
+> >>> both inner and outer IDs to be mangled. In the future, we could add
+> >>> NETIF_F_TSO_MANGLEID_{INNER,OUTER} to provide more granular control to
+> >>> drivers.
+> >>>
+> >>> This commit also modifies a few drivers that use SKB_GSO_FIXEDID directly.
+> >>>
+> >>> Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
+> >>> ---
+> >>>  Documentation/networking/segmentation-offloads.rst |  4 ++--
+> >>>  drivers/net/ethernet/hisilicon/hns3/hns3_enet.c    |  2 +-
+> >>>  drivers/net/ethernet/mellanox/mlx5/core/en_rx.c    |  8 ++++++--
+> >>>  drivers/net/ethernet/sfc/ef100_tx.c                | 14 ++++++++------
+> >>>  include/linux/netdevice.h                          |  9 +++++++--
+> >>>  include/linux/skbuff.h                             |  6 +++++-
+> >>>  net/core/dev.c                                     |  7 +++----
+> >>>  net/ipv4/af_inet.c                                 | 13 ++++++-------
+> >>>  net/ipv4/tcp_offload.c                             |  4 +---
+> >>>  9 files changed, 39 insertions(+), 28 deletions(-)
+> >>>
+> >>> diff --git a/Documentation/networking/segmentation-offloads.rst b/Documentation/networking/segmentation-offloads.rst
+> >>> index 085e8fab03fd..21c759b81f4e 100644
+> >>> --- a/Documentation/networking/segmentation-offloads.rst
+> >>> +++ b/Documentation/networking/segmentation-offloads.rst
+> >>> @@ -42,8 +42,8 @@ also point to the TCP header of the packet.
+> >>>  
+> >>>  For IPv4 segmentation we support one of two types in terms of the IP ID.
+> >>>  The default behavior is to increment the IP ID with every segment.  If the
+> >>> -GSO type SKB_GSO_TCP_FIXEDID is specified then we will not increment the IP
+> >>> -ID and all segments will use the same IP ID.  If a device has
+> >>> +GSO type SKB_GSO_TCP_FIXEDID_{OUTER,INNER} is specified then we will not
+> >>> +increment the IP ID and all segments will use the same IP ID.  If a device has
+> >>>  NETIF_F_TSO_MANGLEID set then the IP ID can be ignored when performing TSO
+> >>>  and we will either increment the IP ID for all frames, or leave it at a
+> >>>  static value based on driver preference.
+> >>> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
+> >>> index bfa5568baa92..b28f890b0af5 100644
+> >>> --- a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
+> >>> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
+> >>> @@ -3868,7 +3868,7 @@ static int hns3_gro_complete(struct sk_buff *skb, u32 l234info)
+> >>>  		skb_shinfo(skb)->gso_type |= SKB_GSO_TCP_ECN;
+> >>>  
+> >>>  	if (l234info & BIT(HNS3_RXD_GRO_FIXID_B))
+> >>> -		skb_shinfo(skb)->gso_type |= SKB_GSO_TCP_FIXEDID;
+> >>> +		skb_shinfo(skb)->gso_type |= SKB_GSO_TCP_FIXEDID_OUTER;
+> >>>  
+> >>>  	skb->csum_start = (unsigned char *)th - skb->head;
+> >>>  	skb->csum_offset = offsetof(struct tcphdr, check);
+> >>> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+> >>> index b8c609d91d11..78df60c62225 100644
+> >>> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+> >>> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+> >>> @@ -1289,8 +1289,12 @@ static void mlx5e_shampo_update_ipv4_tcp_hdr(struct mlx5e_rq *rq, struct iphdr *
+> >>>  	tcp->check = ~tcp_v4_check(skb->len - tcp_off, ipv4->saddr,
+> >>>  				   ipv4->daddr, 0);
+> >>>  	skb_shinfo(skb)->gso_type |= SKB_GSO_TCPV4;
+> >>> -	if (ntohs(ipv4->id) == rq->hw_gro_data->second_ip_id)
+> >>> -		skb_shinfo(skb)->gso_type |= SKB_GSO_TCP_FIXEDID;
+> >>> +	if (ntohs(ipv4->id) == rq->hw_gro_data->second_ip_id) {
+> >>> +		bool encap = rq->hw_gro_data->fk.control.flags & FLOW_DIS_ENCAPSULATION;
+> >>> +
+> >>> +		skb_shinfo(skb)->gso_type |= encap ?
+> >>> +					     SKB_GSO_TCP_FIXEDID_INNER : SKB_GSO_TCP_FIXEDID_OUTER;
+> >>> +	}
+> >>>  
+> >>>  	skb->csum_start = (unsigned char *)tcp - skb->head;
+> >>>  	skb->csum_offset = offsetof(struct tcphdr, check);
+> >>> diff --git a/drivers/net/ethernet/sfc/ef100_tx.c b/drivers/net/ethernet/sfc/ef100_tx.c
+> >>> index e6b6be549581..aab2425e62bb 100644
+> >>> --- a/drivers/net/ethernet/sfc/ef100_tx.c
+> >>> +++ b/drivers/net/ethernet/sfc/ef100_tx.c
+> >>> @@ -189,7 +189,8 @@ static void ef100_make_tso_desc(struct efx_nic *efx,
+> >>>  {
+> >>>  	bool gso_partial = skb_shinfo(skb)->gso_type & SKB_GSO_PARTIAL;
+> >>>  	unsigned int len, ip_offset, tcp_offset, payload_segs;
+> >>> -	u32 mangleid = ESE_GZ_TX_DESC_IP4_ID_INC_MOD16;
+> >>> +	u32 mangleid_outer = ESE_GZ_TX_DESC_IP4_ID_INC_MOD16;
+> >>> +	u32 mangleid_inner = ESE_GZ_TX_DESC_IP4_ID_INC_MOD16;
+> >>>  	unsigned int outer_ip_offset, outer_l4_offset;
+> >>>  	u16 vlan_tci = skb_vlan_tag_get(skb);
+> >>>  	u32 mss = skb_shinfo(skb)->gso_size;
+> >>> @@ -200,8 +201,10 @@ static void ef100_make_tso_desc(struct efx_nic *efx,
+> >>>  	bool outer_csum;
+> >>>  	u32 paylen;
+> >>>  
+> >>> -	if (skb_shinfo(skb)->gso_type & SKB_GSO_TCP_FIXEDID)
+> >>> -		mangleid = ESE_GZ_TX_DESC_IP4_ID_NO_OP;
+> >>> +	if (skb_shinfo(skb)->gso_type & SKB_GSO_TCP_FIXEDID_OUTER)
+> >>> +		mangleid_outer = ESE_GZ_TX_DESC_IP4_ID_NO_OP;
+> >>> +	if (skb_shinfo(skb)->gso_type & SKB_GSO_TCP_FIXEDID_INNER)
+> >>> +		mangleid_inner = ESE_GZ_TX_DESC_IP4_ID_NO_OP;
+> >>>  	if (efx->net_dev->features & NETIF_F_HW_VLAN_CTAG_TX)
+> >>>  		vlan_enable = skb_vlan_tag_present(skb);
+> >>>  
+> >>> @@ -239,14 +242,13 @@ static void ef100_make_tso_desc(struct efx_nic *efx,
+> >>>  			      ESF_GZ_TX_TSO_CSO_INNER_L4, 1,
+> >>>  			      ESF_GZ_TX_TSO_INNER_L3_OFF_W, ip_offset >> 1,
+> >>>  			      ESF_GZ_TX_TSO_INNER_L4_OFF_W, tcp_offset >> 1,
+> >>> -			      ESF_GZ_TX_TSO_ED_INNER_IP4_ID, mangleid,
+> >>> +			      ESF_GZ_TX_TSO_ED_INNER_IP4_ID, mangleid_inner,
+> >>>  			      ESF_GZ_TX_TSO_ED_INNER_IP_LEN, 1,
+> >>>  			      ESF_GZ_TX_TSO_OUTER_L3_OFF_W, outer_ip_offset >> 1,
+> >>>  			      ESF_GZ_TX_TSO_OUTER_L4_OFF_W, outer_l4_offset >> 1,
+> >>>  			      ESF_GZ_TX_TSO_ED_OUTER_UDP_LEN, udp_encap && !gso_partial,
+> >>>  			      ESF_GZ_TX_TSO_ED_OUTER_IP_LEN, encap && !gso_partial,
+> >>> -			      ESF_GZ_TX_TSO_ED_OUTER_IP4_ID, encap ? mangleid :
+> >>> -								     ESE_GZ_TX_DESC_IP4_ID_NO_OP,
+> >>> +			      ESF_GZ_TX_TSO_ED_OUTER_IP4_ID, mangleid_outer,
+> >>>  			      ESF_GZ_TX_TSO_VLAN_INSERT_EN, vlan_enable,
+> >>>  			      ESF_GZ_TX_TSO_VLAN_INSERT_TCI, vlan_tci
+> >>>  		);
+> >>> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> >>> index 5e5de4b0a433..e55ba6918b0a 100644
+> >>> --- a/include/linux/netdevice.h
+> >>> +++ b/include/linux/netdevice.h
+> >>> @@ -5287,13 +5287,18 @@ void skb_warn_bad_offload(const struct sk_buff *skb);
+> >>>  
+> >>>  static inline bool net_gso_ok(netdev_features_t features, int gso_type)
+> >>>  {
+> >>> -	netdev_features_t feature = (netdev_features_t)gso_type << NETIF_F_GSO_SHIFT;
+> >>> +	netdev_features_t feature;
+> >>> +
+> >>> +	if (gso_type & (SKB_GSO_TCP_FIXEDID_OUTER | SKB_GSO_TCP_FIXEDID_INNER))
+> >>> +		gso_type |= __SKB_GSO_TCP_FIXEDID;
+> >>
+> >> This is quite peculiar.
+> >>
+> >> Is there a real use case for specifying FIXEDID separately for outer
+> >> and inner? Can the existing single bit govern both together instead?
+> >> That would be a lot simpler.
+> > 
+> > I guess not, as with GRO this is under control of the sender, and
+> > possibly a separate middlebox in control of encapsulation.
+> > 
+> > Still, possible to preserve existing FIXEDID for the unencapsulated
+> > or inner, and add only one extra FIXEDID for outer? Or is there value
+> > in having three bits?
+> 
+> The ideal solution would be to split NETIF_F_TSO_MANGLEID into
+> NETIF_F_TSO_MANGLEID_OUTER and NETIF_F_TSO_MANGLEID_INNER.
+>  
+> As I noted, we can add this in the future, then each SKB_GSO_FIXEDID
+> bit will have a corresponding NETIF_F_TSO_MANGLEID bit. This would
+> be a much bigger change, as it requires modifying all of the
+> drivers that use NETIF_F_TSO_MANGLEID. My proposed solution is
+> somewhat of a middle-ground, as it preserves the current behavior of
+> NETIF_F_TSO_MANGLEID.
+>  
+> Preserving the existing FIXEDID for unencapsulated or inner headers
+> seems confusing to me, and just moves the ugly code elsewhere. We also
+> still need to compare both SKB_GSO_FIXEDID bits against NETIF_F_TSO_MANGLEID.
 
-The driver supports configuring PPS output using the standard
-PTP subsystem, allowing precise periodic signal generation for
-time synchronization applications.
+Is it not simpler to keep NETIF_F_TSO_MANGLEID and SKB_GSO_FIXEDID as
+meaning unencapsulated, and add an ENCAP variant for outer headers of
+encapsulated packets. Similar to separate UDP_TUNNEL bits.
 
-The feature has been verified using the testptp tool and
-oscilloscope.
+No device currently advertises support for outer FIXEDID. We don't
+intend to add this as an ethtool configurable feature. It is only used
+for GRO packets to maintain GRO+GSO semanticss when forwarding. So no
+matching NETIF_F flag is probably okay. 
 
-Signed-off-by: Raju Rangoju <Raju.Rangoju@amd.com>
----
- drivers/net/ethernet/amd/xgbe/Makefile      |  2 +-
- drivers/net/ethernet/amd/xgbe/xgbe-common.h | 60 +++++++++++++++++++--
- drivers/net/ethernet/amd/xgbe/xgbe-pps.c    | 58 ++++++++++++++++++++
- drivers/net/ethernet/amd/xgbe/xgbe-ptp.c    | 30 ++++++++++-
- drivers/net/ethernet/amd/xgbe/xgbe.h        | 12 +++++
- 5 files changed, 157 insertions(+), 5 deletions(-)
- create mode 100644 drivers/net/ethernet/amd/xgbe/xgbe-pps.c
-
-diff --git a/drivers/net/ethernet/amd/xgbe/Makefile b/drivers/net/ethernet/amd/xgbe/Makefile
-index 5b0ab6240cf2..d546a212806a 100644
---- a/drivers/net/ethernet/amd/xgbe/Makefile
-+++ b/drivers/net/ethernet/amd/xgbe/Makefile
-@@ -3,7 +3,7 @@ obj-$(CONFIG_AMD_XGBE) += amd-xgbe.o
- 
- amd-xgbe-objs := xgbe-main.o xgbe-drv.o xgbe-dev.o \
- 		 xgbe-desc.o xgbe-ethtool.o xgbe-mdio.o \
--		 xgbe-hwtstamp.o xgbe-ptp.o \
-+		 xgbe-hwtstamp.o xgbe-ptp.o xgbe-pps.o\
- 		 xgbe-i2c.o xgbe-phy-v1.o xgbe-phy-v2.o \
- 		 xgbe-platform.o
- 
-diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-common.h b/drivers/net/ethernet/amd/xgbe/xgbe-common.h
-index 009fbc9b11ce..ef4a5c7a9454 100644
---- a/drivers/net/ethernet/amd/xgbe/xgbe-common.h
-+++ b/drivers/net/ethernet/amd/xgbe/xgbe-common.h
-@@ -223,11 +223,18 @@
- #define MAC_TSSR			0x0d20
- #define MAC_TXSNR			0x0d30
- #define MAC_TXSSR			0x0d34
-+#define MAC_AUXCR			0x0d40
-+#define MAC_ATSNR			0x0d48
-+#define MAC_ATSSR			0x0d4C
- #define MAC_TICNR                       0x0d58
- #define MAC_TICSNR                      0x0d5C
- #define MAC_TECNR                       0x0d60
- #define MAC_TECSNR                      0x0d64
--
-+#define MAC_PPSCR			0x0d70
-+#define MAC_PPS0_TTSR			0x0d80
-+#define MAC_PPS0_TTNSR			0x0d84
-+#define MAC_PPS0_INTERVAL		0x0d88
-+#define MAC_PPS0_WIDTH			0x0d8C
- #define MAC_QTFCR_INC			4
- #define MAC_MACA_INC			4
- #define MAC_HTR_INC			4
-@@ -235,6 +242,29 @@
- #define MAC_RQC2_INC			4
- #define MAC_RQC2_Q_PER_REG		4
- 
-+/* PPS helpers */
-+#define PPSEN0				BIT(4)
-+#define MAC_PPSx_TTSR(x)		((MAC_PPS0_TTSR) + ((x) * 0x10))
-+#define MAC_PPSx_TTNSR(x)		((MAC_PPS0_TTNSR) + ((x) * 0x10))
-+#define MAC_PPSx_INTERVAL(x)		((MAC_PPS0_INTERVAL) + ((x) * 0x10))
-+#define MAC_PPSx_WIDTH(x)		((MAC_PPS0_WIDTH) + ((x) * 0x10))
-+#define PPS_MAXIDX(x)			((((x) + 1) * 8) - 1)
-+#define PPS_MINIDX(x)			((x) * 8)
-+#define PPSx_MASK(x) ({						\
-+	unsigned int __x = (x);					\
-+	GENMASK(PPS_MAXIDX(__x), PPS_MINIDX(__x));		\
-+})
-+#define PPSCMDx(x, val) ({					\
-+	unsigned int __x = (x);					\
-+	GENMASK(PPS_MINIDX(__x) + 3, PPS_MINIDX(__x)) &		\
-+	((val) << PPS_MINIDX(__x));				\
-+})
-+#define TRGTMODSELx(x, val) ({					\
-+	unsigned int __x = (x);					\
-+	GENMASK(PPS_MAXIDX(__x) - 1, PPS_MAXIDX(__x) - 2) &	\
-+	((val) << (PPS_MAXIDX(__x) - 2));			\
-+})
-+
- /* MAC register entry bit positions and sizes */
- #define MAC_HWF0R_ADDMACADRSEL_INDEX	18
- #define MAC_HWF0R_ADDMACADRSEL_WIDTH	5
-@@ -460,8 +490,26 @@
- #define MAC_TSCR_TXTSSTSM_WIDTH		1
- #define MAC_TSSR_TXTSC_INDEX		15
- #define MAC_TSSR_TXTSC_WIDTH		1
-+#define MAC_TSSR_ATSSTN_INDEX		16
-+#define MAC_TSSR_ATSSTN_WIDTH		4
-+#define MAC_TSSR_ATSNS_INDEX		25
-+#define MAC_TSSR_ATSNS_WIDTH		5
-+#define MAC_TSSR_ATSSTM_INDEX		24
-+#define MAC_TSSR_ATSSTM_WIDTH		1
-+#define MAC_TSSR_ATSSTN_INDEX		16
-+#define MAC_TSSR_ATSSTN_WIDTH		4
-+#define MAC_TSSR_AUXTSTRIG_INDEX	2
-+#define MAC_TSSR_AUXTSTRIG_WIDTH	1
- #define MAC_TXSNR_TXTSSTSMIS_INDEX	31
- #define MAC_TXSNR_TXTSSTSMIS_WIDTH	1
-+#define MAC_AUXCR_ATSEN3_INDEX		7
-+#define MAC_AUXCR_ATSEN3_WIDTH		1
-+#define MAC_AUXCR_ATSEN2_INDEX		6
-+#define MAC_AUXCR_ATSEN2_WIDTH		1
-+#define MAC_AUXCR_ATSEN1_INDEX		5
-+#define MAC_AUXCR_ATSEN1_WIDTH		1
-+#define MAC_AUXCR_ATSEN0_INDEX		4
-+#define MAC_AUXCR_ATSEN0_WIDTH		1
- #define MAC_TICSNR_TSICSNS_INDEX	8
- #define MAC_TICSNR_TSICSNS_WIDTH	8
- #define MAC_TECSNR_TSECSNS_INDEX	8
-@@ -496,8 +544,14 @@
- #define MAC_VR_SNPSVER_WIDTH		8
- #define MAC_VR_USERVER_INDEX		16
- #define MAC_VR_USERVER_WIDTH		8
--
--/* MMC register offsets */
-+#define MAC_PPSCR_PPSEN0_INDEX		4
-+#define MAC_PPSCR_PPSEN0_WIDTH		1
-+#define MAC_PPSCR_PPSCTRL0_INDEX	0
-+#define MAC_PPSCR_PPSCTRL0_WIDTH	4
-+#define MAC_PPSx_TTNSR_TRGTBUSY0_INDEX	31
-+#define MAC_PPSx_TTNSR_TRGTBUSY0_WIDTH	1
-+
-+ /* MMC register offsets */
- #define MMC_CR				0x0800
- #define MMC_RISR			0x0804
- #define MMC_TISR			0x0808
-diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-pps.c b/drivers/net/ethernet/amd/xgbe/xgbe-pps.c
-new file mode 100644
-index 000000000000..449720a60df5
---- /dev/null
-+++ b/drivers/net/ethernet/amd/xgbe/xgbe-pps.c
-@@ -0,0 +1,58 @@
-+// SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-3-Clause)
-+/*
-+ * Copyright (c) 2014-2025, Advanced Micro Devices, Inc.
-+ * Copyright (c) 2014, Synopsys, Inc.
-+ * All rights reserved
-+ *
-+ * Author: Raju Rangoju <Raju.Rangoju@amd.com>
-+ */
-+
-+#include "xgbe.h"
-+#include "xgbe-common.h"
-+
-+int xgbe_pps_config(struct xgbe_prv_data *pdata,
-+		    struct xgbe_pps_config *cfg, int index, int on)
-+{
-+	unsigned int value = 0;
-+	unsigned int tnsec;
-+	u64 period;
-+
-+	tnsec = XGMAC_IOREAD(pdata, MAC_PPSx_TTNSR(index));
-+	if (XGMAC_GET_BITS(tnsec, MAC_PPSx_TTNSR, TRGTBUSY0))
-+		return -EBUSY;
-+
-+	value = XGMAC_IOREAD(pdata, MAC_PPSCR);
-+
-+	value &= ~PPSx_MASK(index);
-+
-+	if (!on) {
-+		value |= PPSCMDx(index, 0x5);
-+		value |= PPSEN0;
-+		XGMAC_IOWRITE(pdata, MAC_PPSCR, value);
-+		return 0;
-+	}
-+
-+	XGMAC_IOWRITE(pdata, MAC_PPSx_TTSR(index), cfg->start.tv_sec);
-+	XGMAC_IOWRITE(pdata, MAC_PPSx_TTNSR(index), cfg->start.tv_nsec);
-+
-+	period = cfg->period.tv_sec * NSEC_PER_SEC;
-+	period += cfg->period.tv_nsec;
-+	do_div(period, XGBE_V2_TSTAMP_SSINC);
-+
-+	if (period <= 1)
-+		return -EINVAL;
-+
-+	XGMAC_IOWRITE(pdata, MAC_PPSx_INTERVAL(index), period - 1);
-+	period >>= 1;
-+	if (period <= 1)
-+		return -EINVAL;
-+
-+	XGMAC_IOWRITE(pdata, MAC_PPSx_WIDTH(index), period - 1);
-+
-+	value |= PPSCMDx(index, 0x2);
-+	value |= TRGTMODSELx(index, 0x2);
-+	value |= PPSEN0;
-+
-+	XGMAC_IOWRITE(pdata, MAC_PPSCR, value);
-+	return 0;
-+}
-diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-ptp.c b/drivers/net/ethernet/amd/xgbe/xgbe-ptp.c
-index 3658afc7801d..c4b7dcf886ec 100644
---- a/drivers/net/ethernet/amd/xgbe/xgbe-ptp.c
-+++ b/drivers/net/ethernet/amd/xgbe/xgbe-ptp.c
-@@ -106,7 +106,33 @@ static int xgbe_settime(struct ptp_clock_info *info,
- static int xgbe_enable(struct ptp_clock_info *info,
- 		       struct ptp_clock_request *request, int on)
- {
--	return -EOPNOTSUPP;
-+	struct xgbe_prv_data *pdata = container_of(info, struct xgbe_prv_data,
-+						   ptp_clock_info);
-+	struct xgbe_pps_config *pps_cfg;
-+	unsigned long flags;
-+	int ret;
-+
-+	dev_dbg(pdata->dev, "rq->type %d on %d\n", request->type, on);
-+
-+	if (request->type != PTP_CLK_REQ_PEROUT)
-+		return -EOPNOTSUPP;
-+
-+	/* Reject requests with unsupported flags */
-+	if (request->perout.flags)
-+		return -EOPNOTSUPP;
-+
-+	pps_cfg = &pdata->pps[request->perout.index];
-+
-+	pps_cfg->start.tv_sec = request->perout.start.sec;
-+	pps_cfg->start.tv_nsec = request->perout.start.nsec;
-+	pps_cfg->period.tv_sec = request->perout.period.sec;
-+	pps_cfg->period.tv_nsec = request->perout.period.nsec;
-+
-+	spin_lock_irqsave(&pdata->tstamp_lock, flags);
-+	ret = xgbe_pps_config(pdata, pps_cfg, request->perout.index, on);
-+	spin_unlock_irqrestore(&pdata->tstamp_lock, flags);
-+
-+	return ret;
- }
- 
- void xgbe_ptp_register(struct xgbe_prv_data *pdata)
-@@ -122,6 +148,8 @@ void xgbe_ptp_register(struct xgbe_prv_data *pdata)
- 	info->adjtime = xgbe_adjtime;
- 	info->gettimex64 = xgbe_gettimex;
- 	info->settime64 = xgbe_settime;
-+	info->n_per_out = pdata->hw_feat.pps_out_num;
-+	info->n_ext_ts = pdata->hw_feat.aux_snap_num;
- 	info->enable = xgbe_enable;
- 
- 	clock = ptp_clock_register(info, pdata->dev);
-diff --git a/drivers/net/ethernet/amd/xgbe/xgbe.h b/drivers/net/ethernet/amd/xgbe/xgbe.h
-index d7e03e292ec4..adc2b5f69095 100644
---- a/drivers/net/ethernet/amd/xgbe/xgbe.h
-+++ b/drivers/net/ethernet/amd/xgbe/xgbe.h
-@@ -672,6 +672,11 @@ struct xgbe_ext_stats {
- 	u64 rx_vxlan_csum_errors;
- };
- 
-+struct xgbe_pps_config {
-+	struct timespec64 start;
-+	struct timespec64 period;
-+};
-+
- struct xgbe_hw_if {
- 	int (*tx_complete)(struct xgbe_ring_desc *);
- 
-@@ -1142,6 +1147,9 @@ struct xgbe_prv_data {
- 	struct sk_buff *tx_tstamp_skb;
- 	u64 tx_tstamp;
- 
-+	/* Pulse Per Second output */
-+	struct xgbe_pps_config pps[4];
-+
- 	/* DCB support */
- 	struct ieee_ets *ets;
- 	struct ieee_pfc *pfc;
-@@ -1304,6 +1312,10 @@ void xgbe_prep_tx_tstamp(struct xgbe_prv_data *pdata,
- int xgbe_init_ptp(struct xgbe_prv_data *pdata);
- void xgbe_update_tstamp_time(struct xgbe_prv_data *pdata, unsigned int sec,
- 			     unsigned int nsec);
-+
-+int xgbe_pps_config(struct xgbe_prv_data *pdata, struct xgbe_pps_config *cfg,
-+		    int index, int on);
-+
- #ifdef CONFIG_DEBUG_FS
- void xgbe_debugfs_init(struct xgbe_prv_data *);
- void xgbe_debugfs_exit(struct xgbe_prv_data *);
--- 
-2.34.1
 
 
