@@ -1,182 +1,91 @@
-Return-Path: <netdev+bounces-214724-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214725-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04A3BB2B098
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 20:37:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62840B2B0DE
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 20:52:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C2471B63656
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 18:37:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6228918A6398
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 18:51:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 420382253A0;
-	Mon, 18 Aug 2025 18:37:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C6A926FD8F;
+	Mon, 18 Aug 2025 18:50:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aBHIRF+K"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t3vXP1eM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B59B83314D5;
-	Mon, 18 Aug 2025 18:37:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6246A204F8C;
+	Mon, 18 Aug 2025 18:50:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755542239; cv=none; b=D8eTolGNCueEaw/j+FBmgg4+y848EMIbft/fC/p2mTBC2IAcCDYTNxAxmABazgLf73GVjIS6lCvsRSoRBl6sy7xEwqVO3VNZF4WX6p+kz/4a1YRaDva6hm8YbsgzrSEv8U8uQXbcy7Q3v+pXvJIeYKG4XzXdff/ryx5Rv1fHwMY=
+	t=1755543044; cv=none; b=VuOhbgYDhePWw+DgloEtm0fBx8WNUY1iSw/mdoeEmxyx8Q+TMwDYW2E9CNoYmf6fbRPzDUhRT0kTdBlXCscJG3s+L+Ea64bLgzZopTUVasUWJlEbrQ3Fp7wbOn7j0n/bxgY9IIgwh/gb5ugxKOhjnjDoHyT6+eN6zBvx5hxRBWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755542239; c=relaxed/simple;
-	bh=s+h/zpdcLO2sufU3UTB1WVULDoAddfqD9Pkjy5KuALY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kJ6deW49ib5iuRnkpyRZQ1HsBx1QwyTwJ3SKVceowfNglrnN4Iso8uYqZBgTRIjPXHl54kcMaal2d2qhRTkwNfdeefhdt93gsG8zKwOqEo7+y4Qoq1BUysFR8igxfB+tWjURyH6VJdHw6C6JWVVo7G4OV4qHIF0vpGqzKkLFBdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aBHIRF+K; arc=none smtp.client-ip=209.85.166.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-3e566327065so24727855ab.0;
-        Mon, 18 Aug 2025 11:37:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755542235; x=1756147035; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=l7NhKU41/8jq0SdZcC8/fNpL86G4XGs3Ymmr1MZpRjc=;
-        b=aBHIRF+KkQDgdKkNEGFVrBR+XEtjjdbggkxq4ppPRLD2ElwHymh//Y2P79FfvlSo8t
-         hqYgDAVPLJIDtLTYw+GXByLPzjQs2Nd6OVUWXX7xQrMa+pvsQWW2167SlKQ5ANmd3OIJ
-         Bfy/IxQH7RhIbnBegG/VypgWh4mQmyHI2KWkL8E+OdSIK5QeOENzbetfXaU7TohOKII2
-         JwKEJjQDF06h+n8SlUTRNql5jNl8uB30iEtv5YmTu+cLqQvQL0aTa7bhqqBBX3EV62sI
-         4NFpNPTHRgPxJ/JmK5EMCQ+9xo9en1jyDb3ibpeYtghpEqbXQt2xcFRNl/eTO8vwThQx
-         Vqgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755542235; x=1756147035;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=l7NhKU41/8jq0SdZcC8/fNpL86G4XGs3Ymmr1MZpRjc=;
-        b=TsUrbGzAiDFmtv2Ud0owrXZpvfoS1/ThK2R0t4dNQ3BBr+zfhyhUrvrkoIgvSRKg9v
-         xJkh06YNFzIkU+iopwe5JdkaD10cDxBDJ/s7tzXRUXwj2Dm2zpwmRgA5hFIf7lLs2igp
-         E9lBVpDp4YiNsBasQbJ/8gzPasQyVilINDVplAPUybDYP2MeS8D7JnDmkKFOV64fxI4x
-         ugwMKbTaNisbfU13th3UEGX+10KNRlEnnOlEwGVAIDH/wrExlXEz+qKSNgxxVa00a1/y
-         okrgKq/76bNOgXYUIBNsyYTwaIpR9lBQABOb5G8u+41R/v1OsqTqvj9O00ZInyt1MYaA
-         7zWA==
-X-Forwarded-Encrypted: i=1; AJvYcCU0l3VvIgaqE2hHwYb+6/oZ++CWI4EoaFPk8c2cpOhwU8/HvSsPPkOVGzw/1QC8gNsaDdRrF8BI@vger.kernel.org, AJvYcCV0ytZeRoiM8SqvP/XjWA6Y4J3bRWFMMX2dXT6/ZiX7TIeFB3vCRyUeVLMC74MNEq17bJaUHqRPod+y@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyjdo78YdrGhl6O4FER+3vdKF78+vXqtkeSfl5N3EDPqacAJbN7
-	MqA/nQaNiGRAkO/H5gkNnerW9z41nhs1PkAT7D2+CfmsDpxAUXTMOuHK9Q+DL2zbiVgIs+iaqcL
-	5AQ5XQWb9RD2dggypxv6fmzdXwl9EDuY=
-X-Gm-Gg: ASbGncsUhWPI0oeoKbNjGfFE5O3Bss6FUGkagsxRK7KugrxMad9okWcjO3lQHiGZdVL
-	4XfItFRREkZZ5TozPD6KEfLc7bq+Zyg/2h1jkdDlvm+fVhRbFoGr7FRHggYZ+rGgpTB79D+ro3Z
-	HVbZwWg0NlhC1Oj6/g+z2IE+jF6iiV+93lUxsJHAr3pRSHj84Hh59mWFYbP4X7Jd0rc+xrvMDO3
-	HE9CLkqWXUCBF6/dSb+
-X-Google-Smtp-Source: AGHT+IFp/eqRpxZrpvX0+FdFTm9XYzuEaxMNWfFdXQBOq53uvPeyc2lisbJohLLKbeqhWF3vjCt8PfLqxKmdZxE8ZEs=
-X-Received: by 2002:a92:cda3:0:b0:3e5:52a3:daf9 with SMTP id
- e9e14a558f8ab-3e674fc671dmr11528635ab.2.1755542234757; Mon, 18 Aug 2025
- 11:37:14 -0700 (PDT)
+	s=arc-20240116; t=1755543044; c=relaxed/simple;
+	bh=O7W48Fc++HUPE3zXQ8Whd5Cxn4EyCN0S+wvkwo8T5RE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Kq/uWc2Q+oL3ArvFZSMKq9VRxs7q7cj3kGFuRHaQiZXC1qNH4Ba/6soQ5izpdE0u9f38gidws6bt2L3R0F8ZLIbhZE/7PD1T9ihigFzdubAKghQU49lDIhoFpMi4M7aDaL3bA7r2o0bYhEMvwcxN9OkOo3A9pyXrSXNBhdxkWwo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t3vXP1eM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26CF6C4CEEB;
+	Mon, 18 Aug 2025 18:50:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755543042;
+	bh=O7W48Fc++HUPE3zXQ8Whd5Cxn4EyCN0S+wvkwo8T5RE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=t3vXP1eM67XEvvowb0QFpyCezDN/pZI5ZonNHywmtRNwjqYiwwo4HOOkRTBUzUiqh
+	 zRxRu+B7O0nMt/iXbOMtr8GdI5eyMt3HjI2JwE6p/b3P9y9BZt3r/gr4kg/jMRIUaE
+	 z4EgCJcsh+WymXdCGnjgiZsg7tp8a98/L3Gpd3lAVsgtqieOk559Jnsf+xUPuE41Tr
+	 bgNN8BZo8r4jw9s2r8eNna1mjOQzZFYMFpKts6aMsJsnXyTQzzVz9OBu7hrpr8XTxI
+	 LGY7FyLcMhw75D1yy7mBAOtpn3Ek/s8IUQUF2GBqwITGDW0nKyJpU52Awn1N1ybQh8
+	 dvaOQQaUpAUvw==
+Date: Mon, 18 Aug 2025 11:50:41 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: Stanimir Varbanov <svarbanov@suse.de>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-rpi-kernel@lists.infradead.org,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Andrea della Porta <andrea.porta@suse.com>, Nicolas
+ Ferre <nicolas.ferre@microchip.com>, Claudiu Beznea
+ <claudiu.beznea@tuxon.dev>, Phil Elwell <phil@raspberrypi.com>, Jonathan
+ Bell <jonathan@raspberrypi.com>, Dave Stevenson
+ <dave.stevenson@raspberrypi.com>
+Subject: Re: [PATCH 0/5] Add ethernet support for RPi5
+Message-ID: <20250818115041.71041ad6@kernel.org>
+In-Reply-To: <4c454b3c-f62c-4086-a665-282aa2f4a0e1@broadcom.com>
+References: <20250815135911.1383385-1-svarbanov@suse.de>
+	<4c454b3c-f62c-4086-a665-282aa2f4a0e1@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1755525878.git.lucien.xin@gmail.com> <50eb7a8c7f567f0a87b6e11d2ad835cdbb9546b4.1755525878.git.lucien.xin@gmail.com>
- <5d5ac074-1790-410e-acf9-0e559cb7eacb@samba.org> <e4167710-3667-497b-b12e-096fd06217d9@kernel.org>
-In-Reply-To: <e4167710-3667-497b-b12e-096fd06217d9@kernel.org>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Mon, 18 Aug 2025 14:37:03 -0400
-X-Gm-Features: Ac12FXyEgNTxVIoWpY0UM5RyDGnPhjjnR1Tzf70bDhn5xnUoI_HCY-n9PLVqlRU
-Message-ID: <CADvbK_dztN+x1-M6L841X-JROxrQYh=ENQJC_E1TbcPXErkHSQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 01/15] net: define IPPROTO_QUIC and SOL_QUIC constants
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: Stefan Metzmacher <metze@samba.org>, network dev <netdev@vger.kernel.org>, davem@davemloft.net, 
-	kuba@kernel.org, Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Moritz Buhl <mbuhl@openbsd.org>, 
-	Tyler Fanelli <tfanelli@redhat.com>, Pengtao He <hepengtao@xiaomi.com>, linux-cifs@vger.kernel.org, 
-	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
-	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
-	Benjamin Coddington <bcodding@redhat.com>, Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, 
-	Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe" <alibuda@linux.alibaba.com>, 
-	Jason Baron <jbaron@akamai.com>, illiliti <illiliti@protonmail.com>, 
-	Sabrina Dubroca <sd@queasysnail.net>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
-	Daniel Stenberg <daniel@haxx.se>, Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Aug 18, 2025 at 12:20=E2=80=AFPM Matthieu Baerts <matttbe@kernel.or=
-g> wrote:
->
-> Hi Stefan, Xin,
->
-> On 18/08/2025 16:31, Stefan Metzmacher wrote:
-> > Hi,
-> >
-> >> diff --git a/include/linux/socket.h b/include/linux/socket.h
-> >> index 3b262487ec06..a7c05b064583 100644
-> >> --- a/include/linux/socket.h
-> >> +++ b/include/linux/socket.h
-> >> @@ -386,6 +386,7 @@ struct ucred {
-> >>   #define SOL_MCTP    285
-> >>   #define SOL_SMC        286
-> >>   #define SOL_VSOCK    287
-> >> +#define SOL_QUIC    288
-> >>     /* IPX options */
-> >>   #define IPX_TYPE    1
-> >> diff --git a/include/uapi/linux/in.h b/include/uapi/linux/in.h
-> >> index ced0fc3c3aa5..34becd90d3a6 100644
-> >> --- a/include/uapi/linux/in.h
-> >> +++ b/include/uapi/linux/in.h
-> >> @@ -85,6 +85,8 @@ enum {
-> >>   #define IPPROTO_RAW        IPPROTO_RAW
-> >>     IPPROTO_SMC =3D 256,        /* Shared Memory Communications       =
- */
-> >>   #define IPPROTO_SMC        IPPROTO_SMC
-> >> +  IPPROTO_QUIC =3D 261,        /* A UDP-Based Multiplexed and Secure
-> >> Transport    */
-> >> +#define IPPROTO_QUIC        IPPROTO_QUIC
-> >>     IPPROTO_MPTCP =3D 262,        /* Multipath TCP connection        *=
-/
-> >>   #define IPPROTO_MPTCP        IPPROTO_MPTCP
-> >>     IPPROTO_MAX
-> >
-> > Can these constants be accepted, soon?
-> >
-> > Samba 4.23.0 to be released early September will ship userspace code to
-> > use them. It would be good to have them correct when kernel's start to
-> > support this...
-> >
-> > It would also mean less risk for conflicting projects with the need for
-> > such numbers.
-> >
-> > I think it's useful to use a value lower than IPPROTO_MAX, because it m=
-eans
-> > the kernel module can also be build against older kernels as out of tre=
-e
-> > module
-> > and still it would be transparent for userspace consumers like samba.
-> > There are hardcoded checks for IPPROTO_MAX in inet_create, inet6_create=
-,
-> > inet_diag_register
-> > and the value of IPPROTO_MAX is 263 starting with commit
-> > d25a92ccae6bed02327b63d138e12e7806830f78 in 6.11.
->
-> I would also recommend not changing IPPROTO_MAX here. When IPPROTO_MAX
-> got increased to 263, this caused some (small) small issues because it
-> was hardcoded in some userspace code if I remember well.
->
-> It is unclear why IPPROTO_QUIC is using 261 and not 257, but it should
-> not make any differences I suppose.
->
-I agree, it should not.
+On Mon, 18 Aug 2025 11:02:15 -0700 Florian Fainelli wrote:
+> > Few patches to enable support of ethernet on RPi5.
+> > 
+> >   - first patch is setting upper 32bits of DMA RX ring buffer in case of
+> >     RX queue corruption.
+> >   - second patch is adding a new compatible in cdns,macb yaml document
+> >   - third patch adds compatible and configuration for raspberrypi,rp1-gem
+> >   - forth and fifth patches are adding and enabling ethernet DT node on
+> >     RPi5.
+> > 
+> > Comments are welcome!  
+> 
+> netdev maintainers, do you mind if I take patches 2, 4 and 5 via the 
+> Broadcom ARM SoC tree to avoid generating conflicts down the road? You 
+> can take patches 1 and 3. Thanks
 
-I wasn=E2=80=99t sure if any other project was using 257, so to minimize th=
-e risk
-of conflicts, I=E2=80=99ve been using this large value from the beginning.
-
-> Note that for MPTCP, we picked 262, just in case the protocol number was
-> limited to 8 bits, to fallback to IPPROTO_TCP: 262 & 0xFF =3D 6. At that
-> time, we thought it was important, because we were the first ones to use
-> a value higher than U8_MAX. At the end, it is good for new protocols,
-> not to increase IPPROTO_MAX each time :)
->
-Yes, this approach saves a lot of trouble for new protocols!
-
-Thanks.
+4, 5 make perfect sense, why patch 2? We usually take bindings.
 
