@@ -1,42 +1,42 @@
-Return-Path: <netdev+bounces-214441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBAF4B298BD
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 07:03:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id ACC8CB298CF
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 07:12:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 40B041888A76
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 05:03:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 20A4D18A2320
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 05:12:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96A5B22D780;
-	Mon, 18 Aug 2025 05:03:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE2E626B74F;
+	Mon, 18 Aug 2025 05:12:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="g41Y9JGd"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="g/aVH+GI"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C105F1487E9;
-	Mon, 18 Aug 2025 05:03:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 757EA223DF9;
+	Mon, 18 Aug 2025 05:12:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755493400; cv=none; b=WlZtQQuGLUQ2UNCXU43eo4FGexR1N9G29rIDsRUqUjdgb7k4cqmdxFDoCmjIgB3fM46ey1bJd4HqauBrYiqV2+tM6ydenQBDyhc7WiCjgR4/EfIduPnJYD3r+PUgMKefagPXembOCXSJpiGyDi5C40GNvvarnx0p2jU+l+sJkJc=
+	t=1755493950; cv=none; b=GLe830JNad39p81tjvLmIQ0E2/eOd7RIr1lZWZLqQr42VK2ViJB8fj8mMEBGM+66XQmQ7aPV0jQkHcDycrNkn5G3iyCeTHBG9SNagEnKcNRuTwj8Gl+dM3nz9hc0eSb8uSeGBDmkEcy/zLgEl/4MjIRoROXX3M4Lo82gwlkb7cY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755493400; c=relaxed/simple;
-	bh=6cU68ZuXw/wBW7VvbcAWKqmyjRI2mggS4E9J2UxboOA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=h4vabhtYtqd/Ry+aMiMwnuPPT0TxaQBN3nJSiwvQApH3DgPzLjJZCQ0Ogw06nFTuRa7c8a3kWuI3P2gGKPzUcvzdtc0H6aSy9bThpLrsaAF8SMRT4O2TVJF2ptF+D4TOb9px18Agsi2xypKzesgatl48FWbe5rqUuGcl8SLtOHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=g41Y9JGd; arc=none smtp.client-ip=117.135.210.2
+	s=arc-20240116; t=1755493950; c=relaxed/simple;
+	bh=9d6709BznpruFnZml84j6M3CDOWtvG5GWDV/JXu3rwA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=b1C72RhVVVqccOd6kj573FepLDKjrIz5T9JM39tTdonfJfO+B+zQP71caK7w6CpxH4hGnlZxlaR4vLq4L2m0CLlmG6BlIeo/BeXWM0XnFmjFKBOypc06uEHm29HjyNP2C0bhaDODXJ3jSMgzL+iXpP+YaYo90IXlNNcKbrFs4s4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=g/aVH+GI; arc=none smtp.client-ip=117.135.210.4
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=yZ
-	6M105Af4O3tAkh4Svx0T8DTaCqoK10g8Ja5jSPUMc=; b=g41Y9JGduqDGhrPK31
-	pj2T27zh/3HyKRO9ZcWvJZ9mthOtzSQcay3UNskyjNdi6YLoU1da285FRKP7atrq
-	j14JboHMLZDMTVZXhsavJf8W987KaMI50xhulGKjB77kVHPv4uFC/KlPLqa+N3Gf
-	361ahr9EHulek0R9iKmzBpdnQ=
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=fm
+	tBSJrrmWNNN23sVewZ7cg4sL/NzJoddMUAh4T2glc=; b=g/aVH+GIH9kI/jYPg/
+	jP0peKhFfiekNBQ08rSrcmJkF3SadeuxSlghxBTtXyeZi0gWRdOj3NsoCXxMy9RX
+	zQ1wYkrgUJPSB/Laepj0KWQTiQRN9IhXkHMRtHiHzPJ7CCME1ucOMt6zv4J2ozHN
+	aW3suhWVFsOJLLFc1iyhQNxpI=
 Received: from zhaoxin-MS-7E12.. (unknown [])
-	by gzga-smtp-mtada-g1-0 (Coremail) with SMTP id _____wBXVcLqs6JoFIL7Cg--.15455S2;
-	Mon, 18 Aug 2025 13:02:35 +0800 (CST)
+	by gzga-smtp-mtada-g1-4 (Coremail) with SMTP id _____wBXn7MPtqJoWHrmCA--.3435S2;
+	Mon, 18 Aug 2025 13:11:43 +0800 (CST)
 From: Xin Zhao <jackzxcui1989@163.com>
 To: willemdebruijn.kernel@gmail.com,
 	edumazet@google.com,
@@ -49,8 +49,8 @@ Cc: davem@davemloft.net,
 	linux-kernel@vger.kernel.org,
 	Xin Zhao <jackzxcui1989@163.com>
 Subject: [PATCH net-next v4] net: af_packet: Use hrtimer to do the retire operation
-Date: Mon, 18 Aug 2025 13:02:33 +0800
-Message-Id: <20250818050233.155344-1-jackzxcui1989@163.com>
+Date: Mon, 18 Aug 2025 13:11:41 +0800
+Message-Id: <20250818051141.162309-1-jackzxcui1989@163.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -59,12 +59,12 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wBXVcLqs6JoFIL7Cg--.15455S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW3Gw4kJF17Jr1xuryUXr1fWFg_yoWfZw45pa
+X-CM-TRANSID:_____wBXn7MPtqJoWHrmCA--.3435S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW3Gw4kJF17Jr1xuryUXr1fWFg_yoWfuFWfpa
 	y5WryxGw47ZF4agw48Ars7ZFyFgw1UAryUG393Xw4Syasxtryrt3Wj9r90gFWftFZFyw47
-	ArsYqF15Cw1DXrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0z_rWrxUUUUU=
-X-CM-SenderInfo: pmdfy650fxxiqzyzqiywtou0bp/1tbiox2tCmiir0pmcwAAsj
+	ArsYqFn8Cw1DXrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0zMXdjUUUUUU=
+X-CM-SenderInfo: pmdfy650fxxiqzyzqiywtou0bp/1tbibgWtCmiiryKcKQAAs+
 
 In a system with high real-time requirements, the timeout mechanism of
 ordinary timers with jiffies granularity is insufficient to meet the
@@ -94,6 +94,7 @@ Changes in v3:
 - Add comments to explain why hrtimer_set_expires(not hrtimer_forward_now) is used in
   _prb_refresh_rx_retire_blk_timer
   as suggested by Willem de Bruijn;
+- Link to v3: https://lore.kernel.org/all/20250816170130.3969354-1-jackzxcui1989@163.com/
 
 Changes in v2:
 - Drop the tov_in_msecs field of tpacket_kbdq_core added by the patch
