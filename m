@@ -1,121 +1,139 @@
-Return-Path: <netdev+bounces-214791-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214792-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79AD7B2B4C4
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 01:28:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D57FB2B4C7
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 01:33:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5366F16E8C2
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 23:28:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 302442A7E2A
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 23:33:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF0752264B0;
-	Mon, 18 Aug 2025 23:28:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19F6A22B8D0;
+	Mon, 18 Aug 2025 23:33:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="A9EOX86d"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ALV5OOfJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.4])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29E631F1932;
-	Mon, 18 Aug 2025 23:28:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.4
+Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46E2720D51C
+	for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 23:33:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755559694; cv=none; b=g1G0KQ7w7NOgoqmjhnengNzSvtT3ffy1LTKw0oWmYnqmPkuyfDSdAXf3ZlkI5ocBM5ZWNUq1fzZr2QFAnsal+Bs62D4wVm/KpeOQ3qOuQGB1F6DAktinSob7vaLIQZLIhiK8wZpFdWZhFqNIhmaWsikARSnrvGeNDk90Cv3x0fE=
+	t=1755560033; cv=none; b=JiXwY0CVZzu2pfs7zcpvXyGnR4pm1v7bkblGCclutg/Zi0ObNBGcNp0dyQ9TLKyKjK/w8iCEzioYBMFZKVpYaGh4IGskmB7pbR0zNAAiEDHVEO6jBynIOkEe2tOyINTgkSDa6wLXEPiONevrPmUEd47irdqIry4ZQepK75xhkG0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755559694; c=relaxed/simple;
-	bh=qWU5jKZb9in6UgtT2b/F4r0PzCZrNnHxBos+Lj7LMD0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=J30M2NYL9WZXY8bMzm+UYSZxoUHoCIaoIR8ohAv/k5BzbxDhlXB6E4ddWopGDUNjJLc7k3dCukjEF7XzmbfN2ausXe1V/1HdOhz8M9IBA9yZ2Mc9DFWfhlDcWb3vziSdfuHfbXQQ0RCYh08lVhftVmKEFDFmr+TxOIKNHqptNBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=A9EOX86d; arc=none smtp.client-ip=220.197.31.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=/i
-	z/xnD8uPClOoozqxGllgCqbDdwjuuBB3H3lArHsUo=; b=A9EOX86dEh9/qHSGTK
-	FPdXgxdqwMrWjI+dBsrPaPpBUF3U2SHBhNc06zt3K81EwjkGzvn6Z5llQqcm1qsC
-	Ekq6i2/eVqP+uyhZglyY3ZWoeeceDf1nVS1n5k8+rFiycl+DIj0FLopJ+TN+Qp1Q
-	8YhCTV2eyFbukL1DyIZeFnuFI=
-Received: from MS-CMFLBWVCLQRG.localdomain (unknown [])
-	by gzga-smtp-mtada-g1-2 (Coremail) with SMTP id _____wDnt2hstqNotTBVCw--.32213S2;
-	Tue, 19 Aug 2025 07:25:44 +0800 (CST)
-From: luoguangfei <15388634752@163.com>
-To: nicolas.ferre@microchip.com,
-	claudiu.beznea@tuxon.dev
-Cc: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux@armlinux.org.uk,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	15388634752@163.com
-Subject: [PATCH] net: macb: fix unregister_netdev call order in macb_remove() [v2]
-Date: Tue, 19 Aug 2025 07:25:27 +0800
-Message-ID: <20250818232527.1316-1-15388634752@163.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1755560033; c=relaxed/simple;
+	bh=OoeYFB/BvC/0eRzNt4z96d91dntS57ys6UGlVQXsAGY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aPD4rmNngZWloZaAWmdAgLuKRX6G7KJoYGi1ytQWwvMpqRSkmCxNPz/BUSa0aaxUVMpqXAZNaXOP0qXhRjnNFIAlq4M35jbBKVpK3TGJ0ehSXE4XhLiLcXaHS2h/ouoK7LldajH2rf+vTgcYtNGWZqS2vAhnKhu015+DgK5J1mQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ALV5OOfJ; arc=none smtp.client-ip=209.85.167.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-55cc715d0easo3538e87.0
+        for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 16:33:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1755560029; x=1756164829; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ve2DzLaZnDqnbb7Kf6oBSozuJ15Yl3sv46ZZmhVCBOo=;
+        b=ALV5OOfJwrWkFApNk++CdI5JqRT1SFNkuoBR4ninRxPJOMlvyDvldgDZNL1bbqIork
+         rlf1DuToLYUSz1sgNPLqDkWrU80C86K1mbWu/MihZVc83F0TTUAeeUM05iVw156UhtCK
+         GKMtpjJMyquMEjMu67PLzfHsZG7Fh5J5kdfUBg1HrTUKoNCN1L+fKoUpliwjRYiqFwa4
+         DGitOVsWqb0+yWyFhs8SMvHAtBAeAfS5fyKff5dtjmgO6FhOTPcnw7RZQ+mxjh06bIJU
+         DmZC4VKYXrhfIPowsfQLRUeDT4YfhOHEgjm6ujaesoUkK2hRfSwcODwGpyHyA4Asp0f8
+         XdZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755560029; x=1756164829;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ve2DzLaZnDqnbb7Kf6oBSozuJ15Yl3sv46ZZmhVCBOo=;
+        b=rzroMBv5rgevQu3XbwaELkxymKzZ/xh1PT3M1f3fSUCRl7b1fD/B04X6gByGdqxc0o
+         14rfVyCZ3r3mooLjvRHauwLK2fzRKG7Ux9khIuE1ZW2MELvqRWA2g0gVtFcaxnt23CRn
+         7BEryawzqB4qkqsbrqpy56pypDhNISPPF4/O3sCOl10Dl3vO5cL4I49Va2C5Utws0nj9
+         8PJGEw/agK8oA2NxIaussRspWeu0YGT9lnld5QxcgzTQMFAtfGXFhTsVOw9k5rNduJHa
+         ope/UTzxnsIPG4tkuHtadmPHhFX3dijAYhJl7BRdBkim33xCBKKDPNpffC2DV6kIfUKx
+         JmYw==
+X-Forwarded-Encrypted: i=1; AJvYcCU/zv+W9wdAmCKacbH8m9wRu6zZsXo21TBSS9y5PYKLYJ5dgErswaHtFKe42rzsnYUcE9kvfFw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQx2g4H4USceI4jqCFwu3v7UA2O99P1zAO/10o1MSH+UcZf0o4
+	50vjqEkLBsdk/usME9adbMTbkMqgNHZaDM6E51BzBIldiwHuHPNqbdI+XyiLONnaVR+lY8wjK/w
+	eLViSqumOq4LWZdtLLFhOPssotT/Ct5v8auL08Awc
+X-Gm-Gg: ASbGnctUjEHfHXaCGKfN5zZleZVbEqck81qxBOIBxmUciTjR/oJ529FBQGNGkD4lCUj
+	JohIcLHl6X4cnOMWWqhT0iPVqMpsYZkUtzyLuBRvafv6tQ+U1OXGRuWluleEJSUm6fq5qCXVXRr
+	9gVI+LY6qvoxj5bAk9fPkrVsWuJr+XxzX4m1qsFNJYy5Df+llsoKGm/MTdKn3LQhcSyDHf7ECsg
+	2rFdSG9lY0R4RGF/ZB0+R0+3blS0twbw/vWRWzBnXT8+7BQMdwYB8c=
+X-Google-Smtp-Source: AGHT+IFwQTCOO7naIVkzrh2yLXB0Ye5C7kP2H4rJJJq+y1I2xqZOOFQLhHsiWjrfXhQk7xhvimRErO3eSsYfBgTtoKg=
+X-Received: by 2002:a05:6512:134d:b0:558:fd83:bac6 with SMTP id
+ 2adb3069b0e04-55e009c6000mr76627e87.4.1755560029185; Mon, 18 Aug 2025
+ 16:33:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wDnt2hstqNotTBVCw--.32213S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7tw1fXrW3WFyrur47AFWUArb_yoW8AF43pw
-	43CFyfWryIqr4qvws7Xa1UJFy5Ca47t348Wa4xurZ3Z392kw1qyFW0kFy8u345GFZrAFWa
-	yr1Yya9xAa1kCaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0piBWlDUUUUU=
-X-CM-SenderInfo: jprvjmqywtklivs6il2tof0z/xtbBMRKtn2ijpe73zgAAso
+References: <cover.1755499375.git.asml.silence@gmail.com> <9b6b42be0d7fb60b12203fe4f0f762e882f0d798.1755499376.git.asml.silence@gmail.com>
+In-Reply-To: <9b6b42be0d7fb60b12203fe4f0f762e882f0d798.1755499376.git.asml.silence@gmail.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Mon, 18 Aug 2025 16:33:35 -0700
+X-Gm-Features: Ac12FXwfrqXSKcjrhl3FF7ja5U6Np0FPNPSAiVBM9uAKgBQErhZT7EQQpCxE7UU
+Message-ID: <CAHS8izO76s61JY8SMwDar=76Ech0B_xprzc1KgSDEjaAvbdDfA@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 01/23] net: page_pool: sanitise allocation order
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
+	Eric Dumazet <edumazet@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, andrew+netdev@lunn.ch, horms@kernel.org, 
+	davem@davemloft.net, sdf@fomichev.me, dw@davidwei.uk, 
+	michael.chan@broadcom.com, dtatulea@nvidia.com, ap420073@gmail.com, 
+	linux-kernel@vger.kernel.org, io-uring@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-When removing a macb device, the driver calls phy_exit() before
-unregister_netdev(). This leads to a WARN from kernfs:
+On Mon, Aug 18, 2025 at 6:56=E2=80=AFAM Pavel Begunkov <asml.silence@gmail.=
+com> wrote:
+>
+> We're going to give more control over rx buffer sizes to user space, and
+> since we can't always rely on driver validation, let's sanitise it in
+> page_pool_init() as well. Note that we only need to reject over
+> MAX_PAGE_ORDER allocations for normal page pools, as current memory
+> providers don't need to use the buddy allocator and must check the order
+> on init.
+>
+> Suggested-by: Stanislav Fomichev <stfomichev@gmail.com>
+> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
 
-  ------------[ cut here ]------------
-  kernfs: can not remove 'attached_dev', no directory
-  WARNING: CPU: 1 PID: 27146 at fs/kernfs/dir.c:1683
-  Call trace:
-    kernfs_remove_by_name_ns+0xd8/0xf0
-    sysfs_remove_link+0x24/0x58
-    phy_detach+0x5c/0x168
-    phy_disconnect+0x4c/0x70
-    phylink_disconnect_phy+0x6c/0xc0 [phylink]
-    macb_close+0x6c/0x170 [macb]
-    ...
-    macb_remove+0x60/0x168 [macb]
-    platform_remove+0x5c/0x80
-    ...
+Reviewed-by: Mina Almasry <almasrymina@google.com>
 
-The warning happens because the PHY is being exited while the netdev
-is still registered. The correct order is to unregister the netdev
-before shutting down the PHY and cleaning up the MDIO bus.
+I think I noticed an unrelated bug in this code and we need this fix?
 
-Fix this by moving unregister_netdev() ahead of phy_exit() in
-macb_remove().
+```
+diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+index 343a6cac21e3..ba70569bd4b0 100644
+--- a/net/core/page_pool.c
++++ b/net/core/page_pool.c
+@@ -287,8 +287,10 @@ static int page_pool_init(struct page_pool *pool,
+        }
 
-Fixes: 8b73fa3ae02b ("net: macb: Added ZynqMP-specific initialization")
-Signed-off-by: luoguangfei <15388634752@163.com>
----
- drivers/net/ethernet/cadence/macb_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+        if (pool->mp_ops) {
+-               if (!pool->dma_map || !pool->dma_sync)
+-                       return -EOPNOTSUPP;
++               if (!pool->dma_map || !pool->dma_sync) {
++                       err =3D -EOPNOTSUPP;
++                       goto free_ptr_ring;
++               }
 
-diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index ce55a1f59..7bbb674d5 100644
---- a/drivers/net/ethernet/cadence/macb_main.c
-+++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -5407,11 +5407,11 @@ static void macb_remove(struct platform_device *pdev)
- 
- 	if (dev) {
- 		bp = netdev_priv(dev);
-+		unregister_netdev(dev);
- 		phy_exit(bp->sgmii_phy);
- 		mdiobus_unregister(bp->mii_bus);
- 		mdiobus_free(bp->mii_bus);
- 
--		unregister_netdev(dev);
- 		cancel_work_sync(&bp->hresp_err_bh_work);
- 		pm_runtime_disable(&pdev->dev);
- 		pm_runtime_dont_use_autosuspend(&pdev->dev);
--- 
-2.43.0
+                if (WARN_ON(!is_kernel_rodata((unsigned long)pool->mp_ops))=
+) {
+                        err =3D -EFAULT;
+```
 
+I'll send a separate fix.
+
+
+--
+Thanks,
+Mina
 
