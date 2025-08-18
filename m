@@ -1,112 +1,182 @@
-Return-Path: <netdev+bounces-214723-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214724-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90462B2B094
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 20:36:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04A3BB2B098
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 20:37:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7017A6841E4
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 18:36:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C2471B63656
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 18:37:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F398724503F;
-	Mon, 18 Aug 2025 18:36:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 420382253A0;
+	Mon, 18 Aug 2025 18:37:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="gEO4tuua"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aBHIRF+K"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0279223DEE
-	for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 18:36:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B59B83314D5;
+	Mon, 18 Aug 2025 18:37:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755542208; cv=none; b=by0YKtckrNtFPpEzbaPNv18tcEgr/K2rmxvx7QHmLHSSBiQBKqIAnVntzZnRMFvQEmumSnQfuh24awfjdYh90VB3qdnIA3CQBfZBTu71Xz1X3FiHDHTKT6EjZi7XZMiubbls5wXxAlf2RDZyoZVXwLYRMyM2/M3amxOArB5+Rtc=
+	t=1755542239; cv=none; b=D8eTolGNCueEaw/j+FBmgg4+y848EMIbft/fC/p2mTBC2IAcCDYTNxAxmABazgLf73GVjIS6lCvsRSoRBl6sy7xEwqVO3VNZF4WX6p+kz/4a1YRaDva6hm8YbsgzrSEv8U8uQXbcy7Q3v+pXvJIeYKG4XzXdff/ryx5Rv1fHwMY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755542208; c=relaxed/simple;
-	bh=VFTAGHUcOhCsVCHbgqwMOmNRPxnfj8LmI2zeZpIYYZU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gZn84IgIRPE4B12N8Q1aRBAki+wkIbOZ2bl+kiKsrbA3o4pGQOk0GUqev8cUWzu8jeCA8p/zozM13ITH6wTIInqgqEAj4uLWHAS9dBrlii74EDNLNFK+i13fIBBRnlzabGlarYFVBRAhm4xkR1aR39Muv6dO+VYsPpegJN5Ncxk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=gEO4tuua; arc=none smtp.client-ip=91.218.175.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <cab8df87-46fc-49f4-be1d-a55585587e61@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1755542204;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YEleciuqCzDP1u7gctFkcDKDnO/+TN1KeFYy+R1jcs0=;
-	b=gEO4tuua+R3qWKY7ae9B34t7MxPPMhZhAhTH88tS8smrXk0vsQoY18b7cdkNGb7wp5ywpu
-	2ijpvi/fRAFYTVHfQWmNV8+5fo9gDY8h8EYE5KqqCf0X/fzenRAdz5YSYOOr50s1qSh449
-	18YHT00stMsUcbE8itf5NUgvjm1SD68=
-Date: Mon, 18 Aug 2025 19:35:57 +0100
+	s=arc-20240116; t=1755542239; c=relaxed/simple;
+	bh=s+h/zpdcLO2sufU3UTB1WVULDoAddfqD9Pkjy5KuALY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kJ6deW49ib5iuRnkpyRZQ1HsBx1QwyTwJ3SKVceowfNglrnN4Iso8uYqZBgTRIjPXHl54kcMaal2d2qhRTkwNfdeefhdt93gsG8zKwOqEo7+y4Qoq1BUysFR8igxfB+tWjURyH6VJdHw6C6JWVVo7G4OV4qHIF0vpGqzKkLFBdA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aBHIRF+K; arc=none smtp.client-ip=209.85.166.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-3e566327065so24727855ab.0;
+        Mon, 18 Aug 2025 11:37:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755542235; x=1756147035; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=l7NhKU41/8jq0SdZcC8/fNpL86G4XGs3Ymmr1MZpRjc=;
+        b=aBHIRF+KkQDgdKkNEGFVrBR+XEtjjdbggkxq4ppPRLD2ElwHymh//Y2P79FfvlSo8t
+         hqYgDAVPLJIDtLTYw+GXByLPzjQs2Nd6OVUWXX7xQrMa+pvsQWW2167SlKQ5ANmd3OIJ
+         Bfy/IxQH7RhIbnBegG/VypgWh4mQmyHI2KWkL8E+OdSIK5QeOENzbetfXaU7TohOKII2
+         JwKEJjQDF06h+n8SlUTRNql5jNl8uB30iEtv5YmTu+cLqQvQL0aTa7bhqqBBX3EV62sI
+         4NFpNPTHRgPxJ/JmK5EMCQ+9xo9en1jyDb3ibpeYtghpEqbXQt2xcFRNl/eTO8vwThQx
+         Vqgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755542235; x=1756147035;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=l7NhKU41/8jq0SdZcC8/fNpL86G4XGs3Ymmr1MZpRjc=;
+        b=TsUrbGzAiDFmtv2Ud0owrXZpvfoS1/ThK2R0t4dNQ3BBr+zfhyhUrvrkoIgvSRKg9v
+         xJkh06YNFzIkU+iopwe5JdkaD10cDxBDJ/s7tzXRUXwj2Dm2zpwmRgA5hFIf7lLs2igp
+         E9lBVpDp4YiNsBasQbJ/8gzPasQyVilINDVplAPUybDYP2MeS8D7JnDmkKFOV64fxI4x
+         ugwMKbTaNisbfU13th3UEGX+10KNRlEnnOlEwGVAIDH/wrExlXEz+qKSNgxxVa00a1/y
+         okrgKq/76bNOgXYUIBNsyYTwaIpR9lBQABOb5G8u+41R/v1OsqTqvj9O00ZInyt1MYaA
+         7zWA==
+X-Forwarded-Encrypted: i=1; AJvYcCU0l3VvIgaqE2hHwYb+6/oZ++CWI4EoaFPk8c2cpOhwU8/HvSsPPkOVGzw/1QC8gNsaDdRrF8BI@vger.kernel.org, AJvYcCV0ytZeRoiM8SqvP/XjWA6Y4J3bRWFMMX2dXT6/ZiX7TIeFB3vCRyUeVLMC74MNEq17bJaUHqRPod+y@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyjdo78YdrGhl6O4FER+3vdKF78+vXqtkeSfl5N3EDPqacAJbN7
+	MqA/nQaNiGRAkO/H5gkNnerW9z41nhs1PkAT7D2+CfmsDpxAUXTMOuHK9Q+DL2zbiVgIs+iaqcL
+	5AQ5XQWb9RD2dggypxv6fmzdXwl9EDuY=
+X-Gm-Gg: ASbGncsUhWPI0oeoKbNjGfFE5O3Bss6FUGkagsxRK7KugrxMad9okWcjO3lQHiGZdVL
+	4XfItFRREkZZ5TozPD6KEfLc7bq+Zyg/2h1jkdDlvm+fVhRbFoGr7FRHggYZ+rGgpTB79D+ro3Z
+	HVbZwWg0NlhC1Oj6/g+z2IE+jF6iiV+93lUxsJHAr3pRSHj84Hh59mWFYbP4X7Jd0rc+xrvMDO3
+	HE9CLkqWXUCBF6/dSb+
+X-Google-Smtp-Source: AGHT+IFp/eqRpxZrpvX0+FdFTm9XYzuEaxMNWfFdXQBOq53uvPeyc2lisbJohLLKbeqhWF3vjCt8PfLqxKmdZxE8ZEs=
+X-Received: by 2002:a92:cda3:0:b0:3e5:52a3:daf9 with SMTP id
+ e9e14a558f8ab-3e674fc671dmr11528635ab.2.1755542234757; Mon, 18 Aug 2025
+ 11:37:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [RFC PATCH v5] ethtool: add FEC bins histogramm report
-To: Carolina Jubran <cjubran@nvidia.com>, Andrew Lunn <andrew@lunn.ch>,
- Michael Chan <michael.chan@broadcom.com>,
- Pavan Chebbi <pavan.chebbi@broadcom.com>, Tariq Toukan <tariqt@nvidia.com>,
- Gal Pressman <gal@nvidia.com>, intel-wired-lan@lists.osuosl.org,
- Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org
-References: <20250815132729.2251597-1-vadfed@meta.com>
- <5b8da3d8-f24c-43d8-9d82-0bcc257e1dac@nvidia.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <5b8da3d8-f24c-43d8-9d82-0bcc257e1dac@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <cover.1755525878.git.lucien.xin@gmail.com> <50eb7a8c7f567f0a87b6e11d2ad835cdbb9546b4.1755525878.git.lucien.xin@gmail.com>
+ <5d5ac074-1790-410e-acf9-0e559cb7eacb@samba.org> <e4167710-3667-497b-b12e-096fd06217d9@kernel.org>
+In-Reply-To: <e4167710-3667-497b-b12e-096fd06217d9@kernel.org>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Mon, 18 Aug 2025 14:37:03 -0400
+X-Gm-Features: Ac12FXyEgNTxVIoWpY0UM5RyDGnPhjjnR1Tzf70bDhn5xnUoI_HCY-n9PLVqlRU
+Message-ID: <CADvbK_dztN+x1-M6L841X-JROxrQYh=ENQJC_E1TbcPXErkHSQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 01/15] net: define IPPROTO_QUIC and SOL_QUIC constants
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: Stefan Metzmacher <metze@samba.org>, network dev <netdev@vger.kernel.org>, davem@davemloft.net, 
+	kuba@kernel.org, Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Moritz Buhl <mbuhl@openbsd.org>, 
+	Tyler Fanelli <tfanelli@redhat.com>, Pengtao He <hepengtao@xiaomi.com>, linux-cifs@vger.kernel.org, 
+	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
+	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
+	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
+	Benjamin Coddington <bcodding@redhat.com>, Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, 
+	Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe" <alibuda@linux.alibaba.com>, 
+	Jason Baron <jbaron@akamai.com>, illiliti <illiliti@protonmail.com>, 
+	Sabrina Dubroca <sd@queasysnail.net>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
+	Daniel Stenberg <daniel@haxx.se>, Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 18/08/2025 19:17, Carolina Jubran wrote:
-> 
-> 
-> On 15/08/2025 16:27, Vadim Fedorenko wrote:
->> diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
->> index de5bd76a400ca..6c0dc6ae080a8 100644
->> --- a/include/linux/ethtool.h
->> +++ b/include/linux/ethtool.h
->> @@ -492,7 +492,25 @@ struct ethtool_pause_stats {
->>   };
->>   #define ETHTOOL_MAX_LANES    8
->> +#define ETHTOOL_FEC_HIST_MAX    18
-> 
-> Could you clarify why it is set to 18?
-> AFAIU IEEE 802.3ck/df define 16 bins.
+On Mon, Aug 18, 2025 at 12:20=E2=80=AFPM Matthieu Baerts <matttbe@kernel.or=
+g> wrote:
+>
+> Hi Stefan, Xin,
+>
+> On 18/08/2025 16:31, Stefan Metzmacher wrote:
+> > Hi,
+> >
+> >> diff --git a/include/linux/socket.h b/include/linux/socket.h
+> >> index 3b262487ec06..a7c05b064583 100644
+> >> --- a/include/linux/socket.h
+> >> +++ b/include/linux/socket.h
+> >> @@ -386,6 +386,7 @@ struct ucred {
+> >>   #define SOL_MCTP    285
+> >>   #define SOL_SMC        286
+> >>   #define SOL_VSOCK    287
+> >> +#define SOL_QUIC    288
+> >>     /* IPX options */
+> >>   #define IPX_TYPE    1
+> >> diff --git a/include/uapi/linux/in.h b/include/uapi/linux/in.h
+> >> index ced0fc3c3aa5..34becd90d3a6 100644
+> >> --- a/include/uapi/linux/in.h
+> >> +++ b/include/uapi/linux/in.h
+> >> @@ -85,6 +85,8 @@ enum {
+> >>   #define IPPROTO_RAW        IPPROTO_RAW
+> >>     IPPROTO_SMC =3D 256,        /* Shared Memory Communications       =
+ */
+> >>   #define IPPROTO_SMC        IPPROTO_SMC
+> >> +  IPPROTO_QUIC =3D 261,        /* A UDP-Based Multiplexed and Secure
+> >> Transport    */
+> >> +#define IPPROTO_QUIC        IPPROTO_QUIC
+> >>     IPPROTO_MPTCP =3D 262,        /* Multipath TCP connection        *=
+/
+> >>   #define IPPROTO_MPTCP        IPPROTO_MPTCP
+> >>     IPPROTO_MAX
+> >
+> > Can these constants be accepted, soon?
+> >
+> > Samba 4.23.0 to be released early September will ship userspace code to
+> > use them. It would be good to have them correct when kernel's start to
+> > support this...
+> >
+> > It would also mean less risk for conflicting projects with the need for
+> > such numbers.
+> >
+> > I think it's useful to use a value lower than IPPROTO_MAX, because it m=
+eans
+> > the kernel module can also be build against older kernels as out of tre=
+e
+> > module
+> > and still it would be transparent for userspace consumers like samba.
+> > There are hardcoded checks for IPPROTO_MAX in inet_create, inet6_create=
+,
+> > inet_diag_register
+> > and the value of IPPROTO_MAX is 263 starting with commit
+> > d25a92ccae6bed02327b63d138e12e7806830f78 in 6.11.
+>
+> I would also recommend not changing IPPROTO_MAX here. When IPPROTO_MAX
+> got increased to 263, this caused some (small) small issues because it
+> was hardcoded in some userspace code if I remember well.
+>
+> It is unclear why IPPROTO_QUIC is using 261 and not 257, but it should
+> not make any differences I suppose.
+>
+I agree, it should not.
 
-Yeah, the standard defines 16 bins, but this value came out of the
-discussion with Gal and Yael because the hardware supports more bins,
-I believe, in RDMA mode
+I wasn=E2=80=99t sure if any other project was using 257, so to minimize th=
+e risk
+of conflicts, I=E2=80=99ve been using this large value from the beginning.
 
->> diff --git a/net/ethtool/fec.c b/net/ethtool/fec.c
->> index e7d3f2c352a34..9313bd17544fd 100644
->> --- a/net/ethtool/fec.c
->> +++ b/net/ethtool/fec.c
->> @@ -17,6 +17,7 @@ struct fec_reply_data {
->>           u64 stats[1 + ETHTOOL_MAX_LANES];
->>           u8 cnt;
->>       } corr, uncorr, corr_bits;
->> +    struct ethtool_fec_hist fec_stat_hist;
->>   };
->>   #define FEC_REPDATA(__reply_base) \
->> @@ -113,7 +114,11 @@ static int fec_prepare_data(const struct 
->> ethnl_req_info *req_base,
->>           struct ethtool_fec_stats stats;
->>           ethtool_stats_init((u64 *)&stats, sizeof(stats) / 8);
->> -        dev->ethtool_ops->get_fec_stats(dev, &stats);
->> +        ethtool_stats_init((u64 *)data->fec_stat_hist.values,
->> +                   ETHTOOL_MAX_LANES *
-> this should be ETHTOOL_FEC_HIST_MAX since we’re initializing the 
-> histogram bins array.
+> Note that for MPTCP, we picked 262, just in case the protocol number was
+> limited to 8 bits, to fallback to IPPROTO_TCP: 262 & 0xFF =3D 6. At that
+> time, we thought it was important, because we were the first ones to use
+> a value higher than U8_MAX. At the end, it is good for new protocols,
+> not to increase IPPROTO_MAX each time :)
+>
+Yes, this approach saves a lot of trouble for new protocols!
 
-Yes, you're right, I'll change it in the next version
+Thanks.
 
