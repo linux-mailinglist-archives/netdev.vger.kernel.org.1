@@ -1,163 +1,105 @@
-Return-Path: <netdev+bounces-214787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41EA8B2B3FB
-	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 00:12:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D3D0B2B417
+	for <lists+netdev@lfdr.de>; Tue, 19 Aug 2025 00:28:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 14E484E1B90
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 22:12:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5D8D5819EA
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 22:27:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 987EB27A460;
-	Mon, 18 Aug 2025 22:12:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD86227603C;
+	Mon, 18 Aug 2025 22:27:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LMfTw4aE"
+	dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b="W/Iy0Kot"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from r3-18.sinamail.sina.com.cn (r3-18.sinamail.sina.com.cn [202.108.3.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0368F13C3F6;
-	Mon, 18 Aug 2025 22:12:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4086927C17F
+	for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 22:27:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.108.3.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755555153; cv=none; b=McibYb1klnGak0v5aqRwZpsvYeiX4ej+JU26AhRsSehNOL3LnnsM66UCMaJtLmXkRl5R+pYvQM7jrTFAbnLR5LS1Gx9XmnR1pE/8W1xTVEhdc89pX4Wq9xcsba4o0Im0FFX58mylopD75TXVdf/ccEoQm5jhEycWBdyEceRlTyQ=
+	t=1755556063; cv=none; b=kvCfG7YdAxSf5yWnPeliNbm0TgESXxCESp6sBTjOCJzr1JDhZHZ3acwlgbBU59ojl1vzv9S+TYjUymVlYUqATXrrc3XCdDnus8pbHX/XVRRDGCdRPgkyeIm2WQyrIBXIDacoXUdoMyxB8PUvtUvMhfIiinWbTaJRYeXVA47lTow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755555153; c=relaxed/simple;
-	bh=z0WaS3shGqW0QPUywlCBkaS508vo1YK7sC8UbCZ/2Sg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hIpQySLNo4vroBJe6PHsD9W+Mvo2DBCXSNOQp91qY+qoj1Jr3jcM1KP8Bo29pP2XoC80ZvAxY9PbJXWLQNS1FrQc5ekrdfa2QYoxwIRre9TF9HL6bLQTTh13fDdSMxf9L76NYPXe53lH9RIumDsl2kf4Ox4iEcX8SdCDeIAZUUU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LMfTw4aE; arc=none smtp.client-ip=209.85.128.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-71d605c6501so40017337b3.3;
-        Mon, 18 Aug 2025 15:12:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755555151; x=1756159951; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fqNz3P5UaqdajyOjtnD6TKHOU+fmwNNN9rM4/6l4iXo=;
-        b=LMfTw4aEzyYBeKRwcRskAr7MgEtFAYBs0tcl9IRiwNG6xmy8z/sYxGma4I4wbvhbsi
-         E/Uu2HXfdn1R07th1rVPmMzDP6kH5t9puxyHgJdRHhn0DaLumRjteLD3Pt3QoNZy95eQ
-         HZunCd+OZ5LUjZRixoSAvkG2ks2YZQJyfhK8nlFnTBeOSXqaJ9sDBQ4uvmkqM7z3aW5n
-         RZ1Nc2jF8NiDHkwjjK1W0UpAT8NN5Cn713w43yrGsfMD3B6vwtGXpNcMNZF73+RcqBdY
-         w8ISlI90FQhZkY4Stg3Lhqsa5NY1xTxiCbGW5oaLpRWQQGd2Hw4ToyPnVGWfvVIkkf/+
-         DN7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755555151; x=1756159951;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fqNz3P5UaqdajyOjtnD6TKHOU+fmwNNN9rM4/6l4iXo=;
-        b=QuoYiHp4zaMTFQO4vPDQh1PsMlZWYvMwqFNc66p/ussDUDo081ic86NAXzElV9fXi7
-         9pe2e8X5OpZq8aeQ0/H9m8xPSjdIanbYUd9rcb8aBJvSsPaeHOiTpkybKObf0J5M27Po
-         mioSNmXKgJ2snBoUCXI/lqdsutWy/ShO4WPMqeCeBRc59NVJr0aWjHB58e25j5+o1LS7
-         8KRE0rAAsNlHrZULM94MzueFgqoRR+o4+3UlJAsfR+HsAvlL6Pp/ICnUedGbxJYkryx+
-         2z5nOrWMpi+19EyfT3aiX2ZDH8U7h1Vmt/9pzDXgULlRVmN1PInBZr+7FLQp6SH3kdpT
-         A56Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUgbqawQwTbf9WmFPl4QToqW0y1/BkEYLSpbpwEkqJ+f1wLeGSHej/w4QCWUmRTCFMv05jmiacW@vger.kernel.org, AJvYcCWwb9Kxi3Gsa3Bn/Hx+p4Gs5vPxaICcfQ24NA3lEi8YVaO6TWNfHsfRtV9JAHlJ9W0DVw0otTGCZyHB@vger.kernel.org
-X-Gm-Message-State: AOJu0YxM+lKaEsYuHoMpyw38P7oLi6VJq5p89q/HirOEqrBXpyMscdP4
-	aCaYSoeOual0+0tMyPj9ouzugPY7JlDABAQnvYBmF9B1+zoowvUIG8T/o73o4LL36zs5ZdDQJIz
-	eKoKGPRpR/rKMytMiqjGKgKFe3oPS3ps=
-X-Gm-Gg: ASbGncshnbvgwUKIUuQP7hGmyH1gnkUb9wXW6lWhRY5Qc//1KmS5g/ZCZYcq3fzdcv5
-	+YEua6hJLzalt9ZMfeUhUsiPmMiXmuVw7ajMOSNUCI/235UnPaVmBay3c4rAaWzE1VMBNB3I406
-	IZhuGLY0mzi12V8RcdqngphvVxzTxJ0nuLicZpkrX77mnuptVNFme4UVSAfMqLpbTcqZRD28eiU
-	Q0yohHFQkF8zur8cHEMcaITfpjyL0avNYzI/wP5
-X-Google-Smtp-Source: AGHT+IG1Xf8IES8SjgayLID8xC/CuGhwHDMGirJW5U5y2dngifDjnA/vAwdOBP+gB+eCFrarealiYHb6SnOY5OuGLHU=
-X-Received: by 2002:a05:690c:7485:b0:71e:7ee9:839a with SMTP id
- 00721157ae682-71f9d4dd78fmr5382767b3.2.1755555150984; Mon, 18 Aug 2025
- 15:12:30 -0700 (PDT)
+	s=arc-20240116; t=1755556063; c=relaxed/simple;
+	bh=bCPONr1Qtyz3N9oBKepPASZ0r46Hj8tztRncVRsnHLo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=oF/05frzwXumLFyoVSZjWaG+lMYbTPC9XNmQCf/GXdkzKEq03hRSVn3S8kFyxRaso4VAk70n5w8TQLQXVKUcKbKZQaWk3T/tupselvYd5yLCbij/WtdN+ode8s0CofrsDHYc7uMpIjhil3uY2LLOSJsGV8VgvJ+druZf4gqisSo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b=W/Iy0Kot; arc=none smtp.client-ip=202.108.3.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1755556060;
+	bh=7EghuakxsNW7L1YjQWnc7VCdy2bkOsiSmmq/lmW3TeQ=;
+	h=From:Subject:Date:Message-ID;
+	b=W/Iy0KotJzIlSZkh5yJObmdJjGX8E7b0DUVgx7x3pvJVivxD1ZgtFxMezsozbdRXb
+	 iQnS0g1wxTy9KBKvz/9XuEsx34NuOT5XQXOWl2A9g0+4KfFw5fXo+jU8LXw2CNolZJ
+	 XqZy70NIAnAvSVUGAUUuHAmI25N3n9qbzUDIB7Bg=
+X-SMAIL-HELO: localhost.localdomain
+Received: from unknown (HELO localhost.localdomain)([114.249.58.236])
+	by sina.com (10.54.253.32) with ESMTP
+	id 68A3A8D000003CC2; Mon, 19 Aug 2025 06:27:30 +0800 (CST)
+X-Sender: hdanton@sina.com
+X-Auth-ID: hdanton@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=hdanton@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=hdanton@sina.com
+X-SMAIL-MID: 2472084456675
+X-SMAIL-UIID: 3C82A0469A79420784FCC32ED3925293-20250819-062730-1
+From: Hillf Danton <hdanton@sina.com>
+To: syzbot <syzbot+1ec0f904ba50d06110b1@syzkaller.appspotmail.com>
+Cc: Al Viro <viro@zeniv.linux.org.uk>,
+	edumazet@google.com,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [mm?] INFO: rcu detected stall in sys_umount (3)
+Date: Tue, 19 Aug 2025 06:27:17 +0800
+Message-ID: <20250818222718.5061-1-hdanton@sina.com>
+In-Reply-To: <20250818182616.GB222315@ZenIV>
+References: <67555b72.050a0220.2477f.0026.GAE@google.com> <68a2f584.050a0220.e29e5.009d.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <11c5701d-4bf9-4661-ad8a-06690bbe1c1c@free.fr> <fff0b3eb-ea42-4475-970d-30622dc25dca@free.fr>
- <e92e23a7-1503-454f-a7a2-cedab6e55fe2@free.fr> <acd04154-25a5-4721-a62b-36827a6e4e47@free.fr>
- <CAEoi9W6kb0jZXY_Tu27CU7jkyx5O1ne5FOgvYqCk_GFBvnseiw@mail.gmail.com> <11212ddf-bf32-4b11-afee-e234cdee5938@free.fr>
-In-Reply-To: <11212ddf-bf32-4b11-afee-e234cdee5938@free.fr>
-From: Dan Cross <crossd@gmail.com>
-Date: Mon, 18 Aug 2025 18:11:55 -0400
-X-Gm-Features: Ac12FXzClq1nspIzLv0EknXdXf9yT1FEP3tio8_UBvXs4Vf7Ans-5TuQmuNCc0c
-Message-ID: <CAEoi9W5gAMyLtf9TYKuZ7EUAQspmcHADr-bvRNDVXpL+or2dSQ@mail.gmail.com>
-Subject: Re: [ROSE] [AX25] 6.15.10 long term stable kernel oops
-To: F6BVP <f6bvp@free.fr>
-Cc: Bernard Pidoux <bernard.pidoux@free.fr>, David Ranch <dranch@trinnet.net>, 
-	linux-hams@vger.kernel.org, netdev <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, Aug 18, 2025 at 2:29=E2=80=AFPM F6BVP <f6bvp@free.fr> wrote:
-> I agree that it must be the same bug and mkiss module is involved in
-> both cases although the environment is quite different.
-> I am using ROSE/FPAC nodes on different machines for AX25 messages
-> routing with LinFBB BBS.
-> Nowadays I do not have radio anymore and all are interconnected via
-> Internet using IP over AX25 encapsulation with ax25ipd (UDP ports).
->
-> I am running two RaspBerry Pi 3B+ with RaspiOS 64Bit and kernel 6.12.14.
-> AX25 configuration is performed via kissattach to create ax0 device.
-> ROSE / FPAC suite of applications manage ROSE, NetRom and AX25 protocols
-> for communications. FBB BBS forwards via rose0 port and TCP port 23
-> (telnet).
->
-> I do not observe any issue on those RasPiOS systems.
->
-> Another mini PC with Ubuntu 24-04 LTS and kernel 6-14.0-27-generic is
-> configured identiquely with FPAC/ROSE node and have absolutely no issues
-> with mkiss, ROSE or NetRom.
->
-> A few years ago I had been quite active on debugging ROSE module. As I
-> wanted to restart AX25 debugging I installed Linux-6.15.10 stable
-> kernel. This was the beginning of my kernel panic hunting...
->
-> My strategy is to find the most recent kernel that do not have any issue
-> with mkiss and progressively add AX25 patches in order to find the
-> guilty instruction. I will use a buch of printk in order to localize the
-> wrong code. We will see if it works.
+On Mon, 18 Aug 2025 19:26:16 +0100 Al Viro wrote:
+> On Mon, Aug 18, 2025 at 02:42:28AM -0700, syzbot wrote:
+> > syzbot has found a reproducer for the following issue on:
+> > 
+> > HEAD commit:    8f5ae30d69d7 Linux 6.17-rc1
+> > git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
+> > console output: https://syzkaller.appspot.com/x/log.txt?x=1321eba2580000
+> > kernel config:  https://syzkaller.appspot.com/x/.config?x=8c5ac3d8b8abfcb
+> > dashboard link: https://syzkaller.appspot.com/bug?extid=1ec0f904ba50d06110b1
+> > compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+> > userspace arch: arm64
+> > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10cba442580000
+> > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10a1eba2580000
+> > 
+> > Downloadable assets:
+> > disk image: https://storage.googleapis.com/syzbot-assets/18a2e4bd0c4a/disk-8f5ae30d.raw.xz
+> > vmlinux: https://storage.googleapis.com/syzbot-assets/3b5395881b25/vmlinux-8f5ae30d.xz
+> > kernel image: https://storage.googleapis.com/syzbot-assets/e875f4e3b7ff/Image-8f5ae30d.gz.xz
+> > mounted in repro: https://storage.googleapis.com/syzbot-assets/43186d9e448c/mount_0.gz
+> >   fsck result: failed (log: https://syzkaller.appspot.com/x/fsck.log?x=174ba442580000)
+> > 
+> > The issue was bisected to:
+> > 
+> > commit d15121be7485655129101f3960ae6add40204463
+> > Author: Paolo Abeni <pabeni@redhat.com>
+> > Date:   Mon May 8 06:17:44 2023 +0000
+> > 
+> >     Revert "softirq: Let ksoftirqd do its job"
+> 
+> Would be interesting to see how it behaves on 
 
-Bernard,
-
-    Very good. A caveat is that the issue seems to be the bug
-manifests itself in the `skbuff` infrastructure, independent of the
-specific AX.25/NETROM/ROSE code: it may be that some other change
-elsewhere in the kernel failed made a change that was incompatible
-with AX.25 that gave rise to this bug.
-
-    I've found the oops to be very reproducible. Given that you seem
-to have a known working kernel version, you may get more mileage out
-of using `git bisect` to narrow things down to a specific failing
-commit, instead of trying to forward-apply AX.25-specific commits.
-
-        - Dan C.
-
-> Le 18/08/2025 =C3=A0 18:30, Dan Cross a =C3=A9crit :
-> > On Mon, Aug 18, 2025 at 6:02=E2=80=AFAM Bernard Pidoux <bernard.pidoux@=
-free.fr> wrote:
-> >> Hi,
-> >>
-> >> I captured a screen picture of kernel panic in linux-6.16.0 that
-> >> displays [mkiss]. See included picture.
-> >
-> > Hi Bernard,
-> >
-> >      This is the same issue that I and a few other folks have run into.
-> > Please see the analysis in
-> > https://lore.kernel.org/linux-hams/CAEoi9W4FGoEv+2FUKs7zc=3DXoLuwhhLY8f=
-8t_xQ6MgTJyzQPxXA@mail.gmail.com/#R
-> >
-> >      There, I traced the issue far enough to see that it comes from
-> > `sbk->dev` being NULL on these connections. I haven't had time to look
-> > further into why that is, or what changed that made that the case. I
-> > now think that this occurs on the _first_ of the two loops I
-> > mentioned, not the second, however.
-> >
-> >          - Dan C.
-> >
-> > (Aside: I'm pretty sure that `linux-hams@vger.kernel.org` is not a
-> > Debian-specific list.)
->
+#syz test: git://git.kernel.org/pub/scm/linux/kernel/git/viro/vfs.git  fixes
 
