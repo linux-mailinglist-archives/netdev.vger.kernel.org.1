@@ -1,148 +1,215 @@
-Return-Path: <netdev+bounces-214650-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214651-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13CA4B2ABA0
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 16:53:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FF3DB2AC22
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 17:09:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EFE237AB157
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 14:51:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0CA2D189A667
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 15:05:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B631922422A;
-	Mon, 18 Aug 2025 14:52:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B0F0246BB8;
+	Mon, 18 Aug 2025 15:04:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M0Xg/oI1"
+	dkim=pass (2048-bit key) header.d=landley.net header.i=@landley.net header.b="YYOhEVzm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from crocodile.elm.relay.mailchannels.net (crocodile.elm.relay.mailchannels.net [23.83.212.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8300735A2AC;
-	Mon, 18 Aug 2025 14:52:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 216A222422A;
+	Mon, 18 Aug 2025 15:04:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.83.212.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755528774; cv=none; b=Y0cdMexOI0nJVNRT/YnA3+DS/FGwb33J8U7Vu/AcH7Lz4WRApEAkNWCGBIGVBSOdFlkD3KWpkH1So/aW+M+xwGx6XoI4Q8srkLQUOZVXwPQjc8lqbyH60snWtr0PV5EXYkUiGDmDeMsG3Ul/4ohswLwmi9sdy41UUV7ptr63yW8=
+	t=1755529479; cv=none; b=LcSB+Ny5SCfFolk/4P8zfF2A8j76W6eEdpdZWqP29HHgFW0a3eJOE1BdZae142kqiqzQjCYpM4O3vG9uezL72amrD59rCrcroVKreyvSgxVbJWxF4snvHexsCP0KCfXaxHdv+IvPiWFYu1BjvTug9aa8brSkr9odpafJuu/kMcI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755528774; c=relaxed/simple;
-	bh=4Ezi4qd/vRMwuKHWb4eCTtPIoPzHHNvvx+V6bUm3ZAc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bIYcylDNkmkl8EnuKV0dL6GR7V6u2IuB2mq13uXsrh9S1vIqjwKAID3ZihHz0MPjXpb4xX2GC7ELCbYDKo/mcEVZd2M7OcUgaO2Dh4auA7LEm8lY6YMSZYrt+g2Ny1pIUj8uED4sSE3Bd/md+QEv+eyKDy/K0QY8fXTP7pZrJjw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M0Xg/oI1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21466C4CEEB;
-	Mon, 18 Aug 2025 14:52:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755528774;
-	bh=4Ezi4qd/vRMwuKHWb4eCTtPIoPzHHNvvx+V6bUm3ZAc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=M0Xg/oI17+ZOqL9ZkkNYDusfgbL/LP3b450AzcYAEvcjo2W69znvLDlRzH3enng21
-	 EptpSPYGxWHbGpNy4TazNe6YrcNMrudiijpLhc4GqGpXVUyA7LPJrqXmAq8gNYtbEA
-	 hC92ljJNREp12C2jaek/FqHr00FUZYCU2Os0Oar94Efqq3I6sLDcJLoNtykEkRqEi5
-	 FPAIqYOYixVAPIbu43HjcN0mrTYxagAkJzBuY2MWiI2PdUlfySk1ViAbGnRuBcCZ0E
-	 Ry1vkruVWibUEWFvUnUgPSYJN2/DljlJObOhf/lIGDHQvD0pfb/+eGYuqK/twc+HD7
-	 u4aQeyv/9hDZw==
-Date: Mon, 18 Aug 2025 15:52:47 +0100
-From: Will Deacon <will@kernel.org>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: syzbot <syzbot+b4d960daf7a3c7c2b7b1@syzkaller.appspotmail.com>,
-	davem@davemloft.net, edumazet@google.com, eperezma@redhat.com,
-	horms@kernel.org, jasowang@redhat.com, kuba@kernel.org,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, pabeni@redhat.com, sgarzare@redhat.com,
-	stefanha@redhat.com, syzkaller-bugs@googlegroups.com,
-	virtualization@lists.linux.dev, xuanzhuo@linux.alibaba.com
-Subject: Re: [syzbot] [kvm?] [net?] [virt?] WARNING in
- virtio_transport_send_pkt_info
-Message-ID: <aKM-P7LJTIPZIi6v@willie-the-truck>
-References: <20250812052645-mutt-send-email-mst@kernel.org>
- <689b1156.050a0220.7f033.011c.GAE@google.com>
- <20250812061425-mutt-send-email-mst@kernel.org>
- <aJ8HVCbE-fIoS1U4@willie-the-truck>
- <20250815063140-mutt-send-email-mst@kernel.org>
- <aJ8heyq4-RtJAPyI@willie-the-truck>
- <aJ9WsFovkgZM3z09@willie-the-truck>
- <20250816063301-mutt-send-email-mst@kernel.org>
+	s=arc-20240116; t=1755529479; c=relaxed/simple;
+	bh=b/oFLGReGRGIc7T2lr4JuMUteQW36cH+fP9/f+wDfdI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mPtqDicuH/+PWSXkhnzgDXPMpS4MF4hvn9FXcyPg7IZzCkp1IzCQrFUNREbRhgNiquAnzHPsbRu/8COfuOqSl1O8e943Vc4XnzJu1TQYpXk7pRlqjxC91AGAovsiM9pxEvpCRtrkn4OeEXvXI5w8U03Gwib3Z37VzdofHagqGb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=landley.net; spf=pass smtp.mailfrom=landley.net; dkim=pass (2048-bit key) header.d=landley.net header.i=@landley.net header.b=YYOhEVzm; arc=none smtp.client-ip=23.83.212.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=landley.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=landley.net
+X-Sender-Id: dreamhost|x-authsender|rob@landley.net
+Received: from relay.mailchannels.net (localhost [127.0.0.1])
+	by relay.mailchannels.net (Postfix) with ESMTP id 841B84E58FF;
+	Mon, 18 Aug 2025 15:04:30 +0000 (UTC)
+Received: from pdx1-sub0-mail-a235.dreamhost.com (trex-blue-7.trex.outbound.svc.cluster.local [100.96.43.79])
+	(Authenticated sender: dreamhost)
+	by relay.mailchannels.net (Postfix) with ESMTPA id 23D394E420D;
+	Mon, 18 Aug 2025 15:04:10 +0000 (UTC)
+X-Sender-Id: dreamhost|x-authsender|rob@landley.net
+X-MC-Relay: Neutral
+X-MailChannels-SenderId: dreamhost|x-authsender|rob@landley.net
+X-MailChannels-Auth-Id: dreamhost
+X-Arch-Illegal: 63c5801721cfaa18_1755529470300_816563999
+X-MC-Loop-Signature: 1755529470300:2887004154
+X-MC-Ingress-Time: 1755529470300
+Received: from pdx1-sub0-mail-a235.dreamhost.com (pop.dreamhost.com
+ [64.90.62.162])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
+	by 100.96.43.79 (trex/7.1.3);
+	Mon, 18 Aug 2025 15:04:30 +0000
+Received: from [192.168.88.7] (unknown [209.81.127.98])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: rob@landley.net)
+	by pdx1-sub0-mail-a235.dreamhost.com (Postfix) with ESMTPSA id 4c5GFj08Knzb3;
+	Mon, 18 Aug 2025 08:04:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=landley.net;
+	s=dreamhost; t=1755529450;
+	bh=HcrziblwsFLluWpHnBKGpQ1YyfcfHYU/BF0Q24g090Y=;
+	h=Date:Subject:To:Cc:From:Content-Type:Content-Transfer-Encoding;
+	b=YYOhEVzmuUBJOqMJ3oty2DhjBCsZIND2G0eLaM4ogD3beae/GkglsStC/XwV1ebHj
+	 PD7j7ISKzGUb14JCUugk6ZIeA9TZOYg/o/JTbbiieZWp05ALkoUj9p15h41TEl+PXp
+	 W+gDQ6ekpSfmldlPkHAOSGKaUupQXbuDyWkziQjJ81Y1/mFBtp8xPxASFbSsGljFG7
+	 mNEenVQRQ9nhluL2PHcOJ+texyNaoKJhpzGVE2i/5KYXS6cSouV8dBZqbKXBOm6xcZ
+	 LH6d7svmneCAzpyNQMNnu2mWLPQQxG7p+q+xs+RilEu2BWN6iA49ooZpSYwZtBFdEO
+	 My39+Lv8fOMdA==
+Message-ID: <06a0c642-fb7e-4ccb-9772-232e32b4ead9@landley.net>
+Date: Mon, 18 Aug 2025 10:03:17 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250816063301-mutt-send-email-mst@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/3] dt-bindings: net: Add support for J-Core EMAC
+To: Krzysztof Kozlowski <krzk@kernel.org>,
+ Geert Uytterhoeven <geert@linux-m68k.org>,
+ Artur Rojek <contact@artur-rojek.eu>
+Cc: Jeff Dionne <jeff@coresemi.io>,
+ John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250815194806.1202589-1-contact@artur-rojek.eu>
+ <20250815194806.1202589-3-contact@artur-rojek.eu>
+ <aa6bdc05-81b0-49a2-9d0d-8302fa66bf35@kernel.org>
+ <cab483ef08e15d999f83e0fbabdc4fdf@artur-rojek.eu>
+ <CAMuHMdVGv4UHoD0vbe3xrx8Q9thwrtEaKd6X+WaJgJHF_HXSaQ@mail.gmail.com>
+ <26699eb1-26e8-4676-a7bc-623a1f770149@kernel.org>
+Content-Language: en-US
+From: Rob Landley <rob@landley.net>
+In-Reply-To: <26699eb1-26e8-4676-a7bc-623a1f770149@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sat, Aug 16, 2025 at 06:34:29AM -0400, Michael S. Tsirkin wrote:
-> On Fri, Aug 15, 2025 at 04:48:00PM +0100, Will Deacon wrote:
-> > On Fri, Aug 15, 2025 at 01:00:59PM +0100, Will Deacon wrote:
-> > > On Fri, Aug 15, 2025 at 06:44:47AM -0400, Michael S. Tsirkin wrote:
-> > > > On Fri, Aug 15, 2025 at 11:09:24AM +0100, Will Deacon wrote:
-> > > > > On Tue, Aug 12, 2025 at 06:15:46AM -0400, Michael S. Tsirkin wrote:
-> > > > > > On Tue, Aug 12, 2025 at 03:03:02AM -0700, syzbot wrote:
-> > > > > > > Hello,
-> > > > > > > 
-> > > > > > > syzbot has tested the proposed patch but the reproducer is still triggering an issue:
-> > > > > > > WARNING in virtio_transport_send_pkt_info
-> > > > > > 
-> > > > > > OK so the issue triggers on
-> > > > > > commit 6693731487a8145a9b039bc983d77edc47693855
-> > > > > > Author: Will Deacon <will@kernel.org>
-> > > > > > Date:   Thu Jul 17 10:01:16 2025 +0100
-> > > > > > 
-> > > > > >     vsock/virtio: Allocate nonlinear SKBs for handling large transmit buffers
-> > > > > >     
-> > > > > > 
-> > > > > > but does not trigger on:
-> > > > > > 
-> > > > > > commit 8ca76151d2c8219edea82f1925a2a25907ff6a9d
-> > > > > > Author: Will Deacon <will@kernel.org>
-> > > > > > Date:   Thu Jul 17 10:01:15 2025 +0100
-> > > > > > 
-> > > > > >     vsock/virtio: Rename virtio_vsock_skb_rx_put()
-> > > > > >     
-> > > > > > 
-> > > > > > 
-> > > > > > Will, I suspect your patch merely uncovers a latent bug
-> > > > > > in zero copy handling elsewhere.
-> > > 
-> > > I'm still looking at this, but I'm not sure zero-copy is the right place
-> > > to focus on.
-> > > 
-> > > The bisected patch 6693731487a8 ("vsock/virtio: Allocate nonlinear SKBs
-> > > for handling large transmit buffers") only has two hunks. The first is
-> > > for the non-zcopy case and the latter is a no-op for zcopy, as
-> > > skb_len == VIRTIO_VSOCK_SKB_HEADROOM and so we end up with a linear SKB
-> > > regardless.
-> > 
-> > It's looking like this is caused by moving from memcpy_from_msg() to
-> > skb_copy_datagram_from_iter(), which is necessary to handle non-linear
-> > SKBs correctly.
-> > 
-> > In the case of failure (i.e. faulting on the source and returning
-> > -EFAULT), memcpy_from_msg() rewinds the message iterator whereas
-> > skb_copy_datagram_from_iter() does not. If we have previously managed to
-> > transmit some of the packet, then I think
-> > virtio_transport_send_pkt_info() can end up returning a positive "bytes
-> > written" error code and the caller will call it again. If we've advanced
-> > the message iterator, then this can end up with the reported warning if
-> > we run out of input data.
-> > 
-> > As a hack (see below), I tried rewinding the iterator in the error path
-> > of skb_copy_datagram_from_iter() but I'm not sure whether other callers
-> > would be happy with that. If not, then we could save/restore the
-> > iterator state in virtio_transport_fill_skb() if the copy fails. Or we
-> > could add a variant of skb_copy_datagram_from_iter(), say
-> > skb_copy_datagram_from_iter_full(), which has the rewind behaviour.
-> > 
-> > What do you think?
-> > 
-> > Will
+On 8/18/25 03:07, Krzysztof Kozlowski wrote:
+> On 18/08/2025 08:43, Geert Uytterhoeven wrote:
+>>>>
+>>>> You need SoC-based compatibles. And then also rename the file to match
+>>>> it.
+>>>
+>>> Given how the top-most compatible of the bindings [1] of the board I am
+>>> using has "jcore,j2-soc", this driver should probably go with
+>>> "jcore,j2-emac".
+>>>
+>>> But as this is an FPGA design, I don't know how widespread the use is
+>>> across other jcore derived SoCs (if any?).
+>>> I will wait for Jeff (who's design this is) to clarify on that.
+>>>
+>>> PS. Too bad we already have other IP cores following the old pattern:
+>>>
+>>>> $ grep -r "compatible = \"jcore," bindings/ | grep -v "emac"
+>>>> bindings/timer/jcore,pit.yaml:        compatible = "jcore,pit";
+>>>> bindings/spi/jcore,spi.txt:   compatible = "jcore,spi2";
+>>>> bindings/interrupt-controller/jcore,aic.yaml:        compatible =
+>>>> "jcore,aic2";
+>>
+>> I would go with "jcore,emac", as it is already in use.
 > 
-> It is, at least, self-contained. I don't much like hacking around
-> it in virtio_transport_fill_skb. If your patch isn't acceptable,
-> skb_copy_datagram_from_iter_full seem like a better approach, I think.
+> git grep jcore,emac
+> 
+> Gives me zero?
 
-Thanks. I'll send something out shortly with you on cc.
+Ethernet support wasn't part of the original kernel submission, in part 
+because we hadn't created the turtle board yet (and _still_ don't have a 
+consumer retail arm to get them out into the world in less than triple 
+digit lot sizes) and the off the shelf FPGA board we were pointing the 
+open source community at circa 2016 (Numato Mimas V2) didn't include 
+ethernet.
 
-Will
+(Also, our internal driver had half an unfinished IEEE-1588 
+implementation in it, which we kept meaning to clean out for public 
+consumption. We took a different approach to time synchronization but 
+had never produced a clean driver for external use until Artur decided 
+to do one, which was very nice of him.)
+
+>> If an incompatible version comes up, it should use a different
+>> (versioned?) compatible value.
+> 
+> Versions are allowed if they follow some documented and known vendor SoC
+> versioning scheme. Is this the case here?
+
+This ethernet implementation hasn't significantly changed in 10 years.
+
+Whenever we've needed something else we've done different I/O devices 
+that weren't ethernet. (Even the USB 2.0 "ethernet" isn't technically 
+ethernet, it made our board act as a USB dongle that showed up as an 
+ethernet device to the computer it was plugged into so we could exchange 
+data. No actual ethernetting really occurred, it's kind a like calling 
+slip/ppp or virtio-net an ethernet interface.)
+
+In theory gigabit phy would be a successor to this, A) no idea if they 
+would share any code on the VHDL _or_ C side, B) that kind of phy 
+requires 125mhz clock speed which is less cost effective in FPGA, 
+especially now that AMD bought xilinx and doubled the prices. (We've 
+stuck with LPDDR2 for similar reasons, although that's on the shorter 
+term todo list to support. I mean yeah we _could_ use various FPGAs' 
+builtin DDR3 library but we don't because we only want to use stuff we 
+can implement ourselves in ASIC, and we need to not just test the state 
+machine (minimum jedec clock speed 300mhz: kintex or vertex territory) 
+but also commission the analog part of the circuit which is 
+process-specific so you have to pick a fab to have them drawn for if 
+you're avoiding NDAs and per-chip royalties for other people's black box 
+libraries.
+
+(Oh, and the higher up the FPGA stack you go the less likely yosys' open 
+source FPGA tools are to work right, and the more NDA-clingy the closed 
+source tools get, which is kind of annoying for a mostly non-US 
+development team. (Lots of testing for $50 FPGAs, far less for $700 
+FPGAs plus the more lawsuit-happy the vendors get about their crown 
+jewels.) Gowin is trying but those suckers SUCK DOWN power, the ones 
+I've seen are Lattice clones not Xilinx clones (ecp5 exists if we want 
+_bigger_ lattice, the question is _faster_), and going that direction is 
+really just a different kind of ecosystem lock-in...)
+
+tl;dr: the 100baseT engine works fine for its niche, we've had no reason 
+to fiddle with it.
+
+> This is some sort of SoC, right? So it should have actual SoC name?
+
+https://github.com/j-core/jcore-soc
+
+Internally we have branches for various projects, which are named after 
+the project not the base platform. It's "j2" because it's the dual 
+processor version. J1 is what we use on ICE-40:
+
+https://github.com/j-core/jcore-j1-ghdl
+
+They're _mostly_ the same but the j2 SOC build has a whole automatic bus 
+generator thing that pulls in dependencies (it's written in cloture and 
+java) and the broken out j1 builds with just the 01 and 02 stages of the 
+https://github.com/j-core/openlane-vhdl-build open source 
+toolflow/toolchain. (There's a todo item to reorganize the repositories 
+so j1 becomes a git submodule of j2 which would naturally keep them in 
+sync, but it was all originally done in mercurial and needs a bit more 
+massaging. Plus recently we've done a j1 fork removing the hardware 
+multiplier and did a software multiplier toolchain, which hasn't made it 
+over to the J2 side yet because it really needs a better configure 
+mechanism (VHDL generics sure but what _selects_ them...) which REALLY 
+says we need to rewrite the makefiles entirely... it's on the todo list.)
+
+Rob
+
+P.S. We haven't been pushing to github much since Microsoft bought it. 
+I'm trying to convince Jeff to look at codeberg but he's hung up on the 
+gitea->forgejo fork...
 
