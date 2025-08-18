@@ -1,290 +1,348 @@
-Return-Path: <netdev+bounces-214514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214515-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AB4EB29FE4
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 13:01:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 720F5B2A009
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 13:07:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3266D3A6A2B
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 11:01:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B10C918A184C
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 11:06:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACE01156F45;
-	Mon, 18 Aug 2025 11:01:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C0F031063E;
+	Mon, 18 Aug 2025 11:05:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kontron.de header.i=@kontron.de header.b="IomWJPpZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WMT53HGD"
 X-Original-To: netdev@vger.kernel.org
-Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11021121.outbound.protection.outlook.com [52.101.65.121])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5FDD261B62;
-	Mon, 18 Aug 2025 11:01:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.121
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755514871; cv=fail; b=csakhb9WxAUIGcTkWAXeR1CWus3yWH15/0I9coKY5YWK6OAM9xDDSzdt+9ss3VUd1d02/4x77hQtp/DuRsQt7nHQ9Bb8nmE959nbCDke/lQpgiBRyUKRn4OtA5LT1kwsfbZTo6sVs7SHTkdAqoC2miiGecdtnJyT4YzW0ow2ojk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755514871; c=relaxed/simple;
-	bh=8h35WjggQiieF127DzuhjLE+6uCL+Nf4ifrR6BGJHV0=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Ww9LIqept8366H6v2yWNusaYZ6p8j8QoymtRxuS1xSXd/Lu0Kh8sVLHCeslSB8awc7Dv6LomGzuEdXVJppKU3qZa2+NFp7wcMuBPVrLofLOHbs4cX+N8n4taH/ZnNcb6rCe+H2Eo69BfRa3p+oOUtNdxBTcC30ejsZ37Z7CEOYY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kontron.de; spf=pass smtp.mailfrom=kontron.de; dkim=pass (2048-bit key) header.d=kontron.de header.i=@kontron.de header.b=IomWJPpZ; arc=fail smtp.client-ip=52.101.65.121
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kontron.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kontron.de
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=yOgsA49LZK81Tc2EZwvXWptVU87W+/tz1C/doNyWrVuJW85i3euG4VC7yx+G+yVJ2PMJZ7jHcBKffoy+hSzG22Zdhl4bR9eQnjRRMpjpp3JwDCxN7AXqJgeh2hnORLRaHlanUsQTvVKjq2kLNykyIx10jvPX/r4/lhZBR5N4G91fzAREK/7GwG7Mepx/7/qLk7AwAlqyrL/Mkk1aTO9S3DaKtCY2d6rBs9RbmG1d1wgmDCYClk6mOSjdwmtjlC1Jirj9R6YmAjYC43whGmuwUAvbCe/kNTF/GPXxIZgyF/ewqh6ys4TXiekFMvN42zlwwmCUkQrJa1VbV8B4c2hgig==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8qjIKEeeUwnd+IvM2lT+mDjTehM/kFJdBUJkJRSAncE=;
- b=mQ+FJJrbmYlTbjH8oQrFwRiBzfe6/aM3G8pq62J5lgd0hyN/Qr9uQ4dmtYgfgBjf9L6a8PIXwDqOez4fHdZqJrOZxuQ+EByyAsNAe81uRtfD/qmwmHolv6jqYVeYgFq2ZZG7NmyZt/pk6NgqqqQ/xXNMZazKq8YFqs6K6lZOlppILBuWM0xiyTA1+6SM0VN+w2kjm8K583DbrygA+3bkwYY9hX/91TKajaJqfPYVanw0KQzD+Mvj3JXfqxNVtJtIRZYRc7NAumSdBlhNQjfOdYJ5YNjqZw2o57GQr2Hdj/Aoz3iesUuFYVwApT0LnmSMl55XS05UZ7CjKmAYtnYXmw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=kontron.de; dmarc=pass action=none header.from=kontron.de;
- dkim=pass header.d=kontron.de; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kontron.de;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8qjIKEeeUwnd+IvM2lT+mDjTehM/kFJdBUJkJRSAncE=;
- b=IomWJPpZHT2/1MirJau2SYLdFtuyOLEqhNGleA3PTQnQMCIQ7XWaKc0ZF3cKGm7EmwlUrc5FZZMIlANVV1csVlbigqKh7uxLijUVo3hnGIkfO3Dkf0GG2TRXCi0++v5k/pBsRuwJx+lZEBuLEbLaI5r+LGS7Man6oGfSIzZ+FhT+Fz3IEyc93UP4Xx4b5LYGOth2DfI40ENQ6p8Tg6pvexZAMlGWQloLWbJjWMw8RsAmmfF8QCGJZ74oGgsPdCe2wZnallaNdED2nZM71iBHSM5iLSD42+FFDQo+xIEIRu2arzeQI6FM4cZvX1f95CWAHWDcDC0VZUMfGNHI3zJgmQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=kontron.de;
-Received: from PA4PR10MB5681.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:102:263::10)
- by VI0PR10MB9032.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:800:215::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9031.23; Mon, 18 Aug
- 2025 11:01:01 +0000
-Received: from PA4PR10MB5681.EURPRD10.PROD.OUTLOOK.COM
- ([fe80::b854:7611:1533:2a19]) by PA4PR10MB5681.EURPRD10.PROD.OUTLOOK.COM
- ([fe80::b854:7611:1533:2a19%4]) with mapi id 15.20.9031.018; Mon, 18 Aug 2025
- 11:01:01 +0000
-Message-ID: <a45178cf-304d-4fab-bb10-7621296661fe@kontron.de>
-Date: Mon, 18 Aug 2025 13:00:59 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH] net: dsa: microchip: Prevent overriding of HSR port
- forwarding
-To: Tristram.Ha@microchip.com, frieder@fris.de
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, linux-kernel@vger.kernel.org, lukma@denx.de,
- pabeni@redhat.com, UNGLinuxDriver@microchip.com, olteanv@gmail.com,
- Woojung.Huh@microchip.com, andrew@lunn.ch, florian.fainelli@broadcom.com,
- jesseevg@gmail.com, o.rempel@pengutronix.de, pieter.van.trappen@cern.ch,
- rmk+kernel@armlinux.org.uk, horms@kernel.org, vadim.fedorenko@linux.dev
-References: <20250813152615.856532-1-frieder@fris.de>
- <d7b430cf-7b28-49af-91f9-6b0da0f81c6a@lunn.ch>
- <27ccf5c4-db66-491c-aa7c-29b83ebfca3a@fris.de>
- <DM3PR11MB8736A15C582626DE95429F6EEC37A@DM3PR11MB8736.namprd11.prod.outlook.com>
-Content-Language: en-US, de-DE
-From: Frieder Schrempf <frieder.schrempf@kontron.de>
-In-Reply-To: <DM3PR11MB8736A15C582626DE95429F6EEC37A@DM3PR11MB8736.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR4P281CA0321.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:eb::13) To PA4PR10MB5681.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:102:263::10)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 610B6261B78;
+	Mon, 18 Aug 2025 11:05:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755515141; cv=none; b=JHWZbznqUASRNuqdpzinmN/dFdr0RX08aRd7bXsFcHJ0VZkCAO0ZQhoEXd68g+vHnrGHAwptPpb4dO3yn9X7SGgLZEengMIla/fKod0UkhQRbbpYjil6AjV7kAIrCj37hD/epdm3ery98ra5SObBpPJW3pWf7jCIwuMfVEuhZds=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755515141; c=relaxed/simple;
+	bh=r+jVouVxLZsvI407XYs75psAzx+Ma1V++sLeEsna7sc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=h+IK4WEEJd1OC3RhK+BEq36hrK1VTpXmyo7bXaoTGn1GyjZBJTTr8rHLb/CQxLogPnk+AcXvPM8xt8G473yDVr/nKAxlmz+TaSx3Lx0Y6zLUp4xSuSIKZ25xrJ1P7sfjOIw3XlYRB6sLzNv/34YJC8MDHK2HAbrmllt03Buq3yM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WMT53HGD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4C12C4CEF1;
+	Mon, 18 Aug 2025 11:05:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755515141;
+	bh=r+jVouVxLZsvI407XYs75psAzx+Ma1V++sLeEsna7sc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=WMT53HGDMhxWKxLMlzCujgKqlYnvlQkRzBe4pxIZI3DB6Bv3RvGChx7dqRfr9tf0j
+	 zJbthIt1mb2Z0xZcfjTbe+psISD5QDdx5xMgnbvLKIvYyX9AsEKLIaN/DXMHwtlmRm
+	 Dsikh09UpcU9dxxlZM9H3MVPYrA7/Pmdym+uiNldGcbK+mLyH3/YJB8Rjd6Yl8G6MG
+	 n8MAFl792bNKe+AhqhD6jwRHJ/ZvsJX/yEHMb8wYSzvRSsU04PtVz9Nrkhu7Aq+rzR
+	 6ltSNS/TQNxer4Gvs0ZslFzYAWyQYjqhzKnTImKWEls3mjzoOqmePWwduKyHHN9LmN
+	 c3dkpDBNDqJ9Q==
+Message-ID: <3887332b-a892-42f6-9fde-782638ebc5f6@kernel.org>
+Date: Mon, 18 Aug 2025 13:05:33 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PA4PR10MB5681:EE_|VI0PR10MB9032:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3cfea2fc-873e-41ff-ef16-08ddde46847f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|7416014|376014|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Ukd2QUpneG16WVUybEEzZ1k4Y0xqK2M3dE81YzhBV0p5K2YwZ3oxUi9wbEsy?=
- =?utf-8?B?citMNUNMUDVqN2Q2eExDTUprQzBzRDVGRHk1TlFQZzROUTZDZkZ1cmp4MmVa?=
- =?utf-8?B?cDBObzB0aDhXNnZSNGJCWnFlWEpqdFJmejF5eGg0VlJOL1lyNXdkcmhMUnYx?=
- =?utf-8?B?TkFNSUFqWHBKQVpzTE9Rd3dZUitwUVBvV0ZEZytPYldOdVFrRkVudzNkemw1?=
- =?utf-8?B?L2diNWc1blhMcWFnOFBVWHJsQnNmL04zdkV4U2VkU3BVN0pFWnVZSlNTTnFj?=
- =?utf-8?B?eGxxemJRMUxVRi9KUjd2K210UnI4M3hIazh1eGlOU05BOG1PczV1MGZaYzUr?=
- =?utf-8?B?VGFCRkhnbW5RUTEzcWRhVXpwTGFWWGRIakdiR1lEYlFzczQreTlqRGl6bUc0?=
- =?utf-8?B?UnQyKzllakJFWkZVTC9RRmtoNTNhZEFuNFArclovaUpaQlduTnZRd05mUGZv?=
- =?utf-8?B?MWVieTNPdzRkUDF5ZGlxVUx0Y2dlNVlPdW9sQUwvV2xnWTc5S0hhaVIzaXpx?=
- =?utf-8?B?ckV3b0ZIUmt2cVArUEZqZXVwN2pWbnRycDlxUG52N2o5M1A3a0dyM0FmY2pt?=
- =?utf-8?B?OVFoMlgvcVdoT2dkRTJsYk9rQTYyL0hmb204NkV4dG8vTzljdE1mYk0yb2VC?=
- =?utf-8?B?V0pjQkNHTldpTm9hZk5nV1B3b1dGdGlnNHhDd2ErR1dpYTV1aFBpME1DUFEz?=
- =?utf-8?B?dkJ2bGVGQ2s5d2pRV2hSYjBwMWtlUWQxTlZyMjJPa3FiQlJMdWFnZHM0ZnF5?=
- =?utf-8?B?S29pVGxObWxoTmN2aXBXN1RJb21wNE5ONDN2ZjV2WGwyc1ZGRVNlUVR1eVhW?=
- =?utf-8?B?YnllNUkxMHhPQWNLbTYyWUY4VzBHZUpRUkxyRDMvaytQRENWblpyMVlWcWdE?=
- =?utf-8?B?Q00xZHNWTDViNytUQkV5djlFRDZrS1VuOU9kTVllMWFLOTEvd3F6Q2ZUbjRY?=
- =?utf-8?B?dEFDbkpHcUJqeldIK1l6K2E5SWRNN256RDU3bE00Lzk3QkV5K2w2Y0xMOHA2?=
- =?utf-8?B?aGJhSHNreExEa1kxQXkzeEhYenhOangzeUZrSnk5KzR2RmRDeEkzNzR6MFZM?=
- =?utf-8?B?ckdYN0xEK2JqTFcvb2ZDUEZpNkJONENSeTF0OHVRZGtkb1FmeWE4aHdjaVlK?=
- =?utf-8?B?RTVXYlJLbnJhVWRsby9Hd29iSmxOcC9EMWYzVFkzd0lPRFhrVWVoenRIVzJN?=
- =?utf-8?B?R0p6czJaZmxYZ002dHVoV09aMHhiSnRDMU1hQUNLamNkczFOV3l5ck5aOFU4?=
- =?utf-8?B?M1VvZUxJZnlUZjhieTNEa2ttV0xod0UwRU9oSUVjdEk3Z2ZsT0JOMlBPY3dT?=
- =?utf-8?B?a3Nyc0dxRFYvZDY0ckFYTkNzeWl0dGxyWlVtRG9YUmUxSFJRRjI0MDhpZU9G?=
- =?utf-8?B?c3N2Q2NqTE1IUGkwOXlaUjFYV0JnZ2V6RlF1clp6aGcwMlhlOG14MEFoNzM0?=
- =?utf-8?B?VVltaG8wNXlyeEtTWC9ab1JiTzd6Yk4wbFhEb29aZFFiQzVmT2ZnUnNGQ1RU?=
- =?utf-8?B?eGdCaUQyWSt1anhBZWpQNDZOUkY5RVlENTBGcXZ0TWRYU3AzYnc2dWp2VVRi?=
- =?utf-8?B?T2k2d1NPakZ3YzB4dWxjcGZxV2NMWGlHRXhwUzFRcmU1MnJkRjJWWkt4RnhJ?=
- =?utf-8?B?U2pzdEtmMnJZczBySGVmOHZkRHZWeTE4L2pESHRDWGtTcjVlejJoTWt6dllV?=
- =?utf-8?B?UmFqNk53eG43ZHVMZVlYWHNxN1JJMFlJNVErWnpNVkd3YXY2b0tLUk51TGRS?=
- =?utf-8?B?M2MvYVRVaTU1MWt4V0tlWjZQS2l5OXJGU09nVHhSMWluMVdmSkZxQWR2TnZz?=
- =?utf-8?B?YTNnUEVuUzVyQnhXNlhIWGFoUUZERTRwZGlzbkExS2doMHpkblRjdmlzSmxO?=
- =?utf-8?B?ekxqNWN5Z2Q3T1BnVVJBNlQrWEVRTXdORGlvUncrOWtjajZ4Z0NpODEzTzZJ?=
- =?utf-8?Q?IVzJo9wrBAE=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PA4PR10MB5681.EURPRD10.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(7053199007);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?MjF1b3JTYXV4M29IWGFsR2VudERXa2xpSWxCVTJacUE2SFcyekk4TWhmenhq?=
- =?utf-8?B?V2RJMXVTeDdmdXdPZWlSNm1yZFg3WWxXcWpWMDA4ajBBQnl2U29HV2ZFNGx6?=
- =?utf-8?B?aVFSak5Rd1EyWXNud1BmcHJJQjN1TGMrUHRCY2xrQ095Z3dTWVJ6dkw2djNK?=
- =?utf-8?B?Nm1NUVZtM3pWcktqR1hJbWtTUllFc3daVVZ3TGFtdTVDVUExYlZCRmpLdDNM?=
- =?utf-8?B?NERYNEhxZVBsaTdMTHlPRWw3T0xXRk9WZWNHUlpGQnM2TW01QStMVVBjL3E0?=
- =?utf-8?B?dVBqTmt3VmM2cC9WeGIxWFluQW03ZVFDL05JeVMzVExEYk45RUZiS082VnZo?=
- =?utf-8?B?THVnRlRxV25TL0l1WHRyQW0xUmI4MUoyTU1xNlRxOUtSU1NEYmVOTHpYU0xZ?=
- =?utf-8?B?WVNVREI0NFU5T0hQNnZuQUR3TlREaTIreWMvSjU1L0xFT0swdDg2czNLSXpZ?=
- =?utf-8?B?Z3EyQ3NndVdMWnhDeTdBbGxJY08ycUEvYXUrS2dKK2NNd0pNNURQblU5U0VW?=
- =?utf-8?B?aHhXTjR0YkVqU0ZVZTY2SVVWWHlnMkdGa3Azd3Y0Qmc3UUxHTjJxYjBQWUdC?=
- =?utf-8?B?N2ZlZWhobHhZRXhvWjduRU1UQ0RVVmw0aFd3eXMrbldKVnhCR2ZFRTRxS3Uv?=
- =?utf-8?B?QWc5UHFDM3lBMzdOUEthb1V6OTc1YUJuZjhVb3plWmVCeGNQSmNncjBJaUVS?=
- =?utf-8?B?dTFma1dGVkNyNVNReW9lWC8zd0N2blVuY3hKdXJIRGExRGVPUEw4QklQVzJN?=
- =?utf-8?B?QTZpQXc2ZE1wVkdGMG9Wb0dyQXZyM2FMcHRMOW0xc3NaVlMvVyszVVpDR0xs?=
- =?utf-8?B?S1NpME1uYnJXWnZTYVFCaXJkVXIxYkdsWnM4czVWMVVQV28yVm5rRjJ2OVVx?=
- =?utf-8?B?ZTdtVG9jS0pMUzg0Qm55ZmZrWWg5eDN2L1lYQ09nVTNLOUhCK3pSbEhWTW85?=
- =?utf-8?B?QjVMSXZCUG5yWERhVlVBMGt3ZGVGbTZXQ2xqUXVZeGFoTXRESUtUT2VhMXI1?=
- =?utf-8?B?aWJwZHdEUmV1K05SNm1xVHhnUjd3eHQ1dWNvVmI1aWYreG91eG1NcjVjam11?=
- =?utf-8?B?T2Z5V2xFM3pGWjlCaXRRY2tIMGpYQU1vYnU3dVFLdHlCekR6ZmNId0FjcmM0?=
- =?utf-8?B?VUFSZE9NN2pab0N3KzNhWGZ0eEtGdW1KZ0IwZG5pSnJQano0ODZHMUZkb1R5?=
- =?utf-8?B?QlNVT2UxaU5rV003My96R0RIQzZGellpMWZmTlhIZWFGaHpnL09NSUM2Rmx3?=
- =?utf-8?B?akQ1UWNFRzRSM3MxdnRZSzJuMDAzMFNpYnU3cE5NMnZ0Zy9WYzFxRkhPdzF1?=
- =?utf-8?B?ZENwcVJiRTYvS3dMOXl5SjhZWkJqcGxqNkRYK25RdjU5M1RvMlE3Vnp5aURP?=
- =?utf-8?B?dlFscWM1a1pML3FRZGxxMUtIdVdwWnNXZUhzdmx4RUVDT1VQWGJaNTlKRWI0?=
- =?utf-8?B?Mm9PcmF2R2hZSVoxTWlHRmZFTkpDRVpBMkdaREw0M1oyWDBPbGZLUURWN0hT?=
- =?utf-8?B?MTNNMnlIeUpaMkVFeVNwbDZrMUNjN1hsVVZVc2lxb3cvbHhKZFdYRlJhVXVE?=
- =?utf-8?B?Wk90UzNQTVY0OVY4ZnJEa2FzOWRJbUdGaTFRcFVzaFBQS01uWkh0eCttL3pW?=
- =?utf-8?B?cDllM1BJZ21IQi9uMWt3Vlh3N1greVdwc3FTNU9EdkkyZVRtRDNVcHJGdS81?=
- =?utf-8?B?Y2F2YlFOZkY5RFVvelNMa0tVVzN6dXBYN1dObk5IWFR5M1BKK05GV05nMk5L?=
- =?utf-8?B?V0YxTFlsVmtnUUNnclNwa3V6YzhSNTIzK3M5dXRFaGlVWmh4K0ZKMTF2eHVY?=
- =?utf-8?B?YTRQbDJ1elY5WXA2YzlCSHh0a2VlUTk2VHBncGxWc3lhQlhDWG1NVXl3Rklj?=
- =?utf-8?B?Y09jWDIxM2RWcVFPS1pCcU1UcEhhRGM4cERQRENvR256Z1VLVU1vTUkxVS9K?=
- =?utf-8?B?MFhDT2hPZEpndk1Dam11Qmorc3BUekEyOHdhdFFBZDRhcGlJSVdjVnZ1dFdW?=
- =?utf-8?B?Tm1KTGNlTkRubFlXdlRBMEVqekRxQzlzeHA0T0RuWnFCMVRuRVMxbWVIRXJu?=
- =?utf-8?B?aEMva3JWd2hZeUVKYkVnSnRjcitVaDd4cVBCQ0NIWitHV2JUaUlmaHRBSGQ2?=
- =?utf-8?B?TXk2ZUsrN3d6S2c2UEIzZVM5L1k0K1RxK0R6Y2ZvL3pEWHZQVTRaUnpzcnV1?=
- =?utf-8?B?MVE9PQ==?=
-X-OriginatorOrg: kontron.de
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3cfea2fc-873e-41ff-ef16-08ddde46847f
-X-MS-Exchange-CrossTenant-AuthSource: PA4PR10MB5681.EURPRD10.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Aug 2025 11:01:01.0556
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 8c9d3c97-3fd9-41c8-a2b1-646f3942daf1
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 7de0GWRkIzLupwITWGHoFyKcDTMApCIGO1OrlvaZHD4tgKb56qpK4qLFxAEk1XREzwAMq1zUkJpPtWDE0TnZQDKt5TiCEFQnfe2Ntbn/qAQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI0PR10MB9032
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 3/6] ice: fix Rx page leak on multi-buffer frames
+To: Tony Nguyen <anthony.l.nguyen@intel.com>, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
+ andrew+netdev@lunn.ch, netdev@vger.kernel.org
+Cc: Jacob Keller <jacob.e.keller@intel.com>, maciej.fijalkowski@intel.com,
+ magnus.karlsson@intel.com, ast@kernel.org, daniel@iogearbox.net,
+ john.fastabend@gmail.com, sdf@fomichev.me, bpf@vger.kernel.org,
+ horms@kernel.org, przemyslaw.kitszel@intel.com,
+ aleksander.lobakin@intel.com, jaroslav.pulchart@gooddata.com,
+ jdamato@fastly.com, christoph.petrausch@deepl.com,
+ Rinitha S <sx.rinitha@intel.com>, Priya Singh <priyax.singh@intel.com>,
+ Eelco Chaudron <echaudro@redhat.com>
+References: <20250815204205.1407768-1-anthony.l.nguyen@intel.com>
+ <20250815204205.1407768-4-anthony.l.nguyen@intel.com>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <20250815204205.1407768-4-anthony.l.nguyen@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Tristram,
 
-Am 16.08.25 um 02:53 schrieb Tristram.Ha@microchip.com:
->> Am 15.08.25 um 00:59 schrieb Andrew Lunn:
->>> On Wed, Aug 13, 2025 at 05:26:12PM +0200, Frieder Schrempf wrote:
->>>> From: Frieder Schrempf <frieder.schrempf@kontron.de>
->>>>
->>>> The KSZ9477 supports NETIF_F_HW_HSR_FWD to forward packets between
->>>> HSR ports. This is set up when creating the HSR interface via
->>>> ksz9477_hsr_join() and ksz9477_cfg_port_member().
->>>>
->>>> At the same time ksz_update_port_member() is called on every
->>>> state change of a port and reconfiguring the forwarding to the
->>>> default state which means packets get only forwarded to the CPU
->>>> port.
->>>>
->>>> If the ports are brought up before setting up the HSR interface
->>>> and then the port state is not changed afterwards, everything works
->>>> as intended:
->>>>
->>>>    ip link set lan1 up
->>>>    ip link set lan2 up
->>>>    ip link add name hsr type hsr slave1 lan1 slave2 lan2 supervision 45 version 1
->>>>    ip addr add dev hsr 10.0.0.10/24
->>>>    ip link set hsr up
->>>>
->>>> If the port state is changed after creating the HSR interface, this results
->>>> in a non-working HSR setup:
->>>>
->>>>    ip link add name hsr type hsr slave1 lan1 slave2 lan2 supervision 45 version 1
->>>>    ip addr add dev hsr 10.0.0.10/24
->>>>    ip link set lan1 up
->>>>    ip link set lan2 up
->>>>    ip link set hsr up
->>>
->>> So, restating what i said in a different thread, what happens if only
->>> software was used? No hardware offload.
->>
->> Sorry, I don't understand what you are aiming at.
->>
->> Yes, this issue is related to hardware offloading. As far as I know
->> there is no option (for the user) to force HSR into SW-only mode. The
->> KSZ9477 driver uses hardware offloading up to the capabilities of the HW
->> by default.
->>
->> Yes, if I disable the offloading by modifying the driver code as already
->> described in the other thread, the issue can be fixed at the cost of
->> loosing the HW acceleration. In this case the driver consistently
->> configures the HSR ports to forward any packets to the CPU which then
->> forwards them as needed.
->>
->> With the driver code as-is, there are two conflicting values used for
->> the register that configures the forwarding. One is set during the HSR
->> setup and makes sure that HSR ports forward packets among each other
->> (and not only to the CPU), the other is set while changing the link
->> state of the HSR ports and causes the forwarding to only happen between
->> each port and the CPU, therefore effectively disabling the HW offloading
->> while the driver still assumes it is enabled.
->>
->> This is obviously a problem that should be fixed in the driver as
->> changing the link state of the ports *after* setup of the HSR is a
->> completely valid operation that shouldn't break things like it currently
->> does.
+
+On 15/08/2025 22.41, Tony Nguyen wrote:
+> From: Jacob Keller <jacob.e.keller@intel.com>
 > 
-> Here is a simpler fix for this problem.  If that works for you I can
-> submit the fix.
+> The ice_put_rx_mbuf() function handles calling ice_put_rx_buf() for each
+> buffer in the current frame. This function was introduced as part of
+> handling multi-buffer XDP support in the ice driver.
 > 
-> net: dsa: microchip: Fix HSR port setup issue
+> It works by iterating over the buffers from first_desc up to 1 plus the
+> total number of fragments in the frame, cached from before the XDP program
+> was executed.
 > 
-> ksz9477_hsr_join() is called once to setup the HSR port membership, but
-> the port can be enabled later, or disabled and enabled back and the port
-> membership is not set correctly inside ksz_update_port_member().  The
-> added code always use the correct HSR port membership for HSR port that
-> is enabled.
+> If the hardware posts a descriptor with a size of 0, the logic used in
+> ice_put_rx_mbuf() breaks. Such descriptors get skipped and don't get added
+> as fragments in ice_add_xdp_frag. Since the buffer isn't counted as a
+> fragment, we do not iterate over it in ice_put_rx_mbuf(), and thus we don't
+> call ice_put_rx_buf().
 > 
-> Fixes: 2d61298fdd7b ("net: dsa: microchip: Enable HSR offloading for KSZ9477")
-> Signed-off-by: Tristram Ha <tristram.ha@microchip.com>
+> Because we don't call ice_put_rx_buf(), we don't attempt to re-use the
+> page or free it. This leaves a stale page in the ring, as we don't
+> increment next_to_alloc.
+> 
+> The ice_reuse_rx_page() assumes that the next_to_alloc has been incremented
+> properly, and that it always points to a buffer with a NULL page. Since
+> this function doesn't check, it will happily recycle a page over the top
+> of the next_to_alloc buffer, losing track of the old page.
+> 
+> Note that this leak only occurs for multi-buffer frames. The
+> ice_put_rx_mbuf() function always handles at least one buffer, so a
+> single-buffer frame will always get handled correctly. It is not clear
+> precisely why the hardware hands us descriptors with a size of 0 sometimes,
+> but it happens somewhat regularly with "jumbo frames" used by 9K MTU.
+> 
+> To fix ice_put_rx_mbuf(), we need to make sure to call ice_put_rx_buf() on
+> all buffers between first_desc and next_to_clean. Borrow the logic of a
+> similar function in i40e used for this same purpose. Use the same logic
+> also in ice_get_pgcnts().
+> 
+> Instead of iterating over just the number of fragments, use a loop which
+> iterates until the current index reaches to the next_to_clean element just
+> past the current frame. Check the current number of fragments (post XDP
+> program). For all buffers up 1 more than the number of fragments, we'll
+> update the pagecnt_bias. For any buffers past this, pagecnt_bias is left
+> as-is. This ensures that fragments released by the XDP program, as well as
+> any buffers with zero-size won't have their pagecnt_bias updated
+> incorrectly. Unlike i40e, the ice_put_rx_mbuf() function does call
+> ice_put_rx_buf() on the last buffer of the frame indicating end of packet.
+> 
+> The xdp_xmit value only needs to be updated if an XDP program is run, and
+> only once per packet. Drop the xdp_xmit pointer argument from
+> ice_put_rx_mbuf(). Instead, set xdp_xmit in the ice_clean_rx_irq() function
+> directly. This avoids needing to pass the argument and avoids an extra
+> bit-wise OR for each buffer in the frame.
+> 
+> Move the increment of the ntc local variable to ensure its updated *before*
+> all calls to ice_get_pgcnts() or ice_put_rx_mbuf(), as the loop logic
+> requires the index of the element just after the current frame.
+> 
+> This has the advantage that we also no longer need to track or cache the
+> number of fragments in the rx_ring, which saves a few bytes in the ring.
+> 
+
+Have anyone tested the performance impact for XDP_DROP ?
+(with standard non-multi-buffer frames)
+
+Below code change will always touch cache-lines in shared_info area.
+Before it was guarded with a xdp_buff_has_frags() check.
+
+> Cc: Christoph Petrausch <christoph.petrausch@deepl.com>
+> Reported-by: Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
+> Closes: https://lore.kernel.org/netdev/CAK8fFZ4hY6GUJNENz3wY9jaYLZXGfpr7dnZxzGMYoE44caRbgw@mail.gmail.com/
+> Fixes: 743bbd93cf29 ("ice: put Rx buffers after being done with current frame")
+> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+> Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
+> Reviewed-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+> Tested-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+> Tested-by: Priya Singh <priyax.singh@intel.com>
+> Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 > ---
->  drivers/net/dsa/microchip/ksz_common.c | 3 +++
->  1 file changed, 3 insertions(+)
+>   drivers/net/ethernet/intel/ice/ice_txrx.c | 81 +++++++++--------------
+>   drivers/net/ethernet/intel/ice/ice_txrx.h |  1 -
+>   2 files changed, 33 insertions(+), 49 deletions(-)
 > 
-> diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-> index 4cb14288ff0f..c04d4c895025 100644
-> --- a/drivers/net/dsa/microchip/ksz_common.c
-> +++ b/drivers/net/dsa/microchip/ksz_common.c
-> @@ -2457,6 +2457,9 @@ static void ksz_update_port_member(struct ksz_device *dev, int port)
->  		dev->dev_ops->cfg_port_member(dev, i, val | cpu_port);
->  	}
->  
-> +	if (!port_member && p->stp_state == BR_STATE_FORWARDING &&
-> +	    (dev->hsr_ports & BIT(port)))
-> +		port_member = dev->hsr_ports;
->  	dev->dev_ops->cfg_port_member(dev, port, port_member | cpu_port);
->  }
-> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
+> index 29e0088ab6b2..93907ab2eac7 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_txrx.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
+> @@ -894,10 +894,6 @@ ice_add_xdp_frag(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp,
+>   	__skb_fill_page_desc_noacc(sinfo, sinfo->nr_frags++, rx_buf->page,
+>   				   rx_buf->page_offset, size);
+>   	sinfo->xdp_frags_size += size;
+> -	/* remember frag count before XDP prog execution; bpf_xdp_adjust_tail()
+> -	 * can pop off frags but driver has to handle it on its own
+> -	 */
+> -	rx_ring->nr_frags = sinfo->nr_frags;
+>   
+>   	if (page_is_pfmemalloc(rx_buf->page))
+>   		xdp_buff_set_frag_pfmemalloc(xdp);
+> @@ -968,20 +964,20 @@ ice_get_rx_buf(struct ice_rx_ring *rx_ring, const unsigned int size,
+>   /**
+>    * ice_get_pgcnts - grab page_count() for gathered fragments
+>    * @rx_ring: Rx descriptor ring to store the page counts on
+> + * @ntc: the next to clean element (not included in this frame!)
+>    *
+>    * This function is intended to be called right before running XDP
+>    * program so that the page recycling mechanism will be able to take
+>    * a correct decision regarding underlying pages; this is done in such
+>    * way as XDP program can change the refcount of page
+>    */
+> -static void ice_get_pgcnts(struct ice_rx_ring *rx_ring)
+> +static void ice_get_pgcnts(struct ice_rx_ring *rx_ring, unsigned int ntc)
+>   {
+> -	u32 nr_frags = rx_ring->nr_frags + 1;
+>   	u32 idx = rx_ring->first_desc;
+>   	struct ice_rx_buf *rx_buf;
+>   	u32 cnt = rx_ring->count;
+>   
+> -	for (int i = 0; i < nr_frags; i++) {
+> +	while (idx != ntc) {
+>   		rx_buf = &rx_ring->rx_buf[idx];
+>   		rx_buf->pgcnt = page_count(rx_buf->page);
+>   
+> @@ -1154,62 +1150,48 @@ ice_put_rx_buf(struct ice_rx_ring *rx_ring, struct ice_rx_buf *rx_buf)
+>   }
+>   
+>   /**
+> - * ice_put_rx_mbuf - ice_put_rx_buf() caller, for all frame frags
+> + * ice_put_rx_mbuf - ice_put_rx_buf() caller, for all buffers in frame
+>    * @rx_ring: Rx ring with all the auxiliary data
+>    * @xdp: XDP buffer carrying linear + frags part
+> - * @xdp_xmit: XDP_TX/XDP_REDIRECT verdict storage
+> - * @ntc: a current next_to_clean value to be stored at rx_ring
+> + * @ntc: the next to clean element (not included in this frame!)
+>    * @verdict: return code from XDP program execution
+>    *
+> - * Walk through gathered fragments and satisfy internal page
+> - * recycle mechanism; we take here an action related to verdict
+> - * returned by XDP program;
+> + * Called after XDP program is completed, or on error with verdict set to
+> + * ICE_XDP_CONSUMED.
+> + *
+> + * Walk through buffers from first_desc to the end of the frame, releasing
+> + * buffers and satisfying internal page recycle mechanism. The action depends
+> + * on verdict from XDP program.
+>    */
+>   static void ice_put_rx_mbuf(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp,
+> -			    u32 *xdp_xmit, u32 ntc, u32 verdict)
+> +			    u32 ntc, u32 verdict)
+>   {
+> -	u32 nr_frags = rx_ring->nr_frags + 1;
+> +	u32 nr_frags = xdp_get_shared_info_from_buff(xdp)->nr_frags;
 
-This looks fantastic! Way better than my approach!
+Here we unconditionally access the skb_shared_info area.
 
-I just tested it and it seems to fix the issue for me. Please send this
-as formal patch and put me in Reported-by.
+>   	u32 idx = rx_ring->first_desc;
+>   	u32 cnt = rx_ring->count;
+> -	u32 post_xdp_frags = 1;
+>   	struct ice_rx_buf *buf;
+> -	int i;
+> -
+> -	if (unlikely(xdp_buff_has_frags(xdp)))
 
-You might also want to add a comment in the code that gives a short
-explanation for this.
+Previously we only touch shared_info area if this is a multi-buff frame.
 
-Thanks
-Frieder
+> -		post_xdp_frags += xdp_get_shared_info_from_buff(xdp)->nr_frags;
+> +	int i = 0;
+>   
+> -	for (i = 0; i < post_xdp_frags; i++) {
+> +	while (idx != ntc) {
+>   		buf = &rx_ring->rx_buf[idx];
+> +		if (++idx == cnt)
+> +			idx = 0;
+>   
+> -		if (verdict & (ICE_XDP_TX | ICE_XDP_REDIR)) {
+> +		/* An XDP program could release fragments from the end of the
+> +		 * buffer. For these, we need to keep the pagecnt_bias as-is.
+> +		 * To do this, only adjust pagecnt_bias for fragments up to
+> +		 * the total remaining after the XDP program has run.
+> +		 */
+> +		if (verdict != ICE_XDP_CONSUMED)
+>   			ice_rx_buf_adjust_pg_offset(buf, xdp->frame_sz);
+> -			*xdp_xmit |= verdict;
+> -		} else if (verdict & ICE_XDP_CONSUMED) {
+> +		else if (i++ <= nr_frags)
+>   			buf->pagecnt_bias++;
+> -		} else if (verdict == ICE_XDP_PASS) {
+> -			ice_rx_buf_adjust_pg_offset(buf, xdp->frame_sz);
+> -		}
+>   
+>   		ice_put_rx_buf(rx_ring, buf);
+> -
+> -		if (++idx == cnt)
+> -			idx = 0;
+> -	}
+> -	/* handle buffers that represented frags released by XDP prog;
+> -	 * for these we keep pagecnt_bias as-is; refcount from struct page
+> -	 * has been decremented within XDP prog and we do not have to increase
+> -	 * the biased refcnt
+> -	 */
+> -	for (; i < nr_frags; i++) {
+> -		buf = &rx_ring->rx_buf[idx];
+> -		ice_put_rx_buf(rx_ring, buf);
+> -		if (++idx == cnt)
+> -			idx = 0;
+>   	}
+>   
+>   	xdp->data = NULL;
+>   	rx_ring->first_desc = ntc;
+> -	rx_ring->nr_frags = 0;
+>   }
+>   
+>   /**
+> @@ -1317,6 +1299,10 @@ static int ice_clean_rx_irq(struct ice_rx_ring *rx_ring, int budget)
+>   		/* retrieve a buffer from the ring */
+>   		rx_buf = ice_get_rx_buf(rx_ring, size, ntc);
+>   
+> +		/* Increment ntc before calls to ice_put_rx_mbuf() */
+> +		if (++ntc == cnt)
+> +			ntc = 0;
+> +
+>   		if (!xdp->data) {
+>   			void *hard_start;
+>   
+> @@ -1325,24 +1311,23 @@ static int ice_clean_rx_irq(struct ice_rx_ring *rx_ring, int budget)
+>   			xdp_prepare_buff(xdp, hard_start, offset, size, !!offset);
+>   			xdp_buff_clear_frags_flag(xdp);
+>   		} else if (ice_add_xdp_frag(rx_ring, xdp, rx_buf, size)) {
+> -			ice_put_rx_mbuf(rx_ring, xdp, NULL, ntc, ICE_XDP_CONSUMED);
+> +			ice_put_rx_mbuf(rx_ring, xdp, ntc, ICE_XDP_CONSUMED);
+>   			break;
+>   		}
+> -		if (++ntc == cnt)
+> -			ntc = 0;
+>   
+>   		/* skip if it is NOP desc */
+>   		if (ice_is_non_eop(rx_ring, rx_desc))
+>   			continue;
+>   
+> -		ice_get_pgcnts(rx_ring);
+> +		ice_get_pgcnts(rx_ring, ntc);
+>   		xdp_verdict = ice_run_xdp(rx_ring, xdp, xdp_prog, xdp_ring, rx_desc);
+>   		if (xdp_verdict == ICE_XDP_PASS)
+>   			goto construct_skb;
+>   		total_rx_bytes += xdp_get_buff_len(xdp);
+>   		total_rx_pkts++;
+>   
+> -		ice_put_rx_mbuf(rx_ring, xdp, &xdp_xmit, ntc, xdp_verdict);
+> +		ice_put_rx_mbuf(rx_ring, xdp, ntc, xdp_verdict);
+> +		xdp_xmit |= xdp_verdict & (ICE_XDP_TX | ICE_XDP_REDIR);
+>   
+>   		continue;
+>   construct_skb:
+> @@ -1355,7 +1340,7 @@ static int ice_clean_rx_irq(struct ice_rx_ring *rx_ring, int budget)
+>   			rx_ring->ring_stats->rx_stats.alloc_page_failed++;
+>   			xdp_verdict = ICE_XDP_CONSUMED;
+>   		}
+> -		ice_put_rx_mbuf(rx_ring, xdp, &xdp_xmit, ntc, xdp_verdict);
+> +		ice_put_rx_mbuf(rx_ring, xdp, ntc, xdp_verdict);
+>   
+>   		if (!skb)
+>   			break;
+> diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.h b/drivers/net/ethernet/intel/ice/ice_txrx.h
+> index fef750c5f288..2fd8e78178a2 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_txrx.h
+> +++ b/drivers/net/ethernet/intel/ice/ice_txrx.h
+> @@ -358,7 +358,6 @@ struct ice_rx_ring {
+>   	struct ice_tx_ring *xdp_ring;
+>   	struct ice_rx_ring *next;	/* pointer to next ring in q_vector */
+>   	struct xsk_buff_pool *xsk_pool;
+> -	u32 nr_frags;
+>   	u16 max_frame;
+>   	u16 rx_buf_len;
+>   	dma_addr_t dma;			/* physical address of ring */
+
 
