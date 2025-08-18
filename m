@@ -1,124 +1,197 @@
-Return-Path: <netdev+bounces-214507-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4F2AB29F00
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 12:24:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0923B29E58
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 11:49:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AAEC51646A1
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 10:21:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83C684E58F8
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 09:48:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A9FC315796;
-	Mon, 18 Aug 2025 10:20:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55D2E286897;
+	Mon, 18 Aug 2025 09:48:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6500315770;
-	Mon, 18 Aug 2025 10:20:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21FD819D08F;
+	Mon, 18 Aug 2025 09:48:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755512446; cv=none; b=bo6zwtWhETLxzkuydDrPtx+xAEPl0N5W8XSACGt8nkaRACt1dDOjRQplxIYnhC/Jfo+jrEY+sstp7ZjEV/wDmh6Y7g1ga2IY/kWl1WaxHp4yu8Je2mWPuQKfwUy50uMrHKKMiCH5MN3zKKI5Jdf3vJoAoI5z6Bh99vZ6i617bCg=
+	t=1755510515; cv=none; b=Vh4kzzxZnxCu5MEaczpqr9PEMr6OrFbr+s6clIgkdC6mltC/VChLErA0wpHeRQnl2uCOUSJlQOWwQSskX0M6xQgDoi84cVPGU6Q2RLhmopWV25GD8D+PPg4ViVT1WwxdvyUAiRDGFQkk55GtQLOub7SXQc6COiBdMCuU7kNrdsg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755512446; c=relaxed/simple;
-	bh=vVfzZiL3SHLn9VOiHd94n8EbMb/amrFrBX1QpYNDS0Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LII+/4STT3YZP2O3Wvze4WoVcxRWxW8Q0mX1lKYOhhN5LERjGpVmVNXkEMqZ9nF6+6nk0DdxVsPNAyqZq9akYsGXFx64Rcx9asA5DOTPbVJC4pPFhaDqAG8kRqeAXHuUAGhnkuyf9UFOa3aYDHFKzTih6Z3kwJSeofddwcTdEaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
-Received: from localhost (mailhub4.si.c-s.fr [172.26.127.67])
-	by localhost (Postfix) with ESMTP id 4c57gB3XdZz9sSh;
-	Mon, 18 Aug 2025 12:07:18 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from pegase2.c-s.fr ([172.26.127.65])
-	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id UW5otXcsL1ne; Mon, 18 Aug 2025 12:07:18 +0200 (CEST)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-	by pegase2.c-s.fr (Postfix) with ESMTP id 4c57gB2nMFz9sSf;
-	Mon, 18 Aug 2025 12:07:18 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 4B9058B764;
-	Mon, 18 Aug 2025 12:07:18 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-	with ESMTP id ZTl45ucC9PUM; Mon, 18 Aug 2025 12:07:18 +0200 (CEST)
-Received: from [10.25.207.160] (unknown [10.25.207.160])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 269648B763;
-	Mon, 18 Aug 2025 12:07:18 +0200 (CEST)
-Message-ID: <edfed2af-8b4d-4afb-b999-5c46b7d46fba@csgroup.eu>
-Date: Mon, 18 Aug 2025 12:07:18 +0200
+	s=arc-20240116; t=1755510515; c=relaxed/simple;
+	bh=2cebde2kfuXyzBvXebgHT65nyp1L5Usz3QUTVaXigEg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=qRtUoAmKMMOY9QDRjoqBeNsB0B9fbEYr9rwl1Ecz1mAt/OwZd663hukfR1mIikuD3jJBBPr515gHOOkq3MA4TMDxeutSn+2lSKgxTibF3/pqCVM3zB+a1RkeylKGB1F9tMTk9gusqw4+L+vDOXNKhc7/4lY120PgOzzH0UmMO90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.163])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4c57Gh3LqYz3TqZL;
+	Mon, 18 Aug 2025 17:49:32 +0800 (CST)
+Received: from dggpemf500002.china.huawei.com (unknown [7.185.36.57])
+	by mail.maildlp.com (Postfix) with ESMTPS id 80585180042;
+	Mon, 18 Aug 2025 17:48:27 +0800 (CST)
+Received: from huawei.com (10.50.159.234) by dggpemf500002.china.huawei.com
+ (7.185.36.57) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Mon, 18 Aug
+ 2025 17:48:26 +0800
+From: Yue Haibing <yuehaibing@huawei.com>
+To: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<yuehaibing@huawei.com>
+Subject: [PATCH RESEND net-next] ipv6: mcast: Add ip6_mc_find_idev() helper
+Date: Mon, 18 Aug 2025 18:10:51 +0800
+Message-ID: <20250818101051.892443-1-yuehaibing@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: modprobe returns 0 upon -EEXIST from insmod
-To: Phil Sutter <phil@nwl.cc>, netfilter-devel@vger.kernel.org,
- coreteam@netfilter.org
-Cc: linux-modules@vger.kernel.org, Yi Chen <yiche@redhat.com>,
- netdev@vger.kernel.org
-References: <aKEVQhJpRdiZSliu@orbyte.nwl.cc>
- <8a87656d-577a-4d0a-85b1-5fd17d0346fe@csgroup.eu>
- <aKLzsAX14ybEjHfJ@orbyte.nwl.cc>
-From: Christophe Leroy <christophe.leroy@csgroup.eu>
-Content-Language: fr-FR
-In-Reply-To: <aKLzsAX14ybEjHfJ@orbyte.nwl.cc>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ dggpemf500002.china.huawei.com (7.185.36.57)
 
-[+ Netfilter lists]
+__ipv6_sock_mc_join() has the same code as ip6_mc_find_dev() to find dev,
+extract this into ip6_mc_find_dev() and add ip6_mc_find_idev() to reduce
+code duplication and improve readability.
 
-Hi Phil
+Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+---
+ net/ipv6/mcast.c | 76 ++++++++++++++++++++++--------------------------
+ 1 file changed, 35 insertions(+), 41 deletions(-)
 
-Le 18/08/2025 à 11:34, Phil Sutter a écrit :
-> [Vous ne recevez pas souvent de courriers de phil@nwl.cc. Découvrez pourquoi ceci est important à https://aka.ms/LearnAboutSenderIdentification ]
-> 
-> Hi Christophe,
-> 
-> On Sun, Aug 17, 2025 at 05:54:27PM +0200, Christophe Leroy wrote:
->> Le 17/08/2025 à 01:33, Phil Sutter a écrit :
->>> [Vous ne recevez pas souvent de courriers de phil@nwl.cc. D?couvrez pourquoi ceci est important ? https://aka.ms/LearnAboutSenderIdentification ]
->>>
->>> Hi,
->>>
->>> I admittedly didn't fully analyze the cause, but on my system a call to:
->>>
->>> # insmod /lib/module/$(uname -r)/kernel/net/netfilter/nf_conntrack_ftp.ko
->>>
->>> fails with -EEXIST (due to a previous call to 'nfct add helper ftp inet
->>> tcp'). A call to:
->>>
->>> # modprobe nf_conntrack_ftp
->>>
->>> though returns 0 even though module loading fails. Is there a bug in
->>> modprobe error status handling?
->>>
->>
->> Read the man page : https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Flinux.die.net%2Fman%2F8%2Fmodprobe&data=05%7C02%7Cchristophe.leroy%40csgroup.eu%7C34b49eb3d0544fc683e608ddde3a75b2%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C638911064858807750%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=%2F70LV37Zb%2FNeiBV59y9rvkLGh0xsqga08Nl3c5%2BVU5I%3D&reserved=0
->>
->> In the man page I see:
->>
->>              Normally, modprobe will succeed (and do nothing) if told to
->> insert a module which is already present or to remove a module which
->> isn't present.
-> 
-> This is not a case of already inserted module, it is not loaded before
-> the call to modprobe. It is the module_init callback
-> nf_conntrack_ftp_init() which returns -EEXIST it received from
-> nf_conntrack_helpers_register().
-> 
-> Can't user space distinguish the two causes of -EEXIST? Or in other
-> words, is use of -EEXIST in module_init callbacks problematic?
+diff --git a/net/ipv6/mcast.c b/net/ipv6/mcast.c
+index 36ca27496b3c..75430ad55c3d 100644
+--- a/net/ipv6/mcast.c
++++ b/net/ipv6/mcast.c
+@@ -169,6 +169,29 @@ static int unsolicited_report_interval(struct inet6_dev *idev)
+ 	return iv > 0 ? iv : 1;
+ }
+ 
++static struct net_device *ip6_mc_find_dev(struct net *net,
++					  const struct in6_addr *group,
++					  int ifindex)
++{
++	struct net_device *dev = NULL;
++	struct rt6_info *rt;
++
++	if (ifindex == 0) {
++		rcu_read_lock();
++		rt = rt6_lookup(net, group, NULL, 0, NULL, 0);
++		if (rt) {
++			dev = dst_dev(&rt->dst);
++			dev_hold(dev);
++			ip6_rt_put(rt);
++		}
++		rcu_read_unlock();
++	} else {
++		dev = dev_get_by_index(net, ifindex);
++	}
++
++	return dev;
++}
++
+ /*
+  *	socket join on multicast group
+  */
+@@ -191,28 +214,13 @@ static int __ipv6_sock_mc_join(struct sock *sk, int ifindex,
+ 	}
+ 
+ 	mc_lst = sock_kmalloc(sk, sizeof(struct ipv6_mc_socklist), GFP_KERNEL);
+-
+ 	if (!mc_lst)
+ 		return -ENOMEM;
+ 
+ 	mc_lst->next = NULL;
+ 	mc_lst->addr = *addr;
+ 
+-	if (ifindex == 0) {
+-		struct rt6_info *rt;
+-
+-		rcu_read_lock();
+-		rt = rt6_lookup(net, addr, NULL, 0, NULL, 0);
+-		if (rt) {
+-			dev = dst_dev(&rt->dst);
+-			dev_hold(dev);
+-			ip6_rt_put(rt);
+-		}
+-		rcu_read_unlock();
+-	} else {
+-		dev = dev_get_by_index(net, ifindex);
+-	}
+-
++	dev = ip6_mc_find_dev(net, addr, ifindex);
+ 	if (!dev) {
+ 		sock_kfree_s(sk, mc_lst, sizeof(*mc_lst));
+ 		return -ENODEV;
+@@ -302,32 +310,18 @@ int ipv6_sock_mc_drop(struct sock *sk, int ifindex, const struct in6_addr *addr)
+ }
+ EXPORT_SYMBOL(ipv6_sock_mc_drop);
+ 
+-static struct inet6_dev *ip6_mc_find_dev(struct net *net,
+-					 const struct in6_addr *group,
+-					 int ifindex)
++static struct inet6_dev *ip6_mc_find_idev(struct net *net,
++					  const struct in6_addr *group,
++					  int ifindex)
+ {
+-	struct net_device *dev = NULL;
+-	struct inet6_dev *idev;
+-
+-	if (ifindex == 0) {
+-		struct rt6_info *rt;
++	struct inet6_dev *idev = NULL;
++	struct net_device *dev;
+ 
+-		rcu_read_lock();
+-		rt = rt6_lookup(net, group, NULL, 0, NULL, 0);
+-		if (rt) {
+-			dev = dst_dev(&rt->dst);
+-			dev_hold(dev);
+-			ip6_rt_put(rt);
+-		}
+-		rcu_read_unlock();
+-	} else {
+-		dev = dev_get_by_index(net, ifindex);
++	dev = ip6_mc_find_dev(net, group, ifindex);
++	if (dev) {
++		idev = in6_dev_get(dev);
++		dev_put(dev);
+ 	}
+-	if (!dev)
+-		return NULL;
+-
+-	idev = in6_dev_get(dev);
+-	dev_put(dev);
+ 
+ 	return idev;
+ }
+@@ -374,7 +368,7 @@ int ip6_mc_source(int add, int omode, struct sock *sk,
+ 	if (!ipv6_addr_is_multicast(group))
+ 		return -EINVAL;
+ 
+-	idev = ip6_mc_find_dev(net, group, pgsr->gsr_interface);
++	idev = ip6_mc_find_idev(net, group, pgsr->gsr_interface);
+ 	if (!idev)
+ 		return -ENODEV;
+ 
+@@ -509,7 +503,7 @@ int ip6_mc_msfilter(struct sock *sk, struct group_filter *gsf,
+ 	    gsf->gf_fmode != MCAST_EXCLUDE)
+ 		return -EINVAL;
+ 
+-	idev = ip6_mc_find_dev(net, group, gsf->gf_interface);
++	idev = ip6_mc_find_idev(net, group, gsf->gf_interface);
+ 	if (!idev)
+ 		return -ENODEV;
+ 
+-- 
+2.34.1
 
-So if I understand correctly the load fails because it is in conflict 
-with another module ?
-
-Then I think the error returned by nf_conntrack_helpers_register() 
-shouldn't be EEXIST but probably EBUSY.
-
-Christophe
 
