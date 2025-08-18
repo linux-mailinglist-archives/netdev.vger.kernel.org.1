@@ -1,61 +1,60 @@
-Return-Path: <netdev+bounces-214678-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214680-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7F21B2AD9D
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 18:00:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70FB4B2ADB3
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 18:05:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8AB144E10FD
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 16:00:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D87518A6C8F
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 16:05:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5590C33A017;
-	Mon, 18 Aug 2025 16:00:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39EAF283FC3;
+	Mon, 18 Aug 2025 16:05:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M/ms83fx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X8aUYaC+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31E483376B8
-	for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 16:00:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10677221294;
+	Mon, 18 Aug 2025 16:05:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755532811; cv=none; b=G3175wB9g4vNVi3IGkAOnWO6jNn2HkBuhjAgmzXm7feehlH74papRJyOeknAL3zLdrprCdEPkUeXg2BcOkPGnNb95nf6lKp9LGaiKgVmlgk2C3ntCV53fZ8UL7BV56HzZlbrRHBW2FsiZD4vdg+znye/JDVqOOly4Zjr7T9/Kvc=
+	t=1755533121; cv=none; b=ko67t/Uf9XE4VUyMHb09qLPfTLsWrxra33KLyJl6IiAnEiTH3uCwVURUjE4HHB2+d1OQbc8oFPoQedoWr0D2O2ayic8VHPQpqHbLNQ0v2aG51JZ5Di1wODXqoCf99/cCfziCCloTdlWBU5DclkNfe7QDUEXd7BQWCzmCRJd3IBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755532811; c=relaxed/simple;
-	bh=FSlCD5RaSvZxFuFw4a32tctP7mGD+tB6sYhMCTGAHFE=;
+	s=arc-20240116; t=1755533121; c=relaxed/simple;
+	bh=UHJQ5AOO3NWQGsPJiDOZaBcoavjmPk3YU/SIDGJiLyQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hVo19uMS4nrissVLbaMDxZDdmqBMJ7uYFwsu5BuUDUMn4RM/IjPt76UH8eyjGzomfp437oS2YZTMmNDNDlSJRjkZUtjerA/y5Wan/1GapnGmlybgiNoSw3yIlfqrb/tTuFAUvazJf2CdR43PTW5IgpDqkkfn0j+gHPB6L00C4HY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M/ms83fx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0469C4CEEB;
-	Mon, 18 Aug 2025 16:00:10 +0000 (UTC)
+	 MIME-Version:Content-Type; b=XUxR7bIDz0IaKrgZVCsUlbAznDzzr8mJJmST1obrS5Ub4jCQy8EwEf16kHv5+65P/clX5fBIzB6V4mUrGEtvfCNQzlspjXNEJaplGDSzEBdclOxUMlOfhGGjXQCATnRYM3+sFKwe9s/Pm4SOoSZls14yaaDURZ79XPS5R99FStY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X8aUYaC+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5487AC4CEEB;
+	Mon, 18 Aug 2025 16:05:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755532811;
-	bh=FSlCD5RaSvZxFuFw4a32tctP7mGD+tB6sYhMCTGAHFE=;
+	s=k20201202; t=1755533120;
+	bh=UHJQ5AOO3NWQGsPJiDOZaBcoavjmPk3YU/SIDGJiLyQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=M/ms83fxLiVXGve5P2xWEfjAvzD4MxGOvtFgt3E3lF7WDN6Sh0psKyWJ/IUpbixph
-	 W8MOwLj8D36fGll1IP+06EvlKeXnXE8oO/BaR8Yfyg3YekId39kdFtksVoCE8nU5mG
-	 Lc94BLeJi5gLM1jgUGi5cp/CouMX6TsW+pixr7lvAvQEkGSSqlJ3CwKPRgo8LZfXh/
-	 +JAkvN/ByO2duLGpiBdVj81Ih3HoQx7XXSQR1LXSPtg8pL7KoR81PZF5+wWLc46Xa9
-	 SoC+O3MhbjPGewXFFsI4hiyih+q9WmRt3PgYLikZP4UHtYe+EFqi8TXxgGMRsIlnAP
-	 7FVBdkcCLOdwA==
-Date: Mon, 18 Aug 2025 09:00:10 -0700
+	b=X8aUYaC+edxp7UNq2Uhvs74jx45Zzsjskpqa+ccARjEADGRxh5HkkZpEoAWFZxdGw
+	 4C2oPWJrA+MBnUD7gCFKYT0ZOVozFiB3uS9yNpfp/uyC5sCpr+mTmRW5eqXQUspRV5
+	 AM5ODYjFyyITSI1XTe88efBsrxc0x+OyIMo+GekeZgp5NLUgbJfNQ6rKEqKkaqvFrC
+	 0q4FMUBvQkfjvO+ilBVtMWa+y6YqFlVFo6f+f2sqTbW1yHN9x+q0KeUiLWITotNXds
+	 KvTMUSO6piihyY0vLVnEt5hvotMh1giMieKoi8aWnl1SGkEC+BEZ6IcTrpZ84cTTaY
+	 y+80yAFB6NGRw==
+Date: Mon, 18 Aug 2025 09:05:19 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: David Ahern <dsahern@gmail.com>
-Cc: Stephen Hemminger <stephen@networkplumber.org>, Erni Sri Satya Vennela
- <ernis@linux.microsoft.com>, netdev@vger.kernel.org,
- haiyangz@microsoft.com, shradhagupta@linux.microsoft.com,
- ssengar@microsoft.com, dipayanroy@microsoft.com, ernis@microsoft.com
-Subject: Re: [PATCH iproute2-next v3] iproute2: Add 'netshaper' command to
- 'ip link' for netdev shaping
-Message-ID: <20250818090010.1201f52a@kernel.org>
-In-Reply-To: <31e038a1-5a17-4c13-bf37-d07cbccd7056@gmail.com>
-References: <1754895902-8790-1-git-send-email-ernis@linux.microsoft.com>
-	<20250816155510.03a99223@hermes.local>
-	<20250818083612.68a3c137@kernel.org>
-	<31e038a1-5a17-4c13-bf37-d07cbccd7056@gmail.com>
+To: Wen Gu <guwen@linux.alibaba.com>
+Cc: richardcochran@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, xuanzhuo@linux.alibaba.com,
+ dust.li@linux.alibaba.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, David
+ Woodhouse <dwmw2@infradead.org>
+Subject: Re: [PATCH net-next v4] ptp: add Alibaba CIPU PTP clock driver
+Message-ID: <20250818090519.33335d5e@kernel.org>
+In-Reply-To: <2a98165b-a353-405d-83e0-ffbca1d41340@linux.alibaba.com>
+References: <20250812115321.9179-1-guwen@linux.alibaba.com>
+	<20250815113814.5e135318@kernel.org>
+	<2a98165b-a353-405d-83e0-ffbca1d41340@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,23 +64,22 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 18 Aug 2025 09:41:29 -0600 David Ahern wrote:
-> On 8/18/25 9:36 AM, Jakub Kicinski wrote:
-> > Somewhat related -- what's your take on integrating / vendoring in YNL?  
+On Sat, 16 Aug 2025 11:52:18 +0800 Wen Gu wrote:
+> > This driver is lacking documentation. You need to describe how the user
+> > is expected to interact with the device and document all these sysfs
+> > attributes.
+> >   
 > 
-> I feel like this has been brought up a few times.
+> OK. I will add the description.
 > 
-> Is there a specific proposal or any patches to review?
+> Would you prefer me to create a related .rst file under Documentation/
+> (perhaps in a new Documentation/clock/ptp/ directory?), or add the
+> description comments directly in this driver source?
 
-Not AFAIK. Erni is being asked to rethink his approach here, and 
-if we're going with a new command perhaps YNL should be on the table.
+It's supposed to be user-facing documentation, so Documentation.
 
-I'd be very interested to get a final ruling on YNL integration 
-into iproute2 -- given its inability to work as a shared object /
-library it's not unreasonable for the answer to be "no". 
-
-The page pool sample in the kernel sources is very useful, I find
-myself copying to various systems during debug. If there's no clear
-path to YNL integration with iproute2 it's time for that sample to
-be come a real CLI tool.
+But you ignored David Woodhouse's response, and also skirted around
+Andrew's comment on OS kernel being an abstraction layer. So if you
+plan to post a v5 -- the documentation better clearly explain why
+this is a PTP device, and not a real time clock.
 
