@@ -1,156 +1,151 @@
-Return-Path: <netdev+bounces-214432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214433-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3499B295F0
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 02:51:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E3C0B29608
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 03:15:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E9064E579F
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 00:51:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DC600189C688
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 01:15:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B8D31E25FA;
-	Mon, 18 Aug 2025 00:51:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="ELlkNW0T"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B2F322A817;
+	Mon, 18 Aug 2025 01:15:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from smtpbg154.qq.com (smtpbg154.qq.com [15.184.224.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F07661EF092;
-	Mon, 18 Aug 2025 00:51:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E3B92236FC
+	for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 01:14:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=15.184.224.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755478283; cv=none; b=K9NnN9IkEdm4kKhcQ5lHFol4DkX2EjE0QPSm0/H54oLLgxXtVqxMnIivtssS4/pN5YDmtbcCrspJPR7FD72cVF3MVgdsTCVylNpEQMdOTOvn818liuocQd5pQlYeoN2qv9zxDzkZPnpAfuNe4zXKFdaObBFAsXW3vqpa4YUvmek=
+	t=1755479702; cv=none; b=g1u6dmUyxJH6ZfcOGHYCXcG+x3D6Lu+WwhFG/q7Xyu4qyeqG9QafNGdUpIuZIB3uYX/zPRfm5ctV/m63P/ur521TIqFMj7L1DEOlrlsaGI4Ey8I2R+w4UwA22r2POHu9WPvgdfV2Zb+8McnzsvcvPJe4w/0FLDxFVwwLdidLn1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755478283; c=relaxed/simple;
-	bh=HRDV7d/PaCaH4Hi8NGvoS4QDvqvAaxN1e4OXjFRTlpg=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=lMtlLTA8zfrfW4Z3VF1Fx/bdqa2Q9XirU54hMA98Um9mwpezGwJVx4H9bPorOGCdCjaKHMbw/VuF/EGlPtv9gfA7KT8wlM3zlI+z7NUgGOnArzmdP3BQgibUlKKMbUWG1CaQd19RrSQn18/mpi8nt7UxEKYfmsrM278Wktk2cb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=ELlkNW0T; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=202503; t=1755478276;
-	bh=zMn+PHO2tsa0PDDuAHWDh8cMSU5uEaOH8EZoPoM1DWA=;
-	h=Date:From:To:Cc:Subject:From;
-	b=ELlkNW0Towd2VRpOzXrju9ngXkqgGs44fejxqrnlIXXiit2+MYW6nEwd1c7xLJY43
-	 Xx9CGwxR6RLkghW33CRtSISK9YarSBor7TQiRehDnpGdr5fXviiTZYhLexR1zPeCsu
-	 OSmSdTsdhXme81ipdlfcrEs1565q0oSymLr5f6Loa58MIZMqksEmQFYRLVT4k7plNG
-	 MwaPev/xCFrxNxv5GRpoVNIOTg8e17qp+COCN2PDTYmwFLyNfgpmVxHUHpWEsvCs0/
-	 wXLboWAIV5FYDV0kd3opxZjJuXXNaq/VCW/aw12FuPSM/hx4Zwlwox6vf44e8a4jJT
-	 rF+zdoO+w3oMg==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4c4vKc49CTz4wbn;
-	Mon, 18 Aug 2025 10:51:16 +1000 (AEST)
-Date: Mon, 18 Aug 2025 10:51:15 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
- <johan.hedberg@gmail.com>, David Miller <davem@davemloft.net>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: duplicate patches in the bluetooth tree
-Message-ID: <20250818105115.2adf8ef8@canb.auug.org.au>
+	s=arc-20240116; t=1755479702; c=relaxed/simple;
+	bh=re+a3hWvgegvjpaptPnpkLKcIKZ7lfEQo+cdRQVOra0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cU2YTs7zendHgTUXO4n32LW74N1YxZGB0XpLUlR3NwDk4gfgFcItEVLWyiAatuJrNcFye0V2P1rVKncKzRUeZc1WNvonOJmUJH7HlpdvUqp23VZGKyjLaBmlxntJrrcFiDCqygZEvQ2p3LdPGx/3KaEF+ruyHFXKgKJu5CLGQgg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=15.184.224.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
+X-QQ-mid: zesmtpgz8t1755479679t304d19fa
+X-QQ-Originating-IP: U+HouEQjyiYAmzyTLPl5BSeqSP+HEtl38Pp5dE5JTBQ=
+Received: from localhost ( [203.174.112.180])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Mon, 18 Aug 2025 09:14:37 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 10326870123005562293
+Date: Mon, 18 Aug 2025 09:14:37 +0800
+From: Yibo Dong <dong100@mucse.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	corbet@lwn.net, gur.stavi@huawei.com, maddy@linux.ibm.com,
+	mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
+	gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
+	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
+	alexanderduyck@fb.com, richardcochran@gmail.com,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 2/5] net: rnpgbe: Add n500/n210 chip support
+Message-ID: <154C964FB97A8BAE+20250818011437.GA1370135@nic-Precision-5820-Tower>
+References: <20250814073855.1060601-1-dong100@mucse.com>
+ <20250814073855.1060601-3-dong100@mucse.com>
+ <a0553f1d-46dd-470c-aabf-163442449e19@lunn.ch>
+ <F74E98A5E4BF5DA4+20250815023836.GB1137415@nic-Precision-5820-Tower>
+ <63af9ff7-0008-4795-a78b-9bed84d75ae0@lunn.ch>
+ <67844B7C9238FBFB+20250815072103.GC1148411@nic-Precision-5820-Tower>
+ <ade28286-33b9-421c-9f3f-da7963a69d4e@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/8scfY5joeHAvvN/z5DHENta";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ade28286-33b9-421c-9f3f-da7963a69d4e@lunn.ch>
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpgz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: MFyAKqap4x//RpEpeccJuhJyZkL+ocQhhcx219bVkF0Fg27hMfFyJJy9
+	qWqrRIwUm2enhnj04cduuf/IYz15YK9RK7RqksUM1PgSGCLRgrDvRivd0kIAcixnU4uJeZ6
+	VRL//WotM0cT685i6fjscKf97wgtuJJpGHINfC2OSiYse3knAfwqKMoyniBLz9vlop8up3w
+	7YTBmqCHyxlrENw+z+UkUxnq9PubDZcU8vXcKlmOZc97oOyXlMD68l2NnohtFTmZ0hXbf5B
+	xYCQCo1bMjj0ajmpxzcuX4XJq58lPQWs4bIRM6X5luYYZ4lKNC224UNv55BAF3E0Jw35YuB
+	7UeypyKOOhNd/pLiRoyIhyRO6dck06gQTdeq2s1QImwF/5938AEl8Wu/9nWloBqnAUF/NSE
+	MDmkgTmcV+qHepXa2vtd1ecu1e4cI2JP5V2d9qRed7ZdAMFXK98VttgSmylRs4mloRMPTHW
+	jCroF/eaDeoy9tXVdwS+Lja3r0XT6Zkjkl9hRDY5IVMu/slu4HWMGElz3uCY2XHwKfzlmo+
+	spdWYgiZfe+QIpQsIKfSc20ObTHFZTBHxsq6TV4FyEjzO6TCZzwBjvkU2kunDoaqn/I7C1U
+	ol5f8TW6GSQRRCp6QC3KJdvu0OIAbcuQfFoVcjtjFqw9CrPiPW/PIs1k/bYNvjAhePeXpoQ
+	lUHhfaxNzXMibBm/s2y+huFcV9jLpPE+5b25tUN1CirPd37e7uXlRJrQJCgUG7YO5k70n/j
+	e3OJtjF4bdlrhtxaIPhMi5Q9eHBn6bLgo7MKOsVmktKFsUltJH79ClGAZwI8B1AXb7kGLWS
+	iy/qMRXeCgjbeT5NcyaB/r69vI8JIrwyFo6CMLQGf7Tnc+W0HcMBhQR30q4/aUrX8uHINhC
+	ERtNKUqp9R9Y4YiR2YD7g319iiR+r6MxHpohq7+zqoE+X9TwrqyRDUZ1beS0XJ3mtxsktAC
+	FQtCKo7dLJ38cRq+vuJre18kUuCMTffz3Yl8kgm0APrOJl+MPPjEa3lg4sIyBtfuF6d/d6C
+	GZQioSGr16v1IZSg6uODGjRonvG9CVmZVpTvfVRt7TTA+erAzLnOKhVnISvgkO2+/uIH8w/
+	A==
+X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
+X-QQ-RECHKSPAM: 0
 
---Sig_/8scfY5joeHAvvN/z5DHENta
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Fri, Aug 15, 2025 at 03:36:10PM +0200, Andrew Lunn wrote:
+> On Fri, Aug 15, 2025 at 03:21:03PM +0800, Yibo Dong wrote:
+> > On Fri, Aug 15, 2025 at 05:56:30AM +0200, Andrew Lunn wrote:
+> > > > It means driver version 0.2.4.16.
+> > > 
+> > > And what does that mean?
+> > > 
+> > > > I used it in 'mucse_mbx_ifinsmod'(patch4, I will move this to that patch),
+> > > > to echo 'driver version' to FW. FW reply different command for different driver.
+> > > 
+> > > There only is one driver. This driver.
+> > > 
+> > > This all sounds backwards around. Normally the driver asks the
+> > > firmware what version it is. From that, it knows what operations the
+> > > firmware supports, and hence what it can offer to user space.
+> > > 
+> > > So what is your long terms plan? How do you keep backwards
+> > > compatibility between the driver and the firmware?
+> > > 
+> > > 	Andrew
+> > > 
+> > 
+> > To the driver, it is the only driver. It get the fw version and do
+> > interactive with fw, this is ok.
+> > But to the fw, I think it is not interactive with only 'this driver'?
+> > Chips has been provided to various customers with different driver
+> > version......
+> 
+> They theoretically exist, but mainline does not care about them. 
+> 
+> > More specific, our FW can report link state with 2 version:
+> > a: without pause status (to driver < 0.2.1.0)
+> > b: with pause status (driver >= 0.2.1.0)
+> 
+> But mainline does not care about this. It should ask the firmware, do
+> you support pause? If yes, report it, if not EOPNOTSUP. You want to be
+> able to run any version of mainline on any version of the
+> firmware. This means the ABI between the driver and the firmware is
+> fixed. You can extend the ABI, but you cannot make fundamental
+> changes, like adding new fields in the middle of messages. With care,
+> you can add new fields to the end of an existing messages, but you
+> need to do it such that you don't break older versions of the driver
+> which don't expect it.
+> 
+> Please look at other drivers. This is how they all do this. I don't
+> know of any driver which reports its version to the firmware and
+> expects the firmware to change its ABI.
+> 
+> So maybe you should just fill this version with 0xffffffff so the
+> firmware enables everything, and that is the ABI you use. Does the
+> firmware have an RPC to get its version? You can then use that for
+> future extensions to the ABI. Same as all other drivers.
+> 
+> 	Andrew
+> 
 
-Hi all,
+Ok, I will fill 0xffffffff in mucse_mbx_ifinsmod to echo firmware.
 
-The following commits are also in the net tree as different commits
-(but the same patches):
-
-  3ae443de7edf ("Bluetooth: hci_core: Fix not accounting for BIS/CIS/PA lin=
-ks separately")
-  3f9a516852b6 ("Bluetooth: btnxpuart: Uses threaded IRQ for host wakeup ha=
-ndling")
-  8477821d5f12 ("Bluetooth: hci_conn: do return error from hci_enhanced_set=
-up_sync()")
-  ad2f0c8792ef ("Bluetooth: hci_event: fix MTU for BN =3D=3D 0 in CIS Estab=
-lished")
-  3e383124ce63 ("Bluetooth: hci_sync: Prevent unintended PA sync when SID i=
-s 0xFF")
-  c244fc08ac4e ("Bluetooth: hci_core: Fix using ll_privacy_capable for curr=
-ent settings")
-  3ca23aaba210 ("Bluetooth: hci_core: Fix using {cis,bis}_capable for curre=
-nt settings")
-  5ecd1fbdacce ("Bluetooth: btmtk: Fix wait_on_bit_timeout interruption dur=
-ing shutdown")
-  9c533991fe15 ("Bluetooth: hci_conn: Fix not cleaning up Broadcaster/Broad=
-cast Source")
-  b69b1f91b84d ("Bluetooth: hci_conn: Fix running bis_cleanup for hci_conn-=
->type PA_LINK")
-  408410a0a0cb ("Bluetooth: ISO: Fix getname not returning broadcast fields=
-")
-  dc996aa11328 ("Bluetooth: hci_sync: Fix scan state after PA Sync has been=
- established")
-  fdbb50f1b26d ("Bluetooth: hci_sync: Avoid adding default advertising on s=
-tartup")
-
-These are commits
-
-  9d4b01a0bf8d ("Bluetooth: hci_core: Fix not accounting for BIS/CIS/PA lin=
-ks separately")
-  e489317d2fd9 ("Bluetooth: btnxpuart: Uses threaded IRQ for host wakeup ha=
-ndling")
-  0eaf7c7e85da ("Bluetooth: hci_conn: do return error from hci_enhanced_set=
-up_sync()")
-  0b3725dbf61b ("Bluetooth: hci_event: fix MTU for BN =3D=3D 0 in CIS Estab=
-lished")
-  4d19cd228bbe ("Bluetooth: hci_sync: Prevent unintended PA sync when SID i=
-s 0xFF")
-  3dcf7175f2c0 ("Bluetooth: hci_core: Fix using ll_privacy_capable for curr=
-ent settings")
-  709788b154ca ("Bluetooth: hci_core: Fix using {cis,bis}_capable for curre=
-nt settings")
-  099799fa9b76 ("Bluetooth: btmtk: Fix wait_on_bit_timeout interruption dur=
-ing shutdown")
-  3ba486c5f3ce ("Bluetooth: hci_conn: Fix not cleaning up Broadcaster/Broad=
-cast Source")
-  d36349ea73d8 ("Bluetooth: hci_conn: Fix running bis_cleanup for hci_conn-=
->type PA_LINK")
-  aee29c18a38d ("Bluetooth: ISO: Fix getname not returning broadcast fields=
-")
-  ca88be1a2725 ("Bluetooth: hci_sync: Fix scan state after PA Sync has been=
- established")
-  de5d7d3f27dd ("Bluetooth: hci_sync: Avoid adding default advertising on s=
-tartup")
-
-in the net tree.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/8scfY5joeHAvvN/z5DHENta
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmiieQMACgkQAVBC80lX
-0GwbVgf/SoF0vEYiiFCZC9vrml+u1Oe7F+WuBXK081OWrZfCJl9THWAHQT0Owa2Q
-R5Zkjb2ZymIu4lSOIzkKCxU/KTtyWrDvhx1qQe0iS1+HnKQ5xWHMnVxbvyjOwiE+
-WDMyxel1vdkWsgKlkxz53giHVzYBZi+06ti/PCUg3CfGd9kNTZEe1os1D0ggznA/
-6HI6v6fbhB5emGBlbPCkh3nZWyAZnted/g+Mfq1nE6II4sQeOM8ZEPhw6IqF8DCq
-mDr8s1+AMetahY8DkJAJNyt/Q5vUx8DKLn7a2i5W9TuKLX1jfyh5uIe2l+cwnip2
-WyG2/Ezp23iD74QuLEUk18MAn+KLVA==
-=41M/
------END PGP SIGNATURE-----
-
---Sig_/8scfY5joeHAvvN/z5DHENta--
+Thanks for your feedback.
 
