@@ -1,139 +1,149 @@
-Return-Path: <netdev+bounces-214512-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214513-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BDB1B29FCE
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 12:58:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CE16B29FD0
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 12:58:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 523961964BE2
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 10:58:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 246E71963B1C
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 10:58:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF2F03101A1;
-	Mon, 18 Aug 2025 10:57:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nwl.cc header.i=@nwl.cc header.b="M9dAqPvr"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83BC3261B70;
+	Mon, 18 Aug 2025 10:58:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from orbyte.nwl.cc (orbyte.nwl.cc [151.80.46.58])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f51.google.com (mail-vs1-f51.google.com [209.85.217.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD6A2275B1D;
-	Mon, 18 Aug 2025 10:56:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=151.80.46.58
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 934B5261B65;
+	Mon, 18 Aug 2025 10:58:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755514622; cv=none; b=n+xCBsewRiDIRqT06iaaioF962iiKyQWIHEUnVWxcAsY7Bg01706NN/ZsoAMWB2q6Ngpf2GpJ4wVhyLVTzLVANWiKFjFnMa/SyPxKF2FMjQU1a9bR8ZH/XS4b2sWF6p8ROsqEYvRH4A3gB1cUqjcZb+KKHr+WFXA1kaAN4OCL+E=
+	t=1755514692; cv=none; b=he1uVgO2D7Fx/yPcVysXyKLOwVm4yEUdNLomnYflTpeusLxSpLvxLAcJAR95Se4Kv0nPlf9JZUTJ/zjJ0ybUrtzjlffYM/XzjeNBPK4eO3hQT7Nkp4vooMJzdv4uSFa0oISiRp6RcSgYsJ62G9iB8yIQhGQvrAlaftt8USQMbRE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755514622; c=relaxed/simple;
-	bh=2w+EuXC/u8IFg9jA7o7kqWSy53CjQy5oq5noneEIrJ8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bJ2RMXKKhtHvIkyaF5pmPkYKyOIYsxguuJDwu3iqgHUJnQTvHSDYXmKpkCSM/Ts87fE+tAyOO1cxeZThIX4XkN0C7JIQrIKHF8K+M3hPHdN0lPKHuCFwVKYnqggzdCu5E5uARoHuI3ylfFDNe3F8tPHrqEFsn//JvxgrQPH4BvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nwl.cc; spf=pass smtp.mailfrom=nwl.cc; dkim=pass (2048-bit key) header.d=nwl.cc header.i=@nwl.cc header.b=M9dAqPvr; arc=none smtp.client-ip=151.80.46.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nwl.cc
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nwl.cc
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nwl.cc;
-	s=mail2022; h=In-Reply-To:Content-Transfer-Encoding:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=h9WHAFB/RGgGKVIByINwvuyekvUFaG5ctKYRf81tJDo=; b=M9dAqPvr3u2gj5uo/AYom+dfop
-	FhVtQVRbBUJ2D7+d3fuvtZV1aAhSH3rcuYx+pkF8Fs5uVxKg/C+iIwRnla/lATfqtYJg/s0N2lVud
-	S9IBWtok30UYLJ53v6rHb0ZDSDUf0/as7ja/+2ueNzmDSNz+9gfqFOegPfz+0Cxz4MLfh7oxHi+7c
-	wX77fA8hQEZKr3o4J/K7J9OsGwpD9W89l/3KshUwZOiGPnZTt+42wYm7YxIG975rhky18FJkMj8Ol
-	7X1c5rYWNMWG5M38x03qgeUmezhVZInaTujPobu5Hb8xeegsvl9Pyx2H0IoXaZWekvqAYIqzoeUsz
-	gMKuII5w==;
-Received: from n0-1 by orbyte.nwl.cc with local (Exim 4.97.1)
-	(envelope-from <phil@nwl.cc>)
-	id 1unxXs-000000003R7-1iFi;
-	Mon, 18 Aug 2025 12:56:56 +0200
-Date: Mon, 18 Aug 2025 12:56:56 +0200
-From: Phil Sutter <phil@nwl.cc>
-To: Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	linux-modules@vger.kernel.org, Yi Chen <yiche@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: modprobe returns 0 upon -EEXIST from insmod
-Message-ID: <aKMG-LqLs3yaBDiJ@orbyte.nwl.cc>
-Mail-Followup-To: Phil Sutter <phil@nwl.cc>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	linux-modules@vger.kernel.org, Yi Chen <yiche@redhat.com>,
-	netdev@vger.kernel.org
-References: <aKEVQhJpRdiZSliu@orbyte.nwl.cc>
- <8a87656d-577a-4d0a-85b1-5fd17d0346fe@csgroup.eu>
- <aKLzsAX14ybEjHfJ@orbyte.nwl.cc>
- <edfed2af-8b4d-4afb-b999-5c46b7d46fba@csgroup.eu>
+	s=arc-20240116; t=1755514692; c=relaxed/simple;
+	bh=1OYMZNFgCtewx/LdH3kO7ZHFgEX+oJiXBsil7YTth9k=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=X27g9jE+BfzfPv0QsvBjxCbL2Wz2fn9z4FHHP8WgysjDCSXVI5xo5ZSP4NPZWTRQERa9IhdmKPePyKyz4lFzu+dxQbe9gdntPw2208N9IxTN5QvDUJdxb9ARCtfEAWotmr14SwdUa0iaq6wbaMJzxr4+UO+bVcMGi/8jrLgB5B0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.217.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vs1-f51.google.com with SMTP id ada2fe7eead31-50f85ec0885so2805364137.0;
+        Mon, 18 Aug 2025 03:58:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755514689; x=1756119489;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MvZGag46yLy/ylpKI2G9AQ0htuztjd8d1AFLuXJK53I=;
+        b=ERElPTbHRDMijH8RP4RRjJAjzT6SlswR2IE+2cv0CxY0eICyNdH00K9w+c9yilVB1Z
+         MWicG/Pgv/3KVUxGDZH/mhk2PTXgA9olK9x53ALPeilye1QJzIeRZTx84xI8wwmhWf0v
+         m9ixzEMoNH7Hk9oN7fJ68YpI89qraQHQc2zxjl4Khcbq01QFs4mNRde4iKd1qGOBPSIN
+         iYJLmegdm9U0+N6i111xgShaQxbZwE1lpGhNNAUcpmDhn94gWV+qL1sT7ygFpjPtTEXA
+         6T8ii4qvUpiOz7qSoenAOcRnkMNT+jnlQ3JAMc+7qjlH2pR/PL5M0+7qXv2SGqcpLXCi
+         HCMg==
+X-Forwarded-Encrypted: i=1; AJvYcCUlZn+d97M7JVX6z2F+TQeUPpsO+llWvRWHw5ArYait2xoKZ0hr5dhdrOAgRHgQCxbhEBs5jKqtXF8X7hP5@vger.kernel.org, AJvYcCX0hSp7WPaZ5fhvU3ugA7Ys34Tttjt6bcGw74hcYTkg8h7BjjuY+UipjSKER/ACUgQlZ2IDJbCRrXb8@vger.kernel.org, AJvYcCXfV63Q77aG4JkgUjzH2xlUbKCtgMo7Vvx/Zh9vK0W1z9YLF0UJBcuBAqhofJB0CnI0cBzHaon4@vger.kernel.org
+X-Gm-Message-State: AOJu0YxNusP1t+nvJMYlIf4chWfRJ11DnZ7UBFjHA1SRoAhyjI3ETYWQ
+	FhOCuRaVIzSquMWkods7/IaSc2qypORYgB4N/8EL/ujE8kZVWIA6Yb3KNOzsAMx5
+X-Gm-Gg: ASbGncshB30GkWnRw5L+wWpkSBR5aN2MvF+AYItaNVENgjXLHx1ekQyAqloz27PIgp4
+	8ll+H16WmH8AkbgtWntFMzFf9Ukv9+wHVvROlfjYFXs3BN/1q6MUOqqqmrzSolgeiekKy2YnY8t
+	EUCqfKlI9jLDrfFOEO8GyfrZNjdvVJyDOfAqQLRFLq3hJsCxc4gEHdHqe3KQ+vrUVjvJ9bp6b51
+	SPJuq3GM4m79tP6QpTUccmRV67Xizj6otMlgbKAkgI/jMYF65fdK96CcO0tzekj9RsEZCUUFgLW
+	pVuTEZtVD1/C981cfNtALuK51YmmR7kk2X7O1+HQ1JZqC2BXBuQHjhtalZUS/ncCOSIr8tfQWGg
+	71g5LqW31iV6UHHQfk3eqSss5CAKmm1QX2an/Nise2jpY1cZUO602kdnxVJ6/fVBN
+X-Google-Smtp-Source: AGHT+IFCZiCwB1knN9/9a6I3MlWrbQ31oMbjAXU/1TSkzk97Gbr6eSgrdivV3Q+k1E/3JnGo+34X4A==
+X-Received: by 2002:a05:6102:6306:20b0:517:1303:630f with SMTP id ada2fe7eead31-51713036e6bmr763552137.5.1755514689228;
+        Mon, 18 Aug 2025 03:58:09 -0700 (PDT)
+Received: from mail-vk1-f174.google.com (mail-vk1-f174.google.com. [209.85.221.174])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-53b2bdb84f5sm1747700e0c.13.2025.08.18.03.58.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 18 Aug 2025 03:58:08 -0700 (PDT)
+Received: by mail-vk1-f174.google.com with SMTP id 71dfb90a1353d-53b1738e8e3so3112959e0c.1;
+        Mon, 18 Aug 2025 03:58:08 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVpPoy2QXHzSIK2xI9CDbosaMmbav+jncjaClUIntwVPCnmbsCRlevugTjlUsnFwMqM2W/sz9GWsNvRdSQM@vger.kernel.org, AJvYcCVthG6vouNou/SuHbwTYv47u4mxJrbbxOt9WBA8zq2HwdxozkEDNKebyq1oI4bK4AmXSqKrunn9@vger.kernel.org, AJvYcCWBjSLhw99MH++kjgXJHodlVZPef+mzcVNXeCkK9iGEGj3c/wbliY94wHcJ/aCztxaxWY+CLih9P6h4@vger.kernel.org
+X-Received: by 2002:a05:6102:dc8:b0:4e6:f7e9:c4a5 with SMTP id
+ ada2fe7eead31-5126d30d22emr4017732137.22.1755514688621; Mon, 18 Aug 2025
+ 03:58:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <edfed2af-8b4d-4afb-b999-5c46b7d46fba@csgroup.eu>
+References: <20250815194806.1202589-1-contact@artur-rojek.eu>
+ <20250815194806.1202589-3-contact@artur-rojek.eu> <aa6bdc05-81b0-49a2-9d0d-8302fa66bf35@kernel.org>
+ <cab483ef08e15d999f83e0fbabdc4fdf@artur-rojek.eu> <CAMuHMdVGv4UHoD0vbe3xrx8Q9thwrtEaKd6X+WaJgJHF_HXSaQ@mail.gmail.com>
+ <26699eb1-26e8-4676-a7bc-623a1f770149@kernel.org> <295AB115-C189-430E-B361-4A892D7528C9@coresemi.io>
+ <bc96aab8-fbb4-4869-a40a-d655e01bb5c7@kernel.org>
+In-Reply-To: <bc96aab8-fbb4-4869-a40a-d655e01bb5c7@kernel.org>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Mon, 18 Aug 2025 12:57:57 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdW0NZHCX1V01N4oay-yKuOf+RR5YV3kjNFiM6X6aVAvdw@mail.gmail.com>
+X-Gm-Features: Ac12FXwgapf6Ilge_fJ2aLB6KswOb-DOfIP2gi-yDMzAml5eljyD22BBTTZoEkE
+Message-ID: <CAMuHMdW0NZHCX1V01N4oay-yKuOf+RR5YV3kjNFiM6X6aVAvdw@mail.gmail.com>
+Subject: Re: [PATCH 2/3] dt-bindings: net: Add support for J-Core EMAC
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: "D. Jeff Dionne" <jeff@coresemi.io>, Artur Rojek <contact@artur-rojek.eu>, 
+	Rob Landley <rob@landley.net>, John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Aug 18, 2025 at 12:07:18PM +0200, Christophe Leroy wrote:
-> [+ Netfilter lists]
-> 
-> Hi Phil
-> 
-> Le 18/08/2025 à 11:34, Phil Sutter a écrit :
-> > [Vous ne recevez pas souvent de courriers de phil@nwl.cc. Découvrez pourquoi ceci est important à https://aka.ms/LearnAboutSenderIdentification ]
-> > 
-> > Hi Christophe,
-> > 
-> > On Sun, Aug 17, 2025 at 05:54:27PM +0200, Christophe Leroy wrote:
-> >> Le 17/08/2025 à 01:33, Phil Sutter a écrit :
-> >>> [Vous ne recevez pas souvent de courriers de phil@nwl.cc. D?couvrez pourquoi ceci est important ? https://aka.ms/LearnAboutSenderIdentification ]
-> >>>
-> >>> Hi,
-> >>>
-> >>> I admittedly didn't fully analyze the cause, but on my system a call to:
-> >>>
-> >>> # insmod /lib/module/$(uname -r)/kernel/net/netfilter/nf_conntrack_ftp.ko
-> >>>
-> >>> fails with -EEXIST (due to a previous call to 'nfct add helper ftp inet
-> >>> tcp'). A call to:
-> >>>
-> >>> # modprobe nf_conntrack_ftp
-> >>>
-> >>> though returns 0 even though module loading fails. Is there a bug in
-> >>> modprobe error status handling?
-> >>>
+Hi Krzysztof,
+
+On Mon, 18 Aug 2025 at 11:58, Krzysztof Kozlowski <krzk@kernel.org> wrote:
+> On 18/08/2025 10:21, D. Jeff Dionne wrote:
+> > On Aug 18, 2025, at 17:07, Krzysztof Kozlowski <krzk@kernel.org> wrote:
+> >> git grep jcore,emac
 > >>
-> >> Read the man page : https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Flinux.die.net%2Fman%2F8%2Fmodprobe&data=05%7C02%7Cchristophe.leroy%40csgroup.eu%7C34b49eb3d0544fc683e608ddde3a75b2%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C638911064858807750%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=%2F70LV37Zb%2FNeiBV59y9rvkLGh0xsqga08Nl3c5%2BVU5I%3D&reserved=0
+> >> Gives me zero?
+> >
+> > Um, right.  It=E2=80=99s not upstream yet.  Thanks for your work to get=
+ that done, Artur.
+> >
+> >>> If an incompatible version comes up, it should use a different
+> >>> (versioned?) compatible value.
 > >>
-> >> In the man page I see:
+> >> Versions are allowed if they follow some documented and known vendor S=
+oC versioning scheme. Is this the case here?
 > >>
-> >>              Normally, modprobe will succeed (and do nothing) if told to
-> >> insert a module which is already present or to remove a module which
-> >> isn't present.
-> > 
-> > This is not a case of already inserted module, it is not loaded before
-> > the call to modprobe. It is the module_init callback
-> > nf_conntrack_ftp_init() which returns -EEXIST it received from
-> > nf_conntrack_helpers_register().
-> > 
-> > Can't user space distinguish the two causes of -EEXIST? Or in other
-> > words, is use of -EEXIST in module_init callbacks problematic?
-> 
-> So if I understand correctly the load fails because it is in conflict 
-> with another module ?
+> >> This is some sort of SoC, right? So it should have actual SoC name?
+> >
+> > No.  It=E2=80=99s a generic IP core for multiple SoCs, which do have na=
+mes.
+>
+> Then you need other SoCs compatibles, because we do not allow generic
+> items. See writing bindings.
+>
+> > This is the correct naming scheme.  All compatible devices and SoCs mat=
+ch properly.
+>
+> No, it is not a correct naming scheme. Please read writing bindings.
 
-Yes, it tries to signal that there is already a conntrack helper for
-FTP. It is a stub redirecting to an implementation in user space, but
-that's just details.
+Can we please relax this for this specific compatible value?
+All other devices in this specific hardware implementation were
+accepted without SoC-specific compatible values ca. 9 years ago. AFAIK
+the Ethernet MAC was the sole missing piece, because its Linux driver
+was never attempted to be upstreamed before.
 
-> Then I think the error returned by nf_conntrack_helpers_register() 
-> shouldn't be EEXIST but probably EBUSY.
+Thanks!
 
-Sounds good! We could at least adjust the module_init callback return
-code from EEXIST to EBUSY so the change has minimal impact.
+Gr{oetje,eeting}s,
 
-Thanks for your help, Christophe!
+                        Geert
 
-Cheers, Phil
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
