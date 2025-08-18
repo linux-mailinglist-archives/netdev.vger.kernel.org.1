@@ -1,50 +1,56 @@
-Return-Path: <netdev+bounces-214759-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214776-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D579CB2B298
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 22:40:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A3D8B2B318
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 22:59:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C320B56226B
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 20:40:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AAECE587633
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 20:58:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC2142264B1;
-	Mon, 18 Aug 2025 20:40:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36D9D263F3C;
+	Mon, 18 Aug 2025 20:57:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ob5R/DIo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a8DglWyp"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4CF43451B8;
-	Mon, 18 Aug 2025 20:40:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08A9A21D3F0;
+	Mon, 18 Aug 2025 20:57:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755549639; cv=none; b=dQD7YKLTqqBM7mEp3KjopygBuLRojIF5zGKSif5ogH6hQKuldKXEVTTA/ZjKaB1Hh7Rg2wHHAzRN56zx3llrHw77lgBuHitiLJlEgg5mNlKChNyW/5cNkavafcGkdy5cLhYk8rr5/n7QjkChuyiouatIXNnCI1KVEGev8VEzOxo=
+	t=1755550639; cv=none; b=Pk9WMUmb4wg2QNCKfvNZFg5bhwkesQvdlmrG+vmx6v7nLC0UZ+QaCQEPJS3cJbofIhzizwBq4Rn1A4lHUzJ11ZWC/daF5aOHrL6UeDvKX5KYSth4OAkbhEv48ITxdmEhaJiLCNrecy1YWLkc1AaYB9voNrGyYfjoe9TIdUfSkbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755549639; c=relaxed/simple;
-	bh=SLGzkMWb782QPOKXdJcGw4zS6aXjo42Av30yuVLNs8c=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=AOHo2eVdjZP3Hkv5T0YvucHxGVn1oRU1fKqSUQPAmFrTab5NA6oek6rOKCImxfNOyPdZbXmcJl5jdoE+SaTxawT8wSyShZo/pvtNF5buD2Gdk0C1T5GhyD5nPwsX5ZTm2keD5w7ppgreepuS3sU39hArFPHqmLEUHkvUU9rik18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ob5R/DIo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A0A2C4CEEB;
-	Mon, 18 Aug 2025 20:40:39 +0000 (UTC)
+	s=arc-20240116; t=1755550639; c=relaxed/simple;
+	bh=BsJ1jM/8EthLYnXRYxAWkd4Mk8yuUgti9yEUAEHMF1g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mYSkM/71cVJq5HuWNB+L3k6LkH7sTu5kITflElRPdZvpH5m3ltuu5zfJ/ptfn5LpnKF4Vu6pzp5ja9mpu8v0dSIb49np+Ds1IiQ7qhDzuGNov6pn4jQIPb8Q7f077cZurNDMpasGN47lXnld44cEVLKsAeeqUQb/DF09aGYfCmU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a8DglWyp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B776C4CEEB;
+	Mon, 18 Aug 2025 20:57:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755549639;
-	bh=SLGzkMWb782QPOKXdJcGw4zS6aXjo42Av30yuVLNs8c=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ob5R/DIo0SS1ijjporX/AId4430MV/EnT9psgjVHQma0chjz9iV91fXrFU9xpGEun
-	 Oo1Kd15fOcDTPRzz0geVAREEolvKXn54EtVFNM5TGhSC9WCWaRDjl9kntwqXsvnFdE
-	 AMrevbUOXpVJC+j1Hlsl9R/P+1V4NDpOpAwzXoJEKuewBKB5vVQ0Vkuqj1OTaS26sJ
-	 RSAQ2wqnZeCs3E2rxBroZTeWEFM+kD2xamWjIrixKZReIt3xky2MaxGKTp9l+hBVkX
-	 SEMCEXVd2x/BgwQj1c6aif7nq3ZZvQP3rWHwnDcrrxi2WOaQNAyTACjwxfytbpgv/s
-	 yDPfi5azox8oQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70DD7383BF4E;
-	Mon, 18 Aug 2025 20:40:50 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1755550638;
+	bh=BsJ1jM/8EthLYnXRYxAWkd4Mk8yuUgti9yEUAEHMF1g=;
+	h=From:To:Cc:Subject:Date:From;
+	b=a8DglWyp0E31tXMU4uX8KgNoqX2pM9iDMIGoEWLFF1AdIxaKunNmzZyicXTpmqGfZ
+	 dnsv7rQs85YnJzwBqxxhRas7HuVsykwULlcZmvStwb/EOdwMGpEEaVzaxbCB4U9+10
+	 6XpI2n4OZX2BLeMxUt/+cXdxTyMYoooHlANwiSDSVWLfGIgcQtizZezb8FKAQy+tst
+	 vp+wVz8ZbZBRWBQ7dsYheOx97vmu9fidnbcnjmuLkb5qXgmOYNs5q0r6CPwJordWcZ
+	 ho6UvxelueWxEQ4ytTuhtZIUlO8YuXWQZ4KJH6rDbK+yY4BICcyHZ+TMjqNCB+uUJB
+	 x9ezCq1Th7YDQ==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-sctp@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Xin Long <lucien.xin@gmail.com>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+Cc: linux-crypto@vger.kernel.org,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH net-next v3 0/5] sctp: Convert to use crypto lib, and upgrade cookie auth
+Date: Mon, 18 Aug 2025 13:54:21 -0700
+Message-ID: <20250818205426.30222-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,66 +58,51 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf-next v7 0/9] Add a dynptr type for skb metadata for TC
- BPF
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175554964898.2904664.15930245053733821413.git-patchwork-notify@kernel.org>
-Date: Mon, 18 Aug 2025 20:40:48 +0000
-References: 
- <20250814-skb-metadata-thru-dynptr-v7-0-8a39e636e0fb@cloudflare.com>
-In-Reply-To: 
- <20250814-skb-metadata-thru-dynptr-v7-0-8a39e636e0fb@cloudflare.com>
-To: Jakub Sitnicki <jakub@cloudflare.com>
-Cc: bpf@vger.kernel.org, ast@kernel.org, andrii@kernel.org,
- arthur@arthurfabre.com, daniel@iogearbox.net, eddyz87@gmail.com,
- edumazet@google.com, kuba@kernel.org, hawk@kernel.org,
- jbrandeburg@cloudflare.com, joannelkoong@gmail.com, lorenzo@kernel.org,
- martin.lau@linux.dev, thoiland@redhat.com, yan@cloudflare.com,
- kernel-team@cloudflare.com, netdev@vger.kernel.org, sdf@fomichev.me
 
-Hello:
+This series converts SCTP chunk and cookie authentication to use the
+crypto library API instead of crypto_shash.  This is much simpler (the
+diffstat should speak for itself), and also faster too.  In addition,
+this series upgrades the cookie authentication to use HMAC-SHA256.
 
-This series was applied to bpf/bpf-next.git (master)
-by Martin KaFai Lau <martin.lau@kernel.org>:
+I've tested that kernels with this series applied can continue to
+communicate using SCTP with older ones, in either direction, using any
+choice of None, HMAC-SHA1, or HMAC-SHA256 chunk authentication.
 
-On Thu, 14 Aug 2025 11:59:26 +0200 you wrote:
-> TL;DR
-> -----
-> 
-> This is the first step in an effort which aims to enable skb metadata
-> access for all BPF programs which operate on an skb context.
-> 
-> By skb metadata we mean the custom metadata area which can be allocated
-> from an XDP program with the bpf_xdp_adjust_meta helper [1]. Network stack
-> code accesses it using the skb_metadata_* helpers.
-> 
-> [...]
+Changed in v3:
+- Added patch that fixes both MAC comparisons to be constant-time
+- Added patch that stops accepting md5 and sha1 for cookie_hmac_alg
 
-Here is the summary with links:
-  - [bpf-next,v7,1/9] bpf: Add dynptr type for skb metadata
-    https://git.kernel.org/bpf/bpf-next/c/89d912e494f7
-  - [bpf-next,v7,2/9] bpf: Enable read/write access to skb metadata through a dynptr
-    https://git.kernel.org/bpf/bpf-next/c/6877cd392bae
-  - [bpf-next,v7,3/9] selftests/bpf: Cover verifier checks for skb_meta dynptr type
-    https://git.kernel.org/bpf/bpf-next/c/0e74eb4d57f0
-  - [bpf-next,v7,4/9] selftests/bpf: Pass just bpf_map to xdp_context_test helper
-    https://git.kernel.org/bpf/bpf-next/c/6dfd5e01e1a7
-  - [bpf-next,v7,5/9] selftests/bpf: Parametrize test_xdp_context_tuntap
-    https://git.kernel.org/bpf/bpf-next/c/dd9f6cfb4ef4
-  - [bpf-next,v7,6/9] selftests/bpf: Cover read access to skb metadata via dynptr
-    https://git.kernel.org/bpf/bpf-next/c/153f6bfd4890
-  - [bpf-next,v7,7/9] selftests/bpf: Cover write access to skb metadata via dynptr
-    https://git.kernel.org/bpf/bpf-next/c/ed9336080780
-  - [bpf-next,v7,8/9] selftests/bpf: Cover read/write to skb metadata at an offset
-    https://git.kernel.org/bpf/bpf-next/c/bd1b51b31978
-  - [bpf-next,v7,9/9] selftests/bpf: Cover metadata access from a modified skb clone
-    https://git.kernel.org/bpf/bpf-next/c/403fae59781f
+Changed in v2:
+- Added patch which adds CONFIG_CRYPTO_SHA1 to some selftests configs
 
-You are awesome, thank you!
+Eric Biggers (5):
+  selftests: net: Explicitly enable CONFIG_CRYPTO_SHA1 for IPsec
+  sctp: Fix MAC comparison to be constant-time
+  sctp: Use HMAC-SHA1 and HMAC-SHA256 library for chunk authentication
+  sctp: Convert cookie authentication to use HMAC-SHA256
+  sctp: Stop accepting md5 and sha1 for net.sctp.cookie_hmac_alg
+
+ Documentation/networking/ip-sysctl.rst       |  10 +-
+ include/net/netns/sctp.h                     |   4 +-
+ include/net/sctp/auth.h                      |  17 +-
+ include/net/sctp/constants.h                 |   9 +-
+ include/net/sctp/structs.h                   |  35 +---
+ net/sctp/Kconfig                             |  47 ++----
+ net/sctp/auth.c                              | 166 ++++---------------
+ net/sctp/chunk.c                             |   3 +-
+ net/sctp/endpointola.c                       |  23 +--
+ net/sctp/protocol.c                          |  11 +-
+ net/sctp/sm_make_chunk.c                     |  60 +++----
+ net/sctp/sm_statefuns.c                      |   5 +-
+ net/sctp/socket.c                            |  41 +----
+ net/sctp/sysctl.c                            |  49 +++---
+ tools/testing/selftests/net/config           |   1 +
+ tools/testing/selftests/net/netfilter/config |   1 +
+ 16 files changed, 122 insertions(+), 360 deletions(-)
+
+
+base-commit: bab3ce404553de56242d7b09ad7ea5b70441ea41
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.50.1
 
 
