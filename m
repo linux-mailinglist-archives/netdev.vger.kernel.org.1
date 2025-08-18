@@ -1,79 +1,78 @@
-Return-Path: <netdev+bounces-214548-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214549-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8ECCDB2A17E
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 14:26:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47C69B2A1AF
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 14:36:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B3174E195D
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 12:25:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2A7672A7D99
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 12:25:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D606831AF1A;
-	Mon, 18 Aug 2025 12:23:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77464320385;
+	Mon, 18 Aug 2025 12:24:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UKW7LsV5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B52D32039A;
-	Mon, 18 Aug 2025 12:23:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44DCC26F2B4
+	for <netdev@vger.kernel.org>; Mon, 18 Aug 2025 12:24:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755519809; cv=none; b=svXkbzt/6geqgeEXJm1ZLuCbXjz1WY6Is58mdtnM4xoTT/T58f/BWL6c2SEcJDxi6ABDegk0dv95uq45zQo050g4RhGMDN0JIhh6bv2BHAYxGXXmw1h9icHzyJ4aYcGLWUHUO0/M4c+YG5quSI7rQGjGMxNloswe6Ggym/TAEvc=
+	t=1755519882; cv=none; b=jrC0Mtm9r5aWW1nZjCKnc7O/r9HOIPApJQDYPlw5G5q0AALTl9AZ0mxjfoK7HTe3b/ZU9qSFuhHcsVLXjVQqNkM9q3iAOX3A73CPAmBgx0aWS8jFO0cmZZCAcJZyFC4nu6+iUXH4kWsGhM+LcIYB521DN8x+0a1bMLhYanfDTXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755519809; c=relaxed/simple;
-	bh=cNWqQt4MQ5WbtZt7THB+L+EyhqSLbC01jmaTO9WPyFw=;
+	s=arc-20240116; t=1755519882; c=relaxed/simple;
+	bh=NeJYtS1ZoqmOW9N/JfyUTR/Un6XM/CM983LzN4D3cyE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kRoUuroNSIuLzLSVX9lupXObrNDopBR/ZuisDegxy1DocbthXWF5vUL0bz3H1qUqcq20Xx3xhFnz79+YzqDFG3GWqKUcSjUesMgYA3gv9oHnGc7LHh9Lj+T0nmSLbyQ1+Lojrki5JyLmgbj8B+rco4SW1DqK+0IK4Noa0573Rxo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-afcb7347e09so647661366b.0;
-        Mon, 18 Aug 2025 05:23:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755519806; x=1756124606;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=U6rqL6iy7ieXF8l9k3RF3H9T+sQpJgI0Ss9KmW6zFcc=;
-        b=LhIZxmcnfoP3DvSJVZdF4kp3ngKSNyVFIT2H5CmlbFedRg+RtDOj5eGMql+RD7vKNp
-         9vPyx05N4O65UCtrDcQR7PNntHUDLZW2RuZwsbP/+Ut1gwN2phhjJINQziblpH0saoJx
-         D5hyRM77arNRJjCpicDd7/dGteXrNYRbjMSJCXsuQPJhQisYbqZn3rTISAQrw1bBL1W1
-         71pyvcU3hCJt50Lw+y7zrdM58vp+7phc5TYf9ZjE+VLVg3qOZWQn/3acQeTJ+ZFK3Em5
-         LZcP/PgVxMDoiYee65PqQ8tjdavyLfj5Zb53rKInb+Pdbas3Wg16vl54vXi3TXBJPo7J
-         Mn7A==
-X-Forwarded-Encrypted: i=1; AJvYcCU7QnrRDlIPaLlWPEyNRN5z0UVtqtmnkuzOtYiq80UB5v6g1YDfIRR8bz1zNDKVRSZNnVT+eamQoYkCO3w=@vger.kernel.org, AJvYcCUtHpH2kMI8ASLnbZTicmIeZ/IEF7KlrDsuk0C+sMo/iAjn1faZL6z6BlfeGymckVb4q5Kw1wDc@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy5f71pwvpI63KzX0ghw8gf8XvcLhQRpPze3MvrtiC+W7LC+qcj
-	iZlLILNFg1uSRiHhA5mjKxG+eqhUtiIyjqnZj10KTGRwBECoLcQkGrNop+DjOA==
-X-Gm-Gg: ASbGncs04FvjbB5eZcnMrTCadOWxA7RQ8dBL5j339JVrKYOxH4/gPyQYwQvoMkRBeqg
-	h6Pz/kYk2iUtDArfmvSbzEi9RPVrh3EUNi0EVLc8PuFA27yubkzylmSKlKvcTlaMmGyOyPE1Iw0
-	tif0mGgaw1yWuCWE8A9dt5tleEBlYtShDITasd1TIgJA1TwUgSbNmgJqYi9nOxxJsFPdHEqQnzp
-	aseORMJ7FC/RI2fPb3cK1GSEqCROOCSjO9vS1szFcHlVO0BE0fxJseYlxcw6OdzD7jh/Z0yCKaQ
-	n4dAqu03AvIShO6HZNCHv/A8KBRHAhc/ERK5swdlO93qrT6a79bwIUF9DB146IRDMG2KGgkvdVo
-	fWTK7saMK+5oTrwOcUsveIwg=
-X-Google-Smtp-Source: AGHT+IEOqqd2eRXiy1eXOTzfBqOwvwXHDUFfANHxGgZqUyJ9n17gbQzGnyDvI2Pe1/7btASpZQURuQ==
-X-Received: by 2002:a17:907:7291:b0:af9:1184:68b3 with SMTP id a640c23a62f3a-afcdc374d8fmr1194852766b.55.1755519805280;
-        Mon, 18 Aug 2025 05:23:25 -0700 (PDT)
-Received: from gmail.com ([2a03:2880:30ff:7::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-afcdce54021sm787088566b.10.2025.08.18.05.23.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Aug 2025 05:23:24 -0700 (PDT)
-Date: Mon, 18 Aug 2025 05:23:22 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Pavel Begunkov <asml.silence@gmail.com>, 
-	Johannes Berg <johannes@sipsolutions.net>, Mike Galbraith <efault@gmx.de>, paulmck@kernel.org, 
-	LKML <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, boqun.feng@gmail.com
-Subject: Re: netconsole: HARDIRQ-safe -> HARDIRQ-unsafe lock order warning
-Message-ID: <ckitlqjbhhnspqfvj4wnp4d67h7dw7gsxtntyl6skvyplgxwuf@itqjvgdwbiuh>
-References: <fb38cfe5153fd67f540e6e8aff814c60b7129480.camel@gmx.de>
- <oth5t27z6acp7qxut7u45ekyil7djirg2ny3bnsvnzeqasavxb@nhwdxahvcosh>
- <20250814172326.18cf2d72@kernel.org>
- <3d20ce1b-7a9b-4545-a4a9-23822b675e0c@gmail.com>
- <20250815094217.1cce7116@kernel.org>
- <isnqkmh36mnzm5ic5ipymltzljkxx3oxapez5asp24tivwtar2@4mx56cvxtrnh>
- <20250815103308.4993df04@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=IoDnbUQz2zTCfHzUUOmIeuQvHAsh1M3E5NB5/aFtjojaO9r2sGyl4aidkNvkkXjfrgcPswxd5c5wbYUmVxNY7a4tsw2tQ1/PQbVX8qmJ2W7uVaqsVpoqQ2nUKuKqiOWQwj5mwifw477E08M5O+d14ReO1WS/oPt679geuZZywQo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UKW7LsV5; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1755519879;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yD9a9s2aETuFSLgQGqZPxu5HZCmmaR8KXKsmVuvi5Zw=;
+	b=UKW7LsV5Vs9PuD2kLkl/IAFBRRF8TAxjrGbyyTjABs9jHKEi28JyNcUfbviB8sFS/uuTLo
+	ZYyhU6QLNJlSxKppLJDSyKzdMDqAt0LDdZYJRUxJdZh3FO6So0bfrJfKdeRfXjXTJ4GUgq
+	kHwaGYHlUKqpfwFFaxrQwtyzkpxFNLA=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-118-GAWdPVoxPUC2Tc_yKhszkQ-1; Mon,
+ 18 Aug 2025 08:24:35 -0400
+X-MC-Unique: GAWdPVoxPUC2Tc_yKhszkQ-1
+X-Mimecast-MFC-AGG-ID: GAWdPVoxPUC2Tc_yKhszkQ_1755519873
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 122091800446;
+	Mon, 18 Aug 2025 12:24:33 +0000 (UTC)
+Received: from localhost (unknown [10.43.135.229])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3340C30001A5;
+	Mon, 18 Aug 2025 12:24:28 +0000 (UTC)
+Date: Mon, 18 Aug 2025 14:24:26 +0200
+From: Miroslav Lichvar <mlichvar@redhat.com>
+To: Kurt Kanzenbach <kurt@linutronix.de>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next] igb: Retrieve Tx timestamp
+ directly from interrupt
+Message-ID: <aKMbekefL4mJ23kW@localhost>
+References: <20250815-igb_irq_ts-v1-1-8c6fc0353422@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,356 +81,280 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250815103308.4993df04@kernel.org>
+In-Reply-To: <20250815-igb_irq_ts-v1-1-8c6fc0353422@linutronix.de>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Fri, Aug 15, 2025 at 10:33:08AM -0700, Jakub Kicinski wrote:
-> On Fri, 15 Aug 2025 10:29:00 -0700 Breno Leitao wrote:
-> > On Fri, Aug 15, 2025 at 09:42:17AM -0700, Jakub Kicinski wrote:
-> > > On Fri, 15 Aug 2025 11:44:45 +0100 Pavel Begunkov wrote:  
-> > > > On 8/15/25 01:23, Jakub Kicinski wrote:  
-> > > 
-> > > I suspect disabling netconsole over WiFi may be the most sensible way out.  
-> > 
-> > I believe we might be facing a similar issue with virtio-net.
+On Fri, Aug 15, 2025 at 08:50:23AM +0200, Kurt Kanzenbach wrote:
+> Retrieve Tx timestamp directly from interrupt handler.
 > 
-> I could be misremembering but I thought virtio-net try_lock()s.
+> The current implementation uses schedule_work() which is executed by the
+> system work queue to retrieve Tx timestamps. This increases latency and can
+> lead to timeouts in case of heavy system load.
+> 
+> Therefore, fetch the timestamp directly from the interrupt handler.
+> 
+> The work queue code stays for the Intel 82576. Tested on Intel i210.
 
-virtio-net shows the same problem on net-next, as of bab3ce404553de56242
-("Merge branch '100GbE' of
-git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue")
+I tested this patch on 6.17-rc1 with an Intel I350 card on a NTP
+server (chrony 4.4), measuring packet rates and TX timestamp accuracy
+with ntpperf. While the HW TX timestamping seems more reliable at some
+lower request rates, there seems to be about 40% drop in the overall
+performance of the server in how much requests it can handle (falling
+back to SW timestamps when HW timestamp is missed). Is this expected
+or something to be considered? 
 
-	 Chain exists of:
-	   console_owner --> target_list_lock --> _xmit_ETHER#2
+Before:
+               |          responses            |     TX timestamp offset (ns)
+rate   clients |  lost invalid   basic  xleave |    min    mean     max stddev
+1000       100   0.00%   0.00%   0.00% 100.00%      -77     -42      +1     14
+1050       105   0.00%   0.00%   0.00% 100.00%      -68     -35      +2     13
+1102       110   0.00%   0.00%   0.00% 100.00%      -60     -14     +27     15
+1157       115   0.00%   0.00%   0.00% 100.00%      -28     +12     +53     14
+1214       121   0.00%   0.00%   0.00% 100.00%       -3     +34     +68     13
+1274       127   0.00%   0.00%   0.00% 100.00%       -5     +35     +70     14
+1337       133   0.00%   0.00%   0.00% 100.00%       -2     +30     +64     13
+1403       140   0.00%   0.00%   0.00% 100.00%      -27     +11     +57     14
+1473       147   0.00%   0.00%   0.00% 100.00%      -15     +27     +65     15
+1546       154   0.00%   0.00%   0.00% 100.00%      -56      -8     +41     18
+1623       162   0.00%   0.00%   0.00% 100.00%      -69     -27     +28     17
+1704       170   0.00%   0.00%   0.00% 100.00%      -39      -5     +30     13
+1789       178   0.00%   0.00%   0.00% 100.00%      -32      +3     +37     13
+1878       187   0.00%   0.00%   0.00% 100.00%      -22     +20     +75     18
+1971       197   0.00%   0.00%   0.00% 100.00%      -27      +6     +40     12
+2069       206   0.00%   0.00%   0.00% 100.00%      -22     +19     +62     15
+2172       217   0.00%   0.00%   0.00% 100.00%      +16     +53     +92     13
+2280       228   0.00%   0.00%   0.00% 100.00%      -30     +55     +92     18
+2394       239   0.00%   0.00%   0.00% 100.00%      -61      -5     +33     18
+2513       251   0.00%   0.00%   0.00% 100.00%      -66     -23     +20     14
+2638       263   0.00%   0.00%   0.00% 100.00%      -34      -1     +32     12
+2769       276   0.00%   0.00%   0.00% 100.00%      -20     +20     +60     14
+2907       290   0.00%   0.00%   0.00% 100.00%      -35      +6     +68     20
+3052       305   0.00%   0.00%   0.00% 100.00%      -29      +5     +40     12
+3204       320   0.00%   0.00%   0.00% 100.00%      -25      +8     +42     12
+3364       336   0.00%   0.00%   0.00% 100.00%      -12     +31     +70     14
+3532       353   0.00%   0.00%   0.00% 100.00%      -12     +31     +88     17
+3708       370   0.00%   0.00%   0.00% 100.00%       +4     +40     +80     13
+3893       389   0.00%   0.00%   0.00% 100.00%      -47     +42     +93     28
+4087       408   0.00%   0.00%   0.00% 100.00%      -63     -25     +33     18
+4291       429   0.00%   0.00%   0.00% 100.00%      -57      -8     +37     15
+4505       450   0.00%   0.00%   0.00% 100.00%       -8     +27     +64     13
+4730       473   0.00%   0.00%   0.00% 100.00%       +5     +44     +81     13
+4966       496   0.00%   0.00%   0.00% 100.00%      -30     +14  +11670    119
+5214       521   0.00%   0.00%   0.00% 100.00%      -36      +2  +18077    251
+5474       547   0.00%   0.00%   0.00% 100.00%      -30     +14  +16652    160
+5747       574   0.00%   0.00%   0.00% 100.00%      -15     +37  +18081    292
+6034       603   0.00%   0.00%   0.00% 100.00%       +8     +51  +16561    151
+6335       633   0.00%   0.00%   0.00% 100.00%      -10     +28  +18073    161
+6651       665   0.00%   0.00%   0.00% 100.00%      -23     +23  +16349    158
+6983       698   0.00%   0.00%   0.00% 100.00%      -26     +26     +78     19
+7332       733   0.00%   0.00%   0.00% 100.00%      -50     -10     +30     13
+7698       769   0.00%   0.00%   0.00% 100.00%       +5     +45  +16397    148
+8082       808   0.00%   0.00%   0.00% 100.00%      +17     +60  +18089    284
+8486       848   0.00%   0.00%   0.00% 100.00%      -46     +30  +18197    195
+8910       891   0.00%   0.00%   0.00% 100.00%      -48     -13  +16493    127
+9355       935   0.00%   0.00%   0.00% 100.00%      -34     +15  +18049    225
+9822       982   0.00%   0.00%   0.00% 100.00%       -4     +33  +16663    148
+10313     1031   0.00%   0.00%   0.00% 100.00%      -31     +22  +15046    110
+10828     1082   0.00%   0.00%   0.00% 100.00%      -14     +30  +18201    214
+11369     1136   0.00%   0.00%   0.00% 100.00%       +0     +44  +16464    171
+11937     1193   0.00%   0.00%   0.00% 100.00%       -7     +55  +18101    346
+12533     1253   0.00%   0.00%   0.00% 100.00%      -21     +22  +18113    372
+13159     1315   0.00%   0.00%   0.00% 100.00%      -18     +22  +18068    263
+13816     1381   0.00%   0.00%   0.00% 100.00%      -33     +17  +18032    171
+14506     1450   0.00%   0.00%   0.00% 100.00%      -49      -4  +18040    218
+15231     1523   0.00%   0.00%   0.00% 100.00%      -40      -1  +18171    224
+15992     1599   0.00%   0.00%   0.00% 100.00%      -24     +17  +18106    210
+16791     1679   0.00%   0.00%   0.00% 100.00%       +2     +45  +17998    219
+17630     1763   0.00%   0.00%   0.00% 100.00%      -78     -26  +16597    214
+18511     1851   0.00%   0.00%   0.00% 100.00%      -40      +5  +18087    238
+19436     1943   0.00%   0.00%   0.00% 100.00%      -33     +27  +18110    316
+20407     2040   0.00%   0.00%   0.00% 100.00%       -4     +57  +18132    359
+21427     2142   0.00%   0.00%   0.00% 100.00%      -21     +39  +18131    402
+22498     2249   0.00%   0.00%   0.00% 100.00%      -53     +50  +18109    478
+23622     2362   0.00%   0.00%   0.00% 100.00%      -23    +109  +18153    718
+24803     2480   0.00%   0.00%   0.00% 100.00%      -13    +680  +18113   2227
+26043     2604   0.00%   0.00%   0.00% 100.00%     -248   +4060  +18732   6280
+27345     2734   0.00%   0.00%   0.00% 100.00%      -35   +1139  +18072   2774
+28712     2871   0.00%   0.00%   0.00% 100.00%       +9   +1338  +18153   2828
+30147     3014   0.00%   0.00%   0.00% 100.00%      +29   +1481  +17354   3083
+31654     3165   0.00%   0.00%   0.00% 100.00%      -37   +1609  +18032   3405
+33236     3323   0.00%   0.00%   0.00% 100.00%      -97   +2092  +18050   4248
+34897     3489   0.00%   0.00%   0.00% 100.00%     -122   +2537  +18113   4933
+36641     3664   0.00%   0.00%   0.00% 100.00%     -117   +3943  +18433   5985
+38473     3847   0.00%   0.00%   0.00% 100.00%     -178   +4307  +18708   6488
+40396     4039   0.00%   0.00%   0.00% 100.00%      +61   +3570  +18272   5927
+42415     4241   0.00%   0.00%   0.00% 100.00%     -171   +5080  +18745   6633
+44535     4453   0.00%   0.00%   0.00% 100.00%     -620   +3489  +18162   5717
+46761     4676   0.00%   0.00%   0.00% 100.00%     -667   +2999  +18110   5335
+49099     4909   0.00%   0.00%   0.00% 100.00%      +28   +2867  +18219   5023
+51553     5155   0.00%   0.00%   0.00% 100.00%      +64   +2241  +18035   4339
+54130     5413   0.00%   0.00%   0.00% 100.00%      +11   +1873  +18097   3915
+56836     5683   0.00%   0.00%   0.00% 100.00%      -17   +1748  +17564   3828
+59677     5967   0.00%   0.00%   0.00% 100.00%      -13   +1786  +17458   3800
+62660     6266   0.00%   0.00%   0.00% 100.00%       -7   +1932  +18122   3905
+65793     6579   0.00%   0.00%   0.00% 100.00%      -29   +1831  +17546   3731
+69082     6908   0.00%   0.00%   0.06%  99.94%     -152   +2825  +18696   4125
+72536     7253   0.00%   0.00%   0.00% 100.00%     +233   +2128  +18188   3404
+76162     7616   0.00%   0.00%   0.00% 100.00%      +61   +2279  +18109   3774
+79970     7997   0.00%   0.00%   0.00% 100.00%      -26   +2256  +18108   3819
+83968     8396   0.00%   0.00%   0.00% 100.00%      -74   +1886  +17372   3276
+88166     8816   0.00%   0.00%   0.05%  99.95%      -77   +1570  +17911   2158
+92574     9257   0.00%   0.00%   0.02%  99.98%     -151   +1368  +18671   1848
+97202     9720   0.00%   0.00%   0.00% 100.00%      +40   +1418  +17280   2003
+102062   10206   0.00%   0.00%   0.00% 100.00%      +70   +1738  +17183   2442
+107165   10716   0.00%   0.00%   0.00% 100.00%       +3   +1784  +17451   2487
+112523   11252   0.00%   0.00%   0.00% 100.00%      -29   +1459  +16843   1623
+118149   11814   0.00%   0.00%   0.00% 100.00%      -14   +1438  +16975   1516
+124056   12405   0.00%   0.00%   0.00% 100.00%       -8   +1639  +17178   2050
+130258   13025   0.00%   0.00%   0.00% 100.00%      -39   +1607  +17312   1735
+136770   13677   0.00%   0.00%   0.00% 100.00%      -49   +1546  +18063   1553
+143608   14360   0.00%   0.00%   0.00% 100.00%      -28   +1602  +17486   1510
+150788   15078   0.00%   0.00%   0.00% 100.00%       -3   +1540  +16739   1364
+158327   15832   0.05%   0.00%   0.16%  99.79%     -108   +2111  +18784   1405
+166243   16384   0.17%   0.00%   0.00%  99.83%      +67   +1766  +18211   1235
+174555   16384   0.00%   0.00%   0.00% 100.00%      +50   +1702  +16643   1165
+183282   16384   0.00%   0.00%   0.00% 100.00%      -12   +1672  +16543   1196
+192446   16384   0.00%   0.00%   0.00% 100.00%      -28   +1697  +16716   1197
+202068   16384   0.00%   0.00%   0.00% 100.00%      -59   +1692  +16631   1179
+212171   16384   0.00%   0.00%   0.00% 100.00%      -49   +1767  +16621   1179
+222779   16384   0.16%   0.00%   0.07%  99.77%      -44   +1820  +16643   1147
+233917   16384   3.60%   0.00%   0.20%  96.20%     -131   +1680  +31346   1089
+245612   16384   7.58%   0.00%   0.32%  92.10%     -149   +2102  +86219   1316
+257892   16384  11.15%   0.00%   0.40%  88.45%      +14   +2265  +21315   1351
+270786   16384  15.75%   0.00%   0.50%  83.75%       +1   +2338  +18161   1394
+284325   16384  19.72%   0.00%   0.60%  79.68%      -52   +2387  +40370   1437
+298541   16384  22.83%   0.00%   0.66%  76.51%      -61   +2461  +21356   1467
+313468   16384  26.26%   0.00%   0.70%  73.04%      -38   +2495  +24987   1466
+329141   16384  29.02%   0.00%   0.75%  70.24%      -24   +2598  +25469   1484
+345598   16384  32.21%   0.00%   0.78%  67.02%       -1   +2636  +24568   1489
+362877   16384  35.26%   0.00%   0.80%  63.94%      -38   +2654  +21299   1495
+381020   16384  38.66%   0.00%   0.96%  60.38%      -85   +2392  +20972   1415
+400071   16384  41.41%   0.00%   1.02%  57.57%     -524   +2323  +20943   1508
+420074   16384  43.53%   0.00%   1.09%  55.38%     -656   +2464  +68387   1564
 
-Looking at the stack I see it is using try lock:
+After:
+               |          responses            |     TX timestamp offset (ns)
+rate   clients |  lost invalid   basic  xleave |    min    mean     max stddev
+1000       100   0.00%   0.00%   0.00% 100.00%      -50      -1     +60     25
+1050       105   0.00%   0.00%   0.00% 100.00%      -59     -25     +14     13
+1102       110   0.00%   0.00%   0.00% 100.00%      -36      +4     +36     13
+1157       115   0.00%   0.00%   0.00% 100.00%      -26     +20     +67     16
+1214       121   0.00%   0.00%   0.00% 100.00%      +11     +49     +85     14
+1274       127   0.00%   0.00%   0.00% 100.00%      -40     +36     +93     33
+1337       133   0.00%   0.00%   0.00% 100.00%      -37      +4     +49     17
+1403       140   0.00%   0.00%   0.00% 100.00%      -37      +9     +49     14
+1473       147   0.00%   0.00%   0.00% 100.00%      -54     -14     +25     14
+1546       154   0.00%   0.00%   0.00% 100.00%      -52      +9     +48     16
+1623       162   0.00%   0.00%   0.00% 100.00%      -35      +7     +50     15
+1704       170   0.00%   0.00%   0.00% 100.00%      -34      +1     +36     13
+1789       178   0.00%   0.00%   0.00% 100.00%      -44      -8     +31     13
+1878       187   0.00%   0.00%   0.00% 100.00%      -73     -33     +10     14
+1971       197   0.00%   0.00%   0.00% 100.00%      -76     -40      +0     14
+2069       206   0.00%   0.00%   0.00% 100.00%      -62      -4     +38     17
+2172       217   0.00%   0.00%   0.00% 100.00%      -11     +28     +68     15
+2280       228   0.00%   0.00%   0.00% 100.00%       +3     +47     +92     15
+2394       239   0.00%   0.00%   0.00% 100.00%      -19     +47     +95     22
+2513       251   0.00%   0.00%   0.00% 100.00%      -11     +22     +58     13
+2638       263   0.00%   0.00%   0.00% 100.00%      -45      -5     +56     15
+2769       276   0.00%   0.00%   0.00% 100.00%      -47     -10     +29     13
+2907       290   0.00%   0.00%   0.00% 100.00%      -26     +13     +57     14
+3052       305   0.00%   0.00%   0.00% 100.00%       -7     +34     +69     13
+3204       320   0.00%   0.00%   0.00% 100.00%      -91     -16     +25     17
+3364       336   0.00%   0.00%   0.00% 100.00%      -96     -45     +34     26
+3532       353   0.00%   0.00%   0.00% 100.00%      -36     +13     +60     18
+3708       370   0.00%   0.00%   0.00% 100.00%      -41      +2     +49     18
+3893       389   0.00%   0.00%   0.00% 100.00%       +1     +43     +87     14
+4087       408   0.00%   0.00%   0.00% 100.00%      +24     +69    +117     16
+4291       429   0.00%   0.00%   0.00% 100.00%      +43     +88    +137     15
+4505       450   0.00%   0.00%   0.00% 100.00%      -37     +19     +79     27
+4730       473   0.00%   0.00%   0.00% 100.00%      -20     +34  +11484    119
+4966       496   0.00%   0.00%   0.00% 100.00%      -47     +11     +57     21
+5214       521   0.00%   0.00%   0.00% 100.00%      -83     -29   +4438     49
+5474       547   0.00%   0.00%   0.00% 100.00%      -80      +5  +10236    105
+5747       574   0.00%   0.00%   0.00% 100.00%      -22     +27     +95     22
+6034       603   0.00%   0.00%   0.00% 100.00%      -11     +35  +16445    212
+6335       633   0.00%   0.00%   0.00% 100.00%      -44      -9     +29     13
+6651       665   0.00%   0.00%   0.00% 100.00%      -30     +19  +16177    141
+6983       698   0.00%   0.00%   0.00% 100.00%      +20     +64   +2875     28
+7332       733   0.00%   0.00%   0.00% 100.00%      +19     +78  +16312    136
+7698       769   0.00%   0.00%   0.00% 100.00%      -48     +33  +16456    137
+8082       808   0.00%   0.00%   0.00% 100.00%      -48      -4     +32     14
+8486       848   0.00%   0.00%   0.00% 100.00%      -23     +15     +52     13
+8910       891   0.00%   0.00%   0.00% 100.00%       -7     +32   +2514     23
+9355       935   0.00%   0.00%   0.00% 100.00%      -33     +24   +9744     74
+9822       982   0.00%   0.00%   0.00% 100.00%      -23     +18  +16182    227
+10313     1031   0.00%   0.00%   0.00% 100.00%      -36      +4  +16439    135
+10828     1082   0.00%   0.00%   0.00% 100.00%      -14     +30  +16198    177
+11369     1136   0.00%   0.00%   0.00% 100.00%       +4     +53  +16298    144
+11937     1193   0.00%   0.00%   0.00% 100.00%       +5     +45  +16296    164
+12533     1253   0.00%   0.00%   0.00% 100.00%      -27     +23  +16488    173
+13159     1315   0.00%   0.00%   0.00% 100.00%      -18     +24  +16318    135
+13816     1381   0.00%   0.00%   0.00% 100.00%       -9     +40  +16615    143
+14506     1450   0.00%   0.00%   0.00% 100.00%      -35     +18  +16327    155
+15231     1523   0.00%   0.00%   0.00% 100.00%      -36      +3  +16232    153
+15992     1599   0.00%   0.00%   0.00% 100.00%      -31     +12  +16371    148
+16791     1679   0.00%   0.00%   0.00% 100.00%      -29     +15  +16443    195
+17630     1763   0.00%   0.00%   0.00% 100.00%       -9     +30  +16399    188
+18511     1851   0.00%   0.00%   0.00% 100.00%       +3   +2039  +18611   5296
+19436     1943   0.00%   0.00%   0.00% 100.00%     -101   +1658  +18800   4692
+20407     2040   0.00%   0.00%   0.00% 100.00%      +23    +120  +16389    217
+21427     2142   0.00%   0.00%   0.00% 100.00%      -28    +126  +16177    331
+22498     2249   0.00%   0.00%   0.00% 100.00%      -21    +150  +16525    738
+23622     2362   0.00%   0.00%   0.00% 100.00%       +9    +293  +16218   1254
+24803     2480   0.00%   0.00%   0.00% 100.00%      -40    +322  +16404   1423
+26043     2604   0.00%   0.00%   0.00% 100.00%      -49    +389  +16426   1676
+27345     2734   0.00%   0.00%   0.00% 100.00%      -51    +691  +16498   2505
+28712     2871   0.00%   0.00%   0.00% 100.00%      -51    +963  +16607   3015
+30147     3014   0.00%   0.00%   0.00% 100.00%      -19   +1199  +16634   3397
+31654     3165   0.00%   0.00%   0.00% 100.00%      +10   +1592  +16675   3920
+33236     3323   0.00%   0.00%   0.00% 100.00%      -37   +1437  +16766   3881
+34897     3489   0.00%   0.00%   0.00% 100.00%      -34   +1031  +16765   3421
+36641     3664   0.00%   0.00%   0.00% 100.00%      -31    +308  +16668   1906
+38473     3847   0.00%   0.00%   0.00% 100.00%      -28    +327  +16841   1985
+40396     4039   0.00%   0.00%   0.00% 100.00%      -11    +570  +16775   2738
+42415     4241   0.00%   0.00%   0.00% 100.00%      -24    +392  +16872   2225
+44535     4453   0.00%   0.00%   0.00% 100.00%      -12    +396  +17011   2146
+46761     4676   0.00%   0.00%   0.00% 100.00%      -28    +406  +17292   2061
+49099     4909   0.00%   0.00%   0.00% 100.00%      -43    +425  +17224   2025
+51553     5155   0.00%   0.00%   0.00% 100.00%      -26    +578  +17207   2192
+54130     5413   0.00%   0.00%   0.00% 100.00%      -22    +703  +17214   2254
+56836     5683   0.00%   0.00%   0.00% 100.00%       -9    +780  +17239   2192
+59677     5967   0.00%   0.00%   0.00% 100.00%      -41   +1194  +17258   2931
+62660     6266   0.00%   0.00%   0.00% 100.00%      -51   +1245  +17285   3066
+65793     6579   0.00%   0.00%   0.00% 100.00%      -64   +1247  +17246   3103
+69082     6908   0.00%   0.00%   0.00% 100.00%     -784   +2074  +18422   3355
+72536     7253   0.00%   0.00%   0.00% 100.00%     -982    +660  +16681   1700
+76162     7616   0.00%   0.00%   0.00% 100.00%       +0   +1462  +17309   2513
+79970     7997   0.00%   0.00%   0.00% 100.00%     +280   +3833  +17455   5181
+83968     8396   0.00%   0.00%   0.00% 100.00%      -26   +1047  +17189   1689
+88166     8816   0.00%   0.00%   0.00% 100.00%      -85    +835  +16783   1307
+92574     9257   0.00%   0.00%   0.00% 100.00%     -122    +803  +16628   1311
+97202     9720   0.00%   0.00%   0.00% 100.00%      -44    +947  +16791   1345
+102062   10206   0.00%   0.00%   0.00% 100.00%       +7   +1033  +16637   1349
+107165   10716   0.01%   0.00%   0.00%  99.99%       +7   +1002  +24510   1311
+112523   11252   0.00%   0.00%   0.00% 100.00%      +14   +1054  +16479   1281
+118149   11814   0.00%   0.00%   0.11%  99.89%     -170   +1560  +17766   1122
+124056   12405   0.00%   0.00%   0.00% 100.00%      +24   +1255  +16566   1230
+130258   13025   0.00%   0.00%   0.00% 100.00%      +28   +1218  +16479   1331
+136770   13677   0.12%   0.00%   0.05%  99.82%      -13   +1336  +16770   1586
+143608   14360   3.35%   0.00%   0.23%  96.41%      -31   +1547  +21513   1924
+150788   15078   7.22%   0.00%   0.41%  92.37%      -37   +1617  +25333   1989
+158327   15832  11.59%   0.00%   0.62%  87.78%      -44   +1757  +24397   2110
+166243   16384  15.07%   0.00%   0.77%  84.16%      -36   +2074  +21110   2345
+174555   16384  19.09%   0.00%   0.92%  80.00%      -45   +2109  +26063   2294
+183282   16384  23.00%   0.00%   1.02%  75.98%      -35   +2222 +153077   2407
+192446   16384  26.77%   0.00%   1.14%  72.09%      -41   +2267  +18813   2397
+202068   16384  30.04%   0.00%   1.21%  68.74%      -45   +2374  +23266   2413
+212171   16384  32.80%   0.00%   1.34%  65.86%      -49   +2563  +23285   2307
+222779   16384  36.43%   0.00%   1.31%  62.26%     -158   +2693  +26937   2346
+233917   16384  39.76%   0.00%   1.38%  58.86%      +85   +2848  +25018   2349
+245612   16384  42.52%   0.00%   1.41%  56.07%      +89   +2846 +153305   2409
+257892   16384  44.83%   0.00%   1.41%  53.76%      +14   +2789  +24800   2323
+270786   16384  47.64%   0.00%   1.43%  50.94%      -19   +2766  +25002   2382
+284325   16384  49.02%   0.00%   1.51%  49.47%     -886   +2687  +23521   2006
+298541   16384  52.04%   0.00%   1.51%  46.44%     -917   +3332 +118317   2057
 
-	_raw_spin_trylock (./include/linux/spinlock_api_smp.h:90 kernel/locking/spinlock.c:138)
-	virtnet_poll (./include/linux/spinlock.h:? ./include/linux/netdevice.h:4684 drivers/net/virtio_net.c:3056 drivers/net/virtio_net.c:3108)
+-- 
+Miroslav Lichvar
 
-Why would the try_lock() avoid such a problem?
-
-I understand that, whenever the try_lock() succeed, it will reach
-a HARDIRQ-unsafe lock (_xmit_ETHER) from a HARDIRQ-safe lock (console
-lock), which is the path that should be avoided.
-
-Full lockdep snippet when using virtio-net:
-
-[   16.284303] ========================================================
-[   16.284303] WARNING: possible irq lock inversion dependency detected
-[   16.284305] 6.17.0-rc1-00216-g059cb8675a8c #8 Tainted: G            E
-[   16.284306] --------------------------------------------------------
-[   16.284306] swapper/16/0 just changed the state of lock:
-[   16.284307] ffffffff82d84290 (console_owner){-...}-{0:0}, at: console_flush_all (./include/linux/rcupdate.h:336 ./include/linux/srcu.h:319 kernel/printk/printk.c:288 kernel/printk/printk.c:3203) 
-[   16.284315] but this lock took another, HARDIRQ-unsafe lock in the past:
-[   16.284316]  (_xmit_ETHER#2){+.-.}-{3:3}
-[   16.284317]
-[   16.284317]
-[   16.284317] and interrupts could create inverse lock ordering between them.
-[   16.284317]
-[   16.284318]
-[   16.284318] other info that might help us debug this:
-[   16.284318] Chain exists of:
-[   16.284318]   console_owner --> target_list_lock --> _xmit_ETHER#2
-[   16.284318]
-[   16.284320]  Possible interrupt unsafe locking scenario:
-[   16.284320]
-[   16.284321]        CPU0                    CPU1
-[   16.284321]        ----                    ----
-[   16.284321]   lock(_xmit_ETHER#2);
-[   16.284322]                                local_irq_disable();
-[   16.284323]                                lock(console_owner);
-[   16.284323]                                lock(target_list_lock);
-[   16.284324]   <Interrupt>
-[   16.284324]     lock(console_owner);
-[   16.284325]
-[   16.284325]  *** DEADLOCK ***
-[   16.284325]
-[   16.284325] 2 locks held by swapper/16/0:
-[   16.284326] #0: ffffffff82d842b8 (console_lock){+.+.}-{0:0}, at: irq_work_run_list (kernel/irq_work.c:222 kernel/irq_work.c:252) 
-[   16.284330] #1: ffffffff82683d60 (console_srcu){....}-{0:0}, at: console_flush_all (./include/linux/rcupdate.h:336 ./include/linux/srcu.h:319 kernel/printk/printk.c:288 kernel/printk/printk.c:3203) 
-[   16.284333]
-[   16.284333] the shortest dependencies between 2nd lock and 1st lock:
-[   16.284336]   -> (_xmit_ETHER#2){+.-.}-{3:3} ops: 558 {
-[   16.284340]      HARDIRQ-ON-W at:
-[   16.284342] lock_acquire (kernel/locking/lockdep.c:5868) 
-[   16.284343] _raw_spin_trylock (./include/linux/spinlock_api_smp.h:90 kernel/locking/spinlock.c:138) 
-[   16.284346] virtnet_poll (./include/linux/spinlock.h:? ./include/linux/netdevice.h:4684 drivers/net/virtio_net.c:3056 drivers/net/virtio_net.c:3108) 
-[   16.284348] __napi_poll (./arch/x86/include/asm/jump_label.h:36 ./include/trace/events/napi.h:14 net/core/dev.c:7495) 
-[   16.284350] net_rx_action (net/core/dev.c:7559 net/core/dev.c:7684) 
-[   16.284351] handle_softirqs (./arch/x86/include/asm/jump_label.h:36 ./include/trace/events/irq.h:142 kernel/softirq.c:580) 
-[   16.284353] do_softirq (kernel/softirq.c:480) 
-[   16.284353] __local_bh_enable_ip (kernel/softirq.c:?) 
-[   16.284354] virtnet_napi_enable (drivers/net/virtio_net.c:2874) 
-[   16.284356] virtnet_open (drivers/net/virtio_net.c:? drivers/net/virtio_net.c:3211) 
-[   16.284357] __dev_open (net/core/dev.c:1682) 
-[   16.284358] netif_open (net/core/dev.c:1706) 
-[   16.284359] dev_open (net/core/dev_api.c:?) 
-[   16.284360] netpoll_setup (net/core/netpoll.c:744) 
-[   16.284361] init_netconsole (drivers/net/netconsole.c:1876 drivers/net/netconsole.c:1927) 
-[   16.284364] do_one_initcall (init/main.c:1269) 
-[   16.284365] do_initcall_level (init/main.c:1330) 
-[   16.284367] do_initcalls (init/main.c:1344) 
-[   16.284369] kernel_init_freeable (init/main.c:1583) 
-[   16.284452] kernel_init (init/main.c:1471) 
-[   16.284455] ret_from_fork (arch/x86/kernel/process.c:154) 
-[   16.284456] ret_from_fork_asm (arch/x86/entry/entry_64.S:258) 
-[   16.284458]      IN-SOFTIRQ-W at:
-[   16.284458] lock_acquire (kernel/locking/lockdep.c:5868) 
-[   16.284459] _raw_spin_lock (./include/linux/spinlock_api_smp.h:133 kernel/locking/spinlock.c:154) 
-[   16.284460] virtnet_poll_tx (./include/linux/netdevice.h:4661 drivers/net/virtio_net.c:3255) 
-[   16.284462] __napi_poll (./arch/x86/include/asm/jump_label.h:36 ./include/trace/events/napi.h:14 net/core/dev.c:7495) 
-[   16.284463] net_rx_action (net/core/dev.c:7559 net/core/dev.c:7684) 
-[   16.284463] handle_softirqs (./arch/x86/include/asm/jump_label.h:36 ./include/trace/events/irq.h:142 kernel/softirq.c:580) 
-[   16.284464] do_softirq (kernel/softirq.c:480) 
-[   16.284465] __local_bh_enable_ip (kernel/softirq.c:?) 
-[   16.284466] virtnet_napi_tx_enable (drivers/net/virtio_net.c:2895) 
-[   16.284467] virtnet_open (drivers/net/virtio_net.c:3205) 
-[   16.284468] __dev_open (net/core/dev.c:1682) 
-[   16.284469] netif_open (net/core/dev.c:1706) 
-[   16.284470] dev_open (net/core/dev_api.c:?) 
-[   16.284470] netpoll_setup (net/core/netpoll.c:744) 
-[   16.284471] init_netconsole (drivers/net/netconsole.c:1876 drivers/net/netconsole.c:1927) 
-[   16.284472] do_one_initcall (init/main.c:1269) 
-[   16.284473] do_initcall_level (init/main.c:1330) 
-[   16.284475] do_initcalls (init/main.c:1344) 
-[   16.284476] kernel_init_freeable (init/main.c:1583) 
-[   16.284478] kernel_init (init/main.c:1471) 
-[   16.284479] ret_from_fork (arch/x86/kernel/process.c:154) 
-[   16.284480] ret_from_fork_asm (arch/x86/entry/entry_64.S:258) 
-[   16.284481]      INITIAL USE at:
-[   16.284482] lock_acquire (kernel/locking/lockdep.c:5868) 
-[   16.284482] _raw_spin_trylock (./include/linux/spinlock_api_smp.h:90 kernel/locking/spinlock.c:138) 
-[   16.284484] virtnet_poll (./include/linux/spinlock.h:? ./include/linux/netdevice.h:4684 drivers/net/virtio_net.c:3056 drivers/net/virtio_net.c:3108) 
-[   16.284485] __napi_poll (./arch/x86/include/asm/jump_label.h:36 ./include/trace/events/napi.h:14 net/core/dev.c:7495) 
-[   16.284485] net_rx_action (net/core/dev.c:7559 net/core/dev.c:7684) 
-[   16.284486] handle_softirqs (./arch/x86/include/asm/jump_label.h:36 ./include/trace/events/irq.h:142 kernel/softirq.c:580) 
-[   16.284487] do_softirq (kernel/softirq.c:480) 
-[   16.284488] __local_bh_enable_ip (kernel/softirq.c:?) 
-[   16.284489] virtnet_napi_enable (drivers/net/virtio_net.c:2874) 
-[   16.284490] virtnet_open (drivers/net/virtio_net.c:? drivers/net/virtio_net.c:3211) 
-[   16.284490] __dev_open (net/core/dev.c:1682) 
-[   16.284491] netif_open (net/core/dev.c:1706) 
-[   16.284492] dev_open (net/core/dev_api.c:?) 
-[   16.284492] netpoll_setup (net/core/netpoll.c:744) 
-[   16.284493] init_netconsole (drivers/net/netconsole.c:1876 drivers/net/netconsole.c:1927) 
-[   16.284494] do_one_initcall (init/main.c:1269) 
-[   16.284495] do_initcall_level (init/main.c:1330) 
-[   16.284496] do_initcalls (init/main.c:1344) 
-[   16.284498] kernel_init_freeable (init/main.c:1583) 
-[   16.284499] kernel_init (init/main.c:1471) 
-[   16.284501] ret_from_fork (arch/x86/kernel/process.c:154) 
-[   16.284502] ret_from_fork_asm (arch/x86/entry/entry_64.S:258) 
-[   16.284503]    }
-[   16.284503] ... key at: netdev_xmit_lock_key+0x10/0x390 
-[   16.284506]    ... acquired at:
-[   16.284507] _raw_spin_lock (./include/linux/spinlock_api_smp.h:133 kernel/locking/spinlock.c:154) 
-[   16.284508] virtnet_poll_tx (./include/linux/netdevice.h:4661 drivers/net/virtio_net.c:3255) 
-[   16.284509] netpoll_poll_dev (net/core/netpoll.c:157 net/core/netpoll.c:170 net/core/netpoll.c:200) 
-[   16.284510] netpoll_send_skb (./include/asm-generic/delay.h:62 net/core/netpoll.c:356 net/core/netpoll.c:410) 
-[   16.284511] netpoll_send_udp (net/core/netpoll.c:532) 
-[   16.284511] write_ext_msg (drivers/net/netconsole.c:1498 drivers/net/netconsole.c:1536 drivers/net/netconsole.c:1692 drivers/net/netconsole.c:1710) 
-[   16.284513] console_flush_all (kernel/printk/printk.c:3055 kernel/printk/printk.c:3139 kernel/printk/printk.c:3226) 
-[   16.284515] console_unlock (kernel/printk/printk.c:3285 kernel/printk/printk.c:3325) 
-[   16.284516] vprintk_emit (kernel/printk/printk.c:?) 
-[   16.284518] _printk (kernel/printk/printk.c:2478) 
-[   16.284519] register_console (kernel/printk/printk.c:4127) 
-[   16.284521] init_netconsole (drivers/net/netconsole.c:1960) 
-[   16.284522] do_one_initcall (init/main.c:1269) 
-[   16.284523] do_initcall_level (init/main.c:1330) 
-[   16.284524] do_initcalls (init/main.c:1344) 
-[   16.284526] kernel_init_freeable (init/main.c:1583) 
-[   16.284527] kernel_init (init/main.c:1471) 
-[   16.284529] ret_from_fork (arch/x86/kernel/process.c:154) 
-[   16.284530] ret_from_fork_asm (arch/x86/entry/entry_64.S:258) 
-[   16.284530]
-[   16.284531]  -> (target_list_lock){....}-{3:3} ops: 420 {
-[   16.284533]     INITIAL USE at:
-[   16.284534] lock_acquire (kernel/locking/lockdep.c:5868) 
-[   16.284592] _raw_spin_lock_irqsave (./include/linux/spinlock_api_smp.h:110 kernel/locking/spinlock.c:162) 
-[   16.284593] init_netconsole (./include/linux/list.h:169 drivers/net/netconsole.c:1944) 
-[   16.284595] do_one_initcall (init/main.c:1269) 
-[   16.284596] do_initcall_level (init/main.c:1330) 
-[   16.284597] do_initcalls (init/main.c:1344) 
-[   16.284599] kernel_init_freeable (init/main.c:1583) 
-[   16.284600] kernel_init (init/main.c:1471) 
-[   16.284602] ret_from_fork (arch/x86/kernel/process.c:154) 
-[   16.284603] ret_from_fork_asm (arch/x86/entry/entry_64.S:258) 
-[   16.284604]   }
-[   16.284604] ... key at: target_list_lock (??:?) 
-[   16.284606]   ... acquired at:
-[   16.284606] _raw_spin_lock_irqsave (./include/linux/spinlock_api_smp.h:110 kernel/locking/spinlock.c:162) 
-[   16.284607] write_ext_msg (drivers/net/netconsole.c:?) 
-[   16.284609] console_flush_all (kernel/printk/printk.c:3055 kernel/printk/printk.c:3139 kernel/printk/printk.c:3226) 
-[   16.284610] console_unlock (kernel/printk/printk.c:3285 kernel/printk/printk.c:3325) 
-[   16.284612] vprintk_emit (kernel/printk/printk.c:?) 
-[   16.284613] _printk (kernel/printk/printk.c:2478) 
-[   16.284614] register_console (kernel/printk/printk.c:4127) 
-[   16.284616] init_netconsole (drivers/net/netconsole.c:1960) 
-[   16.284617] do_one_initcall (init/main.c:1269) 
-[   16.284618] do_initcall_level (init/main.c:1330) 
-[   16.284619] do_initcalls (init/main.c:1344) 
-[   16.284620] kernel_init_freeable (init/main.c:1583) 
-[   16.284622] kernel_init (init/main.c:1471) 
-[   16.284623] ret_from_fork (arch/x86/kernel/process.c:154) 
-[   16.284624] ret_from_fork_asm (arch/x86/entry/entry_64.S:258) 
-[   16.284625]
-[   16.284625] -> (console_owner){-...}-{0:0} ops: 2643 {
-[   16.284627]    IN-HARDIRQ-W at:
-[   16.284628] lock_acquire (kernel/locking/lockdep.c:5868) 
-[   16.284629] console_flush_all (kernel/printk/printk.c:1924 kernel/printk/printk.c:3132 kernel/printk/printk.c:3226) 
-[   16.284630] console_unlock (kernel/printk/printk.c:3285 kernel/printk/printk.c:3325) 
-[   16.284631] wake_up_klogd_work_func (kernel/printk/printk.c:4529) 
-[   16.284632] irq_work_run_list (kernel/irq_work.c:222 kernel/irq_work.c:252) 
-[   16.284634] update_process_times (kernel/time/timer.c:2478) 
-[   16.284636] tick_nohz_handler (kernel/time/tick-sched.c:187 kernel/time/tick-sched.c:306) 
-[   16.284638] __hrtimer_run_queues (kernel/time/hrtimer.c:1761 kernel/time/hrtimer.c:1825) 
-[   16.284639] hrtimer_interrupt (kernel/time/hrtimer.c:1890) 
-[   16.284640] __sysvec_apic_timer_interrupt (./arch/x86/include/asm/jump_label.h:36 ./arch/x86/include/asm/trace/irq_vectors.h:40 arch/x86/kernel/apic/apic.c:1057) 
-[   16.284642] sysvec_apic_timer_interrupt (arch/x86/kernel/apic/apic.c:1050 arch/x86/kernel/apic/apic.c:1050) 
-[   16.284643] asm_sysvec_apic_timer_interrupt (./arch/x86/include/asm/idtentry.h:702) 
-[   16.284644] pv_native_safe_halt (arch/x86/kernel/paravirt.c:82) 
-[   16.284645] default_idle (./arch/x86/include/asm/paravirt.h:107 arch/x86/kernel/process.c:757) 
-[   16.284647] default_idle_call (./include/linux/cpuidle.h:143 kernel/sched/idle.c:123) 
-[   16.284648] do_idle (kernel/sched/idle.c:191 kernel/sched/idle.c:330) 
-[   16.284649] cpu_startup_entry (kernel/sched/idle.c:427) 
-[   16.284650] start_secondary (arch/x86/kernel/smpboot.c:315) 
-[   16.284651] common_startup_64 (arch/x86/kernel/head_64.S:419) 
-[   16.284653]    INITIAL USE at:
-[   16.284654]  }
-[   16.284654] ... key at: console_owner_dep_map (??:?) 
-[   16.284842]  ... acquired at:
-[   16.284843] mark_lock (kernel/locking/lockdep.c:4753) 
-[   16.284844] __lock_acquire (kernel/locking/lockdep.c:? kernel/locking/lockdep.c:5191) 
-[   16.284845] lock_acquire (kernel/locking/lockdep.c:5868) 
-[   16.284846] console_flush_all (kernel/printk/printk.c:1924 kernel/printk/printk.c:3132 kernel/printk/printk.c:3226) 
-[   16.284847] console_unlock (kernel/printk/printk.c:3285 kernel/printk/printk.c:3325) 
-[   16.284849] wake_up_klogd_work_func (kernel/printk/printk.c:4529) 
-[   16.284849] irq_work_run_list (kernel/irq_work.c:222 kernel/irq_work.c:252) 
-[   16.284850] update_process_times (kernel/time/timer.c:2478) 
-[   16.284852] tick_nohz_handler (kernel/time/tick-sched.c:187 kernel/time/tick-sched.c:306) 
-[   16.284854] __hrtimer_run_queues (kernel/time/hrtimer.c:1761 kernel/time/hrtimer.c:1825) 
-[   16.284854] hrtimer_interrupt (kernel/time/hrtimer.c:1890) 
-[   16.284855] __sysvec_apic_timer_interrupt (./arch/x86/include/asm/jump_label.h:36 ./arch/x86/include/asm/trace/irq_vectors.h:40 arch/x86/kernel/apic/apic.c:1057) 
-[   16.284856] sysvec_apic_timer_interrupt (arch/x86/kernel/apic/apic.c:1050 arch/x86/kernel/apic/apic.c:1050) 
-[   16.284858] asm_sysvec_apic_timer_interrupt (./arch/x86/include/asm/idtentry.h:702) 
-[   16.284858] pv_native_safe_halt (arch/x86/kernel/paravirt.c:82) 
-[   16.284859] default_idle (./arch/x86/include/asm/paravirt.h:107 arch/x86/kernel/process.c:757) 
-[   16.284861] default_idle_call (./include/linux/cpuidle.h:143 kernel/sched/idle.c:123) 
-[   16.284862] do_idle (kernel/sched/idle.c:191 kernel/sched/idle.c:330) 
-[   16.284863] cpu_startup_entry (kernel/sched/idle.c:427) 
-[   16.284863] start_secondary (arch/x86/kernel/smpboot.c:315) 
-[   16.284864] common_startup_64 (arch/x86/kernel/head_64.S:419) 
-[   16.284866]
-[   16.284866]
-[   16.284866] stack backtrace:
-[   16.284870] Tainted: [E]=UNSIGNED_MODULE
-[   16.284871] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.3-0-ga6ed6b701f0a-prebuilt.qemu.org 04/01/2014
-[   16.284872] Call Trace:
-[   16.284873]  <IRQ>
-[   16.284876] dump_stack_lvl (lib/dump_stack.c:123) 
-[   16.284880] print_irq_inversion_bug (kernel/locking/lockdep.c:?) 
-[   16.284882] mark_lock_irq (kernel/locking/lockdep.c:?) 
-[   16.284883] ? stack_trace_save (kernel/stacktrace.c:123) 
-[   16.284886] mark_lock (kernel/locking/lockdep.c:4753) 
-[   16.284887] __lock_acquire (kernel/locking/lockdep.c:? kernel/locking/lockdep.c:5191) 
-[   16.284890] ? printk_get_next_message (kernel/printk/printk.c:3024) 
-[   16.284892] ? console_flush_all (./include/linux/rcupdate.h:336 ./include/linux/srcu.h:319 kernel/printk/printk.c:288 kernel/printk/printk.c:3203) 
-[   16.284894] lock_acquire (kernel/locking/lockdep.c:5868) 
-[   16.284895] ? console_flush_all (./include/linux/rcupdate.h:336 ./include/linux/srcu.h:319 kernel/printk/printk.c:288 kernel/printk/printk.c:3203) 
-[   16.284897] ? console_flush_all (kernel/printk/printk.c:1924 kernel/printk/printk.c:3132 kernel/printk/printk.c:3226) 
-[   16.284899] ? console_flush_all (./include/linux/rcupdate.h:336 ./include/linux/srcu.h:319 kernel/printk/printk.c:288 kernel/printk/printk.c:3203) 
-[   16.284900] console_flush_all (kernel/printk/printk.c:1924 kernel/printk/printk.c:3132 kernel/printk/printk.c:3226) 
-[   16.284923] ? console_flush_all (./include/linux/rcupdate.h:336 ./include/linux/srcu.h:319 kernel/printk/printk.c:288 kernel/printk/printk.c:3203) 
-[   16.284925] ? console_flush_all (./include/linux/rcupdate.h:336 ./include/linux/srcu.h:319 kernel/printk/printk.c:288 kernel/printk/printk.c:3203) 
-[   16.284928] console_unlock (kernel/printk/printk.c:3285 kernel/printk/printk.c:3325) 
-[   16.284930] wake_up_klogd_work_func (kernel/printk/printk.c:4529) 
-[   16.284931] irq_work_run_list (kernel/irq_work.c:222 kernel/irq_work.c:252) 
-[   16.284933] update_process_times (kernel/time/timer.c:2478) 
-[   16.284935] tick_nohz_handler (kernel/time/tick-sched.c:187 kernel/time/tick-sched.c:306) 
-[   16.284936] ? tick_setup_sched_timer (kernel/time/tick-sched.c:285) 
-[   16.284938] __hrtimer_run_queues (kernel/time/hrtimer.c:1761 kernel/time/hrtimer.c:1825) 
-[   16.284940] hrtimer_interrupt (kernel/time/hrtimer.c:1890) 
-[   16.284942] __sysvec_apic_timer_interrupt (./arch/x86/include/asm/jump_label.h:36 ./arch/x86/include/asm/trace/irq_vectors.h:40 arch/x86/kernel/apic/apic.c:1057) 
-[   16.284943] sysvec_apic_timer_interrupt (arch/x86/kernel/apic/apic.c:1050 arch/x86/kernel/apic/apic.c:1050) 
-[   16.284945]  </IRQ>
-[   16.284946]  <TASK>
-[   16.284947] asm_sysvec_apic_timer_interrupt (./arch/x86/include/asm/idtentry.h:702) 
-[   16.284948] RIP: 0010:pv_native_safe_halt (arch/x86/kernel/paravirt.c:82) 
-[ 16.284950] Code: bd 54 01 e8 2f 00 00 00 48 2b 05 a0 8b 57 00 c3 cc cc cc cc cc cc cc f3 0f 1e fa eb 07 0f 00 2d 0d f3 05 00 f3 0f 1e fa fb f4 <c3> cc cc cc cc cc cc cc cc cc cc cc cc 66 0f 1f 00 50 8b 37 83 e6
-All code
-========
-   0:	bd 54 01 e8 2f       	mov    $0x2fe80154,%ebp
-   5:	00 00                	add    %al,(%rax)
-   7:	00 48 2b             	add    %cl,0x2b(%rax)
-   a:	05 a0 8b 57 00       	add    $0x578ba0,%eax
-   f:	c3                   	ret    
-  10:	cc                   	int3   
-  11:	cc                   	int3   
-  12:	cc                   	int3   
-  13:	cc                   	int3   
-  14:	cc                   	int3   
-  15:	cc                   	int3   
-  16:	cc                   	int3   
-  17:	f3 0f 1e fa          	endbr64 
-  1b:	eb 07                	jmp    0x24
-  1d:	0f 00 2d 0d f3 05 00 	verw   0x5f30d(%rip)        # 0x5f331
-  24:	f3 0f 1e fa          	endbr64 
-  28:	fb                   	sti    
-  29:	f4                   	hlt    
-  2a:*	c3                   	ret    		<-- trapping instruction
-  2b:	cc                   	int3   
-  2c:	cc                   	int3   
-  2d:	cc                   	int3   
-  2e:	cc                   	int3   
-  2f:	cc                   	int3   
-  30:	cc                   	int3   
-  31:	cc                   	int3   
-  32:	cc                   	int3   
-  33:	cc                   	int3   
-  34:	cc                   	int3   
-  35:	cc                   	int3   
-  36:	cc                   	int3   
-  37:	66 0f 1f 00          	nopw   (%rax)
-  3b:	50                   	push   %rax
-  3c:	8b 37                	mov    (%rdi),%esi
-  3e:	83                   	.byte 0x83
-  3f:	e6                   	.byte 0xe6
-
-Code starting with the faulting instruction
-===========================================
-   0:	c3                   	ret    
-   1:	cc                   	int3   
-   2:	cc                   	int3   
-   3:	cc                   	int3   
-   4:	cc                   	int3   
-   5:	cc                   	int3   
-   6:	cc                   	int3   
-   7:	cc                   	int3   
-   8:	cc                   	int3   
-   9:	cc                   	int3   
-   a:	cc                   	int3   
-   b:	cc                   	int3   
-   c:	cc                   	int3   
-   d:	66 0f 1f 00          	nopw   (%rax)
-  11:	50                   	push   %rax
-  12:	8b 37                	mov    (%rdi),%esi
-  14:	83                   	.byte 0x83
-  15:	e6                   	.byte 0xe6
-[   16.284952] RSP: 0018:ffa000000012bed8 EFLAGS: 00000282
-[   16.284953] RAX: af64f61648e76300 RBX: ffffffff813cd1f0 RCX: 4000000000000000
-[   16.284954] RDX: 0000000000000001 RSI: ffffffff81fd2a36 RDI: ffffffff813cd1f0
-[   16.284955] RBP: ffa000000012bef8 R08: 0000000000060000 R09: 0000000000000001
-[   16.284956] R10: 0000000000000001 R11: 00000000fffeff01 R12: 0000000000000000
-[   16.284956] R13: 0000000000000000 R14: 0000000000000010 R15: 0000000000000000
-[   16.284958] ? do_idle (kernel/sched/idle.c:191 kernel/sched/idle.c:330) 
-[   16.284959] ? default_idle_call (./include/linux/cpuidle.h:132 kernel/sched/idle.c:121) 
-[   16.284960] ? do_idle (kernel/sched/idle.c:191 kernel/sched/idle.c:330) 
-[   16.284962] ? do_idle (kernel/sched/idle.c:191 kernel/sched/idle.c:330) 
-[   16.284962] default_idle (./arch/x86/include/asm/paravirt.h:107 arch/x86/kernel/process.c:757) 
-[   16.284964] default_idle_call (./include/linux/cpuidle.h:143 kernel/sched/idle.c:123) 
-[   16.284965] do_idle (kernel/sched/idle.c:191 kernel/sched/idle.c:330) 
-[   16.284967] cpu_startup_entry (kernel/sched/idle.c:427) 
-[   16.284968] start_secondary (arch/x86/kernel/smpboot.c:315) 
-[   16.284969] common_startup_64 (arch/x86/kernel/head_64.S:419) 
-[   16.284972]  </TASK>
 
