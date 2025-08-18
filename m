@@ -1,107 +1,130 @@
-Return-Path: <netdev+bounces-214721-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-214722-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79062B2B03F
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 20:26:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3843FB2B062
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 20:29:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2274C188197E
-	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 18:26:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD4031B60A5C
+	for <lists+netdev@lfdr.de>; Mon, 18 Aug 2025 18:29:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F31483314AB;
-	Mon, 18 Aug 2025 18:26:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E90A3314C4;
+	Mon, 18 Aug 2025 18:29:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="X9diEnfv"
+	dkim=pass (2048-bit key) header.d=free.fr header.i=@free.fr header.b="J+c4rNOs"
 X-Original-To: netdev@vger.kernel.org
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
+Received: from smtp4-g21.free.fr (smtp4-g21.free.fr [212.27.42.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4A323314A2;
-	Mon, 18 Aug 2025 18:26:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70C8125484D;
+	Mon, 18 Aug 2025 18:29:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.27.42.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755541585; cv=none; b=CEmekWpdkKH/TjPFxvmV/a/pGD5rdt8TARwiAlFRrqplZ8B59msOl14Mfkh/kKnyHOLP2T1pY5P1+fa+x3B9GKnj2vD0ZC8O58JBW9pCyozbE2CC0j4bjjUojd/wlEwAcU4z8ba4C4PWnHbLtozGk1tdZUudE1B5SrXlUKjkAq8=
+	t=1755541751; cv=none; b=Kx6Ck3f7I4Y1lgIKVIsCFQTch6Sk3ZuOiGN2Nq2o6qMf0/2JZu/u1HVauvkTmOA3WOY1QTqQ/a3iv5K1VGZUS0finjWLxKrFzp3+DeKRsF3uDy8940Nqzke0+N8KdbvdYySQUZqQtQCuAvDIwXaXBcWmAOJQaSrwdK2tNQAflX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755541585; c=relaxed/simple;
-	bh=EgalRbjYn9XvJ6vqxWwAZdqnhgYsrm33nDAWgv9wClU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=akgzklxreDsuEEl7UmQpxY2weo0cVy4CwtrxMNRnM6YuO1uZozJol1FIvVYm6eEcGbnfbl2M4AKhc8F3yx7w3521EjP0IUyNI8HEtWX4cEl0b82Gs9rxLwM02FEgWCgks+DjAYPqJn7gV3tOJAVjtOUrW28K3vjpqnwD/fvyPUU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=X9diEnfv; arc=none smtp.client-ip=62.89.141.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=O75UIUPO5Nhi6baLItc5aorQTbl3aXRmvPV/kSs4z1U=; b=X9diEnfvb8vsZSK7H4Ybwyad7Z
-	VGXrBAuw2mdZ8xiMQYV7DxC1p7tKM3M5WM/UjU+XMGlCrjrjI0Mq0M2JvEz6MXJ/BXJXw3nLzU4eB
-	F31BmJj5GovtvGO5IMSUv5I5qPzczC99qT8PEQtKonLLVan26mNpujoOC6QIPU+yvJoFIl9SUOf76
-	2hseD7EdBenfHkZApwqQFF0MXHvA3024HDtRdCoDNq+Ckj524lpzzRDJl5aRZcKllFh0tupl83bby
-	fcgTywetRcz6pD8NZawdz1QNwugUBHj9I4e7ncdz+FXNc7WYaaBKRPGbtmb4pGRJIetez3cU3LH64
-	+7DImIsA==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uo4Yi-000000078b6-0d8k;
-	Mon, 18 Aug 2025 18:26:16 +0000
-Date: Mon, 18 Aug 2025 19:26:16 +0100
-From: Al Viro <viro@zeniv.linux.org.uk>
-To: syzbot <syzbot+1ec0f904ba50d06110b1@syzkaller.appspotmail.com>
-Cc: andrii@kernel.org, ast@kernel.org, bigeasy@linutronix.de,
-	bpf@vger.kernel.org, brauner@kernel.org, daniel@iogearbox.net,
-	davem@davemloft.net, eddyz87@gmail.com, edumazet@google.com,
-	haoluo@google.com, jack@suse.cz, jiri@resnulli.us,
-	john.fastabend@gmail.com, jolsa@kernel.org,
-	kerneljasonxing@gmail.com, kpsingh@kernel.org, kuba@kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org, martin.lau@linux.dev, netdev@vger.kernel.org,
-	pabeni@redhat.com, sdf@fomichev.me, song@kernel.org,
-	syzkaller-bugs@googlegroups.com, tglx@linutronix.de,
-	yonghong.song@linux.dev
-Subject: Re: [syzbot] [mm?] INFO: rcu detected stall in sys_umount (3)
-Message-ID: <20250818182616.GB222315@ZenIV>
-References: <67555b72.050a0220.2477f.0026.GAE@google.com>
- <68a2f584.050a0220.e29e5.009d.GAE@google.com>
+	s=arc-20240116; t=1755541751; c=relaxed/simple;
+	bh=ED8kNp1rWnbnKy7zRbhLyJo7VD7cKdhxeAEQmHCZhKQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LD22FzuIHFIH5ZQ7DSOi2jAIrr02a+wNYBHBmWaS3KqZVhwCb1Djbxs78Yrd2TxP8fctVyVH7Jg5zu9eSTeNxYqxCWOWIbvQx/0JGqBrBMUlp34b39K3ydR42Fht44x5x2m53VAnqXGD6Dym8tui3yOlgG9NV5x24TUzfMM+5H8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=free.fr; spf=pass smtp.mailfrom=free.fr; dkim=pass (2048-bit key) header.d=free.fr header.i=@free.fr header.b=J+c4rNOs; arc=none smtp.client-ip=212.27.42.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=free.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=free.fr
+Received: from [44.168.19.11] (unknown [86.195.82.193])
+	(Authenticated sender: f6bvp@free.fr)
+	by smtp4-g21.free.fr (Postfix) with ESMTPSA id 3B07119F5C2;
+	Mon, 18 Aug 2025 20:29:01 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=free.fr;
+	s=smtp-20201208; t=1755541746;
+	bh=ED8kNp1rWnbnKy7zRbhLyJo7VD7cKdhxeAEQmHCZhKQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=J+c4rNOs7PBuqxajWhTiyTCWKJg2ePL02OYEw5IHBFL0pHBuG5F6KF7HppqL2HQ0o
+	 oQYSGrDXKIRDS9cGLnOmDiC3LpSuqydIykNQ61KJ1OyvBQP0upeO4VQ72UsRhfTiIZ
+	 ulz8r6xTlIJQ19VIvJ4csO/7Z3CQeiS/i7OfZxDSvp8Of3M/nUZIB/Y10AEnagMr5K
+	 QN/fWilkYbkjRsLST9HNU7hj04BLsvej5XCerq532DDtWMuRGp8vA68UiO+Q+Zby4O
+	 CsrDRr50VOT08muQxvRJhjH3HJpYoTVtQaEBuynh/F8QvvY31G8bgyUh3umO5NyBM+
+	 ob1cHpZ/NIW2w==
+Message-ID: <11212ddf-bf32-4b11-afee-e234cdee5938@free.fr>
+Date: Mon, 18 Aug 2025 20:28:59 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <68a2f584.050a0220.e29e5.009d.GAE@google.com>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [ROSE] [AX25] 6.15.10 long term stable kernel oops
+To: Dan Cross <crossd@gmail.com>, Bernard Pidoux <bernard.pidoux@free.fr>
+Cc: David Ranch <dranch@trinnet.net>, linux-hams@vger.kernel.org,
+ netdev <netdev@vger.kernel.org>
+References: <11c5701d-4bf9-4661-ad8a-06690bbe1c1c@free.fr>
+ <fff0b3eb-ea42-4475-970d-30622dc25dca@free.fr>
+ <e92e23a7-1503-454f-a7a2-cedab6e55fe2@free.fr>
+ <acd04154-25a5-4721-a62b-36827a6e4e47@free.fr>
+ <CAEoi9W6kb0jZXY_Tu27CU7jkyx5O1ne5FOgvYqCk_GFBvnseiw@mail.gmail.com>
+Content-Language: en-US
+From: F6BVP <f6bvp@free.fr>
+In-Reply-To: <CAEoi9W6kb0jZXY_Tu27CU7jkyx5O1ne5FOgvYqCk_GFBvnseiw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, Aug 18, 2025 at 02:42:28AM -0700, syzbot wrote:
-> syzbot has found a reproducer for the following issue on:
-> 
-> HEAD commit:    8f5ae30d69d7 Linux 6.17-rc1
-> git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
-> console output: https://syzkaller.appspot.com/x/log.txt?x=1321eba2580000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=8c5ac3d8b8abfcb
-> dashboard link: https://syzkaller.appspot.com/bug?extid=1ec0f904ba50d06110b1
-> compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
-> userspace arch: arm64
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10cba442580000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10a1eba2580000
-> 
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/18a2e4bd0c4a/disk-8f5ae30d.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/3b5395881b25/vmlinux-8f5ae30d.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/e875f4e3b7ff/Image-8f5ae30d.gz.xz
-> mounted in repro: https://storage.googleapis.com/syzbot-assets/43186d9e448c/mount_0.gz
->   fsck result: failed (log: https://syzkaller.appspot.com/x/fsck.log?x=174ba442580000)
-> 
-> The issue was bisected to:
-> 
-> commit d15121be7485655129101f3960ae6add40204463
-> Author: Paolo Abeni <pabeni@redhat.com>
-> Date:   Mon May 8 06:17:44 2023 +0000
-> 
->     Revert "softirq: Let ksoftirqd do its job"
+Hi Dan,
 
-Would be interesting to see how it behaves on 
+I agree that it must be the same bug and mkiss module is involved in 
+both cases although the environment is quite different.
+I am using ROSE/FPAC nodes on different machines for AX25 messages 
+routing with LinFBB BBS.
+Nowadays I do not have radio anymore and all are interconnected via 
+Internet using IP over AX25 encapsulation with ax25ipd (UDP ports).
 
-git://git.kernel.org/pub/scm/linux/kernel/git/viro/vfs.git #fixes (cda250b0fc83)
+I am running two RaspBerry Pi 3B+ with RaspiOS 64Bit and kernel 6.12.14.
+AX25 configuration is performed via kissattach to create ax0 device.
+ROSE / FPAC suite of applications manage ROSE, NetRom and AX25 protocols 
+for communications. FBB BBS forwards via rose0 port and TCP port 23 
+(telnet).
+
+I do not observe any issue on those RasPiOS systems.
+
+Another mini PC with Ubuntu 24-04 LTS and kernel 6-14.0-27-generic is 
+configured identiquely with FPAC/ROSE node and have absolutely no issues 
+with mkiss, ROSE or NetRom.
+
+A few years ago I had been quite active on debugging ROSE module. As I 
+wanted to restart AX25 debugging I installed Linux-6.15.10 stable 
+kernel. This was the beginning of my kernel panic hunting...
+
+My strategy is to find the most recent kernel that do not have any issue 
+with mkiss and progressively add AX25 patches in order to find the 
+guilty instruction. I will use a buch of printk in order to localize the 
+wrong code. We will see if it works.
+
+Bernard
+f6bvp / ai7bg
+
+
+Le 18/08/2025 à 18:30, Dan Cross a écrit :
+> On Mon, Aug 18, 2025 at 6:02 AM Bernard Pidoux <bernard.pidoux@free.fr> wrote:
+>> Hi,
+>>
+>> I captured a screen picture of kernel panic in linux-6.16.0 that
+>> displays [mkiss]. See included picture.
+> 
+> Hi Bernard,
+> 
+>      This is the same issue that I and a few other folks have run into.
+> Please see the analysis in
+> https://lore.kernel.org/linux-hams/CAEoi9W4FGoEv+2FUKs7zc=XoLuwhhLY8f8t_xQ6MgTJyzQPxXA@mail.gmail.com/#R
+> 
+>      There, I traced the issue far enough to see that it comes from
+> `sbk->dev` being NULL on these connections. I haven't had time to look
+> further into why that is, or what changed that made that the case. I
+> now think that this occurs on the _first_ of the two loops I
+> mentioned, not the second, however.
+> 
+>          - Dan C.
+> 
+> (Aside: I'm pretty sure that `linux-hams@vger.kernel.org` is not a
+> Debian-specific list.)
+
 
